@@ -1,188 +1,143 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36D2020A5DD;
-	Wed, 22 Oct 2025 01:37:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 003AC21A459
+	for <linux-block@vger.kernel.org>; Wed, 22 Oct 2025 02:16:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761097031; cv=none; b=skiDZAeJMHBQnbGyoUB/5tJP3EnILTvkZEkkYgLoIK93yPzs41jcXo1w4vA/oL0kkKsgYejU0Yo3pKPWjfZu+s+5E65dKyZOBB40LibPb+U6K5eUIE8kEd+sMxXPVp7Sdblk8mFi88F/j8VhcLsDXNTQ1edg8FWgJsNVfrgw3OU=
+	t=1761099366; cv=none; b=L/E4+UNNmGnDMXs4EZ1JUk7P35uPHJB1czA042nC00VMXpQ1afXj6n3vZYkVNI6Wkcr2wBh/XqRSBPVZrRn8eVCILwiLkmszCwUl8ULMR5NeXwvVYo5PIK/RqFyviMXrFzv6pSH7CDIEnGI9Yd5cobJWTmyqBqPQd7RdPAdGx6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761097031; c=relaxed/simple;
-	bh=Q/PKMKOCggyE+SSA0vmyycgYe9N/4wQG7i6MvUpns2o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=s71tWOYGg3EupZdtKJ1G/tl3dUbRqrQ0y4VIYG7cfB/bJKycIeVa/wLUj43/EsPJsTDiRQqzeJ/JotCaImkTr1MqyxEBh1vkxK7uQe54HyRQxHgVNDF8lOFSLmbrkrB4eQo2QoWo4FJhEpnexaTVBIxzHy/pX1GNhVgIVeowNYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4crsFS415qzKHMKc;
-	Wed, 22 Oct 2025 09:36:12 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id BAC7B1A19D3;
-	Wed, 22 Oct 2025 09:36:59 +0800 (CST)
-Received: from [10.67.111.176] (unknown [10.67.111.176])
-	by APP1 (Coremail) with SMTP id cCh0CgDnWk45NfhooJirBA--.61559S2;
-	Wed, 22 Oct 2025 09:36:59 +0800 (CST)
-Message-ID: <6d046d0a-30d4-429e-8ae3-f00b6149c397@huaweicloud.com>
-Date: Wed, 22 Oct 2025 09:36:56 +0800
+	s=arc-20240116; t=1761099366; c=relaxed/simple;
+	bh=ZNYpaJWfK2uX7fNuNpV/cydFuI7wkAz8CLs/mB6yfTU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UNLMcCd4Xl/k2icNdV9r+jEV86tHLQdwOSXtkceyThSdOUEuJ8t8ZoUrpUoiw56cGb+iL2KOC5Adnd+TuEdq2lJcEtJipyo/CPdmGgcVoneOhIiABYRvZzoMN57nf6bil1CmLPSRRwzMo9Cflc+z510QR4YJDJQJVUEZF2ogc88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dGvnAwwZ; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dGvnAwwZ"
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-781ea2cee3fso5631004b3a.0
+        for <linux-block@vger.kernel.org>; Tue, 21 Oct 2025 19:16:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761099363; x=1761704163; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+yFbQwKVrg4ulSzHTYcdE0/YBPiD7WzPZ8N0zJ6yfUg=;
+        b=dGvnAwwZt24nsiLUJRQ+UeeMvxr4qhMK7hbIRNA/JtjRZm+MyX5aOyGPmAE9+aG63s
+         sIPjbmktHkBIYrux7vtL2hYmwgKy0ZO3SrjGJoinbBzGJ0vhWAzp3oFa2NwKF+6HSpaF
+         U33/acgsn/aL38aB64HDrZvRVH3aNZwo/M+146H2/AR8b2/2Bsd1Sx4Ti5+ucnXNz4rP
+         jDfYjgKGeoOKPPUszAjZK8/F2YJ5RlC+Z7nmDvQ5Hymjjng1sFkw+m7TSR13ClGpOhwb
+         mWuP6aVNTUZKshV9RAdycFKEF39Uue+m3oIL87XatFOPv0ffaBxrpAiEi6kShMe0dkda
+         r2sg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761099363; x=1761704163;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+yFbQwKVrg4ulSzHTYcdE0/YBPiD7WzPZ8N0zJ6yfUg=;
+        b=w4lElAkWEp5qV9gVyK99lUNy2cJ+vy6/sQ1zO2ULZLqsi2txvfjQxzr/VG8Ef4MiqR
+         REHv40FJxFdmVxbNfHys78M4IB50ps4aNpvjbe2T++QrZDdrzWT+o0MaL+scGCvxIgY6
+         wELXbh8DIWwYYjJyZVja9k3nZHzDhALp0zCdSZUK0qvI3D9CqrAXLnAmXsCrZQuWl1S5
+         J6UPmGcRM5Nlxt+D15GpPxz6XyR4JiiF5lUXpn666PH6Q3fvGbuG0Bh5U4jmTTQc1cMM
+         hty8WOkdYShx5RTnIgTOS/SYo9GRApUTznYE/Lh9A2jkORBUwwLqctsLgLctWdZgu0OF
+         XGlg==
+X-Forwarded-Encrypted: i=1; AJvYcCXB9AzyXRrVYcgVubQqdtQGwDY4PzTFgvg2qtT7hWwEmr5MU+OS/2vUFT2f6D/xEdo748AQsY9lXG7twQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YywwGtkeF08LqhAxDpd4/icQLM/0hpOJ/2pmOtz6Y4RfSOwttae
+	G6SY17o9y4vtws2URQPIrnox1WIAIYhzrEICadwpFA2owKYmHv60IqDW
+X-Gm-Gg: ASbGncui8JyyPRYlydCW6/hOO+vpX+4m97qA5CYFEn7yAT7hAc+IiKt3H6XHc5aK2Ac
+	+b1qWBTq/U4ODfKcV2gZkkXJCnjKugefqcF8rEpEDxLxcVwKIXk5K94F6jjwUbhnp8Ri4CUhECZ
+	MCo1ZykMvYtlb5f8PXO6fMiQNR1gC4diFtTO0EPSQ5c8Vs/aLF6ovF+YBkFWnpHcG80fEKzv2Cx
+	IC/7ZcA2NE55taKsJnMBIoAO0L1g0Onzxr6k4S3CNydcpJW/X2Efl9Y41UZDKMEDNvuTUM/fT2t
+	DdOspEpkHqZy2gAWXQO0RPIhY3FXbsriC/L4uPI41Tk1SFlIVZ0jw0V+VCDa/87OQuYQ+P/rNnG
+	wXzTeKINyk64d/VR+NY8Gu0/OsKtgv4mG7VYfjeqbx23jVBuIkvsQgTcFSSiPYbYgrTNHn3XbKj
+	bZ1HJ94K1VAHcW
+X-Google-Smtp-Source: AGHT+IHgcLczGY0gNkz46ZH3wqYDdp+xytg9WZxLoXNNek71M0Z3I+LEtQXMo7LSXlQTlq9C1XGtow==
+X-Received: by 2002:a05:6a20:5493:b0:304:4f7c:df90 with SMTP id adf61e73a8af0-334a861852amr26222250637.50.1761099363079;
+        Tue, 21 Oct 2025 19:16:03 -0700 (PDT)
+Received: from archie.me ([103.124.138.80])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7a23010da0bsm12753936b3a.55.2025.10.21.19.16.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Oct 2025 19:16:02 -0700 (PDT)
+Received: by archie.me (Postfix, from userid 1000)
+	id 48C344209E4B; Wed, 22 Oct 2025 09:16:00 +0700 (WIB)
+Date: Wed, 22 Oct 2025 09:16:00 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Askar Safin <safinaskar@gmail.com>, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Al Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
+	Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	Andy Shevchenko <andy.shevchenko@gmail.com>,
+	Aleksa Sarai <cyphar@cyphar.com>,
+	Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>,
+	Julian Stecklina <julian.stecklina@cyberus-technology.de>,
+	Gao Xiang <hsiangkao@linux.alibaba.com>,
+	Art Nikpal <email2tema@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Alexander Graf <graf@amazon.com>, Rob Landley <rob@landley.net>,
+	Lennart Poettering <mzxreary@0pointer.de>,
+	linux-arch@vger.kernel.org, linux-block@vger.kernel.org,
+	initramfs@vger.kernel.org, linux-api@vger.kernel.org,
+	linux-doc@vger.kernel.org, Michal Simek <monstr@monstr.eu>,
+	Luis Chamberlain <mcgrof@kernel.org>, Kees Cook <kees@kernel.org>,
+	Thorsten Blum <thorsten.blum@linux.dev>,
+	Heiko Carstens <hca@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
+	Dave Young <dyoung@redhat.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Borislav Petkov <bp@alien8.de>, Jessica Clarke <jrtc27@jrtc27.com>,
+	Nicolas Schichan <nschichan@freebox.fr>,
+	David Disseldorp <ddiss@suse.de>, patches@lists.linux.dev
+Subject: Re: [PATCH v3 2/3] initrd: remove deprecated code path (linuxrc)
+Message-ID: <aPg-YF2pcyI-HusN@archie.me>
+References: <20251017060956.1151347-1-safinaskar@gmail.com>
+ <20251017060956.1151347-3-safinaskar@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 13/33] cpuset: Update HK_TYPE_DOMAIN cpumask from cpuset
-To: Waiman Long <llong@redhat.com>, Frederic Weisbecker
- <frederic@kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Cc: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Bjorn Helgaas <bhelgaas@google.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Danilo Krummrich
- <dakr@kernel.org>, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Gabriele Monaco <gmonaco@redhat.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
- Lai Jiangshan <jiangshanlai@gmail.com>,
- Marco Crivellari <marco.crivellari@suse.com>, Michal Hocko
- <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
- Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
- Phil Auld <pauld@redhat.com>, "Rafael J . Wysocki" <rafael@kernel.org>,
- Roman Gushchin <roman.gushchin@linux.dev>,
- Shakeel Butt <shakeel.butt@linux.dev>, Simon Horman <horms@kernel.org>,
- Tejun Heo <tj@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Vlastimil Babka <vbabka@suse.cz>, Will Deacon <will@kernel.org>,
- cgroups@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-block@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20251013203146.10162-1-frederic@kernel.org>
- <20251013203146.10162-14-frederic@kernel.org>
- <0e02915f-bde7-4b04-b760-89f34fb0a436@redhat.com>
-Content-Language: en-US
-From: Chen Ridong <chenridong@huaweicloud.com>
-In-Reply-To: <0e02915f-bde7-4b04-b760-89f34fb0a436@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgDnWk45NfhooJirBA--.61559S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxAr1kGF15JryxWFy5KrWruFg_yoWrurW7pF
-	WkWFWxWFWUGwn3G3s8Jw1DZry5Wws7Cw1UGrn2ga15AF17WF1jq34j9rnIgr18Zw4xCr12
-	vFn0v39a93W7ArJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvYb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
-	14v26rWY6Fy7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
-	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWrXVW8
-	Jr1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7
-	CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v2
-	6r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07
-	j6a0PUUUUU=
-X-CM-SenderInfo: hfkh02xlgr0w46kxt4xhlfz01xgou0bp/
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="m/ueW+980/ea0Wf8"
+Content-Disposition: inline
+In-Reply-To: <20251017060956.1151347-3-safinaskar@gmail.com>
 
 
+--m/ueW+980/ea0Wf8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 2025/10/21 12:10, Waiman Long wrote:
-> On 10/13/25 4:31 PM, Frederic Weisbecker wrote:
->> Until now, HK_TYPE_DOMAIN used to only include boot defined isolated
->> CPUs passed through isolcpus= boot option. Users interested in also
->> knowing the runtime defined isolated CPUs through cpuset must use
->> different APIs: cpuset_cpu_is_isolated(), cpu_is_isolated(), etc...
->>
->> There are many drawbacks to that approach:
->>
->> 1) Most interested subsystems want to know about all isolated CPUs, not
->>    just those defined on boot time.
->>
->> 2) cpuset_cpu_is_isolated() / cpu_is_isolated() are not synchronized with
->>    concurrent cpuset changes.
->>
->> 3) Further cpuset modifications are not propagated to subsystems
->>
->> Solve 1) and 2) and centralize all isolated CPUs within the
->> HK_TYPE_DOMAIN housekeeping cpumask.
->>
->> Subsystems can rely on RCU to synchronize against concurrent changes.
->>
->> The propagation mentioned in 3) will be handled in further patches.
->>
->> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
->> ---
->>   include/linux/sched/isolation.h |  2 +
->>   kernel/cgroup/cpuset.c          |  2 +
->>   kernel/sched/isolation.c        | 75 ++++++++++++++++++++++++++++++---
->>   kernel/sched/sched.h            |  1 +
->>   4 files changed, 74 insertions(+), 6 deletions(-)
->>
->> diff --git a/include/linux/sched/isolation.h b/include/linux/sched/isolation.h
->> index da22b038942a..94d5c835121b 100644
->> --- a/include/linux/sched/isolation.h
->> +++ b/include/linux/sched/isolation.h
->> @@ -32,6 +32,7 @@ extern const struct cpumask *housekeeping_cpumask(enum hk_type type);
->>   extern bool housekeeping_enabled(enum hk_type type);
->>   extern void housekeeping_affine(struct task_struct *t, enum hk_type type);
->>   extern bool housekeeping_test_cpu(int cpu, enum hk_type type);
->> +extern int housekeeping_update(struct cpumask *mask, enum hk_type type);
->>   extern void __init housekeeping_init(void);
->>     #else
->> @@ -59,6 +60,7 @@ static inline bool housekeeping_test_cpu(int cpu, enum hk_type type)
->>       return true;
->>   }
->>   +static inline int housekeeping_update(struct cpumask *mask, enum hk_type type) { return 0; }
->>   static inline void housekeeping_init(void) { }
->>   #endif /* CONFIG_CPU_ISOLATION */
->>   diff --git a/kernel/cgroup/cpuset.c b/kernel/cgroup/cpuset.c
->> index aa1ac7bcf2ea..b04a4242f2fa 100644
->> --- a/kernel/cgroup/cpuset.c
->> +++ b/kernel/cgroup/cpuset.c
->> @@ -1403,6 +1403,8 @@ static void update_unbound_workqueue_cpumask(bool isolcpus_updated)
->>         ret = workqueue_unbound_exclude_cpumask(isolated_cpus);
->>       WARN_ON_ONCE(ret < 0);
->> +    ret = housekeeping_update(isolated_cpus, HK_TYPE_DOMAIN);
->> +    WARN_ON_ONCE(ret < 0);
->>   }
->>     /**
->> diff --git a/kernel/sched/isolation.c b/kernel/sched/isolation.c
->> index b46c20b5437f..95d69c2102f6 100644
->> --- a/kernel/sched/isolation.c
->> +++ b/kernel/sched/isolation.c
->> @@ -29,18 +29,48 @@ static struct housekeeping housekeeping;
->>     bool housekeeping_enabled(enum hk_type type)
->>   {
->> -    return !!(housekeeping.flags & BIT(type));
->> +    return !!(READ_ONCE(housekeeping.flags) & BIT(type));
->>   }
->>   EXPORT_SYMBOL_GPL(housekeeping_enabled);
->>   +static bool housekeeping_dereference_check(enum hk_type type)
->> +{
->> +    if (IS_ENABLED(CONFIG_LOCKDEP) && type == HK_TYPE_DOMAIN) {
->> +        /* Cpuset isn't even writable yet? */
->> +        if (system_state <= SYSTEM_SCHEDULING)
->> +            return true;
->> +
->> +        /* CPU hotplug write locked, so cpuset partition can't be overwritten */
->> +        if (IS_ENABLED(CONFIG_HOTPLUG_CPU) && lockdep_is_cpus_write_held())
->> +            return true;
->> +
->> +        /* Cpuset lock held, partitions not writable */
->> +        if (IS_ENABLED(CONFIG_CPUSETS) && lockdep_is_cpuset_held())
->> +            return true;
-> 
-> I have some doubt about this condition as the cpuset_mutex may be held in the process of making
-> changes to an isolated partition that will impact HK_TYPE_DOMAIN cpumask.
-> 
-> Cheers,
-> Longman
-> 
+On Fri, Oct 17, 2025 at 06:09:55AM +0000, Askar Safin wrote:
+> +		if (rd_load_image()) {
+> +			pr_warn("using deprecated initrd support, will be removed in Septembe=
+r 2026; "
+> +				"use initramfs instead or (as a last resort) /sys/firmware/initrd; "
+> +				"see section \"Workaround\" in "
+> +				"https://lore.kernel.org/lkml/20251010094047.3111495-1-safinaskar@gm=
+ail.com\n");
+>  		}
 
-+1
+Do you mean that initrd support will be removed in LTS kernel release of 20=
+26?
 
-ie. 'echo isolate > cpuset.cpus.partition'
+Thanks.=20
 
--- 
-Best regards,
-Ridong
+--=20
+An old man doll... just what I always wanted! - Clara
 
+--m/ueW+980/ea0Wf8
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCaPg+YAAKCRD2uYlJVVFO
+o9OtAQCr/giTF4+FVt9hiDGkb1l4yn/kE0D0NKGYI1gigRnAqAEAhLIU0ssllGOB
+IgSBphGX7ddV9bgZvHiqagtFYOgJwwo=
+=plLG
+-----END PGP SIGNATURE-----
+
+--m/ueW+980/ea0Wf8--
