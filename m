@@ -1,240 +1,434 @@
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21DDC1607A4
-	for <linux-block@vger.kernel.org>; Wed, 22 Oct 2025 08:51:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761123083; cv=fail; b=Gc9uLCal/JStKjAaID8r6c3uSxsS12sr+CaTW57mhXVq7zL8HXW6esk7aqL9U43r0xD0l6SxC+dq/rxCLIXSHx926ipzxrrbQxilUYCmMSk5uKrudKJZX6rS3XyxRXCBPSPgQggD2sh4c2dnhXvUVOMi9E8EFw+kxm2z26fv8/I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761123083; c=relaxed/simple;
-	bh=rpL0Pv17h4Ig99lwTnSgJpP7VG7uGWAtwXEW1sFzDVk=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Xuzfen/mkuJDqOdMgm4Xoe3GSQmIINdRmmxeGhddEgLBapwD8QGLQ6b1ku8H5AU89mr9xCV4x16IKjwWV5u+HyXcf+mAzI/apKxuC0vixZgYyoVldPR5vZAfbUTnpxmhw2CzC8Kb0y7O6AHHTJWF0hrYB5N/cNfLY9T41cVuy2E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=PE1aif6v; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=q+fZaM3D; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2210E2367B8
+	for <linux-block@vger.kernel.org>; Wed, 22 Oct 2025 10:15:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761128140; cv=none; b=EOu8H9WtdH484hADtWqxZ2ZKkLBa4plDBk2oEbcX9fxf/CU/7NVbnYDA1TMxfCCeRSxLoaWDtc0kG0q4zI+XnYhU1Uc+c4jkODyYUNWOsf/HosVlk15b19wVH6hRhCRGniZ733X1Xkg8EPReHSTWoi7Aq2s6qblco0EGjHjRlBM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761128140; c=relaxed/simple;
+	bh=BKY2HztaHoZgXSgLSe5nbZxVuvCJIyCNNGgnNWZsHyQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M0An6Q9E43PgFWyq4sWEfiGRu8svLMNkipF7+sO1iZDWgspVbjdTYFSza0IWvonVeZnIZsP9J/Yg22xKA+LkQRke/tTsT/V4uzVGNB79i0x5wGm6UUZD/1SmN8JfUFZh9hwupAeCglWs32p0LaBmGzDcEJKgMg9K2jM7v1qVyC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NjoI/4sV; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="PE1aif6v";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="q+fZaM3D"
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59M8CGat001300;
-	Wed, 22 Oct 2025 08:51:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	corp-2025-04-25; bh=D6hLYwL9WCEWS4zVsD4hVrixuLLFwUZW8h6S1EugbYM=; b=
-	PE1aif6v++WEb6WtggDloLbD0WdhEbT5H5WbEnCGfzwSmzmDZKxypMg5tXSTUJej
-	MCdTBWP3oEdxVDA+G2Y1Tc3NAEYJHGaENJGjjKfI3Y/HfCNU2QsiBuL8qayjRNKV
-	RWERdpDwhhlix4OMh+ej6pfnrwsVNaAJMXEBFQbansVxZR0X/klrZXSU3SbatdVJ
-	TeNCdWEFoCswsim1st4rLhZBAzR4MB41V/wMJ5Eip8ynHUfiSC4yUJuP0XreNVmq
-	0N4vpDuGxyrfvxb9eRKjv61aOHVv8zwCBvGLtXNNscoxq2nsbhtG0+4D6Oxo4SNr
-	ch8qxSWxEOpukOuuzz6YyA==
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 49xstyg8mr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 22 Oct 2025 08:51:02 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 59M8jF52035131;
-	Wed, 22 Oct 2025 08:51:01 GMT
-Received: from byapr05cu005.outbound.protection.outlook.com (mail-westusazon11010005.outbound.protection.outlook.com [52.101.85.5])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 49v1bdx7ck-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 22 Oct 2025 08:51:01 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=he3z9TEIe8jD9a7VtKfWxzQKkBqbIAN6jN4rZgXhbDNsKgC7ZDrfJrtNVFfURWFAzMRcJiNlOlCmquIGLvM0oDtQC9vxGcPCIx2GayDjngq/y0BC1nC4eacauRjO5uFpjQBjKErjAhFaLKiKIOTuGXRmX/fT/uc2jarrEDL/CP6tjtXdalOTk8X4oyLeOpCn+FLNnqXD2J24uqG5hkEMjS232InRroHNRnxegL8wIhPWgz64HYBtL4RpmVx+6S9vaADEVlTlNWmpxKB1ayY1bVQFf+UNCGDqWkFV3d6bQ6j2ZAqC2Jm0ylHnzZwrx2u5c8pd1bU8YFbsTDeizIsHhg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=D6hLYwL9WCEWS4zVsD4hVrixuLLFwUZW8h6S1EugbYM=;
- b=CUbdgRTpokVSpuONS9KOFjLsIfKHSt5mR4FuVQ+LSJI31zA2gm+OMdeyoRITHczsebDKruIiMoXddH8hQnOOxriSoUIqOpXa1eCa1H+BCkg+r6vrph7feh5AEDGmOUzttsPiYrDrHPpZsK7btKV4jxDdIQna+1M7H/3qjj8YOw5UGhji9kQJ9ZlbdYo16+7/JRVpAFCQEiTxbmOuKGk3l8Uh6A1QJXXPO8NtqERoHVDj+f3VCJdvEhE1bwcK3xTdUBDDhypKkqaIaz/J8GnlXXKpJZM/dMsCcYEcP2pla/ff7f8rxdHYM3qwPhey6k+BKWnYpMMIbwRz0rUsqobn9w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=D6hLYwL9WCEWS4zVsD4hVrixuLLFwUZW8h6S1EugbYM=;
- b=q+fZaM3DXMEWXS4sBegUyjStw1RXTw20/PBqkxwPCfuvJECc/BNJvU/7e6v3aw5AEhz5LKprTNGL6lMFMmLOyTKfb1eUnGN3XMTn56cfFnXvcZP6kre8sEclI2ATVuWcj4vWsC62A4BRRyS9MOgZXJX2yObCMok8zHBP7L8guA8=
-Received: from MN2PR10MB4320.namprd10.prod.outlook.com (2603:10b6:208:1d5::16)
- by IA1PR10MB7469.namprd10.prod.outlook.com (2603:10b6:208:446::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9253.12; Wed, 22 Oct
- 2025 08:50:58 +0000
-Received: from MN2PR10MB4320.namprd10.prod.outlook.com
- ([fe80::42ec:1d58:8ba8:800c]) by MN2PR10MB4320.namprd10.prod.outlook.com
- ([fe80::42ec:1d58:8ba8:800c%5]) with mapi id 15.20.9253.011; Wed, 22 Oct 2025
- 08:50:58 +0000
-Message-ID: <e7873ec2-c447-4eda-9725-80e614c3e210@oracle.com>
-Date: Wed, 22 Oct 2025 09:50:55 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: What should we do about the nvme atomics mess?
-To: Nilay Shroff <nilay@linux.ibm.com>, Keith Busch <kbusch@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org
-References: <20250707141834.GA30198@lst.de>
- <ee663f87-0dbd-4685-a462-27da217dd259@linux.ibm.com>
- <aG7fArgdSWIjXcp9@kbusch-mbp>
- <27a01d31-0432-4340-9f45-1595f66f0500@linux.ibm.com>
- <a454f040-327c-46d1-8d0a-7745eb8a7aaf@oracle.com>
- <501169ee-37e9-4b15-89ae-8f2b57da270f@linux.ibm.com>
-Content-Language: en-US
-From: John Garry <john.g.garry@oracle.com>
-Organization: Oracle Corporation
-In-Reply-To: <501169ee-37e9-4b15-89ae-8f2b57da270f@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO4P265CA0300.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:391::10) To MN2PR10MB4320.namprd10.prod.outlook.com
- (2603:10b6:208:1d5::16)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NjoI/4sV"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1761128137;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=42xj7SxCOi2bUIpSukTLyYbT4eu7t1ZV7feZ7Rc8KgU=;
+	b=NjoI/4sVSJIfx5JonhBsR17SkK/MwHTekc4ntgQcrCe9Cy4IDvfsQswX2EUjxhi+8W04fE
+	0uGQklHdKRBAZyUMRKRhrnGc8PcyNpky+FtkSUrCjo/sN5XUo3pUNfq2UaT97N3XN8ImbI
+	pHQkuLTX+2qXPY8lSxLaBYxEVIA+SI4=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-465-OyQTpqXLN0-0dwaz_ePWjw-1; Wed,
+ 22 Oct 2025 06:15:35 -0400
+X-MC-Unique: OyQTpqXLN0-0dwaz_ePWjw-1
+X-Mimecast-MFC-AGG-ID: OyQTpqXLN0-0dwaz_ePWjw_1761128134
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7407E19560B1;
+	Wed, 22 Oct 2025 10:15:34 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.30])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9665D30001BF;
+	Wed, 22 Oct 2025 10:15:30 +0000 (UTC)
+Date: Wed, 22 Oct 2025 18:15:25 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Uday Shankar <ushankar@purestorage.com>
+Subject: Re: [PATCH 08/23] ublk: handle UBLK_U_IO_PREP_IO_CMDS
+Message-ID: <aPiuvRXKHYC9KL8C@fedora>
+References: <20250901100242.3231000-1-ming.lei@redhat.com>
+ <20250901100242.3231000-9-ming.lei@redhat.com>
+ <CADUfDZr6QLHHaM=LJfRKXKGyE+2Emzhvkab53Yen1Cyinp21hg@mail.gmail.com>
+ <aMD27G9-rwJpU49_@fedora>
+ <CADUfDZoQwNhQncLYi-AZZGpPSackgKejXYoBZh43sciCAUDGCg@mail.gmail.com>
+ <aPDELNXqlckznZJI@fedora>
+ <CADUfDZqCo2O0toQ0M=RBDLnYkANJJ3iQkFmpD_QDbbimx6egRg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN2PR10MB4320:EE_|IA1PR10MB7469:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3ca14960-9201-4b8c-f6e2-08de11481ec5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?TjAxdDBBWit3TXJ4SFNkTFpvbjB2djU0UENReFRZWmNkRHZCNklHVG12S2RX?=
- =?utf-8?B?S0lSWlQ4NUlDY25Ia3FIYzBxM1hQQkVWTXN5Z3JJN1ltUXVRMlBXSWZ6aEJC?=
- =?utf-8?B?M2JrcHE5UkRFdXlOZGlBVHhUejVtZVdla1FrWCtoZ283ZW9adlNSdnJjQUJx?=
- =?utf-8?B?NmthMHhPRzhpMGRYZ1d1VEFIN3pjcjNpTDQ1TncwODFkUnA4T1RranJPSm02?=
- =?utf-8?B?bVM1OXRDWEFVYjVOY2libkdCS0MycnV3eGZxTE9LcWkzYVRHVUJSV1JjbXZ4?=
- =?utf-8?B?NGk5ZDJTR0xrV2NxamxEeWRtUHkxUERHZFFNZDF4N3lUWDFKYTZpSitoeDBU?=
- =?utf-8?B?UERCdVgxa1o4QzdwY2Jza2JUTDZhOFFEcW1OdnZWSjhTNTdXcnpKdUtiRXRG?=
- =?utf-8?B?WVJpYmZxY080dFJ1alhtc3RqZk5oaklOZ29YTCtjZUhlVElVSE52TlRQMnow?=
- =?utf-8?B?TVMzZ0htWmFiZmhnVU55V3RLeGRuYzAxKytSNXRzZUp3L0Y2QlcxREN3RGxm?=
- =?utf-8?B?b29mNUxIRnNEL2MwTzg4U0NQWHFwODh2RmE3UzhvMXp2Uk01Y2RyMGk0c2dW?=
- =?utf-8?B?ZjgvdmJ2OS96d1NFZ2J0NDBBQXIrZDg1NnUxdzVRMHllV0IxUlVCL1BxaFlO?=
- =?utf-8?B?VUpaVkt1cml6Y0tnZFQ4OUpjNDdoZy8vV05ZeG8vR3BmajRnL1U4ek9iNHFW?=
- =?utf-8?B?V013cnZwUDAvSjdHbCs2eHNCMHpnb0E0VUU5RkNoY1hIcTk4T1crRW1PWHd6?=
- =?utf-8?B?L1psNHUyYitZbjdrYTRhK09EeFpPVStyZkRpSS8yQVRjclBNQUlDUVBvTTNw?=
- =?utf-8?B?bVAvNUF5cGJ2VlBzTTVQMlhNY3pCQlZNRDZpZ0tOV2d1OWtkMGEyOU5nYlZM?=
- =?utf-8?B?Y0N1NHdHMnlIRmFIanUrYkdXQ1NhVzY1aUhRaTRsOExsKzJ5TXp0dnAxMUFY?=
- =?utf-8?B?NjZzRm1GUC8zWHI4YXY4ZXFtZmR0NUFTN25wVkRmMG5WU3ZFMFpFenQzaW02?=
- =?utf-8?B?TGxCTjFSMzRqZlBBaXZYYmJVaDkrNjRZTWF3WEJuSFVoQ3NFZ0V4N3BpeDdT?=
- =?utf-8?B?eitMVmxPRzJXTVBEd0svMitoaGQrYUlLVGRPMHBNR0tsS0RnVDJsNTl6VFZ4?=
- =?utf-8?B?L1lXblQyVFR1dXQ2amF5STZMYkg4MGVZYWdmYVp2Q3BJVDI5U0pWQm5vNXpG?=
- =?utf-8?B?NkpwcUJDem5RMzBMeUhtVHRYS2txTGZsM2ozNnlFSHBzb1NMcEJKZW04SHFw?=
- =?utf-8?B?bk1vNzNWYVRjNXVFc3ZuY0JJZFIrcmpSdVdJU2h0VzFyaTVTaytMZUdBZmJH?=
- =?utf-8?B?aEE5aDQ4WVRVbFZMbVJvYlB3OTlzay9LK0F4b3FrREViM25WUHB2ZkxUenN5?=
- =?utf-8?B?Z05UdUhnbDZLcXUvWm9TSy9OZzhZSisxNVJ2OFY5RDVhVGJTWFp3ZEV3cXdB?=
- =?utf-8?B?cFI1VmtwdzFKTEtFbE92RWtUTkw0Y1NrWXE5Wk5XeXlQNndDY0Nqb2VSQ1pv?=
- =?utf-8?B?amd6Y1BrNjE5K2huU0RtakR6NVQzWGtGVkI2Zlp6YzRWSW5mM3M0WFEvVkQx?=
- =?utf-8?B?ajFsTTRTYmdKZkRucjQwVXNFNkIrdzBrN0VuZTBVVTlXdGU0VWhJLzV4ckNF?=
- =?utf-8?B?RW5pKzJicHR4UEpOaURoOXBvaFhybks5NVdXd29HOXJzLzV3NGFPcXBJN21D?=
- =?utf-8?B?SVM1V0wvaGlJdCs4RW5ST0NheFVuMlFvTFZpZmlFTjJDUWdvN00vbnVrQUM4?=
- =?utf-8?B?U3YvQUQ4ZmtjeHJJRnhrUW5XaGJBVVRhS0ZCakRSUmtxd2UzSjQ5NVVPR2FT?=
- =?utf-8?B?Um91eUNDU0k2Wk5uWWd2QmpEZkdQNWVEc0RQbW5ITkRvaVB4OVdiWkdUSWtk?=
- =?utf-8?B?UGkydVZZQUVxeFgraERuMXRoNzIrWUs4ejY3VUV6dFJ1N2FRK2U3Sm5mdWps?=
- =?utf-8?B?eVQxcHBQTnorcFZtMEc1dE8yVDFUZFU2a0p6VnpDYXdXRUU1OW53dkVUNTMy?=
- =?utf-8?B?YUtnSUNYSlN3PT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR10MB4320.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?T0ZtMWV3ZTVmYUdEQVhmV2k1NmdhSHM0WEc3bDdGcHE2dFlBNzZKUmxZVVho?=
- =?utf-8?B?N0ZFZFMyUlBjNFhleU91bjlvTm41dkhUYzNGRGc3bW14VFF5RWJmdjZ2d3Fx?=
- =?utf-8?B?V01MSmdnRUg4aFEwVjFzb0ZsQ2tySTVNWFZYZkQ1bks2RmdaUTNBYStoNDBy?=
- =?utf-8?B?K2ExWGVEbEY0Zm1jL1VUOVhtcVRjd09BMU9MT2dwY1FndUFzYXBZZWEramJu?=
- =?utf-8?B?ZVEvU3I3Q21GTkM3ZE04MnBvckhWaXZnNExtcjArY05KQWVSMndaN01OUFNP?=
- =?utf-8?B?SUFuc2JrNVZnVTV5M2x6MTRmNGU3dUNFM2FXNTlhcVVLb0lhdlNKbjVZUnU2?=
- =?utf-8?B?dS9BWjVBK1N2emFzZ0NrUklkZlpFS1hjMUh5V05PdlFWOG5RdWJCTXd3M1I5?=
- =?utf-8?B?Z2VBZWdEY3ppWUh2UHBNWmRweGJ2dnozWW1pa0xTckMyS2ljeitpQ0FEajBJ?=
- =?utf-8?B?alM0ZGpCZEdhT2dadGZBNGdac1FGcHF5cUZmdk9FejUwei96YU1YRjhlQ2JJ?=
- =?utf-8?B?cTY1aVZuZWF5dk9oYnB6MGRabEpEZGFlN09pcEVSL1d6V0lDRFZVNU1CL2lG?=
- =?utf-8?B?di9DdEdXcVhneExGdGF6d2d6OXNURC9jeTBMNStVQ0RZWlJ2dWNLaTBmU1RH?=
- =?utf-8?B?MTlWSGJQcU0wRW5CK1hDcnlvOGlCSUp2Z0R0Ri9LRHVkYm45SDJpNlVaa2Fo?=
- =?utf-8?B?N3JXVVF4T2thbSsxallTUnV0YjRWb0hxRnYzTUFPbFBmdUFDVzl2U1NqbzhY?=
- =?utf-8?B?TVo4cnNWYUVQdjV1VU85eFltYWlSbGgzNC96TGp0eDlSZXhKSC9STmRCNGE5?=
- =?utf-8?B?dEM5T3kvNmpLYkdlUXN2TFBrTC9EN1V2MHZlMTc1SzRvZ2ExeWRXcWEzc1h6?=
- =?utf-8?B?aXQySmdIWjY5Njc2TlFudXZ3NExyUUU4KzdKeWdUMWU2YVBHUmgySTRVK2ZS?=
- =?utf-8?B?WDNla0h5SUdIajVqY01QL3hCM2NRWkZOMXhxOXhXUDlhTWlNVlcrWC85elVn?=
- =?utf-8?B?VC9GdjlTYTUwQjNrR0lIeFp1V1ZVRSt4ZmdnRVphd2lFZ1hpV2JKVGpWUG9m?=
- =?utf-8?B?ODIyZE1iK1RMN3c4SkJYU242Y2lxQVlSYk92bnlseHRnbEIyeitxdUVIdEdF?=
- =?utf-8?B?cjFmWFJrSTFjb1liQUdNREIxRS9PeFljUHFmWGVMTm9vZVUrU3U4c0UzdFlE?=
- =?utf-8?B?Y3RwYThRdmRRTmNDa2pEMWZVM0FzaEM0NXhIRm95WCswZlRyVkdwVWxJL3lN?=
- =?utf-8?B?QlFITFYzY3M1bDRDdWtmRDhseEdQNXJudUVGbWZhcmJ5MFlIMkRSclZ3Zmc1?=
- =?utf-8?B?ZFMrNEJSMTFZQVJoY0NvcFNRYitMYkZIblF5TzBzNFBzTG91WkVPOExEV3VP?=
- =?utf-8?B?T1VzZWk2Yms5ZlFBZTFwOUZtSXhNSzZZZGtJcUxORVMxQU5sZ3M5aEZXbG5E?=
- =?utf-8?B?Q1dRTTEreW9hUnFRc2Z2bHlJbU02dDY0dkFRcEw1bGN5R1dEM0d6OXNuYmx0?=
- =?utf-8?B?eHRUSjVGSXdKS0lyUjMzWHhMWWlXNktaYlpIRWUzNis3ZmdMcGpkWWE2bXVv?=
- =?utf-8?B?RDFOZTE4dktjUmlQRjFIZ3BwcS9QYWg4TTIyRDI1d0FDeXhKVDNRb3RKTGov?=
- =?utf-8?B?bkEzbkpmSldzYVh4VmVCdHpnQjBvSlU5a1VFaXJkNWhiTC9SbEJURVljMGxx?=
- =?utf-8?B?NDNBZXBXcVQ3dS9oUjAzU0ovTmF5Vis0RmMzT2kxb2pUenNpZ3M3bXRzalRB?=
- =?utf-8?B?emFBaUdFWjAyYWJoTzV4Z1R1SndhSVlZQkxHL2NxMWFNbEJXWmE4UkJNcVA1?=
- =?utf-8?B?dmNGczMxMEwzZVd2QTJ1emh0cFpvMHdDUHZvY1NZQVhpY1BPSWNSN0ROeUNv?=
- =?utf-8?B?ZFJpQmxBTGRSTFNRU3lBRE1ldTZ0ZW5LZGl6eU5xbXRHMm8vTStkOFpYZ2RT?=
- =?utf-8?B?RTBja2ZqdDdxMy9oMElKVHQ3NzF2L0JuMXkvQ2l1WEF0VzY4NUY3WFYwenRY?=
- =?utf-8?B?SDYyKzV1ZE1CY1VxUXBIb3d4Wjd2WkVmVlVMV1BocjBSazJXdkc0UTU0K0p4?=
- =?utf-8?B?QTh1TGZuZ3RQc0lsVzFBYVQvbWp5aERLbnRDb2d3aHcyVU1PTnVldkc5UFI2?=
- =?utf-8?B?OHJQS2NqelVMNVYraEZ3MjM5RSsvb1Vhck9IdVJqY3E2V3o4L3IyVzdQOXh1?=
- =?utf-8?B?a0E9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	9oVGt8/IPGYJHcaAPOUlMbJOAkeCAEAZTmDuc/MboYkl0RsTgdfdFY9q4fgJU2oDIvCKSM8oaUdY8A4M9mcblG1TKzecMhito1ZT6O9kZOIm2yOE+6dnUVoLKhO+BMj3PI4kDSc29ZRlebr9MNzn9Mw9EN534omY4EBs/PGwPlLs6Bgd1Y92OHTDhXdO5hWu5sbCfznxEuYxuJIXZI4J6sXMtpChbfV68c6d3llXhVaqYDZcVVjR24Sq3BX1AyUuCDA0BLGhjoDN34dY/yyxZrMOP0GJk8Ay5QlP3JWSkSM0NOFp+6uJ0lNyVGxbtID+QGWCXMdxrgBLXQ0KIYBJa455vM3hjfSIlgMovLtNXOr82J2mpn6E4Q76s1txOm3Y+/hmoSEZJMTuDz4Va25XYWAl++m9TGelBwH/l9J0FyWqNgL1lokLur5Fkro9bufcawrWanMRUiYTKgNGD90vkTLZo502s36nKFxxl+4fmRGjtQB1u5EZtqd/WUzCzbxP2M9V9KsLG8hRA1hcyY8dYNd7hPYETCP6V9zshoYv2RgIkJj/mpVEL9OJgt6kBq4xTpW75gQDVqL6n59IFG0TYUT6uj2zK3VeNUn3Irl+JtQ=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3ca14960-9201-4b8c-f6e2-08de11481ec5
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR10MB4320.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Oct 2025 08:50:58.6679
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: lU4jKl0mMrYgGaYOn22gDGglEpxpbcXoDOJQ0Ex6P+IVwAyRZunDnY0GqsdiJ/Xp4suboJ3lRV8i6/FJRr7/Iw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR10MB7469
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-22_03,2025-10-13_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 malwarescore=0
- adultscore=0 bulkscore=0 spamscore=0 suspectscore=0 mlxscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2510020000 definitions=main-2510220070
-X-Proofpoint-GUID: ASzy6I7aLqtU5bmpvExDhUXy73doZ6ok
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDIyMDA1MCBTYWx0ZWRfX3G8HQVbe5npP
- b3xSIY9UIzytEK1c/RPwvkfffIVQFnKDxwLo91VfDwLtX3aQr/x5sY1fC5xkvlP/LVivFttapUC
- 6mSZsJLdOMbGOR25MdNG29nsZgjXCv6UTuJawpvflxmRr1p7z6u0H+WxKReeYV3Pyqvgl+XLtS1
- 8zGEZZBSthLm/bVX0EcXM9z51sF78Z7OtaD7kppjODbWw2JVK4i5xMjnMaOKf/fp3noEsb7xRk1
- 9u0a/OEaf3BkG+A9Qws31zfacw4GU47FTZsKi0RVlTKqza35QKUhqdtcoYczxi5nR4uD+KP1nIg
- ABm+VN2sW06HMJgV0A8Z06jBgXp4+ySzgszogf8Bop7OmtSyDGcb6NJE0JX+aAcnTIXnvr8MB/+
- ZfEMM9di63RrL8FroLCjAQ8mrlKo41hUrT/07rKo1NhnOVeug4s=
-X-Authority-Analysis: v=2.4 cv=OdeVzxTY c=1 sm=1 tr=0 ts=68f89af6 b=1 cx=c_pps
- a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17
- a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
- a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=I5r0CxplrSDLCy34:21 a=xqWC_Br6kY4A:10
- a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=GoEa3M9JfhUA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=yPCof4ZbAAAA:8
- a=2u6HmN_5VmDs7RH6YMAA:9 a=QEXdDO2ut3YA:10 cc=ntf awl=host:12091
-X-Proofpoint-ORIG-GUID: ASzy6I7aLqtU5bmpvExDhUXy73doZ6ok
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADUfDZqCo2O0toQ0M=RBDLnYkANJJ3iQkFmpD_QDbbimx6egRg@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On 21/10/2025 16:02, Nilay Shroff wrote:
+On Wed, Oct 22, 2025 at 01:00:53AM -0700, Caleb Sander Mateos wrote:
+> On Thu, Oct 16, 2025 at 3:08 AM Ming Lei <ming.lei@redhat.com> wrote:
+> >
+> > On Thu, Sep 18, 2025 at 11:12:00AM -0700, Caleb Sander Mateos wrote:
+> > > On Tue, Sep 9, 2025 at 8:56 PM Ming Lei <ming.lei@redhat.com> wrote:
+> > > >
+> > > > On Sat, Sep 06, 2025 at 12:48:41PM -0700, Caleb Sander Mateos wrote:
+> > > > > On Mon, Sep 1, 2025 at 3:03 AM Ming Lei <ming.lei@redhat.com> wrote:
+> > > > > >
+> > > > > > This commit implements the handling of the UBLK_U_IO_PREP_IO_CMDS command,
+> > > > > > which allows userspace to prepare a batch of I/O requests.
+> > > > > >
+> > > > > > The core of this change is the `ublk_walk_cmd_buf` function, which iterates
+> > > > > > over the elements in the uring_cmd fixed buffer. For each element, it parses
+> > > > > > the I/O details, finds the corresponding `ublk_io` structure, and prepares it
+> > > > > > for future dispatch.
+> > > > > >
+> > > > > > Add per-io lock for protecting concurrent delivery and committing.
+> > > > > >
+> > > > > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > > > > > ---
+> > > > > >  drivers/block/ublk_drv.c      | 191 +++++++++++++++++++++++++++++++++-
+> > > > > >  include/uapi/linux/ublk_cmd.h |   5 +
+> > > > > >  2 files changed, 195 insertions(+), 1 deletion(-)
+> > > > > >
+> > > > > > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > > > > > index 4da0dbbd7e16..a4bae3d1562a 100644
+> > > > > > --- a/drivers/block/ublk_drv.c
+> > > > > > +++ b/drivers/block/ublk_drv.c
+> > > > > > @@ -116,6 +116,10 @@ struct ublk_uring_cmd_pdu {
+> > > > > >  struct ublk_batch_io_data {
+> > > > > >         struct ublk_queue *ubq;
+> > > > > >         struct io_uring_cmd *cmd;
+> > > > > > +       unsigned int issue_flags;
+> > > > > > +
+> > > > > > +       /* set when walking the element buffer */
+> > > > > > +       const struct ublk_elem_header *elem;
+> > > > > >  };
+> > > > > >
+> > > > > >  /*
+> > > > > > @@ -200,6 +204,7 @@ struct ublk_io {
+> > > > > >         unsigned task_registered_buffers;
+> > > > > >
+> > > > > >         void *buf_ctx_handle;
+> > > > > > +       spinlock_t lock;
+> > > > >
+> > > > > From our experience writing a high-throughput ublk server, the
+> > > > > spinlocks and mutexes in the kernel are some of the largest CPU
+> > > > > hotspots. We have spent a lot of effort working to avoid locking where
+> > > > > possible or shard data structures to reduce contention on the locks.
+> > > > > Even uncontended locks are still very expensive to acquire and release
+> > > > > on machines with many CPUs due to the cache coherency overhead. ublk's
+> > > > > per-io daemon architecture is great for performance by removing the
+> > > >
+> > > > io-uring highly depends on batch submission and completion, but per-io daemon
+> > > > may break the batch easily, because it doesn't guarantee that one batch IOs
+> > > > can be forwarded in single io task/io_uring when static tag mapping policy is
+> > > > taken, for example:
+> > >
+> > > That's a good point. We've mainly focused on optimizing the ublk
+> > > server side, but it's true that distributing incoming ublk I/Os to
+> > > more ublk server threads adds overhead on the submitting side. One
+> > > idea we had but haven't experimented with much is for the ublk server
+> > > to perform the round-robin assignment of tags within each queue to
+> >
+> > round-robin often hurts perf, and it isn't enabled yet.
+> 
+> I don't mean BLK_MQ_F_TAG_RR. I thought even the default tag
+> allocation scheme resulted in approximately round-robin tag
+> allocation, right? __sbitmap_queue_get_batch() will attempt to
+> allocate contiguous bits from the map, so a batch of queued requests
+> will likely be assigned sequential tags (or a couple sequential runs
+> of tags) in the queue. I guess that's only true if the queue is mostly
+> empty; if many tags are in use, it will be harder to allocate
+> contiguous sets of tags.
 
--
+Yes, __sbitmap_queue_get_batch() may fail and fallback to single bit
+allocation, so you need to setup big queue depth for avoiding batch
+allocation failure. But it is still hard to avoid in case of very
+high IO depth.
 
->> Does the drive which you are using report NAWUPF as zero (as hinted)?
->>
->> If so, have you tried the followinghttps://lore.kernel.org/linux-nvme/20250820150220.1923826-1- 
->> john.g.garry@oracle.com/
->>
->> We were considering changing the NVMe driver to not use AWUPF at all...
-> Yes, I just tested your patch with the latest upstream kernel on my drive,
-> which reports a non-zero AWUPF but a zero NAWUPF.
+> 
+> >
+> > > threads in larger chunks. For example, with a chunk size of 4, tags 0
+> > > to 3 would be assigned to thread 0, tags 4 to 7 would be assigned to
+> > > thread 1, etc. That would improve the batching of ublk I/Os when
+> > > dispatching them from the submitting CPU to the ublk server thread.
+> > > There's an inherent tradeoff where distributing tags to ublk server
+> > > threads in larger chunks makes the distribution less balanced for
+> > > small numbers of I/Os, but it will be balanced when averaged over
+> > > large numbers of I/Os.
+> >
+> > How can fixed chunk size work generically? It depends on workload batch
+> > size on /dev/ublkbN, and different workload takes different batch size.
+> 
+> Yes, that's a good point. It requires pretty specific knowledge of the
+> workload to optimize the tag assignment to ublk server threads like
+> this.
+> 
+> >
+> > >
+> > > >
+> > > > ```
+> > > > [root@ktest-40 ublk]# ./kublk add -t null  --nthreads 8 -q 4 --per_io_tasks
+> > > > dev id 0: nr_hw_queues 4 queue_depth 128 block size 512 dev_capacity 524288000
+> > > >         max rq size 1048576 daemon pid 89975 flags 0x6042 state LIVE
+> > > >         queue 0: affinity(0 )
+> > > >         queue 1: affinity(4 )
+> > > >         queue 2: affinity(8 )
+> > > >         queue 3: affinity(12 )
+> > > > [root@ktest-40 ublk]#
+> > > > [root@ktest-40 ublk]# ./kublk add -t null  -q 4
+> > > > dev id 1: nr_hw_queues 4 queue_depth 128 block size 512 dev_capacity 524288000
+> > > >         max rq size 1048576 daemon pid 90002 flags 0x6042 state LIVE
+> > > >         queue 0: affinity(0 )
+> > > >         queue 1: affinity(4 )
+> > > >         queue 2: affinity(8 )
+> > > >         queue 3: affinity(12 )
+> > > > [root@ktest-40 ublk]#
+> > > > [root@ktest-40 ublk]# ~/git/fio/t/io_uring -p0 /dev/ublkb0
+> > > > submitter=0, tid=90024, file=/dev/ublkb0, nfiles=1, node=-1
+> > > > polled=0, fixedbufs=1, register_files=1, buffered=0, QD=128
+> > > > Engine=io_uring, sq_ring=128, cq_ring=128
+> > > > IOPS=188.54K, BW=736MiB/s, IOS/call=32/31
+> > > > IOPS=187.90K, BW=734MiB/s, IOS/call=32/32
+> > > > IOPS=195.39K, BW=763MiB/s, IOS/call=32/32
+> > > > ^CExiting on signal
+> > > > Maximum IOPS=195.39K
+> > > >
+> > > > [root@ktest-40 ublk]# ~/git/fio/t/io_uring -p0 /dev/ublkb1
+> > > > submitter=0, tid=90026, file=/dev/ublkb1, nfiles=1, node=-1
+> > > > polled=0, fixedbufs=1, register_files=1, buffered=0, QD=128
+> > > > Engine=io_uring, sq_ring=128, cq_ring=128
+> > > > IOPS=608.26K, BW=2.38GiB/s, IOS/call=32/31
+> > > > IOPS=586.59K, BW=2.29GiB/s, IOS/call=32/31
+> > > > IOPS=599.62K, BW=2.34GiB/s, IOS/call=32/32
+> > > > ^CExiting on signal
+> > > > Maximum IOPS=608.26K
+> > > >
+> > > > ```
+> > > >
+> > > >
+> > > > > need for locks in the I/O path. I can't really see us adopting this
+> > > > > ublk batching feature; adding a spin_lock() + spin_unlock() to every
+> > > > > ublk commit operation is not worth the reduction in io_uring SQEs and
+> > > > > uring_cmds.
+> > > >
+> > > > As I mentioned in cover letter, the per-io lock can be avoided for UBLK_F_PER_IO_DAEMON
+> > > > as one follow-up, since io->task is still there for helping to track task context.
+> > > >
+> > > > Just want to avoid too much features in enablement stage, that is also
+> > > > why the spin lock is wrapped in helper.
+> > >
+> > > Okay, good to know there's at least an idea for how to avoid the
+> > > spinlock. Makes sense to defer it to follow-on work.
+> > >
+> > > >
+> > > > >
+> > > > > >  } ____cacheline_aligned_in_smp;
+> > > > > >
+> > > > > >  struct ublk_queue {
+> > > > > > @@ -276,6 +281,16 @@ static inline bool ublk_support_batch_io(const struct ublk_queue *ubq)
+> > > > > >         return false;
+> > > > > >  }
+> > > > > >
+> > > > > > +static inline void ublk_io_lock(struct ublk_io *io)
+> > > > > > +{
+> > > > > > +       spin_lock(&io->lock);
+> > > > > > +}
+> > > > > > +
+> > > > > > +static inline void ublk_io_unlock(struct ublk_io *io)
+> > > > > > +{
+> > > > > > +       spin_unlock(&io->lock);
+> > > > > > +}
+> > > > > > +
+> > > > > >  static inline struct ublksrv_io_desc *
+> > > > > >  ublk_get_iod(const struct ublk_queue *ubq, unsigned tag)
+> > > > > >  {
+> > > > > > @@ -2538,6 +2553,171 @@ static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
+> > > > > >         return ublk_ch_uring_cmd_local(cmd, issue_flags);
+> > > > > >  }
+> > > > > >
+> > > > > > +static inline __u64 ublk_batch_buf_addr(const struct ublk_batch_io *uc,
+> > > > > > +                                       const struct ublk_elem_header *elem)
+> > > > > > +{
+> > > > > > +       const void *buf = (const void *)elem;
+> > > > >
+> > > > > Don't need an explicit cast in order to cast to void *.
+> > > >
+> > > > OK.
+> > > >
+> > > > >
+> > > > >
+> > > > > > +
+> > > > > > +       if (uc->flags & UBLK_BATCH_F_HAS_BUF_ADDR)
+> > > > > > +               return *(__u64 *)(buf + sizeof(*elem));
+> > > > > > +       return -1;
+> > > > >
+> > > > > Why -1 and not 0? ublk_check_fetch_buf() is expecting a 0 buf_addr to
+> > > > > indicate the lack
+> > > >
+> > > > Good catch, it needs to return 0.
+> > > >
+> > > > >
+> > > > > > +}
+> > > > > > +
+> > > > > > +static struct ublk_auto_buf_reg
+> > > > > > +ublk_batch_auto_buf_reg(const struct ublk_batch_io *uc,
+> > > > > > +                       const struct ublk_elem_header *elem)
+> > > > > > +{
+> > > > > > +       struct ublk_auto_buf_reg reg = {
+> > > > > > +               .index = elem->buf_index,
+> > > > > > +               .flags = (uc->flags & UBLK_BATCH_F_AUTO_BUF_REG_FALLBACK) ?
+> > > > > > +                       UBLK_AUTO_BUF_REG_FALLBACK : 0,
+> > > > > > +       };
+> > > > > > +
+> > > > > > +       return reg;
+> > > > > > +}
+> > > > > > +
+> > > > > > +/* 48 can cover any type of buffer element(8, 16 and 24 bytes) */
+> > > > >
+> > > > > "can cover" is a bit vague. Can you be explicit that the buffer size
+> > > > > needs to be a multiple of any possible buffer element size?
+> > > >
+> > > > I should have documented that 48 is least common multiple(LCM) of (8, 16 and
+> > > > 24)
+> > > >
+> > > > >
+> > > > > > +#define UBLK_CMD_BATCH_TMP_BUF_SZ  (48 * 10)
+> > > > > > +struct ublk_batch_io_iter {
+> > > > > > +       /* copy to this buffer from iterator first */
+> > > > > > +       unsigned char buf[UBLK_CMD_BATCH_TMP_BUF_SZ];
+> > > > > > +       struct iov_iter iter;
+> > > > > > +       unsigned done, total;
+> > > > > > +       unsigned char elem_bytes;
+> > > > > > +};
+> > > > > > +
+> > > > > > +static int __ublk_walk_cmd_buf(struct ublk_batch_io_iter *iter,
+> > > > > > +                               struct ublk_batch_io_data *data,
+> > > > > > +                               unsigned bytes,
+> > > > > > +                               int (*cb)(struct ublk_io *io,
+> > > > > > +                                       const struct ublk_batch_io_data *data))
+> > > > > > +{
+> > > > > > +       int i, ret = 0;
+> > > > > > +
+> > > > > > +       for (i = 0; i < bytes; i += iter->elem_bytes) {
+> > > > > > +               const struct ublk_elem_header *elem =
+> > > > > > +                       (const struct ublk_elem_header *)&iter->buf[i];
+> > > > > > +               struct ublk_io *io;
+> > > > > > +
+> > > > > > +               if (unlikely(elem->tag >= data->ubq->q_depth)) {
+> > > > > > +                       ret = -EINVAL;
+> > > > > > +                       break;
+> > > > > > +               }
+> > > > > > +
+> > > > > > +               io = &data->ubq->ios[elem->tag];
+> > > > > > +               data->elem = elem;
+> > > > > > +               ret = cb(io, data);
+> > > > >
+> > > > > Why not just pas elem as a separate argument to the callback?
+> > > >
+> > > > One reason is that we don't have complete type for 'elem' since its size
+> > > > is a variable.
+> > >
+> > > I didn't mean to pass ublk_elem_header by value, still by pointer.
+> > > Just that you could pass const struct ublk_elem_header *elem as an
+> > > additional parameter to the callback. I think that would make the code
+> > > a bit easier to follow than passing it via data->elem.
+> >
+> > OK.
+> >
+> > >
+> > > >
+> > > > >
+> > > > > > +               if (unlikely(ret))
+> > > > > > +                       break;
+> > > > > > +       }
+> > > > > > +       iter->done += i;
+> > > > > > +       return ret;
+> > > > > > +}
+> > > > > > +
+> > > > > > +static int ublk_walk_cmd_buf(struct ublk_batch_io_iter *iter,
+> > > > > > +                            struct ublk_batch_io_data *data,
+> > > > > > +                            int (*cb)(struct ublk_io *io,
+> > > > > > +                                    const struct ublk_batch_io_data *data))
+> > > > > > +{
+> > > > > > +       int ret = 0;
+> > > > > > +
+> > > > > > +       while (iter->done < iter->total) {
+> > > > > > +               unsigned int len = min(sizeof(iter->buf), iter->total - iter->done);
+> > > > > > +
+> > > > > > +               ret = copy_from_iter(iter->buf, len, &iter->iter);
+> > > > > > +               if (ret != len) {
+> > > > >
+> > > > > How would this be possible? The iterator comes from an io_uring
+> > > > > registered buffer with at least the requested length, so the user
+> > > > > addresses should have been validated when the buffer was registered.
+> > > > > Should this just be a WARN_ON()?
+> > > >
+> > > > yes, that is why pr_warn() is used, I remember that WARN_ON() isn't
+> > > > encouraged in user code path.
+> > > >
+> > > > >
+> > > > > > +                       pr_warn("ublk%d: read batch cmd buffer failed %u/%u\n",
+> > > > > > +                                       data->ubq->dev->dev_info.dev_id, ret, len);
+> > > > > > +                       ret = -EINVAL;
+> > > > > > +                       break;
+> > > > > > +               }
+> > > > > > +
+> > > > > > +               ret = __ublk_walk_cmd_buf(iter, data, len, cb);
+> > > > > > +               if (ret)
+> > > > > > +                       break;
+> > > > > > +       }
+> > > > > > +       return ret;
+> > > > > > +}
+> > > > > > +
+> > > > > > +static int ublk_batch_unprep_io(struct ublk_io *io,
+> > > > > > +                               const struct ublk_batch_io_data *data)
+> > > > > > +{
+> > > > > > +       if (ublk_queue_ready(data->ubq))
+> > > > > > +               data->ubq->dev->nr_queues_ready--;
+> > > > > > +
+> > > > > > +       ublk_io_lock(io);
+> > > > > > +       io->flags = 0;
+> > > > > > +       ublk_io_unlock(io);
+> > > > > > +       data->ubq->nr_io_ready--;
+> > > > > > +       return 0;
+> > > > >
+> > > > > This "unprep" looks very subtle and fairly complicated. Is it really
+> > > > > necessary? What's wrong with leaving the I/Os that were successfully
+> > > > > prepped? It also looks racy to clear io->flags after the queue is
+> > > > > ready, as the io may already be in use by some I/O request.
+> > > >
+> > > > ublk_batch_unprep_io() is called in partial completion of UBLK_U_IO_PREP_IO_CMDS,
+> > > > when START_DEV can't succeed, so there can't be any IO.
+> > >
+> > > Isn't it possible that the UBLK_U_IO_PREP_IO_CMDS batch contains all
+> > > the I/Os not yet prepped followed by some duplicates? Then the device
+> > > could be started following the successful completion of all the newly
+> > > prepped I/Os, but the batch would fail on the following duplicate
+> > > I/Os, causing the successfully prepped I/Os to be unprepped?
+> >
+> > It can be avoided easily because ub->mutex is required for UBLK_U_IO_PREP_IO_CMDS,
+> > such as, ub->dev_info.state can be set to UBLK_S_DEV_DEAD in case of any failure.
+> 
+> Are you saying that the situation I described isn't possible, or that
+> it can be prevented with an additional state check?
 
-Do you think that you could check with the OEM for updated firmware 
-(that reports NAWUPF)?
+I meant it can be avoided easily, such as by adding check ublk_dev_ready() in
+ublk_ctrl_start_dev() after ub->mutex is acquired.
 
-You IBM guys (I guess that you work together) have been a great help for 
-the atomic writes work, and I think that it would be unfortunate to lose 
-the atomic write capability for the drives which you use. Or lose 
-automatic capability (like in this patch).
+> I don't think the mutex alone prevents this situation. The mutex
+> guards against concurrent UBLK_U_IO_PREP_IO_CMDS, but it doesn't
+> prevent requests from being queued concurrently to the ublk device
+> once it's ready. And __ublk_fetch() will mark the ublk device as ready
+> as soon as all the tags have been fetched/prepped, when there could
+> still be more commands in the UBLK_U_IO_PREP_IO_CMDS batch.
+> I think to fix the issue, you'd need to wait to mark the ublk device
+> ready until the end of the UBLK_U_IO_PREP_IO_CMDS batch.
+
 
 Thanks,
-John
+Ming
+
