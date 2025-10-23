@@ -1,60 +1,60 @@
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FCC4200BA1
-	for <linux-block@vger.kernel.org>; Thu, 23 Oct 2025 05:54:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCE3B1DF252
+	for <linux-block@vger.kernel.org>; Thu, 23 Oct 2025 05:57:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761198844; cv=none; b=HtHqOO/NJr2RHrWQ7pceVI6ORRwExXfOS+wRcSH3B4rNKRD8Fo4eOiZKq6/cipDcWl/PDcW/O475TOIv/yp393E6La849PUevLViMvfAbopYX8IBHyOHhn6GYS8N9JWuSrz1XE9Qoz1xDu9HG/4asNco65AMjyMkJWo/YgskNTw=
+	t=1761199062; cv=none; b=W7GQJOuCmc4hdujuCi9blDteXjq+6LNmuHDDAMpI6qi2oS39oU2PI6rglmirdbKjqZlpWx2oUQey02GM0uBXXl4+PaJqdSnXJ6Bzdlid4MNeq/5B8nb2RLRIxaG6I6WqSZ7COX6Fq9XZYG4OESNfVsaKEZ1JKL5L8pxnYbfysLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761198844; c=relaxed/simple;
-	bh=8ow1JAoUuodypZOddDEyC9zGxp1MeGnfnR3OkrPjVjo=;
+	s=arc-20240116; t=1761199062; c=relaxed/simple;
+	bh=YG0lX2u/Blm0csIiDFgSi3IKvKforpaYdjRSwshP+2o=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cWwlgl197P7SWjj1zounrKhaDQczKS/JXde+pmleWELMD5ArYDgjCfxSg5CyP2oEDQAJDQb5CvVmk+ZSP6KBjf1VxqGCWEAk1sBLWVSWFpWs+8LdjwjnGHpqbZfHXllz+ViE9UNpnmaDmiaG9emQg/RGPGa6xtWUcJE6sxFP9IQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=QWb0DCQ3; arc=none smtp.client-ip=148.163.158.5
+	 In-Reply-To:Content-Type; b=ljfUAMUIUxdJF6+kkfcBYgf15A7M1MYPWDh+0x2lndMLfSGphKL8thaFdLwpY8yzf3cRxGKkUiLXmxX9G7MeD9cE1ASiYECIXsxgtDL7yYA5qKxx/eBUL71RRGqhMDis3qIQTh3zsLhJ/LoNG8ZdjIYf6WqawQ7ggjIkO5CuPq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=phEEsGh+; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="QWb0DCQ3"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="phEEsGh+"
 Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59MKLGoJ017019;
-	Thu, 23 Oct 2025 05:53:47 GMT
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59ML8dUL001343;
+	Thu, 23 Oct 2025 05:57:31 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=B+FgxS
-	53/KvXWPIIxX6zClLJ/E3wKy1QptZhfVq+44c=; b=QWb0DCQ32ou5VHaR0p1b68
-	C2vubFwOoyKhU3ITJbhLNDOUzKCtH7Br7B1PWDp2aJTmvr3oQzPZCFU1JhCFDm0j
-	bVpBzZ6MdQVsSfWl3ByhmyEQ1G9MKNQE+H/vpuB7PYoigqYDEfnN3WbmeTN9kDhm
-	Gc9vWJY244LovQB3BXYARZ2T92CpsD3rpOJNzmN8QPvEmODZSCRWRzNahhpGqVI9
-	wAqf4hMwWzzQL6Gpvf/m9IGXpqPb5IdivM9utb+igbXvjywj24uom+wwxUvTbEu9
-	hqNQUoLlC+Jre94Zd8vEZya/OcsQ7nyl/A17j8RjnNLFfrmRz+LDVfXpxZ6iLRKg
+	:message-id:mime-version:references:subject:to; s=pp1; bh=9Z1eb8
+	pUv3TROO/PL62HS4dwx16H6VYQvUV+yTdS1R0=; b=phEEsGh+JHBKSIb7cfxekY
+	rTrNQtEYboIh/J7vJ8aXqieNic9trV2mqZCG2A6r7trfuBMtt1vQhBorw49slDZA
+	/GzBBWaedUMl3z2ucy9N/MeCgUDjax5WUft2TGgtuD14N7d2PvfeDE6ZsWPRhjMd
+	P1YlJB2bf5s+wQueoa8PapCW9PJkugRROpS53Q/1Yv1HrCMW9t7KDvY4ZcObrCak
+	wQY7jvQZCRfqCv3FeNUOqTlKQeciLMKVPGngqU8nje9XII5s1W08dDpFYz0l/OcS
+	Rlg0DE6HmArJzPUOQDPKiQV5qNrQ9j+S5z9MgY8CZ4hjdfHQwTTekScRisgmGmoQ
 	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49v32hq16p-1
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49v32hq1hw-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 Oct 2025 05:53:47 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59N1kosG002926;
-	Thu, 23 Oct 2025 05:53:46 GMT
-Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 49vqejm14k-1
+	Thu, 23 Oct 2025 05:57:31 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59N2v18j011030;
+	Thu, 23 Oct 2025 05:57:30 GMT
+Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 49vqx1bx44-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 Oct 2025 05:53:46 +0000
+	Thu, 23 Oct 2025 05:57:30 +0000
 Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-	by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 59N5rjkT47382978
+	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 59N5vUC327919070
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 23 Oct 2025 05:53:45 GMT
+	Thu, 23 Oct 2025 05:57:30 GMT
 Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 467685805A;
-	Thu, 23 Oct 2025 05:53:45 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 0A7355805A;
+	Thu, 23 Oct 2025 05:57:30 +0000 (GMT)
 Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7ED5F58051;
-	Thu, 23 Oct 2025 05:53:42 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 7A0DE58051;
+	Thu, 23 Oct 2025 05:57:27 +0000 (GMT)
 Received: from [9.109.198.148] (unknown [9.109.198.148])
 	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 23 Oct 2025 05:53:42 +0000 (GMT)
-Message-ID: <0baa8908-529b-45e9-87b5-3c229aecdc52@linux.ibm.com>
-Date: Thu, 23 Oct 2025 11:23:40 +0530
+	Thu, 23 Oct 2025 05:57:27 +0000 (GMT)
+Message-ID: <59cf7e0f-1069-4766-9234-cc91985470e4@linux.ibm.com>
+Date: Thu, 23 Oct 2025 11:27:26 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,34 +62,33 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] block: unify elevator tags and type xarrays into
- struct elv_change_ctx
+Subject: Re: [PATCH 2/3] block: introduce alloc_sched_data and free_sched_data
+ elevator methods
 To: Ming Lei <ming.lei@redhat.com>
 Cc: linux-block@vger.kernel.org, hch@lst.de, yukuai1@huaweicloud.com,
         axboe@kernel.dk, yi.zhang@redhat.com, czhong@redhat.com,
         gjoyce@ibm.com
 References: <20251016053057.3457663-1-nilay@linux.ibm.com>
- <20251016053057.3457663-2-nilay@linux.ibm.com> <aPhZVS9H6mdTaDv_@fedora>
+ <20251016053057.3457663-3-nilay@linux.ibm.com> <aPhgAMxgG2q0DKcv@fedora>
 Content-Language: en-US
 From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <aPhZVS9H6mdTaDv_@fedora>
+In-Reply-To: <aPhgAMxgG2q0DKcv@fedora>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDE4MDAyMiBTYWx0ZWRfX1iCkb+mDGxAA
- gqHqsTqzHS7WmyrG3gEi1JZLHF8QY6/N+EDoWHJfQ38vEM9JEFUPsrdaca8cjAu7DEbPCFwzLuF
- EkJTS1+PV29wXY+1nPccaIA/ODB5z3UqU8ekVSAOzXqWxzOkc2pw2Y/5xiaILXSyviSiBhaiXlA
- Ney4blYVJEPftdaOSqiBfJr44TeClGWjhqv3QIeWGDScvgjn8AnBykBWsAfmhkDvDPGL8BE84Vi
- pFPORfDUPRqlVNEBC/k7c8sXN+ZOYZwRi1MWu87ooyKHwQn08HZsQuW663JfPY7e/c3N9GYriYM
- tZdc3pg+FjodgGuQYUrWTAOfEyXt/lk0yM9q7rh3KXI+nH7Ig4eL0Vb8eNBw+wdVIhOXk3Z0HgK
- kvI6hlxzgWMakcoutgpo9lalnyz9aw==
-X-Authority-Analysis: v=2.4 cv=OrVCCi/t c=1 sm=1 tr=0 ts=68f9c2eb cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDE4MDAyMiBTYWx0ZWRfXxY+QAWa57CjA
+ ueRsAYMLPvlfkbYIMDe4aeJ5lOo0+qQaRl3A7FGgw7GkbwB6LcLxbqaEo4Kuc2I9ZUBf5eY93kh
+ WL3sr2s8Wbm45WsX2NRaU8FSG4wghFQz8Pwbcc0XWiN0gGi+N3tHBF/acLMBQ9awQNQec9qiBzE
+ 43HZAi+ZzwDYQzDfyQwjaz/moD9QmRyqey6XoGIm6yXPpeN5L8uqqhbW2+7CySVPIn7ba7ICRzT
+ CUSLFTAP+/Ai+lXkhT8BwkD4bhE4pwDbbZ0/SLXAAg9d2jQyV5VN0bF+N98yqIaoatbBdL1e560
+ A0Pn0MI7/ZYg6QU70W0EGbQui8EK2N2Zez0Dmikx4M7ha72iFiR2GyXOpOrld6XbqxNE6D+LSqy
+ TPRbIs1dpZkzsqJdg1I8eMbvpJ2r+w==
+X-Authority-Analysis: v=2.4 cv=OrVCCi/t c=1 sm=1 tr=0 ts=68f9c3cb cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
  a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=CA3WoMP3M7Mil-wWCVUA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-GUID: mGWyFKvd2aR1DJjOqxoYNc-_21d69u0s
-X-Proofpoint-ORIG-GUID: mGWyFKvd2aR1DJjOqxoYNc-_21d69u0s
+ a=wrP9mkhF7TO3L0ZhHXgA:9 a=QEXdDO2ut3YA:10 a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-GUID: Jqd7VfFvPQsqK6DHTlbNjU6PbgWj_C9Q
+X-Proofpoint-ORIG-GUID: Jqd7VfFvPQsqK6DHTlbNjU6PbgWj_C9Q
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
  definitions=2025-10-22_08,2025-10-22_01,2025-03-28_01
@@ -101,74 +100,46 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
 
 
 
-On 10/22/25 9:41 AM, Ming Lei wrote:
-> On Thu, Oct 16, 2025 at 11:00:47AM +0530, Nilay Shroff wrote:
-
->>  
->> +int blk_mq_alloc_sched_ctx_batch(struct xarray *elv_tbl,
->> +		struct blk_mq_tag_set *set)
->> +{
->> +	struct request_queue *q;
->> +	struct elv_change_ctx *ctx;
->> +
->> +	lockdep_assert_held_write(&set->update_nr_hwq_lock);
->> +
->> +	list_for_each_entry(q, &set->tag_list, tag_set_list) {
->> +		ctx = kzalloc(sizeof(struct elv_change_ctx), GFP_KERNEL);
->> +		if (!ctx)
->> +			goto out_unwind;
->> +
->> +		if (xa_insert(elv_tbl, q->id, ctx, GFP_KERNEL)) {
->> +			kfree(ctx);
->> +			goto out_unwind;
->> +		}
->> +	}
->> +	return 0;
->> +out_unwind:
->> +	list_for_each_entry_continue_reverse(q, &set->tag_list, tag_set_list) {
->> +		ctx = xa_load(elv_tbl, q->id);
->> +		kfree(ctx);
->> +	}
+On 10/22/25 10:09 AM, Ming Lei wrote:
+> On Thu, Oct 16, 2025 at 11:00:48AM +0530, Nilay Shroff wrote:
+>> The recent lockdep splat [1] highlights a potential deadlock risk
+>> involving ->elevator_lock and ->freeze_lock dependencies on -pcpu_alloc_
+>> mutex. The trace shows that the issue occurs when the Kyber scheduler
+>> allocates dynamic memory for its elevator data during initialization.
+>>
+>> To address this, introduce two new elevator operation callbacks:
+>> ->alloc_sched_data and ->free_sched_data.
 > 
-> No need to unwind, you can let blk_mq_free_sched_ctx_batch cover cleanup from
-> callsite.
-Yes, that makes sense. I’ll drop the unwind logic and rely on 
-blk_mq_free_sched_ctx_batch() for cleanup at the callsite in the next version.
-
-> Not mention you leave freed `ctx` into xarray, which is fragile.
-Good catch! Removing the unwind block will naturally avoid that issue as well.
-
->> @@ -530,12 +563,12 @@ int blk_mq_alloc_sched_tags_batch(struct xarray *et_table,
->>  out_unwind:
->>  	list_for_each_entry_continue_reverse(q, &set->tag_list, tag_set_list) {
->>  		if (q->elevator) {
->> -			et = xa_load(et_table, q->id);
->> -			if (et)
->> -				blk_mq_free_sched_tags(et, set);
->> +			ctx = xa_load(elv_tbl, q->id);
->> +			if (ctx && ctx->et)
->> +				blk_mq_free_sched_tags(ctx->et, set);
+> This way looks good.
 > 
-> please clear ctx->et when it is freed.
-Ack, will fix it in next version.
+>>
+>> When an elevator implements these methods, they are invoked during
+>> scheduler switch before acquiring ->freeze_lock and ->elevator_lock.
+>> This allows safe allocation and deallocation of per-elevator data
+> 
+> This per-elevator data should be very similar with `struct elevator_tags`
+> from block layer viewpoint: both have same lifetime, and follow same
+> allocation constraint(per-cpu lock).
+> 
+> Can we abstract elevator data structure to cover both? Then I guess the
+> code should be more readable & maintainable, what do you think of this way?
+> 
+> One easiest way could be to add 'void *data' into `struct elevator_tags`,
+> just the naming of `elevator_tags` is not generic enough, but might not
+> a big deal.
+> 
+Hmm, good point! I'd rather suggest if we could instead rename 
+struct elevator_tags to struct elevator_resources and then
+add void *data field to it. Something like this:
 
->> +static inline void blk_mq_free_sched_ctx_batch(struct xarray *elv_tbl)
->> +{
->> +	unsigned long i;
->> +	struct elv_change_ctx *ctx;
->> +
->> +	xa_for_each(elv_tbl, i, ctx) {
->> +		xa_erase(elv_tbl, i);
->> +		kfree(ctx);
->> +	}
->> +}
->> +
-> 
-> It could be more readable to move blk_mq_free_sched_ctx_batch() with
-> blk_mq_alloc_sched_ctx_batch() together.
-> 
-Agreed — I’ll move blk_mq_free_sched_ctx_batch() next to
-blk_mq_alloc_sched_ctx_batch() for better readability.
+struct elevator_tags {
+	unsigned int nr_hw_queues;
+	unsigned int nr_requests;
+	struct blk_mq_tags *tags[];
+        void *data;
+};
+
+What do you think?
 
 Thanks,
 --Nilay
