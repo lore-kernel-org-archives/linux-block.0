@@ -1,56 +1,56 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C60AA338913
-	for <linux-block@vger.kernel.org>; Thu, 23 Oct 2025 15:33:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4521331A70
+	for <linux-block@vger.kernel.org>; Thu, 23 Oct 2025 15:33:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761233593; cv=none; b=dFfPduzJAHBpBVxbmUU3d6sMcHsXLSQxaHrJAuQhWUiMb/fSQka0jZO9G3RiwQOaYoHfLOPonhPGc++VWJfS3uuUmUAPkUqeBc8a/8l4ww1rBaD47FiuwCef/IOkMkKRsYOAB+WO8vmBBw/nxho4PhH0tCZqdIzozKfHxGrpSPc=
+	t=1761233595; cv=none; b=ginMUubkXp4O2pig1xMbJp6nYvQF+FvmS0Ab7cobvc/fKt8Equ6uA4QLfOTChlPKfkn6TmONkFP44SRGNEeDntQrXj/DmtiqeGFd0tevs6Vce0ipvIkZTMP8PgAbo2r35s8B+D9DCgcBuXZVaVrs9OtHTyVnHTFy7vnXA9L/Nxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761233593; c=relaxed/simple;
-	bh=43d8QPIzY3KzvqB8qhAlJwz7Elog9g+LlaBF8sJyiHc=;
+	s=arc-20240116; t=1761233595; c=relaxed/simple;
+	bh=edSvZJEmg6uOXLK6jnvDP1APwHqdeK1J4Mvd0xJdixA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YAtRIPfsGsVAWE9wCqKx0bC97B4XkIDA7YZ0yQ3RTD/sC+F2MvWKW5KYbFJCo1yjbAdYUITFY+w0zMScf45KNok5rZZe7lqkkjL3CyQ4gxWZdzyPr+n+jmFMSdm8OcIKfpTiGTpzNWuRlEKRE790UKMSWUl9tomCD1qbXa7m0HY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=i+0oamRa; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=H8Qo4FlqLe1MjfyisDlQvpRbR5FuvsnJyS/xyrtN0bRL//mSDn46bEqD1hZzxKqduuPWW/c9TXuOFujzm3RkfvFMU7oXmfWhMVJAt98eEjBMmK397u3EnqAhSD198fIJvbR10pSxyzn+fdFyLt08aYRj5shRMu4kKkAswdpNFbg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LFSINKDQ; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i+0oamRa"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LFSINKDQ"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761233590;
+	s=mimecast20190719; t=1761233592;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=f8qJ58ko29KNmOP7S9QuDk9cQcuS5q3cBtDYZz21tk4=;
-	b=i+0oamRaI1FmCAmD3pHng8E/R86omKFRSfLFVIq8WRFuxoh3y9p0fNowa73dPgxfA3aDyb
-	8DHVWs+OKXzkURGFsxZ7ODR7I166Hm2D2YjZWKI9HyEecH61worIQpUT3rWPEnLFf2UQKt
-	r0JzwYY8ftZJnT2opnKaooXnZe+K2dk=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=iV1eMIoK1WK91rFE5nCqA11A4aF9wMqCohOVY1SZAnc=;
+	b=LFSINKDQhO0luCRPuXE3BxVH2LlJ2BFxISEPpyOoxIgi1veaMg1vRMfq4a+WerJeszLxTz
+	NNtwtMJ8ok5lr1wdIYR5p7D6G5YzymfRrBAlehInlR9YqWCsxnZtdLG+RLY0CdNasBViUY
+	NRx9SKxY+qA2rSloVAwLctkqRXN45OA=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-692-uSbuZtfXO1-hFgD78hZcxA-1; Thu,
- 23 Oct 2025 11:33:05 -0400
-X-MC-Unique: uSbuZtfXO1-hFgD78hZcxA-1
-X-Mimecast-MFC-AGG-ID: uSbuZtfXO1-hFgD78hZcxA_1761233584
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-383-NJOQ7Ql-OnGbb4ivgFY41A-1; Thu,
+ 23 Oct 2025 11:33:09 -0400
+X-MC-Unique: NJOQ7Ql-OnGbb4ivgFY41A-1
+X-Mimecast-MFC-AGG-ID: NJOQ7Ql-OnGbb4ivgFY41A_1761233588
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B89D1195399A;
-	Thu, 23 Oct 2025 15:33:03 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4E4D6180135A;
+	Thu, 23 Oct 2025 15:33:08 +0000 (UTC)
 Received: from localhost (unknown [10.72.120.30])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BA912180045B;
-	Thu, 23 Oct 2025 15:33:02 +0000 (UTC)
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 25FAE180035A;
+	Thu, 23 Oct 2025 15:33:06 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
 Cc: Uday Shankar <ushankar@purestorage.com>,
 	Caleb Sander Mateos <csander@purestorage.com>,
 	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 04/25] ublk: add helper of __ublk_fetch()
-Date: Thu, 23 Oct 2025 23:32:09 +0800
-Message-ID: <20251023153234.2548062-5-ming.lei@redhat.com>
+Subject: [PATCH V2 05/25] ublk: define ublk_ch_batch_io_fops for the coming feature F_BATCH_IO
+Date: Thu, 23 Oct 2025 23:32:10 +0800
+Message-ID: <20251023153234.2548062-6-ming.lei@redhat.com>
 In-Reply-To: <20251023153234.2548062-1-ming.lei@redhat.com>
 References: <20251023153234.2548062-1-ming.lei@redhat.com>
 Precedence: bulk
@@ -60,86 +60,77 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Add helper __ublk_fetch() for the coming batch io feature.
+Introduces the basic structure for a batched I/O feature in the ublk driver.
+It adds placeholder functions and a new file operations structure,
+ublk_ch_batch_io_fops, which will be used for fetching and committing I/O
+commands in batches. Currently, the feature is disabled.
 
-Meantime move ublk_config_io_buf() out of __ublk_fetch() because batch
-io has new interface for configuring buffer.
-
+Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/ublk_drv.c | 46 +++++++++++++++++++++-------------------
- 1 file changed, 24 insertions(+), 22 deletions(-)
+ drivers/block/ublk_drv.c | 26 +++++++++++++++++++++++++-
+ 1 file changed, 25 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index a11ccf3d96d6..a44e40d1118b 100644
+index a44e40d1118b..6b6e82ec7e45 100644
 --- a/drivers/block/ublk_drv.c
 +++ b/drivers/block/ublk_drv.c
-@@ -2300,39 +2300,41 @@ static int ublk_check_fetch_buf(const struct ublk_device *ub, __u64 buf_addr)
- 	return 0;
- }
+@@ -255,6 +255,11 @@ static inline struct request *__ublk_check_and_get_req(struct ublk_device *ub,
+ 		u16 q_id, u16 tag, struct ublk_io *io, size_t offset);
+ static inline unsigned int ublk_req_build_flags(struct request *req);
  
--static int ublk_fetch(struct io_uring_cmd *cmd, struct ublk_device *ub,
--		      struct ublk_io *io, __u64 buf_addr)
-+static int __ublk_fetch(struct io_uring_cmd *cmd, struct ublk_device *ub,
-+			struct ublk_io *io)
- {
--	int ret = 0;
--
--	/*
--	 * When handling FETCH command for setting up ublk uring queue,
--	 * ub->mutex is the innermost lock, and we won't block for handling
--	 * FETCH, so it is fine even for IO_URING_F_NONBLOCK.
--	 */
--	mutex_lock(&ub->mutex);
- 	/* UBLK_IO_FETCH_REQ is only allowed before dev is setup */
--	if (ublk_dev_ready(ub)) {
--		ret = -EBUSY;
--		goto out;
--	}
-+	if (ublk_dev_ready(ub))
-+		return -EBUSY;
- 
- 	/* allow each command to be FETCHed at most once */
--	if (io->flags & UBLK_IO_FLAG_ACTIVE) {
--		ret = -EINVAL;
--		goto out;
--	}
-+	if (io->flags & UBLK_IO_FLAG_ACTIVE)
-+		return -EINVAL;
- 
- 	WARN_ON_ONCE(io->flags & UBLK_IO_FLAG_OWNED_BY_SRV);
- 
- 	ublk_fill_io_cmd(io, cmd);
--	ret = ublk_config_io_buf(ub, io, cmd, buf_addr, NULL);
--	if (ret)
--		goto out;
- 
- 	WRITE_ONCE(io->task, get_task_struct(current));
- 	ublk_mark_io_ready(ub);
--out:
-+
-+	return 0;
++static inline bool ublk_dev_support_batch_io(const struct ublk_device *ub)
++{
++	return false;
 +}
 +
-+static int ublk_fetch(struct io_uring_cmd *cmd, struct ublk_device *ub,
-+		      struct ublk_io *io, __u64 buf_addr)
-+{
-+	int ret;
-+
-+	/*
-+	 * When handling FETCH command for setting up ublk uring queue,
-+	 * ub->mutex is the innermost lock, and we won't block for handling
-+	 * FETCH, so it is fine even for IO_URING_F_NONBLOCK.
-+	 */
-+	mutex_lock(&ub->mutex);
-+	ret = __ublk_fetch(cmd, ub, io);
-+	if (!ret)
-+		ret = ublk_config_io_buf(ub, io, cmd, buf_addr, NULL);
- 	mutex_unlock(&ub->mutex);
- 	return ret;
+ static inline struct ublksrv_io_desc *
+ ublk_get_iod(const struct ublk_queue *ubq, unsigned tag)
+ {
+@@ -2578,6 +2583,12 @@ static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
+ 	return ublk_ch_uring_cmd_local(cmd, issue_flags);
  }
+ 
++static int ublk_ch_batch_io_uring_cmd(struct io_uring_cmd *cmd,
++				       unsigned int issue_flags)
++{
++	return -EOPNOTSUPP;
++}
++
+ static inline bool ublk_check_ubuf_dir(const struct request *req,
+ 		int ubuf_dir)
+ {
+@@ -2690,6 +2701,16 @@ static const struct file_operations ublk_ch_fops = {
+ 	.mmap = ublk_ch_mmap,
+ };
+ 
++static const struct file_operations ublk_ch_batch_io_fops = {
++	.owner = THIS_MODULE,
++	.open = ublk_ch_open,
++	.release = ublk_ch_release,
++	.read_iter = ublk_ch_read_iter,
++	.write_iter = ublk_ch_write_iter,
++	.uring_cmd = ublk_ch_batch_io_uring_cmd,
++	.mmap = ublk_ch_mmap,
++};
++
+ static void ublk_deinit_queue(struct ublk_device *ub, int q_id)
+ {
+ 	int size = ublk_queue_cmd_buf_size(ub);
+@@ -2827,7 +2848,10 @@ static int ublk_add_chdev(struct ublk_device *ub)
+ 	if (ret)
+ 		goto fail;
+ 
+-	cdev_init(&ub->cdev, &ublk_ch_fops);
++	if (ublk_dev_support_batch_io(ub))
++		cdev_init(&ub->cdev, &ublk_ch_batch_io_fops);
++	else
++		cdev_init(&ub->cdev, &ublk_ch_fops);
+ 	ret = cdev_device_add(&ub->cdev, dev);
+ 	if (ret)
+ 		goto fail;
 -- 
 2.47.0
 
