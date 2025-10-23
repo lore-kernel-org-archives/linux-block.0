@@ -1,67 +1,66 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0317B2367DC
-	for <linux-block@vger.kernel.org>; Thu, 23 Oct 2025 20:42:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 088C0275AFB
+	for <linux-block@vger.kernel.org>; Thu, 23 Oct 2025 21:12:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761252132; cv=none; b=Ecoi0yAOoWLFlaz9gLSogfLZyDtWQg4ImXfjtTqldY/IZ9DL6KjQVo5W5r6fpI66xhgbG4EgUrijfruElhojOmKvF7mlyFnHPBl+0F0IuHpKKX5J2P9Z2JyIbdPhalCr2oxOUg2YjDhLZz6LTvZkZjHl+9fQj7ayXLQlzPgDi5g=
+	t=1761253938; cv=none; b=X5WBVSrKOe9UBbT+pQse71LEVmUqoOJb6Wy6iJS5/btd5HNMVt1JGVBCzI+2pCQveUclcaa8v8GvK+LTw03A5woXOc9zThsc6YND4rrwC1KIJl4JAm7vAe+lmQDkqvKnDC2UnOcT1lH8bM10B8NUfXK8dtgiN258TNWLYYT2DWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761252132; c=relaxed/simple;
-	bh=PDOk5q4ikNsoJ7LaEKqMOSHmjcL2HrrBiXoNtKrmcuQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mCfWtTBZ1x6G5OtfXxPRJyk3ti0ciTd+OqHyc6jW40KKPblJ7GFqpsF1Wrvd5j59/CmJ2htmlPSLCw+j+jDSwUtHCAjv+1b20DW/GIGvdecLzKDhGMN99qVWHAry1yOo+hUCshKp4xDV97M3VhVXrcEyZFkMg7cJveDW75IzXyU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nz7YYkvR; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1761253938; c=relaxed/simple;
+	bh=ELtFrjCBV9N4Nbz0iYvi9/WHhUL3pJWyPhQ/w8w3NaE=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=IAsAIZPja0XfZAXbPGRg18kK2cKMW+dxKi/dzeYnZHGbl+JDLunUFmXLG47pA8uTfkw7ESkHu+vp/Mpn6LjwFTzCO8vFci/cEQ2wp1Z8kxX6dvG02BGhOmAXOdrXVXz7sdSqYBYSM5adnAOUIgVhegwVoAVqiqE5FChn8ExiEAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=LApQzoUV; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nz7YYkvR"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-47112edf9f7so7444865e9.0
-        for <linux-block@vger.kernel.org>; Thu, 23 Oct 2025 13:42:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="LApQzoUV"
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-76e2ea933b7so1390790b3a.1
+        for <linux-block@vger.kernel.org>; Thu, 23 Oct 2025 14:12:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761252129; x=1761856929; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=zH23/gL2/USZLjj/JPdi7ffud5niCkNtnKaJxQ+IhR4=;
-        b=Nz7YYkvRfAPWuBQiozd2EoqtjCYhMKY1dzhlJQNeryYt2f9leHj/UhBjlrC2RmuOYf
-         gzKUb/dWuNSaTvxZQC/BWnWGG9nyAkH1CsipyuCT7ah/gpVqqeb0ZDwCElJilz1neUBi
-         pfHn3MvsPbX/1KnqEvtrrwWsB0dUzTlKavo0NQWRXRBf1OFKYCTdQJbFTMINehKqrIv/
-         WIxgqSZNofWjjzSITfOSqjKiPVTITDXBctcJQflCV4d4d4F00O2zxuV7WNhMH1GlrpDW
-         gPmyETMU1QZ7lfLjlqtk9kVmt3jN05MJGbCbaHchmEWNYX/lLHOVmyCwkq9nVcnP95/Q
-         9kgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761252129; x=1761856929;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1761253936; x=1761858736; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zH23/gL2/USZLjj/JPdi7ffud5niCkNtnKaJxQ+IhR4=;
-        b=hFWhCSmHTOVCfaAnpV4hq3B9APwi2V8krzqX+UdGSivmziiNeufO/0elot3NdSHWGe
-         x7XF2Usyq70+UWGCWAc0Eh4wq267w0qLVsPiBwBUG6Jiwok4whB/YbbiMH7QfzeHWiMq
-         wSlENpyAsToB3s9hLR9oWrw1nloV0ZmBx7MDVQ229EjZPt9ZiKNgsrTy6s0lYvH36TQJ
-         WmIOJVuySkBQyvBOGFg6EpLWYbbYeESF0usZxjE0iwm2uu/kgkQllpIvuatkn/a1gRaM
-         8ROPkAWgtqxw7NLyQPWdUIzVgz7p3pvAc2ppjQEDhwm95Yfh6iqUwk4HrrDd8nPn2o+9
-         PJog==
-X-Forwarded-Encrypted: i=1; AJvYcCX1EKqbarT78MFnsA2XPR/NYUVkuoZuPtIDVUom7iKRS+wXO18bfujGBOiyT4dhcTzzrQIWENWuCZ4VGQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyICQWHmnRnO36o4xkZ4Xza8tEpsOZTH4EukjHHg7jD5LyHLK+z
-	FNxB1zFMtx3Kfwi0C1LoTubw6lZnXR7lh/hTRtUkUTHYhLrgldgltd79
-X-Gm-Gg: ASbGncuufU9/PXu108WVmeIDio8NqToj2UsbApJOy0KSTTj/0Qkz97pMZvTLgHxgqss
-	IuyQIhxtS3yiiz8s+qObdgDTRno6VDPEcr4N1zX1odYksnljocPEHnWI7NW0bBYmFwp9aw1nN0N
-	7SdDG4mw4usmzLXTE5xEJ4sahX6e31Pnjm8m07SGswI4HwASxwSzDmBLFFJc8fMSuKChTbB621c
-	NQxJVNDbH9Oq18HdaRkwJJecDQzmTqGjs7NiA7BK3ViBsAlHzHo2h7pLwbyRqZOc1ZO68aaJGji
-	enOHM12FR4Zw9pM30JZdo8iKyfXtmeme2m2Cf8hAmq3QMPvaCiVKNNBOkGv9mNJQJSvoNDSUy96
-	aSosczkEVKPSRonW5I5JB2GAOipDlOQxaSwDZk4eGvJp6/raQjJQcNljz4ePZEhFn8zsbu5Fogg
-	nOH5obnqLHCYl1jCeAu0IjSQMt5g==
-X-Google-Smtp-Source: AGHT+IHCVB+Pybief1JnxZp/9KwSmKb9+DyZ4IikoY3sTAsLQTmu8dNdfCeK9ekGtKedPfaO6daR0Q==
-X-Received: by 2002:a05:600c:46c5:b0:46e:1cc6:25f7 with SMTP id 5b1f17b1804b1-475cafacc30mr25848925e9.9.1761252129022;
-        Thu, 23 Oct 2025 13:42:09 -0700 (PDT)
-Received: from [192.168.2.12] (85-70-151-113.rcd.o2.cz. [85.70.151.113])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-475caf2f142sm56851425e9.15.2025.10.23.13.42.07
+        bh=sRCjgxmNC25rZrLNDyTER70wkWB4aqo3eV4CmHKoZ04=;
+        b=LApQzoUVTTn9/EhwZ0cBtJe8nsHfhhIySgcgkyahUFx1EOmisOui5LI+plnTiTMNk5
+         zg+RLhzHEywI5ynTWvreQ0YdsbPCZe08uKbVDDzFiiOXo7+w4NuYatu+YzE6Y17RqD86
+         Z0fQFtoxduSFt/8eJYT6JK0Gk7onBpRGRUd4W9wNTj+rr1ucfsbncnRMSk5pHhGCouYm
+         sisaONtdrCobWRILdate3d0Q58KlDvw4BZinqXor9KMNUNVksUdTE2lZ5/1UzAGd/yxg
+         BGrF8qomjm6zEKd2E+YuzC9G1saq8WgcP/IP68CST4NzbQVJe7kdBj6MWllf4xW2S/pH
+         aD5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761253936; x=1761858736;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=sRCjgxmNC25rZrLNDyTER70wkWB4aqo3eV4CmHKoZ04=;
+        b=XviS8kUz7uA6l4pMpQMTqQ6tT6rwZlu++ik5LVaM4RZAyb7Ltys4htER5IiiRxLge5
+         fMWKRitHDe0JqYwaRJmmL3aTwTYvEPk/HIfhvyiGH6/vkbUvvIrpI7qxosJY+LsONPv6
+         k3CO9Msm4uz+cBsvCxT0F26IjnYPml3i/K15fs1obdna9IqrWgU21DmaOY/l59ZzWMX7
+         bqaaSxPJcBbdWJcAG1mEGr62OW2G1D33hu6Ukry572+EqzDR/PCh/3Z6SoMLtSoSBNW3
+         +tj6dcMNQEBR0EOw2MkSJ4JbdY6QDe7k6N74zKyFpuBEVJGKHBCab06v3cxNgOt5YBmY
+         b9vg==
+X-Gm-Message-State: AOJu0YyEoPMzo1ygv0e8e3aBeeQc4h9p2J1zoY5ekwTGh3tTbKEN5eTY
+	pdoA/bZgZg6YW5nhFc6fkFiPx6qrAtGDccikctQMwP2ksdyo20KhzhhQ/84Serw9x/R7Rhp+NK7
+	vtr4drDU=
+X-Gm-Gg: ASbGncvkUG5ynWrNMJsOlWaAigW5GrkEyFSZBqZ5gskVw7oVaG9YrWLalhBYZB6xP7k
+	V4X6fOs/Ddfjdr/t6+GxAsWVkU5GQbZUuLVtDpEu6aOIxeIhMsb2ZqcaHBQL0jxCMd1RPQwsxRe
+	X/2ZC4PrCtxmWrIFMnkS52jZl8LN/glOqHagXPLVQPkAG1OeJ3DKmoKos1uerc2LC+cvuVzuThy
+	2gjO5wqYWGC8nxT9zETieVW1IjX8rf0q0+33SuY4oO8dFG9WnrHBPdULxzpf+NN02RXaf8bHhcF
+	b2mCe0Tyaq/DuHONlSHlBcOj7D5k+2QQEoYYmIPQ8mPLL33VkjB+AiaolgOlFw/xm2HRZVBk9ok
+	B/iVx9HHgT4QtK5/oXk4T1xHDF4wLzR/Lm7aZYaJ5jgmztgAqwtDOowAMFXofk1KOQl0VPBKp8X
+	AqYKTlZBDQAUIYnMfbyBj+IUuP6vAO9wI+kRaLzoqTUEdagy0vWgd9607Zhmb+cpTlR7hJ/CP0f
+	mtv3TkHog==
+X-Google-Smtp-Source: AGHT+IGEQq/W+6DUb6xVUQlR03GwyH9beM+0mneirLXAhnoMxplSnBAlG1ska4gF0njo+WnFNMe+UQ==
+X-Received: by 2002:a05:6a00:1597:b0:7a2:68bf:2592 with SMTP id d2e1a72fcca58-7a284dd5cf6mr334443b3a.12.1761253936202;
+        Thu, 23 Oct 2025 14:12:16 -0700 (PDT)
+Received: from ?IPV6:2a03:83e0:1151:15:18ba:60bd:858e:6985? ([2620:10d:c090:500::6:ccab])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7a274aa183dsm3517101b3a.30.2025.10.23.14.12.15
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Oct 2025 13:42:08 -0700 (PDT)
-Message-ID: <a48a37e3-2c22-44fb-97a4-0e57dc20421a@gmail.com>
-Date: Thu, 23 Oct 2025 22:42:07 +0200
+        Thu, 23 Oct 2025 14:12:15 -0700 (PDT)
+Message-ID: <63c97224-0e9a-4dd8-8706-38c10a1506e9@davidwei.uk>
+Date: Thu, 23 Oct 2025 14:12:14 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -69,115 +68,169 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: dm bug: hibernate to swap located on dm-integrity doesn't work
- (how to get data redundancy for swap?)
-To: Askar Safin <safinaskar@gmail.com>, linux-mm@kvack.org,
- linux-pm@vger.kernel.org, linux-block@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-lvm@lists.linux.dev,
- lvm-devel@lists.linux.dev, linux-raid@vger.kernel.org,
- DellClientKernel <Dell.Client.Kernel@dell.com>, dm-devel@lists.linux.dev,
- linux-btrfs@vger.kernel.org
-Cc: Nhat Pham <nphamcs@gmail.com>, Kairui Song <ryncsn@gmail.com>,
- Pavel Machek <pavel@ucw.cz>, =?UTF-8?B?Um9kb2xmbyBHYXJjw61hIFBlw7FhcyAoa2l4?=
- =?UTF-8?Q?=29?= <kix@kix.es>, "Rafael J. Wysocki" <rafael@kernel.org>,
- Eric Biggers <ebiggers@kernel.org>, Lennart Poettering
- <mzxreary@0pointer.de>, Christian Brauner <brauner@kernel.org>,
- Linus Torvalds <torvalds@linux-foundation.org>
-References: <20251023112920.133897-1-safinaskar@gmail.com>
 Content-Language: en-US
-From: Milan Broz <gmazyland@gmail.com>
-Autocrypt: addr=gmazyland@gmail.com; keydata=
- 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
-In-Reply-To: <20251023112920.133897-1-safinaskar@gmail.com>
+To: linux-block@vger.kernel.org, cgroups@vger.kernel.org
+Cc: hch@lst.de, hare@suse.de, ming.lei@redhat.com, dlemoal@kernel.org,
+ axboe@kernel.dk, tj@kernel.org, josef@toxicpanda.com, gjoyce@ibm.com,
+ lkp@intel.com, oliver.sang@intel.com, Nilay Shroff <nilay@linux.ibm.com>
+From: David Wei <dw@davidwei.uk>
+Subject: [REPORT] Possible circular locking dependency on 6.18-rc2 in
+ blkg_conf_open_bdev_frozen+0x80/0xa0
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi,
+Hi folks, hit this with lockdep on 6.18-rc2:
 
-I am not sure why you cc so many people, most of lists are not relevant here.
+[   36.862405] ======================================================
+[   36.862406] WARNING: possible circular locking dependency detected
+[   36.862408] 6.18.0-rc2-gdbafbca31432-dirty #97 Tainted: G S          E
+[   36.862409] ------------------------------------------------------
+[   36.862410] fb-cgroups-setu/1420 is trying to acquire lock:
+[   36.862411] ffff8884035502a8 (&q->rq_qos_mutex){+.+.}-{4:4}, at: blkg_conf_open_bdev_frozen+0x80/0xa0
+[   36.943164]
+                but task is already holding lock:
+[   36.954824] ffff8884035500a8 (&q->q_usage_counter(io)#2){++++}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0xe/0x20
+[   36.975183]
+                which lock already depends on the new lock.
+[   36.991541]
+                the existing dependency chain (in reverse order) is:
+[   37.006502]
+                -> #4 (&q->q_usage_counter(io)#2){++++}-{0:0}:
+[   37.020429]        blk_alloc_queue+0x345/0x380
+[   37.029315]        blk_mq_alloc_queue+0x51/0xb0
+[   37.038376]        __blk_mq_alloc_disk+0x14/0x60
+[   37.047612]        nvme_alloc_ns+0xa7/0xbc0
+[   37.055976]        nvme_scan_ns+0x25a/0x320
+[   37.064339]        async_run_entry_fn+0x28/0x110
+[   37.073576]        process_one_work+0x1e1/0x570
+[   37.082634]        worker_thread+0x184/0x330
+[   37.091170]        kthread+0xe6/0x1e0
+[   37.098489]        ret_from_fork+0x20b/0x260
+[   37.107026]        ret_from_fork_asm+0x11/0x20
+[   37.115912]
+                -> #3 (fs_reclaim){+.+.}-{0:0}:
+[   37.127232]        fs_reclaim_acquire+0x91/0xd0
+[   37.136293]        kmem_cache_alloc_lru_noprof+0x49/0x760
+[   37.147090]        __d_alloc+0x30/0x2a0
+[   37.154759]        d_alloc_parallel+0x4c/0x760
+[   37.163644]        __lookup_slow+0xc3/0x180
+[   37.172008]        simple_start_creating+0x57/0xc0
+[   37.181590]        debugfs_start_creating.part.0+0x4d/0xe0
+[   37.192561]        debugfs_create_dir+0x3e/0x1f0
+[   37.201795]        regulator_init+0x24/0x100
+[   37.210335]        do_one_initcall+0x46/0x250
+[   37.219043]        kernel_init_freeable+0x22c/0x430
+[   37.228799]        kernel_init+0x16/0x1b0
+[   37.236814]        ret_from_fork+0x20b/0x260
+[   37.245351]        ret_from_fork_asm+0x11/0x20
+[   37.254235]
+                -> #2 (&sb->s_type->i_mutex_key#3){+.+.}-{4:4}:
+[   37.268336]        down_write+0x25/0xa0
+[   37.276003]        simple_start_creating+0x29/0xc0
+[   37.285582]        debugfs_start_creating.part.0+0x4d/0xe0
+[   37.296552]        debugfs_create_dir+0x3e/0x1f0
+[   37.305782]        blk_register_queue+0x98/0x1c0
+[   37.315014]        __add_disk+0x21e/0x3b0
+[   37.323030]        add_disk_fwnode+0x75/0x160
+[   37.331738]        nvme_alloc_ns+0x395/0xbc0
+[   37.340275]        nvme_scan_ns+0x25a/0x320
+[   37.348638]        async_run_entry_fn+0x28/0x110
+[   37.357870]        process_one_work+0x1e1/0x570
+[   37.366929]        worker_thread+0x184/0x330
+[   37.375461]        kthread+0xe6/0x1e0
+[   37.382779]        ret_from_fork+0x20b/0x260
+[   37.391315]        ret_from_fork_asm+0x11/0x20
+[   37.400200]
+                -> #1 (&q->debugfs_mutex){+.+.}-{4:4}:
+[   37.412736]        __mutex_lock+0x83/0x1070
+[   37.421100]        rq_qos_add+0xde/0x130
+[   37.428942]        wbt_init+0x160/0x200
+[   37.436612]        blk_register_queue+0xe9/0x1c0
+[   37.445843]        __add_disk+0x21e/0x3b0
+[   37.453859]        add_disk_fwnode+0x75/0x160
+[   37.462568]        nvme_alloc_ns+0x395/0xbc0
+[   37.471105]        nvme_scan_ns+0x25a/0x320
+[   37.479469]        async_run_entry_fn+0x28/0x110
+[   37.488702]        process_one_work+0x1e1/0x570
+[   37.497761]        worker_thread+0x184/0x330
+[   37.506296]        kthread+0xe6/0x1e0
+[   37.513618]        ret_from_fork+0x20b/0x260
+[   37.522154]        ret_from_fork_asm+0x11/0x20
+[   37.531038]
+                -> #0 (&q->rq_qos_mutex){+.+.}-{4:4}:
+[   37.543399]        __lock_acquire+0x15fc/0x2730
+[   37.552460]        lock_acquire+0xb5/0x2a0
+[   37.560647]        __mutex_lock+0x83/0x1070
+[   37.569010]        blkg_conf_open_bdev_frozen+0x80/0xa0
+[   37.579457]        ioc_qos_write+0x35/0x4a0
+[   37.587820]        kernfs_fop_write_iter+0x15c/0x240
+[   37.597750]        vfs_write+0x31f/0x4c0
+[   37.605590]        ksys_write+0x58/0xd0
+[   37.613257]        do_syscall_64+0x6f/0x1120
+[   37.621790]        entry_SYSCALL_64_after_hwframe+0x4b/0x53
+[   37.632932]
+                other info that might help us debug this:
+[   37.648935] Chain exists of:
+                  &q->rq_qos_mutex --> fs_reclaim --> &q->q_usage_counter(io)#2
+[   37.671552]  Possible unsafe locking scenario:
+[   37.683385]        CPU0                    CPU1
+[   37.692438]        ----                    ----
+[   37.701489]   lock(&q->q_usage_counter(io)#2);
+[   37.710374]                                lock(fs_reclaim);
+[   37.721691]                                lock(&q->q_usage_counter(io)#2);
+[   37.735615]   lock(&q->rq_qos_mutex);
+[   37.742934]
+                 *** DEADLOCK ***
+[   37.754767] 6 locks held by fb-cgroups-setu/1420:
+[   37.764168]  #0: ffff88840ce38e78 (&f->f_pos_lock){+.+.}-{4:4}, at: fdget_pos+0x7a/0xb0
+[   37.780179]  #1: ffff88841c292400 (sb_writers#8){.+.+}-{0:0}, at: ksys_write+0x58/0xd0
+[   37.796018]  #2: ffff88840cfdba88 (&of->mutex#2){+.+.}-{4:4}, at: kernfs_fop_write_iter+0xfd/0x240
+[   37.813943]  #3: ffff888404374428 (kn->active#105){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x112/0x240
+[   37.832390]  #4: ffff8884035500a8 (&q->q_usage_counter(io)#2){++++}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0xe/0x20
+[   37.853618]  #5: ffff8884035500e0 (&q->q_usage_counter(queue)#2){+.+.}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0xe/0x20
+[   37.875365]
+                stack backtrace:
+[   37.884071] CPU: 19 UID: 0 PID: 1420 Comm: fb-cgroups-setu Tainted: G S          E       6.18.0-rc2-gdbafbca31432-dirty #97 NONE
+[   37.884075] Tainted: [S]=CPU_OUT_OF_SPEC, [E]=UNSIGNED_MODULE
+[   37.884075] Hardware name: Quanta Delta Lake MP 29F0EMA01D0/Delta Lake-Class1, BIOS F0E_3A21 06/27/2024
+[   37.884077] Call Trace:
+[   37.884078]  <TASK>
+[   37.884079]  dump_stack_lvl+0x7e/0xc0
+[   37.884083]  print_circular_bug+0x2c2/0x400
+[   37.884087]  check_noncircular+0x118/0x130
+[   37.884090]  ? save_trace+0x46/0x370
+[   37.884093]  ? add_lock_to_list+0x2c/0x1a0
+[   37.884096]  __lock_acquire+0x15fc/0x2730
+[   37.884101]  lock_acquire+0xb5/0x2a0
+[   37.884103]  ? blkg_conf_open_bdev_frozen+0x80/0xa0
+[   37.884108]  __mutex_lock+0x83/0x1070
+[   37.884111]  ? blkg_conf_open_bdev_frozen+0x80/0xa0
+[   37.884114]  ? mark_held_locks+0x49/0x70
+[   37.884135]  ? blkg_conf_open_bdev_frozen+0x80/0xa0
+[   37.884140]  ? blkg_conf_open_bdev_frozen+0x80/0xa0
+[   37.884143]  blkg_conf_open_bdev_frozen+0x80/0xa0
+[   37.884147]  ioc_qos_write+0x35/0x4a0
+[   37.884150]  ? kernfs_root+0x6e/0x160
+[   37.884154]  ? kernfs_root+0x73/0x160
+[   37.884157]  ? kernfs_root_flags+0xa/0x10
+[   37.884160]  ? kn_priv+0x29/0x70
+[   37.884164]  ? cgroup_file_write+0x2b/0x260
+[   37.884168]  kernfs_fop_write_iter+0x15c/0x240
+[   37.884172]  vfs_write+0x31f/0x4c0
+[   37.884176]  ksys_write+0x58/0xd0
+[   37.884179]  do_syscall_64+0x6f/0x1120
+[   37.884182]  entry_SYSCALL_64_after_hwframe+0x4b/0x53
+[   37.884184] RIP: 0033:0x7f4d8171b87d
+[   37.884191] Code: e5 48 83 ec 20 48 89 55 e8 48 89 75 f0 89 7d f8 e8 c8 b3 f7 ff 41 89 c0 48 8b 55 e8 48 8b 75 f0 8b 7d f8 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 3b 44 89 c7 48 89 45 f8 e8 ff b3 f7 ff 48 8b
+[   37.884193] RSP: 002b:00007ffe01969880 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
+[   37.884195] RAX: ffffffffffffffda RBX: 0000000000000041 RCX: 00007f4d8171b87d
+[   37.884196] RDX: 0000000000000041 RSI: 00007f4d7f7aae60 RDI: 0000000000000007
+[   37.884197] RBP: 00007ffe019698a0 R08: 0000000000000000 R09: 00007f4d7f7aae60
+[   37.884199] R10: 00007f4d8160afd0 R11: 0000000000000293 R12: 0000000000000041
+[   37.884200] R13: 0000000000000007 R14: 00007ffe0196a020 R15: 0000000000000000
+[   37.884205]  </TASK>
 
-Anyway, could you please test one thing below so the problem is better isolated?
-
-On 10/23/25 1:29 PM, Askar Safin wrote:
-...
-> Also I tried to add "--integrity-no-journal" to "format" and "open".
-> It didn't work, either. (I don't remember what exactly didn't work.
-> I can do this experiment again, if needed.)
-
-Are you sure you used --integrity-no-journal both in activation before
-hibernation and also in resume? If not, please try it.
-This flag activates direct mode and and completely avoids dm-integrity journal.
-You can verify it with "integritysetup status <device>" - it should say "journal: not active".
-
-And if it does not work, could you try to use -integrity-recovery-mode the same
-way (both before hibernation and later in resume)? This will effectively ignore checksums
-providing no protection, but keeping dm-integrity device still in place.
-You can verify it with "integritysetup status <device>" - it should say "mode: read/write recovery".
-Is the problem still in place with this setting?
-
-You can also try to decrease journal commit time with --journal-commit-time option,
-but this is not a real solution.
-
-...> 
-> Then I tried to do "cryptsetup" instead of "integritysetup". I created
-> swap partition so:
-> 
-> cryptsetup luksFormat --type luks2 /dev/disk/by-partuuid/c4bbc73d-7909-42ea-8d96-eab82512cbe7 /tmp/key
-> cryptsetup open --type luks2 --key-file /tmp/key /dev/disk/by-partuuid/c4bbc73d-7909-42ea-8d96-eab82512cbe7 swap
-> mkswap /dev/mapper/swap
-> swapon /dev/mapper/swap
-> 
-> And, of course, I did all necessary edits to initramfs.
-> 
-> And this time everything worked. This proves that I didn't do any mistakes in my setup
-> (i. e. I got initramfs right, etc), and this is actual bug in dm-integrity.
-> 
-> Unfortunately, LUKS created such way doesn't have any redundancy. So this is not solution for me.
-
-Redundancy? You mean data integrity protection? There is no redundancy, only additional authentication tag
-(detecting integrity error but not correcting it).
+Happens consistently on boot.
 
 Thanks,
-Milan
-
+David
