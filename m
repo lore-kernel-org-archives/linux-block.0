@@ -1,56 +1,56 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17FA632D7FF
-	for <linux-block@vger.kernel.org>; Thu, 23 Oct 2025 15:34:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09E7633B960
+	for <linux-block@vger.kernel.org>; Thu, 23 Oct 2025 15:34:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761233663; cv=none; b=TyUW+iOWbfHmhrxnUSoUrajLdFIPtsSgw8efCikDu72cFyhTeBdW9Rx8n2gxIBC6YpDpmjXDhNItUK/XhQ3u46E/GqWtXNHVoRNOiA/Hi6dGt6bwB5GaYzcOnhZuikxfJIJE0B1QVzsXEA/BazkZBaZqzYD9dl3Vc4/zw8wzPhI=
+	t=1761233665; cv=none; b=oOGjUI6R80CENg5+m7oTRVeU/eKmoRWJyxALKBjdfp4G6BlktcJar6xaz432G4FPRaDBiFtLSttYoErz7Ch+RJrS32PPEBNH8iJzGod4qZZWNraegrkuizASYeuz/zr8woRZGljrGI0JEWSQeSU7+ExDoJTrPp7xsjsYn3yP6ZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761233663; c=relaxed/simple;
-	bh=LbAgS2SkuBtn7mEkEk5FFrJYN4kVqANwlwynfICsTGw=;
+	s=arc-20240116; t=1761233665; c=relaxed/simple;
+	bh=PV9s/UFNPqJvrUc4c0vaFDCC/g3p2t+m25hKjAEclwk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SFYvJOSKTSH82CPbHT+TvFhqm7IXKtgGcoE3P6EvKa0jwGuvoWuJfG8871rc7AZfS1d8mFnoXnz1ZDGFkLaW/Pcm2fM0qEmcBtlS2xwuLhmuZcfrf6Y58OzeSK+h/hxno48K3G/TIS0IKS04mjnpmOt2hCE5V86bNdok6rkz46s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IOLbj4g5; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=g/NarOH8dDgzVaqEuRtZP6fDkq8AjDMqJ+SDp8mN0BBR/4QidtGD4sVYR0K6h4GVxGECLDuo4FMHioFXXw9txiL7mzgojS8TFfHmF7VmI9560G9WmF+HEH6n/X6APbQB41gMEuJ87RNN+6cdl04vTzfFToKHL/TR2Cd1OAYViZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gWI3Vy5c; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IOLbj4g5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gWI3Vy5c"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761233659;
+	s=mimecast20190719; t=1761233663;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=V+dlOmrmoALg6D6fU040Xfb1oXTmJjR0hSLg9tbZIPI=;
-	b=IOLbj4g5Pkad7wuHCwk2zPUDEbFbDP4xzkt4oWln0wL9vA9RZoX/I1qw6p3MCY108YlWk6
-	n7P8EjUxWJUl9PvVCIhIUxAaXW1Roz12dq5E3OZYHAXxiH2aEAviII6gS7fAOGoX9QciKt
-	e94WHmcNy9ZHLxM+grtVVoGLq8OLbI0=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	bh=5XT69VGgJ6Sr13m8xCDDiytgfgPk+8EDxuF8jeDtomI=;
+	b=gWI3Vy5c95uR3NKmCsO4DmesDAXKvSDDj+ptXCnwnQQ3cKSLN7IiSm9tzDsFWerpEgLG+Z
+	PFHXP55m9ILch/qsg0Fh2ol6u42jhkyEc1fTmmdgq1H1Ox+hJ/KFN0MqbkHoYgFU6V0wlJ
+	BzCpCokfmdMul08N/6tCw9CBf94jqUI=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-404-yXnTQ1FUMSGtYsaZxy5d_g-1; Thu,
- 23 Oct 2025 11:34:14 -0400
-X-MC-Unique: yXnTQ1FUMSGtYsaZxy5d_g-1
-X-Mimecast-MFC-AGG-ID: yXnTQ1FUMSGtYsaZxy5d_g_1761233653
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-688-RBm-T8RqNUq4zpVsBl0D0g-1; Thu,
+ 23 Oct 2025 11:34:18 -0400
+X-MC-Unique: RBm-T8RqNUq4zpVsBl0D0g-1
+X-Mimecast-MFC-AGG-ID: RBm-T8RqNUq4zpVsBl0D0g_1761233657
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4F4861956070;
-	Thu, 23 Oct 2025 15:34:13 +0000 (UTC)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A65A61956096;
+	Thu, 23 Oct 2025 15:34:17 +0000 (UTC)
 Received: from localhost (unknown [10.72.120.30])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 65FBB180045B;
-	Thu, 23 Oct 2025 15:34:11 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A86F5195398C;
+	Thu, 23 Oct 2025 15:34:16 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
 Cc: Uday Shankar <ushankar@purestorage.com>,
 	Caleb Sander Mateos <csander@purestorage.com>,
 	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 20/25] selftests: ublk: add batch buffer management infrastructure
-Date: Thu, 23 Oct 2025 23:32:25 +0800
-Message-ID: <20251023153234.2548062-21-ming.lei@redhat.com>
+Subject: [PATCH V2 21/25] selftests: ublk: handle UBLK_U_IO_PREP_IO_CMDS
+Date: Thu, 23 Oct 2025 23:32:26 +0800
+Message-ID: <20251023153234.2548062-22-ming.lei@redhat.com>
 In-Reply-To: <20251023153234.2548062-1-ming.lei@redhat.com>
 References: <20251023153234.2548062-1-ming.lei@redhat.com>
 Precedence: bulk
@@ -60,407 +60,285 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Add the foundational infrastructure for UBLK_F_BATCH_IO buffer
-management including:
+Implement support for UBLK_U_IO_PREP_IO_CMDS in the batch I/O framework:
 
-- Allocator utility functions for small sized per-thread allocation
-- Batch buffer allocation and deallocation functions
-- Buffer index management for commit buffers
-- Thread state management for batch I/O mode
-- Buffer size calculation based on device features
+- Add batch command initialization and setup functions
+- Implement prep command queueing with proper buffer management
+- Add command completion handling for prep and commit commands
+- Integrate batch I/O setup into thread initialization
+- Update CQE handling to support batch commands
 
-This prepares the groundwork for handling batch I/O commands by
-establishing the buffer management layer needed for UBLK_U_IO_PREP_IO_CMDS
-and UBLK_U_IO_COMMIT_IO_CMDS operations.
+The implementation uses the previously established buffer management
+infrastructure to queue UBLK_U_IO_PREP_IO_CMDS commands. Commands are
+prepared in the first thread context and use commit buffers for
+efficient command batching.
 
-The allocator uses CPU sets for efficient per-thread buffer tracking,
-and commit buffers are pre-allocated with 2 buffers per thread to handle
-overlapping command operations.
+Key changes:
+- ublk_batch_queue_prep_io_cmds() prepares I/O command batches
+- ublk_batch_compl_cmd() handles batch command completions
+- Modified thread setup to use batch operations when enabled
+- Enhanced buffer index calculation for batch mode
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- tools/testing/selftests/ublk/Makefile |   2 +-
- tools/testing/selftests/ublk/batch.c  | 153 ++++++++++++++++++++++++++
- tools/testing/selftests/ublk/kublk.c  |  26 ++++-
- tools/testing/selftests/ublk/kublk.h  |  52 +++++++++
- tools/testing/selftests/ublk/utils.h  |  54 +++++++++
- 5 files changed, 283 insertions(+), 4 deletions(-)
- create mode 100644 tools/testing/selftests/ublk/batch.c
+ tools/testing/selftests/ublk/batch.c | 114 +++++++++++++++++++++++++++
+ tools/testing/selftests/ublk/kublk.c |  46 ++++++++---
+ tools/testing/selftests/ublk/kublk.h |  22 ++++++
+ 3 files changed, 172 insertions(+), 10 deletions(-)
 
-diff --git a/tools/testing/selftests/ublk/Makefile b/tools/testing/selftests/ublk/Makefile
-index 770269efe42a..a724276622d0 100644
---- a/tools/testing/selftests/ublk/Makefile
-+++ b/tools/testing/selftests/ublk/Makefile
-@@ -44,7 +44,7 @@ TEST_GEN_PROGS_EXTENDED = kublk
- 
- include ../lib.mk
- 
--$(TEST_GEN_PROGS_EXTENDED): kublk.c null.c file_backed.c common.c stripe.c \
-+$(TEST_GEN_PROGS_EXTENDED): kublk.c batch.c null.c file_backed.c common.c stripe.c \
- 	fault_inject.c
- 
- check:
 diff --git a/tools/testing/selftests/ublk/batch.c b/tools/testing/selftests/ublk/batch.c
-new file mode 100644
-index 000000000000..b6bcdd529df9
---- /dev/null
+index b6bcdd529df9..ca0ecc33e6a1 100644
+--- a/tools/testing/selftests/ublk/batch.c
 +++ b/tools/testing/selftests/ublk/batch.c
-@@ -0,0 +1,153 @@
-+/* SPDX-License-Identifier: MIT */
-+/*
-+ * Description: UBLK_F_BATCH_IO buffer management
-+ */
+@@ -151,3 +151,117 @@ void ublk_batch_free_buf(struct ublk_thread *t)
+ {
+ 	free_batch_commit_buf(t);
+ }
 +
-+#include "kublk.h"
-+
-+static inline void *ublk_get_commit_buf(struct ublk_thread *t,
-+					unsigned short buf_idx)
++static void ublk_init_batch_cmd(struct ublk_thread *t, __u16 q_id,
++				struct io_uring_sqe *sqe, unsigned op,
++				unsigned short elem_bytes,
++				unsigned short nr_elem,
++				unsigned short buf_idx)
 +{
-+	unsigned idx;
++	struct ublk_batch_io *cmd;
++	__u64 user_data;
 +
-+	if (buf_idx < t->commit_buf_start ||
-+			buf_idx >= t->commit_buf_start + t->nr_commit_buf)
-+		return NULL;
-+	idx = buf_idx - t->commit_buf_start;
-+	return t->commit_buf + idx * t->commit_buf_size;
++	cmd = (struct ublk_batch_io *)ublk_get_sqe_cmd(sqe);
++
++	ublk_set_sqe_cmd_op(sqe, op);
++
++	sqe->fd	= 0;	/* dev->fds[0] */
++	sqe->opcode	= IORING_OP_URING_CMD;
++	sqe->flags	= IOSQE_FIXED_FILE;
++
++	cmd->q_id	= q_id;
++	cmd->flags	= 0;
++	cmd->reserved 	= 0;
++	cmd->elem_bytes = elem_bytes;
++	cmd->nr_elem	= nr_elem;
++
++	user_data = build_user_data(buf_idx, _IOC_NR(op), 0, q_id, 0);
++	io_uring_sqe_set_data64(sqe, user_data);
++
++	t->cmd_inflight += 1;
++
++	ublk_dbg(UBLK_DBG_IO_CMD, "%s: thread %u qid %d cmd_op %x data %lx "
++			"nr_elem %u elem_bytes %u buf_size %u buf_idx %d "
++			"cmd_inflight %u\n",
++			__func__, t->idx, q_id, op, user_data,
++			cmd->nr_elem, cmd->elem_bytes,
++			nr_elem * elem_bytes, buf_idx, t->cmd_inflight);
 +}
 +
-+/*
-+ * Allocate one buffer for UBLK_U_IO_PREP_IO_CMDS or UBLK_U_IO_COMMIT_IO_CMDS
-+ *
-+ * Buffer index is returned.
-+ */
-+static inline unsigned short ublk_alloc_commit_buf(struct ublk_thread *t)
++static void ublk_setup_commit_sqe(struct ublk_thread *t,
++				  struct io_uring_sqe *sqe,
++				  unsigned short buf_idx)
 +{
-+	int idx = allocator_get(&t->commit_buf_alloc);
++	struct ublk_batch_io *cmd;
 +
-+	if (idx >= 0)
-+		return  idx + t->commit_buf_start;
-+	return UBLKS_T_COMMIT_BUF_INV_IDX;
++	cmd = (struct ublk_batch_io *)ublk_get_sqe_cmd(sqe);
++
++	sqe->rw_flags= IORING_URING_CMD_FIXED;
++	sqe->buf_index = buf_idx;
++	cmd->flags |= t->cmd_flags;
 +}
 +
-+/*
-+ * Free one commit buffer which is used by UBLK_U_IO_PREP_IO_CMDS or
-+ * UBLK_U_IO_COMMIT_IO_CMDS
-+ */
-+static inline void ublk_free_commit_buf(struct ublk_thread *t,
-+					 unsigned short i)
++int ublk_batch_queue_prep_io_cmds(struct ublk_thread *t, struct ublk_queue *q)
 +{
-+	unsigned short idx = i - t->commit_buf_start;
++	unsigned short nr_elem = q->q_depth;
++	unsigned short buf_idx = ublk_alloc_commit_buf(t);
++	struct io_uring_sqe *sqe;
++	void *buf;
++	int i;
 +
-+	ublk_assert(idx < t->nr_commit_buf);
-+	ublk_assert(allocator_get_val(&t->commit_buf_alloc, idx) != 0);
++	ublk_assert(buf_idx != UBLKS_T_COMMIT_BUF_INV_IDX);
 +
-+	allocator_put(&t->commit_buf_alloc, idx);
-+}
++	ublk_io_alloc_sqes(t, &sqe, 1);
 +
-+static unsigned char ublk_commit_elem_buf_size(struct ublk_dev *dev)
-+{
-+	if (dev->dev_info.flags & (UBLK_F_SUPPORT_ZERO_COPY | UBLK_F_USER_COPY |
-+				UBLK_F_AUTO_BUF_REG))
-+		return 8;
++	ublk_assert(nr_elem == q->q_depth);
++	buf = ublk_get_commit_buf(t, buf_idx);
++	for (i = 0; i < nr_elem; i++) {
++		struct ublk_batch_elem *elem = (struct ublk_batch_elem *)(
++				buf + i * t->commit_buf_elem_size);
++		struct ublk_io *io = &q->ios[i];
 +
-+	/* one extra 8bytes for carrying buffer address */
-+	return 16;
-+}
++		elem->tag = i;
++		elem->result = 0;
 +
-+static unsigned ublk_commit_buf_size(struct ublk_thread *t)
-+{
-+	struct ublk_dev *dev = t->dev;
-+	unsigned elem_size = ublk_commit_elem_buf_size(dev);
-+	unsigned int total = elem_size * dev->dev_info.queue_depth;
-+	unsigned int page_sz = getpagesize();
-+
-+	return round_up(total, page_sz);
-+}
-+
-+static void free_batch_commit_buf(struct ublk_thread *t)
-+{
-+	free(t->commit_buf);
-+	allocator_deinit(&t->commit_buf_alloc);
-+}
-+
-+static int alloc_batch_commit_buf(struct ublk_thread *t)
-+{
-+	unsigned buf_size = ublk_commit_buf_size(t);
-+	unsigned int total = buf_size * t->nr_commit_buf;
-+	struct iovec iov[t->nr_commit_buf];
-+	unsigned int page_sz = getpagesize();
-+	void *buf = NULL;
-+	int i, ret;
-+
-+	allocator_init(&t->commit_buf_alloc, t->nr_commit_buf);
-+
-+	t->commit_buf = NULL;
-+	ret = posix_memalign(&buf, page_sz, total);
-+	if (ret || !buf)
-+		goto fail;
-+
-+	t->commit_buf = buf;
-+	for (i = 0; i < t->nr_commit_buf; i++) {
-+		iov[i].iov_base = buf;
-+		iov[i].iov_len = buf_size;
-+		buf += buf_size;
++		if (ublk_queue_use_auto_zc(q))
++			elem->buf_index = ublk_batch_io_buf_idx(t, q, i);
++		else if (!ublk_queue_no_buf(q))
++			elem->buf_addr = (__u64)io->buf_addr;
 +	}
 +
-+	ret = io_uring_register_buffers_update_tag(&t->ring,
-+			t->commit_buf_start, iov, NULL,
-+			t->nr_commit_buf);
-+	if (ret == t->nr_commit_buf)
-+		return 0;
++	sqe->addr = (__u64)buf;
++	sqe->len = t->commit_buf_elem_size * nr_elem;
 +
-+	ublk_err("%s: io_uring_register_buffers_update_tag failed ret %d\n",
-+				__func__, ret);
-+fail:
-+	free_batch_commit_buf(t);
-+	return ret;
++	ublk_init_batch_cmd(t, q->q_id, sqe, UBLK_U_IO_PREP_IO_CMDS,
++			t->commit_buf_elem_size, nr_elem, buf_idx);
++	ublk_setup_commit_sqe(t, sqe, buf_idx);
++	return 0;
 +}
 +
-+void ublk_batch_prepare(struct ublk_thread *t)
++static void ublk_batch_compl_commit_cmd(struct ublk_thread *t,
++					const struct io_uring_cqe *cqe,
++					unsigned op)
 +{
-+	/*
-+	 * We only handle single device in this thread context.
-+	 *
-+	 * All queues have same feature flags, so use queue 0's for
-+	 * calculate uring_cmd flags.
-+	 *
-+	 * This way looks not elegant, but it works so far.
-+	 */
-+	struct ublk_queue *q = &t->dev->q[0];
++	unsigned short buf_idx = user_data_to_tag(cqe->user_data);
 +
-+	t->commit_buf_elem_size = ublk_commit_elem_buf_size(t->dev);
-+	t->commit_buf_size = ublk_commit_buf_size(t);
-+	t->commit_buf_start = t->nr_bufs;
-+	t->nr_commit_buf = 2;
-+	t->nr_bufs += t->nr_commit_buf;
++	if (op == _IOC_NR(UBLK_U_IO_PREP_IO_CMDS))
++		ublk_assert(cqe->res == 0);
++	else if (op == _IOC_NR(UBLK_U_IO_COMMIT_IO_CMDS))
++		;//assert(cqe->res == t->commit_buf_size);
++	else
++		ublk_assert(0);
 +
-+	t->cmd_flags = 0;
-+	if (ublk_queue_use_auto_zc(q)) {
-+		if (ublk_queue_auto_zc_fallback(q))
-+			t->cmd_flags |= UBLK_BATCH_F_AUTO_BUF_REG_FALLBACK;
-+	} else if (!ublk_queue_no_buf(q))
-+		t->cmd_flags |= UBLK_BATCH_F_HAS_BUF_ADDR;
-+
-+	t->state |= UBLKS_T_BATCH_IO;
-+
-+	ublk_log("%s: thread %d commit(nr_bufs %u, buf_size %u, start %u)\n",
-+			__func__, t->idx,
-+			t->nr_commit_buf, t->commit_buf_size,
-+			t->nr_bufs);
++	ublk_free_commit_buf(t, buf_idx);
 +}
 +
-+int ublk_batch_alloc_buf(struct ublk_thread *t)
++void ublk_batch_compl_cmd(struct ublk_thread *t,
++			  const struct io_uring_cqe *cqe)
 +{
-+	ublk_assert(t->nr_commit_buf < 16);
-+	return alloc_batch_commit_buf(t);
-+}
++	unsigned op = user_data_to_op(cqe->user_data);
 +
-+void ublk_batch_free_buf(struct ublk_thread *t)
-+{
-+	free_batch_commit_buf(t);
++	if (op == _IOC_NR(UBLK_U_IO_PREP_IO_CMDS) ||
++			op == _IOC_NR(UBLK_U_IO_COMMIT_IO_CMDS)) {
++		ublk_batch_compl_commit_cmd(t, cqe, op);
++		return;
++	}
 +}
 diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftests/ublk/kublk.c
-index 388e85a8d07e..088058114136 100644
+index 088058114136..2de422cf3f1c 100644
 --- a/tools/testing/selftests/ublk/kublk.c
 +++ b/tools/testing/selftests/ublk/kublk.c
-@@ -423,6 +423,8 @@ static void ublk_thread_deinit(struct ublk_thread *t)
+@@ -795,28 +795,32 @@ static void ublk_handle_cqe(struct ublk_thread *t,
  {
- 	io_uring_unregister_buffers(&t->ring);
+ 	struct ublk_dev *dev = t->dev;
+ 	unsigned q_id = user_data_to_q_id(cqe->user_data);
+-	struct ublk_queue *q = &dev->q[q_id];
+ 	unsigned cmd_op = user_data_to_op(cqe->user_data);
  
-+	ublk_batch_free_buf(t);
-+
- 	io_uring_unregister_ring_fd(&t->ring);
+ 	if (cqe->res < 0 && cqe->res != -ENODEV)
+-		ublk_err("%s: res %d userdata %llx queue state %x\n", __func__,
+-				cqe->res, cqe->user_data, q->flags);
++		ublk_err("%s: res %d userdata %llx thread state %x\n", __func__,
++				cqe->res, cqe->user_data, t->state);
  
- 	if (t->ring.ring_fd > 0) {
-@@ -505,15 +507,33 @@ static int ublk_thread_init(struct ublk_thread *t, unsigned long long extra_flag
- 		unsigned nr_ios = dev->dev_info.queue_depth * dev->dev_info.nr_hw_queues;
- 		unsigned max_nr_ios_per_thread = nr_ios / dev->nthreads;
- 		max_nr_ios_per_thread += !!(nr_ios % dev->nthreads);
--		ret = io_uring_register_buffers_sparse(
--			&t->ring, max_nr_ios_per_thread);
-+
-+		t->nr_bufs = max_nr_ios_per_thread;
-+	} else {
-+		t->nr_bufs = 0;
-+	}
-+
-+	if (ublk_dev_batch_io(dev))
-+		 ublk_batch_prepare(t);
-+
-+	if (t->nr_bufs) {
-+		ret = io_uring_register_buffers_sparse(&t->ring, t->nr_bufs);
- 		if (ret) {
--			ublk_err("ublk dev %d thread %d register spare buffers failed %d",
-+			ublk_err("ublk dev %d thread %d register spare buffers failed %d\n",
- 					dev->dev_info.dev_id, t->idx, ret);
- 			goto fail;
- 		}
+-	ublk_dbg(UBLK_DBG_IO_CMD, "%s: res %d (qid %d tag %u cmd_op %u target %d/%d) stopping %d\n",
+-			__func__, cqe->res, q->q_id, user_data_to_tag(cqe->user_data),
+-			cmd_op, is_target_io(cqe->user_data),
++	ublk_dbg(UBLK_DBG_IO_CMD, "%s: res %d (thread %d qid %d tag %u cmd_op %x "
++			"data %lx target %d/%d) stopping %d\n",
++			__func__, cqe->res, t->idx, q_id,
++			user_data_to_tag(cqe->user_data),
++			cmd_op, cqe->user_data, is_target_io(cqe->user_data),
+ 			user_data_to_tgt_data(cqe->user_data),
+ 			(t->state & UBLKS_T_STOPPING));
+ 
+ 	/* Don't retrieve io in case of target io */
+ 	if (is_target_io(cqe->user_data)) {
+-		ublksrv_handle_tgt_cqe(t, q, cqe);
++		ublksrv_handle_tgt_cqe(t, &dev->q[q_id], cqe);
+ 		return;
  	}
  
-+	if (ublk_dev_batch_io(dev)) {
-+		ret = ublk_batch_alloc_buf(t);
-+		if (ret) {
-+			ublk_err("ublk dev %d thread %d alloc batch buf failed %d\n",
-+				dev->dev_info.dev_id, t->idx, ret);
-+			goto fail;
-+		}
-+	}
-+
- 	io_uring_register_ring_fd(&t->ring);
+ 	t->cmd_inflight--;
  
- 	if (flags & UBLKS_Q_NO_UBLK_FIXED_FD) {
-diff --git a/tools/testing/selftests/ublk/kublk.h b/tools/testing/selftests/ublk/kublk.h
-index c3da64d3b7b0..4dd9d3053325 100644
---- a/tools/testing/selftests/ublk/kublk.h
-+++ b/tools/testing/selftests/ublk/kublk.h
-@@ -174,6 +174,14 @@ struct ublk_queue {
- 	struct ublk_io ios[UBLK_QUEUE_DEPTH];
- };
- 
-+/* align with `ublk_elem_header` */
-+struct ublk_batch_elem {
-+	__u16 tag;
-+	__u16 buf_index;
-+	__s32 result;
-+	__u64 buf_addr;
-+};
-+
- struct ublk_thread {
- 	struct ublk_dev *dev;
- 	struct io_uring ring;
-@@ -185,7 +193,23 @@ struct ublk_thread {
- 
- #define UBLKS_T_STOPPING	(1U << 0)
- #define UBLKS_T_IDLE	(1U << 1)
-+#define UBLKS_T_BATCH_IO	(1U << 31) 	/* readonly */
- 	unsigned state;
-+
-+	unsigned short nr_bufs;
-+
-+       /* followings are for BATCH_IO */
-+	unsigned short commit_buf_start;
-+	unsigned char  commit_buf_elem_size;
-+       /*
-+        * We just support single device, so pre-calculate commit/prep flags
-+        */
-+	unsigned short cmd_flags;
-+	unsigned int   nr_commit_buf;
-+	unsigned int   commit_buf_size;
-+	void *commit_buf;
-+#define UBLKS_T_COMMIT_BUF_INV_IDX  ((unsigned short)-1)
-+	struct allocator commit_buf_alloc;
- };
- 
- struct ublk_dev {
-@@ -206,6 +230,27 @@ struct ublk_dev {
- 
- extern int ublk_queue_io_cmd(struct ublk_thread *t, struct ublk_io *io);
- 
-+static inline int __ublk_use_batch_io(__u64 flags)
-+{
-+	return flags & UBLK_F_BATCH_IO;
-+}
-+
-+static inline int ublk_queue_batch_io(const struct ublk_queue *q)
-+{
-+	return __ublk_use_batch_io(q->flags);
-+}
-+
-+static inline int ublk_dev_batch_io(const struct ublk_dev *dev)
-+{
-+	return __ublk_use_batch_io(dev->dev_info.flags);
-+}
-+
-+/* only work for handle single device in this pthread context */
-+static inline int ublk_thread_batch_io(const struct ublk_thread *t)
-+{
-+	return t->state & UBLKS_T_BATCH_IO;
-+}
-+
- 
- static inline int ublk_io_auto_zc_fallback(const struct ublksrv_io_desc *iod)
- {
-@@ -421,6 +466,13 @@ static inline int ublk_queue_no_buf(const struct ublk_queue *q)
- 	return ublk_queue_use_zc(q) || ublk_queue_use_auto_zc(q);
+-	ublk_handle_uring_cmd(t, q, cqe);
++	if (ublk_thread_batch_io(t))
++		ublk_batch_compl_cmd(t, cqe);
++	else
++		ublk_handle_uring_cmd(t, &dev->q[q_id], cqe);
  }
  
-+/* Initialize batch I/O state and calculate buffer parameters */
-+void ublk_batch_prepare(struct ublk_thread *t);
-+/* Allocate and register commit buffers for batch operations */
-+int ublk_batch_alloc_buf(struct ublk_thread *t);
-+/* Free commit buffers and cleanup batch allocator */
-+void ublk_batch_free_buf(struct ublk_thread *t);
-+
- extern const struct ublk_tgt_ops null_tgt_ops;
- extern const struct ublk_tgt_ops loop_tgt_ops;
- extern const struct ublk_tgt_ops stripe_tgt_ops;
-diff --git a/tools/testing/selftests/ublk/utils.h b/tools/testing/selftests/ublk/utils.h
-index 17eefed73690..aab522f26167 100644
---- a/tools/testing/selftests/ublk/utils.h
-+++ b/tools/testing/selftests/ublk/utils.h
-@@ -21,6 +21,60 @@
- #define round_up(val, rnd) \
- 	(((val) + ((rnd) - 1)) & ~((rnd) - 1))
+ static int ublk_reap_events_uring(struct ublk_thread *t)
+@@ -873,6 +877,22 @@ struct ublk_thread_info {
+ 	unsigned long long	extra_flags;
+ };
  
-+/* small sized & per-thread allocator */
-+struct allocator {
-+	unsigned int size;
-+	cpu_set_t *set;
-+};
-+
-+static inline int allocator_init(struct allocator *a, unsigned size)
-+{
-+	a->set = CPU_ALLOC(size);
-+	a->size = size;
-+
-+	if (a->set)
-+		return 0;
-+	return -ENOMEM;
-+}
-+
-+static inline void allocator_deinit(struct allocator *a)
-+{
-+	CPU_FREE(a->set);
-+	a->set = NULL;
-+	a->size = 0;
-+}
-+
-+static inline int allocator_get(struct allocator *a)
++static void ublk_batch_setup_queues(struct ublk_thread *t)
 +{
 +	int i;
 +
-+	for (i = 0; i < a->size; i += 1) {
-+		size_t set_size = CPU_ALLOC_SIZE(a->size);
++	/* setup all queues in the 1st thread */
++	for (i = 0; i < t->dev->dev_info.nr_hw_queues; i++) {
++		struct ublk_queue *q = &t->dev->q[i];
++		int ret;
 +
-+		if (!CPU_ISSET_S(i, set_size, a->set)) {
-+			CPU_SET_S(i, set_size, a->set);
-+			return i;
-+		}
++		ret = ublk_batch_queue_prep_io_cmds(t, q);
++		ublk_assert(ret == 0);
++		ret = ublk_process_io(t);
++		ublk_assert(ret >= 0);
++	}
++}
++
+ static void *ublk_io_handler_fn(void *data)
+ {
+ 	struct ublk_thread_info *info = data;
+@@ -897,8 +917,14 @@ static void *ublk_io_handler_fn(void *data)
+ 	ublk_dbg(UBLK_DBG_THREAD, "tid %d: ublk dev %d thread %u started\n",
+ 			gettid(), dev_id, t->idx);
+ 
+-	/* submit all io commands to ublk driver */
+-	ublk_submit_fetch_commands(t);
++	if (!ublk_thread_batch_io(t)) {
++		/* submit all io commands to ublk driver */
++		ublk_submit_fetch_commands(t);
++	} else if (!t->idx) {
++		/* prepare all io commands in the 1st thread context */
++		ublk_batch_setup_queues(t);
 +	}
 +
-+	return -1;
-+}
+ 	do {
+ 		if (ublk_process_io(t) < 0)
+ 			break;
+diff --git a/tools/testing/selftests/ublk/kublk.h b/tools/testing/selftests/ublk/kublk.h
+index 4dd9d3053325..0cecde526a2c 100644
+--- a/tools/testing/selftests/ublk/kublk.h
++++ b/tools/testing/selftests/ublk/kublk.h
+@@ -400,10 +400,16 @@ static inline void ublk_set_sqe_cmd_op(struct io_uring_sqe *sqe, __u32 cmd_op)
+ 	addr[1] = 0;
+ }
+ 
++static inline unsigned short ublk_batch_io_buf_idx(
++		const struct ublk_thread *t, const struct ublk_queue *q,
++		unsigned tag);
 +
-+static inline void allocator_put(struct allocator *a, int i)
-+{
-+	size_t set_size = CPU_ALLOC_SIZE(a->size);
-+
-+	if (i >= 0 && i < a->size)
-+		CPU_CLR_S(i, set_size, a->set);
-+}
-+
-+static inline int allocator_get_val(struct allocator *a, int i)
-+{
-+	size_t set_size = CPU_ALLOC_SIZE(a->size);
-+
-+	return CPU_ISSET_S(i, set_size, a->set);
-+}
-+
- static inline unsigned int ilog2(unsigned int x)
+ static inline unsigned short ublk_io_buf_idx(const struct ublk_thread *t,
+ 					     const struct ublk_queue *q,
+ 					     unsigned tag)
  {
- 	if (x == 0)
++	if (ublk_queue_batch_io(q))
++		return ublk_batch_io_buf_idx(t, q, tag);
+ 	return q->ios[tag].buf_index;
+ }
+ 
+@@ -466,6 +472,22 @@ static inline int ublk_queue_no_buf(const struct ublk_queue *q)
+ 	return ublk_queue_use_zc(q) || ublk_queue_use_auto_zc(q);
+ }
+ 
++/*
++ * Each IO's buffer index has to be calculated by this helper for
++ * UBLKS_T_BATCH_IO
++ */
++static inline unsigned short ublk_batch_io_buf_idx(
++		const struct ublk_thread *t, const struct ublk_queue *q,
++		unsigned tag)
++{
++	return tag;
++}
++
++/* Queue UBLK_U_IO_PREP_IO_CMDS for a specific queue with batch elements */
++int ublk_batch_queue_prep_io_cmds(struct ublk_thread *t, struct ublk_queue *q);
++/* Handle completion of batch I/O commands (prep/commit) */
++void ublk_batch_compl_cmd(struct ublk_thread *t,
++			  const struct io_uring_cqe *cqe);
+ /* Initialize batch I/O state and calculate buffer parameters */
+ void ublk_batch_prepare(struct ublk_thread *t);
+ /* Allocate and register commit buffers for batch operations */
 -- 
 2.47.0
 
