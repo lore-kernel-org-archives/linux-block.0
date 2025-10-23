@@ -1,35 +1,35 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0D392EBDD9
-	for <linux-block@vger.kernel.org>; Thu, 23 Oct 2025 08:09:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ECC02EAB78
+	for <linux-block@vger.kernel.org>; Thu, 23 Oct 2025 08:09:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761206974; cv=none; b=HkrxquwcSJqlnGOkf231OSt6Jvzn6o8bz+AJ2FwwiU2avU/ahD9VjGP0b3k1fY+BxGRj/eVLLB7UPHxqSKUqTADYX+c9ae2ZM+jhrzrCpz1fT/1t51xTdCii0f1lQxnlGjTnh7vaEBLVwk668ABvmy6aniIkNzJb7Nh/7YvBA98=
+	t=1761206978; cv=none; b=mGZ+Mmp5CRtNP2rKIUTGGoslpZ7ZoigTGqYBICdc3UGdqC9JoVHQeePgvy9E0BDzLLXpb8f9kHnK+pD/xYTKlbNh7zL9UcuY5eAwIJodDpxmcKcz4iXavp/l2hgOSeAS9deYbfklJSTRCF6ae6gZM23YXrnk9UJytHGNCP+gohQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761206974; c=relaxed/simple;
-	bh=/77RzbxehvZ1ikM+7gUsqS16xAUFQ5RX1eMOCrGM+84=;
+	s=arc-20240116; t=1761206978; c=relaxed/simple;
+	bh=cMyPEwVxr2wsLve8DzYY6/E1/i60lUlIVDEjLlhqzYU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RRoMJaTLv1XBhvM4C5cKN63hE/YS7kIK6LxPoUzFusaQx0WtUk67SpnIgiwb0TwX7akDYgO3oEnq1Oh+2IiZZaiawtDQWj1xZQLINRT2493cRW/IYish+hLsLBd/KAJXlqQfcPj7Ol0/D0zziX7GcoCkQIqB77aNQMKXT9I8eGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=kYYFswem; arc=none smtp.client-ip=198.137.202.133
+	 MIME-Version; b=HnD7TtDQYnCaqr4OWwrQz1ROXz54v2V87YpQwizOfstXFRS7KJxn5Rp7bmox5BQIk7FSMlOQHdDFcc5Gfh9X7tO1K7tWot8aYZNJDIQPtyAHQiLNChAtjhW0IaLlf6t4SXVVUgCWknfEd9ahZ6wJ1//PQoSiFVH6nch31LGKyGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=kV16myGL; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="kYYFswem"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="kV16myGL"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
 	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
 	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=UDGB5IxL53rt1Dr2ri0tGGZPsBM0MXiOrsmsKajWVtY=; b=kYYFswemG3TCRweSSZtSl+JdiM
-	bBfH9Q9teacyuXl/ATlEQdSFVEtQEqTXQPCide7mVX1Y97knaqWvVQqZuK8nNjTj3C/4ghalxK9Mg
-	e+AEcfuVuxPIU7L/eM+iyjwjA1O+mbioI0KhZLoB5Jv6YrApVx1+sMG2I35L/mBsYsUIeDFK/FsM9
-	y0zqVkAxYA9zs2fcsPJfUJUh6eaKF/TxdgRRdsLd26pqDe6XyWXCKlVfwTsTemBSob6wRlAin9o35
-	EiUKhjAKXyiqEV+V4njQRXdWSCNBDPiKBuOGEakc1r3pwaFTFoIpJna7qg7R4Vm+usBgS1HaskcXn
-	9lTx5jxA==;
+	bh=aAMKm+7bDXxhjSF5naz/L3X2AhxzM7SMNuu5TaNOAXc=; b=kV16myGLCrGCuAwJ0iylxpdMe3
+	awstSqDvkibiB4VkiwoH+rothfdpso3zRLR8yfzC+jY+AXAWuqHh4hGHcGaKBF95s8KPbrogFEiGY
+	tfvlBXO9iMxGOpZMwnSZc2gotBRnP+jb2tVrrrHezqUX3fl8LVDCdhziXQsfPYOQx/WWdN07bP9Ve
+	tMmElJ2YFclax0NjZyAc51m9GIUBkXKvEmPmIhioD3TMDN6IW/Wag9a6AsBTOBuc4Ufl6RvmkL6FB
+	ISLDDqsbHJv4QQF8z0sCHxFQrLP+vzu/xwo/GwdCTmt4HibXN7cRZxAJglaGD4bDVPu+4emhazRYN
+	czU4Jj1A==;
 Received: from 2a02-8389-2341-5b80-d601-7564-c2e0-491c.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:d601:7564:c2e0:491c] helo=localhost)
 	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vBqO1-00000005Tna-39ms;
-	Thu, 23 Oct 2025 08:09:30 +0000
+	id 1vBqO6-00000005Tns-0eWC;
+	Thu, 23 Oct 2025 08:09:34 +0000
 From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: Vlastimil Babka <vbabka@suse.cz>,
@@ -41,9 +41,9 @@ Cc: Vlastimil Babka <vbabka@suse.cz>,
 	"Martin K. Petersen" <martin.petersen@oracle.com>,
 	linux-block@vger.kernel.org,
 	linux-mm@kvack.org
-Subject: [PATCH 1/3] slab, block: generalize bvec_alloc_gfp
-Date: Thu, 23 Oct 2025 10:08:54 +0200
-Message-ID: <20251023080919.9209-2-hch@lst.de>
+Subject: [PATCH 2/3] block: blocking mempool_alloc doesn't fail
+Date: Thu, 23 Oct 2025 10:08:55 +0200
+Message-ID: <20251023080919.9209-3-hch@lst.de>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20251023080919.9209-1-hch@lst.de>
 References: <20251023080919.9209-1-hch@lst.de>
@@ -56,68 +56,35 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-bvec_alloc_gfp is useful for any place that tries to kmalloc first and
-then fall back to a mempool.  Rename it and move it to blk.h to prepare
-for using it to allocate the default integrity buffer.
+So remove the error check for it in bio_integrity_prep.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/bio.c          | 13 ++-----------
- include/linux/slab.h | 10 ++++++++++
- 2 files changed, 12 insertions(+), 11 deletions(-)
+ block/bio-integrity-auto.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index b3a79285c278..4ea5833a7637 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -169,16 +169,6 @@ void bvec_free(mempool_t *pool, struct bio_vec *bv, unsigned short nr_vecs)
- 		kmem_cache_free(biovec_slab(nr_vecs)->slab, bv);
- }
+diff --git a/block/bio-integrity-auto.c b/block/bio-integrity-auto.c
+index 687952f63bbb..2f4a244749ac 100644
+--- a/block/bio-integrity-auto.c
++++ b/block/bio-integrity-auto.c
+@@ -158,8 +158,6 @@ bool bio_integrity_prep(struct bio *bio)
+ 	if (!buf)
+ 		goto err_end_io;
+ 	bid = mempool_alloc(&bid_pool, GFP_NOIO);
+-	if (!bid)
+-		goto err_free_buf;
+ 	bio_integrity_init(bio, &bid->bip, &bid->bvec, 1);
  
--/*
-- * Make the first allocation restricted and don't dump info on allocation
-- * failures, since we'll fall back to the mempool in case of failure.
-- */
--static inline gfp_t bvec_alloc_gfp(gfp_t gfp)
--{
--	return (gfp & ~(__GFP_DIRECT_RECLAIM | __GFP_IO)) |
--		__GFP_NOMEMALLOC | __GFP_NORETRY | __GFP_NOWARN;
--}
--
- struct bio_vec *bvec_alloc(mempool_t *pool, unsigned short *nr_vecs,
- 		gfp_t gfp_mask)
- {
-@@ -201,7 +191,8 @@ struct bio_vec *bvec_alloc(mempool_t *pool, unsigned short *nr_vecs,
- 	if (*nr_vecs < BIO_MAX_VECS) {
- 		struct bio_vec *bvl;
+ 	bid->bio = bio;
+@@ -187,8 +185,6 @@ bool bio_integrity_prep(struct bio *bio)
+ 		bid->saved_bio_iter = bio->bi_iter;
+ 	return true;
  
--		bvl = kmem_cache_alloc(bvs->slab, bvec_alloc_gfp(gfp_mask));
-+		bvl = kmem_cache_alloc(bvs->slab,
-+				try_alloc_gfp(gfp_mask & ~__GFP_IO));
- 		if (likely(bvl) || !(gfp_mask & __GFP_DIRECT_RECLAIM))
- 			return bvl;
- 		*nr_vecs = BIO_MAX_VECS;
-diff --git a/include/linux/slab.h b/include/linux/slab.h
-index d5a8ab98035c..a6672cead03e 100644
---- a/include/linux/slab.h
-+++ b/include/linux/slab.h
-@@ -1113,6 +1113,16 @@ void kfree_rcu_scheduler_running(void);
-  */
- size_t kmalloc_size_roundup(size_t size);
- 
-+/*
-+ * Make the first allocation restricted and don't dump info on allocation
-+ * failures, for callers that will fall back to a mempool in case of failure.
-+ */
-+static inline gfp_t try_alloc_gfp(gfp_t gfp)
-+{
-+	return (gfp & ~__GFP_DIRECT_RECLAIM) |
-+		__GFP_NOMEMALLOC | __GFP_NORETRY | __GFP_NOWARN;
-+}
-+
- void __init kmem_cache_init_late(void);
- void __init kvfree_rcu_init(void);
- 
+-err_free_buf:
+-	kfree(buf);
+ err_end_io:
+ 	bio->bi_status = BLK_STS_RESOURCE;
+ 	bio_endio(bio);
 -- 
 2.47.3
 
