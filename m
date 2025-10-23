@@ -1,60 +1,33 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0ECE2F83AC
-	for <linux-block@vger.kernel.org>; Thu, 23 Oct 2025 08:28:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 622622765DC;
+	Thu, 23 Oct 2025 10:46:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761208110; cv=none; b=TbrgC2d6nXz1I4Fb5/Xf8NXP3o0yol3m18IsUFBVolrj31iGSGRxcNQCwld5kO8wnD9mpiRITRzhK8vUWJ4T0+ybtAit1Xj6z8LTabwvMMam0C1ZeC6/bjIzqQbYBUkISIG8Z50vwkdr7Ftnd4aBaWVI5JSikEC9ijyYFfwezA0=
+	t=1761216413; cv=none; b=J7acZ53Z08PuI0EZ94hojatEirftDrp9WXg5qkcBAkfJI3/SU8yJrIKpyeY84JfavYr9Pt7eA0VXrrfIZwTupibz/vbKJo1ZYsX43B99IwVxUTGis1V6vBqP55s2JalCr2mzwYIvKwLJIlZ/fojSOYLZjU0FUWhvb267sYP92JA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761208110; c=relaxed/simple;
-	bh=ufeh8eXqlHTcGgkz/Bj0ELams+yTjVHVEZXGzjWhB5o=;
+	s=arc-20240116; t=1761216413; c=relaxed/simple;
+	bh=4Nycx1ORZclwlAUuSrDPm+Q6EH8JvLo9+c1zBeefgcA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HF62qhtyNoGFT78pBlBpg0SQwbzxQNps14uHm+FGoMEzw1f8/SwblGCg36Szc/RxkLzIkgADqdaAjJvwrjc8ae2sxqk1rgn64awXfB4FbyGGnGFums8ESran6EszPXso4ySDqSp+MWSykACenoTfFw9mprtuTBWrvyLOi4b1bos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ecKYvSKt; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	 In-Reply-To:Content-Type; b=CbHMTTQpLwl2OGBKFVjSqqSs5a7Kl03vI7CkwY/b+MOtlAdKnt80XVYlnIPw9fy+aqVGiGgUv0Eo8R0gZ4Ef4lHRZpI4TgpCPRs7CkHjpL98MI/jN8P97crQHkOOD1X62f310tNVtCXmzuyO8cpNGs/fohkpICcaRYMV4zVVX9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MLokn6j7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ecKYvSKt"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59MJcV5F003940;
-	Thu, 23 Oct 2025 08:28:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=BmWPXf
-	9o4W1EXNfX+pGF9jJedGOtSCOfcVQ1KnCz0rk=; b=ecKYvSKtvKBS9kp/W41TIp
-	le5uerXgVhUPWF/I/3aQQRaHWV8kuM2OXWqapSQGPszR1dgn4+bIe62imXASUVQP
-	CcGttefBAZQdU/kEo6dSmJ0zwkKCZu7K/JV8rNwAaLiFWVE+KwfelzAmmPAhtEWn
-	isY9+aaHspD/Jo89ba9ofTuMCTCC7AD8bk3Yy8TDJfDyJy2wHSnPOdb24RiNuHIl
-	4aM/KXVvzvZLpBdNIJrZ9WDCIQPwFHB9GfxiBwXqZaqkjsQqY69xb5ntB71LB+mp
-	ERGJ0icE8l21S+2ZXxGfroxBSU/rO+TuUuTBL+fYepzS1Cx91xTecyb/VMQqqLMQ
-	==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49v32hqm89-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 Oct 2025 08:28:14 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59N62aJQ032166;
-	Thu, 23 Oct 2025 08:28:13 GMT
-Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 49vp7n4qw2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 Oct 2025 08:28:13 +0000
-Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 59N8S0Sk26542838
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 23 Oct 2025 08:28:00 GMT
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3550558059;
-	Thu, 23 Oct 2025 08:28:13 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 414C358043;
-	Thu, 23 Oct 2025 08:28:10 +0000 (GMT)
-Received: from [9.109.198.148] (unknown [9.109.198.148])
-	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 23 Oct 2025 08:28:09 +0000 (GMT)
-Message-ID: <17e70cb9-95d9-435b-a497-3924896e9c32@linux.ibm.com>
-Date: Thu, 23 Oct 2025 13:58:08 +0530
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MLokn6j7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD9B7C4CEE7;
+	Thu, 23 Oct 2025 10:46:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761216412;
+	bh=4Nycx1ORZclwlAUuSrDPm+Q6EH8JvLo9+c1zBeefgcA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=MLokn6j7bsPTtDKzR8pqjp2OIR+OMKA1rj3J/6jxNvlhgcsOoQ+moyQ5GdMJY0dDs
+	 Znmt5H3FHjRCN/E5Q2OiSn3Lge5IHCXD/l7T7/WJ6bkLphXMC2HXV8rhysZfDX6Sr+
+	 rNUl8sN5/1gEAa9ysrMEafdWcYQ0VQhevGk1H7BhaFT8iiTd5n9BTY4verf1aGvcpu
+	 2n7qQ7sTY81LVQ1UhGF1Gtff22NCJXEfiZHTApKvHY7cQr6tmKVbYlAGr+xV9kWFbP
+	 87li730Z1OQYtoHcpFjViMqnavqolBedQ+OYK4M6H1LebiK34NEzwo7Gy1V6/AuNf7
+	 96d0cS8eISSpA==
+Message-ID: <5b287ec6-72ff-4707-9040-3c84efc58b94@kernel.org>
+Date: Thu, 23 Oct 2025 12:46:45 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,106 +35,134 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] block: introduce alloc_sched_data and free_sched_data
- elevator methods
-To: Ming Lei <ming.lei@redhat.com>
-Cc: linux-block@vger.kernel.org, hch@lst.de, yukuai1@huaweicloud.com,
-        axboe@kernel.dk, yi.zhang@redhat.com, czhong@redhat.com,
-        gjoyce@ibm.com
-References: <20251016053057.3457663-1-nilay@linux.ibm.com>
- <20251016053057.3457663-3-nilay@linux.ibm.com> <aPhgAMxgG2q0DKcv@fedora>
- <59cf7e0f-1069-4766-9234-cc91985470e4@linux.ibm.com>
- <aPnd2WMKE5gjkM0s@fedora>
+Subject: Re: [PATCH 01/32] pidfs: validate extensible ioctls
+To: Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+ Amir Goldstein <amir73il@gmail.com>, linux-fsdevel@vger.kernel.org
+Cc: Josef Bacik <josef@toxicpanda.com>, Jeff Layton <jlayton@kernel.org>,
+ Mike Yuan <me@yhndnzj.com>, =?UTF-8?Q?Zbigniew_J=C4=99drzejewski-Szmek?=
+ <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>,
+ Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>,
+ Alexander Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>,
+ Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
+ =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, netdev@vger.kernel.org
+References: <20250910-work-namespace-v1-0-4dd56e7359d8@kernel.org>
+ <20250910-work-namespace-v1-1-4dd56e7359d8@kernel.org>
 Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <aPnd2WMKE5gjkM0s@fedora>
-Content-Type: text/plain; charset=UTF-8
+From: Jiri Slaby <jirislaby@kernel.org>
+Autocrypt: addr=jirislaby@kernel.org; keydata=
+ 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
+In-Reply-To: <20250910-work-namespace-v1-1-4dd56e7359d8@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDE4MDAyMiBTYWx0ZWRfXwV1J4iFU1beb
- BN2uKza/zWNlL62W3TU1Oj8qqOoRWVDItU5+rT4c8IPaGGSTBvbSx5snAsiEMsCvBL5OspXcy6y
- VTwVPv5CwoDwfSLaMu74BoVitObWduWAnh6rTDPZafaNj/APjLlKCLzmtoQ40S9q54d6DcVxTn9
- UHJUWspr2Y1jrD+E2RHsbQIZPQgKQ32YD93sZxicm/jWiY5kBsj2OyA5nGNF3/lZBq7cawGCcQv
- qcpX6HiMTkAuM5cemRSGTX4+HRL0QB/6t3lY6GJGoonaw8UQrsMua5FRXNEUTv3NeLCWxrHMWWo
- 4de/LCbbzk+26FXyC4Cgs/YqsVDAHMpWAHzGPPNs06o2CRX3x6AhcTdHMB23kWTCsslUs6ZJjWw
- JMNTgqViipq+PiVBCb1+JVAqFQWaew==
-X-Authority-Analysis: v=2.4 cv=OrVCCi/t c=1 sm=1 tr=0 ts=68f9e71e cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=xLKKOo7hbmr0dyL8mpYA:9 a=QEXdDO2ut3YA:10 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-GUID: anq7KY0Nrw0jR14H5XJ837-H_avEWumV
-X-Proofpoint-ORIG-GUID: anq7KY0Nrw0jR14H5XJ837-H_avEWumV
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-22_08,2025-10-22_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 adultscore=0 priorityscore=1501 spamscore=0 phishscore=0
- clxscore=1015 bulkscore=0 malwarescore=0 lowpriorityscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510020000 definitions=main-2510180022
 
+On 10. 09. 25, 16:36, Christian Brauner wrote:
+> Validate extensible ioctls stricter than we do now.
+> 
+> Signed-off-by: Christian Brauner <brauner@kernel.org>
+> ---
+>   fs/pidfs.c         |  2 +-
+>   include/linux/fs.h | 14 ++++++++++++++
+>   2 files changed, 15 insertions(+), 1 deletion(-)
+> 
+> diff --git a/fs/pidfs.c b/fs/pidfs.c
+> index edc35522d75c..0a5083b9cce5 100644
+> --- a/fs/pidfs.c
+> +++ b/fs/pidfs.c
+> @@ -440,7 +440,7 @@ static bool pidfs_ioctl_valid(unsigned int cmd)
+>   		 * erronously mistook the file descriptor for a pidfd.
+>   		 * This is not perfect but will catch most cases.
+>   		 */
+> -		return (_IOC_TYPE(cmd) == _IOC_TYPE(PIDFD_GET_INFO));
+> +		return extensible_ioctl_valid(cmd, PIDFD_GET_INFO, PIDFD_INFO_SIZE_VER0);
 
+Hi,
 
-On 10/23/25 1:18 PM, Ming Lei wrote:
-> On Thu, Oct 23, 2025 at 11:27:26AM +0530, Nilay Shroff wrote:
->>
->>
->> On 10/22/25 10:09 AM, Ming Lei wrote:
->>> On Thu, Oct 16, 2025 at 11:00:48AM +0530, Nilay Shroff wrote:
->>>> The recent lockdep splat [1] highlights a potential deadlock risk
->>>> involving ->elevator_lock and ->freeze_lock dependencies on -pcpu_alloc_
->>>> mutex. The trace shows that the issue occurs when the Kyber scheduler
->>>> allocates dynamic memory for its elevator data during initialization.
->>>>
->>>> To address this, introduce two new elevator operation callbacks:
->>>> ->alloc_sched_data and ->free_sched_data.
->>>
->>> This way looks good.
->>>
->>>>
->>>> When an elevator implements these methods, they are invoked during
->>>> scheduler switch before acquiring ->freeze_lock and ->elevator_lock.
->>>> This allows safe allocation and deallocation of per-elevator data
->>>
->>> This per-elevator data should be very similar with `struct elevator_tags`
->>> from block layer viewpoint: both have same lifetime, and follow same
->>> allocation constraint(per-cpu lock).
->>>
->>> Can we abstract elevator data structure to cover both? Then I guess the
->>> code should be more readable & maintainable, what do you think of this way?
->>>
->>> One easiest way could be to add 'void *data' into `struct elevator_tags`,
->>> just the naming of `elevator_tags` is not generic enough, but might not
->>> a big deal.
->>>
->> Hmm, good point! I'd rather suggest if we could instead rename 
->> struct elevator_tags to struct elevator_resources and then
->> add void *data field to it. Something like this:
->>
->> struct elevator_tags {
->> 	unsigned int nr_hw_queues;
->> 	unsigned int nr_requests;
->> 	struct blk_mq_tags *tags[];
->>         void *data;
-> 
-> 'data' can't follow `tags[]`.
+this turned EINVAL (from pidfd_info()) into ENOTTY (from pidfd_ioctl()) 
+for at least LTP's:
+struct pidfd_info_invalid {
+	uint32_t dummy;
+};
 
-yeah it was impromptu :)
-> 
->> };
->>
->> What do you think?
-> 
-> It is good. The patch may be split into two:
-> 
-> - add data to `struct elevator_tags` for covering the lockdep issue
-> 
-> - renaming
-> 
-> Then it will become easier for review.
-> 
-Alright, I'll implement it in the next patchset.
+#define PIDFD_GET_INFO_SHORT _IOWR(PIDFS_IOCTL_MAGIC, 11, struct 
+pidfd_info_invalid)
 
-Thanks,
---Nilay
+ioctl(pidfd, PIDFD_GET_INFO_SHORT, info_invalid) == EINVAL
+
+at:
+https://github.com/linux-test-project/ltp/blob/9bb94efa39bb1b08f37e56c7437db5fa13ddcae2/testcases/kernel/syscalls/ioctl/ioctl_pidfd05.c#L46
+
+Is this expected?
+
+> --- a/include/linux/fs.h
+> +++ b/include/linux/fs.h
+> @@ -4023,4 +4023,18 @@ static inline bool vfs_empty_path(int dfd, const char __user *path)
+>   
+>   int generic_atomic_write_valid(struct kiocb *iocb, struct iov_iter *iter);
+>   
+> +static inline bool extensible_ioctl_valid(unsigned int cmd_a,
+> +					  unsigned int cmd_b, size_t min_size)
+> +{
+> +	if (_IOC_DIR(cmd_a) != _IOC_DIR(cmd_b))
+> +		return false;
+> +	if (_IOC_TYPE(cmd_a) != _IOC_TYPE(cmd_b))
+> +		return false;
+> +	if (_IOC_NR(cmd_a) != _IOC_NR(cmd_b))
+> +		return false;
+> +	if (_IOC_SIZE(cmd_a) < min_size)
+> +		return false;
+> +	return true;
+> +}
+> +
+>   #endif /* _LINUX_FS_H */
+> 
+
+thanks,
+-- 
+js
+suse labs
 
