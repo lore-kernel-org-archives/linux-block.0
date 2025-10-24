@@ -1,236 +1,213 @@
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 088C0275AFB
-	for <linux-block@vger.kernel.org>; Thu, 23 Oct 2025 21:12:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9F50156CA
+	for <linux-block@vger.kernel.org>; Fri, 24 Oct 2025 00:01:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761253938; cv=none; b=X5WBVSrKOe9UBbT+pQse71LEVmUqoOJb6Wy6iJS5/btd5HNMVt1JGVBCzI+2pCQveUclcaa8v8GvK+LTw03A5woXOc9zThsc6YND4rrwC1KIJl4JAm7vAe+lmQDkqvKnDC2UnOcT1lH8bM10B8NUfXK8dtgiN258TNWLYYT2DWg=
+	t=1761264092; cv=none; b=Ty8ESombFYVCO+IxO07+y2+KxJrkF0XkSy8ypAZjLna5FKDH95S0EStDDmIrA4mdTIFxnzuUYOxHRgV6Oyye5G6/ssmVm8LrT+sdCYU9+OLo4KQ579J3h1HdoHINgTWv0Dv5uw9LKY+hG0T6ny7tC6rflyQJ4bsSAjnH9ZTDfUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761253938; c=relaxed/simple;
-	bh=ELtFrjCBV9N4Nbz0iYvi9/WHhUL3pJWyPhQ/w8w3NaE=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=IAsAIZPja0XfZAXbPGRg18kK2cKMW+dxKi/dzeYnZHGbl+JDLunUFmXLG47pA8uTfkw7ESkHu+vp/Mpn6LjwFTzCO8vFci/cEQ2wp1Z8kxX6dvG02BGhOmAXOdrXVXz7sdSqYBYSM5adnAOUIgVhegwVoAVqiqE5FChn8ExiEAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=LApQzoUV; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+	s=arc-20240116; t=1761264092; c=relaxed/simple;
+	bh=bubCr/mN0mnspeP8HsbjxerBcLX67vjT45heWM5Tngg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EVt+3a9XAxXfqbSrVLiLEcjXuUxP2iQTTrqZJsJyAxBFXjB5vIM75MRhFQH1Amv/PeYKT2hYgIuTR1Jac8CpDITK27gv1rDLiTBeru0rfmidTYdG5sXtTJgyj/ZdZwJU5afVT/vCdc8m+1gSNV70FwA7Qcr36qWEtIjUQBJEZTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZGTInx+a; arc=none smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="LApQzoUV"
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-76e2ea933b7so1390790b3a.1
-        for <linux-block@vger.kernel.org>; Thu, 23 Oct 2025 14:12:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZGTInx+a"
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4e2d2d764a3so11161751cf.1
+        for <linux-block@vger.kernel.org>; Thu, 23 Oct 2025 17:01:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1761253936; x=1761858736; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1761264088; x=1761868888; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=sRCjgxmNC25rZrLNDyTER70wkWB4aqo3eV4CmHKoZ04=;
-        b=LApQzoUVTTn9/EhwZ0cBtJe8nsHfhhIySgcgkyahUFx1EOmisOui5LI+plnTiTMNk5
-         zg+RLhzHEywI5ynTWvreQ0YdsbPCZe08uKbVDDzFiiOXo7+w4NuYatu+YzE6Y17RqD86
-         Z0fQFtoxduSFt/8eJYT6JK0Gk7onBpRGRUd4W9wNTj+rr1ucfsbncnRMSk5pHhGCouYm
-         sisaONtdrCobWRILdate3d0Q58KlDvw4BZinqXor9KMNUNVksUdTE2lZ5/1UzAGd/yxg
-         BGrF8qomjm6zEKd2E+YuzC9G1saq8WgcP/IP68CST4NzbQVJe7kdBj6MWllf4xW2S/pH
-         aD5A==
+        bh=SS55Wat3aHjR4MMWG/CBZ2nFmq+zfQc/VuJXnUoVzR4=;
+        b=ZGTInx+aztBuwQ2IgRwQPjv5DNbqo+XqzAv/08b60hjrxyzcp4EAVp6so3JuOEJqmm
+         teHQ6zMbNavhimGqFEwhZwr430UC7dkHEc2HM0WvXrJQSv2qTezUKD0CSBUl94cltZL7
+         wmvPjVWrCBUYhrh7gALdJWKbQN4dsHyq/otzT0HT+tALt0qnUIamCZWvC8Gw0UhDpC91
+         Y2HSTtvN08YgH72ymR0Ml5O3NTr0fQB4u1kiNT80utGJIahWdBC3su1givJVvqb6ZYCa
+         DXsKP8C1dbZOZdQglHvjd7w+oomHfbaJiQ5U3hWx7NgjcYAv2gKEg7LlM9/4BqqzdUb1
+         4hYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761253936; x=1761858736;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=sRCjgxmNC25rZrLNDyTER70wkWB4aqo3eV4CmHKoZ04=;
-        b=XviS8kUz7uA6l4pMpQMTqQ6tT6rwZlu++ik5LVaM4RZAyb7Ltys4htER5IiiRxLge5
-         fMWKRitHDe0JqYwaRJmmL3aTwTYvEPk/HIfhvyiGH6/vkbUvvIrpI7qxosJY+LsONPv6
-         k3CO9Msm4uz+cBsvCxT0F26IjnYPml3i/K15fs1obdna9IqrWgU21DmaOY/l59ZzWMX7
-         bqaaSxPJcBbdWJcAG1mEGr62OW2G1D33hu6Ukry572+EqzDR/PCh/3Z6SoMLtSoSBNW3
-         +tj6dcMNQEBR0EOw2MkSJ4JbdY6QDe7k6N74zKyFpuBEVJGKHBCab06v3cxNgOt5YBmY
-         b9vg==
-X-Gm-Message-State: AOJu0YyEoPMzo1ygv0e8e3aBeeQc4h9p2J1zoY5ekwTGh3tTbKEN5eTY
-	pdoA/bZgZg6YW5nhFc6fkFiPx6qrAtGDccikctQMwP2ksdyo20KhzhhQ/84Serw9x/R7Rhp+NK7
-	vtr4drDU=
-X-Gm-Gg: ASbGncvkUG5ynWrNMJsOlWaAigW5GrkEyFSZBqZ5gskVw7oVaG9YrWLalhBYZB6xP7k
-	V4X6fOs/Ddfjdr/t6+GxAsWVkU5GQbZUuLVtDpEu6aOIxeIhMsb2ZqcaHBQL0jxCMd1RPQwsxRe
-	X/2ZC4PrCtxmWrIFMnkS52jZl8LN/glOqHagXPLVQPkAG1OeJ3DKmoKos1uerc2LC+cvuVzuThy
-	2gjO5wqYWGC8nxT9zETieVW1IjX8rf0q0+33SuY4oO8dFG9WnrHBPdULxzpf+NN02RXaf8bHhcF
-	b2mCe0Tyaq/DuHONlSHlBcOj7D5k+2QQEoYYmIPQ8mPLL33VkjB+AiaolgOlFw/xm2HRZVBk9ok
-	B/iVx9HHgT4QtK5/oXk4T1xHDF4wLzR/Lm7aZYaJ5jgmztgAqwtDOowAMFXofk1KOQl0VPBKp8X
-	AqYKTlZBDQAUIYnMfbyBj+IUuP6vAO9wI+kRaLzoqTUEdagy0vWgd9607Zhmb+cpTlR7hJ/CP0f
-	mtv3TkHog==
-X-Google-Smtp-Source: AGHT+IGEQq/W+6DUb6xVUQlR03GwyH9beM+0mneirLXAhnoMxplSnBAlG1ska4gF0njo+WnFNMe+UQ==
-X-Received: by 2002:a05:6a00:1597:b0:7a2:68bf:2592 with SMTP id d2e1a72fcca58-7a284dd5cf6mr334443b3a.12.1761253936202;
-        Thu, 23 Oct 2025 14:12:16 -0700 (PDT)
-Received: from ?IPV6:2a03:83e0:1151:15:18ba:60bd:858e:6985? ([2620:10d:c090:500::6:ccab])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7a274aa183dsm3517101b3a.30.2025.10.23.14.12.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Oct 2025 14:12:15 -0700 (PDT)
-Message-ID: <63c97224-0e9a-4dd8-8706-38c10a1506e9@davidwei.uk>
-Date: Thu, 23 Oct 2025 14:12:14 -0700
+        d=1e100.net; s=20230601; t=1761264088; x=1761868888;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SS55Wat3aHjR4MMWG/CBZ2nFmq+zfQc/VuJXnUoVzR4=;
+        b=A/InQtlDd9PyPQhniZMCm/SJeqxS0qMzMTfiFzua0j8hI8+0mQ3Zgyz42zMOJ2x6mt
+         tIqIuV9IhXzzHR+cmag5yW2DQdsaIx44L/YvWlUTnqQQou3ycjSUykxW5YofFEYFA6gC
+         0OA5ThVp8/mqGBmyNNAZM8+LjJY8JfmiO2X3nj5UdQpw/mZc/9a3ed8uWaM3OaD3Wmpg
+         ZA7XysUAB9qHoPV01U4i4JvvtQBZGggoDJC+GVr2t285W7I3m/Ctx48T/HAZNqf+RdEB
+         X5RptxjJJ6mOAg++APqzTxggdMDyeMoC+jbyaGLUuwwbceTNtcd2AE751MU/tKJzXTRh
+         VzbQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV58hXZFo03rvPFK+yquDDl/IM5A8AHl8biztTl3npQrIkioPl0v6T5Sx4ap2LhajkLLfHt50pM9u28MA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRkpej5pJ/EgIqt2Q73MNvI7owD8VsDGzzxmhnYQzkA21RSA+8
+	GoItpb7b8jLxIiaZrlh9WLKQR7A/Y/NrcYkQchfe3+IHruxmveAyLSJArr7Dy2wQSXFf6bDvHv2
+	1yVTeCQvUbizBUmW34+34jGg44pVnmqg=
+X-Gm-Gg: ASbGnctJAXA0m73FPwhtJqqWuMfBV7atusLyCO0jNnaMXPGSUSddNHhIu5jGaxnyyvA
+	aTg0kqnldxQwhJGnZNjpHzVjbsn37AIOZqv14Qn1WZTwH0Ren16EFbcoi0N7DplM3yWcBZxZ55X
+	w0duRCyuSjBUNVxBVxILhGIKCRc3rdjNESmoNpU9pQJj9W7c5neM0i7Dh/AA1woUCxe0M8d3NNd
+	SyA04DZNGBoKFzSyOAJEFQ0aYPDzjU8yqhU0fsE5kXF7e9Rsy4Yq5mtr14Z4WHUlq6vq0u4AvQf
+	JAYvBeXWtcIlc5s=
+X-Google-Smtp-Source: AGHT+IE4hgSCHnM9w+Nj49Niog7hNVTuiW8jTj0btmv/nz9MG2xgckmanBAHREcxjfZdyiJeVTVHBqmYgG0U0DIDru8=
+X-Received: by 2002:a05:622a:c1:b0:4e8:a307:a42b with SMTP id
+ d75a77b69052e-4eb810215a0mr63223151cf.4.1761264087710; Thu, 23 Oct 2025
+ 17:01:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: linux-block@vger.kernel.org, cgroups@vger.kernel.org
-Cc: hch@lst.de, hare@suse.de, ming.lei@redhat.com, dlemoal@kernel.org,
- axboe@kernel.dk, tj@kernel.org, josef@toxicpanda.com, gjoyce@ibm.com,
- lkp@intel.com, oliver.sang@intel.com, Nilay Shroff <nilay@linux.ibm.com>
-From: David Wei <dw@davidwei.uk>
-Subject: [REPORT] Possible circular locking dependency on 6.18-rc2 in
- blkg_conf_open_bdev_frozen+0x80/0xa0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250926002609.1302233-1-joannelkoong@gmail.com>
+ <20250926002609.1302233-8-joannelkoong@gmail.com> <aPqDPjnIaR3EF5Lt@bfoster>
+In-Reply-To: <aPqDPjnIaR3EF5Lt@bfoster>
+From: Joanne Koong <joannelkoong@gmail.com>
+Date: Thu, 23 Oct 2025 17:01:16 -0700
+X-Gm-Features: AS18NWCr2gof0qHy0win6WQh6W7_ZK9lH8ZiDMcoGInBYeRlL9GA5J28nTVuopc
+Message-ID: <CAJnrk1aNrARYRS+_b0v8yckR5bO4vyJkGKZHB2788vLKOY7xPw@mail.gmail.com>
+Subject: Re: [PATCH v5 07/14] iomap: track pending read bytes more optimally
+To: Brian Foster <bfoster@redhat.com>
+Cc: brauner@kernel.org, miklos@szeredi.hu, djwong@kernel.org, 
+	hch@infradead.org, hsiangkao@linux.alibaba.com, linux-block@vger.kernel.org, 
+	gfs2@lists.linux.dev, linux-fsdevel@vger.kernel.org, kernel-team@meta.com, 
+	linux-xfs@vger.kernel.org, linux-doc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi folks, hit this with lockdep on 6.18-rc2:
+On Thu, Oct 23, 2025 at 12:30=E2=80=AFPM Brian Foster <bfoster@redhat.com> =
+wrote:
+>
+> On Thu, Sep 25, 2025 at 05:26:02PM -0700, Joanne Koong wrote:
+> > Instead of incrementing read_bytes_pending for every folio range read i=
+n
+> > (which requires acquiring the spinlock to do so), set read_bytes_pendin=
+g
+> > to the folio size when the first range is asynchronously read in, keep
+> > track of how many bytes total are asynchronously read in, and adjust
+> > read_bytes_pending accordingly after issuing requests to read in all th=
+e
+> > necessary ranges.
+> >
+> > iomap_read_folio_ctx->cur_folio_in_bio can be removed since a non-zero
+> > value for pending bytes necessarily indicates the folio is in the bio.
+> >
+> > Signed-off-by: Joanne Koong <joannelkoong@gmail.com>
+> > Suggested-by: "Darrick J. Wong" <djwong@kernel.org>
+> > ---
+>
+> Hi Joanne,
+>
+> I was throwing some extra testing at the vfs-6.19.iomap branch since the
+> little merge conflict thing with iomap_iter_advance(). I end up hitting
+> what appears to be a lockup on XFS with 1k FSB (-bsize=3D1k) running
+> generic/051. It reproduces fairly reliably within a few iterations or so
+> and seems to always stall during a read for a dedupe operation:
+>
+> task:fsstress        state:D stack:0     pid:12094 tgid:12094 ppid:12091 =
+ task_flags:0x400140 flags:0x00080003
+> Call Trace:
+>  <TASK>
+>  __schedule+0x2fc/0x7a0
+>  schedule+0x27/0x80
+>  io_schedule+0x46/0x70
+>  folio_wait_bit_common+0x12b/0x310
+>  ? __pfx_wake_page_function+0x10/0x10
+>  ? __pfx_xfs_vm_read_folio+0x10/0x10 [xfs]
+>  filemap_read_folio+0x85/0xd0
+>  ? __pfx_xfs_vm_read_folio+0x10/0x10 [xfs]
+>  do_read_cache_folio+0x7c/0x1b0
+>  vfs_dedupe_file_range_compare.constprop.0+0xaf/0x2d0
+>  __generic_remap_file_range_prep+0x276/0x2a0
+>  generic_remap_file_range_prep+0x10/0x20
+>  xfs_reflink_remap_prep+0x22c/0x300 [xfs]
+>  xfs_file_remap_range+0x84/0x360 [xfs]
+>  vfs_dedupe_file_range_one+0x1b2/0x1d0
+>  ? remap_verify_area+0x46/0x140
+>  vfs_dedupe_file_range+0x162/0x220
+>  do_vfs_ioctl+0x4d1/0x940
+>  __x64_sys_ioctl+0x75/0xe0
+>  do_syscall_64+0x84/0x800
+>  ? do_syscall_64+0xbb/0x800
+>  ? avc_has_perm_noaudit+0x6b/0xf0
+>  ? _copy_to_user+0x31/0x40
+>  ? cp_new_stat+0x130/0x170
+>  ? __do_sys_newfstat+0x44/0x70
+>  ? do_syscall_64+0xbb/0x800
+>  ? do_syscall_64+0xbb/0x800
+>  ? clear_bhb_loop+0x30/0x80
+>  ? clear_bhb_loop+0x30/0x80
+>  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> RIP: 0033:0x7fe6bbd9a14d
+> RSP: 002b:00007ffde72cd4e0 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+> RAX: ffffffffffffffda RBX: 0000000000000068 RCX: 00007fe6bbd9a14d
+> RDX: 000000000a1394b0 RSI: 00000000c0189436 RDI: 0000000000000004
+> RBP: 00007ffde72cd530 R08: 0000000000001000 R09: 000000000a11a3fc
+> R10: 000000000001d6c0 R11: 0000000000000246 R12: 000000000a12cfb0
+> R13: 000000000a12ba10 R14: 000000000a14e610 R15: 0000000000019000
+>  </TASK>
+>
+> It wasn't immediately clear to me what the issue was so I bisected and
+> it landed on this patch. It kind of looks like we're failing to unlock a
+> folio at some point and then tripping over it later..? I can kill the
+> fsstress process but then the umount ultimately gets stuck tossing
+> pagecache [1], so the mount still ends up stuck indefinitely. Anyways,
+> I'll poke at it some more but I figure you might be able to make sense
+> of this faster than I can.
+>
+> Brian
 
-[   36.862405] ======================================================
-[   36.862406] WARNING: possible circular locking dependency detected
-[   36.862408] 6.18.0-rc2-gdbafbca31432-dirty #97 Tainted: G S          E
-[   36.862409] ------------------------------------------------------
-[   36.862410] fb-cgroups-setu/1420 is trying to acquire lock:
-[   36.862411] ffff8884035502a8 (&q->rq_qos_mutex){+.+.}-{4:4}, at: blkg_conf_open_bdev_frozen+0x80/0xa0
-[   36.943164]
-                but task is already holding lock:
-[   36.954824] ffff8884035500a8 (&q->q_usage_counter(io)#2){++++}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0xe/0x20
-[   36.975183]
-                which lock already depends on the new lock.
-[   36.991541]
-                the existing dependency chain (in reverse order) is:
-[   37.006502]
-                -> #4 (&q->q_usage_counter(io)#2){++++}-{0:0}:
-[   37.020429]        blk_alloc_queue+0x345/0x380
-[   37.029315]        blk_mq_alloc_queue+0x51/0xb0
-[   37.038376]        __blk_mq_alloc_disk+0x14/0x60
-[   37.047612]        nvme_alloc_ns+0xa7/0xbc0
-[   37.055976]        nvme_scan_ns+0x25a/0x320
-[   37.064339]        async_run_entry_fn+0x28/0x110
-[   37.073576]        process_one_work+0x1e1/0x570
-[   37.082634]        worker_thread+0x184/0x330
-[   37.091170]        kthread+0xe6/0x1e0
-[   37.098489]        ret_from_fork+0x20b/0x260
-[   37.107026]        ret_from_fork_asm+0x11/0x20
-[   37.115912]
-                -> #3 (fs_reclaim){+.+.}-{0:0}:
-[   37.127232]        fs_reclaim_acquire+0x91/0xd0
-[   37.136293]        kmem_cache_alloc_lru_noprof+0x49/0x760
-[   37.147090]        __d_alloc+0x30/0x2a0
-[   37.154759]        d_alloc_parallel+0x4c/0x760
-[   37.163644]        __lookup_slow+0xc3/0x180
-[   37.172008]        simple_start_creating+0x57/0xc0
-[   37.181590]        debugfs_start_creating.part.0+0x4d/0xe0
-[   37.192561]        debugfs_create_dir+0x3e/0x1f0
-[   37.201795]        regulator_init+0x24/0x100
-[   37.210335]        do_one_initcall+0x46/0x250
-[   37.219043]        kernel_init_freeable+0x22c/0x430
-[   37.228799]        kernel_init+0x16/0x1b0
-[   37.236814]        ret_from_fork+0x20b/0x260
-[   37.245351]        ret_from_fork_asm+0x11/0x20
-[   37.254235]
-                -> #2 (&sb->s_type->i_mutex_key#3){+.+.}-{4:4}:
-[   37.268336]        down_write+0x25/0xa0
-[   37.276003]        simple_start_creating+0x29/0xc0
-[   37.285582]        debugfs_start_creating.part.0+0x4d/0xe0
-[   37.296552]        debugfs_create_dir+0x3e/0x1f0
-[   37.305782]        blk_register_queue+0x98/0x1c0
-[   37.315014]        __add_disk+0x21e/0x3b0
-[   37.323030]        add_disk_fwnode+0x75/0x160
-[   37.331738]        nvme_alloc_ns+0x395/0xbc0
-[   37.340275]        nvme_scan_ns+0x25a/0x320
-[   37.348638]        async_run_entry_fn+0x28/0x110
-[   37.357870]        process_one_work+0x1e1/0x570
-[   37.366929]        worker_thread+0x184/0x330
-[   37.375461]        kthread+0xe6/0x1e0
-[   37.382779]        ret_from_fork+0x20b/0x260
-[   37.391315]        ret_from_fork_asm+0x11/0x20
-[   37.400200]
-                -> #1 (&q->debugfs_mutex){+.+.}-{4:4}:
-[   37.412736]        __mutex_lock+0x83/0x1070
-[   37.421100]        rq_qos_add+0xde/0x130
-[   37.428942]        wbt_init+0x160/0x200
-[   37.436612]        blk_register_queue+0xe9/0x1c0
-[   37.445843]        __add_disk+0x21e/0x3b0
-[   37.453859]        add_disk_fwnode+0x75/0x160
-[   37.462568]        nvme_alloc_ns+0x395/0xbc0
-[   37.471105]        nvme_scan_ns+0x25a/0x320
-[   37.479469]        async_run_entry_fn+0x28/0x110
-[   37.488702]        process_one_work+0x1e1/0x570
-[   37.497761]        worker_thread+0x184/0x330
-[   37.506296]        kthread+0xe6/0x1e0
-[   37.513618]        ret_from_fork+0x20b/0x260
-[   37.522154]        ret_from_fork_asm+0x11/0x20
-[   37.531038]
-                -> #0 (&q->rq_qos_mutex){+.+.}-{4:4}:
-[   37.543399]        __lock_acquire+0x15fc/0x2730
-[   37.552460]        lock_acquire+0xb5/0x2a0
-[   37.560647]        __mutex_lock+0x83/0x1070
-[   37.569010]        blkg_conf_open_bdev_frozen+0x80/0xa0
-[   37.579457]        ioc_qos_write+0x35/0x4a0
-[   37.587820]        kernfs_fop_write_iter+0x15c/0x240
-[   37.597750]        vfs_write+0x31f/0x4c0
-[   37.605590]        ksys_write+0x58/0xd0
-[   37.613257]        do_syscall_64+0x6f/0x1120
-[   37.621790]        entry_SYSCALL_64_after_hwframe+0x4b/0x53
-[   37.632932]
-                other info that might help us debug this:
-[   37.648935] Chain exists of:
-                  &q->rq_qos_mutex --> fs_reclaim --> &q->q_usage_counter(io)#2
-[   37.671552]  Possible unsafe locking scenario:
-[   37.683385]        CPU0                    CPU1
-[   37.692438]        ----                    ----
-[   37.701489]   lock(&q->q_usage_counter(io)#2);
-[   37.710374]                                lock(fs_reclaim);
-[   37.721691]                                lock(&q->q_usage_counter(io)#2);
-[   37.735615]   lock(&q->rq_qos_mutex);
-[   37.742934]
-                 *** DEADLOCK ***
-[   37.754767] 6 locks held by fb-cgroups-setu/1420:
-[   37.764168]  #0: ffff88840ce38e78 (&f->f_pos_lock){+.+.}-{4:4}, at: fdget_pos+0x7a/0xb0
-[   37.780179]  #1: ffff88841c292400 (sb_writers#8){.+.+}-{0:0}, at: ksys_write+0x58/0xd0
-[   37.796018]  #2: ffff88840cfdba88 (&of->mutex#2){+.+.}-{4:4}, at: kernfs_fop_write_iter+0xfd/0x240
-[   37.813943]  #3: ffff888404374428 (kn->active#105){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x112/0x240
-[   37.832390]  #4: ffff8884035500a8 (&q->q_usage_counter(io)#2){++++}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0xe/0x20
-[   37.853618]  #5: ffff8884035500e0 (&q->q_usage_counter(queue)#2){+.+.}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0xe/0x20
-[   37.875365]
-                stack backtrace:
-[   37.884071] CPU: 19 UID: 0 PID: 1420 Comm: fb-cgroups-setu Tainted: G S          E       6.18.0-rc2-gdbafbca31432-dirty #97 NONE
-[   37.884075] Tainted: [S]=CPU_OUT_OF_SPEC, [E]=UNSIGNED_MODULE
-[   37.884075] Hardware name: Quanta Delta Lake MP 29F0EMA01D0/Delta Lake-Class1, BIOS F0E_3A21 06/27/2024
-[   37.884077] Call Trace:
-[   37.884078]  <TASK>
-[   37.884079]  dump_stack_lvl+0x7e/0xc0
-[   37.884083]  print_circular_bug+0x2c2/0x400
-[   37.884087]  check_noncircular+0x118/0x130
-[   37.884090]  ? save_trace+0x46/0x370
-[   37.884093]  ? add_lock_to_list+0x2c/0x1a0
-[   37.884096]  __lock_acquire+0x15fc/0x2730
-[   37.884101]  lock_acquire+0xb5/0x2a0
-[   37.884103]  ? blkg_conf_open_bdev_frozen+0x80/0xa0
-[   37.884108]  __mutex_lock+0x83/0x1070
-[   37.884111]  ? blkg_conf_open_bdev_frozen+0x80/0xa0
-[   37.884114]  ? mark_held_locks+0x49/0x70
-[   37.884135]  ? blkg_conf_open_bdev_frozen+0x80/0xa0
-[   37.884140]  ? blkg_conf_open_bdev_frozen+0x80/0xa0
-[   37.884143]  blkg_conf_open_bdev_frozen+0x80/0xa0
-[   37.884147]  ioc_qos_write+0x35/0x4a0
-[   37.884150]  ? kernfs_root+0x6e/0x160
-[   37.884154]  ? kernfs_root+0x73/0x160
-[   37.884157]  ? kernfs_root_flags+0xa/0x10
-[   37.884160]  ? kn_priv+0x29/0x70
-[   37.884164]  ? cgroup_file_write+0x2b/0x260
-[   37.884168]  kernfs_fop_write_iter+0x15c/0x240
-[   37.884172]  vfs_write+0x31f/0x4c0
-[   37.884176]  ksys_write+0x58/0xd0
-[   37.884179]  do_syscall_64+0x6f/0x1120
-[   37.884182]  entry_SYSCALL_64_after_hwframe+0x4b/0x53
-[   37.884184] RIP: 0033:0x7f4d8171b87d
-[   37.884191] Code: e5 48 83 ec 20 48 89 55 e8 48 89 75 f0 89 7d f8 e8 c8 b3 f7 ff 41 89 c0 48 8b 55 e8 48 8b 75 f0 8b 7d f8 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 3b 44 89 c7 48 89 45 f8 e8 ff b3 f7 ff 48 8b
-[   37.884193] RSP: 002b:00007ffe01969880 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
-[   37.884195] RAX: ffffffffffffffda RBX: 0000000000000041 RCX: 00007f4d8171b87d
-[   37.884196] RDX: 0000000000000041 RSI: 00007f4d7f7aae60 RDI: 0000000000000007
-[   37.884197] RBP: 00007ffe019698a0 R08: 0000000000000000 R09: 00007f4d7f7aae60
-[   37.884199] R10: 00007f4d8160afd0 R11: 0000000000000293 R12: 0000000000000041
-[   37.884200] R13: 0000000000000007 R14: 00007ffe0196a020 R15: 0000000000000000
-[   37.884205]  </TASK>
+Hi Brian,
 
-Happens consistently on boot.
+Thanks for your report and the repro instructions. I will look into
+this and report back what I find.
 
 Thanks,
-David
+Joanne
+>
+> [1] umount stack trace:
+>
+> task:umount          state:D stack:0     pid:12216 tgid:12216 ppid:2514  =
+ task_flags:0x400100 flags:0x00080001
+> Call Trace:
+>  <TASK>
+>  __schedule+0x2fc/0x7a0
+>  schedule+0x27/0x80
+>  io_schedule+0x46/0x70
+>  folio_wait_bit_common+0x12b/0x310
+>  ? __pfx_wake_page_function+0x10/0x10
+>  truncate_inode_pages_range+0x42a/0x4d0
+>  xfs_fs_evict_inode+0x1f/0x30 [xfs]
+>  evict+0x112/0x290
+>  evict_inodes+0x209/0x230
+>  generic_shutdown_super+0x42/0x100
+>  kill_block_super+0x1a/0x40
+>  xfs_kill_sb+0x12/0x20 [xfs]
+>  deactivate_locked_super+0x33/0xb0
+>  cleanup_mnt+0xba/0x150
+>  task_work_run+0x5c/0x90
+>  exit_to_user_mode_loop+0x12f/0x170
+>  do_syscall_64+0x1af/0x800
+>  ? vfs_statx+0x80/0x160
+>  ? do_statx+0x62/0xa0
+>  ? __x64_sys_statx+0xaf/0x100
+>  ? do_syscall_64+0xbb/0x800
+>  ? __x64_sys_statx+0xaf/0x100
+>  ? do_syscall_64+0xbb/0x800
+>  ? count_memcg_events+0xdd/0x1b0
+>  ? handle_mm_fault+0x220/0x340
+>  ? do_user_addr_fault+0x2c3/0x7f0
+>  ? clear_bhb_loop+0x30/0x80
+>  ? clear_bhb_loop+0x30/0x80
+>  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> RIP: 0033:0x7fdd641ed5ab
+> RSP: 002b:00007ffd671182e8 EFLAGS: 00000246 ORIG_RAX: 00000000000000a6
+> RAX: 0000000000000000 RBX: 0000559b3e2056b0 RCX: 00007fdd641ed5ab
+> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000559b3e205ac0
+> RBP: 00007ffd671183c0 R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000103 R11: 0000000000000246 R12: 0000559b3e2057b8
+> R13: 0000000000000000 R14: 0000559b3e205ac0 R15: 0000000000000000
+>  </TASK>
+>
