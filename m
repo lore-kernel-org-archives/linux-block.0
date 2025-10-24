@@ -1,183 +1,226 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6032262D14
-	for <linux-block@vger.kernel.org>; Fri, 24 Oct 2025 04:22:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 394BD219E8;
+	Fri, 24 Oct 2025 04:55:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761279725; cv=none; b=QcMu/5KgeEF479mGQ7lyY2o2vX5GDNCZus12jLHMUd0AUXZ7FAXrU4KyJ/KqVpElQECJ90T2yoivZJKKfpRuKYgL+C3RbrFdKb5u0CiH9DVxERMO98+l5/hT7Z/mA5LpXkd5gxbli2NHVJU+I8VbPS2CzETMVzYYXt2HpVVm08I=
+	t=1761281714; cv=none; b=bBnGVLj2FpQFGhhKbWZMtsDq8iHUxpOjxWNLmmytGTw46ZpAi0W9d9lQLTBEh0OI1I+PMgDz7twzHAl1LdDtUqM1gG00SB8Lc5knfmYj1ONvF1dh0CGXXUv/8VzCTcPwThr+bDdMkRqSZZ3lz2AP98eNHPMTbVx54ju+CLOkOo0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761279725; c=relaxed/simple;
-	bh=faIDFSrWblGzojWXds5591T0YsArkV+e0TTMP15FAI4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GXTx53cWu8jHwxlgZE/oMpElQbqVI88XgRy44BCPg+Fwof2KCk9yuP1VlCo4iecynA6CFGkTcdz/XprZTP3G9litZk1Fsoyu+4iuCKz2oGDjRHWzkboTusf1XM/adJsXUGgZcfzA7zFcqsmlHOiD/dBUurtwbjQb+pgPjUbyuqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c/laar6J; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1761281714; c=relaxed/simple;
+	bh=WMF6ZIsJSyf5vJSfn2XOaIDmGN6b1FeuEaWtCaRDLZ8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Flox83F0GkQnwD16fTsjtsyQ8BZzfD5JS56lt2Jxm8rZFCOOyvOqlOTkB7llP9SeSzDp3pO+B+PnBJCCCDE+jvAS0Me2NVbHsz2iIDST8O5Aa+EJ18aHqJAGWJAf3Ak9hp9H3vkqM8tw3/x2g6JIVTpGnfRQ7/XXArGmXYvk3vc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=m1NpszDE; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c/laar6J"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761279722;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HcyH9reGqGAeYbGxR5vDfBAZeC8+dhdfp3nQT7CViH8=;
-	b=c/laar6JYWHOQJCy5jID/REBMgr3D37EF3ejOJkBw6s0ACkFJNsNlO0ye9coubkdfLlguN
-	dXlWzHQigS4HEtR9OfsXg+Grb7gGIzf8tK7MBPgrc84XF2/I4fbAxW/TZAJI/87SXcB/TK
-	EZiQzEaZry80oR8zEsQwQxDP5cI9ljo=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-307-WDD9V3B9O1agD7-K0GP8SA-1; Fri,
- 24 Oct 2025 00:21:59 -0400
-X-MC-Unique: WDD9V3B9O1agD7-K0GP8SA-1
-X-Mimecast-MFC-AGG-ID: WDD9V3B9O1agD7-K0GP8SA_1761279717
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A3CA318002DD;
-	Fri, 24 Oct 2025 04:21:57 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.13])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 50F0A180057D;
-	Fri, 24 Oct 2025 04:21:48 +0000 (UTC)
-Date: Fri, 24 Oct 2025 12:21:43 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Miklos Szeredi <miklos@szeredi.hu>,
-	Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>, Chris Mason <clm@fb.com>,
-	David Sterba <dsterba@suse.com>, io-uring@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-btrfs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 3/3] io_uring/uring_cmd: avoid double indirect call in
- task work dispatch
-Message-ID: <aPr-11nDqcz4z_V-@fedora>
-References: <20251023201830.3109805-1-csander@purestorage.com>
- <20251023201830.3109805-4-csander@purestorage.com>
- <aPr1i-k0byzYjv8G@fedora>
- <CADUfDZp21icTKrWHcgRTfmsxtdab85b6R75wAYXW2dA+dzXmoA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="m1NpszDE"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59NL7doF030921;
+	Fri, 24 Oct 2025 04:54:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=w2YFGQ
+	yHwYe3oADbRW2mOBrBSRkS/itX+Ac7I8oGgEs=; b=m1NpszDEp+ISWP0P4DVvnU
+	F/Zot1pgl1BSb/IjUFCdzGXbiL0pBD6jTUUiHbWujcAjHBznJt563yWgMDbSv5Fq
+	DTwB3P/GhI1DCvUi2EsHivaqM2m6sY5OfybuB/0EG1E8MzUazigBYadS6iG4G4ux
+	cMYpz4X20wTTQJe8DE9iKFjzXI3DSA2P2MemZ7lVMo5XSjzzovEd9WUevT+31vMs
+	U7N6mg6QJS1w8cq6qSVXSg3UdGih+Y9o+dkOPq5GzLzoQ/l9kYF++b3ekg5ULCpb
+	4eJKRBwxPIBjKUOnPutPxXyZmusUH7VEs69GveJo8dpvkFfKjQcBsvsXmeaE+4dQ
+	==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 49v33fnmkg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 24 Oct 2025 04:54:52 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59O3OQaq014663;
+	Fri, 24 Oct 2025 04:54:51 GMT
+Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 49vn7shnc2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 24 Oct 2025 04:54:51 +0000
+Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
+	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 59O4spVI25821824
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 24 Oct 2025 04:54:51 GMT
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 054675805A;
+	Fri, 24 Oct 2025 04:54:51 +0000 (GMT)
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1B0D358051;
+	Fri, 24 Oct 2025 04:54:44 +0000 (GMT)
+Received: from [9.61.79.238] (unknown [9.61.79.238])
+	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 24 Oct 2025 04:54:43 +0000 (GMT)
+Message-ID: <5b403c7c-67f5-4f42-a463-96aa4a7e6af8@linux.ibm.com>
+Date: Fri, 24 Oct 2025 10:24:42 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [REPORT] Possible circular locking dependency on 6.18-rc2 in
+ blkg_conf_open_bdev_frozen+0x80/0xa0
+To: David Wei <dw@davidwei.uk>, linux-block@vger.kernel.org,
+        cgroups@vger.kernel.org
+Cc: hch@lst.de, hare@suse.de, ming.lei@redhat.com, dlemoal@kernel.org,
+        axboe@kernel.dk, tj@kernel.org, josef@toxicpanda.com, gjoyce@ibm.com,
+        lkp@intel.com, oliver.sang@intel.com
+References: <63c97224-0e9a-4dd8-8706-38c10a1506e9@davidwei.uk>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <63c97224-0e9a-4dd8-8706-38c10a1506e9@davidwei.uk>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADUfDZp21icTKrWHcgRTfmsxtdab85b6R75wAYXW2dA+dzXmoA@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=FMYWBuos c=1 sm=1 tr=0 ts=68fb069c cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8 a=fUZpyD7Rg2de-DjPzZ0A:9 a=3ZKOabzyN94A:10
+ a=QEXdDO2ut3YA:10 a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-GUID: ETyIbunyvyZXEi55mumT6uYrCz8fKm9V
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDE4MDAyMiBTYWx0ZWRfX5YABRNmiWT1W
+ f6c5Y37jiIoVMF8QIsXQei/QlR7Q6bm3CCvSRwi7CyjcQwGqrItVaYtKOFEujonfFEguJ4OXloy
+ nJq8H5wZQYN/GFcIwTq8UG5hT30LoHgoHSW3zIEx3TNTjtO0CMPX5fOackJZFs+oaFnErotilGM
+ n5IWAZ5Zj9xYM2KO8F6PJdvOXoNBjKzoQqmMnV2zQ6TNY/i8BIqOjSpmmQa/nc/sJndplAdmqiV
+ FvvN9xyALk/NUJSM3AYdCiTEYKQCgdkSLGn6bVXmjkVISwNQhYwXzIFUqaWmTNxrrDqcxlF0Pal
+ eKr3xg1xnz7e3PrU3HJ6w+GZ27crebIMXGMLef4ptxX9azAWQFncIKXNFQkCAg4p7BLrLcixvMl
+ n52bKFMjwib6cKjZ/EW4y0jUUgkevw==
+X-Proofpoint-ORIG-GUID: ETyIbunyvyZXEi55mumT6uYrCz8fKm9V
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-23_03,2025-10-22_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1011 impostorscore=0 priorityscore=1501 adultscore=0 bulkscore=0
+ lowpriorityscore=0 suspectscore=0 phishscore=0 spamscore=0 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2510020000 definitions=main-2510180022
 
-On Thu, Oct 23, 2025 at 08:49:40PM -0700, Caleb Sander Mateos wrote:
-> On Thu, Oct 23, 2025 at 8:42 PM Ming Lei <ming.lei@redhat.com> wrote:
-> >
-> > On Thu, Oct 23, 2025 at 02:18:30PM -0600, Caleb Sander Mateos wrote:
-> > > io_uring task work dispatch makes an indirect call to struct io_kiocb's
-> > > io_task_work.func field to allow running arbitrary task work functions.
-> > > In the uring_cmd case, this calls io_uring_cmd_work(), which immediately
-> > > makes another indirect call to struct io_uring_cmd's task_work_cb field.
-> > > Define the uring_cmd task work callbacks as functions whose signatures
-> > > match io_req_tw_func_t. Define a IO_URING_CMD_TASK_WORK_ISSUE_FLAGS
-> > > constant in io_uring/cmd.h to avoid manufacturing issue_flags in the
-> > > uring_cmd task work callbacks. Now uring_cmd task work dispatch makes a
-> > > single indirect call to the uring_cmd implementation's callback. This
-> > > also allows removing the task_work_cb field from struct io_uring_cmd,
-> > > freeing up some additional storage space.
-> >
-> > The idea looks good.
-> >
-> > >
-> > > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-> > > ---
-> > >  block/ioctl.c                |  4 +++-
-> > >  drivers/block/ublk_drv.c     | 15 +++++++++------
-> > >  drivers/nvme/host/ioctl.c    |  5 +++--
-> > >  fs/btrfs/ioctl.c             |  4 +++-
-> > >  fs/fuse/dev_uring.c          |  5 +++--
-> > >  include/linux/io_uring/cmd.h | 16 +++++++---------
-> > >  io_uring/uring_cmd.c         | 13 ++-----------
-> > >  7 files changed, 30 insertions(+), 32 deletions(-)
-> > >
-> > > diff --git a/block/ioctl.c b/block/ioctl.c
-> > > index d7489a56b33c..5c10d48fab27 100644
-> > > --- a/block/ioctl.c
-> > > +++ b/block/ioctl.c
-> > > @@ -767,13 +767,15 @@ long compat_blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg)
-> > >  struct blk_iou_cmd {
-> > >       int res;
-> > >       bool nowait;
-> > >  };
-> > >
-> > > -static void blk_cmd_complete(struct io_uring_cmd *cmd, unsigned int issue_flags)
-> > > +static void blk_cmd_complete(struct io_kiocb *req, io_tw_token_t tw)
-> > >  {
-> > > +     struct io_uring_cmd *cmd = io_kiocb_to_cmd(req, struct io_uring_cmd);
-> > >       struct blk_iou_cmd *bic = io_uring_cmd_to_pdu(cmd, struct blk_iou_cmd);
-> > > +     unsigned int issue_flags = IO_URING_CMD_TASK_WORK_ISSUE_FLAGS;
-> >
-> > Now `io_kiocb` is exposed to driver, it could be perfect if 'io_uring_cmd'
-> > is kept in kernel API interface, IMO.
+
+
+On 10/24/25 2:42 AM, David Wei wrote:
+> Hi folks, hit this with lockdep on 6.18-rc2:
 > 
-> You mean change the io_req_tw_func_t signature to pass struct
-> io_uring_cmd * instead of struct io_kiocb *? I don't think that would
-> make sense because task work is a more general concept, not just for
-> uring_cmd. I agree it's a bit ugly exposing struct io_kiocb * outside
-> of the io_uring core, but I don't see a way to encapsulate it without
-> other downsides (the additional indirect call or the gross macro from
-> v1). Treating it as an opaque pointer type seems like the least bad
-> option...
+> [   36.862405] ======================================================
+> [   36.862406] WARNING: possible circular locking dependency detected
+> [   36.862408] 6.18.0-rc2-gdbafbca31432-dirty #97 Tainted: G S          E
+> [   36.862409] ------------------------------------------------------
+> [   36.862410] fb-cgroups-setu/1420 is trying to acquire lock:
+> [   36.862411] ffff8884035502a8 (&q->rq_qos_mutex){+.+.}-{4:4}, at: blkg_conf_open_bdev_frozen+0x80/0xa0
+> [   36.943164]
+>                but task is already holding lock:
+> [   36.954824] ffff8884035500a8 (&q->q_usage_counter(io)#2){++++}-{0:0}, at: blk_mq_freeze_queue_nomemsave+0xe/0x20
+> [   36.975183]
+>                which lock already depends on the new lock.
+> [   36.991541]
+>                the existing dependency chain (in reverse order) is:
+> [   37.006502]
+>                -> #4 (&q->q_usage_counter(io)#2){++++}-{0:0}:
+> [   37.020429]        blk_alloc_queue+0x345/0x380
+> [   37.029315]        blk_mq_alloc_queue+0x51/0xb0
+> [   37.038376]        __blk_mq_alloc_disk+0x14/0x60
+> [   37.047612]        nvme_alloc_ns+0xa7/0xbc0
+> [   37.055976]        nvme_scan_ns+0x25a/0x320
+> [   37.064339]        async_run_entry_fn+0x28/0x110
+> [   37.073576]        process_one_work+0x1e1/0x570
+> [   37.082634]        worker_thread+0x184/0x330
+> [   37.091170]        kthread+0xe6/0x1e0
+> [   37.098489]        ret_from_fork+0x20b/0x260
+> [   37.107026]        ret_from_fork_asm+0x11/0x20
+> [   37.115912]
+>                -> #3 (fs_reclaim){+.+.}-{0:0}:
+> [   37.127232]        fs_reclaim_acquire+0x91/0xd0
+> [   37.136293]        kmem_cache_alloc_lru_noprof+0x49/0x760
+> [   37.147090]        __d_alloc+0x30/0x2a0
+> [   37.154759]        d_alloc_parallel+0x4c/0x760
+> [   37.163644]        __lookup_slow+0xc3/0x180
+> [   37.172008]        simple_start_creating+0x57/0xc0
+> [   37.181590]        debugfs_start_creating.part.0+0x4d/0xe0
+> [   37.192561]        debugfs_create_dir+0x3e/0x1f0
+> [   37.201795]        regulator_init+0x24/0x100
+> [   37.210335]        do_one_initcall+0x46/0x250
+> [   37.219043]        kernel_init_freeable+0x22c/0x430
+> [   37.228799]        kernel_init+0x16/0x1b0
+> [   37.236814]        ret_from_fork+0x20b/0x260
+> [   37.245351]        ret_from_fork_asm+0x11/0x20
+> [   37.254235]
+>                -> #2 (&sb->s_type->i_mutex_key#3){+.+.}-{4:4}:
+> [   37.268336]        down_write+0x25/0xa0
+> [   37.276003]        simple_start_creating+0x29/0xc0
+> [   37.285582]        debugfs_start_creating.part.0+0x4d/0xe0
+> [   37.296552]        debugfs_create_dir+0x3e/0x1f0
+> [   37.305782]        blk_register_queue+0x98/0x1c0
+> [   37.315014]        __add_disk+0x21e/0x3b0
+> [   37.323030]        add_disk_fwnode+0x75/0x160
+> [   37.331738]        nvme_alloc_ns+0x395/0xbc0
+> [   37.340275]        nvme_scan_ns+0x25a/0x320
+> [   37.348638]        async_run_entry_fn+0x28/0x110
+> [   37.357870]        process_one_work+0x1e1/0x570
+> [   37.366929]        worker_thread+0x184/0x330
+> [   37.375461]        kthread+0xe6/0x1e0
+> [   37.382779]        ret_from_fork+0x20b/0x260
+> [   37.391315]        ret_from_fork_asm+0x11/0x20
+> [   37.400200]
+>                -> #1 (&q->debugfs_mutex){+.+.}-{4:4}:
+> [   37.412736]        __mutex_lock+0x83/0x1070
+> [   37.421100]        rq_qos_add+0xde/0x130
+> [   37.428942]        wbt_init+0x160/0x200
+> [   37.436612]        blk_register_queue+0xe9/0x1c0
+> [   37.445843]        __add_disk+0x21e/0x3b0
+> [   37.453859]        add_disk_fwnode+0x75/0x160
+> [   37.462568]        nvme_alloc_ns+0x395/0xbc0
+> [   37.471105]        nvme_scan_ns+0x25a/0x320
+> [   37.479469]        async_run_entry_fn+0x28/0x110
+> [   37.488702]        process_one_work+0x1e1/0x570
+> [   37.497761]        worker_thread+0x184/0x330
+> [   37.506296]        kthread+0xe6/0x1e0
+> [   37.513618]        ret_from_fork+0x20b/0x260
+> [   37.522154]        ret_from_fork_asm+0x11/0x20
+> [   37.531038]
+>                -> #0 (&q->rq_qos_mutex){+.+.}-{4:4}:
+> [   37.543399]        __lock_acquire+0x15fc/0x2730
+> [   37.552460]        lock_acquire+0xb5/0x2a0
+> [   37.560647]        __mutex_lock+0x83/0x1070
+> [   37.569010]        blkg_conf_open_bdev_frozen+0x80/0xa0
+> [   37.579457]        ioc_qos_write+0x35/0x4a0
+> [   37.587820]        kernfs_fop_write_iter+0x15c/0x240
+> [   37.597750]        vfs_write+0x31f/0x4c0
+> [   37.605590]        ksys_write+0x58/0xd0
+> [   37.613257]        do_syscall_64+0x6f/0x1120
+> [   37.621790]        entry_SYSCALL_64_after_hwframe+0x4b/0x53
+> [   37.632932]
+>                other info that might help us debug this:
+> [   37.648935] Chain exists of:
+>                  &q->rq_qos_mutex --> fs_reclaim --> &q->q_usage_counter(io)#2
+> [   37.671552]  Possible unsafe locking scenario:
+> [   37.683385]        CPU0                    CPU1
+> [   37.692438]        ----                    ----
+> [   37.701489]   lock(&q->q_usage_counter(io)#2);
+> [   37.710374]                                lock(fs_reclaim);
+> [   37.721691]                                lock(&q->q_usage_counter(io)#2);
+> [   37.735615]   lock(&q->rq_qos_mutex);
+> [   37.742934]
 
-If switching to `struct io_kiocb *` can't be accepted, `opaque pointer type`
-might not be too bad:
+Well this appears to be false-positive and its signature is similar to the one
+reported here[1] earlier. The difference here's that we have two different NVMe
+block devices being added concurrently (as can be seen in thread #1 and #2) where
+device #1 pends on device #2's q->debugfs_mutex but in reality those two mutexes
+are distinct as each queue has its own ->debugfs_mutex. 
 
-	- share the callback storage for both `io_uring_cmd_tw_t` and
-	`io_req_tw_func_t` via union
+In the earlier report, the same locking sequence was observed with virtio-blk devices
+which similarly triggered a spurious circular dependency warning.
 
-	- add one request flag for deciding to dispatch which one & prepare `io_kiocb *`
-	or `io_uring_cmd *`.
+IMO, we need to make lockdep learn about this differences by assigning separate
+lockdep key/class for each queue's q->debugfs_mutex to avoid this false positive.
+As this is another report with the same false-positive lockdep splat, I think we
+should address this. 
 
-> 
-> >
-> > ...
-> >
-> > > diff --git a/include/linux/io_uring/cmd.h b/include/linux/io_uring/cmd.h
-> > > index b84b97c21b43..3efad93404f9 100644
-> > > --- a/include/linux/io_uring/cmd.h
-> > > +++ b/include/linux/io_uring/cmd.h
-> > > @@ -9,18 +9,13 @@
-> > >  /* only top 8 bits of sqe->uring_cmd_flags for kernel internal use */
-> > >  #define IORING_URING_CMD_CANCELABLE  (1U << 30)
-> > >  /* io_uring_cmd is being issued again */
-> > >  #define IORING_URING_CMD_REISSUE     (1U << 31)
-> > >
-> > > -typedef void (*io_uring_cmd_tw_t)(struct io_uring_cmd *cmd,
-> > > -                               unsigned issue_flags);
-> > > -
-> > >  struct io_uring_cmd {
-> > >       struct file     *file;
-> > >       const struct io_uring_sqe *sqe;
-> > > -     /* callback to defer completions to task context */
-> > > -     io_uring_cmd_tw_t task_work_cb;
-> > >       u32             cmd_op;
-> > >       u32             flags;
-> > >       u8              pdu[32]; /* available inline for free use */
-> >
-> > pdu[40]
-> 
-> I considered that, but wondered if we might want to reuse the 8 bytes
-> for something internal to uring_cmd rather than providing it to the
-> driver's uring_cmd implementation. If we increase pdu and a driver
-> starts using more than 32 bytes, it will be difficult to claw back. It
-> seems reasonable to reserve half the space for the io_uring/uring_cmd
-> layer and half for the driver.
+Any other thoughts or suggestions from others on the list?
 
-Fair enough, but I think the 8bytes need to define as reserved, at least
-with document benefit.
-
+[1]https://lore.kernel.org/all/7de6c29f-9058-41ca-af95-f3aaf67a64d3@linux.ibm.com/
 
 Thanks,
-Ming
-
+--Nilay
