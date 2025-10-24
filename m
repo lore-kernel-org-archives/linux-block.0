@@ -1,213 +1,131 @@
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19E55326D5E
-	for <linux-block@vger.kernel.org>; Fri, 24 Oct 2025 16:25:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11D9C264F9C
+	for <linux-block@vger.kernel.org>; Fri, 24 Oct 2025 16:31:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761323127; cv=none; b=Zsvxc2pwlv1FCJR++Yh3KQrnYkqcNs79qieUDUFqktaD/UccQk3yf/1eLbCkqm2n1fhvB4tMU046WfBaf/YtZN8xXHoFg8mYjVvvAPAk/v8XFdP5GhO0Nos0GwSiRseeJyxzA1AF63J/6Umxg25poRkWr6lMZHb0V3PemiGaSMM=
+	t=1761323515; cv=none; b=PVb5lBDhbNBTTevZt+rsy2VanvxIE8XkINLgG1rgr+eEg+ay2BoiiUX1wAeuV6hZmPxwe+8VXqQSLoeA7Nn1nKh7vs6yfwuKVY6UNAaiep1VBFC0/azWhod1L9jgZsngmkXdZSli3gS+8g7Gul0nAuDMtcyVEZFIcQ6YIzTYLB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761323127; c=relaxed/simple;
-	bh=+atxU2EiCvuEBwKzBLViHbEHLO1ByLt9iNuuwtmSwYM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kdXTK3xMIn44v/EFwuTIN97JG2q8hHmYloYNCXgG1t+4T5Bg6vr4vey9YDdr03xwhKUbrkjMw6ulikSAWj/kt7dTAdcAmrl+/wCP2yf4ZzDz9UKtQE+LFoFou0bGVHJUvOJq2alP4i4Ym4/zVw2irpId09CTiap0u+N51d/Q6og=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A0rvd96C; arc=none smtp.client-ip=209.85.160.180
+	s=arc-20240116; t=1761323515; c=relaxed/simple;
+	bh=2sni659oKETAt3mg4JWKS26aiVXJeHNTGhbFaOETvpg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ijfWcs7adK8mbjQ3AFG//P4QLGF86TJCqff5hOItNJnlDUFW5V7XBcH6uNabBAHv8LMjw28mvvaAfnVe871WgOULDevzVjl1u2NQHEu+U1+ayuuv0gUyp41Zy4pUKDaEAEFc8V51XSDMxn/1GpJ2BkcKKT/vX3F3Ib3+FLwuLGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=baeGrPtx; arc=none smtp.client-ip=209.85.208.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A0rvd96C"
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4e8b334bff3so21300551cf.2
-        for <linux-block@vger.kernel.org>; Fri, 24 Oct 2025 09:25:25 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="baeGrPtx"
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-63c45c11be7so4053583a12.3
+        for <linux-block@vger.kernel.org>; Fri, 24 Oct 2025 09:31:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761323124; x=1761927924; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1761323510; x=1761928310; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wx/1KUSrS2QODRikqv2kYXYElChlESHNJsV1usUpdu4=;
-        b=A0rvd96C906D3KvaGW5vfosyQzQJmOJfkzEs1+yn+4Vr707jUNl87rUzBKsxXkXnkD
-         gfmsdf1Sq1PMgTSqhLUinUoH2FLNVL0Jx1jrCoj22Eq5/TDCb2cY6Uk4QiYx250ef8Fy
-         2+GSG0i+17l9eb+9IczX0WgA4xW0AUAgrxkZBEi48Nq5zGQRc6nAYBZD9dB4OJQP1OYW
-         AG0Tp2bRizUOE5k8WYkajMfU+ev21sHzeqM3wHGazfKGrEegziImgRyjjWc8PdEoe7Bo
-         0/yadFZUDTOGZGZj7OebQOewijjxYdIrPD8yvS0vyRAodTh18QMFOtw7+qFmemZPrr8V
-         2TDQ==
+        bh=OU6+xLScjAoCvkgYL37muGkf8RRryUsuClOGQPNvZ0U=;
+        b=baeGrPtxRl9Zf/t4igHdLAfWz7seyMy2nyivr30g2fvYihwprt8qlhOJ9DJtSB1hBN
+         TYLvarvSWtjgZgxIFPLdBYl4+zOt6KrUsmyze798Y9YVrE4BJz0upn4uZAdQ0Qm/C69Y
+         73LY1yYKOXRCr1VXZQAMZHTQGiaqwXIQl+XOrqPkJ6DJ3WbI8Lxosftc+V1hDcagxFE+
+         Mv+ER1/NPEMnCHB5T/HRmKAwwHUaJG509q9O5YZGfQ2xoBy9R407zdmitycuDi0eGZZ4
+         4CdnBpGwx2duUok2tRLKfKZLcZlsr35nVFeaUcTiP2b6iztLXtbn99MOpppdextVXb3r
+         L0RQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761323124; x=1761927924;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1761323510; x=1761928310;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=wx/1KUSrS2QODRikqv2kYXYElChlESHNJsV1usUpdu4=;
-        b=fFw8QkJbJ21yXDtqEFBuHpjcvOUXhpqBWu9EoTDXgOyRJ/2hHg2SCWaAr7u3cOLzby
-         44tPDLHpZhaXiZaP1yuL8aoohtMZrZpmQsSyw+JBEcYm0sWhudvqtwLYJAcKCI2g6+mW
-         Gngzx8TxvE+jnT4wj0WBqQiJODV3msh76M6uxEV0BB8dOvFxv8gGGTsZ0w2dKwi9vvuJ
-         9KYDCBBb6hU2bFWAo15R8T8URu3sq4waMLZPzgcV/xMY6nMOHCIQBbCf5WjwuYitKrcC
-         qtMryjNHR8V/b7nWDOLR4v308aP2D/tGmsAxRN0ChzT0f+B9RXXHeD6cavLmvUgN4gev
-         dZmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXGVpEVzpKtqP4yW7LreFrSrOGh085RBA0Yc4JpQYMkgdhHWfY+fck6JMwQb0zfbiD51kYYZych9gL5PQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxmdmp515pbdNqkvxYJqWl++wAKBUc+zhI0p0bHrVUD8Ingi0n3
-	wwW2bcCc9Lg30yrPh7iuCaBBwYYZb5b1WMEBJJ2K0Xr1Yfy+9ndlke6YSMp/AWexu/PqMwtlWG5
-	BC2I3euR24F1rHWOlyrp+9atagXaO8Vs=
-X-Gm-Gg: ASbGncuWn1EBXN709hmm56GNW6NYwrVtpObudi7/hzNFRkIglSzoHSc8Tlxj/ulEmHO
-	ZI2u23Uug7+oHMI52GSE8gbns5iyUPJn80mdjFesb9sIyahlbb5EIkJF47Z/gjiarkR42C2d00K
-	dA5TTSSHh7V3ack/s96xXPB9bOMs88PF+LrfsPjvo1RLBB69TraPkDp1QOVAr1nWXfDOZqVquJh
-	Q+EVwmEPHBup3qy+4v/uPE0kVZABvUoBM+CVfx8jSEPTMB61SdO8zc3895Qh00GDBMFSEbDWygp
-	gAGp4HDLlmcbo3fszkNiHyDM8g==
-X-Google-Smtp-Source: AGHT+IHp3wmsoO5cixVEN6RnBalbhLBxtbDmErayXQYcHx3ZFIvWvsx0O7mjIrtkdb0eYC3IVVBavdS6CsD2AIKgnrM=
-X-Received: by 2002:ac8:7d88:0:b0:4b3:104:792c with SMTP id
- d75a77b69052e-4eb949095dbmr36793101cf.57.1761323124234; Fri, 24 Oct 2025
- 09:25:24 -0700 (PDT)
+        bh=OU6+xLScjAoCvkgYL37muGkf8RRryUsuClOGQPNvZ0U=;
+        b=geElIFwAWuj81XmVvSuV9ZOLBydPZ6akwRdBXzi0ehUzcov2zeR7zfa7qa2WZHqQ26
+         /Q6pVugRM0oK9e4DoY8NCXGaG8PSDxxk4+IXqyHoQLCt0KgJ7oJac7B3L4NwdumCXFVb
+         psLYTeUytE5hVKp97GSSWY1/umIKtoKDBjIhNErz6bOSxXpcqd58WDFgKHAVz7aZLyjt
+         DwPThR4xgVz+qT6iLoSs14r79Wr0BuTBL1BGEgnyQR+NwNdApfSKjLDvNC5/8i03Sb4k
+         a7qbRxFbrjNrbnpv3KzOJfsLC1dCZCprY1vFvxajxSvermPWTI0ypBE4VSgQLJCGTaYb
+         38sA==
+X-Forwarded-Encrypted: i=1; AJvYcCVZe7eYKfpnQXq25vy4BR+j0ehbyknXX4rJ9eYW85wMJTeEUpHtFHK87bRixcy6ltw4mSWCq/Qb+NtmJA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPDb/R0JQWSvrgN/qrBGwrco4rFtdCLJlJXjxKUJT5O1mSopwI
+	KuJrxntnK0tfhCvHV9xfMGGHAGjYW3UPsU2LJHK1MZDSsdq17MeJFjO2
+X-Gm-Gg: ASbGncsJ5u75ZKlGi5pwwNm534ERK9y0kJfs1j7z4jXRLkhzTcpi+OJFws1P8KuhEi5
+	ryhyOom1wm22qtcCS7R3L56Q+Wc+PfStm2tAVcxjHAbnfPBA7jhhIJXCQYwOU8xl5pBHaqHc7CR
+	LQwVjDSow9Ia+0iLseQNNYYLXGuRHkG0cqO6ZSgIHoRamheZdnobuz5s5iq97jNRaTFSSGTjHkP
+	UmHfzMs03PI8rc+dtDKOL+X6+mDCoRQkspdpG0fShfPHxmErkxfSBkyH0PZgs/FOv98lHkfjrvK
+	GdAWZj95SRyEgMIIc/+bkWxwRSrPnKE5i8YTybtvLhMM70ZY1FvoFUH+9TfnAw5RV4utJnebpcG
+	giQpCr9vl6WTNOKXLcWH758NhdSX5r+UNF4/v8JGmJoGJ0EI0CFW/ABKcRSbsYguyNUgsUf6w7l
+	RF
+X-Google-Smtp-Source: AGHT+IGJrzUB5n97Ss2T/JTlLzP7kGDtRqESJivToHOWW6+qmykXupmsLuZ+wNfM3MQ1VRw6GaGwKg==
+X-Received: by 2002:a05:6402:42ca:b0:63b:fbd9:3d9c with SMTP id 4fb4d7f45d1cf-63e6002459emr2596805a12.15.1761323509904;
+        Fri, 24 Oct 2025 09:31:49 -0700 (PDT)
+Received: from localhost ([212.73.77.104])
+        by smtp.gmail.com with UTF8SMTPSA id 4fb4d7f45d1cf-63e3f316b64sm4717822a12.22.2025.10.24.09.31.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 24 Oct 2025 09:31:49 -0700 (PDT)
+From: Askar Safin <safinaskar@gmail.com>
+To: gmazyland@gmail.com
+Cc: Dell.Client.Kernel@dell.com,
+	brauner@kernel.org,
+	dm-devel@lists.linux.dev,
+	ebiggers@kernel.org,
+	kix@kix.es,
+	linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-lvm@lists.linux.dev,
+	linux-mm@kvack.org,
+	linux-pm@vger.kernel.org,
+	linux-raid@vger.kernel.org,
+	lvm-devel@lists.linux.dev,
+	mzxreary@0pointer.de,
+	nphamcs@gmail.com,
+	pavel@ucw.cz,
+	rafael@kernel.org,
+	ryncsn@gmail.com,
+	safinaskar@gmail.com,
+	torvalds@linux-foundation.org
+Subject: Re: dm bug: hibernate to swap located on dm-integrity doesn't work (how to get data redundancy for swap?)
+Date: Fri, 24 Oct 2025 19:31:42 +0300
+Message-ID: <20251024163142.376903-1-safinaskar@gmail.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <a48a37e3-2c22-44fb-97a4-0e57dc20421a@gmail.com>
+References: <a48a37e3-2c22-44fb-97a4-0e57dc20421a@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250926002609.1302233-1-joannelkoong@gmail.com>
- <20250926002609.1302233-8-joannelkoong@gmail.com> <aPqDPjnIaR3EF5Lt@bfoster> <CAJnrk1aNrARYRS+_b0v8yckR5bO4vyJkGKZHB2788vLKOY7xPw@mail.gmail.com>
-In-Reply-To: <CAJnrk1aNrARYRS+_b0v8yckR5bO4vyJkGKZHB2788vLKOY7xPw@mail.gmail.com>
-From: Joanne Koong <joannelkoong@gmail.com>
-Date: Fri, 24 Oct 2025 09:25:13 -0700
-X-Gm-Features: AS18NWA3qoIlbq6W__AaTzux05FyB2J3eGAkfannm8GTk0lfzD_eFocAFZliHW4
-Message-ID: <CAJnrk1b3bHYhbW9q0r4A0NjnMNEbtCFExosAL_rUoBupr1mO3Q@mail.gmail.com>
-Subject: Re: [PATCH v5 07/14] iomap: track pending read bytes more optimally
-To: Brian Foster <bfoster@redhat.com>
-Cc: brauner@kernel.org, miklos@szeredi.hu, djwong@kernel.org, 
-	hch@infradead.org, hsiangkao@linux.alibaba.com, linux-block@vger.kernel.org, 
-	gfs2@lists.linux.dev, linux-fsdevel@vger.kernel.org, kernel-team@meta.com, 
-	linux-xfs@vger.kernel.org, linux-doc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Oct 23, 2025 at 5:01=E2=80=AFPM Joanne Koong <joannelkoong@gmail.co=
-m> wrote:
->
-> On Thu, Oct 23, 2025 at 12:30=E2=80=AFPM Brian Foster <bfoster@redhat.com=
-> wrote:
-> >
-> > On Thu, Sep 25, 2025 at 05:26:02PM -0700, Joanne Koong wrote:
-> > > Instead of incrementing read_bytes_pending for every folio range read=
- in
-> > > (which requires acquiring the spinlock to do so), set read_bytes_pend=
-ing
-> > > to the folio size when the first range is asynchronously read in, kee=
-p
-> > > track of how many bytes total are asynchronously read in, and adjust
-> > > read_bytes_pending accordingly after issuing requests to read in all =
-the
-> > > necessary ranges.
-> > >
-> > > iomap_read_folio_ctx->cur_folio_in_bio can be removed since a non-zer=
-o
-> > > value for pending bytes necessarily indicates the folio is in the bio=
-.
-> > >
-> > > Signed-off-by: Joanne Koong <joannelkoong@gmail.com>
-> > > Suggested-by: "Darrick J. Wong" <djwong@kernel.org>
-> > > ---
-> >
-> > Hi Joanne,
-> >
-> > I was throwing some extra testing at the vfs-6.19.iomap branch since th=
-e
-> > little merge conflict thing with iomap_iter_advance(). I end up hitting
-> > what appears to be a lockup on XFS with 1k FSB (-bsize=3D1k) running
-> > generic/051. It reproduces fairly reliably within a few iterations or s=
-o
-> > and seems to always stall during a read for a dedupe operation:
-> >
-> > task:fsstress        state:D stack:0     pid:12094 tgid:12094 ppid:1209=
-1  task_flags:0x400140 flags:0x00080003
-> > Call Trace:
-> >  <TASK>
-> >  __schedule+0x2fc/0x7a0
-> >  schedule+0x27/0x80
-> >  io_schedule+0x46/0x70
-> >  folio_wait_bit_common+0x12b/0x310
-> >  ? __pfx_wake_page_function+0x10/0x10
-> >  ? __pfx_xfs_vm_read_folio+0x10/0x10 [xfs]
-> >  filemap_read_folio+0x85/0xd0
-> >  ? __pfx_xfs_vm_read_folio+0x10/0x10 [xfs]
-> >  do_read_cache_folio+0x7c/0x1b0
-> >  vfs_dedupe_file_range_compare.constprop.0+0xaf/0x2d0
-> >  __generic_remap_file_range_prep+0x276/0x2a0
-> >  generic_remap_file_range_prep+0x10/0x20
-> >  xfs_reflink_remap_prep+0x22c/0x300 [xfs]
-> >  xfs_file_remap_range+0x84/0x360 [xfs]
-> >  vfs_dedupe_file_range_one+0x1b2/0x1d0
-> >  ? remap_verify_area+0x46/0x140
-> >  vfs_dedupe_file_range+0x162/0x220
-> >  do_vfs_ioctl+0x4d1/0x940
-> >  __x64_sys_ioctl+0x75/0xe0
-> >  do_syscall_64+0x84/0x800
-> >  ? do_syscall_64+0xbb/0x800
-> >  ? avc_has_perm_noaudit+0x6b/0xf0
-> >  ? _copy_to_user+0x31/0x40
-> >  ? cp_new_stat+0x130/0x170
-> >  ? __do_sys_newfstat+0x44/0x70
-> >  ? do_syscall_64+0xbb/0x800
-> >  ? do_syscall_64+0xbb/0x800
-> >  ? clear_bhb_loop+0x30/0x80
-> >  ? clear_bhb_loop+0x30/0x80
-> >  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> > RIP: 0033:0x7fe6bbd9a14d
-> > RSP: 002b:00007ffde72cd4e0 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-> > RAX: ffffffffffffffda RBX: 0000000000000068 RCX: 00007fe6bbd9a14d
-> > RDX: 000000000a1394b0 RSI: 00000000c0189436 RDI: 0000000000000004
-> > RBP: 00007ffde72cd530 R08: 0000000000001000 R09: 000000000a11a3fc
-> > R10: 000000000001d6c0 R11: 0000000000000246 R12: 000000000a12cfb0
-> > R13: 000000000a12ba10 R14: 000000000a14e610 R15: 0000000000019000
-> >  </TASK>
-> >
-> > It wasn't immediately clear to me what the issue was so I bisected and
-> > it landed on this patch. It kind of looks like we're failing to unlock =
-a
-> > folio at some point and then tripping over it later..? I can kill the
-> > fsstress process but then the umount ultimately gets stuck tossing
-> > pagecache [1], so the mount still ends up stuck indefinitely. Anyways,
-> > I'll poke at it some more but I figure you might be able to make sense
-> > of this faster than I can.
-> >
-> > Brian
->
-> Hi Brian,
->
-> Thanks for your report and the repro instructions. I will look into
-> this and report back what I find.
+Milan Broz <gmazyland@gmail.com>:
+> Hi,
 
-This is the fix:
+I just wrote script for reproduction of this bug in Qemu:
+https://zerobin.net/?4e742925aedbecc6#BX3Tulvp7E3gKhopFKrx/2ZdOelMyYk1qOyitcOr1h8=
 
-diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
-index 4e6258fdb915..aa46fec8362d 100644
---- a/fs/iomap/buffered-io.c
-+++ b/fs/iomap/buffered-io.c
-@@ -445,6 +445,9 @@ static void iomap_read_end(struct folio *folio,
-size_t bytes_pending)
-                bool end_read, uptodate;
-                size_t bytes_accounted =3D folio_size(folio) - bytes_pendin=
-g;
+Just run it, and you will reproduce this bug, too.
 
-+               if (!bytes_accounted)
-+                       return;
-+
-                spin_lock_irq(&ifs->state_lock);
+Also, I just reproduced it on current master (43e9ad0c55a3).
 
+Here is output of this script on master:
+https://zerobin.net/?68ef6601ab203a11#7zBZ44AaVKmvRq161MJaOXIXY/5Hiv+hRUxWoqyZ7uE=
 
-What I missed was that if all the bytes in the folio are non-uptodate
-and need to read in by the filesystem, then there's a bug where the
-read will be ended on the folio twice (in iomap_read_end() and when
-the filesystem calls iomap_finish_folio_write(), when only the
-filesystem should end the read), which does 2 folio unlocks which ends
-up locking the folio. Looking at the writeback patch that does a
-similar optimization [1], I miss the same thing there.
+As you can see, hibernate succeeds, but resume fails so:
 
-I'll fix up both. Thanks for catching this and bisecting it down to
-this patch. Sorry for the trouble.
++ blkid --match-tag TYPE --output value /dev/mapper/early-swap
++ TYPE=swap
++ echo 'Type: swap'
+Type: swap
++ echo /dev/mapper/early-swap
+[    0.446545] PM: Image not found (code -22)
 
-Thanks,
-Joanne
+Also, I just noticed that the bug sometimes reproduces, and sometimes not.
+Still it reproduces more than 50% of time.
 
-[1] https://lore.kernel.org/linux-fsdevel/20251009225611.3744728-4-joannelk=
-oong@gmail.com/
->
-> Thanks,
-> Joanne
-> >
+Also, you will find backtrace in logs above. Disregard it. I think this
+is just some master bug, which is unrelated to our dm-integrity bug.
+
+I will answer to rest of your letter later.
+
+Also, I saw patch, I will test it later.
+
+-- 
+Askar Safin
