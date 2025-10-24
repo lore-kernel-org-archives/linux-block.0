@@ -1,150 +1,107 @@
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D321C335093
-	for <linux-block@vger.kernel.org>; Fri, 24 Oct 2025 17:50:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE6C828DB56
+	for <linux-block@vger.kernel.org>; Fri, 24 Oct 2025 19:22:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761328212; cv=none; b=tPV6AW9Ht6IJ7T/H2nT+V0Qf0OhurAYjJKbFIDD2z2z9y5MiJvRNkOrGErpXUQZGu5itgR2u8wDwaglqttRFezDakH1eg9pykImBYvyOGZEVw3YWKAeQvspQJarxvZFn1twIf1TY7eXniogrQHhENP8lVpideA36T/eHRuecEVE=
+	t=1761333766; cv=none; b=tKPDq5bMheiYPMWIHwAJs877tHiDNhTYOdNFJF0aqh/OTLWkVWYYjU0BIX0tdj46ZTOwrLQG8nR4Q7StVLztovyrwq/2mCxMKNg0O8FOImG2H4+3SmoDOybxpWtuy7j/kVncCHxjg1MXL/Hw+bHCPrtFsuQ3doLgaBD2PN9uLTQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761328212; c=relaxed/simple;
-	bh=Cnr0WNctFG8V6FmmOcFwsBfOOmXZZvAjIfyVaJhKdXw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tWA/kC/ZSOlMZzB82old/VA+Sgi+9LKCGkIBC0hO/hgEdbnJU4KhWlFuw+YNAKO4p7HMMbO9ze+ek6jobPO+T892KkPBuSniaRBTi/Tn/ZPGI67g989kOpioGUUQ+zZ7N9JSqV/iCSy0kIJdrU9S+Hv4rX/k/o9migcFwA0DVzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bK007PVk; arc=none smtp.client-ip=209.85.218.42
+	s=arc-20240116; t=1761333766; c=relaxed/simple;
+	bh=QgsR+Vv3MGDc6mihpTVQXoOx12Z77gAlV2xrGnLO6/E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nQSXj5ULwCYpGn6bxyNoKTN/kRYeP7u3aMzS28xBhBoNTeimI3qi/AHgXzFVZgbKWqsEL1vPf1xr6R+KwO6eje1WAeTXv3AX4uBkrujW1/ttMi0faHhpu1b1Lp61JCZrtKLhRjjHwiR1vnrH2TxUy4H53dbePk6dole2MtWLloc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BPjfy8RF; arc=none smtp.client-ip=209.85.160.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bK007PVk"
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-b64cdbb949cso509619466b.1
-        for <linux-block@vger.kernel.org>; Fri, 24 Oct 2025 10:50:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BPjfy8RF"
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4e886550a26so11323611cf.3
+        for <linux-block@vger.kernel.org>; Fri, 24 Oct 2025 12:22:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761328209; x=1761933009; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=0tKDIn8Dd62bIobWa5FrOxCPkfvj/PGwj/fjdmIbdAU=;
-        b=bK007PVkPKuygh6L7DV1dF+8BZU4zRt6yQtbZpcLBMiyQD8qZlyosQLgI1pgt94fFQ
-         jCAbfQAKnCP39z1oZv/EAQ9iH6yab4cRP7WquVjdBAx5mf67bIWy2WTWoXEecGLsSaX9
-         neLpKRUdQKMQwoCnbXD/dgwRzIE9lLzOsWYq2eAYdz4bz/LXhsxjy1HiiNCkGHn09N9T
-         Mys4kh1gQcRaQ7JLQwOSQ+GR1pG58jhX7t0OhwAvjt8WV/u0+ZbcwiN4mcXYkXZWhBd2
-         67A4efD5HYUN5yiZFa2swZtMR7OYxcc9LsaBoARhNI0nJENu/T7BrGUY2i0FHQP7jnxz
-         FgCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761328209; x=1761933009;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1761333764; x=1761938564; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0tKDIn8Dd62bIobWa5FrOxCPkfvj/PGwj/fjdmIbdAU=;
-        b=D/1UeEtpSBO9+Vj9NOXUkndC4XJEP3P139joQH3LYkbEe7SydEyZuE1iyi0M815eIV
-         y3pp8GDIoCEnY5DlcqtJ4udDIc4y+uMVAWJFFMr9C31+Uau95deHx9keD+kdVYZ9TZOa
-         WKXMs9IPYDqE6vMgoOJ35HWJFPFIx6BqY+SI27DKexNeSHu1eGIdZjZfdvztksesufyc
-         VesVuZQk78gEY12NIXtrks9wD6sf2Flyp11TvaUeNJR+FJhQtLi/bNmGsNE215BZQxT2
-         VZxOpBirq6RaxNrLb7rZArKjldNwYeDV8UVhnTl/BQKnUvex+yugELN9jzgf9VxxTLA1
-         DlwA==
-X-Forwarded-Encrypted: i=1; AJvYcCVELfg+o1idlU5f4S1pQoooiEgT5P6lbpWse38j2kmehL/G749zyDGg9aiBFiIca+jQNlkT2Q6DtWsZuw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywh7Zn8qhc2qmivhdS9yURS5MZaLW7AKOwO8JPK406MYncAWCJw
-	dlsLBNZ+cl/a7dbaOGuHChRvjiBTXv0Q3oKD1x9jrcQpaZYhQZHN5puq
-X-Gm-Gg: ASbGncs7zW0gnJhaaIkom40RXSO1JFD9oefZubJGUKkoE5kspQlgI4kK4Vn4ym4Hx31
-	XCE7/lynozYbh/+3m0plbEGR4eZJEcO7Soku5Ag559Z7840zylfhhe473X8okFM7AL5JdAeOI0w
-	dW9EJoFrJAl4XWTUXDAS1dyhpSMtyz20CAi+5JxRv0YPNT3KMurjLkdq6LSO6jcei+8xpxM/ia0
-	J0uz7HfeLAz+XK9jxnDmVJuNAk2Rm7QxST7qlX7QO8TZLdC/dUEpdK1w797TzVF1l3r76E8R3Cy
-	lmoNTj56rdq93fIAOgpun7dJ7SB3BL9/8GQlT8NS3GEDLTwvguNPo4dsb0z5NPOGwkIyqBeSh0V
-	aZ02CuSGAwRbCYwDl/blh2Co9djg64m+fVUxyXwyCVrh2ZN1wvWwfl+nIHIVFeBTHBgcT4fVEhH
-	sQciksrbqGvPwJ5U5grsGrM4A8qg75XyUSRJxkuR4L
-X-Google-Smtp-Source: AGHT+IEHVSSj7rXjwYMoHcZH9vR/vm/UDZA+qYlFM+r0okKL4IfHGOhTECkjaHomhCRDjSe3Dq8uEQ==
-X-Received: by 2002:a17:906:ee89:b0:b47:de64:df26 with SMTP id a640c23a62f3a-b6d6ff25f61mr303261366b.35.1761328208958;
-        Fri, 24 Oct 2025 10:50:08 -0700 (PDT)
-Received: from [192.168.8.101] (37-48-18-87.nat.epc.tmcz.cz. [37.48.18.87])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b6d5144e4acsm585057066b.63.2025.10.24.10.50.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Oct 2025 10:50:08 -0700 (PDT)
-Message-ID: <5e0056d7-3550-4c40-a698-c09535d32bb2@gmail.com>
-Date: Fri, 24 Oct 2025 19:50:06 +0200
+        bh=QgVsq2p7ysLPME1WhWajPgNYUjlNdQ3sSEmcEy2qO6w=;
+        b=BPjfy8RFaXc653UEcDt7aXACeN5dBOMeuj4rA77Emfracun9ngFDcRYifmFpEP2AXK
+         5m8C22v7SdieEVE2rVxNAFRd/1Xc35kZLKBy9wl7zSvt2qfcQnsXmcsAFF7cUA9LNkqA
+         SytL4/F3PHlWEKaUTFmlran24Xb9TNKnOV/BhYmhBRFHM2OSm4FiJ1/DcbkRJ7ZXYK7X
+         FumnweK7iumntqEMKm94QaR5Ssc6S0OVZDEMIUPAiOuAsHk6xqnswWbBWDWKTs3IOcAI
+         wTJ0muof9YdKtxEpxjMCIbnAISM/wVevoa9m7D+4RcHdqFPfObTHJLDHDL+NXhaTzDW5
+         zUwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761333764; x=1761938564;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QgVsq2p7ysLPME1WhWajPgNYUjlNdQ3sSEmcEy2qO6w=;
+        b=KxINe8ZIBqrG2RNSbGkV3DYeWzq1wXvIHCGIhVCbK1ka2B2SuXg7wSslckQ7oqkIvP
+         SkGqkjY96K7JtCnllmcasVBQ3Zr//BaiA7MKh4cDrr/+TfrRwo++rdNyzZmqa40tVjVX
+         SDAvELjwkoJTt/uMfg2L/5L+34zfBgSQVGDgLse3DrTIQMxskvgQ15qbsPViBHkI9hRf
+         b5y+R870b4K2MY18qH1HJw1rmX+IPW/Cfs1wLEU5J2S6r//wFqXlpMJNP+aP6ecB4GPp
+         5HlyF6ch290h6iZe3Hj4og9FTTLWNVVV9rNELem0cuMIpKpy6bK6sGSFoSCkq0Ty49B4
+         ZZeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU0hh9SW6B5cpp7wKcD3bWSK7HxUYoy+zmiEcYMciTT1OoQ7k1Yol/Qb+iCyZW2ZFTznk2AmnpCRbhrsw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+I8UkdCXFcx7L8mmSK0nmqYqhv5lWjikgKq83+okepyY7Bw6e
+	iHojf3fqaWyTuWh/ZP8hjoQYZs7B1XqaKIAYZhYH+7xD2mCuT3HMQA4nev+Y8VRH8Z4/lN49sYC
+	vZUYWiIfKVmLqsDq2yl6hEYl1dXz5Cnc=
+X-Gm-Gg: ASbGncs74+SyywLnqfJGK5y2vAP+fnxmCnYfwypvhFqfWC4ywnP/y4QhIQ01M/tGG21
+	1CGooF+jm2vMhEXdRdjT8KU9jtWO+9R1gWm3qG++1U3vTk8SlzJB6uNsjqf169znhsYLNEUgcfF
+	AcaPYdIuo2JX41M28nRQXxiuAG/Z8tY1rp6rERqiYuaQJmJ9PSQ36A9lXURwLjKSJVFrckXUjj6
+	SqGR2aqYU0pURsuxQ3m/hLOuGL/tI91NGtW+GuyEhd4y6isupE9E/wkxmQCC4ejRBrwVMlj9dsd
+	C0iTuhGwhOCQw5OgzFFE4rdI1A==
+X-Google-Smtp-Source: AGHT+IGxXnezM7H6ghoHWHVk0i5IpwGNkPTA0TF+xQoIAFjkCgqjiFTZpTBBYWa/w3Z7zp2bKm+jQ4qd+hmkKIGk2Xc=
+X-Received: by 2002:a05:622a:138a:b0:4d8:531e:f896 with SMTP id
+ d75a77b69052e-4e89d293c59mr371291051cf.27.1761333763653; Fri, 24 Oct 2025
+ 12:22:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: dm bug: hibernate to swap located on dm-integrity doesn't work
- (how to get data redundancy for swap?)
-To: Askar Safin <safinaskar@gmail.com>
-Cc: Dell.Client.Kernel@dell.com, brauner@kernel.org,
- dm-devel@lists.linux.dev, ebiggers@kernel.org, kix@kix.es,
- linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-lvm@lists.linux.dev, linux-mm@kvack.org,
- linux-pm@vger.kernel.org, linux-raid@vger.kernel.org,
- lvm-devel@lists.linux.dev, mzxreary@0pointer.de, nphamcs@gmail.com,
- pavel@ucw.cz, rafael@kernel.org, ryncsn@gmail.com,
- torvalds@linux-foundation.org, Mikulas Patocka <mpatocka@redhat.com>
-References: <a48a37e3-2c22-44fb-97a4-0e57dc20421a@gmail.com>
- <20251024163142.376903-1-safinaskar@gmail.com>
-Content-Language: en-US
-From: Milan Broz <gmazyland@gmail.com>
-Autocrypt: addr=gmazyland@gmail.com; keydata=
- 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
-In-Reply-To: <20251024163142.376903-1-safinaskar@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250926002609.1302233-1-joannelkoong@gmail.com>
+ <20250926002609.1302233-8-joannelkoong@gmail.com> <aPqDPjnIaR3EF5Lt@bfoster>
+ <CAJnrk1aNrARYRS+_b0v8yckR5bO4vyJkGKZHB2788vLKOY7xPw@mail.gmail.com>
+ <CAJnrk1b3bHYhbW9q0r4A0NjnMNEbtCFExosAL_rUoBupr1mO3Q@mail.gmail.com> <aPu1ilw6Tq6tKPrf@casper.infradead.org>
+In-Reply-To: <aPu1ilw6Tq6tKPrf@casper.infradead.org>
+From: Joanne Koong <joannelkoong@gmail.com>
+Date: Fri, 24 Oct 2025 12:22:32 -0700
+X-Gm-Features: AS18NWDml_8GOzBxWkDpLBz16byJMfZB750GwQQx4HmcQAC4dkTAAf9RVH0Fz44
+Message-ID: <CAJnrk1az+8iFnN4+bViR0USRHzQ8OejhQNNgUT+yr+g+X4nFEA@mail.gmail.com>
+Subject: Re: [PATCH v5 07/14] iomap: track pending read bytes more optimally
+To: Matthew Wilcox <willy@infradead.org>
+Cc: Brian Foster <bfoster@redhat.com>, brauner@kernel.org, miklos@szeredi.hu, 
+	djwong@kernel.org, hch@infradead.org, hsiangkao@linux.alibaba.com, 
+	linux-block@vger.kernel.org, gfs2@lists.linux.dev, 
+	linux-fsdevel@vger.kernel.org, kernel-team@meta.com, 
+	linux-xfs@vger.kernel.org, linux-doc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/24/25 6:31 PM, Askar Safin wrote:
-> 
-> Also, I saw patch, I will test it later.
+On Fri, Oct 24, 2025 at 10:21=E2=80=AFAM Matthew Wilcox <willy@infradead.or=
+g> wrote:
+>
+> On Fri, Oct 24, 2025 at 09:25:13AM -0700, Joanne Koong wrote:
+> > What I missed was that if all the bytes in the folio are non-uptodate
+> > and need to read in by the filesystem, then there's a bug where the
+> > read will be ended on the folio twice (in iomap_read_end() and when
+> > the filesystem calls iomap_finish_folio_write(), when only the
+> > filesystem should end the read), which does 2 folio unlocks which ends
+> > up locking the folio. Looking at the writeback patch that does a
+> > similar optimization [1], I miss the same thing there.
+>
+> folio_unlock() contains:
+>         VM_BUG_ON_FOLIO(!folio_test_locked(folio), folio);
+>
+> Feels like more filesystem people should be enabling CONFIG_DEBUG_VM
+> when testing (excluding performance testing of course; it'll do ugly
+> things to your performance numbers).
 
-Yes, please test it, you can ignore may previous comments as they are irrelevant now.
-Here is the link to the mentioned patch:
-   https://lore.kernel.org/dm-devel/03e58462-5045-e12f-9af6-be2aaf19f32c@redhat.com/T/#u
-
-I think that the issue is clear (as found by Mikulas)
-- DM device (dm-integrity here) does not receive the FLUSH command here.
-
-This would explain all issues you see. If the patch works, it should be fixed in stable kernels
-as it impacts other more complex storage configurations.
+Point taken. It looks like there's a bunch of other memory debugging
+configs as well. Do you recommend enabling all of these when testing?
+Do you have a particular .config you use for when you run tests?
 
 Thanks,
-Milan
-
+Joanne
