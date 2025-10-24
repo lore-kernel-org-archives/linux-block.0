@@ -1,145 +1,181 @@
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ED88261B92
-	for <linux-block@vger.kernel.org>; Fri, 24 Oct 2025 21:59:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33BF822A4D5
+	for <linux-block@vger.kernel.org>; Fri, 24 Oct 2025 22:31:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761343144; cv=none; b=Gj2nfPlDd7eycGAix/UXoAqMU4nsgYW8IITToL338+aMOvhiXB0noDGpMFWKJATvRw7DrP+U+sLtaPpKUElHnmlrg1875impsyAOQbvkpM/nghzPKNiEodYe0WHm9w58GMtJf55+SyXlCHtw99+lTC1DdNkpXOma91iJI4f19Vg=
+	t=1761345071; cv=none; b=fXPnn4WhTaGqd76IsQviWTDBdm8/o9isgYhjWq5qN+i+Yt3J8NgPsXoqYhBVmU6XFA5kEvMHVmBuj+Ih2Fy+Xu5iui2yseRkxN0Kf/0HmKx99B6/IpTbPsZiArtM/r0nftkITPj7cJZ8IBDNmitL5hVrWLliIkyMl+8xJdkmpx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761343144; c=relaxed/simple;
-	bh=mxdDRl5f6ypVZFwxoiySjpzvSm/XaHmi9pbQ4jbflIM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HpWGLds77V9sEyWixuRhS0JHAPlkX9AYEM66lz3k28n2cP3hvhYb2/AyDCVxBA5YDOL/5d55j75oBm/LZOcCCYeJOnoGgD7OOsdqG1vxxKJH45cP0p+hufUhngJFWg+SsNDmrg6XvX3gzuLZmpeEMohaXHenLERw0Z5b+tHiTo0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QKmn90F3; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1761345071; c=relaxed/simple;
+	bh=TdtvSFhVumAdCHdZdAGKLPPL1lptHcjWodC1ykDPzY0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mbUZJ463jhZfoT7RdmaBsaa5StEFphKgCKhn9B4W45ullX0nonFcFg1tzbJ3PqWr7O+ubCS1ISzhgiR3TlchynUxw2wKaffpRShY/O6SzBnh4er8nYIyX1QwqbinWecqLfj0VuNBtV+/ZYceBnSH/WHkn/uw6R3OBv/m7Dr5LSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=WTTwjRCx; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=zPY0qqdk; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=WTTwjRCx; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=zPY0qqdk; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QKmn90F3"
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4e89d2eaca9so15830701cf.1
-        for <linux-block@vger.kernel.org>; Fri, 24 Oct 2025 14:59:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761343142; x=1761947942; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6JSu4wYR7dGj9hekjT0Scgo7oK7p56khXcsyVLerwhg=;
-        b=QKmn90F3xbYBk9WfK+osCC7TbkFMGWeGuYB9idqjQJemxKN9IqaeBRdDGM5DhnA8/T
-         5fRu4lc7X68u7KXNBHgHx6zWled4MJ5GWQOYMoSihuV2ol8Bo/HN/d+AGkvBGBbSaeZx
-         lqapDG/FeFxIOM34ggwhwYRQLOLTqJjmhVCBMp79sIBqjl12hR/EfPDMDjWZutFiJGdR
-         BTkuB9X/aX+A8BO4M9YRWfKPqqo2bzcOiZ/2G+dixUD4wZT4+q/PhJSvVvLIveHN3LkL
-         9VV0pY4neIJqsNBJB2UZjLj51CUg7LF0bxbJrK3LPqbPc3brCnsirhZAsyJ6u+U1Vs97
-         C0Mw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761343142; x=1761947942;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6JSu4wYR7dGj9hekjT0Scgo7oK7p56khXcsyVLerwhg=;
-        b=Od8xbgOecFMI2nHourlZVBuJcSD91j5XzorLUQrNpYXEfLCLRes8xDsplzsnUiVWTj
-         2RVAApAUPAx71SFoN6S6qin7guULT+vAbC6D+CIHP9L1hiZWafzXZrr4Zowysfg2t9ee
-         k84eH6DY+34IdbcB6yfjbzMOgfftNJCQlFbegU3MGG08/oX1bsGH3lJCAFkQeS+KPfvy
-         Eqk42GfQrj3ADI5UmYNWqHto6bNYA2jy+ckaQlg0XWqylOtb3bjt8RTO6y4TKxOJSokI
-         SMWuLowmG8fytTZKhjyJj206e/tF1z9NHTgVACLx8999yItKOLnjW4aRY82D0fOCitGt
-         gj9w==
-X-Forwarded-Encrypted: i=1; AJvYcCW2X7Z78kNo1f/4RNEq3HqJOH6RxMP9VUwBUYnT6qqe/twShYI1LXYPiWrDrryLu/2u9u/yEIGNpBxo5Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxK3xxhGEfi+eJxTVxu038AwLu9RdFfwtFlYk1xoYVD3b8DgmM9
-	IlUpdrreM5gGd8IEswExBL8hY51TIHDQ2ljBYXzy9QNUgG78/cskUttE8iwX9j/Q41lzvfOZnHl
-	gprqmTCmNlglnalXpr9iRZjmSSzIhMdM=
-X-Gm-Gg: ASbGncvBbKjPZncoI8c3cos648+8HFFmBo3vgvYO/PmVQGCm3+5dTYnA1QAc/TeJm3L
-	Sh0NYkllCeKpP9zAfs0AYr8G0+UfVfn8Xldxv5bICaPyComkIQDaeKVIl0vjxASQlCUYvUza3ec
-	VH5CMW9M8hgrKSOK/GmKJIjBrQLmzd2+baV7XxIlIC9Ei32VextXlnByQuTQDtBYx4zraiDb63t
-	s8aZ4HxYafGJvFCAB2lXZPmcb2yXq5raoZzYe0UIcUZiraaeENDWYxQmP+0FaNEC7k+j4c97MfP
-	AjR+hpAucmEjQno=
-X-Google-Smtp-Source: AGHT+IEbBcSwdHcN87CM+xJKbvHNa6uFwmLTJi2BasWFhru45dH++MGND3s6/74r0tI8E8W9g7oqhkLME3Y3cb4B/Bg=
-X-Received: by 2002:a05:622a:180a:b0:4e8:bbd4:99d8 with SMTP id
- d75a77b69052e-4e8bbd49fd5mr247392271cf.37.1761343142321; Fri, 24 Oct 2025
- 14:59:02 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="WTTwjRCx";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="zPY0qqdk";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="WTTwjRCx";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="zPY0qqdk"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 47D59211E8;
+	Fri, 24 Oct 2025 22:31:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1761345066; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XaDkQXEDq3kiZtr1ll+BBk3Dg0qixXh2ek2kyEyFBLo=;
+	b=WTTwjRCxGB26PULa/ak6Okz4dsHb+N43kdKOP+ED1wRE0ANRFxocl1iqwChFEy2qFVB/t6
+	HnEQ3y1qKQv843HJdWRHWuu4eFa4nPQefDPcdaBUEglKWx/SC6JaFoKeiEMw+zjey+sGE2
+	6Dj8XTGGp0WYBlgpxYMuJIB1ygGaM+o=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1761345066;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XaDkQXEDq3kiZtr1ll+BBk3Dg0qixXh2ek2kyEyFBLo=;
+	b=zPY0qqdke3Lu6ES/8PPTBWAO0LRSuqxdR+K2yGNe1/3Z3gdUGnz7iONCHFZFcx+3YtYOC6
+	dAYr1MrZU4+GekDw==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1761345066; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XaDkQXEDq3kiZtr1ll+BBk3Dg0qixXh2ek2kyEyFBLo=;
+	b=WTTwjRCxGB26PULa/ak6Okz4dsHb+N43kdKOP+ED1wRE0ANRFxocl1iqwChFEy2qFVB/t6
+	HnEQ3y1qKQv843HJdWRHWuu4eFa4nPQefDPcdaBUEglKWx/SC6JaFoKeiEMw+zjey+sGE2
+	6Dj8XTGGp0WYBlgpxYMuJIB1ygGaM+o=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1761345066;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XaDkQXEDq3kiZtr1ll+BBk3Dg0qixXh2ek2kyEyFBLo=;
+	b=zPY0qqdke3Lu6ES/8PPTBWAO0LRSuqxdR+K2yGNe1/3Z3gdUGnz7iONCHFZFcx+3YtYOC6
+	dAYr1MrZU4+GekDw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 25DF813693;
+	Fri, 24 Oct 2025 22:31:06 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id JqLLCCr++2gdDAAAD6G6ig
+	(envelope-from <jack@suse.cz>); Fri, 24 Oct 2025 22:31:06 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 80A6CA280E; Sat, 25 Oct 2025 00:31:05 +0200 (CEST)
+Date: Sat, 25 Oct 2025 00:31:05 +0200
+From: Jan Kara <jack@suse.cz>
+To: Jiri Slaby <jirislaby@kernel.org>
+Cc: Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
+	Amir Goldstein <amir73il@gmail.com>, linux-fsdevel@vger.kernel.org, 
+	Josef Bacik <josef@toxicpanda.com>, Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
+	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, 
+	Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 01/32] pidfs: validate extensible ioctls
+Message-ID: <s57bjg2caxa5zhsamkll7b637omcszkammckb56pexs5m3uu4s@fyqo2js5flrk>
+References: <20250910-work-namespace-v1-0-4dd56e7359d8@kernel.org>
+ <20250910-work-namespace-v1-1-4dd56e7359d8@kernel.org>
+ <5b287ec6-72ff-4707-9040-3c84efc58b94@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250926002609.1302233-1-joannelkoong@gmail.com>
- <20250926002609.1302233-8-joannelkoong@gmail.com> <aPqDPjnIaR3EF5Lt@bfoster>
- <CAJnrk1aNrARYRS+_b0v8yckR5bO4vyJkGKZHB2788vLKOY7xPw@mail.gmail.com>
- <CAJnrk1b3bHYhbW9q0r4A0NjnMNEbtCFExosAL_rUoBupr1mO3Q@mail.gmail.com>
- <aPu1ilw6Tq6tKPrf@casper.infradead.org> <CAJnrk1az+8iFnN4+bViR0USRHzQ8OejhQNNgUT+yr+g+X4nFEA@mail.gmail.com>
- <aPvolbqCAr1Tx0Pw@casper.infradead.org>
-In-Reply-To: <aPvolbqCAr1Tx0Pw@casper.infradead.org>
-From: Joanne Koong <joannelkoong@gmail.com>
-Date: Fri, 24 Oct 2025 14:58:51 -0700
-X-Gm-Features: AS18NWApxbcNiaK6JJ1--DN9zMQLqfqvI7dAP8Den9ypsz9jSVcP9ZxOIt1Gw7w
-Message-ID: <CAJnrk1YZoFSMGHRK0M_=ND1RyXPgc6Ts4hh+UMOkrGqO5G884w@mail.gmail.com>
-Subject: Re: [PATCH v5 07/14] iomap: track pending read bytes more optimally
-To: Matthew Wilcox <willy@infradead.org>
-Cc: Brian Foster <bfoster@redhat.com>, brauner@kernel.org, miklos@szeredi.hu, 
-	djwong@kernel.org, hch@infradead.org, hsiangkao@linux.alibaba.com, 
-	linux-block@vger.kernel.org, gfs2@lists.linux.dev, 
-	linux-fsdevel@vger.kernel.org, kernel-team@meta.com, 
-	linux-xfs@vger.kernel.org, linux-doc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5b287ec6-72ff-4707-9040-3c84efc58b94@kernel.org>
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	TAGGED_RCPT(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	R_RATELIMIT(0.00)[to_ip_from(RLbyy5b47ky7xssyr143sji8pp)];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,suse.cz,gmail.com,vger.kernel.org,toxicpanda.com,yhndnzj.com,in.waw.pl,0pointer.de,cyphar.com,zeniv.linux.org.uk,kernel.dk,cmpxchg.org,suse.com,google.com,redhat.com,oracle.com];
+	RCVD_COUNT_THREE(0.00)[3];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.com:email]
+X-Spam-Flag: NO
+X-Spam-Score: -2.30
 
-On Fri, Oct 24, 2025 at 1:59=E2=80=AFPM Matthew Wilcox <willy@infradead.org=
-> wrote:
->
-> On Fri, Oct 24, 2025 at 12:22:32PM -0700, Joanne Koong wrote:
-> > > Feels like more filesystem people should be enabling CONFIG_DEBUG_VM
-> > > when testing (excluding performance testing of course; it'll do ugly
-> > > things to your performance numbers).
-> >
-> > Point taken. It looks like there's a bunch of other memory debugging
-> > configs as well. Do you recommend enabling all of these when testing?
-> > Do you have a particular .config you use for when you run tests?
->
-> Our Kconfig is far too ornate.  We could do with a "recommended for
-> kernel developers" profile.  Here's what I'm currently using, though I
-> know it's changed over time:
->
-> CONFIG_X86_DEBUGCTLMSR=3Dy
-> CONFIG_PM_DEBUG=3Dy
-> CONFIG_PM_SLEEP_DEBUG=3Dy
-> CONFIG_ARCH_SUPPORTS_DEBUG_PAGEALLOC=3Dy
-> CONFIG_BLK_DEBUG_FS=3Dy
-> CONFIG_PNP_DEBUG_MESSAGES=3Dy
-> CONFIG_SCSI_DEBUG=3Dm
-> CONFIG_EXT4_DEBUG=3Dy
-> CONFIG_JFS_DEBUG=3Dy
-> CONFIG_XFS_DEBUG=3Dy
-> CONFIG_BTRFS_DEBUG=3Dy
-> CONFIG_UFS_DEBUG=3Dy
-> CONFIG_DEBUG_BUGVERBOSE=3Dy
-> CONFIG_DEBUG_KERNEL=3Dy
-> CONFIG_DEBUG_MISC=3Dy
-> CONFIG_DEBUG_INFO=3Dy
-> CONFIG_DEBUG_INFO_DWARF4=3Dy
-> CONFIG_DEBUG_INFO_COMPRESSED_NONE=3Dy
-> CONFIG_DEBUG_FS=3Dy
-> CONFIG_DEBUG_FS_ALLOW_ALL=3Dy
-> CONFIG_ARCH_HAS_EARLY_DEBUG=3Dy
-> CONFIG_SLUB_DEBUG=3Dy
-> CONFIG_ARCH_HAS_DEBUG_WX=3Dy
-> CONFIG_HAVE_DEBUG_KMEMLEAK=3Dy
-> CONFIG_SHRINKER_DEBUG=3Dy
-> CONFIG_ARCH_HAS_DEBUG_VM_PGTABLE=3Dy
-> CONFIG_DEBUG_VM_IRQSOFF=3Dy
-> CONFIG_DEBUG_VM=3Dy
-> CONFIG_ARCH_HAS_DEBUG_VIRTUAL=3Dy
-> CONFIG_DEBUG_MEMORY_INIT=3Dy
-> CONFIG_LOCK_DEBUGGING_SUPPORT=3Dy
-> CONFIG_DEBUG_RT_MUTEXES=3Dy
-> CONFIG_DEBUG_SPINLOCK=3Dy
-> CONFIG_DEBUG_MUTEXES=3Dy
-> CONFIG_DEBUG_WW_MUTEX_SLOWPATH=3Dy
-> CONFIG_DEBUG_RWSEMS=3Dy
-> CONFIG_DEBUG_LOCK_ALLOC=3Dy
-> CONFIG_DEBUG_LIST=3Dy
-> CONFIG_X86_DEBUG_FPU=3Dy
-> CONFIG_FAULT_INJECTION_DEBUG_FS=3Dy
->
-> (output from grep DEBUG .build/.config |grep -v ^#)
+On Thu 23-10-25 12:46:45, Jiri Slaby wrote:
+> On 10. 09. 25, 16:36, Christian Brauner wrote:
+> > Validate extensible ioctls stricter than we do now.
+> > 
+> > Signed-off-by: Christian Brauner <brauner@kernel.org>
+> > ---
+> >   fs/pidfs.c         |  2 +-
+> >   include/linux/fs.h | 14 ++++++++++++++
+> >   2 files changed, 15 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/fs/pidfs.c b/fs/pidfs.c
+> > index edc35522d75c..0a5083b9cce5 100644
+> > --- a/fs/pidfs.c
+> > +++ b/fs/pidfs.c
+> > @@ -440,7 +440,7 @@ static bool pidfs_ioctl_valid(unsigned int cmd)
+> >   		 * erronously mistook the file descriptor for a pidfd.
+> >   		 * This is not perfect but will catch most cases.
+> >   		 */
+> > -		return (_IOC_TYPE(cmd) == _IOC_TYPE(PIDFD_GET_INFO));
+> > +		return extensible_ioctl_valid(cmd, PIDFD_GET_INFO, PIDFD_INFO_SIZE_VER0);
+> 
+> Hi,
+> 
+> this turned EINVAL (from pidfd_info()) into ENOTTY (from pidfd_ioctl()) for
+> at least LTP's:
+> struct pidfd_info_invalid {
+> 	uint32_t dummy;
+> };
+> 
+> #define PIDFD_GET_INFO_SHORT _IOWR(PIDFS_IOCTL_MAGIC, 11, struct
+> pidfd_info_invalid)
+> 
+> ioctl(pidfd, PIDFD_GET_INFO_SHORT, info_invalid) == EINVAL
+> 
+> at:
+> https://github.com/linux-test-project/ltp/blob/9bb94efa39bb1b08f37e56c7437db5fa13ddcae2/testcases/kernel/syscalls/ioctl/ioctl_pidfd05.c#L46
+> 
+> Is this expected?
 
-Thank you, I'll copy this.
->
+We already discussed this internally but for others the problem was
+discussed here [1] and we decided the new errno value is OK and LTP test is
+being fixed up.
+
+								Honza
+
+[1] https://lore.kernel.org/all/aPIPGeWo8gtxVxQX@yuki.lan/
+
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
