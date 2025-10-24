@@ -1,255 +1,174 @@
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CF542C17B6
-	for <linux-block@vger.kernel.org>; Fri, 24 Oct 2025 19:48:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC83A2D3212
+	for <linux-block@vger.kernel.org>; Fri, 24 Oct 2025 20:31:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761335304; cv=none; b=YOYMeZFdBhHw0lE60K/EWKLSL1jbHtibgDnFLuc1Z3VRy/ya8mrg+7PgaJbOysxxd7jiVRmwDePEg2tKYOi4t4Pt/xcxDETV605m3AGAlrwPiSCm409IbCtwmBMmiDF3TYfY+8eQeGXmhrP6nExiw0wjdsdmiYE4slgfmn8iTks=
+	t=1761337893; cv=none; b=f+jKdYVnR9KKTJE3KwrRj+Lx0e3+V3hxxFRiZFU3mpE54YKq+IHDS53Rsw/iRLod2X38kFFWFNmGwziSGqyrP30Bb9JjP5qS7oofmifVNZRH7JLfMl1DSCdjt4ojLQkJsCMrf3oOYNA9THUuVsryULUrG5uezL2PDrZ4E7Af898=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761335304; c=relaxed/simple;
-	bh=fuOYLw1PsYlQeJgDBx80FvVTqRBTg0jzKUjvWtGfBmg=;
+	s=arc-20240116; t=1761337893; c=relaxed/simple;
+	bh=YLsDVmBRFUzk4uFHLNXj50aYnzyO7d5mx0WZXJ2eLJQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dU7E1xJ0fIhAM9tb/+wDklGBjciUYYXAi+XIp87BZY4Xgept3JAY4o32/VjY9d5m6slgsCMHOZo7dUej8Bi5FosY3sIr6mSZJG2/ZvngKKKk3g5xij/tG8vnZfWAC4k69mx1+OpNeVH8k7tr6WxVILZmSrgWf9Blsl1+SehL7TU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B6wDnyQg; arc=none smtp.client-ip=209.85.222.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=LMIAPomDZ81+JC/erakP+0aoMyEOe/Sh/0CxNkf3rdELwnjlA1CjGMjnRbwMzmtQ38dR4RkbS6g78pCZrETPeKsAUhdDQ7jvUT/ezv3e67wPGX1hNHJaNSh5zYzJjpin09EVoTIRY2EFwDCnQEp9BbxeL8LnCuHrlbmzfyxp260=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=hv0CJmW+; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B6wDnyQg"
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-89ec3d9c773so66882485a.2
-        for <linux-block@vger.kernel.org>; Fri, 24 Oct 2025 12:48:21 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="hv0CJmW+"
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-b6d3340dc2aso512267566b.0
+        for <linux-block@vger.kernel.org>; Fri, 24 Oct 2025 13:31:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761335301; x=1761940101; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VXL+Hu6HNILeLevcEmTlTrT5mGO7UORsDNusHMc7/mU=;
-        b=B6wDnyQgeDkukWtvDsyE0eHHafOIcinEgDc/Bp6Lg07WCnm1rBlENLALoDRO2PmnUm
-         x6puzOFuFme9d+GA30zVqukW3D4AVX6+sLkMTOLzxyw6Q4hZrAZakmT5gXacqFIeWLfu
-         HWlss7Ln6YAH7rOndRjtuemgUujwyUjnraCCkvuwAqcUUrORmb3Cu8K837QQGYR2N4HF
-         BJIrPs1xur6uBkwN+fThwYYwe6+dJ8rNVctyHRDb2i2eEmeVvzoEGCWTsMgrELm3c0zc
-         SthPRGu5UuVPJYlyXpyLBkXhJBd09dGeVRcjdd7TFeMdo8ahOZZSC+D5SU0pTunjUpT6
-         X+Ig==
+        d=linux-foundation.org; s=google; t=1761337889; x=1761942689; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=BFuzQTMQA5rTZOkoXKW3L8u+HJJavRaRvHnpTIXo3kA=;
+        b=hv0CJmW++3eKf3G9Q/2DIKKT9njJRsLOp3vI4RnVQlRXR2IM/VUgTPFH98NCEzaVVD
+         pATzOaCw6ZZFoX9esHfYlbLMpA6CXBeYFRn7WHMOlx8yJ5OTj4NMTWMW3bz5viKGX5mV
+         KVrelyju+qY2/rlE408i/1niTzoYocyWQev5E=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761335301; x=1761940101;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VXL+Hu6HNILeLevcEmTlTrT5mGO7UORsDNusHMc7/mU=;
-        b=Va/X2wisnhX+0CQCtg/f7XIWUu49hslGOzH3Qyh12zIUgwiX3DhB03nAWfN2vXJCpi
-         B3YlJNW0zIFlnQdOeeQxwHqheNb8fFmY2MgS1PtdYdTtrBNneEQtvrpVdzbPMxb1fpS6
-         2hH6gouhWJYYMHakhbHoAIDGTTgSBU9UDERCs6oKFlM6QJwKCoT3SkNe4gGs0uQImLYO
-         E7JL58ZEZqanEl8rHhvJeG8NM8nnSiojmpAv5+AD0cs5o8pW1ywUpKLMUIQHgFKjcIxa
-         DLWzOa5SK7d7zT7e8D6LbvdBQ2VgseHpKSvhdfFwVc5ECK36ldkxt3+lWMC2/0mEW76w
-         6UpA==
-X-Forwarded-Encrypted: i=1; AJvYcCVGZcL/GoYLo4vWNZEdEmcUQ0rEiaK65IjtUEl4ZAfCL8gXO+PtWQTe9blom6rf2SbWshDrReVs6UPxnQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8E8r2Lli1ebgQ7zhi9nmA4PZZpBdk1LP4YtQ/ag9hu0bacvPk
-	hARd0EnrzWLqSFEli+cy8lDkOb+nwctaKXSWDqIoSTuPhOWQj3fpV+dRTWz/D/0Je0QujkixtKz
-	JM2V4QL7PdBlu5yX2sq93+VaOb55nSjc=
-X-Gm-Gg: ASbGncv/TwjxbsqfVpC4NZi3CNbCDKU6Sw9OSWALEQAxoeapE54M7wBB8nfUhq9Af80
-	zmbHBjEU5hw/jtltnGRfgaZNsedmubDnDIrG7bgBinKn7MafD2njDXnjqHqLpHaOYTQAmeN3und
-	FP8D+qgweybV074E27Hf9/Vyy8qYw4e26pvVjZ8S2WHmcOaWxrfTOGGU8RyjBkur0oVWuomMXoa
-	S98CQnYvi7T7EUlQwR+SCGStoSGPxyb8VlV1/mdf9KGxmZlh93vnbC/gUohblZkW7uL7diwxrYU
-	MSrvpeRdiHGeZL0=
-X-Google-Smtp-Source: AGHT+IFA80mSU92rtRbV9UuI42Axn+KjupRObQQEU4AOkaqRuAcR5Dqvasu5x5WflmV4z8hPWzuXx/NOYjJa+6i7EGE=
-X-Received: by 2002:a05:622a:1187:b0:4e8:a332:ba93 with SMTP id
- d75a77b69052e-4e8a9d0a927mr362501081cf.76.1761335300915; Fri, 24 Oct 2025
- 12:48:20 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1761337889; x=1761942689;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BFuzQTMQA5rTZOkoXKW3L8u+HJJavRaRvHnpTIXo3kA=;
+        b=berToPNdKvBGICHtb9L1Yn0CRyjFK67N4gr27UiSCXlF9hqpxIp6PMX4itGiUtPpe8
+         0gcqOJKUPBQrKXt70Y1O03gLaQGqN1rnqaLjGqJznuoGq0RzmM+NHQwYCBkHxrpqQIFR
+         y62BgZbAZ9qESO9SNDNmrMhPKjx9VmUo37ZrXnuWiXAByS+wAX0JNewHc31sln+GI2mC
+         TBS/Tf0P/0ztjvX6XCijIETNdV3EQAOEFvXlPPOL8o+ptBPUDolIM668amljx1ft3CfI
+         J9M5xjUuNfwVuqF5rfNqLSiL2WxhlE7JdbJetTyBxIRWv6R+0DfiiMoEKHSRz23sb0Hv
+         iYOw==
+X-Gm-Message-State: AOJu0YxAYi2PBikNs04mekR3c3scV2yUK9nInG4qnFk5mwreb+3oDSBy
+	ntkmRmwEgPze8eHAhM1IanpX76gQZ0JD04VvD1+TITmGNHl4CUzn2Xak/4qmVXN2lc7bzIy6H2C
+	jDET076Y=
+X-Gm-Gg: ASbGnctO/h1FjvVElHu0wxd1eGY1eKU2e7xg9TkJZ4kPzeVakLy5Kk0DTri+56PeITW
+	vhohvmQQXTmSXtnoq37WH1TQ92XFMvvsdlJvB7wSAanBojpKT/wz93YLTVM0kJWAfLkiSbpmvsj
+	Tz9b/by4Gr06ncx78RUDonBfa6I+FF/gFaR/MHhFf4M0Yp+rYUKoMBSh25IJQ22Olj6tb0YUKq6
+	gGIEGrD6En6hSkyJFtw43B8npL5Xw6mp+KRqFWpK8ghLWFbdJNuDAztrb8HdBtv5Kj13yfWS+iR
+	uTGMpWZZDWUBmBCj0BaBC+7yPFRUmJGNpGCrkPJBZvbJ4IqW9SwkfVCnW1GRUkczhPXjg1xW9Ov
+	kFE8ysjGpn0+mLmBjteYp3zdjL2Kns6LMfhIvLpuD/FXtSGmLSVgYZe0VLRkQkVhFdsaHeQsy6Z
+	qak/hd1W6t95PnLIdSeLDuHfjX9ITf3dSbB57lxwVMtQG7/nsNZQ==
+X-Google-Smtp-Source: AGHT+IE1SBKTkw09LwlZy5nICrD1DHFAKfApgT+CTyVe5WbXWgXeKtSUfdTmekG4Pv9wLIzreWeDgA==
+X-Received: by 2002:a17:906:919:b0:b5c:6e0b:3706 with SMTP id a640c23a62f3a-b6d6bb1db21mr370087366b.13.1761337888594;
+        Fri, 24 Oct 2025 13:31:28 -0700 (PDT)
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com. [209.85.208.45])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b6d853077d2sm12047866b.3.2025.10.24.13.31.27
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 24 Oct 2025 13:31:27 -0700 (PDT)
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-63c12ff0c5eso5068291a12.0
+        for <linux-block@vger.kernel.org>; Fri, 24 Oct 2025 13:31:27 -0700 (PDT)
+X-Received: by 2002:a05:6402:3511:b0:63b:ec3c:ee32 with SMTP id
+ 4fb4d7f45d1cf-63e5eb18f2dmr3477528a12.11.1761337887233; Fri, 24 Oct 2025
+ 13:31:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250926002609.1302233-1-joannelkoong@gmail.com>
- <20250926002609.1302233-8-joannelkoong@gmail.com> <aPqDPjnIaR3EF5Lt@bfoster>
- <CAJnrk1aNrARYRS+_b0v8yckR5bO4vyJkGKZHB2788vLKOY7xPw@mail.gmail.com>
- <CAJnrk1b3bHYhbW9q0r4A0NjnMNEbtCFExosAL_rUoBupr1mO3Q@mail.gmail.com> <aPuz4Uop66-jRpN-@bfoster>
-In-Reply-To: <aPuz4Uop66-jRpN-@bfoster>
-From: Joanne Koong <joannelkoong@gmail.com>
-Date: Fri, 24 Oct 2025 12:48:10 -0700
-X-Gm-Features: AS18NWAV-t2BsaOLd-eN2LOeLauCX-oLTi7xf6Ow48M0MfPwAA3NHDoMRARJ3GQ
-Message-ID: <CAJnrk1bqjykKtpAdsHLPuuvHTzOHW0tExRZ8KKmKYyfDpuAsTQ@mail.gmail.com>
-Subject: Re: [PATCH v5 07/14] iomap: track pending read bytes more optimally
-To: Brian Foster <bfoster@redhat.com>
-Cc: brauner@kernel.org, miklos@szeredi.hu, djwong@kernel.org, 
-	hch@infradead.org, hsiangkao@linux.alibaba.com, linux-block@vger.kernel.org, 
-	gfs2@lists.linux.dev, linux-fsdevel@vger.kernel.org, kernel-team@meta.com, 
-	linux-xfs@vger.kernel.org, linux-doc@vger.kernel.org
+References: <37fb8720-bee9-43b7-b0ff-0214a8ad33a2@kernel.dk>
+In-Reply-To: <37fb8720-bee9-43b7-b0ff-0214a8ad33a2@kernel.dk>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Fri, 24 Oct 2025 13:31:11 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wgZ9x+yxUB9sjete2s9KBiHnPm2+rcwiWNXhx-rpcKxcw@mail.gmail.com>
+X-Gm-Features: AWmQ_bk4uIZgtxqK_hz679cw5uXq-Z_oOrdasW-TDydWDYZqpoDShTeWLYqsq6s
+Message-ID: <CAHk-=wgZ9x+yxUB9sjete2s9KBiHnPm2+rcwiWNXhx-rpcKxcw@mail.gmail.com>
+Subject: Re: [GIT PULL] Block fixes for 6.18-rc3
+To: Jens Axboe <axboe@kernel.dk>, Paul Moore <paul@paul-moore.com>, 
+	Serge Hallyn <sergeh@kernel.org>, Christian Brauner <brauner@kernel.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
+	LSM List <linux-security-module@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 24, 2025 at 10:10=E2=80=AFAM Brian Foster <bfoster@redhat.com> =
-wrote:
->
-> On Fri, Oct 24, 2025 at 09:25:13AM -0700, Joanne Koong wrote:
-> > On Thu, Oct 23, 2025 at 5:01=E2=80=AFPM Joanne Koong <joannelkoong@gmai=
-l.com> wrote:
-> > >
-> > > On Thu, Oct 23, 2025 at 12:30=E2=80=AFPM Brian Foster <bfoster@redhat=
-.com> wrote:
-> > > >
-> > > > On Thu, Sep 25, 2025 at 05:26:02PM -0700, Joanne Koong wrote:
-> > > > > Instead of incrementing read_bytes_pending for every folio range =
-read in
-> > > > > (which requires acquiring the spinlock to do so), set read_bytes_=
-pending
-> > > > > to the folio size when the first range is asynchronously read in,=
- keep
-> > > > > track of how many bytes total are asynchronously read in, and adj=
-ust
-> > > > > read_bytes_pending accordingly after issuing requests to read in =
-all the
-> > > > > necessary ranges.
-> > > > >
-> > > > > iomap_read_folio_ctx->cur_folio_in_bio can be removed since a non=
--zero
-> > > > > value for pending bytes necessarily indicates the folio is in the=
- bio.
-> > > > >
-> > > > > Signed-off-by: Joanne Koong <joannelkoong@gmail.com>
-> > > > > Suggested-by: "Darrick J. Wong" <djwong@kernel.org>
-> > > > > ---
-> > > >
-> > > > Hi Joanne,
-> > > >
-> > > > I was throwing some extra testing at the vfs-6.19.iomap branch sinc=
-e the
-> > > > little merge conflict thing with iomap_iter_advance(). I end up hit=
-ting
-> > > > what appears to be a lockup on XFS with 1k FSB (-bsize=3D1k) runnin=
-g
-> > > > generic/051. It reproduces fairly reliably within a few iterations =
-or so
-> > > > and seems to always stall during a read for a dedupe operation:
-> > > >
-> > > > task:fsstress        state:D stack:0     pid:12094 tgid:12094 ppid:=
-12091  task_flags:0x400140 flags:0x00080003
-> > > > Call Trace:
-> > > >  <TASK>
-> > > >  __schedule+0x2fc/0x7a0
-> > > >  schedule+0x27/0x80
-> > > >  io_schedule+0x46/0x70
-> > > >  folio_wait_bit_common+0x12b/0x310
-> > > >  ? __pfx_wake_page_function+0x10/0x10
-> > > >  ? __pfx_xfs_vm_read_folio+0x10/0x10 [xfs]
-> > > >  filemap_read_folio+0x85/0xd0
-> > > >  ? __pfx_xfs_vm_read_folio+0x10/0x10 [xfs]
-> > > >  do_read_cache_folio+0x7c/0x1b0
-> > > >  vfs_dedupe_file_range_compare.constprop.0+0xaf/0x2d0
-> > > >  __generic_remap_file_range_prep+0x276/0x2a0
-> > > >  generic_remap_file_range_prep+0x10/0x20
-> > > >  xfs_reflink_remap_prep+0x22c/0x300 [xfs]
-> > > >  xfs_file_remap_range+0x84/0x360 [xfs]
-> > > >  vfs_dedupe_file_range_one+0x1b2/0x1d0
-> > > >  ? remap_verify_area+0x46/0x140
-> > > >  vfs_dedupe_file_range+0x162/0x220
-> > > >  do_vfs_ioctl+0x4d1/0x940
-> > > >  __x64_sys_ioctl+0x75/0xe0
-> > > >  do_syscall_64+0x84/0x800
-> > > >  ? do_syscall_64+0xbb/0x800
-> > > >  ? avc_has_perm_noaudit+0x6b/0xf0
-> > > >  ? _copy_to_user+0x31/0x40
-> > > >  ? cp_new_stat+0x130/0x170
-> > > >  ? __do_sys_newfstat+0x44/0x70
-> > > >  ? do_syscall_64+0xbb/0x800
-> > > >  ? do_syscall_64+0xbb/0x800
-> > > >  ? clear_bhb_loop+0x30/0x80
-> > > >  ? clear_bhb_loop+0x30/0x80
-> > > >  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> > > > RIP: 0033:0x7fe6bbd9a14d
-> > > > RSP: 002b:00007ffde72cd4e0 EFLAGS: 00000246 ORIG_RAX: 0000000000000=
-010
-> > > > RAX: ffffffffffffffda RBX: 0000000000000068 RCX: 00007fe6bbd9a14d
-> > > > RDX: 000000000a1394b0 RSI: 00000000c0189436 RDI: 0000000000000004
-> > > > RBP: 00007ffde72cd530 R08: 0000000000001000 R09: 000000000a11a3fc
-> > > > R10: 000000000001d6c0 R11: 0000000000000246 R12: 000000000a12cfb0
-> > > > R13: 000000000a12ba10 R14: 000000000a14e610 R15: 0000000000019000
-> > > >  </TASK>
-> > > >
-> > > > It wasn't immediately clear to me what the issue was so I bisected =
-and
-> > > > it landed on this patch. It kind of looks like we're failing to unl=
-ock a
-> > > > folio at some point and then tripping over it later..? I can kill t=
-he
-> > > > fsstress process but then the umount ultimately gets stuck tossing
-> > > > pagecache [1], so the mount still ends up stuck indefinitely. Anywa=
-ys,
-> > > > I'll poke at it some more but I figure you might be able to make se=
-nse
-> > > > of this faster than I can.
-> > > >
-> > > > Brian
-> > >
-> > > Hi Brian,
-> > >
-> > > Thanks for your report and the repro instructions. I will look into
-> > > this and report back what I find.
-> >
-> > This is the fix:
-> >
-> > diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
-> > index 4e6258fdb915..aa46fec8362d 100644
-> > --- a/fs/iomap/buffered-io.c
-> > +++ b/fs/iomap/buffered-io.c
-> > @@ -445,6 +445,9 @@ static void iomap_read_end(struct folio *folio,
-> > size_t bytes_pending)
-> >                 bool end_read, uptodate;
-> >                 size_t bytes_accounted =3D folio_size(folio) - bytes_pe=
-nding;
-> >
-> > +               if (!bytes_accounted)
-> > +                       return;
-> > +
-> >                 spin_lock_irq(&ifs->state_lock);
-> >
-> >
-> > What I missed was that if all the bytes in the folio are non-uptodate
-> > and need to read in by the filesystem, then there's a bug where the
-> > read will be ended on the folio twice (in iomap_read_end() and when
-> > the filesystem calls iomap_finish_folio_write(), when only the
-> > filesystem should end the read), which does 2 folio unlocks which ends
-> > up locking the folio. Looking at the writeback patch that does a
-> > similar optimization [1], I miss the same thing there.
-> >
->
-> Makes sense.. though a short comment wouldn't hurt in there. ;) I found
-> myself a little confused by the accounted vs. pending naming when
-> reading through that code. If I follow correctly, the intent is to refer
-> to the additional bytes accounted to read_bytes_pending via the init
-> (where it just accounts the whole folio up front) and pending refers to
-> submitted I/O.
->
-> Presumably that extra accounting doubly serves as the typical "don't
-> complete the op before the submitter is done processing" extra
-> reference, except in this full submit case of course. If so, that's
-> subtle enough in my mind that a sentence or two on it wouldn't hurt..
+[ Adding LSM people. Also Christian, because he did the cred refcount
+cleanup with override_creds() and friends last year, and I'm
+suggesting taking that one step further ]
 
-I will add some a comment about this :) That's a good point about the
-naming, maybe "bytes_submitted" and "bytes_unsubmitted" is a lot less
-confusing than "bytes_pending" and "bytes_accounted".
+On Fri, 24 Oct 2025 at 06:58, Jens Axboe <axboe@kernel.dk> wrote:
+>
+> Ondrej Mosnacek (1):
+>       nbd: override creds to kernel when calling sock_{send,recv}msg()
 
-Thanks,
-Joanne
+I've pulled this, but looking at the patch, I note that more than half
+the patch - 75% to be exact - is just boilerplate for "I need to
+allocate the kernel cred and deal with error handling there".
 
->
-> > I'll fix up both. Thanks for catching this and bisecting it down to
-> > this patch. Sorry for the trouble.
-> >
->
-> No prob. Thanks for the fix!
->
-> Brian
->
-> > Thanks,
-> > Joanne
-> >
-> > [1] https://lore.kernel.org/linux-fsdevel/20251009225611.3744728-4-joan=
-nelkoong@gmail.com/
-> > >
-> > > Thanks,
-> > > Joanne
-> > > >
-> >
->
+It literally has three lines of new actual useful code (two statements
+and one local variable declaration), and then nine lines of the "setup
+dance".
+
+Which isn't wrong, but when the infrastructure boilerplate is three
+times more than the actual code, it makes me think we should maybe
+just get rid of the
+
+    my_kernel_cred = prepare_kernel_cred(&init_task);
+
+pattern for this use-case, and just let people use "init_cred"
+directly for things like this.
+
+Because that's essentially what that prepare_kernel_cred() thing
+returns, except it allocates a new copy of said thing, so now you have
+error handling and you have to free it after-the-fact.
+
+And I'm not seeing that the extra error handling and freeing dance
+actually buys us anything at all.
+
+Now, some *other* users actually go on to change the creds: they want
+that prepare_kernel_cred() dance because they then actually do
+something else like using their own keyring or whatever (eg the NFS
+idmap code or some other filesystem stuff).
+
+So it's not like prepare_kernel_cred() is wrong, but in this kind of
+case where people just go "I'm a driver with hardware access, I want
+to do something with kernel privileges not user privileges", it
+actually seems counterproductive to have extra code just to complicate
+things.
+
+Now, my gut feel is that if we just let people use 'init_cred'
+directly, we should also make sure that it's always exposed as a
+'const struct cred' , but wouldn't that be a whole lot simpler and
+more straightforward?
+
+This is *not* the only use case of that.
+
+We now have at least four use-cases of this "raw kernel cred" pattern:
+core-dumping over unix domain socket, nbd, firmware loading and SCSI
+target all do this exact thing as far as I can tell.
+
+So  they all just want that bare kernel cred, and this interface then
+forces it to do extra work instead of just doing
+
+        old_cred = override_creds(&init_cred);
+        ...
+        revert_creds(old_cred);
+
+and it ends up being extra code for allocating and freeing that copy
+of a cred that we already *had* and could just have used directly.
+
+I did just check that making 'init_cred' be const
+
+  --- a/include/linux/init_task.h
+  +++ b/include/linux/init_task.h
+  @@ -28 +28 @@ extern struct nsproxy init_nsproxy;
+  -extern struct cred init_cred;
+  +extern const struct cred init_cred;
+  --- a/kernel/cred.c
+  +++ b/kernel/cred.c
+  @@ -44 +44 @@ static struct group_info init_groups = { .usage =
+REFCOUNT_INIT(2) };
+  -struct cred init_cred = {
+  +const struct cred init_cred = {
+
+seems to build just fine and would seem to be the right thing to do
+even if we *don't* expect people to use it. And override_creds() is
+perfectly happy with a
+
+Maybe there's some reason for that extra work that I'm not seeing and
+thinking of? But it all smells like make-believe work to me that
+probably has a historical reason for it, but doesn't seem to make a
+lot of sense any more.
+
+Hmm?
+
+               Linus
