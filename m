@@ -1,109 +1,79 @@
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F7C929BDB8
-	for <linux-block@vger.kernel.org>; Sat, 25 Oct 2025 05:26:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE37F1494C2
+	for <linux-block@vger.kernel.org>; Sat, 25 Oct 2025 12:19:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761370010; cv=none; b=cdfrRXHiMvTIHbLfLWTIm94+TemGroSCwfWS/8ZL/4Pm4UumJqfHLgVQhgFXws4W76FcU6emP79djyaO/KPrggphQeMtxWzfawVXueVqI7KwxLc/KRuiblsQQzA4/jCQwKmPVGyPyqGPGRjm3KWEVr10umIBp92sld9X5LQ7/QI=
+	t=1761394748; cv=none; b=EXgJ2wmAa5op3v+jUGdoO/nFzeHTyu/iSoQkBp3TozwxGZkmlIc7utcdAqdopeV1IpSCN2GP3Es5sbBWXBMpLHc9JBSm3xUVsHkqxtHyqFaRnzE7Ij3yy4C6QDOR7NstdnMYxSIgGX2Gkh+UmM1T+j7NKWP0lC1jvZabS1OXPJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761370010; c=relaxed/simple;
-	bh=/zQwfhMEJhTOa5/FV1euV1Dku1nFTDlTsbnBQjlqjDQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Tqr83PowGCiY8SsUWpWXh6tsXBiZdB5wRwl/SZjHQg4AAZw7m6+HfIQkYAri+T3vsQ/2oCGdZzLQNibbmPCKOwAfda+/3gfgVdZiRK+skkBhR8kBAdX6eXmZ1jUnBoqXPvzAal+KQXw/DLUa5lEi0TXIjXmbVArM+39tbVze2vA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Pjvfa8SE; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pjvfa8SE"
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-63c31c20b64so4945461a12.1
-        for <linux-block@vger.kernel.org>; Fri, 24 Oct 2025 22:26:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761370005; x=1761974805; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mV8buuSZQP0rHOq5S4b8K+cOmbjRvDVQwA71gPDHBAE=;
-        b=Pjvfa8SEZbxsM/zJR4PQ+NRDcthojbCwES9h0rerasc6DuX+QlbPq3ReB7mSmCwZzk
-         G+RaYizITPByzjqWgNZCCdnHaJaARqKNOXhortmhpG6uojE+a0urH8nCO97GrZMm6zuO
-         DdvtNpTMeHn5rWMFFQ7Ju4peQwzCN+8hsCog0MMBRSxOQ39Bv9ts+qL7kuXrPafx2mDp
-         gsIImPcmgn6dRmfYObiegOz3nu/ZxylQPh2GOg8+npFQgjOqF89CdQqJEmYiltz2lDST
-         DmfDH2jHtwgINimt1F9lgcm6fSLUUT2WEstjXw4+XuAN4I8VbQ5sjQS+kAyiVJ8caOWb
-         zu7Q==
+	s=arc-20240116; t=1761394748; c=relaxed/simple;
+	bh=EVlFebBa6swtthoo3XMik13PZNNqhlB1y4EKOTdvLE8=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=MHynteD9+qOTM2bGwNltG7EH8NL4W8M1xrK3ipvWpzh9OUM7d6CFmfe2Si29+Kiro8sDF3zEXlnXyParwTFm36f2bX+SZji0XTvCCyZJyH9NU+kJOtnQmdcQq8z5pIcelq4UVHUe00AncVxbBbrF89/wTsQ7ayF8cN7MvqiDlVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-430e1a4a129so39484765ab.1
+        for <linux-block@vger.kernel.org>; Sat, 25 Oct 2025 05:19:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761370005; x=1761974805;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mV8buuSZQP0rHOq5S4b8K+cOmbjRvDVQwA71gPDHBAE=;
-        b=Mc81npCATWzSgd9MUjEBP/iIJEtRvtkU0pecmoemb3IdXOqgRWDt1Tq4OI7CkxOYO4
-         dJVISRmS4v/sPbolDg+Z8uHy+lmj6f2UG/TCeSzrVYR/mIzZi6oFcdp1dSvWt3xw3mru
-         ZT1sgpGfcjDShVyZGL/2CBtfRWX8JXUlttZrhZoPHMOTIe9LN4kbwRqRUmUPzuDZCidq
-         nE2SrVr4NS69pZTyClc/xscPYfrPxJSLBU+0IFKbDMxKK22AQXP/WqU1r1E4YyReccLq
-         Or0eAaHJS40/+6CMH5N4zrS7jp07lVB39ZBRzEQOFH1Hqxom9Zlx2t2QudA1hBFFUAds
-         NpAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWfz4eatj2bW2ngJKE5MssR8AFLSU8mzoillZssVpMz0E5qyI6mZwWykWyEYRS8IPYPwlWQkyr51O/ALA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrGVzpEptE5TzJEiKLtOFb7SwMPXFPJDWGI4n23u3CkbHP4rd/
-	kKMNmYnM9jckErVyMi2KMUXUMQD0e3stP1+KJyLNi8Aches6qBcphi8h
-X-Gm-Gg: ASbGncsV0UQYvtFYMCqIOJ6BgC5hankuQqneakMEuashx5kJk7lRy1GG+H8wqFyZ6k7
-	hiWULIXZfB7WUDlC651Ko3RYC5ApZPRtrc1t1sa5avTdr1szfvpE0Ixw1vawkZQqhJ/XkE+X/u6
-	PxTHHoCFEJ9KDzwoqwercnhOzEheWdnQb2SKDhtG8OiCuu4GCqp61QaVt97kJZZRuynnOiDBLPP
-	WsUDQnKGIuSVtFHS7yY1Fnoe8rU2l6trr8Z6X86+XrFCuDFt7CSOXlLSC98NtnMAqXGbW5s6gML
-	I0QNdOmJCUpXDIyVpX9GJH3Qn8PnPwpucLaDGBj6WxN0e4ash+2pc1qRZo9aBA1mQucliV3+y+J
-	BZT26Wv6ey4yu2ubLLQe2EA2F6lXT5LlDQxGPMNMkUzWdf/iOAcc7CZNInGo2WkC5nZAR0xyk05
-	zOM4LSWTyjfHI=
-X-Google-Smtp-Source: AGHT+IHk4JGeekekahtUg2k/EhAC9kyrxVTGjCsIExfHrDtgIcN62P8FCtHZWZXypDamfyJkpyvf/Q==
-X-Received: by 2002:a05:6402:40d5:b0:628:5b8c:64b7 with SMTP id 4fb4d7f45d1cf-63c1f64ec00mr33191598a12.6.1761370005212;
-        Fri, 24 Oct 2025 22:26:45 -0700 (PDT)
-Received: from localhost ([212.73.77.104])
-        by smtp.gmail.com with UTF8SMTPSA id 4fb4d7f45d1cf-63e7ef96105sm880960a12.19.2025.10.24.22.26.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Oct 2025 22:26:44 -0700 (PDT)
-From: Askar Safin <safinaskar@gmail.com>
-To: safinaskar@gmail.com
-Cc: Dell.Client.Kernel@dell.com,
-	brauner@kernel.org,
-	dm-devel@lists.linux.dev,
-	ebiggers@kernel.org,
-	gmazyland@gmail.com,
-	kix@kix.es,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-lvm@lists.linux.dev,
-	linux-mm@kvack.org,
-	linux-pm@vger.kernel.org,
-	linux-raid@vger.kernel.org,
-	lvm-devel@lists.linux.dev,
-	mzxreary@0pointer.de,
-	nphamcs@gmail.com,
-	pavel@ucw.cz,
-	rafael@kernel.org,
-	ryncsn@gmail.com,
-	torvalds@linux-foundation.org
-Subject: Re: dm bug: hibernate to swap located on dm-integrity doesn't work (how to get data redundancy for swap?)
-Date: Sat, 25 Oct 2025 08:26:37 +0300
-Message-ID: <20251025052637.422902-1-safinaskar@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251024163142.376903-1-safinaskar@gmail.com>
-References: <20251024163142.376903-1-safinaskar@gmail.com>
+        d=1e100.net; s=20230601; t=1761394743; x=1761999543;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=detJ0ZqNeJlrOsDrnLZMjTVhzUl3dolYqWJSe5Y+Nq0=;
+        b=qPFCOwgiG8sXx7MM7xTsLfMAY8F4df0PbFf+u5ldGumP9vi8harxUH8eY7d0+co5LM
+         4zgCIUyE95Tujz3J/W7ng/kGsHZraZzPxNVO3YyArvQ2FEorbjU8BgmZ38SkadMu7gao
+         djmSkm9I1G4QltjAuj9CDH5MtNfGOQs+G1cypgoVyJy8/6XpiuZBnw2TuvXAWyR0k9nP
+         y2UpN1wzWEwmUfuG91gG9VSLR6vrovdqoADaKjzw+Bf5nZA7BZG8MHOkioneOmZhQHzh
+         vgl5Mnkd5U2zyjlHDBCZPqB2VBr/XUbOKqVgDzrSo98rz4FQC699Rquz3HgJ9Tdb5Q7X
+         9Luw==
+X-Forwarded-Encrypted: i=1; AJvYcCUsMJcLvc5lP1nt7r27Wnm6wU4GL1328vRBucYwS20OT+5i+j5nykyVH9wuYyOWUYo+QhdcP5Im+Z+zTw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxovTfBw0V1OmWDActhiEghWN0ggBDDWxyW8T5dCznJdR7njJ5M
+	vf0pt0xo6QnefUaj8+wLN9Ghh+G2Z0V878A5rT+1nPV7Y537dtWOu6oEzMdLfCQvQ51DbhQ0VUs
+	0JS0Uu5dDTV+3VyunjCCQpgiCF8i1/YQEx+O4h9/ftXjhBPGq9GbLhLuDZeA=
+X-Google-Smtp-Source: AGHT+IG0oFMhPB3qHtmC1dmKqk1sRLQIj1ue+TTfk/yvBRc/nkTT76FySFISbYfurl785uiqw6lIns7SAqbjDTDaXjD7xmlkbQv5
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:3f04:b0:430:c49d:750c with SMTP id
+ e9e14a558f8ab-431ebed79admr68309205ab.27.1761394742947; Sat, 25 Oct 2025
+ 05:19:02 -0700 (PDT)
+Date: Sat, 25 Oct 2025 05:19:02 -0700
+In-Reply-To: <68fc07a0.a70a0220.3bf6c6.01aa.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68fcc036.a00a0220.9662e.0017.GAE@google.com>
+Subject: Re: [syzbot] [block?] [trace?] WARNING in __blk_add_trace
+From: syzbot <syzbot+153e64c0aa875d7e4c37@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, dlemoal@kernel.org, johannes.thumshirn@wdc.com, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, martin.petersen@oracle.com, 
+	mathieu.desnoyers@efficios.com, mhiramat@kernel.org, rostedt@goodmis.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Askar Safin <safinaskar@gmail.com>:
-> Here is output of this script on master:
-> https://zerobin.net/?68ef6601ab203a11#7zBZ44AaVKmvRq161MJaOXIXY/5Hiv+hRUxWoqyZ7uE=
-[...]
-> Also, you will find backtrace in logs above. Disregard it. I think this
-> is just some master bug, which is unrelated to our dm-integrity bug.
+syzbot has bisected this issue to:
 
-That WARNING in logs is unrelated bug, which happens always when I hibernate.
-I reported it here: https://lore.kernel.org/regressions/20251025050812.421905-1-safinaskar@gmail.com/
+commit f9ee38bbf70fb20584625849a253c8652176fa66
+Author: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Date:   Wed Oct 22 11:41:12 2025 +0000
 
--- 
-Askar Safin
+    blktrace: add block trace commands for zone operations
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1750c7e2580000
+start commit:   72fb0170ef1f Add linux-next specific files for 20251024
+git tree:       linux-next
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=14d0c7e2580000
+console output: https://syzkaller.appspot.com/x/log.txt?x=10d0c7e2580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f02d98016cc9c137
+dashboard link: https://syzkaller.appspot.com/bug?extid=153e64c0aa875d7e4c37
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=145ae3cd980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13f58be2580000
+
+Reported-by: syzbot+153e64c0aa875d7e4c37@syzkaller.appspotmail.com
+Fixes: f9ee38bbf70f ("blktrace: add block trace commands for zone operations")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
