@@ -1,33 +1,49 @@
-Received: from mail.hallyn.com (mail.hallyn.com [178.63.66.53])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A779272633;
-	Sun, 26 Oct 2025 21:10:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.63.66.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 995AA27F017
+	for <linux-block@vger.kernel.org>; Sun, 26 Oct 2025 21:19:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761513007; cv=none; b=ZxafzxhvMPQnpR6h54wHzbV7Xovep3dyn6uSVTm0DS9kDEiEVeikfyc4qxgWJavM4qmYU5BSUwdIx2Sy262ppxb20RlaC5AkWwC99U5+x6jpUMhmtXLImVfstD8zbco6AsO3aw8YeRINNDnF30GDkhKWkcwBlcpvoRVzIOcSzYA=
+	t=1761513579; cv=none; b=VytUjLqT16gf5epC+/hu42FYXa+NU0B8ipUyQgwaIgsrmZyNQlTjFfSzqZTcN38VfH7A5z6vAJoTDnK1R5whRx/+PY6oTdE3dQlx3qOG5XzidCSMvBbgGzbCjTanWm0JbXI/aKbeVoCN/yJ6NGWAzZmy9eekgwHnAcDZM25CeKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761513007; c=relaxed/simple;
-	bh=PBriKsO4tuCNyzAbjqejCaW1YZ+cNYR+Ve+QvRU2rvE=;
+	s=arc-20240116; t=1761513579; c=relaxed/simple;
+	bh=ycmIoTznwM1Q+TA+UGowXozs3bnJZAzpKQUBvjZD9zQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GVBzTRQfrhAY8PfxgfxUm9ubY5vETAcY6/pjs+ul580vVkNOI9eCBt+koI/goGXeQAlbNz1YPd9fpgFrY9Mn135mmNgtBNciFIdL0ZZb4s7ODcbqvM+kdqgM5gY7RyGNUxbyls8GneDSpUsFgwo1pLjcINQmIbUpGOHrO11osto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hallyn.com; spf=pass smtp.mailfrom=mail.hallyn.com; arc=none smtp.client-ip=178.63.66.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hallyn.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mail.hallyn.com
-Received: by mail.hallyn.com (Postfix, from userid 1001)
-	id 20D969C6; Sun, 26 Oct 2025 16:09:57 -0500 (CDT)
-Date: Sun, 26 Oct 2025 16:09:57 -0500
-From: "Serge E. Hallyn" <serge@hallyn.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Paul Moore <paul@paul-moore.com>,
-	Serge Hallyn <sergeh@kernel.org>,
-	Christian Brauner <brauner@kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	LSM List <linux-security-module@vger.kernel.org>
-Subject: Re: [GIT PULL] Block fixes for 6.18-rc3
-Message-ID: <aP6OJTTWPQBkll56@mail.hallyn.com>
-References: <37fb8720-bee9-43b7-b0ff-0214a8ad33a2@kernel.dk>
- <CAHk-=wgZ9x+yxUB9sjete2s9KBiHnPm2+rcwiWNXhx-rpcKxcw@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=MljsRhIr7FNL9YeGne7v09jW3mtoefZsH85tPWxwF2yHvH8VlseNkvEYnahc2uEKGR1sMsIALPHaUW3uPWxoOz3wBKkoeDYyg4/Hsia/llPi4DPmfSw3cw+kP/5g3GKBhbq2CJPwSkmfSQdWiwK0UrkktVJOaFDnqqPUuByDKpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=U2p641UF; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="U2p641UF"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=vbgQSpwLiN23ZFyAT4xgeAAvMjoXTalRrJzies8wmYU=; b=U2p641UFAqafJssWfbrxUlfsV9
+	+ALoEky47nqLTJU069Bgi1LHB3KG/HkbGEDId1PBFct5nNGL9Pw1sOF/Unh9a25ymrz6266A9SZwb
+	J1fSGMzgQc+yITlbtS3HLEx5R3YSy3uzlBlt36zL5ErBS3CA6749Vg9UjEEgOaemqkl/fYsF0CLBy
+	d6lAVuVFxRaKluOzCxUZ5yBZI053JPPxhMUKGn5ChwCbxp6H33PU6rV3c1dxbTMKXic90iGrWHG3O
+	3lAxmdI+G+IElxmJVdxQmwWWE4hqfNOrmOFLgD31AxJ1uoiP+NSYmqsoIh+nmXFEZePzLAtzj8Qe6
+	cSCkb7HQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vD89A-0000000HQQ6-0aNJ;
+	Sun, 26 Oct 2025 21:19:28 +0000
+Date: Sun, 26 Oct 2025 21:19:27 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Vlastimil Babka <vbabka@suse.cz>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Christoph Lameter <cl@gentwo.org>,
+	David Rientjes <rientjes@google.com>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Harry Yoo <harry.yoo@oracle.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-block@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH 1/3] slab, block: generalize bvec_alloc_gfp
+Message-ID: <aP6QX_gNpY9UDtub@casper.infradead.org>
+References: <20251023080919.9209-1-hch@lst.de>
+ <20251023080919.9209-2-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -36,106 +52,33 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAHk-=wgZ9x+yxUB9sjete2s9KBiHnPm2+rcwiWNXhx-rpcKxcw@mail.gmail.com>
+In-Reply-To: <20251023080919.9209-2-hch@lst.de>
 
-On Fri, Oct 24, 2025 at 01:31:11PM -0700, Linus Torvalds wrote:
-> [ Adding LSM people. Also Christian, because he did the cred refcount
-> cleanup with override_creds() and friends last year, and I'm
-> suggesting taking that one step further ]
-> 
-> On Fri, 24 Oct 2025 at 06:58, Jens Axboe <axboe@kernel.dk> wrote:
-> >
-> > Ondrej Mosnacek (1):
-> >       nbd: override creds to kernel when calling sock_{send,recv}msg()
-> 
-> I've pulled this, but looking at the patch, I note that more than half
-> the patch - 75% to be exact - is just boilerplate for "I need to
-> allocate the kernel cred and deal with error handling there".
-> 
-> It literally has three lines of new actual useful code (two statements
-> and one local variable declaration), and then nine lines of the "setup
-> dance".
-> 
-> Which isn't wrong, but when the infrastructure boilerplate is three
-> times more than the actual code, it makes me think we should maybe
-> just get rid of the
-> 
->     my_kernel_cred = prepare_kernel_cred(&init_task);
-> 
-> pattern for this use-case, and just let people use "init_cred"
-> directly for things like this.
-> 
-> Because that's essentially what that prepare_kernel_cred() thing
-> returns, except it allocates a new copy of said thing, so now you have
-> error handling and you have to free it after-the-fact.
-> 
-> And I'm not seeing that the extra error handling and freeing dance
-> actually buys us anything at all.
-> 
-> Now, some *other* users actually go on to change the creds: they want
-> that prepare_kernel_cred() dance because they then actually do
-> something else like using their own keyring or whatever (eg the NFS
-> idmap code or some other filesystem stuff).
-> 
-> So it's not like prepare_kernel_cred() is wrong, but in this kind of
-> case where people just go "I'm a driver with hardware access, I want
-> to do something with kernel privileges not user privileges", it
-> actually seems counterproductive to have extra code just to complicate
-> things.
-> 
-> Now, my gut feel is that if we just let people use 'init_cred'
-> directly, we should also make sure that it's always exposed as a
-> 'const struct cred' , but wouldn't that be a whole lot simpler and
-> more straightforward?
-> 
-> This is *not* the only use case of that.
-> 
-> We now have at least four use-cases of this "raw kernel cred" pattern:
-> core-dumping over unix domain socket, nbd, firmware loading and SCSI
-> target all do this exact thing as far as I can tell.
-> 
-> So  they all just want that bare kernel cred, and this interface then
-> forces it to do extra work instead of just doing
-> 
->         old_cred = override_creds(&init_cred);
->         ...
->         revert_creds(old_cred);
-> 
-> and it ends up being extra code for allocating and freeing that copy
-> of a cred that we already *had* and could just have used directly.
-> 
-> I did just check that making 'init_cred' be const
-> 
->   --- a/include/linux/init_task.h
->   +++ b/include/linux/init_task.h
->   @@ -28 +28 @@ extern struct nsproxy init_nsproxy;
->   -extern struct cred init_cred;
->   +extern const struct cred init_cred;
->   --- a/kernel/cred.c
->   +++ b/kernel/cred.c
->   @@ -44 +44 @@ static struct group_info init_groups = { .usage =
-> REFCOUNT_INIT(2) };
->   -struct cred init_cred = {
->   +const struct cred init_cred = {
-> 
-> seems to build just fine and would seem to be the right thing to do
-> even if we *don't* expect people to use it. And override_creds() is
-> perfectly happy with a
-> 
-> Maybe there's some reason for that extra work that I'm not seeing and
-> thinking of? But it all smells like make-believe work to me that
+On Thu, Oct 23, 2025 at 10:08:54AM +0200, Christoph Hellwig wrote:
+> +/*
+> + * Make the first allocation restricted and don't dump info on allocation
+> + * failures, for callers that will fall back to a mempool in case of failure.
+> + */
+> +static inline gfp_t try_alloc_gfp(gfp_t gfp)
+> +{
+> +	return (gfp & ~__GFP_DIRECT_RECLAIM) |
+> +		__GFP_NOMEMALLOC | __GFP_NORETRY | __GFP_NOWARN;
+> +}
 
-The keychains are all NULL and won't be allocated (by init) without
-copying a new cred, right?  And it seems like smack, selinux, and
-apparmor at least each set the security field to a copy of the
-daemon's.  Now, in theory, some LSM *could* come by and try to merge
-current's info with init's, but that would probably be misguided.
+Comparing to the kvmalloc code:
 
-So this does seem like it should work.
+        flags |= __GFP_NOWARN;
 
-> probably has a historical reason for it, but doesn't seem to make a
-> lot of sense any more.
-> 
-> Hmm?
-> 
->                Linus
+        if (!(flags & __GFP_RETRY_MAYFAIL))
+                flags &= ~__GFP_DIRECT_RECLAIM;
+
+        /* nofail semantic is implemented by the vmalloc fallback */
+        flags &= ~__GFP_NOFAIL;
+
+it's quite different.  I am by no stretch of the imagination a GFP
+flags expert, but it seems to me that we should make the two the same
+since they're both "try to allocate and we have a fallback if
+necessary".  I suspect kvmalloc() is called with a wider range of
+GFP flags than bvec allocation is, so it's probably better tested.
+
+Is there a reason _not_ to use the kvmalloc code for bvec allocations?
