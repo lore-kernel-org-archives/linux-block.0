@@ -1,110 +1,74 @@
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 050E722F386;
-	Sun, 26 Oct 2025 07:55:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 237BA2D9EF8;
+	Sun, 26 Oct 2025 12:38:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761465320; cv=none; b=en3Ugy9s//nS8mX1w5xmoojCYFWWMUG4a+ZK7f3S3eUT8BFXMYH6FnNtY+UdFablghvTyYmalhZaXPnWmVWJnCy271oAo3aKEBjM7N7dULbXOEYZUoEZQiYqnH8SDjGpYGYtYpGSri8+QXGeYg2UMoft8+ofutcK5JsBRdq5TB0=
+	t=1761482290; cv=none; b=YpvpgqejPZjOP32p/jk2U3NlA0zjrcbwyX6rlee6RhAKTVs3iaVVqgZhmChO00wMEX/lpI3go1ywpnhv0tMn5dSyWXKPyyF+yTieDDO+UQyP4TgyA8qImwOnCYm63VfM4XL78pQSVcUtQSAQjmIvC7OPra6xvJkGcOuSoBauJw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761465320; c=relaxed/simple;
-	bh=6gQ0b96ksH6i06Ro3IgrAKOKydTsy37oius49iYhX08=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=heeYJLX3O+Dt0L/nrsVZaxWIGr4aGqurxxxFpD53kpuFHu7l26CW5iFMW8sQSb41lvrt2tVSRB5tf40kQz58QfJFAoJtm1hZiiTsNAXgHHXMTUwvNBlScb2aSrO3kesdmKfDdTt/+rymfXhK988G4NG6Payi7sR8KApfQ3D0yZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=w1EvaNvl; arc=none smtp.client-ip=115.124.30.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	s=arc-20240116; t=1761482290; c=relaxed/simple;
+	bh=qw8/PAvD2816zMcT/W8BWmFh+apV2YWDBWzHohHc9Ds=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ESHBfPZF5eXeV97IRXS1qy6v9TMPFiZSWj7g51DLIyIuFmvhBuOIgtAP7w6F5joDdtmRCCDAOlrAyUP8w8WDrOZSIRE2gJJqPkI0xQ1yNFXrvN81TDPrbXOuaUCX3t+kTnjviJ59eiUXiZOXjFsmi1GxkqpswuxiUxRDHXzzmHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UQkNk0St; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="w1EvaNvl"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1761465308; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=gbW6lsAeQnITBSvhA7va7FPK1N1OCTuc7ZM09ubMnwE=;
-	b=w1EvaNvl6VFnpLbbIhM9EH3J+k5X0NviL/4AMSLRUIkIBb+piVyJkusnscjydLGVvKu8spPiicc04LDecNvsFhKSVDF04tSt5ysDuE6zx/nxRA6UgIWJq00z4h8gD83xtiiQbxddnm0/V0kAPbJPASglw5DenO0U0CUmqenwv14=
-Received: from 30.246.176.102(mailfrom:xueshuai@linux.alibaba.com fp:SMTPD_---0Wqyle5w_1761465304 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Sun, 26 Oct 2025 15:55:06 +0800
-Message-ID: <3db524e7-b6ce-4652-8420-fdb4639ac73a@linux.alibaba.com>
-Date: Sun, 26 Oct 2025 15:55:04 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UQkNk0St"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6923C4CEE7;
+	Sun, 26 Oct 2025 12:38:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761482289;
+	bh=qw8/PAvD2816zMcT/W8BWmFh+apV2YWDBWzHohHc9Ds=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UQkNk0Sta/L0r0qWJfiwMmnRcxJLqPTWe/65cQ3Pfpc0tJUxZYvyNDt5rE8LNhrwH
+	 ggkYucPLXnNtjYQjAlu8w6qWbMQl7YVrXhkxMuFysWP3k3fxIhhYQZmDRktF2ySR9a
+	 kc7oNCgEHxB/0wOT1YfEsl+0oH2Pl5pleG/MPqcicK2J94n794MkgfH8zsmvTvzVgM
+	 c0ufi4zVyPp/rVKwUwJMljkndLo/iwp3RR3LY4yWDAVU3X151+3YKUTHwJ9YN8H4bN
+	 tSbWQ6s5DqB0b0mgg0++GGAVkizOJJL6b+MXVvbr/Gb9OGqPe1cr4pXQIbDoy8ayvy
+	 X9sOiqXbIGEdg==
+Date: Sun, 26 Oct 2025 14:38:04 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: Re: [PATCH v2 1/2] nvme-pci: migrate to dma_map_phys instead of
+ map_page
+Message-ID: <20251026123804.GD12554@unreal>
+References: <20251020-block-with-mmio-v2-0-147e9f93d8d4@nvidia.com>
+ <20251020-block-with-mmio-v2-1-147e9f93d8d4@nvidia.com>
+ <20251022061418.GC4317@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 9/9] vfio/pci: Add dma-buf export support for MMIO
- regions
-To: Jason Gunthorpe <jgg@nvidia.com>, Leon Romanovsky <leon@kernel.org>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
- Leon Romanovsky <leonro@nvidia.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Bjorn Helgaas <bhelgaas@google.com>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
- Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
- kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-media@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org,
- Logan Gunthorpe <logang@deltatee.com>,
- Marek Szyprowski <m.szyprowski@samsung.com>,
- Robin Murphy <robin.murphy@arm.com>, Sumit Semwal <sumit.semwal@linaro.org>,
- Vivek Kasireddy <vivek.kasireddy@intel.com>, Will Deacon <will@kernel.org>
-References: <cover.1760368250.git.leon@kernel.org>
- <72ecaa13864ca346797e342d23a7929562788148.1760368250.git.leon@kernel.org>
- <20251022125012.GB244727@nvidia.com>
-From: Shuai Xue <xueshuai@linux.alibaba.com>
-In-Reply-To: <20251022125012.GB244727@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251022061418.GC4317@lst.de>
 
-
-
-在 2025/10/22 20:50, Jason Gunthorpe 写道:
-> On Mon, Oct 13, 2025 at 06:26:11PM +0300, Leon Romanovsky wrote:
->> From: Leon Romanovsky <leonro@nvidia.com>
->>
->> Add support for exporting PCI device MMIO regions through dma-buf,
->> enabling safe sharing of non-struct page memory with controlled
->> lifetime management. This allows RDMA and other subsystems to import
->> dma-buf FDs and build them into memory regions for PCI P2P operations.
->>
->> The implementation provides a revocable attachment mechanism using
->> dma-buf move operations. MMIO regions are normally pinned as BARs
->> don't change physical addresses, but access is revoked when the VFIO
->> device is closed or a PCI reset is issued. This ensures kernel
->> self-defense against potentially hostile userspace.
+On Wed, Oct 22, 2025 at 08:14:18AM +0200, Christoph Hellwig wrote:
+> This actually has block and nvme bits, so the subject line should
+> say that.
 > 
-> Let's enhance this:
+> > +	unsigned int attrs = 0;
 > 
-> Currently VFIO can take MMIO regions from the device's BAR and map
-> them into a PFNMAP VMA with special PTEs. This mapping type ensures
-> the memory cannot be used with things like pin_user_pages(), hmm, and
-> so on. In practice only the user process CPU and KVM can safely make
-> use of these VMA. When VFIO shuts down these VMAs are cleaned by
-> unmap_mapping_range() to prevent any UAF of the MMIO beyond driver
-> unbind.
+> attrs is always zero here, no need to start passing it for the
+> map_phys conversion alone.
 > 
-> However, VFIO type 1 has an insecure behavior where it uses
-> follow_pfnmap_*() to fish a MMIO PFN out of a VMA and program it back
-> into the IOMMU. This has a long history of enabling P2P DMA inside
-> VMs, but has serious lifetime problems by allowing a UAF of the MMIO
-> after the VFIO driver has been unbound.
+> > +	unsigned int attrs = 0;
+> 
+> Same here.
 
-Hi, Jason,
+It gave me more clean second patch where I only added new attribute, but
+if it doesn't look right to you, let's change.
 
-Can you elaborate on this more?
+> 
+> > +	unsigned int			attrs;
+> 
+> And this is also entirely unused as far as I can tell.
 
- From my understanding of the VFIO type 1 implementation:
+Right, it is used in second patch, will fix.
 
-- When a device is opened through VFIO type 1, it increments the
-   device->refcount
-- During unbind, the driver waits for this refcount to drop to zero via
-   wait_for_completion(&device->comp)
-- This should prevent the unbind() from completing while the device is
-   still in use
-
-Given this refcount mechanism, I do not figure out how the UAF can
-occur.
-
-Thanks.
+Thanks
