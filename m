@@ -1,70 +1,138 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC0AE30EF84;
-	Mon, 27 Oct 2025 16:06:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B19F311977
+	for <linux-block@vger.kernel.org>; Mon, 27 Oct 2025 16:18:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761581210; cv=none; b=mq/PtHIGd36ePvuqcPz3Yl0EJXMa1pq0REqizw0yV18JQjuAvBisvsFwuNFw4ALf5HBU2nRAOec+FkzcQsHy1Oks68oP28p6HTMSNXvEvZTdg7ELnWqcAfQ1UL5BshK12eQM/nesbvQugmyXWPCehCQCctnWhc5M61axl8jZzZo=
+	t=1761581914; cv=none; b=G25AJb5RD4WbjtAq7vZnkGTMUgj6eCsvOt204l/TspTiRzWrwf9TPC7OLRMZPK+VxEYlI0KI3QbYJwi8OeWuFeiJRlBCnmugYmhq8ABadzhq//DC+tkgkVfTolCTrq0Kl+bRLkXWMjxsRLgkL5y78rlEmoBMBiHrntRXZGX7FAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761581210; c=relaxed/simple;
-	bh=lgYGdJqJLSXnsekhf4n7haNtiB25n4IV3mTGIwEdIt0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XBnODvn+VofiHhFXvU31zomc1ZHWEQeCPjzxqktyS7IYy97kx3BIdF0aTL6nqKG2pDIN08mFwDJHCdkZ9M1E4lMUODC8hoAK0V0a8XfMBpKTw1pRKQlo4IWF+I0SVHhz55I87s1tZBMP8Dehmak9MZWaJo0795j+44XvLo+0/4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BtLEgncf; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1761581914; c=relaxed/simple;
+	bh=bO+j/PvY5TEVJo8+1ruKwQwqMR5RXF6ReyVEGwwH37Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=K5MywP5H0OgvB3cB6qKPoUmlnj00Dp6mk4ccOQVQerXrmJGEQDUdKt3w22jTm5X1ZUy/6tRaJCNzZ0kgCwBdCYoEHklmEEWs7AraL59BDCNj66Pp4VOYAXneDyROJAi7EymdGQ+ntxiUw/NynHLFiyC51uUpruRyNL5Ez+ifCC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=XvnBsVOg; arc=none smtp.client-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BtLEgncf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23D84C4CEF1;
-	Mon, 27 Oct 2025 16:06:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761581210;
-	bh=lgYGdJqJLSXnsekhf4n7haNtiB25n4IV3mTGIwEdIt0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BtLEgncf3+Nx2+/q5LePpZKjn73XUJB/FjnjW8HOPme7rRrIUzbkPoZ9yLit4Xdd6
-	 1th/Izvrun+V9r9cyFF2FlcbICtJKaG7RzQ4ySXdiKJ0f+BrpN9c0DmY0cFNsethnt
-	 cdyTZ4OMaCzePVC69gtUtKBPD12NlwU2AB/Xoy51tq8Il91BP9lhqFAok/9W2zvVWJ
-	 NZ4g22e8RDxsHWMXBgWXmPN6PT9kHcGH9sNxc443NtmfgHkcK5kK/BwM3lywrlVfzC
-	 dR1hJ6hqKugOAnPoiTvkuXKy6Xx2ZYi4tCp7OGoNfX+KysZvHF1SvCGQlKhMyvcFdd
-	 M1GxuWkiW9oxw==
-Date: Mon, 27 Oct 2025 06:06:49 -1000
-From: Tejun Heo <tj@kernel.org>
-To: jinji zhong <jinji.z.zhong@gmail.com>
-Cc: minchan@kernel.org, senozhatsky@chromium.org,
-	philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-	christoph.boehmwalder@linbit.com, corbet@lwn.net,
-	hannes@cmpxchg.org, mkoutny@suse.com, axboe@kernel.dk,
-	mhocko@kernel.org, roman.gushchin@linux.dev, shakeel.butt@linux.dev,
-	akpm@linux-foundation.org, terrelln@fb.com, dsterba@suse.com,
-	muchun.song@linux.dev, linux-kernel@vger.kernel.org,
-	drbd-dev@lists.linbit.com, linux-doc@vger.kernel.org,
-	cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-mm@kvack.org, zhongjinji@honor.com, liulu.liu@honor.com,
-	feng.han@honor.com
-Subject: Re: [RFC PATCH 0/3] Introduce per-cgroup compression priority
-Message-ID: <aP-Ymcsoyls04jov@slm.duckdns.org>
-References: <cover.1761439133.git.jinji.z.zhong@gmail.com>
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="XvnBsVOg"
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-33257e0fb88so715071a91.1
+        for <linux-block@vger.kernel.org>; Mon, 27 Oct 2025 09:18:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1761581912; x=1762186712; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=h5zRXIVQDgNQl8MjZbaWTaE8Q8S6ay1wxqt0gc/leLc=;
+        b=XvnBsVOg/CrRr0yoO2l83CqWoPbZFCL+4hiiegHkaoNzWRHGotC31MiaYUPZ59ibMR
+         a9y+11995KHnLGfWrq7lz54DNaf+uK4luRf84lg8/UdJ8RRTt+mnLhwcrmYlPya3yJJ/
+         6icozbXZrF8UO5CqNEkP0Vny8IW74716v4iIl6mGRiPFapA3bzyCXGL7nwnyrsR8hMSu
+         9CsXiChSDlAJLPb89x9GK+zdhdgT6nzckRh+XWM7Lg/S7VJqhTOVRrT/h5G2vxpnkTT/
+         aRzm5KZN2XZ3cFmzdhgPn+7gOhlTeZJt0Vg3aXwRXBitZEXf3hmCTZkSPZvxeLKmpNq2
+         QRjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761581912; x=1762186712;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=h5zRXIVQDgNQl8MjZbaWTaE8Q8S6ay1wxqt0gc/leLc=;
+        b=dXTxHlhFNmNqIGWVNBJzlSYcb8QdMPzH7Q90WRlFDeyAgTDyzpL9rvwfZGrnPtrLAq
+         ssiiPTDOgV9GT6sXDm6KrkAD1oZhUbGdfeeI7C+BD/cGA8WrnzilmSTUSokqtufLtW2S
+         AiOSOCJqHH6hxIeI6GhDbWHCkXmRgsXbdEgHQ7Y+tiUpN2jezG05UDUpVLJNb5iO7wdK
+         fIxa2DnjXvQsBSUXyu1SJaAPPkbNmmjE1o2NjUbuubXbRoQzq5NGHrVaJqy+Clm7EZP2
+         AtYrn4Hhr3zYKiZtFbwbLoPwJEOC2XVL5vR34Y2yqwv7b/cGXMSl9iXefUAJva+EoaL4
+         yQ8g==
+X-Forwarded-Encrypted: i=1; AJvYcCWV6hDWRiYlI2xviY0jS6iwFiJujMPvWkVmgeJ2a1FU4cg9QOoc/qPIIFKCEBrpXrcHcTkDiA/+ULflYQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw+XZeOo8rH9hHHcTVXqhU66JUwwKvFekzgJfzoPnKEKYU3ti50
+	PdC2pjRN1qc6EZHQv0euu/krIKpJSW5mGMDt+KiHGFgVdpBk4yFgvIedU0jjZr6Y9sfzgvqgumu
+	sD39DUsc8oTicu1WHqDPI4cQLYB/pW3WtFKPgXRpyYQ==
+X-Gm-Gg: ASbGnctc5O1nEGsut3ymQqml0iFjBHcaB9H9Z3aLSbSJ6+tDT0QPYhQjQZF6QFP7BdE
+	zFzSgBsmp0w4HJrpaAaJrhjrPYcUA57TtKE5qpN9uBKj2O+1PHt5oEgrfnuuRIqXs5XbHqZCmZo
+	Dqvxgh02ePBca4XHUqgpwzGgE9BZ7JRZltzdgQOIe/TIKSlfySMZRtzoykXoMqjmz229K6Dq9Uw
+	HG/eySH6hgMHu9RLrMG3WlYvu5vymsXMwhp6SyPuJSa0g0Mnq/gATmUvDPH6uQuG339aqmmpBh+
+	XG2K2EqNzN3GB/2HKS1cGJoaeXqk
+X-Google-Smtp-Source: AGHT+IF+U0+JPxygQDcLS4EnXZA4SATIEvqgFk4pH1K+CJB3ZS4a/KMkLzBdjAEQiPtBFclKsqbUVzjMEiWxt09FcMw=
+X-Received: by 2002:a17:903:38cd:b0:290:8d7b:4041 with SMTP id
+ d9443c01a7336-294cb53417fmr2913805ad.10.1761581911751; Mon, 27 Oct 2025
+ 09:18:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1761439133.git.jinji.z.zhong@gmail.com>
+References: <20251027114950.129414-1-ming.lei@redhat.com> <20251027114950.129414-2-ming.lei@redhat.com>
+In-Reply-To: <20251027114950.129414-2-ming.lei@redhat.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Mon, 27 Oct 2025 09:18:19 -0700
+X-Gm-Features: AWmQ_bkkqPw_4RHPBRa9XTYF9J5P_IZenXVc5EFu4b6HPbadyDtHesyQgQA9SzU
+Message-ID: <CADUfDZqkfmARPB80pqCcB3ANzWbPvirUT77rjFUj_efoC9xL4w@mail.gmail.com>
+Subject: Re: [PATCH 1/4] ublk: reorder tag_set initialization before queue allocation
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	Uday Shankar <ushankar@purestorage.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Mon, Oct 27, 2025 at 4:50=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
+e:
+>
+> Move ublk_add_tag_set() before ublk_init_queues() in the device
+> initialization path. This allows us to use the blk-mq CPU-to-queue
+> mapping established by the tag_set to determine the appropriate
+> NUMA node for each queue allocation.
+>
+> The error handling paths are also reordered accordingly.
+>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 
-On Sun, Oct 26, 2025 at 01:05:07AM +0000, jinji zhong wrote:
-> This patch introduces a per-cgroup compression priority mechanism,
-> where different compression priorities map to different algorithms.
-> This allows administrators to select appropriate compression
-> algorithms on a per-cgroup basis.
+Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
 
-I don't think it makes sense to tie this to cgroups. Is there something
-preventing this from following the process hierarchy?
-
-Thanks.
-
--- 
-tejun
+> ---
+>  drivers/block/ublk_drv.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+>
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 0c74a41a6753..2569566bf5e6 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -3178,17 +3178,17 @@ static int ublk_ctrl_add_dev(const struct ublksrv=
+_ctrl_cmd *header)
+>                         ub->dev_info.nr_hw_queues, nr_cpu_ids);
+>         ublk_align_max_io_size(ub);
+>
+> -       ret =3D ublk_init_queues(ub);
+> +       ret =3D ublk_add_tag_set(ub);
+>         if (ret)
+>                 goto out_free_dev_number;
+>
+> -       ret =3D ublk_add_tag_set(ub);
+> +       ret =3D ublk_init_queues(ub);
+>         if (ret)
+> -               goto out_deinit_queues;
+> +               goto out_free_tag_set;
+>
+>         ret =3D -EFAULT;
+>         if (copy_to_user(argp, &ub->dev_info, sizeof(info)))
+> -               goto out_free_tag_set;
+> +               goto out_deinit_queues;
+>
+>         /*
+>          * Add the char dev so that ublksrv daemon can be setup.
+> @@ -3197,10 +3197,10 @@ static int ublk_ctrl_add_dev(const struct ublksrv=
+_ctrl_cmd *header)
+>         ret =3D ublk_add_chdev(ub);
+>         goto out_unlock;
+>
+> -out_free_tag_set:
+> -       blk_mq_free_tag_set(&ub->tag_set);
+>  out_deinit_queues:
+>         ublk_deinit_queues(ub);
+> +out_free_tag_set:
+> +       blk_mq_free_tag_set(&ub->tag_set);
+>  out_free_dev_number:
+>         ublk_free_dev_number(ub);
+>  out_free_ub:
+> --
+> 2.47.0
+>
