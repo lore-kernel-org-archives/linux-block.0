@@ -1,104 +1,135 @@
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CB4F2DC34B
-	for <linux-block@vger.kernel.org>; Mon, 27 Oct 2025 19:51:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 283BC2E5B0D
+	for <linux-block@vger.kernel.org>; Mon, 27 Oct 2025 20:24:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761594693; cv=none; b=rU5UCOfdYbqt6OE8UHnxpOtSTAfekusNwmwwGVt9y/TUreQpmFqcjxcO76JZ05D+IISQoyCSSEwxLB8xeVa/iJG+qBOzv8QdoGI/mH7Oz4j56q8nb8n5B/DDraBxfwHHMpOVunp1cr72ye/CaQND+spA6zOCzuHfZSbLZV+PIIo=
+	t=1761596695; cv=none; b=iffNUc3FrAqfmiwOwl9lAbL0DeDSvuGdbIaanHxzRzq46t0yCzdf0aJeIYIzVSG/1BII28/OXdBrDxm9IJysqmIlbhNSy9cAMs7buFmfIwjtNAokb6zEeAv/cdv9nlAVvTl+zO1wYpR06vLNTNLzYjNRuO7+dvOBn6UovR/5X4U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761594693; c=relaxed/simple;
-	bh=LUw2mZCfH1yOBKTSy9rxXAh/jPqUNSJVBaTxVdNrEJg=;
+	s=arc-20240116; t=1761596695; c=relaxed/simple;
+	bh=O26YNzEdJ3QPI+0VWzw6KhHngkhD5YgkTZsq/NIar8E=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MyFjc8ZKMLVQv58fRLQq6o80hJwHTaZmDLWibQuowsrYUe79ewl1Hjrx/Fp9Wor1u+EKVDadIRzgOPAhwTPDDYE6vIgpZy8eYrrn54e6JKKm7yI/CdHNMDnIY0W4GGqXChrHd7DQNZFKfAICGnr+k/fEv56GBa7U/YFbScJcL1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=v1dlgCdz; arc=none smtp.client-ip=209.85.160.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 To:Cc:Content-Type; b=KkaeHojQuZWf4UldK/m0gWp2K5LRnnzYk70bqTmns5biUEcYwa8CFQ/dr4vPCW4YY5NmQyiHLKyibbqcnEo17fk6YCcime5RqI6AfvBHWJ+F8DgxM6RZzCYn38uBMPMDHFFhTi1PyNUN9ozNuIgimk6E+cZLsS4NEnAiRlDJDHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=IE1kYpNn; arc=none smtp.client-ip=209.85.215.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="v1dlgCdz"
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4ecfafb92bcso14831cf.1
-        for <linux-block@vger.kernel.org>; Mon, 27 Oct 2025 12:51:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="IE1kYpNn"
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-b49c1c130c9so3460203a12.0
+        for <linux-block@vger.kernel.org>; Mon, 27 Oct 2025 13:24:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761594690; x=1762199490; darn=vger.kernel.org;
+        d=paul-moore.com; s=google; t=1761596693; x=1762201493; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LUw2mZCfH1yOBKTSy9rxXAh/jPqUNSJVBaTxVdNrEJg=;
-        b=v1dlgCdzKU2VKZ0tcQYZU9PtfJ+TzPScfLGl+vxfqtwwDx0Fz+gyS9RMoEkK5uhdHK
-         IrQDFjyE1qTvzqKbCEq0gE0exVZVi+yT5xqrRJglNH+CmQy3pcG9S+6eJ2TOZsm/zeIh
-         XVg4KCVTqjx1cpxfvOgqZt38KgeyUYrobhQZ3Dy4ti+iYalFFqeezm1IsXOd1p3Lq1A5
-         KAZ3xncqNFuv2fvLLofC16hE0gxVIdegvos6BuV5yYi5cD0r7t2KWIgM5bXT9yFueV3N
-         3EP5N8TBda13BOaWSSA/3htFfO8sq5GMcprsQ2b/3rZ+7IZgbSi+GbFAIukNi1k0mYUJ
-         7AbA==
+        bh=FgWagJo2YU/oFmsKHPKceT2jMbhn9OwgubjxZ/WaMPs=;
+        b=IE1kYpNnASmzdMHFZ+P3Oh9wrlZ75TdhMaxHCviyH+A93AEvjG/WfIwcHkBHOv/NQv
+         d6V+YZYSnTkMAEgdcykGmrnE1UKlqEBkTLYyC0jOJExxp0IR4NaEtS5wapNAWMF96UpS
+         ExWDDtIHsW3/8i+fjrYQB24GQwR1tfWYorQo7gsNhI/yC9R1LaOL1S1q+hsjVup5zMeJ
+         46TQ1NHXKRLOzkgjnkAVTIJ7V/C771lZXFZ+oEz22j6Gnk1LA5xCE2Se3jXDybNrdopI
+         nJSZE7L4JCiUrbGi/+4Nb2ymSRk7AHYnnNMLD96YT6sy1qwVRWJ7PAILRVLDy31qHy0K
+         kzPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761594690; x=1762199490;
+        d=1e100.net; s=20230601; t=1761596693; x=1762201493;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=LUw2mZCfH1yOBKTSy9rxXAh/jPqUNSJVBaTxVdNrEJg=;
-        b=NXEj0xgqUjkgEB6pQOw7Y0PglEYdOQoP/Tun9Tt7XhOg7V1AwdHEv/8YGQHbYIegYo
-         B69BuUtbCY7IvRmUXCG/wEXy0Uj+tFxlLEL4Va8/8nw0c/d5wZBHSZEtvCWNDxVhrpBA
-         F1C6G2D1V+kVWUr3Vzu+OBLc43eHaqk2ChFv6T2VWJMoXfCvTzUNTvGfx6q55F9zKdEI
-         0+75mD46qvoYkH5XK7QYwCwv/M+6DfFR7bjLgac2rzmg1ZlG37zi8QKw87Wwgiqa23XU
-         1MK9fpalGagub8lH6s2tSqczrBFdcF+/k5+NVQW+5Zy6aJQZSsCbRlxZyBnK40A1/cs0
-         MjEw==
-X-Forwarded-Encrypted: i=1; AJvYcCW7XIaZfMdooLQMOcqX73mMjTBq4dujl4luIAYul9cycs5vW1jrkwsG5cr+40Qor+Vqbxd4Y1mnCj8GVw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDrPt6/BWwXGFh2xIwybBRp5coZWCDTHr7zzAVADjjrDFBMl2W
-	jwp+Ier/uVIog8X0JzhRns+7r1afWkemUUNCL4euHIbszG7n1a9OgbMHFMIq/X35p358rqyIMSa
-	9WBeovtBwW3egOoDPjBICb5V+TRijdO1GCLsuPsqu
-X-Gm-Gg: ASbGncui9wbqV1Hhu3623o0GV3xTm1VZHZDxKdXQ/t5F9qSZtmqM/+D4qJ0DQ6sxGlK
-	XHR0gMWAomGVc4pRlQtwVk7aaHHh1iACMXlaMv+i0tF0stTAdcZEyyn7xMD0RK87aF/lJm4ippe
-	2rzg5PyXgUKP4tNrfNpSf+ELEQNx4TRySoOPTc0Hv4su5Yu1qfKfsbeNrBbBvq0eROqu7HvZ0Wj
-	YFs/dB6jUVkRPhm29V9NSCWlacf/W4MEtipgndpbUZpN/vSOaLouP0eSOOPfpaij2rYeA==
-X-Google-Smtp-Source: AGHT+IEmicxEYEPLgQn38b6v1mJfTIvyLMT/qtHkmyMNLHlEBQmcYJx6gF8JYoLZrM0kAWrtv1hez5d7WlrSFzFFVW4=
-X-Received: by 2002:ac8:7fcb:0:b0:4e8:b04a:82e3 with SMTP id
- d75a77b69052e-4ed08f1af35mr1416621cf.10.1761594690047; Mon, 27 Oct 2025
- 12:51:30 -0700 (PDT)
+        bh=FgWagJo2YU/oFmsKHPKceT2jMbhn9OwgubjxZ/WaMPs=;
+        b=PdWAk5sbYkV3X1Jt5bUZArdYl5bkXDy4ivcmLXvcLRnTsY5sQhaYuOsVVVncMR+KWY
+         NKe3hphhRjO1VTIjj+gSp02HQgsQ5lOB3kQUDZuGbJVDdvG/ZKAf18Mz/KeSjgf5fsUo
+         zBqmY8+b8O83SkmmbbzIw1FQ++0Jchhf9+T6yerFTbBbauZbvQNk47yrkozbUQe+C4HU
+         aoj7cDu5qvNWXnKC7YyR126JuWERSTHw0SYpmp/xi/6kDaN0Ft8Z81fc4Q72Yf8kSLPS
+         U5JmZPq/b2GQq1cjwOrVuBB5FZV+1Ar6J+8+n5qs5DhN8+EudBFo5ZpbN3H4UVlyFdxv
+         5dzQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU3uo/+Gi6PS1o3H53TVkpc26hKZYkeGDE/5YpQmi1Ikq+ow/UOuyeAwmZZ42XYoU2oyghlBtJeojC/iA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXUcIK0h7FJmECNihH9sqJxjIzptH42ub9FevBfQD2EP+SBhrf
+	19zS8YhPT9JJBBCtFSTduvj1/efIPcSiopei1he4DTE/W+dDXOMBqv1bc9JXvMTZbqzBOb/fS8H
+	f/rAlUbppv7Wj2dpC2yNVXc4EQwoW/KPptut9nJBApJ+FXZigtZuiMg==
+X-Gm-Gg: ASbGncsgK3XFeQg4PIS3vJlmu4G2EPU4WwP8lw9wUIgcWTwtF4SvKEgK7gjTuIbZ8uA
+	7PHr6CNcdipuKNGjhCcjBqde0A0tT3vuZhgbRSU7PpmTB+XJfIisu97v3sScXRmSVsk7cWIWwIi
+	NdLoQVfprQm+Td1LVz69qi/lo71RMVE54+6BXEvZtfGKiom7gp4W7nQuXYmpJYrHcDZkkgeaNyH
+	ZxBROdBhpkZNyhA4ANacAYRdrpwOMdkM6ve1JiV78L6k6lO42Z01HfZUFvV
+X-Google-Smtp-Source: AGHT+IFDV3g6ErN3yxsEWnHW1/CkPBxwftrCLJfB2QJuWDrssPOc1igql1P21JcoH56S8Ml7SDBpIHdU/bMeTDi6Uzk=
+X-Received: by 2002:a17:902:f601:b0:272:dee1:c137 with SMTP id
+ d9443c01a7336-294cb384b88mr11688695ad.13.1761596693344; Mon, 27 Oct 2025
+ 13:24:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251026203611.1608903-1-surenb@google.com> <aP8XMZ_DfJEvrNxL@infradead.org>
-In-Reply-To: <aP8XMZ_DfJEvrNxL@infradead.org>
-From: Suren Baghdasaryan <surenb@google.com>
-Date: Mon, 27 Oct 2025 12:51:17 -0700
-X-Gm-Features: AWmQ_blGO7QUW6nBgXPDBNUnzq3Ln5ah_SLow5ox4iXfcHmzA4G72ZsuhQ4Fq80
-Message-ID: <CAJuCfpH1Nmnvmg--T2nYQ4r25pgJhDEo=2-GAXMjWaFU5vH7LQ@mail.gmail.com>
-Subject: Re: [PATCH v2 0/8] Guaranteed CMA
-To: Christoph Hellwig <hch@infradead.org>
-Cc: akpm@linux-foundation.org, david@redhat.com, lorenzo.stoakes@oracle.com, 
-	Liam.Howlett@oracle.com, vbabka@suse.cz, alexandru.elisei@arm.com, 
-	peterx@redhat.com, sj@kernel.org, rppt@kernel.org, mhocko@suse.com, 
-	corbet@lwn.net, axboe@kernel.dk, viro@zeniv.linux.org.uk, brauner@kernel.org, 
-	jack@suse.cz, willy@infradead.org, m.szyprowski@samsung.com, 
-	robin.murphy@arm.com, hannes@cmpxchg.org, zhengqi.arch@bytedance.com, 
-	shakeel.butt@linux.dev, axelrasmussen@google.com, yuanchu@google.com, 
-	weixugc@google.com, minchan@kernel.org, linux-mm@kvack.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	iommu@lists.linux.dev
+References: <37fb8720-bee9-43b7-b0ff-0214a8ad33a2@kernel.dk>
+ <CAHk-=wgZ9x+yxUB9sjete2s9KBiHnPm2+rcwiWNXhx-rpcKxcw@mail.gmail.com>
+ <aP6OJTTWPQBkll56@mail.hallyn.com> <CAHk-=wjE5t6=eO90iXqEsw6yMGfE8Y6=THP0dqXUJHvNQ7=gMg@mail.gmail.com>
+In-Reply-To: <CAHk-=wjE5t6=eO90iXqEsw6yMGfE8Y6=THP0dqXUJHvNQ7=gMg@mail.gmail.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Mon, 27 Oct 2025 16:24:41 -0400
+X-Gm-Features: AWmQ_bn8BYWuSBwc_rGyFbpuoo8trBAKKr6VahOoiHX2AiPEdC3J7WklfW7oY2w
+Message-ID: <CAHC9VhTTaMe3ezEiXUwLfgCMrp7-of_K-9HmHk-TKApq4sGbfw@mail.gmail.com>
+Subject: Re: [GIT PULL] Block fixes for 6.18-rc3
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "Serge E. Hallyn" <serge@hallyn.com>, Jens Axboe <axboe@kernel.dk>, Serge Hallyn <sergeh@kernel.org>, 
+	Christian Brauner <brauner@kernel.org>, 
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
+	LSM List <linux-security-module@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Oct 26, 2025 at 11:54=E2=80=AFPM Christoph Hellwig <hch@infradead.o=
-rg> wrote:
+On Sun, Oct 26, 2025 at 6:57=E2=80=AFPM Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
+> On Sun, 26 Oct 2025 at 14:10, Serge E. Hallyn <serge@hallyn.com> wrote:
+> >
+> > The keychains are all NULL and won't be allocated (by init) without
+> > copying a new cred, right?
 >
-> Hi Sure,
+> Right. As mentioned, 'struct init_cred' really should be 'const' -
+> it's not *technically* really constant, because the reference counting
+> casts away the const, but refs are designed to be copy-on-write apart
+> from the reference counting.
 >
-> jsut as last time please don't build empires with abstractions that
-> don't have a single user, and instead directly wire up your CMA variant.
-> Which actually allows to much more easily review both this submission
-> and any future MM changes touching it.
-
-Hi Christoph,
-I'm guessing you missed my reply to your comment in the previous
-submission: https://lore.kernel.org/all/CAJuCfpFs5aKv8E96YC_pasNjH6=3DeukTu=
-S2X8f=3DnBGiiuE0Nwhg@mail.gmail.com/
-Please check it out and follow up here or on the original thread.
-Thanks,
-Suren.
-
-
+> So whenever you change it, that's when you are supposed to always copy
+> things. So that  prepare_kernel_cred() thing exists for a good reason.
 >
+> But the pattern here in nbd (and the other three usage cases I found)
+> is really just "use the kernel creds as-is".
+>
+> They don't even need any reference counting as long as they can just
+> rely on the cred staying around for the duration of the use - which
+> obviously is the case for init_cred.
+>
+> > Now, in theory, some LSM *could* come by and try to merge
+> > current's info with init's, but that would probably be misguided.
+> >
+> > So this does seem like it should work.
+>
+> Yeah, I can't see how any LSM could possibly do anything about
+> init_cred - it really ends up being the source of all other creds. You
+> can't really validly mess with it or deny it anything.
+
+This came in just as I was logging off for the weekend and I've been
+kicking it around in my head and I can't think of any *good* LSM
+related reason why this should be a problem, however I do have a
+somewhat generic concern about potential future issues caused by
+someone choosing the wrong access pattern and causing an odd bug.  In
+theory, a const attribute should catch a lot of that before it starts,
+but that assumes we don't have some casting somewhere doing odd
+things.
+
+If we care about this, and I'm not sure we do, or rather I'm not sure
+how much I care about this, we could create a new cred instance, say
+'kernel_cred', that is purely for things like nbd where no changes are
+expected and it can be accessed directly.  This would limit the
+direct-access pattern to just kernel_cred, making code
+inspection/review easier and leaving the door open for WARN_ON-esque
+assertions in things like prepare_creds() and similar*.
+
+* This reminds me that we need to talk some more with the keys folks
+and see if we can get rid of the ugliness that is
+key_change_session_keyring()/security_transfer_creds().  Jann had some
+patches for that, but if I recall correctly there was a concern about
+backwards compatibility.
+
+--=20
+paul-moore.com
