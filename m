@@ -1,31 +1,45 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ACF31C6A3;
-	Mon, 27 Oct 2025 08:17:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F8F81C6A3;
+	Mon, 27 Oct 2025 08:22:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761553025; cv=none; b=fFzS0bBPiwYpfwTOGvG9V6MvMMx4MTFG5t+vhtfMAhD6fJQa0SOK9phlXGVmELXZCMj/anVgTwRJapp+TfL8jdglo7DEn/iusAh2S5d8YbJdVaMYRtCNTn/fmiHU8kmSuv63cTwEyBs2e288FYIX/7uFqm1qfzxxHF+FAHkCsLs=
+	t=1761553340; cv=none; b=XfjIx8tLz3W5pH5zR5JDhvTj5i6H+1TMHFWiZAkDA8hMS+N0ykRfLKRAFoJ3eB8ePTVozJvNzUlj4yo3qVDqy1EuzcdlZ/M0EHSEb30B39GatD2TkNL3vxyVSvqZ/6NDo7rVKbqcsnABfGr5VOiEshGNWdlP6+lqyqKkdaL6vYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761553025; c=relaxed/simple;
-	bh=3s+c9UrgxVlE87z6LbpFebBA+Z7zC+mE0JUYrBr/dMY=;
+	s=arc-20240116; t=1761553340; c=relaxed/simple;
+	bh=ql+BZhNvD24lFAr0m8oGRVb6NxzFtRyzqioXOwAhNrg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F6vbqwq7OaBkkFHTJ2pm4aR47hkgFwkPuN9/kQ5Y6Gp0NPxULvCl6fBI7moo5GchN753xhyasBxNU4kv7begR7G4eIUR3WuhLfwG+AYeNtLGhwXb1sP1x35FJlh7C3IjKZ7f5MD2NuJl0KiB0O6jjKBsCpRQBkv2WKIn+2h4uZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 76B4A227A87; Mon, 27 Oct 2025 09:16:58 +0100 (CET)
-Date: Mon, 27 Oct 2025 09:16:58 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-nvme@lists.infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=iQrYa5STIeeR7MQ1tGe/XDLMNvGGcKz+idn5Ofo8bJN3jqCcG7FZtiywHdJYWPQXRIYJEEDUst3WxLaWDb/oFX+jkjWjliopen2RSYcXk1vjmzC53XKZfu16GI4T3pDGG40brVMgSVDPmLu2sDVOWcEREjTyeAW8QKvziaYRKu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tuP+2aKO; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tuP+2aKO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FFD4C4CEF1;
+	Mon, 27 Oct 2025 08:22:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761553339;
+	bh=ql+BZhNvD24lFAr0m8oGRVb6NxzFtRyzqioXOwAhNrg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=tuP+2aKO3ar4pbdjUcaMokMQO54MmE0odQM7D+wdywnTnF0mKUQKYcbcBOawGW6OG
+	 Tv3Il0jJq//3vBQRCfwY/5RYESQR1uD1i0r6X5LIviRVSlIWDPr6cVbx0cQMgcKOMN
+	 ApWOakX3ku9paZwpZjr7knCtPUh66YwHx1gv8jIb/ElHevhMu9exGzPZG6tlrcnW1J
+	 u+l8UV+XPKZhuHEqsy9bez1xS7T+9nqokVY5Rf1aukVTLAo1RlD0kvJDYUAXowsLtn
+	 lBR+o0X3Fk5WqpOH+jSQHDwn8jIKvI58mWnRdbtTVL3docQv+X0pNuFOGS9Z1Bsqdi
+	 sU8UO/g6yEpeA==
+Date: Mon, 27 Oct 2025 10:22:15 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
 Subject: Re: [PATCH v3 2/2] block-dma: properly take MMIO path
-Message-ID: <20251027081658.GA15229@lst.de>
-References: <20251027-block-with-mmio-v3-0-ac3370e1f7b7@nvidia.com> <20251027-block-with-mmio-v3-2-ac3370e1f7b7@nvidia.com> <20251027074922.GA14543@lst.de> <20251027075738.GF12554@unreal> <20251027081142.GG12554@unreal>
+Message-ID: <20251027082215.GH12554@unreal>
+References: <20251027-block-with-mmio-v3-0-ac3370e1f7b7@nvidia.com>
+ <20251027-block-with-mmio-v3-2-ac3370e1f7b7@nvidia.com>
+ <20251027074922.GA14543@lst.de>
+ <20251027075738.GF12554@unreal>
+ <20251027081142.GG12554@unreal>
+ <20251027081658.GA15229@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -34,14 +48,15 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251027081142.GG12554@unreal>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20251027081658.GA15229@lst.de>
 
-On Mon, Oct 27, 2025 at 10:11:42AM +0200, Leon Romanovsky wrote:
-> BTW, one can reorganize pci_p2pdma_map_type to make sure that
-> PCI_P2PDMA_MAP_BUS_ADDR will be 2 and PCI_P2PDMA_MAP_THRU_HOST_BRIDGE
-> will be 3, so it will be possible to take 2 bits per-type instead of 3.
+On Mon, Oct 27, 2025 at 09:16:58AM +0100, Christoph Hellwig wrote:
+> On Mon, Oct 27, 2025 at 10:11:42AM +0200, Leon Romanovsky wrote:
+> > BTW, one can reorganize pci_p2pdma_map_type to make sure that
+> > PCI_P2PDMA_MAP_BUS_ADDR will be 2 and PCI_P2PDMA_MAP_THRU_HOST_BRIDGE
+> > will be 3, so it will be possible to take 2 bits per-type instead of 3.
+> 
+> Maybe.  I'd be happy to leave this as-is and then see if we can optimize
+> things once we grow more users.
 
-Maybe.  I'd be happy to leave this as-is and then see if we can optimize
-things once we grow more users.
-
+Completely agree, thanks for the patience and review.
