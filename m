@@ -1,54 +1,58 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A41692E2EEE
-	for <linux-block@vger.kernel.org>; Mon, 27 Oct 2025 11:50:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90E4C2FFDFA
+	for <linux-block@vger.kernel.org>; Mon, 27 Oct 2025 11:50:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761565807; cv=none; b=aLs35woF2Ao5UGxLrSX8YZH5mMPFieKdvHGaTu2pPQDgb2FxX8nxk+z9Mvwm3/6ywIz2Rwl3hnGx+4/ZGQ7f9RoFNtTXKsZS0r0IMcbprg2n8bemFiV2szzC71BI5oVIUuGo9bVun9BP+RqI6OLHv3oQRWqgfS8x9FmVVSl3u3s=
+	t=1761565810; cv=none; b=leQOFkrcQJV4nzi1k9A30xiJi/zbxLHK8QsFEJI30Jle3coVag2JwVSRnVmSnysCBI6SkKmXw1n7NDFrnCcKi3a1YwSywN6t/9OXZr3s9bZMCgE3nt6PBTuvykwsNd/G/2xBpp0UyuotNrdqoKj7RDCa1TAotW/wUMbmWJhrh0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761565807; c=relaxed/simple;
-	bh=EpQFjOwrkQfFu+Gt5XgCG8kbcgC2F3qk3D60ME1Kdjw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NJ9CqbDu7gKcavBR43tEr1C7cq1mLWOvuRwtnjHYlEVargpSOKGaCGwRnceLmQun0lSD2OHVunTjCuAuA41qPc9/0azGDt5Xv26XkStccHEbJifmgO3GUhS+ORyj3uPyThn974zA89VLc9prm7t+RK+8K7GVVDsZKugIR1g7iJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fqTooQ8P; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1761565810; c=relaxed/simple;
+	bh=b88/3EBGPJc9lzm/1nNld4B7KP2zJeqohaTkIIqcqWQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=tJVpap2xcgFVIeFRa3CkhXsFn+kPTUsq1GqlBKtkCZOS3uf6fQsjJfzKsaspCqlyyvrEbbwb8xUEpRZaqP6LdZ/ArUoeTbhp1SQqMeXADIGrAk18zVqDGPhEsML4FWvs4yZprDny8a8n9KacY/A9CcnVd8tOkHVCxIxKtAOZrmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WmL+MYdZ; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fqTooQ8P"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WmL+MYdZ"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761565804;
+	s=mimecast20190719; t=1761565807;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=24JsHF8n5WksK4AdXGMZfE0/VOPpcNEqtsJ2mClL4E4=;
-	b=fqTooQ8PXv42XBVycECcznMkk2bHCqII6hc2tQfl5FZe0utQoJFkOt5il+qfTahorucQQ0
-	GQTYmsMAl15j9cUgV/d4CoQkRlh16iKHN9q/2SC51AWmxDK9Z/R0blxyJmZh4E6PW8akYW
-	/L1edPc5CbSx91jmYHxxLgHCXawR19g=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ridfegMKiCWwyYVYIRWxiR2J+JhEK7Yce+cXCCHxbKw=;
+	b=WmL+MYdZXn9JPRHtG5GkJY7tvpYEVpjkV/H7B45DtwWWLtpMcrJ9S6VgzHKyWFFdbynIHE
+	Yv62yCKem7HUgVLNENPaCfD4ztqrDizqXX11iMUW9/5VRRNZaGPXRXQv2jlo9mXkhoIA3R
+	+jIj4ba2Hn1HAZ9xYJwrxAK1hKk2Zgw=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-298-vmjkSKgqPQ2Kh8ahCz9yCQ-1; Mon,
- 27 Oct 2025 07:50:01 -0400
-X-MC-Unique: vmjkSKgqPQ2Kh8ahCz9yCQ-1
-X-Mimecast-MFC-AGG-ID: vmjkSKgqPQ2Kh8ahCz9yCQ_1761565800
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-546-ic7qNOvYMm-1iYA4ArFjVQ-1; Mon,
+ 27 Oct 2025 07:50:06 -0400
+X-MC-Unique: ic7qNOvYMm-1iYA4ArFjVQ-1
+X-Mimecast-MFC-AGG-ID: ic7qNOvYMm-1iYA4ArFjVQ_1761565805
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D505E1800654;
-	Mon, 27 Oct 2025 11:49:59 +0000 (UTC)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 92FFD1954224;
+	Mon, 27 Oct 2025 11:50:04 +0000 (UTC)
 Received: from localhost (unknown [10.72.120.21])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9E87A180044F;
-	Mon, 27 Oct 2025 11:49:57 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 648941955F1B;
+	Mon, 27 Oct 2025 11:50:02 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
 Cc: Uday Shankar <ushankar@purestorage.com>,
 	Caleb Sander Mateos <csander@purestorage.com>,
 	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 0/4] ublk: NUMA-aware memory allocation
-Date: Mon, 27 Oct 2025 19:49:44 +0800
-Message-ID: <20251027114950.129414-1-ming.lei@redhat.com>
+Subject: [PATCH 1/4] ublk: reorder tag_set initialization before queue allocation
+Date: Mon, 27 Oct 2025 19:49:45 +0800
+Message-ID: <20251027114950.129414-2-ming.lei@redhat.com>
+In-Reply-To: <20251027114950.129414-1-ming.lei@redhat.com>
+References: <20251027114950.129414-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -56,30 +60,59 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Hi Jens,
+Move ublk_add_tag_set() before ublk_init_queues() in the device
+initialization path. This allows us to use the blk-mq CPU-to-queue
+mapping established by the tag_set to determine the appropriate
+NUMA node for each queue allocation.
 
-The 1st two patches implement ublk driver NUMA aware memory allocation.
+The error handling paths are also reordered accordingly.
 
-The last two patches implement it for ublk selftest utility.
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/block/ublk_drv.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-`taskset -c 0-31 ~/git/fio/t/io_uring -p0 -n16 -r 40 /dev/ublkb0` shows
-5%~10% IOPS improvement on one AMD zen4 dual socket machine when creating
-ublk/null with 16 queues and AUTO_BUF_REG(zero copy).
-
-
-Ming Lei (4):
-  ublk: reorder tag_set initialization before queue allocation
-  ublk: implement NUMA-aware memory allocation
-  selftests: ublk: set CPU affinity before thread initialization
-  selftests: ublk: make ublk_thread thread-local variable
-
- drivers/block/ublk_drv.c             | 60 +++++++++++++++++-------
- tools/testing/selftests/ublk/kublk.c | 70 +++++++++++++++++-----------
- tools/testing/selftests/ublk/kublk.h |  9 ++--
- 3 files changed, 89 insertions(+), 50 deletions(-)
-
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 0c74a41a6753..2569566bf5e6 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -3178,17 +3178,17 @@ static int ublk_ctrl_add_dev(const struct ublksrv_ctrl_cmd *header)
+ 			ub->dev_info.nr_hw_queues, nr_cpu_ids);
+ 	ublk_align_max_io_size(ub);
+ 
+-	ret = ublk_init_queues(ub);
++	ret = ublk_add_tag_set(ub);
+ 	if (ret)
+ 		goto out_free_dev_number;
+ 
+-	ret = ublk_add_tag_set(ub);
++	ret = ublk_init_queues(ub);
+ 	if (ret)
+-		goto out_deinit_queues;
++		goto out_free_tag_set;
+ 
+ 	ret = -EFAULT;
+ 	if (copy_to_user(argp, &ub->dev_info, sizeof(info)))
+-		goto out_free_tag_set;
++		goto out_deinit_queues;
+ 
+ 	/*
+ 	 * Add the char dev so that ublksrv daemon can be setup.
+@@ -3197,10 +3197,10 @@ static int ublk_ctrl_add_dev(const struct ublksrv_ctrl_cmd *header)
+ 	ret = ublk_add_chdev(ub);
+ 	goto out_unlock;
+ 
+-out_free_tag_set:
+-	blk_mq_free_tag_set(&ub->tag_set);
+ out_deinit_queues:
+ 	ublk_deinit_queues(ub);
++out_free_tag_set:
++	blk_mq_free_tag_set(&ub->tag_set);
+ out_free_dev_number:
+ 	ublk_free_dev_number(ub);
+ out_free_ub:
 -- 
 2.47.0
 
