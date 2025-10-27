@@ -1,233 +1,250 @@
-Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010018.outbound.protection.outlook.com [52.101.56.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E366F2FFFAD;
-	Mon, 27 Oct 2025 12:09:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761566953; cv=fail; b=mqyynSg3nSQLoH8JiUZ9gIbtd8vLDrKB7YVnn85Efc43C0ru4YXqS+lX80ti/GR2uE0ZjLcsDCyQ6hFpuvFNNZDQBEceiSCTo78bKe3c0TKzN1coNl3EE5Sh3c/i3CssPOY/zn9FmqTPSLrFtWQoY8DCHzrhXl9HpitafLcG50I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761566953; c=relaxed/simple;
-	bh=bFquOLf8GYUslWvPEpWqml8DeAlupK70fez7xhP/8ZA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=u7HEbvmoQm5/5iBOQtUOu2Ebu+cVIhcH3AFOqN7LD3MbuzjILW+pacmBBNF5gQ8XgmKS805K2jgEXINjKqAjVSfcns793ngwCWC7f6skbmblRN4/2dqouZoxBE5pyFBw02VU788Qr8S0Uy8BfOW2zK4DlslAu0vaEQ9NeRN/yO8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=cvnz+lbs; arc=fail smtp.client-ip=52.101.56.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A12132FD7DE
+	for <linux-block@vger.kernel.org>; Mon, 27 Oct 2025 12:12:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761567136; cv=none; b=INk2vlj0HGuYwj2ZzsU9U5qp3V8AMTapW3c3CT6AJTAwTkEm5iuWKwGayp3sw8G8XwrEqV33WVZnddQdbmr87Ib51SGVJ22JaVt41gt2A7jzUMh6o4/7AqcwCmB59eqtRk0saYxBfk1H8RzA0hyZvM/wU4Rd2QTDFsj4XGlGSU8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761567136; c=relaxed/simple;
+	bh=Abr5mbwnWBxHCsJT0JX28zRVj7tmgWW1C8etKDryohM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=vAPQsh4xHG7A+yvm6dW79WlJp4Pg0+CW2JAA4pkDnU2nV1JWILyAAD0nsVdQSJ4K7u+v3HBs7GJ+af6fULqB3yDdqx7mDZ40BAR8jVw0i07UL61YKfzClCv+VWE4HIWDVH7Ed8pxFYQ5kg0Ofeg+vX50uiIPIE+UBSy51K+d2ZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UpUAvZe6; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="cvnz+lbs"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=i7ymwHihQj5LHyYcPmA4oOgAVWqMw6bz3XdLAt9uDhbhY6bk+rB1EOZsKryCpKE09x97Bi/TrT8iOOJDWDXk73Et01gJiukRL2lYjj2yqd+Ek1QruBgc7eEz5C4kFq/hMTxM7B4ffllMEGF9yqO4KTlS7tmEsrcYimeABSgyf+9fTfww6iLPaU570E6UyXkWwCS0gUnKoJBOrxcRZYiUSYQau3sVxL1WpFA7S8+EqMqFiA3HbCr8+fiM5zAPetZfAOjFEc8SpN2uzZ54nQtgSVJwZjg8jTtwYF1i5YxqYXB9vqeNwDNYWGc6p/H3slJH1feu79Tnl0NFYkeVdrPckg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cBs/l5l606+H1bSQpmh8tseVZlkb7Cav1y6/HQF2BKM=;
- b=uezvAB1AfN46RMh4wMFJBC2QdyvN/D8H0aCIhH6zYXsjYuzzwFLBEZFjcYSEOMFH3CIieN0CMyPGeH1MoJSlkNhbe0mHq0YvPAA81wSi7hkSKiqp4cxzGj97HAxHR3u96RKKGcGCQXSVJH+dgK0wo5AEIwTXw1L7CDIxbTcEe1qDdlUA4rHU9v33JSgucd1qadJb1IqYWX2GgosLlpRK+ryOagrAASYx2AhvDGe+/81uySjy++uot26jspZtEmj4kCIV6ctcawa44xStLVFFyZEdOI/GtJv2tj//J6jKq3zEWn2Gh8W3hSJZWS1DlaHzDHXnnk6K4Vk+TK13Fx5sPw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cBs/l5l606+H1bSQpmh8tseVZlkb7Cav1y6/HQF2BKM=;
- b=cvnz+lbsVOHCym2szh81rvEO2IVGoKvvZyTitl/Q8hso9/d2ewZkLuLE/kS4qI4Q69Uwk9hm6jurLGFgViF0ZE0Qd0jYqUalHUWi7PB2r9typt4G96xBgIVtgu7gb4cUQmQShEqs7tWef55znkwXyqDCQ9kmszMeVB5NLupl/zebY3YEoaTxpaLQgbrUOtqdXVvpYaGYAzlvN0sOq55M3aVLCiRnubfgF1OslRt7afgW84y4PkbkkMT9/plJ0zbIS95+vA/y8Dkx7anXp9ekVjjXk39W67CP+EoWQTNNOMnI8gCrYFsoXyxsWhOPkTqxmLScfnQRMClWWyXEYPvk/A==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB3613.namprd12.prod.outlook.com (2603:10b6:208:c1::17)
- by SA1PR12MB6872.namprd12.prod.outlook.com (2603:10b6:806:24c::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9253.18; Mon, 27 Oct
- 2025 12:09:06 +0000
-Received: from MN2PR12MB3613.namprd12.prod.outlook.com
- ([fe80::1b3b:64f5:9211:608b]) by MN2PR12MB3613.namprd12.prod.outlook.com
- ([fe80::1b3b:64f5:9211:608b%4]) with mapi id 15.20.9253.017; Mon, 27 Oct 2025
- 12:09:06 +0000
-Date: Mon, 27 Oct 2025 09:09:04 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Shuai Xue <xueshuai@linux.alibaba.com>
-Cc: Leon Romanovsky <leon@kernel.org>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
-	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
-	kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-mm@kvack.org,
-	linux-pci@vger.kernel.org, Logan Gunthorpe <logang@deltatee.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v5 9/9] vfio/pci: Add dma-buf export support for MMIO
- regions
-Message-ID: <20251027120904.GA896317@nvidia.com>
-References: <cover.1760368250.git.leon@kernel.org>
- <72ecaa13864ca346797e342d23a7929562788148.1760368250.git.leon@kernel.org>
- <20251022125012.GB244727@nvidia.com>
- <3db524e7-b6ce-4652-8420-fdb4639ac73a@linux.alibaba.com>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <3db524e7-b6ce-4652-8420-fdb4639ac73a@linux.alibaba.com>
-X-ClientProxiedBy: MN2PR16CA0050.namprd16.prod.outlook.com
- (2603:10b6:208:234::19) To MN2PR12MB3613.namprd12.prod.outlook.com
- (2603:10b6:208:c1::17)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UpUAvZe6"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1761567133;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=l8QmYcf2qcgHxyLSSNmPzf2VO7g9R1+3AwVMwAbR4/s=;
+	b=UpUAvZe6uK10LI1iZhcTmote/rKR2VL6JEkVbxbinI6FGXxHGltMQApTkyPRs0CsRi9E41
+	gLjUCrll3wBI2YHUYbdIi58f4OPHO91AgYH+4XO3HpHkP52/3V1L1EtLpRhSRi1WgqGXP6
+	/FFHe3mb2Z7P3MNwcBIlJIBg4dz6CA8=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-483-gTH_jFoHP2-lTU4NonmGOw-1; Mon,
+ 27 Oct 2025 08:12:09 -0400
+X-MC-Unique: gTH_jFoHP2-lTU4NonmGOw-1
+X-Mimecast-MFC-AGG-ID: gTH_jFoHP2-lTU4NonmGOw_1761567127
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 420A81956095;
+	Mon, 27 Oct 2025 12:12:07 +0000 (UTC)
+Received: from bfoster (unknown [10.22.88.105])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AE0241955F1B;
+	Mon, 27 Oct 2025 12:12:03 +0000 (UTC)
+Date: Mon, 27 Oct 2025 08:16:22 -0400
+From: Brian Foster <bfoster@redhat.com>
+To: Joanne Koong <joannelkoong@gmail.com>
+Cc: brauner@kernel.org, miklos@szeredi.hu, djwong@kernel.org,
+	hch@infradead.org, hsiangkao@linux.alibaba.com,
+	linux-block@vger.kernel.org, gfs2@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org, kernel-team@meta.com,
+	linux-xfs@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH v5 07/14] iomap: track pending read bytes more optimally
+Message-ID: <aP9illNXOVJ8SF6m@bfoster>
+References: <20250926002609.1302233-1-joannelkoong@gmail.com>
+ <20250926002609.1302233-8-joannelkoong@gmail.com>
+ <aPqDPjnIaR3EF5Lt@bfoster>
+ <CAJnrk1aNrARYRS+_b0v8yckR5bO4vyJkGKZHB2788vLKOY7xPw@mail.gmail.com>
+ <CAJnrk1b3bHYhbW9q0r4A0NjnMNEbtCFExosAL_rUoBupr1mO3Q@mail.gmail.com>
+ <aPuz4Uop66-jRpN-@bfoster>
+ <CAJnrk1bqjykKtpAdsHLPuuvHTzOHW0tExRZ8KKmKYyfDpuAsTQ@mail.gmail.com>
+ <CAJnrk1ZOcnOT77c2fCiqzV=ZiiNnxOcB7wXn4=V+VFijS+-2Rw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN2PR12MB3613:EE_|SA1PR12MB6872:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1887583c-8be2-4b71-b55b-08de1551a02c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?cnFyU21zdDFCMmcrOFlaejlnM1RuaElhWVpDOXcveW1ER0VCU1drMVBEc0hO?=
- =?utf-8?B?ZmNZeWM1N0VpWjF4ZmR1NzM3dHFDWnNYNUl4emRzTDFtcUhtYjlaWEJILzRo?=
- =?utf-8?B?Rk1nOWk2S1JYT09XRWphL2pVL2lGRi9pL1dYeU1uODhnTVJ1Qi8yT1BaZEhr?=
- =?utf-8?B?ZzNLWHg4ekdmRnFiY2c4UkFtcnRuV20yQnl6SkVnekJmamlxU0xQZjl6T2Jv?=
- =?utf-8?B?akF2UklYbHdoN01BcnIyNk9VUFk0R1pJSTFwbVNqdFZFcUpJR2FPZ0ZnM0lV?=
- =?utf-8?B?UEZBaXdNbXN5VmhkMk9QTXRaaERUeVhBQWx2UjdOVSthZnBITksyaU03ZFY2?=
- =?utf-8?B?bWw4Q1NwRFV1WXY0ZzlMbnA3ODBPamk3NVNZZUN5TlNJVnR0WWlIZlJtM1hW?=
- =?utf-8?B?OFp6dHZQOVNkbDJibFdjWk43Z3Y3L0hyMitUWW1FUkNHdElLZ2JoQjd1QTVo?=
- =?utf-8?B?cFlNb2w3MkxqdERaaUFiRXU4TWowWlljR0lLblMraEFuelpmZlFHa04yd2Vk?=
- =?utf-8?B?VUxHK2puUml4bTg1eWtXMi8xbG92anp4LytkdVQ0Tk0zS3VpbU9vZEdheGlp?=
- =?utf-8?B?TzRmYmRlYko3TXJFMGUxbDF6Q1h2c2pPNzNjcm5SK3Jpb1RaK2NsckpIS2Rx?=
- =?utf-8?B?K0hDWGI5WHpka0lDQmtnaEpvZGpUL3FiU1RGeHhsYjlISFc0eFcxNkR0bUN3?=
- =?utf-8?B?SVFnUjFhQWZQV2p4MUV4K29JdUhSR2x4MEFIY0R3VFo0RTdSMEJPeUhSNDZt?=
- =?utf-8?B?U1p5SWVJaG03NExvZEU3YWZHeGlFK21YLyswdkRZVU9ZTmhMVk15cURUZk56?=
- =?utf-8?B?WjF4R0ZJZjBWWllNTXhWd0NRSEN2SUIxeWxlUjcwWmFIU2o1bzIwbmZRb1FK?=
- =?utf-8?B?Q3d1Um1lYllBTHE3U3hhWUViL3c1c0hMVTNyNXp2UWJtbUpCdFpXNjVZYVFN?=
- =?utf-8?B?aEdTQ3BuRHIrd3FzVWNaenhTdHlOSnhEWmVhdU5MMGVhUEI1ZlhSM2l4Z3FO?=
- =?utf-8?B?eklqZnZnaVM2cWxIQllnZFZ5MEpXTmlDZEMxK1VRYUcwaU56VGhtbURBTjhE?=
- =?utf-8?B?TTIrVGhNaUhCRVB1TVlqRTQvZE1tekllWjNnRXkrbG54Vm1ZN29iL3JYY293?=
- =?utf-8?B?K0pZbWN2UzhuYkhXUUF2SVVLTTN2cG1tcUo0ZkVUSm5Qc1A1Yk5Kak5Ed3hV?=
- =?utf-8?B?c0RvdTFZOG1DRldGcVEycXlianU2ci9GTnZUQ2NlalQya2p5bXNTQjNMUndk?=
- =?utf-8?B?S3JSVHFJenlRdDhmVGRCd3VVVFJDMzU3aDdvOEQ1bU9KY2sxaE5rQk9MZFRS?=
- =?utf-8?B?Rlhab1FiTjdwWXpMcXhqYzhpb0lzUGtRS096R2tyazZwVDVGVGxrZUVRazNv?=
- =?utf-8?B?Q3Y5VVNWQVBLcGFVOGovZE5mR2Q5MkpDSDZlUmptc2p0MXN4THIwT3JkNlNP?=
- =?utf-8?B?amhNeEUyak1jR0ZrSURXNDhEaWU5TXVFM2pKaHpwOCtWK1B6MkhvRW01OEU2?=
- =?utf-8?B?eDlyWnJFMXBFZWh1MjhiSCs1dHFoZTZQeFVmeWd3N29ZVE9IY0FlTk45d3p3?=
- =?utf-8?B?Vm4wUmZiMnVhelBxY1RXdTR3VTluWmIwWkl3d0hJQVFUZld2eGpPaWVuNjhN?=
- =?utf-8?B?a2VyUHJyYXR1Tnp1ZW10cGY3RmFIQUZPU1JKSHpCaUZlVUwyR2RjRzdoZGNx?=
- =?utf-8?B?anE2bnQvV2UvcjE2dU1veEVmOE1CdnlENFR0Smg1MHMwb0pMa1E3QmJ3RmFl?=
- =?utf-8?B?QVBnbnVua2VVeWoyQkNxd25GcWRGbFFxbVNtTHd5Vnd5ZmVZWjFxUEJ0akk0?=
- =?utf-8?B?OWFJcEdGc0w3cWhsTDRIckVLUy9EaUQ1ODZwbC9jZ3hTVVhPc0R0QjVZMW0z?=
- =?utf-8?B?M1ZzL2RyRGFIVlpwT1V5cjAzaFdGcTFaYUVmdlZQYXp6Szd3YU05K1plUmh3?=
- =?utf-8?Q?rmpXPkGIkb86/8DQQyJxuSSbGJOoSkXH?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB3613.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?RXRNM3VjVGpMRTVGUFl6QU9ENzlORFllVWlmK2ZHVWhFM3pGUEJtM25OVTNU?=
- =?utf-8?B?RkMvdFZ2WExkQ2RkY2k1STVyYktsL1haMzZJYjJiWDc2Rzd6YzBIQlR5UXdB?=
- =?utf-8?B?ZmFZVzMwbklOd0ltY1RrN3VQRUJNREtiS01ZazlyNjAzaDhNNDZmK0w5bm83?=
- =?utf-8?B?MmowckJ6VTJ5VEl4a3l6OWQ1Y1hzVUFJUUgxRGI2amZoSDVobzAwQmUxcGc4?=
- =?utf-8?B?SEwrUXRsTUZmRlhSOFcya0hZdFZNdkNFVkw1VlFwcE00VXhPOE42ZTI1YnBj?=
- =?utf-8?B?L0xweXhiQXNJQXNTeFc1QlJvZnB6OHo4RmRlNnl1ZzJWNFdVWU1WTDRER0xj?=
- =?utf-8?B?aHg5b1gxL0VOQlRKNnpidnVwbWtrS1Q5bEZsUjRQK01rYkpJN1RiZjAvNFVq?=
- =?utf-8?B?R3hrVFhJUjlxR2V1cGZPWk5iN2NrY0FEcFdrZE9QOWpxcXVaU0E4cTJueUx1?=
- =?utf-8?B?K1BSRmlYa3RtcjBoMDFzSnpnTUZhbDFtdEszVzdQMUhSM0pvQVM0bStjYmFr?=
- =?utf-8?B?cFYyNVk4eXBpWFlpZFRyT0pMMzBqOW0zSjVVMzUyMS9iZUdGd3hCT0c0bEZs?=
- =?utf-8?B?L3ZFeWNTV1V6UEZ1emJta0hWM2pBRDJNUlh3T1VnaGcvTTZIcFkvK0V3MzRz?=
- =?utf-8?B?eFN4ZXdZejZJZVIvZUJKeko5V2t6WlhsT3FDTkcwOXJ3aU1uakc1NkVTNTdy?=
- =?utf-8?B?eitaTGIvYVlHVnFKc2pWdjlQNGIveTVieGMvZ2l2TnYrbkVhcGdZRVBWU0o0?=
- =?utf-8?B?Z2RVQmhFd0JaY1VSbnc1dmNhaTVZTEFNcU5VdWpFRG54dmFkTllIc21oRldO?=
- =?utf-8?B?akx3ekEzcW1EZ1hwcmpUNHBzMGNMVVNhd2FqVHVzVWdiZUdDS0QvTDk1QjdQ?=
- =?utf-8?B?WmtHWk9kcm0wN2VtUTA0VTNaL2Y0a1ZHeUZHL0FVUmNLRWhTYlpUZGZZOWk2?=
- =?utf-8?B?MDlrd1ZuNTQyS0VGYThhUEYvOGtkR1hYQkk5Q0liUHYxbDZYckw4LzQvVk1W?=
- =?utf-8?B?RXZrK3FQR3J2SEZ0WHF6Zkx1eWtwekZaQzRkTUtmZGdadlBTdWJzRlpEQ29j?=
- =?utf-8?B?bDQ2dnQ5eENBNGl4am15cExGeERqSi91ZVUzWnFLbUh3cXlWYVBNVDczN21B?=
- =?utf-8?B?ZkxCSTFZODh2eDJ3VUE5Q2FhdWdUdzVDNVpqVERFQTYxZVA4RWs1MkErYzJQ?=
- =?utf-8?B?Mm90VERhN1JiekNqMmFQRy9sdHYxcE1lTHpuR0U0dkVMY29LSkVzdEljdkc2?=
- =?utf-8?B?VjFrK2tWcE9saFVMbDdJUS80VTAxN2VBUWt2K0lRaW52WGFKejBELzdRazFR?=
- =?utf-8?B?bm5TUHN4Q0R0WFQzTnBXaDFVaCtnSFdWY1RidFpMQ1ZwQTFGcmlhWE1QUU15?=
- =?utf-8?B?R01zT3VWeU94K2lVcGhSYmtPdW1nd0lOYjNsQzlTVENLbmJVN1IyVXQ4MElP?=
- =?utf-8?B?ckxNWTdUTE9FYlNxZ1VyQW0yZkpXMVZmMTNjcGU0MUNCS0t3NStkOCtzL3Qw?=
- =?utf-8?B?cVlDMkRhN2JBeVlmNFVzZU9NRWEraEhSak5GYTloS1VaY0wyZTJjM3pNWFJo?=
- =?utf-8?B?UmkvOVU0TUZzU0RVWTNKNDIxZk9YaGk1Q2s4UXUzQ1ZkRzJ3Tlpid2N4aC81?=
- =?utf-8?B?bk9oSFFHaVZ3dnFoUU5QcE5aTEtTbVp0Ni9iTGVDMFF3eEJITEV4TlhDRDB2?=
- =?utf-8?B?ZUdITS9JVU5wZ0NabmZsR1F1RGd2OE1Yem5xYVFzSExEblNiNTRMeVRGV0pN?=
- =?utf-8?B?RUZUNGM0SHZiRUE0aXdzNm5wbENzNGpmMVA0MThxWW96K25kUitNOUROa0JY?=
- =?utf-8?B?YkRDbEVqZjcvREZUWUlnZjZwRG82UGZaTlpMV2V5MUZmeVpsZVJzNVdqTlBM?=
- =?utf-8?B?S0NHaXFrL0dVblZPRldtMm5OODQxL3lkNVRkaDZhaklaS3NydVcvY1J3b01n?=
- =?utf-8?B?MHp3WURUZ2tPNFlBSENhUGQzTE4rMi9oNkQ2TU16WC9pTy8xVlFFYVZwVVk3?=
- =?utf-8?B?Z0laaGRpbGFuVm5kbFpxWjdDa1BNOE1Sb3dDOEdTeENzUlRvcXF1Zk9KYlJR?=
- =?utf-8?B?clg4THJkWEFrUU5ZV0xrQVVYaTkzd0NvaFJ6SW5aTDJzV016S2t0KzlJeTdO?=
- =?utf-8?Q?jmNs=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1887583c-8be2-4b71-b55b-08de1551a02c
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB3613.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Oct 2025 12:09:06.2764
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /jioCEvMD+vbYQxtsp3YSORIFv1o0aoA0FuNIuLXqKFHc2H0MoqEd0ROqePK9guQ
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6872
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJnrk1ZOcnOT77c2fCiqzV=ZiiNnxOcB7wXn4=V+VFijS+-2Rw@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Sun, Oct 26, 2025 at 03:55:04PM +0800, Shuai Xue wrote:
+On Fri, Oct 24, 2025 at 02:55:20PM -0700, Joanne Koong wrote:
+> On Fri, Oct 24, 2025 at 12:48 PM Joanne Koong <joannelkoong@gmail.com> wrote:
+> >
+> > On Fri, Oct 24, 2025 at 10:10 AM Brian Foster <bfoster@redhat.com> wrote:
+> > >
+> > > On Fri, Oct 24, 2025 at 09:25:13AM -0700, Joanne Koong wrote:
+> > > > On Thu, Oct 23, 2025 at 5:01 PM Joanne Koong <joannelkoong@gmail.com> wrote:
+> > > > >
+> > > > > On Thu, Oct 23, 2025 at 12:30 PM Brian Foster <bfoster@redhat.com> wrote:
+> > > > > >
+> > > > > > On Thu, Sep 25, 2025 at 05:26:02PM -0700, Joanne Koong wrote:
+> > > > > > > Instead of incrementing read_bytes_pending for every folio range read in
+> > > > > > > (which requires acquiring the spinlock to do so), set read_bytes_pending
+> > > > > > > to the folio size when the first range is asynchronously read in, keep
+> > > > > > > track of how many bytes total are asynchronously read in, and adjust
+> > > > > > > read_bytes_pending accordingly after issuing requests to read in all the
+> > > > > > > necessary ranges.
+> > > > > > >
+> > > > > > > iomap_read_folio_ctx->cur_folio_in_bio can be removed since a non-zero
+> > > > > > > value for pending bytes necessarily indicates the folio is in the bio.
+> > > > > > >
+> > > > > > > Signed-off-by: Joanne Koong <joannelkoong@gmail.com>
+> > > > > > > Suggested-by: "Darrick J. Wong" <djwong@kernel.org>
+> > > > > > > ---
+> > > > > >
+> > > > > > Hi Joanne,
+> > > > > >
+> > > > > > I was throwing some extra testing at the vfs-6.19.iomap branch since the
+> > > > > > little merge conflict thing with iomap_iter_advance(). I end up hitting
+> > > > > > what appears to be a lockup on XFS with 1k FSB (-bsize=1k) running
+> > > > > > generic/051. It reproduces fairly reliably within a few iterations or so
+> > > > > > and seems to always stall during a read for a dedupe operation:
+> > > > > >
+> > > > > > task:fsstress        state:D stack:0     pid:12094 tgid:12094 ppid:12091  task_flags:0x400140 flags:0x00080003
+> > > > > > Call Trace:
+> > > > > >  <TASK>
+> > > > > >  __schedule+0x2fc/0x7a0
+> > > > > >  schedule+0x27/0x80
+> > > > > >  io_schedule+0x46/0x70
+> > > > > >  folio_wait_bit_common+0x12b/0x310
+> > > > > >  ? __pfx_wake_page_function+0x10/0x10
+> > > > > >  ? __pfx_xfs_vm_read_folio+0x10/0x10 [xfs]
+> > > > > >  filemap_read_folio+0x85/0xd0
+> > > > > >  ? __pfx_xfs_vm_read_folio+0x10/0x10 [xfs]
+> > > > > >  do_read_cache_folio+0x7c/0x1b0
+> > > > > >  vfs_dedupe_file_range_compare.constprop.0+0xaf/0x2d0
+> > > > > >  __generic_remap_file_range_prep+0x276/0x2a0
+> > > > > >  generic_remap_file_range_prep+0x10/0x20
+> > > > > >  xfs_reflink_remap_prep+0x22c/0x300 [xfs]
+> > > > > >  xfs_file_remap_range+0x84/0x360 [xfs]
+> > > > > >  vfs_dedupe_file_range_one+0x1b2/0x1d0
+> > > > > >  ? remap_verify_area+0x46/0x140
+> > > > > >  vfs_dedupe_file_range+0x162/0x220
+> > > > > >  do_vfs_ioctl+0x4d1/0x940
+> > > > > >  __x64_sys_ioctl+0x75/0xe0
+> > > > > >  do_syscall_64+0x84/0x800
+> > > > > >  ? do_syscall_64+0xbb/0x800
+> > > > > >  ? avc_has_perm_noaudit+0x6b/0xf0
+> > > > > >  ? _copy_to_user+0x31/0x40
+> > > > > >  ? cp_new_stat+0x130/0x170
+> > > > > >  ? __do_sys_newfstat+0x44/0x70
+> > > > > >  ? do_syscall_64+0xbb/0x800
+> > > > > >  ? do_syscall_64+0xbb/0x800
+> > > > > >  ? clear_bhb_loop+0x30/0x80
+> > > > > >  ? clear_bhb_loop+0x30/0x80
+> > > > > >  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> > > > > > RIP: 0033:0x7fe6bbd9a14d
+> > > > > > RSP: 002b:00007ffde72cd4e0 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+> > > > > > RAX: ffffffffffffffda RBX: 0000000000000068 RCX: 00007fe6bbd9a14d
+> > > > > > RDX: 000000000a1394b0 RSI: 00000000c0189436 RDI: 0000000000000004
+> > > > > > RBP: 00007ffde72cd530 R08: 0000000000001000 R09: 000000000a11a3fc
+> > > > > > R10: 000000000001d6c0 R11: 0000000000000246 R12: 000000000a12cfb0
+> > > > > > R13: 000000000a12ba10 R14: 000000000a14e610 R15: 0000000000019000
+> > > > > >  </TASK>
+> > > > > >
+> > > > > > It wasn't immediately clear to me what the issue was so I bisected and
+> > > > > > it landed on this patch. It kind of looks like we're failing to unlock a
+> > > > > > folio at some point and then tripping over it later..? I can kill the
+> > > > > > fsstress process but then the umount ultimately gets stuck tossing
+> > > > > > pagecache [1], so the mount still ends up stuck indefinitely. Anyways,
+> > > > > > I'll poke at it some more but I figure you might be able to make sense
+> > > > > > of this faster than I can.
+> > > > > >
+> > > > > > Brian
+> > > > >
+> > > > > Hi Brian,
+> > > > >
+> > > > > Thanks for your report and the repro instructions. I will look into
+> > > > > this and report back what I find.
+> > > >
+> > > > This is the fix:
+> > > >
+> > > > diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
+> > > > index 4e6258fdb915..aa46fec8362d 100644
+> > > > --- a/fs/iomap/buffered-io.c
+> > > > +++ b/fs/iomap/buffered-io.c
+> > > > @@ -445,6 +445,9 @@ static void iomap_read_end(struct folio *folio,
+> > > > size_t bytes_pending)
+> > > >                 bool end_read, uptodate;
+> > > >                 size_t bytes_accounted = folio_size(folio) - bytes_pending;
+> > > >
+> > > > +               if (!bytes_accounted)
+> > > > +                       return;
+> > > > +
+> > > >                 spin_lock_irq(&ifs->state_lock);
+> > > >
+> > > >
+> > > > What I missed was that if all the bytes in the folio are non-uptodate
+> > > > and need to read in by the filesystem, then there's a bug where the
+> > > > read will be ended on the folio twice (in iomap_read_end() and when
+> > > > the filesystem calls iomap_finish_folio_write(), when only the
+> > > > filesystem should end the read), which does 2 folio unlocks which ends
+> > > > up locking the folio. Looking at the writeback patch that does a
+> > > > similar optimization [1], I miss the same thing there.
+> > > >
+> > >
+> > > Makes sense.. though a short comment wouldn't hurt in there. ;) I found
+> > > myself a little confused by the accounted vs. pending naming when
+> > > reading through that code. If I follow correctly, the intent is to refer
+> > > to the additional bytes accounted to read_bytes_pending via the init
+> > > (where it just accounts the whole folio up front) and pending refers to
+> > > submitted I/O.
+> > >
+> > > Presumably that extra accounting doubly serves as the typical "don't
+> > > complete the op before the submitter is done processing" extra
+> > > reference, except in this full submit case of course. If so, that's
+> > > subtle enough in my mind that a sentence or two on it wouldn't hurt..
+> >
+> > I will add some a comment about this :) That's a good point about the
+> > naming, maybe "bytes_submitted" and "bytes_unsubmitted" is a lot less
+> > confusing than "bytes_pending" and "bytes_accounted".
 > 
+> Thinking about this some more, bytes_unsubmitted sounds even more
+> confusing, so maybe bytes_nonsubmitted or bytes_not_submitted. I'll
+> think about this some more but kept it as pending/accounted for now.
 > 
-> 在 2025/10/22 20:50, Jason Gunthorpe 写道:
-> > On Mon, Oct 13, 2025 at 06:26:11PM +0300, Leon Romanovsky wrote:
-> > > From: Leon Romanovsky <leonro@nvidia.com>
-> > > 
-> > > Add support for exporting PCI device MMIO regions through dma-buf,
-> > > enabling safe sharing of non-struct page memory with controlled
-> > > lifetime management. This allows RDMA and other subsystems to import
-> > > dma-buf FDs and build them into memory regions for PCI P2P operations.
-> > > 
-> > > The implementation provides a revocable attachment mechanism using
-> > > dma-buf move operations. MMIO regions are normally pinned as BARs
-> > > don't change physical addresses, but access is revoked when the VFIO
-> > > device is closed or a PCI reset is issued. This ensures kernel
-> > > self-defense against potentially hostile userspace.
-> > 
-> > Let's enhance this:
-> > 
-> > Currently VFIO can take MMIO regions from the device's BAR and map
-> > them into a PFNMAP VMA with special PTEs. This mapping type ensures
-> > the memory cannot be used with things like pin_user_pages(), hmm, and
-> > so on. In practice only the user process CPU and KVM can safely make
-> > use of these VMA. When VFIO shuts down these VMAs are cleaned by
-> > unmap_mapping_range() to prevent any UAF of the MMIO beyond driver
-> > unbind.
-> > 
-> > However, VFIO type 1 has an insecure behavior where it uses
-> > follow_pfnmap_*() to fish a MMIO PFN out of a VMA and program it back
-> > into the IOMMU. This has a long history of enabling P2P DMA inside
-> > VMs, but has serious lifetime problems by allowing a UAF of the MMIO
-> > after the VFIO driver has been unbound.
-> 
-> Hi, Jason,
-> 
-> Can you elaborate on this more?
-> 
-> From my understanding of the VFIO type 1 implementation:
-> 
-> - When a device is opened through VFIO type 1, it increments the
->   device->refcount
-> - During unbind, the driver waits for this refcount to drop to zero via
->   wait_for_completion(&device->comp)
-> - This should prevent the unbind() from completing while the device is
->   still in use
-> 
-> Given this refcount mechanism, I do not figure out how the UAF can
-> occur.
 
-A second vfio device can be opened and then use follow_pfnmap_*() to
-read the first vfio device's PTEs. There is no relationship betweent
-the first and second VFIO devices, so once the first is unbound it
-sails through the device->comp while the second device retains the PFN
-in its type1 iommu_domain.
+bytes_submitted sounds better than pending to me, not sure about
+unsubmitted or whatever. As long as there's a sentence or two that
+explains what accounted means in the end helper, though, that seems
+reasonable enough to me.
 
-Jason
+Brian
+
+> The fix for this bug is here [1].
+> 
+> Thanks,
+> Joanne
+> 
+> [1] https://lore.kernel.org/linux-fsdevel/20251024215008.3844068-1-joannelkoong@gmail.com/
+> 
+> >
+> > Thanks,
+> > Joanne
+> >
+> > >
+> > > > I'll fix up both. Thanks for catching this and bisecting it down to
+> > > > this patch. Sorry for the trouble.
+> > > >
+> > >
+> > > No prob. Thanks for the fix!
+> > >
+> > > Brian
+> > >
+> > > > Thanks,
+> > > > Joanne
+> > > >
+> > > > [1] https://lore.kernel.org/linux-fsdevel/20251009225611.3744728-4-joannelkoong@gmail.com/
+> > > > >
+> > > > > Thanks,
+> > > > > Joanne
+> > > > > >
+> > > >
+> > >
+> 
+
