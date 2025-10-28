@@ -1,108 +1,122 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFA80328617;
-	Tue, 28 Oct 2025 12:02:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B8E433031E;
+	Tue, 28 Oct 2025 13:06:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761652934; cv=none; b=tFlJd6m5qCI/+fVZ5nVK+91PnCj9ALCDNHW6jbOiBqyJI143p3x1ry2QzizxiFPFpmqVIEudp4AqavLaA3WhTD4VkbthhPdklyZ5EnnZPIdBJjwQvQ6HSxs3XzQ7PJPafNLMWVT53npdfBS1QQxggj2xGZqhIzmpv9vzzMXbHNk=
+	t=1761656807; cv=none; b=Kvj2U1ZkSYLiTIBeD86g0obFOIzNnKE3V+HAtzoqT7aLWbrW7QgKXFK9fTJKzkU2KiFZYPl6YlFMheXS8EpO5xXR3xueI6ieWwt8Q7D6Sau8kCZd2ic7clNsoJXsDrbC9N/bg9sgmnQGRU45OGdvTJNWvVME3gtasrkoGUgsr8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761652934; c=relaxed/simple;
-	bh=mZf/YKmsAob1fECJczEmiCct9PI3ELB+8/2Zjo1x01o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DyShAmpB1sV1LVad2AisW335Gq33qdq7SEzXH5pLBPojMUQhZ75sk6z8gq0FAOSpBj9U6QfP6tKFR4cdGXq2J5E6ZKu53sxtjCphaYERhSG7Se5vYx9JTxTIEb/9LCTMNzifmvEMCd/4juNeiKG3C4Iuym8si4bIHZrE//oWKKY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SwZX30kq; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1761656807; c=relaxed/simple;
+	bh=7vB9WSLdaId0S4kzNtTPDpMUfT1DBxQg+ULFJ8/2J1A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IoR093AUyi91/vSl1ysRDtiuZso6TLy6I0s3W7pi9g2eaOBCN1PVJ8nS6NL6ndx6F7TnHKybPN1jba/YOem7T2sdNba2tq6DBVMeqG/osEHN1z4jQH6cvfAdUD+FpLBThMAsAStDc/k/pzwC6V4e7R5FqgF43CPJDvqUqeUJtAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=WGi+3WJ9; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SwZX30kq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9F27C4CEE7;
-	Tue, 28 Oct 2025 12:02:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761652933;
-	bh=mZf/YKmsAob1fECJczEmiCct9PI3ELB+8/2Zjo1x01o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SwZX30kqTRxKywW3JAgQpZq9YEFkCs4mbYnsls8E10OCO8sCik7skaC6kTTCKlfog
-	 IAGPeflZVG4EU9joGw/E4TiGl7RA8FEFNbJr5eZDvYRVR5AqDOAKiVBJ3RW9NglqMt
-	 YrKtMpdU8ZM7ej9CU2ASIMTiUtmkgbi/4YlElhPAm8ukENsd2Q5yb9qGC57bQdTv87
-	 kSyfTWb41F+rhshf2CL1q0957AOwBmoHWs/npuXlrXKWFgxS/IeSKCP1J/gK/MKvkJ
-	 lcPBPR7SnFgSuuCKpUntaxB+uWX3d7haPhR2st8URjXBigR+NbHjYiQJL0WRxmtmiQ
-	 /cOOFozsC/eiA==
-Date: Tue, 28 Oct 2025 14:02:07 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: David Matlack <dmatlack@google.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
-	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
-	kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-mm@kvack.org,
-	linux-pci@vger.kernel.org, Logan Gunthorpe <logang@deltatee.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v5 9/9] vfio/pci: Add dma-buf export support for MMIO
- regions
-Message-ID: <20251028120207.GQ12554@unreal>
-References: <cover.1760368250.git.leon@kernel.org>
- <72ecaa13864ca346797e342d23a7929562788148.1760368250.git.leon@kernel.org>
- <CALzav=cj_g8ndvbWdm=dukW+37cDh04k1n7ssFrDG+dN3D+cbw@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="WGi+3WJ9"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59S47CRS014181;
+	Tue, 28 Oct 2025 13:06:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=96JQNh
+	KOUBLMAp+sGP4AUbbzpGWvaanYUgX6geyOwcY=; b=WGi+3WJ9h3oOk6GmUladXN
+	wT3MctSZDpOkSGAtOupKO2qPxu7wt7zEKo4uyneSdiCiKUsbeYPVqbsoFLCXm0FI
+	h0KUaH2JReq0xqZlTLlM/kBxXK5GHydUMrcDrQu4LIGaAYZwyi9C1st0GNuH8zYc
+	3mQ6J5SYurC/6hh2zbhhNNG/heUr8hh1QPTQx7gVF8B7bQcP+DvoZSZghf0ZR0H7
+	IyQ+ZgZVfITXsAog94+YdmDosfXw7MEXA9VhwJRKCwC1OEf1rSaAvuCBBrwjK9Pi
+	w7fMBPOFxVTFAjpXH0ec6PKI0yS3CxXbBMnmpMFAgkiv07v2hkgko/nHzGoSNJeQ
+	==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4a0p81v24v-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 28 Oct 2025 13:06:28 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59SBcCZe021604;
+	Tue, 28 Oct 2025 13:06:27 GMT
+Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4a18vs2y4t-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 28 Oct 2025 13:06:27 +0000
+Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
+	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 59SD6QIs21758700
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 28 Oct 2025 13:06:27 GMT
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8834358056;
+	Tue, 28 Oct 2025 13:06:26 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CEEBA5805D;
+	Tue, 28 Oct 2025 13:06:21 +0000 (GMT)
+Received: from [9.109.198.245] (unknown [9.109.198.245])
+	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 28 Oct 2025 13:06:21 +0000 (GMT)
+Message-ID: <544b60be-376c-4891-95a4-361b4a207b8a@linux.ibm.com>
+Date: Tue, 28 Oct 2025 18:36:20 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CALzav=cj_g8ndvbWdm=dukW+37cDh04k1n7ssFrDG+dN3D+cbw@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [REPORT] Possible circular locking dependency on 6.18-rc2 in
+ blkg_conf_open_bdev_frozen+0x80/0xa0
+To: Bart Van Assche <bvanassche@acm.org>, David Wei <dw@davidwei.uk>,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org
+Cc: hch@lst.de, hare@suse.de, ming.lei@redhat.com, dlemoal@kernel.org,
+        axboe@kernel.dk, tj@kernel.org, josef@toxicpanda.com, gjoyce@ibm.com,
+        lkp@intel.com, oliver.sang@intel.com
+References: <63c97224-0e9a-4dd8-8706-38c10a1506e9@davidwei.uk>
+ <5b403c7c-67f5-4f42-a463-96aa4a7e6af8@linux.ibm.com>
+ <5c29fa84-3a2c-44be-9842-f0230e7b46dd@acm.org>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <5c29fa84-3a2c-44be-9842-f0230e7b46dd@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=fIQ0HJae c=1 sm=1 tr=0 ts=6900bfd4 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=PGCdswBLe-Oi2NptYxEA:9 a=QEXdDO2ut3YA:10 a=zZCYzV9kfG8A:10
+ a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-ORIG-GUID: 2BwY0Bm3qfLhk62aaeYB__bxQ_OJEtHC
+X-Proofpoint-GUID: 2BwY0Bm3qfLhk62aaeYB__bxQ_OJEtHC
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI1MDAyNCBTYWx0ZWRfXwDiLLcg2bSMH
+ 1glaaqGVuuVKUNkV+BE1FT5PB0yPDM5d32LRdRMFHIMry5p++gYI3NeObdvIxaJZPUNJKBW+tHf
+ CsO3BzoDscLKZ17EDtH9x479Zn+UKxN6VhRMmI2mXda6A5ALpg5Bz1dNdrDPF06c3vaT0XJIdTb
+ qYd45Mo5X/IiUi6ScPP2n2Vhy/llBYHcieGCR+atx79EndKf6aaHuEL2H3+57IlWPgeCdUoOOwo
+ WncBl26n8fa9mHOpBR7XNNioeikBLmjkJ61bpchHicXdb9579XDCGncHo4dssifK3osN2QEgL+8
+ dgsyosQvQYidXb49zP97agmFM57Z28EXLUNu1hlWiazByqNUq20pQk3ffjcb8Ostg6r22CpQxIS
+ osfqvBfyZbxSBFdGPxLNSZjVqul2VQ==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-28_04,2025-10-22_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 priorityscore=1501 adultscore=0 suspectscore=0 spamscore=0
+ clxscore=1015 bulkscore=0 lowpriorityscore=0 phishscore=0 impostorscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2510020000 definitions=main-2510250024
 
-On Mon, Oct 27, 2025 at 04:13:05PM -0700, David Matlack wrote:
-> On Mon, Oct 13, 2025 at 8:44 AM Leon Romanovsky <leon@kernel.org> wrote:
-> >
-> > From: Leon Romanovsky <leonro@nvidia.com>
-> >
-> > Add support for exporting PCI device MMIO regions through dma-buf,
-> > enabling safe sharing of non-struct page memory with controlled
-> > lifetime management. This allows RDMA and other subsystems to import
-> > dma-buf FDs and build them into memory regions for PCI P2P operations.
+
+
+On 10/28/25 2:00 AM, Bart Van Assche wrote:
+> On 10/23/25 9:54 PM, Nilay Shroff wrote:
+>> IMO, we need to make lockdep learn about this differences by assigning separate
+>> lockdep key/class for each queue's q->debugfs_mutex to avoid this false positive.
+>> As this is another report with the same false-positive lockdep splat, I think we
+>> should address this.
+>>
+>> Any other thoughts or suggestions from others on the list?
 > 
-> > +/**
-> > + * Upon VFIO_DEVICE_FEATURE_GET create a dma_buf fd for the
-> > + * regions selected.
-> > + *
-> > + * open_flags are the typical flags passed to open(2), eg O_RDWR, O_CLOEXEC,
-> > + * etc. offset/length specify a slice of the region to create the dmabuf from.
-> > + * nr_ranges is the total number of (P2P DMA) ranges that comprise the dmabuf.
-> > + *
-> > + * Return: The fd number on success, -1 and errno is set on failure.
-> > + */
-> > +#define VFIO_DEVICE_FEATURE_DMA_BUF 11
-> > +
-> > +struct vfio_region_dma_range {
-> > +       __u64 offset;
-> > +       __u64 length;
-> > +};
-> > +
-> > +struct vfio_device_feature_dma_buf {
-> > +       __u32   region_index;
-> > +       __u32   open_flags;
-> > +       __u32   flags;
-> > +       __u32   nr_ranges;
-> > +       struct vfio_region_dma_range dma_ranges[];
-> > +};
+> Please take a look at lockdep_register_key() and
+> lockdep_unregister_key(). I introduced these functions six years ago to
+> suppress false positive lockdep complaints like this one.
 > 
-> This uAPI would be a good candidate for a VFIO selftest. You can test
-> that it returns an error when it's supposed to, and a valid fd when
-> it's supposed to. And once the iommufd importer side is ready, we can
-> extend the test and verify that the fd can be mapped into iommufd.
+Thanks Bart! I'll send out patch with the above proposed fix.
 
-No problem, I'll add such test, but let's focus on making sure that this
-series is accepted first.
-
-Thanks
+Thanks,
+--Nilay
