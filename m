@@ -1,131 +1,104 @@
-Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0E931F4606;
-	Tue, 28 Oct 2025 13:46:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACFCD233149
+	for <linux-block@vger.kernel.org>; Tue, 28 Oct 2025 13:53:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761659222; cv=none; b=kl0vNYLq2wrJ6qf0mlAUa9dBdh1ZNRDYTWjlXBj2HrhPaZInt+sijamOD8QkFxAxEAekrd7sWlegZCPyh/tCirPRFbm3uFLeoAdm9MDhlQ4Xj4PZ2Ko7Lv1/JhoSIz0ATNlabLPWA2sPyc27NUvcj9ugAFeULe/JsyiesuENP6o=
+	t=1761659613; cv=none; b=rtkCucOqOu1RvZ5MH8cwDlgDH9DA13s2uYalYndZUlQ9Ip8q51y+2xjzoMZbbRatb10tbIwAx40QOwU5JLH8qav7E0v3KGZHFxi6t3iVzecQ5JwvvzBDKTJApjtwxpx63ni3cJKsTne+yvam08VV1cERYR8PplMhR38GiFHcfwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761659222; c=relaxed/simple;
-	bh=3Wa50ZqGT8eSNTFPzwHcDHhGPw3XmeC01Xuy33bOsgE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HSDTWOvKslA8vkCQIO0iunDV0jNxi9Jy/alTiHUVHDcZcEuaYdzSEGq0VoCsODdmlNHCuD8QzjR817synYkG+On4hbAyC8wpAFWZzf12j878koTLL98vW/qGmD7/II8eHBVdMWQdloeoOCenhQ9FqNMrL0l59MyyM/47T1F6PwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=a4QvicBh; arc=none smtp.client-ip=115.124.30.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	s=arc-20240116; t=1761659613; c=relaxed/simple;
+	bh=7UwiJZAArm8JmCEJeHhvUn7NllcPI7IXe8Yvs3eKY3A=;
+	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=S+BfMbL6VoFVj880Yh9hzh4Y59D1LWSnTNB44qsxyGk/l2wsCT4WHEUhHCluZ3UcDVY2r0+nqw+f+diT/vxX6upSqaxLEmNZKLkQgfgoChg+s6W/rjtyG85AI53L0CEfUJh/x5ngfF5kTfFrJPH23pNqNb/SIJR7q1CfU3f5EpY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=3RAydxDO; arc=none smtp.client-ip=209.85.166.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="a4QvicBh"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1761659214; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=SdP4P384sbs4h39646JsReKLjr8gZ9zv4XENPQNf9Lk=;
-	b=a4QvicBhKu7BrMaOW0kT0Dwui2BH/axotYbjhhLYIK2f0FBvkiEDY2yEy8ETyM1e0v8cCfuLtZjtug6WX2uf2MiFe/zsUPCh7z65Ya3IwctJcsOVQ/Vzv2uZ+PNN+K5lO3xGanvNfN6P+SppfRgGYeYswq1hgVZOuu47NKZdoxM=
-Received: from 30.246.176.102(mailfrom:xueshuai@linux.alibaba.com fp:SMTPD_---0WrCJu3H_1761659211 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 28 Oct 2025 21:46:52 +0800
-Message-ID: <0d95b8af-97e4-43b6-a35a-aa3ce153f0ee@linux.alibaba.com>
-Date: Tue, 28 Oct 2025 21:46:51 +0800
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="3RAydxDO"
+Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-94359aa7f60so384704739f.0
+        for <linux-block@vger.kernel.org>; Tue, 28 Oct 2025 06:53:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1761659607; x=1762264407; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4Nb3h+I9r3eVKgBEZka7IhQ9jkoV4w7ZeARyH9Ccd44=;
+        b=3RAydxDODPbrc/0HyHKgVKuaoaDIrNfA0nOgyt7ZhstKeU38pTIyGwCxB+1MfikEDj
+         HeOkvsYr0WvXDtc3WbOivNx12S0N2boMxrfrFcjOzSWwy07rqmg/4AeTSLeJCW44zSrX
+         IMyXEvijzy6Vl0rGCYA1QMnznkdZx/nymA2uyls4e/cciX8rETenCR/ePgmt1ZUFUzND
+         AGcvcIvCVNe8ZZLt5EURyNgVkOqZZ2ckUMV/XE+cNy6zX7hcVyRYmY1qMe4r9FF4jNY2
+         VuKdEx1aECbZEbfKGuExYiLfzsaObPtZl9mm/fC8/S8qEYh+Xetjl4FyxrukPJXZbMb2
+         4pJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761659607; x=1762264407;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4Nb3h+I9r3eVKgBEZka7IhQ9jkoV4w7ZeARyH9Ccd44=;
+        b=kTa2cP9eVkCXDbGXPRtvrOgc+Pyu7CGDkh0Fy/u7PGknq6wEU0sU11Cgr3e3uzfgv3
+         v5JPfx1h3n5CrRxuX4Lt+6e/eJs+hNpvPgkN7yyhFEvl1JQD+brAMinv0w5E7mfB3PMi
+         DTpX24gO4JU6VC9xs04gi0H3x0O6Wr7Mcp9lixW4rrp+hQKNAR2QZ10yRyEJ21FjQv7F
+         ui5ZlXRPWGBfo5gImpTWDYTwvR0h1Ps2oFbchdVawCiF6LzJohQCNXCR7RV24FBIbpxx
+         T44SfB2Lb/BNloLoBI/fQC2v+KsbQ62867jgZyOBl6+/XmhzsJKPUoCazCrhpLa1Jy94
+         usSQ==
+X-Gm-Message-State: AOJu0Yz1vgEtYV8N9MrvihhJS95oJzZFFkz2ICA0IIx3Rh6uXuc2pGjF
+	d89zG5c/5GiECaJWFzUp70N1SsTw8IXTfQtOyBJ++YL1gNPGa5NFGhbfTJd8Cja4OO4D0A1LU6v
+	JO1dRmp8=
+X-Gm-Gg: ASbGncsrvU1ce2uMKdVJVQcBBjAFOU2hZl3cBySgpotu0Q22meW8AGLNqd8oerS7qMu
+	coCQzFDhD1mpPgjZsplRzmfBCEuwOlPU8qX6RrrvloX0vq+gS8mPM3q8ZZJLyTgAGOIoPea8wwF
+	x+lwWI8nYV8/LfQrb+xWy6yfRETdCb7KFj+1lPEnseUk7El+DcP+QJKWmsyGzpEWV/23l0xlhcJ
+	qG1ULCWgdAWe3+Rq8bJhuQksgzwCBNBnewAJkNLkmU2bcMUz8PWB0trJsMMGFtWv1qigjEcqjli
+	lUtK0p+yfkat+GNR90kIDko/umPfhkTpICJhVxJI3q8zjiPjfQg0zjNDw9tU8DuZh0f0/vaNsC1
+	uC2a2C3H9qphk2PyQcmLfpHmDquKCvzEGtx6cZHvKltjj9etPXjpli2V47Zzbrp4L/cs=
+X-Google-Smtp-Source: AGHT+IEivRlZe0KpNjNxRPKGwOg7QIcJ10LcVZ4NW1yNoDerzdW7sqtcWm/8i69j+dhs0RFOX5Ftjw==
+X-Received: by 2002:a92:cdaa:0:b0:430:a530:ede2 with SMTP id e9e14a558f8ab-4320f842c93mr49258275ab.24.1761659607216;
+        Tue, 28 Oct 2025 06:53:27 -0700 (PDT)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5aea995e701sm4287485173.49.2025.10.28.06.53.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Oct 2025 06:53:26 -0700 (PDT)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Damien Le Moal <dlemoal@kernel.org>
+In-Reply-To: <20251027002733.567121-1-dlemoal@kernel.org>
+References: <20251027002733.567121-1-dlemoal@kernel.org>
+Subject: Re: [PATCH 0/2] Zone operation fixes
+Message-Id: <176165960624.274653.9187095828796238088.b4-ty@kernel.dk>
+Date: Tue, 28 Oct 2025 07:53:26 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 9/9] vfio/pci: Add dma-buf export support for MMIO
- regions
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Leon Romanovsky <leon@kernel.org>,
- Alex Williamson <alex.williamson@redhat.com>,
- Leon Romanovsky <leonro@nvidia.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Bjorn Helgaas <bhelgaas@google.com>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
- Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
- kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-media@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org,
- Logan Gunthorpe <logang@deltatee.com>,
- Marek Szyprowski <m.szyprowski@samsung.com>,
- Robin Murphy <robin.murphy@arm.com>, Sumit Semwal <sumit.semwal@linaro.org>,
- Vivek Kasireddy <vivek.kasireddy@intel.com>, Will Deacon <will@kernel.org>
-References: <cover.1760368250.git.leon@kernel.org>
- <72ecaa13864ca346797e342d23a7929562788148.1760368250.git.leon@kernel.org>
- <20251022125012.GB244727@nvidia.com>
- <3db524e7-b6ce-4652-8420-fdb4639ac73a@linux.alibaba.com>
- <20251027120904.GA896317@nvidia.com>
-From: Shuai Xue <xueshuai@linux.alibaba.com>
-In-Reply-To: <20251027120904.GA896317@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3
 
 
-
-在 2025/10/27 20:09, Jason Gunthorpe 写道:
-> On Sun, Oct 26, 2025 at 03:55:04PM +0800, Shuai Xue wrote:
->>
->>
->> 在 2025/10/22 20:50, Jason Gunthorpe 写道:
->>> On Mon, Oct 13, 2025 at 06:26:11PM +0300, Leon Romanovsky wrote:
->>>> From: Leon Romanovsky <leonro@nvidia.com>
->>>>
->>>> Add support for exporting PCI device MMIO regions through dma-buf,
->>>> enabling safe sharing of non-struct page memory with controlled
->>>> lifetime management. This allows RDMA and other subsystems to import
->>>> dma-buf FDs and build them into memory regions for PCI P2P operations.
->>>>
->>>> The implementation provides a revocable attachment mechanism using
->>>> dma-buf move operations. MMIO regions are normally pinned as BARs
->>>> don't change physical addresses, but access is revoked when the VFIO
->>>> device is closed or a PCI reset is issued. This ensures kernel
->>>> self-defense against potentially hostile userspace.
->>>
->>> Let's enhance this:
->>>
->>> Currently VFIO can take MMIO regions from the device's BAR and map
->>> them into a PFNMAP VMA with special PTEs. This mapping type ensures
->>> the memory cannot be used with things like pin_user_pages(), hmm, and
->>> so on. In practice only the user process CPU and KVM can safely make
->>> use of these VMA. When VFIO shuts down these VMAs are cleaned by
->>> unmap_mapping_range() to prevent any UAF of the MMIO beyond driver
->>> unbind.
->>>
->>> However, VFIO type 1 has an insecure behavior where it uses
->>> follow_pfnmap_*() to fish a MMIO PFN out of a VMA and program it back
->>> into the IOMMU. This has a long history of enabling P2P DMA inside
->>> VMs, but has serious lifetime problems by allowing a UAF of the MMIO
->>> after the VFIO driver has been unbound.
->>
->> Hi, Jason,
->>
->> Can you elaborate on this more?
->>
->>  From my understanding of the VFIO type 1 implementation:
->>
->> - When a device is opened through VFIO type 1, it increments the
->>    device->refcount
->> - During unbind, the driver waits for this refcount to drop to zero via
->>    wait_for_completion(&device->comp)
->> - This should prevent the unbind() from completing while the device is
->>    still in use
->>
->> Given this refcount mechanism, I do not figure out how the UAF can
->> occur.
+On Mon, 27 Oct 2025 09:27:31 +0900, Damien Le Moal wrote:
+> Jens,
 > 
-> A second vfio device can be opened and then use follow_pfnmap_*() to
-> read the first vfio device's PTEs. There is no relationship betweent
-> the first and second VFIO devices, so once the first is unbound it
-> sails through the device->comp while the second device retains the PFN
-> in its type1 iommu_domain.
+> A couple of patches to fix zone operations definition and handling.
+> These are not in response to bug reports, but they certainly fix things
+> that are incorrect.
 > 
-> Jason
+> Damien Le Moal (2):
+>   block: fix op_is_zone_mgmt() to handle REQ_OP_ZONE_RESET_ALL
+>   block: make REQ_OP_ZONE_OPEN a write operation
+> 
+> [...]
 
-I see.
+Applied, thanks!
 
-Thanks.
+[1/2] block: fix op_is_zone_mgmt() to handle REQ_OP_ZONE_RESET_ALL
+      commit: 12a1c9353c47c0fb3464eba2d78cdf649dee1cf7
+[2/2] block: make REQ_OP_ZONE_OPEN a write operation
+      commit: 19de03b312d69a7e9bacb51c806c6e3f4207376c
 
-Best Regard,
-Shuai
+Best regards,
+-- 
+Jens Axboe
+
+
 
