@@ -1,74 +1,68 @@
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4199D34F482
-	for <linux-block@vger.kernel.org>; Tue, 28 Oct 2025 19:20:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB00D33CEA7
+	for <linux-block@vger.kernel.org>; Tue, 28 Oct 2025 19:24:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761679256; cv=none; b=DJlcrKVt+LlEpvMJCQhO1M6tt4OuOTiznPcKhUja1pSohizysaA4BuC4GGTJdnrEQnKGFA9E+uGlQeUJ+4DCXoIxU15Rb0xBXNwqyf+qyqvaBxIsb4vpliwT2X8OhQQFtQIKt3WZ2W7eYk6VtE6QtrziAB418GstN/MvISzJXvg=
+	t=1761679457; cv=none; b=MsZ3U1jQ7/AFbocOJM4If67V98b7KUY4vK2E7gL4/jNfEoX453VA2Uecj8rulShr0rLj8yhppRumyWdMSe2WV8qORviWc9FOKH1rMb1OH/Dd7p5PPCU0bp6NdOfjcd4RDFgYXGw0Zv14XeLYlARGE0B+usDm0xsm7fTL1ByOOjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761679256; c=relaxed/simple;
-	bh=tzkE1thdXmdvSPD1kwvNCB7PzSIuHMvurBU+WDXYyS8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dTFCgqg8EkN/377sm1JwbbQlVvSdk2wovJmMcUZ9vfXrUp8RYWdrGhAoD1XRnTRV1xnr2gQSmfyt3oGy01v16vcI+HB/xIjZu7IfY48aVLJWIVt7le5JQLPo/CDM40CcpgjkVAU6Kr9xbs/3cAkQiciqUqgXkEcQBdj3eHwduBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H6IrBSAI; arc=none smtp.client-ip=209.85.214.179
+	s=arc-20240116; t=1761679457; c=relaxed/simple;
+	bh=ZJPWYFIgWr/fyuaN2xn9XcDL+G5i6WTk1gIkovuWKVE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=L3xKSInvei7vRX1tEmyO4jHW+23k/n5A9vr1R5zb3DkPbgCwcpiE9K8P5WV23fidzA/lzKXFMrk+YlY0iZ8FhL9p2vIOSRYkkg3R4DkIIJWgPpBSYxVdWHbM+3ex2DZLvx7SLkRcHFiNnLyYCHd+yjXGZRLaVt8T+DuVHHfd+Tc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ki3USmfY; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H6IrBSAI"
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-290aaff555eso58953345ad.2
-        for <linux-block@vger.kernel.org>; Tue, 28 Oct 2025 12:20:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ki3USmfY"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-290a3a4c7ecso73065045ad.0
+        for <linux-block@vger.kernel.org>; Tue, 28 Oct 2025 12:24:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761679254; x=1762284054; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nULmnNC1B3ayUuViw8iyE3V8T5hxKxh98fx7PJHa6OI=;
-        b=H6IrBSAIUllY94sg4GHhorjKFPEQ2vdWOgdHobgjbsIko8c4eGEPGTekGFE0BG/8b1
-         RPkkbC1nbLwyF+XhZb8q2deXecbBLD/Br3GnnTbfaerN3ypHvQsPIPpB1wbemV4HlgrB
-         QsL9ksATH4a9I5glKO5YiV+pwua8yZQk4MMtW7faNO5zn82g8A8kz4rQzlTmsbpww/e1
-         Q9O1lyye4RdiNTv6oxE/YABvkUAyymFpkHG4UB0xQeZ6bN9jOGX8AmJ1HzD7zAQszkhV
-         d2cZcqeKfNUE3PQCVYGhnlo3/zz/PEf+QkPriwhGWAVW4+rbynjNMbM0D9fUppEtCmFN
-         IUyw==
+        d=gmail.com; s=20230601; t=1761679455; x=1762284255; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5ZUNqxnm0eoGyVL12t/bcEaXAjA9vRK9Z+0QxIk2Yok=;
+        b=ki3USmfYIMKIRdaQrsRdXGtt2NnpWeg2H1sMNUvM9v3KZLq+f2oYdxwnXZ5myKNWIt
+         D7NYt57KPO+Jpk9N6f9HYT6nyCe3QJMDDoIkMDvaEC7j9W5OUXETK3x6T/31o75gEBIM
+         FNCUVeKmPsbqhn3g/yV6AR52RjsrP518RhBJHD00Oxj5/pTITFGeOKQ+LQUUK420AJNU
+         tw7VoXe2wHs7ksuNax6l4wziquXRPNmkcJpKuSxjaUfEiya+w1oboX+P+1DFAV8Vpz0O
+         CLqHbf26Z9d/GqfdLUMRsxKlCO+Ivud6gHyAORYKHExsOeVVIFEz7hhF/e8SgJ6H3YuZ
+         6EwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761679254; x=1762284054;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nULmnNC1B3ayUuViw8iyE3V8T5hxKxh98fx7PJHa6OI=;
-        b=DqN9IFrg2Q91kLjRPyU2Z61SXErfFyoTSsEKsnyDvEWhxmq3c9DJsjik0IpP7kTDHd
-         IpOmfW/bfL0fPhTq0eFrfGGWJl1jUUhw0NHEqYfhJuB3bzDMzAdnbXM07xXRTgxxCsC7
-         SnWGR2MW6n4uxpy8DV8fTUmPpBr8g22GMxvgA/ROV+o0LFRF0Bb6FkeZ7nnbfwGD1ci8
-         +xhCv36+ms1yV+WP3O7wcmlcyCLjBYURRrlPmtMhavKHdb/PQBUH5sZf33NQiBO7JCX4
-         QMfkcYOoLa7gDhXaG748S2fAnPpHzq4Q3+9fE3gAib0mXFPOVMmkujIbBcWWBuAcORem
-         91bw==
-X-Forwarded-Encrypted: i=1; AJvYcCUcmdt8nwVrirLcqXZ+MrHA7IJOdKtoUCE9nX4AexJ+66YRWbooztTSDqreWlJ0nUXvy6z3jlZUMBcdPQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyA3bx7p4KBvENo+T4wNabObT1/US4BIYOtVX03HfoKjwdL/9Db
-	t/nSNuZW/tqc/XJM5lDq86UfAeDaZoex2fDVGJXsS7gN40nD60R2WZ2N
-X-Gm-Gg: ASbGnctn5amilgSvynmpzdy8o0R94ppbGL+xg3o7PJMl0YF06VvtKeCB+Wx/YMMdisq
-	VFbjucOiF96zJmJh3M0Y+77qC8MsBKkHYrxD8PdFzWiDYEA4taplYRhuKGMraM9VYC6We3f2LBv
-	kJFx7K6b6wxvpjSeMTsEEXR5kuyA9pD8EIdOjLLtBXVxi5QQPjnLp0J8eYCLUkcyDOzCFowyWXY
-	hG0cLbL2nyiU3eA8qK5falDqZJeJtjbupPFqSe9FicyabiTJ2W7Iadn6o8MsYVH5VQvutAr8qwV
-	HEXNqv6WcNLzFq1uRmk5LROvQ5i9rBM3pMiz2C4XuSqBtgIQUv8znrzS5MydPNgWf1fLOZ0xb/G
-	0puP8Jj4d9zbJF+cd2ypKqLzykp7zB4ZbFBG5a0DejM6pNFLrgaYGsTF+3TQMYQLf
-X-Google-Smtp-Source: AGHT+IGirE4lTWQn4+mh2/Whn8RwSBeSs+tPBsapow5X70N0VYW4jzGac01/yKsu605hOJRlmGhM4Q==
-X-Received: by 2002:a17:903:2a88:b0:267:9a29:7800 with SMTP id d9443c01a7336-294def3638emr3646535ad.59.1761679254371;
-        Tue, 28 Oct 2025 12:20:54 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1761679455; x=1762284255;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5ZUNqxnm0eoGyVL12t/bcEaXAjA9vRK9Z+0QxIk2Yok=;
+        b=KlyFj+r6u9JcCnP+dB5wx4wXY+Ld/lqX5/TJ6pbSeb24MirtVAlUL0AyGMJG13jUEV
+         mvhj/iB8FMd45Zh7CE1EDas8lm+cHfXMclEedr+MdMtqq+lj/tTCZImpPs0FDi/rsb5U
+         kCPis8m8Y4ev17GCF3cYKNebfAfFcE4XSUYq6SWiAbiaBdxpP7b5Hv7LsxgnOxgvFx00
+         U55dI5g2HV11Y8+utLG3nD3lmB9vaRrR2mn1WOPfIhVeaN9ckTYBVfVSldstdwqeXF0U
+         MhIDInjwaS4YSGLd2zAcO8hi5shmnsFmgD5Uhs9nUbc60c7cSc/cdESZB3PY1qUSPGWM
+         2O6g==
+X-Gm-Message-State: AOJu0YzmNUnRTnMWjB3Q5VZBszLNBopIzU1xm+rUE1lI2Eo2Vg9zQhAO
+	2IS2bb/PKuwXan1MiIjDT6YqlWBsfV3lFcz0yyAUxuyh1F97rEcH7Kuzkz//uQ==
+X-Gm-Gg: ASbGncsVZpvJQaIA4NXuiTHmknBJWpEGlm58SHCf/V7Tr/9nmF1CynjtZ7qarRR/jNX
+	arGU85L6p2s3hzRm27a76Ph1ILDPL/aQDdLqw2TS804W3LjpYxJwNw0HcN/wbWtTu7Kj3nXsPk6
+	RiHlAFnu1S4z3DNBA/Pm2Olx1UhIS7jqrWYX3basUs5cUFwhKDh/fS/7dc2+z+hWUsAWJFIkKq4
+	2gbwUc4HR3XEGMWp3up/C+i2lzLmtPdFwtgs1xOLE3knr8URHbw7+gi4JWGjEtyv/Mm/lUIpkwD
+	8QKr9vTWRt9xKAKWIlct/DT9wxIz1KFsowsefls9wiR/CEJTL2qotaMXxwUC9ni22LdVsqikQjH
+	+2icsVOeguc3fYTa3H/yOTti2ZBcdVUetNEQr4o/vdrMlqPU3ePDCsZz8wKHSHWe4
+X-Google-Smtp-Source: AGHT+IFgnuSnxzxyZhlxXCm06adjAhw+FMslmg7CdLoYqsLNAQ2SWmYevbIro3Br6Bwt3HhLVwp6ug==
+X-Received: by 2002:a17:902:f693:b0:24c:7b94:2f87 with SMTP id d9443c01a7336-294dee80f3dmr3866555ad.14.1761679454779;
+        Tue, 28 Oct 2025 12:24:14 -0700 (PDT)
 Received: from localhost ([2600:8802:b00:9ce0::f9da])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-33fed7f6040sm12929248a91.16.2025.10.28.12.20.53
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29498d429c6sm128114365ad.85.2025.10.28.12.24.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Oct 2025 12:20:53 -0700 (PDT)
+        Tue, 28 Oct 2025 12:24:13 -0700 (PDT)
 From: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
-To: johannes.thumshirn@wdc.com
-Cc: shinichiro.kawasaki@wdc.com,
-	linux-block@vger.kernel.org,
+To: shinichiro.kawasaki@wdc.com
+Cc: linux-block@vger.kernel.org,
 	Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
-Subject: [PATCH V2 2/2] blktrace: add blktrace ftrace corruption regression test
-Date: Tue, 28 Oct 2025 12:20:48 -0700
-Message-Id: <20251028192048.18923-2-ckulkarnilinux@gmail.com>
+Subject: [PATCH blktest] Makefile: add check-parallel target for faster shellcheck
+Date: Tue, 28 Oct 2025 12:24:11 -0700
+Message-Id: <20251028192411.19144-1-ckulkarnilinux@gmail.com>
 X-Mailer: git-send-email 2.40.0
-In-Reply-To: <20251028192048.18923-1-ckulkarnilinux@gmail.com>
-References: <20251028192048.18923-1-ckulkarnilinux@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -77,140 +71,122 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add regression test for blktrace ftrace corruption bug that occurs when
-sysfs trace is enabled followed by ftrace blk tracer.
+Add a new check-parallel target that utilizes all available CPUs to
+run shellcheck in parallel on test files, significantly reducing
+validation time from ~40s to ~11s on a 48-core system.
 
-When /sys/block/*/trace/enable is enabled and then ftrace's blk tracer
-is activated, the trace output becomes corrupted showing "Unknown action"
-with invalid hex values instead of proper action codes.
+The original check target remains unchanged for compatibility.
 
-The root cause is that ftrace allocates a blk_io_trace2 buffer (64 bytes)
-but calls record_blktrace_event() which writes v1 format (48 bytes),
-causing field offset mismatches and corruption.
+blktests (master) # vim 0001-Makefile-add-check-parallel-target-for-faster-shellc.patch
+blktests (master) # time make check
+shellcheck -x -e SC2119 -f gcc check common/* \
+    tests/*/rc tests/*/[0-9]*[0-9] src/*.sh
+check:634:20: note: Double quote to prevent globbing and word splitting. [SC2086]
+check:667:20: note: Double quote to prevent globbing and word splitting. [SC2086]
+common/nvme:447:5: note: Double quote to prevent globbing and word splitting. [SC2086]
+common/nvme:453:6: note: Double quote to prevent globbing and word splitting. [SC2086]
+common/nvme:553:42: note: Double quote to prevent globbing and word splitting. [SC2086]
+common/nvme:554:28: note: Double quote to prevent globbing and word splitting. [SC2086]
+common/nvme:556:28: note: Double quote to prevent globbing and word splitting. [SC2086]
+common/nvme:557:28: note: Double quote to prevent globbing and word splitting. [SC2086]
+common/nvme:558:23: note: Double quote to prevent globbing and word splitting. [SC2086]
+tests/pr.bk/001:9:3: note: Not following: tests/pr/rc: openBinaryFile: does not exist (No such file or directory) [SC1091]
+tests/pr.bk/001:11:1: warning: DESCRIPTION appears unused. Verify use (or export if used externally). [SC2034]
+tests/pr.bk/001:12:1: warning: QUICK appears unused. Verify use (or export if used externally). [SC2034]
+tests/pr.bk/002:8:3: note: Not following: tests/pr/rc: openBinaryFile: does not exist (No such file or directory) [SC1091]
+tests/pr.bk/002:10:1: warning: DESCRIPTION appears unused. Verify use (or export if used externally). [SC2034]
+tests/pr.bk/002:11:1: warning: QUICK appears unused. Verify use (or export if used externally). [SC2034]
+tests/pr.bk/003:8:3: note: Not following: tests/pr/rc: openBinaryFile: does not exist (No such file or directory) [SC1091]
+tests/pr.bk/003:10:1: warning: DESCRIPTION appears unused. Verify use (or export if used externally). [SC2034]
+tests/pr.bk/003:11:1: warning: QUICK appears unused. Verify use (or export if used externally). [SC2034]
+tests/pr.bk/004:8:3: note: Not following: tests/pr/rc: openBinaryFile: does not exist (No such file or directory) [SC1091]
+tests/pr.bk/004:10:1: warning: DESCRIPTION appears unused. Verify use (or export if used externally). [SC2034]
+tests/pr.bk/004:11:1: warning: QUICK appears unused. Verify use (or export if used externally). [SC2034]
+tests/pr.bk/005:8:3: note: Not following: tests/pr/rc: openBinaryFile: does not exist (No such file or directory) [SC1091]
+tests/pr.bk/005:10:1: warning: DESCRIPTION appears unused. Verify use (or export if used externally). [SC2034]
+tests/pr.bk/005:11:1: warning: QUICK appears unused. Verify use (or export if used externally). [SC2034]
+tests/pr.bk/006:9:3: note: Not following: tests/pr/rc: openBinaryFile: does not exist (No such file or directory) [SC1091]
+tests/pr.bk/006:11:1: warning: DESCRIPTION appears unused. Verify use (or export if used externally). [SC2034]
+tests/pr.bk/006:12:1: warning: TIMED appears unused. Verify use (or export if used externally). [SC2034]
+make: *** [Makefile:22: check] Error 1
 
-This test verifies that the trace output is correct and doesn't show
-the corruption pattern.
+real    3m43.712s
+user    3m38.640s
+sys    0m3.321s
+Running shellcheck with 48 parallel jobs...
+tests/pr.bk/005:8:3: note: Not following: tests/pr/rc: openBinaryFile: does not exist (No such file or directory) [SC1091]
+tests/pr.bk/005:10:1: warning: DESCRIPTION appears unused. Verify use (or export if used externally). [SC2034]
+tests/pr.bk/005:11:1: warning: QUICK appears unused. Verify use (or export if used externally). [SC2034]
+tests/pr.bk/006:9:3: note: Not following: tests/pr/rc: openBinaryFile: does not exist (No such file or directory) [SC1091]
+tests/pr.bk/006:11:1: warning: DESCRIPTION appears unused. Verify use (or export if used externally). [SC2034]
+tests/pr.bk/006:12:1: warning: TIMED appears unused. Verify use (or export if used externally). [SC2034]
+tests/pr.bk/001:9:3: note: Not following: tests/pr/rc: openBinaryFile: does not exist (No such file or directory) [SC1091]
+tests/pr.bk/001:11:1: warning: DESCRIPTION appears unused. Verify use (or export if used externally). [SC2034]
+tests/pr.bk/001:12:1: warning: QUICK appears unused. Verify use (or export if used externally). [SC2034]
+tests/pr.bk/002:8:3: note: Not following: tests/pr/rc: openBinaryFile: does not exist (No such file or directory) [SC1091]
+tests/pr.bk/002:10:1: warning: DESCRIPTION appears unused. Verify use (or export if used externally). [SC2034]
+tests/pr.bk/002:11:1: warning: QUICK appears unused. Verify use (or export if used externally). [SC2034]
+tests/pr.bk/004:8:3: note: Not following: tests/pr/rc: openBinaryFile: does not exist (No such file or directory) [SC1091]
+tests/pr.bk/004:10:1: warning: DESCRIPTION appears unused. Verify use (or export if used externally). [SC2034]
+tests/pr.bk/004:11:1: warning: QUICK appears unused. Verify use (or export if used externally). [SC2034]
+tests/pr.bk/003:8:3: note: Not following: tests/pr/rc: openBinaryFile: does not exist (No such file or directory) [SC1091]
+tests/pr.bk/003:10:1: warning: DESCRIPTION appears unused. Verify use (or export if used externally). [SC2034]
+tests/pr.bk/003:11:1: warning: QUICK appears unused. Verify use (or export if used externally). [SC2034]
+check:634:20: note: Double quote to prevent globbing and word splitting. [SC2086]
+check:667:20: note: Double quote to prevent globbing and word splitting. [SC2086]
+common/nvme:447:5: note: Double quote to prevent globbing and word splitting. [SC2086]
+common/nvme:453:6: note: Double quote to prevent globbing and word splitting. [SC2086]
+common/nvme:553:42: note: Double quote to prevent globbing and word splitting. [SC2086]
+common/nvme:554:28: note: Double quote to prevent globbing and word splitting. [SC2086]
+common/nvme:556:28: note: Double quote to prevent globbing and word splitting. [SC2086]
+common/nvme:557:28: note: Double quote to prevent globbing and word splitting. [SC2086]
+common/nvme:558:23: note: Double quote to prevent globbing and word splitting. [SC2086]
+make: *** [Makefile:30: check-parallel] Error 1
+
+real    0m22.464s
+user    7m24.518s
+sys    0m11.703s
+
+
+10.0x faster than sequential
+  Concrete numbers:
+  - make check: 223.7s (3m43.7s)
+  - make check-parallel: 22.5s
 
 Signed-off-by: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
 ---
- tests/blktrace/002     | 97 ++++++++++++++++++++++++++++++++++++++++++
- tests/blktrace/002.out |  3 ++
- 2 files changed, 100 insertions(+)
- create mode 100755 tests/blktrace/002
- create mode 100644 tests/blktrace/002.out
+ Makefile | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/tests/blktrace/002 b/tests/blktrace/002
-new file mode 100755
-index 0000000..73b8597
---- /dev/null
-+++ b/tests/blktrace/002
-@@ -0,0 +1,97 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2025 Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
-+#
-+# Regression test for blktrace ftrace corruption bug when using sysfs
-+# trace enable with ftrace blk tracer.
-+#
-+# Bug: When sysfs trace is enabled (/sys/block/*/trace/enable) and then
-+# ftrace blk tracer is enabled, the trace output becomes corrupted showing
-+# "Unknown action" with invalid hex values.
-+#
-+# Root cause: ftrace allocated blk_io_trace2 buffer (64 bytes) but called
-+# record_blktrace_event() which writes v1 format (48 bytes), causing field
-+# offset mismatches and corruption.
+diff --git a/Makefile b/Makefile
+index 36dbcaf..7825c79 100644
+--- a/Makefile
++++ b/Makefile
+@@ -16,6 +16,7 @@ install:
+ # SC2119: "Use foo "$@" if function's $1 should mean script's $1". False
+ # positives on helpers like _init_scsi_debug.
+ SHELLCHECK_EXCLUDE := SC2119
++NPROCS := $(shell nproc)
+ 
+ check:
+ 	shellcheck -x -e $(SHELLCHECK_EXCLUDE) -f gcc check common/* \
+@@ -24,4 +25,15 @@ check:
+ 	! grep TODO tests/*/rc tests/*/[0-9]*[0-9]
+ 	! find -L -name '*.out' -perm /u=x+g=x+o=x -printf '%p is executable\n' | grep .
+ 
+-.PHONY: all check install
++check-parallel:
++	@echo "Running shellcheck with $(NPROCS) parallel jobs..."
++	@ret=0; \
++	find tests -type f -name '[0-9]*[0-9]' | \
++		xargs -P $(NPROCS) -n 1 shellcheck -x -e $(SHELLCHECK_EXCLUDE) -f gcc || ret=1; \
++	shellcheck -x -e $(SHELLCHECK_EXCLUDE) -f gcc check common/* tests/*/rc src/*.sh || ret=1; \
++	shellcheck --exclude=$(SHELLCHECK_EXCLUDE),SC2154 --format=gcc new || ret=1; \
++	grep TODO tests/*/rc tests/*/[0-9]*[0-9] && ret=1; \
++	find -L -name '*.out' -perm /u=x+g=x+o=x -printf '%p is executable\n' | grep . && ret=1; \
++	exit $$ret
 +
-+. tests/blktrace/rc
-+. common/null_blk
-+
-+DESCRIPTION="blktrace ftrace corruption with sysfs trace"
-+QUICK=1
-+
-+requires() {
-+	_have_null_blk
-+	_have_tracefs
-+}
-+
-+test() {
-+	echo "Running ${TEST_NAME}"
-+
-+	local trace_dir="/sys/kernel/debug/tracing"
-+	local device
-+
-+	# Initialize null_blk with one device
-+	if ! _init_null_blk nr_devices=1; then
-+		return 1
-+	fi
-+
-+	device=/dev/nullb0
-+
-+	# Verify device exists
-+	if [[ ! -b "$device" ]]; then
-+		echo "Device $device not found"
-+		_exit_null_blk
-+		return 1
-+	fi
-+
-+	# Clean up any previous trace state
-+	echo 0 > "$trace_dir/tracing_on" 2>/dev/null || true
-+	echo > "$trace_dir/trace" 2>/dev/null || true
-+	echo nop > "$trace_dir/current_tracer" 2>/dev/null || true
-+
-+	# Enable sysfs trace for nullb0 (this triggers the bug path)
-+	if [[ -f /sys/block/nullb0/trace/enable ]]; then
-+		echo 1 > /sys/block/nullb0/trace/enable
-+	else
-+		echo "No sysfs trace support"
-+		_exit_null_blk
-+		return 1
-+	fi
-+
-+	# Enable blk ftrace tracer
-+	echo blk > "$trace_dir/current_tracer"
-+	echo 1 > "$trace_dir/tracing_on"
-+
-+	# Generate some I/O
-+	dd if="$device" of=/dev/null bs=4k count=10 iflag=direct >> "$FULL" 2>&1
-+
-+	# Stop tracing
-+	echo 0 > "$trace_dir/tracing_on"
-+
-+	# Check trace output for corruption
-+	# Get first 10 non-comment lines
-+	local trace_output
-+	trace_output=$(grep -v "^#" "$trace_dir/trace" | head -10)
-+
-+	if [[ -z "$trace_output" ]]; then
-+		echo "No trace output captured"
-+		_exit_null_blk
-+		return 1
-+	fi
-+
-+	# Check for "Unknown action" which indicates the bug
-+	if echo "$trace_output" | grep -q "Unknown action"; then
-+		echo "BUG: Trace corruption detected with 'Unknown action'"
-+		echo "$trace_output" | head -5 >> "$FULL"
-+	else
-+		echo "Trace output looks correct"
-+	fi
-+
-+	# Cleanup: disable sysfs trace
-+	echo 0 > /sys/block/nullb0/trace/enable 2>/dev/null || true
-+	echo nop > "$trace_dir/current_tracer" 2>/dev/null || true
-+
-+	_exit_null_blk
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/blktrace/002.out b/tests/blktrace/002.out
-new file mode 100644
-index 0000000..b358be9
---- /dev/null
-+++ b/tests/blktrace/002.out
-@@ -0,0 +1,3 @@
-+Running blktrace/002
-+Trace output looks correct
-+Test complete
++.PHONY: all check check-parallel install
 -- 
 2.40.0
 
