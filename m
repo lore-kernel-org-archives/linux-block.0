@@ -1,74 +1,75 @@
-Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
+Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4852E24676A
-	for <linux-block@vger.kernel.org>; Tue, 28 Oct 2025 13:56:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDC422417F0
+	for <linux-block@vger.kernel.org>; Tue, 28 Oct 2025 13:56:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761659788; cv=none; b=ciIUAjghpUK00wmUREit7Okkg1CTbwUQTKbDwBfi7Bhut1fqv627ybMDz5jPEQlevUXhexzXNWyblw0m53+wJrHsUIHayBUP/f/ymLBMtl0QiFPlTMSf24GOO4QREE/cbTDZMqtKKHNLY3HKipclxh+IBJZjKLWyqwxZzfqiLhs=
+	t=1761659790; cv=none; b=rt5DmF62q/KlNeLwXUtHGLwE0ROZ9jabnwZ7/9dm7EMl2Y/KrroY/73GSfV2vmhX0qEpOvzfTd/5rJLO2D5rHzbR5J57KyJFkWc/ssiL9CJMZbcZ2afA11EBg239fwMDGQwkplvc5+H5Cvu0rxXUGq1HWOofEGSfws3ul7grlgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761659788; c=relaxed/simple;
-	bh=Ot4LFi7LbWmwt0mguA3UZcXFThUWLrjK4CdZFD8cIbo=;
+	s=arc-20240116; t=1761659790; c=relaxed/simple;
+	bh=3yX0PMRRsPge/Jf2DkXrzdJzwEPUlKMjqZfym+bpR10=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=sbWPIBIqbhcFcFJlqI9P2Yr2q3ZAxviYfoyEvrWMo5k+F9jkAxNuN6IMv18RTm+VMTbSsRb5b9XpTAb/d4GJHjopNl33YKXP2M9rFJUOEUeMazHzMtHTDIiJtE0WkLU170tXxGMyxRPI60fX9inW2aDj9cBsDYM+FysOKaofx14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=VAvlyFQ9; arc=none smtp.client-ip=209.85.166.43
+	 MIME-Version:Content-Type; b=JDiq+S6iDl7Y5UlxI0IGigK4m4ZAn4jLBo1vicRDjmrpHdWgKhOqPNUmgfofTEX12KCWxEW/sXm1Hr3vgCm8OjMzsSYBpnVD3Uu++EEHxi6lFIEO8nalJEEnV5bnBQB00elHmhDhPxJb20FaTwqwmMYarl13OeH1jyNP5IBo4jA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=cEArvhSN; arc=none smtp.client-ip=209.85.166.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="VAvlyFQ9"
-Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-945a4218f19so114699339f.1
-        for <linux-block@vger.kernel.org>; Tue, 28 Oct 2025 06:56:27 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="cEArvhSN"
+Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-938de0df471so584836839f.2
+        for <linux-block@vger.kernel.org>; Tue, 28 Oct 2025 06:56:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1761659786; x=1762264586; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1761659788; x=1762264588; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=F6wbtY81dSRy9MRbXywZEcg+tILFhq9XFH05X9o3f84=;
-        b=VAvlyFQ9QQRCC425AO4NJAsc73DdyHCfXLA7v3qOhxD2Binv7rT4nf1djxCGLv7RfC
-         Ltzfjaf+fcGdxLmgm6ncMsN8PIQAJ5WOsWRNyhkXVXk5dwWc3nnh7HOK5neY9nDxDhUO
-         15dAR5CRKhJYiZctZ7/ji/hnfS702Ishkf2/0UYQ6cLEDnpil1loi20pURkjSMqZB9UP
-         gjajbI1g0Fkv5gk1oVzZQmGe8g4zRi9RTj63uy0ZweJEY0kV2wVhaBIE2CFEPD5VFzsG
-         icIb5fJo/HTKPRodfUHuNsFqHRIKv92m6SC1d3k+ha8Y9BTnIFxDchtc8y2dAa61aBoF
-         VrAw==
+        bh=HS7aVHySoC26X2g400yNRMWOdQPkG+s0cofDF7UbIHY=;
+        b=cEArvhSN5eWbF2JynGm7N3q+pTQwKOz3+hxp5EKFw6LEiSzNh5RjkgUh2x+RQ7r7TJ
+         rY5+/Bd6BABEi6LtOuncgm2zegbdv0vAj3/1vm+wKQItZRshrPe63RUckHkIWmsHnL+p
+         zwZ3tl/T0NWrFpeDVb3MDpjo0xEQZNnC26GWFfR5zXu02aDdfsRSCoib8If4+BVtVPlg
+         jmqcmMH7VYztdByzFAexJUvN1WF3mfyj5ZVE2rExf4+AOg7s/AzQW5+Ak7nNrWT2nD3b
+         LRlygnx21eOnOETbRQgq2IB2lDx7+d3srbLOI8HUZOBso2/zDHKD7jVPhns0LA7dqCer
+         foJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761659786; x=1762264586;
+        d=1e100.net; s=20230601; t=1761659788; x=1762264588;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=F6wbtY81dSRy9MRbXywZEcg+tILFhq9XFH05X9o3f84=;
-        b=v9GdWzBDNQU2wmDXQzoq/satuhaKS3zjehD0pFZX6WzznuXFQK6PzHz064Srvr55ak
-         jVb3jvnXUCUQYIKohFYoGNz48jIh98X8ulT1+2ceF5q+HmN0lkNKg0OI6ug5ybeBaEC8
-         1lcwLVooPDtG+iN5at4cj0bgIaiKBUWuMh1l4VedcWC7vdFDs1AYD7rndGJy9LyV6liY
-         /6beKanIveqr7Ew9NU3ck1nVJzOvemoLnZU28K4XNN9okMAxfNvNQXFBn8Z5te/6Ietu
-         vsXMNjXNL/KUUxxQ3thQHf5wBorn8NexdTLbcIIYkK3u4XV2mP1wS4LO7UtF1N5tjwSN
-         +X3A==
-X-Gm-Message-State: AOJu0YyKkaFSZmeqUNMtlkKUAIDptMDeN8Hr8mNWu7jJbFtirN/FBY0y
-	JiEvxt8LE9pXHgkT3TYU++c021tWdL2NBwSY8TE6ZiGloWylRXKhr6y+QSPc8e9spGc=
-X-Gm-Gg: ASbGnctmQNBhlCsZrStN4v/x80VQtL/+MFMeQFclyGNCGdNMd8+mH9U4lg0au9k5Ron
-	Es4WBpTtLT7qfl2E68NZ43+zjUfknemwCV5f2TPs0gY1owrRY9Ahx4q3g82T59aZktaSrUvVPnk
-	WqxnhKboOtTymLc6AIAdnoxPYj7/WkBRi74C0r9fXQmw2EM1fSpsK6BCk+du8xc3TGw1lxKuLML
-	8TtkqEvqeQqNdXVkU0DnsfN42+aSbiWJlHfRxsRK2RpmQ73Ul3WOFCv+pG4nzAMPEGV1FbDPHZr
-	yDC2CTJANebNunNGbcnSa3crC0r9xCJyWmI8tPOwl0Eb3o/iJaLvT+zn+Ij0VJnAFtpGW7/EBWe
-	SEljwJITHs0qyAG0EInPUI9OflUsTfebL1QFNiBHOO5du0Y6OpkD9ZT9iHgwbxMJuyF0=
-X-Google-Smtp-Source: AGHT+IHpi9fcig8I/C6rD2AJbhQFmZg/nFKgIfZMbtIO4JewhOuBYnH/9ejDEE9esj3af+RKBhxDGQ==
-X-Received: by 2002:a05:6e02:1749:b0:431:d83a:9ca with SMTP id e9e14a558f8ab-43210421462mr40304595ab.12.1761659786327;
-        Tue, 28 Oct 2025 06:56:26 -0700 (PDT)
+        bh=HS7aVHySoC26X2g400yNRMWOdQPkG+s0cofDF7UbIHY=;
+        b=smczSyo3iYZb5adrLDnl6kZdvMLeRp9EhzYuarWjWIA6aO8avxNIqMjJYx7McbQ+7u
+         gd+jg+q8AVNX7GBSMh49U4OIpCCxE2pbqQLc/evfCEKtbuDkEfURp1cOuvGcI4jxxJWL
+         9nlrVWM2x8bnacwfw6JgZ6lcBDRSvoISIh+Cd5vxhSawpo8LVbgLqiykv1H9i8vTBA08
+         v8/+lwjUynRkEcABxF5ODEVsJtsKMLa+PKsWFV+sXchl+v7XNVU/NnTlX8qp7FKFkbov
+         barYsHQ6dYHSWjlN/pr1MSgq3oYLycD07qP3E0Msg6Zhmdal6RbjfAytK+Q9VmwLIvg+
+         YKWA==
+X-Forwarded-Encrypted: i=1; AJvYcCVorKNPdZ1U6mGCqmom8dmCcr8J0wNJdnoWupLOzGz92svhVGDy7wuH2Uk+6tO/XMgrvpZp3ygmF1n/Wg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzxl7QSWs/dxKmOTZg99PqmSv6mWrOAClaRPam8AgvYT+JOVl1E
+	wavUUHyR9K801NHoxPVK4m2lirF33l4FOLAXGfQoy4vc70ikbm+/wtdNCHbRaOYA07A=
+X-Gm-Gg: ASbGnctagcaCNa4jlUayGjVC0QXBUPjm9rbwyncOyKTwSXw/Fs4DvAkIAadqTiVmfi+
+	lV13w4IoPt9Ne2hzsNR4TmuEOHh3sH4ZpaU+KDx7vOHYo4eNQ5OQDXdO3LteO0fiB768A+evhmT
+	gEbOvnTPNWMr/mkPFlva6h7nA3lenow4rT/lUGhP3eqeEmBlJ1+wMRltkZFh+kKMtObIRbZkhtQ
+	+ZBSsl5m1QoCb3DxynMTRld5PvWdzQpF3k+HxHrx7UBpimy8atrdG7hFG5ThljyNU+d+emrBo73
+	q2kVRKU8kB50NgDjQBmEF1XlgQXPdcqkQaysDklHpkPC5gu7Szjbro5WLXdueCFhfZKKots6ZtP
+	Yk63mkePq7dzg4ON7woOjS4YIFmxFXKL8vODOEIJczHQ0zannBUJ+rERq2zRFhLr3/NJvZDpbmd
+	RrgQ==
+X-Google-Smtp-Source: AGHT+IEdc4xGrJXWc3tHAJipq3aqm80R5GD7jsg6lZLjvrViIKttEM81bBaIDX6JIfhx3esdcT1a0A==
+X-Received: by 2002:a05:6e02:1fce:b0:431:d721:266d with SMTP id e9e14a558f8ab-4320f87863cmr51014765ab.31.1761659787946;
+        Tue, 28 Oct 2025 06:56:27 -0700 (PDT)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-431f6714f2esm42905325ab.0.2025.10.28.06.56.25
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-431f6714f2esm42905325ab.0.2025.10.28.06.56.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Oct 2025 06:56:25 -0700 (PDT)
+        Tue, 28 Oct 2025 06:56:27 -0700 (PDT)
 From: Jens Axboe <axboe@kernel.dk>
-To: Johannes.Thumshirn@wdc.com, 
+To: johannes.thumshirn@wdc.com, 
  Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
-Cc: linux-block@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
- martin.petersen@oracle.com, dlemoal@kernel.org, 
- mathieu.desnoyers@efficios.com, mhiramat@kernel.org, rostedt@goodmis.org, 
- syzbot+153e64c0aa875d7e4c37@syzkaller.appspotmail.com
-In-Reply-To: <20251028024619.2906-1-ckulkarnilinux@gmail.com>
-References: <20251028024619.2906-1-ckulkarnilinux@gmail.com>
-Subject: Re: [PATCH] blktrace: use debug print to report dropped events
-Message-Id: <176165978538.275475.690120789162912071.b4-ty@kernel.dk>
-Date: Tue, 28 Oct 2025 07:56:25 -0600
+Cc: dlemoal@kernel.org, rostedt@goodmis.org, mhiramat@kernel.org, 
+ mathieu.desnoyers@efficios.com, martin.petersen@oracle.com, 
+ linux-block@vger.kernel.org, linux-trace-kernel@vger.kernel.org
+In-Reply-To: <20251028055042.2948-1-ckulkarnilinux@gmail.com>
+References: <20251028055042.2948-1-ckulkarnilinux@gmail.com>
+Subject: Re: [PATCH] blktrace: for ftrace use correct trace format ver
+Message-Id: <176165978646.275475.8893961838089059417.b4-ty@kernel.dk>
+Date: Tue, 28 Oct 2025 07:56:26 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -80,20 +81,20 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3
 
 
-On Mon, 27 Oct 2025 19:46:19 -0700, Chaitanya Kulkarni wrote:
-> The WARN_ON_ONCE introduced in
-> commit f9ee38bbf70f ("blktrace: add block trace commands for zone operations")
-> triggers kernel warnings when zone operations are traced with blktrace
-> version 1. This can spam the kernel log during normal operation with
-> zoned block devices when userspace is using the legacy blktrace
-> protocol.
+On Mon, 27 Oct 2025 22:50:42 -0700, Chaitanya Kulkarni wrote:
+> The ftrace blktrace path allocates buffers and writes trace events but
+> was using the wrong recording function. After
+> commit 4d8bc7bd4f73 ("blktrace: move ftrace blk_io_tracer to blk_io_trace2"),
+> the ftrace interface was moved to use blk_io_trace2 format, but
+> __blk_add_trace() still called record_blktrace_event() which writes in
+> blk_io_trace (v1) format.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] blktrace: use debug print to report dropped events
-      commit: 4a0940bdcac260be1e3460e99464fa63d317c6a2
+[1/1] blktrace: for ftrace use correct trace format ver
+      commit: e48886b9d668d80be24e37345bd0904e9138473c
 
 Best regards,
 -- 
