@@ -1,117 +1,129 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C88FA27F016;
-	Tue, 28 Oct 2025 03:44:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AE03D271
+	for <linux-block@vger.kernel.org>; Tue, 28 Oct 2025 04:32:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761623066; cv=none; b=KSYvEaxVPnjrxp57xYzcWadJnEbYltKrSBSx0Pi3Iia+R2QB1ufyX6AuBsyFhplATZiBJG+KDbzm0g7XWPgYMrzbqDr0+rsNFsZiJP61WAyIkzX02E9rJR4eFOvuk5breJQfxw4a2RFxzOyZhajLhIWCzpA5bjiFhBK94Cq9fyw=
+	t=1761625974; cv=none; b=VHGuqzx2b0he2sV2Gml49fW8sTBFbA6UUpoAwkH1svl6Lw7rY3VzZ4t9N30LL6yLta7r5Prw2oW5P7YEKMZZOb7aNlzyTNIZdyY/sEfK0J2uP+6YKEKp1BwvZN12Zk2n9HPdUZIVvgZxn/w2pwIhS/5ioIvXxFc2lW01HUyuy+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761623066; c=relaxed/simple;
-	bh=TnFIbM+bq7/HtWgjH5l2JYw1r4W3RkKTaKZQ39zMTXI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fYMDMrcIdzKrDji+cvxxPJawTe9gkvK/RgS80L1XwJ6KrTjMuvmrm/ZFVuQNCF/31iozrJzoWPpRuET+lh41Cs0uPrH+OPqaV4Pg4nj+jxmGg60K2UaNJ5uPVN0ml2anfTshiOVu7gwoE32X9I1wULEWnj2ya4cpiMvCIXeEJVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OBXslR44; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1761625974; c=relaxed/simple;
+	bh=S/lne8wybyE1gO5htDFPkrjiiUfBJTJUUGjSUp3mgWA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=q13BVs6HrfnPsN7+L7RT8isdMLIWDQT9Ulyd2Fm1bcG8iLvT+vIzzeIu1LbTrZShNZomQW7x8Mzk30RsqoNzqG/5mfjzikYYOD/ZswF2LkiFiY+xDjx2J4cZm+SM94Z7tJItiSNJirzfOuFhp007mzzjXnRKhtTKvpyOFS1ol8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LMHnOLzP; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OBXslR44"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27786C4CEE7;
-	Tue, 28 Oct 2025 03:44:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761623066;
-	bh=TnFIbM+bq7/HtWgjH5l2JYw1r4W3RkKTaKZQ39zMTXI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=OBXslR44Gdx3KqvVkKSDO1fbyT+3KaBycyKYr+5ysSMLzBg98a9iD9aFYY4e8Idif
-	 uIOebabqY+faUfhJ1epzPoJy6FA9JuQTK7ftV4cSKR9GQn/pJZd4BM7rN2EmVqEr17
-	 TbRysXQvc5MwVmpG99SgSFBLqxYz+kWvmg8catMGHHqvIcxN0qICHvlFgowAg6zL/o
-	 j3wH4MkRX4wG28nwcTEfI9vXGICkv7r6HhJS4x+QJ54mtfid2cmgtc6hrpWml52289
-	 cerEfbl74jFmhT0GuDP2X7VCKAWRQlv/Oei/KNfLQ5D1sKgTCB7ndulZF32lblZN4N
-	 TD/DUjht6gSeQ==
-Message-ID: <980b6563-07f6-405d-9bf8-e67b5f00c556@kernel.org>
-Date: Tue, 28 Oct 2025 12:40:40 +0900
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LMHnOLzP"
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-b62e7221351so4836245a12.1
+        for <linux-block@vger.kernel.org>; Mon, 27 Oct 2025 21:32:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761625972; x=1762230772; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5TXKHptYyH+Ht2HxkkCZQsOl8z28P1fxyA0/H0EwTQI=;
+        b=LMHnOLzPeBtSvYILtN2gzRx1+T6YLxZTdP2FKIocIhpWpeMmKraoRkpZq8ooLt3ozn
+         L+aCRVKnOM439xw+UojizqwEAKT5C9gUORI7CbsHWcnYuR5s1YDe8jHR4GSqJSoBtxQp
+         gaD2pbZqTxxhVng0zaLPyqCuaIL8GsuD+/mCXbkksTviFN/ztTDW3dRVmdMVt23bmZai
+         X0kPEFow516jCTu8OSRhKcaeAtLoUVYo0V9on8ombka2St/Bj6WbhsZ/2jMp6uCYM0IC
+         7NDFoJF8fPJsO2TZ6d/063FI/PrXSPWMDH7RVKSCfxBsvjEFrmJCA4xNeI925JsB3c0U
+         Rlsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761625972; x=1762230772;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5TXKHptYyH+Ht2HxkkCZQsOl8z28P1fxyA0/H0EwTQI=;
+        b=O2TC3TsUta6+B0PzknBWpynWCqrlf60uPJyCnUQceu6hjclSybATjRF7u8yFcgMvKt
+         58jToNcQym02Z+f65eLV5LM8dkF6b70jpGa6YV6XA4vsdjpjIUFCJAD9J8S6dOj/2bBs
+         aXcjjXK1hf9EtxJwMp2XHtR3KbEQYgO86QQt1bdgtVvT4qOUvdsyOX1+oxIEim9gF9uT
+         IZkONqLW01kJ3MuT+Lr1594daWPpjs3EPczcwCUFCn8/yAITHp1OyiiyYshYlj/pW9lj
+         vs1X99fztdQLEpC/ft0D1p94+4dqJa8xCzrjNLOWBS8h7pIi0BvEFmt/tqyvi7z/npld
+         M0Jw==
+X-Gm-Message-State: AOJu0YxpFiaC60jda3zFH+B4CN4WYPRAX0PdqiJ5L4Yb+5JZ7zD9XBX8
+	H0DImem1RBn/wOvP9VJOk0Li80SXhpxO2MnjPYddOJEZ6IQ7ViS9+O+RjMzVlg==
+X-Gm-Gg: ASbGncvKxxtu8d1G8fqqvTqDRPxK4BJzYJ++dVxJEtgir6hU2CbCdLDEZr6doZI/Ieo
+	Ri8McezlSYEC1N59zJQJYbD/YuWVqLR2hDoW93mJaJq5pQqVXzJwppCzDLok/+sT+GI3GcN0FOA
+	gkDRpGmbXGl37BPuP/h7DOQddcEfI/QsdDyMpAyBYMuMSfW7Gbrfbify5pUt/Y71Sx2l3SetuId
+	+dEid/Lkj/5ThL+uiNfXnWrOG+Kyv4MAqmSei6XzpH1xo+iwP/WVNhV664WnrEQqJCqsuom0amn
+	jCsjFEKdbsbJ9ETufLJQNh+40oncmvbWr+P4n5mPhNw+CbGOXQSMkDpvlB8fIc4fFjeq3ZgrqtT
+	1hk7m7S5xPLF3gHOpdGPwrF6Wwp774NlSoCq8IqCfR3xbeE+87yEuI/lkc+YAd2Rw
+X-Google-Smtp-Source: AGHT+IHO6nGqRH+A9osLM89yQ2mH2wz/2VUNsGYa2/Nw7fF8/pMHkXQuIu1wg0vyQuBPzr8zUy6OJw==
+X-Received: by 2002:a17:903:38c5:b0:24c:da3b:7376 with SMTP id d9443c01a7336-294cb3a11dfmr27045135ad.26.1761625971756;
+        Mon, 27 Oct 2025 21:32:51 -0700 (PDT)
+Received: from localhost ([2600:8802:b00:9ce0::f9da])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29498e4349fsm99416565ad.107.2025.10.27.21.32.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Oct 2025 21:32:51 -0700 (PDT)
+From: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+To: Johannes.Thumshirn@wdc.com
+Cc: linux-block@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	martin.petersen@oracle.com,
+	dlemoal@kernel.org,
+	mathieu.desnoyers@efficios.com,
+	mhiramat@kernel.org,
+	rostedt@goodmis.org,
+	axboe@kernel.dk,
+	Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+Subject: [PATCH] blktrace: log dropped REQ_OP_ZONE_XXX events ver1
+Date: Mon, 27 Oct 2025 21:32:48 -0700
+Message-Id: <20251028043248.2873-1-ckulkarnilinux@gmail.com>
+X-Mailer: git-send-email 2.40.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] blktrace: use debug print to report dropped events
-To: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>, Johannes.Thumshirn@wdc.com
-Cc: linux-block@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- martin.petersen@oracle.com, mathieu.desnoyers@efficios.com,
- mhiramat@kernel.org, rostedt@goodmis.org, axboe@kernel.dk,
- syzbot+153e64c0aa875d7e4c37@syzkaller.appspotmail.com
-References: <20251028024619.2906-1-ckulkarnilinux@gmail.com>
-From: Damien Le Moal <dlemoal@kernel.org>
-Content-Language: en-US
-Organization: Western Digital Research
-In-Reply-To: <20251028024619.2906-1-ckulkarnilinux@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 10/28/25 11:46 AM, Chaitanya Kulkarni wrote:
-> The WARN_ON_ONCE introduced in
-> commit f9ee38bbf70f ("blktrace: add block trace commands for zone operations") 
-> triggers kernel warnings when zone operations are traced with blktrace
-> version 1. This can spam the kernel log during normal operation with
-> zoned block devices when userspace is using the legacy blktrace
-> protocol.
-> 
-> Currently blktrace implementation drops newly added REQ_OP_ZONE_XXX
-> when blktrace userspce version is set to 1.
-> 
-> Remove the WARN_ON_ONCE and quietly filter these events. Add a
-> rate-limited debug message to help diagnose potential issues without
-> flooding the kernel log. The debug message can be enabled via dynamic
-> debug when needed for troubleshooting.
-> 
-> This approach is more appropriate as encountering zone operations with
-> blktrace v1 is an expected condition that should be handled gracefully
-> rather than warned about, since users may be running older blktrace
-> userspace tools that only support version 1 of the protocol.
-> 
-> With this patch :-
-> linux-block (for-next) # git log -1 
-> commit c8966006a0971d2b4bf94c0426eb7e4407c6853f (HEAD -> for-next)
-> Author: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
-> Date:   Mon Oct 27 19:26:53 2025 -0700
-> 
->     blktrace: use debug print to report dropped events
-> linux-block (for-next) # cdblktests
-> blktests (master) # ./check blktrace
-> blktrace/001 (blktrace zone management command tracing)      [passed]
->     runtime  3.805s  ...  3.889s
-> blktests (master) # dmesg  -c
-> blktests (master) #  echo "file kernel/trace/blktrace.c +p" > /sys/kernel/debug/dynamic_debug/control
-> blktests (master) # ./check blktrace
-> blktrace/001 (blktrace zone management command tracing)      [passed]
->     runtime  3.889s  ...  3.881s
-> blktests (master) # dmesg  -c
-> [   77.826237] blktrace: blktrace v1 cannot trace zone operation 0x1000190001
-> [   77.826260] blktrace: blktrace v1 cannot trace zone operation 0x1000190004
-> [   77.826282] blktrace: blktrace v1 cannot trace zone operation 0x1001490007
-> [   77.826288] blktrace: blktrace v1 cannot trace zone operation 0x1001890008
-> [   77.826343] blktrace: blktrace v1 cannot trace zone operation 0x1000190001
-> [   77.826347] blktrace: blktrace v1 cannot trace zone operation 0x1000190004
-> [   77.826350] blktrace: blktrace v1 cannot trace zone operation 0x1001490007
-> [   77.826354] blktrace: blktrace v1 cannot trace zone operation 0x1001890008
-> [   77.826373] blktrace: blktrace v1 cannot trace zone operation 0x1000190001
-> [   77.826377] blktrace: blktrace v1 cannot trace zone operation 0x1000190004
-> blktests (master) #  echo "file kernel/trace/blktrace.c -p" > /sys/kernel/debug/dynamic_debug/control
-> blktests (master) # ./check blktrace
-> blktrace/001 (blktrace zone management command tracing)      [passed]
->     runtime  3.881s  ...  3.824s
-> blktests (master) # dmesg  -c 
-> blktests (master) # 
-> 
-> Reported-by: syzbot+153e64c0aa875d7e4c37@syzkaller.appspotmail.com
-> Fixes: f9ee38bbf70f ("blktrace: add block trace commands for zone operations")
-> Signed-off-by: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+Add informational messages during blktrace setup when version 1 tools
+are used on kernels with CONFIG_BLK_DEV_ZONED enabled. This alerts users
+that REQ_OP_ZONE_* events will be dropped and suggests upgrading to
+blktrace tools version 2 or later.
 
-Looks good.
+The warning is printed once during trace setup to inform users about
+the limitation without spamming the logs during tracing operations.
+Version 2 blktrace tools properly handle zone management operations
+(zone reset, zone open, zone close, zone finish, zone append) that
+were added for zoned block devices.
 
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+Example output:
+blktests (master) # ./check blktrace
+blktrace/001 (blktrace zone management command tracing)      [passed]
+    runtime  3.882s  ...  3.866s
+blktests (master) # dmesg -c
+[   95.874361] blktrace: nullb0:blktrace events for REQ_OP_ZONE_XXX will be dropped
+[   95.874372] blktrace: use blktrace tools version >= 2 to track REQ_OP_ZONE_XXX
+blktests (master) # 
 
+This helps users understand why zone operation traces may be missing
+when using older blktrace tool versions with modern kernels that
+support REQ_OP_ZONE_XXX in blktrace.
+
+Signed-off-by: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+---
+ kernel/trace/blktrace.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index 776ae4190f36..200d0deb6c90 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -690,6 +690,12 @@ static void blk_trace_setup_finalize(struct request_queue *q,
+ 	 */
+ 	strreplace(buts->name, '/', '_');
+ 
++	if (version == 1 && (IS_ENABLED(CONFIG_BLK_DEV_ZONED))) {
++		pr_info("%s:blktrace events for REQ_OP_ZONE_XXX will be dropped\n",
++				name);
++		pr_info("use blktrace tools version >= 2 to track REQ_OP_ZONE_XXX\n");
++	}
++
+ 	bt->version = version;
+ 	bt->act_mask = buts->act_mask;
+ 	if (!bt->act_mask)
 -- 
-Damien Le Moal
-Western Digital Research
+2.40.0
+
