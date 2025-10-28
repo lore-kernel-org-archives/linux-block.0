@@ -1,176 +1,242 @@
-Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11012036.outbound.protection.outlook.com [40.107.209.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7D96330336
-	for <linux-block@vger.kernel.org>; Tue, 28 Oct 2025 17:45:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.209.36
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761673515; cv=fail; b=qcYTt7yp41XxkmzJvyZg1ALwKCDvtbXp7T28b5br5xI4aCkUMJcVQ5+PkM3DHLwzQ3emVyxEkJ1ZdEa2GpcRZEMY5M/3VamGCY+RUvqO8vgSA0CgqFtp3Y2wciJY5ZBsCrMsd/5KqQal2RK1CdCfzMy/338FlTURLJxVoZpSIHo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761673515; c=relaxed/simple;
-	bh=aB9KxSGi4k8nm7i+UhXckc3aq3B1QdFV0k8MsZCiTM4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Nou3lRAd4BoTmQwEk4ibCLq3JllOF7rQtyyIQ/sMWrvnGF3qXSj27jt8y+u5abfxKnJDl8oOhdkO6fa5Yst2gnVn0sn7zRy49LHf8cpBCiLiML2KKXigCICsi37KJscnrl8gn7Fq+t8pae0s8WBwZYaixnJNB5wO6qv2o0vCVgc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=nMhikwJ2; arc=fail smtp.client-ip=40.107.209.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58D991AC44D
+	for <linux-block@vger.kernel.org>; Tue, 28 Oct 2025 19:20:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761679253; cv=none; b=lIB1AcLc+AQFrmeuPWrA/bP3vUNqyKqzQ+ImSGP+VQP7ZY86N+DbveW2HtyRqbtv3k7bj4dTRLhKma5sajYnZ9gR+nrifY7+bUUkZPOdeevocLckd+/TNjE6sGcYPuktLpUDdNKGNZps4WgrJl+m/nYPMEnX58cHSbQZwoBLdn4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761679253; c=relaxed/simple;
+	bh=NVZdPCleQ0CQsp8hIW6QuoytFZ4F6sBofDe2NFZcw4c=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YjbHoPRq7/VZ2rH6SAtguNK6AOK88OQ8GZZOh/5KKHZqkI9mo9f63l7pfyEPRlaP20RFZx10v2crob5olVKvj4Be2auofA+UVurqz9RfG+blXCEN+APl2ajkUs4xWU3AWFMbkpUAfHSY/4rQXLcJKI4n+/Je4dATNV/OZf3o5zI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Cek+89w1; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="nMhikwJ2"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=HrTd6teuLqKZbeiSkjfQQhYNaCRGXmWR6KsUL+djLY7stcKlDTEhXG75WkY3srpq6zKQDnpaQPxqsXT8i7XYGz0NogTR6F7Oqj+lUKIxq7/LCTTgbA7TLs/uKuEp0Jkf3L5wWMxtRrtQgzEDvlbYw1BaUBCrhGBLGChREbZAWasaP3rT1clc3e45ls9SOVQL57AlsKQU1Y/AR/I3/HoyWJpXBbLK3H+e7MEFT7Oy3hh0t3YAl4oJLA+OiYJf6PxkoFsp1xEXpD8yGfkXkvPeVxiuHrTvktXRos11z1evVKnWjKRVM1CDJVwNnYZZz395LwwPzJyLFU78BLWdkdUY/A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=aB9KxSGi4k8nm7i+UhXckc3aq3B1QdFV0k8MsZCiTM4=;
- b=sEWyZ1DSE9HoGwhks+V6GS9r/e+LvQk2GFAcZ207rwYXknECdh/z5ibDSFy5u8OiI0lx1+1q2iynebV6dxXEKQa1UKyCijFUURV2PR1fVUYXirpQn38IlRd26rwcmkqEOjrawD31WQdpuGHYKLEEZdIXuV244c8HDZrkJ0PZNJhycyEPyFGCn3iFMQbdBvH4Rslx163btvctcOPQjCaVvgOI0nM0kh05jU9w/2hI8SMkIERzPhNzgSBMrLB0ERBBm2+h1JEcCy354tbtpKkvBHHq3hQje+xV9ne7hIVesoD+E/ScR//1yGlj/2lUUAy9zYh4r9lCyhSx5n52aemLqA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aB9KxSGi4k8nm7i+UhXckc3aq3B1QdFV0k8MsZCiTM4=;
- b=nMhikwJ2pfjPEujAopKmsuBizjI5Yn7QkIO7XygADCpnEg1X7Le9mlHiOAOWsASKg3PXDKTCwNt0X2aAQSQiih8AuXMPk6MAT+kmrVVrnjbW2qKwXyleAzQrjwa4pWD1Bi+fJgCxNMHIPzaI7pjq1nykQqMOjQe2UC/+2nXmq6EXlJW4V5VeYLWlN1nAXF6Oryxo+co48CDHtyYfQ9DKRA3cED9BYY8fu+l44uqCK6hJ0MLhDee81F8jmRtIABgoB1TNyFTJrZahp6SClb58/xpyycI8rtBgx9VJ6AmGrjYclP8vy1jbZfwFY3Z9oAGj9QXnji8GIroy18/GesasLw==
-Received: from LV3PR12MB9404.namprd12.prod.outlook.com (2603:10b6:408:219::9)
- by CH2PR12MB4295.namprd12.prod.outlook.com (2603:10b6:610:a7::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9253.19; Tue, 28 Oct
- 2025 17:45:10 +0000
-Received: from LV3PR12MB9404.namprd12.prod.outlook.com
- ([fe80::57ac:82e6:1ec5:f40b]) by LV3PR12MB9404.namprd12.prod.outlook.com
- ([fe80::57ac:82e6:1ec5:f40b%5]) with mapi id 15.20.9253.017; Tue, 28 Oct 2025
- 17:45:08 +0000
-From: Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>, Chaitanya Kulkarni
-	<ckulkarnilinux@gmail.com>
-CC: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH blktests 1/2] blktrace: add blktrace zone management
- regression test
-Thread-Topic: [PATCH blktests 1/2] blktrace: add blktrace zone management
- regression test
-Thread-Index: AQHcR9WyRbu+wdEajUGQGIEdNu9kcrTXKDgAgACtToA=
-Date: Tue, 28 Oct 2025 17:45:08 +0000
-Message-ID: <158d6401-9d06-42e6-886c-57b57cb75293@nvidia.com>
-References: <20251028063949.10503-1-ckulkarnilinux@gmail.com>
- <4513674c-9d99-4356-9fb5-f39030cd6a92@wdc.com>
-In-Reply-To: <4513674c-9d99-4356-9fb5-f39030cd6a92@wdc.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Mozilla Thunderbird
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: LV3PR12MB9404:EE_|CH2PR12MB4295:EE_
-x-ms-office365-filtering-correlation-id: f43b6a62-881c-47bf-8023-08de1649bc71
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|10070799003|376014|366016|1800799024|38070700021;
-x-microsoft-antispam-message-info:
- =?utf-8?B?VDM5R1NHdExTWWtoWkF1WXZEc0Nqajc4R2RVRlV6aEhsQkRwcnVrdEJhaFBQ?=
- =?utf-8?B?WFd1NG9qb0kxSENMZVdsNUpRbkFudnMySTNxZzJXd1gwbUh4THNXTCt0MlUz?=
- =?utf-8?B?T0VNNElmU2tBZUdEZTdacDlkS0h4R2FneklYK0VRNWd2eUlUUnlLYitWSFlN?=
- =?utf-8?B?OTZPOGErM3Y0NUpqbDhLZHJLcjAxNkswMXFZS1FqQjRPdUkwd2gyWnVWOERQ?=
- =?utf-8?B?OUpJWENIMjdhN0hIVjA4cDNBSENhdUVSOG5TbUZIY2lLVVlDdFk3cmUrVTBr?=
- =?utf-8?B?cVVGSXZVTmp5b0RCd2Q1Z20vRTNJek1HeDlpWXEyV0FGU05SeDFmUjZickta?=
- =?utf-8?B?b3c1MVJra1M1dm5SVE9DYm02SjFkVHB3azluSVJZcUJueFhUdkpXLzYxYVdk?=
- =?utf-8?B?WlhpMWJ6eVl5cHhnbnNabkFFbHpmLzk0WjBOUTZEK0lqRGhKOFJEdWJINkhW?=
- =?utf-8?B?RWRiUWJpQmlMNklxK2RhblZMWVVmVHFSSnhDWnZLOXFRL2FPRlQ2ejduN09k?=
- =?utf-8?B?Smc0YXF6NXBuS2dSQWl1ZFNFR2pNZmtZSkUwNFZQYmdiOTRmdkJNZ29DZW1R?=
- =?utf-8?B?V3BCVkwyUFRXSE1OVkZWMWZwd3VIb3BNUjkrZ2lrMkJTZHYvZlcrZWt0OTBl?=
- =?utf-8?B?NmVtR0FyelFvME5kZnV5SUk3cnRqU2I5QlNZa1lHUDZDTHdoZm8xQTYrVlo1?=
- =?utf-8?B?SWlZbXM3ZDZFYytOQlNUOUllRXN3QVNWTlZPWmtnNUQrUkY3NjFKb0pLdlNF?=
- =?utf-8?B?d0F0WHJjMExYbkE3SkhFQ2FwS2p1emJQRStZVGZDVXZ3aXk5OWkrTjVCVGtU?=
- =?utf-8?B?OVg0SGhpa0t3dEovR2hMaFFMbm4yc0k5TXhWa0hQZmJRMVNBSkY5UWhheWtP?=
- =?utf-8?B?bG5BbHUxbFlqdmZ0SlhlY3NTWEtRWE93VjVUMlVnZDFFYURTYW85TlRUT01o?=
- =?utf-8?B?QTM5OUNwNENtalBkMzQwYVpWS3dhSFl4MlJyMTdHOEo3bHk1cWIrMS9GK3FH?=
- =?utf-8?B?Nlh0V1owVzFrOTVZMk0rMHpBQmc2UXdoMnJvVlgxVkZDaXRkYVl5L3gyS2xR?=
- =?utf-8?B?eDVzVVBwbitmQUZXKzFLTFpPc3hUWW5nOFhyTTJOWHgzNy82WFJ4aTFqRHRX?=
- =?utf-8?B?YWRvYUpYSlduVGdEZmw1T3pMM0Y4V2VnOVAyeFIrbVV1dDNuUXJsbHRNckFY?=
- =?utf-8?B?Vllsa2RWME1hOER2UmRiMXVuWWttbWRHU3QxbWEyQjhHL28raEo4a2ZuNEVQ?=
- =?utf-8?B?QkFRNjNKZ2pkcEl2SVc1OUFyby9xa21LaDEyTVpZSDVNOXdvNGhVOUN5VzdM?=
- =?utf-8?B?TUM1TmlwczlpZktTVy9DK2RRM0NNMTV1amNGOFlFMlBCdGhnUTlZWWtJL1N4?=
- =?utf-8?B?RGppNWpHNE1TRkQ2b01jalEraXIzNnQwalI4allrdURGTmZ3dVJmUkVaNmhZ?=
- =?utf-8?B?VVBOemdFY2lxOFMvM3podTRFbjBaWDFqcHI5MVNwWk0zS3V5L1VHMk5RaUpM?=
- =?utf-8?B?MjM0WHRmYllMeThMQlcrQ3RCdGQ2ZkRHRmIraXlQRy81RGFncTc5bkRxN25y?=
- =?utf-8?B?SjBHWndveVdEMDVSU0gyMS9kcURrc3J4N0dEdXlYOHRST0g3b0diTUZZSEVU?=
- =?utf-8?B?SERYNm9UUEVTR2ZBajMvTUZWZ04zWW1nem5xdHB0TFpMaFlIUmtxVWkxeEpR?=
- =?utf-8?B?bmRpNDNiSjVKMnJPK0FVVWtnQ0NwNGJROTlubnRzUW1QSEJtckFiMStKaTg2?=
- =?utf-8?B?SXpwbHFkMUFkdUNHRVRJV1VHUGN2dlZZRGswbkxUREZhZlVVUWRIdnljWDUv?=
- =?utf-8?B?ZWwrSWpsT1lvUEo0WDJCUjVuMFQza2oxdk5KL3IzY3ZJVzdyenpqSkpQR0NJ?=
- =?utf-8?B?MFlmL1p3ODJCcUtzM3RPTUZiRVFGU2JGVHpGVmV1WVpubWI1RGQwdXlGTGNF?=
- =?utf-8?B?dnJ1SmVDdlJPTWJvcUd6a2UyN3hsM3BVYnFKM0VJRFAvbGE0RzlIQjRkSG9U?=
- =?utf-8?B?QWR3ZUhVYlQwNTZ5bnFUUFRzcTJOTHQ5UUNLZmpDNFVvU2daTURNaHpCT0Nt?=
- =?utf-8?Q?DnTvRc?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR12MB9404.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(376014)(366016)(1800799024)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?bWF5QncxSXNoZXcxZG9FQkpyQ0hCeUltYlZwbnNjYlJlb1lOUG51NitxcTZM?=
- =?utf-8?B?VlFKUlRtZWJKN3kvMXdNY1pseVp3Yks2bWozWitneFJaMjdvNUFNR3NNMzJV?=
- =?utf-8?B?S1JEdkJ2Z3YyM0FyK01xdGF1eHpJb1FrSjhRN3BlZjNKWktKK2tkckFDMDVO?=
- =?utf-8?B?eXF5ZFYxbFk1dU0vcVFJSG9GcVZvOVJiY1o1amc0U29Da1BUR0t3SFFmekNn?=
- =?utf-8?B?bmZVZUxEcFN3c1VmWTlGaWZVQUZxb1ZTRG1tNWVEWEs0cVg3ZXBmUEsxVnVV?=
- =?utf-8?B?YWtxc0ErbXJCRUhyb2pEaTNUMTZWK2ZndlZ1cTh3R2VacDRrMm5KYU5MOVVw?=
- =?utf-8?B?TnpkdGFERnQyeWdoQnJvNmUxaDJKUllsMVNCRS9NVzRBQTI1ZmRyb2YySDlO?=
- =?utf-8?B?SkxDNWFLZkxvdnpINTVHR2ZuSUdxdERqMjA1ZzlZUUdIS2FKVGcrZi9IMTdQ?=
- =?utf-8?B?bk5NUVg5a3NvL2JkQ2p1Y3p5Um80STcrQmFRcVVoVWlLa3dSdTNhMmFwbnhh?=
- =?utf-8?B?Y3QwL05OWkYxM0VvS09wTHhYQ1JLclN6RytOOXh5aHpJSXdTZSsxNGRsTmVp?=
- =?utf-8?B?dWw3RnF0ZUFCcnJ6WlQySHhXMFREekZTSko5dmYrWThJQ0dHaWE0d2xidjV2?=
- =?utf-8?B?MjhnemlKc013cVhJWnV6TXdrWG9wQW5qbk5HTUZ1VzJqV2VHR1R5czJFVHgv?=
- =?utf-8?B?bWlJRkx1SEdOU2pPWGs5UEJkRFRSdXE2S1phK2dsZ3poWTBwelJ2ZFpwNlBY?=
- =?utf-8?B?a2Q0Rkp0MU9iY2gzWnNZTFRLR0p2ZEdZdjVjKy9YMzQ2bkxneHRMTVhtKzRR?=
- =?utf-8?B?MDRqNDdzMUF0L3E5UDNWMFhqdExrVVNHUlhNKzZtTzVKaFhsR3VTUjZtOU1X?=
- =?utf-8?B?MmtXRDNBRGcyeVAwWTZwMDU5Wmg1TzdWK0xYNjRRVlVvNlFYQU9Db0Q4SVpt?=
- =?utf-8?B?OWJyYVpuRC82enMxMjRFMVprWDg1b2prSjhvUVM2R0h3TFNJQmJRdEJtS2kv?=
- =?utf-8?B?cGlSWFZoL3VRNS9YQnJEM3VyRk81ZU9yTkdGSjhOeUpuaktwSVl0Mm90cjhZ?=
- =?utf-8?B?UnFUMThtZWpFVXYxUkFWaks1KytrMERGbUxCYTZwY2wwU29kdzBVVU9ick5F?=
- =?utf-8?B?ZWhvS3VVa3ljS3p2K0g3TXRSUi9SN3I4SUZvMFBrMDVMb1hXUjVCOE04ZStK?=
- =?utf-8?B?MVp6V3lHNlorZktpNllpL1g1Ti9Md3d2YlNOUUZ2d25BVTNhTWVSMDFlQVF3?=
- =?utf-8?B?TlZDeFl0ZEk3U085M1JoUmdqcUNmZm83Ymk3OGdNSm9qeTUrMk1SWm51cHY2?=
- =?utf-8?B?UHYvbmNOMUgwcm5wWDhNV2pLN0wyUVNxYlRDTi9IdlZjbUlSbkNlTUtTS2pk?=
- =?utf-8?B?QTB2eEZ1T2dadkpLejBBY0FrcStPMXJLR01saE51b21rY1dkWW9zZHovMW1t?=
- =?utf-8?B?b1VKVG82NHJiVk1hNDdIMXh3RGJxN1I1ZmFYODlpWHlEQkZ6dWx4TVgxekpB?=
- =?utf-8?B?R1k3akV4dG8yMHNQUmM4KytTcktIbmFWQXM4WXpnTzhpUFpTbDdUaHJsTDhW?=
- =?utf-8?B?enYwOHVxZzBtbSt1anY1T3dQR2pJd0IzUUlyckZpaHd4T1JSV25kT2xhNW5C?=
- =?utf-8?B?S0JoakU1bjFTeHEzVDhkdTdWcGM4K3ZOUU0rdTAyZnRFVStiV3lGbjVIa3FK?=
- =?utf-8?B?UVNlUm9IblVyam5lWU9mS3ZrOXlaWU90c0lTb0szaXI1Z0FKVHY3U1RYKzd4?=
- =?utf-8?B?VDdMSy9tZE5uSnY0NUk1TU5tS0tIOFpEU0JrYUk1ZW43Z0JKc3oxQWhqeGFH?=
- =?utf-8?B?eENFMHBKdkZjczhxRVRGUElqWkQ1YldHajRjMFpqUVJhbG1lYTVIelRScS9v?=
- =?utf-8?B?L1lKbkZLeFZtQlNhMFUzOURrQnBIUVpESUVtZUdQZkVIZHBBUk1YT3pPTzdX?=
- =?utf-8?B?aWZqVlM5NmhocElBTGRoUTFiSnBCUkVQdUdrNzU5Zm8zRzZKWkVjdzE2V05Z?=
- =?utf-8?B?eWZQRmtVdXd6amw5eHNJS1d4a0JkNVZXM1daL1RNZ3lDclQyL2w0WTlYZU1z?=
- =?utf-8?B?MFZSc2l5YklkVk5NTlc1bC92WFVjU3Z5NnhtcUpPdXhQQnArK0UvQ1VVN2lP?=
- =?utf-8?B?QWhTU01qZ0paTFYyL0tWQ0RUaDNzMU9SZ2dnZ09rbFVQcStwVExnZUVOdVJB?=
- =?utf-8?Q?oBczWgvnZEDgdIO7vr6BHzGijo/cuKvF7eikm5zjVtuE?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D2AFA02A704870498A6EF43CA42E99DD@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cek+89w1"
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-34029c5beabso1434394a91.1
+        for <linux-block@vger.kernel.org>; Tue, 28 Oct 2025 12:20:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761679252; x=1762284052; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HYSq9IClrUvG1oGKDeC8H/7AeUSwxz0XnSZ/bQ9dAd0=;
+        b=Cek+89w1YIobVI5Je9faYVZAz0NwrPcxpli7433QID8TXLaNvgL+mWLSNWbrZahuys
+         d/qQMSbJyVFtH91lEouELut0BceAqx6JtcTl9HNPPtpUAzs09izKQUv9l8QLlMX1pHVu
+         YHHpUL8JtrRCootKfNbLatytkB4Sqb/MIfCCKB+0KvA1UOeUvbWe0WE+x52SKlBeYnFr
+         v8KQHJxPT6YcxJnXYNPke54U0I+AsHlYGPsTrwhQHSXQzTCa9Jo2PQPC3C+zKq5YG5YM
+         3Wnue7DkkYRe6xK3U7cph73W2J9boWOwIWX1a8z6WZSzubNa1SixQVON7cIPoBuGYBSI
+         wo1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761679252; x=1762284052;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HYSq9IClrUvG1oGKDeC8H/7AeUSwxz0XnSZ/bQ9dAd0=;
+        b=ahCFrAAsKkAjZ1d+NV8wSDn5KTAR5kX1PVz7hJpNZhH4J01fE/TCoVeXVNgPIwkYUB
+         xE1dLgH6TSE+2fsWTZ6pi8N68FKeu77lB6vsDY61bdJqbt9GVhYiyEjc9qlZo+lJP7y6
+         4Us6G8wZNKBFITRsHt9nfbvT/3EzNr0nCFsWSYcLU7jJyMs57d8e8mL1Rs0Z143m0ck5
+         1zTKnEqT9KBLlOV4S7aSKFi/sWudVtxrorilwQXRvkgx3+kRf/JvkVe5dbw0O5QGRknq
+         8ibd9FbSMpQ0TGVgdE9eVHEB5xibNw5I/uBDlmtTQhECUntmeo3rZmhQL0s0U+pbxSrq
+         l0aw==
+X-Forwarded-Encrypted: i=1; AJvYcCW/7M3Yi5m3oXNVfRBdXItbJj7+Shv2c/x13hrguFrohwLXEe4yrE7+dB7xVsPIuP1pJPrW805mtzLiHQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzxY5BJjy32huqaqnFIO+X7kvLI3jtFx1P7AUdJmCOw5V3CP0y0
+	Hft27R1zim/JIz96r0GH4/RDfddLlSMTLqgT0/x5xf6imnQTw+VjhTsZ
+X-Gm-Gg: ASbGncv6kgDBZ/o8nU6xslMrccJz8wCK6w0f9Dv3T2C1w3A0NBEpM14+a8IDC8Z5Npq
+	zuZueiA9G5mywppCcZ0A6QGSKdhdzMcm1QLCZBwLDfTC6KLU7LwJpKRe9np/0Ac7Qr6HwsYjr6O
+	Mv8zPpRpxgIrULWwm2gNQMVV0scYHVMH1dIR7jgSvORNpEMgG8pJV0d5RMdbyXbkqQevkdEEeBz
+	NIoBZRg0VdNBFc5aR1rvSMwz+fUj/wojIJPiQZ5rqz2riFr+812fjRTZYOEiiBcvNBE9+pc6Uwe
+	DK8iunVaIiG6I3tA0dk1oheyw4ZiMpB7oJ4UxKV7K2OnXPxnHjWYjo/TBxGQhDlXH12Nszs4VCQ
+	ffZiuyyHpoc1WE12kXVgxx+8UEZ+jyzXfK7kbPDMd91iITSciBmxk51gguuxbDy5a
+X-Google-Smtp-Source: AGHT+IFgD5YXjG/WguaVlw8y5CCXqav6u9YvKxBGFedwnQ6rH7ANcRcUmbYYnRlYgogKTuS9ouMt+A==
+X-Received: by 2002:a17:90b:4cd2:b0:32e:749d:fcb7 with SMTP id 98e67ed59e1d1-3403a15c41dmr217304a91.13.1761679251392;
+        Tue, 28 Oct 2025 12:20:51 -0700 (PDT)
+Received: from localhost ([2600:8802:b00:9ce0::f9da])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3402a61f83asm1504879a91.13.2025.10.28.12.20.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Oct 2025 12:20:50 -0700 (PDT)
+From: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+To: johannes.thumshirn@wdc.com
+Cc: shinichiro.kawasaki@wdc.com,
+	linux-block@vger.kernel.org,
+	Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+Subject: [PATCH V2 1/2] blktrace: add blktrace zone management regression test
+Date: Tue, 28 Oct 2025 12:20:47 -0700
+Message-Id: <20251028192048.18923-1-ckulkarnilinux@gmail.com>
+X-Mailer: git-send-email 2.40.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: LV3PR12MB9404.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f43b6a62-881c-47bf-8023-08de1649bc71
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Oct 2025 17:45:08.2591
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: FtuJ/VlsbyNcXvy+xfyAhr3xN8o3Yu0QosLjfHYY3V5mw0ViJdl4MEOCaF+amsJNPYJbACt0XgUevMVf0OT0qQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4295
+Content-Transfer-Encoding: 8bit
 
-T24gMTAvMjgvMjUgMTI6MjQgQU0sIEpvaGFubmVzIFRodW1zaGlybiB3cm90ZToNCj4gT24gMTAv
-MjgvMjUgNzozOSBBTSwgQ2hhaXRhbnlhIEt1bGthcm5pIHdyb3RlOg0KPj4gKwkjIENsZWFyIGRt
-ZXNnIHRvIGlzb2xhdGUgdGVzdCBvdXRwdXQNCj4+ICsJZG1lc2cgLUMgMj4vZGV2L251bGwgfHwg
-dHJ1ZQ0KPiBEb2Vzbid0IGJsa3Rlc3RzIGhhdmUgc29tZXRoaW5nIGxpa2UgZnN0ZXN0cycgX2No
-ZWNrX2RtZXNnKCk/IENsZWFyaW5nDQo+IHRoZSBkbWVzZyBidWZmZXIgZnJvbSBvdGhlciB0ZXN0
-cyBkb2Vzbid0IHNvdW5kIGxpa2UgYSBnb29kIGlkZWEgdG8gbWUuDQo+DQphZ3JlZSB3aWxsIHNl
-bmQgVjIuDQoNCi1jaw0KDQo=
+Create a new blktrace test group and add a regression test for a
+blktrace false positive WARNING that occurs when zone management
+commands are traced with blktrace on V1 version.
+
+Bug: https://syzkaller.appspot.com/bug?extid=153e64c0aa875d7e4c37
+Location: kernel/trace/blktrace.c:367-368
+
+The test:
+1. Creates a zoned null_blk device (8 zones, 1GB, no conventional zones)
+2. Starts blktrace on the device
+3. Issues zone open command for all zones
+4. Checks dmesg for the false positive WARNING
+
+Device configuration:
+- Total size: 1GB
+- Zone size: 128MB
+- Number of zones: 8
+- Conventional zones: 0
+
+If the WARNING is found, the bug is present and logged to the full
+output. If no WARNING appears, the bug is fixed.
+
+Note: The bug uses WARN_ON_ONCE, so it triggers only once per boot.
+Subsequent runs after the first trigger will not show the WARNING.
+
+Signed-off-by: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+---
+V1->V2:
+Removed dmesg -C to avoid clearing dmesg buffer from other tests
+Use _dmesg_since_test_start() to only check messages from this test (Johannes)
+---
+ tests/blktrace/001     | 94 ++++++++++++++++++++++++++++++++++++++++++
+ tests/blktrace/001.out |  2 +
+ tests/blktrace/rc      | 11 +++++
+ 3 files changed, 107 insertions(+)
+ create mode 100755 tests/blktrace/001
+ create mode 100644 tests/blktrace/001.out
+ create mode 100644 tests/blktrace/rc
+
+diff --git a/tests/blktrace/001 b/tests/blktrace/001
+new file mode 100755
+index 0000000..43331c1
+--- /dev/null
++++ b/tests/blktrace/001
+@@ -0,0 +1,94 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2025 Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
++#
++# Regression test for blktrace false positive WARNING on zone management
++# commands.
++#
++# Bug: https://syzkaller.appspot.com/bug?extid=153e64c0aa875d7e4c37
++# Location: kernel/trace/blktrace.c:367-368
++#
++# The bug triggers a WARNING when zone management commands (zone open/close/
++# finish/reset) are traced with blktrace on V1 version. This is a false
++# positive that should be fixed.
++
++. tests/blktrace/rc
++. common/null_blk
++
++DESCRIPTION="blktrace zone management command tracing"
++QUICK=1
++
++requires() {
++	_have_program blkzone
++	_have_null_blk
++	_have_module_param null_blk zoned
++}
++
++test() {
++	echo "Running ${TEST_NAME}"
++
++	local blktrace_pid
++	local warning_count
++	local device
++
++	# Initialize null_blk with no default devices
++	if ! _init_null_blk nr_devices=0; then
++		return 1
++	fi
++
++	# Create zoned null_blk device via configfs
++	# 8 zones, 1GB total, 128MB per zone, no conventional zones
++	if ! _configure_null_blk nullb0 \
++		memory_backed=1 \
++		zone_size=128 \
++		zone_nr_conv=0 \
++		size=1024 \
++		zoned=1 \
++		power=1; then
++		return 1
++	fi
++
++	device=/dev/nullb0
++
++	# Verify it's a zoned device
++	local zoned_mode
++	zoned_mode=$(cat /sys/block/nullb0/queue/zoned)
++	if [[ "$zoned_mode" != "host-managed" ]]; then
++		echo "Device is not zoned (mode: $zoned_mode)"
++		_exit_null_blk
++		return 1
++	fi
++
++	# Start blktrace
++	blktrace -d "${device}" -o trace >> "$FULL" 2>&1 &
++	blktrace_pid=$!
++	sleep 2
++
++	# Verify blktrace started
++	if ! ps -p $blktrace_pid > /dev/null 2>&1; then
++		echo "blktrace failed to start"
++		_exit_null_blk
++		return 1
++	fi
++
++	# Issue zone open command for all zones (triggers bug if present)
++	blkzone open "${device}" >> "$FULL" 2>&1
++
++	sleep 1
++
++	# Stop blktrace
++	kill $blktrace_pid 2>/dev/null
++	wait $blktrace_pid 2>/dev/null || true
++
++	# Check for WARNING (bug present if WARNING found)
++	warning_count=$(_dmesg_since_test_start | grep -c "WARNING.*blktrace.c:367" || true)
++
++	if [[ $warning_count -gt 0 ]]; then
++		echo "WARNING: blktrace bug detected at blktrace.c:367"
++		_dmesg_since_test_start | grep -A 10 "WARNING.*blktrace.c:367" >> "$FULL"
++	fi
++
++	_exit_null_blk
++
++	echo "Test complete"
++}
+diff --git a/tests/blktrace/001.out b/tests/blktrace/001.out
+new file mode 100644
+index 0000000..a122a65
+--- /dev/null
++++ b/tests/blktrace/001.out
+@@ -0,0 +1,2 @@
++Running blktrace/001
++Test complete
+diff --git a/tests/blktrace/rc b/tests/blktrace/rc
+new file mode 100644
+index 0000000..9b987a2
+--- /dev/null
++++ b/tests/blktrace/rc
+@@ -0,0 +1,11 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2025 Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
++#
++# Tests for blktrace infrastructure
++
++. common/rc
++
++group_requires() {
++	_have_root && _have_blktrace && _have_program blkparse
++}
+-- 
+2.40.0
+
