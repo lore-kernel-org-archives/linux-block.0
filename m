@@ -1,263 +1,108 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 438F0201278
-	for <linux-block@vger.kernel.org>; Tue, 28 Oct 2025 08:57:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFA80328617;
+	Tue, 28 Oct 2025 12:02:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761641832; cv=none; b=UNfxZ5lo/iv/Iwj4Jr9DFUyw9pimymzlo4kHNp2hZw+h0/8nhaGGbV8lMihuqpp5SOUx2p+4gH9n0vtu5V7lr5F2jqPxQ91pj0dMKDi1nEjqtZ9EmHHL8QgRjplL/KezLQmw8R00CKUNcZymf5m/oUz26lD8H3oZKL88Vgu8Ozo=
+	t=1761652934; cv=none; b=tFlJd6m5qCI/+fVZ5nVK+91PnCj9ALCDNHW6jbOiBqyJI143p3x1ry2QzizxiFPFpmqVIEudp4AqavLaA3WhTD4VkbthhPdklyZ5EnnZPIdBJjwQvQ6HSxs3XzQ7PJPafNLMWVT53npdfBS1QQxggj2xGZqhIzmpv9vzzMXbHNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761641832; c=relaxed/simple;
-	bh=t5uRfxDF7qOYzj8Kz1EFN+edA5rfvzBDnCRulwGCQ6Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BOcNg49yUcW2ypLSjRjkX8nqBTNPJtR6r1k/9GrXD/fJNeEwzJbMY/giNtVVAbEmck7DIfvF3ujIpX09nnntQc38VZ2819/EKOG5SMtrSZnET7GKBbV22tfbI7+FpCLI97G2HrlE8luksICjUHH/7TLLhN59Ppub7JopSb+8NSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M8SRelsH; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1761652934; c=relaxed/simple;
+	bh=mZf/YKmsAob1fECJczEmiCct9PI3ELB+8/2Zjo1x01o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DyShAmpB1sV1LVad2AisW335Gq33qdq7SEzXH5pLBPojMUQhZ75sk6z8gq0FAOSpBj9U6QfP6tKFR4cdGXq2J5E6ZKu53sxtjCphaYERhSG7Se5vYx9JTxTIEb/9LCTMNzifmvEMCd/4juNeiKG3C4Iuym8si4bIHZrE//oWKKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SwZX30kq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M8SRelsH"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761641829;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qWrFXyHxIqRt8XsFUm61dbcpwhVzn9gLTCKPNmVXN+Y=;
-	b=M8SRelsHynzA7B//KF9mpRnyTo7rDol/hFtI+UFngpjOPISYhWw2oNgruRq2JDuHHZ+XDk
-	rfGVYE5vUUPn0Sx1kiQUVGpE8izVsY/OM7BYUghOlwQb5WUmD1VGCffMadaN1E7aL+i0X4
-	w/hUFnv8qu6KMTx1UjcxvYoy7IDC3pk=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-401-4pREN9fDMtql1yevJ-7CfQ-1; Tue,
- 28 Oct 2025 04:57:07 -0400
-X-MC-Unique: 4pREN9fDMtql1yevJ-7CfQ-1
-X-Mimecast-MFC-AGG-ID: 4pREN9fDMtql1yevJ-7CfQ_1761641826
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A8C43195608D;
-	Tue, 28 Oct 2025 08:57:06 +0000 (UTC)
-Received: from localhost (unknown [10.72.120.23])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 769931956056;
-	Tue, 28 Oct 2025 08:57:05 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Uday Shankar <ushankar@purestorage.com>,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 5/5] selftests: ublk: make ublk_thread thread-local variable
-Date: Tue, 28 Oct 2025 16:56:34 +0800
-Message-ID: <20251028085636.185714-6-ming.lei@redhat.com>
-In-Reply-To: <20251028085636.185714-1-ming.lei@redhat.com>
-References: <20251028085636.185714-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SwZX30kq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9F27C4CEE7;
+	Tue, 28 Oct 2025 12:02:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761652933;
+	bh=mZf/YKmsAob1fECJczEmiCct9PI3ELB+8/2Zjo1x01o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SwZX30kqTRxKywW3JAgQpZq9YEFkCs4mbYnsls8E10OCO8sCik7skaC6kTTCKlfog
+	 IAGPeflZVG4EU9joGw/E4TiGl7RA8FEFNbJr5eZDvYRVR5AqDOAKiVBJ3RW9NglqMt
+	 YrKtMpdU8ZM7ej9CU2ASIMTiUtmkgbi/4YlElhPAm8ukENsd2Q5yb9qGC57bQdTv87
+	 kSyfTWb41F+rhshf2CL1q0957AOwBmoHWs/npuXlrXKWFgxS/IeSKCP1J/gK/MKvkJ
+	 lcPBPR7SnFgSuuCKpUntaxB+uWX3d7haPhR2st8URjXBigR+NbHjYiQJL0WRxmtmiQ
+	 /cOOFozsC/eiA==
+Date: Tue, 28 Oct 2025 14:02:07 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: David Matlack <dmatlack@google.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>,
+	Jason Gunthorpe <jgg@nvidia.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
+	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
+	kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org, linux-mm@kvack.org,
+	linux-pci@vger.kernel.org, Logan Gunthorpe <logang@deltatee.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v5 9/9] vfio/pci: Add dma-buf export support for MMIO
+ regions
+Message-ID: <20251028120207.GQ12554@unreal>
+References: <cover.1760368250.git.leon@kernel.org>
+ <72ecaa13864ca346797e342d23a7929562788148.1760368250.git.leon@kernel.org>
+ <CALzav=cj_g8ndvbWdm=dukW+37cDh04k1n7ssFrDG+dN3D+cbw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+In-Reply-To: <CALzav=cj_g8ndvbWdm=dukW+37cDh04k1n7ssFrDG+dN3D+cbw@mail.gmail.com>
 
-Refactor ublk_thread to be a thread-local variable instead of storing
-it in ublk_dev:
+On Mon, Oct 27, 2025 at 04:13:05PM -0700, David Matlack wrote:
+> On Mon, Oct 13, 2025 at 8:44 AM Leon Romanovsky <leon@kernel.org> wrote:
+> >
+> > From: Leon Romanovsky <leonro@nvidia.com>
+> >
+> > Add support for exporting PCI device MMIO regions through dma-buf,
+> > enabling safe sharing of non-struct page memory with controlled
+> > lifetime management. This allows RDMA and other subsystems to import
+> > dma-buf FDs and build them into memory regions for PCI P2P operations.
+> 
+> > +/**
+> > + * Upon VFIO_DEVICE_FEATURE_GET create a dma_buf fd for the
+> > + * regions selected.
+> > + *
+> > + * open_flags are the typical flags passed to open(2), eg O_RDWR, O_CLOEXEC,
+> > + * etc. offset/length specify a slice of the region to create the dmabuf from.
+> > + * nr_ranges is the total number of (P2P DMA) ranges that comprise the dmabuf.
+> > + *
+> > + * Return: The fd number on success, -1 and errno is set on failure.
+> > + */
+> > +#define VFIO_DEVICE_FEATURE_DMA_BUF 11
+> > +
+> > +struct vfio_region_dma_range {
+> > +       __u64 offset;
+> > +       __u64 length;
+> > +};
+> > +
+> > +struct vfio_device_feature_dma_buf {
+> > +       __u32   region_index;
+> > +       __u32   open_flags;
+> > +       __u32   flags;
+> > +       __u32   nr_ranges;
+> > +       struct vfio_region_dma_range dma_ranges[];
+> > +};
+> 
+> This uAPI would be a good candidate for a VFIO selftest. You can test
+> that it returns an error when it's supposed to, and a valid fd when
+> it's supposed to. And once the iommufd importer side is ready, we can
+> extend the test and verify that the fd can be mapped into iommufd.
 
-- Remove pthread_t thread field from struct ublk_thread and move it to
-  struct ublk_thread_info
+No problem, I'll add such test, but let's focus on making sure that this
+series is accepted first.
 
-- Remove struct ublk_thread array from struct ublk_dev, reducing memory
-  footprint
-
-- Define struct ublk_thread as local variable in __ublk_io_handler_fn()
-  instead of accessing it from dev->threads[]
-
-- Extract main IO handling logic into __ublk_io_handler_fn() which is
-  marked as noinline
-
-- Move CPU affinity setup to ublk_io_handler_fn() before calling
-  __ublk_io_handler_fn()
-
-- Update ublk_thread_set_sched_affinity() to take struct ublk_thread_info *
-  instead of struct ublk_thread *, and use pthread_setaffinity_np()
-  instead of sched_setaffinity()
-
-- Reorder struct ublk_thread fields to group related state together
-
-This change makes each thread's ublk_thread structure truly local to
-the thread, improving cache locality and reducing memory usage.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- tools/testing/selftests/ublk/kublk.c | 76 +++++++++++++++-------------
- tools/testing/selftests/ublk/kublk.h |  9 ++--
- 2 files changed, 45 insertions(+), 40 deletions(-)
-
-diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftests/ublk/kublk.c
-index 062537ab8976..f8fa102a627f 100644
---- a/tools/testing/selftests/ublk/kublk.c
-+++ b/tools/testing/selftests/ublk/kublk.c
-@@ -836,62 +836,70 @@ static int ublk_process_io(struct ublk_thread *t)
- 	return reapped;
- }
- 
--static void ublk_thread_set_sched_affinity(const struct ublk_thread *t,
--		cpu_set_t *cpuset)
--{
--	if (pthread_setaffinity_np(pthread_self(), sizeof(*cpuset), cpuset) < 0)
--		ublk_err("ublk dev %u thread %u set affinity failed",
--				t->dev->dev_info.dev_id, t->idx);
--}
--
- struct ublk_thread_info {
- 	struct ublk_dev 	*dev;
-+	pthread_t		thread;
- 	unsigned		idx;
- 	sem_t 			*ready;
- 	cpu_set_t 		*affinity;
- 	unsigned long long	extra_flags;
- };
- 
--static void *ublk_io_handler_fn(void *data)
-+static void ublk_thread_set_sched_affinity(const struct ublk_thread_info *info)
- {
--	struct ublk_thread_info *info = data;
--	struct ublk_thread *t = &info->dev->threads[info->idx];
-+	if (pthread_setaffinity_np(pthread_self(), sizeof(*info->affinity), info->affinity) < 0)
-+		ublk_err("ublk dev %u thread %u set affinity failed",
-+				info->dev->dev_info.dev_id, info->idx);
-+}
-+
-+static __attribute__((noinline)) int __ublk_io_handler_fn(struct ublk_thread_info *info)
-+{
-+	struct ublk_thread t = {
-+		.dev = info->dev,
-+		.idx = info->idx,
-+	};
- 	int dev_id = info->dev->dev_info.dev_id;
- 	int ret;
- 
--	t->dev = info->dev;
--	t->idx = info->idx;
--
--	/*
--	 * IO perf is sensitive with queue pthread affinity on NUMA machine
--	 *
--	 * Set sched_affinity at beginning, so following allocated memory/pages
--	 * could be CPU/NUMA aware.
--	 */
--	if (info->affinity)
--		ublk_thread_set_sched_affinity(t, info->affinity);
--
--	ret = ublk_thread_init(t, info->extra_flags);
-+	ret = ublk_thread_init(&t, info->extra_flags);
- 	if (ret) {
- 		ublk_err("ublk dev %d thread %u init failed\n",
--				dev_id, t->idx);
--		return NULL;
-+				dev_id, t.idx);
-+		return ret;
- 	}
- 	sem_post(info->ready);
- 
- 	ublk_dbg(UBLK_DBG_THREAD, "tid %d: ublk dev %d thread %u started\n",
--			gettid(), dev_id, t->idx);
-+			gettid(), dev_id, t.idx);
- 
- 	/* submit all io commands to ublk driver */
--	ublk_submit_fetch_commands(t);
-+	ublk_submit_fetch_commands(&t);
- 	do {
--		if (ublk_process_io(t) < 0)
-+		if (ublk_process_io(&t) < 0)
- 			break;
- 	} while (1);
- 
- 	ublk_dbg(UBLK_DBG_THREAD, "tid %d: ublk dev %d thread %d exiting\n",
--		 gettid(), dev_id, t->idx);
--	ublk_thread_deinit(t);
-+		 gettid(), dev_id, t.idx);
-+	ublk_thread_deinit(&t);
-+	return 0;
-+}
-+
-+static void *ublk_io_handler_fn(void *data)
-+{
-+	struct ublk_thread_info *info = data;
-+
-+	/*
-+	 * IO perf is sensitive with queue pthread affinity on NUMA machine
-+	 *
-+	 * Set sched_affinity at beginning, so following allocated memory/pages
-+	 * could be CPU/NUMA aware.
-+	 */
-+	if (info->affinity)
-+		ublk_thread_set_sched_affinity(info);
-+
-+	__ublk_io_handler_fn(info);
-+
- 	return NULL;
- }
- 
-@@ -989,14 +997,13 @@ static int ublk_start_daemon(const struct dev_ctx *ctx, struct ublk_dev *dev)
- 		 */
- 		if (dev->nthreads == dinfo->nr_hw_queues)
- 			tinfo[i].affinity = &affinity_buf[i];
--		pthread_create(&dev->threads[i].thread, NULL,
-+		pthread_create(&tinfo[i].thread, NULL,
- 				ublk_io_handler_fn,
- 				&tinfo[i]);
- 	}
- 
- 	for (i = 0; i < dev->nthreads; i++)
- 		sem_wait(&ready);
--	free(tinfo);
- 	free(affinity_buf);
- 
- 	/* everything is fine now, start us */
-@@ -1019,7 +1026,8 @@ static int ublk_start_daemon(const struct dev_ctx *ctx, struct ublk_dev *dev)
- 
- 	/* wait until we are terminated */
- 	for (i = 0; i < dev->nthreads; i++)
--		pthread_join(dev->threads[i].thread, &thread_ret);
-+		pthread_join(tinfo[i].thread, &thread_ret);
-+	free(tinfo);
-  fail:
- 	for (i = 0; i < dinfo->nr_hw_queues; i++)
- 		ublk_queue_deinit(&dev->q[i]);
-diff --git a/tools/testing/selftests/ublk/kublk.h b/tools/testing/selftests/ublk/kublk.h
-index 5e55484fb0aa..fe42705c6d42 100644
---- a/tools/testing/selftests/ublk/kublk.h
-+++ b/tools/testing/selftests/ublk/kublk.h
-@@ -175,23 +175,20 @@ struct ublk_queue {
- 
- struct ublk_thread {
- 	struct ublk_dev *dev;
--	struct io_uring ring;
--	unsigned int cmd_inflight;
--	unsigned int io_inflight;
--
--	pthread_t thread;
- 	unsigned idx;
- 
- #define UBLKS_T_STOPPING	(1U << 0)
- #define UBLKS_T_IDLE	(1U << 1)
- 	unsigned state;
-+	unsigned int cmd_inflight;
-+	unsigned int io_inflight;
-+	struct io_uring ring;
- };
- 
- struct ublk_dev {
- 	struct ublk_tgt tgt;
- 	struct ublksrv_ctrl_dev_info  dev_info;
- 	struct ublk_queue q[UBLK_MAX_QUEUES];
--	struct ublk_thread threads[UBLK_MAX_THREADS];
- 	unsigned nthreads;
- 	unsigned per_io_tasks;
- 
--- 
-2.47.0
-
+Thanks
