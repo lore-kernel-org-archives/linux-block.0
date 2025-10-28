@@ -1,177 +1,215 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8604C220F21
-	for <linux-block@vger.kernel.org>; Tue, 28 Oct 2025 04:51:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D25662877F6
+	for <linux-block@vger.kernel.org>; Tue, 28 Oct 2025 05:50:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761627092; cv=none; b=ZyDIde9PulP1xmXW2YIKyvKUmug98MsP03af9TkpS7xNuyK7b0vkTSoF8JgXdUEFScVHEYAaKzXW31LbDeehjmjICrROcFpr9xagxx3M5ctvPVENgRCWAI9YGu+4KAKpYjrdxco3NbQLi0vHjOpVpGIkAa5fF591w81og5wOuh8=
+	t=1761630649; cv=none; b=pqriMF2I9VmrZWffygmgKu9NE+PMVfFH3V6gBFOCzst28uf6nkUScKe6N0gCGo91J8NCW04lBcHIoCsQ4EC+nwuOUOXghSEj+stZQP7LuWdiuVxp4byfTLaL1R8zv9zGejhimY4JR+LgHUn976FuPwjCDFlaZKRX/vFXN3GiUms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761627092; c=relaxed/simple;
-	bh=yAcC7eqTwtAiecz5VeM664MAJayRuURxH9K60lD9+PY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=P/XR2U9lEjoiV4zIMUF0YxbV+jhM3i8RWUw1fI4RJ5MOyChpHubMsbN5/KwT4zGuv5dOylaE9bvLcwfcCkwbf+Vr3mQQ3he+xLbcb+UvtR+PndpNo34lRBXfUDkITg4d9y3cxddJB+nhh6okS3iPU9yaoqRxS7ie697BiJNdEQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=pzIkDii3; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1761630649; c=relaxed/simple;
+	bh=V+R7tuy399smX+YSsLanuk3wt7AGssXe1sEdTJgsvpc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iAQ2G3TkuzV3YhZaR0tRUoBexLGhyPMKADd7/npBDXpGQiWusBAR/EChm5CswTQlX0GsPcnTnoYWu29x7w/3DmH+Uw0GAXATKvCV/nudmO2o7rC48nDiJvWuPsoRpp3Kz709xiP5TMDALG428BqId8Mt8SRH1FOjrd7pecPs63o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D7dyYQ8P; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="pzIkDii3"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59S3KCkl020972;
-	Tue, 28 Oct 2025 04:51:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=wigA2y
-	CjR/j0fnCFeoEgr9d1AItBnJGJYLSbre7x2QE=; b=pzIkDii3ep5UDio+1eps7X
-	1e/TPGS402mobeb+7lAStRc8rKQV9eacAMc0PpqlDLSmWEJQSL/QE8/2qbr5lqpa
-	2mNZGrAO63S7B+jYBH7YrOsQyj/+s0rXgtHjVJRkqnNzOvynaIg9Eiq5Dg8zi8tQ
-	z57lM13c+NPfRRb/GIZy3lmiP/rPIrXkbc7q2o+4nSguYnVBrx0XiMrgQdpldHSG
-	6x8R3WJq/YiGcJa+LXcQBkSbzZ9pBdQL1vS8NLpoXy5xwvjgI+PkMQOVoMzSL3J5
-	xSt+ot0vQ82hxCo1xUwW5eSfB4SFpAMG5i/WPprnbx1Aq1MzQG8NGe6xDTJaZnAg
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4a0mys211t-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 28 Oct 2025 04:51:18 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59S4i1fu009379;
-	Tue, 28 Oct 2025 04:51:18 GMT
-Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4a1b3j0ujy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 28 Oct 2025 04:51:18 +0000
-Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
-	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 59S4pHUt27853544
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 28 Oct 2025 04:51:17 GMT
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A7D7658067;
-	Tue, 28 Oct 2025 04:51:17 +0000 (GMT)
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E9C3A58052;
-	Tue, 28 Oct 2025 04:51:14 +0000 (GMT)
-Received: from [9.109.198.245] (unknown [9.109.198.245])
-	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 28 Oct 2025 04:51:14 +0000 (GMT)
-Message-ID: <1448de6a-f86f-4d23-9e30-b1368e5cec57@linux.ibm.com>
-Date: Tue, 28 Oct 2025 10:21:13 +0530
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D7dyYQ8P"
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-290d14e5c9aso77577545ad.3
+        for <linux-block@vger.kernel.org>; Mon, 27 Oct 2025 22:50:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761630647; x=1762235447; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Wv/EAcXN5Xk/SquNgzGMR9LGsMPlGCTi4qPOcWgnJ0I=;
+        b=D7dyYQ8PdZyel4yPmPaSH+7LNJfc2mfZHCQHeSqoY40bRH56MuRFNwRg9MuAmzlvXk
+         E0CsP7B6ra3kC9lLYJMUXjJkzH9zTKWg23VYZpVoIDO0YUWthp/vr0FIYC7+5rV/8ZvX
+         SBSadWubXZOEcS7oVXBEgrECGx2ag9qSprjXEkKfr8orhjiqfh7hrZkuaxl/nzLr1isl
+         8OnwX7sr08HOOcwMDjuhXV38gUAhSX1dDUg+LD5u3qghL5KM+hEsCVmBRCjChwwXaNWx
+         bEbekZ+nvnMxExHEkj/sXIuvSwPAx6Z69uGJ51ZSANKUK5vwPzwrxg7bsHoRCTCa/H3x
+         qayw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761630647; x=1762235447;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Wv/EAcXN5Xk/SquNgzGMR9LGsMPlGCTi4qPOcWgnJ0I=;
+        b=OEe3SmiySmatj+9j8xPVwwH4nxCA9UPytIi4aTiU/vtNlmSuPK5NutoOSRwLgBE/WK
+         Su/tU+sW36Bxqz3c76kFW05yjUJe8wNF9MUzImr3uXEkupPr8KnkaLUAd5M67CF5Y9Bo
+         mZ7PZrrpmqINCV53hBq3f+2C6mFpQAZyLveCgOO3SAl9F2t10IS2WGzG6a4eQ4YcoQf4
+         gWL+NORdLaRENJ4ZqOAtYItHNadzXVplZXN59ek5ntyVpnph+EJxjxy7UEfE9jtioZAm
+         joIDB+EoJeVCo2lcb8qBpCljXwEKDhJUu+EgmMpAelG29PqotNZziVlr2ehEFnXlwGX0
+         D61A==
+X-Forwarded-Encrypted: i=1; AJvYcCXGmNICp7WUg2+W2k0BEzEayx7itviid4/Sg0/53NzIWu+1Uz3wXYwd8C01ogfbBkehRYk0PJXJwTR5Aw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwLxoc8xTgFdGLm4gtcTyItuFj/UMMNANuW+Rpz7EB4qedNZIey
+	ydRT6fFk7e0ypgab5Rtn9vg/uu2+2txZm+WbMmk8FNccOBaWtD08452E7nUDzA==
+X-Gm-Gg: ASbGncsr97ySsJ6e+Vl51M+5BJK+LbTwYhmPHhclbTeJsHHFL1wuZSqXmBQXaYDHNp+
+	NcVBURcCu91exRRY6+LNzdfPVAGOcbzijXDYAfGlPEzAzO3FmPkfetmt5mgGa9LXseYKWeib7pw
+	T5wFI/HGD6J7fVeZdMExOBT0yDXa0AtLm9BSn0Z7IOX8oVCV0Y+/D7Xn/MHz/c4oOl1jOO0iz9K
+	cdeYTWpxMCxuCHcMAypvBOqK4/5BqXFT8OKiPLwZnAsDHL9+HT0/DB46uAIeX3seqb4VFKyzIJA
+	FZQVl15tKre3KBqDDREqMXnvqiX8wA5Pzxkd8Ebsqsr8HDuH7QKxzMKr+XDNQr+VnJbvZYvzwaa
+	R0otS7jkiioyhGYfyvvGiK6ijoIiZic4jT2zJynXfNl3gNoPTuWH1Z9aGIG8W7pgFwg1e1nApfX
+	Q=
+X-Google-Smtp-Source: AGHT+IFUHdC+KcH7BW7cVtNDj7+9GI8cLO9LHNToQH5xGJryfpDgESRKNShQOvPHiYm+liNyVvkgqQ==
+X-Received: by 2002:a17:903:2f86:b0:290:b158:5db8 with SMTP id d9443c01a7336-294cb51a4e2mr26767935ad.44.1761630646789;
+        Mon, 27 Oct 2025 22:50:46 -0700 (PDT)
+Received: from localhost ([2600:8802:b00:9ce0::f9da])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29498cf3405sm104554055ad.2.2025.10.27.22.50.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Oct 2025 22:50:46 -0700 (PDT)
+From: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+To: johannes.thumshirn@wdc.com
+Cc: axboe@kernel.dk,
+	dlemoal@kernel.org,
+	rostedt@goodmis.org,
+	mhiramat@kernel.org,
+	mathieu.desnoyers@efficios.com,
+	martin.petersen@oracle.com,
+	linux-block@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+Subject: [PATCH] blktrace: for ftrace use correct trace format ver
+Date: Mon, 27 Oct 2025 22:50:42 -0700
+Message-Id: <20251028055042.2948-1-ckulkarnilinux@gmail.com>
+X-Mailer: git-send-email 2.40.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] block: introduce alloc_sched_data and free_sched_data
- elevator methods
-To: Ming Lei <ming.lei@redhat.com>
-Cc: linux-block@vger.kernel.org, hch@lst.de, yukuai1@huaweicloud.com,
-        axboe@kernel.dk, yi.zhang@redhat.com, czhong@redhat.com,
-        gjoyce@ibm.com
-References: <20251016053057.3457663-1-nilay@linux.ibm.com>
- <20251016053057.3457663-3-nilay@linux.ibm.com> <aPhgAMxgG2q0DKcv@fedora>
- <29e11529-aa37-47e1-a5c4-20fa100ae6cc@linux.ibm.com>
- <aQAt2rOO4dgkW10o@fedora>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <aQAt2rOO4dgkW10o@fedora>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: wM2EvabJu82kcJmPCZL8a7GhE_NNAKbc
-X-Authority-Analysis: v=2.4 cv=ct2WUl4i c=1 sm=1 tr=0 ts=69004bc6 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=hhZ8n0MlffzBx2DurcYA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI1MDAxMCBTYWx0ZWRfX3s+liPOGz80E
- O8lDwz94r/7RbJ90e0Z2QE/w8LSZ/WZDtZG9ezYlpt08n7QJl1DDWmQQ/YnavdP+o7upp6PMYar
- 6iuv225LC4SUWnfr42lwOQppyA3Mb50Cyyea8Ah4v9dY1yAcshCYBCCCn1F9Qewr7WqIwW68wuJ
- Tfw6xaEsof0WlVgBRvZBCEmyzEuhS9lSbJbEHrUlG/Ct5POy/Vd4abJSyES2Q8iLtAoRPTcxhPl
- ul/aBUaaeSm5DPJht6EqqxXtjcTjfxMRkOC8UO8FcsNKSru+eyhVYT2YXIKZ0oU7NEf8cSfF31v
- uTDaTXXGLjd8rIiwiEDKS1YOrpGJjM8Nom6RXpFM+rLtw0ctADqJE8QzpsTvDlWzFfN0YIqK12A
- PF+o81GmQnhS8pyXOuO0rAwNN3PQjQ==
-X-Proofpoint-GUID: wM2EvabJu82kcJmPCZL8a7GhE_NNAKbc
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
- definitions=2025-10-28_02,2025-10-22_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 phishscore=0 lowpriorityscore=0 impostorscore=0 malwarescore=0
- spamscore=0 adultscore=0 priorityscore=1501 clxscore=1015 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510020000 definitions=main-2510250010
 
+The ftrace blktrace path allocates buffers and writes trace events but
+was using the wrong recording function. After
+commit 4d8bc7bd4f73 ("blktrace: move ftrace blk_io_tracer to blk_io_trace2"), 
+the ftrace interface was moved to use blk_io_trace2 format, but 
+__blk_add_trace() still called record_blktrace_event() which writes in
+blk_io_trace (v1) format.
 
+This causes critical data corruption:
 
-On 10/28/25 8:13 AM, Ming Lei wrote:
-> On Mon, Oct 27, 2025 at 11:08:13PM +0530, Nilay Shroff wrote:
->> Hi Ming,
->>
->> On 10/22/25 10:09 AM, Ming Lei wrote:
->>> On Thu, Oct 16, 2025 at 11:00:48AM +0530, Nilay Shroff wrote:
->>>> The recent lockdep splat [1] highlights a potential deadlock risk
->>>> involving ->elevator_lock and ->freeze_lock dependencies on -pcpu_alloc_
->>>> mutex. The trace shows that the issue occurs when the Kyber scheduler
->>>> allocates dynamic memory for its elevator data during initialization.
->>>>
->>>> To address this, introduce two new elevator operation callbacks:
->>>> ->alloc_sched_data and ->free_sched_data.
->>>
->>> This way looks good.
->>>
->>>>
->>>> When an elevator implements these methods, they are invoked during
->>>> scheduler switch before acquiring ->freeze_lock and ->elevator_lock.
->>>> This allows safe allocation and deallocation of per-elevator data
->>>
->>> This per-elevator data should be very similar with `struct elevator_tags`
->>> from block layer viewpoint: both have same lifetime, and follow same
->>> allocation constraint(per-cpu lock).
->>>
->>> Can we abstract elevator data structure to cover both? Then I guess the
->>> code should be more readable & maintainable, what do you think of this way?
->>>
->>> One easiest way could be to add 'void *data' into `struct elevator_tags`,
->>> just the naming of `elevator_tags` is not generic enough, but might not
->>> a big deal.
->>>
->> I realized that struct elevator_tags is already a member of struct elevator_queue,
->> and we also have a separate void *elevator_data member within the same structure.
->>
->> So, adding void *data directly into struct elevator_tags may not be ideal, as it
->> would mix two logically distinct resources under a misleading name. Instead, we
->> can abstract both — void *elevator_data and struct elevator_tags — into a new
->> structure named struct elevator_resources. For instance:
->>
->> struct elevator_resources {
->>     void *data;
->>     struct elevator_tags *et;
->> };
->>
->> struct elv_change_ctx {
->> 	const char *name;
->> 	bool no_uevent;
->> 	struct elevator_queue *old;
->> 	struct elevator_queue *new;
->> 	struct elevator_type *type;
->> 	struct elevator_resources res;
->> };
->>
->> I've just sent out PATCHv3 with the above change. Please review and let me know
->> if this approach looks good to you.
-> 
-> It is fine to add `struct elevator_resources` for further abstraction, but
-> you need to abstract related methods too, otherwise the patch 3 still becomes
-> hard to follow: the existing blk_mq_free_sched_tags can be renamed to
-> blk_mq_free_sched_resource first, then you can call blk_mq_free_sched_data()
-> from blk_mq_free_sched_resource() inside only, instead of calling it
-> following every blk_mq_free_sched_tags().
-> 
-> Same with blk_mq_alloc_sched_tags_batch()/blk_mq_free_sched_tags_batch(),
-> you can make universal blk_mq_alloc_sched_res_batch/blk_mq_free_sched_res_batch()
-> to cover both tags & schedule data, and it is easier to extend in future too.
-> 
-Okay that makes sense.. I will restructure code and prepare a new patchset.
+- blk_io_trace (v1) has 32-bit 'action' field at offset 28
+- blk_io_trace2 (v2) has 32-bit 'pid' at offset 28 and 64-bit 'action'
+  at offset 32
+- When record_blktrace_event() writes to a v2 buffer:
+  * Writing pid (offset 32 in v1) corrupts the v2 action field
+  * Writing action (offset 28 in v1) corrupts the v2 pid field
+  * The 64-bit action is truncated to 32-bit via lower_32_bits()
 
-Thanks,
---Nilay
+Fix by:
+1. Adding version switch to select correct format (v1 vs v2)
+2. Calling appropriate recording function based on version
+3. Defaulting to v2 for ftrace (as intended by commit 4d8bc7bd4f73)
+4. Adding WARN_ONCE for unexpected version values
+
+Without this patch :-
+linux-block (for-next) # sh reproduce_blktrace_bug.sh
+              dd-14242   [033] d..1.  3903.022308: Unknown action 36a2
+              dd-14242   [033] d..1.  3903.022333: Unknown action 36a2
+              dd-14242   [033] d..1.  3903.022365: Unknown action 36a2
+              dd-14242   [033] d..1.  3903.022366: Unknown action 36a2
+              dd-14242   [033] d..1.  3903.022369: Unknown action 36a2
+
+The action field is corrupted because:
+  - ftrace allocated blk_io_trace2 buffer (64 bytes)
+  - But called record_blktrace_event() (writes v1, 48 bytes)
+  - Field offsets don't match, causing corruption
+
+The hex value shown 0x30e3 is actually a PID, not an action code!
+
+linux-block (for-next) #
+linux-block (for-next) #
+linux-block (for-next) # sh reproduce_blktrace_bug.sh
+Trace output looks correct:
+
+              dd-2420    [019] d..1.    59.641742: 251,0    Q  RS 0 + 8 [dd]
+              dd-2420    [019] d..1.    59.641775: 251,0    G  RS 0 + 8 [dd]
+              dd-2420    [019] d..1.    59.641784: 251,0    P   N [dd]
+              dd-2420    [019] d..1.    59.641785: 251,0    U   N [dd] 1
+              dd-2420    [019] d..1.    59.641788: 251,0    D  RS 0 + 8 [dd]
+
+Fixes: 4d8bc7bd4f73 ("blktrace: move ftrace blk_io_tracer to blk_io_trace2")
+Signed-off-by: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+---
+ kernel/trace/blktrace.c | 59 +++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 54 insertions(+), 5 deletions(-)
+
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index 1a83e03255ce..4097a288c235 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -384,16 +384,65 @@ static void __blk_add_trace(struct blk_trace *bt, sector_t sector, int bytes,
+ 
+ 		buffer = blk_tr->array_buffer.buffer;
+ 		trace_ctx = tracing_gen_ctx_flags(0);
+-		trace_len = sizeof(struct blk_io_trace2) + pdu_len + cgid_len;
++		switch (bt->version) {
++		case 1:
++			trace_len = sizeof(struct blk_io_trace);
++			break;
++		case 2:
++		default:
++			/*
++			 * ftrace always uses v2 (blk_io_trace2) format.
++			 *
++			 * For sysfs-enabled tracing path (enabled via
++			 * /sys/block/DEV/trace/enable), blk_trace_setup_queue()
++			 * never initializes bt->version, leaving it 0 from
++			 * kzalloc(). We must handle version==0 safely here.
++			 *
++			 * Fall through to default to ensure we never hit the
++			 * old bug where default set trace_len=0, causing
++			 * buffer underflow and memory corruption.
++			 *
++			 * Always use v2 format for ftrace and normalize
++			 * bt->version to 2 when uninitialized.
++			 */
++			trace_len = sizeof(struct blk_io_trace2);
++			if (bt->version == 0)
++				bt->version = 2;
++			break;
++		}
++		trace_len += pdu_len + cgid_len;
+ 		event = trace_buffer_lock_reserve(buffer, TRACE_BLK,
+ 						  trace_len, trace_ctx);
+ 		if (!event)
+ 			return;
+ 
+-		record_blktrace_event(ring_buffer_event_data(event),
+-				      pid, cpu, sector, bytes,
+-				      what, bt->dev, error, cgid, cgid_len,
+-				      pdu_data, pdu_len);
++		switch (bt->version) {
++		case 1:
++			record_blktrace_event(ring_buffer_event_data(event),
++					      pid, cpu, sector, bytes,
++					      what, bt->dev, error, cgid, cgid_len,
++					      pdu_data, pdu_len);
++			break;
++		case 2:
++		default:
++			/*
++			 * Use v2 recording function (record_blktrace_event2)
++			 * which writes blk_io_trace2 structure with correct
++			 * field layout:
++			 *   - 32-bit pid at offset 28
++			 *   - 64-bit action at offset 32
++			 *
++			 * Fall through to default handles version==0 case
++			 * (from sysfs path), ensuring we always use correct
++			 * v2 recording function to match the v2 buffer
++			 * allocated above.
++			 */
++			record_blktrace_event2(ring_buffer_event_data(event),
++					       pid, cpu, sector, bytes,
++					       what, bt->dev, error, cgid, cgid_len,
++					       pdu_data, pdu_len);
++			break;
++		}
+ 
+ 		trace_buffer_unlock_commit(blk_tr, buffer, event, trace_ctx);
+ 		return;
+-- 
+2.40.0
+
