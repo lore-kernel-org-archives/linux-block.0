@@ -1,129 +1,177 @@
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AE03D271
-	for <linux-block@vger.kernel.org>; Tue, 28 Oct 2025 04:32:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8604C220F21
+	for <linux-block@vger.kernel.org>; Tue, 28 Oct 2025 04:51:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761625974; cv=none; b=VHGuqzx2b0he2sV2Gml49fW8sTBFbA6UUpoAwkH1svl6Lw7rY3VzZ4t9N30LL6yLta7r5Prw2oW5P7YEKMZZOb7aNlzyTNIZdyY/sEfK0J2uP+6YKEKp1BwvZN12Zk2n9HPdUZIVvgZxn/w2pwIhS/5ioIvXxFc2lW01HUyuy+I=
+	t=1761627092; cv=none; b=ZyDIde9PulP1xmXW2YIKyvKUmug98MsP03af9TkpS7xNuyK7b0vkTSoF8JgXdUEFScVHEYAaKzXW31LbDeehjmjICrROcFpr9xagxx3M5ctvPVENgRCWAI9YGu+4KAKpYjrdxco3NbQLi0vHjOpVpGIkAa5fF591w81og5wOuh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761625974; c=relaxed/simple;
-	bh=S/lne8wybyE1gO5htDFPkrjiiUfBJTJUUGjSUp3mgWA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=q13BVs6HrfnPsN7+L7RT8isdMLIWDQT9Ulyd2Fm1bcG8iLvT+vIzzeIu1LbTrZShNZomQW7x8Mzk30RsqoNzqG/5mfjzikYYOD/ZswF2LkiFiY+xDjx2J4cZm+SM94Z7tJItiSNJirzfOuFhp007mzzjXnRKhtTKvpyOFS1ol8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LMHnOLzP; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1761627092; c=relaxed/simple;
+	bh=yAcC7eqTwtAiecz5VeM664MAJayRuURxH9K60lD9+PY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=P/XR2U9lEjoiV4zIMUF0YxbV+jhM3i8RWUw1fI4RJ5MOyChpHubMsbN5/KwT4zGuv5dOylaE9bvLcwfcCkwbf+Vr3mQQ3he+xLbcb+UvtR+PndpNo34lRBXfUDkITg4d9y3cxddJB+nhh6okS3iPU9yaoqRxS7ie697BiJNdEQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=pzIkDii3; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LMHnOLzP"
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-b62e7221351so4836245a12.1
-        for <linux-block@vger.kernel.org>; Mon, 27 Oct 2025 21:32:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761625972; x=1762230772; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=5TXKHptYyH+Ht2HxkkCZQsOl8z28P1fxyA0/H0EwTQI=;
-        b=LMHnOLzPeBtSvYILtN2gzRx1+T6YLxZTdP2FKIocIhpWpeMmKraoRkpZq8ooLt3ozn
-         L+aCRVKnOM439xw+UojizqwEAKT5C9gUORI7CbsHWcnYuR5s1YDe8jHR4GSqJSoBtxQp
-         gaD2pbZqTxxhVng0zaLPyqCuaIL8GsuD+/mCXbkksTviFN/ztTDW3dRVmdMVt23bmZai
-         X0kPEFow516jCTu8OSRhKcaeAtLoUVYo0V9on8ombka2St/Bj6WbhsZ/2jMp6uCYM0IC
-         7NDFoJF8fPJsO2TZ6d/063FI/PrXSPWMDH7RVKSCfxBsvjEFrmJCA4xNeI925JsB3c0U
-         Rlsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761625972; x=1762230772;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5TXKHptYyH+Ht2HxkkCZQsOl8z28P1fxyA0/H0EwTQI=;
-        b=O2TC3TsUta6+B0PzknBWpynWCqrlf60uPJyCnUQceu6hjclSybATjRF7u8yFcgMvKt
-         58jToNcQym02Z+f65eLV5LM8dkF6b70jpGa6YV6XA4vsdjpjIUFCJAD9J8S6dOj/2bBs
-         aXcjjXK1hf9EtxJwMp2XHtR3KbEQYgO86QQt1bdgtVvT4qOUvdsyOX1+oxIEim9gF9uT
-         IZkONqLW01kJ3MuT+Lr1594daWPpjs3EPczcwCUFCn8/yAITHp1OyiiyYshYlj/pW9lj
-         vs1X99fztdQLEpC/ft0D1p94+4dqJa8xCzrjNLOWBS8h7pIi0BvEFmt/tqyvi7z/npld
-         M0Jw==
-X-Gm-Message-State: AOJu0YxpFiaC60jda3zFH+B4CN4WYPRAX0PdqiJ5L4Yb+5JZ7zD9XBX8
-	H0DImem1RBn/wOvP9VJOk0Li80SXhpxO2MnjPYddOJEZ6IQ7ViS9+O+RjMzVlg==
-X-Gm-Gg: ASbGncvKxxtu8d1G8fqqvTqDRPxK4BJzYJ++dVxJEtgir6hU2CbCdLDEZr6doZI/Ieo
-	Ri8McezlSYEC1N59zJQJYbD/YuWVqLR2hDoW93mJaJq5pQqVXzJwppCzDLok/+sT+GI3GcN0FOA
-	gkDRpGmbXGl37BPuP/h7DOQddcEfI/QsdDyMpAyBYMuMSfW7Gbrfbify5pUt/Y71Sx2l3SetuId
-	+dEid/Lkj/5ThL+uiNfXnWrOG+Kyv4MAqmSei6XzpH1xo+iwP/WVNhV664WnrEQqJCqsuom0amn
-	jCsjFEKdbsbJ9ETufLJQNh+40oncmvbWr+P4n5mPhNw+CbGOXQSMkDpvlB8fIc4fFjeq3ZgrqtT
-	1hk7m7S5xPLF3gHOpdGPwrF6Wwp774NlSoCq8IqCfR3xbeE+87yEuI/lkc+YAd2Rw
-X-Google-Smtp-Source: AGHT+IHO6nGqRH+A9osLM89yQ2mH2wz/2VUNsGYa2/Nw7fF8/pMHkXQuIu1wg0vyQuBPzr8zUy6OJw==
-X-Received: by 2002:a17:903:38c5:b0:24c:da3b:7376 with SMTP id d9443c01a7336-294cb3a11dfmr27045135ad.26.1761625971756;
-        Mon, 27 Oct 2025 21:32:51 -0700 (PDT)
-Received: from localhost ([2600:8802:b00:9ce0::f9da])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29498e4349fsm99416565ad.107.2025.10.27.21.32.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Oct 2025 21:32:51 -0700 (PDT)
-From: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
-To: Johannes.Thumshirn@wdc.com
-Cc: linux-block@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	martin.petersen@oracle.com,
-	dlemoal@kernel.org,
-	mathieu.desnoyers@efficios.com,
-	mhiramat@kernel.org,
-	rostedt@goodmis.org,
-	axboe@kernel.dk,
-	Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
-Subject: [PATCH] blktrace: log dropped REQ_OP_ZONE_XXX events ver1
-Date: Mon, 27 Oct 2025 21:32:48 -0700
-Message-Id: <20251028043248.2873-1-ckulkarnilinux@gmail.com>
-X-Mailer: git-send-email 2.40.0
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="pzIkDii3"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59S3KCkl020972;
+	Tue, 28 Oct 2025 04:51:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=wigA2y
+	CjR/j0fnCFeoEgr9d1AItBnJGJYLSbre7x2QE=; b=pzIkDii3ep5UDio+1eps7X
+	1e/TPGS402mobeb+7lAStRc8rKQV9eacAMc0PpqlDLSmWEJQSL/QE8/2qbr5lqpa
+	2mNZGrAO63S7B+jYBH7YrOsQyj/+s0rXgtHjVJRkqnNzOvynaIg9Eiq5Dg8zi8tQ
+	z57lM13c+NPfRRb/GIZy3lmiP/rPIrXkbc7q2o+4nSguYnVBrx0XiMrgQdpldHSG
+	6x8R3WJq/YiGcJa+LXcQBkSbzZ9pBdQL1vS8NLpoXy5xwvjgI+PkMQOVoMzSL3J5
+	xSt+ot0vQ82hxCo1xUwW5eSfB4SFpAMG5i/WPprnbx1Aq1MzQG8NGe6xDTJaZnAg
+	==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4a0mys211t-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 28 Oct 2025 04:51:18 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59S4i1fu009379;
+	Tue, 28 Oct 2025 04:51:18 GMT
+Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4a1b3j0ujy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 28 Oct 2025 04:51:18 +0000
+Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
+	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 59S4pHUt27853544
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 28 Oct 2025 04:51:17 GMT
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A7D7658067;
+	Tue, 28 Oct 2025 04:51:17 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E9C3A58052;
+	Tue, 28 Oct 2025 04:51:14 +0000 (GMT)
+Received: from [9.109.198.245] (unknown [9.109.198.245])
+	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 28 Oct 2025 04:51:14 +0000 (GMT)
+Message-ID: <1448de6a-f86f-4d23-9e30-b1368e5cec57@linux.ibm.com>
+Date: Tue, 28 Oct 2025 10:21:13 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/3] block: introduce alloc_sched_data and free_sched_data
+ elevator methods
+To: Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org, hch@lst.de, yukuai1@huaweicloud.com,
+        axboe@kernel.dk, yi.zhang@redhat.com, czhong@redhat.com,
+        gjoyce@ibm.com
+References: <20251016053057.3457663-1-nilay@linux.ibm.com>
+ <20251016053057.3457663-3-nilay@linux.ibm.com> <aPhgAMxgG2q0DKcv@fedora>
+ <29e11529-aa37-47e1-a5c4-20fa100ae6cc@linux.ibm.com>
+ <aQAt2rOO4dgkW10o@fedora>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <aQAt2rOO4dgkW10o@fedora>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: wM2EvabJu82kcJmPCZL8a7GhE_NNAKbc
+X-Authority-Analysis: v=2.4 cv=ct2WUl4i c=1 sm=1 tr=0 ts=69004bc6 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=hhZ8n0MlffzBx2DurcYA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI1MDAxMCBTYWx0ZWRfX3s+liPOGz80E
+ O8lDwz94r/7RbJ90e0Z2QE/w8LSZ/WZDtZG9ezYlpt08n7QJl1DDWmQQ/YnavdP+o7upp6PMYar
+ 6iuv225LC4SUWnfr42lwOQppyA3Mb50Cyyea8Ah4v9dY1yAcshCYBCCCn1F9Qewr7WqIwW68wuJ
+ Tfw6xaEsof0WlVgBRvZBCEmyzEuhS9lSbJbEHrUlG/Ct5POy/Vd4abJSyES2Q8iLtAoRPTcxhPl
+ ul/aBUaaeSm5DPJht6EqqxXtjcTjfxMRkOC8UO8FcsNKSru+eyhVYT2YXIKZ0oU7NEf8cSfF31v
+ uTDaTXXGLjd8rIiwiEDKS1YOrpGJjM8Nom6RXpFM+rLtw0ctADqJE8QzpsTvDlWzFfN0YIqK12A
+ PF+o81GmQnhS8pyXOuO0rAwNN3PQjQ==
+X-Proofpoint-GUID: wM2EvabJu82kcJmPCZL8a7GhE_NNAKbc
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-28_02,2025-10-22_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 phishscore=0 lowpriorityscore=0 impostorscore=0 malwarescore=0
+ spamscore=0 adultscore=0 priorityscore=1501 clxscore=1015 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2510020000 definitions=main-2510250010
 
-Add informational messages during blktrace setup when version 1 tools
-are used on kernels with CONFIG_BLK_DEV_ZONED enabled. This alerts users
-that REQ_OP_ZONE_* events will be dropped and suggests upgrading to
-blktrace tools version 2 or later.
 
-The warning is printed once during trace setup to inform users about
-the limitation without spamming the logs during tracing operations.
-Version 2 blktrace tools properly handle zone management operations
-(zone reset, zone open, zone close, zone finish, zone append) that
-were added for zoned block devices.
 
-Example output:
-blktests (master) # ./check blktrace
-blktrace/001 (blktrace zone management command tracing)      [passed]
-    runtime  3.882s  ...  3.866s
-blktests (master) # dmesg -c
-[   95.874361] blktrace: nullb0:blktrace events for REQ_OP_ZONE_XXX will be dropped
-[   95.874372] blktrace: use blktrace tools version >= 2 to track REQ_OP_ZONE_XXX
-blktests (master) # 
+On 10/28/25 8:13 AM, Ming Lei wrote:
+> On Mon, Oct 27, 2025 at 11:08:13PM +0530, Nilay Shroff wrote:
+>> Hi Ming,
+>>
+>> On 10/22/25 10:09 AM, Ming Lei wrote:
+>>> On Thu, Oct 16, 2025 at 11:00:48AM +0530, Nilay Shroff wrote:
+>>>> The recent lockdep splat [1] highlights a potential deadlock risk
+>>>> involving ->elevator_lock and ->freeze_lock dependencies on -pcpu_alloc_
+>>>> mutex. The trace shows that the issue occurs when the Kyber scheduler
+>>>> allocates dynamic memory for its elevator data during initialization.
+>>>>
+>>>> To address this, introduce two new elevator operation callbacks:
+>>>> ->alloc_sched_data and ->free_sched_data.
+>>>
+>>> This way looks good.
+>>>
+>>>>
+>>>> When an elevator implements these methods, they are invoked during
+>>>> scheduler switch before acquiring ->freeze_lock and ->elevator_lock.
+>>>> This allows safe allocation and deallocation of per-elevator data
+>>>
+>>> This per-elevator data should be very similar with `struct elevator_tags`
+>>> from block layer viewpoint: both have same lifetime, and follow same
+>>> allocation constraint(per-cpu lock).
+>>>
+>>> Can we abstract elevator data structure to cover both? Then I guess the
+>>> code should be more readable & maintainable, what do you think of this way?
+>>>
+>>> One easiest way could be to add 'void *data' into `struct elevator_tags`,
+>>> just the naming of `elevator_tags` is not generic enough, but might not
+>>> a big deal.
+>>>
+>> I realized that struct elevator_tags is already a member of struct elevator_queue,
+>> and we also have a separate void *elevator_data member within the same structure.
+>>
+>> So, adding void *data directly into struct elevator_tags may not be ideal, as it
+>> would mix two logically distinct resources under a misleading name. Instead, we
+>> can abstract both — void *elevator_data and struct elevator_tags — into a new
+>> structure named struct elevator_resources. For instance:
+>>
+>> struct elevator_resources {
+>>     void *data;
+>>     struct elevator_tags *et;
+>> };
+>>
+>> struct elv_change_ctx {
+>> 	const char *name;
+>> 	bool no_uevent;
+>> 	struct elevator_queue *old;
+>> 	struct elevator_queue *new;
+>> 	struct elevator_type *type;
+>> 	struct elevator_resources res;
+>> };
+>>
+>> I've just sent out PATCHv3 with the above change. Please review and let me know
+>> if this approach looks good to you.
+> 
+> It is fine to add `struct elevator_resources` for further abstraction, but
+> you need to abstract related methods too, otherwise the patch 3 still becomes
+> hard to follow: the existing blk_mq_free_sched_tags can be renamed to
+> blk_mq_free_sched_resource first, then you can call blk_mq_free_sched_data()
+> from blk_mq_free_sched_resource() inside only, instead of calling it
+> following every blk_mq_free_sched_tags().
+> 
+> Same with blk_mq_alloc_sched_tags_batch()/blk_mq_free_sched_tags_batch(),
+> you can make universal blk_mq_alloc_sched_res_batch/blk_mq_free_sched_res_batch()
+> to cover both tags & schedule data, and it is easier to extend in future too.
+> 
+Okay that makes sense.. I will restructure code and prepare a new patchset.
 
-This helps users understand why zone operation traces may be missing
-when using older blktrace tool versions with modern kernels that
-support REQ_OP_ZONE_XXX in blktrace.
-
-Signed-off-by: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
----
- kernel/trace/blktrace.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 776ae4190f36..200d0deb6c90 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -690,6 +690,12 @@ static void blk_trace_setup_finalize(struct request_queue *q,
- 	 */
- 	strreplace(buts->name, '/', '_');
- 
-+	if (version == 1 && (IS_ENABLED(CONFIG_BLK_DEV_ZONED))) {
-+		pr_info("%s:blktrace events for REQ_OP_ZONE_XXX will be dropped\n",
-+				name);
-+		pr_info("use blktrace tools version >= 2 to track REQ_OP_ZONE_XXX\n");
-+	}
-+
- 	bt->version = version;
- 	bt->act_mask = buts->act_mask;
- 	if (!bt->act_mask)
--- 
-2.40.0
-
+Thanks,
+--Nilay
