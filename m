@@ -1,70 +1,74 @@
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58D991AC44D
-	for <linux-block@vger.kernel.org>; Tue, 28 Oct 2025 19:20:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4199D34F482
+	for <linux-block@vger.kernel.org>; Tue, 28 Oct 2025 19:20:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761679253; cv=none; b=lIB1AcLc+AQFrmeuPWrA/bP3vUNqyKqzQ+ImSGP+VQP7ZY86N+DbveW2HtyRqbtv3k7bj4dTRLhKma5sajYnZ9gR+nrifY7+bUUkZPOdeevocLckd+/TNjE6sGcYPuktLpUDdNKGNZps4WgrJl+m/nYPMEnX58cHSbQZwoBLdn4=
+	t=1761679256; cv=none; b=DJlcrKVt+LlEpvMJCQhO1M6tt4OuOTiznPcKhUja1pSohizysaA4BuC4GGTJdnrEQnKGFA9E+uGlQeUJ+4DCXoIxU15Rb0xBXNwqyf+qyqvaBxIsb4vpliwT2X8OhQQFtQIKt3WZ2W7eYk6VtE6QtrziAB418GstN/MvISzJXvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761679253; c=relaxed/simple;
-	bh=NVZdPCleQ0CQsp8hIW6QuoytFZ4F6sBofDe2NFZcw4c=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YjbHoPRq7/VZ2rH6SAtguNK6AOK88OQ8GZZOh/5KKHZqkI9mo9f63l7pfyEPRlaP20RFZx10v2crob5olVKvj4Be2auofA+UVurqz9RfG+blXCEN+APl2ajkUs4xWU3AWFMbkpUAfHSY/4rQXLcJKI4n+/Je4dATNV/OZf3o5zI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Cek+89w1; arc=none smtp.client-ip=209.85.216.41
+	s=arc-20240116; t=1761679256; c=relaxed/simple;
+	bh=tzkE1thdXmdvSPD1kwvNCB7PzSIuHMvurBU+WDXYyS8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=dTFCgqg8EkN/377sm1JwbbQlVvSdk2wovJmMcUZ9vfXrUp8RYWdrGhAoD1XRnTRV1xnr2gQSmfyt3oGy01v16vcI+HB/xIjZu7IfY48aVLJWIVt7le5JQLPo/CDM40CcpgjkVAU6Kr9xbs/3cAkQiciqUqgXkEcQBdj3eHwduBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H6IrBSAI; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cek+89w1"
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-34029c5beabso1434394a91.1
-        for <linux-block@vger.kernel.org>; Tue, 28 Oct 2025 12:20:52 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H6IrBSAI"
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-290aaff555eso58953345ad.2
+        for <linux-block@vger.kernel.org>; Tue, 28 Oct 2025 12:20:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761679252; x=1762284052; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=HYSq9IClrUvG1oGKDeC8H/7AeUSwxz0XnSZ/bQ9dAd0=;
-        b=Cek+89w1YIobVI5Je9faYVZAz0NwrPcxpli7433QID8TXLaNvgL+mWLSNWbrZahuys
-         d/qQMSbJyVFtH91lEouELut0BceAqx6JtcTl9HNPPtpUAzs09izKQUv9l8QLlMX1pHVu
-         YHHpUL8JtrRCootKfNbLatytkB4Sqb/MIfCCKB+0KvA1UOeUvbWe0WE+x52SKlBeYnFr
-         v8KQHJxPT6YcxJnXYNPke54U0I+AsHlYGPsTrwhQHSXQzTCa9Jo2PQPC3C+zKq5YG5YM
-         3Wnue7DkkYRe6xK3U7cph73W2J9boWOwIWX1a8z6WZSzubNa1SixQVON7cIPoBuGYBSI
-         wo1A==
+        d=gmail.com; s=20230601; t=1761679254; x=1762284054; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nULmnNC1B3ayUuViw8iyE3V8T5hxKxh98fx7PJHa6OI=;
+        b=H6IrBSAIUllY94sg4GHhorjKFPEQ2vdWOgdHobgjbsIko8c4eGEPGTekGFE0BG/8b1
+         RPkkbC1nbLwyF+XhZb8q2deXecbBLD/Br3GnnTbfaerN3ypHvQsPIPpB1wbemV4HlgrB
+         QsL9ksATH4a9I5glKO5YiV+pwua8yZQk4MMtW7faNO5zn82g8A8kz4rQzlTmsbpww/e1
+         Q9O1lyye4RdiNTv6oxE/YABvkUAyymFpkHG4UB0xQeZ6bN9jOGX8AmJ1HzD7zAQszkhV
+         d2cZcqeKfNUE3PQCVYGhnlo3/zz/PEf+QkPriwhGWAVW4+rbynjNMbM0D9fUppEtCmFN
+         IUyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761679252; x=1762284052;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HYSq9IClrUvG1oGKDeC8H/7AeUSwxz0XnSZ/bQ9dAd0=;
-        b=ahCFrAAsKkAjZ1d+NV8wSDn5KTAR5kX1PVz7hJpNZhH4J01fE/TCoVeXVNgPIwkYUB
-         xE1dLgH6TSE+2fsWTZ6pi8N68FKeu77lB6vsDY61bdJqbt9GVhYiyEjc9qlZo+lJP7y6
-         4Us6G8wZNKBFITRsHt9nfbvT/3EzNr0nCFsWSYcLU7jJyMs57d8e8mL1Rs0Z143m0ck5
-         1zTKnEqT9KBLlOV4S7aSKFi/sWudVtxrorilwQXRvkgx3+kRf/JvkVe5dbw0O5QGRknq
-         8ibd9FbSMpQ0TGVgdE9eVHEB5xibNw5I/uBDlmtTQhECUntmeo3rZmhQL0s0U+pbxSrq
-         l0aw==
-X-Forwarded-Encrypted: i=1; AJvYcCW/7M3Yi5m3oXNVfRBdXItbJj7+Shv2c/x13hrguFrohwLXEe4yrE7+dB7xVsPIuP1pJPrW805mtzLiHQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxY5BJjy32huqaqnFIO+X7kvLI3jtFx1P7AUdJmCOw5V3CP0y0
-	Hft27R1zim/JIz96r0GH4/RDfddLlSMTLqgT0/x5xf6imnQTw+VjhTsZ
-X-Gm-Gg: ASbGncv6kgDBZ/o8nU6xslMrccJz8wCK6w0f9Dv3T2C1w3A0NBEpM14+a8IDC8Z5Npq
-	zuZueiA9G5mywppCcZ0A6QGSKdhdzMcm1QLCZBwLDfTC6KLU7LwJpKRe9np/0Ac7Qr6HwsYjr6O
-	Mv8zPpRpxgIrULWwm2gNQMVV0scYHVMH1dIR7jgSvORNpEMgG8pJV0d5RMdbyXbkqQevkdEEeBz
-	NIoBZRg0VdNBFc5aR1rvSMwz+fUj/wojIJPiQZ5rqz2riFr+812fjRTZYOEiiBcvNBE9+pc6Uwe
-	DK8iunVaIiG6I3tA0dk1oheyw4ZiMpB7oJ4UxKV7K2OnXPxnHjWYjo/TBxGQhDlXH12Nszs4VCQ
-	ffZiuyyHpoc1WE12kXVgxx+8UEZ+jyzXfK7kbPDMd91iITSciBmxk51gguuxbDy5a
-X-Google-Smtp-Source: AGHT+IFgD5YXjG/WguaVlw8y5CCXqav6u9YvKxBGFedwnQ6rH7ANcRcUmbYYnRlYgogKTuS9ouMt+A==
-X-Received: by 2002:a17:90b:4cd2:b0:32e:749d:fcb7 with SMTP id 98e67ed59e1d1-3403a15c41dmr217304a91.13.1761679251392;
-        Tue, 28 Oct 2025 12:20:51 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1761679254; x=1762284054;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nULmnNC1B3ayUuViw8iyE3V8T5hxKxh98fx7PJHa6OI=;
+        b=DqN9IFrg2Q91kLjRPyU2Z61SXErfFyoTSsEKsnyDvEWhxmq3c9DJsjik0IpP7kTDHd
+         IpOmfW/bfL0fPhTq0eFrfGGWJl1jUUhw0NHEqYfhJuB3bzDMzAdnbXM07xXRTgxxCsC7
+         SnWGR2MW6n4uxpy8DV8fTUmPpBr8g22GMxvgA/ROV+o0LFRF0Bb6FkeZ7nnbfwGD1ci8
+         +xhCv36+ms1yV+WP3O7wcmlcyCLjBYURRrlPmtMhavKHdb/PQBUH5sZf33NQiBO7JCX4
+         QMfkcYOoLa7gDhXaG748S2fAnPpHzq4Q3+9fE3gAib0mXFPOVMmkujIbBcWWBuAcORem
+         91bw==
+X-Forwarded-Encrypted: i=1; AJvYcCUcmdt8nwVrirLcqXZ+MrHA7IJOdKtoUCE9nX4AexJ+66YRWbooztTSDqreWlJ0nUXvy6z3jlZUMBcdPQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyA3bx7p4KBvENo+T4wNabObT1/US4BIYOtVX03HfoKjwdL/9Db
+	t/nSNuZW/tqc/XJM5lDq86UfAeDaZoex2fDVGJXsS7gN40nD60R2WZ2N
+X-Gm-Gg: ASbGnctn5amilgSvynmpzdy8o0R94ppbGL+xg3o7PJMl0YF06VvtKeCB+Wx/YMMdisq
+	VFbjucOiF96zJmJh3M0Y+77qC8MsBKkHYrxD8PdFzWiDYEA4taplYRhuKGMraM9VYC6We3f2LBv
+	kJFx7K6b6wxvpjSeMTsEEXR5kuyA9pD8EIdOjLLtBXVxi5QQPjnLp0J8eYCLUkcyDOzCFowyWXY
+	hG0cLbL2nyiU3eA8qK5falDqZJeJtjbupPFqSe9FicyabiTJ2W7Iadn6o8MsYVH5VQvutAr8qwV
+	HEXNqv6WcNLzFq1uRmk5LROvQ5i9rBM3pMiz2C4XuSqBtgIQUv8znrzS5MydPNgWf1fLOZ0xb/G
+	0puP8Jj4d9zbJF+cd2ypKqLzykp7zB4ZbFBG5a0DejM6pNFLrgaYGsTF+3TQMYQLf
+X-Google-Smtp-Source: AGHT+IGirE4lTWQn4+mh2/Whn8RwSBeSs+tPBsapow5X70N0VYW4jzGac01/yKsu605hOJRlmGhM4Q==
+X-Received: by 2002:a17:903:2a88:b0:267:9a29:7800 with SMTP id d9443c01a7336-294def3638emr3646535ad.59.1761679254371;
+        Tue, 28 Oct 2025 12:20:54 -0700 (PDT)
 Received: from localhost ([2600:8802:b00:9ce0::f9da])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3402a61f83asm1504879a91.13.2025.10.28.12.20.50
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-33fed7f6040sm12929248a91.16.2025.10.28.12.20.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Oct 2025 12:20:50 -0700 (PDT)
+        Tue, 28 Oct 2025 12:20:53 -0700 (PDT)
 From: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
 To: johannes.thumshirn@wdc.com
 Cc: shinichiro.kawasaki@wdc.com,
 	linux-block@vger.kernel.org,
 	Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
-Subject: [PATCH V2 1/2] blktrace: add blktrace zone management regression test
-Date: Tue, 28 Oct 2025 12:20:47 -0700
-Message-Id: <20251028192048.18923-1-ckulkarnilinux@gmail.com>
+Subject: [PATCH V2 2/2] blktrace: add blktrace ftrace corruption regression test
+Date: Tue, 28 Oct 2025 12:20:48 -0700
+Message-Id: <20251028192048.18923-2-ckulkarnilinux@gmail.com>
 X-Mailer: git-send-email 2.40.0
+In-Reply-To: <20251028192048.18923-1-ckulkarnilinux@gmail.com>
+References: <20251028192048.18923-1-ckulkarnilinux@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -73,170 +77,140 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Create a new blktrace test group and add a regression test for a
-blktrace false positive WARNING that occurs when zone management
-commands are traced with blktrace on V1 version.
+Add regression test for blktrace ftrace corruption bug that occurs when
+sysfs trace is enabled followed by ftrace blk tracer.
 
-Bug: https://syzkaller.appspot.com/bug?extid=153e64c0aa875d7e4c37
-Location: kernel/trace/blktrace.c:367-368
+When /sys/block/*/trace/enable is enabled and then ftrace's blk tracer
+is activated, the trace output becomes corrupted showing "Unknown action"
+with invalid hex values instead of proper action codes.
 
-The test:
-1. Creates a zoned null_blk device (8 zones, 1GB, no conventional zones)
-2. Starts blktrace on the device
-3. Issues zone open command for all zones
-4. Checks dmesg for the false positive WARNING
+The root cause is that ftrace allocates a blk_io_trace2 buffer (64 bytes)
+but calls record_blktrace_event() which writes v1 format (48 bytes),
+causing field offset mismatches and corruption.
 
-Device configuration:
-- Total size: 1GB
-- Zone size: 128MB
-- Number of zones: 8
-- Conventional zones: 0
-
-If the WARNING is found, the bug is present and logged to the full
-output. If no WARNING appears, the bug is fixed.
-
-Note: The bug uses WARN_ON_ONCE, so it triggers only once per boot.
-Subsequent runs after the first trigger will not show the WARNING.
+This test verifies that the trace output is correct and doesn't show
+the corruption pattern.
 
 Signed-off-by: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
 ---
-V1->V2:
-Removed dmesg -C to avoid clearing dmesg buffer from other tests
-Use _dmesg_since_test_start() to only check messages from this test (Johannes)
----
- tests/blktrace/001     | 94 ++++++++++++++++++++++++++++++++++++++++++
- tests/blktrace/001.out |  2 +
- tests/blktrace/rc      | 11 +++++
- 3 files changed, 107 insertions(+)
- create mode 100755 tests/blktrace/001
- create mode 100644 tests/blktrace/001.out
- create mode 100644 tests/blktrace/rc
+ tests/blktrace/002     | 97 ++++++++++++++++++++++++++++++++++++++++++
+ tests/blktrace/002.out |  3 ++
+ 2 files changed, 100 insertions(+)
+ create mode 100755 tests/blktrace/002
+ create mode 100644 tests/blktrace/002.out
 
-diff --git a/tests/blktrace/001 b/tests/blktrace/001
+diff --git a/tests/blktrace/002 b/tests/blktrace/002
 new file mode 100755
-index 0000000..43331c1
+index 0000000..73b8597
 --- /dev/null
-+++ b/tests/blktrace/001
-@@ -0,0 +1,94 @@
++++ b/tests/blktrace/002
+@@ -0,0 +1,97 @@
 +#!/bin/bash
 +# SPDX-License-Identifier: GPL-3.0+
 +# Copyright (C) 2025 Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
 +#
-+# Regression test for blktrace false positive WARNING on zone management
-+# commands.
++# Regression test for blktrace ftrace corruption bug when using sysfs
++# trace enable with ftrace blk tracer.
 +#
-+# Bug: https://syzkaller.appspot.com/bug?extid=153e64c0aa875d7e4c37
-+# Location: kernel/trace/blktrace.c:367-368
++# Bug: When sysfs trace is enabled (/sys/block/*/trace/enable) and then
++# ftrace blk tracer is enabled, the trace output becomes corrupted showing
++# "Unknown action" with invalid hex values.
 +#
-+# The bug triggers a WARNING when zone management commands (zone open/close/
-+# finish/reset) are traced with blktrace on V1 version. This is a false
-+# positive that should be fixed.
++# Root cause: ftrace allocated blk_io_trace2 buffer (64 bytes) but called
++# record_blktrace_event() which writes v1 format (48 bytes), causing field
++# offset mismatches and corruption.
 +
 +. tests/blktrace/rc
 +. common/null_blk
 +
-+DESCRIPTION="blktrace zone management command tracing"
++DESCRIPTION="blktrace ftrace corruption with sysfs trace"
 +QUICK=1
 +
 +requires() {
-+	_have_program blkzone
 +	_have_null_blk
-+	_have_module_param null_blk zoned
++	_have_tracefs
 +}
 +
 +test() {
 +	echo "Running ${TEST_NAME}"
 +
-+	local blktrace_pid
-+	local warning_count
++	local trace_dir="/sys/kernel/debug/tracing"
 +	local device
 +
-+	# Initialize null_blk with no default devices
-+	if ! _init_null_blk nr_devices=0; then
-+		return 1
-+	fi
-+
-+	# Create zoned null_blk device via configfs
-+	# 8 zones, 1GB total, 128MB per zone, no conventional zones
-+	if ! _configure_null_blk nullb0 \
-+		memory_backed=1 \
-+		zone_size=128 \
-+		zone_nr_conv=0 \
-+		size=1024 \
-+		zoned=1 \
-+		power=1; then
++	# Initialize null_blk with one device
++	if ! _init_null_blk nr_devices=1; then
 +		return 1
 +	fi
 +
 +	device=/dev/nullb0
 +
-+	# Verify it's a zoned device
-+	local zoned_mode
-+	zoned_mode=$(cat /sys/block/nullb0/queue/zoned)
-+	if [[ "$zoned_mode" != "host-managed" ]]; then
-+		echo "Device is not zoned (mode: $zoned_mode)"
++	# Verify device exists
++	if [[ ! -b "$device" ]]; then
++		echo "Device $device not found"
 +		_exit_null_blk
 +		return 1
 +	fi
 +
-+	# Start blktrace
-+	blktrace -d "${device}" -o trace >> "$FULL" 2>&1 &
-+	blktrace_pid=$!
-+	sleep 2
++	# Clean up any previous trace state
++	echo 0 > "$trace_dir/tracing_on" 2>/dev/null || true
++	echo > "$trace_dir/trace" 2>/dev/null || true
++	echo nop > "$trace_dir/current_tracer" 2>/dev/null || true
 +
-+	# Verify blktrace started
-+	if ! ps -p $blktrace_pid > /dev/null 2>&1; then
-+		echo "blktrace failed to start"
++	# Enable sysfs trace for nullb0 (this triggers the bug path)
++	if [[ -f /sys/block/nullb0/trace/enable ]]; then
++		echo 1 > /sys/block/nullb0/trace/enable
++	else
++		echo "No sysfs trace support"
 +		_exit_null_blk
 +		return 1
 +	fi
 +
-+	# Issue zone open command for all zones (triggers bug if present)
-+	blkzone open "${device}" >> "$FULL" 2>&1
++	# Enable blk ftrace tracer
++	echo blk > "$trace_dir/current_tracer"
++	echo 1 > "$trace_dir/tracing_on"
 +
-+	sleep 1
++	# Generate some I/O
++	dd if="$device" of=/dev/null bs=4k count=10 iflag=direct >> "$FULL" 2>&1
 +
-+	# Stop blktrace
-+	kill $blktrace_pid 2>/dev/null
-+	wait $blktrace_pid 2>/dev/null || true
++	# Stop tracing
++	echo 0 > "$trace_dir/tracing_on"
 +
-+	# Check for WARNING (bug present if WARNING found)
-+	warning_count=$(_dmesg_since_test_start | grep -c "WARNING.*blktrace.c:367" || true)
++	# Check trace output for corruption
++	# Get first 10 non-comment lines
++	local trace_output
++	trace_output=$(grep -v "^#" "$trace_dir/trace" | head -10)
 +
-+	if [[ $warning_count -gt 0 ]]; then
-+		echo "WARNING: blktrace bug detected at blktrace.c:367"
-+		_dmesg_since_test_start | grep -A 10 "WARNING.*blktrace.c:367" >> "$FULL"
++	if [[ -z "$trace_output" ]]; then
++		echo "No trace output captured"
++		_exit_null_blk
++		return 1
 +	fi
++
++	# Check for "Unknown action" which indicates the bug
++	if echo "$trace_output" | grep -q "Unknown action"; then
++		echo "BUG: Trace corruption detected with 'Unknown action'"
++		echo "$trace_output" | head -5 >> "$FULL"
++	else
++		echo "Trace output looks correct"
++	fi
++
++	# Cleanup: disable sysfs trace
++	echo 0 > /sys/block/nullb0/trace/enable 2>/dev/null || true
++	echo nop > "$trace_dir/current_tracer" 2>/dev/null || true
 +
 +	_exit_null_blk
 +
 +	echo "Test complete"
 +}
-diff --git a/tests/blktrace/001.out b/tests/blktrace/001.out
+diff --git a/tests/blktrace/002.out b/tests/blktrace/002.out
 new file mode 100644
-index 0000000..a122a65
+index 0000000..b358be9
 --- /dev/null
-+++ b/tests/blktrace/001.out
-@@ -0,0 +1,2 @@
-+Running blktrace/001
++++ b/tests/blktrace/002.out
+@@ -0,0 +1,3 @@
++Running blktrace/002
++Trace output looks correct
 +Test complete
-diff --git a/tests/blktrace/rc b/tests/blktrace/rc
-new file mode 100644
-index 0000000..9b987a2
---- /dev/null
-+++ b/tests/blktrace/rc
-@@ -0,0 +1,11 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2025 Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
-+#
-+# Tests for blktrace infrastructure
-+
-+. common/rc
-+
-+group_requires() {
-+	_have_root && _have_blktrace && _have_program blkparse
-+}
 -- 
 2.40.0
 
