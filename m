@@ -1,104 +1,130 @@
-Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
+Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACFCD233149
-	for <linux-block@vger.kernel.org>; Tue, 28 Oct 2025 13:53:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACC71239E7F
+	for <linux-block@vger.kernel.org>; Tue, 28 Oct 2025 13:54:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761659613; cv=none; b=rtkCucOqOu1RvZ5MH8cwDlgDH9DA13s2uYalYndZUlQ9Ip8q51y+2xjzoMZbbRatb10tbIwAx40QOwU5JLH8qav7E0v3KGZHFxi6t3iVzecQ5JwvvzBDKTJApjtwxpx63ni3cJKsTne+yvam08VV1cERYR8PplMhR38GiFHcfwM=
+	t=1761659683; cv=none; b=XguYdULmOaC0hGl+8bt8MvnJ5KGTssKW56tlhg34Kr/MOvedXZ/hG3V1TEKY9F2H0iq46kvW+I7X2sC4hCftoCS4MqVB6l9hzIeJa93ZYDpzj/mNlVwQ9gK2s9FEg8MGe2eW8gNJgqS+wo+dDHrqfqx+wEMX3KUGrJA5ERRyyeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761659613; c=relaxed/simple;
-	bh=7UwiJZAArm8JmCEJeHhvUn7NllcPI7IXe8Yvs3eKY3A=;
-	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=S+BfMbL6VoFVj880Yh9hzh4Y59D1LWSnTNB44qsxyGk/l2wsCT4WHEUhHCluZ3UcDVY2r0+nqw+f+diT/vxX6upSqaxLEmNZKLkQgfgoChg+s6W/rjtyG85AI53L0CEfUJh/x5ngfF5kTfFrJPH23pNqNb/SIJR7q1CfU3f5EpY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=3RAydxDO; arc=none smtp.client-ip=209.85.166.48
+	s=arc-20240116; t=1761659683; c=relaxed/simple;
+	bh=jSd4hcS7xop9ZuK0NsOQ84M/HWN04CoJ1NRFNJlY0hM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=e/y7+RUTeWIXDa/6zKWE4ZndX0jePCv1jVbv6yon8yIB/5RKBBrVHI/Zd180z+Mv7+fc++9WnK3GLJwJfSrKjAzpRnWa4rfu0fsVgnb9YcCZ4IUsUPpsUZ6EW4sdAi+zp7SoBxYNgIFFVlbJUg/gHRMynMbwQzercVsQz2/gPdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=3cBvKpa9; arc=none smtp.client-ip=209.85.166.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="3RAydxDO"
-Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-94359aa7f60so384704739f.0
-        for <linux-block@vger.kernel.org>; Tue, 28 Oct 2025 06:53:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="3cBvKpa9"
+Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-430ccd45f19so63878775ab.1
+        for <linux-block@vger.kernel.org>; Tue, 28 Oct 2025 06:54:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1761659607; x=1762264407; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4Nb3h+I9r3eVKgBEZka7IhQ9jkoV4w7ZeARyH9Ccd44=;
-        b=3RAydxDODPbrc/0HyHKgVKuaoaDIrNfA0nOgyt7ZhstKeU38pTIyGwCxB+1MfikEDj
-         HeOkvsYr0WvXDtc3WbOivNx12S0N2boMxrfrFcjOzSWwy07rqmg/4AeTSLeJCW44zSrX
-         IMyXEvijzy6Vl0rGCYA1QMnznkdZx/nymA2uyls4e/cciX8rETenCR/ePgmt1ZUFUzND
-         AGcvcIvCVNe8ZZLt5EURyNgVkOqZZ2ckUMV/XE+cNy6zX7hcVyRYmY1qMe4r9FF4jNY2
-         VuKdEx1aECbZEbfKGuExYiLfzsaObPtZl9mm/fC8/S8qEYh+Xetjl4FyxrukPJXZbMb2
-         4pJg==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1761659679; x=1762264479; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Vr99gX2aBwJu7kf6ztY22NIa238ykp6XTngN2e+Qruc=;
+        b=3cBvKpa9JmgeLjstIEf+J/VUZ+v0sbh9Er8gI1w4+8Q95yZzgczN8xaEoY1ncvyGsK
+         XUjrLualq1Dm5pPztchhu5EkbdRzfjp8QxMUOKAj38j1SO1efb/KJIEPYWErTMCQFKfA
+         cinidTqquiqSeFnJaL6ktSVgHHGqFKMc/Zk385jllWtLi/z4vNJSFhTCcfosOyx3vlb/
+         6U132VumGnwSDsj9jWKHsjBl7s+JmPoQkhXzJ2tshpMQ8YRPqKzM1lJzN8A7gy2jXaVI
+         BA27vVLbCS8rnZ8CFbL7mWhwlojx5XOu/ufsOfv+kETNR9zNKOQr4PhVYUK9N3H4x1+A
+         PRdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761659607; x=1762264407;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4Nb3h+I9r3eVKgBEZka7IhQ9jkoV4w7ZeARyH9Ccd44=;
-        b=kTa2cP9eVkCXDbGXPRtvrOgc+Pyu7CGDkh0Fy/u7PGknq6wEU0sU11Cgr3e3uzfgv3
-         v5JPfx1h3n5CrRxuX4Lt+6e/eJs+hNpvPgkN7yyhFEvl1JQD+brAMinv0w5E7mfB3PMi
-         DTpX24gO4JU6VC9xs04gi0H3x0O6Wr7Mcp9lixW4rrp+hQKNAR2QZ10yRyEJ21FjQv7F
-         ui5ZlXRPWGBfo5gImpTWDYTwvR0h1Ps2oFbchdVawCiF6LzJohQCNXCR7RV24FBIbpxx
-         T44SfB2Lb/BNloLoBI/fQC2v+KsbQ62867jgZyOBl6+/XmhzsJKPUoCazCrhpLa1Jy94
-         usSQ==
-X-Gm-Message-State: AOJu0Yz1vgEtYV8N9MrvihhJS95oJzZFFkz2ICA0IIx3Rh6uXuc2pGjF
-	d89zG5c/5GiECaJWFzUp70N1SsTw8IXTfQtOyBJ++YL1gNPGa5NFGhbfTJd8Cja4OO4D0A1LU6v
-	JO1dRmp8=
-X-Gm-Gg: ASbGncsrvU1ce2uMKdVJVQcBBjAFOU2hZl3cBySgpotu0Q22meW8AGLNqd8oerS7qMu
-	coCQzFDhD1mpPgjZsplRzmfBCEuwOlPU8qX6RrrvloX0vq+gS8mPM3q8ZZJLyTgAGOIoPea8wwF
-	x+lwWI8nYV8/LfQrb+xWy6yfRETdCb7KFj+1lPEnseUk7El+DcP+QJKWmsyGzpEWV/23l0xlhcJ
-	qG1ULCWgdAWe3+Rq8bJhuQksgzwCBNBnewAJkNLkmU2bcMUz8PWB0trJsMMGFtWv1qigjEcqjli
-	lUtK0p+yfkat+GNR90kIDko/umPfhkTpICJhVxJI3q8zjiPjfQg0zjNDw9tU8DuZh0f0/vaNsC1
-	uC2a2C3H9qphk2PyQcmLfpHmDquKCvzEGtx6cZHvKltjj9etPXjpli2V47Zzbrp4L/cs=
-X-Google-Smtp-Source: AGHT+IEivRlZe0KpNjNxRPKGwOg7QIcJ10LcVZ4NW1yNoDerzdW7sqtcWm/8i69j+dhs0RFOX5Ftjw==
-X-Received: by 2002:a92:cdaa:0:b0:430:a530:ede2 with SMTP id e9e14a558f8ab-4320f842c93mr49258275ab.24.1761659607216;
-        Tue, 28 Oct 2025 06:53:27 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5aea995e701sm4287485173.49.2025.10.28.06.53.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Oct 2025 06:53:26 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Damien Le Moal <dlemoal@kernel.org>
-In-Reply-To: <20251027002733.567121-1-dlemoal@kernel.org>
-References: <20251027002733.567121-1-dlemoal@kernel.org>
-Subject: Re: [PATCH 0/2] Zone operation fixes
-Message-Id: <176165960624.274653.9187095828796238088.b4-ty@kernel.dk>
-Date: Tue, 28 Oct 2025 07:53:26 -0600
+        d=1e100.net; s=20230601; t=1761659679; x=1762264479;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Vr99gX2aBwJu7kf6ztY22NIa238ykp6XTngN2e+Qruc=;
+        b=bKZbb2B7Rtiu9QiLPtcQ7guqvRh7YKjOLCAczIVVRSMoSQjMViCPPafxXpKEAhF8TY
+         UBA8nBZ3j4im1/bVOeqofc8+9XLRRaZRXdCFyKoV3Emm2Dwngf9WUURvCjat1lcDDhuo
+         L6ymbBMXvmI1rJWmedk3dXGue503AoS19dJ5xRQ+d4OoUtTrmXy8Z9MOP8H6wkd6GrH0
+         A98u15poV8+i7svhwufeEtqhJw20axo9JTqiH+t4GSWX2co7Ru6aWjYeNQ8R5FPCZVxB
+         hTVdlH2JFwYCbuA/XIuwci1ot60jeatWbaqkKQLsLGu1PnZr3wXeaEaFdEcgMf7VdgZ5
+         UH7A==
+X-Gm-Message-State: AOJu0YwEwPXh8ctgZvirAR5WjUe9fIFUQUBCaHeQ3CTKi2v7RDjyVk0T
+	UvUJWAaJKR/nvl3VBLZZ4Rnf94O7N94Jj+Sbm7BLkCcbHMgyqRDAnUZl7tIEGm/k0MM=
+X-Gm-Gg: ASbGncuy7rTrt3BkHN+fYKxT3yoMkbk+rfcUsn/W69vOjYZrJhtYtjW3bLav3HisMvr
+	auflIbVCKnXLJAPm4bZ/61bQ/YweGTL8wp9wk/Tk2YkMPgz29FUdcqQo0DqV0rhs0nqCUUvpbsa
+	VL0h0AbUwdKwPSedprePfEPkzuo+9cVBckFYI3+lXt/Gu8Q6kbFZ9ilHBVSbHcJkrwLSAXkxNjW
+	GhOo3M+62eaKNxognn1aCnuAF1TzIBZZ7wvtvQW3lFE2hokPif5tXsk279N/uYXUUMwHQb4joy9
+	rOloW5/VksIYzXIlbG8HSG1UGAFcIggKgQwbduCMi089PVkdv1Jm0b57kQI6RHc2JFxT3oZ/rff
+	o7rMdrQTSZpBEXzNSQPupTuZzhsRvZksZf0bCzy/dQwwEoB+sRFCoihzUmEAa4Bikt6VM8nj8
+X-Google-Smtp-Source: AGHT+IGCC24xLu0YPxPJqjvvOdQHxuwTrOmVY7UuZn98v9qWq2D9d2x55e3Zpz42GT5EFXIAara3Iw==
+X-Received: by 2002:a05:6e02:330d:b0:430:a538:25e7 with SMTP id e9e14a558f8ab-4320f7af6cdmr54831985ab.29.1761659679547;
+        Tue, 28 Oct 2025 06:54:39 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5aea995d420sm4405918173.43.2025.10.28.06.54.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Oct 2025 06:54:38 -0700 (PDT)
+Message-ID: <ce30aa10-4138-4c25-857f-f1a2ea1c91f4@kernel.dk>
+Date: Tue, 28 Oct 2025 07:54:38 -0600
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] blktrace: log dropped REQ_OP_ZONE_XXX events ver1
+To: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>, Johannes.Thumshirn@wdc.com
+Cc: linux-block@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ martin.petersen@oracle.com, dlemoal@kernel.org,
+ mathieu.desnoyers@efficios.com, mhiramat@kernel.org, rostedt@goodmis.org
+References: <20251028043248.2873-1-ckulkarnilinux@gmail.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20251028043248.2873-1-ckulkarnilinux@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
 
-
-On Mon, 27 Oct 2025 09:27:31 +0900, Damien Le Moal wrote:
-> Jens,
+On 10/27/25 10:32 PM, Chaitanya Kulkarni wrote:
+> Add informational messages during blktrace setup when version 1 tools
+> are used on kernels with CONFIG_BLK_DEV_ZONED enabled. This alerts users
+> that REQ_OP_ZONE_* events will be dropped and suggests upgrading to
+> blktrace tools version 2 or later.
 > 
-> A couple of patches to fix zone operations definition and handling.
-> These are not in response to bug reports, but they certainly fix things
-> that are incorrect.
+> The warning is printed once during trace setup to inform users about
+> the limitation without spamming the logs during tracing operations.
+> Version 2 blktrace tools properly handle zone management operations
+> (zone reset, zone open, zone close, zone finish, zone append) that
+> were added for zoned block devices.
 > 
-> Damien Le Moal (2):
->   block: fix op_is_zone_mgmt() to handle REQ_OP_ZONE_RESET_ALL
->   block: make REQ_OP_ZONE_OPEN a write operation
+> Example output:
+> blktests (master) # ./check blktrace
+> blktrace/001 (blktrace zone management command tracing)      [passed]
+>     runtime  3.882s  ...  3.866s
+> blktests (master) # dmesg -c
+> [   95.874361] blktrace: nullb0:blktrace events for REQ_OP_ZONE_XXX will be dropped
+> [   95.874372] blktrace: use blktrace tools version >= 2 to track REQ_OP_ZONE_XXX
+> blktests (master) # 
 > 
-> [...]
+> This helps users understand why zone operation traces may be missing
+> when using older blktrace tool versions with modern kernels that
+> support REQ_OP_ZONE_XXX in blktrace.
+> 
+> Signed-off-by: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+> ---
+>  kernel/trace/blktrace.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+> index 776ae4190f36..200d0deb6c90 100644
+> --- a/kernel/trace/blktrace.c
+> +++ b/kernel/trace/blktrace.c
+> @@ -690,6 +690,12 @@ static void blk_trace_setup_finalize(struct request_queue *q,
+>  	 */
+>  	strreplace(buts->name, '/', '_');
+>  
+> +	if (version == 1 && (IS_ENABLED(CONFIG_BLK_DEV_ZONED))) {
 
-Applied, thanks!
+Redundant parens around IS_ENABLED() here.
 
-[1/2] block: fix op_is_zone_mgmt() to handle REQ_OP_ZONE_RESET_ALL
-      commit: 12a1c9353c47c0fb3464eba2d78cdf649dee1cf7
-[2/2] block: make REQ_OP_ZONE_OPEN a write operation
-      commit: 19de03b312d69a7e9bacb51c806c6e3f4207376c
+> +		pr_info("%s:blktrace events for REQ_OP_ZONE_XXX will be dropped\n",
+> +				name);
 
-Best regards,
+%s: blktrace events [...]? Seems weird not to have a space there.
+
 -- 
 Jens Axboe
-
-
 
