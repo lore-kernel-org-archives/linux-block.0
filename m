@@ -1,71 +1,145 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 955F83128CA;
-	Wed, 29 Oct 2025 09:23:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05A5233468F
+	for <linux-block@vger.kernel.org>; Wed, 29 Oct 2025 09:36:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761729834; cv=none; b=PvLwhdI18CLRRlX6dpEeE0IB7D1wx6Zj2jgxaz0N1BHDNr7n11uATYn4Q6hvlKG4Oq9AQ87aUX7MBo40hXs4Ql3aa9O4qN4fn2g1KP36BuXSo7s44W1PGvH3U74IEM7oa4krXodagNS9ySmdrvCYq4wZqXP2s3f48S+dTzsPIQM=
+	t=1761730595; cv=none; b=QZWU0IKMZki1UQM05MckrpJF/9+I0FGFkHqDT4KvsAm0PK6LqBj+EJ4E0WXnNU+B8ddyeTLDmaJGMUuwOVcJfDBV4evRa+OEJHYtle2Gmg6L+Urw8GJXPu0nEtG0E5ZXCmXAtKqrnH8TCKQoJZ0nBY6mKWLzDoM60u98iE9pOQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761729834; c=relaxed/simple;
-	bh=jTxdkb4v5//ZDCSckJFq++uwvUJsKMWAwmKvwtlqekU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NC+v8RA+NzAyDLUkWkqEVL2e/Y7qr9+FfHf5RNeCjhUmXiCZ2tOknzW5H/wntSxkZGZSHau4KQFE29JDFK3/z5KQc0Z4qjQiHlTdvXkKeb8ITUyc+0aj/69J6SRofuGUaBoynZ5qmnEDH44DGdXoF0qKfxOfk0cPIpaVVDGl1qk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=GA03knUk; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1761730595; c=relaxed/simple;
+	bh=JU7QrsZLf15J+89iNKo+w3/EF36mGD83dag6eMRh0jc=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=WdlM/0jzE1F27e32iOQ89PphHsf4TY0VL+6hHB7hr6T09xM0qI8cFXjHWDPNj3q6LQx/y1BPQ1abDmwRRZa7kBsrmlE3uIgg5FfITKFCCTBx0ybMuctn6ChUq0PkjoUb4HjhOvlHYhy7GdY4GY9x3/woLTjbFcAatLqW0y4U/9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=CbKk1HhJ; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=CbKk1HhJ; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="GA03knUk"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=3Ih05HK+8ZsKOo5cQ+utqVaq+hUnBg4xFJaxP/XkN4A=; b=GA03knUksWMuLiHmkDJ5EtiFSg
-	wtcTt2zLP5rdVxMJlL5t+2bQPR9r1FAu+7TxdPT1FZoVd+9zZqS8DvVU3U58tlcANQo3Ijlxm29r6
-	BIL1s0m3nl0Oj5zeyYWGYkRZrAQgYCgg7EwQeFKub1LK86Uy5OSqSsuBN38/AYPS3gZpPXq24K0x0
-	9hFELXTlQiy0mJ1/LIvBFNKdrwvGhc6WAtCupQZEw8eVo10iVBdtQ2tvC/JcnCTHrsd578Gj8mAoI
-	DiiBs5ov9+QgkPuCXSJMAiWBqFr+vrzwt270IQq6w3w9rvz7L7t9vBla6YL+/OiGk39CXMbQYj+eu
-	RZXfs7tg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vE2P5-00000000TeR-1TcB;
-	Wed, 29 Oct 2025 09:23:39 +0000
-Date: Wed, 29 Oct 2025 02:23:39 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Suren Baghdasaryan <surenb@google.com>
-Cc: Christoph Hellwig <hch@infradead.org>, akpm@linux-foundation.org,
-	david@redhat.com, lorenzo.stoakes@oracle.com,
-	Liam.Howlett@oracle.com, vbabka@suse.cz, alexandru.elisei@arm.com,
-	peterx@redhat.com, sj@kernel.org, rppt@kernel.org, mhocko@suse.com,
-	corbet@lwn.net, axboe@kernel.dk, viro@zeniv.linux.org.uk,
-	brauner@kernel.org, jack@suse.cz, willy@infradead.org,
-	m.szyprowski@samsung.com, robin.murphy@arm.com, hannes@cmpxchg.org,
-	zhengqi.arch@bytedance.com, shakeel.butt@linux.dev,
-	axelrasmussen@google.com, yuanchu@google.com, weixugc@google.com,
-	minchan@kernel.org, linux-mm@kvack.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, iommu@lists.linux.dev
-Subject: Re: [PATCH v2 0/8] Guaranteed CMA
-Message-ID: <aQHdG_4yk0-o0iEY@infradead.org>
-References: <20251026203611.1608903-1-surenb@google.com>
- <aP8XMZ_DfJEvrNxL@infradead.org>
- <CAJuCfpH1Nmnvmg--T2nYQ4r25pgJhDEo=2-GAXMjWaFU5vH7LQ@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="CbKk1HhJ";
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="CbKk1HhJ"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 110FA204C5;
+	Wed, 29 Oct 2025 09:36:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1761730591; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JU7QrsZLf15J+89iNKo+w3/EF36mGD83dag6eMRh0jc=;
+	b=CbKk1HhJU0lQhBkXUpLz9SZniyQpCoT+aihpdi+Wt15tYs8pTdE8XbDeNMCKprMBr3ZTNC
+	rZKzcHc0SDNr3yU/U76QpGQKn3YFr4aYXJfqMZrp8LbbNy/KP+A7gxMzKBFx6eWfhrzxAO
+	bxgJAPGLdd5dT+c7UBDljHj7gCUlOpA=
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.com header.s=susede1 header.b=CbKk1HhJ
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1761730591; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JU7QrsZLf15J+89iNKo+w3/EF36mGD83dag6eMRh0jc=;
+	b=CbKk1HhJU0lQhBkXUpLz9SZniyQpCoT+aihpdi+Wt15tYs8pTdE8XbDeNMCKprMBr3ZTNC
+	rZKzcHc0SDNr3yU/U76QpGQKn3YFr4aYXJfqMZrp8LbbNy/KP+A7gxMzKBFx6eWfhrzxAO
+	bxgJAPGLdd5dT+c7UBDljHj7gCUlOpA=
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id DC7E31396A;
+	Wed, 29 Oct 2025 09:36:30 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id tKW1NB7gAWkZCQAAD6G6ig
+	(envelope-from <mwilck@suse.com>); Wed, 29 Oct 2025 09:36:30 +0000
+Message-ID: <91b583c2fad9f1e72ed5dc794a709289de363a39.camel@suse.com>
+Subject: Re: [PATCH 0/3] Fix a deadlock related to modifying queue attributes
+From: Martin Wilck <mwilck@suse.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>, 
+	linux-block@vger.kernel.org, Benjamin Marzinski <bmarzins@redhat.com>,
+ Hannes Reinecke <hare@suse.com>
+Date: Wed, 29 Oct 2025 10:36:30 +0100
+In-Reply-To: <20251029085810.GA32474@lst.de>
+References: <20250702182430.3764163-1-bvanassche@acm.org>
+	 <20250703090906.GG4757@lst.de>
+	 <918963a5-a349-433a-80a8-6d06c609f20e@acm.org>
+	 <20250708095707.GA28737@lst.de>
+	 <b23c05be-2bde-424a-a275-811ccc01567c@acm.org>
+	 <20250710080341.GA8622@lst.de>
+	 <563ef9b02d49fa05418c7a1b0b384d898819e0e9.camel@suse.com>
+	 <20251029085810.GA32474@lst.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.1 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJuCfpH1Nmnvmg--T2nYQ4r25pgJhDEo=2-GAXMjWaFU5vH7LQ@mail.gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Rspamd-Queue-Id: 110FA204C5
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=susede1];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_SIGNED(0.00)[suse.com:s=susede1];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.com:+];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.com:dkim,suse.com:mid]
+X-Spam-Score: -4.51
 
-On Mon, Oct 27, 2025 at 12:51:17PM -0700, Suren Baghdasaryan wrote:
-> I'm guessing you missed my reply to your comment in the previous
-> submission: https://lore.kernel.org/all/CAJuCfpFs5aKv8E96YC_pasNjH6=eukTuS2X8f=nBGiiuE0Nwhg@mail.gmail.com/
-> Please check it out and follow up here or on the original thread.
+On Wed, 2025-10-29 at 09:58 +0100, Christoph Hellwig wrote:
+> On Mon, Oct 27, 2025 at 03:43:50PM +0100, Martin Wilck wrote:
+> > As Bart's patch only addresses the regression introduced by
+> > b07a889e8335 ("block: move q->sysfs_lock and queue-freeze under
+> > show/store method"), can we perhaps leave non-sysfs users of queue
+> > freezing aside in this context?
+> >=20
+> > As far as sysfs users are concerned, what problem do you see with
+> > Bart's approach to introduce a timeout for freezing the queues, and
+> > returning an error to user space if this timeout is exceeded?
+> >=20
+> > Would you be willing to accept the set if we'd use the timeout
+> > approach
+> > for all affected sysfs attributes?
+>=20
+> Maybe it's because the discussion, but I have no idea what you are
+> trying to advocate for.=C2=A0 But a timeout for a locking operation is
+> not an option to work around deadlocks.
 
-I didn't feel to comment on it.  Please don't just build abstractions
-on top of abstractions for no reason.  If you later have to introduce
-them add them when they are actually needed.
+Consider it a "trylock" type of operation, which is a valid method to
+avoid deadlocks, AFAIK.
 
+When we need to freeze a queue for changing a sysfs attribute, we try
+to freeze it, and fail (releasing the limits_lock) if we can't. IMO
+failing in this use case is totally legitimate, and obviously better
+than the "deadlock" situation described by Bart.=C2=A0User space can
+implement retries in situations like this if it really needs to modify
+the attribute.
+
+Technically, the "trylock" must be implemented using a timeout, because
+freezing a queue isn't an atomic operation as is taking a lock.
+
+Regards,
+Martin
