@@ -1,45 +1,46 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EED122D8779;
-	Wed, 29 Oct 2025 16:14:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD04E2F12C0
+	for <linux-block@vger.kernel.org>; Wed, 29 Oct 2025 16:15:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761754489; cv=none; b=g7JTgFFd1qpw997pKDZn7apLktIuhbfb+hFDcODwYQePlmj2T3N3pkwY3OBGDuXgojVFR13tomrJoOnrvLgo1n0a8+bZb7z7S7ZyVXkYZIlYG5ZzoEdVG++VG+fs4xcgUTNmICi4JyFYhyB/Xy0AHp78hPF/eqpZc/uzIZwtEbw=
+	t=1761754556; cv=none; b=BwPsfTMPvFA93RlSe6nn5p6ZKoR9zRlPWPHXpnvzNPL3IrOr0He73veUdGBD5W9deAIOrzBnR1EPP71/DL48hWM62kynV8LWaezxrDkjMxam/n7zZcR6hXx7SCtAVLyEihwVzIluTdOJ6TuUiQffoP3DP+QDIbEDOfhG9IDBZvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761754489; c=relaxed/simple;
-	bh=BU/KJ2BFrWdN2k7V2JQhqCYa+EJvjFnOYlY5BUSYT9s=;
+	s=arc-20240116; t=1761754556; c=relaxed/simple;
+	bh=oOC1zgaVVaJ3qVkKEcaDMIcFtxNTCgOyx15Yb9PY+GA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aqhKKRU5uK9r7gBurFD+F5lPyAuR9sy0CFA0IaAT0+EIZFOuhfgpfVBboilQ39mVEPI4SV/LAZMV1MHhoSQaZHgT8XFVSWf1xvddB73LWzVjJJh8n0gp9DMO2kpT1MpEKaBMd0QD1uPEmFc2Fh0X2YrAP8jPMRgChySpQ8UYETo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R8+lEigM; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=OEDxDAOd1UehPI/9r1cXAIO5XHe5cT9KdAJRGYyEyE/zmzY6lFYIp5ByhRNkR8LoRSb6y5nSHII8wXb9Qsaw1W2B0+Xbwy4HePg1uAI5QLNvF9QVUk1Jwu5a78vKzJ8hh+cWH/li3tzGKwP3Wxsx3YUUEohXz4o3hwGpxUyNdjw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mUhTqyGh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R8+lEigM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BFFCC4CEF7;
-	Wed, 29 Oct 2025 16:14:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mUhTqyGh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD24AC4CEF7;
+	Wed, 29 Oct 2025 16:15:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761754488;
-	bh=BU/KJ2BFrWdN2k7V2JQhqCYa+EJvjFnOYlY5BUSYT9s=;
+	s=k20201202; t=1761754556;
+	bh=oOC1zgaVVaJ3qVkKEcaDMIcFtxNTCgOyx15Yb9PY+GA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=R8+lEigMCWnv6jmZw7f3tuW9pVGrdDzpaYzGpAmok0dAUywXkVhHfV+pEpY2S+ObD
-	 MhgPMLz7+QpkFbjwJYYIzG3s4I34eOY9QZMCh5UWa0bSNXYsIoJoDuuarPMRLkGjqC
-	 gyhFFH9+wwU4JmNGpKCinn0H33s7pLrMaPetcPVJaTGU+Z1J6xLIHixm20IX7VQees
-	 3rRU25vTn3ZJeR4IYwNfj8YAzomS2wcdKfgSboFTHfdT8LfvdashHSYGQmIhLbcN89
-	 FY5vptUOjJ5+fh75bKtGOIuYb6tbOZjCA8zWZ3O0iqTvmwnqvuLcXlVxp2TiWXqLfc
-	 ew7CKmj0W7s2g==
-Date: Wed, 29 Oct 2025 09:14:47 -0700
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: Bart Van Assche <bart.vanassche@gmail.com>
-Cc: Christoph Hellwig <hch@lst.de>, Carlos Maiolino <cem@kernel.org>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-raid@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: Re: fall back from direct to buffered I/O when stable writes are
- required
-Message-ID: <20251029161447.GG3356773@frogsfrogsfrogs>
-References: <20251029071537.1127397-1-hch@lst.de>
- <ea07dede-5baa-41e5-ad5d-a9f6a90ac6e8@gmail.com>
+	b=mUhTqyGhl0sdbRZ7K5S18Hqts4IqycfS6DVA0VeRLRvam1RyqRKGp2Kp7PmA/k27C
+	 bDS0t6dEsBELFTRn7CA4zJf9yu1rI6ZCQBZW4IHLFGx26gP+6QL0luji2ofBKnOtjk
+	 cQ9BCN9Jj0wHexiBRUGRUSduh6otBpsZhSvToWNnWehgMfs6f14G1Nhe+I+zcEHjIU
+	 kFOiPwyKScZGEwTZdKRCw0yEK8CzcMoP8Rz+3hSEk5uA0BSWHEXIvpkRxAOJ2nHn33
+	 uAZsf4YTEhBtcaMOyf/3xQiFywRDtNpmQ7TMXSj6/rg4gS/i6FXgk3jxmw+8IiG7aK
+	 YgcyuKgokSXrA==
+Date: Wed, 29 Oct 2025 10:15:54 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Hans Holmberg <Hans.Holmberg@wdc.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Johannes Thumshirn <Johannes.Thumshirn@wdc.com>, hch <hch@lst.de>,
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Andreas Hindborg <a.hindborg@kernel.org>
+Subject: Re: [PATCH] null_blk: set dma alignment to logical block size
+Message-ID: <aQI9uiTuEr8hbWbC@kbusch-mbp>
+References: <20251029133956.19554-1-hans.holmberg@wdc.com>
+ <aQIgvwec4Ol7ed8K@kbusch-mbp>
+ <49749a76-5849-410f-966d-6011dd4d5f41@wdc.com>
+ <aQI7hyET6f-nXnmp@kbusch-mbp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -48,68 +49,18 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ea07dede-5baa-41e5-ad5d-a9f6a90ac6e8@gmail.com>
+In-Reply-To: <aQI7hyET6f-nXnmp@kbusch-mbp>
 
-On Wed, Oct 29, 2025 at 08:58:52AM -0700, Bart Van Assche wrote:
-> On 10/29/25 12:15 AM, Christoph Hellwig wrote:
-> > we've had a long standing issue that direct I/O to and from devices that
-> > require stable writes can corrupt data because the user memory can be
-> > modified while in flight.  This series tries to address this by falling
-> > back to uncached buffered I/O.  Given that this requires an extra copy it
-> > is usually going to be a slow down, especially for very high bandwith
-> > use cases, so I'm not exactly happy about.
-> > 
-> > I suspect we need a way to opt out of this for applications that know
-> > what they are doing, and I can think of a few ways to do that:
-> > 
-> > 1a) Allow a mount option to override the behavior
-> > 
-> > 	This allows the sysadmin to get back to the previous state.
-> > 	This is fairly easy to implement, but the scope might be to wide.
-
-/me dislikes mount options because getting rid of them is hard.
-
-> > 1b) Sysfs attribute
-> > 
-> > 	Same as above.  Slightly easier to modify, but a more unusual
-> > 	interface.
-> > 
-> > 2) Have a per-inode attribute
-> > 
-> > 	Allows to set it on a specific file.  Would require an on-disk
-> > 	format change for the usual attr options.
-> > 
-> > 3) Have a fcntl or similar to allow an application to override it
-> > 
-> > 	Fine granularity.  Requires application change.  We might not
-> > 	allow any application to force this as it could be used to inject
-> > 	corruption.
-> > 
-> > In other words, they are all kinda horrible.
-
-Yeah, I don't like the choices either.  Bart's prctl sounds the least
-annoying but even then I still don't like "I KNOW WHAT I'M DOING!!"
-flags.
-
-> Hi Christoph,
+On Wed, Oct 29, 2025 at 10:06:31AM -0600, Keith Busch wrote:
 > 
-> Has the opposite been considered: only fall back to buffered I/O for buggy
-> software that modifies direct I/O buffers before I/O has
-> completed?
+> After this, you can set dma_alignment to 1.
 
-How would xfs detect that?  For all we know the dio buffer is actually a
-piece of device memory or something, and some hardware changed the
-memory without the kernel knowing that.  Later on the raid scrub fails a
-parity check and it's far too late to do anything about it.
+Oh wait, no, it still can't be smaller than 511 because everything
+operates on "SECTOR_SIZE". Which also seems like it shouldn't be
+necessary...
 
---D
+Sorry, let's just do your patch. That seems the safest thing for now,
+and I can mess with dma alignment limits for a follow up (I'm already
+doing something similiar for generic protection information).
 
-> Regarding selecting the direct I/O behavior for a process, how about
-> introducing a new prctl() flag and introducing a new command-line
-> utility that follows the style of ionice and sets the new flag before
-> any code runs in the started process?
-> 
-> Thanks,
-> 
-> Bart.
-> 
+Reviewed-by: Keith Busch <kbusch@kernel.org>
