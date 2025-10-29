@@ -1,115 +1,97 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 588AC199931;
-	Tue, 28 Oct 2025 23:03:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD1F32EA147
+	for <linux-block@vger.kernel.org>; Wed, 29 Oct 2025 02:51:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761692633; cv=none; b=WU6b12kFAexuY48nH1qIteo0cvXUKFK2KSRi8CbjJASkoyk33OYG+CwgF44RApHesBESH5zUrSoZtS/6V9D/dLnP8NuuTGRmV2eUKkDsYpCHusbPoiIO35AZ8f9XhMnC6aUXpFLyUGtysy1sH8S+VYGF6dNBRzDjYlUK0kIxnYY=
+	t=1761706313; cv=none; b=PexFL3Mti6RhkxXDiBGNIUEutZ66IvZL7HmE1H1cbm1S39jqi4N33TNMLsTXkJavsQMLQOm57H1VeQ4bgs6ewFQgNq8NzZ4MGHsbbcuUcoyM+cVfyhe1emPMPQ9Syzn9P2+L+5V4BzLacyqj4JDhNQEgDy4rs2WY4EYjdQKxcoo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761692633; c=relaxed/simple;
-	bh=kgX4g6vUYkvgZSZP1fvrdIYXiC9PY9BfKX/VN+ui3hw=;
+	s=arc-20240116; t=1761706313; c=relaxed/simple;
+	bh=ZbAxezF3L3IXSVSc7yDQnZImTRzdDuotgE0Z+fKriH4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z4lOLDILYJzwC4Pg9pltD0VVzkex0PRfw6atNjQB5HrPAvtIeNVdt4W+CEWZjMsqKOxmvzsXfxOLrjvBYBla2APjb+Dtg298wE6fgNY/ef5g1SZhZFD+6fPaUDxSYc1y1izQyMK17iac250pPxmUvoqB910vYrYmXeuLNj+Ofs0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UitXAtQ+; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=aBcWk0tXeW2l8cavQC6ssuVWoQzEna+YgejXX5ge9jaLS3PVbyEDWCjwScp+0ENqgxyQAOvABCYN0SVsZnDG7wlYxZdomfxkWEQHYFxchKUbWDHpHvUHmEJlrV6v4N0yF1KLTEH4SC5drtvGSZ2Yy8kLy1ycQO8q69htembFbWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YeiyK4UL; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UitXAtQ+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FB94C4CEE7;
-	Tue, 28 Oct 2025 23:03:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761692632;
-	bh=kgX4g6vUYkvgZSZP1fvrdIYXiC9PY9BfKX/VN+ui3hw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UitXAtQ+ZUQ9Pn9+px3V6NR+FRxoklye0tQSSoWExizr1U8ODSP0DqrADg8Va1IlL
-	 sqwUgTk5ScjgGkrAMJfBhVcyVE3LhHbxB38slMtsnhRIzJmsiUu62coD4x/gcDOrYj
-	 f3Anr7AzIRiNB1MYTe6eu4FNeQlnF9y3YMlBVhuMxaTmWvyCJmL9nbg7C7vRytPG0W
-	 Im0kvOsKKLmzbjsMLhvnLjC1WJ6PBU5vpisfNj04Ebulit1ohS/PMm2PtfhXsJDaPi
-	 7W9Wv411rpbjAHdXtGH+1k9xg7pPNl+qtaUxWwea+86zkNWU17NTnJpufsc+eInCsS
-	 s68rycFoWURDA==
-Date: Tue, 28 Oct 2025 23:03:50 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: Carlos Llamas <cmllamas@google.com>
-Cc: Keith Busch <kbusch@kernel.org>, Keith Busch <kbusch@meta.com>,
-	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-xfs@vger.kernel.org, linux-ext4@vger.kernel.org, hch@lst.de,
-	axboe@kernel.dk, Hannes Reinecke <hare@suse.de>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>
-Subject: Re: [PATCHv4 5/8] iomap: simplify direct io validity check
-Message-ID: <20251028230350.GB1639650@google.com>
-References: <20250827141258.63501-1-kbusch@meta.com>
- <20250827141258.63501-6-kbusch@meta.com>
- <aP-c5gPjrpsn0vJA@google.com>
- <aP-hByAKuQ7ycNwM@kbusch-mbp>
- <aQFIGaA5M4kDrTlw@google.com>
- <20251028225648.GA1639650@google.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YeiyK4UL"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1761706310;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mkESQ9g+QJaCYqatuTMLYF2kEm3QnYoy+kX4vua6hGs=;
+	b=YeiyK4ULDmO0earFSNS4RJJy5QbFp0Ga4C1TUjv6xrTWjF3OQyiVRsAK/WVteQpyms7hSc
+	sWukqkf0DqUVVRLvOlQ+sCsk7aUgtRG1aayNje8H+k11BQkhHfUKHLYNrADn6PWemNnc+m
+	eNo3IS8EL05bG7m8HPM8XCCDqs99C+U=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-401-jlAwDizuOwiLnHFhsnr6Bw-1; Tue,
+ 28 Oct 2025 22:51:48 -0400
+X-MC-Unique: jlAwDizuOwiLnHFhsnr6Bw-1
+X-Mimecast-MFC-AGG-ID: jlAwDizuOwiLnHFhsnr6Bw_1761706307
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DFF9218002C1;
+	Wed, 29 Oct 2025 02:51:46 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.24])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 04CB31800353;
+	Wed, 29 Oct 2025 02:51:42 +0000 (UTC)
+Date: Wed, 29 Oct 2025 10:51:36 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Uday Shankar <ushankar@purestorage.com>
+Subject: Re: [PATCH V2 3/5] ublk: use flexible array for ublk_queue.ios
+Message-ID: <aQGBOLwiqKILxIAB@fedora>
+References: <20251028085636.185714-1-ming.lei@redhat.com>
+ <20251028085636.185714-4-ming.lei@redhat.com>
+ <CADUfDZr-4iq752TrPjb8a9u_Wsa73dFMz_Z5_P8rmJjPUe5dGQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20251028225648.GA1639650@google.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADUfDZr-4iq752TrPjb8a9u_Wsa73dFMz_Z5_P8rmJjPUe5dGQ@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Tue, Oct 28, 2025 at 10:56:48PM +0000, Eric Biggers wrote:
-> On Tue, Oct 28, 2025 at 10:47:53PM +0000, Carlos Llamas wrote:
-> > Ok, I did a bit more digging. I'm using f2fs but the problem in this
-> > case is the blk_crypto layer. The OP_READ request goes through
-> > submit_bio() which then calls blk_crypto_bio_prep() and if the bio has
-> > crypto context then it checks for bio_crypt_check_alignment().
-> > 
-> > This is where the LTP tests fails the alignment. However, the propagated
-> > error goes through "bio->bi_status = BLK_STS_IOERR" which in bio_endio()
-> > get translates to EIO due to blk_status_to_errno().
-> > 
-> > I've verified this restores the original behavior matching the LTP test,
-> > so I'll write up a patch and send it a bit later.
-> > 
-> > diff --git a/block/blk-crypto.c b/block/blk-crypto.c
-> > index 1336cbf5e3bd..a417843e7e4a 100644
-> > --- a/block/blk-crypto.c
-> > +++ b/block/blk-crypto.c
-> > @@ -293,7 +293,7 @@ bool __blk_crypto_bio_prep(struct bio **bio_ptr)
-> >  	}
-> >  
-> >  	if (!bio_crypt_check_alignment(bio)) {
-> > -		bio->bi_status = BLK_STS_IOERR;
-> > +		bio->bi_status = BLK_STS_INVAL;
-> >  		goto fail;
-> >  	}
+On Tue, Oct 28, 2025 at 02:52:25PM -0700, Caleb Sander Mateos wrote:
+> On Tue, Oct 28, 2025 at 1:57 AM Ming Lei <ming.lei@redhat.com> wrote:
+> >
+> > Convert ublk_queue to use DECLARE_FLEX_ARRAY for the ios field and
+> > use struct_size() for allocation, following kernel best practices.
+> >
+> > Changes in this commit:
+> >
+> > 1. Convert ios field from "struct ublk_io ios[]" to use
+> >    DECLARE_FLEX_ARRAY(struct ublk_io, ios) for consistency with
+> >    modern kernel style.
 > 
-> That change looks fine, but I'm wondering how this case was reached in
-> the first place.  Upper layers aren't supposed to be submitting
-> misaligned bios like this.  For example, ext4 and f2fs require
-> filesystem logical block size alignment for direct I/O on encrypted
-> files.  They check for this early, before getting to the point of
-> submitting a bio, and fall back to buffered I/O if needed.
+> Documentation/process/deprecated.rst suggests that
+> DECLARE_FLEX_ARRAY() is discouraged except in the niche cases when
+> it's necessary (which don't apply here). Or am I misunderstanding
+> something?
 
-I suppose it's this code in f2fs_should_use_dio():
+You are right, DECLARE_FLEX_ARRAY is only needed:
 
-	/*
-	 * Direct I/O not aligned to the disk's logical_block_size will be
-	 * attempted, but will fail with -EINVAL.
-	 *
-	 * f2fs additionally requires that direct I/O be aligned to the
-	 * filesystem block size, which is often a stricter requirement.
-	 * However, f2fs traditionally falls back to buffered I/O on requests
-	 * that are logical_block_size-aligned but not fs-block aligned.
-	 *
-	 * The below logic implements this behavior.
-	 */
-	align = iocb->ki_pos | iov_iter_alignment(iter);
-	if (!IS_ALIGNED(align, i_blocksize(inode)) &&
-	    IS_ALIGNED(align, bdev_logical_block_size(inode->i_sb->s_bdev)))
-		return false;
+```
+when the flexible array is either alone in a struct or is part of a union.
+```
 
-So it relies on the alignment check in iomap in the case where the
-request is neither logical_block_size nor filesystem_block_size aligned.
+> However, struct ublk_io ios[] does seem like a good use
+> case for __counted_by().
 
-f2fs_should_use_dio() probably should just handle that case explicitly.
+Good point!
 
-But making __blk_crypto_bio_prep() use a better error code sounds good
-too.
+Thanks, 
+Ming
 
-- Eric
