@@ -1,45 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 073F4301001
-	for <linux-block@vger.kernel.org>; Wed, 29 Oct 2025 16:06:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EED122D8779;
+	Wed, 29 Oct 2025 16:14:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761753994; cv=none; b=RWFVogfn7+SBSR4qXSWctEeIUGnM1T+H9Azsk8LyF0a1+fOiW5ONWPdWYsLsgPCh65lYUt3gpnGDVZUXuL9hBJ91td+Ymoty5n/7Q0zAtTc6X+WxwkryndLB1JBgrBNruscrU+VJNKwTNngVIm1uyn93klAf5Mf+DnMP7Pth1vk=
+	t=1761754489; cv=none; b=g7JTgFFd1qpw997pKDZn7apLktIuhbfb+hFDcODwYQePlmj2T3N3pkwY3OBGDuXgojVFR13tomrJoOnrvLgo1n0a8+bZb7z7S7ZyVXkYZIlYG5ZzoEdVG++VG+fs4xcgUTNmICi4JyFYhyB/Xy0AHp78hPF/eqpZc/uzIZwtEbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761753994; c=relaxed/simple;
-	bh=oBHgkEpdHT07OPZTUFGQJibbhABmUlX2gu9JV2jZzUo=;
+	s=arc-20240116; t=1761754489; c=relaxed/simple;
+	bh=BU/KJ2BFrWdN2k7V2JQhqCYa+EJvjFnOYlY5BUSYT9s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R4ZfW61Jn6sWbJDEb0hhQQbTMOrm4RFNOD8eaXwjWAAr5dGD2xhFF4vwkrCtk//D9V57Cf7p3RZ4aOD5jP0yCy7vy23irtaQVBfXVas+cuq31Yq/HT2+2yBKF75VJ+oBimDlosLJ1bJATzVWUdnD+cKaz9vRTHm0ReTdnpue3ZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eFKfjw+S; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=aqhKKRU5uK9r7gBurFD+F5lPyAuR9sy0CFA0IaAT0+EIZFOuhfgpfVBboilQ39mVEPI4SV/LAZMV1MHhoSQaZHgT8XFVSWf1xvddB73LWzVjJJh8n0gp9DMO2kpT1MpEKaBMd0QD1uPEmFc2Fh0X2YrAP8jPMRgChySpQ8UYETo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R8+lEigM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eFKfjw+S"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DCBDC4CEF7;
-	Wed, 29 Oct 2025 16:06:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R8+lEigM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BFFCC4CEF7;
+	Wed, 29 Oct 2025 16:14:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761753993;
-	bh=oBHgkEpdHT07OPZTUFGQJibbhABmUlX2gu9JV2jZzUo=;
+	s=k20201202; t=1761754488;
+	bh=BU/KJ2BFrWdN2k7V2JQhqCYa+EJvjFnOYlY5BUSYT9s=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eFKfjw+SX15oD+wJz+Qg2wo5r5nj1u577kQi5HYUOWkhO8qmKC9zco9tdGe1iQ4Fu
-	 +/x1zZcuPKYmRBnRYY1GrYjGpKYH2ZcfFqBQnjicJIw3ZPlBU7I1cQ7AnrFCnY6HDt
-	 J+3bvpqX8m3nLCRUoHWkIF82bAu4a1iEZ6IxSD227meAk4UQy/UOq+GclE0vsCgF08
-	 uOuLbqZeAUb+eTf1NXIYCtjQrfunNqttKGYiY9kwizijdXirNnUNYMTJfU89pKZ8gY
-	 ncJ80EgO3mrSwF+gQyMPd1FEhrfiDri7A0h5XlfckNpj09Km1MotOTYCTmAIDs3OTb
-	 xeNqjdm78u56A==
-Date: Wed, 29 Oct 2025 10:06:31 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Hans Holmberg <Hans.Holmberg@wdc.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Johannes Thumshirn <Johannes.Thumshirn@wdc.com>, hch <hch@lst.de>,
-	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	Andreas Hindborg <a.hindborg@kernel.org>
-Subject: Re: [PATCH] null_blk: set dma alignment to logical block size
-Message-ID: <aQI7hyET6f-nXnmp@kbusch-mbp>
-References: <20251029133956.19554-1-hans.holmberg@wdc.com>
- <aQIgvwec4Ol7ed8K@kbusch-mbp>
- <49749a76-5849-410f-966d-6011dd4d5f41@wdc.com>
+	b=R8+lEigMCWnv6jmZw7f3tuW9pVGrdDzpaYzGpAmok0dAUywXkVhHfV+pEpY2S+ObD
+	 MhgPMLz7+QpkFbjwJYYIzG3s4I34eOY9QZMCh5UWa0bSNXYsIoJoDuuarPMRLkGjqC
+	 gyhFFH9+wwU4JmNGpKCinn0H33s7pLrMaPetcPVJaTGU+Z1J6xLIHixm20IX7VQees
+	 3rRU25vTn3ZJeR4IYwNfj8YAzomS2wcdKfgSboFTHfdT8LfvdashHSYGQmIhLbcN89
+	 FY5vptUOjJ5+fh75bKtGOIuYb6tbOZjCA8zWZ3O0iqTvmwnqvuLcXlVxp2TiWXqLfc
+	 ew7CKmj0W7s2g==
+Date: Wed, 29 Oct 2025 09:14:47 -0700
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Bart Van Assche <bart.vanassche@gmail.com>
+Cc: Christoph Hellwig <hch@lst.de>, Carlos Maiolino <cem@kernel.org>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-raid@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: Re: fall back from direct to buffered I/O when stable writes are
+ required
+Message-ID: <20251029161447.GG3356773@frogsfrogsfrogs>
+References: <20251029071537.1127397-1-hch@lst.de>
+ <ea07dede-5baa-41e5-ad5d-a9f6a90ac6e8@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -48,52 +48,68 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <49749a76-5849-410f-966d-6011dd4d5f41@wdc.com>
+In-Reply-To: <ea07dede-5baa-41e5-ad5d-a9f6a90ac6e8@gmail.com>
 
-On Wed, Oct 29, 2025 at 03:32:30PM +0000, Hans Holmberg wrote:
-> Hmm, the data is actually copied nullb->dev->blocksize sized chunks
+On Wed, Oct 29, 2025 at 08:58:52AM -0700, Bart Van Assche wrote:
+> On 10/29/25 12:15 AM, Christoph Hellwig wrote:
+> > we've had a long standing issue that direct I/O to and from devices that
+> > require stable writes can corrupt data because the user memory can be
+> > modified while in flight.  This series tries to address this by falling
+> > back to uncached buffered I/O.  Given that this requires an extra copy it
+> > is usually going to be a slow down, especially for very high bandwith
+> > use cases, so I'm not exactly happy about.
+> > 
+> > I suspect we need a way to opt out of this for applications that know
+> > what they are doing, and I can think of a few ways to do that:
+> > 
+> > 1a) Allow a mount option to override the behavior
+> > 
+> > 	This allows the sysadmin to get back to the previous state.
+> > 	This is fairly easy to implement, but the scope might be to wide.
+
+/me dislikes mount options because getting rid of them is hard.
+
+> > 1b) Sysfs attribute
+> > 
+> > 	Same as above.  Slightly easier to modify, but a more unusual
+> > 	interface.
+> > 
+> > 2) Have a per-inode attribute
+> > 
+> > 	Allows to set it on a specific file.  Would require an on-disk
+> > 	format change for the usual attr options.
+> > 
+> > 3) Have a fcntl or similar to allow an application to override it
+> > 
+> > 	Fine granularity.  Requires application change.  We might not
+> > 	allow any application to force this as it could be used to inject
+> > 	corruption.
+> > 
+> > In other words, they are all kinda horrible.
+
+Yeah, I don't like the choices either.  Bart's prctl sounds the least
+annoying but even then I still don't like "I KNOW WHAT I'M DOING!!"
+flags.
+
+> Hi Christoph,
 > 
-> see copy_to_nullb:
+> Has the opposite been considered: only fall back to buffered I/O for buggy
+> software that modifies direct I/O buffers before I/O has
+> completed?
+
+How would xfs detect that?  For all we know the dio buffer is actually a
+piece of device memory or something, and some hardware changed the
+memory without the kernel knowing that.  Later on the raid scrub fails a
+parity check and it's far too late to do anything about it.
+
+--D
+
+> Regarding selecting the direct I/O behavior for a process, how about
+> introducing a new prctl() flag and introducing a new command-line
+> utility that follows the style of ionice and sets the new flag before
+> any code runs in the started process?
 > 
-> temp = min_t(size_t, nullb->dev->blocksize, n - count);
-
-That's just saying blocksize is the largest it will transfer. It can be
-smaller if there's less data than a block size in the bvec.
-
-> ..
-> memcpy_page(t_page->page, offset, source, off + count, temp);
+> Thanks,
 > 
-> Just to verify that nullblk was missbehaving I enabled debugging
-> for the copy and hit a bug_on in memcpy_page:
+> Bart.
 > 
-> VM_BUG_ON(dst_off + len > PAGE_SIZE || src_off + len > PAGE_SIZE);
-> 
-> (This was a 4k block size nullblk with the default 511 byte dma limit)
-
-Oh, I see. It's that the source buffer with its weird offsets that don't
-align can cause a problem. This should fix it:
-
----
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index f982027e8c858..385fe6523ec12 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -1143,6 +1143,7 @@ static int copy_to_nullb(struct nullb *nullb, struct page *source,
- 			null_make_cache_space(nullb, PAGE_SIZE);
- 
- 		offset = (sector & SECTOR_MASK) << SECTOR_SHIFT;
-+		temp = min_t(size_t, temp, PAGE_SIZE - offset);
- 		t_page = null_insert_page(nullb, sector,
- 			!null_cache_active(nullb) || is_fua);
- 		if (!t_page)
-@@ -1172,6 +1173,7 @@ static int copy_from_nullb(struct nullb *nullb, struct page *dest,
- 		temp = min_t(size_t, nullb->dev->blocksize, n - count);
- 
- 		offset = (sector & SECTOR_MASK) << SECTOR_SHIFT;
-+		temp = min_t(size_t, temp, PAGE_SIZE - offset);
- 		t_page = null_lookup_page(nullb, sector, false,
- 			!null_cache_active(nullb));
- 
---
-
-After this, you can set dma_alignment to 1.
