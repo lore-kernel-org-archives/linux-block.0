@@ -1,117 +1,108 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25E3F2C0F7B;
-	Wed, 29 Oct 2025 14:53:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F5945478D
+	for <linux-block@vger.kernel.org>; Wed, 29 Oct 2025 14:57:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761749618; cv=none; b=NSoVANkLGskMXfU0iHrLzZ3fzRvHOggDgaAfM26GRVD5K1Zr1zyolyh7e/9Aqsc4Y09Oy9+lhLd4uf5z7k1PaOs+VR0scIDqTdj5wQBkFvKDzIyRhUAat+dhNkkfqSPJhDoFqi/tDTuJAG27Xf/MWfC7j0HoOBjgzp5QJvfE+8I=
+	t=1761749868; cv=none; b=mPU6VKzDiuzAEzHR877Pw9T60ahDteNUcymV4oWpYf7QOGZMUuGvY11Q8IsxZt8Fu3EoSLKDiHaN6osoQWPd6ejUziGVVjdbBNc27F3Z27TRHqEbXBZNPo14wQxR8GPJ+R9a5Wim/ZcmNYUl48WJzP7C/ObNeI2wS79Av6qTVf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761749618; c=relaxed/simple;
-	bh=4N52YreIUF0OvAY3AgVuCEeEXHoxvfXQKpRpGqGXt0Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qTF/08hMBurk2hPwiIPkUZwmEy9OIzZyGfzUNdQj5E0gGxLFwX+tqQp907bMfRzXXyl/gekmuswJXYIETm6t0bFAc454qrV8pVgSrG445q/6IeGFWhm6YGVB85fuoq/lBa1dRg1sAjIp826mzPY8Dbp9LxT4iVr7mngzjE0GAe8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d6i+Tpv8; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1761749868; c=relaxed/simple;
+	bh=sW0fcO523ng4pGFY9aQJooiGcb2xLELRhF6pvb9Out4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VZn2ig1cU1VFwxEuDG41aYELizkea3W4vOxFpqxzuFYMVT7anMB+VOe4zy7Kpx4lW06IYFMfGAYopRf34NP00/torGD04Rwh1C1SCINuc2Cj1Rh9pXDUBsAyqfHAf81zc+oGWYarVj7bB2Kjn7dFlED3E5cCtJhcF0EuzG2baBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=P8pSUfFi; arc=none smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d6i+Tpv8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75851C4CEF7;
-	Wed, 29 Oct 2025 14:53:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761749617;
-	bh=4N52YreIUF0OvAY3AgVuCEeEXHoxvfXQKpRpGqGXt0Y=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=d6i+Tpv81I+RjXv1z/ZhRypcIVRTtXraq5U9iBWHQnvW+KkPDvGl1y2pSEVEa6fIB
-	 Ln4x6wF3AkfAIwedEj981+iIN+wR6+btNH1aNeYDoUlV+PjuWWLC2qWuazlwsZDUyc
-	 w6JEXBhDvgpuQ5ndnBinokI18XbR2srsXkcfTy4nMLpLT5LYAeO4NgeFX7Rl3DUghg
-	 Y+Yu9YxHcIql1AYDpRrZVpwWLKrTXwOqAs1s25OG2ooUXYEvx3zM1w82Fg077igDaB
-	 eTslPtXRVVOcLbKtU1sdxtLF6P6BiY2N2GMT83pc272G20lW+5PvUy3M8NbUj0mjMG
-	 oZaRyJXLYf5Iw==
-From: Christian Brauner <brauner@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Christian Brauner <brauner@kernel.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Jan Kara <jack@suse.cz>,
-	linux-block@vger.kernel.org,
-	v9fs@lists.linux.dev,
-	linux-btrfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	jfs-discussion@lists.sourceforge.net,
-	ocfs2-devel@lists.linux.dev,
-	linux-xfs@vger.kernel.org,
-	linux-mm@kvack.org,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Christian Schoenebeck <linux_oss@crudebyte.com>,
-	Chris Mason <clm@fb.com>,
-	David Sterba <dsterba@suse.com>,
-	Mark Fasheh <mark@fasheh.com>,
-	Joel Becker <jlbec@evilplan.org>,
-	Joseph Qi <joseph.qi@linux.alibaba.com>
-Subject: Re: filemap_* writeback interface cleanups v2
-Date: Wed, 29 Oct 2025 15:53:19 +0100
-Message-ID: <20251029-fahrdienst-klaglos-834e266b8e42@brauner>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251024080431.324236-1-hch@lst.de>
-References: <20251024080431.324236-1-hch@lst.de>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="P8pSUfFi"
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4ed0c8e4dbcso383081cf.0
+        for <linux-block@vger.kernel.org>; Wed, 29 Oct 2025 07:57:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761749866; x=1762354666; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=d1yPrZJAtYC54ch5kkR2jlvgWTejLF7D5+gBaBiHJFI=;
+        b=P8pSUfFiXDPDvWHmEXuinZOCNdErarnp4POZ0SOm+Nft/ANiXqnl82D1ltOuvaxP2s
+         RH0K4kWiEOjHoyP3J6XC7Vv3EFYLm+P9ul8yKQuoRy8/xTCUNl6MSBeb+CmCWHSPd3Sb
+         JcTJlOBlIgMdppqp1oVg9pEjoUbvzy6XrklLosfX6s5Kb0Cu56C8gBleV0aVVFRKDPe4
+         sJZU483KkhPOrqeiIjJFnj4l5NNwWSxVfdReZGU7PYWWlG3Kzti3eXuhCBOq86OLRrlz
+         7wCz5egdwKvC6zV5PHkrbqNTTZPrHe55bfZvOf9W1rE+KJAu9Rm6qI+EOx5Ke3jEFoDT
+         NoYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761749866; x=1762354666;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=d1yPrZJAtYC54ch5kkR2jlvgWTejLF7D5+gBaBiHJFI=;
+        b=R1nXY190jYG9k6suHnLA7OPntNIORPrLeTQ779RePzE/kNlV65Y324jfp6BSibOIrv
+         XooBtnLpLTk2BqCro+S12ZsIRuYEa5NAQxv7zsQ61W18Fy06yszRFy5GMKxAHxZS3hhy
+         jZ2rlYIoU0vKoTQIOfEQZnw8sJ+TMyk1XKjFytVywn7WZLBzxb8jvbPrKVbmppKfqOdP
+         1tLedU7NdO0TJYOeBrOC800PtMcWDgBCSmQWFdaTle7F3GUdFV8jWHlp/d8bfatnEcuG
+         Dllwj5ynRETq47Ourqvya/YWJyMX9YObmt7ley2u2lLpHD62UtEM9xSkSuRDpaEpUnCi
+         xqgw==
+X-Forwarded-Encrypted: i=1; AJvYcCVfKrmEhqg5LsNNCjxGIdKIXrrnROnKEDzOMliDpoQ2RsK6MUynz7O/Qg7107onD/ST4H/IIIBUErWMlQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxmMRTmzw5P2ckkaf08t1MazDI9qQKtPYB0IZfq/LUpiaDuTP6i
+	10YI52n7wyN6bbBZwSqhN1LmMZpxFrk6qu1Kwhd3QxgeIvmoqXOJAfbbxyZ4Mbrap4NeIUgJCSQ
+	zfUbt3YO57uTvbVw+Cv/Cz94L3eCDZYQf6oqDYBrH
+X-Gm-Gg: ASbGncvOR8tbJmbypwszNZPk2PT1M7ohR/AxW/dVqEMePFor4DglAdicb5NB800+odI
+	wZhExK4VefFcZIq6sfsc9usSnif+MNXGkkM6dOVblogSDgHvGxrx9i8qIU/iBluxgZmRbqzDftX
+	8lYDFIZ7O1L3FdgFWeW0bNzs6sP42G8Ov109gSsddt0XmzyM1t5OaRRET7NH3/2t7RjGLDiiEwg
+	k7XTvuYg71zmzQo3T3cItXv3pkrlX+SvCg80QawYz+mPD1F6+odAZzO+rye8O2uEckTouNEEyvI
+	PVvhQ65uEaSbLahp8Bj8ZXMyhQ==
+X-Google-Smtp-Source: AGHT+IHJk1Z4xsEEl6nhEK364d+WNrqkglBzi78RQdt59uckdBYZ7htllhsIgZwt9bC5EN7/2oXDuEWCE2gLHAXeC4U=
+X-Received: by 2002:a05:622a:11c8:b0:4e4:d480:ef3a with SMTP id
+ d75a77b69052e-4ed165a8088mr6994811cf.13.1761749865638; Wed, 29 Oct 2025
+ 07:57:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2522; i=brauner@kernel.org; h=from:subject:message-id; bh=4N52YreIUF0OvAY3AgVuCEeEXHoxvfXQKpRpGqGXt0Y=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWQyaaVPuJ+i9m4br2nk2mOv3Hiqzuq8kEi/LX5pZ5Jpp 1hLQ0l0RykLgxgXg6yYIotDu0m43HKeis1GmRowc1iZQIYwcHEKwESObmZkePvsGoekGs9rdpbt ZmmmOZrb/hx/6K49NePTtSDdi8HVvIwMl5ZenxV508LqDt+pO5cidkrwHHy3v/970ayNXZffekh 4MAEA
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
-Content-Transfer-Encoding: 8bit
+References: <20251026203611.1608903-1-surenb@google.com> <aP8XMZ_DfJEvrNxL@infradead.org>
+ <CAJuCfpH1Nmnvmg--T2nYQ4r25pgJhDEo=2-GAXMjWaFU5vH7LQ@mail.gmail.com> <aQHdG_4yk0-o0iEY@infradead.org>
+In-Reply-To: <aQHdG_4yk0-o0iEY@infradead.org>
+From: Suren Baghdasaryan <surenb@google.com>
+Date: Wed, 29 Oct 2025 07:57:34 -0700
+X-Gm-Features: AWmQ_blGYfe_lFn4eY8RCcDjRQso5Ijs05VisPx1zbBZudE9r4ISvY1EtlCdvh4
+Message-ID: <CAJuCfpFPDPaQdHW3fy46fsNczyqje0W8BemHSfroeawB1-SRpQ@mail.gmail.com>
+Subject: Re: [PATCH v2 0/8] Guaranteed CMA
+To: Christoph Hellwig <hch@infradead.org>
+Cc: akpm@linux-foundation.org, david@redhat.com, lorenzo.stoakes@oracle.com, 
+	Liam.Howlett@oracle.com, vbabka@suse.cz, alexandru.elisei@arm.com, 
+	peterx@redhat.com, sj@kernel.org, rppt@kernel.org, mhocko@suse.com, 
+	corbet@lwn.net, axboe@kernel.dk, viro@zeniv.linux.org.uk, brauner@kernel.org, 
+	jack@suse.cz, willy@infradead.org, m.szyprowski@samsung.com, 
+	robin.murphy@arm.com, hannes@cmpxchg.org, zhengqi.arch@bytedance.com, 
+	shakeel.butt@linux.dev, axelrasmussen@google.com, yuanchu@google.com, 
+	weixugc@google.com, minchan@kernel.org, linux-mm@kvack.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	iommu@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 24 Oct 2025 10:04:11 +0200, Christoph Hellwig wrote:
-> while looking at the filemap writeback code, I think adding
-> filemap_fdatawrite_wbc ended up being a mistake, as all but the original
-> btrfs caller should be using better high level interfaces instead.  This
-> series removes all these, switches btrfs to a more specific interfaces
-> and also cleans up another too low-level interface.  With this the
-> writeback_control that is passed to the writeback code is only
-> initialized in three places, although there are a lot more places in
-> file system code that never reach the common writeback code.
-> 
-> [...]
+On Wed, Oct 29, 2025 at 2:23=E2=80=AFAM Christoph Hellwig <hch@infradead.or=
+g> wrote:
+>
+> On Mon, Oct 27, 2025 at 12:51:17PM -0700, Suren Baghdasaryan wrote:
+> > I'm guessing you missed my reply to your comment in the previous
+> > submission: https://lore.kernel.org/all/CAJuCfpFs5aKv8E96YC_pasNjH6=3De=
+ukTuS2X8f=3DnBGiiuE0Nwhg@mail.gmail.com/
+> > Please check it out and follow up here or on the original thread.
+>
+> I didn't feel to comment on it.  Please don't just build abstractions
+> on top of abstractions for no reason.  If you later have to introduce
+> them add them when they are actually needed.
 
-Applied to the vfs-6.19.writeback branch of the vfs/vfs.git tree.
-Patches in the vfs-6.19.writeback branch should appear in linux-next soon.
+Ok, if it makes it easier to review the code, I'll do it. So, I can:
+1. merge cleancache code (patch 1) with the GCMA code (patch 7). This
+way all the logic will be together.
+2. . LRU additiona (patch 2) and readahead support (patch 3) can stay
+as incremental additions to GCMA, sysfs interface (patch 4) and
+cleancache documentation (
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
 
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
-
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
-
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs-6.19.writeback
-
-[01/10] mm: don't opencode filemap_fdatawrite_range in filemap_invalidate_inode
-        https://git.kernel.org/vfs/vfs/c/a21134b5d6cb
-[02/10] 9p: don't opencode filemap_fdatawrite_range in v9fs_mmap_vm_close
-        https://git.kernel.org/vfs/vfs/c/3c2e5cee5eb3
-[03/10] ocfs2: don't opencode filemap_fdatawrite_range in ocfs2_journal_submit_inode_data_buffers
-        https://git.kernel.org/vfs/vfs/c/890f141da068
-[04/10] btrfs: use the local tmp_inode variable in start_delalloc_inodes
-        https://git.kernel.org/vfs/vfs/c/41e52c644753
-[05/10] btrfs: push struct writeback_control into start_delalloc_inodes
-        https://git.kernel.org/vfs/vfs/c/c9501112e3cb
-[06/10] mm,btrfs: add a filemap_flush_nr helper
-        https://git.kernel.org/vfs/vfs/c/7fabcb7fbabb
-[07/10] mm: remove __filemap_fdatawrite
-        https://git.kernel.org/vfs/vfs/c/735965144806
-[08/10] mm: remove filemap_fdatawrite_wbc
-        https://git.kernel.org/vfs/vfs/c/1bcb413d0cd8
-[09/10] mm: remove __filemap_fdatawrite_range
-        https://git.kernel.org/vfs/vfs/c/45cbce5b8877
-[10/10] mm: rename filemap_fdatawrite_range_kick to filemap_flush_range
-        https://git.kernel.org/vfs/vfs/c/c28d67b33cbf
+>
