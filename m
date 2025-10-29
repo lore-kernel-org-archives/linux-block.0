@@ -1,137 +1,95 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2ED9351FC8
-	for <linux-block@vger.kernel.org>; Wed, 29 Oct 2025 13:31:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C553934CFC5
+	for <linux-block@vger.kernel.org>; Wed, 29 Oct 2025 13:40:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.154.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761744677; cv=none; b=ZhBJKavL7RzWXWDfKtHKX6M0csVMCoJrojXSxHSy6BxbP+zGcjdXgZTfvfVRrKTU7xvaukwj+ZrDzH8eBwar7eQFT9FZYO8wkdOUsNVvfdF7bjM6DgHU9m9fIo/l9SuXy21K1SeKrJq3DxHKZ62yW9rv6RYZC7LcZUBy1Ka5ksg=
+	t=1761745218; cv=none; b=SUYU1dWMJZhDrAJuMQjX0Src3Po6e9XBexOAIhZZ5mg44W6IHlXXOAw2O7QOChw5WQz+PyuGIugrBd1uqz20svppW90DyqmWSnu3peAjhfyJntP6WL3+KQIgqNMeHD546YrjeZvIw9bYBq1y44nhZPvoCvfZ2G7qiyFBgytYL70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761744677; c=relaxed/simple;
-	bh=H4STyYQkAuprklyTlY2BjwuSs1iXn17miHrAUSvF+TM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MAUUpcgsomXaKv/sooUBeZiI+XQgAVWh2Xybn1sQc3CcsVn2mAgMaUBAbR8prxVqdgCg25DnIVJUZnwhDFmpJPD3AkI3nV6D8R0nKdBAk+ff6dieT9EQBHY2tKNx3Xvd2TsYc52NgKuXbPu9O64710y0+KrtfmAdYmCHuQwaJ0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k/YUzPJY; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1761745218; c=relaxed/simple;
+	bh=WRvDJwrxBS2qVE3lF/ZaBQ/jjn15vGmmM9IHJKxrFMA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cWCtukgdr5psHnSDX4TzB4vsGlZOSRDXw8Vr3sga+6C5JO33+wHfzO6u0/Cgz4dn/5EpT/0fhVymdz34f9WMzgBA7WzoSTxNnmuwEK0z1H/dgi1TRVYrcY1dYuFN+RuZ+aRg4EqH+WUGTubAtlNdCYObPz6J9zcQ3lKYcsNvcCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=U97lS5yM; arc=none smtp.client-ip=216.71.154.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k/YUzPJY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FD25C19423
-	for <linux-block@vger.kernel.org>; Wed, 29 Oct 2025 13:31:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761744677;
-	bh=H4STyYQkAuprklyTlY2BjwuSs1iXn17miHrAUSvF+TM=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=k/YUzPJYNKtOchZEqmQ2MNC4VR8TnxopP0fpnEkTWlWsfz9tx8ThePcktS069B0t4
-	 fmcgrYYMrzyXGrbyzar22eouO9Ja3+s8CSZZsdNrDEGINsJysImL8I38EzDlt8mQKs
-	 kGJvCzZje3ZdtNXHUnKVBnXd5esJ+BfuAnzsuRoVkCrsxJMkJ9vqHst9Fve9f9trsm
-	 oLr8pwHCar8rp567vTcxlFJjsQN5QzBt06MZnNFU9uUOzjlAMY3qQrwDt5YhIfog7b
-	 eMvlTyVyC/KzAFBM5H6gHZS6w+lQLG56w53bfIXPd1o3RWZ29qIKSBnB/2IzmVVhRk
-	 uFejWm6Tr2+xQ==
-Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-7c5338b1d10so2915462a34.0
-        for <linux-block@vger.kernel.org>; Wed, 29 Oct 2025 06:31:17 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCX+bUuXuuAv0rfEUpXRnA04yth2ugOr+15TIxtlklrjv+9zAy/rEo34DJmqlZlHu9KmVYZK0k1YQNpaWQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyplfiFaO9BN3iuhho8i1MrgEmT99ZLB78rVnoBzfB9XxDlL+DL
-	nf1GoEignWpIEyek6JtOWgQE3DWetQgEFL7yGQvU+lvgfLeGJ4PiwVF86nKk81l99K1FwRPLhNP
-	TdgQMINTO++iVap1YyWHAbPIOD3l+OAQ=
-X-Google-Smtp-Source: AGHT+IEi0R7W8u+k9kuQ+Q/TOuonlY+thu2InbF4UTFVllbZ//+bkXdFiNu5AHmFd0ihQtxuffxUIcoyOHNos6JMUKo=
-X-Received: by 2002:a05:6830:82e9:b0:7c5:3afb:79db with SMTP id
- 46e09a7af769-7c6831898admr1590559a34.35.1761744676587; Wed, 29 Oct 2025
- 06:31:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="U97lS5yM"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1761745216; x=1793281216;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=WRvDJwrxBS2qVE3lF/ZaBQ/jjn15vGmmM9IHJKxrFMA=;
+  b=U97lS5yM0L2+S/MGWPBifyfCaWCa724zfo52Yd20jpnFkumwJj4RVkhN
+   hMPMi7oU8ISCQlrTU8eyIXnyIZnB/j7D5480jjMSBLABmoIXk0Xe6qwwt
+   SFT2fgs3iw5G6rWbgIIEtIHcRMIW/8HTiGUrJZHebYKXBIfY1gyKGD3/G
+   reRQeYTveM/zAfByeLEaytzFmZmKG140HoGICcXJsvB4rvv+t+ejlL+QE
+   lbY+Oh1EBYp3smbW2KpU7MDtKwcD2m2jSgBCVueYR4gJMS2scciqIjd9r
+   3K/GBjQguqyVsGjkkQMThYRl1JiyjBVFqxOj/l3DH6vsr52dmkQW1GUGc
+   A==;
+X-CSE-ConnectionGUID: I9zccb6+QMWFVXghzQUQJg==
+X-CSE-MsgGUID: snVJ+hr8TSylEgXCnfMc4w==
+X-IronPort-AV: E=Sophos;i="6.19,264,1754928000"; 
+   d="scan'208";a="131119073"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep03.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 29 Oct 2025 21:40:10 +0800
+IronPort-SDR: 6902193a_VpdgAOd0Q5+97eiLVFHv8zR9ID9DuVgUli0FQl3s9nNT3f4
+ dxP0Zzq9RjKxjS+j852CZG6Unhy1WWNlYyNJ6Iw==
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep03.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 29 Oct 2025 06:40:11 -0700
+WDCIronportException: Internal
+Received: from 5cg1443ry6.ad.shared (HELO gcv.wdc.com) ([10.224.178.6])
+  by uls-op-cesaip01.wdc.com with ESMTP; 29 Oct 2025 06:40:08 -0700
+From: Hans Holmberg <hans.holmberg@wdc.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Keith Busch <kbusch@kernel.org>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Hans Holmberg <hans.holmberg@wdc.com>
+Subject: [PATCH] null_blk: set dma alignment to logical block size
+Date: Wed, 29 Oct 2025 14:39:56 +0100
+Message-ID: <20251029133956.19554-1-hans.holmberg@wdc.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251023112920.133897-1-safinaskar@gmail.com> <4cd2d217-f97d-4923-b852-4f8746456704@mazyland.cz>
- <03e58462-5045-e12f-9af6-be2aaf19f32c@redhat.com>
-In-Reply-To: <03e58462-5045-e12f-9af6-be2aaf19f32c@redhat.com>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Wed, 29 Oct 2025 14:31:05 +0100
-X-Gmail-Original-Message-ID: <CAJZ5v0gcEjZPVtKrysS=ek7kHpH3afinwY-apKm3Yd4PmKDHdA@mail.gmail.com>
-X-Gm-Features: AWmQ_bnfFqqg5xNQkg3Ut6H7tX7EttVRgAcRKjLdiyhAs_brzIkV0t-kTKujKfc
-Message-ID: <CAJZ5v0gcEjZPVtKrysS=ek7kHpH3afinwY-apKm3Yd4PmKDHdA@mail.gmail.com>
-Subject: Re: [PATCH] pm-hibernate: flush block device cache when hibernating
-To: Mikulas Patocka <mpatocka@redhat.com>
-Cc: Askar Safin <safinaskar@gmail.com>, linux-mm@kvack.org, linux-pm@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	linux-lvm@lists.linux.dev, lvm-devel@lists.linux.dev, 
-	linux-raid@vger.kernel.org, DellClientKernel <Dell.Client.Kernel@dell.com>, 
-	dm-devel@lists.linux.dev, linux-btrfs@vger.kernel.org, 
-	Nhat Pham <nphamcs@gmail.com>, Kairui Song <ryncsn@gmail.com>, Pavel Machek <pavel@ucw.cz>, 
-	=?UTF-8?Q?Rodolfo_Garc=C3=ADa_Pe=C3=B1as?= <kix@kix.es>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Eric Biggers <ebiggers@kernel.org>, 
-	Lennart Poettering <mzxreary@0pointer.de>, Christian Brauner <brauner@kernel.org>, 
-	Linus Torvalds <torvalds@linux-foundation.org>, Milan Broz <milan@mazyland.cz>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Oct 24, 2025 at 12:23=E2=80=AFPM Mikulas Patocka <mpatocka@redhat.c=
-om> wrote:
->
->
->
-> On Fri, 24 Oct 2025, Askar Safin wrote:
->
-> > Hi.
-> >
-> > Hibernate to swap located on dm-integrity doesn't work.
-> > Let me first describe why I need this, then I will describe a bug with =
-steps
-> > to reproduce
-> > (and some speculation on cause of the bug).
->
-> Hi
->
-> Does this patch fix it?
->
-> Mikulas
->
->
-> From: Mikulas Patocka <mpatocka@redhat.com>
->
-> There was reported failure that hibernation doesn't work with
-> dm-integrity. The reason for the failure is that the hibernation code
-> doesn't issue the FLUSH bio - the data still sits in the dm-integrity
-> cache and they are lost when poweroff happens.
->
-> This commit fixes the suspend code so that it issues flushes before
-> writing the header and after writing the header.
+This driver assumes that bio vectors are memory aligned to the logical
+block size, so set the queue limit to reflect that.
 
-Hmm, shouldn't it flush every time it does a sync write, and not just
-in these two cases?
+Unless we set up the limit based on the logical block size, we will go
+out of page bounds in copy_to_nullb / copy_from_nullb.
 
->
-> Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
-> Reported-by: Askar Safin <safinaskar@gmail.com>
-> Link: https://lore.kernel.org/dm-devel/a48a37e3-2c22-44fb-97a4-0e57dc2042=
-1a@gmail.com/T/
-> Cc: stable@vger.kernel.org
->
-> ---
->  kernel/power/swap.c |    4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> Index: linux-2.6/kernel/power/swap.c
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> --- linux-2.6.orig/kernel/power/swap.c  2025-10-13 21:42:48.000000000 +02=
-00
-> +++ linux-2.6/kernel/power/swap.c       2025-10-24 12:01:32.000000000 +02=
-00
-> @@ -320,8 +320,10 @@ static int mark_swapfiles(struct swap_ma
->                 swsusp_header->flags =3D flags;
->                 if (flags & SF_CRC32_MODE)
->                         swsusp_header->crc32 =3D handle->crc32;
-> -               error =3D hib_submit_io_sync(REQ_OP_WRITE | REQ_SYNC,
-> +               error =3D hib_submit_io_sync(REQ_OP_WRITE | REQ_SYNC | RE=
-Q_PREFLUSH,
->                                       swsusp_resume_block, swsusp_header)=
-;
-> +               if (!error)
-> +                       error =3D blkdev_issue_flush(file_bdev(hib_resume=
-_bdev_file));
->         } else {
->                 pr_err("Swap header not found!\n");
->                 error =3D -ENODEV;
->
+Signed-off-by: Hans Holmberg <hans.holmberg@wdc.com>
+---
+
+A fixes tag would be in order, but I have not figured out exactly when
+this became a problem.
+
+ drivers/block/null_blk/main.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index f982027e8c85..0ee55f889cfd 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -1949,6 +1949,7 @@ static int null_add_dev(struct nullb_device *dev)
+ 		.logical_block_size	= dev->blocksize,
+ 		.physical_block_size	= dev->blocksize,
+ 		.max_hw_sectors		= dev->max_sectors,
++		.dma_alignment		= dev->blocksize - 1,
+ 	};
+ 
+ 	struct nullb *nullb;
+-- 
+2.34.1
+
