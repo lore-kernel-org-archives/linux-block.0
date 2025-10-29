@@ -1,174 +1,208 @@
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47AB1299A8F
-	for <linux-block@vger.kernel.org>; Wed, 29 Oct 2025 21:23:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A7F42E2EE4
+	for <linux-block@vger.kernel.org>; Wed, 29 Oct 2025 22:53:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761773021; cv=none; b=rqs21FPz+OAkyjfQTZZLGDiDvC4FAj6PVNV98w+zsqwdvSyqGoxl3q1IAWLm0/QW8LAe82gu0RLeIleyadvM/AaZ8agViZpnNCUhEjJUin8f0M8qB96ENh31INrDttLEZq+b5vqEghizAADMvBMEeeT91KqqEqEsbVX4W3G2rB4=
+	t=1761778441; cv=none; b=EkIpf9G1OSNEObJh0LvjpL/uoauoRiDpYHidZAd4y8zX18A2wejmUD+Uj6lpHaJbeswUTO6I10tNtW9SvGRLy+NvIwy0CJReEZgV7elCE7UPKoKERcOUE37x54gUT0zy83upN+1mbKZCTS+G6NdJIp+0ApJp4SZzORYddbP3bSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761773021; c=relaxed/simple;
-	bh=Q8GbFpKZ0G2WK3boaHgt/WIjta7Wgy2yicNjI9IW2zs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=V0Yh24ju2XScdhnWAZ2El33/jN/Ox0YyydnDWwJ0IVL3mAL4+peLjuenBe0CHoyTNoiD20sOsOoZFV63KJua5+Z70qox1ELLknV3rzleUmMjnUffutrLiGhSonYIi4ybcMxg9kR4wnSAjLra5QyuDqxoAz4QJJ3NgquvWmc5kSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Lhi4nY7m; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1761778441; c=relaxed/simple;
+	bh=6Il7XjuA0WfB7nAskwX7jAtJVUW4cOjAee2so+audSI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Hb3Uw3rx9Qjsm9xumLxomY1abDkjDg+VWvo/AdPs7CRNuQg9xITIf8EpCY56DB7H6VnXyMy+LVXl5vSxKPldXkCDX6D1d6GWe1vqU7CqPAxDp7u+axxTSTbJ7rytRl60Og+ZUXq7q+c110A3x2qtWpE+3iioqPMSYNGZLm20Ftc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Hy0yeafl; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Lhi4nY7m"
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-427007b1fe5so253946f8f.1
-        for <linux-block@vger.kernel.org>; Wed, 29 Oct 2025 14:23:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1761773018; x=1762377818; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=pTUPsF7Fte/AGInCGPT8Bm06cRTL6FI2Yd2BduEa3rQ=;
-        b=Lhi4nY7mE1VKGUIUe7MMOYx3vwfyb6bQKJi06EWO7qIIMxMobGFA6FoW5ZEE3pgX50
-         sM145QJkripClJTk67gkYqNmwgRuVFelnnuNxatUMdMQHFwIYCOnh0J9/ywJ69/52sjb
-         pDQ5XLuS05q4hZh50K4/87jw6GEtgk3UvyJk3NAxZS8zcoGnByseefsUyTU48e4pN2zA
-         Kqem8znipIdYalxSf8ePbKh+lDpl/pyRjso98IFsZo3qIkcCRicik7m7HolQ8nU90oSD
-         As5LJDjFf/bBpJoeMCFxzmJ3WZ+xcd/slEusVnTyORw5Y1Zg0qS1rQfg7NN1/4+XXMo2
-         0JpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761773018; x=1762377818;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pTUPsF7Fte/AGInCGPT8Bm06cRTL6FI2Yd2BduEa3rQ=;
-        b=C5R9t755ScwsZx13TAU60oLJtRONvYincTeMgQ4tdLuZtHC5twYW/d/5gKPtFl2NBN
-         +VF5Q4ZxApn6JnYza/K6c7fQX3OcdbQQyA7u+n1JYlvHIYAsjmA8iFY38UX/FzGbS2yu
-         gKQWeul5fYro+U5EHq4Zfl4c2rvL+SEZZ15YCSVwZ7RWVtb4sdDi4Vmtul9Soo2/QnIv
-         LAiFmfvVpMJCGylnF4eYVVnQ0YN7mSylAL3A1LUywz5vRzYVGLuCmDtGtizwNvXDNLoi
-         Ex+GTXWqjnYV2hNrIzGhZ8OA2PvuAee4WGnAyyw6xLp+nQ0vdF+RxLf93PnbYMskCD+Q
-         T4GA==
-X-Forwarded-Encrypted: i=1; AJvYcCW10T1+aZObV/RjlXK0a9JiFt6bY70Wpc75raMaoVeiJJprCX4CeuZEJg5w2gEGrmLo/YjUhIlEO+vb+Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxfYfJhtvCjKh8O9XT1NtzpMv3QXhMTnIYmPjWc1xEtXxF0jcmW
-	wvjZzZlWYKu/JL3+egff3ejMdwkroKbZ6lMh4EZJx2QMY0W3j/imCGEAzbauxHRmo+w=
-X-Gm-Gg: ASbGncvYD55zzWDVztvBkzJjSmKmhEeCs3+on7twCKVGBNwUjMetAJGdtgiYSjNvN6m
-	tnZLzSxMcvjkWka7TjS/jNYc3LbC0HDK8jviK3uHnGE4wf++nifaXSyCu8KgZ24ylfDDmD89Pw2
-	DMJaQFGnrk/+Xnrwg9y/skCsDi7FHo2tzvDbEf+LTe/GGaR5IBJHQ7Sxx0DeE0v6O6HYP2xU/Ce
-	NW8shPsDAHA16F+CbqmylAX8NBoQ0u4dlr1Tt6PeGLRS8YnBNDsUtguY+xt5ePEzExXCVsv/iTH
-	s0JSvkZwYJjYIaOQ7iEIbJgencv2NS9g9HXaKLEYykaec86Y58hNblywotn32A10uyBQcEqvzS0
-	vK/J9c1NFeb7cbXxp75kfZ1EpgUKl31y5+8o/cxFMVJ9WUjwXINb6DIf+Xb0Ye3y4T7MeLL6jga
-	1zPYlVpI+p+ap81v6eDqjD3UM4TKkX
-X-Google-Smtp-Source: AGHT+IFWiY+tTPVyw5FGPKRDc6cNk4FAtKyr7K6bwTWppv+W/Z3W2oVYRb1tD5oyBMeW0DnOYj0IDg==
-X-Received: by 2002:a05:6000:2088:b0:3e6:f91e:fa72 with SMTP id ffacd0b85a97d-429aef7355amr2706394f8f.7.1761773017473;
-        Wed, 29 Oct 2025 14:23:37 -0700 (PDT)
-Received: from ?IPV6:2403:580d:fda1::299? (2403-580d-fda1--299.ip6.aussiebb.net. [2403:580d:fda1::299])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29498d097fasm161757355ad.29.2025.10.29.14.23.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Oct 2025 14:23:36 -0700 (PDT)
-Message-ID: <8f384c85-e432-445e-afbf-0d9953584b05@suse.com>
-Date: Thu, 30 Oct 2025 07:53:30 +1030
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hy0yeafl"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1761778438;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8iHCl4IHW6aAjpz/B3RZEb3I+FpCmt0riBVLveFMgpE=;
+	b=Hy0yeaflccJcJmxVta8XJC0L3EO841LvZbWERe3qPFJ9bdPwcuDuqMWWaD0gRSxWOB5bRY
+	N/xoSYAI34wBHCp8mtPaKF8mLVf7CAHNoswFlW79MZvUe8yZIHsjQWvHmBkQ4D6RMVpxJL
+	1/9TN4WC3dIWbcC/tTK9T11o9WPcoCI=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-350-fMFeM2LgOpm5hZPCbDtNJg-1; Wed,
+ 29 Oct 2025 18:53:56 -0400
+X-MC-Unique: fMFeM2LgOpm5hZPCbDtNJg-1
+X-Mimecast-MFC-AGG-ID: fMFeM2LgOpm5hZPCbDtNJg_1761778434
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 90D171809A04;
+	Wed, 29 Oct 2025 22:53:53 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.12])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E045530001BF;
+	Wed, 29 Oct 2025 22:53:49 +0000 (UTC)
+Date: Thu, 30 Oct 2025 06:53:44 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Uday Shankar <ushankar@purestorage.com>
+Subject: Re: [PATCH V3 2/5] ublk: implement NUMA-aware memory allocation
+Message-ID: <aQKa-Jjg-Gr2DeXe@fedora>
+References: <20251029031035.258766-1-ming.lei@redhat.com>
+ <20251029031035.258766-3-ming.lei@redhat.com>
+ <CADUfDZpBhBO8cppa2phmhkaCSJW1Yzk1aLzoF4zH3Cgu+D9Pcg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/4] xfs: fallback to buffered I/O for direct I/O when
- stable writes are required
-To: Christoph Hellwig <hch@lst.de>, "Darrick J. Wong" <djwong@kernel.org>
-Cc: Carlos Maiolino <cem@kernel.org>, Christian Brauner <brauner@kernel.org>,
- Jan Kara <jack@suse.cz>, "Martin K. Petersen" <martin.petersen@oracle.com>,
- linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-raid@vger.kernel.org,
- linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org
-References: <20251029071537.1127397-1-hch@lst.de>
- <20251029071537.1127397-5-hch@lst.de>
- <20251029155306.GC3356773@frogsfrogsfrogs> <20251029163555.GB26985@lst.de>
-Content-Language: en-US
-From: Qu Wenruo <wqu@suse.com>
-Autocrypt: addr=wqu@suse.com; keydata=
- xsBNBFnVga8BCACyhFP3ExcTIuB73jDIBA/vSoYcTyysFQzPvez64TUSCv1SgXEByR7fju3o
- 8RfaWuHCnkkea5luuTZMqfgTXrun2dqNVYDNOV6RIVrc4YuG20yhC1epnV55fJCThqij0MRL
- 1NxPKXIlEdHvN0Kov3CtWA+R1iNN0RCeVun7rmOrrjBK573aWC5sgP7YsBOLK79H3tmUtz6b
- 9Imuj0ZyEsa76Xg9PX9Hn2myKj1hfWGS+5og9Va4hrwQC8ipjXik6NKR5GDV+hOZkktU81G5
- gkQtGB9jOAYRs86QG/b7PtIlbd3+pppT0gaS+wvwMs8cuNG+Pu6KO1oC4jgdseFLu7NpABEB
- AAHNGFF1IFdlbnJ1byA8d3F1QHN1c2UuY29tPsLAlAQTAQgAPgIbAwULCQgHAgYVCAkKCwIE
- FgIDAQIeAQIXgBYhBC3fcuWlpVuonapC4cI9kfOhJf6oBQJnEXVgBQkQ/lqxAAoJEMI9kfOh
- Jf6o+jIH/2KhFmyOw4XWAYbnnijuYqb/obGae8HhcJO2KIGcxbsinK+KQFTSZnkFxnbsQ+VY
- fvtWBHGt8WfHcNmfjdejmy9si2jyy8smQV2jiB60a8iqQXGmsrkuR+AM2V360oEbMF3gVvim
- 2VSX2IiW9KERuhifjseNV1HLk0SHw5NnXiWh1THTqtvFFY+CwnLN2GqiMaSLF6gATW05/sEd
- V17MdI1z4+WSk7D57FlLjp50F3ow2WJtXwG8yG8d6S40dytZpH9iFuk12Sbg7lrtQxPPOIEU
- rpmZLfCNJJoZj603613w/M8EiZw6MohzikTWcFc55RLYJPBWQ+9puZtx1DopW2jOwE0EWdWB
- rwEIAKpT62HgSzL9zwGe+WIUCMB+nOEjXAfvoUPUwk+YCEDcOdfkkM5FyBoJs8TCEuPXGXBO
- Cl5P5B8OYYnkHkGWutAVlUTV8KESOIm/KJIA7jJA+Ss9VhMjtePfgWexw+P8itFRSRrrwyUf
- E+0WcAevblUi45LjWWZgpg3A80tHP0iToOZ5MbdYk7YFBE29cDSleskfV80ZKxFv6koQocq0
- vXzTfHvXNDELAuH7Ms/WJcdUzmPyBf3Oq6mKBBH8J6XZc9LjjNZwNbyvsHSrV5bgmu/THX2n
- g/3be+iqf6OggCiy3I1NSMJ5KtR0q2H2Nx2Vqb1fYPOID8McMV9Ll6rh8S8AEQEAAcLAfAQY
- AQgAJgIbDBYhBC3fcuWlpVuonapC4cI9kfOhJf6oBQJnEXWBBQkQ/lrSAAoJEMI9kfOhJf6o
- cakH+QHwDszsoYvmrNq36MFGgvAHRjdlrHRBa4A1V1kzd4kOUokongcrOOgHY9yfglcvZqlJ
- qfa4l+1oxs1BvCi29psteQTtw+memmcGruKi+YHD7793zNCMtAtYidDmQ2pWaLfqSaryjlzR
- /3tBWMyvIeWZKURnZbBzWRREB7iWxEbZ014B3gICqZPDRwwitHpH8Om3eZr7ygZck6bBa4MU
- o1XgbZcspyCGqu1xF/bMAY2iCDcq6ULKQceuKkbeQ8qxvt9hVxJC2W3lHq8dlK1pkHPDg9wO
- JoAXek8MF37R8gpLoGWl41FIUb3hFiu3zhDDvslYM4BmzI18QgQTQnotJH8=
-In-Reply-To: <20251029163555.GB26985@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADUfDZpBhBO8cppa2phmhkaCSJW1Yzk1aLzoF4zH3Cgu+D9Pcg@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-
-
-在 2025/10/30 03:05, Christoph Hellwig 写道:
-> [Adding Qu and the btrfs list]
+On Wed, Oct 29, 2025 at 09:00:12AM -0700, Caleb Sander Mateos wrote:
+> On Tue, Oct 28, 2025 at 8:11 PM Ming Lei <ming.lei@redhat.com> wrote:
+> >
+> > Implement NUMA-friendly memory allocation for ublk driver to improve
+> > performance on multi-socket systems.
+> >
+> > This commit includes the following changes:
+> >
+> > 1. Convert struct ublk_device to use a flexible array member for the
+> >    queues field instead of a separate pointer array allocation. This
+> >    eliminates one level of indirection and simplifies memory management.
+> >    The queues array is now allocated as part of struct ublk_device using
+> >    struct_size().
 > 
-> On Wed, Oct 29, 2025 at 08:53:06AM -0700, Darrick J. Wong wrote:
->>> +	if (mapping_stable_writes(iocb->ki_filp->f_mapping)) {
->>> +		xfs_info_once(mp,
->>> +			"falling back from direct to buffered I/O for write");
->>> +		return -ENOTBLK;
->>> +	}
->>
->> /me wonders if the other filesystems will have to implement this same
->> fallback and hence this should be a common helper ala
->> dio_warn_stale_pagecache?  But we'll get there when we get there.
+> Technically it ends up being the same number of indirections as
+> before, since changing queues from a single allocation to an array of
+> separate allocations adds another indirection.
+
+I think it is fine, because the pre-condition is NUMA aware allocation for
+ublk_queue.
+
 > 
-> As far as I'm concerned they should.  Btrfs in fact has recently done
-> that, as they are even more exposed due to the integrated checksumming.
+> >
+> > 2. Rename __queues to queues, dropping the __ prefix since the field is
+> >    now accessed directly throughout the codebase rather than only through
+> >    the ublk_get_queue() helper.
+> >
+> > 3. Remove the queue_size field from struct ublk_device as it is no longer
+> >    needed.
+> >
+> > 4. Move queue allocation and deallocation into ublk_init_queue() and
+> >    ublk_deinit_queue() respectively, improving encapsulation. This
+> >    simplifies ublk_init_queues() and ublk_deinit_queues() to just
+> >    iterate and call the per-queue functions.
+> >
+> > 5. Add ublk_get_queue_numa_node() helper function to determine the
+> >    appropriate NUMA node for a queue by finding the first CPU mapped
+> >    to that queue via tag_set.map[HCTX_TYPE_DEFAULT].mq_map[] and
+> >    converting it to a NUMA node using cpu_to_node(). This function is
+> >    called internally by ublk_init_queue() to determine the allocation
+> >    node.
+> >
+> > 6. Allocate each queue structure on its local NUMA node using
+> >    kvzalloc_node() in ublk_init_queue().
+> >
+> > 7. Allocate the I/O command buffer on the same NUMA node using
+> >    alloc_pages_node().
+> >
+> > This reduces memory access latency on multi-socket NUMA systems by
+> > ensuring each queue's data structures are local to the CPUs that
+> > access them.
+> >
+> > Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  drivers/block/ublk_drv.c | 84 +++++++++++++++++++++++++---------------
+> >  1 file changed, 53 insertions(+), 31 deletions(-)
+> >
+> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > index 2569566bf5e6..ed77b4527b33 100644
+> > --- a/drivers/block/ublk_drv.c
+> > +++ b/drivers/block/ublk_drv.c
+> > @@ -209,9 +209,6 @@ struct ublk_queue {
+> >  struct ublk_device {
+> >         struct gendisk          *ub_disk;
+> >
+> > -       char    *__queues;
+> > -
+> > -       unsigned int    queue_size;
+> >         struct ublksrv_ctrl_dev_info    dev_info;
+> >
+> >         struct blk_mq_tag_set   tag_set;
+> > @@ -239,6 +236,8 @@ struct ublk_device {
+> >         bool canceling;
+> >         pid_t   ublksrv_tgid;
+> >         struct delayed_work     exit_work;
+> > +
+> > +       struct ublk_queue       *queues[] __counted_by(dev_info.nr_hw_queues);
+> >  };
+> >
+> >  /* header of ublk_params */
+> > @@ -781,7 +780,7 @@ static noinline void ublk_put_device(struct ublk_device *ub)
+> >  static inline struct ublk_queue *ublk_get_queue(struct ublk_device *dev,
+> >                 int qid)
+> >  {
+> > -       return (struct ublk_queue *)&(dev->__queues[qid * dev->queue_size]);
+> > +       return dev->queues[qid];
+> >  }
+> >
+> >  static inline bool ublk_rq_has_data(const struct request *rq)
+> > @@ -2662,9 +2661,13 @@ static const struct file_operations ublk_ch_fops = {
+> >
+> >  static void ublk_deinit_queue(struct ublk_device *ub, int q_id)
+> >  {
+> > -       int size = ublk_queue_cmd_buf_size(ub);
+> > -       struct ublk_queue *ubq = ublk_get_queue(ub, q_id);
+> > -       int i;
+> > +       struct ublk_queue *ubq = ub->queues[q_id];
+> > +       int size, i;
+> > +
+> > +       if (!ubq)
+> > +               return;
+> > +
+> > +       size = ublk_queue_cmd_buf_size(ub);
+> >
+> >         for (i = 0; i < ubq->q_depth; i++) {
+> >                 struct ublk_io *io = &ubq->ios[i];
+> > @@ -2676,57 +2679,76 @@ static void ublk_deinit_queue(struct ublk_device *ub, int q_id)
+> >
+> >         if (ubq->io_cmd_buf)
+> >                 free_pages((unsigned long)ubq->io_cmd_buf, get_order(size));
+> > +
+> > +       kvfree(ubq);
+> > +       ub->queues[q_id] = NULL;
+> > +}
+> > +
+> > +static int ublk_get_queue_numa_node(struct ublk_device *ub, int q_id)
+> > +{
+> > +       unsigned int cpu;
+> > +
+> > +       /* Find first CPU mapped to this queue */
+> > +       for_each_possible_cpu(cpu) {
+> > +               if (ub->tag_set.map[HCTX_TYPE_DEFAULT].mq_map[cpu] == q_id)
+> > +                       return cpu_to_node(cpu);
+> > +       }
 > 
-> So yes, a common helper might make sense.  Especially if we want common
-> configuration for opt-outs eventually.
+> I think you could avoid this quadratic lookup by using blk_mq_hw_ctx's
+> numa_node field. The initialization code would probably have to move
+> to ublk_init_hctx() in order to have access to the blk_mq_hw_ctx. But
+> may not be worth the effort just to save some time at ublk creation
+> time. What you have seems fine.
 
-Yep, a common helper will help, or even integrate the check into 
-__iomap_dio_rw().
+It isn't doable and not necessary.
 
-Although btrfs currently uses some btrfs specific flags to do the check, 
-we're also setting stable writes flags for the address space, thus we 
-can share the same check.
+disk/hw queues are created & initialized when handling UBLK_CMD_START_DEV, but the
+backed ublk_queue need to be allocated when handling UBLK_CMD_ADD_DEV, which happens
+before dealing with UBLK_CMD_START_DEV.
 
-However I'm not sure if a warning will be that useful.
-
-If the warning is only outputted once like here, it doesn't show the ino 
-number to tell which file is affected.
-If the warning is shown every time, it will flood the dmesg.
-
-It will be much straightforward if there is some flag allowing us to 
-return error directly if true zero-copy direct IO can not be executed.
 
 Thanks,
-Qu
-
-> 
->>>   	file->f_mode |= FMODE_NOWAIT | FMODE_CAN_ODIRECT;
->>> -	file->f_mode |= FMODE_DIO_PARALLEL_WRITE;
->>> -	if (xfs_get_atomic_write_min(XFS_I(inode)) > 0)
->>> -		file->f_mode |= FMODE_CAN_ATOMIC_WRITE;
->>> +	if (!mapping_stable_writes(file->f_mapping)) {
->>> +		file->f_mode |= FMODE_DIO_PARALLEL_WRITE;
->>
->> Hrm.  So parallel directio writes are disabled for writes to files on
->> stable_pages devices because we have to fall back to buffered writes.
->> Those serialize on i_rwsem so that's why we don't set
->> FMODE_DIO_PARALLEL_WRITE, correct?
-> 
-> Yes.
-> 
->> There's not some more subtle reason
->> for not supporting it, right?
-> 
-> Not that I know of anyway.
-> 
+Ming
 
