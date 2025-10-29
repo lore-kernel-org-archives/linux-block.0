@@ -1,134 +1,312 @@
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4AD033A01E
-	for <linux-block@vger.kernel.org>; Wed, 29 Oct 2025 15:58:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8050B34AB1C
+	for <linux-block@vger.kernel.org>; Wed, 29 Oct 2025 16:00:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761753537; cv=none; b=lgYbpoiJuT6CqcXz9Lm8e6eoDx4lfsTKMol0HA16gFEMspeTsrSwltMPzx870LAJRS8WBpqUDY1W1pm2gnGSxGihBq1di1pVVSkNVIX9kELSaGO3QEdaGnzPnDbdV7lm8Bw+Omu0W6LdWPaxwGywSQFSuxi4kBbdojkdykADkyo=
+	t=1761753628; cv=none; b=RuyrHlGi49lv14PL5HRanlv4CV9uPxbQjjeW1pMQTu6z+xWttR5syEo2TfMjIsfZ54quuwUXfiZ7DzERSSk/gN/n2A6v6SSgFmaSs97dbtkGSRTzhtPGpoauHR7Mq9PsswPftmzHykLoWYYu1rPS3QVzP5qv47xwOw+9u/swpAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761753537; c=relaxed/simple;
-	bh=tPzwOV7GvDpR5Xi6HBtXCUHPQBBKe8WKMdp/yKCjpiU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kgkgx5v1DzrK2HK3pGXB6II7k2FSv9ctd5f6DMLAzzmXo+VV/Y1Ng0MskJ+RWEnyXWc2qNZ8v+Muo/XpPO/lWI74l7b6MXpu4bpraPZRLi60Tu6s986oHLMaOzpsT8Uf85EzvMBXx42yYtkOi1d1pyiz4q1v5+9fjZOnN0iLIv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dqQJSL0c; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1761753628; c=relaxed/simple;
+	bh=Fr7U5baYRN8HfbdSjE7ZI3OSi+lUhCiRsDDJhQiI/uQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Yv+87PbeSM5JrZLI81x8o1P8mhgoTTv2Cn6gENQ6DvJZ8Wss83s1FDlTHzkHLcsdEHxD2jLdkr55TyehI0Lo7ColxYGRE1cRw4/VHiKaYSMUmSvBdkV5Ea5huIvtYkqMuEX/K45wUof3v7/rqSeW/Z9THMYmdMBCDKoY4nVwuV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=PpMlbWl/; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dqQJSL0c"
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7a28c7e3577so76049b3a.1
-        for <linux-block@vger.kernel.org>; Wed, 29 Oct 2025 08:58:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="PpMlbWl/"
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-27eca7297a7so8328125ad.1
+        for <linux-block@vger.kernel.org>; Wed, 29 Oct 2025 09:00:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761753534; x=1762358334; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MwxrExpiKXBKK+ITlQ6foefTYgM8fnPgsDyzvsZJuN8=;
-        b=dqQJSL0cde3zct34IDioKcpml5cSDJiX5DBjAXwMS5+O10h9VSDCTp231V+o50yaHa
-         /pEAmUzsxxh0yxU+NO+wQ3YMejdtnq+unVXWVITg+SnfBTmen5K1jQo1W4MMi4xda/+f
-         U70SeIvuGan9MrlgMezrcsrJm4XJ1mVPtSrP74v4SfvvJi+dBeLA0Df7kNbKD5MHrOYk
-         Tg9f0qZEzUsFJmrzc5WO7JJ9iBqwgRt0+nffaBMkQP2+CPCzyDdzH5d6jf8NY1csfH8z
-         nZOVk1Gy8393qfno8c+cUaa0d+LWBpMMOKnw2PWD+LIlcNz09xwfhvrrpAXrjvqMzsOf
-         nR+w==
+        d=purestorage.com; s=google2022; t=1761753626; x=1762358426; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=O3tYa5A7MyefjzRhEXSfNpMUwfO4ju4wXaq3vjxUkHo=;
+        b=PpMlbWl/tZ+YsJjH3aG3qjve4f119fQjVjwOvzohZWydJkpJnkIayaZLh8Pul9IAeR
+         SBEhI7xs6AaDnB6YP0xHvA+5PR+IQZav5/azCIeVsL6mKSvIM0oqg7adB8R4XsQ7K3lp
+         kDA6lqq3+OYRWPO/ahgijX0FmV6ahvOmP8oroKpqEDfptw/nHc7y4j3HrB1H7d9uqZGE
+         2TwPfD/4g9Im60mGecP6Vye5zaZBrC1UKDyfEyxEa19F4pkNiPVg/8bKZI+bZ9E3JS/9
+         KlJ/5b/W/ZDYOZ4bRdwOSc5fh5tGBS22EX1EZ3E9uQbbiViuDCoYuUE8OjSxvmDv6rG7
+         g9uA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761753534; x=1762358334;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MwxrExpiKXBKK+ITlQ6foefTYgM8fnPgsDyzvsZJuN8=;
-        b=kXVxOYSQaTOIJiWX7Thz2wniFxYjizWrLo0v/gpar65rOLGj1GaLv9f14XuReArY+1
-         Jk8jM9lZRUd5cL89mRI8ppyPvryZDhWdt9EWC3DBscKHlHluZBVxFELVTAHQc3ljWjhp
-         yzSLbD2DwIvLVkZYUDxqpnNYXwQdOUig/Xbox7F8XMqnYJTwEctvfIno8X4yOpXVmhJf
-         AGfHpNAE7OAHwMYWUJzh1ro3CUojxn0/yvRMenO6b3bDWqKeDhSYI2ykax9A/ub4BWvg
-         egMfB0XObRCOxtzqvw1/TzLHWjsQ3TxH5HpK6DCN3UevvPy/q0z5tjOiEZiihG1AfnHp
-         oEqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV7JEYzA9GEIVdzmXW8F1Qz8Uq3H4RaiUZchE2ju5CSRPiXPPItSl+xL5AfnoCPgnub4rTuWgOzt2ft8Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGz6/XVpANmMvuU06AWqBQsTtNKKw0lDVSxkLla3esmCFOMOML
-	SqPxL1fn/yoMwTot/f2lZadn/zSeJ+9cJ2/SDbrZqW/DIYQHgKfQ9gGj2E2dG4fA
-X-Gm-Gg: ASbGncvNLLOGOKtkNNU8r0cNGlcHP1Cr09BsF75dAiV72T6caEfK/I5wPINiGnfQiVB
-	bubrDfqgEgJ+Okahs6m/6ZMS8wxPW2NCewSV+yyaBgXwrJnwjSmfH6sA8T8PuGDbFnPj8O6AYWw
-	aEUGlF8FdiOc2oi+34M8355l28dD4a6iheAL8zY4fAF1IetHQgo3OOejWwyu5WlCmhWA6899Zxz
-	Y0KRstDCHZHEDQQwMFLq+U9M3uEZDqZCt7/QWuLhG0BA/0HXac4x/aa8Rg48j7g47hCd6ECdRnY
-	7cmNGphIQp1NkQb6/Rp1JYeNVxtE2YlNfrB+SH3RqwIJ9e9sJ+a6MlnCEyd2k3d4ob/UOs37FL7
-	EV4n02mPO2W3oQ4HG1CafEyw9Jk/OG80bgDgcAehs2Jij5oZngNfXWkfcDZv86IAU6y/xBgQYTO
-	UEKCVLOIrc6YFAJBgmRuopDtFAGkLvuFVPpG3nYCn7zrY4xSnvIbIb2deyMD9HpQWtbRKmZdmU9
-	nxAbaqlCOFVsEHriDrBeotajR3665nKIT3jbBYIQAQWZEhGYStqUXT4pKaBsHVLohEI
-X-Google-Smtp-Source: AGHT+IEDUOVYU4FbtZmNjoIisTx8ifKNOJtO/21KsW1AgRzDGmjWuA4/mf+B5T+NZ/lyYpe4qwFN0Q==
-X-Received: by 2002:a05:6a00:7589:b0:7a5:396d:76af with SMTP id d2e1a72fcca58-7a5396d7d19mr2988818b3a.18.1761753534501;
-        Wed, 29 Oct 2025 08:58:54 -0700 (PDT)
-Received: from ?IPV6:2a00:79e0:2e7c:8:8b41:6bc3:2074:828c? ([2a00:79e0:2e7c:8:8b41:6bc3:2074:828c])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7a414069164sm15874564b3a.45.2025.10.29.08.58.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Oct 2025 08:58:54 -0700 (PDT)
-Message-ID: <ea07dede-5baa-41e5-ad5d-a9f6a90ac6e8@gmail.com>
-Date: Wed, 29 Oct 2025 08:58:52 -0700
+        d=1e100.net; s=20230601; t=1761753626; x=1762358426;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=O3tYa5A7MyefjzRhEXSfNpMUwfO4ju4wXaq3vjxUkHo=;
+        b=NWLlC8JGE1FCOzd7xwUiliI6E83jImQJ4zZ0ZgUMy1uw7PI0nO65OrGfksgNbKqSVk
+         AGUllRr0gI4RLnArzlIT994jdBvKJ4Ht9m/VTH+DjtCDH3j5Yu7kQwEugpw5w2CRIYrI
+         L7JYnuo+bVTfG/0ZCbLoO868zMrgVQGAso6I9L2v96i+/wIzG89LQP1OI/ib/OHMMb/F
+         7yUqDG6hhw8T5LRCoYz7HMmqOEgpKoWWofpOFgEiMeWlPmvE19tLxKOblrTqyPnOJve5
+         se/ig76Fz3DfZaEyZ/f63iD6j5IZvb3A6FtLjdpdJOEFsGo14tuBUJDdGvmzYlPgSTCZ
+         5guw==
+X-Forwarded-Encrypted: i=1; AJvYcCUezME2USCZw+Z5f6pgCm9O914Wnab6QSg7ZlvmsAPUbe7QsszRkcIyA4UMkqMFEY4szRU+pS7m8aXQlA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yycx7DTpf6K5cGJp15N08gqoEF2AhGc0ZGmXpUUAEAUT/lq5wlg
+	qMrgVhwob+SWdJK++Qok9Hb9DqbYMBFJQuedJmMp1YsTdYAbpOibT4PjQrPEVL7aNmtbelQGFZW
+	vsias2swHBRx+lIvcLGtcCVW3DWHnYqlkl9SWeg1rztFjq3zZApUgK6te2g==
+X-Gm-Gg: ASbGnctpKXaz/lpGBp3HWSjvMX53kAULCg7EMFVHSTQgK2aTgygANHRVG9/KFPXEG0a
+	+okrTHEmf+1rQwJ2kLr4IkX3GrJ2iut0Ww8zyIGAbKO06dGO57128/6867H1Kgh/ceG0pAfFXwm
+	tNQ6Va8GQLnJr1LL5g+6iRroE1wU8jVgHjptVf8Kk+4P+DY32YJfw4+pb4Ui83uv+b8Wy+Znv6x
+	IQaDumsn4NjE0uGUpyCDORiESMwgvu6ilXz9bJ4uhPDbWpWb/WFrrs4xPn7e0H5omLyvaLOvvp2
+	pQAflCEXi55JzTssig==
+X-Google-Smtp-Source: AGHT+IEoCRbEb52RtTy5icslCFqy278IzbjfHRANIbzt8mqyds2SX41wVt/1NyVR99WCRavejHBhvuXeWSeJvRjWL7I=
+X-Received: by 2002:a17:903:2445:b0:257:3283:b859 with SMTP id
+ d9443c01a7336-294deee3548mr18277985ad.9.1761753625487; Wed, 29 Oct 2025
+ 09:00:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: fall back from direct to buffered I/O when stable writes are
- required
-To: Christoph Hellwig <hch@lst.de>, Carlos Maiolino <cem@kernel.org>,
- Christian Brauner <brauner@kernel.org>
-Cc: Jan Kara <jack@suse.cz>, "Martin K. Petersen"
- <martin.petersen@oracle.com>, linux-kernel@vger.kernel.org,
- linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-raid@vger.kernel.org, linux-block@vger.kernel.org
-References: <20251029071537.1127397-1-hch@lst.de>
-Content-Language: en-US
-From: Bart Van Assche <bart.vanassche@gmail.com>
-In-Reply-To: <20251029071537.1127397-1-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20251029031035.258766-1-ming.lei@redhat.com> <20251029031035.258766-3-ming.lei@redhat.com>
+In-Reply-To: <20251029031035.258766-3-ming.lei@redhat.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Wed, 29 Oct 2025 09:00:12 -0700
+X-Gm-Features: AWmQ_bmN7W1ZzrfnfgX5e28iMzDRDfX64ZaHKIVvQARSNuu_kYcPSPnhtgSJEVE
+Message-ID: <CADUfDZpBhBO8cppa2phmhkaCSJW1Yzk1aLzoF4zH3Cgu+D9Pcg@mail.gmail.com>
+Subject: Re: [PATCH V3 2/5] ublk: implement NUMA-aware memory allocation
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	Uday Shankar <ushankar@purestorage.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/29/25 12:15 AM, Christoph Hellwig wrote:
-> we've had a long standing issue that direct I/O to and from devices that
-> require stable writes can corrupt data because the user memory can be
-> modified while in flight.  This series tries to address this by falling
-> back to uncached buffered I/O.  Given that this requires an extra copy it
-> is usually going to be a slow down, especially for very high bandwith
-> use cases, so I'm not exactly happy about.
-> 
-> I suspect we need a way to opt out of this for applications that know
-> what they are doing, and I can think of a few ways to do that:
-> 
-> 1a) Allow a mount option to override the behavior
-> 
-> 	This allows the sysadmin to get back to the previous state.
-> 	This is fairly easy to implement, but the scope might be to wide.
-> 
-> 1b) Sysfs attribute
-> 
-> 	Same as above.  Slightly easier to modify, but a more unusual
-> 	interface.
-> 
-> 2) Have a per-inode attribute
-> 
-> 	Allows to set it on a specific file.  Would require an on-disk
-> 	format change for the usual attr options.
-> 
-> 3) Have a fcntl or similar to allow an application to override it
-> 
-> 	Fine granularity.  Requires application change.  We might not
-> 	allow any application to force this as it could be used to inject
-> 	corruption.
-> 
-> In other words, they are all kinda horrible.
+On Tue, Oct 28, 2025 at 8:11=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrot=
+e:
+>
+> Implement NUMA-friendly memory allocation for ublk driver to improve
+> performance on multi-socket systems.
+>
+> This commit includes the following changes:
+>
+> 1. Convert struct ublk_device to use a flexible array member for the
+>    queues field instead of a separate pointer array allocation. This
+>    eliminates one level of indirection and simplifies memory management.
+>    The queues array is now allocated as part of struct ublk_device using
+>    struct_size().
 
-Hi Christoph,
+Technically it ends up being the same number of indirections as
+before, since changing queues from a single allocation to an array of
+separate allocations adds another indirection.
 
-Has the opposite been considered: only fall back to buffered I/O for 
-buggy software that modifies direct I/O buffers before I/O has
-completed?
+>
+> 2. Rename __queues to queues, dropping the __ prefix since the field is
+>    now accessed directly throughout the codebase rather than only through
+>    the ublk_get_queue() helper.
+>
+> 3. Remove the queue_size field from struct ublk_device as it is no longer
+>    needed.
+>
+> 4. Move queue allocation and deallocation into ublk_init_queue() and
+>    ublk_deinit_queue() respectively, improving encapsulation. This
+>    simplifies ublk_init_queues() and ublk_deinit_queues() to just
+>    iterate and call the per-queue functions.
+>
+> 5. Add ublk_get_queue_numa_node() helper function to determine the
+>    appropriate NUMA node for a queue by finding the first CPU mapped
+>    to that queue via tag_set.map[HCTX_TYPE_DEFAULT].mq_map[] and
+>    converting it to a NUMA node using cpu_to_node(). This function is
+>    called internally by ublk_init_queue() to determine the allocation
+>    node.
+>
+> 6. Allocate each queue structure on its local NUMA node using
+>    kvzalloc_node() in ublk_init_queue().
+>
+> 7. Allocate the I/O command buffer on the same NUMA node using
+>    alloc_pages_node().
+>
+> This reduces memory access latency on multi-socket NUMA systems by
+> ensuring each queue's data structures are local to the CPUs that
+> access them.
+>
+> Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  drivers/block/ublk_drv.c | 84 +++++++++++++++++++++++++---------------
+>  1 file changed, 53 insertions(+), 31 deletions(-)
+>
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 2569566bf5e6..ed77b4527b33 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -209,9 +209,6 @@ struct ublk_queue {
+>  struct ublk_device {
+>         struct gendisk          *ub_disk;
+>
+> -       char    *__queues;
+> -
+> -       unsigned int    queue_size;
+>         struct ublksrv_ctrl_dev_info    dev_info;
+>
+>         struct blk_mq_tag_set   tag_set;
+> @@ -239,6 +236,8 @@ struct ublk_device {
+>         bool canceling;
+>         pid_t   ublksrv_tgid;
+>         struct delayed_work     exit_work;
+> +
+> +       struct ublk_queue       *queues[] __counted_by(dev_info.nr_hw_que=
+ues);
+>  };
+>
+>  /* header of ublk_params */
+> @@ -781,7 +780,7 @@ static noinline void ublk_put_device(struct ublk_devi=
+ce *ub)
+>  static inline struct ublk_queue *ublk_get_queue(struct ublk_device *dev,
+>                 int qid)
+>  {
+> -       return (struct ublk_queue *)&(dev->__queues[qid * dev->queue_size=
+]);
+> +       return dev->queues[qid];
+>  }
+>
+>  static inline bool ublk_rq_has_data(const struct request *rq)
+> @@ -2662,9 +2661,13 @@ static const struct file_operations ublk_ch_fops =
+=3D {
+>
+>  static void ublk_deinit_queue(struct ublk_device *ub, int q_id)
+>  {
+> -       int size =3D ublk_queue_cmd_buf_size(ub);
+> -       struct ublk_queue *ubq =3D ublk_get_queue(ub, q_id);
+> -       int i;
+> +       struct ublk_queue *ubq =3D ub->queues[q_id];
+> +       int size, i;
+> +
+> +       if (!ubq)
+> +               return;
+> +
+> +       size =3D ublk_queue_cmd_buf_size(ub);
+>
+>         for (i =3D 0; i < ubq->q_depth; i++) {
+>                 struct ublk_io *io =3D &ubq->ios[i];
+> @@ -2676,57 +2679,76 @@ static void ublk_deinit_queue(struct ublk_device =
+*ub, int q_id)
+>
+>         if (ubq->io_cmd_buf)
+>                 free_pages((unsigned long)ubq->io_cmd_buf, get_order(size=
+));
+> +
+> +       kvfree(ubq);
+> +       ub->queues[q_id] =3D NULL;
+> +}
+> +
+> +static int ublk_get_queue_numa_node(struct ublk_device *ub, int q_id)
+> +{
+> +       unsigned int cpu;
+> +
+> +       /* Find first CPU mapped to this queue */
+> +       for_each_possible_cpu(cpu) {
+> +               if (ub->tag_set.map[HCTX_TYPE_DEFAULT].mq_map[cpu] =3D=3D=
+ q_id)
+> +                       return cpu_to_node(cpu);
+> +       }
 
-Regarding selecting the direct I/O behavior for a process, how about
-introducing a new prctl() flag and introducing a new command-line
-utility that follows the style of ionice and sets the new flag before
-any code runs in the started process?
+I think you could avoid this quadratic lookup by using blk_mq_hw_ctx's
+numa_node field. The initialization code would probably have to move
+to ublk_init_hctx() in order to have access to the blk_mq_hw_ctx. But
+may not be worth the effort just to save some time at ublk creation
+time. What you have seems fine.
 
-Thanks,
+Best,
+Caleb
 
-Bart.
+> +
+> +       return NUMA_NO_NODE;
+>  }
+>
+>  static int ublk_init_queue(struct ublk_device *ub, int q_id)
+>  {
+> -       struct ublk_queue *ubq =3D ublk_get_queue(ub, q_id);
+> +       int depth =3D ub->dev_info.queue_depth;
+> +       int ubq_size =3D sizeof(struct ublk_queue) + depth * sizeof(struc=
+t ublk_io);
+>         gfp_t gfp_flags =3D GFP_KERNEL | __GFP_ZERO;
+> -       void *ptr;
+> +       struct ublk_queue *ubq;
+> +       struct page *page;
+> +       int numa_node;
+>         int size;
+>
+> +       /* Determine NUMA node based on queue's CPU affinity */
+> +       numa_node =3D ublk_get_queue_numa_node(ub, q_id);
+> +
+> +       /* Allocate queue structure on local NUMA node */
+> +       ubq =3D kvzalloc_node(ubq_size, GFP_KERNEL, numa_node);
+> +       if (!ubq)
+> +               return -ENOMEM;
+> +
+>         spin_lock_init(&ubq->cancel_lock);
+>         ubq->flags =3D ub->dev_info.flags;
+>         ubq->q_id =3D q_id;
+> -       ubq->q_depth =3D ub->dev_info.queue_depth;
+> +       ubq->q_depth =3D depth;
+>         size =3D ublk_queue_cmd_buf_size(ub);
+>
+> -       ptr =3D (void *) __get_free_pages(gfp_flags, get_order(size));
+> -       if (!ptr)
+> +       /* Allocate I/O command buffer on local NUMA node */
+> +       page =3D alloc_pages_node(numa_node, gfp_flags, get_order(size));
+> +       if (!page) {
+> +               kvfree(ubq);
+>                 return -ENOMEM;
+> +       }
+> +       ubq->io_cmd_buf =3D page_address(page);
+>
+> -       ubq->io_cmd_buf =3D ptr;
+> +       ub->queues[q_id] =3D ubq;
+>         ubq->dev =3D ub;
+>         return 0;
+>  }
+>
+>  static void ublk_deinit_queues(struct ublk_device *ub)
+>  {
+> -       int nr_queues =3D ub->dev_info.nr_hw_queues;
+>         int i;
+>
+> -       if (!ub->__queues)
+> -               return;
+> -
+> -       for (i =3D 0; i < nr_queues; i++)
+> +       for (i =3D 0; i < ub->dev_info.nr_hw_queues; i++)
+>                 ublk_deinit_queue(ub, i);
+> -       kvfree(ub->__queues);
+>  }
+>
+>  static int ublk_init_queues(struct ublk_device *ub)
+>  {
+> -       int nr_queues =3D ub->dev_info.nr_hw_queues;
+> -       int depth =3D ub->dev_info.queue_depth;
+> -       int ubq_size =3D sizeof(struct ublk_queue) + depth * sizeof(struc=
+t ublk_io);
+> -       int i, ret =3D -ENOMEM;
+> +       int i, ret;
+>
+> -       ub->queue_size =3D ubq_size;
+> -       ub->__queues =3D kvcalloc(nr_queues, ubq_size, GFP_KERNEL);
+> -       if (!ub->__queues)
+> -               return ret;
+> -
+> -       for (i =3D 0; i < nr_queues; i++) {
+> -               if (ublk_init_queue(ub, i))
+> +       for (i =3D 0; i < ub->dev_info.nr_hw_queues; i++) {
+> +               ret =3D ublk_init_queue(ub, i);
+> +               if (ret)
+>                         goto fail;
+>         }
+>
+> @@ -3128,7 +3150,7 @@ static int ublk_ctrl_add_dev(const struct ublksrv_c=
+trl_cmd *header)
+>                 goto out_unlock;
+>
+>         ret =3D -ENOMEM;
+> -       ub =3D kzalloc(sizeof(*ub), GFP_KERNEL);
+> +       ub =3D kzalloc(struct_size(ub, queues, info.nr_hw_queues), GFP_KE=
+RNEL);
+>         if (!ub)
+>                 goto out_unlock;
+>         mutex_init(&ub->mutex);
+> --
+> 2.47.0
+>
