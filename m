@@ -1,50 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4B7436CA70;
-	Thu, 30 Oct 2025 17:41:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 901F536CE06;
+	Thu, 30 Oct 2025 17:56:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761846113; cv=none; b=CHo+qE0ZyqWX65Zmgum2HZU+qloFXQEMTq3qot2yJ1dLwygVSlgBc3Qe6vT78jxWXPibu2y4oJx92+edSU5rMsajGkO73AdVpq7B6BMyZAlcLehrro5x2zVvNdlLJYWSUckWHdunfHlU9erdRhLvfLMcdh57G6UAMg00ihED1H0=
+	t=1761846996; cv=none; b=QQq+IORM3vXtbrKECaMERYdFRPOrtt/9sh3dBhoDFKgabIUfSP3C6Ip4cLLW1Xu13nnvvbAyAwG+HVUvZ9JU0iIG6ENttH8dFKP48qbPd/HMUH9YYbOhm++S6rHk7CQSXHUBeAUNefomGuZ2HZXgCXUC3e95uLypjyHtVUKBmXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761846113; c=relaxed/simple;
-	bh=XpcDxbobWuhXBAKt4h2GGHNX8CNan4v+jW1nwx/LFX8=;
+	s=arc-20240116; t=1761846996; c=relaxed/simple;
+	bh=mwm5eTSkEuWGrdyR9+atXifBE3uTQt90HxWeDV+iaAY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ObtTNxJoS6MreFEDc4QZn5wlpUNuPZlt7/F5Y/Qw2Ii+3N/bbW/zS4mkcbW9dEeQ2HDf8FLSObj/O/4y3S7cZcWuEhF7duScdZ9SJBCUhKhnQOt30R2YTN+3AFdnw4zYIlGNm7gR7/hOKhy30PAK2gZ/+b/J/d88DWilTGq1AC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XyIRM5Q/; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=gKXEAQ0K9FIOZGGk1hcPPTbo+pIvwucMohPxGMt3IWz8iLIi+I8v2ftt4lD8kLaLzGXLmI5xWbRkKICt4AdTITCAiymP7zGjWj/eDbFbpnDNbel3iRbAp7iRAZutNJgVSLMpS730M8nr+hUhTVxvagVOxf4eTyWhBr6xeCV9MXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jxx1MJ1Q; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XyIRM5Q/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC9C9C4CEF8;
-	Thu, 30 Oct 2025 17:41:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jxx1MJ1Q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CBC4C4CEFB;
+	Thu, 30 Oct 2025 17:56:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761846113;
-	bh=XpcDxbobWuhXBAKt4h2GGHNX8CNan4v+jW1nwx/LFX8=;
+	s=k20201202; t=1761846996;
+	bh=mwm5eTSkEuWGrdyR9+atXifBE3uTQt90HxWeDV+iaAY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XyIRM5Q/rSUlJQi6J3yO4pAfO52uSoksNK1uIYJ4sHRlob7L1PL8N+X7/0ttC5B/B
-	 +U+BtrMRn8vIfPEmW9O9w3d73nUWR92vyVDgqA2UaA+0ao6hIuz3c4yXkRu3PvHX6v
-	 AoE75G0nZLr0utg3hTpXZ1MX/lsdEcr1dPN5SmuJvTAoxZWCy2OB59pZZ85Y12OJRk
-	 WiNB5nWgSjo2aoxT+21LJMcAW0n6HlEAACcs9/hFcpm6vwUQQBkeez6qKF2r2UjprS
-	 MQ5BkibVZ0t2oqvWGITt75UtO8xuXXJHZHRJnq7AsZo+A8NVBSvH08gl/fhRpQTRS+
-	 NlqrPfxi+z6Vg==
-Date: Thu, 30 Oct 2025 10:40:15 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Carlos Llamas <cmllamas@google.com>, Keith Busch <kbusch@kernel.org>,
-	Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org, axboe@kernel.dk,
-	Hannes Reinecke <hare@suse.de>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>
-Subject: Re: [PATCHv4 5/8] iomap: simplify direct io validity check
-Message-ID: <20251030174015.GC1624@sol>
-References: <20250827141258.63501-1-kbusch@meta.com>
- <20250827141258.63501-6-kbusch@meta.com>
- <aP-c5gPjrpsn0vJA@google.com>
- <aP-hByAKuQ7ycNwM@kbusch-mbp>
- <aQFIGaA5M4kDrTlw@google.com>
- <20251028225648.GA1639650@google.com>
- <20251028230350.GB1639650@google.com>
- <20251029070618.GA29697@lst.de>
+	b=jxx1MJ1Q8q1gc0kqTfMR64liwkhDa+LJepcgefKlU8Q5/UUZvGWlVRupsSObx+/qF
+	 d9oqPIA/FSl+ljENqFIWjb9xExEM/2E1Xh8KCUjPcjcYRKQ1QQoUR3nULI5B86kj4r
+	 wVTmNiMZrUVpaw/UwjDYuSet3EQZyfRp6oP3NHoh19EoQphq9KzwbAwzCib1Pu6ZfW
+	 J/FxyIVeACkN5m+gfSNB7/ABRC4+X/nqcSqqlr3Unl0hLwg/pGwoXZILma9lGHQPAG
+	 2Z2n12HMwyUM2SEkAFxNCqEyj4m7HWBzOePt7e6G/cCcBiSVbW2lImAr4gYufXTxI0
+	 1CNBfT4f7JwrQ==
+Date: Thu, 30 Oct 2025 10:56:31 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: kernel test robot <lkp@intel.com>, Ming Lei <ming.lei@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Uday Shankar <ushankar@purestorage.com>,
+	Kees Cook <kees@kernel.org>
+Subject: Re: [PATCH V3 2/5] ublk: implement NUMA-aware memory allocation
+Message-ID: <20251030175631.GB417112@ax162>
+References: <20251029031035.258766-3-ming.lei@redhat.com>
+ <202510301522.i47z9R95-lkp@intel.com>
+ <CADUfDZonryeHe1MGTfnUa16VbvEt5C+yu11yh3ZRDbwFqJ_L9w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -54,71 +48,34 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251029070618.GA29697@lst.de>
+In-Reply-To: <CADUfDZonryeHe1MGTfnUa16VbvEt5C+yu11yh3ZRDbwFqJ_L9w@mail.gmail.com>
 
-On Wed, Oct 29, 2025 at 08:06:18AM +0100, Christoph Hellwig wrote:
-> I think we need to take a step back and talk about what alignment
-> we're talking about here, as there are two dimensions to it.
+On Thu, Oct 30, 2025 at 07:07:25AM -0700, Caleb Sander Mateos wrote:
+> On Thu, Oct 30, 2025 at 1:01 AM kernel test robot <lkp@intel.com> wrote:
+...
+> > patch link:    https://lore.kernel.org/r/20251029031035.258766-3-ming.lei%40redhat.com
+> > patch subject: [PATCH V3 2/5] ublk: implement NUMA-aware memory allocation
+> > config: x86_64-randconfig-074-20251030 (https://download.01.org/0day-ci/archive/20251030/202510301522.i47z9R95-lkp@intel.com/config)
+> > compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+> > reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251030/202510301522.i47z9R95-lkp@intel.com/reproduce)
+> >
+> > If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> > the same patch/commit), kindly add following tags
+> > | Reported-by: kernel test robot <lkp@intel.com>
+> > | Closes: https://lore.kernel.org/oe-kbuild-all/202510301522.i47z9R95-lkp@intel.com/
+> >
+> > All errors (new ones prefixed by >>):
+> >
+> > >> drivers/block/ublk_drv.c:240:49: error: 'counted_by' argument must be a simple declaration reference
+> >      240 |         struct ublk_queue       *queues[] __counted_by(dev_info.nr_hw_queues);
+> >          |                                                        ^~~~~~~~~~~~~~~~~~~~~
 > 
-> The first dimension is: disk alignment vs memory alignment.
-> 
-> Disk alignment:
->   Direct I/O obviously needs to be aligned to on-disk sectors to have
->   a chance to work, as that is the lowest possible granularity of access.
-> 
->   For fіle systems that write out of place we also need to align writes
->   to the logical block size of the file system.
-> 
->   With blk-crypto we need to align to the DUN if it is larger than the
->   disk-sector dize.
-> 
-> Memory alignment:
-> 
->   This is the alignment of the buffer in-memory.  Hardware only really
->   cares about this when DMA engines discard the lowest bits, so a typical
->   hardware alignment requirement is to only require a dword (4 byte)
->   alignment.   For drivers that process the payload in software such
->   low alignment have a tendency to cause bugs as they're not written
->   thinking about it.  Similarly for any additional processing like
->   encryption, parity or checksums.
-> 
-> The second dimension is for the entire operation vs individual vectors,
-> this has implications both for the disk and memory alignment.  Keith
-> has done work there recently to relax the alignment of the vectors to
-> only require the memory alignment, so that preadv/pwritev-like calls
-> can have lots of unaligned segments.
-> 
-> I think it's the latter that's tripping up here now.  Hard coding these
-> checks in the file systems seem like a bad idea, we really need to
-> advertise them in the queue limits, which is complicated by the fact that
-> we only want to do that for bios using block layer encryption. i.e., we
-> probably need a separate queue limit that mirrors dma_alignment, but only
-> for encrypted bios, and which is taken into account in the block layer
-> splitting and communicated up by file systems only for encrypted bios.
-> For blk-crypto-fallback we'd need DUN alignment so that the algorithms
-> just work (assuming the crypto API can't scatter over misaligned
-> segments), but for hardware blk-crypto I suspect that the normal DMA
-> engine rules apply, and we don't need to restrict alignment.
+> Hmm, guess it doesn't support nested fields?
 
-Allowing DIO segments to be aligned (in memory address and/or length) to
-less than crypto_data_unit_size on encrypted files has been attempted
-and discussed before.  Read the cover letter of
-https://lore.kernel.org/linux-fscrypt/20220128233940.79464-1-ebiggers@kernel.org/
+Correct. I think this is something that we want to support at some point
+if I remember correctly but I think there was a lot of discussion
+between GCC and clang on how to actually do it but Kees is free to
+correct me if that is wrong.
 
-We eventually decided to proceed with DIO support without it, since it
-would have added a lot of complexity.  It would have made the bio
-splitting code in the block layer split bios at boundaries where the
-length isn't aligned to crypto_data_unit_size, it would have caused a
-lot of trouble for blk-crypto-fallback, and it even would have been
-incompatible with some of the hardware drivers (e.g. ufs-exynos.c).
-
-It also didn't seem to be all that useful, and it would have introduced
-edge cases that don't get tested much.  All reachable to unprivileged
-userspace code too, of course.
-
-I can't say that the idea seems all that great to me.
-
-We can always reconsider and still add support for this.  But it's not
-clear to me what's changed.
-
-- Eric
+Cheers,
+Nathan
