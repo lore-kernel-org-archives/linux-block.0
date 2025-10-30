@@ -1,104 +1,133 @@
-Received: from mta20.hihonor.com (mta20.honor.com [81.70.206.69])
+Received: from sender-op-o19.zoho.eu (sender-op-o19.zoho.eu [136.143.169.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDB402641FB;
-	Thu, 30 Oct 2025 11:51:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.70.206.69
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761825064; cv=none; b=Kfzm7Cq/bW3BSIyJOVBI50XJt3yacI0+qI1coqBuKpSFn7uidt49i10enOZ4SFwcGhXq85rf3FtQ1RAsMx86R4un+zjXO4yP3BFGeHDjT3RhGNzj9DiEdB0vt0w+kaJ8evzEaDXMgZBotZIF77n8m/QyRcZKPs+uz/hEMnIJW9E=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761825064; c=relaxed/simple;
-	bh=QIS0nTgd8Yks5rn0YdXxKcA8EFMyWIsZaG7wRpISRlg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qryfKVqIHufxSodYhDrdUP5ai0p5LtTqfTZTrZw42vqOrtZqBRiGGKd3PA9VFG34GK1gFFyzFk01BEStPBTALKtGgoXo8zzK6FM1wapBWu5b4ArV+DCEJLYeyn6JiB4Z30j/UB/d2Vraocl7KHQBdI15DwdgaEhlBG9OOsNEBzU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=honor.com; spf=pass smtp.mailfrom=honor.com; arc=none smtp.client-ip=81.70.206.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=honor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=honor.com
-Received: from w002.hihonor.com (unknown [10.68.28.120])
-	by mta20.hihonor.com (SkyGuard) with ESMTPS id 4cy24h54rFzYkxgw;
-	Thu, 30 Oct 2025 19:31:32 +0800 (CST)
-Received: from a018.hihonor.com (10.68.17.250) by w002.hihonor.com
- (10.68.28.120) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 30 Oct
- 2025 19:32:33 +0800
-Received: from localhost.localdomain (10.144.20.219) by a018.hihonor.com
- (10.68.17.250) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 30 Oct
- 2025 19:32:32 +0800
-From: zhongjinji <zhongjinji@honor.com>
-To: <shakeel.butt@linux.dev>
-CC: <akpm@linux-foundation.org>, <axboe@kernel.dk>, <cgroups@vger.kernel.org>,
-	<christoph.boehmwalder@linbit.com>, <corbet@lwn.net>,
-	<drbd-dev@lists.linbit.com>, <dsterba@suse.com>, <feng.han@honor.com>,
-	<hannes@cmpxchg.org>, <jinji.z.zhong@gmail.com>, <lars.ellenberg@linbit.com>,
-	<linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>, <liulu.liu@honor.com>,
-	<mhocko@kernel.org>, <minchan@kernel.org>, <mkoutny@suse.com>,
-	<muchun.song@linux.dev>, <philipp.reisner@linbit.com>,
-	<roman.gushchin@linux.dev>, <senozhatsky@chromium.org>, <terrelln@fb.com>,
-	<tj@kernel.org>, <zhongjinji@honor.com>
-Subject: Re: [RFC PATCH 0/3] Introduce per-cgroup compression priority
-Date: Thu, 30 Oct 2025 19:32:28 +0800
-Message-ID: <20251030113228.18817-1-zhongjinji@honor.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <k6jwua5rlkds7dxomwvxotwtjq4hauyevvyoxd5hjz733k7kk5@mmezlradxhpu>
-References: <k6jwua5rlkds7dxomwvxotwtjq4hauyevvyoxd5hjz733k7kk5@mmezlradxhpu>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0BA31B983F
+	for <linux-block@vger.kernel.org>; Thu, 30 Oct 2025 12:02:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.169.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761825758; cv=pass; b=rmPMr8oAi5ox1nK+RIxytD4GsKcZB6MvEs+kbHluEfKUnCbcRCsdMAIOiauSa94FQfs5CfGs3dN1tGg092ozINWPw7ly9KcUpb4D6X9tXonwi0Rn4G6+uGCYWjYhGlwT0L9OcuztYun5jL8M6c5UCTrjNKWqCXtl/K2sqUmQ044=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761825758; c=relaxed/simple;
+	bh=84iQb1dwCxC9xyLsfKemUeFDBxUHPjVNNi+3KgD/8cA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EMFv461DOgxjq9d1nyXD8Xb/3uhTLoakf9P3COToudFp3HG5Tkgfs3Ph87MlvUP8iEOoVRH5HmVwoAISvwp8wqr3whyh4LT5to1pNQvdvLWuDcIbx0/cTOwfGSYqpjybkDjkJ2M0cJQKKAJIwjVj7XFm9EC+3TmMGqgs7ppUPdE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=demonlair.co.uk; spf=pass smtp.mailfrom=demonlair.co.uk; dkim=pass (1024-bit key) header.d=demonlair.co.uk header.i=geoff@demonlair.co.uk header.b=Ufb36xN+; arc=pass smtp.client-ip=136.143.169.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=demonlair.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=demonlair.co.uk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=demonlair.co.uk header.i=geoff@demonlair.co.uk header.b="Ufb36xN+"
+ARC-Seal: i=1; a=rsa-sha256; t=1761825631; cv=none; 
+	d=zohomail.eu; s=zohoarc; 
+	b=Q8wrnbr+0lfEvwTSqeyHL3Em7bzliJUURbPvs5hnVRyLqY2+d7w7GNwBO5kh0k5URJmU89T7xNdN/fXk3FeYE5Yd4yXIaIVipX0oT+YxWzFGvZMszCjfUl6IOStM/ZkKWY3JpgEMBexG6p0tGZ84sMJdksvVh23FtuerOsfOyNo=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
+	t=1761825631; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=EB0cp732OsDDfGOv/Hf8MnYe8fEWnlwPkpeCR1Zt+zo=; 
+	b=aoRdijVbvJYUfeufQw9Z8itd/Ye8AzamDWPy/YZdQnCHkiVd8Czk0IRy3pO+xNlifw6o3JdD1o6hFK96mR3bmC56m9llP3vAGuw0quQzk19fER4Vhgc/sEfZcqoiRK9DQGLl/o5OMUgrgGLIw3ldBX86FFSZNyzcaK5NtFGkPfI=
+ARC-Authentication-Results: i=1; mx.zohomail.eu;
+	dkim=pass  header.i=demonlair.co.uk;
+	spf=pass  smtp.mailfrom=geoff@demonlair.co.uk;
+	dmarc=pass header.from=<geoff@demonlair.co.uk>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1761825631;
+	s=zmail; d=demonlair.co.uk; i=geoff@demonlair.co.uk;
+	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=EB0cp732OsDDfGOv/Hf8MnYe8fEWnlwPkpeCR1Zt+zo=;
+	b=Ufb36xN+wsixKFppcR3FAeR8y8d0qKpHvgwwklV+AfMJV+Rb7Jw+vfudTsIET5LD
+	E9lNthtSwhk4yb4lIj4mgzEDFdKP6K3UbPZXMa9ZZk+Yn2csO20u50E5fMq+lJqaRzQ
+	NA+Etv36fZzmADqlaC7kLvfN66NsAPFhM+qdXuDE=
+Received: by mx.zoho.eu with SMTPS id 1761825628575601.0401082169022;
+	Thu, 30 Oct 2025 13:00:28 +0100 (CET)
+Message-ID: <5ac7fb86-07a2-4fc6-959e-524ff54afebf@demonlair.co.uk>
+Date: Thu, 30 Oct 2025 12:00:26 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: w012.hihonor.com (10.68.27.189) To a018.hihonor.com
- (10.68.17.250)
+User-Agent: Mozilla Thunderbird
+Subject: Re: fall back from direct to buffered I/O when stable writes are
+ required
+Content-Language: en-GB
+To: Dave Chinner <david@fromorbit.com>, Christoph Hellwig <hch@lst.de>
+Cc: Carlos Maiolino <cem@kernel.org>, Christian Brauner <brauner@kernel.org>,
+ Jan Kara <jack@suse.cz>, "Martin K. Petersen" <martin.petersen@oracle.com>,
+ linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-raid@vger.kernel.org,
+ linux-block@vger.kernel.org
+References: <20251029071537.1127397-1-hch@lst.de>
+ <aQNJ4iQ8vOiBQEW2@dread.disaster.area>
+From: Geoff Back <geoff@demonlair.co.uk>
+In-Reply-To: <aQNJ4iQ8vOiBQEW2@dread.disaster.area>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
-> Hi Jinji,
-> 
-> On Sun, Oct 26, 2025 at 01:05:07AM +0000, jinji zhong wrote:
-> > Hello everyone,
-> > 
-> > On Android, different applications have varying tolerance for
-> > decompression latency. Applications with higher tolerance for
-> > decompression latency are better suited for algorithms like ZSTD,
-> > which provides high compression ratio but slower decompression
-> > speed. Conversely, applications with lower tolerance for
-> > decompression latency can use algorithms like LZ4 or LZO that
-> > offer faster decompression but lower compression ratios. For example,
-> > lightweight applications (with few anonymous pages) or applications
-> > without foreground UI typically have higher tolerance for decompression
-> > latency.
-> > 
-> > Similarly, in memory allocation slow paths or under high CPU
-> > pressure, using algorithms with faster compression speeds might
-> > be more appropriate.
-> > 
-> > This patch introduces a per-cgroup compression priority mechanism,
-> > where different compression priorities map to different algorithms.
-> > This allows administrators to select appropriate compression
-> > algorithms on a per-cgroup basis.
-> > 
-> > Currently, this patch is experimental and we would greatly
-> > appreciate community feedback. I'm uncertain whether obtaining
-> > compression priority via get_cgroup_comp_priority in zram is the
-> > best approach. While this implementation is convenient, it seems
-> > somewhat unusual. Perhaps the next step should be to pass
-> > compression priority through page->private.
-> > 
-> 
-> Setting aside the issues in the implementation (like changing
-> compression algorithm of a cgroup while it already has some memory
+On 30/10/2025 11:20, Dave Chinner wrote:
+> On Wed, Oct 29, 2025 at 08:15:01AM +0100, Christoph Hellwig wrote:
+>> Hi all,
+>>
+>> we've had a long standing issue that direct I/O to and from devices that
+>> require stable writes can corrupt data because the user memory can be
+>> modified while in flight.  This series tries to address this by falling
+>> back to uncached buffered I/O.  Given that this requires an extra copy it
+>> is usually going to be a slow down, especially for very high bandwith
+>> use cases, so I'm not exactly happy about.
+> How many applications actually have this problem? I've not heard of
+> anyone encoutnering such RAID corruption problems on production
+> XFS filesystems -ever-, so it cannot be a common thing.
+>
+> So, what applications are actually tripping over this, and why can't
+> these rare instances be fixed instead of penalising the vast
+> majority of users who -don't have a problem to begin with-?
+I don't claim to have deep knowledge of what's going on here, but if I
+understand correctly the problem occurs only if the process submitting
+the direct I/O is breaking the semantic "contract" by modifying the page
+after submitting the I/O but before it completes.  Since the page
+referenced by the I/O is supposed to be immutable until the I/O
+completes, what about marking the page read only at time of submission
+and restoring the original page permissions after the I/O completes? 
+Then if the process writes to the page (triggering a fault) make a copy
+of the page that can be mapped back as writeable for the process - i.e.
+normal copy-on-write behaviour - and write a once-per-process dmesg
+warning that the process broke the direct I/O "contract".  And maybe tag
+the process with a flag that forces all future "direct I/O" requests
+made by that process to be automatically made buffered?
 
-Zram uses flags to track the compression priority of each page,
-which should be ok when the page is decompressed.
+That way, processes that behave correctly still get direct I/O, and
+those that do break the rules get degraded to buffered I/O.
 
-> compressed using older algo), I don't think memcg interface is the right
-> way to go about it. We usually add interfaces to memcg that have
-> hierarchical semantics.
+Unfortunately I don't know enough to know what the performance impact of
+changing the page permissions for every direct I/O would be.
 
-Thanks a lot, Shakeel. I got it.
+>
+>> I suspect we need a way to opt out of this for applications that know
+>> what they are doing, and I can think of a few ways to do that:
+> ....
+>
+>> In other words, they are all kinda horrible.
+> Forcing a performance regression on users, then telling them "you
+> need to work around the performance regression" is a pretty horrible
+> thing to do in the first place. Given that none of the workarounds
+> are any better, perhaps this approach should be discarded and some
+> other way of addressin the problem be considered?
+>
+> How about we do it the other way around? If the application is known
+> to corrupt stable page based block devices, then perhaps they should
+> be setting a "DIO is not supported" option somewhere. None of them
+> are pretty, but instead of affecting the whole world, it only
+> affects the rare applications that trigger this DIO issue.
+>
+> That seems like a much better way to deal with the issue to me;
+> most users are completely unaffected, and never have to worry about
+> (or even know about) this workaround for a very specific type of
+> weird application behaviour...
+Yes, I completely agree that we should not be penalising processes that
+obey the direct I/O rules for the benefit of those that do not.
 
-> Anyways if you want to have this feature, I think BPF might be the way
-> to get this flexibility without introducing any stable API and then you
-> can experiment and evaluate if this really helps.
+>
+> -Dave.
+>
+Regards,
+
+Geoff.
 
