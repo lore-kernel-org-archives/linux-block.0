@@ -1,159 +1,156 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87F1A325715
-	for <linux-block@vger.kernel.org>; Thu, 30 Oct 2025 04:54:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A788D37A3BB;
+	Thu, 30 Oct 2025 05:49:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761800070; cv=none; b=ANsZhiGqHXmoabdggE+3X4Kwmth/H9yEmm1LE0M8GXF7MbZhjInilpAlTmZAG9aysIuyfc2mVBEzAeof8+xiw6Jms4JSjs1H2Bt/7aX9klpNYEtkxiX80/WTRapzwmLWRmYe0d750hzcupX8OmAQkSvgSL5FvaItC20kvEtmzNk=
+	t=1761803365; cv=none; b=GdS/3tDjV3gqNPJwYnsVVt8HwK/ioJuFsOLh62jgPjwtFARtT/dPy0JI+I25SfjaWZqzPCP2Pkzgz++C15Ua5ZYYyBzlraEw50cqES4rFALmB1DO4+FzryvzNB4lx3RSshfqa4VhrFJNr0M3109O92el+OA2gNWz8PmR/UuwM3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761800070; c=relaxed/simple;
-	bh=VxZENKZkB6Z+YZgyLavSwJWdOW+IEJ+F18A1MxXcN5c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tsG02ZNYVzVghmq6GIjnTjBhXH7e1Gp7eHvxDoCLnYZBO78Z6/R8yddYvTgYDvmUO23oFX6clLvE0J8F8gBiqvhe40SxmprVy28fYCfubur8qxrXrUwsi3sIoWIKgliNtPEVtrRZndNReWPMTZCWmPp5pOLxm5N8ejGuVGOvWnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Tlgmo2/W; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1761803365; c=relaxed/simple;
+	bh=Lq/LBeiS9LAVCxiDbuPdhKp2+aH2lE5mBeLQBiP8qm8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TyeU8FgrHoCbAvd/hCtbOoR2CVQINxBmvhEjj/WcgiiY7Lrla7j/4owSslfjiC/UVJ+n2l4Wq5gPirS+SttM26CqTOCmNyfrV+3wEvg+YRiJb0c8ezhggtC3720XaqQcTxahfMRdCHiMPgFJTJr7EODDD+bKV1MNLveJmB53DJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Wd7gVS89; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Tlgmo2/W"
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-27eeafd4882so93075ad.0
-        for <linux-block@vger.kernel.org>; Wed, 29 Oct 2025 21:54:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761800068; x=1762404868; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ej/auf+/EmPMyY6GqjKBQhQwJpW0Nqnj+K+f6BktHE0=;
-        b=Tlgmo2/Wm9hutAIeSz4vU5YsTZNTyN3xDraA+m7VfEoqgfH3F38q2pD3IMe1HiaPLq
-         kVM2q4++zCzHD4I1OHRRuKfZ8dlPMdqipeVzk9hyMMsv8n+VZ5dkwA32zp0l4+nMS50i
-         laKQUIrUHXeqZkODCGEF7moR5hp4b2enn2mNyoLBRuSIikghXk9mbVfpcyaJHWYCX0BH
-         Ru/b0BWyOmMOCVQe1GlArVfGajNy0aYi5WrIv//RyjOYClkZ1cdxD+NI10uTncx32WMY
-         pCdf0105ls9dKoT6X0llI1lTvCzo9LTHh2d0QkDf5um89IHEfdFp0UXQMhjoyVHmzavT
-         klFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761800068; x=1762404868;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ej/auf+/EmPMyY6GqjKBQhQwJpW0Nqnj+K+f6BktHE0=;
-        b=podwkyL7NFAzxsSrCtfUx1z0bPTY8CwdtQcdq26GNSYj5aHFYo7hhx+whmaP49awCE
-         dh5Z1mF3VaUEECnB7BI0/YwmzrMWckWgtouhA6UEUKs5juFjbq5dX/87JcnZmyLhodob
-         91W9fmWvjYzi6lpfgxL3g3cSZTmrod7hRRyfVW8RGdSkFTA5cCAM/tAWNicRcZrkyZnD
-         qAkiUZMATJiUv9WWrJNjXVSaTA9yvaw2cwas/weTij0mupN/Jc7abK5hqxjZc9B9jW1u
-         AdA74NReZp3p5zTEu1o2fjZnHtpPaYP0/7XYlvFHMdfj3/MlwKQLP2UvOQ4FcTHkHeFZ
-         7JnA==
-X-Forwarded-Encrypted: i=1; AJvYcCXpxmEJtZwbpoRn6w+VqfRMJCO9or87ia35jUfNDikQ55AQH/RICsyvKLXLWf7uSmfvCGcnkl78wM9mMw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwkM527vsWLXZcbOEeuoARouVu/1SHhuLG0KPBrg/Y4pkr1IbfX
-	8/eqqvBrmxgbzGm+mJiVKxbdOy8tFF+p2X/xrxMhGN+ssfss40nQIXKWoQ3EhGOlng==
-X-Gm-Gg: ASbGncsKNdvjKUhPZANyMeqjQJOZpNxbu/2vPNRK/pDFsSZ84ToQAHlh8+Iy4EORBmt
-	F+oALQXgVFnuRt/mewcDTVJWVniyltv5DvbjyjXlBz5oH7mAOxdrZlS9uZ0/NSYVKN0E+HbvvWg
-	fZIml9Em03wPhX4hE3QHxvGkqIM4tPGEXH5FkEbpkRnpc8e9JB6HmfALpmYRzYQW5BIzi+gHLZ8
-	HkP7ra5JQSQJ56PSDOFHfieD3xj7xkz7aPl9e6npnWTm9dhYu6+U1XXmvSle19IuhbWKdvYhNlz
-	qaMZ8oFiYBGeL+JMpdzITas3RDW4o23XYNRcKQK3MVWvfakAM8sunu7OfSneLmIc1OS2OyKB+Q4
-	63kUc7SzAz5lPAMekQ+oXABExEdfJeEuD7IZawbnpudEcYo9osz88TBh3AaDH0xEaSXvaWE6mcK
-	AZwIl2LoG5vtemXWMmT5C5bmnCLWg+HhjOFJqCXdPOYtVVUuEQVQVysTzVKEEaWD/ySenyGDOTJ
-	0g6Q007uqcIITb0dZTqRTqzHdcANFf588Q=
-X-Google-Smtp-Source: AGHT+IF1aIVtDtqyINIaT4VsEA6+urTc/5YTHi0A6ZrXvPoa8CEW59KPabjqx3mO+bDkKlfEESX4Bg==
-X-Received: by 2002:a17:903:22c4:b0:290:d7fd:6297 with SMTP id d9443c01a7336-294ee1aad86mr3315295ad.2.1761800067395;
-        Wed, 29 Oct 2025 21:54:27 -0700 (PDT)
-Received: from google.com (235.215.125.34.bc.googleusercontent.com. [34.125.215.235])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29498d2317csm170936075ad.48.2025.10.29.21.54.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Oct 2025 21:54:26 -0700 (PDT)
-Date: Thu, 30 Oct 2025 04:54:21 +0000
-From: Carlos Llamas <cmllamas@google.com>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Keith Busch <kbusch@kernel.org>, Keith Busch <kbusch@meta.com>,
-	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-xfs@vger.kernel.org, linux-ext4@vger.kernel.org, hch@lst.de,
-	axboe@kernel.dk, Hannes Reinecke <hare@suse.de>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>
-Subject: Re: [PATCHv4 5/8] iomap: simplify direct io validity check
-Message-ID: <aQLvfayGPi1YezHV@google.com>
-References: <20250827141258.63501-1-kbusch@meta.com>
- <20250827141258.63501-6-kbusch@meta.com>
- <aP-c5gPjrpsn0vJA@google.com>
- <aP-hByAKuQ7ycNwM@kbusch-mbp>
- <aQFIGaA5M4kDrTlw@google.com>
- <20251028225648.GA1639650@google.com>
- <20251028230350.GB1639650@google.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Wd7gVS89"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59TMfRBJ019802;
+	Thu, 30 Oct 2025 05:48:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=X8Ei9e
+	sppa0RKeFtgzVtNBEWvlVXzVV21vq8eSCV3Jo=; b=Wd7gVS89Wzz6QQhsLeGLaN
+	ckQdqYrpgL+U7KY5SzZLIy6PUdASgzTKYYWMeZSeJq8bdWnEUH1PelvHIsaSc7Iq
+	uk4HiWQYXe2xagcleNJbQWLD2peH0pFqKspvKxhuaPQlVwA/Fy0+x/Ufw2hm/D+4
+	t7c6mmGA/3qbPibC2PJtLEUpt9RHGLxgvL6UqqAO83AYr1BcPhMTy4hls1EHF2k4
+	SM6Eo1gp09vDLC8/6RlkXr6+iIhPuXRSvtWaXMdP3bEOGih5bbfIAyBkxBCBloO0
+	rdc/OLGcVw4TzFBwzcBXqMzZcbcuH/omtgG6Z4Kpi1DWHU7URws5Ij7gSPjb/JQw
+	==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4a34agpm11-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 30 Oct 2025 05:48:54 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 59U1hLWd019170;
+	Thu, 30 Oct 2025 05:48:53 GMT
+Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4a33xy713h-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 30 Oct 2025 05:48:53 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 59U5mrgq46465398
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 30 Oct 2025 05:48:53 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EAEC458058;
+	Thu, 30 Oct 2025 05:48:52 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0A32E5805C;
+	Thu, 30 Oct 2025 05:48:48 +0000 (GMT)
+Received: from [9.109.198.245] (unknown [9.109.198.245])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 30 Oct 2025 05:48:47 +0000 (GMT)
+Message-ID: <ed1d37dc-e24d-4514-ba70-21ff1dc61381@linux.ibm.com>
+Date: Thu, 30 Oct 2025 11:18:46 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251028230350.GB1639650@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [REPORT] Possible circular locking dependency on 6.18-rc2 in
+ blkg_conf_open_bdev_frozen+0x80/0xa0
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Bart Van Assche <bvanassche@acm.org>, David Wei <dw@davidwei.uk>,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org, hch@lst.de,
+        hare@suse.de, dlemoal@kernel.org, axboe@kernel.dk, tj@kernel.org,
+        josef@toxicpanda.com, gjoyce@ibm.com, lkp@intel.com,
+        oliver.sang@intel.com, yukuai@fnnas.com
+References: <63c97224-0e9a-4dd8-8706-38c10a1506e9@davidwei.uk>
+ <5b403c7c-67f5-4f42-a463-96aa4a7e6af8@linux.ibm.com>
+ <5c29fa84-3a2c-44be-9842-f0230e7b46dd@acm.org>
+ <544b60be-376c-4891-95a4-361b4a207b8a@linux.ibm.com>
+ <aQHPgJNUW8aPPXTO@fedora>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <aQHPgJNUW8aPPXTO@fedora>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=K+gv3iWI c=1 sm=1 tr=0 ts=6902fc46 cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VwQbUJbxAAAA:8 a=i0EeH86SAAAA:8 a=O3u3lyOBOEInR-bzjhIA:9 a=QEXdDO2ut3YA:10
+ a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-ORIG-GUID: MretWpkvEj0PpNKjTGasGnimotDX7Sz6
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI4MDE2NiBTYWx0ZWRfX69+iXaDJhVKN
+ M9uC2p2LrcvMeExjIlJBlwpaHUKSth3QHJ2XaPaGL0Cxu6w0PND9qkmNZXLzWjtAAx4r/7T5Owg
+ xw+VLwNv4NBp9SzeOI8ulvFIyyHAiwLyovcdvxl2Hle3GIx4R7Kt9TEXFXAH9MqgKaD25Yw4zQN
+ lyhXbgzbYeQvhE1MObvF9mrb4Ex4zogRXHmrSAXLruipYCEfDBdbG+XoBLgPgXSDH0yGh0jAJI4
+ 3nYu36YtzBMoEyeynt3iIXtXvAU+iBo80XBDg80oqkcJ2++hKHMIXOgX+CACfNdoQSNdHJWMTni
+ vVfXigCT99d6gn4+btdEWL6IKy/Q8Agmzv6l+Mr5ybot/LuvbIfge9rUjJcNXzlFpdpRqsomQQ/
+ vcqokJYSsGBH76GdiSLerSrKu1VHKg==
+X-Proofpoint-GUID: MretWpkvEj0PpNKjTGasGnimotDX7Sz6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-10-30_01,2025-10-29_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0 priorityscore=1501 impostorscore=0 suspectscore=0
+ adultscore=0 clxscore=1011 malwarescore=0 phishscore=0 spamscore=0
+ bulkscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.19.0-2510240000
+ definitions=main-2510280166
 
-On Tue, Oct 28, 2025 at 11:03:50PM +0000, Eric Biggers wrote:
-> On Tue, Oct 28, 2025 at 10:56:48PM +0000, Eric Biggers wrote:
-> > On Tue, Oct 28, 2025 at 10:47:53PM +0000, Carlos Llamas wrote:
-> > > Ok, I did a bit more digging. I'm using f2fs but the problem in this
-> > > case is the blk_crypto layer. The OP_READ request goes through
-> > > submit_bio() which then calls blk_crypto_bio_prep() and if the bio has
-> > > crypto context then it checks for bio_crypt_check_alignment().
-> > > 
-> > > This is where the LTP tests fails the alignment. However, the propagated
-> > > error goes through "bio->bi_status = BLK_STS_IOERR" which in bio_endio()
-> > > get translates to EIO due to blk_status_to_errno().
-> > > 
-> > > I've verified this restores the original behavior matching the LTP test,
-> > > so I'll write up a patch and send it a bit later.
-> > > 
-> > > diff --git a/block/blk-crypto.c b/block/blk-crypto.c
-> > > index 1336cbf5e3bd..a417843e7e4a 100644
-> > > --- a/block/blk-crypto.c
-> > > +++ b/block/blk-crypto.c
-> > > @@ -293,7 +293,7 @@ bool __blk_crypto_bio_prep(struct bio **bio_ptr)
-> > >  	}
-> > >  
-> > >  	if (!bio_crypt_check_alignment(bio)) {
-> > > -		bio->bi_status = BLK_STS_IOERR;
-> > > +		bio->bi_status = BLK_STS_INVAL;
-> > >  		goto fail;
-> > >  	}
-> > 
-> > That change looks fine, but I'm wondering how this case was reached in
-> > the first place.  Upper layers aren't supposed to be submitting
-> > misaligned bios like this.  For example, ext4 and f2fs require
-> > filesystem logical block size alignment for direct I/O on encrypted
-> > files.  They check for this early, before getting to the point of
-> > submitting a bio, and fall back to buffered I/O if needed.
-> 
-> I suppose it's this code in f2fs_should_use_dio():
-> 
-> 	/*
-> 	 * Direct I/O not aligned to the disk's logical_block_size will be
-> 	 * attempted, but will fail with -EINVAL.
-> 	 *
-> 	 * f2fs additionally requires that direct I/O be aligned to the
-> 	 * filesystem block size, which is often a stricter requirement.
-> 	 * However, f2fs traditionally falls back to buffered I/O on requests
-> 	 * that are logical_block_size-aligned but not fs-block aligned.
-> 	 *
-> 	 * The below logic implements this behavior.
-> 	 */
-> 	align = iocb->ki_pos | iov_iter_alignment(iter);
-> 	if (!IS_ALIGNED(align, i_blocksize(inode)) &&
-> 	    IS_ALIGNED(align, bdev_logical_block_size(inode->i_sb->s_bdev)))
-> 		return false;
-> 
-> So it relies on the alignment check in iomap in the case where the
-> request is neither logical_block_size nor filesystem_block_size aligned.
-> 
-> f2fs_should_use_dio() probably should just handle that case explicitly.
-> 
-> But making __blk_crypto_bio_prep() use a better error code sounds good
-> too.
 
-I realize this is a bit of a band-aid but here is the patch to fail the
-bad alignment with EINVAL:
-https://lore.kernel.org/all/20251030043919.2787231-1-cmllamas@google.com/
 
-As for the more achitectural fix suggested by Christoph, I'm absolutely
-out of my depth so I can't comment on that.
+On 10/29/25 1:55 PM, Ming Lei wrote:
+> On Tue, Oct 28, 2025 at 06:36:20PM +0530, Nilay Shroff wrote:
+>>
+>>
+>> On 10/28/25 2:00 AM, Bart Van Assche wrote:
+>>> On 10/23/25 9:54 PM, Nilay Shroff wrote:
+>>>> IMO, we need to make lockdep learn about this differences by assigning separate
+>>>> lockdep key/class for each queue's q->debugfs_mutex to avoid this false positive.
+>>>> As this is another report with the same false-positive lockdep splat, I think we
+>>>> should address this.
+>>>>
+>>>> Any other thoughts or suggestions from others on the list?
+>>>
+>>> Please take a look at lockdep_register_key() and
+>>> lockdep_unregister_key(). I introduced these functions six years ago to
+>>> suppress false positive lockdep complaints like this one.
+>>>
+>> Thanks Bart! I'll send out patch with the above proposed fix.
+> 
+> IMO, that may not be a smart approach, here the following dependency should
+> be cut:
+> #4 (&q->q_usage_counter(io)#2){++++}-{0:0}:
+> 
+> ...
+> 
+> #1 (&q->debugfs_mutex){+.+.}-{4:4}:
+> #0 (&q->rq_qos_mutex){+.+.}-{4:4}:
+> 
+> Why is there the dependency between `#1 (&q->debugfs_mutex)` and `#0 (&q->rq_qos_mutex)`?
+> 
+Okay this also makes sense: if we could remove the ->rq_qos_mutex depedency on
+->debug_fs_mutex. However I also think lockdep may, even after cutting depedency,
+still generate spurious splat (due to it's not able to distinguish between 
+distinct ->debugfs_mutex instances). We may check that letter if that really
+happens.  
 
-Cheers,
---
-Carlos Llamas
+> I remember that Yu Kuai is working on remove it:
+> 
+> https://lore.kernel.org/linux-block/20251014022149.947800-1-yukuai3@huawei.com/
+> 
+Let me add Yu Kuai in the Cc. BTW, of late I saw my emails to Yu are bouncing.
+But I found another email of Yu from lore, so I am adding it here - hope, this
+is the correct email.
+
+Thanks,
+--Nilay
+
