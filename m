@@ -1,348 +1,163 @@
-Received: from fhigh-a1-smtp.messagingengine.com (fhigh-a1-smtp.messagingengine.com [103.168.172.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51A1E3271F8;
-	Thu, 30 Oct 2025 20:38:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D12B82BEC30
+	for <linux-block@vger.kernel.org>; Thu, 30 Oct 2025 22:02:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761856724; cv=none; b=Ov73VzzqTfXZqbqHftEvaZF+5Y97CisqJh1q4EERtOheK2NU5OT/dy7VBOwMp3QtqSWozHoC6CRWLzlwiSX6IOgWydbURRFmlVXVpnPIcoHdOxFyggLtJk4ilbOU7cJyMGwLsOwMwHB00F/mpH+R1AfliT+1Nm1nJtTpAFQh9s0=
+	t=1761861769; cv=none; b=Uhhh7xcZJYtiXm+KNw8D4dsPTkC1CbEZHFWJeEB6cVXdVKhCwLN6sgtQnLWpOLZufupbFejWkekt02+UQGguGUVO3HW036YAp6SuiBWm5d1KMPjPTQ0KJgPws+bUbOerGXKtuaOXmOFbBMoPkjWIKE2tmGuYKtp2XUIyWCHD6x0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761856724; c=relaxed/simple;
-	bh=Otc/CbhHm7gxjIcqJPP+5I/QV+QqqLRp7pDOdr60Iuk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Wq3hD2Nl5aQaSYo7/b/R7x5wWVAA4vA0lCwTt6kV57ewuFDhzxb1F///LbMIyV5RE4boMBlSae/dmz5P3IMDq+YyCpJdx1x1Coa7GQIyjgmkVHc825THfxn4vWsXPESlsdj+xcUuQX1y+Jcjuxdzi/9QH2E5bayumX4Hf0QxyeQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=DsC38lET; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=yWVHoBY1; arc=none smtp.client-ip=103.168.172.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
+	s=arc-20240116; t=1761861769; c=relaxed/simple;
+	bh=UvRyiZNqMNUKokDlWDsbCD3weBxD2oq5vMb44qnepsw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fZrbXlzYFq73m7XkqMHSndRG0pXlu3Bqvv0UcV+/tnUKyHbdtss8FNV5um3l9svBjKvMojX2Yf+wnjcfA2gtNqigJjygxhXPMJcWFOZqL0HyZk63rto7A0Ww//7SzBskLVhN17CIrEFq9Y7YgfwQUDu57CefMZCqwZhAqr66oGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=YW+HpKG9; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="DsC38lET";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="yWVHoBY1"
-Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 8C9A014001DA;
-	Thu, 30 Oct 2025 16:38:41 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-02.internal (MEProxy); Thu, 30 Oct 2025 16:38:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1761856721;
-	 x=1761943121; bh=p/8nyxWirOj4W+hYeRtMTG+81adajTiGVYuh/z6LXOE=; b=
-	DsC38lETCmk/UCR0NCEwSG/uMsWXv3KF8nqtv5mXrxnOSNXAuNpeCuWFpcBvb+Rd
-	qJBjT5+eedr1G7iNzvqfrWIs8YRmqr2Wn21vsB0Emgw2ammXeAjJNTKT8X3CRF7f
-	sgThj4w6Go/EWjZJV5hnPtkmvfi6+pv64RwRGY8broPbxr/l47tuMqaHoojfoTlR
-	x8NDbZZySjAGPtlXTOwEeVtGqPiFwdzOMit5oo4Jlrg3Xiv12ZeKHlQsjJ2dfLoo
-	Dd4zchU1KSWfT+xErx3Qp84XfWS++Q21slSUIXTr2Vf+w51bpou71HnP2egRiZFl
-	JYynwj6jAFgGlfam/THdRQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1761856721; x=
-	1761943121; bh=p/8nyxWirOj4W+hYeRtMTG+81adajTiGVYuh/z6LXOE=; b=y
-	WVHoBY1ck0fhOfaNyfXlK3MsltrJ16L4JMUjk4/8F1vhiZvK9+ByZAPE2Fr+lDEn
-	31wuiMAdQO9JUckxnFimEg9qgiR7Buz2VVu3gcL2K4BISNU112JvnuEfmtkVFPU/
-	WkKn9wiMCn/ibulsR45YnPo3Fgmy6RI+6Fk3aMG8co7oZG18ttXuQ58m649z8toG
-	uT5IEDW7hMQMIpoPYi22aGzWDJxfD1aqI4Iw7ZnDH3Ltcib06o+rASeKq7T4jlRO
-	a3slUeUe0CCl0KdMKPV16WqcZAYF7H/sqwJXPOUxsj0SzU4xV0yEV9o7Tp0CRH3k
-	UOAJNTt/tx/Lco0qxnstA==
-X-ME-Sender: <xms:z8wDaZLo5dD7ZxDV6II0FqH4O7jccYwOPy06udjLAl4RXkxI_trqqw>
-    <xme:z8wDaW3NyxbzGjLL5VL8Xo8PzYRVFCOzMbstflMQqva5Wle0FjF3VlMyKQrzHC5El
-    q3grRf5LAMq5wsIJswOZBD4TQxX7zoQ86zYjcR_77WmesqtyRs2M7A>
-X-ME-Received: <xmr:z8wDaVIW0bK32xwhEPjPTrLSw9kl2duIIdiJN2tr1QWnNDZ4iA2BxWRaG40>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduieejheelucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkjghfgggtgfesthejredttddtvdenucfhrhhomheptehlvgigucgh
-    ihhllhhirghmshhonhcuoegrlhgvgiesshhhrgiisghothdrohhrgheqnecuggftrfgrth
-    htvghrnhepteetudelgeekieegudegleeuvdffgeehleeivddtfeektdekkeehffehudet
-    hffhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
-    hlvgigsehshhgriigsohhtrdhorhhgpdhnsggprhgtphhtthhopedvgedpmhhouggvpehs
-    mhhtphhouhhtpdhrtghpthhtoheplhgvohhnsehkvghrnhgvlhdrohhrghdprhgtphhtth
-    hopegrlhgvgidrfihilhhlihgrmhhsohhnsehrvgguhhgrthdrtghomhdprhgtphhtthho
-    pehlvghonhhrohesnhhvihguihgrrdgtohhmpdhrtghpthhtohepjhhgghesnhhvihguih
-    grrdgtohhmpdhrtghpthhtoheprghkphhmsehlihhnuhigqdhfohhunhgurghtihhonhdr
-    ohhrghdprhgtphhtthhopegshhgvlhhgrggrshesghhoohhglhgvrdgtohhmpdhrtghpth
-    htoheptghhrhhishhtihgrnhdrkhhovghnihhgsegrmhgurdgtohhmpdhrtghpthhtohep
-    ughrihdquggvvhgvlheslhhishhtshdrfhhrvggvuggvshhkthhophdrohhrghdprhgtph
-    htthhopehiohhmmhhusehlihhsthhsrdhlihhnuhigrdguvghv
-X-ME-Proxy: <xmx:z8wDaaMiGwbWX7czDe5iiad6EIpQFwJ1yQIteZ0s-dAUbUDysgOuAQ>
-    <xmx:z8wDaWyOXEdvkv2nByzkDyCMSCs83bIcsse_dM2y2-1KvLiBXmR81Q>
-    <xmx:z8wDaSIr0J6kFZz5NMvG-wATtPZO5nIJ7XYS0F5DucQqhu-KLzZWag>
-    <xmx:z8wDaVrwkjuhIMeJQEscr9oJy00Glt_Gj0UMB1ES18qD9i2fTKlcuQ>
-    <xmx:0cwDacSuknghBUpyXTe85wMhy52PcPg_FWLjbD2hGGkyV4h7HjHD1dZT>
-Feedback-ID: i03f14258:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 30 Oct 2025 16:38:37 -0400 (EDT)
-Date: Thu, 30 Oct 2025 14:38:36 -0600
-From: Alex Williamson <alex@shazbot.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Alex Williamson <alex.williamson@redhat.com>, Leon Romanovsky
- <leonro@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>, Andrew Morton
- <akpm@linux-foundation.org>, Bjorn Helgaas <bhelgaas@google.com>, Christian
- =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>,
- dri-devel@lists.freedesktop.org, iommu@lists.linux.dev, Jens Axboe
- <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
- linaro-mm-sig@lists.linaro.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
- linux-mm@kvack.org, linux-pci@vger.kernel.org, Logan Gunthorpe
- <logang@deltatee.com>, Marek Szyprowski <m.szyprowski@samsung.com>, Robin
- Murphy <robin.murphy@arm.com>, Sumit Semwal <sumit.semwal@linaro.org>,
- Vivek Kasireddy <vivek.kasireddy@intel.com>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v5 9/9] vfio/pci: Add dma-buf export support for MMIO
- regions
-Message-ID: <20251030143836.66cdf116@shazbot.org>
-In-Reply-To: <72ecaa13864ca346797e342d23a7929562788148.1760368250.git.leon@kernel.org>
-References: <cover.1760368250.git.leon@kernel.org>
-	<72ecaa13864ca346797e342d23a7929562788148.1760368250.git.leon@kernel.org>
+	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="YW+HpKG9"
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2698384978dso12830365ad.0
+        for <linux-block@vger.kernel.org>; Thu, 30 Oct 2025 15:02:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1761861766; x=1762466566; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=e5LA5B446ZeXEQHrU7Ra5D5BiNT5+4vY/ARHOc1M/cs=;
+        b=YW+HpKG9ayD6GegW6NezJzkN0SqzwrSxdvOG4apPJFCam0i29cg6u7OEmBHmVMSo2m
+         cw5WLbdYG5mbAfwc0d1f5Xy1bwdOlzt4WlWBwP4ITVf8/Ak3y4z9Rraa7vRLhoKSZALd
+         0A/nlP1HKNhGW1hdFfr+fXnFb52FUNUNOkEZAi8tMw7ALeCyP5+adoXlVQxLKpFGNpv7
+         WBTmq36FHtV9zCeSArzoi+0SqPZflrlyiE20uaF/RMRjoUoHHIBOQAx3M26Ulg+ku69m
+         5Zg7PBRph9+HTG/HiDyAYoI2IExdn2859P4c+ueP9MnWc1OmXg109rVGCee5U321jzDd
+         tCeg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761861766; x=1762466566;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=e5LA5B446ZeXEQHrU7Ra5D5BiNT5+4vY/ARHOc1M/cs=;
+        b=FA84vFjGUGGkDyN+kA5HzDe6wkLHB57h5IopSjR6N9bDfzs1ri2DJxrDF4an7dP6bM
+         tbaLp2o3vLL5U6AwRfB11bfphxSeZ4DUTePMYNTvDeUC+CxLPXUcuEmVpjep0qu7o6Xp
+         4bzl67IrD7Qb50TAdW6pSKAEWWJAk6+/SFOTSwLAAt6IgTHqxrS2GapiSa1yhO+hMYO/
+         2gnHTSZD2xYUuXx3Dz/4Pyg7hIr4Jj7lxSLjLARuvYKtsnD5n/yA1a4qcUuEh9WoKai7
+         6E/Mr3C3v7ifRv/2eo6qf9FoR+ayu9BU9HJt+LTmTzhZpxZ6b3+iDS2YxW2U2CDs5c2d
+         q8Kg==
+X-Forwarded-Encrypted: i=1; AJvYcCV1Nybsah2wuVYONFqkuKZ3s7QzgCK3UPp9rwE0gn/PX/vaciazb6TJeNiCsLgm2ZQrtVR1MwLTCSMdTA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx48oIg6pa9dUD3pRiktps6jKcnzK82v8RbcGYVRtJMdW92MzXp
+	T1LoaN7HMfA5NX8AfrGYCscW2cSMfNyVnYSa+bXA/K1xIjgySZPs6z5BC3DAuKwjR/s=
+X-Gm-Gg: ASbGncuGvu/bhBTB8TScoPO//A1IoBssX7jIjNJtk39TWZkqfKtMBciIPAKICvfCJVl
+	VZpe0PXFXJnFxEA0Nqd0jLRe696855+BwZWC81mM/2TBz3Nc21iXsYfHwC81nQMvSxxBWn56qLk
+	JGu5NGiItPu9t3W32VzKATjRk+Kv0e1MgNzGE3ePjrucVV59KHh5Z7xnmyIigA/a4U9BxOM2fXj
+	GTJwfBionTPyyg/eMc69X5Mdp0h9SvfsIXDUPTmzMh5w/ZJ2P9YdGcLUgqEC87OKSXsplQjrytv
+	J8Ex9YHz26nng2npMtFpso7FfcjVe0DxIuGbaWYt742G/Gb5o6+d/XKc0fMS0Ojs2aPrPQ1m/MN
+	AOl2yqnk31u+iEtch0CYyJthAo5gBKHsQ8ne9Qt1O03lHmVuLIz3R0ZtwkKFRMXqaOSQHo4scxp
+	lcMUiGOYNp7t2T6VLwXdkJ7Jbeip37O8ukRbK45QLnBhm63Ed2/Wk=
+X-Google-Smtp-Source: AGHT+IEUK4VY3vlv2EG4ggLi7rfSvrtgNznZMJVA1McqV5dhVhLohhKpNsIroL+zzWYFGo32TwDWLg==
+X-Received: by 2002:a17:903:2312:b0:24c:7b94:2f53 with SMTP id d9443c01a7336-2951a420e44mr15402805ad.6.1761861765826;
+        Thu, 30 Oct 2025 15:02:45 -0700 (PDT)
+Received: from dread.disaster.area (pa49-181-58-136.pa.nsw.optusnet.com.au. [49.181.58.136])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2951ab8c1dfsm6755835ad.75.2025.10.30.15.02.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Oct 2025 15:02:45 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.98.2)
+	(envelope-from <david@fromorbit.com>)
+	id 1vEajC-00000004HIE-0S7o;
+	Fri, 31 Oct 2025 09:02:42 +1100
+Date: Fri, 31 Oct 2025 09:02:42 +1100
+From: Dave Chinner <david@fromorbit.com>
+To: Geoff Back <geoff@demonlair.co.uk>
+Cc: Christoph Hellwig <hch@lst.de>, Carlos Maiolino <cem@kernel.org>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-raid@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: Re: fall back from direct to buffered I/O when stable writes are
+ required
+Message-ID: <aQPggv2LK4kkXj3L@dread.disaster.area>
+References: <20251029071537.1127397-1-hch@lst.de>
+ <aQNJ4iQ8vOiBQEW2@dread.disaster.area>
+ <5ac7fb86-07a2-4fc6-959e-524ff54afebf@demonlair.co.uk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <5ac7fb86-07a2-4fc6-959e-524ff54afebf@demonlair.co.uk>
 
-On Mon, 13 Oct 2025 18:26:11 +0300
-Leon Romanovsky <leon@kernel.org> wrote:
-> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> index fe247d0e2831..56b1320238a9 100644
-> --- a/drivers/vfio/pci/vfio_pci_core.c
-> +++ b/drivers/vfio/pci/vfio_pci_core.c
-> @@ -1511,6 +1520,19 @@ int vfio_pci_core_ioctl_feature(struct vfio_device *device, u32 flags,
->  		return vfio_pci_core_pm_exit(vdev, flags, arg, argsz);
->  	case VFIO_DEVICE_FEATURE_PCI_VF_TOKEN:
->  		return vfio_pci_core_feature_token(vdev, flags, arg, argsz);
-> +	case VFIO_DEVICE_FEATURE_DMA_BUF:
-> +		if (device->ops->ioctl != vfio_pci_core_ioctl)
-> +			/*
-> +			 * Devices that overwrite general .ioctl() callback
-> +			 * usually do it to implement their own
-> +			 * VFIO_DEVICE_GET_REGION_INFO handlerm and they present
+On Thu, Oct 30, 2025 at 12:00:26PM +0000, Geoff Back wrote:
+> On 30/10/2025 11:20, Dave Chinner wrote:
+> > On Wed, Oct 29, 2025 at 08:15:01AM +0100, Christoph Hellwig wrote:
+> >> Hi all,
+> >>
+> >> we've had a long standing issue that direct I/O to and from devices that
+> >> require stable writes can corrupt data because the user memory can be
+> >> modified while in flight.  This series tries to address this by falling
+> >> back to uncached buffered I/O.  Given that this requires an extra copy it
+> >> is usually going to be a slow down, especially for very high bandwith
+> >> use cases, so I'm not exactly happy about.
+> > How many applications actually have this problem? I've not heard of
+> > anyone encoutnering such RAID corruption problems on production
+> > XFS filesystems -ever-, so it cannot be a common thing.
+> >
+> > So, what applications are actually tripping over this, and why can't
+> > these rare instances be fixed instead of penalising the vast
+> > majority of users who -don't have a problem to begin with-?
+> I don't claim to have deep knowledge of what's going on here, but if I
+> understand correctly the problem occurs only if the process submitting
+> the direct I/O is breaking the semantic "contract" by modifying the page
+> after submitting the I/O but before it completes.  Since the page
+> referenced by the I/O is supposed to be immutable until the I/O
+> completes, what about marking the page read only at time of submission
+> and restoring the original page permissions after the I/O completes? 
+> Then if the process writes to the page (triggering a fault) make a copy
+> of the page that can be mapped back as writeable for the process - i.e.
+> normal copy-on-write behaviour
 
-Typo, "handlerm"
+There's nothing new in this world - this is pretty much how the IO
+paths in Irix worked back in the mid 1990s. The transparent
+zero-copy buffered read and zero-copy network send paths that this
+enabled was one of the reasons why Irix was always at the top of the
+IO performance charts, even though the CPUs were underpowered
+compared to the competition...
 
-> +			 * different BAR information from the real PCI.
-> +			 *
-> +			 * DMABUF relies on real PCI information.
-> +			 */
-> +			return -EOPNOTSUPP;
-> +
-> +		return vfio_pci_core_feature_dma_buf(vdev, flags, arg, argsz);
->  	default:
->  		return -ENOTTY;
->  	}
-...
-> @@ -2459,6 +2482,7 @@ static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
->  			break;
->  		}
->  
-> +		vfio_pci_dma_buf_move(vdev, true);
->  		vfio_pci_zap_bars(vdev);
->  	}
->  
-> @@ -2482,6 +2506,10 @@ static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
->  
->  	ret = pci_reset_bus(pdev);
->  
-> +	list_for_each_entry(vdev, &dev_set->device_list, vdev.dev_set_list)
-> +		if (__vfio_pci_memory_enabled(vdev))
-> +			vfio_pci_dma_buf_move(vdev, false);
-> +
->  	vdev = list_last_entry(&dev_set->device_list,
->  			       struct vfio_pci_core_device, vdev.dev_set_list);
->  
+> - and write a once-per-process dmesg
+> warning that the process broke the direct I/O "contract". 
 
-This needs to be placed in the existing undo loop with the up_write(),
-otherwise it can be missed in the error case.
+Yes, there was occasionally an application that tried to re-use
+buffers before the kernel was finished with them and triggered the
+COW path.  However, these were easily identified and generally fixed
+pretty quickly by the application vendors because performance was
+the very reason they were deploying IO intensive applications on
+SGI/Irix platforms in the first place....
 
-> diff --git a/drivers/vfio/pci/vfio_pci_dmabuf.c b/drivers/vfio/pci/vfio_pci_dmabuf.c
-> new file mode 100644
-> index 000000000000..eaba010777f3
-> --- /dev/null
-> +++ b/drivers/vfio/pci/vfio_pci_dmabuf.c
-> +static unsigned int calc_sg_nents(struct vfio_pci_dma_buf *priv,
-> +				  struct dma_iova_state *state)
-> +{
-> +	struct phys_vec *phys_vec = priv->phys_vec;
-> +	unsigned int nents = 0;
-> +	u32 i;
-> +
-> +	if (!state || !dma_use_iova(state))
-> +		for (i = 0; i < priv->nr_ranges; i++)
-> +			nents += DIV_ROUND_UP(phys_vec[i].len, UINT_MAX);
-> +	else
-> +		/*
-> +		 * In IOVA case, there is only one SG entry which spans
-> +		 * for whole IOVA address space, but we need to make sure
-> +		 * that it fits sg->length, maybe we need more.
-> +		 */
-> +		nents = DIV_ROUND_UP(priv->size, UINT_MAX);
+> And maybe tag
+> the process with a flag that forces all future "direct I/O" requests
+> made by that process to be automatically made buffered?
+>
+> That way, processes that behave correctly still get direct I/O, and
+> those that do break the rules get degraded to buffered I/O.
 
-I think we're arguably running afoul of the coding style standard here
-that this is not a single simple statement and should use braces.
+Why? The cost of the COW for the user page is the same as copying
+the data in the first place. However, if COW faults are rare, then
+allowing DIO to continue will result in better performance overall.
 
-> +
-> +	return nents;
-> +}
-> +
-> +static struct sg_table *
-> +vfio_pci_dma_buf_map(struct dma_buf_attachment *attachment,
-> +		     enum dma_data_direction dir)
-> +{
-> +	struct vfio_pci_dma_buf *priv = attachment->dmabuf->priv;
-> +	struct dma_iova_state *state = attachment->priv;
-> +	struct phys_vec *phys_vec = priv->phys_vec;
-> +	unsigned long attrs = DMA_ATTR_MMIO;
-> +	unsigned int nents, mapped_len = 0;
-> +	struct scatterlist *sgl;
-> +	struct sg_table *sgt;
-> +	dma_addr_t addr;
-> +	int ret;
-> +	u32 i;
-> +
-> +	dma_resv_assert_held(priv->dmabuf->resv);
-> +
-> +	if (priv->revoked)
-> +		return ERR_PTR(-ENODEV);
-> +
-> +	sgt = kzalloc(sizeof(*sgt), GFP_KERNEL);
-> +	if (!sgt)
-> +		return ERR_PTR(-ENOMEM);
-> +
-> +	nents = calc_sg_nents(priv, state);
-> +	ret = sg_alloc_table(sgt, nents, GFP_KERNEL | __GFP_ZERO);
-> +	if (ret)
-> +		goto err_kfree_sgt;
-> +
-> +	sgl = sgt->sgl;
-> +
-> +	for (i = 0; i < priv->nr_ranges; i++) {
-> +		if (!state) {
-> +			addr = pci_p2pdma_bus_addr_map(priv->provider,
-> +						       phys_vec[i].paddr);
-> +		} else if (dma_use_iova(state)) {
-> +			ret = dma_iova_link(attachment->dev, state,
-> +					    phys_vec[i].paddr, 0,
-> +					    phys_vec[i].len, dir, attrs);
-> +			if (ret)
-> +				goto err_unmap_dma;
-> +
-> +			mapped_len += phys_vec[i].len;
-> +		} else {
-> +			addr = dma_map_phys(attachment->dev, phys_vec[i].paddr,
-> +					    phys_vec[i].len, dir, attrs);
-> +			ret = dma_mapping_error(attachment->dev, addr);
-> +			if (ret)
-> +				goto err_unmap_dma;
-> +		}
-> +
-> +		if (!state || !dma_use_iova(state))
-> +			sgl = fill_sg_entry(sgl, phys_vec[i].len, addr);
-> +	}
-> +
-> +	if (state && dma_use_iova(state)) {
-> +		WARN_ON_ONCE(mapped_len != priv->size);
-> +		ret = dma_iova_sync(attachment->dev, state, 0, mapped_len);
-> +		if (ret)
-> +			goto err_unmap_dma;
-> +		sgl = fill_sg_entry(sgl, mapped_len, state->addr);
-> +	}
-> +
-> +	/*
-> +	 * SGL must be NULL to indicate that SGL is the last one
-> +	 * and we allocated correct number of entries in sg_alloc_table()
-> +	 */
-> +	WARN_ON_ONCE(sgl);
-> +	return sgt;
-> +
-> +err_unmap_dma:
-> +	if (!i || !state)
-> +		; /* Do nothing */
-> +	else if (dma_use_iova(state))
-> +		dma_iova_destroy(attachment->dev, state, mapped_len, dir,
-> +				 attrs);
-> +	else
-> +		for_each_sgtable_dma_sg(sgt, sgl, i)
-> +			dma_unmap_phys(attachment->dev, sg_dma_address(sgl),
-> +					sg_dma_len(sgl), dir, attrs);
+The other side of this is that falling back to buffered IO for AIO
+is an -awful thing to do-. You no longer get AIO behaviour - reads
+will block on IO, and writes will block on reads and other writes...
 
-Same, here for braces.
+> Unfortunately I don't know enough to know what the performance impact of
+> changing the page permissions for every direct I/O would be.
 
-> +	sg_free_table(sgt);
-> +err_kfree_sgt:
-> +	kfree(sgt);
-> +	return ERR_PTR(ret);
-> +}
-> +
-> +static void vfio_pci_dma_buf_unmap(struct dma_buf_attachment *attachment,
-> +				   struct sg_table *sgt,
-> +				   enum dma_data_direction dir)
-> +{
-> +	struct vfio_pci_dma_buf *priv = attachment->dmabuf->priv;
-> +	struct dma_iova_state *state = attachment->priv;
-> +	unsigned long attrs = DMA_ATTR_MMIO;
-> +	struct scatterlist *sgl;
-> +	int i;
-> +
-> +	if (!state)
-> +		; /* Do nothing */
-> +	else if (dma_use_iova(state))
-> +		dma_iova_destroy(attachment->dev, state, priv->size, dir,
-> +				 attrs);
-> +	else
-> +		for_each_sgtable_dma_sg(sgt, sgl, i)
-> +			dma_unmap_phys(attachment->dev, sg_dma_address(sgl),
-> +				       sg_dma_len(sgl), dir, attrs);
-> +
+On high performance storage, it will almost certainly be less of an
+impact than forcing all IO to be bounce buffered through the page
+cache.
 
-Here too.
-
-> +	sg_free_table(sgt);
-> +	kfree(sgt);
-> +}
-...
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index 75100bf009ba..63214467c875 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -1478,6 +1478,31 @@ struct vfio_device_feature_bus_master {
->  };
->  #define VFIO_DEVICE_FEATURE_BUS_MASTER 10
->  
-> +/**
-> + * Upon VFIO_DEVICE_FEATURE_GET create a dma_buf fd for the
-> + * regions selected.
-> + *
-> + * open_flags are the typical flags passed to open(2), eg O_RDWR, O_CLOEXEC,
-> + * etc. offset/length specify a slice of the region to create the dmabuf from.
-> + * nr_ranges is the total number of (P2P DMA) ranges that comprise the dmabuf.
-> + *
-
-Probably worth noting that .flags should be zero, I see we enforce
-that.  Thanks,
-
-Alex
-
-> + * Return: The fd number on success, -1 and errno is set on failure.
-> + */
-> +#define VFIO_DEVICE_FEATURE_DMA_BUF 11
-> +
-> +struct vfio_region_dma_range {
-> +	__u64 offset;
-> +	__u64 length;
-> +};
-> +
-> +struct vfio_device_feature_dma_buf {
-> +	__u32	region_index;
-> +	__u32	open_flags;
-> +	__u32   flags;
-> +	__u32   nr_ranges;
-> +	struct vfio_region_dma_range dma_ranges[];
-> +};
-> +
->  /* -------- API for Type1 VFIO IOMMU -------- */
->  
->  /**
-
+-Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
