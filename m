@@ -1,147 +1,97 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 544422E6CDA
-	for <linux-block@vger.kernel.org>; Thu, 30 Oct 2025 04:09:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8236B2DECDE
+	for <linux-block@vger.kernel.org>; Thu, 30 Oct 2025 04:39:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761797358; cv=none; b=j44FSaStjUjvH4LKTRDe/G9H5129ArWr9LYuWhCa5dd8ddib/hqXY21iYymh7hsx5XTSVXObFuOmc4D7MYpa//giEVVhWBm2aq5oIpd6nG2m3gac/6pTleNjEt7zRwhz8lq13w2jjdgwjQE/eqqnmcTK6EwXy8WEsjGvRqZW1Ks=
+	t=1761799201; cv=none; b=UgoF3U0JjTG2NqLsEElYtTYNnZTdPQQJwX3xdLtvAywDROrHCII44GGTLr2MnkTl3V+uZa/mWqeWUkr1u35MHLWzQnMeZofesHEWR4GsZRR+jI0TJvJh9AZekGuWD0SOD5nkVJZ1591eTPQmCjQsodtDAI9zZKgry2dmsVa2kgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761797358; c=relaxed/simple;
-	bh=oaOra25jcFBZrMoUSHfE9wW3/OEH/6izRqDrp3mpIyc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dAtJ8cZ2n//zUVOAUzntEw1uT678qt78Xbg9idoYntSNNztyDEMaM7dC1Q8MuI0U2tqym44ur1zOsnUyvyYLmYULmCY2JxehOfVAYdEVueQ51DGSXx4sIXHeJXvHvSDDIHIPkfnfURtkxr5rjkSlxXjM6xeC+ozft4YM2+bC9Os=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iAAzQNj5; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1761799201; c=relaxed/simple;
+	bh=ylCmhFM7cJmjVhYJQQKlRmvgfFCYeLYyHkxtenDhaV4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Vz00MCaZaPGaTEJRT+nz96I24/w3p+2H3pfqJkg7MdcLxRrrEaMtrSYlg9ZAykagSu0Yl4jjKZbfUlmaWYpkz9TWPowSWA7haKAMzD8dIm04UcS0MBW+v5+JFI1bGZSjwdPIE4W9y05+HgEvu8tS17n1tCadW/f2Mm0FX4wXDG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--cmllamas.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B0aTCYT7; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--cmllamas.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iAAzQNj5"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761797358; x=1793333358;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=oaOra25jcFBZrMoUSHfE9wW3/OEH/6izRqDrp3mpIyc=;
-  b=iAAzQNj56VxoFf/It4lPZ+ECx5O3VauDaTX2J5WExB8ajXoBWPJ/Gk1B
-   rIebAlSv/LVTOQHFEA8OpmL+WHAMWBZXQYuwpweLRoD1/rwfTihQEuMt4
-   Iwqwnmyq++wempSg61KsMMLz0Vwpwt+GZcTNCpqMQa9mM1hICj0xDsDDf
-   ED7+YM2OUp0Iy0L5pHhoUnjjXUIw+loNv2hypYo7AvOpnjrJD/rVanPwd
-   ZRS3hzlO89hjCZjL80n9OnqZBw63F5ZzT+zvZrSdKHUq1C5lQ9f6aBYiF
-   uO70MGlLJDMOJI62XuG4l28DQAhgJc6fk+KwmjxkIKOu6NWaiLZeKSqA6
-   g==;
-X-CSE-ConnectionGUID: /nLQ5pTOR0KSnxLwfSA85A==
-X-CSE-MsgGUID: q6VtWObSQRWkF+yUk/s9oA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11597"; a="75380067"
-X-IronPort-AV: E=Sophos;i="6.19,265,1754982000"; 
-   d="scan'208";a="75380067"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 21:09:17 -0700
-X-CSE-ConnectionGUID: 2JgBIYc/TOKKMYx93jcdZA==
-X-CSE-MsgGUID: ZE3C6i5zQcSDNueulDmX8A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,265,1754982000"; 
-   d="scan'208";a="185099039"
-Received: from lkp-server02.sh.intel.com (HELO 66d7546c76b2) ([10.239.97.151])
-  by orviesa010.jf.intel.com with ESMTP; 29 Oct 2025 21:09:14 -0700
-Received: from kbuild by 66d7546c76b2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1vEJxv-000LRm-0d;
-	Thu, 30 Oct 2025 04:09:00 +0000
-Date: Thu, 30 Oct 2025 12:04:26 +0800
-From: kernel test robot <lkp@intel.com>
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Uday Shankar <ushankar@purestorage.com>,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: Re: [PATCH V3 2/5] ublk: implement NUMA-aware memory allocation
-Message-ID: <202510301107.wrn8eeW8-lkp@intel.com>
-References: <20251029031035.258766-3-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B0aTCYT7"
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-290bcced220so5404945ad.1
+        for <linux-block@vger.kernel.org>; Wed, 29 Oct 2025 21:39:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761799199; x=1762403999; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=dGqbfRti9hKegZ5HASb6KUqvXOdBftPi9jvd9UavZPQ=;
+        b=B0aTCYT7K1yXb2RR6r/0i5hET/gfnJP2Pi/6iI2EgSmrow87oxpL19lDPrl6AT9P5c
+         vpraF/Cne7tLVawv15lbI5DKs43TuhPzrcsqfnspHK3CuIYNdpWMKH3drN7ZeJbj3yJm
+         dy/Eppp3qT28xty/vP9ah+I5Ogw5gp8euNWEkRuuVnaxiRcfx6E8VWSf1WOupSwBNU1y
+         audHMcJ6K3Z0jis2Nwj0QTGDLDdOUInQRtRex6zCw7yNy4dQNDHb1fBn2wVZZIVNg8VP
+         x+o9gINBDn110bsYY/9RGshiyqQMsqCd7WqXavjEds4t+rVNyNsxFcJtK6MdXLwNYDrk
+         Rhtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761799199; x=1762403999;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dGqbfRti9hKegZ5HASb6KUqvXOdBftPi9jvd9UavZPQ=;
+        b=vW2ZJIUztFS1C7fOd0de5jMm3UqSKvEKyff5JiprKzbXHaL4gGk/spg2AuXZk8PRIc
+         zdmXgiDk1YKCjectVSJxcM8cbECAvmp+dTkuQISnqKpcc+NyjU7IW4JIA5yWOgrp/sVj
+         gZ3/4umirYaJp4DXUgKpMmSYlGmVrl0yxfkvVrhvnOEqn4fWz0usQYc+zxt7Cf8evxHH
+         oWY05sEG2RitxyT0xNWzZmFe1Lyf+SqCmcrVrp6ia3YcVxUfA8qjvdJnFc/uFlqm27Hf
+         wtQjO0Kc0z14QzczyEtMT7OhngjDc+6bXKFu2CZV7I4LKg5FanlWFfDO29pyD8sJVxxl
+         Um3A==
+X-Forwarded-Encrypted: i=1; AJvYcCVp75c7Yc/uwhHHadsGHmEB+qyrUpvyytjaVe7TqRlASoHkV49FH9jaGENJp/WtPe84/bHghG9Y2IsJaA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyjb2P27lPpf8IgkwLfaIDy8SAwTrFsE7CGN5FtImHv0nivkCOF
+	jcd6yuoamxPk3KoL/A4WDp678OF4f0HhGVPhKwaFAfOuP/OMfouzOALvyj6V1pYmkZ2zbtWjc2C
+	AIay0EzLmnNpZVQ==
+X-Google-Smtp-Source: AGHT+IETAfRwSZjXvtbywaaxsUIs6gs/rosu5l5QM3+aYkJm9qGMcrBnPPBbsvi03WTHK/FOtH1RVHn61ndsrg==
+X-Received: from plhs12.prod.google.com ([2002:a17:903:320c:b0:27e:ea91:acb6])
+ (user=cmllamas job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:903:ac6:b0:290:b53b:745b with SMTP id d9443c01a7336-294deedabdfmr66533655ad.39.1761799198776;
+ Wed, 29 Oct 2025 21:39:58 -0700 (PDT)
+Date: Thu, 30 Oct 2025 04:39:18 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251029031035.258766-3-ming.lei@redhat.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.1.851.g4ebd6896fd-goog
+Message-ID: <20251030043919.2787231-1-cmllamas@google.com>
+Subject: [PATCH] blk-crypto: use BLK_STS_INVAL for alignment errors
+From: Carlos Llamas <cmllamas@google.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: kernel-team@android.com, linux-kernel@vger.kernel.org, 
+	Carlos Llamas <cmllamas@google.com>, Eric Biggers <ebiggers@kernel.org>, 
+	Christoph Hellwig <hch@lst.de>, "open list:BLOCK LAYER" <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Ming,
+Make __blk_crypto_bio_prep() propagate BLK_STS_INVAL when IO segments
+fail the data unit alignment check.
 
-kernel test robot noticed the following build errors:
+This was flagged by an LTP test that expects EINVAL when performing an
+O_DIRECT read with a misaligned buffer [1].
 
-[auto build test ERROR on axboe-block/for-next]
-[also build test ERROR on linus/master v6.18-rc3 next-20251029]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Cc: Eric Biggers <ebiggers@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>
+Link: https://lore.kernel.org/all/aP-c5gPjrpsn0vJA@google.com/ [1]
+Signed-off-by: Carlos Llamas <cmllamas@google.com>
+---
+ block/blk-crypto.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Ming-Lei/ublk-reorder-tag_set-initialization-before-queue-allocation/20251029-111323
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-patch link:    https://lore.kernel.org/r/20251029031035.258766-3-ming.lei%40redhat.com
-patch subject: [PATCH V3 2/5] ublk: implement NUMA-aware memory allocation
-config: csky-randconfig-r054-20251030 (https://download.01.org/0day-ci/archive/20251030/202510301107.wrn8eeW8-lkp@intel.com/config)
-compiler: csky-linux-gcc (GCC) 15.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251030/202510301107.wrn8eeW8-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202510301107.wrn8eeW8-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from <command-line>:
->> drivers/block/ublk_drv.c:240:56: error: 'dev_info' undeclared here (not in a function); did you mean '_dev_info'?
-     240 |         struct ublk_queue       *queues[] __counted_by(dev_info.nr_hw_queues);
-         |                                                        ^~~~~~~~
-   include/linux/compiler_types.h:346:71: note: in definition of macro '__counted_by'
-     346 | # define __counted_by(member)           __attribute__((__counted_by__(member)))
-         |                                                                       ^~~~~~
->> drivers/block/ublk_drv.c:240:34: error: 'counted_by' argument is not an identifier
-     240 |         struct ublk_queue       *queues[] __counted_by(dev_info.nr_hw_queues);
-         |                                  ^~~~~~
-
-
-vim +240 drivers/block/ublk_drv.c
-
-   208	
-   209	struct ublk_device {
-   210		struct gendisk		*ub_disk;
-   211	
-   212		struct ublksrv_ctrl_dev_info	dev_info;
-   213	
-   214		struct blk_mq_tag_set	tag_set;
-   215	
-   216		struct cdev		cdev;
-   217		struct device		cdev_dev;
-   218	
-   219	#define UB_STATE_OPEN		0
-   220	#define UB_STATE_USED		1
-   221	#define UB_STATE_DELETED	2
-   222		unsigned long		state;
-   223		int			ub_number;
-   224	
-   225		struct mutex		mutex;
-   226	
-   227		spinlock_t		lock;
-   228		struct mm_struct	*mm;
-   229	
-   230		struct ublk_params	params;
-   231	
-   232		struct completion	completion;
-   233		u32			nr_io_ready;
-   234		bool 			unprivileged_daemons;
-   235		struct mutex cancel_mutex;
-   236		bool canceling;
-   237		pid_t 	ublksrv_tgid;
-   238		struct delayed_work	exit_work;
-   239	
- > 240		struct ublk_queue       *queues[] __counted_by(dev_info.nr_hw_queues);
-   241	};
-   242	
-
+diff --git a/block/blk-crypto.c b/block/blk-crypto.c
+index 4b1ad84d1b5a..3e7bf1974cbd 100644
+--- a/block/blk-crypto.c
++++ b/block/blk-crypto.c
+@@ -292,7 +292,7 @@ bool __blk_crypto_bio_prep(struct bio **bio_ptr)
+ 	}
+ 
+ 	if (!bio_crypt_check_alignment(bio)) {
+-		bio->bi_status = BLK_STS_IOERR;
++		bio->bi_status = BLK_STS_INVAL;
+ 		goto fail;
+ 	}
+ 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.51.1.851.g4ebd6896fd-goog
+
