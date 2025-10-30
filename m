@@ -1,79 +1,153 @@
-Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA4D536E375;
-	Thu, 30 Oct 2025 18:08:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC88A36B98A
+	for <linux-block@vger.kernel.org>; Thu, 30 Oct 2025 18:21:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761847698; cv=none; b=r8VbOxtVI+eoldOAQdY3/n9YdmHQ3iM51c/L98YsEVpo5S0ZsBseIPfhIXk+4c9RSYMhgUhpdukP/jKNbfQ2yVmdYstvDTZ23N0lCD332LzCAUamA8iQLuu3ItcLAE2wwK3dsstmXEAxSjMtj0GRqeNHRU5GyK5K+bIJmPbdfvo=
+	t=1761848470; cv=none; b=aQfL/m3YoH4+YtqN9mEBDU/3GH9RQwuowFCZ2vUjp/HtGkfCzhgU2aW59mMM4YonTudnjiAcyRXrjrbtDdXIySM3qbxUBTZDSJkAKudZcJieOUpDWDWoaMjZhplzZg2aXAtSjdaFtUZGM8cIUXqgpeO7MaS27mJp0Qu2Jx7pp4U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761847698; c=relaxed/simple;
-	bh=T9zIm0gSu4kD3QxXQl0Q2BQyodM1bhAdjnLFxbtSi50=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Uhd3YSeeMSkIvUvzFhHPNLRbDHE7vi2EnmtBp/S0zxHG0vyHb0ucqm4cQZrXA8JkZlPV1wHNAxOFOwWtmvg7kz/9KgeNKG9k9BR0mSMYAKsYcm4gki7FpJIitY5z6bIP4yrEi+XqJuWjgTGYm/ivZ35CSny3Rx56xcFkhy/IlLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=WQKLZHod; arc=none smtp.client-ip=199.89.3.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1761848470; c=relaxed/simple;
+	bh=MHjPd3cIr9Ro8JvYM4wscOP1KLV2+IEH+OrZHKIv/+Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mm4G4BwY1lPfv89jvvPyD7/JSuPHKgZdTw8/jwBuLo7ITHTawfyVvWeakPzyh56ckZscOJbBiz7MEUgccWgu2K9mm0MAlA+dml2gtm08DfxiaUdlCYMOAB+IonHyzfaraGv2ap+QbI05MAFBQ/MAqCn4u1n0I35avCLmp8Wbq6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=j/xDpomi; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=BgUnj8Qj; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=cCgp4+xR; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=Y02q4QQG; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="WQKLZHod"
-Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4cyBtQ5pjMzlgqTq;
-	Thu, 30 Oct 2025 18:08:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1761847692; x=1764439693; bh=T9zIm0gSu4kD3QxXQl0Q2BQy
-	odM1bhAdjnLFxbtSi50=; b=WQKLZHodyoO/cFA4rZnuxmcTMPl1J6lZjczTQmQX
-	0lcomaVrcWTUgYDDmtuob7TiXHXGNo95h3OkBUL85WxvT+C/mnpsrJaAPDCKsEC5
-	Zj40yTrdh//p2wWeBFQ9layhw8PZQqPzLoY9bg2XNAc5NNTf+Uqx7PwlTom6OoJI
-	hmqRzKx5nzt6+X1Yw9ejYkXrpnIY2E5SMV9fXwRK1sDeMuBsWxxXQj9TU3S5nk8D
-	k9r4SuPgd/+Dztv0Wn7+nikUZ3KS8njwiE61M9o+JygfvYFjIVlSh/7YtfeYUh/M
-	kTd4i7n0fDTVhVCA/gsCMfRY+XWISS9iMrR+TMpX0Ohuaw==
-X-Virus-Scanned: by MailRoute
-Received: from 003.mia.mailroute.net ([127.0.0.1])
- by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 6tTr8fDkTX7R; Thu, 30 Oct 2025 18:08:12 +0000 (UTC)
-Received: from [100.119.48.131] (unknown [104.135.180.219])
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="j/xDpomi";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="BgUnj8Qj";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="cCgp4+xR";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="Y02q4QQG"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4cyBtC3RfszltBDW;
-	Thu, 30 Oct 2025 18:08:01 +0000 (UTC)
-Message-ID: <1b4dd7b7-2af2-4026-b6e2-be517b249ba3@acm.org>
-Date: Thu, 30 Oct 2025 11:08:00 -0700
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 0559D3377A;
+	Thu, 30 Oct 2025 18:21:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1761848466;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=35Rgq9aWXXCYtegCi5Nd8FkRSQcbW288tXIHMGLSzos=;
+	b=j/xDpomipRi27Xvy5GBORux7vuiP/KIQypNiMxJ8XY5CAbXUZwuZU26mxFjInTO+/6/9Az
+	yp4Zk/5YrAK9vfNS0FBWYcF1k/XIUs+WnhQtbidqXPDPPSHgwIfBn/uKBM9DiMXh76p25L
+	QfOM3INTM8rTbEHkNjI+ohNh/JXVzxw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1761848466;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=35Rgq9aWXXCYtegCi5Nd8FkRSQcbW288tXIHMGLSzos=;
+	b=BgUnj8Qjc9JEkRhbNm9umHTuI9hdu2AQHZAeqr0cUg5Ti1fHlpDUPAO2VvjgWm+mkJeEB7
+	bh0sjWg6UEJwvqCA==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=cCgp4+xR;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=Y02q4QQG
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1761848465;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=35Rgq9aWXXCYtegCi5Nd8FkRSQcbW288tXIHMGLSzos=;
+	b=cCgp4+xRw5fM4joQmxNWc82CsEDmpI8WHpVjHkG7LIHe5MO5lOaHu6CJRJPph59idlGVSo
+	1GEifCUC/UXW3iHjs+dN0oy9hpXC3sev/rDh51NDLoFJZ4y22TYsuPgNZzxHlmVyOE3yMt
+	eR70wdyU9CS8HtyYY/REg7rgXoaEcgo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1761848465;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=35Rgq9aWXXCYtegCi5Nd8FkRSQcbW288tXIHMGLSzos=;
+	b=Y02q4QQGUEocIdhPkNnWmwYmiyhHHVVYkXfo4ejKJow+PUEPO/8nr0WoTihHxbaNeNEJOT
+	4BEYFr6dQxGabwAw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D15001396A;
+	Thu, 30 Oct 2025 18:21:04 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id njTnMpCsA2lrBgAAD6G6ig
+	(envelope-from <dsterba@suse.cz>); Thu, 30 Oct 2025 18:21:04 +0000
+Date: Thu, 30 Oct 2025 19:21:03 +0100
+From: David Sterba <dsterba@suse.cz>
+To: Christoph Hellwig <hch@lst.de>
+Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Latchesar Ionkov <lucho@ionkov.net>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Christian Schoenebeck <linux_oss@crudebyte.com>,
+	Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>,
+	Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>,
+	Joseph Qi <joseph.qi@linux.alibaba.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	Josef Bacik <josef@toxicpanda.com>, Jan Kara <jack@suse.cz>,
+	linux-block@vger.kernel.org, v9fs@lists.linux.dev,
+	linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, jfs-discussion@lists.sourceforge.net,
+	ocfs2-devel@lists.linux.dev, linux-xfs@vger.kernel.org,
+	linux-mm@kvack.org, Damien Le Moal <dlemoal@kernel.org>,
+	Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: Re: [PATCH 05/10] btrfs: push struct writeback_control into
+ start_delalloc_inodes
+Message-ID: <20251030182103.GC13846@twin.jikos.cz>
+Reply-To: dsterba@suse.cz
+References: <20251024080431.324236-1-hch@lst.de>
+ <20251024080431.324236-6-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] block: Remove queue freezing from several sysfs store
- callbacks
-To: Martin Wilck <mwilck@suse.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Nilay Shroff <nilay@linux.ibm.com>, Benjamin Marzinski
- <bmarzins@redhat.com>, stable@vger.kernel.org,
- Damien Le Moal <dlemoal@kernel.org>, Chaitanya Kulkarni <kch@nvidia.com>,
- Hannes Reinecke <hare@suse.de>
-References: <20251030172417.660949-1-bvanassche@acm.org>
- <f4ef82a5ca88901653ce07fb0313c144a0fdb6ac.camel@suse.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <f4ef82a5ca88901653ce07fb0313c144a0fdb6ac.camel@suse.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251024080431.324236-6-hch@lst.de>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Rspamd-Queue-Id: 0559D3377A
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-4.21 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	HAS_REPLYTO(0.30)[dsterba@suse.cz];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	MIME_TRACE(0.00)[0:+];
+	R_RATELIMIT(0.00)[to_ip_from(RL9qow8fch3pfgh43469ius4rs)];
+	TO_DN_SOME(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	REPLYTO_ADDR_EQ_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.cz:+]
+X-Spam-Score: -4.21
 
-On 10/30/25 10:38 AM, Martin Wilck wrote:
-> So the "deadlock" situation for the other sysfs attributes that you
-> handled with the timeout in v2 will remain now? Are you planning to
-> send a follow-up patch for these attributes?
+On Fri, Oct 24, 2025 at 10:04:16AM +0200, Christoph Hellwig wrote:
+> In preparation for changing the filemap_fdatawrite_wbc API to not expose
+> the writeback_control to the callers, push the wbc declaration next to
+> the filemap_fdatawrite_wbc call and just pass the nr_to_write value to
+> start_delalloc_inodes.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+> Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 
-Only if agreement can be reached about the approach that should be used
-to fix the deadlock for the remaining request queue sysfs attributes.
-
-Thanks,
-
-Bart.
+Acked-by: David Sterba <dsterba@suse.com>
