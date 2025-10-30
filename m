@@ -1,86 +1,175 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27973126BF1;
-	Thu, 30 Oct 2025 14:05:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 992F818A93F
+	for <linux-block@vger.kernel.org>; Thu, 30 Oct 2025 14:07:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761833120; cv=none; b=Aw3MyWTrbdoqmSlY81u0vtgRekKXGNEGjNOhI1d6dxAd/nCQeZ1iWoIi8scERezVBSMRd8SnXYZl7hk46+L2e/UkSS8FtXtPuQBv/pEKcAqHEYNEMLaO5QXjsTxCT8tTfUXJxhI+eMk9DiH/jhbvTORNRJOtI/sLvBnhL3ACHpU=
+	t=1761833259; cv=none; b=u9V++8+WMwowFCaSMo6zn3sMKbrJZzGTHo60tZ3Qhiu68xSfsJ3hYyAmnCpj0BwMNF86bx+DouezqOT/fm8GirmsQHK2fkKLQjJCMMbWDTkPJyj0hqGttGqqKaLH4qM7o5+0/Pd8qYdMQN8R9DvEnMK+neTOYliPeMQzWH7MdFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761833120; c=relaxed/simple;
-	bh=FIKu4iYEpNCcQJAJFxEAKcyoNhn57WXUvUK9Lqt+ERU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DmZ213yzDCgKJpLu8x3RgRZnQZYUTv9PkN93SXlu+sybxdhR383rRjRmXMzO2e1xZKHOou2He3GfkGD7d4qqWYfs14cUzlcugWM1whI89n+VJCs4CuZeMtY3gcFFIDILydJo6GsdrMx9PIlB9fYdBdMZqEEfsQVgoMbA00Buu2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=OU42mios; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1761833259; c=relaxed/simple;
+	bh=P1vXdtD0/zDTrhzDe4WtqYiJG27vKd72yMnPE4sZbxQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CjxwFdQIBgXXp/0EsGS2H2XnCQE1pW4TAJIyi49F8fUc7CgvB0jhYeHHvRtUAEc6UUPOV52XdEfSTqQ6Q2lYCIgPiMjh8aHbgoHMmnz4kruyrzfq7DohHN5XcP1OQCAJ2129E/HHg96O+HrZyTcj6WSpUYzxzH8wIjhMIUGYis4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=PwgnNgs6; arc=none smtp.client-ip=209.85.215.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="OU42mios"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
-	:Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=xFP5v3fUOlDAEzHhimBhc19pvPkZDICA/lfyXRtuCO8=; b=OU42miosZZnsNGA8GWX4rxDD5v
-	NbliiDx+SjRjbIF9jFGckM3MdP80CQtGSDK/nbkvMlbdk1UygMYUDjPgN0c3vvX0NOyP5CKxGp8AZ
-	A0DJkJWWLkbUlw/iPQNrDXvp28dgzimT0B/sxr0cBPO6KMupjjlnCC3hxe9S9lUyGvfnixBrqjeAC
-	wT0vgTXn2TPw1TpM6hxsYrRnggBilsHevdZqkWTFmJhpkv49kyH6eyrb1h6QAe2DZ4/V8W1eTyrm9
-	TrXUxnBsjtbfa8pB8oZssfa0DYQyEYtx2WM8A6WPnUYKejXmj9paTw59DZGiAsEmGg/W8PAHKEk9q
-	Asgroq/g==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vETGn-00000004H02-1Xin;
-	Thu, 30 Oct 2025 14:04:54 +0000
-Date: Thu, 30 Oct 2025 07:04:53 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Suren Baghdasaryan <surenb@google.com>
-Cc: Christoph Hellwig <hch@infradead.org>, akpm@linux-foundation.org,
-	david@redhat.com, lorenzo.stoakes@oracle.com,
-	Liam.Howlett@oracle.com, vbabka@suse.cz, alexandru.elisei@arm.com,
-	peterx@redhat.com, sj@kernel.org, rppt@kernel.org, mhocko@suse.com,
-	corbet@lwn.net, axboe@kernel.dk, viro@zeniv.linux.org.uk,
-	brauner@kernel.org, jack@suse.cz, willy@infradead.org,
-	m.szyprowski@samsung.com, robin.murphy@arm.com, hannes@cmpxchg.org,
-	zhengqi.arch@bytedance.com, shakeel.butt@linux.dev,
-	axelrasmussen@google.com, yuanchu@google.com, weixugc@google.com,
-	minchan@kernel.org, linux-mm@kvack.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, iommu@lists.linux.dev
-Subject: Re: [PATCH v2 0/8] Guaranteed CMA
-Message-ID: <aQNwhQcN8Su_Il6c@infradead.org>
-References: <20251026203611.1608903-1-surenb@google.com>
- <aP8XMZ_DfJEvrNxL@infradead.org>
- <CAJuCfpH1Nmnvmg--T2nYQ4r25pgJhDEo=2-GAXMjWaFU5vH7LQ@mail.gmail.com>
- <aQHdG_4yk0-o0iEY@infradead.org>
- <CAJuCfpFPDPaQdHW3fy46fsNczyqje0W8BemHSfroeawB1-SRpQ@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="PwgnNgs6"
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-b6d0294865eso23352a12.2
+        for <linux-block@vger.kernel.org>; Thu, 30 Oct 2025 07:07:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1761833257; x=1762438057; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dAxgp4DobvE+uLPgcEm11YRUjuXuChtKAGj6UrKONnQ=;
+        b=PwgnNgs63sFUAdiOI/N4hy65BGVaYSzjIW64Buw6r+IC3dcdBg/ubxtxLBTCOoswBz
+         evaN9XcrnUuSJxxHClPAlYnlNEGiqrdvE1YXrkXsUE7euwiXarLUD5+UhcGEriJIWu+O
+         FwayDnSwrbMWGpms/4/YyHIftgrDs+8gJ2XjVVQZ2cdmXrozeO+fC4WEwsnOtlU0nRnO
+         /8/6R+36+LfCTBcrWa5NaSDv/3Az+czXQQOCqh47qkQI0zsqcHKWjAG6nSYlSVDNwd6O
+         dh/gYtQxl37W8AIGgZtwFnv3zlI4LtsubV3XnWr7rIErT/g1L0BfFHPtMiSCm6d/LcpX
+         R5jg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761833257; x=1762438057;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dAxgp4DobvE+uLPgcEm11YRUjuXuChtKAGj6UrKONnQ=;
+        b=ia2/29kX3IG98PnKaGCnp5FVyNYEkOZ3gIwoyzkbPbf93ed4GG7E0vsjazNYl6txj5
+         ncFBQfQqVFZ5Tb8wdl0ZQ/gyjkkJIFddOiI36qqGPG1T5/knIkJCt5cpiyhutLKxQ4b7
+         XMbVOmSnxPTV701mGepDaMhrkU65WtTbQ0a/WS6s/mzlMuETRM5fZbHgfSk9Wi4BHBGM
+         J51H18d7K5TdB/Etl9MlcUWfk83Z9x05HHU6RNodgRTeLJ9U1T44SSO/SUhkvfy3FLLM
+         yuj9yNjEDHl8bfHouHZFLXLAKkmq+a9XaQkY4Hk2wWl9XS7TVKOoMi94f6K1gBlwUm/z
+         NgRg==
+X-Forwarded-Encrypted: i=1; AJvYcCUf/JmUP+alFoSCS2YtRYOP6K97NF7jXK2Br63U6w58jpi2Y8o+nvZ3MjsOYKMvhKghj750m7V8UNqfQQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzDsiSsHwLOa76DleDu/gHu7/xojkoJfRwNA5Gd0cn9EtjjAJbb
+	iuAiqMdIQe2c24jenYV9ntQyKV/axOAMPaLSkfqzWiVgUR0V1bDUYtdLTjdl97YISnwP1XZqN+R
+	9pr7yYjFaEgC6eAXdnYQn9TjHQOBxRvQEtLNBJRm7GA==
+X-Gm-Gg: ASbGncsqJ5YC+WolYDTTN1liPR0aa1PkVv92pY++VC5z2k/QinM/1lc5mFaOZri7FxF
+	kESpklcMN4V24yf7tQNAlSCgBIgqFKDXHCGbAOdxJ72lZQNNh1Esgp44/+OERSx2u4DRYZZiOGN
+	FYr7u557ObNNYMWYvj+7+YGdKhKFCaQ95CRpu047Wu6NZW8CWO+kasBZbjUsjHZ19aDKePS8/AP
+	8XBa2epBQLhGKLF0TS3qFXXdHbtHbfynvwI89K4GYG39R7yfRnn4p8VNBHpZ/unBByDV/YeH3dX
+	NEkC5wwUPRJL1LoE
+X-Google-Smtp-Source: AGHT+IGLk7sq7NhL8k8uqBKtrEmQ7vzjjb/AL2MdPgF05B2+INPNj0iaAaA6tgH/ao+zYq6pmzSG5GrrrFudXOsQ/80=
+X-Received: by 2002:a17:903:41ca:b0:295:535:1bbd with SMTP id
+ d9443c01a7336-295053520f7mr11380015ad.0.1761833256539; Thu, 30 Oct 2025
+ 07:07:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJuCfpFPDPaQdHW3fy46fsNczyqje0W8BemHSfroeawB1-SRpQ@mail.gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+References: <20251029031035.258766-3-ming.lei@redhat.com> <202510301522.i47z9R95-lkp@intel.com>
+In-Reply-To: <202510301522.i47z9R95-lkp@intel.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Thu, 30 Oct 2025 07:07:25 -0700
+X-Gm-Features: AWmQ_bmndyNTmYbHLvKzf_pj338cBa-tg0F7ZytjDWHgVSGpxBT7VI2JIZc-Vg8
+Message-ID: <CADUfDZonryeHe1MGTfnUa16VbvEt5C+yu11yh3ZRDbwFqJ_L9w@mail.gmail.com>
+Subject: Re: [PATCH V3 2/5] ublk: implement NUMA-aware memory allocation
+To: kernel test robot <lkp@intel.com>
+Cc: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, 
+	Uday Shankar <ushankar@purestorage.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 29, 2025 at 07:57:34AM -0700, Suren Baghdasaryan wrote:
-> On Wed, Oct 29, 2025 at 2:23 AM Christoph Hellwig <hch@infradead.org> wrote:
-> >
-> > On Mon, Oct 27, 2025 at 12:51:17PM -0700, Suren Baghdasaryan wrote:
-> > > I'm guessing you missed my reply to your comment in the previous
-> > > submission: https://lore.kernel.org/all/CAJuCfpFs5aKv8E96YC_pasNjH6=eukTuS2X8f=nBGiiuE0Nwhg@mail.gmail.com/
-> > > Please check it out and follow up here or on the original thread.
-> >
-> > I didn't feel to comment on it.  Please don't just build abstractions
-> > on top of abstractions for no reason.  If you later have to introduce
-> > them add them when they are actually needed.
-> 
-> Ok, if it makes it easier to review the code, I'll do it. So, I can:
-> 1. merge cleancache code (patch 1) with the GCMA code (patch 7). This
-> way all the logic will be together.
-> 2. . LRU additiona (patch 2) and readahead support (patch 3) can stay
-> as incremental additions to GCMA, sysfs interface (patch 4) and
-> cleancache documentation (
+On Thu, Oct 30, 2025 at 1:01=E2=80=AFAM kernel test robot <lkp@intel.com> w=
+rote:
+>
+> Hi Ming,
+>
+> kernel test robot noticed the following build errors:
+>
+> [auto build test ERROR on axboe-block/for-next]
+> [also build test ERROR on shuah-kselftest/next shuah-kselftest/fixes linu=
+s/master v6.18-rc3 next-20251029]
+> [If your patch is applied to the wrong git tree, kindly drop us a note.
+> And when submitting patch, we suggest to use '--base' as documented in
+> https://git-scm.com/docs/git-format-patch#_base_tree_information]
+>
+> url:    https://github.com/intel-lab-lkp/linux/commits/Ming-Lei/ublk-reor=
+der-tag_set-initialization-before-queue-allocation/20251029-111323
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block=
+.git for-next
+> patch link:    https://lore.kernel.org/r/20251029031035.258766-3-ming.lei=
+%40redhat.com
+> patch subject: [PATCH V3 2/5] ublk: implement NUMA-aware memory allocatio=
+n
+> config: x86_64-randconfig-074-20251030 (https://download.01.org/0day-ci/a=
+rchive/20251030/202510301522.i47z9R95-lkp@intel.com/config)
+> compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0=
+227cb60147a26a1eeb4fb06e3b505e9c7261)
+> reproduce (this is a W=3D1 build): (https://download.01.org/0day-ci/archi=
+ve/20251030/202510301522.i47z9R95-lkp@intel.com/reproduce)
+>
+> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
+ion of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202510301522.i47z9R95-lkp=
+@intel.com/
+>
+> All errors (new ones prefixed by >>):
+>
+> >> drivers/block/ublk_drv.c:240:49: error: 'counted_by' argument must be =
+a simple declaration reference
+>      240 |         struct ublk_queue       *queues[] __counted_by(dev_inf=
+o.nr_hw_queues);
+>          |                                                        ^~~~~~~=
+~~~~~~~~~~~~~~
 
-Sounds good.
+Hmm, guess it doesn't support nested fields?
 
+>    include/linux/compiler_types.h:346:62: note: expanded from macro '__co=
+unted_by'
+>      346 | # define __counted_by(member)           __attribute__((__count=
+ed_by__(member)))
+>          |                                                               =
+        ^~~~~~
+>    1 error generated.
+>
+>
+> vim +/counted_by +240 drivers/block/ublk_drv.c
+>
+>    208
+>    209  struct ublk_device {
+>    210          struct gendisk          *ub_disk;
+>    211
+>    212          struct ublksrv_ctrl_dev_info    dev_info;
+>    213
+>    214          struct blk_mq_tag_set   tag_set;
+>    215
+>    216          struct cdev             cdev;
+>    217          struct device           cdev_dev;
+>    218
+>    219  #define UB_STATE_OPEN           0
+>    220  #define UB_STATE_USED           1
+>    221  #define UB_STATE_DELETED        2
+>    222          unsigned long           state;
+>    223          int                     ub_number;
+>    224
+>    225          struct mutex            mutex;
+>    226
+>    227          spinlock_t              lock;
+>    228          struct mm_struct        *mm;
+>    229
+>    230          struct ublk_params      params;
+>    231
+>    232          struct completion       completion;
+>    233          u32                     nr_io_ready;
+>    234          bool                    unprivileged_daemons;
+>    235          struct mutex cancel_mutex;
+>    236          bool canceling;
+>    237          pid_t   ublksrv_tgid;
+>    238          struct delayed_work     exit_work;
+>    239
+>  > 240          struct ublk_queue       *queues[] __counted_by(dev_info.n=
+r_hw_queues);
+>    241  };
+>    242
+>
+> --
+> 0-DAY CI Kernel Test Service
+> https://github.com/intel/lkp-tests/wiki
