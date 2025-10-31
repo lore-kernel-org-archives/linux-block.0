@@ -1,65 +1,48 @@
-Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E37E62E718F
-	for <linux-block@vger.kernel.org>; Fri, 31 Oct 2025 17:04:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBEDB306B0D;
+	Fri, 31 Oct 2025 17:48:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761930254; cv=none; b=e9SeuBppbZTFUzWqerz+9UQ/z/wRbH1h9tCjwlP4JlpQQOABPtOtywWqeefZKBGgd0ql1RbQgqAgGh4vut7D4yCyrBFDHHikCF/9nJikTH1cfh/1yRPLiAaLKfYV+UDFjDcx11vjyHb7NWheSlSaehMkqTB+XvvEk4SEaJZgk6I=
+	t=1761932905; cv=none; b=K+pP0Cwy1lV1W7BvjAU/Zc2syUltwMTrBnpBAsTBe2cagGpiFstwLOeYp8d7ICRVE967tqWVNPpDwZ1rVZJhGt0oO689TZCgeYU8H5TBe4R45Q2NjIVK2P9OXEC974zpAadsO1reIikoxMoA+WZ17bS5RdpLvg6t/jzgys0Xhlg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761930254; c=relaxed/simple;
-	bh=HWDVbpqeaBkJyA3VWcTc2b7lwz3yCd/4hq5AVMzKPNE=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=Zs0yfz3db8+663d5iez0q48Njlm9sUNowE5IzDJjtHLfmcDzhc63ICLHtIUKGhAQhzIYI0PRy9Qg3TMlFeSU3lGktl+xrsNar3lZafk+wJaz0R21lmE/1rlyMXbTRL4sh8fIuupkWYYyMAM0/Q47+zU4bwlUUlL50HhlPcrtCGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=XmPv8vG5; arc=none smtp.client-ip=209.85.166.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1761932905; c=relaxed/simple;
+	bh=TirghRST3T97Ek6HMrDXmUxlQBdHwkN3Ro2bVMgzjlI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=XziBdy3Lx3gPhccaefTgecyV9qilo1jQMh+GrmTE2t2zriPIJ/YVu3s6z4dqzDDc1o7F6rmmpE0beQ5hBs1BW7j6RAHd8XxQV6NBqZ7lscf8Fjj7XdTYm3sHP3LISPfysAPyWO2cWLV6LfBkJOx2Fc1xlkEecFtWt0ekhOj0fjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=mvnNsEhs; arc=none smtp.client-ip=199.89.3.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="XmPv8vG5"
-Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-93e7ece3025so109304939f.1
-        for <linux-block@vger.kernel.org>; Fri, 31 Oct 2025 10:04:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1761930250; x=1762535050; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=g3g7S5qD8Jzc1eHgDYcIRwL/BJkxLdQR17azMzznU7o=;
-        b=XmPv8vG5AFkfqKn+sPmBkai1y9fcvm5zcmQRGVEW4IuFfGxjhH0EQGvGYlOQ+oR5zP
-         j34N67T1TjA88HqlI5iw/K0jQjcysc7gg9XqPwWuYhXbFIDAmFAauTdLD4FPDWBjV7/D
-         hdTArLk+vlb/2ou27sds2rTCEHnGd5PdJQ6dy+JUHWUOXayvto5BexHRhU1XYawOhV6/
-         EXWOWa7AorQzqT4BcA6RXr7wMWbKZeiZC0OYq6IaKFbjC4Ds3Oy6+D5w/aJn0kV7o19t
-         YSLiJjY/EwnIJ5pkvXY1LJhejjmQ1YRwhjhwzLYWwLSxZnOuujETOFcOhsbCQxRPDkjt
-         ZZCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761930250; x=1762535050;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=g3g7S5qD8Jzc1eHgDYcIRwL/BJkxLdQR17azMzznU7o=;
-        b=fWgZ6SVVKDfk3iJuA0CLE7k9Z1wqd6f5xWamyr1OaaX/QrdLIY9Uv+FehaX4gAcL7Z
-         Hq5wlxZ7PiBzFyqxXZJueM8vlZC7I+FNokpxTO/mR9HTrAPINaZTLx43PPlxrieNJgbI
-         lyLP7Omj8BLvay6cyoX7ZD5E5hfvz34C4nQFTI2z5Tq0pot2ODawtPTVO0Xx7/h6l2pt
-         0g4SytNwxi0gZhzj3mZVsckwh6sf8VXX3zJ0fqupX6WBFmv5RPhsbYmnsAW8zr6vufl3
-         9URx0+E8v9R3YXiNxzabXtXJ9kD+bohMCPQjj4ms18nnBZ+2JPVuC35mMa6rA0MuTHFh
-         VERg==
-X-Gm-Message-State: AOJu0Yxf4StG3WMqffhWJ/te7+ww/xe0Pt/XMBf/3uTm8BLSEZMOIYXH
-	H1rfpb+21kxLT4NJ1ufBIzqrYshJHY/FHouRB2g4B6pFEDvS9Lhx14BD8R+ReaX3syDwC8Hqdg2
-	n5irA
-X-Gm-Gg: ASbGncsHFN2V+pLeWugFh7SBzUSVg/TlQxaHfxxXzdBXcvHkMU9GWahju+yaVdJlEFw
-	GhKhMoV3z6uPtrSdbAtvJJcmYKj/falyQSz79771x5e1eMPWYl+JuyaYPCzSRhSbr1hoPWcgsJr
-	rcMDmPJnfT+z4+JIFwaX4d9hWeiroB9sdWdq9+EYiidkqzJ1IYGXLfXSe6iTU5nEXtZvStWvejd
-	Z9hchxkE4zBngYtsZH9kn4+/QKZeZiyc5tfIgA8pDnOr71+5Hl0LDnDhniX5M7Rfl4oICF79e7e
-	MElSTA5EdITdkogHuURjV5H/biEaRjO9FMWynuxgsUjGfL5o9FIkkdbXIx96+LHLSwZKnOVNf0k
-	BVEu6VztWSfRAWsiV7Lo9j07w4vh6DYbPgQWbfJg3h2BqSXseBbqrzxtcU728hRC2CC7rRCGbAx
-	pXuAYVhBs=
-X-Google-Smtp-Source: AGHT+IFcrZwmY12x7qHQCX9935YadBlItn1iFjU3UIq0umWrt41CYVUAOOo183AwI8cfNoMGK7wK0Q==
-X-Received: by 2002:a05:6e02:23c6:b0:433:100c:58f4 with SMTP id e9e14a558f8ab-433100c59d1mr48109415ab.14.1761930249611;
-        Fri, 31 Oct 2025 10:04:09 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5b6a55b1b27sm884115173.41.2025.10.31.10.04.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 31 Oct 2025 10:04:08 -0700 (PDT)
-Message-ID: <abdcc067-2eab-422b-abb3-bb4ce8793c1b@kernel.dk>
-Date: Fri, 31 Oct 2025 11:04:07 -0600
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="mvnNsEhs"
+Received: from localhost (localhost [127.0.0.1])
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4cypNw6qsGzlvq50;
+	Fri, 31 Oct 2025 17:48:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1761932894; x=1764524895; bh=nL551B3V05vqyW+XimcHYYij
+	1ibWq2M2wbELFVqT4RY=; b=mvnNsEhs1PPWUDvDh1SX4Y+85yPIV55ftsmKpUtx
+	KVnPMtra7jXYM48vO8spgPf8PYvKVtDKtRs/W2vjRpaI3tPBqSwDA8sg0mU5GLoP
+	+A2WlsZJ0L3olpHgjZY+hi8m/r9bfFHbBC6cmaaK57KjkKDXHGqnTpox8N0j3f2w
+	Kv7FROAYchc9W4NAXiiRex4Tp4aFI38ASM4HaiuDVE6YQVnmc3YfBEfvbgFLLYyt
+	nNIe18PmEAOOot6mCPZXgnniKmDOCwFblrpa/9FPFORTQXwBN/H6S6CqtDRHqieF
+	/aM4eDxaxKcoyaz2Yt7riOOV4J4R1Cn3DmQ/3Gz/8gabtg==
+X-Virus-Scanned: by MailRoute
+Received: from 003.mia.mailroute.net ([127.0.0.1])
+ by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id taZA1Dyqq5Qm; Fri, 31 Oct 2025 17:48:14 +0000 (UTC)
+Received: from [100.119.48.131] (unknown [104.135.180.219])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4cypNg6Wm3zltP0b;
+	Fri, 31 Oct 2025 17:48:02 +0000 (UTC)
+Message-ID: <55887a39-21ee-4e6c-a6f3-19d75af6395a@acm.org>
+Date: Fri, 31 Oct 2025 10:48:01 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -67,74 +50,108 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 01/13] block: freeze queue when updating zone resources
+To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+ Keith Busch <keith.busch@wdc.com>, Christoph Hellwig <hch@lst.de>,
+ dm-devel@lists.linux.dev, Mike Snitzer <snitzer@kernel.org>,
+ Mikulas Patocka <mpatocka@redhat.com>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ linux-scsi@vger.kernel.org, linux-xfs@vger.kernel.org,
+ Carlos Maiolino <cem@kernel.org>, linux-btrfs@vger.kernel.org,
+ David Sterba <dsterba@suse.com>
+References: <20251031061307.185513-1-dlemoal@kernel.org>
+ <20251031061307.185513-2-dlemoal@kernel.org>
 Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 6.18-rc4
-Content-Type: text/plain; charset=UTF-8
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20251031061307.185513-2-dlemoal@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi Linus,
+On 10/30/25 11:12 PM, Damien Le Moal wrote:
+> Modify disk_update_zone_resources() to freeze the device queue before
+> updating the number of zones, zone capacity and other zone related
+> resources. The locking order resulting from the call to
+> queue_limits_commit_update_frozen() is preserved, that is, the queue
+> limits lock is first taken by calling queue_limits_start_update() before
+> freezing the queue, and the queue is unfrozen after executing
+> queue_limits_commit_update(), which replaces the call to
+> queue_limits_commit_update_frozen().
+> 
+> This change ensures that there are no in-flights I/Os when the zone
+> resources are updated due to a zone revalidation.
+> 
+> Fixes: 0b83c86b444a ("block: Prevent potential deadlock in blk_revalidate_disk_zones()")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+> ---
+>   block/blk-zoned.c | 19 ++++++++++++++-----
+>   1 file changed, 14 insertions(+), 5 deletions(-)
+> 
+> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+> index 5e2a5788dc3b..f3b371056df4 100644
+> --- a/block/blk-zoned.c
+> +++ b/block/blk-zoned.c
+> @@ -1516,8 +1516,13 @@ static int disk_update_zone_resources(struct gendisk *disk,
+>   {
+>   	struct request_queue *q = disk->queue;
+>   	unsigned int nr_seq_zones, nr_conv_zones;
+> -	unsigned int pool_size;
+> +	unsigned int pool_size, memflags;
+>   	struct queue_limits lim;
+> +	int ret;
+> +
+> +	lim = queue_limits_start_update(q);
+> +
+> +	memflags = blk_mq_freeze_queue(q);
+>   
+>   	disk->nr_zones = args->nr_zones;
+>   	disk->zone_capacity = args->zone_capacity;
+> @@ -1527,11 +1532,10 @@ static int disk_update_zone_resources(struct gendisk *disk,
+>   	if (nr_conv_zones >= disk->nr_zones) {
+>   		pr_warn("%s: Invalid number of conventional zones %u / %u\n",
+>   			disk->disk_name, nr_conv_zones, disk->nr_zones);
+> -		return -ENODEV;
+> +		ret = -ENODEV;
+> +		goto unfreeze;
+>   	}
+>   
+> -	lim = queue_limits_start_update(q);
+> -
+>   	/*
+>   	 * Some devices can advertize zone resource limits that are larger than
+>   	 * the number of sequential zones of the zoned block device, e.g. a
+> @@ -1568,7 +1572,12 @@ static int disk_update_zone_resources(struct gendisk *disk,
+>   	}
+>   
+>   commit:
+> -	return queue_limits_commit_update_frozen(q, &lim);
+> +	ret = queue_limits_commit_update(q, &lim);
+> +
+> +unfreeze:
+> +	blk_mq_unfreeze_queue(q, memflags);
+> +
+> +	return ret;
+>   }
+>   
+>   static int blk_revalidate_conv_zone(struct blk_zone *zone, unsigned int idx,
 
-A few fixes for block that should go into the 6.18 kernel release. This
-pull request contains:
+Hi Damien,
 
-- Fix blk-crypto reporting EIO when EINVAL is the correct error code.
+disk_update_zone_resources() only has a single caller and just below the
+only call of this function the following code is present:
 
-- Two bug fixes for the block zone support.
+	if (ret) {
+		unsigned int memflags = blk_mq_freeze_queue(q);
 
-- NVME pull request via Keith
-	- Target side authentication fixup
-	- Peer-to-peer metadata fixup
+		disk_free_zone_resources(disk);
+		blk_mq_unfreeze_queue(q, memflags);
+	}
 
-- null_blk DMA alignment fix.
+Shouldn't this code be moved into disk_update_zone_resources() such that
+error handling happens without unfreezing and refreezing the request
+queue?
 
-Please pull!
+Thanks,
 
-
-The following changes since commit 4c8cf6bd28d6fea23819f082ddc8063fd6fa963a:
-
-  block: require LBA dma_alignment when using PI (2025-10-22 10:02:54 -0600)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-6.18-20251031
-
-for you to fetch changes up to 0d92a3eaa6726e64a18db74ece806c2c021aaac3:
-
-  null_blk: set dma alignment to logical block size (2025-10-31 09:03:12 -0600)
-
-----------------------------------------------------------------
-block-6.18-20251031
-
-----------------------------------------------------------------
-Carlos Llamas (1):
-      blk-crypto: use BLK_STS_INVAL for alignment errors
-
-Damien Le Moal (2):
-      block: fix op_is_zone_mgmt() to handle REQ_OP_ZONE_RESET_ALL
-      block: make REQ_OP_ZONE_OPEN a write operation
-
-Hannes Reinecke (1):
-      nvmet-auth: update sc_c in host response
-
-Hans Holmberg (1):
-      null_blk: set dma alignment to logical block size
-
-Jens Axboe (1):
-      Merge tag 'nvme-6.18-2025-10-30' of git://git.infradead.org/nvme into block-6.18
-
-Keith Busch (1):
-      nvme-pci: use blk_map_iter for p2p metadata
-
- block/blk-crypto.c            |  2 +-
- drivers/block/null_blk/main.c |  1 +
- drivers/nvme/host/pci.c       | 13 ++++++++++---
- drivers/nvme/target/auth.c    |  5 +++--
- include/linux/blk_types.h     | 11 ++++++-----
- 5 files changed, 21 insertions(+), 11 deletions(-)
-
--- 
-Jens Axboe
-
+Bart.
