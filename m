@@ -1,200 +1,94 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from unicom145.biz-email.net (unicom145.biz-email.net [210.51.26.145])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29FA2238C2F;
-	Fri, 31 Oct 2025 06:48:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 115BAAD4B;
+	Fri, 31 Oct 2025 07:19:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.51.26.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761893336; cv=none; b=ChwptOsNFknTXnXw26vcsq9hPdWRd5+idlyzVuo+KweVVEpzspiKIxHRttsnGY9Z4SEZpxCjeNIcHZY3Qi2eVJMmtAWbjtk4kPUCcqj2P+EndE/c+tvr2nbr1tWrJo/RQGdKAQ0yiGPlz4g+KUVUyFRzNdAV16qFdU382BiqFc8=
+	t=1761895198; cv=none; b=alaKlmDkZ5XFDyRl9+hwfO2m/IHapVSfSGa87EgRXKE0XRSxRLG6YA6ZoWKjDs2aNKVGZdO/TEvHMe9+/TxMcyKO32wVgWWlJYNm5Krrxj0+Mn0fBr86Yj/+M9hNMYFrO5vbrIDzeq35z4fkU3llqw7X3LFX4wTRttEj6RAI0x4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761893336; c=relaxed/simple;
-	bh=R5M/BZuEUeO6MNnujDu/RdiqPqOvxifgK+E/jWj/M64=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aLw56Eoxsj0PJ6lG3jkhJfDMvme+EyaDlYXZ3Zpg3fhdzoBeOE649xfIFGNicRrbauCXfuZe3VkXCG5y2cfpl7y+MZ2rASE9pyep26jD1okEmyKlI1lMeEEf8H18KTnhopTRwzz+OaGtrdegCnbeUw5BLenimqNKTGuMeaxbVao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a1h6FTwN; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a1h6FTwN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30340C4CEF1;
-	Fri, 31 Oct 2025 06:48:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761893335;
-	bh=R5M/BZuEUeO6MNnujDu/RdiqPqOvxifgK+E/jWj/M64=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=a1h6FTwN+q+A4td6LvgwCZbm56rsVEOnHoTSFeQoA8kEIgslHwi8eKhmcAv9St0Ok
-	 W80x4Wj8UXuXSY+0aKudJ5lih9rGfReoMhWTywfeghp1RUox6v4uqV5oNv5qbYEg56
-	 QbNeAscqzR9+MyI87V97tP4x1PtA/rtR2xTBusZX/rYO0ZXMXvRQOdHykNpR4S0/F0
-	 1WmfFbl2veaaeJ/gkMhFWNLbBDpTqt/7ZKw1BnTuN4+koJ6EwRipT90WVcZLqWqcZF
-	 nn5bH+8Pi8nXwLiOrgVS7RmUROm+rQImaoV3BWpLLmivAW/zoQbjZp2iEz7zcV0W1P
-	 XuCupc4+xACzg==
-Date: Fri, 31 Oct 2025 08:48:51 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Alex Williamson <alex@shazbot.org>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
-	Jens Axboe <axboe@kernel.dk>, Joerg Roedel <joro@8bytes.org>,
-	kvm@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-mm@kvack.org,
-	linux-pci@vger.kernel.org, Logan Gunthorpe <logang@deltatee.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v5 9/9] vfio/pci: Add dma-buf export support for MMIO
- regions
-Message-ID: <20251031064851.GA74544@unreal>
-References: <cover.1760368250.git.leon@kernel.org>
- <72ecaa13864ca346797e342d23a7929562788148.1760368250.git.leon@kernel.org>
- <20251030143836.66cdf116@shazbot.org>
+	s=arc-20240116; t=1761895198; c=relaxed/simple;
+	bh=HzsfSmIPMvkYSxvGNg6clmzwnLravppfT8kvOZj7JK8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=M0dMo2yMFivwqt+yQ+igNZj8TFqIsSfSlvkANnPBMIuWLxvjVmW7RlD/8W7dP6S/293l1ctxJwCOU2/qiZH1k1zXW7Fw0NcYZ7PenxfX/Tl2tkABvD7Od/H2ZzmPuK0jyKSUtrEJQ1Ads3oqinPb2CNAtKWAhaa1e5VALbpgbMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com; spf=pass smtp.mailfrom=inspur.com; arc=none smtp.client-ip=210.51.26.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inspur.com
+Received: from Jtjnmail201614.home.langchao.com
+        by unicom145.biz-email.net ((D)) with ASMTP (SSL) id 202510311519484386;
+        Fri, 31 Oct 2025 15:19:48 +0800
+Received: from jtjnmailAR01.home.langchao.com (10.100.2.42) by
+ Jtjnmail201614.home.langchao.com (10.100.2.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58; Fri, 31 Oct 2025 15:19:47 +0800
+Received: from inspur.com (10.100.2.96) by jtjnmailAR01.home.langchao.com
+ (10.100.2.42) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
+ Transport; Fri, 31 Oct 2025 15:19:47 +0800
+Received: from localhost.com (unknown [10.94.18.144])
+	by app1 (Coremail) with SMTP id YAJkCsDwdHQSYwRpuDI6AA--.2532S4;
+	Fri, 31 Oct 2025 15:19:46 +0800 (CST)
+From: Chu Guangqing <chuguangqing@inspur.com>
+To: <sth@linux.ibm.com>, <hoeppner@linux.ibm.com>, <axboe@kernel.dk>
+CC: <linux-s390@vger.kernel.org>, <linux-block@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Chu Guangqing <chuguangqing@inspur.com>
+Subject: [PATCH] partitions/ibm: Fix a spelling mistake
+Date: Fri, 31 Oct 2025 15:18:46 +0800
+Message-ID: <20251031071846.3387-1-chuguangqing@inspur.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251030143836.66cdf116@shazbot.org>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: YAJkCsDwdHQSYwRpuDI6AA--.2532S4
+X-Coremail-Antispam: 1UD129KBjvdXoWrZFWftr17tr4kWr4rJrW7XFb_yoWfGwb_Gw
+	1Ika1UXr18Jr92vwnxCF45KrWvvw1UGF1DWFsrKws3XrW8AF4DCrn29rZFgrZxXayUWr13
+	Xr98XF1ayF429jkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbcAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_GcCE
+	3s1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s
+	1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0
+	cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8Jw
+	ACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_JF0_
+	Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxV
+	WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI
+	7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
+	1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI
+	42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUYCJmUUUUU
+X-CM-SenderInfo: 5fkxw35dqj1xlqj6x0hvsx2hhfrp/
+X-CM-DELIVERINFO: =?B?gMd245RRTeOiUs3aOqHZ50hzsfHKF9Ds6CbXmDm38RucXu3DYXJR7Zlh9zE0nt/Iac
+	D+KWaEjeGlY+z6GeJZ4PnyUbEMtZbmSBC65wHo7y+C+eKhRf/5Nys9v/8ZqnnSdn8Ecwqx
+	cuC+A+VMzGS1ClDofEA=
+Content-Type: text/plain
+tUid: 20251031151948194737514bba3967b8d3802a14985b86
+X-Abuse-Reports-To: service@corp-email.com
+Abuse-Reports-To: service@corp-email.com
+X-Complaints-To: service@corp-email.com
+X-Report-Abuse-To: service@corp-email.com
 
-On Thu, Oct 30, 2025 at 02:38:36PM -0600, Alex Williamson wrote:
-> On Mon, 13 Oct 2025 18:26:11 +0300
-> Leon Romanovsky <leon@kernel.org> wrote:
-> > diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> > index fe247d0e2831..56b1320238a9 100644
-> > --- a/drivers/vfio/pci/vfio_pci_core.c
-> > +++ b/drivers/vfio/pci/vfio_pci_core.c
-> > @@ -1511,6 +1520,19 @@ int vfio_pci_core_ioctl_feature(struct vfio_device *device, u32 flags,
-> >  		return vfio_pci_core_pm_exit(vdev, flags, arg, argsz);
-> >  	case VFIO_DEVICE_FEATURE_PCI_VF_TOKEN:
-> >  		return vfio_pci_core_feature_token(vdev, flags, arg, argsz);
-> > +	case VFIO_DEVICE_FEATURE_DMA_BUF:
-> > +		if (device->ops->ioctl != vfio_pci_core_ioctl)
-> > +			/*
-> > +			 * Devices that overwrite general .ioctl() callback
-> > +			 * usually do it to implement their own
-> > +			 * VFIO_DEVICE_GET_REGION_INFO handlerm and they present
-> 
-> Typo, "handlerm"
+The word "formatted" is missing a letter "t" (the incorrect spelling would
+ be "formated").
 
-Thanks, this part of code is going to be different in v6.
+Signed-off-by: Chu Guangqing <chuguangqing@inspur.com>
+---
+ block/partitions/ibm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> 
+diff --git a/block/partitions/ibm.c b/block/partitions/ibm.c
+index 631291fbb356..9a6c84773cca 100644
+--- a/block/partitions/ibm.c
++++ b/block/partitions/ibm.c
+@@ -247,7 +247,7 @@ static int find_lnx1_partitions(struct parsed_partitions *state,
+ 		size = label->lnx.formatted_blocks * secperblk;
+ 	} else {
+ 		/*
+-		 * Formated w/o large volume support. If the sanity check
++		 * Formatted w/o large volume support. If the sanity check
+ 		 * 'size based on geo == size based on nr_sectors' is true, then
+ 		 * we can safely assume that we know the formatted size of
+ 		 * the disk, otherwise we need additional information
+-- 
+2.43.7
 
-<...>
-
-> > @@ -2482,6 +2506,10 @@ static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
-> >  
-> >  	ret = pci_reset_bus(pdev);
-> >  
-> > +	list_for_each_entry(vdev, &dev_set->device_list, vdev.dev_set_list)
-> > +		if (__vfio_pci_memory_enabled(vdev))
-> > +			vfio_pci_dma_buf_move(vdev, false);
-> > +
-> >  	vdev = list_last_entry(&dev_set->device_list,
-> >  			       struct vfio_pci_core_device, vdev.dev_set_list);
-> >  
-> 
-> This needs to be placed in the existing undo loop with the up_write(),
-> otherwise it can be missed in the error case.
-
-I'll move, but it caused me to wonder what did you want to achieve with
-this "vdev = list_last_entry ..." line? vdev is overwritten immediately
-after that line.
-
-> 
-> > diff --git a/drivers/vfio/pci/vfio_pci_dmabuf.c b/drivers/vfio/pci/vfio_pci_dmabuf.c
-> > new file mode 100644
-> > index 000000000000..eaba010777f3
-> > --- /dev/null
-> > +++ b/drivers/vfio/pci/vfio_pci_dmabuf.c
-> > +static unsigned int calc_sg_nents(struct vfio_pci_dma_buf *priv,
-> > +				  struct dma_iova_state *state)
-> > +{
-> > +	struct phys_vec *phys_vec = priv->phys_vec;
-> > +	unsigned int nents = 0;
-> > +	u32 i;
-> > +
-> > +	if (!state || !dma_use_iova(state))
-> > +		for (i = 0; i < priv->nr_ranges; i++)
-> > +			nents += DIV_ROUND_UP(phys_vec[i].len, UINT_MAX);
-> > +	else
-> > +		/*
-> > +		 * In IOVA case, there is only one SG entry which spans
-> > +		 * for whole IOVA address space, but we need to make sure
-> > +		 * that it fits sg->length, maybe we need more.
-> > +		 */
-> > +		nents = DIV_ROUND_UP(priv->size, UINT_MAX);
-> 
-> I think we're arguably running afoul of the coding style standard here
-> that this is not a single simple statement and should use braces.
-> 
-
-<...>
-
-> > +err_unmap_dma:
-> > +	if (!i || !state)
-> > +		; /* Do nothing */
-> > +	else if (dma_use_iova(state))
-> > +		dma_iova_destroy(attachment->dev, state, mapped_len, dir,
-> > +				 attrs);
-> > +	else
-> > +		for_each_sgtable_dma_sg(sgt, sgl, i)
-> > +			dma_unmap_phys(attachment->dev, sg_dma_address(sgl),
-> > +					sg_dma_len(sgl), dir, attrs);
-> 
-> Same, here for braces.
-> 
-
-<...>
-
-> > +	if (!state)
-> > +		; /* Do nothing */
-> > +	else if (dma_use_iova(state))
-> > +		dma_iova_destroy(attachment->dev, state, priv->size, dir,
-> > +				 attrs);
-> > +	else
-> > +		for_each_sgtable_dma_sg(sgt, sgl, i)
-> > +			dma_unmap_phys(attachment->dev, sg_dma_address(sgl),
-> > +				       sg_dma_len(sgl), dir, attrs);
-> > +
-> 
-> Here too.
-
-I will change it, but it is worth to admit that I'm consistent in my
-coding style.
-
-> 
-> > +	sg_free_table(sgt);
-> > +	kfree(sgt);
-> > +}
-> ...
-> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> > index 75100bf009ba..63214467c875 100644
-> > --- a/include/uapi/linux/vfio.h
-> > +++ b/include/uapi/linux/vfio.h
-> > @@ -1478,6 +1478,31 @@ struct vfio_device_feature_bus_master {
-> >  };
-> >  #define VFIO_DEVICE_FEATURE_BUS_MASTER 10
-> >  
-> > +/**
-> > + * Upon VFIO_DEVICE_FEATURE_GET create a dma_buf fd for the
-> > + * regions selected.
-> > + *
-> > + * open_flags are the typical flags passed to open(2), eg O_RDWR, O_CLOEXEC,
-> > + * etc. offset/length specify a slice of the region to create the dmabuf from.
-> > + * nr_ranges is the total number of (P2P DMA) ranges that comprise the dmabuf.
-> > + *
-> 
-> Probably worth noting that .flags should be zero, I see we enforce
-> that.  Thanks,
-
-Added, thanks
-
-> 
-> Alex
-> 
