@@ -1,103 +1,114 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 748B6135A53
-	for <linux-block@vger.kernel.org>; Fri, 31 Oct 2025 03:45:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 978FD25BEE8;
+	Fri, 31 Oct 2025 06:16:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761882333; cv=none; b=uSnswgHqP0hM6vwo46zpSOAtLZf378dP4/ta2N2MhQd2PtB+mae4nKeEwU/MfDbrsDnFk6uk4vL5+3Ph4uAK455xa83uxnbQYcNW0Gb8eHKiriGoSk9D2o9rscDQfMgERBDv8Kf/3KkGLed/I4lUiF8HiKM+3rKbKkpKLiLtqAg=
+	t=1761891415; cv=none; b=LaBFpjhKguE2A7uSBEb4dVx8sSL4SfWimh3hbf41UtSkpZ2JTOxSjJpVzMbw6XYblB3oRCmL7WBL2NzqY4DLfziEZyibXUQFJm/GW2ZGJ0i6jDty6xpWBi4tSmF1SLcqk19TpEIeMDq/yNxD2T7N4u3AquAoa8igtVXDgLPUf24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761882333; c=relaxed/simple;
-	bh=SE2LXa2lkwxnT5rasq2vZJV1CCtoXHkNxlZ6HmwpByo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WeCs+O3hhn0PPETYnluMhVaEWxnEYWZoaFbU6BlUtJssVucVif1D5tS54NDjFjD8lquwMgildf/m4CZhjnI1OQ4hfnWADoiwMY+Uqj0AkxEHAaq4OMS2EgoLG0X4gb4WEVX9dnb7TrkWWo+OlPvKN+cN8Lqd2zJBxIkKKc4w8dM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fFTBSSFE; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1761891415; c=relaxed/simple;
+	bh=7GvVW4uZiDm+Tw9/lHA4zIrauzC8lt+7kjJjVl6Nmh0=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=lQ/BPajWOkDK/ge6KHINq8yw2dgCldLqsRNblszWEBicRFb2IVcuOImsbVOZRgKFx7f/KMM9BmPiNLxzOhT4d15tAWZ1H9ZX85DbU1VV0NyhVJKvBvvmjWiwB/iY9QKSqaR2JW16gaN6o2etSMb4q9LgTQaUJsQL5N27K3aTGjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ADhIOAk3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fFTBSSFE"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761882330;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YH4wSzDPaeYqFiotjSVbG3CNJDKYovKauDGIGQdaamU=;
-	b=fFTBSSFE7L0QW6GLFk3ytTrQUTUKZmPKw1AKLGfXEpxEEm93IvOTZP/fzI1NTjJlD/hjhV
-	SCStKyXIAJ4xcfvyUwOyvyMfl019iz/05crW0TTOgSH5F988NAWcW2ni0x8bahYGRPmWIJ
-	zFMdsFZYmAdFPdQzPWlDijIm+2HkRfU=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-136-AM4UnVkyMlG4bDuAdoWj8w-1; Thu,
- 30 Oct 2025 23:45:27 -0400
-X-MC-Unique: AM4UnVkyMlG4bDuAdoWj8w-1
-X-Mimecast-MFC-AGG-ID: AM4UnVkyMlG4bDuAdoWj8w_1761882326
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DB1FF1955DD1;
-	Fri, 31 Oct 2025 03:45:25 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.28])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2A0AD1800589;
-	Fri, 31 Oct 2025 03:45:21 +0000 (UTC)
-Date: Fri, 31 Oct 2025 11:45:15 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] ublk: use copy_{to,from}_iter() for user copy
-Message-ID: <aQQwy7l_OCzG430i@fedora>
-References: <20251031010522.3509499-1-csander@purestorage.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ADhIOAk3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95E61C4CEF1;
+	Fri, 31 Oct 2025 06:16:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761891415;
+	bh=7GvVW4uZiDm+Tw9/lHA4zIrauzC8lt+7kjJjVl6Nmh0=;
+	h=From:To:Subject:Date:From;
+	b=ADhIOAk3iHBYRPIDhHIJjRfXk6JxkMJw0eZF/SzWIlcPcsZ/YgeHV7UISZCt8MENk
+	 0PVhOU+HjBCos0FR0+6Z177Q9VZXrZNnTQIjCRjlFC/GVA+nn2MD8jEuCELMCqDzvY
+	 3tRDqADSx1LiUZqU7vtIM14dYrOmKXEeHG9fsPamPXCs7jcGh3Tpv8jxSltWtfGfvK
+	 LJNHu2zMa18ez6uDTPDK8WaANNs7ZmsS1hBqyjihnKyJ5juo9YrUwAGd8+H8YtDT3f
+	 R44DBY1xYY8Trh2ZqwXdFMNbc/7UCDpfoCXvNZjS7z7PChUkOdXN6TpYYlsZLE/TgQ
+	 bJjJOFxVLu+vw==
+From: Damien Le Moal <dlemoal@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	Keith Busch <keith.busch@wdc.com>,
+	Christoph Hellwig <hch@lst.de>,
+	dm-devel@lists.linux.dev,
+	Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-scsi@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	Carlos Maiolino <cem@kernel.org>,
+	linux-btrfs@vger.kernel.org,
+	David Sterba <dsterba@suse.com>
+Subject: [PATCH 00/13] Introduce cached report zones
+Date: Fri, 31 Oct 2025 15:12:54 +0900
+Message-ID: <20251031061307.185513-1-dlemoal@kernel.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251031010522.3509499-1-csander@purestorage.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Transfer-Encoding: 8bit
 
-On Thu, Oct 30, 2025 at 07:05:21PM -0600, Caleb Sander Mateos wrote:
-> ublk_copy_user_pages()/ublk_copy_io_pages() currently uses
-> iov_iter_get_pages2() to extract the pages from the iov_iter and
-> memcpy()s between the bvec_iter and the iov_iter's pages one at a time.
-> Switch to using copy_to_iter()/copy_from_iter() instead. This avoids the
-> user page reference count increments and decrements and needing to split
-> the memcpy() at user page boundaries. It also simplifies the code
-> considerably.
-> 
-> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-> ---
->  drivers/block/ublk_drv.c | 62 +++++++++-------------------------------
->  1 file changed, 14 insertions(+), 48 deletions(-)
-> 
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index 0c74a41a6753..852350e639d6 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -912,58 +912,47 @@ static const struct block_device_operations ub_fops = {
->  	.open =		ublk_open,
->  	.free_disk =	ublk_free_disk,
->  	.report_zones =	ublk_report_zones,
->  };
->  
-> -#define UBLK_MAX_PIN_PAGES	32
-> -
->  struct ublk_io_iter {
-> -	struct page *pages[UBLK_MAX_PIN_PAGES];
->  	struct bio *bio;
->  	struct bvec_iter iter;
->  };
+The patch series implements a cached report zones using information from
+the block layer zone write plugs and a new zone condition tracking. This
+avoids having to execute slow report zones commands on the device when
+for instance mounting file systems, which can significantly speed things
+up, especially in setups with multiple SMR HDDs (e.g. a RAID volume).
 
-->pages[] is actually for pinning user io pages in batch, so killing it may cause
-perf drop.
+The first patch improves zone resource updates. The following 3 patches
+cleanup and improve handling of zone reports and of other zone
+management operations. From patch 5 to 10, cached report zones in
+implemented and made available to users with a new ioctl() command.
 
-This similar trick is used in direct io code path too.
+Finally, patches 12 and 13 introduce the use of cached report zones in
+the mount operation of XFS and BTRFS.
+
+These patches are against Jen's for-next tree.
+
+Damien Le Moal (13):
+  block: freeze queue when updating zone resources
+  block: cleanup blkdev_report_zones()
+  block: handle zone management operations completions
+  block: introduce disk_report_zone()
+  block: reorganize struct blk_zone_wplug
+  block: use zone condition to determine conventional zones
+  block: track zone conditions
+  block: introduce blkdev_get_zone_info()
+  block: introduce blkdev_report_zones_cached()
+  block: introduce BLKREPORTZONESV2 ioctl
+  block: add zone write plug condition to debugfs zone_wplugs
+  btrfs: use blkdev_report_zones_cached()
+  xfs: use blkdev_report_zones_cached()
+
+ block/blk-zoned.c                 | 762 ++++++++++++++++++++++++------
+ block/blk.h                       |  14 +
+ block/ioctl.c                     |   1 +
+ drivers/block/null_blk/null_blk.h |   3 +-
+ drivers/block/null_blk/zoned.c    |   4 +-
+ drivers/block/ublk_drv.c          |   4 +-
+ drivers/block/virtio_blk.c        |  11 +-
+ drivers/block/zloop.c             |   4 +-
+ drivers/md/dm-zone.c              |  54 ++-
+ drivers/md/dm.h                   |   3 +-
+ drivers/nvme/host/core.c          |   5 +-
+ drivers/nvme/host/multipath.c     |   4 +-
+ drivers/nvme/host/nvme.h          |   2 +-
+ drivers/nvme/host/zns.c           |  10 +-
+ drivers/scsi/sd.h                 |   2 +-
+ drivers/scsi/sd_zbc.c             |  17 +-
+ fs/btrfs/zoned.c                  |  11 +-
+ fs/xfs/xfs_zone_alloc.c           |   2 +-
+ include/linux/blkdev.h            |  44 +-
+ include/linux/device-mapper.h     |  10 +-
+ include/uapi/linux/blkzoned.h     |  36 +-
+ include/uapi/linux/fs.h           |   2 +-
+ 22 files changed, 746 insertions(+), 259 deletions(-)
 
 
-Thanks 
-Ming
+base-commit: ba6a8208cc205c6545c610b5863ea89466fc486a
+-- 
+2.51.0
 
