@@ -1,178 +1,215 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-ej1-f104.google.com (mail-ej1-f104.google.com [209.85.218.104])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 471FB24169D
-	for <linux-block@vger.kernel.org>; Thu, 30 Oct 2025 23:18:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58CE321B192
+	for <linux-block@vger.kernel.org>; Fri, 31 Oct 2025 01:05:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.104
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761866331; cv=none; b=BADM1DD9qH8wWRRkmlKtamG+H+Zf4xTTIV/Zdh+zLvrD15b0toXCm4ilvXAO3QV/P3/cwTXkiSUh7zzqYI4Oi+VhiEa1qVoC+CqtU15YePOKPZSZ6g1HFvP7vaPVFeX+zpI+ILxUq2nIUPHrkOapmpHp+9RGaEzI2AoI5x6SW2M=
+	t=1761872729; cv=none; b=tSpoy6LPoCl4VWmAMFxD7yDC5K0LeYjbf4nQD4gqFFmDu+trIe+8xvWREbCGKG+R85yVb0CPIV6DMNqDSXnL+CT56bzgfuVViVSjLfC9lt9z4FL7G1p4/3RrpnJOH/66gVwO1iXQwH7lw04Mp7gi3z2cfNluEYD5r5aNB6f4Sto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761866331; c=relaxed/simple;
-	bh=uyIXTX283OC1kScJiq1BmNvAstOmpxdr5HCMuNHi0fQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uh+26xgvEcb2R0WA+YfgUzu6lkTlyynDQuVyqYqhyj19UCj2MT1d3oLcD3qyaqY0ltBAyN3eqHceYT29iEQ3FyBZjcL8SL+f97uIa/rT0wnz74PyzEvTjNGtKT7J+vthvmUGJKeEHK6p7nUHIOeU/CM9J3NtHzNdeVs7luTPGuA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=MjkRN0eU; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
+	s=arc-20240116; t=1761872729; c=relaxed/simple;
+	bh=QgO1i7/LcbddJaAQvCDrIY0FhdeHRaZIDoyXNGxmPko=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OQ4Wo//kwSxSPI6SxhpuOUmhiexIkkyXytp1ifw29sJOl07GhMEzjOlZnU1VyLk41kwVyAUNbsbxgx4pvXjGnI3mKrX1Jx++fAM8NG4O9YetQHPtsAn+aXpQ8dYeYguzp4HyLDpXWDQvBSqF9v8TqKhNOGLj9q0+tWV9it3A3o8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=CS6017fJ; arc=none smtp.client-ip=209.85.218.104
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="MjkRN0eU"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-295018cbc50so15249405ad.3
-        for <linux-block@vger.kernel.org>; Thu, 30 Oct 2025 16:18:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="CS6017fJ"
+Received: by mail-ej1-f104.google.com with SMTP id a640c23a62f3a-b6dc4667305so31459466b.3
+        for <linux-block@vger.kernel.org>; Thu, 30 Oct 2025 18:05:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1761866329; x=1762471129; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qCbSBxSr0lLm7sBF21gLzNw2k4fWMvq9RhDFJxnnKCU=;
-        b=MjkRN0eUQYCY+pow13wzfHTyaRtLTZMsgpaIePm6uu+qnhlXj3rR535w+YrIxQ28h7
-         TLI5cmdgr/ZDpm14ymS20tSuC2us1e0xaVwtFBCYnm2wanpXzlgo/OFSvPN4teLcf/YE
-         /of6Mz40YLKckhLZ6V1NxZvGPGN5ttbCAeYsIGHIArq10p+wOOcOJGa9oTeeT4daqwyt
-         G2Qhg7IzpEOUwQzT0V+09gZkgduXmCV+IJtrC/hkwYITTCbvwysP79wJFSbNg8Y2Rnh3
-         fSFG8tN9e/wjgtIKjQDlK6Y4HzBOyQ8yMLQmL3Cn660PUQx7xKStnYKvtvqDpNB7oC37
-         /waQ==
+        d=purestorage.com; s=google2022; t=1761872726; x=1762477526; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rfVQMMzkhlV0Y30v8r08oWrAUc2m58EUIU01ulibFEY=;
+        b=CS6017fJxmdiXkl7OZBqYrqGJ1I9KjiUP3XnTrHqkw7Y6FzjIPhXwNmZfBEQTkAWjr
+         9nQxCsgKlWkNRsoxNGblsDzibXonI2N2zk9gWZJZ7sHLNCDYlmegMJOVOgREpusKrOxW
+         wZ+QZUB+V1EEs8CkGuva/PZ/vBG7+yI2EI2wnTrvKOXLvZ6vJ1cfo50YTrAivt14CuhM
+         eROt2MZLKAQT9wv4fjxePHMz8EI1qXiaAKPxwMHE/qtnFXbJi1HiBSfGcZEJTQbrCxrp
+         KylMChthwhJ0XAu2joJr8VXfxzNLfM8H4QW9GShlomoL/ZOVVQ07GjPPpmKz2d643mrI
+         2LDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761866329; x=1762471129;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qCbSBxSr0lLm7sBF21gLzNw2k4fWMvq9RhDFJxnnKCU=;
-        b=FhB8UeeAHaNe3TMwqmpV9psdhLhUR4B39SyVUjxvqHxMvlEO6Y5VufbyoDzaadKEus
-         Iq3YhYyBRV5ZVTyeNmCZC9tqKyvpl6fia8k6lscECCtVrlLA1sfYksAtmlEgUQ3kyoEO
-         xvZ93KaB8OmgLlMhDREVfOGfBh9NELJBwwipU+UF9tRUA5E4fVap0rv0ef8Tz2qRCnvH
-         4moxY3owVrP16k6s5Gj014uueluJQkbjZMgFp/xW7KOcCJ+RtLD6XfZn85dgm3ixTqwg
-         2WWQtKjyDfYeig4fqHj6JZkmP0Xvc7X/N0HfYTuwcMS7oao5JBLsEWDz2dBtkeSo6SVC
-         Azzg==
-X-Forwarded-Encrypted: i=1; AJvYcCUvUpP+OGucW1ytKrIu1kTj8LL8GQnCC1W1Lz9XLIViP6Sih/PGA0XCBhZEKl5XkwhqSaG2Ud1ts2A/Bg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwyxksXO16w5DLK17TYbc0d5/sWzKIempXChuiVgEn2Z42ub7ID
-	EbbuqtjBDrXh3T+u9B8zLbZCxr3+Zqj2BfAv87/+mz1vLjv4C0Rse9hpcvrTCXdpVoQ=
-X-Gm-Gg: ASbGncsC6ZQO6+s01oLSmFAbsQ+gUCj6k72ST+AShmLsKgpwbVHP2vt3bDnXai8bZd1
-	RVA7X9q2ZdKNcKTvDY8BxU8EDErogGUqeoJIrOWeA7lhlyq1ZOnDDsqL8SFfvwVoKcXy6pm8fAH
-	jvDTr29jQifsmAzZBrneGf2Xfc7FQBPthpHvSu6bMal09Rf9Z27UoXUzQ2WE7Pyrv4zvXXpXAtN
-	MmSu8L0zyUPZ6i54wlPZTxfI37usIVa/kDXQ3LXtvFqvDJdMqw/vJ2rV0fZV0Jeqq64RA+39mFC
-	VhFyJw/t9f40kFSxIZtSczq1Kt8j91Nw3TMADIm6lu8B0TfuwItXq1//lgoAtljz0kIx4xeyHA5
-	437uk64QPxE6TqEyzNGunDM/t7k++wd78+vbNHAD9XCbuDS/cauZWBJfnCnu0lIj7E90+mWEill
-	ZEcbcnpyWrASehVAddALwKnHmJ1nAztSKc6Li/ehlA8xeBtR2SRjI=
-X-Google-Smtp-Source: AGHT+IGCGfP0IWbXjpKpFiO2EIcl6d55MTKqgA8ReFs8GKHUG4igFi9rEAY/xEAVF+O7aUhdVIl2Ew==
-X-Received: by 2002:a17:902:fc45:b0:295:73f:90db with SMTP id d9443c01a7336-2951a524b7bmr20673395ad.41.1761866329403;
-        Thu, 30 Oct 2025 16:18:49 -0700 (PDT)
-Received: from dread.disaster.area (pa49-181-58-136.pa.nsw.optusnet.com.au. [49.181.58.136])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2952699cd48sm982535ad.83.2025.10.30.16.18.48
+        d=1e100.net; s=20230601; t=1761872726; x=1762477526;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rfVQMMzkhlV0Y30v8r08oWrAUc2m58EUIU01ulibFEY=;
+        b=lCT7oDRfjC9Z+iNIFKfywKveicqNSFlzdr1zGFC5dE7zIw4GvCLBRn+md7i9zOHe1B
+         SQFCv7Ws3vKnQBczQGVnF1YAL7ZgpjAC0jduq9GubQLWT9DcfRFuulPgOlbm4N6YGlY8
+         2unbAkUJlw+TwEvEHEtEGR1cbEFIbdcdJeR45AJ4dMSBJ99U5nwSY53YmfArVEUfczBS
+         eb/WMxGe+D//2/UJfIMHTNY1kaP/owUVgJiLiN8f2xL3/oQsaHuhtHxXqr21SOi96lCe
+         r1JKCb0ZIJ53uo69yHBmnDUAXvkPiIqSa//6GdWSrI/VbUKbPf2x+lBV7zLSmfnwc3Xs
+         oJJw==
+X-Forwarded-Encrypted: i=1; AJvYcCXahw0HMSygP4GNpVUizh/qkRSIfhh05VT8HggGOpKVjZrkv6x0PMyajhQp3aEl2FgjLAnqJF3g/7IW0w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxiRykng2fXvB53n9A3dSzVwX5s9NDETfAxIRfHBIHratwNhUqa
+	nuF9jG8R4F3sLSFVmG5TOzx376e0MizObYXGmoO+u4yvaWRwKat+unkPldHtB6/1/s9I7LSFtT6
+	P1fsghYwAEMcPiucX8p3CbQCLCSggq/WunIU1Tjs7roVslb6P/TJp
+X-Gm-Gg: ASbGncv+LBzbpHxIHqSfrF7L3qsrZSSUf6sgizyeaVl3C8/o+n6iFKzgps3cRdElbLb
+	AjnXeFbVPU0J1myORbIvfBblcOG8wG3zwkIJTQJEDlSeaMFG5lYp2BsuYdIr0jjyT33gQgVhFS5
+	v9dxB0SWn01qmg72L4epC86QrcJJHgDfZ5sYIeTPXuZWp0xtg9G1p1vVo5Q7FZTt2cn4SnCIhNe
+	L7pq59iibAX866pfB4TdmY+AIPfQFv4PR+TWHN9XeCJB20/Jin3kim1CXs2/mNMJXeevhIr6A0P
+	dwSmX8XYGJ+1gv8omTUfiK/YsGPPQTOZ12+57q9+vCCd30tzTD1wv2ZLgu6kMbHZl3pa9rtTW0R
+	ESLdT1FdTwwOj/XQ7
+X-Google-Smtp-Source: AGHT+IFOK69ROlMKXBBWP8G4jGiql0UOfHUJc2N6zLUoUX6qzQjFY+p6mG1kcfzN4L3bW8Mg1AiFvbwj6Gsf
+X-Received: by 2002:a17:907:3f13:b0:b65:c8b8:144f with SMTP id a640c23a62f3a-b70705fb91fmr71990966b.6.1761872725535;
+        Thu, 30 Oct 2025 18:05:25 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
+        by smtp-relay.gmail.com with ESMTPS id a640c23a62f3a-b70779a15a0sm4231666b.2.2025.10.30.18.05.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Oct 2025 16:18:48 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.98.2)
-	(envelope-from <david@fromorbit.com>)
-	id 1vEbuo-00000004Ia1-0Gmg;
-	Fri, 31 Oct 2025 10:18:46 +1100
-Date: Fri, 31 Oct 2025 10:18:46 +1100
-From: Dave Chinner <david@fromorbit.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Carlos Maiolino <cem@kernel.org>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-raid@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: Re: fall back from direct to buffered I/O when stable writes are
- required
-Message-ID: <aQPyVtkvTg4W1nyz@dread.disaster.area>
-References: <20251029071537.1127397-1-hch@lst.de>
- <aQNJ4iQ8vOiBQEW2@dread.disaster.area>
- <20251030143324.GA31550@lst.de>
+        Thu, 30 Oct 2025 18:05:25 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.7.70.37])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 26A5C3400E5;
+	Thu, 30 Oct 2025 19:05:24 -0600 (MDT)
+Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
+	id 1B0CCE41BC3; Thu, 30 Oct 2025 19:05:24 -0600 (MDT)
+From: Caleb Sander Mateos <csander@purestorage.com>
+To: Ming Lei <ming.lei@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Caleb Sander Mateos <csander@purestorage.com>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] ublk: use copy_{to,from}_iter() for user copy
+Date: Thu, 30 Oct 2025 19:05:21 -0600
+Message-ID: <20251031010522.3509499-1-csander@purestorage.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251030143324.GA31550@lst.de>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Oct 30, 2025 at 03:33:24PM +0100, Christoph Hellwig wrote:
-> On Thu, Oct 30, 2025 at 10:20:02PM +1100, Dave Chinner wrote:
-> > > use cases, so I'm not exactly happy about.
-> > 
-> > How many applications actually have this problem? I've not heard of
-> > anyone encoutnering such RAID corruption problems on production
-> > XFS filesystems -ever-, so it cannot be a common thing.
-> 
-> The most common application to hit this is probably the most common
-> use of O_DIRECT: qemu.  Look up for btrfs errors with PI, caused by
-> the interaction of checksumming.  Btrfs finally fixed this a short
-> while ago, and there are reports for other applications a swell.
+ublk_copy_user_pages()/ublk_copy_io_pages() currently uses
+iov_iter_get_pages2() to extract the pages from the iov_iter and
+memcpy()s between the bvec_iter and the iov_iter's pages one at a time.
+Switch to using copy_to_iter()/copy_from_iter() instead. This avoids the
+user page reference count increments and decrements and needing to split
+the memcpy() at user page boundaries. It also simplifies the code
+considerably.
 
-I'm not asking about btrfs - I'm asking about actual, real world
-problems reported in production XFS environments.
+Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+---
+ drivers/block/ublk_drv.c | 62 +++++++++-------------------------------
+ 1 file changed, 14 insertions(+), 48 deletions(-)
 
-> For RAID you probably won't see too many reports, as with RAID the
-> problem will only show up as silent corruption long after a rebuild
-> rebuild happened that made use of the racy data.
-
-Yet we are not hearing about this, either. Nobody is reporting that
-their data is being found to be corrupt days/weeks/months/years down
-the track.
-
-This is important, because software RAID5 is pretty much the -only-
-common usage of BLK_FEAT_STABLE_WRITES that users are exposed to.
-This patch set is effectively disallowing direct IO for anyone
-using software RAID5.
-
-That is simply not an acceptible outcome here.
-
-> With checksums
-> it is much easier to reproduce and trivially shown by various xfstests.
-
-Such as? 
-
-> With increasing storage capacities checksums are becoming more and
-> more important, and I'm trying to get Linux in general and XFS
-> specifically to use them well.
-
-So when XFS implements checksums and that implementation is
-incompatible with Direct IO, then we can talk about disabling Direct
-IO on XFS when that feature is enabled. But right now, that feature
-does not exist, and ....
-
-> Right now I don't think anyone is
-> using PI with XFS or any Linux file system given the amount of work
-> I had to put in to make it work well, and how often I see regressions
-> with it.
-
-.... as you say, "nobody is using PI with XFS".
-
-So patchset is a "fix" for a problem that no-one is actually having
-right now.
-
-> > Forcing a performance regression on users, then telling them "you
-> > need to work around the performance regression" is a pretty horrible
-> > thing to do in the first place.
-> 
-> I disagree.  Not corruption user data for applications that use the
-> interface correctly per all documentation is a prime priority.
-
-Modifying an IO buffer whilst a DIO is in flight on that buffer has
--always- been an application bug.  It is a vector for torn writes
-that don't get detected until the next read. It is a vector for
-in-memory data corruption of read buffers.
-
-Indeed, it does not matter if the underlying storage asserts
-BLK_FEAT_STABLE_WRITES or not, modifying DIO buffers that are under
-IO will (eventually) result in data corruption.  Hence, by your
-logic, we should disable Direct IO for everyone.
-
-That's just .... insane.
-
-Remember: O_DIRECT means the application takes full responsibility
-for ensuring IO concurrency semantics are correctly implemented.
-Modifying IO buffers whilst the IO buffer is being read from or
-written to by the hardware has always been an IO concurrency bug in
-the application.
-
-The behaviour being talked about here is, and always has been, an
-application IO concurrency bug, regardless of PI, stable writes,
-etc. Such an application bug existing is *not a valid reason for the
-kernel or filesystem to disable Direct IO*.
-
--Dave.
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 0c74a41a6753..852350e639d6 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -912,58 +912,47 @@ static const struct block_device_operations ub_fops = {
+ 	.open =		ublk_open,
+ 	.free_disk =	ublk_free_disk,
+ 	.report_zones =	ublk_report_zones,
+ };
+ 
+-#define UBLK_MAX_PIN_PAGES	32
+-
+ struct ublk_io_iter {
+-	struct page *pages[UBLK_MAX_PIN_PAGES];
+ 	struct bio *bio;
+ 	struct bvec_iter iter;
+ };
+ 
+-/* return how many pages are copied */
+-static void ublk_copy_io_pages(struct ublk_io_iter *data,
+-		size_t total, size_t pg_off, int dir)
++/* return how many bytes are copied */
++static size_t ublk_copy_io_pages(struct ublk_io_iter *data,
++		struct iov_iter *uiter, int dir)
+ {
+-	unsigned done = 0;
+-	unsigned pg_idx = 0;
++	size_t done = 0;
+ 
+-	while (done < total) {
++	for (;;) {
+ 		struct bio_vec bv = bio_iter_iovec(data->bio, data->iter);
+-		unsigned int bytes = min3(bv.bv_len, (unsigned)total - done,
+-				(unsigned)(PAGE_SIZE - pg_off));
+ 		void *bv_buf = bvec_kmap_local(&bv);
+-		void *pg_buf = kmap_local_page(data->pages[pg_idx]);
++		size_t copied;
+ 
+ 		if (dir == ITER_DEST)
+-			memcpy(pg_buf + pg_off, bv_buf, bytes);
++			copied = copy_to_iter(bv_buf, bv.bv_len, uiter);
+ 		else
+-			memcpy(bv_buf, pg_buf + pg_off, bytes);
++			copied = copy_from_iter(bv_buf, bv.bv_len, uiter);
+ 
+-		kunmap_local(pg_buf);
+ 		kunmap_local(bv_buf);
+ 
+-		/* advance page array */
+-		pg_off += bytes;
+-		if (pg_off == PAGE_SIZE) {
+-			pg_idx += 1;
+-			pg_off = 0;
+-		}
+-
+-		done += bytes;
++		done += copied;
++		if (copied < bv.bv_len)
++			break;
+ 
+ 		/* advance bio */
+-		bio_advance_iter_single(data->bio, &data->iter, bytes);
++		bio_advance_iter_single(data->bio, &data->iter, copied);
+ 		if (!data->iter.bi_size) {
+ 			data->bio = data->bio->bi_next;
+ 			if (data->bio == NULL)
+ 				break;
+ 			data->iter = data->bio->bi_iter;
+ 		}
+ 	}
++	return done;
+ }
+ 
+ static bool ublk_advance_io_iter(const struct request *req,
+ 		struct ublk_io_iter *iter, unsigned int offset)
+ {
+@@ -987,38 +976,15 @@ static bool ublk_advance_io_iter(const struct request *req,
+  */
+ static size_t ublk_copy_user_pages(const struct request *req,
+ 		unsigned offset, struct iov_iter *uiter, int dir)
+ {
+ 	struct ublk_io_iter iter;
+-	size_t done = 0;
+ 
+ 	if (!ublk_advance_io_iter(req, &iter, offset))
+ 		return 0;
+ 
+-	while (iov_iter_count(uiter) && iter.bio) {
+-		unsigned nr_pages;
+-		ssize_t len;
+-		size_t off;
+-		int i;
+-
+-		len = iov_iter_get_pages2(uiter, iter.pages,
+-				iov_iter_count(uiter),
+-				UBLK_MAX_PIN_PAGES, &off);
+-		if (len <= 0)
+-			return done;
+-
+-		ublk_copy_io_pages(&iter, len, off, dir);
+-		nr_pages = DIV_ROUND_UP(len + off, PAGE_SIZE);
+-		for (i = 0; i < nr_pages; i++) {
+-			if (dir == ITER_DEST)
+-				set_page_dirty(iter.pages[i]);
+-			put_page(iter.pages[i]);
+-		}
+-		done += len;
+-	}
+-
+-	return done;
++	return ublk_copy_io_pages(&iter, uiter, dir);
+ }
+ 
+ static inline bool ublk_need_map_req(const struct request *req)
+ {
+ 	return ublk_rq_has_data(req) && req_op(req) == REQ_OP_WRITE;
 -- 
-Dave Chinner
-david@fromorbit.com
+2.45.2
+
