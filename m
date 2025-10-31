@@ -1,108 +1,97 @@
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 785A534D385
-	for <linux-block@vger.kernel.org>; Fri, 31 Oct 2025 15:05:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56DE22D23B1;
+	Fri, 31 Oct 2025 15:30:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761923152; cv=none; b=en4hpJhtdHAr2oZOXzTQdMTJttUQz1yEfwxlollQ12Dsvbd6p2qn8Mul3WQ1Sz648UYTaadpNoJ6n9eg/am4rFMSCdIb7zhW1ssvOgpSlD6fOpnFsuyUdXxZ6XltcjFNLd1ydY/Pcur1KkvzjKvR7XxbG2e+GHjgTquergFJtQU=
+	t=1761924607; cv=none; b=pDZ8T5q0G5SjgWSUZinuFrAM4dYxdy3m/dq8+9L7ikqPo3TNp+VQLhlFFvX3K9cFF60yQ/Qpe9VjIpwZ2E/hMiRgrkP5MWKBjPLYem7Yq4fvzGpulD/cHF6A1f3+UnURGuB9lE0jEK8aAbcoXckJWYkxUdbFpDh3qgL88SURWA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761923152; c=relaxed/simple;
-	bh=O5l4TkAdQv7h6Ni21WOu1ey+TV0EFyrTLTBth+SNUe0=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=AwuTkRbLEfkIwg2wB/h+gHOS2IR3CHlaswYDN5ndwE/VoFKIPUnhjMr/OLkHlugW2TiGX41sVFVKc4H5D9sifAUZv/fJKg26obDhkxnskhZqcGw24kMAO1PFlVLJzFFh/gHURGpFcLAGLY28/mVwsgugxEQJJwDdg4yM/UbGENs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=NdE76bSs; arc=none smtp.client-ip=209.85.166.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1761924607; c=relaxed/simple;
+	bh=YN9mFpyOirMJG3gxerIW77pECs9cukfzbQfkHOAQpHs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OS0qujMUWvoioKtTSzcBP1GNWdxUbHu0ZHiA1QJoT/1/Y7AKNmNsJqg1626KfzqCx+8LCT4Qe2wTnz6Vnupq8tBhQzIhX+Kjw3Tzbt2lScI99P03Q212lI5p5JrY9rHaSk5tpDqc85/4GZTjAArflud+xGayB+KTZibe6h7UnBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qc8FbJqr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="NdE76bSs"
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-430d7638d27so20526125ab.3
-        for <linux-block@vger.kernel.org>; Fri, 31 Oct 2025 08:05:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1761923147; x=1762527947; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=F8cvAPKv3mb7AhUVdmpvo6tHI5k8pw6yNxWW9OX7WNA=;
-        b=NdE76bSsBUg+LhKT3LTVAS6iDZfocxzElamKsLtHaoylt3AWGFahX6H3wQFQ5KoegG
-         XHvb/meF2iarh5m/ScTRjbLCSgk4Z+z0Z/CeCO0k6XMI6MKj7AokpKJzXY2mpl19P07X
-         oJhntAiCA/OqZMKM82mq7FdaUczUdKt5nBjvWsz1mph0ovXMsxqKMjIfoCd8hUtIdVoX
-         RkVUDHfKW6B6A5XXe7Xpxih/df3p6DmEL8DTjbq+NrNyfnLO6FwhAn47GniWj7JXj6Op
-         S3LKxrx0ub0SfYmsoMWqWPlT8w6gpNweptR/UU4qxdJpuU++zD2INeouERxn1epkqm78
-         MUAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761923147; x=1762527947;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=F8cvAPKv3mb7AhUVdmpvo6tHI5k8pw6yNxWW9OX7WNA=;
-        b=eWOguHkqScgm7IQmbzvkroGcRkGwIopGftl9B30SNi+yENyO/Zgilp6cVkPb7RpuXX
-         /kIPadBLsZak8rshfcaYfJynFuhz9KFxNnU7gCagPg5UJ0z7032oOYWduTY/JDKuoOaA
-         cOX3iRfM7Sq0FYtNbCawjgIGKq2wl8P+k/Ebk3mO9yg0OS7ke58KFMAY4c3IgVWE5jK1
-         /BDfc9eC6tqXF49tAwbRHZUwAfhEr91yY4zQ1RHj9e2uWcqlZgvTfA3brHhUpuF4lQyM
-         nopRmqrnHH1XUbEuoHVO3Vo1JHVOHhEGnUTqVXxoWX6qaGKZ3oZtqjQA6Oi5V/zAvn7w
-         +GRQ==
-X-Gm-Message-State: AOJu0YwbKwTEz2e9dFmF0UwEXsdCLi739nhPZIYKYzauNqcrvQ6wnUbj
-	cgO6wxWJmNT/TAnBvVlqP73dJRHs8IoctHYkQ4Plrjc4xWiDevoU8sQ5S40OWf+NAUY=
-X-Gm-Gg: ASbGncsT5z3Sq/PH4SZp80MIGRN5dwjX6Tg1kKhigRSq9lNZNGRil1/IO9fNqQ8PBMO
-	GHNBT5GvPrUDur7w+no6G6wptKhGMJLgoPAyoclGxB5m5zSAtCF9DWQu1kWBnA+wCpPuvntdewV
-	8H46uC8zsrfCftOX0LPAKooj+Q04IjGYLRgjplZFz6SZqgc+VxPBq9deZdJYNesiZNGBa5WHLiS
-	iG6J/iLT4Y66hg+XlUXZXezu2NsEWGprnc4XFSXN3O3aEWg/EEE4iLK03zfjJGfn4+qWmth1abK
-	WF2s6DLhoGwD8BSk5rTPrNYgXpl9/3JJS3q+pxsdX1gHEgMGnuQrfLedmG7RgPatsMAz0xf9fJ6
-	lnhv4k1xQUQ6vpmX4y0stWDL45/kXJ+JOrgLqgiaj6RpdOFW9VIUQ3esXymUn0GqRNS4=
-X-Google-Smtp-Source: AGHT+IHULlzZf4btYOjbD1WcGbBPBHNAt3oGZa8u5l57fP7BFLt9XpO+DGZBrtZgZuFdeUyKg6G+3A==
-X-Received: by 2002:a05:6e02:3311:b0:430:a013:b523 with SMTP id e9e14a558f8ab-4330d1ddf1fmr65206255ab.25.1761923147342;
-        Fri, 31 Oct 2025 08:05:47 -0700 (PDT)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5b6a2fded5bsm793557173.2.2025.10.31.08.05.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 Oct 2025 08:05:46 -0700 (PDT)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Hans Holmberg <hans.holmberg@wdc.com>
-Cc: Keith Busch <kbusch@kernel.org>, Damien Le Moal <dlemoal@kernel.org>, 
- Johannes Thumshirn <johannes.thumshirn@wdc.com>, 
- Christoph Hellwig <hch@lst.de>, 
- Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>, 
- Andreas Hindborg <a.hindborg@kernel.org>
-In-Reply-To: <20251031094826.135296-1-hans.holmberg@wdc.com>
-References: <20251031094826.135296-1-hans.holmberg@wdc.com>
-Subject: Re: [PATCH v4] null_blk: set dma alignment to logical block size
-Message-Id: <176192314617.599606.8616539941373631435.b4-ty@kernel.dk>
-Date: Fri, 31 Oct 2025 09:05:46 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qc8FbJqr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63CA2C4CEE7;
+	Fri, 31 Oct 2025 15:30:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761924606;
+	bh=YN9mFpyOirMJG3gxerIW77pECs9cukfzbQfkHOAQpHs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qc8FbJqrkdCIX64uhcGh/3sGHjyZ/kg6c299TYuVaR/EIJqJe7VvR4brCH0bIYjIm
+	 ccsiXGVZz9k3yUOR3gfrmQ4kIjoms18UgykNgu+1CPsw1KuPLyFPYP/ri0CslMVeUb
+	 vNzzDSei9y78K6SkntbzS3NuE/nOFh03zqzWcjMyZqDmbWPbmwfVj9iGHSmvPPXwPc
+	 bLnL/UODhTrwTO/5oR0zP4Ffx/OwNa3rxctvcB2Auk1OYMjRRkNvJeY9CtHVN3Bugi
+	 cKqrp5O5IQGjZsNXoECmy3q447y0cXLwfHpdovDId8J2RkKvC1IhxGiQRqQ+t06oEy
+	 OmO8wkiAp0STQ==
+Date: Fri, 31 Oct 2025 16:30:04 +0100
+From: Frederic Weisbecker <frederic@kernel.org>
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Danilo Krummrich <dakr@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Gabriele Monaco <gmonaco@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
+	Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+	linux-mm@kvack.org, linux-pci@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 01/33] PCI: Prepare to protect against concurrent
+ isolated cpuset change
+Message-ID: <aQTV_F-p4tGjdBEq@localhost.localdomain>
+References: <20251013203146.10162-2-frederic@kernel.org>
+ <20251014205313.GA906793@bhelgaas>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20251014205313.GA906793@bhelgaas>
 
-
-On Fri, 31 Oct 2025 10:48:26 +0100, Hans Holmberg wrote:
-> This driver assumes that bio vectors are memory aligned to the logical
-> block size, so set the queue limit to reflect that.
+Le Tue, Oct 14, 2025 at 03:53:13PM -0500, Bjorn Helgaas a écrit :
+> On Mon, Oct 13, 2025 at 10:31:14PM +0200, Frederic Weisbecker wrote:
+> > HK_TYPE_DOMAIN will soon integrate cpuset isolated partitions and
+> > therefore be made modifyable at runtime. Synchronize against the cpumask
+> > update using RCU.
+> > 
+> > The RCU locked section includes both the housekeeping CPU target
+> > election for the PCI probe work and the work enqueue.
+> > 
+> > This way the housekeeping update side will simply need to flush the
+> > pending related works after updating the housekeeping mask in order to
+> > make sure that no PCI work ever executes on an isolated CPU. This part
+> > will be handled in a subsequent patch.
 > 
-> Unless we set up the limit based on the logical block size, we will go
-> out of page bounds in copy_to_nullb / copy_from_nullb.
-> 
-> Apparently this wasn't noticed so far because none of the tests generate
-> such buffers, but since commit 851c4c96db00 ("xfs: implement
-> XFS_IOC_DIOINFO in terms of vfs_getattr") xfstests generates unaligned
-> I/O, which now lead to memory corruption when using null_blk devices
-> with 4k block size.
-> 
-> [...]
+> s/modifyable/modifiable/ (also in several other commit logs)
 
-Applied, thanks!
+Languages are hard.
 
-[1/1] null_blk: set dma alignment to logical block size
-      commit: 0d92a3eaa6726e64a18db74ece806c2c021aaac3
+Fixing the set, thanks!
 
-Best regards,
 -- 
-Jens Axboe
-
-
-
+Frederic Weisbecker
+SUSE Labs
