@@ -1,225 +1,332 @@
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B476D3A1CD
-	for <linux-block@vger.kernel.org>; Fri, 31 Oct 2025 19:19:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23623347FE5
+	for <linux-block@vger.kernel.org>; Fri, 31 Oct 2025 19:29:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761938361; cv=none; b=oDMYXF+G9Adk9hGfNBnId9qbDQMa0sdRLFB4g2lRoPwV2yfL+Cq5+14HV2GxF6DiKzMiKJ5wEUikI32eKXQ8eWJXtyMqMksuIAfYbL1QZmO/NfmohfgxfPUiIhEOXh9UM0ZIRWaSX80xsSspym2s5rtKjtE6PoHtdxlx6eHnNDA=
+	t=1761938978; cv=none; b=GHQdFCvxNr3mY6NbbnQqUvb5zbdwYsiXMQ4oSyKDpzLRWFPFVtqB7wGOkJIox726LDztPRsjR+DfTw0AUsb9dL6+Z9ytLa5VafijegDS2gqe2aX+eKpdw27fC31P2Au46NPfRBHnyShAA+g3cum11xrN/jFLWUn29LA9Ug5YI1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761938361; c=relaxed/simple;
-	bh=IsXAQl5ES5eHlQl/WXqXlMIxfOLf1esZulCzSKKm8As=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EYG0KWjQncv5qlfdmmPo3OXTxT9rPEdBHJQXdjLa0f3zs4s3i1HmfY8lzzjx92VSf4gMgZG0GaS17NqB3kYQL7Hz/5fmmeidJBOH8n6U810zKaBc5FuQuTJafA//MbGu/CKT3+gF+GcmchrnRq2hZv0O3BJnve1ufGkEkQ6SzRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=W24YrTT2; arc=none smtp.client-ip=209.85.222.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1761938978; c=relaxed/simple;
+	bh=X20NpIR0WX//ANJMW0ltN+fInGZmh1CBawCuytn/QT4=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=m+pvBO1v1IBSQdHXbecOsTR6XQjqYsfZbBpDW9C5ZrpewThKjm3vuywoSC/KVM60oA2F0GXKHI6TO02MB6KpQuXCzIGq9+ClaLPtPS98c1bU5hTOh7kJF4ThmsGJZoHKA3eRyzTDdK+Ws0C+zWlfqBKiJUSXrkWRF6rMAJLIIvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Cy3R+jqB; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="W24YrTT2"
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-88fbbec670aso34182285a.0
-        for <linux-block@vger.kernel.org>; Fri, 31 Oct 2025 12:19:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1761938358; x=1762543158; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9ObbBtY4bAACLHGXaCLYX4TLQoujOeHfNhffdejq4q8=;
-        b=W24YrTT22cnjMjEA4+ZG27axr9gzY8PUkkJ6YTluQseCS5alMxnyyqONMYdOeQBdoH
-         GwzrkORJF10zb16B5/trw7bsHQM15WXU4tfzL/yoA63Mkrqh7EM5qBGhMmVr1elvCqJA
-         NPvjn6+PeHjBjDVwDzIkJsH50CEoSbJ1QwO47zdUFEaH9uskKqP7nfwVOvZbvyuP5pgL
-         B0+44ljF/F1Zrx7mSJB29ZYV7kjL97pm0RfzPIvfsO+9pFnHIWtLxtgxJbQXyPCy1pcp
-         ScfgBzvlxEBjPD7SwEkLDEmM5UBj0dByIXFRxI/aCOP4yNTyDuV5EwwP9Njq90XBY2yH
-         QkhA==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cy3R+jqB"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1761938974;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=S5LPLyq7lQEV5yeoAq12Udobk8GGeNqbKub31AGenK0=;
+	b=Cy3R+jqBjD/Z3VQyAX1rX1Y7koSrpX147QaP5N8hJYCPS7/KmKpEt+cXe7jufChqHTltp7
+	qi2SUJSalt0scZHEHizzpedJMNDdFcDuK17Q1bW51Sddw6yhf/mp+GcnSisCsKOaXHtB3M
+	/uHUKtIOMkeTpOuRu95seka292Q45kI=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-330-o4P6EDh4NDO91C7VsIet6w-1; Fri, 31 Oct 2025 15:29:32 -0400
+X-MC-Unique: o4P6EDh4NDO91C7VsIet6w-1
+X-Mimecast-MFC-AGG-ID: o4P6EDh4NDO91C7VsIet6w_1761938972
+Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-4e88ddf3cd0so64731481cf.3
+        for <linux-block@vger.kernel.org>; Fri, 31 Oct 2025 12:29:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761938358; x=1762543158;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9ObbBtY4bAACLHGXaCLYX4TLQoujOeHfNhffdejq4q8=;
-        b=IRwZORTTIzeiGXZEgdCdIgXYvJyrP2Eq9T9uOOdD+qffHviFFrKhGuFHeG55AJpW+E
-         orypLbpSJLUj/aqvLd4kLEqpeBM9ZJ6eA7/GxTQlV3FNF1m2ld5gmm6u6ttGKYX+oDBN
-         vD9IAGxhSf576TYjX12b0zYMvha/evvAAU4WDKcdPvGuUGs/JBfI5cRhX5YsOvJJ7eL1
-         Kca2K4tbMzld6AB5y7sc+qdTTA8eeGZZYaCPWjkX30g6lHSf0gESmKNc4VOJpDdbn4up
-         UphfVRpaWg5r6zj56ppeSGr33AKHqz4zcS7aSTwrPeKso8DKWXUExPhJono4RggmxhNb
-         Kzfg==
-X-Forwarded-Encrypted: i=1; AJvYcCUGZYEr15k8azM8mfmHj7sg/YFl1NuMsiU5zjy4Bb1tbI+vyIbMpBtRRW0Uz4KMshPH++J4is6YjvWckA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXkTg1DD1hqKYyL04sE7VQf/nzNfzL2+tO6Hbyv1nWofCHudCn
-	G+Bfdi6UIyz+T2zH4APsNw8FKW+xFtPcQa53UW6rCCNIV8Uq/K16RNop6faB8Osru7NQ5YT8zQW
-	sUXy81NtcOFc8hpY+cFQQX9Jk8RLC6YPg8i7e83eUJw==
-X-Gm-Gg: ASbGnctN0MR4YD2lLftmSTMrGV4pUbDoUtbWUWIk0ucX02v7ZUFk1zcJGiD/mZOW/d4
-	Fr+OdeQAiKoHjZEJ/GrMB9EXIvQeju6kcEnRyByBNrUDpgcHvKNrtBsol+3oFomOreGARVjt6Q7
-	ZRKCVoMj+xwxpFafkoDZLGnHAceXAUI/w5u3iOiLOeP0mHsiSQcVtatNL3wnNiqinClX+QIcX1O
-	Vo9pmQPHbwl/WN5fRdPYPAQ8cSfJ+DKckZbM0uwoD3ETIWW/BQU6eWA8lVe
-X-Google-Smtp-Source: AGHT+IHXoeGmi8LnCdXA77pFlBZKMCAMSpt8AYomLHc17PLdvJiM/1UMje1jR4m5+81nyZw+tLwE34AQdhYwBck5Yz0=
-X-Received: by 2002:a05:620a:1a85:b0:863:88f9:3edf with SMTP id
- af79cd13be357-8ab9b694e4fmr379255185a.13.1761938358244; Fri, 31 Oct 2025
- 12:19:18 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1761938972; x=1762543772;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=S5LPLyq7lQEV5yeoAq12Udobk8GGeNqbKub31AGenK0=;
+        b=rrC+aAJQgY6J0TGP9OMOiCFLGdijjwwHYNQQGR7hrwHdybXzEAPqRn2OsJCV5tbvPm
+         iSO/5W/huDSzgPUef8zBhL7L2bQoGyYnCuUInUtTYPQYn8O5lm+dM4hd0RwgWJINLFFT
+         fxsQzxQhsmFH6Au90tYpP+ChR89bIknxoOagZ03Q8WQkg+yYBzVNH8DNfV2G4ViMynz6
+         +XPP9o50VR44ds02n6gAiuvJwZZ8tF+1hjR8++UKDpji7AHWQmZOfiVmm5tw8Hlki8tZ
+         03q6sITXV29l2C5qsXQrRTMY9gPgp2JGKlH8B7nc8MovfCuLWTEYGIUDW4hwULX4XjOq
+         185g==
+X-Forwarded-Encrypted: i=1; AJvYcCVNZYHTGCnLEJFFuEHiKSQdmfGwkkC9sQPj4zdsnN4/1j71Sehfd1NVPyLXDQ6L2irzRmPbaVzqEL5Cbw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzt2o9RDekxHzmUjsj+MSyFa875jMtQu/WGa2md4Sciq3HkUA64
+	2fM7EHs0ovrRs7DaQnjUptiNmuRVkmhrwZPYi7ZTWqXzI3FzNIc8pldk1TA3DXnBrz5+ausx0O6
+	kvzj0yHd1/L6jbFkMHAY9v01XaMKQIX5pjmjqHgZA2HGCfPDvE/oTdGj3lmtAiWFQ
+X-Gm-Gg: ASbGnctkdCRNEEYeKm7bjooEnx9+3cugNdAyfgC939/DuoHdSBlMLnXTuSnPMi8ZZxc
+	SBz0fG9hkinSzbAkwNJWPaxBa2P+UJZIZ+DlV0Fwmj1W/I//JnpdlBy1SO7EqgbAfEmMMhHu9nv
+	WoXtJKIlefAcBh8HRgBi8OrUb1wMbjq5PGHebucZwuGGjEXX7v/YG40fKcvhHoQTwr1DqW3xQJY
+	Dj2sCAHCQukjjoe4v4VeuUwiPtzhQeKA0/a3OVJlFMtiVlCCjUloFUrW54Xe91TVlsfxHs+pj03
+	ItR1WFxFyO7jXGuyKoeY+sOESGVVwtvroq2wVk5ToVq4F4xmcjpQIkWpdznJv9O/V05gbRSM3cz
+	ewtXuyfqOUCmbTgDMK+0HKOCqRx7mxXPQqbI0aUgeCy+FVQ==
+X-Received: by 2002:a05:622a:2307:b0:4ec:f9c2:c1f2 with SMTP id d75a77b69052e-4ed30ddf142mr56740761cf.25.1761938972044;
+        Fri, 31 Oct 2025 12:29:32 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHsufGaMUA5MBhPpAao9g1sdBf7cQRBSBhg2O/Yxw8E8X+buRZx82UZZuHnveKzdlEADeGJAg==
+X-Received: by 2002:a05:622a:2307:b0:4ec:f9c2:c1f2 with SMTP id d75a77b69052e-4ed30ddf142mr56740481cf.25.1761938971569;
+        Fri, 31 Oct 2025 12:29:31 -0700 (PDT)
+Received: from ?IPV6:2601:188:c102:b180:1f8b:71d0:77b1:1f6e? ([2601:188:c102:b180:1f8b:71d0:77b1:1f6e])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ed3536a24bsm15383671cf.35.2025.10.31.12.29.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 31 Oct 2025 12:29:30 -0700 (PDT)
+From: Waiman Long <llong@redhat.com>
+X-Google-Original-From: Waiman Long <longman@redhat.com>
+Message-ID: <3a15d293-43b5-453d-9ba7-9b145aaba492@redhat.com>
+Date: Fri, 31 Oct 2025 15:29:28 -0400
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251029210853.20768-1-cachen@purestorage.com>
- <20251029210853.20768-2-cachen@purestorage.com> <aQKzxpJp98Po_pch@kbusch-mbp> <9669f8a9-11ad-4911-9e03-00758e1d9957@nvidia.com>
-In-Reply-To: <9669f8a9-11ad-4911-9e03-00758e1d9957@nvidia.com>
-From: Casey Chen <cachen@purestorage.com>
-Date: Fri, 31 Oct 2025 12:19:06 -0700
-X-Gm-Features: AWmQ_blv_5UoJMF1pDaZQg5T4Bip-zzv__0KvKfNk-uc74laM-93_6kfXXbTk20
-Message-ID: <CALCePG3Q9u-Mcj6qWqudip+JPVHMq=XBX2=QxJJrV1hELJrYDw@mail.gmail.com>
-Subject: Re: [PATCH 1/1] nvme: fix use-after-free of admin queue via stale pointer
-To: Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc: Keith Busch <kbusch@kernel.org>, 
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, 
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
-	"yzhong@purestorage.com" <yzhong@purestorage.com>, 
-	"sconnor@purestorage.com" <sconnor@purestorage.com>, "axboe@kernel.dk" <axboe@kernel.dk>, 
-	"mkhalfella@purestorage.com" <mkhalfella@purestorage.com>, Ming Lei <ming.lei@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 12/33] sched/isolation: Convert housekeeping cpumasks to
+ rcu pointers
+To: Frederic Weisbecker <frederic@kernel.org>, Waiman Long <llong@redhat.com>
+Cc: Chen Ridong <chenridong@huaweicloud.com>,
+ LKML <linux-kernel@vger.kernel.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?=
+ <mkoutny@suse.com>, Andrew Morton <akpm@linux-foundation.org>,
+ Bjorn Helgaas <bhelgaas@google.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Danilo Krummrich
+ <dakr@kernel.org>, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Gabriele Monaco <gmonaco@redhat.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+ Lai Jiangshan <jiangshanlai@gmail.com>,
+ Marco Crivellari <marco.crivellari@suse.com>, Michal Hocko
+ <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+ Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
+ Phil Auld <pauld@redhat.com>, "Rafael J . Wysocki" <rafael@kernel.org>,
+ Roman Gushchin <roman.gushchin@linux.dev>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Simon Horman <horms@kernel.org>,
+ Tejun Heo <tj@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Vlastimil Babka <vbabka@suse.cz>, Will Deacon <will@kernel.org>,
+ cgroups@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-block@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20251013203146.10162-1-frederic@kernel.org>
+ <20251013203146.10162-13-frederic@kernel.org>
+ <bb9a75dc-8c34-41da-b064-e31bf5fe6cb2@huaweicloud.com>
+ <510b0185-51d6-44e6-8c39-dfc4c1721e03@redhat.com>
+ <aQThLsnmqu8Lor6c@localhost.localdomain>
+Content-Language: en-US
+In-Reply-To: <aQThLsnmqu8Lor6c@localhost.localdomain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, Oct 30, 2025 at 1:12=E2=80=AFAM Chaitanya Kulkarni
-<chaitanyak@nvidia.com> wrote:
+On 10/31/25 12:17 PM, Frederic Weisbecker wrote:
+> Le Tue, Oct 21, 2025 at 12:03:05AM -0400, Waiman Long a écrit :
+>> On 10/20/25 9:46 PM, Chen Ridong wrote:
+>>> On 2025/10/14 4:31, Frederic Weisbecker wrote:
+>>>> HK_TYPE_DOMAIN's cpumask will soon be made modifyable by cpuset.
+>>>> A synchronization mechanism is then needed to synchronize the updates
+>>>> with the housekeeping cpumask readers.
+>>>>
+>>>> Turn the housekeeping cpumasks into RCU pointers. Once a housekeeping
+>>>> cpumask will be modified, the update side will wait for an RCU grace
+>>>> period and propagate the change to interested subsystem when deemed
+>>>> necessary.
+>>>>
+>>>> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+>>>> ---
+>>>>    kernel/sched/isolation.c | 58 +++++++++++++++++++++++++---------------
+>>>>    kernel/sched/sched.h     |  1 +
+>>>>    2 files changed, 37 insertions(+), 22 deletions(-)
+>>>>
+>>>> diff --git a/kernel/sched/isolation.c b/kernel/sched/isolation.c
+>>>> index 8690fb705089..b46c20b5437f 100644
+>>>> --- a/kernel/sched/isolation.c
+>>>> +++ b/kernel/sched/isolation.c
+>>>> @@ -21,7 +21,7 @@ DEFINE_STATIC_KEY_FALSE(housekeeping_overridden);
+>>>>    EXPORT_SYMBOL_GPL(housekeeping_overridden);
+>>>>    struct housekeeping {
+>>>> -	cpumask_var_t cpumasks[HK_TYPE_MAX];
+>>>> +	struct cpumask __rcu *cpumasks[HK_TYPE_MAX];
+>>>>    	unsigned long flags;
+>>>>    };
+>>>> @@ -33,17 +33,28 @@ bool housekeeping_enabled(enum hk_type type)
+>>>>    }
+>>>>    EXPORT_SYMBOL_GPL(housekeeping_enabled);
+>>>> +const struct cpumask *housekeeping_cpumask(enum hk_type type)
+>>>> +{
+>>>> +	if (static_branch_unlikely(&housekeeping_overridden)) {
+>>>> +		if (housekeeping.flags & BIT(type)) {
+>>>> +			return rcu_dereference_check(housekeeping.cpumasks[type], 1);
+>>>> +		}
+>>>> +	}
+>>>> +	return cpu_possible_mask;
+>>>> +}
+>>>> +EXPORT_SYMBOL_GPL(housekeeping_cpumask);
+>>>> +
+>>>>    int housekeeping_any_cpu(enum hk_type type)
+>>>>    {
+>>>>    	int cpu;
+>>>>    	if (static_branch_unlikely(&housekeeping_overridden)) {
+>>>>    		if (housekeeping.flags & BIT(type)) {
+>>>> -			cpu = sched_numa_find_closest(housekeeping.cpumasks[type], smp_processor_id());
+>>>> +			cpu = sched_numa_find_closest(housekeeping_cpumask(type), smp_processor_id());
+>>>>    			if (cpu < nr_cpu_ids)
+>>>>    				return cpu;
+>>>> -			cpu = cpumask_any_and_distribute(housekeeping.cpumasks[type], cpu_online_mask);
+>>>> +			cpu = cpumask_any_and_distribute(housekeeping_cpumask(type), cpu_online_mask);
+>>>>    			if (likely(cpu < nr_cpu_ids))
+>>>>    				return cpu;
+>>>>    			/*
+>>>> @@ -59,28 +70,18 @@ int housekeeping_any_cpu(enum hk_type type)
+>>>>    }
+>>>>    EXPORT_SYMBOL_GPL(housekeeping_any_cpu);
+>>>> -const struct cpumask *housekeeping_cpumask(enum hk_type type)
+>>>> -{
+>>>> -	if (static_branch_unlikely(&housekeeping_overridden))
+>>>> -		if (housekeeping.flags & BIT(type))
+>>>> -			return housekeeping.cpumasks[type];
+>>>> -	return cpu_possible_mask;
+>>>> -}
+>>>> -EXPORT_SYMBOL_GPL(housekeeping_cpumask);
+>>>> -
+>>>>    void housekeeping_affine(struct task_struct *t, enum hk_type type)
+>>>>    {
+>>>>    	if (static_branch_unlikely(&housekeeping_overridden))
+>>>>    		if (housekeeping.flags & BIT(type))
+>>>> -			set_cpus_allowed_ptr(t, housekeeping.cpumasks[type]);
+>>>> +			set_cpus_allowed_ptr(t, housekeeping_cpumask(type));
+>>>>    }
+>>>>    EXPORT_SYMBOL_GPL(housekeeping_affine);
+>>>>    bool housekeeping_test_cpu(int cpu, enum hk_type type)
+>>>>    {
+>>>> -	if (static_branch_unlikely(&housekeeping_overridden))
+>>>> -		if (housekeeping.flags & BIT(type))
+>>>> -			return cpumask_test_cpu(cpu, housekeeping.cpumasks[type]);
+>>>> +	if (housekeeping.flags & BIT(type))
+>>>> +		return cpumask_test_cpu(cpu, housekeeping_cpumask(type));
+>>>>    	return true;
+>>>>    }
+>>>>    EXPORT_SYMBOL_GPL(housekeeping_test_cpu);
+>>>> @@ -96,20 +97,33 @@ void __init housekeeping_init(void)
+>>>>    	if (housekeeping.flags & HK_FLAG_KERNEL_NOISE)
+>>>>    		sched_tick_offload_init();
+>>>> -
+>>>> +	/*
+>>>> +	 * Realloc with a proper allocator so that any cpumask update
+>>>> +	 * can indifferently free the old version with kfree().
+>>>> +	 */
+>>>>    	for_each_set_bit(type, &housekeeping.flags, HK_TYPE_MAX) {
+>>>> +		struct cpumask *omask, *nmask = kmalloc(cpumask_size(), GFP_KERNEL);
+>>>> +
+>>>> +		if (WARN_ON_ONCE(!nmask))
+>>>> +			return;
+>>>> +
+>>>> +		omask = rcu_dereference(housekeeping.cpumasks[type]);
+>>>> +
+>>>>    		/* We need at least one CPU to handle housekeeping work */
+>>>> -		WARN_ON_ONCE(cpumask_empty(housekeeping.cpumasks[type]));
+>>>> +		WARN_ON_ONCE(cpumask_empty(omask));
+>>>> +		cpumask_copy(nmask, omask);
+>>>> +		RCU_INIT_POINTER(housekeeping.cpumasks[type], nmask);
+>>>> +		memblock_free(omask, cpumask_size());
+>>>>    	}
+>>>>    }
+>>>>    static void __init housekeeping_setup_type(enum hk_type type,
+>>>>    					   cpumask_var_t housekeeping_staging)
+>>>>    {
+>>>> +	struct cpumask *mask = memblock_alloc_or_panic(cpumask_size(), SMP_CACHE_BYTES);
+>>>> -	alloc_bootmem_cpumask_var(&housekeeping.cpumasks[type]);
+>>>> -	cpumask_copy(housekeeping.cpumasks[type],
+>>>> -		     housekeeping_staging);
+>>>> +	cpumask_copy(mask, housekeeping_staging);
+>>>> +	RCU_INIT_POINTER(housekeeping.cpumasks[type], mask);
+>>>>    }
+>>>>    static int __init housekeeping_setup(char *str, unsigned long flags)
+>>>> @@ -162,7 +176,7 @@ static int __init housekeeping_setup(char *str, unsigned long flags)
+>>>>    		for_each_set_bit(type, &iter_flags, HK_TYPE_MAX) {
+>>>>    			if (!cpumask_equal(housekeeping_staging,
+>>>> -					   housekeeping.cpumasks[type])) {
+>>>> +					   housekeeping_cpumask(type))) {
+>>>>    				pr_warn("Housekeeping: nohz_full= must match isolcpus=\n");
+>>>>    				goto free_housekeeping_staging;
+>>>>    			}
+>>>> diff --git a/kernel/sched/sched.h b/kernel/sched/sched.h
+>>>> index 1f5d07067f60..0c0ef8999fd6 100644
+>>>> --- a/kernel/sched/sched.h
+>>>> +++ b/kernel/sched/sched.h
+>>>> @@ -42,6 +42,7 @@
+>>>>    #include <linux/ktime_api.h>
+>>>>    #include <linux/lockdep_api.h>
+>>>>    #include <linux/lockdep.h>
+>>>> +#include <linux/memblock.h>
+>>>>    #include <linux/minmax.h>
+>>>>    #include <linux/mm.h>
+>>>>    #include <linux/module.h>
+>>> A warning was detected:
+>>>
+>>> =============================
+>>> WARNING: suspicious RCU usage
+>>> 6.17.0-next-20251009-00033-g4444da88969b #808 Not tainted
+>>> -----------------------------
+>>> kernel/sched/isolation.c:60 suspicious rcu_dereference_check() usage!
+>>>
+>>> other info that might help us debug this:
+>>>
+>>>
+>>> rcu_scheduler_active = 2, debug_locks = 1
+>>> 1 lock held by swapper/0/1:
+>>>    #0: ffff888100600ce0 (&type->i_mutex_dir_key#3){++++}-{4:4}, at: walk_compone
+>>>
+>>> stack backtrace:
+>>> CPU: 3 UID: 0 PID: 1 Comm: swapper/0 Not tainted 6.17.0-next-20251009-00033-g4
+>>> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239
+>>> Call Trace:
+>>>    <TASK>
+>>>    dump_stack_lvl+0x68/0xa0
+>>>    lockdep_rcu_suspicious+0x148/0x1b0
+>>>    housekeeping_cpumask+0xaa/0xb0
+>>>    housekeeping_test_cpu+0x25/0x40
+>>>    find_get_block_common+0x41/0x3e0
+>>>    bdev_getblk+0x28/0xa0
+>>>    ext4_getblk+0xba/0x2d0
+>>>    ext4_bread_batch+0x56/0x170
+>>>    __ext4_find_entry+0x17c/0x410
+>>>    ? lock_release+0xc6/0x290
+>>>    ext4_lookup+0x7a/0x1d0
+>>>    __lookup_slow+0xf9/0x1b0
+>>>    walk_component+0xe0/0x150
+>>>    link_path_walk+0x201/0x3e0
+>>>    path_openat+0xb1/0xb30
+>>>    ? stack_depot_save_flags+0x41e/0xa00
+>>>    do_filp_open+0xbc/0x170
+>>>    ? _raw_spin_unlock_irqrestore+0x2c/0x50
+>>>    ? __create_object+0x59/0x80
+>>>    ? trace_kmem_cache_alloc+0x1d/0xa0
+>>>    ? vprintk_emit+0x2b2/0x360
+>>>    do_open_execat+0x56/0x100
+>>>    alloc_bprm+0x1a/0x200
+>>>    ? __pfx_kernel_init+0x10/0x10
+>>>    kernel_execve+0x4b/0x160
+>>>    kernel_init+0xe5/0x1c0
+>>>    ret_from_fork+0x185/0x1d0
+>>>    ? __pfx_kernel_init+0x10/0x10
+>>>    ret_from_fork_asm+0x1a/0x30
+>>>    </TASK>
+>>> random: crng init done
+>>>
+>> It is because bh_lru_install() of fs/buffer.c calls cpu_is_isolated()
+>> without holding a rcu_read_lock. Will need to add a rcu_read_lock() there.
+> But this is called within bh_lru_lock() which should have either disabled
+> IRQs or preemption off. I would expect rcu_dereference_check() to automatically
+> verify those implied RCU read-side critical sections.
 >
-> On 10/29/25 17:39, Keith Busch wrote:
-> > On Wed, Oct 29, 2025 at 03:08:53PM -0600, Casey Chen wrote:
-> >> Fix this by taking an additional reference on the admin queue during
-> >> namespace allocation and releasing it during namespace cleanup.
-> > Since the namespaces already hold references on the controller, would i=
-t
-> > be simpler to move the controller's final blk_put_queue to the final
-> > ctrl free? This should have the same lifetime as your patch, but with
-> > simpler ref counting:
-> >
-> > ---
-> > diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-> > index fa4181d7de736..0b83d82f67e75 100644
-> > --- a/drivers/nvme/host/core.c
-> > +++ b/drivers/nvme/host/core.c
-> > @@ -4901,7 +4901,6 @@ void nvme_remove_admin_tag_set(struct nvme_ctrl *=
-ctrl)
-> >           */
-> >          nvme_stop_keep_alive(ctrl);
-> >          blk_mq_destroy_queue(ctrl->admin_q);
-> > -       blk_put_queue(ctrl->admin_q);
-> >          if (ctrl->ops->flags & NVME_F_FABRICS) {
-> >                  blk_mq_destroy_queue(ctrl->fabrics_q);
-> >                  blk_put_queue(ctrl->fabrics_q);
-> > @@ -5045,6 +5044,7 @@ static void nvme_free_ctrl(struct device *dev)
-> >                  container_of(dev, struct nvme_ctrl, ctrl_device);
-> >          struct nvme_subsystem *subsys =3D ctrl->subsys;
-> >
-> > +       blk_put_queue(ctrl->admin_q);
-> >          if (!subsys || ctrl->instance !=3D subsys->instance)
-> >                  ida_free(&nvme_instance_ida, ctrl->instance);
-> >          nvme_free_cels(ctrl);
-> > --
-> >
+> Let's see, lockdep_assert_in_rcu_reader() checks preemptible(), which is:
 >
-> above is much better approach that doesn't rely on taking extra
-> ref count but using existing count to protect the UAF.
-> I've added required comments that are very much needed here,
-> totally untested :-
+> #define preemptible()	(preempt_count() == 0 && !irqs_disabled())
 >
-> nvme: fix UAF when accessing admin queue after removal
+> Ah but if !CONFIG_PREEMPT_COUNT:
 >
-> Fix a use-after-free where userspace IOCTLs can access ctrl->admin_q
-> after it has been freed during controller removal.
+> #define preemptible()	0
 >
-> The Race Condition:
+> Chen did you have !CONFIG_PREEMPT_COUNT ?
 >
->    Thread 1 (userspace IOCTL)          Thread 2 (sysfs remove)
->    --------------------------          -------------------
->    open(/dev/nvme0n1) -> fd=3D3
->    ioctl(3, NVME_IOCTL_ADMIN_CMD)
->      nvme_ioctl()
->      nvme_user_cmd()
->                                         echo 1 > .../remove
->                                         pci_device_remove()
->                                         nvme_remove()
->   nvme_remove_admin_tag_set()
->                                           blk_put_queue(admin_q)
->                                           [RCU grace period]
->                                           blk_free_queue(admin_q)
->                                             kmem_cache_free() <- FREED
->      nvme_submit_user_cmd(ns->ctrl->admin_q) <- STALE POINTER
->        blk_mq_alloc_request(admin_q)
->          blk_queue_enter(admin_q)
->            *** USE-AFTER-FREE ***
->
->
-> The admin queue is freed in nvme_remove_admin_tag_set() while userspace
-> may still hold open file descriptors to namespace devices. These open
-> file descriptors can issue IOCTLs that dereference ctrl->admin_q after
-> it has been freed.
->
-> Defer blk_put_queue(ctrl->admin_q) from nvme_remove_admin_tag_set() to
-> nvme_free_ctrl(). Since each namespace holds a controller reference via
-> nvme_get_ctrl()/nvme_put_ctrl(), the controller will only be freed after
-> all namespaces (and their open file descriptors) are released. This
-> guarantees admin_q remains allocated while it may still be accessed.
->
-> After blk_mq_destroy_queue() in nvme_remove_admin_tag_set(), the queue
-> is marked dying (QUEUE_FLAG_DYING), so new IOCTL attempts fail safely
-> at blk_queue_enter() with -ENODEV. The queue structure remains valid for
-> pointer dereference until nvme_free_ctrl() is called.
->
-> ---
->   drivers/nvme/host/core.c | 22 +++++++++++++++++++++-
->   1 file changed, 21 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-> index 734ad725e6f4..dbbcf99dbef8 100644
-> --- a/drivers/nvme/host/core.c
-> +++ b/drivers/nvme/host/core.c
-> @@ -4897,7 +4897,19 @@ void nvme_remove_admin_tag_set(struct nvme_ctrl
-> *ctrl)
->        */
->       nvme_stop_keep_alive(ctrl);
->       blk_mq_destroy_queue(ctrl->admin_q);
-> -    blk_put_queue(ctrl->admin_q);
-> +    /**
-> +     * Defer blk_put_queue() to nvme_free_ctrl() to prevent use-after-fr=
-ee.
-> +     *
-> +     * Userspace may hold open file descriptors to namespace devices and
-> +     * issue IOCTLs that dereference ctrl->admin_q after controller remo=
-val
-> +     * starts. Since each namespace holds a controller reference, deferr=
-ing
-> +     * the final queue release ensures admin_q remains allocated until a=
-ll
-> +     * namespace references are released.
-> +     *
-> +     * blk_mq_destroy_queue() above marks the queue dying
-> (QUEUE_FLAG_DYING),
-> +     * causing new requests to fail at blk_queue_enter() with -ENODEV wh=
-ile
-> +     * keeping the structure valid for pointer access.
-> +     */
->       if (ctrl->ops->flags & NVME_F_FABRICS) {
->           blk_mq_destroy_queue(ctrl->fabrics_q);
->           blk_put_queue(ctrl->fabrics_q);
-> @@ -5041,6 +5053,14 @@ static void nvme_free_ctrl(struct device *dev)
->           container_of(dev, struct nvme_ctrl, ctrl_device);
->       struct nvme_subsystem *subsys =3D ctrl->subsys;
->
-> +    /**
-> +     * Release admin_q's final reference. All namespace references have
-> +     * been released at this point. NULL check is needed for to handle
-> +     * allocation failure in nvme_alloc_admin_tag_set().
-> +     */
-> +    if (ctrl->admin_q)
-> +        blk_put_queue(ctrl->admin_q);
-> +
->       if (!subsys || ctrl->instance !=3D subsys->instance)
->           ida_free(&nvme_instance_ida, ctrl->instance);
->       nvme_free_cels(ctrl);
->
-> -ck
->
->
->
+> Probably lockdep_assert_in_rcu_reader() should be fixed accordingly and consider
+> preemption always disabled whenever !CONFIG_PREEMPT_COUNT. Let me check that...
 
-Thanks Chaitanya. I tested your fix and all tests look good. We're
-looking forward to your final version.
+Yes, !CONFIG_PREEMPT_COUNT could be the problem here. I thought it was 
+missing rcu_read_lock(), but I didn't really check the code to ensure that.
+
+Cheers, Longman
+
