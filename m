@@ -1,181 +1,147 @@
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC7B62EC0BF
-	for <linux-block@vger.kernel.org>; Fri, 31 Oct 2025 16:03:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D879D34F46C;
+	Fri, 31 Oct 2025 16:08:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761926586; cv=none; b=grwwOY47uc8+fNlNRSTRaeEvZl57iYo/z3YIImIYLrRWSlfk7IlzhPvUZQzSvS6vzA+Ad5V4PDRa/6DGFATkBBIClx601OjAWQm4YlKEVJg79t5neWFiTrU32T8odEuTwhnh1r71ZUx5GAR4hGm7CMWNWBzW+8zgUPjZEbeWVnU=
+	t=1761926893; cv=none; b=p+yYkcKVqoV8FNRNoUrm167b133MfLytUbu+JacqnA9h94m5jyuxAxnRe+Tb5Jf5gpcXjzF9hY9L+Cq98LdvsPJe+VOgkydK4MwwJRgaxw6SSfSAFTfeNGOyVQvWyy3wCREhOKHSSnh7Ge7eUHqzdR41i3vf9RfLJs79RhFWq4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761926586; c=relaxed/simple;
-	bh=wOFtqKU5cY/H+/wFI62mVCydJUcPAJO0oOtjoN+GD0M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rBPKOtA6B/Q4IWMZxJpLSrZkB3lw1zOK0eUPKQfuzTuy5YtWv0yj3paDc+8xyqVxhCUZhSCZNCQ4sPmoTxLBeI5S0+0JcLB63fuW6W7h68xn+Jp2ihbyQiQ+pQxbYAqr4NCDuA0JyZMg8wuk32USjKC37EAswQo9RU+yK2TfqIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=EiH4IaWo; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1761926893; c=relaxed/simple;
+	bh=DBnRWCc9yOikTyJAePQMQXl8JnrzRu+fPN1hD2Ld8qU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eIRAAy3Cv3mCN0owTp9W7KpkNHE4M9QWuKYpJsfjNNGLN/mxGC507nhKV7iHJADgz4jVdALLlBQtcVc9etJPLt6xC015TAx9uehTdnNOSGcAinmRUswvAKQ0hcIR84Br7oi0H8yA+D137fPjosoTfDDNGsX4HEv5H2ErYtMrT7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lNm3q3Fx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="EiH4IaWo"
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-7a432101882so98451b3a.3
-        for <linux-block@vger.kernel.org>; Fri, 31 Oct 2025 09:03:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1761926583; x=1762531383; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CKLnpauphF64zVNd2V79/vxesQJj7qD0DUlSjcW6MUA=;
-        b=EiH4IaWolqZhtZSfAi/GsnIKmWR9uLr1lp3OEaW197rzRgOE6hA9dsWLbCmQBJ8qXn
-         FtQ+YMpMi27vPKlTHmfqz1U5e8dybW6SYPhBXIZHEeuoG+KCugMR+83PGsU1KBmpUpY1
-         +bhpOUs+IAHAipZRzhQVwjpQX6jG24CAFyzHKvDzetKjLrHwGfJmjNjmeEst8zwdDUXG
-         GpER4z6BbJ0Harcm4kBUGfCe0eK90fv05kEBLnVzHHsTi+sEYo6VcjvYevYWnTN3OTyZ
-         vOFLJ+k6D7Owx2X67BW7geIfPt3wtcKNV6kwTN+JDc7duV1C3GUCR0pXvY8AGqwmHxXs
-         iHrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761926583; x=1762531383;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CKLnpauphF64zVNd2V79/vxesQJj7qD0DUlSjcW6MUA=;
-        b=OkD4m2F56GMgupYp8+CHEjzDhT+wC31F4SyLrsMaPIODPYnXPZ+4iiqSqrCaxqvZlm
-         4Ks/yeAhi1X/UKHSYHLnqraV0UNGjZCCOlCYWSL+pu7oSuyTabp92UXXAjf8yN2kqXAd
-         EaCLdNmGGro8ibXIJOlaPlIjnkBopxmGMhM5Q138Hq1tCOaqlDsVcns8kTL+40XRETq2
-         Y/9P7v11imU7EXCsXPeBq5CdjT0gSVVIAAmpasFvJNL2VH9F7X8WJJ/1+/yoLYo+RWqj
-         KZnodQ6KNmWn75fy07j9GrS41Yb3jMjDmoqH46LEWO6ECJ4y2w7jYo256jvvLsjwxi6S
-         7Ilw==
-X-Forwarded-Encrypted: i=1; AJvYcCWsdXccjlDuWRAsEfERzJExMXtPVW09QB8XtjHiNVy3ClFiYNeGXc+Z/+II587NEW1zuqTjuxlmc/H0Dg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzdmxOsTX5Fxz+xY1UlXukJRKICeEix7LQZ/DpzZnapzZjXQkTe
-	1s+Q037ip5s9Z6Hk9h/Od598Q0bI39ucUGNQzAEX6saHRna9w6k5ctu+9qU+HHfxgfH/LHBwHN8
-	683H9PpPFYx5hDcH3LlCXk7fQhWzBAE99D+p6e4aAuA==
-X-Gm-Gg: ASbGncvkXmXH+shBK66r8Xdw2NNgPT391VFv/6RCYmRrYgpAFJptSiLYNdUQm42bw0l
-	6GPEzSrOfy0fYYt3Y3MgDQL58erxQ5BaNaWbaMKorN4nlyLi9HxVN4tWFItWwieNJ0AVFa/Zlrn
-	V9cTWH90gaJBIyzWmB20jnFUDW6ANkx979pz5xlEZQtDBdGr2crwtqKNqcZCHbxDhbrZVa22q3J
-	2uRhWyNWEp/8FzVY0gdvaa4PFn1/bWl4robDEqZb7cJrrjPc1yb1VFtm9TZM8lo2roEyFju9mvU
-	OxGrui40Kh+fBRNH9Ws=
-X-Google-Smtp-Source: AGHT+IHQNwuWDK2T/eNnooHACy3fG8LlSN+5KqjixEyYxsKgHxuFp/7yzY+VqxnhcGwGexzG2IWKvU/wfslm4s4hXyM=
-X-Received: by 2002:a17:902:c40f:b0:294:c54e:88 with SMTP id
- d9443c01a7336-2951a566345mr32508655ad.11.1761926582838; Fri, 31 Oct 2025
- 09:03:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lNm3q3Fx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDA40C4CEE7;
+	Fri, 31 Oct 2025 16:08:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761926892;
+	bh=DBnRWCc9yOikTyJAePQMQXl8JnrzRu+fPN1hD2Ld8qU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lNm3q3FxkqsL5QWMXLypsadCbVDHoS7srbuL3umgOILAgP2CmodbUjbmVgoYLqLve
+	 gqW5tz1EPBizlAZk5MqElD4DQfIHAxzmtN19JFglozpQKcQGBxYMl7yLPgL06f0Alc
+	 Wmr5T7iw805pUJEirQ0gG/+y+Tb8PrWnxbGm6rEfbp7xc7L8cnr1zQFwXjAnhR1hBH
+	 leAVv9GH6W28+5E2FEe+8vxpWiPWLa7dvgRWsbm9oHb0ZrOKO2qaDT1p5UMDci9pYi
+	 2qfoSEzL1lmFVYHaphzP0WGPUKmYmpipLpz2ALLuOYx0tXFwTP1Ngxt7pTzWQPBIkK
+	 d4ltC1wGy9Gzg==
+Date: Fri, 31 Oct 2025 17:08:09 +0100
+From: Frederic Weisbecker <frederic@kernel.org>
+To: Chen Ridong <chenridong@huaweicloud.com>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Danilo Krummrich <dakr@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Gabriele Monaco <gmonaco@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
+	Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+	linux-mm@kvack.org, linux-pci@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 11/33] cpuset: Provide lockdep check for cpuset lock held
+Message-ID: <aQTe6X5XXSp8_3z5@localhost.localdomain>
+References: <20251013203146.10162-1-frederic@kernel.org>
+ <20251013203146.10162-12-frederic@kernel.org>
+ <b94f6159-a280-4890-a02a-f19ff808de5b@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251031010522.3509499-1-csander@purestorage.com> <aQQwy7l_OCzG430i@fedora>
-In-Reply-To: <aQQwy7l_OCzG430i@fedora>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Fri, 31 Oct 2025 09:02:48 -0700
-X-Gm-Features: AWmQ_bllfNr7JNMeEI7t-sb-EdtYcOvAPuSji3rKtHyHN6KPL5msm9P2N6_ycpk
-Message-ID: <CADUfDZoPDbKO60nNVFk35X2JvT=8EV7vgROP+y2jgx6P39Woew@mail.gmail.com>
-Subject: Re: [PATCH] ublk: use copy_{to,from}_iter() for user copy
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <b94f6159-a280-4890-a02a-f19ff808de5b@huaweicloud.com>
 
-On Thu, Oct 30, 2025 at 8:45=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrot=
-e:
->
-> On Thu, Oct 30, 2025 at 07:05:21PM -0600, Caleb Sander Mateos wrote:
-> > ublk_copy_user_pages()/ublk_copy_io_pages() currently uses
-> > iov_iter_get_pages2() to extract the pages from the iov_iter and
-> > memcpy()s between the bvec_iter and the iov_iter's pages one at a time.
-> > Switch to using copy_to_iter()/copy_from_iter() instead. This avoids th=
-e
-> > user page reference count increments and decrements and needing to spli=
-t
-> > the memcpy() at user page boundaries. It also simplifies the code
-> > considerably.
-> >
-> > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+Le Tue, Oct 14, 2025 at 09:29:25PM +0800, Chen Ridong a écrit :
+> 
+> 
+> On 2025/10/14 4:31, Frederic Weisbecker wrote:
+> > cpuset modifies partitions, including isolated, while holding the cpuset
+> > mutex.
+> > 
+> > This means that holding the cpuset mutex is safe to synchronize against
+> > housekeeping cpumask changes.
+> > 
+> > Provide a lockdep check to validate that.
+> > 
+> > Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
 > > ---
-> >  drivers/block/ublk_drv.c | 62 +++++++++-------------------------------
-> >  1 file changed, 14 insertions(+), 48 deletions(-)
-> >
-> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > index 0c74a41a6753..852350e639d6 100644
-> > --- a/drivers/block/ublk_drv.c
-> > +++ b/drivers/block/ublk_drv.c
-> > @@ -912,58 +912,47 @@ static const struct block_device_operations ub_fo=
-ps =3D {
-> >       .open =3D         ublk_open,
-> >       .free_disk =3D    ublk_free_disk,
-> >       .report_zones =3D ublk_report_zones,
-> >  };
-> >
-> > -#define UBLK_MAX_PIN_PAGES   32
-> > -
-> >  struct ublk_io_iter {
-> > -     struct page *pages[UBLK_MAX_PIN_PAGES];
-> >       struct bio *bio;
-> >       struct bvec_iter iter;
-> >  };
->
-> ->pages[] is actually for pinning user io pages in batch, so killing it m=
-ay cause
-> perf drop.
+> >  include/linux/cpuset.h | 2 ++
+> >  kernel/cgroup/cpuset.c | 7 +++++++
+> >  2 files changed, 9 insertions(+)
+> > 
+> > diff --git a/include/linux/cpuset.h b/include/linux/cpuset.h
+> > index 2ddb256187b5..051d36fec578 100644
+> > --- a/include/linux/cpuset.h
+> > +++ b/include/linux/cpuset.h
+> > @@ -18,6 +18,8 @@
+> >  #include <linux/mmu_context.h>
+> >  #include <linux/jump_label.h>
+> >  
+> > +extern bool lockdep_is_cpuset_held(void);
+> > +
+> >  #ifdef CONFIG_CPUSETS
+> >  
+> >  /*
+> > diff --git a/kernel/cgroup/cpuset.c b/kernel/cgroup/cpuset.c
+> > index 8595f1eadf23..aa1ac7bcf2ea 100644
+> > --- a/kernel/cgroup/cpuset.c
+> > +++ b/kernel/cgroup/cpuset.c
+> > @@ -279,6 +279,13 @@ void cpuset_full_unlock(void)
+> >  	cpus_read_unlock();
+> >  }
+> >  
+> > +#ifdef CONFIG_LOCKDEP
+> > +bool lockdep_is_cpuset_held(void)
+> > +{
+> > +	return lockdep_is_held(&cpuset_mutex);
+> > +}
+> > +#endif
+> > +
+> >  static DEFINE_SPINLOCK(callback_lock);
+> >  
+> >  void cpuset_callback_lock_irq(void)
+> 
+> Is the lockdep_is_cpuset_held function actually being used?
+> If CONFIG_LOCKDEP is disabled, compilation would fail with an "undefined reference to
+> lockdep_is_cpuset_held" error.
 
-As far as I can tell, copy_to_iter()/copy_from_iter() avoids the page
-pinning entirely. It calls copy_to_user_iter() for each contiguous
-user address range:
+Although counter-intuitive, this is how the lockdep_is_held() functions family
+do work.
 
-size_t _copy_to_iter(const void *addr, size_t bytes, struct iov_iter *i)
-{
-        if (WARN_ON_ONCE(i->data_source))
-                return 0;
-        if (user_backed_iter(i))
-                might_fault();
-        return iterate_and_advance(i, bytes, (void *)addr,
-                                   copy_to_user_iter, memcpy_to_iter);
-}
+This allows this kind of trick:
 
-Which just checks that the address range doesn't include any kernel
-addresses and then memcpy()s directly via the userspace virtual
-addresses:
+if (IS_ENABLED(CONFIG_LOCKDEP))
+   WARN_ON_ONCE(!lockdep_is_held(&some_lock))
 
-static __always_inline
-size_t copy_to_user_iter(void __user *iter_to, size_t progress,
-                         size_t len, void *from, void *priv2)
-{
-        if (should_fail_usercopy())
-                return len;
-        if (access_ok(iter_to, len)) {
-                from +=3D progress;
-                instrument_copy_to_user(iter_to, from, len);
-                len =3D raw_copy_to_user(iter_to, from, len);
-        }
-        return len;
-}
+This works during the compilation because the prototype of lockdep_is_held()
+is declared. And since the IS_ENABLED() is resolved during compilation as well,
+the conditional code is wiped out and therefore not linked. As a result the
+linker doesn't even look for the definition of lockdep_is_held() and we don't
+need to define an off case that would return a wrong assumption.
 
-static __always_inline __must_check unsigned long
-raw_copy_to_user(void __user *dst, const void *src, unsigned long size)
-{
-        return copy_user_generic((__force void *)dst, src, size);
-}
+Thanks.
 
-static __always_inline __must_check unsigned long
-copy_user_generic(void *to, const void *from, unsigned long len)
-{
-        stac();
-        /*
-         * If CPU has FSRM feature, use 'rep movs'.
-         * Otherwise, use rep_movs_alternative.
-         */
-        asm volatile(
-                "1:\n\t"
-                ALTERNATIVE("rep movsb",
-                            "call rep_movs_alternative",
-ALT_NOT(X86_FEATURE_FSRM))
-                "2:\n"
-                _ASM_EXTABLE_UA(1b, 2b)
-                :"+c" (len), "+D" (to), "+S" (from), ASM_CALL_CONSTRAINT
-                : : "memory", "rax");
-        clac();
-        return len;
-}
-
-Am I missing something?
-
-Best,
-Caleb
+-- 
+Frederic Weisbecker
+SUSE Labs
