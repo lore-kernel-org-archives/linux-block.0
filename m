@@ -1,87 +1,182 @@
-Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3A1427FB3C;
-	Fri, 31 Oct 2025 21:55:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE1502045B7
+	for <linux-block@vger.kernel.org>; Fri, 31 Oct 2025 23:04:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761947739; cv=none; b=bRAOMWgJ2AC7fHtyb0TNLHubUa6B0iWYrlJ6MADX6adhovl6/I5cBm06KKIMhYu3Q2xgH+YfU2HcZYC0JwKpXPBqHjKQl6qsBoTKSsAQ4rXYKVx0Sy8sRltXmgIC6fFw5YYLdrpvNOt/onr8U0idXsI+jRW8zLA0diG792IS0D4=
+	t=1761951850; cv=none; b=OSWR8bXldYrjM+Sr92d7gS28UWZCT6tCVajsgM8feWb0g1i3AWFE5x/eDAnCJAClVaPosYTIZkJq9KI+fkgJhGlmJWfbH0PuydkQEwJfRIIit40+8opTSg1Z9iIDsPe1kstFupyJzd9SfjGQvssHSLlJHPR0fgW0lz1TxauUz7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761947739; c=relaxed/simple;
-	bh=ejTnG+XD06HRWSx/Nh4/cSNkzZ+idaKjT0gGtVZ3zHM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=U9b7emeQiQYfuu2dD+jHCsc4hpdw8jXilLtY8qf26J83btXtk4eq13AyI3vKhg+wx4vxu0L9OpCwCYsF8ZrZnjtjer72/WAXwinHTLBvMmTd8AQlJmEadpZJ13GUwZ42mP5RHOsm5J3AVReq1LxyYOwzuAARS8QdV1Uh4vxTW/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=OpmO3xIc; arc=none smtp.client-ip=199.89.3.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1761951850; c=relaxed/simple;
+	bh=2qpx8hbT/SE/3lTaD4/w/mtyg8N5YsHDSoHAVF8d6zE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=c0b9Emv/9ZnxQPor+TXE8g3y8ZefTKilVmbRg+CwekxoTFXXYBWJaVDe11GjSGCGrnLboMPMDE6hVOiAM4cyrLPATlS4rv2YNthO+J0w2u8U8P4k4lF93uuGHN2L/yLIixRN9wkLXt0zhFpcipHFLTbRv5bW/unv6QKurPnOrf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K/Kyk6Zv; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="OpmO3xIc"
-Received: from localhost (localhost [127.0.0.1])
-	by 004.mia.mailroute.net (Postfix) with ESMTP id 4cyvtJ6kM4zm0jvK;
-	Fri, 31 Oct 2025 21:55:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1761947734; x=1764539735; bh=cMr12pMLjE66ZLJgfh9u6SnW
-	e7M5oEz8wUdwX9iE4Ic=; b=OpmO3xIcXuZXUen+RPg8c8kumkTVrBZ3LPnA8Qvy
-	mYEZ3Wu7qgNYPNitoaUA8BKnHDO2shinTSHDeOfg7ftya7SNfranagToCSF7lN0E
-	KVU28LDu7UTvnD3qnf8rrzK4OzCy/CBAKOgyykQXhnS8Y0ngjU64St86qFBAMAZQ
-	o8Es0EYtpN4ckwkVwRKU/xYQrejzL8vDzdSxQ75utlmUpgAMK93VKIYjmWNmq3Vf
-	Ca3sY2WILYoYpzobqnLcguya7EgV/LmgqsRcmMX01bkdtzQLzehZwHXUvsZOi/fF
-	QK9E5rGuKsip6GcfbFGHINBcBIlgeJhbz/HH2wIBHdYtQA==
-X-Virus-Scanned: by MailRoute
-Received: from 004.mia.mailroute.net ([127.0.0.1])
- by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id tmX2EuuEY4-X; Fri, 31 Oct 2025 21:55:34 +0000 (UTC)
-Received: from [100.119.48.131] (unknown [104.135.180.219])
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K/Kyk6Zv"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1761951847;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5ThkqP4KaoWB0HS0HVt8nqsOJjwG9UYgjJCNYGNLL94=;
+	b=K/Kyk6Zvbk424AZPndTHz2waUzrpa0VCR8IsA/Z9k2gudZ8JC2x7SYg3QmW1mZEYVDubux
+	1WfXXXUMCHH8Pq5aKUy18GJrTnuTXruGKxFqARd5meVpbXO8MKNUl5zUfIEMSfQlSYO2oa
+	ahOk5974Aca5If2qabdls1dTFxAy2sE=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-528-7XS1Ex_LP7-aYUlParY28w-1; Fri,
+ 31 Oct 2025 19:04:00 -0400
+X-MC-Unique: 7XS1Ex_LP7-aYUlParY28w-1
+X-Mimecast-MFC-AGG-ID: 7XS1Ex_LP7-aYUlParY28w_1761951839
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4cyvt42Yn3zm0pL4;
-	Fri, 31 Oct 2025 21:55:23 +0000 (UTC)
-Message-ID: <22912f8a-01af-415c-a4f0-9db87eac32d2@acm.org>
-Date: Fri, 31 Oct 2025 14:55:22 -0700
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E42A319560B2;
+	Fri, 31 Oct 2025 23:03:58 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.13])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1A23A30001A1;
+	Fri, 31 Oct 2025 23:03:54 +0000 (UTC)
+Date: Sat, 1 Nov 2025 07:03:48 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] ublk: use copy_{to,from}_iter() for user copy
+Message-ID: <aQVAVBGM7inQUa7z@fedora>
+References: <20251031010522.3509499-1-csander@purestorage.com>
+ <aQQwy7l_OCzG430i@fedora>
+ <CADUfDZoPDbKO60nNVFk35X2JvT=8EV7vgROP+y2jgx6P39Woew@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 11/13] block: add zone write plug condition to debugfs
- zone_wplugs
-To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
- Keith Busch <keith.busch@wdc.com>, Christoph Hellwig <hch@lst.de>,
- dm-devel@lists.linux.dev, Mike Snitzer <snitzer@kernel.org>,
- Mikulas Patocka <mpatocka@redhat.com>,
- "Martin K . Petersen" <martin.petersen@oracle.com>,
- linux-scsi@vger.kernel.org, linux-xfs@vger.kernel.org,
- Carlos Maiolino <cem@kernel.org>, linux-btrfs@vger.kernel.org,
- David Sterba <dsterba@suse.com>
-References: <20251031061307.185513-1-dlemoal@kernel.org>
- <20251031061307.185513-12-dlemoal@kernel.org>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20251031061307.185513-12-dlemoal@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADUfDZoPDbKO60nNVFk35X2JvT=8EV7vgROP+y2jgx6P39Woew@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On 10/30/25 11:13 PM, Damien Le Moal wrote:
-> -	seq_printf(m, "%u 0x%x %u %u %u\n", zwp_zone_no, zwp_flags, zwp_ref,
-> -		   zwp_wp_offset, zwp_bio_list_size);
-> +	seq_printf(m, "%u 0x%x %u 0x%x %u %u\n",
-> +		   zwp_zone_no, zwp_flags, zwp_ref,
-> +		   zwp_cond, zwp_wp_offset, zwp_bio_list_size);
+On Fri, Oct 31, 2025 at 09:02:48AM -0700, Caleb Sander Mateos wrote:
+> On Thu, Oct 30, 2025 at 8:45 PM Ming Lei <ming.lei@redhat.com> wrote:
+> >
+> > On Thu, Oct 30, 2025 at 07:05:21PM -0600, Caleb Sander Mateos wrote:
+> > > ublk_copy_user_pages()/ublk_copy_io_pages() currently uses
+> > > iov_iter_get_pages2() to extract the pages from the iov_iter and
+> > > memcpy()s between the bvec_iter and the iov_iter's pages one at a time.
+> > > Switch to using copy_to_iter()/copy_from_iter() instead. This avoids the
+> > > user page reference count increments and decrements and needing to split
+> > > the memcpy() at user page boundaries. It also simplifies the code
+> > > considerably.
+> > >
+> > > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+> > > ---
+> > >  drivers/block/ublk_drv.c | 62 +++++++++-------------------------------
+> > >  1 file changed, 14 insertions(+), 48 deletions(-)
+> > >
+> > > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > > index 0c74a41a6753..852350e639d6 100644
+> > > --- a/drivers/block/ublk_drv.c
+> > > +++ b/drivers/block/ublk_drv.c
+> > > @@ -912,58 +912,47 @@ static const struct block_device_operations ub_fops = {
+> > >       .open =         ublk_open,
+> > >       .free_disk =    ublk_free_disk,
+> > >       .report_zones = ublk_report_zones,
+> > >  };
+> > >
+> > > -#define UBLK_MAX_PIN_PAGES   32
+> > > -
+> > >  struct ublk_io_iter {
+> > > -     struct page *pages[UBLK_MAX_PIN_PAGES];
+> > >       struct bio *bio;
+> > >       struct bvec_iter iter;
+> > >  };
+> >
+> > ->pages[] is actually for pinning user io pages in batch, so killing it may cause
+> > perf drop.
+> 
+> As far as I can tell, copy_to_iter()/copy_from_iter() avoids the page
+> pinning entirely. It calls copy_to_user_iter() for each contiguous
+> user address range:
+> 
+> size_t _copy_to_iter(const void *addr, size_t bytes, struct iov_iter *i)
+> {
+>         if (WARN_ON_ONCE(i->data_source))
+>                 return 0;
+>         if (user_backed_iter(i))
+>                 might_fault();
+>         return iterate_and_advance(i, bytes, (void *)addr,
+>                                    copy_to_user_iter, memcpy_to_iter);
+> }
+> 
+> Which just checks that the address range doesn't include any kernel
+> addresses and then memcpy()s directly via the userspace virtual
+> addresses:
+> 
+> static __always_inline
+> size_t copy_to_user_iter(void __user *iter_to, size_t progress,
+>                          size_t len, void *from, void *priv2)
+> {
+>         if (should_fail_usercopy())
+>                 return len;
+>         if (access_ok(iter_to, len)) {
+>                 from += progress;
+>                 instrument_copy_to_user(iter_to, from, len);
+>                 len = raw_copy_to_user(iter_to, from, len);
+>         }
+>         return len;
+> }
+> 
+> static __always_inline __must_check unsigned long
+> raw_copy_to_user(void __user *dst, const void *src, unsigned long size)
+> {
+>         return copy_user_generic((__force void *)dst, src, size);
+> }
+> 
+> static __always_inline __must_check unsigned long
+> copy_user_generic(void *to, const void *from, unsigned long len)
+> {
+>         stac();
+>         /*
+>          * If CPU has FSRM feature, use 'rep movs'.
+>          * Otherwise, use rep_movs_alternative.
+>          */
+>         asm volatile(
+>                 "1:\n\t"
+>                 ALTERNATIVE("rep movsb",
+>                             "call rep_movs_alternative",
+> ALT_NOT(X86_FEATURE_FSRM))
+>                 "2:\n"
+>                 _ASM_EXTABLE_UA(1b, 2b)
+>                 :"+c" (len), "+D" (to), "+S" (from), ASM_CALL_CONSTRAINT
+>                 : : "memory", "rax");
+>         clac();
+>         return len;
+> }
+> 
+> Am I missing something?
 
-The debugfs output is incomprehensible for anyone who has not memorized
-the source code of queue_zone_wplug_show(). Please expand the debugfs
-output such that it becomes easier to comprehend. See e.g. the
-queue_zone_wplug_show() changes in
-https://lore.kernel.org/linux-block/20251014215428.3686084-15-bvanassche@acm.org/.
+page is allocated & mapped in page fault handler.
+
+However, in typical cases, pages in io buffer shouldn't be swapped out
+frequently, so this cleanup may be good, I will run some perf test.
+
+Also copy_page_from_iter()/copy_page_to_iter() can be used for avoiding
+bvec_kmap_local(), and the two helper can handle one whole bvec instead
+of single page.
+
+Then rq_for_each_bvec() can be used directly, and `ublk_io_iter` may be
+killed.
+
+
 
 Thanks,
+Ming
 
-Bart.
