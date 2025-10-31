@@ -1,63 +1,98 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 714E71F75A6
-	for <linux-block@vger.kernel.org>; Fri, 31 Oct 2025 09:36:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4D232D9797
+	for <linux-block@vger.kernel.org>; Fri, 31 Oct 2025 09:36:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761903397; cv=none; b=A9+m+E+oy2YovIggJCqhSfV6P9XMU/DAvE0GAVtkmH/ykxXLxIof43UEOUaVGZvI3SRXGz6CD07hBrinUDEb2HVix/abUJr0WuPehipDGa1FTEk/OEKeQlMl6hbojFJnrb8y2fg0xb8o8656htphgXSP1Mc+m7p1gc7RAHn5Hbk=
+	t=1761903412; cv=none; b=Ivk9wt6AFNVZ2F9pIJnbfmL8f4DPDFyXr2dIW4uQI9xskFoZckcAv7h7o7lEm+PaXMV1iO/onNrGwNo2w2wvNeI9887PqKYcJYtFFLcUaic48Iqho5s67gQY2HDo0dl0AXwrO1YwlWFTNWU3Fb/iMCkLOpcnFAcdcNepK5LhtW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761903397; c=relaxed/simple;
-	bh=PQgIlECVSRfTU3b67YwWxRQtT3s7QeB4p4Iu88ZXffc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m3nr9grODbgmCXxv4imw4M4VRJTFY0rBWx82y83A8W26gpd5lvOIWEwq+uolPegr4N0TEBxLyU+HW8xH4eN2ETAlrUQBw6wVd5ayH2CEg0hdOu1mwGb/FW6qhyb0gf2WBwR++8iwRDGz2VBVQInfXf1t9Gc3rpXJzSd2N72jFJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 25826227A88; Fri, 31 Oct 2025 10:36:31 +0100 (CET)
-Date: Fri, 31 Oct 2025 10:36:30 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Hans Holmberg <hans.holmberg@wdc.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Keith Busch <kbusch@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-	Andreas Hindborg <a.hindborg@kernel.org>
-Subject: Re: [PATCH v3] null_blk: set dma alignment to logical block size
-Message-ID: <20251031093630.GA9957@lst.de>
-References: <20251031093546.134229-1-hans.holmberg@wdc.com>
+	s=arc-20240116; t=1761903412; c=relaxed/simple;
+	bh=nvNw+eBzau7jHl2SH6kk0F5lMVke3j2tW8GaTFH1hCg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uT21ospW25cvStKsWZifvzOLn505QK2g970JxAiXCR8ZXABvwFYSx6yP+mmHlYTdHRtv+7aHF4zA3VnkJxmvSUr6WHU7dyaneWgb79wbbnqTWo4d5H7k3qUs1eO+CzQE6DCc+wwFnljgp2+3Z3t+tfAQBRAVSTCOYcGmJwHPwLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=M8XsMH2e; arc=none smtp.client-ip=115.124.30.110
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="M8XsMH2e"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1761903407; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=tlq1q0qf7tR7hYmQijZRFkXeOywMt6Qxywm1qb4NC+A=;
+	b=M8XsMH2eq3AQSAc2nBL5DwPskTGY5FwlARD3TU/44klO/iXn/Dhh+T0L/wyEYj1vzqHsr1wNiUv41ALfes9SAWJzHgue15pPF3RWZ2rWVkOQtT2qiv8x13fFPxHBz67TQg9g2yFMtiKOyxIIwoTo3GVWheKzNzuTxuHU/saGgNw=
+Received: from 30.221.132.210(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0WrOW9Dm_1761903405 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Fri, 31 Oct 2025 17:36:46 +0800
+Message-ID: <ae38c5dc-da90-4fb3-bb72-61b66ab5a0d2@linux.alibaba.com>
+Date: Fri, 31 Oct 2025 17:36:45 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251031093546.134229-1-hans.holmberg@wdc.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+User-Agent: Mozilla Thunderbird
+Subject: Re: question about bd_inode hashing against device_add() // Re:
+ [PATCH 03/11] block: call bdev_add later in device_add_disk
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
+ Christian Brauner <brauner@kernel.org>, "Michael S. Tsirkin"
+ <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Luis Chamberlain <mcgrof@kernel.org>, linux-block@vger.kernel.org,
+ Joseph Qi <joseph.qi@linux.alibaba.com>, guanghuifeng@linux.alibaba.com,
+ zongyong.wzy@alibaba-inc.com, zyfjeff@linux.alibaba.com
+References: <20210818144542.19305-1-hch@lst.de>
+ <20210818144542.19305-4-hch@lst.de>
+ <43375218-2a80-4a7a-b8bb-465f6419b595@linux.alibaba.com>
+ <20251031090925.GA9379@lst.de>
+From: Gao Xiang <hsiangkao@linux.alibaba.com>
+In-Reply-To: <20251031090925.GA9379@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Oct 31, 2025 at 10:35:46AM +0100, Hans Holmberg wrote:
-> This driver assumes that bio vectors are memory aligned to the logical
-> block size, so set the queue limit to reflect that.
+Hi Christoph,
+
+On 2025/10/31 17:09, Christoph Hellwig wrote:
+> On Fri, Oct 31, 2025 at 03:46:02PM +0800, Gao Xiang wrote:
+>>  From my understanding, before this commit, bdev_add() will
+>> be called prior to device_add() so insert_inode_hash()
+>> in bdev_add() will be called before users can see blkdev
+>> in the devtmpfs.
+>>
+>> But after this change, blkdev can be seen before
+>> insert_inode_hash(), which opens a race (although I'm not
+>> sure if it's an expected behavior) blkdev_get_no_open() will
+>> find nothing (e.g. mounting) even blkdev in devtmpfs is
+>> there.
 > 
-> Unless we set up the limit based on the logical block size, we will go
-> out of page bounds in copy_to_nullb / copy_from_nullb.
-> 
-> Apparently this wasn't noticed so far because none of the tests generate
-> such buffers, but since commit 851c4c96db00 ("xfs: implement
-> XFS_IOC_DIOINFO in terms of vfs_getattr") xfstests generates unaligned
-> I/O, which now lead to memory corruption when using null_blk devices
-> with 4k block size.
-> 
-> Fixes: bf8d08532bc1 ("iomap: add support for dma aligned direct-io")
-> Fixes: b1a000d3b8ec ("block: relax direct io memory alignment")
-> Signed-off-by: Hans Holmberg <hans.holmberg@wdc.com>
+> We're not supposed to see the uevent notification before the
+> block device is ready.
 
-Still no reviewed-by tag seen.  But just for the record:
+Thanks for the quick response.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Right, sorry yes, disk_uevent(KOBJ_ADD) is in the end.
 
+>  Do you see that earlier, or do you have
+> code busy polling for a node?
+
+Personally I think it will break many userspace programs
+(although I also don't think it's a correct expectation.)
+
+After recheck internally, the userspace program logic is:
+   - stat /dev/vdX;
+   - if exists, mount directly;
+   - if non-exists, listen uevent disk_add instead.
+
+Previously, for devtmpfs blkdev files, such stat/mount
+assumption is always valid.
+
+After this change, it's only valid for udev generated blkdev
+files (because they're generated by uevent).  again I'm not
+saying it's a good assumption, but I guess many developpers
+who don't know this will write such user code, including our
+internal users.
+
+Thanks,
+Gao Xiang
