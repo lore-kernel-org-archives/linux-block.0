@@ -1,79 +1,80 @@
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD37126B75C
-	for <linux-block@vger.kernel.org>; Fri, 31 Oct 2025 07:37:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.153.144
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA46B35957
+	for <linux-block@vger.kernel.org>; Fri, 31 Oct 2025 07:43:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.143.124
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761896253; cv=fail; b=gOlxKcIPIS/ffoZGXg/tTb+aCmqDytlY0rb1uULLAz2UitE71h58199wBV0Hy02yL0Pfm3LFiaJnI0NCY+sRZoN0JOsxj2oNCOzdT6rpFArzq0Xh/8d2Tzkgz1Da9V9JKAt0HiD7/b4ICgh8e4s+CC6LuKT0qwddfAuUCqtHmto=
+	t=1761896598; cv=fail; b=I3EZKuHgSjeVaq0HPhW5XvSiSpEnL7MQfk/Vt0PC1nElRx6X6mHXwiFlb7Pm7ywxuK1SU2yIjQvISmnWZlnBnn45Dp1V3v0ZH+IChz9CgXsRmVyyUpP5Xlz7h3/K3bOiWVLDFqHksjlaEPbajxr6WfSyhUMAApb+C2hQVdN4cS8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761896253; c=relaxed/simple;
-	bh=U/ZLzp116Ppq60b7MF20bmLXhjPw/zOmt6lA/t/XZDY=;
+	s=arc-20240116; t=1761896598; c=relaxed/simple;
+	bh=ZnCklT5dbEsleflmjE3cRdjVnqyIG5BL3x091ezTh6Q=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=ikx5dyDo1PMColApi56cAx4INUP/ElZakpmL/muPmrrWJBpUoqwmeWsBksqoq1gCEHEHby/qWVi0FmmSe0Ja4dxGStDVNTp7sRQxNUrbhEkTY8hfPi8zP4QDLnRtvUks1p+TraqVpoIGrTQTNeV87Mo3CNMf4uQoVRduAHPRY50=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=eUeMvinU; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=H+yZJIvU; arc=fail smtp.client-ip=216.71.153.144
+	 Content-Type:MIME-Version; b=tz8/hGZ1+Ub99smzMR9IC7GtWtnKaCVp45zmsLvfGi3yUNMsYKIHXehf7HVhB+kZxXowcdgphwg0RRD3FG/G+b+T2SULTRCh2g3e0V9dQfRWZAzQ1mzMpBLyhRsr0BGRjfZjQIZd8JwnYDDEggM7+A1857Qxpf/wyqvo9DmwMfA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=c2gDcdv0; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=gWP35hCX; arc=fail smtp.client-ip=68.232.143.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="eUeMvinU";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="H+yZJIvU"
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="c2gDcdv0";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="gWP35hCX"
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1761896251; x=1793432251;
+  t=1761896596; x=1793432596;
   h=from:to:cc:subject:date:message-id:references:
    in-reply-to:content-id:content-transfer-encoding:
    mime-version;
-  bh=U/ZLzp116Ppq60b7MF20bmLXhjPw/zOmt6lA/t/XZDY=;
-  b=eUeMvinU20eybI1R0c9kkfQNVCWn8azas4ABaZ4Y7GjR9bzIr40CUqxP
-   oqZDOJbKy/53HPQIWAyPlBB4wENI9/IbJvF1PcO5smrv1qSkb8M0jutCB
-   EfJAAb8+Td1wBE0XL95raq1z+PpFR+MGnvhZLHXbHrq5gL5Lv6oN2oKCh
-   b+VDvxtlibEBmrouSLO53AlXCGGlU5JXxVGA2q7F5SV19uSnEiht7KcjM
-   8PsvaQoZo3u6D556W3fZJ+RZzJcVR+V1yJkJM+l/2Kr3awcwF68BCY2f9
-   9Br4I5+Z+j31h0NWRh+CGK8J2ZZ9D068CDEZhcKaA+mMlb2lAWVfsNd10
-   w==;
-X-CSE-ConnectionGUID: Zt8rdX1ySge41QOgl9HU4Q==
-X-CSE-MsgGUID: zkmzZaHVTmeDt9LOnNz9tA==
+  bh=ZnCklT5dbEsleflmjE3cRdjVnqyIG5BL3x091ezTh6Q=;
+  b=c2gDcdv0bH1BG2b7YA7lwXCW2T8PYY8IEOfZ2tlORDeXQADYD4Byg2Vl
+   xPxdxbBTLQAdwRnE7DeMSWN7Bk3LUDRTG0XuDUMd95UwEEQh5gx3mBgdC
+   fv1rYHhEZLY9x7Bk6kGypN09d0+cLuxk2UUN61tKnCGxMm5tepOy8e5IS
+   8Ix0ds4JEatos4k4hwKt4MPrRPqcBjx6FJC17mc2R5EnVCILnvmwS+ISn
+   8NkNrx4c/Pwy+mRxu/MT/y0eOkeqemPeU4gvTfeywDlc1rTTh2BnNiPzo
+   Ep6QONYU2ZRW54TuA9c+qt7fmVLE6ZWlCaoqMALfLifIzpvRFjvb8o6m6
+   Q==;
+X-CSE-ConnectionGUID: qrRYVTKwSVioFCfjtcFowg==
+X-CSE-MsgGUID: aZ5ZT1hOSi2bvG1rVuxryQ==
 X-IronPort-AV: E=Sophos;i="6.19,268,1754928000"; 
-   d="scan'208";a="134257841"
-Received: from mail-eastus2azon11010045.outbound.protection.outlook.com (HELO BN1PR04CU002.outbound.protection.outlook.com) ([52.101.56.45])
-  by ob1.hgst.iphmx.com with ESMTP; 31 Oct 2025 15:37:24 +0800
+   d="scan'208";a="135520532"
+Received: from mail-westusazon11010013.outbound.protection.outlook.com (HELO BYAPR05CU005.outbound.protection.outlook.com) ([52.101.85.13])
+  by ob1.hgst.iphmx.com with ESMTP; 31 Oct 2025 15:43:09 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gFn2O4aEUA7AhjlhYLicZWuZ0cp21bG0cowOplqNkXwCSBqq4djcdOiZjgUVhoRzNiSZeKc/gPZUMbRs9n7irZXuKd3V5iAkxXOZ7XJIHMEo8juIo8WWYk54rZlt5wgNcOCFI8EWgNIV1oMscPDzJ+ryYD5XDxaIYVsvoqAhMdVHCjkq7bI7ce2OPh/zy7XxozyG3Qv3tE2y8eFaxlf7H2xZpvy+OZx5eYT58HhRIuChLaohtOc7hQ87EVPlJQiST3TynOC8O3tU/M3irlT/1jkxNGpUIG1azHZPHtUu7W1CJ49NV0lML75RRUIj/gbAepNwzGiSDQjnCtfzoF5dog==
+ b=E3D7DwlK987uyPnIT1NV3OHCS/c14Mw0RGmxUc/lNOae3uxAGcVF1C4w9IZvQk4I2dWZkDZ1h81L0ySlqMSYdrLIx5/Cko16iRfbmVgC/RynuJpQsnfeAFX22AiecHnv1hDGwC71UVY700GoX+pF0LAADgBCKjesFgZ2Af2WL/nmVlR5N8UTppvM4bsVyswDfU/s79AmzUuMW1n2tLbBstL43uqlbzZJ+XorvJofnmdZ9EYSW+FgIvDO2amrsH+tiftKFQMIZUCToO/4yg6q2nYnmIKHzTqlX1vN0GmdJKwbHhzwWywx/r9ODBxO7iMGa2Pcb4tEJ/6uOtVjkVW1wg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Y1cR6h2fiZJ4bWOvHPLfryvuULXiZ15ZpwQhbdUd2jc=;
- b=GjkGmc9A+Nj++q5VFo1wR/RN2Pd1csAksXvK6vBctyrpYkNROSIXUDtSXS3ELS78Nqx3kaWiwU1LoqDnnDxZpQ1DILHfQZ8s6T8V+FZ9PfEYO4CSyab6/jokto/7GgWxso+DumRdp4OekH7YspzS1QBYBw6kTi639OUE1eZnQxr5O+gPR/iq2uWtMjE+9aWfkygHUA3JrlM/dHT+u8RFNUI/IOreN/7risyyH6AjzMlSp5NMvf6CFFE5+NIIklyj07qXE3mWp8GwphoB+/lz5GUaJS91/lBI9+f2AvOCczbULNkCxua/DdqO+0z+JwXyCdiBqtJ1IU+ntGbckKUH6Q==
+ bh=zutFOsxLYoJslV2dKrTT+PU5qG/jbWENqjANtxnUdyo=;
+ b=a5HmYe/mhy4HJMAIrv1H3jNPq/BIxhmG2W7BBsVSKTP8ZLqKRp3xpesDIbQJKqyzTZxD4+iOvL2l/4Wo0MEB6KdgTzRFqW/9i7O4dklo0TTfcMntfdUkx4bJBhJ1seJAZVDr3pn/P1vLRsK/ramrzu4Q5B1LvEKQ7b6Y9oCzAgJWGJv6k7LGZck4iDoDqibHM2YU9SDzyE9LrMIKHrxCXdz5W7OD7S3ybo1xJy+lSUu4j5jQEzdqZzlNfDta618stqEf9gratdTHzj2vRWLEC3FcPRsvoMD9knIpBlMOqW06WMcJzZq77erdS1jbr+nYOmlEh25lhqB9iCf9BDYeNg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Y1cR6h2fiZJ4bWOvHPLfryvuULXiZ15ZpwQhbdUd2jc=;
- b=H+yZJIvU9HjdaAbXmPtL0WePCyEQZIuqrPAkcESP44tOlQW0XqrxMemnugMezmpQ80Z9p1+zgabh4gOe1fXvaK3mfUV5/U488+udzPBl1Q3CpbOEJVxwnYm9cPc/c+EfqxitbPLN5hyvJKh/Ubxv/SUiUFrm0YQMgMNcV7c4IkY=
+ bh=zutFOsxLYoJslV2dKrTT+PU5qG/jbWENqjANtxnUdyo=;
+ b=gWP35hCX6zLo8H3hKLmarJmjags53xlD0hAEKYPILVL/aOs1FMd+ldAvjWzt/WiASY70wd9lrPFNEqm5zhvp6Jbj0NOf5a1P0f72Ck3eFPbOwmjRFlli5wm+9BvZNhq6JnMZvHibnD7n6ddl9foEqVPBgTp3Xqg39n7xDabzvs8=
 Received: from SN7PR04MB8532.namprd04.prod.outlook.com (2603:10b6:806:350::6)
  by CH0PR04MB8097.namprd04.prod.outlook.com (2603:10b6:610:f5::19) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.14; Fri, 31 Oct
- 2025 07:37:21 +0000
+ 2025 07:43:07 +0000
 Received: from SN7PR04MB8532.namprd04.prod.outlook.com
  ([fe80::4e14:94e7:a9b3:a4d4]) by SN7PR04MB8532.namprd04.prod.outlook.com
  ([fe80::4e14:94e7:a9b3:a4d4%7]) with mapi id 15.20.9275.011; Fri, 31 Oct 2025
- 07:37:21 +0000
+ 07:43:07 +0000
 From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
 CC: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
 	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH V2 1/2] blktrace: add blktrace zone management regression
- test
-Thread-Topic: [PATCH V2 1/2] blktrace: add blktrace zone management regression
- test
-Thread-Index: AQHcSD/9RwSTpOblOkyOH/PIFIftCbTb4eAA
-Date: Fri, 31 Oct 2025 07:37:21 +0000
-Message-ID: <rzusdqnb6my64syib5stekerczfjluqc7ddcyiqh6ea6s6lwrk@onumpctdad6q>
+Subject: Re: [PATCH V2 2/2] blktrace: add blktrace ftrace corruption
+ regression test
+Thread-Topic: [PATCH V2 2/2] blktrace: add blktrace ftrace corruption
+ regression test
+Thread-Index: AQHcSD/9IN42+FssnECt8npHmUO0frTb430A
+Date: Fri, 31 Oct 2025 07:43:07 +0000
+Message-ID: <lx6ec37izk67e25t553npy7bpgerbopjuisx7yycv542jxrgcg@vovm6iwqagjo>
 References: <20251028192048.18923-1-ckulkarnilinux@gmail.com>
-In-Reply-To: <20251028192048.18923-1-ckulkarnilinux@gmail.com>
+ <20251028192048.18923-2-ckulkarnilinux@gmail.com>
+In-Reply-To: <20251028192048.18923-2-ckulkarnilinux@gmail.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach:
@@ -82,72 +83,73 @@ authentication-results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=wdc.com;
 x-ms-publictraffictype: Email
 x-ms-traffictypediagnostic: SN7PR04MB8532:EE_|CH0PR04MB8097:EE_
-x-ms-office365-filtering-correlation-id: 4f3608f7-4936-47a1-5467-08de185053b8
+x-ms-office365-filtering-correlation-id: 64ba9b62-c09e-42f4-7c29-08de185121ff
 wdcipoutbound: EOP-TRUE
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam:
  BCL:0;ARA:13230040|366016|19092799006|1800799024|376014|7053199007|38070700021;
 x-microsoft-antispam-message-info:
- =?us-ascii?Q?bIrMG3UlM1IMWo0TDQzpT+si1Zrac3Tb/MZeiCYz0BbP6PQc/2Sl29uDMfTa?=
- =?us-ascii?Q?+GFE8jo05PGgUZNg16PX7zs25UmBUxlqv1dzpUhfM/XiLq+Kcs0J3MhVdDZ/?=
- =?us-ascii?Q?/cDxLxN9X/8XiZ5xFRvBVvxrx+JAq93QInhi7xBToqpuLnyD/ljfIfEsZ7GR?=
- =?us-ascii?Q?1V0I1MmDWa95DVqqheHA/HU87Mv1ZcDt0mCoyjJbb48ejXCar7HD1cyCqXI3?=
- =?us-ascii?Q?bwJQWvTtMxArYAwGJZoxyjUVR/Zp3+OUgqZVd5iSGIUUHUGI1vFBfMxeFwBo?=
- =?us-ascii?Q?1+eYl7bXCeGGnI/XR1gFfiUVcXs/73QS10USRqc0dgE42zYA28oDaloFCUcf?=
- =?us-ascii?Q?nAqM5hZZxgdGTwb2qtPR+/EomFQTa9xq9QFo9CBLqaWcJ5LxckLBSvIy5tBP?=
- =?us-ascii?Q?66p/IQzFrXHImod8pITkg5gNWLhTGgZdmEielNA+8L42CYu9R54E5RtIp+84?=
- =?us-ascii?Q?FeTEEeCW0j1/qEGCkkpF1h89wLXo3ILBQbqZZwT8aF5w/Fb/v+WQXEKc7EJg?=
- =?us-ascii?Q?bMe1KwpXltWIan7L8H36MiJRASuTG5wc/L41ORoE+N4eZUCOcgCuHbLH8TKj?=
- =?us-ascii?Q?gHdxa6CgtMNYQcLqbWzBwmKsv69WdhJj9ZkRyoYs4ezrFDhGjc/3usltTupC?=
- =?us-ascii?Q?bfR74DmJA5ANHDok8XQp2HOC4MuPv4T9pHU4qSzPIqyRQQNXCnV0vheWLwcQ?=
- =?us-ascii?Q?JmQq95BT1L/V2l+1ORNiPpZjul0AxCzEppomQcdJvfC8diZNsVzSCqPrYGha?=
- =?us-ascii?Q?yucULAExflMsbq8StZ6rix/vioKWL4kdBQyZqetxYQe8nB8gE/9xdUfktU43?=
- =?us-ascii?Q?KCsRZLhB/q5rBsNCb2F7RxorOZeO8IF+G9HWomlv2fomMGW8z/Ke7xWru5pP?=
- =?us-ascii?Q?BrmJymvaDEZ8L4SFiTmnb2B1UkxnaV0MERhaD86oyIbINGHb3GEw3JS7Ep1v?=
- =?us-ascii?Q?PcuXd1wZWNsKIF51GPwHYjXe2Hhr2RVKvdgDm5L4su4b2Zh3h2Ct0w0ys+oU?=
- =?us-ascii?Q?QscGwa4MtnVKTVOlveH2Y0p5brnA33w/lsaVJ5DUA6ha8GrHjXDMa9zDBrQQ?=
- =?us-ascii?Q?Ob7FfavIDUczBRsKE+GruE1vdp2q3TgiYdCr1xB3AQG6t07nNtj0VlCnh9sj?=
- =?us-ascii?Q?yPvN5puJOMRznRkSYHaTiGYHRIBwUfCRb0WUwgRVF33WaEZBKOQt0PwJa/a/?=
- =?us-ascii?Q?uUkMr7hxuPeWwGK45YPSgqWu9YArN6dAePWnBXD7RZr9iTPigQH28knaMaOk?=
- =?us-ascii?Q?FQUwDhYZJQdsTMLfem7XvNc/T+7z2PHLtFY3M7L8ocKYROvc155G1rf76YkS?=
- =?us-ascii?Q?GN+2QRoUABgcLnaKK76aOvyjgejXDZ7l+4I+2XgkEVHz/D6w5UBZ9CBKfEUE?=
- =?us-ascii?Q?UtYQXLl7oHPxJnQ49HDP8f4pM+/aN0oa+8qH4gwJM03ge/n4laPEsukbWwfT?=
- =?us-ascii?Q?yOqgum/MTqg6TOBRE2gZgYR6okul+LppXX3+59my3TVPX+z5jXTJUA=3D=3D?=
+ =?us-ascii?Q?33ltC/Xp9yVPI4xi366wClmA0iCZkY7xHl9/s0pVDbqtDkI6i99UBW9pQUDh?=
+ =?us-ascii?Q?88eRJCZn8Dd/g9JgVPae0YcnJM+PECiCHfKrxmnaBO2+qobfzn7y7DpL5Zi8?=
+ =?us-ascii?Q?a0lcAgDsMxw91epvTiuDN0imf0lREBi4OynII7XnnCzUleJdyu9zzBy+i+Vc?=
+ =?us-ascii?Q?i3utyHAPR8TEOGNZo+cZVOh3kbEa7S/SfscHPDtScaBvRAxgzHqQuDIT5GR/?=
+ =?us-ascii?Q?9T7Hr7EIgKgTFsymAtCS65LsQDWIfbxVW+xcOXxsvWqJ4NHooxwsl+a3FRWz?=
+ =?us-ascii?Q?1efOro8JpBRgz2I8Ov6gbRZWp6baUILK6wN11Hl1D4DUQPDG402xXKBQ8MsJ?=
+ =?us-ascii?Q?SQuzRwUtdv5cZ4fE6hdKlUKEy17sWG0A/R5zs3100XQ34ieM3Qg+sezCy7Df?=
+ =?us-ascii?Q?PKN8jBR6sf2CzcrNC+sUepw2jrJ7rUn9QBkBKjvTJ7oqjXbINxXuNODBXguy?=
+ =?us-ascii?Q?IAkSwHGBwM1mChXQS2BpCvaE5HwDsqaw+1uSSSGauNmmhX/U6A8kGcTVsgIi?=
+ =?us-ascii?Q?cWPDRrc5pn0NI2p4MXqZpCZinULzezszbwVUdQT1QusRShMLBWSjhnm+h5Tn?=
+ =?us-ascii?Q?qo5oqd8vxn4TzS348mVlx1D3QEmi4hh0lqLAFDniEu8poFrUrWKQQOcuO6jy?=
+ =?us-ascii?Q?4oH9/L8FMT3AZlF9nCG4rOEsSov8zuZl6NG4TL5aNZdDQcmR8pu+HEIeeEM1?=
+ =?us-ascii?Q?HltjwC1zjWroRvfyE6LPP9Y2bIXjUFKSEHuhjYpRdka/ODt7iVnDhSUDNpkA?=
+ =?us-ascii?Q?XjdUhIhYuUTd5MnO8+upZDLyxDBhYwQ27P24fOEsorbTk0S7moAhPUHjyDc/?=
+ =?us-ascii?Q?9hqnnGdtwjAY6ueyv0SVbCm1t9NVDGrJmEUDoEXq0G6XWB8JIMLVt0O6DrqN?=
+ =?us-ascii?Q?HoGCMooS/CGfAZ/xO5Z7YWd3EH0NWQG5sHcWs7CkFMQOJvKPTXGri+d1laNu?=
+ =?us-ascii?Q?6R7Kvwy03mEbaKtiEMB4wHD7etMMX424rZrQoisIWUbFCUN42V2/xl+A45OV?=
+ =?us-ascii?Q?ph8VQmcGMBWe8vPTwpJuDxY4a3ofma5E4uwglvVQGhVDexf9gSPYJDfmwMiq?=
+ =?us-ascii?Q?qkb+0AcR/l9UPa+jqc4kvMryRzNjYFOjIWFq+6pJdTgq93fqOPotMSJ7fd77?=
+ =?us-ascii?Q?rndgBFhQaSyp/1z+VredUkEFOuhGuPaqUFImN+UrG1FP+VA0G7/jnKUJwsQQ?=
+ =?us-ascii?Q?iOL9lp91I6w/1MOn2FqEP3H1cSnxxeeKdiAvON0Nzx+8KacG5nEbpotiWIA5?=
+ =?us-ascii?Q?eo1Y+RsUAh03+0fecMVur2x99lxJ6vN5atRFodarPG2SyOf+UuywLYLG6RNa?=
+ =?us-ascii?Q?LtiJ+3ce0W7fY2u1ZsuTppXlzwBfvLo0FbkZgpHBsPGyXq+gE8eeV7KBISjG?=
+ =?us-ascii?Q?UfBjwjYrth3bQV1G39F+KdqW4Hll37CxGKa1HyscS8i9y8eOO3TMqF8JBWNJ?=
+ =?us-ascii?Q?1AyocFH+TQbjBmxyz20IcPqt2uHYqmV+ONSIPzWetwtlgO6fK0rufvkp9XI5?=
+ =?us-ascii?Q?4Pt4H28uPByTZBA18Ol/16MjMF8mZJbKx5sf?=
 x-forefront-antispam-report:
  CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR04MB8532.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(19092799006)(1800799024)(376014)(7053199007)(38070700021);DIR:OUT;SFP:1101;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
 x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?ls8e3DwAKyf79osI7z6NV1Ns8Hy4svymXVIL4XASc0BllS9kZff5VZarnf+J?=
- =?us-ascii?Q?JJEt+hZ8LDLW0RQpTsdMYdwT5VJxHXFf8IuvHMz/MtH9Vm6S5Ehz2W1/lcra?=
- =?us-ascii?Q?1Tati5b1GTENB+XxT9CG8jjRMG2OI+CRdiHiRNPuLTkKNgqcNWOocQx0kNjg?=
- =?us-ascii?Q?slKi8+t/bsciW+RBEwLmDcHBdvH2Z9RsbS/L6JR3QCNcVCB6nzS4UJDYrcCQ?=
- =?us-ascii?Q?WahiQBc6V9YXxO6ncclfpdVUNldAPVy/MTIaStye3By3Q/c7/m0klOND2eal?=
- =?us-ascii?Q?XbkB7jSp5pMh7gY2dqNqP+xCxUOMXwBSc7w7EO+LzrwXXlthKRhgTUfhy2/m?=
- =?us-ascii?Q?FMoJL5VExKhzfU3VGw1nNcJoyOvVbeQdeIWx5i12gd8fe0jAnAfNvmsWp3OM?=
- =?us-ascii?Q?CYVvvGgmFr3+9YoBQhgkSW4f3eb2hR+E3jEtQN5V5yfmibnf3uQcHKGUqvU/?=
- =?us-ascii?Q?R25D07Hk3BbeFic+JWOuiaFOG1puo/TeLJVLu7AakaLEDayMsSuFfH4jr/GV?=
- =?us-ascii?Q?xNiRqlM9G6utyIFSPWOj3rXatP8C8T0sjulc0cr26DZfpGa+gcebShsV5qmG?=
- =?us-ascii?Q?ef2kcv2ImeXcisycgwpdEFioNTrugPaBcOOF9hRD33QzvMxvlbwcSqwSH0IJ?=
- =?us-ascii?Q?qrFjVs2mfuqBhvTAroneIF8tgjYHH4CX/n/pJwV+MLs9CwoTgb35aiLPeb8t?=
- =?us-ascii?Q?CcpTxVvjvIqW4InqRB2ZXAMp8D+IGeJOGp5oe2aGGS9COFA/+9n2c8U7Vm1E?=
- =?us-ascii?Q?Ef4CApLEPoAs4PdgWFBP5+wAYb9DHzlcc5kF69MgRm7AgDIQdbo/ut1kpcLs?=
- =?us-ascii?Q?dPGkFhSiFBFz6o2c8AfkZ/BRkrikhOUSEe2sQEcOhvXOt/JVzQKbbZYksDKp?=
- =?us-ascii?Q?fZcDgiPLFhzhrclx4nQgDuocdJrU82oRCWpRZQBakT5Qc0PPnVSYvAgrt+qK?=
- =?us-ascii?Q?Qf1A15LL9KcbJyQWKxgzolKPYlI0ZvMSx4qGf3nhS/r2mlJYXZ4nydRCBBuM?=
- =?us-ascii?Q?PvWi04upPMOrFX/DdJl5tCTzAA4ZKW7qgy8mxK/7m3+gMH+heHoPjkgpFnnq?=
- =?us-ascii?Q?Uv5+uR1G3wa+2iEbc58WHW2KaLzFPfBcjb7M+Q+zhvt6CM7rdyqZeTIDeLYH?=
- =?us-ascii?Q?B9L84bg6G3I5vK8aDF3EOidGN89oQaOqICJiO/ksaIF9tLG0P5EXwFjspy5i?=
- =?us-ascii?Q?EiSoopeyGNYjg5GsoU0p1l/3rj7rZGgbbUobZj8ab1jt5KOXUT7s+HmRA3V0?=
- =?us-ascii?Q?gQeJhbsdfotbDfsftPdBTuAvTWF5j5JykyZXmyN2f5oidA0bGy5NAPParcLV?=
- =?us-ascii?Q?8ihkq/BzFEWcP+7MkEFo8Z/6HP9I1m/b1XwLEkett17lzamyldu1Vp1N5aCS?=
- =?us-ascii?Q?s+WgkNEsyBs7oEdZDfNANvEIZVbuD5j0WQgYKPe25xfYWd7z7AfeaAZdjiNX?=
- =?us-ascii?Q?7E0fOMlEwFlYZqzVtRioTMrAMjJFZx720RdizfWnn0Xjh+5lh05agKwUaUfW?=
- =?us-ascii?Q?Nd2HKedh9By2RjflOefriZqm4JoYPvezbQ3pbBTbFVizEZtSyLHfPEHM3nT9?=
- =?us-ascii?Q?Hfz3h9kvyV9AmoC5cdiJSd+2BmtBcjsNnBknXI+3sy85NvWVMDwaYXL63FWt?=
- =?us-ascii?Q?ewvmN5lgJ2zQsPBlRiKEtLU=3D?=
+ =?us-ascii?Q?ssJwhllIfwceiCjDaLyLt8Upuynw/gJQ14M03kUQfxjkuXAl93WVHoHE/q8c?=
+ =?us-ascii?Q?UAgtqyK13D3WjmoIeVuto7DwebLs/zjVdzEC3G7FDCR4YwmMgwXtsdFDeTaw?=
+ =?us-ascii?Q?cthT4j8h9gZeFqF7T0BULJ3VWTBv6rVeSf0BoVlPAiH/ZnNksBXgMASdomBb?=
+ =?us-ascii?Q?m2zGMq9Isy0JIcdL+mHBOcVRttKnItCWWZNuSzm3pX1KsUOH0jrvwV1j7epP?=
+ =?us-ascii?Q?zrSFiPbmzM2Ohqz+0MOcLZ1rojgufhV+CPZeJsrMoRYsmXykoEcAMhV5xZCk?=
+ =?us-ascii?Q?uk+2uu8rVKOaq2ZaQtzqPRAT6aKqAh7UZVwoPSjPPoberO9gvR4FuxfKNoTW?=
+ =?us-ascii?Q?NIvt+v2lTFnZoyC+BlrGw2HtA/MuX96oFTdQKDG5Zlbn1/dn7X7kEbY57C+i?=
+ =?us-ascii?Q?JO6Kq7i4AmhTRv0f5WKcmRD+L3a3OAnkzosvD4IRhhub+atG1T3Rr2ZmpOqc?=
+ =?us-ascii?Q?laEl1LPdAp1/hKTMwWOpe03TJTfIi/Fsmnb3g3UNHU8daWM59c8OwsrlwwGO?=
+ =?us-ascii?Q?r9QYYwdVYJy4NY233L+gV7d/gX7t43J6MHAZSbXTn4f8mxy6EDkWDPzLpeoX?=
+ =?us-ascii?Q?BL4R9WiNaCMm8vWmGyPmZN1uHrql5fOsq67c1xtf8ZpARdBG7QDzonhfzWF3?=
+ =?us-ascii?Q?XoHTYsTmCsWxHtJHNx/wUltXa3NoKFKqrgUv8K+poqca1RfB0dS3y8gkcLh6?=
+ =?us-ascii?Q?tPpVkfiE3onuh06TtYJGhiIXFGdtQneOaG1D+qwUD4f2IXf8rJ+4FWxCw8D5?=
+ =?us-ascii?Q?/dNzZObVh1hAw2zY0dbjsIUAv7EAuNOJ9X5kfL4bkZlLysxTZMK2nntZvGak?=
+ =?us-ascii?Q?GdhB1qV/noNuVZ3qBybXEQX5LjyVrCbQkq9uceBTiuYh5ZzUHD77o0R2lWGr?=
+ =?us-ascii?Q?FGbTt7DK9n+e+hzMoICDV5LujM2RA13KyvTUFf2ARX95HPfuGMylJYQoY32/?=
+ =?us-ascii?Q?Ew2L/rFEKWN5oUXxvcImh8aC2PXdM6sx+5ORxNE3yNgwtIS4K1WxCqv0IB/R?=
+ =?us-ascii?Q?6kdXlvQjo0rpq8awxwx+adm14KTbbT7lCVQ9gWFqfCdLDvBwCbz47su4Zgp1?=
+ =?us-ascii?Q?0NPGyGullgMWW71GEmc3DeiBsVUf38GRHWBEfasrAPG7vi4B4zcuAUx7XrfI?=
+ =?us-ascii?Q?Z4kdzFOFbOI8vMwPuCAaH7nSPez+jCUZfrTjJ+vD+aU/7clT2BpJEeyndGp9?=
+ =?us-ascii?Q?RL/IPkNssQ4/FmHuH50aIIiV+cyLXrDmSqUARMXeCXnl+eRKdSZ9SDU7CfpN?=
+ =?us-ascii?Q?pH2alZqJJdbR0njn2TipdHTiR0f05KHWmrUGe87xarNpI0y7yaWw5hSg8inr?=
+ =?us-ascii?Q?jPPE2gwAoms4wzAmpJu9PSplxB2Lt/mFJhLfAHiho2fFlEvq3IP1515njqNS?=
+ =?us-ascii?Q?d6886/k9Y3EFrJOBzM/pdWdNhsY1jemCun5gmTbfuKGG0zB2tnQ5t2pf0OhP?=
+ =?us-ascii?Q?XwbdKVK54ZyVdeHOkV/qigofPZJhweWYkt8SLNekIPPPr2/KnJjl8QCAhTe4?=
+ =?us-ascii?Q?FzJQJ3DBrQa4d9HlFDo2sQlEeT4/fDmTbbP/GbXLDiO6wVlPwGTSJePoPV/d?=
+ =?us-ascii?Q?HFwel9BL65Ac21Lgo0cL2unrJbZ0OxRs+/Etq3cknU8XgcBc9qgxel2A9lV6?=
+ =?us-ascii?Q?GR18WBB2rU9/RhwG/v/VRl0=3D?=
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <D7798DADAB4DD24AA9356CCFF479E112@namprd04.prod.outlook.com>
+Content-ID: <DAF1F469763A164DA67008B18E147767@namprd04.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -157,234 +159,142 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	MaEXpOG1A48hdjnyWV0JJeArN+XbPJJD2lS4O0K5a6PMENwZjTWax3W63l5onKG9WfO5fuwhOLz1ligTr8leRRw9GA78ElCw8iMuHZLd616nTqATmG5w68Aknvj22Rz1QXfQuuTVEnqPOgrpJmiiWwQwTz/SoFOaFZt0V8zm8uaKsVRvV1T+fAJ4fZeLD7nzWki8H3vb15gEJuyAFEIyXAF/wBO6Z1kC6aXtZTfLPGqBJjpHOVN477uwEkLigybyqddkWSuuREQXbGfBuu6FpKu5jYeE4gEOW4XiY/ehw4sPfxoYkMhz7uYonZpj/Vqsda0TeLJ0RDbRc18zoA3TJ+f0cU04tZfwzRRL8Xxy6sTbvhNnNyLEMnOiIsZ+9oTeR8++UOiiHQTXuMp9cxWVyk4vOV+3iE736xSEZBrhgrjKEohFx3ulSvDan9FYRO0+2YAEpEIbMCdft8jnrjx+hLLau1HOhToxC6XvTPPMpPNdPuYbJ6Xv0vYuflipgObfaS4zGyRJcOBwYCWWvQWUThELZPPDuBJhNUs9bLUzt7auhoJ52bu1EYJiYO0VRFHAaa4ERzGhJKQfKOGjzAFz3CMjIGwH5Z42ZKwNEVwc6maJBFlHC6n5KGsdIU3WLHHx
+	lndvFtuaClLsoZPpaf5ZcencXRe9v5afRAV1Zxe9PwVuBi1X2zzouIz5J2CxwYiUyrt4CaHxjceBpgChcSDmQWmuEFt6IgIWR7icdBMmwk+IWXes2SsfH2JqIXPsjFo6XMhOMqru/spgD5CJPAbfyRwYgF1IHm+qqbxuTHftDYRlEY2Lykq1JYiDU8nuVWNA8fkVvKeq6QNzqoRNNMjh/VjauM5GXJ9K1Y0635PvbHwJSy5aFNjkOkuq8ovfbUCZ92CSz+wZJ6CnQr6nKjxPTcS6u/PvweuWg1OqSm+exyaLtZjiyqA0mRwHcWfraH4TuC9qM3bahcAWRepc8MDANaiAZsqABPxU2Ej5o6xbpXZ4WP1fOaU1hDKnYp61cMSGgHDST8KkHAlM9G2jqSGdhwKRapZaR1LDTlbgiKpakCkVH0EzAb2BLFHcmiSL5EYnVQvZXf1rnRycGjjvw4PLTE+GhubImwoiGmnqeWpPXkeSpmR3bAsR5O844Uos7T4qPMko9YxU+MOEIPzUDXYbWAnE10T15Nj9q8jBflvqv8lHw7TzZUEp6WYfOQYGtOZ6SQxsBu2PEHrg4BnEAzwTRgJvvwkrzV3dWvusCJAR9tW5E2mc+SWP11EOHqg6ta/J
 X-OriginatorOrg: wdc.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: SN7PR04MB8532.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4f3608f7-4936-47a1-5467-08de185053b8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Oct 2025 07:37:21.3953
+X-MS-Exchange-CrossTenant-Network-Message-Id: 64ba9b62-c09e-42f4-7c29-08de185121ff
+X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Oct 2025 07:43:07.4565
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: hboQ4fqzVWLyeO4jG3ix4UFIyqWHjhqRTgVFxbtC2thN00NNs6AZtk43h+s/QXqZOljQr2E2ux7JcGftBr8l+IBxP4Km+EcWGnKAIytlvxg=
+X-MS-Exchange-CrossTenant-userprincipalname: BXBkNALfkUr1YW/vboHHmKIF2gc+IuX/u6tn738LmIvk6YSU5tMA2F6g7YlWwagJIT4PQMf6IGr09OQg8hgZG4FkTiPH36iW4ynJ9zufJjo=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR04MB8097
 
-Hi Chaitanya, thanks for the series. Please find my comments in line.
-
 On Oct 28, 2025 / 12:20, Chaitanya Kulkarni wrote:
-> Create a new blktrace test group and add a regression test for a
-> blktrace false positive WARNING that occurs when zone management
-> commands are traced with blktrace on V1 version.
+> Add regression test for blktrace ftrace corruption bug that occurs when
+> sysfs trace is enabled followed by ftrace blk tracer.
 >=20
-> Bug: https://syzkaller.appspot.com/bug?extid=3D153e64c0aa875d7e4c37
-> Location: kernel/trace/blktrace.c:367-368
+> When /sys/block/*/trace/enable is enabled and then ftrace's blk tracer
+> is activated, the trace output becomes corrupted showing "Unknown action"
+> with invalid hex values instead of proper action codes.
 >=20
-> The test:
-> 1. Creates a zoned null_blk device (8 zones, 1GB, no conventional zones)
-> 2. Starts blktrace on the device
-> 3. Issues zone open command for all zones
-> 4. Checks dmesg for the false positive WARNING
+> The root cause is that ftrace allocates a blk_io_trace2 buffer (64 bytes)
+> but calls record_blktrace_event() which writes v1 format (48 bytes),
+> causing field offset mismatches and corruption.
 >=20
-> Device configuration:
-> - Total size: 1GB
-> - Zone size: 128MB
-> - Number of zones: 8
-> - Conventional zones: 0
+> This test verifies that the trace output is correct and doesn't show
+> the corruption pattern.
+
+To clarify the relevant kernel side change, I suggest to note that this tes=
+t
+case confirms the fix by the kernel patch titled,
+
+  "blktrace: for ftrace use correct trace format ver"
+
+and add the Link tag to,
+
+  https://lore.kernel.org/linux-block/20251028055042.2948-1-ckulkarnilinux@=
+gmail.com/
+
 >=20
-> If the WARNING is found, the bug is present and logged to the full
-> output. If no WARNING appears, the bug is fixed.
->=20
-> Note: The bug uses WARN_ON_ONCE, so it triggers only once per boot.
-> Subsequent runs after the first trigger will not show the WARNING.
->=20
-
-To clarify which kernel side change is relevant, I suggest to note that thi=
-s
-test case confirms the fix by the patch titled,
-
-  "blktrace: use debug print to report dropped events"
-
-and add the Link tag to:
-
-   https://lore.kernel.org/linux-block/20251028024619.2906-1-ckulkarnilinux=
-@gmail.com/
-
-
 > Signed-off-by: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
 > ---
-> V1->V2:
-> Removed dmesg -C to avoid clearing dmesg buffer from other tests
-> Use _dmesg_since_test_start() to only check messages from this test (Joha=
-nnes)
-> ---
->  tests/blktrace/001     | 94 ++++++++++++++++++++++++++++++++++++++++++
->  tests/blktrace/001.out |  2 +
->  tests/blktrace/rc      | 11 +++++
->  3 files changed, 107 insertions(+)
->  create mode 100755 tests/blktrace/001
->  create mode 100644 tests/blktrace/001.out
->  create mode 100644 tests/blktrace/rc
+>  tests/blktrace/002     | 97 ++++++++++++++++++++++++++++++++++++++++++
+>  tests/blktrace/002.out |  3 ++
+>  2 files changed, 100 insertions(+)
+>  create mode 100755 tests/blktrace/002
+>  create mode 100644 tests/blktrace/002.out
 >=20
-> diff --git a/tests/blktrace/001 b/tests/blktrace/001
+> diff --git a/tests/blktrace/002 b/tests/blktrace/002
 > new file mode 100755
-> index 0000000..43331c1
+> index 0000000..73b8597
 > --- /dev/null
-> +++ b/tests/blktrace/001
+> +++ b/tests/blktrace/002
 [...]
 > +test() {
 > +	echo "Running ${TEST_NAME}"
 > +
-> +	local blktrace_pid
-> +	local warning_count
+> +	local trace_dir=3D"/sys/kernel/debug/tracing"
 > +	local device
 > +
-> +	# Initialize null_blk with no default devices
-> +	if ! _init_null_blk nr_devices=3D0; then
-> +		return 1
-> +	fi
+> +	# Initialize null_blk with one device
+> +	if ! _init_null_blk nr_devices=3D1; then
 
-This _init_null_blk() call is no longer required. The helper function is us=
-eful
-only if the test case requires loadable null_blk. Also, I suggest to used n=
-ullb1
-instead of nullb0, since nullb1 can be created even when null_blk module is
-built-in. Please refer to the diff I attached [1].
+This test can be run with built-in null_blk by using _configure_null_blk
+and nullb1 instead of _init_null_blk and nullb0. Please refer to [1].
 
-> +
-> +	# Create zoned null_blk device via configfs
-> +	# 8 zones, 1GB total, 128MB per zone, no conventional zones
-> +	if ! _configure_null_blk nullb0 \
-> +		memory_backed=3D1 \
-> +		zone_size=3D128 \
-> +		zone_nr_conv=3D0 \
-> +		size=3D1024 \
-> +		zoned=3D1 \
-> +		power=3D1; then
 > +		return 1
 > +	fi
 > +
 > +	device=3D/dev/nullb0
 > +
-> +	# Verify it's a zoned device
-> +	local zoned_mode
-> +	zoned_mode=3D$(cat /sys/block/nullb0/queue/zoned)
-> +	if [[ "$zoned_mode" !=3D "host-managed" ]]; then
-> +		echo "Device is not zoned (mode: $zoned_mode)"
+> +	# Verify device exists
+> +	if [[ ! -b "$device" ]]; then
+> +		echo "Device $device not found"
 > +		_exit_null_blk
 > +		return 1
 > +	fi
 > +
-> +	# Start blktrace
-> +	blktrace -d "${device}" -o trace >> "$FULL" 2>&1 &
+> +	# Clean up any previous trace state
+> +	echo 0 > "$trace_dir/tracing_on" 2>/dev/null || true
+> +	echo > "$trace_dir/trace" 2>/dev/null || true
+> +	echo nop > "$trace_dir/current_tracer" 2>/dev/null || true
 
-This blktrace command leaves the trace files in the current directory. I su=
-ggest
-to create fhe files in TMPDIR so that the files get cleaned up. Also, I sug=
-gest
-to use long option names to avoid confusions, like this:
-
-	blktrace --dev=3D"${device}" --output=3Dtrace --output-dir=3D"$TMPDIR" \
-		 >> "$FULL" 2>&1 &
-
-> +	blktrace_pid=3D$!
-> +	sleep 2
-> +
-> +	# Verify blktrace started
-> +	if ! ps -p $blktrace_pid > /dev/null 2>&1; then
-> +		echo "blktrace failed to start"
-> +		_exit_null_blk
-> +		return 1
-> +	fi
-> +
-> +	# Issue zone open command for all zones (triggers bug if present)
-> +	blkzone open "${device}" >> "$FULL" 2>&1
-> +
-> +	sleep 1
-> +
-> +	# Stop blktrace
-> +	kill $blktrace_pid 2>/dev/null
-> +	wait $blktrace_pid 2>/dev/null || true
-
-Can we drop the "|| true" here,
+Can we drop the "|| true"s here,
 
 > +
-> +	# Check for WARNING (bug present if WARNING found)
-> +	warning_count=3D$(_dmesg_since_test_start | grep -c "WARNING.*blktrace.=
-c:367" || true)
+> +	# Enable sysfs trace for nullb0 (this triggers the bug path)
+> +	if [[ -f /sys/block/nullb0/trace/enable ]]; then
+> +		echo 1 > /sys/block/nullb0/trace/enable
+[...]
+> +	# Cleanup: disable sysfs trace
+> +	echo 0 > /sys/block/nullb0/trace/enable 2>/dev/null || true
+> +	echo nop > "$trace_dir/current_tracer" 2>/dev/null || true
 
 and here?
-
-> +
-> +	if [[ $warning_count -gt 0 ]]; then
-> +		echo "WARNING: blktrace bug detected at blktrace.c:367"
-> +		_dmesg_since_test_start | grep -A 10 "WARNING.*blktrace.c:367" >> "$FU=
-LL"
-> +	fi
-> +
-> +	_exit_null_blk
-> +
-> +	echo "Test complete"
-> +}
-[...]
-> diff --git a/tests/blktrace/rc b/tests/blktrace/rc
-> new file mode 100644
-> index 0000000..9b987a2
-> --- /dev/null
-> +++ b/tests/blktrace/rc
-> @@ -0,0 +1,11 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-3.0+
-> +# Copyright (C) 2025 Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
-> +#
-> +# Tests for blktrace infrastructure
-> +
-> +. common/rc
-> +
-> +group_requires() {
-> +	_have_root && _have_blktrace && _have_program blkparse
-
-Nit: it's the better to drop the "&&" operators.
-
-> +}
-> --=20
-> 2.40.0
->=20
 
 
 [1]
 
-diff --git a/tests/blktrace/001 b/tests/blktrace/001
-index 43331c1..79f51d6 100755
---- a/tests/blktrace/001
-+++ b/tests/blktrace/001
-@@ -31,14 +31,9 @@ test() {
- 	local warning_count
+diff --git a/tests/blktrace/002 b/tests/blktrace/002
+index 73b8597..57d42f1 100755
+--- a/tests/blktrace/002
++++ b/tests/blktrace/002
+@@ -31,11 +31,11 @@ test() {
  	local device
 =20
--	# Initialize null_blk with no default devices
--	if ! _init_null_blk nr_devices=3D0; then
--		return 1
--	fi
--
- 	# Create zoned null_blk device via configfs
- 	# 8 zones, 1GB total, 128MB per zone, no conventional zones
--	if ! _configure_null_blk nullb0 \
-+	if ! _configure_null_blk nullb1 \
- 		memory_backed=3D1 \
- 		zone_size=3D128 \
- 		zone_nr_conv=3D0 \
-@@ -48,11 +43,11 @@ test() {
+ 	# Initialize null_blk with one device
+-	if ! _init_null_blk nr_devices=3D1; then
++	if ! _configure_null_blk nullb1 power=3D1; then
  		return 1
  	fi
 =20
 -	device=3D/dev/nullb0
 +	device=3D/dev/nullb1
 =20
- 	# Verify it's a zoned device
- 	local zoned_mode
--	zoned_mode=3D$(cat /sys/block/nullb0/queue/zoned)
-+	zoned_mode=3D$(cat /sys/block/nullb1/queue/zoned)
- 	if [[ "$zoned_mode" !=3D "host-managed" ]]; then
- 		echo "Device is not zoned (mode: $zoned_mode)"
- 		_exit_null_blk=
+ 	# Verify device exists
+ 	if [[ ! -b "$device" ]]; then
+@@ -49,9 +49,9 @@ test() {
+ 	echo > "$trace_dir/trace" 2>/dev/null || true
+ 	echo nop > "$trace_dir/current_tracer" 2>/dev/null || true
+=20
+-	# Enable sysfs trace for nullb0 (this triggers the bug path)
+-	if [[ -f /sys/block/nullb0/trace/enable ]]; then
+-		echo 1 > /sys/block/nullb0/trace/enable
++	# Enable sysfs trace for nullb1 (this triggers the bug path)
++	if [[ -f /sys/block/nullb1/trace/enable ]]; then
++		echo 1 > /sys/block/nullb1/trace/enable
+ 	else
+ 		echo "No sysfs trace support"
+ 		_exit_null_blk
+@@ -88,7 +88,7 @@ test() {
+ 	fi
+=20
+ 	# Cleanup: disable sysfs trace
+-	echo 0 > /sys/block/nullb0/trace/enable 2>/dev/null || true
++	echo 0 > /sys/block/nullb1/trace/enable 2>/dev/null || true
+ 	echo nop > "$trace_dir/current_tracer" 2>/dev/null || true
+=20
+ 	_exit_null_blk=
