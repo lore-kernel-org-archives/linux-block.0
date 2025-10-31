@@ -1,54 +1,60 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30FDD2D9797;
-	Fri, 31 Oct 2025 09:35:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EF52329E64
+	for <linux-block@vger.kernel.org>; Fri, 31 Oct 2025 09:35:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.154.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761903356; cv=none; b=T2nx7aCzpLkKnXTKEuMwvv9Gz5O726ZFdS08YG/gcMlYWTzQTjTMwQPTEz7l2slI2VCBugCwSq2GEcUHoAxWlN6iDMboex7ii/p9iJ6TsE+t+iwLIb10X7Pb/2JI7MhurpaPuBzEJoHtLDkrxnI9kMIwSGW3yNBHnTqUAty4ZPc=
+	t=1761903361; cv=none; b=U1jIM9qYVo0ShnK7O+R6dJpPupQNzgJD+/tNba8G+R/nwyA7wRzaRiJAdKsyXQgcoCb1DkxgxHggFJIPZlkj99Hn4kk+0jHzUr5CuJ08jFNwPJjfHRN/dMUqoCy9nojD+UFsNMQEAmZ+gl298VeAoQ3PJWCiU+SQLjhi9Hipv30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761903356; c=relaxed/simple;
-	bh=Ch8dnRvIPiOumk4fubF1bzEeJTaSOPFH1JLOkzI+eu8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NoQV9R4m87Vz4vKE4HMavX8bPBPwNn1eNtM51hojOH8T6Vg4OkbpYl6z7foSMx1/fZPpn9MchfknhqeiTCic1dJFx9xNaIV7xepBcHDrYpMGRScgzaY9GyQaXh2rPfcWnzojcY/7QRXOepyMnafDL9bQ6HTDao5qEs6ogZuJ+CM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Bteif0mR; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1761903361; c=relaxed/simple;
+	bh=axLiaAY5+w7Dletd+wQX1BHJcWPqi4LziJ21WSkAwik=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qvGSF9medjLzFv3rB1XfSujzo2ddmzBfZfant1w6MLNvvfJuddR9zUT8ORk7y4mxYTDB5T/mVQhwIo7oOujsUxkV+sak3kKgGqAeKCV3KsMAP0gY/y4CK/xJmKD+Mf8FPZSa9ql+/MaVtD1TgJZIWlC4eeqzpCow8I/PTtx9qwY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=DZPTwvK5; arc=none smtp.client-ip=216.71.154.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Bteif0mR"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=gz1ZHnV8MPEOv0SwBRPIHVFkDVJvCNG/ND6yLhSPhtA=; b=Bteif0mR4s8h/WLphDjB4FnnRa
-	xMbZsylDUJHp4lv94cx6I9VZU5TTU/iWLAzzKakTc0Z/f87IIU7PtPegAXa+BbRRg6ygx9umE9zL0
-	GqjwckW9hC4yBBTY25LUhEA18fYoiGyqrmEtEA0/XUrEGisNeLpU+7j6FqSnI9GgUJ0eHig4eIZqo
-	yJgXMttc+E056wFOHElCBIDt6HlGThnfVWg6Dh53azJX0rqU3yH590/ADIL+whfP2FXie4b3Vv8Wf
-	sCVf72qObjvoXlORWjgN8n8RPp9OGliqR/FvObUMRSegl3eCfVzqD+9909fGcxrbKwacGLQoT6UUx
-	Uz48B2Xg==;
-Received: from [2001:4bb8:2dc:1001:a959:25cf:98e9:329b] (helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vElY0-00000005orm-1z1q;
-	Fri, 31 Oct 2025 09:35:52 +0000
-From: Christoph Hellwig <hch@lst.de>
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="DZPTwvK5"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1761903360; x=1793439360;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=axLiaAY5+w7Dletd+wQX1BHJcWPqi4LziJ21WSkAwik=;
+  b=DZPTwvK5o+tTXWMQfh5uRPYPwpl2W3vnGw42R76BvXjtZ2eY5BGhMKw9
+   8MsLLycgWHHeEMagQvZNf2M9ryxAx0jVs5S+u6pFfVswvC/axskG4AxGo
+   olqsxGisRTi1RPdcX90WoPJRJri+M9zQVBehq/ERMQsa56WIxPM5hZHoe
+   v1wEWs8Fl4Pk0YNWo46f1uQtHYcU2BT+aS8vwST9r3HdQ8Rg57c+uOQp7
+   BOWOoq9BX1Muvi1y3TcyHuuAGZzvUTqUAsawa1eBIcYqPJcFaviHIzkuU
+   3aAia4O6iztybY9SIbcVijErtNApi5vTXu4/FnTbnEltDb7IPL66S7RHZ
+   g==;
+X-CSE-ConnectionGUID: pkXZ+RVdTiaK3SvBs4g9+w==
+X-CSE-MsgGUID: NNL80SRBRLO8TPElzpm0gw==
+X-IronPort-AV: E=Sophos;i="6.19,269,1754928000"; 
+   d="scan'208";a="133904006"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 31 Oct 2025 17:35:53 +0800
+IronPort-SDR: 690482f8_9ZGUljlAkujpCc1cT8YVCpjLf52f/CFXRWov2GRzisV5WT1
+ /1IX4QPlXUVhdIIYvhE2P4NQNVJZ9UAJ3yLxGLw==
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 31 Oct 2025 02:35:53 -0700
+WDCIronportException: Internal
+Received: from wdap-nazonkp1b2.ad.shared (HELO gcv.wdc.com) ([10.224.178.8])
+  by uls-op-cesaip02.wdc.com with ESMTP; 31 Oct 2025 02:35:49 -0700
+From: Hans Holmberg <hans.holmberg@wdc.com>
 To: Jens Axboe <axboe@kernel.dk>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Andrew Morton <akpm@linux-foundation.org>
-Cc: Christoph Lameter <cl@gentwo.org>,
-	David Rientjes <rientjes@google.com>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Harry Yoo <harry.yoo@oracle.com>,
-	linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-fscrypt@vger.kernel.org,
-	linux-mm@kvack.org
-Subject: [PATCH 6/9] blk-crypto: optimize bio splitting in blk_crypto_fallback_encrypt_bio
-Date: Fri, 31 Oct 2025 10:34:36 +0100
-Message-ID: <20251031093517.1603379-7-hch@lst.de>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251031093517.1603379-1-hch@lst.de>
-References: <20251031093517.1603379-1-hch@lst.de>
+	linux-block@vger.kernel.org
+Cc: Keith Busch <kbusch@kernel.org>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Hans Holmberg <hans.holmberg@wdc.com>
+Subject: [PATCH v3] null_blk: set dma alignment to logical block size
+Date: Fri, 31 Oct 2025 10:35:46 +0100
+Message-ID: <20251031093546.134229-1-hans.holmberg@wdc.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -56,277 +62,50 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-The current code in blk_crypto_fallback_encrypt_bio is inefficient and
-prone to deadlocks under memory pressure: It first walks to pass in
-plaintext bio to see how much of it can fit into a single encrypted
-bio using up to BIO_MAX_VEC PAGE_SIZE segments, and then allocates a
-plaintext clone that fits the size, only to allocate another bio for
-the ciphertext later.  While the plaintext clone uses a bioset to avoid
-deadlocks when allocations could fail, the ciphertex one uses bio_kmalloc
-which is a no-go in the file system I/O path.
+This driver assumes that bio vectors are memory aligned to the logical
+block size, so set the queue limit to reflect that.
 
-Switch blk_crypto_fallback_encrypt_bio to walk the source plaintext bio
-while consuming bi_iter without cloning it, and instead allocate a
-ciphertext bio at the beginning and whenever we fille up the previous
-one.  The existing bio_set for the plaintext clones is reused for the
-ciphertext bios to remove the deadlock risk.
+Unless we set up the limit based on the logical block size, we will go
+out of page bounds in copy_to_nullb / copy_from_nullb.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Apparently this wasn't noticed so far because none of the tests generate
+such buffers, but since commit 851c4c96db00 ("xfs: implement
+XFS_IOC_DIOINFO in terms of vfs_getattr") xfstests generates unaligned
+I/O, which now lead to memory corruption when using null_blk devices
+with 4k block size.
+
+Fixes: bf8d08532bc1 ("iomap: add support for dma aligned direct-io")
+Fixes: b1a000d3b8ec ("block: relax direct io memory alignment")
+Signed-off-by: Hans Holmberg <hans.holmberg@wdc.com>
 ---
- block/blk-crypto-fallback.c | 162 ++++++++++++++----------------------
- 1 file changed, 63 insertions(+), 99 deletions(-)
 
-diff --git a/block/blk-crypto-fallback.c b/block/blk-crypto-fallback.c
-index 86b27f96051a..1f58010fb437 100644
---- a/block/blk-crypto-fallback.c
-+++ b/block/blk-crypto-fallback.c
-@@ -152,35 +152,26 @@ static void blk_crypto_fallback_encrypt_endio(struct bio *enc_bio)
+Changes in v3:
+* Improved the commit message, providing more background and hilighting
+  the severty of the issue (as suggested by Christoph, thanks!)
+
+Changes in v2:
+* Added fixes tags from Christoph
+* Added reviewed-bys from Keith and Christoph
+
+v1: https://lore.kernel.org/all/20251029133956.19554-1-hans.holmberg@wdc.com/
+
+
+ drivers/block/null_blk/main.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index f982027e8c85..0ee55f889cfd 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -1949,6 +1949,7 @@ static int null_add_dev(struct nullb_device *dev)
+ 		.logical_block_size	= dev->blocksize,
+ 		.physical_block_size	= dev->blocksize,
+ 		.max_hw_sectors		= dev->max_sectors,
++		.dma_alignment		= dev->blocksize - 1,
+ 	};
  
- 	src_bio->bi_status = enc_bio->bi_status;
- 
--	bio_uninit(enc_bio);
--	kfree(enc_bio);
-+	bio_put(enc_bio);
- 	bio_endio(src_bio);
- }
- 
--static struct bio *blk_crypto_fallback_clone_bio(struct bio *bio_src)
-+static struct bio *blk_crypto_alloc_enc_bio(struct bio *bio_src,
-+		unsigned int nr_segs)
- {
--	unsigned int nr_segs = bio_segments(bio_src);
--	struct bvec_iter iter;
--	struct bio_vec bv;
- 	struct bio *bio;
- 
--	bio = bio_kmalloc(nr_segs, GFP_NOIO);
--	if (!bio)
--		return NULL;
--	bio_init_inline(bio, bio_src->bi_bdev, nr_segs, bio_src->bi_opf);
-+	bio = bio_alloc_bioset(bio_src->bi_bdev, nr_segs, bio_src->bi_opf,
-+			GFP_NOIO, &crypto_bio_split);
- 	if (bio_flagged(bio_src, BIO_REMAPPED))
- 		bio_set_flag(bio, BIO_REMAPPED);
-+	bio->bi_private		= bio_src;
-+	bio->bi_end_io		= blk_crypto_fallback_encrypt_endio;
- 	bio->bi_ioprio		= bio_src->bi_ioprio;
- 	bio->bi_write_hint	= bio_src->bi_write_hint;
- 	bio->bi_write_stream	= bio_src->bi_write_stream;
- 	bio->bi_iter.bi_sector	= bio_src->bi_iter.bi_sector;
--	bio->bi_iter.bi_size	= bio_src->bi_iter.bi_size;
--
--	bio_for_each_segment(bv, bio_src, iter)
--		bio->bi_io_vec[bio->bi_vcnt++] = bv;
--
- 	bio_clone_blkg_association(bio, bio_src);
--
- 	return bio;
- }
- 
-@@ -208,32 +199,6 @@ blk_crypto_fallback_alloc_cipher_req(struct blk_crypto_keyslot *slot,
- 	return true;
- }
- 
--static bool blk_crypto_fallback_split_bio_if_needed(struct bio **bio_ptr)
--{
--	struct bio *bio = *bio_ptr;
--	unsigned int i = 0;
--	unsigned int num_sectors = 0;
--	struct bio_vec bv;
--	struct bvec_iter iter;
--
--	bio_for_each_segment(bv, bio, iter) {
--		num_sectors += bv.bv_len >> SECTOR_SHIFT;
--		if (++i == BIO_MAX_VECS)
--			break;
--	}
--
--	if (num_sectors < bio_sectors(bio)) {
--		bio = bio_submit_split_bioset(bio, num_sectors,
--					      &crypto_bio_split);
--		if (!bio)
--			return false;
--
--		*bio_ptr = bio;
--	}
--
--	return true;
--}
--
- union blk_crypto_iv {
- 	__le64 dun[BLK_CRYPTO_DUN_ARRAY_SIZE];
- 	u8 bytes[BLK_CRYPTO_MAX_IV_SIZE];
-@@ -257,34 +222,22 @@ static void blk_crypto_dun_to_iv(const u64 dun[BLK_CRYPTO_DUN_ARRAY_SIZE],
-  */
- static bool blk_crypto_fallback_encrypt_bio(struct bio **bio_ptr)
- {
--	struct bio *src_bio, *enc_bio;
--	struct bio_crypt_ctx *bc;
--	struct blk_crypto_keyslot *slot;
--	int data_unit_size;
-+	struct bio *src_bio = *bio_ptr;
-+	struct bio_crypt_ctx *bc = src_bio->bi_crypt_context;
-+	int data_unit_size = bc->bc_key->crypto_cfg.data_unit_size;
- 	struct skcipher_request *ciph_req = NULL;
-+	struct blk_crypto_keyslot *slot;
- 	DECLARE_CRYPTO_WAIT(wait);
- 	u64 curr_dun[BLK_CRYPTO_DUN_ARRAY_SIZE];
- 	struct scatterlist src, dst;
- 	union blk_crypto_iv iv;
--	unsigned int i, j;
-+	struct bio *enc_bio = NULL;
-+	unsigned int nr_segs;
-+	unsigned int enc_idx = 0;
-+	unsigned int j;
- 	bool ret = false;
- 	blk_status_t blk_st;
- 
--	/* Split the bio if it's too big for single page bvec */
--	if (!blk_crypto_fallback_split_bio_if_needed(bio_ptr))
--		return false;
--
--	src_bio = *bio_ptr;
--	bc = src_bio->bi_crypt_context;
--	data_unit_size = bc->bc_key->crypto_cfg.data_unit_size;
--
--	/* Allocate bounce bio for encryption */
--	enc_bio = blk_crypto_fallback_clone_bio(src_bio);
--	if (!enc_bio) {
--		src_bio->bi_status = BLK_STS_RESOURCE;
--		return false;
--	}
--
- 	/*
- 	 * Get a blk-crypto-fallback keyslot that contains a crypto_skcipher for
- 	 * this bio's algorithm and key.
-@@ -293,7 +246,7 @@ static bool blk_crypto_fallback_encrypt_bio(struct bio **bio_ptr)
- 					bc->bc_key, &slot);
- 	if (blk_st != BLK_STS_OK) {
- 		src_bio->bi_status = blk_st;
--		goto out_put_enc_bio;
-+		return false;
- 	}
- 
- 	/* and then allocate an skcipher_request for it */
-@@ -309,61 +262,72 @@ static bool blk_crypto_fallback_encrypt_bio(struct bio **bio_ptr)
- 	skcipher_request_set_crypt(ciph_req, &src, &dst, data_unit_size,
- 				   iv.bytes);
- 
--	/* Encrypt each page in the bounce bio */
--	for (i = 0; i < enc_bio->bi_vcnt; i++) {
--		struct bio_vec *enc_bvec = &enc_bio->bi_io_vec[i];
--		struct page *plaintext_page = enc_bvec->bv_page;
--		struct page *ciphertext_page =
--			mempool_alloc(blk_crypto_bounce_page_pool, GFP_NOIO);
--
--		enc_bvec->bv_page = ciphertext_page;
-+	/* Encrypt each page in the origin bio */
-+	nr_segs = bio_segments(src_bio);
-+	for (;;) {
-+		struct bio_vec src_bv =
-+			bio_iter_iovec(src_bio, src_bio->bi_iter);
-+		struct page *enc_page;
- 
--		if (!ciphertext_page) {
--			src_bio->bi_status = BLK_STS_RESOURCE;
--			goto out_free_bounce_pages;
-+		if (!enc_bio) {
-+			enc_bio = blk_crypto_alloc_enc_bio(src_bio,
-+					min(nr_segs, BIO_MAX_VECS));
- 		}
- 
--		sg_set_page(&src, plaintext_page, data_unit_size,
--			    enc_bvec->bv_offset);
--		sg_set_page(&dst, ciphertext_page, data_unit_size,
--			    enc_bvec->bv_offset);
-+		enc_page = mempool_alloc(blk_crypto_bounce_page_pool,
-+				GFP_NOIO);
-+		__bio_add_page(enc_bio, enc_page, src_bv.bv_len,
-+				src_bv.bv_offset);
-+
-+		sg_set_page(&src, src_bv.bv_page, data_unit_size,
-+			    src_bv.bv_offset);
-+		sg_set_page(&dst, enc_page, data_unit_size, src_bv.bv_offset);
- 
- 		/* Encrypt each data unit in this page */
--		for (j = 0; j < enc_bvec->bv_len; j += data_unit_size) {
-+		for (j = 0; j < src_bv.bv_len; j += data_unit_size) {
- 			blk_crypto_dun_to_iv(curr_dun, &iv);
- 			if (crypto_wait_req(crypto_skcipher_encrypt(ciph_req),
--					    &wait)) {
--				i++;
--				src_bio->bi_status = BLK_STS_IOERR;
--				goto out_free_bounce_pages;
--			}
-+					    &wait))
-+				goto out_ioerror;
- 			bio_crypt_dun_increment(curr_dun, 1);
- 			src.offset += data_unit_size;
- 			dst.offset += data_unit_size;
- 		}
-+
-+		bio_advance_iter_single(src_bio, &src_bio->bi_iter,
-+				src_bv.bv_len);
-+		if (!src_bio->bi_iter.bi_size)
-+			break;
-+
-+		if (++enc_idx == enc_bio->bi_max_vecs) {
-+			/*
-+			 * Each encrypted bio will call bio_endio in the
-+			 * completion handler, so ensure the remaining count
-+			 * matches the number of submitted bios.
-+			 */
-+			bio_inc_remaining(src_bio);
-+			submit_bio(enc_bio);
-+			enc_bio = NULL;
-+			enc_idx = 0;
-+		}
-+		nr_segs--;
- 	}
- 
--	enc_bio->bi_private = src_bio;
--	enc_bio->bi_end_io = blk_crypto_fallback_encrypt_endio;
- 	*bio_ptr = enc_bio;
- 	ret = true;
--
--	enc_bio = NULL;
--	goto out_free_ciph_req;
--
--out_free_bounce_pages:
--	while (i > 0)
--		mempool_free(enc_bio->bi_io_vec[--i].bv_page,
--			     blk_crypto_bounce_page_pool);
- out_free_ciph_req:
- 	skcipher_request_free(ciph_req);
- out_release_keyslot:
- 	blk_crypto_put_keyslot(slot);
--out_put_enc_bio:
--	if (enc_bio)
--		bio_uninit(enc_bio);
--	kfree(enc_bio);
- 	return ret;
-+
-+out_ioerror:
-+	while (enc_idx > 0)
-+		mempool_free(enc_bio->bi_io_vec[enc_idx--].bv_page,
-+			     blk_crypto_bounce_page_pool);
-+	bio_put(enc_bio);
-+	src_bio->bi_status = BLK_STS_IOERR;
-+	goto out_free_ciph_req;
- }
- 
- /*
-@@ -537,7 +501,7 @@ static int blk_crypto_fallback_init(void)
- 
- 	get_random_bytes(blank_key, sizeof(blank_key));
- 
--	err = bioset_init(&crypto_bio_split, 64, 0, 0);
-+	err = bioset_init(&crypto_bio_split, 64, 0, BIOSET_NEED_BVECS);
- 	if (err)
- 		goto out;
- 
+ 	struct nullb *nullb;
 -- 
-2.47.3
+2.34.1
 
