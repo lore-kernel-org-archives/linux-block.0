@@ -1,56 +1,56 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06C129460
-	for <linux-block@vger.kernel.org>; Sat,  1 Nov 2025 13:31:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 545D4199BC
+	for <linux-block@vger.kernel.org>; Sat,  1 Nov 2025 13:31:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762003908; cv=none; b=QeZYqmqfpljdWsE04VlrfiLhGhgkELrO36invhR8PjkT7erJ2DojzUOyCeX4ClZou+krVGOAdzzpm1qnb5jqRIEXBgOHysK5G1lRz8nq6t5uyarx4luz3epdvIEv907nyhfeZXoEEI1x/JcTITTURdvX5Pd+7pGQMo6ZIIfg/Pk=
+	t=1762003911; cv=none; b=rx08/l3pkZb8rh75llNJurXnAXf6lZX11VRiMdCAqOgyTPEN9sPtmzYBgphs/GSgRisa3z6ET+7KJhS3ihO7anTIve8+Ea7NSAeYZ2MsGdzVGrOmbIY+gSL45PscI9h+kPkteQUgvIruHzNHO8uY5NllC82LZZCA9mTFrVgeHAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762003908; c=relaxed/simple;
-	bh=018WYY0EqPqwLmBE18IVXCSJYohDoGCQw8K5cQFr9B0=;
+	s=arc-20240116; t=1762003911; c=relaxed/simple;
+	bh=XBtDMCQ8Z26PR87XHubAs9yPbzRTFjED7FepHdLHdCE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RT+vq7t9rNBIzDPFZAzaZf0S2znThG2ijdUPQ5fAD4+9tQ+0ovFLObG139wJa2hquYPKmpvZZ/yfi0zQVj5xafnw+skg0LqyHtm7cUzn/t3YKYOil6qvWYZAW9eEHEZlSWQlB3catm8Zh0Qo+zZWtYgveinNScgtvDDnR8WfWmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dfIzBF9E; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=Od9rrbTXmTEz7AKxw02y3fJM8K8JhjQXI1vlcc2Fy39NgLLSY+46VN72phddE2XnpfcgDZ7hK5SSrhXsLhmg8qJd1XL1sVPDsseuGNqGrrvkDCh6avcgHKRhWjkbIcW+Uub8bjyMAoYt3ycXE4/I46syD5wdiGEwwofZOOXsqcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Djnd1l9D; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dfIzBF9E"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Djnd1l9D"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762003905;
+	s=mimecast20190719; t=1762003909;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/o8IklOxvwXgYp+MAI4cDFz9SsKoUzpqlWJgZhlHgGQ=;
-	b=dfIzBF9EDENe28i6TW2pF85WQwnQM4llY2PnsO7j38BrvNb4EfuGqez4tRh1fvk32dBpwq
-	4XiXOibFmyNb3UPZN2nA7lO/zqhabs4mTXbN5lHEjinqyomwAPUhqjtA7s8DJjmVwTR6wF
-	cf9p8S5twhi9koaoy/xGPUdoSUhRd4w=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+	bh=Iv8yrlwNcQgjmjBqS8jZZXx6Q0/npBLeSw5bM/zJaNQ=;
+	b=Djnd1l9DUBT6H8gfXUcdeGGh/Vqfifad+TMc/XwCGRz582XUSiheZgEqNTW2SD2KrEemQh
+	ohvzxoLi8KelSw5WBISF/8F/FP7fJF/05YqWZpnEvM9aEm9jNA1RhFROVMveJ7cdgt4iBR
+	Y6IlY76dh8/3lKZEkv7RbzKZOGG9Tcg=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-308-YoGZ4TbNPZ2jVooHPugEsg-1; Sat,
- 01 Nov 2025 09:31:42 -0400
-X-MC-Unique: YoGZ4TbNPZ2jVooHPugEsg-1
-X-Mimecast-MFC-AGG-ID: YoGZ4TbNPZ2jVooHPugEsg_1762003901
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-427-S6eWMbFvPO6Th0IWibPaLA-1; Sat,
+ 01 Nov 2025 09:31:47 -0400
+X-MC-Unique: S6eWMbFvPO6Th0IWibPaLA-1
+X-Mimecast-MFC-AGG-ID: S6eWMbFvPO6Th0IWibPaLA_1762003906
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A5829180034C;
-	Sat,  1 Nov 2025 13:31:41 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AEBBC180057A;
+	Sat,  1 Nov 2025 13:31:46 +0000 (UTC)
 Received: from localhost (unknown [10.72.120.13])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A96371800576;
-	Sat,  1 Nov 2025 13:31:40 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 77C7E30001A1;
+	Sat,  1 Nov 2025 13:31:44 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
 Cc: Uday Shankar <ushankar@purestorage.com>,
 	Caleb Sander Mateos <csander@purestorage.com>,
 	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 2/5] ublk: implement NUMA-aware memory allocation
-Date: Sat,  1 Nov 2025 21:31:17 +0800
-Message-ID: <20251101133123.670052-3-ming.lei@redhat.com>
+Subject: [PATCH V4 3/5] ublk: use struct_size() for allocation
+Date: Sat,  1 Nov 2025 21:31:18 +0800
+Message-ID: <20251101133123.670052-4-ming.lei@redhat.com>
 In-Reply-To: <20251101133123.670052-1-ming.lei@redhat.com>
 References: <20251101133123.670052-1-ming.lei@redhat.com>
 Precedence: bulk
@@ -60,206 +60,58 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Implement NUMA-friendly memory allocation for ublk driver to improve
-performance on multi-socket systems.
+Convert ublk_queue to use struct_size() for allocation.
 
-This commit includes the following changes:
+Changes in this commit:
 
-1. Rename __queues to queues, dropping the __ prefix since the field is
-   now accessed directly throughout the codebase rather than only through
-   the ublk_get_queue() helper.
+1. Update ublk_init_queue() to use struct_size(ubq, ios, depth)
+   instead of manual size calculation (sizeof(struct ublk_queue) +
+   depth * sizeof(struct ublk_io)).
 
-2. Remove the queue_size field from struct ublk_device as it is no longer
-   needed.
+This provides better type safety and makes the code more maintainable
+by using standard kernel macro for flexible array handling.
 
-3. Move queue allocation and deallocation into ublk_init_queue() and
-   ublk_deinit_queue() respectively, improving encapsulation. This
-   simplifies ublk_init_queues() and ublk_deinit_queues() to just
-   iterate and call the per-queue functions.
-
-4. Add ublk_get_queue_numa_node() helper function to determine the
-   appropriate NUMA node for a queue by finding the first CPU mapped
-   to that queue via tag_set.map[HCTX_TYPE_DEFAULT].mq_map[] and
-   converting it to a NUMA node using cpu_to_node(). This function is
-   called internally by ublk_init_queue() to determine the allocation
-   node.
-
-5. Allocate each queue structure on its local NUMA node using
-   kvzalloc_node() in ublk_init_queue().
-
-6. Allocate the I/O command buffer on the same NUMA node using
-   alloc_pages_node().
-
-This reduces memory access latency on multi-socket NUMA systems by
-ensuring each queue's data structures are local to the CPUs that
-access them.
+Meantime annotate ublk_queue.ios by __counted_by().
 
 Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/ublk_drv.c | 84 +++++++++++++++++++++++++---------------
- 1 file changed, 53 insertions(+), 31 deletions(-)
+ drivers/block/ublk_drv.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 2569566bf5e6..d920f7cf4dad 100644
+index d920f7cf4dad..96e07763cd28 100644
 --- a/drivers/block/ublk_drv.c
 +++ b/drivers/block/ublk_drv.c
-@@ -209,9 +209,6 @@ struct ublk_queue {
- struct ublk_device {
- 	struct gendisk		*ub_disk;
- 
--	char	*__queues;
--
--	unsigned int	queue_size;
- 	struct ublksrv_ctrl_dev_info	dev_info;
- 
- 	struct blk_mq_tag_set	tag_set;
-@@ -239,6 +236,8 @@ struct ublk_device {
- 	bool canceling;
- 	pid_t 	ublksrv_tgid;
- 	struct delayed_work	exit_work;
-+
-+	struct ublk_queue       *queues[];
+@@ -203,7 +203,7 @@ struct ublk_queue {
+ 	bool fail_io; /* copy of dev->state == UBLK_S_DEV_FAIL_IO */
+ 	spinlock_t		cancel_lock;
+ 	struct ublk_device *dev;
+-	struct ublk_io ios[];
++	struct ublk_io ios[] __counted_by(q_depth);
  };
  
- /* header of ublk_params */
-@@ -781,7 +780,7 @@ static noinline void ublk_put_device(struct ublk_device *ub)
- static inline struct ublk_queue *ublk_get_queue(struct ublk_device *dev,
- 		int qid)
- {
--       return (struct ublk_queue *)&(dev->__queues[qid * dev->queue_size]);
-+	return dev->queues[qid];
- }
- 
- static inline bool ublk_rq_has_data(const struct request *rq)
-@@ -2662,9 +2661,13 @@ static const struct file_operations ublk_ch_fops = {
- 
- static void ublk_deinit_queue(struct ublk_device *ub, int q_id)
- {
--	int size = ublk_queue_cmd_buf_size(ub);
--	struct ublk_queue *ubq = ublk_get_queue(ub, q_id);
--	int i;
-+	struct ublk_queue *ubq = ub->queues[q_id];
-+	int size, i;
-+
-+	if (!ubq)
-+		return;
-+
-+	size = ublk_queue_cmd_buf_size(ub);
- 
- 	for (i = 0; i < ubq->q_depth; i++) {
- 		struct ublk_io *io = &ubq->ios[i];
-@@ -2676,57 +2679,76 @@ static void ublk_deinit_queue(struct ublk_device *ub, int q_id)
- 
- 	if (ubq->io_cmd_buf)
- 		free_pages((unsigned long)ubq->io_cmd_buf, get_order(size));
-+
-+	kvfree(ubq);
-+	ub->queues[q_id] = NULL;
-+}
-+
-+static int ublk_get_queue_numa_node(struct ublk_device *ub, int q_id)
-+{
-+	unsigned int cpu;
-+
-+	/* Find first CPU mapped to this queue */
-+	for_each_possible_cpu(cpu) {
-+		if (ub->tag_set.map[HCTX_TYPE_DEFAULT].mq_map[cpu] == q_id)
-+			return cpu_to_node(cpu);
-+	}
-+
-+	return NUMA_NO_NODE;
- }
- 
+ struct ublk_device {
+@@ -2700,7 +2700,6 @@ static int ublk_get_queue_numa_node(struct ublk_device *ub, int q_id)
  static int ublk_init_queue(struct ublk_device *ub, int q_id)
  {
--	struct ublk_queue *ubq = ublk_get_queue(ub, q_id);
-+	int depth = ub->dev_info.queue_depth;
-+	int ubq_size = sizeof(struct ublk_queue) + depth * sizeof(struct ublk_io);
- 	gfp_t gfp_flags = GFP_KERNEL | __GFP_ZERO;
--	void *ptr;
-+	struct ublk_queue *ubq;
-+	struct page *page;
-+	int numa_node;
- 	int size;
- 
-+	/* Determine NUMA node based on queue's CPU affinity */
-+	numa_node = ublk_get_queue_numa_node(ub, q_id);
-+
-+	/* Allocate queue structure on local NUMA node */
-+	ubq = kvzalloc_node(ubq_size, GFP_KERNEL, numa_node);
-+	if (!ubq)
-+		return -ENOMEM;
-+
- 	spin_lock_init(&ubq->cancel_lock);
- 	ubq->flags = ub->dev_info.flags;
- 	ubq->q_id = q_id;
--	ubq->q_depth = ub->dev_info.queue_depth;
-+	ubq->q_depth = depth;
- 	size = ublk_queue_cmd_buf_size(ub);
- 
--	ptr = (void *) __get_free_pages(gfp_flags, get_order(size));
--	if (!ptr)
-+	/* Allocate I/O command buffer on local NUMA node */
-+	page = alloc_pages_node(numa_node, gfp_flags, get_order(size));
-+	if (!page) {
-+		kvfree(ubq);
- 		return -ENOMEM;
-+	}
-+	ubq->io_cmd_buf = page_address(page);
- 
--	ubq->io_cmd_buf = ptr;
-+	ub->queues[q_id] = ubq;
- 	ubq->dev = ub;
- 	return 0;
- }
- 
- static void ublk_deinit_queues(struct ublk_device *ub)
- {
--	int nr_queues = ub->dev_info.nr_hw_queues;
- 	int i;
- 
--	if (!ub->__queues)
--		return;
--
--	for (i = 0; i < nr_queues; i++)
-+	for (i = 0; i < ub->dev_info.nr_hw_queues; i++)
- 		ublk_deinit_queue(ub, i);
--	kvfree(ub->__queues);
- }
- 
- static int ublk_init_queues(struct ublk_device *ub)
- {
--	int nr_queues = ub->dev_info.nr_hw_queues;
--	int depth = ub->dev_info.queue_depth;
+ 	int depth = ub->dev_info.queue_depth;
 -	int ubq_size = sizeof(struct ublk_queue) + depth * sizeof(struct ublk_io);
--	int i, ret = -ENOMEM;
-+	int i, ret;
+ 	gfp_t gfp_flags = GFP_KERNEL | __GFP_ZERO;
+ 	struct ublk_queue *ubq;
+ 	struct page *page;
+@@ -2711,7 +2710,8 @@ static int ublk_init_queue(struct ublk_device *ub, int q_id)
+ 	numa_node = ublk_get_queue_numa_node(ub, q_id);
  
--	ub->queue_size = ubq_size;
--	ub->__queues = kvcalloc(nr_queues, ubq_size, GFP_KERNEL);
--	if (!ub->__queues)
--		return ret;
--
--	for (i = 0; i < nr_queues; i++) {
--		if (ublk_init_queue(ub, i))
-+	for (i = 0; i < ub->dev_info.nr_hw_queues; i++) {
-+		ret = ublk_init_queue(ub, i);
-+		if (ret)
- 			goto fail;
- 	}
+ 	/* Allocate queue structure on local NUMA node */
+-	ubq = kvzalloc_node(ubq_size, GFP_KERNEL, numa_node);
++	ubq = kvzalloc_node(struct_size(ubq, ios, depth), GFP_KERNEL,
++			    numa_node);
+ 	if (!ubq)
+ 		return -ENOMEM;
  
-@@ -3128,7 +3150,7 @@ static int ublk_ctrl_add_dev(const struct ublksrv_ctrl_cmd *header)
- 		goto out_unlock;
- 
- 	ret = -ENOMEM;
--	ub = kzalloc(sizeof(*ub), GFP_KERNEL);
-+	ub = kzalloc(struct_size(ub, queues, info.nr_hw_queues), GFP_KERNEL);
- 	if (!ub)
- 		goto out_unlock;
- 	mutex_init(&ub->mutex);
 -- 
 2.47.0
 
