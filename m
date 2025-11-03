@@ -1,65 +1,67 @@
-Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EAC3313538
-	for <linux-block@vger.kernel.org>; Mon,  3 Nov 2025 15:59:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 071A13161BF
+	for <linux-block@vger.kernel.org>; Mon,  3 Nov 2025 16:22:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762185595; cv=none; b=bY5tpOoA7IE37mGuxa/eVPK5yooOs9vdKLg/k6pdBu0OPbphff2hSHmIUxdteUZDI8DxWKe5LZFbXs83OFBv/Yu+LX3iEQxolZwZ3AYEVUDIurOrl3xIN8Jo7VOSGIXaG5maZbNMlKWxIwx3wpEvy6KGQI71Ier21u65eAOkXGE=
+	t=1762186971; cv=none; b=dge/OGVeueO7uXtZ5FGC2mwUjISqBaBsIxg55fuauoyh6mcoMRkYl89K5j5rr7GzW5QIZkotRQn1T2uoMt7Yb86V9XzpRM8eiQfgAyKyOSMyktWEY3ioX+z4SnCK0snPPZEQvnaml57KW8qew0TI1oAi/u/pml6K6ldevl94C9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762185595; c=relaxed/simple;
-	bh=OmMLchAeUeySgwhNaGcYu4r3ZEqXxE+MViOzf2cqMVs=;
+	s=arc-20240116; t=1762186971; c=relaxed/simple;
+	bh=MAqh8a5N+ZsOAGEcWjRLDNWJ4Cf1BpHeOMi77RPjhlo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iirtoexIzUkHX2imEX5ivLrLx8gmCLzmXJkW/L2rJ3PzWpQvxS616FjzRC1jv9A300rRbMblLzt3TOSATjhEVcmOGIFC+SY7rfY4hI9lVYPDYHWYOs4Zrt3mn512zUe+Tqy1gODAWeivOEhV2OE1mIiA6Y5lZz5xN3HmJ9JEJYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=dFwaQpX8; arc=none smtp.client-ip=209.85.166.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	 In-Reply-To:Content-Type; b=XE6g4a8fZ+rlCU3uU50p6igwnP2jidxaGa3B2GQWaH25GrKIvkmg8b9o3ZluSvWIY1LXYRxi5M8ad+VKlst/sWXMUfnCVi+QXI6C1+4lOA0pbrc5Nj5hO3GzTP8UFpVxJ8ZeyvC+OIUWnMYaiMTh/e2xrFI0UEeaOVyRPMJw1u4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cJm1QDIE; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="dFwaQpX8"
-Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-92aee734585so195069539f.3
-        for <linux-block@vger.kernel.org>; Mon, 03 Nov 2025 07:59:53 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cJm1QDIE"
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2907948c1d2so49577675ad.3
+        for <linux-block@vger.kernel.org>; Mon, 03 Nov 2025 08:22:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1762185592; x=1762790392; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1762186969; x=1762791769; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=0KVTIa+dOzj0V3NHrOXqsCxCiYIvaXVpSTfeWllBoew=;
-        b=dFwaQpX8EUQUc+4KUj8ARxBrY3doGCtQPfHhwn2rD5BPjToob3JDfD5cbzzZuVePTJ
-         XzzrD7/n8Lx5eqCkFol0gvFAgnPsSbDHKUryKhoKzpKtXC/oTTM17LZZGW1HIWzC+pYV
-         19WpkrYAY8VTY+fd5N8dvTodrGkoUnbLGVdtnVx4jifY50z/Azy0Kk4ezYCuMVFAQkCW
-         Fqs8aFzD0o1wXWdwW6/wM9HpBbxkZ9y38iTCwxI+XmM0Uuva90WlsJIoPe39UK9egaLf
-         MRx7iMo09Q2vkUNaY4U8DNJEtuHZdNHK1k+hyPK1aOSDCE1PiD43Rfzy+9M+mFzGZ1bT
-         0PMA==
+        bh=DfeI4do2p8OwX1bs3r/PVpU23cvBEdcK3KBLEfo+aK8=;
+        b=cJm1QDIEvy6vQsHD2LLXTwJJJf4Mpe4/+xOPU31gpiXO/voaC5GoTJdUP49sLohvUe
+         VIT0lc7p9a59kWz3sRDeNRIp71R+3k+NRLHa0uOyqjEfnoLkSwpEHgF3+xHG0rIW1z0d
+         tFnbE6XgB1P2J/c1jChgyGO80pQHfClydnR3caIx3ckCib4P0qgDptgqoieL3rWnI4tU
+         YNGBeWXsxrFna+hB5hpNmNKR4ZoFxvPEWlEKPLX1TE3XYWiz1tuqhTRQ4wwi0EtxK9hG
+         a3059MRX9Km7YEESIe1OlxhdYoslcqhX0Hatum6onHcJ4RyA6vH5YOLuqMkS3voyNH4k
+         PBxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762185592; x=1762790392;
+        d=1e100.net; s=20230601; t=1762186969; x=1762791769;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0KVTIa+dOzj0V3NHrOXqsCxCiYIvaXVpSTfeWllBoew=;
-        b=fuZxYz2Gv5GDqIQAF/jKYSrfgKel1wwCacsE8HBbJyakD7Uzi1GQ+S4GeGsZZ/lAe9
-         I2azNPdac6ozKtKvW4UMTaIIwD83rbFLPUzuYMtDBjxY+IwphT31qy+mW4267UoSI6eY
-         ez60s0l6iLNuFbe8w6/hM1jMi64KISl8dq/A7X/VFNYMuFBEodYCVebNrXqhCu9ZPUfG
-         zVeqoC8FxWIw7NsEPbkseGxwR/wUJRRIQI4NfCWMDAz4UGdf2+iP+ynb/uxgs8Y/HCQ/
-         QWYU6RQ5ino6izoYrfNthVxCOEDfcyhpqrZPXGf9t3E2V4zRyoG+ydOQpT0vCViCORE8
-         eezA==
-X-Gm-Message-State: AOJu0YxUnLl9h+0rBJw9aemoAHU0d7tQ1DXrCBdbMuAgn94jH0i6L4La
-	1ghYvbemmS16vVgBbhfnv8+CeIEyfy/im5AOiCdOnkYbnK2OUtAh3KRElVtNxBUFo2A=
-X-Gm-Gg: ASbGncvATcvANWfsPYStZx280VTB+S9E6kGMe+fNUkltWwquPOndypUeDqgP0NZO227
-	2hnuPAkSSsNq9YA+9iXwB2agdfCUIV8zvGLLsYwayZQ3JO4aqVkyiecLiCl0eZaG0aiLLabxFmt
-	ONzikMS45zODcFoOQV6KwJv5Q5dSXkU75TCtSzf62Ya2Glwxofk0SctZm3xu+/9z8z/9Y9vxZhi
-	yV1VoUCNG7pqK3H60HWS6hHdlqK4Y4Qrj9XUpzJPkSIiBi6DA0bPRj5kD32lQSyWYpyjl0+gDKV
-	uRO7cIhSVJqkqniPZHIRHdWZhwB6bDS2XoIUEyJpERtOGLysgdAxav4FtxvM1QaF4Hv5We+LEk4
-	rT/1qLYBE5CSM3tnHMt/OVvu78ieSLxpPGyytpYDl16hxeiJeB0xs8kvN6s9xjjB1On76uMWevH
-	DLLwavBoo=
-X-Google-Smtp-Source: AGHT+IHeXwTU86jvQEounNr5wea3NvcMebFpU966CMiAJWXRdJYK+Hd/OBHUo1KPbvA9CtwHSCTOvA==
-X-Received: by 2002:a05:6602:48e:b0:938:9f22:ed34 with SMTP id ca18e2360f4ac-94822a37960mr1887920539f.16.1762185592385;
-        Mon, 03 Nov 2025 07:59:52 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5b7225ad8a9sm290152173.15.2025.11.03.07.59.50
+        bh=DfeI4do2p8OwX1bs3r/PVpU23cvBEdcK3KBLEfo+aK8=;
+        b=OD/HCRDqz7z7BaTXhszelt7GpJpbtYxUowf4LRKCvIUX2YFvcUyIxN0xBgbxBtp3O1
+         6muPYq3cwvtCXRMZJqLGp0iw1w1Zuneh7mqykibIQ/YQw06Q3YgBQhKajZey40/x9994
+         57nE3jOxPTcF6KFWj1EWrdgigivy4txj7dPhKjrUD/GEVh9zcpJvFOs/QqLv8DEcfhbs
+         a7sSYXYRo03Zlv4mN1KJ+2r3Xd2ZruGx6jSYWDgZja5rK6QJHL5kQv1V/0fqAiuFCYPp
+         Q2CA6ooguvNGMeHuZDraeV2/hvIBwwNUPTHjUa8CEp68set1mNZlublYC5kqyYAZGPIJ
+         4G7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWT4m6nK4z6COB//5fS3VTx97pbZOd7lOfNBqBGkHtxRhMzr8ZS86iyEi+31INy2lCS+UONlIsvBx0Lfw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyqoQ7Rv4FAJHLZDDcdX3bCFPei6tp1uQudEDNl6GUinyjkabKJ
+	SsW2Ju7MP/jUiZf+B9z76K4sIbWhRQM6/lckEACe05R1zm3RY3W7xOFT
+X-Gm-Gg: ASbGnctA9NrzT6RyypWHkydiwGQwTGhh0xjS6A7k7nb711QJniXbxm7yLkpykgevD0l
+	bYa9ti6f8nRmpvlLTWpe6UpJ95dPNCIQVMUamX3xlkRQQ07qirAbvyjdLC8meci14wcR2eI23fo
+	Ghu6stHt/xpmJ5K7xWAZmGwHqvmIPL8T/jRebyO6C1W8J3sRQgfS2FKg3BKuWM4LTO5OoOHU42E
+	MO1An1PdmPIcS2u0JBr18Q3AjGo4g/Ma3fDzppYoWQAlW6zbS6xW9h8qoygUUqtoCpWfJLjx5ih
+	e5TxrPjWii5Z72+Go3UwVychhyRMoEloWKeDZtV0dlRYcmoSxatHegxoJ2dUEqhbJIrmpcQd6RN
+	Bo0GB5OjYuYFhCMed4hyga6r88zjBbW4Pf8HTLlV6Tb3L8OPYBp1iyPlhp+kG/BxH1Oa3WJsf6f
+	ALTPg+so27Tsd1ZH74GknH70TQxaKwbYUJrH6JyztfI8ziPTEp8ZRzmqLR3WSZ8hRx493KazCQ0
+	65BKQ7UByI=
+X-Google-Smtp-Source: AGHT+IEQaEN/YRqaD9Q0fZ6GjLoywGPuwEKc41YzWo/EM8FatoGxq2+IaYk2SY8ba4sIfOPAOnQ3UA==
+X-Received: by 2002:a17:902:ecd0:b0:295:9b3a:16b7 with SMTP id d9443c01a7336-2959b3a1914mr60038095ad.4.1762186969039;
+        Mon, 03 Nov 2025 08:22:49 -0800 (PST)
+Received: from ?IPV6:2409:8a00:79b4:1a90:5d7b:82d2:2626:164a? ([2409:8a00:79b4:1a90:5d7b:82d2:2626:164a])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-295743772e9sm73908245ad.66.2025.11.03.08.22.42
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Nov 2025 07:59:50 -0800 (PST)
-Message-ID: <d7b57146-9703-461d-97d3-232cba3f8191@kernel.dk>
-Date: Mon, 3 Nov 2025 08:59:50 -0700
+        Mon, 03 Nov 2025 08:22:48 -0800 (PST)
+Message-ID: <a89cb9af-784d-41a6-9f1e-dfa28d09be29@gmail.com>
+Date: Tue, 4 Nov 2025 00:22:20 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -67,67 +69,51 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/8] creds: add {scoped_}with_kernel_creds()
-To: Christian Brauner <brauner@kernel.org>,
- Linus Torvalds <torvalds@linux-foundation.org>
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-References: <20251103-work-creds-init_cred-v1-0-cb3ec8711a6a@kernel.org>
+Subject: Re: [PATCH v3] fix missing sb_min_blocksize() return value checks in
+ some filesystems
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Namjae Jeon <linkinjeon@kernel.org>, Sungjong Seo
+ <sj1557.seo@samsung.com>, OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+ Jan Kara <jack@suse.cz>, Carlos Maiolino <cem@kernel.org>,
+ Jens Axboe <axboe@kernel.dk>, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, Sasha Levin <sashal@kernel.org>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, linux-xfs@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+ stable@vger.kernel.org, Matthew Wilcox <willy@infradead.org>,
+ "Darrick J . Wong" <djwong@kernel.org>,
+ Yongpeng Yang <yangyongpeng@xiaomi.com>
+References: <20251103135024.35289-1-yangyongpeng.storage@gmail.com>
+ <aQi4Q536D6VviQ-6@infradead.org>
 Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20251103-work-creds-init_cred-v1-0-cb3ec8711a6a@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Yongpeng Yang <yangyongpeng.storage@gmail.com>
+In-Reply-To: <aQi4Q536D6VviQ-6@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 11/2/25 4:12 PM, Christian Brauner wrote:
-> Hey,
+On 11/3/2025 10:12 PM, Christoph Hellwig wrote:
+> On Mon, Nov 03, 2025 at 09:50:24PM +0800, Yongpeng Yang wrote:
+>> From: Yongpeng Yang <yangyongpeng@xiaomi.com>
+>>
+>> When emulating an nvme device on qemu with both logical_block_size and
+>> physical_block_size set to 8 KiB, but without format, a kernel panic
+>> was triggered during the early boot stage while attempting to mount a
+>> vfat filesystem.
 > 
-> A few months ago I did work to make override_creds()/revert_creds()
-> completely reference count free - mostly for the sake of
-> overlayfs but it has been beneficial to everyone using this.
+> Please split this into a patch per file system, with a proper commit
+> log for each.
 > 
-> In a recent pull request from Jens that introduced another round of
-> override_creds()/revert_creds() for nbd Linus asked whether we could
-> avoide the prepare_kernel_creds() calls that duplicate the kernel
-> credentials and then drop them again later.
+>> Cc: <stable@vger.kernel.org> # v6.15
+>> Fixes: a64e5a596067bd ("bdev: add back PAGE_SIZE block size validation
+>> for sb_set_blocksize()")
 > 
-> Yes, we can actually. We can use the guard infrastructure to completely
-> avoid the allocation and then also to never expose the temporary
-> variable to hold the kernel credentials anywhere in the callers.
+> That just adds back one error case in sb_set_blocksize.
 > 
-> So add with_kernel_creds() and scoped_with_kernel_creds() for this
-> purpose. Also take the opportunity to fixup the scoped_class() macro I
-> introduced two cycles ago.
+> The Fixes tag should be for the commit adding the call to
+> sb_set_blocksize / sb_min_blocksize in each of the file systems.
 > 
-> I've put this into kernel-6.19.cred now. Linus, not sure if you're
-> paying attention but if you want you can give this a final look.
-> 
-> Signed-off-by: Christian Brauner <brauner@kernel.org>
-> ---
-> Christian Brauner (8):
->       cleanup: fix scoped_class()
->       cred: add kernel_cred() helper
->       cred: make init_cred static
->       cred: add {scoped_}with_kernel_creds
->       firmware: don't copy kernel creds
->       nbd: don't copy kernel creds
->       target: don't copy kernel creds
->       unix: don't copy creds
-> 
->  drivers/base/firmware_loader/main.c   | 59 +++++++++++++++--------------------
->  drivers/block/nbd.c                   | 17 ++--------
->  drivers/target/target_core_configfs.c | 14 ++-------
->  include/linux/cleanup.h               | 15 ++++-----
->  include/linux/cred.h                  | 18 +++++++++++
->  include/linux/init_task.h             |  1 -
->  init/init_task.c                      | 27 ++++++++++++++++
->  kernel/cred.c                         | 27 ----------------
->  net/unix/af_unix.c                    | 17 +++-------
->  security/keys/process_keys.c          |  2 +-
->  10 files changed, 87 insertions(+), 110 deletions(-)
 
-Looks good to me, and love diffstats like that:
+Thanks for the suggestion. I'll send v3 and split the changes into 
+multiple patches.
 
-Reviewed-by: Jens Axboe <axboe@kernel.dk>
-
--- 
-Jens Axboe
+Yongpeng,
