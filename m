@@ -1,121 +1,75 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4630308F0A;
-	Mon,  3 Nov 2025 12:59:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4EDB635
+	for <linux-block@vger.kernel.org>; Mon,  3 Nov 2025 13:20:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762174794; cv=none; b=fLP31nl57cnQbZgOL/E9WExW58JtGPnO32Lu4iOoUzsb/hIouDpO5L31vlWMN++1epCvPMgB5ZXMdVxs2UgufK6BYZEDSbbiwtemDOQLFVTnogogLuOWAQJ0Acm0AIqssi+Qu1stCy2u+Nnbu0xBW3AIBrYYTbgoUHWok8OSL3M=
+	t=1762176059; cv=none; b=HRAAP3/J/iNn1IQTCjHugjnUlQSiYgDC/mCOlYG3zdJOjwTgpazAA/MvCTlQRfW7BVjxAH73xwAk6WDT99onx2d1Far+kYUi/ebsrUQSKA5EiUX5zyCyv28DnNcJ49wLrB3Ym9ENOJEOWjRNVAabDJJuB9LEeHSL4TXodXKYVQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762174794; c=relaxed/simple;
-	bh=mg14JfajU5W0qY3xKlC1LzugPqDhaogBLa+MoPCu9po=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=cat0t2zspx+mDnpH/nH8Rl4euS3z+6bYz0Aj0pCHq5b8ltnlN+rqcmEE3tJmKrcFQqJukdN4QysJ2hlQ+J8Z2HyoKWlw2WhNh0WIN0z5EiZHRC4UgtUgOv9BJVlaoxhj2aOSxGesT1nQ+IdAwinZVuaawQ+aqFJmUMKLcY6Y5uw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tfzuyc0w; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1762176059; c=relaxed/simple;
+	bh=gm1y3HjSbfjetP2qj6SkQ/PvAerOiP935sq/jHQIUpg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dchlGrwTKfDC39I3+LYh994S7J/7nl8u2wc7kgoRe08h5bQZXJuqjbvsc2J/M+SKNPDCnP0ruui15S7pdFrfoonVv/+Dc4NMs/LshvFUgDXDWQ1sboZ7Xaa5DfQEDaQTNFPkgQsaoRRRKh9MaCdVarNbigBLMTyqRYzvqL5sYmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K5xE9YxF; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tfzuyc0w"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FAC8C4CEE7;
-	Mon,  3 Nov 2025 12:59:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762174794;
-	bh=mg14JfajU5W0qY3xKlC1LzugPqDhaogBLa+MoPCu9po=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=Tfzuyc0w0PG8B9qeo4EY1e6oWHR35RGpaPLMhqntB/ik1LckO74VHTfp82JdQfC9k
-	 0XUUezUYERCKbPcEpQY508qcq5lLukAr+xy/HgvMMnFHFrhxq+AwL0mtcl8g3ynIYb
-	 FsW8Nr3O/XJikCmQBNqdHGt7OEq0tEcBuNdvdKHO7YvkkFHuIcD0/uRGGFqYSqR9u1
-	 Pd7ZRjdZfeTJpyRPVCSwWFC4B9ujnv6yxK+/mq21WfNfEkreGE0imhdNkpA+pHbXy/
-	 TECb2JVsfxse8iQFM6majHDvwTu6aCy7dgtulG1U5hG4HAxVR6J6cFHyAK4kOVvqY9
-	 uSZasy7Ak7n8g==
-Message-ID: <32f2f32a-eafd-43ef-a599-fc4784fdf492@kernel.org>
-Date: Mon, 3 Nov 2025 21:59:49 +0900
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K5xE9YxF"
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-6408f9cb1dcso3471736a12.3
+        for <linux-block@vger.kernel.org>; Mon, 03 Nov 2025 05:20:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762176056; x=1762780856; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=gm1y3HjSbfjetP2qj6SkQ/PvAerOiP935sq/jHQIUpg=;
+        b=K5xE9YxFrBeO1X5k2vO1UJWe2NKn/h+6jzNhTAOVNg88ktKUJlcBO3F4YJuAUgK/Jk
+         K2z2yT1sr6am+xiQuBppP1BcS9d81e/qx2cqAnzC5nlh6mq8srxnUo3YhjGAW5UuIk/l
+         /PQqJ2ruqaTZWhn4mmRQJ2jgXe+NOc1Nzkute8eEZOu/aFBH1ZlHheMN4ZklIA3NHx90
+         Vex2XGKoLZhtRx/CUlOiM4/oSNQd4vrgiS2j+wVDXnYCoC39/RX0rzdCTw6aV4Jkseg/
+         GjhG3xa/TIo2qXiiUtS7jFN/0VEzQupq4wHI2GvZwmzqcMITrruqaGPjiE8A6sHbf1V+
+         8chQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762176056; x=1762780856;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gm1y3HjSbfjetP2qj6SkQ/PvAerOiP935sq/jHQIUpg=;
+        b=HW3jccY89LNZ/yLY2zVbMa5jMWxVLnW4R7V53VOvDJaFzJsgJZ+BeuN6jPc9fadvzh
+         kW5cLa4k/aJc2SG0PmGrTcI6d+YI/3Q/4yqTQDKaK86hRLLIBeoTdKrSmHojpD6QUoYx
+         FuStltkr/3JIWJf+OQLIG+EV+l3SeR77bX1NqN0L+038kQ2OT4PkQ2d+D1H1oXFHaiVU
+         ztQVhfHa4il3AGfFvGJVlcgQfCPByiMQ4A32ZuXtXX7VVTPNt2YjmcoXUOgdR/ULESMo
+         qZPVt3p9Kc1+jLmh3DypRFhxI9s3OTU+jZt11YTjYNktN/kCyt7erQcLy9+1pnDG202+
+         xYRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX02+QSq1PzRSmC2IsVyqyBBAG8KL/UPx/Dpk6mpEdMiVuK93L2qNHX905BsDFRuIJ37zDFIPDO9Rf+3A==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwIeqIstddmq9+o56maPLhtze8FH+QQNsNh1YqCdxqDpRz0ANtQ
+	0bwl/4gg4fchIUUQMaQWm5olYLUuzhMBgem7OcIL8+3rficeoPnkXpSg7c/sJnaXIrNs9+/j8pc
+	6q1Fyd1Zh2zM5rmb/yFuAR1c3R2Rfyw==
+X-Gm-Gg: ASbGnctfhGcb/wvNdp07mdKGx7uT72YUXalhdi6uBniqkjjUB3jNDXewmYDxIeY65Z6
+	DvT7b3dHdpRAofxuV3S3Nj9EJ5v8MzxFHJTPtKX4upf1MtcWw43PbJwP0c8eYeTYl69mYNWsGI4
+	8JRqMGs+X8gdkbIlZojKqQSduzzVxDvzuwgE7k0WnQOTpNF7yPc27ryhgBpsmRzJ8Babp8SaOIC
+	ilMqXxoN9rExYwQj/K5UDlHGn74xbY3ReH6DCDFIJ+QVV8QTfm5oqYbiQqteY00S0+aDtQgumH8
+	U46dTGzHCJfIFi1oUSfoNtR+bQioEMOUYVihCrC1PwovIg==
+X-Google-Smtp-Source: AGHT+IF3LTr89nFjbGoS7hJbgl6+dxhH5VK2KXUzyIqEiv1KrWSuv1pX3LCfT49kdTm2AHFKxYr5TjiCqTiNfBpfggs=
+X-Received: by 2002:a05:6402:24a4:b0:633:8c43:eff8 with SMTP id
+ 4fb4d7f45d1cf-64077040526mr10313624a12.36.1762176056159; Mon, 03 Nov 2025
+ 05:20:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 03/13] block: handle zone management operations
- completions
-To: Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
- Keith Busch <keith.busch@wdc.com>, Christoph Hellwig <hch@lst.de>,
- dm-devel@lists.linux.dev, Mike Snitzer <snitzer@kernel.org>,
- Mikulas Patocka <mpatocka@redhat.com>,
- "Martin K . Petersen" <martin.petersen@oracle.com>,
- linux-scsi@vger.kernel.org, linux-xfs@vger.kernel.org,
- Carlos Maiolino <cem@kernel.org>, linux-btrfs@vger.kernel.org,
- David Sterba <dsterba@suse.com>
-References: <20251031061307.185513-1-dlemoal@kernel.org>
- <20251031061307.185513-4-dlemoal@kernel.org>
- <8947e877-cd53-4f1d-989c-bdde311c00e9@suse.de>
-Content-Language: en-US
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <8947e877-cd53-4f1d-989c-bdde311c00e9@suse.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20251103101653.2083310-1-hch@lst.de> <20251103101653.2083310-3-hch@lst.de>
+In-Reply-To: <20251103101653.2083310-3-hch@lst.de>
+From: Anuj gupta <anuj1072538@gmail.com>
+Date: Mon, 3 Nov 2025 18:50:17 +0530
+X-Gm-Features: AWmQ_bkZ4vlfmlqQ5XNb-WejF0xczl_KHyuI_IT3DY2mmAwPi7-hxfX2-JDqOH8
+Message-ID: <CACzX3AtB-NNfNR3EQbDzH4AnyjkLBGDuOd5fkOyJ-QzS_BsNrQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] block: make bio auto-integrity deadlock safe
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, "Martin K. Petersen" <martin.petersen@oracle.com>, 
+	linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 11/3/25 20:41, Hannes Reinecke wrote:
-> On 10/31/25 07:12, Damien Le Moal wrote:
->> The functions blk_zone_wplug_handle_reset_or_finish() and
->> blk_zone_wplug_handle_reset_all() both modify the zone write pointer
->> offset of zone write plugs that are the target of a reset, reset all or
->> finish zone management operation. However, these functions do this
->> modification before the BIO is executed. So if the zone operation fails,
->> the modified zone write pointer offsets become invalid.
->>
->> Avoid this by modifying the zone write pointer offset of a zone write
->> plug that is the target of a zone management operation when the
->> operation completes. To do so, modify blk_zone_bio_endio() to call the
->> new function blk_zone_mgmt_bio_endio() which in turn calls the functions
->> blk_zone_reset_all_bio_endio(), blk_zone_reset_bio_endio() or
->> blk_zone_finish_bio_endio() depending on the operation of the completed
->> BIO, to modify a zone write plug write pointer offset accordingly.
->> These functions are called only if the BIO execution was successful.
->>
-> Hmm.
-> Question remains: what _is_ the status of a write pointer once a
-> zone management operation is in flight?
-
-On the device, it will be unchanged until the command completes, or rather, one
-can only see it that way since the drive will serialize such command with report
-zones.
-
-> I would argue it's turning into a Schroedinger state, and so we
-> cannot make any assumptions here.
-
-Let me try to skin that cat below :)
-
-> In particular we cannot issue any other write I/O to that zone once
-> the operation is in flight, and so it becomes meaningless if we set
-> the write pointer before or after the zone operation.
-> Once the operation fails we have to issue a 'report write pointer'
-> command anyway as I'd be surprised if we could assume that a failure
-> in a zone management command would leave the write pointer unmodified.
-> So I would assume that zone write plugging already blocks the zone
-> while an zone management command is in flight.
-> But if it does, why do we need this patch?
-
-There is no such "blocking" done, the user is free to issue a zone reset while
-writes are n flight, and most likely get write errors as a result such bad practice.
-
-For this patch, the assumption is that a failed zone reset or zone finish leaves
-the zone write pointer untouched. All the drives I know do that. So it is better
-to not modify the zone write plug write pointer offset until we complete the
-command.
-
-But granted, that is not always true since the failure may happen *after* the
-drive completed the command (e.g. the HBA loses the connection with the drive
-before signaling the completion or something like that). In such case, it would
-not matter when the update is done. And for zone reset all commands, all bets
-are off since the command may fail half-way through all the zones that need a reset.
-
-But in the end, logically speaking, it makes more sense to update things when we
-get a success result instead of assuming we will always succeed. This has also
-the benefit of leaving the zone write plugs in place for eventual error recovery
-if needed.
-
--- 
-Damien Le Moal
-Western Digital Research
+Reviewed-by: Anuj Gupta <anuj20.g@samsung.com>
