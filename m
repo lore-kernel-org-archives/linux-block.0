@@ -1,79 +1,72 @@
-Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
+Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92157286891
-	for <linux-block@vger.kernel.org>; Mon,  3 Nov 2025 15:31:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 245953112BC
+	for <linux-block@vger.kernel.org>; Mon,  3 Nov 2025 15:35:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762183906; cv=none; b=RIdMuVNaWpVHuUl0WYKsaWLdwZ2OQgKcFhFzAfeNkPKox6rVIG6IalXKBKNCLsTLid/CjrOqOSq0LNYXHOcyyNU8g+MFV+LTK8Osd1WG7GHvxLmpdV75LtN83SIPKHAB96onm509kXdsriFPbuUNaNSjoodnqnqtiDAm9Sa5TXU=
+	t=1762184117; cv=none; b=u17gcUNYwySXVTrKAHxh47DxLs3aWK94UkDh8A31PqmyNoBzJV5SYIslN0YW/DgDNE/so9PJvtd8Bz7hn9MNjNOyKcVyMpXGvHtwfFnJD8uAvrBGgtY3vTfTZRgbp5yCl54Fkvp5xuwBnUyW6qONLvDiICjan1e2DN4+cSJE+IE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762183906; c=relaxed/simple;
-	bh=wXqRBILaE55JdL+E9B9wbUTmWAfxB6SrR/EgtwrIOKk=;
+	s=arc-20240116; t=1762184117; c=relaxed/simple;
+	bh=Q/7KSfCt9B8YNSUdE+mhLVwRE6bImpKQOHCd3aRxcmQ=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=SbXWXAMUmSzUeTtR9TbM+oe8L57XTU06hgy0nVsGahfDl+MtfP1/Ya67CYEgS6TEHmYIsPBfJZHKBYOW+bG/6baTPRnlHudpdqC6iK6F/7OUh4yIUGg5ZAGa5qG69/bZUxomZ3yCMmxZP85sV2kPQjkjO1D5SZWeIKqv2wewnSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=DqhkjNNA; arc=none smtp.client-ip=209.85.166.42
+	 MIME-Version:Content-Type; b=E3+waRrBYD9b7xo1nSd6wdD8KsEd1gTFXLvL2L8p+4KLDsYSNcZacruDAEnSv9IZw5dW5GjFW3GNPnRWgGlNIVtM5BVg/Jr+QZmYoqWejA2btWSS28VGKgVvkqF9oYUW0kLf6+boU5B/lauueIytrAc1g2RM3X3ua7vR5sqkVtg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=SpGVeMXI; arc=none smtp.client-ip=209.85.166.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="DqhkjNNA"
-Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-945a5731dd3so179558339f.0
-        for <linux-block@vger.kernel.org>; Mon, 03 Nov 2025 07:31:44 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="SpGVeMXI"
+Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-4331e9cb748so6502495ab.1
+        for <linux-block@vger.kernel.org>; Mon, 03 Nov 2025 07:35:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1762183903; x=1762788703; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1762184114; x=1762788914; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=I3hgVPxvqQKN83gQ2kvBZd5VQbXv1Ml6JmbzYW4vBlk=;
-        b=DqhkjNNARmUumWmAELJ8kG6aFkYpyL/osO+/82gX7guXvoQcO3WYgmnk0LRFkp+G1V
-         CtkXa974DGFYOe/ezzuhTCW6iAJwZWTsanKUwVfoFS59vuiRDWIQDY10V6l7ZQux9wHh
-         T8qeG2ikGlRb4C8bY23BPled/bsUr2+ZA5kK81m42ZkGrZE/dmbAht7VsbdLJkMIfULU
-         dUFftII2zAGIBfkcb+R2MlRwe6+R8mSFgzCDULDdLOIszUwyF38q749EsAIM9vTW2nPL
-         Uj9tH21ZIMuXrJTCqSKmPgrmYF7cJf8ZmJz0FzcKrMrRnxCASka4eQNhOo4SdFQYHUtq
-         i62g==
+        bh=UTjdEFNLv9QOO30a19cBVfIB/VrJFuCp5x6+pJ4o2kw=;
+        b=SpGVeMXIYeYmL8MSopYMNxPXfW1aqEwF5Jjk5nHfEmX6bA0fk0AWPjhhAGOHsv3FFY
+         F2x/u7nyXTF8HlV3Bb/Do5T3ZGwPE87MWhDVdx7YBla3RSzs21PeKbOTcXK377MMubOY
+         TIMVC+IA2Yem3bcWQIOeeFXvE0+q2cTGUHTF2Ur/I8viq4brW/sI5Y+iDik0/UmEVyJT
+         /IXJ0VGsBbevpllhAM8YbcT7iQEbF0+Q5sEzhTo53Z9OvzahWbva7IcGNIGmeHubqoAY
+         S4a/scG5Ihvpt3Uk6D85Lg0QvEUDAeIOh028rYn/NN3nhW1YX1yNi0Dmj7+GOSOu4LFX
+         Sg8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762183903; x=1762788703;
+        d=1e100.net; s=20230601; t=1762184114; x=1762788914;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=I3hgVPxvqQKN83gQ2kvBZd5VQbXv1Ml6JmbzYW4vBlk=;
-        b=piVoNggdJBEIMWY1iRSk87oN5/ABO0kBrtoF2a4zq/884pwq0YM4dpGI+hQSwaoh/7
-         X/unTdFrMnhI9rzxAB5lTksMcdUuPvdKUirPSy9DbSzWxrTHytDdwuPyISLHtP8L83ch
-         OkDAfTf6YNL4zE0fuLBn+0V6ddh5CV+0qyFxsGuLkF6GY3sCViFkg/kkDn5MmjaCwm2c
-         X8CfS+6t2yvGoeg5IAOCL/cFPCsueJ8XwetbmztakM1ZPkzqndXZmvTxTwHfPUYXWoM6
-         d0j0whzOFkCZVUcD72rz4RWrL5+ad05obGGjkxmiX/TWqfiQ7djov58WrP9A8Tgay2vQ
-         RMIA==
-X-Forwarded-Encrypted: i=1; AJvYcCUv1Mq1u16ASBvIrDF03BYAQYGD38EGWGu4D+glD/DZrvKXMI8mLIbBOYhGLmUD7bHsFWzPq48e4LCrag==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxf+rZi7Q51bR0CCMGaLeSttQ3KsyiD3CfeTsGmblQj2C3dMHo1
-	n2n9vC8IRDkIId92RpVQcnJGLAgVdHuw1yHJOiguefJeUOzLknc/6GJhBnEmRB06eAE=
-X-Gm-Gg: ASbGncs8LR6gS1P4Z8cmSfG0iz1MOA0GCkpxuGDvfSOfUQ+Di/2U91bxvwiwRL/WuIG
-	eHRFzYv2FijdbISqP1uFrp5dtdNJhzeHDxeD8XflMIqe5J39OsFVRVOKGuBV3qexZujAz5PWZ0B
-	JGHEcjDtxoB/JuHGwZmeFnxiFevOc7CcM17LkAXIHKxq3dR9FjXrrNZXtjksdCvZAgRMQHieo6L
-	RYAxUjs920TsFvDp51zYgKfKtDVHVfPmIESjNIZsiQx3a5hylUfuZ+M6jOX8BMpsIwZoPBRL/3X
-	jsEJHJr0EZGvY35cChWiQKZ0CUDz6zHjQM41rI9+O5SDylMqjs5zM/EZCAqJJQVWa6yMb/A8HpX
-	4jRC6kyZlm4HVcpEv74Y14SDipLtDInV8ztWZbJuHOHSmf/MZ+kBIg68HJkhf1ckpJ35k/LGO/n
-	MA9Q==
-X-Google-Smtp-Source: AGHT+IFTIBxUfn46sYZ6hbUJrbv86bqFQPF02qtQJk8t7o8hAHovGW6C2GZKwz2eeRA4AwfjgvTr9g==
-X-Received: by 2002:a05:6e02:3110:b0:431:d093:758d with SMTP id e9e14a558f8ab-4330d1f5a08mr177643355ab.22.1762183903343;
-        Mon, 03 Nov 2025 07:31:43 -0800 (PST)
+        bh=UTjdEFNLv9QOO30a19cBVfIB/VrJFuCp5x6+pJ4o2kw=;
+        b=Bfyc/MAdEYqbz3gFfLoIBS8wDUVtFy3ArAvUormfKq0uyb9qmxsknoBKRfcuKgZzAA
+         nsZp9/0785/s4eE2/Kyv1CPCzKEPb5gaWKDVni65LH6XZmOaFb4GVh+Ng2wp1CbTUq5r
+         aF62abLtvOSKscMqsvzoHqchgjEmbJp5Dwkb2E/nIWsclbxAE9Xuco41kiTy0sYXj3WB
+         Ckr3u3Uao+jgyxXFVHeBg4UZ1Saw1Guj2GUtIqtxVyBz6vagIGgEH82kBajwFGeIJ8Xu
+         NUot9tLExev+5esOPKH/48sxVW3fOo+Ir3rdRBmnAvtlZzS6f1UHzVURw+sMtIviiZWU
+         wHbA==
+X-Gm-Message-State: AOJu0YygoTPU0gQFGPiUctimhIhAljQNX60FlHUSj/Yew/yWtBbb147a
+	vIFxCc1/De3uuX1h7737ipxqUUqwQQ/XjaSF9L1L6HjeCCpYBL8VRknC+zDdxq85qlYD4DlT7KT
+	2orei
+X-Gm-Gg: ASbGncuIBZyNJibeFqDQ6gxYN1u/yxTAKKOvVyEMKvvJc126cU3N01d9SQSo60MtYsf
+	9NXrMj3t1B3exz05k22bt7iJQM2Ckz5X2HAUrx2AnOQRIdKmHToxGXFBrpuzwz4i2HF3Gmp5x5y
+	sfignNKUdbG2gUsp0r6hdTyhSBPwApsbbJWOdKencw9x7Q0uXPE1DWQXYZ0GnwzanEMt2PLbIAv
+	ZaMmOBde+SiNznfCQDfF8DoTkDhZ9hsThSptM05CKMV3xnvE57pPBF0NymF9J5EJ/dlUlepqEKJ
+	epHRSAvev7jvccNfJFxgwxNvwGNZPA9NkOJG2aSH0gIknq1a4ngDeR7nd6n/vDXChYAgZGygUk3
+	OGCmaiJishYJLuheS17oyGh9ysPkMAw5j5B58miyPHlKdMJcJYgWmQcP7q8Iys8u+wZk=
+X-Google-Smtp-Source: AGHT+IEfPaeBhc08yzORBGRG7GQgaoHwaYnzIH7k9NhCnoJt8LuQEqKDdWCFpLF03Ie0eOApb8BB1A==
+X-Received: by 2002:a05:6e02:221c:b0:433:2dcb:db41 with SMTP id e9e14a558f8ab-4332dcbde8fmr61244285ab.10.1762184114106;
+        Mon, 03 Nov 2025 07:35:14 -0800 (PST)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-43335b5a92dsm2754945ab.28.2025.11.03.07.31.41
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-43335a9e6f1sm2798375ab.9.2025.11.03.07.35.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Nov 2025 07:31:42 -0800 (PST)
+        Mon, 03 Nov 2025 07:35:13 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: Miklos Szeredi <miklos@szeredi.hu>, Ming Lei <ming.lei@redhat.com>, 
- Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, 
- Sagi Grimberg <sagi@grimberg.me>, Chris Mason <clm@fb.com>, 
- David Sterba <dsterba@suse.com>, 
+To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Cc: Uday Shankar <ushankar@purestorage.com>, 
  Caleb Sander Mateos <csander@purestorage.com>
-Cc: io-uring@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
- linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
- linux-btrfs@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20251031203430.3886957-1-csander@purestorage.com>
-References: <20251031203430.3886957-1-csander@purestorage.com>
-Subject: Re: [PATCH v4 0/3] io_uring/uring_cmd: avoid double indirect call
- in task work dispatch
-Message-Id: <176218390170.6648.16490159252453601596.b4-ty@kernel.dk>
-Date: Mon, 03 Nov 2025 08:31:41 -0700
+In-Reply-To: <20251101133123.670052-1-ming.lei@redhat.com>
+References: <20251101133123.670052-1-ming.lei@redhat.com>
+Subject: Re: [PATCH V4 0/5] ublk: NUMA-aware memory allocation
+Message-Id: <176218411310.7436.8916433606322971771.b4-ty@kernel.dk>
+Date: Mon, 03 Nov 2025 08:35:13 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -85,27 +78,29 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3
 
 
-On Fri, 31 Oct 2025 14:34:27 -0600, Caleb Sander Mateos wrote:
-> Define uring_cmd implementation callback functions to have the
-> io_req_tw_func_t signature to avoid the additional indirect call and
-> save 8 bytes in struct io_uring_cmd.
+On Sat, 01 Nov 2025 21:31:15 +0800, Ming Lei wrote:
+> The 1st two patches implement ublk driver NUMA aware memory allocation.
 > 
-> v4:
-> - Rebase on "io_uring: unify task_work cancelation checks"
-> - Small cleanup in io_fallback_req_func()
-> - Avoid intermediate variables where IO_URING_CMD_TASK_WORK_ISSUE_FLAG
->   is only used once (Christoph)
+> The last two patches implement it for ublk selftest utility.
+> 
+> `taskset -c 0-31 ~/git/fio/t/io_uring -p0 -n16 -r 40 /dev/ublkb0` shows
+> 5%~10% IOPS improvement on one AMD zen4 dual socket machine when creating
+> ublk/null with 16 queues and AUTO_BUF_REG(zero copy).
 > 
 > [...]
 
 Applied, thanks!
 
-[1/3] io_uring: only call io_should_terminate_tw() once for ctx
-      commit: 4531d165ee39edb315b42a4a43e29339fa068e51
-[2/3] io_uring: add wrapper type for io_req_tw_func_t arg
-      commit: c33e779aba6804778c1440192a8033a145ba588d
-[3/3] io_uring/uring_cmd: avoid double indirect call in task work dispatch
-      commit: 20fb3d05a34b55c8ec28ec3d3555e70c5bc0c72d
+[1/5] ublk: reorder tag_set initialization before queue allocation
+      commit: 011af85ccd871526df36988c7ff20ca375fb804d
+[2/5] ublk: implement NUMA-aware memory allocation
+      commit: 529d4d6327880e5c60f4e0def39b3faaa7954e54
+[3/5] ublk: use struct_size() for allocation
+      commit: c28ba6b6c51d090103800eb1c7679c32f6501dbc
+[4/5] selftests: ublk: set CPU affinity before thread initialization
+      commit: 0123bb91f464487cc1bbdcc515757dc723496a39
+[5/5] selftests: ublk: make ublk_thread thread-local variable
+      commit: 3f5b1169d2ab20ed14271654799121232b9eb9d7
 
 Best regards,
 -- 
