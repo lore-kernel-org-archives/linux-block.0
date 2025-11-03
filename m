@@ -1,131 +1,126 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C8932BE658;
-	Mon,  3 Nov 2025 07:30:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F01DC2C0F63;
+	Mon,  3 Nov 2025 08:05:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762155038; cv=none; b=be/p9uqpe24xQ5nwq0xCY7RTZdqdJmkmd8uYQg3yUg5UTH9l/4nKwubl3UViSY5IcmyCChN82+xHtFPY2qCsv/2t+BptEryKVJtWBgW0izTJX+FA1iwvnlzw8ea6UmFrqkXrhW8hRJ3Tg2VlwwJFBd0QZwQCwoGoVwqycB/oQwU=
+	t=1762157127; cv=none; b=P76Z9moxFAwTsJTIF1/fy1YWuw6n56Yw1tE3c/8ftjoMChhhycaKhPeAWMdQbuOJ3+4TZgUqZooYK9yPZGENZYhRSpn6nvNFSLyewVF/7otaqBDaMmbzfwFd5ZzHYactkQc6df9l+qu4uoFMG5zTALaHSvjqhgXzif+kDChPLSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762155038; c=relaxed/simple;
-	bh=fNPEgWhmKcSfXgHxY8vQ6zDm8hy1QN8YPkQR/O50gEk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gmYwWlqeMWkKaSsUSbrlfIa7R5Bw+HSf9Iw/5ftSiN1Abegx+au4v4qX3KY0oqQiuZOs40wOMpPn104vxV6Oes0GM6Yx/KjzCWH9sujgdCcKo5Y8BHqqlRXw/Bf58ohE129sG41JlTZUoCS+s0pB7eYKlNJdXunFZ1XeihuzVKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GwOFFC0Q; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1762157127; c=relaxed/simple;
+	bh=/Z00hsFx0kFKgS/fH2fkWOXPCRXDBSY3j5PVFskPLtY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=d/y0xbp5LMVt+pDAUSF0YqPeaOUJTU1A8tuh0c5vCsf6lUhpFHYi9p07usY6fhYOt/5jp/PlPbVxXvRQm3NsZMAOc61OtyVr2BRvr/479QW4549K3GpqE/vrrA7piieEIj92lR/lQe8kgnGQ+w5jthJVzLfyCEbxE2qdfZ0gXdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YNIMhHK+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GwOFFC0Q"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC116C4CEE7;
-	Mon,  3 Nov 2025 07:30:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YNIMhHK+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDBE8C4CEE7;
+	Mon,  3 Nov 2025 08:05:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762155038;
-	bh=fNPEgWhmKcSfXgHxY8vQ6zDm8hy1QN8YPkQR/O50gEk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=GwOFFC0Qu1g/MgQu4yB4BGazeSYVXu7QOTJ+EMkLVI5N1EIFimk3bn1scoQrD6vLC
-	 Evn9J2oxFzNX2KdKVdDmZ0XS4naB8WkFv1YBXXniCy7oV8GIcNkU4AVFd7VZm0pOeH
-	 E/dIFrMTSQ0q9jnaWOTnNGr2oUBbpYqhm3LzpVaqG93dMBejtWBMCCq4T0Xylgzj0+
-	 k4KReocg/4eFiPA9zBQK+mq2IbffujegIuTfbQq1WUEHY7Fv4BrDVgc6gtp2NyP0AI
-	 wbtkqReZ9p8BS+4ut/UwgOmK1SbuBxOt7mSCer/fPybYFflSsYlOsUJ6rnOlMbUfPs
-	 RsxmdR54fDyvg==
-Message-ID: <f0124d2d-880a-4c44-bd42-178838891b20@kernel.org>
-Date: Mon, 3 Nov 2025 16:30:34 +0900
+	s=k20201202; t=1762157126;
+	bh=/Z00hsFx0kFKgS/fH2fkWOXPCRXDBSY3j5PVFskPLtY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YNIMhHK+TIAw9S8epUQRLJ0hHWrXGrX021AASru7kQYHYuMFC6zo5jxbc7KUmJ0L3
+	 YNEe1nE+4ae3JtQxcTTez3gXWgSy2u2msyRHFv6Ufnrx2bt2n0+8KYqma3OyMomdHy
+	 Und0omT0toRmHQSOMJHh8FIiBDSXmNrLx8mv1uScrl9HdFKsXLarM713jjbRgR+/v4
+	 7/jTF678ISrptDm6AzMN9ALIVAtiWOrlbYsGz2TuzZPwPoiteJ/wA8NnfdkaDlmCac
+	 R8sanushWpLqk/uQd051eoYlDOALHHRNHhGhWZBT9cBCKpSLGzr/fRIrMBO19/jAvs
+	 SiEU4tXpMsS3Q==
+Date: Mon, 3 Nov 2025 10:05:18 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>, Jens Axboe <axboe@kernel.dk>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <skolothumtho@nvidia.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Krishnakant Jaju <kjaju@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
+	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, iommu@lists.linux.dev,
+	linux-mm@kvack.org, linux-doc@vger.kernel.org,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org, kvm@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v6 05/11] PCI/P2PDMA: Document DMABUF model
+Message-ID: <20251103080518.GB50752@unreal>
+References: <20251102-dmabuf-vfio-v6-0-d773cff0db9f@nvidia.com>
+ <20251102-dmabuf-vfio-v6-5-d773cff0db9f@nvidia.com>
+ <86383031-807e-43d9-976e-dd955d79dc52@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 01/13] block: freeze queue when updating zone resources
-To: Daniel Vacek <neelx@suse.com>
-Cc: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
- Keith Busch <keith.busch@wdc.com>, Christoph Hellwig <hch@lst.de>,
- dm-devel@lists.linux.dev, Mike Snitzer <snitzer@kernel.org>,
- Mikulas Patocka <mpatocka@redhat.com>,
- "Martin K . Petersen" <martin.petersen@oracle.com>,
- linux-scsi@vger.kernel.org, linux-xfs@vger.kernel.org,
- Carlos Maiolino <cem@kernel.org>, linux-btrfs@vger.kernel.org,
- David Sterba <dsterba@suse.com>
-References: <20251031061307.185513-1-dlemoal@kernel.org>
- <20251031061307.185513-2-dlemoal@kernel.org>
- <55887a39-21ee-4e6c-a6f3-19d75af6395a@acm.org>
- <bd71691f-e230-42ca-8920-d93bf1ea6371@kernel.org>
- <CAPjX3FebPLu_P=-BuP63VuaiAnC62rthcQ0vb+J8b-w0OckyqA@mail.gmail.com>
-Content-Language: en-US
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <CAPjX3FebPLu_P=-BuP63VuaiAnC62rthcQ0vb+J8b-w0OckyqA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86383031-807e-43d9-976e-dd955d79dc52@infradead.org>
 
-On 11/3/25 16:18, Daniel Vacek wrote:
-> On Mon, 3 Nov 2025 at 06:55, Damien Le Moal <dlemoal@kernel.org> wrote:
->>
->> On 11/1/25 02:48, Bart Van Assche wrote:
->>> Hi Damien,
->>>
->>> disk_update_zone_resources() only has a single caller and just below the
->>> only call of this function the following code is present:
->>>
->>>       if (ret) {
->>>               unsigned int memflags = blk_mq_freeze_queue(q);
->>>
->>>               disk_free_zone_resources(disk);
->>>               blk_mq_unfreeze_queue(q, memflags);
->>>       }
->>>
->>> Shouldn't this code be moved into disk_update_zone_resources() such that
->>> error handling happens without unfreezing and refreezing the request
->>> queue?
->>
->> Check the code again. disk_free_zone_resources() if the report zones callbacks
->> return an error, and in that case disk_update_zone_resources() is not called.
->> So having this call as it is cover all cases.
+On Sun, Nov 02, 2025 at 10:16:59AM -0800, Randy Dunlap wrote:
 > 
-> I understand Bart's idea was more like below:
 > 
->> @@ -1568,7 +1572,12 @@ static int disk_update_zone_resources(str
-> uct gendisk *disk,
->>       }
->>
->>   commit:
->> -     return queue_limits_commit_update_frozen(q, &lim);
->> +     ret = queue_limits_commit_update(q, &lim);
->> +
->> +unfreeze:
-> 
-> +       if (ret)
-> +               disk_free_zone_resources(disk);
-> 
->> +     blk_mq_unfreeze_queue(q, memflags);
->> +
->> +     return ret;
->>   }
->>
->>   static int blk_revalidate_conv_zone(struct blk_zone *zone, unsigned int idx,
-> 
-> And then in blk_revalidate_disk_zones() do this:
-> 
->         if (ret > 0) {
->                 ret = disk_update_zone_resources(disk, &args);
->         } else if (ret) {
->                 unsigned int memflags;
-> 
->                 pr_warn("%s: failed to revalidate zones\n", disk->disk_name);
-> 
->                memflags = blk_mq_freeze_queue(q);
->                disk_free_zone_resources(disk);
->                 blk_mq_unfreeze_queue(q, memflags);
->         }
-> 
-> The question remains if this looks better?
+> On 11/2/25 1:00 AM, Leon Romanovsky wrote:
+> > From: Jason Gunthorpe <jgg@nvidia.com>
+> > 
+> > Reflect latest changes in p2p implementation to support DMABUF lifecycle.
+> > 
+> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> > ---
+> >  Documentation/driver-api/pci/p2pdma.rst | 95 +++++++++++++++++++++++++--------
+> >  1 file changed, 72 insertions(+), 23 deletions(-)
 
-Rereading everything, I think that Bart has a good point: moving the call to
-disk_free_zone_resources() in the error path of disk_update_zone_resources()
-allows doing the error handling without unfreezing and re-freezing the queue.
-That's better.
+<...>
 
+> > +guarentee that the consuming driver has stopped using the MMIO during a removal
+> 
+>    guarantee
 
--- 
-Damien Le Moal
-Western Digital Research
+<...>
+
+> > +if are used with mmap() must create special PTEs. As such there are very few
+> 
+>    if used
+
+<...>
+
+> > +pggmap of MEMORY_DEVICE_PCI_P2PDMA to create struct pages. The lifecylce of
+> 
+>    pgmap ?                                                        lifecycle
+
+<...>
+
+> > +architectures, others will experiance corruption or just crash in the kernel.
+> 
+>                               experience
+
+<...>
+
+> > +In this case the initator and target pci_devices are known and the P2P subsystem
+> 
+>                     initiator
+
+<...>
+
+> > +exporting driver has destroyed it's p2p_provider.
+>                                   its
+
+Thanks a lot, fixed.
+
+> 
+> -- 
+> ~Randy
+> 
+> 
