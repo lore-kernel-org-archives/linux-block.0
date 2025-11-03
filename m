@@ -1,228 +1,128 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AE513191D9;
-	Mon,  3 Nov 2025 18:02:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E540D1E8337;
+	Mon,  3 Nov 2025 18:12:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762192979; cv=none; b=m7cF2St6BroBkyTMZeunGae+7NCCJsVlNRRb+kHXESieUwVylTFPbN65nScAlTIsCP1lZWDsjfkOcwx4TEvizAoMbeU1eNhtiIU52XXJS2+35S23IrBfClQWlVb6WYt9uxIO7jGIeDwJzSNBvT9wnNtVARRuEpHaNf9e7hYu+/g=
+	t=1762193535; cv=none; b=pMpDM5EaPda+CH7svYEx9TXpE9JVdhiKakT0UAcFN2lmxItHgww2Meb1MdXxdl27focrrXCpbex2FY55PAR730PKWYNPEj+WgUK6UUIb/bp0VIUiYqvCE9zND9fvaTqjF1cExYqonpIKvD31EWv1IdOOq1E3NI4D+qR125BMOp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762192979; c=relaxed/simple;
-	bh=vl0Tp49hz3vNvPD7VFbfVGeYXFdWgp2ZvB51HlVrx58=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rY+dUwLZnXZmUHhaBBlxauO+v9IwrBreP3UojO2eRyD9zWwufouz1bCHp9rs86CjjYWCoBuRjDGzqkxYfPj9aAeOdKkYsdgNQpaRp8ZqVoLPGIRcoi0DlqnNxwE+5O42MG9sQPvkfe4LxYVpPN+IIy82BStn8opp0zvfeYej24c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JAFRa06M; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1762193535; c=relaxed/simple;
+	bh=M1pVPbRrjLhkDe0zx6OgJARfBzbrof9TSwxA4ZDCYSI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mXorIM6X/RQSzUkO0iMDd+wg9RNMl/cxKKQ14L2IZ6wphmNL1QiRMrySPK960wY99tFr0R8be/SqQswccS/ANRAvYsZdSFSHCqBmyamy6jVsU2T0mgVHlgILNX0JkK0V/BZIwXfHxcGSZrKbzOGjEYJRf4RtLSQdDanUJUg+27A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q5i2sSiX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JAFRa06M"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0EDFC4CEE7;
-	Mon,  3 Nov 2025 18:02:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q5i2sSiX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20316C4CEE7;
+	Mon,  3 Nov 2025 18:12:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762192978;
-	bh=vl0Tp49hz3vNvPD7VFbfVGeYXFdWgp2ZvB51HlVrx58=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JAFRa06M2MMOu8BL7hoXhVdG5oMdBWpOnSsF+kd7fvNbmIoWDujr7cN6ZzCOz3Syk
-	 Q03quLsvjW/AEPqqN9Ux9JdpiPkt05P5V+oI9jltrPCE1KA9Es5l7sE0UF33k0EWLG
-	 XCd0FGq+qXg5d+RSHUiXIapVwVy7RkalNyVBbdJP/LRvlfaVU1VlbNDtzEfhByncPI
-	 EQX2cHiz7Hf3ZfstoHuvKYYXM9J+3XoujXMqEoKfKlcYorN31gn9okeLqJ9sYTvmA8
-	 zfXdBeDNjFJ/U2if/BQVc7JYf1S1ykULOuykc5nxV6zdr/2VmqynPUZGaTX5nvs3UY
-	 xTLLSXF3mcyLA==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: Carlos Llamas <cmllamas@google.com>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	Sasha Levin <sashal@kernel.org>,
-	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.17-6.12] blk-crypto: use BLK_STS_INVAL for alignment errors
-Date: Mon,  3 Nov 2025 13:02:19 -0500
-Message-ID: <20251103180246.4097432-6-sashal@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251103180246.4097432-1-sashal@kernel.org>
-References: <20251103180246.4097432-1-sashal@kernel.org>
+	s=k20201202; t=1762193532;
+	bh=M1pVPbRrjLhkDe0zx6OgJARfBzbrof9TSwxA4ZDCYSI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Q5i2sSiXK4ldRk4Vx+n5en9XmNQ06OkwANTsaof8hwtGQYz+3rBY/V22TGL7IDmdx
+	 4+FHfr1/PgYmr0eRJt01MwpV3IVDUbzRcpm4MJPT761OJcifWiuX+RQLKGnaYo9N7T
+	 eY1vAwAM9svkD2H68zFcevSFWN2+Enb3ponAR5ujfGjozQ+4ecY9X6TZsofoJ/xnAK
+	 us01tk5Di1KrnTQODjXB2CLqB7HNzeGgTZnIpMx5kNu06xvDkrXioGKnXvEXYvP3Hh
+	 +IHYKTmYiyMW/OL3ZH7wCxeLyyR1k1gegmfTlpeA4TGh14T+Bjk9VYki4Jvo+QlQcT
+	 yuNQ02cCZa8uA==
+Date: Mon, 3 Nov 2025 10:10:31 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Carlos Llamas <cmllamas@google.com>, Keith Busch <kbusch@kernel.org>,
+	Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org, axboe@kernel.dk,
+	Hannes Reinecke <hare@suse.de>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>
+Subject: Re: [PATCHv4 5/8] iomap: simplify direct io validity check
+Message-ID: <20251103181031.GI1735@sol>
+References: <20250827141258.63501-1-kbusch@meta.com>
+ <20250827141258.63501-6-kbusch@meta.com>
+ <aP-c5gPjrpsn0vJA@google.com>
+ <aP-hByAKuQ7ycNwM@kbusch-mbp>
+ <aQFIGaA5M4kDrTlw@google.com>
+ <20251028225648.GA1639650@google.com>
+ <20251028230350.GB1639650@google.com>
+ <20251029070618.GA29697@lst.de>
+ <20251030174015.GC1624@sol>
+ <20251031091820.GA9508@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.17.7
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251031091820.GA9508@lst.de>
 
-From: Carlos Llamas <cmllamas@google.com>
+On Fri, Oct 31, 2025 at 10:18:20AM +0100, Christoph Hellwig wrote:
+> On Thu, Oct 30, 2025 at 10:40:15AM -0700, Eric Biggers wrote:
+> > Allowing DIO segments to be aligned (in memory address and/or length) to
+> > less than crypto_data_unit_size on encrypted files has been attempted
+> > and discussed before.  Read the cover letter of
+> > https://lore.kernel.org/linux-fscrypt/20220128233940.79464-1-ebiggers@kernel.org/
+> 
+> Hmm, where does "First, it
+> necessarily causes it to be possible that crypto data units span bvecs.
+> Splits cannot occur at such locations; however the block layer currently
+> assumes that bios can be split at any bvec boundary.? come from?  The
+> block layer splits at arbitrary boundaries that don't need any kind of
+> bvec alignment.
 
-[ Upstream commit 0b39ca457241aeca07a613002512573e8804f93a ]
+While splits in general can occur on any logical_block_size boundary,
+the last I checked if things are set up properly the splitting is much
+better behaved than that in practice.
 
-Make __blk_crypto_bio_prep() propagate BLK_STS_INVAL when IO segments
-fail the data unit alignment check.
+For example, if max_segment_size is a multiple of logical_block_size
+size but not the crypto_data_unit_size being used, then that would of
+course cause incorrect splits.  However, that's not an issue if the
+driver sets max_segment_size to be a multiple of its largest supported
+crypto_data_unit_size.  For example, the UFS driver defaults to
+max_segment_size=SZ_256K, which is nicely aligned.
 
-This was flagged by an LTP test that expects EINVAL when performing an
-O_DIRECT read with a misaligned buffer [1].
+I'm sure there are other examples, related to dm devices,
+virt_boundary_mask, and so on.  But the point is that they don't seem to
+have been applicable to anyone actually using
+crypto_data_unit_size > logical_block_size yet.
 
-Cc: Eric Biggers <ebiggers@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Link: https://lore.kernel.org/all/aP-c5gPjrpsn0vJA@google.com/ [1]
-Signed-off-by: Carlos Llamas <cmllamas@google.com>
-Reviewed-by: Eric Biggers <ebiggers@kernel.org>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
+In contrast, allowing DIO with memory alignment < crypto_data_unit_size
+makes the current code trivially start generating incorrect splits due
+to the max_segments based splitting.
 
-LLM Generated explanations, may be completely bogus:
+I'm not sure the current situation of the block layer not really paying
+attention to crypto_data_unit_size is sustainable.  But when someone
+looked into making the "only split on crypto_data_unit_size" boundaries
+guarantee explicit
+(https://lkml.kernel.org/linux-block/20210707052943.3960-1-satyaprateek2357@gmail.com/),
+it turned out to be a lot of work.  And no one could find a real-world
+example where it actually mattered, besides DIO with memory alignment <
+crypto_data_unit_size which didn't seem that useful in the first place.
+So that's why we're still in the current situation.
 
-## Backport Analysis Result
+> > We eventually decided to proceed with DIO support without it, since it
+> > would have added a lot of complexity.  It would have made the bio
+> > splitting code in the block layer split bios at boundaries where the
+> > length isn't aligned to crypto_data_unit_size, it would have caused a
+> > lot of trouble for blk-crypto-fallback, and it even would have been
+> > incompatible with some of the hardware drivers (e.g. ufs-exynos.c).
+> 
+> Ok, if hardware drivers can't handle it that's a good argument.  I can
+> see why handling it in the software case is very annoying, but non-stupid
+> hardware should not be affected.  Stupid me assuming UFS might not be
+> dead stupid of course.
+> 
+> > It also didn't seem to be all that useful, and it would have introduced
+> > edge cases that don't get tested much.  All reachable to unprivileged
+> > userspace code too, of course.
+> 
+> xfstests just started exercising this and we're getting lots of interesting
+> reports (for the non-fscrypt case).
 
-**YES** - This commit should be backported to stable kernel trees.
+Great to hear that it's starting to be tested.  But it's concerning that
+it's just happening now, 3 years after the patches went in, and is also
+still finding lots of bugs.  It's hard for me to understand how it was
+ready, or even useful, in the first place.
 
----
-
-## Detailed Analysis
-
-### 1. Semantic Code Analysis Using MCP Tools
-
-#### Function Location and Impact Scope
-Using `mcp__semcode__find_function`, I located the affected function
-`__blk_crypto_bio_prep` at **block/blk-crypto.c:283-311**. This function
-prepares bios for inline encryption.
-
-#### Call Chain Analysis - User-Space Exposure
-Using `mcp__semcode__find_callers` and `mcp__semcode__find_callchain`, I
-traced the complete call path:
-
-```
-User-space (O_DIRECT I/O)
-  → submit_bio()
-    → submit_bio_noacct()
-      → __submit_bio()
-        → blk_crypto_bio_prep()
-          → __blk_crypto_bio_prep()  ← Changed function
-```
-
-**Finding**: This function is **directly exposed to user-space** through
-the standard I/O submission path. Users performing O_DIRECT operations
-with encrypted block devices will trigger this code.
-
-#### Error Code Semantic Analysis
-I examined **block/blk-core.c:163-166** to understand error code
-mappings:
-
-```c
-[BLK_STS_INVAL]  = { -EINVAL, "invalid" },  // For invalid arguments
-[BLK_STS_IOERR]  = { -EIO,    "I/O" },      // For I/O errors
-```
-
-**Finding**:
-- **BLK_STS_IOERR** → `-EIO` (I/O error - device/hardware issue)
-- **BLK_STS_INVAL** → `-EINVAL` (Invalid argument - user error)
-
-The `bio_crypt_check_alignment()` function validates user-provided data
-alignment against encryption requirements. Alignment violations are
-**user errors**, not I/O errors.
-
-#### Consistency Check
-I verified other validation errors in the block layer:
-- `blk_validate_atomic_write_op_size()` (block/blk-core.c:764-768):
-  Returns `BLK_STS_INVAL` for size validation failures
-- DMA alignment check (block/blk-mq-dma.c:181): Returns `BLK_STS_INVAL`
-  for alignment failures
-
-**Finding**: Using `BLK_STS_INVAL` for alignment/validation errors is
-the **established pattern** in the block layer.
-
-### 2. Bug Impact Assessment
-
-#### What Does This Fix?
-The commit fixes **incorrect error code propagation** when I/O segments
-fail the data unit alignment check in encrypted block operations.
-
-**Before**: Returns `-EIO` (suggesting hardware/device problem)
-**After**: Returns `-EINVAL` (correctly indicating user's misaligned
-buffer)
-
-#### Real-World Impact
-1. **LTP Test Failure**: The commit message explicitly states this was
-   "flagged by an LTP test that expects EINVAL when performing an
-   O_DIRECT read with a misaligned buffer"
-2. **User Confusion**: Applications receiving `-EIO` might retry or
-   report hardware errors, when the actual problem is a programming
-   error (misaligned buffer)
-3. **POSIX Compliance**: EINVAL is the semantically correct error for
-   invalid user arguments
-
-### 3. Change Characteristics
-
-#### Scope Analysis
-- **Files changed**: 1 file (block/blk-crypto.c)
-- **Lines changed**: 1 line (single error code constant)
-- **Behavioral changes**: None - only error code reporting
-- **Dependencies**: None - uses existing BLK_STS_INVAL constant
-- **Architectural impact**: None
-
-#### Risk Assessment
-- **Risk level**: **VERY LOW**
-- **Regression potential**: Minimal - only changes which errno is
-  returned
-- **Side effects**: Applications expecting EIO might need adjustment,
-  but EINVAL is the correct semantic value
-- **Testing**: Already validated by LTP tests
-
-### 4. Backport Suitability Evaluation
-
-#### Stable Tree Compliance
-✅ **Bug fix**: YES - fixes wrong error code
-✅ **Small and contained**: YES - 1 line change
-✅ **User-facing impact**: YES - fixes observable behavior
-✅ **No new features**: Correct
-✅ **No architectural changes**: Correct
-✅ **Minimal dependencies**: Only requires blk-crypto support (kernel
-5.7+)
-
-#### Backport Indicators
-- **Review status**: Reviewed-by: Eric Biggers (blk-crypto maintainer)
-- **Signed-off**: Jens Axboe (block layer maintainer)
-- **Test coverage**: LTP test validates the fix
-- **Already backported**: This commit has already been applied to the
-  6.17 stable tree as c4802041cc9f6
-
-### 5. Conclusion
-
-This is an **ideal backport candidate**:
-
-1. **Fixes a real bug**: Wrong error code breaks POSIX semantics and LTP
-   tests
-2. **User-visible**: Directly affects applications using O_DIRECT on
-   encrypted devices
-3. **Minimal risk**: One-line change with no functional logic
-   modifications
-4. **Well-tested**: Validated by LTP test suite
-5. **Maintainer-approved**: Reviewed by subsystem experts
-6. **Consistent with kernel patterns**: Aligns with how other validation
-   errors are reported
-
-The fix should be backported to all stable kernel trees that include
-blk-crypto support (5.7+) to ensure correct error reporting for user-
-space applications.
-
- block/blk-crypto.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/blk-crypto.c b/block/blk-crypto.c
-index 4b1ad84d1b5ab..3e7bf1974cbd8 100644
---- a/block/blk-crypto.c
-+++ b/block/blk-crypto.c
-@@ -292,7 +292,7 @@ bool __blk_crypto_bio_prep(struct bio **bio_ptr)
- 	}
- 
- 	if (!bio_crypt_check_alignment(bio)) {
--		bio->bi_status = BLK_STS_IOERR;
-+		bio->bi_status = BLK_STS_INVAL;
- 		goto fail;
- 	}
- 
--- 
-2.51.0
-
+- Eric
