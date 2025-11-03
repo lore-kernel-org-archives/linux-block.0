@@ -1,94 +1,161 @@
-Received: from mail.parknet.co.jp (mail.parknet.co.jp [210.171.160.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3741528750A;
-	Mon,  3 Nov 2025 16:56:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.171.160.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 428FA31D373
+	for <linux-block@vger.kernel.org>; Mon,  3 Nov 2025 17:03:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762188980; cv=none; b=pJx/w19RYkJ3VBEXMIvvUf31yTFeuh1KSRUTO32/cvExRRkrhCwUcD1c7Q0s3YHOdidRDETJkWHZw0OxC7PO8OXrw721FRlxRn6M4ADk6+4rHyVrx4kEOnjFguplDTkxh0BX9SNxGw+FztsShGmX3OPbYRumQB4wKQZsxzB5wBY=
+	t=1762189401; cv=none; b=VrQ8TIanNWBosn+BkX6nlhQ7fMo8ce00B2Kp/B0Ed6vsWXKxXSdXIWolh9GsPHm9768F3UEweO7ZxCjcmzqXshzE17ZWjvLLsSoI8H81i5QPHICOInaDXBdShe1qicXHfVhQuCIkH57Ei7Phlseuyg5vW0eW2mY2d1v986Rt1DY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762188980; c=relaxed/simple;
-	bh=rUdhc9/dZGIPnjRxxoKqxJEAxeMc/H4w+8L2UFjmxzo=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=sxcFw7f0Lylbe4cpLzLDFry/Up77DpqvForG2L1YdGyOFSRYDrflbJLq2QsUs2HAIregAErondp3BGJNlXLZ9m3+tMX+y4hd0Ap2JN/FgXR+YiK+pidzFum3Rg4R+VID/byrwjGgJoxMA3RHN2dWJ/wxRBwqZVvH590soeQmy8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mail.parknet.co.jp; spf=pass smtp.mailfrom=parknet.co.jp; dkim=pass (2048-bit key) header.d=parknet.co.jp header.i=@parknet.co.jp header.b=AKx8k3U9; dkim=permerror (0-bit key) header.d=parknet.co.jp header.i=@parknet.co.jp header.b=UzNzfMyW; arc=none smtp.client-ip=210.171.160.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mail.parknet.co.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=parknet.co.jp
+	s=arc-20240116; t=1762189401; c=relaxed/simple;
+	bh=4bjsKbSySZoag6DbG6yKeL0WVlW44Hfu9n1kFvBUiuM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=TmGu0mxFn2iy9MhHVO3ekVcbotG5x85Qkw3xhumH+D0QMRd2WFR4FZtyLduXc+q6plbbQ5ccH8EfF9EBzOdk6yyFFSSDqHxCvpkXQpKno6/4O03RNXk/dUfSnffQWuC4paTMmtrP4SEVN3hvwVVKPVQaPfIZt4LIYZeYtw3XTAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ipylypiv.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GbOxx1WJ; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ipylypiv.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=parknet.co.jp header.i=@parknet.co.jp header.b="AKx8k3U9";
-	dkim=permerror (0-bit key) header.d=parknet.co.jp header.i=@parknet.co.jp header.b="UzNzfMyW"
-Received: from ibmpc.myhome.or.jp (server.parknet.ne.jp [210.171.168.39])
-	by mail.parknet.co.jp (Postfix) with ESMTPSA id B1F892051576;
-	Tue,  4 Nov 2025 01:56:09 +0900 (JST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=parknet.co.jp;
-	s=20250114; t=1762188970;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=V3y+4DVGUspp58JJWY2SOnaLsTUPZnxETW8fSaQHj9Y=;
-	b=AKx8k3U9AjJf5i9G34VdNUXwSa4+qoC8VJAITSzTioOXQuZHi4tcaYqIBnB69AsiFHlXHn
-	aKg3PZTxJNRyjK5u+w+pymmkoU4LG41JRrHuYHQiCkmfTCz8YPuBBcENdPeRt/DWVhoNpA
-	7SQi4ZJe4zzZwuL2HoHRKCSvUKXRTY9xXrG3eQp/e+8b26xtC8q3TZgojk5Ytz6IatD/Uz
-	HYL5SNrqkwcmK1mtbybpsHLkjElgpyXPqg2kBFRbjt+oz7T7kkpPw1MJNA4eOG38BZzZOo
-	IfbKIS1jQQp8aGTMRzd3PPFbtLRtVrq64rSlo9tjJTyrcMPzdIO1wSb5kb++vQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=parknet.co.jp;
-	s=20250114-ed25519; t=1762188970;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=V3y+4DVGUspp58JJWY2SOnaLsTUPZnxETW8fSaQHj9Y=;
-	b=UzNzfMyW6oVv2Xlx7iJyGeZa1lzjOal6Bnu7ppOxhsUxiUbNl1GY6q6xFP+veTL7EhrULo
-	joOV7X6jU/nhkDBA==
-Received: from devron.myhome.or.jp (foobar@devron.myhome.or.jp [192.168.0.3])
-	by ibmpc.myhome.or.jp (8.18.1/8.18.1/Debian-7) with ESMTPS id 5A3Gu8J7034550
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Tue, 4 Nov 2025 01:56:09 +0900
-Received: from devron.myhome.or.jp (foobar@localhost [127.0.0.1])
-	by devron.myhome.or.jp (8.18.1/8.18.1/Debian-7) with ESMTPS id 5A3Gu72F110914
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Tue, 4 Nov 2025 01:56:08 +0900
-Received: (from hirofumi@localhost)
-	by devron.myhome.or.jp (8.18.1/8.18.1/Submit) id 5A3Gu52E110913;
-	Tue, 4 Nov 2025 01:56:05 +0900
-From: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
-To: Yongpeng Yang <yangyongpeng.storage@gmail.com>
-Cc: Namjae Jeon <linkinjeon@kernel.org>,
-        Sungjong Seo
- <sj1557.seo@samsung.com>, Jan Kara <jack@suse.cz>,
-        Carlos Maiolino
- <cem@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>,
-        Sasha Levin <sashal@kernel.org>,
-        Alexander
- Viro <viro@zeniv.linux.org.uk>,
-        Christian Brauner <brauner@kernel.org>,
-        Christoph Hellwig <hch@infradead.org>, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        stable@vger.kernel.org, Matthew Wilcox <willy@infradead.org>,
-        "Darrick
- J . Wong" <djwong@kernel.org>,
-        Yongpeng Yang <yangyongpeng@xiaomi.com>
-Subject: Re: [PATCH v5 1/5] vfat: fix missing sb_min_blocksize() return
- value checks
-In-Reply-To: <20251103164722.151563-2-yangyongpeng.storage@gmail.com>
-References: <20251103164722.151563-2-yangyongpeng.storage@gmail.com>
-Date: Tue, 04 Nov 2025 01:56:05 +0900
-Message-ID: <871pmfoy1m.fsf@mail.parknet.co.jp>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GbOxx1WJ"
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-78117b8e49fso10169778b3a.3
+        for <linux-block@vger.kernel.org>; Mon, 03 Nov 2025 09:03:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1762189399; x=1762794199; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=zgwz91HH8FrCQPCQZHYghyqaicLvlJMRA6PNzprcFtw=;
+        b=GbOxx1WJoe+hFCHPwTEnjYXNa668HDl3p+zt1A7J9KjBxpYRYnhQ7kXb+poaYdDJHQ
+         exuMPIDisP3//Nh7fy/sUQTp5rbc407oTSRqhy9qjm0LKINU2R3kGHbh0xBJcQOaSzE0
+         y3Gg8ObgtPACerSxrli0n6GXw38khI6QuG74QU7ckMAQWNiTQe0macP/2TrYvOn9huIg
+         oTlSmFyhBqYh01FjqCmcCFVsdiKuEHI6f6D08so6LCq2XyyHVYFTDQmB+VxDILW+9WJi
+         V0uzCVDd2cFzjBETkxIYFJeHFqDHcEAMFbcmaEAmBLfs2XzDIF7Ie9hAgUF5QJuOrd9Y
+         5kYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762189399; x=1762794199;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zgwz91HH8FrCQPCQZHYghyqaicLvlJMRA6PNzprcFtw=;
+        b=U0AgPVgBPLYMNzEXDEuUxUiegMzrxUawMQnkdbOepURGTd4lR/10z/2x2GqBD1WL9N
+         om8nNaCSFdIrQWHH+JgdT+3qIq9EbGwlS/4bVjiI1U2yFbszqT3nd6lZUz8c1RczYuqS
+         XyBEOzrIjLg4iKOmcu8EjYmPblWB9xAf4IZ9AqUDxpFIoWaKWuj21UisiLw9WQ8IIIoa
+         eyGzz4fXcbr5Ue6wyockXUqFteec5/yha/ekp0McioXEY8ga+pQBPI9ikSWhJK/bnce4
+         mRwu+0eZQnDjHTCl4u8R61kC8GJns43ZTlrfng4hWJAJ7BZ3rMrrvhmzUvWV3O9S3FUn
+         OrIw==
+X-Forwarded-Encrypted: i=1; AJvYcCVwoeThroovA+3Wv4eUnGk0Knb1+RAkkpg7ljqBOL9nKTwbr5vPtP0LlD2O29NuE2nxvu7UoNvO2e5jWA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzO2PPaTAGERmdkQLHr4X/Kjmx2Bf/E8fYYa/SKCswQ1b19nSUp
+	zTVAu1LLNnbfEKE4++sbdGoc8TBbBhvAEGlovL0VwLBMwiynWEF4S3gW9W3ZmLYoi2iOdEUR25L
+	BxDQ1/pVQbx+Mrg==
+X-Google-Smtp-Source: AGHT+IH41Dl7hDmGgj7d7BxzapzK5R66sc/peGO073X46xDSp88OGy7LVCzfK2/dApFQoyv/KwYxK/D2JaBrtA==
+X-Received: from pjblb16.prod.google.com ([2002:a17:90b:4a50:b0:33d:6d99:1ed4])
+ (user=ipylypiv job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a20:914b:b0:334:9f66:5273 with SMTP id adf61e73a8af0-348cc8e3793mr16329585637.47.1762189396816;
+ Mon, 03 Nov 2025 09:03:16 -0800 (PST)
+Date: Mon,  3 Nov 2025 09:03:04 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.1.930.gacf6e81ea2-goog
+Message-ID: <20251103170308.3356608-1-ipylypiv@google.com>
+Subject: ATA PASS-THROUGH latency regression after exposing blk-mq hardware queues
+From: Igor Pylypiv <ipylypiv@google.com>
+To: Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, 
+	John Garry <john.garry@huawei.com>
+Cc: Igor Pylypiv <ipylypiv@google.com>, Jens Axboe <axboe@kernel.dk>, 
+	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, linux-scsi@vger.kernel.org, 
+	linux-ide@vger.kernel.org, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Yongpeng Yang <yangyongpeng.storage@gmail.com> writes:
+Hello,
 
-> Fixes: a64e5a596067bd ("bdev: add back PAGE_SIZE block size validation
-> for sb_set_blocksize()")
+I'm observing significant latency regressions for ATA PASS-THROUGH
+commands that started after commit 42f22fe36d51 ("scsi: pm8001:
+Expose hardware queues for pm80xx"). It looks like the libata's deferral
+logic that relies on returning SCSI_MLQUEUE_DEVICE_BUSY does not work
+correctly for blk-mq's multiple hardware queues.
 
-Looks like inserted a strange '\n'? Otherwise looks good.
--- 
-OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+Here's what I've figured out after some tracing:
+
+ATA PASS-THROUGH commands get continously deferred because NCQ queue is
+not yet drained. At the same time, other hardware queues (other CPUs)
+keep issuing more data commands effectively preventing the NCQ queue
+from draining. Since NCQ queue is not getting drained, ATA PASS-THROUGH
+commands can get starved for a really long time e.g. ~5 minutes.
+
+Steps to reproduce:
+1. Run FIO workload to keep the NCQ queue full.
+
+    ~# fio --name randread_4k --rw=randread --bs=4k --iodepth=32 --filename=/dev/sdb --ioengine=libaio --direct=1
+
+2. While FIO is running, issue ATA PASS-THROUGH commands and check latency.
+
+    ~# time ./sg_sat_identify /dev/sdb
+
+
+NOK: v6.18-rc3:
+
+~# for i in {0..20}; do { time ./sg_sat_identify /dev/sdb; } 2>&1 | grep real; done
+real	0m1.533s
+real	0m1.133s
+real	0m6.431s
+real	0m1.466s
+real	0m5.551s
+real	0m6.093s
+real	0m9.104s
+real	0m0.254s
+real	0m36.142s
+real	3m16.001s
+real	4m50.856s
+real	0m0.409s
+real	0m22.833s
+real	0m3.359s
+real	1m3.895s
+real	0m21.314s
+real	0m5.180s
+real	0m10.178s
+real	0m2.251s
+real	0m15.205s
+real	0m0.206s  
+
+OK: v6.18-rc3 with 42f22fe36d51 reverted:
+
+~# for i in {0..20}; do { time ./sg_sat_identify /dev/sdb; } 2>&1 | grep real; done
+real	0m0.223s
+real	0m0.187s
+real	0m0.199s
+real	0m0.226s
+real	0m0.229s
+real	0m0.215s
+real	0m0.212s
+real	0m0.211s
+real	0m0.193s
+real	0m0.204s
+real	0m0.202s
+real	0m0.224s
+real	0m0.223s
+real	0m0.219s
+real	0m0.194s
+real	0m0.209s
+real	0m0.211s
+real	0m0.225s
+real	0m0.197s
+real	0m0.204s
+real	0m0.189s
+
+
+Reverting 42f22fe36d51 seems like a plausible workaround but I think that
+driver might still benefit from using multiple hardware queues e.g. to
+issue commands to different drives from other hardware queues. It seems
+like there should be a way to drain/freeze all hardware queues before
+issuing ATA PASS-THROUGH commands but I haven't yet figured out how to do
+that.
+
+If you have any ideas or suggestions on how to fix this issue and/or what
+things to try, please share. If you happened to have patches that would
+fix the issue I would gladly review and test the patches.
+
+Thank you!
+
+Regards,
+Igor
