@@ -1,154 +1,145 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0596A298CA2
-	for <linux-block@vger.kernel.org>; Mon,  3 Nov 2025 07:03:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B6F4296BDA
+	for <linux-block@vger.kernel.org>; Mon,  3 Nov 2025 07:18:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762153422; cv=none; b=tdQJELXUWMRC6JN7QOuZhVpdNISaxY4YNbD+EK7OmjnJGIK+oP0O6HofCSfZeYS4DGHEnckUTmnLiuOl1xlLqoakL/7ltkWFevIwfYsynwObiJO2aB9yRbiSfeeYJmEiZ3EJ3fo6nbJLiBIO0Yd9R3IUzYk7P9M9BYNUKfvJ6XE=
+	t=1762154296; cv=none; b=bS3y6+urSJd6CPsvs6Zs5VrtF/abVf54JA8qXDSyrEtCI6pFeAJnmemUOwZD6THhsUEtz6jmo0P2Fz/XATd7BEUr6F2FbhjnKKdJPIXI4LDwtNhPhpS4v4nUHvFVbBZ+r0PGxiDVha0oc+rQ5YU/pZ2aYq5P7U1OLIKKpBrcKt8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762153422; c=relaxed/simple;
-	bh=WKvdrgpIoXtnUy5RsRPtlXhM4urKekJy7HDJU/iVP5s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=P8J4EXGH7c18ltk7/zBWy+GPgxzyN6KU7qhmnL0Z70+bCFmX3otQ1yfuV6riZerlQ1psvqZ2ndI0PnJKbWnopsV4f1hcRwnWdWfbfrpto8BEWOQzTCIFfKokIRjS0ejlBBO52PmiyEFJqbapcDKL/TazayrKC/38scDVB2DSfhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=oFce1bSg; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1762154296; c=relaxed/simple;
+	bh=mNiBHRHLdMqnvaJIEavpx7C7tTm8CYCoyLazYi6SDLg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jHVHiC9ItVsZN1b1i2Nc7iGf8AvhY2Vkeil4covpaSsDwfD+MPwx/pqkm+nI4CWPq3bcF4D9gsvqP44QVM5Qre/OlcCLxGqfOxeXi9Uvky2Thmuca9Tg1cRA/7vwIF4vMTWD7B+5+CjdyTag3NDCvnzxIlc5EiqAKEqzzazS6hE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=NBvkeDKl; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="oFce1bSg"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5A2NlMbY008410;
-	Mon, 3 Nov 2025 07:03:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=5HuXZ3
-	9dKVIIg9lPb7H25rpyeg0Bg6as+BjX4BZfnWI=; b=oFce1bSgSqjeIhaN458Lhk
-	KcN2X3JXfbIdK9fo+w+3zUdS57G13Gmc9beDL5TXEd/nDigmOARYt2g6mD/qRy8L
-	ofYjaMHM8KirPmOhuxmeNYUYuCtg8p9NJ11B4YXqJd1CiIYrailvRCrVWJOY/ir2
-	ifqOzM3MA+BoZjPtrpDgfzhw6eAqXWamBHDo2C4B+MQ0frYsyeaPLuD2YmAA6vh8
-	haYxUmYyua+UddO0QgfZCg6xYc/me01QwOF93O5HJ6ildxkeNrBIdNZIlIGC5Cti
-	tz67dySFZbXUCsYsdMb/n7qHQyDqm8oKBjcFMIdcPfSYHCNXhXWOgxGBoQavx0dQ
-	==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4a58mknbc0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 03 Nov 2025 07:03:36 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5A32imi6009869;
-	Mon, 3 Nov 2025 07:03:35 GMT
-Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4a5x1k4878-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 03 Nov 2025 07:03:35 +0000
-Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
-	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5A373ZmB30737110
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 3 Nov 2025 07:03:35 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1B0AC58052;
-	Mon,  3 Nov 2025 07:03:35 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 93AC45805E;
-	Mon,  3 Nov 2025 07:03:32 +0000 (GMT)
-Received: from [9.61.101.239] (unknown [9.61.101.239])
-	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  3 Nov 2025 07:03:32 +0000 (GMT)
-Message-ID: <d4c86b29-4b5e-4a85-82b9-8b80f66ed24c@linux.ibm.com>
-Date: Mon, 3 Nov 2025 12:33:31 +0530
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="NBvkeDKl"
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4770c2cd96fso25682255e9.3
+        for <linux-block@vger.kernel.org>; Sun, 02 Nov 2025 23:18:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1762154293; x=1762759093; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=fyxHa9/8/Ar3cmThFu6k2oVGwIVFxlREAcZe35Eyfc8=;
+        b=NBvkeDKlfAkIDsV3UME85lnO9awL8QzNTwhFYaIiXF9Af/y9CYyrD70ovpNljZmod3
+         rFP7K3fGfVVqsaBHO6UKTsL+kif5I7mVOUCMLTCcb5wcGyYI1jGpsZKnXqYcNavXmv19
+         Yr1fgqjxa6wHgu9aIKZ+qOY7FxuDKLNXa3XqLlBfAxvq5wnFec/HEXubeEttJlb6fFu3
+         1/DXeHl2ZQ//HVGCciwqXamvP0mSsXWGOONj6Dxx560+qhaFySNYYjtMztf1MS0mjZll
+         WHJdl+kqkVsyORk2/8wZZ8tt8O8rYf+W52e6SHEsgAvy4Z6D1ZssqXRP9yzOrjST19yM
+         vmGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762154293; x=1762759093;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fyxHa9/8/Ar3cmThFu6k2oVGwIVFxlREAcZe35Eyfc8=;
+        b=rq+K4izsJbscp45KMoXiZsYjkpAJgFeS5hEHfbKb5U1VXdPwv+b8GDwWhADPp7Oo2V
+         /1hA+H7DS2ke/N9zjOotF9hwE4h+xZqNpu0igVpMT9t6ste2Bv2jyrX7GIngCxSaMMvZ
+         qC+jp+OxLO6Mt5XSCU9BduDME5JsHQSRWRuQGfzyekU07OUvA6KLkP8Y8QH/7cA1/FrK
+         iCi+CemgcD9AIUz3G6Ewfswhrib2jjpj6vfloBymF0+y/g0j7bzA6X45BUQMdDQz+9EK
+         kAIBECFEmExFnlSa2kprw82wwr2fGFsa8aktnJzV/jODx3EcVUzzZ9ulycp6uB8wvL2s
+         /ZeA==
+X-Forwarded-Encrypted: i=1; AJvYcCWWygJUE+Cs9eqEdIhL/4h2SEE6znU0mzNd6Cyj4+FoU1ko/Ru5kO3V6fenkmWn8WYiLWOkwWo2gZDiFw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwipEbPpBdPLIdhz3WllSgLAPkFOHMgRKmhZCcNSoUZ9yZdvdEG
+	mepCOzUWXpPMU0UE+6FRmNrftArMfE3VC24Pb4VBvKc5P4xvJsC2dU98jJ/5XE8HeqO+QArsfEP
+	dZzXp4yfohrdthCrz3DNZVl2Lro7m2hCM3sY/HCPH8w==
+X-Gm-Gg: ASbGncsR77DbQmV0ZHvhlZ9fh44uXnZK8C6jyNFG6L2t4lEnIJdCkyyHLMQNfNwB9LF
+	TGsAtBuQfH72B6kHqGMKpvHzZdWKV0VIto9+sbEmalOMAMqO1fyY146awMbpa7y+1gGbDrqBoCy
+	edz6FosNxyYKRDKu+dc/gtPSKv+SH4/X6EoTAvuVG3rQXiErmhl1CN+whQJL6UiJ3/9c0pv+JuU
+	9t8Ht3nj1Z2ff8wwpdPaTfSo2ynMawHNahyq1Wj+xSG5Yx43fzFCfvSMfzivxVITB0Sd5eDknCz
+	YEOlINm1hv3RfWNSkdqV2VQc0ZafnWiS8DoV1+VH76y0zQGZgGEnCxWhsxX0yBjQXSfa
+X-Google-Smtp-Source: AGHT+IHqUQu8mdmKFV60YUxpDIMFoEiDUTPxoVdwOa3d9A2KABNI1QO1FJGgMlmc/MHoUnrp0Cz2XrvfjpDIzK4Hz9g=
+X-Received: by 2002:a05:600c:620a:b0:471:7a:791a with SMTP id
+ 5b1f17b1804b1-4773bf42644mr79682075e9.7.1762154292857; Sun, 02 Nov 2025
+ 23:18:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv3 2/4] block: move elevator tags into struct
- elevator_resources
-To: Ming Lei <ming.lei@redhat.com>
-Cc: linux-block@vger.kernel.org, hch@lst.de, axboe@kernel.dk,
-        yi.zhang@redhat.com, czhong@redhat.com, gjoyce@ibm.com
-References: <20251029103622.205607-1-nilay@linux.ibm.com>
- <20251029103622.205607-3-nilay@linux.ibm.com> <aQgmckPkiAtr8LzM@fedora>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <aQgmckPkiAtr8LzM@fedora>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: eMTnVhRIBYSGJ2Q7e-TNPlCufxCQb5Kg
-X-Proofpoint-GUID: eMTnVhRIBYSGJ2Q7e-TNPlCufxCQb5Kg
-X-Authority-Analysis: v=2.4 cv=SqidKfO0 c=1 sm=1 tr=0 ts=690853c8 cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=wspqj8QR-kYkxBFrkRkA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTAxMDAwOSBTYWx0ZWRfX9ZV9pgstYybH
- wAow2GhAI4Y9GIMXFztuLkapKLcEQqJU92e+JFjwZzKY4jT7IwSxzw5eZKjyTtdTFezP6oNkgZj
- g5+dYp7qCIonjusbLqdmP0r2muWr1lvKW8FrpbezOHfmQlZy+0IC4uti50KUOn+h8+OChNAfudq
- y/m60FHm7HurqfK/yB+dXoPO21JdGTUz+fbEvG+VXqN3XjlJyVZkBa6o8y1Uyuwd/xI4npsz0OP
- eiiofd9WBQG4RWQU/mLQpUJeR3YR+XKnNDBnyDehTXwPuuG8fSOWlRkd9NJaIvFZOP9tgT4wXTm
- jJMZx+tBz+QqTwv95DWBxp+cd9on/lCscJVq6OReyomTbT2Df2SPwdgx3GFwUthYuRXITPMtaIm
- Qd4ykAGK/wOi+3d9RjO3i/c5hwiixg==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-02_02,2025-10-29_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 clxscore=1015 impostorscore=0 adultscore=0 lowpriorityscore=0
- malwarescore=0 spamscore=0 priorityscore=1501 bulkscore=0 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511010009
+References: <20251031061307.185513-1-dlemoal@kernel.org> <20251031061307.185513-2-dlemoal@kernel.org>
+ <55887a39-21ee-4e6c-a6f3-19d75af6395a@acm.org> <bd71691f-e230-42ca-8920-d93bf1ea6371@kernel.org>
+In-Reply-To: <bd71691f-e230-42ca-8920-d93bf1ea6371@kernel.org>
+From: Daniel Vacek <neelx@suse.com>
+Date: Mon, 3 Nov 2025 08:18:00 +0100
+X-Gm-Features: AWmQ_bmxLu0zc6F1WlZXfm4Psv5Sxs14UirqMZbxcqRpQmruSk8F7QkSWlVIM64
+Message-ID: <CAPjX3FebPLu_P=-BuP63VuaiAnC62rthcQ0vb+J8b-w0OckyqA@mail.gmail.com>
+Subject: Re: [PATCH 01/13] block: freeze queue when updating zone resources
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	linux-nvme@lists.infradead.org, Keith Busch <keith.busch@wdc.com>, 
+	Christoph Hellwig <hch@lst.de>, dm-devel@lists.linux.dev, Mike Snitzer <snitzer@kernel.org>, 
+	Mikulas Patocka <mpatocka@redhat.com>, "Martin K . Petersen" <martin.petersen@oracle.com>, 
+	linux-scsi@vger.kernel.org, linux-xfs@vger.kernel.org, 
+	Carlos Maiolino <cem@kernel.org>, linux-btrfs@vger.kernel.org, 
+	David Sterba <dsterba@suse.com>
+Content-Type: text/plain; charset="UTF-8"
 
+On Mon, 3 Nov 2025 at 06:55, Damien Le Moal <dlemoal@kernel.org> wrote:
+>
+> On 11/1/25 02:48, Bart Van Assche wrote:
+> > Hi Damien,
+> >
+> > disk_update_zone_resources() only has a single caller and just below the
+> > only call of this function the following code is present:
+> >
+> >       if (ret) {
+> >               unsigned int memflags = blk_mq_freeze_queue(q);
+> >
+> >               disk_free_zone_resources(disk);
+> >               blk_mq_unfreeze_queue(q, memflags);
+> >       }
+> >
+> > Shouldn't this code be moved into disk_update_zone_resources() such that
+> > error handling happens without unfreezing and refreezing the request
+> > queue?
+>
+> Check the code again. disk_free_zone_resources() if the report zones callbacks
+> return an error, and in that case disk_update_zone_resources() is not called.
+> So having this call as it is cover all cases.
 
+I understand Bart's idea was more like below:
 
-On 11/3/25 9:20 AM, Ming Lei wrote:
->> @@ -580,7 +595,7 @@ int blk_mq_alloc_sched_tags_batch(struct xarray *elv_tbl,
->>  
->>  /* caller must have a reference to @e, will grab another one if successful */
->>  int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e,
->> -		struct elevator_tags *et)
->> +		struct elevator_resources *res)
->>  {
->>  	unsigned int flags = q->tag_set->flags;
->>  	struct blk_mq_hw_ctx *hctx;
->> @@ -588,23 +603,23 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e,
->>  	unsigned long i;
->>  	int ret;
->>  
->> -	eq = elevator_alloc(q, e, et);
->> +	eq = elevator_alloc(q, e, res);
->>  	if (!eq)
->>  		return -ENOMEM;
->>  
->> -	q->nr_requests = et->nr_requests;
->> +	q->nr_requests = res->et->nr_requests;
->>  
->>  	if (blk_mq_is_shared_tags(flags)) {
->>  		/* Shared tags are stored at index 0 in @et->tags. */
->> -		q->sched_shared_tags = et->tags[0];
->> -		blk_mq_tag_update_sched_shared_tags(q, et->nr_requests);
->> +		q->sched_shared_tags = res->et->tags[0];
->> +		blk_mq_tag_update_sched_shared_tags(q, res->et->nr_requests);
->>  	}
->>  
->>  	queue_for_each_hw_ctx(q, hctx, i) {
->>  		if (blk_mq_is_shared_tags(flags))
->>  			hctx->sched_tags = q->sched_shared_tags;
->>  		else
->> -			hctx->sched_tags = et->tags[i];
->> +			hctx->sched_tags = res->et->tags[i];
->>  	}
-> The above change(include elevator_alloc() signature change) can be avoided if
-> you add one local variable `et`.
+> @@ -1568,7 +1572,12 @@ static int disk_update_zone_resources(str
+uct gendisk *disk,
+>       }
+>
+>   commit:
+> -     return queue_limits_commit_update_frozen(q, &lim);
+> +     ret = queue_limits_commit_update(q, &lim);
+> +
+> +unfreeze:
 
-Yes, we can avoid changing the prototype in this patch. However, in the subsequent
-patch, we’ll still need to update the prototype of elevator_alloc() so that we can
-pass ->res as an argument. This will allow us to access and update both ->data and
-->et within the elevator_alloc() method using a single argument, which is more
-convenient. Otherwise, we would have to pass both ->data and ->et as separate
-arguments. That said, I'd update this patch so we don't change elevator_alloc()
-prototype in this patch but then update it in the subsequent patch. Let me know
-if you think otherwise.
++       if (ret)
++               disk_free_zone_resources(disk);
 
-Thanks,
---Nilay
+> +     blk_mq_unfreeze_queue(q, memflags);
+> +
+> +     return ret;
+>   }
+>
+>   static int blk_revalidate_conv_zone(struct blk_zone *zone, unsigned int idx,
 
+And then in blk_revalidate_disk_zones() do this:
+
+        if (ret > 0) {
+                ret = disk_update_zone_resources(disk, &args);
+        } else if (ret) {
+                unsigned int memflags;
+
+                pr_warn("%s: failed to revalidate zones\n", disk->disk_name);
+
+               memflags = blk_mq_freeze_queue(q);
+               disk_free_zone_resources(disk);
+                blk_mq_unfreeze_queue(q, memflags);
+        }
+
+The question remains if this looks better?
+
+> --
+> Damien Le Moal
+> Western Digital Research
+>
