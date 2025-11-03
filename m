@@ -1,86 +1,109 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46EF91A9F82;
-	Mon,  3 Nov 2025 22:47:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C55FB2E6CD7;
+	Mon,  3 Nov 2025 22:51:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762210034; cv=none; b=fwYS6T4t01jymCasqv/VZutYy0ldycdZK9GDcKXyzX66yDNSrmSDnMt5ZIxgFStDRscCWlJl0VpCZ4fyz8InnGDRiGiwvvKSGq8lGjpFBRNOyjSqsPMNw9l2QKzXx1jP1Si2Hf8xG6v0w7Mw4EF1UWfA64Yd5mKHapgXIYyiFK4=
+	t=1762210282; cv=none; b=UbzUCfJPeRrbZHx0cUExz5CeRVTcp3UFr2BUs7bs91KD384S2eMxo/itvsK+R4gmpyIMgbccYk/Vb1lEAaXkFepanwvWqlJapcvNAw8wetAxD9+nUmPwMjusGR80mmlwJM5paVrMslQJpAbU4jXHV5diFKXbqoLJ940Qnrucd7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762210034; c=relaxed/simple;
-	bh=vzcjcZ/KzE5MpIcBsK7RTULC/BX++/fNaI56/t7f19g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sfpQKvwjZ+RnG+93QG8h9jzTk7fFK/0uHnQwOEC7biY/C04b5DDy9ilQshmDi2+9PGoJMs9iC1HQCVuvRgPgu8IvFhy0hcctDO/do/pXvV3IzKXCKjnukzbePba91WaB+WCxUgTy9W33rJAaWxSAwfRGFwF5uZVVwUSb+tA46dA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FKXMJ/Ec; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1762210282; c=relaxed/simple;
+	bh=+MRghoTidc+qlTKw3kb7aFeEYXb+o5vL9QO5Jyos7Uw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FIc4RDMuI5CM8ZxD4cB6HxjvqEbXp0roHFoCSPgHGDoV5670kPikq/zveC/sQVKHv8roKI9SVu+SzSW8+fiO+pDf3/fbVt0uASDs51vfkrzO2cXj0OOOTqaK8ajD1LzN6h3rZtuPzEvFHI62CG0PvL8efeantx36bpUs6oxpNMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MDRx75kk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FKXMJ/Ec"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E436C4CEE7;
-	Mon,  3 Nov 2025 22:47:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MDRx75kk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C5ACC116B1;
+	Mon,  3 Nov 2025 22:51:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762210033;
-	bh=vzcjcZ/KzE5MpIcBsK7RTULC/BX++/fNaI56/t7f19g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FKXMJ/Ec48ilrcgKvTG5GjgA5Z6I2mEPDZv3qtg5HhqKnAHiccABnQUzmRdyMaZCu
-	 hFjYLCQGqBJzqbKrqRsUiRuQ+0kshhLEduF5rRRAUbkSt2Z4OkDuJxEBusN8X4pKXt
-	 8FVTCg1ox+IrXozkewp4toraYgU0zItF8xFQfH4hGKx7wmq22kKuCdhM3x6/DsFWEe
-	 GY0Bnk2cWlL7r/RqYtZIJFpebDk5XnJdWE79KOuVk4bTIJvP3Lk/I2wWaKCcQsDtet
-	 LsdPNc/Ss0XvbsocywYxO+ZdzBnkdooEVdSAq7wnkLlMCkUMlKUcSbU5FLFr8oY2jJ
-	 Vz3aZTmotFj7g==
-Date: Mon, 3 Nov 2025 15:47:11 -0700
-From: Keith Busch <kbusch@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jan Kara <jack@suse.cz>, Dave Chinner <david@fromorbit.com>,
-	Carlos Maiolino <cem@kernel.org>,
-	Christian Brauner <brauner@kernel.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-raid@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: Re: fall back from direct to buffered I/O when stable writes are
- required
-Message-ID: <aQkw75D2cqqtkOrT@kbusch-mbp>
-References: <20251029071537.1127397-1-hch@lst.de>
- <aQNJ4iQ8vOiBQEW2@dread.disaster.area>
- <20251030143324.GA31550@lst.de>
- <aQPyVtkvTg4W1nyz@dread.disaster.area>
- <20251031130050.GA15719@lst.de>
- <aQTcb-0VtWLx6ghD@kbusch-mbp>
- <20251031164701.GA27481@lst.de>
- <kpk2od2fuqofdoneqse2l3gvn7wbqx3y4vckmnvl6gc2jcaw4m@hsxqmxshckpj>
- <20251103122111.GA17600@lst.de>
+	s=k20201202; t=1762210282;
+	bh=+MRghoTidc+qlTKw3kb7aFeEYXb+o5vL9QO5Jyos7Uw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=MDRx75kknFqeD7byta0iT8As3D8wrn21+VlwkTsAbLuSmTrM0QIDS2SWD0BaPuqYK
+	 /5XuMfifJqX4ke4mO7Njpj8CuohKlsnJeIC3psnCmzYp7Tu9t0Jgl4xfIKNEr+Poh/
+	 2kLE+Wts61ELmEqBbb1rN2s/5uOYCuoG0jcUw1EkSdZRMzgOP6BIUabY7yAvCK354X
+	 BbBDi7bF85ydWMdb0FyMFm9Nky4DtGUHPxG16P+zRE3PfsdzSw6hmfsLSjZsMCeuww
+	 U9Tptzx1dnXB7DWSNRKpiebIruTwvVZBfGPlz7c9WNAJ7eeDwCbLqV99bPrCdQQOxU
+	 ++s3aApcyb1tw==
+Message-ID: <51db9579-f78d-4192-93fa-b252fe954d13@kernel.org>
+Date: Tue, 4 Nov 2025 07:51:19 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251103122111.GA17600@lst.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: ATA PASS-THROUGH latency regression after exposing blk-mq
+ hardware queues
+To: Igor Pylypiv <ipylypiv@google.com>, Niklas Cassel <cassel@kernel.org>,
+ John Garry <john.garry@huawei.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
+ linux-block@vger.kernel.org
+References: <20251103170308.3356608-1-ipylypiv@google.com>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <20251103170308.3356608-1-ipylypiv@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Nov 03, 2025 at 01:21:11PM +0100, Christoph Hellwig wrote:
-> On Mon, Nov 03, 2025 at 12:14:06PM +0100, Jan Kara wrote:
-> > > Yes, it's pretty clear that the result in non-deterministic in what you
-> > > get.  But that result still does not result in corruption, because
-> > > there is a clear boundary ( either the sector size, or for NVMe
-> > > optionally even a larger bodunary) that designates the atomicy boundary.
-> > 
-> > Well, is that boundary really guaranteed? I mean if you modify the buffer
-> > under IO couldn't it happen that the DMA sees part of the sector new and
-> > part of the sector old? I agree the window is small but I think the real
-> > guarantee is architecture dependent and likely cacheline granularity or
-> > something like that.
+On 11/4/25 02:03, Igor Pylypiv wrote:
+> Hello,
 > 
-> If you actually modify it: yes.  But I think Keith' argument was just
-> about regular racing reads vs writes.
+> I'm observing significant latency regressions for ATA PASS-THROUGH
+> commands that started after commit 42f22fe36d51 ("scsi: pm8001:
+> Expose hardware queues for pm80xx"). It looks like the libata's deferral
+> logic that relies on returning SCSI_MLQUEUE_DEVICE_BUSY does not work
+> correctly for blk-mq's multiple hardware queues.
+> 
+> Here's what I've figured out after some tracing:
+> 
+> ATA PASS-THROUGH commands get continously deferred because NCQ queue is
+> not yet drained. At the same time, other hardware queues (other CPUs)
+> keep issuing more data commands effectively preventing the NCQ queue
+> from draining. Since NCQ queue is not getting drained, ATA PASS-THROUGH
+> commands can get starved for a really long time e.g. ~5 minutes.
 
-I was seeking documented behavior about concurrently modifying and
-using any part of a host data buffer, so I look to storage specs. The
-general guidance there aligns with "the reprecussions are your fault".
-Linux DIO didn't say that, but I'm just saying there's precedence lower
-down.
+We already received a report of such issue, a while back. But being busy with
+other things, it fell through the cracks.
 
-I'm not even sure how you handle the read side when multiple entities
-are concurrently modifying the buffer. That has to be an application
-bug even if bouncing it defeats the gaurd checks before the completion
-overwrites the application's conflicting changes from the bounce buffer.
+Note that the issue is not just for passthrough commands, but rather for
+commands which trigger ap->ops->qc_defer() returning true, that is (most of the
+time) a non-NCQ command issued while NCQ commands are on-going. It just happen
+that most pasthrough commands are non-NCQ.
+
+I think it is time to address this command starvation issue...
+> Reverting 42f22fe36d51 seems like a plausible workaround but I think that
+> driver might still benefit from using multiple hardware queues e.g. to
+> issue commands to different drives from other hardware queues. It seems
+> like there should be a way to drain/freeze all hardware queues before
+> issuing ATA PASS-THROUGH commands but I haven't yet figured out how to do
+> that.
+
+Yes, we need to remember the fact that a deferred command exists/was issued. But
+that is not trivial to handle unless we introduce a workqueue in libata that
+handle these, draining the queue when needed. But that would mean that we keep
+on hand commands that are not being issued, which is something that the block
+layer better handles (with a requeue).
+
+So in the end, I think that the better solution is to look at the scsi & block
+layers requeue path for deferred commands and make sure that these commands are
+at the head of the dispatch queue, always, to ensure that the next time they are
+issued, they are issued first and will eventually get a chance to run once all
+on-going requests complete.
+
+> If you have any ideas or suggestions on how to fix this issue and/or what
+> things to try, please share. If you happened to have patches that would
+> fix the issue I would gladly review and test the patches.
+
+Let me see with Niklas how we can handle this. We'll send something soon.
+
+
+-- 
+Damien Le Moal
+Western Digital Research
