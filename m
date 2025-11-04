@@ -1,86 +1,54 @@
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C3F02FB63A
-	for <linux-block@vger.kernel.org>; Tue,  4 Nov 2025 14:21:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8BB232E694;
+	Tue,  4 Nov 2025 14:42:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762266094; cv=none; b=YHCi5MresumsL26vCilz4bJ7bqmjf73Ut6HPwRhpwdk/ZesK/51xDHIv0zwHvRkRud1BPuA19BIDU/AVPot+8r4XdK+8SKGQdjgvxsuRiBrybyjUnCQBfdId1zPiptUz++4+rhBlg4j1AAXZRm0MY9/r5WERv2KeUYHXywoG8dg=
+	t=1762267325; cv=none; b=qwh4+WzIBe6Bpno/XhWcFplW48jsKGWwr4kbC7hOCFvMg1mM522SzPGt6/J3MmnAPAVxnyTM0wLw4QYhj6Qi/cW4zobxH23S274XSMyZgxfDyGcmE5VCA6L1DtT9a6+DzFE6J6h4S01FqV+dTOMvGIgh+TcCb8/+AR8guFoj98o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762266094; c=relaxed/simple;
-	bh=5mXvuTR1PiKSIZIeQ+mXYzLrB9FmHxAaPAEgu0nL7Io=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=HMJlaZGQm+5gYD95NKzbDvl2jgqqR2/BM005wZ9UtQ9ooh6hPLdcNxuJDzwvEy1X/yCq1VhNYqPVoRiqrZEG4FycT/xU3BKPlB5Tz+aIIhARG51sG8NIrzLgNzyf3/QWNekXdnORD3AEKwiGjA39kWtwKx2/YB8yjpfwZJmUyCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-93e8092427aso554357139f.0
-        for <linux-block@vger.kernel.org>; Tue, 04 Nov 2025 06:21:32 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762266092; x=1762870892;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7L/jSGya7egt/NiedCx/1BfP1PKnwqFiSMxG2dzvm6E=;
-        b=k8oykPQsX3SbxloMr9fPJMNkIyHGap5b+0lTABvCWkMVBiExBow5LYahL3RbZCmrxq
-         pnfvCytMSs67N5XkiTTnD7iHYZxPf+ThCx7HjiRjnafP8PfnleX4KCo9IdH+PDy7tAye
-         Mum7kA4jicxMihB6uTRcD7heniANtYYzEZ9eVb1wMN5nRiRVcatvfJKtim+Y5wovqCfP
-         Wu5OAqNgoYi+4kY52AiqoQIMl3euZRXYA9ouBO50YVkwGofhpk6gZdSdYyM4mqefDmu1
-         VI2a6odq/nNgLYAKBweSLvqJhBYVSHutU59lsN+x/GHb0UnvUd8ZITJNVaGqc6xZxiKT
-         CXDw==
-X-Forwarded-Encrypted: i=1; AJvYcCWm1V/X8QVP5vi22nqmA4ImSocsSPycDd12HfD3UgqZgOE8kKWeM+Dm3WSUz14xD7tX17+Rw8MOixZ5qA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YybU6yUm2abyNnsAFdOicB3ZSU4u3DVbXUlriA/+0UWClccW/dL
-	EnWicey5ED9IDJAJe6UPmYJ/WQ16z5SGLsBvG+pkW8QamFTJ61n0j90JFeFU5w4aUA8WSP4bbnK
-	7/H0bBxI9+hejUY2G3EWM/nFyfxyj6m/FhwvLdgBATaspFT59VovzaVA8Agc=
-X-Google-Smtp-Source: AGHT+IHmghhbRbHc2151lEMdR+Fkctnu2OMAFAv+53FJy/pwcW/nqwYE+rSNRwYm8lpm9Ln89ZBat27dAoQpv/kgtCP6eb3W0aQ4
+	s=arc-20240116; t=1762267325; c=relaxed/simple;
+	bh=tCfDuD4tZdVerUe1Dhm+w5PrK+7s8k6DKAyP3vf9Eo0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gKSlZfh16dotceP6ArqhScR/kdbv6ybMXFb9Urmu0iKsCIprvAzDdfpzdrPVZB+jeK7RIUAdaeGKwCkzqE/rFUwmXbuDatQI1zRF0mezfdk6ub56p+oKFok93NKHThXgeG+TIwuEUrEycldZmDI/egZ/+5gYgTTmbX667OX7JlI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id ECAAF227A87; Tue,  4 Nov 2025 15:41:58 +0100 (CET)
+Date: Tue, 4 Nov 2025 15:41:58 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org, Keith Busch <keith.busch@wdc.com>,
+	Christoph Hellwig <hch@lst.de>, dm-devel@lists.linux.dev,
+	Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-scsi@vger.kernel.org, linux-xfs@vger.kernel.org,
+	Carlos Maiolino <cem@kernel.org>, linux-btrfs@vger.kernel.org,
+	David Sterba <dsterba@suse.com>
+Subject: Re: [PATCH v3 00/15] Introduce cached report zones
+Message-ID: <20251104144158.GA27416@lst.de>
+References: <20251104013147.913802-1-dlemoal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:718b:b0:945:cbd9:55cc with SMTP id
- ca18e2360f4ac-948229840a8mr2134810839f.15.1762266091838; Tue, 04 Nov 2025
- 06:21:31 -0800 (PST)
-Date: Tue, 04 Nov 2025 06:21:31 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <690a0beb.050a0220.98a6.00af.GAE@google.com>
-Subject: [syzbot] Monthly nbd report (Nov 2025)
-From: syzbot <syzbot+listc0bf6fe607a7f411a734@syzkaller.appspotmail.com>
-To: josef@toxicpanda.com, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, nbd@other.debian.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251104013147.913802-1-dlemoal@kernel.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-Hello nbd maintainers/developers,
+I just threw this into my xfstests setup, and it seems this version
+is broken somehow.  Running on emulated ZNS devices with XFS I get
+a lot of failures with warnings like this:
 
-This is a 31-day syzbot report for the nbd subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/nbd
+[   30.068652] XFS (nvme1n1): empty zone 1 has non-zero used counter (0x1).
 
-During the period, 1 new issues were detected and 0 were fixed.
-In total, 7 issues are still open and 8 have already been fixed.
+[   49.316873] XFS (nvme0n1): empty zone 2 has non-zero used counter (0x10).
 
-Some of the still happening issues:
-
-Ref Crashes Repro Title
-<1> 2373    Yes   possible deadlock in pcpu_alloc_noprof (2)
-                  https://syzkaller.appspot.com/bug?extid=91771b3fb86ec2dd7227
-<2> 339     Yes   INFO: task hung in nbd_queue_rq
-                  https://syzkaller.appspot.com/bug?extid=30c16035531e3248dcbc
-<3> 64      Yes   possible deadlock in nbd_queue_rq
-                  https://syzkaller.appspot.com/bug?extid=3dbc6142c85cc77eaf04
-<4> 4       Yes   KASAN: slab-use-after-free Write in recv_work (3)
-                  https://syzkaller.appspot.com/bug?extid=56fbf4c7ddf65e95c7cc
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+so it seems like it's not tracking WPs correctly, probably when using
+zone append and unmount/remounting.
