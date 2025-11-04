@@ -1,102 +1,186 @@
-Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C74C42C11EC;
-	Tue,  4 Nov 2025 06:50:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ED522FDC41
+	for <linux-block@vger.kernel.org>; Tue,  4 Nov 2025 07:00:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762239019; cv=none; b=MQnJ7wM8qYLc+91FfHk0Gt2ZXbqmb0YnYuj3CQPmoYoLpjnE59KAwnto1YK0UDT4DhltUcuXne47LMHpqRlsPocQb62C7fRvINNUB5kZSLTHOsjh36Njoo3maKu2XDqvf4g0UUpa6jmK7hEqtLOFVHYpXiGyx4gmx/Vqa20BrB8=
+	t=1762239620; cv=none; b=a/jZPWMc4zGdZBNNYjd51VZrmpispxGkbHvNDv6GIml6eQzGb89trnN9faQI3ZhnufeJgxfRNz5nWo2BEC8wn6rveg4JgpF8CvdpFjxMcNhC7YS2WbiJm5ubBALtL9zq7FWNqt578DRcidpAW7k/GNrV7iIJ+/pJY2ktoPr3AAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762239019; c=relaxed/simple;
-	bh=3590HN+g5RX4oDq7ek2ZvmoAVN56lGJ+5FZuZi6407o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kW2XswtUPrcQN2Y1Sel8Plu9u62JxfvCHgRcVNCB50mJCy1isGYdOjhdHqVN5f7MIrHzc9/vOTjkKv4XdG8S5nejIjv+j2TjFCvj0s4edQCyAdQ7FdrV6Ykf+z66p0CJ4SdqJbfH79YOo7KorwUbMp9hmaWW164haV5HqDbeQDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-Received: from localhost (mailhub4.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4d0zMS3Cgtz9sSm;
-	Tue,  4 Nov 2025 07:39:32 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JVa3bC_JehNO; Tue,  4 Nov 2025 07:39:32 +0100 (CET)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4d0zMS2Q1Zz9sSj;
-	Tue,  4 Nov 2025 07:39:32 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 409D08B76C;
-	Tue,  4 Nov 2025 07:39:32 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id CzfwR0aRXjyU; Tue,  4 Nov 2025 07:39:32 +0100 (CET)
-Received: from [192.168.235.99] (unknown [192.168.235.99])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id AD5B78B763;
-	Tue,  4 Nov 2025 07:39:30 +0100 (CET)
-Message-ID: <01d89f24-8fca-4fc3-9f48-79e28b9663db@csgroup.eu>
-Date: Tue, 4 Nov 2025 07:39:30 +0100
+	s=arc-20240116; t=1762239620; c=relaxed/simple;
+	bh=FGCfv80twEdU+R8XzVK1ejUCe8z8NADKArJeiCnBOKg=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:Mime-Version; b=bilE99y0h5lN7taQ2bGIIXNPS19f7nTy5xfrkXOANGWDbdptnYaIDX3xFyQWivsZkUpGZ8I5+ler9L3M93S9+bd7OV6dcV/n7DZzO1+/fXojW79BjHWQlh8gWqReq9K/vVF01ydLwkv6DnuvHRhDDRo7o1WttmlWLZrfj7dWf9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FbCgQvdu; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FbCgQvdu"
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-33be037cf73so5339379a91.2
+        for <linux-block@vger.kernel.org>; Mon, 03 Nov 2025 23:00:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762239615; x=1762844415; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:date
+         :cc:to:from:subject:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=f/FIOUr7S9hTEYtUjYatl+ZnZSEtRo87u/cEQk+2WP4=;
+        b=FbCgQvduY+kiMoBAfavdLJOETBVfGVgmUaKrOYa11on1jxXoPfqaBcw+U7TkdD5H4R
+         +GhT2Uz1LzAE3NsDLkwV/tE+Q6thVyn7Eh8heVZDp1kKM0HUPCClZ0r5Rtrj+Cdb6aNv
+         err+Wt91QKD09n0PMWpJzAhJAb+LdwmzzkMpOmqFul/l2rjjyj7U/gfSBsjSrXQpLH/g
+         MzJVmNS+3Ka5ArrnG9Bv8v3lL+blPMX3z54UDzrOu0XUl3Oplrfwu+CWSL+J0vwYHIMT
+         6wPg/FXcYJXYMQjd8G1HFQumxaEiK/QDDPgirOlvfTJYq+sDfjl0EbtBwcH7qp2xtPUY
+         Ihgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762239615; x=1762844415;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:date
+         :cc:to:from:subject:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=f/FIOUr7S9hTEYtUjYatl+ZnZSEtRo87u/cEQk+2WP4=;
+        b=pTQrlqT697ciIOrnnZo5ayhnnopE6FDVfGlFpvVKYQyTWT8X0hjScn9s88gBnHRc8h
+         it94X/s2JlQP8x0yBA5ZdlspOQYQ+F/33wuuIUBZs60UlancJH1ZTpZ7QwoxOVtGoDAH
+         Bfyniy162sB3px0fGB1ioXXkf2SMti08Sk5EOAQpEdwYBCauXJN+pnfanlQz2DTmIxrv
+         mywQekiEhSJgnyrTmdgvMnj0Q++Jul0PP8U6nPlr7TeLVUzfK0X2CyP6B/NO0Ko292SW
+         ic10j7ZMBzK3JBaxNy88Gg9WIAdnXHkuWMjbbz1qbD6ArlYUwRyYB+CsoLJU6RgMHA2h
+         V5Hg==
+X-Forwarded-Encrypted: i=1; AJvYcCXPicKg8PM555g6fUDGwvjdmxd5qujj4PHAyFh6/F/pfuz/xagwcmvw1ybjL2TsfPVnNx9NKPqz04Zr4w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJwGWHsDCQjTLNnAgbgsNXXQ90sXheB28/DE/FxwXUUWIrB0F3
+	Yy1qBHlHLb9bR+MB+Dr8vnYxmQAWSVHYIgHhAZy98b01wRmgT7P3tMM7
+X-Gm-Gg: ASbGncsm+sBGBALFavPc3li5zDMafdUPunHcwqI3K4gHhuvL7/VsTo8iFI63qP70drL
+	THOJ2WwW4li8mOpBhaudOn8Dimr+YpajpK3Mx97k2k5hdAfpz3nJAWaRZ6pe+3v+zvgGKM6qGYi
+	DtowERIwpSBFBBu9iG9cppqb2C+96K+/B9KKGeUBdfYQUSlruy9sKu+u8x4OCII0X4xc80cbJOz
+	GLkROSXdwTegU7N+wZE7Tm8aoGtD6JMa7qge6vdG77dnITrLY92xkOJxOsCbz8v7GcGmISLHkba
+	iEIOJYKtO0MU3+DltVqu7CIs1XpvVFmv3N+FFbWX5BQhYO3vm3ZvCZp8rTDBvW8W/yYdY/6V4fP
+	qTTkI/4lipIIvIKWqwIzCG+Z1Q0x5Dah632Krncq3xjYt3m6DRqGG0cQHdLoZTmwA3d5q40Zkg5
+	rPL00OkScMfRJ6aTORZzsdx3eKxCGIUVqmCiByVvH2inYpS09edg==
+X-Google-Smtp-Source: AGHT+IFswYKAZZGcmKubDw1Ut70XcdWnygbu/Nz8V8ZIBKgcbXyXjsFNYlrpqEz2UFnG6Imng1iP6Q==
+X-Received: by 2002:a17:90b:2783:b0:340:ff7d:c2e with SMTP id 98e67ed59e1d1-340ff7d105cmr10133442a91.29.1762239614970;
+        Mon, 03 Nov 2025 23:00:14 -0800 (PST)
+Received: from li-5d80d4cc-2782-11b2-a85c-bed59fe4c9e5.ibm.com ([129.41.58.6])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3415c4aa8a5sm3316460a91.13.2025.11.03.23.00.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Nov 2025 23:00:14 -0800 (PST)
+Message-ID: <f79ef55f5ec05400582dea69e7bc3f14f5a5d1f0.camel@gmail.com>
+Subject: Re: [PATCH 1/4] fs: replace FOP_DIO_PARALLEL_WRITE with a fmode bits
+From: "Nirjhar Roy (IBM)" <nirjhar.roy.lists@gmail.com>
+To: Christoph Hellwig <hch@lst.de>, Carlos Maiolino <cem@kernel.org>, 
+	Christian Brauner
+	 <brauner@kernel.org>
+Cc: Jan Kara <jack@suse.cz>, "Martin K. Petersen"
+ <martin.petersen@oracle.com>,  linux-kernel@vger.kernel.org,
+ linux-xfs@vger.kernel.org,  linux-fsdevel@vger.kernel.org,
+ linux-raid@vger.kernel.org,  linux-block@vger.kernel.org
+Date: Tue, 04 Nov 2025 12:30:06 +0530
+In-Reply-To: <20251029071537.1127397-2-hch@lst.de>
+References: <20251029071537.1127397-1-hch@lst.de>
+	 <20251029071537.1127397-2-hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-27.el8_10) 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 03/10] uaccess: Add
- masked_user_{read/write}_access_begin
-To: Thomas Gleixner <tglx@linutronix.de>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
- Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
- Darren Hart <dvhart@infradead.org>, Davidlohr Bueso <dave@stgolabs.net>,
- Andre Almeida <andrealmeid@igalia.com>,
- Andrew Morton <akpm@linux-foundation.org>, Eric Dumazet
- <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Dave Hansen <dave.hansen@linux.intel.com>,
- Madhavan Srinivasan <maddy@linux.ibm.com>,
- Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>
-Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org
-References: <cover.1760529207.git.christophe.leroy@csgroup.eu>
- <a4ef0a8e1659805c60fafc8d3b073ecd08117241.1760529207.git.christophe.leroy@csgroup.eu>
- <87bjlyyiii.ffs@tglx>
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-Content-Language: fr-FR
-In-Reply-To: <87bjlyyiii.ffs@tglx>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-
-
-Le 22/10/2025 à 19:05, Thomas Gleixner a écrit :
-> On Fri, Oct 17 2025 at 12:20, Christophe Leroy wrote:
->> Allthough masked_user_access_begin() is to only be used when reading
->> data from user at the moment, introduce masked_user_read_access_begin()
->> and masked_user_write_access_begin() in order to match
->> user_read_access_begin() and user_write_access_begin().
->>
->> That means masked_user_read_access_begin() is used when user memory is
->> exclusively read during the window, masked_user_write_access_begin()
->> is used when user memory is exclusively writen during the window,
->> masked_user_access_begin() remains and is used when both reads and
->> writes are performed during the open window. Each of them is expected
->> to be terminated by the matching user_read_access_end(),
->> user_write_access_end() and user_access_end().
->>
->> Have them default to masked_user_access_begin() when they are
->> not defined.
->>
->> Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+On Wed, 2025-10-29 at 08:15 +0100, Christoph Hellwig wrote:
+> To properly handle the direct to buffered I/O fallback for devices that
+> require stable writes, we need to be able to set the DIO_PARALLEL_WRITE
+> on a per-file basis and no statically for a given file_operations
+> instance.
+So, is the fallback configurable(like we can turn it on/off)? Looking at the code it seems like it
+is not. Any reason for not making it configurable?
+--NR
 > 
-> Can we please coordinate on that vs. the scoped_access() work as this
-> nicely collides all over the place?
+> This effectively reverts a part of 210a03c9d51a ("fs: claw back a few
+> FMODE_* bits").
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  fs/ext4/file.c      | 2 +-
+>  fs/xfs/xfs_file.c   | 4 ++--
+>  include/linux/fs.h  | 7 ++-----
+>  io_uring/io_uring.c | 2 +-
+>  4 files changed, 6 insertions(+), 9 deletions(-)
+> 
+> diff --git a/fs/ext4/file.c b/fs/ext4/file.c
+> index 7a8b30932189..b484e98b9c78 100644
+> --- a/fs/ext4/file.c
+> +++ b/fs/ext4/file.c
+> @@ -924,6 +924,7 @@ static int ext4_file_open(struct inode *inode, struct file *filp)
+>  		filp->f_mode |= FMODE_CAN_ATOMIC_WRITE;
+>  
+>  	filp->f_mode |= FMODE_NOWAIT | FMODE_CAN_ODIRECT;
+> +	filp->f_mode |= FMODE_DIO_PARALLEL_WRITE;
+>  	return dquot_file_open(inode, filp);
+>  }
+>  
+> @@ -978,7 +979,6 @@ const struct file_operations ext4_file_operations = {
+>  	.splice_write	= iter_file_splice_write,
+>  	.fallocate	= ext4_fallocate,
+>  	.fop_flags	= FOP_MMAP_SYNC | FOP_BUFFER_RASYNC |
+> -			  FOP_DIO_PARALLEL_WRITE |
+>  			  FOP_DONTCACHE,
+>  };
+>  
+> diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
+> index 2702fef2c90c..5703b6681b1d 100644
+> --- a/fs/xfs/xfs_file.c
+> +++ b/fs/xfs/xfs_file.c
+> @@ -1553,6 +1553,7 @@ xfs_file_open(
+>  	if (xfs_is_shutdown(XFS_M(inode->i_sb)))
+>  		return -EIO;
+>  	file->f_mode |= FMODE_NOWAIT | FMODE_CAN_ODIRECT;
+> +	file->f_mode |= FMODE_DIO_PARALLEL_WRITE;
+>  	if (xfs_get_atomic_write_min(XFS_I(inode)) > 0)
+>  		file->f_mode |= FMODE_CAN_ATOMIC_WRITE;
+>  	return generic_file_open(inode, file);
+> @@ -1951,8 +1952,7 @@ const struct file_operations xfs_file_operations = {
+>  	.fadvise	= xfs_file_fadvise,
+>  	.remap_file_range = xfs_file_remap_range,
+>  	.fop_flags	= FOP_MMAP_SYNC | FOP_BUFFER_RASYNC |
+> -			  FOP_BUFFER_WASYNC | FOP_DIO_PARALLEL_WRITE |
+> -			  FOP_DONTCACHE,
+> +			  FOP_BUFFER_WASYNC | FOP_DONTCACHE,
+>  };
+>  
+>  const struct file_operations xfs_dir_file_operations = {
+> diff --git a/include/linux/fs.h b/include/linux/fs.h
+> index c895146c1444..09b47effc55e 100644
+> --- a/include/linux/fs.h
+> +++ b/include/linux/fs.h
+> @@ -128,9 +128,8 @@ typedef int (dio_iodone_t)(struct kiocb *iocb, loff_t offset,
+>  #define FMODE_WRITE_RESTRICTED	((__force fmode_t)(1 << 6))
+>  /* File supports atomic writes */
+>  #define FMODE_CAN_ATOMIC_WRITE	((__force fmode_t)(1 << 7))
+> -
+> -/* FMODE_* bit 8 */
+> -
+> +/* Supports non-exclusive O_DIRECT writes from multiple threads */
+> +#define FMODE_DIO_PARALLEL_WRITE ((__force fmode_t)(1 << 8))
+>  /* 32bit hashes as llseek() offset (for directories) */
+>  #define FMODE_32BITHASH         ((__force fmode_t)(1 << 9))
+>  /* 64bit hashes as llseek() offset (for directories) */
+> @@ -2317,8 +2316,6 @@ struct file_operations {
+>  #define FOP_BUFFER_WASYNC	((__force fop_flags_t)(1 << 1))
+>  /* Supports synchronous page faults for mappings */
+>  #define FOP_MMAP_SYNC		((__force fop_flags_t)(1 << 2))
+> -/* Supports non-exclusive O_DIRECT writes from multiple threads */
+> -#define FOP_DIO_PARALLEL_WRITE	((__force fop_flags_t)(1 << 3))
+>  /* Contains huge pages */
+>  #define FOP_HUGE_PAGES		((__force fop_flags_t)(1 << 4))
+>  /* Treat loff_t as unsigned (e.g., /dev/mem) */
+> diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
+> index 296667ba712c..668937da27e8 100644
+> --- a/io_uring/io_uring.c
+> +++ b/io_uring/io_uring.c
+> @@ -469,7 +469,7 @@ static void io_prep_async_work(struct io_kiocb *req)
+>  
+>  		/* don't serialize this request if the fs doesn't need it */
+>  		if (should_hash && (req->file->f_flags & O_DIRECT) &&
+> -		    (req->file->f_op->fop_flags & FOP_DIO_PARALLEL_WRITE))
+> +		    (req->file->f_mode & FMODE_DIO_PARALLEL_WRITE))
+>  			should_hash = false;
+>  		if (should_hash || (ctx->flags & IORING_SETUP_IOPOLL))
+>  			io_wq_hash_work(&req->work, file_inode(req->file));
 
-Sure, I will rebase on top of your series.
-
-Once it is rebased, could you take the non powerpc patches in your tree ?
-
-Thanks
-Christophe
