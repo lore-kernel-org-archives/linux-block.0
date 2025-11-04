@@ -1,202 +1,161 @@
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D69CC23F429
-	for <linux-block@vger.kernel.org>; Tue,  4 Nov 2025 17:13:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04B6533BBBD
+	for <linux-block@vger.kernel.org>; Tue,  4 Nov 2025 17:55:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762276412; cv=none; b=jsq/x2tNLgcL9s2fQYiQlt5RuL62XcCSmVoJWetbMlCMOb2OSWh3AsmzYcXW3xUxocfcYIQTno+CEF9peXfABOtNoGQqQ8KKGJHCmZtWBH1el89JfphFxrpjoVt2qmTlHbohfVRUj+S2Ql2/iRPtw1CVxStggD3ePo7LuMdcIIA=
+	t=1762278933; cv=none; b=ZX1l25tVlNWkylKcYGExYIjjygS6oZV2hAgPFDpf8+DjmJezXCyFvSFGVx7Ao3CK4zBs8iI1jr3amisRCAsrur+ndJimvNY5IesC7m7xk+C8VQXm/QlGqLxuf2imcFCMlvTnRsYGycACAaNnDnBte6yc5CxJO6j7N105M2GozLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762276412; c=relaxed/simple;
-	bh=m1XkeAEKgnYB+1UGxur6dH6wOd+HzUrXUozfaL+/uQ4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=urD/NBukgRKFMl9DFhOeSk5yVg95+4lGdi+BdzyGWxI31M8NUugSWSs3aDf8gv0bjj8WtFKnE4jah98RKwHE01xyRxkCxzs1nLdgfo+n1vq+KflLqfWHpPxHtL2d63BIAKDGvi4l6RH0u/BoQU3x4d5Zl9YIDzH3gTXrlTb4tnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=acJyscNx; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1762278933; c=relaxed/simple;
+	bh=Uflt1BUm18HPLVV8TZr9Kk+KXTK7PClhqwMZjwCcEkY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=PNlPfJNORaRyOEwK3vs4HAPvG+mH8vl231TE+XOh71TWrTK97hxNL3SKFuttRB0w3D2elCz2TGBoIvN3+H8Nh4ED5xghcPB6CVQKtI6Zr99oehi+tB+LBGb/z6C2YUJzK0YdwSTJihoGEi12nPzOCmZjVVvxFlhOShFuh+FOptI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=1oGK9Wlw; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Mut4Kb+h; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=1oGK9Wlw; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Mut4Kb+h; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="acJyscNx"
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2958db8ae4fso28431905ad.2
-        for <linux-block@vger.kernel.org>; Tue, 04 Nov 2025 09:13:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762276410; x=1762881210; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=usbtFusXECf+ztp+zNDIhf2MMecxiC++PMfHrUtumrQ=;
-        b=acJyscNx1YvB+GtAkExmVtzeAcptRjQEGsQCayEOdRuLV7/0RcbB04/pqPyiRN2XtJ
-         Pcz+OmJtgJiO4CRBChWae0sdCs6iz+aN49E97+//aNQo66IBEdAEO3PuMxKUUN+aSPAm
-         NCdWzX1AKD+z8Ke03KqBm4toO2t/O1c/e/L/mzcmDGeFEVW/oTwbI9ArzOHPqjZXaBVB
-         gNYzPIPnD9v0XO7+goVMtBAz+yiZ1r8bzbb1LT9nf1ZE0s+ss/JQgFI/LCYrw5tG4u3t
-         AI2+Jby6Z6NDC7+uG5yar0OdoEYNQ8zzAzs4TU+ifGAeMTfcb5gJ52Ly/2T5+SShxshS
-         dUNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762276410; x=1762881210;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=usbtFusXECf+ztp+zNDIhf2MMecxiC++PMfHrUtumrQ=;
-        b=TK6IHY4c+XDqIwow7qrXvRxWRVx5U7cWRXS7hYis4t/dFoKoQe7bi8JOhwFTXyzNVO
-         4eH7HbYSl7qZPa/T9LMSRbndrlMTGZzNuYkjpehA6+qT71v2vMXxFJPseyB1KuKYaziw
-         BtFgVhM1sAd97pnGEc8RpkK9C9TfLQFRo8f/u0PW+0mjGWg5jHbgLd7fKcjKxBcT25Lt
-         qyY74eouhpOwh8ir8XYFQuY5j2xw8K0m0PSMqPO8MZdhAnqKg0kyGrFjjX9NDn/7TaQ/
-         GJSxfnQSobrEUiwF6ggOYyzTr9dAFtw5KZS4Qd6Be53q0jtyMeWg9GYsr93FrU+qtn+v
-         i2cA==
-X-Forwarded-Encrypted: i=1; AJvYcCVy6I0N1Xg1ZKCk6LHt0ff0Cu2S66g8riu/dcKGF0hEoGLR2CV0XleWscU0nb1TLCjgQwWvTJhSe0omog==@vger.kernel.org
-X-Gm-Message-State: AOJu0YztvXYQKEpxNmMyQmn8HWIHHZ+YkF5XE3zkt1gvGhyYHZqdQz3G
-	nBLN33tmopt0XKX3BW0+SpBlOtLdN/jObeSIfDLUUMnMGHtS4IENqmFc
-X-Gm-Gg: ASbGnctHhi/qimuJrgLnKoIxg08qjsN2g0vQyiBxg9Opm4lrH3/jBEE+PXtGbeFM08l
-	vCSMtj414c9LdHfBt5BfgPtcmPw0XsEgjd2xeYlQmMPoK6s57bg67i4otM3j4wvIZiNs/88LQbU
-	9zscZDvc5uHjaBUJ8EUAGRbVv3Wo/zLj0mDEw08gri79ADHITkVoOUkK4QLwZxLMBuzzeAUEQfr
-	iw/7yTLPqlTVToLGop/PhOAWmMyyuOCtwooCvjjTtjUhvF3el8grP3RBuQUhGR50ekPIyrWRK63
-	GleohVkvOKacMCyogUP+HIpZEeAiIxeJ2sChEHruCSE4UNjws/8O/hITKoQhXtoKQzyyTbtG3B9
-	EkO3clXS2FYY23OmPW61gAzOSTyiyad2gN2ZjBWg19ufwlm9+KPbP9uDlamt0170XVS3RfXgVxS
-	pp6V5YFHl3eQOqcc+XhAY=
-X-Google-Smtp-Source: AGHT+IHEPM6IeTHqwRglV3CNNPvXG1HRbfYSUDnDZvEYFFaMOFPrf9AoRvdMvHe2ekdTYstoOgW7Og==
-X-Received: by 2002:a17:903:3bc7:b0:295:bedb:8d7 with SMTP id d9443c01a7336-2962add071cmr4121695ad.48.1762276410092;
-        Tue, 04 Nov 2025 09:13:30 -0800 (PST)
-Received: from shankari-IdeaPad.. ([2409:408c:9413:f347:f0d6:3544:e27:d190])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-296019982c7sm32643875ad.25.2025.11.04.09.13.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Nov 2025 09:13:29 -0800 (PST)
-From: Shankari Anand <shankari.ak0208@gmail.com>
-To: Andreas Hindborg <a.hindborg@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Alex Gaynor <alex.gaynor@gmail.com>
-Cc: Boqun Feng <boqun.feng@gmail.com>,
-	Gary Guo <gary@garyguo.net>,
-	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
-	Benno Lossin <lossin@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Trevor Gross <tmgross@umich.edu>,
-	Danilo Krummrich <dakr@kernel.org>,
-	linux-block@vger.kernel.org,
-	rust-for-linux@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Shankari Anand <shankari.ak0208@gmail.com>
-Subject: Re:[PATCH v2] rust: block: update ARef and AlwaysRefCounted imports from sync::aref
-Date: Tue,  4 Nov 2025 22:43:16 +0530
-Message-Id: <20251104171316.6672-1-shankari.ak0208@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20251012142012.166230-1-shankari.ak0208@gmail.com>
-References: <20251012142012.166230-1-shankari.ak0208@gmail.com>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="1oGK9Wlw";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Mut4Kb+h";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="1oGK9Wlw";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Mut4Kb+h"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 1853121174;
+	Tue,  4 Nov 2025 17:55:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1762278930; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rHd2eFoirDazFmsA5WtLKtkEgeModSBKHWr5WI9janA=;
+	b=1oGK9WlwrBPSGNkB/1bZxsknUz91EFsK7rh1LgGEkGR/rpNzFKE1FkqhESnW6ilXwbMd3B
+	hin0iBlMLcoQjc9ZcxaqZqvFUmlAF49DqFm2tM7USm5Ce8jj7rnKmIAP8sriUKE9m1ZDUq
+	XdaOzvHsKKECSGiUScT67lgJW2BtI5s=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1762278930;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rHd2eFoirDazFmsA5WtLKtkEgeModSBKHWr5WI9janA=;
+	b=Mut4Kb+hFZqwDOeWHnJSXEaZBOqA3AnCP+fQPY6TgwB14Tg/3eGgddrWweoJAHdRa5FGiq
+	uGixNavXGYYft6Aw==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1762278930; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rHd2eFoirDazFmsA5WtLKtkEgeModSBKHWr5WI9janA=;
+	b=1oGK9WlwrBPSGNkB/1bZxsknUz91EFsK7rh1LgGEkGR/rpNzFKE1FkqhESnW6ilXwbMd3B
+	hin0iBlMLcoQjc9ZcxaqZqvFUmlAF49DqFm2tM7USm5Ce8jj7rnKmIAP8sriUKE9m1ZDUq
+	XdaOzvHsKKECSGiUScT67lgJW2BtI5s=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1762278930;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rHd2eFoirDazFmsA5WtLKtkEgeModSBKHWr5WI9janA=;
+	b=Mut4Kb+hFZqwDOeWHnJSXEaZBOqA3AnCP+fQPY6TgwB14Tg/3eGgddrWweoJAHdRa5FGiq
+	uGixNavXGYYft6Aw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 78841136D1;
+	Tue,  4 Nov 2025 17:55:29 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id fBHjGxE+Cmk9HgAAD6G6ig
+	(envelope-from <hare@suse.de>); Tue, 04 Nov 2025 17:55:29 +0000
+Message-ID: <d22ea013-76d9-4c61-a762-4afeed804557@suse.de>
+Date: Tue, 4 Nov 2025 18:53:48 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 01/15] block: handle zone management operations
+ completions
+To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+ Keith Busch <keith.busch@wdc.com>, Christoph Hellwig <hch@lst.de>,
+ dm-devel@lists.linux.dev, Mike Snitzer <snitzer@kernel.org>,
+ Mikulas Patocka <mpatocka@redhat.com>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ linux-scsi@vger.kernel.org, linux-xfs@vger.kernel.org,
+ Carlos Maiolino <cem@kernel.org>, linux-btrfs@vger.kernel.org,
+ David Sterba <dsterba@suse.com>
+References: <20251104013147.913802-1-dlemoal@kernel.org>
+ <20251104013147.913802-2-dlemoal@kernel.org>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20251104013147.913802-2-dlemoal@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-0.988];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_DN_SOME(0.00)[]
+X-Spam-Flag: NO
+X-Spam-Score: -4.30
 
-On Sun, Oct 12, 2025 at 07:50:12PM +0530, Shankari Anand wrote:
-> Update call sites in the block subsystem to import `ARef` and
-> `AlwaysRefCounted` from `sync::aref` instead of `types`.
+On 11/4/25 02:31, Damien Le Moal wrote:
+> The functions blk_zone_wplug_handle_reset_or_finish() and
+> blk_zone_wplug_handle_reset_all() both modify the zone write pointer
+> offset of zone write plugs that are the target of a reset, reset all or
+> finish zone management operation. However, these functions do this
+> modification before the BIO is executed. So if the zone operation fails,
+> the modified zone write pointer offsets become invalid.
 > 
-> This aligns with the ongoing effort to move `ARef` and
-> `AlwaysRefCounted` to sync.
+> Avoid this by modifying the zone write pointer offset of a zone write
+> plug that is the target of a zone management operation when the
+> operation completes. To do so, modify blk_zone_bio_endio() to call the
+> new function blk_zone_mgmt_bio_endio() which in turn calls the functions
+> blk_zone_reset_all_bio_endio(), blk_zone_reset_bio_endio() or
+> blk_zone_finish_bio_endio() depending on the operation of the completed
+> BIO, to modify a zone write plug write pointer offset accordingly.
+> These functions are called only if the BIO execution was successful.
 > 
-> Suggested-by: Benno Lossin <lossin@kernel.org>
-> Link: https://github.com/Rust-for-Linux/linux/issues/1173
-> Signed-off-by: Shankari Anand <shankari.ak0208@gmail.com>
+> Fixes: dd291d77cc90 ("block: Introduce zone write plugging")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 > ---
-> Changelog:
-> v1 -> v2:
-> Rebased it on top of the latest linux-next upstream commit
-> Dropped 1/7 from the subject as it might lead to confusion of it being a series
-> Link of v1: https://lore.kernel.org/lkml/20250716090712.809750-1-shankari.ak0208@gmail.com/
+>   block/blk-zoned.c | 139 ++++++++++++++++++++++++++++++----------------
+>   block/blk.h       |  14 +++++
+>   2 files changed, 104 insertions(+), 49 deletions(-)
 > 
-> The original patch of moving ARef and AlwaysRefCounted to sync::aref is here:
-> (commit 07dad44aa9a93)
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=07dad44aa9a93b16af19e8609a10b241c352b440
-> 
-> 
-> Gradually the re-export from types.rs will be eliminated in the
-> future cycle.
-> ---
->  
->  drivers/block/rnull/rnull.rs       | 3 +--
->  rust/kernel/block/mq.rs            | 5 ++---
->  rust/kernel/block/mq/operations.rs | 4 ++--
->  rust/kernel/block/mq/request.rs    | 8 ++++++--
->  4 files changed, 11 insertions(+), 9 deletions(-)
-> 
-> diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
-> index 1ec694d7f1a6..a9d5e575a2c4 100644
-> --- a/drivers/block/rnull/rnull.rs
-> +++ b/drivers/block/rnull/rnull.rs
-> @@ -17,8 +17,7 @@
->      error::Result,
->      pr_info,
->      prelude::*,
-> -    sync::Arc,
-> -    types::ARef,
-> +    sync::{aref::ARef, Arc},
->  };
->  use pin_init::PinInit;
->  
-> diff --git a/rust/kernel/block/mq.rs b/rust/kernel/block/mq.rs
-> index 637018ead0ab..1fd0d54dd549 100644
-> --- a/rust/kernel/block/mq.rs
-> +++ b/rust/kernel/block/mq.rs
-> @@ -20,7 +20,7 @@
->  //! The kernel will interface with the block device driver by calling the method
->  //! implementations of the `Operations` trait.
->  //!
-> -//! IO requests are passed to the driver as [`kernel::types::ARef<Request>`]
-> +//! IO requests are passed to the driver as [`kernel::sync::aref::ARef<Request>`]
->  //! instances. The `Request` type is a wrapper around the C `struct request`.
->  //! The driver must mark end of processing by calling one of the
->  //! `Request::end`, methods. Failure to do so can lead to deadlock or timeout
-> @@ -61,8 +61,7 @@
->  //!     block::mq::*,
->  //!     new_mutex,
->  //!     prelude::*,
-> -//!     sync::{Arc, Mutex},
-> -//!     types::{ARef, ForeignOwnable},
-> +//!     sync::{aref::ARef, Arc, Mutex},
->  //! };
->  //!
->  //! struct MyBlkDevice;
-> diff --git a/rust/kernel/block/mq/operations.rs b/rust/kernel/block/mq/operations.rs
-> index f91a1719886c..8ad46129a52c 100644
-> --- a/rust/kernel/block/mq/operations.rs
-> +++ b/rust/kernel/block/mq/operations.rs
-> @@ -9,8 +9,8 @@
->      block::mq::{request::RequestDataWrapper, Request},
->      error::{from_result, Result},
->      prelude::*,
-> -    sync::Refcount,
-> -    types::{ARef, ForeignOwnable},
-> +    sync::{aref::ARef, Refcount},
-> +    types::ForeignOwnable,
->  };
->  use core::marker::PhantomData;
->  
-> diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
-> index c5f1f6b1ccfb..ce3e30c81cb5 100644
-> --- a/rust/kernel/block/mq/request.rs
-> +++ b/rust/kernel/block/mq/request.rs
-> @@ -8,8 +8,12 @@
->      bindings,
->      block::mq::Operations,
->      error::Result,
-> -    sync::{atomic::Relaxed, Refcount},
-> -    types::{ARef, AlwaysRefCounted, Opaque},
-> +    sync::{
-> +        aref::{ARef, AlwaysRefCounted},
-> +        atomic::Relaxed,
-> +        Refcount,
-> +    },
-> +    types::Opaque,
->  };
->  use core::{marker::PhantomData, ptr::NonNull};
-> 
-> base-commit: 2b763d4652393c90eaa771a5164502ec9dd965ae 
-> -- 
-> 2.34.1
-> 
-Hello, can this patch be reviewed?
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-Thanks,
-Shankari
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
