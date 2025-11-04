@@ -1,65 +1,33 @@
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43CDB1B7F4
-	for <linux-block@vger.kernel.org>; Tue,  4 Nov 2025 19:47:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5D722EA169;
+	Tue,  4 Nov 2025 20:13:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762285636; cv=none; b=KFKMh028g7su7iJFNM1aa7LKvvDORU9SiLxxAfhcx9BWY2WwmUirmH4cvkUvYaERNFig8xbLDrg+jUICK5/B5zZA/IRWx6eMya/ANyRqEPBmzA/e9ZHEwPcPV/L8OGFvrUfO5o2pmWCrfDh3LJNKhjciS+0jYW0HUPI8kHHusLk=
+	t=1762287229; cv=none; b=AoaFgyRcc6oJ8oJH8JalL8Jq3X8/kdyz2zFv/1IS0CVJRDYA1B5Ryjn82J7+lGDWB0vWvsEWNUuVAND9Kly0K/NOppqSB77gxPz4B5ZzPY3HMLUtnjUN7FFE35PC56WPNnKsVVOYaeRYrkbEOsDtQyENhc3wve0HONXMEejrhCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762285636; c=relaxed/simple;
-	bh=uzLFSAFtoaqYt4qKlJdghnAueSiTe1iEVYtNChPk7mc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lqa1Q+GifHciVnwg43LVBrKQUE+pv16qL8v0/ZI3bGbadD/pIPWragywpBRrt3CTnvZSFPqsGtDEmw9I7aHm3BjFVnWmmgn5FMB0VGIIS0dte4zRs1h8psWFbtxDf52+3EvC4jq0agk43uJ9FexqlgZWu+4HgUCjIeuwHcFKUoc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ccxu29Dt; arc=none smtp.client-ip=209.85.166.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1762287229; c=relaxed/simple;
+	bh=3FSJqyPE1Vqo06Q/AoUzipo9gS2M6q2r8A7ZJUYYuF4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=cMDC9bhrtvDO0aCT6mPPzTDasjBx25F+SNQidNLLndFh3Lp6ksTEM7gCgqB1g1qhJJB3D75IPxKyPn23RQ1FUKPGWTbBmw7RcVekGlFwkILAvnPvVCc8ouBVj3Al1LtGv8r2hqyjKSt2BwvX2HR/VWCZJtrs5RemEMd9zYeIzeY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CJbwQVBE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ccxu29Dt"
-Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-4330eb0f232so849775ab.0
-        for <linux-block@vger.kernel.org>; Tue, 04 Nov 2025 11:47:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1762285631; x=1762890431; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=iKRAQuqoax81Pv7uca8UK+pqJYsXqiySO+8521Beqbk=;
-        b=ccxu29DtfLmjNcL2l0CaA9GA0BqRzi/KlL1X/gXHumufb8kZOTxCons+9KZQqOmgd9
-         rnA6LPbRZwRgH+n56Kfjv4an6K1YhcRU0NoOrXbDHvIrgcd1DU4I+eoIPS2XUMbkrtdg
-         XACoJlOLd2ZoI9RHnmmcarA3g6x/1L1dvkBXUcUCrPnwxrBsy+hFYlLqUVx71sNJHlkk
-         qHwr2f0YLx0rN3Mk3ZhlhVZXTUcgKSf6z4Nf/xsxYjoFt2IfYgdIAFL1gNM1AGfZF7EB
-         jsV6nYaieTzqlVdGFeSlw2s7pSA5mGKtGqF5z2hzbYSg0fryXszq2ikhde9btz6KmHpW
-         6aYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762285631; x=1762890431;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iKRAQuqoax81Pv7uca8UK+pqJYsXqiySO+8521Beqbk=;
-        b=qfqvxSHhhcc2f7SOXxCbgHMlyr60RXEyuYKjakvjavWkHVk6HvaDNKg71hngl5JMaA
-         j2grEIimHcyzh+a74we8kT3jf5zYWNv4cmCt8NtyoxscoJXmNKYxf+qqpX8HhoR36dr7
-         lGZsv5OF/wGnwOMWbbSfEKlxxgeCKw74Nn0TvsqeDgehBTDSDk5E/IXVWc9JOruvhjyv
-         GCsjw7boBW2kFiiZGQQRp3MxrA0ce2Gw0jDu4Wf1My7RlvIZ+Gz0J+BA7dRceZm381oc
-         uvghYlk3k41Afy14SPTfsnh/qyVdv16RCslFcT4RLcMb2lUmRe8AtftIZycUVDLsprNM
-         eRUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW56v6c7bx8Nnv4ITltVj1x3B2tKxdaHAQe3NChrixyprpMClTf9NPUbYBH3oT7bbzArCzQ5mxVJM02Mw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzCYTZtN7me3g4X5fZwfmP/q0EMVEacfbyS/lCI29d4EQbr0DHK
-	7XZeATHd7Zug3Mo9L2YgxF0c6c4wQ5sbYLIGOadiW13GNZ5XgXowjrj4tbpwyLZzd/c=
-X-Gm-Gg: ASbGncsk4eRsOoHZxz4y65YSccsyrcSAs8qbfSGzlMFsNHVlotAA7wGWJyZZETKR/8E
-	q46VLlcajN/t1EBbveQcOnTZMMmuSf9hukQhvkgXnkBs8jB2LHIIz4dQJ32lVWtpPnFccx3nOkc
-	DtkFh+sbY3NZAQcxh20JKQyAnNy1/UVmn0jPE+h761jZD0P08ou422oWT2CSvR7HWnCXF+EAjrQ
-	F8KdRyM4sjN8uYO4bh/xNOx2G9zDOm1VyfZedTJIZP4XA1kG4n643KZVP43WLNKsV4JTYwJ6YlA
-	vjb0CcDjo1WB37SqGhI0XTcNzI5qq0guuhafTSruMM5ItmtDV4Emlb/Oqp9DuX+h+LC1uRN+BFo
-	ppMoMLadMdsfJVAB25uAdnywHcKOKWUSg1aDaMqIA6yhM2HtU2Lf158a3ASB+oM8pUfd+GWJ2
-X-Google-Smtp-Source: AGHT+IE0WbdJ7Csn5G1aeZNBQJZljKZdfhOIN6zZEuCeCH4z1Yeo0uHog6L1nj217+OD/ojOIMkn7g==
-X-Received: by 2002:a05:6e02:480a:b0:430:af6a:de13 with SMTP id e9e14a558f8ab-433377fbdebmr61885145ab.2.1762285631299;
-        Tue, 04 Nov 2025 11:47:11 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5b72258d881sm1583654173.7.2025.11.04.11.47.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Nov 2025 11:47:10 -0800 (PST)
-Message-ID: <afe10b17-245b-4b21-81ee-ff5589a7ca47@kernel.dk>
-Date: Tue, 4 Nov 2025 12:47:09 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CJbwQVBE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A74D6C4CEF7;
+	Tue,  4 Nov 2025 20:13:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762287229;
+	bh=3FSJqyPE1Vqo06Q/AoUzipo9gS2M6q2r8A7ZJUYYuF4=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=CJbwQVBE1D1MYm990XnLqqMuyjhnCCOdAlu+z03qAX2ImU+84t4gZezs53Dzn9YpY
+	 xtvwjMHu+8X7lnYZ7JH4Pylbx4OxU+wk7qFyH49pRSdzAPUohWE2+gx1CkiP48JcWA
+	 mnW2fbmijTHwh06o/88J4zyBfAaWNyvd7glFfXqzL0ir7Ks5RBywi418cZ1gnuwbTq
+	 wppFtkGUZqi82Yt8ZyH+IqGRrBTo8wU4a2GROfbtr/EK6jMSAgdty7FmdAiDrAR2fM
+	 g7o35wTbh4g/MsecHVA5qC90s2DhjfjjHF23pfL29BWk6AO7AJmXaPL94b6x2Yg39y
+	 uSGT2Lsjtq+xw==
+Message-ID: <da7e8c3e-49fe-49bd-9642-3b0ae67a3503@kernel.org>
+Date: Wed, 5 Nov 2025 05:13:45 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -67,43 +35,52 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: make block layer auto-PI deadlock safe v3
-To: Christoph Hellwig <hch@lst.de>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
- linux-block@vger.kernel.org
-References: <20251103101653.2083310-1-hch@lst.de>
+Subject: Re: [PATCH v3 11/15] block: introduce BLKREPORTZONESV2 ioctl
+To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+ Keith Busch <keith.busch@wdc.com>, Christoph Hellwig <hch@lst.de>,
+ dm-devel@lists.linux.dev, Mike Snitzer <snitzer@kernel.org>,
+ Mikulas Patocka <mpatocka@redhat.com>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ linux-scsi@vger.kernel.org, linux-xfs@vger.kernel.org,
+ Carlos Maiolino <cem@kernel.org>, linux-btrfs@vger.kernel.org,
+ David Sterba <dsterba@suse.com>
+References: <20251104013147.913802-1-dlemoal@kernel.org>
+ <20251104013147.913802-12-dlemoal@kernel.org>
+ <0cb7eefb-4501-47e8-805f-6e8737ca6bb5@acm.org>
 Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20251103101653.2083310-1-hch@lst.de>
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <0cb7eefb-4501-47e8-805f-6e8737ca6bb5@acm.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 11/3/25 3:16 AM, Christoph Hellwig wrote:
-> Hi all,
+On 11/5/25 04:00, Bart Van Assche wrote:
+> On 11/3/25 5:31 PM, Damien Le Moal wrote:
+>> - * @BLKREPORTZONE: Get zone information. Takes a zone report as argument.
+>> - *                 The zone report will start from the zone containing the
+>> - *                 sector specified in the report request structure.
+>> + * @BLKREPORTZONE: Get zone information from a zoned device. Takes a zone report
+>> + *		   as argument. The zone report will start from the zone
+>> + *		   containing the sector specified in struct blk_zone_report.
+>> + *		   The flags field of struct blk_zone_report is used as an
+>> + *		   output only and ignored as an input.
+>> + *		   DEPRECATED, use BLKREPORTZONEV2 instead.
+>> + * @BLKREPORTZONEV2: Same as @BLKREPORTZONE but uses the flags field of
+>> + *		     struct blk_zone_report as an input, allowing to get a zone
+>> + *		     report using cached zone information if BLK_ZONE_REP_CACHED
+>> + *		     is set.
 > 
-> currently the automatic block layer PI generation allocates the integrity
-> buffer using kmalloc, and thus could deadlock, or fail I/O request due
-> to memory pressure.
-> 
-> Fix this by adding a mempool, and capping the maximum I/O size on PI
-> capable devices to not exceed the allocation size of the mempool.
-> 
-> This is against the block-6.18 branch as it has a contextual dependency
-> on the PI fix merged there yesterday.
+> Was it promised to add information in the above comment about the 
+> differences in accuracy between the two ioctls? See also
+> https://lore.kernel.org/linux-block/97535dde-5902-4f2f-951c-3470d26158da@kernel.org/
 
-Yesterday? Guessing this got copy/pasted from the v1 posting, as it must
-be this one:
+As I said, I did. See the comments with the BLK_ZONE_COND_ACTIVE condition.
+If you think that is not enough, I can cross reference tht in the comment for
+BLKREPORTZONEV2.
 
-commit 4c8cf6bd28d6fea23819f082ddc8063fd6fa963a (tag: block-6.18-20251023)
-Author: Christoph Hellwig <hch@lst.de>
-Date:   Wed Oct 22 10:33:31 2025 +0200
 
-    block: require LBA dma_alignment when using PI
-
-which is a bit longer ago.
-
-But why? Surely this is 6.19 material?
 
 -- 
-Jens Axboe
-
+Damien Le Moal
+Western Digital Research
