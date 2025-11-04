@@ -1,126 +1,110 @@
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from wxsgout04.xfusion.com (wxsgout04.xfusion.com [36.139.87.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2486514E2E2
-	for <linux-block@vger.kernel.org>; Tue,  4 Nov 2025 12:33:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC5051DA55;
+	Tue,  4 Nov 2025 12:35:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=36.139.87.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762259625; cv=none; b=GvZMfB7rWl83UmR2eZFxVC8cjwLrNJiekxsp8VfQWF2SThu/vM27ZZm84bQTAlI5cnWnNlS4WGzpmU53GyI0XETJFTYOYzdqvkovDFWKFoEmssKHLg9IdUJahut+MFNG5Z0wHlElOFoL31g8xZ2PR7g9Ko9F1M+ABXaWAY8gZ8M=
+	t=1762259722; cv=none; b=qH9oURW3XboVe1IOpVHboGjU6PF7OgWGA5y7OHWXDX1LpRGklPnnlqmMizPrjXT6yVE6NsEZml5HMzHPM4PICaz8hB6P2pUd12pyXT9fk33PwAgjdqeIhEwUS4XfCAWZ4cInn0fYREsF88O0y/5qopMUjdMnuHY6dgRxz4bGaa0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762259625; c=relaxed/simple;
-	bh=PVG/u/rBRJtGXc7icffonY7sSvjL0w8UC+NsDC4RqhA=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:Mime-Version; b=rWtxHEtmwGsw3adVy+84GB0EomyUgD4vAlJSO0uCIjCN8IKfoSZ3OP2QWXSUKwYRP0okdBNK5RH5NMT3VzwhbZx3UqfjzfGb3nzzdc7h8HFJv7ikHePmSA9sTdCy8QrqSx5I6yqZj+IPDV0Ixn5s7o5HJU996lV31ogrP2KNcTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gV7J1MhR; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gV7J1MhR"
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-294df925292so49515775ad.1
-        for <linux-block@vger.kernel.org>; Tue, 04 Nov 2025 04:33:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762259623; x=1762864423; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:date
-         :cc:to:from:subject:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=iRHHdJQM2gcBeM06136CQSgxSJ3eclLtWip34bcWYH4=;
-        b=gV7J1MhRmn62F5zM9AFF5163CxrhGjqCIvlisytWIbGoMhUdo8L0WHCJCAEjTHNKJR
-         wdtLGJdQJLDRGL4uTiaZsH5OIkBE04KlizY5y8mb81o5v5J/HJb1GgvCyhspkzhXO0Ko
-         HLlYZBNyOWNyC8EKfQQhdsvolw1Vq6AePzTCIT34DnRkVR9ZQT090KCtGTTceC19x8M1
-         amUhZ7PwnGdaQtpe5AO6A+XqSKZY09RGwRPrfQB4fuMc6wXkh1jlmywVMwwE3ZWTtBaf
-         oZ/8Lz0QDKwWIhkzPvrv7njY08lt+GNV2k2xHxqeAgt0aqS4c6qOqR/hx/mHhYfeztu3
-         dsuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762259623; x=1762864423;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:date
-         :cc:to:from:subject:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=iRHHdJQM2gcBeM06136CQSgxSJ3eclLtWip34bcWYH4=;
-        b=OKUyOyjjUGIej4BfWevrENFTwBJ0qBNEjYMSk2KrgE+NBHyxXmw5wp2RHBcfmhstll
-         /hjAagc92j1xT3R0yyszc0gTmWptsMbwjknkE6i37MIo5vFzk+HB7PYsfsb2Ll0oOhgM
-         EbgAYDs8AaipVwBSFp3SRzC6KN2U9DH9jHx0iNWq6RiOoubMkXl/dC5W9ZBrHZvpXGbm
-         jqX0ZjKYztiBYudY4fl7Efr3hgteafK5KJodCp+gIKYn6qBk25hCz+mx660je63m9LRH
-         6o94tgTuCUZOztHtT16s5QtJPq8v6V73l66ByTZdm684/rbtDqLy1IqhYjopMMzLGl5y
-         YaFw==
-X-Forwarded-Encrypted: i=1; AJvYcCX5839ETRwhOZULXOWRa+uAxhqm6NLRs41EYEb9pNE9om5WTfdHxeoqW7udpVnyLDiACuo3AVuqLAo2lQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxY2pHwMJ92M7IZxJyB+y7cfD603BS3J++TNBkTOMq7MEH7qNvL
-	Dd0+kpwIKZe0c1/IfbQb7VAi8iEVCHFThdxTM31cENj3ibqgrcjSowBt
-X-Gm-Gg: ASbGncuu/bml0hsc0nLmJ6d7e6107Ers4DfhRPczvdH+1MLlY8OeqdLJ5+flUUJbfdZ
-	MDn4jSMj67XmnVX/FqT9WnqPYrIIBEhOdN3/Uz9j4dNxPNPu+tz8gOupvPANwJEw2+qiVJ+GCeG
-	eE3w3AL0Cb5GW1ikKXg2H72I8E4aBDPE5pdY6neYDtGJBR8vZgIKwfI4L7mqwEppI2+/0q3tHLt
-	FEqaVhtE6+uBITkwAo5+UCdxMZyqOmiUYoGlpe8RmbPppYOnJrb4NVJWsV+jBM9ZvZbsfKXnJTJ
-	6RoKpmqdGfN7ybeU+ltsBFRcVg1LNwS5JVMzUnYNyFYJMaXPKjh98HFDjTgUmfEvtvwrTNvRdO6
-	J93Zxju5q+glURLIsQ/NMX9EY9oq8dPmRgVmFQerVPAJoukJp/2puIQoZ31rtWnycLnx84fl9sx
-	lLHvCpaJU2bz8+HOY2AWfMpBwJRDNjIiQSTrBUQ19JMERXVeZ/NunTQg==
-X-Google-Smtp-Source: AGHT+IFcDWr3KBlNMXeLNPkyZZOa63IpUuqeGF/O+KRb8PWkuF5qhGuak3PkMEe642XnoKQJ5ppqRw==
-X-Received: by 2002:a17:902:da8b:b0:295:2cb6:f498 with SMTP id d9443c01a7336-2952cb6f55emr159576605ad.7.1762259623021;
-        Tue, 04 Nov 2025 04:33:43 -0800 (PST)
-Received: from li-5d80d4cc-2782-11b2-a85c-bed59fe4c9e5.ibm.com ([49.207.200.106])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29601a5d181sm26106575ad.85.2025.11.04.04.33.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Nov 2025 04:33:40 -0800 (PST)
-Message-ID: <a162ddcbd8c73adf43c7c64179db06ce60b087d6.camel@gmail.com>
-Subject: Re: [PATCH 3/4] xfs: use IOCB_DONTCACHE when falling back to
- buffered writes
-From: "Nirjhar Roy (IBM)" <nirjhar.roy.lists@gmail.com>
-To: Christoph Hellwig <hch@lst.de>, Carlos Maiolino <cem@kernel.org>, 
-	Christian Brauner
-	 <brauner@kernel.org>
-Cc: Jan Kara <jack@suse.cz>, "Martin K. Petersen"
- <martin.petersen@oracle.com>,  linux-kernel@vger.kernel.org,
- linux-xfs@vger.kernel.org,  linux-fsdevel@vger.kernel.org,
- linux-raid@vger.kernel.org,  linux-block@vger.kernel.org
-Date: Tue, 04 Nov 2025 18:03:35 +0530
-In-Reply-To: <20251029071537.1127397-4-hch@lst.de>
-References: <20251029071537.1127397-1-hch@lst.de>
-	 <20251029071537.1127397-4-hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-27.el8_10) 
+	s=arc-20240116; t=1762259722; c=relaxed/simple;
+	bh=ie0gj8wY77Jlfqx4kJJF+9LMvcIjxzq8ymFXAV6j3Cs=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UR5WL/k3QfK0DH/8Df6voM/Vbp86RXPVUlBwQCht6GlnmbTTSPLcDoHoAesnylXzFetvCKhsKmn+Kncs295hhp71JcCX878ow1PDADrYXMv+pIqhPz08EA+aCDX2JD/Zc7A/SzrSvBynC7QNGcPu3G/VFYYr1/2BQBE3BaiTuTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xfusion.com; spf=pass smtp.mailfrom=xfusion.com; arc=none smtp.client-ip=36.139.87.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xfusion.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xfusion.com
+Received: from wuxpheds03048.xfusion.com (unknown [10.32.143.30])
+	by wxsgout04.xfusion.com (SkyGuard) with ESMTPS id 4d17C21LX5zB4n5C;
+	Tue,  4 Nov 2025 20:32:46 +0800 (CST)
+Received: from DESKTOP-Q8I2N5U.xfusion.com (10.82.130.100) by
+ wuxpheds03048.xfusion.com (10.32.143.30) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_RSA_WITH_AES_128_CBC_SHA256) id 15.2.2562.20;
+ Tue, 4 Nov 2025 20:35:14 +0800
+From: shechenglong <shechenglong@xfusion.com>
+To: <hch@infradead.org>, <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<stone.xulei@xfusion.com>, <chenjialong@xfusion.com>, shechenglong
+	<shechenglong@xfusion.com>, Chaitanya Kulkarni <kch@nvidia.com>
+Subject: [PATCH v2 1/1] block: fix typos in comments and strings in blk-core
+Date: Tue, 4 Nov 2025 20:35:00 +0800
+Message-ID: <20251104123500.1330-2-shechenglong@xfusion.com>
+X-Mailer: git-send-email 2.38.0.windows.1
+In-Reply-To: <20251104123500.1330-1-shechenglong@xfusion.com>
+References: <aQneZipPwoRsoeeA@infradead.org>
+ <20251104123500.1330-1-shechenglong@xfusion.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: wuxpheds03048.xfusion.com (10.32.143.30) To
+ wuxpheds03048.xfusion.com (10.32.143.30)
 
-On Wed, 2025-10-29 at 08:15 +0100, Christoph Hellwig wrote:
-> Doing sub-block direct writes to COW inodes is not supported by XFS,
-> because new blocks need to be allocated as a whole.  Such writes
-Okay, since allocation of new blocks involves whole lot of metatdata updates/transactions etc and
-that would consume a lot of time and in this large window the user buffer(for direct I/O) can be re-
-used/freed which would cause corruptions?
-Just thinking out loud: What if we supported sub-block direct IO in XFS and indeed allocated new
-blocks+ update the metadata structures and then directly write the user data to the newly allocated
-blocks instead of using the page cache? Assuming the application doesn't modify the user data buffer
-- can we (at least theoritically) do such kind of sub-block DIO?
---NR
-> fall back to buffered I/O, and really should be using the
-> IOCB_DONTCACHE that didn't exist when the code was added to mimic
-Just curious: How was it mimiced? 
-> direct I/O semantics as closely as possible.  Also clear the
-> IOCB_DIRECT flags so that later code can't get confused by it being
-> set for something that at this point is not a direct I/O operation
-> any more.
-This makes sense to me.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  fs/xfs/xfs_file.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
-> index 5703b6681b1d..e09ae86e118e 100644
-> --- a/fs/xfs/xfs_file.c
-> +++ b/fs/xfs/xfs_file.c
-> @@ -1119,6 +1119,9 @@ xfs_file_write_iter(
->  		ret = xfs_file_dio_write(iocb, from);
->  		if (ret != -ENOTBLK)
->  			return ret;
-> +
-> +		iocb->ki_flags &= ~IOCB_DIRECT;
-> +		iocb->ki_flags |= IOCB_DONTCACHE;
->  	}
->  
->  	if (xfs_is_zoned_inode(ip))
+This patch fixes multiple spelling mistakes in comments and documentation
+in the file block/blk-core.c.
+
+No functional changes intended.
+
+Suggested-by: Christoph Hellwig <hch@infradead.org>
+Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+Signed-off-by: shechenglong <shechenglong@xfusion.com>
+---
+ block/blk-core.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 14ae73eebe0d..8387fe50ea15 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -662,13 +662,13 @@ static void __submit_bio(struct bio *bio)
+  *    bio_list of new bios to be added.  ->submit_bio() may indeed add some more
+  *    bios through a recursive call to submit_bio_noacct.  If it did, we find a
+  *    non-NULL value in bio_list and re-enter the loop from the top.
+- *  - In this case we really did just take the bio of the top of the list (no
++ *  - In this case we really did just take the bio off the top of the list (no
+  *    pretending) and so remove it from bio_list, and call into ->submit_bio()
+  *    again.
+  *
+  * bio_list_on_stack[0] contains bios submitted by the current ->submit_bio.
+  * bio_list_on_stack[1] contains bios that were submitted before the current
+- *	->submit_bio, but that haven't been processed yet.
++ *	->submit_bio(), but that haven't been processed yet.
+  */
+ static void __submit_bio_noacct(struct bio *bio)
+ {
+@@ -743,8 +743,8 @@ void submit_bio_noacct_nocheck(struct bio *bio, bool split)
+ 	/*
+ 	 * We only want one ->submit_bio to be active at a time, else stack
+ 	 * usage with stacked devices could be a problem.  Use current->bio_list
+-	 * to collect a list of requests submited by a ->submit_bio method while
+-	 * it is active, and then process them after it returned.
++	 * to collect a list of requests submitted by a ->submit_bio method
++	 * while it is active, and then process them after it returned.
+ 	 */
+ 	if (current->bio_list) {
+ 		if (split)
+@@ -901,7 +901,7 @@ static void bio_set_ioprio(struct bio *bio)
+  *
+  * submit_bio() is used to submit I/O requests to block devices.  It is passed a
+  * fully set up &struct bio that describes the I/O that needs to be done.  The
+- * bio will be send to the device described by the bi_bdev field.
++ * bio will be sent to the device described by the bi_bdev field.
+  *
+  * The success/failure status of the request, along with notification of
+  * completion, is delivered asynchronously through the ->bi_end_io() callback
+@@ -991,7 +991,7 @@ int iocb_bio_iopoll(struct kiocb *kiocb, struct io_comp_batch *iob,
+ 	 * point to a freshly allocated bio at this point.  If that happens
+ 	 * we have a few cases to consider:
+ 	 *
+-	 *  1) the bio is beeing initialized and bi_bdev is NULL.  We can just
++	 *  1) the bio is being initialized and bi_bdev is NULL.  We can just
+ 	 *     simply nothing in this case
+ 	 *  2) the bio points to a not poll enabled device.  bio_poll will catch
+ 	 *     this and return 0
+-- 
+2.33.0
 
