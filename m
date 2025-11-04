@@ -1,62 +1,109 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 176BC2E3373;
-	Tue,  4 Nov 2025 12:03:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 545E82EC56F
+	for <linux-block@vger.kernel.org>; Tue,  4 Nov 2025 12:04:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762257796; cv=none; b=aow9LAiknrbEPDyqf9BtndFGtGwaNHNUVlFMItVZ16L+I5HijmxLLPkxdYGfunBgFM+QDtiiwkaGTQZA/19eVlEi+qsallHuzPNDOuTX/nDd47Ykv4IwYtfd5UEhEb5kpXBHHvAmVViji3ZWBWQyEM5+L7c2BSavXbr40oDcGDU=
+	t=1762257898; cv=none; b=Gm4fsaMh9Cbz+aPbGchHpb+2Tw62ElUAHN77z3ZeEn2Tutnx0KeooZMyDMXv7EJZo1F6yFQN0TAsl6u1ZwsqB5bfq8QfzPmCFEsKb0Sd8aEB3Msi5XiLAkjHOSRqUpf75qp9VgVan0EEFf37FxdhmjijxM7HCtgrWeYldll+ogQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762257796; c=relaxed/simple;
-	bh=QS40qdRp3eQcP2yb01uL6R/pw61ly5auhn8DQ2oVhbM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ixqWDPV83oE76DNFow1S8MGPbZ3J5zXq47rt1sSn/smegodm3HjLm9R9NJKvwBTk1Mn6yILTRVOn+Y/5mlxU15QoVfWUjp/IeI5JKkbX5TZlSGwQST2fgLseFqtkeZ10TApUQmkS7eQ3/VACp+Ab7qVa53QUKnhOIeynW4wRHtk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id AA5B6227A88; Tue,  4 Nov 2025 13:03:09 +0100 (CET)
-Date: Tue, 4 Nov 2025 13:03:09 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	Christoph Hellwig <hch@lst.de>,
-	"dm-devel@lists.linux.dev" <dm-devel@lists.linux.dev>,
-	Mike Snitzer <snitzer@kernel.org>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	"linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-	Carlos Maiolino <cem@kernel.org>,
-	"linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-	David Sterba <dsterba@suse.com>,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH 07/13] block: track zone conditions
-Message-ID: <20251104120309.GA16283@lst.de>
-References: <20251031061307.185513-1-dlemoal@kernel.org> <20251031061307.185513-8-dlemoal@kernel.org> <40c87475-7d5a-4792-b2a6-3eeb8406f9be@acm.org> <93215b7c-80bd-4860-8a77-42cdd4db1ec6@kernel.org> <95c729d6-fd73-4480-af1c-68075b31cd1d@acm.org> <6008fbc8-b556-46d9-98a5-a4622731d206@nvidia.com> <83b60505-64a4-40fe-aa50-02a56ca7ad8c@kernel.org>
+	s=arc-20240116; t=1762257898; c=relaxed/simple;
+	bh=91j83r0a/744GsjSSpvMj2vPPbbmwRCLqH0NKKKQxTs=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:Mime-Version; b=K8/octdNImSsRwmFjvmz95LciYZnwqM5ztiviKvLT8YuSNjha1wtSiWZU/CsHb3PzDRIqg6qMIoPEIpjqQWC2deb8ba490X8Ealtrn6e2rmYkpPj+cgdvsEtxVEUg3x14989uxAe5oDiptxzFoDb6yPSlnPF8TZcFDRuS3rE+Sk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VfPVlvIU; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VfPVlvIU"
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-29524abfba3so40685405ad.1
+        for <linux-block@vger.kernel.org>; Tue, 04 Nov 2025 04:04:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762257897; x=1762862697; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:date
+         :cc:to:from:subject:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hIMOgpEtwvgPznTb3R/noQ8H3QESHZcJ3b2FNe/UuI0=;
+        b=VfPVlvIUyTV8qIihY9JjSsKeyNBWMl6UMFmRHCYWXD/joLcLMadxUuigePc7OhaZrY
+         poj39NwZlF7+axyTDmSBJZ4OAlWaIr7WNFIwvrpEi3HxnWPGVIBY+gLnWoFBRlDDThYl
+         j5zBzjXV9t/sahOazDTvFdKATZUWOqVN1tY2AzxYG1MId0HMuxoSEe2F6b82KB1ne/h+
+         LEDmMa4nPJ6uRvAYKezrrO6KUc7QMaqhzHqVkUS40HQUtiFYcPk+XmZH/a9FvXU2/hf4
+         6a80ov5PHP2a0+LlvS8un7oaNXSNfvizKWZKs7QCnHqx/okdk249o3XS+QCDKsBfTnTM
+         /yXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762257897; x=1762862697;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:date
+         :cc:to:from:subject:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=hIMOgpEtwvgPznTb3R/noQ8H3QESHZcJ3b2FNe/UuI0=;
+        b=toFjhmCCgYHpSHavCk1uO5owJ+kRHJfOxxXYar77A5bm8bldM5EKajSaa6oKToiU6j
+         lCvLyiPE/x9fFPVDyYBmJ6d80Kd5QzwtqaPvvYLX8Je6K8poZJITrJjKXo8ZWav1ZXOO
+         IOlVJ/1T10xCQcdRYLpD/T+e7PXMYHA1jDGyYTzd4uvgUa9jUXK8LANayw5AU+FhbLCR
+         NuyqLsYBeBwBFOuUNqT7IhgZRKRqRp5K6rdW3C1FeTovmTkbFCTeOl7PnROkY0w92u/g
+         F0KvLkPT4/h1sh4Hzv1cAEGW+whJVb3qsJ6Y5PjtSyQ/iEPvsJAU2Lr93H5qf3DDrJiP
+         CeMg==
+X-Forwarded-Encrypted: i=1; AJvYcCUjQxlfjMYojIdXyZySVTdJ5B4qpXV9djIqAQxTqp08DjDz7v4QurDtzKFcaBgABQSe6kp45p6mC2gZbg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YydScS3nMkTt3nAJjiAmvNVJhXvlnLtJzzvw/jOz7QDL8yebmMC
+	9BfbOBBAq9aWZJcQ6AS0jWIYtsDflVjUzZNhRj0y966oL4VJQkraInSD
+X-Gm-Gg: ASbGncu1VVLEnlRTqNsFkuUB3Mb9cDWBD7n4NRLeaa1oKjF3ddxSUMyN9YAbs069KKE
+	Il4L0i0A9ClEiPZBzYBDO+ZDaZ/7Hd4vrRKFyT0kiF5YH90QeX4hIllRDbTyINWsRMS4dW4gQ1h
+	1rBicHdWYh/MX1K88Xm4yjxzgdwT/tCZ18AWdCU92QnCQP89Ah3ulGg7+tpAI8ALZVP50dhP6/h
+	8ZHUA1iqCrSbdXZhKDV+09Cr6zL7nNhhCdT4pHi2b1v0NrYXy+bG9/M2jaU5qQwaivZY8on1fQ3
+	vyhbCY7DlztYVA5+s/j+x51hlPX9wofMHBcuJ8BTkcE4T/bgqIVyFqcuWH2Icx1YacMdrQP0vet
+	mxJZXCIUImlZuhDiEKYPUXw7Nei2HdkIunsxp9b/yFM9BAuTaNj/UpfTTkc7BYDcGrw+BWnW2go
+	xkFB9O6v2UVcID60bKHOdV+0NpHH/LUmPt59WqF2V6O8CMoBO+8usfeA==
+X-Google-Smtp-Source: AGHT+IHhptMGeN6GUWdSr3woSCYhxUw05Wn9RRD4O2T5DayZS0jhPNbaRMV4ZHTfd4sd7Ew85mCkaw==
+X-Received: by 2002:a17:902:e88e:b0:295:fe33:18bb with SMTP id d9443c01a7336-295fe331993mr38565105ad.14.1762257896410;
+        Tue, 04 Nov 2025 04:04:56 -0800 (PST)
+Received: from li-5d80d4cc-2782-11b2-a85c-bed59fe4c9e5.ibm.com ([49.207.200.106])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2960199831esm24707045ad.37.2025.11.04.04.04.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Nov 2025 04:04:55 -0800 (PST)
+Message-ID: <a05cde7d15d85f2cee6eafdb69b1380c8b704207.camel@gmail.com>
+Subject: Re: [PATCH 2/4] fs: return writeback errors for IOCB_DONTCACHE in
+ generic_write_sync
+From: "Nirjhar Roy (IBM)" <nirjhar.roy.lists@gmail.com>
+To: Christoph Hellwig <hch@lst.de>, "Darrick J. Wong" <djwong@kernel.org>
+Cc: Carlos Maiolino <cem@kernel.org>, Christian Brauner
+ <brauner@kernel.org>,  Jan Kara <jack@suse.cz>, "Martin K. Petersen"
+ <martin.petersen@oracle.com>,  linux-kernel@vger.kernel.org,
+ linux-xfs@vger.kernel.org,  linux-fsdevel@vger.kernel.org,
+ linux-raid@vger.kernel.org,  linux-block@vger.kernel.org
+Date: Tue, 04 Nov 2025 17:34:50 +0530
+In-Reply-To: <20251029163708.GC26985@lst.de>
+References: <20251029071537.1127397-1-hch@lst.de>
+	 <20251029071537.1127397-3-hch@lst.de>
+	 <20251029160101.GE3356773@frogsfrogsfrogs> <20251029163708.GC26985@lst.de>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-27.el8_10) 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <83b60505-64a4-40fe-aa50-02a56ca7ad8c@kernel.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Tue, Nov 04, 2025 at 07:53:07AM +0900, Damien Le Moal wrote:
-> > In case current file systems store this, isn't that a code duplication for each
-> > fs ? perhaps having a central interface at block layer should help remove the
-> > code duplication ?
+On Wed, 2025-10-29 at 17:37 +0100, Christoph Hellwig wrote:
+> On Wed, Oct 29, 2025 at 09:01:01AM -0700, Darrick J. Wong wrote:
+> > Hum.  So we kick writeback but don't wait for any of it to start, and
+> > immediately sample wberr.  Does that mean that in the "bdev died" case,
+> > the newly initiated writeback will have failed so quickly that
+> > file_check_and_advance_wb_err will see that?
 > 
-> catch 22: You cannot ask the file system without first knowing the zone layout
-> and conditions of zone to check the file system metadata.
-
-The file system also really needs to verify that it's view matches the
-hardware view at mount time, otherwise you'll run into really nasty
-cases later when they are out of sync due to a bug or corruption.
+> Yes, this is primarily about catching errors in the submission path
+> before it reaches the device, which are returned synchronously.
+So, what you are saying is file_check_and_advance_wb_err() will wait/block till the write back
+request done in filemap_fdatawrite_range_kick() is completely submitted and there are no more
+chances of write back failure?
+--NR
+> 
+> > Or are we only reflecting
+> > past write failures back to userspace on the *second* write after the
+> > device dies?
+> > 
+> > It would be helpful to know which fstests break, btw.
+> 
+> generic/252 generic/329 xfs/237
+> 
 
