@@ -1,79 +1,92 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C398329C5D;
-	Tue,  4 Nov 2025 18:11:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54BC42ED84C;
+	Tue,  4 Nov 2025 19:00:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762279907; cv=none; b=deIpzYfJ6DyaoAHRlot/4wDF4FmltnWXapJRyTgJLE+Rgiy1FWRTJNFgb8dZ8qVRftlNGrZjH96wP+Bvp+BKU2KPzNlNixuQluAoJ406IOUhIvsapt34Vq9msSV0w7QSDGOb6OJpMHinJsW+UWpGSjwkpPQmkGSVT8gReyPS0Wg=
+	t=1762282850; cv=none; b=GgU0BSs8FMbFfn6/k9bS3HqP7gC8bCa6lT2h6dXLtGb14kSWYcxlRQnV2wClZxTwDO0o753C+QigAHcQtZdzddcg6VpEbEkB5yCdq4kyc+gnSqN6+W620+GDduTKQHk1giGrfjLUJN2qSeboYDvCoP/3qTHt6HkYQvD3KEZ68yQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762279907; c=relaxed/simple;
-	bh=QtVuO/Lf5mKvZSCkZXHHEdaFVDQtNaMjrLQ1Azzoy7c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qNRx10+Z7gNUioxpWvpCxkUM4KmdwBzpydw2s27XfP1bwBver4+51dYnz4j+My9vguo4kzJaOqmFfFH1AyyuP3ILnlHaGvGAp/t2+tRoFsVo77v7I3GmIcflxHuljy5p0kvSnrjiZqjHVVjrFnvqMZV1qfXchx2Z/hxTMNH/5nY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qwaX63na; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1762282850; c=relaxed/simple;
+	bh=rZcGwmQLcueA+pKrWGVQC0oWEavs3MSHLzu7gfG36V4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=uvTAPLnfTbfD0Sg+Bku7/Rg0pAX5uwPBJFUVcNQG7PvtnT3vvUq5HuAWrPF1DlCMDr3IN3hOfF/wxpZmVpRBQwJrRy2++jSaNCh+eNvCr52HI67SdyhVTbRwlW7vJ4hlMXr2JCElc6lSfcrCb2PQijzW1IchwYSheuBiiltALbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=jl2qi6oN; arc=none smtp.client-ip=199.89.3.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qwaX63na"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6459C116B1;
-	Tue,  4 Nov 2025 18:11:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762279907;
-	bh=QtVuO/Lf5mKvZSCkZXHHEdaFVDQtNaMjrLQ1Azzoy7c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qwaX63naGOYkkOJYXih0b1FJh5pTybSDihXd9NpVsdYQKhaeOtOvWDuJde0k0or+c
-	 AV8qY1mkPNdsAtUSHOnQNSEvRlPg9yF34dX+vRlVwQYQnChSbAY7QITh1BO0SLw9Hd
-	 moIoD0cq9RHwdPSJsU0Ac9nD0Coa0KL+OEzZXY4PCnSmFKbV6MinVdc6E1JzE5ngE+
-	 ER0kJ2udvfghV/b4L/HZcJ2RN8bzjqJdg71z6T9PTqnqEOIR1uvO0Lrhd+pXuf2lqe
-	 GWm/viqUZ2vJt7E+Q6urimYbGgNEriABb9R4a+QAo7P0RCH8C7aWurFvn+FkW4ya0+
-	 P3VoQ9ElmdNMA==
-Date: Tue, 4 Nov 2025 10:10:06 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Yongpeng Yang <yangyongpeng.storage@gmail.com>,
-	Jaegeuk Kim <jaegeuk@kernel.org>, Theodore Ts'o <tytso@mit.edu>,
-	linux-fscrypt@vger.kernel.org,
-	Yongpeng Yang <yangyongpeng@xiaomi.com>,
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-	Luis Chamberlain <mcgrof@kernel.org>
-Subject: Re: [PATCH v2] fscrypt: fix left shift underflow when
- inode->i_blkbits > PAGE_SHIFT
-Message-ID: <20251104181006.GC1780@sol>
-References: <20251030072956.454679-1-yangyongpeng.storage@gmail.com>
- <20251103164829.GC1735@sol>
- <aQnftXAg93-4FbaO@infradead.org>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="jl2qi6oN"
+Received: from localhost (localhost [127.0.0.1])
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4d1Hpj6RDkzly6Vc;
+	Tue,  4 Nov 2025 19:00:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1762282843; x=1764874844; bh=EJw2W4R20I0tbP9KTHA+4Oke
+	v2/0KvJztiMzbhvTnNI=; b=jl2qi6oNwA87r19QHd4bFtJjfr4Oj17sQMNvOQf/
+	RhOyR0SYK/HZoqEHVr9wvC/wNUZ3OYoCrVChC4LCEm/umbw4ZKaTl9H/tD5hri+E
+	RlAdb2J8XEwP1U0KfDJoEcaVcD/A+sz2aqCeTn9JTtAjcg/8g+4jF8RRypVPznDX
+	jl4/eWdb4dezQf8mmXcSrYLMApLTdv3zGENS3zLDzjqhZJ3cKV52htqveEmWNzO9
+	v91zGwYfZ8mghDT7lwawv60A62wi4zFveUDXWitoN2PpznE5/ZRkMXWZJMTfjdTm
+	dCSfhuXAjpLY1bM8A4OlD3rq+gzjuRimgNpHBF6bsgJ4Qg==
+X-Virus-Scanned: by MailRoute
+Received: from 003.mia.mailroute.net ([127.0.0.1])
+ by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id ktQnhIQwp04c; Tue,  4 Nov 2025 19:00:43 +0000 (UTC)
+Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4d1HpQ08l3zm0XTn;
+	Tue,  4 Nov 2025 19:00:28 +0000 (UTC)
+Message-ID: <0cb7eefb-4501-47e8-805f-6e8737ca6bb5@acm.org>
+Date: Tue, 4 Nov 2025 11:00:27 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aQnftXAg93-4FbaO@infradead.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 11/15] block: introduce BLKREPORTZONESV2 ioctl
+To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+ Keith Busch <keith.busch@wdc.com>, Christoph Hellwig <hch@lst.de>,
+ dm-devel@lists.linux.dev, Mike Snitzer <snitzer@kernel.org>,
+ Mikulas Patocka <mpatocka@redhat.com>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ linux-scsi@vger.kernel.org, linux-xfs@vger.kernel.org,
+ Carlos Maiolino <cem@kernel.org>, linux-btrfs@vger.kernel.org,
+ David Sterba <dsterba@suse.com>
+References: <20251104013147.913802-1-dlemoal@kernel.org>
+ <20251104013147.913802-12-dlemoal@kernel.org>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20251104013147.913802-12-dlemoal@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Nov 04, 2025 at 03:12:53AM -0800, Christoph Hellwig wrote:
-> On Mon, Nov 03, 2025 at 08:48:29AM -0800, Eric Biggers wrote:
-> > >  	*inode_ret = inode;
-> > > -	*lblk_num_ret = ((u64)folio->index << (PAGE_SHIFT - inode->i_blkbits)) +
-> > > +	*lblk_num_ret = (((u64)folio->index << PAGE_SHIFT) >> inode->i_blkbits) +
-> 
-> This should be using folio_pos() instead of open coding the arithmetics.
+On 11/3/25 5:31 PM, Damien Le Moal wrote:
+> - * @BLKREPORTZONE: Get zone information. Takes a zone report as argument.
+> - *                 The zone report will start from the zone containing the
+> - *                 sector specified in the report request structure.
+> + * @BLKREPORTZONE: Get zone information from a zoned device. Takes a zone report
+> + *		   as argument. The zone report will start from the zone
+> + *		   containing the sector specified in struct blk_zone_report.
+> + *		   The flags field of struct blk_zone_report is used as an
+> + *		   output only and ignored as an input.
+> + *		   DEPRECATED, use BLKREPORTZONEV2 instead.
+> + * @BLKREPORTZONEV2: Same as @BLKREPORTZONE but uses the flags field of
+> + *		     struct blk_zone_report as an input, allowing to get a zone
+> + *		     report using cached zone information if BLK_ZONE_REP_CACHED
+> + *		     is set.
 
-Well, folio_pos() doesn't work with sizes greater than S64_MAX, and it
-uses multiplication rather than a shift.
+Was it promised to add information in the above comment about the 
+differences in accuracy between the two ioctls? See also
+https://lore.kernel.org/linux-block/97535dde-5902-4f2f-951c-3470d26158da@kernel.org/
 
-Probably doesn't matter, but I always feel like I have to actually check
-that.
+Thanks,
 
-It looks like the size of block device can come from several different
-places, including set_capacity(), bdev_resize_partition(), and
-add_partition().  The first has a size check.  I don't immediately see a
-size check in the other two.  Maybe it's there and I need to look
-closer.  Also can the size of a block device be set in other ways?
-
-Then I have to remember whether a multiplication of a signed value gets
-reliably optimized to a shift on all architectures or not.  I think so.
-
-Anyway, the trivial version avoids having to consider any of this...
-
-- Eric
+Bart.
