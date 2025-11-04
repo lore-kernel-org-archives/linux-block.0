@@ -1,285 +1,196 @@
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1904E3090FB
-	for <linux-block@vger.kernel.org>; Tue,  4 Nov 2025 08:14:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45838236435
+	for <linux-block@vger.kernel.org>; Tue,  4 Nov 2025 08:59:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762244081; cv=none; b=bbdf+BwWJ3uLS5LDthxwQyb2kaNiQ7/zDVSYf5oWVjX5VYtH2sThGOftMjWsEhAm8nTIhDNo+3F8caI6KLaOlPWJJy9LVJQ3T89bfV6LgFnDh4rzLsvFYL85OEzbr7zKZac9kXsKfguHRP3y9DrUt4+1B2WL6TzXNJvwUAEKv14=
+	t=1762246760; cv=none; b=B99llALp+dyWLYM6hCxV512NAfPm3baLx0byl3e+PLVtUhIhr0Dm+VTn6QmiWZNYXFroNAZaJAH+GCEEtA69j9jj65ObJD8IM0VF4ORZW23iUudWS66FnKWF6yNF/X/0RW3lrYAPFAXF8cMvp1C7rtYu34C5KuWzfgo4BDTp9gg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762244081; c=relaxed/simple;
-	bh=Mx6TDbeipdWVRn1B/14Y4tyLZJrUGg71nJmtwYAh2VE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nCbOe8+zN8BZ1eSWcCRvj9gP7HlJFvNkqBd0N6t2Eebp0ILRuJ3bttFpLQ5hYFWScU9OfZwXQVYpV9rYKxU+ql7mIjKlypdtPp91SnHBqcgKrjOpPtt60iA4JTPDPXF9FuqVMlr85dTu8H2mK3OhVrhdkbp4m1AKI6XAKCqrwqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hNaEF2iV; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1762246760; c=relaxed/simple;
+	bh=5JMNWhwcNO8dRjYHih9/DdKYtWKpXKT/ZdkKaFVrUZg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ai/Mn7wX6grU7A0sXF86jgMASnXy6X5huu8i8+EeP3Up4kuGvYd330JUGtbdPt2pAwHgovuCq3T6NzTmm0dU0VKp6vtq4zjGnXMh5LOSdkLlrmW28R5x2EdjFqa/KHDQCna8rWoXxX02dHc6Je8ZmmKCQTG4s53ekH60nm+5Mfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=eJPrZOpe; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=zZD60Nvn; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=eJPrZOpe; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=zZD60Nvn; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hNaEF2iV"
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2953b321f99so34203635ad.1
-        for <linux-block@vger.kernel.org>; Tue, 04 Nov 2025 00:14:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762244079; x=1762848879; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=5yPPom5EQkKpKnENEVWAiI55FVm2YuKTD0Zs1aq5/h8=;
-        b=hNaEF2iVmYIENerjjvsNyR5IWBjatQ+CXfIciP7zAqTpZrXDRBIP1fD79uBTvy3RPa
-         syLy8Kb8FCMUCcWo2d5vEG7LySVknZdomZq+EfSFaHy7Rm6a2qX7t134VYsu5BMfbpgI
-         QL4xW34VPKNVRSTX6uOs1kgPJNePEgpD1Vhmo+k/2z5nXo/uVnvf8euZXX2x7hLqMHZS
-         Jycko7tTcRuvfyq8ZcDNp7ZK3FRBoAq28ilDylwpDk01490LrLD1s7Gx5+LrDIr2CTIx
-         GyckBWNAF9uq8nVbWD6J6WlYzUK5poUOqq5j0AUAaWkiu0dKI2jXWW1pHhQpmU4IK4xd
-         H1ow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762244079; x=1762848879;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5yPPom5EQkKpKnENEVWAiI55FVm2YuKTD0Zs1aq5/h8=;
-        b=Y/f2H9RVSxePQZMKzDNqMyHmKqGjLKTgxaYq8N1QOZIGaaAiQTseicJ9PcSlRnFuF6
-         4bxq38OCa5CEhrhmbtA3LWMwTLZ1M0uy47o6/tEvZPSZJPRXK22x3wwxru2cL/cFljKp
-         HJepPyUjmCUUdRzG0lU2mYuCQOyMGww2QToPlmKAVcRwOvw48XxbwgVvb2TJgpx+83rx
-         STrRtwySSQajk4YWTX29x6sGIdkRi8+ZV4sq5oJVCcVFbeSxbgm557BCIpZRxu+XO4+5
-         unrxfShrb2hSuVHPzIK3HrDhoaNfsOEMRWuzMAMxP20wNOyETgh03F+60bQF897isOAm
-         0oXg==
-X-Gm-Message-State: AOJu0YxGukMjMBdazG45uWG0gr7GrP9jNhA7yNklTUcWi3L6Bxx/+b3K
-	ijuIiGEbcBmBhXID+l2LAAoJek/euBUHLIgT+tLhAaK/CewQhPfZB/8Y
-X-Gm-Gg: ASbGncsVsjaS1OPoKaPTlZsAo75gmanzepjM76Q+NbJuOKLjDsAEVpVs7ve/7jxsE9D
-	ch4/K5Hp3h3cuRpvpG9bnlaREs51GNdHXTyVQ5k//4yYlZ6hLe5w1QDGzK0b3PrWtw3Maa++RHj
-	VKz8U9SxJmSnNMA6uwOzDJye1LVrEBP9bk7BW4yACwyIAsNZxmQWP7bhGMwUeG9Lx+t1pXkJ0Qq
-	JEDbYYZgedI42d3IDag8/oE2QjAuU3V5XWVMyY1rWPnEDlI+Qgl4nnFxTWuWO1Qbqza2J8gG7zT
-	J1cgb/NnPAu0Z2LlMAl6zG3ykzNz2mmeTzSsf4zN40wko/dnrVYINMVEjMGAKnS9zt7Hcba7i52
-	hnzSPxaEUTNejAUd1jRlJz+8yb/5kd586+CELBmhFncA229HsleFjveqfLmLoi78zPjq8iVfBqr
-	9P55dahEIFrf3CJCQ7mayTjoWJex8InRRJwibN
-X-Google-Smtp-Source: AGHT+IFOdB7IzjwFPem2ggmTDmjy3G6bzYqa3MERE3FT9sIp/UxQCFfmCHoNZ7seosLifsrFBq+xAQ==
-X-Received: by 2002:a17:902:d48b:b0:295:fac:7b72 with SMTP id d9443c01a7336-2951a4b3595mr182681015ad.52.1762244079082;
-        Tue, 04 Nov 2025 00:14:39 -0800 (PST)
-Received: from localhost (ip70-175-132-216.oc.oc.cox.net. [70.175.132.216])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29601b8f28esm17214615ad.5.2025.11.04.00.14.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Nov 2025 00:14:38 -0800 (PST)
-From: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
-To: shinichiro.kawasaki@wdc.com
-Cc: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
-Subject: [PATCH blktest] blktests: add nvmet memory backend support
-Date: Tue,  4 Nov 2025 00:14:36 -0800
-Message-Id: <20251104081436.191823-1-ckulkarnilinux@gmail.com>
-X-Mailer: git-send-email 2.40.0
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="eJPrZOpe";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="zZD60Nvn";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="eJPrZOpe";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="zZD60Nvn"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 46D4821181;
+	Tue,  4 Nov 2025 08:59:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1762246755; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lYheQBRGcVqlTXI1JyYQyiIeOMV9/eRoJPBxMRYmLiw=;
+	b=eJPrZOpeDwh2UQNXtYYYqgOaVT4Y8SZAdag42bF55AoMJNHro1CVT4rZ+NedKhPDWizk3e
+	ws90OrlGFEo6CbBZt0zdQsHL/tT5FDeq6p5pbkC/tdAalESkWgwIoJaYoL03y2fM+uEQFS
+	dhr5ySjzdS1+XdzBlbh9quKyPq2AE08=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1762246755;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lYheQBRGcVqlTXI1JyYQyiIeOMV9/eRoJPBxMRYmLiw=;
+	b=zZD60Nvn11Ir61m8JDukAbMAKPj0ZET+tuQKJHK2hxYNj/tMeTnmmqE62QLu0qSCY/psRF
+	6l5y6wYR10R0nSBg==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=eJPrZOpe;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=zZD60Nvn
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1762246755; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lYheQBRGcVqlTXI1JyYQyiIeOMV9/eRoJPBxMRYmLiw=;
+	b=eJPrZOpeDwh2UQNXtYYYqgOaVT4Y8SZAdag42bF55AoMJNHro1CVT4rZ+NedKhPDWizk3e
+	ws90OrlGFEo6CbBZt0zdQsHL/tT5FDeq6p5pbkC/tdAalESkWgwIoJaYoL03y2fM+uEQFS
+	dhr5ySjzdS1+XdzBlbh9quKyPq2AE08=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1762246755;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lYheQBRGcVqlTXI1JyYQyiIeOMV9/eRoJPBxMRYmLiw=;
+	b=zZD60Nvn11Ir61m8JDukAbMAKPj0ZET+tuQKJHK2hxYNj/tMeTnmmqE62QLu0qSCY/psRF
+	6l5y6wYR10R0nSBg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 38493139A9;
+	Tue,  4 Nov 2025 08:59:15 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id O+S2DWPACWkzegAAD6G6ig
+	(envelope-from <jack@suse.cz>); Tue, 04 Nov 2025 08:59:15 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id EDCC7A2812; Tue,  4 Nov 2025 09:59:10 +0100 (CET)
+Date: Tue, 4 Nov 2025 09:59:10 +0100
+From: Jan Kara <jack@suse.cz>
+To: Yongpeng Yang <yangyongpeng.storage@gmail.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>, 
+	Sungjong Seo <sj1557.seo@samsung.com>, OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>, 
+	Jan Kara <jack@suse.cz>, Carlos Maiolino <cem@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Sasha Levin <sashal@kernel.org>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, 
+	Christoph Hellwig <hch@infradead.org>, linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-block@vger.kernel.org, stable@vger.kernel.org, Matthew Wilcox <willy@infradead.org>, 
+	"Darrick J . Wong" <djwong@kernel.org>, Yongpeng Yang <yangyongpeng@xiaomi.com>
+Subject: Re: [PATCH v4 5/5] block: add __must_check attribute to
+ sb_min_blocksize()
+Message-ID: <7tabta4e54yl3jsk7axwrs2kabefv236wc7ijrlogb222bxidp@oozpqae467ax>
+References: <20251103163617.151045-2-yangyongpeng.storage@gmail.com>
+ <20251103163617.151045-6-yangyongpeng.storage@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20251103163617.151045-6-yangyongpeng.storage@gmail.com>
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Rspamd-Queue-Id: 46D4821181
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-2.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[suse.cz:+];
+	TO_DN_SOME(0.00)[]
+X-Spam-Score: -2.51
 
-Add support for testing nvmet memory backend across all transport
-types. This allows tests using _set_combined_conditions with
-_set_nvmet_blkdev_type to automatically test memory backend alongside
-device and file backends.
+On Tue 04-11-25 00:36:18, Yongpeng Yang wrote:
+> From: Yongpeng Yang <yangyongpeng@xiaomi.com>
+> 
+> When sb_min_blocksize() returns 0 and the return value is not checked,
+> it may lead to a situation where sb->s_blocksize is 0 when
+> accessing the filesystem super block. After commit a64e5a596067bd
+> ("bdev: add back PAGE_SIZE block size validation for
+> sb_set_blocksize()"), this becomes more likely to happen when the
+> block device’s logical_block_size is larger than PAGE_SIZE and the
+> filesystem is unformatted. Add the __must_check attribute to ensure
+> callers always check the return value.
+> 
+> Suggested-by: Matthew Wilcox <willy@infradead.org>
+> Signed-off-by: Yongpeng Yang <yangyongpeng@xiaomi.com>
 
-The memory backend provides RAM-based volatile storage for NVMe
-namespaces, useful for high-performance testing without disk I/O.
+Looks good. Feel free to add:
 
-- Add "mem" to NVMET_BLKDEV_TYPES default value
-- Add _require_nvme_mem_backend() prerequisite check
-- Add _create_nvmet_ns_mem() helper for memory namespace creation
-- Modify _nvmet_target_setup() to handle memory backend type
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-All existing tests that support multiple backends (device, file) will
-now automatically run with memory backend as well, providing 3x test
-coverage: device, file, and mem backends across loop, tcp, and rdma
-transports.
+								Honza
 
-Signed-off-by: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
----
- common/nvme | 135 ++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 125 insertions(+), 10 deletions(-)
-
-diff --git a/common/nvme b/common/nvme
-index 3d43790..a558943 100644
---- a/common/nvme
-+++ b/common/nvme
-@@ -23,7 +23,7 @@ _check_conflict_and_set_default NVMET_TRTYPES nvme_trtype "loop"
- _check_conflict_and_set_default NVME_IMG_SIZE nvme_img_size 1G
- _check_conflict_and_set_default NVME_NUM_ITER nvme_num_iter 1000
- nvmet_blkdev_type=${nvmet_blkdev_type:-"device"}
--NVMET_BLKDEV_TYPES=${NVMET_BLKDEV_TYPES:-"device file"}
-+NVMET_BLKDEV_TYPES=${NVMET_BLKDEV_TYPES:-"device file mem"}
- nvme_target_control="${NVME_TARGET_CONTROL:-}"
- NVMET_CFS="/sys/kernel/config/nvmet/"
- # shellcheck disable=SC2034
-@@ -62,6 +62,35 @@ _require_nvme_trtype_is_fabrics() {
- 	return 0
- }
- 
-+_require_nvme_mem_backend() {
-+	# Check if memory backend is supported in kernel
-+	local test_subsys="${NVMET_CFS}/subsystems/blktests-mem-test-$$"
-+	local test_ns="${test_subsys}/namespaces/1"
-+
-+	if ! mkdir -p "${test_subsys}" 2>/dev/null; then
-+		SKIP_REASONS+=("cannot create test subsystem in configfs")
-+		return 1
-+	fi
-+
-+	if ! mkdir -p "${test_ns}" 2>/dev/null; then
-+		rmdir "${test_subsys}"
-+		SKIP_REASONS+=("cannot create test namespace in configfs")
-+		return 1
-+	fi
-+
-+	# Try to set mem_size attribute
-+	if ! echo "1073741824" > "${test_ns}/mem_size" 2>/dev/null; then
-+		rmdir "${test_ns}"
-+		rmdir "${test_subsys}"
-+		SKIP_REASONS+=("nvmet memory backend not supported")
-+		return 1
-+	fi
-+
-+	rmdir "${test_ns}"
-+	rmdir "${test_subsys}"
-+	return 0
-+}
-+
- _have_nvme_cli_with_json_support() {
- 	_have_program nvme || return $?
- 
-@@ -726,6 +755,71 @@ _create_nvmet_ns() {
- 	echo "${uuid}"
- }
- 
-+_create_nvmet_ns_mem() {
-+	local subsysnqn="${def_subsysnqn}"
-+	local nsid="${def_nsid}"
-+	local grpid="1"
-+	local mem_size="${NVME_IMG_SIZE}"
-+	local uuid
-+	local subsys_path
-+	local ns_path
-+
-+	while [[ $# -gt 0 ]]; do
-+		case $1 in
-+			--subsysnqn)
-+				subsysnqn="$2"
-+				shift 2
-+				;;
-+			--nsid)
-+				nsid="$2"
-+				shift 2
-+				;;
-+			--mem-size)
-+				mem_size="$2"
-+				shift 2
-+				;;
-+			--uuid)
-+				uuid="$2"
-+				shift 2
-+				;;
-+			--grpid)
-+				grpid="$2"
-+				shift 2
-+				;;
-+			*)
-+				echo "WARNING: unknown argument: $1"
-+				shift
-+				;;
-+		esac
-+	done
-+
-+	subsys_path="${NVMET_CFS}/subsystems/${subsysnqn}"
-+	ns_path="${subsys_path}/namespaces/${nsid}"
-+
-+	mkdir "${ns_path}"
-+
-+	# Memory backend uses mem_size instead of device_path
-+	# Convert size string (e.g., "1G") to bytes
-+	local mem_size_bytes
-+	mem_size_bytes=$(numfmt --from=iec "${mem_size}")
-+	printf "%s" "${mem_size_bytes}" > "${ns_path}/mem_size"
-+
-+	# Set UUID if provided, otherwise read generated one
-+	if [[ -n "${uuid}" ]]; then
-+		printf "%s" "${uuid}" > "${ns_path}/device_uuid"
-+	else
-+		uuid=$(cat "${ns_path}/device_uuid")
-+	fi
-+
-+	# Set ANA group if not default
-+	if (( grpid != 1 )); then
-+		printf "%d" "${grpid}" > "${ns_path}/ana_grpid"
-+	fi
-+
-+	printf "%d" 1 > "${ns_path}/enable"
-+	echo "${uuid}"
-+}
-+
- _setup_nvmet_ns_ana() {
- 	local nvmet_subsystem="$1"
- 	local nsid="$2"
-@@ -956,6 +1050,7 @@ _find_nvme_ns() {
- _nvmet_target_setup() {
- 	local blkdev_type="${nvmet_blkdev_type}"
- 	local blkdev
-+	local mem_size="${NVME_IMG_SIZE}"
- 	local ctrlkey=""
- 	local hostkey=""
- 	local subsysnqn="${def_subsysnqn}"
-@@ -1011,7 +1106,12 @@ _nvmet_target_setup() {
- 		esac
- 	done
- 
--	if [[ "${blkdev_type}" != "none" ]]; then
-+	# Handle backend-specific setup
-+	if [[ "${blkdev_type}" == "mem" || "${blkdev_type}" == "memory" ]]; then
-+		# Memory backend - no file or device needed
-+		blkdev=""
-+	elif [[ "${blkdev_type}" != "none" ]]; then
-+		# Device or file backend - create backing file
- 		truncate -s "${NVME_IMG_SIZE}" "$(_nvme_def_file_path)"
- 		if [[ "${blkdev_type}" == "device" ]]; then
- 			blkdev="$(losetup -f --show "$(_nvme_def_file_path)")"
-@@ -1036,17 +1136,32 @@ _nvmet_target_setup() {
- 		return
- 	fi
- 
-+	# Handle namespace creation based on backend type
- 	ARGS=(--subsysnqn "${subsysnqn}")
--	if [[ -n "${blkdev}" ]]; then
-+
-+	if [[ "${blkdev_type}" == "mem" || "${blkdev_type}" == "memory" ]]; then
-+		# Memory backend: create subsystem without namespace first
-+		_create_nvmet_subsystem "${ARGS[@]}"
-+		# Then create memory namespace separately
-+		ARGS=(--subsysnqn "${subsysnqn}" --mem-size "${mem_size}")
-+		if [[ -n "${subsys_uuid}" ]]; then
-+			ARGS+=(--uuid "${subsys_uuid}")
-+		fi
-+		def_subsys_uuid=$(_create_nvmet_ns_mem "${ARGS[@]}")
-+	elif [[ -n "${blkdev}" ]]; then
-+		# Device or file backend: use existing flow
- 		ARGS+=(--blkdev "${blkdev}")
-+		if [[ -n "${subsys_uuid}" ]]; then
-+			ARGS+=(--uuid "${subsys_uuid}")
-+		fi
-+		if [[ -n "${resv_enable}" ]]; then
-+			ARGS+=("${resv_enable}")
-+		fi
-+		_create_nvmet_subsystem "${ARGS[@]}"
-+	else
-+		# No backend (none type): just create subsystem
-+		_create_nvmet_subsystem "${ARGS[@]}"
- 	fi
--	if [[ -n "${subsys_uuid}" ]]; then
--		ARGS+=(--uuid "${subsys_uuid}")
--	fi
--	if [[ -n "${resv_enable}" ]]; then
--		ARGS+=("${resv_enable}")
--	fi
--	_create_nvmet_subsystem "${ARGS[@]}"
- 
- 	p=0
- 	while (( p < num_ports )); do
+> ---
+>  block/bdev.c       | 2 +-
+>  include/linux/fs.h | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/bdev.c b/block/bdev.c
+> index 810707cca970..638f0cd458ae 100644
+> --- a/block/bdev.c
+> +++ b/block/bdev.c
+> @@ -231,7 +231,7 @@ int sb_set_blocksize(struct super_block *sb, int size)
+>  
+>  EXPORT_SYMBOL(sb_set_blocksize);
+>  
+> -int sb_min_blocksize(struct super_block *sb, int size)
+> +int __must_check sb_min_blocksize(struct super_block *sb, int size)
+>  {
+>  	int minsize = bdev_logical_block_size(sb->s_bdev);
+>  	if (size < minsize)
+> diff --git a/include/linux/fs.h b/include/linux/fs.h
+> index c895146c1444..26d4ca0f859a 100644
+> --- a/include/linux/fs.h
+> +++ b/include/linux/fs.h
+> @@ -3424,7 +3424,7 @@ extern void inode_sb_list_add(struct inode *inode);
+>  extern void inode_add_lru(struct inode *inode);
+>  
+>  extern int sb_set_blocksize(struct super_block *, int);
+> -extern int sb_min_blocksize(struct super_block *, int);
+> +extern int __must_check sb_min_blocksize(struct super_block *, int);
+>  
+>  int generic_file_mmap(struct file *, struct vm_area_struct *);
+>  int generic_file_mmap_prepare(struct vm_area_desc *desc);
+> -- 
+> 2.43.0
+> 
 -- 
-2.40.0
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
