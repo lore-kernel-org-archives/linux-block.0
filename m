@@ -1,161 +1,79 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B33AA7DA66
-	for <linux-block@vger.kernel.org>; Tue,  4 Nov 2025 17:56:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C398329C5D;
+	Tue,  4 Nov 2025 18:11:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762279018; cv=none; b=n2IDUTeAyMrPNU/Ne5pU/sogVwkiZfv98TbG0hFZtIgzJyO/ydLZFYTJl5rvgYliPoo/vB3JhsRicHW6uTlj8e1SXXjf938eno06RD4Z+iPJRDg70iQCEhOP+DsXQEaSsJmGLvb7tcKl1Vy+uPMDspC1In5nuLB1Qey7GObGwbM=
+	t=1762279907; cv=none; b=deIpzYfJ6DyaoAHRlot/4wDF4FmltnWXapJRyTgJLE+Rgiy1FWRTJNFgb8dZ8qVRftlNGrZjH96wP+Bvp+BKU2KPzNlNixuQluAoJ406IOUhIvsapt34Vq9msSV0w7QSDGOb6OJpMHinJsW+UWpGSjwkpPQmkGSVT8gReyPS0Wg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762279018; c=relaxed/simple;
-	bh=tLImsQRnXall+fGJy0KSNwEfqLoUf7FGTEXhDy6v/s8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Y0YRrrQYDzfsFsyB2iw5+MKcRJx7zV336P9LxyeZBQttSdU1dpdLl2dbIfzIa0aeHfiH2BMhGumDa79LIZL7oVpcCKU2iYRea5Htuuytwo5LCA8OhfWXIS5iEAxgc+GUY6rWc5g5mz7lNrTcoUEJoB9E9Sa6tiLPdODy/Uo3bC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ad96QY4m; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=pXZ12jyJ; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ad96QY4m; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=pXZ12jyJ; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1762279907; c=relaxed/simple;
+	bh=QtVuO/Lf5mKvZSCkZXHHEdaFVDQtNaMjrLQ1Azzoy7c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qNRx10+Z7gNUioxpWvpCxkUM4KmdwBzpydw2s27XfP1bwBver4+51dYnz4j+My9vguo4kzJaOqmFfFH1AyyuP3ILnlHaGvGAp/t2+tRoFsVo77v7I3GmIcflxHuljy5p0kvSnrjiZqjHVVjrFnvqMZV1qfXchx2Z/hxTMNH/5nY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qwaX63na; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ad96QY4m";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="pXZ12jyJ";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ad96QY4m";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="pXZ12jyJ"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 03CFA2118E;
-	Tue,  4 Nov 2025 17:56:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1762279015; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=72Df+f2BPsETgjqjYZwpqI0AkKut+6tw+H2/JoEAAV8=;
-	b=ad96QY4mlJI1fmOEdgejpaoxLIb7EelqW7DX9QhtYO4sAe+HA6ahLM7/p4qBsQNJG4RCMw
-	0+pbm8v8V0U+tuf8RclLqQjFR3hqGH5yCAahL9j9L0xj1YHFabUCfgebCo91pXf1rbG6Wo
-	hAoIB/lZRJDDoxyolcMQRmvT816nHLA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1762279015;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=72Df+f2BPsETgjqjYZwpqI0AkKut+6tw+H2/JoEAAV8=;
-	b=pXZ12jyJm9f4fGWlohjkYbtOBtoga4Ca9oOXS8dl7XMZe3y+9POHM5YGpSq4/XXA8LunW4
-	v+A/wk/o1mao73Ag==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1762279015; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=72Df+f2BPsETgjqjYZwpqI0AkKut+6tw+H2/JoEAAV8=;
-	b=ad96QY4mlJI1fmOEdgejpaoxLIb7EelqW7DX9QhtYO4sAe+HA6ahLM7/p4qBsQNJG4RCMw
-	0+pbm8v8V0U+tuf8RclLqQjFR3hqGH5yCAahL9j9L0xj1YHFabUCfgebCo91pXf1rbG6Wo
-	hAoIB/lZRJDDoxyolcMQRmvT816nHLA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1762279015;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=72Df+f2BPsETgjqjYZwpqI0AkKut+6tw+H2/JoEAAV8=;
-	b=pXZ12jyJm9f4fGWlohjkYbtOBtoga4Ca9oOXS8dl7XMZe3y+9POHM5YGpSq4/XXA8LunW4
-	v+A/wk/o1mao73Ag==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 82E08136D1;
-	Tue,  4 Nov 2025 17:56:54 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 8T6OHmY+CmnTHwAAD6G6ig
-	(envelope-from <hare@suse.de>); Tue, 04 Nov 2025 17:56:54 +0000
-Message-ID: <d7b6727a-683f-4963-a388-d74cd2033537@suse.de>
-Date: Tue, 4 Nov 2025 18:56:53 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qwaX63na"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6459C116B1;
+	Tue,  4 Nov 2025 18:11:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762279907;
+	bh=QtVuO/Lf5mKvZSCkZXHHEdaFVDQtNaMjrLQ1Azzoy7c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qwaX63naGOYkkOJYXih0b1FJh5pTybSDihXd9NpVsdYQKhaeOtOvWDuJde0k0or+c
+	 AV8qY1mkPNdsAtUSHOnQNSEvRlPg9yF34dX+vRlVwQYQnChSbAY7QITh1BO0SLw9Hd
+	 moIoD0cq9RHwdPSJsU0Ac9nD0Coa0KL+OEzZXY4PCnSmFKbV6MinVdc6E1JzE5ngE+
+	 ER0kJ2udvfghV/b4L/HZcJ2RN8bzjqJdg71z6T9PTqnqEOIR1uvO0Lrhd+pXuf2lqe
+	 GWm/viqUZ2vJt7E+Q6urimYbGgNEriABb9R4a+QAo7P0RCH8C7aWurFvn+FkW4ya0+
+	 P3VoQ9ElmdNMA==
+Date: Tue, 4 Nov 2025 10:10:06 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Yongpeng Yang <yangyongpeng.storage@gmail.com>,
+	Jaegeuk Kim <jaegeuk@kernel.org>, Theodore Ts'o <tytso@mit.edu>,
+	linux-fscrypt@vger.kernel.org,
+	Yongpeng Yang <yangyongpeng@xiaomi.com>,
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+	Luis Chamberlain <mcgrof@kernel.org>
+Subject: Re: [PATCH v2] fscrypt: fix left shift underflow when
+ inode->i_blkbits > PAGE_SHIFT
+Message-ID: <20251104181006.GC1780@sol>
+References: <20251030072956.454679-1-yangyongpeng.storage@gmail.com>
+ <20251103164829.GC1735@sol>
+ <aQnftXAg93-4FbaO@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 02/15] block: freeze queue when updating zone resources
-To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
- Keith Busch <keith.busch@wdc.com>, Christoph Hellwig <hch@lst.de>,
- dm-devel@lists.linux.dev, Mike Snitzer <snitzer@kernel.org>,
- Mikulas Patocka <mpatocka@redhat.com>,
- "Martin K . Petersen" <martin.petersen@oracle.com>,
- linux-scsi@vger.kernel.org, linux-xfs@vger.kernel.org,
- Carlos Maiolino <cem@kernel.org>, linux-btrfs@vger.kernel.org,
- David Sterba <dsterba@suse.com>
-References: <20251104013147.913802-1-dlemoal@kernel.org>
- <20251104013147.913802-3-dlemoal@kernel.org>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20251104013147.913802-3-dlemoal@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.991];
-	MIME_GOOD(-0.10)[text/plain];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:email,lst.de:email,wdc.com:email]
-X-Spam-Flag: NO
-X-Spam-Score: -4.30
-X-Spam-Level: 
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aQnftXAg93-4FbaO@infradead.org>
 
-On 11/4/25 02:31, Damien Le Moal wrote:
-> Modify disk_update_zone_resources() to freeze the device queue before
-> updating the number of zones, zone capacity and other zone related
-> resources. The locking order resulting from the call to
-> queue_limits_commit_update_frozen() is preserved, that is, the queue
-> limits lock is first taken by calling queue_limits_start_update() before
-> freezing the queue, and the queue is unfrozen after executing
-> queue_limits_commit_update(), which replaces the call to
-> queue_limits_commit_update_frozen().
+On Tue, Nov 04, 2025 at 03:12:53AM -0800, Christoph Hellwig wrote:
+> On Mon, Nov 03, 2025 at 08:48:29AM -0800, Eric Biggers wrote:
+> > >  	*inode_ret = inode;
+> > > -	*lblk_num_ret = ((u64)folio->index << (PAGE_SHIFT - inode->i_blkbits)) +
+> > > +	*lblk_num_ret = (((u64)folio->index << PAGE_SHIFT) >> inode->i_blkbits) +
 > 
-> This change ensures that there are no in-flights I/Os when the zone
-> resources are updated due to a zone revalidation. In case of error when
-> the limits are applied, directly call disk_free_zone_resources() from
-> disk_update_zone_resources() while the disk queue is still frozen to
-> avoid needing to freeze & unfreeze the queue again in
-> blk_revalidate_disk_zones(), thus simplifying that function code a
-> little.
-> 
-> Fixes: 0b83c86b444a ("block: Prevent potential deadlock in blk_revalidate_disk_zones()")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> ---
->   block/blk-zoned.c | 42 ++++++++++++++++++++++++------------------
->   1 file changed, 24 insertions(+), 18 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+> This should be using folio_pos() instead of open coding the arithmetics.
 
-Cheers,
+Well, folio_pos() doesn't work with sizes greater than S64_MAX, and it
+uses multiplication rather than a shift.
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+Probably doesn't matter, but I always feel like I have to actually check
+that.
+
+It looks like the size of block device can come from several different
+places, including set_capacity(), bdev_resize_partition(), and
+add_partition().  The first has a size check.  I don't immediately see a
+size check in the other two.  Maybe it's there and I need to look
+closer.  Also can the size of a block device be set in other ways?
+
+Then I have to remember whether a multiplication of a signed value gets
+reliably optimized to a shift on all architectures or not.  I think so.
+
+Anyway, the trivial version avoids having to consider any of this...
+
+- Eric
