@@ -1,175 +1,196 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19848333452;
-	Wed,  5 Nov 2025 20:37:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BA5C2D8783;
+	Wed,  5 Nov 2025 21:04:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762375050; cv=none; b=IVL1KT7AiPE+2FSh7rRJlz/GdJSxl7ItuUgK8i+WZJdeQsWnX4D4ka8s1cpZlezgikbjj1CAyHHvufCityMsYJN2Uji+sn9lR9AgD46L1nr3ANCw+zMVuXiRtzEGxVNnRz68NwnMqtYTwoETMahyq2CbELpc8rfQCrccRmEx5v4=
+	t=1762376643; cv=none; b=tqTWDSiuGyPaPP9m+9xluqaj6GajjZlG8xYeoxgafDk09D4Qoo44N9x+kGgryLz1uuY6b3Snti6GqTyD/X6wXJfJxxADMhF/jb+2/Hmn0BWDfH0NkQ97c9goTz3jLuAuf2T81KftGJoiVS8HiTmj9xv98XAVMLmbSZ1f9VHFgto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762375050; c=relaxed/simple;
-	bh=UTReFefAF+6gXiQ2Z4l2YL1BSXnOxNYuKlBMTtxjWIs=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=VMJbRKoBfog4zAy9ix2YpQq8dQeip5c34lZmj6Q7mK8oAS/aS8mS35Rj2RGU4T8chAja9MeRerPhZmqFR6IoyaQ0QyEYC3Z8Qq04veVsb7D9jL7OM8tg6CtM4HMGzxFslLkzHluYPx4kkWU3pbk0QdL9FlaZQPdFnXWQTivnu8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HVCDzFWs; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1762376643; c=relaxed/simple;
+	bh=3lbd/EU2NQ8mLBwmqz/2m2jc7qv0uF70cLO4qQ/HcLI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=W4I3orefCSJOfTMMifWUpQgYd6rWcb4z+CAnAOfRX04Z2C3m/THvsoM7nHrg52h7tzYaQ0yOKLCagkdXqVhW3f7GumxJV1OFoMLJq121zSSLXSZRKje2ea2M4177CXd4ILfI/W0AstgS1t/oDxZgByiFnlUDcHZkU0WIK4LW95I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dtbAR/JO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HVCDzFWs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCB13C4CEF5;
-	Wed,  5 Nov 2025 20:37:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dtbAR/JO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21204C4CEF5;
+	Wed,  5 Nov 2025 21:03:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762375049;
-	bh=UTReFefAF+6gXiQ2Z4l2YL1BSXnOxNYuKlBMTtxjWIs=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=HVCDzFWsS3mRiRwZ9n4zO6J8K02zYN0I+IDaIP/Qz2UQK1klAzX7Nql2a+Lq88N9S
-	 1QIAM8LMu7LN4W3ABBVxdIFeN4eP3A5H7zln5NUyCTdJdhtcJEFCzoAzjXkqNvlNZy
-	 zBGQW3SUx1QyIwIF4KPwQlGCYHquKyutKQr1CkQRqE+ETagIJLGGt2kfh+f39GN8qZ
-	 4tZaPXQTIymYqgRNXKvJYKFNVcc+H8u1atTD5WUN3YZlRMiH9cVCYzOj4oF/+u6N4m
-	 qd2tvSpxS5PDZ4df5JxMXxxQ21LeK45fJChPRSdQXeJggqljFmafCalkdLc9Ec6DXG
-	 6N4AgiuUUz45A==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-To: Shankari Anand <shankari.ak0208@gmail.com>, Jens Axboe
- <axboe@kernel.dk>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor
- <alex.gaynor@gmail.com>
-Cc: Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
- =?utf-8?Q?Bj=C3=B6rn?=
- Roy Baron <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>,
- Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
- Danilo Krummrich <dakr@kernel.org>, linux-block@vger.kernel.org,
- rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, Shankari
- Anand <shankari.ak0208@gmail.com>
-Subject: Re:[PATCH v2] rust: block: update ARef and AlwaysRefCounted imports
- from sync::aref
-In-Reply-To: <20251104171316.6672-1-shankari.ak0208@gmail.com>
-References: <20251012142012.166230-1-shankari.ak0208@gmail.com>
- <2EAsrR9pInr4r9ZEowYQNdH4LHuonKsTkjkqwn36aqxjRO7jOAlYZOaWyRzgdl-YU_bxzR50-VFWQHwcl479iA==@protonmail.internalid>
- <20251104171316.6672-1-shankari.ak0208@gmail.com>
-Date: Wed, 05 Nov 2025 21:37:19 +0100
-Message-ID: <87tsz86wsg.fsf@t14s.mail-host-address-is-not-set>
+	s=k20201202; t=1762376642;
+	bh=3lbd/EU2NQ8mLBwmqz/2m2jc7qv0uF70cLO4qQ/HcLI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=dtbAR/JOu+tct/pxmTcYqviFrVXO6KQL6RNEt8EvVv6P33xPHb9dgHSk9ViufUw5h
+	 kJ1uxg96GLeI8292NUvdAXLPsvexKzZTOvz/gqFR4B6Tf9OaddzbqXg2yQcuwzn5ku
+	 NZ8Sz2aQ7UWT3Uo0jQ1QoNPnzhRVhti/SyAe56tyLNPuuhK+nf+q1QjFVpUI4PCL/l
+	 xdV1u0DRnHSkyp4q84sPX72DQOu3N6R+ft0MWsYIMWFXcaMrhmv46DFunA41fPSuim
+	 VgLUQjfA+k0lz49d9bWIB9ytxdlmtWzuFUN4GpAWzvETdfY0TBnWeKp8qSygESbq3Z
+	 Ohs2vu0HGP3Lw==
+From: Frederic Weisbecker <frederic@kernel.org>
+To: LKML <linux-kernel@vger.kernel.org>
+Cc: Frederic Weisbecker <frederic@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	Thomas Gleixner <tglx@linutronix.de>,
+	=?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Will Deacon <will@kernel.org>,
+	Gabriele Monaco <gmonaco@redhat.com>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Phil Auld <pauld@redhat.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	cgroups@vger.kernel.org,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	linux-mm@kvack.org,
+	Michal Hocko <mhocko@suse.com>,
+	linux-pci@vger.kernel.org,
+	Simon Horman <horms@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Waiman Long <longman@redhat.com>,
+	linux-block@vger.kernel.org,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Tejun Heo <tj@kernel.org>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	netdev@vger.kernel.org,
+	Muchun Song <muchun.song@linux.dev>
+Subject: [PATCH 00/31 v4] cpuset/isolation: Honour kthreads preferred affinity
+Date: Wed,  5 Nov 2025 22:03:16 +0100
+Message-ID: <20251105210348.35256-1-frederic@kernel.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-"Shankari Anand" <shankari.ak0208@gmail.com> writes:
+Hi,
 
-> On Sun, Oct 12, 2025 at 07:50:12PM +0530, Shankari Anand wrote:
->> Update call sites in the block subsystem to import `ARef` and
->> `AlwaysRefCounted` from `sync::aref` instead of `types`.
->>
->> This aligns with the ongoing effort to move `ARef` and
->> `AlwaysRefCounted` to sync.
->>
->> Suggested-by: Benno Lossin <lossin@kernel.org>
->> Link: https://github.com/Rust-for-Linux/linux/issues/1173
->> Signed-off-by: Shankari Anand <shankari.ak0208@gmail.com>
->> ---
->> Changelog:
->> v1 -> v2:
->> Rebased it on top of the latest linux-next upstream commit
->> Dropped 1/7 from the subject as it might lead to confusion of it being a series
->> Link of v1: https://lore.kernel.org/lkml/20250716090712.809750-1-shankari.ak0208@gmail.com/
->>
->> The original patch of moving ARef and AlwaysRefCounted to sync::aref is here:
->> (commit 07dad44aa9a93)
->> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=07dad44aa9a93b16af19e8609a10b241c352b440
->>
->>
->> Gradually the re-export from types.rs will be eliminated in the
->> future cycle.
->> ---
->>
->>  drivers/block/rnull/rnull.rs       | 3 +--
->>  rust/kernel/block/mq.rs            | 5 ++---
->>  rust/kernel/block/mq/operations.rs | 4 ++--
->>  rust/kernel/block/mq/request.rs    | 8 ++++++--
->>  4 files changed, 11 insertions(+), 9 deletions(-)
->>
->> diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
->> index 1ec694d7f1a6..a9d5e575a2c4 100644
->> --- a/drivers/block/rnull/rnull.rs
->> +++ b/drivers/block/rnull/rnull.rs
->> @@ -17,8 +17,7 @@
->>      error::Result,
->>      pr_info,
->>      prelude::*,
->> -    sync::Arc,
->> -    types::ARef,
->> +    sync::{aref::ARef, Arc},
->>  };
->>  use pin_init::PinInit;
->>
->> diff --git a/rust/kernel/block/mq.rs b/rust/kernel/block/mq.rs
->> index 637018ead0ab..1fd0d54dd549 100644
->> --- a/rust/kernel/block/mq.rs
->> +++ b/rust/kernel/block/mq.rs
->> @@ -20,7 +20,7 @@
->>  //! The kernel will interface with the block device driver by calling the method
->>  //! implementations of the `Operations` trait.
->>  //!
->> -//! IO requests are passed to the driver as [`kernel::types::ARef<Request>`]
->> +//! IO requests are passed to the driver as [`kernel::sync::aref::ARef<Request>`]
->>  //! instances. The `Request` type is a wrapper around the C `struct request`.
->>  //! The driver must mark end of processing by calling one of the
->>  //! `Request::end`, methods. Failure to do so can lead to deadlock or timeout
->> @@ -61,8 +61,7 @@
->>  //!     block::mq::*,
->>  //!     new_mutex,
->>  //!     prelude::*,
->> -//!     sync::{Arc, Mutex},
->> -//!     types::{ARef, ForeignOwnable},
->> +//!     sync::{aref::ARef, Arc, Mutex},
->>  //! };
->>  //!
->>  //! struct MyBlkDevice;
->> diff --git a/rust/kernel/block/mq/operations.rs b/rust/kernel/block/mq/operations.rs
->> index f91a1719886c..8ad46129a52c 100644
->> --- a/rust/kernel/block/mq/operations.rs
->> +++ b/rust/kernel/block/mq/operations.rs
->> @@ -9,8 +9,8 @@
->>      block::mq::{request::RequestDataWrapper, Request},
->>      error::{from_result, Result},
->>      prelude::*,
->> -    sync::Refcount,
->> -    types::{ARef, ForeignOwnable},
->> +    sync::{aref::ARef, Refcount},
->> +    types::ForeignOwnable,
->>  };
->>  use core::marker::PhantomData;
->>
->> diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
->> index c5f1f6b1ccfb..ce3e30c81cb5 100644
->> --- a/rust/kernel/block/mq/request.rs
->> +++ b/rust/kernel/block/mq/request.rs
->> @@ -8,8 +8,12 @@
->>      bindings,
->>      block::mq::Operations,
->>      error::Result,
->> -    sync::{atomic::Relaxed, Refcount},
->> -    types::{ARef, AlwaysRefCounted, Opaque},
->> +    sync::{
->> +        aref::{ARef, AlwaysRefCounted},
->> +        atomic::Relaxed,
->> +        Refcount,
->> +    },
->> +    types::Opaque,
->>  };
->>  use core::{marker::PhantomData, ptr::NonNull};
->>
->> base-commit: 2b763d4652393c90eaa771a5164502ec9dd965ae
->> --
->> 2.34.1
->>
-> Hello, can this patch be reviewed?
+The kthread code was enhanced lately to provide an infrastructure which
+manages the preferred affinity of unbound kthreads (node or custom
+cpumask) against housekeeping constraints and CPU hotplug events.
 
-I think I already ACK'ed this patch [1]. I can't apply patches for
-block. Jens or Miguel should apply this.
+One crucial missing piece is cpuset: when an isolated partition is
+created, deleted, or its CPUs updated, all the unbound kthreads in the
+top cpuset are affine to _all_ the non-isolated CPUs, possibly breaking
+their preferred affinity along the way
 
-Best regards,
-Andreas Hindborg
+Solve this with performing the kthreads affinity update from cpuset to
+the kthreads consolidated relevant code instead so that preferred
+affinities are honoured.
 
+The dispatch of the new cpumasks to workqueues and kthreads is performed
+by housekeeping, as per the nice Tejun's suggestion.
 
-[1] https://lore.kernel.org/r/87cy965edf.fsf@kernel.org
+As a welcome side effect, HK_TYPE_DOMAIN then integrates both the set
+from isolcpus= and cpuset isolated partitions. Housekeeping cpumasks are
+now modifyable with specific synchronization. A big step toward making
+nohz_full= also mutable through cpuset in the future.
 
+Changes since v3:
+
+- Spelling issues all over the place (Bjorn Helgaas, Simon Horman
+
+- Comment each HK_TYPE_* (Valentin Schneider)
+
+- Keep static branch in housekeeping_test_cpu() (Waiman Long)
+
+- Use rcu_dereference_all_check() to also check preemption disabled
+  (Chen Ridong)
+
+- Use cpumask_size() for allocation (Waiman Long)
+
+- Fix inverted branch on update (Phil Auld)
+
+- Set WQ_PERCPU to memcg workqueue (Waiman Long)
+
+- Remove linux/cpuset.h include from include/linux/sched/isolation.h
+  (Waiman Long)
+
+- Comment why unbound kthreads aren't updated on CPU online (Waiman Long)
+
+- Remove genirq related patches (handled in another patch after discussion
+  with Thomas Gleixner)
+
+git://git.kernel.org/pub/scm/linux/kernel/git/frederic/linux-dynticks.git
+	kthread/core-v4
+
+HEAD: 9ba457a61e09fb17a4698879367b7e6593c256d2
+
+Thanks,
+	Frederic
+---
+
+Frederic Weisbecker (30):
+      PCI: Prepare to protect against concurrent isolated cpuset change
+      cpu: Revert "cpu/hotplug: Prevent self deadlock on CPU hot-unplug"
+      memcg: Prepare to protect against concurrent isolated cpuset change
+      mm: vmstat: Prepare to protect against concurrent isolated cpuset change
+      sched/isolation: Save boot defined domain flags
+      cpuset: Convert boot_hk_cpus to use HK_TYPE_DOMAIN_BOOT
+      driver core: cpu: Convert /sys/devices/system/cpu/isolated to use HK_TYPE_DOMAIN_BOOT
+      net: Keep ignoring isolated cpuset change
+      block: Protect against concurrent isolated cpuset change
+      cpu: Provide lockdep check for CPU hotplug lock write-held
+      cpuset: Provide lockdep check for cpuset lock held
+      sched/isolation: Convert housekeeping cpumasks to rcu pointers
+      cpuset: Update HK_TYPE_DOMAIN cpumask from cpuset
+      sched/isolation: Flush memcg workqueues on cpuset isolated partition change
+      sched/isolation: Flush vmstat workqueues on cpuset isolated partition change
+      PCI: Flush PCI probe workqueue on cpuset isolated partition change
+      cpuset: Propagate cpuset isolation update to workqueue through housekeeping
+      cpuset: Remove cpuset_cpu_is_isolated()
+      sched/isolation: Remove HK_TYPE_TICK test from cpu_is_isolated()
+      PCI: Remove superfluous HK_TYPE_WQ check
+      kthread: Refine naming of affinity related fields
+      kthread: Include unbound kthreads in the managed affinity list
+      kthread: Include kthreadd to the managed affinity list
+      kthread: Rely on HK_TYPE_DOMAIN for preferred affinity management
+      sched: Switch the fallback task allowed cpumask to HK_TYPE_DOMAIN
+      sched/arm64: Move fallback task cpumask to HK_TYPE_DOMAIN
+      kthread: Honour kthreads preferred affinity after cpuset changes
+      kthread: Comment on the purpose and placement of kthread_affine_node() call
+      kthread: Document kthread_affine_preferred()
+      doc: Add housekeeping documentation
+
+Gabriele Monaco (1):
+      cgroup/cpuset: Fail if isolated and nohz_full don't leave any housekeeping
+
+ Documentation/cpu_isolation/housekeeping.rst | 111 +++++++++++++++++++
+ arch/arm64/kernel/cpufeature.c               |  18 ++-
+ block/blk-mq.c                               |   6 +-
+ drivers/base/cpu.c                           |   2 +-
+ drivers/pci/pci-driver.c                     |  71 ++++++++----
+ include/linux/cpu.h                          |   4 +
+ include/linux/cpuhplock.h                    |   1 +
+ include/linux/cpuset.h                       |   8 +-
+ include/linux/kthread.h                      |   1 +
+ include/linux/memcontrol.h                   |   4 +
+ include/linux/mmu_context.h                  |   2 +-
+ include/linux/pci.h                          |   3 +
+ include/linux/percpu-rwsem.h                 |   1 +
+ include/linux/sched/isolation.h              |  16 ++-
+ include/linux/vmstat.h                       |   2 +
+ include/linux/workqueue.h                    |   2 +-
+ init/Kconfig                                 |   1 +
+ kernel/cgroup/cpuset.c                       | 134 +++++++++++++++-------
+ kernel/cpu.c                                 |  42 +++----
+ kernel/kthread.c                             | 160 ++++++++++++++++++---------
+ kernel/sched/isolation.c                     | 138 ++++++++++++++++++-----
+ kernel/sched/sched.h                         |   4 +
+ kernel/workqueue.c                           |  17 +--
+ mm/memcontrol.c                              |  25 ++++-
+ mm/vmstat.c                                  |  15 ++-
+ net/core/net-sysfs.c                         |   2 +-
+ 26 files changed, 596 insertions(+), 194 deletions(-)
