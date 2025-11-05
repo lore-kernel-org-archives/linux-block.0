@@ -1,211 +1,175 @@
-Received: from mail-wr1-f104.google.com (mail-wr1-f104.google.com [209.85.221.104])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 998C0346FC3
-	for <linux-block@vger.kernel.org>; Wed,  5 Nov 2025 20:28:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.104
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19848333452;
+	Wed,  5 Nov 2025 20:37:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762374517; cv=none; b=reQ8zwYFm7euzu2dX26bEI21fnossIRrhKPHJK7SGt5tSH52L45ncXZbqrkTj6tWH5Pl7CkmEr+U8pRxumsvWt0Q7pZ+F2tsQd0G3q2nHo/NTzYK7rWdKByjxO8YIFwK3i8zInB9PE58KTQNcHak5HgvHq1qEeakTQT4kjBzpzc=
+	t=1762375050; cv=none; b=IVL1KT7AiPE+2FSh7rRJlz/GdJSxl7ItuUgK8i+WZJdeQsWnX4D4ka8s1cpZlezgikbjj1CAyHHvufCityMsYJN2Uji+sn9lR9AgD46L1nr3ANCw+zMVuXiRtzEGxVNnRz68NwnMqtYTwoETMahyq2CbELpc8rfQCrccRmEx5v4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762374517; c=relaxed/simple;
-	bh=ZNQBWF5E/kCd66vnCIEh1pwOhtP6knbpleihD38HzT8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=svXMZwblX64BQryIYJumB+tCQ+5iW3DjkVfV3W5+CI/HBqhfMRoKRBMBdIob6NZbSxLkWoBiKpcmv9MD5F1xzmzwShja8Hl1SBZ2L0+nOCC2Uq3L9DUKDbogAYwW0JNusB1SiBQ3PlOb39goGDtmWgUlB06e++DssRklVYg+510=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=EIOjqxkG; arc=none smtp.client-ip=209.85.221.104
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1762375050; c=relaxed/simple;
+	bh=UTReFefAF+6gXiQ2Z4l2YL1BSXnOxNYuKlBMTtxjWIs=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=VMJbRKoBfog4zAy9ix2YpQq8dQeip5c34lZmj6Q7mK8oAS/aS8mS35Rj2RGU4T8chAja9MeRerPhZmqFR6IoyaQ0QyEYC3Z8Qq04veVsb7D9jL7OM8tg6CtM4HMGzxFslLkzHluYPx4kkWU3pbk0QdL9FlaZQPdFnXWQTivnu8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HVCDzFWs; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="EIOjqxkG"
-Received: by mail-wr1-f104.google.com with SMTP id ffacd0b85a97d-4271234b49cso40516f8f.3
-        for <linux-block@vger.kernel.org>; Wed, 05 Nov 2025 12:28:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1762374514; x=1762979314; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=piuezMo/+nJvsS63m8MZriLez8iEvJ7btVwHROt2ogA=;
-        b=EIOjqxkGKrivEbXDb9Hzqr+XKgCZu9uLXAO52ajIC1d5bU5D+wKp8UPN/eTqZhUoh2
-         jVwjznhDeZgD5NtVc75BcA68M1csx86CihXWniV9cwT4Zx7k4tN7B2zR/CFQRavzOOt+
-         +vAn2TExCUJcCbb1b7egXbmLVa+oC+nAeuiDXnh71N16FtrltrvQugt1BkU+IgHOJxGf
-         ydDxP14jYMripXPKDke84T4JHvEIbjiqurMgNCsIH/wdhTdgtvKLBrxl2Gq+EuSqaQIz
-         TyRbpv7WBYXsUOQUr9CnJ5Q12AXnGS/VmgCyMaEw4KI3tXLRRw5YVdVZwRP5ILHGt4jU
-         KJnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762374514; x=1762979314;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=piuezMo/+nJvsS63m8MZriLez8iEvJ7btVwHROt2ogA=;
-        b=VbC80YghBq6bQGYYKjPi3O6qOUrJnezSP9KRNuOCY23ZhFfZLPczJZQzgEIec4BzXY
-         i/0BCuWOm1M37NqycMPreP9WFsBH7Y5FRzWOtqQirV/d3anuRJcmkSxgJDoHomQrFQyT
-         uZ5ht2AW/IUzGVo4J2qp/HFK621MEXvkKe4UR+Co5b0yGHjhi3gaeamgUTodDYOtP0tR
-         V/WJ53WmYCO5Wwr74ouVGRGC/YWa8MPGqic2EO54/uSsor5RVop33L6GcjYvMT+NtP7l
-         xHHJjZFik1HvPoBQ1JsTwJuafkTA2d1D/mNNZxU6jIoTWU9suDvS03wCF9bBFz70VALg
-         5BTA==
-X-Gm-Message-State: AOJu0YwUngSr6Dx32EezOVyvR0ub8wYeo9qtePt4WOxSPaJPYW91T8uF
-	kiScgBRt2eNNK8F3i5wX5f60o4397VNMxCOUGzRUXWwDqL84MqObfMc+w7lqmXE5ZAdNy/dUoX8
-	tUID96L1K308IUWLq/9o4yuDHC6a7D23OLkKi
-X-Gm-Gg: ASbGnctCdBBWD6kY5GyBY+F6WVa98oVje7VREKmFLJShNNTkIHhyAZaQZSley9Z+GGL
-	evADmPkJdjwMjzD1TZTkFN+3AhhCZWD+E9L4B5Gi5Mo+nkiRZdhIfSTUC8w7Z4Qs9fkNAbHn9MK
-	4kgguVciARk8jYa3slkWBBQWyg987M+Zdy5nykZqJ3OIZUdL8rxRyd1qHQWPki5NRdHOF1yaNaw
-	8+HOL4UyKWEpkow62jiHFqXPFs1ob91os1GichVZIDFxgkoueFTcDUqoMIpaZzRNcgqQu2PqMnb
-	Ys7Ue+I/k2Gbk/uQzx0VFBxJZKBBpW7bQQET42VbdCuCO4i8YVd1fnsC/OTdaIUWJn4p/BGqmb3
-	O0SmQBACEYIYSfF7z/kDmr/frUbd0LFY=
-X-Google-Smtp-Source: AGHT+IF3HJ9NqzHMzyJZYtlBawCznKJ3NSlqmqxl8ss4jfLNnF2OITyYlaRDgdmSnz2QY8Aul6AHUCVP6eiM
-X-Received: by 2002:a5d:64c9:0:b0:429:b697:1fa with SMTP id ffacd0b85a97d-429e32c53fcmr2205430f8f.2.1762374513766;
-        Wed, 05 Nov 2025 12:28:33 -0800 (PST)
-Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.128])
-        by smtp-relay.gmail.com with ESMTPS id ffacd0b85a97d-429eb3d499bsm24593f8f.19.2025.11.05.12.28.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Nov 2025 12:28:33 -0800 (PST)
-X-Relaying-Domain: purestorage.com
-Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.7.70.37])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id E416934057A;
-	Wed,  5 Nov 2025 13:28:30 -0700 (MST)
-Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id 10591E413BB; Wed,  5 Nov 2025 13:28:31 -0700 (MST)
-From: Caleb Sander Mateos <csander@purestorage.com>
-To: Ming Lei <ming.lei@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Caleb Sander Mateos <csander@purestorage.com>
-Subject: [PATCH v2 2/2] ublk: use rq_for_each_bvec() for user copy
-Date: Wed,  5 Nov 2025 13:28:23 -0700
-Message-ID: <20251105202823.2198194-3-csander@purestorage.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20251105202823.2198194-1-csander@purestorage.com>
-References: <20251105202823.2198194-1-csander@purestorage.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HVCDzFWs"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCB13C4CEF5;
+	Wed,  5 Nov 2025 20:37:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762375049;
+	bh=UTReFefAF+6gXiQ2Z4l2YL1BSXnOxNYuKlBMTtxjWIs=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=HVCDzFWsS3mRiRwZ9n4zO6J8K02zYN0I+IDaIP/Qz2UQK1klAzX7Nql2a+Lq88N9S
+	 1QIAM8LMu7LN4W3ABBVxdIFeN4eP3A5H7zln5NUyCTdJdhtcJEFCzoAzjXkqNvlNZy
+	 zBGQW3SUx1QyIwIF4KPwQlGCYHquKyutKQr1CkQRqE+ETagIJLGGt2kfh+f39GN8qZ
+	 4tZaPXQTIymYqgRNXKvJYKFNVcc+H8u1atTD5WUN3YZlRMiH9cVCYzOj4oF/+u6N4m
+	 qd2tvSpxS5PDZ4df5JxMXxxQ21LeK45fJChPRSdQXeJggqljFmafCalkdLc9Ec6DXG
+	 6N4AgiuUUz45A==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: Shankari Anand <shankari.ak0208@gmail.com>, Jens Axboe
+ <axboe@kernel.dk>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor
+ <alex.gaynor@gmail.com>
+Cc: Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
+ =?utf-8?Q?Bj=C3=B6rn?=
+ Roy Baron <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>,
+ Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
+ Danilo Krummrich <dakr@kernel.org>, linux-block@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, Shankari
+ Anand <shankari.ak0208@gmail.com>
+Subject: Re:[PATCH v2] rust: block: update ARef and AlwaysRefCounted imports
+ from sync::aref
+In-Reply-To: <20251104171316.6672-1-shankari.ak0208@gmail.com>
+References: <20251012142012.166230-1-shankari.ak0208@gmail.com>
+ <2EAsrR9pInr4r9ZEowYQNdH4LHuonKsTkjkqwn36aqxjRO7jOAlYZOaWyRzgdl-YU_bxzR50-VFWQHwcl479iA==@protonmail.internalid>
+ <20251104171316.6672-1-shankari.ak0208@gmail.com>
+Date: Wed, 05 Nov 2025 21:37:19 +0100
+Message-ID: <87tsz86wsg.fsf@t14s.mail-host-address-is-not-set>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-ublk_advance_io_iter() and ublk_copy_io_pages() currently open-code the
-iteration over request's bvecs. Switch to the rq_for_each_bvec() macro
-provided by blk-mq to avoid reaching into the bio internals and simplify
-the code. Unlike bio_iter_iovec(), rq_for_each_bvec() can return
-multi-page bvecs. So switch from copy_{to,from}_iter() to
-copy_page_{to,from}_iter() to map and copy each page in the bvec.
+"Shankari Anand" <shankari.ak0208@gmail.com> writes:
 
-Suggested-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
----
- drivers/block/ublk_drv.c | 78 ++++++++++++----------------------------
- 1 file changed, 23 insertions(+), 55 deletions(-)
+> On Sun, Oct 12, 2025 at 07:50:12PM +0530, Shankari Anand wrote:
+>> Update call sites in the block subsystem to import `ARef` and
+>> `AlwaysRefCounted` from `sync::aref` instead of `types`.
+>>
+>> This aligns with the ongoing effort to move `ARef` and
+>> `AlwaysRefCounted` to sync.
+>>
+>> Suggested-by: Benno Lossin <lossin@kernel.org>
+>> Link: https://github.com/Rust-for-Linux/linux/issues/1173
+>> Signed-off-by: Shankari Anand <shankari.ak0208@gmail.com>
+>> ---
+>> Changelog:
+>> v1 -> v2:
+>> Rebased it on top of the latest linux-next upstream commit
+>> Dropped 1/7 from the subject as it might lead to confusion of it being a series
+>> Link of v1: https://lore.kernel.org/lkml/20250716090712.809750-1-shankari.ak0208@gmail.com/
+>>
+>> The original patch of moving ARef and AlwaysRefCounted to sync::aref is here:
+>> (commit 07dad44aa9a93)
+>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=07dad44aa9a93b16af19e8609a10b241c352b440
+>>
+>>
+>> Gradually the re-export from types.rs will be eliminated in the
+>> future cycle.
+>> ---
+>>
+>>  drivers/block/rnull/rnull.rs       | 3 +--
+>>  rust/kernel/block/mq.rs            | 5 ++---
+>>  rust/kernel/block/mq/operations.rs | 4 ++--
+>>  rust/kernel/block/mq/request.rs    | 8 ++++++--
+>>  4 files changed, 11 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
+>> index 1ec694d7f1a6..a9d5e575a2c4 100644
+>> --- a/drivers/block/rnull/rnull.rs
+>> +++ b/drivers/block/rnull/rnull.rs
+>> @@ -17,8 +17,7 @@
+>>      error::Result,
+>>      pr_info,
+>>      prelude::*,
+>> -    sync::Arc,
+>> -    types::ARef,
+>> +    sync::{aref::ARef, Arc},
+>>  };
+>>  use pin_init::PinInit;
+>>
+>> diff --git a/rust/kernel/block/mq.rs b/rust/kernel/block/mq.rs
+>> index 637018ead0ab..1fd0d54dd549 100644
+>> --- a/rust/kernel/block/mq.rs
+>> +++ b/rust/kernel/block/mq.rs
+>> @@ -20,7 +20,7 @@
+>>  //! The kernel will interface with the block device driver by calling the method
+>>  //! implementations of the `Operations` trait.
+>>  //!
+>> -//! IO requests are passed to the driver as [`kernel::types::ARef<Request>`]
+>> +//! IO requests are passed to the driver as [`kernel::sync::aref::ARef<Request>`]
+>>  //! instances. The `Request` type is a wrapper around the C `struct request`.
+>>  //! The driver must mark end of processing by calling one of the
+>>  //! `Request::end`, methods. Failure to do so can lead to deadlock or timeout
+>> @@ -61,8 +61,7 @@
+>>  //!     block::mq::*,
+>>  //!     new_mutex,
+>>  //!     prelude::*,
+>> -//!     sync::{Arc, Mutex},
+>> -//!     types::{ARef, ForeignOwnable},
+>> +//!     sync::{aref::ARef, Arc, Mutex},
+>>  //! };
+>>  //!
+>>  //! struct MyBlkDevice;
+>> diff --git a/rust/kernel/block/mq/operations.rs b/rust/kernel/block/mq/operations.rs
+>> index f91a1719886c..8ad46129a52c 100644
+>> --- a/rust/kernel/block/mq/operations.rs
+>> +++ b/rust/kernel/block/mq/operations.rs
+>> @@ -9,8 +9,8 @@
+>>      block::mq::{request::RequestDataWrapper, Request},
+>>      error::{from_result, Result},
+>>      prelude::*,
+>> -    sync::Refcount,
+>> -    types::{ARef, ForeignOwnable},
+>> +    sync::{aref::ARef, Refcount},
+>> +    types::ForeignOwnable,
+>>  };
+>>  use core::marker::PhantomData;
+>>
+>> diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
+>> index c5f1f6b1ccfb..ce3e30c81cb5 100644
+>> --- a/rust/kernel/block/mq/request.rs
+>> +++ b/rust/kernel/block/mq/request.rs
+>> @@ -8,8 +8,12 @@
+>>      bindings,
+>>      block::mq::Operations,
+>>      error::Result,
+>> -    sync::{atomic::Relaxed, Refcount},
+>> -    types::{ARef, AlwaysRefCounted, Opaque},
+>> +    sync::{
+>> +        aref::{ARef, AlwaysRefCounted},
+>> +        atomic::Relaxed,
+>> +        Refcount,
+>> +    },
+>> +    types::Opaque,
+>>  };
+>>  use core::{marker::PhantomData, ptr::NonNull};
+>>
+>> base-commit: 2b763d4652393c90eaa771a5164502ec9dd965ae
+>> --
+>> 2.34.1
+>>
+> Hello, can this patch be reviewed?
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 40eee3e15a4c..929d40fe0250 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -911,81 +911,49 @@ static const struct block_device_operations ub_fops = {
- 	.open =		ublk_open,
- 	.free_disk =	ublk_free_disk,
- 	.report_zones =	ublk_report_zones,
- };
- 
--struct ublk_io_iter {
--	struct bio *bio;
--	struct bvec_iter iter;
--};
--
--/* return how many bytes are copied */
--static size_t ublk_copy_io_pages(struct ublk_io_iter *data,
--		struct iov_iter *uiter, int dir)
-+/*
-+ * Copy data between request pages and io_iter, and 'offset'
-+ * is the start point of linear offset of request.
-+ */
-+static size_t ublk_copy_user_pages(const struct request *req,
-+		unsigned offset, struct iov_iter *uiter, int dir)
- {
-+	struct req_iterator iter;
-+	struct bio_vec bv;
- 	size_t done = 0;
- 
--	for (;;) {
--		struct bio_vec bv = bio_iter_iovec(data->bio, data->iter);
--		void *bv_buf = bvec_kmap_local(&bv);
-+	rq_for_each_bvec(bv, req, iter) {
- 		size_t copied;
- 
-+		if (offset >= bv.bv_len) {
-+			offset -= bv.bv_len;
-+			continue;
-+		}
-+
-+		bv.bv_offset += offset;
-+		bv.bv_len -= offset;
-+		bv.bv_page += bv.bv_offset / PAGE_SIZE;
-+		bv.bv_offset %= PAGE_SIZE;
- 		if (dir == ITER_DEST)
--			copied = copy_to_iter(bv_buf, bv.bv_len, uiter);
-+			copied = copy_page_to_iter(
-+				bv.bv_page, bv.bv_offset, bv.bv_len, uiter);
- 		else
--			copied = copy_from_iter(bv_buf, bv.bv_len, uiter);
--
--		kunmap_local(bv_buf);
-+			copied = copy_page_from_iter(
-+				bv.bv_page, bv.bv_offset, bv.bv_len, uiter);
- 
- 		done += copied;
- 		if (copied < bv.bv_len)
- 			break;
- 
--		/* advance bio */
--		bio_advance_iter_single(data->bio, &data->iter, copied);
--		if (!data->iter.bi_size) {
--			data->bio = data->bio->bi_next;
--			if (data->bio == NULL)
--				break;
--			data->iter = data->bio->bi_iter;
--		}
-+		offset = 0;
- 	}
- 	return done;
- }
- 
--static bool ublk_advance_io_iter(const struct request *req,
--		struct ublk_io_iter *iter, unsigned int offset)
--{
--	struct bio *bio = req->bio;
--
--	for_each_bio(bio) {
--		if (bio->bi_iter.bi_size > offset) {
--			iter->bio = bio;
--			iter->iter = bio->bi_iter;
--			bio_advance_iter(iter->bio, &iter->iter, offset);
--			return true;
--		}
--		offset -= bio->bi_iter.bi_size;
--	}
--	return false;
--}
--
--/*
-- * Copy data between request pages and io_iter, and 'offset'
-- * is the start point of linear offset of request.
-- */
--static size_t ublk_copy_user_pages(const struct request *req,
--		unsigned offset, struct iov_iter *uiter, int dir)
--{
--	struct ublk_io_iter iter;
--
--	if (!ublk_advance_io_iter(req, &iter, offset))
--		return 0;
--
--	return ublk_copy_io_pages(&iter, uiter, dir);
--}
--
- static inline bool ublk_need_map_req(const struct request *req)
- {
- 	return ublk_rq_has_data(req) && req_op(req) == REQ_OP_WRITE;
- }
- 
--- 
-2.45.2
+I think I already ACK'ed this patch [1]. I can't apply patches for
+block. Jens or Miguel should apply this.
+
+Best regards,
+Andreas Hindborg
+
+
+[1] https://lore.kernel.org/r/87cy965edf.fsf@kernel.org
 
