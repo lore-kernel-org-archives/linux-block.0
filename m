@@ -1,206 +1,269 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78C82339B47;
-	Wed,  5 Nov 2025 16:57:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7BED2222D0;
+	Wed,  5 Nov 2025 17:06:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762361823; cv=none; b=KI42riCZ+1kvSEJWiQlcpKxeSkjsiwgXRQ2fEFbTax+ndc+t3Tq9vkXi0Mu2lH5uLDD6ky/3djDgEB23ujS+8UZWr68dEwHLRMZKvkJG+hbRkEi+GupPynq9LxMVgPCTf0kQSPtej1yoec0884LZYdWutY2S/1ifMxgaDg37yiY=
+	t=1762362370; cv=none; b=rDVi5FagKKflrEDFJ48zqnyxRp4VDERdZPxGCap1a4UQ7U5pTqqGIOwy0rq4Sh7jffUv3EnG35dq7Vhl8/Rsbl1ILVAadcGVQQ0aLSrNuzXUunYC0ngOwIYRYvq4vi2PouE5ajz2X/Kn5Dddj5AUPnGm8yN77C+UMnohre5QkrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762361823; c=relaxed/simple;
-	bh=nhM7jbKOW56d3hh/niEe2UapYbSyWoAGZQptKDlqI44=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h1hfKE5NVqdKsc4ZknTJnrLkEa4O5D5/3VygawME0wtKJojxW1IWucyeMJEDtICSvKb4zqtPZxVINLA/2eBPKGB2MsAikfy4ozndQvzrc9rM6jXtO+zuM0Ly9kaCb2XwYV76MUcG5j+GOj/v2DCjOoCVWcYNIzc3DUyyrJNeSU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XkrNSQmV; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1762362370; c=relaxed/simple;
+	bh=Gk/CiOYKk/7fyEqA+IWuarZ1K1PjWKoryFhEXgHtH54=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YM2aVIndXxC8e7uiHCprE3drP2BQQ0rsXnH9LLQRvpwSTvnSius57qPB+EtC7VOq5/HfhVhJfiQoXInwb0V08Di2EgEwh2sgPiA2rSkH+eIIo6TeWYcJCACVrtrWrcWYTiLIfOoMEBXzv86iWschTssgKv6ITzOAwo5SiSmdclc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=2L1jxihu; arc=none smtp.client-ip=199.89.3.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XkrNSQmV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61FC2C4CEF5;
-	Wed,  5 Nov 2025 16:57:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762361823;
-	bh=nhM7jbKOW56d3hh/niEe2UapYbSyWoAGZQptKDlqI44=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XkrNSQmVRGDQ0lt4n06gp9o429LO1OThSwSo+tIIP2EJBJlS8ww/ro7sMmGiVdhrM
-	 t1rgH6uGlaXnjmVa+q0tT6T/wHZzevQNMI/p1TJa24pvFPEM/3OqPC7DF47OIz9o9m
-	 rS7nbd/l2kvzZuGV09bu3MD4TN55uh1avGCcK3xopWmiC5ZLktsFp0az7HaETHuJoY
-	 Vh1Stje19/PGgTlt9Jb499Vr+Bcz3Vt9T3rYp8qWR+6Y0CAW4VMy94J4OlikA0BiAP
-	 dy2pVF6eF1/01q9zF36JMleysXGqAX5oXg57tsMBxZrtmIJQPGP9L3s7oIbUpsJ6fD
-	 yvwf0f0RHi11g==
-Date: Wed, 5 Nov 2025 17:57:00 +0100
-From: Frederic Weisbecker <frederic@kernel.org>
-To: Waiman Long <llong@redhat.com>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Gabriele Monaco <gmonaco@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Marco Crivellari <marco.crivellari@suse.com>,
-	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
-	"Rafael J . Wysocki" <rafael@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Vlastimil Babka <vbabka@suse.cz>, Will Deacon <will@kernel.org>,
-	cgroups@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-mm@kvack.org,
-	linux-pci@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 22/33] kthread: Include unbound kthreads in the managed
- affinity list
-Message-ID: <aQuB3Oy7i6Z0SJlA@localhost.localdomain>
-References: <20251013203146.10162-1-frederic@kernel.org>
- <20251013203146.10162-23-frederic@kernel.org>
- <ba437129-062a-4a2f-a753-64945e9a13ff@redhat.com>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="2L1jxihu"
+Received: from localhost (localhost [127.0.0.1])
+	by 004.mia.mailroute.net (Postfix) with ESMTP id 4d1sCw3Mm7zm88Hc;
+	Wed,  5 Nov 2025 17:06:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:mime-version:x-mailer:message-id:date
+	:date:subject:subject:from:from:received:received; s=mr01; t=
+	1762362362; x=1764954363; bh=9nUScaESm1FAqlqIpease1umCaDtIn+JtuA
+	1Ch7zeBQ=; b=2L1jxihudzu8/EOEvaribVA/vG+FKTPoo4qallD3fK5zpBZ7pA5
+	iBv6qMMzZ3bjFwMV7s9j5sQKsf/iOVQwh+dR/XHjg5dlTPykiz2A7ge2Kztouc7f
+	n8A4SrVIjrGgds0rU8j8pMcoN48mWRK5cuMXGssj1F545gP7tb7GzY4KKV85ly0Q
+	J94ujGPJzhoiE1oyuqHXLsSXD8FtKI9cHd/FG9Pal+VLxTOZbIcpJpnQiQBp91ak
+	lXUdfKjslfjJVapQvRbbjdMMNs+RwgnDcW34J+TBwOAIJ0LgeD1VJkXHkj0cV/QF
+	27uglQq3ruaDucfSp1HQIP6PznOumyif2Kw==
+X-Virus-Scanned: by MailRoute
+Received: from 004.mia.mailroute.net ([127.0.0.1])
+ by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id h0_T-8mBeTgK; Wed,  5 Nov 2025 17:06:02 +0000 (UTC)
+Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4d1sCb747Jzm84w4;
+	Wed,  5 Nov 2025 17:05:46 +0000 (UTC)
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Ming Lei <ming.lei@redhat.com>,
+	Nilay Shroff <nilay@linux.ibm.com>,
+	Martin Wilck <mwilck@suse.com>,
+	Benjamin Marzinski <bmarzins@redhat.com>,
+	stable@vger.kernel.org,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Damien Le Moal <dlemoal@kernel.org>
+Subject: [PATCH v4] block: Remove queue freezing from several sysfs store callbacks
+Date: Wed,  5 Nov 2025 09:05:33 -0800
+Message-ID: <20251105170534.2989596-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.51.2.1006.ga50a493c49-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ba437129-062a-4a2f-a753-64945e9a13ff@redhat.com>
+Content-Transfer-Encoding: quoted-printable
 
-Le Tue, Oct 21, 2025 at 06:42:59PM -0400, Waiman Long a écrit :
-> 
-> On 10/13/25 4:31 PM, Frederic Weisbecker wrote:
-> > The managed affinity list currently contains only unbound kthreads that
-> > have affinity preferences. Unbound kthreads globally affine by default
-> > are outside of the list because their affinity is automatically managed
-> > by the scheduler (through the fallback housekeeping mask) and by cpuset.
-> > 
-> > However in order to preserve the preferred affinity of kthreads, cpuset
-> > will delegate the isolated partition update propagation to the
-> > housekeeping and kthread code.
-> > 
-> > Prepare for that with including all unbound kthreads in the managed
-> > affinity list.
-> > 
-> > Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
-> > ---
-> >   kernel/kthread.c | 59 ++++++++++++++++++++++++------------------------
-> >   1 file changed, 30 insertions(+), 29 deletions(-)
-> > 
-> > diff --git a/kernel/kthread.c b/kernel/kthread.c
-> > index c4dd967e9e9c..cba3d297f267 100644
-> > --- a/kernel/kthread.c
-> > +++ b/kernel/kthread.c
-> > @@ -365,9 +365,10 @@ static void kthread_fetch_affinity(struct kthread *kthread, struct cpumask *cpum
-> >   	if (kthread->preferred_affinity) {
-> >   		pref = kthread->preferred_affinity;
-> >   	} else {
-> > -		if (WARN_ON_ONCE(kthread->node == NUMA_NO_NODE))
-> > -			return;
-> > -		pref = cpumask_of_node(kthread->node);
-> > +		if (kthread->node == NUMA_NO_NODE)
-> > +			pref = housekeeping_cpumask(HK_TYPE_KTHREAD);
-> > +		else
-> > +			pref = cpumask_of_node(kthread->node);
-> >   	}
-> >   	cpumask_and(cpumask, pref, housekeeping_cpumask(HK_TYPE_KTHREAD));
-> > @@ -380,32 +381,29 @@ static void kthread_affine_node(void)
-> >   	struct kthread *kthread = to_kthread(current);
-> >   	cpumask_var_t affinity;
-> > -	WARN_ON_ONCE(kthread_is_per_cpu(current));
-> > +	if (WARN_ON_ONCE(kthread_is_per_cpu(current)))
-> > +		return;
-> > -	if (kthread->node == NUMA_NO_NODE) {
-> > -		housekeeping_affine(current, HK_TYPE_KTHREAD);
-> > -	} else {
-> > -		if (!zalloc_cpumask_var(&affinity, GFP_KERNEL)) {
-> > -			WARN_ON_ONCE(1);
-> > -			return;
-> > -		}
-> > -
-> > -		mutex_lock(&kthread_affinity_lock);
-> > -		WARN_ON_ONCE(!list_empty(&kthread->affinity_node));
-> > -		list_add_tail(&kthread->affinity_node, &kthread_affinity_list);
-> > -		/*
-> > -		 * The node cpumask is racy when read from kthread() but:
-> > -		 * - a racing CPU going down will either fail on the subsequent
-> > -		 *   call to set_cpus_allowed_ptr() or be migrated to housekeepers
-> > -		 *   afterwards by the scheduler.
-> > -		 * - a racing CPU going up will be handled by kthreads_online_cpu()
-> > -		 */
-> > -		kthread_fetch_affinity(kthread, affinity);
-> > -		set_cpus_allowed_ptr(current, affinity);
-> > -		mutex_unlock(&kthread_affinity_lock);
-> > -
-> > -		free_cpumask_var(affinity);
-> > +	if (!zalloc_cpumask_var(&affinity, GFP_KERNEL)) {
-> > +		WARN_ON_ONCE(1);
-> > +		return;
-> >   	}
-> > +
-> > +	mutex_lock(&kthread_affinity_lock);
-> > +	WARN_ON_ONCE(!list_empty(&kthread->affinity_node));
-> > +	list_add_tail(&kthread->affinity_node, &kthread_affinity_list);
-> > +	/*
-> > +	 * The node cpumask is racy when read from kthread() but:
-> > +	 * - a racing CPU going down will either fail on the subsequent
-> > +	 *   call to set_cpus_allowed_ptr() or be migrated to housekeepers
-> > +	 *   afterwards by the scheduler.
-> > +	 * - a racing CPU going up will be handled by kthreads_online_cpu()
-> > +	 */
-> > +	kthread_fetch_affinity(kthread, affinity);
-> > +	set_cpus_allowed_ptr(current, affinity);
-> > +	mutex_unlock(&kthread_affinity_lock);
-> > +
-> > +	free_cpumask_var(affinity);
-> >   }
-> >   static int kthread(void *_create)
-> > @@ -924,8 +922,11 @@ static int kthreads_online_cpu(unsigned int cpu)
-> >   			ret = -EINVAL;
-> >   			continue;
-> >   		}
-> > -		kthread_fetch_affinity(k, affinity);
-> > -		set_cpus_allowed_ptr(k->task, affinity);
-> > +
-> > +		if (k->preferred_affinity || k->node != NUMA_NO_NODE) {
-> > +			kthread_fetch_affinity(k, affinity);
-> > +			set_cpus_allowed_ptr(k->task, affinity);
-> > +		}
-> >   	}
-> 
-> My understanding of kthreads_online_cpu() is that hotplug won't affect the
-> affinity returned from kthread_fetch_affinity().
+Freezing the request queue from inside sysfs store callbacks may cause a
+deadlock in combination with the dm-multipath driver and the
+queue_if_no_path option. Additionally, freezing the request queue slows
+down system boot on systems where sysfs attributes are set synchronously.
 
-It should. The onlining CPU is considered online at this point and might
-be part of the returned kthread_fetch_affinity().
+Fix this by removing the blk_mq_freeze_queue() / blk_mq_unfreeze_queue()
+calls from the store callbacks that do not strictly need these callbacks.
+This patch may cause a small delay in applying the new settings.
 
-> However, set_cpus_allowed_ptr() will mask out all the offline CPUs. So if the given
-> "cpu" to be brought online is in the returned affinity, we should call
-> set_cpus_allowed_ptr() to add this cpu into its affinity mask though the
-> current code will call it even it is not strictly necessary.
+This patch affects the following sysfs attributes:
+* io_poll_delay
+* io_timeout
+* nomerges
+* read_ahead_kb
+* rq_affinity
 
-I'm not sure I understand what you mean.
+Here is an example of a deadlock triggered by running test srp/002:
 
-> This change will not do this update to NUMA_NO_NODE kthread with no preferred_affinity,
-> is this a problem?
+task:multipathd
+Call Trace:
+ <TASK>
+ __schedule+0x8c1/0x1bf0
+ schedule+0xdd/0x270
+ schedule_preempt_disabled+0x1c/0x30
+ __mutex_lock+0xb89/0x1650
+ mutex_lock_nested+0x1f/0x30
+ dm_table_set_restrictions+0x823/0xdf0
+ __bind+0x166/0x590
+ dm_swap_table+0x2a7/0x490
+ do_resume+0x1b1/0x610
+ dev_suspend+0x55/0x1a0
+ ctl_ioctl+0x3a5/0x7e0
+ dm_ctl_ioctl+0x12/0x20
+ __x64_sys_ioctl+0x127/0x1a0
+ x64_sys_call+0xe2b/0x17d0
+ do_syscall_64+0x96/0x3a0
+ entry_SYSCALL_64_after_hwframe+0x4b/0x53
+ </TASK>
+task:(udev-worker)
+Call Trace:
+ <TASK>
+ __schedule+0x8c1/0x1bf0
+ schedule+0xdd/0x270
+ blk_mq_freeze_queue_wait+0xf2/0x140
+ blk_mq_freeze_queue_nomemsave+0x23/0x30
+ queue_ra_store+0x14e/0x290
+ queue_attr_store+0x23e/0x2c0
+ sysfs_kf_write+0xde/0x140
+ kernfs_fop_write_iter+0x3b2/0x630
+ vfs_write+0x4fd/0x1390
+ ksys_write+0xfd/0x230
+ __x64_sys_write+0x76/0xc0
+ x64_sys_call+0x276/0x17d0
+ do_syscall_64+0x96/0x3a0
+ entry_SYSCALL_64_after_hwframe+0x4b/0x53
+ </TASK>
 
-Ah, so unbound kthreads without preferred affinity are already affine to all
-possible CPUs (or housekeeping), whether those CPUs are online or not. So we
-don't need to add newly online CPUs to them.
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Nilay Shroff <nilay@linux.ibm.com>
+Cc: Martin Wilck <mwilck@suse.com>
+Cc: Benjamin Marzinski <bmarzins@redhat.com>
+Cc: stable@vger.kernel.org
+Fixes: af2814149883 ("block: freeze the queue in queue_attr_store")
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
 
-kthreads with a preferred affinity or node are different because if none of
-their preferred CPUs are online, they must be affine to housekeeping. But as
-soon as one of their preferred CPU becomes online, they must be affine to them.
+Changes compared to v3:
+ - Added two data_race() annotations.
 
-Hence the different treatment. I'm adding a big comment to explain that.
+Changes compared to v2:
+ - Dropped the controversial patch "block: Restrict the duration of sysfs
+   attribute changes".
 
-Thanks!
+Changes compared to v1:
+ - Added patch "block: Restrict the duration of sysfs attribute changes".
+ - Remove queue freezing from more sysfs callbacks.
 
--- 
-Frederic Weisbecker
-SUSE Labs
+block/blk-sysfs.c | 20 +++-----------------
+ 1 file changed, 3 insertions(+), 17 deletions(-)
+
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 76c47fe9b8d6..6eaccd18d8b4 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -143,7 +143,6 @@ queue_ra_store(struct gendisk *disk, const char *page=
+, size_t count)
+ {
+ 	unsigned long ra_kb;
+ 	ssize_t ret;
+-	unsigned int memflags;
+ 	struct request_queue *q =3D disk->queue;
+=20
+ 	ret =3D queue_var_store(&ra_kb, page, count);
+@@ -154,10 +153,8 @@ queue_ra_store(struct gendisk *disk, const char *pag=
+e, size_t count)
+ 	 * calculated from the queue limits by queue_limits_commit_update.
+ 	 */
+ 	mutex_lock(&q->limits_lock);
+-	memflags =3D blk_mq_freeze_queue(q);
+-	disk->bdi->ra_pages =3D ra_kb >> (PAGE_SHIFT - 10);
++	data_race(disk->bdi->ra_pages =3D ra_kb >> (PAGE_SHIFT - 10));
+ 	mutex_unlock(&q->limits_lock);
+-	blk_mq_unfreeze_queue(q, memflags);
+=20
+ 	return ret;
+ }
+@@ -375,21 +372,18 @@ static ssize_t queue_nomerges_store(struct gendisk =
+*disk, const char *page,
+ 				    size_t count)
+ {
+ 	unsigned long nm;
+-	unsigned int memflags;
+ 	struct request_queue *q =3D disk->queue;
+ 	ssize_t ret =3D queue_var_store(&nm, page, count);
+=20
+ 	if (ret < 0)
+ 		return ret;
+=20
+-	memflags =3D blk_mq_freeze_queue(q);
+ 	blk_queue_flag_clear(QUEUE_FLAG_NOMERGES, q);
+ 	blk_queue_flag_clear(QUEUE_FLAG_NOXMERGES, q);
+ 	if (nm =3D=3D 2)
+ 		blk_queue_flag_set(QUEUE_FLAG_NOMERGES, q);
+ 	else if (nm)
+ 		blk_queue_flag_set(QUEUE_FLAG_NOXMERGES, q);
+-	blk_mq_unfreeze_queue(q, memflags);
+=20
+ 	return ret;
+ }
+@@ -409,7 +403,6 @@ queue_rq_affinity_store(struct gendisk *disk, const c=
+har *page, size_t count)
+ #ifdef CONFIG_SMP
+ 	struct request_queue *q =3D disk->queue;
+ 	unsigned long val;
+-	unsigned int memflags;
+=20
+ 	ret =3D queue_var_store(&val, page, count);
+ 	if (ret < 0)
+@@ -421,7 +414,6 @@ queue_rq_affinity_store(struct gendisk *disk, const c=
+har *page, size_t count)
+ 	 * are accessed individually using atomic test_bit operation. So we
+ 	 * don't grab any lock while updating these flags.
+ 	 */
+-	memflags =3D blk_mq_freeze_queue(q);
+ 	if (val =3D=3D 2) {
+ 		blk_queue_flag_set(QUEUE_FLAG_SAME_COMP, q);
+ 		blk_queue_flag_set(QUEUE_FLAG_SAME_FORCE, q);
+@@ -432,7 +424,6 @@ queue_rq_affinity_store(struct gendisk *disk, const c=
+har *page, size_t count)
+ 		blk_queue_flag_clear(QUEUE_FLAG_SAME_COMP, q);
+ 		blk_queue_flag_clear(QUEUE_FLAG_SAME_FORCE, q);
+ 	}
+-	blk_mq_unfreeze_queue(q, memflags);
+ #endif
+ 	return ret;
+ }
+@@ -446,11 +437,9 @@ static ssize_t queue_poll_delay_store(struct gendisk=
+ *disk, const char *page,
+ static ssize_t queue_poll_store(struct gendisk *disk, const char *page,
+ 				size_t count)
+ {
+-	unsigned int memflags;
+ 	ssize_t ret =3D count;
+ 	struct request_queue *q =3D disk->queue;
+=20
+-	memflags =3D blk_mq_freeze_queue(q);
+ 	if (!(q->limits.features & BLK_FEAT_POLL)) {
+ 		ret =3D -EINVAL;
+ 		goto out;
+@@ -459,7 +448,6 @@ static ssize_t queue_poll_store(struct gendisk *disk,=
+ const char *page,
+ 	pr_info_ratelimited("writes to the poll attribute are ignored.\n");
+ 	pr_info_ratelimited("please use driver specific parameters instead.\n")=
+;
+ out:
+-	blk_mq_unfreeze_queue(q, memflags);
+ 	return ret;
+ }
+=20
+@@ -472,7 +460,7 @@ static ssize_t queue_io_timeout_show(struct gendisk *=
+disk, char *page)
+ static ssize_t queue_io_timeout_store(struct gendisk *disk, const char *=
+page,
+ 				  size_t count)
+ {
+-	unsigned int val, memflags;
++	unsigned int val;
+ 	int err;
+ 	struct request_queue *q =3D disk->queue;
+=20
+@@ -480,9 +468,7 @@ static ssize_t queue_io_timeout_store(struct gendisk =
+*disk, const char *page,
+ 	if (err || val =3D=3D 0)
+ 		return -EINVAL;
+=20
+-	memflags =3D blk_mq_freeze_queue(q);
+-	blk_queue_rq_timeout(q, msecs_to_jiffies(val));
+-	blk_mq_unfreeze_queue(q, memflags);
++	data_race((blk_queue_rq_timeout(q, msecs_to_jiffies(val)), 0));
+=20
+ 	return count;
+ }
