@@ -1,66 +1,31 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C14E1DDC35
-	for <linux-block@vger.kernel.org>; Wed,  5 Nov 2025 02:17:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BAF82222CB;
+	Wed,  5 Nov 2025 03:04:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762309045; cv=none; b=QoB1MXQLQNm4Q91+z6nbdugcxmZ+xI0ffzHk70+fvwYIrph4oCUYSB1J0O4ZxbAFoID6oUkwfSXZ7dD8l5OL90F82Z18zCDI4nOMWd5munPUQWZIfRpdjQO58QFkKd7+qAlv6Byez33w97LKK8aIAJ0H+JA0khyi44h15h9YFOY=
+	t=1762311855; cv=none; b=j9F9ipdzRqWQTCw5XVO6RmLw7PB0YW387b96LpnV+hiZJ2yCsfy8WoJsc7svtN+sQMzP3RPt3HVg63MxUzWxRoEgl5JZmFqeJakT/0DXMuiredzEZg/tP/EnPHhYI24g5ML31Oqo1rDHYmk7DtioZ/x12w5grN5Yl4cmFAKQsfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762309045; c=relaxed/simple;
-	bh=tIkUTPwyZxnsrTixu38fGF7ItfuUWaUD0A4ZjzU7nQw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uUOEx5ITOGE5IGJKevk7md3BQ+fIJagz6PJwMmzgTOOdQSyunvPKidy+3fofNNqCj9Z+iFDvCcvSCQNMPfNPpYlQhbKYf9DShoGpGQjtna8vOhVMho8707CAkwDtBwM70Jo85qcqzu94TG7AToDV7HHGAzxVvOf24lv9X36DqpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MWkXTJSJ; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1762311855; c=relaxed/simple;
+	bh=EYe5bn5+pWPaZKRizWsa4rQFl0NSIZQeStp8fFoQuXg=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=owc63/YB0guaemD1MuqIdPNJ0hMGJwhasYcmecPOQx9uTqE3XDJJXM/oTVZsTmyPZa/w7402JO7znKrMbNbKF9A81Vx5A/4Wiyx2kFAadbuinbJEF6f2TJiIu2KSmyW7kaoP50MAwIEFR2vEeYzGPwLZb6W8JLe4VSWEMj1dPCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=qX+36mnn; arc=none smtp.client-ip=115.124.30.97
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MWkXTJSJ"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-29586626fbeso31573325ad.0
-        for <linux-block@vger.kernel.org>; Tue, 04 Nov 2025 18:17:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762309043; x=1762913843; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=H6BPDj3wavhdGIBE9zS61DdhM4idE+BoIHjh+Hrdzy4=;
-        b=MWkXTJSJ5ZL4ErTJIoUQo/iNguMVRjHrQanPorc4eTV5Rlv8QYjCLFiGHjKmRjpRwk
-         4xxxKav3v6eLPXwNtCrgTZC5Iop06bfiTf9kPSewONmGJ+UX3VxZGBJZVTEiU1924+1V
-         4L51dAELkUT1pCO7iX/m427VCRuBlmTdMnmF5/ZZYx241HwHFjtO0QFEiXdqd6lUticB
-         DgoAcy4oQ9r1QW+/ArBqc98iNqaLw9dNhJWssQoWMYA7q1jydTZm1+PQeJQ6i1VNs85H
-         d4la/h/hbfXqIDObtkaLHY8CZwI/g8N5hzXS1dVqxS0FJhVmaN/AwwasIxuBsi37d5O3
-         6EyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762309043; x=1762913843;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=H6BPDj3wavhdGIBE9zS61DdhM4idE+BoIHjh+Hrdzy4=;
-        b=TVAXUyFEeVeyqg9sKQiOLFuAbItr/181hgVkicO/oweas8JfK3ZK+T8I+Tx33PpQ3v
-         5wiCVpBeGB5F0MECyp2UlDuMCnywoCuawAdXIXDCwi9KKsugSFp1uUlWEaiATHAGlkwW
-         9Sxp52nCnls2PoQEc4/MyVOepvON624lcyvEZpa1LJN8iLYJWTrmBDkWSCFeF27puatt
-         opuvM9MN4t3C+1ImrbGQeyHc2Myokk/oJA+JKaXZsQVIFFA1QMUe993+eRXaqu6GaR2K
-         A42v3kscrd5/2RJLc43P1atcj3dEWvEE8pyXjA7IfsBN3uRU29+EiB1o/ZMwADhlCqXc
-         N8KQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXVxp7NSwnQtxC0YKU+rnvcCcyuFSr4EbRt5eGfV9M83uwVTFCEj56gphe3UXbrWZARs4WonlnQSxPc2A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMPPpdGV0J53QEIj8DL4IehenUuZj5fSzP6nG1FDteks0Hl+Qt
-	LEgPRoi8uc0CFwgAU+1syoRkj3T7H6uAeqlMcbPQ9LexSFo/K0hqdxu7
-X-Gm-Gg: ASbGncsAUisPpVrB+O2i/Cbkm7NaXHZnbUnkvhKwfc2cMjaUmpIeo7zYTWKPQGvUj3P
-	MIKPruhPfmMQzmLnLkSoPIg4IfM3qeseIr8jIQotEYjUmp1HbuLvx1eCNSW7tFcnIMPnDKKYl2H
-	aN4hJQJMtkdpZsRvYdH3KCoxdLCnMP7l69TSJVrZT1ic7N4I/5JiLzSzJMGw/o6i1De6MyDAAlR
-	MwBX4sh/pVS9bShX7cK2wwqlR3AxT5HpIMFOThU3P4gP1wkeAyKWhfRgqXuuikmri2npDSe1jAs
-	xMc8D+xkK/K3FpFd0SKITnw/Gtfgs4NwSxMCcaCCzihytkkql0b4LNeSkgmwZyL5Ed5eaG9LzsB
-	aDkzs6zFZByzqg9cHxEAhAISX/668VeavuAMqxXaE6o8/7JC6qbEofHuoExZwDpj9prE5YVpusn
-	QGMo6wq+sMrU+InRoUJt/1MjY=
-X-Google-Smtp-Source: AGHT+IEYmsytaR1mEiRZPjc6ohcI5FrMoE1+JkNMyyS9qC58igvtXBSkpPErsXNTO8SABAM2YSvmsQ==
-X-Received: by 2002:a17:902:f684:b0:24b:1625:5fa5 with SMTP id d9443c01a7336-2962acfd7e2mr27115905ad.11.1762309042615;
-        Tue, 04 Nov 2025 18:17:22 -0800 (PST)
-Received: from [10.189.138.37] ([43.224.245.241])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29601998336sm41935745ad.31.2025.11.04.18.17.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Nov 2025 18:17:22 -0800 (PST)
-Message-ID: <ed736d06-3f91-43d9-b24f-60c54807a1c9@gmail.com>
-Date: Wed, 5 Nov 2025 10:17:17 +0800
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="qX+36mnn"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1762311849; h=Message-ID:Date:MIME-Version:Subject:From:To:Content-Type;
+	bh=avKJ2M+nhkiKkwQaDLh9kOvywgRDFhXu3Wyry+jipq0=;
+	b=qX+36mnnGzXfcbI50gQbMRvYhHaZ529HQ3b3dtfYavBczuNzI853KJKNdyHo6T2R3IPkEJ7OMLFGBOLfqc+m5OH7oVXO69AG0HHqkYBOy3P2qmfxGZPYWzpnsN/TxqWpBDpTvLnhyy8Vdj+CSL2erlHawFskehl+e2m/xzKpqno=
+Received: from 30.50.177.104(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0WrjSX1X_1762311847 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Wed, 05 Nov 2025 11:04:08 +0800
+Message-ID: <893184b5-57a8-4ba8-b923-614978a4c1be@linux.alibaba.com>
+Date: Wed, 5 Nov 2025 11:04:06 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -68,72 +33,211 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 3/5] isofs: check the return value of
- sb_min_blocksize() in isofs_fill_super
-To: Damien Le Moal <dlemoal@kernel.org>,
- Yongpeng Yang <yangyongpeng.storage@gmail.com>,
- Namjae Jeon <linkinjeon@kernel.org>, Sungjong Seo <sj1557.seo@samsung.com>,
- OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>, Jan Kara <jack@suse.cz>,
- Carlos Maiolino <cem@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Sasha Levin <sashal@kernel.org>, Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Christoph Hellwig <hch@infradead.org>
-Cc: linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-block@vger.kernel.org, stable@vger.kernel.org,
- Matthew Wilcox <willy@infradead.org>, "Darrick J . Wong"
- <djwong@kernel.org>, Yongpeng Yang <yangyongpeng@xiaomi.com>,
- Christoph Hellwig <hch@lst.de>
-References: <20251104125009.2111925-2-yangyongpeng.storage@gmail.com>
- <20251104125009.2111925-4-yangyongpeng.storage@gmail.com>
- <0a04e68d-5b2a-4f0b-8051-60a0b7381d17@kernel.org>
-Content-Language: en-US
-From: Yongpeng Yang <yangyongpeng.storage@gmail.com>
-In-Reply-To: <0a04e68d-5b2a-4f0b-8051-60a0b7381d17@kernel.org>
+Subject: Re: question about bd_inode hashing against device_add() // Re:
+ [PATCH 03/11] block: call bdev_add later in device_add_disk
+From: Gao Xiang <hsiangkao@linux.alibaba.com>
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jan Kara <jack@suse.cz>,
+ Christian Brauner <brauner@kernel.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Luis Chamberlain <mcgrof@kernel.org>, linux-block@vger.kernel.org,
+ Joseph Qi <joseph.qi@linux.alibaba.com>, guanghuifeng@linux.alibaba.com,
+ zongyong.wzy@alibaba-inc.com, zyfjeff@linux.alibaba.com,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>,
+ linux-kernel@vger.kernel.org
+References: <20210818144542.19305-1-hch@lst.de>
+ <20210818144542.19305-4-hch@lst.de>
+ <43375218-2a80-4a7a-b8bb-465f6419b595@linux.alibaba.com>
+ <20251031090925.GA9379@lst.de>
+ <ae38c5dc-da90-4fb3-bb72-61b66ab5a0d2@linux.alibaba.com>
+ <20251031094552.GA10011@lst.de>
+ <7d0d8480-13a2-449f-a46d-d9b164d44089@linux.alibaba.com>
+ <2025103155-definite-stays-ebfe@gregkh>
+ <2a9ab583-07fc-4147-949e-7c68feda82f2@linux.alibaba.com>
+ <ec8b1c76-c211-49a5-a056-6a147faddd3b@linux.alibaba.com>
+ <2025103106-proposal-jogging-a076@gregkh>
+ <83b9dac8-815e-4990-8cc7-5aaf4ba85f42@linux.alibaba.com>
+In-Reply-To: <83b9dac8-815e-4990-8cc7-5aaf4ba85f42@linux.alibaba.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 11/5/25 05:29, Damien Le Moal wrote:
-> On 11/4/25 21:50, Yongpeng Yang wrote:
->> From: Yongpeng Yang <yangyongpeng@xiaomi.com>
+Hi Christiph,
+
+On 2025/10/31 22:44, Gao Xiang wrote:
+> 
+
+..
+
+>>> I just spent time to reproduce with dynamic loop devices and
+>>> actually it's easy if msleep() is located artificiallly,
+>>> the diff as below:
+>>>
+>>> diff --git a/block/bdev.c b/block/bdev.c
+>>> index 810707cca970..a4273b5ad456 100644
+>>> --- a/block/bdev.c
+>>> +++ b/block/bdev.c
+>>> @@ -821,7 +821,7 @@ struct block_device *blkdev_get_no_open(dev_t dev, bool autoload)
+>>>       struct inode *inode;
+>>>
+>>>       inode = ilookup(blockdev_superblock, dev);
+>>> -    if (!inode && autoload && IS_ENABLED(CONFIG_BLOCK_LEGACY_AUTOLOAD)) {
+>>> +    if (0) {
+>>>           blk_request_module(dev);
+>>>           inode = ilookup(blockdev_superblock, dev);
+>>>           if (inode)
+>>> diff --git a/block/genhd.c b/block/genhd.c
+>>> index 9bbc38d12792..3c9116fdc1ce 100644
+>>> --- a/block/genhd.c
+>>> +++ b/block/genhd.c
+>>> @@ -428,6 +428,8 @@ static void add_disk_final(struct gendisk *disk)
+>>>       set_bit(GD_ADDED, &disk->state);
+>>>   }
+>>>
+>>> +#include <linux/delay.h>
+>>> +
+>>>   static int __add_disk(struct device *parent, struct gendisk *disk,
+>>>                 const struct attribute_group **groups,
+>>>                 struct fwnode_handle *fwnode)
+>>> @@ -497,6 +499,9 @@ static int __add_disk(struct device *parent, struct gendisk *disk,
+>>>       if (ret)
+>>>           goto out_free_ext_minor;
+>>>
+>>> +    if (disk->major == LOOP_MAJOR)
+>>> +        msleep(2500);           // delay 2.5s for all loops
+>>> +
 >>
->> sb_min_blocksize() may return 0. Check its return value to avoid
->> opt->blocksize and sb->s_blocksize is 0.
+>> Yes, so you need to watch for the uevent to happen, THEN it is safe to
+>> access the block device.  Doing it before then isn't a good idea :)
 >>
->> Cc: <stable@vger.kernel.org> # v6.15
->> Fixes: 1b17a46c9243e9 ("isofs: convert isofs to use the new mount API")
->> Reviewed-by: Jan Kara <jack@suse.cz>
->> Reviewed-by: Christoph Hellwig <hch@lst.de>
->> Signed-off-by: Yongpeng Yang <yangyongpeng@xiaomi.com>
->> ---
->>   fs/isofs/inode.c | 5 +++++
->>   1 file changed, 5 insertions(+)
->>
->> diff --git a/fs/isofs/inode.c b/fs/isofs/inode.c
->> index 6f0e6b19383c..ad3143d4066b 100644
->> --- a/fs/isofs/inode.c
->> +++ b/fs/isofs/inode.c
->> @@ -610,6 +610,11 @@ static int isofs_fill_super(struct super_block *s, struct fs_context *fc)
->>   		goto out_freesbi;
->>   	}
->>   	opt->blocksize = sb_min_blocksize(s, opt->blocksize);
->> +	if (!opt->blocksize) {
->> +		printk(KERN_ERR
->> +		       "ISOFS: unable to set blocksize\n");
+>> But, if you think this is an issue, do you have a patch that passes your
+>> testing to fix it?
 > 
-> Nit: using pr_err() maybe better here ? Not sure what isofs prefers.
+> I just raise it up for some ideas, and this change is
+> buried into the code refactor and honestly I need to
+> look into the codebase and related patchsets first.
 > 
+> Currently I have dozens of other development stuffs
+> on hand, if it's really a regression, I do hope
+> Christoph or other folks who are familiar with the code
+> could try to address this.
 
-Thanks for the review. I checked fs/isofs/inode.c, and other functions
-seem to prefer using "printk(KERN_ERR|KERN_DEBUG|KERN_WARNING ...)"
-rather than "pr_err|pr_debug|pr_warn".
+I've provided a reproducible way:
+https://lore.kernel.org/linux-block/ec8b1c76-c211-49a5-a056-6a147faddd3b@linux.alibaba.com
 
-Yongpeng,
+As the author of these gendisk/bdev enhancement commits, what's
+your opinion on this?
 
->> +		goto out_freesbi;
->> +	}
->>   
->>   	sbi->s_high_sierra = 0; /* default is iso9660 */
->>   	sbi->s_session = opt->session;
-> 
-> 
+In other words, do you think it's a regression, or just a behavior
+change but not a regression? Also, a minor confirmation:
+if it is a regression on your side, would you like to address it?
 
+Due to further code changes, I proposed a temporary workaround
+for our 6.6 kernels as below (I don't think it's clean but we will
+do more tests), but due to limited time, currently I don't have
+time to come up with a cleaner solution and track this until the
+upstream fix lands.
+
+Thanks,
+Gao Xiang
+
+  block/blk.h             |  1 +
+  block/genhd.c           | 18 ++++++++++++++++--
+  block/partitions/core.c |  6 +++++-
+  3 files changed, 22 insertions(+), 3 deletions(-)
+
+diff --git a/block/blk.h b/block/blk.h
+index 475bbb40bb83..4410ae9da378 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -419,6 +419,7 @@ static inline int blkdev_zone_mgmt_ioctl(struct block_device *bdev,
+  #endif /* CONFIG_BLK_DEV_ZONED */
+  
+  struct block_device *bdev_alloc(struct gendisk *disk, u8 partno);
++void bdev_inode_failed(struct block_device *bdev);
+  void bdev_add(struct block_device *bdev, dev_t dev);
+  
+  int blk_alloc_ext_minor(void);
+diff --git a/block/genhd.c b/block/genhd.c
+index 039e7c17523b..cb4313a7c618 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -383,6 +383,14 @@ int disk_scan_partitions(struct gendisk *disk, blk_mode_t mode)
+  	return ret;
+  }
+  
++void bdev_inode_failed(struct block_device *bdev)
++{
++	struct inode *inode = bdev->bd_inode;
++
++	make_bad_inode(inode);
++	unlock_new_inode(inode);
++}
++
+  /**
+   * device_add_disk - add disk information to kernel list
+   * @parent: parent device for the disk
+@@ -452,8 +460,12 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
+  	ddev->parent = parent;
+  	ddev->groups = groups;
+  	dev_set_name(ddev, "%s", disk->disk_name);
+-	if (!(disk->flags & GENHD_FL_HIDDEN))
++	if (!(disk->flags & GENHD_FL_HIDDEN)) {
+  		ddev->devt = MKDEV(disk->major, disk->first_minor);
++		disk->part0->bd_inode->i_state |= I_NEW;
++		bdev_add(disk->part0, ddev->devt);
++	}
++
+  	ret = device_add(ddev);
+  	if (ret)
+  		goto out_free_ext_minor;
+@@ -505,7 +517,7 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
+  		if (get_capacity(disk) && disk_has_partscan(disk))
+  			set_bit(GD_NEED_PART_SCAN, &disk->state);
+  
+-		bdev_add(disk->part0, ddev->devt);
++		unlock_new_inode(disk->part0->bd_inode);
+  		if (get_capacity(disk))
+  			disk_scan_partitions(disk, BLK_OPEN_READ);
+  
+@@ -546,6 +558,8 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
+  out_device_del:
+  	device_del(ddev);
+  out_free_ext_minor:
++	if (!(disk->flags & GENHD_FL_HIDDEN))
++		bdev_inode_failed(disk->part0);
+  	if (disk->major == BLOCK_EXT_MAJOR)
+  		blk_free_ext_minor(disk->first_minor);
+  out_exit_elevator:
+diff --git a/block/partitions/core.c b/block/partitions/core.c
+index 549ce89a657b..c69e369955b9 100644
+--- a/block/partitions/core.c
++++ b/block/partitions/core.c
+@@ -376,6 +376,9 @@ static struct block_device *add_partition(struct gendisk *disk, int partno,
+  			goto out_put;
+  	}
+  
++	bdev->bd_inode->i_state |= I_NEW;
++	bdev_add(bdev, devt);
++
+  	/* delay uevent until 'holders' subdir is created */
+  	dev_set_uevent_suppress(pdev, 1);
+  	err = device_add(pdev);
+@@ -398,7 +401,7 @@ static struct block_device *add_partition(struct gendisk *disk, int partno,
+  	err = xa_insert(&disk->part_tbl, partno, bdev, GFP_KERNEL);
+  	if (err)
+  		goto out_del;
+-	bdev_add(bdev, devt);
++	unlock_new_inode(bdev->bd_inode);
+  
+  	/* suppress uevent if the disk suppresses it */
+  	if (!dev_get_uevent_suppress(ddev))
+@@ -409,6 +412,7 @@ static struct block_device *add_partition(struct gendisk *disk, int partno,
+  	kobject_put(bdev->bd_holder_dir);
+  	device_del(pdev);
+  out_put:
++	bdev_inode_failed(bdev);
+  	put_device(pdev);
+  	return ERR_PTR(err);
+  out_put_disk:
+-- 
