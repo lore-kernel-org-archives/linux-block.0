@@ -1,384 +1,130 @@
-Received: from out162-62-57-252.mail.qq.com (out162-62-57-252.mail.qq.com [162.62.57.252])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC0441DE4EF;
-	Wed,  5 Nov 2025 06:53:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.252
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 084AA261B9F;
+	Wed,  5 Nov 2025 06:54:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762325609; cv=none; b=BX6/uHfFXxOyklmIhqm4G7prUggjERMmjFY4DUK0xljuq7+ETBxe49FmlJbljQKkSWEyhyKBM2fIYulEIoNPZE2TDqNgJ67I+zmY0JRbYDmGPXMAG/u+isZx7MY4toZrqSU7CQHbMUMlNzDx7si60RBPusMw6ND+Py9kEP8DfSM=
+	t=1762325655; cv=none; b=mzwfulBKyLSbenTbHNLTkbqSTr9CqRupe8kpmUUT1r42T0HOM9lVoJzSWVxpC/EdTT7/zXeTH8DLWMTQTPXgAUbZRsx//ULWk05LBVOygXX3WAdFT0W4VgT3N7G4p1BiHtZCN7ma26t8k0JexMBbZQjlYogWDf0fCt0ZBXMfI9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762325609; c=relaxed/simple;
-	bh=0mWnEOVacj3cGA7GI/EWCIoCvvtQEXQYIvQB95dcB0M=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=L/KPtyOuzsY52/bqCiECwYf5IjarziCXZlwuVUHmIRXQRX2X5MlCvci8tIy+ghh0rCFSB38ww65TcCWXbnCI4A6+PpMbyaJjHieoxm43Vy/jBi7OtfNjp+2h2qjf+R1dfhAn3WHgfZFdvAU1oWKbB84edjVYetCJaQdk5pJvv5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=pA2Dn0SW; arc=none smtp.client-ip=162.62.57.252
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
+	s=arc-20240116; t=1762325655; c=relaxed/simple;
+	bh=uBFkuZWkTbQtVaFIvftCub5c2XfflkmLEvSymfgliiY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XwbfAacWctePTUWbhZqlD7XyiMc5NPMQ4rPaLk4c177v+gPzawJOBxsN3vYtI0/HghFSJimUC00D4qxgrQl1mfnwvvtfuVcglzpsqnVImfcqgaDYzKZobbLTwtLSMp2Jk9PsbZzJtX/tLit1HpOywWlppNoOFm+/h4gGHyKj5jU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=DXWblFML; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="pA2Dn0SW"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1762325292;
-	bh=mq0JclBaKBy4TWJ/ryyvsbPzM+n7z5k9LWVUwRw09pg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=pA2Dn0SW6uCilyS4Jd88ookYK4VOEjweQrDJle6m5y1CpoNtrvIl9U1tU7v3bpFic
-	 f4hegzMgL3Sa+VUhQVPtbA6IiOxTvz6fX0XoRQ5ModbxZiCATuXaHsLLXqpz98KPdV
-	 7TUNucWBp/7HzDsY3Ln3HNK6KuVpGOh9CfZuvhyo=
-Received: from meizu-Precision-3660.meizu.com ([112.91.84.72])
-	by newxmesmtplogicsvrszc43-0.qq.com (NewEsmtp) with SMTP
-	id C09020D0; Wed, 05 Nov 2025 14:48:09 +0800
-X-QQ-mid: xmsmtpt1762325289tzwix3fmp
-Message-ID: <tencent_25F89AABFE39535EF957519750D107B7D406@qq.com>
-X-QQ-XMAILINFO: MfXlhb1xJpsOoWvb9KDTSsn7+G3+IQwE/kGDDi09Bd4UMOaaXP8X4IJ2J3rzLL
-	 MUSe1cNV5v19tJRYJSI1BAfSvmtabJBs+6WgDlzlkoF+gHPYEhST8P4nqHjmYPH/4T4WmYE/Mo+t
-	 vhBuU6tI8N93MJydEZzJ0lRHAY+SzpOWNmwUBnKNnH0EFVWOTA0gr3NKZFthWWW6U/SS8Ir0lQ5w
-	 wPAgA7ae2V0Pyi9AjZ1thW55/Y1kl2qYAq3JKkfe2Xk+DjryxfG1r6QXnsQQF0BCxgNv8gdVb2k3
-	 UzxujK5VlTdGzchyS0X9/gl16zOMCD9p1Pg1O3CTxmSgi2LXLIyJPigRYgBnSCln++4QLC24NiFG
-	 K0t6XcfSLPlV/oR0Fob8WEsyj5BtUGPbm31/7+OPXUhYYbN9LKx2xaqBlgtKTz98Kri+twmPOJu8
-	 QWLdrY/ytBNcccFM/3CVMwdrry0HFRZ1n0UBkN4hFwaUegUFPUOhz1G3A55zB1YaFzOEP3SLxVWe
-	 7K39ikWXeLo0c3SrDQwkTH2Zrc7LWsOudZtvo0DqLzZMERVlN2iAGvKjnTSojfSj1Brx94nmiQja
-	 75LklGflGKDx4uWMO/f/kCWgcE17vtXATgDD+SF4XNLRXI799yitsBW/BDxftGR361ST4iZSjMop
-	 OMaOp+E1Mk22OmXEYPq6wGwoxuVIZU8yWFA92RkxLyVHUP+lb+g7XAzKtdAlsZJ2SiHlUXwWv2FY
-	 FkWRbOMTxQWe4Z89PvBhDc3xPo4j20iIUMy5RKerO96GR05+LrobD/AfeJl1Q3Hh3C49wEJwUxfa
-	 YVV6Njp5p+PQw/7IEU2CmDYFm197mj/5ODR0QET1DlBo6OSXQUTiBJcYulIK5/37D2veYz66KlcP
-	 +GwashhllGX9/RvhWuik3w45JFZAGBmN3oVd0CTnjOe9v4tO8CCyC0JBDCLiz7wxo827vW7Kzq10
-	 lXivwfbliMbVMiRiW4Kg3GpdSt8vwvizMgdfHczCWgyFiytVJ1xCepySpvTsFURs9XTF+bwFER3I
-	 JVqqYU7w4/toK3h1Quvdaa4JnJRmcMMenNcS+o6SZhPHe+BQppI3TQYQtllTG8uTy0eVAvIGyL1N
-	 nL7W5QN7j+4qdBdXE=
-X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
-From: Yuwen Chen <ywen.chen@foxmail.com>
-To: ywen.chen@foxmail.com
-Cc: akpm@linux-foundation.org,
-	axboe@kernel.dk,
-	bgeffon@google.com,
-	licayy@outlook.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	liumartin@google.com,
-	minchan@kernel.org,
-	richardycc@google.com,
-	senozhatsky@chromium.org
-Subject: [PATCH v3] zram: Implement multi-page write-back
-Date: Wed,  5 Nov 2025 14:48:06 +0800
-X-OQ-MSGID: <20251105064806.2693018-1-ywen.chen@foxmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <tencent_85F14CD7BA73843CA32FF7AEB6A21A6EC907@qq.com>
-References: <tencent_85F14CD7BA73843CA32FF7AEB6A21A6EC907@qq.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="DXWblFML"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5A4KKCrS016813;
+	Wed, 5 Nov 2025 06:54:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=NIgReO
+	Lt1nH2NiTpdMcRGEfC2amuOW8w72i+WvMIeLw=; b=DXWblFMLcMK7dQnPYAng2p
+	ovWrkQ8gQI0cvrhoMcZjBmvQIx8P+Sz2NL+Md6+V+xPNXyBJHnTTCSL/4y/5MrFA
+	PMOUp9zQhTeMcnS8+c0mfcPXHBIwaeNnON/Cp0jV+p5XME/AxxcF0Ut4bNxasgV7
+	V75jLM1HqjQauUz1cqtytC3U+wRSdS5Wq/OZdOs4ITExeN9qf6EFf8qZF9oD1XL7
+	dSSNM8DBrQj26v3pRKinhfxEoFk8aB1QHnvVNdCeKrd8npYdR+x8KF4ePv8NNwgM
+	2X/c6fcNJnu+6XowVbD9ZV2Onr12uofr9HeJ9fHgqYFXNWbFmi6NKheHroM1mZMQ
+	==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4a59v1ygt1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 05 Nov 2025 06:54:04 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5A542OCU021471;
+	Wed, 5 Nov 2025 06:54:03 GMT
+Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4a5xrjpmy7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 05 Nov 2025 06:54:03 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5A56s33P30671612
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 5 Nov 2025 06:54:03 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8076858058;
+	Wed,  5 Nov 2025 06:54:03 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 588BB5805D;
+	Wed,  5 Nov 2025 06:54:02 +0000 (GMT)
+Received: from [9.109.198.245] (unknown [9.109.198.245])
+	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  5 Nov 2025 06:54:02 +0000 (GMT)
+Message-ID: <b8e86d6f-dadc-477e-b0f9-f5d9d50a3127@linux.ibm.com>
+Date: Wed, 5 Nov 2025 12:24:00 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [bug report] fstests generic/085 btrfs hang with use-after-free
+ at bdev_super_lock
+To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc: "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
+References: <asuxk7u6tlrjb5ruugshjvydiixo6vcvayu6yzfeu5fblkxdxh@3whdau6mprqv>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <asuxk7u6tlrjb5ruugshjvydiixo6vcvayu6yzfeu5fblkxdxh@3whdau6mprqv>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: udrflgboVtG4Ikl1yGaWkSVzHEZVTTFX
+X-Proofpoint-ORIG-GUID: udrflgboVtG4Ikl1yGaWkSVzHEZVTTFX
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTAxMDAyMSBTYWx0ZWRfX54Kf18vUpkfq
+ EPH90OZY5n4r3Mt8s8W/td22KKfurh8k59kqTpmTnVe0xt+pJDyQUtntiBqx8Yape9UfP6hog7k
+ d25NeVjQgzyU9Vk6Hsd5ovjW/fAulwQ51etq0WL2j/iuxvInOSNaZHNVxy7rchSqG6PMT4vo1kB
+ z4gs8sJaEYfNN5VDKkH8gpTSjgGDUPFmBjCmOO4tLbp5nHgE7QHnFOmThpvN57+1DNfdCWlxi8E
+ AV5BelXeBf7ddbbfFv6vcw0ESsp41aScKMzFo8+vfkIrIgjpCYz9lJK5858GA4GGVs/az2KF3Ue
+ KBEzCjoM5JaNSC82MimLFL85pBdLoWwgSzMZck1H1Qp1OBpYieaPqvGWY/DA6+MGDUvWNCy3U3S
+ fz2YcWk3NqV0jhnpQAwFNphJauxRIQ==
+X-Authority-Analysis: v=2.4 cv=H8HWAuYi c=1 sm=1 tr=0 ts=690af48c cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=_FWC9dmBtg7OGuMU_m4A:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-05_03,2025-11-03_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 phishscore=0 lowpriorityscore=0 priorityscore=1501 adultscore=0
+ impostorscore=0 clxscore=1015 bulkscore=0 suspectscore=0 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511010021
 
-For block devices, sequential write performance is significantly
-better than random write. Currently, zram's write-back function
-only supports single-page operations, which fails to leverage
-the sequential write advantage and leads to suboptimal performance.
-This patch implements multi-page batch write-back for zram to
-leverage sequential write performance of block devices.
-After applying this patch, a large number of pages being merged
-into batch write operations can be observed via the following test
-code, which effectively improves write-back performance.
+Hi Shinichiro,
 
-mount -t debugfs none /sys/kernel/debug/
-echo "block:block_bio_frontmerge" >> /sys/kernel/debug/tracing/set_event
-echo "block:block_bio_backmerge" >> /sys/kernel/debug/tracing/set_event
-cat /sys/kernel/debug/tracing/trace_pipe &
-echo "page_indexes=1-10000" > /sys/block/zram0/writeback
+On 11/5/25 6:31 AM, Shinichiro Kawasaki wrote:
+> When I run fstests for btrfs on regular null_blk devices, I observe KASAN
+> slab-use-after-free in bdev_super_lock() followed by kernel hang. I observed it
+> for the kernel v6.17-rc4 for the first time. And I still observe it for the
+> latest kernel v6.18-rc4.
+> 
+> The hang is recreated when I prepare eight of 5Gib size null_blk devices, assign
+> one for TEST_DEV, and assign the other seven for SCRATCH_DEV_POOl. The hang
+> happens at generic/085. It is sporadic. When I repeat the test case g085 only,
+> the hang is not recreated. But when I repeat the whole fstests a few times, the
+> hang is recreated in stable manner. It takes several hours to recreate the hang.
+> 
+> I spent some weeks to bisect, and found the trigger commit is this:
+> 
+>   370ac285f23a ("block: avoid cpu_hotplug_lock depedency on freeze_lock")
+> 
+> The commit was included in the kernel tag v6.17-rc3. When I reverted the commit
+> from v6.17-rc3, the hang disappeared (I repeated the whole fstests 5 times on
+> two test nodes, and did not observe the hang). I'm not sure if the commit
+> created the problem cause or revealed the hidden problem.
 
-Signed-off-by: Yuwen Chen <ywen.chen@foxmail.com>
-Reviewed-by: Fengyu Lian <licayy@outlook.com>
----
-Changes in v3:
-  - Postpone the page allocation.
-Changes in v2:
-  - Rename some data structures.
-  - Fix an exception caused by accessing a null pointer.
----
- drivers/block/zram/zram_drv.c | 224 ++++++++++++++++++++++++++--------
- 1 file changed, 170 insertions(+), 54 deletions(-)
+Thanks for the report!
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 4f2824a..ce8fc3c 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -751,21 +751,131 @@ static void read_from_bdev_async(struct zram *zram, struct page *page,
- 	submit_bio(bio);
- }
- 
--static int zram_writeback_slots(struct zram *zram, struct zram_pp_ctl *ctl)
--{
--	unsigned long blk_idx = 0;
--	struct page *page = NULL;
-+enum {
-+	/* Indicate that the request has been allocated */
-+	ZRAM_WB_REQUEST_ALLOCATED = 0,
-+
-+	/* the request has been processed by the block device layer */
-+	ZRAM_WB_REQUEST_COMPLETED,
-+};
-+
-+struct zram_wb_request {
-+	struct completion *done;
-+	unsigned long blk_idx;
-+	struct page *page;
- 	struct zram_pp_slot *pps;
- 	struct bio_vec bio_vec;
- 	struct bio bio;
--	int ret = 0, err;
--	u32 index;
-+	unsigned long flags;
-+};
- 
--	page = alloc_page(GFP_KERNEL);
--	if (!page)
--		return -ENOMEM;
-+static int zram_writeback_complete(struct zram *zram, struct zram_wb_request *req)
-+{
-+	u32 index = 0;
-+	int err;
- 
--	while ((pps = select_pp_slot(ctl))) {
-+	if (!test_and_clear_bit(ZRAM_WB_REQUEST_COMPLETED, &req->flags))
-+		return 0;
-+
-+	err = blk_status_to_errno(req->bio.bi_status);
-+	if (err)
-+		return err;
-+
-+	index = req->pps->index;
-+	atomic64_inc(&zram->stats.bd_writes);
-+	zram_slot_lock(zram, index);
-+	/*
-+	 * Same as above, we release slot lock during writeback so
-+	 * slot can change under us: slot_free() or slot_free() and
-+	 * reallocation (zram_write_page()). In both cases slot loses
-+	 * ZRAM_PP_SLOT flag. No concurrent post-processing can set
-+	 * ZRAM_PP_SLOT on such slots until current post-processing
-+	 * finishes.
-+	 */
-+	if (!zram_test_flag(zram, index, ZRAM_PP_SLOT))
-+		goto next;
-+
-+	zram_free_page(zram, index);
-+	zram_set_flag(zram, index, ZRAM_WB);
-+	zram_set_handle(zram, index, req->blk_idx);
-+	req->blk_idx = 0;
-+	atomic64_inc(&zram->stats.pages_stored);
-+	spin_lock(&zram->wb_limit_lock);
-+	if (zram->wb_limit_enable && zram->bd_wb_limit > 0)
-+		zram->bd_wb_limit -=  1UL << (PAGE_SHIFT - 12);
-+	spin_unlock(&zram->wb_limit_lock);
-+
-+next:
-+	zram_slot_unlock(zram, index);
-+	release_pp_slot(zram, req->pps);
-+	req->pps = NULL;
-+	return 0;
-+}
-+
-+static void zram_writeback_endio(struct bio *bio)
-+{
-+	struct zram_wb_request *req = bio->bi_private;
-+
-+	set_bit(ZRAM_WB_REQUEST_COMPLETED, &req->flags);
-+	clear_bit(ZRAM_WB_REQUEST_ALLOCATED, &req->flags);
-+	complete(req->done);
-+}
-+
-+static struct zram_wb_request *zram_writeback_next_request(struct zram_wb_request *pool,
-+	int pool_cnt, int *cnt_off)
-+{
-+	struct zram_wb_request *req = NULL;
-+	int i = 0;
-+
-+	for (i = *cnt_off; i < pool_cnt + *cnt_off; i++) {
-+		req = &pool[i % pool_cnt];
-+		if (!req->page) {
-+			/* This memory should be freed by the caller. */
-+			req->page = alloc_page(GFP_KERNEL);
-+			if (!req->page)
-+				continue;
-+		}
-+
-+		if (!test_and_set_bit(ZRAM_WB_REQUEST_ALLOCATED, &req->flags)) {
-+			*cnt_off = (i + 1) % pool_cnt;
-+			return req;
-+		}
-+	}
-+	return NULL;
-+}
-+
-+#define ZRAM_WB_REQ_CNT (32)
-+static int zram_writeback_slots(struct zram *zram, struct zram_pp_ctl *ctl)
-+{
-+	int ret = 0, err, i = 0, cnt_off = 0;
-+	int req_pool_cnt = 0;
-+	struct zram_wb_request req_prealloc[2] = {0};
-+	struct zram_wb_request *req = NULL, *req_pool = NULL;
-+	DECLARE_COMPLETION_ONSTACK(done);
-+	u32 index = 0;
-+	struct blk_plug plug;
-+
-+	/* allocate memory for req_pool */
-+	req_pool = kzalloc(sizeof(*req) * ZRAM_WB_REQ_CNT, GFP_KERNEL);
-+	if (req_pool) {
-+		req_pool_cnt = ZRAM_WB_REQ_CNT;
-+	} else {
-+		req_pool = req_prealloc;
-+		req_pool_cnt = ARRAY_SIZE(req_prealloc);
-+	}
-+
-+	for (i = 0; i < req_pool_cnt; i++) {
-+		req_pool[i].done = &done;
-+		req_pool[i].flags = 0;
-+	}
-+	req = zram_writeback_next_request(req_pool, req_pool_cnt, &cnt_off);
-+	if (!req) {
-+		ret = -ENOMEM;
-+		goto out_free_req_pool;
-+	}
-+
-+	blk_start_plug(&plug);
-+	while ((req->pps = select_pp_slot(ctl))) {
- 		spin_lock(&zram->wb_limit_lock);
- 		if (zram->wb_limit_enable && !zram->bd_wb_limit) {
- 			spin_unlock(&zram->wb_limit_lock);
-@@ -774,15 +884,15 @@ static int zram_writeback_slots(struct zram *zram, struct zram_pp_ctl *ctl)
- 		}
- 		spin_unlock(&zram->wb_limit_lock);
- 
--		if (!blk_idx) {
--			blk_idx = alloc_block_bdev(zram);
--			if (!blk_idx) {
-+		if (!req->blk_idx) {
-+			req->blk_idx = alloc_block_bdev(zram);
-+			if (!req->blk_idx) {
- 				ret = -ENOSPC;
- 				break;
- 			}
- 		}
- 
--		index = pps->index;
-+		index = req->pps->index;
- 		zram_slot_lock(zram, index);
- 		/*
- 		 * scan_slots() sets ZRAM_PP_SLOT and relases slot lock, so
-@@ -792,22 +902,32 @@ static int zram_writeback_slots(struct zram *zram, struct zram_pp_ctl *ctl)
- 		 */
- 		if (!zram_test_flag(zram, index, ZRAM_PP_SLOT))
- 			goto next;
--		if (zram_read_from_zspool(zram, page, index))
-+		if (zram_read_from_zspool(zram, req->page, index))
- 			goto next;
- 		zram_slot_unlock(zram, index);
- 
--		bio_init(&bio, zram->bdev, &bio_vec, 1,
-+		bio_init(&req->bio, zram->bdev, &req->bio_vec, 1,
- 			 REQ_OP_WRITE | REQ_SYNC);
--		bio.bi_iter.bi_sector = blk_idx * (PAGE_SIZE >> 9);
--		__bio_add_page(&bio, page, PAGE_SIZE, 0);
--
--		/*
--		 * XXX: A single page IO would be inefficient for write
--		 * but it would be not bad as starter.
--		 */
--		err = submit_bio_wait(&bio);
-+		req->bio.bi_iter.bi_sector = req->blk_idx * (PAGE_SIZE >> 9);
-+		req->bio.bi_end_io = zram_writeback_endio;
-+		req->bio.bi_private = req;
-+		__bio_add_page(&req->bio, req->page, PAGE_SIZE, 0);
-+
-+		list_del_init(&req->pps->entry);
-+		submit_bio(&req->bio);
-+
-+		do {
-+			req = zram_writeback_next_request(req_pool, req_pool_cnt, &cnt_off);
-+			if (!req) {
-+				blk_finish_plug(&plug);
-+				wait_for_completion_io(&done);
-+				blk_start_plug(&plug);
-+			}
-+		} while (!req);
-+		err = zram_writeback_complete(zram, req);
- 		if (err) {
--			release_pp_slot(zram, pps);
-+			release_pp_slot(zram, req->pps);
-+			req->pps = NULL;
- 			/*
- 			 * BIO errors are not fatal, we continue and simply
- 			 * attempt to writeback the remaining objects (pages).
-@@ -817,43 +937,39 @@ static int zram_writeback_slots(struct zram *zram, struct zram_pp_ctl *ctl)
- 			 * the most recent BIO error.
- 			 */
- 			ret = err;
--			continue;
- 		}
-+		cond_resched();
-+		continue;
- 
--		atomic64_inc(&zram->stats.bd_writes);
--		zram_slot_lock(zram, index);
--		/*
--		 * Same as above, we release slot lock during writeback so
--		 * slot can change under us: slot_free() or slot_free() and
--		 * reallocation (zram_write_page()). In both cases slot loses
--		 * ZRAM_PP_SLOT flag. No concurrent post-processing can set
--		 * ZRAM_PP_SLOT on such slots until current post-processing
--		 * finishes.
--		 */
--		if (!zram_test_flag(zram, index, ZRAM_PP_SLOT))
--			goto next;
--
--		zram_free_page(zram, index);
--		zram_set_flag(zram, index, ZRAM_WB);
--		zram_set_handle(zram, index, blk_idx);
--		blk_idx = 0;
--		atomic64_inc(&zram->stats.pages_stored);
--		spin_lock(&zram->wb_limit_lock);
--		if (zram->wb_limit_enable && zram->bd_wb_limit > 0)
--			zram->bd_wb_limit -=  1UL << (PAGE_SHIFT - 12);
--		spin_unlock(&zram->wb_limit_lock);
- next:
- 		zram_slot_unlock(zram, index);
--		release_pp_slot(zram, pps);
--
-+		release_pp_slot(zram, req->pps);
-+		req->pps = NULL;
- 		cond_resched();
- 	}
-+	blk_finish_plug(&plug);
- 
--	if (blk_idx)
--		free_block_bdev(zram, blk_idx);
--	if (page)
--		__free_page(page);
-+	if (req)
-+		clear_bit(ZRAM_WB_REQUEST_ALLOCATED, &req->flags);
-+	for (i = 0; i < req_pool_cnt; i++) {
-+		while (test_bit(ZRAM_WB_REQUEST_ALLOCATED, &req_pool[i].flags))
-+			wait_for_completion_io(&done);
-+		err = zram_writeback_complete(zram, &req_pool[i]);
-+		if (err) {
-+			release_pp_slot(zram, req_pool[i].pps);
-+			req->pps = NULL;
-+			ret = err;
-+		}
-+
-+		if (req_pool[i].blk_idx)
-+			free_block_bdev(zram, req_pool[i].blk_idx);
-+		if (req_pool[i].page)
-+			__free_page(req_pool[i].page);
-+	}
- 
-+out_free_req_pool:
-+	if (req_pool != req_prealloc)
-+		kfree(req_pool);
- 	return ret;
- }
- 
--- 
-2.34.1
+This doesn't seem to be caused due to 370ac285f23a ("block: avoid cpu_hotplug_lock
+depedency on freeze_lock"). However it appears that we're hitting a race while 
+freezing/unfreezing filesystem. It'd better if someone from fs team can take a 
+look at it.
 
+Thanks,
+--Nilay
