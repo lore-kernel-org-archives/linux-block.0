@@ -1,60 +1,80 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 084AA261B9F;
-	Wed,  5 Nov 2025 06:54:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24A8C2C11E8
+	for <linux-block@vger.kernel.org>; Wed,  5 Nov 2025 07:02:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762325655; cv=none; b=mzwfulBKyLSbenTbHNLTkbqSTr9CqRupe8kpmUUT1r42T0HOM9lVoJzSWVxpC/EdTT7/zXeTH8DLWMTQTPXgAUbZRsx//ULWk05LBVOygXX3WAdFT0W4VgT3N7G4p1BiHtZCN7ma26t8k0JexMBbZQjlYogWDf0fCt0ZBXMfI9I=
+	t=1762326135; cv=none; b=tSe58Y1A/sGM4fA7hLfnuhvDE5HjKFHQNdfXgj3Ka2OEietzShXuYhO9BtIYCJsamdKLfDQeKA7uLzjA39RInIKk109fBMDjb+Ana2nOSlg5QyZxhQogEAdBaUmgJDv+LO+zFJ9ui+HB+kNqNehAgnyVR/WCk2GJgb7LfegcIds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762325655; c=relaxed/simple;
-	bh=uBFkuZWkTbQtVaFIvftCub5c2XfflkmLEvSymfgliiY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XwbfAacWctePTUWbhZqlD7XyiMc5NPMQ4rPaLk4c177v+gPzawJOBxsN3vYtI0/HghFSJimUC00D4qxgrQl1mfnwvvtfuVcglzpsqnVImfcqgaDYzKZobbLTwtLSMp2Jk9PsbZzJtX/tLit1HpOywWlppNoOFm+/h4gGHyKj5jU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=DXWblFML; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1762326135; c=relaxed/simple;
+	bh=gIbZAVyb3XvaNqywmxw8bSlwhzPTd2U80vLEEe9WntM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=ugjzG2Asm7rFxa4WXtKHLv/8ZZg7bzsUCXMmfjaLdnlspWFpeHLVA76QznMegzKRE47uEaUAxfNvbZ8K95Hekhxj9lU5HpfFLydrUQEVh3K4wOdyqiiu7acyqTFJ+jAFuvx3wfWwHijATAhpFg+YGVXM89CEF74VdmSmNZxnjDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=bamh70B1; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=824OQiKv; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=bamh70B1; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=824OQiKv; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="DXWblFML"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5A4KKCrS016813;
-	Wed, 5 Nov 2025 06:54:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=NIgReO
-	Lt1nH2NiTpdMcRGEfC2amuOW8w72i+WvMIeLw=; b=DXWblFMLcMK7dQnPYAng2p
-	ovWrkQ8gQI0cvrhoMcZjBmvQIx8P+Sz2NL+Md6+V+xPNXyBJHnTTCSL/4y/5MrFA
-	PMOUp9zQhTeMcnS8+c0mfcPXHBIwaeNnON/Cp0jV+p5XME/AxxcF0Ut4bNxasgV7
-	V75jLM1HqjQauUz1cqtytC3U+wRSdS5Wq/OZdOs4ITExeN9qf6EFf8qZF9oD1XL7
-	dSSNM8DBrQj26v3pRKinhfxEoFk8aB1QHnvVNdCeKrd8npYdR+x8KF4ePv8NNwgM
-	2X/c6fcNJnu+6XowVbD9ZV2Onr12uofr9HeJ9fHgqYFXNWbFmi6NKheHroM1mZMQ
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4a59v1ygt1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 05 Nov 2025 06:54:04 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5A542OCU021471;
-	Wed, 5 Nov 2025 06:54:03 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4a5xrjpmy7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 05 Nov 2025 06:54:03 +0000
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5A56s33P30671612
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 5 Nov 2025 06:54:03 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8076858058;
-	Wed,  5 Nov 2025 06:54:03 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 588BB5805D;
-	Wed,  5 Nov 2025 06:54:02 +0000 (GMT)
-Received: from [9.109.198.245] (unknown [9.109.198.245])
-	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  5 Nov 2025 06:54:02 +0000 (GMT)
-Message-ID: <b8e86d6f-dadc-477e-b0f9-f5d9d50a3127@linux.ibm.com>
-Date: Wed, 5 Nov 2025 12:24:00 +0530
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="bamh70B1";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="824OQiKv";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="bamh70B1";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="824OQiKv"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 13B7F2118E;
+	Wed,  5 Nov 2025 07:02:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1762326130; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HiWTKq6RFEsgq4tdBiXrdi6UiJ/nLkzXTBqjXsIruM0=;
+	b=bamh70B1hocnN40iCBeYeIBTceV1d9Zm1rbXv4xuvaTBVzsdEAhq4ltYE7RaNBvAwM/fuh
+	XyllWQMANOViiywAfJoxaycYqphihAlEhzkrbtawyT6GuL/Eo94dSpX941ZBEf5avmGfhb
+	IInP8tgBAax5LnAfHKtbguwpljEt7eA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1762326130;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HiWTKq6RFEsgq4tdBiXrdi6UiJ/nLkzXTBqjXsIruM0=;
+	b=824OQiKvKNmQ5aey60IjcInoMm2F1zM+hwgVZc13D2zIR2xaMjz2NLuYOqB4IEIt7vV7Ja
+	I04Bwr0romzXawDQ==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1762326130; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HiWTKq6RFEsgq4tdBiXrdi6UiJ/nLkzXTBqjXsIruM0=;
+	b=bamh70B1hocnN40iCBeYeIBTceV1d9Zm1rbXv4xuvaTBVzsdEAhq4ltYE7RaNBvAwM/fuh
+	XyllWQMANOViiywAfJoxaycYqphihAlEhzkrbtawyT6GuL/Eo94dSpX941ZBEf5avmGfhb
+	IInP8tgBAax5LnAfHKtbguwpljEt7eA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1762326130;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HiWTKq6RFEsgq4tdBiXrdi6UiJ/nLkzXTBqjXsIruM0=;
+	b=824OQiKvKNmQ5aey60IjcInoMm2F1zM+hwgVZc13D2zIR2xaMjz2NLuYOqB4IEIt7vV7Ja
+	I04Bwr0romzXawDQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 7E819132DD;
+	Wed,  5 Nov 2025 07:02:09 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id v1XlHHH2CmmGDAAAD6G6ig
+	(envelope-from <hare@suse.de>); Wed, 05 Nov 2025 07:02:09 +0000
+Message-ID: <57f304f4-ddfe-4d31-91c0-c4fcc5c6c737@suse.de>
+Date: Wed, 5 Nov 2025 08:02:09 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,69 +82,68 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [bug report] fstests generic/085 btrfs hang with use-after-free
- at bdev_super_lock
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc: "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
-References: <asuxk7u6tlrjb5ruugshjvydiixo6vcvayu6yzfeu5fblkxdxh@3whdau6mprqv>
+Subject: Re: [PATCH v3 05/15] block: reorganize struct blk_zone_wplug
+To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+ Keith Busch <keith.busch@wdc.com>, Christoph Hellwig <hch@lst.de>,
+ dm-devel@lists.linux.dev, Mike Snitzer <snitzer@kernel.org>,
+ Mikulas Patocka <mpatocka@redhat.com>,
+ "Martin K . Petersen" <martin.petersen@oracle.com>,
+ linux-scsi@vger.kernel.org, linux-xfs@vger.kernel.org,
+ Carlos Maiolino <cem@kernel.org>, linux-btrfs@vger.kernel.org,
+ David Sterba <dsterba@suse.com>
+References: <20251104013147.913802-1-dlemoal@kernel.org>
+ <20251104013147.913802-6-dlemoal@kernel.org>
 Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <asuxk7u6tlrjb5ruugshjvydiixo6vcvayu6yzfeu5fblkxdxh@3whdau6mprqv>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: udrflgboVtG4Ikl1yGaWkSVzHEZVTTFX
-X-Proofpoint-ORIG-GUID: udrflgboVtG4Ikl1yGaWkSVzHEZVTTFX
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTAxMDAyMSBTYWx0ZWRfX54Kf18vUpkfq
- EPH90OZY5n4r3Mt8s8W/td22KKfurh8k59kqTpmTnVe0xt+pJDyQUtntiBqx8Yape9UfP6hog7k
- d25NeVjQgzyU9Vk6Hsd5ovjW/fAulwQ51etq0WL2j/iuxvInOSNaZHNVxy7rchSqG6PMT4vo1kB
- z4gs8sJaEYfNN5VDKkH8gpTSjgGDUPFmBjCmOO4tLbp5nHgE7QHnFOmThpvN57+1DNfdCWlxi8E
- AV5BelXeBf7ddbbfFv6vcw0ESsp41aScKMzFo8+vfkIrIgjpCYz9lJK5858GA4GGVs/az2KF3Ue
- KBEzCjoM5JaNSC82MimLFL85pBdLoWwgSzMZck1H1Qp1OBpYieaPqvGWY/DA6+MGDUvWNCy3U3S
- fz2YcWk3NqV0jhnpQAwFNphJauxRIQ==
-X-Authority-Analysis: v=2.4 cv=H8HWAuYi c=1 sm=1 tr=0 ts=690af48c cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=_FWC9dmBtg7OGuMU_m4A:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-05_03,2025-11-03_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 phishscore=0 lowpriorityscore=0 priorityscore=1501 adultscore=0
- impostorscore=0 clxscore=1015 bulkscore=0 suspectscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511010021
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20251104013147.913802-6-dlemoal@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-0.997];
+	MIME_GOOD(-0.10)[text/plain];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:mid]
+X-Spam-Flag: NO
+X-Spam-Score: -4.30
 
-Hi Shinichiro,
-
-On 11/5/25 6:31 AM, Shinichiro Kawasaki wrote:
-> When I run fstests for btrfs on regular null_blk devices, I observe KASAN
-> slab-use-after-free in bdev_super_lock() followed by kernel hang. I observed it
-> for the kernel v6.17-rc4 for the first time. And I still observe it for the
-> latest kernel v6.18-rc4.
+On 11/4/25 02:31, Damien Le Moal wrote:
+> Reorganize the fields of struct blk_zone_wplug to remove a hole after
+> the wp_offset field and avoid having the bio_work structure split
+> between 2 cache lines.
 > 
-> The hang is recreated when I prepare eight of 5Gib size null_blk devices, assign
-> one for TEST_DEV, and assign the other seven for SCRATCH_DEV_POOl. The hang
-> happens at generic/085. It is sporadic. When I repeat the test case g085 only,
-> the hang is not recreated. But when I repeat the whole fstests a few times, the
-> hang is recreated in stable manner. It takes several hours to recreate the hang.
+> No functional changes.
 > 
-> I spent some weeks to bisect, and found the trigger commit is this:
+> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+> Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+> ---
+>   block/blk-zoned.c | 20 ++++++++++----------
+>   1 file changed, 10 insertions(+), 10 deletions(-)
 > 
->   370ac285f23a ("block: avoid cpu_hotplug_lock depedency on freeze_lock")
-> 
-> The commit was included in the kernel tag v6.17-rc3. When I reverted the commit
-> from v6.17-rc3, the hang disappeared (I repeated the whole fstests 5 times on
-> two test nodes, and did not observe the hang). I'm not sure if the commit
-> created the problem cause or revealed the hidden problem.
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-Thanks for the report!
+Cheers,
 
-This doesn't seem to be caused due to 370ac285f23a ("block: avoid cpu_hotplug_lock
-depedency on freeze_lock"). However it appears that we're hitting a race while 
-freezing/unfreezing filesystem. It'd better if someone from fs team can take a 
-look at it.
-
-Thanks,
---Nilay
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
