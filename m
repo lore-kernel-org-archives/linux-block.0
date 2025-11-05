@@ -1,269 +1,243 @@
-Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7BED2222D0;
-	Wed,  5 Nov 2025 17:06:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76E972E541F
+	for <linux-block@vger.kernel.org>; Wed,  5 Nov 2025 17:10:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762362370; cv=none; b=rDVi5FagKKflrEDFJ48zqnyxRp4VDERdZPxGCap1a4UQ7U5pTqqGIOwy0rq4Sh7jffUv3EnG35dq7Vhl8/Rsbl1ILVAadcGVQQ0aLSrNuzXUunYC0ngOwIYRYvq4vi2PouE5ajz2X/Kn5Dddj5AUPnGm8yN77C+UMnohre5QkrQ=
+	t=1762362656; cv=none; b=dg+R9gf59vduBAa4OXty1pA8RuYK5FdrZYqNPAYlxfOSj33MEtpu2gWI+ONNBYR5Mzo0E3K/LzWPLFuyt6E5O3y5wfkTda7t5s0x4ISc5AzxkzKIIEjo3N6i/lWpSi50J6b/DiNQZ2f9aGNz8T5BsYEM8KOWnGYf5ecY0ZLIXrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762362370; c=relaxed/simple;
-	bh=Gk/CiOYKk/7fyEqA+IWuarZ1K1PjWKoryFhEXgHtH54=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YM2aVIndXxC8e7uiHCprE3drP2BQQ0rsXnH9LLQRvpwSTvnSius57qPB+EtC7VOq5/HfhVhJfiQoXInwb0V08Di2EgEwh2sgPiA2rSkH+eIIo6TeWYcJCACVrtrWrcWYTiLIfOoMEBXzv86iWschTssgKv6ITzOAwo5SiSmdclc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=2L1jxihu; arc=none smtp.client-ip=199.89.3.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1762362656; c=relaxed/simple;
+	bh=qPV/w09JCjV/Ft5bIc3c+0VCoh2wOPiQ/KzXMdID1Jc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=o8bQyTlyhxBUsocNQ88h4gFEtkQ7AMqU0Jl12m+SdLpI+8R7e54TD5r3uqTu5y6mLL4MhX4/G14MdxTSsokyH5R8Zl7Ed1XosOuBPM5VFV6qbGQ66KpzgqICCt6g7pFOVKyz5jwRM2ePob4JpFXiE40hBebAlmHssm3Mg463nWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=T7/enu3R; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="2L1jxihu"
-Received: from localhost (localhost [127.0.0.1])
-	by 004.mia.mailroute.net (Postfix) with ESMTP id 4d1sCw3Mm7zm88Hc;
-	Wed,  5 Nov 2025 17:06:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:mime-version:x-mailer:message-id:date
-	:date:subject:subject:from:from:received:received; s=mr01; t=
-	1762362362; x=1764954363; bh=9nUScaESm1FAqlqIpease1umCaDtIn+JtuA
-	1Ch7zeBQ=; b=2L1jxihudzu8/EOEvaribVA/vG+FKTPoo4qallD3fK5zpBZ7pA5
-	iBv6qMMzZ3bjFwMV7s9j5sQKsf/iOVQwh+dR/XHjg5dlTPykiz2A7ge2Kztouc7f
-	n8A4SrVIjrGgds0rU8j8pMcoN48mWRK5cuMXGssj1F545gP7tb7GzY4KKV85ly0Q
-	J94ujGPJzhoiE1oyuqHXLsSXD8FtKI9cHd/FG9Pal+VLxTOZbIcpJpnQiQBp91ak
-	lXUdfKjslfjJVapQvRbbjdMMNs+RwgnDcW34J+TBwOAIJ0LgeD1VJkXHkj0cV/QF
-	27uglQq3ruaDucfSp1HQIP6PznOumyif2Kw==
-X-Virus-Scanned: by MailRoute
-Received: from 004.mia.mailroute.net ([127.0.0.1])
- by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id h0_T-8mBeTgK; Wed,  5 Nov 2025 17:06:02 +0000 (UTC)
-Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4d1sCb747Jzm84w4;
-	Wed,  5 Nov 2025 17:05:46 +0000 (UTC)
-From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Ming Lei <ming.lei@redhat.com>,
-	Nilay Shroff <nilay@linux.ibm.com>,
-	Martin Wilck <mwilck@suse.com>,
-	Benjamin Marzinski <bmarzins@redhat.com>,
-	stable@vger.kernel.org,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Damien Le Moal <dlemoal@kernel.org>
-Subject: [PATCH v4] block: Remove queue freezing from several sysfs store callbacks
-Date: Wed,  5 Nov 2025 09:05:33 -0800
-Message-ID: <20251105170534.2989596-1-bvanassche@acm.org>
-X-Mailer: git-send-email 2.51.2.1006.ga50a493c49-goog
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="T7/enu3R"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2951e58fa43so66415ad.1
+        for <linux-block@vger.kernel.org>; Wed, 05 Nov 2025 09:10:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1762362654; x=1762967454; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j8r8YRNzKuw0NkQeMuXs0kLpJhnGNfTo6Ot2ZhZ9K18=;
+        b=T7/enu3R4im8rmF90zghFw4LEp/Dea1TyT3wkQvNCx2YAt1cdP8myy1KZ+5YSMyMln
+         DkINrkkaKH8v1n5OxSetc31fzAkAxDHN7PzkgXJzllDB/1YQMPwj268SLHvfBiJWYZAn
+         SSzxVLY8njmfw0sGS5QJjZ3Dp2/DlOyhl/xCLhWlLir7kz8UsHmL2wshFW2IlxvOM9Wi
+         hgZsiWj4EGIG1ZHs3zvVfF+V5Kp4g6ysXKrw1eiFIIWtIeWxzK/fBr8yYIfN40cumBKz
+         k9nTmSVchhGB/EcD49iUGr6KViUO6MNqZrKUtH7HkCfAT+uUpAUxk7q8mYFP3sylIzgC
+         xBBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762362654; x=1762967454;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=j8r8YRNzKuw0NkQeMuXs0kLpJhnGNfTo6Ot2ZhZ9K18=;
+        b=mV0YOF+V7LLCb6MP3mQfTKpMUS3SBJHDKIITQBgfZVIc3uM24HwJxGwzVlZ4wYzSa3
+         pPKMf3fPV4p2i0t14Dl3lY6qLfYE8omdyvUuH7kqM49nzWcaLslOIBsIIEEcpQLZ34qV
+         SzS8Ee8dAokSUubyvmKNtsUa/rXqmf+pavRaWoenpOx03lKhREDLcGQVXIEsVRcOUeFu
+         HVv4b2YrRbm5Dpffg6P03GWaev9LooXaRO2AUlpuOKTocZpXCno4vXcSdIxDWxCLtXvc
+         L2xpX3wa2xjpHfNSB2E06w9rx3kzzgMCUbcVq0yeg7F7TBOKR4a59XbATP7Ppdlxi8eQ
+         2gmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWmAVvdfKgObi+qVE/T/LWa08PGxcvddhY+p4lDR3Q0GOzQ8bRQ6HDAdJuFMCLWjm+Q78bjqiZ04ixkfg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwqoWZgU8mE8RBzrZ+kcK43YrpVgZTTI6iW3kc5qwpchQNvGcZA
+	Jpdpoac0nnRf7NUyme8UO2k7i97D3S3pzDkKn6WYvV1u5sUPa9mwh4c3Nm3xPPvfismT+lp9B7y
+	Hi43TK8cWb9MeRMkeJgSLbOPbpvmrosTQvKTfFz978A==
+X-Gm-Gg: ASbGncudu9Mp4PQqLEsfi+OTOmnQSOPYXnTCKKh0WwGfPGHtN+RMHXFlMeRUbd9sWPa
+	Fc2oCzfNa7VDWaftXQK+MhstJMcZRS6XsueV3DG3O8siGkl+EfC8tyXj3nLULbf6+dhLcSuG2cL
+	R5aAzoY59kelEIMdjbEOXvUzMNiU0gPPTVEgtdpT5YBFwESH5qntn7mv2B61cfyHESaEcbVaLsZ
+	Q9Wp6fF3HHFh9s6lCgN7gI/yXQK7SQrXLLyQvR+DE/zUpFYRGptpGzxqu+lw/u8dqOJ61JBBl71
+	e2a6izk2RQeqbTZnjs6r/KsC3q467Q==
+X-Google-Smtp-Source: AGHT+IGoV/ylZSfFpRLhYc41dJLjjRkryt9A/HzTATgyvmsLaQip5/uWX977HiMeTccKVtdjo/ZyXIa60Rr2YwoecCs=
+X-Received: by 2002:a17:902:daca:b0:290:c3a9:42b5 with SMTP id
+ d9443c01a7336-2962adee35emr27729075ad.5.1762362653695; Wed, 05 Nov 2025
+ 09:10:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20251031010522.3509499-1-csander@purestorage.com>
+ <aQQwy7l_OCzG430i@fedora> <CADUfDZoPDbKO60nNVFk35X2JvT=8EV7vgROP+y2jgx6P39Woew@mail.gmail.com>
+ <aQVAVBGM7inQUa7z@fedora> <CADUfDZqKV2SzbWoe4gr4aSPaBtr+VwmEgEidZKo=LQBU9Quf2Q@mail.gmail.com>
+ <CADUfDZpb7QTTS6A6SV7zQVfG--Oke71Nqb5xBR2m65SoZczcTw@mail.gmail.com>
+In-Reply-To: <CADUfDZpb7QTTS6A6SV7zQVfG--Oke71Nqb5xBR2m65SoZczcTw@mail.gmail.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Wed, 5 Nov 2025 09:10:41 -0800
+X-Gm-Features: AWmQ_bl8O6C7Hx2hop8_9BOT3UY_EgJ7nbDUZhf7rrBgOfPIPmhv1Uwab9jXVY4
+Message-ID: <CADUfDZp+j+85zNiMvi0qDatzHqoDx2x8Ch48TLiF7umsCRSMuw@mail.gmail.com>
+Subject: Re: [PATCH] ublk: use copy_{to,from}_iter() for user copy
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Freezing the request queue from inside sysfs store callbacks may cause a
-deadlock in combination with the dm-multipath driver and the
-queue_if_no_path option. Additionally, freezing the request queue slows
-down system boot on systems where sysfs attributes are set synchronously.
+On Wed, Nov 5, 2025 at 8:16=E2=80=AFAM Caleb Sander Mateos
+<csander@purestorage.com> wrote:
+>
+> On Mon, Nov 3, 2025 at 8:40=E2=80=AFAM Caleb Sander Mateos
+> <csander@purestorage.com> wrote:
+> >
+> > On Fri, Oct 31, 2025 at 4:04=E2=80=AFPM Ming Lei <ming.lei@redhat.com> =
+wrote:
+> > >
+> > > On Fri, Oct 31, 2025 at 09:02:48AM -0700, Caleb Sander Mateos wrote:
+> > > > On Thu, Oct 30, 2025 at 8:45=E2=80=AFPM Ming Lei <ming.lei@redhat.c=
+om> wrote:
+> > > > >
+> > > > > On Thu, Oct 30, 2025 at 07:05:21PM -0600, Caleb Sander Mateos wro=
+te:
+> > > > > > ublk_copy_user_pages()/ublk_copy_io_pages() currently uses
+> > > > > > iov_iter_get_pages2() to extract the pages from the iov_iter an=
+d
+> > > > > > memcpy()s between the bvec_iter and the iov_iter's pages one at=
+ a time.
+> > > > > > Switch to using copy_to_iter()/copy_from_iter() instead. This a=
+voids the
+> > > > > > user page reference count increments and decrements and needing=
+ to split
+> > > > > > the memcpy() at user page boundaries. It also simplifies the co=
+de
+> > > > > > considerably.
+> > > > > >
+> > > > > > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+> > > > > > ---
+> > > > > >  drivers/block/ublk_drv.c | 62 +++++++++-----------------------=
+--------
+> > > > > >  1 file changed, 14 insertions(+), 48 deletions(-)
+> > > > > >
+> > > > > > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.=
+c
+> > > > > > index 0c74a41a6753..852350e639d6 100644
+> > > > > > --- a/drivers/block/ublk_drv.c
+> > > > > > +++ b/drivers/block/ublk_drv.c
+> > > > > > @@ -912,58 +912,47 @@ static const struct block_device_operatio=
+ns ub_fops =3D {
+> > > > > >       .open =3D         ublk_open,
+> > > > > >       .free_disk =3D    ublk_free_disk,
+> > > > > >       .report_zones =3D ublk_report_zones,
+> > > > > >  };
+> > > > > >
+> > > > > > -#define UBLK_MAX_PIN_PAGES   32
+> > > > > > -
+> > > > > >  struct ublk_io_iter {
+> > > > > > -     struct page *pages[UBLK_MAX_PIN_PAGES];
+> > > > > >       struct bio *bio;
+> > > > > >       struct bvec_iter iter;
+> > > > > >  };
+> > > > >
+> > > > > ->pages[] is actually for pinning user io pages in batch, so kill=
+ing it may cause
+> > > > > perf drop.
+> > > >
+> > > > As far as I can tell, copy_to_iter()/copy_from_iter() avoids the pa=
+ge
+> > > > pinning entirely. It calls copy_to_user_iter() for each contiguous
+> > > > user address range:
+> > > >
+> > > > size_t _copy_to_iter(const void *addr, size_t bytes, struct iov_ite=
+r *i)
+> > > > {
+> > > >         if (WARN_ON_ONCE(i->data_source))
+> > > >                 return 0;
+> > > >         if (user_backed_iter(i))
+> > > >                 might_fault();
+> > > >         return iterate_and_advance(i, bytes, (void *)addr,
+> > > >                                    copy_to_user_iter, memcpy_to_ite=
+r);
+> > > > }
+> > > >
+> > > > Which just checks that the address range doesn't include any kernel
+> > > > addresses and then memcpy()s directly via the userspace virtual
+> > > > addresses:
+> > > >
+> > > > static __always_inline
+> > > > size_t copy_to_user_iter(void __user *iter_to, size_t progress,
+> > > >                          size_t len, void *from, void *priv2)
+> > > > {
+> > > >         if (should_fail_usercopy())
+> > > >                 return len;
+> > > >         if (access_ok(iter_to, len)) {
+> > > >                 from +=3D progress;
+> > > >                 instrument_copy_to_user(iter_to, from, len);
+> > > >                 len =3D raw_copy_to_user(iter_to, from, len);
+> > > >         }
+> > > >         return len;
+> > > > }
+> > > >
+> > > > static __always_inline __must_check unsigned long
+> > > > raw_copy_to_user(void __user *dst, const void *src, unsigned long s=
+ize)
+> > > > {
+> > > >         return copy_user_generic((__force void *)dst, src, size);
+> > > > }
+> > > >
+> > > > static __always_inline __must_check unsigned long
+> > > > copy_user_generic(void *to, const void *from, unsigned long len)
+> > > > {
+> > > >         stac();
+> > > >         /*
+> > > >          * If CPU has FSRM feature, use 'rep movs'.
+> > > >          * Otherwise, use rep_movs_alternative.
+> > > >          */
+> > > >         asm volatile(
+> > > >                 "1:\n\t"
+> > > >                 ALTERNATIVE("rep movsb",
+> > > >                             "call rep_movs_alternative",
+> > > > ALT_NOT(X86_FEATURE_FSRM))
+> > > >                 "2:\n"
+> > > >                 _ASM_EXTABLE_UA(1b, 2b)
+> > > >                 :"+c" (len), "+D" (to), "+S" (from), ASM_CALL_CONST=
+RAINT
+> > > >                 : : "memory", "rax");
+> > > >         clac();
+> > > >         return len;
+> > > > }
+> > > >
+> > > > Am I missing something?
+> > >
+> > > page is allocated & mapped in page fault handler.
+> >
+> > Right, physical pages certainly need to be allocated for the virtual
+> > address range being copied to/from. But that would have happened
+> > previously in iov_iter_get_pages2(), so this isn't a new cost. And as
+> > you point out, in the common case that the virtual pages are already
+> > mapped to physical pages, the copy won't cause any page faults.
+> >
+> > >
+> > > However, in typical cases, pages in io buffer shouldn't be swapped ou=
+t
+> > > frequently, so this cleanup may be good, I will run some perf test.
+> >
+> > Thanks for testing.
+> >
+> > >
+> > > Also copy_page_from_iter()/copy_page_to_iter() can be used for avoidi=
+ng
+> > > bvec_kmap_local(), and the two helper can handle one whole bvec inste=
+ad
+> > > of single page.
+> >
+> > Yes, that's a good idea. Thanks, I didn't know about that.
+>
+> Looking into this further, copy_page_{to,from}_iter() doesn't seem
+> like an improvement. It still uses kmap_local_page() +
+> copy_{to,from}_iter() + kunmap_local() internally, and it splits the
+> copy at page boundaries instead of copying the whole bvec at once. I
+> don't think it's worth switching just to hide the bvec_kmap_local() +
+> kunmap_local() calls.
 
-Fix this by removing the blk_mq_freeze_queue() / blk_mq_unfreeze_queue()
-calls from the store callbacks that do not strictly need these callbacks.
-This patch may cause a small delay in applying the new settings.
+Maybe that's because bvec_kmap_local() only maps the first page of the
+bvec even if it spans multiple pages? Seems like it may be an existing
+bug that ublk_copy_io_pages() can copy past the end of the page
+returned from bvec_kmap_local(). But given that kmap_local_page() is a
+no-op when CONFIG_HIGHMEM is disabled, it's probably not visible in
+typical configurations.
 
-This patch affects the following sysfs attributes:
-* io_poll_delay
-* io_timeout
-* nomerges
-* read_ahead_kb
-* rq_affinity
-
-Here is an example of a deadlock triggered by running test srp/002:
-
-task:multipathd
-Call Trace:
- <TASK>
- __schedule+0x8c1/0x1bf0
- schedule+0xdd/0x270
- schedule_preempt_disabled+0x1c/0x30
- __mutex_lock+0xb89/0x1650
- mutex_lock_nested+0x1f/0x30
- dm_table_set_restrictions+0x823/0xdf0
- __bind+0x166/0x590
- dm_swap_table+0x2a7/0x490
- do_resume+0x1b1/0x610
- dev_suspend+0x55/0x1a0
- ctl_ioctl+0x3a5/0x7e0
- dm_ctl_ioctl+0x12/0x20
- __x64_sys_ioctl+0x127/0x1a0
- x64_sys_call+0xe2b/0x17d0
- do_syscall_64+0x96/0x3a0
- entry_SYSCALL_64_after_hwframe+0x4b/0x53
- </TASK>
-task:(udev-worker)
-Call Trace:
- <TASK>
- __schedule+0x8c1/0x1bf0
- schedule+0xdd/0x270
- blk_mq_freeze_queue_wait+0xf2/0x140
- blk_mq_freeze_queue_nomemsave+0x23/0x30
- queue_ra_store+0x14e/0x290
- queue_attr_store+0x23e/0x2c0
- sysfs_kf_write+0xde/0x140
- kernfs_fop_write_iter+0x3b2/0x630
- vfs_write+0x4fd/0x1390
- ksys_write+0xfd/0x230
- __x64_sys_write+0x76/0xc0
- x64_sys_call+0x276/0x17d0
- do_syscall_64+0x96/0x3a0
- entry_SYSCALL_64_after_hwframe+0x4b/0x53
- </TASK>
-
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Nilay Shroff <nilay@linux.ibm.com>
-Cc: Martin Wilck <mwilck@suse.com>
-Cc: Benjamin Marzinski <bmarzins@redhat.com>
-Cc: stable@vger.kernel.org
-Fixes: af2814149883 ("block: freeze the queue in queue_attr_store")
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
-
-Changes compared to v3:
- - Added two data_race() annotations.
-
-Changes compared to v2:
- - Dropped the controversial patch "block: Restrict the duration of sysfs
-   attribute changes".
-
-Changes compared to v1:
- - Added patch "block: Restrict the duration of sysfs attribute changes".
- - Remove queue freezing from more sysfs callbacks.
-
-block/blk-sysfs.c | 20 +++-----------------
- 1 file changed, 3 insertions(+), 17 deletions(-)
-
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 76c47fe9b8d6..6eaccd18d8b4 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -143,7 +143,6 @@ queue_ra_store(struct gendisk *disk, const char *page=
-, size_t count)
- {
- 	unsigned long ra_kb;
- 	ssize_t ret;
--	unsigned int memflags;
- 	struct request_queue *q =3D disk->queue;
-=20
- 	ret =3D queue_var_store(&ra_kb, page, count);
-@@ -154,10 +153,8 @@ queue_ra_store(struct gendisk *disk, const char *pag=
-e, size_t count)
- 	 * calculated from the queue limits by queue_limits_commit_update.
- 	 */
- 	mutex_lock(&q->limits_lock);
--	memflags =3D blk_mq_freeze_queue(q);
--	disk->bdi->ra_pages =3D ra_kb >> (PAGE_SHIFT - 10);
-+	data_race(disk->bdi->ra_pages =3D ra_kb >> (PAGE_SHIFT - 10));
- 	mutex_unlock(&q->limits_lock);
--	blk_mq_unfreeze_queue(q, memflags);
-=20
- 	return ret;
- }
-@@ -375,21 +372,18 @@ static ssize_t queue_nomerges_store(struct gendisk =
-*disk, const char *page,
- 				    size_t count)
- {
- 	unsigned long nm;
--	unsigned int memflags;
- 	struct request_queue *q =3D disk->queue;
- 	ssize_t ret =3D queue_var_store(&nm, page, count);
-=20
- 	if (ret < 0)
- 		return ret;
-=20
--	memflags =3D blk_mq_freeze_queue(q);
- 	blk_queue_flag_clear(QUEUE_FLAG_NOMERGES, q);
- 	blk_queue_flag_clear(QUEUE_FLAG_NOXMERGES, q);
- 	if (nm =3D=3D 2)
- 		blk_queue_flag_set(QUEUE_FLAG_NOMERGES, q);
- 	else if (nm)
- 		blk_queue_flag_set(QUEUE_FLAG_NOXMERGES, q);
--	blk_mq_unfreeze_queue(q, memflags);
-=20
- 	return ret;
- }
-@@ -409,7 +403,6 @@ queue_rq_affinity_store(struct gendisk *disk, const c=
-har *page, size_t count)
- #ifdef CONFIG_SMP
- 	struct request_queue *q =3D disk->queue;
- 	unsigned long val;
--	unsigned int memflags;
-=20
- 	ret =3D queue_var_store(&val, page, count);
- 	if (ret < 0)
-@@ -421,7 +414,6 @@ queue_rq_affinity_store(struct gendisk *disk, const c=
-har *page, size_t count)
- 	 * are accessed individually using atomic test_bit operation. So we
- 	 * don't grab any lock while updating these flags.
- 	 */
--	memflags =3D blk_mq_freeze_queue(q);
- 	if (val =3D=3D 2) {
- 		blk_queue_flag_set(QUEUE_FLAG_SAME_COMP, q);
- 		blk_queue_flag_set(QUEUE_FLAG_SAME_FORCE, q);
-@@ -432,7 +424,6 @@ queue_rq_affinity_store(struct gendisk *disk, const c=
-har *page, size_t count)
- 		blk_queue_flag_clear(QUEUE_FLAG_SAME_COMP, q);
- 		blk_queue_flag_clear(QUEUE_FLAG_SAME_FORCE, q);
- 	}
--	blk_mq_unfreeze_queue(q, memflags);
- #endif
- 	return ret;
- }
-@@ -446,11 +437,9 @@ static ssize_t queue_poll_delay_store(struct gendisk=
- *disk, const char *page,
- static ssize_t queue_poll_store(struct gendisk *disk, const char *page,
- 				size_t count)
- {
--	unsigned int memflags;
- 	ssize_t ret =3D count;
- 	struct request_queue *q =3D disk->queue;
-=20
--	memflags =3D blk_mq_freeze_queue(q);
- 	if (!(q->limits.features & BLK_FEAT_POLL)) {
- 		ret =3D -EINVAL;
- 		goto out;
-@@ -459,7 +448,6 @@ static ssize_t queue_poll_store(struct gendisk *disk,=
- const char *page,
- 	pr_info_ratelimited("writes to the poll attribute are ignored.\n");
- 	pr_info_ratelimited("please use driver specific parameters instead.\n")=
-;
- out:
--	blk_mq_unfreeze_queue(q, memflags);
- 	return ret;
- }
-=20
-@@ -472,7 +460,7 @@ static ssize_t queue_io_timeout_show(struct gendisk *=
-disk, char *page)
- static ssize_t queue_io_timeout_store(struct gendisk *disk, const char *=
-page,
- 				  size_t count)
- {
--	unsigned int val, memflags;
-+	unsigned int val;
- 	int err;
- 	struct request_queue *q =3D disk->queue;
-=20
-@@ -480,9 +468,7 @@ static ssize_t queue_io_timeout_store(struct gendisk =
-*disk, const char *page,
- 	if (err || val =3D=3D 0)
- 		return -EINVAL;
-=20
--	memflags =3D blk_mq_freeze_queue(q);
--	blk_queue_rq_timeout(q, msecs_to_jiffies(val));
--	blk_mq_unfreeze_queue(q, memflags);
-+	data_race((blk_queue_rq_timeout(q, msecs_to_jiffies(val)), 0));
-=20
- 	return count;
- }
+Best,
+Caleb
