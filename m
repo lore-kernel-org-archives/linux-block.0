@@ -1,174 +1,148 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C95F347BBC;
-	Tue,  4 Nov 2025 23:38:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48C462940D;
+	Wed,  5 Nov 2025 00:38:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762299505; cv=none; b=kA+7nTohmKNxNsqchywktUOa/w9YYReN13EVZa4qVfODEiOCl/eOXXv1YWovzlLvzd/AhNdyslGJoUjlRsMj6jrsxm9FLRfZ/rjfsCfPTSh9MahoTtMWMJMKW6sSHawblpzzXztye5rtK56Y6KvploZ4LGFHYDjlgr8X4XpIyp4=
+	t=1762303113; cv=none; b=t+GXxjKTELhEfdmyQvCSEmVwD3AYhAOVWEDLpkMkTGeRweLrGYAFYyFXbDzLHzpUGzKU9ethbXCXFI7Qcdle4lwkyS9rfOAcH85oBdLfZ3rtigttmRyT5XJuXBmMs10p1eWqWb9j/o4e7at57N4NCnAVC7PXhltx7Z36BZJp+nY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762299505; c=relaxed/simple;
-	bh=tJcYkVr7LDCJ3MMs5R6illjOG3OtSdYUQ0177dtNWZI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Oi1Ey9ywAnYcdKFZrEVWFT2Hulod0v7LjrEJyzPBLSm7TCZNQCGWTc7lcY90gI+t/sUgTH2ZiB6BpniUERphS/MvkWyB8nCgfUQmmtXwX7ER+Sdc742RM0aAofCK4r5WTrXaZwRsRyBfd3tJwy2zoBKjUqpEoxHFfp6e3dzMe7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bf69R+tQ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1762303113; c=relaxed/simple;
+	bh=ozzedGexVm3c7LAJROJn2IsFXaRUObyKrN+iT0hZtCY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cKw4tcby5VQKjP8Yd7QMloQ0ek0pVnhtT80m/VSsUoWik4716bFgo4Mo5K8LZFWGl92kLGH03607MHC8ZgK/9f13cccBvMFPNJDiwLs3M0QDHmaunha6QMsEcQIDa7qRLPZ20E773j3WoivWKyNITu8B0tCbKTUA13CqPXZjQMw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ptR0KmoB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bf69R+tQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A562CC4CEF7;
-	Tue,  4 Nov 2025 23:38:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ptR0KmoB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C518C4CEF7;
+	Wed,  5 Nov 2025 00:38:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762299504;
-	bh=tJcYkVr7LDCJ3MMs5R6illjOG3OtSdYUQ0177dtNWZI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bf69R+tQbvoJJc0RLl9XP2yy03u+QbW76n0pXCeLTt4k21stSTQLGIfFCFkPgQ8wr
-	 xjByoqA7J03Ezw4oQ1gFjVlemtqgC8X3ekeY0ngiO18CkRnq0BgNr3724p7SawDRr0
-	 pINZzgqhVjY6vAX/P3BQ0wl/7Wv4mqE1hkELAV28qBDh2jF4epW7BBQlUUQfoHP4St
-	 CVldaiJhf4RI9Tv1aX4GuHvO+D5PYMfIKw47sXuEDYcshMVEmDtC/Tdy8fe60aAzXq
-	 KxEjpkZqFI8xy2BPoIR031tGqioAaBazMmRW297lx8gZnlJJLgSqbRBK/EyrVPDmNM
-	 v8cLinDTB4/Cg==
-Date: Tue, 4 Nov 2025 15:38:24 -0800
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jan Kara <jack@suse.cz>, Keith Busch <kbusch@kernel.org>,
-	Dave Chinner <david@fromorbit.com>,
-	Carlos Maiolino <cem@kernel.org>,
-	Christian Brauner <brauner@kernel.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-raid@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: Re: fall back from direct to buffered I/O when stable writes are
- required
-Message-ID: <20251104233824.GO196370@frogsfrogsfrogs>
-References: <20251029071537.1127397-1-hch@lst.de>
- <aQNJ4iQ8vOiBQEW2@dread.disaster.area>
- <20251030143324.GA31550@lst.de>
- <aQPyVtkvTg4W1nyz@dread.disaster.area>
- <20251031130050.GA15719@lst.de>
- <aQTcb-0VtWLx6ghD@kbusch-mbp>
- <20251031164701.GA27481@lst.de>
- <kpk2od2fuqofdoneqse2l3gvn7wbqx3y4vckmnvl6gc2jcaw4m@hsxqmxshckpj>
- <20251103122111.GA17600@lst.de>
+	s=k20201202; t=1762303111;
+	bh=ozzedGexVm3c7LAJROJn2IsFXaRUObyKrN+iT0hZtCY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=ptR0KmoBFtTbL19XkNIzXueSZWZY/twdtmdgLFHw75tnPtDRLgthL4Nu42I1+NGgP
+	 R9YGZwqNNroue9gVRuJOYNFQl8c5CCpwsAb/DUR/WcDNILYwgUPd8NYjGCpxlA4LP2
+	 1NoLoMvXzsIiAz/i4dwPKYEtJgwki5bEAnh5aniham5fCcjSgmCJtmVRQBVaQ7GIgk
+	 Lh70Vw9Elxqxq8hv8mLW+41TPihRhOeqYz4Fmh1g1DHOdWO0n3htihIMSlbC5J+DKF
+	 wBNG2RzCxDahK8tEKZinOcULkU3G+14Y2GCKiuCRrqWtYNCm9USN72qyt2RU76j0Qv
+	 uA1GHnu4H3/xQ==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-fscrypt@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Yongpeng Yang <yangyongpeng@xiaomi.com>,
+	stable@vger.kernel.org,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH v3] fscrypt: fix left shift underflow when inode->i_blkbits > PAGE_SHIFT
+Date: Tue,  4 Nov 2025 16:36:42 -0800
+Message-ID: <20251105003642.42796-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.51.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251103122111.GA17600@lst.de>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Nov 03, 2025 at 01:21:11PM +0100, Christoph Hellwig wrote:
-> On Mon, Nov 03, 2025 at 12:14:06PM +0100, Jan Kara wrote:
-> > > Yes, it's pretty clear that the result in non-deterministic in what you
-> > > get.  But that result still does not result in corruption, because
-> > > there is a clear boundary ( either the sector size, or for NVMe
-> > > optionally even a larger bodunary) that designates the atomicy boundary.
-> > 
-> > Well, is that boundary really guaranteed? I mean if you modify the buffer
-> > under IO couldn't it happen that the DMA sees part of the sector new and
-> > part of the sector old? I agree the window is small but I think the real
-> > guarantee is architecture dependent and likely cacheline granularity or
-> > something like that.
-> 
-> If you actually modify it: yes.  But I think Keith' argument was just
-> about regular racing reads vs writes.
-> 
-> > > pretty clearly not an application bug.  It's also pretty clear that
-> > > at least some applications (qemu and other VMs) have been doings this
-> > > for 20+ years.
-> > 
-> > Well, I'm mostly of the opinion that modifying IO buffers in flight is an
-> > application bug (as much as most current storage stacks tolerate it) but on
-> > the other hand returning IO errors later or even corrupting RAID5 on resync
-> > is, in my opinion, not a sane error handling on the kernel side either so I
-> > think we need to do better.
-> 
-> Yes.  Also if you look at the man page which is about official as it gets
-> for the semantics you can't find anything requiring the buffers to be
-> stable (but all kinds of other odd rants).
-> 
-> > I also think the performance cost of the unconditional bounce buffering is
-> > so heavy that it's just a polite way of pushing the app to do proper IO
-> > buffer synchronization itself (assuming it cares about IO performance but
-> > given it bothered with direct IO it presumably does). 
-> >
-> > So the question is how to get out of this mess with the least disruption
-> > possible which IMO also means providing easy way for well-behaved apps to
-> > avoid the overhead.
-> 
-> Remember the cases where this matters is checksumming and parity, where
-> we touch all the cache lines anyway and consume the DRAM bandwidth,
-> although bounce buffering upgrades this from pure reads to also writes.
-> So the overhead is heavy, but if we handle it the right way, that is
-> doing the checksum/parity calculation while the cache line is still hot
-> it should not be prohibitive.  And getting this right in the direct
-> I/O code means that the low-level code could stop bounce buffering
-> for buffered I/O, providing a major speedup there.
-> 
-> I've been thinking a bit more on how to better get the copy close to the
-> checksumming at least for PI, and to avoid the extra copies for RAID5
-> buffered I/O. M maybe a better way is to mark a bio as trusted/untrusted
-> so that the checksumming/raid code can bounce buffer it, and I start to
-> like that idea.  A complication is that PI could relax that requirement
-> if we support PI passthrough from userspace (currently only for block
-> device, but I plan to add file system support), where the device checks
-> it, but we can't do that for parity RAID.
+From: Yongpeng Yang <yangyongpeng@xiaomi.com>
 
-IIRC, a PI disk is supposed to check the supplied CRC against the
-supplied data, and fail the write if there's a discrepancy, right?  In
-that case, an application can't actually corrupt its own data because
-hardware will catch it.
+When simulating an nvme device on qemu with both logical_block_size and
+physical_block_size set to 8 KiB, an error trace appears during
+partition table reading at boot time. The issue is caused by
+inode->i_blkbits being larger than PAGE_SHIFT, which leads to a left
+shift of -1 and triggering a UBSAN warning.
 
-For reads, the kernel will check the supplied CRC against the data
-buffer, right?  So a program can blow itself up, but that only affects
-the buggy program.
+[    2.697306] ------------[ cut here ]------------
+[    2.697309] UBSAN: shift-out-of-bounds in fs/crypto/inline_crypt.c:336:37
+[    2.697311] shift exponent -1 is negative
+[    2.697315] CPU: 3 UID: 0 PID: 274 Comm: (udev-worker) Not tainted 6.18.0-rc2+ #34 PREEMPT(voluntary)
+[    2.697317] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
+[    2.697320] Call Trace:
+[    2.697324]  <TASK>
+[    2.697325]  dump_stack_lvl+0x76/0xa0
+[    2.697340]  dump_stack+0x10/0x20
+[    2.697342]  __ubsan_handle_shift_out_of_bounds+0x1e3/0x390
+[    2.697351]  bh_get_inode_and_lblk_num.cold+0x12/0x94
+[    2.697359]  fscrypt_set_bio_crypt_ctx_bh+0x44/0x90
+[    2.697365]  submit_bh_wbc+0xb6/0x190
+[    2.697370]  block_read_full_folio+0x194/0x270
+[    2.697371]  ? __pfx_blkdev_get_block+0x10/0x10
+[    2.697375]  ? __pfx_blkdev_read_folio+0x10/0x10
+[    2.697377]  blkdev_read_folio+0x18/0x30
+[    2.697379]  filemap_read_folio+0x40/0xe0
+[    2.697382]  filemap_get_pages+0x5ef/0x7a0
+[    2.697385]  ? mmap_region+0x63/0xd0
+[    2.697389]  filemap_read+0x11d/0x520
+[    2.697392]  blkdev_read_iter+0x7c/0x180
+[    2.697393]  vfs_read+0x261/0x390
+[    2.697397]  ksys_read+0x71/0xf0
+[    2.697398]  __x64_sys_read+0x19/0x30
+[    2.697399]  x64_sys_call+0x1e88/0x26a0
+[    2.697405]  do_syscall_64+0x80/0x670
+[    2.697410]  ? __x64_sys_newfstat+0x15/0x20
+[    2.697414]  ? x64_sys_call+0x204a/0x26a0
+[    2.697415]  ? do_syscall_64+0xb8/0x670
+[    2.697417]  ? irqentry_exit_to_user_mode+0x2e/0x2a0
+[    2.697420]  ? irqentry_exit+0x43/0x50
+[    2.697421]  ? exc_page_fault+0x90/0x1b0
+[    2.697422]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[    2.697425] RIP: 0033:0x75054cba4a06
+[    2.697426] Code: 5d e8 41 8b 93 08 03 00 00 59 5e 48 83 f8 fc 75 19 83 e2 39 83 fa 08 75 11 e8 26 ff ff ff 66 0f 1f 44 00 00 48 8b 45 10 0f 05 <48> 8b 5d f8 c9 c3 0f 1f 40 00 f3 0f 1e fa 55 48 89 e5 48 83 ec 08
+[    2.697427] RSP: 002b:00007fff973723a0 EFLAGS: 00000202 ORIG_RAX: 0000000000000000
+[    2.697430] RAX: ffffffffffffffda RBX: 00005ea9a2c02760 RCX: 000075054cba4a06
+[    2.697432] RDX: 0000000000002000 RSI: 000075054c190000 RDI: 000000000000001b
+[    2.697433] RBP: 00007fff973723c0 R08: 0000000000000000 R09: 0000000000000000
+[    2.697434] R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000000
+[    2.697434] R13: 00005ea9a2c027c0 R14: 00005ea9a2be5608 R15: 00005ea9a2be55f0
+[    2.697436]  </TASK>
+[    2.697436] ---[ end trace ]---
 
-I think that means the following:
+This situation can happen for block devices because when
+CONFIG_TRANSPARENT_HUGEPAGE is enabled, the maximum logical_block_size
+is 64 KiB. set_init_blocksize() then sets the block device
+inode->i_blkbits to 13, which is within this limit.
 
-A. We can allow mutant directio to non-PI devices because buggy programs
-   can only screw themselves over.  Not great but we've allowed this
-   forever.
+File I/O does not trigger this problem because for filesystems that do
+not support the FS_LBS feature, sb_set_blocksize() prevents
+sb->s_blocksize_bits from being larger than PAGE_SHIFT. During inode
+allocation, alloc_inode()->inode_init_always() assigns inode->i_blkbits
+from sb->s_blocksize_bits. Currently, only xfs_fs_type has the FS_LBS
+flag, and since xfs I/O paths do not reach submit_bh_wbc(), it does not
+hit the left-shift underflow issue.
 
-B. We can also allow it to PI devices because those buggy programs will
-   get hit with EIOs immediately.
+Signed-off-by: Yongpeng Yang <yangyongpeng@xiaomi.com>
+Fixes: 47dd67532303 ("block/bdev: lift block size restrictions to 64k")
+Cc: stable@vger.kernel.org
+[EB: use folio_pos() and consolidate the two shifts by i_blkbits]
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
 
-C. Mutant directio reads from a RAID1/5 on non-PI devices are ok-ish
-   because the broken application can decide to retry and that's just
-   wasting resources.
+This patch is targeting the fscrypt/for-current tree
 
-D. Mutant directio reads from a RAID1/5 on PI devices are not good
-   because the read failure will result in an unnecessary rebuild, which
-   could turn really bad if the other disks are corrupt.
+ fs/crypto/inline_crypt.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-E. Mutant directio writes to a RAID5 are bad bad bad because you corrupt
-   the stripe and now unsuspecting users on other strips lose data.
+diff --git a/fs/crypto/inline_crypt.c b/fs/crypto/inline_crypt.c
+index 5dee7c498bc8..ed6e926226b5 100644
+--- a/fs/crypto/inline_crypt.c
++++ b/fs/crypto/inline_crypt.c
+@@ -331,12 +331,11 @@ static bool bh_get_inode_and_lblk_num(const struct buffer_head *bh,
+ 	if (!mapping)
+ 		return false;
+ 	inode = mapping->host;
+ 
+ 	*inode_ret = inode;
+-	*lblk_num_ret = ((u64)folio->index << (PAGE_SHIFT - inode->i_blkbits)) +
+-			(bh_offset(bh) >> inode->i_blkbits);
++	*lblk_num_ret = (folio_pos(folio) + bh_offset(bh)) >> inode->i_blkbits;
+ 	return true;
+ }
+ 
+ /**
+  * fscrypt_set_bio_crypt_ctx_bh() - prepare a file contents bio for inline
 
-I think the btrfs corruption problems are akin to a RAID5 where you can
-persist the wrong CRC to storage and you'll only see it on re-read; but
-at least the blast is contained to the buggy application's file.
+base-commit: 6146a0f1dfae5d37442a9ddcba012add260bceb0
+-- 
+2.51.2
 
-I wonder if that means we really need a way to convey the potential
-damage of a mutant write through the block layer / address space so that
-the filesystem can do the right thing?  IOWs, instead of a single
-stable-pages flag, something along the lines of:
-
-enum mutation_blast_radius {
-	/* nobody will notice a thing */
-	MBR_UNCHECKED,
-
-	/* program doing the corruption will notice */
-	MBR_BADAPP,
-
-	/* everyone else's data get corrupted too */
-	MBR_EVERYONE,
-};
-
-AS_STABLE_WRITES is set for MBR_BADAPP and MBR_EVERYONE, and the
-directio -> dontcache flag change is done for a write to a MBR_EVERYONE
-bdev.
-
-Hm?
-
---D
