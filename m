@@ -1,41 +1,30 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C327329E4B
-	for <linux-block@vger.kernel.org>; Wed,  5 Nov 2025 14:51:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0EFA2DC332
+	for <linux-block@vger.kernel.org>; Wed,  5 Nov 2025 14:53:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762354295; cv=none; b=pOqMjn1RysSTZiKMmviMbbZEl50VDRl3lz+nLM8F2VyWEWrecmr/whnr5c8i/KAHSeJdQ/rkrsQwo+TaNKhio2t+3AxHMAkF1dCLAuEfb/grhQYQxq0cfBQYrDOSzEFrvYuA9yWRR50L+ssuAxvbwKxASdBrWBHMtL9Bl+NzdIk=
+	t=1762354395; cv=none; b=cwTgoGLIspZS7wzSaFCeJibTmX2Jg5v71Ykgaub6xOLhrj/81LlRhOYZSKSmBx5+S3juaTo1A+vnKG0MdICzz9HpLO/ZmZsWsaqbbLvWlCrLZodEsV9+844uRrjHpoWQ9/8t+l37O6q1OzGlW9UCDBmXvsCsz2MWWZhqTi38pxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762354295; c=relaxed/simple;
-	bh=pv5uSwS+JX7GbE8nm5cy2PnqwZKV1EyNWL6NvJ7hUj4=;
+	s=arc-20240116; t=1762354395; c=relaxed/simple;
+	bh=nlkOGnSxulbLF2POFUoDKR9joA3LvWAMf6UXkbS5NMk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GmLb/PggDbTM4cTt/zVtQFy9GTseHMWmtq7r9dbjrF7x+AF5yKxpvb+/thGHPFABmhGNHLlxXgQHvGJbk97LHihL0BIBk8HWzUFxTxMBOM/dI0vt7YuQmAFw24x79GglzfZXgIapPfQUZq5QlQBtyFA0G8AyQOm2kFWSMY+KUI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bdSXdIeO; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bdSXdIeO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98EF3C4CEF8;
-	Wed,  5 Nov 2025 14:51:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762354294;
-	bh=pv5uSwS+JX7GbE8nm5cy2PnqwZKV1EyNWL6NvJ7hUj4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bdSXdIeOxFNYHiSR+D7DzaXJFZStoRnYjVqTEPRgfjSUPn2I2RA4t1BcxbSbEfFpd
-	 Jdi3rlo+DyZiWkOsPfCHDmwk5e8ekUhJuJ9c7IcNI0Jd2mQbpHjhzOhYL+4bO3Ss0x
-	 0M2KP25uQLtM0BHXhTD908Pk1BDFIkXm/JMbwJFdzq8atGG3HlyICGmlGylfCRnwJB
-	 fwT7p8J3XQ7YwgjBFqmwYdRDP+Pc/NyjJT60JFx/R7Rb8RXuRO9N2DLNHjtxQHAc4Z
-	 i25S9NAF4wRm/gJp5deOPjR8pThuZPpvcu3DIX1OgL/bwmxYJzZ/WJw3Zi777uEoqS
-	 Mq+UVPHvghYzw==
-Date: Wed, 5 Nov 2025 07:51:32 -0700
-From: Keith Busch <kbusch@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-	martin.petersen@oracle.com, axboe@kernel.dk
+	 Content-Type:Content-Disposition:In-Reply-To; b=rgb2dAqq9zPnw9h3GHrB/0tFjl0zqSLAlSNCjQ61X240IYXwz6+DQU6cxKdUrMPxYIkXY1dsLlppw3qcPHFl/sHNhoOHpRNX7noDryHDFl4T1B26G0wTi34Ojd9bzV39Je9eR9ecm0hrrrQXNbT/EibtO23glxdFzCMBrBgsS7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 66876227AAA; Wed,  5 Nov 2025 15:53:09 +0100 (CET)
+Date: Wed, 5 Nov 2025 15:53:09 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Keith Busch <kbusch@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@meta.com>,
+	linux-block@vger.kernel.org, martin.petersen@oracle.com,
+	axboe@kernel.dk
 Subject: Re: [RFC PATCH] blk-integrity: support arbitrary buffer alignment
-Message-ID: <aQtkdNQOA1Twvoeh@kbusch-mbp>
-References: <20251104224045.3396384-1-kbusch@meta.com>
- <20251105141504.GC22325@lst.de>
- <aQtiYd69E-3G_PC4@kbusch-mbp>
+Message-ID: <20251105145309.GA26042@lst.de>
+References: <20251104224045.3396384-1-kbusch@meta.com> <20251105141504.GC22325@lst.de> <aQtiYd69E-3G_PC4@kbusch-mbp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -45,19 +34,20 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <aQtiYd69E-3G_PC4@kbusch-mbp>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
 On Wed, Nov 05, 2025 at 07:42:41AM -0700, Keith Busch wrote:
-> On Wed, Nov 05, 2025 at 03:15:04PM +0100, Christoph Hellwig wrote:
+> This generally does pass 'void *' to contiguous protection data. If the
+> actual protection payload is spread across multiple segments, though, we
+> don't have contiguous data, so we have to bounce it through something.
+> Declaring the union on the stack provides this memory for that unusual
+> case. If the bip segment is big enough, we point the 'void *' directly
+> at it; if not, we point it to the temporary onstack allocation. Using
+> a union ensures that it's definitely big enough for any checksum type.
 
-... 
+The union contains pointers, which are always 8 bytes.  But I guess
+I can see now how this didn't blow up, assuming this was only tested
+on classic PI, as the tuples are just 8 bytes and you just used the
+pointer as storage?  I.e. these aren't supposed to be pointers, but
+values?
 
-> > What does that union of two pointers 
-
-...
-
->  Using a union ensures that it's definitely big enough for any
->  checksum type.
-
-Oh geez, it should have been a union of the structs, not pointers to
-those types... So this is a mistake in the code, but I hope the
-intention is more clear.
