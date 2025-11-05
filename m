@@ -1,95 +1,122 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 018AC214812;
-	Wed,  5 Nov 2025 15:23:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBC9832548A
+	for <linux-block@vger.kernel.org>; Wed,  5 Nov 2025 15:25:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762356184; cv=none; b=gVdJ3zCzAn/kvoWEuxLzgohdApoKM+0vevvpTX5piYXFyho5cI90vrgCY9BCNnsiLnqy/TOdhVA9ENVvrOkditB9NklhoLPZ0N+t3FY8+Zxb7c1CDhO8ZPfASvP93dDDYi8pD3a07OxbJqHsKnaCmhcwCHt0eW6IYI8jfSNNCzg=
+	t=1762356325; cv=none; b=WdiECTWnoNIz14VeBR0ufWu1vdwu8dZPaouk1yh5ZuGqCxzFK5WEfwPhrdJOq3YBp4ycf+MyCfAtrho7pHKi12zpgvAZacu1ace6HU2WU73ChzCt6AT0O5ug9sl6p7HCIDkfleuYHF1DTXKn+dIjW3z4ZsTxqPDxmIfu3NSsz8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762356184; c=relaxed/simple;
-	bh=fusB0gibvJKJQXePl8CXgegfMzOrPm+adEItFF8rn4g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=htytefE4YnDrCTZsTOMuTQmyODYqZ9jrBR2hKhuETlRa1iqQrnGG0y4YPZq8Yi+CKriz1k0+uDMyoJBEcHowa7HMHRNwdCCarkoGsmPBVQ/yJheU3ba2F0r6+l3iZiZR3c8fDh12rBDym/d18gYPSGYtKwkUf0x7o1hqeyH4EZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fI54FeAi; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1762356325; c=relaxed/simple;
+	bh=jVa87eKGqVF+l20ajBfd8ThYEZLpCOEp5uPFz1FOVig=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jvm6vqyQ6r3j00HSNBbW3telKIATloITerjGD7oMUp1vUFWtve9uc+YARQBjGOMLufGUwJPA4N5m9HAxhLRXeP3lrqJS1mYuSbphSjKSF94HLRIZg94NuwigDNGQPHtOutgXRkIbwysvCU9Nb1qoXbaSmisMs5UsKcQW3X4+b/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=SuLYuNMQ; arc=none smtp.client-ip=209.85.166.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fI54FeAi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CEDBC4CEF5;
-	Wed,  5 Nov 2025 15:23:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762356183;
-	bh=fusB0gibvJKJQXePl8CXgegfMzOrPm+adEItFF8rn4g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fI54FeAijnMRfBlbxLG2+Iek1ya9gdrVicMOy6ppH48QNJY1JwCA0YIcMTsGcAyyZ
-	 KuEb2RQHhUEh749M7gs858+NV46mLYZbGP/8Mp4QmoJ81PcA4BX5I+j9kHoraKETyY
-	 5/xsZ+pDWMBJe6yrYwpFs/GuyQIvd/XVyzYLrl689vn8XudarKTwU0ZOlC8B+b3wxA
-	 4M04j8KUlHVMArmw92JUAxOG0ooE93fYnwL/Ap60WXkOAbqG1sxhteuwbYCz02ush8
-	 Nel4ht9ZvEnSBScs7Jx0YygYSCSf5Dvon/HzaCuHFaOaiCZMR0DrRHFWElXp1YaKVm
-	 4kzXv9mqOHBdg==
-Date: Wed, 5 Nov 2025 16:23:01 +0100
-From: Frederic Weisbecker <frederic@kernel.org>
-To: Waiman Long <llong@redhat.com>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Gabriele Monaco <gmonaco@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Marco Crivellari <marco.crivellari@suse.com>,
-	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
-	"Rafael J . Wysocki" <rafael@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Vlastimil Babka <vbabka@suse.cz>, Will Deacon <will@kernel.org>,
-	cgroups@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-mm@kvack.org,
-	linux-pci@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 12/33] sched/isolation: Convert housekeeping cpumasks to
- rcu pointers
-Message-ID: <aQtr1VM9k5-uJbfu@localhost.localdomain>
-References: <20251013203146.10162-1-frederic@kernel.org>
- <20251013203146.10162-13-frederic@kernel.org>
- <083388fb-3240-4329-ad49-b81cd89acffd@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="SuLYuNMQ"
+Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-4331b4d5c6eso18847205ab.2
+        for <linux-block@vger.kernel.org>; Wed, 05 Nov 2025 07:25:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1762356321; x=1762961121; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=487sI5AbJzpMbYjr1CjDcFAjiYiuuI8y81LMpEqcmVA=;
+        b=SuLYuNMQsvW2Wzy7K4mLUkR0AoGJNXWXa0P0gDdbBgbZx3j0quIPnpr3upInBfCwFn
+         RPwNLHQK5wV356rmAywxjbeB9tJDB7v1cnTrIkA4STiha2ORKBmLmOQApD4kxn5kuFCQ
+         4QGrxLeifnYktJ67DjF8XFqNvklzewbeDSW3vKwsBMdWVgq9GETI6XOc72jOBotOHN13
+         OmCd57PuNi0/2jb9ryaH3q/6zjtXi51CwEQe3Cg4rCnYA6J/gGVEMpj1XD5gZ5x9ZjIL
+         kRwcPBtDaPLpwInKxWRkZnnIJs1Ej/SarM1CXuLUfvUsyKg2gbiV/lldR+HSu6QIDW6z
+         fUHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762356321; x=1762961121;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=487sI5AbJzpMbYjr1CjDcFAjiYiuuI8y81LMpEqcmVA=;
+        b=gtzB9UF6BNPcD3UzVePBejSBeS33xRBT/AhRsuTIq7BxNxNUNyDvZn9qoawSeQGGci
+         yVk9iDUijZPl9n1r21tObBxSvMY6OGGWH7aGpsZFFxP+EiebwKOAJ/HfKbFCYHVpXQDg
+         nDIUyEAz281MgoyCoySvmsXB6AgeV2ScbG4p5+a15IxB6eqEZp38B4QFOfxDMkUrNVZt
+         MvU0yMZasrt4EI6HKMLkTazwbNDbtrUinbU8zZ7ymdEXF9h0/wd5uGN+V+EuckYdxmVv
+         CemGFakpOBMtX8RYClEMum6bWnjx4ZR2FCy2SZmOlvXcZUFKl8ef1EfvR3nIn3mC+l2u
+         CMAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVpbxgGeQdBR/cs+UToqSca/VSZcvSlGPK4fS/rutpKVZRKakIKJlw8s3CUci8TFJAWNhim3jSH7y0JCA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyohswbcBh993VhXPKCwNzAs5QcjMIZ2V9ptmuQ5dD+u+yU0FH4
+	qpqX6jyQvpRyRDQzxpTYEuwbgN96jDABIjTvGW4pSBDfV3t27BPElz34uACFGG/qX1mgBSoHQch
+	0GEan
+X-Gm-Gg: ASbGnct7kFmCg1Yd7/RuESN7l+79QUY5K6hRxWc0ftZzY+d/rbL0Fywnnlue9QM2Fr8
+	ZzyGo2F0U+sROtP4WiDnZhxuzOQ6mBoVV9yetr8pWCY6eT5bbkvEP/ijFrO/3znXK65QVuxbWQJ
+	++K5jjlKl2EfgZiTUj7T+nQIMbskb5lvJ5VUCPPUBSQXpj6IPY2bwfaq7K+GzSydZ+lxkHS3O79
+	AnUuYLjmfGvYeoNJaymj0Uwi4arV6BlFYYkbebbDA9zaIj24KGYr2KI80qvgJ4hgxvYG2re6gv3
+	/uc6cjklo7dfJ7XUqtjUZfKDewjorQRNEJrH07Qzu6rlrypdTZ6Ss7y0oOmYJRJt0C2HtYZjQTm
+	x/T8cMi3DkgkFqRX1cxeqAMMoblGoSzPjuBLExjnPSvkLW7W49s5zvGsIP47RcSWSccbOZh6K
+X-Google-Smtp-Source: AGHT+IGc9ECZf5jYK1jLXUdJ3FXQag+q/dzClLumbg8vy2PbyYvXZm9bHKrc58cJrzWZLVcyD9QYcw==
+X-Received: by 2002:a05:6e02:174b:b0:42d:8b25:47ed with SMTP id e9e14a558f8ab-433407a705bmr56303455ab.6.1762356320939;
+        Wed, 05 Nov 2025 07:25:20 -0800 (PST)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5b72258d620sm2536362173.8.2025.11.05.07.25.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 Nov 2025 07:25:20 -0800 (PST)
+Message-ID: <83d64478-d53c-441f-b5b4-55b5f1530a03@kernel.dk>
+Date: Wed, 5 Nov 2025 08:25:19 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <083388fb-3240-4329-ad49-b81cd89acffd@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] zram: Implement multi-page write-back
+To: Yuwen Chen <ywen.chen@foxmail.com>
+Cc: akpm@linux-foundation.org, bgeffon@google.com, licayy@outlook.com,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-mm@kvack.org, liumartin@google.com, minchan@kernel.org,
+ richardycc@google.com, senozhatsky@chromium.org
+References: <tencent_85F14CD7BA73843CA32FF7AEB6A21A6EC907@qq.com>
+ <tencent_25F89AABFE39535EF957519750D107B7D406@qq.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <tencent_25F89AABFE39535EF957519750D107B7D406@qq.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Le Mon, Oct 20, 2025 at 11:49:53PM -0400, Waiman Long a écrit :
-> >   bool housekeeping_test_cpu(int cpu, enum hk_type type)
-> >   {
-> > -	if (static_branch_unlikely(&housekeeping_overridden))
-> > -		if (housekeeping.flags & BIT(type))
-> > -			return cpumask_test_cpu(cpu, housekeeping.cpumasks[type]);
-> > +	if (housekeeping.flags & BIT(type))
-> > +		return cpumask_test_cpu(cpu, housekeeping_cpumask(type));
-> >   	return true;
-> >   }
+On 11/4/25 11:48 PM, Yuwen Chen wrote:
+> For block devices, sequential write performance is significantly
+> better than random write. Currently, zram's write-back function
+> only supports single-page operations, which fails to leverage
+> the sequential write advantage and leads to suboptimal performance.
+> This patch implements multi-page batch write-back for zram to
+> leverage sequential write performance of block devices.
+> After applying this patch, a large number of pages being merged
+> into batch write operations can be observed via the following test
+> code, which effectively improves write-back performance.
 > 
-> The housekeeping_overridden static key check is kept in other places except
-> this one. Should we keep it for consistency?
+> mount -t debugfs none /sys/kernel/debug/
+> echo "block:block_bio_frontmerge" >> /sys/kernel/debug/tracing/set_event
+> echo "block:block_bio_backmerge" >> /sys/kernel/debug/tracing/set_event
+> cat /sys/kernel/debug/tracing/trace_pipe &
+> echo "page_indexes=1-10000" > /sys/block/zram0/writeback
+> 
+> Signed-off-by: Yuwen Chen <ywen.chen@foxmail.com>
+> Reviewed-by: Fengyu Lian <licayy@outlook.com>
+> ---
+> Changes in v3:
+>   - Postpone the page allocation.
+> Changes in v2:
+>   - Rename some data structures.
+>   - Fix an exception caused by accessing a null pointer.
 
-Indeed!
+Please either finish the patch before sending it out, or take your
+time before posting again. Sending 3 versions in one day will just
+make people ignore you.
 
-Thanks.
+This commit message is in dire need of some actual performance
+results. This is a change for better performance, no? If so, you
+should have some clear numbers in there describing where it's
+better, and where it's worse (if appropriate).
 
 -- 
-Frederic Weisbecker
-SUSE Labs
+Jens Axboe
+
