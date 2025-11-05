@@ -1,214 +1,145 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E770434D3BD
-	for <linux-block@vger.kernel.org>; Wed,  5 Nov 2025 01:48:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0C0522157B
+	for <linux-block@vger.kernel.org>; Wed,  5 Nov 2025 02:08:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762307305; cv=none; b=RdqxTnUVyiH4A556rU0+jrWmDzwsCFgiAb5x5x0u13HkCDWtb/PSnDTl2B6XVz4hshgjuD7MzhlrvcB4ARrLce9ooq2gl46ha58ABWT5Ya6cMCHORgNl9OQLpgV2iI5t2DYjY1HadHNi0l1LNHN/raHMWzhiu9463j3Y0IgH8LQ=
+	t=1762308496; cv=none; b=qKQRfo0W4S0X+RvZYMbxLBd55IUly1MAv49R6xD/Yzu6H40PQOt+SLxp6jCtiIDX5gFAb0O2CFoe0IAvYLLZ7YOBt3iuEI9IfANBDH/lSPychuJc8pw0w6af0rYxlOZOxd6ytUuhkyXLMs6Op9vn9LIs5VihChGmZ4KS//ILtW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762307305; c=relaxed/simple;
-	bh=k3rauIZ5CGXgfrJkKcA12x7VQSg277A/Wjd7cYzgaOQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fz94PHwgi7wzKVWgNXhWwlJkR9Rbly7yAMU2OTBzrG7CozgawP77jjDs1ADC8+0jVggeC1b43Gcc9fZ0xLpPduBefDRwsAU4YtBgCkYWB7dh9EBcmfLdu8pZX//xNDKxBnMHTaiqDeKPt21nXxHZm5dpKFOrt/Xn4+Qe67GyuWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZgKSGdlh; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1762308496; c=relaxed/simple;
+	bh=aCIePvxR6b0aME6sxxADpgHuW9tgTHqfJqmmFPqOqb8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GeMjJV7MWGGTZNjVTPpfMMT5g3fOGSPOtYlN1MsXSKDrbeMbVFooJv8fRwOZUe6lKNbQBuQGKyj7fmMz2rDVzUPt2s5KzzOzwnsptXsvKhz27fnvKidse6hkiO9+Fc3ax0vu+gzmST4932QJ7/sJi245vlUycpG8jqwmcD7oW5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AOXRdKOU; arc=none smtp.client-ip=209.85.215.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZgKSGdlh"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762307302;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sMbwjC+PDOMjlfFNbA9ncfkYxb/LczwezWdontvo8i0=;
-	b=ZgKSGdlhkHKuZDEfxrIpJyjoFtV6rsm5AZ62xT17PN99qeG4O5QZUUgcM6lGdJpOedlrIl
-	ChzCmc850uO7y5TlA6IUi77nV+Fj9eNSRmUWn6ftSrN0mkjUAQMvFoN6MOhh9/YtGsQigv
-	8/ESE8qI3EdEJAzfTMN2yBOIdTOgcJ4=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-534-dQ_x-NeQNsSSKyQw_rO_Ug-1; Tue,
- 04 Nov 2025 20:48:20 -0500
-X-MC-Unique: dQ_x-NeQNsSSKyQw_rO_Ug-1
-X-Mimecast-MFC-AGG-ID: dQ_x-NeQNsSSKyQw_rO_Ug_1762307299
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4A52D19560B0;
-	Wed,  5 Nov 2025 01:48:19 +0000 (UTC)
-Received: from fedora (unknown [10.72.120.17])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9C89A19560A2;
-	Wed,  5 Nov 2025 01:48:15 +0000 (UTC)
-Date: Wed, 5 Nov 2025 09:48:09 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] ublk: use copy_{to,from}_iter() for user copy
-Message-ID: <aQqs2TlXU0UYlsuy@fedora>
-References: <20251031010522.3509499-1-csander@purestorage.com>
- <aQQwy7l_OCzG430i@fedora>
- <CADUfDZoPDbKO60nNVFk35X2JvT=8EV7vgROP+y2jgx6P39Woew@mail.gmail.com>
- <aQVAVBGM7inQUa7z@fedora>
- <CADUfDZqKV2SzbWoe4gr4aSPaBtr+VwmEgEidZKo=LQBU9Quf2Q@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AOXRdKOU"
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-b98a619f020so3248506a12.2
+        for <linux-block@vger.kernel.org>; Tue, 04 Nov 2025 18:08:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762308493; x=1762913293; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=a4yDBu3bQnhMe9kSGDJfDwWvTH191XsVU1fFztibKfQ=;
+        b=AOXRdKOUWbvJa/YjPYbAkr6KmAf/lpgcXmUSDMlJy4DYU6lDrP6RkJyQnnU8PTt7ke
+         2sY+RCUIJTIcQig8mGcG5B3Qu74NRGKT6e2gucYzRCyw68u3Pxc6r2DV2z4GhAvecxsc
+         M9hVastkDwW3WAqenP+6idkb7Yif1hEeYLO9+Zf3Txax7je4fkY4p+Ch5NTCg2FNHrgx
+         X1ALGtL14NAxGbczmqgoq/HBmD9874hXQHTZx3j3lXwqrycY1t3Pl2jwCZmxgN6vIaIy
+         FFHgaA11QsAfEFUtoKWa/9nuuOomJepM+uB1M1KJ4mb6OKwJf8I/DpYIAOi9vYjMCcDu
+         UI4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762308493; x=1762913293;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=a4yDBu3bQnhMe9kSGDJfDwWvTH191XsVU1fFztibKfQ=;
+        b=I3qeZBMF6q77EJ8bd0ehV+ZPGSAdgrWVdWWPNQ3MSI1OcII4M11/Ph1qeCv37zyWRY
+         3YTxdWM0C/g6PbNfj2cfCmBWogqSETGH2xaDtNxo1fUsFM7shVrgVKLxqnc6hKqsq0FQ
+         MKS82O9l+qKcjmqmuPgJCgB/sbBKHJFTctkNrsi0y8WlOKqt9pl3lQ7I3iig6D5l8Oan
+         N6Skp982PidFhVGvdxrBGv6+rLpJOI8APlxTlc+LCwTHGqgOMlpYRGWg5dhnFiVpzuIc
+         wpp11E0k4zicQ2N7kbVGgV7jWdI61XHg84flVBwXswwyW70NRei2YC6gKZU5QMmOgc4y
+         ZdrA==
+X-Forwarded-Encrypted: i=1; AJvYcCWwywLNvBqIQqZHUWImcaj/599NfI39FPI1aqWpMdvNsTS5LPPgYeCqd5z8Z1cRfsbZ5AshHOWnN4u+qA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCzlZN3aCZkAfxN13hEEbmLhDvn8WYU96akrimHnGHP7Np6ZjV
+	Xuc4IfZ4frZWjZ466NoZa/H+5Ld4YXSj4VsHB8OmauJp1K0/hmEavTzc
+X-Gm-Gg: ASbGnct495MewJYGzNq1G8UbjVdDEof5pZlqy4vis/lBkIm+uXKLeRDBNuY7886IcF0
+	hwSCJsi24zwWscSX6l0pLU0ddBknM495pwbHTbNgIhaVO1ieLjvTZitdg76287/I0lvtTejMquS
+	sD8/G40njJD+jn+tw9bs2XzHAD1NUSQ1ysEX+1U4JIK11g0K2cr60jJuGb4YS0MI3P+0YrME3St
+	Ho/77ONd2EXzjyf8ROEpj+rSmn2gpwigqbW70ccp5O6VMepNWEuJKxVjjsGQ8aiu8VX3eiDevU0
+	s8zhi5GbzUuXaBwyenRPXMwo1A8jMKF/uAsdTovU4UtujO6Ors8Irfy7bm7OjBQkRr3F6tfHuty
+	5Gzb95+dnwOPe811T72BHFw+LfyGMhXYCuDWPDxaRciHOhob+yNWJEytjV8RXw+DKR24xPB2C7d
+	IpxmLYgzOxmcpIueBaxxaHC9k=
+X-Google-Smtp-Source: AGHT+IHFEEDEwbkYMhDcYlAouSByZjRV09d05fMzqHjwPvk8mlwVG2htfWc/MvggLNSc+kqx17qoEQ==
+X-Received: by 2002:a17:903:2448:b0:295:6d30:e263 with SMTP id d9443c01a7336-2962adafc02mr23971055ad.40.1762308492736;
+        Tue, 04 Nov 2025 18:08:12 -0800 (PST)
+Received: from [10.189.138.37] ([43.224.245.241])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29601978210sm42828115ad.2.2025.11.04.18.08.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Nov 2025 18:08:12 -0800 (PST)
+Message-ID: <221cdf62-f8aa-421b-9d39-d540cbe7346f@gmail.com>
+Date: Wed, 5 Nov 2025 10:08:07 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 4/5] xfs: check the return value of sb_min_blocksize()
+ in xfs_fs_fill_super
+To: "Darrick J. Wong" <djwong@kernel.org>,
+ Yongpeng Yang <yangyongpeng.storage@gmail.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>, Sungjong Seo
+ <sj1557.seo@samsung.com>, OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+ Jan Kara <jack@suse.cz>, Carlos Maiolino <cem@kernel.org>,
+ Jens Axboe <axboe@kernel.dk>, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, Sasha Levin <sashal@kernel.org>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Christoph Hellwig
+ <hch@infradead.org>, linux-xfs@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+ stable@vger.kernel.org, Matthew Wilcox <willy@infradead.org>,
+ Yongpeng Yang <yangyongpeng@xiaomi.com>
+References: <20251103163617.151045-2-yangyongpeng.storage@gmail.com>
+ <20251103163617.151045-5-yangyongpeng.storage@gmail.com>
+ <20251104154209.GA196362@frogsfrogsfrogs>
+Content-Language: en-US
+From: Yongpeng Yang <yangyongpeng.storage@gmail.com>
+In-Reply-To: <20251104154209.GA196362@frogsfrogsfrogs>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADUfDZqKV2SzbWoe4gr4aSPaBtr+VwmEgEidZKo=LQBU9Quf2Q@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Mon, Nov 03, 2025 at 08:40:30AM -0800, Caleb Sander Mateos wrote:
-> On Fri, Oct 31, 2025 at 4:04 PM Ming Lei <ming.lei@redhat.com> wrote:
-> >
-> > On Fri, Oct 31, 2025 at 09:02:48AM -0700, Caleb Sander Mateos wrote:
-> > > On Thu, Oct 30, 2025 at 8:45 PM Ming Lei <ming.lei@redhat.com> wrote:
-> > > >
-> > > > On Thu, Oct 30, 2025 at 07:05:21PM -0600, Caleb Sander Mateos wrote:
-> > > > > ublk_copy_user_pages()/ublk_copy_io_pages() currently uses
-> > > > > iov_iter_get_pages2() to extract the pages from the iov_iter and
-> > > > > memcpy()s between the bvec_iter and the iov_iter's pages one at a time.
-> > > > > Switch to using copy_to_iter()/copy_from_iter() instead. This avoids the
-> > > > > user page reference count increments and decrements and needing to split
-> > > > > the memcpy() at user page boundaries. It also simplifies the code
-> > > > > considerably.
-> > > > >
-> > > > > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-> > > > > ---
-> > > > >  drivers/block/ublk_drv.c | 62 +++++++++-------------------------------
-> > > > >  1 file changed, 14 insertions(+), 48 deletions(-)
-> > > > >
-> > > > > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > > > > index 0c74a41a6753..852350e639d6 100644
-> > > > > --- a/drivers/block/ublk_drv.c
-> > > > > +++ b/drivers/block/ublk_drv.c
-> > > > > @@ -912,58 +912,47 @@ static const struct block_device_operations ub_fops = {
-> > > > >       .open =         ublk_open,
-> > > > >       .free_disk =    ublk_free_disk,
-> > > > >       .report_zones = ublk_report_zones,
-> > > > >  };
-> > > > >
-> > > > > -#define UBLK_MAX_PIN_PAGES   32
-> > > > > -
-> > > > >  struct ublk_io_iter {
-> > > > > -     struct page *pages[UBLK_MAX_PIN_PAGES];
-> > > > >       struct bio *bio;
-> > > > >       struct bvec_iter iter;
-> > > > >  };
-> > > >
-> > > > ->pages[] is actually for pinning user io pages in batch, so killing it may cause
-> > > > perf drop.
-> > >
-> > > As far as I can tell, copy_to_iter()/copy_from_iter() avoids the page
-> > > pinning entirely. It calls copy_to_user_iter() for each contiguous
-> > > user address range:
-> > >
-> > > size_t _copy_to_iter(const void *addr, size_t bytes, struct iov_iter *i)
-> > > {
-> > >         if (WARN_ON_ONCE(i->data_source))
-> > >                 return 0;
-> > >         if (user_backed_iter(i))
-> > >                 might_fault();
-> > >         return iterate_and_advance(i, bytes, (void *)addr,
-> > >                                    copy_to_user_iter, memcpy_to_iter);
-> > > }
-> > >
-> > > Which just checks that the address range doesn't include any kernel
-> > > addresses and then memcpy()s directly via the userspace virtual
-> > > addresses:
-> > >
-> > > static __always_inline
-> > > size_t copy_to_user_iter(void __user *iter_to, size_t progress,
-> > >                          size_t len, void *from, void *priv2)
-> > > {
-> > >         if (should_fail_usercopy())
-> > >                 return len;
-> > >         if (access_ok(iter_to, len)) {
-> > >                 from += progress;
-> > >                 instrument_copy_to_user(iter_to, from, len);
-> > >                 len = raw_copy_to_user(iter_to, from, len);
-> > >         }
-> > >         return len;
-> > > }
-> > >
-> > > static __always_inline __must_check unsigned long
-> > > raw_copy_to_user(void __user *dst, const void *src, unsigned long size)
-> > > {
-> > >         return copy_user_generic((__force void *)dst, src, size);
-> > > }
-> > >
-> > > static __always_inline __must_check unsigned long
-> > > copy_user_generic(void *to, const void *from, unsigned long len)
-> > > {
-> > >         stac();
-> > >         /*
-> > >          * If CPU has FSRM feature, use 'rep movs'.
-> > >          * Otherwise, use rep_movs_alternative.
-> > >          */
-> > >         asm volatile(
-> > >                 "1:\n\t"
-> > >                 ALTERNATIVE("rep movsb",
-> > >                             "call rep_movs_alternative",
-> > > ALT_NOT(X86_FEATURE_FSRM))
-> > >                 "2:\n"
-> > >                 _ASM_EXTABLE_UA(1b, 2b)
-> > >                 :"+c" (len), "+D" (to), "+S" (from), ASM_CALL_CONSTRAINT
-> > >                 : : "memory", "rax");
-> > >         clac();
-> > >         return len;
-> > > }
-> > >
-> > > Am I missing something?
-> >
-> > page is allocated & mapped in page fault handler.
+On 11/4/25 23:42, Darrick J. Wong wrote:
+> On Tue, Nov 04, 2025 at 12:36:17AM +0800, Yongpeng Yang wrote:
+>> From: Yongpeng Yang <yangyongpeng@xiaomi.com>
+>>
+>> sb_min_blocksize() may return 0. Check its return value to avoid the
+>> filesystem super block when sb->s_blocksize is 0.
+>>
+>> Cc: <stable@vger.kernel.org> # v6.15
+>> Fixes: a64e5a596067bd ("bdev: add back PAGE_SIZE block size validation
+>> for sb_set_blocksize()")
 > 
-> Right, physical pages certainly need to be allocated for the virtual
-> address range being copied to/from. But that would have happened
-> previously in iov_iter_get_pages2(), so this isn't a new cost. And as
-> you point out, in the common case that the virtual pages are already
-> mapped to physical pages, the copy won't cause any page faults.
+> Odd line wrapping, does this actually work with $stablemaintainer
+> scripts?
 > 
-> >
-> > However, in typical cases, pages in io buffer shouldn't be swapped out
-> > frequently, so this cleanup may be good, I will run some perf test.
-> 
-> Thanks for testing.
 
-`fio/t/io_uring` shows 40% improvement on `./kublk -t null -q 2` with this
-patch in my test VM, so looks very nice improvement.
+Sorry for my mistake. I’ve sent v6 patch to fix this issue.
 
-Also it works well by forcing to pass IOSQE_ASYNC on the ublk uring_cmd,
-and this change is correct because the copy is guaranteed to be done in ublk
-daemon context.
+Yongpeng,
 
+>> Signed-off-by: Yongpeng Yang <yangyongpeng@xiaomi.com>
 > 
-> >
-> > Also copy_page_from_iter()/copy_page_to_iter() can be used for avoiding
-> > bvec_kmap_local(), and the two helper can handle one whole bvec instead
-> > of single page.
+> Otherwise looks fine to me
+> Reviewed-by: "Darrick J. Wong" <djwong@kernel.org>
 > 
-> Yes, that's a good idea. Thanks, I didn't know about that.
+> --D
 > 
-> >
-> > Then rq_for_each_bvec() can be used directly, and `ublk_io_iter` may be
-> > killed.
-> 
-> Hmm, we still need a way to offset into the request (i.e. what
-> ublk_advance_io_iter() does currently). Are you thinking of a single
-> rq_for_each_bvec() loop that would skip bvecs until the offset is
-> reached and then copy until reaching the end of the user iterator?
-
-Yeah, that is basically what ublk_advance_io_iter() does.
-
-
-Thanks,
-Ming
+>> ---
+>>   fs/xfs/xfs_super.c | 5 ++++-
+>>   1 file changed, 4 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/fs/xfs/xfs_super.c b/fs/xfs/xfs_super.c
+>> index 1067ebb3b001..bc71aa9dcee8 100644
+>> --- a/fs/xfs/xfs_super.c
+>> +++ b/fs/xfs/xfs_super.c
+>> @@ -1693,7 +1693,10 @@ xfs_fs_fill_super(
+>>   	if (error)
+>>   		return error;
+>>   
+>> -	sb_min_blocksize(sb, BBSIZE);
+>> +	if (!sb_min_blocksize(sb, BBSIZE)) {
+>> +		xfs_err(mp, "unable to set blocksize");
+>> +		return -EINVAL;
+>> +	}
+>>   	sb->s_xattr = xfs_xattr_handlers;
+>>   	sb->s_export_op = &xfs_export_operations;
+>>   #ifdef CONFIG_XFS_QUOTA
+>> -- 
+>> 2.43.0
+>>
+>>
 
