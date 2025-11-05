@@ -1,77 +1,81 @@
-Received: from mail-lf1-f99.google.com (mail-lf1-f99.google.com [209.85.167.99])
+Received: from mail-wr1-f104.google.com (mail-wr1-f104.google.com [209.85.221.104])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C688346FB7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 998C0346FC3
 	for <linux-block@vger.kernel.org>; Wed,  5 Nov 2025 20:28:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.99
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.104
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762374517; cv=none; b=OD9X75JDau7DItUbYa2AbcmXTnK5xlmYxeXeO8kKa773df135poumljWekUq0uurD2SokYoFoEmJMAIo6pD7mJdENYYLO7HqzGcd+4wpHhRKv/uxlQ1+pnkyCDhgAWiveBJlfdWkoYak0KWysIxezGYGue6rP4HLG8E31MNLzr4=
+	t=1762374517; cv=none; b=reQ8zwYFm7euzu2dX26bEI21fnossIRrhKPHJK7SGt5tSH52L45ncXZbqrkTj6tWH5Pl7CkmEr+U8pRxumsvWt0Q7pZ+F2tsQd0G3q2nHo/NTzYK7rWdKByjxO8YIFwK3i8zInB9PE58KTQNcHak5HgvHq1qEeakTQT4kjBzpzc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1762374517; c=relaxed/simple;
-	bh=vbqZgxt+ddV/gMkFndwkKli1Qq2AmUr3CIWnYw0YR+M=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MgzpdPoG7KK0NN8zgt+PQWO34YrOVHGUc8V4RVObKyp7xIxu7sEMlQ1yH2dkDUIIFlAn56ZgBIbjsr3cZBqxKFwzWBtTutMk6NCZMt8vSy5NQjwwKlIPQ0JGkWR4i8/U4hpVFQdX7N8B/m1fMU75IVMMd9REftWjqBcjZbrP6XI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=O6mjjhaF; arc=none smtp.client-ip=209.85.167.99
+	bh=ZNQBWF5E/kCd66vnCIEh1pwOhtP6knbpleihD38HzT8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=svXMZwblX64BQryIYJumB+tCQ+5iW3DjkVfV3W5+CI/HBqhfMRoKRBMBdIob6NZbSxLkWoBiKpcmv9MD5F1xzmzwShja8Hl1SBZ2L0+nOCC2Uq3L9DUKDbogAYwW0JNusB1SiBQ3PlOb39goGDtmWgUlB06e++DssRklVYg+510=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=EIOjqxkG; arc=none smtp.client-ip=209.85.221.104
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="O6mjjhaF"
-Received: by mail-lf1-f99.google.com with SMTP id 2adb3069b0e04-59425b1f713so29194e87.0
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="EIOjqxkG"
+Received: by mail-wr1-f104.google.com with SMTP id ffacd0b85a97d-4271234b49cso40516f8f.3
         for <linux-block@vger.kernel.org>; Wed, 05 Nov 2025 12:28:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=purestorage.com; s=google2022; t=1762374514; x=1762979314; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=hqzNF//smCH/wXecy4K5ISa7DPzn6oehsCzEe3RVrHk=;
-        b=O6mjjhaFAPe2uNPTMK4gmVhTqCVG2biPQDaboBual9Ul5aD5Umf7XGxueXtHSvq/tp
-         t4RkEZ3sxNuzB1eAEkik+hqJ9ihTSyVArUI2nhOPh/JXu9qSTBHbzkpiRwsvBl50JM7K
-         PMp92jnXkkoMVDBosrW5CGiHQ8U/P/s0PsdN9Y1RAeFx35SFdbOaeem1UZgPUMMvKbvp
-         E+DmTQPEGjyCHZH/BpuezZsTeLg5WobmToLaz+scYzFPzNxp5VVGKoPocFK0JgCu+82B
-         groMf+YartE60TX1enKVrNu74dWplA+/i40qEc3JT//gfh8x7vSBBse2OwDNPFllEnON
-         hhdw==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=piuezMo/+nJvsS63m8MZriLez8iEvJ7btVwHROt2ogA=;
+        b=EIOjqxkGKrivEbXDb9Hzqr+XKgCZu9uLXAO52ajIC1d5bU5D+wKp8UPN/eTqZhUoh2
+         jVwjznhDeZgD5NtVc75BcA68M1csx86CihXWniV9cwT4Zx7k4tN7B2zR/CFQRavzOOt+
+         +vAn2TExCUJcCbb1b7egXbmLVa+oC+nAeuiDXnh71N16FtrltrvQugt1BkU+IgHOJxGf
+         ydDxP14jYMripXPKDke84T4JHvEIbjiqurMgNCsIH/wdhTdgtvKLBrxl2Gq+EuSqaQIz
+         TyRbpv7WBYXsUOQUr9CnJ5Q12AXnGS/VmgCyMaEw4KI3tXLRRw5YVdVZwRP5ILHGt4jU
+         KJnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1762374514; x=1762979314;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hqzNF//smCH/wXecy4K5ISa7DPzn6oehsCzEe3RVrHk=;
-        b=Z1bkWDrQmRTGoWzFULhZPiGSGddzmUWN4hgEYk4RWJUU5WeHB0JPbVnyChZOiS2eHK
-         MzFTHN+i6S6jnq55UjRktYa3uXVLiPy221m1Tt2I9mx6fItHPajXMLN4/bfqA7xyKBjk
-         KJ6d1AwyxD2LGIiSmB9pp2CViarumN8kOa9FIPAYZihwXWChn/b7CDuRG1vT4CW8tFnO
-         LizneJShwxyFH4Uw08H+DTnnTUYMYw6M5CoFiCDZxu5cMFJnGNzKcEwPgyrnhxyQY97k
-         DeSiZsR5LElXLX5y5FoQmtATr4UP2K38EBfuFRavStGJwRmNdht111PvuRcCe9vFLASY
-         ZDkQ==
-X-Gm-Message-State: AOJu0YyW38+J3ISr/dxe4/8+GUnHv8IqsmeY/LUF2GksYJZWESKBJL/q
-	8HpVIedQTkJ1UaKrMEOHEf1oT4VyFfvvgqv5IC8zYS0o75I1FR70hBXYe8xHmO6S8Smf/YOR9fr
-	bbwncc52Y+hwQrbIWoGSpmeg6fF0+xQk5M8Zx
-X-Gm-Gg: ASbGncsP/CbjxtgPRSXkmJ1i5WLga8OlsAf/mwOn47MmheOQ2sE1iAmz9Xlyc4abeWH
-	K07p0cEtm5uW3qC0icIG6dHQ57U0S9C71K48libyCf14DlsUSOfjYIK1zQGrvty0nA4dKp2kFXG
-	2Zn32wo8uI41xJ/ckXHFOvG45oDt/FO3InmHYBRGbiIm5G2in99tcgxzFFPcXPsvUQ6XjMwhhNg
-	pTj5MX6IoAif7bWcaDJKAkntBsz8AIk//DMMNWh3baQ2APdmGGKFJhLML/jH2HEoKZaPDTMd5Gi
-	cBBoJ9wqy6nsmy8vgik5WVNEAsH0PSKQUzvRYBs7AleulxbvSwaxyw48/dobNfHe9Rn3wggCMkS
-	dMbVUSvNbzYsHZ98evQre9SAO4EtlsfY=
-X-Google-Smtp-Source: AGHT+IF1qzknNMPR4sXhFbfjCjDnaAvrB84RmIyS+GxY4Bwmj8KbhDyluGDBr1gzppGHTLZrqh0wn4FE9H8y
-X-Received: by 2002:a05:6512:3b86:b0:594:2d0d:a3dc with SMTP id 2adb3069b0e04-5943d7c97c2mr786137e87.6.1762374513403;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=piuezMo/+nJvsS63m8MZriLez8iEvJ7btVwHROt2ogA=;
+        b=VbC80YghBq6bQGYYKjPi3O6qOUrJnezSP9KRNuOCY23ZhFfZLPczJZQzgEIec4BzXY
+         i/0BCuWOm1M37NqycMPreP9WFsBH7Y5FRzWOtqQirV/d3anuRJcmkSxgJDoHomQrFQyT
+         uZ5ht2AW/IUzGVo4J2qp/HFK621MEXvkKe4UR+Co5b0yGHjhi3gaeamgUTodDYOtP0tR
+         V/WJ53WmYCO5Wwr74ouVGRGC/YWa8MPGqic2EO54/uSsor5RVop33L6GcjYvMT+NtP7l
+         xHHJjZFik1HvPoBQ1JsTwJuafkTA2d1D/mNNZxU6jIoTWU9suDvS03wCF9bBFz70VALg
+         5BTA==
+X-Gm-Message-State: AOJu0YwUngSr6Dx32EezOVyvR0ub8wYeo9qtePt4WOxSPaJPYW91T8uF
+	kiScgBRt2eNNK8F3i5wX5f60o4397VNMxCOUGzRUXWwDqL84MqObfMc+w7lqmXE5ZAdNy/dUoX8
+	tUID96L1K308IUWLq/9o4yuDHC6a7D23OLkKi
+X-Gm-Gg: ASbGnctCdBBWD6kY5GyBY+F6WVa98oVje7VREKmFLJShNNTkIHhyAZaQZSley9Z+GGL
+	evADmPkJdjwMjzD1TZTkFN+3AhhCZWD+E9L4B5Gi5Mo+nkiRZdhIfSTUC8w7Z4Qs9fkNAbHn9MK
+	4kgguVciARk8jYa3slkWBBQWyg987M+Zdy5nykZqJ3OIZUdL8rxRyd1qHQWPki5NRdHOF1yaNaw
+	8+HOL4UyKWEpkow62jiHFqXPFs1ob91os1GichVZIDFxgkoueFTcDUqoMIpaZzRNcgqQu2PqMnb
+	Ys7Ue+I/k2Gbk/uQzx0VFBxJZKBBpW7bQQET42VbdCuCO4i8YVd1fnsC/OTdaIUWJn4p/BGqmb3
+	O0SmQBACEYIYSfF7z/kDmr/frUbd0LFY=
+X-Google-Smtp-Source: AGHT+IF3HJ9NqzHMzyJZYtlBawCznKJ3NSlqmqxl8ss4jfLNnF2OITyYlaRDgdmSnz2QY8Aul6AHUCVP6eiM
+X-Received: by 2002:a5d:64c9:0:b0:429:b697:1fa with SMTP id ffacd0b85a97d-429e32c53fcmr2205430f8f.2.1762374513766;
         Wed, 05 Nov 2025 12:28:33 -0800 (PST)
-Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.129])
-        by smtp-relay.gmail.com with ESMTPS id 2adb3069b0e04-5944a0b9327sm15740e87.41.2025.11.05.12.28.31
+Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.128])
+        by smtp-relay.gmail.com with ESMTPS id ffacd0b85a97d-429eb3d499bsm24593f8f.19.2025.11.05.12.28.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Wed, 05 Nov 2025 12:28:33 -0800 (PST)
 X-Relaying-Domain: purestorage.com
 Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.7.70.37])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id E5147340355;
-	Wed,  5 Nov 2025 13:28:29 -0700 (MST)
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id E416934057A;
+	Wed,  5 Nov 2025 13:28:30 -0700 (MST)
 Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id 036ADE413BB; Wed,  5 Nov 2025 13:28:30 -0700 (MST)
+	id 10591E413BB; Wed,  5 Nov 2025 13:28:31 -0700 (MST)
 From: Caleb Sander Mateos <csander@purestorage.com>
 To: Ming Lei <ming.lei@redhat.com>,
 	Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Caleb Sander Mateos <csander@purestorage.com>
-Subject: [PATCH v2 0/2] ublk: simplify user copy
-Date: Wed,  5 Nov 2025 13:28:21 -0700
-Message-ID: <20251105202823.2198194-1-csander@purestorage.com>
+Subject: [PATCH v2 2/2] ublk: use rq_for_each_bvec() for user copy
+Date: Wed,  5 Nov 2025 13:28:23 -0700
+Message-ID: <20251105202823.2198194-3-csander@purestorage.com>
 X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20251105202823.2198194-1-csander@purestorage.com>
+References: <20251105202823.2198194-1-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -80,25 +84,128 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Use copy_page_{to,from}_user() and rq_for_each_bvec() to simplify the
-implementation of ublk_copy_user_pages(). Avoiding the page pinning and
-unpinning saves expensive atomic increments and decrements of the page
-reference counts. And copying via user virtual addresses avoids needing
-to split the copy at user page boundaries. Ming reports a 40% throughput
-improvement when issuing I/O to the selftests null ublk server with
-zero-copy disabled.
+ublk_advance_io_iter() and ublk_copy_io_pages() currently open-code the
+iteration over request's bvecs. Switch to the rq_for_each_bvec() macro
+provided by blk-mq to avoid reaching into the bio internals and simplify
+the code. Unlike bio_iter_iovec(), rq_for_each_bvec() can return
+multi-page bvecs. So switch from copy_{to,from}_iter() to
+copy_page_{to,from}_iter() to map and copy each page in the bvec.
 
-v2:
-- Use rq_for_each_bvec() to further simplify the code (Ming)
-- Add performance measurements from Ming
+Suggested-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+---
+ drivers/block/ublk_drv.c | 78 ++++++++++++----------------------------
+ 1 file changed, 23 insertions(+), 55 deletions(-)
 
-Caleb Sander Mateos (2):
-  ublk: use copy_{to,from}_iter() for user copy
-  ublk: use rq_for_each_bvec() for user copy
-
- drivers/block/ublk_drv.c | 113 ++++++++-------------------------------
- 1 file changed, 23 insertions(+), 90 deletions(-)
-
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 40eee3e15a4c..929d40fe0250 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -911,81 +911,49 @@ static const struct block_device_operations ub_fops = {
+ 	.open =		ublk_open,
+ 	.free_disk =	ublk_free_disk,
+ 	.report_zones =	ublk_report_zones,
+ };
+ 
+-struct ublk_io_iter {
+-	struct bio *bio;
+-	struct bvec_iter iter;
+-};
+-
+-/* return how many bytes are copied */
+-static size_t ublk_copy_io_pages(struct ublk_io_iter *data,
+-		struct iov_iter *uiter, int dir)
++/*
++ * Copy data between request pages and io_iter, and 'offset'
++ * is the start point of linear offset of request.
++ */
++static size_t ublk_copy_user_pages(const struct request *req,
++		unsigned offset, struct iov_iter *uiter, int dir)
+ {
++	struct req_iterator iter;
++	struct bio_vec bv;
+ 	size_t done = 0;
+ 
+-	for (;;) {
+-		struct bio_vec bv = bio_iter_iovec(data->bio, data->iter);
+-		void *bv_buf = bvec_kmap_local(&bv);
++	rq_for_each_bvec(bv, req, iter) {
+ 		size_t copied;
+ 
++		if (offset >= bv.bv_len) {
++			offset -= bv.bv_len;
++			continue;
++		}
++
++		bv.bv_offset += offset;
++		bv.bv_len -= offset;
++		bv.bv_page += bv.bv_offset / PAGE_SIZE;
++		bv.bv_offset %= PAGE_SIZE;
+ 		if (dir == ITER_DEST)
+-			copied = copy_to_iter(bv_buf, bv.bv_len, uiter);
++			copied = copy_page_to_iter(
++				bv.bv_page, bv.bv_offset, bv.bv_len, uiter);
+ 		else
+-			copied = copy_from_iter(bv_buf, bv.bv_len, uiter);
+-
+-		kunmap_local(bv_buf);
++			copied = copy_page_from_iter(
++				bv.bv_page, bv.bv_offset, bv.bv_len, uiter);
+ 
+ 		done += copied;
+ 		if (copied < bv.bv_len)
+ 			break;
+ 
+-		/* advance bio */
+-		bio_advance_iter_single(data->bio, &data->iter, copied);
+-		if (!data->iter.bi_size) {
+-			data->bio = data->bio->bi_next;
+-			if (data->bio == NULL)
+-				break;
+-			data->iter = data->bio->bi_iter;
+-		}
++		offset = 0;
+ 	}
+ 	return done;
+ }
+ 
+-static bool ublk_advance_io_iter(const struct request *req,
+-		struct ublk_io_iter *iter, unsigned int offset)
+-{
+-	struct bio *bio = req->bio;
+-
+-	for_each_bio(bio) {
+-		if (bio->bi_iter.bi_size > offset) {
+-			iter->bio = bio;
+-			iter->iter = bio->bi_iter;
+-			bio_advance_iter(iter->bio, &iter->iter, offset);
+-			return true;
+-		}
+-		offset -= bio->bi_iter.bi_size;
+-	}
+-	return false;
+-}
+-
+-/*
+- * Copy data between request pages and io_iter, and 'offset'
+- * is the start point of linear offset of request.
+- */
+-static size_t ublk_copy_user_pages(const struct request *req,
+-		unsigned offset, struct iov_iter *uiter, int dir)
+-{
+-	struct ublk_io_iter iter;
+-
+-	if (!ublk_advance_io_iter(req, &iter, offset))
+-		return 0;
+-
+-	return ublk_copy_io_pages(&iter, uiter, dir);
+-}
+-
+ static inline bool ublk_need_map_req(const struct request *req)
+ {
+ 	return ublk_rq_has_data(req) && req_op(req) == REQ_OP_WRITE;
+ }
+ 
 -- 
 2.45.2
 
