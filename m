@@ -1,206 +1,112 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 896AB34CFA0;
-	Wed,  5 Nov 2025 21:08:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A086219319;
+	Wed,  5 Nov 2025 21:44:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762376887; cv=none; b=dnpYLT+Y0DMo8cBOe8MnGNqxNRuz+2gUP94wnpOmpl9Z4ijL+hwKG5pI86hZKToX0G8YEDK61+5BKiLBAcgCDRWK8xU1XtkLKU6mvl8wW3UUQPivlveN2sYBb9eVajreL/gjlZIoA2hFTcrMX09U+Mb4po/YwniXPCXT/0IKU9A=
+	t=1762379049; cv=none; b=S7x7TpF1DdMVI8/LuT9BtkWnuw0RyxI1VqEhXZCI61pRq0yI7Dx1z5YuHbY4M4lLCuxsi51cdf+3ZlAkc9XNOJh5xHGxu/Lgd9CtPwbLWICKkPX/kEWJJoOZglvKbAPlVw0nTdGwYBvzmn+4o97sPHQPPgDaqz2VqkdXe86payY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762376887; c=relaxed/simple;
-	bh=Jrc2SP9zuO/q8lVKXeMSZQ2TjjYp5fXU9+UkI2oxxh8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OL18o24modziuZcfHgobmkthlJxB+hoyjQjMk9E0HWgAm3RXNBJXrY19CcvTLmpZ3ODUYEi8wpV9AhIDXUF6x1LlLrWibiinUbArR8vDBHaICc4EMWmSUUw6DjliZ93MA3yN4kUQC73O+jT0JX4E2Y66CGYmkxCdXPPVWNjQW6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MvMmy9z/; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1762379049; c=relaxed/simple;
+	bh=eQieCjh8t22+XloRu2p1/oK9/d2dh8UCLxdwY7O5YgY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N7giOvC9Y/rWtxtaC6jmY/QWZMj2pIseO+ZTyce7HsyAt+wQgsfpRqquaKJ6r8X28DynM6HEjjS23b/XObVtMb0/P0mu8zAlLhLCGQv6V8OCmNw09yVDjHvo74HfBWIJ1H0h8PTybWn/uUAJlK+cgUl0YWMtp8vS2/uE8GdXj/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NN+ReGI3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MvMmy9z/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D4C2C116C6;
-	Wed,  5 Nov 2025 21:07:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NN+ReGI3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8327DC116B1;
+	Wed,  5 Nov 2025 21:44:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762376887;
-	bh=Jrc2SP9zuO/q8lVKXeMSZQ2TjjYp5fXU9+UkI2oxxh8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MvMmy9z/Tgk53O6EbE+zG2oKCMSZwHnfkHuPoSeCh479KVbDuJNzsb/Q95ddbdX1O
-	 YQTf2wfL/dngH/FTqEV6nyuyONeRGG6HmXIoUpQYnvRwoBce1dGez5Rnclx/R54AJG
-	 jF46uVQGSBmc+QMKekLAz3yISaEfO/lEUBh/VXH4j9x5/+pRiLN7gYF1+fWkOKQ36F
-	 j1wBHxPHnmeF1FuhdLWetNBKgWb0hoEHcy6zOXnoMX7DeUEMTwVgqvZecZg7n+SX65
-	 jdNVvmiqi+lM6qGacp0TkqxYpP3U9TZXPPfxP2T1eiIo+XV5uRXCcGxIxzrr4Zr+Kh
-	 OUYcrvQZvJ2Zg==
-From: Frederic Weisbecker <frederic@kernel.org>
-To: LKML <linux-kernel@vger.kernel.org>
-Cc: Frederic Weisbecker <frederic@kernel.org>,
-	=?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Gabriele Monaco <gmonaco@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Marco Crivellari <marco.crivellari@suse.com>,
-	Michal Hocko <mhocko@suse.com>,
-	Muchun Song <muchun.song@linux.dev>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Phil Auld <pauld@redhat.com>,
-	"Rafael J . Wysocki" <rafael@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Simon Horman <horms@kernel.org>,
-	Tejun Heo <tj@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Waiman Long <longman@redhat.com>,
-	Will Deacon <will@kernel.org>,
-	cgroups@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-pci@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH 31/31] doc: Add housekeeping documentation
-Date: Wed,  5 Nov 2025 22:03:47 +0100
-Message-ID: <20251105210348.35256-32-frederic@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251105210348.35256-1-frederic@kernel.org>
-References: <20251105210348.35256-1-frederic@kernel.org>
+	s=k20201202; t=1762379048;
+	bh=eQieCjh8t22+XloRu2p1/oK9/d2dh8UCLxdwY7O5YgY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NN+ReGI3gpraSXnSf9lVg5nwyvG4oRQ39walsEJTQd9pVPfP6fGocvEMfknhX8hPA
+	 ZXD7QYyN43RNKTpycwtS2ngEK/jtrVWmSW30MYGieb3NOIx0kM5hIKXJYg85qYz3QH
+	 QRqyRKnROxw/gP52wmI60NUhYS4pIg8Zmpvd0U1X1XcxH46VT81lVV8s8QTvhEbYOZ
+	 +0+s1Blo+3tXUaw+iJfA/bxNniTMTjB688aoERkcYTML/USx7TSbhHg6HlIyJeB30e
+	 3XLNBP1bqLlAzdX51LJXju/14Rk9Jf1hHwy9CsboAXT05D6YbS7HM38QaZOvaQOpQo
+	 vU+i2AAymF7rw==
+Date: Wed, 5 Nov 2025 13:44:07 -0800
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jan Kara <jack@suse.cz>, Keith Busch <kbusch@kernel.org>,
+	Dave Chinner <david@fromorbit.com>,
+	Carlos Maiolino <cem@kernel.org>,
+	Christian Brauner <brauner@kernel.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-raid@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: Re: fall back from direct to buffered I/O when stable writes are
+ required
+Message-ID: <20251105214407.GN196362@frogsfrogsfrogs>
+References: <aQNJ4iQ8vOiBQEW2@dread.disaster.area>
+ <20251030143324.GA31550@lst.de>
+ <aQPyVtkvTg4W1nyz@dread.disaster.area>
+ <20251031130050.GA15719@lst.de>
+ <aQTcb-0VtWLx6ghD@kbusch-mbp>
+ <20251031164701.GA27481@lst.de>
+ <kpk2od2fuqofdoneqse2l3gvn7wbqx3y4vckmnvl6gc2jcaw4m@hsxqmxshckpj>
+ <20251103122111.GA17600@lst.de>
+ <20251104233824.GO196370@frogsfrogsfrogs>
+ <20251105141130.GB22325@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251105141130.GB22325@lst.de>
 
-Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
----
- Documentation/cpu_isolation/housekeeping.rst | 111 +++++++++++++++++++
- 1 file changed, 111 insertions(+)
- create mode 100644 Documentation/cpu_isolation/housekeeping.rst
+On Wed, Nov 05, 2025 at 03:11:30PM +0100, Christoph Hellwig wrote:
+> On Tue, Nov 04, 2025 at 03:38:24PM -0800, Darrick J. Wong wrote:
+> > IIRC, a PI disk is supposed to check the supplied CRC against the
+> > supplied data, and fail the write if there's a discrepancy, right?
+> 
+> Yes.
+> 
+> > In
+> > that case, an application can't actually corrupt its own data because
+> > hardware will catch it.
+> 
+> Yes.
+> 
+> > A. We can allow mutant directio to non-PI devices because buggy programs
+> >    can only screw themselves over.  Not great but we've allowed this
+> >    forever.
+> >
+> > B. We can also allow it to PI devices because those buggy programs will
+> >    get hit with EIOs immediately.
+> 
+> Well, those "buggy programs" include qemu and probably others.  Which
+> immediately limits the usefulness of operating with PI.
+> 
+> This also does not help with non-PI checksums - one thing my RFC series
+> did is to allow storing checksums in non-PI metadata, which is useful
+> for devices that are too cheap for PI, but still provide metadata.  These
+> do exist, although are not very wide spread, and this will require an
+> on-disk flag in XFS, so it's not right there.  But compared to all the
+> others methods to provide checksums, block metdata is by far the best,
+> so I'll keep it on the agenda in the hope that such devices become
+> more prelevant.
+> 
+> > I wonder if that means we really need a way to convey the potential
+> > damage of a mutant write through the block layer / address space so that
+> > the filesystem can do the right thing?  IOWs, instead of a single
+> > stable-pages flag, something along the lines of:
+> 
+> Maybe, I actually suggested this earlier.  But breaking the biggest user
+> of direct I/O (qemu) by default once we have checksums still feels like a
+> losing proposition.
 
-diff --git a/Documentation/cpu_isolation/housekeeping.rst b/Documentation/cpu_isolation/housekeeping.rst
-new file mode 100644
-index 000000000000..e5417302774c
---- /dev/null
-+++ b/Documentation/cpu_isolation/housekeeping.rst
-@@ -0,0 +1,111 @@
-+======================================
-+Housekeeping
-+======================================
-+
-+
-+CPU Isolation moves away kernel work that may otherwise run on any CPU.
-+The purpose of its related features is to reduce the OS jitter that some
-+extreme workloads can't stand, such as in some DPDK usecases.
-+
-+The kernel work moved away by CPU isolation is commonly described as
-+"housekeeping" because it includes ground work that performs cleanups,
-+statistics maintainance and actions relying on them, memory release,
-+various deferrals etc...
-+
-+Sometimes housekeeping is just some unbound work (unbound workqueues,
-+unbound timers, ...) that gets easily assigned to non-isolated CPUs.
-+But sometimes housekeeping is tied to a specific CPU and requires
-+elaborated tricks to be offloaded to non-isolated CPUs (RCU_NOCB, remote
-+scheduler tick, etc...).
-+
-+Thus, a housekeeping CPU can be considered as the reverse of an isolated
-+CPU. It is simply a CPU that can execute housekeeping work. There must
-+always be at least one online housekeeping CPU at any time. The CPUs that
-+are not	isolated are automatically assigned as housekeeping.
-+
-+Housekeeping is currently divided in four features described
-+by the ``enum hk_type type``:
-+
-+1.	HK_TYPE_DOMAIN matches the work moved away by scheduler domain
-+	isolation performed through ``isolcpus=domain`` boot parameter or
-+	isolated cpuset partitions in cgroup v2. This includes scheduler
-+	load balancing, unbound workqueues and timers.
-+
-+2.	HK_TYPE_KERNEL_NOISE matches the work moved away by tick isolation
-+	performed through ``nohz_full=`` or ``isolcpus=nohz`` boot
-+	parameters. This includes remote scheduler tick, vmstat and lockup
-+	watchdog.
-+
-+3.	HK_TYPE_MANAGED_IRQ matches the IRQ handlers moved away by managed
-+	IRQ isolation performed through ``isolcpus=managed_irq``.
-+
-+4.	HK_TYPE_DOMAIN_BOOT matches the work moved away by scheduler domain
-+	isolation performed through ``isolcpus=domain`` only. It is similar
-+	to HK_TYPE_DOMAIN except it ignores the isolation performed by
-+	cpusets.
-+
-+
-+Housekeeping cpumasks
-+=================================
-+
-+Housekeeping cpumasks include the CPUs that can execute the work moved
-+away by the matching isolation feature. These cpumasks are returned by
-+the following function::
-+
-+	const struct cpumask *housekeeping_cpumask(enum hk_type type)
-+
-+By default, if neither ``nohz_full=``, nor ``isolcpus``, nor cpuset's
-+isolated partitions are used, which covers most usecases, this function
-+returns the cpu_possible_mask.
-+
-+Otherwise the function returns the cpumask complement of the isolation
-+feature. For example:
-+
-+With isolcpus=domain,7 the following will return a mask with all possible
-+CPUs except 7::
-+
-+	housekeeping_cpumask(HK_TYPE_DOMAIN)
-+
-+Similarly with nohz_full=5,6 the following will return a mask with all
-+possible CPUs except 5,6::
-+
-+	housekeeping_cpumask(HK_TYPE_KERNEL_NOISE)
-+
-+
-+Synchronization against cpusets
-+=================================
-+
-+Cpuset can modify the HK_TYPE_DOMAIN housekeeping cpumask while creating,
-+modifying or deleting an isolated partition.
-+
-+The users of HK_TYPE_DOMAIN cpumask must then make sure to synchronize
-+properly against cpuset in order to make sure that:
-+
-+1.	The cpumask snapshot stays coherent.
-+
-+2.	No housekeeping work is queued on a newly made isolated CPU.
-+
-+3.	Pending housekeeping work that was queued to a non isolated
-+	CPU which just turned isolated through cpuset must be flushed
-+	before the related created/modified isolated partition is made
-+	available to userspace.
-+
-+This synchronization is maintained by an RCU based scheme. The cpuset update
-+side waits for an RCU grace period after updating the HK_TYPE_DOMAIN
-+cpumask and before flushing pending works. On the read side, care must be
-+taken to gather the housekeeping target election and the work enqueue within
-+the same RCU read side critical section.
-+
-+A typical layout example would look like this on the update side
-+(``housekeeping_update()``)::
-+
-+	rcu_assign_pointer(housekeeping_cpumasks[type], trial);
-+	synchronize_rcu();
-+	flush_workqueue(example_workqueue);
-+
-+And then on the read side::
-+
-+	rcu_read_lock();
-+	cpu = housekeeping_any_cpu(HK_TYPE_DOMAIN);
-+	queue_work_on(cpu, example_workqueue, work);
-+	rcu_read_unlock();
--- 
-2.51.0
+Just out of curiosity -- is qemu itself mutating the buffers that it is
+passing down to the lower levels via dio?  Or is it a program in the
+guest that's mutating buffers that are submitted for dio, which then get
+zerocopied all the way down to the hypervisor?
 
+(But yeah, I'm coming back around to the notion that the dio ->
+dontcache transition is needed for all of the PI/raid cases...)
+
+--D
