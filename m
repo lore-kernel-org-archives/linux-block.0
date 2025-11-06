@@ -1,222 +1,132 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45FE832C305;
-	Thu,  6 Nov 2025 13:02:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85EFB304BAF
+	for <linux-block@vger.kernel.org>; Thu,  6 Nov 2025 13:43:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762434124; cv=none; b=Z+f33vq25441VE54HApGBoz450RD1sGLxchR+jRXV38xt1d6n337brEjr4pPKU4msxAhRd6nlS69ZnOMksyXjCtntTJ24s414P6PRDVqg58fVKpzbFaSgl3osgcPJ9fKeeo5+HKtn2n6BDscpjzmY7p3pfQEaRpL4JAFrwGNdnQ=
+	t=1762436584; cv=none; b=XSoDss5RdFMFIdQQRJYvknUD0qr5Ki9jjb5Ff9IAjGFGJQnpnQFe705maPVttNOf4vtoMRCsBof8WkkSTB58TmODUo1mKC438w1/A3fNDCdnyREp1OPIYYmXh9aY0hV8stBL+H4lp+itv/rOUqPau8qdMaRhN6eoGn1+xUfKUeA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762434124; c=relaxed/simple;
-	bh=0Msik2psULPh2Ih/MH7/EDlaxGNgMadwtuVXfx6/Pcg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XB+JAObrb0ZOnBYOsI2L78/DfM9JvI4K3aAWXn/pPYHmx0DfLn8P1sHfN317qFrfJLaoUVGpGbqFA388vJayMaVaEWf/VBwzj+tazaFs0h0N+JlmxCRg0YNSmEbPFU7iJNPp65FSdtWvoqUn+3Dpmh6nOH1ZQ5x/2vgCvzH9cOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=e2of75u4; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1762436584; c=relaxed/simple;
+	bh=yM08vXYgeS+2QUmB9lU/TpbxKmTJ2bayDxKCYSgsODA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=j5m5rz/Q84bLAHwhwlVNEzwO7bSo+ckw/jMCi/boEwMr121950nQND3G1X6sT1o508kA0AYjlf/4P57m9jM2IUH2uGopIDbzfvGOkggUkuaKhNSpMA1dRyGsm4bN80vfkniklmdp1lCeLqGZ1TfIEsWmna9fiZbVRxkCmZXBbOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l9x5nJ4A; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="e2of75u4"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5A66bAHm013986;
-	Thu, 6 Nov 2025 13:01:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=lvIC7h
-	l8dkAf5eu01Joa5gEqrAJTNGfVUM9W00tHpwA=; b=e2of75u4f7xribouB6taMz
-	SNPQJSojlS2x7ovCwkVeRJrhs0zuY8/t/3v66vEiz99r3MP4EdhTRSRZf9eKAV7M
-	zkJ0PXt2q/8VDCAwLg3UA8v7evKo8qJej2RBQKx/1HZVUq+mTllX9klP2q/JwPtc
-	BcOnxrUK/K20lPEolM7JmTGnJDhq/gfg5uZ3xK856TXSNso2vVYpkF28GmdS1eNu
-	kMHZ4UE3ydU5OW8H80PctoQZmqGYOz937khzS9NOspjwUSdj+V3T9+B7LAFWfMEu
-	/u4BPO3b96SVzvQfJm8NKra7Nu4J/pNLGm0af2UtrzOdDDPa39q72m3UoEKC3ajg
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4a59q976jp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 06 Nov 2025 13:01:34 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5A6C7gTS021467;
-	Thu, 6 Nov 2025 13:01:34 GMT
-Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4a5xrjwae8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 06 Nov 2025 13:01:33 +0000
-Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
-	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5A6D1Ja612780280
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 6 Nov 2025 13:01:19 GMT
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1F43458050;
-	Thu,  6 Nov 2025 13:01:33 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CB5E158045;
-	Thu,  6 Nov 2025 13:01:28 +0000 (GMT)
-Received: from [9.61.3.251] (unknown [9.61.3.251])
-	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  6 Nov 2025 13:01:28 +0000 (GMT)
-Message-ID: <b556d704-dc3b-4e6c-a158-69fb5b377dac@linux.ibm.com>
-Date: Thu, 6 Nov 2025 18:31:27 +0530
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l9x5nJ4A"
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-429eb7fafc7so693590f8f.2
+        for <linux-block@vger.kernel.org>; Thu, 06 Nov 2025 05:43:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762436581; x=1763041381; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Y4DaQeGVyB05KYzPS0LHKvWlhb6TnpUA8LWnzGCb6LE=;
+        b=l9x5nJ4AF4qOQZd2QseTvTvF/rCgyyJIN6Qv2MsWPmsPJ5d451JTrINWDA8Q80ZAzI
+         jyAck/zrgsmhQFqcT6p2/BvTEZu4VTPZd8133qGGTnw6O74kmjSQ6Ap4gTLbhaQDT9QB
+         r68iBUc4wxX1MrLQ0jlIaIbh6nUKnpEBd0psRiUjJQpgR2LYFWa4K2YJ2NGt3ecrD2rB
+         4g4U3Ci0QpWeZHcbjuaHFfarQncTFQz8+QWo469YWfUiMszgGcNXO1YSLDpP03HppifK
+         BAe0mvnkUA32K952D7kSNEQ+R1PbWgm61mqKQ+Afj2AycHhVbB8s1Zk7UbJDd28ymJfZ
+         Yi7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762436581; x=1763041381;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Y4DaQeGVyB05KYzPS0LHKvWlhb6TnpUA8LWnzGCb6LE=;
+        b=oHBHw7k4X2eLIERgm2q2Ggw2ZRXEqCr1mZinx4rsWH5gRy8n2t7VCo5GsSUnY3TlAF
+         F38Q9BXDASDt5UyVxfJJZ10DXLD7x1bBmS7+OYNe2bv57CZ0VPqpe0dDn7K93e6zJnmh
+         weq1OR6bQLtF/e9WX12YPQgvz4qS2TQXPE393GmOsdOk4LVKm1mpo677h+b+zyPqEjjn
+         LRSEn7qOcfyP6SU1JxbVEwqIkDZn+lSMaMlnVyutBsces2GhpiEfht38wu9eQq/fQJsA
+         ITW/QqiZF6nVgqfERyjkxZBIQ46T7MK/FFhh1+YIEgX4kSLRAMdvGhPbAPLovo8wTIfU
+         j80w==
+X-Forwarded-Encrypted: i=1; AJvYcCUPpFLv67HQliSVTCkVWeelsBU7Yh9cWK7J44gZR0epUzZtpgOu2szX5Cz5P6XbxHw32C1LMjTaH6yoJA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1IuCYQt31pruO8/muuu48cYUmcxakne34hRka1THz38ggmmac
+	l2ABpnRyQKdZOZk/AHOUltXv3ng8wwAg4eEd7m3dBDCjELbn5AI2cVsh
+X-Gm-Gg: ASbGncsrMHaY/wTLQhefZNfe6EvpC47NMzS6qacIyJ0QnU/BVtOF8OAoQ270L+6HnLj
+	bbusWqZ1httOCOzmQpZsXgOz+wXzjHxgfRhxKlJ+/TWloUD7jJdzIA8EDRgquzZq7k6PQWEj7FH
+	LB4N2NvGznuGghND1DHOit9GsjUTNHr4h8iLHOVXjev0sCYmxMqpI9pSSjF8JraSyeQGP8NRBmV
+	3O6oprqNWsck0X5jtGJhktP3B8Y+1bqhPVTi74iSTGFkEMyIgjb2yGfjy1JT3PqzBB1lhs51dui
+	DWpt6/NoTNyaODaOxc8p8idvwwmp9bX1cyRWsmdsJBrQCKEtgyNVN7ztPOoNYFNOnCtbT44PMeL
+	HUZeshz/qiaxFTJ5gHxJQl9uisf+Q+nl77NcSp2Ip2dSPhZJyKg/SfljzmAGdGU1ImHCFSjM3jY
+	lak5z6mBHRbFvWR2Bf3IrIaw+Z/J9RNUWLp9GrrjQ4nPV/AyXvcgojUZrZC3COB40=
+X-Google-Smtp-Source: AGHT+IHDsjJABGBM/pDAFp2o03YAq/Y+Phzta3DyuV5Jfm/SuLEOelkoMEjBy0TTBTORIGeE1uEwkw==
+X-Received: by 2002:a05:6000:26c1:b0:426:d81f:483c with SMTP id ffacd0b85a97d-429e33088ddmr6854934f8f.33.1762436580431;
+        Thu, 06 Nov 2025 05:43:00 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429eb42a354sm4888852f8f.20.2025.11.06.05.42.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Nov 2025 05:43:00 -0800 (PST)
+Date: Thu, 6 Nov 2025 13:42:55 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Christophe Leroy <christophe.leroy@csgroup.eu>, Alexander Viro
+ <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara
+ <jack@suse.cz>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
+ <mingo@redhat.com>, Darren Hart <dvhart@infradead.org>, Davidlohr Bueso
+ <dave@stgolabs.net>, Andre Almeida <andrealmeid@igalia.com>, Andrew Morton
+ <akpm@linux-foundation.org>, Eric Dumazet <edumazet@google.com>, Kuniyuki
+ Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, Willem de
+ Bruijn <willemb@google.com>, "David S. Miller" <davem@davemloft.net>, Jakub
+ Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Dave Hansen <dave.hansen@linux.intel.com>,
+ Madhavan Srinivasan <maddy@linux.ibm.com>, Michael Ellerman
+ <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
+ linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH v4 10/10] powerpc/uaccess: Implement masked user access
+Message-ID: <20251106134255.2412971a@pumpkin>
+In-Reply-To: <20251106123550.GX4067720@noisy.programming.kicks-ass.net>
+References: <cover.1762427933.git.christophe.leroy@csgroup.eu>
+	<5c80dddf8c7b1e75f08b3f42bddde891d6ea3f64.1762427933.git.christophe.leroy@csgroup.eu>
+	<20251106123550.GX4067720@noisy.programming.kicks-ass.net>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4] block: Remove queue freezing from several sysfs store
- callbacks
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Ming Lei <ming.lei@redhat.com>, Martin Wilck <mwilck@suse.com>,
-        Benjamin Marzinski <bmarzins@redhat.com>, stable@vger.kernel.org,
-        Chaitanya Kulkarni <kch@nvidia.com>, Hannes Reinecke <hare@suse.de>,
-        Damien Le Moal <dlemoal@kernel.org>
-References: <20251105170534.2989596-1-bvanassche@acm.org>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20251105170534.2989596-1-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=StmdKfO0 c=1 sm=1 tr=0 ts=690c9c2f cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=TFDWyf3hBjIInHEowKkA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-ORIG-GUID: 3k6APeHdC5-T3Z9POxx8l4be3Qep7zlr
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTAxMDAxOCBTYWx0ZWRfX6nZ8Eqr3t9Pp
- zRx1m+WC1fti63D4vb49tTb0OxihIeoNwf5eJlhszsKmg3ELRkCWaV2LFq5zBu8pvJaaZ2GSEF+
- mN6Ojv8ArN/vYyCQLX1liNsCynfKCfPw58JDnA9Ghwy6J1zxllDg3HvweWiD5CxC/pWIjzIfzZ7
- nG6Q6Ci9IvUfUUUpaic8cKRiRzhZJZkP0xubuOpn3WFw/nDdWM6GVF4xTVDL/issGKqPJ2iOHDs
- 4Qc8BdVbqWfmOvweeD5HxIHEYPPQ3ca3NuZ40o/CNJLdqQJ/+OhoDtKl4u6HT9wWChE94y+NJbA
- EYk7F6BmtxBreqL9QOO5PcjVTRM1DjWI440iTrqtXM50Yq9uv1+DXm3w1VHrileDLrie2+vWh1q
- d718GrKJNY203l2S2WAy99uKnZr9nw==
-X-Proofpoint-GUID: 3k6APeHdC5-T3Z9POxx8l4be3Qep7zlr
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-06_03,2025-11-06_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 suspectscore=0 phishscore=0 impostorscore=0 priorityscore=1501
- malwarescore=0 clxscore=1015 adultscore=0 bulkscore=0 lowpriorityscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511010018
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Thu, 6 Nov 2025 13:35:50 +0100
+Peter Zijlstra <peterz@infradead.org> wrote:
 
+> On Thu, Nov 06, 2025 at 12:31:28PM +0100, Christophe Leroy wrote:
+> 
+> > On 32 bits it is more tricky. In theory user space can go up to
+> > 0xbfffffff while kernel will usually start at 0xc0000000. So a gap
+> > needs to be added in-between. Allthough in theory a single 4k page
+                                  Although
+> > would suffice, it is easier and more efficient to enforce a 128k gap
+> > below kernel, as it simplifies the masking.  
+> 
+> Do we have the requirement that the first access of a masked pointer is
+> within 4k of the initial address?
+> 
+> Suppose the pointer is to an 16k array, and the memcpy happens to like
+> going backwards. Then a 4k hole just won't do.
 
-> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-> index 76c47fe9b8d6..6eaccd18d8b4 100644
-> --- a/block/blk-sysfs.c
-> +++ b/block/blk-sysfs.c
-> @@ -143,7 +143,6 @@ queue_ra_store(struct gendisk *disk, const char *page, size_t count)
->  {
->  	unsigned long ra_kb;
->  	ssize_t ret;
-> -	unsigned int memflags;
->  	struct request_queue *q = disk->queue;
->  
->  	ret = queue_var_store(&ra_kb, page, count);
-> @@ -154,10 +153,8 @@ queue_ra_store(struct gendisk *disk, const char *page, size_t count)
->  	 * calculated from the queue limits by queue_limits_commit_update.
->  	 */
->  	mutex_lock(&q->limits_lock);
-> -	memflags = blk_mq_freeze_queue(q);
-> -	disk->bdi->ra_pages = ra_kb >> (PAGE_SHIFT - 10);
-> +	data_race(disk->bdi->ra_pages = ra_kb >> (PAGE_SHIFT - 10));
->  	mutex_unlock(&q->limits_lock);
-> -	blk_mq_unfreeze_queue(q, memflags);
->  
->  	return ret;
->  }
+I think that requiring the accesses be within 4k of the base (or previous
+access) is a reasonable restriction.
+It is something that needs verifying before code is changed to use
+these accessors.
 
-I think we don't need data_race() here as disk->bdi->ra_pages is already
-protected by ->limits_lock. Furthermore, while you're at it, I’d suggest
-protecting the set/get access of ->ra_pages using ->limits_lock when it’s
-invoked from the ioctl context (BLKRASET/BLKRAGET).
+Documenting a big gap is almost more likely to lead to errors!
+If 128k is ok, no one is really going to notice code that might
+offset by 130k.
+OTOH if the (documented) limit is 256 bytes then you don't have to be
+careful about accessing structures sequentially, and can safely realign
+pointers.
+I suspect the mk-1 brain treats 4k and 256 as muchthe same value.
 
->  
-> @@ -472,7 +460,7 @@ static ssize_t queue_io_timeout_show(struct gendisk *disk, char *page)
->  static ssize_t queue_io_timeout_store(struct gendisk *disk, const char *page,
->  				  size_t count)
->  {
-> -	unsigned int val, memflags;
-> +	unsigned int val;
->  	int err;
->  	struct request_queue *q = disk->queue;
->  
-> @@ -480,9 +468,7 @@ static ssize_t queue_io_timeout_store(struct gendisk *disk, const char *page,
->  	if (err || val == 0)
->  		return -EINVAL;
->  
-> -	memflags = blk_mq_freeze_queue(q);
-> -	blk_queue_rq_timeout(q, msecs_to_jiffies(val));
-> -	blk_mq_unfreeze_queue(q, memflags);
-> +	data_race((blk_queue_rq_timeout(q, msecs_to_jiffies(val)), 0));
->  
->  	return count;
->  }
+Requiring fully sequential accesses (which the original x86-64 required
+because it converted kernel addresses to ~0) would require policing by
+the compiler - I tried it once, it horrid.
 
-The use of data_race() above seems redundant, since the update to q->rq_timeout
-is already marked with WRITE_ONCE(). However, the read access to q->rq_timeout
-in a few places within the I/O hotpath is not marked and instead accessed directly
-using plain C-language loads.
-
-When I ran this proposed change with KCSAN enabled on my system, I observed the following
-warning ( when one thread was running I/O and another thread was concurrently updating 
-q->rq_timeout):
-
-BUG: KCSAN: data-race in blk_add_timer+0x74/0x1f0
-
-race at unknown origin, with read to 0xc000000143c9c568 of 4 bytes by task 3725 on cpu 16:
- blk_add_timer+0x74/0x1f0
- blk_mq_start_request+0xe0/0x558
- nvme_prep_rq.part.0+0x300/0x194c [nvme]
- nvme_queue_rqs+0x1f0/0x4e4 [nvme]
- blk_mq_dispatch_queue_requests+0x510/0x8e0
- blk_mq_flush_plug_list+0xc0/0x3d8
- __blk_flush_plug+0x29c/0x368
- __submit_bio+0x320/0x3bc
- submit_bio_noacct_nocheck+0x604/0x94c
- submit_bio_noacct+0x3b4/0xef8
- submit_bio+0x7c/0x310
- submit_bio_wait+0xd4/0x19c
- __blkdev_direct_IO_simple+0x290/0x484
- blkdev_direct_IO+0x658/0x1000
- blkdev_write_iter+0x530/0x67c
- vfs_write+0x698/0x894
- sys_pwrite64+0x140/0x17c
- system_call_exception+0x1ac/0x520
- system_call_vectored_common+0x15c/0x2ec
-
-value changed: 0x00000bb8 -> 0x000005dc
-
-Reported by Kernel Concurrency Sanitizer on:
-CPU: 16 UID: 0 PID: 3725 Comm: fio Kdump: loaded Not tainted 6.18.0-rc3+ #47 VOLUNTARY
-Hardware name: IBM,9105-22A Power11 (architected) 0x820200 0xf000007 of:IBM,FW1120.00 (RB1120_115) hv:phyp pSeries
-==================================================================
-
-Based on the gdb trace:
-
-(gdb) info line *(blk_add_timer+0x74)
-Line 138 of "block/blk-timeout.c" starts at address 0xc000000000d5637c <blk_add_timer+108> and ends at 0xc000000000d5638c <blk_add_timer+124>.
-
-This corresponds to:
-
-128 void blk_add_timer(struct request *req)
-129 {
-130         struct request_queue *q = req->q;
-131         unsigned long expiry;
-132 
-133         /*
-134          * Some LLDs, like scsi, peek at the timeout to prevent a
-135          * command from being retried forever.
-136          */
-137         if (!req->timeout)
-138                 req->timeout = q->rq_timeout;
-
-As seen above, the read access to q->rq_timeout is unmarked. To avoid the reported
-data race, we should replace this plain access with READ_ONCE(q->rq_timeout).
-This is one instance in the I/O hotpath where q->rq_timeout is read without annotation,
-and there are likely a few more similar cases that should be updated in the same way.
-
-Thanks,
---Nilay
+	David
 
