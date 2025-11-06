@@ -1,73 +1,58 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A815529A1
-	for <linux-block@vger.kernel.org>; Thu,  6 Nov 2025 04:35:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B94425C70D
+	for <linux-block@vger.kernel.org>; Thu,  6 Nov 2025 04:40:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762403718; cv=none; b=uIDKly+NV9ArO8c08FKwsvCBQxVPPdHMO7JUan81hxtlMpogPX2gA+nlchl9CofQjbX4R3OzolHU6CKYbs/K8STFCkhmV5BZKKfGufaGT7gNmC9f572UTdV8/gKKqdnCKNXOteimcyIajiLuWH7dq/HPZvD8Xqs6iVC/ED9uaxQ=
+	t=1762404054; cv=none; b=ZBRgT/aTiUvjhvXxW9ohyeihrfV/TESR75V1QMN8hvT4ccm08RWuZyAMAyg8imO+ckz12q1GgMZtBPXRSifQWzifH3Nu3aomi1WbN08t5Gy45mSxaxnu78+uUtuDRE+PNJj504zfsOINdGKTE6GuKCwhY+66oMpktxFnht9puWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762403718; c=relaxed/simple;
-	bh=0NKkoXcj12kuxL014ecN1w6NAn33C9rghjSJpEtZHOQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eZz3iffGQrB7KBdHgS/aLtqQHPBhcSe0LB4jfqf+wU9ETEmgrLzjkSLqxZE3+NfoeilsXCoy43MYuq0X0WscYv7sdTdmthpMIobgNMepv+NuaWNwlc927AZxK42vfAq4Yeu6BGF+LBdvTk7T4odBke1W6PU1b9UuDfqH3h4YUvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SRhxtk6g; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1762404054; c=relaxed/simple;
+	bh=Z2r7PThb4hJGpMVbTJZ/QgwyTAvBU/r2M3NW6kyUu/o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UkxyV9toMTvpuc1i920LGF7FyhiFdgd360MrR0PeSauihUbtLQ3DXwylym2KrtOMnAu2Lg2SfqyeiSuFjRx4nkXYibIJzfiWzMR7U+WDm0m5PHmv/4eHI5Gi4wHPo4iQGkNCbXZkpG4IXSXftKsPJNsZz1WcTxx8OuW2rKOqJxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TVDOIT3Q; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SRhxtk6g"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40DB4C4CEFB;
-	Thu,  6 Nov 2025 04:35:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TVDOIT3Q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E36CC4CEF7;
+	Thu,  6 Nov 2025 04:40:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762403718;
-	bh=0NKkoXcj12kuxL014ecN1w6NAn33C9rghjSJpEtZHOQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=SRhxtk6gfU1muu+tMgG1D8XEc0ewEnfV04V0exyom2RoBQhZcQOjEMqkNWSvu0Vs8
-	 peSoVNT6VYaf1COyMVHSoExN2wH66ClRS2sx4HzihyGsCagH/Cqthxev+3u+Jm/Svq
-	 wZD27M2UyZmmM+fxTAMxFSC/+NT39285Adiorm6ACfmMWtkLXbn91oKIlc/lyWchUT
-	 xKXEgr+1XNZCklVA6iRbxd5KhO/9wD1QSTIccf+9oHDNLXkSJsxgXsbvaMOBPkmtmw
-	 IYZF1cHciX2VqkKw+fgsteejQEEUy4ANlWBJoboaiZ1KcjmU86BhDmRF199gzihRKq
-	 tTYHiIXLSmlTQ==
-Message-ID: <57db9d0f-299b-4043-82ec-55d502642631@kernel.org>
-Date: Thu, 6 Nov 2025 13:31:24 +0900
+	s=k20201202; t=1762404053;
+	bh=Z2r7PThb4hJGpMVbTJZ/QgwyTAvBU/r2M3NW6kyUu/o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=TVDOIT3Q99QCsurV4cHsZGtbSorfHvdw3k6CPLG3eVnVxy9SFd4gYXJZo9QjCdZmV
+	 NLylgL+kavruRjkigDNXsCFRyHAT7sHjTWEpfGdjucL3v2inSK9PEJqx9Y2wdyzg4J
+	 jBDUmiWR3Z5qli4/ih4vqItCSwN1ZS5KpYuziqcx2sRL8hOjq9yzvfpnLFP1AzLCyT
+	 d4nSBmB/nkUpik1cTAXsYoBBPTs7q3y7s1hVy/jxsa6l+hrHFn7wij2Spl8auKtnZJ
+	 0ggeuhVLL6RzdxoTl5qdqm7OgYTi+bfuRlH8Vyyr0GvmyMIECgskvtUtEbf/wmKEPc
+	 CpunI120KKjGg==
+Date: Wed, 5 Nov 2025 21:40:51 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org, hch@lst.de,
+	axboe@kernel.dk, hans.holmberg@wdc.com
+Subject: Re: [PATCHv2 4/4] null_blk: allow byte aligned memory offsets
+Message-ID: <aQwm04sLFcOvKV4Y@kbusch-mbp>
+References: <20251106015447.1372926-1-kbusch@meta.com>
+ <20251106015447.1372926-5-kbusch@meta.com>
+ <57db9d0f-299b-4043-82ec-55d502642631@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 4/4] null_blk: allow byte aligned memory offsets
-To: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org, hch@lst.de,
- axboe@kernel.dk, hans.holmberg@wdc.com
-Cc: Keith Busch <kbusch@kernel.org>
-References: <20251106015447.1372926-1-kbusch@meta.com>
- <20251106015447.1372926-5-kbusch@meta.com>
-From: Damien Le Moal <dlemoal@kernel.org>
-Content-Language: en-US
-Organization: Western Digital Research
-In-Reply-To: <20251106015447.1372926-5-kbusch@meta.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <57db9d0f-299b-4043-82ec-55d502642631@kernel.org>
 
-On 11/6/25 10:54 AM, Keith Busch wrote:
-> From: Keith Busch <kbusch@kernel.org>
+On Thu, Nov 06, 2025 at 01:31:24PM +0900, Damien Le Moal wrote:
 > 
-> Allowing byte aligned memory provides a nice testing ground for
+> Note: on top of this, for testing, I think it would be nice to add a config
+> parameter to allow changing dma_alignment to higher values, and check requests
+> when processing them against that alignment. That could allow testing corner
+> cases or emulate devices with weird DMA alignment constraints.
 
-.dma_alignment = 1 means a minimum of 2-bytes alignment, no ?
-
-> direct-io.
-> 
-> Signed-off-by: Keith Busch <kbusch@kernel.org>
-
-Looks good.
-
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
-
-Note: on top of this, for testing, I think it would be nice to add a config
-parameter to allow changing dma_alignment to higher values, and check requests
-when processing them against that alignment. That could allow testing corner
-cases or emulate devices with weird DMA alignment constraints.
-
--- 
-Damien Le Moal
-Western Digital Research
+Yeah, that sounds like it fits in with this limit: there are other
+similar limits paramaterized by null_blk, like the virtual boundary, so
+user defined dma alignment makes sense.
