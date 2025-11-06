@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 952E23346A9;
-	Thu,  6 Nov 2025 14:17:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B0C3332ED7;
+	Thu,  6 Nov 2025 14:17:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762438647; cv=none; b=Xxbd9GU0tsVOK8R0xqaFyUCXvRElbdPK7Sq0/xNry/RNPeSxXmPe+m1/pSmXsVlfm3jWn6GybXnPYxPyNNcjaYf4GMZpguDdw0s1RU/8zqhWJRrx3+8DbpcgO30bzqrZwDkvwJocvwmXp9z1qEUsOmMYoWN2x+yXxfC/vXfLraI=
+	t=1762438651; cv=none; b=QE49olOZHuSzu42haC7IG66ixpFtqkmymOkkSuUnif8Lm05T5iBK3I3cmGgos7UvHM+9yZxN/jbRScUYMuQ3T3mJfRxBPfIJED+jTiXh43x3uvRo2k4h0hiJIXkO70JIc8TsqQWWA8a2BpH7QWafb9uMW13zbCNzaE45/rHRXik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762438647; c=relaxed/simple;
-	bh=bwei1HYhLRtewmmz8jQCKq/LKlcarzlK+hJ1OTkPqzA=;
+	s=arc-20240116; t=1762438651; c=relaxed/simple;
+	bh=toF5THSZHOeJ/QvtdnZ6Wy9PsXvPdD6mPNagdzYgFMc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mLxjgI30+uoosrQLg2wATo+jh4KuUmhUfIXR8HCPPsXTQEPtuyBZqpLkQB5VFUvYs17Kuj/5D6dgQgv8lSh0u/bSjAPqSziYzSGG9h6doLuKRzE45ApAJrZBTroI3Re63BWMF1on5rRCdtPNrLKO6sF0P2fGvHKk4qeEQNG7kqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TrDqHCGg; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=neAGIxYbILiZFvkmC+IULGrgV5H1Aa8TCmB5nuhsxm20p59XrB0+iIzGXpX4JFNgEpelNefkIi5JalLXY5UetKF+RC2sPvt8/iGjSTC8EOoNOwCgWVjvHtooDC0GUK0sPdM8jygxFfUj5joNTv0coB1vDvO1UXQHW49FkTVyEHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fzqy63mR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TrDqHCGg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78ABEC116C6;
-	Thu,  6 Nov 2025 14:17:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fzqy63mR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21EE0C16AAE;
+	Thu,  6 Nov 2025 14:17:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762438647;
-	bh=bwei1HYhLRtewmmz8jQCKq/LKlcarzlK+hJ1OTkPqzA=;
+	s=k20201202; t=1762438650;
+	bh=toF5THSZHOeJ/QvtdnZ6Wy9PsXvPdD6mPNagdzYgFMc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TrDqHCGgXOoHmIWjseyq7yOeltz2u5un40QJmWLqxTEqnJ73fQAv+rag4bVDt89hh
-	 NIS/JyfwG92mjzRrs17uqcR2QFDhnIfwnlp5AEGEFRvoaH5SiFX9+M8BJlLZdrP+Lu
-	 w4nz2j359fxSdtHqx4lz58EQZL6NlhxSXgT2hsPMa6bT+NrXpX8XT2NQmj16toeUKq
-	 RG0IIx4VUnwzDrPnXInLFsGiJDocVXYnSAcEAL50vy8Mmp28wBFcNoFvVBuScK2riU
-	 K3VAJdr1zzyGufNRSUgTj2GCrjfIpfu6Yt0dp1rYZ5yn8/6779gHmK+eIKkc+074KX
-	 nyiFT56TKhmTA==
+	b=fzqy63mRk0H3tg29gwLTZH/cTlIPmqxphVfyUtq26pZ0XiuN9j75SNelw3hCfgKKh
+	 mXWhZJtQEQ/pJnnHfBBjUFMrr8VF/zQwqtrIHAX0RCeQeWUkomRk6U8r8i/BL+9HlZ
+	 +TDe1P54EX3GW0Lv6v3fUdh4aP27BgPbqoBaHF3B233+l5jgOHzgTolDNjzI0KOZ/M
+	 lkVEpE13znSftvQYnljsIDgAdXL8uXHA7+xrgunTbdj9xRlIEl50uYGYp8F851zS7p
+	 T1sEek1LpRUc97A9uUGBFLWozCN4PBFbIOlHx4a5why6KArbuUayjuyLHFTW0omU3c
+	 qcQGAUYLfDqpA==
 From: Leon Romanovsky <leon@kernel.org>
 To: Bjorn Helgaas <bhelgaas@google.com>,
 	Logan Gunthorpe <logang@deltatee.com>,
@@ -60,13 +60,11 @@ Cc: Krishnakant Jaju <kjaju@nvidia.com>,
 	linaro-mm-sig@lists.linaro.org,
 	kvm@vger.kernel.org,
 	linux-hardening@vger.kernel.org,
-	Vivek Kasireddy <vivek.kasireddy@intel.com>,
 	Alex Mastro <amastro@fb.com>,
-	Nicolin Chen <nicolinc@nvidia.com>,
-	Jason Gunthorpe <jgg@nvidia.com>
-Subject: [PATCH v7 07/11] vfio: Export vfio device get and put registration helpers
-Date: Thu,  6 Nov 2025 16:16:52 +0200
-Message-ID: <20251106-dmabuf-vfio-v7-7-2503bf390699@nvidia.com>
+	Nicolin Chen <nicolinc@nvidia.com>
+Subject: [PATCH v7 04/11] PCI/P2PDMA: Provide an access to pci_p2pdma_map_type() function
+Date: Thu,  6 Nov 2025 16:16:49 +0200
+Message-ID: <20251106-dmabuf-vfio-v7-4-2503bf390699@nvidia.com>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <20251106-dmabuf-vfio-v7-0-2503bf390699@nvidia.com>
 References: <20251106-dmabuf-vfio-v7-0-2503bf390699@nvidia.com>
@@ -80,52 +78,175 @@ Content-Type: text/plain; charset="utf-8"
 X-Mailer: b4 0.15-dev-3ae27
 Content-Transfer-Encoding: 8bit
 
-From: Vivek Kasireddy <vivek.kasireddy@intel.com>
+From: Leon Romanovsky <leonro@nvidia.com>
 
-These helpers are useful for managing additional references taken
-on the device from other associated VFIO modules.
+Provide an access to pci_p2pdma_map_type() function to allow subsystems
+to determine the appropriate mapping type for P2PDMA transfers between
+a provider and target device.
 
-Original-patch-by: Jason Gunthorpe <jgg@nvidia.com>
-Signed-off-by: Vivek Kasireddy <vivek.kasireddy@intel.com>
+The pci_p2pdma_map_type() function is the core P2P layer version of
+the existing public, but struct page focused, pci_p2pdma_state()
+function. It returns the same result. It is required to use the p2p
+subsystem from drivers that don't use the struct page layer.
+
+Like __pci_p2pdma_update_state() it is not an exported function. The
+idea is that only subsystem code will implement mapping helpers for
+taking in phys_addr_t lists, this is deliberately not made accessible
+to every driver to prevent abuse.
+
+Following patches will use this function to implement a shared DMA
+mapping helper for DMABUF.
+
 Tested-by: Alex Mastro <amastro@fb.com>
 Tested-by: Nicolin Chen <nicolinc@nvidia.com>
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- drivers/vfio/vfio_main.c | 2 ++
- include/linux/vfio.h     | 2 ++
- 2 files changed, 4 insertions(+)
+ drivers/pci/p2pdma.c       | 14 ++++++--
+ include/linux/pci-p2pdma.h | 85 +++++++++++++++++++++++++---------------------
+ 2 files changed, 58 insertions(+), 41 deletions(-)
 
-diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-index 38c8e9350a60..9aa4a5d081e8 100644
---- a/drivers/vfio/vfio_main.c
-+++ b/drivers/vfio/vfio_main.c
-@@ -172,11 +172,13 @@ void vfio_device_put_registration(struct vfio_device *device)
- 	if (refcount_dec_and_test(&device->refcount))
- 		complete(&device->comp);
+diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
+index 664ea3272d73..11526e3c83fc 100644
+--- a/drivers/pci/p2pdma.c
++++ b/drivers/pci/p2pdma.c
+@@ -1056,8 +1056,18 @@ void pci_p2pmem_publish(struct pci_dev *pdev, bool publish)
  }
-+EXPORT_SYMBOL_GPL(vfio_device_put_registration);
+ EXPORT_SYMBOL_GPL(pci_p2pmem_publish);
  
- bool vfio_device_try_get_registration(struct vfio_device *device)
+-static enum pci_p2pdma_map_type
+-pci_p2pdma_map_type(struct p2pdma_provider *provider, struct device *dev)
++/**
++ * pci_p2pdma_map_type - Determine the mapping type for P2PDMA transfers
++ * @provider: P2PDMA provider structure
++ * @dev: Target device for the transfer
++ *
++ * Determines how peer-to-peer DMA transfers should be mapped between
++ * the provider and the target device. The mapping type indicates whether
++ * the transfer can be done directly through PCI switches or must go
++ * through the host bridge.
++ */
++enum pci_p2pdma_map_type pci_p2pdma_map_type(struct p2pdma_provider *provider,
++					     struct device *dev)
  {
- 	return refcount_inc_not_zero(&device->refcount);
+ 	enum pci_p2pdma_map_type type = PCI_P2PDMA_MAP_NOT_SUPPORTED;
+ 	struct pci_dev *pdev = to_pci_dev(provider->owner);
+diff --git a/include/linux/pci-p2pdma.h b/include/linux/pci-p2pdma.h
+index e307c9380d46..1e499a8e0099 100644
+--- a/include/linux/pci-p2pdma.h
++++ b/include/linux/pci-p2pdma.h
+@@ -26,6 +26,45 @@ struct p2pdma_provider {
+ 	u64 bus_offset;
+ };
+ 
++enum pci_p2pdma_map_type {
++	/*
++	 * PCI_P2PDMA_MAP_UNKNOWN: Used internally as an initial state before
++	 * the mapping type has been calculated. Exported routines for the API
++	 * will never return this value.
++	 */
++	PCI_P2PDMA_MAP_UNKNOWN = 0,
++
++	/*
++	 * Not a PCI P2PDMA transfer.
++	 */
++	PCI_P2PDMA_MAP_NONE,
++
++	/*
++	 * PCI_P2PDMA_MAP_NOT_SUPPORTED: Indicates the transaction will
++	 * traverse the host bridge and the host bridge is not in the
++	 * allowlist. DMA Mapping routines should return an error when
++	 * this is returned.
++	 */
++	PCI_P2PDMA_MAP_NOT_SUPPORTED,
++
++	/*
++	 * PCI_P2PDMA_MAP_BUS_ADDR: Indicates that two devices can talk to
++	 * each other directly through a PCI switch and the transaction will
++	 * not traverse the host bridge. Such a mapping should program
++	 * the DMA engine with PCI bus addresses.
++	 */
++	PCI_P2PDMA_MAP_BUS_ADDR,
++
++	/*
++	 * PCI_P2PDMA_MAP_THRU_HOST_BRIDGE: Indicates two devices can talk
++	 * to each other, but the transaction traverses a host bridge on the
++	 * allowlist. In this case, a normal mapping either with CPU physical
++	 * addresses (in the case of dma-direct) or IOVA addresses (in the
++	 * case of IOMMUs) should be used to program the DMA engine.
++	 */
++	PCI_P2PDMA_MAP_THRU_HOST_BRIDGE,
++};
++
+ #ifdef CONFIG_PCI_P2PDMA
+ int pcim_p2pdma_init(struct pci_dev *pdev);
+ struct p2pdma_provider *pcim_p2pdma_provider(struct pci_dev *pdev, int bar);
+@@ -45,6 +84,8 @@ int pci_p2pdma_enable_store(const char *page, struct pci_dev **p2p_dev,
+ 			    bool *use_p2pdma);
+ ssize_t pci_p2pdma_enable_show(char *page, struct pci_dev *p2p_dev,
+ 			       bool use_p2pdma);
++enum pci_p2pdma_map_type pci_p2pdma_map_type(struct p2pdma_provider *provider,
++					     struct device *dev);
+ #else /* CONFIG_PCI_P2PDMA */
+ static inline int pcim_p2pdma_init(struct pci_dev *pdev)
+ {
+@@ -106,6 +147,11 @@ static inline ssize_t pci_p2pdma_enable_show(char *page,
+ {
+ 	return sprintf(page, "none\n");
  }
-+EXPORT_SYMBOL_GPL(vfio_device_try_get_registration);
++static inline enum pci_p2pdma_map_type
++pci_p2pdma_map_type(struct p2pdma_provider *provider, struct device *dev)
++{
++	return PCI_P2PDMA_MAP_NOT_SUPPORTED;
++}
+ #endif /* CONFIG_PCI_P2PDMA */
  
- /*
-  * VFIO driver API
-diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-index eb563f538dee..217ba4ef1752 100644
---- a/include/linux/vfio.h
-+++ b/include/linux/vfio.h
-@@ -297,6 +297,8 @@ static inline void vfio_put_device(struct vfio_device *device)
- int vfio_register_group_dev(struct vfio_device *device);
- int vfio_register_emulated_iommu_dev(struct vfio_device *device);
- void vfio_unregister_group_dev(struct vfio_device *device);
-+bool vfio_device_try_get_registration(struct vfio_device *device);
-+void vfio_device_put_registration(struct vfio_device *device);
  
- int vfio_assign_device_set(struct vfio_device *device, void *set_id);
- unsigned int vfio_device_set_open_count(struct vfio_device_set *dev_set);
+@@ -120,45 +166,6 @@ static inline struct pci_dev *pci_p2pmem_find(struct device *client)
+ 	return pci_p2pmem_find_many(&client, 1);
+ }
+ 
+-enum pci_p2pdma_map_type {
+-	/*
+-	 * PCI_P2PDMA_MAP_UNKNOWN: Used internally as an initial state before
+-	 * the mapping type has been calculated. Exported routines for the API
+-	 * will never return this value.
+-	 */
+-	PCI_P2PDMA_MAP_UNKNOWN = 0,
+-
+-	/*
+-	 * Not a PCI P2PDMA transfer.
+-	 */
+-	PCI_P2PDMA_MAP_NONE,
+-
+-	/*
+-	 * PCI_P2PDMA_MAP_NOT_SUPPORTED: Indicates the transaction will
+-	 * traverse the host bridge and the host bridge is not in the
+-	 * allowlist. DMA Mapping routines should return an error when
+-	 * this is returned.
+-	 */
+-	PCI_P2PDMA_MAP_NOT_SUPPORTED,
+-
+-	/*
+-	 * PCI_P2PDMA_MAP_BUS_ADDR: Indicates that two devices can talk to
+-	 * each other directly through a PCI switch and the transaction will
+-	 * not traverse the host bridge. Such a mapping should program
+-	 * the DMA engine with PCI bus addresses.
+-	 */
+-	PCI_P2PDMA_MAP_BUS_ADDR,
+-
+-	/*
+-	 * PCI_P2PDMA_MAP_THRU_HOST_BRIDGE: Indicates two devices can talk
+-	 * to each other, but the transaction traverses a host bridge on the
+-	 * allowlist. In this case, a normal mapping either with CPU physical
+-	 * addresses (in the case of dma-direct) or IOVA addresses (in the
+-	 * case of IOMMUs) should be used to program the DMA engine.
+-	 */
+-	PCI_P2PDMA_MAP_THRU_HOST_BRIDGE,
+-};
+-
+ struct pci_p2pdma_map_state {
+ 	struct p2pdma_provider *mem;
+ 	enum pci_p2pdma_map_type map;
 
 -- 
 2.51.1
