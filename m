@@ -1,48 +1,48 @@
-Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
+Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D73B034A3A7
-	for <linux-block@vger.kernel.org>; Thu,  6 Nov 2025 16:02:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9A1F329C41
+	for <linux-block@vger.kernel.org>; Thu,  6 Nov 2025 16:06:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762444982; cv=none; b=GGWPILzQyRqS28prCGBCEewtpGneRRIqgo0vjzSlg+gYN3tY4EYMGQdZXgovhbf9iVwUtLbaiwkXNjMwJY9yDRlU8+fOJ8Nn9lPBACmY1eLn6YFNDhzLUXR24TP28nJt6JUzeR3tc0jhXz1Ktj6JtHECcUI4IiDkkIXLLxDciso=
+	t=1762445215; cv=none; b=K7ss5bcG/2Yay0ZzAB6Er6cKciL+bD86hajwA73mnVN4jpaGax6zruZR38m2UiLu45Ri+k/GocJaksd6KtNfQq5j2nW2g36QDCJzIiyh/2VLLrkkQ+f3fnMpHtxVfls3IdQo1dqaL1jXTaZjlVg3wr+CllOMHv0PWuRNFVrpQCU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762444982; c=relaxed/simple;
-	bh=wPbmgXKRZnr/cFhNAsNKbmrEI/iivaEszlnkS3OPdxs=;
+	s=arc-20240116; t=1762445215; c=relaxed/simple;
+	bh=1zr6smHDD+phnrSORfXf64ygF9GGhPKJnFai9X25QW4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MDC8wkckfKVMljCO3Ahwn6XBeRP5zj0JaMUf1EFWSWSqp+jdxPM4h4vT2IFTdFXfuETDPUz63HU+4Fw08CytrJeXkL/Vl2saViwtB77apX3prnyqlP1XMu1aAE6WNvcaEG0Zwg+mYx8s5NZGXXIkGUcE/MrDKafyes4IMDSZQdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=17qNhsus; arc=none smtp.client-ip=199.89.3.6
+	 In-Reply-To:Content-Type; b=FZmiJFkJHcD94RnIItuPVqax1b7TL2pWLZhzdcrzMv2kZZAsujY8Q/sMttVsOGeNs5mP8K8sXDtm0qUNiEWF+bmJvduEtvnHXKOkZWdaDsix4EO9GRbkMcUKDM5UROnS5zQsWpK+T1c/UnoSr1wu6a6L+WO9GPxILQzTXgqdQcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=L2z27ja3; arc=none smtp.client-ip=199.89.3.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="17qNhsus"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="L2z27ja3"
 Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4d2RmY2YktzltPtV;
-	Thu,  6 Nov 2025 16:02:53 +0000 (UTC)
+	by 004.mia.mailroute.net (Postfix) with ESMTP id 4d2Rs35gkRzmhZkv;
+	Thu,  6 Nov 2025 16:06:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:content-type:content-type:in-reply-to
 	:from:from:content-language:references:subject:subject
 	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1762444972; x=1765036973; bh=wPbmgXKRZnr/cFhNAsNKbmrE
-	I/iivaEszlnkS3OPdxs=; b=17qNhsusT80umUj+XYaOQKfiFWbn1eoDTMpj+1mj
-	W7SFEdl3R2CGTKmyvFkeKGOqt/HLV8mqp6qqVCr6mWmztBtOg8g2Eza3AwcK0GuZ
-	fwZx+/0R4WT+QQRFITPTZjk10SKynsgE+SIydq5nz7+IakPOzDjpBdpOZcJMBTIV
-	WPfHgXFR3V+/68/Pe/IVRsVbGjGwl3YO0L9fSWNLF/fFml5j1CGL2CRJKzlf5yg1
-	rV8cC0N/2Wau+BvM7VdptGXnPpmZBQN9WAns04dFWLgvfuMmof1o+0t+L9cxKsNs
-	XzcBN+bgKtvPt5GDmnqz/twJzu5vzBJwC/Ppk0X1rGhmJQ==
+	 s=mr01; t=1762445206; x=1765037207; bh=1zr6smHDD+phnrSORfXf64yg
+	F9GGhPKJnFai9X25QW4=; b=L2z27ja38+cxSDRX0wNghYyxW9AqfR0yNgvQnEv0
+	gSzWKtSDS70rFO9XkKrkSFsZUjzxBG5xQYmavphVl/pLnb/zyQNDGEjv29JWQMnY
+	tSkwHUgeUgP5IOFstxDrRMN5K1pFpTNvyhbTCxlBwPp2ICBWsqoZ0OoGCBgGgjtS
+	KxeY/RSdoqC/Si/Jo0GdYjcuvgleH58Bl10pM9J45OEYaLwilf+E3YKkZORtyyRx
+	IO3Q/ZtRnhGgPC+ch4+W8aGfTkmQh43kMwvrObuleX6IKSE6kCOXYweiWhTdVYua
+	7wlhbaFbj5vrCRP2wY6Q7xHUDHTK4dyRdH5+0dNUmB9iKA==
 X-Virus-Scanned: by MailRoute
-Received: from 003.mia.mailroute.net ([127.0.0.1])
- by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id WVoXY5rz9MIJ; Thu,  6 Nov 2025 16:02:52 +0000 (UTC)
+Received: from 004.mia.mailroute.net ([127.0.0.1])
+ by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id WG_lf4nz_Nsz; Thu,  6 Nov 2025 16:06:46 +0000 (UTC)
 Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4d2RmS4P9GzltKNH;
-	Thu,  6 Nov 2025 16:02:47 +0000 (UTC)
-Message-ID: <fb5be2a5-b0f1-420d-9479-77fab63682db@acm.org>
-Date: Thu, 6 Nov 2025 08:02:46 -0800
+	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4d2Rrz3CGRzm83Wk;
+	Thu,  6 Nov 2025 16:06:41 +0000 (UTC)
+Message-ID: <f47feb62-ed23-4b24-abf4-4239e76187af@acm.org>
+Date: Thu, 6 Nov 2025 08:06:40 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,22 +50,21 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] block: introduce bdev_zone_start()
-To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>
-References: <20251106070627.96995-1-dlemoal@kernel.org>
- <20251106070627.96995-3-dlemoal@kernel.org>
+Subject: Re: cached zone reporting fixes
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: Damien Le Moal <dlemoal@kernel.org>, linux-block@vger.kernel.org
+References: <20251105195225.2733142-1-hch@lst.de>
 Content-Language: en-US
 From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20251106070627.96995-3-dlemoal@kernel.org>
+In-Reply-To: <20251105195225.2733142-1-hch@lst.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 11/5/25 11:06 PM, Damien Le Moal wrote:
-> Introduce the function bdev_zone_start() as a more explicit (and clear)
-> replacement for ALIGN_DOWN() to get the start sector of a zone
-> containing a particular sector of a zoned block device.
+On 11/5/25 11:52 AM, Christoph Hellwig wrote:
+> this series fixes two issues with the new zone writeplug caching code
+> found running xfstests on ZNS devices.
+
+For both patches:
 
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 
