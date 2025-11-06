@@ -1,30 +1,29 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6DE12222CB
-	for <linux-block@vger.kernel.org>; Thu,  6 Nov 2025 11:01:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5669B280035
+	for <linux-block@vger.kernel.org>; Thu,  6 Nov 2025 11:03:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762426869; cv=none; b=k+G5IT1j+PjmNHN8dLiYxN62X6NMmiE23sDo3P9Vib9SUthaY97barLX+9aE/4vYD4K68g8opHprUVn7SD/nUeVhA3/97SpwWQWzosjjP3QPDPVprWYM89YzaaJUoNEX97dyD1oMxMWJGT+jEM3kblloa40AVz9j5iHypXrwGcE=
+	t=1762427003; cv=none; b=ShYC6ndthk7FvZ4Usv89iKF4mU6w/jGlO2DnPgtAIRDYLurHUVg5xWfXkYocflPlTfffcNs/SpRbqhc93MmGUnZuByWup2Cok38jZ9rmvokToHBK6c/SlcaLdT63yh2glcn03wfxhTTSksz7xDGe64EDmah3w2qEvdQCxfVI1HU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762426869; c=relaxed/simple;
-	bh=O5TJGAXFLs+T73pr2Ra9RC1ly5J2h+1T4iU3TGKUJRY=;
+	s=arc-20240116; t=1762427003; c=relaxed/simple;
+	bh=+xzh3DrZalez2EfYpa3Wr7FVx4Qom89QL2q2kENjQ5c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KvwoFAkmCpgbnUnuzJJ9839laJtRfsc3Nu8QCh2pwjlsqwsLcf6W1K94t4CoXhMMqHLk95yzK29Kpkx1BXdI2K/qh/yvP5553jU+ijTDN2kmUz8b9mgHtgBqy2buaNRdblA8iNZ1y/9lRo7woaoQaUA6tpPT8kEuPqSmsL7Evrw=
+	 Content-Type:Content-Disposition:In-Reply-To; b=b11HoCPQgq9Tqe1dDl9YCZ5aSFGH7usiDL2CyWJkYiUg0+mEp0OTKw4BhietZhgblTnJGGf7+d8TBLR1zr9kuDgQhvJPV1WgrM7ydeSovm+vToFYcuzFGt9oJvdwmAB1A/4uj82DvPFJkTNnf6DPDZXGgJMsGQPIKOjo+PUWiTk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 7B617227A87; Thu,  6 Nov 2025 12:00:58 +0100 (CET)
-Date: Thu, 6 Nov 2025 12:00:58 +0100
+	id C80B8227A87; Thu,  6 Nov 2025 12:03:16 +0100 (CET)
+Date: Thu, 6 Nov 2025 12:03:16 +0100
 From: Christoph Hellwig <hch@lst.de>
 To: Damien Le Moal <dlemoal@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH 2/2] block: fix cached zone reporting after zone append
- was used
-Message-ID: <20251106110058.GA30278@lst.de>
-References: <20251105195225.2733142-1-hch@lst.de> <20251105195225.2733142-3-hch@lst.de> <ad303562-5b34-4156-94f1-516787e873b1@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 1/2] block: remove blk_zone_wp_offset()
+Message-ID: <20251106110316.GB30278@lst.de>
+References: <20251106070627.96995-1-dlemoal@kernel.org> <20251106070627.96995-2-dlemoal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -33,16 +32,31 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ad303562-5b34-4156-94f1-516787e873b1@kernel.org>
+In-Reply-To: <20251106070627.96995-2-dlemoal@kernel.org>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Thu, Nov 06, 2025 at 01:10:28PM +0900, Damien Le Moal wrote:
-> > +	if (!test_bit(GD_ZONE_APPEND_USED, &disk->state))
-> > +		set_bit(GD_ZONE_APPEND_USED, &disk->state);
+On Thu, Nov 06, 2025 at 04:06:26PM +0900, Damien Le Moal wrote:
+> The helper function blk_zone_wp_offset() is called from
+> disk_zone_wplug_sync_wp_offset(), and again called from
+> blk_revalidate_seq_zone() right after the call to
+> disk_zone_wplug_sync_wp_offset().
 > 
-> We could remove the test_bit() here and unconditionally call set_bit(): single
-> atomic op instead of 2.
+> Change disk_zone_wplug_sync_wp_offset() to return the wp_offset it used
+> for updating the target zone write plug to avoid this double call. With
+> this change, blk_zone_wp_offset() can be open coded directly in
+> disk_zone_wplug_sync_wp_offset(). This open-coding introduces 2 changes:
+> handle the BLK_COND_ZONE_ACTIVE case, and return UINT_MAX as the
+> wp_offset for a full zone, since the write pointer of full zones is
+> invalid.
+> 
+> For the case where a zone does not have a zone write plug,
+> disk_zone_wplug_sync_wp_offset() does nothing and returns 0. This in
+> turn leads to blk_revalidate_seq_zone() to immediately return, which is
+> exactly what we want (because there is no need to attempt removing a
+> zone write plug that does not exist).
 
-test_bit doesn't need a lock prefix (at least on x86) and avoid
-unconditionally dirtying the cache line.
+I like the use of disk_zone_wplug_sync_wp_offset in
+blk_revalidate_seq_zone, but having the switch on the zone conditions
+in a separate helper seems nicer than open coding it next to the
+write plug handling.
 
