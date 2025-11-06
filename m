@@ -1,198 +1,247 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E81233DEE6;
-	Thu,  6 Nov 2025 14:17:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3694E33FE19
+	for <linux-block@vger.kernel.org>; Thu,  6 Nov 2025 14:27:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762438666; cv=none; b=OkcavlAJLM5608ETxPh/EL2PgwwQ+U6PuRCMhYWXxySOMJpKa0eveGKDSkH8nMS5+kyjG4TlUKE2JZpN14YRiLG74ezLKzM+lGCn8HRP8ztKTKTzo03RvrmJbwwpuH/YIBfI2ENa70lrGufWE6CxSRr62d1YBok/sZZjWG1MJP0=
+	t=1762439260; cv=none; b=akMLCYKRRu/sUzk4AtTvcR3pYjrhr40cM6b04xt/IZjEHaEnXVr/OnfQPJfXsrKJd2OlwX3aCXWSMjP9fGh3Vyt8GeepL/zGkCktQk4tlUU13xXQOgScXwZX08HHjV4Xdh2VuUtdyKRoXiHPC9Jlxwi4E6XDrZyw7xp4xG/gEvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762438666; c=relaxed/simple;
-	bh=Ysr30Sn5K0VIh/QChgAA+mxNzBcIIHvszbujsNqJTIY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LdwL31D0TuoAeF1kDp8RKkfEQ90G49yZQuvc9NL7SHSDHLzaxSFfkrQOo2tZw9Xpvy64ne3jRd0PS4qEIrWjX2h7YGEoG1AEFAT5r/d3Ci9AFZMns0FnPFgb69uGqlAGysn6TeKbAuqi3d8auZ2yTZhuWR6OrGIY/Vi4tXtBfIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qSfbrYle; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1762439260; c=relaxed/simple;
+	bh=l33Zzo0dszyAM02EEHDUZazvYNIsv0wOFRJicpIAZpQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oklDyp3T2Irxz5NAXD8YaGBzKtl/o/xeILvbNd3Hn/qcTjoyBYzxX3mK63SL7+54D+DXPOVTN9n4G3cUaGe+rarHnpxo37Qx54VYd70nQ/eEzujZIrsDLYJFMDZXYS8D3aoQO7cyqWI8z8m9o0cFSySHy4dXeA+8jIEzaaqTx1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=UM6v927M; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=NYryjSG6; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=UM6v927M; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=NYryjSG6; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qSfbrYle"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40CACC19423;
-	Thu,  6 Nov 2025 14:17:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762438665;
-	bh=Ysr30Sn5K0VIh/QChgAA+mxNzBcIIHvszbujsNqJTIY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=qSfbrYleS0pgRnWFVOVVECfkmFN3RhXDUr/qoNyfh3zGJM1uA2s4UV18MtwOik7ka
-	 O4/CuPI1n6UVPro/r9Jyh/hs/0aO7rlsmwPkiXVCMLbBw0Bh9xwKkhVFBUffXCLwUj
-	 5b8B6F2h7nhjNngQA8Rq0R9L5064vJnmjKlDemXUyy2OEQdvyHHjaucrxksP26KgZ1
-	 rnT5Ep8vEinwOQ7uBWN57R2mEmsTM9V47wfGBgzEwiHvgH4i9Rv0SMKteBvBGq3dty
-	 +GPOfSKQdiHbe2RpZM3uiqyZNrzu0UXvfyY38PqqqLZdXOqMkkKwxarubXjozUjpZ3
-	 7AN5yEPxfo5Kg==
-From: Leon Romanovsky <leon@kernel.org>
-To: Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Leon Romanovsky <leon@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	=?utf-8?q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
-	Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <skolothumtho@nvidia.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex@shazbot.org>
-Cc: Krishnakant Jaju <kjaju@nvidia.com>,
-	Matt Ochs <mochs@nvidia.com>,
-	linux-pci@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	iommu@lists.linux.dev,
-	linux-mm@kvack.org,
-	linux-doc@vger.kernel.org,
-	linux-media@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	linaro-mm-sig@lists.linaro.org,
-	kvm@vger.kernel.org,
-	linux-hardening@vger.kernel.org,
-	Alex Mastro <amastro@fb.com>,
-	Nicolin Chen <nicolinc@nvidia.com>
-Subject: [PATCH v7 11/11] vfio/nvgrace: Support get_dmabuf_phys
-Date: Thu,  6 Nov 2025 16:16:56 +0200
-Message-ID: <20251106-dmabuf-vfio-v7-11-2503bf390699@nvidia.com>
-X-Mailer: git-send-email 2.51.1
-In-Reply-To: <20251106-dmabuf-vfio-v7-0-2503bf390699@nvidia.com>
-References: <20251106-dmabuf-vfio-v7-0-2503bf390699@nvidia.com>
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="UM6v927M";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="NYryjSG6";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="UM6v927M";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="NYryjSG6"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 5443E1F74C;
+	Thu,  6 Nov 2025 14:27:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1762439256; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=hzExTjpfTe0MsCrHd3btlVc/M393MGUafFxJXP1rOqU=;
+	b=UM6v927MK9uy2gtWMa+VPRbV9jxn9KMXFoJmYRZtoQT0VdcNDppl1lRFLNJEmk6CsEZXLd
+	0UtqFjt+CWWOgnfQG+OE6P0bm5+DeYrTbB/rACcPznkCPRcoRjMjsRgPAWsVg3fGj/uxkZ
+	1Nm3Y6NlPiHFaSYoM3wynWWyJ+aPG48=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1762439256;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=hzExTjpfTe0MsCrHd3btlVc/M393MGUafFxJXP1rOqU=;
+	b=NYryjSG67m2GfIiui/LExEukeoRnUvrs0IPvhv1pO9QH47IQKpKQdFWMrYkZ2IBWXrcO5A
+	RtL5OZHczIhKNDDw==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1762439256; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=hzExTjpfTe0MsCrHd3btlVc/M393MGUafFxJXP1rOqU=;
+	b=UM6v927MK9uy2gtWMa+VPRbV9jxn9KMXFoJmYRZtoQT0VdcNDppl1lRFLNJEmk6CsEZXLd
+	0UtqFjt+CWWOgnfQG+OE6P0bm5+DeYrTbB/rACcPznkCPRcoRjMjsRgPAWsVg3fGj/uxkZ
+	1Nm3Y6NlPiHFaSYoM3wynWWyJ+aPG48=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1762439256;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=hzExTjpfTe0MsCrHd3btlVc/M393MGUafFxJXP1rOqU=;
+	b=NYryjSG67m2GfIiui/LExEukeoRnUvrs0IPvhv1pO9QH47IQKpKQdFWMrYkZ2IBWXrcO5A
+	RtL5OZHczIhKNDDw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 35FCF13A31;
+	Thu,  6 Nov 2025 14:27:36 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id Ihm5C1iwDGmARAAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Thu, 06 Nov 2025 14:27:36 +0000
+Message-ID: <b950d1a9-3686-4adc-ac2d-795b598ff1a5@suse.cz>
+Date: Thu, 6 Nov 2025 15:27:35 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Mailer: b4 0.15-dev-3ae27
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/9] mempool: add mempool_{alloc,free}_bulk
+Content-Language: en-US
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Eric Biggers <ebiggers@kernel.org>,
+ Andrew Morton <akpm@linux-foundation.org>, Christoph Lameter
+ <cl@gentwo.org>, David Rientjes <rientjes@google.com>,
+ Roman Gushchin <roman.gushchin@linux.dev>, Harry Yoo <harry.yoo@oracle.com>,
+ linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-fscrypt@vger.kernel.org, linux-mm@kvack.org
+References: <20251031093517.1603379-1-hch@lst.de>
+ <20251031093517.1603379-4-hch@lst.de>
+ <1fff522d-1987-4dcc-a6a2-4406a22d3ec2@suse.cz>
+ <20251106141306.GA12043@lst.de>
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ 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
+ m6M14QORSWTLRg==
+In-Reply-To: <20251106141306.GA12043@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	FROM_HAS_DN(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
+X-Spam-Flag: NO
+X-Spam-Score: -4.30
+X-Spam-Level: 
 
-From: Jason Gunthorpe <jgg@nvidia.com>
+On 11/6/25 15:13, Christoph Hellwig wrote:
+> On Wed, Nov 05, 2025 at 04:04:53PM +0100, Vlastimil Babka wrote:
+>> > +	for (; i < count; i++) {
+>> > +		if (!elem[i]) {
+>> > +			if (should_fail_ex(&fail_mempool_alloc, 1,
+>> > +					FAULT_NOWARN)) {
+>> > +				pr_info("forcing pool usage for pool %pS\n",
+>> > +					(void *)caller_ip);
+>> > +				goto use_pool;
+>> > +			}
+>> 
+>> Would it be enough to do this failure injection attempt once and not in
+>> every iteration?
+> 
+> Well, that would only test failure handling for the first element. Or
+> you mean don't call it again if called once?
 
-Call vfio_pci_core_fill_phys_vec() with the proper physical ranges for the
-synthetic BAR 2 and BAR 4 regions. Otherwise use the normal flow based on
-the PCI bar.
+I mean since this is (due to the semantics of mempools) not really causing a
+failure to the caller (unlike the typical failure injection usage), but
+forcing preallocated objecs use, I'm not sure we get much benefit (in terms
+of testing caller's error paths) from the fine grained selection of the
+first element where we inject fail, and failing immediately or never should
+be sufficient.
 
-This demonstrates a DMABUF that follows the region info report to only
-allow mapping parts of the region that are mmapable. Since the BAR is
-power of two sized and the "CXL" region is just page aligned the there can
-be a padding region at the end that is not mmaped or passed into the
-DMABUF.
+>> >  	/*
+>> > @@ -445,10 +463,12 @@ void *mempool_alloc_noprof(mempool_t *pool, gfp_t gfp_mask)
+>> >  	/* We must not sleep if !__GFP_DIRECT_RECLAIM */
+>> >  	if (!(gfp_mask & __GFP_DIRECT_RECLAIM)) {
+>> >  		spin_unlock_irqrestore(&pool->lock, flags);
+>> > -		return NULL;
+>> > +		if (i > 0)
+>> > +			mempool_free_bulk(pool, elem + i, count - i);
+>> 
+>> I don't understand why we are trying to free from i to count and not from 0
+>> to i? Seems buggy, there will likely be NULLs which might go through
+>> add_element() which assumes they are not NULL.
+> 
+> Yes, this looks like broken copy and paste.  The again I'm not even
+> sure who calls into mempool without __GFP_DIRECT_RECLAIM reset, as
+> that's kinda pointless.
 
-The "CXL" ranges that are remapped into BAR 2 and BAR 4 areas are not PCI
-MMIO, they actually run over the CXL-like coherent interconnect and for
-the purposes of DMA behave identically to DRAM. We don't try to model this
-distinction between true PCI BAR memory that takes a real PCI path and the
-"CXL" memory that takes a different path in the p2p framework for now.
+Hm yeah would have to be some special case where something limits how many
+such outstanding allocations can there be, otherwise it's just a cache to
+make success more likely but not guaranteed.
 
-Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-Tested-by: Alex Mastro <amastro@fb.com>
-Tested-by: Nicolin Chen <nicolinc@nvidia.com>
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
----
- drivers/vfio/pci/nvgrace-gpu/main.c | 56 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 56 insertions(+)
+>> Assuming this is fixed we might still have confusing API. We might be
+>> freeing away elements that were already in the array when
+>> mempool_alloc_bulk() was called. OTOH the pool might be missing less than i
+>> elements and mempool_free_bulk() will not do anything with the rest.
+>> Anything beyond i is untouched. The caller has no idea what's in the array
+>> after getting this -ENOMEM. (alloc_pages_bulk() returns the number of pages
+>> there).
+>> Maybe it's acceptable (your usecase I think doesn't even add a caller that
+>> can't block), but needs documenting clearly.
+> 
+> I'm tempted to just disallow !__GFP_DIRECT_RECLAIM bulk allocations.
+> That feature seems to being a lot of trouble for no real gain, as
+> we can't use mempool as a guaranteed allocator there, so it's kinda
+> pointless.
 
-diff --git a/drivers/vfio/pci/nvgrace-gpu/main.c b/drivers/vfio/pci/nvgrace-gpu/main.c
-index e346392b72f6..7d7ab2c84018 100644
---- a/drivers/vfio/pci/nvgrace-gpu/main.c
-+++ b/drivers/vfio/pci/nvgrace-gpu/main.c
-@@ -7,6 +7,7 @@
- #include <linux/vfio_pci_core.h>
- #include <linux/delay.h>
- #include <linux/jiffies.h>
-+#include <linux/pci-p2pdma.h>
- 
- /*
-  * The device memory usable to the workloads running in the VM is cached
-@@ -683,6 +684,54 @@ nvgrace_gpu_write(struct vfio_device *core_vdev,
- 	return vfio_pci_core_write(core_vdev, buf, count, ppos);
- }
- 
-+static int nvgrace_get_dmabuf_phys(struct vfio_pci_core_device *core_vdev,
-+				   struct p2pdma_provider **provider,
-+				   unsigned int region_index,
-+				   struct dma_buf_phys_vec *phys_vec,
-+				   struct vfio_region_dma_range *dma_ranges,
-+				   size_t nr_ranges)
-+{
-+	struct nvgrace_gpu_pci_core_device *nvdev = container_of(
-+		core_vdev, struct nvgrace_gpu_pci_core_device, core_device);
-+	struct pci_dev *pdev = core_vdev->pdev;
-+
-+	if (nvdev->resmem.memlength && region_index == RESMEM_REGION_INDEX) {
-+		/*
-+		 * The P2P properties of the non-BAR memory is the same as the
-+		 * BAR memory, so just use the provider for index 0. Someday
-+		 * when CXL gets P2P support we could create CXLish providers
-+		 * for the non-BAR memory.
-+		 */
-+		*provider = pcim_p2pdma_provider(pdev, 0);
-+		if (!*provider)
-+			return -EINVAL;
-+		return vfio_pci_core_fill_phys_vec(phys_vec, dma_ranges,
-+						   nr_ranges,
-+						   nvdev->resmem.memphys,
-+						   nvdev->resmem.memlength);
-+	} else if (region_index == USEMEM_REGION_INDEX) {
-+		/*
-+		 * This is actually cachable memory and isn't treated as P2P in
-+		 * the chip. For now we have no way to push cachable memory
-+		 * through everything and the Grace HW doesn't care what caching
-+		 * attribute is programmed into the SMMU. So use BAR 0.
-+		 */
-+		*provider = pcim_p2pdma_provider(pdev, 0);
-+		if (!*provider)
-+			return -EINVAL;
-+		return vfio_pci_core_fill_phys_vec(phys_vec, dma_ranges,
-+						   nr_ranges,
-+						   nvdev->usemem.memphys,
-+						   nvdev->usemem.memlength);
-+	}
-+	return vfio_pci_core_get_dmabuf_phys(core_vdev, provider, region_index,
-+					     phys_vec, dma_ranges, nr_ranges);
-+}
-+
-+static const struct vfio_pci_device_ops nvgrace_gpu_pci_dev_ops = {
-+	.get_dmabuf_phys = nvgrace_get_dmabuf_phys,
-+};
-+
- static const struct vfio_device_ops nvgrace_gpu_pci_ops = {
- 	.name		= "nvgrace-gpu-vfio-pci",
- 	.init		= vfio_pci_core_init_dev,
-@@ -703,6 +752,10 @@ static const struct vfio_device_ops nvgrace_gpu_pci_ops = {
- 	.detach_ioas	= vfio_iommufd_physical_detach_ioas,
- };
- 
-+static const struct vfio_pci_device_ops nvgrace_gpu_pci_dev_core_ops = {
-+	.get_dmabuf_phys = vfio_pci_core_get_dmabuf_phys,
-+};
-+
- static const struct vfio_device_ops nvgrace_gpu_pci_core_ops = {
- 	.name		= "nvgrace-gpu-vfio-pci-core",
- 	.init		= vfio_pci_core_init_dev,
-@@ -965,6 +1018,9 @@ static int nvgrace_gpu_probe(struct pci_dev *pdev,
- 						    memphys, memlength);
- 		if (ret)
- 			goto out_put_vdev;
-+		nvdev->core_device.pci_ops = &nvgrace_gpu_pci_dev_ops;
-+	} else {
-+		nvdev->core_device.pci_ops = &nvgrace_gpu_pci_dev_core_ops;
- 	}
- 
- 	ret = vfio_pci_core_register_device(&nvdev->core_device);
+Agree. If anyone comes up with a use case they can extend and actually test
+these rollback paths.
 
--- 
-2.51.1
+>> So in theory callers waiting for many objects might wait indefinitely to
+>> find enough objects in the pool, while smaller callers succeed their
+>> allocations and deplete the pool. Mempools never provided some fair ordering
+>> of waiters, but this might make it worse deterministically instead of
+>> randomly. Guess it's not such a problem if all callers are comparable in
+>> number of objects.
+> 
+> Yeah, which is the use case.
+
+Good.
+
+>> >   * This function only sleeps if the free_fn callback sleeps.
+>> 
+>> This part now only applies to mempool_free() ?
+> 
+> Both mempool_free and mempool_free_bulk.
+
+But mempool_free_bulk() doesn't use the callback, it's up to the caller to
+free anything the mempool didn't use for its refill.
+
 
