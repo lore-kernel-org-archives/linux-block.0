@@ -1,51 +1,55 @@
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED97A30FF2E
-	for <linux-block@vger.kernel.org>; Fri,  7 Nov 2025 23:24:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAB43207A22;
+	Fri,  7 Nov 2025 23:53:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762557845; cv=none; b=t7VL9dxSMv25mgbqbs8SDiAZFEBGfCw1ahl7yLznKilN2cp0ogW5LFe4hBLZDObFS/OLGL4CV/qa+L/zmR/SUwaOGp+kl2M/ZUhVAdQ7HN0LFZ8fjVTpvcaEK78u2xZev5hC8GeiyKdIbpIRPkX2kop18ZUUnxJx9xxL6XFU8p8=
+	t=1762559612; cv=none; b=ijQ+aIhHrRwL8ERTk3odfanfOF4hJW3gfAkwUfAxtmV4su4RbrL7gNU0itj0qH04Q9l0qtriAuOsUN8PdU8IKqWqK8zED5YIV1SX/FKceVLbtFQQhIMjE/8X2mnHB2wDr0suh5v3+vOJnmwAri3eqssvSZW9CXHzCVe5YZAYp60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762557845; c=relaxed/simple;
-	bh=ZtZK6FxAR9B/xpw0W+Rj817OiS819BhTlphgh0e1sHI=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Gc09wend6YMWJJFwI4AvPQUwtpam2Z7kcgVgVquY9GdR1sN4aEKXgyJAByZBKJZEVG4NO+aZy8NF5mw2X7RETWl6oSIxShoE2uI6Rlj8WA0rFmYNn8abY95JK+UbnPIrbSO6rTEUBYWmE1DYL6ssppNIdGpV3hudbXrZLMzbxZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=RHuNucKZ; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+	s=arc-20240116; t=1762559612; c=relaxed/simple;
+	bh=xeduAIMnU9tjgT3Xhdjqfy7ozVDu2q2t6Btx1Uz2M/w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gJu0R8Bnp0WfCfYWEX8B0CoHdZX/A5MwuZ2y9Q8pLnyz9ix894vQLxkjvXbx6s8IFsPKBhrlUhzisbhHlM6GTBHRfX76pOemJD70793oWRqr9aSWc3Wfczvbn7Od+8VFBvy9+P7Cb4MKfyiE4wRjPDv97HizsiZrHVGiqgmzAZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=dTZQMqXp; arc=none smtp.client-ip=199.89.3.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="RHuNucKZ"
-Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5A7IMae21487795
-	for <linux-block@vger.kernel.org>; Fri, 7 Nov 2025 15:24:02 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=s2048-2025-q2; bh=Lb5JOF3xKa2aZfJ8ap
-	+ZnYsoSuzEJdQ+r5Xc3XqZr1I=; b=RHuNucKZUk9Q/W0K1sq8L38jFmCiYRmEFe
-	LGZb+rleEV9u6/kmlA5+Z0LnqWjRVTsLaH+5IttrKRsKqQdRaCZSsFYk6PqRzJSR
-	G8LQIgFLbQzXIms6Ie0pOUfN9tApSUeskJVQKr2BNbuQmQZy0eFMvHWszEgEgyWU
-	/xK3HzTf16XqL4DbaacEtyZ1sarG/P+By643jugb3nedacKGu+vpUKbpbqDyl1h/
-	vWmIp/dtGQYLZjTJEIm36wQ5GyUhca7jrlx5OT/tbsWi1Bu8+s6PaVQaPiesIJ8t
-	M8vFLvUUXcflARf0uJqOnp7COgmNLt8yoG7TdxZrPwHDZ82OpA6A==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4a9p09jb8y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Fri, 07 Nov 2025 15:24:02 -0800 (PST)
-Received: from twshared125961.16.frc2.facebook.com (2620:10d:c085:108::150d)
- by mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.20; Fri, 7 Nov 2025 23:24:01 +0000
-Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
-	id 79ED5389AA2E; Fri,  7 Nov 2025 15:23:58 -0800 (PST)
-From: Keith Busch <kbusch@meta.com>
-To: <linux-block@vger.kernel.org>
-CC: <hch@lst.de>, <axboe@kernel.dk>, <martin.petersen@oracle.com>,
-        Keith Busch
-	<kbusch@kernel.org>
-Subject: [PATCHv3] blk-integrity: support arbitrary buffer alignment
-Date: Fri, 7 Nov 2025 15:23:58 -0800
-Message-ID: <20251107232358.1324461-1-kbusch@meta.com>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="dTZQMqXp"
+Received: from localhost (localhost [127.0.0.1])
+	by 004.mia.mailroute.net (Postfix) with ESMTP id 4d3G944SJjzm17wZ;
+	Fri,  7 Nov 2025 23:53:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:mime-version:x-mailer:message-id:date
+	:date:subject:subject:from:from:received:received; s=mr01; t=
+	1762559607; x=1765151608; bh=K1azKyhrS0NmM69QwFAqM67sGxKbDXO/LvU
+	P80gvx9g=; b=dTZQMqXpqancygTKcfFxmwidaHXIIuyQLIr4eN/blXGdBOs94AB
+	S8hJh2UTY39cycvXpUhuA00QYGAfyCEbg6vbZaNurab19GnhaPlK7h+euw9j0+1N
+	dVYeMLnpn4xTWSvD7ikT3IhFmC8Jpl5+3wS+ldlbUL4JRphsztGVAu3jDkNPvLxI
+	QsKakGwGE4DsnyVgW0eYuhqlP3FlfWtgUePngmxqMdNn38al7aJkPUhtTRliATlj
+	IzEKh+owSakUR5zsgJmowBDa2QMByIeQzlkg6QINmzk7xUNzsr2kZec7zet0hEJF
+	jj8WfDPbSwzrsIfOMZWsDqJselAxIQO6prQ==
+X-Virus-Scanned: by MailRoute
+Received: from 004.mia.mailroute.net ([127.0.0.1])
+ by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id kEHdn0ylzKEO; Fri,  7 Nov 2025 23:53:27 +0000 (UTC)
+Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4d3G8z12GXzm17wv;
+	Fri,  7 Nov 2025 23:53:22 +0000 (UTC)
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH v26 00/17] Improve write performance for zoned UFS devices
+Date: Fri,  7 Nov 2025 15:52:53 -0800
+Message-ID: <20251107235310.2098676-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.51.2.1041.gc1ab5b90ca-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -53,997 +57,338 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA3MDE5NCBTYWx0ZWRfX3qCnyr/BlaV0
- Eo/Q7QXG5oTds7J+3h1zBjLpjdmHn2SypTCefFy36TrHLjeQ136JpZzvq30iZH1kPaJ5xAnkG0H
- fHIz7iooq8x8dAp5mUajFFM+SEMyNeemxhOdXcl57PFH0vLl5N0b9j6sxf6K1Yyi1aJEce4SHoj
- 1wiBt7cD6TbnC4/L2B9BHYhePL9f5DI8nXMi5s1WaAhO9O9XTJ/fLw9XDmiTOvy4QmjBLA1H5nl
- Qn0HjAo4mUFV7LzYRhJ+dd/VeFzcNvXa4ebzx8gIEy9aWZhA9uTpnRfEcgGAmE0mTwe9OQ1GpBc
- SDTi0sA3N24qgJmRFffF7naao9y5MwRZ7ZFi1GO+Va2sVgpflDcTkbVkCt5SHVrxZuAvx9s6oRT
- 9VOEpu1RMRT6v2SJVqe2b/yvExXSnA==
-X-Authority-Analysis: v=2.4 cv=D8ZK6/Rj c=1 sm=1 tr=0 ts=690e7f92 cx=c_pps
- a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
- a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=VabnemYjAAAA:8
- a=afosOz21P-N2k3ssSmEA:9 a=gKebqoRLp9LExxC7YDUY:22
-X-Proofpoint-GUID: N9d4hOzg38_msu4QbHK60-CluxFyd5bz
-X-Proofpoint-ORIG-GUID: N9d4hOzg38_msu4QbHK60-CluxFyd5bz
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-07_07,2025-11-06_01,2025-10-01_01
 
-From: Keith Busch <kbusch@kernel.org>
+Hi Jens,
 
-A bio segment might have partial block data with the rest continuing
-into the next segments.
+This patch series improves small write IOPS by a factor of 3.5 for zoned =
+UFS
+devices on my test setup (+250%). The changes included in this patch seri=
+es are
+as follows:
+ - A new request queue limits flag is introduced that allows block driver=
+s to
+   declare whether or not the request order is preserved per hardware que=
+ue.
+ - The order of zoned writes is preserved in the block layer by submittin=
+g all
+   zoned writes from the same CPU core as long as any zoned writes are pe=
+nding.
+ - A new member 'from_cpu' is introduced in the per-zone data structure
+   'blk_zone_wplug' to track from which CPU to submit zoned writes. This =
+data
+   member is reset to -1 after all pending zoned writes for a zone have
+   completed.
+ - The retry count for zoned writes is increased in the SCSI core to deal=
+ with
+   reordering caused by unit attention conditions or the SCSI error handl=
+er.
+ - New functionality is added in the null_blk and scsi_debug drivers to m=
+ake it
+   easier to test the changes introduced by this patch series.
 
-At the same time, the protection information may also be split in
-multiple segments. The most likely way that may happen is if two
-requests merge, or if we're directly using the io_uring user metadata.
-Further, it may be possible to have unalign the protection fields from
-the user space buffer, or if there are odd additional opaque bytes in
-front or in back of the protection information metadata region.
+Please consider this patch series for the next merge window.
 
-Change up the iteration to allow spanning multiple segments. This patch
-is mostly a re-write of the protection information handling to allow any
-arbitrary alignments, so it's probably easier to review the end result
-rather than the diff.
+Thanks,
 
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
-v2->v3:
+Bart.
 
-  Folded in cleanups from Christoph
+Changes compared to v25:
+ - Dropped the mq-deadline patches.
+ - Introduced a new mechanism in the block layer core for serializing dis=
+patch
+   operations. This mechanism is activated only if write pipelining is en=
+abled.
 
-  A fix for the crc64 ref tag remapping
+Changes compared to v24:
+ - Split the mq-deadline patch into two patches to make reviewing easier.
+ - Further improved patch descriptions and source code comments.
+ - Included a patch with a source code comment fix.
 
-I ported the liburing's test to blktests here:
+Changes compared to v23:
+ - Removed the sysfs attribute for configuring write pipelining.
+ - Split patch "Run all hwqs for sq scheds if write pipelining is enabled=
+" into
+   two patches to make it easier to review.
+ - Added patch "blk-zoned: Document disk_zone_wplug_schedule_bio_work() l=
+ocking".
+ - Rebased on top of Jens' for-next branch.
 
-  https://lore.kernel.org/linux-block/20251107231836.1280881-1-kbusch@met=
-a.com/
+Changes compared to v22:
+ - Made write pipelining configurable via sysfs.
+ - Fixed sporadic write errors observed with the mq-deadline I/O schedule=
+r.
 
- block/blk-settings.c |  10 -
- block/t10-pi.c       | 791 +++++++++++++++++++++++--------------------
- 2 files changed, 431 insertions(+), 370 deletions(-)
+Changes compared to v21:
+ - Added a patch that makes the block layer preserve the request order wh=
+en
+   inserting a request.
+ - Restored a warning statement in block/blk-zoned.c.
+ - Reworked the code that selects a CPU to queue zoned writes from such t=
+hat no
+   changes have to be undone if blk_zone_wplug_prepare_bio() fails.
+ - Removed the "plug" label in block/blk-zoned.c and retained the
+   "add_to_bio_list" label.
+ - Changed scoped_guard() back into spin_lock_*() calls.
+ - Fixed a recently introduced reference count leak in
+   disk_zone_wplug_schedule_bio_work().
+ - Restored the patch for the null_blk driver.
 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 78dfef1176231..e0d0b035f39d2 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -197,16 +197,6 @@ static int blk_validate_integrity_limits(struct queu=
-e_limits *lim)
- 	if (!bi->interval_exp)
- 		bi->interval_exp =3D ilog2(lim->logical_block_size);
-=20
--	/*
--	 * The PI generation / validation helpers do not expect intervals to
--	 * straddle multiple bio_vecs.  Enforce alignment so that those are
--	 * never generated, and that each buffer is aligned as expected.
--	 */
--	if (bi->csum_type) {
--		lim->dma_alignment =3D max(lim->dma_alignment,
--					(1U << bi->interval_exp) - 1);
--	}
+Changes compared to v20:
+ - Converted a struct queue_limits member variable into a queue_limits fe=
+ature
+   flag.
+ - Optimized performance of blk_mq_requeue_work().
+ - Instead of splitting blk_zone_wplug_bio_work(), introduce a loop in th=
+at
+   function.
+ - Reworked patch "blk-zoned: Support pipelining of zoned writes".
+ - Dropped the null_blk driver patch.
+ - Improved several patch descriptions.
+
+Changes compared to v19:
+ - Dropped patch 2/11 "block: Support allocating from a specific software=
+ queue"
+ - Implemented Damien's proposal to always add pipelined bios to the plug=
+ list
+   and to submit all pipelined bios from the bio work for a zone.
+ - Added three refactoring patches to make this patch series easier to re=
+view.
+
+Changes compared to v18:
+ - Dropped patch 2/12 "block: Rework request allocation in blk_mq_submit_=
+bio()".
+ - Improved patch descriptions.
+
+Changes compared to v17:
+ - Rebased the patch series on top of kernel v6.16-rc1.
+ - Dropped support for UFSHCI 3.0 controllers because the UFSHCI 3.0 auto=
 -
- 	/*
- 	 * The block layer automatically adds integrity data for bios that don'=
-t
- 	 * already have it.  Limit the I/O size so that a single maximum size
-diff --git a/block/t10-pi.c b/block/t10-pi.c
-index 0c4ed97021460..6266ce0043280 100644
---- a/block/t10-pi.c
-+++ b/block/t10-pi.c
-@@ -12,231 +12,136 @@
- #include <linux/unaligned.h>
- #include "blk.h"
-=20
-+#define APP_TAG_ESCAPE 0xffff
-+#define REF_TAG_ESCAPTE 0xffffffff
-+
-+/*
-+ * This union is used for onstack allocations when the pi field is split=
- across
-+ * segments. blk_validate_integrity_limits() guarantees pi_tuple_size ma=
-tches
-+ * the sizeof one of these two types.
-+ */
-+union pi_tuple {
-+	struct crc64_pi_tuple	crc64_pi;
-+	struct t10_pi_tuple	t10_pi;
-+};
-+
- struct blk_integrity_iter {
--	void			*prot_buf;
--	void			*data_buf;
--	sector_t		seed;
--	unsigned int		data_size;
--	unsigned short		interval;
--	const char		*disk_name;
-+	struct bio			*bio;
-+	struct bio_integrity_payload	*bip;
-+	struct blk_integrity		*bi;
-+	struct bvec_iter		data_iter;
-+	struct bvec_iter		prot_iter;
-+	unsigned int			interval_remaining;
-+	u64				seed;
-+	u64				crc;
- };
-=20
--static __be16 t10_pi_csum(__be16 csum, void *data, unsigned int len,
--		unsigned char csum_type)
-+static void blk_crc(struct blk_integrity_iter *iter, void *data,
-+		    unsigned int len)
- {
--	if (csum_type =3D=3D BLK_INTEGRITY_CSUM_IP)
--		return (__force __be16)ip_compute_csum(data, len);
--	return cpu_to_be16(crc_t10dif_update(be16_to_cpu(csum), data, len));
-+	switch (iter->bi->csum_type) {
-+	case BLK_INTEGRITY_CSUM_CRC64:
-+		iter->crc =3D crc64_nvme(iter->crc, data, len);
-+		break;
-+	case BLK_INTEGRITY_CSUM_CRC:
-+		iter->crc =3D crc_t10dif_update(iter->crc, data, len);
-+		break;
-+	case BLK_INTEGRITY_CSUM_IP:
-+		iter->crc =3D (__force u32)csum_partial(data, len,
-+						(__force __wsum)iter->crc);
-+		break;
-+	default:
-+		WARN_ON_ONCE(1);
-+		iter->crc =3D U64_MAX;
-+		break;
-+	}
- }
-=20
- /*
-- * Type 1 and Type 2 protection use the same format: 16 bit guard tag,
-- * 16 bit app tag, 32 bit reference tag. Type 3 does not define the ref
-- * tag.
-+ * Update the crc for formats that have metadata padding in front of the=
- data
-+ * integrity field
-  */
--static void t10_pi_generate(struct blk_integrity_iter *iter,
--		struct blk_integrity *bi)
-+static void blk_integrity_crc_offset(struct blk_integrity_iter *iter)
- {
--	u8 offset =3D bi->pi_offset;
--	unsigned int i;
--
--	for (i =3D 0 ; i < iter->data_size ; i +=3D iter->interval) {
--		struct t10_pi_tuple *pi =3D iter->prot_buf + offset;
--
--		pi->guard_tag =3D t10_pi_csum(0, iter->data_buf, iter->interval,
--				bi->csum_type);
--		if (offset)
--			pi->guard_tag =3D t10_pi_csum(pi->guard_tag,
--					iter->prot_buf, offset, bi->csum_type);
--		pi->app_tag =3D 0;
--
--		if (bi->flags & BLK_INTEGRITY_REF_TAG)
--			pi->ref_tag =3D cpu_to_be32(lower_32_bits(iter->seed));
--		else
--			pi->ref_tag =3D 0;
--
--		iter->data_buf +=3D iter->interval;
--		iter->prot_buf +=3D bi->metadata_size;
--		iter->seed++;
-+	unsigned int offset =3D iter->bi->pi_offset;
-+	struct bio_vec *bvec =3D iter->bip->bip_vec;
-+
-+	while (offset > 0) {
-+		struct bio_vec pbv =3D mp_bvec_iter_bvec(bvec, iter->prot_iter);
-+		unsigned int len =3D min(pbv.bv_len, offset);
-+		void *prot_buf =3D bvec_kmap_local(&pbv);
-+
-+		blk_crc(iter, prot_buf, len);
-+		kunmap_local(prot_buf);
-+		offset -=3D len;
-+		bvec_iter_advance_single(bvec, &iter->prot_iter, len);
- 	}
- }
-=20
--static blk_status_t t10_pi_verify(struct blk_integrity_iter *iter,
--		struct blk_integrity *bi)
-+static void blk_integrity_copy_from_tuple(struct bio_integrity_payload *=
-bip,
-+					  struct bvec_iter *iter, void *tuple,
-+					  unsigned int tuple_size)
- {
--	u8 offset =3D bi->pi_offset;
--	unsigned int i;
--
--	for (i =3D 0 ; i < iter->data_size ; i +=3D iter->interval) {
--		struct t10_pi_tuple *pi =3D iter->prot_buf + offset;
--		__be16 csum;
--
--		if (bi->flags & BLK_INTEGRITY_REF_TAG) {
--			if (pi->app_tag =3D=3D T10_PI_APP_ESCAPE)
--				goto next;
--
--			if (be32_to_cpu(pi->ref_tag) !=3D
--			    lower_32_bits(iter->seed)) {
--				pr_err("%s: ref tag error at location %llu " \
--				       "(rcvd %u)\n", iter->disk_name,
--				       (unsigned long long)
--				       iter->seed, be32_to_cpu(pi->ref_tag));
--				return BLK_STS_PROTECTION;
--			}
--		} else {
--			if (pi->app_tag =3D=3D T10_PI_APP_ESCAPE &&
--			    pi->ref_tag =3D=3D T10_PI_REF_ESCAPE)
--				goto next;
--		}
-+	void *prot_buf;
-=20
--		csum =3D t10_pi_csum(0, iter->data_buf, iter->interval,
--				bi->csum_type);
--		if (offset)
--			csum =3D t10_pi_csum(csum, iter->prot_buf, offset,
--					bi->csum_type);
--
--		if (pi->guard_tag !=3D csum) {
--			pr_err("%s: guard tag error at sector %llu " \
--			       "(rcvd %04x, want %04x)\n", iter->disk_name,
--			       (unsigned long long)iter->seed,
--			       be16_to_cpu(pi->guard_tag), be16_to_cpu(csum));
--			return BLK_STS_PROTECTION;
--		}
-+	while (tuple_size) {
-+		struct bio_vec pbv =3D mp_bvec_iter_bvec(bip->bip_vec, *iter);
-+		unsigned int len =3D min(tuple_size, pbv.bv_len);
-=20
--next:
--		iter->data_buf +=3D iter->interval;
--		iter->prot_buf +=3D bi->metadata_size;
--		iter->seed++;
--	}
-+		prot_buf =3D bvec_kmap_local(&pbv);
-+		memcpy(prot_buf, tuple, len);
-+		kunmap_local(prot_buf);
-=20
--	return BLK_STS_OK;
-+		bvec_iter_advance_single(bip->bip_vec, iter, len);
-+		tuple_size -=3D len;
-+		tuple +=3D len;
-+	}
- }
-=20
--/**
-- * t10_pi_type1_prepare - prepare PI prior submitting request to device
-- * @rq:              request with PI that should be prepared
-- *
-- * For Type 1/Type 2, the virtual start sector is the one that was
-- * originally submitted by the block layer for the ref_tag usage. Due to
-- * partitioning, MD/DM cloning, etc. the actual physical start sector is
-- * likely to be different. Remap protection information to match the
-- * physical LBA.
-- */
--static void t10_pi_type1_prepare(struct request *rq)
-+static void blk_integrity_copy_to_tuple(struct bio_integrity_payload *bi=
-p,
-+					struct bvec_iter *iter, void *tuple,
-+					unsigned int tuple_size)
- {
--	struct blk_integrity *bi =3D &rq->q->limits.integrity;
--	const int tuple_sz =3D bi->metadata_size;
--	u32 ref_tag =3D t10_pi_ref_tag(rq);
--	u8 offset =3D bi->pi_offset;
--	struct bio *bio;
-+	void *prot_buf;
-=20
--	__rq_for_each_bio(bio, rq) {
--		struct bio_integrity_payload *bip =3D bio_integrity(bio);
--		u32 virt =3D bip_get_seed(bip) & 0xffffffff;
--		struct bio_vec iv;
--		struct bvec_iter iter;
-+	while (tuple_size) {
-+		struct bio_vec pbv =3D mp_bvec_iter_bvec(bip->bip_vec, *iter);
-+		unsigned int len =3D min(tuple_size, pbv.bv_len);
-=20
--		/* Already remapped? */
--		if (bip->bip_flags & BIP_MAPPED_INTEGRITY)
--			break;
--
--		bip_for_each_vec(iv, bip, iter) {
--			unsigned int j;
--			void *p;
--
--			p =3D bvec_kmap_local(&iv);
--			for (j =3D 0; j < iv.bv_len; j +=3D tuple_sz) {
--				struct t10_pi_tuple *pi =3D p + offset;
--
--				if (be32_to_cpu(pi->ref_tag) =3D=3D virt)
--					pi->ref_tag =3D cpu_to_be32(ref_tag);
--				virt++;
--				ref_tag++;
--				p +=3D tuple_sz;
--			}
--			kunmap_local(p);
--		}
-+		prot_buf =3D bvec_kmap_local(&pbv);
-+		memcpy(tuple, prot_buf, len);
-+		kunmap_local(prot_buf);
-=20
--		bip->bip_flags |=3D BIP_MAPPED_INTEGRITY;
-+		bvec_iter_advance_single(bip->bip_vec, iter, len);
-+		tuple_size -=3D len;
-+		tuple +=3D len;
- 	}
- }
-=20
--/**
-- * t10_pi_type1_complete - prepare PI prior returning request to the blk=
- layer
-- * @rq:              request with PI that should be prepared
-- * @nr_bytes:        total bytes to prepare
-- *
-- * For Type 1/Type 2, the virtual start sector is the one that was
-- * originally submitted by the block layer for the ref_tag usage. Due to
-- * partitioning, MD/DM cloning, etc. the actual physical start sector is
-- * likely to be different. Since the physical start sector was submitted
-- * to the device, we should remap it back to virtual values expected by =
+   hibernation mechanism causes request reordering. UFSHCI 4.0 controller=
+s
+   remain supported.
+ - Removed the error handling and write pointer tracking mechanisms again
+   from block/blk-zoned.c.
+ - Dropped the dm-linear patch from this patch series since I'm not aware=
+ of
+   any use cases for write pipelining and dm-linear.
+
+Changes compared to v16:
+ - Rebased the entire patch series on top of Jens' for-next branch. Compa=
+red
+   to when v16 of this series was posted, the BLK_ZONE_WPLUG_NEED_WP_UPDA=
+TE
+   flag has been introduced and support for REQ_NOWAIT has been fixed.
+ - The behavior for SMR disks is preserved: if .driver_preserves_write_or=
+der
+   has not been set, BLK_ZONE_WPLUG_NEED_WP_UPDATE is still set if a writ=
+e
+   error has been encountered. If .driver_preserves_write_order has not b=
+een
+   set, the write pointer is restored and the failed zoned writes are ret=
+ried.
+ - The superfluous "disk->zone_wplugs_hash_bits !=3D 0" tests have been r=
+emoved.
+
+Changes compared to v15:
+ - Reworked this patch series on top of the zone write plugging approach.
+ - Moved support for requeuing requests from the SCSI core into the block
+   layer core.
+ - In the UFS driver, instead of disabling write pipelining if
+   auto-hibernation is enabled, rely on the requeuing mechanism to handle
+   reordering caused by resuming from auto-hibernation.
+
+Changes compared to v14:
+ - Removed the drivers/scsi/Kconfig.kunit and drivers/scsi/Makefile.kunit
+   files. Instead, modified drivers/scsi/Kconfig and added #include "*_te=
+st.c"
+   directives in the appropriate .c files. Removed the EXPORT_SYMBOL()
+   directives that were added to make the unit tests link.
+ - Fixed a double free in a unit test.
+
+Changes compared to v13:
+ - Reworked patch "block: Preserve the order of requeued zoned writes".
+ - Addressed a performance concern by removing the eh_needs_prepare_resub=
+mit
+   SCSI driver callback and by introducing the SCSI host template flag
+   .needs_prepare_resubmit instead.
+ - Added a patch that adds a 'host' argument to scsi_eh_flush_done_q().
+ - Made the code in unit tests less repetitive.
+
+Changes compared to v12:
+ - Added two new patches: "block: Preserve the order of requeued zoned wr=
+ites"
+   and "scsi: sd: Add a unit test for sd_cmp_sector()"
+ - Restricted the number of zoned write retries. To my surprise I had to =
+add
+   "&& scmd->retries <=3D scmd->allowed" in the SCSI error handler to lim=
+it the
+   number of retries.
+ - In patch "scsi: ufs: Inform the block layer about write ordering", onl=
+y set
+   ELEVATOR_F_ZBD_SEQ_WRITE for zoned block devices.
+
+Changes compared to v11:
+ - Fixed a NULL pointer dereference that happened when booting from an AT=
+A
+   device by adding an scmd->device !=3D NULL check in scsi_needs_prepara=
+tion().
+ - Updated Reviewed-by tags.
+
+Changes compared to v10:
+ - Dropped the UFS MediaTek and HiSilicon patches because these are not c=
+orrect
+   and because it is safe to drop these patches.
+ - Updated Acked-by / Reviewed-by tags.
+
+Changes compared to v9:
+ - Introduced an additional scsi_driver callback: .eh_needs_prepare_resub=
+mit().
+ - Renamed the scsi_debug kernel module parameter 'no_zone_write_lock' in=
+to
+   'preserves_write_order'.
+ - Fixed an out-of-bounds access in the unit scsi_call_prepare_resubmit()=
+ unit
+   test.
+ - Wrapped ufshcd_auto_hibern8_update() calls in UFS host drivers with
+   WARN_ON_ONCE() such that a kernel stack appears in case an error code =
+is
+   returned.
+ - Elaborated a comment in the UFSHCI driver.
+
+Changes compared to v8:
+ - Fixed handling of 'driver_preserves_write_order' and 'use_zone_write_l=
+ock'
+   in blk_stack_limits().
+ - Added a comment in disk_set_zoned().
+ - Modified blk_req_needs_zone_write_lock() such that it returns false if
+   q->limits.use_zone_write_lock is false.
+ - Modified disk_clear_zone_settings() such that it clears
+   q->limits.use_zone_write_lock.
+ - Left out one change from the mq-deadline patch that became superfluous=
+ due to
+   the blk_req_needs_zone_write_lock() change.
+ - Modified scsi_call_prepare_resubmit() such that it only calls list_sor=
+t() if
+   zoned writes have to be resubmitted for which zone write locking is di=
+sabled.
+ - Added an additional unit test for scsi_call_prepare_resubmit().
+ - Modified the sorting code in the sd driver such that only those SCSI c=
+ommands
+   are sorted for which write locking is disabled.
+ - Modified sd_zbc.c such that ELEVATOR_F_ZBD_SEQ_WRITE is only set if th=
+e
+   write order is not preserved.
+ - Included three patches for UFS host drivers that rework code that wrot=
+e
+   directly to the auto-hibernation controller register.
+ - Modified the UFS driver such that enabling auto-hibernation is not all=
+owed
+   if a zoned logical unit is present and if the controller operates in l=
+egacy
+   mode.
+ - Also in the UFS driver, simplified ufshcd_auto_hibern8_update().
+
+Changes compared to v7:
+ - Split the queue_limits member variable `use_zone_write_lock' into two =
+member
+   variables: `use_zone_write_lock' (set by disk_set_zoned()) and
+   `driver_preserves_write_order' (set by the block driver or SCSI LLD). =
+This
+   should clear up the confusion about the purpose of this variable.
+ - Moved the code for sorting SCSI commands by LBA from the SCSI error ha=
+ndler
+   into the SCSI disk (sd) driver as requested by Christoph.
+  =20
+Changes compared to v6:
+ - Removed QUEUE_FLAG_NO_ZONE_WRITE_LOCK and instead introduced a flag in
+   the request queue limits data structure.
+
+Changes compared to v5:
+ - Renamed scsi_cmp_lba() into scsi_cmp_sector().
+ - Improved several source code comments.
+
+Changes compared to v4:
+ - Dropped the patch that introduces the REQ_NO_ZONE_WRITE_LOCK flag.
+ - Dropped the null_blk patch and added two scsi_debug patches instead.
+ - Dropped the f2fs patch.
+ - Split the patch for the UFS driver into two patches.
+ - Modified several patch descriptions and source code comments.
+ - Renamed dd_use_write_locking() into dd_use_zone_write_locking().
+ - Moved the list_sort() call from scsi_unjam_host() into scsi_eh_flush_d=
+one_q()
+   such that sorting happens just before reinserting.
+ - Removed the scsi_cmd_retry_allowed() call from scsi_check_sense() to m=
+ake
+   sure that the retry counter is adjusted once per retry instead of twic=
+e.
+
+Changes compared to v3:
+ - Restored the patch that introduces QUEUE_FLAG_NO_ZONE_WRITE_LOCK. That=
+ patch
+   had accidentally been left out from v2.
+ - In patch "block: Introduce the flag REQ_NO_ZONE_WRITE_LOCK", improved =
 the
-- * block layer.
-- */
--static void t10_pi_type1_complete(struct request *rq, unsigned int nr_by=
-tes)
-+static void blk_set_ext_pi(struct crc64_pi_tuple *pi,
-+			   struct blk_integrity_iter *iter)
- {
--	struct blk_integrity *bi =3D &rq->q->limits.integrity;
--	unsigned intervals =3D nr_bytes >> bi->interval_exp;
--	const int tuple_sz =3D bi->metadata_size;
--	u32 ref_tag =3D t10_pi_ref_tag(rq);
--	u8 offset =3D bi->pi_offset;
--	struct bio *bio;
--
--	__rq_for_each_bio(bio, rq) {
--		struct bio_integrity_payload *bip =3D bio_integrity(bio);
--		u32 virt =3D bip_get_seed(bip) & 0xffffffff;
--		struct bio_vec iv;
--		struct bvec_iter iter;
--
--		bip_for_each_vec(iv, bip, iter) {
--			unsigned int j;
--			void *p;
--
--			p =3D bvec_kmap_local(&iv);
--			for (j =3D 0; j < iv.bv_len && intervals; j +=3D tuple_sz) {
--				struct t10_pi_tuple *pi =3D p + offset;
--
--				if (be32_to_cpu(pi->ref_tag) =3D=3D ref_tag)
--					pi->ref_tag =3D cpu_to_be32(virt);
--				virt++;
--				ref_tag++;
--				intervals--;
--				p +=3D tuple_sz;
--			}
--			kunmap_local(p);
--		}
--	}
-+	put_unaligned_be64(iter->crc, &pi->guard_tag);
-+	put_unaligned((__be16)0, &pi->app_tag);
-+	put_unaligned_be48(iter->seed, &pi->ref_tag);
- }
-=20
--static __be64 ext_pi_crc64(u64 crc, void *data, unsigned int len)
-+static void blk_set_t10_pi(struct t10_pi_tuple *pi,
-+			   struct blk_integrity_iter *iter)
- {
--	return cpu_to_be64(crc64_nvme(crc, data, len));
-+	put_unaligned_be16(iter->crc, &pi->guard_tag);
-+	put_unaligned((__be16)0, &pi->app_tag);
-+	put_unaligned_be32(iter->seed, &pi->ref_tag);
- }
-=20
--static void ext_pi_crc64_generate(struct blk_integrity_iter *iter,
--		struct blk_integrity *bi)
-+static void blk_set_ip_pi(struct t10_pi_tuple *pi,
-+			  struct blk_integrity_iter *iter)
- {
--	u8 offset =3D bi->pi_offset;
--	unsigned int i;
--
--	for (i =3D 0 ; i < iter->data_size ; i +=3D iter->interval) {
--		struct crc64_pi_tuple *pi =3D iter->prot_buf + offset;
-+	__be16 csum =3D (__force __be16)~(lower_16_bits(iter->crc));
-=20
--		pi->guard_tag =3D ext_pi_crc64(0, iter->data_buf, iter->interval);
--		if (offset)
--			pi->guard_tag =3D ext_pi_crc64(be64_to_cpu(pi->guard_tag),
--					iter->prot_buf, offset);
--		pi->app_tag =3D 0;
--
--		if (bi->flags & BLK_INTEGRITY_REF_TAG)
--			put_unaligned_be48(iter->seed, pi->ref_tag);
--		else
--			put_unaligned_be48(0ULL, pi->ref_tag);
--
--		iter->data_buf +=3D iter->interval;
--		iter->prot_buf +=3D bi->metadata_size;
--		iter->seed++;
--	}
-+	__put_unaligned_t(__be16, csum, &pi->guard_tag);
-+	put_unaligned_be16(0, &pi->app_tag);
-+	put_unaligned_be32(iter->seed, &pi->ref_tag);
- }
-=20
- static bool ext_pi_ref_escape(const u8 ref_tag[6])
-@@ -247,227 +152,393 @@ static bool ext_pi_ref_escape(const u8 ref_tag[6]=
-)
- }
-=20
- static blk_status_t ext_pi_crc64_verify(struct blk_integrity_iter *iter,
--		struct blk_integrity *bi)
-+					struct crc64_pi_tuple *pi)
- {
--	u8 offset =3D bi->pi_offset;
--	unsigned int i;
--
--	for (i =3D 0; i < iter->data_size; i +=3D iter->interval) {
--		struct crc64_pi_tuple *pi =3D iter->prot_buf + offset;
--		u64 ref, seed;
--		__be64 csum;
--
--		if (bi->flags & BLK_INTEGRITY_REF_TAG) {
--			if (pi->app_tag =3D=3D T10_PI_APP_ESCAPE)
--				goto next;
--
--			ref =3D get_unaligned_be48(pi->ref_tag);
--			seed =3D lower_48_bits(iter->seed);
--			if (ref !=3D seed) {
--				pr_err("%s: ref tag error at location %llu (rcvd %llu)\n",
--					iter->disk_name, seed, ref);
--				return BLK_STS_PROTECTION;
--			}
--		} else {
--			if (pi->app_tag =3D=3D T10_PI_APP_ESCAPE &&
--			    ext_pi_ref_escape(pi->ref_tag))
--				goto next;
-+	u64 seed =3D lower_48_bits(iter->seed);
-+	u64 guard =3D get_unaligned_be64(&pi->guard_tag);
-+	u64 ref =3D get_unaligned_be48(pi->ref_tag);
-+	u16 app =3D get_unaligned_be16(&pi->app_tag);
-+
-+	if (iter->bi->flags & BLK_INTEGRITY_REF_TAG) {
-+		if (app =3D=3D APP_TAG_ESCAPE)
-+			return BLK_STS_OK;
-+		if (ref !=3D seed) {
-+			pr_err("%s: ref tag error at location %llu (rcvd %llu)\n",
-+				iter->bio->bi_bdev->bd_disk->disk_name, seed,
-+				ref);
-+			return BLK_STS_PROTECTION;
- 		}
-+	} else if (app =3D=3D APP_TAG_ESCAPE && ext_pi_ref_escape(pi->ref_tag))=
- {
-+		return BLK_STS_OK;
-+	}
-+
-+	if (guard !=3D iter->crc) {
-+		pr_err("%s: guard tag error at sector %llu (rcvd %016llx, want %016llx=
-)\n",
-+			iter->bio->bi_bdev->bd_disk->disk_name, iter->seed,
-+			guard, iter->crc);
-+		return BLK_STS_PROTECTION;
-+	}
-=20
--		csum =3D ext_pi_crc64(0, iter->data_buf, iter->interval);
--		if (offset)
--			csum =3D ext_pi_crc64(be64_to_cpu(csum), iter->prot_buf,
--					    offset);
-+	return BLK_STS_OK;
-+}
-=20
--		if (pi->guard_tag !=3D csum) {
--			pr_err("%s: guard tag error at sector %llu " \
--			       "(rcvd %016llx, want %016llx)\n",
--				iter->disk_name, (unsigned long long)iter->seed,
--				be64_to_cpu(pi->guard_tag), be64_to_cpu(csum));
-+static blk_status_t t10_pi_verify(struct blk_integrity_iter *iter,
-+				  struct t10_pi_tuple *pi)
-+{
-+	u32 seed =3D lower_32_bits(iter->seed);
-+	u32 ref =3D get_unaligned_be32(&pi->ref_tag);
-+	u16 guard =3D get_unaligned_be16(&pi->guard_tag);
-+	u16 app =3D get_unaligned_be16(&pi->app_tag);
-+
-+	if (iter->bi->flags & BLK_INTEGRITY_REF_TAG) {
-+		if (app =3D=3D APP_TAG_ESCAPE)
-+			return BLK_STS_OK;
-+		if (ref !=3D seed) {
-+			pr_err("%s: ref tag error at location %u (rcvd %u)\n",
-+				iter->bio->bi_bdev->bd_disk->disk_name, seed,
-+				ref);
- 			return BLK_STS_PROTECTION;
- 		}
-+	} else if (app =3D=3D APP_TAG_ESCAPE && ref =3D=3D REF_TAG_ESCAPTE) {
-+		return BLK_STS_OK;
-+	}
-=20
--next:
--		iter->data_buf +=3D iter->interval;
--		iter->prot_buf +=3D bi->metadata_size;
--		iter->seed++;
-+	if (guard !=3D (u16)iter->crc) {
-+		pr_err("%s: guard tag error at sector %llu (rcvd %04x, want %04x)\n",
-+			iter->bio->bi_bdev->bd_disk->disk_name, iter->seed,
-+			guard, (u16)iter->crc);
-+		return BLK_STS_PROTECTION;
- 	}
-=20
- 	return BLK_STS_OK;
- }
-=20
--static void ext_pi_type1_prepare(struct request *rq)
-+static blk_status_t blk_integrity_verify(struct blk_integrity_iter *iter=
-,
-+					 union pi_tuple *tuple)
- {
--	struct blk_integrity *bi =3D &rq->q->limits.integrity;
--	const int tuple_sz =3D bi->metadata_size;
--	u64 ref_tag =3D ext_pi_ref_tag(rq);
--	u8 offset =3D bi->pi_offset;
--	struct bio *bio;
-+	switch (iter->bi->csum_type) {
-+	case BLK_INTEGRITY_CSUM_CRC64:
-+		return ext_pi_crc64_verify(iter, &tuple->crc64_pi);
-+	case BLK_INTEGRITY_CSUM_CRC:
-+	case BLK_INTEGRITY_CSUM_IP:
-+		return t10_pi_verify(iter, &tuple->t10_pi);
-+	default:
-+		return BLK_STS_OK;
-+	}
-+}
-=20
--	__rq_for_each_bio(bio, rq) {
--		struct bio_integrity_payload *bip =3D bio_integrity(bio);
--		u64 virt =3D lower_48_bits(bip_get_seed(bip));
--		struct bio_vec iv;
--		struct bvec_iter iter;
-+static void blk_integrity_set(struct blk_integrity_iter *iter,
-+			      union pi_tuple *tuple)
-+{
-+	switch (iter->bi->csum_type) {
-+	case BLK_INTEGRITY_CSUM_CRC64:
-+		return blk_set_ext_pi(&tuple->crc64_pi, iter);
-+	case BLK_INTEGRITY_CSUM_CRC:
-+		return blk_set_t10_pi(&tuple->t10_pi, iter);
-+	case BLK_INTEGRITY_CSUM_IP:
-+		return blk_set_ip_pi(&tuple->t10_pi, iter);
-+	default:
-+		WARN_ON_ONCE(1);
-+		return;
-+	}
-+}
-=20
--		/* Already remapped? */
--		if (bip->bip_flags & BIP_MAPPED_INTEGRITY)
--			break;
-+static blk_status_t blk_integrity_interval(struct blk_integrity_iter *it=
-er,
-+					   bool verify)
-+{
-+	blk_status_t ret =3D BLK_STS_OK;
-+	union pi_tuple tuple;
-+	void *ptuple =3D &tuple;
-+	struct bio_vec pbv;
-+
-+	blk_integrity_crc_offset(iter);
-+	pbv =3D mp_bvec_iter_bvec(iter->bip->bip_vec, iter->prot_iter);
-+	if (pbv.bv_len >=3D iter->bi->pi_tuple_size) {
-+		ptuple =3D bvec_kmap_local(&pbv);
-+		bvec_iter_advance_single(iter->bip->bip_vec, &iter->prot_iter,
-+				iter->bi->metadata_size - iter->bi->pi_offset);
-+	} else if (verify) {
-+		blk_integrity_copy_to_tuple(iter->bip, &iter->prot_iter,
-+				ptuple, iter->bi->pi_tuple_size);
-+	}
-=20
--		bip_for_each_vec(iv, bip, iter) {
--			unsigned int j;
--			void *p;
--
--			p =3D bvec_kmap_local(&iv);
--			for (j =3D 0; j < iv.bv_len; j +=3D tuple_sz) {
--				struct crc64_pi_tuple *pi =3D p +  offset;
--				u64 ref =3D get_unaligned_be48(pi->ref_tag);
--
--				if (ref =3D=3D virt)
--					put_unaligned_be48(ref_tag, pi->ref_tag);
--				virt++;
--				ref_tag++;
--				p +=3D tuple_sz;
--			}
--			kunmap_local(p);
--		}
-+	if (verify)
-+		ret =3D blk_integrity_verify(iter, ptuple);
-+	else
-+		blk_integrity_set(iter, ptuple);
-=20
--		bip->bip_flags |=3D BIP_MAPPED_INTEGRITY;
-+	if (likely(ptuple !=3D &tuple)) {
-+		kunmap_local(ptuple);
-+	} else if (!verify) {
-+		blk_integrity_copy_from_tuple(iter->bip, &iter->prot_iter,
-+				ptuple, iter->bi->pi_tuple_size);
- 	}
-+
-+
-+	iter->interval_remaining =3D 1 << iter->bi->interval_exp;
-+	iter->crc =3D 0;
-+	iter->seed++;
-+
-+	return ret;
- }
-=20
--static void ext_pi_type1_complete(struct request *rq, unsigned int nr_by=
-tes)
-+static void blk_integrity_iterate(struct bio *bio, struct bvec_iter *dat=
-a_iter,
-+				  bool verify)
- {
--	struct blk_integrity *bi =3D &rq->q->limits.integrity;
--	unsigned intervals =3D nr_bytes >> bi->interval_exp;
--	const int tuple_sz =3D bi->metadata_size;
--	u64 ref_tag =3D ext_pi_ref_tag(rq);
--	u8 offset =3D bi->pi_offset;
--	struct bio *bio;
--
--	__rq_for_each_bio(bio, rq) {
--		struct bio_integrity_payload *bip =3D bio_integrity(bio);
--		u64 virt =3D lower_48_bits(bip_get_seed(bip));
--		struct bio_vec iv;
--		struct bvec_iter iter;
--
--		bip_for_each_vec(iv, bip, iter) {
--			unsigned int j;
--			void *p;
--
--			p =3D bvec_kmap_local(&iv);
--			for (j =3D 0; j < iv.bv_len && intervals; j +=3D tuple_sz) {
--				struct crc64_pi_tuple *pi =3D p + offset;
--				u64 ref =3D get_unaligned_be48(pi->ref_tag);
--
--				if (ref =3D=3D ref_tag)
--					put_unaligned_be48(virt, pi->ref_tag);
--				virt++;
--				ref_tag++;
--				intervals--;
--				p +=3D tuple_sz;
--			}
--			kunmap_local(p);
-+	struct blk_integrity *bi =3D blk_get_integrity(bio->bi_bdev->bd_disk);
-+	struct bio_integrity_payload *bip =3D bio_integrity(bio);
-+	struct blk_integrity_iter iter =3D {
-+		.bio =3D bio,
-+		.bip =3D bip,
-+		.bi =3D bi,
-+		.data_iter =3D *data_iter,
-+		.prot_iter =3D bip->bip_iter,
-+		.interval_remaining =3D 1 << bi->interval_exp,
-+		.seed =3D data_iter->bi_sector,
-+		.crc =3D 0,
-+	};
-+	blk_status_t ret =3D BLK_STS_OK;
-+
-+	while (iter.data_iter.bi_size && ret =3D=3D BLK_STS_OK) {
-+		struct bio_vec bv =3D mp_bvec_iter_bvec(iter.bio->bi_io_vec,
-+						      iter.data_iter);
-+		void *kaddr =3D bvec_kmap_local(&bv);
-+		void *data =3D kaddr;
-+		unsigned int len;
-+
-+		bvec_iter_advance_single(iter.bio->bi_io_vec, &iter.data_iter,
-+					 bv.bv_len);
-+		while (bv.bv_len && ret =3D=3D BLK_STS_OK) {
-+			len =3D min(iter.interval_remaining, bv.bv_len);
-+			blk_crc(&iter, data, len);
-+			bv.bv_len -=3D len;
-+			data +=3D len;
-+			iter.interval_remaining -=3D len;
-+			if (!iter.interval_remaining)
-+				ret =3D blk_integrity_interval(&iter, verify);
- 		}
-+		kunmap_local(kaddr);
- 	}
-+
-+	if (ret)
-+		bio->bi_status =3D ret;
- }
-=20
- void blk_integrity_generate(struct bio *bio)
- {
- 	struct blk_integrity *bi =3D blk_get_integrity(bio->bi_bdev->bd_disk);
--	struct bio_integrity_payload *bip =3D bio_integrity(bio);
--	struct blk_integrity_iter iter;
--	struct bvec_iter bviter;
--	struct bio_vec bv;
--
--	iter.disk_name =3D bio->bi_bdev->bd_disk->disk_name;
--	iter.interval =3D 1 << bi->interval_exp;
--	iter.seed =3D bio->bi_iter.bi_sector;
--	iter.prot_buf =3D bvec_virt(bip->bip_vec);
--	bio_for_each_segment(bv, bio, bviter) {
--		void *kaddr =3D bvec_kmap_local(&bv);
-=20
--		iter.data_buf =3D kaddr;
--		iter.data_size =3D bv.bv_len;
--		switch (bi->csum_type) {
--		case BLK_INTEGRITY_CSUM_CRC64:
--			ext_pi_crc64_generate(&iter, bi);
--			break;
--		case BLK_INTEGRITY_CSUM_CRC:
--		case BLK_INTEGRITY_CSUM_IP:
--			t10_pi_generate(&iter, bi);
--			break;
--		default:
--			break;
--		}
--		kunmap_local(kaddr);
-+	switch (bi->csum_type) {
-+	case BLK_INTEGRITY_CSUM_CRC64:
-+	case BLK_INTEGRITY_CSUM_CRC:
-+	case BLK_INTEGRITY_CSUM_IP:
-+		blk_integrity_iterate(bio, &bio->bi_iter, false);
-+		break;
-+	default:
-+		break;
- 	}
- }
-=20
- void blk_integrity_verify_iter(struct bio *bio, struct bvec_iter *saved_=
-iter)
- {
- 	struct blk_integrity *bi =3D blk_get_integrity(bio->bi_bdev->bd_disk);
--	struct bio_integrity_payload *bip =3D bio_integrity(bio);
--	struct blk_integrity_iter iter;
--	struct bvec_iter bviter;
--	struct bio_vec bv;
-+
-+	switch (bi->csum_type) {
-+	case BLK_INTEGRITY_CSUM_CRC64:
-+	case BLK_INTEGRITY_CSUM_CRC:
-+	case BLK_INTEGRITY_CSUM_IP:
-+		blk_integrity_iterate(bio, saved_iter, true);
-+		break;
-+	default:
-+		break;
-+	}
-+}
-+
-+/*
-+ * Advance @iter past the protection offset for protection formats that
-+ * contain front padding on the metadata region.
-+ */
-+static void blk_pi_advance_offset(struct blk_integrity *bi,
-+				  struct bio_integrity_payload *bip,
-+				  struct bvec_iter *iter)
-+{
-+	unsigned int offset =3D bi->pi_offset;
-+
-+	while (offset > 0) {
-+		struct bio_vec bv =3D mp_bvec_iter_bvec(bip->bip_vec, *iter);
-+		unsigned int len =3D min(bv.bv_len, offset);
-+
-+		bvec_iter_advance_single(bip->bip_vec, iter, len);
-+		offset -=3D len;
-+	}
-+}
-+
-+static void *blk_tuple_remap_begin(union pi_tuple *tuple,
-+				   struct blk_integrity *bi,
-+				   struct bio_integrity_payload *bip,
-+				   struct bvec_iter *iter)
-+{
-+	struct bvec_iter titer;
-+	struct bio_vec pbv;
-+
-+	blk_pi_advance_offset(bi, bip, iter);
-+	pbv =3D mp_bvec_iter_bvec(bip->bip_vec, *iter);
-+	if (likely(pbv.bv_len >=3D bi->pi_tuple_size))
-+		return bvec_kmap_local(&pbv);
-=20
- 	/*
--	 * At the moment verify is called bi_iter has been advanced during spli=
-t
--	 * and completion, so use the copy created during submission here.
-+	 * We need to preserve the state of the original iter for the
-+	 * copy_from_tuple at the end, so make a temp iter for here.
- 	 */
--	iter.disk_name =3D bio->bi_bdev->bd_disk->disk_name;
--	iter.interval =3D 1 << bi->interval_exp;
--	iter.seed =3D saved_iter->bi_sector;
--	iter.prot_buf =3D bvec_virt(bip->bip_vec);
--	__bio_for_each_segment(bv, bio, bviter, *saved_iter) {
--		void *kaddr =3D bvec_kmap_local(&bv);
--		blk_status_t ret =3D BLK_STS_OK;
-+	titer =3D *iter;
-+	blk_integrity_copy_to_tuple(bip, &titer, tuple, bi->pi_tuple_size);
-+	return tuple;
-+}
-=20
--		iter.data_buf =3D kaddr;
--		iter.data_size =3D bv.bv_len;
--		switch (bi->csum_type) {
--		case BLK_INTEGRITY_CSUM_CRC64:
--			ret =3D ext_pi_crc64_verify(&iter, bi);
--			break;
--		case BLK_INTEGRITY_CSUM_CRC:
--		case BLK_INTEGRITY_CSUM_IP:
--			ret =3D t10_pi_verify(&iter, bi);
--			break;
--		default:
--			break;
--		}
--		kunmap_local(kaddr);
-+static void blk_tuple_remap_end(union pi_tuple *tuple, void *ptuple,
-+				struct blk_integrity *bi,
-+				struct bio_integrity_payload *bip,
-+				struct bvec_iter *iter)
-+{
-+	unsigned int len =3D bi->metadata_size - bi->pi_offset;
-+
-+	if (likely(ptuple !=3D tuple)) {
-+		kunmap_local(ptuple);
-+	} else {
-+		blk_integrity_copy_from_tuple(bip, iter, ptuple,
-+				bi->pi_tuple_size);
-+		len -=3D bi->pi_tuple_size;
-+	}
-=20
--		if (ret) {
--			bio->bi_status =3D ret;
--			return;
--		}
-+	bvec_iter_advance(bip->bip_vec, iter, len);
-+}
-+
-+static void blk_set_ext_unmap_ref(struct crc64_pi_tuple *pi, u64 virt,
-+				  u64 ref_tag)
-+{
-+	u64 ref =3D get_unaligned_be48(&pi->ref_tag);
-+
-+	if (ref =3D=3D lower_48_bits(ref_tag) && ref !=3D lower_48_bits(virt))
-+		put_unaligned_be48(virt, pi->ref_tag);
-+}
-+
-+static void blk_set_t10_unmap_ref(struct t10_pi_tuple *pi, u32 virt,
-+				  u32 ref_tag)
-+{
-+	u32 ref =3D get_unaligned_be32(&pi->ref_tag);
-+
-+	if (ref =3D=3D ref_tag && ref !=3D virt)
-+		put_unaligned_be32(virt, &pi->ref_tag);
-+}
-+
-+static void blk_reftag_remap_complete(struct blk_integrity *bi,
-+				      union pi_tuple *tuple, u64 virt, u64 ref)
-+{
-+	switch (bi->csum_type) {
-+	case BLK_INTEGRITY_CSUM_CRC64:
-+		blk_set_ext_unmap_ref(&tuple->crc64_pi, virt, ref);
-+		break;
-+	case BLK_INTEGRITY_CSUM_CRC:
-+	case BLK_INTEGRITY_CSUM_IP:
-+		blk_set_t10_unmap_ref(&tuple->t10_pi, virt, ref);
-+		break;
-+	default:
-+		WARN_ON_ONCE(1);
-+		break;
- 	}
- }
-=20
--void blk_integrity_prepare(struct request *rq)
-+static void blk_set_ext_map_ref(struct crc64_pi_tuple *pi, u64 virt,
-+				u64 ref_tag)
- {
--	struct blk_integrity *bi =3D &rq->q->limits.integrity;
-+	u64 ref =3D get_unaligned_be48(&pi->ref_tag);
-=20
--	if (!(bi->flags & BLK_INTEGRITY_REF_TAG))
-+	if (ref =3D=3D lower_48_bits(virt) && ref !=3D ref_tag)
-+		put_unaligned_be48(ref_tag, pi->ref_tag);
-+}
-+
-+static void blk_set_t10_map_ref(struct t10_pi_tuple *pi, u32 virt, u32 r=
-ef_tag)
-+{
-+	u32 ref =3D get_unaligned_be32(&pi->ref_tag);
-+
-+	if (ref =3D=3D virt && ref !=3D ref_tag)
-+		put_unaligned_be32(ref_tag, &pi->ref_tag);
-+}
-+
-+static void blk_reftag_remap_prepare(struct blk_integrity *bi,
-+				     union pi_tuple *tuple,
-+				     u64 virt, u64 ref)
-+{
-+	switch (bi->csum_type) {
-+	case BLK_INTEGRITY_CSUM_CRC64:
-+		blk_set_ext_map_ref(&tuple->crc64_pi, virt, ref);
-+		break;
-+	case BLK_INTEGRITY_CSUM_CRC:
-+	case BLK_INTEGRITY_CSUM_IP:
-+		blk_set_t10_map_ref(&tuple->t10_pi, virt, ref);
-+		break;
-+	default:
-+		WARN_ON_ONCE(1);
-+		break;
-+	}
-+}
-+
-+static void __blk_reftag_remap(struct bio *bio, struct blk_integrity *bi=
-,
-+			       unsigned *intervals, u64 *ref, bool prep)
-+{
-+	struct bio_integrity_payload *bip =3D bio_integrity(bio);
-+	struct bvec_iter iter =3D bip->bip_iter;
-+	u64 virt =3D bip_get_seed(bip);
-+	union pi_tuple tuple;
-+	union pi_tuple *ptuple;
-+
-+	if (prep && bip->bip_flags & BIP_MAPPED_INTEGRITY) {
-+		*ref +=3D bio->bi_iter.bi_size >> bi->interval_exp;
- 		return;
-+	}
-=20
--	if (bi->csum_type =3D=3D BLK_INTEGRITY_CSUM_CRC64)
--		ext_pi_type1_prepare(rq);
--	else
--		t10_pi_type1_prepare(rq);
-+	while (iter.bi_size && *intervals) {
-+		ptuple =3D blk_tuple_remap_begin(&tuple, bi, bip, &iter);
-+
-+		if (prep)
-+			blk_reftag_remap_prepare(bi, ptuple, virt, *ref);
-+		else
-+			blk_reftag_remap_complete(bi, ptuple, virt, *ref);
-+
-+		blk_tuple_remap_end(&tuple, ptuple, bi, bip, &iter);
-+		(*intervals)--;
-+		(*ref)++;
-+		virt++;
-+	}
-+
-+	if (prep)
-+		bip->bip_flags |=3D BIP_MAPPED_INTEGRITY;
- }
-=20
--void blk_integrity_complete(struct request *rq, unsigned int nr_bytes)
-+static void blk_integrity_remap(struct request *rq, unsigned int nr_byte=
-s,
-+				bool prep)
- {
- 	struct blk_integrity *bi =3D &rq->q->limits.integrity;
-+	u64 ref =3D blk_rq_pos(rq) >> (bi->interval_exp - SECTOR_SHIFT);
-+	unsigned intervals =3D nr_bytes >> bi->interval_exp;
-+	struct bio *bio;
-=20
- 	if (!(bi->flags & BLK_INTEGRITY_REF_TAG))
- 		return;
-=20
--	if (bi->csum_type =3D=3D BLK_INTEGRITY_CSUM_CRC64)
--		ext_pi_type1_complete(rq, nr_bytes);
--	else
--		t10_pi_type1_complete(rq, nr_bytes);
-+	__rq_for_each_bio(bio, rq) {
-+		__blk_reftag_remap(bio, bi, &intervals, &ref, prep);
-+		if (!intervals)
-+			break;
-+	}
-+}
-+
-+void blk_integrity_prepare(struct request *rq)
-+{
-+	blk_integrity_remap(rq, blk_rq_bytes(rq), true);
-+}
-+
-+void blk_integrity_complete(struct request *rq, unsigned int nr_bytes)
-+{
-+	blk_integrity_remap(rq, nr_bytes, false);
- }
---=20
-2.47.3
+   patch description and added the function blk_no_zone_write_lock().
+ - In patch "block/mq-deadline: Only use zone locking if necessary", move=
+d the
+   blk_queue_is_zoned() call into dd_use_write_locking().
+ - In patch "fs/f2fs: Disable zone write locking", set REQ_NO_ZONE_WRITE_=
+LOCK
+   from inside __bio_alloc() instead of in f2fs_submit_write_bio().
+
+Changes compared to v2:
+ - Renamed the request queue flag for disabling zone write locking.
+ - Introduced a new request flag for disabling zone write locking.
+ - Modified the mq-deadline scheduler such that zone write locking is onl=
+y
+   disabled if both flags are set.
+ - Added an F2FS patch that sets the request flag for disabling zone writ=
+e
+   locking.
+ - Only disable zone write locking in the UFS driver if auto-hibernation =
+is
+   disabled.
+
+Changes compared to v1:
+ - Left out the patches that are already upstream.
+ - Switched the approach in patch "scsi: Retry unaligned zoned writes" fr=
+om
+   retrying immediately to sending unaligne
+
+Bart Van Assche (17):
+  block: Support block devices that preserve the order of write requests
+  blk-mq: Always insert sequential zoned writes into a software queue
+  blk-mq: Restore the zone write order when requeuing
+  blk-mq: Serialize dispatching for zoned write pipelining
+  blk-zoned: Fix a typo in a source code comment
+  blk-zoned: Add an argument to blk_zone_plug_bio()
+  blk-zoned: Split an if-statement
+  blk-zoned: Move code from disk_zone_wplug_add_bio() into its caller
+  blk-zoned: Introduce a loop in blk_zone_wplug_bio_work()
+  blk-zoned: Document disk_zone_wplug_schedule_bio_work() locking
+  blk-zoned: Support pipelining of zoned writes
+  null_blk: Add the preserves_write_order attribute
+  scsi: core: Retry unaligned zoned writes
+  scsi: sd: Increase retry count for zoned writes
+  scsi: scsi_debug: Add the preserves_write_order module parameter
+  scsi: scsi_debug: Support injecting unaligned write errors
+  ufs: core: Inform the block layer about write ordering
+
+ block/bfq-iosched.c               |   2 +
+ block/blk-mq.c                    |  79 +++++++++---
+ block/blk-mq.h                    |  38 ++++++
+ block/blk-settings.c              |   2 +
+ block/blk-zoned.c                 | 203 +++++++++++++++++++-----------
+ block/kyber-iosched.c             |   2 +
+ block/mq-deadline.c               |   7 +-
+ drivers/block/null_blk/main.c     |   4 +
+ drivers/block/null_blk/null_blk.h |   1 +
+ drivers/md/dm.c                   |   5 +-
+ drivers/scsi/scsi_debug.c         |  22 +++-
+ drivers/scsi/scsi_error.c         |  16 +++
+ drivers/scsi/sd.c                 |   6 +
+ drivers/ufs/core/ufshcd.c         |   7 ++
+ include/linux/blk-mq.h            |  19 ++-
+ include/linux/blkdev.h            |  28 ++++-
+ 16 files changed, 348 insertions(+), 93 deletions(-)
 
