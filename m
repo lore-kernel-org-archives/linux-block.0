@@ -1,158 +1,104 @@
-Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31DC525C810;
-	Fri,  7 Nov 2025 16:19:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A7C5286408
+	for <linux-block@vger.kernel.org>; Fri,  7 Nov 2025 16:28:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762532360; cv=none; b=IIhK6GdrfeU9jmAeuLvGxQ43DJikTiaWNRcupUKq8zpF0NHP4PzhwWSu8mQMbL0F8ffJtKM60Oauo5Y9OOEziJ+RrUyAVKNoqHFK/qWYtzdw4p+L9RmAfCIuQ+n0ozUrxNVW699LF6xk1THj5x5pd2DMhtjbZ0+x24JvLpUC8PU=
+	t=1762532915; cv=none; b=cuZ+DqFFjC4tEidqw+qFew2mqjpmKbW0OUWT1MfvviZJfdzqq9TdrcFunWgltE9l+6F2mMT4A8j53GvdTroS0oMyk0oYk+2Wks25By1L9yOonmVnzemI3Q6xbmRQXlalt4qRioYFqgr2lSo4k9aZu5Qd5VPiyNhD4MbHTyQSwas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762532360; c=relaxed/simple;
-	bh=WbRX7mezc1hkSGv/O3eHZdEH+UlazBmlAxDE8/oSk84=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RGa9NmYQhfC6Duqm8Cd4kQGEU2F5M5Drh6uMRLJzTvZlpj5vp00qUfVcjH+ljoG7lVpa/FeNZSlEuFl8bdrEqKx89V85tdaZZIazMWBk6KsS/FLuP4OQzEVk6gGHfAUPUWRXhqxqkP9ZKYADzLapH5ZGku3IvwvqQ2rNnnkkQ0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=Hj0+XCX6; arc=none smtp.client-ip=199.89.3.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1762532915; c=relaxed/simple;
+	bh=GU9i+cSHYeAmfgu5QgUvOaQ/EYfB9seYknc41Y1q2Xk=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=pXDijd5xY1QUolPnoyeaCZXsWJs8od+OaMsUp/SWE4kno7DurhfzCUveRn4F9fZlwCR+Bs8tO2xLdIPMEdr8MIYkhzLvVlkbbgJKQch3Bz4KcGEEP3IG79gNuvbrK1nwHiC2CJnZURNItNoQafCaavhaIdLrtIh97xiLreHWEVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=mJdQfiwM; arc=none smtp.client-ip=209.85.160.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="Hj0+XCX6"
-Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4d344w3L2ZzlgqV6;
-	Fri,  7 Nov 2025 16:19:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1762532348; x=1765124349; bh=jbhPWfJ0xDnjiVPuOPTte/So
-	5DeOuewRoHeum+5O9+c=; b=Hj0+XCX6K9hpi/dv7rjOs/7RqfSJcus3Mfq515Zp
-	3HXoEHWddqwaK5H9Jkn8KT1lb5sh8NyvYufKasQAXyCE9ElxzPtZI2DMdv+hQoms
-	q2RV89lh6YfeMc2Pz8jdaduQgy92MFNvyG7GrqUqBKfZd6pf9pJB3vbtM7lmdNke
-	RwZtlbXBotlsEYrtpcICA1l0A4/7M5XMK1xHQBg5M9U0gFoyUOXzdiqqZ/z2mcMz
-	TGqVQBOqrT0f5aT5Xkv5AgvismJUrZ0eL5hX52InwVsgkKcozA6C36xYXH9CyxQU
-	GymF5cTL8DUoYJID6GIPAHhDYbiiovLY0IouximsZBRqDQ==
-X-Virus-Scanned: by MailRoute
-Received: from 003.mia.mailroute.net ([127.0.0.1])
- by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id JogAQFbsZk9F; Fri,  7 Nov 2025 16:19:08 +0000 (UTC)
-Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4d344f2KNXzlgqTx;
-	Fri,  7 Nov 2025 16:18:56 +0000 (UTC)
-Message-ID: <e7c3d79e-6557-4497-973b-5038f9f35958@acm.org>
-Date: Fri, 7 Nov 2025 08:18:55 -0800
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="mJdQfiwM"
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4ed8e22689dso5798641cf.1
+        for <linux-block@vger.kernel.org>; Fri, 07 Nov 2025 08:28:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1762532910; x=1763137710; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6P14HrSOAwtoffAEwKkFFjJLaLN+ZlqobXY/qFUNR2g=;
+        b=mJdQfiwM3nfs+ZmeNTML3oaVToDLYS1gcefbhJ4fx6h6fGCbVusj0gcjPoq3AMxCI1
+         DpPqJYX2eZpfdKKywIpyLCXJ7nauqJxnSJZYqJrk3C7/ayzOiTcy8T+XqMBwfXy44My6
+         VK2tOPC/5ygt2vpPPHA6TtBsjprAFalasT7ycs6Waq9Ge/TTY/6TprHF2+zvxT7N911v
+         oK9YQNB/Lw30sZbp5i9vLK3nHBLgPodZnPUjMgCVvvtKe5koQlt2HTURF/xwOhkkNBBj
+         jwlGHijwFq7lTCDT/0iy+486D06uvTK6d0RhChB45tIegpFfuGuJtus5cyIOBvVodq1t
+         n1Sw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762532910; x=1763137710;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=6P14HrSOAwtoffAEwKkFFjJLaLN+ZlqobXY/qFUNR2g=;
+        b=KHja6kdIXFUR0R1L1RwaDDOI1xSaTJTujQpbD3GIhE9+wFBXTktZH97Ou2RbngVk8Y
+         Dn0gUJci3QMjRGrwSR0E8QeYuga3663wZAvCK8bwfx/60frJ8NFS5YMC7YJTDG9/BOOI
+         HvRS+dxjQo5qU4wq9FadwHRHTVG7ktoWbplTNdT+uCMK0xek5QT03/1+M5AKBo4N/Srv
+         Vxyccor11wKR2AP/0T6PWn8XPgeA+eOQxnA0yCzq9FYKemiDGxmbOaPLiTo+8aZDSC45
+         76S5ekRS4rq35R9BYEyhpf4NEgJF+g5v9rXE09jQx/B9Oh5NKhed7beZqUKBDh7t2x7v
+         Aqbw==
+X-Gm-Message-State: AOJu0YwsfWXdvHTo5jHCCsONjoQIeW7PO/DurjjDU4ouTiVB79XqkIr3
+	J0giyzckEVhl/I6821g6zwi6eo6ZamKVSB+TAsQJ4uFOZjIummrPzBCoaGByIywoP1M=
+X-Gm-Gg: ASbGncsultLFPjhuPD23od0boAFs5t36ERhnvSFaNgjzn7ktEaCNR9A6yRxsIP46hKp
+	ft7qLmhqLoiJ6aFoI0UJo4XAbuQCpepuGMlVCztNRDKBVpeSr1goYQjxbsbCZYwc8k9vH4qe5KF
+	UY1sHJOZ9UJr65yqDONh89w+bC7DTKtMd5Clxa+CsfTIM1tZsiJl+30D10Ck2o8z/le4oxCUsmK
+	GY7SnkIdsMj/DOfxDcfg8qJI/mcidNkwf56ywejJ5FtAcefw1u2IJ6FH1OkwGQy9lm3hvGmOLSV
+	5sL80IpSPSFotxPUqZyYRtC8xf0ltP5Fbz0L2z/CeasLQewc4u/zveWTVV5qirGe6PG6jmF7+LN
+	O7vDRWsEopfR7VIFAMFNBj8FIB9kOs34oloSUMLORylDtQhBCeBMUFfw1TEO1CHQ4u7jRrLy+p1
+	2IdFc9LcU=
+X-Google-Smtp-Source: AGHT+IHZazYd2NvyUtFipfvLburkKBnoPfQ/XZtRCCSd2tkD1A94ImezLGmro8U7f0hJ0367J0nhiQ==
+X-Received: by 2002:a05:622a:14d1:b0:4eb:a10c:de05 with SMTP id d75a77b69052e-4ed94a66ae5mr39495061cf.55.1762532909587;
+        Fri, 07 Nov 2025 08:28:29 -0800 (PST)
+Received: from [127.0.0.1] ([2600:380:1841:97f9:e336:e121:5b93:f02e])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ed8131b371sm42119581cf.8.2025.11.07.08.28.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Nov 2025 08:28:28 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Damien Le Moal <dlemoal@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>
+In-Reply-To: <20251107063844.151103-1-dlemoal@kernel.org>
+References: <20251107063844.151103-1-dlemoal@kernel.org>
+Subject: Re: [PATCH v2 0/3] Zone related cleanups
+Message-Id: <176253290817.22541.15432277161231584094.b4-ty@kernel.dk>
+Date: Fri, 07 Nov 2025 09:28:28 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4] block: Remove queue freezing from several sysfs store
- callbacks
-To: Nilay Shroff <nilay@linux.ibm.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Ming Lei <ming.lei@redhat.com>, Martin Wilck <mwilck@suse.com>,
- Benjamin Marzinski <bmarzins@redhat.com>, stable@vger.kernel.org,
- Chaitanya Kulkarni <kch@nvidia.com>, Hannes Reinecke <hare@suse.de>,
- Damien Le Moal <dlemoal@kernel.org>
-References: <20251105170534.2989596-1-bvanassche@acm.org>
- <b556d704-dc3b-4e6c-a158-69fb5b377dac@linux.ibm.com>
- <7f2d2486-6b74-4ed1-81c8-2aa584cfe264@acm.org>
- <096323ad-529b-4b5c-a966-ff7cd6315ecc@linux.ibm.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <096323ad-529b-4b5c-a966-ff7cd6315ecc@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3
 
-On 11/7/25 2:41 AM, Nilay Shroff wrote:
-> On 11/7/25 2:19 AM, Bart Van Assche wrote:
->> On 11/6/25 5:01 AM, Nilay Shroff wrote:
->>>> @@ -154,10 +153,8 @@ queue_ra_store(struct gendisk *disk, const char=
- *page, size_t count)
->>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * calculated from the queue li=
-mits by queue_limits_commit_update.
->>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
->>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mutex_lock(&q->limits_lock);
->>>> -=C2=A0=C2=A0=C2=A0 memflags =3D blk_mq_freeze_queue(q);
->>>> -=C2=A0=C2=A0=C2=A0 disk->bdi->ra_pages =3D ra_kb >> (PAGE_SHIFT - 1=
-0);
->>>> +=C2=A0=C2=A0=C2=A0 data_race(disk->bdi->ra_pages =3D ra_kb >> (PAGE=
-_SHIFT - 10));
->>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mutex_unlock(&q->limits_lock);
->>>> -=C2=A0=C2=A0=C2=A0 blk_mq_unfreeze_queue(q, memflags);
->>>>  =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return ret;
->>>>  =C2=A0 }
->>>
->>> I think we don't need data_race() here as disk->bdi->ra_pages is alre=
-ady
->>> protected by ->limits_lock. Furthermore, while you're at it, I=E2=80=99=
-d suggest
->>> protecting the set/get access of ->ra_pages using ->limits_lock when =
-it=E2=80=99s
->>> invoked from the ioctl context (BLKRASET/BLKRAGET).
->>
->> I think that we really need the data_race() annotation here because
->> there is plenty of code that reads ra_pages without using any locking.
->=20
-> I believe, in that case we need to annotate both reader and writer, usi=
-ng
-> data_race(). Annotating only writer but not reader would not help suppr=
-ess
-> KCSAN reports of a data race.
 
-No. As the comment above the data_race() macro explains, the data_race()
-macro makes memory accesses invisible to KCSAN. Hence, annotating
-writers only with data_race() is sufficient.
->>>> @@ -480,9 +468,7 @@ static ssize_t queue_io_timeout_store(struct gen=
-disk *disk, const char *page,
->>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (err || val =3D=3D 0)
->>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -EINV=
-AL;
->>>>  =C2=A0 -=C2=A0=C2=A0=C2=A0 memflags =3D blk_mq_freeze_queue(q);
->>>> -=C2=A0=C2=A0=C2=A0 blk_queue_rq_timeout(q, msecs_to_jiffies(val));
->>>> -=C2=A0=C2=A0=C2=A0 blk_mq_unfreeze_queue(q, memflags);
->>>> +=C2=A0=C2=A0=C2=A0 data_race((blk_queue_rq_timeout(q, msecs_to_jiff=
-ies(val)), 0));
->>>>  =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return count;
->>>>  =C2=A0 }
->>>
->>> The use of data_race() above seems redundant, since the update to q->=
-rq_timeout
->>> is already marked with WRITE_ONCE(). However, the read access to q->r=
-q_timeout
->>> in a few places within the I/O hotpath is not marked and instead acce=
-ssed directly
->>> using plain C-language loads.
->>
->> That's an existing issue and an issue that falls outside the scope of =
-my
->> patch.
->>
-> Hmm, I don=E2=80=99t think this issue falls outside the scope of the cu=
-rrent patch.
-> Without this change, it would not be possible for queue_io_timeout_stor=
-e()
-> to run concurrently with the I/O hotpath and update q->rq_timeout while=
- it=E2=80=99s
-> being read. Since this patch removes queue freeze from queue_io_timeout=
-_store(),
-> it can now potentially execute concurrently with the I/O hotpath, which=
- could
-> then manifest the KCSAN-reported data race described above.
-Annotating all rq_timeout read accesses with READ_ONCE() would be
-cumbersome because there are plenty of direct rq_timeout accesses
-outside the block layer, e.g. in drivers/scsi/st.c (SCSI tape driver).
+On Fri, 07 Nov 2025 15:38:41 +0900, Damien Le Moal wrote:
+> 3 more patches to go on top of the cached report zone support (and its
+> fixes from Christoph)..
+> The first one improves blk_zone_wp_offset(), the second patch refactors
+> the use of this function to simplify the code a little. The last patch
+> introduces bdev_zone_start() as a replacement to using ALIGN_DOWN() for
+> getting the start sector of a zone.
+> 
+> [...]
 
-I prefer an alternative approach: annotate the q->rq_timeout update in
-blk_queue_rq_timeout() with both data_race() and WRITE_ONCE(). That
-guarantees that rq_timeout update happens once and prevents that KCSAN
-complains about rq_timeout reads.
+Applied, thanks!
 
-Thanks,
+[1/3] block: improve blk_zone_wp_offset()
+      commit: bbac6e0fa57f6624123edf20ba8f9b7c0e092117
+[2/3] block: refactor disk_zone_wplug_sync_wp_offset()
+      commit: e2b0ec776164c11569ee021fac89596a2642654c
+[3/3] block: introduce bdev_zone_start()
+      commit: 25976c314f6596254c9b1e2291d94393b7d5ae81
 
-Bart.
+Best regards,
+-- 
+Jens Axboe
+
+
 
