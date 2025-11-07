@@ -1,30 +1,63 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 678E72D97A1
-	for <linux-block@vger.kernel.org>; Fri,  7 Nov 2025 15:35:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA9AE1DE8AE;
+	Fri,  7 Nov 2025 16:01:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762529737; cv=none; b=ugBqZ1K5yFrlczYunXw+zOCCEZlbQjOk8e6d3PesK2u1SBZTs88AXhSxS3s5qJwtHBVN7fTq/NQwdIGjCSMCt6yML6PCn+eRqecEkluxwlZZyyJNMW0CFfiW1UZU6nCiqdsoD1JhM6SUj7oM0n5P8jdtikzpqwR08DR01otEb50=
+	t=1762531285; cv=none; b=X2o+jSgd/sEkieoSsHJLzPhtEZJslTg9vU1LCyApi0nN7B1kylXXrZ8DGo1QbrBpu1TWLBttzybEMyOcF8MmMvQBbQMqkkTHudXXTpme0M0U9l8Syy9o8rUKxxFlJ+KX/wYVeJHs+UMDC9cy/jtJlTOZxJ2X9h9r8Xuw1+w0Mlw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762529737; c=relaxed/simple;
-	bh=h56xRp6jHzq/pENHzzblIJgM27L2mQ9mf8rShySgEYk=;
+	s=arc-20240116; t=1762531285; c=relaxed/simple;
+	bh=SAXkSml11M5xQ5oAowfwGP1WfIbbhD9Zwsc1+gFtZVE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OHoRScx49uUfl8EurBKkIxtVoRa9HzbrxiD1j7mxn1z03zk2XCMKtWd79AzQp3nIAKNN+tSkP9eZfIif2kgwMIZqtr56SdirOzWmHrRAmwGE5yPbAALz3+1w1CnFN+MiyOCUlIjglAWm5SE7ab9RgO+n2vLjKSZdKDjhMGUf2YA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 9D9BD227A87; Fri,  7 Nov 2025 16:35:24 +0100 (CET)
-Date: Fri, 7 Nov 2025 16:35:24 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Keith Busch <kbusch@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@meta.com>,
-	linux-block@vger.kernel.org, axboe@kernel.dk,
-	martin.petersen@oracle.com
-Subject: Re: [PATCHv2] blk-integrity: support arbitrary buffer alignment
-Message-ID: <20251107153524.GA15737@lst.de>
-References: <20251107043447.3437347-1-kbusch@meta.com> <20251107131519.GA3975@lst.de> <aQ4JihZLWPrrgdCK@kbusch-mbp>
+	 Content-Type:Content-Disposition:In-Reply-To; b=gE5bBhg+qvsgoRdDnfV9IRjE9MFxMtgCa7aJ6jruVf1wiXM6knGj4pWj7db4h7VRxedWTkHsqJ8HDx+v61GFnJWcB5VidzFLNt6aIL0PER+l4gkoRPu6W16xFsoST5DW3QzpL8uMxANXyPq4oLSp6Jb+CqpZgpf4naH7//Q5Ngc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G1OqoxtV; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G1OqoxtV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C30C3C4CEF8;
+	Fri,  7 Nov 2025 16:01:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762531285;
+	bh=SAXkSml11M5xQ5oAowfwGP1WfIbbhD9Zwsc1+gFtZVE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=G1OqoxtV7XlT2wwuQ5Uez60kwG8g2e3K4oXYvr5lCUmDLnRe2lDqJfqpdyozZ9Kfs
+	 9cK/Pp4gs2exlM5ZaZgfE/mSts/OwwIwkCNUlopoOf55C/E/oCxFH4g1GkpuhBOQLc
+	 GevH4WEkQ/xUCsGWGMcEuw40zHNAV2BFJUHAJFbr5fa5pHtu6BKUEsKKzGsJoGHBVK
+	 LIruon02MTTCyGk7ziSVANwsf4TxGmKVozxHLsq3vvxJUR+H9wB9GZSvIotqrUV4ud
+	 cVhLCCIpj3frChH2BVoHb8jxb4jO/OzKabXV1PHaTXuqZVIniF59yBQsetybD1Wq21
+	 bF79hpL4xdXKw==
+Date: Fri, 7 Nov 2025 18:01:20 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>, Jens Axboe <axboe@kernel.dk>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <skolothumtho@nvidia.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex@shazbot.org>,
+	Krishnakant Jaju <kjaju@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
+	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, iommu@lists.linux.dev,
+	linux-mm@kvack.org, linux-doc@vger.kernel.org,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org, kvm@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v7 05/11] PCI/P2PDMA: Document DMABUF model
+Message-ID: <20251107160120.GD15456@unreal>
+References: <20251106-dmabuf-vfio-v7-0-2503bf390699@nvidia.com>
+ <20251106-dmabuf-vfio-v7-5-2503bf390699@nvidia.com>
+ <135df7eb-9291-428b-9c86-d58c2e19e052@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -33,12 +66,113 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aQ4JihZLWPrrgdCK@kbusch-mbp>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <135df7eb-9291-428b-9c86-d58c2e19e052@infradead.org>
 
-On Fri, Nov 07, 2025 at 08:00:26AM -0700, Keith Busch wrote:
-> Thanks! These all look good to me. If it's okay with you, I'll fold
-> these in and tag you for Co-developed-by.
+On Thu, Nov 06, 2025 at 10:15:07PM -0800, Randy Dunlap wrote:
+> 
+> 
+> On 11/6/25 6:16 AM, Leon Romanovsky wrote:
+> > From: Jason Gunthorpe <jgg@nvidia.com>
+> > 
+> > Reflect latest changes in p2p implementation to support DMABUF lifecycle.
+> > 
+> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> > ---
+> >  Documentation/driver-api/pci/p2pdma.rst | 95 +++++++++++++++++++++++++--------
+> >  1 file changed, 72 insertions(+), 23 deletions(-)
+> > 
+> > diff --git a/Documentation/driver-api/pci/p2pdma.rst b/Documentation/driver-api/pci/p2pdma.rst
+> > index d0b241628cf1..69adea45f73e 100644
+> > --- a/Documentation/driver-api/pci/p2pdma.rst
+> > +++ b/Documentation/driver-api/pci/p2pdma.rst
+> > @@ -9,22 +9,47 @@ between two devices on the bus. This type of transaction is henceforth
+> >  called Peer-to-Peer (or P2P). However, there are a number of issues that
+> >  make P2P transactions tricky to do in a perfectly safe way.
+> >  
+> > -One of the biggest issues is that PCI doesn't require forwarding
+> > -transactions between hierarchy domains, and in PCIe, each Root Port
+> > -defines a separate hierarchy domain. To make things worse, there is no
+> > -simple way to determine if a given Root Complex supports this or not.
+> > -(See PCIe r4.0, sec 1.3.1). Therefore, as of this writing, the kernel
+> > -only supports doing P2P when the endpoints involved are all behind the
+> > -same PCI bridge, as such devices are all in the same PCI hierarchy
+> > -domain, and the spec guarantees that all transactions within the
+> > -hierarchy will be routable, but it does not require routing
+> > -between hierarchies.
+> > -
+> > -The second issue is that to make use of existing interfaces in Linux,
+> > -memory that is used for P2P transactions needs to be backed by struct
+> > -pages. However, PCI BARs are not typically cache coherent so there are
+> > -a few corner case gotchas with these pages so developers need to
+> > -be careful about what they do with them.
+> > +For PCIe the routing of TLPs is well defined up until they reach a host bridge
+> 
+> Define what TLP means?
 
-Please fold them yes.  I don't think I need a Co-developed-by or any
-attribution for these trivial cleanups.
+In PCIe "world", TLP is very well-known and well-defined acronym, which
+means Transaction Layer Packet.
+
+>                                    well-defined
+
+Thanks
+
+diff --git a/Documentation/driver-api/pci/p2pdma.rst b/Documentation/driver-api/pci/p2pdma.rst
+index 69adea45f73e..7530296a5dea 100644
+--- a/Documentation/driver-api/pci/p2pdma.rst
++++ b/Documentation/driver-api/pci/p2pdma.rst
+@@ -9,17 +9,17 @@ between two devices on the bus. This type of transaction is henceforth
+ called Peer-to-Peer (or P2P). However, there are a number of issues that
+ make P2P transactions tricky to do in a perfectly safe way.
+
+-For PCIe the routing of TLPs is well defined up until they reach a host bridge
+-or root port. If the path includes PCIe switches then based on the ACS settings
+-the transaction can route entirely within the PCIe hierarchy and never reach the
+-root port. The kernel will evaluate the PCIe topology and always permit P2P
+-in these well defined cases.
++For PCIe the routing of Transaction Layer Packets (TLPs) is well-defined up
++until they reach a host bridge or root port. If the path includes PCIe switches
++then based on the ACS settings the transaction can route entirely within
++the PCIe hierarchy and never reach the root port. The kernel will evaluate
++the PCIe topology and always permit P2P in these well-defined cases.
+
+ However, if the P2P transaction reaches the host bridge then it might have to
+ hairpin back out the same root port, be routed inside the CPU SOC to another
+ PCIe root port, or routed internally to the SOC.
+
+-As this is not well defined or well supported in real HW the kernel defaults to
++As this is not well-defined or well supported in real HW the kernel defaults to
+ blocking such routing. There is an allow list to allow detecting known-good HW,
+ in which case P2P between any two PCIe devices will be permitted.
+
+@@ -39,7 +39,7 @@ delegates lifecycle management to the providing driver. It is expected that
+ drivers using this option will wrap their MMIO memory in DMABUF and use DMABUF
+ to provide an invalidation shutdown. These MMIO pages have no struct page, and
+ if used with mmap() must create special PTEs. As such there are very few
+-kernel uAPIs that can accept pointers to them, in particular they cannot be used
++kernel uAPIs that can accept pointers to them; in particular they cannot be used
+ with read()/write(), including O_DIRECT.
+
+ Building on this, the subsystem offers a layer to wrap the MMIO in a ZONE_DEVICE
+@@ -154,7 +154,7 @@ access happens.
+ Usage With DMABUF
+ =================
+
+-DMABUF provides an alternative to the above struct page based
++DMABUF provides an alternative to the above struct page-based
+ client/provider/orchestrator system. In this mode the exporting driver will wrap
+ some of its MMIO in a DMABUF and give the DMABUF FD to userspace.
+
+@@ -162,10 +162,10 @@ Userspace can then pass the FD to an importing driver which will ask the
+ exporting driver to map it.
+
+ In this case the initiator and target pci_devices are known and the P2P subsystem
+-is used to determine the mapping type. The phys_addr_t based DMA API is used to
++is used to determine the mapping type. The phys_addr_t-based DMA API is used to
+ establish the dma_addr_t.
+
+-Lifecycle is controlled by DMABUF move_notify(), when the exporting driver wants
++Lifecycle is controlled by DMABUF move_notify(). When the exporting driver wants
+ to remove() it must deliver an invalidation shutdown to all DMABUF importing
+ drivers through move_notify() and synchronously DMA unmap all the MMIO.
+
