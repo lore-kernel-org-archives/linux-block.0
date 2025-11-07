@@ -1,38 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEBC72FBE13
-	for <linux-block@vger.kernel.org>; Fri,  7 Nov 2025 06:42:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91AA92FCC16
+	for <linux-block@vger.kernel.org>; Fri,  7 Nov 2025 06:42:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762497758; cv=none; b=OsU5QaullH83B60VtvOc1oxe+/68sZV4DnUSWVCX4yDB4KSh/S20dR0e9AzEcszUMFWJDKUHxVl9BRICjn02IVSreVivL4j5k55oIs7OOil4Q6s6rnHWidOVLEY/jGGCyN72xVUOKMbRLOGlLZUSPV5o0kUccQlnJN6zkBxYYsU=
+	t=1762497758; cv=none; b=cPFZHacLeGVg423gjGIZAS3Y3KoMHk8ocQtsV7LSwquDp/tR4yguuNByCs8xo8r1TOM9xMF6tpm2F/1qQh3SB8lXC+8sdN7s7+kOQZJhtYNXdrep4cljPASbAMpiTaoMkfLLiNrRw22X5vdSAyFMyK/++frGwnC7ZIBBu0mlsYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1762497758; c=relaxed/simple;
-	bh=tXDqtEd0mS9opq0+1PMt7hZITC/DKkesbm1nfuE6F4s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KHti5BkShffJxwoBR29J5+xvuATPr6yH+NrzlY66J32whmHpG66ufDxGbww8QlBQmlvGWnRFqUL4X5Aju+AjNcMu9V9SZVWYMc2XfdxkSK8I7ce4ZdKmxkEZlADXnhHgITuBIzjWR3uAdPhIzvp0PU1NvOeDNz/E1KQAkeHHwBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l9PhHA7k; arc=none smtp.client-ip=10.30.226.201
+	bh=dILuvlTfHqJF3IaMGWVDhHa4iHHeWJGjL83Jk2wwFZA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=JT3swBE45LrEn1oOILUtffhOK4r5X4aqa5FlGz3dvngSJ4cxG7EHf2kL1umcwkbkJlrjUmiYa0c9wuRhjYyEkhfqYAnB2mkMxAgRa0zRc227Z2FHq0czBCaAZ3oQqp20mv/aTSwgW3+hksjTrE4uxwFzw69oMDBjcrXDWZ5kpjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M4/WYft0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l9PhHA7k"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D1D2C4CEF8;
-	Fri,  7 Nov 2025 06:42:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M4/WYft0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B957CC116C6;
+	Fri,  7 Nov 2025 06:42:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762497757;
-	bh=tXDqtEd0mS9opq0+1PMt7hZITC/DKkesbm1nfuE6F4s=;
-	h=From:To:Cc:Subject:Date:From;
-	b=l9PhHA7k4UbHyJsls3ykfYO4cW2H3hWH69sc06cMF9SXOn/hFZi8kKax343xiN+dW
-	 vr7a8uF/QgFcbGu5DNzl4bngBvS+GpVZltCLbK0AUyjL4HDYMokUl+ND8PStC7cfjW
-	 ISN/ETjcKYcOkqoDXUxnR5v/WqhDjPOWNDdYWtFTW+9yv1yvbyc2A17Ke7GpulPEDw
-	 b5FSEfeG+5C0Ynznkri6Fd7HMv8O2LJ56PBvyvp85WYLArDaLBffVpCzpPvuX1CDIG
-	 cCJmpVfm5daji2nXTyYNZoAtbr0jfvUMK3lmiJfbwLOH2OhsDMAsPn7CJ1rHZI4FNe
-	 qgUKW6zPUfC1A==
+	s=k20201202; t=1762497758;
+	bh=dILuvlTfHqJF3IaMGWVDhHa4iHHeWJGjL83Jk2wwFZA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=M4/WYft0OzAaXo6Pqs8EddxmxidTPgUK2YuoCaWPADnBK0UNVw3MFxGUEBhaMW7wJ
+	 ieZx/ZYxbIGoTBw4qhxLecQkU1iWpMXGrimw37VDbzmAjz0P0HN1ViFsNRTHKD1Z9w
+	 PWZaU+/ECZ0Q5LqGcel41TprkLpE8Sqth18SQRlHLFb4UWdSUorrZRKm7fodzx4clu
+	 qhAYQj1+Jza+AfQUsDtC3cjES0EVUw9kZzMVqn67+Ouj8Bjxs+qKzjaT7XOKoZS4OU
+	 Jm/Yeb9ep/wJwCw8fnpu+aUPQJYtiGaiiHM1kdMnzoTPfmEdIXKHJxUfFY5xcKsUpI
+	 kInduLg5y+AqQ==
 From: Damien Le Moal <dlemoal@kernel.org>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
 Cc: Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v2 0/3] Zone related cleanups
-Date: Fri,  7 Nov 2025 15:38:41 +0900
-Message-ID: <20251107063844.151103-1-dlemoal@kernel.org>
+Subject: [PATCH v2 1/3] block: improve blk_zone_wp_offset()
+Date: Fri,  7 Nov 2025 15:38:42 +0900
+Message-ID: <20251107063844.151103-2-dlemoal@kernel.org>
 X-Mailer: git-send-email 2.51.1
+In-Reply-To: <20251107063844.151103-1-dlemoal@kernel.org>
+References: <20251107063844.151103-1-dlemoal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -41,28 +44,49 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-3 more patches to go on top of the cached report zone support (and its
-fixes from Christoph)..
-The first one improves blk_zone_wp_offset(), the second patch refactors
-the use of this function to simplify the code a little. The last patch
-introduces bdev_zone_start() as a replacement to using ALIGN_DOWN() for
-getting the start sector of a zone.
+blk_zone_wp_offset() is always called with a struct blk_zone obtained
+from the device, that is, it will never see the BLK_ZONE_COND_ACTIVE
+condition. However, handling this condition makes this function more
+solid and will also avoid issues when propagating cached report requests
+to underlying stacked devices is implemented. Add BLK_ZONE_COND_ACTIVE
+as a new case in blk_zone_wp_offset() switch.
 
-Changes from v1:
- - Added patch 1
- - Changed patch 2 to not open code blk_zone_wp_offset() in
-   disk_zone_wplug_sync_wp_offset().
- - Added review tags to patch 3
+Also while at it, change the handling of the full condition to return
+UINT_MAX for the zone write pointer to reflect the fact that the write
+pointer of a full zone is invalid.
 
-Damien Le Moal (3):
-  block: improve blk_zone_wp_offset()
-  block: refactor disk_zone_wplug_sync_wp_offset()
-  block: introduce bdev_zone_start()
+Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+---
+ block/blk-zoned.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
- block/blk-zoned.c      | 39 +++++++++++++++++++--------------------
- include/linux/blkdev.h |  6 ++++++
- 2 files changed, 25 insertions(+), 20 deletions(-)
-
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index 8204214e3b89..7ce7b8ea5a4f 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -800,18 +800,18 @@ static unsigned int blk_zone_wp_offset(struct blk_zone *zone)
+ 	case BLK_ZONE_COND_IMP_OPEN:
+ 	case BLK_ZONE_COND_EXP_OPEN:
+ 	case BLK_ZONE_COND_CLOSED:
++	case BLK_ZONE_COND_ACTIVE:
+ 		return zone->wp - zone->start;
+-	case BLK_ZONE_COND_FULL:
+-		return zone->len;
+ 	case BLK_ZONE_COND_EMPTY:
+ 		return 0;
++	case BLK_ZONE_COND_FULL:
+ 	case BLK_ZONE_COND_NOT_WP:
+ 	case BLK_ZONE_COND_OFFLINE:
+ 	case BLK_ZONE_COND_READONLY:
+ 	default:
+ 		/*
+-		 * Conventional, offline and read-only zones do not have a valid
+-		 * write pointer.
++		 * Conventional, full, offline and read-only zones do not have
++		 * a valid write pointer.
+ 		 */
+ 		return UINT_MAX;
+ 	}
 -- 
 2.51.1
 
