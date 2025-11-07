@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 032842FD1B2
-	for <linux-block@vger.kernel.org>; Fri,  7 Nov 2025 06:42:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 000B92FD1B2
+	for <linux-block@vger.kernel.org>; Fri,  7 Nov 2025 06:42:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762497759; cv=none; b=lzNTVbxfIqtntyIkluNX7gOF7jxRRmi8g+y6nh23FE1lr0X6ylScBGVDm0QhttLQah8s7Rd7UnImF4epI47ADCk7kCT38pRnDvcuL7REcivuKQPwqtndp4xgiaX2n/bTugJP2xlGPH5Sy0NxLbWE4S5BiYovLtF/XteQy1J2AG4=
+	t=1762497760; cv=none; b=gP55j/3mOecll+arHCAjVbq2Cfrlyk9d7hpQVKl1XTXlqskBSDTCaPgE5cgfHhZN65jJuZFtHhzd2j1udfGmOKXzgCo2TI9ifzKFtNkEhsRm2LfKEqL4xiR9RoCaOxy6vyNx4PdmALiDx9Je9iTmp6oQ3eY9wesVedkdl4ZMr4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762497759; c=relaxed/simple;
-	bh=eCeCnK/RPdSLT0gJPf6DI6SrMd5i7WuVr9+GBgGHj0c=;
+	s=arc-20240116; t=1762497760; c=relaxed/simple;
+	bh=1yuAw+Eq627vltGoMnXJGgxh4DEfuHAppqCydIdY7dI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BhdrVE5mbrt74GaQz8aDKPa3FnZtG0ZTN265JIkmaOBz/QGcC6YAovi4pDc4wWh0fHO6kZLwbh5KVJALQ5ZH4Sbwz8XDJc7X1moKDGqAwLL5ZxlTi1P48rmernSbe0pXMieI1L52Vth3WQyFPtmjyZchh0jXWHwpfSp8OKBuA1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NYR8F4Az; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=B4MupITSQhim7Txxkbo8Vxosc+Th6Aoy3kYIy09zsp5iunTAhlAFgP1qog94NY4PCoRAWJZ08RDadoy2OQIPYWWn9Hr5E8C0kOan7TA6ZIGHZmRAD3fWCp4OXo3SfSuSnn3aNFOBz7S8iugY5FsYjtveHxdwZrIwf/OX+fcreSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rsgEmeIO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NYR8F4Az"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AF4FC4CEF8;
-	Fri,  7 Nov 2025 06:42:38 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rsgEmeIO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25F40C16AAE;
+	Fri,  7 Nov 2025 06:42:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762497758;
-	bh=eCeCnK/RPdSLT0gJPf6DI6SrMd5i7WuVr9+GBgGHj0c=;
+	s=k20201202; t=1762497759;
+	bh=1yuAw+Eq627vltGoMnXJGgxh4DEfuHAppqCydIdY7dI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NYR8F4Azam2oLXD2py1esoFirugzdBdP8nXpxmKgpsMHl8OuswAwhwV8vyw5qRx7f
-	 dzQswe9v/tvdm5dYakoZo0GXKZ2D8s0ucBPA8fh/heEhxUIIjn3PI+0CPJBBubLWiW
-	 xuCh7WR/eCOAIY457iTOEn4Es5J9KqL/k6PB5qEzT5Ghzt3zbPmHeQ/4zts2ebW0J2
-	 plVO7rdWZA1kX4Zx5APCT5+2Si6FPY8OBbmjIFzp9bPNlcZ63DoramGEt6zj5rMY56
-	 6A1b3CZE4/ogbvMZlwjDX5o/RhIllsYsT1VPxgM/m1U3bwVo0Kel5n5toK0u8c/abG
-	 1rDeUBFYPLotw==
+	b=rsgEmeIOi6Eka4xZ6ey+fOmq44mGLjRhkcudcSd25U9TL9QJsNgtHPqUX7fPZhMTg
+	 9+aXKqJxh24GJt3/Hnpv87B/3me+4T7Bhp6eo34KOlBNWRjiGOCgRBCDD8d6JxCzAk
+	 1lhQmhf+6iWPOXZlDi+Ts68AnX2QtmDgCRO6n+C1vzw6Sme3nMUg8mA/xpDpp5Oys+
+	 1zTmgMfVtxV3WSz0j4f0pMldHsd8DNbWZTz0WFlL9IMeJzzbf+U2XNDDTklVseMJUs
+	 6CxS7Zd2WDwGqaSFUhsHWmI771cMNnwVvbXXo+ZBrGKNxuflq+b6qoNZzj6BvXnhEI
+	 Ybp/9njSixC7A==
 From: Damien Le Moal <dlemoal@kernel.org>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
 Cc: Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v2 2/3] block: refactor disk_zone_wplug_sync_wp_offset()
-Date: Fri,  7 Nov 2025 15:38:43 +0900
-Message-ID: <20251107063844.151103-3-dlemoal@kernel.org>
+Subject: [PATCH v2 3/3] block: introduce bdev_zone_start()
+Date: Fri,  7 Nov 2025 15:38:44 +0900
+Message-ID: <20251107063844.151103-4-dlemoal@kernel.org>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <20251107063844.151103-1-dlemoal@kernel.org>
 References: <20251107063844.151103-1-dlemoal@kernel.org>
@@ -44,71 +44,60 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The helper function blk_zone_wp_offset() is called from
-disk_zone_wplug_sync_wp_offset(), and again called from
-blk_revalidate_seq_zone() right after the call to
-disk_zone_wplug_sync_wp_offset().
+Introduce the function bdev_zone_start() as a more explicit (and clear)
+replacement for ALIGN_DOWN() to get the start sector of a zone
+containing a particular sector of a zoned block device.
 
-Change disk_zone_wplug_sync_wp_offset() to return the value of obtained
-with blk_zone_wp_offset() to avoid this double call, which simplifies a
-little blk_revalidate_seq_zone().
+Use this new helper in blkdev_get_zone_info() and
+blkdev_report_zones_cached().
 
 Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-zoned.c | 27 +++++++++++++--------------
- 1 file changed, 13 insertions(+), 14 deletions(-)
+ block/blk-zoned.c      | 4 ++--
+ include/linux/blkdev.h | 6 ++++++
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 7ce7b8ea5a4f..b580d59ce210 100644
+index b580d59ce210..3791755bc6ad 100644
 --- a/block/blk-zoned.c
 +++ b/block/blk-zoned.c
-@@ -817,23 +817,24 @@ static unsigned int blk_zone_wp_offset(struct blk_zone *zone)
+@@ -950,7 +950,7 @@ int blkdev_get_zone_info(struct block_device *bdev, sector_t sector,
+ 		return -EINVAL;
+ 
+ 	memset(zone, 0, sizeof(*zone));
+-	sector = ALIGN_DOWN(sector, zone_sectors);
++	sector = bdev_zone_start(bdev, sector);
+ 
+ 	if (!blkdev_has_cached_report_zones(bdev))
+ 		return blkdev_report_zone_fallback(bdev, sector, zone);
+@@ -1068,7 +1068,7 @@ int blkdev_report_zones_cached(struct block_device *bdev, sector_t sector,
+ 		return blkdev_do_report_zones(bdev, sector, nr_zones, &args);
  	}
+ 
+-	for (sector = ALIGN_DOWN(sector, zone_sectors);
++	for (sector = bdev_zone_start(bdev, sector);
+ 	     sector < capacity && idx < nr_zones;
+ 	     sector += zone_sectors, idx++) {
+ 		ret = blkdev_get_zone_info(bdev, sector, &zone);
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 6a498aa7f7e7..2fff8a80dbd2 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1522,6 +1522,12 @@ static inline sector_t bdev_zone_sectors(struct block_device *bdev)
+ 	return q->limits.chunk_sectors;
  }
  
--static void disk_zone_wplug_sync_wp_offset(struct gendisk *disk,
--					   struct blk_zone *zone)
-+static unsigned int disk_zone_wplug_sync_wp_offset(struct gendisk *disk,
-+						   struct blk_zone *zone)
++static inline sector_t bdev_zone_start(struct block_device *bdev,
++				       sector_t sector)
++{
++	return sector & ~(bdev_zone_sectors(bdev) - 1);
++}
++
+ static inline sector_t bdev_offset_from_zone_start(struct block_device *bdev,
+ 						   sector_t sector)
  {
- 	struct blk_zone_wplug *zwplug;
--	unsigned long flags;
-+	unsigned int wp_offset = blk_zone_wp_offset(zone);
- 
- 	zwplug = disk_get_zone_wplug(disk, zone->start);
--	if (!zwplug)
--		return;
-+	if (zwplug) {
-+		unsigned long flags;
- 
--	spin_lock_irqsave(&zwplug->lock, flags);
--	if (zwplug->flags & BLK_ZONE_WPLUG_NEED_WP_UPDATE)
--		disk_zone_wplug_set_wp_offset(disk, zwplug,
--					      blk_zone_wp_offset(zone));
--	spin_unlock_irqrestore(&zwplug->lock, flags);
-+		spin_lock_irqsave(&zwplug->lock, flags);
-+		if (zwplug->flags & BLK_ZONE_WPLUG_NEED_WP_UPDATE)
-+			disk_zone_wplug_set_wp_offset(disk, zwplug, wp_offset);
-+		spin_unlock_irqrestore(&zwplug->lock, flags);
-+		disk_put_zone_wplug(zwplug);
-+	}
- 
--	disk_put_zone_wplug(zwplug);
-+	return wp_offset;
- }
- 
- /**
-@@ -2101,9 +2102,7 @@ static int blk_revalidate_seq_zone(struct blk_zone *zone, unsigned int idx,
- 	if (!queue_emulates_zone_append(disk->queue) || !disk->zone_wplugs_hash)
- 		return 0;
- 
--	disk_zone_wplug_sync_wp_offset(disk, zone);
--
--	wp_offset = blk_zone_wp_offset(zone);
-+	wp_offset = disk_zone_wplug_sync_wp_offset(disk, zone);
- 	if (!wp_offset || wp_offset >= zone->capacity)
- 		return 0;
- 
 -- 
 2.51.1
 
