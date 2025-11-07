@@ -1,48 +1,50 @@
 Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69B4E30DED7
-	for <linux-block@vger.kernel.org>; Fri,  7 Nov 2025 23:18:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED97A30FF2E
+	for <linux-block@vger.kernel.org>; Fri,  7 Nov 2025 23:24:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762557535; cv=none; b=Msc6DTeuOwJvJmclplEAFXpq4mq2nu09CZtP4GPUGkiLG29ZwdHXCWASN2njy5G6hPaubJKK7b1rh7AH+MiyImvrbHw0tLjceBd5q3J+cC01Lv+wXCpA5WW8N+um8vmOTVMJH7uIBPBauj29cUqioYhWba+PP8Uh0oApsFU1GYQ=
+	t=1762557845; cv=none; b=t7VL9dxSMv25mgbqbs8SDiAZFEBGfCw1ahl7yLznKilN2cp0ogW5LFe4hBLZDObFS/OLGL4CV/qa+L/zmR/SUwaOGp+kl2M/ZUhVAdQ7HN0LFZ8fjVTpvcaEK78u2xZev5hC8GeiyKdIbpIRPkX2kop18ZUUnxJx9xxL6XFU8p8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762557535; c=relaxed/simple;
-	bh=wOaZwZidfpC8n8hyIdxUrqUEBGaNRuISmPcHbhv/XHY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fFXttke/weZdChG4F0E6rFlEudC1YPX5Ha/lyNqZmCjvHAgO4GLN5W7Bh4t8i38CxfJX8A+rhflWkqDCRkh/OV/aVBM7eBEc/lxNtPcKBvCEOdcSay6uxSAdEPs0aGvt4bWSjtUQoVwc9DH0ofdrFCk/Tz7JClfngfn51B6OpEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=Unp3TDcE; arc=none smtp.client-ip=67.231.145.42
+	s=arc-20240116; t=1762557845; c=relaxed/simple;
+	bh=ZtZK6FxAR9B/xpw0W+Rj817OiS819BhTlphgh0e1sHI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Gc09wend6YMWJJFwI4AvPQUwtpam2Z7kcgVgVquY9GdR1sN4aEKXgyJAByZBKJZEVG4NO+aZy8NF5mw2X7RETWl6oSIxShoE2uI6Rlj8WA0rFmYNn8abY95JK+UbnPIrbSO6rTEUBYWmE1DYL6ssppNIdGpV3hudbXrZLMzbxZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=RHuNucKZ; arc=none smtp.client-ip=67.231.145.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="Unp3TDcE"
-Received: from pps.filterd (m0044012.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5A7IWhGM118293
-	for <linux-block@vger.kernel.org>; Fri, 7 Nov 2025 15:18:52 -0800
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="RHuNucKZ"
+Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5A7IMae21487795
+	for <linux-block@vger.kernel.org>; Fri, 7 Nov 2025 15:24:02 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
 	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=s2048-2025-q2; bh=vIKho3Lz0TNolcg8yp
-	qRaI/Dxor0LEtbF1VPj+RVwis=; b=Unp3TDcEWmwuIwgEq44ik8IUD1IpapiBhi
-	tRffG6XYV+7PV7aOFiDARieE4bPjdM+clJGO08RbJZOZpx/5R5GZkzAnTRmVHOuH
-	DVpsnlELC9nH/kcrhGC/AG1wlWiPs6eSwAOS7hGjm0zIAZ4pNLMkiS13v3SH0lGa
-	slINqpzQkhjvokLHWeAC1YlVuy+Z+AOAHRzyZx4jT3ni0VyTeZrDQz2hJtOZFbad
-	de0OeSosuZ54f6lFMGZZgoH04BAQY6UTKbLPRaBRtDYPZi5MUkfzpGL2x8darbXR
-	UMXXguXSbcw8ggeZxE9oQMT4vOhE+iVXrdyWjWtzWYbMMDtrRpfA==
+	:mime-version:subject:to; s=s2048-2025-q2; bh=Lb5JOF3xKa2aZfJ8ap
+	+ZnYsoSuzEJdQ+r5Xc3XqZr1I=; b=RHuNucKZUk9Q/W0K1sq8L38jFmCiYRmEFe
+	LGZb+rleEV9u6/kmlA5+Z0LnqWjRVTsLaH+5IttrKRsKqQdRaCZSsFYk6PqRzJSR
+	G8LQIgFLbQzXIms6Ie0pOUfN9tApSUeskJVQKr2BNbuQmQZy0eFMvHWszEgEgyWU
+	/xK3HzTf16XqL4DbaacEtyZ1sarG/P+By643jugb3nedacKGu+vpUKbpbqDyl1h/
+	vWmIp/dtGQYLZjTJEIm36wQ5GyUhca7jrlx5OT/tbsWi1Bu8+s6PaVQaPiesIJ8t
+	M8vFLvUUXcflARf0uJqOnp7COgmNLt8yoG7TdxZrPwHDZ82OpA6A==
 Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4a9p5125yn-3
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4a9p09jb8y-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Fri, 07 Nov 2025 15:18:52 -0800 (PST)
-Received: from twshared12874.03.snb2.facebook.com (2620:10d:c085:208::7cb7) by
- mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
+	for <linux-block@vger.kernel.org>; Fri, 07 Nov 2025 15:24:02 -0800 (PST)
+Received: from twshared125961.16.frc2.facebook.com (2620:10d:c085:108::150d)
+ by mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.20; Fri, 7 Nov 2025 23:18:51 +0000
+ 15.2.2562.20; Fri, 7 Nov 2025 23:24:01 +0000
 Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
-	id 9DDDA389A4C8; Fri,  7 Nov 2025 15:18:36 -0800 (PST)
+	id 79ED5389AA2E; Fri,  7 Nov 2025 15:23:58 -0800 (PST)
 From: Keith Busch <kbusch@meta.com>
-To: <linux-block@vger.kernel.org>, <hch@lst.de>, <shinichiro.kawasaki@wdc.com>
-CC: Keith Busch <kbusch@kernel.org>
-Subject: [PATCH blktests] io_uring user metadata offset test
-Date: Fri, 7 Nov 2025 15:18:36 -0800
-Message-ID: <20251107231836.1280881-1-kbusch@meta.com>
+To: <linux-block@vger.kernel.org>
+CC: <hch@lst.de>, <axboe@kernel.dk>, <martin.petersen@oracle.com>,
+        Keith Busch
+	<kbusch@kernel.org>
+Subject: [PATCHv3] blk-integrity: support arbitrary buffer alignment
+Date: Fri, 7 Nov 2025 15:23:58 -0800
+Message-ID: <20251107232358.1324461-1-kbusch@meta.com>
 X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -53,613 +55,995 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-GUID: 07t9dsU1k_a0kou6h5yUwND1rx-ia0KC
-X-Authority-Analysis: v=2.4 cv=G4wR0tk5 c=1 sm=1 tr=0 ts=690e7e5c cx=c_pps
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA3MDE5NCBTYWx0ZWRfX3qCnyr/BlaV0
+ Eo/Q7QXG5oTds7J+3h1zBjLpjdmHn2SypTCefFy36TrHLjeQ136JpZzvq30iZH1kPaJ5xAnkG0H
+ fHIz7iooq8x8dAp5mUajFFM+SEMyNeemxhOdXcl57PFH0vLl5N0b9j6sxf6K1Yyi1aJEce4SHoj
+ 1wiBt7cD6TbnC4/L2B9BHYhePL9f5DI8nXMi5s1WaAhO9O9XTJ/fLw9XDmiTOvy4QmjBLA1H5nl
+ Qn0HjAo4mUFV7LzYRhJ+dd/VeFzcNvXa4ebzx8gIEy9aWZhA9uTpnRfEcgGAmE0mTwe9OQ1GpBc
+ SDTi0sA3N24qgJmRFffF7naao9y5MwRZ7ZFi1GO+Va2sVgpflDcTkbVkCt5SHVrxZuAvx9s6oRT
+ 9VOEpu1RMRT6v2SJVqe2b/yvExXSnA==
+X-Authority-Analysis: v=2.4 cv=D8ZK6/Rj c=1 sm=1 tr=0 ts=690e7f92 cx=c_pps
  a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
- a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8
- a=NdmO-H2m6orospU8_PoA:9
-X-Proofpoint-ORIG-GUID: 07t9dsU1k_a0kou6h5yUwND1rx-ia0KC
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA3MDE5MyBTYWx0ZWRfX8p2AuppJFAcu
- s9qt2qQIS+9Vrzd0/JdhirIgMe3e1JT57fEPeLgcxFxLE4riCdh5haBUSOJlZWmVNsVaO0567aJ
- dwDOblVtk3bE1rWuxBGkdcvjiq/XJv3+0fsdNrmUpCLbwF2/F1J+24tWsfyRepJF5FxBF4L4hjZ
- SnV3NBhv8WdiuCflKzvU/u1qhmv67/I5l+MhW8vQmZP38qNNI1OkCrqmJPKLbP35K3X1eHvOQ2Y
- s5EComvygMa8L+OhqbOK2EhYvWDRT9yDal3pnFK2k9uHLKaCmhaK4bGGjNaPaLXafOFr2T6fz/B
- iGmCAK+g7I7n+8hpsd/OXklvDmCOLedYyjm2aWSMvmhLFXFdpZA0t6iamdD7uy5oayVttc5eT+F
- a5MKbD6KLDSF/KGUFIgrInyRfvfR0w==
+ a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=VabnemYjAAAA:8
+ a=afosOz21P-N2k3ssSmEA:9 a=gKebqoRLp9LExxC7YDUY:22
+X-Proofpoint-GUID: N9d4hOzg38_msu4QbHK60-CluxFyd5bz
+X-Proofpoint-ORIG-GUID: N9d4hOzg38_msu4QbHK60-CluxFyd5bz
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
  definitions=2025-11-07_07,2025-11-06_01,2025-10-01_01
 
 From: Keith Busch <kbusch@kernel.org>
 
-For devices with metadata, tests various userspace offsets with
-io_uring capabilities. If the metadata is formatted with ref tag
-protection information, test various seed offsets as well.
+A bio segment might have partial block data with the rest continuing
+into the next segments.
+
+At the same time, the protection information may also be split in
+multiple segments. The most likely way that may happen is if two
+requests merge, or if we're directly using the io_uring user metadata.
+Further, it may be possible to have unalign the protection fields from
+the user space buffer, or if there are odd additional opaque bytes in
+front or in back of the protection information metadata region.
+
+Change up the iteration to allow spanning multiple segments. This patch
+is mostly a re-write of the protection information handling to allow any
+arbitrary alignments, so it's probably easier to review the end result
+rather than the diff.
 
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- src/.gitignore      |   1 +
- src/Makefile        |   7 +-
- src/metadata.c      | 481 ++++++++++++++++++++++++++++++++++++++++++++
- tests/block/043     |  27 +++
- tests/block/043.out |   2 +
- 5 files changed, 515 insertions(+), 3 deletions(-)
- create mode 100644 src/metadata.c
- create mode 100755 tests/block/043
- create mode 100644 tests/block/043.out
+v2->v3:
 
-diff --git a/src/.gitignore b/src/.gitignore
-index 865675c..e6c6c38 100644
---- a/src/.gitignore
-+++ b/src/.gitignore
-@@ -3,6 +3,7 @@
- /loblksize
- /loop_change_fd
- /loop_get_status_null
-+/metadata
- /mount_clear_sock
- /nbdsetsize
- /openclose
-diff --git a/src/Makefile b/src/Makefile
-index 179a673..7146db0 100644
---- a/src/Makefile
-+++ b/src/Makefile
-@@ -22,7 +22,8 @@ C_TARGETS :=3D \
- 	sg/syzkaller1 \
- 	zbdioctl
+  Folded in cleanups from Christoph
+
+  A fix for the crc64 ref tag remapping
+
+I ported the liburing's test to blktests here:
+
+  https://lore.kernel.org/linux-block/20251107231836.1280881-1-kbusch@met=
+a.com/
+
+ block/blk-settings.c |  10 -
+ block/t10-pi.c       | 791 +++++++++++++++++++++++--------------------
+ 2 files changed, 431 insertions(+), 370 deletions(-)
+
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 78dfef1176231..e0d0b035f39d2 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -197,16 +197,6 @@ static int blk_validate_integrity_limits(struct queu=
+e_limits *lim)
+ 	if (!bi->interval_exp)
+ 		bi->interval_exp =3D ilog2(lim->logical_block_size);
 =20
--C_MINIUBLK :=3D miniublk
-+C_MINIUBLK :=3D miniublk \
-+		metadata
+-	/*
+-	 * The PI generation / validation helpers do not expect intervals to
+-	 * straddle multiple bio_vecs.  Enforce alignment so that those are
+-	 * never generated, and that each buffer is aligned as expected.
+-	 */
+-	if (bi->csum_type) {
+-		lim->dma_alignment =3D max(lim->dma_alignment,
+-					(1U << bi->interval_exp) - 1);
+-	}
+-
+ 	/*
+ 	 * The block layer automatically adds integrity data for bios that don'=
+t
+ 	 * already have it.  Limit the I/O size so that a single maximum size
+diff --git a/block/t10-pi.c b/block/t10-pi.c
+index 0c4ed97021460..6266ce0043280 100644
+--- a/block/t10-pi.c
++++ b/block/t10-pi.c
+@@ -12,231 +12,136 @@
+ #include <linux/unaligned.h>
+ #include "blk.h"
 =20
- HAVE_LIBURING :=3D $(call HAVE_C_MACRO,liburing.h,IORING_OP_URING_CMD)
- HAVE_UBLK_HEADER :=3D $(call HAVE_C_HEADER,linux/ublk_cmd.h,1)
-@@ -61,8 +62,8 @@ $(C_TARGETS): %: %.c
- $(CXX_TARGETS): %: %.cpp
- 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) -o $@ $^
-=20
--$(C_MINIUBLK): %: miniublk.c
--	$(CC) $(CFLAGS) $(LDFLAGS) $(MINIUBLK_FLAGS) -o $@ miniublk.c \
-+$(C_MINIUBLK): %: %.c
-+	$(CC) $(CFLAGS) $(LDFLAGS) $(MINIUBLK_FLAGS) -o $@ $^ \
- 		$(MINIUBLK_LIBS)
-=20
- .PHONY: all clean install
-diff --git a/src/metadata.c b/src/metadata.c
-new file mode 100644
-index 0000000..4628299
---- /dev/null
-+++ b/src/metadata.c
-@@ -0,0 +1,481 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Description: test userspace metadata
-+ */
-+
-+#ifndef _GNU_SOURCE
-+#define _GNU_SOURCE
-+#endif
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <fcntl.h>
-+#include <unistd.h>
-+#include <errno.h>
-+#include <sys/ioctl.h>
-+#include <linux/fs.h>
-+#include <liburing.h>
-+
-+#ifndef IORING_RW_ATTR_FLAG_PI
-+#define PI_URING_COMPAT
-+#define IORING_RW_ATTR_FLAG_PI  (1U << 0)
-+/* PI attribute information */
-+struct io_uring_attr_pi {
-+	__u16   flags;
-+	__u16   app_tag;
-+	__u32   len;
-+	__u64   addr;
-+	__u64   seed;
-+	__u64   rsvd;
-+};
-+#endif
-+
-+#ifndef FS_IOC_GETLBMD_CAP
-+/* Protection info capability flags */
-+#define LBMD_PI_CAP_INTEGRITY           (1 << 0)
-+#define LBMD_PI_CAP_REFTAG              (1 << 1)
-+
-+/* Checksum types for Protection Information */
-+#define LBMD_PI_CSUM_NONE               0
-+#define LBMD_PI_CSUM_IP                 1
-+#define LBMD_PI_CSUM_CRC16_T10DIF       2
-+#define LBMD_PI_CSUM_CRC64_NVME         4
++#define APP_TAG_ESCAPE 0xffff
++#define REF_TAG_ESCAPTE 0xffffffff
 +
 +/*
-+ * Logical block metadata capability descriptor
-+ * If the device does not support metadata, all the fields will be zero.
-+ * Applications must check lbmd_flags to determine whether metadata is
-+ * supported or not.
++ * This union is used for onstack allocations when the pi field is split=
+ across
++ * segments. blk_validate_integrity_limits() guarantees pi_tuple_size ma=
+tches
++ * the sizeof one of these two types.
 + */
-+struct logical_block_metadata_cap {
-+	/* Bitmask of logical block metadata capability flags */
-+	__u32	lbmd_flags;
-+	/*
-+	 * The amount of data described by each unit of logical block
-+	 * metadata
-+	 */
-+	__u16	lbmd_interval;
-+	/*
-+	 * Size in bytes of the logical block metadata associated with each
-+	 * interval
-+	 */
-+	__u8	lbmd_size;
-+	/*
-+	 * Size in bytes of the opaque block tag associated with each
-+	 * interval
-+	 */
-+	__u8	lbmd_opaque_size;
-+	/*
-+	 * Offset in bytes of the opaque block tag within the logical block
-+	 * metadata
-+	 */
-+	__u8	lbmd_opaque_offset;
-+	/* Size in bytes of the T10 PI tuple associated with each interval */
-+	__u8	lbmd_pi_size;
-+	/* Offset in bytes of T10 PI tuple within the logical block metadata */
-+	__u8	lbmd_pi_offset;
-+	/* T10 PI guard tag type */
-+	__u8	lbmd_guard_tag_type;
-+	/* Size in bytes of the T10 PI application tag */
-+	__u8	lbmd_app_tag_size;
-+	/* Size in bytes of the T10 PI reference tag */
-+	__u8	lbmd_ref_tag_size;
-+	/* Size in bytes of the T10 PI storage tag */
-+	__u8	lbmd_storage_tag_size;
-+	__u8	pad;
++union pi_tuple {
++	struct crc64_pi_tuple	crc64_pi;
++	struct t10_pi_tuple	t10_pi;
 +};
 +
-+#define FS_IOC_GETLBMD_CAP                      _IOWR(0x15, 2, struct lo=
-gical_block_metadata_cap)
-+#endif /* FS_IOC_GETLBMD_CAP */
+ struct blk_integrity_iter {
+-	void			*prot_buf;
+-	void			*data_buf;
+-	sector_t		seed;
+-	unsigned int		data_size;
+-	unsigned short		interval;
+-	const char		*disk_name;
++	struct bio			*bio;
++	struct bio_integrity_payload	*bip;
++	struct blk_integrity		*bi;
++	struct bvec_iter		data_iter;
++	struct bvec_iter		prot_iter;
++	unsigned int			interval_remaining;
++	u64				seed;
++	u64				crc;
+ };
+=20
+-static __be16 t10_pi_csum(__be16 csum, void *data, unsigned int len,
+-		unsigned char csum_type)
++static void blk_crc(struct blk_integrity_iter *iter, void *data,
++		    unsigned int len)
+ {
+-	if (csum_type =3D=3D BLK_INTEGRITY_CSUM_IP)
+-		return (__force __be16)ip_compute_csum(data, len);
+-	return cpu_to_be16(crc_t10dif_update(be16_to_cpu(csum), data, len));
++	switch (iter->bi->csum_type) {
++	case BLK_INTEGRITY_CSUM_CRC64:
++		iter->crc =3D crc64_nvme(iter->crc, data, len);
++		break;
++	case BLK_INTEGRITY_CSUM_CRC:
++		iter->crc =3D crc_t10dif_update(iter->crc, data, len);
++		break;
++	case BLK_INTEGRITY_CSUM_IP:
++		iter->crc =3D (__force u32)csum_partial(data, len,
++						(__force __wsum)iter->crc);
++		break;
++	default:
++		WARN_ON_ONCE(1);
++		iter->crc =3D U64_MAX;
++		break;
++	}
+ }
+=20
+ /*
+- * Type 1 and Type 2 protection use the same format: 16 bit guard tag,
+- * 16 bit app tag, 32 bit reference tag. Type 3 does not define the ref
+- * tag.
++ * Update the crc for formats that have metadata padding in front of the=
+ data
++ * integrity field
+  */
+-static void t10_pi_generate(struct blk_integrity_iter *iter,
+-		struct blk_integrity *bi)
++static void blk_integrity_crc_offset(struct blk_integrity_iter *iter)
+ {
+-	u8 offset =3D bi->pi_offset;
+-	unsigned int i;
+-
+-	for (i =3D 0 ; i < iter->data_size ; i +=3D iter->interval) {
+-		struct t10_pi_tuple *pi =3D iter->prot_buf + offset;
+-
+-		pi->guard_tag =3D t10_pi_csum(0, iter->data_buf, iter->interval,
+-				bi->csum_type);
+-		if (offset)
+-			pi->guard_tag =3D t10_pi_csum(pi->guard_tag,
+-					iter->prot_buf, offset, bi->csum_type);
+-		pi->app_tag =3D 0;
+-
+-		if (bi->flags & BLK_INTEGRITY_REF_TAG)
+-			pi->ref_tag =3D cpu_to_be32(lower_32_bits(iter->seed));
+-		else
+-			pi->ref_tag =3D 0;
+-
+-		iter->data_buf +=3D iter->interval;
+-		iter->prot_buf +=3D bi->metadata_size;
+-		iter->seed++;
++	unsigned int offset =3D iter->bi->pi_offset;
++	struct bio_vec *bvec =3D iter->bip->bip_vec;
 +
-+#ifndef IO_INTEGRITY_CHK_GUARD
-+/* flags for integrity meta */
-+#define IO_INTEGRITY_CHK_GUARD          (1U << 0) /* enforce guard check=
- */
-+#define IO_INTEGRITY_CHK_REFTAG         (1U << 1) /* enforce ref check *=
-/
-+#define IO_INTEGRITY_CHK_APPTAG         (1U << 2) /* enforce app check *=
-/
-+#endif /* IO_INTEGRITY_CHK_GUARD */
++	while (offset > 0) {
++		struct bio_vec pbv =3D mp_bvec_iter_bvec(bvec, iter->prot_iter);
++		unsigned int len =3D min(pbv.bv_len, offset);
++		void *prot_buf =3D bvec_kmap_local(&pbv);
 +
-+/* This size should guarantee at least one split */
-+#define DATA_SIZE (8 * 1024 * 1024)
++		blk_crc(iter, prot_buf, len);
++		kunmap_local(prot_buf);
++		offset -=3D len;
++		bvec_iter_advance_single(bvec, &iter->prot_iter, len);
+ 	}
+ }
+=20
+-static blk_status_t t10_pi_verify(struct blk_integrity_iter *iter,
+-		struct blk_integrity *bi)
++static void blk_integrity_copy_from_tuple(struct bio_integrity_payload *=
+bip,
++					  struct bvec_iter *iter, void *tuple,
++					  unsigned int tuple_size)
+ {
+-	u8 offset =3D bi->pi_offset;
+-	unsigned int i;
+-
+-	for (i =3D 0 ; i < iter->data_size ; i +=3D iter->interval) {
+-		struct t10_pi_tuple *pi =3D iter->prot_buf + offset;
+-		__be16 csum;
+-
+-		if (bi->flags & BLK_INTEGRITY_REF_TAG) {
+-			if (pi->app_tag =3D=3D T10_PI_APP_ESCAPE)
+-				goto next;
+-
+-			if (be32_to_cpu(pi->ref_tag) !=3D
+-			    lower_32_bits(iter->seed)) {
+-				pr_err("%s: ref tag error at location %llu " \
+-				       "(rcvd %u)\n", iter->disk_name,
+-				       (unsigned long long)
+-				       iter->seed, be32_to_cpu(pi->ref_tag));
+-				return BLK_STS_PROTECTION;
+-			}
+-		} else {
+-			if (pi->app_tag =3D=3D T10_PI_APP_ESCAPE &&
+-			    pi->ref_tag =3D=3D T10_PI_REF_ESCAPE)
+-				goto next;
+-		}
++	void *prot_buf;
+=20
+-		csum =3D t10_pi_csum(0, iter->data_buf, iter->interval,
+-				bi->csum_type);
+-		if (offset)
+-			csum =3D t10_pi_csum(csum, iter->prot_buf, offset,
+-					bi->csum_type);
+-
+-		if (pi->guard_tag !=3D csum) {
+-			pr_err("%s: guard tag error at sector %llu " \
+-			       "(rcvd %04x, want %04x)\n", iter->disk_name,
+-			       (unsigned long long)iter->seed,
+-			       be16_to_cpu(pi->guard_tag), be16_to_cpu(csum));
+-			return BLK_STS_PROTECTION;
+-		}
++	while (tuple_size) {
++		struct bio_vec pbv =3D mp_bvec_iter_bvec(bip->bip_vec, *iter);
++		unsigned int len =3D min(tuple_size, pbv.bv_len);
+=20
+-next:
+-		iter->data_buf +=3D iter->interval;
+-		iter->prot_buf +=3D bi->metadata_size;
+-		iter->seed++;
+-	}
++		prot_buf =3D bvec_kmap_local(&pbv);
++		memcpy(prot_buf, tuple, len);
++		kunmap_local(prot_buf);
+=20
+-	return BLK_STS_OK;
++		bvec_iter_advance_single(bip->bip_vec, iter, len);
++		tuple_size -=3D len;
++		tuple +=3D len;
++	}
+ }
+=20
+-/**
+- * t10_pi_type1_prepare - prepare PI prior submitting request to device
+- * @rq:              request with PI that should be prepared
+- *
+- * For Type 1/Type 2, the virtual start sector is the one that was
+- * originally submitted by the block layer for the ref_tag usage. Due to
+- * partitioning, MD/DM cloning, etc. the actual physical start sector is
+- * likely to be different. Remap protection information to match the
+- * physical LBA.
+- */
+-static void t10_pi_type1_prepare(struct request *rq)
++static void blk_integrity_copy_to_tuple(struct bio_integrity_payload *bi=
+p,
++					struct bvec_iter *iter, void *tuple,
++					unsigned int tuple_size)
+ {
+-	struct blk_integrity *bi =3D &rq->q->limits.integrity;
+-	const int tuple_sz =3D bi->metadata_size;
+-	u32 ref_tag =3D t10_pi_ref_tag(rq);
+-	u8 offset =3D bi->pi_offset;
+-	struct bio *bio;
++	void *prot_buf;
+=20
+-	__rq_for_each_bio(bio, rq) {
+-		struct bio_integrity_payload *bip =3D bio_integrity(bio);
+-		u32 virt =3D bip_get_seed(bip) & 0xffffffff;
+-		struct bio_vec iv;
+-		struct bvec_iter iter;
++	while (tuple_size) {
++		struct bio_vec pbv =3D mp_bvec_iter_bvec(bip->bip_vec, *iter);
++		unsigned int len =3D min(tuple_size, pbv.bv_len);
+=20
+-		/* Already remapped? */
+-		if (bip->bip_flags & BIP_MAPPED_INTEGRITY)
+-			break;
+-
+-		bip_for_each_vec(iv, bip, iter) {
+-			unsigned int j;
+-			void *p;
+-
+-			p =3D bvec_kmap_local(&iv);
+-			for (j =3D 0; j < iv.bv_len; j +=3D tuple_sz) {
+-				struct t10_pi_tuple *pi =3D p + offset;
+-
+-				if (be32_to_cpu(pi->ref_tag) =3D=3D virt)
+-					pi->ref_tag =3D cpu_to_be32(ref_tag);
+-				virt++;
+-				ref_tag++;
+-				p +=3D tuple_sz;
+-			}
+-			kunmap_local(p);
+-		}
++		prot_buf =3D bvec_kmap_local(&pbv);
++		memcpy(tuple, prot_buf, len);
++		kunmap_local(prot_buf);
+=20
+-		bip->bip_flags |=3D BIP_MAPPED_INTEGRITY;
++		bvec_iter_advance_single(bip->bip_vec, iter, len);
++		tuple_size -=3D len;
++		tuple +=3D len;
+ 	}
+ }
+=20
+-/**
+- * t10_pi_type1_complete - prepare PI prior returning request to the blk=
+ layer
+- * @rq:              request with PI that should be prepared
+- * @nr_bytes:        total bytes to prepare
+- *
+- * For Type 1/Type 2, the virtual start sector is the one that was
+- * originally submitted by the block layer for the ref_tag usage. Due to
+- * partitioning, MD/DM cloning, etc. the actual physical start sector is
+- * likely to be different. Since the physical start sector was submitted
+- * to the device, we should remap it back to virtual values expected by =
+the
+- * block layer.
+- */
+-static void t10_pi_type1_complete(struct request *rq, unsigned int nr_by=
+tes)
++static void blk_set_ext_pi(struct crc64_pi_tuple *pi,
++			   struct blk_integrity_iter *iter)
+ {
+-	struct blk_integrity *bi =3D &rq->q->limits.integrity;
+-	unsigned intervals =3D nr_bytes >> bi->interval_exp;
+-	const int tuple_sz =3D bi->metadata_size;
+-	u32 ref_tag =3D t10_pi_ref_tag(rq);
+-	u8 offset =3D bi->pi_offset;
+-	struct bio *bio;
+-
+-	__rq_for_each_bio(bio, rq) {
+-		struct bio_integrity_payload *bip =3D bio_integrity(bio);
+-		u32 virt =3D bip_get_seed(bip) & 0xffffffff;
+-		struct bio_vec iv;
+-		struct bvec_iter iter;
+-
+-		bip_for_each_vec(iv, bip, iter) {
+-			unsigned int j;
+-			void *p;
+-
+-			p =3D bvec_kmap_local(&iv);
+-			for (j =3D 0; j < iv.bv_len && intervals; j +=3D tuple_sz) {
+-				struct t10_pi_tuple *pi =3D p + offset;
+-
+-				if (be32_to_cpu(pi->ref_tag) =3D=3D ref_tag)
+-					pi->ref_tag =3D cpu_to_be32(virt);
+-				virt++;
+-				ref_tag++;
+-				intervals--;
+-				p +=3D tuple_sz;
+-			}
+-			kunmap_local(p);
+-		}
+-	}
++	put_unaligned_be64(iter->crc, &pi->guard_tag);
++	put_unaligned((__be16)0, &pi->app_tag);
++	put_unaligned_be48(iter->seed, &pi->ref_tag);
+ }
+=20
+-static __be64 ext_pi_crc64(u64 crc, void *data, unsigned int len)
++static void blk_set_t10_pi(struct t10_pi_tuple *pi,
++			   struct blk_integrity_iter *iter)
+ {
+-	return cpu_to_be64(crc64_nvme(crc, data, len));
++	put_unaligned_be16(iter->crc, &pi->guard_tag);
++	put_unaligned((__be16)0, &pi->app_tag);
++	put_unaligned_be32(iter->seed, &pi->ref_tag);
+ }
+=20
+-static void ext_pi_crc64_generate(struct blk_integrity_iter *iter,
+-		struct blk_integrity *bi)
++static void blk_set_ip_pi(struct t10_pi_tuple *pi,
++			  struct blk_integrity_iter *iter)
+ {
+-	u8 offset =3D bi->pi_offset;
+-	unsigned int i;
+-
+-	for (i =3D 0 ; i < iter->data_size ; i +=3D iter->interval) {
+-		struct crc64_pi_tuple *pi =3D iter->prot_buf + offset;
++	__be16 csum =3D (__force __be16)~(lower_16_bits(iter->crc));
+=20
+-		pi->guard_tag =3D ext_pi_crc64(0, iter->data_buf, iter->interval);
+-		if (offset)
+-			pi->guard_tag =3D ext_pi_crc64(be64_to_cpu(pi->guard_tag),
+-					iter->prot_buf, offset);
+-		pi->app_tag =3D 0;
+-
+-		if (bi->flags & BLK_INTEGRITY_REF_TAG)
+-			put_unaligned_be48(iter->seed, pi->ref_tag);
+-		else
+-			put_unaligned_be48(0ULL, pi->ref_tag);
+-
+-		iter->data_buf +=3D iter->interval;
+-		iter->prot_buf +=3D bi->metadata_size;
+-		iter->seed++;
+-	}
++	__put_unaligned_t(__be16, csum, &pi->guard_tag);
++	put_unaligned_be16(0, &pi->app_tag);
++	put_unaligned_be32(iter->seed, &pi->ref_tag);
+ }
+=20
+ static bool ext_pi_ref_escape(const u8 ref_tag[6])
+@@ -247,227 +152,393 @@ static bool ext_pi_ref_escape(const u8 ref_tag[6]=
+)
+ }
+=20
+ static blk_status_t ext_pi_crc64_verify(struct blk_integrity_iter *iter,
+-		struct blk_integrity *bi)
++					struct crc64_pi_tuple *pi)
+ {
+-	u8 offset =3D bi->pi_offset;
+-	unsigned int i;
+-
+-	for (i =3D 0; i < iter->data_size; i +=3D iter->interval) {
+-		struct crc64_pi_tuple *pi =3D iter->prot_buf + offset;
+-		u64 ref, seed;
+-		__be64 csum;
+-
+-		if (bi->flags & BLK_INTEGRITY_REF_TAG) {
+-			if (pi->app_tag =3D=3D T10_PI_APP_ESCAPE)
+-				goto next;
+-
+-			ref =3D get_unaligned_be48(pi->ref_tag);
+-			seed =3D lower_48_bits(iter->seed);
+-			if (ref !=3D seed) {
+-				pr_err("%s: ref tag error at location %llu (rcvd %llu)\n",
+-					iter->disk_name, seed, ref);
+-				return BLK_STS_PROTECTION;
+-			}
+-		} else {
+-			if (pi->app_tag =3D=3D T10_PI_APP_ESCAPE &&
+-			    ext_pi_ref_escape(pi->ref_tag))
+-				goto next;
++	u64 seed =3D lower_48_bits(iter->seed);
++	u64 guard =3D get_unaligned_be64(&pi->guard_tag);
++	u64 ref =3D get_unaligned_be48(pi->ref_tag);
++	u16 app =3D get_unaligned_be16(&pi->app_tag);
 +
-+static unsigned short lba_size;
-+static unsigned char metadata_size;
-+static unsigned char pi_size;
-+static unsigned char pi_offset;
-+static bool reftag_enabled;
++	if (iter->bi->flags & BLK_INTEGRITY_REF_TAG) {
++		if (app =3D=3D APP_TAG_ESCAPE)
++			return BLK_STS_OK;
++		if (ref !=3D seed) {
++			pr_err("%s: ref tag error at location %llu (rcvd %llu)\n",
++				iter->bio->bi_bdev->bd_disk->disk_name, seed,
++				ref);
++			return BLK_STS_PROTECTION;
+ 		}
++	} else if (app =3D=3D APP_TAG_ESCAPE && ext_pi_ref_escape(pi->ref_tag))=
+ {
++		return BLK_STS_OK;
++	}
 +
-+static long pagesize;
-+
-+struct t10_pi_tuple {
-+        __be16 guard_tag;       /* Checksum */
-+        __be16 app_tag;         /* Opaque storage */
-+        __be32 ref_tag;         /* Target LBA or indirect LBA */
-+};
-+
-+struct crc64_pi_tuple {
-+        __be64 guard_tag;
-+        __be16 app_tag;
-+        __u8   ref_tag[6];
-+};
-+
-+static int init_capabilities(int fd)
-+{
-+	struct logical_block_metadata_cap md_cap;
-+	int ret;
-+
-+	ret =3D ioctl(fd, FS_IOC_GETLBMD_CAP, &md_cap);
-+	if (ret < 0)
-+		return ret;
-+
-+	lba_size =3D md_cap.lbmd_interval;
-+	metadata_size =3D md_cap.lbmd_size;
-+	pi_size =3D md_cap.lbmd_pi_size;
-+	pi_offset =3D md_cap.lbmd_pi_offset;
-+	reftag_enabled =3D md_cap.lbmd_flags & LBMD_PI_CAP_REFTAG;
-+
-+	pagesize =3D sysconf(_SC_PAGE_SIZE);
-+	return 0;
++	if (guard !=3D iter->crc) {
++		pr_err("%s: guard tag error at sector %llu (rcvd %016llx, want %016llx=
+)\n",
++			iter->bio->bi_bdev->bd_disk->disk_name, iter->seed,
++			guard, iter->crc);
++		return BLK_STS_PROTECTION;
++	}
+=20
+-		csum =3D ext_pi_crc64(0, iter->data_buf, iter->interval);
+-		if (offset)
+-			csum =3D ext_pi_crc64(be64_to_cpu(csum), iter->prot_buf,
+-					    offset);
++	return BLK_STS_OK;
 +}
-+
-+static unsigned int swap(unsigned int value)
+=20
+-		if (pi->guard_tag !=3D csum) {
+-			pr_err("%s: guard tag error at sector %llu " \
+-			       "(rcvd %016llx, want %016llx)\n",
+-				iter->disk_name, (unsigned long long)iter->seed,
+-				be64_to_cpu(pi->guard_tag), be64_to_cpu(csum));
++static blk_status_t t10_pi_verify(struct blk_integrity_iter *iter,
++				  struct t10_pi_tuple *pi)
 +{
-+	return ((value >> 24) & 0x000000ff) |
-+		((value >> 8)  & 0x0000ff00) |
-+		((value << 8)  & 0x00ff0000) |
-+		((value << 24) & 0xff000000);
++	u32 seed =3D lower_32_bits(iter->seed);
++	u32 ref =3D get_unaligned_be32(&pi->ref_tag);
++	u16 guard =3D get_unaligned_be16(&pi->guard_tag);
++	u16 app =3D get_unaligned_be16(&pi->app_tag);
++
++	if (iter->bi->flags & BLK_INTEGRITY_REF_TAG) {
++		if (app =3D=3D APP_TAG_ESCAPE)
++			return BLK_STS_OK;
++		if (ref !=3D seed) {
++			pr_err("%s: ref tag error at location %u (rcvd %u)\n",
++				iter->bio->bi_bdev->bd_disk->disk_name, seed,
++				ref);
+ 			return BLK_STS_PROTECTION;
+ 		}
++	} else if (app =3D=3D APP_TAG_ESCAPE && ref =3D=3D REF_TAG_ESCAPTE) {
++		return BLK_STS_OK;
++	}
+=20
+-next:
+-		iter->data_buf +=3D iter->interval;
+-		iter->prot_buf +=3D bi->metadata_size;
+-		iter->seed++;
++	if (guard !=3D (u16)iter->crc) {
++		pr_err("%s: guard tag error at sector %llu (rcvd %04x, want %04x)\n",
++			iter->bio->bi_bdev->bd_disk->disk_name, iter->seed,
++			guard, (u16)iter->crc);
++		return BLK_STS_PROTECTION;
+ 	}
+=20
+ 	return BLK_STS_OK;
+ }
+=20
+-static void ext_pi_type1_prepare(struct request *rq)
++static blk_status_t blk_integrity_verify(struct blk_integrity_iter *iter=
+,
++					 union pi_tuple *tuple)
+ {
+-	struct blk_integrity *bi =3D &rq->q->limits.integrity;
+-	const int tuple_sz =3D bi->metadata_size;
+-	u64 ref_tag =3D ext_pi_ref_tag(rq);
+-	u8 offset =3D bi->pi_offset;
+-	struct bio *bio;
++	switch (iter->bi->csum_type) {
++	case BLK_INTEGRITY_CSUM_CRC64:
++		return ext_pi_crc64_verify(iter, &tuple->crc64_pi);
++	case BLK_INTEGRITY_CSUM_CRC:
++	case BLK_INTEGRITY_CSUM_IP:
++		return t10_pi_verify(iter, &tuple->t10_pi);
++	default:
++		return BLK_STS_OK;
++	}
 +}
-+
-+static inline void __put_unaligned_be48(const __u64 val, __u8 *p)
+=20
+-	__rq_for_each_bio(bio, rq) {
+-		struct bio_integrity_payload *bip =3D bio_integrity(bio);
+-		u64 virt =3D lower_48_bits(bip_get_seed(bip));
+-		struct bio_vec iv;
+-		struct bvec_iter iter;
++static void blk_integrity_set(struct blk_integrity_iter *iter,
++			      union pi_tuple *tuple)
 +{
-+	*p++ =3D (val >> 40) & 0xff;
-+	*p++ =3D (val >> 32) & 0xff;
-+	*p++ =3D (val >> 24) & 0xff;
-+	*p++ =3D (val >> 16) & 0xff;
-+	*p++ =3D (val >> 8) & 0xff;
-+	*p++ =3D val & 0xff;
++	switch (iter->bi->csum_type) {
++	case BLK_INTEGRITY_CSUM_CRC64:
++		return blk_set_ext_pi(&tuple->crc64_pi, iter);
++	case BLK_INTEGRITY_CSUM_CRC:
++		return blk_set_t10_pi(&tuple->t10_pi, iter);
++	case BLK_INTEGRITY_CSUM_IP:
++		return blk_set_ip_pi(&tuple->t10_pi, iter);
++	default:
++		WARN_ON_ONCE(1);
++		return;
++	}
 +}
-+
-+static inline void put_unaligned_be48(const __u64 val, void *p)
+=20
+-		/* Already remapped? */
+-		if (bip->bip_flags & BIP_MAPPED_INTEGRITY)
+-			break;
++static blk_status_t blk_integrity_interval(struct blk_integrity_iter *it=
+er,
++					   bool verify)
 +{
-+	__put_unaligned_be48(val, p);
-+}
++	blk_status_t ret =3D BLK_STS_OK;
++	union pi_tuple tuple;
++	void *ptuple =3D &tuple;
++	struct bio_vec pbv;
 +
-+static inline __u64 __get_unaligned_be48(const __u8 *p)
-+{
-+	return (__u64)p[0] << 40 | (__u64)p[1] << 32 | (__u64)p[2] << 24 |
-+		p[3] << 16 | p[4] << 8 | p[5];
-+}
++	blk_integrity_crc_offset(iter);
++	pbv =3D mp_bvec_iter_bvec(iter->bip->bip_vec, iter->prot_iter);
++	if (pbv.bv_len >=3D iter->bi->pi_tuple_size) {
++		ptuple =3D bvec_kmap_local(&pbv);
++		bvec_iter_advance_single(iter->bip->bip_vec, &iter->prot_iter,
++				iter->bi->metadata_size - iter->bi->pi_offset);
++	} else if (verify) {
++		blk_integrity_copy_to_tuple(iter->bip, &iter->prot_iter,
++				ptuple, iter->bi->pi_tuple_size);
++	}
+=20
+-		bip_for_each_vec(iv, bip, iter) {
+-			unsigned int j;
+-			void *p;
+-
+-			p =3D bvec_kmap_local(&iv);
+-			for (j =3D 0; j < iv.bv_len; j +=3D tuple_sz) {
+-				struct crc64_pi_tuple *pi =3D p +  offset;
+-				u64 ref =3D get_unaligned_be48(pi->ref_tag);
+-
+-				if (ref =3D=3D virt)
+-					put_unaligned_be48(ref_tag, pi->ref_tag);
+-				virt++;
+-				ref_tag++;
+-				p +=3D tuple_sz;
+-			}
+-			kunmap_local(p);
+-		}
++	if (verify)
++		ret =3D blk_integrity_verify(iter, ptuple);
++	else
++		blk_integrity_set(iter, ptuple);
+=20
+-		bip->bip_flags |=3D BIP_MAPPED_INTEGRITY;
++	if (likely(ptuple !=3D &tuple)) {
++		kunmap_local(ptuple);
++	} else if (!verify) {
++		blk_integrity_copy_from_tuple(iter->bip, &iter->prot_iter,
++				ptuple, iter->bi->pi_tuple_size);
+ 	}
 +
-+static inline __u64 get_unaligned_be48(const void *p)
-+{
-+	return __get_unaligned_be48(p);
-+}
 +
-+static void init_metadata(void *p, int intervals, int ref)
-+{
-+	int i, j;
++	iter->interval_remaining =3D 1 << iter->bi->interval_exp;
++	iter->crc =3D 0;
++	iter->seed++;
 +
-+	for (i =3D 0; i < intervals; i++, ref++) {
-+		int remaining =3D metadata_size - pi_offset;
-+		unsigned char *m =3D p;
++	return ret;
+ }
+=20
+-static void ext_pi_type1_complete(struct request *rq, unsigned int nr_by=
+tes)
++static void blk_integrity_iterate(struct bio *bio, struct bvec_iter *dat=
+a_iter,
++				  bool verify)
+ {
+-	struct blk_integrity *bi =3D &rq->q->limits.integrity;
+-	unsigned intervals =3D nr_bytes >> bi->interval_exp;
+-	const int tuple_sz =3D bi->metadata_size;
+-	u64 ref_tag =3D ext_pi_ref_tag(rq);
+-	u8 offset =3D bi->pi_offset;
+-	struct bio *bio;
+-
+-	__rq_for_each_bio(bio, rq) {
+-		struct bio_integrity_payload *bip =3D bio_integrity(bio);
+-		u64 virt =3D lower_48_bits(bip_get_seed(bip));
+-		struct bio_vec iv;
+-		struct bvec_iter iter;
+-
+-		bip_for_each_vec(iv, bip, iter) {
+-			unsigned int j;
+-			void *p;
+-
+-			p =3D bvec_kmap_local(&iv);
+-			for (j =3D 0; j < iv.bv_len && intervals; j +=3D tuple_sz) {
+-				struct crc64_pi_tuple *pi =3D p + offset;
+-				u64 ref =3D get_unaligned_be48(pi->ref_tag);
+-
+-				if (ref =3D=3D ref_tag)
+-					put_unaligned_be48(virt, pi->ref_tag);
+-				virt++;
+-				ref_tag++;
+-				intervals--;
+-				p +=3D tuple_sz;
+-			}
+-			kunmap_local(p);
++	struct blk_integrity *bi =3D blk_get_integrity(bio->bi_bdev->bd_disk);
++	struct bio_integrity_payload *bip =3D bio_integrity(bio);
++	struct blk_integrity_iter iter =3D {
++		.bio =3D bio,
++		.bip =3D bip,
++		.bi =3D bi,
++		.data_iter =3D *data_iter,
++		.prot_iter =3D bip->bip_iter,
++		.interval_remaining =3D 1 << bi->interval_exp,
++		.seed =3D data_iter->bi_sector,
++		.crc =3D 0,
++	};
++	blk_status_t ret =3D BLK_STS_OK;
 +
-+		for (j =3D 0; j < pi_offset; j++)
-+			m[j] =3D (unsigned char)(ref + j + i);
++	while (iter.data_iter.bi_size && ret =3D=3D BLK_STS_OK) {
++		struct bio_vec bv =3D mp_bvec_iter_bvec(iter.bio->bi_io_vec,
++						      iter.data_iter);
++		void *kaddr =3D bvec_kmap_local(&bv);
++		void *data =3D kaddr;
++		unsigned int len;
 +
-+		p +=3D pi_offset;
-+		if (reftag_enabled) {
-+			if (pi_size =3D=3D 8) {
-+				struct t10_pi_tuple *tuple =3D p;
++		bvec_iter_advance_single(iter.bio->bi_io_vec, &iter.data_iter,
++					 bv.bv_len);
++		while (bv.bv_len && ret =3D=3D BLK_STS_OK) {
++			len =3D min(iter.interval_remaining, bv.bv_len);
++			blk_crc(&iter, data, len);
++			bv.bv_len -=3D len;
++			data +=3D len;
++			iter.interval_remaining -=3D len;
++			if (!iter.interval_remaining)
++				ret =3D blk_integrity_interval(&iter, verify);
+ 		}
++		kunmap_local(kaddr);
+ 	}
 +
-+				tuple->ref_tag =3D swap(ref);
-+				remaining -=3D sizeof(*tuple);
-+				p +=3D sizeof(*tuple);
-+			} else if (pi_size =3D=3D 16) {
-+				struct crc64_pi_tuple *tuple =3D p;
++	if (ret)
++		bio->bi_status =3D ret;
+ }
+=20
+ void blk_integrity_generate(struct bio *bio)
+ {
+ 	struct blk_integrity *bi =3D blk_get_integrity(bio->bi_bdev->bd_disk);
+-	struct bio_integrity_payload *bip =3D bio_integrity(bio);
+-	struct blk_integrity_iter iter;
+-	struct bvec_iter bviter;
+-	struct bio_vec bv;
+-
+-	iter.disk_name =3D bio->bi_bdev->bd_disk->disk_name;
+-	iter.interval =3D 1 << bi->interval_exp;
+-	iter.seed =3D bio->bi_iter.bi_sector;
+-	iter.prot_buf =3D bvec_virt(bip->bip_vec);
+-	bio_for_each_segment(bv, bio, bviter) {
+-		void *kaddr =3D bvec_kmap_local(&bv);
+=20
+-		iter.data_buf =3D kaddr;
+-		iter.data_size =3D bv.bv_len;
+-		switch (bi->csum_type) {
+-		case BLK_INTEGRITY_CSUM_CRC64:
+-			ext_pi_crc64_generate(&iter, bi);
+-			break;
+-		case BLK_INTEGRITY_CSUM_CRC:
+-		case BLK_INTEGRITY_CSUM_IP:
+-			t10_pi_generate(&iter, bi);
+-			break;
+-		default:
+-			break;
+-		}
+-		kunmap_local(kaddr);
++	switch (bi->csum_type) {
++	case BLK_INTEGRITY_CSUM_CRC64:
++	case BLK_INTEGRITY_CSUM_CRC:
++	case BLK_INTEGRITY_CSUM_IP:
++		blk_integrity_iterate(bio, &bio->bi_iter, false);
++		break;
++	default:
++		break;
+ 	}
+ }
+=20
+ void blk_integrity_verify_iter(struct bio *bio, struct bvec_iter *saved_=
+iter)
+ {
+ 	struct blk_integrity *bi =3D blk_get_integrity(bio->bi_bdev->bd_disk);
+-	struct bio_integrity_payload *bip =3D bio_integrity(bio);
+-	struct blk_integrity_iter iter;
+-	struct bvec_iter bviter;
+-	struct bio_vec bv;
 +
-+				__put_unaligned_be48(ref, tuple->ref_tag);
-+				remaining -=3D sizeof(*tuple);
-+				p +=3D sizeof(*tuple);
-+			}
-+		}
-+
-+		m =3D p;
-+		for (j =3D 0; j < remaining; j++)
-+			m[j] =3D (unsigned char)~(ref + j + i);
-+
-+		p +=3D remaining;
++	switch (bi->csum_type) {
++	case BLK_INTEGRITY_CSUM_CRC64:
++	case BLK_INTEGRITY_CSUM_CRC:
++	case BLK_INTEGRITY_CSUM_IP:
++		blk_integrity_iterate(bio, saved_iter, true);
++		break;
++	default:
++		break;
 +	}
 +}
 +
-+static int check_metadata(void *p, int intervals, int ref)
++/*
++ * Advance @iter past the protection offset for protection formats that
++ * contain front padding on the metadata region.
++ */
++static void blk_pi_advance_offset(struct blk_integrity *bi,
++				  struct bio_integrity_payload *bip,
++				  struct bvec_iter *iter)
 +{
-+	int i, j;
++	unsigned int offset =3D bi->pi_offset;
 +
-+	for (i =3D 0; i < intervals; i++, ref++) {
-+		int remaining =3D metadata_size - pi_offset;
-+		unsigned char *m =3D p;
++	while (offset > 0) {
++		struct bio_vec bv =3D mp_bvec_iter_bvec(bip->bip_vec, *iter);
++		unsigned int len =3D min(bv.bv_len, offset);
 +
-+		for (j =3D 0; j < pi_offset; j++) {
-+			if (m[j] !=3D (unsigned char)(ref + j + i)) {
-+				fprintf(stderr, "(pre)interval:%d byte:%d expected:%x got:%x\n",
-+					i, j, (unsigned char)(ref + j + i), m[j]);
-+				return -1;
-+			}
-+		}
-+
-+		p +=3D pi_offset;
-+		if (reftag_enabled) {
-+			if (pi_size =3D=3D 8) {
-+				struct t10_pi_tuple *tuple =3D p;
-+
-+				if (swap(tuple->ref_tag) !=3D ref) {
-+					fprintf(stderr, "reftag interval:%d expected:%x got:%x\n",
-+						i, ref, swap(tuple->ref_tag));
-+					return -1;
-+				}
-+
-+				remaining -=3D sizeof(*tuple);
-+				p +=3D sizeof(*tuple);
-+			} else if (pi_size =3D=3D 16) {
-+				struct crc64_pi_tuple *tuple =3D p;
-+				__u64 v =3D get_unaligned_be48(tuple->ref_tag);
-+
-+				if (v !=3D ref) {
-+					fprintf(stderr, "reftag interval:%d expected:%x got:%llx\n",
-+						i, ref, v);
-+					return -1;
-+				}
-+				remaining -=3D sizeof(*tuple);
-+				p +=3D sizeof(*tuple);
-+			}
-+		}
-+
-+		m =3D p;
-+		for (j =3D 0; j < remaining; j++) {
-+			if (m[j] !=3D (unsigned char)~(ref + j + i)) {
-+				fprintf(stderr, "(post)interval:%d byte:%d expected:%x got:%x\n",
-+					i, j, (unsigned char)~(ref + j + i), m[j]);
-+				return -1;
-+			}
-+		}
-+
-+		p +=3D remaining;
++		bvec_iter_advance_single(bip->bip_vec, iter, len);
++		offset -=3D len;
 +	}
-+
-+	return 0;
 +}
 +
-+static int init_data(void *data, int offset)
++static void *blk_tuple_remap_begin(union pi_tuple *tuple,
++				   struct blk_integrity *bi,
++				   struct bio_integrity_payload *bip,
++				   struct bvec_iter *iter)
 +{
-+	unsigned char *d =3D data;
-+	int i;
++	struct bvec_iter titer;
++	struct bio_vec pbv;
 +
-+	for (i =3D 0; i < DATA_SIZE; i++)
-+		d[i] =3D (unsigned char)(0xaa + offset + i);
-+
-+	return 0;
++	blk_pi_advance_offset(bi, bip, iter);
++	pbv =3D mp_bvec_iter_bvec(bip->bip_vec, *iter);
++	if (likely(pbv.bv_len >=3D bi->pi_tuple_size))
++		return bvec_kmap_local(&pbv);
+=20
+ 	/*
+-	 * At the moment verify is called bi_iter has been advanced during spli=
+t
+-	 * and completion, so use the copy created during submission here.
++	 * We need to preserve the state of the original iter for the
++	 * copy_from_tuple at the end, so make a temp iter for here.
+ 	 */
+-	iter.disk_name =3D bio->bi_bdev->bd_disk->disk_name;
+-	iter.interval =3D 1 << bi->interval_exp;
+-	iter.seed =3D saved_iter->bi_sector;
+-	iter.prot_buf =3D bvec_virt(bip->bip_vec);
+-	__bio_for_each_segment(bv, bio, bviter, *saved_iter) {
+-		void *kaddr =3D bvec_kmap_local(&bv);
+-		blk_status_t ret =3D BLK_STS_OK;
++	titer =3D *iter;
++	blk_integrity_copy_to_tuple(bip, &titer, tuple, bi->pi_tuple_size);
++	return tuple;
 +}
-+
-+static int check_data(void *data, int offset)
+=20
+-		iter.data_buf =3D kaddr;
+-		iter.data_size =3D bv.bv_len;
+-		switch (bi->csum_type) {
+-		case BLK_INTEGRITY_CSUM_CRC64:
+-			ret =3D ext_pi_crc64_verify(&iter, bi);
+-			break;
+-		case BLK_INTEGRITY_CSUM_CRC:
+-		case BLK_INTEGRITY_CSUM_IP:
+-			ret =3D t10_pi_verify(&iter, bi);
+-			break;
+-		default:
+-			break;
+-		}
+-		kunmap_local(kaddr);
++static void blk_tuple_remap_end(union pi_tuple *tuple, void *ptuple,
++				struct blk_integrity *bi,
++				struct bio_integrity_payload *bip,
++				struct bvec_iter *iter)
 +{
-+	unsigned char *d =3D data;
-+	int i;
++	unsigned int len =3D bi->metadata_size - bi->pi_offset;
 +
-+	for (i =3D 0; i < DATA_SIZE; i++)
-+		if (d[i] !=3D (unsigned char)(0xaa + offset + i))
-+			return -1;
-+
-+	return 0;
++	if (likely(ptuple !=3D tuple)) {
++		kunmap_local(ptuple);
++	} else {
++		blk_integrity_copy_from_tuple(bip, iter, ptuple,
++				bi->pi_tuple_size);
++		len -=3D bi->pi_tuple_size;
++	}
+=20
+-		if (ret) {
+-			bio->bi_status =3D ret;
+-			return;
+-		}
++	bvec_iter_advance(bip->bip_vec, iter, len);
 +}
 +
-+int main(int argc, char *argv[])
++static void blk_set_ext_unmap_ref(struct crc64_pi_tuple *pi, u64 virt,
++				  u64 ref_tag)
 +{
-+	int fd, ret, offset, intervals, metabuffer_size, metabuffer_tx_size;
-+	void *orig_data_buf, *orig_pi_buf, *data_buf;
-+	struct io_uring_sqe *sqe;
-+	struct io_uring_cqe *cqe;
-+	struct io_uring ring;
++	u64 ref =3D get_unaligned_be48(&pi->ref_tag);
 +
-+	if (argc < 2) {
-+		fprintf(stderr, "Usage: %s <dev>\n", argv[0]);
-+		return 1;
-+	}
-+
-+	fd =3D open(argv[1], O_RDWR | O_DIRECT);
-+	if (fd < 0) {
-+		perror("Failed to open device with O_DIRECT");
-+		return 1;
-+	}
-+
-+	ret =3D init_capabilities(fd);
-+	if (ret < 0)
-+		return 1;
-+	if (lba_size =3D=3D 0 || metadata_size =3D=3D 0)
-+		return 1;
-+
-+	intervals =3D DATA_SIZE / lba_size;
-+	metabuffer_tx_size =3D intervals * metadata_size;
-+	metabuffer_size =3D metabuffer_tx_size * 2;
-+
-+	if (posix_memalign(&orig_data_buf, pagesize, DATA_SIZE)) {
-+		perror("posix_memalign failed for data buffer");
-+		ret =3D 1;
-+		goto close;
-+	}
-+
-+	if (posix_memalign(&orig_pi_buf, pagesize, metabuffer_size)) {
-+		perror("posix_memalign failed for metadata buffer");
-+		ret =3D 1;
-+		goto free;
-+	}
-+
-+	ret =3D io_uring_queue_init(8, &ring, 0);
-+	if (ret < 0) {
-+		perror("io_uring_queue_init failed");
-+		goto cleanup;
-+	}
-+
-+	data_buf =3D orig_data_buf;
-+	for (offset =3D 0; offset < 512; offset++) {
-+		void *pi_buf =3D (char *)orig_pi_buf + offset * 4;
-+		struct io_uring_attr_pi pi_attr =3D {
-+			.addr =3D (__u64)pi_buf,
-+			.seed =3D offset,
-+			.len =3D metabuffer_tx_size,
-+		};
-+
-+		if (reftag_enabled)
-+			pi_attr.flags =3D IO_INTEGRITY_CHK_REFTAG;
-+
-+		init_data(data_buf, offset);
-+		init_metadata(pi_buf, intervals, offset);
-+
-+		sqe =3D io_uring_get_sqe(&ring);
-+		if (!sqe) {
-+			fprintf(stderr, "Failed to get SQE\n");
-+			ret =3D 1;
-+			goto ring_exit;
-+		}
-+
-+		io_uring_prep_write(sqe, fd, data_buf, DATA_SIZE, offset * lba_size * =
-8);
-+		io_uring_sqe_set_data(sqe, (void *)1L);
-+
-+#ifdef PI_URING_COMPAT
-+		/* old liburing, use fields that overlap in the union */
-+		sqe->__pad2[0] =3D IORING_RW_ATTR_FLAG_PI;
-+		sqe->addr3 =3D (__u64)&pi_attr;
-+#else
-+		sqe->attr_type_mask =3D IORING_RW_ATTR_FLAG_PI;
-+		sqe->attr_ptr =3D (__u64)&pi_attr;
-+#endif
-+
-+		ret =3D io_uring_submit(&ring);
-+		if (ret < 1) {
-+			perror("io_uring_submit failed (WRITE)");
-+			ret =3D 1;
-+			goto ring_exit;
-+		}
-+
-+		ret =3D io_uring_wait_cqe(&ring, &cqe);
-+		if (ret < 0) {
-+			perror("io_uring_wait_cqe failed (WRITE)");
-+			ret =3D 1;
-+			goto ring_exit;
-+		}
-+
-+		if (cqe->res < 0) {
-+			fprintf(stderr, "write failed at offset %d: %s\n",
-+				offset, strerror(-cqe->res));
-+			ret =3D 1;
-+			goto ring_exit;
-+		}
-+
-+		io_uring_cqe_seen(&ring, cqe);
-+
-+		memset(data_buf, 0, DATA_SIZE);
-+		memset(pi_buf, 0, metabuffer_tx_size);
-+
-+		sqe =3D io_uring_get_sqe(&ring);
-+		if (!sqe) {
-+			fprintf(stderr, "failed to get SQE\n");
-+			ret =3D 1;
-+			goto ring_exit;
-+		}
-+
-+		io_uring_prep_read(sqe, fd, data_buf, DATA_SIZE, offset * lba_size * 8=
-);
-+		io_uring_sqe_set_data(sqe, (void *)2L);
-+
-+#ifdef PI_URING_COMPAT
-+		sqe->__pad2[0] =3D IORING_RW_ATTR_FLAG_PI;
-+		sqe->addr3 =3D (__u64)&pi_attr;
-+#else
-+		sqe->attr_type_mask =3D IORING_RW_ATTR_FLAG_PI;
-+		sqe->attr_ptr =3D (__u64)&pi_attr;
-+#endif
-+
-+		ret =3D io_uring_submit(&ring);
-+		if (ret < 1) {
-+			perror("io_uring_submit failed (read)");
-+			ret =3D 1;
-+			goto ring_exit;
-+		}
-+
-+		ret =3D io_uring_wait_cqe(&ring, &cqe);
-+		if (ret < 0) {
-+			fprintf(stderr, "io_uring_wait_cqe failed (read): %s\n", strerror(-re=
-t));
-+			ret =3D 1;
-+			goto ring_exit;
-+		}
-+
-+		if (cqe->res < 0) {
-+			fprintf(stderr, "read failed at offset %d: %s\n",
-+				offset, strerror(-cqe->res));
-+			ret =3D 1;
-+			goto ring_exit;
-+		}
-+
-+		ret =3D check_data(data_buf, offset);
-+		if (ret) {
-+			fprintf(stderr, "data corruption at offset %d\n",
-+				offset);
-+			ret =3D 1;
-+			goto ring_exit;
-+		}
-+
-+		ret =3D check_metadata(pi_buf, intervals, offset);
-+		if (ret) {
-+			fprintf(stderr, "metadata corruption at offset %d\n",
-+				offset);
-+			ret =3D 1;
-+			goto ring_exit;
-+		}
-+
-+		io_uring_cqe_seen(&ring, cqe);
-+	}
-+
-+	memset(data_buf, 0, DATA_SIZE);
-+
-+	sqe =3D io_uring_get_sqe(&ring);
-+	io_uring_prep_write(sqe, fd, data_buf, DATA_SIZE, 0);
-+	io_uring_sqe_set_data(sqe, (void *)1L);
-+
-+	sqe =3D io_uring_get_sqe(&ring);
-+	io_uring_prep_write(sqe, fd, data_buf, DATA_SIZE, DATA_SIZE);
-+	io_uring_sqe_set_data(sqe, (void *)2L);
-+
-+	io_uring_submit(&ring);
-+
-+	io_uring_wait_cqe(&ring, &cqe);
-+	io_uring_cqe_seen(&ring, cqe);
-+	io_uring_wait_cqe(&ring, &cqe);
-+	io_uring_cqe_seen(&ring, cqe);
-+ring_exit:
-+    io_uring_queue_exit(&ring);
-+cleanup:
-+    free(orig_pi_buf);
-+free:
-+    free(orig_data_buf);
-+close:
-+    close(fd);
-+    return ret;
-+}
-diff --git a/tests/block/043 b/tests/block/043
-new file mode 100755
-index 0000000..0e6a6cb
---- /dev/null
-+++ b/tests/block/043
-@@ -0,0 +1,27 @@
-+#!/bin/bash
-+
-+. tests/block/rc
-+
-+DESCRIPTION=3D"Test userspace metadataoffsets"
-+QUICK=3D1
-+
-+device_requires() {
-+	_test_dev_has_metadata
-+	_test_dev_disables_extended_lba
++	if (ref =3D=3D lower_48_bits(ref_tag) && ref !=3D lower_48_bits(virt))
++		put_unaligned_be48(virt, pi->ref_tag);
 +}
 +
-+requires() {
-+	_have_kernel_option IO_URING
-+	_have_kernel_option BLK_DEV_INTEGRITY
++static void blk_set_t10_unmap_ref(struct t10_pi_tuple *pi, u32 virt,
++				  u32 ref_tag)
++{
++	u32 ref =3D get_unaligned_be32(&pi->ref_tag);
++
++	if (ref =3D=3D ref_tag && ref !=3D virt)
++		put_unaligned_be32(virt, &pi->ref_tag);
 +}
 +
-+test_device() {
-+	echo "Running ${TEST_NAME}"
-+
-+	if ! src/metadata ${TEST_DEV}; then
-+		echo "src/dio-offsets failed"
-+	fi
-+
-+	echo "Test complete"
++static void blk_reftag_remap_complete(struct blk_integrity *bi,
++				      union pi_tuple *tuple, u64 virt, u64 ref)
++{
++	switch (bi->csum_type) {
++	case BLK_INTEGRITY_CSUM_CRC64:
++		blk_set_ext_unmap_ref(&tuple->crc64_pi, virt, ref);
++		break;
++	case BLK_INTEGRITY_CSUM_CRC:
++	case BLK_INTEGRITY_CSUM_IP:
++		blk_set_t10_unmap_ref(&tuple->t10_pi, virt, ref);
++		break;
++	default:
++		WARN_ON_ONCE(1);
++		break;
+ 	}
+ }
+=20
+-void blk_integrity_prepare(struct request *rq)
++static void blk_set_ext_map_ref(struct crc64_pi_tuple *pi, u64 virt,
++				u64 ref_tag)
+ {
+-	struct blk_integrity *bi =3D &rq->q->limits.integrity;
++	u64 ref =3D get_unaligned_be48(&pi->ref_tag);
+=20
+-	if (!(bi->flags & BLK_INTEGRITY_REF_TAG))
++	if (ref =3D=3D lower_48_bits(virt) && ref !=3D ref_tag)
++		put_unaligned_be48(ref_tag, pi->ref_tag);
 +}
 +
-diff --git a/tests/block/043.out b/tests/block/043.out
-new file mode 100644
-index 0000000..fda7fca
---- /dev/null
-+++ b/tests/block/043.out
-@@ -0,0 +1,2 @@
-+Running block/043
-+Test complete
++static void blk_set_t10_map_ref(struct t10_pi_tuple *pi, u32 virt, u32 r=
+ef_tag)
++{
++	u32 ref =3D get_unaligned_be32(&pi->ref_tag);
++
++	if (ref =3D=3D virt && ref !=3D ref_tag)
++		put_unaligned_be32(ref_tag, &pi->ref_tag);
++}
++
++static void blk_reftag_remap_prepare(struct blk_integrity *bi,
++				     union pi_tuple *tuple,
++				     u64 virt, u64 ref)
++{
++	switch (bi->csum_type) {
++	case BLK_INTEGRITY_CSUM_CRC64:
++		blk_set_ext_map_ref(&tuple->crc64_pi, virt, ref);
++		break;
++	case BLK_INTEGRITY_CSUM_CRC:
++	case BLK_INTEGRITY_CSUM_IP:
++		blk_set_t10_map_ref(&tuple->t10_pi, virt, ref);
++		break;
++	default:
++		WARN_ON_ONCE(1);
++		break;
++	}
++}
++
++static void __blk_reftag_remap(struct bio *bio, struct blk_integrity *bi=
+,
++			       unsigned *intervals, u64 *ref, bool prep)
++{
++	struct bio_integrity_payload *bip =3D bio_integrity(bio);
++	struct bvec_iter iter =3D bip->bip_iter;
++	u64 virt =3D bip_get_seed(bip);
++	union pi_tuple tuple;
++	union pi_tuple *ptuple;
++
++	if (prep && bip->bip_flags & BIP_MAPPED_INTEGRITY) {
++		*ref +=3D bio->bi_iter.bi_size >> bi->interval_exp;
+ 		return;
++	}
+=20
+-	if (bi->csum_type =3D=3D BLK_INTEGRITY_CSUM_CRC64)
+-		ext_pi_type1_prepare(rq);
+-	else
+-		t10_pi_type1_prepare(rq);
++	while (iter.bi_size && *intervals) {
++		ptuple =3D blk_tuple_remap_begin(&tuple, bi, bip, &iter);
++
++		if (prep)
++			blk_reftag_remap_prepare(bi, ptuple, virt, *ref);
++		else
++			blk_reftag_remap_complete(bi, ptuple, virt, *ref);
++
++		blk_tuple_remap_end(&tuple, ptuple, bi, bip, &iter);
++		(*intervals)--;
++		(*ref)++;
++		virt++;
++	}
++
++	if (prep)
++		bip->bip_flags |=3D BIP_MAPPED_INTEGRITY;
+ }
+=20
+-void blk_integrity_complete(struct request *rq, unsigned int nr_bytes)
++static void blk_integrity_remap(struct request *rq, unsigned int nr_byte=
+s,
++				bool prep)
+ {
+ 	struct blk_integrity *bi =3D &rq->q->limits.integrity;
++	u64 ref =3D blk_rq_pos(rq) >> (bi->interval_exp - SECTOR_SHIFT);
++	unsigned intervals =3D nr_bytes >> bi->interval_exp;
++	struct bio *bio;
+=20
+ 	if (!(bi->flags & BLK_INTEGRITY_REF_TAG))
+ 		return;
+=20
+-	if (bi->csum_type =3D=3D BLK_INTEGRITY_CSUM_CRC64)
+-		ext_pi_type1_complete(rq, nr_bytes);
+-	else
+-		t10_pi_type1_complete(rq, nr_bytes);
++	__rq_for_each_bio(bio, rq) {
++		__blk_reftag_remap(bio, bi, &intervals, &ref, prep);
++		if (!intervals)
++			break;
++	}
++}
++
++void blk_integrity_prepare(struct request *rq)
++{
++	blk_integrity_remap(rq, blk_rq_bytes(rq), true);
++}
++
++void blk_integrity_complete(struct request *rq, unsigned int nr_bytes)
++{
++	blk_integrity_remap(rq, nr_bytes, false);
+ }
 --=20
 2.47.3
 
