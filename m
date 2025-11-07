@@ -1,104 +1,80 @@
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E934D347FD1
-	for <linux-block@vger.kernel.org>; Thu,  6 Nov 2025 23:33:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6A091DFE12
+	for <linux-block@vger.kernel.org>; Fri,  7 Nov 2025 00:10:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762472027; cv=none; b=Xxy2pame4HM4wYpxEoN333ov1mn1MUHpo3FA8KBK9mw2XIdsaWcX5xj4u+09C0Varr9qbhRflvoxGWaO0mCOZdw7SuJ0OHxT5ZVAJFTe7LlqFstTk+jMSne0Wn9EBqtZV5mXRU5nD/qZRDteJ8WsdXtc7TWpde3xvJgq/aFBnL0=
+	t=1762474260; cv=none; b=bjyTc5369e0RLUX8IJljlY8GRlc+dSmRm+6aVDvUifWil0Ttxuk6xwIZHMawId894F1odyr3hv21tQxFLNKf/NRyNk0WnCk7J+swbhsqki4bDiEmUZA1QvT4wPHehDxosJC13pg9z1p/YcmLLf24UClDUvbeUWEyFgT5G5UJdJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762472027; c=relaxed/simple;
-	bh=E1ekq6cGetq/EM4Mk8jO06W5nqMewZh3FMKPQXLdf8s=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=MvkgWot+ANA43iY9nRNAaEqA6FiiBMDwplpOD1q4lg4VRBrmNEDVWwQRdyPRdbSC56xV04jIng0tbCdobnRQEGl0PPJ7jOWzPDyxbxsfmg6xdxh/+CL68K2Y7h9p1DS1LQnVLRKtgry70t3hBm0FzT4iagCg7U2gMTPWS5WKsUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=qbHRGXLP; arc=none smtp.client-ip=209.85.219.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1762474260; c=relaxed/simple;
+	bh=YwGnfZV13ZP8Ogk95cKBeclXjRlSTKAjTiLl25kTRFA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IbTGJbBPPyPnxtfjuHUH13Ydi4btF1yMK3QQHMYvlHEtJ8sJ+GQJz9P6Oplpr3foYaWKdpVbU1yvrh58t424P7k5uiyySH3tWpqh53T0gn7jtoao8Y/MFBgS1KbbUYE4PIaMepTR5jF9pqtWX0HvMWWg1KEdr7At5ylU3nI2+gw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SOxiRMeF; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="qbHRGXLP"
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-88044caaa3eso2204976d6.3
-        for <linux-block@vger.kernel.org>; Thu, 06 Nov 2025 15:33:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1762472025; x=1763076825; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pRXXfNY9pyURNKfsdcnYJbg6hRyM80+iEOQucrkOHfk=;
-        b=qbHRGXLPGgQ8EMicb4RfotIVWm9S9+3WYzIzq/+qE8cgZsps4FXiLO7ygi20vD1JPu
-         OOnu39Pqjh23QNP0zK7MfdIHfYdqEs4aKRTLkP/pw1nB+iiJ704lpqzJ7IxCXAv5yNkp
-         k3PUM5yxlT0D+dgJ8Cj5uxqe1TBDhc2Wtw6AX+Ynd7xWOBj9t6zIB6M/va9CvpCh7Xjd
-         Sk6yfBSlPDXdBRSpXobeIFRR4u3IZ8mWyk7tsSuN4Q6bWivKHNsCANVPhWczekja/EY9
-         dyqoisctGa44l1tVqMGtgRWc/Ke4ez5hTkWsk4ppHPu7Sgg0sF9/OYNGlpgsZMAMgc0e
-         3ENA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762472025; x=1763076825;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=pRXXfNY9pyURNKfsdcnYJbg6hRyM80+iEOQucrkOHfk=;
-        b=KkWJ9km+140d7/fPqY0aZyCfmNtR7opcf59MTX7SDPoqzLCqoZ+QuzR8HXerOYnuca
-         Cxxa9XZ1IyYCuhDnUpIPaZdUPmdqKfl+bPh4bm7GB9hbEcATBWWvv78Lgugf537v67w8
-         Ae3FCVjdhDymBLFwX3n+pVeRoU1qCMRbaYznp65hmqIkM4+u9eYW1VwvVhmUw1O5KEYY
-         b4AL5MXaKNxFfJR/AAl7srDG4XOWbNpGQ/Zmf3lAWaZ+VniMkQRvKp8jSN/wIYNLyvfN
-         RJbznkhUXW+lHjaA9YFzijQgNNeGg8+OG0Nc/0kB7OjP7pwQ9H6LAe5RPKsexsl5NMD2
-         dAIA==
-X-Forwarded-Encrypted: i=1; AJvYcCWWylqiaN5WvRsy8yLk0oc1/BpTZgEBaJjemnuTz+n31cab1+FokjRb8T+bS6bss4Hd3a2d17Fp2EOWyw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwG5c/Pkx2s/ORY07P4r5tDJ45KEKJkbc312tqjAi8Wju/AhXMv
-	hXMrzlgnQMLDJngUbyJFwsMjyo+S7Rszvq/0DFLbO4wxXe3V4pLc/I4l5EHpInYEtBk=
-X-Gm-Gg: ASbGncsadUQYspZj+pYTyS7MkKwuHNV6Gf+ueB4Jgz7rtRdDJVxbxS15k3lP85BDKY7
-	iqdxsDMLu4Ql6WcjRk/7UKw1QlRuOoDSJMc6rJdZjglModL8REfYU3msye/lR/gXc2yVugSv4gA
-	83nI/WtOwEtOyvA/8HhlkDYe3NsmaiD2zpi9J6LkW+RGT4ekY7a6xcBozcSoHr9ocWFB2N1qkpM
-	uQ1vLxrZPqtAa1DeOFOKoI+kzrN2AhPdg+QcII3vGMROmmzkiRrdNBsxyd4W8MKAn2zMDN/Z+lL
-	re964Fn8xEv4SSQL71xCBH9rzJOngEYadkbxaj0cgz8TFjEI/0pzGTuGuzOugiyKL76vcpuIIJ4
-	vtGalkTMDcuEBBc1blvuppTeiJ6mvjAoWCtJFIFDcH6DJpSX3VYsaZVbwXYFq89O3mXJPVHM=
-X-Google-Smtp-Source: AGHT+IEa/p1y28PH7vF+rUuXCk73+M+v/UzuRPpQS8qzH/lxCGdYQdwuZfTniyRJTftE0hYC6qkFUw==
-X-Received: by 2002:ad4:5cad:0:b0:880:53b3:a9bd with SMTP id 6a1803df08f44-88167afcc3amr18286516d6.5.1762472024851;
-        Thu, 06 Nov 2025 15:33:44 -0800 (PST)
-Received: from [127.0.0.1] ([216.235.231.34])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-880829c83edsm27627626d6.31.2025.11.06.15.33.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Nov 2025 15:33:42 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
- Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
- Cong Zhang <cong.zhang@oss.qualcomm.com>
-Cc: linux-arm-msm@vger.kernel.org, virtualization@lists.linux.dev, 
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- pavan.kondeti@oss.qualcomm.com
-In-Reply-To: <20251021-virtio_double_free-v1-1-4dd0cfd258f1@oss.qualcomm.com>
-References: <20251021-virtio_double_free-v1-1-4dd0cfd258f1@oss.qualcomm.com>
-Subject: Re: [PATCH] virtio_blk: NULL out vqs to avoid double free on
- failed resume
-Message-Id: <176247202182.294230.13399520810544725524.b4-ty@kernel.dk>
-Date: Thu, 06 Nov 2025 16:33:41 -0700
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SOxiRMeF"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762474257;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CmkS/EwwmVv+zOfOfidDYpacGfbtN7LhsV4QegBVAFw=;
+	b=SOxiRMeFrz34plcT4u5pguFvze2CZyM0Jcc0/ME743ZzqZMVqWJXtKEOasqPwAUs3xgKJH
+	ORmJFDNBtTyIJSnu7VAM4ZfzYzIG7m5BA4mzXwBVHQN45aq0pQrLsilOhndKttxrswKZrp
+	LqIFzXFBZ/P0zb4YO4OtmWLCyECLGFE=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-400-wFoTcsUIPsu0t6itzAX8GQ-1; Thu,
+ 06 Nov 2025 19:10:52 -0500
+X-MC-Unique: wFoTcsUIPsu0t6itzAX8GQ-1
+X-Mimecast-MFC-AGG-ID: wFoTcsUIPsu0t6itzAX8GQ_1762474251
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2C56718007F2;
+	Fri,  7 Nov 2025 00:10:51 +0000 (UTC)
+Received: from fedora (unknown [10.72.120.7])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 64D8519560A7;
+	Fri,  7 Nov 2025 00:10:46 +0000 (UTC)
+Date: Fri, 7 Nov 2025 08:10:41 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 2/2] ublk: use rq_for_each_segment() for user copy
+Message-ID: <aQ05AQOlm4pDnELt@fedora>
+References: <20251106171647.2590074-1-csander@purestorage.com>
+ <20251106171647.2590074-3-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251106171647.2590074-3-csander@purestorage.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-
-On Tue, 21 Oct 2025 19:07:56 +0800, Cong Zhang wrote:
-> The vblk->vqs releases during freeze. If resume fails before vblk->vqs
-> is allocated, later freeze/remove may attempt to free vqs again.
-> Set vblk->vqs to NULL after freeing to avoid double free.
+On Thu, Nov 06, 2025 at 10:16:47AM -0700, Caleb Sander Mateos wrote:
+> ublk_advance_io_iter() and ublk_copy_io_pages() currently open-code the
+> iteration over the request's bvecs. Switch to the rq_for_each_segment()
+> macro provided by blk-mq to avoid reaching into the bio internals and
+> simplify the code.
 > 
-> 
+> Suggested-by: Ming Lei <ming.lei@redhat.com>
+> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
 
-Applied, thanks!
+Nice cleanup:
 
-[1/1] virtio_blk: NULL out vqs to avoid double free on failed resume
-      commit: 0739c2c6a015604a7c01506bea28200a2cc2e08c
-
-Best regards,
--- 
-Jens Axboe
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
 
+Thanks,
+Ming
 
