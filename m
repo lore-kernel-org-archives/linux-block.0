@@ -1,96 +1,105 @@
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E1DA1BCA1C
-	for <linux-block@vger.kernel.org>; Sat,  8 Nov 2025 13:40:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15FC172602
+	for <linux-block@vger.kernel.org>; Sat,  8 Nov 2025 14:53:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762609216; cv=none; b=lJcw7mU7SCuxoVJXG9pxpruPXOrJwnOtty49nWEoc/5IV6lwBmtm0kKVyKXE+SrRAPwlcEI9x9/a6bcFvG65nddTrVVtAS6D/IE26Dr4x4cGyfYDsPnGgnUnrJU1KOMTMLheCHHcdJMCPvJncfRh00MI4H/zz5VOCZELHnCMzpA=
+	t=1762613594; cv=none; b=V60Qi9tGVUiwNCmniF4C5nFp88UjWReq7H6lGqa+tt4aorWoAPp3So/jqMDKZ4gCNwQcW6ZZCO4yXKqyuly92XKFL9E4b/+90uqv9jSm87NLXKXScLmpUrJRRzbzDFPUKnsRosvle/8OAFfAFd0ozkR3EfiRqgTT9d5wJf4Jjbo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762609216; c=relaxed/simple;
-	bh=273VHuh3p/ntcPrXYgH3JgdfT+IV3y3JCMHzGqVXhKM=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=RVNv6Rv7OcLVnCaAnLNn/JRvJf2D7Zb+kYdRVs3zT6LWCeiZAVkf0bJj72dE1lKcP2XmO3EY3N2i6OWvPTYyOicRjVqz80h/lCdGRHUaQ/RPfMKwlSWNJ8qnWFGt1n2bIle8/cQiYuT8UWU3MJJGBjxyg/uF3Qvl5lz1tbl9b9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=DYMH1XF3; arc=none smtp.client-ip=209.85.219.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1762613594; c=relaxed/simple;
+	bh=M/pvfdvLz2kekRf1KXJQIhxor6Ncywo3beSJvOhSq/s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=A8KvdkMapP79dPfgxxPqd5ZKb30kHzdjn0ZytTIiqgpEmDI6r2cJNxJOEVuwvDJ192zkZmooBANsMTNyLSdXjph/sTa+onPxun1zzPD1NPeeSRfZsz3L9MXpgZL+wYgpL9bpZ6XSJLo6/OS1+AHZlZkvgMtuvmP+xiHH5MI+gus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OGU4k/AU; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=hFaNJfJa; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="DYMH1XF3"
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-880439c5704so13439196d6.1
-        for <linux-block@vger.kernel.org>; Sat, 08 Nov 2025 05:40:13 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OGU4k/AU";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="hFaNJfJa"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762613590;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=M/pvfdvLz2kekRf1KXJQIhxor6Ncywo3beSJvOhSq/s=;
+	b=OGU4k/AUecfpDGRcrcXJsKS7z3Ux/jQhof3Jiz9y9H+Ggj+k/K79dCnXrgNmE1UQ9EGuES
+	lLn7Q0hQiTzSQrWGWaJbKK4mB/1LHszUtIo5q/GH3ROv0nDOlZqbpAUKKRSOuC4fVKvi80
+	NiXoVZkJGMLqHr/HACfLOhDB6cbhxuY=
+Received: from mail-vk1-f198.google.com (mail-vk1-f198.google.com
+ [209.85.221.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-283-4WpReZQyPe-uP8bz8Jc23Q-1; Sat, 08 Nov 2025 09:53:08 -0500
+X-MC-Unique: 4WpReZQyPe-uP8bz8Jc23Q-1
+X-Mimecast-MFC-AGG-ID: 4WpReZQyPe-uP8bz8Jc23Q_1762613588
+Received: by mail-vk1-f198.google.com with SMTP id 71dfb90a1353d-557e2f8039aso1216533e0c.0
+        for <linux-block@vger.kernel.org>; Sat, 08 Nov 2025 06:53:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1762609213; x=1763214013; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+        d=redhat.com; s=google; t=1762613588; x=1763218388; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2giZadMJBuuT3KA47dI/fWZ1tD3AsoNgXq1hGiRElGk=;
-        b=DYMH1XF3HkOMB1JI/syWZ+yjudL++zGbGH4lGi+EiMsfzt2ioJROOoV8h+GtS+D5uH
-         cjmKZL5CaLAnSyELS/Lzvcq3glGWkGG9yvtnakrIQK1D6XJpde364NPWxlWm3ihy766p
-         7rlPmgynhRUq7BhV21O51hRpGz707GKhEWUYsQvTZXzwcJb7RPYggeGcw5W5A6s0CI3C
-         I5AKUY+w/7pFyFOEt97Ukb/vMbBfzsnM+tlSEvKKHjeE3iWNvn4/nPf0nTbXFIIikm9T
-         DNleOb8kR1Mi4Xn3+/cmSFaqdr2PDfxRr99uzRIx6N5tSIPgxQOiEIGrfeqziwfBvaam
-         O4XA==
+        bh=M/pvfdvLz2kekRf1KXJQIhxor6Ncywo3beSJvOhSq/s=;
+        b=hFaNJfJaOfiYJakUF6UJf8OL0wN8Ah/lg8PALKRTQBS+jJaMoE6EyBo+/uapfwk89C
+         rXiGTUUNCx7vjSCXCF7tVue4qANVqns2wrTWpq/Zym3eQ5/M/PzxqpuxvLIDa4BvukST
+         WPZ59CpXgntVjce+UHp0IgbmxgEDHOMs0YENyOiL8gW/cn3eksBus+82ghC9pTN6b1+M
+         uIoV4xBwAGE6OhJGgyvSFDY6qW1sBEzE9H5SyAGzXfzJPczULzzRi79RtY836bsnZq4U
+         5ZcESq4L33CNqf1vTz1cObXADav4EXsnoJsYLH8bMeTdi2A91k31+Ezod3aGL5ehX+k+
+         bjrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762609213; x=1763214013;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1762613588; x=1763218388;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=2giZadMJBuuT3KA47dI/fWZ1tD3AsoNgXq1hGiRElGk=;
-        b=mcltfYdhM+9K/C8fgCyVFJkRJ12NWdne887eiaJNjqMc0pIxC43LAruXFGB/M/bEXl
-         B5/QDSNKL+k/ZgSyuthqAtzWSFtmYR1Yiqib9Lc5ydrvHDA3/5gAW6Tqo0wyOI6L+xnF
-         dC9FR5ju0eumn4nPt8BH6dILsadb8MmZm1fFoNJdmIBmCmor+7vCJ9gYJdJgjUKAevhF
-         lBMaV/3mSM2Mp65X5tVh24Rt0DeM3FVeVAmoJzV972LucfQtqRumGxvQlDy0roDx95Dj
-         SmPI77n/BHBN8aCMsMeXltFp0F58VUUQkFIiE7JynQHQK7vmLLi20LgCGQKauziAocch
-         vl/Q==
-X-Gm-Message-State: AOJu0Yzv7l1Dt3LW8qPRtCgxoo5nQ+sabHdEm9H91Vonvpkgz2RroCzf
-	SN0XUfO+I8/S/JTZaeyMJ2V8cDeFY60/yClHlyb8nM585Y7XE4FIJ0DxNu5IUJSEauo=
-X-Gm-Gg: ASbGncsi+iyUe8bQWqYF5v2kIrwA8gh3lxPCezcRhru2Jj9wK9KjyCMyiGRTTrmTbW0
-	956artFA3zlSK6e0YQmeSyJieDCB6x0PwvmwJuQ7GKoU+mWjEB+tuJLr0dtEb1zhPslqXWtw5yN
-	R9Ytna7un5tC3S8+nZ8KewOTZOcFdcgOlG1D1ZlrBCHqfnVIByGrFqzmANZgPQFuA9e4EXNSvrg
-	34NKRocljWvcvpekTd6emr5A4CmNxPaOPd1LRwxLgtON9+6X54c8ksNRKPbMrEwIe9Jb4L0brls
-	WEsc0uRpNAaAVr3yQb1huhwj/nBxji0+EoMOzX5bLQ3eXBC71OM42VmhOLBavLYk0L2xIMxGeQg
-	7IIWDOgDLBOmNvLkii/aTEIGbLnutQgZ0/NhsWuSEYeOdbjgqEhliyaT4ILeR5HSzLXbLU3OKLD
-	La3zKIcA==
-X-Google-Smtp-Source: AGHT+IEZDp/cTQkzh9cxMAh79OJkaYdzIACL6/dfy5lNuD3BuayrWignNj/jpDQd1nF/EBwlxeFaNg==
-X-Received: by 2002:a05:6214:234f:b0:720:3cd9:1f7e with SMTP id 6a1803df08f44-882384c4c66mr24941386d6.0.1762609212990;
-        Sat, 08 Nov 2025 05:40:12 -0800 (PST)
-Received: from [127.0.0.1] ([216.235.231.34])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-88238b290eesm14808676d6.34.2025.11.08.05.40.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 08 Nov 2025 05:40:12 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20251108040614.3526634-1-csander@purestorage.com>
-References: <20251108040614.3526634-1-csander@purestorage.com>
-Subject: Re: [PATCH] block: clean up indentation in blk_rq_map_iter_init()
-Message-Id: <176260921183.52069.2979400547946367939.b4-ty@kernel.dk>
-Date: Sat, 08 Nov 2025 06:40:11 -0700
+        bh=M/pvfdvLz2kekRf1KXJQIhxor6Ncywo3beSJvOhSq/s=;
+        b=FGcChJbHHxFGu6bqU+lXzjNgbGKcMNXOQ2V9Mp0lnEr+96RVHKxkMT2JsGRMMKwGaJ
+         DAyImcRzvw8ycsrvQK+/Kz2qiNJf8YyCwcZM3m9lUxVrOKdxOj/pQ1Q5d3F7uNNXxbOd
+         zJdjtZv5oajCHg2fxchjP6kGCnGkDKQOyFpouV7ll/CTeaOlKHyhxBa6jfFYPAeqEQGi
+         7UyWU3ke3sGD9YMGjKI0PDtnMcBz7WqqvO/QjcZlL0BAPUC04EXFYvK1mqhOOyrmveWd
+         Ete46qiInl1WHSIRExOjYi6RgQJWuWFQkRTeAkiWMOf+ERjuC3836ajqr2f6LKFnXxrG
+         XAQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVeweovUeEAOmGZAnWNd4ZBj+RZ5e8LSsmLdfvK5Orcbfc/jZGLAzn3V0spXT3tWiASTXvvSOiGKYx3Yg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6qaTjM4MwyiPnI5ORxh5gJvFG0ArEpO57M42DLQSzY3RCNwus
+	A6HFUM8iKTF0gsYgGmREQF1d2UwluD/ewSr9P3TsWIOaxwkEuGSdUY8GO4m0mNq8yMWY4g6zgJ4
+	lqrJnzu78mw4nLYJ/V0XB1fUcoPcZ/6YUtB9W4lnWcXc7kQ9fEKwVGdAsUsFLdTbYtlzwK8jBh/
+	Mlh3V6UW5w+lzJexFrJvmE+Xcp363GEDkyCebmgxA=
+X-Gm-Gg: ASbGncs60Nf70MAx3JQHssl4c/Fc/my90EO3LQ8B5bqkqsjUN1RkIJ0fvtMaLVX+seh
+	dCz/3tfJsxxJB0SOsPu/uX83YwBNqhSsEhj0nDa2V3pi/6708r1aG+x+RqT5+YlszzjNxCt0+md
+	U4BpF8gIU0MZc1xnWv/3X/1LyJIXEbAHOl4Xa7bm4GVpQ8QCj24kkEqZWy
+X-Received: by 2002:a05:6122:2a0e:b0:559:65d6:1674 with SMTP id 71dfb90a1353d-559b32ecfc1mr781019e0c.14.1762613588134;
+        Sat, 08 Nov 2025 06:53:08 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGpfXbjTTSMaE4v8qrE291tFIS6TN2LcX8U6LtZK6fslNq6XbOw/4b7sE2PjVGHDcg2ww2yKZ6a9/OifUdY/Ng=
+X-Received: by 2002:a05:6122:2a0e:b0:559:65d6:1674 with SMTP id
+ 71dfb90a1353d-559b32ecfc1mr781005e0c.14.1762613587832; Sat, 08 Nov 2025
+ 06:53:07 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
+References: <20251108042317.3569682-1-csander@purestorage.com>
+In-Reply-To: <20251108042317.3569682-1-csander@purestorage.com>
+From: Ming Lei <ming.lei@redhat.com>
+Date: Sat, 8 Nov 2025 22:52:55 +0800
+X-Gm-Features: AWmQ_bn54L_mrL-XH2_W-7fM1t6V8FDDbIvOrhBipY_MR5DvmqHYfqpmmtoUoy8
+Message-ID: <CAFj5m9+P9FmNk6kQb6GUgFvTwGm9orGF1ycnvSxGk5QiYx7Lpw@mail.gmail.com>
+Subject: Re: [PATCH] ublk: return unsigned from ublk_{,un}map_io()
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Sat, Nov 8, 2025 at 12:23=E2=80=AFPM Caleb Sander Mateos
+<csander@purestorage.com> wrote:
+>
+> ublk_map_io() and ublk_unmap_io() never return negative values, and
+> their return values are stored in variables of type unsigned. Clarify
+> that they can't fail by making their return types unsigned.
+>
+> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
 
-On Fri, 07 Nov 2025 21:06:13 -0700, Caleb Sander Mateos wrote:
-> blk_rq_map_iter_init() has one line with 7 spaces of indentation and
-> another that mixes 1 tab and 8 spaces. Convert both to tabs.
-> 
-> 
-
-Applied, thanks!
-
-[1/1] block: clean up indentation in blk_rq_map_iter_init()
-      commit: 4cda40dce95a5b4ec0620a84f322472730d01f7a
-
-Best regards,
--- 
-Jens Axboe
-
-
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
