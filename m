@@ -1,67 +1,69 @@
-Received: from mail-ej1-f99.google.com (mail-ej1-f99.google.com [209.85.218.99])
+Received: from mail-lf1-f98.google.com (mail-lf1-f98.google.com [209.85.167.98])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E96C1DF72C
-	for <linux-block@vger.kernel.org>; Sat,  8 Nov 2025 23:01:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CB4B20487E
+	for <linux-block@vger.kernel.org>; Sat,  8 Nov 2025 23:01:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762642871; cv=none; b=jtSOPufFV/tUxOF/R7LWWvkC0s68yq3uNAzmqeR64wmYehQaCJuNu3TQhjOSChy1ia74RiXiG5wfgRXeKPsw5PVHnk6RNAsVQXQ+hRgGrv26g/O2aX3VxbCDyUrPy/wovu/gkCiSIGzKnlaBqbmhTuL3mptxjJbxB3OEJtebq64=
+	t=1762642872; cv=none; b=hBK6ykaz70qxBvisUC9M+E4CPbRL4FF1KXex/QQXwg4/ma2XRtOvVM6zpcKBfLutlpSArrILDk3liVcIbmBVQxH7y9sEyo9/1DGFhXiBmJBCw2Pgq3bTq2PwDgR1WvqQKYPKDozu9ky0rO3zbycPZZPQPOMY4FnJzg4SHffWI7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762642871; c=relaxed/simple;
-	bh=ELCrrGtrdySxwwWAm//4H4Qes1u+2MVrTViH+GLXMhQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ho6wSQiJgGG15Lk/4C9Fgwj666qydfxgpDwtCLSTTvBpJvgYKbuHgIS0OVw6peH84FSxfv9N6n1ESV9FnRyeX/qPd3EGUMk0auH4StlbPI04Obz5Bwdi5dtFe4iPBsNl6GPGwK5tCLAjcY+W1dcrJdt6zqXmxG5UCSKIhAtdLMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=NEv/GsMb; arc=none smtp.client-ip=209.85.218.99
+	s=arc-20240116; t=1762642872; c=relaxed/simple;
+	bh=g4ddBgla8YQdcKEudweh6zNN2rYBzDIa3qmJAJdcF6w=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=WaojWVsMVdWQC7dZooRxbc7CZgfy6jDWDMlYGVoWPpOI5QjFga7F4vATBPqFXEZ8FOnRr+8SZOZanjGBST+o7BilE6gkacGedCSUrNtcSPfIFVdAMES1OL5E2GQC3uY8EQEz2sB/rIYpEL11BmlScvG9uz2mWyjbdpbd07EvbF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Jo5KQ9mj; arc=none smtp.client-ip=209.85.167.98
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="NEv/GsMb"
-Received: by mail-ej1-f99.google.com with SMTP id a640c23a62f3a-b72e7205953so15836066b.0
-        for <linux-block@vger.kernel.org>; Sat, 08 Nov 2025 15:01:09 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Jo5KQ9mj"
+Received: by mail-lf1-f98.google.com with SMTP id 2adb3069b0e04-59441206c1dso211502e87.3
+        for <linux-block@vger.kernel.org>; Sat, 08 Nov 2025 15:01:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1762642868; x=1763247668; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=JRDSAPEErao6vhdU+yX/E1lGKcHqsrIexk2wWTATv1Y=;
-        b=NEv/GsMbOH4omCoq6q9baqxkEiEHHAQuyokbP65SqbtrXn7BG6VatEAzJe3nRPja28
-         PnbKChUoYOxs+kBPpsanN4KhO81p1brmUk9k0NlPXN1FG4DzaNU0z5z5mXb0c1N4FGH/
-         +f+tk1wroM7HYlRIOGfRUbzeg1nnm1zFBk/sSiH14b0aesOZtZxPffks9tpgCLmwx7Ky
-         Nm/kMtvi7QfaEDcwmuPJjev3Hil3VQGwSQtVffaKqwUbiWjnl8Qt1W91lmwfW80isHbU
-         nv94DJGEJ+av/xqU5jISdsRzTjuz8Qz7ar+kq2GOlnIDqJgZJ9PMSsx9zJNUOBVBOVSx
-         0d4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762642868; x=1763247668;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=purestorage.com; s=google2022; t=1762642869; x=1763247669; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JRDSAPEErao6vhdU+yX/E1lGKcHqsrIexk2wWTATv1Y=;
-        b=E0K6yw7xsqiIECw+iTjoZGokrLBL3tvLS4hgBy09XPSVweH/dVz+H8CDNismpFoWBs
-         4FQ2VMPIXamf/MN4r/7ZUTQ1Zku9hNjlLQnSO9GdWvgLDeSc1x/+qO7h60vtH7/lgI5Q
-         esbP1lCVT6o1bGZSNuoPKiLDzHzuFKlMZE3jPqUtzP64l8ekvVq7u359Xd5lfifVBjKf
-         pCa8D6AimTSu1HMtJrFLudLt/euZrSTcd/zk/VUvspDX3ZoCsf1F0SyodQmPgYHA2zhu
-         Z/SwSK8hNZ/hkTh274+xOyR5ohJpbl88fvpmjaRD2F5KcAX8k4eyVU2oKjmPiUUnuW9e
-         DUwg==
-X-Gm-Message-State: AOJu0YxQx8KYxHe5+hE2aNRqVQ0+jQR/9vF1SYJpYmEpzVnXzBDR7UDr
-	4ARVT0M5jxjVpDXM+zTFV6EK8AaZrfeaJxovoVNMHWEhp5gUqXEWPLumDKu3zKjyoA+dEdCrKdG
-	nePz/DrMSXpuUSwWs4gYSclweiYsox4S1K/QOcgYBu5knM7Cp+aKV
-X-Gm-Gg: ASbGncvq/DfqdE1DnLgxzDV1sDWIf7Vba7ZlhTWvI3YOph1y38yJ3Zg6fIxCycdKC8C
-	LJAFHIv6D9//Ef90Xvs2JMbtEyvdXp/QgAeT7/n3Hh1bJsb7C6S71UILizWNpSQdEodrMtMCpDi
-	kthEUPd3VEkYrOqCWMFUN5RQhOdHpGCE+vkCxxYK2mr5CTdtljhwP7pDy9VBdXoke1FWlawwO54
-	rYhD3sTMqkKljRW5PusCngoQJm0BGk/WuM4ImXII2XseKoHeJo84DS3zEM0ajqsgIsUFcc/EkgD
-	dVVve/3+qT7/30EbZeoRHvk5mfGKM109baEQkI66ru19A9ceqlAfZUXBY8e2Nl0F2N4Zh+/1+y3
-	ZkU4+LVXswc74nC04
-X-Google-Smtp-Source: AGHT+IEMd+m9WWXrqh8XFpPvM49jh9lbnX3DzcemwYGT2EGH+S6yj+AppF1rpNbc9Ne+H7XQyIDKrQOXg45e
-X-Received: by 2002:a17:907:6d0b:b0:b72:dcdb:1320 with SMTP id a640c23a62f3a-b72e05a3090mr211515866b.8.1762642868337;
-        Sat, 08 Nov 2025 15:01:08 -0800 (PST)
+        bh=+WVuCf9VQVlr+A9p95nOr8A77FSbZ2C8bh+iEVyLBwI=;
+        b=Jo5KQ9mjrWkROXOpc+iIpMpaOZ3/m/DMk1TbuJj7xM+2zIEjgOSVtV4KOuFvNTNCeE
+         UENVkG/dRlkFf8pQptGe3IBx6AQa6w3mDM7ouHj8hIw7vrXTUZ3dDPNuZqiIA2dm+PEd
+         lMfWXFBjAZakv/wU029F8jfnyNQ4Si6f5uh98uK4LSaa0wrVR/4xy/s+1Ke5KmYJUkFT
+         o1/GBXfLrYhselble9edRnk+BtOsHMbYVhDMogJD9mx1I+dtHmBaR+UCgzck94YI18QS
+         2z9kCa5FYWUz7pa/IHC3L5rINPraZMg/tfydK/Q6m7nmQSVNZVmLV4wq61AdBDpb5QPq
+         G0KA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762642869; x=1763247669;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=+WVuCf9VQVlr+A9p95nOr8A77FSbZ2C8bh+iEVyLBwI=;
+        b=MKXodxjA8W+BOcP7axdIR+4Cq+CpS+6PLYdBNj5TGQm+P8pZZZN4YfcmVnfNjO2heD
+         XJ4GS7He2qfy2gIU9azQIoRGXWV8/FC6qApDJHnYNFYAIuw363YGzCy6OgcqtJDAF5r7
+         +BUngFVtblSA9M8gUlU0K1lsPrrlpSidvXjR2q+zST1uJaamf1GxAwSr28AnmFOeylkM
+         dLpZurVczNt0GaeZPIomSZ3G5D5qmxPS9VrDh7kENy0ZWfBMOYkCDzFAxqOKXWYnD0AA
+         fD4ZAEn9glGx77l9qNCrQy9iMb1subHs3gg1OXqhdRqN2qye+PeQJ/88G0lHbsLWCfzX
+         xsDw==
+X-Gm-Message-State: AOJu0Yx+vzzHAfVHmailnMtzxOdJeTjs8g7lb4cze+9FczvwDI567eNw
+	2JEre0cOKuzwopoATHYgYOMzp/OLjPAaBZrRL2Z0rnlx8vpNqxEu7TZkVxHJqmr6Mm7MaVQQxxF
+	Ac1e89EukeqUpzi2zfzPZfLYBs6wE2vi01giHgSSVZVATLyR2Q0Cl
+X-Gm-Gg: ASbGncvrVwkXKccbtj+jYazY4Nubdy5BwrZSREaLOLV0pd3a7pHFQo6odIuTPfk+MaR
+	qCw2Iotb7Ak/d3KSQ7J0yBFh9HYraVl6uQZIr6M7lM27DFHMaDa5+dkOBpsVIGK42U+neGTU1nM
+	Lze7K6IRDaBP0BEq5vUd7gXvqmtJqsLYLwDnC9NqBt+1NfPUGezuGtNFyxZRGSTEmWh+i7PJsjl
+	REb4GgNM8TLkTrlZCixp0vb0Ig0wC8tmZQdW1w7UVx9cQf7BYg3/yaj0cRMJIsMPBBh//SHA71+
+	AtIiiLc5Z51QnCRM50WEwnUeZXbfyeANq9undDL1YtgHpDqyyN3t1Gu1Y5As5mNhfPk1fNDcWpe
+	dXScG+CupUxXySdaC
+X-Google-Smtp-Source: AGHT+IEi0Gyq93gG1HUhWiqGcWqqJYy3lxU5f5qNsMzYHUTOHbtDZ+IHRkCB2VavnTbM6L9xIJZvppTQtWuf
+X-Received: by 2002:a05:6512:3c8c:b0:594:2d0d:a3dc with SMTP id 2adb3069b0e04-5945f1dc4f9mr582180e87.6.1762642869025;
+        Sat, 08 Nov 2025 15:01:09 -0800 (PST)
 Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
-        by smtp-relay.gmail.com with ESMTPS id a640c23a62f3a-b72bf93b18esm102059266b.94.2025.11.08.15.01.07
+        by smtp-relay.gmail.com with ESMTPS id 2adb3069b0e04-5944a39e420sm1385687e87.54.2025.11.08.15.01.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 08 Nov 2025 15:01:08 -0800 (PST)
+        Sat, 08 Nov 2025 15:01:09 -0800 (PST)
 X-Relaying-Domain: purestorage.com
-Received: from dev-csander.dev.purestorage.com (unknown [IPv6:2620:125:9007:640:ffff::1199])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id E6DB234039D;
-	Sat,  8 Nov 2025 16:01:06 -0700 (MST)
+Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.7.70.37])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 6A50234052C;
+	Sat,  8 Nov 2025 16:01:07 -0700 (MST)
 Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id E0A76E41BD7; Sat,  8 Nov 2025 16:01:06 -0700 (MST)
+	id 68074E41BD7; Sat,  8 Nov 2025 16:01:07 -0700 (MST)
 From: Caleb Sander Mateos <csander@purestorage.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	Damien Le Moal <dlemoal@kernel.org>,
@@ -69,10 +71,12 @@ To: Jens Axboe <axboe@kernel.dk>,
 Cc: linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Caleb Sander Mateos <csander@purestorage.com>
-Subject: [PATCH 0/2] use blk_rq_nr_phys_segments() instead of iterating bvecs
-Date: Sat,  8 Nov 2025 16:00:59 -0700
-Message-ID: <20251108230101.4187106-1-csander@purestorage.com>
+Subject: [PATCH 1/2] loop: use blk_rq_nr_phys_segments() instead of iterating bvecs
+Date: Sat,  8 Nov 2025 16:01:00 -0700
+Message-ID: <20251108230101.4187106-2-csander@purestorage.com>
 X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20251108230101.4187106-1-csander@purestorage.com>
+References: <20251108230101.4187106-1-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -81,17 +85,37 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Minor simplification to loop and zloop to get the number of segments
-from the request directly instead of iterating over all its bvecs.
+The number of bvecs can be obtained directly from struct request's
+nr_phys_segments field via blk_rq_nr_phys_segments(), so use that
+instead of iterating over the bvecs an extra time.
 
-Caleb Sander Mateos (2):
-  loop: use blk_rq_nr_phys_segments() instead of iterating bvecs
-  zloop: use blk_rq_nr_phys_segments() instead of iterating bvecs
+Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+---
+ drivers/block/loop.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
- drivers/block/loop.c  | 5 +----
- drivers/block/zloop.c | 5 +----
- 2 files changed, 2 insertions(+), 8 deletions(-)
-
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 13ce229d450c..8096478fad45 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -346,16 +346,13 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 	struct request *rq = blk_mq_rq_from_pdu(cmd);
+ 	struct bio *bio = rq->bio;
+ 	struct file *file = lo->lo_backing_file;
+ 	struct bio_vec tmp;
+ 	unsigned int offset;
+-	int nr_bvec = 0;
++	unsigned short nr_bvec = blk_rq_nr_phys_segments(rq);
+ 	int ret;
+ 
+-	rq_for_each_bvec(tmp, rq, rq_iter)
+-		nr_bvec++;
+-
+ 	if (rq->bio != rq->biotail) {
+ 
+ 		bvec = kmalloc_array(nr_bvec, sizeof(struct bio_vec),
+ 				     GFP_NOIO);
+ 		if (!bvec)
 -- 
 2.45.2
 
