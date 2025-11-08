@@ -1,130 +1,121 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 200272737F8;
-	Sat,  8 Nov 2025 09:24:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 852C92AD04
+	for <linux-block@vger.kernel.org>; Sat,  8 Nov 2025 10:00:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762593879; cv=none; b=pq9RGAU81JwjmQRJ5mUpuCRzh3Jsquhyg+z0wjfrrVmf+TD+/kJ/AfKdo3Qjet8GlLikvALWMZMFGTw0gS2Sio66EEufJ+5yM4LYrLOJt/GPFwHte/d03kdj337K3j3WbOOL5J2HJ8gBcklb95hM7JXhbGSY+xECKfi5Q2jI9Vg=
+	t=1762596039; cv=none; b=gsIBL0HLmdAfdzKwso6tnZvgy0rhTEPh9yz4NflpwyVJrfTgxqhWJ7KbCLAyRj2yWJJpOvR0L8/iZxuO7/zHNzYRZo/WPVqer1/rTOGisUXHbb8aG1qDrnxV1pGyqTm/y1ylF4oHpu53n4iEhXFxMzhROD2xtkbEuZjWGYcA5H4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762593879; c=relaxed/simple;
-	bh=+LS6ZrGO7B6vLyR4/fHLFcG30wc9EjVsZTbQqzeQlp0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=l4J119H19axrywjAZyVYy57zSnkp3tl/mEzKwLYbBOOoCsn8TZxuytVu8pV0LbhFpLVpV/z8prtrOVvlTNbXMkuQh1/dawiPeTZj0aegDFLC3QK33WV+OXpseBL1adlbh1lHNDbRg+dmVyt55sKFRVjUiDZ2xT492zr3XMR6Mq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4d3VPS3q9gzKHMbr;
-	Sat,  8 Nov 2025 17:05:00 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id EA27C1A07BB;
-	Sat,  8 Nov 2025 17:05:11 +0800 (CST)
-Received: from [10.67.111.176] (unknown [10.67.111.176])
-	by APP4 (Coremail) with SMTP id gCh0CgAnUF3GBw9pgLIYAA--.42082S2;
-	Sat, 08 Nov 2025 17:05:11 +0800 (CST)
-Message-ID: <e0c0f8b7-112f-40d7-b211-89065e9003b2@huaweicloud.com>
-Date: Sat, 8 Nov 2025 17:05:10 +0800
+	s=arc-20240116; t=1762596039; c=relaxed/simple;
+	bh=zovWvIXTeGOZM00GW5G9wnFnWbpq9w2A9fP8s/yN0Ec=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=oEvOL56/hVzuCIkA8i/611DcjkEK6AMGMxGsFx8Sbt6EL+flxOUG3peTuxNHDjC+81a5/+Rmd6DQ+3kcFSawx+RcAoNP5EveVbm5zkCp3HM84ozw4rk74WA5YYWpCMmvprMz1508/2z9DFZCjpIYQc9YOpvKW4/FbulWTJ0+2pw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SV7etRvJ; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SV7etRvJ"
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-781997d195aso986817b3a.3
+        for <linux-block@vger.kernel.org>; Sat, 08 Nov 2025 02:00:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762596038; x=1763200838; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xKkpvmb/gNhZAh81SS7lxMpIqynFZoUlh3WN1RUeadA=;
+        b=SV7etRvJf8D5B68he+R3tbfhXTE3tvhR6e0VZnKVKDHfWRRaKKR8lhujEaC4BMpmu/
+         mDbb4Dswk6G4k+Bzr5FEaYGlzNh0mBiB3RyvP6ARm6+n9pfpdx9GBY427FZ5ngdq/sSY
+         ySa/9Mq97/nsicufPQ/4PzKk1AP2+Dy2xP66jGWp71yvXYUmp82KB6PcIcZjHNmALJvk
+         TmMetQZR8hkb4V9IzFxpfraevJYuktdim0HeLWsqF0XgpZYD+iu7NggT2IT4wryG9Pgu
+         Q4zjQeYJji9vrVkL15D7NJjPQlGVffzTG8UjXd1u87WbrdIugnQi9GZ7v2dTKPhcpwDG
+         l4Vw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762596038; x=1763200838;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xKkpvmb/gNhZAh81SS7lxMpIqynFZoUlh3WN1RUeadA=;
+        b=HqGBqdIu5GwtYY1WrGtEDaLwWmzl3oeSlIdjZNxnctwYgk2xaqmDw4li8d9XByHB3R
+         7koK15+uT9gK7GP6ACU38bEGXcPceTY8OlE25CVPhhU43i/jiRoiQ2XprmgWgSaJnxRr
+         jTUx4tMI4i67mrtFwrabXCykDy2sVnVFMhsNY5k7DIjPMbeITdNdenJWxx3ZoGNQuXW2
+         izi7f23RLnY+/rw9ifbl0wo8pbAR7k3Yt5f2rmRaWla6ha6XuBVVcPNoYsyqf/WwTYEx
+         3LAbAdAbJEgluphyR0HDPIefjaWD47Lmnt9ET2tJ0NYB5LDqigAvRPyyEySySucstAe0
+         7KrQ==
+X-Gm-Message-State: AOJu0YyXyEN9e4zYSQ1i676/RPMGyNnNX22G+PktRPlIC5/7oeS6pTPz
+	evb5F8aRqDp7O1DBjiJ0u20C+KaNsw8XD6f3atVNRbHDkKAVlS0HQUHt
+X-Gm-Gg: ASbGnctl/J2A3bxIMimzYhOPxJhemOg5ItUTeEJ9Jks/iu+cDCB3AzvgXcZiGDqK8Ka
+	0Tpe744mNh38uWHMZbX9TqU5+kyVXDPTaGSReVT0LxPW/pkzl+uQ/o+1dwqatLpRQvnomPKr6Rd
+	2vN8yu4/CkiuoyMEDmI93AeXq2xY80XlhD2Vzb7m8ZMK4gBcQ/lVFKopxKYMSNsThh+k4JQT0Vg
+	paRmQCBFlFbH4KkQJ5mYJkHt7gZ0PPf0XwyXFZU2wFTM/NlEo01UtdS5MZbRPY5jlaXSQkb3GVd
+	KMaRAymSYRNhiUz3pO9F1GIrK/PSVaNLVo4+9NSpclrO7166pO4luL5Bwxz60Zl6OIUUaAVvqyq
+	DD7smWH5stb4DXqJRGGCScOOa5aoNHkbruyQmYzPnfngbOQmXPXEH/y+H70hOEHmfNg9FcvKn8Z
+	F4bv+Ne7rvoaLyRvdIxtoFaq33D9U8RGddNHTgfOqo3bXualq6eiXl9fk/8Q==
+X-Google-Smtp-Source: AGHT+IHeqVqxMetOHAbnbE/jeU7bkSaaZHhTfZXTTL7tsffypUXuVkCFrS/EZD7ccDhZsjdeCDvGeA==
+X-Received: by 2002:a05:6a20:6a22:b0:33b:625:36be with SMTP id adf61e73a8af0-353a3574e00mr2761286637.38.1762596037688;
+        Sat, 08 Nov 2025 02:00:37 -0800 (PST)
+Received: from localhost (ip70-175-132-216.oc.oc.cox.net. [70.175.132.216])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7b2c83906e5sm960397b3a.71.2025.11.08.02.00.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 08 Nov 2025 02:00:37 -0800 (PST)
+From: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+To: shinichiro.kawasaki@wdc.com,
+	wagi@kernel.org
+Cc: linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+Subject: [PATCH blktests 1/2] common/rc: add _have_kernel_options helper function
+Date: Sat,  8 Nov 2025 02:00:33 -0800
+Message-Id: <20251108100034.82125-1-ckulkarnilinux@gmail.com>
+X-Mailer: git-send-email 2.40.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 13/31] cpuset: Update HK_TYPE_DOMAIN cpumask from cpuset
-To: Frederic Weisbecker <frederic@kernel.org>,
- LKML <linux-kernel@vger.kernel.org>
-Cc: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Bjorn Helgaas <bhelgaas@google.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Danilo Krummrich
- <dakr@kernel.org>, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Gabriele Monaco <gmonaco@redhat.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
- Lai Jiangshan <jiangshanlai@gmail.com>,
- Marco Crivellari <marco.crivellari@suse.com>, Michal Hocko
- <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
- Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
- Phil Auld <pauld@redhat.com>, "Rafael J . Wysocki" <rafael@kernel.org>,
- Roman Gushchin <roman.gushchin@linux.dev>,
- Shakeel Butt <shakeel.butt@linux.dev>, Simon Horman <horms@kernel.org>,
- Tejun Heo <tj@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
- Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
- linux-mm@kvack.org, linux-pci@vger.kernel.org, netdev@vger.kernel.org
-References: <20251105210348.35256-1-frederic@kernel.org>
- <20251105210348.35256-14-frederic@kernel.org>
-Content-Language: en-US
-From: Chen Ridong <chenridong@huaweicloud.com>
-In-Reply-To: <20251105210348.35256-14-frederic@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:gCh0CgAnUF3GBw9pgLIYAA--.42082S2
-X-Coremail-Antispam: 1UD129KBjvdXoW7JrWUCF4fXF43Gr1UAF4kCrg_yoWDuFc_Wr
-	15WF4Uuw15JFyqgw1Yy34qga1fJa17t39aqa48try5W3Z5JF43Jrs3A345Ca13Xa4xJF1a
-	934kK393ZrnFqjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbxkYFVCjjxCrM7AC8VAFwI0_Wr0E3s1l1xkIjI8I6I8E6xAIw20E
-	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
-	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x02
-	67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AF
-	wI0_Wrv_ZF1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26rWY6r4U
-	JwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
-	0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_
-	Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU0
-	EksDUUUUU==
-X-CM-SenderInfo: hfkh02xlgr0w46kxt4xhlfz01xgou0bp/
+Content-Transfer-Encoding: 8bit
 
+Add a new helper function _have_kernel_options() that accepts multiple
+kernel config options as arguments. This allows tests to check for
+multiple kernel options in a single call, making the requires()
+function more concise.
 
+Example usage:
+  requires() {
+      _have_kernel_options IO_URING BLK_DEV_INTEGRITY
+  }
 
+Instead of:
+  requires() {
+      _have_kernel_option IO_URING
+      _have_kernel_option BLK_DEV_INTEGRITY
+  }
 
-> +int housekeeping_update(struct cpumask *mask, enum hk_type type)
-> +{
-> +	struct cpumask *trial, *old = NULL;
-> +
-> +	if (type != HK_TYPE_DOMAIN)
-> +		return -ENOTSUPP;
-> +
-> +	trial = kmalloc(cpumask_size(), GFP_KERNEL);
-> +	if (!trial)
-> +		return -ENOMEM;
-> +
-> +	cpumask_andnot(trial, housekeeping_cpumask(HK_TYPE_DOMAIN_BOOT), mask);
+The function iterates through all provided options and returns failure
+if any option is not enabled, maintaining the same error reporting
+behavior as individual calls.
 
-Since there's no comment for the 'mask' parameter, would it be better to name it 'isol_mask'? This
-would make it clearer that this is the isolation mask input and what is doing here.
+Signed-off-by: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+---
+ common/rc | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-> +	if (!cpumask_intersects(trial, cpu_online_mask)) {
-> +		kfree(trial);
-> +		return -EINVAL;
-> +	}
-> +
-> +	if (!housekeeping.flags)
-> +		static_branch_enable(&housekeeping_overridden);
-> +
-> +	if (housekeeping.flags & BIT(type))
-> +		old = housekeeping_cpumask_dereference(type);
-> +	else
-> +		WRITE_ONCE(housekeeping.flags, housekeeping.flags | BIT(type));
-> +	rcu_assign_pointer(housekeeping.cpumasks[type], trial);
-> +
-> +	synchronize_rcu();
-> +
-> +	kfree(old);
-> +
-> +	return 0;
-> +}
-> +
-
-
+diff --git a/common/rc b/common/rc
+index 86bb991..545da61 100644
+--- a/common/rc
++++ b/common/rc
+@@ -226,6 +226,12 @@ _have_kernel_option() {
+ 	return 0
+ }
+ 
++_have_kernel_options() {
++      for opt in "$@"; do
++          _have_kernel_option "$opt" || return 1
++      done
++}
++
+ # Compare the version string in $1 in "a.b.c" format with "$2.$3.$4".
+ # If "a.b.c" is smaller than "$2.$3.$4", return true. Otherwise, return
+ # false.
 -- 
-Best regards,
-Ridong
+2.40.0
 
