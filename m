@@ -1,218 +1,245 @@
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54A371A9F97
-	for <linux-block@vger.kernel.org>; Sat,  8 Nov 2025 03:52:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762573951; cv=fail; b=c28KfUJMWTlbSDmAxoOqHQPfomAKRQz7c1a55dyhu2OQnnZPpTmCPV5PlYvIfHUGlQYn1gPlUy8CMLGlWmo+0mp+0hxjBG0fWX5XPCkRKXUX8g8V2wuHBMnvqnh8p2nHXj0DF42bln4hM8RXmejHUW1M1OHbyo2mKFMS7zA/uK4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762573951; c=relaxed/simple;
-	bh=KIRCHjSE4+3/vrFmkmG/2FEvASiMdt1PmstKf3AuOTE=;
-	h=To:Cc:Subject:From:In-Reply-To:Message-ID:References:Date:
-	 Content-Type:MIME-Version; b=aGqgAchTdcCWPlsxYWPQ3kbQy8F2zZCRlcisxW7H7MA5OUGn4ueIRvM5DfzFE89n3r+OX4kqyuYxLBLdFGj31AVSwowU3gMJt0NrzpxzcTJPauOspSQ0JlX2e8ctqy2PcODHpXOSVHxYQPdhSJ0fvlSmGJ9swfW0dRcXkxDdNno=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=IXmZmyGv; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=Sztx+8op; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="IXmZmyGv";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="Sztx+8op"
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5A83XxVL032322;
-	Sat, 8 Nov 2025 03:52:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=corp-2025-04-25; bh=bIjj4J/uKY3K7h5RaY
-	6jt8zYpCEEplUoaGNpypThXuM=; b=IXmZmyGvlb3lvHstQywqg/tpVhb2yAODex
-	jdOBu6/xeg8Ke0r/xgY62gfQ/nqVQbJiaxFa4eZZ8YHqMIX8Z+OpY2XHkOpPKwhC
-	oajE4pnoK5quG+6C8UDtYshc/aLVnp9Xa3Sygnyl0ntnRSIXNYVkfH5EobLE+wJT
-	UBNY2eyww0zTRoK7YHTR29HS8cfNfPwTv1gqfrZQr4o4APb8Ky8Z3XTZLO9L0EB0
-	4Q2wo1VV70XrStQTQY3CkBquHm9ZLjs8wnqCjClkUz29wp1wmhfDhosKzRmCdpxS
-	om666///7QmehB0ztZTfliq+ntW4DaZfJUvZuQRWulQ+Xzyxaepw==
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4a9sah89md-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sat, 08 Nov 2025 03:52:20 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5A81XOJ6007466;
-	Sat, 8 Nov 2025 03:52:20 GMT
-Received: from bn1pr04cu002.outbound.protection.outlook.com (mail-eastus2azon11010045.outbound.protection.outlook.com [52.101.56.45])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4a9va6tk7a-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sat, 08 Nov 2025 03:52:20 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=AlM2TsWwieTScsL+yAN8sHESLVLdZHzKxGF/v8PuC6CJhmlPnD5e7Y3KRzWzm3c1neEXc0rhwx4H6bvuZKAY+Z77jOMrROnY3OXki816MCyNsKD4YoPGDpz3mNiY0MswmkmBnNS3brRkZG75HSM7fHX9iDnbiW8mSjeaJSpaYz6oDDcI36D9luia5Dp1+8uTv9L4AxdBUlzb7MHJLdbUxRkuFYpa/sjsmyhAspEHqolBwUvGmsWSSdlhYO2l04u5qqVxP/j34YzkoOJJNDy3UUYapZSVrAetVUDPy3MRXATsQ0lnDbwEvWnlnFIL7N0PGCvinicmkcTD7hM/aQUlYw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bIjj4J/uKY3K7h5RaY6jt8zYpCEEplUoaGNpypThXuM=;
- b=DpwmyJoNEsxu4IHx6Ang+h1PDDbrwE0tCkblaubv9rfZXmx5uhGiVeHkjpuu6s+5tlE9LmpFlfIGu1b1rBQFVSdGE6pJhnbGjNAXwB+bGDbhBB1CJPjj9KNI0ggpFKnJAzYqTaBAhHIrisbHTdm1/WZS+dTsCkvSngO/TYPXCrffaJoT6UYtoj3dqx+6Hk+Lk5sHzn8U40IylTpx5QNXRykItBx6b6dzTWPfe7tb6YL6+dIHvNWN70XLGfsDc2rpNIKoctQdYfmOUgI2S1atIYE6rTuA877nMsyUodln5Of6ek0UFn3NaEIP3tgGC3VUETNUFLKLNZNwqivr5P8nsA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bIjj4J/uKY3K7h5RaY6jt8zYpCEEplUoaGNpypThXuM=;
- b=Sztx+8ophD3P/xspguB1pAtiW59CCJTRAQ+nuQW143EJsq7YopteKZuAvfaePDIY2uRYBUVcswbwq2neAkGKBRKXGPjGN87wUvJ7aQvPbCD1riMUwTsKHabubJBhEeuhw5Cr6HRiskwaA4Uboh+7FZwGE0rZuunkTS5qJGcNqzQ=
-Received: from CH0PR10MB5338.namprd10.prod.outlook.com (2603:10b6:610:cb::8)
- by MW4PR10MB6584.namprd10.prod.outlook.com (2603:10b6:303:226::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.12; Sat, 8 Nov
- 2025 03:52:16 +0000
-Received: from CH0PR10MB5338.namprd10.prod.outlook.com
- ([fe80::5cca:2bcc:cedb:d9bf]) by CH0PR10MB5338.namprd10.prod.outlook.com
- ([fe80::5cca:2bcc:cedb:d9bf%6]) with mapi id 15.20.9298.012; Sat, 8 Nov 2025
- 03:52:16 +0000
-To: Keith Busch <kbusch@meta.com>
-Cc: <linux-block@vger.kernel.org>, <hch@lst.de>, <axboe@kernel.dk>,
-        <martin.petersen@oracle.com>, Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCHv3] blk-integrity: support arbitrary buffer alignment
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-In-Reply-To: <20251107232358.1324461-1-kbusch@meta.com> (Keith Busch's message
-	of "Fri, 7 Nov 2025 15:23:58 -0800")
-Organization: Oracle Corporation
-Message-ID: <yq1y0ohjk5a.fsf@ca-mkp.ca.oracle.com>
-References: <20251107232358.1324461-1-kbusch@meta.com>
-Date: Fri, 07 Nov 2025 22:52:14 -0500
-Content-Type: text/plain
-X-ClientProxiedBy: YQZPR01CA0118.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:c01:83::6) To CH0PR10MB5338.namprd10.prod.outlook.com
- (2603:10b6:610:cb::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 636CD23535E
+	for <linux-block@vger.kernel.org>; Sat,  8 Nov 2025 04:01:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762574489; cv=none; b=QH5Y2jdWlnwIMeFSTwiQeRERv90VpFByypC8HB9DqxrdXaf9widGoO0hLqj1O7+r9riiuh4uUX1v/OfORQue8zax0ghETBspIg+Y6Nrlub1ovZHKNbnaNccaqF+M0UtRTeAxvA3swCxuc8p7a9qe+tJVrXxjBZdFidd+mt9UXdY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762574489; c=relaxed/simple;
+	bh=679CCx0Mjyk8sR0Ed/UiMndqrqMGUzmqQI0hQU3W1K8=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=WZ0Sa/MMCVTCQvQxRvsJAsQasPzOJN3dY5aqvI0YvEDXanXOGWzGioCPkZe5AoqqMpV2rsDizkUC5T55aH9bpTaubsA6/9nSLzU7LnrgAztEarrzbbnUUYUeIYrNapsNxWZTPpy8opktKkvsMLbZu6EGqWU8GdIo+jkm+YNtapc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-4333052501cso15708905ab.2
+        for <linux-block@vger.kernel.org>; Fri, 07 Nov 2025 20:01:27 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762574486; x=1763179286;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2ZayVuwne5RPjgu24eL/vYWkKondkC7H5ToXJVWPy0k=;
+        b=rG6O9G8MG/dkxt4f/iMzCjZR4RR8l4fsgDqdsPuh4AOiFI9oiIOr98V2CUc9hp6fGi
+         4+dKGEm+PHWpXuxMjnrIOZwJ/IyfAYobMYePfZFCODekg91kVug5xEVZ3JiYH4f611v2
+         kwTFTz6OpZG+0VTUiEo7eOu/QvrLfRTiGA+Qvfkk9KK/tUc+ByVvNSoyp+2n9VVGW7f/
+         +xrUoumzkP0kZ8sb4VwHH7XcSW1t7wQU7VVYcSsWTrzIY/hsljSpOkkHZnLwcCb2n+QJ
+         fynchwE2wc9A0w3XilpCjOQEDtkGCMpGa+ZLuWdslYq5QjSdncGp/hsorvZd2aNbf3VQ
+         8hbA==
+X-Forwarded-Encrypted: i=1; AJvYcCU1SbfowhfOk4HGHKd8BFzJxxM8QSGDwm5au2PT5Me3sH5q9UdH11ipUFPbwxhYdpYSTvBBJIPU7nKitQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDMP1WyCk+khmKn6hkM7caZRmmpU7MCyAmaahjt+JUYU4BrGBJ
+	9vGHd+1ZCh1OgtIgOjKPNyTPmi91BlOoTjDE+W4PKQoFxfHTwGNMpq6NWIlm0lD+R4nQpYhmg0I
+	oYQHP7OQ6ROmh3uM+Di9I9bYdo48ciIMdxKbU2Wdo5fJ0y+xlvLZ65g7yqzE=
+X-Google-Smtp-Source: AGHT+IFu9xP1zhSNlyygRKbceParQpjsVyZQ73lPbVX6pNfjMz2g0BFnN8SiU2TArtPnjOS5YrNN41Nt/3nLMaJLiN9GG25DCMPG
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH0PR10MB5338:EE_|MW4PR10MB6584:EE_
-X-MS-Office365-Filtering-Correlation-Id: 17158d3f-2cf6-4895-2d6a-08de1e7a3518
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?sV6VERh2WyRz4bJs1/f5ZaNO1zOTdGkpW6v8FCb3lsrCIZypcXhGLTav1IYW?=
- =?us-ascii?Q?C8neDzLSEWxbR4vQBQ2tDjQ4sAsnXt0CypLRy6UoQYpqmChKjZMbVidt6Okb?=
- =?us-ascii?Q?BX1qTdUAMfnI7LnMe+ZGWFIc2gu+wqA8vYnKjZ1xp8OyqsGO61Gjil2CDC2C?=
- =?us-ascii?Q?XxpqL7tk1x15hmoCQrMxqR6oEkamacv3odPj4qkIXMsb/2wFiYiTLQOt39Mm?=
- =?us-ascii?Q?P6t1crrAMKMqZUMvLB+EcMzN5ULpkfEfILLCLqqjC7VG5j9szJc2dRSiPQ4O?=
- =?us-ascii?Q?74HzUOovAIH/NE6UnzNbFAGXs/BW5P+E3xky7RUmznYs28r+M/KiQ6snRQCp?=
- =?us-ascii?Q?gnJpVSjXooGR5ts/hsim4fhlDW+fKA1UvGDfQzW02w3t1OSsCPXBPnxkcEaI?=
- =?us-ascii?Q?IeehFCCqLiVzyCLgeT1hRYEuPITw/g5MNJFwoXSPOoNaQlxbCcfcAdtFE/x/?=
- =?us-ascii?Q?EqWRxxmwf+9MLuZxZRuKhgKQJjVj8vbT65CdazUFMJFMtQLivACVROEV2Q4D?=
- =?us-ascii?Q?LA6jLuyiKCJvXKnQPExxW09YtMxXOD4o38sBg1c9VF3czav/iAlIr7w3c9ts?=
- =?us-ascii?Q?wIcjXUOCRCb2Kg1MgDIJ7MCW48idw9e/kwpFHs8pIaJOxxs2EtGZ7x5oWLXB?=
- =?us-ascii?Q?mpefnCkqtr2VhzVDJ8OZqQSuOKBMe2T5msGo9CCQ8fWdnWPrUxx9ItS1iTQh?=
- =?us-ascii?Q?Go6xjbYk6o3fpBSmPO/cs7gNSkbAsMga9S2H7WFTrID1njijiGKynlfyhPyn?=
- =?us-ascii?Q?JeuUo3nuB7WAbgAyr1354RTnx73xEUpL7DaMKXsJqUxYKrPPPlZ3+NgqnVJX?=
- =?us-ascii?Q?XmZO8Wv/ofyVf+RbDFycsR1dS5/Ia/GhseKjMyZ7aHkMBXCIaRqJfoEBVU7v?=
- =?us-ascii?Q?cWdYb9iDzx7IV6YWgkWEEmGT76qBnAIHWqn8u+sUwqcAUmcNSwzkRGxfBQ9n?=
- =?us-ascii?Q?2sbJZrOic47JGcbbKn5KjWaxfrwiDE7U1UGdyXR273i/Dvm34yYs0x+v6wQ+?=
- =?us-ascii?Q?CfuOCFlyqC9G3CZ8GQdCbZiaL1TAXcBWKLUUkQmN6P03b1DAUsV6MR7Ndrj/?=
- =?us-ascii?Q?NLBGlVhhFc9/Kmvk0bePu7h21rSbwqbHk1UDUzRq1Uja49gs7yTw1xBo5NRn?=
- =?us-ascii?Q?uM6hUXu3HhnVEzozvB5eMTskQDClXyGLJVf0KxFiMRI52k0o6qzbF3BsNGKl?=
- =?us-ascii?Q?Xkz/hYC/q54EYTxiCTqDlZr2eavSYMr75sBWxw9X9O9JRVOD0o1vyLyDTRju?=
- =?us-ascii?Q?tg+fOt8+D7ENvTubJ3zRgyFpxnvZZqtbQurDmLTImGbz2Ws1yxohu5QZSuUA?=
- =?us-ascii?Q?rEOIUJaGKfims+VHWGmKRMq+kUXb6KlGvRnXV0EyNi/WeAWteW9KaMrPQXsm?=
- =?us-ascii?Q?nDUpxDrrDDnsD7imumasAW5+zoSFzdaxCu1yLrZ6OQHQazVMftIjrGnnGkyE?=
- =?us-ascii?Q?BLZ3Perq9Hqpin6Hc3yivAM4TMPvbNX7?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR10MB5338.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?quMQ+3tBcdzd25VueWEb/KwYetW1+urc5Ivtc3jtj8IPmPN1w1cEv16GcHBo?=
- =?us-ascii?Q?/ZWfnK8cnJ06TZV3LQghp7U9yIahRLEsMHe5vMdmAm3EkWeILettSCaIIzia?=
- =?us-ascii?Q?KY17OKiA6Q+x6Esj5CGvqmCwG4aYmjqsAS07IMDaiE7mQsMtgt09tG1aEuPD?=
- =?us-ascii?Q?IQ+GVWLpC329F/FVVXoNd9ZQcVs8tyUY0PUcFs83IQ1KxScgCDJP0A/BQSoj?=
- =?us-ascii?Q?t4lYS0K/piLvcZkgpvrfPeUNl7hyOOM9ZVRpPpAeHlL/tjpY39bQKr3er8x/?=
- =?us-ascii?Q?oKoL95Tu7RgXzotdNbt5vyVUKaXbjBmbmdAExrNLkC8+OkZZXb4mrwF+vfuF?=
- =?us-ascii?Q?C9XhHOPS97ybPWhzLw5c38B6t8ND450HcuR7SWcGe+/fb170PmoF/OvvVaQX?=
- =?us-ascii?Q?9vy7oHr8z5U2bZ79NC3/m5ZJbHx/QHPphfTYo3b26IhXweRTDUlBUneFw+Mi?=
- =?us-ascii?Q?ZnJfTau9HCkd6Ksg8MOdW0J+ssLHNx+exZRUpdpZuR86BqlmG73jQhJHRhvY?=
- =?us-ascii?Q?EgPoxrstDqbJZwUUWRlkHrXsEnmVYV1ECVflItmZFQWbSxO/YfbIHv/NBCEr?=
- =?us-ascii?Q?6Kdh31+Hyd8RPGlluCGvSZ0gnXMAgaS2sMAm2M7Z3mTsRcLtftnMXV+Qhd+p?=
- =?us-ascii?Q?bEqs7V6vH0S6Yrgu3xlZgcUH3vdliRmoccZmm7678hToOOvXljiKSGFcFlq9?=
- =?us-ascii?Q?aatNH+7Oolopi18nWqd+SWHsuZ0nSsOa8jxoXKdEVWLmbFgPkzHq7/TlkIvE?=
- =?us-ascii?Q?Lwc9qYKKvfXfheq24rhXeP5FV9mQhHiWR2BoqvEdpr3f+OOFANHdxcDMyD2N?=
- =?us-ascii?Q?nPYfCoJz8JHlFiWWZMZ6YAgYYPtBCoAZP8EPLo4QoLSHIEaEyctjLvT997p+?=
- =?us-ascii?Q?SIV1zZjsBvmzpWTyjdJjepAlKy148+xJxq7EaRwxzXOTKYQHIfiqPEi92o6V?=
- =?us-ascii?Q?TH/oxjzCWuGK/2EX+wXWtEsvxukHVms6Mz3+p+MYSzTJ0POQQrwybv+KkjAw?=
- =?us-ascii?Q?deA334luTTY4dvM1f+UTubbEnkgasqqj6F/iVXrAw4L0wftzO38Jvbv6FSWa?=
- =?us-ascii?Q?HwMcn6jnw9HKiF3ZYgzZcZgi1G7ezF+FT+OkWFEMrx9lS1GYOvv5MAClKODp?=
- =?us-ascii?Q?PXHFsLfT8XeStO3Z6fPDCQrXZz43zbaqCOFZEfj7CQv55sDuRpDMSOX6dVms?=
- =?us-ascii?Q?wsQZwPZiBbPk3/XeYUCIdAGfOnBQncYrSiAUTzpJ6ZGUJcR38AKdxE+jMf/o?=
- =?us-ascii?Q?MidlzM98Lr1OgD7IwiDo5FYF1M79Ew308liLlvI6p7J6iVpqBsDTwpkG+TKq?=
- =?us-ascii?Q?oCAk0834t5dX3NefET4clCGPYXIQ1MlGUXsIEuG4pu6a2TjlTC34NyjUOMCL?=
- =?us-ascii?Q?jmrsumcZlm1/AQP71wSjGgK4ayAxICn0xyuqVhs+y+gRhIKLSL0181EkHYQj?=
- =?us-ascii?Q?9obe3VisLcrS4SCBPOu9zUUGsd8tS1L1ZB27FQdD5mgObuwM5OxP0qyLWczc?=
- =?us-ascii?Q?4izQ66tzgNxiI04ZjxF+6p39xpuvYRngpDplgl84RnWKhION9S6Anv/Ij7fH?=
- =?us-ascii?Q?MLNRWHw6bcnFwzh9D/XIO4sVQQnKFyPbJzhu/JTuT8Qi5rJ8X7EDSJ5iW4y0?=
- =?us-ascii?Q?qQ=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	BPA/cw+bjx7HNFS84O3tSORbgCfCQvWbb/FO0Uc9gy1YoffIoNvMzUxSndjASRtjc618JHuip6KHPD6YcqZ5hRyidCCXeOezvamXuZFZWnZkXTw7OOzVx6MN2pmVGKXmvY1FwoORaDjemsXcS8Iw9UwAvfUcplalquoEinZ8SROJBaiG1MnjTnu6bD3hHkjZEKxq8UZ1h5WHcoSa35xmHEd7gZQF7L2PQ8P4SATh2iBcGEoWYS5NfNSbrM2A9whmdBbyDFkI4vtGOEVs3wGXjEMQvlBvYBQqiUD9SZzZi+h+IkGo0ClohN+LUbCsg0XR63EnJod2CHUzkpDwGyGZ4iOW/vkcyJN3ytVPpVytp5k8LiuB12sLXu6o/jMOdYimjt6qHFFtcbUgMrE3gSjxzk4MIjCpbQb54qGgNsQNi3sB8c9BplWJjjf+h07ZgYAaq00AduGcCkoB1Ehr/z3INWzff3ztLOs7x3bNDoc/Y7V4C3MGxzCaA+pdH4M2odbPkfjS1fOQIYAQ6p7yoUQtpp+nHK4ekArYf7bE5vxrgaHvDRu2dFNw0BI1KSMMED5HYtWr2cMMAxGm4DQaMiwywvI7wwIoL67TNp59yK52rvc=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 17158d3f-2cf6-4895-2d6a-08de1e7a3518
-X-MS-Exchange-CrossTenant-AuthSource: CH0PR10MB5338.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Nov 2025 03:52:16.0395
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0o2Gs4w6VVCvmvyrEGV+HDz/U7CDoLznmmZEQGH/dcWzBlFyaQCzvR9yd3IiDiybtYAQjNa7Wm91pxbMJ7gk9bpd0ts3pCZVt63M8JmgZpE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR10MB6584
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-08_01,2025-11-06_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 malwarescore=0 spamscore=0
- mlxscore=0 bulkscore=0 suspectscore=0 mlxlogscore=999 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2510240000
- definitions=main-2511080029
-X-Proofpoint-GUID: Cv0ywq0u3Pas3VbyTajqvIaaYgeOd9sF
-X-Authority-Analysis: v=2.4 cv=RPK+3oi+ c=1 sm=1 tr=0 ts=690ebe75 cx=c_pps
- a=XiAAW1AwiKB2Y8Wsi+sD2Q==:117 a=XiAAW1AwiKB2Y8Wsi+sD2Q==:17
- a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
- a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=6UeiqGixMTsA:10
- a=GoEa3M9JfhUA:10 a=VkNPw1HP01LnGYTKEx00:22 a=8OUypy0B3JaldwkWoCwA:9
- a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA3MDE4MyBTYWx0ZWRfX1x6xBQbra+xS
- KyUOq/KLihQL4dRFSLlUBC8YwZ2VedxPVW7CL0r6BEhQh6Fz0OluzFKwHNIWL0w4HovyV1bCzVt
- QZa4I7AW+KyaRzzpHJlxMQGbpeiJtPvd1nQWPvOmtHLaKTJVcJJCnMSLD1Q/jbwf+QhIHMuXOY7
- Q1JfJNRy46+AgKnL7wV0MhezAF07h5U0T4TLmwY8nlvHdKIZi1IJT2afXnMuoh/V2ubwJ+AEQOA
- TNu3x+I9Rs4wok1Gx9q/BQIqcduy5IK/VBe2ShJvOjCBcPZHopsnIuAS3mBgp/yLcyx5OxauqKz
- AdZRP6C8zP6V+A8M8XmDpQepzsDaXJ6oOMAaZMzHNTtKikAa/Kvt6uR5+1JXCsYz/zF/MTuEmVK
- TntGnTzyYzE00ADfWB4Md2UuDy50IA==
-X-Proofpoint-ORIG-GUID: Cv0ywq0u3Pas3VbyTajqvIaaYgeOd9sF
+X-Received: by 2002:a05:6e02:b4d:b0:433:2920:a0fe with SMTP id
+ e9e14a558f8ab-43367d29a62mr26460295ab.0.1762574486517; Fri, 07 Nov 2025
+ 20:01:26 -0800 (PST)
+Date: Fri, 07 Nov 2025 20:01:26 -0800
+In-Reply-To: <68dea1d7.050a0220.25d7ab.07bc.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <690ec096.a70a0220.22f260.0070.GAE@google.com>
+Subject: Re: [syzbot] [block?] general protection fault in rtlock_slowlock_locked
+From: syzbot <syzbot+08df3e4c9b304b37cb04@syzkaller.appspotmail.com>
+To: almaz.alexandrovich@paragon-software.com, axboe@kernel.dk, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-usb@vger.kernel.org, ntfs3@lists.linux.dev, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+
+syzbot has found a reproducer for the following issue on:
+
+HEAD commit:    da32d155f4a8 Merge tag 'gpio-fixes-for-v6.18-rc5' of git:/..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=118faa58580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=41ad820f608cb833
+dashboard link: https://syzkaller.appspot.com/bug?extid=08df3e4c9b304b37cb04
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=103d4412580000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/811f765ca0a8/disk-da32d155.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/1f6516907c8f/vmlinux-da32d155.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/45682ff9dc9c/bzImage-da32d155.xz
+mounted in repro #1: https://storage.googleapis.com/syzbot-assets/cb5a9fd06f24/mount_0.gz
+  fsck result: failed (log: https://syzkaller.appspot.com/x/fsck.log?x=13312a92580000)
+mounted in repro #2: https://storage.googleapis.com/syzbot-assets/d496dd2d1446/mount_6.gz
+  fsck result: failed (log: https://syzkaller.appspot.com/x/fsck.log?x=1516117c580000)
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+08df3e4c9b304b37cb04@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: slab-use-after-free in __raw_spin_lock_irq include/linux/spinlock_api_smp.h:119 [inline]
+BUG: KASAN: slab-use-after-free in _raw_spin_lock_irq+0xa2/0xf0 kernel/locking/spinlock.c:170
+Read of size 1 at addr ffff888030dcba68 by task ksoftirqd/1/30
+
+CPU: 1 UID: 0 PID: 30 Comm: ksoftirqd/1 Not tainted syzkaller #0 PREEMPT_{RT,(full)} 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/02/2025
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+ print_address_description mm/kasan/report.c:378 [inline]
+ print_report+0xca/0x240 mm/kasan/report.c:482
+ kasan_report+0x118/0x150 mm/kasan/report.c:595
+ __kasan_check_byte+0x2a/0x40 mm/kasan/common.c:580
+ kasan_check_byte include/linux/kasan.h:401 [inline]
+ lock_acquire+0x8d/0x360 kernel/locking/lockdep.c:5842
+ __raw_spin_lock_irq include/linux/spinlock_api_smp.h:119 [inline]
+ _raw_spin_lock_irq+0xa2/0xf0 kernel/locking/spinlock.c:170
+ rtlock_slowlock_locked+0x3821/0x4010 kernel/locking/rtmutex.c:1871
+ rtlock_slowlock kernel/locking/rtmutex.c:1895 [inline]
+ rtlock_lock kernel/locking/spinlock_rt.c:43 [inline]
+ __rt_spin_lock kernel/locking/spinlock_rt.c:49 [inline]
+ rt_spin_lock+0x158/0x3e0 kernel/locking/spinlock_rt.c:57
+ spin_lock include/linux/spinlock_rt.h:44 [inline]
+ __wake_up_common_lock+0x2f/0x1e0 kernel/sched/wait.c:124
+ blk_update_request+0x57e/0xe60 block/blk-mq.c:998
+ blk_mq_end_request+0x3e/0x70 block/blk-mq.c:1160
+ blk_complete_reqs block/blk-mq.c:1235 [inline]
+ blk_done_softirq+0x10a/0x160 block/blk-mq.c:1240
+ handle_softirqs+0x22f/0x710 kernel/softirq.c:622
+ run_ksoftirqd+0xac/0x210 kernel/softirq.c:1063
+ smpboot_thread_fn+0x542/0xa60 kernel/smpboot.c:160
+ kthread+0x711/0x8a0 kernel/kthread.c:463
+ ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+
+Allocated by task 7682:
+ kasan_save_stack mm/kasan/common.c:56 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:77
+ poison_kmalloc_redzone mm/kasan/common.c:400 [inline]
+ __kasan_kmalloc+0x93/0xb0 mm/kasan/common.c:417
+ kasan_kmalloc include/linux/kasan.h:262 [inline]
+ __kmalloc_cache_noprof+0x1ef/0x6c0 mm/slub.c:5767
+ kmalloc_noprof include/linux/slab.h:957 [inline]
+ lbmLogInit fs/jfs/jfs_logmgr.c:1821 [inline]
+ lmLogInit+0x3db/0x19e0 fs/jfs/jfs_logmgr.c:1269
+ open_inline_log fs/jfs/jfs_logmgr.c:1175 [inline]
+ lmLogOpen+0x4e1/0xfa0 fs/jfs/jfs_logmgr.c:1069
+ jfs_mount_rw+0xe9/0x670 fs/jfs/jfs_mount.c:257
+ jfs_fill_super+0x754/0xd80 fs/jfs/super.c:532
+ get_tree_bdev_flags+0x40e/0x4d0 fs/super.c:1691
+ vfs_get_tree+0x92/0x2b0 fs/super.c:1751
+ fc_mount fs/namespace.c:1208 [inline]
+ do_new_mount_fc fs/namespace.c:3651 [inline]
+ do_new_mount+0x302/0xa10 fs/namespace.c:3727
+ do_mount fs/namespace.c:4050 [inline]
+ __do_sys_mount fs/namespace.c:4238 [inline]
+ __se_sys_mount+0x313/0x410 fs/namespace.c:4215
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Freed by task 5925:
+ kasan_save_stack mm/kasan/common.c:56 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:77
+ __kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:587
+ kasan_save_free_info mm/kasan/kasan.h:406 [inline]
+ poison_slab_object mm/kasan/common.c:252 [inline]
+ __kasan_slab_free+0x5c/0x80 mm/kasan/common.c:284
+ kasan_slab_free include/linux/kasan.h:234 [inline]
+ slab_free_hook mm/slub.c:2539 [inline]
+ slab_free mm/slub.c:6634 [inline]
+ kfree+0x197/0x950 mm/slub.c:6841
+ lbmLogShutdown fs/jfs/jfs_logmgr.c:1864 [inline]
+ lmLogShutdown+0x441/0x830 fs/jfs/jfs_logmgr.c:1683
+ lmLogClose+0x28a/0x520 fs/jfs/jfs_logmgr.c:1459
+ jfs_umount+0x2ef/0x3c0 fs/jfs/jfs_umount.c:114
+ jfs_put_super+0x8c/0x190 fs/jfs/super.c:194
+ generic_shutdown_super+0x135/0x2c0 fs/super.c:642
+ kill_block_super+0x44/0x90 fs/super.c:1722
+ deactivate_locked_super+0xbc/0x130 fs/super.c:473
+ cleanup_mnt+0x425/0x4c0 fs/namespace.c:1327
+ task_work_run+0x1d4/0x260 kernel/task_work.c:227
+ resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
+ exit_to_user_mode_loop+0xe9/0x130 kernel/entry/common.c:43
+ exit_to_user_mode_prepare include/linux/irq-entry-common.h:225 [inline]
+ syscall_exit_to_user_mode_work include/linux/entry-common.h:175 [inline]
+ syscall_exit_to_user_mode include/linux/entry-common.h:210 [inline]
+ do_syscall_64+0x2bd/0xfa0 arch/x86/entry/syscall_64.c:100
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+The buggy address belongs to the object at ffff888030dcba00
+ which belongs to the cache kmalloc-256 of size 256
+The buggy address is located 104 bytes inside of
+ freed 256-byte region [ffff888030dcba00, ffff888030dcbb00)
+
+The buggy address belongs to the physical page:
+page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x30dca
+head: order:1 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+ksm flags: 0x80000000000040(head|node=0|zone=1)
+page_type: f5(slab)
+raw: 0080000000000040 ffff88813ff26b40 ffffea000157d380 dead000000000003
+raw: 0000000000000000 0000000000100010 00000000f5000000 0000000000000000
+head: 0080000000000040 ffff88813ff26b40 ffffea000157d380 dead000000000003
+head: 0000000000000000 0000000000100010 00000000f5000000 0000000000000000
+head: 0080000000000001 ffffea0000c37281 00000000ffffffff 00000000ffffffff
+head: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000002
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 1, migratetype Unmovable, gfp_mask 0xd2040(__GFP_IO|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 5919, tgid 5919 (syz-executor), ts 100669428717, free_ts 100657311754
+ set_page_owner include/linux/page_owner.h:32 [inline]
+ post_alloc_hook+0x240/0x2a0 mm/page_alloc.c:1850
+ prep_new_page mm/page_alloc.c:1858 [inline]
+ get_page_from_freelist+0x28c0/0x2960 mm/page_alloc.c:3884
+ __alloc_frozen_pages_noprof+0x181/0x370 mm/page_alloc.c:5183
+ alloc_pages_mpol+0xd1/0x380 mm/mempolicy.c:2416
+ alloc_slab_page mm/slub.c:3055 [inline]
+ allocate_slab+0x96/0x350 mm/slub.c:3228
+ new_slab mm/slub.c:3282 [inline]
+ ___slab_alloc+0xb10/0x1400 mm/slub.c:4651
+ __slab_alloc+0xc6/0x1f0 mm/slub.c:4774
+ __slab_alloc_node mm/slub.c:4850 [inline]
+ slab_alloc_node mm/slub.c:5272 [inline]
+ __do_kmalloc_node mm/slub.c:5645 [inline]
+ __kmalloc_noprof+0x14b/0x7d0 mm/slub.c:5658
+ kmalloc_noprof include/linux/slab.h:961 [inline]
+ kmalloc_array_noprof include/linux/slab.h:1003 [inline]
+ security_inode_init_security+0x107/0x3f0 security/security.c:1868
+ __ext4_new_inode+0x3314/0x3cb0 fs/ext4/ialloc.c:1325
+ ext4_mkdir+0x3cb/0xc50 fs/ext4/namei.c:3007
+ vfs_mkdir+0x306/0x510 fs/namei.c:4453
+ do_mkdirat+0x247/0x590 fs/namei.c:4486
+ __do_sys_mkdir fs/namei.c:4508 [inline]
+ __se_sys_mkdir fs/namei.c:4506 [inline]
+ __x64_sys_mkdir+0x6c/0x80 fs/namei.c:4506
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+page last free pid 20 tgid 20 stack trace:
+ reset_page_owner include/linux/page_owner.h:25 [inline]
+ free_pages_prepare mm/page_alloc.c:1394 [inline]
+ __free_frozen_pages+0xfb6/0x1140 mm/page_alloc.c:2906
+ mm_free_pgd kernel/fork.c:541 [inline]
+ __mmdrop+0xb5/0x4f0 kernel/fork.c:683
+ rcu_do_batch kernel/rcu/tree.c:2605 [inline]
+ rcu_core kernel/rcu/tree.c:2861 [inline]
+ rcu_cpu_kthread+0xbf6/0x1b50 kernel/rcu/tree.c:2949
+ smpboot_thread_fn+0x542/0xa60 kernel/smpboot.c:160
+ kthread+0x711/0x8a0 kernel/kthread.c:463
+ ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+Memory state around the buggy address:
+ ffff888030dcb900: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff888030dcb980: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>ffff888030dcba00: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                                          ^
+ ffff888030dcba80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff888030dcbb00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+==================================================================
 
 
-Hi Keith!
-
-> diff --git a/block/t10-pi.c b/block/t10-pi.c
-> index 0c4ed97021460..6266ce0043280 100644
-> --- a/block/t10-pi.c
-> +++ b/block/t10-pi.c
-> @@ -12,231 +12,136 @@
->  #include <linux/unaligned.h>
->  #include "blk.h"
->  
-> +#define APP_TAG_ESCAPE 0xffff
-> +#define REF_TAG_ESCAPTE 0xffffffff
-
-ESCAPE
-
-> +static void blk_crc(struct blk_integrity_iter *iter, void *data,
-> +		    unsigned int len)
-
-Maybe blk_calculate_checksum() or blk_calculate_guard()? It's a bit
-weird to refer to the IP checksum as a CRC.
-
-To my knowledge, no SCSI controller can handle PI split across segments
-and the PI tuples are required to be naturally aligned in memory. SCSI
-controllers probably can't handle split data segments either since the
-design constraint is one PI segment per protection interval sized data
-segment.
-
--- 
-Martin K. Petersen
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
