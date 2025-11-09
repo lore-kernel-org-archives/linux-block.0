@@ -1,82 +1,71 @@
-Received: from mail-wm1-f100.google.com (mail-wm1-f100.google.com [209.85.128.100])
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9D2E24E4B4
-	for <linux-block@vger.kernel.org>; Sat,  8 Nov 2025 23:01:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40A0C193077
+	for <linux-block@vger.kernel.org>; Sun,  9 Nov 2025 07:44:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762642873; cv=none; b=FdSwrVCu6v+dOknQw+HhsOnd6ASj/5eonteoOmie3cTnzx1TYw6Lltbrd4F67vcdL7XVsIAvLqIdeU5GwEfX4xhcw6CpkloC9ypl2mkbUMxep5JAzdd37VhaUSMdLlCc7zeoZD+HZpbRQbaIPQEruUVA0szOpudbpIxlDc+cu68=
+	t=1762674272; cv=none; b=TcALHc4Mhk643Iu5i5ZjKZtCw5A97511GSGXjizFefawb4Y/wKrUKVfB2PV8RKEhrGUlLAtuDL8/Epe76aitAwN2kbZLJzKoDeAfYBlrw6B6C89ncgmNlOrKv5ZJrujdmmUV9RqtOu4QCFIJ0mKE91eUSUsnhDBnKfqKb5CZAXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762642873; c=relaxed/simple;
-	bh=v7TGA+6QCVK8DbEC2CDrbNmhkXqca0cIDEJRGw+jHVM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GpxDxaOhzDvgJZ9OP4wYuVwxRqPXl2rlFt/Rw8S4kYDTcWl/66znDgUeWQWRyQShMxrHK4qZGczs0VEENjmd5EyxsLrA92X4uKWmOwyl8x29Nn6sk6bdIn74s+A4SxAVbuq49QpIy7I+FzSAUGRk6Bolu0+x1EvwWrGdaTzgEP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Tq34V5OE; arc=none smtp.client-ip=209.85.128.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1762674272; c=relaxed/simple;
+	bh=CIyrpfTNwo+r3ux8nGQ3CcKAu9xjmMHIRHwqsv003x4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mw8aBjRwULHDaE5YXWLBAbWCm8Iw87F4AcdysfTT7QmcV+V8sW670y4bY9TUIw+7ntahHnDgM8sVe54Gtc0sZh/JebScq92MxKP6RcTz1mXD0wZ6MG9gdHPk+BFNDmX+Gt9Es0edSX6xe7MZGJtJvtKk6jxtZhS/5ZbTzpni5yM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dx9CKc4h; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Tq34V5OE"
-Received: by mail-wm1-f100.google.com with SMTP id 5b1f17b1804b1-47776bf5900so132815e9.0
-        for <linux-block@vger.kernel.org>; Sat, 08 Nov 2025 15:01:11 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dx9CKc4h"
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-3437af8444cso409549a91.2
+        for <linux-block@vger.kernel.org>; Sat, 08 Nov 2025 23:44:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1762642870; x=1763247670; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5RI1kzI7IRCwyOcrqW1kzUHyAYWD73+nYiTUVhp+Ekk=;
-        b=Tq34V5OEihPpA3EhqlP62A3kvf7uv+mZveXShKfR8QcYwxCEKDVYSA9jgO1YCPLFRg
-         oK6XejcXJf2t0Lj2q+FhMEDrGMW+5Mgw+C3xQW3x9O80qStlEGvZP2i8jMPMFHUtV6ev
-         KWeOwBF/tUX/X5jfRWGBOmnd7cqr3QNRgIvEKbUKf0zBIOou5i5b49ZFABj6hsFLesTt
-         LBD5c/4FRUZz1EGeEoV+WAUnvrZQcTdwOhoC8WIkZNR58sTRWQ2VaNDrYu3YgvpIUs0k
-         yHn5x/f8fCDQKjU+VyvBZr1xc/UJQnyfg2yRloHXHve+kPunjg0q7TUo4odUs5wZl4fQ
-         OJ0Q==
+        d=gmail.com; s=20230601; t=1762674270; x=1763279070; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=b14aDsmji/7PVHezr8Axy3n7TuJRR+JLjw9V6CCyUcg=;
+        b=dx9CKc4hzvh3fEGg4TGSV6st2IMjOeo0UBiSrDCL89E/CFtlxQeEVMB3miC4nVuqwo
+         pUUwnykypn5wOWU3pTFStmUnT8OBgEkbDc2eTCREtNGdyZxdWqovlPATTXyOd3EymDCV
+         q8mYG9z13JPzziUpOewJH0Tfmjkcufs9ul7mKRT8Wocm2Z+EBVltTsppJnnV7xBxZD5o
+         oqtTFABM2XLYqZiMZe5JVLNSG6tLWqAB19+4ATqV4R7SuxcwfcWCrohdTxMWkJfAwONz
+         rUOKgBJ92ok9/t7cJidFBcCbUOtI73aevZNIReKq0SnkO/+GdPdScXG3N1zu3GyDuO4A
+         07Cg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762642870; x=1763247670;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=5RI1kzI7IRCwyOcrqW1kzUHyAYWD73+nYiTUVhp+Ekk=;
-        b=NqeOjHvSwYU9TdoOpbfWs21L+79acOfV5eeMLAicnwLIIAFDEdEsjj21EvFCyNzkSq
-         PsWrNo2NiCxXX+Ewpeso9v1CzEvvTxOooJg6hUCwk7ZmU5yBrky3kl73B/lbJqI0b4mD
-         WanXwbbu9IvdJ+HYv3iyPkkHgWMh1y9EzSuRSxxLp6PW+oV4Tr5cP/944SOIqV0p2Gd9
-         ZsW02kJl6HHZhx6uNHUGyl4xnSZunUDnSXoGQKMuJ+pU4weJGdiBtC/MBNKpjY0OxsOR
-         p0dTRfwmYUd3WEoyQk8vb7wJX4HUuiZpCzpba7AOuUgyfAo4N+z5hUgISkClial4jm0P
-         vuBQ==
-X-Gm-Message-State: AOJu0Yw+BeDDs1BY4NDp86w+NnDae0jj3LQUP1IP017qv8kkYx+fQo5P
-	Jeiu9ziiO02Y0bJ1FVg/jr0F6z8idQu37PjLlVzFHUteCNgrPVOGLb5ZZz5ZBgy2ODIu0Nm2eZf
-	gjeo4+hq2yn5Hc9nLY/v30j6rU3CZedwDuZdx
-X-Gm-Gg: ASbGnctAkP0VHlNjIt/1AWrVoIC49ZzvQvUAA+/ahU0EmYS8EgqZ6ex0wmhlgxlathi
-	mFwPCVYMwSp5/gUa5+MSO1z6/zVDk0PA50EPjjxXvPEh+2bIwbggZwjp4SjIFpdhAgELWPHITSW
-	J0bGGhI2KkiaUahc+VvoN3PwqN76A8rshzph7JQs9srfm0m8hpnFxmvJVoPKbfzNhbWUzCXs2Bw
-	14y6lhOzGGuN5moXXkZvlpUHp4k516Zkdjx8eIPegw5aO5B30M9iLDNvMTNjJ1/z35LUJE/l6WE
-	12H9N/qLayXXVw+RtjDaek9MepjgMA4omORRBSoHhw3FWyyJQRHotF35EvytSu8DWmhib6+iBjn
-	2VdKRDBbAbqCwpnLdwx3nAnNPynA6qa8=
-X-Google-Smtp-Source: AGHT+IHcxgVfwpzXfrUh/1XC3GR9TFTNVVnuZXFXWIUDCpd/RKokGzpROkYIeTRhbDAxmyKUUOVuVsE8we1S
-X-Received: by 2002:a05:600c:46cc:b0:475:d7fe:87a5 with SMTP id 5b1f17b1804b1-4777329d164mr16143665e9.6.1762642870143;
-        Sat, 08 Nov 2025 15:01:10 -0800 (PST)
-Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.128])
-        by smtp-relay.gmail.com with ESMTPS id 5b1f17b1804b1-4775cdf251esm8824525e9.12.2025.11.08.15.01.08
+        d=1e100.net; s=20230601; t=1762674270; x=1763279070;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=b14aDsmji/7PVHezr8Axy3n7TuJRR+JLjw9V6CCyUcg=;
+        b=Vxt9vNW0yAWJe4ssltPIQc36mzl/4jZ5JGPZVqN+XAiaSWtt/gW4qGM+PH4lSruUzr
+         ML+cvmY0QB8yCN2wXsKzs9Dtlm3TCyyK5HxNapvO1+N7YhFJq329zTTNrwwU53uFsd8A
+         NiGndppUsv/HYJTPlwddVF3xXJTmCElCbSL7CO/lw6/hhLQO/y4M2RT9O+jDWLmbnmJ0
+         9TDvv5kP042b/dV6VdwgkSa2toTrS5WCrKRtvLzNKVrR3b/hhHWtF3MWOEQNRJILwTqw
+         whE1OzY0I1mdtkUPP79ohkrfu4exdPvCnicM+M5L/mFyfo4QeJTCxuNHEzz2yBS0rjyM
+         h5Gw==
+X-Forwarded-Encrypted: i=1; AJvYcCWEYMvUlwZ0t0epdmdg9VNKbNOmSQ5c7WnHyb9XRbArazjOQ2myQ2uhK1xKJOZM3fnvSfktexZcpFO5Vg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw2098Dg2jHsAJC3tFqqiuNMf1vS5n8MJ6WBU5ne7wtIlvgktOl
+	fKp9pp2mjO+RfCRpYLuP7JuJibuGk85n/BmUCJq2gFIy4rQCxXAUUbeO
+X-Gm-Gg: ASbGncsfRLDZpaotQFRZ9jV/ffn+b7YOe+pKrZ+EWBPHkt2U7OAXVaDNKTMm5WKwx4z
+	Ff1j/hb1LJpWWQc7lEU/OGYHyxGom4z/dvrI0EjvS3OsZvxJOGwFrHg8Zms5oEsCs5Zm5GUqYBr
+	dY3+1sGjriP/lrDWzBfLaDSGhqkuD9f4lMrZXT7dBk8RJ/K7NPOJ9+7O0YWnuYAqKu0rINYgvBx
+	1HgAoH8bsIZ+GZI3yoOnGf/DOvbuiy6zpR+1exTEetJjYW/KSL6udvJjFk/bm9ZX6kA4zRLr0+O
+	XUz3ba2xXy9hPRYQw0oPSGmPRRtMT+k68xU0Wb16vo8rrmkiZeJH5usqA9Jd1q5Txa2kqJTrzSR
+	pey/0X1XeqAW82j5+JGN4OwJl6HR/EK3suiryZeKa80FPX8c5hwA7tTKpbB58Gkas9XkZOt/z3W
+	ByXwwmUwSAwNnKUEKN8CUqm7z+H6o99dvbyQqF
+X-Google-Smtp-Source: AGHT+IGzI6ODn8UFkgPxgRGrX14lmOnwNQhhxui354pIxQag2tMTdOwoHtxZibXHQG0lMIBHIJBqSg==
+X-Received: by 2002:a17:90a:e710:b0:341:8bdd:5cf3 with SMTP id 98e67ed59e1d1-3436cb739d3mr5935076a91.7.1762674270398;
+        Sat, 08 Nov 2025 23:44:30 -0800 (PST)
+Received: from localhost (ip70-175-132-216.oc.oc.cox.net. [70.175.132.216])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-341a67e2f82sm14157009a91.0.2025.11.08.23.44.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 08 Nov 2025 15:01:10 -0800 (PST)
-X-Relaying-Domain: purestorage.com
-Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.7.70.37])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id D5E7F3401C3;
-	Sat,  8 Nov 2025 16:01:07 -0700 (MST)
-Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id D403AE41BD7; Sat,  8 Nov 2025 16:01:07 -0700 (MST)
-From: Caleb Sander Mateos <csander@purestorage.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Christoph Hellwig <hch@lst.de>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Caleb Sander Mateos <csander@purestorage.com>
-Subject: [PATCH 2/2] zloop: use blk_rq_nr_phys_segments() instead of iterating bvecs
-Date: Sat,  8 Nov 2025 16:01:01 -0700
-Message-ID: <20251108230101.4187106-3-csander@purestorage.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20251108230101.4187106-1-csander@purestorage.com>
-References: <20251108230101.4187106-1-csander@purestorage.com>
+        Sat, 08 Nov 2025 23:44:30 -0800 (PST)
+From: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+To: hch@lst.de
+Cc: axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+Subject: [PATCH] block: add lockdep to queue_limits_commit_update()
+Date: Sat,  8 Nov 2025 23:44:26 -0800
+Message-Id: <20251109074426.6674-1-ckulkarnilinux@gmail.com>
+X-Mailer: git-send-email 2.40.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -85,46 +74,86 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The number of bvecs can be obtained directly from struct request's
-nr_phys_segments field via blk_rq_nr_phys_segments(), so use that
-instead of iterating over the bvecs an extra time.
+queue_limits_commit_update() expects q->limits_lock to be held by
+the caller (via queue_limits_start_update()).
 
-Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+The API pattern is:
+
+  lim = queue_limits_start_update(q);  /* acquires lock */
+              /* modify lim */
+  queue_limits_commit_update(q, &lim); /* releases lock */
+
+  OR
+
+  queue_limits_commit_update_frozen(q, &lim);
+   lim = queue_limits_start_update(q); /* acquires lock */
+  queue_limits_commit_update(q, &lim); /* releases lock */
+
+Add lockdep_assert_held() to report incorrect API usage.
+
+Signed-off-by: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
 ---
- drivers/block/zloop.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/drivers/block/zloop.c b/drivers/block/zloop.c
-index 92be9f0af00a..7883e56ed12a 100644
---- a/drivers/block/zloop.c
-+++ b/drivers/block/zloop.c
-@@ -368,11 +368,11 @@ static void zloop_rw(struct zloop_cmd *cmd)
- 	struct req_iterator rq_iter;
- 	struct zloop_zone *zone;
- 	struct iov_iter iter;
- 	struct bio_vec tmp;
- 	sector_t zone_end;
--	int nr_bvec = 0;
-+	unsigned short nr_bvec = blk_rq_nr_phys_segments(rq);
- 	int ret;
+With this patch incorrect calls to queue_limits_commit_update() will
+report following :-
+
+[  800.055674] ------------[ cut here ]------------
+[  800.055676] WARNING: CPU: 36 PID: 5507 at block/blk-settings.c:559 queue_limits_commit_update+0xc2/0xd0
+[  800.055691] Modules linked in: test_lockdep(O+) snd_seq_dummy snd_hrtimer snd_seq snd_seq_device snd_timer snd soundcore bridge stp llc ip_set nf_tables rfkill nfnetlink tun sunrpc xfs squashfs loop intel_rapl_msr intel_rapl_common kvm_amd ccp kvm ppdev parport_pc parport irqbypass i2c_piix4 joydev pcspkr i2c_smbus qxl drm_exec drm_ttm_helper bochs ttm drm_shmem_helper drm_client_lib virtio_net drm_kms_helper net_failover ghash_clmulni_intel virtio_blk failover drm ata_generic serio_raw pata_acpi qemu_fw_cfg ipmi_devintf ipmi_msghandler fuse [last unloaded: test_lockdep(O)]
+[  800.055785] CPU: 36 UID: 0 PID: 5507 Comm: insmod Tainted: G           O     N  6.18.0-rc4lblk+ #103 PREEMPT(voluntary)
+[  800.055792] Tainted: [O]=OOT_MODULE, [N]=TEST
+[  800.055794] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
+[  800.055797] RIP: 0010:queue_limits_commit_update+0xc2/0xd0
+[  800.055801] Code: e8 f3 b8 89 00 44 89 e0 5b 5d 41 5c c3 cc cc cc cc 48 8d bf f8 06 00 00 be ff ff ff ff e8 06 2f 89 00 85 c0 0f 85 5b ff ff ff <0f> 0b e9 54 ff ff ff 0f 1f 80 00 00 00 00 90 90 90 90 90 90 90 90
+[  800.055805] RSP: 0018:ffffc90007e37b30 EFLAGS: 00010246
+[  800.055809] RAX: 0000000000000000 RBX: ffff88815afaae40 RCX: 0000000000000001
+[  800.055812] RDX: 0000000000000000 RSI: ffffffff8294deb9 RDI: ffffffff829e7716
+[  800.055815] RBP: ffffc90007e37b50 R08: ffffc90007e37b50 R09: ffff88815afaae40
+[  800.055818] R10: ffff8897df0a0000 R11: ffff88983fed3bc0 R12: 0000000000000000
+[  800.055820] R13: 000055d8c85e62a0 R14: ffff8881761b24a8 R15: ffffffff8457b4e0
+[  800.055825] FS:  00007faf1f802b80(0000) GS:ffff88985c0e7000(0000) knlGS:0000000000000000
+[  800.055834] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  800.055837] CR2: 000055d8c85e9eb8 CR3: 000000021fc44000 CR4: 0000000000350ef0
+[  800.055842] DR0: ffffffff845fdc70 DR1: ffffffff845fdc71 DR2: ffffffff845fdc72
+[  800.055844] DR3: ffffffff845fdc73 DR6: 00000000ffff0ff0 DR7: 0000000000000600
+[  800.055847] Call Trace:
+[  800.055850]  <TASK>
+[  800.055853]  ? __pfx_test_lockdep_init+0x10/0x10 [test_lockdep]
+[  800.055860]  test_lockdep_init+0x1f1/0xff0 [test_lockdep]
+[  800.055881]  ? lock_acquire+0xe3/0x2f0
+[  800.055889]  ? find_held_lock+0x2b/0x80
+[  800.055895]  ? __kmalloc_cache_noprof+0x5d/0x770
+[  800.055906]  ? lock_release+0x14a/0x2b0
+[  800.055911]  ? fs_reclaim_acquire+0x48/0xd0
+[  800.055923]  ? __pfx_test_lockdep_init+0x10/0x10 [test_lockdep]
+[  800.055929]  do_one_initcall+0x58/0x2b0
+[  800.055941]  do_init_module+0x64/0x260
+[  800.055952]  init_module_from_file+0x8a/0xd0
+[  800.055969]  idempotent_init_module+0x17b/0x280
+[  800.055980]  ? netif_queue_set_napi+0xe0/0x150
+[  800.056007]  __x64_sys_finit_module+0x66/0xd0
+[  800.056012]  ? do_syscall_64+0x38/0xb00
+[  800.056064]  do_syscall_64+0x76/0xb00
+[  800.056072]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[  800.056076] RIP: 0033:0x7faf1f32bddd
+
+---
+ block/blk-settings.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 78dfef117623..51401f08ce05 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -556,6 +556,8 @@ int queue_limits_commit_update(struct request_queue *q,
+ {
+ 	int error;
  
- 	atomic_set(&cmd->ref, 2);
- 	cmd->sector = sector;
- 	cmd->nr_sectors = nr_sectors;
-@@ -435,13 +435,10 @@ static void zloop_rw(struct zloop_cmd *cmd)
- 		zone->wp += nr_sectors;
- 		if (zone->wp == zone_end)
- 			zone->cond = BLK_ZONE_COND_FULL;
- 	}
- 
--	rq_for_each_bvec(tmp, rq, rq_iter)
--		nr_bvec++;
--
- 	if (rq->bio != rq->biotail) {
- 		struct bio_vec *bvec;
- 
- 		cmd->bvec = kmalloc_array(nr_bvec, sizeof(*cmd->bvec), GFP_NOIO);
- 		if (!cmd->bvec) {
++	lockdep_assert_held(&q->limits_lock);
++
+ 	error = blk_validate_limits(lim);
+ 	if (error)
+ 		goto out_unlock;
 -- 
-2.45.2
+2.40.0
 
