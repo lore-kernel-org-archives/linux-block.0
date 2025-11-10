@@ -1,306 +1,122 @@
-Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4F6F2798F8;
-	Mon, 10 Nov 2025 16:24:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E51AF279DAD
+	for <linux-block@vger.kernel.org>; Mon, 10 Nov 2025 16:47:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762791890; cv=none; b=h14mNpXtMiuwngdpvpqvf+EBG5oTZc3GKgJ2SFAsb39UlguKw4nYHUHRbwjD6g6hpPZv83ly7I5uAvKQK45CFW1ZaOavdVoCDnOUuCacL5LTy9oppwrloNx3k81kwEwqOv+CQcO2NWJB5DJ3atODvYA55ixi/GbDE4MmVsJUOwo=
+	t=1762793280; cv=none; b=ZW2rbOwnBiFwsEiwvbznFA4jsTgZ9OCbF+ql/wZAh0bdR6SS/YH5msg0fkiE8NjNkjk+pCLZI+u9xWYH+wD2xsUhq1i6sSCoH9C5dkSkvHakH+30PAV0ZGduOHDq9bKjuDSRqV1LekcHn5nVLVI/yaDkE0mtNQBWNxFXVwzUA8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762791890; c=relaxed/simple;
-	bh=Nu40uPXSob4vITvNDOyn/Bd8AXmkS6y6Mz+mgkqSj0M=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WjTWDLLexzk2i8ms7aSmYx2x8W11GzL/putWbwHPLDdmPKxWvpZVFbDLdRy3DZbAnbln2sx89OBK7qc8GaQnUImx04vKufglZ0MmJxHdZe+4e60Kje+goZU1wrSijBzTFCxFTeqCAlSRq1oI+nKdI0/vLAVtgwrf7G6I60ZoKCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=TL5Ccumm; arc=none smtp.client-ip=199.89.3.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1762793280; c=relaxed/simple;
+	bh=nOIq144xGgFO4bva4FYwPZPvaRNZDvPcNywFLSl7Wtk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VaMDDcHyfM5ZTcrF2/FNFDuGsLXCH13iCt4Kt5tRc8PRP+/xBPO8EF2L53TXMAHmTL8YTwfN8uo1oBFXx2s4530qJgXmm55X14d3WnetEexjlRy8mBefEzfruDv8A8XFdv5e04WnAsYB71jBUJtTiCEwvN4Q2sbEq6J4uNgLqv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=EIE1mYY8; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="TL5Ccumm"
-Received: from localhost (localhost [127.0.0.1])
-	by 004.mia.mailroute.net (Postfix) with ESMTP id 4d4w3t2QCqzm0c5M;
-	Mon, 10 Nov 2025 16:24:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:mime-version:x-mailer:message-id:date
-	:date:subject:subject:from:from:received:received; s=mr01; t=
-	1762791879; x=1765383880; bh=LIolwOxiTgqZvk1Ba8Fs9YAB7HKOR8ysPrd
-	7bHZjrZo=; b=TL5CcummpHdNuKEFJd8hWYqdyFy4vDrBleNEYEyXH5kWXcHlJCX
-	/X/YPGHB+ZbH2mDXuuvkKq5EUPCMrVL/3Ozp/mO68Mm6YP0ZTZkLxNDhf0LKVQaZ
-	Bcn02mP8G8KtHAh9IWd4ZZdQ6mouInTAZ0ipLfdZ0aDW6NK0rN7Fv5d655j0uYtE
-	DxlDw2lllQXDp4drW29moVnN/mRx8jeNjxM7HDn68PZNxb0dPtChjbjxwQVok8S/
-	04vBg501rfyr0OjLlgNnIwgz7eNrm79fKOwO37efqbremdLAWDlIzPjdIOzomq06
-	tSKJ2T8S74tFkbvmm+DUByuj528W1vMdr3w==
-X-Virus-Scanned: by MailRoute
-Received: from 004.mia.mailroute.net ([127.0.0.1])
- by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id w1j-c0W67Pqi; Mon, 10 Nov 2025 16:24:39 +0000 (UTC)
-Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4d4w3f4KZBzm1Hcj;
-	Mon, 10 Nov 2025 16:24:29 +0000 (UTC)
-From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Ming Lei <ming.lei@redhat.com>,
-	Nilay Shroff <nilay@linux.ibm.com>,
-	Martin Wilck <mwilck@suse.com>,
-	Benjamin Marzinski <bmarzins@redhat.com>,
-	stable@vger.kernel.org,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Hannes Reinecke <hare@suse.de>
-Subject: [PATCH v5] block: Remove queue freezing from several sysfs store callbacks
-Date: Mon, 10 Nov 2025 08:24:18 -0800
-Message-ID: <20251110162418.2915157-1-bvanassche@acm.org>
-X-Mailer: git-send-email 2.51.2.1041.gc1ab5b90ca-goog
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="EIE1mYY8"
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-297f5278e5cso4041555ad.3
+        for <linux-block@vger.kernel.org>; Mon, 10 Nov 2025 08:47:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1762793278; x=1763398078; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xZqfsqvlctuD50vkPLsM39GcbviXIyVkPfjtYlBZ/X4=;
+        b=EIE1mYY8cMtV/BEwVJHw4yegOmjxsyMLsaj1JcTJtE3KNNf5J4AlxFYgWXDNKCQFG3
+         YyGGCgkPXkFkMtNiiTBajQi9FLptD8LkGzM/URxVGNADKkLyrVuEezxwi1yGpAHaBCSf
+         I3qnhxPsGI/dDiS3lzlXKN5tyJZx/0lShIZcBInnJ/3Z+6IRns5ark6f2YLRVJBsFUki
+         cXLWsHAr6PQQZYuoeKs3M9EJNFCSM3B3SRqB1oNhItXOh8o/2cCPpQ+NRMsUAFSlV8Mp
+         NbTdNoDmCBO6j0ZSplp0pFXvcVwZjmqKUm1FeJTx/+wETuzNOoK9XaQpvEf3xv0DqXk8
+         YGtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762793278; x=1763398078;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=xZqfsqvlctuD50vkPLsM39GcbviXIyVkPfjtYlBZ/X4=;
+        b=K2+lGqdXjGDYknyUynkvy/WM7eWUFyjo9kEQ2KW82dHgG8hdg3Ah8mlaNt6jK4eJZl
+         KT9iB2orzZRSLoeVpctwOSv6/7ewGhLAC5cR6yck9xMxLdFT2aVUdtVrdU42bAWzUUHK
+         8Lzj7tGog4ByvdIVmWTt8/I3xIG1JXf872DzMMXt829OFA3gMuGu8eSoLaccMDVNqvpR
+         fphXVbcx9nLAarU1sYAgkCsGcAlW3S7hTE3ATWMy9zrn7TWqHJlNRo5/ZnieP+GhyUhp
+         ukDyyIoe5ijRNRO/zk44/hVvL7jTFne+Kcb1dZbuZl0+UjFnRNcR88R+ihUWNnig2Z9k
+         Fuiw==
+X-Forwarded-Encrypted: i=1; AJvYcCUAPxxnCkF28D3cNtrl15PETsoygtAdJI2FUhHDKNu3cXdSgqoGf257N0lHhGv33m7a/m+oTg5h/OTnig==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx2+eEa846Y3zSJryKA4a7+Nvi8uxbsELBwI92Y0ItR3y9cfc/X
+	IhDhETQb6L0q2idKoATiiX4V537zrdML4fF6u1UPZnMGbyyDg9x0ot5XpfkpewFV7+GYG+rzqt/
+	1C3N2zOLCZS5V0Pe+KmUBW5VTPO7vxoO2lvXwxVLGbQ==
+X-Gm-Gg: ASbGncttORPU20W2ROe0ICEK9Q3WbfSPF55Eha/JGtfEBHL0D1T8L4CNA2PP5mP+wUj
+	ttjB4Z5D8vwmgWid18fS4RgspqWj1JZ8v+Fb9zOqZ/1UAlZxbpO1ifBzhuJPiteVyfUuwmuGbjE
+	OBrAm6pKI8OiFUYF6DYqE9ES7Qu7qucY0FZ2ibmIkwFqqAGr6mPK3eubxY5hBI506x4sPx2faT3
+	WMcXvJptUHXof8ImohFClZ+h3xvam8gB8mfL5QNehTWWzZ5tu9LI5QYxW5p5WnZs6muIOmvkjjC
+	au8xTwHWH9I2m9LeAi8mG3+7iI7E
+X-Google-Smtp-Source: AGHT+IFIOdjBHi3w1pnM/HGJ88+v2H+dG9zQ6DmQ1N7yZm773WThOr3yfaWrN+hUKMkOOzsS5iJ835zONe6DvUk5kkI=
+X-Received: by 2002:a17:902:eccc:b0:272:2bf1:6a1f with SMTP id
+ d9443c01a7336-297e5657e71mr63866195ad.4.1762793278132; Mon, 10 Nov 2025
+ 08:47:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20251108230101.4187106-1-csander@purestorage.com>
+ <20251108230101.4187106-2-csander@purestorage.com> <aRCG3OUThPCys92r@fedora>
+In-Reply-To: <aRCG3OUThPCys92r@fedora>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Mon, 10 Nov 2025 08:47:46 -0800
+X-Gm-Features: AWmQ_blYPrkmtS7MiqmLPPXzGp4JyIMEirgGSbanrjWPFtKq4gAWKN2U4mpi-Qg
+Message-ID: <CADUfDZocSmRC2uSiY=1gayxQ5TGAcCnKQRSg+4SeficpQ3Bfhw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] loop: use blk_rq_nr_phys_segments() instead of
+ iterating bvecs
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Damien Le Moal <dlemoal@kernel.org>, Christoph Hellwig <hch@lst.de>, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Keith Busch <kbusch@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Freezing the request queue from inside sysfs store callbacks may cause a
-deadlock in combination with the dm-multipath driver and the
-queue_if_no_path option. Additionally, freezing the request queue slows
-down system boot on systems where sysfs attributes are set synchronously.
+On Sun, Nov 9, 2025 at 4:20=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrote=
+:
+>
+> On Sat, Nov 08, 2025 at 04:01:00PM -0700, Caleb Sander Mateos wrote:
+> > The number of bvecs can be obtained directly from struct request's
+> > nr_phys_segments field via blk_rq_nr_phys_segments(), so use that
+> > instead of iterating over the bvecs an extra time.
+> >
+> > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+> > ---
+> >  drivers/block/loop.c | 5 +----
+> >  1 file changed, 1 insertion(+), 4 deletions(-)
+> >
+> > diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> > index 13ce229d450c..8096478fad45 100644
+> > --- a/drivers/block/loop.c
+> > +++ b/drivers/block/loop.c
+> > @@ -346,16 +346,13 @@ static int lo_rw_aio(struct loop_device *lo, stru=
+ct loop_cmd *cmd,
+> >       struct request *rq =3D blk_mq_rq_from_pdu(cmd);
+> >       struct bio *bio =3D rq->bio;
+> >       struct file *file =3D lo->lo_backing_file;
+> >       struct bio_vec tmp;
+> >       unsigned int offset;
+> > -     int nr_bvec =3D 0;
+> > +     unsigned short nr_bvec =3D blk_rq_nr_phys_segments(rq);
+> >       int ret;
+> >
+> > -     rq_for_each_bvec(tmp, rq, rq_iter)
+> > -             nr_bvec++;
+> > -
+>
+> The two may not be same, since one bvec can be splitted into multiple seg=
+ments.
 
-Fix this by removing the blk_mq_freeze_queue() / blk_mq_unfreeze_queue()
-calls from the store callbacks that do not strictly need these callbacks.
-This patch may cause a small delay in applying the new settings.
+Hmm, io_buffer_register_bvec() already assumes
+blk_rq_nr_phys_segments() returns the number of bvecs iterated by
+rq_for_each_bvec(). I asked about this on the patch adding it, but
+Keith assures me they match:
+https://lore.kernel.org/io-uring/Z7TmrB4_aBnZdFbo@kbusch-mbp/.
 
-This patch affects the following sysfs attributes:
-* io_poll_delay
-* io_timeout
-* nomerges
-* read_ahead_kb
-* rq_affinity
-
-Here is an example of a deadlock triggered by running test srp/002:
-
-task:multipathd
-Call Trace:
- <TASK>
- __schedule+0x8c1/0x1bf0
- schedule+0xdd/0x270
- schedule_preempt_disabled+0x1c/0x30
- __mutex_lock+0xb89/0x1650
- mutex_lock_nested+0x1f/0x30
- dm_table_set_restrictions+0x823/0xdf0
- __bind+0x166/0x590
- dm_swap_table+0x2a7/0x490
- do_resume+0x1b1/0x610
- dev_suspend+0x55/0x1a0
- ctl_ioctl+0x3a5/0x7e0
- dm_ctl_ioctl+0x12/0x20
- __x64_sys_ioctl+0x127/0x1a0
- x64_sys_call+0xe2b/0x17d0
- do_syscall_64+0x96/0x3a0
- entry_SYSCALL_64_after_hwframe+0x4b/0x53
- </TASK>
-task:(udev-worker)
-Call Trace:
- <TASK>
- __schedule+0x8c1/0x1bf0
- schedule+0xdd/0x270
- blk_mq_freeze_queue_wait+0xf2/0x140
- blk_mq_freeze_queue_nomemsave+0x23/0x30
- queue_ra_store+0x14e/0x290
- queue_attr_store+0x23e/0x2c0
- sysfs_kf_write+0xde/0x140
- kernfs_fop_write_iter+0x3b2/0x630
- vfs_write+0x4fd/0x1390
- ksys_write+0xfd/0x230
- __x64_sys_write+0x76/0xc0
- x64_sys_call+0x276/0x17d0
- do_syscall_64+0x96/0x3a0
- entry_SYSCALL_64_after_hwframe+0x4b/0x53
- </TASK>
-
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Nilay Shroff <nilay@linux.ibm.com>
-Cc: Martin Wilck <mwilck@suse.com>
-Cc: Benjamin Marzinski <bmarzins@redhat.com>
-Cc: stable@vger.kernel.org
-Fixes: af2814149883 ("block: freeze the queue in queue_attr_store")
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
-
-Changes compared to v4:
- - Use WRITE_ONCE() to update bdi->ra_pages.
- - Move a data_race() annotation from queue_io_timeout_store() into
-   blk_queue_rq_timeout().
-
-Changes compared to v3:
- - Added two data_race() annotations.
-
-Changes compared to v2:
- - Dropped the controversial patch "block: Restrict the duration of sysfs
-   attribute changes".
-
-Changes compared to v1:
- - Added patch "block: Restrict the duration of sysfs attribute changes".
- - Remove queue freezing from more sysfs callbacks.
-=20
- block/blk-settings.c |  9 ++++++++-
- block/blk-sysfs.c    | 30 ++++++++++++------------------
- 2 files changed, 20 insertions(+), 19 deletions(-)
-
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 78dfef117623..b5587cc535e5 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -23,7 +23,14 @@
-=20
- void blk_queue_rq_timeout(struct request_queue *q, unsigned int timeout)
- {
--	WRITE_ONCE(q->rq_timeout, timeout);
-+	/*
-+	 * Use WRITE_ONCE() to write q->rq_timeout once. Use data_race() to
-+	 * suppress KCSAN race reports against the write below.
-+	 */
-+	data_race(({
-+		WRITE_ONCE(q->rq_timeout, timeout);
-+		0;
-+	}));
- }
- EXPORT_SYMBOL_GPL(blk_queue_rq_timeout);
-=20
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 76c47fe9b8d6..99e78d907c1c 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -143,21 +143,26 @@ queue_ra_store(struct gendisk *disk, const char *pa=
-ge, size_t count)
- {
- 	unsigned long ra_kb;
- 	ssize_t ret;
--	unsigned int memflags;
- 	struct request_queue *q =3D disk->queue;
-=20
- 	ret =3D queue_var_store(&ra_kb, page, count);
- 	if (ret < 0)
- 		return ret;
- 	/*
--	 * ->ra_pages is protected by ->limits_lock because it is usually
--	 * calculated from the queue limits by queue_limits_commit_update.
-+	 * The ->ra_pages change below is protected by ->limits_lock because it
-+	 * is usually calculated from the queue limits by
-+	 * queue_limits_commit_update().
-+	 *
-+	 * bdi->ra_pages reads are not serialized against bdi->ra_pages writes.
-+	 * Use WRITE_ONCE() to write bdi->ra_pages once. Use data_race() to
-+	 * suppress KCSAN race reports against the write below.
- 	 */
- 	mutex_lock(&q->limits_lock);
--	memflags =3D blk_mq_freeze_queue(q);
--	disk->bdi->ra_pages =3D ra_kb >> (PAGE_SHIFT - 10);
-+	data_race(({
-+		WRITE_ONCE(disk->bdi->ra_pages, ra_kb >> (PAGE_SHIFT - 10));
-+		0;
-+	}));
- 	mutex_unlock(&q->limits_lock);
--	blk_mq_unfreeze_queue(q, memflags);
-=20
- 	return ret;
- }
-@@ -375,21 +380,18 @@ static ssize_t queue_nomerges_store(struct gendisk =
-*disk, const char *page,
- 				    size_t count)
- {
- 	unsigned long nm;
--	unsigned int memflags;
- 	struct request_queue *q =3D disk->queue;
- 	ssize_t ret =3D queue_var_store(&nm, page, count);
-=20
- 	if (ret < 0)
- 		return ret;
-=20
--	memflags =3D blk_mq_freeze_queue(q);
- 	blk_queue_flag_clear(QUEUE_FLAG_NOMERGES, q);
- 	blk_queue_flag_clear(QUEUE_FLAG_NOXMERGES, q);
- 	if (nm =3D=3D 2)
- 		blk_queue_flag_set(QUEUE_FLAG_NOMERGES, q);
- 	else if (nm)
- 		blk_queue_flag_set(QUEUE_FLAG_NOXMERGES, q);
--	blk_mq_unfreeze_queue(q, memflags);
-=20
- 	return ret;
- }
-@@ -409,7 +411,6 @@ queue_rq_affinity_store(struct gendisk *disk, const c=
-har *page, size_t count)
- #ifdef CONFIG_SMP
- 	struct request_queue *q =3D disk->queue;
- 	unsigned long val;
--	unsigned int memflags;
-=20
- 	ret =3D queue_var_store(&val, page, count);
- 	if (ret < 0)
-@@ -421,7 +422,6 @@ queue_rq_affinity_store(struct gendisk *disk, const c=
-har *page, size_t count)
- 	 * are accessed individually using atomic test_bit operation. So we
- 	 * don't grab any lock while updating these flags.
- 	 */
--	memflags =3D blk_mq_freeze_queue(q);
- 	if (val =3D=3D 2) {
- 		blk_queue_flag_set(QUEUE_FLAG_SAME_COMP, q);
- 		blk_queue_flag_set(QUEUE_FLAG_SAME_FORCE, q);
-@@ -432,7 +432,6 @@ queue_rq_affinity_store(struct gendisk *disk, const c=
-har *page, size_t count)
- 		blk_queue_flag_clear(QUEUE_FLAG_SAME_COMP, q);
- 		blk_queue_flag_clear(QUEUE_FLAG_SAME_FORCE, q);
- 	}
--	blk_mq_unfreeze_queue(q, memflags);
- #endif
- 	return ret;
- }
-@@ -446,11 +445,9 @@ static ssize_t queue_poll_delay_store(struct gendisk=
- *disk, const char *page,
- static ssize_t queue_poll_store(struct gendisk *disk, const char *page,
- 				size_t count)
- {
--	unsigned int memflags;
- 	ssize_t ret =3D count;
- 	struct request_queue *q =3D disk->queue;
-=20
--	memflags =3D blk_mq_freeze_queue(q);
- 	if (!(q->limits.features & BLK_FEAT_POLL)) {
- 		ret =3D -EINVAL;
- 		goto out;
-@@ -459,7 +456,6 @@ static ssize_t queue_poll_store(struct gendisk *disk,=
- const char *page,
- 	pr_info_ratelimited("writes to the poll attribute are ignored.\n");
- 	pr_info_ratelimited("please use driver specific parameters instead.\n")=
-;
- out:
--	blk_mq_unfreeze_queue(q, memflags);
- 	return ret;
- }
-=20
-@@ -472,7 +468,7 @@ static ssize_t queue_io_timeout_show(struct gendisk *=
-disk, char *page)
- static ssize_t queue_io_timeout_store(struct gendisk *disk, const char *=
-page,
- 				  size_t count)
- {
--	unsigned int val, memflags;
-+	unsigned int val;
- 	int err;
- 	struct request_queue *q =3D disk->queue;
-=20
-@@ -480,9 +476,7 @@ static ssize_t queue_io_timeout_store(struct gendisk =
-*disk, const char *page,
- 	if (err || val =3D=3D 0)
- 		return -EINVAL;
-=20
--	memflags =3D blk_mq_freeze_queue(q);
- 	blk_queue_rq_timeout(q, msecs_to_jiffies(val));
--	blk_mq_unfreeze_queue(q, memflags);
-=20
- 	return count;
- }
+Best,
+Caleb
