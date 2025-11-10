@@ -1,122 +1,141 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-b7-smtp.messagingengine.com (fout-b7-smtp.messagingengine.com [202.12.124.150])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E51AF279DAD
-	for <linux-block@vger.kernel.org>; Mon, 10 Nov 2025 16:47:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0010F1A7AE3;
+	Mon, 10 Nov 2025 20:05:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762793280; cv=none; b=ZW2rbOwnBiFwsEiwvbznFA4jsTgZ9OCbF+ql/wZAh0bdR6SS/YH5msg0fkiE8NjNkjk+pCLZI+u9xWYH+wD2xsUhq1i6sSCoH9C5dkSkvHakH+30PAV0ZGduOHDq9bKjuDSRqV1LekcHn5nVLVI/yaDkE0mtNQBWNxFXVwzUA8o=
+	t=1762805138; cv=none; b=LjonZkeCBWPLLo8D4wHdKuu+98HeKUt+uo5LbKiEaLgJmUuMCp55TWrQizuuNjRpJhrLlk1ScrmUg/Ss2Qa0i/0DBIjnUHSJ+mLZclrxGerm8Iw2ZiY5H3eiF1N7QyuBJ36Ipt3kZYB13tN7maXnr0T2p2QojWwud0WnrW1DCoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762793280; c=relaxed/simple;
-	bh=nOIq144xGgFO4bva4FYwPZPvaRNZDvPcNywFLSl7Wtk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VaMDDcHyfM5ZTcrF2/FNFDuGsLXCH13iCt4Kt5tRc8PRP+/xBPO8EF2L53TXMAHmTL8YTwfN8uo1oBFXx2s4530qJgXmm55X14d3WnetEexjlRy8mBefEzfruDv8A8XFdv5e04WnAsYB71jBUJtTiCEwvN4Q2sbEq6J4uNgLqv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=EIE1mYY8; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1762805138; c=relaxed/simple;
+	bh=ZIYO3CpaK6TCINhe6w8XA+pYaZFiVJ/7Kigz3C4Xd9g=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kbOXwzIzWNN4tYWKT3QCT1tnKuMxliDJsFJk4RQWYovXG1sry+CUN1LsXTKUjNQ/M3sJWicdFTorUpQFRPViHjsBSecfrmkpi4ziyQkPuwpQiwS6mzwnhANutgvVKWXeXaFETLFKY9Z+Kqw2i6sw0n2ObobgH0UCXCV2XNxdQrU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=VTtNveK1; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ehVjo0kN; arc=none smtp.client-ip=202.12.124.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="EIE1mYY8"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-297f5278e5cso4041555ad.3
-        for <linux-block@vger.kernel.org>; Mon, 10 Nov 2025 08:47:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1762793278; x=1763398078; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xZqfsqvlctuD50vkPLsM39GcbviXIyVkPfjtYlBZ/X4=;
-        b=EIE1mYY8cMtV/BEwVJHw4yegOmjxsyMLsaj1JcTJtE3KNNf5J4AlxFYgWXDNKCQFG3
-         YyGGCgkPXkFkMtNiiTBajQi9FLptD8LkGzM/URxVGNADKkLyrVuEezxwi1yGpAHaBCSf
-         I3qnhxPsGI/dDiS3lzlXKN5tyJZx/0lShIZcBInnJ/3Z+6IRns5ark6f2YLRVJBsFUki
-         cXLWsHAr6PQQZYuoeKs3M9EJNFCSM3B3SRqB1oNhItXOh8o/2cCPpQ+NRMsUAFSlV8Mp
-         NbTdNoDmCBO6j0ZSplp0pFXvcVwZjmqKUm1FeJTx/+wETuzNOoK9XaQpvEf3xv0DqXk8
-         YGtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762793278; x=1763398078;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=xZqfsqvlctuD50vkPLsM39GcbviXIyVkPfjtYlBZ/X4=;
-        b=K2+lGqdXjGDYknyUynkvy/WM7eWUFyjo9kEQ2KW82dHgG8hdg3Ah8mlaNt6jK4eJZl
-         KT9iB2orzZRSLoeVpctwOSv6/7ewGhLAC5cR6yck9xMxLdFT2aVUdtVrdU42bAWzUUHK
-         8Lzj7tGog4ByvdIVmWTt8/I3xIG1JXf872DzMMXt829OFA3gMuGu8eSoLaccMDVNqvpR
-         fphXVbcx9nLAarU1sYAgkCsGcAlW3S7hTE3ATWMy9zrn7TWqHJlNRo5/ZnieP+GhyUhp
-         ukDyyIoe5ijRNRO/zk44/hVvL7jTFne+Kcb1dZbuZl0+UjFnRNcR88R+ihUWNnig2Z9k
-         Fuiw==
-X-Forwarded-Encrypted: i=1; AJvYcCUAPxxnCkF28D3cNtrl15PETsoygtAdJI2FUhHDKNu3cXdSgqoGf257N0lHhGv33m7a/m+oTg5h/OTnig==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx2+eEa846Y3zSJryKA4a7+Nvi8uxbsELBwI92Y0ItR3y9cfc/X
-	IhDhETQb6L0q2idKoATiiX4V537zrdML4fF6u1UPZnMGbyyDg9x0ot5XpfkpewFV7+GYG+rzqt/
-	1C3N2zOLCZS5V0Pe+KmUBW5VTPO7vxoO2lvXwxVLGbQ==
-X-Gm-Gg: ASbGncttORPU20W2ROe0ICEK9Q3WbfSPF55Eha/JGtfEBHL0D1T8L4CNA2PP5mP+wUj
-	ttjB4Z5D8vwmgWid18fS4RgspqWj1JZ8v+Fb9zOqZ/1UAlZxbpO1ifBzhuJPiteVyfUuwmuGbjE
-	OBrAm6pKI8OiFUYF6DYqE9ES7Qu7qucY0FZ2ibmIkwFqqAGr6mPK3eubxY5hBI506x4sPx2faT3
-	WMcXvJptUHXof8ImohFClZ+h3xvam8gB8mfL5QNehTWWzZ5tu9LI5QYxW5p5WnZs6muIOmvkjjC
-	au8xTwHWH9I2m9LeAi8mG3+7iI7E
-X-Google-Smtp-Source: AGHT+IFIOdjBHi3w1pnM/HGJ88+v2H+dG9zQ6DmQ1N7yZm773WThOr3yfaWrN+hUKMkOOzsS5iJ835zONe6DvUk5kkI=
-X-Received: by 2002:a17:902:eccc:b0:272:2bf1:6a1f with SMTP id
- d9443c01a7336-297e5657e71mr63866195ad.4.1762793278132; Mon, 10 Nov 2025
- 08:47:58 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="VTtNveK1";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ehVjo0kN"
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfout.stl.internal (Postfix) with ESMTP id 6D7811D00147;
+	Mon, 10 Nov 2025 15:05:33 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-04.internal (MEProxy); Mon, 10 Nov 2025 15:05:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1762805133;
+	 x=1762891533; bh=LRTbnDgOZdkcWyYb0TrSsTJyowo8VQnXM0W6ONAWUts=; b=
+	VTtNveK1sP3RdPO0iA1mluhOTIezB/pxiWEOpTMtRrXpqSxqoom2HwDYk67QuWkW
+	sPYOFU9wblpXDKzCcGaz76SsbUIjzORvB2iixAZGqW2fpsMJzqP5XDSLJZuUeose
+	gUs7geKqCEZxyILKTVR1G6bjEdT1IDPI9lORfC7uU7VXjawAWvGl2cthKxtM67hg
+	2LGDVSp2fb5+OY7d95VBUt3xXcg4zmyZNGQJvu4WmoOyjyktai2rEvD59ntUSPrz
+	noD0hx+3MnVDFBYoEm291EVo6ioNy0I4iVxIt4URSUSibY5VQFYlMAenBohjrrqE
+	5M+jBIsmcKEZFKzLT7cG6Q==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1762805133; x=
+	1762891533; bh=LRTbnDgOZdkcWyYb0TrSsTJyowo8VQnXM0W6ONAWUts=; b=e
+	hVjo0kNkpXpEnjyGLa3/HioTTAA5OcK4yDT+dT+kSj8VoCNpXQicmGnR1r8kl3i4
+	n/q1SGSEgGz8mmhYlrkKrESCZwS6ZmjcXz2B3B9WVYhcun1l7NR44AgVENlnLqvu
+	a1zJZ2CuMWjHrlkgrKrx6rKTVBu03wGm/PEyRLxXjeJPUmeJkA1RNRcTv4vkR077
+	UeYkeuPv7KXX5jjN3Q3Admhq/wVV39C97HYyXRwatVk2JzsEizOnKtCy3nYrgUV0
+	f16CdLzVqw7okI7dfupJaRHAfGhXWIUe34rM5F+7RmgptMF8UZmdovDBQ67FlOmL
+	bbZtZ4jSrTcVOKqnpDH4g==
+X-ME-Sender: <xms:i0USacfcdiFukOkHlGoqV_M4dCc620hY4NSllrMdUQNN1jhyNXA0dA>
+    <xme:i0USaebmv-CqTmGTtMURt40eSNK-Wx58zPcA6lUAMFk6_sJ7kTrwfXO5-hJI7QP35
+    WOjketLVpgzAmupEQaOyA0CSU46lUmN1quCAYwRJCTFcTgJGFD4>
+X-ME-Received: <xmr:i0USaQJZE78F87doANetcSybuW5K51r7sW1QPQxDU2rb0XeXgAf-OVXV>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduleelvdefucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkjghfgggtgfesthejredttddtvdenucfhrhhomheptehlvgigucgh
+    ihhllhhirghmshhonhcuoegrlhgvgiesshhhrgiisghothdrohhrgheqnecuggftrfgrth
+    htvghrnhepteetudelgeekieegudegleeuvdffgeehleeivddtfeektdekkeehffehudet
+    hffhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
+    hlvgigsehshhgriigsohhtrdhorhhgpdhnsggprhgtphhtthhopeeffedpmhhouggvpehs
+    mhhtphhouhhtpdhrtghpthhtoheplhgvohhnsehkvghrnhgvlhdrohhrghdprhgtphhtth
+    hopegshhgvlhhgrggrshesghhoohhglhgvrdgtohhmpdhrtghpthhtoheplhhoghgrnhhg
+    seguvghlthgrthgvvgdrtghomhdprhgtphhtthhopegrgigsohgvsehkvghrnhgvlhdrug
+    hkpdhrtghpthhtoheprhhosghinhdrmhhurhhphhihsegrrhhmrdgtohhmpdhrtghpthht
+    ohepjhhorhhoseeksgihthgvshdrohhrghdprhgtphhtthhopeifihhllheskhgvrhhnvg
+    hlrdhorhhgpdhrtghpthhtohepmhdrshiihihprhhofihskhhisehsrghmshhunhhgrdgt
+    ohhmpdhrtghpthhtohepjhhgghesiihivghpvgdrtggr
+X-ME-Proxy: <xmx:i0USadiojN3-M4EVjjaRRugj8V8QuJnr5MsQlLluVx8g5hN9fuNwjw>
+    <xmx:i0USacvol4BakuBUda4qcSsYifPCPIwHmQFFbRa4tQipabSTTp737w>
+    <xmx:i0USaREDw4I87L0odND3wJ85uUDm4QaLw4uwBFQIJ-AXU7QEY82_xw>
+    <xmx:i0USaS_gEbCoj0gRiNt7PSMpEk5gV19bFOSSEZSZfZgUVR07IZj5bA>
+    <xmx:jUUSaRJMGClENgI7ttLAOXLiOuPL8ZATIaHOyPe6Y_F7QjCcID7VjG5j>
+Feedback-ID: i03f14258:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 10 Nov 2025 15:05:29 -0500 (EST)
+Date: Mon, 10 Nov 2025 13:05:25 -0700
+From: Alex Williamson <alex@shazbot.org>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Bjorn Helgaas <bhelgaas@google.com>,
+ Logan Gunthorpe <logang@deltatee.com>, Jens Axboe <axboe@kernel.dk>,
+ Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+ Will Deacon <will@kernel.org>,
+ Marek Szyprowski <m.szyprowski@samsung.com>,
+ Jason Gunthorpe <jgg@ziepe.ca>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Jonathan Corbet <corbet@lwn.net>, Sumit Semwal <sumit.semwal@linaro.org>,
+ Christian =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+ Kees Cook <kees@kernel.org>,
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ Ankit Agrawal <ankita@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>,
+ Shameer Kolothum <skolothumtho@nvidia.com>,
+ Kevin Tian <kevin.tian@intel.com>, Krishnakant Jaju <kjaju@nvidia.com>,
+ Matt Ochs <mochs@nvidia.com>, linux-pci@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+ iommu@lists.linux.dev, linux-mm@kvack.org, linux-doc@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linaro-mm-sig@lists.linaro.org, kvm@vger.kernel.org,
+ linux-hardening@vger.kernel.org,
+ Vivek Kasireddy <vivek.kasireddy@intel.com>
+Subject: Re: [PATCH v7 10/11] vfio/pci: Add dma-buf export support for MMIO
+ regions
+Message-ID: <20251110130525.6712552b.alex@shazbot.org>
+In-Reply-To: <20251106-dmabuf-vfio-v7-10-2503bf390699@nvidia.com>
+References: <20251106-dmabuf-vfio-v7-0-2503bf390699@nvidia.com>
+	<20251106-dmabuf-vfio-v7-10-2503bf390699@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251108230101.4187106-1-csander@purestorage.com>
- <20251108230101.4187106-2-csander@purestorage.com> <aRCG3OUThPCys92r@fedora>
-In-Reply-To: <aRCG3OUThPCys92r@fedora>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Mon, 10 Nov 2025 08:47:46 -0800
-X-Gm-Features: AWmQ_blYPrkmtS7MiqmLPPXzGp4JyIMEirgGSbanrjWPFtKq4gAWKN2U4mpi-Qg
-Message-ID: <CADUfDZocSmRC2uSiY=1gayxQ5TGAcCnKQRSg+4SeficpQ3Bfhw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] loop: use blk_rq_nr_phys_segments() instead of
- iterating bvecs
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Damien Le Moal <dlemoal@kernel.org>, Christoph Hellwig <hch@lst.de>, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Keith Busch <kbusch@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Sun, Nov 9, 2025 at 4:20=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrote=
-:
->
-> On Sat, Nov 08, 2025 at 04:01:00PM -0700, Caleb Sander Mateos wrote:
-> > The number of bvecs can be obtained directly from struct request's
-> > nr_phys_segments field via blk_rq_nr_phys_segments(), so use that
-> > instead of iterating over the bvecs an extra time.
-> >
-> > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-> > ---
-> >  drivers/block/loop.c | 5 +----
-> >  1 file changed, 1 insertion(+), 4 deletions(-)
-> >
-> > diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> > index 13ce229d450c..8096478fad45 100644
-> > --- a/drivers/block/loop.c
-> > +++ b/drivers/block/loop.c
-> > @@ -346,16 +346,13 @@ static int lo_rw_aio(struct loop_device *lo, stru=
-ct loop_cmd *cmd,
-> >       struct request *rq =3D blk_mq_rq_from_pdu(cmd);
-> >       struct bio *bio =3D rq->bio;
-> >       struct file *file =3D lo->lo_backing_file;
-> >       struct bio_vec tmp;
-> >       unsigned int offset;
-> > -     int nr_bvec =3D 0;
-> > +     unsigned short nr_bvec =3D blk_rq_nr_phys_segments(rq);
-> >       int ret;
-> >
-> > -     rq_for_each_bvec(tmp, rq, rq_iter)
-> > -             nr_bvec++;
-> > -
->
-> The two may not be same, since one bvec can be splitted into multiple seg=
-ments.
+On Thu,  6 Nov 2025 16:16:55 +0200
+Leon Romanovsky <leon@kernel.org> wrote:
+> diff --git a/drivers/vfio/pci/vfio_pci_dmabuf.c b/drivers/vfio/pci/vfio_pci_dmabuf.c
+> new file mode 100644
+> index 000000000000..cbf502b14e3c
+> --- /dev/null
+> +++ b/drivers/vfio/pci/vfio_pci_dmabuf.c
+...
+> +
+> +int vfio_pci_core_feature_dma_buf(struct vfio_pci_core_device *vdev, u32 flags,
+> +				  struct vfio_device_feature_dma_buf __user *arg,
+> +				  size_t argsz)
+> +{
+> +	struct vfio_device_feature_dma_buf get_dma_buf = {};
+> +	struct vfio_region_dma_range *dma_ranges;
+> +	DEFINE_DMA_BUF_EXPORT_INFO(exp_info);
+> +	struct vfio_pci_dma_buf *priv;
+> +	size_t length;
+> +	int ret;
+> +
+> +	if (!vdev->pci_ops->get_dmabuf_phys)
 
-Hmm, io_buffer_register_bvec() already assumes
-blk_rq_nr_phys_segments() returns the number of bvecs iterated by
-rq_for_each_bvec(). I asked about this on the patch adding it, but
-Keith assures me they match:
-https://lore.kernel.org/io-uring/Z7TmrB4_aBnZdFbo@kbusch-mbp/.
 
-Best,
-Caleb
+vdev->pci_ops can be NULL.
+
+Thanks,
+Alex
