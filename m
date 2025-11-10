@@ -1,125 +1,150 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from m16.mail.126.com (m16.mail.126.com [220.197.31.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45CF73126C7;
-	Mon, 10 Nov 2025 14:13:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE17616EB42
+	for <linux-block@vger.kernel.org>; Mon, 10 Nov 2025 15:23:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762784018; cv=none; b=du4mQUpU/BJ9dvcZIfd7MGwc1f2eMvW+iMWvf21kp4Oi2RMU91C7R0NA5/KEOi7y+3znh8Y5r9m5+2PbWoqUeCuQkitJ81oRDqIzi77nLARdO4o3oJhAn4H3VewPkX/eD+VwcCN+8CGKSAKV5GLMls7b2j+DnIlHK8krBkC/HY4=
+	t=1762788243; cv=none; b=eOinT4WBaSzUWicHi1cSWPifYFmSLNsF1pC8iGtNCrhAziMaXBqafPKMnyWgDZFcaBgWhHsDTSR1KDW0D3W1OH3cOFxbl+DWOisqNn73h8IF4NxXgLQlKUmW07yMEoTAFj6GXxEieMKBAiOwyQ5Mjv5IhMs+y2Szb6e+qx6nPAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762784018; c=relaxed/simple;
-	bh=7tIWrGouMUaytXUKW8IlvpRs6GDUMAJ2YsLhkWoK6Ng=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=krVQJdh62V9pBUI/FLoMnjj86uH5B7T3NdWGO2V/bOxeHGpOWSq+d7NvgkJAAY5Bd0q6TgvvZFoiZ1iPWHXRZD1SbsLZjvDnpA6VR4XWuF1Hmm0bJ8UH1sUe5XN9nc4o0Va+PmAxOduF+ZkpRmf7eqa7wNjQkKillC+EUe7cXqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4d4s8F02v6zKHMjR;
-	Mon, 10 Nov 2025 22:13:17 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.75])
-	by mail.maildlp.com (Postfix) with ESMTP id B160E1A0847;
-	Mon, 10 Nov 2025 22:13:31 +0800 (CST)
-Received: from [10.174.178.152] (unknown [10.174.178.152])
-	by APP2 (Coremail) with SMTP id Syh0CgAHZXsH8xFp7DgWAQ--.14837S3;
-	Mon, 10 Nov 2025 22:13:29 +0800 (CST)
-Message-ID: <2b8a6767-5e37-48e1-b75c-cd16005580a7@huaweicloud.com>
-Date: Mon, 10 Nov 2025 22:13:26 +0800
+	s=arc-20240116; t=1762788243; c=relaxed/simple;
+	bh=WgPLYwWBqPbdNvjsPPY3wllr3qGd3ZqFjx0fePA+ao8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XqMN7NmwYcsJ+AUFw6p8vwsSy0s5F2t5VcrpHKdseqzGLrlOqfunKpJz8PAbEVoUmDcgZQamncQww0HTVWvdADYvr+Yj0sPSWe9o37M6LFiqvhJ8HxnevsfghIbWpcaKdaVTlUoyQytKumODy9bqXuTBG7kSBHOuBRIlTzbGghU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com; spf=pass smtp.mailfrom=126.com; dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b=EaDTc//I; arc=none smtp.client-ip=220.197.31.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="EaDTc//I"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=N1
+	EVr8G896vfw0lYI4Fn8dKmiUCvwQC3BiB+o1WqZH4=; b=EaDTc//Iez3koX9nQ+
+	irYl5WUFsZp4C+vxrEOOALnU3V4eLmRBVjubNX23RldEC5AX9TQjIjtHWbav7Q/+
+	f1vgWtL8k3XviaeAq2+m+P7ia5Cp6BvXA9+r1iGSvqW9Wnf3Aoad8W3lja2WD/NA
+	1IqGjhhn2XB+Dxx2Kl4DZjnxU=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g1-0 (Coremail) with SMTP id _____wAHKj+GAxJp64DdAg--.31764S2;
+	Mon, 10 Nov 2025 23:23:51 +0800 (CST)
+From: lwk <lwk111111@126.com>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	lwk <lwk111111@126.com>
+Subject: [PATCH] block: add sysctl_blk_timeout
+Date: Mon, 10 Nov 2025 23:23:48 +0800
+Message-ID: <20251110152348.2653843-1-lwk111111@126.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] bdev: add hint prints in sb_set_blocksize() for LBS
- dependency on THP
-To: libaokun@huaweicloud.com, linux-fsdevel@vger.kernel.org
-Cc: brauner@kernel.org, jack@suse.cz, viro@zeniv.linux.org.uk,
- axboe@kernel.dk, linux-block@vger.kernel.org, yangerkun@huawei.com,
- libaokun1@huawei.com, Theodore Ts'o <tytso@mit.edu>
-References: <20251110124714.1329978-1-libaokun@huaweicloud.com>
-Content-Language: en-US
-From: Zhang Yi <yi.zhang@huaweicloud.com>
-In-Reply-To: <20251110124714.1329978-1-libaokun@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:Syh0CgAHZXsH8xFp7DgWAQ--.14837S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7Aw47Wr4xGFyrKr4fXrWxXrb_yoW8ur18pF
-	y8Gr1rAr18KF1xuFy7Z3ZxJasa9ws5JFyUJ34xuFyjvryDt34fGr93Kry5XF4IvrsxCrZ3
-	XFsrKFWI9r1UW3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
-	14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
-	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8
-	ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
-	0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_
-	Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUF1
-	v3UUUUU
-X-CM-SenderInfo: d1lo6xhdqjqx5xdzvxpfor3voofrz/
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wAHKj+GAxJp64DdAg--.31764S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxWrykWryUAF1DKFy7uw1kuFg_yoW5Aw1kpF
+	s8K3WrGw48KF47XFyfG3WayF1rJa18KryjkF9ru34Fyr9akrZ7Ar1vyry8tFn2kanxCF43
+	XF17WrW5G3yrGa7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pRvzuXUUUUU=
+X-CM-SenderInfo: 5ozniiirrriqqrswhudrp/1tbiFgcCSmkR9FfGmwAAsf
 
-On 11/10/2025 8:47 PM, libaokun@huaweicloud.com wrote:
-> From: Baokun Li <libaokun1@huawei.com>
-> 
-> Support for block sizes greater than the page size depends on large
-> folios, which in turn require CONFIG_TRANSPARENT_HUGEPAGE to be enabled.
-> 
-> Because the code is wrapped in multiple layers of abstraction, this
-> dependency is rather obscure, so users may not realize it and may be
-> unsure how to enable LBS.
-> 
-> As suggested by Theodore, I have added hint messages in sb_set_blocksize
-> so that users can distinguish whether a mount failure with block size
-> larger than page size is due to lack of filesystem support or the absence
-> of CONFIG_TRANSPARENT_HUGEPAGE.
-> 
-> Suggested-by: Theodore Ts'o <tytso@mit.edu>
-> Link: https://patch.msgid.link/20251110043226.GD2988753@mit.edu
-> Signed-off-by: Baokun Li <libaokun1@huawei.com>
+In some scenarios, we want to modify the blk timeout, but the
+blk timeout is a hard-code constant, the default value is 30s,
+so this patch changes blk timeout to a variable that can be
+controlled via sysctl.
 
-Looks good to me.
+Signed-off-by: lwk <lwk111111@126.com>
 
-Reviewed-by: Zhang Yi <yi.zhang@huawei.com>
+	modified:   block/blk-mq.c
+	modified:   drivers/block/Makefile
+	new file:   drivers/block/blk_sysctl.c
+	modified:   include/linux/blkdev.h
+---
+ block/blk-mq.c             |  2 +-
+ drivers/block/Makefile     |  1 +
+ drivers/block/blk_sysctl.c | 37 +++++++++++++++++++++++++++++++++++++
+ include/linux/blkdev.h     |  1 +
+ 4 files changed, 40 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/block/blk_sysctl.c
 
-> ---
->  block/bdev.c | 19 ++++++++++++++++++-
->  1 file changed, 18 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/bdev.c b/block/bdev.c
-> index 810707cca970..4888831acaf5 100644
-> --- a/block/bdev.c
-> +++ b/block/bdev.c
-> @@ -217,9 +217,26 @@ int set_blocksize(struct file *file, int size)
->  
->  EXPORT_SYMBOL(set_blocksize);
->  
-> +static int sb_validate_large_blocksize(struct super_block *sb, int size)
-> +{
-> +	const char *err_str = NULL;
-> +
-> +	if (!(sb->s_type->fs_flags & FS_LBS))
-> +		err_str = "not supported by filesystem";
-> +	else if (!IS_ENABLED(CONFIG_TRANSPARENT_HUGEPAGE))
-> +		err_str = "is only supported with CONFIG_TRANSPARENT_HUGEPAGE";
-> +
-> +	if (!err_str)
-> +		return 0;
-> +
-> +	pr_warn_ratelimited("%s: block size(%d) > page size(%lu) %s\n",
-> +				sb->s_type->name, size, PAGE_SIZE, err_str);
-> +	return -EINVAL;
-> +}
-> +
->  int sb_set_blocksize(struct super_block *sb, int size)
->  {
-> -	if (!(sb->s_type->fs_flags & FS_LBS) && size > PAGE_SIZE)
-> +	if (size > PAGE_SIZE && sb_validate_large_blocksize(sb, size))
->  		return 0;
->  	if (set_blocksize(sb->s_bdev_file, size))
->  		return 0;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 40490ac88..2a087b6b8 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -4537,7 +4537,7 @@ int blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 		goto err_hctxs;
+ 
+ 	INIT_WORK(&q->timeout_work, blk_mq_timeout_work);
+-	blk_queue_rq_timeout(q, set->timeout ? set->timeout : 30 * HZ);
++	blk_queue_rq_timeout(q, set->timeout ? set->timeout : sysctl_blk_timeout);
+ 
+ 	q->queue_flags |= QUEUE_FLAG_MQ_DEFAULT;
+ 
+diff --git a/drivers/block/Makefile b/drivers/block/Makefile
+index 1105a2d4f..544e6b6b5 100644
+--- a/drivers/block/Makefile
++++ b/drivers/block/Makefile
+@@ -12,6 +12,7 @@ ccflags-y				+= -I$(src)
+ obj-$(CONFIG_BLK_DEV_RUST_NULL) += rnull_mod.o
+ rnull_mod-y := rnull.o
+ 
++obj-$(CONFIG_SYSCTL)        += blk_sysctl.o
+ obj-$(CONFIG_MAC_FLOPPY)	+= swim3.o
+ obj-$(CONFIG_BLK_DEV_SWIM)	+= swim_mod.o
+ obj-$(CONFIG_BLK_DEV_FD)	+= floppy.o
+diff --git a/drivers/block/blk_sysctl.c b/drivers/block/blk_sysctl.c
+new file mode 100644
+index 000000000..f8f96ad12
+--- /dev/null
++++ b/drivers/block/blk_sysctl.c
+@@ -0,0 +1,37 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * blk_sysctl.c: sysctl interface to block subsystem.
++ *
++ * Begun Nov 10, 2025, lwk.
++ * Added /proc/sys/block directory entry
++ */
++
++#include <linux/init.h>
++#include <linux/kernel.h>
++#include <linux/sysctl.h>
++#include <linux/blkdev.h>
++
++
++unsigned int sysctl_blk_timeout = 30;
++
++static struct ctl_table blk_table_sysctls[] = {
++	{
++		.procname		= "blk_timeout",
++		.data			= &sysctl_blk_timeout,
++		.maxlen			= sizeof(int),
++		.mode			= 0644,
++		.proc_handler	= proc_dointvec
++	},
++	{}
++};
++
++static __init int sysctl_blk_init(void)
++{
++#ifdef CONFIG_SYSCTL
++	register_sysctl_init("block", blk_table_sysctls);
++#endif
++
++	return 0;
++}
++
++__initcall(sysctl_blk_init);
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index d37751789..51802d5f7 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -42,6 +42,7 @@ struct blk_queue_stats;
+ struct blk_stat_callback;
+ struct blk_crypto_profile;
+ 
++extern unsigned int sysctl_blk_timeout;
+ extern const struct device_type disk_type;
+ extern const struct device_type part_type;
+ extern const struct class block_class;
+-- 
+2.47.3
 
