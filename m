@@ -1,185 +1,248 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F23E1C8FBA
-	for <linux-block@vger.kernel.org>; Mon, 10 Nov 2025 13:15:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56850312809
+	for <linux-block@vger.kernel.org>; Mon, 10 Nov 2025 13:38:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762780514; cv=none; b=qfQIFRPQ2VRBA8No4rkzRNpDhyrZF5wg0vM2Y4oKpCDsBdxPkHyA5WYfQPTER5FAGLApzf/INoBSshvdCRbzLvtC1a0nwp/mixSuPzgoMGVcfeQB0+WBByB3BEAdMg5tcDX/1qyTvQkxka3JWfuoPwU4lhhz0+a8/4aWPKBC7R4=
+	t=1762781894; cv=none; b=fBW+aqhljiF2YVTdjYB2K+7rJ32vwwe+IodKwpZT8ZhZ1YeOyCGPu8WMe2K0uIiNvRdYfJPwoRz6ABII/uHmz1g+KUPjEspF069OUy0Cj6xVz9MMp6btEn3BAstmV3woH0unr/LR5FtCB1xW/GbvuSsV/uwcujIn8VIYNkszbdY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762780514; c=relaxed/simple;
-	bh=UDFAmRjHGjSapaGRPRIM+Nkgi1V7QaMsLubQACwIBvo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ADwmLBF7xVnK3vO5QkTni+df0a52Bojx8lZl+N9zJjAmoFoeMtk1dtBWD11EBmIsUJ1Wi44YRCKiewuUG7+KgBEAQ3DrsuASIX9HP9lpSgsd1EDLWNoGyeqNYQOMpOsTnxo1uvhmuNWYxJ6X9UtcYQ/HC+f43SSFB91EwHc++Uo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=2oB1tbgc; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=GY2pZ8lu; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=2oB1tbgc; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=GY2pZ8lu; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1762781894; c=relaxed/simple;
+	bh=HOUCuTxWwKHYskDLNwEKHT2ZtC97epKNJQ0iYXnYKSw=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:Mime-Version; b=iaAUdTahvVKAEBYEi0LG+G3Lgqh27OYcfl22gUO27nWSaApI3U0tzN5ft9cYALtA44UJ6WxNUBZoXrrfTnMzN0zxGrIdmqGxA5c4lqy13Otb4ABlclyUJMIaO4QnuElIoarHLzCvBuF1WWMDdlulhJDWFC01TdC8rp2/sOitUKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cnzfU5Dx; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="2oB1tbgc";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="GY2pZ8lu";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="2oB1tbgc";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="GY2pZ8lu"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 3E6F22125B;
-	Mon, 10 Nov 2025 13:15:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1762780510; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Bob9q4zZe78YDc7c7xXVoYI5YSZxt/68IuU4mBqqm28=;
-	b=2oB1tbgc5h+N0YnX145fTn8vYrjujiH42wsJ7bKD2yw7OPvMoeLwqfeqRi2rfOitr3kmMe
-	5vyN8mNlYxXNbB/oiipJDkZvQRHXB5jwa73jMbHgpdnzOh5dVhlsnOKf190w23HTDNy01K
-	hmuDCF4PxRG8C9wv7qgtJ72UPUKlXJs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1762780510;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Bob9q4zZe78YDc7c7xXVoYI5YSZxt/68IuU4mBqqm28=;
-	b=GY2pZ8luFO/31CQuaFw/H6EzaiG7YGDyQlY7TVA9duLek0vkWfSUaVbDPNvP4gUATaTDI0
-	nWVFNZ/985nAYmBQ==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1762780510; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Bob9q4zZe78YDc7c7xXVoYI5YSZxt/68IuU4mBqqm28=;
-	b=2oB1tbgc5h+N0YnX145fTn8vYrjujiH42wsJ7bKD2yw7OPvMoeLwqfeqRi2rfOitr3kmMe
-	5vyN8mNlYxXNbB/oiipJDkZvQRHXB5jwa73jMbHgpdnzOh5dVhlsnOKf190w23HTDNy01K
-	hmuDCF4PxRG8C9wv7qgtJ72UPUKlXJs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1762780510;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Bob9q4zZe78YDc7c7xXVoYI5YSZxt/68IuU4mBqqm28=;
-	b=GY2pZ8luFO/31CQuaFw/H6EzaiG7YGDyQlY7TVA9duLek0vkWfSUaVbDPNvP4gUATaTDI0
-	nWVFNZ/985nAYmBQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 32426143EE;
-	Mon, 10 Nov 2025 13:15:10 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id /Uk8DF7lEWk5RwAAD6G6ig
-	(envelope-from <jack@suse.cz>); Mon, 10 Nov 2025 13:15:10 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id DACB6A28B1; Mon, 10 Nov 2025 14:15:09 +0100 (CET)
-Date: Mon, 10 Nov 2025 14:15:09 +0100
-From: Jan Kara <jack@suse.cz>
-To: libaokun@huaweicloud.com
-Cc: linux-fsdevel@vger.kernel.org, brauner@kernel.org, jack@suse.cz, 
-	viro@zeniv.linux.org.uk, axboe@kernel.dk, linux-block@vger.kernel.org, 
-	yi.zhang@huawei.com, yangerkun@huawei.com, libaokun1@huawei.com, 
-	Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH] bdev: add hint prints in sb_set_blocksize() for LBS
- dependency on THP
-Message-ID: <rbrz2e3zilyjejol2azth3z43irzq3fp2sapecgzv4ocio5cjk@uu76dbfmoy3k>
-References: <20251110124714.1329978-1-libaokun@huaweicloud.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cnzfU5Dx"
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-7a9c64dfa6eso2308677b3a.3
+        for <linux-block@vger.kernel.org>; Mon, 10 Nov 2025 05:38:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762781892; x=1763386692; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:date
+         :cc:to:from:subject:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jnGlBRb9DwPiK9LmBGDtYmrRRuxIEh43z/epZv69VLQ=;
+        b=cnzfU5Dx7ei5165Oe21fXuxJobF5pYYWzJ6nz44a4qpnbTDHfaxt2uNEIxhyaar0gM
+         NOiGAVlSOw9p1tOzQFuPRIqGvuf7I5xwuy589Sfw72gkHII2klEm/0qHqw9/xcP4QnE7
+         CwA3VrKfrqD4OxTCCcSZdGsjfPcDafyt4ICvATeS2b9s0zidabiqqVankwQQ8doo+pE9
+         JCEyAQVtuSQ7MsXe7Z/V54rHKuuNGWADEvDJrG02KvQ3jGrz2og562GH4STpSy6GuVHq
+         qiQfG5gqFJ9amS4S1jQCXko05sruq0T0IEbHGMzBXbpV1F0k8G3JEXxaNJD2cK7jWkTK
+         oF3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762781892; x=1763386692;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:date
+         :cc:to:from:subject:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jnGlBRb9DwPiK9LmBGDtYmrRRuxIEh43z/epZv69VLQ=;
+        b=I/XrlXCA9GLXpXBkXL8rYTq85KXPiOShIwVnE0hfZgTKNuJy2Tko15ni8Rmwos0Ori
+         6RjHVdG0gnq1x4hejbVEzgo8jcn3u4l1iKEun62LPg6fvjwPljjojCh6KNBSOY8xPMPI
+         /kjJLHMJM8Ihl3xu4tTJQcZ20oyZc3S6Imi8+6o74SgAr12AYXIIxrb1+5P2rPzuGqMt
+         1w6JAt+5iYtDyQOYLewj4owHQVGkloYYC7Fa9xiPtaAVek56CzHTAqhgryjK/3rnMqm1
+         YkoW9hA2b4LsgmMWPQ4EW4E56OFlomhq85Zc+6wts3y/biwdmQFzeAW1OJbqJiu5IrRT
+         bSow==
+X-Forwarded-Encrypted: i=1; AJvYcCV3WPjj8ow3sIdEK+ZiYdUkbBfTDYHJkBgJP5ihQlGvbl++6z5iy3jNKUvSeypvokakN+5KHo/wuK0ATg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwcWXPqoCgwad0ZnMc4iehVG5kW470svdvw+wsOY9Tzu71YTQ5f
+	SlthX+IjgnQQLOHUQsf1Y0RY0jVxt3+pY4IfcJ3qgf742sGqaPKUqtnX
+X-Gm-Gg: ASbGncsz8R2WqCSTHsFc76gi21pZxxPa2h7txKa8bOwBzyeqVt2jpMcko1Op5FV2G38
+	dypD0zLlTXYlShWxlBeBZKtWz9hKv2CIMsT6D6QGDsSL5S3wAp11xwsNIfo1bKCWNTYxN4ch7Nw
+	nHGIQx3gtN5otsKTe5AqHDlrHYitQ2qcbxx6FgeFXa8MFCuFPf+tOhX3dS7ToRkb59XLGjeu19O
+	5Z0p782Xx5T/zZe9H7LAOo8CHmKPAaB3Vt+WUqczBTYQvZjnB00vVhthRsy9AsktwVEEfOOD/cY
+	mNceTgu2sjKJmG36adk8W9l32GPhjErnzeicKJmGZKFAtatHY52Yh5uvbgO2kdvLbTzx477Ru71
+	4fVkCc9jm7kWb3gnEGAOpMoAjUFhjEJEjrdkVnuppAk5ldCa5SboSP1mhiAvyvIzBRy/ka6bV86
+	eYL9tXTCJ6tviHlf8BVfnST7fl7H32wq954rCjiEbtbhcd3FTeqtomCNLxrvfNvBjG
+X-Google-Smtp-Source: AGHT+IHNvk2m9lZznt0nbMSiGOUuWH6p+xE2cZfK8zcBuHfxFqo1BWD3CQfalfJc7QB2TuotmiLZDQ==
+X-Received: by 2002:a05:6a21:32a0:b0:334:a784:304a with SMTP id adf61e73a8af0-353a2d3cec1mr9389506637.33.1762781891518;
+        Mon, 10 Nov 2025 05:38:11 -0800 (PST)
+Received: from li-5d80d4cc-2782-11b2-a85c-bed59fe4c9e5.ibm.com ([49.207.198.166])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-ba8f9ed21desm13311276a12.11.2025.11.10.05.38.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Nov 2025 05:38:11 -0800 (PST)
+Message-ID: <7f7163d79dc89ae8c8d1157ce969b369acbcfb5d.camel@gmail.com>
+Subject: Re: [PATCH 4/4] xfs: fallback to buffered I/O for direct I/O when
+ stable writes are required
+From: "Nirjhar Roy (IBM)" <nirjhar.roy.lists@gmail.com>
+To: Christoph Hellwig <hch@lst.de>, Carlos Maiolino <cem@kernel.org>, 
+	Christian Brauner
+	 <brauner@kernel.org>
+Cc: Jan Kara <jack@suse.cz>, "Martin K. Petersen"
+ <martin.petersen@oracle.com>,  linux-kernel@vger.kernel.org,
+ linux-xfs@vger.kernel.org,  linux-fsdevel@vger.kernel.org,
+ linux-raid@vger.kernel.org,  linux-block@vger.kernel.org
+Date: Mon, 10 Nov 2025 19:08:05 +0530
+In-Reply-To: <20251029071537.1127397-5-hch@lst.de>
+References: <20251029071537.1127397-1-hch@lst.de>
+	 <20251029071537.1127397-5-hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-27.el8_10) 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251110124714.1329978-1-libaokun@huaweicloud.com>
-X-Spamd-Result: default: False [-0.30 / 50.00];
-	SEM_URIBL(3.50)[huaweicloud.com:email];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-0.999];
-	MIME_GOOD(-0.10)[text/plain];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_COUNT_THREE(0.00)[3];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.com:email]
-X-Spam-Flag: NO
-X-Spam-Score: -0.30
-X-Spam-Level: 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Mon 10-11-25 20:47:14, libaokun@huaweicloud.com wrote:
-> From: Baokun Li <libaokun1@huawei.com>
+On Wed, 2025-10-29 at 08:15 +0100, Christoph Hellwig wrote:
+> Inodes can be marked as requiring stable writes, which is a setting
+> usually inherited from block devices that require stable writes.  Block
+> devices require stable writes when the drivers have to sample the data
+> more than once, e.g. to calculate a checksum or parity in one pass, and
+> then send the data on to a hardware device, and modifying the data
+> in-flight can lead to inconsistent checksums or parity.
 > 
-> Support for block sizes greater than the page size depends on large
-> folios, which in turn require CONFIG_TRANSPARENT_HUGEPAGE to be enabled.
+> For buffered I/O, the writeback code implements this by not allowing
+> modifications while folios are marked as under writeback, but for
+> direct I/O, the kernel currently does not have any way to prevent the
+> user application from modifying the in-flight memory, so modifications
+> can easily corrupt data despite the block driver setting the stable
+> write flag.  Even worse, corruption can happen on reads as well,
+> where concurrent modifications can cause checksum mismatches, or
+> failures to rebuild parity.  One application known to trigger this
+> behavior is Qemu when running Windows VMs, but there might be many
+> others as well.  xfstests can also hit this behavior, not only in the
+> specifically crafted patch for this (generic/761), but also in
+> various other tests that mostly stress races between different I/O
+> modes, which generic/095 being the most trivial and easy to hit
+> one.
 > 
-> Because the code is wrapped in multiple layers of abstraction, this
-> dependency is rather obscure, so users may not realize it and may be
-> unsure how to enable LBS.
+> Fix XFS to fall back to uncached buffered I/O when the block device
+> requires stable writes to fix these races.
 > 
-> As suggested by Theodore, I have added hint messages in sb_set_blocksize
-> so that users can distinguish whether a mount failure with block size
-> larger than page size is due to lack of filesystem support or the absence
-> of CONFIG_TRANSPARENT_HUGEPAGE.
-> 
-> Suggested-by: Theodore Ts'o <tytso@mit.edu>
-> Link: https://patch.msgid.link/20251110043226.GD2988753@mit.edu
-> Signed-off-by: Baokun Li <libaokun1@huawei.com>
-
-Looks good. Feel free to add:
-
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-								Honza
-
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 > ---
->  block/bdev.c | 19 ++++++++++++++++++-
->  1 file changed, 18 insertions(+), 1 deletion(-)
+>  fs/xfs/xfs_file.c | 54 +++++++++++++++++++++++++++++++++++++++--------
+>  fs/xfs/xfs_iops.c |  6 ++++++
+>  2 files changed, 51 insertions(+), 9 deletions(-)
 > 
-> diff --git a/block/bdev.c b/block/bdev.c
-> index 810707cca970..4888831acaf5 100644
-> --- a/block/bdev.c
-> +++ b/block/bdev.c
-> @@ -217,9 +217,26 @@ int set_blocksize(struct file *file, int size)
+> diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
+> index e09ae86e118e..0668af07966a 100644
+> --- a/fs/xfs/xfs_file.c
+> +++ b/fs/xfs/xfs_file.c
+> @@ -230,6 +230,12 @@ xfs_file_dio_read(
+>  	struct xfs_inode	*ip = XFS_I(file_inode(iocb->ki_filp));
+>  	ssize_t			ret;
 >  
->  EXPORT_SYMBOL(set_blocksize);
+> +	if (mapping_stable_writes(iocb->ki_filp->f_mapping)) {
+> +		xfs_info_once(ip->i_mount,
+> +			"falling back from direct to buffered I/O for read");
+> +		return -ENOTBLK;
+> +	}
+> +
+>  	trace_xfs_file_direct_read(iocb, to);
 >  
-> +static int sb_validate_large_blocksize(struct super_block *sb, int size)
-> +{
-> +	const char *err_str = NULL;
+>  	if (!iov_iter_count(to))
+> @@ -302,13 +308,22 @@ xfs_file_read_iter(
+>  	if (xfs_is_shutdown(mp))
+>  		return -EIO;
+>  
+> -	if (IS_DAX(inode))
+> +	if (IS_DAX(inode)) {
+>  		ret = xfs_file_dax_read(iocb, to);
+> -	else if (iocb->ki_flags & IOCB_DIRECT)
+> +		goto done;
+> +	}
 > +
-> +	if (!(sb->s_type->fs_flags & FS_LBS))
-> +		err_str = "not supported by filesystem";
-> +	else if (!IS_ENABLED(CONFIG_TRANSPARENT_HUGEPAGE))
-> +		err_str = "is only supported with CONFIG_TRANSPARENT_HUGEPAGE";
+> +	if (iocb->ki_flags & IOCB_DIRECT) {
+>  		ret = xfs_file_dio_read(iocb, to);
+> -	else
+> -		ret = xfs_file_buffered_read(iocb, to);
+> +		if (ret != -ENOTBLK)
+> +			goto done;
 > +
-> +	if (!err_str)
-> +		return 0;
-> +
-> +	pr_warn_ratelimited("%s: block size(%d) > page size(%lu) %s\n",
-> +				sb->s_type->name, size, PAGE_SIZE, err_str);
-> +	return -EINVAL;
-> +}
-> +
->  int sb_set_blocksize(struct super_block *sb, int size)
+> +		iocb->ki_flags &= ~IOCB_DIRECT;
+> +		iocb->ki_flags |= IOCB_DONTCACHE;
+> +	}
+>  
+> +	ret = xfs_file_buffered_read(iocb, to);
+> +done:
+>  	if (ret > 0)
+>  		XFS_STATS_ADD(mp, xs_read_bytes, ret);
+>  	return ret;
+> @@ -883,6 +898,7 @@ xfs_file_dio_write(
+>  	struct iov_iter		*from)
 >  {
-> -	if (!(sb->s_type->fs_flags & FS_LBS) && size > PAGE_SIZE)
-> +	if (size > PAGE_SIZE && sb_validate_large_blocksize(sb, size))
->  		return 0;
->  	if (set_blocksize(sb->s_bdev_file, size))
->  		return 0;
-> -- 
-> 2.46.1
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+>  	struct xfs_inode	*ip = XFS_I(file_inode(iocb->ki_filp));
+> +	struct xfs_mount	*mp = ip->i_mount;
+>  	struct xfs_buftarg      *target = xfs_inode_buftarg(ip);
+>  	size_t			count = iov_iter_count(from);
+>  
+> @@ -890,15 +906,21 @@ xfs_file_dio_write(
+>  	if ((iocb->ki_pos | count) & target->bt_logical_sectormask)
+>  		return -EINVAL;
+>  
+> +	if (mapping_stable_writes(iocb->ki_filp->f_mapping)) {
+> +		xfs_info_once(mp,
+> +			"falling back from direct to buffered I/O for write");
+Minor: Let us say that an user opens a file in O_DIRECT in an atomic write enabled device(requiring
+stable writes), we get this warning once. Now the same/different user/application opens another file
+with O_DIRECT in the same atomic write enabled device and expects atomic write to be enabled - but
+it will not be enabled (since the kernel has falled back to the uncached buffered write path)
+without any warning message. Won't that be a bit confusing for the user (of course unless the user
+is totally aware of the kernel's exact behavior)?
+--NR
+
+> +		return -ENOTBLK;
+> +	}
+> +
+>  	/*
+>  	 * For always COW inodes we also must check the alignment of each
+>  	 * individual iovec segment, as they could end up with different
+>  	 * I/Os due to the way bio_iov_iter_get_pages works, and we'd
+>  	 * then overwrite an already written block.
+>  	 */
+> -	if (((iocb->ki_pos | count) & ip->i_mount->m_blockmask) ||
+> +	if (((iocb->ki_pos | count) & mp->m_blockmask) ||
+>  	    (xfs_is_always_cow_inode(ip) &&
+> -	     (iov_iter_alignment(from) & ip->i_mount->m_blockmask)))
+> +	     (iov_iter_alignment(from) & mp->m_blockmask)))
+>  		return xfs_file_dio_write_unaligned(ip, iocb, from);
+>  	if (xfs_is_zoned_inode(ip))
+>  		return xfs_file_dio_write_zoned(ip, iocb, from);
+> @@ -1555,10 +1577,24 @@ xfs_file_open(
+>  {
+>  	if (xfs_is_shutdown(XFS_M(inode->i_sb)))
+>  		return -EIO;
+> +
+> +	/*
+> +	 * If the underlying devices requires stable writes, we have to fall
+> +	 * back to (uncached) buffered I/O for direct I/O reads and writes, as
+> +	 * the kernel can't prevent applications from modifying the memory under
+> +	 * I/O.  We still claim to support O_DIRECT as we want opens for that to
+> +	 * succeed and fall back.
+> +	 *
+> +	 * As atomic writes are only supported for direct I/O, they can't be
+> +	 * supported either in this case.
+> +	 */
+>  	file->f_mode |= FMODE_NOWAIT | FMODE_CAN_ODIRECT;
+> -	file->f_mode |= FMODE_DIO_PARALLEL_WRITE;
+> -	if (xfs_get_atomic_write_min(XFS_I(inode)) > 0)
+> -		file->f_mode |= FMODE_CAN_ATOMIC_WRITE;
+> +	if (!mapping_stable_writes(file->f_mapping)) {
+> +		file->f_mode |= FMODE_DIO_PARALLEL_WRITE;
+> +		if (xfs_get_atomic_write_min(XFS_I(inode)) > 0)
+> +			file->f_mode |= FMODE_CAN_ATOMIC_WRITE;
+> +	}
+> +
+>  	return generic_file_open(inode, file);
+>  }
+>  
+> diff --git a/fs/xfs/xfs_iops.c b/fs/xfs/xfs_iops.c
+> index caff0125faea..bd49ac6b31de 100644
+> --- a/fs/xfs/xfs_iops.c
+> +++ b/fs/xfs/xfs_iops.c
+> @@ -672,6 +672,12 @@ xfs_report_atomic_write(
+>  	struct xfs_inode	*ip,
+>  	struct kstat		*stat)
+>  {
+> +	/*
+> +	 * If the stable writes flag is set, we have to fall back to buffered
+> +	 * I/O, which doesn't support atomic writes.
+> +	 */
+> +	if (mapping_stable_writes(VFS_I(ip)->i_mapping))
+> +		return;
+>  	generic_fill_statx_atomic_writes(stat,
+>  			xfs_get_atomic_write_min(ip),
+>  			xfs_get_atomic_write_max(ip),
+
