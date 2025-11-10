@@ -1,128 +1,94 @@
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 101D21E8342;
-	Mon, 10 Nov 2025 04:05:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B99CF19F13F
+	for <linux-block@vger.kernel.org>; Mon, 10 Nov 2025 04:49:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762747551; cv=none; b=gqjZ0iGHHkenmy2t6gcHVTAuvInpSQlTxgwbRgEvalmc0Gnu5/0Y6/kGrYyvfJXQSVamlUtbQRcuIZwEZdiZ6TWMONSy06BQxYs69IwyEw8R/6vuNN3moU50IxTpghyCrW4PWl4cFjs7cBauyrVFcLZwwDy/WndoXc5gW20jZ0E=
+	t=1762750174; cv=none; b=lFk5dwKG0wKGf4LnzoSNWW8fhypTmz+q/C2rKWSC7D427OW9ZC5LOVTDNIZvBF0q5AICpXgvQdQNVBk2/R+DxUptQrEURCDdJHQfIvwlbdQymle9PDilvvDCfZH62dVs8KFjm2YwCCRm7s5whBv86ODC2hlUPwdtCQoeZP27Gm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762747551; c=relaxed/simple;
-	bh=fCzNOcCv+34id0JN6CaPhdnrpIkEFQLgtspsZOCQFZg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=KzOW+XdykU84GoUSRLDgEjh95jkTAyUwBjAvKnlMMY3LgyHpXg/kfT/VXv7C6JhhOShL9QGj5VzjTtKM6u8smb58wRW8M8heQeCVZEOUMHahkDt2foG2GkFx+/peItp3811Gndbi2xb2VyKasG6pov4SA3o7n7NNgrEhwZ+YOhc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=a7USyjRm; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=a7USyjRm; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1762750174; c=relaxed/simple;
+	bh=JJrfHDLE5lDw8HoUWCOGU+LDxN6zZNc3/zArvkGfYpA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VwR51lnbt/3OtLXSwSi5SOIM7TQbNubIhgE5bdZG5Ls1ojtnzy4LC46BU1MFyaZdRclZz44ekwMLKNUG3gh4lltfsWf9cUUsncDV1Mz4ONer42wuFffJjM0yUV6X9umnV5Vb77Rs6Ciy6VY/xvpQ+Oxofk7SgaxZRZXe131wQXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=av5QdGqw; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="a7USyjRm";
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="a7USyjRm"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=wX2mOYwb+MegAjrRKvNO6FT3ETpFUSjsdZcrt+5LHv8=;
-	b=a7USyjRmWWpR1Be6G2EEy/lNN8xVjlyspc1/0Xxm01+J8s7yn6Kw2b3duTCu+1MLx/ICbc57g
-	l1m98FTsiy4BAKaDuAW7NI6vKcrjYkMFBLkPAU627Dgf3CiqcVnO1L+JnYAXNDjiZdQ7vjqIE2R
-	nsfX435YOMYhWvz6he1Z0Z0=
-Received: from canpmsgout08.his.huawei.com (unknown [172.19.92.156])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTPS id 4d4bfk1bVsz1BGFf;
-	Mon, 10 Nov 2025 12:05:18 +0800 (CST)
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=wX2mOYwb+MegAjrRKvNO6FT3ETpFUSjsdZcrt+5LHv8=;
-	b=a7USyjRmWWpR1Be6G2EEy/lNN8xVjlyspc1/0Xxm01+J8s7yn6Kw2b3duTCu+1MLx/ICbc57g
-	l1m98FTsiy4BAKaDuAW7NI6vKcrjYkMFBLkPAU627Dgf3CiqcVnO1L+JnYAXNDjiZdQ7vjqIE2R
-	nsfX435YOMYhWvz6he1Z0Z0=
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by canpmsgout08.his.huawei.com (SkyGuard) with ESMTPS id 4d4bd33h7wzmV7F;
-	Mon, 10 Nov 2025 12:03:51 +0800 (CST)
-Received: from kwepemh100003.china.huawei.com (unknown [7.202.181.85])
-	by mail.maildlp.com (Postfix) with ESMTPS id C737B180043;
-	Mon, 10 Nov 2025 12:05:29 +0800 (CST)
-Received: from [10.174.178.72] (10.174.178.72) by
- kwepemh100003.china.huawei.com (7.202.181.85) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 10 Nov 2025 12:05:28 +0800
-Message-ID: <f5a2e5e7-d46e-45fa-bd28-c58bd7134d8e@huawei.com>
-Date: Mon, 10 Nov 2025 12:05:28 +0800
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="av5QdGqw"
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-34374febdefso1493391a91.0
+        for <linux-block@vger.kernel.org>; Sun, 09 Nov 2025 20:49:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1762750172; x=1763354972; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JJrfHDLE5lDw8HoUWCOGU+LDxN6zZNc3/zArvkGfYpA=;
+        b=av5QdGqwPYUO2zSK3VcL92zqYDt0Ngw04kbuF15dA0MagLBPwNPpbSe93rZd8bpay1
+         6COOOuhwTXoAvfP8eeN0YBipWsMUud7BwWcgumjPHlSpKkImTRYcj9nAw1w8f8Q0ZB0L
+         h48JWkV/2MvCDYdYjz4wxVGqKo5xMafun/ekk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762750172; x=1763354972;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JJrfHDLE5lDw8HoUWCOGU+LDxN6zZNc3/zArvkGfYpA=;
+        b=knHOy9JOm3B8qbCyS2ejTKFHL54e7t18Q8UdIZAErm3M903/ipXDdhjkwNykBYQXWF
+         1xsvA2CfwGm5/DD2Jnptb6P7WGPTvfEnoCTCxOBmh9Sop81AraqqdywbsQeFdFtcbVDN
+         20iOlf7o/wwZ1RENMgsQvgsQbqXCR6/MrRzWKTJ80B/BGgeMY4Utcqa4gcTHGGJfsGoG
+         LCZB95Olk72M93H/5MEo7lh9tMHcJdoz+qsAUFvxn1Bf2OWzmOGeRqZVkhLCxgJgMmq8
+         Ebm8yDoHY/RMpQZ5mjnUGRyfBHCZZq6FPhhxWDzfw6QlEwPgFwKhaYIhrgvhJb+lXVOo
+         9bVw==
+X-Forwarded-Encrypted: i=1; AJvYcCUzGGkaxahWeH11lUPSAaUY3pjPC1eDpeCmkQ4E02k51s9hNrcE86f/9HQ5bZJU9Vwgew4lG0uaM44ytw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyMEdpe9dGvp1S+eXeGid5DMhyb2QWePz4q+RwUt9YQ+qVd0Kur
+	bGpokVKTKrBJU7e2g1qQEjjsptASxYhO2BfRpgHNLSuZBdpUJjha6mMKvjVw7SGQUQ==
+X-Gm-Gg: ASbGncvTPEf4DKFyJWIz4rPTC/6aXMOXmY7J6ZyHNT3m6bAbE5rT0yj/rsYuLFEcZfa
+	kuxceJa/UbmqIShW5xB4iGBjYxRbS3DbCK8cImwMrbHm2VP2sKQGASyOM+SEwYuu7WOp9oc+QiO
+	SBiH+ajcCvzXnuzYt3imMojIQk8gzxPc43ckZ2VwIwLIzzuOw2aYrioS3cNs9srx2DVb3hDTuly
+	0xi4SV/YGLY7mkT6JZrYmMcBK/PWDU58fRW/JsZf0BJzCF3l2v/2kmmyXZTSgCd6TJ+/PwoUxik
+	wWz3q16gb6ea1+2x6t6GK+gF09caAW6dWLxja/W6YgiZzMDwqJD1IttrLwnjf9BzxLuNRu2tzIB
+	iIZzY80YZkx7MOFrfaaSpgvSwiZJwoiiff/nSUdBoxS8lLF1hHBVe6CCSwNlCRoSkUjnzVK8rP1
+	XlnCMkoPHqrv+NTSM=
+X-Google-Smtp-Source: AGHT+IFU2CaJomS2LyBwnHV14ftccCZxEQuCF/t81lUe+RkW65j+E/MggTuG8Flk2e7EBPHiXfOouw==
+X-Received: by 2002:a17:90b:2d81:b0:340:c4dc:4b70 with SMTP id 98e67ed59e1d1-3436cb7d916mr10393716a91.6.1762750172021;
+        Sun, 09 Nov 2025 20:49:32 -0800 (PST)
+Received: from google.com ([2401:fa00:8f:203:f189:dea3:4254:ff1e])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7b0cc17ad4asm10139624b3a.37.2025.11.09.20.49.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 09 Nov 2025 20:49:31 -0800 (PST)
+Date: Mon, 10 Nov 2025 13:49:26 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Yuwen Chen <ywen.chen@foxmail.com>
+Cc: axboe@kernel.dk, akpm@linux-foundation.org, bgeffon@google.com, 
+	licayy@outlook.com, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, liumartin@google.com, minchan@kernel.org, richardycc@google.com, 
+	senozhatsky@chromium.org
+Subject: Re: [PATCH v4] zram: Implement multi-page write-back
+Message-ID: <yv2ktkwwu3hadzkw6wb4inqzihndfpwb42svuu25ngmn6eb7c4@hclvcrnsmvvk>
+References: <83d64478-d53c-441f-b5b4-55b5f1530a03@kernel.dk>
+ <tencent_0FBBFC8AE0B97BC63B5D47CE1FF2BABFDA09@qq.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] nbd: defer config put in recv_work
-To: Lizhi Xu <lizhi.xu@windriver.com>, <zhengqixing@huaweicloud.com>
-CC: <axboe@kernel.dk>, <houtao1@huawei.com>, <josef@toxicpanda.com>,
-	<linan122@h-partners.com>, <linux-block@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <nbd@other.debian.org>, <xiubli@redhat.com>,
-	<yangerkun@huawei.com>, <yi.zhang@huawei.com>
-References: <20251108070202.1816004-1-zhengqixing@huaweicloud.com>
- <20251110005453.546675-1-lizhi.xu@windriver.com>
-From: Zheng Qixing <zhengqixing@huawei.com>
-In-Reply-To: <20251110005453.546675-1-lizhi.xu@windriver.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- kwepemh100003.china.huawei.com (7.202.181.85)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <tencent_0FBBFC8AE0B97BC63B5D47CE1FF2BABFDA09@qq.com>
 
-Hi,
+On (25/11/06 09:49), Yuwen Chen wrote:
+> For block devices, sequential write performance is significantly
+> better than random write. Currently, zram's write-back function
+> only supports single-page operations, which fails to leverage
+> the sequential write advantage and leads to suboptimal performance.
 
-
-在 2025/11/10 8:54, Lizhi Xu 写道:
-> On Sat,  8 Nov 2025 15:02:02 +0800, Zheng Qixing wrote:
->> Reported-by: syzbot+56fbf4c7ddf65e95c7cc@syzkaller.appspotmail.com
->> Closes: https://lore.kernel.org/all/6907edce.a70a0220.37351b.0014.GAE@google.com/T/
->> Fixes: 87aac3a80af5 ("nbd: make the config put is called before the notifying the waiter")
->> Depends-on: e2daec488c57 ("nbd: Fix hungtask when nbd_config_put")
->> Signed-off-by: Zheng Qixing <zhengqixing@huawei.com>
->> ---
->>   drivers/block/nbd.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
->> index a853c65ac65d..215fc18115b7 100644
->> --- a/drivers/block/nbd.c
->> +++ b/drivers/block/nbd.c
->> @@ -1024,9 +1024,9 @@ static void recv_work(struct work_struct *work)
->>   	nbd_mark_nsock_dead(nbd, nsock, 1);
->>   	mutex_unlock(&nsock->tx_lock);
->>
->> -	nbd_config_put(nbd);
->>   	atomic_dec(&config->recv_threads);
->>   	wake_up(&config->recv_wq);
->> +	nbd_config_put(nbd);
->>   	kfree(args);
->>   }
-> This only makes the problem more hidden, and that's far from enough.
-> I tested the same patch on syzbot on October 3rd before you did; you
-> can check it out here [1].
->
-> [1] https://syzkaller.appspot.com/bug?extid=56fbf4c7ddf65e95c7cc
-
-
-The same patch was triggered by eslam.medhat1993 on Nov 5 via syzbot,
-
-but it didn't produce the same stack trace. Is this stack trace necessarily
-
-related to the UAF issue in nbd? It seems more likely to be a memory
-
-corruption problem, but I'm not certain.
-
-
-In addition, this issue arises from the mixed use of netlink and ioctl. 
-Since
-
-user-space tools generally do not mix these two interfaces, I believe a 
-simple
-
-solution along these lines could effectively avoid the UAF problem.
-
-
-Regards,
-
-Qixing
-
-
+As a side note:
+You almost never do sequential writes to the backing device. The
+thing is, e.g. when zram is used as swap, page faults happen randomly
+and free up (slot-free) random page-size chunks (so random bits in
+zram->bitmap become clear), which then get overwritten (zram simply
+picks the first available bit from zram->bitmap) during next writeback.
+There is nothing sequential about that, in systems with sufficiently
+large uptime and sufficiently frequent writeback/readback events
+writeback bitmap becomes sparse, which results in random IO, so your
+test tests an ideal case that almost never happens in practice.
