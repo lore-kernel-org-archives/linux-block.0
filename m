@@ -1,125 +1,185 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFE3928B415;
-	Mon, 10 Nov 2025 12:58:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F23E1C8FBA
+	for <linux-block@vger.kernel.org>; Mon, 10 Nov 2025 13:15:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762779486; cv=none; b=UpkVJomAHVebkjiJexb4E6dPkKa9a36GblEKcdYhfbahW+bWHP7MFyaS3pVOJhi4p8zzI1YIk3fZX81jxN2Xu6r8d1OsCS2J04f1VTvIoEWtGk8wDNMzoMsUrueDTEYSFoaKd7YpV0Uh/WURBGVNa67m41XRh1n8T6snmb8o/ws=
+	t=1762780514; cv=none; b=qfQIFRPQ2VRBA8No4rkzRNpDhyrZF5wg0vM2Y4oKpCDsBdxPkHyA5WYfQPTER5FAGLApzf/INoBSshvdCRbzLvtC1a0nwp/mixSuPzgoMGVcfeQB0+WBByB3BEAdMg5tcDX/1qyTvQkxka3JWfuoPwU4lhhz0+a8/4aWPKBC7R4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762779486; c=relaxed/simple;
-	bh=pns06N2Youi4f1wGvNXHVEUQOTtynPEsqQVZbJ+wnBQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DY836AF+7TO8VQ4BvSIFT3okOCIrZG535nc7TFXb9b8oCmZN/QbvkLlBnADaBXei+KpDeQ9xCkYves06q6sOlC8M2TKtNrP/ncOVH0o6hHL23odCbAKC83mGpAD1+PKJI5Ce0yKe64PYNwj2mJGa/3GyUEldx2tBHx+LbNR4v28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4d4qSv1cZkzYQvBq;
-	Mon, 10 Nov 2025 20:57:35 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.75])
-	by mail.maildlp.com (Postfix) with ESMTP id 4D9D71A0FB8;
-	Mon, 10 Nov 2025 20:58:00 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.50.87.129])
-	by APP2 (Coremail) with SMTP id Syh0CgAHZXtX4RFpBDUQAQ--.13239S4;
-	Mon, 10 Nov 2025 20:58:00 +0800 (CST)
-From: Zheng Qixing <zhengqixing@huaweicloud.com>
-To: josef@toxicpanda.com,
-	axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	nbd@other.debian.org,
-	linux-kernel@vger.kernel.org,
-	yi.zhang@huawei.com,
-	yangerkun@huawei.com,
-	houtao1@huawei.com,
-	zhengqixing@huawei.com
-Subject: [PATCH] nbd: defer config unlock in nbd_genl_connect
-Date: Mon, 10 Nov 2025 20:49:20 +0800
-Message-Id: <20251110124920.1333561-1-zhengqixing@huaweicloud.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1762780514; c=relaxed/simple;
+	bh=UDFAmRjHGjSapaGRPRIM+Nkgi1V7QaMsLubQACwIBvo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ADwmLBF7xVnK3vO5QkTni+df0a52Bojx8lZl+N9zJjAmoFoeMtk1dtBWD11EBmIsUJ1Wi44YRCKiewuUG7+KgBEAQ3DrsuASIX9HP9lpSgsd1EDLWNoGyeqNYQOMpOsTnxo1uvhmuNWYxJ6X9UtcYQ/HC+f43SSFB91EwHc++Uo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=2oB1tbgc; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=GY2pZ8lu; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=2oB1tbgc; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=GY2pZ8lu; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="2oB1tbgc";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="GY2pZ8lu";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="2oB1tbgc";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="GY2pZ8lu"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 3E6F22125B;
+	Mon, 10 Nov 2025 13:15:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1762780510; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Bob9q4zZe78YDc7c7xXVoYI5YSZxt/68IuU4mBqqm28=;
+	b=2oB1tbgc5h+N0YnX145fTn8vYrjujiH42wsJ7bKD2yw7OPvMoeLwqfeqRi2rfOitr3kmMe
+	5vyN8mNlYxXNbB/oiipJDkZvQRHXB5jwa73jMbHgpdnzOh5dVhlsnOKf190w23HTDNy01K
+	hmuDCF4PxRG8C9wv7qgtJ72UPUKlXJs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1762780510;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Bob9q4zZe78YDc7c7xXVoYI5YSZxt/68IuU4mBqqm28=;
+	b=GY2pZ8luFO/31CQuaFw/H6EzaiG7YGDyQlY7TVA9duLek0vkWfSUaVbDPNvP4gUATaTDI0
+	nWVFNZ/985nAYmBQ==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1762780510; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Bob9q4zZe78YDc7c7xXVoYI5YSZxt/68IuU4mBqqm28=;
+	b=2oB1tbgc5h+N0YnX145fTn8vYrjujiH42wsJ7bKD2yw7OPvMoeLwqfeqRi2rfOitr3kmMe
+	5vyN8mNlYxXNbB/oiipJDkZvQRHXB5jwa73jMbHgpdnzOh5dVhlsnOKf190w23HTDNy01K
+	hmuDCF4PxRG8C9wv7qgtJ72UPUKlXJs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1762780510;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Bob9q4zZe78YDc7c7xXVoYI5YSZxt/68IuU4mBqqm28=;
+	b=GY2pZ8luFO/31CQuaFw/H6EzaiG7YGDyQlY7TVA9duLek0vkWfSUaVbDPNvP4gUATaTDI0
+	nWVFNZ/985nAYmBQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 32426143EE;
+	Mon, 10 Nov 2025 13:15:10 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id /Uk8DF7lEWk5RwAAD6G6ig
+	(envelope-from <jack@suse.cz>); Mon, 10 Nov 2025 13:15:10 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id DACB6A28B1; Mon, 10 Nov 2025 14:15:09 +0100 (CET)
+Date: Mon, 10 Nov 2025 14:15:09 +0100
+From: Jan Kara <jack@suse.cz>
+To: libaokun@huaweicloud.com
+Cc: linux-fsdevel@vger.kernel.org, brauner@kernel.org, jack@suse.cz, 
+	viro@zeniv.linux.org.uk, axboe@kernel.dk, linux-block@vger.kernel.org, 
+	yi.zhang@huawei.com, yangerkun@huawei.com, libaokun1@huawei.com, 
+	Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [PATCH] bdev: add hint prints in sb_set_blocksize() for LBS
+ dependency on THP
+Message-ID: <rbrz2e3zilyjejol2azth3z43irzq3fp2sapecgzv4ocio5cjk@uu76dbfmoy3k>
+References: <20251110124714.1329978-1-libaokun@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:Syh0CgAHZXtX4RFpBDUQAQ--.13239S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7tF13JFyrKFW5KF4kZr1xuFg_yoW8Cw1rpa
-	1akFZ7Gw18Ja1rWrWkC3s7W3W5tasrKr1xKry7Jw1Fv3s3A34xur4kK34fXFyUXr9rJFW3
-	AFW8W3WIkFWvkwUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUAVWUtwAv7VC2z280aVAFwI0_Gr1j6F4UJwAm72CE4I
-	kC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IY
-	c2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s
-	026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF
-	0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0x
-	vE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv
-	6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07UpCJPUUUUU=
-X-CM-SenderInfo: x2kh0wptl0x03j6k3tpzhluzxrxghudrp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251110124714.1329978-1-libaokun@huaweicloud.com>
+X-Spamd-Result: default: False [-0.30 / 50.00];
+	SEM_URIBL(3.50)[huaweicloud.com:email];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-0.999];
+	MIME_GOOD(-0.10)[text/plain];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RCVD_COUNT_THREE(0.00)[3];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MISSING_XM_UA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.com:email]
+X-Spam-Flag: NO
+X-Spam-Score: -0.30
+X-Spam-Level: 
 
-From: Zheng Qixing <zhengqixing@huawei.com>
+On Mon 10-11-25 20:47:14, libaokun@huaweicloud.com wrote:
+> From: Baokun Li <libaokun1@huawei.com>
+> 
+> Support for block sizes greater than the page size depends on large
+> folios, which in turn require CONFIG_TRANSPARENT_HUGEPAGE to be enabled.
+> 
+> Because the code is wrapped in multiple layers of abstraction, this
+> dependency is rather obscure, so users may not realize it and may be
+> unsure how to enable LBS.
+> 
+> As suggested by Theodore, I have added hint messages in sb_set_blocksize
+> so that users can distinguish whether a mount failure with block size
+> larger than page size is due to lack of filesystem support or the absence
+> of CONFIG_TRANSPARENT_HUGEPAGE.
+> 
+> Suggested-by: Theodore Ts'o <tytso@mit.edu>
+> Link: https://patch.msgid.link/20251110043226.GD2988753@mit.edu
+> Signed-off-by: Baokun Li <libaokun1@huawei.com>
 
-There is one use-after-free warning when running NBD_CMD_CONNECT and
-NBD_CLEAR_SOCK:
+Looks good. Feel free to add:
 
-nbd_genl_connect
-  nbd_alloc_and_init_config // config_refs=1
-  nbd_start_device // config_refs=2
-  set NBD_RT_HAS_CONFIG_REF			open nbd // config_refs=3
-  recv_work done // config_refs=2
-						NBD_CLEAR_SOCK // config_refs=1
-						close nbd // config_refs=0
-  refcount_inc -> uaf
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-------------[ cut here ]------------
-refcount_t: addition on 0; use-after-free.
-WARNING: CPU: 24 PID: 1014 at lib/refcount.c:25 refcount_warn_saturate+0x12e/0x290
- nbd_genl_connect+0x16d0/0x1ab0
- genl_family_rcv_msg_doit+0x1f3/0x310
- genl_rcv_msg+0x44a/0x790
+								Honza
 
-The issue can be easily reproduced by adding a small delay before
-refcount_inc(&nbd->config_refs) in nbd_genl_connect():
-
-        mutex_unlock(&nbd->config_lock);
-        if (!ret) {
-                set_bit(NBD_RT_HAS_CONFIG_REF, &config->runtime_flags);
-+               printk("before sleep\n");
-+               mdelay(5 * 1000);
-+               printk("after sleep\n");
-                refcount_inc(&nbd->config_refs);
-                nbd_connect_reply(info, nbd->index);
-        }
-
-Fixes: e46c7287b1c2 ("nbd: add a basic netlink interface")
-Signed-off-by: Zheng Qixing <zhengqixing@huawei.com>
----
- drivers/block/nbd.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 215fc18115b7..a05ff68e58d0 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -2241,12 +2241,13 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
- 
- 	ret = nbd_start_device(nbd);
- out:
--	mutex_unlock(&nbd->config_lock);
- 	if (!ret) {
- 		set_bit(NBD_RT_HAS_CONFIG_REF, &config->runtime_flags);
- 		refcount_inc(&nbd->config_refs);
- 		nbd_connect_reply(info, nbd->index);
- 	}
-+	mutex_unlock(&nbd->config_lock);
-+
- 	nbd_config_put(nbd);
- 	if (put_dev)
- 		nbd_put(nbd);
+> ---
+>  block/bdev.c | 19 ++++++++++++++++++-
+>  1 file changed, 18 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/bdev.c b/block/bdev.c
+> index 810707cca970..4888831acaf5 100644
+> --- a/block/bdev.c
+> +++ b/block/bdev.c
+> @@ -217,9 +217,26 @@ int set_blocksize(struct file *file, int size)
+>  
+>  EXPORT_SYMBOL(set_blocksize);
+>  
+> +static int sb_validate_large_blocksize(struct super_block *sb, int size)
+> +{
+> +	const char *err_str = NULL;
+> +
+> +	if (!(sb->s_type->fs_flags & FS_LBS))
+> +		err_str = "not supported by filesystem";
+> +	else if (!IS_ENABLED(CONFIG_TRANSPARENT_HUGEPAGE))
+> +		err_str = "is only supported with CONFIG_TRANSPARENT_HUGEPAGE";
+> +
+> +	if (!err_str)
+> +		return 0;
+> +
+> +	pr_warn_ratelimited("%s: block size(%d) > page size(%lu) %s\n",
+> +				sb->s_type->name, size, PAGE_SIZE, err_str);
+> +	return -EINVAL;
+> +}
+> +
+>  int sb_set_blocksize(struct super_block *sb, int size)
+>  {
+> -	if (!(sb->s_type->fs_flags & FS_LBS) && size > PAGE_SIZE)
+> +	if (size > PAGE_SIZE && sb_validate_large_blocksize(sb, size))
+>  		return 0;
+>  	if (set_blocksize(sb->s_bdev_file, size))
+>  		return 0;
+> -- 
+> 2.46.1
+> 
 -- 
-2.39.2
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
