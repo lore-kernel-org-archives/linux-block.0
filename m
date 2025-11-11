@@ -1,161 +1,97 @@
-Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F33D303A1A
-	for <linux-block@vger.kernel.org>; Mon, 10 Nov 2025 22:30:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CAB22FB973
+	for <linux-block@vger.kernel.org>; Tue, 11 Nov 2025 01:18:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762813839; cv=none; b=t0vvIIRAvV9iWTpAAV2fBUBQfYesvXcgd8X9V6CVMl+tADz+nlg25TP0mza5lA0xMmgBmB13P0GH6f6236o1nJI4ncTMpweMDYqSR6Pp+A8jS3cuB5JE7Tr5dsVJtxjEp29b1hjgRVZ5WyjCmNSF7HXXV40BAK4Gcsy001qN2hc=
+	t=1762823940; cv=none; b=jD0D98BNwRhF6GzI4ES1nokY4gGJmZZGuOp8aYbuZjlTZmKPbilfD7MAe9K5Yfr1WHa/viImsrjJNpCymfkBJmRZhg4NBenfCNLWXF5Df9Qlr/f/Oye72JYzgbGf7RHyO02tNvwohPwHQuasUfvkZzDkBB8/q3rPto0jx6x+lZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762813839; c=relaxed/simple;
-	bh=dBSv/jcxqrVTYY2z7oZ3IW1vuQfuEwzWNI1PGG+MFPw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QxRQgRZLWDyCRcReYGV4zbMt/0R9MqTJO9x/Wb9iKDXUCelMXCH2KsF1UM4VvzPK4k5jQakEgUcCfojrWzdEn2Uii6eqHgiXdemo/ouq1auY1HRMGFk7O9jYVOjehoBHZm0YIIHfbejLQx6wS5wBQQA6ouIUNx8gCvQfb3ZLDps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=0jch2/Gw; arc=none smtp.client-ip=199.89.3.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1762823940; c=relaxed/simple;
+	bh=gVOCHcLd7vlaD45mmmeT2DbaDnluYLi6634DCgWvvug=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PnXZLNVay3QYKss4Gi+I6i1QLgdXbnqUPSvRJXvm0NFgdG5AhhuTGFk1dZnaHp2K7AFzM1rmBGbxNzDiBHEzIsa8Y+/pBRzHJrQvOmMWGW1aRzvTxAX0BDqIhk/0FQvHKglMJOYL/h3R1G2kRa1PeJHb7LM6icpx75NfVNUwm2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IGBTbDkZ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="0jch2/Gw"
-Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4d54B44vvBzltH96;
-	Mon, 10 Nov 2025 22:30:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:mime-version:references:in-reply-to
-	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1762813835; x=1765405836; bh=YelaY
-	WhHzmj60CWF76SzrXTts47H5yIgwLWy4CiaxtY=; b=0jch2/Gw4pfn8pb8AI3/L
-	Gtk+PyOradXe0e+ygtLq8GCBqwR/3sVlHShf5knlvnCNgGW1oPy+sbYxcVRZuh0w
-	pPkPREfGiqDas0HbSPnR4AghPz1Y2yl9iP6npUFmx88nithg5oDqAafpYaFgAnCg
-	PNgD720SJbXle3gz3BGSBt5NSzh9yBcPRJsoEwIO/Istmx8CWyGpiptzFyBQrnoo
-	HUe3pQpCLzr0kKAEQF3T4Z71yUeXUpx1N8pOUWa70q8nErQ/cUGHOJkOzBbV2M/T
-	hU5FEHA6iTuCexUrgg8EETEur+kHNagA8B3lk9OERohs1JEzdqEuN7tO33ar3P3E
-	g==
-X-Virus-Scanned: by MailRoute
-Received: from 003.mia.mailroute.net ([127.0.0.1])
- by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id mASlklWxs-lI; Mon, 10 Nov 2025 22:30:35 +0000 (UTC)
-Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IGBTbDkZ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762823937;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=r2FQUwSyyoVoVriZCBJzfpQK97TJampYcHK1ld/GSIw=;
+	b=IGBTbDkZGaoFs9m/v8h2T8OIA6ZLG6mxlbybhhfW0PJxYKhBxezkOQK4iCQPSNuuZiwB/d
+	oddyRQJOEiKgnn2S7sGAJw5KLcxfaAKFoStdMaO7z7aYsnPbYLJWZqsac2oFYgk5bO1c0u
+	BskguIlVOLz6uwbkFpvP4KW0bCMxec0=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-502-wLs83JxXNamULDwXnWUAYA-1; Mon,
+ 10 Nov 2025 20:18:54 -0500
+X-MC-Unique: wLs83JxXNamULDwXnWUAYA-1
+X-Mimecast-MFC-AGG-ID: wLs83JxXNamULDwXnWUAYA_1762823932
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4d54B03pX6zlv4DL;
-	Mon, 10 Nov 2025 22:30:31 +0000 (UTC)
-From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Damien Le Moal <dlemoal@kernel.org>
-Subject: [PATCH 4/4] blk-zoned: Move code from disk_zone_wplug_add_bio() into its caller
-Date: Mon, 10 Nov 2025 14:30:02 -0800
-Message-ID: <20251110223003.2900613-5-bvanassche@acm.org>
-X-Mailer: git-send-email 2.51.2.1041.gc1ab5b90ca-goog
-In-Reply-To: <20251110223003.2900613-1-bvanassche@acm.org>
-References: <20251110223003.2900613-1-bvanassche@acm.org>
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E02F81956096;
+	Tue, 11 Nov 2025 01:18:51 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.124])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 67F6B30044E4;
+	Tue, 11 Nov 2025 01:18:44 +0000 (UTC)
+Date: Tue, 11 Nov 2025 09:18:40 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Nilay Shroff <nilay@linux.ibm.com>,
+	Martin Wilck <mwilck@suse.com>,
+	Benjamin Marzinski <bmarzins@redhat.com>, stable@vger.kernel.org,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Chaitanya Kulkarni <kch@nvidia.com>, Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH v5] block: Remove queue freezing from several sysfs store
+ callbacks
+Message-ID: <aRKO8KbvokgBUPGB@fedora>
+References: <20251110162418.2915157-1-bvanassche@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251110162418.2915157-1-bvanassche@acm.org>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Move the following code into the only caller of disk_zone_wplug_add_bio()=
-:
- - The code for clearing the REQ_NOWAIT flag.
- - The code that sets the BLK_ZONE_WPLUG_PLUGGED flag.
- - The disk_zone_wplug_schedule_bio_work() call.
+On Mon, Nov 10, 2025 at 08:24:18AM -0800, Bart Van Assche wrote:
+> Freezing the request queue from inside sysfs store callbacks may cause a
+> deadlock in combination with the dm-multipath driver and the
+> queue_if_no_path option. Additionally, freezing the request queue slows
+> down system boot on systems where sysfs attributes are set synchronously.
+> 
+> Fix this by removing the blk_mq_freeze_queue() / blk_mq_unfreeze_queue()
+> calls from the store callbacks that do not strictly need these callbacks.
+> This patch may cause a small delay in applying the new settings.
+> 
+> This patch affects the following sysfs attributes:
+> * io_poll_delay
+> * io_timeout
+> * nomerges
+> * read_ahead_kb
+> * rq_affinity
 
-This patch moves all code that is related to REQ_NOWAIT or to bio
-scheduling into a single function. No functionality has been changed.
+I'd suggest to add words why freeze isn't needed, such as:
 
-Cc: Damien Le Moal <dlemoal@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- block/blk-zoned.c | 27 +++++++++------------------
- 1 file changed, 9 insertions(+), 18 deletions(-)
+```
+Intermediate value isn't possible, and either the old or new value is just fine to take
+in io fast path.
+```
 
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 73c7358ec184..bff953416ffc 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -1204,8 +1204,6 @@ static inline void disk_zone_wplug_add_bio(struct g=
-endisk *disk,
- 				struct blk_zone_wplug *zwplug,
- 				struct bio *bio, unsigned int nr_segs)
- {
--	bool schedule_bio_work =3D false;
--
- 	/*
- 	 * Grab an extra reference on the BIO request queue usage counter.
- 	 * This reference will be reused to submit a request for the BIO for
-@@ -1221,16 +1219,6 @@ static inline void disk_zone_wplug_add_bio(struct =
-gendisk *disk,
- 	 */
- 	bio_clear_polled(bio);
-=20
--	/*
--	 * REQ_NOWAIT BIOs are always handled using the zone write plug BIO
--	 * work, which can block. So clear the REQ_NOWAIT flag and schedule the
--	 * work if this is the first BIO we are plugging.
--	 */
--	if (bio->bi_opf & REQ_NOWAIT) {
--		schedule_bio_work =3D !(zwplug->flags & BLK_ZONE_WPLUG_PLUGGED);
--		bio->bi_opf &=3D ~REQ_NOWAIT;
--	}
--
- 	/*
- 	 * Reuse the poll cookie field to store the number of segments when
- 	 * split to the hardware limits.
-@@ -1246,11 +1234,6 @@ static inline void disk_zone_wplug_add_bio(struct =
-gendisk *disk,
- 	bio_list_add(&zwplug->bio_list, bio);
- 	trace_disk_zone_wplug_add_bio(zwplug->disk->queue, zwplug->zone_no,
- 				      bio->bi_iter.bi_sector, bio_sectors(bio));
--
--	zwplug->flags |=3D BLK_ZONE_WPLUG_PLUGGED;
--
--	if (schedule_bio_work)
--		disk_zone_wplug_schedule_bio_work(disk, zwplug);
- }
-=20
- /*
-@@ -1418,6 +1401,7 @@ static bool blk_zone_wplug_handle_write(struct bio =
-*bio, unsigned int nr_segs)
- {
- 	struct gendisk *disk =3D bio->bi_bdev->bd_disk;
- 	sector_t sector =3D bio->bi_iter.bi_sector;
-+	bool schedule_bio_work =3D false;
- 	struct blk_zone_wplug *zwplug;
- 	gfp_t gfp_mask =3D GFP_NOIO;
- 	unsigned long flags;
-@@ -1464,8 +1448,10 @@ static bool blk_zone_wplug_handle_write(struct bio=
- *bio, unsigned int nr_segs)
- 	 * Add REQ_NOWAIT BIOs to the plug list to ensure that we will not see =
-a
- 	 * BLK_STS_AGAIN failure if we let the BIO execute.
- 	 */
--	if (bio->bi_opf & REQ_NOWAIT)
-+	if (bio->bi_opf & REQ_NOWAIT) {
-+		bio->bi_opf &=3D ~REQ_NOWAIT;
- 		goto plug;
-+	}
-=20
- 	/* If the zone is already plugged, add the BIO to the BIO plug list. */
- 	if (zwplug->flags & BLK_ZONE_WPLUG_PLUGGED)
-@@ -1485,7 +1471,12 @@ static bool blk_zone_wplug_handle_write(struct bio=
- *bio, unsigned int nr_segs)
- 	return false;
-=20
- plug:
-+	schedule_bio_work =3D !(zwplug->flags & BLK_ZONE_WPLUG_PLUGGED);
-+	zwplug->flags |=3D BLK_ZONE_WPLUG_PLUGGED;
-+
- 	disk_zone_wplug_add_bio(disk, zwplug, bio, nr_segs);
-+	if (schedule_bio_work)
-+		disk_zone_wplug_schedule_bio_work(disk, zwplug);
-=20
- 	spin_unlock_irqrestore(&zwplug->lock, flags);
-=20
+otherwise this patch is good for me.
+
+
+Thanks, 
+Ming
+
