@@ -1,51 +1,97 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sg-1-11.ptr.blmpb.com (sg-1-11.ptr.blmpb.com [118.26.132.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8C3C2D97BE
-	for <linux-block@vger.kernel.org>; Tue, 11 Nov 2025 13:58:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 777A833FE24
+	for <linux-block@vger.kernel.org>; Tue, 11 Nov 2025 14:01:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762869496; cv=none; b=XQ6V1nWVGMTuhppZNhhnJNoO0QAXf6aijLRDhicOyhoCSIyhTqD9OmwDphbddkPAyfiwVSkiARPDNDSO5pu58WDi5+UkSk6EJlPQaeqpeZMUfZ6ls2iHSY42kHCYWl0quyT+mmqo2AAvDnNhKNMhrSOdFrf0fCRHyHL5+M7pG6c=
+	t=1762869685; cv=none; b=jqs35dFrNDn0EaWhlHt806XzelOKXToDUix1Z3PAiU7L+Nfp2Swoo/4xjU3l4UTBtNkoEPD0K+c9VZpxlUFgIDwyhMfCMf9ebMDFw2m4KfynnnZgGsIWkNRvcVmue53OqO2bZQfrYF9iwuLACIlj0WHD7lPbucYHLq6KEr5RRok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762869496; c=relaxed/simple;
-	bh=NeYGnUoe2HIpXfsW79DVH3maFdgfAxvr5lMn/ecyVBE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P8x73CKDhJP+q/Mmw0DUV0OjqRmIUHgyuB+xM/RNtQAuUE5U7373o/0eoHJqCN0liH1yybY9XAUw+3XSWCnEqi2/uZRcgegAOQFyFFz/IDNYhnOdGpoeGrdJp4ROd8hrTJrTqMK7d4mbasJ6InVAXqVuCTiJp95zGpTRcDyzv3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 196DE227AAA; Tue, 11 Nov 2025 14:58:10 +0100 (CET)
-Date: Tue, 11 Nov 2025 14:58:09 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Keith Busch <kbusch@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Yu Kuai <yukuai@fnnas.com>,
-	Matthew Wilcox <willy@infradead.org>, Keith Busch <kbusch@meta.com>,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-	axboe@kernel.dk
-Subject: Re: [PATCHv5 1/2] block: accumulate memory segment gaps per bio
-Message-ID: <20251111135809.GA2096@lst.de>
-References: <20251014150456.2219261-2-kbusch@meta.com> <aRK67ahJn15u5OGC@casper.infradead.org> <aRLAqyRBY6k4pT2M@kbusch-mbp> <20251111071439.GA4240@lst.de> <024631dc-3c65-49a8-a97a-f9110fd00e9a@fnnas.com> <20251111093903.GB14438@lst.de> <c82cd0f1-f56e-445b-8d78-f55a0c3b2b4c@fnnas.com> <aRM5UoApKZ9_V7PV@kbusch-mbp> <20251111134001.GA708@lst.de> <aRNALUnnxzIuyHng@kbusch-mbp>
+	s=arc-20240116; t=1762869685; c=relaxed/simple;
+	bh=fYekhjUgmwCWq96nzBDP/OPSUfruHRfrdWzsn3FWX4E=;
+	h=From:Date:In-Reply-To:References:Content-Type:Cc:Subject:
+	 Message-Id:Mime-Version:To; b=rtKlDuu1oYgiC9EUur7bCADEHOJpHbAiRbNegmwxsedrzImp8OjgJKgqPmjJJ9vRqFCbIRBqtvu2046t0DG4dvZ92P0pPCp0gIDbhXVoFuX3Fu24gv8byq6dGLHxNXPhM08vvKYxRU6bDG2wRsTAydJTnIO9XHCq6qeHhH9aNUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=fail smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=E9q1R7m6; arc=none smtp.client-ip=118.26.132.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=fnnas.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="E9q1R7m6"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1762869671;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=HeiFAq8m+pszRxKRkfLlU5b+dRr3M5cAVbg7a9AKRAQ=;
+ b=E9q1R7m6aC5YtNLfiZz3FSZOPhdCjXkg1NmduFrYFrhpM2aU3friK460i1qCoQHl5ZrQFT
+ B0HlnbwKFGC897fig330b31fmXu1ZjTn4I2h2CbEnzJifNBoSM1j+Oe5CsbwP6siZd8Y9L
+ k9DIxo4j1OY0YBmtoxK38M/R3S3odgSRaptr4+uFuI+rUXkWuABSxqMDZM05lG8R26LLG0
+ 3gvUTHLjtI/fy2oSRMOFY688I0oyvPyIhJeV739/r2ynEL1MDaFTZRO1ggSr3jR29CF2lU
+ XtzJ0ROeKXicG3PXPvpvCqogCuI3/eWn5dreUQv1AUqktYGQ5e7ZgF2S8sSNfA==
+From: "Yu Kuai" <yukuai@fnnas.com>
+Date: Tue, 11 Nov 2025 22:01:05 +0800
+In-Reply-To: <20251110124920.1333561-1-zhengqixing@huaweicloud.com>
+References: <20251110124920.1333561-1-zhengqixing@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8
+Reply-To: yukuai@fnnas.com
+X-Original-From: Yu Kuai <yukuai@fnnas.com>
+Received: from [192.168.1.104] ([39.182.0.168]) by smtp.feishu.cn with ESMTPS; Tue, 11 Nov 2025 22:01:09 +0800
+Organization: fnnas
+X-Lms-Return-Path: <lba+2691341a5+3a356f+vger.kernel.org+yukuai@fnnas.com>
+User-Agent: Mozilla Thunderbird
+Cc: <linux-block@vger.kernel.org>, <nbd@other.debian.org>, 
+	<linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>, 
+	<yangerkun@huawei.com>, <houtao1@huawei.com>, <zhengqixing@huawei.com>
+Subject: Re: [PATCH] nbd: defer config unlock in nbd_genl_connect
+Message-Id: <49872d86-3867-41eb-916e-4debf463cc60@fnnas.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aRNALUnnxzIuyHng@kbusch-mbp>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Mime-Version: 1.0
+To: "Zheng Qixing" <zhengqixing@huaweicloud.com>, <josef@toxicpanda.com>, 
+	<axboe@kernel.dk>
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 11, 2025 at 08:54:53AM -0500, Keith Busch wrote:
-> On Tue, Nov 11, 2025 at 02:40:01PM +0100, Christoph Hellwig wrote:
-> > On Tue, Nov 11, 2025 at 08:25:38AM -0500, Keith Busch wrote:
-> > > Ah, so we're merging a discard for a device that doesn't support
-> > > vectored discard. I think we still want to be able to front/back merge
-> > > such requests, though.
-> > 
-> > Yes, but purely based on bi_sector/bi_size, not based on the payload.
-> 
-> This should do it:
+=E5=9C=A8 2025/11/10 20:49, Zheng Qixing =E5=86=99=E9=81=93:
 
-Yes, that looks sensible.
+> There is one use-after-free warning when running NBD_CMD_CONNECT and
+> NBD_CLEAR_SOCK:
+>
+> nbd_genl_connect
+>    nbd_alloc_and_init_config // config_refs=3D1
+>    nbd_start_device // config_refs=3D2
+>    set NBD_RT_HAS_CONFIG_REF			open nbd // config_refs=3D3
+>    recv_work done // config_refs=3D2
+> 						NBD_CLEAR_SOCK // config_refs=3D1
+> 						close nbd // config_refs=3D0
+>    refcount_inc -> uaf
+>
+> ------------[ cut here ]------------
+> refcount_t: addition on 0; use-after-free.
+> WARNING: CPU: 24 PID: 1014 at lib/refcount.c:25 refcount_warn_saturate+0x=
+12e/0x290
+>   nbd_genl_connect+0x16d0/0x1ab0
+>   genl_family_rcv_msg_doit+0x1f3/0x310
+>   genl_rcv_msg+0x44a/0x790
+>
+> The issue can be easily reproduced by adding a small delay before
+> refcount_inc(&nbd->config_refs) in nbd_genl_connect():
+>
+>          mutex_unlock(&nbd->config_lock);
+>          if (!ret) {
+>                  set_bit(NBD_RT_HAS_CONFIG_REF, &config->runtime_flags);
+> +               printk("before sleep\n");
+> +               mdelay(5 * 1000);
+> +               printk("after sleep\n");
+>                  refcount_inc(&nbd->config_refs);
+>                  nbd_connect_reply(info, nbd->index);
+>          }
+>
+> Fixes: e46c7287b1c2 ("nbd: add a basic netlink interface")
+> Signed-off-by: Zheng Qixing<zhengqixing@huawei.com>
+> ---
+>   drivers/block/nbd.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+
+LGTM
+Reviewed-by: Yu Kuai <yukuai@fnnas.com>
