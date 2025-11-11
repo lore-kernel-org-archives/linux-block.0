@@ -1,407 +1,305 @@
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013055.outbound.protection.outlook.com [40.107.201.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59A1C377E94
-	for <linux-block@vger.kernel.org>; Tue, 11 Nov 2025 17:02:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762880532; cv=none; b=D/F/IG/fX3MkdO4oMblOsdFC5NjB5ug83OAeSie4GRKMAZhh5UkySVj5b9kuwQAUdEDJAb/d8quhTFEvjTPVjooNmWgaXeIJ3X4saKydUFDqONSuI54aWZmb46wTY7NviQFlbGULT+46sVNEgSROwpY0BDc4oiaH82EWVhohTEU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762880532; c=relaxed/simple;
-	bh=Zr6r/ftyGmWr4w5JnTzMxlHYVDhui5Zdgmro5rQ54Vc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k8I7DU1OhmDQbfyx5r0xVZthlqU07R/rzPSsZvju4MJTzGZAb2/nLwtO1VDKGw1uVU8Q/6COghVMkiXdUb3k/MUPFM5DUy3cJtUPsXE6urHNUZyH1RpAQyz3Havz7iyUwCn976R450tU5LWo0oliftDFuOnBEYfoL89wKBL5Zbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org; spf=pass smtp.mailfrom=wbinvd.org; dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b=Nn6CxuSn; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wbinvd.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wbinvd.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2C4A26056E
+	for <linux-block@vger.kernel.org>; Tue, 11 Nov 2025 18:16:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.55
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762884990; cv=fail; b=WVEmLQFn94atgxLB8JnvksiZCni8eV4diGaZpaw6VETjfG2/tAlgSI8PgK9ODoBc5zrdPpwst9p+l/KDWsWyfPd/VObqIARKr97VB8Su2tWpozhUZ9V3BFPOF7/d4cXHvXOYMXBAqzqWeAapmm9JdYHdZitnl6dwB1vxGdgvgV8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762884990; c=relaxed/simple;
+	bh=erkINPdtsDhAV2kbdybZ8u0lXhEdzuaIbuC5LpIvv6k=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=MEszB38MObGchy/W11wk3RR392SruGAxWc0MK8JYAkicfuQ0d/ysObVT4W+XVNhV4DvhZfpVckMqE1g4Ucn0mZpIzLqAIP+oFG5BaYojqQGoqjtXyD7DWSsWdNN/87AXZm4V+eFE9CAr85mPFkXumqCBm3o9uge9ayw8KaNWgLE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=UzTNQ0Gh; arc=fail smtp.client-ip=40.107.201.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wbinvd.org header.i=@wbinvd.org header.b="Nn6CxuSn"
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-781ea2cee3fso3552330b3a.0
-        for <linux-block@vger.kernel.org>; Tue, 11 Nov 2025 09:02:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=wbinvd.org; s=wbinvd; t=1762880528; x=1763485328; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=vCzmE033nuL3iHnCWz2ye+biF00WnBmAxg8Ssm7kzfg=;
-        b=Nn6CxuSn4jfwA/diDCJTx1VIFMnLzJ9XcrOoOrldG7wHgsKWgavOqQcaMvLiOYl6P9
-         lBJhjV6aqswEzR7yXINn+52LQt7mqubrWQTnCv310CkE/aKdsjYvT/mL+/4aZVK3w4Oh
-         jxFxFXi4AzMuGhRiYMKfFyjqsa0cChKyJwFAL1irh4zQT+JOVF35iGH5R3Wr3ta0qSHm
-         WJrKQF5ja0fns5+kDfhmiVq+n3ejZbaSTUHyrLoEmULhJ4X/BNxR4bLfzEMmpI+9pFIW
-         KChC3vSYw30Y338kSC63/FqzRWa9HWx5sSzH8y3Qi8ICEZPkvdvW2Wz2HB5rRey1JQLV
-         CbvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762880528; x=1763485328;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vCzmE033nuL3iHnCWz2ye+biF00WnBmAxg8Ssm7kzfg=;
-        b=G/vh3Wv8TP1z0RqwFzRs+g6Ct3vGTAe3tiau9FpNW2t3m+eUyoE82/jq8QzmtmUniC
-         sfh+jAODJSQcp/PR+zfgy3z8BzRMPrmJr227bLc7KHm8Mckzbds5Wz9kQyn/kxOx8lCM
-         RHAmrcEykMF4UzwGmv7eFSFQOaVhYvW/7yxY2myrzbrxZbRrO3v3VbnXVr4s4acGHB2W
-         ld6Z+WUP+Ce7uxcR3SmlHQR9vO27oBN5MGwZTpEQqEVIlSye49Z54JvwN1iF0VVmwyPQ
-         qTarJHZ+dYn20TMlXOKhkOjxHi/SpHJryoHYY7yjxSj72znOsPZSxc2jqEsOxALmVsXt
-         fqug==
-X-Gm-Message-State: AOJu0YxiMD0qc5HgUXdRB0EnnXuEXmhInG5eYTcbHqeOOltQn8sHHJNV
-	dOEyvbKz0GVHVSn5NOck3UnHNU7WG5wsfLLGJOPHQXNovqt5hN3pyYPWCcj84yRJkLrEN3r5mim
-	FSv/7
-X-Gm-Gg: ASbGnctahdU+UsDwP4LRE8/2JwOg0zZqlJe/iNAjUw/Cp+DMa9bgwvEpZKpNsUlTnRK
-	DvH3R6UvmlrycLgHJ7vt/bop8g1LK0YBYOG+2OVBWKNvDJa6p9QlU++xSnIq6r6QzLIO5pIbnty
-	dY1tS3higznrT2FDLqF5Wr4GssnjKmB+F2Shx5+JS8lWs9jIqlPr9NuXoUNDubRVsjUgh2INIrz
-	4Jbjon9xoxllrgqn3fm7oOm1H3FvJr+l991NmTECVZj/zWzG0VSjHov7HVJ0Z4CQdsCvIlJF5Vs
-	nO3mupLT1eRBFQxQX0M8huiIdiR9rTiAgWj6lJoapVC0QaL/GClDMfa/9etlvTBNKFQAVbo4ZLt
-	g5enhSqhzND+ExKOxH5rFYmwxsKLnt3Jr8+Z7aklM7B39v2EVQvG2Hf0+GmNDRObRtz+PG798tn
-	ejJw==
-X-Google-Smtp-Source: AGHT+IFN/MBsxerXBsiVpK7PLbTdCH32DKv4/Wk7nQ7A4KND7mhyW24/tDMvOFQ+7O4h43oz2BzQNg==
-X-Received: by 2002:a05:6a00:84a:b0:7a9:c21a:5599 with SMTP id d2e1a72fcca58-7b225adc008mr16198605b3a.4.1762880528061;
-        Tue, 11 Nov 2025 09:02:08 -0800 (PST)
-Received: from mozart.vkv.me ([192.184.167.117])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7b0cc863a09sm15671106b3a.53.2025.11.11.09.02.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Nov 2025 09:02:07 -0800 (PST)
-From: Calvin Owens <calvin@wbinvd.org>
-To: linux-block@vger.kernel.org
-Cc: linux-raid@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: [QUESTION] Debugging some file data corruption
-Date: Tue, 11 Nov 2025 09:01:42 -0800
-Message-ID: <20251111170142.635908-1-calvin@wbinvd.org>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="UzTNQ0Gh"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=f16CyqdtdimNte/hLL5TZ8v6asOmGNJrCYs73heiCEyTs2+SCHTJeds/Z5rAsNYAP2PV7hMq63EzNLSm0O5DF0U97wIqQ0oXiqO07+kmibqGPR3zpEWdHglRKj/7113t/fwZsrwWQ0q9FByYgmOxgqpZOWVYPzj46aKTfnYfUywtpfkLpTBKQK2nmyTRdbEtV9/uCagfY1DHccWl6s9oeQadYe5DeQhb90v5///LnoYqiKrWN6oja61H7UYlTP3rfTRgAWKf/+lcLmt1X2/r99Q9rDgyjc++A+8v3jcziawgZOgMPa8i5EBjtTwRpYVif6RE5YesNjwgX/JOgWXwqg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=erkINPdtsDhAV2kbdybZ8u0lXhEdzuaIbuC5LpIvv6k=;
+ b=yS9syvl1tUwJSNEYVjo3DcCi7aaDlhIWdncC0mPT8ENl6OVLYNiXwNbBxteov6Ibh+cWACryrPjdPkBuu03Txhnol5fgh9LU7WbtCOn84YPH94OIJtna8K837YjZ4lb5D0ViLAYl87DI9+02bLpJiA4wWEXsz2GHSU7ct3EFysRxQQEGemUms/bMlUaaE9nXzkmDjXSc1eIkE7KUU9MWCo0MXbZhuiNrm8OczyZ9X7XO87lVqQvubtuWtL86h8QbvxyFxZ4bv0iYA2oAXvgfcpNgGP/7XWziadDKQgrFdl/81UFn5uOg7UwyECJKpRrhKEIG/sZ5vRoTiRt6BCAWQw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=erkINPdtsDhAV2kbdybZ8u0lXhEdzuaIbuC5LpIvv6k=;
+ b=UzTNQ0Gh2EybuTj0KfYDmuHoaKvNCQQ/mL+0DcjJb4/Ppp5xxRHrdKS4epvnnjWB6B9DZgRw/QqN5Wyi+gEcjbrdFp1F5rYzpYK1ttvYfPqVAW1Ql5tQuIZ9UdmYfClUDNDaYE3zCKQlf3Lqy6tUbNPyNfqdHVibH7gx53PgBwn1hlbvX5ynGSQnBkhhasCbrgQqvTgdiPfunH4ati6kX9DdfsaAy9vwFbEqUPk+hQ896I3Z4jZmftrRgS7X5WbaoR+UFZVxi6J+mOVJzTFR19pJdBPypMPWC3FK1U2/CkxL7/APzJHiQgiCIeStiZ6shNkW9C4/Pu9Rys4WfaKfnw==
+Received: from LV3PR12MB9404.namprd12.prod.outlook.com (2603:10b6:408:219::9)
+ by DM4PR12MB5748.namprd12.prod.outlook.com (2603:10b6:8:5f::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.13; Tue, 11 Nov
+ 2025 18:16:24 +0000
+Received: from LV3PR12MB9404.namprd12.prod.outlook.com
+ ([fe80::57ac:82e6:1ec5:f40b]) by LV3PR12MB9404.namprd12.prod.outlook.com
+ ([fe80::57ac:82e6:1ec5:f40b%5]) with mapi id 15.20.9298.015; Tue, 11 Nov 2025
+ 18:16:24 +0000
+From: Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Subject: linux-block/for-next nvme_trtype=tcp blktest nvme/005
+Thread-Topic: linux-block/for-next nvme_trtype=tcp blktest nvme/005
+Thread-Index: AQHcUzdKmemTy6KxzESre1pF7U5EfQ==
+Date: Tue, 11 Nov 2025 18:16:24 +0000
+Message-ID: <69a7f0d6-ef87-4916-be1d-cf5b4bd7a9a7@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: LV3PR12MB9404:EE_|DM4PR12MB5748:EE_
+x-ms-office365-filtering-correlation-id: b683aece-7159-456a-9095-08de214e6c8b
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|1800799024|376014|10070799003|38070700021;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?bWRXSDFuelJsaTlqT2dOZXdLWEpJY2VqL3RpY1JnLzJnL2RCZnUrSlB6bTFU?=
+ =?utf-8?B?TGg2WXlVcTcxb0JGREVQWHFMK0JIakwzUEx5eFVKblU4TEtoQUxQbjE3RHA5?=
+ =?utf-8?B?UFlWai9HYzZEc2l0Wk96eit0Vmlpb09LREowMzczVTZxTmhMdzF2ZElpLzUz?=
+ =?utf-8?B?NGtaSkZmNllIWGJiYTdZRUhMTXhjWlRLL3dXWWwxZlh6UEJkMjkyQlBreTRM?=
+ =?utf-8?B?T2IwUFRpSWtkSjdnZEhtbTFhMm96NFArK3dIM0g5dzRJbmtPcnVtRDlGbG9S?=
+ =?utf-8?B?SFdUZGczcnMrRjNFNEtpcE9MbXVOb1hZMmhOSEZLRnhmdE0wQzV4RkEzdVFD?=
+ =?utf-8?B?ZE5aU2pqY2VyOTE2bUMydUFOV05wYWtDeDNqUkdOK1UvcTN0SjB1SERoeFph?=
+ =?utf-8?B?NjhnWG1TVDRjYjVkVDRkVlFNdmpYSEt1emhqSUwyQnAxL0YvN0lNVXZ1U3Jw?=
+ =?utf-8?B?NXFkbE9Oc2svdjA5Rm9zVndXb2ZlKzFvVFdhK2tRTC9pWHQ0WnRQQjZmMVZs?=
+ =?utf-8?B?UTlWUzBpTUlmNy9PaGZlOUV4TUdFR01mWmQrcEU5U3JmeXhIbThjK3BJZG9j?=
+ =?utf-8?B?WGxsRjNxWHExZTNtbzNzSlBzT01nWkJoQmZaTFVodlVCRE1IcmtCUWozemE0?=
+ =?utf-8?B?YnduOHl1cjNrQ3duNm1wbHpNVEVLQXZIekNrbGpCM1F2UTQwWGNVLzNPOWJv?=
+ =?utf-8?B?K3ZLdWd5UTM4SERlbzNueC9QbEcva3h2Y0xOWHVjQktnQ1NEa01RYlIvUWFS?=
+ =?utf-8?B?NE4vWUxqSnlxV21GdGkrV2t2eFBubGQzczlpcUttNk52cmFJcURYZ2RoUmxw?=
+ =?utf-8?B?NFRUdjk4aitGNzZzMDFmN05aQ1JCYnJPMy9zNVIycTQzUDV3ekdiVzNtTHNW?=
+ =?utf-8?B?Skw4VmNhbTBkR1l0UWgrV2VRWnJOUUhxMGo3VUovTzVFVUxKWUtCNzlpVFE1?=
+ =?utf-8?B?eE1VTWlXNkhWaDJ6YkRoSjhFKzhDbmVBVmlzaHBRQWtJd2xndzR5bVNZQ1RC?=
+ =?utf-8?B?TzR0SnhEbW8xM1VRTmhSVVlKZE5xamJ4QlRPOGRacFJkcFFLNkloSTBxTE0r?=
+ =?utf-8?B?Y1d1aTVsU1RDT25obERjS3ZLTXlnRXhhTjBqSGVuN2hYRXE4OW8wd2gxQ2pi?=
+ =?utf-8?B?UWV4b3NyTVBTS2lYcVkrYUpmZ0h6eUVNRlR5MUFzTlArVXhHemRJRUtEcXpL?=
+ =?utf-8?B?L21uUnkxM0IrSWwzU2kxeFZrOG1TZTJXVW95ZDVjNkNNalN1d2t1Q1pvZzYz?=
+ =?utf-8?B?RzB5SjV5L2lsa0NTK3EyRUw3aC9tanNhYmxIcG5QaTV1MnE3cDVPM1IwMjV5?=
+ =?utf-8?B?T09aWVlYWDAwdkZVV1FObjFzUFZTQVZuOWdRVkYxWitFeWZPdEMyWDZGc0hs?=
+ =?utf-8?B?czRNTjZiaTVVZm1ZeENZdGlkRmFHTm1JRTIwYUNCd3gwTHpYTnAraGlFeDUw?=
+ =?utf-8?B?bjhJWW96YkwrZVY4empqTUc2bVpDTmdyU1RnU1ZqcHI4dGtFSURmQzRrTWY1?=
+ =?utf-8?B?M0U3bTZsOUY0Y1BRbFBUS3I3ZkZ1SnJDNDQ4OEZHaFFoY0pjaERzakdYNkVt?=
+ =?utf-8?B?Tzd3dGloa2V6TDJVTWkrVys3OG9DTFlLYWRnMmVmUkNvZU9DQlZVVFFnRVJs?=
+ =?utf-8?B?V3RIWGFUNmp6eGNIVTB4ZXc4L3VpZ1ZXK2g5QmFlU0QwOUp6SE9BbjZLMW9O?=
+ =?utf-8?B?WVl6b0pnVWxhQ0UzTHlLV3d1cllvL2ZDdTNBQzlIU0ZidnJaa3lJeDNUcEtj?=
+ =?utf-8?B?ViswQklOa3B1d0lxc1VKemkzaTh2YlYxQnc5cjJoNFNLUTg2bGg5QUxqWmpU?=
+ =?utf-8?B?bzFQTjRaVW5tUlpLVVo1S3Y1VW5DWk01dStTeWhRM1BXbkZwWDk0QUVnL2Ex?=
+ =?utf-8?B?bUdBY1dtTlBINGw5bG81WnBLbHY4NVFMSGVNRkhaL1d6WjVKYkU5UmNHMStH?=
+ =?utf-8?B?dnRSaXNCUlBNNnZtb2dQb05LR3VuNHNrNU0xYWFORnFubjB2VFNVMjRBQnNn?=
+ =?utf-8?B?Rk9MVFVzdnJyaTd4RlZzOU9KY1JxelZiNFIxWWVQSVdtR2ZIS1RjNmF1NGhi?=
+ =?utf-8?Q?g7vzFk?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR12MB9404.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(10070799003)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?VTRnQzY0aDVtN0JyTUZyQzUxcUNhRmtKRGRMSGh4K0Zpa1h0a0UvVDliUEJV?=
+ =?utf-8?B?dnVpaTd4VDBXRVE2L2JIaS9vRU1JVWhicG1CT2c5aFpJdG5VQXgxOGVxZ09k?=
+ =?utf-8?B?bmdXUzk2NkFIR1RRdDJxaDNzNFFRNVpxcUVWNDFtb2VHOGgxenllRDFncDNa?=
+ =?utf-8?B?Tk5zamdLOElDYzB3MUVrU3pPb1Q1Qk52K1lYdFpzTk1aRXJ1cnE5NGRQMGw3?=
+ =?utf-8?B?VWxldldkYjJZOHRKbWwzVC9uRFNSdzY0RGpYd0ZBMFZUbUMyU0JHcDVYVlBF?=
+ =?utf-8?B?YUpFU0FlTnpZYWZIT3J0RkR2RE1sTE5YdEFnbWRPVlJUd2YvVEwwSHlJSHhK?=
+ =?utf-8?B?cjZsMzgwWFBqWHFiM3hFcDdWS2xLQXplMGdIUDFZS0dqalp5U29PQmpvMWZw?=
+ =?utf-8?B?U1hldE5Bemk5K0hiWnBCZllKc1FJZ0U0ZFlvNG9EaXZBeTVrYVp5N2VmeGFX?=
+ =?utf-8?B?d1Ara3NrTG9DUFRoL2R5WFF1YWFEV3BPN2RDODRXVVZzQjVsZWZMWiszRkJJ?=
+ =?utf-8?B?MUpWQlFPMjlnWVdLb1R5d3lKZkV2YWFuV0RTK0hwbEFPSWV3KzFjOWRna3hJ?=
+ =?utf-8?B?U2dCL3dRbDVYVkpwQVoyNHEzWnh4S3F1b2kyQnpuaFNYZUhUcUZkWGhaK1Nq?=
+ =?utf-8?B?RHVhZUFSMXFaT0V4OUt0ZU94V3JPdVVnN1YramNSOCtmZWpxeTh6dkFqdksx?=
+ =?utf-8?B?NUJRV1hLd2E1WGJLekVpV1BZanJTZ1hVaUJ2UnpwK1k1QWxDTjJXT0lINGVo?=
+ =?utf-8?B?VHRGU09xbEltTzRmZmhBNEFSRDhCdWxZNEFDZDQwcldiV0pGSFFZVjF2Q25H?=
+ =?utf-8?B?cFNXbUVnMkZjRlJOOHhBa0Jta3lsWDZ1MlVDckxDSHV2ZWN1RW9zUEZvYXQ0?=
+ =?utf-8?B?TzBDdUxGZVQwU0tEVW1FbnhLWkFBa2Zyamp4MTFqRitDanpGN3BCQ1RTc0Z6?=
+ =?utf-8?B?ZGpwZ3VNZkxBR1JVQVBhR1gxazRRcmIvTHVjaXcwTTMxdFlUMDg5S0V3ZWg5?=
+ =?utf-8?B?ZEcwWHlNRE9scHJiY1JLTEQwcFlGc1VWM0g1Y0JyNzFuV3pUbzhGVG1YWEEx?=
+ =?utf-8?B?ME9Tb0ZRTDdnclpyZE9MbWFZUVBkQVBuNzl1Z0Nnak9MZkppZzdmS25CSzNv?=
+ =?utf-8?B?eHJreFJrTklBZmpOZ2ZoakdJVG9zbVNQMSt6VzBmbVUyR0laT0FkQTBXNjJ5?=
+ =?utf-8?B?ODkvTXJIS2ViTDN1cFhGeHlBRlJTRkVuRi9MSjlWZm5yYzNic0RINCs0VzVh?=
+ =?utf-8?B?b0QzdGxOeEJEQXMzN0FHOXBNSmVybE5zM0NkMnJNSEdDb1d5ZG1udG5ia1dp?=
+ =?utf-8?B?a1huZGhmK1FyTDQ2Q1lvL25CQVRRSTU4Mjc2SUNuWm42cGF5bUF4c3ZBSDJV?=
+ =?utf-8?B?MkF2K1RlZVZjQWNmWXJ5QTZFc0k0YVkvTTNuOHNZR2NGUXNDUytYQUZnZjUx?=
+ =?utf-8?B?RVFFZ1p4S014N2QrOTNmUmJ6QWttdS84a0dTa0V4QWUvb0JQdVQzOEt3WGJ0?=
+ =?utf-8?B?NGR3ZHYweURZWU1ZaWR1RG9EZDRxaU1HbVFjbStQaG1zNERjUDF0bkszU3Rk?=
+ =?utf-8?B?bjNQdWFJUTlGNmhKTk15TGlIcGtkMEEwVGltQVNBMWZCaytJcWdaWW1KSjFs?=
+ =?utf-8?B?NW5ENks1Q3htZkZjOC8wdnZRZklHS09XVmtyNi85ZTl2bUN1WmR6QXl5S2pQ?=
+ =?utf-8?B?cUlxRUJrTjRaeVpFdTJWcEJHZnN4QUFVWWpvUStzR3l2RnZyOHBYY1NXdXJN?=
+ =?utf-8?B?UkR6dFZtZm1XNEg4YlB2dE5COGczRm5UcE92b0xFWllwSysvby8xOFFseGt4?=
+ =?utf-8?B?V2VlRXlIVUdhVVBTZkZOaG5neWlIQmJ1NWoyK2ZNK3ZBYXBjbndhbVMySU9G?=
+ =?utf-8?B?eWlCNnliREp6aWs0UTE1d3NxdDZCb09IWEcyTHBhcXRYVXl1TXUxN1J0ejE4?=
+ =?utf-8?B?T3FrRUx0Um9nbnhtanNUWG1hWGFydjVycUUyZjFHSHV1UFg5UnE2T3JaYlNj?=
+ =?utf-8?B?cS80MHB6K0R0S2FBdGRlR0ZUNG1pL05pL0Z6d2RZTldXNmV6M0JmUW4yOTFM?=
+ =?utf-8?B?QWRLT2h1amNtKzBVTHo4WlovODMwTWNpMnNscDMwenRZb3BycjFEc05yTlpp?=
+ =?utf-8?B?UWpvVE8wWFo4TFMzQU1yY1ZSWktzenpYcytKR3UxaGRMZE5ocDNCV0o5K0NC?=
+ =?utf-8?Q?lUiUk85394naCyTRrw4xri2y0ayyTQZzrRNw/gybdEz9?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <C924E2FABC80C84D9373B155B7AE3EEC@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: LV3PR12MB9404.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b683aece-7159-456a-9095-08de214e6c8b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Nov 2025 18:16:24.4992
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: WXrP6fRmTldDLDSpFpS3l2uqcft6i2l3r0I2+dEQ5zDB5gR1iiFoddiWtcSif4aa8fgP0HJzPkSSLKGAwzqoXQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5748
 
-Hello all,
-
-I'm looking for help debugging some corruption I recently encountered.
-It happened on 6.17.0, and I'm trying to reproduce it on 6.18-rc. This
-is not really actionable yet, I'm just looking for advice.
-
-After copying about 10TB of data to a btrfs+luks+mdraid1 across two 18TB
-drives, a btrfs scrub of the filesystem on a second machine threw about
-ten checksum failures. The filesystem has never experienced a powerfail
-or any unclean shutdown.
-
-I ran an MD check, which showed some differences, so I wrote a trivial
-userspace tool to log the differences (appended to the end of this
-mail). It found 21 locations where the drives differed (39 LBAs).
-
-The corruptions are clearly not valid ciphertext (non-random). Here's
-an example of one mismatched LBA from both mirrors:
-
-    /dev/sdb                                                              /dev/sda
-
-    e3 df 31 cf de 9b 5b 07  b7 c2 c2 ae 1e 3d 78 06  |..1...[......=x.|  e3 df 31 cf de 9b 5b 07  b7 c2 c2 ae 1e 3d 78 06  |..1...[......=x.|
-    82 fc fe 1b 79 04 f0 89  4a 8d c3 03 ad 28 7f de  |....y...J....(..|  82 fc fe 1b 79 04 f0 89  4a 8d c3 03 ad 28 7f de  |....y...J....(..|
-    59 8b b4 65 d3 1d dd a5  b7 77 58 a9 d9 a3 44 9c  |Y..e.....wX...D.|  59 8b b4 65 d3 1d dd a5  b7 77 58 a9 d9 a3 44 9c  |Y..e.....wX...D.|
-    81 a8 03 1e bd e9 3f bb  98 0d ee a4 cd 4c 67 44  |......?......LgD|  81 a8 03 1e bd e9 3f bb  98 0d ee a4 cd 4c 67 44  |......?......LgD|
-    5c a5 55 21 c1 ec cc 23  94 08 61 db cd b1 46 20  |\.U!...#..a...F |  5c a5 55 21 c1 ec cc 23  94 08 61 db cd b1 46 20  |\.U!...#..a...F |
-    01 18 77 7e d9 c5 d7 27  b0 ef 5f b7 6f b7 d1 ab  |..w~...'.._.o...|  01 18 77 7e d9 c5 d7 27  b0 ef 5f b7 6f b7 d1 ab  |..w~...'.._.o...|
-    42 e5 36 f0 d1 9a 11 2c  22 1b a7 16 34 1d 22 a1  |B.6....,"...4.".|  42 e5 36 f0 d1 9a 11 2c  22 1b a7 16 34 1d 22 a1  |B.6....,"...4.".|
-    4b 26 62 c3 d0 fa 02 ef  c3 7b 59 a5 4d 29 c0 62  |K&b......{Y.M).b|  4b 26 62 c3 d0 fa 02 ef  c3 7b 59 a5 4d 29 c0 62  |K&b......{Y.M).b|
-    aa 32 9e e2 0f b8 6d 2c  f2 4b 56 87 5f 70 cc 26  |.2....m,.KV._p.&|  aa 32 9e e2 0f b8 6d 2c  f2 4b 56 87 5f 70 cc 26  |.2....m,.KV._p.&|
-    ae a2 18 a4 25 74 a6 88  98 07 26 75 10 a4 33 ae  |....%t....&u..3.|  ae a2 18 a4 25 74 a6 88  98 07 26 75 10 a4 33 ae  |....%t....&u..3.|
-    9b 01 d9 b7 19 d7 5c b1  1d d6 a0 fe 63 0e b8 c5  |......\.....c...|  9b 01 d9 b7 19 d7 5c b1  1d d6 a0 fe 63 0e b8 c5  |......\.....c...|
-    00 20 0f 78 80 0b 24 9c  09 c0 0f 2f d7 87 3a 8c  |. .x..$..../..:.|  00 20 0f 78 80 0b 24 9c  09 c0 0f 2f d7 87 3a 8c  |. .x..$..../..:.|
-    2d c4 1e 21 c8 45 02 95  33 37 06 50 b0 7f 1c 36  |-..!.E..37.P...6|  2d c4 1e 21 c8 45 02 95  33 37 06 50 b0 7f 1c 36  |-..!.E..37.P...6|
-    8e 65 8c a9 e1 11 2b 7b  4f 9b 8b bd c3 3b 97 d9  |.e....+{O....;..|  9f 46 1d 21 c8 45 16 2d  c9 1c 19 fc d8 b6 db ed  |.F.!.E.-........|
-    69 0d 76 80 a4 60 c8 51  20 12 67 d8 b6 f5 fa 77  |i.v..`.Q .g....w|  c7 9b 18 21 c8 45 ea aa  20 3e e9 94 a0 8a e9 2c  |...!.E.. >.....,|
-    09 2c 1a 16 73 a6 ea 48  c7 6e 39 5a e5 6d c4 34  |.,..s..H.n9Z.m.4|  f0 db 11 21 c8 45 41 29  a2 e2 32 4b c7 ae cb a5  |...!.EA)..2K....|
-    ac 2e 12 3b d4 cc cc 7b  9d d7 6c 2c fa 19 9d b3  |...;...{..l,....|  8d 39 12 21 c8 45 78 47  4e 97 0c 46 43 ec 7a ba  |.9.!.ExGN..FC.z.|
-    58 26 ab fb 01 32 d7 f8  fb ba c5 84 f4 fe 01 47  |X&...2.........G|  8a 55 16 21 c8 45 48 ad  28 32 9c 3c f3 17 eb a1  |.U.!.EH.(2.<....|
-    92 b8 c9 40 d9 77 53 59  f8 3e 3f 41 49 03 4a c1  |...@.wSY.>?AI.J.|  ca cd 16 21 c8 45 ff 6b  c9 19 91 4c d4 0b 85 b2  |...!.E.k...L....|
-    43 9a 7e 42 6b da a1 9e  7d de 03 f9 4c 61 ed a3  |C.~Bk...}...La..|  dd 1c 1d 21 c8 45 9d 54  f4 6c 0c cb e2 6c e5 ad  |...!.E.T.l...l..|
-    7a 8f 54 f7 13 8f 7c ac  c2 db e0 ef c8 4c 80 80  |z.T...|......L..|  08 f7 19 21 c8 45 7e 49  90 47 7e 8d 1d 49 22 8c  |...!.E~I.G~..I".|
-    cd f2 32 10 88 78 23 9f  d7 eb b3 da 98 77 3c 95  |..2..x#......w<.|  a5 8f 1e 21 c8 45 4c f9  b0 bc 74 6d 2e 80 7b 36  |...!.EL...tm..{6|
-    fc 3b 8d 8f 46 82 cc 8c  cf f1 16 7d 01 59 d3 6e  |.;..F......}.Y.n|  18 0c 1b 21 c8 45 e3 51  09 5e a9 14 33 00 d9 30  |...!.E.Q.^..3..0|
-    2d 8f 43 8a 12 e3 e7 26  8a 76 cc 28 89 4c 19 04  |-.C....&.v.(.L..|  70 51 13 21 c8 45 81 d9  54 45 89 e5 52 0d c2 ba  |pQ.!.E..TE..R...|
-    d9 e1 a7 a5 a4 c9 ef 64  2b 6b 91 a3 b1 4a f8 98  |.......d+k...J..|  65 0c 18 21 c8 45 69 e0  a8 86 92 af 41 cf a0 40  |e..!.Ei.....A..@|
-    69 18 c7 96 82 17 5b 57  34 75 84 c1 35 9e 38 d1  |i.....[W4u..5.8.|  7c 6d 10 21 c8 45 46 04  00 00 00 00 00 00 00 00  ||m.!.EF.........|
-    93 87 c2 c7 28 3b 9d 48  f4 8d 14 17 cb b7 09 90  |....(;.H........|  19 5f 12 21 c8 45 b4 0c  27 37 cf 44 81 29 c7 8a  |._.!.E..'7.D.)..|
-    c0 3c 04 ac e0 44 b2 1e  8a 77 7e 19 85 8f ff 6c  |.<...D...w~....l|  3d 17 1b 21 c8 45 50 d7  00 00 00 00 00 00 00 00  |=..!.EP.........|
-    ca 7f 3a 5c d3 52 cb b3  cf a8 89 66 a0 a1 16 ef  |..:\.R.....f....|  87 e7 10 21 c8 45 eb 5c  0a 70 b0 de bf be 1d 5f  |...!.E.\.p....._|
-    a4 87 d8 1d 57 c4 73 11  4d d8 0a cf a9 d2 43 08  |....W.s.M.....C.|  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
-    15 2d 4e c8 b2 d7 3b 55  30 59 a1 6e ff 36 83 33  |.-N...;U0Y.n.6.3|  0a f5 10 21 c8 45 d2 3e  00 00 00 00 00 00 00 00  |...!.E.>........|
-    82 2b 4f 55 64 ec 5b 34  90 a6 7d 83 b1 af 44 75  |.+OUd.[4..}...Du|  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
-
-The obvious "streak" of repeated bytes on a 16-byte stride followed by
-chunks of zeros is very consistent across my 21 corrupt samples. The
-streak always repeats a piece of the real data ("21 c8 45" above).
-
-I uploaded all 21 samples here:
-
-    https://github.com/jcalvinowens/lkml-debug-mdraid-618
-
-Does this pattern of corruption mean anything to anybody?
-
-Next, I "split" the mdraid1, using read-only loopback devices with an
-offset so they appear as individual btrfs filesystems, and ran an
-offline btrfs scrub against each individually.
-
-The first drive:
-
-    calvinow@hackpi1 ~ $ sudo losetup -f /dev/sda -o 135266304
-    calvinow@hackpi1 ~ $ sudo cryptsetup luksOpen -r /dev/loop0 sda_only_crypt -d keyfiles/f1ce8b7f-cd32-4ccd-baee-8443f60d9d1d.key
-    calvinow@hackpi1 ~ $ sudo btrfs check --check-data-csum /dev/mapper/sda_only_crypt
-    [1/8] checking log skipped (none written)
-    [2/8] checking root items
-    [3/8] checking extents
-    [4/8] checking free space tree
-    [5/8] checking fs roots
-    [6/8] checking csums against data
-    mirror 1 bytenr 1850055942144 csum 0x7e5e39be4c95c330acb06620b4ad5647d2092d76ad217296213c835ead479608 expected csum 0xc91d405eb407360748a8a3300a098575cdfb559d169b7b0114f1901a76bc0168
-    mirror 1 bytenr 2878389952512 csum 0xe8d67f41f097a790465ba475736b517ec18ebf5d4379c85e681d7ec0a2de148c expected csum 0xfa775cf8e22f6c493c9e4a4b35152146c6af6730972413f57472a0b84eaf1b48
-    mirror 1 bytenr 3128346521600 csum 0x9ec824a9e4ddcffdf1062f1ba62b9451969a99be14be202f2439453d7d3004d2 expected csum 0xf671fa7c9ff422d63e33ab2308b743f2efec75bc665f4b39d2b3528ed67b8dd2
-    mirror 1 bytenr 4804343029760 csum 0x120b9da3ad94bae74b87dd5348bffe2a63abae51ec1967fe4940ef4d0e04f6b2 expected csum 0xcb35ff0f65d3c83d58c973349e95ddca941db192704d90f117f5748d60847871
-    mirror 1 bytenr 4864481669120 csum 0xc47f3d34ad469b42a6c4ac53082711d7a54adfc639b8cae0eca68fa85c553d9e expected csum 0x408d55c9ddb82d687d22cfd88cd97b92e9ada7eeafbf1ffe5361d6c8d668979e
-    mirror 1 bytenr 5960080613376 csum 0x01b4b8ed8aeb58e10a817df137ecd7897d71c55e13a1e4b26057ad04545ec25f expected csum 0x2ab1dac1d5f588f945ef21c0e1cbaec6e80f0c1e70b7869b6d60ec10bf0904ad
-    mirror 1 bytenr 5961402257408 csum 0xb0286e4ffb2dc14544aa9cbfc93b673f0bedabe2bf8897ea55ab56b360cdb2fd expected csum 0x94296eb48c729bc769b30249fd6f9a495e5bcd7ee53f5b9fa804e8e29b61a1a0
-    mirror 1 bytenr 6542744866816 csum 0xa94702d753843de35c7c36aa421d577fc3ee266dcecf667ab889038e3816d9cf expected csum 0xa0f23e680a34bee49f92b93018f691a17c2a333b654969304e6f5fd7451efdf3
-    mirror 1 bytenr 8062253760512 csum 0xba3a46a1c1b0305eeeea50576d45d42bc4c2df78dc4298ed8a0430f4ffe02b29 expected csum 0x7e0b0bc4e506d453b69fdd195575f5caafa33833fc690f790594eb9070737e92
-    ERROR: errors found in csum tree
-    [7/8] checking root refs
-    [8/8] checking quota groups skipped (not enabled on this FS)
-    Opening filesystem to check...
-    Checking filesystem on /dev/mapper/sda_only_crypt
-    UUID: 3bd1727b-c8ae-4876-96b2-9318c1f9556f
-    found 8215070863360 bytes used, error(s) found
-    total csum bytes: 63585280608
-    total tree bytes: 76154945536
-    total fs tree bytes: 379305984
-    total extent tree bytes: 496074752
-    btree space waste bytes: 11008701324
-    file data blocks allocated: 8138915917824
-     referenced 8335585824768
-
-The second drive:
-
-    calvinow@hackpi1 ~ $ sudo losetup -f /dev/sdb -o 135266304
-    calvinow@hackpi1 ~ $ sudo cryptsetup luksOpen -r /dev/loop1 sdb_only_crypt -d keyfiles/f1ce8b7f-cd32-4ccd-baee-8443f60d9d1d.key
-    calvinow@hackpi1 ~ $ sudo btrfs check --check-data-csum /dev/mapper/sdb_only_crypt
-    [1/8] checking log skipped (none written)
-    [2/8] checking root items
-    [3/8] checking extents
-    [4/8] checking free space tree
-    [5/8] checking fs roots
-    [6/8] checking csums against data
-    mirror 1 bytenr 360507215872 csum 0xd73bd43f8bbe02623cb49d8c2d22098e9f8f7d1e168a4a3ce09afd6afb3fb7b7 expected csum 0xffd5b2ab2e2a988d1fd8161a770533e3fa12ce42a22a608b33da0e354423bcf2
-    mirror 1 bytenr 948478869504 csum 0x7013cafbcede6444418ed6bc6dde69a074d95f54ada5c8f397d5a5a7c7401308 expected csum 0x9707f1e1d21f901608c7406928fb0ac4e4329ee84f0cd927711de1933088bfb9
-    mirror 1 bytenr 1335329157120 csum 0x53b36149b0b1404e6033ccee7da2f78a771a216226570b153ec842f75579c01b expected csum 0x8c073e81cd73acbed85e10371bffd684b65480104c97484dd8c35dcd1d7292a4
-    mirror 1 bytenr 3342155005952 csum 0xae6b7410b5b3525164b37162d62f0686ed69670dd0e636118520b750f4f90c98 expected csum 0x6813929e1c2858de05525d9a9d60b1a609a9c127ec0fbea386db872da06f911a
-    mirror 1 bytenr 3394104115200 csum 0x0bbfe4d49e2831a3534ca5e2731d0913f7fb5a0742bfb584280b6e2ab140f79e expected csum 0xbb404a2115d4db21bca0376ec6a2b147438dd5dc12d2ce77657ffce3a341c791
-    mirror 1 bytenr 3540474392576 csum 0xafdfb82fc21d4e9ee86f8f4eeeb80f72e821abc7efc16ec0d1543a8fe766f810 expected csum 0x6d431ad6c9a78ab9b1b4523135bf1f92d196cb3784c0012e82277fde1284f6bb
-    mirror 1 bytenr 3764206202880 csum 0xd634900646ca8b656e0e461152abe4d56fcf266e66deaa7995723cdbaad1c3f6 expected csum 0x4bc0bb748c93d6764c4477e759fb0fff987398df31124e407a96ad88c1c08f12
-    mirror 1 bytenr 5795747512320 csum 0x29ded608e1e53a33a018173cb1b9653ac1f5ae4c58b2728abcd4147dae1e9038 expected csum 0xdf19cadbca20a6b70673a78a18715e950ab9ff8dce9b5263b4a53106ae64c540
-    mirror 1 bytenr 6096793878528 csum 0x73a9cf95307e303118f5a46c4150159b22be9300dd853987d44f162bd6ce3106 expected csum 0x1f8cb156b55dbdbf24ff126b182506f42987d59d470847cee0866a59a52d44c3
-    mirror 1 bytenr 6684691709952 csum 0x809afb12bca20c21e167cb90d890144f74ac7860996348e78e8d4e8fe67a5815 expected csum 0xc67c8b6ced8d2e7ae7b3897b1ac7432bbec0c2566f759652ab0892095bca6689
-    mirror 1 bytenr 7101833793536 csum 0xcaae7fa28faab629bb5826550cc94ed504bf3e8146c451d284b887405b649dde expected csum 0xa2ba3334fd5b18557139577fb0875a6ba142588654dead275407976ab8b6d80c
-    mirror 1 bytenr 8067768504320 csum 0xafac926d7032c1f36efe0b0b4473e1eb1f165271a7ac913564c4b3824815f885 expected csum 0x8e2b6e08d78b7f0e60352091c7b4e329d7c1756806dcdbc7b66d3544499615dc
-    ERROR: errors found in csum tree
-    [7/8] checking root refs
-    [8/8] checking quota groups skipped (not enabled on this FS)
-    Opening filesystem to check...
-    Checking filesystem on /dev/mapper/sdb_only_crypt
-    UUID: 3bd1727b-c8ae-4876-96b2-9318c1f9556f
-    found 8215070863360 bytes used, error(s) found
-    total csum bytes: 63585280608
-    total tree bytes: 76154945536
-    total fs tree bytes: 379305984
-    total extent tree bytes: 496074752
-    btree space waste bytes: 11008701324
-    file data blocks allocated: 8138915917824
-     referenced 8335585824768
-
-The full btrfs inspect-internal dump-tree output is about 160GB of text,
-and was exactly identical from both mirrors.
-
-Because the drives are encrypted, the real data are statistically
-random, so I was able to use compression to test which blocks were
-corrupt. I wrote all the "less" corrupt instances of each of the 21
-blocks to drive B, and all the "more" corrupt instances to drive A,
-using this python script:
-
-    import bz2
-    import os
-    
-    with open("combined-corrupt-lba-list.txt", "r") as f:
-        lbas = [int(x.rstrip()) for x in f.readlines()]
-    
-    fd_sda = os.open("/dev/sda", os.O_RDWR | os.O_EXCL)
-    fd_sdb = os.open("/dev/sdb", os.O_RDWR | os.O_EXCL)
-    
-    for lba in lbas:
-        f1 = f"lba-{lba}.sda.bin"
-        with open(f1, "rb") as f:
-            d1 = f.read()
-        l1 = len(bz2.compress(d1))
-    
-        f2 = f"lba-{lba}.sdb.bin"
-        with open(f2, "rb") as f:
-            d2 = f.read()
-        l2 = len(bz2.compress(d2))
-    
-        if l1 < l2:
-            print(f"sda bad, sdb good: {lba}")
-            os.pwrite(fd_sda, d1, lba * 512)
-            os.pwrite(fd_sdb, d2, lba * 512)
-        elif l2 < l1:
-            print(f"sda good, sdb bad: {lba}")
-            os.pwrite(fd_sda, d2, lba * 512)
-            os.pwrite(fd_sdb, d1, lba * 512)
-        else:
-            raise RuntimeError(f"can't tell: {lba}")
-
-This was the output:
-
-    sda good, sdb bad: 693943242
-    sda good, sdb bad: 1850713991
-    sda good, sdb bad: 2610475259
-    sda bad, sdb good: 3630481074
-    sda bad, sdb good: 5657885844
-    sda bad, sdb good: 6146082269
-    sda good, sdb bad: 6563676964
-    sda good, sdb bad: 6677722982
-    sda good, sdb bad: 6963602424
-    sda good, sdb bad: 7400578618
-    sda bad, sdb good: 9446775924
-    sda bad, sdb good: 9564234206
-    sda good, sdb bad: 11389404262
-    sda bad, sdb good: 11712464500
-    sda bad, sdb good: 11715045836
-    sda good, sdb bad: 11979482596
-    sda bad, sdb good: 12863063528
-    sda good, sdb bad: 13140303458
-    sda good, sdb bad: 13955034090
-    sda bad, sdb good: 15845534402
-    sda good, sdb bad: 15856305388
-
-Then, I re-ran the offline scrubs: drive A now shows all the errors
-originally seen across both drives, and drive B is now clean.
-
-Finally, I ran userspace checksums of the full set of files on the
-newly clean drive B: they perfectly match an older copy in my backups.
-
-This proves that:
-
-    1) RAID mismatches and btrfs checksum failures are strictly 1:1.
-    2) For every RAID mismatch, strictly one mirror was corrupted.
-    3) No slient corruption occurred, btrfs caught everything.
-
-The hard drives are brand new, so that is my current suspicion. I've
-used the same two-drive USB enclosure extensively with older HDDs and
-never seen a problem. I'm running this FIO job to test them:
-
-    [global]
-    numjobs=1
-    loops=20
-    ioengine=io_uring
-    rw=randrw
-    percentage_random=5%
-    rwmixwrite=95
-    iodepth=32
-    direct=1
-    size=5%
-    blocksize_range=1k-32m
-    sync=none
-    refill_buffers=1
-    random_distribution=random
-    random_generator=tausworthe64
-    verify=xxhash
-    verify_fatal=1
-    verify_dump=1
-    do_verify=1
-    verify_async=$ncpus
-    
-    [hdd-sdb-test]
-    filename=/dev/sdb
-    
-    [hdd-sdc-test]
-    filename=/dev/sdc
-
-...but no luck hitting anything after about 18 hours.
-
-Unless anybody else has a better idea, my plan is to "work my way up"
-the storage stack with FIO verify jobs like the above. Any advice would
-be greatly appreciated :)
-
-Thanks,
-Calvin
-
---
-
-#define _GNU_SOURCE
-#include <stdlib.h>
-#include <stdio.h>
-#include <err.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <string.h>
-
-int main(int argc, char **argv)
-{
-	int fd1, fd2, m_ret = EXIT_SUCCESS;
-	size_t lba = 0;
-
-	if (argc < 3)
-		errx(1, "Usage: ./test <drv1> <drv2>");
-
-	fd1 = open(argv[1], O_RDONLY);
-	if (fd1 == -1)
-		err(1, "Can't open %s", argv[1]);
-
-	fd2 = open(argv[2], O_RDONLY);
-	if (fd2 == -1)
-		err(1, "Can't open %s", argv[2]);
-
-	while (1) {
-		int ret1, ret2;
-		char buf1[512];
-		char buf2[512];
-
-		ret1 = read(fd1, buf1, 512);
-		if (ret1 == -1)
-			err(2, "Bad read from input #1");
-
-		ret2 = read(fd2, buf2, 512);
-		if (ret2 == -1)
-			err(2, "Bad read from input #2");
-
-		if (ret1 != ret2)
-			err(3, "Files differ in length at lba %lu (%d/%d)",
-			    lba, ret1, ret2);
-
-		if (ret1 == 0)
-			break;
-
-		if (ret1 != 512)
-			err(4, "Short read!?");
-
-		if (memcmp(buf1, buf2, 512)) {
-			unsigned i;
-			FILE *out;
-
-			m_ret = EXIT_FAILURE;
-			printf("LBA %lu differs:\n", lba);
-			for (i = 0; i < 512; i++)
-				buf1[i] ^= buf2[i];
-
-			out = popen("hexdump -C", "w");
-			if (!out)
-				err(5, "Unable to dump XOR of blocks");
-
-			fflush(stdout);
-			fwrite(buf1, 1, 512, out);
-			pclose(out);
-		}
-
-		lba++;
-	}
-
-	close(fd2);
-	close(fd1);
-	return m_ret;
-}
+SGksDQoNClBsZWFzZSBoYXZlIGEgbG9vaywgaWYgdGhlcmUgaXMgYWxyZWFkeSBmb3IgdGhpcyBw
+bGVhc2UgaWdub3JlLg0KDQpSdW5uaW5nIGJsa3Rlc3RzIG9uIGxhdGVzdCBsaW51eC1ibG9jay9m
+b3ItbmV4dCByZXN1bHRpbmcgaW4gdGhpcyA6LSANCm52bWUvMDA1ICh0cj10Y3ApIChyZXNldCBs
+b2NhbCBsb29wYmFjayB0YXJnZXQpIFtmYWlsZWRdIHJ1bnRpbWUgMC4yNjRzIA0KLi4uIDAuNjk4
+cyBzb21ldGhpbmcgZm91bmQgaW4gZG1lc2c6IFsgMTAyMC4wNDU5ODNdIHJ1biBibGt0ZXN0cyAN
+Cm52bWUvMDA1IGF0IDIwMjUtMTEtMTEgMTA6MTA6MjIgWyAxMDIwLjA4OTkwNF0gbG9vcDM6IGRl
+dGVjdGVkIGNhcGFjaXR5IA0KY2hhbmdlIGZyb20gMCB0byAxMDI0MDAwIFsgMTAyMC4xMjE5NTNd
+IG52bWV0OiBhZGRpbmcgbnNpZCAxIHRvIA0Kc3Vic3lzdGVtIGJsa3Rlc3RzLXN1YnN5c3RlbS0x
+IFsgMTAyMC4xMzM2MTBdIG52bWV0X3RjcDogZW5hYmxpbmcgcG9ydCAwIA0KKDEyNy4wLjAuMTo0
+NDIwKSBbIDEwMjAuMTY5MjM3XSBudm1ldDogQ3JlYXRlZCBudm0gY29udHJvbGxlciAxIGZvciAN
+CnN1YnN5c3RlbSBibGt0ZXN0cy1zdWJzeXN0ZW0tMSBmb3IgTlFOIA0KbnFuLjIwMTQtMDgub3Jn
+Lm52bWV4cHJlc3M6dXVpZDowZjAxZmI0Mi05ZjdmLTQ4NTYtYjBiMy01MWU2MGI4ZGUzNDkuIFsg
+DQoxMDIwLjE3MzkxM10gbnZtZSBudm1lMDogY3JlYXRpbmcgNDggSS9PIHF1ZXVlcy4gWyAxMDIw
+LjE4Njg3NV0gbnZtZSANCm52bWUwOiBtYXBwZWQgNDgvMC8wIGRlZmF1bHQvcmVhZC9wb2xsIHF1
+ZXVlcy4gWyAxMDIwLjIwMjE4OF0gbnZtZSANCm52bWUwOiBuZXcgY3RybDogTlFOICJibGt0ZXN0
+cy1zdWJzeXN0ZW0tMSIsIGFkZHIgMTI3LjAuMC4xOjQ0MjAsIA0KaG9zdG5xbjogDQpucW4uMjAx
+NC0wOC5vcmcubnZtZXhwcmVzczp1dWlkOjBmMDFmYjQyLTlmN2YtNDg1Ni1iMGIzLTUxZTYwYjhk
+ZTM0OSBbIA0KMTAyMC4yODM3NDFdIG52bWV0OiBDcmVhdGVkIG52bSBjb250cm9sbGVyIDIgZm9y
+IHN1YnN5c3RlbSANCmJsa3Rlc3RzLXN1YnN5c3RlbS0xIGZvciBOUU4gDQpucW4uMjAxNC0wOC5v
+cmcubnZtZXhwcmVzczp1dWlkOjBmMDFmYjQyLTlmN2YtNDg1Ni1iMGIzLTUxZTYwYjhkZTM0OS4g
+DQouLi4gKFNlZSAnL3Jvb3QvYmxrdGVzdHMvcmVzdWx0cy9ub2Rldl90cl90Y3AvbnZtZS8wMDUu
+ZG1lc2cnIGZvciB0aGUgDQplbnRpcmUgbWVzc2FnZSkgWyAxMDIwLjI4NDQ4Nl0gDQo9PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0gWyAxMDIwLjI4
+NDQ4OV0gDQpXQVJOSU5HOiBwb3NzaWJsZSBjaXJjdWxhciBsb2NraW5nIGRlcGVuZGVuY3kgZGV0
+ZWN0ZWQgWyAxMDIwLjI4NDQ5MV0gDQo2LjE4LjAtcmM0bGJsaysgIzQgVGFpbnRlZDogRyBOIFsg
+MTAyMC4yODQ0OTNdIA0KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tIFsgMTAyMC4yODQ0OTRdIA0Ka3dvcmtlci8zNDoxLzMyMyBpcyB0cnlpbmcg
+dG8gYWNxdWlyZSBsb2NrOiBbIDEwMjAuMjg0NDk2XSANCmZmZmZmZmZmODJlNDg3ZTAgKGZzX3Jl
+Y2xhaW0peysuKy59LXswOjB9LCBhdDogDQprbWVtX2NhY2hlX2FsbG9jX25vZGVfbm9wcm9mKzB4
+NWEvMHg3NzAgWyAxMDIwLjI4NDUwN10gYnV0IHRhc2sgaXMgDQphbHJlYWR5IGhvbGRpbmcgbG9j
+azogWyAxMDIwLjI4NDUwOF0gZmZmZjg4ODE2N2Q4OGU5OCANCihza19sb2NrLUFGX0lORVQtTlZN
+RSBbIDEwMjAuMjk1MTMzXSBudm1lIG52bWUwOiBjcmVhdGluZyA0OCBJL08gcXVldWVzLiANClsg
+MTAyMC4yOTg5NzldICl7Ky4rLn0tezA6MH0sIGF0OiB0Y3BfY2xvc2UrMHgxNS8weDgwIFsgMTAy
+MC4yOTg5ODhdIA0Kd2hpY2ggbG9jayBhbHJlYWR5IGRlcGVuZHMgb24gdGhlIG5ldyBsb2NrLiBb
+IDEwMjAuMjk4OTg5XSB0aGUgZXhpc3RpbmcgDQpkZXBlbmRlbmN5IGNoYWluIChpbiByZXZlcnNl
+IG9yZGVyKSBpczogWyAxMDIwLjI5ODk5MF0gLT4gIzQgDQooc2tfbG9jay1BRl9JTkVULU5WTUUp
+eysuKy59LXswOjB9OiBbIDEwMjAuMjk4OTk0XSANCmxvY2tfc29ja19uZXN0ZWQrMHgyZS8weDcw
+IFsgMTAyMC4zNTI1NTFdIHRjcF9zZW5kbXNnKzB4MWEvMHg0MCBbIA0KMTAyMC4zNTQ2NjldIHNv
+Y2tfc2VuZG1zZysweGVkLzB4MTEwIFsgMTAyMC4zNTY4MzFdIA0KbnZtZV90Y3BfdHJ5X3NlbmRf
+Y21kX3BkdSsweDEzZS8weDI2MCBbbnZtZV90Y3BdIFsgMTAyMC4zNjAxMjldIA0KbnZtZV90Y3Bf
+dHJ5X3NlbmQrMHhiMy8weDMzMCBbbnZtZV90Y3BdIFsgMTAyMC4zNjMwMThdIA0KbnZtZV90Y3Bf
+cXVldWVfcnErMHgzNDIvMHgzZDAgW252bWVfdGNwXSBbIDEwMjAuMzY1OTc1XSANCmJsa19tcV9k
+aXNwYXRjaF9ycV9saXN0KzB4MjlhLzB4ODAwIFsgMTAyMC4zNjg2OThdIA0KX19ibGtfbXFfc2No
+ZWRfZGlzcGF0Y2hfcmVxdWVzdHMrMHgzZGIvMHg1ZjAgWyAxMDIwLjM3MTg1NF0gDQpibGtfbXFf
+c2NoZWRfZGlzcGF0Y2hfcmVxdWVzdHMrMHgyOS8weDcwIFsgMTAyMC4zNzQwODddIA0KYmxrX21x
+X3J1bl93b3JrX2ZuKzB4NzYvMHgxYjAgWyAxMDIwLjM3NTc1MF0gDQpwcm9jZXNzX29uZV93b3Jr
+KzB4MjExLzB4NjMwIFsgMTAyMC4zNzczNzldIHdvcmtlcl90aHJlYWQrMHgxODQvMHgzMzAgWyAN
+CjEwMjAuMzc4OTQ5XSBrdGhyZWFkKzB4MTBkLzB4MjUwIFsgMTAyMC4zODAyOTZdIA0KcmV0X2Zy
+b21fZm9yaysweDI5YS8weDMwMCBbIDEwMjAuMzgxODU1XSByZXRfZnJvbV9mb3JrX2FzbSsweDFh
+LzB4MzAgWyANCjEwMjAuMzgzNDIwXSAtPiAjMyAoc2V0LT5zcmN1KXsuKy4rfS17MDowfTogWyAx
+MDIwLjM4NTQ3N10gDQpfX3N5bmNocm9uaXplX3NyY3UrMHg0OS8weDE3MCBbIDEwMjAuMzg3MTY5
+XSBlbGV2YXRvcl9zd2l0Y2grMHhjOS8weDMzMCANClsgMTAyMC4zODg3NjNdIGVsZXZhdG9yX2No
+YW5nZSsweDEyOC8weDFjMCBbIDEwMjAuMzkwMzM2XSANCmVsZXZhdG9yX3NldF9ub25lKzB4NGMv
+MHg5MCBbIDEwMjAuMzkxOTQzXSANCmJsa191bnJlZ2lzdGVyX3F1ZXVlKzB4YTgvMHgxMTAgWyAx
+MDIwLjM5MzY5M10gX19kZWxfZ2VuZGlzaysweDE0ZS8weDNjMCANClsgMTAyMC4zOTUyMjJdIGRl
+bF9nZW5kaXNrKzB4NzUvMHhhMCBbIDEwMjAuMzk2NzA5XSANCm52bWVfbnNfcmVtb3ZlKzB4ZjIv
+MHgyMzAgW252bWVfY29yZV0gWyAxMDIwLjM5ODYzNF0gDQpudm1lX3JlbW92ZV9uYW1lc3BhY2Vz
+KzB4ZjIvMHgxNTAgW252bWVfY29yZV0gWyAxMDIwLjQwMDgwOF0gDQpudm1lX2RvX2RlbGV0ZV9j
+dHJsKzB4NzEvMHg5MCBbbnZtZV9jb3JlXSBbIDEwMjAuNDAyODU4XSANCm52bWVfZGVsZXRlX2N0
+cmxfc3luYysweDNiLzB4NTAgW252bWVfY29yZV0gWyAxMDIwLjQwNDk1OF0gDQpudm1lX3N5c2Zz
+X2RlbGV0ZSsweDM0LzB4NDAgW252bWVfY29yZV0gWyAxMDIwLjQwNjk0M10gDQprZXJuZnNfZm9w
+X3dyaXRlX2l0ZXIrMHgxNmQvMHgyMjAgWyAxMDIwLjQwODc5MF0gdmZzX3dyaXRlKzB4MzdiLzB4
+NTIwIFsgDQoxMDIwLjQxMDE5N10ga3N5c193cml0ZSsweDY3LzB4ZTAgWyAxMDIwLjQxMTU4MF0g
+DQpkb19zeXNjYWxsXzY0KzB4NzYvMHhiMDAgWyAxMDIwLjQxMzA4NF0gDQplbnRyeV9TWVNDQUxM
+XzY0X2FmdGVyX2h3ZnJhbWUrMHg3Ni8weDdlIFsgMTAyMC40MTUwNzhdIC0+ICMyIA0KKCZxLT5l
+bGV2YXRvcl9sb2NrKXsrLisufS17NDo0fTogWyAxMDIwLjQxNzM2NV0gX19tdXRleF9sb2NrKzB4
+YTIvMHgxMTUwIA0KWyAxMDIwLjQxODkxMl0gZWxldmF0b3JfY2hhbmdlKzB4YTgvMHgxYzAgWyAx
+MDIwLjQyMDQ3MF0gDQplbHZfaW9zY2hlZF9zdG9yZSsweGRmLzB4MTQwIFsgMTAyMC40MjIxMTZd
+IA0Ka2VybmZzX2ZvcF93cml0ZV9pdGVyKzB4MTZkLzB4MjIwIFsgMTAyMC40MjQyMDNdIHZmc193
+cml0ZSsweDM3Yi8weDUyMCBbIA0KMTAyMC40MjU3MTldIGtzeXNfd3JpdGUrMHg2Ny8weGUwIFsg
+MTAyMC40MjcxNTRdIA0KZG9fc3lzY2FsbF82NCsweDc2LzB4YjAwIFsgMTAyMC40Mjg3NjNdIA0K
+ZW50cnlfU1lTQ0FMTF82NF9hZnRlcl9od2ZyYW1lKzB4NzYvMHg3ZSBbIDEwMjAuNDMwODkxXSAt
+PiAjMSANCigmcS0+cV91c2FnZV9jb3VudGVyKGlvKSl7KysrK30tezA6MH06IFsgMTAyMC40MzM0
+OTBdIA0KYmxrX2FsbG9jX3F1ZXVlKzB4MzBlLzB4MzUwIFsgMTAyMC40MzUyNDhdIGJsa19tcV9h
+bGxvY19xdWV1ZSsweDYxLzB4ZDAgDQpbIDEwMjAuNDM3MDEwXSBzY3NpX2FsbG9jX3NkZXYrMHgy
+YTAvMHgzZTAgWyAxMDIwLjQzODc2N10gDQpzY3NpX3Byb2JlX2FuZF9hZGRfbHVuKzB4MWJkLzB4
+NDMwIFsgMTAyMC40NDA3MjRdIA0KX19zY3NpX2FkZF9kZXZpY2UrMHgxMDkvMHgxMjAgWyAxMDIw
+LjQ0MjQ4OF0gDQphdGFfc2NzaV9zY2FuX2hvc3QrMHg5Ny8weDFjMCBbIDEwMjAuNDQ0MzA4XSAN
+CmFzeW5jX3J1bl9lbnRyeV9mbisweDMwLzB4MTMwIFsgMTAyMC40NDYxMTJdIA0KcHJvY2Vzc19v
+bmVfd29yaysweDIxMS8weDYzMCBbIDEwMjAuNDQ3ODg0XSB3b3JrZXJfdGhyZWFkKzB4MTg0LzB4
+MzMwIFsgDQoxMDIwLjQ0OTU2Ml0ga3RocmVhZCsweDEwZC8weDI1MCBbIDEwMjAuNDUxMDEzXSAN
+CnJldF9mcm9tX2ZvcmsrMHgyOWEvMHgzMDAgWyAxMDIwLjQ1MjY5OF0gcmV0X2Zyb21fZm9ya19h
+c20rMHgxYS8weDMwIFsgDQoxMDIwLjQ1NDQwM10gLT4gIzAgKGZzX3JlY2xhaW0peysuKy59LXsw
+OjB9OiBbIDEwMjAuNDU2NTU5XSANCl9fbG9ja19hY3F1aXJlKzB4MTQ2OC8weDIyMTAgWyAxMDIw
+LjQ1ODI5NF0gbG9ja19hY3F1aXJlKzB4ZDMvMHgyZjAgWyANCjEwMjAuNDU5OTM1XSBmc19yZWNs
+YWltX2FjcXVpcmUrMHg5OS8weGQwIFsgMTAyMC40NjE3MTJdIA0Ka21lbV9jYWNoZV9hbGxvY19u
+b2RlX25vcHJvZisweDVhLzB4NzcwIFsgMTAyMC40NjM4MjBdIA0KX19hbGxvY19za2IrMHgxNWYv
+MHgxOTAgWyAxMDIwLjQ2NTQxNF0gdGNwX3NlbmRfYWN0aXZlX3Jlc2V0KzB4M2YvMHgxZTAgDQpb
+IDEwMjAuNDY3Mzc0XSB0Y3BfZGlzY29ubmVjdCsweDU1MS8weDc3MCBbIDEwMjAuNDY5MTE2XSAN
+Cl9fdGNwX2Nsb3NlKzB4MmM3LzB4NTIwIFsgMTAyMC40NzA3NDJdIHRjcF9jbG9zZSsweDIwLzB4
+ODAgWyANCjEwMjAuNDcyMTYwXSBpbmV0X3JlbGVhc2UrMHgzNC8weDYwIFsgMTAyMC40NzM3MzJd
+IA0KX19zb2NrX3JlbGVhc2UrMHgzZC8weGMwIFsgMTAyMC40NzUzNDZdIHNvY2tfY2xvc2UrMHgx
+NC8weDIwIFsgDQoxMDIwLjQ3Njg0Ml0gX19mcHV0KzB4ZjEvMHgyYzAgWyAxMDIwLjQ3ODIwNF0g
+ZGVsYXllZF9mcHV0KzB4MzEvMHg1MCBbIA0KMTAyMC40Nzk3ODhdIHByb2Nlc3Nfb25lX3dvcmsr
+MHgyMTEvMHg2MzAgWyAxMDIwLjQ4MTUyMF0gDQp3b3JrZXJfdGhyZWFkKzB4MTg0LzB4MzMwIFsg
+MTAyMC40ODMyMDZdIGt0aHJlYWQrMHgxMGQvMHgyNTAgWyANCjEwMjAuNDg0NjgzXSByZXRfZnJv
+bV9mb3JrKzB4MjlhLzB4MzAwIFsgMTAyMC40ODYyODRdIA0KcmV0X2Zyb21fZm9ya19hc20rMHgx
+YS8weDMwIFsgMTAyMC40ODgwMDRdIG90aGVyIGluZm8gdGhhdCBtaWdodCBoZWxwIHVzIA0KZGVi
+dWcgdGhpczogWyAxMDIwLjQ5MTA2M10gQ2hhaW4gZXhpc3RzIG9mOiBmc19yZWNsYWltIC0tPiBz
+ZXQtPnNyY3UgLS0+IA0Kc2tfbG9jay1BRl9JTkVULU5WTUUgWyAxMDIwLjQ5NDk4NV0gUG9zc2li
+bGUgdW5zYWZlIGxvY2tpbmcgc2NlbmFyaW86IFsgDQoxMDIwLjQ5NzI2Ml0gQ1BVMCBDUFUxIFsg
+MTAyMC40OTkwMTVdIC0tLS0gLS0tLSBbIDEwMjAuNTAwNzkwXSANCmxvY2soc2tfbG9jay1BRl9J
+TkVULU5WTUUpOyBbIDEwMjAuNTAyMjk5XSBsb2NrKHNldC0+c3JjdSk7IFsgDQoxMDIwLjUwNDQ0
+NF0gbG9jayhza19sb2NrLUFGX0lORVQtTlZNRSk7IFsgMTAyMC41MDcwMTVdIA0KbG9jayhmc19y
+ZWNsYWltKTsgWyAxMDIwLjUwODI0Ml0gKioqIERFQURMT0NLICoqKiBbIDEwMjAuNTEwNTI0XSA0
+IGxvY2tzIA0KaGVsZCBieSBrd29ya2VyLzM0OjEvMzIzOiBbIDEwMjAuNTEyMjM1XSAjMDogZmZm
+Zjg4ODEwMDA2YWY0OCANCigod3FfY29tcGxldGlvbilldmVudHMpeysuKy59LXswOjB9LCBhdDog
+cHJvY2Vzc19vbmVfd29yaysweDU3YS8weDYzMCBbIA0KMTAyMC41MTU4OTJdICMxOiBmZmZmYzkw
+MDAwYzU3ZTI4IA0KKChkZWxheWVkX2ZwdXRfd29yaykud29yayl7Ky4rLn0tezA6MH0sIGF0OiBw
+cm9jZXNzX29uZV93b3JrKzB4MWQwLzB4NjMwIA0KWyAxMDIwLjUxOTY0NF0gIzI6IGZmZmY4ODgx
+MDQxZGE4ODggDQooJnNiLT5zX3R5cGUtPmlfbXV0ZXhfa2V5IzEwKXsrLisufS17NDo0fSwgYXQ6
+IF9fc29ja19yZWxlYXNlKzB4MzAvMHhjMCANClsgMTAyMC41MjMzMDldICMzOiBmZmZmODg4MTY3
+ZDg4ZTk4IChza19sb2NrLUFGX0lORVQtTlZNRSl7Ky4rLn0tezA6MH0sIA0KYXQ6IHRjcF9jbG9z
+ZSsweDE1LzB4ODAgWyAxMDIwLjUyNjY4M10gc3RhY2sgYmFja3RyYWNlOiBbIDEwMjAuNTI4MzM3
+XSANCkNQVTogMzQgVUlEOiAwIFBJRDogMzIzIENvbW06IGt3b3JrZXIvMzQ6MSBUYWludGVkOiBH
+IE4gNi4xOC4wLXJjNGxibGsrIA0KIzQgUFJFRU1QVCh2b2x1bnRhcnkpIFsgMTAyMC41MjgzNDFd
+IFRhaW50ZWQ6IFtOXT1URVNUIFsgMTAyMC41MjgzNDFdIA0KSGFyZHdhcmUgbmFtZTogUUVNVSBT
+dGFuZGFyZCBQQyAoaTQ0MEZYICsgUElJWCwgMTk5NiksIEJJT1MgDQpyZWwtMS4xNi4zLTAtZ2E2
+ZWQ2YjcwMWYwYS1wcmVidWlsdC5xZW11Lm9yZyAwNC8wMS8yMDE0IFsgMTAyMC41MjgzNDNdIA0K
+V29ya3F1ZXVlOiBldmVudHMgZGVsYXllZF9mcHV0IFsgMTAyMC41MjgzNDVdIENhbGwgVHJhY2U6
+IFsgMTAyMC41MjgzNDhdIA0KPFRBU0s+IFsgMTAyMC41MjgzNDldIGR1bXBfc3RhY2tfbHZsKzB4
+NzUvMHhiMCBbIDEwMjAuNTI4MzUzXSANCnByaW50X2NpcmN1bGFyX2J1ZysweDI2YS8weDMzMCBb
+IDEwMjAuNTI4MzU2XSANCmNoZWNrX25vbmNpcmN1bGFyKzB4MTJmLzB4MTUwIFsgMTAyMC41Mjgz
+NTldIA0KX19sb2NrX2FjcXVpcmUrMHgxNDY4LzB4MjIxMCBbIDEwMjAuNTI4MzYzXSBsb2NrX2Fj
+cXVpcmUrMHhkMy8weDJmMCBbIA0KMTAyMC41MjgzNjVdID8ga21lbV9jYWNoZV9hbGxvY19ub2Rl
+X25vcHJvZisweDVhLzB4NzcwIFsgMTAyMC41MjgzNjhdIA0KZnNfcmVjbGFpbV9hY3F1aXJlKzB4
+OTkvMHhkMCBbIDEwMjAuNTI4MzcwXSA/IA0Ka21lbV9jYWNoZV9hbGxvY19ub2RlX25vcHJvZisw
+eDVhLzB4NzcwIFsgMTAyMC41MjgzNzFdIA0Ka21lbV9jYWNoZV9hbGxvY19ub2RlX25vcHJvZisw
+eDVhLzB4NzcwIFsgMTAyMC41MjgzNzJdID8gDQpfX2FsbG9jX3NrYisweDE1Zi8weDE5MCBbIDEw
+MjAuNTI4Mzc1XSA/IF9fYWxsb2Nfc2tiKzB4MTVmLzB4MTkwIFsgDQoxMDIwLjUyODM3Nl0gX19h
+bGxvY19za2IrMHgxNWYvMHgxOTAgWyAxMDIwLjUyODM3OF0gDQp0Y3Bfc2VuZF9hY3RpdmVfcmVz
+ZXQrMHgzZi8weDFlMCBbIDEwMjAuNTI4MzgxXSANCnRjcF9kaXNjb25uZWN0KzB4NTUxLzB4Nzcw
+IFsgMTAyMC41MjgzODNdIF9fdGNwX2Nsb3NlKzB4MmM3LzB4NTIwIFsgDQoxMDIwLjUyODM4Nl0g
+dGNwX2Nsb3NlKzB4MjAvMHg4MCBbIDEwMjAuNTI4Mzg4XSBpbmV0X3JlbGVhc2UrMHgzNC8weDYw
+IFsgDQoxMDIwLjUyODM5MF0gX19zb2NrX3JlbGVhc2UrMHgzZC8weGMwIFsgMTAyMC41MjgzOTNd
+IA0Kc29ja19jbG9zZSsweDE0LzB4MjAgWyAxMDIwLjUyODM5NF0gX19mcHV0KzB4ZjEvMHgyYzAg
+WyAxMDIwLjUyODM5Nl0gDQpkZWxheWVkX2ZwdXQrMHgzMS8weDUwIFsgMTAyMC41MjgzOTddIHBy
+b2Nlc3Nfb25lX3dvcmsrMHgyMTEvMHg2MzAgWyANCjEwMjAuNTI4NDAwXSB3b3JrZXJfdGhyZWFk
+KzB4MTg0LzB4MzMwIFsgMTAyMC41Mjg0MDJdID8gDQpfX3BmeF93b3JrZXJfdGhyZWFkKzB4MTAv
+MHgxMCBbIDEwMjAuNTI4NDAzXSBrdGhyZWFkKzB4MTBkLzB4MjUwIFsgDQoxMDIwLjUyODQwNV0g
+PyBfX3BmeF9rdGhyZWFkKzB4MTAvMHgxMCBbIDEwMjAuNTI4NDA3XSANCnJldF9mcm9tX2Zvcmsr
+MHgyOWEvMHgzMDAgWyAxMDIwLjUyODQwOF0gPyBfX3BmeF9rdGhyZWFkKzB4MTAvMHgxMCBbIA0K
+MTAyMC41Mjg0MDldIHJldF9mcm9tX2ZvcmtfYXNtKzB4MWEvMHgzMCBbIDEwMjAuNTI4NDE0XSA8
+L1RBU0s+IC1jaw0KDQo=
