@@ -1,70 +1,84 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE8282EBBAF
-	for <linux-block@vger.kernel.org>; Tue, 11 Nov 2025 09:39:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EEDC2D7398;
+	Tue, 11 Nov 2025 09:43:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762853956; cv=none; b=X4Xffrbeq12sVnMsRyhCcF9d+h3sJJUW1kzo4L6Mi+LCyQvz3RCNckod7JA4n0SLRyA8jNF6+tnYi8v/ZnwQMDniyoZLR0Hg5MvC9isc+iXJXi2Gy8PNYBQrvQNJmr/uYb4RyfNQ5+LLRZTdrVow816PddqQLC7eT7qCkVTdZzI=
+	t=1762854199; cv=none; b=RsjCMVDcvomqeIHqRfuW9XBLvD3nhVN+Qv2BV54vVwbRByAxUotwlOfsXadDk4ampCAnBnnJQn3/fJ2VkOWMgaZcns3IeM1x1lN1c5Qytip5oIUnwIjSYhxXJvaHMbc3CRJ4fjehK2WCpF4Xh1IzqERd2F3O9f+RMlBpxbwcsTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762853956; c=relaxed/simple;
-	bh=IzuWBz5gYED9o9QnslycXAlrEioUcqIGM7IDy7QBMys=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LIODID3unDSvNw3wR6RFTV6bYDRephQF1K67t1stDJT4eZU8hIweotIEGC0no+2X4qO9Yo3yOlPeoz2uLqgn+GYCg5wtYGUqprZMCDBBNpw9J9UCoH/6qbioa7DLwPtNwwuMqw5lxxG/yBNY21j//IjS3cFm3piWtCG3sVSpH+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 70484227A87; Tue, 11 Nov 2025 10:39:03 +0100 (CET)
-Date: Tue, 11 Nov 2025 10:39:03 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Yu Kuai <yukuai@fnnas.com>
-Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>, Keith Busch <kbusch@meta.com>,
-	linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-	axboe@kernel.dk
-Subject: Re: [PATCHv5 1/2] block: accumulate memory segment gaps per bio
-Message-ID: <20251111093903.GB14438@lst.de>
-References: <20251014150456.2219261-1-kbusch@meta.com> <20251014150456.2219261-2-kbusch@meta.com> <aRK67ahJn15u5OGC@casper.infradead.org> <aRLAqyRBY6k4pT2M@kbusch-mbp> <20251111071439.GA4240@lst.de> <024631dc-3c65-49a8-a97a-f9110fd00e9a@fnnas.com>
+	s=arc-20240116; t=1762854199; c=relaxed/simple;
+	bh=EFgckVy4iUefAejLks1ILzXNYSpboVM39lPnuZZQi/s=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WLWJNC6JgGLlzEE6kV9mCsbI9wbGOIn9jmHQEwInsmLPgA3n9DJDsj60XOK5saNHai8bYNZDFTfdH/W4rDaxwLsT2ogna+XnIX0U994xZjatMVXDBgB1QOMSd8w7AA1JhfhK0c7ZNdX/JV2UPvJlHFYox18z5tgtyt1WrTx31oM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i0ji5CgG; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i0ji5CgG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 811F9C4CEFB;
+	Tue, 11 Nov 2025 09:43:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762854199;
+	bh=EFgckVy4iUefAejLks1ILzXNYSpboVM39lPnuZZQi/s=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=i0ji5CgGYgojSOQ7aitsv8rjpxzC8QSsw/0Tmlg9hBFa8QwueIzfgaFh9H8+PbX5z
+	 taA9fr1w6EC3bi8GBD1yrHcbe7SRnngbraRWa8K59YApEqwhq1uPaUATVzgCxcn00X
+	 Lz96Gtw51K5mXTfIFf1PpG+pFq9igzWEkWVGE+ze4IVpAk5AGfzgHC9nmMhcmuA7qt
+	 UAaXbkmzjFAzF1ERkV7eCdRaqSzjNI4LaQbzvPU6yxs/5vP7eqqIo7GeCQyQABzZx1
+	 9u5n192KyC8R9PrVwjh8Et9oDp+sARxkHSmeRae0z89Lbxc7wHrPfY8LdqYTv07276
+	 zc/buY0rsjnsA==
+From: Christian Brauner <brauner@kernel.org>
+To: linux-fsdevel@vger.kernel.org,
+	libaokun@huaweicloud.com
+Cc: Christian Brauner <brauner@kernel.org>,
+	jack@suse.cz,
+	viro@zeniv.linux.org.uk,
+	axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com,
+	libaokun1@huawei.com,
+	Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [PATCH] bdev: add hint prints in sb_set_blocksize() for LBS dependency on THP
+Date: Tue, 11 Nov 2025 10:43:11 +0100
+Message-ID: <20251111-golden-drinnen-9a205c60b6bb@brauner>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20251110124714.1329978-1-libaokun@huaweicloud.com>
+References: <20251110124714.1329978-1-libaokun@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <024631dc-3c65-49a8-a97a-f9110fd00e9a@fnnas.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1201; i=brauner@kernel.org; h=from:subject:message-id; bh=EFgckVy4iUefAejLks1ILzXNYSpboVM39lPnuZZQi/s=; b=kA0DAAoWkcYbwGV43KIByyZiAGkTBTGibdmvDS7qhLpXIdlKff2bR5kUG5IddbdFxZHnfAVFQ Yh1BAAWCgAdFiEEQIc0Vx6nDHizMmkokcYbwGV43KIFAmkTBTEACgkQkcYbwGV43KLnqwD9F6LC Ri0sbdi79L+VaY7T1gL8OMpzo+Mdp/fE/QsxIacBAKnj26g5vA+q5JBxvmtNOQQ3P9xJE5qcS9f ycynnswME
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Transfer-Encoding: 8bit
 
-On Tue, Nov 11, 2025 at 05:36:39PM +0800, Yu Kuai wrote:
-> This can be reproduced 100% with branch for-6.19/block now, just:
+On Mon, 10 Nov 2025 20:47:14 +0800, libaokun@huaweicloud.com wrote:
+> Support for block sizes greater than the page size depends on large
+> folios, which in turn require CONFIG_TRANSPARENT_HUGEPAGE to be enabled.
 > 
-> blkdiscard /dev/md0
+> Because the code is wrapped in multiple layers of abstraction, this
+> dependency is rather obscure, so users may not realize it and may be
+> unsure how to enable LBS.
 > 
-> Where discard IO will be split to different underlying disks and then
-> merge. And for discard bio, bio->bi_io_vec is NULL. So when discard
-> bio ends up to the merge path, bio->bi_io_vec will be dereferenced
-> unconditionally.
+> [...]
 
-Ah, so it's not a NULL req->bio but bio->bi_io_vec.
+Applied to the vfs-6.19.misc branch of the vfs/vfs.git tree.
+Patches in the vfs-6.19.misc branch should appear in linux-next soon.
 
-> 
-> How about following simple fix:
-> 
-> diff --git a/block/blk-merge.c b/block/blk-merge.c
-> index 3ca6fbf8b787..31f460422fe3 100644
-> --- a/block/blk-merge.c
-> +++ b/block/blk-merge.c
-> @@ -740,6 +740,9 @@ u8 bio_seg_gap(struct request_queue *q, struct bio *prev, struct bio *next,
->          gaps_bit = min_not_zero(gaps_bit, prev->bi_bvec_gap_bit);
->          gaps_bit = min_not_zero(gaps_bit, next->bi_bvec_gap_bit);
-> 
-> +       if (op_is_discard(prev->bi_opf) || op_is_discard(next->bi_opf))
-> +               return gaps_bit;
-> +
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
 
-I think the problem is how we even end up here?  The only merging
-for discard should be the special multi-segment merge.  So I think
-something higher up is messed up
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
 
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
+
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs-6.19.misc
+
+[1/1] bdev: add hint prints in sb_set_blocksize() for LBS dependency on THP
+      https://git.kernel.org/vfs/vfs/c/5382107fad9b
