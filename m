@@ -1,103 +1,85 @@
-Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
+Received: from sg-1-11.ptr.blmpb.com (sg-1-11.ptr.blmpb.com [118.26.132.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9529308F14
-	for <linux-block@vger.kernel.org>; Tue, 11 Nov 2025 14:02:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEA2A3AA195
+	for <linux-block@vger.kernel.org>; Tue, 11 Nov 2025 14:03:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762869772; cv=none; b=eyWhod8WpCRXHteeV0TF8YMXdWaqW+1bVzkyUtS66dMSxNEt0dk6ngKg8G3An3hXHAMkHvrcHWdzdj+6gGIub/6/rtuIUDELDar8psSGravlsQ3l7lk+DDaR2hxFvhLqzdgcaqiE76UH0hX7bSim4lMytKp7u3acJwpyLVr7xHw=
+	t=1762869830; cv=none; b=FDQv6XF/gmaoNSXjnATs15/wxmYL8PlIFQKfaqLb+Jvqe3u3dR95z0ALaj7umPt7mX41Eg3ybLNFLtEzzrt7Q6AeZ3ggrGJf5D2I5yP6AF56qbtCHxAeVLCUurXynhm621SO1fO95G+QYNexYkQsH/BC+LEpJ9H6EhTEqur/+1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762869772; c=relaxed/simple;
-	bh=+r3MreT/sT1crw54UI3hsaeGtJviYXqN84hPams0hvY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CyI9YBijpIr/aY/5kLlcS1ZQ/rnSPXxDYD4hTXpHjriWshk2zkFiHXEiTJ4oqT+7OIwzoSQz32o0+ELUssC7zrwDYynVqT0z8PdFkF1Y8gSrwEnunsUV9PW4wqH7bPaJs4tvF6iUkyphKHwzLX695Z6tSn3sMs6DnOQgfuLak9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=rm1hMLqq; arc=none smtp.client-ip=209.85.166.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1762869830; c=relaxed/simple;
+	bh=/5kmZWPLrOXlUSVGBi3iNjaRUd4UXNYQkUNK5+RlXsA=;
+	h=Mime-Version:From:Subject:Message-Id:Cc:Date:To:Content-Type:
+	 In-Reply-To:References; b=U7+DEr0IWVHlZV1tmeSR7/eA3X9Z46HdH+c/4eNwZbRpL0AtUeCvvjwJiuj03mtsydZvSfMD4N/7rZC73LwyFNFvgRY3vAm4tpftBJGK548OauiuoYFBg7B2sZOWdQjzGck+sxpnMJiU2S8io5J64yn3Dxw1i56a2aiwDT51hxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=none smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=vaeq8iZq; arc=none smtp.client-ip=118.26.132.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=fnnas.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="rm1hMLqq"
-Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-93e7c7c3d0bso357363439f.2
-        for <linux-block@vger.kernel.org>; Tue, 11 Nov 2025 06:02:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1762869769; x=1763474569; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kawQyvNWLbHDUPhQUWN8vZdFV5j3qEt7ltniUTxkDo4=;
-        b=rm1hMLqqj8ptfoOWC40cTuLVzu3hQBh7hJUEIgih8e4Y933cglapFvvAcxQGDg2a8B
-         gt6Dn1Uk7Lwwr4k991phNHRBMgCFSaisidvxuTOdtQaraiilQn8Xzvok7hXQIzgCfxok
-         NGBU7l5iZd7bcr10kEaW4ZbqRSpzwjgLEgGF6AEYl3u6lq5YCGMJ8BWpoHm4+B81Ekmc
-         p80e4gLrcVECFkhlzVFcPbuiro8IfXKcLw5SRSeN44wR71vyFuhxJsYEwduSZoVRXxrr
-         xshO2z4CCwlorwJ19q0N+zkBGJkF+yL83GOsC0EieAQ69Qi++eF0DsI8MnIIsFTuJBQZ
-         9p+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762869769; x=1763474569;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kawQyvNWLbHDUPhQUWN8vZdFV5j3qEt7ltniUTxkDo4=;
-        b=P6MplWXxdEdK6fXJGQWHDujmit+Hp4q2qrhf651y4BNdpTiPiNfcI45HFBAYDqOq1l
-         1Z9WC+KrlWYoj1fI1PsGxK6ILxhKrq3KStb74z8K8ZcGi1AmTz9+DKl9+JDYCcjlPbYy
-         u45IVieg10cmeUWQEKZ/9Q7lFirWgftXlCn2RnIDHtjS7UrBByfaC/hDa6KuFLg1mutJ
-         xbr+3OUyxi29V6YJO/rr6dSCtlXM5eT6XvdEoMAKjT+mgg7y20aD8NvYa+Lxomph5eMe
-         wTbjkQORUAXnk6C+zrd0rMkVl1/sxMzg2ir2huiy/vA39yCtbudUehaNNIGwK8MkI2pg
-         D/FA==
-X-Forwarded-Encrypted: i=1; AJvYcCXdF5VFSuSLSXqkb6DIIaAtTKO8NtatVyxsRuWvLRsR/5r0QD4UNDoYFs98oYWPXN4ckPr/cTDFzjccIg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJB0YhG0XuR887yZcsAQgT8HpmoDWplWlIBYUWjxZAB0Beeln+
-	3M9ij4xS8O4SKKKOGem9sYcargUdiJ+3VaBHrPM+46mOmd92n8LwW9q3t5tCLLiuARA=
-X-Gm-Gg: ASbGncvHktU5eJ0RvykbH3xPYxuKM1QBNaSorV9OKN1rEsFdcngw/jJbvqVCBfuS/br
-	TVJtLRbyJylaHTJXC3OsKTCdx8bmXl899sraqu4QOYrymJkm+hM8OdiApcXyMp05S/L2Qjiuy6V
-	0Eoxl7colqcvSBU0zqksIhB8BpGkxRBEKigSYZs5UgSF8MTyP3G7BDof5q+YyCWly6hIQ/IfFoM
-	6V7jv8l+nZFaFul8dvnkGj8E28/SD4NaAYsbc6NNZKGX6+4ztfl18uqM+D5MHqKI6zvB9nB4bQG
-	OlExaw3WPEBWbBxGKEYviN9Xv3G5AIZEX6z6TxJp+UuWZQL0o7b6e64PcRTxNK/mel1aKBjPy81
-	ts2jpK+tr3px8GSC7qh7d+PpsNywd8LHzpaopmMQnFO+Pyseve5uN4794SJBXI0lGob9DAFYtGg
-	==
-X-Google-Smtp-Source: AGHT+IEjx/Ad1PPGGmmL2f+33W3x8Uw2hjSm6whM7hoISF4f4YXW/8JP7W6YocdtEbXJDFt6cPZXgg==
-X-Received: by 2002:a05:6602:14c8:b0:948:6aca:4932 with SMTP id ca18e2360f4ac-94895f76778mr1714074539f.3.1762869768413;
-        Tue, 11 Nov 2025 06:02:48 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5b74698c508sm6266557173.59.2025.11.11.06.02.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Nov 2025 06:02:47 -0800 (PST)
-Message-ID: <0bfb4acf-b07d-4b12-8f4c-fc5359595d47@kernel.dk>
-Date: Tue, 11 Nov 2025 07:02:45 -0700
+	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="vaeq8iZq"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1762869818;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=Ae4EIh4ONcbs6jvdEyBqGmmn/47kQ5NZ9WtLM72vbj8=;
+ b=vaeq8iZqHTd7SDI8+3xNWw+UJ/e7nqiRyP94OXffRhAEzYdLV2ty6WLjtmPqFi2IfXCgk5
+ KuOiSE/6pVTOyYBh67OQkITIT5taAmhf99i+eFvCltREX1Npf9tsH5sIs0bwb+1s2RpQXG
+ fYxfJlAVfGzBpdnD+vycR/tmcuQX2kruGGaI26Xgc97PrAFiU5DL9nHCaEOiHs+5FUftaa
+ pknXa2nvvbd3nWCqrwBCl0nyBtEKT4Br7COQ0JaQjyEl8XV3blTk+yOOmg3dRpob3WB9mU
+ VifyUnNpGlYspa/zzvh0K5PdDr5F2xmg6rghZzE5cW2RHVarT4nLB4zzo0b6tQ==
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+From: "Yu Kuai" <yukuai@fnnas.com>
+Subject: Re: [PATCHv5 1/2] block: accumulate memory segment gaps per bio
+Message-Id: <ab181a42-ffe6-4d12-8b8d-7aca1069c59e@fnnas.com>
 User-Agent: Mozilla Thunderbird
-Subject: Re: [GIT PULL] md-6.19-20251111
-To: Yu Kuai <yukuai@fnnas.com>, linux-block@vger.kernel.org,
- linux-raid@vger.kernel.org
-Cc: linan122@huawei.com, hehuiwen@kylinos.cn, xni@redhat.com,
- nichen@iscas.ac.cn, john.g.garry@oracle.com, wuguanghao3@huawei.com,
- yun.zhou@windriver.com
-References: <20251111033529.2178410-1-yukuai@fnnas.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20251111033529.2178410-1-yukuai@fnnas.com>
+Cc: "Matthew Wilcox" <willy@infradead.org>, "Keith Busch" <kbusch@meta.com>, 
+	<linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>, 
+	<axboe@kernel.dk>, <yukuai@fnnas.com>
+Date: Tue, 11 Nov 2025 22:03:33 +0800
+Content-Transfer-Encoding: quoted-printable
+X-Original-From: Yu Kuai <yukuai@fnnas.com>
+To: "Keith Busch" <kbusch@kernel.org>, "Christoph Hellwig" <hch@lst.de>
+Received: from [192.168.1.104] ([39.182.0.168]) by smtp.feishu.cn with ESMTPS; Tue, 11 Nov 2025 22:03:35 +0800
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <aRNALUnnxzIuyHng@kbusch-mbp>
+References: <20251014150456.2219261-1-kbusch@meta.com> <20251014150456.2219261-2-kbusch@meta.com> <aRK67ahJn15u5OGC@casper.infradead.org> <aRLAqyRBY6k4pT2M@kbusch-mbp> <20251111071439.GA4240@lst.de> <024631dc-3c65-49a8-a97a-f9110fd00e9a@fnnas.com> <20251111093903.GB14438@lst.de> <c82cd0f1-f56e-445b-8d78-f55a0c3b2b4c@fnnas.com> <aRM5UoApKZ9_V7PV@kbusch-mbp> <20251111134001.GA708@lst.de> <aRNALUnnxzIuyHng@kbusch-mbp>
+Reply-To: yukuai@fnnas.com
+X-Lms-Return-Path: <lba+269134238+c30958+vger.kernel.org+yukuai@fnnas.com>
 
-On 11/10/25 8:35 PM, Yu Kuai wrote:
-> Hi, Jens
-> 
-> Please consider pulling following changes on your for-6.19/block branch,
-> this pull request contain:
-> 
-> - change maintainer's email address (Yu Kuai)
-> - data can be lost if array is created with different lbs devices, fix
->   this problem and record lbs of the array in metadata (Li Nan)
-> - fix rcu protection for md_thread (Yun Zhou)
-> - fix mddev kobject lifetime regression (Xiao Ni)
-> - enable atomic writes for md-linear (John Garry)
-> - some cleanups (Chen Ni, Huiwen He, Wu Guanghao)
+Hi,
 
-Pulled, thanks.
+=E5=9C=A8 2025/11/11 21:54, Keith Busch =E5=86=99=E9=81=93:
+> On Tue, Nov 11, 2025 at 02:40:01PM +0100, Christoph Hellwig wrote:
+>> On Tue, Nov 11, 2025 at 08:25:38AM -0500, Keith Busch wrote:
+>>> Ah, so we're merging a discard for a device that doesn't support
+>>> vectored discard. I think we still want to be able to front/back merge
+>>> such requests, though.
+>> Yes, but purely based on bi_sector/bi_size, not based on the payload.
+> This should do it:
+>
+> ---
+> diff --git a/block/blk-merge.c b/block/blk-merge.c
+> index 3ca6fbf8b7870..d3115d7469df0 100644
+> --- a/block/blk-merge.c
+> +++ b/block/blk-merge.c
+> @@ -737,6 +737,9 @@ u8 bio_seg_gap(struct request_queue *q, struct bio *p=
+rev, struct bio *next,
+>   {
+>   	struct bio_vec pb, nb;
+>  =20
+> +	if (!bio_has_data(prev))
+> +		return 0;
+> +
+>   	gaps_bit =3D min_not_zero(gaps_bit, prev->bi_bvec_gap_bit);
+>   	gaps_bit =3D min_not_zero(gaps_bit, next->bi_bvec_gap_bit);
+>  =20
+> --
 
--- 
-Jens Axboe
+This looks good.
 
+Thanks,
+Kuai
