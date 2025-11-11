@@ -1,66 +1,47 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53141F513
-	for <linux-block@vger.kernel.org>; Tue, 11 Nov 2025 07:13:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68DDFF513
+	for <linux-block@vger.kernel.org>; Tue, 11 Nov 2025 07:14:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762845192; cv=none; b=YGkb5Z9z4EheexmLFVWK21+lRFPpM4WgI8r7hHjMHruEiAoO0qXWeTKtc84uJvY9XmcBH70xYPwZSB6DmEfex+lzqw04lTzWS6qbnJNw42aewAQZQrLv7RdEvz39qcAySiARopH7G9wsHGwI8K1xZnGPyDs1ZbTQv/4qAenuFtc=
+	t=1762845290; cv=none; b=Evb1+s03P9mcj0ktAxXkO/pp6IpVszQ8LOklrdhf6DlaB5aSmpC1ZB6QcZDajaAS6LuSvYYqQWd00x5qvk6TccevCZx4IkG72zZ8L47HI+EfgpjyfiLZWt5Vrd9A33wKmzk/Kh2aSLdyVbyb/nhA45BPzlDncy0kISmdoZU/eGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762845192; c=relaxed/simple;
-	bh=gCqe7z8l68Vc70gRTJgpCR1oPvegacLLJlALpORFlns=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TgVHLrvw8tkYOcjGyF78eVViu0fob0ZnCgR4+Euk69rleqOhw/fwOzRtp2tbNg1pQUcReWc8FAYScAGBFBApD6iWIpo1HKXETSrRX0hxuZeQf4Hn3Blqv2hIQK7sZdaWy+kc/m9cG0a1CX4LWOVUseEKodUINaHDlrHDkWbExIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CXHGISRb; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CXHGISRb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1248EC113D0;
-	Tue, 11 Nov 2025 07:13:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762845187;
-	bh=gCqe7z8l68Vc70gRTJgpCR1oPvegacLLJlALpORFlns=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=CXHGISRbE6j1CFkrYuscMQmXRKITnKkOi5SySKMiOjNVeHXRe/DqB35wzlNx5vhUy
-	 1rf0D6i0m3laXxLLAyVfv0qrmk3K2zE7uHFOAsudHFd44MZfwdIJ9OYN19UCQfooaX
-	 knZBFVN4R/scjE7/l9J7VKeySSINxNPOAKcjFzTme/7YYd4JEFjLog6t1RiU36C5XO
-	 LCam6wfPfcJFpXoR6rGLDhv7J6oWp3ge5zMg2NlI4gJpo590xhjlJ3tlTwdYfa2Yge
-	 9+Eb1K9io6dhP1jHUD88/8VaPLPDN6ZvnD2fV4HxPJv+FhQe8hLsYoq/3r+cTev/jf
-	 NveVqnKDaKVMQ==
-Message-ID: <5c264096-2bc1-42b7-91af-739f4ca1916b@kernel.org>
-Date: Tue, 11 Nov 2025 16:09:10 +0900
+	s=arc-20240116; t=1762845290; c=relaxed/simple;
+	bh=04+5KjgisiLHiiEW99zbS9wzJTW6Tibh80TlX1ZK+Do=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HjRY9lHxuIr40wQWvLYqO/HWv8eAZf9AGFdls3qGM8OAXSMAm1X51Tzg+MnfZVPuZkAC5RYP/CPyf84wbbIPu/+b79fOsJqqibWVbzwnuZvmEPF0MoeTpP6zAsmw9VXTBEfcB9fszALOPL7VOtG5H7eGqgMpqNa9LKkKWOHvfdo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id CF1FA227AA8; Tue, 11 Nov 2025 08:14:39 +0100 (CET)
+Date: Tue, 11 Nov 2025 08:14:39 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Keith Busch <kbusch@kernel.org>
+Cc: Matthew Wilcox <willy@infradead.org>, Keith Busch <kbusch@meta.com>,
+	hch@lst.de, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, axboe@kernel.dk
+Subject: Re: [PATCHv5 1/2] block: accumulate memory segment gaps per bio
+Message-ID: <20251111071439.GA4240@lst.de>
+References: <20251014150456.2219261-1-kbusch@meta.com> <20251014150456.2219261-2-kbusch@meta.com> <aRK67ahJn15u5OGC@casper.infradead.org> <aRLAqyRBY6k4pT2M@kbusch-mbp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/4] blk-zoned: Split an if-statement
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-References: <20251110223003.2900613-1-bvanassche@acm.org>
- <20251110223003.2900613-4-bvanassche@acm.org>
-From: Damien Le Moal <dlemoal@kernel.org>
-Content-Language: en-US
-Organization: Western Digital Research
-In-Reply-To: <20251110223003.2900613-4-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aRLAqyRBY6k4pT2M@kbusch-mbp>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On 11/11/25 7:30 AM, Bart Van Assche wrote:
-> Split an if-statement and also the comment above that if-statement. This
-> patch makes the code slightly easier to read. No functionality has been
-> changed.
-> 
-> Cc: Damien Le Moal <dlemoal@kernel.org>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+On Mon, Nov 10, 2025 at 11:50:51PM -0500, Keith Busch wrote:
+> Thanks for the heads up. This is in the path I'd been modifying lately,
+> so sounds plausible that I introduced the bug. The information here
+> should be enough for me to make progress: it looks like req->bio is NULL
+> in your trace, which I did not expect would happen. But it's late here
+> too, so look with fresh eyes in the morning.
 
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
-
-Though it feels like this should be squashed with patch 4/4.
-
-
--- 
-Damien Le Moal
-Western Digital Research
+req->bio should only be NULL for flush requests or passthrough requests
+that do not transfer data.  None of them should end up in this path.
