@@ -1,72 +1,73 @@
-Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
+Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97FB9331215
-	for <linux-block@vger.kernel.org>; Tue, 11 Nov 2025 15:36:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E6935F8A7
+	for <linux-block@vger.kernel.org>; Tue, 11 Nov 2025 15:39:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762875382; cv=none; b=aYLxJ/anx75G+vMKnb7P4fCmnu3AlbQgGe4qqomaGjI2TJYQbKG/JZvrKB1+G8NPXbWP0E0LtmcqYtUQUS2QYBLuYMgLu8VEfEVU/oz9G0J7J1jxpKbAHx8suH6k37JSb82ZYWg16XNhQ158k3gmqSsAs9nrvm4gBf/sHCf908s=
+	t=1762875582; cv=none; b=klyx/FGGw6qlkAEL4pln8NfvUssfpv6aKgGpm7YZoVMYeRX5Uz+q7mwoPgUkLTMhZzFtqvKzt/ca9TgGKbqISDsvufXI3SIWXbmHgIi4gkiCt/vKlQnuXOuQeubs49e+vkNUpcGmuXvtQnGqvFwKj7HnU/qxansEZ9KyViEsd4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762875382; c=relaxed/simple;
-	bh=fkLEpn5IW5RtBAfwB9p4yqA4T0FYBWk5L4CdUP0OFB0=;
+	s=arc-20240116; t=1762875582; c=relaxed/simple;
+	bh=cEH5jKud37Ut4uAau2wbec6Mi8UBb61QRGB2ASEBwck=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=MAl5byyrXYqrIl/b01fDr5iFqOFNcZDsr3JdWKQk/HaMF9BBcq/781XUa/4+hJ0dBqX16VlPz39dIBZ95MsXVuKp7tyvarQdPsLCqPY1uTHZKOzUaixs3jD8HTiDRvcvp2TON+jcOknVL4lR3rST2O4ppkEhs5MkiXTUc3ExWaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=R+KWEfLM; arc=none smtp.client-ip=209.85.166.182
+	 MIME-Version:Content-Type; b=WHI67C7PQ6Fh/jIxbTChnbR2g+2AzPU0p2sL4qObbCkeOrhkx18beL1cUkOP8qMOPPdG+sx2r0e+aP2yEAlblGvFxOOv88yp4u++2s/vEO1PUfeZ7CxefIddKF4Z6Ren7Yj48+3ALJhX1YBsl1TP2TN0KKErtroUHRVQAwZygbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=QazHqZyj; arc=none smtp.client-ip=209.85.166.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="R+KWEfLM"
-Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-4337076ae3fso15960665ab.1
-        for <linux-block@vger.kernel.org>; Tue, 11 Nov 2025 07:36:19 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="QazHqZyj"
+Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-4331e9cb748so3690915ab.1
+        for <linux-block@vger.kernel.org>; Tue, 11 Nov 2025 07:39:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1762875378; x=1763480178; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1762875579; x=1763480379; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZMIoGR4xeNbxvWJ8AeyNEhi+trRuU0DC7MBoEsb8APk=;
-        b=R+KWEfLMnI09xgPw7gY3DKPEP1DWkILxwFnirWm9RPqw1VDwXAtka2bNQ5dRWv7EHf
-         Pf1Rn9iQ3sOH8eMkZWLk0ET+wX2QsSBZsEEfecFbPrV6nRvWbIqgI/D21NsB1VYI/AsR
-         Im1A5VcSenp33eC79MpUI2BaKmFN9PBU0AwaJGHpVcDEhkeuTBDJ4cVgTr9znx4NOQXj
-         fpAasaeBvbVyKoWc8HW80KYlK1cMW8DdBHcGbb+mscltuZuaUetUVFGQWAT1EjB8kXYe
-         qAk2dRY6+6l9ohlUUJ0aRnEcmnJ6/J70VqODek/WQIg7+xO8JuS/Uy6HSbWt3HqSnBc4
-         91zg==
+        bh=CLrTWxuYaH3EU6gA0gU55ZOBwqFiNvTbPI5shGJZ/Vs=;
+        b=QazHqZyjAF/FRldg2XwA9cPDDRd7U4GG0KLoW42e7GqigksMrQW7S+sl18mOyncTks
+         fx2/Zasa9h6aeQATfyY2LksKa4R/H9r9BLyQPM9y1ImT/M8gYMmW9lmen9cR+Bg9e0/H
+         YFhOnXA48bDqLRdNznnwOuWLn/UMe+Z2pCjgyXJBchUCJQWEQ4pKKlKISGLkUPofhgSQ
+         EyzIlI+0hNoZzXZ8m3RveKGrMpl5Jlj3hO+GLvt2xJiDLOVxg2JtdrksH4tKTqbqlCXs
+         X3xmYSSf3fGDG1Ic9qUwkTkCMRmFgcFdrFo4Ua38JNBvxBqOdxDLXwBE4jnFFy24hU8g
+         5h6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762875378; x=1763480178;
+        d=1e100.net; s=20230601; t=1762875579; x=1763480379;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=ZMIoGR4xeNbxvWJ8AeyNEhi+trRuU0DC7MBoEsb8APk=;
-        b=we6HVDTJumSm7nfIX6R5mDe4uFUH86QoCQpRhsKAcefjxWh3bt/ludK0pH8z8QDj0S
-         ZluEkKZvmNnmYl2sBKcu2dx8KiNunAuQcIAY1dExLBfp0tzQbmGXHj/MnF466e0a3arb
-         8G1SSBak/O8EeTymc+kUp1eRFkr0YADiyRFUG4oSdC0Xzlz5XkCeJsF+2ON2O4VW21xl
-         1IQ/Y3/C9Zd59Xo2k/FTuzAfEXUnNjnVw1/NtQmZeYakF8e7fKOppYPZ75MEWm3qbTnI
-         Q9ZDAxrQl+obxuKLe4Gdbe/9PjU/pbBxG/EpWVh4NJOCh4R9Jx6tY7AIfnQhGNXDVma7
-         Gf3A==
-X-Gm-Message-State: AOJu0Yxsd0SXSikVBw0fhdSe60dL3m7gcqcfIJPRfuYszsPxK0lFCq0u
-	dnE6V2k7NVK4PTdDdvPk+cJQUzbM9hQ/sYCeju6vgxBrYK4EZRJndnPO2OiD2xdwZOc=
-X-Gm-Gg: ASbGncvSa5EOJw8YrsPKRoBXWXXNKy+An5HI5GI+dv7RK0nTl7FZ0g/04uFiN9PuMfi
-	2OmRHUERCmwDel+qxCvpDY78G6/li2OoP1ajKBae9vP8PUUhRsAhXvh+1dj3iRCWzAiQ+1b5Nl5
-	WdKgFxpStaE8dFDyiigW5UNC2Pbvl+m7fOJyR5XG2Kq996y4Tn1iOqG3WTWmNL/UgeDJMLCuQfl
-	jy/7bMpw6Qw23JPjKb31EhG6CEBEOyiJsmZlXOqN3o7vtm4M9oNZSc4Vkd6oL/pvrcdR4B2Y+db
-	LZ+ozZLNPHLUYU9e9yNgkNUugkzDR3e4qomdIbwrKKALtby8c4oWNKXD7y9F4CtXf/RSp9QWSAB
-	svkcPK1Apr297u7SHWm2neTZMQhH6K0pupsPwiCChETmAK6ZMa9J1uFtqggxvHuB8Ab14j+1nKX
-	3TqmU=
-X-Google-Smtp-Source: AGHT+IGWXNwRfF8x6SN//ASxy+zY6uK9f9sb7lB0geZ6oANWguOWXvE/LHmFtJAroSn1950bEcUcyw==
-X-Received: by 2002:a92:cbc5:0:b0:433:77ee:1e3c with SMTP id e9e14a558f8ab-43377ee1f62mr114637665ab.2.1762875378624;
-        Tue, 11 Nov 2025 07:36:18 -0800 (PST)
+        bh=CLrTWxuYaH3EU6gA0gU55ZOBwqFiNvTbPI5shGJZ/Vs=;
+        b=w2wWamYJdo9+OEzv+8Mgxtp9zqwPL/flZwRKI4k1UvcBTjl30U5FM6BNACihtVL+5S
+         +cC0gNARfE1x4b8iG87aynkkKMHrfSy7VDD3Ia1PQVO3ebULcslmwNv+5LFfFxnhx2mJ
+         0pYT/J09wwBoWOKdNgRqYVcg7Np/Lm8oR+H+5N+IpPAzgnFVJYqh4SVsNAyAH5GAZG2M
+         QQJyPqTeg4hcTJ/r4LLCIDfm7hH1Ru4QanAS8HeWwcR8XPchPxZMYPFrjNmB8884MIB7
+         uuyQrGSMApZvWB5bJCB+qn02by9rExD1qJza74O5yQR4pm7HHphUpa4nI8YXFoSLt/mf
+         PcHg==
+X-Gm-Message-State: AOJu0Yzchfz1owq/fuC6KNT1DJs4bdtV485+XsYvQzdaGAX2pnSyxAVs
+	ch6CHIm1AE7kwAdhRTYgA9vObnsaVmG1zwOawark1UeGj9iJ2wEaN8Qkzq3cyjbquuw3hGQ1lix
+	VYkVi
+X-Gm-Gg: ASbGncss2Qo5OZae+nZE+pk2C6gk577Pgi3bK4uuaI9yaZMJR7AVJaJZ2eCxJeZ+WzA
+	IxlTUjtXhIKncHSa5idto+xgfnYWtynA1I976noqngmjLJV9dfgWr50WuVcJlr+C4MjTw8Wrvce
+	OHEQWvUngxaqPMppPl94f3KZ82WLqu6VORqj9loAXT15ed79E6EBTrklUNaS3z1y+o+7M0K5hru
+	yQYa69fhpEAhjI/+j4L+rmjFfJclScGpRtVGgzGBYBxu9YDqaWgexBTWGwhmutBC8cwN+8UyFVT
+	ZOa+94E+4KBFXe4pI54BeQuAMXtlAG//ZZ4LKleFiWW1SYNe9/QQAYobp8f2wSm1UQplt27Bqbt
+	MbLN2hGL2Yuz8bPKvdd6jvExZZHGbwI3gdF5ZckDcmTMnejHVYrUAgT6xYYeRmvoJbl8T+nflNp
+	HVEYo=
+X-Google-Smtp-Source: AGHT+IHFsM5Zl0GGE51bbx2dgFFwizRiJUsR67FF2A6HSsCKq/X0xIJ2XJp1FbG+RSFGG3MnBlWa5Q==
+X-Received: by 2002:a05:6e02:ecd:b0:433:3060:f5b with SMTP id e9e14a558f8ab-4338beed058mr38487015ab.12.1762875579296;
+        Tue, 11 Nov 2025 07:39:39 -0800 (PST)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5b7aaf59b2asm3288173.6.2025.11.11.07.36.17
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-43473301539sm113695ab.2.2025.11.11.07.39.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Nov 2025 07:36:17 -0800 (PST)
+        Tue, 11 Nov 2025 07:39:38 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, hch@lst.de, Keith Busch <kbusch@meta.com>
-Cc: yukuai@fnnas.com, Keith Busch <kbusch@kernel.org>, 
- Matthew Wilcox <willy@infradead.org>
-In-Reply-To: <20251111140620.2606536-1-kbusch@meta.com>
-References: <20251111140620.2606536-1-kbusch@meta.com>
-Subject: Re: [PATCH] block: fix merging data-less bios
-Message-Id: <176287537700.179777.7442841246937619442.b4-ty@kernel.dk>
-Date: Tue, 11 Nov 2025 08:36:17 -0700
+To: Kriish Sharma <kriish.sharma2006@gmail.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20251111115810.2320857-1-kriish.sharma2006@gmail.com>
+References: <20251111115810.2320857-1-kriish.sharma2006@gmail.com>
+Subject: Re: [PATCH] blk-mq-dma: fix kernel-doc function name for integrity
+ DMA iterator
+Message-Id: <176287557764.181573.7380138449406423011.b4-ty@kernel.dk>
+Date: Tue, 11 Nov 2025 08:39:37 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -78,16 +79,22 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3
 
 
-On Tue, 11 Nov 2025 06:06:20 -0800, Keith Busch wrote:
-> The data segment gaps the block layer tracks doesn't apply to bio's that
-> don't have data. Skip calculating this to fix a NULL pointer access.
+On Tue, 11 Nov 2025 11:58:10 +0000, Kriish Sharma wrote:
+> Documentation build reported:
 > 
+>   Warning: block/blk-mq-dma.c:373 expecting prototype for blk_rq_integrity_dma_map_iter_start(). Prototype was for blk_rq_integrity_dma_map_iter_next() instead
 > 
+> The kernel-doc comment above `blk_rq_integrity_dma_map_iter_next()` used
+> the wrong function name (`blk_rq_integrity_dma_map_iter_start`) in its
+> header. This patch corrects the function name in the kernel-doc block to
+> match the actual implementation, ensuring clean documentation builds.
+> 
+> [...]
 
 Applied, thanks!
 
-[1/1] block: fix merging data-less bios
-      commit: fd9ecd005252b595fd02ff7fcc4056251027404d
+[1/1] blk-mq-dma: fix kernel-doc function name for integrity DMA iterator
+      commit: 6d7e3870af11c2b5966b2769f9e8a0d4764f52cc
 
 Best regards,
 -- 
