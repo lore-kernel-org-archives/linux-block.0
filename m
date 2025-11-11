@@ -1,97 +1,103 @@
-Received: from sg-1-11.ptr.blmpb.com (sg-1-11.ptr.blmpb.com [118.26.132.11])
+Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 777A833FE24
-	for <linux-block@vger.kernel.org>; Tue, 11 Nov 2025 14:01:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9529308F14
+	for <linux-block@vger.kernel.org>; Tue, 11 Nov 2025 14:02:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762869685; cv=none; b=jqs35dFrNDn0EaWhlHt806XzelOKXToDUix1Z3PAiU7L+Nfp2Swoo/4xjU3l4UTBtNkoEPD0K+c9VZpxlUFgIDwyhMfCMf9ebMDFw2m4KfynnnZgGsIWkNRvcVmue53OqO2bZQfrYF9iwuLACIlj0WHD7lPbucYHLq6KEr5RRok=
+	t=1762869772; cv=none; b=eyWhod8WpCRXHteeV0TF8YMXdWaqW+1bVzkyUtS66dMSxNEt0dk6ngKg8G3An3hXHAMkHvrcHWdzdj+6gGIub/6/rtuIUDELDar8psSGravlsQ3l7lk+DDaR2hxFvhLqzdgcaqiE76UH0hX7bSim4lMytKp7u3acJwpyLVr7xHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762869685; c=relaxed/simple;
-	bh=fYekhjUgmwCWq96nzBDP/OPSUfruHRfrdWzsn3FWX4E=;
-	h=From:Date:In-Reply-To:References:Content-Type:Cc:Subject:
-	 Message-Id:Mime-Version:To; b=rtKlDuu1oYgiC9EUur7bCADEHOJpHbAiRbNegmwxsedrzImp8OjgJKgqPmjJJ9vRqFCbIRBqtvu2046t0DG4dvZ92P0pPCp0gIDbhXVoFuX3Fu24gv8byq6dGLHxNXPhM08vvKYxRU6bDG2wRsTAydJTnIO9XHCq6qeHhH9aNUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=fail smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=E9q1R7m6; arc=none smtp.client-ip=118.26.132.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=fnnas.com
+	s=arc-20240116; t=1762869772; c=relaxed/simple;
+	bh=+r3MreT/sT1crw54UI3hsaeGtJviYXqN84hPams0hvY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CyI9YBijpIr/aY/5kLlcS1ZQ/rnSPXxDYD4hTXpHjriWshk2zkFiHXEiTJ4oqT+7OIwzoSQz32o0+ELUssC7zrwDYynVqT0z8PdFkF1Y8gSrwEnunsUV9PW4wqH7bPaJs4tvF6iUkyphKHwzLX695Z6tSn3sMs6DnOQgfuLak9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=rm1hMLqq; arc=none smtp.client-ip=209.85.166.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="E9q1R7m6"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1762869671;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=HeiFAq8m+pszRxKRkfLlU5b+dRr3M5cAVbg7a9AKRAQ=;
- b=E9q1R7m6aC5YtNLfiZz3FSZOPhdCjXkg1NmduFrYFrhpM2aU3friK460i1qCoQHl5ZrQFT
- B0HlnbwKFGC897fig330b31fmXu1ZjTn4I2h2CbEnzJifNBoSM1j+Oe5CsbwP6siZd8Y9L
- k9DIxo4j1OY0YBmtoxK38M/R3S3odgSRaptr4+uFuI+rUXkWuABSxqMDZM05lG8R26LLG0
- 3gvUTHLjtI/fy2oSRMOFY688I0oyvPyIhJeV739/r2ynEL1MDaFTZRO1ggSr3jR29CF2lU
- XtzJ0ROeKXicG3PXPvpvCqogCuI3/eWn5dreUQv1AUqktYGQ5e7ZgF2S8sSNfA==
-From: "Yu Kuai" <yukuai@fnnas.com>
-Date: Tue, 11 Nov 2025 22:01:05 +0800
-In-Reply-To: <20251110124920.1333561-1-zhengqixing@huaweicloud.com>
-References: <20251110124920.1333561-1-zhengqixing@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8
-Reply-To: yukuai@fnnas.com
-X-Original-From: Yu Kuai <yukuai@fnnas.com>
-Received: from [192.168.1.104] ([39.182.0.168]) by smtp.feishu.cn with ESMTPS; Tue, 11 Nov 2025 22:01:09 +0800
-Organization: fnnas
-X-Lms-Return-Path: <lba+2691341a5+3a356f+vger.kernel.org+yukuai@fnnas.com>
-User-Agent: Mozilla Thunderbird
-Cc: <linux-block@vger.kernel.org>, <nbd@other.debian.org>, 
-	<linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>, 
-	<yangerkun@huawei.com>, <houtao1@huawei.com>, <zhengqixing@huawei.com>
-Subject: Re: [PATCH] nbd: defer config unlock in nbd_genl_connect
-Message-Id: <49872d86-3867-41eb-916e-4debf463cc60@fnnas.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="rm1hMLqq"
+Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-93e7c7c3d0bso357363439f.2
+        for <linux-block@vger.kernel.org>; Tue, 11 Nov 2025 06:02:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1762869769; x=1763474569; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kawQyvNWLbHDUPhQUWN8vZdFV5j3qEt7ltniUTxkDo4=;
+        b=rm1hMLqqj8ptfoOWC40cTuLVzu3hQBh7hJUEIgih8e4Y933cglapFvvAcxQGDg2a8B
+         gt6Dn1Uk7Lwwr4k991phNHRBMgCFSaisidvxuTOdtQaraiilQn8Xzvok7hXQIzgCfxok
+         NGBU7l5iZd7bcr10kEaW4ZbqRSpzwjgLEgGF6AEYl3u6lq5YCGMJ8BWpoHm4+B81Ekmc
+         p80e4gLrcVECFkhlzVFcPbuiro8IfXKcLw5SRSeN44wR71vyFuhxJsYEwduSZoVRXxrr
+         xshO2z4CCwlorwJ19q0N+zkBGJkF+yL83GOsC0EieAQ69Qi++eF0DsI8MnIIsFTuJBQZ
+         9p+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762869769; x=1763474569;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kawQyvNWLbHDUPhQUWN8vZdFV5j3qEt7ltniUTxkDo4=;
+        b=P6MplWXxdEdK6fXJGQWHDujmit+Hp4q2qrhf651y4BNdpTiPiNfcI45HFBAYDqOq1l
+         1Z9WC+KrlWYoj1fI1PsGxK6ILxhKrq3KStb74z8K8ZcGi1AmTz9+DKl9+JDYCcjlPbYy
+         u45IVieg10cmeUWQEKZ/9Q7lFirWgftXlCn2RnIDHtjS7UrBByfaC/hDa6KuFLg1mutJ
+         xbr+3OUyxi29V6YJO/rr6dSCtlXM5eT6XvdEoMAKjT+mgg7y20aD8NvYa+Lxomph5eMe
+         wTbjkQORUAXnk6C+zrd0rMkVl1/sxMzg2ir2huiy/vA39yCtbudUehaNNIGwK8MkI2pg
+         D/FA==
+X-Forwarded-Encrypted: i=1; AJvYcCXdF5VFSuSLSXqkb6DIIaAtTKO8NtatVyxsRuWvLRsR/5r0QD4UNDoYFs98oYWPXN4ckPr/cTDFzjccIg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJB0YhG0XuR887yZcsAQgT8HpmoDWplWlIBYUWjxZAB0Beeln+
+	3M9ij4xS8O4SKKKOGem9sYcargUdiJ+3VaBHrPM+46mOmd92n8LwW9q3t5tCLLiuARA=
+X-Gm-Gg: ASbGncvHktU5eJ0RvykbH3xPYxuKM1QBNaSorV9OKN1rEsFdcngw/jJbvqVCBfuS/br
+	TVJtLRbyJylaHTJXC3OsKTCdx8bmXl899sraqu4QOYrymJkm+hM8OdiApcXyMp05S/L2Qjiuy6V
+	0Eoxl7colqcvSBU0zqksIhB8BpGkxRBEKigSYZs5UgSF8MTyP3G7BDof5q+YyCWly6hIQ/IfFoM
+	6V7jv8l+nZFaFul8dvnkGj8E28/SD4NaAYsbc6NNZKGX6+4ztfl18uqM+D5MHqKI6zvB9nB4bQG
+	OlExaw3WPEBWbBxGKEYviN9Xv3G5AIZEX6z6TxJp+UuWZQL0o7b6e64PcRTxNK/mel1aKBjPy81
+	ts2jpK+tr3px8GSC7qh7d+PpsNywd8LHzpaopmMQnFO+Pyseve5uN4794SJBXI0lGob9DAFYtGg
+	==
+X-Google-Smtp-Source: AGHT+IEjx/Ad1PPGGmmL2f+33W3x8Uw2hjSm6whM7hoISF4f4YXW/8JP7W6YocdtEbXJDFt6cPZXgg==
+X-Received: by 2002:a05:6602:14c8:b0:948:6aca:4932 with SMTP id ca18e2360f4ac-94895f76778mr1714074539f.3.1762869768413;
+        Tue, 11 Nov 2025 06:02:48 -0800 (PST)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5b74698c508sm6266557173.59.2025.11.11.06.02.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 Nov 2025 06:02:47 -0800 (PST)
+Message-ID: <0bfb4acf-b07d-4b12-8f4c-fc5359595d47@kernel.dk>
+Date: Tue, 11 Nov 2025 07:02:45 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-To: "Zheng Qixing" <zhengqixing@huaweicloud.com>, <josef@toxicpanda.com>, 
-	<axboe@kernel.dk>
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [GIT PULL] md-6.19-20251111
+To: Yu Kuai <yukuai@fnnas.com>, linux-block@vger.kernel.org,
+ linux-raid@vger.kernel.org
+Cc: linan122@huawei.com, hehuiwen@kylinos.cn, xni@redhat.com,
+ nichen@iscas.ac.cn, john.g.garry@oracle.com, wuguanghao3@huawei.com,
+ yun.zhou@windriver.com
+References: <20251111033529.2178410-1-yukuai@fnnas.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20251111033529.2178410-1-yukuai@fnnas.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-=E5=9C=A8 2025/11/10 20:49, Zheng Qixing =E5=86=99=E9=81=93:
+On 11/10/25 8:35 PM, Yu Kuai wrote:
+> Hi, Jens
+> 
+> Please consider pulling following changes on your for-6.19/block branch,
+> this pull request contain:
+> 
+> - change maintainer's email address (Yu Kuai)
+> - data can be lost if array is created with different lbs devices, fix
+>   this problem and record lbs of the array in metadata (Li Nan)
+> - fix rcu protection for md_thread (Yun Zhou)
+> - fix mddev kobject lifetime regression (Xiao Ni)
+> - enable atomic writes for md-linear (John Garry)
+> - some cleanups (Chen Ni, Huiwen He, Wu Guanghao)
 
-> There is one use-after-free warning when running NBD_CMD_CONNECT and
-> NBD_CLEAR_SOCK:
->
-> nbd_genl_connect
->    nbd_alloc_and_init_config // config_refs=3D1
->    nbd_start_device // config_refs=3D2
->    set NBD_RT_HAS_CONFIG_REF			open nbd // config_refs=3D3
->    recv_work done // config_refs=3D2
-> 						NBD_CLEAR_SOCK // config_refs=3D1
-> 						close nbd // config_refs=3D0
->    refcount_inc -> uaf
->
-> ------------[ cut here ]------------
-> refcount_t: addition on 0; use-after-free.
-> WARNING: CPU: 24 PID: 1014 at lib/refcount.c:25 refcount_warn_saturate+0x=
-12e/0x290
->   nbd_genl_connect+0x16d0/0x1ab0
->   genl_family_rcv_msg_doit+0x1f3/0x310
->   genl_rcv_msg+0x44a/0x790
->
-> The issue can be easily reproduced by adding a small delay before
-> refcount_inc(&nbd->config_refs) in nbd_genl_connect():
->
->          mutex_unlock(&nbd->config_lock);
->          if (!ret) {
->                  set_bit(NBD_RT_HAS_CONFIG_REF, &config->runtime_flags);
-> +               printk("before sleep\n");
-> +               mdelay(5 * 1000);
-> +               printk("after sleep\n");
->                  refcount_inc(&nbd->config_refs);
->                  nbd_connect_reply(info, nbd->index);
->          }
->
-> Fixes: e46c7287b1c2 ("nbd: add a basic netlink interface")
-> Signed-off-by: Zheng Qixing<zhengqixing@huawei.com>
-> ---
->   drivers/block/nbd.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
+Pulled, thanks.
 
-LGTM
-Reviewed-by: Yu Kuai <yukuai@fnnas.com>
+-- 
+Jens Axboe
+
