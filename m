@@ -1,108 +1,91 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5523234F466
-	for <linux-block@vger.kernel.org>; Tue, 11 Nov 2025 12:09:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6533261B77
+	for <linux-block@vger.kernel.org>; Tue, 11 Nov 2025 13:25:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762862944; cv=none; b=RtDY11G4UPfUla+FI2LDmylVFW3jGlTCWu45KC1Eq4j5Fp66lZ5SG+ufVDYIjn+V9RxSglsN8SIG8zEoIgpBH5w70L1P/HPTX91dgiiEgQPHpNQpz9JkjSO1p8oCeueiCczxjmd68OJzlE12tWEYTUj9ZzkHRYEywcSyAzAFUYU=
+	t=1762867541; cv=none; b=JjWov+OqaoWzGhrWs/pG1HWpWCt+QqlSBB69/Ej17QEeMSlNRZL/QwpyXKclvBzl/z7buMcs/yncR44eOsSNhhP4lBS/Q+fLmWq1+sZQvixeHwybLrK5m7GpLCMxIizXKQ9yIbAo5p7zFGmQb3qIVskqxKVNRJg6kN4GVw0XezU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762862944; c=relaxed/simple;
-	bh=SbqShAIE3SZM5AqKJRVAvqGq43IpxY2ybj2d3tdXMSI=;
+	s=arc-20240116; t=1762867541; c=relaxed/simple;
+	bh=pCCfLAd+jgtFe99TpuN79KMHvJQ3KhJwNnbu3i0DEQo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=To173M81ARvpDTzczcxpcAYJIKJg5+KIL/+grENa/VbF1hnnbopYSorWGY+Y2uxUdrzQDfyQdkF12jtOPQ4LvrH/HR2vYqZ1JQ8/E3SegD06O5Av79uMjTxpuNHp+prTAOtI9vlDJuarOsPpRs0SB1ikIKnDmuSqiAl8XW5LuKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q9qsxrK4; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=fcw800L2MxNC4LZxPLEAqUCTDFNl2ACWxf/dZGguDL+6uXyt3aIYYuEBxD2Rv9uUI8frN2SXYl3btIrPqjSPDft+l0SzSYj1ql/JPBpQICbajfTGVdWyHAhhjES51w7ZX3/BO4PBVTMa3ALKEpZ52MBF19kNzW2e4ddkpkKa8nE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XStIr7KE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q9qsxrK4"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762862942;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZRHAUY22f4DMZXjGNy9kKErIJtv/qXFs3nnNzhiEiMY=;
-	b=Q9qsxrK4/CbuH5Fs9miAUUftbZ2H3ilWwdp78Y6NbM/SjdYtJRmOQcvbBih5gGSoZop1zW
-	CDXfV+r4bLnQLIPubKob0WQEg68AIlfV5+fDMMAslBa5sab9u6Io9971CgFQy2m/jDRoPE
-	fJ71UTiOxQ66Hu1o73/uOw78NZ/8P+U=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-626-v5kAbdCLOKGzNWrqMNMF5A-1; Tue,
- 11 Nov 2025 07:08:57 -0500
-X-MC-Unique: v5kAbdCLOKGzNWrqMNMF5A-1
-X-Mimecast-MFC-AGG-ID: v5kAbdCLOKGzNWrqMNMF5A_1762862935
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EA3371955D48;
-	Tue, 11 Nov 2025 12:08:52 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.74])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9BA411800451;
-	Tue, 11 Nov 2025 12:08:44 +0000 (UTC)
-Date: Tue, 11 Nov 2025 20:08:39 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: "Guo, Wangyang" <wangyang.guo@intel.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@fb.com>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-	virtualization@lists.linux-foundation.org,
-	linux-block@vger.kernel.org, Tianyou Li <tianyou.li@intel.com>,
-	Tim Chen <tim.c.chen@linux.intel.com>,
-	Dan Liang <dan.liang@intel.com>
-Subject: Re: [PATCH RESEND] lib/group_cpus: make group CPU cluster aware
-Message-ID: <aRMnR5DRdsU8lGtU@fedora>
-References: <20251111020608.1501543-1-wangyang.guo@intel.com>
- <aRKssW96lHFrT2ZN@fedora>
- <b94a0d74-0770-4751-9064-2ef077fada14@intel.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XStIr7KE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 932E9C19421;
+	Tue, 11 Nov 2025 13:25:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762867541;
+	bh=pCCfLAd+jgtFe99TpuN79KMHvJQ3KhJwNnbu3i0DEQo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XStIr7KEPP6lsJ/X20MeRdxMRZBEFVNwaZARKWvlQtCOPoPRKLcHrH6NLQAV2v07/
+	 4fIfceZuxnn9B2sL5dPnf9GWrmoIbf9rjVTjd+F3AVK0FQYrNDTx2ugHx8JHTSiY3+
+	 fsBywk1tIHHffVtoK/ex4cnbbmPCIhBj9t4tMfbX/63moCK0nWyXRjFcf+yqJOLxXJ
+	 DGVcSrDdb0JR2GbynBsTPDpI6Ft9Hx7wl9njOZdkAj23oa3gmr6t+Y9+JS/kpjmz8w
+	 hyqygSpSxf0etucQWAouS/+hu7YqPAEj1unljxkuWEOGDf49pWiVUbGXQgyhMNLaPo
+	 1z/ntfJjdDPeQ==
+Date: Tue, 11 Nov 2025 08:25:38 -0500
+From: Keith Busch <kbusch@kernel.org>
+To: Yu Kuai <yukuai@fnnas.com>
+Cc: Christoph Hellwig <hch@lst.de>, Matthew Wilcox <willy@infradead.org>,
+	Keith Busch <kbusch@meta.com>, linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org, axboe@kernel.dk
+Subject: Re: [PATCHv5 1/2] block: accumulate memory segment gaps per bio
+Message-ID: <aRM5UoApKZ9_V7PV@kbusch-mbp>
+References: <20251014150456.2219261-1-kbusch@meta.com>
+ <20251014150456.2219261-2-kbusch@meta.com>
+ <aRK67ahJn15u5OGC@casper.infradead.org>
+ <aRLAqyRBY6k4pT2M@kbusch-mbp>
+ <20251111071439.GA4240@lst.de>
+ <024631dc-3c65-49a8-a97a-f9110fd00e9a@fnnas.com>
+ <20251111093903.GB14438@lst.de>
+ <c82cd0f1-f56e-445b-8d78-f55a0c3b2b4c@fnnas.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <b94a0d74-0770-4751-9064-2ef077fada14@intel.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+In-Reply-To: <c82cd0f1-f56e-445b-8d78-f55a0c3b2b4c@fnnas.com>
 
-On Tue, Nov 11, 2025 at 01:31:04PM +0800, Guo, Wangyang wrote:
-> On 11/11/2025 11:25 AM, Ming Lei wrote:
-> > On Tue, Nov 11, 2025 at 10:06:08AM +0800, Wangyang Guo wrote:
-> > > As CPU core counts increase, the number of NVMe IRQs may be smaller than
-> > > the total number of CPUs. This forces multiple CPUs to share the same
-> > > IRQ. If the IRQ affinity and the CPU’s cluster do not align, a
-> > > performance penalty can be observed on some platforms.
-> > 
-> > Can you add details why/how CPU cluster isn't aligned with IRQ
-> > affinity? And how performance penalty is caused?
+On Tue, Nov 11, 2025 at 06:14:24PM +0800, Yu Kuai wrote:
+> >
+> At least from blk_try_merge(), blk_discard_mergable() do return false,
+> however, following checking passed and we end up to the back merge patch.
 > 
-> Intel Xeon E platform packs 4 CPU cores as 1 module (cluster) and share the
-> L2 cache. Let's say, if there are 40 CPUs in 1 NUMA domain and 11 IRQs to
-> dispatch. The existing algorithm will map first 7 IRQs each with 4 CPUs and
-> remained 4 IRQs each with 3 CPUs each. The last 4 IRQs may have cross
-> cluster issue. For example, the 9th IRQ which pinned to CPU32, then for
-> CPU31, it will have cross L2 memory access.
+> blk_try_merge
+>   if (blk_discard_mergable())
+>     // false due to max_discard_segments is 1
+>   else if (...)
+>    return ELEVATOR_BACK_MERGE
+> 
+> Perhaps are you suggesting to change this to:
+> 
+>   enum elv_merge blk_try_merge(struct request *rq, struct bio *bio)
+>   {
+> -       if (blk_discard_mergable(rq))
+> -               return ELEVATOR_DISCARD_MERGE;
+> -       else if (blk_rq_pos(rq) + blk_rq_sectors(rq) == bio->bi_iter.bi_sector)
+> +       if (req_op(rq) == REQ_OP_DISCARD) {
+> +               if (blk_discard_mergable((rq)))
+> +                       return ELEVATOR_DISCARD_MERGE;
+> +               return ELEVATOR_NO_MERGE;
+> +       }
+> +
+> +       if (blk_rq_pos(rq) + blk_rq_sectors(rq) == bio->bi_iter.bi_sector)
+>                  return ELEVATOR_BACK_MERGE;
+> -       else if (blk_rq_pos(rq) - bio_sectors(bio) == bio->bi_iter.bi_sector)
+> +       if (blk_rq_pos(rq) - bio_sectors(bio) == bio->bi_iter.bi_sector)
+>                  return ELEVATOR_FRONT_MERGE;
+>          return ELEVATOR_NO_MERGE;
+>   }
+> 
+> And the same for other callers for blk_discard_mergable().
 
-
-CPUs sharing L2 usually have small number, and it is common to see one queue
-mapping includes CPUs from different L2.
-
-So how much does crossing L2 hurt IO perf?
-
-They still should share same L3 cache, and cpus_share_cache() should be
-true when the IO completes on the CPU which belong to different L2 with the
-submission CPU, and remote completion via IPI won't be triggered.
-
-From my observation, remote completion does hurt NVMe IO perf very much,
-for example, AMD's crossing L3 mapping.
-
-
-Thanks,
-Ming
-
+Ah, so we're merging a discard for a device that doesn't support
+vectored discard. I think we still want to be able to front/back merge
+such requests, though.
