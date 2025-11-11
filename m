@@ -1,347 +1,175 @@
-Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
+Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010061.outbound.protection.outlook.com [52.101.201.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B97035CBB6
-	for <linux-block@vger.kernel.org>; Tue, 11 Nov 2025 22:09:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762898943; cv=none; b=KSLq1fxa8zUFRdX2rTZIXIziF7F3YDwqCSceaT8Z/lAFg71jC1t57V0vmtA/GZY7GOkzzsvjplRRcSV7KsrxoJHJjqv0uRrNeGu4wRgVRt0DBSgsH8nks+hjggRYSDaIhZbmbGdbQyAcOgCRznZpYEMCsPcnCwvX2xoh4FYhyjg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762898943; c=relaxed/simple;
-	bh=DkKw8ueN+OWjZps/8Vgmc03IAmvEhQt7v+cIGFE9NgA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DWKUS1IIGIZjR++AIX1DgIIPOFlO7M7i72dxvyrjgQZPTqL/R03NIJ7k4EdtKPeKNKXcancQB5q9TEa2ez2iJmSfGOQ3aL+m4kXYFDtLGdsUMtd4jAVfzoV0X21vP0gyWu7sd1R5rzpq0y7iLzACST60Jz9C7K6WrXvurekvfKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=SrLH9l9u; arc=none smtp.client-ip=199.89.3.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA47D26B75C
+	for <linux-block@vger.kernel.org>; Tue, 11 Nov 2025 22:48:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.61
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762901290; cv=fail; b=m7Lfb1t2g1EXUDyIpAeA38XUQDxghu07p4qf0XvbcGyCCdEakcnDIcM3sjtLl2oiQxYYp6h9Pl8UyMgguX2uadcJ+g1WjvFPM74Dm65i48ZBMsp8KrIybqSXH5wiLnKMPD6zdW1jrna60+o1b0cRVbXr/+ADoUrbek1hsP7ioc8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762901290; c=relaxed/simple;
+	bh=KOqvQm2FECdz1wux28mJw5/sWs0crREKtatjF1J7Lfc=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=SP1vUJdsLRlNRHJhINlePOo34FJKPMehKtrbTNHJTMcS02HK3AGvbWtqGlXaSXsrGsKAbouNd1uqMuWsrQgLMFr4VPFlN5TYhGQa5z1RtVhf9qsCgjwFrrzaYrFtNP8g5r2csJZssn8q7nFPT0R5ZuvWOoaq92hChfFM9TbVDts=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=NW94W12H; arc=fail smtp.client-ip=52.101.201.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="SrLH9l9u"
-Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4d5gfh0HDnzlv4V1;
-	Tue, 11 Nov 2025 22:09:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:mime-version:x-mailer:message-id:date
-	:date:subject:subject:from:from:received:received; s=mr01; t=
-	1762898937; x=1765490938; bh=7FupEGXOw+168+N2eZPhc3GLIQYRdM0KHrR
-	dyU9ozdY=; b=SrLH9l9uA7eYkytrFxVZoOTPYDqp0yNKmAMdv8Ct7Uar66hfvzn
-	dtMi8WfaCgkIVD0JNyUn2P+7XeeoqqpD//5RZnz1WOSL9CVe/F5pY9OzLWK3+t8J
-	gzqdp2oXd1fUgXkif8inXslXMzZcX5VlB1hHOLduk5vi6MU6l9dJVTVPoH3m0xS2
-	2duMt0Zal7XGpLnaQ/NLr3atDTsu6ZSJw4uxcTzo5A05U4BaNaa6JRvmNBG+1S2D
-	E2uWTMPP4j/7cHLMHMgo81F+J8zdQtWKAQII9wRrmrX5xAF70l98g09fo1vrEEQN
-	Eq4wMgF96BkepEVuzea6OIP6zpP8eegX4XA==
-X-Virus-Scanned: by MailRoute
-Received: from 003.mia.mailroute.net ([127.0.0.1])
- by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id Ozq_qKFuXEMY; Tue, 11 Nov 2025 22:08:57 +0000 (UTC)
-Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4d5gfV5FsCzlsxDq;
-	Tue, 11 Nov 2025 22:08:49 +0000 (UTC)
-From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Keith Busch <kbusch@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	"Shin'ichiro Kawasaki" <shinichiro.kawasaki@wdc.com>,
-	Zheng Qixing <zhengqixing@huawei.com>,
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="NW94W12H"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=AvlN46V5N/Gob+LEEX8hYttdOaP2lVMuuMqL0FNbdbXofBPYx7x8UfdmfxWNo/XzgoDPsil0+AtIOn0ffBTXIERX1ZWaU+9K508SG9FjsIHNG4BatvrzRTnS5aSMuhf8oRAQQkp9MHxCtF0kQ13RT4nCmPmEEOTIl9YzPlFlH1rfX+ijM+9Y8vEULqXg4DO4+F6L8afh712uvxEyjHhuP+OLP0S+W4jJ4R4PoZw5Q5D9MvAJtFBr2xGN5KDWDZWdDDtlErce6X0DVKJTbeurEzB7ppWrPIzHJCRvLxirNrQJYT2REhb0/sFhElMHffPwpzDgwczwBgUVakQ4Phd2Ow==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=KOqvQm2FECdz1wux28mJw5/sWs0crREKtatjF1J7Lfc=;
+ b=Uju9qbcnpKGG/nANQKVoaKAkKfZ2nGfJJvLXtrkIRi346Y+JQjaQs5Xhk2cKRs40grIcdxQGQNvmYAN11Mc1In4hbkAF4fh/hS5+Za+OOMOrfzdnOs2gjO2rJK2PAS4Nxh8fszJz3QS8Lrs2pXpiGnohZ9nj9ziKOo0hpAe9oK3ScJW7r8ZYAPU1fOL8VVX/8tSyodFJk7r1OSfLJeYcqMu9XOk/C3tb+9rJESeHUvRuVyuF+/d67gQ0WzDJSmo7+JH7M+gyfoZabg3y0gY/qnbAAfTJVrxc2ZkYxc4eHKK0YShPIq2I4ADtHcbdtoTzDc6wAIBtHs0v5yiHjSwAtQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KOqvQm2FECdz1wux28mJw5/sWs0crREKtatjF1J7Lfc=;
+ b=NW94W12HFaqEODRqx1n842Xavjl7q6a/A90+nzI8ICCTvN9nRvHWXhRZyd6TUX34qGefNGAhDWUq/ufQEOIe2xh9GFu3AdcL9y6Fbbyp7Kb5phKKAWKA/g3ILSMFrG3wkFDBQSf35r3oSTvchJR17mwYfg2HOVAAeVxeo4wfyw35Jy1exUyNuxyh9UyLrtuPf1dvaenCCWUarna89GOwetMyFg5q/hEyimGMRrPyNRPRN0aBR5Ra6r6ay6s3JDYi35sb2bKg3NBrjQwoBXa/2GFI7BOQi/jyVEmOseR/0EgMDHUixgdd5pPLf5Tih53wcvnJrNMv/00mkpnKiuazwQ==
+Received: from LV3PR12MB9404.namprd12.prod.outlook.com (2603:10b6:408:219::9)
+ by SN7PR12MB6716.namprd12.prod.outlook.com (2603:10b6:806:270::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.15; Tue, 11 Nov
+ 2025 22:48:01 +0000
+Received: from LV3PR12MB9404.namprd12.prod.outlook.com
+ ([fe80::57ac:82e6:1ec5:f40b]) by LV3PR12MB9404.namprd12.prod.outlook.com
+ ([fe80::57ac:82e6:1ec5:f40b%5]) with mapi id 15.20.9298.015; Tue, 11 Nov 2025
+ 22:48:00 +0000
+From: Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Christoph
+ Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>, Damien Le Moal
+	<dlemoal@kernel.org>, Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>, Shin'ichiro Kawasaki
+	<shinichiro.kawasaki@wdc.com>, Zheng Qixing <zhengqixing@huawei.com>,
 	"Matthew Wilcox (Oracle)" <willy@infradead.org>
-Subject: [PATCH] Revert "null_blk: allow byte aligned memory offsets"
-Date: Tue, 11 Nov 2025 14:08:33 -0800
-Message-ID: <20251111220838.926321-1-bvanassche@acm.org>
-X-Mailer: git-send-email 2.51.2.1041.gc1ab5b90ca-goog
+Subject: Re: [PATCH] Revert "null_blk: allow byte aligned memory offsets"
+Thread-Topic: [PATCH] Revert "null_blk: allow byte aligned memory offsets"
+Thread-Index: AQHcU1fLinJu53fqvUCgBZXiC1mIBrTuE8WA
+Date: Tue, 11 Nov 2025 22:47:59 +0000
+Message-ID: <2b9ccdc5-ef7a-44cb-8838-a684a2bae939@nvidia.com>
+References: <20251111220838.926321-1-bvanassche@acm.org>
+In-Reply-To: <20251111220838.926321-1-bvanassche@acm.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: LV3PR12MB9404:EE_|SN7PR12MB6716:EE_
+x-ms-office365-filtering-correlation-id: dbc809ca-1c2c-4a26-c581-08de21745d68
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|7416014|376014|10070799003|1800799024|366016|38070700021;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?K0p6YjlPakZLRmJ4WnBNS2tBei9UZmhBY3p2dWdLUEtMRDFSMTFJNTVpSC83?=
+ =?utf-8?B?MkdGalAyUjQrZ0k1UDFBWjg0aVFyczBDWS90MjdZaGdHLy96ckFEdXVhdnNN?=
+ =?utf-8?B?V3F0U3c1UXpnTFhOcFd2UVp2WU5haHQ4aWUzeFlVdjlIaGNYK0dqcEFVbDV6?=
+ =?utf-8?B?YmdGR040UjZSN2Qyb1NEcVVNeDBSNHBhNkYxYTkzVkJ6MWR1Z28xRy9vL0NO?=
+ =?utf-8?B?WmVZTGRWNnRYc05YSGRXak9VQS9PNU96NEtPVEpGK1NZQ2JiNWJXc1NHcGxJ?=
+ =?utf-8?B?eXJVUG54R2doRGRPQlJMd1NkU0Y1VmVPSFlUWUVHRjZQU1dCTXdaMHZJSzFq?=
+ =?utf-8?B?Y0tZRGtFcWMyTERiaS9kaS9FMW4rZk5BRkxDZkVrWnI1QklXN0VsTWc0aVA1?=
+ =?utf-8?B?UnhOOTRRRHZDa3c2NHVaeU9hYVpHM1VjMzhUQlM2MXV1SHZmbkg5SFZiQThz?=
+ =?utf-8?B?SUxVZlRqUmFTYjVzbHE5MlE2Zkd3dXJCOE9HWFdIeVVMekxzZlE1RzJFYUFI?=
+ =?utf-8?B?R0owdFVUcExOdklFWnloRXFCU0N6RUlIOE9IVnFlZThyNUNZNHlzYk10WG56?=
+ =?utf-8?B?SzFyTm1FYk5yYUE1VWF0Q3hmWTFBVGJmQ2RzNkFvZE5xUlp2OGMwK3REb2Iw?=
+ =?utf-8?B?MHlpRDJnUExJZUFEbnZXbHVPdFhmUlRLMUNqeVlqMWVpR1VFZ1pLRS9UWWYv?=
+ =?utf-8?B?R0t6T3dtczdVVGdTcXJTS1QrUlRxaUdnd1gyaktBQmU3RGVBcis0YTMxZGNk?=
+ =?utf-8?B?M2tpNGJFRjZkNDhYRnpWZjN2K3AwYXRtR3dscFJjL1RDazNTcHVnSytzNW5o?=
+ =?utf-8?B?OTU3VFFHWGtvUW9kYzRkRU9NOFk2Z09yY1VBVFEvMTUzYWp3YjlWVWVudlhv?=
+ =?utf-8?B?MHlIeWVoaC9nK2M3UFJsRkN3Ums2cFF3T0t5S3FxWlRpd2tScjkxd3lndWww?=
+ =?utf-8?B?ZGs3SHdYczJvVzRzcGcxODF5bEdFS0ZxQ2ZUY05xUFNkV1VzNU8wUGRYK3o2?=
+ =?utf-8?B?Ri9Lc2F1TFdQSmxETDdTWlZYSllMNlVEQ3R2bXVhelNwYUlWWEdOeG5PRnRr?=
+ =?utf-8?B?alpXRGk2djA0NzlpYU5hdzVOMFdSYWJjTk1sZThnbHNpQ0VrZHl3OGh6UHhy?=
+ =?utf-8?B?VGhiYThhL2V5VWoyUjBXNUEvZGdpSGlDNHdnRnV3aFd4bUJjTmJxNjZ0TUlp?=
+ =?utf-8?B?LzRvMWV6NFR3ZUNZdjl3dU5Uc1dVOHY5T2M2UnlUU1VCajN0RFVBcldPM0JE?=
+ =?utf-8?B?aFdYVEt5b0I0eGduY3dDTTBOOUhocWdWeW1kVFZUNnRlaUsvdTc5SU9mMEdZ?=
+ =?utf-8?B?VStzYk5xTHE2NWxmckhLMVdpM2tqZHpZdTVYb0JFWVFQcjNla0QyanU2NUFn?=
+ =?utf-8?B?MitDS2hNaHJRbS9KNDltcFQ1WjdaSUgrSFhtNHdVclFGTUlOZC9uSFNLb1Av?=
+ =?utf-8?B?Wm1adkxzQk9jWGVydTdFTTRCaVNkbTNkU0FPZ0d1R3RqQzV4MHYwQ29ZZXRL?=
+ =?utf-8?B?T0gzNlJNQkpaRmVMLzZjbzlSZ21wNjZHUkFVVFlFdEswZXEvallibWJ1YTlX?=
+ =?utf-8?B?T2gxZFIrNEYwUHFTT2F5dFFUY05JQlo0dWRsVUVJSVJ1cWxueHg3V1FocmJQ?=
+ =?utf-8?B?TktHYjAxUTU4dHZhMTdjcVdnV1lsNEw4d2ZLNVpuMTFjWTJrMWhrWjFRamRj?=
+ =?utf-8?B?U2hKdkdSWlNMcm1jMHlwcDJTT1RHU2tVSXArS1pUS242RWNOdlZuVlVYTkpl?=
+ =?utf-8?B?S1g1WlRsT1ExSDhQeXZITDJRQWJyRnBYV0ZKcUxWV3BRcmJUM3VJVkZDNVY4?=
+ =?utf-8?B?YkJad1kxZk1reGdnbGNJKzN3alpFWXcyRUxzWWk0V202Yy9RcVJLRm9GUFNX?=
+ =?utf-8?B?bmFFUnJqZitKRGJUenhWNS9wY1JrMTEvOTFEbmUvZGxzRWs4emFLblBMUUlk?=
+ =?utf-8?B?RVg2YjlHSmRLUkEvck9qdjZQY2V2TjI5MFQ3WDdXOHU3Ky91L3QxNklNYzg4?=
+ =?utf-8?B?NFBReVUwQ3cwOHRyTW81dmZOMmxKZ1BqVnpCdENJWE5oUjQ0UHhzS0FIb3Bl?=
+ =?utf-8?Q?kGFBZj?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR12MB9404.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(10070799003)(1800799024)(366016)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?Z2ZqaUZrY3B2KytxRFZHdGNXd0lFMDVEMUtXejhVc2dXdFRiY1JiOEl3Yk9k?=
+ =?utf-8?B?MkQzY0lUNUR2UEFhT0x3S09EOENxUmc1bW5HdVpzeUdtSllKMTdBU2QvZTJC?=
+ =?utf-8?B?Z1c2SjN5ZGJ2NEdaRkxPQkU1bkJuZGgvVkhZR21lWk5DS24ra3Y2dUo4cEpk?=
+ =?utf-8?B?cnc5SGNOYVJJNXhRWjIvNHZhVnMxb2N2MlhTNjFLb3k5RVhLNDhzcGFacVhr?=
+ =?utf-8?B?YmtpU2pnc1JBNjVJL21aUm50c2NyZ2RvZEVvSDBHa0hUbk1vWlpmK3Z2c010?=
+ =?utf-8?B?OHNXRVBuV3pWeUF5OU9ETUUvL2ZHOTZZNlBLVGJPakJGRHVSZi9ZTFVjVkI3?=
+ =?utf-8?B?L1l3UGhMc0hKUmxVaUpTcmJpa1ZnVHdGYnNvZ3c0emFONTVteDJ2VDVzWDFj?=
+ =?utf-8?B?R1FrRG5aNW01bGpPZWIvSWVVdGQ4ZHN4WVN4UzNjNWVTYmduTmExTkl4ZnRJ?=
+ =?utf-8?B?cXJZOVJ6NWF0NlhYeHI2Y0FMUHluQnVEN3ZJekVOa0Z6bEc4MnREWVRoWm9L?=
+ =?utf-8?B?VWV1NjNVcytzRG9wSDlQMS9tNk16WDBGREhVdHg2UHlTaEFBZ2tjK0s0Q0t0?=
+ =?utf-8?B?MGNZcFJ5RUdaKzVaTmJOTXFITlAvSzhVUVhhVlpjQklBdVBSWDYwdUZ3Zm9y?=
+ =?utf-8?B?REVabFZ6V1ZnZkEzS2QvQzkyT3cyWFlCR055QzNweDYwenVBUmg3aWt2YWwx?=
+ =?utf-8?B?a2pERTV1RGEyL2o4d3lLaUlGRVlNV3EyZGJLc3NCNVlLRGQvVHgvWXRsYmM2?=
+ =?utf-8?B?YWpVL3MxdmJYMzBKYTBBbitPUHNPd0YvcTQrQ3pPMzIxdnhhNDN4WUo3bDZs?=
+ =?utf-8?B?ZXlMOFBqazdkN1lxZVdpRGNJTHFLZXFwMng1YzQrU3hWOVpVK2tLNnhReUl6?=
+ =?utf-8?B?U0pYSVptZXZoYVlDNEhiSXh0UDgzYUVZWWF4c3RIc0RKSDZSWE9qekNzbHo0?=
+ =?utf-8?B?VEpVV05USzVQV0YxL2IwUWI1Z2I4eTNIbUthUkJZQTJ1OEM3NFgzd05WRGlS?=
+ =?utf-8?B?SnFSb0k5aU9lVXlBSEFOL2I2QzhreWtZY2o4clhkOHQwOW1JODV6eHdXaUdq?=
+ =?utf-8?B?RHpHVEEwRnZVWDBGeWVnbkwvUUhIZVRpQXFUREhScXdWR2h2OU5LeUUrYUU3?=
+ =?utf-8?B?bWVad1FkRnRFbmNxSXFXYldVdisvaFcwRjdhSUFOSmVPdktsczBCSWQ2cVV0?=
+ =?utf-8?B?aVNldWRQSTVyNXNZQ0o2VzhtRDIzSlhkTzVoZHJNemRqaUxpL0Q1c283T3NI?=
+ =?utf-8?B?a2h5dWo4RG40dm1kSXNTckZuREQwNW9wWVVTYnBJL2x1dkdFd3JhMjQwRzIv?=
+ =?utf-8?B?Ui81K1dIMTBVbGFUdlhDNmhURUZnMHJkVGoyOTIwd0plejJBYVUxNjRCY0M2?=
+ =?utf-8?B?YU13YVYyUU1tYXVuTkh3QW12RlZiQTZZR3JtWlVseTdTMVQ4TkJHcCtCM1k2?=
+ =?utf-8?B?T3BjZ1NHNkQ4UEdJaTUxZ0ZreFhEZ25MY3g5OGpiMVlmNVhLTGRaUUhqZnJy?=
+ =?utf-8?B?WjhQV29kallxVEJld1VSR3lEcy9MZ1o5SUlnK1ZHbmFqZ0RqTUl1czFxbzhN?=
+ =?utf-8?B?MlBicXVYTHBscWhNK0Rmbkt0cm5TZEpiWnQ5NDRzT1JITldCWVBUZ29EQ0Rx?=
+ =?utf-8?B?Z25SR2xZbi8rNm9HWVYzRi9LUVJnNlh1VzZPWExZRVliRzBxZ0JBNXBmVWRM?=
+ =?utf-8?B?MWpkUHdhRitBRnJVYXJuU2pZaWNVV3FUaURyK3hNVUxCYnZHL3U2YzRrV3NS?=
+ =?utf-8?B?cTZlbW9OaGxhOHB2ZEUvRC8xVCtYOXlsQzV2emdNa3VGdXNTVitVTEM3emYx?=
+ =?utf-8?B?M1A3S0FNM3M2OGE2NTRDYjNXSUtCeHcySXdBa21LREgxUmdObG5CTnJjQnFU?=
+ =?utf-8?B?N3RXeHRhOW5ITiszWThCRU9lbWhBZVRCQmFxeklQdm9CaTZ5YStuRjRKY2N2?=
+ =?utf-8?B?NWdQZ3NDUmtRTEgyV3k0QWw3L1ZPK1FPWkhGN0lTL0lqUzhMcmNOR1JKMEtl?=
+ =?utf-8?B?Z0xxOFdKMnZjSnAxd0RReFpETVJuemNva1Nhay9VS1E4QXgyb2FVMjZDY1l4?=
+ =?utf-8?B?SGdMVTV4cmhjekZtRzhvc3VJYnR6Y1M3Sk1vRVdneWM4SzVPS1lqQVBmMEto?=
+ =?utf-8?B?NjVBL3Zwc3piMW5vcERYV1VLTWw1UmRSTWovNGduY0lDcWhBR2dBaU9wNUsw?=
+ =?utf-8?Q?qU86y2kR3eI61peQR+4w+1wb7NOcyTv2rj2dpibgk1U8?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <38E54DD8CA6AE14EA7ADCEA34824D1EA@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: LV3PR12MB9404.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: dbc809ca-1c2c-4a26-c581-08de21745d68
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Nov 2025 22:47:59.4935
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: o4tuYk9aoLSH7Nd4dehasEXf4X9FT/PGRuVRozhNuO5wTHqdGOGznSAYWqNHvhRbS7tDk+YXEygYvfHoKqcWtQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6716
 
-This reverts commit 3451cf34f51bb70c24413abb20b423e64486161b and fixes
-the following KASAN complaint when running test zbd/013:
-
-BUG: KASAN: slab-use-after-free in null_handle_data_transfer+0x88c/0xe50 =
-[null_blk]
-Write of size 4096 at addr ffff8881ab162000 by task (udev-worker)/78072
-
-CPU: 8 UID: 0 PID: 78072 Comm: (udev-worker) Not tainted 6.18.0-rc5-dbg #=
-14 PREEMPT  737e33391e24fa2fcd9958673f6992b5ee131a07
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.=
-16.3-2 04/01/2014
-Call Trace:
- <TASK>
- show_stack+0x4d/0x60
- dump_stack_lvl+0x61/0x80
- print_address_description.constprop.0+0x8b/0x310
- print_report+0xfd/0x1d7
- kasan_report+0xde/0x1c0
- kasan_check_range+0x10c/0x1f0
- __asan_memcpy+0x3f/0x70
- null_handle_data_transfer+0x88c/0xe50 [null_blk]
- null_process_cmd+0x1a4/0x370 [null_blk]
- null_process_zoned_cmd+0x1ff/0x3c0 [null_blk]
- null_handle_cmd+0x1bd/0x580 [null_blk]
- null_queue_rq+0x568/0x970 [null_blk]
- null_queue_rqs+0xe5/0x2b0 [null_blk]
- __blk_mq_flush_list+0x83/0xb0
- blk_mq_dispatch_queue_requests+0x3d7/0x660
- blk_mq_flush_plug_list+0x1a1/0x730
- __blk_flush_plug+0x290/0x540
- blk_finish_plug+0x53/0xc0
- read_pages+0x456/0xad0
- page_cache_ra_unbounded+0x3cd/0x6e0
- force_page_cache_ra+0x1f0/0x370
- page_cache_sync_ra+0x158/0x870
- filemap_get_pages+0x327/0xcb0
- filemap_read+0x336/0xd30
- blkdev_read_iter+0x15c/0x430
- vfs_read+0x79a/0x1150
- ksys_read+0xfd/0x230
- __x64_sys_read+0x76/0xc0
- x64_sys_call+0x143c/0x17e0
- do_syscall_64+0x96/0x360
- entry_SYSCALL_64_after_hwframe+0x4b/0x53
- </TASK>
-
-Allocated by task 0 on cpu 0 at 3226.274686s:
- kasan_save_stack+0x2a/0x50
- kasan_save_track+0x1c/0x70
- kasan_save_alloc_info+0x3d/0x50
- __kasan_kmalloc+0xa0/0xb0
- __kmalloc_cache_noprof+0x2e9/0x8a0
- kmem_cache_free+0x590/0x870
- mempool_free_slab+0x1b/0x20
- mempool_free+0xd1/0x9b0
- bio_free+0x15e/0x1c0
- bio_put+0x34f/0x790
- bio_endio+0x31d/0x6c0
- blk_update_request+0x425/0xfb0
- blk_mq_end_request+0x5d/0x370
- null_cmd_timer_expired+0x43/0x60 [null_blk]
- __hrtimer_run_queues+0x53e/0xb40
- hrtimer_interrupt+0x32f/0x850
- __sysvec_apic_timer_interrupt+0xdc/0x360
- sysvec_apic_timer_interrupt+0xa4/0xe0
- asm_sysvec_apic_timer_interrupt+0x1f/0x30
-
-Freed by task 14 on cpu 0 at 3226.398721s:
- kasan_save_stack+0x2a/0x50
- kasan_save_track+0x1c/0x70
- __kasan_save_free_info+0x3f/0x60
- __kasan_slab_free+0x67/0x80
- kfree+0x170/0x780
- slab_free_after_rcu_debug+0x6c/0x250
- rcu_do_batch+0x369/0x13f0
- rcu_core+0x385/0x5a0
- rcu_core_si+0x12/0x20
- handle_softirqs+0x1a3/0x930
- run_ksoftirqd+0x3e/0x60
- smpboot_thread_fn+0x311/0xa00
- kthread+0x3cc/0x830
- ret_from_fork+0x39c/0x500
- ret_from_fork_asm+0x11/0x20
-
-Last potentially related work creation:
- kasan_save_stack+0x2a/0x50
- kasan_record_aux_stack+0xad/0xc0
- __call_rcu_common.constprop.0+0xfb/0xbb0
- call_rcu+0x12/0x20
- kmem_cache_free+0x5bc/0x870
- mempool_free_slab+0x1b/0x20
- mempool_free+0xd1/0x9b0
- bio_free+0x15e/0x1c0
- bio_put+0x34f/0x790
- bio_endio+0x31d/0x6c0
- blk_update_request+0x425/0xfb0
- blk_mq_end_request+0x5d/0x370
- null_cmd_timer_expired+0x43/0x60 [null_blk]
- __hrtimer_run_queues+0x53e/0xb40
- hrtimer_interrupt+0x32f/0x850
- __sysvec_apic_timer_interrupt+0xdc/0x360
- sysvec_apic_timer_interrupt+0xa4/0xe0
- asm_sysvec_apic_timer_interrupt+0x1f/0x30
-
-The buggy address belongs to the object at ffff8881ab162000
- which belongs to the cache kmalloc-32 of size 32
-The buggy address is located 0 bytes inside of
- freed 32-byte region [ffff8881ab162000, ffff8881ab162020)
-
-Cc: Keith Busch <kbusch@kernel.org>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- drivers/block/null_blk/main.c  | 45 ++++++++++++++++------------------
- drivers/block/null_blk/zoned.c |  2 +-
- 2 files changed, 22 insertions(+), 25 deletions(-)
-
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.=
-c
-index f1e67962ecae..ea3fc4241f82 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -1130,27 +1130,25 @@ static int null_make_cache_space(struct nullb *nu=
-llb, unsigned long n)
- }
-=20
- static blk_status_t copy_to_nullb(struct nullb *nullb, void *source,
--				  loff_t pos, size_t n, bool is_fua)
-+				  sector_t sector, size_t n, bool is_fua)
- {
- 	size_t temp, count =3D 0;
-+	unsigned int offset;
- 	struct nullb_page *t_page;
--	sector_t sector;
-=20
- 	while (count < n) {
--		temp =3D min3(nullb->dev->blocksize, n - count,
--			    PAGE_SIZE - offset_in_page(pos));
--		sector =3D pos >> SECTOR_SHIFT;
-+		temp =3D min_t(size_t, nullb->dev->blocksize, n - count);
-=20
- 		if (null_cache_active(nullb) && !is_fua)
- 			null_make_cache_space(nullb, PAGE_SIZE);
-=20
-+		offset =3D (sector & SECTOR_MASK) << SECTOR_SHIFT;
- 		t_page =3D null_insert_page(nullb, sector,
- 			!null_cache_active(nullb) || is_fua);
- 		if (!t_page)
- 			return BLK_STS_NOSPC;
-=20
--		memcpy_to_page(t_page->page, offset_in_page(pos),
--			       source + count, temp);
-+		memcpy_to_page(t_page->page, offset, source + count, temp);
-=20
- 		__set_bit(sector & SECTOR_MASK, t_page->bitmap);
-=20
-@@ -1158,33 +1156,33 @@ static blk_status_t copy_to_nullb(struct nullb *n=
-ullb, void *source,
- 			null_free_sector(nullb, sector, true);
-=20
- 		count +=3D temp;
--		pos +=3D temp;
-+		sector +=3D temp >> SECTOR_SHIFT;
- 	}
- 	return BLK_STS_OK;
- }
-=20
--static void copy_from_nullb(struct nullb *nullb, void *dest, loff_t pos,
-+static void copy_from_nullb(struct nullb *nullb, void *dest, sector_t se=
-ctor,
- 			    size_t n)
- {
- 	size_t temp, count =3D 0;
-+	unsigned int offset;
- 	struct nullb_page *t_page;
--	sector_t sector;
-=20
- 	while (count < n) {
--		temp =3D min3(nullb->dev->blocksize, n - count,
--			    PAGE_SIZE - offset_in_page(pos));
--		sector =3D pos >> SECTOR_SHIFT;
-+		temp =3D min_t(size_t, nullb->dev->blocksize, n - count);
-=20
-+		offset =3D (sector & SECTOR_MASK) << SECTOR_SHIFT;
- 		t_page =3D null_lookup_page(nullb, sector, false,
- 			!null_cache_active(nullb));
-+
- 		if (t_page)
--			memcpy_from_page(dest + count, t_page->page,
--					 offset_in_page(pos), temp);
-+			memcpy_from_page(dest + count, t_page->page, offset,
-+					 temp);
- 		else
- 			memset(dest + count, 0, temp);
-=20
- 		count +=3D temp;
--		pos +=3D temp;
-+		sector +=3D temp >> SECTOR_SHIFT;
- 	}
- }
-=20
-@@ -1230,7 +1228,7 @@ static blk_status_t null_handle_flush(struct nullb =
-*nullb)
- }
-=20
- static blk_status_t null_transfer(struct nullb *nullb, struct page *page=
-,
--	unsigned int len, unsigned int off, bool is_write, loff_t pos,
-+	unsigned int len, unsigned int off, bool is_write, sector_t sector,
- 	bool is_fua)
- {
- 	struct nullb_device *dev =3D nullb->dev;
-@@ -1242,10 +1240,10 @@ static blk_status_t null_transfer(struct nullb *n=
-ullb, struct page *page,
- 	if (!is_write) {
- 		if (dev->zoned)
- 			valid_len =3D null_zone_valid_read_len(nullb,
--				pos >> SECTOR_SHIFT, len);
-+				sector, len);
-=20
- 		if (valid_len) {
--			copy_from_nullb(nullb, p, pos, valid_len);
-+			copy_from_nullb(nullb, p, sector, valid_len);
- 			off +=3D valid_len;
- 			len -=3D valid_len;
- 		}
-@@ -1255,7 +1253,7 @@ static blk_status_t null_transfer(struct nullb *nul=
-lb, struct page *page,
- 		flush_dcache_page(page);
- 	} else {
- 		flush_dcache_page(page);
--		err =3D copy_to_nullb(nullb, p, pos, len, is_fua);
-+		err =3D copy_to_nullb(nullb, p, sector, len, is_fua);
- 	}
-=20
- 	kunmap_local(p);
-@@ -1273,7 +1271,7 @@ static blk_status_t null_handle_data_transfer(struc=
-t nullb_cmd *cmd,
- 	struct nullb *nullb =3D cmd->nq->dev->nullb;
- 	blk_status_t err =3D BLK_STS_OK;
- 	unsigned int len;
--	loff_t pos =3D blk_rq_pos(rq) << SECTOR_SHIFT;
-+	sector_t sector =3D blk_rq_pos(rq);
- 	unsigned int max_bytes =3D nr_sectors << SECTOR_SHIFT;
- 	unsigned int transferred_bytes =3D 0;
- 	struct req_iterator iter;
-@@ -1285,11 +1283,11 @@ static blk_status_t null_handle_data_transfer(str=
-uct nullb_cmd *cmd,
- 		if (transferred_bytes + len > max_bytes)
- 			len =3D max_bytes - transferred_bytes;
- 		err =3D null_transfer(nullb, bvec.bv_page, len, bvec.bv_offset,
--				     op_is_write(req_op(rq)), pos,
-+				     op_is_write(req_op(rq)), sector,
- 				     rq->cmd_flags & REQ_FUA);
- 		if (err)
- 			break;
--		pos +=3D len;
-+		sector +=3D len >> SECTOR_SHIFT;
- 		transferred_bytes +=3D len;
- 		if (transferred_bytes >=3D max_bytes)
- 			break;
-@@ -1946,7 +1944,6 @@ static int null_add_dev(struct nullb_device *dev)
- 		.logical_block_size	=3D dev->blocksize,
- 		.physical_block_size	=3D dev->blocksize,
- 		.max_hw_sectors		=3D dev->max_sectors,
--		.dma_alignment		=3D 1,
- 	};
-=20
- 	struct nullb *nullb;
-diff --git a/drivers/block/null_blk/zoned.c b/drivers/block/null_blk/zone=
-d.c
-index dbf292a8eae9..6a93b12a06ff 100644
---- a/drivers/block/null_blk/zoned.c
-+++ b/drivers/block/null_blk/zoned.c
-@@ -242,7 +242,7 @@ size_t null_zone_valid_read_len(struct nullb *nullb,
- {
- 	struct nullb_device *dev =3D nullb->dev;
- 	struct nullb_zone *zone =3D &dev->zones[null_zone_no(dev, sector)];
--	unsigned int nr_sectors =3D DIV_ROUND_UP(len, SECTOR_SHIFT);
-+	unsigned int nr_sectors =3D len >> SECTOR_SHIFT;
-=20
- 	/* Read must be below the write pointer position */
- 	if (zone->type =3D=3D BLK_ZONE_TYPE_CONVENTIONAL ||
+T24gMTEvMTEvMjUgMTQ6MDgsIEJhcnQgVmFuIEFzc2NoZSB3cm90ZToNCj4gVGhpcyByZXZlcnRz
+IGNvbW1pdCAzNDUxY2YzNGY1MWJiNzBjMjQ0MTNhYmIyMGI0MjNlNjQ0ODYxNjFiIGFuZCBmaXhl
+cw0KPiB0aGUgZm9sbG93aW5nIEtBU0FOIGNvbXBsYWludCB3aGVuIHJ1bm5pbmcgdGVzdCB6YmQv
+MDEzOg0KPg0KDQpNeSBibGt0ZXN0cyBhdXRvbWF0aW9uIGRpZG4ndCBjYXVnaHQgdGhpcywgbmVl
+ZCB0byBmaXggdGhhdC4NCg0KTG9va3MgZ29vZC4NCg0KUmV2aWV3ZWQtYnk6IENoYWl0YW55YSBL
+dWxrYXJuaSA8a2NoQG52aWRpYS5jb20+DQoNCi1jaw0KDQoNCg==
