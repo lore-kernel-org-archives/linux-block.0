@@ -1,105 +1,121 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sg-1-11.ptr.blmpb.com (sg-1-11.ptr.blmpb.com [118.26.132.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB1B334AAF5
-	for <linux-block@vger.kernel.org>; Tue, 11 Nov 2025 03:25:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC7A860B8A
+	for <linux-block@vger.kernel.org>; Tue, 11 Nov 2025 03:35:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762831559; cv=none; b=HxpU00BDZfE8shbr/qF2yKJY35WWsyg7FULSolOXEvRLGwlyGKmmF1A2YZb6ScvjfRQcnHfqf8rwiHKlrcd2d3bDsMXmaKpXE5Ym89AnthC8S8V/81aIFsBTy03fKLW7z6pMXNONF8d8ql4/N8TEE+0ZNqfBpilHm6B43Mh8/Cg=
+	t=1762832153; cv=none; b=eXCot91mu3n0B/3fG1h/9IjJT8Ju2cum8V7QzZ9gfzGsJjxppZ8wAylvfb8CsJsosiCuoe4E/AmPC1nYbmR7wyPnW2BbzK5r3A2XD7kQpKuG3fyGvXyl0o49xiU7wCWTu/sKqfGGfBjtxUxQE5Fq/LkyG6aP5dXVpBblSylAvgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762831559; c=relaxed/simple;
-	bh=OagPxu3BDFrMdi8d9a7SIWrmYUKVURgm7s+OlqgLC0g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p6QQgEVsew7/000lZpYJRjU6XFtvuCSXyidpoW9wmoq/UhMMUozrjy9upnSmRTN3QBepqgD42CFFp6oC8qIroGVmp83NPuraXzcE8MpfQF/wS3DsWUaT5pBMmGnJcRBz76zO6HPPezP1eWymqmjswf8cIqE7JtUDTFK27+aOZ0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hXjm9J1e; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1762832153; c=relaxed/simple;
+	bh=p6aYua9kJxOLKWhrpeXWKWUipFf2jbmyS+Z7gjvk6Mk=;
+	h=Subject:Date:Message-Id:Content-Type:To:Cc:From:Mime-Version; b=N8IsW35tadkczVJUcmbiUn+Os3Uu+HIibtxtIAa+tAXDTMu4ig3jHgL589eHNxNYF6FOM4tjKZqQUfDJFSHHHNHiOrcJonO9arLXg5wfwC9Chcc82vjA9htgxODqjhgdQvzOa+JQT1EIShyV45bzily6HS5iUh0JJOkLQIXM2sU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=none smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=DdAepbAy; arc=none smtp.client-ip=118.26.132.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=fnnas.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hXjm9J1e"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762831556;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cO5w3yJkudGRFXI8OauYWxvQ3+YR+NH5t9Z29OeLOJo=;
-	b=hXjm9J1e7r0LKiZeNu9XiPh8K+km0IGZVU4AKZe+GZEu/gOVCYkzpl33ZmjGZxTz32oezl
-	3bjvx4kICDeQIfgxvO1GkLAevvLqXbNfPPTUeIFOmpbFZy9XxgD9uCVtzxK1YbYFmIGdhZ
-	SiuBOuj8yGIvHuTBaXUbUzgpbccK4zo=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-166-gGQa16xoORyOd_8dTj8QQg-1; Mon,
- 10 Nov 2025 22:25:55 -0500
-X-MC-Unique: gGQa16xoORyOd_8dTj8QQg-1
-X-Mimecast-MFC-AGG-ID: gGQa16xoORyOd_8dTj8QQg_1762831553
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 51BB1180048E;
-	Tue, 11 Nov 2025 03:25:51 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.124])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 461EC30044E0;
-	Tue, 11 Nov 2025 03:25:42 +0000 (UTC)
-Date: Tue, 11 Nov 2025 11:25:37 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Wangyang Guo <wangyang.guo@intel.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@fb.com>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-	virtualization@lists.linux-foundation.org,
-	linux-block@vger.kernel.org, Tianyou Li <tianyou.li@intel.com>,
-	Tim Chen <tim.c.chen@linux.intel.com>,
-	Dan Liang <dan.liang@intel.com>
-Subject: Re: [PATCH RESEND] lib/group_cpus: make group CPU cluster aware
-Message-ID: <aRKssW96lHFrT2ZN@fedora>
-References: <20251111020608.1501543-1-wangyang.guo@intel.com>
+	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="DdAepbAy"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1762832139;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=sY2AGwyPnUFx1ZWNLbYpUBJOjEJIvg2hMRs/X0DaAyI=;
+ b=DdAepbAyaskBc7DD3bi0h0ymCqffvv/X9yWa0M+Qz5GIgvMKh4FskYLlXZJu+I4ESSrqp4
+ iR5VIhshwtZ3G3A9g3SPLxOnZdtD1w1B7rxNr/orryws4YYKUV7RJ0AFv4U9OdlZCp3XUQ
+ UOBovn+9uv/QG4EmIX2mQ3E8bebJ/ZYctZ4Gx40kL+/ol/aSCPzawG9XrYaO50239uwZlp
+ Jgx1u1FvHrtcxxPfHZlTYE/eC95pBpbcF6cYdgqTpYG9V+XgxeEq3WswPS4IxhWq8W+AYT
+ NCKQPycOOruYZ/MRIHTiZTRxNMUR80y1qHjEFuIHHoljZsTayEdzx3+EzyCiqQ==
+Subject: [GIT PULL] md-6.19-20251111
+Date: Tue, 11 Nov 2025 11:35:29 +0800
+Message-Id: <20251111033529.2178410-1-yukuai@fnnas.com>
+Received: from linux ([39.182.0.168]) by smtp.feishu.cn with ESMTPS; Tue, 11 Nov 2025 11:35:36 +0800
+X-Lms-Return-Path: <lba+26912af09+473410+vger.kernel.org+yukuai@fnnas.com>
+X-Original-From: Yu Kuai <yukuai@fnnas.com>
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>, 
+	<linux-raid@vger.kernel.org>
+Cc: <yukuai@fnnas.com>, <linan122@huawei.com>, <hehuiwen@kylinos.cn>, 
+	<xni@redhat.com>, <nichen@iscas.ac.cn>, <john.g.garry@oracle.com>, 
+	<wuguanghao3@huawei.com>, <yun.zhou@windriver.com>
+From: "Yu Kuai" <yukuai@fnnas.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251111020608.1501543-1-wangyang.guo@intel.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0
 
-On Tue, Nov 11, 2025 at 10:06:08AM +0800, Wangyang Guo wrote:
-> As CPU core counts increase, the number of NVMe IRQs may be smaller than
-> the total number of CPUs. This forces multiple CPUs to share the same
-> IRQ. If the IRQ affinity and the CPU’s cluster do not align, a
-> performance penalty can be observed on some platforms.
+Hi, Jens
 
-Can you add details why/how CPU cluster isn't aligned with IRQ
-affinity? And how performance penalty is caused?
+Please consider pulling following changes on your for-6.19/block branch,
+this pull request contain:
 
-Is it caused by remote IO completion in blk_mq_complete_need_ipi()?
+- change maintainer's email address (Yu Kuai)
+- data can be lost if array is created with different lbs devices, fix
+  this problem and record lbs of the array in metadata (Li Nan)
+- fix rcu protection for md_thread (Yun Zhou)
+- fix mddev kobject lifetime regression (Xiao Ni)
+- enable atomic writes for md-linear (John Garry)
+- some cleanups (Chen Ni, Huiwen He, Wu Guanghao)
 
-	/* same CPU or cache domain and capacity?  Complete locally */
-	if (cpu == rq->mq_ctx->cpu ||
-	    (!test_bit(QUEUE_FLAG_SAME_FORCE, &rq->q->queue_flags) &&
-	     cpus_share_cache(cpu, rq->mq_ctx->cpu) &&
-	     cpus_equal_capacity(cpu, rq->mq_ctx->cpu)))
-	        return false;
+Thanks,
+Kuai
 
-If yes, which case you are addressing to? cache domain or capccity?
+The following changes since commit 25976c314f6596254c9b1e2291d94393b7d5ae81:
 
-AMD's CCX shares L3 cache inside NUMA node, which has similar issue,
-I guess this patchset may cover it?
+  block: introduce bdev_zone_start() (2025-11-07 09:28:08 -0700)
 
-> This patch improves IRQ affinity by grouping CPUs by cluster within each
-> NUMA domain, ensuring better locality between CPUs and their assigned
-> NVMe IRQs.
+are available in the Git repository at:
 
-Will look into this patch, but I feel one easier way is to build
-sub-node(cluster) cpumask array, and just spread over the sub-node(cluster). 
+  git@gitolite.kernel.org:pub/scm/linux/kernel/git/mdraid/linux.git tags/md-6.19-20251111
 
+for you to fetch changes up to 62ed1b58224636185fa689db81224b8c8af46473:
 
-Thanks, 
-Ming
+  md: allow configuring logical block size (2025-11-11 11:20:15 +0800)
 
+----------------------------------------------------------------
+Chen Ni (1):
+      md/md-llbitmap: Remove unneeded semicolon
+
+Huiwen He (1):
+      md/raid5: remove redundant __GFP_NOWARN
+
+John Garry (1):
+      md/md-linear: Enable atomic writes
+
+Li Nan (6):
+      md: prevent adding disks with larger logical_block_size to active arrays
+      md: delete md_redundancy_group when array is becoming inactive
+      md: init bioset in mddev_init
+      md/raid0: Move queue limit setup before r0conf initialization
+      md: add check_new_feature module parameter
+      md: allow configuring logical block size
+
+Wu Guanghao (1):
+      Factor out code into md_should_do_recovery()
+
+Xiao Ni (2):
+      md: delete mddev kobj before deleting gendisk kobj
+      md: avoid repeated calls to del_gendisk
+
+Yu Kuai (1):
+      MAINTAINERS: Update Yu Kuai's E-mail address
+
+Yun Zhou (1):
+      md: fix rcu protection in md_wakeup_thread
+
+ Documentation/admin-guide/md.rst |  10 ++++++++
+ MAINTAINERS                      |   4 +--
+ drivers/md/md-linear.c           |   2 ++
+ drivers/md/md-llbitmap.c         |   2 +-
+ drivers/md/md.c                  | 247 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-------------------------------------------
+ drivers/md/md.h                  |  10 +++++++-
+ drivers/md/raid0.c               |  17 ++++++-------
+ drivers/md/raid1.c               |   1 +
+ drivers/md/raid10.c              |   1 +
+ drivers/md/raid5-cache.c         |   2 +-
+ drivers/md/raid5.c               |   1 +
+ include/uapi/linux/raid/md_p.h   |   3 ++-
+ 12 files changed, 225 insertions(+), 75 deletions(-)
