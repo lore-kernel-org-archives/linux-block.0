@@ -1,73 +1,74 @@
-Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
+Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 165EF29BDB0
-	for <linux-block@vger.kernel.org>; Tue, 11 Nov 2025 14:55:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37DA728FFF6
+	for <linux-block@vger.kernel.org>; Tue, 11 Nov 2025 14:59:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762872909; cv=none; b=IVInF4c9g8QNyADyKxSvRFCxmmJJ+In/01vJcz1zAL/mpr1hIoKeVKAFMcbvohGTWrKAdqjpta7KLhtbLIN59cFHkLZ2HEyhUBxBXlph6Yx991kvYiNGkxUwVuXUgxp83wbjeD7pYNWy4ujnbTOTFTX6/FcOGtsPnjboxLJrW/Y=
+	t=1762873150; cv=none; b=Usg0UyAASSAYk27t3DdUBLCLu+DjqK0948NAxgeSGUPkOLVwxKxK5n9oS/jp/oSOgJuPFUtE0wjWdNmiKgN+6JCva833ohaS/+Q3Q7WEiFqLnQZ0pugyGLTwsoEHiO6FX9s8CYunUzDATfZevdjEIe7TrhTiOWpdhn3K0oYp0Wk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762872909; c=relaxed/simple;
-	bh=Pc086ujvScE2BI9hiMALfAHgXYz5Z656q27m00hb3To=;
+	s=arc-20240116; t=1762873150; c=relaxed/simple;
+	bh=p4NcimrN2RPYbrdDS0aQ7vYMlnE7U1wMAL5BiS8FvCE=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=VjVRuV0Au8JdtpV1pOxtQSYkDrBRQdtPkXG7lRhzI5Hv6mIQ1F6/jVnEGy/EueqrVt0BF4OPCnGs5IWg7r4Yic0WAWLc6hIVlHmImqqp/P6vFXmsPgjPvBRD/4ccCZ6zwzHJoJlIishaJNPsoIcgfoBjWVA4MHePI7JioJJvRJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=zw4y/LOE; arc=none smtp.client-ip=209.85.166.169
+	 MIME-Version:Content-Type; b=cS16SQSYux5CsHZ2y0k49kcgAslSlp09vjIouhtDvJ2P1rP2PNVSoS9v75ElKPJ4IhTVPruzSnJVkIiD772MFtsOoLVM7sNuuDlkZzMqICFz/u9AlFAKW6qgkOneLYMjgqgPKkUVsG8YwMx5qamyOoGUd8Kz/yGwvQeTamvxMbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=FQKCeDhv; arc=none smtp.client-ip=209.85.166.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="zw4y/LOE"
-Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-43323851d03so16479985ab.0
-        for <linux-block@vger.kernel.org>; Tue, 11 Nov 2025 06:55:04 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="FQKCeDhv"
+Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-4337076ae3fso15726715ab.1
+        for <linux-block@vger.kernel.org>; Tue, 11 Nov 2025 06:59:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1762872904; x=1763477704; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1762873147; x=1763477947; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Vd60/KfMSWtIeVZjWzA7tGiHeUAva3B/1z//rOpfIQw=;
-        b=zw4y/LOE287jm6K6HVPtVkEOlEeIcCJRNRUEjwlkMdRAnc/su6+SQ/zIOK4hndN5B2
-         fb+4DGpQH7D+V3yq5dhHsZ78w5xQ38SLm/3rJ+hwfAf3pxZnuc9NmmqfFp4x/WA4G7BJ
-         Vqt9Xaa0zCkxGK+UpwHMc32hhvZteXjl6r4b7gT2mPFtY2UilHHk3gP8o17oi05ay+nF
-         sqkYR+ASvcqAn7CVJI+adySa7hHCS+S50TM+2dlno/ErCtFK+HCki0a0JpPzKpq9oG8G
-         oIew/J9HAx823uccYExYzF/JIuJV5A1PGDlkJONBmGzkmzkBXyaajvm/MC9CaxdenNxe
-         PyJg==
+        bh=m2l3/DAp/XMYRh6GYe6vQu+pHtDQHTp+dBAwA2D1Xpw=;
+        b=FQKCeDhvNvp/aOjvtyPPiZSNzKMfF30ZHN70BdPZeR74DfMy27oLQb+apE+GG+FQsp
+         /BwyVc3BNVvXW9acCYJlaoB8MuEPhtnRpgRJC7+M1V3axKTXSi2/KigO4DrDtqe431x9
+         KNUPqzKpmRgUlIeBcCwpHgvemNZQCnp4iQWX3nCeeQfhIwaG7jRru2DbjDyuicvNZKvh
+         AgeRaoSepUuPjAvk5KnGi6n87ePwozCxGNp2VTa4C5uYXGyd5YA64kmMxrJfPW89ftQ7
+         KjWUg3ICt1VGldjDaJcgIIG2Tb2Y2RAd08+PW8eTg+eRS4YEe89R3yHCzx4Snzus6uPw
+         zT4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762872904; x=1763477704;
+        d=1e100.net; s=20230601; t=1762873147; x=1763477947;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Vd60/KfMSWtIeVZjWzA7tGiHeUAva3B/1z//rOpfIQw=;
-        b=Y7gYttyNgWA86ansy8cgm4tIWVo3cwhEoNUv6P/pQN/GyYJvYdAkZYoxU4Q+grhVKE
-         MfNobSFFMUV6Dk5ji76unYkSDnKXdWLIA+u6YG1tRZXqdoomtgB3f7lODW+UZvIBZfsA
-         n6VXaGSf1L0yf6AAXN7ihKmwLbkh3VO1aogxbiHG8HYyueeny2Sqo8gFXW4rSDvo2IJX
-         AnLgnE9eP5TW49XYjMAz3sAbZLXR22LmCxA4VTqh4YmPhqcMNZIewBfd3vSasn40or2r
-         TkpeuB9zw7hPLIEUTTW/a7OXPZRjI/EoZac8+QuWpwcQvdzhY0PO4J+0tVUQ7vfSz8zA
-         7aUA==
-X-Gm-Message-State: AOJu0YzeJcw0IoxVbKtN9E2FPW7XBNxW5OmrHR7kdFFXQcgHbJnAtI1o
-	aFLr8xD0RQpVdOc7TZYbusxO16byX+Gfsqz2Vg4XpPB1hEU+tjouxPSj+pRX/i9RSEk=
-X-Gm-Gg: ASbGncu/l9OLcTy4y5tqV/J0x1X2DzggR9kq8fzdyTlgaMV8fj/N4V7p0HZZgB5mUyQ
-	vYmPOAmLhTtrOT3rvf8FBlSnPTjm2zfFsS8cWEg2l9pO0bo12QBxpPKHMvtZ3NR53g6eISgsgyJ
-	bOmL3jUH4Eq/4+3lvv9v3h3uAdBy68rgHlI3VZlUPvQvMAc7yoSnbBl+tEYiMocd2fFsuIC74dM
-	qZWeAiCKX+ByvHyU3VqgMOHgmRIjNryQug0n5DK6tRDnW9f456oU9aC6EeX0+hUdSLc1DsBHPKC
-	jLlFnFQtrD8D/pam6ADrJc/HWQdhMzuuk7wJgiPYBMQAtnlgXPgcBmoaSyDAvm1cK9s4VEKDT3X
-	jrr9Wr4zHipJ6P5xvZQUdK6UroC0Ds1mvPBdVDHOCVAD5Qroe71d06IU1tzK3UN8YwlbGPwTIsW
-	dCqp4=
-X-Google-Smtp-Source: AGHT+IFMYYVFn/FWFoI4cBgTrfFiY+nGqvc8CTHosZF05Ixu1TUPMtPgPExq2cQbx0wbLmmkWOTIQQ==
-X-Received: by 2002:a05:6e02:17ca:b0:433:5a9d:dac6 with SMTP id e9e14a558f8ab-43367e7166fmr180713905ab.27.1762872904081;
-        Tue, 11 Nov 2025 06:55:04 -0800 (PST)
+        bh=m2l3/DAp/XMYRh6GYe6vQu+pHtDQHTp+dBAwA2D1Xpw=;
+        b=lDRxLesyRLQFM0PVWVJQbF9w7OX7gprHvubOWsi5X9C2U/dNHnwrs5Lcb1GDNmE4Qz
+         FXUNUwVlQqc9GTncZlQrTmoajfDuZE7a3P6djJkyMYLoGr7fj9WtJmcxQSuxWKP3yfIs
+         wkwnryWGF+5sbv3ACK1fxSqBL1M6JBJuMkUuV5o7pb0Qjf5mqaibMWIR6m4crkRCCaw8
+         pK9FKjCOxWyQwD0QqXLFj8mBiPz1u24d3/5gMf1AXeyxKxfu5Ru6x8tUPsNBPdix2eaK
+         I72Armjat8ynkx+ZLH+gzjxZsVMpbFhfAxhSXPkQ84+YiEnp1lX2FwI51pHNbDGV+0/D
+         8A3g==
+X-Gm-Message-State: AOJu0YzySjPpo1x6n6iTnn27Qyt9t0p8pcw1KWGLXgeCIQa4Fz5G3l0z
+	Cgq+dQ+LqdkEx1uGiu0XmvaDr7uhgBUjoq/novozSCrAEdU9agNOz2vOWYC8yfTSRfEJaoW+4MR
+	Y/Tdj
+X-Gm-Gg: ASbGncueWECdIktASwIR7GQiCKSpD9NDr/UyqSDNQZWhWjZ1gEQ/ieBEhebjW5OULe6
+	uP3/YAsjog5numVf0LqMhh3U0bJJ+rjhqBwWyO2uqIiCj6Ya9C/evSPkvskC2djrYGqtlLnCuCr
+	cvCw/5ETJGSU5CLExXhG54ANkKS8IgcPqqbrziJ6O+aqk50XOm2hoYYMdV6rYn1y6aknvEKD9ia
+	0a+Dbyow8wGfFE7UDn231hLB+NGZRrJsnMAXPKTSPcqtqAzIKJnM3m62Ta3b2ARnnL3P2P8RJKB
+	HubUw1BSeplVfFKfh2eQRo+yRAzhHDk7LiEXNX8jlKzHpNoPir1WUhFlI4FcUU/v8o79skhQCEF
+	E341MXEOTSWsBu65NUKbBWjoddJQTfc0i0qdt7VtqvzvmwIQP88rF6hMcFEWb49oZtSj+S54BeK
+	MPwGQrPKhRdr0FTw==
+X-Google-Smtp-Source: AGHT+IEmsNNjF5MhN82jjicIsOrc06hjWbFtIqHWBtmHjw3+ohFeEHE0nup7E1CkIcuK8C0lO9WCEA==
+X-Received: by 2002:a05:6e02:1c23:b0:433:2fa2:a55d with SMTP id e9e14a558f8ab-43367de53edmr206093235ab.12.1762873146782;
+        Tue, 11 Nov 2025 06:59:06 -0800 (PST)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-43380302872sm26311045ab.32.2025.11.11.06.55.02
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5b74695d420sm6036612173.46.2025.11.11.06.59.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Nov 2025 06:55:03 -0800 (PST)
+        Tue, 11 Nov 2025 06:59:06 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: josef@toxicpanda.com, Zheng Qixing <zhengqixing@huaweicloud.com>
-Cc: linux-block@vger.kernel.org, nbd@other.debian.org, 
- linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com, 
- houtao1@huawei.com, zhengqixing@huawei.com
-In-Reply-To: <20251110124920.1333561-1-zhengqixing@huaweicloud.com>
-References: <20251110124920.1333561-1-zhengqixing@huaweicloud.com>
-Subject: Re: [PATCH] nbd: defer config unlock in nbd_genl_connect
-Message-Id: <176287290263.173215.8003110522218932458.b4-ty@kernel.dk>
-Date: Tue, 11 Nov 2025 07:55:02 -0700
+To: Ming Lei <ming.lei@redhat.com>, 
+ Caleb Sander Mateos <csander@purestorage.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20251108221746.4159333-1-csander@purestorage.com>
+References: <20251108221746.4159333-1-csander@purestorage.com>
+Subject: Re: [PATCH] ublk: remove unnecessary checks in
+ ublk_check_and_get_req()
+Message-Id: <176287314577.174455.6127833224197613328.b4-ty@kernel.dk>
+Date: Tue, 11 Nov 2025 07:59:05 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -79,25 +80,20 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3
 
 
-On Mon, 10 Nov 2025 20:49:20 +0800, Zheng Qixing wrote:
-> There is one use-after-free warning when running NBD_CMD_CONNECT and
-> NBD_CLEAR_SOCK:
+On Sat, 08 Nov 2025 15:17:45 -0700, Caleb Sander Mateos wrote:
+> ub = iocb->ki_filp->private_data cannot be NULL, as it's set in
+> ublk_ch_open() before it returns succesfully. req->mq_hctx cannot be
+> NULL as any inflight ublk request must belong to some queue. And
+> req->mq_hctx->driver_data cannot be NULL as it's set to the ublk_queue
+> pointer in ublk_init_hctx(). So drop the unnecessary checks.
 > 
-> nbd_genl_connect
->   nbd_alloc_and_init_config // config_refs=1
->   nbd_start_device // config_refs=2
->   set NBD_RT_HAS_CONFIG_REF			open nbd // config_refs=3
->   recv_work done // config_refs=2
-> 						NBD_CLEAR_SOCK // config_refs=1
-> 						close nbd // config_refs=0
->   refcount_inc -> uaf
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] nbd: defer config unlock in nbd_genl_connect
-      commit: 1649714b930f9ea6233ce0810ba885999da3b5d4
+[1/1] ublk: remove unnecessary checks in ublk_check_and_get_req()
+      commit: 6b0a29933f688a284e8869da0f63a93acf893757
 
 Best regards,
 -- 
