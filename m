@@ -1,205 +1,258 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 420482BE02C
-	for <linux-block@vger.kernel.org>; Wed, 12 Nov 2025 09:03:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7E9135CBBE
+	for <linux-block@vger.kernel.org>; Wed, 12 Nov 2025 09:33:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762938199; cv=none; b=pC5KGB+q//ROGfx5CnTbyNfsr8mGVOKQ7+GyO6Ywzncnk7MuCxdCGts4wKDQvP4jxhnd9DJwmiqWka5kJ2w/E1hPFauoIG9amNCf0WVQgDvd7YqbDa4FWw4yjiyRZXIn7diyAjJIEtVp2Xh1XyyPojpbWAtEMHBnLAOV5bICiho=
+	t=1762940017; cv=none; b=Ro29hl2n6KsRFAhfqhHmY8zdAM/p+WS5CJF2e2ypycbAZWbV6SkumuzamMvKxhAjEs9HFvjYVi+c4Ph2rsX5K43JTf/2g8gc1SkCNVDd/VnDQn9XppWctBjmg7j1T9xusHrnrqI7HiGZxFhBt0FNERr598DeVshmLgyebccv2LY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762938199; c=relaxed/simple;
-	bh=Ow7vIAjU+SiZpQTtMA6TzsfJUo5tFGjQa3z0lhIdVHw=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=bcw4Q6DW7VPIELa9ZMNg074hUoOLbxfOCa4QLX9aG2BFqZge4hOHMEsmCRdvrghlsHLHHpUo4WL4c6T+3bnTmm+fyp5KmcgB1y6FXmyRjiq9h19rxfmQTkRr3boF9MkY1xJMO8JvKw5GSHo1sBxjbQr/4O8hie5LFArgEiVJaak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=L8Y+dJh7; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=NUmmQzsD; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1762940017; c=relaxed/simple;
+	bh=u+GJ+fgWLBOKon4AYLbpLjIvodZoyXHLoMwjO0TcmRg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bOTHubBywS7obcx0kneCgX2l+jbFUvWYX7ni/GeFZla2peyYH/wVarHXyj0zs5V11IirQMdag8HAUhbjXhdVDk7BxiGcV5y05/U5XkSdfOToJ5nEDRF+PUKxw/urBEEOSfnGBgLuHpCKuCuEmzbzpAc7q45ce/wdd61kVp6LmtI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=b/UYt6Dj; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=aoAP8JQO; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Q352pHDV; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=G4eBS/53; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L8Y+dJh7";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="NUmmQzsD"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762938196;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type;
-	bh=OVs3UnRzUFvqS/kxOOixa8C/mKBiUCs2Wodz5uBDZAI=;
-	b=L8Y+dJh7h5i3xSoVTF2y3YAjQuKSoMDBr7BLGVYAIm135RVXNXpDiUvQQZy3j/R9f+bTu+
-	P0CLAQhGTwWk9fOo6BHYmRBP7QpAT9d9Abbm7h3RK0ATuMbGagr5verLMz+q2gaHl68lfq
-	1EwmWAL4Y1aQl/y0YX8kzEndlSlRftQ=
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
- [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-90-RF_00e5xNMClL-DSMzjK1Q-1; Wed, 12 Nov 2025 04:03:14 -0500
-X-MC-Unique: RF_00e5xNMClL-DSMzjK1Q-1
-X-Mimecast-MFC-AGG-ID: RF_00e5xNMClL-DSMzjK1Q_1762938194
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-297e66542afso13802655ad.3
-        for <linux-block@vger.kernel.org>; Wed, 12 Nov 2025 01:03:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762938193; x=1763542993; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=OVs3UnRzUFvqS/kxOOixa8C/mKBiUCs2Wodz5uBDZAI=;
-        b=NUmmQzsD7bDEolP9E6WXfVnCDlIv68+5fH66T4R3lFDdIhK6VrrZyZt17qlvlOs9Iz
-         Gy7ipD3turISZhH6HlI2BLRKrrNthlgrNBtGbFkKbDAZJZA1f4pN8E3YWQytFkkzrLH5
-         Zkmc70Q6A2pU5xfkvBfxdxRQWaXEVpq9rZcRk1MlhkasWicMyzEvhNtMtP0/b+AlUUrl
-         Q3lExIr7fR5aBtoqnlxst4S/J6exWMjdx8vyUiMQYTEZNIIPbwa9SoZKWjPm/36X87Tb
-         MfD1k/inVQGQd1OCipKwSDBgiFCcFWNxPb81WUrR5+vq4w0OOBWp2FpqTIIoj5G67mv2
-         yENg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762938193; x=1763542993;
-        h=to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OVs3UnRzUFvqS/kxOOixa8C/mKBiUCs2Wodz5uBDZAI=;
-        b=T8XmwkaX8FxrAdUzEbOpP3bU1HcEMZjTXisBKhgo5p/yzqPAH7DcbC97RRxeKkh7CZ
-         hYYz1X9ux+U6DI2HR2B7Nbxxl9EMjxf1PAL7IeS9Wej6g8cjkueMcSeidUY6r4kVSrzS
-         TMYQsZRBaI/CLceXzsAY2xnlbmTFPOgl/Nj1fPkZ19jl8UNZJJpJ7/ya8mU4KYiKI94G
-         ByGNNcr4TwRRnIW/AgfjtRfj88Ph6i94Uy54Kt5SIeqDOJhAlLfOmlkz3ustuJTGeOpa
-         IiqtCzMosH3vXfIaCBWhwaMtshjyTktPNBTjY5QSHATX9WxVMR/JeqPN9DetRJnhNCIr
-         BnzA==
-X-Gm-Message-State: AOJu0Yw+3FnfcMc9UagSZvqHmSdKWtCVVMSKRNJXfKbboFe2BVFS6Ye2
-	RB0nFlZXLmBAJU6qB47BqrVNyA/zUhQ9VPiicX3eBgy1PaRmb1mL745/q63CGTCYz8Gg0klcOL+
-	cPSvhQFUOZ27+cOXLGWTShPaoF22j3fZuN+YdRCE8osv6vnUSWEdVh1UmttMZflHKyh1btyQq6U
-	in3FUFNZc8sm4ec+NBfw26GpMrlXNovRQlnj7rKmbl2jh8KZTX9ndC
-X-Gm-Gg: ASbGncvdSGwjUNdQ67IjL88ZYt18GdLVeFdTDXFohJJcE/Hkg4XiFyC80ZGVulEFeom
-	Al6XDhKxzsD1mPyBfCuvdyyLK3WUfETqvBwxNv9RPX/wy7G0sBRJBVXW2+0GTU6/n93TLZmaFQo
-	n7dJmwWvQJoP7MnVZQ6ud9Qn6MRhSYMpDb6AF8o+xst2KGYNVbQDAAOwPfTMhLRMlHASyU1cdFm
-	20dkwvab/FEY3ckPHRbJ2azANU542qT3pxeDDvVhxLfiGfWY7pAvTUi6A==
-X-Received: by 2002:a17:903:2c0f:b0:297:fc22:3ab2 with SMTP id d9443c01a7336-2984edcaca4mr28998485ad.36.1762938193316;
-        Wed, 12 Nov 2025 01:03:13 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IECk0fNHyMkvyVM/g+yV1M1DFlZNXlXxGh79YGHDHADJAAzOQCHjI+rb1dfFUi3IVHxXtMIr7kw4JpeYThdaV0=
-X-Received: by 2002:a17:903:2c0f:b0:297:fc22:3ab2 with SMTP id
- d9443c01a7336-2984edcaca4mr28998145ad.36.1762938192837; Wed, 12 Nov 2025
- 01:03:12 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="b/UYt6Dj";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="aoAP8JQO";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Q352pHDV";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="G4eBS/53"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id C65B61F45E;
+	Wed, 12 Nov 2025 09:33:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1762940013; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=z7xhwIJIKNChEmHzgpJc+xaTvyWpzzX1wyegjJYFT8s=;
+	b=b/UYt6Dj305pVtxjmOzd7bgFCLxxub1rCIgX70FxdUxFR9h11sEFsbUE2XgvPSB+qNsHVK
+	+mXkRCgVF91ugifDXPhYVsvLpFzdzPQWWSsXs0+VH8gYp8svSIZ/WSDXc8Ua3PTYRD3P7G
+	ue6i/GlxUblbYVQb6J8Dn4MPOFYOry4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1762940013;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=z7xhwIJIKNChEmHzgpJc+xaTvyWpzzX1wyegjJYFT8s=;
+	b=aoAP8JQOcJRXC95bEDzi6WNPGSAZZQivBDuZ/28Db756BojWER7Uwm7lcN5qjS2bos1s7T
+	iIBYSZkXDDVEYNBA==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=Q352pHDV;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b="G4eBS/53"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1762940012; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=z7xhwIJIKNChEmHzgpJc+xaTvyWpzzX1wyegjJYFT8s=;
+	b=Q352pHDVmxQ7tTq3Ga27iseQNZhrkT60Sysj7z9dXgXDqQJ0CGW7GuuAkEgY9T2OnTdnE/
+	u3JUgFGwuhb5Eh+J6S2uRdKJTbgPmJqgoDwB0Gt/dCDlZh40xBFVB7jOiOA7vlSrker5TG
+	J/b7w/yB8ij7YlZFgv2L1UkdRgaCmaM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1762940012;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=z7xhwIJIKNChEmHzgpJc+xaTvyWpzzX1wyegjJYFT8s=;
+	b=G4eBS/536eeVjQS3boyERCL0o2r1L1/3z7N2c00m4qCRRnKHOgU4MkCb+u/S4pi0xSylsU
+	DEoBQqnMD1Y7tODg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 74E1B3EA61;
+	Wed, 12 Nov 2025 09:33:32 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id bFXbG2xUFGk7BQAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Wed, 12 Nov 2025 09:33:32 +0000
+Message-ID: <a90b1707-b97a-454c-bced-a25068b28325@suse.cz>
+Date: Wed, 12 Nov 2025 10:33:32 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Changhui Zhong <czhong@redhat.com>
-Date: Wed, 12 Nov 2025 17:02:59 +0800
-X-Gm-Features: AWmQ_bnOl8RhDoCvXBNpIhkWFxt-WaHOblA7VVk9m5lUvGJmhyoD9jJsAEcT_Hc
-Message-ID: <CAGVVp+VqVnvGeneUoTbYvBv2cw6GwQRrR3B-iQ-_9rVfyumoKA@mail.gmail.com>
-Subject: [bug report] BUG: kernel NULL pointer dereference, address: 0000000000000050
-To: Linux Block Devices <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: poison_element vs highmem, was Re: [linux-next:master] [block]
+ ec7f31b2a2: BUG:unable_to_handle_page_fault_for_address
+To: Christoph Hellwig <hch@lst.de>, kernel test robot <oliver.sang@intel.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+ Christoph Lameter <cl@gentwo.org>, David Rientjes <rientjes@google.com>,
+ Roman Gushchin <roman.gushchin@linux.dev>, Harry Yoo <harry.yoo@oracle.com>,
+ linux-mm@kvack.org, oe-lkp@lists.linux.dev, lkp@intel.com,
+ Jens Axboe <axboe@kernel.dk>, "Martin K. Petersen"
+ <martin.petersen@oracle.com>, Johannes Thumshirn
+ <johannes.thumshirn@wdc.com>, Anuj Gupta <anuj20.g@samsung.com>,
+ Kanchan Joshi <joshi.k@samsung.com>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <202511111411.9ebfa1ba-lkp@intel.com>
+ <20251111074828.GA6596@lst.de>
+Content-Language: en-US
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ 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
+ m6M14QORSWTLRg==
+In-Reply-To: <20251111074828.GA6596@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Rspamd-Queue-Id: C65B61F45E
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-0.999];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	ARC_NA(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	MIME_TRACE(0.00)[0:+];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.cz:+];
+	RCVD_COUNT_TWO(0.00)[2];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received,2a07:de40:b281:104:10:150:64:97:from];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:dkim,suse.cz:mid,suse.cz:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Score: -4.51
 
-the following kernel panic was triggered,
-please help check and let me know if you need any info/test, thanks.
+On 11/11/25 08:48, Christoph Hellwig wrote:
+> Looks like this is due to the code in poison_element, which tries
+> to memset more than PAGE_SIZE for a single page.  This probably
+> implies we are the first users of the mempool page helpers for order > 0,
+> or at least the first one tested by anyone on 32-bit with highmem :)
+> 
+> That code seems to come from
+> 
+> commit bdfedb76f4f5aa5e37380e3b71adee4a39f30fc6
+> Author: David Rientjes <rientjes@google.com>
+> Date:   Wed Apr 15 16:14:17 2015 -0700
+> 
+>     mm, mempool: poison elements backed by slab allocator
+> 
+> originally.  The easiest fix would be to just skip poisoning for this
+> case, although that would reduce the usefulness of the poisoning.
 
-repo: https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git/
-branch: for-next
-INFO: HEAD of cloned kernel
-commit 9d5d227cc571e4dde525aa4fa00bb049c436a9b9
-Merge: 6e2eeb8123bc 6d7e3870af11
-Author: Jens Axboe <axboe@kernel.dk>
-Date:   Tue Nov 11 08:39:32 2025 -0700
+#syz test
 
-    Merge branch 'for-6.19/block' into for-next
+----8<----
+From 4d97b55c208c611cb01062e0fbf9dbda9f5617d5 Mon Sep 17 00:00:00 2001
+From: Vlastimil Babka <vbabka@suse.cz>
+Date: Wed, 12 Nov 2025 10:29:52 +0100
+Subject: [PATCH] mm/mempool: fix poisoning order>0 pages with HIGHMEM
 
-    * for-6.19/block:
-      blk-mq-dma: fix kernel-doc function name for integrity DMA iterator
+Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
+---
+ mm/mempool.c | 28 ++++++++++++++++++++++------
+ 1 file changed, 22 insertions(+), 6 deletions(-)
 
-reproducer:
-# cat repro.sh
-#!/bin/bash
+diff --git a/mm/mempool.c b/mm/mempool.c
+index 1c38e873e546..75fea9441b93 100644
+--- a/mm/mempool.c
++++ b/mm/mempool.c
+@@ -68,10 +68,18 @@ static void check_element(mempool_t *pool, void *element)
+ 	} else if (pool->free == mempool_free_pages) {
+ 		/* Mempools backed by page allocator */
+ 		int order = (int)(long)pool->pool_data;
+-		void *addr = kmap_local_page((struct page *)element);
++#ifdef CONFIG_HIGHMEM
++		for (int i = 0; i < (1 << order); i++) {
++			struct page *page = (struct page *)element;
++			void *addr = kmap_local_page(page + i);
 
-for i in {0..3};do
-        dd if=/dev/zero bs=1M count=2000 of=file$i.img
-        sleep 1
-        device=$(losetup -fP --show file$i.img)
-        devices+=" $device"
-        eval "dev$i=$device"
-        sleep 1
-        mkfs -t xfs -f $device
-done
+-		__check_element(pool, addr, 1UL << (PAGE_SHIFT + order));
+-		kunmap_local(addr);
++			__check_element(pool, addr, PAGE_SIZE);
++			kunmap_local(addr);
++		}
++#else
++		void *addr = page_address((struct page *)element);
++		__check_element(pool, addr, PAGE_SIZE << order);
++#endif
+ 	}
+ }
 
-echo "dev list: $dev0 ,$dev1 ,$dev2 ,$dev3"
-pvcreate -y $devices
-vgcreate  black_bird $devices
+@@ -97,10 +105,18 @@ static void poison_element(mempool_t *pool, void *element)
+ 	} else if (pool->alloc == mempool_alloc_pages) {
+ 		/* Mempools backed by page allocator */
+ 		int order = (int)(long)pool->pool_data;
+-		void *addr = kmap_local_page((struct page *)element);
++#ifdef CONFIG_HIGHMEM
++		for (int i = 0; i < (1 << order); i++) {
++			struct page *page = (struct page *)element;
++			void *addr = kmap_local_page(page + i);
 
-lvcreate --type raid0 --stripesize 64k -i 3 \
-        -n non_synced_primary_raid_3legs_1 -L 1G \
-        black_bird $dev0:0-300 $dev1:0-300 \
-        $dev2:0-300 $dev3:0-300
+-		__poison_element(addr, 1UL << (PAGE_SHIFT + order));
+-		kunmap_local(addr);
++			__poison_element(addr, PAGE_SIZE);
++			kunmap_local(addr);
++		}
++#else
++		void *addr = page_address((struct page *)element);
++		__poison_element(addr, PAGE_SIZE << order);
++#endif
+ 	}
+ }
+ #else /* CONFIG_SLUB_DEBUG_ON */
+-- 
+2.51.1
 
-
-dmesg log:
-[  375.341923] BUG: kernel NULL pointer dereference, address: 0000000000000050
-[  375.349711] #PF: supervisor read access in kernel mode
-[  375.355450] #PF: error_code(0x0000) - not-present page
-[  375.361178] PGD 1366f3067 P4D 0
-[  375.364783] Oops: Oops: 0000 [#1] SMP NOPTI
-[  375.369454] CPU: 15 UID: 0 PID: 9991 Comm: lvcreate Kdump: loaded
-Tainted: G S                  6.18.0-rc5+ #1 PREEMPT(voluntary)
-[  375.382561] Tainted: [S]=CPU_OUT_OF_SPEC
-[  375.386938] Hardware name: Lenovo ThinkSystem SR650 V2/7Z73CTO1WW,
-BIOS AFE118M-1.32 06/29/2022
-[  375.396647] RIP: 0010:create_strip_zones+0x3c/0x7d0 [raid0]
-[  375.402872] Code: 49 89 fc 55 53 48 89 f3 48 83 ec 48 48 8b 3d 63
-86 2a f3 48 89 74 24 38 be c0 0d 00 00 e8 9c c5 f9 f1 49 89 c6 49 8b
-44 24 78 <48> 8b 40 50 8b a8 b0 00 00 00 48 c7 03 f4 ff ff ff 4d 85 f6
-0f 84
-[  375.423830] RSP: 0018:ff6856f988a0fa10 EFLAGS: 00010246
-[  375.429655] RAX: 0000000000000000 RBX: ff6856f988a0fa90 RCX: 0000000000000000
-[  375.437620] RDX: 0000000000000000 RSI: ffffffffc14cc7f4 RDI: ff20815ae89bdc60
-[  375.445586] RBP: ffffffffc16407c5 R08: 0000000000000020 R09: 0000000000000000
-[  375.453552] R10: ff6856f988a0fa10 R11: fefefefefefefeff R12: ff20815af4df6058
-[  375.461516] R13: ffffffffc160b0c0 R14: ff20815ae89bdc40 R15: 0000000000000000
-[  375.469480] FS:  00007f4bf7188940(0000) GS:ff20815e3a471000(0000)
-knlGS:0000000000000000
-[  375.478514] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  375.484926] CR2: 0000000000000050 CR3: 0000000128c76004 CR4: 0000000000773ef0
-[  375.492892] PKRU: 55555554
-[  375.495912] Call Trace:
-[  375.498641]  <TASK>
-[  375.500986]  raid0_run+0x10d/0x150 [raid0]
-[  375.505559]  md_run+0x2bb/0x790
-[  375.509068]  ? __pfx_autoremove_wake_function+0x10/0x10
-[  375.514906]  raid_ctr+0x492/0xcdb [dm_raid]
-[  375.519579]  dm_table_add_target+0x193/0x3c0 [dm_mod]
-[  375.525240]  populate_table+0x9a/0xd0 [dm_mod]
-[  375.530214]  ? __pfx_table_load+0x10/0x10 [dm_mod]
-[  375.535571]  table_load+0xc9/0x230 [dm_mod]
-[  375.540250]  ctl_ioctl+0x1a0/0x300 [dm_mod]
-[  375.544933]  dm_ctl_ioctl+0xe/0x20 [dm_mod]
-[  375.549612]  __x64_sys_ioctl+0x96/0xe0
-[  375.553800]  ? syscall_trace_enter+0xfe/0x1a0
-[  375.558664]  do_syscall_64+0x7f/0x810
-[  375.562757]  ? __rseq_handle_notify_resume+0x35/0x60
-[  375.568301]  ? arch_exit_to_user_mode_prepare.isra.0+0xa2/0xd0
-[  375.574816]  ? do_syscall_64+0xb1/0x810
-[  375.579100]  ? clear_bhb_loop+0x30/0x80
-[  375.583382]  ? clear_bhb_loop+0x30/0x80
-[  375.587665]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[  375.593303] RIP: 0033:0x7f4bf74464bf
-[  375.597294] Code: 00 48 89 44 24 18 31 c0 48 8d 44 24 60 c7 04 24
-10 00 00 00 48 89 44 24 08 48 8d 44 24 20 48 89 44 24 10 b8 10 00 00
-00 0f 05 <89> c2 3d 00 f0 ff ff 77 18 48 8b 44 24 18 64 48 2b 04 25 28
-00 00
-[  375.618244] RSP: 002b:00007ffef26ed6d0 EFLAGS: 00000246 ORIG_RAX:
-0000000000000010
-[  375.626695] RAX: ffffffffffffffda RBX: 00005583edb4f810 RCX: 00007f4bf74464bf
-[  375.634660] RDX: 00005583edb4f8f0 RSI: 00000000c138fd09 RDI: 0000000000000003
-[  375.642625] RBP: 00007ffef26ed8b0 R08: 00005583eadfbbb8 R09: 00007ffef26ed580
-[  375.650588] R10: 0000000000000007 R11: 0000000000000246 R12: 00005583ead95d8c
-[  375.658553] R13: 00005583edb4f9a0 R14: 00005583ead95d8c R15: 0000000000000020
-[  375.666517]  </TASK>
-[  375.668955] Modules linked in: raid0 dm_raid raid456
-async_raid6_recov async_memcpy async_pq async_xor xor async_tx
-raid6_pq tls rpcsec_gss_krb5 auth_rpcgss nfsv4 dns_resolver nfs lockd
-grace nfs_localio netfs rfkill intel_rapl_msr intel_rapl_common
-intel_uncore_frequency intel_uncore_frequency_common i10nm_edac
-skx_edac_common nfit libnvdimm x86_pkg_temp_thermal intel_powerclamp
-coretemp kvm_intel kvm ipmi_ssif irqbypass rapl intel_cstate cdc_ether
-iTCO_wdt usbnet mgag200 dax_hmem iTCO_vendor_support cxl_acpi cxl_port
-cxl_core mii isst_if_mmio intel_uncore i2c_i801 isst_if_mbox_pci
-i2c_algo_bit mei_me intel_th_gth ioatdma einj pcspkr i2c_smbus
-isst_if_common intel_th_pci intel_pch_thermal mei intel_vsec intel_th
-dca ipmi_si acpi_power_meter acpi_ipmi ipmi_devintf ipmi_msghandler
-acpi_pad sg fuse loop xfs sd_mod ahci libahci libata
-ghash_clmulni_intel tg3 wmi sunrpc dm_mirror dm_region_hash dm_log
-dm_multipath dm_mod nfnetlink
-
-
-Best Regards,
-Changhui
 
