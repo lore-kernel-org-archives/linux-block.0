@@ -1,73 +1,41 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7BF8304BDF
-	for <linux-block@vger.kernel.org>; Wed, 12 Nov 2025 14:19:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15E9E33C53F;
+	Wed, 12 Nov 2025 14:38:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762957151; cv=none; b=kW24EnuJzJG4idBmQo4OASEZgUQiM3epbTygjPByVsBUjQbv50AC8bdLh01unDZGh1xNK5skHkngrEFMI8xJqzUu67370iT6YBNWkuqqsX0TW/RD0raAOGG0DzQjMuk8pkuilNFdC4znPD/ite8ZRFvYHmXu3OoU00VQaS/3mUA=
+	t=1762958291; cv=none; b=FxFxJdFWD5odvBGAIFMwsUVus9zp362vlfEdlN0mnNUCvhO+aXteLV+KEYThLHtoGmCu1BMl/cLkeK/9rb42oDeM2KNKs5LqY6rUAxuSLJjiH23LHpDmF7X7bwEJt+vh33XgV2pqQgTv/vU8tRcvIv+MNLFhq/3clf5rwbX2HxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762957151; c=relaxed/simple;
-	bh=t+kYm055Q/4/JVRyEGrqO/ETHMRrbbqvnDg9NCLuJQA=;
+	s=arc-20240116; t=1762958291; c=relaxed/simple;
+	bh=3w+5TRvSRZNdSUCPnulOp1wUZx4xTqD2yLBq2QoKneQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UnDSAer/v0gNSQF7GXVcK4GaAkqGxofZcng3O28m10obdNkVrX8RQgGX7Qn3lWEHx9VXfUJZfDcf2C/mXO6AwI77U8Huet7g7QVHTSAVqy4yOY3rCK8D+awgfA27F7vTiX0Il3M4F4BXV1kNjqMd6GY3/S0KQaSQtwHufT3YZWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KfIJsOdn; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=CoLY3tFQdmyul+l7vYpdT8Dn8sBnZPNQGPjqhWo0hC49rf6Y/xWtIV6Qt4jRpRtVtMfaq3PK6iYWfvTnV4RB46MfJvaf5S7MjOYlC/cyFf+6tKHgA0g/yFY8MjB2g0mIYDYbnciaawkHYHdZVBCQAyvtkW8S2k+ecqtvk94P01M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RPV1gENl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KfIJsOdn"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762957149;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=11dzZTZID/e9Yjzv4yjI8lw4KBQwSPfbDNh4cEy8sp8=;
-	b=KfIJsOdnDU6QWgzK/mYY1vYv1FkdHB+cApQ0dzrGK6wNb/OkQUNZ8goTkZJA4ELAiJn0+u
-	ynYTBE7tMvlp0yL7AjNIAFAfzJf4igLuISqTaWyPN4s5cvwGEOAQwUTdmul6Qvm2tfOhQs
-	RiozRCf6RZRBNniGd+hlVJeNBYRufZU=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-387-XOLzT4QWP0C5oz8QabkWEQ-1; Wed,
- 12 Nov 2025 09:19:02 -0500
-X-MC-Unique: XOLzT4QWP0C5oz8QabkWEQ-1
-X-Mimecast-MFC-AGG-ID: XOLzT4QWP0C5oz8QabkWEQ_1762957141
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 785BA18002C2;
-	Wed, 12 Nov 2025 14:19:00 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.179])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BECD31800947;
-	Wed, 12 Nov 2025 14:18:52 +0000 (UTC)
-Date: Wed, 12 Nov 2025 22:18:40 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: hch <hch@lst.de>
-Cc: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-	"Darrick J. Wong" <djwong@kernel.org>, Jan Kara <jack@suse.cz>,
-	Keith Busch <kbusch@kernel.org>, Dave Chinner <david@fromorbit.com>,
-	Carlos Maiolino <cem@kernel.org>,
-	Christian Brauner <brauner@kernel.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: fall back from direct to buffered I/O when stable writes are
- required
-Message-ID: <aRSXQKgkV55fFtNG@fedora>
-References: <20251031130050.GA15719@lst.de>
- <aQTcb-0VtWLx6ghD@kbusch-mbp>
- <20251031164701.GA27481@lst.de>
- <kpk2od2fuqofdoneqse2l3gvn7wbqx3y4vckmnvl6gc2jcaw4m@hsxqmxshckpj>
- <20251103122111.GA17600@lst.de>
- <20251104233824.GO196370@frogsfrogsfrogs>
- <20251105141130.GB22325@lst.de>
- <20251105214407.GN196362@frogsfrogsfrogs>
- <9530fca4-418d-4415-b365-cad04a06449b@wdc.com>
- <20251106124900.GA6144@lst.de>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RPV1gENl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDBA7C4CEF8;
+	Wed, 12 Nov 2025 14:38:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762958290;
+	bh=3w+5TRvSRZNdSUCPnulOp1wUZx4xTqD2yLBq2QoKneQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RPV1gENlHnzIHESu9BbF88ylyZanjfn8jyXO2haMRr2VQJBg9aoXf423Z9gkqjY1x
+	 tubOVbg5LYUdW8AjO2MGOwFGsccdqID34Hc286+wxwQChN4kXumx+23xJNrSXbE9wz
+	 EzmvMq5uLrz/2bMF3NUFbvADRocsT6jmsT+DKLAOUaxPLuEKAn/aQgurCazMx/8JL+
+	 y+6xKFiyH6H52MjrsD0T1m+4Plcnb7a+qGABlPxs1XvuaZfWFhe1SVFYFLkqC2j65M
+	 YgcRZFXP4H4LewlG+B+oZZgaQi4QBeVHqRa0XJ1ed+R1K76a1hC6/rUPMKIeCurBhq
+	 sl06EsxKqIH9g==
+Date: Wed, 12 Nov 2025 09:38:07 -0500
+From: Keith Busch <kbusch@kernel.org>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: Re: [PATCH v3 2/2] block-dma: properly take MMIO path
+Message-ID: <aRSbzwpS2AuP92_n@kbusch-mbp>
+References: <20251027-block-with-mmio-v3-0-ac3370e1f7b7@nvidia.com>
+ <20251027-block-with-mmio-v3-2-ac3370e1f7b7@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -76,29 +44,68 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251106124900.GA6144@lst.de>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+In-Reply-To: <20251027-block-with-mmio-v3-2-ac3370e1f7b7@nvidia.com>
 
-On Thu, Nov 06, 2025 at 01:49:00PM +0100, hch wrote:
-> On Thu, Nov 06, 2025 at 09:50:10AM +0000, Johannes Thumshirn wrote:
-> > On 11/5/25 10:44 PM, Darrick J. Wong wrote:
-> > > Just out of curiosity -- is qemu itself mutating the buffers that it is
-> > > passing down to the lower levels via dio?  Or is it a program in the
-> > > guest that's mutating buffers that are submitted for dio, which then get
-> > > zerocopied all the way down to the hypervisor?
-> > 
-> > If my memory serves me right it is the guest (or at least can be). I 
-> > remember a bug report on btrfs where a Windows guest had messed up 
-> > checksums because of modifying inflight I/O.
-> 
-> qemu passes I/O through, so yes it is guest controller.  Windows is most
-> famous, but the Linux swap code can trigger it easily too.
+On Mon, Oct 27, 2025 at 09:30:21AM +0200, Leon Romanovsky wrote:
+> @@ -732,13 +746,20 @@ static void nvme_unmap_metadata(struct request *req)
+>  		return;
+>  	}
+>  
+> -	if (!blk_rq_integrity_dma_unmap(req, dma_dev, &iod->meta_dma_state,
+> -					iod->meta_total_len)) {
+> +	if (iod->flags & IOD_META_P2P)
+> +		map = PCI_P2PDMA_MAP_BUS_ADDR;
+> +	if (iod->flags & IOD_META_MMIO) {
+> +		map = PCI_P2PDMA_MAP_THRU_HOST_BRIDGE;
+> +		attrs |= DMA_ATTR_MMIO;
+> +	}
 
-Looks buffer overwrite is actually done by buggy software in guest side,
-why is qemu's trouble? Or will qemu IO emulator write to the IO buffer
-when guest IO is inflight?
+This should be an 'else if' no?
 
+> @@ -760,12 +783,20 @@ static void nvme_unmap_data(struct request *req)
+>  		return;
+>  	}
+>  
+> -	if (!blk_rq_dma_unmap(req, dma_dev, &iod->dma_state, iod->total_len)) {
+> +	if (iod->flags & IOD_DATA_P2P)
+> +		map = PCI_P2PDMA_MAP_BUS_ADDR;
+> +	if (iod->flags & IOD_DATA_MMIO) {
+> +		map = PCI_P2PDMA_MAP_THRU_HOST_BRIDGE;
+> +		attrs |= DMA_ATTR_MMIO;
+> +	}
 
-Thanks,
-Ming
+Same here.
 
+> @@ -1036,6 +1067,17 @@ static blk_status_t nvme_map_data(struct request *req)
+>  	if (!blk_rq_dma_map_iter_start(req, dev->dev, &iod->dma_state, &iter))
+>  		return iter.status;
+>  
+> +	switch (iter.p2pdma.map) {
+> +	case PCI_P2PDMA_MAP_BUS_ADDR:
+> +		iod->flags |= IOD_DATA_P2P;
+> +		break;
+> +	case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
+> +		iod->flags |= IOD_DATA_MMIO;
+> +		break;
+> +	default:
+> +		return BLK_STS_RESOURCE;
+> +	}
+
+Why is it an error if the data isn't a P2PDMA type?
+
+> @@ -1058,6 +1100,17 @@ static blk_status_t nvme_pci_setup_meta_sgls(struct request *req)
+>  						&iod->meta_dma_state, &iter))
+>  		return iter.status;
+>  
+> +	switch (iter.p2pdma.map) {
+> +	case PCI_P2PDMA_MAP_BUS_ADDR:
+> +		iod->flags |= IOD_META_P2P;
+> +		break;
+> +	case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
+> +		iod->flags |= IOD_META_MMIO;
+> +		break;
+> +	default:
+> +		return BLK_STS_RESOURCE;
+> +	}
+
+Same here.
