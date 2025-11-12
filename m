@@ -1,122 +1,109 @@
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out203-205-221-202.mail.qq.com (out203-205-221-202.mail.qq.com [203.205.221.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9812F285C96
-	for <linux-block@vger.kernel.org>; Wed, 12 Nov 2025 07:14:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97D26192D8A;
+	Wed, 12 Nov 2025 07:16:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762931652; cv=none; b=ZsL4dAOlHLL8r6fWEv6zNH/cW7iCkdQwJ4ORyurTxCaq5qcv65FGWdI7I5vZrDwXe+Gqt6sofhuYTz6IKWv0kvcZm1Y9D5SaIKBcO3n+A76J3EmFysY2TFdKnHujn2Yyy4IGkKpOfNwo4V0iW+Rsu8OzDuULLC/bq/X9rEx1TKM=
+	t=1762931774; cv=none; b=Dp+DxwRKcLI0vuwUNgkF29QQyRGM2axlJK2BJqZAeD2gfTVZpBOdZhkwPNqLLsjoDo3RlfFAYG9AGcTtrp8C1aJXSrrTNvXylKQZnWWOPFma55/7PsG9HWRhQ4l3fWhhvw/Uf/bmkt7bDejaqITYsNlr8Sf2fYr/ZWwPp3CK4jw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762931652; c=relaxed/simple;
-	bh=cUgCmt7/S4H78nSegwnrwPgzDrfISuJQ8hnVSCrlVDQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=C0PajoTe2n7/+0Rv87IVq1sYUeG/SFKkc9MnGiSrv6NqWOl1Mu/ojlM5B0S2bgHCNgxaard+In+BcCnTBDa2w2yzYAzt7WA9uqeUHTMUe9EKiqChWH88YyDG4p07+kaLSXfop9KHTwTyAt+Bq8vtNHYNS2K3Fcj3MMId1uds1gw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XgH8q1jr; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1762931774; c=relaxed/simple;
+	bh=Xcv2+AJm4TH1a1rjdj3gcabqSWqME7NMMLUOioPIm0c=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=guakrllMasXjKq3skS9Vl1xssWowsWU/6SEE1oVhQS6RpEi1B3gdaC+pTEtjpVpSqJXQXgFX5CvilA2mzTQgNj4VpS5AXFiUP+H2ep9iJznUiOvFoWL4mHrdBer41XJieP+chne6IPDJDkKqinO2ZL+0Vw9kXX5Tx7l4ZjuM/8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=qmwnyyFV; arc=none smtp.client-ip=203.205.221.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XgH8q1jr"
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-7aad4823079so486620b3a.0
-        for <linux-block@vger.kernel.org>; Tue, 11 Nov 2025 23:14:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762931650; x=1763536450; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=X8sb02e1W+AKeJ6wR0eYaD2KkfiM6HqalBahoIkkYHA=;
-        b=XgH8q1jr2+XQgLkfDKCa/eUWE1ZvSrkjRxtr5lBbLGxRYdtzxNaRzJKM50Ux2SEHOn
-         0BlAjFIYdWeA6qeOVyyZmDrK6k4OKLxGTQYKjGI7qHlLKCwbVIW0OFzrgEv4v5ewBziv
-         lv4ohKUGv7dG6To2zsCiMcMO+Ruuo3xwZdTgTqKyLYSvet1wbq7QLkzDOvfx78zFlOw+
-         MR3w5gfbC9TLFm1qlc0UjFCOBC78Zar1o6Tx335kme/yEGz0nsP3JeYSRpYmnGxuxOuv
-         z5Wpi3dE0zdK4SoBYUa7rWSOkPUcOAf6XQY3Au3eII4YW4J+vud6XV4zDnR1hSYZ39Yj
-         SQ2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762931650; x=1763536450;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=X8sb02e1W+AKeJ6wR0eYaD2KkfiM6HqalBahoIkkYHA=;
-        b=un1yCDMrqz3UlldI9H+EoEyt3pWlWFUOQhc3Al7kcqPICppK3Ex1JAWQ66bodfzKmw
-         7YM1xc+lXWpT1XrSVTvk7zZyMnj/s+ks5ivDCY5dsRleDzbf3TDc6qXxUSWHjyzZzwZ2
-         f5qYSGfJp/MnngkkEromT6nOkPTbeLUjJGvdoB9joJUZaKNA2j+/1nUTGoC9YpEIUjr7
-         sfrsOmaDUBnQPp97v5jIbF7zN7d+XLbWYOcSPcs8bw/bLaT49dRBfAxUr0etl1odBNtW
-         +40gYu7XJzcLIN/jwG6YKoZKfHWEnAQB4mJqO2qRPK8WZ7wYkO206RgBfqNeVix8ZQuG
-         OPiw==
-X-Forwarded-Encrypted: i=1; AJvYcCU+6TgjyryfQgX/dYW6Kc2G3Wi+KReoseqvMXZqQ7gnqvmpeRwDWAt1rHMjbN1gvvGitG0I1EhHwBgwkQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8gDNbjnqfX7hpRUyFNjm6Wx97CNjBaIgeK8Y59BRE8qtb+w2Y
-	FmOcAbyvEIGnXUfQ6OHIykJrIdg4lJ+Y3aybKpLGPX0+Ryuu8QVFaahP
-X-Gm-Gg: ASbGncv6nSrqLBs16TzOGICNAne2a4Cm99AW716ueEEyhrVrCrKvVo1NSr7PiCRLDgx
-	4wnHAJUwWHnxqUiyB3VPcdtS/O0iUaUkwCPfB6magsXkxWvD1iW9M8OtWilLiWZCH8pRrPAu9Tm
-	5I+DcR36BGOJKZ3mMiIiiyYqM+GJ0Olg+9YxbIg1zutyMIeUYrQGJGz3exemuTONP1XLTeVTyGq
-	9mp4w25OiqbMAaOXlbOFPTeVoMOGgrR0JY8yCADMRSXPHHhvY7aG3ysAdxq1dwkrP6gdgRoXSP2
-	/cbOfOkCtIyQWJA4tsHmMX8mMr0KOqHXt/KQSxKHmH7CAb3ND2RPssOpKyWxQVk561RvuuPLmUU
-	HvSawWbm3NFZM12WsIxRmR6mL6JmTUDPItkbp05gNxrdtHoEFTrXL0pC/hCSdOItXRBqAheRlvd
-	2E9n8/wl7Jph2iRuac
-X-Google-Smtp-Source: AGHT+IFxIDHbMDQtJnDd1j29er8I9W16ktyYHaqy/e9kdgu1LMq6asMSVrMWec36NOc6lpyOhk0v6w==
-X-Received: by 2002:a17:903:3d0b:b0:295:9e4e:4090 with SMTP id d9443c01a7336-2984edde5demr21733055ad.52.1762931650013;
-        Tue, 11 Nov 2025 23:14:10 -0800 (PST)
-Received: from [9.109.246.38] ([129.41.58.6])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2984dca027esm19947645ad.70.2025.11.11.23.14.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Nov 2025 23:14:09 -0800 (PST)
-Message-ID: <c91c87ab-dd85-4c42-9af4-a25ea2540de3@gmail.com>
-Date: Wed, 12 Nov 2025 12:43:05 +0530
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="qmwnyyFV"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1762931463;
+	bh=aI1DtojJ3uIlfMHHyo3gbCN97mQw0Es8Q9FMf59dQ/0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=qmwnyyFVudo5FNg9tNff7bxheDeVYTJqfAdyFs6X9aYV4msYHJQb3eLVzlVLCluVz
+	 HTDvR29e+jHVxoMXA3wAhyPIZLB9CIyfYCW1wcgBTPms2fQCh254YnOpkUiqMygpep
+	 jfC6LdxDUAhQDqWxNnKUUi8DlqgHYvZbGeqoodoY=
+Received: from meizu-Precision-3660.meizu.com ([14.21.33.152])
+	by newxmesmtplogicsvrsza56-0.qq.com (NewEsmtp) with SMTP
+	id E6C29EB1; Wed, 12 Nov 2025 14:57:44 +0800
+X-QQ-mid: xmsmtpt1762930664t3r16dqsu
+Message-ID: <tencent_17B2F3A0BCCBAFD3AE942235EE98F1595707@qq.com>
+X-QQ-XMAILINFO: N7qqMxIPUfzlejnxzQ6ythel/a3Tm6mb1P8jrwVKo9It+HgpxUwJ7p6FhD9GwW
+	 6sBlZtFDtxdbIzunrvVRbintL1eAuUABZFf0n53X22tNuayQs9oQxTDv2W/AK/DqtfSHBbNrPo4Y
+	 6iIhsknA5vUgM+gsCHBaIS/vhyfq7Pg5KVbi60NeM8hgYDrswKYGAb3G8G1DJcEEDn/RbACj/49h
+	 ahWpe8BBeN5mxSXnNmOHInBw+1agxhJ9kxWyroctg9a7s4e1NG1Eba3fF3G2jg9c6J5ygMJxvc6L
+	 CpxtoRng7XOMwMjELhQqWlntGmfGXsb6Qnxt8tyHvYuIPRA+z4/btPyyASqe009XJqCGXPUe1lhX
+	 K4+hzj3JZqHdaD62ZSP2uUuP7jqksebAO2TdEm1ogqkUuKHNSBhIeTjpKleanyLp36y3nZMKWbbl
+	 GCbE7GiGeZTtkNL8CFJD1B2ZZhtGSQWYIj/AaLnQnmu+v/lgjUTKBUGUwKfIRMt3ERFUpggU5wYq
+	 HY765VN84IXnzkSpL9nrXooj4uc5Ii56oNPhQzmIX7jkajnI9BMpIfxRUixAGCY5bAXUbTFh2DPq
+	 bXLjZeSDOYkUunhZz/191z2XPgIeGvyJcG/sGtdoPS1GlQvLz/8bjQV/MKTBS0+UPg1aOMudWthG
+	 tiHPrq2dwEC3XbRMxLcj6sCMOLyU+aSKgTVOP/GQFaahImw768ahfc/tbTnUBFdgwOYJpLw+JcXe
+	 yKEPn9og42iS5B4GXJylvMjvt1jBkW9tFPBZjCJBab9RH2Oyyy+69/sI1cJozfWaM77sh7GQ82Cr
+	 htbvbHmUT26eD5W8HTVtSgE1xDZN1lL2qqmShYao3CRQnt+0id80CpFpR8b4FpwQ19tIa3GfFkNR
+	 odsT3BvrYGN8uvaIFmBqExAR+FG4EEsQFUUMXYUSAY/Cyhwh0nFoBIk0ZK7SA2uCQLuhOYazcGc+
+	 ZDNOa+ipxNAu1XEaXtGj1VwR1k3WsAa2t5FiEh2XHhwPzuXeKI5OQ1y0W1KC1fVZGqbr2sztBLLO
+	 ggSopnFNvrKVCJj2/wcuhybO16fLU=
+X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
+From: Yuwen Chen <ywen.chen@foxmail.com>
+To: senozhatsky@chromium.org
+Cc: akpm@linux-foundation.org,
+	axboe@kernel.dk,
+	bgeffon@google.com,
+	licayy@outlook.com,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	liumartin@google.com,
+	minchan@kernel.org,
+	richardycc@google.com,
+	ywen.chen@foxmail.com
+Subject: Re: [PATCH v4] zram: Implement multi-page write-back
+Date: Wed, 12 Nov 2025 14:57:44 +0800
+X-OQ-MSGID: <20251112065744.3293306-1-ywen.chen@foxmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <htycvrcqbnkk7ldhpaqxesy7uhz3lssymwqm7nzkhyhnid3krm@mfju626njxvb>
+References: <htycvrcqbnkk7ldhpaqxesy7uhz3lssymwqm7nzkhyhnid3krm@mfju626njxvb>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/4] xfs: fallback to buffered I/O for direct I/O when
- stable writes are required
-Content-Language: en-US
-To: Christoph Hellwig <hch@lst.de>
-Cc: Carlos Maiolino <cem@kernel.org>, Christian Brauner <brauner@kernel.org>,
- Jan Kara <jack@suse.cz>, "Martin K. Petersen" <martin.petersen@oracle.com>,
- linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-raid@vger.kernel.org,
- linux-block@vger.kernel.org
-References: <20251029071537.1127397-1-hch@lst.de>
- <20251029071537.1127397-5-hch@lst.de>
- <7f7163d79dc89ae8c8d1157ce969b369acbcfb5d.camel@gmail.com>
- <20251110135932.GA11277@lst.de>
-From: "Nirjhar Roy (IBM)" <nirjhar.roy.lists@gmail.com>
-In-Reply-To: <20251110135932.GA11277@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+On Wed, 12 Nov 2025 14:16:20 +0900, Sergey Senozhatsky wrote:
+> The thing that I'm curious about is why does it help for flash storage?
+> It's not a spinning disk, where seek times dominate the IO time.
 
-On 11/10/25 19:29, Christoph Hellwig wrote:
-> On Mon, Nov 10, 2025 at 07:08:05PM +0530, Nirjhar Roy (IBM) wrote:
->> Minor: Let us say that an user opens a file in O_DIRECT in an atomic
->> write enabled device(requiring stable writes), we get this warning
->> once. Now the same/different user/application opens another file
->> with O_DIRECT in the same atomic write enabled device and expects
->> atomic write to be enabled - but it will not be enabled (since the
->> kernel has falled back to the uncached buffered write path)
->> without any warning message. Won't that be a bit confusing for the
->> user (of course unless the user is totally aware of the kernel's exact
->> behavior)?
-> The kernel with this patch should reject IOCB_ATOMIC writes because
-> the FMODE_CAN_ATOMIC_WRITE is not set when we need to fallback.
-Okay, makes sense.
->
-> But anyway, based on the feedback in this thread I plan to revisit the
-> approach so that the I/O issuer can declare I/O stable (initially just
-> for buffered I/O, but things like nvmet and nfsd might be able to
-> guarantee that for direct I/O as well), and then bounce buffer in lower
-> layers.  This should then also support parallel writes, async I/O and
-> atomic writes.
+1. For flash-based storage devices such as UFS and NVMe, the Command Queue
+mechanism is implemented. Submitting multiple random write requests can
+fully utilize the bandwidth of their buses.
 
-Okay.
+2. When we submit consecutive pages separately instead of submitting them
+continuously together, the write amplification problem is more likely to
+occur. This is because there is an LBA (Logical Block Addressing) table in UFS.
 
---NR
+3. Sequential writing has lower requirements for the bus bandwidth.
 
->
--- 
-Nirjhar Roy
-Linux Kernel Developer
-IBM, Bangalore
+> My next question is: what problem do you solve with this?  I mean,
+> do you use it production (somewhere).  If so, do you have a rough
+> number of how many MiBs you writeback and how often, and what's the
+> performance impact of this patch.  Again, if you use it in production.
+
+We haven't deployed this commit in the product yet. We're now deploying
+it on mobile phones running the Android system. Our ideas are as follows:
+
+1. When an app switches to the background, use process_madvise to swap out
+the app's anonymous pages to zram. When the system is idle, cache the app
+to the external UFS through the writeback interface.
+
+2. When the system memory is tight and the IO load is low, use the IO load to
+improve the memory release speed.
+
+On Wed, 12 Nov 2025 14:18:01 +0900, Sergey Senozhatsky wrote:
+> Why do you do this do-while loop here?
+
+When there are no free zram_wb_request structures in the req_pool,
+zram_writeback_next_request will return NULL. In this case, you need
+to retry once to obtain a zram_wb_request.
 
