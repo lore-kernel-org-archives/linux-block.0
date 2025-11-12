@@ -1,105 +1,104 @@
-Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14F8F1ADC83
-	for <linux-block@vger.kernel.org>; Wed, 12 Nov 2025 14:00:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7BF8304BDF
+	for <linux-block@vger.kernel.org>; Wed, 12 Nov 2025 14:19:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762956039; cv=none; b=FAoRT3NcEDDng/SiLM6KXwZFdLzyJwPXmbcVS0xQzHjlP+xAqGlaF+7apXJDvAwgcwUKZ1I7ZMEsIKqVsR402+zgSDeKCFb0rJXvIcBGlYA6PF+CTykavza9gbF7pEQjc7hag+4CYwVOXfD8Z4BUPsFom8Ex0HI+034Iw4iWmHQ=
+	t=1762957151; cv=none; b=kW24EnuJzJG4idBmQo4OASEZgUQiM3epbTygjPByVsBUjQbv50AC8bdLh01unDZGh1xNK5skHkngrEFMI8xJqzUu67370iT6YBNWkuqqsX0TW/RD0raAOGG0DzQjMuk8pkuilNFdC4znPD/ite8ZRFvYHmXu3OoU00VQaS/3mUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762956039; c=relaxed/simple;
-	bh=WM/yqXIneSYB6y10Ptk9a3kSgmCsWnqo3wNTzYJK7GM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pwlwcL8Ani5MbUsgiXRHHajn0lE0fDSedClECaqDwdUR3w7a+5GP5iM5mvB1zArHnQ1wIblIhJKmQcp03B7zd/r8F8YihnufaA0eshRNEh+CwbNNfPdZ96nu5SeTpC7Tvz86xjR3enUiJUhDtJuJsOBP4xeJGzMIQAs77zfUFPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=H0hVafSd; arc=none smtp.client-ip=209.85.166.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1762957151; c=relaxed/simple;
+	bh=t+kYm055Q/4/JVRyEGrqO/ETHMRrbbqvnDg9NCLuJQA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UnDSAer/v0gNSQF7GXVcK4GaAkqGxofZcng3O28m10obdNkVrX8RQgGX7Qn3lWEHx9VXfUJZfDcf2C/mXO6AwI77U8Huet7g7QVHTSAVqy4yOY3rCK8D+awgfA27F7vTiX0Il3M4F4BXV1kNjqMd6GY3/S0KQaSQtwHufT3YZWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KfIJsOdn; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="H0hVafSd"
-Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-434717509afso4224025ab.2
-        for <linux-block@vger.kernel.org>; Wed, 12 Nov 2025 06:00:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1762956034; x=1763560834; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=O+mMfQC8uU5hH6IjadSuFEXz2DHCeAdeqj+orJRu214=;
-        b=H0hVafSdXpgWKFNDYaPjaf41CNDYuS1Z4e39f3wvElTJOAfRFWeHuaE+A7THtkXSd+
-         2a8Oe3SoK+8m8T/wosV//PKYiNr39s+QDOj2rKGnCNpZ0ir8TQBdMIx4Ano3YcpqeurB
-         Thy2fJ6v5a8kDxewdrwxKcY179r0DhqjnBahg3Vo7TqD3IcDDfTntZrGA8CjlxpTuDtr
-         kAdPUcymo8K6ucTHqG8cSDvxhL+l8AOhh0WfWCVGVmTgrGhXsG9Br5KUl9ImglqmPeKb
-         uUmTRRAQW3u0R3CZ1zM1wAmWeP8ku8jSlZfBAXDMVUo6CiC3uGItncJdp+ZS8gPQFFr0
-         SmWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762956034; x=1763560834;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=O+mMfQC8uU5hH6IjadSuFEXz2DHCeAdeqj+orJRu214=;
-        b=uQJJTZFVPrSkHL4k0gdF7ZWbEc85UEUkx2uOwA94Q102+upFY/yjvfrI78yRbQv3Nh
-         FUwK3AZWw+KZtrRJfCb/HMn7aRs/BUkuT6PkzHgvU6fSIzSIm0oC588fYcUDgpPKxr+7
-         WJXgjA2ULu210aMRYsdaIIzF9tgoXo6YFgY3fZKpiFguAIDpAHEZwvqXSrHGLFy/dG1r
-         TS4T5ow+vpbNmq974A7o5jSNpaADQNJ9ZWhd/bMVU0tQVtPtWx6R3UFMtQS3EN7r5all
-         5DLbljekW80kipXZlgBMjoN+WrzWH4PJ8WVbgj0sY5l/Zrak76qeULfoRa9STkjQ5zki
-         slDQ==
-X-Gm-Message-State: AOJu0Yyl8UtLCXVs5HiGqF1ErcLBVozyF6TcKG6BNYxgAv3KnUoH9UKz
-	ynXDwvhw7Y9kKjBwif/fBhUMShP8YnCR4tx5dtkrCDyQurhn9oUCwyEuGtFLGBRicQY=
-X-Gm-Gg: ASbGnctLudmbaXFXpPUyfpw1DDxV82JmbtSR905/oV/E9PIXtBhKA2Q5HuXyfnaUH6J
-	V+ln+d+JT8XUhAt3PlENM+Ae9u62CQM8oZrrH2wLfAdcoCAdzAbUD7qouXKjW9YXnn12QCwXAtA
-	dG8tvehnRneJo3jx1F6RwJv2ef+g9diVp1AgDCQac55LIdgHAvBrDmCRclHC+GT0eG74thb+FP6
-	sz7KEtFRIx1tT38VblTLsXUfe4sECSH4dRPcXsmiCru+aEnobtoxHdUqJJUYXM7Uu5JRw115lVj
-	VjWH4IOBTAXthQfbuhrRwWb+yieXjcFpbR8KJ1OiiRmybie20RMz2FSMR9KU7Do2TjrUY426C5b
-	aGMhk0Cfur9KnMuUvp2radWYyPPTiZeL08YalLaIVAcbgHJ5VcitilxqP/WGXPSNVwVsjdehKsA
-	==
-X-Google-Smtp-Source: AGHT+IFxKNLgoCGLxWoTf1NRvsAdvMHFCIcKIIyw0/9zGWosV8UYX2oDx90WG9vAiLNC6kplOUyIzQ==
-X-Received: by 2002:a05:6e02:1561:b0:429:6c5a:61f3 with SMTP id e9e14a558f8ab-43473d19f09mr33489125ab.8.1762956033691;
-        Wed, 12 Nov 2025 06:00:33 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-434767dc5c7sm5669155ab.33.2025.11.12.06.00.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Nov 2025 06:00:32 -0800 (PST)
-Message-ID: <499e05be-69c6-472c-a9e1-3061a583d71e@kernel.dk>
-Date: Wed, 12 Nov 2025 07:00:31 -0700
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KfIJsOdn"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762957149;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=11dzZTZID/e9Yjzv4yjI8lw4KBQwSPfbDNh4cEy8sp8=;
+	b=KfIJsOdnDU6QWgzK/mYY1vYv1FkdHB+cApQ0dzrGK6wNb/OkQUNZ8goTkZJA4ELAiJn0+u
+	ynYTBE7tMvlp0yL7AjNIAFAfzJf4igLuISqTaWyPN4s5cvwGEOAQwUTdmul6Qvm2tfOhQs
+	RiozRCf6RZRBNniGd+hlVJeNBYRufZU=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-387-XOLzT4QWP0C5oz8QabkWEQ-1; Wed,
+ 12 Nov 2025 09:19:02 -0500
+X-MC-Unique: XOLzT4QWP0C5oz8QabkWEQ-1
+X-Mimecast-MFC-AGG-ID: XOLzT4QWP0C5oz8QabkWEQ_1762957141
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 785BA18002C2;
+	Wed, 12 Nov 2025 14:19:00 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.179])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BECD31800947;
+	Wed, 12 Nov 2025 14:18:52 +0000 (UTC)
+Date: Wed, 12 Nov 2025 22:18:40 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: hch <hch@lst.de>
+Cc: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+	"Darrick J. Wong" <djwong@kernel.org>, Jan Kara <jack@suse.cz>,
+	Keith Busch <kbusch@kernel.org>, Dave Chinner <david@fromorbit.com>,
+	Carlos Maiolino <cem@kernel.org>,
+	Christian Brauner <brauner@kernel.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: fall back from direct to buffered I/O when stable writes are
+ required
+Message-ID: <aRSXQKgkV55fFtNG@fedora>
+References: <20251031130050.GA15719@lst.de>
+ <aQTcb-0VtWLx6ghD@kbusch-mbp>
+ <20251031164701.GA27481@lst.de>
+ <kpk2od2fuqofdoneqse2l3gvn7wbqx3y4vckmnvl6gc2jcaw4m@hsxqmxshckpj>
+ <20251103122111.GA17600@lst.de>
+ <20251104233824.GO196370@frogsfrogsfrogs>
+ <20251105141130.GB22325@lst.de>
+ <20251105214407.GN196362@frogsfrogsfrogs>
+ <9530fca4-418d-4415-b365-cad04a06449b@wdc.com>
+ <20251106124900.GA6144@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2] blk-mq: add blk_rq_nr_bvec() helper
-To: Keith Busch <kbusch@kernel.org>,
- Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
-Cc: linux-block@vger.kernel.org, hch@lst.de, kch@nvidia.com,
- dlemoal@kernel.org
-References: <20251111232252.24941-1-ckulkarnilinux@gmail.com>
- <aRP6KdADdbnhwwrj@kbusch-mbp>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <aRP6KdADdbnhwwrj@kbusch-mbp>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251106124900.GA6144@lst.de>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On 11/11/25 8:08 PM, Keith Busch wrote:
-> On Tue, Nov 11, 2025 at 03:22:52PM -0800, Chaitanya Kulkarni wrote:
->> This patch also provides a clear API to avoid any potential misuse of
->> blk_nr_phys_segments() for calculating the bvecs since, one bvec can
->> have more than one segments and use of blk_nr_phys_segments() can
->> lead to extra memory allocation :-
+On Thu, Nov 06, 2025 at 01:49:00PM +0100, hch wrote:
+> On Thu, Nov 06, 2025 at 09:50:10AM +0000, Johannes Thumshirn wrote:
+> > On 11/5/25 10:44 PM, Darrick J. Wong wrote:
+> > > Just out of curiosity -- is qemu itself mutating the buffers that it is
+> > > passing down to the lower levels via dio?  Or is it a program in the
+> > > guest that's mutating buffers that are submitted for dio, which then get
+> > > zerocopied all the way down to the hypervisor?
+> > 
+> > If my memory serves me right it is the guest (or at least can be). I 
+> > remember a bug report on btrfs where a Windows guest had messed up 
+> > checksums because of modifying inflight I/O.
 > 
-> Perhaps blk_nr_phys_segments is misnamed as it represents device
-> segments, not physical host memory segments. Instead of rewalking to
-> calculate physical segments, maybe just introduce a new field into the
-> request so that we can save both the physical and device segments to
-> avoid having to repeatedly rewalk the same list. There is an ongoing
-> effort to avoid such repeated work.
+> qemu passes I/O through, so yes it is guest controller.  Windows is most
+> famous, but the Linux swap code can trigger it easily too.
 
-Is it used in the fast path? From the initial patch, I only see
-loop/zloop using it, and that's certainly not enough to warrant
-further bloating struct request. Just have them iterate the
-darn thing, it's not a huge deal.
+Looks buffer overwrite is actually done by buggy software in guest side,
+why is qemu's trouble? Or will qemu IO emulator write to the IO buffer
+when guest IO is inflight?
 
--- 
-Jens Axboe
+
+Thanks,
+Ming
 
