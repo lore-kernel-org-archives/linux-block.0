@@ -1,83 +1,120 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AE3934889A;
-	Wed, 12 Nov 2025 18:30:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 661681C695;
+	Wed, 12 Nov 2025 19:29:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762972249; cv=none; b=Qq9jCx3dFq5ouKXOgiuN2g+DQZ+kuYXniJHEu5uVVMZ4fTWd+kNtPRHCWf8OzifQczqwDgbrz6+/BpYBeVlyH4mw3xcnPx5Hx4CT0DhPe5Bs6pe+U9fdJ+vF9NqEmPkOdXXjdZ9GZZkKm08BpoLSGRRgVuPKPfigqFnBAqd33y4=
+	t=1762975757; cv=none; b=gGTpZ0F+mWUZI2uaa6SVmz3pQL/ELIRaLapOz7C6OrYPg++hxjs6JJjqxQY3qGeqtPWOAJ1n9QAQLdVhOWkbXwZmcSzsIp4x3TD7ATqvEeTkFec2JhjAu8R6f8j3G8h5UuV6PGXlJu4582FY5xDWIRa0OR/pv3UPtLMqrJ5fgnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762972249; c=relaxed/simple;
-	bh=CNUuHy/bpt4vT9lybSu7TmV/AB42+O/pew00JBqknEg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ep5Vm4dhwd0qqITM4i8B8WlHCMNAqBSTSaTVxlrrNSwF0xDzHfojaQdvPdi4Kho3Hjv/XTz54034p26tQQxKUlD5mCyTtt65pXu8t+aoJD/JzPQUZEn/HWdFevNwVkgerjQelRvOZ5/ObZdACorNxTKW4reYW3Jk6tf5Km/DFE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p0q3oWbE; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1762975757; c=relaxed/simple;
+	bh=JmkStz5Gh3rOJ+hhrwXD71Fdps8rm8yy5L0EEOeZmIE=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=b/JT3ZFud4M5WaZ/FcvBW+CfRUTIibPFe/TcezYhl6k8ddrBtbm6xIsTSVMxrFuxIRoxvfzCkQSRGxKdtaeHDV3I1iOteA2nZtT6FSjlj+KzjCzyFQ0pwkcnn/WTLTPZ4TOg+/WE04MWk4Kx31/EiD83Uo2+BInaoBZoWagey94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=jV7B9ZTX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p0q3oWbE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 627D5C4CEF7;
-	Wed, 12 Nov 2025 18:30:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762972247;
-	bh=CNUuHy/bpt4vT9lybSu7TmV/AB42+O/pew00JBqknEg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=p0q3oWbEBImXCu7pv/1N4lXSKrIYXeALiciQ7vUEJAcW7Z3DHOQldOJ4COJS2eNj6
-	 gJfu6pqiBaDj1+NWy2dV/IpBi2v2qTC7Rxc7TF+lXc4+rfEBNWe/5f+mUhmHOYxoBo
-	 EL2mH54mGM86fUWRoJlEFNGD8qYocRntJqvvhfH5wmDLxZn9yOW7pBz93QaQCV/XjP
-	 JNR11E4iY11h1gXstnR5sLOVnaCLcJcGFNvvH1SYFfRsFpw2aScDmQdYaz1hKtabqf
-	 TmC/dsqZAjGvDQnj6PGzibnqjMLLYucIypQwafYwbSYXwDgxAj+XOJ/xA34qPq8E6f
-	 RqjgKNcuDdlLw==
-Date: Wed, 12 Nov 2025 20:30:42 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Keith Busch <kbusch@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: Re: [PATCH v3 2/2] block-dma: properly take MMIO path
-Message-ID: <20251112183042.GA10544@unreal>
-References: <20251027-block-with-mmio-v3-0-ac3370e1f7b7@nvidia.com>
- <20251027-block-with-mmio-v3-2-ac3370e1f7b7@nvidia.com>
- <aRSbzwpS2AuP92_n@kbusch-mbp>
- <20251112151604.GF17382@unreal>
- <aRSmZ6IisXDmI9Yg@kbusch-mbp>
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="jV7B9ZTX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6AB3C113D0;
+	Wed, 12 Nov 2025 19:29:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+	s=korg; t=1762975755;
+	bh=JmkStz5Gh3rOJ+hhrwXD71Fdps8rm8yy5L0EEOeZmIE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=jV7B9ZTXfZmPp8me+Wuw+QBmvt0yn5k6449d2MFzoWtNYgQAgvWFCnN63D4FxHdEK
+	 xr0CS75jOOBvnUb5WaBGXYHGrThYQ9xzUsZac0uDJk6lnos4tcUXBcN/rfRiu/obRh
+	 z+TazN1tQlcqy0WK84BZYYHNZMhaZxyiIyF77ZxI=
+Date: Wed, 12 Nov 2025 11:29:14 -0800
+From: Andrew Morton <akpm@linux-foundation.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, Caleb Sander
+ Mateos <csander@purestorage.com>, Uday Shankar <ushankar@purestorage.com>,
+ Stefani Seibold <stefani@seibold.net>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V3 01/27] kfifo: add kfifo_alloc_node() helper for NUMA
+ awareness
+Message-Id: <20251112112914.459baa16c4e9117d67f53011@linux-foundation.org>
+In-Reply-To: <20251112093808.2134129-2-ming.lei@redhat.com>
+References: <20251112093808.2134129-1-ming.lei@redhat.com>
+	<20251112093808.2134129-2-ming.lei@redhat.com>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aRSmZ6IisXDmI9Yg@kbusch-mbp>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 12, 2025 at 10:23:19AM -0500, Keith Busch wrote:
-> On Wed, Nov 12, 2025 at 05:16:04PM +0200, Leon Romanovsky wrote:
-> > On Wed, Nov 12, 2025 at 09:38:07AM -0500, Keith Busch wrote:
-> > > On Mon, Oct 27, 2025 at 09:30:21AM +0200, Leon Romanovsky wrote:
-> > > > @@ -732,13 +746,20 @@ static void nvme_unmap_metadata(struct request *req)
-> > > >  		return;
-> > > >  	}
-> > > >  
-> > > > -	if (!blk_rq_integrity_dma_unmap(req, dma_dev, &iod->meta_dma_state,
-> > > > -					iod->meta_total_len)) {
-> > > > +	if (iod->flags & IOD_META_P2P)
-> > > > +		map = PCI_P2PDMA_MAP_BUS_ADDR;
-> > > > +	if (iod->flags & IOD_META_MMIO) {
-> > > > +		map = PCI_P2PDMA_MAP_THRU_HOST_BRIDGE;
-> > > > +		attrs |= DMA_ATTR_MMIO;
-> > > > +	}
-> > > 
-> > > This should be an 'else if' no?
-> > 
-> > We can't have both IOD_META_P2P and IOD_META_MMIO. It can be only one or
-> > IOD_META_P2P or IOD_META_MMIO. In this case "else if' is not necessary.
+On Wed, 12 Nov 2025 17:37:39 +0800 Ming Lei <ming.lei@redhat.com> wrote:
+
+> Add __kfifo_alloc_node() by refactoring and reusing __kfifo_alloc(),
+> and define kfifo_alloc_node() macro to support NUMA-aware memory
+> allocation.
 > 
-> I get that and I'm not saying this is a bug, but it just looks odd.
+> The new __kfifo_alloc_node() function accepts a NUMA node parameter
+> and uses kmalloc_array_node() instead of kmalloc_array() for
+> node-specific allocation. The existing __kfifo_alloc() now calls
+> __kfifo_alloc_node() with NUMA_NO_NODE to maintain backward
+> compatibility.
+> 
+> This enables users to allocate kfifo buffers on specific NUMA nodes,
+> which is important for performance in NUMA systems where the kfifo
+> will be primarily accessed by threads running on specific nodes.
 
-Sorry, I didn't get the intent.
+I was about to ask "please don't add infrastructure without users", but
+I see a "01/27" there.  I wander over to lkml but I can't find 02-27
+there either.  Maybe something went wrong.
 
-Thanks
+I prefer to be cc'ed on the entire series, please.
 
-> You're checking the conditions as if they're independent of each other
-> when they're not. If the first 'if' is true, there's no need to test the
-> second one as we know it's false, but this code flow will test it
-> anyway.
+> --- a/include/linux/kfifo.h
+> +++ b/include/linux/kfifo.h
+> @@ -369,6 +369,30 @@ __kfifo_int_must_check_helper( \
+>  }) \
+>  )
+>  
+> +/**
+> + * kfifo_alloc_node - dynamically allocates a new fifo buffer on a NUMA node
+> + * @fifo: pointer to the fifo
+> + * @size: the number of elements in the fifo, this must be a power of 2
+> + * @gfp_mask: get_free_pages mask, passed to kmalloc()
+> + * @node: NUMA node to allocate memory on
+> + *
+> + * This macro dynamically allocates a new fifo buffer with NUMA node awareness.
+> + *
+> + * The number of elements will be rounded-up to a power of 2.
+> + * The fifo will be release with kfifo_free().
+> + * Return 0 if no error, otherwise an error code.
+> + */
+> +#define kfifo_alloc_node(fifo, size, gfp_mask, node) \
+> +__kfifo_int_must_check_helper( \
+> +({ \
+> +	typeof((fifo) + 1) __tmp = (fifo); \
+> +	struct __kfifo *__kfifo = &__tmp->kfifo; \
+> +	__is_kfifo_ptr(__tmp) ? \
+> +	__kfifo_alloc_node(__kfifo, size, sizeof(*__tmp->type), gfp_mask, node) : \
+> +	-EINVAL; \
+> +}) \
+> +)
+
+Well this is an eyesore.  Do we really need it?  It seems to be here so
+we can check for a programming bug?  Well, don't add programming bugs!
+
+I'm actually not enjoying the existence of __is_kfifo_ptr() at all. 
+What  is it all doing?  It's a FIFO for heck's sake, why is this so hard.
+
+> @@ -902,6 +926,9 @@ __kfifo_uint_must_check_helper( \
+>  extern int __kfifo_alloc(struct __kfifo *fifo, unsigned int size,
+>  	size_t esize, gfp_t gfp_mask);
+>  
+> +extern int __kfifo_alloc_node(struct __kfifo *fifo, unsigned int size,
+> +	size_t esize, gfp_t gfp_mask, int node);
+> +
+
+Nit: please align things like this:
+
+extern int __kfifo_alloc_node(struct __kfifo *fifo, unsigned int size,
+			      size_t esize, gfp_t gfp_mask, int node);
+
+(several places)
+
