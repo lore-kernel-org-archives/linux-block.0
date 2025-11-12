@@ -1,154 +1,233 @@
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A91F2C1580
-	for <linux-block@vger.kernel.org>; Wed, 12 Nov 2025 13:05:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86FF5311583
+	for <linux-block@vger.kernel.org>; Wed, 12 Nov 2025 13:23:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762952725; cv=none; b=R/7EYrpRooH/mufvkL2ijd/emophN2iIzx/Xg21aYXOMELy5nX92WWOLOGqGsUeF310d7ukOh6990MlXSJamzS+gwKmvx8+d5ewn+K6f0UhB0NZEK74LmuM8Hx1VEV6lVO+TexuSX7+Ut2ZfGbBm+J6m2mwAqEGDQ7Dka6pbuxI=
+	t=1762953795; cv=none; b=XIJiYDRlRoaZtMi/OnhqpSutNWTnpcwMoFhakIOTlm+MusAZjCdg9kJNiHYL5SpfZD+AYyx8QwtPGC0VO7wXH+AyPXBPK6uEqQ/PWAnDm9YWMdfH7hmbn1MbZFC8Hn9zgtmw+/dAYPwNTQvh0mpnDlfLXin/qjAf/YqmJOWYod0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762952725; c=relaxed/simple;
-	bh=JZHRWJ0VXR7589q4YvpdkIKz3+SIFx/pa/SBbMDVTlc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nJRvOf1uNh8VWfja4yItW3CzkE6RUgaaycY2ui8htQ59Oc74fb4AfELOIeh07/oh4+dM3SjYhH6ydzYKtc8kPR8CquerZz/CbJK8i0SY0+YeC1HrhUx0gbpgBbdm6MCykHhUTCWQ9JqWGPlteKj76Ide11F9grGEP1jraTFwgfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=WAqEaF6O; arc=none smtp.client-ip=148.163.158.5
+	s=arc-20240116; t=1762953795; c=relaxed/simple;
+	bh=ojYxByaKG6sGFzYixd4ier67BJVebeRCENWu3yVg3Zw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qW11XUMx9qVP/vsG/3377DQ7FiPUlwOP0K1rB9TEvyQJ3ptjNw2KO/M1SRyZxCyOAHiAZPKREAOBL9XMPr0aLwrGc4iYpgnkfCwPu+0NGgG9UkA6H86n+10Wr5vZfpDw14PgsPd3RH3REBHbm8F7IUG6SKhA4JuMeXavj5aYtqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Vho1S5Nd; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="WAqEaF6O"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AC8GGFs018831;
-	Wed, 12 Nov 2025 13:05:09 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Vho1S5Nd"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5ACB2tmC022431;
+	Wed, 12 Nov 2025 13:22:58 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=WK6jGg
-	FyTbO6HWDcEwyojgPTfdSb8Aeb1Xlp6pO2nhg=; b=WAqEaF6OL+P1e7lfQmBc0y
-	Acjokk54LGaUIkluewisMA4NLfm9eJbMRjFCJPCO4vgbLe6RBF4oLG9h0zXJtb9r
-	LCpxySTEGUf0UuSgRdQwRQsmGaQNkhjecdxtiLZUOaBisFNO6LGWWRLXSzm4zJ1u
-	UjFlZ60EDSLfb9jrZrHw6IRIwdxT4F0EMHK5Un7Okcr+dfGGxsTNHleb8KYYyoB0
-	aXPQnoHw+KUT5YJfjExpiWC9sHgUHsxgerDgRDRVvoSk+ibw+LuCxuOxlr7iPsq5
-	lVBSkG1WthFbSeoQokVt6un3Ump+RnSXEUlXcSoVdMmdtBQgqPgDUF0mEzgoMUEA
-	==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aa3m88e9n-1
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pp1; bh=0FLT/yXgGF0vkseV4iimLlqjz+P4
+	lat692LgOGLuM0c=; b=Vho1S5NdOfTOSu0bXNHOYGyZhYB2dOmxAioYFzqlD0XD
+	nMa1UBLk/M1mfh0cx6XzJXz51ramh/HWIjrUMKGqwSyd8IFv1qUw4ha6BsTDr0d7
+	Q/OeUk6+gzUznfVVlXLGw3Yo7EgHDPqBusQZHsH2st5RbPdEmpbYFPB/jcmfz6AW
+	pQMxOQxC8h1CILOzeD0l52ohz109p+772GVCEEI9UDRXEtkDP66amZ8YebiiK2xL
+	EVUZQLLvRu72CB1R3osMA/MuAc/ecG2n+njksEMcuckhilTocGejsao+lTMakDEO
+	Nf5BhXD5ShDOcfOz73/CoQesNol7LUQFxIzZpPQrDA==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aa5tk066f-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 12 Nov 2025 13:05:08 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5AC9ghCQ014841;
-	Wed, 12 Nov 2025 13:05:08 GMT
-Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4aahpk88x6-1
+	Wed, 12 Nov 2025 13:22:57 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5ACD2FKD007309;
+	Wed, 12 Nov 2025 13:22:56 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4aajdjg6gy-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 12 Nov 2025 13:05:08 +0000
-Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
-	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5ACD57V532113304
+	Wed, 12 Nov 2025 13:22:56 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5ACDMtIr44433824
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 12 Nov 2025 13:05:07 GMT
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A545B58050;
-	Wed, 12 Nov 2025 13:05:07 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2AB4258045;
-	Wed, 12 Nov 2025 13:05:03 +0000 (GMT)
-Received: from [9.43.41.49] (unknown [9.43.41.49])
-	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 12 Nov 2025 13:05:02 +0000 (GMT)
-Message-ID: <5dd4d03e-d988-4dfe-8c6d-d7ee18d321a4@linux.ibm.com>
-Date: Wed, 12 Nov 2025 18:35:00 +0530
+	Wed, 12 Nov 2025 13:22:55 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2A87220043;
+	Wed, 12 Nov 2025 13:22:55 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2258F20040;
+	Wed, 12 Nov 2025 13:22:51 +0000 (GMT)
+Received: from li-c9696b4c-3419-11b2-a85c-f9edc3bf8a84.ibm.com.com (unknown [9.43.41.49])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 12 Nov 2025 13:22:50 +0000 (GMT)
+From: Nilay Shroff <nilay@linux.ibm.com>
+To: linux-block@vger.kernel.org
+Cc: ming.lei@redhat.com, hch@lst.de, axboe@kernel.dk, yi.zhang@redhat.com,
+        czhong@redhat.com, yukuai@fnnas.com, gjoyce@ibm.com
+Subject: [PATCHv6 0/5] block: restructure elevator switch path and fix a lockdep splat
+Date: Wed, 12 Nov 2025 18:52:23 +0530
+Message-ID: <20251112132249.1791304-1-nilay@linux.ibm.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv5 3/5] block: introduce alloc_sched_data and
- free_sched_data elevator methods
-To: Ming Lei <ming.lei@redhat.com>
-Cc: linux-block@vger.kernel.org, hch@lst.de, axboe@kernel.dk,
-        yi.zhang@redhat.com, czhong@redhat.com, yukuai@fnnas.com,
-        gjoyce@ibm.com
-References: <20251112052848.1433256-1-nilay@linux.ibm.com>
- <20251112052848.1433256-4-nilay@linux.ibm.com> <aRRiwBMmLzkD6bag@fedora>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <aRRiwBMmLzkD6bag@fedora>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=MtZfKmae c=1 sm=1 tr=0 ts=69148604 cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+X-Proofpoint-GUID: ghxqwjhZYogozfyZrQqKNYeNoL2Qpp-R
+X-Proofpoint-ORIG-GUID: ghxqwjhZYogozfyZrQqKNYeNoL2Qpp-R
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA4MDA5OSBTYWx0ZWRfX3PgvLtsHoWfY
+ D9nSoo6f8H7BwyWnhPh8SmW3A01oU3vVqltTTNbqnUlLw/R0B/4qZkBMhYXLKFKyhmkalu8mlXr
+ NUQBd2eapyxJVnBIuUCJkenERYHfXLC4dWSFKVilcazS57vzDaEhHmVTzihEfcDhp/4yzUvv66r
+ WwS7BUPS1Y4LyFwj3LXUt7/kI6Eu/K8v+6lHxEucuajkXmynqYosDJXE6TWbKS2dGtINyQKmxwk
+ 3PT4EJGll3e/0tEhm8O2dpRKQCqb50NhvRPiCmIQfGUEfTknruIW2uHy0LEuAQNL3ruXEw/83oB
+ Kv8uHUv+wZZZlH4D2dgnSCvkv6H6VndyicLGEq/bTvv0oAklA+eqvdWCwxPQxDa7CmXwIinTjFu
+ 1zv4D1LO8mdH/kePH1w2Xv+oEvKkeA==
+X-Authority-Analysis: v=2.4 cv=V6xwEOni c=1 sm=1 tr=0 ts=69148a31 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
  a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VwQbUJbxAAAA:8 a=pGLkceISAAAA:8 a=20KFwNOVAAAA:8 a=VnNF1IyMAAAA:8
- a=91t--V6Uq9am7j5nezsA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-GUID: XptJL04Um1HsSaV_oube8ysSExq_o8lq
-X-Proofpoint-ORIG-GUID: XptJL04Um1HsSaV_oube8ysSExq_o8lq
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA4MDA3OSBTYWx0ZWRfX4xP9ALsDSqlE
- sIKSAn9ztX3ihzhqsg3bpj0aYn0JhCfmpDUzrFZval4rXwas66Mw7kuigA02BxNO7PRZppN33OK
- WXjTQtTipLFJS2eoTWmL88hz9yidiKqRW66ns+xc00+PDmdchtMqrwFLNoYwQ4f6WPelvmIpcKS
- oyRFghdm9PJ6xVIhGtgFz2W1StdxYp20fulP4luUha6zdyNbIt6tcv3vIClySUP77QLz/P/NEe+
- R0ZLxQBYQUWtgu2jafTaZG+/plsmbHqwTw4lO1kQJin0TEkNYbEqID2IBVqoYsHL06+8S4L5aye
- w3O8iqejUQlK9OzWKWjOR/OFRf+Ky1i2pCm10It5ZBApo60UcUsb60FAlZ7RaBy64VcLYG2p3UW
- 256rKlzcPMXfZH8ZKgE1Rhg6g7/LlQ==
+ a=VwQbUJbxAAAA:8 a=pGLkceISAAAA:8 a=VnNF1IyMAAAA:8 a=5mTiuFpr0edpLGR4-ccA:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=cPQSjfK2_nFv0Q5t_7PE:22
+ a=HhbK4dLum7pmb74im6QT:22 a=pHzHmUro8NiASowvMSCR:22 a=Ew2E2A-JSTLzCXPT_086:22
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
  definitions=2025-11-12_03,2025-11-11_03,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 adultscore=0 priorityscore=1501 bulkscore=0 impostorscore=0
- suspectscore=0 lowpriorityscore=0 clxscore=1015 phishscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 adultscore=0 malwarescore=0 impostorscore=0
+ suspectscore=0 priorityscore=1501 phishscore=0 bulkscore=0 spamscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511080079
+ reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511080099
 
+Hi,
 
+This patchset reorganizes the elevator switch path used during both
+nr_hw_queues update and elv_iosched_store() operations to address a
+recently reported lockdep splat [1].
 
-On 11/12/25 4:04 PM, Ming Lei wrote:
-> On Wed, Nov 12, 2025 at 10:56:04AM +0530, Nilay Shroff wrote:
->> The recent lockdep splat [1] highlights a potential deadlock risk
->> involving ->elevator_lock and ->freeze_lock dependencies on -pcpu_alloc_
->> mutex. The trace shows that the issue occurs when the Kyber scheduler
->> allocates dynamic memory for its elevator data during initialization.
->>
->> To address this, introduce two new elevator operation callbacks:
->> ->alloc_sched_data and ->free_sched_data. The subsequent patch would
->> build upon these newly introduced methods to suppress lockdep splat[1].
->>
->> [1] https://lore.kernel.org/all/CAGVVp+VNW4M-5DZMNoADp6o2VKFhi7KxWpTDkcnVyjO0=-D5+A@mail.gmail.com/
->>
->> Reviewed-by: Ming Lei <ming.lei@redhat.com>
->> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
->> ---
->>  block/blk-mq-sched.h | 15 +++++++++++++++
->>  block/elevator.h     |  2 ++
->>  2 files changed, 17 insertions(+)
->>
->> diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
->> index 1f8e58dd4b49..3ac64b66176a 100644
->> --- a/block/blk-mq-sched.h
->> +++ b/block/blk-mq-sched.h
->> @@ -39,6 +39,21 @@ void blk_mq_free_sched_res(struct elevator_resources *res,
->>  void blk_mq_free_sched_res_batch(struct xarray *et_table,
->>  		struct blk_mq_tag_set *set);
->>  
->> +static inline void *blk_mq_alloc_sched_data(struct request_queue *q,
->> +		struct elevator_type *e)
->> +{
->> +	if (e && e->ops.alloc_sched_data)
->> +		return e->ops.alloc_sched_data(q);
->> +
->> +	return 0;
-> 
-> s/0/NULL
-> 
-Thanks, but it seems replacing 0 with NULL doesn’t quite work here because that
-would make the caller assume that allocation of the scheduler data has failed.
-We need to handle two cases:
-- If ->alloc_sched_data is defined, then return the value it provides.
-- If ->alloc_sched_data is not defined, we should still treat it as a success
-  case and return a sentinel pointer that the caller can interpret as “success,
-  but no allocation required.”
+The warning highlights a locking dependency between ->freeze_lock and
+->elevator_lock on pcpu_alloc_mutex, triggered when the Kyber scheduler
+dynamically allocates its private scheduling data. The fix is to ensure
+that such allocations occur outside the locked sections, thus eliminating
+the dependency chain.
 
-I'll send out the above change. 
+While working on this, it also became evident that the nr_hw_queue update
+code maintains two disjoint xarrays—one for elevator tags and another
+for elevator type—both serving the same purpose. Unifying these into a
+single elv_change_ctx structure improves clarity and maintainability.
+
+This series therefore implements five patches:
+The first perparatory patch unifies elevator tags and type xarrays. It
+combines both xarrays into a single struct elv_change_ctx, simplifying
+per-queue elevator state management.
+
+The second patch is aimed to group together all elevator-related 
+resources that share the same lifetime and as a first step we move the
+elevator tags pointer from struct elv_change_ctx into the newly
+inroduced struct elevator_resources. The subsequent patch extends the 
+struct elevator_resources to include other elevator-related data.
+
+The third patch introduce ->alloc_sched_data and ->free_sched_data
+elevator ops which could be then used to safely allocate and free 
+scheduler data.
+
+The fourth patch now builds upon the previous patch and starts using the
+newly introduced alloc/free sched data methods in the earlier patch
+during elevator switch and nr_hw_queue update. And while doing so, it's
+ensured that sched data allocation and free happens before we acquire
+->freeze_lock and ->elevator_lock thus preventing its dependency on
+pcpu_alloc_mutex.
+
+The last patch of this series converts Kyber scheduler to use the new
+methods inroduced in the previous patch. It hooks Kyber’s scheduler data
+allocation and teardown logic from ->init_sched and ->exit_sched into
+the new methods, ensuring memory operations are performed outside
+locked sections.
+
+Together, these changes simplify the elevator switch logic and prevent
+the reported lockdep splat.
+
+As always, feedback and suggestions are very welcome!
+
+[1] https://lore.kernel.org/all/CAGVVp+VNW4M-5DZMNoADp6o2VKFhi7KxWpTDkcnVyjO0=-D5+A@mail.gmail.com/
 
 Thanks,
 --Nilay
+
+changes from v5:
+  - Update blk_mq_alloc_sched_data() to return a sentinel pointer
+    when the ->alloc_sched_data method is not defined. Also update
+    its caller accordingly to use the IS_ERR() macro to distinguish
+    between success and failure cases.
+
+Link to v5: https://lore.kernel.org/all/20251112052848.1433256-1-nilay@linux.ibm.com/
+
+changes from v4:
+  - Update the signature of blk_mq_alloc_sched_res() in patch #2
+    and add a struct request_queue * parameter. This allows direct
+    access to blk_mq_tag_set from the request queue, removing the
+    need for a separate struct blk_mq_tag_set * argument. (Ming Lei)
+
+  - Update blk_mq_init_sched() to add a local variable et of type
+    struct elevator_tags *. This avoids additional code changes, 
+    as we can avoid dereferencing struct elevator_resources *res
+    to reach it. (Ming Lei)
+
+  - Simplify blk_mq_alloc_sched_data() to return a pointer to the
+    allocated scheduler data on success, or NULL on failure. Update
+    the caller accordingly to use the return value directly instead
+    of passing **sched_data as an additional argument. (Yu Kuai)
+
+Link to v4: https://lore.kernel.org/all/20251110081457.1006206-1-nilay@linux.ibm.com/
+
+changes from v3:
+  - Split the third patch into two patches to separate the introduction
+    of ->alloc_sched_data and ->free_sched_data methods from their users.
+  - Free scheduler tags during sched resource allocation failures using
+    blk_mq_free_sched_tags() instead of kfree() to avoid kmemleak
+    (Ming Lei).
+  - Delay the signature change of elevator_alloc() until the fourth
+    patch, where we actually start allocating scheduler data during
+    elevator switch and nr_hw_queue_update (Ming Lei).
+
+Link to v3: https://lore.kernel.org/all/20251029103622.205607-1-nilay@linux.ibm.com/
+
+changes fron v2:
+  - Introduce helper functions blk_mq_alloc_sched_res_batch() and
+    blk_mq_free_sched_res_batch() to encapsulate scheduler resource
+    (tags and data) allocation and freeing in batch mode. (Ming Lei)
+
+  - Introduce helper functions blk_mq_alloc_sched_res() and
+    blk_mq_free_sched_res() to encapsulate scheduler resource
+    allocation and freeing. (Ming Lei)
+
+Link to v2: https://lore.kernel.org/all/20251027173631.1081005-1-nilay@linux.ibm.com/
+
+changes from v1:
+  - Keep blk_mq_free_sched_ctx_batch() and blk_mq_alloc_sched_ctx_batch()
+    together in the same file (Ming Lei)
+  - Since the ctx pointer is stored in xarray after it's dynamically
+    allocated, if blk_mq_alloc_sched_ctx_batch() fails to allocate or
+    insert ctx pointer in xarray then unwinding the allocation is not
+    necessary. Instead looping over the xarray to retrieve the inserted
+    ctx pointer and freeing it should be sufficibet. So invoke blk_mq_
+    free_sched_ctx_batch() from the blk_mq_alloc_sched_ctx_batch()
+    callsite on failure (Ming Lei)
+  - As both elevator tags and elevator data shares the same lifetime
+    and allocation constraints, abstract both into a new structure
+    (Ming Lei)
+
+Link to v1: https://lore.kernel.org/all/20251016053057.3457663-1-nilay@linux.ibm.com/
+
+Nilay Shroff (5):
+  block: unify elevator tags and type xarrays into struct elv_change_ctx
+  block: move elevator tags into struct elevator_resources
+  block: introduce alloc_sched_data and free_sched_data elevator methods
+  block: use {alloc|free}_sched data methods
+  block: define alloc_sched_data and free_sched_data methods for kyber
+
+ block/blk-mq-sched.c  | 117 ++++++++++++++++++++++++++++++++++--------
+ block/blk-mq-sched.h  |  41 +++++++++++++--
+ block/blk-mq.c        |  50 ++++++++++--------
+ block/blk.h           |   7 ++-
+ block/elevator.c      |  80 +++++++++++++----------------
+ block/elevator.h      |  26 +++++++++-
+ block/kyber-iosched.c |  30 ++++++++---
+ 7 files changed, 249 insertions(+), 102 deletions(-)
+
+-- 
+2.51.0
+
