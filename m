@@ -1,143 +1,225 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADBFD1F09B3
-	for <linux-block@vger.kernel.org>; Wed, 12 Nov 2025 05:18:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3531C2D97A5
+	for <linux-block@vger.kernel.org>; Wed, 12 Nov 2025 05:29:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762924689; cv=none; b=JtLSitRuU8w2QJwoDhTgaBbIL6Tf9pjlIv3CfXeBE80J2RhDZDYzmOIAye/NxQc7X0rQzveDoysfYKdbrHSWFz+bSWkxfOJgCooKU0d/L1hLyOxoxxqpX66Gek62iOIbD2jnv5LoOAhN2/dr7BrCbuxKUDT0AAs0fVeQ37YyQtw=
+	t=1762925356; cv=none; b=N1Ge795JlkTZuYRM/wuB4xzitj746CF9zPnE+S+cPIBVgMrkuthIyRQo/ZTxFOAMMqTrACo/euVvwt7F19aoA/Spm6LQJvyS+rh8XyTuBYNFpZkSjcIYDbLojClfYTOXg5AlS8xlI+fyOeUwaH7frCpkXoK93CHHMGr9b/aOcVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762924689; c=relaxed/simple;
-	bh=N2i7mYhy/wako5FItulAn51gZ+92I+axWJfXi+cvC60=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B7GWxH5lKyhTPWtJxTlnXvfqadrCFlhxx1XOGBwn8dMEdIDaREGJqEpKXYEMeF3glwhlVrHgLXW1/OfwXOO8myZ0+mf1x0p/xCEZ31CYxzLJEYjJDxZEbkjPA+BIhKItwng1GO3NU9wBpqBqjE04FD17JaCoRrWL1W8vpQROTCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=nVEg4d4H; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1762925356; c=relaxed/simple;
+	bh=DESJgKmxHkjnxoxc4kgAspw5361FtxCCLZFB71r23BA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=en6pb3HFq7K43exEJxYzM3r2GJd7RNFbHYsRttolLlBRhTJXsOAORh807klJ3jH0set3SfKa89H1cM5glZV3v2K5T+GzaSWix05/SRnSxNmEVpKQeIcZ6lnlCydTcb66cB4GrxOrW4VbvMx5sjAgbsSsnZ4fnXc+WjpD2mkEmsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=RSbPT2Ab; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="nVEg4d4H"
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-297e982506fso5196265ad.2
-        for <linux-block@vger.kernel.org>; Tue, 11 Nov 2025 21:18:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1762924687; x=1763529487; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kJv5UmqfgHdkO0lr5oB99ha660rGNd0N5LAs+dq++Iw=;
-        b=nVEg4d4HFceVmE6td0hEsE1pz6FLQdDsA7zlIePdMeu8XFli/T7Owb0EmJ1tnoUDeE
-         3PIT+yiFk9ZfTQlm4d9hfwnkPPNcHi4PfQ/t170txOTcL484VoqPv47gSe/dc2EztecI
-         1LeIbBUB1qt2O2gDEx0pqsC3jp/Dv1XUhQX8I=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762924687; x=1763529487;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kJv5UmqfgHdkO0lr5oB99ha660rGNd0N5LAs+dq++Iw=;
-        b=Erf1lhVngA1YIPXpst8z246n/Im4SCA/jus4L9nlwKbyXuNDXA2IEq2tjpfWmDafal
-         YfQ7lF9FyvRsVN6+omx9PBvrVKH5QYlbjP9TOVZpLOuRMYZ6e6VnNzU+LoEJm5ltJFHj
-         N5fc9f+AcsY7KRk5fg92OzBd+bNSWcMNX6TB6NNSniiBnkRRyosKJUzcHDnt/zj9apNr
-         EYt3HHLfyNDu+TNd5zxeCWhURELGv+kU+LOQegXlDL/Rbs+hlwgJK9omMFBYAgVvZ0bY
-         J1PWBujL/Cc5fC2EJuTyOw2p5STjxj2KxAcJNZyeIGGbMmj0aquvMhM1xMK1/yhz5/aB
-         ZEjA==
-X-Forwarded-Encrypted: i=1; AJvYcCXF4V/B27W8uw1GibiAmyQT19aMhbIKUbV60e7iFJOuifAAaSwQv06bKrBknKh9mwiWHeIqEp7d4Wdzgg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyv/E6asFCtxESYI6V5jWRMdhJ1TiKI13Jigp9pYdj/MIdHjIeG
-	yq/1HB2FdnGpasUqzuRdQ0TVubGtYp5amlcvckVjNfXWdiTNu732xemFrDaIQLGuHA==
-X-Gm-Gg: ASbGnctirwvyUnO8vXu+Rx+Zfg/HZWoWZApcCPAwLkct0ezRypPGnLrERr8t7NFHaV8
-	EVuyyysOsQu7ff5aY+h9ImBggqYWKvmvHDpgSs9PqRmfje4RRsb0QpymyPbbRt0+Da1t93boPCR
-	m1w69COp4aH/gYfR7lCvDphDqJxWvJFl0iUw9f3jUkqkcHnAYldR2HG7r7dsvcvivjzEYBr0zgo
-	SLHX9g/N1Lxd4l950O2xj6fYMaZh2IgrPId5RDAACjm7T3awaVvJlCpfx7h6wA+Xb0gZ7MdHlcF
-	x5rPL06HWah1RhdxjNSI/Yd3BjA3zVKGEvKvuKjDtuS0dvw9pwpmXKcWa9+Ju3T01sELIPRqTKn
-	DqwPr3U37N4uOfdfJcqjsMOXBVNpfczauNmJIcW6I09uJPJX4c5dZcyrHld6HREOhF5+Kn8y+Ew
-	6UTWaH0aIrcYvWiQA=
-X-Google-Smtp-Source: AGHT+IGbKMmfp62moQ55XqRXlYknpv7VsvU1R/1ooo2QU9Rce7Cy8tcLuOmjURe+U+W+1KDGa9Khaw==
-X-Received: by 2002:a17:902:e5d0:b0:295:1aa7:edbe with SMTP id d9443c01a7336-2984ee021demr25227455ad.41.1762924686858;
-        Tue, 11 Nov 2025 21:18:06 -0800 (PST)
-Received: from google.com ([2401:fa00:8f:203:2495:f9c3:243d:2a7e])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2984dbf550bsm15774345ad.33.2025.11.11.21.18.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Nov 2025 21:18:06 -0800 (PST)
-Date: Wed, 12 Nov 2025 14:18:01 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Yuwen Chen <ywen.chen@foxmail.com>
-Cc: axboe@kernel.dk, akpm@linux-foundation.org, bgeffon@google.com, 
-	licayy@outlook.com, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, liumartin@google.com, minchan@kernel.org, richardycc@google.com, 
-	senozhatsky@chromium.org
-Subject: Re: [PATCH v4] zram: Implement multi-page write-back
-Message-ID: <htycvrcqbnkk7ldhpaqxesy7uhz3lssymwqm7nzkhyhnid3krm@mfju626njxvb>
-References: <83d64478-d53c-441f-b5b4-55b5f1530a03@kernel.dk>
- <tencent_0FBBFC8AE0B97BC63B5D47CE1FF2BABFDA09@qq.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="RSbPT2Ab"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5ABGuPb1024315;
+	Wed, 12 Nov 2025 05:29:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pp1; bh=Pvd+thP6bwS6dngLw7lVS7ac+ucA
+	iUdnfzdsxIqSYGE=; b=RSbPT2AbxSdhWlXrkHsnq47dliiQt/uTNfldVYVx5PA0
+	1LZlTW3d1/rHXH8Xy2iLfYB9NT45Z75VsICu7O0CJu7viKODRDkQBfVHQgrx/iVb
+	wJtp7dUxXSTPKvhdGlPct9ryduQoUXF6bDiUqEaEpoHPLJbehx9eCd71OahR03mF
+	7ORH5yR7h6k3dNderHHz3YMo8w+vdifFREWiZxbzS1tYruzDN91uh5J6Fe1NwVQV
+	eAD6j9YqCVDHSnFZUiFKP96Tzbwt7jzCHpHIXvI0KVAWtm6i5v9ZrEEQQZ4SucAu
+	EY1xAlsd1dcUy45VuAdPZORE3rzkd9La2ynMznv3Pg==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aa5cj7hmc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 12 Nov 2025 05:29:00 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5AC1wpZu004748;
+	Wed, 12 Nov 2025 05:28:59 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4aagjxxjhd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 12 Nov 2025 05:28:58 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5AC5SvDU31064470
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 12 Nov 2025 05:28:57 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E49312004B;
+	Wed, 12 Nov 2025 05:28:56 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 28EC920040;
+	Wed, 12 Nov 2025 05:28:52 +0000 (GMT)
+Received: from li-c9696b4c-3419-11b2-a85c-f9edc3bf8a84.ibm.com.com (unknown [9.43.41.49])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 12 Nov 2025 05:28:51 +0000 (GMT)
+From: Nilay Shroff <nilay@linux.ibm.com>
+To: linux-block@vger.kernel.org
+Cc: ming.lei@redhat.com, hch@lst.de, axboe@kernel.dk, yi.zhang@redhat.com,
+        czhong@redhat.com, yukuai@fnnas.com, gjoyce@ibm.com
+Subject: [PATCHv5 0/5] block: restructure elevator switch path and fix a lockdep splat
+Date: Wed, 12 Nov 2025 10:56:01 +0530
+Message-ID: <20251112052848.1433256-1-nilay@linux.ibm.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <tencent_0FBBFC8AE0B97BC63B5D47CE1FF2BABFDA09@qq.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=Ss+dKfO0 c=1 sm=1 tr=0 ts=69141b1c cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
+ a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VwQbUJbxAAAA:8 a=pGLkceISAAAA:8 a=VnNF1IyMAAAA:8 a=NKmVwkrdNWel0eFzVGEA:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=HhbK4dLum7pmb74im6QT:22
+ a=cPQSjfK2_nFv0Q5t_7PE:22 a=pHzHmUro8NiASowvMSCR:22 a=Ew2E2A-JSTLzCXPT_086:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA4MDA5NSBTYWx0ZWRfX4Z6cNXwNgE7o
+ sujQCz9H0fgdSW5J7q4wM9zxVhAnGXOXJVyWQFmYC9DhjK/ZkHUFSL53DA8JgqVb+nP4G8N7U4I
+ H/Wqu4nCqzf+DpW4uTYv9rRQzFJZ2yLvwQ4hTS6AncpKsjcw8KLAFghJcHvdg3OOpoHV4VmanIE
+ H3dDFgtcgd+LFpittjXhFIG0sQSNeP9z9Jeq9pc1ReAsxKrLoZqDfJ3W7WeEgzWU1bBPv5SLbZj
+ sA7KjGDYbO9Hq+G7UjdTHTciKnBGH8lKM1zfRAHW6uFB+7HrbkgjsDsYs4Tcx8YBA21aOkDGyhW
+ FiOxW+jEUy1HtOT01GyuZ6ro8aurAmRYwuOANC3uC3FroNS9T6yRItO/9jPg9MniKd3rSlDX6kS
+ L7SFDREWvcMklApks9KNcpy1YQJ0mA==
+X-Proofpoint-GUID: MPd-wqW2Ucz2z62QdcDQgkM7hpOCU8i2
+X-Proofpoint-ORIG-GUID: MPd-wqW2Ucz2z62QdcDQgkM7hpOCU8i2
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-12_01,2025-11-11_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 suspectscore=0 impostorscore=0 bulkscore=0 phishscore=0
+ lowpriorityscore=0 adultscore=0 priorityscore=1501 spamscore=0 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511080095
 
-On (25/11/06 09:49), Yuwen Chen wrote:
-[..]
-> +	blk_start_plug(&plug);
-> +	while ((req->pps = select_pp_slot(ctl))) {
->  		spin_lock(&zram->wb_limit_lock);
->  		if (zram->wb_limit_enable && !zram->bd_wb_limit) {
->  			spin_unlock(&zram->wb_limit_lock);
-> @@ -774,15 +884,15 @@ static int zram_writeback_slots(struct zram *zram, struct zram_pp_ctl *ctl)
->  		}
->  		spin_unlock(&zram->wb_limit_lock);
->  
-> -		if (!blk_idx) {
-> -			blk_idx = alloc_block_bdev(zram);
-> -			if (!blk_idx) {
-> +		if (!req->blk_idx) {
-> +			req->blk_idx = alloc_block_bdev(zram);
-> +			if (!req->blk_idx) {
->  				ret = -ENOSPC;
->  				break;
->  			}
->  		}
->  
-> -		index = pps->index;
-> +		index = req->pps->index;
->  		zram_slot_lock(zram, index);
->  		/*
->  		 * scan_slots() sets ZRAM_PP_SLOT and relases slot lock, so
-> @@ -792,22 +902,32 @@ static int zram_writeback_slots(struct zram *zram, struct zram_pp_ctl *ctl)
->  		 */
->  		if (!zram_test_flag(zram, index, ZRAM_PP_SLOT))
->  			goto next;
-> -		if (zram_read_from_zspool(zram, page, index))
-> +		if (zram_read_from_zspool(zram, req->page, index))
->  			goto next;
->  		zram_slot_unlock(zram, index);
->  
-> -		bio_init(&bio, zram->bdev, &bio_vec, 1,
-> +		bio_init(&req->bio, zram->bdev, &req->bio_vec, 1,
->  			 REQ_OP_WRITE | REQ_SYNC);
-> -		bio.bi_iter.bi_sector = blk_idx * (PAGE_SIZE >> 9);
-> -		__bio_add_page(&bio, page, PAGE_SIZE, 0);
-> -
-> -		/*
-> -		 * XXX: A single page IO would be inefficient for write
-> -		 * but it would be not bad as starter.
-> -		 */
-> -		err = submit_bio_wait(&bio);
-> +		req->bio.bi_iter.bi_sector = req->blk_idx * (PAGE_SIZE >> 9);
-> +		req->bio.bi_end_io = zram_writeback_endio;
-> +		req->bio.bi_private = req;
-> +		__bio_add_page(&req->bio, req->page, PAGE_SIZE, 0);
-> +
-> +		list_del_init(&req->pps->entry);
-> +		submit_bio(&req->bio);
-> +
-> +		do {
-> +			req = zram_writeback_next_request(req_pool, req_pool_cnt, &cnt_off);
-> +			if (!req) {
-> +				blk_finish_plug(&plug);
-> +				wait_for_completion_io(&done);
-> +				blk_start_plug(&plug);
-> +			}
-> +		} while (!req);
+Hi,
 
-Why do you do this do-while loop here?
+This patchset reorganizes the elevator switch path used during both
+nr_hw_queues update and elv_iosched_store() operations to address a
+recently reported lockdep splat [1].
+
+The warning highlights a locking dependency between ->freeze_lock and
+->elevator_lock on pcpu_alloc_mutex, triggered when the Kyber scheduler
+dynamically allocates its private scheduling data. The fix is to ensure
+that such allocations occur outside the locked sections, thus eliminating
+the dependency chain.
+
+While working on this, it also became evident that the nr_hw_queue update
+code maintains two disjoint xarrays—one for elevator tags and another
+for elevator type—both serving the same purpose. Unifying these into a
+single elv_change_ctx structure improves clarity and maintainability.
+
+This series therefore implements five patches:
+The first perparatory patch unifies elevator tags and type xarrays. It
+combines both xarrays into a single struct elv_change_ctx, simplifying
+per-queue elevator state management.
+
+The second patch is aimed to group together all elevator-related 
+resources that share the same lifetime and as a first step we move the
+elevator tags pointer from struct elv_change_ctx into the newly
+inroduced struct elevator_resources. The subsequent patch extends the 
+struct elevator_resources to include other elevator-related data.
+
+The third patch introduce ->alloc_sched_data and ->free_sched_data
+elevator ops which could be then used to safely allocate and free 
+scheduler data.
+
+The fourth patch now builds upon the previous patch and starts using the
+newly introduced alloc/free sched data methods in the earlier patch
+during elevator switch and nr_hw_queue update. And while doing so, it's
+ensured that sched data allocation and free happens before we acquire
+->freeze_lock and ->elevator_lock thus preventing its dependency on
+pcpu_alloc_mutex.
+
+The last patch of this series converts Kyber scheduler to use the new
+methods inroduced in the previous patch. It hooks Kyber’s scheduler data
+allocation and teardown logic from ->init_sched and ->exit_sched into
+the new methods, ensuring memory operations are performed outside
+locked sections.
+
+Together, these changes simplify the elevator switch logic and prevent
+the reported lockdep splat.
+
+As always, feedback and suggestions are very welcome!
+
+[1] https://lore.kernel.org/all/CAGVVp+VNW4M-5DZMNoADp6o2VKFhi7KxWpTDkcnVyjO0=-D5+A@mail.gmail.com/
+
+Thanks,
+--Nilay
+
+changes from v4:
+  - Update the signature of blk_mq_alloc_sched_res() in patch #2
+    and add a struct request_queue * parameter. This allows direct
+    access to blk_mq_tag_set from the request queue, removing the
+    need for a separate struct blk_mq_tag_set * argument. (Ming Lei)
+
+  - Update blk_mq_init_sched() to add a local variable et of type
+    struct elevator_tags *. This avoids additional code changes, 
+    as we can avoid dereferencing struct elevator_resources *res
+    to reach it. (Ming Lei)
+
+  - Simplify blk_mq_alloc_sched_data() to return a pointer to the
+    allocated scheduler data on success, or NULL on failure. Update
+    the caller accordingly to use the return value directly instead
+    of passing **sched_data as an additional argument. (Yu Kuai)
+
+Link to v4: https://lore.kernel.org/all/20251110081457.1006206-1-nilay@linux.ibm.com/
+
+changes from v3:
+  - Split the third patch into two patches to separate the introduction
+    of ->alloc_sched_data and ->free_sched_data methods from their users.
+  - Free scheduler tags during sched resource allocation failures using
+    blk_mq_free_sched_tags() instead of kfree() to avoid kmemleak
+    (Ming Lei).
+  - Delay the signature change of elevator_alloc() until the fourth
+    patch, where we actually start allocating scheduler data during
+    elevator switch and nr_hw_queue_update (Ming Lei).
+
+Link to v3: https://lore.kernel.org/all/20251029103622.205607-1-nilay@linux.ibm.com/
+
+changes fron v2:
+  - Introduce helper functions blk_mq_alloc_sched_res_batch() and
+    blk_mq_free_sched_res_batch() to encapsulate scheduler resource
+    (tags and data) allocation and freeing in batch mode. (Ming Lei)
+
+  - Introduce helper functions blk_mq_alloc_sched_res() and
+    blk_mq_free_sched_res() to encapsulate scheduler resource
+    allocation and freeing. (Ming Lei)
+
+Link to v2: https://lore.kernel.org/all/20251027173631.1081005-1-nilay@linux.ibm.com/
+
+changes from v1:
+  - Keep blk_mq_free_sched_ctx_batch() and blk_mq_alloc_sched_ctx_batch()
+    together in the same file (Ming Lei)
+  - Since the ctx pointer is stored in xarray after it's dynamically
+    allocated, if blk_mq_alloc_sched_ctx_batch() fails to allocate or
+    insert ctx pointer in xarray then unwinding the allocation is not
+    necessary. Instead looping over the xarray to retrieve the inserted
+    ctx pointer and freeing it should be sufficibet. So invoke blk_mq_
+    free_sched_ctx_batch() from the blk_mq_alloc_sched_ctx_batch()
+    callsite on failure (Ming Lei)
+  - As both elevator tags and elevator data shares the same lifetime
+    and allocation constraints, abstract both into a new structure
+    (Ming Lei)
+
+Link to v1: https://lore.kernel.org/all/20251016053057.3457663-1-nilay@linux.ibm.com/
+
+Nilay Shroff (5):
+  block: unify elevator tags and type xarrays into struct elv_change_ctx
+  block: move elevator tags into struct elevator_resources
+  block: introduce alloc_sched_data and free_sched_data elevator methods
+  block: use {alloc|free}_sched data methods
+  block: define alloc_sched_data and free_sched_data methods for kyber
+
+ block/blk-mq-sched.c  | 117 ++++++++++++++++++++++++++++++++++--------
+ block/blk-mq-sched.h  |  31 +++++++++--
+ block/blk-mq.c        |  50 ++++++++++--------
+ block/blk.h           |   7 ++-
+ block/elevator.c      |  80 +++++++++++++----------------
+ block/elevator.h      |  26 +++++++++-
+ block/kyber-iosched.c |  30 ++++++++---
+ 7 files changed, 239 insertions(+), 102 deletions(-)
+
+-- 
+2.51.0
+
