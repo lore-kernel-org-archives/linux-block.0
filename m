@@ -1,131 +1,79 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6DA1296BDF
-	for <linux-block@vger.kernel.org>; Wed, 12 Nov 2025 01:59:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2DD1296BB6
+	for <linux-block@vger.kernel.org>; Wed, 12 Nov 2025 02:02:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762912790; cv=none; b=c6B4JRBb0ZiUliEjulvzDUwB+icQLtdcn3at2m6JvQTRG3i0+8NRzIXYJbAX8stBfHH9Omw250XudkIjD8vJFGUf+yenUAsdrUHBQQdd6sWeE/GSN21WBD+H5HpyYWJSOixaaBJALf/3KuNvYKy2jS2B4kZKKIx4uFywdbmrwXA=
+	t=1762912937; cv=none; b=QXOvtwUwfhK8s/pAY1IWiIvyqzqz+uIQ1qrk36vjCDcdVATXPkbW2480yRC4ftSnapOkDQl8oBZlt175DdEhID1jFf+3Wq3BG0nt4nbwySvynboSLyINI1CIe7Xl06HY3Sa+SrmmzyYmC/TrQTkI/mfvj/pUOyLsx/vY0udJkq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762912790; c=relaxed/simple;
-	bh=Wfr3708VkOzQuU9pmmB7aToKJOPuRgH/eukxjbY9KU8=;
+	s=arc-20240116; t=1762912937; c=relaxed/simple;
+	bh=9yBkmFjX0BTdmGTaus/EfJdbv16QgnTQmTdabBOZ3os=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dE06rrKsfFko/0vbDmjmbTVlmFCdHtJp9Tiesgc1sUlb5XyZGtJNDg4zQNwoWnxEWElvmmmbs/eI+sZEADurmzDE3I/X9/EWHk5B1TfixvTBbfzaVCIT/CdP0jeiZD1t9nX87RE4SxeDMJfs7Kea+P429nod69zEJbMazdpUDuk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dDEMgj8B; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=DXfmASXhG3K4Uahml3btpJm2tk3fC7SWClB7KVHgMJHvIMOIuzu7L94iEr5z0/KXV40weCKwLkoem5hyf0ONkzyyvt1PtXWhu7eR5S85RIVrhuB1+88BeLz0djyClhKoGju9EtoeQCnq6Mv0iYisMTQelj76SCaAx8YM9eGO2po=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ieOg/LOc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dDEMgj8B"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762912787;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wngBwJkqZcDDqt4ItO4kcRZbl92Nxn6rjpRy3iP5nl0=;
-	b=dDEMgj8BcWzCgUBB5abIQHl10Pas6yrpF82tpOqJekbDX5wK4b9ZAxDeNZaNq/eAFMzF64
-	gl7V4QzyJ7KZl2OIOB6Y++SL2xQa1F80gFg3lVOEkM3TIgqzcIKQDmU2qTpEN/M0NlWA+f
-	l0InVqbDHnQgeDSOq9KiJ9bCsfAY3z0=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-596-AcWe2vnTNfGQGEaV41nhWQ-1; Tue,
- 11 Nov 2025 20:59:44 -0500
-X-MC-Unique: AcWe2vnTNfGQGEaV41nhWQ-1
-X-Mimecast-MFC-AGG-ID: AcWe2vnTNfGQGEaV41nhWQ_1762912782
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F243219560B2;
-	Wed, 12 Nov 2025 01:59:41 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.179])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D790D18004D8;
-	Wed, 12 Nov 2025 01:59:36 +0000 (UTC)
-Date: Wed, 12 Nov 2025 09:59:31 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Keith Busch <kbusch@kernel.org>, Chaitanya Kulkarni <kch@nvidia.com>,
-	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	io-uring@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] io_uring/rsrc: don't use blk_rq_nr_phys_segments() as
- number of bvecs
-Message-ID: <aRPqA1XGWnY4YpIm@fedora>
-References: <20251111191530.1268875-1-csander@purestorage.com>
- <aRPcdmpZoet2fwbu@fedora>
- <CADUfDZovn5fPh_E6GGvGkPYbW12L2z6BS4jPkpQjuEjNd=bRGA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ieOg/LOc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A966C4CEF5;
+	Wed, 12 Nov 2025 02:02:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762912935;
+	bh=9yBkmFjX0BTdmGTaus/EfJdbv16QgnTQmTdabBOZ3os=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ieOg/LOcPTkJVycz9NRlyWZ/60xtRSJe2eO3TmS4fes5TIoRDJn13D2TJhGTzoQ9l
+	 4zTIDsw9yUndSSUwkwuNIzPQ54EEZsHs6LV1tzGKsLm8D37YqppYZ9DncHf2t040+S
+	 kKu4bgpqHO4k4Mv7SYLQ/4tiOv2IWlZyB7apeCDmSmoA8WPLfIqJZ7eJ7sBfvcFlBT
+	 btEvrh7a9bDmsLshYzZMzRbUO8dbdw7yNtxsvg1zQmr4Ok5z8Aqa5zaNbHx6MYS/Pf
+	 HcZNTm3cTkhxjcULRN4COAovaSySBewE4zk+KNqw2dd4eC28OUSB/8SQftNEstIiJd
+	 NQq/uvOz6oWlg==
+Date: Tue, 11 Nov 2025 21:02:10 -0500
+From: Keith Busch <kbusch@kernel.org>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>,
+	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Zheng Qixing <zhengqixing@huawei.com>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>
+Subject: Re: [PATCH] Revert "null_blk: allow byte aligned memory offsets"
+Message-ID: <aRPqoinLQjYFBJsO@kbusch-mbp>
+References: <20251111220838.926321-1-bvanassche@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADUfDZovn5fPh_E6GGvGkPYbW12L2z6BS4jPkpQjuEjNd=bRGA@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+In-Reply-To: <20251111220838.926321-1-bvanassche@acm.org>
 
-On Tue, Nov 11, 2025 at 05:44:18PM -0800, Caleb Sander Mateos wrote:
-> On Tue, Nov 11, 2025 at 5:01 PM Ming Lei <ming.lei@redhat.com> wrote:
-> >
-> > On Tue, Nov 11, 2025 at 12:15:29PM -0700, Caleb Sander Mateos wrote:
-> > > io_buffer_register_bvec() currently uses blk_rq_nr_phys_segments() as
-> > > the number of bvecs in the request. However, bvecs may be split into
-> > > multiple segments depending on the queue limits. Thus, the number of
-> > > segments may overestimate the number of bvecs. For ublk devices, the
-> > > only current users of io_buffer_register_bvec(), virt_boundary_mask,
-> > > seg_boundary_mask, max_segments, and max_segment_size can all be set
-> > > arbitrarily by the ublk server process.
-> > > Set imu->nr_bvecs based on the number of bvecs the rq_for_each_bvec()
-> > > loop actually yields. However, continue using blk_rq_nr_phys_segments()
-> > > as an upper bound on the number of bvecs when allocating imu to avoid
-> > > needing to iterate the bvecs a second time.
-> > >
-> > > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-> > > Fixes: 27cb27b6d5ea ("io_uring: add support for kernel registered bvecs")
-> >
-> > Reviewed-by: Ming Lei <ming.lei@redhat.com>
-> >
-> > BTW, this issue may not be a problem because ->nr_bvecs is only used in
-> > iov_iter_bvec(), in which 'offset' and 'len' can control how far the
-> > iterator can reach, so the uninitialized bvecs won't be touched basically.
-> 
-> I see your point, but what about iov_iter_extract_bvec_pages()? That
-> looks like it only uses i->nr_segs to bound the iteration, not
-> i->count. Hopefully there aren't any other helpers relying on nr_segs.
+On Tue, Nov 11, 2025 at 02:08:33PM -0800, Bart Van Assche wrote:
+> This reverts commit 3451cf34f51bb70c24413abb20b423e64486161b and fixes
+> the following KASAN complaint when running test zbd/013
 
-iov_iter_extract_bvec_pages() is only called from iov_iter_extract_pages(),
-in which 'maxsize' is capped by i->count. 
+Can I please just get one chance to fix it before a kneejerk revert??
 
-> If you really don't think it's a problem, I'm fine deferring the patch
-> to 6.19. We haven't encountered any problems caused by this bug, but
-> we haven't tested with any non-default virt_boundary_mask,
-> seg_boundary_mask, max_segments, or max_segment_size on the ublk
-> device.
+This was in v1, it was mistakenly dropped from v2.
 
-IMO it should belong to v6.18: your fix not only makes code more robust, but
-also it is correct thing to do.
+---
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index f1e67962ecaeb..55c3f4d62c2e3 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -1240,9 +1240,12 @@ static blk_status_t null_transfer(struct nullb *nullb, struct page *page,
 
-I am just thinking why the issue wasn't triggered because we have lots of
-test cases(rw verify, mkfs & mount ...) 
+        p = kmap_local_page(page) + off;
+        if (!is_write) {
+-               if (dev->zoned)
++               if (dev->zoned) {
+                        valid_len = null_zone_valid_read_len(nullb,
+                                pos >> SECTOR_SHIFT, len);
++                       if (valid_len != len)
++                               valid_len -= (pos & (SECTOR_SIZE - 1));
++               }
 
-> 
-> >
-> > Otherwise, the issue should have been triggered somewhere.
-> >
-> > Also the bvec allocation may be avoided in case of single-bio request,
-> > which can be one future optimization.
-> 
-> I'm not sure what you're suggesting. The bio_vec array is a flexible
-> array member of io_mapped_ubuf, so unless we add another pointer
-> indirection, I don't see how to reuse the bio's bi_io_vec array.
-> io_mapped_ubuf is also used for user registered buffers, where this
-> optimization isn't possible, so it may not be a clear win.
-
-io_mapped_ubuf->acct_pages can be one field reused for the indirect
-pointer, please see lo_rw_aio() about how to reuse the bvec array.
-
-Thanks,
-Ming
-
+                if (valid_len) {
+                        copy_from_nullb(nullb, p, pos, valid_len);
+--
