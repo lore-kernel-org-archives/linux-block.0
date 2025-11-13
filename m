@@ -1,56 +1,85 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BB152E7658
-	for <linux-block@vger.kernel.org>; Thu, 13 Nov 2025 10:15:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D7C73321BA
+	for <linux-block@vger.kernel.org>; Thu, 13 Nov 2025 10:32:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763028915; cv=none; b=TByc1G0gNtDldR5FjZ7iAeo4/t+nzq7UFQzPKOUy/SuebmVSrWyFROrbBL50HEEJEUYXTQiP0+ifqkQrnZsL2tpBEnJVgm6LrXAa+mdkWR9p9g0u+WeTCpddWygHynmZlR4Myi0NjBhUn/K9k7hp9V/yZY3wLJTwquGWCR+EgjQ=
+	t=1763029939; cv=none; b=E3T6+1CjfALaZhyhkb5Hik0ZtEpEl9i3UoyY8vHtQcM5/0UcJLAT5VLbriazTVUOe6POGH9agk/zJLK42eWZPFdZ9p52qxyXPjGQNz3qBHgybXAlBh2cq4kfQrL6LsBs1hQIcvcVYuKM6o+oUdSpEbts8B2eJAsdRhflA17+MaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763028915; c=relaxed/simple;
-	bh=ShMy3nLafbdyxOStUvqd7oI2N/f66M1pOhgVh2OmtYY=;
+	s=arc-20240116; t=1763029939; c=relaxed/simple;
+	bh=/ez4viGQxwKl6xh/PPq/TWsOWmDT70HNbDNx4QUOYcw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YzighmAZJ6Q4IMUy2n5sNNa1/XJMY/eCXioW4gUyI8PpRxiOhA86NkxHSCTI2vR4sJSYyg4nByHJhSCWKzbQzqwzprqOaA2caPDLqm5GxpvSTt1Ogy6Py36drKBZBqvASNHI+XqQ9oVqPkc+pB1M+4lMHVuSPcerDXfGa6bTQX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g1JOScuJ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=GQCfcuuLUTrq9O4xmxsMo+PlvO/dHsuupTySPbVEs4cXCYn8tpZ2TAjxk9S9OfpjpzoowTmVWOx6cAS8/v/2GBlOqtICCBaBBQE/36IcZiqtak+2YtE1iGy9XjimSj5Lskry8o1YqEJsbjmwwcuzDL8duAwXuR2+ImUPaLpFEvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=tSNZuhly; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g1JOScuJ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763028912;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HD4mugaHkDDtHPnrViY3D59+rWWIvzs7KEepW4USoek=;
-	b=g1JOScuJym43Q7589J62dvpcqBxLzzkgFxvAGR0zrJitLSFem0xixfjVkCar7g7RUgaj5v
-	4PGinGNpNBnFs51b33iUxAcNl7SKtElKoMVw4bF4eJ04YWntMpseadVcGTFGNK9C8cz1FI
-	R8ZlFuH6dtQfooyjv2MyuZqEQkZPHR8=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-178-T0l06bT9OlKxDc6tf60pPQ-1; Thu,
- 13 Nov 2025 05:15:09 -0500
-X-MC-Unique: T0l06bT9OlKxDc6tf60pPQ-1
-X-Mimecast-MFC-AGG-ID: T0l06bT9OlKxDc6tf60pPQ_1763028908
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7C9B118002D0;
-	Thu, 13 Nov 2025 10:15:07 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.82])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 27143300018D;
-	Thu, 13 Nov 2025 10:15:01 +0000 (UTC)
-Date: Thu, 13 Nov 2025 18:14:56 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Xue He <xue01.he@samsung.com>
-Cc: axboe@kernel.dk, yukuai@fnnas.com, akpm@linux-foundation.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 RESEND] block: plug attempts to batch allocate tags
- multiple times
-Message-ID: <aRWvoOmo3_JTelPq@fedora>
-References: <CGME20251113080643epcas5p154d9edfbf0f99e0d4c08408ad6cf68f4@epcas5p1.samsung.com>
- <20251113080202.193508-1-xue01.he@samsung.com>
+	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="tSNZuhly"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-297e239baecso16354435ad.1
+        for <linux-block@vger.kernel.org>; Thu, 13 Nov 2025 02:32:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1763029935; x=1763634735; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=QURbCPhZLgDFuDO50oTy4YxAU/M/cxLF0F1zsVf26eM=;
+        b=tSNZuhlyAsQdCBROny1W2LKQ+njhOt2F7hJrDAVykMsiBZA2MsD9NPFanFer8ixnfI
+         sdkBrAmS0uqU6umEqeHqPVbTAle0GYtByJLkmItLMttKPO8XRDP73qkQbC6Fk/Juwqd1
+         shoafwuSzT7epdC6vUtw6oapaYnkQHyTNmWSRjPCqiEXdnAjgW6Z0qCiCt54EKdDGzRE
+         pJp7ktXn2HGrXD+4hBvWl7fl6rjgS8nluU/PbinBDE7EejqbotPO8fLloqqISnl6HC23
+         kq69ahcD1dtQNS+fzxbMp8d7RWVFJAwOohDH7u01gS0lzSvXcx7xY14NndQNP7hqGl34
+         wiNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763029935; x=1763634735;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QURbCPhZLgDFuDO50oTy4YxAU/M/cxLF0F1zsVf26eM=;
+        b=LQDV/+zkt0y/MiIDS2fUA2id68hkUEkQhd/WpkIZxhOqw9wd966vIMJRdIvEBLdFxC
+         1ZVenDYTo/5gV0NvANH6uEzZ+zupxymPumZHEyTJYfA2CHteZp6U4Pn4mBGvv7pEjVLR
+         /5ONO+t9cUH1vup94e3Ye40KuRKAEvr6PdZ6EHqXy/3tgtNIZN5sh3OFK2Wa1FcVwCSR
+         kTZBAr9/7kugamyUQ/qI1dHuciSNBnHBcW77L8IOBy6T07+ViNW8rIHqyAjNozQFV2Oj
+         9+Bvz6uv2qzuIOm37P7tr7L5z+iZzAbixPMkghiefte87sxyVv5pAp4pU0LvQqGoRaxL
+         EtEA==
+X-Forwarded-Encrypted: i=1; AJvYcCWKmUm1O+4TpZcuI+AUCSM/zpmMhQ5Fb92dIMziHiErRT7SUVhKMEsVcaJ1rs2wxUB2/bJ4uNvr99MA9A==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqwfTkxA0UsVDs+a4Q73inhPcWh8jo8uRnjeqkpRiH9as+Tw+b
+	zsy9pbPd6xqxXQrR7vAmNoLI9gDzhCAXVPWYzt/+kKMRSE90Cfciolsmc+mwBfvfNPE=
+X-Gm-Gg: ASbGncuXBy/aETbCg2djMeGLgUuHRXD1ljIoo8qC0issm2rMD3nvH6JE/sxIOgxZfwB
+	0SN615rnjT8NJhoOzvLVgQ64FBOrs5qeBih94/dov+0qnze2RUvEGoc8x3VFJ1IvEhTn4QqOONq
+	lz/h/iSOB7MMMM95m6ohA7SXgSSKl2TbBZYWr+YKT+xkyLaV2R+a9uEBuDpHHHFOlf8KVbaOy8z
+	Hxb2NqdLwtETBACFccKz+rLgoHogZ0SBlfAy0LsjIe73vI9XV2bn0+qBJhUmBJbjQUetZicdPmr
+	7dU/PLyzeI5bJNbblWAz91VpfIVJvf/ADeW/Yb3ZBDCcNPdsIVnsSBE+qWZi00RIS/wj7iOeOUa
+	40DANdY64cyaPDuUp8jl8UtZYgEJ6FzLk+uc0UueTG1tjwgydxpvHTi7AwzJRJGr1Y79/4CS82/
+	t1SDw3paySVXfNDbZEexV7iBB+LtANKpcmEOV04gRVzvRj/8E/lZk=
+X-Google-Smtp-Source: AGHT+IHZRVqKk3Xf4AoXPh3RQ9USehQ1ClsNRN+oJOsjTDjAvAY9LII/LH2yTXr91VjJoLaVXeTfMQ==
+X-Received: by 2002:a17:903:1af0:b0:267:912b:2b36 with SMTP id d9443c01a7336-2985a51863emr28237365ad.23.1763029934984;
+        Thu, 13 Nov 2025 02:32:14 -0800 (PST)
+Received: from dread.disaster.area (pa49-181-58-136.pa.nsw.optusnet.com.au. [49.181.58.136])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2985c2b0fe9sm20457965ad.65.2025.11.13.02.32.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Nov 2025 02:32:14 -0800 (PST)
+Received: from dave by dread.disaster.area with local (Exim 4.98.2)
+	(envelope-from <david@fromorbit.com>)
+	id 1vJUcd-0000000ADSS-414B;
+	Thu, 13 Nov 2025 21:32:11 +1100
+Date: Thu, 13 Nov 2025 21:32:11 +1100
+From: Dave Chinner <david@fromorbit.com>
+To: Ritesh Harjani <ritesh.list@gmail.com>
+Cc: Christoph Hellwig <hch@lst.de>, Ojaswin Mujoo <ojaswin@linux.ibm.com>,
+	Christian Brauner <brauner@kernel.org>, djwong@kernel.org,
+	john.g.garry@oracle.com, tytso@mit.edu, willy@infradead.org,
+	dchinner@redhat.com, linux-xfs@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-ext4@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, jack@suse.cz,
+	nilay@linux.ibm.com, martin.petersen@oracle.com,
+	rostedt@goodmis.org, axboe@kernel.dk, linux-block@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 0/8] xfs: single block atomic writes for buffered IO
+Message-ID: <aRWzq_LpoJHwfYli@dread.disaster.area>
+References: <cover.1762945505.git.ojaswin@linux.ibm.com>
+ <aRUCqA_UpRftbgce@dread.disaster.area>
+ <20251113052337.GA28533@lst.de>
+ <87frai8p46.ritesh.list@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -59,82 +88,45 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251113080202.193508-1-xue01.he@samsung.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+In-Reply-To: <87frai8p46.ritesh.list@gmail.com>
 
-On Thu, Nov 13, 2025 at 08:02:02AM +0000, Xue He wrote:
-> This patch aims to enable batch allocation of sufficient tags after
-> batch IO submission with plug mechanism, thereby avoiding the need for
-> frequent individual requests when the initial allocation is
-> insufficient.
+On Thu, Nov 13, 2025 at 11:12:49AM +0530, Ritesh Harjani wrote:
+> Christoph Hellwig <hch@lst.de> writes:
 > 
-> ------------------------------------------------------------
-> Perf:
-> base code: __blk_mq_alloc_requests() 1.31%
-> patch: __blk_mq_alloc_requests() 0.7%
-> ------------------------------------------------------------
+> > On Thu, Nov 13, 2025 at 08:56:56AM +1100, Dave Chinner wrote:
+> >> On Wed, Nov 12, 2025 at 04:36:03PM +0530, Ojaswin Mujoo wrote:
+> >> > This patch adds support to perform single block RWF_ATOMIC writes for
+> >> > iomap xfs buffered IO. This builds upon the inital RFC shared by John
+> >> > Garry last year [1]. Most of the details are present in the respective 
+> >> > commit messages but I'd mention some of the design points below:
+> >> 
+> >> What is the use case for this functionality? i.e. what is the
+> >> reason for adding all this complexity?
+> >
+> > Seconded.  The atomic code has a lot of complexity, and further mixing
+> > it with buffered I/O makes this even worse.  We'd need a really important
+> > use case to even consider it.
+> 
+> I agree this should have been in the cover letter itself. 
+> 
+> I believe the reason for adding this functionality was also discussed at
+> LSFMM too...  
+> 
+> For e.g. https://lwn.net/Articles/974578/ goes in depth and talks about
+> Postgres folks looking for this, since PostgreSQL databases uses
+> buffered I/O for their database writes.
 
-Can you include the workload with perf together?
+Pointing at a discussion about how "this application has some ideas
+on how it can maybe use it someday in the future" isn't a
+particularly good justification. This still sounds more like a
+research project than something a production system needs right now.
 
-> 
-> ---
-> changes since v1:
-> - Modify multiple batch registrations into a single loop to achieve
->   the batch quantity
-> 
-> changes since v2:
-> - Modify the call location of remainder handling
-> - Refactoring sbitmap cleanup time
-> 
-> changes since v3:
-> - Add handle operation in loop
-> - Add helper sbitmap_find_bits_in_word
-> 
-> changes since v4:
-> - Split blk-mq.c changes from sbitmap
-> 
-> Signed-off-by: hexue <xue01.he@samsung.com>
-> ---
->  block/blk-mq.c | 39 ++++++++++++++++++++++-----------------
->  1 file changed, 22 insertions(+), 17 deletions(-)
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 09f579414161..64cd0a3c7cbf 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -467,26 +467,31 @@ __blk_mq_alloc_requests_batch(struct blk_mq_alloc_data *data)
->  	unsigned long tag_mask;
->  	int i, nr = 0;
->  
-> -	tag_mask = blk_mq_get_tags(data, data->nr_tags, &tag_offset);
-> -	if (unlikely(!tag_mask))
-> -		return NULL;
-> +	do {
-> +		tag_mask = blk_mq_get_tags(data, data->nr_tags, &tag_offset);
-> +		if (unlikely(!tag_mask)) {
-> +			if (nr == 0)
-> +				return NULL;
-> +			break;
-> +		}
-> +		tags = blk_mq_tags_from_data(data);
-> +		for (i = 0; tag_mask; i++) {
-> +			if (!(tag_mask & (1UL << i)))
-> +				continue;
-> +			tag = tag_offset + i;
-> +			prefetch(tags->static_rqs[tag]);
-> +			tag_mask &= ~(1UL << i);
-> +			rq = blk_mq_rq_ctx_init(data, tags, tag);
-> +			rq_list_add_head(data->cached_rqs, rq);
-> +			data->nr_tags--;
-> +			nr++;
-> +		}
-> +		if (!(data->rq_flags & RQF_SCHED_TAGS))
-> +			blk_mq_add_active_requests(data->hctx, nr);
+Why didn't you use the existing COW buffered write IO path to
+implement atomic semantics for buffered writes? The XFS
+functionality is already all there, and it doesn't require any
+changes to the page cache or iomap to support...
 
-Here not only less-efficient, but also a over-counting bug, please
-move the above two lines after `percpu_ref_get_many`.
-
-
-Thanks, 
-Ming
-
+-Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
