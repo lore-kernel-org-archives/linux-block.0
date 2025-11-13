@@ -1,279 +1,63 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4405522173F
-	for <linux-block@vger.kernel.org>; Thu, 13 Nov 2025 13:48:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4E8B2D47F1
+	for <linux-block@vger.kernel.org>; Thu, 13 Nov 2025 14:45:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763041693; cv=none; b=qeZ3x7fYhh8zws5CUAVhc/xrqLwImS+OcUo2TLajHXjwBon1Nk2ubRIEwAYcz84AQhzhS4o2lgOG+cphshaqYU6+0EYodvw8fzoFfopSUsiFUKL3Y+40bcL9MnfpO9Wa/eXzABZgK0U7Ret0S2wugURjOs7Bi244XdqpbdyithQ=
+	t=1763045109; cv=none; b=hnpLzzlLX2SddH+BK4lDuqy+sapLOcC1TT9LttYcRap1AnwPSkWFKTkZIeIXOwC4DKfvwRhfJ+tVqAAkULLFaTtUIw8uvn7Gmxjj2LyanrKPzhcJ0eJyN43TWUGFqq0DMA61cHcvG3bwhLifq2STSSZAz+WWyQhEY/NnVLRn/po=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763041693; c=relaxed/simple;
-	bh=2ay4WwEd7UmWy2E/pZTZ94XLdYLLgp2LX7tjcCEbjPs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Yhvo/a4P2tppjhf8Fy3yqTwAzBoC4fFGOXZxYKEPm8f7uhf5TjxydkUuHfZGtg0nlwxw7LKn6UIbQdI1fjiLW5daeQ1ci5pbmwVjVIGeN9Jem610D+wni018BNySShoIOZTTv5BPFAzfbrzL0LtJrdAPpf5Yy+GfbvQz3wKHhzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=EZzu4l+U; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=roeUSB9w; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=EZzu4l+U; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=roeUSB9w; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="EZzu4l+U";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="roeUSB9w";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="EZzu4l+U";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="roeUSB9w"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 82E54216EE;
-	Thu, 13 Nov 2025 13:48:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1763041686; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=mFAGU4XxhhELslwlDz67aEXHbA7WKGtlGK0QybdrGNE=;
-	b=EZzu4l+UCK+XZUrSKIG+VtcI9P+R2W8BPUvGlGGho/8pUbD8WyfImBEM0nMebZFzxYDHbe
-	uRYHhZ3zTvowBmgVorucv9275w2NGIJgJ/71PKWfWIa8p0GmPEEB/4g5V95xsuu0oga8GI
-	u3ig7gT5/FvENJQ6WMsqn5H0hyft2Uw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1763041686;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=mFAGU4XxhhELslwlDz67aEXHbA7WKGtlGK0QybdrGNE=;
-	b=roeUSB9wdsPt9YbUAWGEuUvyhnnja24H3lIUYW+LUn95KayXevOtek2Xe40O/LI9dGUD3C
-	z1NJC2Fx5EqCUuBA==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=EZzu4l+U;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=roeUSB9w
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1763041686; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=mFAGU4XxhhELslwlDz67aEXHbA7WKGtlGK0QybdrGNE=;
-	b=EZzu4l+UCK+XZUrSKIG+VtcI9P+R2W8BPUvGlGGho/8pUbD8WyfImBEM0nMebZFzxYDHbe
-	uRYHhZ3zTvowBmgVorucv9275w2NGIJgJ/71PKWfWIa8p0GmPEEB/4g5V95xsuu0oga8GI
-	u3ig7gT5/FvENJQ6WMsqn5H0hyft2Uw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1763041686;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=mFAGU4XxhhELslwlDz67aEXHbA7WKGtlGK0QybdrGNE=;
-	b=roeUSB9wdsPt9YbUAWGEuUvyhnnja24H3lIUYW+LUn95KayXevOtek2Xe40O/LI9dGUD3C
-	z1NJC2Fx5EqCUuBA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 63E2C3EA61;
-	Thu, 13 Nov 2025 13:48:06 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id XDgMGJbhFWlyeQAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Thu, 13 Nov 2025 13:48:06 +0000
-Message-ID: <e88f9909-cb5e-4205-b4cb-461fdd71120a@suse.cz>
-Date: Thu, 13 Nov 2025 14:48:06 +0100
+	s=arc-20240116; t=1763045109; c=relaxed/simple;
+	bh=7Se7GqFjoSPSpFsaUkSTA8OG5xonS0Z/6rqAuAc/oOA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nkY4RwV+BTLCbekYEumFoxUbDFv5+UrirkTtOlTnCjjmKseqIFSXVOBBRLKGmCXkovwIMtY8tmOYfLpkLFWLi0kzO5J2l2wLYVeKi/66GyC4NkwLBrDbyZjwnje7OfUSvztHtBrrPFd3+d0bCqSKHYBGAFIbRsPBHd9Tzs/1b0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id E07C3227A88; Thu, 13 Nov 2025 15:44:55 +0100 (CET)
+Date: Thu, 13 Nov 2025 15:44:55 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 1/3] block: fix NULL pointer dereference in
+ blk_zone_reset_all_bio_endio()
+Message-ID: <20251113144455.GA30779@lst.de>
+References: <20251113134028.890166-1-dlemoal@kernel.org> <20251113134028.890166-2-dlemoal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: poison_element vs highmem, was Re: [linux-next:master] [block]
- ec7f31b2a2: BUG:unable_to_handle_page_fault_for_address
-Content-Language: en-US
-To: Oliver Sang <oliver.sang@intel.com>
-Cc: Christoph Hellwig <hch@lst.de>, Andrew Morton
- <akpm@linux-foundation.org>, Christoph Lameter <cl@gentwo.org>,
- David Rientjes <rientjes@google.com>,
- Roman Gushchin <roman.gushchin@linux.dev>, Harry Yoo <harry.yoo@oracle.com>,
- linux-mm@kvack.org, oe-lkp@lists.linux.dev, lkp@intel.com,
- Jens Axboe <axboe@kernel.dk>, "Martin K. Petersen"
- <martin.petersen@oracle.com>, Johannes Thumshirn
- <johannes.thumshirn@wdc.com>, Anuj Gupta <anuj20.g@samsung.com>,
- Kanchan Joshi <joshi.k@samsung.com>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <202511111411.9ebfa1ba-lkp@intel.com>
- <20251111074828.GA6596@lst.de> <a90b1707-b97a-454c-bced-a25068b28325@suse.cz>
- <aRWMT6DTNhAdudn+@xsang-OptiPlex-9020>
-From: Vlastimil Babka <vbabka@suse.cz>
-Autocrypt: addr=vbabka@suse.cz; keydata=
- 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
- m6M14QORSWTLRg==
-In-Reply-To: <aRWMT6DTNhAdudn+@xsang-OptiPlex-9020>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Rspamd-Queue-Id: 82E54216EE
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_TRACE(0.00)[suse.cz:+]
-X-Spam-Score: -4.51
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251113134028.890166-2-dlemoal@kernel.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On 11/13/25 08:44, Oliver Sang wrote:
-> hi, Vlastimil Babka,
+On Thu, Nov 13, 2025 at 10:40:26PM +0900, Damien Le Moal wrote:
+> For zoned block devices that do not need zone write plugs (e.g. most
+> device mapper devices that support zones), the disk hash table of zone
+> write plugs is NULL. For such devices, blk_zone_reset_all_bio_endio()
+> should not attempt to scan this has table as that causes a NULL pointer
+> dereference.
 > 
-> On Wed, Nov 12, 2025 at 10:33:32AM +0100, Vlastimil Babka wrote:
->> On 11/11/25 08:48, Christoph Hellwig wrote:
->> > Looks like this is due to the code in poison_element, which tries
->> > to memset more than PAGE_SIZE for a single page.  This probably
->> > implies we are the first users of the mempool page helpers for order > 0,
->> > or at least the first one tested by anyone on 32-bit with highmem :)
->> > 
->> > That code seems to come from
->> > 
->> > commit bdfedb76f4f5aa5e37380e3b71adee4a39f30fc6
->> > Author: David Rientjes <rientjes@google.com>
->> > Date:   Wed Apr 15 16:14:17 2015 -0700
->> > 
->> >     mm, mempool: poison elements backed by slab allocator
->> > 
->> > originally.  The easiest fix would be to just skip poisoning for this
->> > case, although that would reduce the usefulness of the poisoning.
->> 
->> #syz test
+> Fix this by checking that the disk does have zone write plugs using the
+> atomic counter. This is equivalent to checking for a non-NULL hash table
+> but has the advantage to also speed up the execution of
+> blk_zone_reset_all_bio_endio() for devices that do use zone write plugs
+> but do not have any plug in the hash table (e.g. a disk with only full
+> zones).
 > 
-> we applied below patch upon ec7f31b2a2 directly, and confirmed the issue we
-> reported gone now with the patch.
-> 
-> Tested-by: kernel test robot <oliver.sang@intel.com>
+> Fixes: efae226c2ef1 ("block: handle zone management operations completions")
+> Reported-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
 
-Thanks!
+Looks good:
 
-> BTW, we are kernel test robot, not the syzbot :) thanks
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-Yeah I realized only after sending...
-
-I'll make this a full patch then. How urgent is it, Christoph? I suppose
-this is related to the bulk mempool changes, and we discussed the users will
-target 6.20 (7.0?) merge window? So landing this fix in 6.19 is enough?
-
->> ----8<----
->> From 4d97b55c208c611cb01062e0fbf9dbda9f5617d5 Mon Sep 17 00:00:00 2001
->> From: Vlastimil Babka <vbabka@suse.cz>
->> Date: Wed, 12 Nov 2025 10:29:52 +0100
->> Subject: [PATCH] mm/mempool: fix poisoning order>0 pages with HIGHMEM
->> 
->> Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
->> ---
->>  mm/mempool.c | 28 ++++++++++++++++++++++------
->>  1 file changed, 22 insertions(+), 6 deletions(-)
->> 
->> diff --git a/mm/mempool.c b/mm/mempool.c
->> index 1c38e873e546..75fea9441b93 100644
->> --- a/mm/mempool.c
->> +++ b/mm/mempool.c
->> @@ -68,10 +68,18 @@ static void check_element(mempool_t *pool, void *element)
->>  	} else if (pool->free == mempool_free_pages) {
->>  		/* Mempools backed by page allocator */
->>  		int order = (int)(long)pool->pool_data;
->> -		void *addr = kmap_local_page((struct page *)element);
->> +#ifdef CONFIG_HIGHMEM
->> +		for (int i = 0; i < (1 << order); i++) {
->> +			struct page *page = (struct page *)element;
->> +			void *addr = kmap_local_page(page + i);
->> 
->> -		__check_element(pool, addr, 1UL << (PAGE_SHIFT + order));
->> -		kunmap_local(addr);
->> +			__check_element(pool, addr, PAGE_SIZE);
->> +			kunmap_local(addr);
->> +		}
->> +#else
->> +		void *addr = page_address((struct page *)element);
->> +		__check_element(pool, addr, PAGE_SIZE << order);
->> +#endif
->>  	}
->>  }
->> 
->> @@ -97,10 +105,18 @@ static void poison_element(mempool_t *pool, void *element)
->>  	} else if (pool->alloc == mempool_alloc_pages) {
->>  		/* Mempools backed by page allocator */
->>  		int order = (int)(long)pool->pool_data;
->> -		void *addr = kmap_local_page((struct page *)element);
->> +#ifdef CONFIG_HIGHMEM
->> +		for (int i = 0; i < (1 << order); i++) {
->> +			struct page *page = (struct page *)element;
->> +			void *addr = kmap_local_page(page + i);
->> 
->> -		__poison_element(addr, 1UL << (PAGE_SHIFT + order));
->> -		kunmap_local(addr);
->> +			__poison_element(addr, PAGE_SIZE);
->> +			kunmap_local(addr);
->> +		}
->> +#else
->> +		void *addr = page_address((struct page *)element);
->> +		__poison_element(addr, PAGE_SIZE << order);
->> +#endif
->>  	}
->>  }
->>  #else /* CONFIG_SLUB_DEBUG_ON */
->> -- 
->> 2.51.1
->> 
->> 
+although maybe factoring that loop into helper might be a tad cleaner?
 
