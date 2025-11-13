@@ -1,96 +1,91 @@
-Received: from out162-62-58-211.mail.qq.com (out162-62-58-211.mail.qq.com [162.62.58.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD4BC2A1BA;
-	Thu, 13 Nov 2025 07:55:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFE3B2F7AAC
+	for <linux-block@vger.kernel.org>; Thu, 13 Nov 2025 07:55:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763020536; cv=none; b=UZdzehRToofQ/pEvCzgCg7yrfq16H4cZ+hXU+d0Dr8q50ghbZp20M1z/6d/sf3OLIHsyRCFYtdrYZIaae6fDa3XIGYB42Q9zftseQfaFk7Fg+w7v/n/74hI1QQ1lRanQK8EWj4m8nF0lDFZZ5v0u9a7vXSXVfGBDZ7CkSTNZHjE=
+	t=1763020549; cv=none; b=hKtNiI8UQAhkfhpP1wEdOnPGVSUTh2+E9rZLTwXFisWUNFPTKaeE9b6C43DdClrh/joeiJp5xc94aSkohB2EwwIF2Jfd7S03WoQLa2K2q5o1rExKr10X7cgfqV/FDfB3tqDQM52/U4DN3uArnqNvL0/8Ksv0bROSyBfYrZZFxFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763020536; c=relaxed/simple;
-	bh=swa1iz9lIJYaRcE252xEGLS58GUF2KRd05CElalUAmY=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=LLFwM5dq2EJbkw/i3PWsSt5/XOsrrP1D2vnUKM2jgWU5S9zuKpOffbdL67ZXXh/bJIIblCq1NZTCOJWhckOFFnOH63anQmoxdEJKuxXNSCPTEb3SB20SoVFjwtsqsvyD6GWaNnO5CbTvRoDaCXlPd3t/S0mm8Vpw2JjSMXErvBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=lsZ/AFs/; arc=none smtp.client-ip=162.62.58.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
+	s=arc-20240116; t=1763020549; c=relaxed/simple;
+	bh=eGCFzE3FTJolIZuT03VIztGS+4PbmTrojtX2VPB4hNc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ByUAXC8sdMqxjLAzPd9CfqcwM2jGP9gmIFkHo3ZxZ8FY98a3R0LTmNiTdDkJY3z4OCf6LjAF5s8nb8CPnpLomQhhTJfSAhYXGS1FwcjjQBaj1NFCASlQB3+i72HqLokzZ1K4MH4cb43M9v/hf8jkFSoOTsqgh7TIjffECCpU4qo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=MnE9TKaA; arc=none smtp.client-ip=209.85.215.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="lsZ/AFs/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1763020523;
-	bh=t5xHITYUt6oFMxXRYSXMZYMrVmkRWvp/mzkgT57QABw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=lsZ/AFs/ch1AnbI2jmg3cJUhWwytfpFQ2qR3NmCqw5L5pbMMQvdsmQmjVtT0OQpMc
-	 NxZL+Pn0mfPJxyCfohWTs1GZ0/1WwP2ZVvJlKCiEaMXqmqvZvOOzEcRSYFFFOqVnJZ
-	 jhLGckLvpzLcsstCbRvPfDN9iTCsXHdSzIDK9utA=
-Received: from meizu-Precision-3660.meizu.com ([112.91.84.72])
-	by newxmesmtplogicsvrszc43-0.qq.com (NewEsmtp) with SMTP
-	id DD4BA6FE; Thu, 13 Nov 2025 15:55:20 +0800
-X-QQ-mid: xmsmtpt1763020520t39bf1js8
-Message-ID: <tencent_FE5751D11BB7EC389B2BC0B957DEE0D75E06@qq.com>
-X-QQ-XMAILINFO: OWROGFTRp+d+cprrP6KWNZeBoDbPIt355KIOdz7m8YO0yifwHSmyC318L/1UFM
-	 HQjK+iAcQMCwKSjbrPtsC5tB5a8AQ5NdkcSrP9g4SAB5M4UIEHZO06KxjpYRmJAc8xTyuCg9LlGq
-	 2cIfEHotv7sPvLZW9Yj4KYRmoGTTswTwG0SgP3lychboOjo5ANiK8wtzYXpws2pqEPNivta748i6
-	 pSvYwiaYLC2r1eyW5Rqi+/wasPYhDwZtFVo2Ctc3S5WKG3tXDd2l948ROigBSTe8pNiBWqNo9J7P
-	 Y+YOGhxBUiansipAfh862fXC9tuiIa/mY2XrqH43W/GdLREfobKISqlXBaXB7z0Isfew4KXbXNPw
-	 Bp8ihfv828SMU/k4BGO6GbV3ZgitsyvLzxgpBzKP5Ug6bEOQnbY3hwRmm00qedwc5cgyQQOonmJu
-	 TJwybxJcPuiXot9KClyFQ+YytKvS+XeyWU55jbgPwR5yev3JeIjtAS//4Hsl7DxZO2M2rohbge6F
-	 MjdmlR0esGEzMoTaZ4i8wS2kIPOMTSKZwK3vZMwSqVv9nRgWTxhiCAoD+tP2tDRzf6sOntmyKyE2
-	 YbtwkgagBwt7zxLZc+4tiO2LoIFyTPN2PSo4DiheTdf1Okc/l7mE9Q/qzGCb/bD/XWE/L8U7B2Uu
-	 UTIrycqxeiWo2kjQduzJk5FTavIWDSqN9UBHxos8docNkd9idrMfClQ0kOLAEMD5BHe36JHivPPi
-	 5k/ACopMxuB8EB/rXIY7TexiAC8A6i3+L9MNdk3R7bURVbPE37d42w6u2tDPNXLw7vJBXemPUqTc
-	 1t8w4B7KS1kpPOmBItMQdSwu5CjAn7s8wVRhMaU4O0bxG69jT90Sbz4p8IFDchKKbz034dKP3rb/
-	 Q80MXqdJo7lTocENwm7HbaajYcVZ4H2EBaR6cPsVcCzUrveJxFkDWnb7bVpbg+fymO0RbL8Bv0N/
-	 r2L4NYeTwjWJWIJVdq48tDELGZB4kCw8t+ybRkOGzVoGGROUCB4LyoTCunSIB7PdGXNtLybsLrr/
-	 v6cBaZZ+j8xXLec9dlGuqjcy/Hy+vJNlEjD2lRRg3+OgfGG38g
-X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
-From: Yuwen Chen <ywen.chen@foxmail.com>
-To: senozhatsky@chromium.org
-Cc: akpm@linux-foundation.org,
-	axboe@kernel.dk,
-	bgeffon@google.com,
-	licayy@outlook.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	liumartin@google.com,
-	minchan@kernel.org,
-	richardycc@google.com,
-	ywen.chen@foxmail.com
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="MnE9TKaA"
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-ba488b064cbso415382a12.1
+        for <linux-block@vger.kernel.org>; Wed, 12 Nov 2025 23:55:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1763020547; x=1763625347; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=BqOCdzG8TVwmmpstxldCFsocgLp9/QVeRrpBCk4yxaQ=;
+        b=MnE9TKaA3HEmrHiKHYRS+t+vWPcTMrcs0rXUHkq+C2PduJ8pJS6ms53NyCH5xqwN5+
+         kDDcytqHUZ74OgmVDMHsQcAwvpmYJc/HiDiuDGYb55BzpLsVtKzoEH/MAgBar9ixPH4+
+         0o1O07IURmMEvcUb8mrDemOsMQ72dlWX58zDc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763020547; x=1763625347;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BqOCdzG8TVwmmpstxldCFsocgLp9/QVeRrpBCk4yxaQ=;
+        b=fzMKpMucldPK3GrIeCNbsAa2YMXpr/XJyQYpANCcZ9pHtD5XJ8Z62f8zmgbdmCGMTE
+         RYdPa506f35Ozfuqe4sIt+DtLrkFhiI3SJHCuL+JdvUyH5zvayxkeu9ARX2YAXEzlmmP
+         s3CTdQShZZ05wtuyB8aziFiyO6+OQKfpc0chxvk5Fd7dwI3n2kkzBGB5M/PMiJitqVIC
+         doTokvbqeH84iaC5jgGk4fhMJjhCxS2RZ7UgRR1LYo5zj6ehxKe7PzEGJYLHQpx5fzVV
+         h+kMaizPeIqH9bXi6PdAhaX26er+o7zhYP5a86+gfs7VXWBh8t5NFYTl+MZTLBL9x9yF
+         b3yg==
+X-Forwarded-Encrypted: i=1; AJvYcCUVBO1i6RvGkaybtkeHQ8N9zczuytUa9Q9aXrMbxXxY+awlpMstGH2LJdufBOgYnNr4fSC7qeO8SD69fw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzshl/jZnZYdBmO86GCpSxi/ibbn0Df4j0VlyLtZ3ShYyBEB6mz
+	EZgVuQYt57W4XHGxOzjYfe388x/yJ/X1Wqf1Lf9upK7ZmMCOrRLnVJ7GVPyyYxTJCA==
+X-Gm-Gg: ASbGncvZBhDVJjMCXDK5Fejc3aluI3ABGjEW1fOeSWuocivkwPrzc6lGk9Pqt3SU6bH
+	4q/egcVD9hP9P3bYQZ9IJ86H22OXaLheWV+c2fs/u9yB1mVTw0aFGOuVAvlPbQTpLi0Xm+ENgql
+	rgXPROIfaTqbDAkhIcQ04Jqk4Z44bZiJpKSUWhX/IZ6VSPO6eNJo0kWq8spUAng7Qi9TwGZoFfx
+	0twmmoK6GvMApr4VvAgoX4AjLl9DlqlLdnTead8WxjHYIpwp0tdNre7WsVg57wuqIDjr2ApCuX+
+	NDi/T9NEQyaTmWb8Rsa0nHavUjrWUmBAsVPMyqakIbRCw/U005FJ3/7UdP2zDn4US7s30ZblcNt
+	Pg7Row6e7o42xUCs5QYhu92V5XrHdtu0DVp6HoNq8ifNMlgbKc4awnZTVHb6yeDDYiQW3OCwL0t
+	29j6W/
+X-Google-Smtp-Source: AGHT+IFeFnwmYEOF77S5xrw0OtwdfxalTIPfjFUnxj2d/tiwYlK6zp64b1GatmlTBDH62gN5nOONJA==
+X-Received: by 2002:a17:902:d54e:b0:297:dabf:98f9 with SMTP id d9443c01a7336-2984ec8e279mr73263485ad.0.1763020547289;
+        Wed, 12 Nov 2025 23:55:47 -0800 (PST)
+Received: from google.com ([2401:fa00:8f:203:6d96:d8c6:55e6:2377])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2985c2b0c4bsm15357275ad.62.2025.11.12.23.55.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Nov 2025 23:55:46 -0800 (PST)
+Date: Thu, 13 Nov 2025 16:55:41 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Yuwen Chen <ywen.chen@foxmail.com>
+Cc: axboe@kernel.dk, akpm@linux-foundation.org, bgeffon@google.com, 
+	licayy@outlook.com, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, liumartin@google.com, minchan@kernel.org, richardycc@google.com, 
+	senozhatsky@chromium.org
 Subject: Re: [PATCH v4] zram: Implement multi-page write-back
-Date: Thu, 13 Nov 2025 15:55:20 +0800
-X-OQ-MSGID: <20251113075520.3325126-1-ywen.chen@foxmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <x6ksirxv2xffhzpvdxmm5fa7r4b56mlh3kbhopljdsvwzg62wm@rrsslefk4rb4>
-References: <x6ksirxv2xffhzpvdxmm5fa7r4b56mlh3kbhopljdsvwzg62wm@rrsslefk4rb4>
+Message-ID: <ob2qytrsog2ydftywgdxdis25c2ygboqqltbwcfuaks4iaxzct@lwx7xyklzdde>
+References: <83d64478-d53c-441f-b5b4-55b5f1530a03@kernel.dk>
+ <tencent_0FBBFC8AE0B97BC63B5D47CE1FF2BABFDA09@qq.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <tencent_0FBBFC8AE0B97BC63B5D47CE1FF2BABFDA09@qq.com>
 
-On Thu, 13 Nov 2025 11:04:04 +0900, Sergey Senozhatsky wrote:
-> How was this number chosen?  Did you try lower/higher values?
-> I think we might want this to be runtime tunable via sysfs, e.g.
-> writeback_batch_size attr, with min value of 1.
+Just a minor side not:
 
-I haven't conducted any tests on this value. I just set an empirical
-value of 32 based on the submission queue length of the storage device.
+> +
+> +static struct zram_wb_request *zram_writeback_next_request(struct zram_wb_request *pool,
+> +	int pool_cnt, int *cnt_off)
+> +{
 
-As you said, providing a sys node for configuration might offer
-performance advantages for mechanical hard drives.
+This is not in accordance with the kernel coding style.
 
-On Thu, 13 Nov 2025 11:20:15 +0900, Sergey Senozhatsky wrote:
-> So I wonder if things will look simpler (is this the word I'm looking
-> for?) if you just have two lists for requests: one list for completed/idle
-> requests and one list for in-flight requests (and you move requests
-> around accordingly).  Then you don't need to iterate the pool and check
-> flags, you just can check list_empty(&idle_requests) and take the first
-> (front) element.
+If you use the best code editor (vim/nvim) then I'd highly
+recommend the linuxsty plugin [1]
 
-Yes, using two linked lists can reduce the complexity. It's just that
-before I saw your submission, I couldn't find a better way to avoid
-introducing locks. Thank you very much!
-
+[1] https://github.com/gregkh/kernel-coding-style
