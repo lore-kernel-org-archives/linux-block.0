@@ -1,95 +1,78 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AEEF2C2357
-	for <linux-block@vger.kernel.org>; Thu, 13 Nov 2025 20:13:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57EE23148CE
+	for <linux-block@vger.kernel.org>; Thu, 13 Nov 2025 20:21:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763064818; cv=none; b=tIuXhFHYsWXQdstVTjPc1Bd/j4dqVzUe21mNVD3+TyOOnIDWiaJqm0GF6QVw9ksfUSIRgHGCfGANosoh562NnGwRbGeM70rOtg5Ncl8ePQKzvrQz/l/b5g725c1aCW6XMSvsjB1GZs9pWUJsu7lwtJI6Ln/6fKqMOXmXJ9o7Upk=
+	t=1763065266; cv=none; b=hxESCO6wgI2A4fTAwpwoU37q5cwTREHWbmWo87DOg+LKTeXhwH6mbTDYnW1W/IndITeKCyLCa1k3fPVCYDauvLZHlMOsod0tVu42fz/kCnWXFq/KthylJ4KMgGUh16R7IR5Vib6fNTgaBX+L5fmMYmCfecQogLUg1wp4VSHJU/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763064818; c=relaxed/simple;
-	bh=R3yi+cLMsc/L6sR5rN3U9sVi/JaSUtT0gxwfSLY7z+8=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=ssRh8eT0sfYDqIVGuSHEmEeInCU5Xm8xqWjEdFzsr7Tb4cC13w//5sSsIItD/fq0MYcsL+AkguJJOtGv90qH8WQbOe3VGu4MxOxS9TzsuTW7prIWlUTI4Sl1iLzDgwAk43RTU57eWaT7W4Sa4sBkHgiOb5tSEgbjBJp1tI5uRH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MM9a8K+C; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763065266; c=relaxed/simple;
+	bh=02V4JfOnzdMAA0dJ16sclnatpneh3FN3MXFY2aEDE4M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JtXRVQUGVUKdBIIEETQiVRFsG9Wo6XsBp4IRRJToyJWq779uu/XEeXeCT7lWZnkjKlqY2SYodhgRolIDhdoTvZItmdd9GOirSCFwY/vzVtl97IspR94UzvGhWLrhcFzzq+xYNenaZQY7Yn1MTWoIYEaojd+Bwg1olejue8Onmss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cUanHa0R; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MM9a8K+C"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78977C4CEF8;
-	Thu, 13 Nov 2025 20:13:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cUanHa0R"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84E2FC4CEF7;
+	Thu, 13 Nov 2025 20:21:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763064817;
-	bh=R3yi+cLMsc/L6sR5rN3U9sVi/JaSUtT0gxwfSLY7z+8=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=MM9a8K+C2agMp+gYd55xxl0uRpc/VDT53ay/Ie4CGKDi3pLKYGnZ4pOyu+HyWLf7e
-	 /qNVLeF4SIowLXNMdHILC140sSygao38VmaQh1HWFNJhrdd87eT+ZO6Rl6jcT/YUa9
-	 iYOiHr4ZPWXwd5kMmt/DowCDjevoF4hsWclCVRa58jO7dhWRS/PSYqmKRMWg0tqJQN
-	 Qv3mH7VTUH8phRmBXeMmv1aW6Pltrorb9r4PeV16vpAwLtO36+lcvEgPvG8cO7IqOK
-	 lDbGUzn6Y4VEzpWRLljjlB4XvYeUvg36Bc2k8Syism+MKlvE4V8sffXSKhZfAGXa8k
-	 Wb9tDmK79LcbQ==
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 9B937F40078;
-	Thu, 13 Nov 2025 15:13:36 -0500 (EST)
-Received: from phl-imap-08 ([10.202.2.84])
-  by phl-compute-04.internal (MEProxy); Thu, 13 Nov 2025 15:13:36 -0500
-X-ME-Sender: <xms:8DsWabLpHErX5_FxkX26uPnf_E4VqNMGjHBXt23VH6JmN9Rf6CQqMQ>
-    <xme:8DsWaZ9A7C8g4QT56wYvRZ_dHN9HnPDTd-0aSze-YUqhE6_56QlEQMM-AW8rXsMxe
-    AS207WZ9EOL2dG7c2zxW_6AAvykADk3smAjLKaWHO5gikrYH4Xs>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvtdejkeejucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedfnfgvohhn
-    ucftohhmrghnohhvshhkhidfuceolhgvohhnsehkvghrnhgvlhdrohhrgheqnecuggftrf
-    grthhtvghrnhepjeevffelgfelvdfgvedvteelhefhvdffheegffekveelieevfeejteei
-    leeuuedvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    eplhgvohhnodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdduvdeftdehfeel
-    keegqddvjeejleejjedvkedqlhgvohhnpeepkhgvrhhnvghlrdhorhhgsehlvghonhdrnh
-    hupdhnsggprhgtphhtthhopeejpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehs
-    rghgihesghhrihhmsggvrhhgrdhmvgdprhgtphhtthhopegrgigsohgvsehkvghrnhgvlh
-    drughkpdhrtghpthhtohepkhgsuhhstghhsehkvghrnhgvlhdrohhrghdprhgtphhtthho
-    pehlihhnuhigqdhnvhhmvgeslhhishhtshdrihhnfhhrrgguvggrugdrohhrghdprhgtph
-    htthhopehhtghhsehlshhtrdguvgdprhgtphhtthhopehlihhnuhigqdgslhhotghksehv
-    ghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlse
-    hvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:8DsWaYCitHph3b6ZiMTFx3ZcBcEe49wdStjLVOZ-GSMxVIyCgJODEw>
-    <xmx:8DsWaXfudOpE5Z5fKbcvMDAO96mfLGejjqQRgPYmhzKFGrHYFsbrBQ>
-    <xmx:8DsWaXOQpV52RhRmcpBDxzFURalbL1PeEkiC_sA76UerqHCAjuaqug>
-    <xmx:8DsWaXJhiBiYJXEapqMynX2DwPEI7mL7_GWe5RBNKD2WYcV4Per5Pw>
-    <xmx:8DsWaXLnbYtNaBAmi3Dwrs77dzp0Hw8oMhalS_098UsWnTXB-NAzwEol>
-Feedback-ID: i927946fb:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 67D4C2CE0067; Thu, 13 Nov 2025 15:13:36 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=k20201202; t=1763065265;
+	bh=02V4JfOnzdMAA0dJ16sclnatpneh3FN3MXFY2aEDE4M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cUanHa0RdNCojm4/C2G8QIUZsOKED9qU8tBSF3pdrsX6QF6iA3xpaFOD/MAtqStvb
+	 GUOi5kKB6RJTWDKiV+E074KYUEevjaXJr9Ul/hvwWq2eIZP9S48nBwCEEsaOnsVY2v
+	 zo4IP7YJIOXaKOnIcZ//aVUf5cFOeb3r/FGHXaEXjtJcIWhonpvlIKqtNykvx+7OsA
+	 GTAYt4bqinwTG/Wutpyi74QtzOj24GapOERFzk2Y4H+AjOtzFqCjJ7yXxQkqATgwxE
+	 6Z4lUz9zUtmdpDB+nsHPZuYNahtPOAUAXtsVdgheUYcwsMs8o76RjVqu03QluDtHqu
+	 eTkN3CY2nKXew==
+Date: Thu, 13 Nov 2025 20:21:03 +0000
+From: Eric Biggers <ebiggers@kernel.org>
+To: Keith Busch <kbusch@kernel.org>
+Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org, hch@lst.de,
+	axboe@kernel.dk, "Martin K. Petersen" <martin.petersen@oracle.com>
+Subject: Re: [PATCHv4] blk-integrity: support arbitrary buffer alignment
+Message-ID: <20251113202103.GC3971299@google.com>
+References: <20251113152621.2183637-1-kbusch@meta.com>
+ <20251113173135.GD1792@sol>
+ <aRYf9S-UuJqa37fi@kbusch-mbp>
+ <20251113192022.GA3971299@google.com>
+ <aRY2G6xEgEVqLBgb@kbusch-mbp>
+ <20251113200237.GB3971299@google.com>
+ <aRY7jDVt2jpLCWoO@kbusch-mbp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: AaNBfhOYEQos
-Date: Thu, 13 Nov 2025 22:13:16 +0200
-From: "Leon Romanovsky" <leon@kernel.org>
-To: "Keith Busch" <kbusch@kernel.org>
-Cc: "Jens Axboe" <axboe@kernel.dk>, "Christoph Hellwig" <hch@lst.de>,
- "Sagi Grimberg" <sagi@grimberg.me>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
-Message-Id: <c745d717-fcd5-48a5-b640-af5697be6049@app.fastmail.com>
-In-Reply-To: <aRY5nCvNnQk4mMCT@kbusch-mbp>
-References: <20251112-block-with-mmio-v4-0-54aeb609d28d@nvidia.com>
- <176305197986.133468.1935881415989157155.b4-ty@kernel.dk>
- <cec91b1e-a545-4799-97c3-676e3b566721@kernel.dk>
- <4f75497d-11cb-437c-ab90-d65d4d2e0a52@kernel.dk>
- <20251113195008.GA111768@unreal> <aRY5nCvNnQk4mMCT@kbusch-mbp>
-Subject: Re: [PATCH v4 0/2] block: Enable proper MMIO memory handling for P2P DMA
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aRY7jDVt2jpLCWoO@kbusch-mbp>
 
+On Thu, Nov 13, 2025 at 03:11:56PM -0500, Keith Busch wrote:
+> On Thu, Nov 13, 2025 at 08:02:37PM +0000, Eric Biggers wrote:
+> > On Thu, Nov 13, 2025 at 02:48:43PM -0500, Keith Busch wrote:
+> > > Like on real hardware? I'm a bit at a loss as to how, I've never seen
+> > > anything subscribe to this format, not even in emulation. The only thing
+> > > I can readily do to test this is run random data through the old code,
+> > > print the result, then run the same data through the new code and see if
+> > > they're the same. That test is successful. Not good enough?
+> > 
+> > ip_compute_csum() returns a folded 16-bit checksum, whereas
+> > csum_partial() returns an unfolded 32-bit checksum.
+> 
+> Sorry, I must be missing something. do_csum() returns an unfolded 32-bit
+> result
 
+Nope.  It returns a folded 16-bit result.
 
-On Thu, Nov 13, 2025, at 22:03, Keith Busch wrote:
-> On Thu, Nov 13, 2025 at 09:50:08PM +0200, Leon Romanovsky wrote:
->> Can you please squash this fixup instead?
->
-> I think you should change pci_p2pdma_state() to always initialize the
-> map type instead of making the caller do it.
+> In any case, I find that running any random data through it at block
+> interval lengths (4k or 512b) is always producing results that fit in 16
+> bits anyway, so maybe that's why it appears to be working?
 
-Yes, i just was afraid to add another subsystem into the mix.
+Your kernel build may be using the generic csum_partial(), which folds
+the checksum more frequently than the x86 one (and maybe some of the
+other arch-optimized implementations too).  Try the x86 one.
+
+- Eric
