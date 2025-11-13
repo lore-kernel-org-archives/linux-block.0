@@ -1,136 +1,153 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36A941F63D9
-	for <linux-block@vger.kernel.org>; Thu, 13 Nov 2025 17:39:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 951632DA75F
+	for <linux-block@vger.kernel.org>; Thu, 13 Nov 2025 17:45:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763055564; cv=none; b=R3FaQgSH7D5IRSjMZmLBUjJMlftjaRZ+PEOQXWW9t3ZCJhPFdEh2IDF/LpRtT/yD7r7wQ8uOoU+H/RK01MeR+iB5U2Hlxe8Hik/XhzO/KxUWRzffJrfPkxBP+VgNtk6emWaVcHXVj756YCjYxWDnpRv6xnYKVcHFPVWZQrlNkbc=
+	t=1763055958; cv=none; b=PpSvFqMp3y2tL3kb5Qgn6oX3jfrYGdydEIBvEYT4YovEOIxB5cK4VrF6rKHfwqRf4b3zL+x3QjaandPWhC0QDUvbyKqCWZwjuwbfgeehmXdbVQ/ykjvOEkPpbiz7YaFiXnlOEKy3fu0w9+Cn0q/fY56f2UKjyLTPNQAEJ0FW6ts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763055564; c=relaxed/simple;
-	bh=GGp2s0LvtKjt+t1W7yDNtjXdzWykxFnnHM6LUMYRznE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r5P1/R13OjjtC7w3K/SK55DSwZqtTeVRgFpt8jd471rN88SgIhp0xZvMHnPSPqqYxyNphINM3FwztljM0WixBeMOxV1ROOnHcZLBggsXxsGHwQ6sMGN7CjcLkBUDtXfovyW4djvElyQsEfUEddg6yCHlo0mlgCV5+v6ODhylnaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S2Fy41ml; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1763055958; c=relaxed/simple;
+	bh=VhUwfEPicoZB6PDTCTi2VBzQfXpAEA3RaDSuxi8dF+g=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=GpL0/JA40z7ezrt2B9PGktLCtyDjs8UnIBVT8L1SoGS4l0w9WozQg5orB9EOzDLM3sSyBM/tyJ0gudWyGszl+2uyPme0AivUjgr3jhlHka4Py7LQptjYNJvaOtxrP9bkOcghDag4qFlVhlx+oWKrj7y8PDsCsh0uxThp0hnwSes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=l8GNPs44; arc=none smtp.client-ip=209.85.166.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S2Fy41ml"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763055562;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PXiG8WHDv5vtbMZ81FzbMwHzCV62RlyG1r3nUFcyKUo=;
-	b=S2Fy41mlyE2uNEtFwfqEKx5YAKe4bmOn0tyrfZvs+Ak0HGx4Oi1EGz03Yx3dezHhtUT0mn
-	7Zj1swCnjNilNre/8mR2uqQPsSkYZ0ul5IA+skbZS4VLa3DqePOmMuRA9OOQF8C0DFWxLO
-	qyAPALVPAY978zud1m1FIF0PehNmcPI=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-267-E9sQLSMdPc-ALg_OhBjXIQ-1; Thu,
- 13 Nov 2025 12:39:18 -0500
-X-MC-Unique: E9sQLSMdPc-ALg_OhBjXIQ-1
-X-Mimecast-MFC-AGG-ID: E9sQLSMdPc-ALg_OhBjXIQ_1763055557
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 221EC1956070;
-	Thu, 13 Nov 2025 17:39:17 +0000 (UTC)
-Received: from redhat.com (unknown [10.45.224.162])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3D6D9300018D;
-	Thu, 13 Nov 2025 17:39:11 +0000 (UTC)
-Date: Thu, 13 Nov 2025 18:39:07 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jan Kara <jack@suse.cz>, Keith Busch <kbusch@kernel.org>,
-	Dave Chinner <david@fromorbit.com>,
-	Carlos Maiolino <cem@kernel.org>,
-	Christian Brauner <brauner@kernel.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-raid@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: Re: fall back from direct to buffered I/O when stable writes are
- required
-Message-ID: <aRYXuwtSQUz6buBs@redhat.com>
-References: <20251029071537.1127397-1-hch@lst.de>
- <aQNJ4iQ8vOiBQEW2@dread.disaster.area>
- <20251030143324.GA31550@lst.de>
- <aQPyVtkvTg4W1nyz@dread.disaster.area>
- <20251031130050.GA15719@lst.de>
- <aQTcb-0VtWLx6ghD@kbusch-mbp>
- <20251031164701.GA27481@lst.de>
- <kpk2od2fuqofdoneqse2l3gvn7wbqx3y4vckmnvl6gc2jcaw4m@hsxqmxshckpj>
- <20251103122111.GA17600@lst.de>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="l8GNPs44"
+Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-93e9b5bafa5so42052739f.3
+        for <linux-block@vger.kernel.org>; Thu, 13 Nov 2025 09:45:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1763055954; x=1763660754; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=tui2oZdOGFo/UwA9EjBvgc/qLK6VZNJJO4rcigX5624=;
+        b=l8GNPs44aOi2zmgUyy/ptzTERJc7JBPXCSd9zonf9W1jfguiFAeZMv+CkgEWjUwXcE
+         Y9WMGkJLjfUbXJky0r8QN3EB8QRGOWjR0o2L59ZO953xOj8jRStY1KQGjMmzvHfrtXAp
+         JqG9Vb9lFPwJleVO2LsucKDcI7AkWXTDQfy45L4B/hdug+Dlp2+Iy8gID1O/IMeOzMJh
+         l0t5fsCz8/SR99zsAp3x14TZygTyDVi2u2pdJacF8eF3ZMF9FhzxwDsPOC2Pu9rPohJC
+         MOl99hfqn4do6cSZU2HV3g17wiEK92RF5779ulV1gFQaHUYzo+fMv3lWFTp9bOGZyeur
+         7Efw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763055954; x=1763660754;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tui2oZdOGFo/UwA9EjBvgc/qLK6VZNJJO4rcigX5624=;
+        b=sPqBD2POK2tOptFBs+3HifD9/psMrYFCS+OZQzs4kHp1CKXzsXjukNP/NCKlSrW6tN
+         DPM+oD0LkvR0goHdDcXNXTYavOElitFXzWr4UZdc5g3yTaQM6Jm2oJpPOBEs5pugZ/g0
+         +J2Eb0TYJEs9Foym064FQeHtjxlQ+uKCc70yl35f4c7LeQuEgF0Cp/lGs1v0ErAr9Mtn
+         cpMeMKhf9Fp9VBRiFYprl1O+op+cgrzWKliuJM9BlSurqUG185Vy2NtMdvAYQ/h/7ugD
+         JVxvCNLOLdNiec+l4gu5uOhXYdCr/NEk1rerP9WklaeJGDhAFY8/TrXYUN3OfjMjO/A9
+         NdNw==
+X-Gm-Message-State: AOJu0YxkG4ZDbAjh2rS7T8QtVvo0iXF6q+kmNBZQ/jwfuP0d/6D19FpZ
+	4kEE8G6abpGMo0Ga42a5xCZ7GeqgNXVbYFIuCyjtA2Srd7AdOPQ9c1IBYf98j/qTgbk=
+X-Gm-Gg: ASbGncsXd/rHQ3zvEROPRcBKTVsAh7nw+g/vg9NwjMBAzyK4DUodkGG+dsHWwMB2HX6
+	5QmPSs2cae1y2YrEY7bWjWPxUL0TlCSR+vG9dwTCdH+fKeJ/9X+e8jdZFR76cBSZInPZXQvuG6U
+	NzSRb7nkPGrlbvddCNZu5IpCXQ55m9+P/KsrJRP+RJrpj2kPYUK5BlZw7HOAOXFGKPkqu5EoGf/
+	+y7Qz3Ys+oIXa2xr3Q8wXDITFP2lH+OJznqM6f0A9OZ5WRnl3UEGF8yTQqIc6EJJ5y5SLME16Qu
+	YUicHHrQROB3eI8EhUTJve3F9GkaplA0HaRjzmGgvEhdPrL08exklGgo5jXkRN68SDESr9ZBKxH
+	lAUMaYC13XA4scFXCDE8yXqgFmk7Pnpj+38pV+YiqUZCU7jkv/hgj5v3o27XGexc0e12wX6LG
+X-Google-Smtp-Source: AGHT+IFXSRU9xlOg2cSLBdle6h81Us/iIfHLsl+eoj1ZDKVfNRBNwooLejXMxXYqDr3/KqGkAsIfkQ==
+X-Received: by 2002:a05:6e02:3302:b0:433:2072:9d2c with SMTP id e9e14a558f8ab-4348c89e9d5mr6229635ab.10.1763055954535;
+        Thu, 13 Nov 2025 09:45:54 -0800 (PST)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-43483990056sm9159445ab.19.2025.11.13.09.45.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Nov 2025 09:45:54 -0800 (PST)
+Message-ID: <4f75497d-11cb-437c-ab90-d65d4d2e0a52@kernel.dk>
+Date: Thu, 13 Nov 2025 10:45:53 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251103122111.GA17600@lst.de>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 0/2] block: Enable proper MMIO memory handling for P2P
+ DMA
+From: Jens Axboe <axboe@kernel.dk>
+To: Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
+ Sagi Grimberg <sagi@grimberg.me>, Leon Romanovsky <leon@kernel.org>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-nvme@lists.infradead.org
+References: <20251112-block-with-mmio-v4-0-54aeb609d28d@nvidia.com>
+ <176305197986.133468.1935881415989157155.b4-ty@kernel.dk>
+ <cec91b1e-a545-4799-97c3-676e3b566721@kernel.dk>
+Content-Language: en-US
+In-Reply-To: <cec91b1e-a545-4799-97c3-676e3b566721@kernel.dk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Am 03.11.2025 um 13:21 hat Christoph Hellwig geschrieben:
-> On Mon, Nov 03, 2025 at 12:14:06PM +0100, Jan Kara wrote:
-> > I also think the performance cost of the unconditional bounce buffering is
-> > so heavy that it's just a polite way of pushing the app to do proper IO
-> > buffer synchronization itself (assuming it cares about IO performance but
-> > given it bothered with direct IO it presumably does). 
-> >
-> > So the question is how to get out of this mess with the least disruption
-> > possible which IMO also means providing easy way for well-behaved apps to
-> > avoid the overhead.
+On 11/13/25 10:12 AM, Jens Axboe wrote:
+> On 11/13/25 9:39 AM, Jens Axboe wrote:
+>>
+>> On Wed, 12 Nov 2025 21:48:03 +0200, Leon Romanovsky wrote:
+>>> Changelog:
+>>> v4:
+>>>  * Changed double "if" to be "else if".
+>>>  * Added missed PCI_P2PDMA_MAP_NONE case.
+>>> v3: https://patch.msgid.link/20251027-block-with-mmio-v3-0-ac3370e1f7b7@nvidia.com
+>>>  * Encoded p2p map type in IOD flags instead of DMA attributes.
+>>>  * Removed REQ_P2PDMA flag from block layer.
+>>>  * Simplified map_phys conversion patch.
+>>> v2: https://lore.kernel.org/all/20251020-block-with-mmio-v2-0-147e9f93d8d4@nvidia.com/
+>>>  * Added Chirstoph's Reviewed-by tag for first patch.
+>>>  * Squashed patches
+>>>  * Stored DMA MMIO attribute in NVMe IOD flags variable instead of block layer.
+>>> v1: https://patch.msgid.link/20251017-block-with-mmio-v1-0-3f486904db5e@nvidia.com
+>>>  * Reordered patches.
+>>>  * Dropped patch which tried to unify unmap flow.
+>>>  * Set MMIO flag separately for data and integrity payloads.
+>>> v0: https://lore.kernel.org/all/cover.1760369219.git.leon@kernel.org/
+>>>
+>>> [...]
+>>
+>> Applied, thanks!
+>>
+>> [1/2] nvme-pci: migrate to dma_map_phys instead of map_page
+>>       commit: f10000db2f7cf29d8c2ade69266bed7b51c772cb
+>> [2/2] block-dma: properly take MMIO path
+>>       commit: 8df2745e8b23fdbe34c5b0a24607f5aaf10ed7eb
 > 
-> Remember the cases where this matters is checksumming and parity, where
-> we touch all the cache lines anyway and consume the DRAM bandwidth,
-> although bounce buffering upgrades this from pure reads to also writes.
-> So the overhead is heavy, but if we handle it the right way, that is
-> doing the checksum/parity calculation while the cache line is still hot
-> it should not be prohibitive.  And getting this right in the direct
-> I/O code means that the low-level code could stop bounce buffering
-> for buffered I/O, providing a major speedup there.
-> 
-> I've been thinking a bit more on how to better get the copy close to the
-> checksumming at least for PI, and to avoid the extra copies for RAID5
-> buffered I/O. M maybe a better way is to mark a bio as trusted/untrusted
-> so that the checksumming/raid code can bounce buffer it, and I start to
-> like that idea.
+> And now dropped again - this doesn't boot on neither my big test box
+> with 33 nvme drives, nor even on my local test vm. Two different archs,
+> and very different setups. Which begs the question, how on earth was
+> this tested, if it doesn't boot on anything I have here?!
 
-This feels like the right idea to me. It's also what I thought of after
-reading your problem description.
+I took a look, and what happens here is that iter.p2pdma.map is 0 as it
+never got set to anything. That is the same as PCI_P2PDMA_MAP_UNKNOWN,
+and hence we just end up in a BLK_STS_RESOURCE. First of all, returning
+BLK_STS_RESOURCE for that seems... highly suspicious. That should surely
+be a fatal error. And secondly, this just further backs up that there's
+ZERO testing done on this patchset at all. WTF?
 
-The problem is not that RAID5 uses bounce buffers. That's the correct
-and safe thing to do when you don't know that the buffer can't change.
-I'd argue changing that would be a RAID5 bug, and the corruption you
-showed earlier in the thread is not a sign of a buggy filesystem or
-application [1], but that you told the device to operate incorrectly.
+FWIW, the below makes it boot just fine, as expected, as a default zero
+filled iter then matches the UNKNOWN case.
 
-What is the problem is that it still uses bounce buffers when you do
-know that the buffer can't change. Then it's just wasteful and doesn't
-contribute to correctness.
 
-Passing down a flag to the device so that it can decide whether the
-bounce buffer is needed seems like the obvious solution for that.
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index e5ca8301bb8b..4cce69226773 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -1087,6 +1087,7 @@ static blk_status_t nvme_map_data(struct request *req)
+ 	case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
+ 		iod->flags |= IOD_DATA_MMIO;
+ 		break;
++	case PCI_P2PDMA_MAP_UNKNOWN:
+ 	case PCI_P2PDMA_MAP_NONE:
+ 		break;
+ 	default:
+@@ -1122,6 +1123,7 @@ static blk_status_t nvme_pci_setup_meta_iter(struct request *req)
+ 	case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
+ 		iod->flags |= IOD_META_MMIO;
+ 		break;
++	case PCI_P2PDMA_MAP_UNKNOWN:
+ 	case PCI_P2PDMA_MAP_NONE:
+ 		break;
+ 	default:
 
-> A complication is that PI could relax that requirement if we support
-> PI passthrough from userspace (currently only for block device, but I
-> plan to add file system support), where the device checks it, but we
-> can't do that for parity RAID.
-
-Not sure I understand the problem here. If it's passed through from
-userspace, isn't its validity the problem of userspace, too? I'd expect
-that you only need a bounce buffer in the kernel if the kernel itself
-does something like a checksum calculation?
-
-Kevin
-
-[1] For a QEMU developer like me, not blaming the application may sound
-    like an excuse, but we're really only in the same position as the
-    kernel here for anything that comes from the guest. Whenever we rely
-    on stable buffers, we already have to use bounce buffers, too.
-
+-- 
+Jens Axboe
