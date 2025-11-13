@@ -1,71 +1,73 @@
-Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
+Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE7263559CD
-	for <linux-block@vger.kernel.org>; Thu, 13 Nov 2025 16:27:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D66534A3B1
+	for <linux-block@vger.kernel.org>; Thu, 13 Nov 2025 16:39:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763051223; cv=none; b=i/E4TAbBXvg+dYYXMnic+jvsItrv//e3o+QPc175GlWWC54Sb9WwgFLL6Vhk8fm+TsSWiQ6A+1yG/+NmUMRRSlJZp9SK0Y1PCUYs++VIm26GUHGtyf9SJwNEfn/Cvki7VlyYtVOxM17d469rWgesGxVdHcGq04qozrV2z/DxQqU=
+	t=1763051983; cv=none; b=RQInXufrI6C7ynLip6lxTWdmvNASSrQYTN2pNGNJjg4aamKvRrriZOCjlVE2vuP90Evivw/ahk5Ne6N+uCqqq+SZHCdbzZzLn6w6jJZp8HA6EncQKYifBrwDsl+AOdTf+E/fetTYGASVomotbtd+bhanP1mZNBVQmSGM0Qx93hA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763051223; c=relaxed/simple;
-	bh=8cGpt1mnnD4Nd84oB3FjjbO1ZroPYw3Bi1pxnVfLhrk=;
+	s=arc-20240116; t=1763051983; c=relaxed/simple;
+	bh=hW177gakDHf+Ufs3x0FyqJ++5WlmyEhFjU4hzGDlJb4=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=Cupa2Q+Q9eLLwh9jahQfrbRUGvPl0OqepuWcsH8cYuRUorG9dHqV6AU7vUJr3yl74EAKEARxGNsfi3jPch3Fm55EIZRfsItRKD34NSP5DYTux0sLM89R05u0pmABKy9x+RBMkynT9D6objzk9fWFFzIrtssIh208uC49mk6cFyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=QKi16B8U; arc=none smtp.client-ip=209.85.166.44
+	 MIME-Version:Content-Type; b=DUVN52v8i88F6tLLCQrAhhsgEsbnrQYw2AD2/VR/g0b/Fn/tWqrrDQukReOrpIh+JEyQN8YIMeFdC2gpeA01X7tg3H+cZ5xmiNsFTsWoZ5dzFj0zZsMpgBBptKqzdcKOehywfRcxWRfks5j6bHc32HDoiBSW23a0z6a5apExvOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=wN4D4/ma; arc=none smtp.client-ip=209.85.166.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="QKi16B8U"
-Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-940d9772e28so43584339f.2
-        for <linux-block@vger.kernel.org>; Thu, 13 Nov 2025 08:27:00 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="wN4D4/ma"
+Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-4336f492d75so6446965ab.1
+        for <linux-block@vger.kernel.org>; Thu, 13 Nov 2025 08:39:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1763051220; x=1763656020; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1763051980; x=1763656780; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+WV0XxB+XpXMsT65IEjX1Mg5hj1WPsVipB9m+jCtnpo=;
-        b=QKi16B8U97BczHNWv3tbcTOdHFf4ULVB0kmAG6gLit+pmQT494KOsHR/EvXhrd13kP
-         aa6YHaHouA/nXFKaY2PBj6WfEhFYozBy4Y0IFbVPifpHxICbXFCP63UHXUghMfrHid/C
-         aK7bEMf/sERG90SKl1s49KH2Cu0nJS/pILsJEDH3I9gT6dSSrHa/zBbgGWXNXAmbVBhU
-         k/aZfoAH/KwsswZotkt3D1oORlIRsk86D5ZHmofBQ0hWE7OXppXfTaOMdfswMnY8dEhC
-         lqEkRWfsfEP+ucfHIHTZseCvCplEVWL5Sth8qS+w0xAfSYHn6p3Qu7+F3uGgVzwTuJa1
-         bKkw==
+        bh=jwztvobeODOxhK0CvyheBFjMbfSTg5YCa6BHqK/XpGw=;
+        b=wN4D4/maZ0eKf0lMC4s1W6VsQ+Mu3CMbsitJbo3LfGzhAtM8eMldmTPkiExdj6P2Mg
+         ZtaZ+Ce7aAttBKCAMFXsa90PBrwBEGAaBqp1rJQ9VBRuXtal5I8q9jGbj5Ue/t6eedGe
+         3dKZK3sc/MnPh1pq3SYvD4hi2xDPamCCL7gpnROOfURgy6oGqsg2TFANWdsYS7N+srYu
+         /3834YsAtvCpSH/YHH0gXV6MFWPl5iWW+VCHBZW7alOtlmyCIb3+2UQSbcBb/i9GM2uf
+         impwgrbmTn2t1vbO7neNtizwPNZsCEB0gdE7u/ln9+IX0O5CXcCST53ixM9QT8jyP7M7
+         4vJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763051220; x=1763656020;
+        d=1e100.net; s=20230601; t=1763051980; x=1763656780;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=+WV0XxB+XpXMsT65IEjX1Mg5hj1WPsVipB9m+jCtnpo=;
-        b=R4oErzOcceCIp7uvip2MLdxS9FjJCbpTs8TTqYzVP/98CPdRZSFs4PdgWGtJf+AfOd
-         H3QjYkg6wJZ4kw8uDgRkcLwe0v1cNul2T5Zk+DMNNbaJSQA/xF2K3SrIPlTeBpc7eK0A
-         MX3VuPR2eqzb5hHnVw2ipNpuw2T0TTlnXeV1wqiNN45c+ffNjK9JArzjAAqkH6XWk7Q7
-         /9axquIR8HLUl8Cg5YOnvf34Gd1cwJns8GcxE3KQ1lOc+Ba4dTkS8S7LPoYaT7+QcSIv
-         WmU6nww/Vw75zgvM2b+jnyZkFzk4tCB3IAFOKlm9YxjS39jLSrbFKXjCbLPbdvz3yoA2
-         TaIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV24BMADL8NclVOdybH0X3IebtMxkWuq8gKl2FE/UbPtb+Ls7UOhRT4PZJ/J35orwApbNfHWC2kL0ao0A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyesWCQLPGJahhsANOn+DwdKxectFYwaCUmEO+S5rQWdpKM2pFR
-	x+FXTgBItxYeLaQ3rBv203CB8YvPWat+0KqW8f087sPwfk9RVk/WATyYm3idlHTJin4=
-X-Gm-Gg: ASbGncv3ooF3KP748V3tTRvP2i7kjDPdJ+voFo4HQ9US2ZOKJUu+u8ZkRKNg1ugZSRM
-	alWsxTmSFfoKa6HR1xmvAHUjS0kQnUYvU8GD32I/z+7/dXKyZqECV71PmrSDNXWZrk+uojS4PQ6
-	bo4ehFcd7BGlsvdXCK8Z6IiIk9CgoLaQD7tyY8J49+5237AE6XQ+AcC7QMc0iqJdGBL6nSRnl+h
-	9dJhgGLSimI/+oz3/tpDFLao3hoAc7F6yPtMDrZH9xkdRua82JH5Vya2acu0DMRQ2eVBkUb+gln
-	B+P2LSZrlL+J42XASttLN8NXj2gUqdFS3IjiC2Zql3UVz1AAtFMH8DGC/g7z+td9LRb5a71P5dg
-	Px0lwQUarPvw1Wv66FL8YbS46YzpLWDuKGAlPeKkC56TwTYO6urLI3P/9QL1KlLK2vcQ=
-X-Google-Smtp-Source: AGHT+IEfPEzNVUtSijTeS0YXmDIkYTXhI19QS5zHoA8Z8cIEgyRelQqFXKdqTDIpcP6BSYul/ZnQtw==
-X-Received: by 2002:a05:6e02:318f:b0:433:6fe2:6b00 with SMTP id e9e14a558f8ab-4348c8648a5mr1678615ab.5.1763051219861;
-        Thu, 13 Nov 2025 08:26:59 -0800 (PST)
+        bh=jwztvobeODOxhK0CvyheBFjMbfSTg5YCa6BHqK/XpGw=;
+        b=FfyMI6b6oelE00xdd3d7lbHopGryotLtDg1KYpAlTIurDICKloeDdahjQ4bfpBa6qp
+         Jh4Rt4LMcrwgn1YzdN5PXjiix3oYHhioGucIynsGqce3vCBoFM4rC4kWt/LV6KlZXup1
+         PjzDAsICSAUhPyaC37xSGQQJfTaHemlCnY+Wr/aNVKvCyXQlkM/xgt/dW3kQD5c7sbl0
+         6+omr7XwJe/hDPY8HuVJKksUjtjhg1YS84WAK6z9O29tV5Iwz9KzeD6+4wrgkJlHbMGQ
+         yTemL9U9a/Zz6WS/T9eGVlExwIrhAVrTKSEr6D9cPg293y4A3Rj6w6NhcFRzhhiR03w2
+         qYEg==
+X-Gm-Message-State: AOJu0Yz+NKQNP2zr+krwXuj0J/WqBdbhZf44VqG0R3ntacn+40fExOG9
+	GlSPqUX1KizeWZwJhB3b8AC6OuHb2aZexz/GYN5Poi0tjHETzPo11WQelfSLsgIZ6NJW5725rML
+	4gsZ6
+X-Gm-Gg: ASbGncsyXrnNJXbqB8MTwaL6jSTaW/OfBfuvc7YxRpBf4ZP81gLDXccLIEPNK2gOTEj
+	mxSvzPALFjVwDQDUylV/r2llL3hWn5strvI+SeL/jCU3xKRL2AolzFLeQjisdLW0pJxyogAN8FM
+	VoypMnkeucVlvuI93aMVqwDCCgc6zEa4PiFM+Qm03vLWrPcNZYRVjjf+MZvO/VqMKW/O47i8+pp
+	e7hd2ZAWXdrDMNEI3NOD617AUShoE3U9/Gb5zDcezeJ6II7eHNX94q+LvGu0eG2UAvnfCLXp6it
+	2j+Gw+sN7QO3l3fIvSCJxXjH8RY2h7Cj85SKlE/JhqFEDwiEeNYkmwtdBOnyTqneh2H22ak2X9a
+	S8+uigagykUhSY20qcn/dvyyVJo1OazOKGspydlivkZA09P9xGBcmObbxAJbRgGAW5xs=
+X-Google-Smtp-Source: AGHT+IF3aRufDXUXYiyExpWVx2upcPigPhDcwwEm4YNsDP+368K3AwrsMWbwCUWHU/Et4Fmh85T5ZA==
+X-Received: by 2002:a05:6e02:1fe2:b0:431:d864:366a with SMTP id e9e14a558f8ab-4348c87b440mr2388545ab.2.1763051979764;
+        Thu, 13 Nov 2025 08:39:39 -0800 (PST)
 Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-434833c5357sm8641725ab.2.2025.11.13.08.26.58
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5b7bd35c5f4sm852672173.61.2025.11.13.08.39.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Nov 2025 08:26:59 -0800 (PST)
+        Thu, 13 Nov 2025 08:39:39 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: colyli@fnnas.com
-Cc: linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-In-Reply-To: <20251113053630.54218-1-colyli@fnnas.com>
-References: <20251113053630.54218-1-colyli@fnnas.com>
-Subject: Re: [PATCH 0/9] bcache patches for Linux 6.19
-Message-Id: <176305121881.129995.1450932700968780784.b4-ty@kernel.dk>
-Date: Thu, 13 Nov 2025 09:26:58 -0700
+To: linux-block@vger.kernel.org, Nilay Shroff <nilay@linux.ibm.com>
+Cc: ming.lei@redhat.com, hch@lst.de, yi.zhang@redhat.com, czhong@redhat.com, 
+ yukuai@fnnas.com, gjoyce@ibm.com
+In-Reply-To: <20251113090619.2030737-1-nilay@linux.ibm.com>
+References: <20251113090619.2030737-1-nilay@linux.ibm.com>
+Subject: Re: [PATCHv7 0/5] block: restructure elevator switch path and fix
+ a lockdep splat
+Message-Id: <176305197886.133468.154479782311200841.b4-ty@kernel.dk>
+Date: Thu, 13 Nov 2025 09:39:38 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -77,38 +79,31 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3
 
 
-On Thu, 13 Nov 2025 13:36:21 +0800, colyli@fnnas.com wrote:
-> This is the first wave bcache patches for Linux 6.19.
+On Thu, 13 Nov 2025 14:28:17 +0530, Nilay Shroff wrote:
+> This patchset reorganizes the elevator switch path used during both
+> nr_hw_queues update and elv_iosched_store() operations to address a
+> recently reported lockdep splat [1].
 > 
-> The major change is from me, which is to remove useless discard
-> interface and code for cache device (not the backing device). And the
-> last patch about gc latency is a cooperative result from Robert Pang
-> (Google), Mingzhe Zou (Easystack) and me, by inspired from their
-> previous works, I compose the final version and Robert prvides positive
-> benchmark result.
+> The warning highlights a locking dependency between ->freeze_lock and
+> ->elevator_lock on pcpu_alloc_mutex, triggered when the Kyber scheduler
+> dynamically allocates its private scheduling data. The fix is to ensure
+> that such allocations occur outside the locked sections, thus eliminating
+> the dependency chain.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/9] bcache: get rid of discard code from journal
-      commit: 0c72e9fcc156caaf123a6291321bc9bd74cd1b61
-[2/9] bcache: remove discard code from alloc.c
-      commit: b4056afbd4b90f5bdbdc53cca2768f9b8872a2dd
-[3/9] bcache: drop discard sysfs interface
-      commit: 73a004f83cf024e785b74243ba9817a329423379
-[4/9] bcache: remove discard sysfs interface document
-      commit: 7bf90cd740bf87dd1692cf74d49bb1dc849dcd11
-[5/9] bcache: reduce gc latency by processing less nodes and sleep less time
-      commit: 70bc173ce06be90b026bb00ea175567c91f006e4
-[6/9] bcache: remove redundant __GFP_NOWARN
-      commit: 21194c44b6bdf50a27a0e065683d94bae16f69cb
-[7/9] bcache: replace use of system_wq with system_percpu_wq
-      commit: fd82071814d06c7b760fe8d90b932d8a66cffc63
-[8/9] bcache: WQ_PERCPU added to alloc_workqueue users
-      commit: c0c808214249c32a8961999e0779b953095b0074
-[9/9] bcache: Avoid -Wflex-array-member-not-at-end warning
-      commit: 699122b590ebbc450737eebde3ab8f5b871cc7f0
+[1/5] block: unify elevator tags and type xarrays into struct elv_change_ctx
+      commit: 232143b605387b372dee0ec7830f93b93df5f67d
+[2/5] block: move elevator tags into struct elevator_resources
+      commit: 04728ce90966c54417fd8120a3820104d18ba68d
+[3/5] block: introduce alloc_sched_data and free_sched_data elevator methods
+      commit: 61019afdf6ac17c8e8f9c42665aa1fa82f04a3e2
+[4/5] block: use {alloc|free}_sched data methods
+      commit: 0315476e78c050048e80f66334a310e5581b46bb
+[5/5] block: define alloc_sched_data and free_sched_data methods for kyber
+      commit: d4c3ef56a1618cb7d55a4be74a09cda09165745a
 
 Best regards,
 -- 
