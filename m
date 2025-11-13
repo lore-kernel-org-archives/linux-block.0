@@ -1,131 +1,109 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39AB0331A56
-	for <linux-block@vger.kernel.org>; Thu, 13 Nov 2025 08:49:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C65B3321B8
+	for <linux-block@vger.kernel.org>; Thu, 13 Nov 2025 08:54:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763023783; cv=none; b=fv4oRLCtpsj3Mhil9tIRebDYSbA75mCJLdMI1/iTKeGFsrMZ8AA19eOdTQQqpSjQF9tDe6jt7aVMxYNY9HPjmWn9hPheFAZgs0GRymwZZqUZND7q9N2KInPNB88RBAhL9ft8qKCZX27WDCDTv/0/dOZ9CVPp9scPKQY8DiAfMek=
+	t=1763024058; cv=none; b=ia2hU7jWpDp7iAeRf+Xt8HEDGkk+qp9DTPJHNe/txE3x2vRsgdFHLBg5sErFlBDxR9Q2ApAqIRBHgs8k3OibmPxwwadqNX/F88q3mPPou72aEzo4LfTZhVEsq1PSnXxNtK4b4CNUOZ2MPKMUG24CRRQqkDlk0XXwW3+ZGSZJ3F8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763023783; c=relaxed/simple;
-	bh=WABqBvnf40xuNML8etL1KBAMBM0JbL6h/eVyMiTy6KE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Hjs5BdIZ+YT9AdVeJcJbh5NT6VVlFTWNPGm7tCEzDeIsnmVQzEIOgwZKMyOfG9IXTwQT2udps/imCZczeajw6aFd16fSk0c4go3D844Lbu2pmZNyANaaJ1ZpLEyBzbQnw2d51jym6/2pILZyjnqncOBUsS7NUOJ3uRCT1pIOiRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qtY/EZaq; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1763024058; c=relaxed/simple;
+	bh=Cy9k5PTF2jHawTbczSDqjkd6lnnaXLzDfsP+BCHK13g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hkg/tolloKRIJMwM+apyda1BW57dcNTtkdIT24KdaodqTJVBVjCmyv1EFO2aMMvqF+r6FE0ABK8iZsrbrkl9Q4yhhP0/sl6FlspEjf2KlRlZNIw6EV9HgplEl8pUKwPVOR2zB5X6Ts9Kim2t10yNHZpNie2L8diDTALog8XxHfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=BIWJUEyo; arc=none smtp.client-ip=209.85.215.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qtY/EZaq"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AD82NBK002270;
-	Thu, 13 Nov 2025 08:49:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=KlIIQT
-	60m62NZxWxSfb+RplrxBGZq3xEb+iIOrekQ6E=; b=qtY/EZaqVr+caUslo+7rK0
-	wT6GN/erd0wmA8rfLKCdDEcH6nrXoEBmmduT1nS4fqZANygN2eeUthhyCPlsV2fg
-	u2b3/fj4lyStmYtv1D4uytqliM+yUEFie+9waOP1stZKOw0eWrqO7EX8VXrKWxI3
-	6r7JxBkhlCwVi8IalcGK3x5TVeEnZpFuXr0DvbnWOo3by7IORSpoE/Xm0+sjzPCy
-	Lao5WZN2y9FVNmawQ+jLsr4icoKgKBNP05JOsBc0V8U+/HgBLtm/rHRSaezRdF6n
-	9q9bD+4fT1Dyjx0ESyCEtjor6dfDg+mGnXEmyjgxR9Wv+E8WS5T1DLlvoN31nvmA
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4a9wgx5c7a-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 13 Nov 2025 08:49:10 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5AD4tdFp028880;
-	Thu, 13 Nov 2025 08:49:09 GMT
-Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4aag6sn29d-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 13 Nov 2025 08:49:09 +0000
-Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
-	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5AD8mtfU36241884
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 13 Nov 2025 08:48:55 GMT
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 432305804B;
-	Thu, 13 Nov 2025 08:49:09 +0000 (GMT)
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 62DCD58065;
-	Thu, 13 Nov 2025 08:49:06 +0000 (GMT)
-Received: from [9.109.198.209] (unknown [9.109.198.209])
-	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 13 Nov 2025 08:49:06 +0000 (GMT)
-Message-ID: <b2dbf740-f2a3-4451-8f44-e35c7173bdf4@linux.ibm.com>
-Date: Thu, 13 Nov 2025 14:19:04 +0530
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="BIWJUEyo"
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-bb2447d11ceso352855a12.0
+        for <linux-block@vger.kernel.org>; Thu, 13 Nov 2025 00:54:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1763024056; x=1763628856; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=dpTnA2MUAj836lGOlG7UmadHMuhVvcz41++jJ9KkuhM=;
+        b=BIWJUEyog4nkC7sB3MSt3OiOQ+PE9/ncxPH4Wqp5zmcfF7aBPD0ngPrjTgfydfqGt8
+         i5Vyq3lqr2guYorcBhZC9pZRcIOieZ4bnZ54iqhsQ3BfCeWAAGtXhmfExKuuJk5wKxnP
+         LKaYK92TP2NmRVDFz7oLcCFi64rvfQRM37uYE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763024056; x=1763628856;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dpTnA2MUAj836lGOlG7UmadHMuhVvcz41++jJ9KkuhM=;
+        b=WIYzVPBFaczgw1gVeDa5yHWO9MbbOjoEZ9dxpKiZKcg5Gdr7Y7O0bDvFnSJpWMT3mo
+         a1o9jXup8U81ubxqU+UCbdhU2b18WP2pAcZr7JuU9DMihNHqwcomjAL/Jk4aqClC8nXk
+         ZFJehmujWmRGlGy6eIzYSdozkv+Vy726kf6Ss4LobwsGAKUx9kAbA7/BDAu6mS4f5lt2
+         xcOfR3lfk26jKA3hQezdNd4QMZbUdGkn/Xc5XSwuZpxGBL3Ig9WXc5dW7O+LhhGi547t
+         5TLiV+Lb969lmGX9gdp97f+ZTshYXZ+0oamUsSfdU9nVPoXzDODt1zqt9K5Sx0k7EAbE
+         AioQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUPxE5+LuOXsQO5vily3hxw1o0cWd3jXjB4PISP98ZZEl6SlsUZntFApLU6WvxfKe5RrOES+PlOpvnEjw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxllEQCTLxml3xiaSluZ9bpU98Sj2d/eEtsAdgOkzLkRx6PspLn
+	O/LHLZ6ZhBXvp+nV8vScNquQYq/mm6XCPtWBh95yla2KTnxN16i1R9g/gJF0Ai5r/Q==
+X-Gm-Gg: ASbGncsoYzBUAty+/dFubYxndlET+3vUqo04RpDlQtdeRgCKVYJfaudddmk9m0ZkLQs
+	lK8l5DWuGZ6G19Zu7QV0hi7D37dO1eNGsZddEEfVQaf3SPF+BQyiJeKvEkEYjKISjp0i4pvNSE4
+	i+cSboNAl/putZGeRt+5EfwcJVR9MtnHdEBGpO9B8W2y1cP9LSDlTq9pmYjSWCy8aPf4ANQcSh7
+	S+1Qbd26i8/YKywDXP+NMfZSFzs18+KkUPGfUPIl3i7cZQOOUonYdEpDXfcKOx5qqrRx5TG1S0N
+	IeZAsh/kQcEbwjexWwTNorkuDib7qybEa5MirkK/3Wmm0xY3iMRfTMjdMsuQyCk6EcT14Q/OS5f
+	P0MoKxGv0obSCEYTns7KzZbLSjPGZ8cHQtFRZrrWvGLp3R8bKRH9FAst1duN43mWwA/n1wLRqcP
+	e4S6uLaoNakareNcyaOl4RMGu7Iho=
+X-Google-Smtp-Source: AGHT+IGlRYtrFj/4YjKWjf1OzOHSeLUgv3Uc7+FXohdQ3S1q8hcdNvpoDApiTwcA0/LloW0V+MPPWw==
+X-Received: by 2002:a17:903:19cf:b0:294:fcae:826 with SMTP id d9443c01a7336-2984edeedffmr89237465ad.59.1763024056517;
+        Thu, 13 Nov 2025 00:54:16 -0800 (PST)
+Received: from tigerii.tok.corp.google.com ([2401:fa00:8f:203:6d96:d8c6:55e6:2377])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2985c2346f3sm17486465ad.18.2025.11.13.00.54.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Nov 2025 00:54:15 -0800 (PST)
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Minchan Kim <minchan@kernel.org>,
+	Yuwen Chen <ywen.chen@foxmail.com>,
+	Richard Chang <richardycc@google.com>
+Cc: Brian Geffon <bgeffon@google.com>,
+	Fengyu Lian <licayy@outlook.com>,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-block@vger.kernel.org,
+	Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: [PATCHv2 0/4] zram: introduce writeback bio batching
+Date: Thu, 13 Nov 2025 17:53:58 +0900
+Message-ID: <20251113085402.1811522-1-senozhatsky@chromium.org>
+X-Mailer: git-send-email 2.51.2.1041.gc1ab5b90ca-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv6 3/5] block: introduce alloc_sched_data and
- free_sched_data elevator methods
-To: yukuai@fnnas.com, linux-block@vger.kernel.org
-Cc: ming.lei@redhat.com, hch@lst.de, axboe@kernel.dk, yi.zhang@redhat.com,
-        czhong@redhat.com, gjoyce@ibm.com
-References: <20251112132249.1791304-1-nilay@linux.ibm.com>
- <20251112132249.1791304-4-nilay@linux.ibm.com>
- <f4490af5-e198-4d30-84e2-f33c70935de7@fnnas.com>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <f4490af5-e198-4d30-84e2-f33c70935de7@fnnas.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: JQLzxVT9BngPa5EJ37luhwxV2nvVSkoS
-X-Proofpoint-ORIG-GUID: JQLzxVT9BngPa5EJ37luhwxV2nvVSkoS
-X-Authority-Analysis: v=2.4 cv=VMPQXtPX c=1 sm=1 tr=0 ts=69159b86 cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VbHPKtdFqRduu5zKMNEA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA4MDAyMiBTYWx0ZWRfX09oCh73a61X8
- reX0iXuLmVH0sMTBEznI6CgcMdB4jMaAFKsGhl+qhIJ1IqC97DOHVhCWyRsRR3P2DZkkZ0Bwp6k
- v7Uyw2oVxUYLxAJaPza8fK3loom+hOebdXICZQjTR9gkgB3J6bvl/j4uV9Qr3iTZCszonWhc5gd
- NvUP/hX+ZY38Uf5G0FP/lAQkG+pdKpNt5I9RVUHbqj8fn1Cdymrj3J4L3aLhrgr31Q8Y+XfjBR+
- yEaSUGr/fuVp9PVmMmB+nGfPKv51aqd2I/FtB2WztKiYH0F9lkS4cPcB+j8mU3NiqEsUc7vMo7Q
- M9kVaUJs5cbG+uVgqLkqpuyzfxTG87pEOIJt447r6MRcQoiU7JRRXl4tt6F+ucf0Oo23s0HUTvN
- jqPQkvM0xgO/mZQCt55rWS18msot0Q==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-12_06,2025-11-12_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 priorityscore=1501 lowpriorityscore=0 bulkscore=0
- clxscore=1015 phishscore=0 spamscore=0 malwarescore=0 adultscore=0
- suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2510240000
- definitions=main-2511080022
 
+This is a rework of Yuwen's patch [1] that adds writeback bio
+batching support to zram, which can improve throughput of
+writeback operation.
 
+v1->v2:
+- moved pp-slot ownership to req before submission (pp_ctl doesn't own it
+  anymore after it's assigned to the req)
+- do not take spin-lock in bach_limit handler
+- dropped wb_limit_lock
+- moved wb_limt accounting to pre-submit and completion stages
+- introduced simple wb_limit helpers
+- more comments and cleanups
 
-On 11/13/25 12:05 PM, Yu Kuai wrote:
->> +/*
->> + * blk_mq_alloc_sched_data() - Allocates scheduler specific data
->> + * Returns:
->> + *         - Pointer to allocated data on success
->> + *         - &blk_mq_sched_data sentinel if no allocation needed
->> + *         - ERR_PTR(-ENOMEM) in case of failure
->> + */
->> +static inline void *blk_mq_alloc_sched_data(struct request_queue *q,
->> +		struct elevator_type *e)
->> +{
->> +	void *sched_data;
->> +	static char blk_mq_sched_data;	/* act as a success sentinel */
->> +
->> +	if (!e || !e->ops.alloc_sched_data)
->> +		return &blk_mq_sched_data;
-> Looks to me it's fine to return NULL here, if so, I don't like this
-> hacky value. Otherwise LGTM.
+[1] https://lore.kernel.org/linux-block/tencent_0FBBFC8AE0B97BC63B5D47CE1FF2BABFDA09@qq.com/
 
-Yeah, you’re right. The only reason I used a sentinel pointer was
-to distinguish the “no allocation needed” case from an actual
-allocation failure, since returning NULL can look like an error.
-That said, given the context, returning NULL here would also work.
-So I’ll update it accordingly.
+Sergey Senozhatsky (3):
+  zram: add writeback batch size device attr
+  zram: take write lock in wb limit store handlers
+  zram: drop wb_limit_lock
 
-Thanks,
---Nilay
+Yuwen Chen (1):
+  zram: introduce writeback bio batching support
+
+ drivers/block/zram/zram_drv.c | 410 +++++++++++++++++++++++++++-------
+ drivers/block/zram/zram_drv.h |   2 +-
+ 2 files changed, 326 insertions(+), 86 deletions(-)
+
+-- 
+2.51.2.1041.gc1ab5b90ca-goog
+
