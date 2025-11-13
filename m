@@ -1,57 +1,88 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C62630F923;
-	Thu, 13 Nov 2025 05:23:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F56E2A1CF;
+	Thu, 13 Nov 2025 05:36:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763011426; cv=none; b=higb0xEjPB4pLLoCWrL44/NerAZYHfAyruAl3uCXX/RvO+YC+lffH8Dw0zITf7Ss9Y2NrpsSDK3B9d3eg8ch9CCY5Y/FsTFm7aEE23gSskLH3A+A+eQcTUPuHwyHKamZt4eRiGCrsypZ8z3PRwYzCf9msCSxvNx5pOG6RNYol6w=
+	t=1763012198; cv=none; b=POKUo8OXstsGGGxatG+qCeiR5OEGfDMSBbjfYXEVie/ekV8z66Y5mHPHxM3FeQR2foa9j13XTvE0ONMFdrOzt4eVsYEIGVaVQk2BBKb7KXvcO/iewmp+arNbVi7AIhyFYuTwf3Bw8FMv6xBR2s+ZG5dRnsEPm1C71V6gmWoW+iw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763011426; c=relaxed/simple;
-	bh=lx71oAOAcYYpIlbWv0x5xTCVshQjEG5IZwAdCJb6eio=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m08EHGRMLQxxRBWD8unO7cvuM9XRSUzeVKzqE2UT23sunBMUTmogBK6xVDH5B9MWzdgRYjZyys1spQOWokUiqoL+PJFKeeyXo5qKHTqfJ/3wizMr1o6NCInlINOq04J7haKCHALVN6usvJuZfE8rmMRbwH8/gDRhEm1GQQ5RacY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 38EF96732A; Thu, 13 Nov 2025 06:23:37 +0100 (CET)
-Date: Thu, 13 Nov 2025 06:23:37 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Dave Chinner <david@fromorbit.com>
-Cc: Ojaswin Mujoo <ojaswin@linux.ibm.com>,
-	Christian Brauner <brauner@kernel.org>, djwong@kernel.org,
-	ritesh.list@gmail.com, john.g.garry@oracle.com, tytso@mit.edu,
-	willy@infradead.org, dchinner@redhat.com, hch@lst.de,
-	linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org, jack@suse.cz, nilay@linux.ibm.com,
-	martin.petersen@oracle.com, rostedt@goodmis.org, axboe@kernel.dk,
-	linux-block@vger.kernel.org, linux-trace-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 0/8] xfs: single block atomic writes for buffered IO
-Message-ID: <20251113052337.GA28533@lst.de>
-References: <cover.1762945505.git.ojaswin@linux.ibm.com> <aRUCqA_UpRftbgce@dread.disaster.area>
+	s=arc-20240116; t=1763012198; c=relaxed/simple;
+	bh=uqYXlpbqyXRA0MLB1Tm9ycD8UbMN1jFTsR1e8l63fxg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=eZZeYLhAv+hjXEyvoFdqNv5bGLJgSy3mt3UdQLmHkJERO+eWUd898xAoqqM48D9GJzNNPyCZlSLbBWNX37rbzGjQgnbiwTJXgP0huESP6b8p+/4Mi8ageQKa/fequ26YiOnbeq3zl9Dne7dJ2be3yLg+WVmj7q0gZ0QKtp3RiY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F12EC4CEF5;
+	Thu, 13 Nov 2025 05:36:36 +0000 (UTC)
+From: colyli@fnnas.com
+To: axboe@kernel.dk
+Cc: linux-bcache@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Coly Li <colyli@fnnas.com>
+Subject: [PATCH 0/9] bcache patches for Linux 6.19 
+Date: Thu, 13 Nov 2025 13:36:21 +0800
+Message-ID: <20251113053630.54218-1-colyli@fnnas.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aRUCqA_UpRftbgce@dread.disaster.area>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 13, 2025 at 08:56:56AM +1100, Dave Chinner wrote:
-> On Wed, Nov 12, 2025 at 04:36:03PM +0530, Ojaswin Mujoo wrote:
-> > This patch adds support to perform single block RWF_ATOMIC writes for
-> > iomap xfs buffered IO. This builds upon the inital RFC shared by John
-> > Garry last year [1]. Most of the details are present in the respective 
-> > commit messages but I'd mention some of the design points below:
-> 
-> What is the use case for this functionality? i.e. what is the
-> reason for adding all this complexity?
+From: Coly Li <colyli@fnnas.com>
 
-Seconded.  The atomic code has a lot of complexity, and further mixing
-it with buffered I/O makes this even worse.  We'd need a really important
-use case to even consider it.
+Hi Jens,
+
+This is the first wave bcache patches for Linux 6.19.
+
+The major change is from me, which is to remove useless discard
+interface and code for cache device (not the backing device). And the
+last patch about gc latency is a cooperative result from Robert Pang
+(Google), Mingzhe Zou (Easystack) and me, by inspired from their
+previous works, I compose the final version and Robert prvides positive
+benchmark result.
+
+Marco contributes 2 patches to improve the usage of  per-cpu system work
+queue. Gustavo contributes a patch to fix the not-at-end flexible-array
+member warning by gcc14. And Qianfeng contributes a code cleanup patch
+to remove redundant __GFP_NOWARN.
+
+Please consider to take them for 6.19. Thank you in advance.
+
+Coly Li
+---
+Coly Li (5):
+  bcache: get rid of discard code from journal
+  bcache: remove discard code from alloc.c
+  bcache: drop discard sysfs interface
+  bcache: remove discard sysfs interface document
+  bcache: reduce gc latency by processing less nodes and sleep less time
+
+Gustavo A. R. Silva (1):
+  bcache: Avoid -Wflex-array-member-not-at-end warning
+
+Marco Crivellari (2):
+  bcache: replace use of system_wq with system_percpu_wq
+  bcache: WQ_PERCPU added to alloc_workqueue users
+
+Qianfeng Rong (1):
+  bcache: remove redundant __GFP_NOWARN
+
+ Documentation/ABI/testing/sysfs-block-bcache |  7 --
+ Documentation/admin-guide/bcache.rst         | 13 +--
+ drivers/md/bcache/alloc.c                    | 25 ++----
+ drivers/md/bcache/bcache.h                   |  6 +-
+ drivers/md/bcache/bset.h                     |  8 +-
+ drivers/md/bcache/btree.c                    | 53 +++++------
+ drivers/md/bcache/journal.c                  | 93 ++------------------
+ drivers/md/bcache/journal.h                  | 13 ---
+ drivers/md/bcache/super.c                    | 33 ++++---
+ drivers/md/bcache/sysfs.c                    | 15 ----
+ drivers/md/bcache/writeback.c                |  5 +-
+ 11 files changed, 71 insertions(+), 200 deletions(-)
+
+-- 
+2.47.3
+
