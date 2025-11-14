@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C5DB274B3C;
-	Fri, 14 Nov 2025 08:13:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2985125A2DE;
+	Fri, 14 Nov 2025 08:16:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763108030; cv=none; b=YKI5W/omROMli4KlYO4I4u7J8yhJoUsyXn1zZRzMxiu30Q88fE9VBdKsQpQ9BZTXm7HmlnpaYMqIQZr+CFEzHm7hXTc1DIUl/WbZX+f0TniHD4Vh0QOp7kKEyvWsYMNcJ+hV5RR4VJvUWqsA+fVah3kvFXPONXsPe8Guh+7wKuo=
+	t=1763108188; cv=none; b=KEYso/jDbZijkEyZjmZU4P6cZHRbnsQPv5jg+fHxJ3johKXFb8ZtvOkR8MRhMUjBPqzFwVaDt6xzdfNV611hcdEz0gphq0SXqbSlayplwPVldFHnb0lQKTXFdXHY2eFdDycJA2yswH+VuRT9KYL2zX1mW7nNb5B658xBj65vQLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763108030; c=relaxed/simple;
-	bh=P0FgX3vUN9KZb40lNaLzQGkELt39BZYMmApmf8qsUKc=;
+	s=arc-20240116; t=1763108188; c=relaxed/simple;
+	bh=/GKXEoBtcXx0a0NjG6jUraQg+k9dQvuk/Fg5FkEDWFM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YQTxgszDnCjMUbPMVIQzX+qO5KL7f4TEDDssPENtgmERGD7Hrhbz2klujrbdWuSvN24xTMINAoymUnF6f5UhfKY/Lvgo87oXAnG0h0hSZ1DLMED/L6ejlqYYpI90yimSkgLiIzhjJf3Mq4U5FqKrzOlx6fOfGUWTTPkHJ2raVAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EUjPqlYC; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=OcRuz0BRbK87KkNBmRSSNi1DJbBRHJLtSRyfwRtUtN4iaaQmYWMAMmC3hzu7Z0P9gLjLXPuJP389836cpGxaYeFQF9DGsRhHhnb9VsfOiN8TnEB0LWvip8AtX++aIuTIaJgoqshFlcmiN50TtjzVQdW2yV6JJ3E/MU3ErWj6wxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gOf05MVj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EUjPqlYC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D86FC113D0;
-	Fri, 14 Nov 2025 08:13:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gOf05MVj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A3CBC116D0;
+	Fri, 14 Nov 2025 08:16:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763108030;
-	bh=P0FgX3vUN9KZb40lNaLzQGkELt39BZYMmApmf8qsUKc=;
+	s=k20201202; t=1763108188;
+	bh=/GKXEoBtcXx0a0NjG6jUraQg+k9dQvuk/Fg5FkEDWFM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EUjPqlYCj8le/ZIID0iCiUcPg3CnQw0wcsFTZ+qK9ck+cMIm9r++W0UW1KeEsPSTl
-	 WJguODf8qwDn2XNi0Ia35XwCXxBJM2pjKr0WzY2X2Ymhk1xUHmZ6FU5Co5uVUwnIcn
-	 hxWjIuXr2OI9y7/fSfgEZMSd78aCMvDarXeZ5duknv3COWwqUWu3jhHNvmJOJrEJc7
-	 wZPjzzw+jagijJcSD9v08HIxZA2IzMqkIbfU/yZls6KehYNUGNc5RoHW4BmLafcMjN
-	 4324ZZKwTy59OzVOlUmvcvpDFCI9nQT1DfmV3hZ6vpwRJHLZpOF/JT3frib2oYH7GG
-	 ZvG6WOjUN9DtA==
-Date: Fri, 14 Nov 2025 10:13:44 +0200
+	b=gOf05MVjrdRhj/0Yd+x4tuVND9kaU0XV73O5OHkWW8Mq2O5bQXMgxARIBMgCEymc/
+	 Em8yXhLFvhRQjNfr/pAILbNT/krqQDSRuHeFftF1VifoLo2S6o/uiVitEVa4qrbO9t
+	 0YVd56YATKVnr1fzblG68tp8oehiZ4RVdD64YNI1QBnn6TlaW6mATf0gVgx3oenpKp
+	 NhMTR0DkPLSugOhWQ9MvKsq3/dFDsjhZtQMok0qKieO8YKVfPL0ZYWkSNJVR2eIHUy
+	 srbbkj28JGCqDctUigibzl6RX/fMjxwMN/FyRqtKwMB7VVie+ulvesrOfDNZaRKm1o
+	 1WSlR0mF0TShQ==
+Date: Fri, 14 Nov 2025 10:16:23 +0200
 From: Leon Romanovsky <leon@kernel.org>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
@@ -34,13 +34,13 @@ Cc: Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
 	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org
 Subject: Re: [PATCH v4 0/2] block: Enable proper MMIO memory handling for P2P
  DMA
-Message-ID: <20251114081344.GA147495@unreal>
+Message-ID: <20251114081623.GB147495@unreal>
 References: <20251112-block-with-mmio-v4-0-54aeb609d28d@nvidia.com>
  <176305197986.133468.1935881415989157155.b4-ty@kernel.dk>
  <cec91b1e-a545-4799-97c3-676e3b566721@kernel.dk>
  <4f75497d-11cb-437c-ab90-d65d4d2e0a52@kernel.dk>
- <20251113195008.GA111768@unreal>
- <569825cd-c98f-4399-ad25-d4e62fba4255@kernel.dk>
+ <aRY28IRvBFmTW6cz@kbusch-mbp>
+ <d1641814-5ef8-4ccd-8a41-42bf99a61d0d@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -49,47 +49,11 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <569825cd-c98f-4399-ad25-d4e62fba4255@kernel.dk>
+In-Reply-To: <d1641814-5ef8-4ccd-8a41-42bf99a61d0d@kernel.dk>
 
-On Thu, Nov 13, 2025 at 01:43:09PM -0700, Jens Axboe wrote:
-> On 11/13/25 12:50 PM, Leon Romanovsky wrote:
+On Thu, Nov 13, 2025 at 01:40:50PM -0700, Jens Axboe wrote:
+> On 11/13/25 12:52 PM, Keith Busch wrote:
 > > On Thu, Nov 13, 2025 at 10:45:53AM -0700, Jens Axboe wrote:
-> >> On 11/13/25 10:12 AM, Jens Axboe wrote:
-> >>> On 11/13/25 9:39 AM, Jens Axboe wrote:
-> >>>>
-> >>>> On Wed, 12 Nov 2025 21:48:03 +0200, Leon Romanovsky wrote:
-> >>>>> Changelog:
-> >>>>> v4:
-> >>>>>  * Changed double "if" to be "else if".
-> >>>>>  * Added missed PCI_P2PDMA_MAP_NONE case.
-> >>>>> v3: https://patch.msgid.link/20251027-block-with-mmio-v3-0-ac3370e1f7b7@nvidia.com
-> >>>>>  * Encoded p2p map type in IOD flags instead of DMA attributes.
-> >>>>>  * Removed REQ_P2PDMA flag from block layer.
-> >>>>>  * Simplified map_phys conversion patch.
-> >>>>> v2: https://lore.kernel.org/all/20251020-block-with-mmio-v2-0-147e9f93d8d4@nvidia.com/
-> >>>>>  * Added Chirstoph's Reviewed-by tag for first patch.
-> >>>>>  * Squashed patches
-> >>>>>  * Stored DMA MMIO attribute in NVMe IOD flags variable instead of block layer.
-> >>>>> v1: https://patch.msgid.link/20251017-block-with-mmio-v1-0-3f486904db5e@nvidia.com
-> >>>>>  * Reordered patches.
-> >>>>>  * Dropped patch which tried to unify unmap flow.
-> >>>>>  * Set MMIO flag separately for data and integrity payloads.
-> >>>>> v0: https://lore.kernel.org/all/cover.1760369219.git.leon@kernel.org/
-> >>>>>
-> >>>>> [...]
-> >>>>
-> >>>> Applied, thanks!
-> >>>>
-> >>>> [1/2] nvme-pci: migrate to dma_map_phys instead of map_page
-> >>>>       commit: f10000db2f7cf29d8c2ade69266bed7b51c772cb
-> >>>> [2/2] block-dma: properly take MMIO path
-> >>>>       commit: 8df2745e8b23fdbe34c5b0a24607f5aaf10ed7eb
-> >>>
-> >>> And now dropped again - this doesn't boot on neither my big test box
-> >>> with 33 nvme drives, nor even on my local test vm. Two different archs,
-> >>> and very different setups. Which begs the question, how on earth was
-> >>> this tested, if it doesn't boot on anything I have here?!
-> >>
 > >> I took a look, and what happens here is that iter.p2pdma.map is 0 as it
 > >> never got set to anything. That is the same as PCI_P2PDMA_MAP_UNKNOWN,
 > >> and hence we just end up in a BLK_STS_RESOURCE. First of all, returning
@@ -99,47 +63,15 @@ On Thu, Nov 13, 2025 at 01:43:09PM -0700, Jens Axboe wrote:
 > >>
 > >> FWIW, the below makes it boot just fine, as expected, as a default zero
 > >> filled iter then matches the UNKNOWN case.
-> >>
-> >>
-> >> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-> >> index e5ca8301bb8b..4cce69226773 100644
-> >> --- a/drivers/nvme/host/pci.c
-> >> +++ b/drivers/nvme/host/pci.c
-> >> @@ -1087,6 +1087,7 @@ static blk_status_t nvme_map_data(struct request *req)
-> >>  	case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
-> >>  		iod->flags |= IOD_DATA_MMIO;
-> >>  		break;
-> >> +	case PCI_P2PDMA_MAP_UNKNOWN:
-> >>  	case PCI_P2PDMA_MAP_NONE:
-> >>  		break;
-> >>  	default:
-> >> @@ -1122,6 +1123,7 @@ static blk_status_t nvme_pci_setup_meta_iter(struct request *req)
-> >>  	case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
-> >>  		iod->flags |= IOD_META_MMIO;
-> >>  		break;
-> >> +	case PCI_P2PDMA_MAP_UNKNOWN:
-> >>  	case PCI_P2PDMA_MAP_NONE:
-> >>  		break;
-> >>  	default:
 > > 
-> > Sorry for troubles.
-> > 
-> > Can you please squash this fixup instead?
-> > diff --git a/block/blk-mq-dma.c b/block/blk-mq-dma.c
-> > index 98554929507a..807048644f2e 100644
-> > --- a/block/blk-mq-dma.c
-> > +++ b/block/blk-mq-dma.c
-> > @@ -172,6 +172,7 @@ static bool blk_dma_map_iter_start(struct request *req, struct device *dma_dev,
-> >  
-> >         memset(&iter->p2pdma, 0, sizeof(iter->p2pdma));
-> >         iter->status = BLK_STS_OK;
-> > +       iter->p2pdma.map = PCI_P2PDMA_MAP_NONE;
-> >  
-> >         /*
-> >          * Grab the first segment ASAP because we'll need it to check for P2P
+> > I think this must mean you don't have CONFIG_PCI_P2PDMA enabled. The
 > 
-> Please send out a v5, and then also base it on the current tree. I had
-> to hand apply one hunk on v4 because it didn't apply directly. Because
-> another patch from 9 days ago modified it.
+> Right, like most normal people :-)
 
-Thanks, will do.
+It depends how you are declaring normal people :).
+In my Fedora OS, installed on my laptop, CONFIG_PCI_P2PDMA is enabled by default.
+https://src.fedoraproject.org/rpms/kernel/blob/rawhide/f/kernel-x86_64-fedora.config#_5567
+and in RHEL too
+https://src.fedoraproject.org/rpms/kernel/blob/rawhide/f/kernel-x86_64-rhel.config#_4964
+
+Thanks
