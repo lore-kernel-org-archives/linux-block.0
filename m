@@ -1,86 +1,188 @@
-Received: from exactco.de (exactco.de [176.9.10.151])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C039326D4A
-	for <linux-block@vger.kernel.org>; Fri, 14 Nov 2025 16:25:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.9.10.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37B2029AB15
+	for <linux-block@vger.kernel.org>; Fri, 14 Nov 2025 16:51:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763137551; cv=none; b=K1G8iv/0e45w/0Au1xuWAAthXAppmJ9H1DbjBbZSfHm6I50u0pVIRm1hlcjhNOGPM5mCLXdu1s0zv1p5vMgBLOdsmiglpJpCZjgMtE6Z89ncTSgOMEnNabnBlMBO5RDUP9Qa74Pwx24oGgELe/mVHh8ijo/B7RAgCqSAZcjRqUU=
+	t=1763139085; cv=none; b=Ev+8xZ40X05bUvxjBdMwvSvyRWI5chSfANp9rO5P+btR2cjW5Qi44AgV4KI+oyOhE1RfKv/ooEErvCjvmO8BAFzsAC4KhwoUdhMSHhkWBYuab3Yrl/iF40w8xGo6Ggb9HvgfXWQ0VmqVhFBmFfdm0W+tJ4NtnUr4DZcjnnrR1fY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763137551; c=relaxed/simple;
-	bh=jMHyNvFyRKuUidjHCOqNTKAd8sdKWYzRNRNIsxVz34s=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=O2N/zpOdQfa+7tIZkUJFWDF6iZwK2jbNpqhAN17n6zf32oSThLm1dTXhjV2etDgikms6RmuvEpOeOej4fLD2Y5FL+/8A2CIeue5Oiw9I7Le/gzIvQB9HfiThTXaXSnDQOAjobHZIctZ7xnuRgEHht44EtZyLp2WjArCHD1n0JGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exactco.de; spf=pass smtp.mailfrom=exactco.de; dkim=pass (2048-bit key) header.d=exactco.de header.i=@exactco.de header.b=eOtCkp/s; arc=none smtp.client-ip=176.9.10.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exactco.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=exactco.de
+	s=arc-20240116; t=1763139085; c=relaxed/simple;
+	bh=KQLFJCTVvfzEpBPpiuevyh10j9z8nJ2CHWh7wk1O+4g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Xxp3K3QleKDMn8q0eYeFq4zXv04O7+Iz3UugPp5ciLtyVxY2tFN7q+zYoS0g7+hEpXRdFAoD/+i3RFpRjKqlguY56rTln6q6q2mtinMV+lvYh/VidnLlF3YPGbLmHUoeRAf1ui6UVSYZea8fEpBtH8JkMqDHMZlHdolUIY8+ZVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=NpuON5sm; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=/53GYY7y; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=NpuON5sm; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=/53GYY7y; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=exactco.de header.i=@exactco.de header.b="eOtCkp/s"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=exactco.de;
-	s=x; h=Content-Transfer-Encoding:Content-Type:Mime-Version:References:
-	In-Reply-To:From:Subject:Cc:To:Message-Id:Date:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=DFNMHJkohAfPYyu2h0uo7l5kVioM6jyih0lJ/buNhQg=; b=eOtCkp/s6KnVkPmlAVVNgbZpIc
-	o42Y/bwRHvYUBdmh2MnNPXNZP8oSkUU5LzGfQW+ztj82pzxg8Ih1WBuuT3KAN6W8yk7PMysw9pktc
-	m1a6yJWI1h1tsFdTSjpGv7QBKGNNMRxsGrGHBwZJuPJ5iFuJJM+M54KvBjzaTkQmq51xoWzjhzScx
-	uH3cW0V2/SfE+FFB9M2poJ0AU+pbUIxAfW9fW2g6L4FGwnakUywgmR57JFlzCu3v8GkksNNhmTxff
-	GGyta/zuMuH1ZA1RRcCs3lPl9l55ZQKVuS+FNb3cS+JzPr9BJ/r1Br+O3se9wPeq26n59gsm7f9nu
-	NaTbaPzQ==;
-Date: Fri, 14 Nov 2025 17:25:43 +0100 (CET)
-Message-Id: <20251114.172543.20704181754788128.rene@exactco.de>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, efremov@linux.com
-Subject: Re: [PATCH] fix floppy for PAGE_SIZE != 4KB
-From: =?iso-8859-1?Q?Ren=E9?= Rebe <rene@exactco.de>
-In-Reply-To: <b1e17016-3d4d-4fac-b5b0-97db357d0749@kernel.dk>
-References: <20251114.144127.170518024415947073.rene@exactco.de>
-	<b1e17016-3d4d-4fac-b5b0-97db357d0749@kernel.dk>
-X-Mailer: Mew version 6.10 on Emacs 30.2
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="NpuON5sm";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="/53GYY7y";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="NpuON5sm";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="/53GYY7y"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 589C9211BA;
+	Fri, 14 Nov 2025 16:51:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1763139081; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=CtYOFKKSpg2Bb/w+uJqdIAvBphJZ2lroa/jghbQYexs=;
+	b=NpuON5sm5fpY0XnXC2G0GlCrPXke+mYDn2fyrbH6esINMpwMibsiqwbYsfjdgNc0iVluk1
+	w4vw5hAOsmeweh8/uS0OJ7k/VJJ9pLr78q2MdDMeGyk/K9jmnyO172BP9+Fu7aLb5pAsCj
+	fEqVcprTUjHx3PSVhsCNO1xGdAyVwI0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1763139081;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=CtYOFKKSpg2Bb/w+uJqdIAvBphJZ2lroa/jghbQYexs=;
+	b=/53GYY7yQnhBr9vvWJq+HNcRaP4799YtMdxrp9sr/Sfpyj8iis7o2v8868rCjov5YgAb6A
+	D7t5jwJYWbw3l0Aw==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1763139081; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=CtYOFKKSpg2Bb/w+uJqdIAvBphJZ2lroa/jghbQYexs=;
+	b=NpuON5sm5fpY0XnXC2G0GlCrPXke+mYDn2fyrbH6esINMpwMibsiqwbYsfjdgNc0iVluk1
+	w4vw5hAOsmeweh8/uS0OJ7k/VJJ9pLr78q2MdDMeGyk/K9jmnyO172BP9+Fu7aLb5pAsCj
+	fEqVcprTUjHx3PSVhsCNO1xGdAyVwI0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1763139081;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=CtYOFKKSpg2Bb/w+uJqdIAvBphJZ2lroa/jghbQYexs=;
+	b=/53GYY7yQnhBr9vvWJq+HNcRaP4799YtMdxrp9sr/Sfpyj8iis7o2v8868rCjov5YgAb6A
+	D7t5jwJYWbw3l0Aw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 35E653EA61;
+	Fri, 14 Nov 2025 16:51:21 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id o1H3CwleF2khBwAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Fri, 14 Nov 2025 16:51:21 +0000
+Message-ID: <61d451f7-a54a-4c27-afab-9ae684b4bc6b@suse.cz>
+Date: Fri, 14 Nov 2025 17:51:20 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] mm/mempool: fix poisoning order>0 pages with HIGHMEM
+To: Christoph Hellwig <hch@lst.de>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+ Christoph Lameter <cl@gentwo.org>, David Rientjes <rientjes@google.com>,
+ Roman Gushchin <roman.gushchin@linux.dev>, Harry Yoo <harry.yoo@oracle.com>,
+ Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+ kernel test robot <oliver.sang@intel.com>
+References: <20251113-mempool-poison-v1-1-233b3ef984c3@suse.cz>
+ <20251114050410.GA26404@lst.de>
+Content-Language: en-US
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ xsFNBFZdmxYBEADsw/SiUSjB0dM+vSh95UkgcHjzEVBlby/Fg+g42O7LAEkCYXi/vvq31JTB
+ KxRWDHX0R2tgpFDXHnzZcQywawu8eSq0LxzxFNYMvtB7sV1pxYwej2qx9B75qW2plBs+7+YB
+ 87tMFA+u+L4Z5xAzIimfLD5EKC56kJ1CsXlM8S/LHcmdD9Ctkn3trYDNnat0eoAcfPIP2OZ+
+ 9oe9IF/R28zmh0ifLXyJQQz5ofdj4bPf8ecEW0rhcqHfTD8k4yK0xxt3xW+6Exqp9n9bydiy
+ tcSAw/TahjW6yrA+6JhSBv1v2tIm+itQc073zjSX8OFL51qQVzRFr7H2UQG33lw2QrvHRXqD
+ Ot7ViKam7v0Ho9wEWiQOOZlHItOOXFphWb2yq3nzrKe45oWoSgkxKb97MVsQ+q2SYjJRBBH4
+ 8qKhphADYxkIP6yut/eaj9ImvRUZZRi0DTc8xfnvHGTjKbJzC2xpFcY0DQbZzuwsIZ8OPJCc
+ LM4S7mT25NE5kUTG/TKQCk922vRdGVMoLA7dIQrgXnRXtyT61sg8PG4wcfOnuWf8577aXP1x
+ 6mzw3/jh3F+oSBHb/GcLC7mvWreJifUL2gEdssGfXhGWBo6zLS3qhgtwjay0Jl+kza1lo+Cv
+ BB2T79D4WGdDuVa4eOrQ02TxqGN7G0Biz5ZLRSFzQSQwLn8fbwARAQABzSBWbGFzdGltaWwg
+ QmFia2EgPHZiYWJrYUBzdXNlLmN6PsLBlAQTAQoAPgIbAwULCQgHAwUVCgkICwUWAgMBAAIe
+ AQIXgBYhBKlA1DSZLC6OmRA9UCJPp+fMgqZkBQJnyBr8BQka0IFQAAoJECJPp+fMgqZkqmMQ
+ AIbGN95ptUMUvo6aAdhxaOCHXp1DfIBuIOK/zpx8ylY4pOwu3GRe4dQ8u4XS9gaZ96Gj4bC+
+ jwWcSmn+TjtKW3rH1dRKopvC07tSJIGGVyw7ieV/5cbFffA8NL0ILowzVg8w1ipnz1VTkWDr
+ 2zcfslxJsJ6vhXw5/npcY0ldeC1E8f6UUoa4eyoskd70vO0wOAoGd02ZkJoox3F5ODM0kjHu
+ Y97VLOa3GG66lh+ZEelVZEujHfKceCw9G3PMvEzyLFbXvSOigZQMdKzQ8D/OChwqig8wFBmV
+ QCPS4yDdmZP3oeDHRjJ9jvMUKoYODiNKsl2F+xXwyRM2qoKRqFlhCn4usVd1+wmv9iLV8nPs
+ 2Db1ZIa49fJet3Sk3PN4bV1rAPuWvtbuTBN39Q/6MgkLTYHb84HyFKw14Rqe5YorrBLbF3rl
+ M51Dpf6Egu1yTJDHCTEwePWug4XI11FT8lK0LNnHNpbhTCYRjX73iWOnFraJNcURld1jL1nV
+ r/LRD+/e2gNtSTPK0Qkon6HcOBZnxRoqtazTU6YQRmGlT0v+rukj/cn5sToYibWLn+RoV1CE
+ Qj6tApOiHBkpEsCzHGu+iDQ1WT0Idtdynst738f/uCeCMkdRu4WMZjteQaqvARFwCy3P/jpK
+ uvzMtves5HvZw33ZwOtMCgbpce00DaET4y/UzsBNBFsZNTUBCACfQfpSsWJZyi+SHoRdVyX5
+ J6rI7okc4+b571a7RXD5UhS9dlVRVVAtrU9ANSLqPTQKGVxHrqD39XSw8hxK61pw8p90pg4G
+ /N3iuWEvyt+t0SxDDkClnGsDyRhlUyEWYFEoBrrCizbmahOUwqkJbNMfzj5Y7n7OIJOxNRkB
+ IBOjPdF26dMP69BwePQao1M8Acrrex9sAHYjQGyVmReRjVEtv9iG4DoTsnIR3amKVk6si4Ea
+ X/mrapJqSCcBUVYUFH8M7bsm4CSxier5ofy8jTEa/CfvkqpKThTMCQPNZKY7hke5qEq1CBk2
+ wxhX48ZrJEFf1v3NuV3OimgsF2odzieNABEBAAHCwXwEGAEKACYCGwwWIQSpQNQ0mSwujpkQ
+ PVAiT6fnzIKmZAUCZ8gcVAUJFhTonwAKCRAiT6fnzIKmZLY8D/9uo3Ut9yi2YCuASWxr7QQZ
+ lJCViArjymbxYB5NdOeC50/0gnhK4pgdHlE2MdwF6o34x7TPFGpjNFvycZqccSQPJ/gibwNA
+ zx3q9vJT4Vw+YbiyS53iSBLXMweeVV1Jd9IjAoL+EqB0cbxoFXvnjkvP1foiiF5r73jCd4PR
+ rD+GoX5BZ7AZmFYmuJYBm28STM2NA6LhT0X+2su16f/HtummENKcMwom0hNu3MBNPUOrujtW
+ khQrWcJNAAsy4yMoJ2Lw51T/5X5Hc7jQ9da9fyqu+phqlVtn70qpPvgWy4HRhr25fCAEXZDp
+ xG4RNmTm+pqorHOqhBkI7wA7P/nyPo7ZEc3L+ZkQ37u0nlOyrjbNUniPGxPxv1imVq8IyycG
+ AN5FaFxtiELK22gvudghLJaDiRBhn8/AhXc642/Z/yIpizE2xG4KU4AXzb6C+o7LX/WmmsWP
+ Ly6jamSg6tvrdo4/e87lUedEqCtrp2o1xpn5zongf6cQkaLZKQcBQnPmgHO5OG8+50u88D9I
+ rywqgzTUhHFKKF6/9L/lYtrNcHU8Z6Y4Ju/MLUiNYkmtrGIMnkjKCiRqlRrZE/v5YFHbayRD
+ dJKXobXTtCBYpLJM4ZYRpGZXne/FAtWNe4KbNJJqxMvrTOrnIatPj8NhBVI0RSJRsbilh6TE
+ m6M14QORSWTLRg==
+In-Reply-To: <20251114050410.GA26404@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lst.de:email,suse.cz:mid,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Flag: NO
+X-Spam-Score: -4.30
+X-Spam-Level: 
 
-From: Jens Axboe <axboe@kernel.dk>
-
-> On 11/14/25 6:41 AM, Rene Rebe wrote:
-> > For years I wondered why the floppy driver does not just work on
-> > sparc64, e.g:
-> > 
-> > root@SUNW_375_0066:# disktype /dev/fd0
-> > --- /dev/fd0
-> > disktype: Can't open /dev/fd0: No such device or address
-> > 
-> > [  525.341906] disktype: attempt to access beyond end of device
-> >                fd0: rw=0, sector=0, nr_sectors = 16 limit=8
-> > [  525.341991] floppy: error 10 while reading block 0
-> > 
-> > Turns out floppy.c __floppy_read_block_0 tries to read one page for
-> > the first test read to determine the disk size and thus fails if that
-> > is greater than 4k. Adjust minimum MAX_DISK_SIZE to PAGE_SIZE to fix
-> > floppy on sparc64 and likely all other PAGE_SIZE != 4KB configs.
+On 11/14/25 06:04, Christoph Hellwig wrote:
+> On Thu, Nov 13, 2025 at 07:54:35PM +0100, Vlastimil Babka wrote:
+>> Christoph found out this is due to the poisoning code not dealing
+>> properly with CONFIG_HIGHMEM because only the first page is mapped but
+>> then the whole potentially high-order page is accessed.
+>> 
+>> This went unnoticed for years probably because nobody has yet used a
+>> mempool for order>0 pages before the new block code in -next.
 > 
-> 16k seem like a lot to read from a floppy, no? Why isn't it just
-> reading a single 512b sector? Or just cap it at 4k rather than do
-> a full page, at least?
+> I did a quick audit: and bcache, dm-integrity (config dependent) and the
+> KASAN unit tests create page based mempools with order > 0.  It looks
+> like none of those ever got much testing on highmem systems.
 
-Well, on my sparc64.config it is just 8k and I did not feel like
-changing this vintage code more than was necessiary to write a floppy
-for a Firmware update of another systems while my Ultra10 was the only
-system with a floppy drive in my office. But even 16k or 64k is not
-that much of a 1.44mb disk.
+Thanks,
 
-But if someone wants to refactor this code some more, ... I'm happy to
-test it, too ;-)
+KASAN unit tests sounds like something that would have been flagged by
+automated testing long ago, however the mempool-specific poisoning isn't
+compatible with it so poison_element() and check_element() both return
+immediately with kasan_enabled().
 
-    René
+bcache and dm-integrity are perhaps too complex setups for the test robots.
+But I'll add cc: stable then.
 
--- 
-  René Rebe, ExactCODE GmbH, Lietzenburger Str. 42, DE-10789 Berlin
-  https://exactco.de | https://t2linux.com | https://rene.rebe.de
+> The fix looks good:
+> 
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+
