@@ -1,119 +1,129 @@
-Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0F3135CBAF
-	for <linux-block@vger.kernel.org>; Fri, 14 Nov 2025 12:19:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30B7D147C9B
+	for <linux-block@vger.kernel.org>; Fri, 14 Nov 2025 12:31:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763122801; cv=none; b=ZrCf1hLVNwtyWsT2/nJlPiVl5iLZNP06zsF1ryruWPnHwnK77HF3M87nVcvS1Nat3D8itH2EJpG+pU29+LYvLeRGCF6R9sVHebH/HxyleDrdnvl5gLmxdhh2FjQIvtRuAz1hBQwlJmpnD/DEX0DrpYkZ5mGRTZ3hhhJIicl8a0Q=
+	t=1763123495; cv=none; b=Zny+wNjbdXpz/je1ILXe2VJ3I/wwpLSfsG5cVp7xmYgs79CKflrkjYhyJ1fgLZ6GiO3NxDhU4cIZLroQOrpVmkutMsoSwkx8aH2gMou8yWLaDs1vSi42AM/SwD26Tz3wFhGVSOdODfwKTX8JzVtbAuK1s2WvDEfORniTMpE6u/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763122801; c=relaxed/simple;
-	bh=ZY4j4qcCxJcSxH819MVZH5zxtVuqMjM+bT7fAd9UgWU=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=otEQDwY2hMnjOZO3qf1xxPkAOdDZf+q1Xpj+BJJ2DzlvpC8Lm7HWpKzHVVADg0j43BcSf6LApCo0AhWieMt7zBJA5w4UYPPhOfiEKAUKnl8oHaK5+Vzgk64fyvhYF9zIG+J1pEvfvV0eNvgRDdRkCs023EvpdbJ9Spq5ZoZLG+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=zwqdg12p; arc=none smtp.client-ip=209.85.166.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1763123495; c=relaxed/simple;
+	bh=I/5ZwKDnJtZ1QHeVA7vHi5YjQFEo9sYBLzy3T8zEbME=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rnRr02VfHGxl2cDNzU3JxONpoUrcCNtLZQsu4FCjfCORjlY4NVMYZWaHUhkoeBSpL4l/Cakppcd3EgLOnKnQQMgoPgISPEGw5/BGjA9Xrhz5fIjjEhgHgsBoYfx5br4pqd8yVLhFMfpBuGzNhdPl1bxjIYGfuUZLkpqk/DV1KyY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CMotN4Is; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="zwqdg12p"
-Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-4330ef18daeso7782535ab.3
-        for <linux-block@vger.kernel.org>; Fri, 14 Nov 2025 04:19:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1763122798; x=1763727598; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uvGPnwIJ9UQ+3xbjjhhyEYoRm3l1sjhSWrnsi1M6ybA=;
-        b=zwqdg12puqHPiZB6JD8zRR7uhdPy+tTrDEBbLt5BxdZt700MWXConrI649WC1u0vtq
-         f6i4z5vHT2ke20KxRhzz1PfbOgH/VUWbjQhkcW8N09hP2eY80+26zrlXWqxfByKqgx4m
-         /GY8IhvtqUwfjH6yXTtgyRJuRLQCmcWZsOI5K/U2j7+WfytT/npeUBuS+O5rUN1FQKCO
-         lx4uyh6QY5ZGUJ4NEpNTiGdkbqhlSedQ89ZNoFQ+Hih+1IXXDDTdjGL2PAWEbmxY1m/v
-         Jiwx3woPxOe7cloPYp0BjU0TmhsfludMKT0ik941/J2JD29ALDvkzxB5hb0BGrq8RUi2
-         IGvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763122798; x=1763727598;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=uvGPnwIJ9UQ+3xbjjhhyEYoRm3l1sjhSWrnsi1M6ybA=;
-        b=U1dPcU0cQYBKkOJZ9/ZgqC6Zsnm/hfXhYCs67YCjmUXb1OXQAfUPNwcCCX+HHugOiq
-         E8+R0IVDr9KJr8Okj+mlPGYYyu8QV8sjD7KjbTDhteHG/DqluIejr5bzWWb1z4N6qYoJ
-         lXrPVBpKy44Wtfu/zpLL25utdNq142OJJXZLyroEAhxoAS2pNZ5TEhIB2zyYYlcEsRrR
-         XE0YF2Swchtho6ypQTnLpndaGIx2BSVqcfAf57SOpnbB51aLInQl7RZZcDg/SX9sb2BL
-         aDu4zLGSE/dhBV/tnksCp1Fga9TYg/AAAs+cU2i2qzh0/KM7gFWBv0hXkJeWtCYo0SJQ
-         KzPw==
-X-Gm-Message-State: AOJu0Yxbr2N8Di9VNYP0hMMKjMPq9v5ey401dFBzGR5lntYFcRwzy4qe
-	tUWD4QWvu5mLANw/NmQnBM1jpX7IAvxgTNEn4059Pj0dm3EzsTgUilkW/WT1zn95dWA=
-X-Gm-Gg: ASbGncvjxSjGnCFlIAJNOb3+K1KG8PjwFy9kxu6fqSDzS1oeW8L3E10iWO4Ipnamlvx
-	WaNQ5+6AXNvTumjzuGdOKv0F7VrCutNIF97G8dGxoUbPTMssxffHAtmBoS9RRF5WFAZeWzO5nRP
-	uH7L6PcKoA6BxS/lE6tX4rhBFp83ONqSfT6HQSZRpDczF48cboItMFK3Pbxd81s/9na6QIKJoG5
-	tLM00utqMFLK9oZTCLQQBsUJ5FOeuJsv4mG2R/zqwfBhTozhwX+h3eH5eM2bK6NOgRDg+fvUG+l
-	LdL6qSl/dsEmnp8bySuPUUaRulJ7ukSzGqRNWNefQgjsvTOxOJuoIBZ5VIP9vVp4ShXX2Y+rmIx
-	Q/eGPrs4BVg0uXo3GhECnSALx9vHOdCS+42aZogWFsYKRaXfWAvLuVeMsZ95TTEgXENhKoKV4S4
-	DW1o2pY1JvPdTHiA==
-X-Google-Smtp-Source: AGHT+IHwtGthrFFBC8JB1kEGmmsPtQ31Pwz0+G7f5ToInBYvE+tM3YbahqKyzO64P4TCNs1gtbOyDA==
-X-Received: by 2002:a05:6e02:3113:b0:42e:7273:a370 with SMTP id e9e14a558f8ab-4348c87af71mr40523795ab.5.1763122797878;
-        Fri, 14 Nov 2025 04:19:57 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-4348398ff45sm23452835ab.17.2025.11.14.04.19.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Nov 2025 04:19:57 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, 
- Sagi Grimberg <sagi@grimberg.me>, Leon Romanovsky <leon@kernel.org>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-nvme@lists.infradead.org, Chaitanya Kulkarni <kch@nvidia.com>
-In-Reply-To: <20251114-block-with-mmio-v5-0-69d00f73d766@nvidia.com>
-References: <20251114-block-with-mmio-v5-0-69d00f73d766@nvidia.com>
-Subject: Re: [PATCH v5 0/2] block: Enable proper MMIO memory handling for
- P2P DMA
-Message-Id: <176312279654.329326.7978292363976805159.b4-ty@kernel.dk>
-Date: Fri, 14 Nov 2025 05:19:56 -0700
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CMotN4Is"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763123493;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IFVcxodsfdbO76GQsBhbtk1ePR5txWpCuWnMr3v/vyY=;
+	b=CMotN4IsWlorLC341YeUxGOUdwjoajIZfoaJ2EZCLlQHKbgNUSDZiYrlsYlPShol+Xgn9c
+	7Qyieglsml8EnIoVW7Ow0oWCMWb35C6ZpmSzQAh/mO8zuWbeHJjmpRtPEpGLnHH7xSt2fk
+	C8PcoMCaWzX7QvDYW/5tWEVHbmfW+NQ=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-26-AXg7kpStM3KFnE5mu2sImQ-1; Fri,
+ 14 Nov 2025 07:31:29 -0500
+X-MC-Unique: AXg7kpStM3KFnE5mu2sImQ-1
+X-Mimecast-MFC-AGG-ID: AXg7kpStM3KFnE5mu2sImQ_1763123487
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6D12B18AB406;
+	Fri, 14 Nov 2025 12:31:27 +0000 (UTC)
+Received: from redhat.com (unknown [10.44.33.81])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5651D19560B9;
+	Fri, 14 Nov 2025 12:31:23 +0000 (UTC)
+Date: Fri, 14 Nov 2025 13:31:20 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jan Kara <jack@suse.cz>, Keith Busch <kbusch@kernel.org>,
+	Dave Chinner <david@fromorbit.com>,
+	Carlos Maiolino <cem@kernel.org>,
+	Christian Brauner <brauner@kernel.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-raid@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: Re: fall back from direct to buffered I/O when stable writes are
+ required
+Message-ID: <aRchGBJA1ExoGi8W@redhat.com>
+References: <aQPyVtkvTg4W1nyz@dread.disaster.area>
+ <20251031130050.GA15719@lst.de>
+ <aQTcb-0VtWLx6ghD@kbusch-mbp>
+ <20251031164701.GA27481@lst.de>
+ <kpk2od2fuqofdoneqse2l3gvn7wbqx3y4vckmnvl6gc2jcaw4m@hsxqmxshckpj>
+ <20251103122111.GA17600@lst.de>
+ <aRYXuwtSQUz6buBs@redhat.com>
+ <20251114053943.GA26898@lst.de>
+ <aRb2g3VLjz1Q_rLa@redhat.com>
+ <20251114120152.GA13689@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251114120152.GA13689@lst.de>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-
-On Fri, 14 Nov 2025 11:07:02 +0200, Leon Romanovsky wrote:
-> Changelog:
-> v5:
->  * Rebased on top of 8e1bf774ab18 ("Merge branch 'elevator-switch-6.19' into for-6.19/block")
->  * Initialized p2p map to PCI_P2PDMA_MAP_NONE.
-> v4: https://patch.msgid.link/20251112-block-with-mmio-v4-0-54aeb609d28d@nvidia.com
->  * Changed double "if" to be "else if".
->  * Added missed PCI_P2PDMA_MAP_NONE case.
-> v3: https://patch.msgid.link/20251027-block-with-mmio-v3-0-ac3370e1f7b7@nvidia.com
->  * Encoded p2p map type in IOD flags instead of DMA attributes.
->  * Removed REQ_P2PDMA flag from block layer.
->  * Simplified map_phys conversion patch.
-> v2: https://lore.kernel.org/all/20251020-block-with-mmio-v2-0-147e9f93d8d4@nvidia.com/
->  * Added Chirstoph's Reviewed-by tag for first patch.
->  * Squashed patches
->  * Stored DMA MMIO attribute in NVMe IOD flags variable instead of block layer.
-> v1: https://patch.msgid.link/20251017-block-with-mmio-v1-0-3f486904db5e@nvidia.com
->  * Reordered patches.
->  * Dropped patch which tried to unify unmap flow.
->  * Set MMIO flag separately for data and integrity payloads.
-> v0: https://lore.kernel.org/all/cover.1760369219.git.leon@kernel.org/
+Am 14.11.2025 um 13:01 hat Christoph Hellwig geschrieben:
+> On Fri, Nov 14, 2025 at 10:29:39AM +0100, Kevin Wolf wrote:
+> > Right, but since this is direct I/O and the approach with only declaring
+> > I/O from the page cache safe without a bounce buffer means that RAID has
+> > to use a bounce buffer here anyway (with or without PI), doesn't this
+> > automatically solve it?
+> >
+> > So if it's only PI, it's the problem of userspace, and if you add RAID
+> > on top, then the normal rules for RAID apply. (And that the buffer
+> > doesn't get modified and PI doesn't become invalid until RAID does its
+> > thing is still a userspace problem.)
 > 
-> [...]
+> Well, only if we have different levels of I/O stability guarantees:
+> 
+> Level 0
+>   - trusted caller guarantees pages are stable (buffered I/O,
+>     in-kernel direct I/O callers that control the buffer)
+> 
+> Level 1:
+>   - untrusted caller declares the pages are stable
+>     (direct I/O with PI)
+> 
+> Level 2:
+>   - no one guarantees nothing
+>     (other direct I/O directly or indirectly fed from userspace)
+> 
+> PI formatted devices would only bounce for 1, parity would bounce for
+> 1 and 2.  Software checksums could probably get away with only 1,
+> although 2 would feel safer.
 
-Applied, thanks!
+My main point above was that RAID and (potentially passed through) PI
+are independent of each other and I think that's still true with or
+without multiple stability levels.
 
-[1/2] nvme-pci: migrate to dma_map_phys instead of map_page
-      (no commit info)
-[2/2] block-dma: properly take MMIO path
-      (no commit info)
+If you don't have these levels, you just have to treat level 1 and 2 the
+same, i.e. bounce all the time if the kernel needs the guarantee (which
+is not for userspace PI, unless the same request needs the bounce buffer
+for another reason in a different place like RAID). That might be less
+optimal, but still correct and better than what happens today because at
+least you don't bounce for level 0 any more.
 
-Best regards,
--- 
-Jens Axboe
+If there is something you can optimise by delegating the responsibility
+to userspace in some cases - like you can prove that only the
+application itself would be harmed by doing things wrong - then having
+level 1 separate could certainly be interesting. In this case, I'd
+consider adding an RWF_* flag for userspace to make the promise even
+outside PI passthrough. But while potentially worthwhile, it feels like
+this is a separate optimisation from what you tried to address here.
 
-
+Kevin
 
