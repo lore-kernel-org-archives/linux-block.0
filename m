@@ -1,160 +1,176 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EF07305E01;
-	Fri, 14 Nov 2025 09:07:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93BA12F6164;
+	Fri, 14 Nov 2025 09:21:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763111257; cv=none; b=guURTpTtuRWGm1YD4TSxvl84ZF23gP1JbOK5R0PnxPhIBxe/T+xmgxMXdJWYTXUPURRlY5Z6xR9nVcn3dz5fAMjanSeG3N4OLmF5KJvRmPXu1o8j3n/QkSgphfp8y6k0YByU6SKsdZ1aYkiOj0Wd5mOZFpq+Bj1w+JSYZ2NLR+I=
+	t=1763112074; cv=none; b=aeGOfFJiKGG+eWrcUKVS5QVPDslDuBf5ircc5/TSycO17zmrIXiuGgFD/5Yf6FTd6Lo8v7qcjvbQFGVMDuhdIrTof2C8MAufafAyU72RN+09XZD7ewS7wMOx+hiVSePmofqHvgnbeWdRGqFkR5FP/M0ajSGsxuY9uSz0gz6mnVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763111257; c=relaxed/simple;
-	bh=YaWZXYmXx+PhMXWHJqf6Jb8nEtJj1VHDpaFRLnqYjvM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=vDAXm6HM8ZwBG1viYNtmopQ9tZcx/PUhlnwAAPza6Ihdg3qgf3muo4Fk7WS67mwnWuoPYIjkSYHqu7S8yc/JhziGfj8LBh3Zkw3yb1ec32fpiXqDjYIw6Pv5Usrh4E55EVCi9pxn+yBCBqzvYbONjOhVyvbNlt9ZtP0EUvcC7P0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZNGg7Jar; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763112074; c=relaxed/simple;
+	bh=tLXs6QGR6tyfdtQa9CRonCTGW8w8q5P9WL7FJ71aNiA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tBFEwZ2+kZTfRviPCqAzbZ5UPp4dZMUTW73ba9kY22+vTQc5r8EIBhRE57WXzvMnHLKHxFx/mr74lJhffn1ErB/Rmk8VUIQeQTR/C8CEL0M5UvJHIh1k38Og9shvYlCqpeacwecU1eMGQ+FX5yBjV1rHUir2qGVUdPm0W6QUD78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=O23AHUJz; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZNGg7Jar"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0ED82C116D0;
-	Fri, 14 Nov 2025 09:07:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763111256;
-	bh=YaWZXYmXx+PhMXWHJqf6Jb8nEtJj1VHDpaFRLnqYjvM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZNGg7Jarpo+tHGgf0g22G5KMf9LnRtGr39pGZUWgp6zcKGCHePuEyXMZsMDF7RjbX
-	 czmei7aZNKsVbc0kzTpgWcSxdALqakUGrBKCRfv/1bSL8ls393PZWhiw+sKkfHoHrH
-	 HbwGBNK3Z9Z7JBQiwRjIBwCUALstMYGyGeGfJ1HDS2tP/N6o44tN8ZIWToQz+AKzWB
-	 WI3JNw42CDv9vvVOoZsdTtG3we7m1FE/OzfusjC3P3c3/fZrn3xDNPWXSdQdA458CY
-	 xj450VBSsYcNOByZBeY7uXgzzLBqk+LJBY0WPf0pGd50F6ZMc+H6wCZ1XljquGO1a6
-	 v757mRpfm4CiA==
-From: Leon Romanovsky <leon@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <kbusch@kernel.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	Chaitanya Kulkarni <kch@nvidia.com>
-Subject: [PATCH v5 1/2] nvme-pci: migrate to dma_map_phys instead of map_page
-Date: Fri, 14 Nov 2025 11:07:03 +0200
-Message-ID: <20251114-block-with-mmio-v5-1-69d00f73d766@nvidia.com>
-X-Mailer: git-send-email 2.51.1
-In-Reply-To: <20251114-block-with-mmio-v5-0-69d00f73d766@nvidia.com>
-References: <20251114-block-with-mmio-v5-0-69d00f73d766@nvidia.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="O23AHUJz"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5ADMlP0P000482;
+	Fri, 14 Nov 2025 09:20:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=qeHXUYMFSy8eRy5hcdz09NbECVSzhU
+	F3RPksa1OX55Y=; b=O23AHUJz7ranXNGFgaqbiPJtfqqV1CiruQIzwI/JynZgWW
+	a579AwNYFprV3BVB3XZXRk2K7mQpx4Rj77oF/JDot6EjlcIqCW2AVD2zHXyZ1FMT
+	yVHGyq+vCOUiF/TaBZ20Xism4LSu2geobF55yMydsG7EgsAMdc/1YycnUlfATfrB
+	YR2tKE2Qgbfq/qWFPGDJCUab9xCXx4A1kJ03/vwsRnqnVuGYGRgehbyHXqmnEUXl
+	gnwcWVijQ9oEgVcuqArSQlB8U6Hfe6rKUZ1xEsl6cj/EzfUm4w4ihsPrBepInGRD
+	BSIaGCr6XMAzRyXxBhwNnBmiXzI9KzjaxkqcdTcA==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4adrechv90-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 14 Nov 2025 09:20:35 +0000 (GMT)
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 5AE9CBA8001006;
+	Fri, 14 Nov 2025 09:20:35 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4adrechv8u-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 14 Nov 2025 09:20:35 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5AE8tXwm011441;
+	Fri, 14 Nov 2025 09:20:34 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4aajw1t53e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 14 Nov 2025 09:20:33 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5AE9KWVK58327466
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 14 Nov 2025 09:20:32 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 100F620040;
+	Fri, 14 Nov 2025 09:20:32 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9F74420043;
+	Fri, 14 Nov 2025 09:20:27 +0000 (GMT)
+Received: from li-dc0c254c-257c-11b2-a85c-98b6c1322444.ibm.com (unknown [9.124.212.173])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Fri, 14 Nov 2025 09:20:27 +0000 (GMT)
+Date: Fri, 14 Nov 2025 14:50:25 +0530
+From: Ojaswin Mujoo <ojaswin@linux.ibm.com>
+To: Dave Chinner <david@fromorbit.com>
+Cc: Ritesh Harjani <ritesh.list@gmail.com>, Christoph Hellwig <hch@lst.de>,
+        Christian Brauner <brauner@kernel.org>, djwong@kernel.org,
+        john.g.garry@oracle.com, tytso@mit.edu, willy@infradead.org,
+        dchinner@redhat.com, linux-xfs@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, jack@suse.cz,
+        nilay@linux.ibm.com, martin.petersen@oracle.com, rostedt@goodmis.org,
+        axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-trace-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 0/8] xfs: single block atomic writes for buffered IO
+Message-ID: <aRb0WQJi4rQQ-Zmo@li-dc0c254c-257c-11b2-a85c-98b6c1322444.ibm.com>
+References: <cover.1762945505.git.ojaswin@linux.ibm.com>
+ <aRUCqA_UpRftbgce@dread.disaster.area>
+ <20251113052337.GA28533@lst.de>
+ <87frai8p46.ritesh.list@gmail.com>
+ <aRWzq_LpoJHwfYli@dread.disaster.area>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Mailer: b4 0.15-dev-a6db3
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aRWzq_LpoJHwfYli@dread.disaster.area>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: rsuUkEddEYzblp7K82O2A1ALKBX7yvA8
+X-Proofpoint-ORIG-GUID: Hwgk37d6V1PX3jo4iq9ZXuUVV9Bmk7Vr
+X-Authority-Analysis: v=2.4 cv=RrzI7SmK c=1 sm=1 tr=0 ts=6916f463 cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=kj9zAlcOel0A:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=07d9gI8wAAAA:8 a=7-415B0cAAAA:8 a=wh1SXWFTCzeTCxTICb8A:9 a=CjuIK1q_8ugA:10
+ a=e2CUPOnPG4QKp8I52DXD:22 a=biEYGPWJfzWAr4FL6Ov7:22 a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTEzMDE3OSBTYWx0ZWRfX150420s1nCiX
+ 7qQ5hJedJunqCODNeKz66X70QQJ0LdWGXEnS/cA0XqkCNH2SP6XgX8Za4MDcxPoAWtbbtILRwcB
+ tw/ZL5uast4uLcZwLLG/LC/BW7p0HDcasm4eXCM3ZODuI6iR+lslaRCML7uH/FD39jel9jU+9FL
+ hxRGc0iBPZWU19T7ldVHN6v42CtZsIUo6FnMu9EBibki21TQwsg9b4Vq8WtHn1xtyJhuYevVf5n
+ 8N2BBPcReUx/ag+siORfb773p08hMhPx3PIMzKnbsWnTVLVvR78TAdhnbyzCV3z2QU/e/R4Vas+
+ TRC30GJfiU9nnGT4eYsKgornUKStXENev/cBPIBjMh5EVNLqnIP2VrJhouYE8IhZoU05bs+iYN3
+ NI9ZnxRP9FjDNvPYlI1m0afTz8CgOw==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-14_02,2025-11-13_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 clxscore=1011 malwarescore=0 priorityscore=1501 suspectscore=0
+ lowpriorityscore=0 adultscore=0 bulkscore=0 impostorscore=0 spamscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511130179
 
-From: Leon Romanovsky <leonro@nvidia.com>
+On Thu, Nov 13, 2025 at 09:32:11PM +1100, Dave Chinner wrote:
+> On Thu, Nov 13, 2025 at 11:12:49AM +0530, Ritesh Harjani wrote:
+> > Christoph Hellwig <hch@lst.de> writes:
+> > 
+> > > On Thu, Nov 13, 2025 at 08:56:56AM +1100, Dave Chinner wrote:
+> > >> On Wed, Nov 12, 2025 at 04:36:03PM +0530, Ojaswin Mujoo wrote:
+> > >> > This patch adds support to perform single block RWF_ATOMIC writes for
+> > >> > iomap xfs buffered IO. This builds upon the inital RFC shared by John
+> > >> > Garry last year [1]. Most of the details are present in the respective 
+> > >> > commit messages but I'd mention some of the design points below:
+> > >> 
+> > >> What is the use case for this functionality? i.e. what is the
+> > >> reason for adding all this complexity?
+> > >
+> > > Seconded.  The atomic code has a lot of complexity, and further mixing
+> > > it with buffered I/O makes this even worse.  We'd need a really important
+> > > use case to even consider it.
+> > 
+> > I agree this should have been in the cover letter itself. 
+> > 
+> > I believe the reason for adding this functionality was also discussed at
+> > LSFMM too...  
+> > 
+> > For e.g. https://lwn.net/Articles/974578/ goes in depth and talks about
+> > Postgres folks looking for this, since PostgreSQL databases uses
+> > buffered I/O for their database writes.
+> 
+> Pointing at a discussion about how "this application has some ideas
+> on how it can maybe use it someday in the future" isn't a
+> particularly good justification. This still sounds more like a
+> research project than something a production system needs right now.
 
-After introduction of dma_map_phys(), there is no need to convert
-from physical address to struct page in order to map page. So let's
-use it directly.
+Hi Dave, Christoph,
 
-Reviewed-by: Keith Busch <kbusch@kernel.org>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
----
- block/blk-mq-dma.c      |  4 ++--
- drivers/nvme/host/pci.c | 25 +++++++++++++------------
- 2 files changed, 15 insertions(+), 14 deletions(-)
+There were some discussions around use cases for buffered atomic writes
+in the previous LSFMM covered by LWN here [1]. AFAIK, there are 
+databases that recommend/prefer buffered IO over direct IO. As mentioned
+in the article, MongoDB being one that supports both but recommends
+buffered IO. Further, many DBs support both direct IO and buffered IO
+well and it may not be fair to force them to stick to direct IO to get
+the benefits of atomic writes.
 
-diff --git a/block/blk-mq-dma.c b/block/blk-mq-dma.c
-index b4f456472961..cebfead826ee 100644
---- a/block/blk-mq-dma.c
-+++ b/block/blk-mq-dma.c
-@@ -92,8 +92,8 @@ static bool blk_dma_map_bus(struct blk_dma_iter *iter, struct phys_vec *vec)
- static bool blk_dma_map_direct(struct request *req, struct device *dma_dev,
- 		struct blk_dma_iter *iter, struct phys_vec *vec)
- {
--	iter->addr = dma_map_page(dma_dev, phys_to_page(vec->paddr),
--			offset_in_page(vec->paddr), vec->len, rq_dma_dir(req));
-+	iter->addr = dma_map_phys(dma_dev, vec->paddr, vec->len,
-+			rq_dma_dir(req), 0);
- 	if (dma_mapping_error(dma_dev, iter->addr)) {
- 		iter->status = BLK_STS_RESOURCE;
- 		return false;
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 3c1727df1e36..d0dd836ccdb9 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -698,20 +698,20 @@ static void nvme_free_descriptors(struct request *req)
- 	}
- }
- 
--static void nvme_free_prps(struct request *req)
-+static void nvme_free_prps(struct request *req, unsigned int attrs)
- {
- 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
- 	struct nvme_queue *nvmeq = req->mq_hctx->driver_data;
- 	unsigned int i;
- 
- 	for (i = 0; i < iod->nr_dma_vecs; i++)
--		dma_unmap_page(nvmeq->dev->dev, iod->dma_vecs[i].addr,
--				iod->dma_vecs[i].len, rq_dma_dir(req));
-+		dma_unmap_phys(nvmeq->dev->dev, iod->dma_vecs[i].addr,
-+			       iod->dma_vecs[i].len, rq_dma_dir(req), attrs);
- 	mempool_free(iod->dma_vecs, nvmeq->dev->dmavec_mempool);
- }
- 
- static void nvme_free_sgls(struct request *req, struct nvme_sgl_desc *sge,
--		struct nvme_sgl_desc *sg_list)
-+		struct nvme_sgl_desc *sg_list, unsigned int attrs)
- {
- 	struct nvme_queue *nvmeq = req->mq_hctx->driver_data;
- 	enum dma_data_direction dir = rq_dma_dir(req);
-@@ -720,13 +720,14 @@ static void nvme_free_sgls(struct request *req, struct nvme_sgl_desc *sge,
- 	unsigned int i;
- 
- 	if (sge->type == (NVME_SGL_FMT_DATA_DESC << 4)) {
--		dma_unmap_page(dma_dev, le64_to_cpu(sge->addr), len, dir);
-+		dma_unmap_phys(dma_dev, le64_to_cpu(sge->addr), len, dir,
-+			       attrs);
- 		return;
- 	}
- 
- 	for (i = 0; i < len / sizeof(*sg_list); i++)
--		dma_unmap_page(dma_dev, le64_to_cpu(sg_list[i].addr),
--			le32_to_cpu(sg_list[i].length), dir);
-+		dma_unmap_phys(dma_dev, le64_to_cpu(sg_list[i].addr),
-+			le32_to_cpu(sg_list[i].length), dir, attrs);
- }
- 
- static void nvme_unmap_metadata(struct request *req)
-@@ -747,10 +748,10 @@ static void nvme_unmap_metadata(struct request *req)
- 	if (!blk_rq_integrity_dma_unmap(req, dma_dev, &iod->meta_dma_state,
- 					iod->meta_total_len)) {
- 		if (nvme_pci_cmd_use_meta_sgl(&iod->cmd))
--			nvme_free_sgls(req, sge, &sge[1]);
-+			nvme_free_sgls(req, sge, &sge[1], 0);
- 		else
--			dma_unmap_page(dma_dev, iod->meta_dma,
--				       iod->meta_total_len, dir);
-+			dma_unmap_phys(dma_dev, iod->meta_dma,
-+				       iod->meta_total_len, dir, 0);
- 	}
- 
- 	if (iod->meta_descriptor)
-@@ -775,9 +776,9 @@ static void nvme_unmap_data(struct request *req)
- 	if (!blk_rq_dma_unmap(req, dma_dev, &iod->dma_state, iod->total_len)) {
- 		if (nvme_pci_cmd_use_sgl(&iod->cmd))
- 			nvme_free_sgls(req, iod->descriptors[0],
--				       &iod->cmd.common.dptr.sgl);
-+				       &iod->cmd.common.dptr.sgl, 0);
- 		else
--			nvme_free_prps(req);
-+			nvme_free_prps(req, 0);
- 	}
- 
- 	if (iod->nr_descriptors)
+[1] https://lwn.net/Articles/1016015/
+> 
+> Why didn't you use the existing COW buffered write IO path to
+> implement atomic semantics for buffered writes? The XFS
+> functionality is already all there, and it doesn't require any
+> changes to the page cache or iomap to support...
 
--- 
-2.51.1
+This patch set focuses on HW accelerated single block atomic writes with
+buffered IO, to get some early reviews on the core design.
 
+Just like we did for direct IO atomic writes, the software fallback with
+COW and multi block support can be added eventually.
+
+Regards,
+ojaswin
+
+> 
+> -Dave.
+> -- 
+> Dave Chinner
+> david@fromorbit.com
