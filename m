@@ -1,116 +1,85 @@
-Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF15B1A8F84
-	for <linux-block@vger.kernel.org>; Fri, 14 Nov 2025 12:32:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F405030F52B;
+	Fri, 14 Nov 2025 13:16:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763123575; cv=none; b=K4KgvwJczsrypCMNJ/tFFPEoTtvxRBp9t3SDNgVW8CypNloT61c1nMutR7UwvX4u/OhUnLM74cwVua2HvE5PUPQLk5WjKdYxeFepeQPvy8B6/VRjTVLYt2CCWt30sQWdaMvhn2Osu4ikg6Hn7nwL7YNadM7GJQMVc7adBQut1nY=
+	t=1763126222; cv=none; b=W4Mkx9/DGkwCF+SWm3GFdWJjnmNywXMFrkGJc5vAbzr2PWfvENq4+Etu5B5zawMsWD9mbVb9Jl2ZfuQYIxVw96MNi3DWlMwtR159El0mmqUYV//y5lGgS7DxQPdQuR9HBbkx+jhBocIwCNTdKTTuuCSeeAaYwthKPGV7R76Ty9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763123575; c=relaxed/simple;
-	bh=j2DTEN+q6rExgpSX0ZvCHj+92wEnbJMb0wyhQvW3edo=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=lsJwSLk2qKoTCl8J3dHeNSF75rWvuO2KQtqpBUIFwKP62JgIXHDkgUffv/yse48YivlG4oCeukQvwOgPIsp0GcMGVeBYbUa+Yp4jVTp0pmC+A97lp7VgL8xhj02rNJQR2JRd/IP7LCfEhCITg55MuIcA+ammJ30RidRa1IxbNxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=MUMoOhX9; arc=none smtp.client-ip=209.85.166.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1763126222; c=relaxed/simple;
+	bh=m25Ht5MJmYjNkEujCtZhivVNuoNdHi2llzCoTBXzsv0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=faUkkKPVboDcIKTbVRyNDVNV+gOsPDgykr0FSJfNDA5MzLQMFQj2kEqhBOzktZr8z43/4l9tuxeEOawYJh7Gn0EWxTs047MgRGs4jpV+sPeV3zg1VxqVMEDgvOT7bAu/ayCi4RAgg581gDbhYSdZ+Afh2QBqmMoXjIpklJHlLVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=uhTAacUV; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="MUMoOhX9"
-Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-4330ef18d8aso8560975ab.0
-        for <linux-block@vger.kernel.org>; Fri, 14 Nov 2025 04:32:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1763123572; x=1763728372; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=r+DvBoia5YaCRSzy0UQ+Uj7LAWlNRV6szM940avo8z4=;
-        b=MUMoOhX9zKtyKGkHMK7H1PsGNtIER4tMHeL8NXF/rv5letlidRMpq6APNXphu6OZYV
-         eAgyKG0D9GFmOr0HjUKPdi7z9M2IzffjKhU/lTTbwgVIFmAZJLmnaT/N70nYd3Qm7ly5
-         fjPe/oqghK0DVXvIFWn42Ph0YLb5RBy+++H67Bk0l9PUqulkrTzlIAhlG1Go0mAnMzan
-         hCk4qXwPzd+PSgYJG//pAW2BauEtoasMNk91AqXv/PBqp/bAYG1Kk/4h4dkLhvtHhHUh
-         lv9ZlAY6xRpg9Hj+60Jeh5x5BZSBbYRyJb0lCkx+lSokzTf4FsSFIPf1Ef6c2sDPh7Pm
-         zXXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763123572; x=1763728372;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=r+DvBoia5YaCRSzy0UQ+Uj7LAWlNRV6szM940avo8z4=;
-        b=UZy2Cx/l/R4L7E13vMmHkRqY5m2cDhfbwMYQnnc6jEg+PI5PFf6eQeiN1CcMYGSOuI
-         PJNyYo2dt7qq/VWNLEa6Jjw+HHmyrgDw4FFlsAe08i8wIq1Pb+e5O8dk7hKXE5EBxJ83
-         znplwZYu03MdRfzVXE+xyzFrJm6LfQ0VWixKe/7hsiqDzT721PZ8KhveWJWoD4PCEhjW
-         2Id0dm/2GQH87zc50eM5ksoglSZpLs4LQR2L8maYqz72ofWAKhzaTvS2e5ZJGLCk9Ds2
-         FcwHCle5imc1y6XGlAJkeb+EcxUIephuWaINKHyrzNDmlesOxKhuN22nbG7kkdaBr6rF
-         0eWg==
-X-Gm-Message-State: AOJu0YyOnep2t2s+z9omRIfmkUYdltu0sdTW5Gv3Sa4SmEVzk+Qma0Kc
-	RSgJ078quPSTz5Yo5S/tILaZKn8F6IMvebGNJn5NGa7Ob02TaqWj7H55LI10Ry7DZSw6L84j/tO
-	RR0dm
-X-Gm-Gg: ASbGncusIV0wJovdCLZyd+l4BQ9cV0l5MlDRicGkhigPbN9a2NpoltTaoyN/BszohQ+
-	grq6NuMat9e2PlqlRcJl6SWj9weHi59gYkNvY+XuzRP+qp9bdQkwQxKYFTETdx2W9fame05qI+D
-	tr3akSPaauV6D+3Nzz+Ik2ffIPGatYzHtIbunsq99nnXtyEsakzrCRZBj9XrhRPKfFU6iJ0gcsj
-	Q6FVCdwVaL0uRN7eqFBtekqTrOOg21OMN4OXX9hl7BZYbcH6xHINW/q9noPzJQzS6jewqoQKdb2
-	2Bpa0Y34Ih7FTo26xNXWKqbkzhO4eG5VsTz/AHOhE6/bfJejUed5JuLpY8eyVzSvmp5PSdf9A7K
-	aH17J9yvb4eJwQN56YD7kbQqepZaCjTnA6r1mDD41LHJupgup6SPx7ih4AoS66Qb8PXp+gcAUJx
-	f2u92D9YO0
-X-Google-Smtp-Source: AGHT+IHY9ygHHg1+2edJWlyJ6bVUbi0JzgizxxcLteZasSIkbrZ7wQVHH3uDfH2PB3GJxKuzOjyTGA==
-X-Received: by 2002:a05:6e02:1986:b0:433:46fa:6a7a with SMTP id e9e14a558f8ab-4348c91c18cmr38748265ab.25.1763123571801;
-        Fri, 14 Nov 2025 04:32:51 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-434839cdbe8sm22977205ab.31.2025.11.14.04.32.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Nov 2025 04:32:51 -0800 (PST)
-Message-ID: <84cc4f70-9746-47bb-a606-0fd71b01332d@kernel.dk>
-Date: Fri, 14 Nov 2025 05:32:49 -0700
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="uhTAacUV"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=Vo+N5YbzZDjZeiNvAhfJhGp+deegDT8E/3cOAOwzUvY=; b=uhTAacUV/flhXWxNQV5FeR3HnC
+	dbisfExygmslgLyDpvLG+2/Hlg/pmt0VQFR60ENfWSheMwZ71gSfJvn5cpAz3jQ4C8GbW22mGZnvr
+	IAvWXV16IcxEqXlj9aGECgc6jWa+TYNslUF/UG5UZnNeVmX9uCBtHkF3/PhZqpKloo53DY7lQjfBs
+	aJlrIOpHrSuxqQ5zFLrpzFxS0hDURfOE1mKKnlaxrFAzISnDVMx2YoDYjEeGrpZfA+xmHgA5z4Aqa
+	ikMn5lzxyvLtVuWvtU3KSheAYA6RnH67j72rXcCqX5yw2ewTbxE7qcEs/APRhRTTgydkga2huH2E1
+	f93tK/uw==;
+Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vJtfX-00000009Mru-0lqh;
+	Fri, 14 Nov 2025 13:16:51 +0000
+Date: Fri, 14 Nov 2025 13:16:50 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: Ritesh Harjani <ritesh.list@gmail.com>
+Cc: Ojaswin Mujoo <ojaswin@linux.ibm.com>,
+	Christian Brauner <brauner@kernel.org>, djwong@kernel.org,
+	john.g.garry@oracle.com, tytso@mit.edu, dchinner@redhat.com,
+	hch@lst.de, linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org, jack@suse.cz, nilay@linux.ibm.com,
+	martin.petersen@oracle.com, rostedt@goodmis.org, axboe@kernel.dk,
+	linux-block@vger.kernel.org, linux-trace-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 2/8] mm: Add PG_atomic
+Message-ID: <aRcrwgxV6cBu2_RH@casper.infradead.org>
+References: <cover.1762945505.git.ojaswin@linux.ibm.com>
+ <5f0a7c62a3c787f2011ada10abe3826a94f99e17.1762945505.git.ojaswin@linux.ibm.com>
+ <aRSuH82gM-8BzPCU@casper.infradead.org>
+ <87ecq18azq.ritesh.list@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block tree update
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87ecq18azq.ritesh.list@gmail.com>
 
-Hi Linus,
+On Fri, Nov 14, 2025 at 10:30:09AM +0530, Ritesh Harjani wrote:
+> Matthew Wilcox <willy@infradead.org> writes:
+> 
+> > On Wed, Nov 12, 2025 at 04:36:05PM +0530, Ojaswin Mujoo wrote:
+> >> From: John Garry <john.g.garry@oracle.com>
+> >> 
+> >> Add page flag PG_atomic, meaning that a folio needs to be written back
+> >> atomically. This will be used by for handling RWF_ATOMIC buffered IO
+> >> in upcoming patches.
+> >
+> > Page flags are a precious resource.  I'm not thrilled about allocating one
+> > to this rather niche usecase.  Wouldn't this be more aptly a flag on the
+> > address_space rather than the folio?  ie if we're doing this kind of write
+> > to a file, aren't most/all of the writes to the file going to be atomic?
+> 
+> As of today the atomic writes functionality works on the per-write
+> basis (given it's a per-write characteristic). 
+> 
+> So, we can have two types of dirty folios sitting in the page cache of
+> an inode. Ones which were done using atomic buffered I/O flag
+> (RWF_ATOMIC) and the other ones which were non-atomic writes. Hence a
+> need of a folio flag to distinguish between the two writes.
 
-Been sitting on this one for a week or two, planning on sending it out
-when there were other block changes for 6.18. But as that hasn't
-materialized in the second week of sitting on it, let's flush it out.
-
-A previous commit updated my git tree locations, but one was missed as
-it was already set to the git.kernel.org one. As the git location swap
-also renamed the actual tree from linux-block to just linux, let's get
-that last one updated too.
-
-Please pull!
-
-
-The following changes since commit 0d92a3eaa6726e64a18db74ece806c2c021aaac3:
-
-  null_blk: set dma alignment to logical block size (2025-10-31 09:03:12 -0600)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-6.18-20251114
-
-for you to fetch changes up to 8f05967b022d255412640670915475ac4cdc10e9:
-
-  MAINTAINERS: correct git location for block layer tree (2025-11-03 08:55:12 -0700)
-
-----------------------------------------------------------------
-block-6.18-20251114
-
-----------------------------------------------------------------
-Jens Axboe (1):
-      MAINTAINERS: correct git location for block layer tree
-
- MAINTAINERS | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
--- 
-Jens Axboe
-
+I know, but is this useful?  AFAIK, the files where Postgres wants to
+use this functionality are the log files, and all writes to the log
+files will want to use the atomic functionality.  What's the usecase
+for "I want to mix atomic and non-atomic buffered writes to this file"?
