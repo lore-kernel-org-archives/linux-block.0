@@ -1,129 +1,116 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30B7D147C9B
-	for <linux-block@vger.kernel.org>; Fri, 14 Nov 2025 12:31:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF15B1A8F84
+	for <linux-block@vger.kernel.org>; Fri, 14 Nov 2025 12:32:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763123495; cv=none; b=Zny+wNjbdXpz/je1ILXe2VJ3I/wwpLSfsG5cVp7xmYgs79CKflrkjYhyJ1fgLZ6GiO3NxDhU4cIZLroQOrpVmkutMsoSwkx8aH2gMou8yWLaDs1vSi42AM/SwD26Tz3wFhGVSOdODfwKTX8JzVtbAuK1s2WvDEfORniTMpE6u/0=
+	t=1763123575; cv=none; b=K4KgvwJczsrypCMNJ/tFFPEoTtvxRBp9t3SDNgVW8CypNloT61c1nMutR7UwvX4u/OhUnLM74cwVua2HvE5PUPQLk5WjKdYxeFepeQPvy8B6/VRjTVLYt2CCWt30sQWdaMvhn2Osu4ikg6Hn7nwL7YNadM7GJQMVc7adBQut1nY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763123495; c=relaxed/simple;
-	bh=I/5ZwKDnJtZ1QHeVA7vHi5YjQFEo9sYBLzy3T8zEbME=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rnRr02VfHGxl2cDNzU3JxONpoUrcCNtLZQsu4FCjfCORjlY4NVMYZWaHUhkoeBSpL4l/Cakppcd3EgLOnKnQQMgoPgISPEGw5/BGjA9Xrhz5fIjjEhgHgsBoYfx5br4pqd8yVLhFMfpBuGzNhdPl1bxjIYGfuUZLkpqk/DV1KyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CMotN4Is; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1763123575; c=relaxed/simple;
+	bh=j2DTEN+q6rExgpSX0ZvCHj+92wEnbJMb0wyhQvW3edo=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=lsJwSLk2qKoTCl8J3dHeNSF75rWvuO2KQtqpBUIFwKP62JgIXHDkgUffv/yse48YivlG4oCeukQvwOgPIsp0GcMGVeBYbUa+Yp4jVTp0pmC+A97lp7VgL8xhj02rNJQR2JRd/IP7LCfEhCITg55MuIcA+ammJ30RidRa1IxbNxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=MUMoOhX9; arc=none smtp.client-ip=209.85.166.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CMotN4Is"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763123493;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IFVcxodsfdbO76GQsBhbtk1ePR5txWpCuWnMr3v/vyY=;
-	b=CMotN4IsWlorLC341YeUxGOUdwjoajIZfoaJ2EZCLlQHKbgNUSDZiYrlsYlPShol+Xgn9c
-	7Qyieglsml8EnIoVW7Ow0oWCMWb35C6ZpmSzQAh/mO8zuWbeHJjmpRtPEpGLnHH7xSt2fk
-	C8PcoMCaWzX7QvDYW/5tWEVHbmfW+NQ=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-26-AXg7kpStM3KFnE5mu2sImQ-1; Fri,
- 14 Nov 2025 07:31:29 -0500
-X-MC-Unique: AXg7kpStM3KFnE5mu2sImQ-1
-X-Mimecast-MFC-AGG-ID: AXg7kpStM3KFnE5mu2sImQ_1763123487
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6D12B18AB406;
-	Fri, 14 Nov 2025 12:31:27 +0000 (UTC)
-Received: from redhat.com (unknown [10.44.33.81])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5651D19560B9;
-	Fri, 14 Nov 2025 12:31:23 +0000 (UTC)
-Date: Fri, 14 Nov 2025 13:31:20 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jan Kara <jack@suse.cz>, Keith Busch <kbusch@kernel.org>,
-	Dave Chinner <david@fromorbit.com>,
-	Carlos Maiolino <cem@kernel.org>,
-	Christian Brauner <brauner@kernel.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-raid@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: Re: fall back from direct to buffered I/O when stable writes are
- required
-Message-ID: <aRchGBJA1ExoGi8W@redhat.com>
-References: <aQPyVtkvTg4W1nyz@dread.disaster.area>
- <20251031130050.GA15719@lst.de>
- <aQTcb-0VtWLx6ghD@kbusch-mbp>
- <20251031164701.GA27481@lst.de>
- <kpk2od2fuqofdoneqse2l3gvn7wbqx3y4vckmnvl6gc2jcaw4m@hsxqmxshckpj>
- <20251103122111.GA17600@lst.de>
- <aRYXuwtSQUz6buBs@redhat.com>
- <20251114053943.GA26898@lst.de>
- <aRb2g3VLjz1Q_rLa@redhat.com>
- <20251114120152.GA13689@lst.de>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="MUMoOhX9"
+Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-4330ef18d8aso8560975ab.0
+        for <linux-block@vger.kernel.org>; Fri, 14 Nov 2025 04:32:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1763123572; x=1763728372; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=r+DvBoia5YaCRSzy0UQ+Uj7LAWlNRV6szM940avo8z4=;
+        b=MUMoOhX9zKtyKGkHMK7H1PsGNtIER4tMHeL8NXF/rv5letlidRMpq6APNXphu6OZYV
+         eAgyKG0D9GFmOr0HjUKPdi7z9M2IzffjKhU/lTTbwgVIFmAZJLmnaT/N70nYd3Qm7ly5
+         fjPe/oqghK0DVXvIFWn42Ph0YLb5RBy+++H67Bk0l9PUqulkrTzlIAhlG1Go0mAnMzan
+         hCk4qXwPzd+PSgYJG//pAW2BauEtoasMNk91AqXv/PBqp/bAYG1Kk/4h4dkLhvtHhHUh
+         lv9ZlAY6xRpg9Hj+60Jeh5x5BZSBbYRyJb0lCkx+lSokzTf4FsSFIPf1Ef6c2sDPh7Pm
+         zXXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763123572; x=1763728372;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=r+DvBoia5YaCRSzy0UQ+Uj7LAWlNRV6szM940avo8z4=;
+        b=UZy2Cx/l/R4L7E13vMmHkRqY5m2cDhfbwMYQnnc6jEg+PI5PFf6eQeiN1CcMYGSOuI
+         PJNyYo2dt7qq/VWNLEa6Jjw+HHmyrgDw4FFlsAe08i8wIq1Pb+e5O8dk7hKXE5EBxJ83
+         znplwZYu03MdRfzVXE+xyzFrJm6LfQ0VWixKe/7hsiqDzT721PZ8KhveWJWoD4PCEhjW
+         2Id0dm/2GQH87zc50eM5ksoglSZpLs4LQR2L8maYqz72ofWAKhzaTvS2e5ZJGLCk9Ds2
+         FcwHCle5imc1y6XGlAJkeb+EcxUIephuWaINKHyrzNDmlesOxKhuN22nbG7kkdaBr6rF
+         0eWg==
+X-Gm-Message-State: AOJu0YyOnep2t2s+z9omRIfmkUYdltu0sdTW5Gv3Sa4SmEVzk+Qma0Kc
+	RSgJ078quPSTz5Yo5S/tILaZKn8F6IMvebGNJn5NGa7Ob02TaqWj7H55LI10Ry7DZSw6L84j/tO
+	RR0dm
+X-Gm-Gg: ASbGncusIV0wJovdCLZyd+l4BQ9cV0l5MlDRicGkhigPbN9a2NpoltTaoyN/BszohQ+
+	grq6NuMat9e2PlqlRcJl6SWj9weHi59gYkNvY+XuzRP+qp9bdQkwQxKYFTETdx2W9fame05qI+D
+	tr3akSPaauV6D+3Nzz+Ik2ffIPGatYzHtIbunsq99nnXtyEsakzrCRZBj9XrhRPKfFU6iJ0gcsj
+	Q6FVCdwVaL0uRN7eqFBtekqTrOOg21OMN4OXX9hl7BZYbcH6xHINW/q9noPzJQzS6jewqoQKdb2
+	2Bpa0Y34Ih7FTo26xNXWKqbkzhO4eG5VsTz/AHOhE6/bfJejUed5JuLpY8eyVzSvmp5PSdf9A7K
+	aH17J9yvb4eJwQN56YD7kbQqepZaCjTnA6r1mDD41LHJupgup6SPx7ih4AoS66Qb8PXp+gcAUJx
+	f2u92D9YO0
+X-Google-Smtp-Source: AGHT+IHY9ygHHg1+2edJWlyJ6bVUbi0JzgizxxcLteZasSIkbrZ7wQVHH3uDfH2PB3GJxKuzOjyTGA==
+X-Received: by 2002:a05:6e02:1986:b0:433:46fa:6a7a with SMTP id e9e14a558f8ab-4348c91c18cmr38748265ab.25.1763123571801;
+        Fri, 14 Nov 2025 04:32:51 -0800 (PST)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-434839cdbe8sm22977205ab.31.2025.11.14.04.32.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 14 Nov 2025 04:32:51 -0800 (PST)
+Message-ID: <84cc4f70-9746-47bb-a606-0fd71b01332d@kernel.dk>
+Date: Fri, 14 Nov 2025 05:32:49 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251114120152.GA13689@lst.de>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block tree update
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Am 14.11.2025 um 13:01 hat Christoph Hellwig geschrieben:
-> On Fri, Nov 14, 2025 at 10:29:39AM +0100, Kevin Wolf wrote:
-> > Right, but since this is direct I/O and the approach with only declaring
-> > I/O from the page cache safe without a bounce buffer means that RAID has
-> > to use a bounce buffer here anyway (with or without PI), doesn't this
-> > automatically solve it?
-> >
-> > So if it's only PI, it's the problem of userspace, and if you add RAID
-> > on top, then the normal rules for RAID apply. (And that the buffer
-> > doesn't get modified and PI doesn't become invalid until RAID does its
-> > thing is still a userspace problem.)
-> 
-> Well, only if we have different levels of I/O stability guarantees:
-> 
-> Level 0
->   - trusted caller guarantees pages are stable (buffered I/O,
->     in-kernel direct I/O callers that control the buffer)
-> 
-> Level 1:
->   - untrusted caller declares the pages are stable
->     (direct I/O with PI)
-> 
-> Level 2:
->   - no one guarantees nothing
->     (other direct I/O directly or indirectly fed from userspace)
-> 
-> PI formatted devices would only bounce for 1, parity would bounce for
-> 1 and 2.  Software checksums could probably get away with only 1,
-> although 2 would feel safer.
+Hi Linus,
 
-My main point above was that RAID and (potentially passed through) PI
-are independent of each other and I think that's still true with or
-without multiple stability levels.
+Been sitting on this one for a week or two, planning on sending it out
+when there were other block changes for 6.18. But as that hasn't
+materialized in the second week of sitting on it, let's flush it out.
 
-If you don't have these levels, you just have to treat level 1 and 2 the
-same, i.e. bounce all the time if the kernel needs the guarantee (which
-is not for userspace PI, unless the same request needs the bounce buffer
-for another reason in a different place like RAID). That might be less
-optimal, but still correct and better than what happens today because at
-least you don't bounce for level 0 any more.
+A previous commit updated my git tree locations, but one was missed as
+it was already set to the git.kernel.org one. As the git location swap
+also renamed the actual tree from linux-block to just linux, let's get
+that last one updated too.
 
-If there is something you can optimise by delegating the responsibility
-to userspace in some cases - like you can prove that only the
-application itself would be harmed by doing things wrong - then having
-level 1 separate could certainly be interesting. In this case, I'd
-consider adding an RWF_* flag for userspace to make the promise even
-outside PI passthrough. But while potentially worthwhile, it feels like
-this is a separate optimisation from what you tried to address here.
+Please pull!
 
-Kevin
+
+The following changes since commit 0d92a3eaa6726e64a18db74ece806c2c021aaac3:
+
+  null_blk: set dma alignment to logical block size (2025-10-31 09:03:12 -0600)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-6.18-20251114
+
+for you to fetch changes up to 8f05967b022d255412640670915475ac4cdc10e9:
+
+  MAINTAINERS: correct git location for block layer tree (2025-11-03 08:55:12 -0700)
+
+----------------------------------------------------------------
+block-6.18-20251114
+
+----------------------------------------------------------------
+Jens Axboe (1):
+      MAINTAINERS: correct git location for block layer tree
+
+ MAINTAINERS | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+-- 
+Jens Axboe
 
