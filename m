@@ -1,46 +1,73 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB30919F43A;
-	Fri, 14 Nov 2025 00:38:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A85541865ED
+	for <linux-block@vger.kernel.org>; Fri, 14 Nov 2025 01:53:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763080712; cv=none; b=rDyzGWNXb5IkhWZFfyBnRtwvCRWK7Mgp7x6MsnwUhniVJaA64lALMB4Yke+qr3drCXRvKtJzxRM0n9NEJqToW6F0egytF+kmkptP2fJl7/lTny1hwDxrLFUL2BQTmtUchhxj8qK3Wm222oVX0S30PYaIZXzNEc9/bP98RGSl8/I=
+	t=1763085211; cv=none; b=OJWHl5xR4PLwiVMNAO/kqHyyAJqx9m7D7sPAgzZ8IB+9AkZ+IvBGNooAf1WvKW+94qvurask383wQD+z/MCbVJu77kPkzQ+tj6B01a9Jw5fsZ6BZ4Z7OYagfvZbUhfbNIOcWfyq5PObwjTI9Sq7Ft6TgmO4VihPtS8z8ULOQ7Nw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763080712; c=relaxed/simple;
-	bh=VnC/Cpeb7QXhyfiqkSDO4UcZXLs/noIUYMjxye6egB0=;
+	s=arc-20240116; t=1763085211; c=relaxed/simple;
+	bh=fpbe7+BYlw1Y671HcTH+ox5SS0E8eqH7WWACwS87yg4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qMG3BsDNwPDPaxes00qaLdY/q9izp6ZwXIFT7rbNjp7GuPTaTzvZnjyzJIzESyoZqSm1VF8Lb5eaciPYdS2VpIFAinp7al0bIPiaqt5d4fH/ry43G7nrpbobkcNeJEPR9X1k0w3ddPdEbD+GIL1IGulz8bmj05D0sP3h4ply3Ew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XUAnNNjJ; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=NXBkiVKwq4H6z356rw5k4zDVKFq/9ylQWPMHEs8k0vyQLBJbRT43zpEkkv+uQjOs8A/h2vfXDVVt2nY3BLHKMMsg7KfNxyWoj1eG9GkuATwUAD85ILGOv19ddt2F4SokPyFJC6HdpAogC1GSudwzOdNrVitorLilIguiXAhDwSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=cEYQcZPb; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XUAnNNjJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08769C4CEF8;
-	Fri, 14 Nov 2025 00:37:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763080712;
-	bh=VnC/Cpeb7QXhyfiqkSDO4UcZXLs/noIUYMjxye6egB0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XUAnNNjJ+3nSCgOJ3PR8vZDu67EvX/FawQM01PvWo/ci8bnmP2rNvE/WsnHqZ6L6S
-	 YKJx52A01ibfJBY+6aDXkc9edSsf4tVWTFBLbBPjeEaaFT4ks/H/cxNgYKplSvAVm/
-	 mF0mzwsc2B7Od1fIZWgDi/uuCqoQhcL7Xc0bIvMf88v59R1GUTwcom7oHYlUEAD2WH
-	 H+ShHpfNNlDzA60Z/AqHCux1aFzH0HUcNYhbKHYBsyiJqZJQR9LHP42oOokHTgpgo5
-	 U7AsaeRG2b0CFIMRJEJZBCZ/D+eV2pKlMQjeWCnkd0ktHmQtIc3FdQZxZiMjn/m2aI
-	 iSJdeGllV5Oaw==
-Date: Thu, 13 Nov 2025 16:37:38 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Vlastimil Babka <vbabka@suse.cz>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Christoph Lameter <cl@gentwo.org>,
-	David Rientjes <rientjes@google.com>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Harry Yoo <harry.yoo@oracle.com>, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-	linux-mm@kvack.org
-Subject: Re: [PATCH 7/9] blk-crypto: handle the fallback above the block layer
-Message-ID: <20251114003738.GC30712@quark>
-References: <20251031093517.1603379-1-hch@lst.de>
- <20251031093517.1603379-8-hch@lst.de>
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="cEYQcZPb"
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-7b991081160so1237209b3a.2
+        for <linux-block@vger.kernel.org>; Thu, 13 Nov 2025 17:53:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1763085209; x=1763690009; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9LDGlt5BP9HGrN5kDVPAodxjrvpp8sHxQXkzmFVXsTw=;
+        b=cEYQcZPbjJTuskpL/5X0bBUx6GhOjc9fGC0vHOV2teFoRGiCuc9Ss8D6sUpWId4ZuR
+         3PUNcFEYUK/WT9XPgPcbXbJknCbTSloLDvsqEad+eOvNj7r73mkqVDX42edXJSpV/YqU
+         2rohYaeNO+RKf5mjxZEzhPQK89abFIeda3ReI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763085209; x=1763690009;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9LDGlt5BP9HGrN5kDVPAodxjrvpp8sHxQXkzmFVXsTw=;
+        b=K+URU4zW3284WGtEaSxhsIP1gbY/J9fF5qRkILuy0rEH/gY5SCxNnr2rPefFOCceO4
+         H8wRK96om57BCGX7AGX2hXQtfUQTsyjEWyiUYgTN11u7K0Tzpifjc37MAYzJAXdvfPa7
+         jYSj65kFSaNYoQv6B5dVStJe7lDkZpIf3gd9X7N2XGcbGJM0eKFHgJxh99rtVNZmbzN6
+         O9uGm2/JGY58P4asECutJlR5CmuWHALfe5nvSBSmQjhX6bz+jz10X+3j34lnffTotRZV
+         vnuIREHEiAvf7jhSxPqwHailsc2Ag9EhoCD8QyhU06fV7Xp6tZYgJmOUfg5V6wWINGGG
+         Qh1w==
+X-Forwarded-Encrypted: i=1; AJvYcCWupITXr+jZgO8QThgfW2Jsz/vIWjl4qrtHBDx0DQ7ndvWu9xeJ0g+fqBe6P5BfqXnVJM+tIBM9VAX9jg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx2SfYosRI1C61fiITBs2t3mj+zJJ9T7YgwOz4NQ8Ut/MJutdph
+	3TA7eAf2mFqET6BpgV4Zh/gKuGR2OQktPu+cLAvyM1EuG623RYB23uBSOiK4AJb3zw==
+X-Gm-Gg: ASbGncshyhlV+Rth3pRzUuyd8ZA/NmMEfc2rgD58ZyikaGUusKTq/KSqjN6lE3GHw+X
+	Z4d3o+dYyEj9EehW2Bonr5ewbfsWxr2DuKQz8Tc4aIGjFZIYP6ZPmVnIGVzkm5XufXKWzhPEkuz
+	bbKUEVUF7bIXu0QwgHW3FXiCB+4gUpHp6mBz7sMqLBBBkJxDTBd+7m5vT4R9gBfYVbhTI17SuLX
+	+Fi6DGX/v8O1hLabnBaEE6pbZDKXMeHzQAXjb/ZlI1fkmQyBd4+Q/fMJbaQZUUkNSeE4nOCAY0b
+	TrebV4liQ9xJEmHyEsLMMuqNrh7u7ba2NEq5l8oQYDfVFczU3r3O8BUAxmqcYjJUBUDth2rhTCe
+	vijv+UYdYyBzOFD4It7ClKmHD3CHkO/9UJ0s8z44tn74IoZznYSlN3bxB6RqQNcBPVm+Afsw90I
+	mNi+iAi20VW9glfw4=
+X-Google-Smtp-Source: AGHT+IF8knbLFGnSfk91LbrxqoXrIXu987LpSYmuVrZv5LzQ+C4wG/KgOmFWJ7dRbgMRz0JhH+7PxA==
+X-Received: by 2002:a05:6a20:6a1d:b0:355:1add:c298 with SMTP id adf61e73a8af0-35ba047db16mr2310631637.21.1763085208913;
+        Thu, 13 Nov 2025 17:53:28 -0800 (PST)
+Received: from google.com ([2401:fa00:8f:203:6d96:d8c6:55e6:2377])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7b92782d39bsm3518611b3a.63.2025.11.13.17.53.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Nov 2025 17:53:28 -0800 (PST)
+Date: Fri, 14 Nov 2025 10:53:23 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Minchan Kim <minchan@kernel.org>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, Yuwen Chen <ywen.chen@foxmail.com>, 
+	Richard Chang <richardycc@google.com>, Brian Geffon <bgeffon@google.com>, 
+	Fengyu Lian <licayy@outlook.com>, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-block@vger.kernel.org
+Subject: Re: [PATCHv2 1/4] zram: introduce writeback bio batching support
+Message-ID: <rjowf2hdk7pkmqpslj6jaqm6y4mhvr726dxpjyz7jtcjixv3hi@jyah654foky4>
+References: <20251113085402.1811522-1-senozhatsky@chromium.org>
+ <20251113085402.1811522-2-senozhatsky@chromium.org>
+ <aRZttTsRG1cZoovl@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -49,72 +76,134 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251031093517.1603379-8-hch@lst.de>
+In-Reply-To: <aRZttTsRG1cZoovl@google.com>
 
-On Fri, Oct 31, 2025 at 10:34:37AM +0100, Christoph Hellwig wrote:
-> -/**
-> - * blk_crypto_fallback_bio_prep - Prepare a bio to use fallback en/decryption
-> - *
-> - * @bio_ptr: pointer to the bio to prepare
-> - *
-> - * If bio is doing a WRITE operation, this splits the bio into two parts if it's
-> - * too big (see blk_crypto_fallback_split_bio_if_needed()). It then allocates a
-> - * bounce bio for the first part, encrypts it, and updates bio_ptr to point to
-> - * the bounce bio.
-> - *
-> - * For a READ operation, we mark the bio for decryption by using bi_private and
-> - * bi_end_io.
-> - *
-> - * In either case, this function will make the bio look like a regular bio (i.e.
-> - * as if no encryption context was ever specified) for the purposes of the rest
-> - * of the stack except for blk-integrity (blk-integrity and blk-crypto are not
-> - * currently supported together).
-> - *
-> - * Return: true on success. Sets bio->bi_status and returns false on error.
-> +/*
-> + * bio READ case: Set up a f_ctx in the bio's bi_private and set the bi_end_io
-> + * appropriately to trigger decryption when the bio is ended.
->   */
-> -bool blk_crypto_fallback_bio_prep(struct bio **bio_ptr)
-> +bool blk_crypto_fallback_prep_decrypt_bio(struct bio *bio)
+On (25/11/13 15:45), Minchan Kim wrote:
+[..]
+> > +struct zram_wb_req {
+> > +	unsigned long blk_idx;
+> > +	struct page *page;
+> >  	struct zram_pp_slot *pps;
+> >  	struct bio_vec bio_vec;
+> >  	struct bio bio;
+> > -	int ret = 0, err;
+> > +
+> > +	struct list_head entry;
+> > +};
+> 
+> How about moving structure definition to the upper part of the C file?
+> Not only readability to put together data types but also better diff
+> for reviewer to know what we changed in this patch.
 
-This omits some important details.  Maybe:
+This still needs to be under #ifdef CONFIG_ZRAM_WRITEBACK so readability
+is not significantly better.  Do you still prefer moving it up?
 
-/*
- * bio READ case: Set up a fallback crypt context in the bio's bi_private, clear
- * the bio's original crypt context, and set bi_end_io appropriately to trigger
- * decryption when the bio is ended.  Returns true if bio submission should
- * continue, or false if aborted with bio_endio already called.
- */
+[..]
 
-> -/**
-> - * __blk_crypto_bio_prep - Prepare bio for inline encryption
-> - *
-> - * @bio_ptr: pointer to original bio pointer
-> - *
-> - * If the bio crypt context provided for the bio is supported by the underlying
-> - * device's inline encryption hardware, do nothing.
-> - *
-> - * Otherwise, try to perform en/decryption for this bio by falling back to the
-> - * kernel crypto API. When the crypto API fallback is used for encryption,
-> - * blk-crypto may choose to split the bio into 2 - the first one that will
-> - * continue to be processed and the second one that will be resubmitted via
-> - * submit_bio_noacct. A bounce bio will be allocated to encrypt the contents
-> - * of the aforementioned "first one", and *bio_ptr will be updated to this
-> - * bounce bio.
-> - *
-> - * Caller must ensure bio has bio_crypt_ctx.
-> - *
-> - * Return: true on success; false on error (and bio->bi_status will be set
-> - *	   appropriately, and bio_endio() will have been called so bio
-> - *	   submission should abort).
-> - */
-> -bool __blk_crypto_bio_prep(struct bio **bio_ptr)
-> +bool __blk_crypto_submit_bio(struct bio *bio)
+> > +/* XXX: should be a per-device sysfs attr */
+> > +#define ZRAM_WB_REQ_CNT 1
+> 
+> Understand you will create the knob for the tune but at least,
+> let's introduce default number for that here.
+> 
+> How about 32 since it's general queue depth for modern storage?
 
-Similarly, this could at least use a comment about what the return value
-means.  It's true if the caller should continue with submission, or
-false if blk-crypto took ownership of the bio (either by completing the
-bio right away or by arranging for it to be completed later).
+So this is tricky.  I don't know what number is a good default for
+all, given the variety of devices out there, variety of specs and
+hardware, on both sides of price range.  I don't know if 32 is safe
+wrt to performance/throughput (I may be wrong and 32 is safe for
+everyone).  On the other hand, 1 was our baseline for ages, so I
+wanted to minimize the risks and just keep the baseline behavior.
 
-- Eric
+Do you still prefer 32 as default?  (here and in the next patch)
+
+[..]
+> > +	for (i = 0; i < ZRAM_WB_REQ_CNT; i++) {
+> > +		struct zram_wb_req *req;
+> > +
+> > +		/*
+> > +		 * This is fatal condition only if we couldn't allocate
+> > +		 * any requests at all.  Otherwise we just work with the
+> > +		 * requests that we have successfully allocated, so that
+> > +		 * writeback can still proceed, even if there is only one
+> > +		 * request on the idle list.
+> > +		 */
+> > +		req = kzalloc(sizeof(*req), GFP_NOIO | __GFP_NOWARN);
+> 
+> Why GFP_NOIO?
+> 
+> > +		if (!req)
+> > +			break;
+> > +
+> > +		req->page = alloc_page(GFP_NOIO | __GFP_NOWARN);
+> 
+> Ditto
+
+So we do this for post-processing, which allocates a bunch of memory
+for post-processing (not only requests lists with physical pages, but
+also candidate slots buckets).  The thing is that post-processing can
+be called under memory pressure and we don't really want to block and
+reclaim memory from the path that is called to relive memory pressure
+(by doing writeback or recompression).
+
+> > +		if (!req->page) {
+> > +			kfree(req);
+> > +			break;
+> > +		}
+> > +
+> > +		INIT_LIST_HEAD(&req->entry);
+> 
+> Do we need this reset?
+
+Let me take a look.
+
+> > +static void zram_account_writeback_rollback(struct zram *zram)
+> > +{
+> > +	spin_lock(&zram->wb_limit_lock);
+> > +	if (zram->wb_limit_enable)
+> > +		zram->bd_wb_limit +=  1UL << (PAGE_SHIFT - 12);
+> > +	spin_unlock(&zram->wb_limit_lock);
+> > +}
+> > +
+> > +static void zram_account_writeback_submit(struct zram *zram)
+> > +{
+> > +	spin_lock(&zram->wb_limit_lock);
+> > +	if (zram->wb_limit_enable && zram->bd_wb_limit > 0)
+> > +		zram->bd_wb_limit -=  1UL << (PAGE_SHIFT - 12);
+> > +	spin_unlock(&zram->wb_limit_lock);
+> > +}
+> 
+> I didn't think about much about this that we really need to be
+> accurate like this. Maybe, next time after coffee.
+
+Sorry, not sure I understand this comment.
+
+[..]
+> > +static int zram_writeback_slots(struct zram *zram,
+> > +				struct zram_pp_ctl *ctl,
+> > +				struct zram_wb_ctl *wb_ctl)
+> > +{
+> > +	struct zram_wb_req *req = NULL;
+> > +	unsigned long blk_idx = 0;
+> > +	struct zram_pp_slot *pps;
+> > +	int ret = 0, err;
+> > +	u32 index = 0;
+> > +
+> > +	blk_start_plug(&wb_ctl->plug);
+> 
+> Why is the plug part of wb_ctl?
+> 
+> The scope of plug is in this function and the purpose is for
+> this writeback batch in this function so the plug can be local
+> variable in this function.
+
+ACK, that's a leftover from when I manipulated plugs outside of this
+function.  Now it's completely local.
+
+[..]
+> > +		bio_init(&req->bio, zram->bdev, &req->bio_vec, 1,
+> > +			 REQ_OP_WRITE | REQ_SYNC);
+> 
+> Can't we drop the REQ_SYNC now?
+
+Good catch, I suppose we can.
