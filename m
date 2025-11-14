@@ -1,188 +1,117 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37B2029AB15
-	for <linux-block@vger.kernel.org>; Fri, 14 Nov 2025 16:51:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66EBD336EF4
+	for <linux-block@vger.kernel.org>; Fri, 14 Nov 2025 16:56:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763139085; cv=none; b=Ev+8xZ40X05bUvxjBdMwvSvyRWI5chSfANp9rO5P+btR2cjW5Qi44AgV4KI+oyOhE1RfKv/ooEErvCjvmO8BAFzsAC4KhwoUdhMSHhkWBYuab3Yrl/iF40w8xGo6Ggb9HvgfXWQ0VmqVhFBmFfdm0W+tJ4NtnUr4DZcjnnrR1fY=
+	t=1763139368; cv=none; b=HA2CksjDF7Spg0KqiP92Xcyv0CitEOap+zSYFC8aLejhbZySx9rebWKhvjoehzG9rnhDh+KaaD54iherHbM6m4x+5rXq4Yqbhk3vAAVf9q4Qt/i1PAJAyO6ZcoF/ytOWy7iwICAB+KEdUs+fsmVGwQHNnDuirdMoX1jSOvJu8Y4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763139085; c=relaxed/simple;
-	bh=KQLFJCTVvfzEpBPpiuevyh10j9z8nJ2CHWh7wk1O+4g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Xxp3K3QleKDMn8q0eYeFq4zXv04O7+Iz3UugPp5ciLtyVxY2tFN7q+zYoS0g7+hEpXRdFAoD/+i3RFpRjKqlguY56rTln6q6q2mtinMV+lvYh/VidnLlF3YPGbLmHUoeRAf1ui6UVSYZea8fEpBtH8JkMqDHMZlHdolUIY8+ZVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=NpuON5sm; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=/53GYY7y; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=NpuON5sm; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=/53GYY7y; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1763139368; c=relaxed/simple;
+	bh=6TSkTd8QYhGIkuJktBXMhRTbFnRorBPr9gWU+GWWeCY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Qqtwa+ML2UVsR3zKzIkFMxzxs0B/3Eq0i9c3p0Z49p4bVBV3SJS93bXNDiXEzurZIz4tFCjgD+Tg0VZvnxm9qesMw+rnvQ/BBAa/ZYa/Qg2ckauobGjr2poD2m4mDQdrOQbRJRYQ8Yfu9HVFimSqO4t4SE9i8NZjuAONmO/0umo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ONv6JmVU; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="NpuON5sm";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="/53GYY7y";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="NpuON5sm";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="/53GYY7y"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ONv6JmVU"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763139365;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=G+w7fTZt5yUvxxlHlhv9qFh5bl+En30eT9dJ3sbzFCY=;
+	b=ONv6JmVULZu5AJ9KK2C7r76UfjdpV/57RMOEC3fVutqTUojnaySk5/aCU9U+5jJeXMKb2C
+	77NVxGyLUBCSTErVvcCZeumzn/VyEtChzl+b35FXg5ZE3xtasPGlV+qwQ2RK0f+O2+NxB9
+	6hTiRd08gLikJU9goosh8+Ul4kTkzGA=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-693-0Y7IkpOzNdGYfOhy4GdU6A-1; Fri,
+ 14 Nov 2025 11:55:59 -0500
+X-MC-Unique: 0Y7IkpOzNdGYfOhy4GdU6A-1
+X-Mimecast-MFC-AGG-ID: 0Y7IkpOzNdGYfOhy4GdU6A_1763139358
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 589C9211BA;
-	Fri, 14 Nov 2025 16:51:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1763139081; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=CtYOFKKSpg2Bb/w+uJqdIAvBphJZ2lroa/jghbQYexs=;
-	b=NpuON5sm5fpY0XnXC2G0GlCrPXke+mYDn2fyrbH6esINMpwMibsiqwbYsfjdgNc0iVluk1
-	w4vw5hAOsmeweh8/uS0OJ7k/VJJ9pLr78q2MdDMeGyk/K9jmnyO172BP9+Fu7aLb5pAsCj
-	fEqVcprTUjHx3PSVhsCNO1xGdAyVwI0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1763139081;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=CtYOFKKSpg2Bb/w+uJqdIAvBphJZ2lroa/jghbQYexs=;
-	b=/53GYY7yQnhBr9vvWJq+HNcRaP4799YtMdxrp9sr/Sfpyj8iis7o2v8868rCjov5YgAb6A
-	D7t5jwJYWbw3l0Aw==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1763139081; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=CtYOFKKSpg2Bb/w+uJqdIAvBphJZ2lroa/jghbQYexs=;
-	b=NpuON5sm5fpY0XnXC2G0GlCrPXke+mYDn2fyrbH6esINMpwMibsiqwbYsfjdgNc0iVluk1
-	w4vw5hAOsmeweh8/uS0OJ7k/VJJ9pLr78q2MdDMeGyk/K9jmnyO172BP9+Fu7aLb5pAsCj
-	fEqVcprTUjHx3PSVhsCNO1xGdAyVwI0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1763139081;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=CtYOFKKSpg2Bb/w+uJqdIAvBphJZ2lroa/jghbQYexs=;
-	b=/53GYY7yQnhBr9vvWJq+HNcRaP4799YtMdxrp9sr/Sfpyj8iis7o2v8868rCjov5YgAb6A
-	D7t5jwJYWbw3l0Aw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 35E653EA61;
-	Fri, 14 Nov 2025 16:51:21 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id o1H3CwleF2khBwAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Fri, 14 Nov 2025 16:51:21 +0000
-Message-ID: <61d451f7-a54a-4c27-afab-9ae684b4bc6b@suse.cz>
-Date: Fri, 14 Nov 2025 17:51:20 +0100
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DB9F019540E8;
+	Fri, 14 Nov 2025 16:55:57 +0000 (UTC)
+Received: from redhat.com (unknown [10.44.33.81])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0E2B618004A3;
+	Fri, 14 Nov 2025 16:55:52 +0000 (UTC)
+Date: Fri, 14 Nov 2025 17:55:49 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jan Kara <jack@suse.cz>, Keith Busch <kbusch@kernel.org>,
+	Dave Chinner <david@fromorbit.com>,
+	Carlos Maiolino <cem@kernel.org>,
+	Christian Brauner <brauner@kernel.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-raid@vger.kernel.org,
+	linux-block@vger.kernel.org
+Subject: Re: fall back from direct to buffered I/O when stable writes are
+ required
+Message-ID: <aRdfFRw1vKUHXqIg@redhat.com>
+References: <aQTcb-0VtWLx6ghD@kbusch-mbp>
+ <20251031164701.GA27481@lst.de>
+ <kpk2od2fuqofdoneqse2l3gvn7wbqx3y4vckmnvl6gc2jcaw4m@hsxqmxshckpj>
+ <20251103122111.GA17600@lst.de>
+ <aRYXuwtSQUz6buBs@redhat.com>
+ <20251114053943.GA26898@lst.de>
+ <aRb2g3VLjz1Q_rLa@redhat.com>
+ <20251114120152.GA13689@lst.de>
+ <aRchGBJA1ExoGi8W@redhat.com>
+ <20251114153644.GA31395@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] mm/mempool: fix poisoning order>0 pages with HIGHMEM
-To: Christoph Hellwig <hch@lst.de>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
- Christoph Lameter <cl@gentwo.org>, David Rientjes <rientjes@google.com>,
- Roman Gushchin <roman.gushchin@linux.dev>, Harry Yoo <harry.yoo@oracle.com>,
- Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- linux-mm@kvack.org, linux-kernel@vger.kernel.org,
- kernel test robot <oliver.sang@intel.com>
-References: <20251113-mempool-poison-v1-1-233b3ef984c3@suse.cz>
- <20251114050410.GA26404@lst.de>
-Content-Language: en-US
-From: Vlastimil Babka <vbabka@suse.cz>
-Autocrypt: addr=vbabka@suse.cz; keydata=
- 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
- m6M14QORSWTLRg==
-In-Reply-To: <20251114050410.GA26404@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lst.de:email,suse.cz:mid,imap1.dmz-prg2.suse.org:helo]
-X-Spam-Flag: NO
-X-Spam-Score: -4.30
-X-Spam-Level: 
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251114153644.GA31395@lst.de>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On 11/14/25 06:04, Christoph Hellwig wrote:
-> On Thu, Nov 13, 2025 at 07:54:35PM +0100, Vlastimil Babka wrote:
->> Christoph found out this is due to the poisoning code not dealing
->> properly with CONFIG_HIGHMEM because only the first page is mapped but
->> then the whole potentially high-order page is accessed.
->> 
->> This went unnoticed for years probably because nobody has yet used a
->> mempool for order>0 pages before the new block code in -next.
+Am 14.11.2025 um 16:36 hat Christoph Hellwig geschrieben:
+> On Fri, Nov 14, 2025 at 01:31:20PM +0100, Kevin Wolf wrote:
+> > My main point above was that RAID and (potentially passed through) PI
+> > are independent of each other and I think that's still true with or
+> > without multiple stability levels.
+> > 
+> > If you don't have these levels, you just have to treat level 1 and 2 the
+> > same, i.e. bounce all the time if the kernel needs the guarantee (which
+> > is not for userspace PI, unless the same request needs the bounce buffer
+> > for another reason in a different place like RAID). That might be less
+> > optimal, but still correct and better than what happens today because at
+> > least you don't bounce for level 0 any more.
 > 
-> I did a quick audit: and bcache, dm-integrity (config dependent) and the
-> KASAN unit tests create page based mempools with order > 0.  It looks
-> like none of those ever got much testing on highmem systems.
-
-Thanks,
-
-KASAN unit tests sounds like something that would have been flagged by
-automated testing long ago, however the mempool-specific poisoning isn't
-compatible with it so poison_element() and check_element() both return
-immediately with kasan_enabled().
-
-bcache and dm-integrity are perhaps too complex setups for the test robots.
-But I'll add cc: stable then.
-
-> The fix looks good:
+> Agreed.
 > 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> > If there is something you can optimise by delegating the responsibility
+> > to userspace in some cases - like you can prove that only the
+> > application itself would be harmed by doing things wrong - then having
+> > level 1 separate could certainly be interesting. In this case, I'd
+> > consider adding an RWF_* flag for userspace to make the promise even
+> > outside PI passthrough. But while potentially worthwhile, it feels like
+> > this is a separate optimisation from what you tried to address here.
+> 
+> Agreed as well.
+> 
+> In fact I'm kinda lost what we're even arguing about :)
+
+Probably nothing then. :-) I was just confused because you called PI
+passthrough from userspace a complication, but it seems we agree that
+there is no real complication in the sense that it's hard to get
+correct and the approach can be implemented just like that.
+
+That's really why I posted in the first place, to agree with you that
+this approach seems best to me, and because I don't want to see our
+O_DIRECT requests silently fall back to buffered I/O in more cases,
+especially with AIO.
+
+Kevin
 
