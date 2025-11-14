@@ -1,124 +1,183 @@
-Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7471827E066
-	for <linux-block@vger.kernel.org>; Fri, 14 Nov 2025 18:31:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53ACC3D3B3;
+	Fri, 14 Nov 2025 19:14:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763145119; cv=none; b=SuY6ZinluSOBhxqicUuA0NYThPbuWzcX0OHOoSIXXB9EVgrwBvHKFZG6v5U6ukkW7HfhhKchjM4yOYqVf+b3MKw/ZRzez6i8IaOypp9qj2snQTx77aQJvt4psHEC5IAV9HoPvrUOX3+ZOGr1TCXTRJj4h22ZP73gSm1rgfpeBg4=
+	t=1763147678; cv=none; b=N0qBQ2QySTt2c0DXmm9Ij8tBlDHujW05v8VDScjsbZf1Fbms5u/Ap0PqsjUsKTsjQLe+ObVN91xmVDkpen9nZiv7cHSAfMgJPcacBIJnMQk28yneduXiBdd/q4QqHju1Nx//R112YnyLgHONAazrzboj5e4vKDKKCSZiMwtRR/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763145119; c=relaxed/simple;
-	bh=aMCkvHP40uRZdkExq4Q/mdmYLEC/bxodpGVHy5KMAvc=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AJiNCNE6xNFd/en+20DIhgE9OvlSWdFpjH3G4U3iIPH7fPDsqsZAHFwPeiVJEha+hhtkRwsJVD8zBdysH4o5YCVJ7VUFWUMhk4SQTzOzEEOUap5pY9o/wKdHU2wjSeh4+ktBtHs51Q6ESOXUIw6OAJSZ2lCp6CPoLhct7jcWFnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=DPDm2vek; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+	s=arc-20240116; t=1763147678; c=relaxed/simple;
+	bh=My3Y9e3ducF2mohQ2n4aoCRXOn2E/nZUqXPJKHyG7oc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QLbBzd5wRDqDVj5ZdTssktJ2KslxSt+mG9hFVQqYpIaZRDFiCn8SOPunB/YtOtTSGUWxaHO/nCqI6NM5PncFO1fn3YuXnAcuYN8zGi6Oul5hUi7A9Hdc8ZomdtAB0gmP1o7Z/zzk6fvKflK8HzVau/fu7lGGU7qcIXMlDGIuiJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NKERhunL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="DPDm2vek"
-Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
-	by m0089730.ppops.net (8.18.1.11/8.18.1.11) with ESMTP id 5AECBBpS3794482
-	for <linux-block@vger.kernel.org>; Fri, 14 Nov 2025 10:31:56 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=s2048-2025-q2; bh=+i65Bybqh3tzhztRSy
-	3LoecpOu42G+2xuZaorHy+OGA=; b=DPDm2vekqcmxb3JKTTQWqHgyWGTEGQtwwF
-	0RKXoLQiTM/JajetZPhCDnjuJzpzb0EuSItJ2298dY46nbaPRu79yXoAAcn7VRZm
-	4V0KKYcbS6nFLYJRQOSIHpaT2bX1WyWzHdT+SnaqDPnECHpxY6OnVjqmbDXZDhUV
-	dvhGhJ0RSiP4739EMXAOq8cpfA/QArsPm9Nx0NtuSquZv0XkrpJvRJQZ8xSTyA2U
-	ns6DNjfqPSRgdW+UPopP7eNrDgq6JRWS5xaVG0fh2y9L1dfQFHAXPD2VbX6tI627
-	6Of0W1atG/96uluPrVSQXOEZ0ElePPCs4pN2opjEYh3nqSM8kIbA==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by m0089730.ppops.net (PPS) with ESMTPS id 4ae476asur-18
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Fri, 14 Nov 2025 10:31:56 -0800 (PST)
-Received: from twshared31947.34.frc3.facebook.com (2620:10d:c0a8:1b::2d) by
- mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.20; Fri, 14 Nov 2025 18:31:51 +0000
-Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
-	id 49AE63C6D85B; Fri, 14 Nov 2025 10:31:46 -0800 (PST)
-From: Keith Busch <kbusch@meta.com>
-To: <linux-block@vger.kernel.org>, <axboe@kernel.dk>
-CC: Keith Busch <kbusch@kernel.org>
-Subject: [PATCH] block: consider discard merge last
-Date: Fri, 14 Nov 2025 10:31:45 -0800
-Message-ID: <20251114183145.519913-1-kbusch@meta.com>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NKERhunL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32CB8C19421;
+	Fri, 14 Nov 2025 19:14:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763147678;
+	bh=My3Y9e3ducF2mohQ2n4aoCRXOn2E/nZUqXPJKHyG7oc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NKERhunLvJBf9Z+pbC7lExPnhNqVDAAUA4VZjjsu7qvwJWLy7uerCBO1ZSONctBjS
+	 hWlS3AbPZi0vH4bImRuWfjtMpNAO6ahOISB1d4BDZk/qGCSzhFeZm7XfThua/Vl3fy
+	 8NonjbGkjsMPPuFWPUpaz/G/jCWYNG/rosXtdp4BhO0PMoJYGiD36+8j2BJV34eHnL
+	 xVNHeomBCbHCR2MId6g62VCpDXCQjRR6EmS8x8Afi8oEeDIlGw1pSVAq/r7y3a4kl3
+	 cMNAswUjrj6Mw5XGfiM+B/3xXQtxpTvPVw7e06/V3cgiKg40/wckRuM0tVoSQ5QcTV
+	 Vk5glnzTKWbmw==
+Date: Fri, 14 Nov 2025 11:14:35 -0800
+From: Minchan Kim <minchan@kernel.org>
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Yuwen Chen <ywen.chen@foxmail.com>,
+	Richard Chang <richardycc@google.com>,
+	Brian Geffon <bgeffon@google.com>, Fengyu Lian <licayy@outlook.com>,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-block@vger.kernel.org
+Subject: Re: [PATCHv2 1/4] zram: introduce writeback bio batching support
+Message-ID: <aRd_m00a6AcVtDh0@google.com>
+References: <20251113085402.1811522-1-senozhatsky@chromium.org>
+ <20251113085402.1811522-2-senozhatsky@chromium.org>
+ <aRZttTsRG1cZoovl@google.com>
+ <rjowf2hdk7pkmqpslj6jaqm6y4mhvr726dxpjyz7jtcjixv3hi@jyah654foky4>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: hnFaED6_4r_Nx1csOg_fQksEYNKCybY3
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTE0MDE0OSBTYWx0ZWRfX48X4BzJzeFR9
- VUpQUeYTYGUY8oxxKaRYaggSl+xosMlKtvgIvmTm8Fmj1rWCM+LzCCnp8bCRIW3cnaTl5APvtnF
- 8B3z3kx2JCW2NtGPgdTmi0+NBIJjC/GUztuW1lADg8Dd+V1GWNIzwS2vNUzRrgAWvERSGko7jiW
- LpwNp2JUQ/eQniz7QZev6w6sFz0yi328g8vencPc6F1nStDEbOXXJ5SuQLsdHPVGcFSshoN4bwi
- GKCECBpEwql7E4M4b+8Dmv44Xez9mZubiy0PfZjdItk5xnOAH1TphEHze97xZxnVm8GlW8oJJ2/
- f1guvc/1UZq+F4D8dMoFkeGeNCkVsJM9HPPdNPd9FL24YjTp+9dSxX23SXFYSzrj4EXMsUpvUJ1
- rmxbnc1Fb3Uo8p70hkbEFdq23fcO5A==
-X-Authority-Analysis: v=2.4 cv=JbSxbEKV c=1 sm=1 tr=0 ts=6917759c cx=c_pps
- a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
- a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8
- a=TxlfCqywItWwZHMmrIkA:9
-X-Proofpoint-GUID: hnFaED6_4r_Nx1csOg_fQksEYNKCybY3
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-14_05,2025-11-13_02,2025-10-01_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <rjowf2hdk7pkmqpslj6jaqm6y4mhvr726dxpjyz7jtcjixv3hi@jyah654foky4>
 
-From: Keith Busch <kbusch@kernel.org>
+On Fri, Nov 14, 2025 at 10:53:23AM +0900, Sergey Senozhatsky wrote:
+> On (25/11/13 15:45), Minchan Kim wrote:
+> [..]
+> > > +struct zram_wb_req {
+> > > +	unsigned long blk_idx;
+> > > +	struct page *page;
+> > >  	struct zram_pp_slot *pps;
+> > >  	struct bio_vec bio_vec;
+> > >  	struct bio bio;
+> > > -	int ret = 0, err;
+> > > +
+> > > +	struct list_head entry;
+> > > +};
+> > 
+> > How about moving structure definition to the upper part of the C file?
+> > Not only readability to put together data types but also better diff
+> > for reviewer to know what we changed in this patch.
+> 
+> This still needs to be under #ifdef CONFIG_ZRAM_WRITEBACK so readability
+> is not significantly better.  Do you still prefer moving it up?
 
-If the next discard range is contiguous with the current range being
-considered, it's cheaper to expand the current range than to append an
-additional bio.
+Let's move them on top of ifdef CONFIG_ZRAM_WRITEBACK, then.
+IOW, above of writeback_limit_enable_store.
 
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
- block/blk-merge.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+> 
+> [..]
+> 
+> > > +/* XXX: should be a per-device sysfs attr */
+> > > +#define ZRAM_WB_REQ_CNT 1
+> > 
+> > Understand you will create the knob for the tune but at least,
+> > let's introduce default number for that here.
+> > 
+> > How about 32 since it's general queue depth for modern storage?
+> 
+> So this is tricky.  I don't know what number is a good default for
+> all, given the variety of devices out there, variety of specs and
+> hardware, on both sides of price range.  I don't know if 32 is safe
+> wrt to performance/throughput (I may be wrong and 32 is safe for
+> everyone).  On the other hand, 1 was our baseline for ages, so I
+> wanted to minimize the risks and just keep the baseline behavior.
+> 
+> Do you still prefer 32 as default?  (here and in the next patch)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index d3115d7469df0..db08bc9060916 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -712,10 +712,10 @@ static void blk_account_io_merge_request(struct req=
-uest *req)
- static enum elv_merge blk_try_req_merge(struct request *req,
- 					struct request *next)
- {
--	if (blk_discard_mergable(req))
--		return ELEVATOR_DISCARD_MERGE;
--	else if (blk_rq_pos(req) + blk_rq_sectors(req) =3D=3D blk_rq_pos(next))
-+	if (blk_rq_pos(req) + blk_rq_sectors(req) =3D=3D blk_rq_pos(next))
- 		return ELEVATOR_BACK_MERGE;
-+	else if (blk_discard_mergable(req))
-+		return ELEVATOR_DISCARD_MERGE;
-=20
- 	return ELEVATOR_NO_MERGE;
- }
-@@ -903,12 +903,12 @@ bool blk_rq_merge_ok(struct request *rq, struct bio=
- *bio)
-=20
- enum elv_merge blk_try_merge(struct request *rq, struct bio *bio)
- {
--	if (blk_discard_mergable(rq))
--		return ELEVATOR_DISCARD_MERGE;
--	else if (blk_rq_pos(rq) + blk_rq_sectors(rq) =3D=3D bio->bi_iter.bi_sec=
-tor)
-+	if (blk_rq_pos(rq) + blk_rq_sectors(rq) =3D=3D bio->bi_iter.bi_sector)
- 		return ELEVATOR_BACK_MERGE;
- 	else if (blk_rq_pos(rq) - bio_sectors(bio) =3D=3D bio->bi_iter.bi_secto=
-r)
- 		return ELEVATOR_FRONT_MERGE;
-+	else if (blk_discard_mergable(rq))
-+		return ELEVATOR_DISCARD_MERGE;
- 	return ELEVATOR_NO_MERGE;
- }
-=20
---=20
-2.47.3
+Yes, we couldn't get the perfect number everyone would be happpy
+since we don't know their configuration but the value is the
+typical UFS 3.1(even, it's little old sice UFS has higher queue depth)'s
+queue depth. More good thing with the 32 is aligned with SWAP_CLUSTER_MAX
+which is the unit of batching in the traditional split LRU reclaim.
 
+Assuming we don't encounter any significant regressions, I'd like to
+move forward with a queue depth of 32 so that all users can benefit from
+this speedup.
+
+> 
+> [..]
+> > > +	for (i = 0; i < ZRAM_WB_REQ_CNT; i++) {
+> > > +		struct zram_wb_req *req;
+> > > +
+> > > +		/*
+> > > +		 * This is fatal condition only if we couldn't allocate
+> > > +		 * any requests at all.  Otherwise we just work with the
+> > > +		 * requests that we have successfully allocated, so that
+> > > +		 * writeback can still proceed, even if there is only one
+> > > +		 * request on the idle list.
+> > > +		 */
+> > > +		req = kzalloc(sizeof(*req), GFP_NOIO | __GFP_NOWARN);
+> > 
+> > Why GFP_NOIO?
+> > 
+> > > +		if (!req)
+> > > +			break;
+> > > +
+> > > +		req->page = alloc_page(GFP_NOIO | __GFP_NOWARN);
+> > 
+> > Ditto
+> 
+> So we do this for post-processing, which allocates a bunch of memory
+> for post-processing (not only requests lists with physical pages, but
+> also candidate slots buckets).  The thing is that post-processing can
+> be called under memory pressure and we don't really want to block and
+> reclaim memory from the path that is called to relive memory pressure
+> (by doing writeback or recompression).
+
+Sorry, I didn't understand what's the post-processing means.
+
+First, this writeback_store path is not critical path. Typical usecase
+is trigger the writeback store on system idle time to save zram memory.
+
+Second, If you used the flag to relieve memory pressure, that's not
+the right flag. GFP_NOIO aimed to prevent deadlock with IO context
+but the writeback_store is just process context so no reason to use
+the GFP_NOIO. (If we really want to releieve memory presure, we
+should use __GFP_NORETRY with ~__GFP_RECLAIM but I doubt)
+
+
+> 
+> > > +		if (!req->page) {
+> > > +			kfree(req);
+> > > +			break;
+> > > +		}
+> > > +
+> > > +		INIT_LIST_HEAD(&req->entry);
+> > 
+> > Do we need this reset?
+> 
+> Let me take a look.
+> 
+> > > +static void zram_account_writeback_rollback(struct zram *zram)
+> > > +{
+> > > +	spin_lock(&zram->wb_limit_lock);
+> > > +	if (zram->wb_limit_enable)
+> > > +		zram->bd_wb_limit +=  1UL << (PAGE_SHIFT - 12);
+> > > +	spin_unlock(&zram->wb_limit_lock);
+> > > +}
+> > > +
+> > > +static void zram_account_writeback_submit(struct zram *zram)
+> > > +{
+> > > +	spin_lock(&zram->wb_limit_lock);
+> > > +	if (zram->wb_limit_enable && zram->bd_wb_limit > 0)
+> > > +		zram->bd_wb_limit -=  1UL << (PAGE_SHIFT - 12);
+> > > +	spin_unlock(&zram->wb_limit_lock);
+> > > +}
+> > 
+> > I didn't think about much about this that we really need to be
+> > accurate like this. Maybe, next time after coffee.
+> 
+> Sorry, not sure I understand this comment.
+
+I meant I didn't took close look the part, yet. :)
