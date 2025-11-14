@@ -1,187 +1,124 @@
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D5362D662D
-	for <linux-block@vger.kernel.org>; Fri, 14 Nov 2025 17:34:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72E0E340A69
+	for <linux-block@vger.kernel.org>; Fri, 14 Nov 2025 17:39:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763141664; cv=none; b=uVRIUa7S1AuKC9pazdZUdnGW1I5VccppMANFu386jTWU/JW1r22gMA5Xn68HX8+hzUKxjXq1k5XhhvuZk+oy/W5dEQK4Va7gP4kp8xFAuYLUifG1q893ufLhJ5hbSGpcFV8crlomDdc5gAQMWLrepCbbspsYIkm+lMPA4LOJzI4=
+	t=1763141967; cv=none; b=g280Tr4dQcfIKW5G2p0myx6h/3L1naPR/0WPVsGXCmUj54fon4PGdZThRTWkv5ekRj+pzfAQNkmJMEqVZmVs+LhD5/Po31oY8K2u98lmDVSCmyRMst+asrgkqkf1ZgzR2RDYUJbtxIGaOuJJNLbRua+45iNIbOySXlruPTlnIhg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763141664; c=relaxed/simple;
-	bh=nLz43LnRd+kA17y256sY+WJKZEzD2uhppj+PkR0z9yI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LHuGnw2Nr2u0xbFJutu4uq+ZWTTfkUUjiRETNBRjnL9Va0sbkHSV5EkEHuapFvookUhb4vwCOMsrL5+n5vzGed5xJOw6oLtxTBVFVa5PhfnAt23bAi+yg10kenImntjUWLayyUd/5yxFQZNOM5iuZgJ64G8JknFez2depOdEOPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=TUKkzspe; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1763141967; c=relaxed/simple;
+	bh=Klq++H1zq3wWnDMreuLQ9vTxkpMORqg0J7GlRnDFKpI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=E+fgdxD9j/lcU0/EOsBQJ/J1VCGPEvvcDEG+lFUo5J3gNC9MafvjbEGqVsKLfm8jv5jIUuh8FL58HOGf31dyt6eRGWX0lq8qe9cP0LMKGuNeBE7sKG4jWtrCGidqrFCCzhzvRRkz0iesh2yXDPdETjRUM44FkVO37ddTjoHr6us=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=bZKDCn5L; arc=none smtp.client-ip=209.85.166.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="TUKkzspe"
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-7ad1cd0db3bso2010180b3a.1
-        for <linux-block@vger.kernel.org>; Fri, 14 Nov 2025 09:34:21 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="bZKDCn5L"
+Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-9486248f01bso79689339f.0
+        for <linux-block@vger.kernel.org>; Fri, 14 Nov 2025 09:39:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1763141661; x=1763746461; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cxEoFbzQwfAmuQdYnQsCZazVU2iXkrM1iusny5D0ajU=;
-        b=TUKkzspeJjTakJJXhlfDGyDdpysn7pP2C1c1gDCitm0YNlqO6OBl5lFoO5uOI+JH7x
-         ikyWdI8M/NN3XQzxo+KBpspp/6lHHPdG6GAH4PXiA2feRU08fJg7i9ikckZBjFNbRt3X
-         Q57YsgwDXuhUa41IWhwJwuNaz7ISgMexnCntlnDmoTg1ulFmjn4A8wGNfWbQ7j3lkh+F
-         3662B9MxMXM+EK5kgppPJjAtJBv/4i4RUJIGGETlV0a77ZTKwNv3pbbvcV0l+Zq65j29
-         Upc24lVx4RjVFBKpkqA3Q8puoofDc/GfVTvNCyofKkh5c+xDmjsn71/2vut3MZMiN9Cw
-         Dhdw==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1763141963; x=1763746763; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lZaaDarMi0uZmQYGpNnbLmsBdRPS9KXQOUgY8RY+ykY=;
+        b=bZKDCn5L0TbYLnGoZCeotvJFScQbDVpr7R4SpQWJGnBGZWM1hIFRNGl3Z5rgT95n0O
+         HbirAJctoll1lpo7RBFz+lIDWgOyQ5k1dlJVyrmyEl6Vs28jpWwLgU4TTmVUAhsG9sS8
+         5nKVkUYx43K+YqZNBNg/xMIe+Qh1wGgwNzOMggcrsytqEq6URInmq/xdbaL2bKZdlhJA
+         VmC3Nu1Mm3MmKSgLhIVVy/LQpSetkjECrQ2tWTq2t9L/mloDFlrrhTGeEY/MbY3VOBUh
+         q3EXuZecEaIDxpv3wawZhYCWXdtRWMVcuds1vR9VChBqGdkHe6RvHUr/vNy1DsZKa1Td
+         3GNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763141661; x=1763746461;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cxEoFbzQwfAmuQdYnQsCZazVU2iXkrM1iusny5D0ajU=;
-        b=Y26pAIz5YDI1H5JrmYsbea0N94+S0+15AkCCH5k9NfYHCjfAKWmTjEi76FMLB6gO3R
-         Whe9LVFgkQPL18z2GkdxqbuiMJTzq57/vLUMYfQSBPd27wdwgPgAE6nqwp/wj+ShP3+F
-         IOvrZAkuP1h+wOhYZo5A/Mw/P4r7pfwcgI2BGA8wZGPVji8U0+tY2eknEAe5jvKx06Ro
-         r2NQNvP9TKzwcGC5jTqTaUR/Xv1F5dmliVdLuFObRbansLd/1yGDfbpQRjRkvL8nQwOB
-         1eye+4yT4unei7fkAgjrvyokqx23dKXtCid015/G/Ssjw2VYVOWBuH0FgMo6LDSgQ8jp
-         5heA==
-X-Forwarded-Encrypted: i=1; AJvYcCUcQNW3gfcoKdO9ivRO5A18Nbyju8gSeTAKa2CvxP5ZSGjNL3R6OBQjRpacjs35RQSBRuhonhQk6D0tPg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4uH2A6JizCEvaw6fCS41lbgTkxDi0z96CQmM7EnvK0ncuffV/
-	svIMv61JAGKDK9178hztSIbzRaKLXZ1mIv/Ujbo9pOjmUQGo/AXoRbF/Sa2oDX59E/0=
-X-Gm-Gg: ASbGncu4ZvGaKgZ8m+Eg4wYDrBzct6MxLB5sru82kP7lT1MWxv62xIeVc73iq/F/BiN
-	/QcIjFJ0JZfV+mOZfT+yJsQCjiz4vxoM6VFJPC5PADCSnSzxCP3cZ8lEg9cNJL5AdK3NnU9m243
-	XnCq7/IxfCsttvDWx9xBSRV0H+rWZVOBscols6aX9zGZUMVY/QHPRdmzs1Oa2zeKqk3wfT0/BHw
-	8s0Du4lFpNcWhSh22ysSejvhIrZD66gezMXMjva69hn4NVNPwmgwKU6aregQfpRq04OYrLHjdZ8
-	fWhsUakPJdO8g7M0TF/WzOj3c0Cd05KSR7myMajYKYGJU/laXR/C0DfloISs7u5mbRSrL3s7dfS
-	Vj6A5c6JE3+vZqgdLzQyAUnOb8Qn6R1Z5kn3d6XAOqE10j6PZbob5SpJ3UzjFZObl+oro45Ss/z
-	s8MCjL9bymvYySJqkkuS4l5B7OwDkT3iZC2ANHrXn4Ww==
-X-Google-Smtp-Source: AGHT+IHDaJWCuyrcAQ7bh/F0PTreqc48q+/8A87q7fLc4R6puX9/rJVN4MbbzRVHyhCNNkpaJDzXLQ==
-X-Received: by 2002:a05:7022:619e:b0:11b:38c:5370 with SMTP id a92af1059eb24-11b411ff1c3mr1214091c88.20.1763141660782;
-        Fri, 14 Nov 2025 09:34:20 -0800 (PST)
-Received: from medusa.lab.kspace.sh ([208.88.152.253])
-        by smtp.googlemail.com with UTF8SMTPSA id a92af1059eb24-11b06088604sm12363461c88.7.2025.11.14.09.34.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Nov 2025 09:34:20 -0800 (PST)
-Date: Fri, 14 Nov 2025 09:34:19 -0800
-From: Mohamed Khalfella <mkhalfella@purestorage.com>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Casey Chen <cachen@purestorage.com>,
-	Vikas Manocha <vmanocha@purestorage.com>,
-	Yuanyuan Zhong <yzhong@purestorage.com>,
-	Hannes Reinecke <hare@suse.de>, linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] nvme: Convert tag_list mutex to rwsemaphore to avoid
- deadlock
-Message-ID: <20251114173419.GA2197103-mkhalfella@purestorage.com>
-References: <20251113202320.2530531-1-mkhalfella@purestorage.com>
- <aRcVWtE4fHCe3jjM@fedora>
+        d=1e100.net; s=20230601; t=1763141963; x=1763746763;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lZaaDarMi0uZmQYGpNnbLmsBdRPS9KXQOUgY8RY+ykY=;
+        b=opnGWOQ/JWAjRdlBOFTUo9mzS/pu+66zSjVfmzL6yS1uXPvxJiXxypxc6YHN8XBdau
+         0Cj9aylqZhuv4bQPEL16CSxNAyFeVjY03U1+FRrQGzxnzte7sS8jlTTg/yoP+bAY9GWg
+         MDJst/U6aeUPRigdNiTb4EoEKxUxTkm6lU2tuA7vtj/3AKo03yBTjdvbL5OzrLO3q9qL
+         lYvxkYJkItWTLsIiom7qKyiWJPUoW0zD2enCd+J/CGwB83CKNlE1PaAvWN3tn9Aeu8Ti
+         p2R1G6Y7QJX8MAySdDa00J/SO1LbzaQBWkjNOxPjtB0kwdXJ1J8trJIWOpS9tZ3D3NvN
+         YQ+A==
+X-Gm-Message-State: AOJu0YzHA+xTIPba2VreZTu/O8ZTRntiL7ARXE4dXgpjAmVGAhH7gY+p
+	gnGm4QZ4dPWV8nuE37xXytwZ85U8mcrbJ2o1cLXaaUs6WKX7vehgnRiyRzeLtz/WJeRZj9XFzpX
+	OUyPa
+X-Gm-Gg: ASbGncvn8AH28yK0gaIny9b1A82h1lNyie5ANmm9XRDm1C1ssydwULyz+aqrmjihXHd
+	abH3se7dPlMf7MgYEeILMNP/6NlD8cpT+HY+1yTznlLPwHmaG+c2rd82moFdgQm33M3HrzttP2w
+	+I1CgEOQ2UV1eG4ZO2OSjGkg1DCxysK2uRXDI5RdKHrfXIj5xPhrwG2t8rW+echE9OVs+Ztk+a6
+	LWlBSBtsMEHo8n3MAvs90vp6M8fHZNHXOPmTfIp8MTb0SCsvqNmh0eTyF7KfUpruIT4Xz6uOsHO
+	XxNZAKxB63+yaXd17CZmXyPQtYWokj19h6JOQEpd+u4Xfn6mkTvkmxxBD3SuRR7PAbaEM23T++N
+	KElKki73BgZNmlOUfxqbhh3P8zsn73HNkboit/Lcc7HWaS16by32NWU8KEvULpCFHiky6nh/rrJ
+	KDBxkMllA=
+X-Google-Smtp-Source: AGHT+IEjcZzHdGktbTOeAvLIuYkdqP8emkJEPDTbPxihjchGZYlR3EBTZoHoVOIlFQFJfLry0Ohr7A==
+X-Received: by 2002:a05:6e02:1a21:b0:433:771e:3dd6 with SMTP id e9e14a558f8ab-4348c87a9f4mr58244765ab.6.1763141963425;
+        Fri, 14 Nov 2025 09:39:23 -0800 (PST)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-434839badb6sm28987385ab.27.2025.11.14.09.39.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 14 Nov 2025 09:39:22 -0800 (PST)
+Message-ID: <fec67c88-53f5-4482-aeef-86e1213d187e@kernel.dk>
+Date: Fri, 14 Nov 2025 10:39:21 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aRcVWtE4fHCe3jjM@fedora>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] fix floppy for PAGE_SIZE != 4KB
+To: =?UTF-8?Q?Ren=C3=A9_Rebe?= <rene@exactco.de>
+Cc: linux-block@vger.kernel.org, efremov@linux.com
+References: <20251114.144127.170518024415947073.rene@exactco.de>
+ <b1e17016-3d4d-4fac-b5b0-97db357d0749@kernel.dk>
+ <20251114.172543.20704181754788128.rene@exactco.de>
+From: Jens Axboe <axboe@kernel.dk>
+Content-Language: en-US
+In-Reply-To: <20251114.172543.20704181754788128.rene@exactco.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri 2025-11-14 19:41:14 +0800, Ming Lei wrote:
-> On Thu, Nov 13, 2025 at 12:23:20PM -0800, Mohamed Khalfella wrote:
-> > blk_mq_{add,del}_queue_tag_set() functions add and remove queues from
-> > tagset, the functions make sure that tagset and queues are marked as
-> > shared when two or more queues are attached to the same tagset.
-> > Initially a tagset starts as unshared and when the number of added
-> > queues reaches two, blk_mq_add_queue_tag_set() marks it as shared along
-> > with all the queues attached to it. When the number of attached queues
-> > drops to 1 blk_mq_del_queue_tag_set() need to mark both the tagset and
-> > the remaining queues as unshared.
-> > 
-> > Both functions need to freeze current queues in tagset before setting on
-> > unsetting BLK_MQ_F_TAG_QUEUE_SHARED flag. While doing so, both functions
-> > hold set->tag_list_lock mutex, which makes sense as we do not want
-> > queues to be added or deleted in the process. This used to work fine
-> > until commit 98d81f0df70c ("nvme: use blk_mq_[un]quiesce_tagset")
-> > made the nvme driver quiesce tagset instead of quiscing individual
-> > queues. blk_mq_quiesce_tagset() does the job and quiesce the queues in
-> > set->tag_list while holding set->tag_list_lock also.
-> > 
-> > This results in deadlock between two threads with these stacktraces:
-> > 
-> >   __schedule+0x48e/0xed0
-> >   schedule+0x5a/0xc0
-> >   schedule_preempt_disabled+0x11/0x20
-> >   __mutex_lock.constprop.0+0x3cc/0x760
-> >   blk_mq_quiesce_tagset+0x26/0xd0
-> >   nvme_dev_disable_locked+0x77/0x280 [nvme]
-> >   nvme_timeout+0x268/0x320 [nvme]
-> >   blk_mq_handle_expired+0x5d/0x90
-> >   bt_iter+0x7e/0x90
-> >   blk_mq_queue_tag_busy_iter+0x2b2/0x590
-> >   ? __blk_mq_complete_request_remote+0x10/0x10
-> >   ? __blk_mq_complete_request_remote+0x10/0x10
-> >   blk_mq_timeout_work+0x15b/0x1a0
-> >   process_one_work+0x133/0x2f0
-> >   ? mod_delayed_work_on+0x90/0x90
-> >   worker_thread+0x2ec/0x400
-> >   ? mod_delayed_work_on+0x90/0x90
-> >   kthread+0xe2/0x110
-> >   ? kthread_complete_and_exit+0x20/0x20
-> >   ret_from_fork+0x2d/0x50
-> >   ? kthread_complete_and_exit+0x20/0x20
-> >   ret_from_fork_asm+0x11/0x20
-> > 
-> >   __schedule+0x48e/0xed0
-> >   schedule+0x5a/0xc0
-> >   blk_mq_freeze_queue_wait+0x62/0x90
-> >   ? destroy_sched_domains_rcu+0x30/0x30
-> >   blk_mq_exit_queue+0x151/0x180
-> >   disk_release+0xe3/0xf0
-> >   device_release+0x31/0x90
-> >   kobject_put+0x6d/0x180
-> >   nvme_scan_ns+0x858/0xc90 [nvme_core]
-> >   ? nvme_scan_work+0x281/0x560 [nvme_core]
-> >   nvme_scan_work+0x281/0x560 [nvme_core]
-> >   process_one_work+0x133/0x2f0
-> >   ? mod_delayed_work_on+0x90/0x90
-> >   worker_thread+0x2ec/0x400
-> >   ? mod_delayed_work_on+0x90/0x90
-> >   kthread+0xe2/0x110
-> >   ? kthread_complete_and_exit+0x20/0x20
-> >   ret_from_fork+0x2d/0x50
-> >   ? kthread_complete_and_exit+0x20/0x20
-> >   ret_from_fork_asm+0x11/0x20
+On 11/14/25 9:25 AM, Ren? Rebe wrote:
+> From: Jens Axboe <axboe@kernel.dk>
 > 
-> It is one AB-BA deadlock, lockdep should have complained it, but nvme doesn't
-> support owned freeze queue.
+>> On 11/14/25 6:41 AM, Rene Rebe wrote:
+>>> For years I wondered why the floppy driver does not just work on
+>>> sparc64, e.g:
+>>>
+>>> root@SUNW_375_0066:# disktype /dev/fd0
+>>> --- /dev/fd0
+>>> disktype: Can't open /dev/fd0: No such device or address
+>>>
+>>> [  525.341906] disktype: attempt to access beyond end of device
+>>>                fd0: rw=0, sector=0, nr_sectors = 16 limit=8
+>>> [  525.341991] floppy: error 10 while reading block 0
+>>>
+>>> Turns out floppy.c __floppy_read_block_0 tries to read one page for
+>>> the first test read to determine the disk size and thus fails if that
+>>> is greater than 4k. Adjust minimum MAX_DISK_SIZE to PAGE_SIZE to fix
+>>> floppy on sparc64 and likely all other PAGE_SIZE != 4KB configs.
+>>
+>> 16k seem like a lot to read from a floppy, no? Why isn't it just
+>> reading a single 512b sector? Or just cap it at 4k rather than do
+>> a full page, at least?
 > 
-> Maybe the following change can avoid it?
-> 
-> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-> index c916176bd9f0..9967c4a7e72d 100644
-> --- a/drivers/nvme/host/pci.c
-> +++ b/drivers/nvme/host/pci.c
-> @@ -3004,6 +3004,7 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
->         bool dead;
-> 
->         mutex_lock(&dev->shutdown_lock);
-> +       nvme_quiesce_io_queues(&dev->ctrl);
->         dead = nvme_pci_ctrl_is_dead(dev);
->         if (state == NVME_CTRL_LIVE || state == NVME_CTRL_RESETTING) {
->                 if (pci_is_enabled(pdev))
-> @@ -3016,8 +3017,6 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
->                         nvme_wait_freeze_timeout(&dev->ctrl, NVME_IO_TIMEOUT);
->         }
-> 
-> -       nvme_quiesce_io_queues(&dev->ctrl);
-> -
->         if (!dead && dev->ctrl.queue_count > 0) {
->                 nvme_delete_io_queues(dev);
->                 nvme_disable_ctrl(&dev->ctrl, shutdown);
-> 
-> 
+> Well, on my sparc64.config it is just 8k and I did not feel like
+> changing this vintage code more than was necessiary to write a floppy
+> for a Firmware update of another systems while my Ultra10 was the only
+> system with a floppy drive in my office. But even 16k or 64k is not
+> that much of a 1.44mb disk.
 
-Interesting. Can you elaborate more on why this diff can help us avoid
-the problem?
+64k is 4% of a floppy disk! But I hear you, works for you.
 
-If the thread doing nvme_scan_work() is waiting for queue to be frozen
-while holding set->tag_list_lock, then nvme_quiesce_io_queues() moved up
-will cause the deadlock, no?
+> But if someone wants to refactor this code some more, ... I'm happy to
+> test it, too ;-)
+
+I don't think refactoring would be required here, it's probably just
+capping that probe read to something constant irrespective of hardware
+page sizes.
+
+-- 
+Jens Axboe
