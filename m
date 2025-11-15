@@ -1,155 +1,104 @@
 Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDCC961FFE
-	for <linux-block@vger.kernel.org>; Sat, 15 Nov 2025 02:26:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51F4513A244
+	for <linux-block@vger.kernel.org>; Sat, 15 Nov 2025 02:35:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763173565; cv=none; b=XcARoEFsiGqICfNOmVriG4elIh9HQp5Hd9YujgndrctkcKQwgATOTSVwbON0ZwZ/P+2OsBOjxvO0XnrfbGkyJ0LwrZk2xT7glGyyxXRaNSXsO71VEFt9CHJAAq31fJcwm8dvMm1aYgDI6YN5oT37jMxJ4LGzT7HtfI4OHRfUjY0=
+	t=1763174110; cv=none; b=puW/JnFVMBQdYq6EI0xkB5KmnvQkI1qyvaN4tHQvnXjPngqlSbCa0UAAYCZ14iS7PbuHH1X/OLOkXspXjFUgoC6HowaYdffWvjFzf0AVVJtxCYjOAuYZe82NJbLeP6Iz/cCDPgIrdVliCvfbF6h0U6EJvNu+A23wmMQwpvsMg28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763173565; c=relaxed/simple;
-	bh=EfIbv215Kt4SY1TIo+8uK6qOfxJKFjYXTEd+gVNH8QE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YgwZnvCYiWLZY3q9Q0fALMfeQSdt3qUN+GXNjbVngixU2So+eEu+bRIPDnbgzwpFgJA0ePTzps3eSXx2cEjUnty7qua1haPXSPjAXBQFCevN7gPl4gCDX93ifnaCdJ5YhTDRAdR9K1skNVFWqMC+NDkTM7/vGRo/HvLJ1pSyU8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=a4MgE4Jb; arc=none smtp.client-ip=209.85.214.181
+	s=arc-20240116; t=1763174110; c=relaxed/simple;
+	bh=3gu/Lt+2RDWE54kpBmJj0bCUrtvnlOmSE4DBon4d+6E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SX5PLmkUoWQk+pdaqGIuymkQ2eCceS+FV6NuQcfr7fKKKUvJmGkiny75oLlTHW3Os7kVzcpemicU2gj/g1jV1o1n00GgzMtURjr5pdF5S8CUhIry3j8YzVm5ixOE30IMIH/fcwlD89O9lwM7jF9qwjdVNJPF2f/BOOZ7qZ+5Wl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=arkMzSxW; arc=none smtp.client-ip=209.85.214.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="a4MgE4Jb"
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-297f35be2ffso38318875ad.2
-        for <linux-block@vger.kernel.org>; Fri, 14 Nov 2025 18:26:01 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="arkMzSxW"
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-297f35be2ffso38376145ad.2
+        for <linux-block@vger.kernel.org>; Fri, 14 Nov 2025 18:35:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1763173561; x=1763778361; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gvIo+2FZ6EfZjFDRwQfsjxC3rzbK6C8gqJLE1Fnuis8=;
-        b=a4MgE4Jbh5hKevYmxcbCFhHUZVmsBGHttHIkxHmpAQJoI5slss2q/zato5d0iBoHJ1
-         9Rxehve7iDV3mSBXnV0t1QHQCBg1nNaH92/2sfocBvR2OLF5xOLafzRSvp0fyliP3mSh
-         F+4T3R1esx3ESCzcYBOIWU381F3y9Fqjw2oTg=
+        d=chromium.org; s=google; t=1763174105; x=1763778905; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=bvGwPC/29enE/uDNSsqwLmFNQ1QdSQel3u5hnxMC1QA=;
+        b=arkMzSxWdkH4TdawRnCD/1K/VUheh2/EAELyBIB/EkvgB9OsfA0zihqLlSsM9p0oRj
+         i45w+HNSl2IqXwcef0oTbPcSVzT9pZIv/vYqZhlmJ2VZwNuVBZCDesq0+SdE05vSs2Cf
+         Dxlt3TgOX0+WJSn5DiqwBZCwaFJ7p0d8h1QzA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763173561; x=1763778361;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gvIo+2FZ6EfZjFDRwQfsjxC3rzbK6C8gqJLE1Fnuis8=;
-        b=vxgJ/OVSi50BQZTP4tJ+IWr3pLPVQlrk6kYSqWeoirUULLtH1IPfofRRvh07YtMl0N
-         nI8Mxpu01boTb+e1kQtyhw8Fe+zjtn15h+8LKKBIwCrgFSFqJPEkIE7iT3Rdsm+40+Uo
-         qYLbQB+yTDvnh4UvoRCL+McqO/CTmiJP04aWg2JViy5a8jYbU2UQ41XRop7fDjf7KfiD
-         aU7Mk22FZpbSAkYXhSPWwjFMNZk1Zst+opFkuaDAxGR4f7P+J7MFAkfeQ5uY28FFxI+w
-         4syFn1aNR+PNPQo7RR45PfqxGAksfayOaQgrY19BPV6JzdG8TDR40IuZaprzG/9rYiob
-         5bBg==
-X-Forwarded-Encrypted: i=1; AJvYcCVOT9pNMGRd8mHVztiFMCu9+rpFKWw8vziYCIkS/uI38wxOWZ7gQY0Jz7eRySn3dk3DXnnKgdGCwmiezw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzCR8MIsZjt/L0pZik4Rgtre7NKcRU6Tb62Arf71IAtePLYXMVS
-	A+TxNWlXkNeoi3vw6gka0g0qzRkDoKanhJh6GoQGOrNkt6EFMDvHfHq24njRYWLfTQ==
-X-Gm-Gg: ASbGnctOFqZHCcGZgtY2hrafcujHnecQkMeego50P04VUc7nBjXKl1qi9p6G44Fq9Q9
-	46vINST2Dll8iAkoSisFkTJbz7kX2/8CGYRqWMNTx4dUOKsMSMwbL/A6e1geLCHEmLrZJ2AEuZ+
-	butS/ce/BV8fW5acfabJm6AeXu4w98X8eVmihK07E3/4PddkvEtGdOlcIYp+7QAhuAunfI3TVi2
-	UmNWvfAbm9yROAkiaEm5MycLXO5YsbcWHXIep96dlHgLBVSnRkMaNhl7ebLcG50NiNdFLXOoSVP
-	RQ4qdqKvxmoWTBJ1kUeEhJCoV6dk7D+XUi7fnq3T+GcPrmrxJL81/dWWBSNFIc/P/5nzWufuGBk
-	9W7W3JhPTqtsTt9+s07ilfbS5yXtevLBFdXMTSj3G6EYKTuyFlTAhF8EBj8DuNJDjVQw0GObSYx
-	9n/PpCwXUoqWVYSA==
-X-Google-Smtp-Source: AGHT+IErNbdNIWz3yRgr2AVKBX9ONMzdwgKUAcvQOJAS+HeDR5jF0B3ToxhaPZ0vVdrGWcO8Z2zZRA==
-X-Received: by 2002:a17:902:fc86:b0:295:f1f:65f with SMTP id d9443c01a7336-2986a7414c9mr50925375ad.31.1763173561010;
-        Fri, 14 Nov 2025 18:26:01 -0800 (PST)
-Received: from google.com ([2401:fa00:8f:203:8e2:bf91:1dd0:a9c0])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2985c245e04sm68472305ad.38.2025.11.14.18.25.58
+        d=1e100.net; s=20230601; t=1763174105; x=1763778905;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bvGwPC/29enE/uDNSsqwLmFNQ1QdSQel3u5hnxMC1QA=;
+        b=JCrM4DAW1KgIn2eTTDzWNAwbQ4bucfdoQCzpCB4zlaa535D9vll4VoohEcE1tjcHeI
+         9PYf9RlGaskzd81GRDvKFezU1KSes0tnwn+gB2sZFBQ8SgXodFn0Y/2wsGWCYndpHWjl
+         ZIvXCbQ8Dj+P27p1pJKymVNJfifTq3oI2dURISH1Xah53JznlpQOIWGoBqiPV/IQZ+5u
+         crBLKOrU9XXTr6hwe2nMyJCHHowqYaS1Ob2VIFjNvN98q7x9fZtyl3HjJASPgyKVgcIB
+         7IlY7hkVVVR35XXQGBSyBX+lZzAdhyBmYXrKu4JCRXZYTptX0i9CqrtlTISO7rk0HCmp
+         vQaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUSBC0eALtnaRq5EXGmG+GZRD/4nmBYWR5chXfUew0q7Bfs+FxxUjqN7TOF1Qt4T7y5IqoNyC3rZgRoQg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEfaa+6Ypo0BResmBDcIS/acezbUR+cccg7RNeJIVBWMmnoHVV
+	JC7LryW/ElgGDtXhWJBthYGDEPowB5TO6OO40cSuWeorIt+0gEe1V06T6pPo/FHX4w==
+X-Gm-Gg: ASbGncs5+RKobrs67gQ3LIj8J3DU7hkqJNWbZP9g3Fa3eHIGsiGtnL+mFRbSXEMYtSG
+	WXYO8ygJcZ4031DOQrftSoc5oTpRHbKkUDzqFdesOptlfBpXxxJE38WdrB9vLLEBb71oB4h2ZKh
+	Z7nJDFb+D6bqh3V9eNbvDNCIK8actYMonfIeczg0iQ3VB41myEoiFZyKJEK7SFXBtt0IacY5yl6
+	bR/0b5MiWPeankgwUb6QqQuz7ZgjeeFFw4slpXAQCVaItL234dmJ7Vn983Kno4q0y8YxZpe8Ht8
+	eLeCcelOEALVvh9apsZLMuSLZ2YT9d4bC4NWNEedQSVc8YbhNVQu4feRRqpmH+hrGQiLh4ywiIL
+	VXO441BWArxzvKrOluJR/KmBVzSdhr+RSqIc1O61phwy4U51lv7uKMJZ9oU5gZdxHj05vWQXXwt
+	r/OhZc8c+bP/JEV8tZPRCZebsayQsDZjQVPj+4qw==
+X-Google-Smtp-Source: AGHT+IEtm5GlISBRItBssRqjjMdpT5JTRyYu+xENZW+2fV+/0mSOGCmWTuVBcIzHooQpUVRS/VwIXw==
+X-Received: by 2002:a17:903:1aed:b0:295:3eb5:6de1 with SMTP id d9443c01a7336-2986a7414d6mr53788275ad.34.1763174104609;
+        Fri, 14 Nov 2025 18:35:04 -0800 (PST)
+Received: from tigerii.tok.corp.google.com ([2401:fa00:8f:203:b069:973b:b865:16a1])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2985c2b1088sm68641555ad.57.2025.11.14.18.35.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Nov 2025 18:26:00 -0800 (PST)
-Date: Sat, 15 Nov 2025 11:25:55 +0900
+        Fri, 14 Nov 2025 18:35:04 -0800 (PST)
 From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Minchan Kim <minchan@kernel.org>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, Yuwen Chen <ywen.chen@foxmail.com>, 
-	Richard Chang <richardycc@google.com>, Brian Geffon <bgeffon@google.com>, 
-	Fengyu Lian <licayy@outlook.com>, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-block@vger.kernel.org
-Subject: Re: [PATCHv2 1/4] zram: introduce writeback bio batching support
-Message-ID: <rgbcwa6rcfxpyf75k6voinza7ba2fnsht45kb6ittv4qrbrmyb@i25srryjss3i>
-References: <20251113085402.1811522-1-senozhatsky@chromium.org>
- <20251113085402.1811522-2-senozhatsky@chromium.org>
- <aRZttTsRG1cZoovl@google.com>
- <rjowf2hdk7pkmqpslj6jaqm6y4mhvr726dxpjyz7jtcjixv3hi@jyah654foky4>
- <aRd_m00a6AcVtDh0@google.com>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Minchan Kim <minchan@kernel.org>,
+	Yuwen Chen <ywen.chen@foxmail.com>,
+	Richard Chang <richardycc@google.com>
+Cc: Brian Geffon <bgeffon@google.com>,
+	Fengyu Lian <licayy@outlook.com>,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-block@vger.kernel.org,
+	Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: [PATCHv3 0/4] zram: introduce writeback bio batching
+Date: Sat, 15 Nov 2025 11:34:43 +0900
+Message-ID: <20251115023447.495417-1-senozhatsky@chromium.org>
+X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aRd_m00a6AcVtDh0@google.com>
+Content-Transfer-Encoding: 8bit
 
-On (25/11/14 11:14), Minchan Kim wrote:
-> > > How about moving structure definition to the upper part of the C file?
-> > > Not only readability to put together data types but also better diff
-> > > for reviewer to know what we changed in this patch.
-> > 
-> > This still needs to be under #ifdef CONFIG_ZRAM_WRITEBACK so readability
-> > is not significantly better.  Do you still prefer moving it up?
-> 
-> Let's move them on top of ifdef CONFIG_ZRAM_WRITEBACK, then.
-> IOW, above of writeback_limit_enable_store.
+This is a rework of Yuwen's patch [1] that adds writeback bio
+batching support to zram, which can improve throughput of
+writeback operation.
 
-Done.
+[1] https://lore.kernel.org/linux-block/tencent_0FBBFC8AE0B97BC63B5D47CE1FF2BABFDA09@qq.com/
 
-> > > How about 32 since it's general queue depth for modern storage?
-> > 
-> > So this is tricky.  I don't know what number is a good default for
-> > all, given the variety of devices out there, variety of specs and
-> > hardware, on both sides of price range.  I don't know if 32 is safe
-> > wrt to performance/throughput (I may be wrong and 32 is safe for
-> > everyone).  On the other hand, 1 was our baseline for ages, so I
-> > wanted to minimize the risks and just keep the baseline behavior.
-> > 
-> > Do you still prefer 32 as default?  (here and in the next patch)
-> 
-> Yes, we couldn't get the perfect number everyone would be happpy
-> since we don't know their configuration but the value is the
-> typical UFS 3.1(even, it's little old sice UFS has higher queue depth)'s
-> queue depth. More good thing with the 32 is aligned with SWAP_CLUSTER_MAX
-> which is the unit of batching in the traditional split LRU reclaim.
-> 
-> Assuming we don't encounter any significant regressions, I'd like to
-> move forward with a queue depth of 32 so that all users can benefit from
-> this speedup.
+v2->v3:
+- addressed Minchan's feedback
+  - changed GFP flags, dropped SYNC req, minor code tweaks.
 
-Done.
+Sergey Senozhatsky (3):
+  zram: add writeback batch size device attr
+  zram: take write lock in wb limit store handlers
+  zram: drop wb_limit_lock
 
-> > So we do this for post-processing, which allocates a bunch of memory
-> > for post-processing (not only requests lists with physical pages, but
-> > also candidate slots buckets).  The thing is that post-processing can
-> > be called under memory pressure and we don't really want to block and
-> > reclaim memory from the path that is called to relive memory pressure
-> > (by doing writeback or recompression).
-> 
-> Sorry, I didn't understand what's the post-processing means.
-> 
-> First, this writeback_store path is not critical path. Typical usecase
-> is trigger the writeback store on system idle time to save zram memory.
-> 
-> Second, If you used the flag to relieve memory pressure, that's not
-> the right flag. GFP_NOIO aimed to prevent deadlock with IO context
-> but the writeback_store is just process context so no reason to use
-> the GFP_NOIO. (If we really want to releieve memory presure, we
-> should use __GFP_NORETRY with ~__GFP_RECLAIM but I doubt)
+Yuwen Chen (1):
+  zram: introduce writeback bio batching support
 
-Done.
+ drivers/block/zram/zram_drv.c | 410 +++++++++++++++++++++++++++-------
+ drivers/block/zram/zram_drv.h |   2 +-
+ 2 files changed, 325 insertions(+), 87 deletions(-)
 
-I wouldn't necessarily call it "wrong", we do re-enter zram
-	
-	user-space wb > zram writeback -> reclaim IO -> zram write page
+--
+2.52.0.rc1.455.g30608eb744-goog
 
-it's not deadlock-ish, for sure, but still looked to me important enough
-to avoid, so that writeback would be more robust and make faster forward
-progress (by actually saving memory) in various situations, including
-possible memory pressure.  Changed in v3.
-
-> > > I didn't think about much about this that we really need to be
-> > > accurate like this. Maybe, next time after coffee.
-> > 
-> > Sorry, not sure I understand this comment.
-> 
-> I meant I didn't took close look the part, yet. :)
-
-Ah, I see :)
