@@ -1,69 +1,75 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A49514A60C
-	for <linux-block@vger.kernel.org>; Sat, 15 Nov 2025 02:37:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17578EAE7
+	for <linux-block@vger.kernel.org>; Sat, 15 Nov 2025 03:42:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763174253; cv=none; b=tu0k3LVaALl/Oo+5psa7myHVdKWofEbkk8DQSssamIJvEadcpqi+NMN/4396kGNLi75EGqKwf4rjTXfqVEWewVn+tAtGSPvONB9JRAzWGFGLYdG6oqQbIAYvK6e4pIsC9EdjntqUp4XNxF6+CS4ZrxgiH4ZMRAGJMgU3E9Sl35w=
+	t=1763178140; cv=none; b=meTbqn/8qJXyarmeUpdnVvmPupAFjnC7jSETDpq7R58SJJVNyEAGkcoGzfiuAid2rpcMSLA8pbHuTRr0G+iyTWqsi7Y7Y/gFLX/2QVU6MTcFjAYPXSPywOiMVE0N2yWXIr+u4hzdiHiqz5DyS0yt6fcapZTfN47TQI7zZ60XT/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763174253; c=relaxed/simple;
-	bh=HePIT3yczan3hTWI74USDCto/HNVdgpcjZbVU9ifQog=;
+	s=arc-20240116; t=1763178140; c=relaxed/simple;
+	bh=8fbJMn3a2CnI53IMpCv6vTPvdaCVUb+Qvl+uByHlSSE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VUiey2uEe3hQ/29uE7rcUbY8Q+iRZSmH/RecTmTwrorLFeTAOFLoRx/gjiazUHHbcJPOE3XihZg4rMSfuZmFKd9on0eN7t3qe7EAY0sfrC2lpq975Nm5eFHzUY7lO+oq4pt4j7d78ZJeOnLxTBEzoO42bg3QYjaAIEdhgY8Pe68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=Go55bFZd; arc=none smtp.client-ip=209.85.214.177
+	 Content-Type:Content-Disposition:In-Reply-To; b=gPDXApZB2lnjiLx45On635FaANZXfwZATVwH/3Nu67mFAPcyH7nKvR4QeL+h/DHYycnW5Ng/OoHc8pZCbQ5Qnx4rZPBxuv8qCH47REFwCPR8ahAuB13xir5qtSeu7DwI5KdOtkNOnw2jNkWomk4hA6TCAh6wK+lnT3IZeokK3dk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=GsoXXtt6; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Go55bFZd"
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-29845b06dd2so28240665ad.2
-        for <linux-block@vger.kernel.org>; Fri, 14 Nov 2025 18:37:31 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="GsoXXtt6"
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2964d616df7so35575745ad.3
+        for <linux-block@vger.kernel.org>; Fri, 14 Nov 2025 19:42:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1763174251; x=1763779051; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1763178138; x=1763782938; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Medgtts3GbALKGd7rnGlqiSFg3iMYy8R/qbPdHzfI5c=;
-        b=Go55bFZdPaL6U/bvbMV8NXxbRF+OvS/yhJLU6ixtAERrBuEXExff2vZMgJJI6cS84k
-         9bGFOqTPUa3haop/6DJ1lxE91XGm/XBgvVz+dtzuQc3NjSSLIFU7sC4R9CO5KMnci7hu
-         j4ZZwAeDSgTKVVMkw4CnznENYhmHZqZA6fuxE=
+        bh=4Af+nXEWtEaAxNcvRVetKdQJrBk2sAifaziyN+YLmfE=;
+        b=GsoXXtt6BvTB3Ar00m4qBbyDLcngTl8SKHtDawjwLm3xFKx8mhLAqrjA0gewye9FiV
+         UNKHXBmHBOXbr6xgXk2qQcoOriZQNI67FXTbxeE4zBuvm/N0E6/fEX85nVuF3a+6C/a8
+         aZmu+Gd4VEzj+CLbVBwQoVRT2j4vzgLUNGJjM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763174251; x=1763779051;
+        d=1e100.net; s=20230601; t=1763178138; x=1763782938;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Medgtts3GbALKGd7rnGlqiSFg3iMYy8R/qbPdHzfI5c=;
-        b=vrq+wd+BLpc1AKT43kaQSanX5SjqhV9jAfDabn8TuBSi3UiPUBeRKKFUXIRBFPKrgO
-         LxYYoug9t3gfOewXN5utBSphdw197xcoo5GVRaF6mdzS2DR1SWMp5EUNrqFUq37OjIyh
-         jTRzcvz8w2lPWAkFm/u7TS4kAeqBeNFucT/9bMyLc+zQiRlzEH9fjBnhmqrxpNeVeT3u
-         HNuE5SERuP/kYbQjt9ms3MJC7yqZX76gzjOz3cs80FH/BvGOz8nXc0reKDiqazLeXY48
-         R4u4VhowS/NkUPOVTiVidgG4JAjoedpTBV8s4NeARNtjaaeWbH3opVPu96Eccdo1cuQ4
-         sltQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUU7oeEPnk41OvLhhQ8TadEPpKYS7rOkiST7Sj/HQ/pYtK/rTngVQmsw9Y2z7Kk40GG0iaAwn5krsFWPg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzk3sZPHYbslUNaF05VDzfa1F69XG50cniC5naC3SU9J+Q43JJY
-	6Zj2YgYXi1u57ImPxis5+gS3xf6hJVEzArh49+4tUbGqpq185p8GJPdh4je3VK61wQ==
-X-Gm-Gg: ASbGncswzOucgeZD9ARL2OCqokN0H27nRTOo5dKgy57ZuoZVbfv/tqRojkhn57oveTX
-	kXS+6XwLMKmqspuE651lHArC2KF2psWFzlMKaVfQVhbu45OIc7lTeTxaZbeTCJolzWTfZzRHGr+
-	06BmbK9ocRSPq7MROTaWyQ38f/E+mppKZUSo2el4n7zRYX5mnKsaajNO6GmvKZ1aL/JVyjSnMdi
-	wCIVxNwAM+5hl5MuCTwkKnAVN2w+W3m7izLXc2s3fLuUl0wto1KpOPe3ELO+5ClRUO5qvsFLGp1
-	66VGUgADUvgRM6wLklbuAvcr/I6z/NJrIvUCIzRjnG0rkIMH4SvGT8zuLRN0XIC5AJ6uDKffFe5
-	MRjMSIlKLCevOLAbFPQqH++vms30H2Ro2Av06QMPY+OpvnMQZGacWLUaYTrttyujg+RVwM6laBA
-	ueBpOoLyeU+ChXKFA=
-X-Google-Smtp-Source: AGHT+IEZLohcVNFDlEFWacx1LqPJ3ulORLXL0fBBkAiZi5qrk7eL/494WR5aZ7WWOpQhM/vhe3ZEjg==
-X-Received: by 2002:a17:903:2a8b:b0:295:4d97:8503 with SMTP id d9443c01a7336-2986a72bf65mr58841065ad.30.1763174251419;
-        Fri, 14 Nov 2025 18:37:31 -0800 (PST)
+        bh=4Af+nXEWtEaAxNcvRVetKdQJrBk2sAifaziyN+YLmfE=;
+        b=IIuOAYXlv3Cj2NHm9EqLvqOARFkHkHGVJ2ZMNwzCiD06xk12NaQSkMwXqQ/7jnKXVD
+         P7oukhzpRSdnyx3qdJ5rOe33Zv1zzgtO2rPEii+Uj3z9xRpi3/sLYflxXK2AhURRt+o6
+         2Qn7r8Ta8JYIlVKMGtEaYm1tUftylMm3eU5433AFmKpLKNXA00YhPLsEBWVlSyaj2Abw
+         RYFN9chrbUmaYUFs0prNM6uYYddNGsxSFNioWDeJnx3IDbso/SvFtLRbTouUB6oZiEgM
+         86I5MnCFexj3uVlkkRwPqKlJYbNEyMnV71WvkuxWa7uCDuLjKXenmFjFMndqv+zZmDQI
+         Bv7g==
+X-Forwarded-Encrypted: i=1; AJvYcCXZu55XAgUwHM+G57rXt4Y3hzuKfcpISEZgFMbgW9AlWCRsMl0sUz8sr8gDF57C8B82Gw2Nj1W415QqaA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywav4M/AYsDD1JAwcrlkUNF7HPStSIgFLSchluErXxyfdyz6zqS
+	Mm4eO0gOmXm8SN9BnTp0kYX1H3YuwzwfwRLR5BiiYCFYqYVbUoPZ7A7CG3829z9Www==
+X-Gm-Gg: ASbGncuiS8wJRJLmOUMioLhLDIWknjgWpqgKKOFxDNVddXz3VUx5Ccru6apLfkG/knW
+	tRt5YGh5bsWvTcAA+2RFayyz8d1yuL7Bj0IA9o8YQpvHpuSKfpTqwtcmylNrnEO1BtD8npUo0jL
+	oLSeA671Viqu9b+QFscxQ7+SBLg1zCYuq/J9f8J97qZMtPVd2n2O/kEy366c6ZomzB+Wddzk0aA
+	GnCq7GaaEgYZA2/NC34Wdamxjlb11IinAlezS3LCjb0VlrVAcTgzDZQjCfYZN4s57wlIggeKAQF
+	2/KAmtJzBgN8ZzQc7Kay55FnKHYRlYtQ010asSt5Kph3+cAJYJXIp12gcCgswzluTEiEnQ04PsX
+	EGtuActHYL+4kKZUm04aWvx1rTaTTwSXUqsHoOsnZhcx2EjJPjduuU0gZPYJrQo4cY26HeY4X7P
+	k3tMGdbBNAUSkIWOA=
+X-Google-Smtp-Source: AGHT+IHF1HltwLwMqhbQxQs+gAn1RIWFWael5BuA17en31fTdcRQ390Bt7bG4aTQ2UBh7dpIUKY4Mw==
+X-Received: by 2002:a17:903:1a2f:b0:298:2afa:796d with SMTP id d9443c01a7336-2986a76bcefmr57326565ad.61.1763178138476;
+        Fri, 14 Nov 2025 19:42:18 -0800 (PST)
 Received: from google.com ([2401:fa00:8f:203:b069:973b:b865:16a1])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2985c2346b8sm68715835ad.16.2025.11.14.18.37.28
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2985c245da0sm69774885ad.26.2025.11.14.19.42.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Nov 2025 18:37:30 -0800 (PST)
-Date: Sat, 15 Nov 2025 11:37:26 +0900
+        Fri, 14 Nov 2025 19:42:17 -0800 (PST)
+Date: Sat, 15 Nov 2025 12:42:12 +0900
 From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: syzbot <syzbot+16a8410141ca18c0d963@syzkaller.appspotmail.com>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, minchan@kernel.org, senozhatsky@chromium.org, 
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [block?] general protection fault in zcomp_stream_get
-Message-ID: <7ousgnpwrsdzbpp7svqzkkvse752pz5djhfl4zxyf2kwwyvoyt@axtbbqp6vnvu>
-References: <6917d919.050a0220.3565dc.004b.GAE@google.com>
+To: Minchan Kim <minchan@kernel.org>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, Yuwen Chen <ywen.chen@foxmail.com>, 
+	Richard Chang <richardycc@google.com>, Brian Geffon <bgeffon@google.com>, 
+	Fengyu Lian <licayy@outlook.com>, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-block@vger.kernel.org
+Subject: Re: [PATCHv2 1/4] zram: introduce writeback bio batching support
+Message-ID: <rt5rjjjypqv7b3syrey4bb3rqmoewvpudt44sacaarzvfvrss7@vtn77o3upvha>
+References: <20251113085402.1811522-1-senozhatsky@chromium.org>
+ <20251113085402.1811522-2-senozhatsky@chromium.org>
+ <aRZttTsRG1cZoovl@google.com>
+ <rjowf2hdk7pkmqpslj6jaqm6y4mhvr726dxpjyz7jtcjixv3hi@jyah654foky4>
+ <aRd_m00a6AcVtDh0@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -72,22 +78,17 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6917d919.050a0220.3565dc.004b.GAE@google.com>
+In-Reply-To: <aRd_m00a6AcVtDh0@google.com>
 
-On (25/11/14 17:36), syzbot wrote:
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    7a0892d2836e Merge tag 'pci-v6.18-fixes-5' of git://git.ke..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=12152914580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=19d831c6d0386a9c
-> dashboard link: https://syzkaller.appspot.com/bug?extid=16a8410141ca18c0d963
-> compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-> 
-> Unfortunately, I don't have any reproducer for this issue yet.
+On (25/11/14 11:14), Minchan Kim wrote:
+[..]
+> First, this writeback_store path is not critical path. Typical usecase
+> is trigger the writeback store on system idle time to save zram memory.
 
-This will be difficult to understand w/o a reproducer.
-I'll try to look at it, but it doesn't make a lot of sense
-to me right now: raw_cpu_ptr(comp->stream) should work.
+One thing to note here, is that this is likely the case for embedded devices
+(smartphones, laptops, etc), where zram is often used as swap device.
+However, on servers (or desktops), zram can be used as a general purpose
+block device, and writeback can be executed under very different conditions
+there.  Writeback is guaranteed to save memory, while on servers there
+might be no "idle time", so I can see scenarios when writeback is executed
+under load.
