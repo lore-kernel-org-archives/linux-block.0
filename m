@@ -1,130 +1,100 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sg-1-13.ptr.blmpb.com (sg-1-13.ptr.blmpb.com [118.26.132.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 691CD283CB0
-	for <linux-block@vger.kernel.org>; Sat, 15 Nov 2025 12:20:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BFCB225390
+	for <linux-block@vger.kernel.org>; Sat, 15 Nov 2025 15:51:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763209205; cv=none; b=Effot5tdXllDzKzIMMWLPmPGDvkkqrqlR5ZUHPwmg/4fdunXLQoHCN3ExkTHtGHSH7p9o/FFQXopmX3/0UQCU4yBzPWLuYuQx56gqRNNV2uTLItHna9gmyHdhYP+wyNlea9W4QAItKGqpfELR0NFgTgug70SY4isnTzI9Ap4whA=
+	t=1763221906; cv=none; b=rSdiYRO3IhWkT4iUCQeO72PCmyiXfj25x6AUoCeRNrAdZ03CetIw20tRpirDpsFhNi+OZHynnt+EbupTSzN++ALb0uZFpAHg4LuO1qkzMQpi7+DB8FxK7nMb/WlpS7H2fbTP+/UKuHsDh5sds1k68YthWRUYPM7zo0DCGu0C00c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763209205; c=relaxed/simple;
-	bh=unAU9uAsip7tWQFwi7uxy2YVjiPdG/vwwDj9LJJ3JVA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=N7FMOn9jBYm8OLfaDNo6kynbBwyA+y8NFAzAWY1S0tVcJz/YiOItkwMLdb5ri4ZnyP8HyBMsb8NJuqhGe0sqvpAfabJ72aefO3WI3XJ4f5Jl6ci/1DeNapgQ9hz1KsZXnHEcfmO3yE6r8ovTv3H6VHyTSE9itUH23z3j+vQPTYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iBxbiDLo; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763221906; c=relaxed/simple;
+	bh=pzWPVQ8GdreVBO816k8UADkKSCD77YskIZrpvAC4HHg=;
+	h=In-Reply-To:From:To:Cc:Message-Id:Content-Type:Subject:Date:
+	 Mime-Version:References; b=LLeq0X68LwB2Yr3ox3CkNlsf15dbUfe75qeRZAkXn2k0XEBOK6MWkpIbfagWR70+LWFClD2V+iTqRQObhvgsW7d3+BwHQrR1VXD1VwIJA1aRprJ7AAMjT5sunJZXlO70kGY5gyWXmdM5eBrrPByalAJeBABOW2FaWMvIPQGr1vk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=fail smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=s5P3v6VJ; arc=none smtp.client-ip=118.26.132.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=fnnas.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iBxbiDLo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59E6EC116B1;
-	Sat, 15 Nov 2025 12:20:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763209203;
-	bh=unAU9uAsip7tWQFwi7uxy2YVjiPdG/vwwDj9LJJ3JVA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=iBxbiDLogccr8aCDnh6F8XCm/i7GgfVRZfql3F8uE82r6+V75oqNRi6lVUXfViztN
-	 UJaXdwCcuyEvlXYgTFC2noYzM5XChaQod+Pgo3wGYj1dvtr75oH2L8dTKeUnS0Naw6
-	 BxLmHZvZI24N+eG/tec9FrGwlDkp7dNcomgpiqRZWyPyVctSw5J51xi28QOlFeQJDk
-	 cfTMvq2JEgkHw9SwPSbysY/qWW7o+tHW3AY0NZm0Lde0pWcPBDrBMZiSWP1Wy9hs8L
-	 qlWzdAdZoq31IIPkhRFqO8ZojHx6kkLpoe72BnWYCkrKRUfyzyLU9C+77adzKmsOiQ
-	 OQtffVEEk6Ttg==
-From: Damien Le Moal <dlemoal@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 6/6] Documentation: admin-guide: blockdev: update zloop parameters
-Date: Sat, 15 Nov 2025 21:15:56 +0900
-Message-ID: <20251115121556.196104-7-dlemoal@kernel.org>
-X-Mailer: git-send-email 2.51.1
-In-Reply-To: <20251115121556.196104-1-dlemoal@kernel.org>
-References: <20251115121556.196104-1-dlemoal@kernel.org>
+	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="s5P3v6VJ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1763221892;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=eIVIqg5H76+/wW/OhmQAvmScyINJb7NcynmvVQrg6zM=;
+ b=s5P3v6VJ2L/A5lonjj9bAClhcUYQWBr6uKrmSCsTxEhTBwNXLquwC7dGm6xQoMfjBt3//5
+ g18Wxk85fDVC4QBnKQ5HWuoLk11jNfz2uup/giYuIuiatAzhI/+LcvCeC9kqg406f27FyV
+ GVQZ/ISx5XVDZR2WZkkim2wqRJZnbO3a+ldsUUQi/MUvFmKX0Rewf79VfwQ/Hv+e2pzYYH
+ xYf1NzsekRgja8B1JC13McIu5EXJF4pjyfwc3sAVLaJ8rGUu93M4EkqmudCgDcF3uWNyTI
+ XF5rBKP0Rhwuf8hkvzV4RVvKkQe+JCfIN0YraFTW6T5b4ip4iGXYk6JzmEsoEg==
+Content-Language: en-US
+In-Reply-To: <20251114235434.2168072-2-khazhy@google.com>
+X-Lms-Return-Path: <lba+26918a182+ea5146+vger.kernel.org+yukuai@fnnas.com>
+From: "Yu Kuai" <yukuai@fnnas.com>
+Content-Transfer-Encoding: quoted-printable
+X-Original-From: Yu Kuai <yukuai@fnnas.com>
+To: "Khazhismel Kumykov" <khazhy@chromium.org>, "Tejun Heo" <tj@kernel.org>, 
+	"Josef Bacik" <josef@toxicpanda.com>, "Jens Axboe" <axboe@kernel.dk>
+Cc: <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>, 
+	<linux-kernel@vger.kernel.org>, "Guenter Roeck" <linux@roeck-us.net>, 
+	"Yu Kuai" <yukuai@kernel.org>, "Khazhismel Kumykov" <khazhy@google.com>
+Message-Id: <2d827b93-9ffa-4767-8409-88460e64a407@fnnas.com>
+User-Agent: Mozilla Thunderbird
+Content-Type: text/plain; charset=UTF-8
+Received: from [192.168.1.104] ([39.182.0.135]) by smtp.feishu.cn with ESMTPS; Sat, 15 Nov 2025 23:51:29 +0800
+Reply-To: yukuai@fnnas.com
+Subject: Re: [PATCH v2 1/3] block/blk-throttle: Fix throttle slice time for SSDs
+Date: Sat, 15 Nov 2025 23:51:27 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20251114235434.2168072-1-khazhy@google.com> <20251114235434.2168072-2-khazhy@google.com>
 
-In Documentation/admin-guide/blockdev/zoned_loop.rst, add the
-description of the zone_append and ordered_zone_append configuration
-arguments of zloop "add" command (device creation).
+=E5=9C=A8 2025/11/15 7:54, Khazhismel Kumykov =E5=86=99=E9=81=93:
+> From: Guenter Roeck<linux@roeck-us.net>
+>
+> Commit d61fcfa4bb18 ("blk-throttle: choose a small throtl_slice for SSD")
+> introduced device type specific throttle slices if BLK_DEV_THROTTLING_LOW
+> was enabled. Commit bf20ab538c81 ("blk-throttle: remove
+> CONFIG_BLK_DEV_THROTTLING_LOW") removed support for BLK_DEV_THROTTLING_LO=
+W,
+> but left the device type specific throttle slices in place. This
+> effectively changed throttling behavior on systems with SSD which now use
+> a different and non-configurable slice time compared to non-SSD devices.
+> Practical impact is that throughput tests with low configured throttle
+> values (65536 bps) experience less than expected throughput on SSDs,
+> presumably due to rounding errors associated with the small throttle slic=
+e
+> time used for those devices. The same tests pass when setting the throttl=
+e
+> values to 65536 * 4 =3D 262144 bps.
+>
+> The original code sets the throttle slice time to DFL_THROTL_SLICE_HD if
+> CONFIG_BLK_DEV_THROTTLING_LOW is disabled. Restore that code to fix the
+> problem. With that, DFL_THROTL_SLICE_SSD is no longer necessary. Revert t=
+o
+> the original code and re-introduce DFL_THROTL_SLICE to replace both
+> DFL_THROTL_SLICE_HD and DFL_THROTL_SLICE_SSD. This effectively reverts
+> commit d61fcfa4bb18 ("blk-throttle: choose a small throtl_slice for SSD")=
+.
+>
+> While at it, also remove MAX_THROTL_SLICE since it is not used anymore.
+>
+> Fixes: bf20ab538c81 ("blk-throttle: remove CONFIG_BLK_DEV_THROTTLING_LOW"=
+)
+> Cc: Yu Kuai<yukuai@kernel.org>
+> Cc: Tejun Heo<tj@kernel.org>
+> Signed-off-by: Guenter Roeck<linux@roeck-us.net>
+> Signed-off-by: Khazhismel Kumykov<khazhy@google.com>
+> ---
+>   block/blk-throttle.c | 9 ++-------
+>   1 file changed, 2 insertions(+), 7 deletions(-)
 
-Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
----
- .../admin-guide/blockdev/zoned_loop.rst       | 61 +++++++++++--------
- 1 file changed, 37 insertions(+), 24 deletions(-)
+LGTM
+Reviewed-by: Yu Kuai <yukuai@fnnas.com>
 
-diff --git a/Documentation/admin-guide/blockdev/zoned_loop.rst b/Documentation/admin-guide/blockdev/zoned_loop.rst
-index 64dcfde7450a..806adde664db 100644
---- a/Documentation/admin-guide/blockdev/zoned_loop.rst
-+++ b/Documentation/admin-guide/blockdev/zoned_loop.rst
-@@ -68,30 +68,43 @@ The options available for the add command can be listed by reading the
- In more details, the options that can be used with the "add" command are as
- follows.
- 
--================   ===========================================================
--id                 Device number (the X in /dev/zloopX).
--                   Default: automatically assigned.
--capacity_mb        Device total capacity in MiB. This is always rounded up to
--                   the nearest higher multiple of the zone size.
--                   Default: 16384 MiB (16 GiB).
--zone_size_mb       Device zone size in MiB. Default: 256 MiB.
--zone_capacity_mb   Device zone capacity (must always be equal to or lower than
--                   the zone size. Default: zone size.
--conv_zones         Total number of conventioanl zones starting from sector 0.
--                   Default: 8.
--base_dir           Path to the base directory where to create the directory
--                   containing the zone files of the device.
--                   Default=/var/local/zloop.
--                   The device directory containing the zone files is always
--                   named with the device ID. E.g. the default zone file
--                   directory for /dev/zloop0 is /var/local/zloop/0.
--nr_queues          Number of I/O queues of the zoned block device. This value is
--                   always capped by the number of online CPUs
--                   Default: 1
--queue_depth        Maximum I/O queue depth per I/O queue.
--                   Default: 64
--buffered_io        Do buffered IOs instead of direct IOs (default: false)
--================   ===========================================================
-+===================   =========================================================
-+id                    Device number (the X in /dev/zloopX).
-+                      Default: automatically assigned.
-+capacity_mb           Device total capacity in MiB. This is always rounded up
-+                      to the nearest higher multiple of the zone size.
-+                      Default: 16384 MiB (16 GiB).
-+zone_size_mb          Device zone size in MiB. Default: 256 MiB.
-+zone_capacity_mb      Device zone capacity (must always be equal to or lower
-+                      than the zone size. Default: zone size.
-+conv_zones            Total number of conventioanl zones starting from
-+                      sector 0
-+                      Default: 8
-+base_dir              Path to the base directory where to create the directory
-+                      containing the zone files of the device.
-+                      Default=/var/local/zloop.
-+                      The device directory containing the zone files is always
-+                      named with the device ID. E.g. the default zone file
-+                      directory for /dev/zloop0 is /var/local/zloop/0.
-+nr_queues             Number of I/O queues of the zoned block device. This
-+                      value is always capped by the number of online CPUs
-+                      Default: 1
-+queue_depth           Maximum I/O queue depth per I/O queue.
-+                      Default: 64
-+buffered_io           Do buffered IOs instead of direct IOs (default: false)
-+zone_append           Enable or disable a zloop device native zone append
-+                      support.
-+                      Default: 1 (enabled).
-+                      If native zone append support is disabled, the block layer
-+                      will emulate this operation using regular write
-+                      operations.
-+ordered_zone_append   Enable zloop mitigation of zone append reordering.
-+                      Default: disabled.
-+                      This is useful for testing file systems file data mapping
-+                      (extents), as when enabled, this can significantly reduce
-+                      the number of data extents needed to for a file data
-+                      mapping.
-+===================   =========================================================
- 
- 3) Deleting a Zoned Device
- --------------------------
--- 
-2.51.1
-
+--=20
+Thanks
+Kuai
