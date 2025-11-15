@@ -1,85 +1,79 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sg-1-19.ptr.blmpb.com (sg-1-19.ptr.blmpb.com [118.26.132.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E77C221F13;
-	Sat, 15 Nov 2025 15:53:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 087CB1E0B9C
+	for <linux-block@vger.kernel.org>; Sat, 15 Nov 2025 15:53:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763222014; cv=none; b=YOaRKnLceNphbc3EbUzul39tmSNdxf3ra1vdu8xtQeL5R8jJB/qfW2II3N/7PM9nPIzkGJE/OzwYiD54o01Xvzx20fKSxbE7ffQRp5AEBRBkkYVLxCroU+/aklGgkHlbiVq+brvnRSE7/lRKRnkNTurqDvG/IqXANyp64NCzgmY=
+	t=1763222034; cv=none; b=R0oyxJJYo/ymEUXuh1ejIwj5cPf11ugHvN2oBlO8IzFuzwupDAHwD1uUHPuWHHbJ/HdgiOz3oWcX0pqUDCNs28qSdFykLL46KJCev1OEZVMm+M0BWWeHkJ7JYuZVouu8QyhqwZ0ysm1ZcsJg4OJsnKiKWnS+vwxzLtVYMLU44Lo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763222014; c=relaxed/simple;
-	bh=EwI8Hmw+254IZUwdLgVMHCQUgGZu/DpRy2TKDt3lpxg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=cA4KvByywCF0279xvn0aqkG44ePnQMyvJ2Fa1KUbuyRBYHkQlno35KTmLADG3AOrB3/AFF8Yss83UBJJi8G2mPwNRm43FoM6kis7X76bhrHzskPlcKX2+8tR2Jik9L/2ghHKguj29yI9MIpKctzmULjdOOXwdQZJ6A/Fl8eJ5LY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=SLEtXJs9; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=fCWvnkFh; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	s=arc-20240116; t=1763222034; c=relaxed/simple;
+	bh=8adI+e5YLCmDbskIfTR944x+Mj4gGEug5GGgWim+XFE=;
+	h=References:Date:Content-Type:From:Mime-Version:In-Reply-To:To:Cc:
+	 Subject:Message-Id; b=JJjXYuqz1Qj2FkJ7Hbk2cJX4hr29rJxpzL2D3501DYwOua+vXYw3bgOiiWHNfYIMoZ2E4bH+O88upExvy0waDZVAa6FrjXp4p26C+xaHuD3eSq8mn167cl+ygISb2W/0OAYTY9PeMjze4RYQ99DDSNlzvUUMS5AJ9KIw5g8+W/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=none smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=3+10FsmF; arc=none smtp.client-ip=118.26.132.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=fnnas.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="SLEtXJs9";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="fCWvnkFh"
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1763222011;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xZ3ruAdoiAVL5AiOWMufuanCJT2Hk+KKUqr8L/GImxg=;
-	b=SLEtXJs90G/7NF9CrSjBMolaz51zpek96DGbr3R8BvIftzWculk19f97DkjJIqgyyOE5b1
-	rJq4JYu+8eltZRC6K+Ky57qlhN2irEA0MVU6CbJrmV6I2WxV6d7H4STn3FmW2Nm2iAukJ1
-	Lb8+gYcxQTz8PXfTHVLntDKFeg/wHLmYTUNXVU7q8+YKUJOK7GGJ4Ht7pDCTSTNrD9qetm
-	bwZVGPoW3pSFcoWuUh5ciT5paxc6cOtYOyWcMyrDIjB0kKPRd+w9rnUbKiuawGL22julqt
-	2tsXicGSHUzzZFnVkQbPDZJumodu0COCelq70rNBeeac/Ib2X38KS/w1VXZucw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1763222011;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xZ3ruAdoiAVL5AiOWMufuanCJT2Hk+KKUqr8L/GImxg=;
-	b=fCWvnkFhaCE05joawZuvor/UjHcnZb/Uv1cgWtTEj3z+VMFBzvtxj4oixCLjs41kiNl59I
-	ipV96EcnsYStGXCg==
-To: Christophe Leroy <christophe.leroy@csgroup.eu>, Alexander Viro
- <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan
- Kara <jack@suse.cz>, Ingo Molnar <mingo@redhat.com>, Peter Zijlstra
- <peterz@infradead.org>, Darren Hart <dvhart@infradead.org>, Davidlohr
- Bueso <dave@stgolabs.net>, Andre Almeida <andrealmeid@igalia.com>, Andrew
- Morton <akpm@linux-foundation.org>, Eric Dumazet <edumazet@google.com>,
- Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Willem de Bruijn <willemb@google.com>, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Simon Horman
- <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Dave Hansen
- <dave.hansen@linux.intel.com>, Madhavan Srinivasan <maddy@linux.ibm.com>,
- Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>
-Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
- linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH v4 03/10] uaccess: Use
- masked_user_{read/write}_access_begin when required
-In-Reply-To: <5effda898b110d413dc84a53c5664d4c9d11c1bf.1762427933.git.christophe.leroy@csgroup.eu>
-References: <cover.1762427933.git.christophe.leroy@csgroup.eu>
- <5effda898b110d413dc84a53c5664d4c9d11c1bf.1762427933.git.christophe.leroy@csgroup.eu>
-Date: Sat, 15 Nov 2025 16:53:30 +0100
-Message-ID: <87h5uv9ts5.ffs@tglx>
+	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="3+10FsmF"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1763222020;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=rn1YfrUUtpK18D8e9dNkroJv5PhCwNNCz3WtSyxT9Hk=;
+ b=3+10FsmFiuc6fWwRWpii9+q2S5R4uVAzsE20nvPtGWtiHhIOB4xCqM+b1m/ZyOp4j+N+Ee
+ 0aUxJ2Z+AS+U/2CI4a9nnMQsbMxHTPosYDXRcdK2oZ/kYHsETzaUVwloZJLSkT1l3jmUng
+ 91r/u/ITRHzZqpZZ0HaUgAbYlvlBulV4P/qnfTsX9GeTPRHUWRUdB3lp6I98QWo9Zx7ahH
+ GyOa6nHe4lU7jTjWGodLKSzt67YqF25d62I7py104Tv+YMt/gIen4GeV48x56FHw0wBJqy
+ xQXPEBuIF8a461Pf0yf5rr8hPJB0i/82RIqXZrdPNHT9xUPvte3wMkdQojha/A==
+References: <20251114235434.2168072-1-khazhy@google.com> <20251114235434.2168072-3-khazhy@google.com>
+X-Lms-Return-Path: <lba+26918a202+5353f1+vger.kernel.org+yukuai@fnnas.com>
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 15 Nov 2025 23:53:35 +0800
+Content-Type: text/plain; charset=UTF-8
+X-Original-From: Yu Kuai <yukuai@fnnas.com>
+From: "Yu Kuai" <yukuai@fnnas.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
+Mime-Version: 1.0
+User-Agent: Mozilla Thunderbird
+In-Reply-To: <20251114235434.2168072-3-khazhy@google.com>
+Reply-To: yukuai@fnnas.com
+To: "Khazhismel Kumykov" <khazhy@chromium.org>, "Tejun Heo" <tj@kernel.org>, 
+	"Josef Bacik" <josef@toxicpanda.com>, "Jens Axboe" <axboe@kernel.dk>
+Cc: <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>, 
+	<linux-kernel@vger.kernel.org>, "Guenter Roeck" <linux@roeck-us.net>, 
+	"Yu Kuai" <yukuai@kernel.org>, "Khazhismel Kumykov" <khazhy@google.com>
+Content-Language: en-US
+Subject: Re: [PATCH v2 2/3] block/blk-throttle: drop unneeded blk_stat_enable_accounting
+Message-Id: <96c6e645-6378-47b5-bdca-25900a1b60d0@fnnas.com>
+Received: from [192.168.1.104] ([39.182.0.135]) by smtp.feishu.cn with ESMTPS; Sat, 15 Nov 2025 23:53:37 +0800
 
-On Thu, Nov 06 2025 at 12:31, Christophe Leroy wrote:
-> diff --git a/net/core/scm.c b/net/core/scm.c
-> index 66eaee783e8be..4a65f9baa87e7 100644
-> --- a/net/core/scm.c
-> +++ b/net/core/scm.c
-> @@ -274,7 +274,7 @@ int put_cmsg(struct msghdr * msg, int level, int type, int len, void *data)
->  		check_object_size(data, cmlen - sizeof(*cm), true);
->  
->  		if (can_do_masked_user_access())
-> -			cm = masked_user_access_begin(cm);
-> +			cm = masked_user_write_access_begin(cm);
->  		else if (!user_write_access_begin(cm, cmlen))
->  			goto efault;
+=E5=9C=A8 2025/11/15 7:54, Khazhismel Kumykov =E5=86=99=E9=81=93:
+> From: Guenter Roeck<linux@roeck-us.net>
+>
+> After the removal of CONFIG_BLK_DEV_THROTTLING_LOW, it is no longer
+> necessary to enable block accounting, so remove the call to
+> blk_stat_enable_accounting(). With that, the track_bio_latency variable
+> is no longer used and can be deleted from struct throtl_data. Also,
+> including blk-stat.h is no longer necessary.
+>
+> Fixes: bf20ab538c81 ("blk-throttle: remove CONFIG_BLK_DEV_THROTTLING_LOW"=
+)
+> Cc: Yu Kuai<yukuai@kernel.org>
+> Cc: Tejun Heo<tj@kernel.org>
+> Signed-off-by: Guenter Roeck<linux@roeck-us.net>
+> Signed-off-by: Khazhismel Kumykov<khazhy@google.com>
+> ---
+>   block/blk-throttle.c | 6 ------
+>   1 file changed, 6 deletions(-)
 
-Shouldn't this be converted to scoped_....() ?
+LGTM
+Reviewed-by: Yu Kuai <yukuai@fnnas.com>
+
+--=20
+Thanks
+Kuai
