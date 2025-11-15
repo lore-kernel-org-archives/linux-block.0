@@ -1,94 +1,203 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17578EAE7
-	for <linux-block@vger.kernel.org>; Sat, 15 Nov 2025 03:42:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 051E119F12A
+	for <linux-block@vger.kernel.org>; Sat, 15 Nov 2025 04:14:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763178140; cv=none; b=meTbqn/8qJXyarmeUpdnVvmPupAFjnC7jSETDpq7R58SJJVNyEAGkcoGzfiuAid2rpcMSLA8pbHuTRr0G+iyTWqsi7Y7Y/gFLX/2QVU6MTcFjAYPXSPywOiMVE0N2yWXIr+u4hzdiHiqz5DyS0yt6fcapZTfN47TQI7zZ60XT/8=
+	t=1763180085; cv=none; b=NcB0UUtDQ/0tJ+axiMc9IJ2fSzyS/lI60+Z4pcnq8RgLPuoysxjvquP7ORXNaEjtg8zBpOn0L6oNGvAZDBhX53MG9Wqcaktw8ZsqjtxmIkVVsIqPW/RktoHo4T3XDssHoOOhPbTBcIjayXA7ThmOjpwx2iUuO/zCTXTtgPfJKuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763178140; c=relaxed/simple;
-	bh=8fbJMn3a2CnI53IMpCv6vTPvdaCVUb+Qvl+uByHlSSE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gPDXApZB2lnjiLx45On635FaANZXfwZATVwH/3Nu67mFAPcyH7nKvR4QeL+h/DHYycnW5Ng/OoHc8pZCbQ5Qnx4rZPBxuv8qCH47REFwCPR8ahAuB13xir5qtSeu7DwI5KdOtkNOnw2jNkWomk4hA6TCAh6wK+lnT3IZeokK3dk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=GsoXXtt6; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1763180085; c=relaxed/simple;
+	bh=R9YlM3Fc8ZoZioSThJHE8Noe5KQqzOxdajN2Vg8qV2M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jZ6zzonJpUbd4PXPWwa5LPp1yRREw/BnYpuSLg6jDP3rEgzDPBXrcBSvz8sxBG3LM3uYiRuleBZFsyqjvfDTjfJDkNWC9B2hHavzu23Xvqcw5xLQ/rWAks1jr0j4ZZUHG7B9RiYHalNoN6k+059YYF1DS0/lg3rQnOKYHtBkdu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=XyDhCbVp; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="GsoXXtt6"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2964d616df7so35575745ad.3
-        for <linux-block@vger.kernel.org>; Fri, 14 Nov 2025 19:42:18 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="XyDhCbVp"
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-340ad724ea4so455905a91.0
+        for <linux-block@vger.kernel.org>; Fri, 14 Nov 2025 20:14:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1763178138; x=1763782938; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4Af+nXEWtEaAxNcvRVetKdQJrBk2sAifaziyN+YLmfE=;
-        b=GsoXXtt6BvTB3Ar00m4qBbyDLcngTl8SKHtDawjwLm3xFKx8mhLAqrjA0gewye9FiV
-         UNKHXBmHBOXbr6xgXk2qQcoOriZQNI67FXTbxeE4zBuvm/N0E6/fEX85nVuF3a+6C/a8
-         aZmu+Gd4VEzj+CLbVBwQoVRT2j4vzgLUNGJjM=
+        d=purestorage.com; s=google2022; t=1763180082; x=1763784882; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MVwmpEB8Bj8tH7qdGyQtHjvQ6YUfnbrSzY7l2lyfjlk=;
+        b=XyDhCbVpaW3QTT1d/2KMk7wk+25UwMKrtC9fucMtG7KvgqN7TJJ15PAB4qAmu55j7t
+         ZPPL3seNX++u1GzyVv7y7miTewBsXYwwhFwY7+phvncFU9qU8RRJ0mxAvEA2kOZHkS8g
+         CFj+NfbCGu2DUcOWrnstuVtFi26r16XuIJ/kMixLNq0M3nPbBfsOHgDuivsfAScBk+UO
+         8u1xH4rW8DRfeaeLRXMWx2/EFWr+9de0V+N2hbh3pmf3miZm1voM1W/nU/BjN6G7z3SH
+         MEmmtLPu8VjLBl8dmzIwk7x66LiU8Jf4R7U+qVMyOp63dN/aqWck9yqqji9jNSK7OLe+
+         D+kw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763178138; x=1763782938;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4Af+nXEWtEaAxNcvRVetKdQJrBk2sAifaziyN+YLmfE=;
-        b=IIuOAYXlv3Cj2NHm9EqLvqOARFkHkHGVJ2ZMNwzCiD06xk12NaQSkMwXqQ/7jnKXVD
-         P7oukhzpRSdnyx3qdJ5rOe33Zv1zzgtO2rPEii+Uj3z9xRpi3/sLYflxXK2AhURRt+o6
-         2Qn7r8Ta8JYIlVKMGtEaYm1tUftylMm3eU5433AFmKpLKNXA00YhPLsEBWVlSyaj2Abw
-         RYFN9chrbUmaYUFs0prNM6uYYddNGsxSFNioWDeJnx3IDbso/SvFtLRbTouUB6oZiEgM
-         86I5MnCFexj3uVlkkRwPqKlJYbNEyMnV71WvkuxWa7uCDuLjKXenmFjFMndqv+zZmDQI
-         Bv7g==
-X-Forwarded-Encrypted: i=1; AJvYcCXZu55XAgUwHM+G57rXt4Y3hzuKfcpISEZgFMbgW9AlWCRsMl0sUz8sr8gDF57C8B82Gw2Nj1W415QqaA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywav4M/AYsDD1JAwcrlkUNF7HPStSIgFLSchluErXxyfdyz6zqS
-	Mm4eO0gOmXm8SN9BnTp0kYX1H3YuwzwfwRLR5BiiYCFYqYVbUoPZ7A7CG3829z9Www==
-X-Gm-Gg: ASbGncuiS8wJRJLmOUMioLhLDIWknjgWpqgKKOFxDNVddXz3VUx5Ccru6apLfkG/knW
-	tRt5YGh5bsWvTcAA+2RFayyz8d1yuL7Bj0IA9o8YQpvHpuSKfpTqwtcmylNrnEO1BtD8npUo0jL
-	oLSeA671Viqu9b+QFscxQ7+SBLg1zCYuq/J9f8J97qZMtPVd2n2O/kEy366c6ZomzB+Wddzk0aA
-	GnCq7GaaEgYZA2/NC34Wdamxjlb11IinAlezS3LCjb0VlrVAcTgzDZQjCfYZN4s57wlIggeKAQF
-	2/KAmtJzBgN8ZzQc7Kay55FnKHYRlYtQ010asSt5Kph3+cAJYJXIp12gcCgswzluTEiEnQ04PsX
-	EGtuActHYL+4kKZUm04aWvx1rTaTTwSXUqsHoOsnZhcx2EjJPjduuU0gZPYJrQo4cY26HeY4X7P
-	k3tMGdbBNAUSkIWOA=
-X-Google-Smtp-Source: AGHT+IHF1HltwLwMqhbQxQs+gAn1RIWFWael5BuA17en31fTdcRQ390Bt7bG4aTQ2UBh7dpIUKY4Mw==
-X-Received: by 2002:a17:903:1a2f:b0:298:2afa:796d with SMTP id d9443c01a7336-2986a76bcefmr57326565ad.61.1763178138476;
-        Fri, 14 Nov 2025 19:42:18 -0800 (PST)
-Received: from google.com ([2401:fa00:8f:203:b069:973b:b865:16a1])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2985c245da0sm69774885ad.26.2025.11.14.19.42.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Nov 2025 19:42:17 -0800 (PST)
-Date: Sat, 15 Nov 2025 12:42:12 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Minchan Kim <minchan@kernel.org>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, Yuwen Chen <ywen.chen@foxmail.com>, 
-	Richard Chang <richardycc@google.com>, Brian Geffon <bgeffon@google.com>, 
-	Fengyu Lian <licayy@outlook.com>, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-block@vger.kernel.org
-Subject: Re: [PATCHv2 1/4] zram: introduce writeback bio batching support
-Message-ID: <rt5rjjjypqv7b3syrey4bb3rqmoewvpudt44sacaarzvfvrss7@vtn77o3upvha>
-References: <20251113085402.1811522-1-senozhatsky@chromium.org>
- <20251113085402.1811522-2-senozhatsky@chromium.org>
- <aRZttTsRG1cZoovl@google.com>
- <rjowf2hdk7pkmqpslj6jaqm6y4mhvr726dxpjyz7jtcjixv3hi@jyah654foky4>
- <aRd_m00a6AcVtDh0@google.com>
+        d=1e100.net; s=20230601; t=1763180082; x=1763784882;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=MVwmpEB8Bj8tH7qdGyQtHjvQ6YUfnbrSzY7l2lyfjlk=;
+        b=YaAGyX3BIYGqP7SnTi49GhHkKZ0OnGwgFpx/YpHD5HgSXfWAOG8/uPJRX2q13YHqk/
+         lkT7NbDS/GxhavxpbyButE36Rzl1uZQtPJLC7C1J35khxsY6AGry0AHn5lUYY+qeUjh+
+         krmWkccD20l+0IN4GgE2rIqU8ud/aqJIalgHmgAjSvsW9XOcbg0LJ44NZxKjnjV2xfRq
+         8hy386XD5tp/+Qw7vicOqkXi7/vGLgnGOiUOEwitYbVqovI88yjXP7FdG2EyE19A7MQ6
+         KhO8tTbiQw04cYgBO8/bgWld8DdVhh/9tSsdODD+fCYzeVf/mIt3uG3d2S4T6glm0LHj
+         wjzA==
+X-Forwarded-Encrypted: i=1; AJvYcCVfBa02yVrOIgweaZpvpkxG8GVOC3A+uIqBj9vaweDRr1VX8cKMi0iNtUMlCx3RFyEfNKIuRgrKaraQdg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJejTjX4SNly0KnMNFEqLBpr9DWBqqVUKUtfUgtatTTXV+ySnk
+	yOlDsA5lOVu+gPkj/3Yu7I12g3EZS8c/H3nLQbwwHwZ1sC3EY/wwFmrXNF63uMoLAzPBZFA0+fs
+	VMycK49p91QJq0eSU1vnif3HZHGyoX63qwt4DdDaBUg==
+X-Gm-Gg: ASbGnctnEkn6YQSUEqTRTUhkPCdwSe1EGSqs9X/ihHZNzQtm3Hu3ijMFC4iUflixE6U
+	ZUOVpUOV8ThIo0n5Fn837wYnehYfmTz5ISkXm7c2JEVYsN97H1ge7INM4eFc4UbV0zFgu7LOc2L
+	XT2fT7Miq96nNt1mpIoeoqLeWgQB8DKs87muUHfwqeb4jg056HeyWNdpv1sZb6Ij7whRokLPYJo
+	e3CRZ0cQF6dDveNE4McvlDSmKOKh+xoKhO0qoL7qLUGLpKC6LOIck/dagg9oQ==
+X-Google-Smtp-Source: AGHT+IG06OKOPxs2KL9FiNMv5EavgqO6i+1LnipcMMzNGHdQkomLzw0Ac/ujZ5S0QV4oKIDZPIfDJsM3lSp4XoSli0A=
+X-Received: by 2002:a05:7022:224:b0:119:e56a:4fff with SMTP id
+ a92af1059eb24-11b41405607mr1754260c88.4.1763180081853; Fri, 14 Nov 2025
+ 20:14:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aRd_m00a6AcVtDh0@google.com>
+References: <20251112093808.2134129-1-ming.lei@redhat.com> <20251112093808.2134129-2-ming.lei@redhat.com>
+In-Reply-To: <20251112093808.2134129-2-ming.lei@redhat.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Fri, 14 Nov 2025 20:14:29 -0800
+X-Gm-Features: AWmQ_bmXMewXa3hzF3Hz6jOk14_epW6NwwIts6iR0ot-WLfTkPMnKaB28ZSufVg
+Message-ID: <CADUfDZrSO5eAwzjzedMf1gHTUv3Bv7JPL-nspqQG4bQE+F=6XA@mail.gmail.com>
+Subject: Re: [PATCH V3 01/27] kfifo: add kfifo_alloc_node() helper for NUMA awareness
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	Uday Shankar <ushankar@purestorage.com>, Stefani Seibold <stefani@seibold.net>, 
+	Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On (25/11/14 11:14), Minchan Kim wrote:
-[..]
-> First, this writeback_store path is not critical path. Typical usecase
-> is trigger the writeback store on system idle time to save zram memory.
+On Wed, Nov 12, 2025 at 1:38=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
+e:
+>
+> Add __kfifo_alloc_node() by refactoring and reusing __kfifo_alloc(),
+> and define kfifo_alloc_node() macro to support NUMA-aware memory
+> allocation.
+>
+> The new __kfifo_alloc_node() function accepts a NUMA node parameter
+> and uses kmalloc_array_node() instead of kmalloc_array() for
+> node-specific allocation. The existing __kfifo_alloc() now calls
+> __kfifo_alloc_node() with NUMA_NO_NODE to maintain backward
+> compatibility.
+>
+> This enables users to allocate kfifo buffers on specific NUMA nodes,
+> which is important for performance in NUMA systems where the kfifo
+> will be primarily accessed by threads running on specific nodes.
+>
+> Cc: Stefani Seibold <stefani@seibold.net>
+> Cc: Andrew Morton <akpm@linux-foundation.org>
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  include/linux/kfifo.h | 27 +++++++++++++++++++++++++++
+>  lib/kfifo.c           | 13 ++++++++++---
+>  2 files changed, 37 insertions(+), 3 deletions(-)
+>
+> diff --git a/include/linux/kfifo.h b/include/linux/kfifo.h
+> index fd743d4c4b4b..61d1fe014a6c 100644
+> --- a/include/linux/kfifo.h
+> +++ b/include/linux/kfifo.h
+> @@ -369,6 +369,30 @@ __kfifo_int_must_check_helper( \
+>  }) \
+>  )
+>
+> +/**
+> + * kfifo_alloc_node - dynamically allocates a new fifo buffer on a NUMA =
+node
+> + * @fifo: pointer to the fifo
+> + * @size: the number of elements in the fifo, this must be a power of 2
+> + * @gfp_mask: get_free_pages mask, passed to kmalloc()
+> + * @node: NUMA node to allocate memory on
+> + *
+> + * This macro dynamically allocates a new fifo buffer with NUMA node awa=
+reness.
+> + *
+> + * The number of elements will be rounded-up to a power of 2.
+> + * The fifo will be release with kfifo_free().
+> + * Return 0 if no error, otherwise an error code.
+> + */
+> +#define kfifo_alloc_node(fifo, size, gfp_mask, node) \
+> +__kfifo_int_must_check_helper( \
+> +({ \
+> +       typeof((fifo) + 1) __tmp =3D (fifo); \
+> +       struct __kfifo *__kfifo =3D &__tmp->kfifo; \
+> +       __is_kfifo_ptr(__tmp) ? \
+> +       __kfifo_alloc_node(__kfifo, size, sizeof(*__tmp->type), gfp_mask,=
+ node) : \
+> +       -EINVAL; \
+> +}) \
+> +)
+> +
+>  /**
+>   * kfifo_free - frees the fifo
+>   * @fifo: the fifo to be freed
+> @@ -902,6 +926,9 @@ __kfifo_uint_must_check_helper( \
+>  extern int __kfifo_alloc(struct __kfifo *fifo, unsigned int size,
+>         size_t esize, gfp_t gfp_mask);
+>
+> +extern int __kfifo_alloc_node(struct __kfifo *fifo, unsigned int size,
+> +       size_t esize, gfp_t gfp_mask, int node);
+> +
+>  extern void __kfifo_free(struct __kfifo *fifo);
+>
+>  extern int __kfifo_init(struct __kfifo *fifo, void *buffer,
+> diff --git a/lib/kfifo.c b/lib/kfifo.c
+> index a8b2eed90599..195cf0feecc2 100644
+> --- a/lib/kfifo.c
+> +++ b/lib/kfifo.c
+> @@ -22,8 +22,8 @@ static inline unsigned int kfifo_unused(struct __kfifo =
+*fifo)
+>         return (fifo->mask + 1) - (fifo->in - fifo->out);
+>  }
+>
+> -int __kfifo_alloc(struct __kfifo *fifo, unsigned int size,
+> -               size_t esize, gfp_t gfp_mask)
+> +int __kfifo_alloc_node(struct __kfifo *fifo, unsigned int size,
+> +               size_t esize, gfp_t gfp_mask, int node)
+>  {
+>         /*
+>          * round up to the next power of 2, since our 'let the indices
+> @@ -41,7 +41,7 @@ int __kfifo_alloc(struct __kfifo *fifo, unsigned int si=
+ze,
+>                 return -EINVAL;
+>         }
+>
+> -       fifo->data =3D kmalloc_array(esize, size, gfp_mask);
+> +       fifo->data =3D kmalloc_array_node(esize, size, gfp_mask, node);
+>
+>         if (!fifo->data) {
+>                 fifo->mask =3D 0;
+> @@ -51,6 +51,13 @@ int __kfifo_alloc(struct __kfifo *fifo, unsigned int s=
+ize,
+>
+>         return 0;
+>  }
+> +EXPORT_SYMBOL(__kfifo_alloc_node);
+> +
+> +int __kfifo_alloc(struct __kfifo *fifo, unsigned int size,
+> +               size_t esize, gfp_t gfp_mask)
+> +{
+> +       return __kfifo_alloc_node(fifo, size, esize, gfp_mask, NUMA_NO_NO=
+DE);
+> +}
+>  EXPORT_SYMBOL(__kfifo_alloc);
 
-One thing to note here, is that this is likely the case for embedded devices
-(smartphones, laptops, etc), where zram is often used as swap device.
-However, on servers (or desktops), zram can be used as a general purpose
-block device, and writeback can be executed under very different conditions
-there.  Writeback is guaranteed to save memory, while on servers there
-might be no "idle time", so I can see scenarios when writeback is executed
-under load.
+Is it worth keeping __kfifo_alloc() as an extern function? Seems like
+it would make the executable smaller to turn __kfifo_alloc() into a
+static inline function that just defers to __kfifo_alloc_node().
+
+Best,
+Caleb
+
+>
+>  void __kfifo_free(struct __kfifo *fifo)
+> --
+> 2.47.0
+>
