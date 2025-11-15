@@ -1,174 +1,155 @@
-Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A118B19EEC2
-	for <linux-block@vger.kernel.org>; Sat, 15 Nov 2025 01:36:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDCC961FFE
+	for <linux-block@vger.kernel.org>; Sat, 15 Nov 2025 02:26:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763170588; cv=none; b=Jaz2awci1Zy40db/sMmFZsxXOzihiRGvpco3lNixtl1AUz5AxuHSSgFSqS/2vr8nR/pvInW/MrCs1sDC2evOJMw+A29FuRItnWTjzD9MWpGnER7Wt8DVOBw6E5kxKjAlgumkwKjSbGPc8lyBoeA9shmEU/5dnAKWAoEkwXctc14=
+	t=1763173565; cv=none; b=XcARoEFsiGqICfNOmVriG4elIh9HQp5Hd9YujgndrctkcKQwgATOTSVwbON0ZwZ/P+2OsBOjxvO0XnrfbGkyJ0LwrZk2xT7glGyyxXRaNSXsO71VEFt9CHJAAq31fJcwm8dvMm1aYgDI6YN5oT37jMxJ4LGzT7HtfI4OHRfUjY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763170588; c=relaxed/simple;
-	bh=7vMLxDoVdyud5TuRomZ/MpXE6tYPJ4LRQcLdhusWGv4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=MqjmoiH+eV/V+fEoW+5qBjELuuboaAQDIxKVHgRP5STOauZlQv1F6EOmejtL0KlT9iVITP1SlMtvshhxkukeeDFgsXaEpv1rA3vl7k7aglifRZGIOwh9VcvgKVk4rINA8kzhOO7fdQ3NSKSDwby1gCA3adVtFpgdlPCCBkH6tkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-93e7f4f7bb1so216413639f.3
-        for <linux-block@vger.kernel.org>; Fri, 14 Nov 2025 17:36:26 -0800 (PST)
+	s=arc-20240116; t=1763173565; c=relaxed/simple;
+	bh=EfIbv215Kt4SY1TIo+8uK6qOfxJKFjYXTEd+gVNH8QE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YgwZnvCYiWLZY3q9Q0fALMfeQSdt3qUN+GXNjbVngixU2So+eEu+bRIPDnbgzwpFgJA0ePTzps3eSXx2cEjUnty7qua1haPXSPjAXBQFCevN7gPl4gCDX93ifnaCdJ5YhTDRAdR9K1skNVFWqMC+NDkTM7/vGRo/HvLJ1pSyU8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=a4MgE4Jb; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="a4MgE4Jb"
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-297f35be2ffso38318875ad.2
+        for <linux-block@vger.kernel.org>; Fri, 14 Nov 2025 18:26:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1763173561; x=1763778361; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=gvIo+2FZ6EfZjFDRwQfsjxC3rzbK6C8gqJLE1Fnuis8=;
+        b=a4MgE4Jbh5hKevYmxcbCFhHUZVmsBGHttHIkxHmpAQJoI5slss2q/zato5d0iBoHJ1
+         9Rxehve7iDV3mSBXnV0t1QHQCBg1nNaH92/2sfocBvR2OLF5xOLafzRSvp0fyliP3mSh
+         F+4T3R1esx3ESCzcYBOIWU381F3y9Fqjw2oTg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763170586; x=1763775386;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HXADMyKgol+4ZYHF6+0Ht+l795eH6xblTXW+I0Xrg64=;
-        b=bCDBrHJ8udLJdsWqn9RFNgBFSoPBkenSbRZVaVv7F1sjfBic7OLMwBgPfKUxNZBK1K
-         G6cjGkWVDZ6fZxYvO5OtbZ7pFzJcEXF1h6vTqa6SfynhDeJ5W9rKpU1A35W0/M8lWV37
-         aFiy1anhQ/GL0rRZDJ5wYgcEV91BZUJ0QORXrBGEVLFfli+rD/R4edNBBbC/zhhYNk8u
-         gDClSLUZJv73FMCPWvPkde6qDdi+Vwy4Czh7jDbKOelRM/4MLmjFvXJuXrAs+7Dif0/L
-         ycxxHtSEGhRR/ZKY5RCB891Vv1fc9d916QHp5CNofBKlIAtpt2sXa41/bRbggAYEhLhm
-         hn5w==
-X-Forwarded-Encrypted: i=1; AJvYcCU2oN85s513l/WF7hIv2gu1YP41ikJpoBkPMDw6eOYi81EwDibEX0HHEj4rVBg9xPcLaUD6ctP/IUJeIQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YymvdYBEq2xbsVOfJ9Jxm4UMlO5tQfAre0ing1ntK4RQaBK+1Iz
-	Vp8v5yHhh+QgycZvAn3Ug8tBFaoUGB7n/jZ8QlxGR/tmrQC8bW6aEb7IOcQOXjdfkpdFrEzqaD8
-	f7pu9Rj3v1A+maWsnU2K5CJOJU2nbTLMUN+TT7bWWOvFjp0oXzjzQhg4doTo=
-X-Google-Smtp-Source: AGHT+IFq5PAPXYr80k2eK5i6QUqOMpm3sepjekWPe0XQ0YtHzYHeSWi0yvjjMGLr3T45/aNqO8YwJxOEFESHB4RbAhDN6K96fOPR
+        d=1e100.net; s=20230601; t=1763173561; x=1763778361;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gvIo+2FZ6EfZjFDRwQfsjxC3rzbK6C8gqJLE1Fnuis8=;
+        b=vxgJ/OVSi50BQZTP4tJ+IWr3pLPVQlrk6kYSqWeoirUULLtH1IPfofRRvh07YtMl0N
+         nI8Mxpu01boTb+e1kQtyhw8Fe+zjtn15h+8LKKBIwCrgFSFqJPEkIE7iT3Rdsm+40+Uo
+         qYLbQB+yTDvnh4UvoRCL+McqO/CTmiJP04aWg2JViy5a8jYbU2UQ41XRop7fDjf7KfiD
+         aU7Mk22FZpbSAkYXhSPWwjFMNZk1Zst+opFkuaDAxGR4f7P+J7MFAkfeQ5uY28FFxI+w
+         4syFn1aNR+PNPQo7RR45PfqxGAksfayOaQgrY19BPV6JzdG8TDR40IuZaprzG/9rYiob
+         5bBg==
+X-Forwarded-Encrypted: i=1; AJvYcCVOT9pNMGRd8mHVztiFMCu9+rpFKWw8vziYCIkS/uI38wxOWZ7gQY0Jz7eRySn3dk3DXnnKgdGCwmiezw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzCR8MIsZjt/L0pZik4Rgtre7NKcRU6Tb62Arf71IAtePLYXMVS
+	A+TxNWlXkNeoi3vw6gka0g0qzRkDoKanhJh6GoQGOrNkt6EFMDvHfHq24njRYWLfTQ==
+X-Gm-Gg: ASbGnctOFqZHCcGZgtY2hrafcujHnecQkMeego50P04VUc7nBjXKl1qi9p6G44Fq9Q9
+	46vINST2Dll8iAkoSisFkTJbz7kX2/8CGYRqWMNTx4dUOKsMSMwbL/A6e1geLCHEmLrZJ2AEuZ+
+	butS/ce/BV8fW5acfabJm6AeXu4w98X8eVmihK07E3/4PddkvEtGdOlcIYp+7QAhuAunfI3TVi2
+	UmNWvfAbm9yROAkiaEm5MycLXO5YsbcWHXIep96dlHgLBVSnRkMaNhl7ebLcG50NiNdFLXOoSVP
+	RQ4qdqKvxmoWTBJ1kUeEhJCoV6dk7D+XUi7fnq3T+GcPrmrxJL81/dWWBSNFIc/P/5nzWufuGBk
+	9W7W3JhPTqtsTt9+s07ilfbS5yXtevLBFdXMTSj3G6EYKTuyFlTAhF8EBj8DuNJDjVQw0GObSYx
+	9n/PpCwXUoqWVYSA==
+X-Google-Smtp-Source: AGHT+IErNbdNIWz3yRgr2AVKBX9ONMzdwgKUAcvQOJAS+HeDR5jF0B3ToxhaPZ0vVdrGWcO8Z2zZRA==
+X-Received: by 2002:a17:902:fc86:b0:295:f1f:65f with SMTP id d9443c01a7336-2986a7414c9mr50925375ad.31.1763173561010;
+        Fri, 14 Nov 2025 18:26:01 -0800 (PST)
+Received: from google.com ([2401:fa00:8f:203:8e2:bf91:1dd0:a9c0])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2985c245e04sm68472305ad.38.2025.11.14.18.25.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Nov 2025 18:26:00 -0800 (PST)
+Date: Sat, 15 Nov 2025 11:25:55 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Minchan Kim <minchan@kernel.org>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, Yuwen Chen <ywen.chen@foxmail.com>, 
+	Richard Chang <richardycc@google.com>, Brian Geffon <bgeffon@google.com>, 
+	Fengyu Lian <licayy@outlook.com>, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-block@vger.kernel.org
+Subject: Re: [PATCHv2 1/4] zram: introduce writeback bio batching support
+Message-ID: <rgbcwa6rcfxpyf75k6voinza7ba2fnsht45kb6ittv4qrbrmyb@i25srryjss3i>
+References: <20251113085402.1811522-1-senozhatsky@chromium.org>
+ <20251113085402.1811522-2-senozhatsky@chromium.org>
+ <aRZttTsRG1cZoovl@google.com>
+ <rjowf2hdk7pkmqpslj6jaqm6y4mhvr726dxpjyz7jtcjixv3hi@jyah654foky4>
+ <aRd_m00a6AcVtDh0@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:982a:b0:5b7:bc45:7128 with SMTP id
- 8926c6da1cb9f-5b7c9e0350emr1027826173.17.1763170585831; Fri, 14 Nov 2025
- 17:36:25 -0800 (PST)
-Date: Fri, 14 Nov 2025 17:36:25 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6917d919.050a0220.3565dc.004b.GAE@google.com>
-Subject: [syzbot] [block?] general protection fault in zcomp_stream_get
-From: syzbot <syzbot+16a8410141ca18c0d963@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	minchan@kernel.org, senozhatsky@chromium.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aRd_m00a6AcVtDh0@google.com>
 
-Hello,
+On (25/11/14 11:14), Minchan Kim wrote:
+> > > How about moving structure definition to the upper part of the C file?
+> > > Not only readability to put together data types but also better diff
+> > > for reviewer to know what we changed in this patch.
+> > 
+> > This still needs to be under #ifdef CONFIG_ZRAM_WRITEBACK so readability
+> > is not significantly better.  Do you still prefer moving it up?
+> 
+> Let's move them on top of ifdef CONFIG_ZRAM_WRITEBACK, then.
+> IOW, above of writeback_limit_enable_store.
 
-syzbot found the following issue on:
+Done.
 
-HEAD commit:    7a0892d2836e Merge tag 'pci-v6.18-fixes-5' of git://git.ke..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=12152914580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=19d831c6d0386a9c
-dashboard link: https://syzkaller.appspot.com/bug?extid=16a8410141ca18c0d963
-compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+> > > How about 32 since it's general queue depth for modern storage?
+> > 
+> > So this is tricky.  I don't know what number is a good default for
+> > all, given the variety of devices out there, variety of specs and
+> > hardware, on both sides of price range.  I don't know if 32 is safe
+> > wrt to performance/throughput (I may be wrong and 32 is safe for
+> > everyone).  On the other hand, 1 was our baseline for ages, so I
+> > wanted to minimize the risks and just keep the baseline behavior.
+> > 
+> > Do you still prefer 32 as default?  (here and in the next patch)
+> 
+> Yes, we couldn't get the perfect number everyone would be happpy
+> since we don't know their configuration but the value is the
+> typical UFS 3.1(even, it's little old sice UFS has higher queue depth)'s
+> queue depth. More good thing with the 32 is aligned with SWAP_CLUSTER_MAX
+> which is the unit of batching in the traditional split LRU reclaim.
+> 
+> Assuming we don't encounter any significant regressions, I'd like to
+> move forward with a queue depth of 32 so that all users can benefit from
+> this speedup.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Done.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/a45e159158b8/disk-7a0892d2.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/846d1b2a57ec/vmlinux-7a0892d2.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/8b608296ff12/bzImage-7a0892d2.xz
+> > So we do this for post-processing, which allocates a bunch of memory
+> > for post-processing (not only requests lists with physical pages, but
+> > also candidate slots buckets).  The thing is that post-processing can
+> > be called under memory pressure and we don't really want to block and
+> > reclaim memory from the path that is called to relive memory pressure
+> > (by doing writeback or recompression).
+> 
+> Sorry, I didn't understand what's the post-processing means.
+> 
+> First, this writeback_store path is not critical path. Typical usecase
+> is trigger the writeback store on system idle time to save zram memory.
+> 
+> Second, If you used the flag to relieve memory pressure, that's not
+> the right flag. GFP_NOIO aimed to prevent deadlock with IO context
+> but the writeback_store is just process context so no reason to use
+> the GFP_NOIO. (If we really want to releieve memory presure, we
+> should use __GFP_NORETRY with ~__GFP_RECLAIM but I doubt)
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+16a8410141ca18c0d963@syzkaller.appspotmail.com
+Done.
 
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-CPU: 1 UID: 0 PID: 14292 Comm: syz.1.2163 Tainted: G     U  W    L XTNJ syzkaller #0 PREEMPT(full) 
-Tainted: [U]=USER, [W]=WARN, [L]=SOFTLOCKUP, [X]=AUX, [T]=RANDSTRUCT, [N]=TEST, [J]=FWCTL
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
-RIP: 0010:zcomp_stream_get+0x33/0xa0 drivers/block/zram/zcomp.c:113
-Code: 00 00 00 00 fc ff df 41 54 55 48 89 fd 53 49 89 ec 49 c1 ec 03 4d 01 ec e8 5a b8 d5 fb e8 55 b8 d5 fb 65 48 8b 1d 15 90 ba 0d <41> 80 3c 24 00 75 4f 48 03 5d 00 31 f6 48 89 df e8 e8 92 78 05 48
-RSP: 0018:ffffc90003baf488 EFLAGS: 00010283
-RAX: 0000000000000516 RBX: ffff888124b0d000 RCX: ffffc9000ae99000
-RDX: 0000000000080000 RSI: ffffffff85e6a00b RDI: 0000000000000000
-RBP: 0000000000000000 R08: 0000000000000006 R09: 7277682f7665642f
-R10: eb9cce1e473f4118 R11: 0000000000000001 R12: dffffc0000000000
-R13: dffffc0000000000 R14: ffff888142f2fc00 R15: ffffea0002067280
-FS:  00007f1de6ff66c0(0000) GS:ffff888124b0d000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000001b311f7ff8 CR3: 000000004f02c000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- zram_write_page drivers/block/zram/zram_drv.c:1859 [inline]
- zram_bvec_write drivers/block/zram/zram_drv.c:1932 [inline]
- zram_bio_write drivers/block/zram/zram_drv.c:2373 [inline]
- zram_submit_bio+0xdd4/0x1df0 drivers/block/zram/zram_drv.c:2402
- __submit_bio+0x304/0x690 block/blk-core.c:646
- __submit_bio_noacct block/blk-core.c:692 [inline]
- submit_bio_noacct_nocheck+0x75c/0xc10 block/blk-core.c:757
- submit_bio_noacct+0x5bd/0x1f60 block/blk-core.c:879
- submit_bio_wait+0x110/0x250 block/bio.c:1388
- __blkdev_direct_IO_simple+0x488/0x860 block/fops.c:99
- blkdev_direct_IO+0xcc6/0x2100 block/fops.c:435
- blkdev_direct_write block/fops.c:726 [inline]
- blkdev_write_iter+0x703/0xe00 block/fops.c:794
- new_sync_write fs/read_write.c:593 [inline]
- vfs_write+0x7d3/0x11d0 fs/read_write.c:686
- ksys_write+0x12a/0x250 fs/read_write.c:738
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xcd/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f1de8d8f6c9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f1de6ff6038 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 00007f1de8fe5fa0 RCX: 00007f1de8d8f6c9
-RDX: 000000100000a3d9 RSI: 0000200000000400 RDI: 0000000000000003
-RBP: 00007f1de8e11f91 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f1de8fe6038 R14: 00007f1de8fe5fa0 R15: 00007ffd527f5948
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:zcomp_stream_get+0x33/0xa0 drivers/block/zram/zcomp.c:113
-Code: 00 00 00 00 fc ff df 41 54 55 48 89 fd 53 49 89 ec 49 c1 ec 03 4d 01 ec e8 5a b8 d5 fb e8 55 b8 d5 fb 65 48 8b 1d 15 90 ba 0d <41> 80 3c 24 00 75 4f 48 03 5d 00 31 f6 48 89 df e8 e8 92 78 05 48
-RSP: 0018:ffffc90003baf488 EFLAGS: 00010283
-RAX: 0000000000000516 RBX: ffff888124b0d000 RCX: ffffc9000ae99000
-RDX: 0000000000080000 RSI: ffffffff85e6a00b RDI: 0000000000000000
-RBP: 0000000000000000 R08: 0000000000000006 R09: 7277682f7665642f
-R10: eb9cce1e473f4118 R11: 0000000000000001 R12: dffffc0000000000
-R13: dffffc0000000000 R14: ffff888142f2fc00 R15: ffffea0002067280
-FS:  00007f1de6ff66c0(0000) GS:ffff888124b0d000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055a02d54d950 CR3: 000000004f02c000 CR4: 00000000003526f0
-----------------
-Code disassembly (best guess), 6 bytes skipped:
-   0:	df 41 54             	filds  0x54(%rcx)
-   3:	55                   	push   %rbp
-   4:	48 89 fd             	mov    %rdi,%rbp
-   7:	53                   	push   %rbx
-   8:	49 89 ec             	mov    %rbp,%r12
-   b:	49 c1 ec 03          	shr    $0x3,%r12
-   f:	4d 01 ec             	add    %r13,%r12
-  12:	e8 5a b8 d5 fb       	call   0xfbd5b871
-  17:	e8 55 b8 d5 fb       	call   0xfbd5b871
-  1c:	65 48 8b 1d 15 90 ba 	mov    %gs:0xdba9015(%rip),%rbx        # 0xdba9039
-  23:	0d
-* 24:	41 80 3c 24 00       	cmpb   $0x0,(%r12) <-- trapping instruction
-  29:	75 4f                	jne    0x7a
-  2b:	48 03 5d 00          	add    0x0(%rbp),%rbx
-  2f:	31 f6                	xor    %esi,%esi
-  31:	48 89 df             	mov    %rbx,%rdi
-  34:	e8 e8 92 78 05       	call   0x5789321
-  39:	48                   	rex.W
+I wouldn't necessarily call it "wrong", we do re-enter zram
+	
+	user-space wb > zram writeback -> reclaim IO -> zram write page
 
+it's not deadlock-ish, for sure, but still looked to me important enough
+to avoid, so that writeback would be more robust and make faster forward
+progress (by actually saving memory) in various situations, including
+possible memory pressure.  Changed in v3.
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+> > > I didn't think about much about this that we really need to be
+> > > accurate like this. Maybe, next time after coffee.
+> > 
+> > Sorry, not sure I understand this comment.
+> 
+> I meant I didn't took close look the part, yet. :)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Ah, I see :)
