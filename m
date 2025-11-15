@@ -1,74 +1,72 @@
-Received: from sg-1-22.ptr.blmpb.com (sg-1-22.ptr.blmpb.com [118.26.132.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D88C2257827
-	for <linux-block@vger.kernel.org>; Sat, 15 Nov 2025 15:56:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A3441DF25F;
+	Sat, 15 Nov 2025 16:22:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763222204; cv=none; b=CAbaFE4q57Z4iObUMYH2nIdFQ1uLoT5F5QoEJolYJnnxWFefSmlLPnBN2k5qPDLBoaZXN/0cpVvBaNOAlzFOw5KSG845yFi5OclttrIIFcdYIPtsl5zlQxUhC2k6io5NCR9jjUR712OIO5x9YLp7Pi+nXg5mFVb5uJtwyPHHppg=
+	t=1763223775; cv=none; b=d+GJZMmmw4d4Kn8mV8Zo2aByLTlDzVvyOCjfBrtXhSdyhR+Raff7DWiWsmnGLxSf/SWcD1sNawHrYYn3t21r6pvUPH8xmP+VRkeeyp2BJ7zqaMdiop5ITjgPTf1xR//NSFYEbivystWNwXf7pXmWY49zjxdK1TayPO4yevVY6DY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763222204; c=relaxed/simple;
-	bh=8oG2jvXcoSQgG6l+ycl3M4S6AsZENjJLPQUkE+b2cOg=;
-	h=Cc:References:In-Reply-To:To:From:Subject:Content-Type:Date:
-	 Message-Id:Mime-Version; b=Ab6QpxiTA0aDgRGFjDYWxanEPmDS8JQBWmoSxD9HAxxHfem0hblcQROkkntQSBaEqItiBVm2OvQIFA1uvCI8rCvDt6/I41vA3d6Xvnh2Z8yZwxuMy8ftvL9i8p2M0xgHZtcEOhVnnasHZGqFqZBQZWsGsUCVYL5vCUdRnYV/Hq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=none smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=HkTsJIRv; arc=none smtp.client-ip=118.26.132.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=fnnas.com
+	s=arc-20240116; t=1763223775; c=relaxed/simple;
+	bh=dkf+PPZ9lvXL5kEc6dGDQYL+MKICC5QBe4nJe2bEqDk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=d2w868/sYwjzuTQREtvZETI6U957tLqTo+dHryzHIdqpsjcCbpbD6g6+NPtYPFov/SInb/pdXYnNvQ0hRzYE/Bh0ZkYUQp4OiwjGU3S0AiO7Fdq1wx/lsI8o8XxaI0VMpnWes4t3EyX+NMpIoYLejhRhRv9QVHwwwcUbhfUwhJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O5wG0rSW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="HkTsJIRv"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1763222192;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=XEKTOtTM0l3ze9zn+ntcfJAG62DORfYVvOb51c12gC0=;
- b=HkTsJIRvPoRIGXPt3Wt5GUSCoGa5mCIXk1ZA3Qu12W7cemmH6xVQ44L+0pCj1VTDEMOzNp
- hTjt8miLdfdQ+I3xXqlHBTpZsLIN2RNKTtB/+lwEUzcd5RyEOFOJH5IR6wtbveUxGyx1xg
- JYrO5BjAOnUZdSwaiq27mY+3pM34lg7b6ce/MfqGz01ix+0cDRS4qq7RO4VwhzGsUoATFK
- ADW0MgieIXVPt/7+ebtTmLmQK2o3XkvD3ev+rxa3C9VU3ychK9CLcpbQ7zvJk9p8IujytE
- SbomkKCxhkqoKgWUstWbMtmJE9B0XZBBpdIifjgWHHvOkVsnhGd3CR4J9NBbag==
-Content-Transfer-Encoding: quoted-printable
-Reply-To: yukuai@fnnas.com
-X-Original-From: Yu Kuai <yukuai@fnnas.com>
-X-Lms-Return-Path: <lba+26918a2ae+f87099+vger.kernel.org+yukuai@fnnas.com>
-Cc: <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>, 
-	<linux-kernel@vger.kernel.org>, "Guenter Roeck" <linux@roeck-us.net>, 
-	"Yu Kuai" <yukuai@kernel.org>, "Khazhismel Kumykov" <khazhy@google.com>
-User-Agent: Mozilla Thunderbird
-References: <20251114235434.2168072-1-khazhy@google.com> <20251114235434.2168072-4-khazhy@google.com>
-In-Reply-To: <20251114235434.2168072-4-khazhy@google.com>
-To: "Khazhismel Kumykov" <khazhy@chromium.org>, "Tejun Heo" <tj@kernel.org>, 
-	"Josef Bacik" <josef@toxicpanda.com>, "Jens Axboe" <axboe@kernel.dk>
-From: "Yu Kuai" <yukuai@fnnas.com>
-Subject: Re: [PATCH v2 3/3] block/blk-throttle: Remove throtl_slice from struct throtl_data
-Content-Language: en-US
-Received: from [192.168.1.104] ([39.182.0.135]) by smtp.feishu.cn with ESMTPS; Sat, 15 Nov 2025 23:56:29 +0800
-Content-Type: text/plain; charset=UTF-8
-Date: Sat, 15 Nov 2025 23:56:28 +0800
-Message-Id: <077953d4-8f21-4203-9f85-21e8977f1298@fnnas.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O5wG0rSW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BA96C116D0;
+	Sat, 15 Nov 2025 16:22:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763223775;
+	bh=dkf+PPZ9lvXL5kEc6dGDQYL+MKICC5QBe4nJe2bEqDk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=O5wG0rSWt91XzQaEbMhM/t8nd9pBoUJ+ph6daIuK7cmHYOux8HGw+taxO5cQgVbAo
+	 iHMe7Ggi1y5j0xG6X8GLskNweg4z0Kq45Mrahj7NDJQ3N2whucLl7/sydbazesGhB9
+	 6TVI/hR6nichbr7lCc3uLqS7uFQPRC2rP3vaJGnovUQL08v6ZdC5GccobsliM/io2G
+	 xoMMl1RfdrktcSfPI8WL6MmkmVlMAg8Lv6+Vb3Uwyd2Y88t3ggGlzB8/+MlsvtSwFj
+	 4f8sTMf8TYf0jzEG+auT9xK0yzxX9sSu/moi9vRx6kqOt0+W/oRu/k6lw+UnppaNh7
+	 jXNScmpIhIYpQ==
+From: Leon Romanovsky <leon@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <kbusch@kernel.org>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-nvme@lists.infradead.org
+Subject: [PATCH 0/2] block: Generalize physical entry definition
+Date: Sat, 15 Nov 2025 18:22:44 +0200
+Message-ID: <20251115-nvme-phys-types-v1-0-c0f2e5e9163d@kernel.org>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+X-Change-ID: 20251030-nvme-phys-types-988893249454
+X-Mailer: b4 0.15-dev-a6db3
+Content-Transfer-Encoding: quoted-printable
 
-=E5=9C=A8 2025/11/15 7:54, Khazhismel Kumykov =E5=86=99=E9=81=93:
-> From: Guenter Roeck<linux@roeck-us.net>
->
-> throtl_slice is now a constant. Remove the variable and use the constant
-> directly where needed.
->
-> Cc: Yu Kuai<yukuai@kernel.org>
-> Cc: Tejun Heo<tj@kernel.org>
-> Signed-off-by: Guenter Roeck<linux@roeck-us.net>
-> Signed-off-by: Khazhismel Kumykov<khazhy@google.com>
-> ---
->   block/blk-throttle.c | 32 +++++++++++++-------------------
->   1 file changed, 13 insertions(+), 19 deletions(-)
-
-LGTM
-Reviewed-by: Yu Kuai <yukuai@fnnas.com>
-
---=20
-Thanks
-Kuai
+The block layer code is declared "struct phys_vec" entry which describes=0D
+contiguous chunk of physical memory. That definition is useful for all=0D
+possible users of DMA physical address-based API.=0D
+=0D
+This series changes NVMe code to support larger chunks of memory by changin=
+g=0D
+length field from u32 to be size_t, which will be u64 on 64-bits platforms,=
+=0D
+and promotes "struct phys_vec" to general place.=0D
+=0D
+---=0D
+Leon Romanovsky (2):=0D
+      nvme-pci: Use size_t for length fields to handle larger sizes=0D
+      types: move phys_vec definition to common header=0D
+=0D
+ block/blk-mq-dma.c      | 17 ++++++++---------=0D
+ drivers/nvme/host/pci.c |  4 ++--=0D
+ include/linux/types.h   |  5 +++++=0D
+ 3 files changed, 15 insertions(+), 11 deletions(-)=0D
+---=0D
+base-commit: 79bd8c9814a273fa7ba43399e1c07adec3fc95db=0D
+change-id: 20251030-nvme-phys-types-988893249454=0D
