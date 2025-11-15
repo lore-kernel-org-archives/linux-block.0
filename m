@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7502429CB4C
-	for <linux-block@vger.kernel.org>; Sat, 15 Nov 2025 12:20:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5440A29B20D
+	for <linux-block@vger.kernel.org>; Sat, 15 Nov 2025 12:20:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763209200; cv=none; b=ZgVnVMgwqe1i0FCnxK52pubVo0ejazQ3XYls8v5Ztzfoj2XTe2+pj9up75xIYXa/6yJjngyUXon+raG/acBllfiLIfFh62Kdt5HNq+ufY+76CJ+VPHWfYNSRMpTs2qQg5cc+M5R8uicb2VW7OTRmeMFNnvu52L08fLq3d2vRHNQ=
+	t=1763209202; cv=none; b=P0tDz8dWTBE1p3d9IiknZAhYOD7O/vT0/3Vf+LIV8r8r0WTKjTMbtdLYOB3+NVJyjfUyvEKeFxvcxwBGdsFtKioUvmJZE/7NA6YuxIG7bmlLzteWx61oWYQ9NpgNZ4YsLK3UJwbTDUDWRR7KOcpMHOEIr8P+344nBtd663X23ww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763209200; c=relaxed/simple;
-	bh=LIFeb1rjjjhb85UYE14aIpsl7hUuCifvgZ3pXhid8Y8=;
+	s=arc-20240116; t=1763209202; c=relaxed/simple;
+	bh=77H7hEFlIZa37AghadVbw+5zXwOIkJy5S402JEyur2g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hb1Qjd7nShsOc3X9ppT/6PV3rnFdqORdSW3KLTKeDY3jJ65JnZWnWiPC6sdG+GQ7T9QR7vzMB6dyGJ/AwP47uMsJmIN/0VkKRG6rx1XzdR/r7K7CKY7mJ7hs5eCwcxsdNDaDuHOV4QvQw1u5IvaNVXknIUAb+GJfQnVYx1mZcIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=giZamhAT; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=RBLUB8yMDDW/00EhUQNwWaV2aK5C4BjUxX29PK7s8J9TqUyUm1ela95YiA7RYEd4jUJNqgFgoiIzhfA7rZsqCMVuilNyhWv46Q5Hh9uHME2dtRGC4kaYNY80ZjFxiC2ah9jpjdMxvFh7RWgD8aMU3kRz4q5hKi4o++Vi8DkBS+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GAriWFWI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="giZamhAT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79B9FC16AAE;
-	Sat, 15 Nov 2025 12:19:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GAriWFWI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BAE3C4CEF5;
+	Sat, 15 Nov 2025 12:20:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763209200;
-	bh=LIFeb1rjjjhb85UYE14aIpsl7hUuCifvgZ3pXhid8Y8=;
+	s=k20201202; t=1763209201;
+	bh=77H7hEFlIZa37AghadVbw+5zXwOIkJy5S402JEyur2g=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=giZamhATJhK6kouvsMNHFizgQRHQyrAZ0iEnmyYgdxUCRUW5cTeOHFSOwDr362wcq
-	 dkBfWNDX8WJFEzHjzRggQhyNE+z5ZpXjt7HsqR2aEsVJKrWQkT0hpOiwim0a2nS+dS
-	 +y8pBtTDOqtgqoXK2xvTl1/ZCL6UChw++DJfrcjmq7Asq4WQQlIKFihykw5O3B5RSI
-	 90L4jZymT0lu/ti5ZizphyAqCL6SZP69heyLzhzG2QtyWpYQowWbTc7xNQC7sOV0ZM
-	 SR/xnW/nO7zdhdIxsAkJsnPxXlyxqNBQFgyO2MZzVT+hH7aQaGvGjeQWKe4chywUjp
-	 z7KOyBBT/sQwA==
+	b=GAriWFWIaOnMMWIggl5GFNhPYaGslc9dcHNvyZAZrZNqZM/Obf3LILImVEcNvmUDa
+	 HuuiSzIPrqk5NCnuwb/1tv+HpIlsxdn06Ss4ii/Qe18tjQtBLOuC/tUTc5oTei7NQp
+	 D+nATUEfhRAjiYN7J9bTr+h2zpAUkrsoDQryhhd4DpFKtgq6lUjPLPhjmTzwuTPIEd
+	 jKfpzZ2OpuvppwG86BvpQQFBBp4hD/tZLdHFchQbUta447fHQoE2D8DEYxNsVL2/FY
+	 Vopj9STu4u0tuAqJ73PLBhGtqLVW9RMeIJM3oS+4l8TcErzd7Y0fKBDezDS+VHSz/t
+	 lIzvQ6xO8gklw==
 From: Damien Le Moal <dlemoal@kernel.org>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
 Cc: Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 2/6] zloop: fail zone append operations that are targeting full zones
-Date: Sat, 15 Nov 2025 21:15:52 +0900
-Message-ID: <20251115121556.196104-3-dlemoal@kernel.org>
+Subject: [PATCH 3/6] zloop: simplify checks for writes to sequential zones
+Date: Sat, 15 Nov 2025 21:15:53 +0900
+Message-ID: <20251115121556.196104-4-dlemoal@kernel.org>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <20251115121556.196104-1-dlemoal@kernel.org>
 References: <20251115121556.196104-1-dlemoal@kernel.org>
@@ -44,37 +44,66 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-zloop_rw() will fail any regular write operation that targets a full
-sequential zone. The check for this is indirect and achieved by checking
-the write pointer alignment of the write operation. But this check is
-ineffective for zone append operations since these are alwasy
-automatically directed at a zone write pointer.
+The function zloop_rw() already checks early that a request is fully
+contained within the target zone. So this check does not need to be done
+again for regular writes to sequential zones. Furthermore, since zone
+append operations are always directed to the zone write pointer
+location, we do not need to check for their alignment to that value
+after setting it. So turn the "if" checking the write pointer alignment
+into an "else if".
 
-Prevent zone append operations from being executed in a full zone with
-an explicit check of the zone condition.
+While at it, improve the comment describing the write pointer
+modification and how this value is corrected in case of error.
 
-Fixes: eb0570c7df23 ("block: new zoned loop block device driver")
-Cc: stable@vger.kernel.org
 Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
 ---
- drivers/block/zloop.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ drivers/block/zloop.c | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/block/zloop.c b/drivers/block/zloop.c
-index a975b1d07f1c..266d233776ad 100644
+index 266d233776ad..0526277f6cd1 100644
 --- a/drivers/block/zloop.c
 +++ b/drivers/block/zloop.c
-@@ -407,6 +407,10 @@ static void zloop_rw(struct zloop_cmd *cmd)
+@@ -406,6 +406,11 @@ static void zloop_rw(struct zloop_cmd *cmd)
+ 	if (!test_bit(ZLOOP_ZONE_CONV, &zone->flags) && is_write) {
  		mutex_lock(&zone->lock);
  
++		/*
++		 * Zone append operations always go at the current write
++		 * pointer, but regular write operations must already be
++		 * aligned to the write pointer when submitted.
++		 */
  		if (is_append) {
-+			if (zone->cond == BLK_ZONE_COND_FULL) {
-+				ret = -EIO;
-+				goto unlock;
-+			}
+ 			if (zone->cond == BLK_ZONE_COND_FULL) {
+ 				ret = -EIO;
+@@ -413,13 +418,7 @@ static void zloop_rw(struct zloop_cmd *cmd)
+ 			}
  			sector = zone->wp;
  			cmd->sector = sector;
- 		}
+-		}
+-
+-		/*
+-		 * Write operations must be aligned to the write pointer and
+-		 * fully contained within the zone capacity.
+-		 */
+-		if (sector != zone->wp || zone->wp + nr_sectors > zone_end) {
++		} else if (sector != zone->wp) {
+ 			pr_err("Zone %u: unaligned write: sect %llu, wp %llu\n",
+ 			       zone_no, sector, zone->wp);
+ 			ret = -EIO;
+@@ -432,9 +431,9 @@ static void zloop_rw(struct zloop_cmd *cmd)
+ 			zone->cond = BLK_ZONE_COND_IMP_OPEN;
+ 
+ 		/*
+-		 * Advance the write pointer of sequential zones. If the write
+-		 * fails, the wp position will be corrected when the next I/O
+-		 * copmpletes.
++		 * Advance the write pointer. If the write fails, the write
++		 * pointer position will be corrected when the next I/O starts
++		 * execution.
+ 		 */
+ 		zone->wp += nr_sectors;
+ 		if (zone->wp == zone_end) {
 -- 
 2.51.1
 
