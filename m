@@ -1,275 +1,188 @@
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F61B28031C
-	for <linux-block@vger.kernel.org>; Sun, 16 Nov 2025 08:11:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90D44274B2E
+	for <linux-block@vger.kernel.org>; Sun, 16 Nov 2025 12:00:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763280717; cv=none; b=GsBldnQd/5ShiWTUleuimpI4UkyGv5DVluycsO76teQIu4hZ7AN7Izhm10GBMpt8VxXZ97cbAyvmXw00/FZWQF36+vG3gAYPF/6MPl8q0wrdFbck7ronxsVjE/dVnkCweZ1UmsbaJV9sqASaPYmZW1V2Ofc5GIjCau7ZGjOdymg=
+	t=1763294416; cv=none; b=jv6mjn23owp3HMo5CEn606ws7WLvEjl+U68QN89qpQ4JHWEqs7cIvCcFQyX+gYAb+8iMxw7vw7FE2ILW76PXxhaZfnMpdF8JJfWYJ7uV+rhPMR+Qkc2Q4rGO8LxU80Kv3E2Z/ZZy8grWXVCHtlvAwF/IENPsLx9nEls3u90p9AI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763280717; c=relaxed/simple;
-	bh=4jwDEm2sAyYHKu+zGh5hRNHcB8FQ+DLUM7X5j7Jlq5E=;
+	s=arc-20240116; t=1763294416; c=relaxed/simple;
+	bh=UgifHQykeZ4ZMomR6gat/PeqqB4CWvAk/5DKHEuEwgQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tpEJm0ZX0faIXtaKEpl26wcid8jeNdWK/psQzyULdY4XQEf3kZHgXtHJRXnyFFah7ptauZJb34Z/EwdZ2vnNf0SPRhjC8n9JD/9lsnVsAwX5M10+cHELjiq/jaZfp/pplTk4fet9xln1WnuAYwntB3cpUt2t03Zy7UsDEcGLOQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=cbzwDDRp; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=EuOptOrlV1q5GDOF1KvJNIcb1WJtySxVyTqQWK6a0CZdNzHIYJrFxEBJPT+lw3URF+dmwDIo5ttxSvtDBc/R6glGprkejVZbQikqMmBwTDqnpMdufcBHUxPHTUc0R32iz8b3C/1RkIoMAG3dw9MHrGloa9munT/6M6AYjcQV6CU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TmhFZddx; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="cbzwDDRp"
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2958db8ae4fso31139005ad.2
-        for <linux-block@vger.kernel.org>; Sun, 16 Nov 2025 00:11:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1763280714; x=1763885514; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HxFwg3ju+ftuSMqIiYAdOOvZ0OAIJu2EJhRRFE1j4DA=;
-        b=cbzwDDRpkw3DgAJ3PaSrTatxTwbDkfkdswhBitGYCpQlycV6H62giabeUcmpEZdd0/
-         GHsK/NQUeUOOnvuXK8Qanh9NY9E+0qjtAXW4WUejYI5Bz4eFZKZwhzRVqnD7u4RbSeJQ
-         HB5Hm03mGZYK13pfL4ayd6Rw5Ni+OFxI7eVdF+ZHsEeb0yhOwQweDqvjqArD7YTXClsc
-         fxPRjT0QP1cFhaWQMVNXMWcto4SY1t2lIPBeE5dYff6RUBWoX2k1ifkP6elRzlhEyKah
-         cJrbTTWiCA8RQmQ2OCAAv4hY0l/ylzAJmv4Dk+rVTE7/JHheEZ0f62/XuETG1I5c8ezD
-         ywwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763280714; x=1763885514;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HxFwg3ju+ftuSMqIiYAdOOvZ0OAIJu2EJhRRFE1j4DA=;
-        b=GiyR2A+qvCCR5EbAV5AXfIJNrDlfDAoxVufhsLyBf87Bfe4VWVkmDcNnF02V+hbkyo
-         pYneDT+8oiv1aOY6R0liJUtSJjr0OndL/NSIB6tDGRYx4rOfSxlrK2+p38213dKgbHm1
-         E913RN6oKcm9ED9CBYSyB4FAlnvz9WMK1iUPHpzMUORPIz+VNWKlHbmlRpmw/DN+R+Eo
-         C9Mm1n1do7vRi5wpP04vVTm0GH0lhGIGWmeOy4Icku6mrvt0pb/eIG1YJkCAO2ynHzjl
-         xTHN6kt6drRTRo7sOqSQi3gm4xSDHVQMSb2E79rQllm8xC8Crf8570i0RENzjbMhAuJF
-         BJYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVqtfXgT35OFr8QYSeSs9CFuAlTynRjiqfa7Gkv4e7aNYbv0QW+lQfKxh9Hr9VzWWAumMfWj3+hAVQPig==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyymI7NmhZC9yCAkutB+na8hoUsWe7O4DrwQiTPeYweDLj0071M
-	EnbdvTF1pxqTpKp4e5MO5ElAPusErVZ90o7+0FdkWeNT5KJzLsjLyjQwsbU1Pe35YLw=
-X-Gm-Gg: ASbGncvWZ3EGRZtEQfBrkgDHlPNIBR+h/0s/KzWfwDcZYQbOq1dZ9255EDDVIFf/LKI
-	b/2ueKZE80X5gS5dygbfi36IMQvHAuy0rZ5L8djTXsw7Cxa7lML61+Z9Kk029KfaKyof3hfxTb+
-	UPhbVkk2OQFrXCgehZfp79feQtQk5nofmWctXegqTTN3v5jszj7kDRJmmTFsTPEELe5gkJ1ZZlZ
-	FRYPU4aPyQhqKDbAUR6c1KK2g6p8aeS1BZrseiZlz6KOgV/c5hKCpRA7ZhTBn8G5fpnCaMdTSvg
-	UtQ3W8CRYoPraET+bE0N6wnk8ocRT/9XjPxZEjOUUbS/as2A72QsZGmm6nMvclccBkANiOK3Y43
-	TgDAlYJ3dZ/vcbSw6e5WB/mESvoZc4+6cQ6sd69YguObVX2n5uN3+bJw0Sz4od4fgr2X0oLTmf+
-	TjdmErcq83eHi7WheO+Fgnrdxtm4LoKYgrf1+sN//x+bwFB/Dib7c=
-X-Google-Smtp-Source: AGHT+IG4zTCgOyc8q36N6azv8U3/msRqtiTIPYqJrKFmmGWBG01OEhj/Rfjn+kBTPtApfo/xiU3cYQ==
-X-Received: by 2002:a17:903:230a:b0:295:94e1:91da with SMTP id d9443c01a7336-2986a73b093mr100196375ad.33.1763280714289;
-        Sun, 16 Nov 2025 00:11:54 -0800 (PST)
-Received: from dread.disaster.area (pa49-181-58-136.pa.nsw.optusnet.com.au. [49.181.58.136])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2985c234726sm104981205ad.8.2025.11.16.00.11.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 16 Nov 2025 00:11:53 -0800 (PST)
-Received: from dave by dread.disaster.area with local (Exim 4.98.2)
-	(envelope-from <david@fromorbit.com>)
-	id 1vKXrS-0000000BUZh-0XuM;
-	Sun, 16 Nov 2025 19:11:50 +1100
-Date: Sun, 16 Nov 2025 19:11:50 +1100
-From: Dave Chinner <david@fromorbit.com>
-To: Ojaswin Mujoo <ojaswin@linux.ibm.com>
-Cc: Ritesh Harjani <ritesh.list@gmail.com>, Christoph Hellwig <hch@lst.de>,
-	Christian Brauner <brauner@kernel.org>, djwong@kernel.org,
-	john.g.garry@oracle.com, tytso@mit.edu, willy@infradead.org,
-	dchinner@redhat.com, linux-xfs@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-ext4@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, jack@suse.cz,
-	nilay@linux.ibm.com, martin.petersen@oracle.com,
-	rostedt@goodmis.org, axboe@kernel.dk, linux-block@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 0/8] xfs: single block atomic writes for buffered IO
-Message-ID: <aRmHRk7FGD4nCT0s@dread.disaster.area>
-References: <cover.1762945505.git.ojaswin@linux.ibm.com>
- <aRUCqA_UpRftbgce@dread.disaster.area>
- <20251113052337.GA28533@lst.de>
- <87frai8p46.ritesh.list@gmail.com>
- <aRWzq_LpoJHwfYli@dread.disaster.area>
- <aRb0WQJi4rQQ-Zmo@li-dc0c254c-257c-11b2-a85c-98b6c1322444.ibm.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TmhFZddx"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763294413;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/S7mZMjOJf0NUeuKlTCB8fNClaQ105nEL4CD3u5Bc08=;
+	b=TmhFZddx6N7jRsmMW2BqQpxlScq8tqsuej1sTtL77m6j++M9k6307Ibr+5jTkH0KJXjuaV
+	DAiQSm6pxPylobgnKiieb5R/bbhwMeMSQJZdyqWtZ+SNAM/mNR99YKiwExpuOxDdpH9SsT
+	hNM5s3oHNfVlX1fVfh19vMVrm60IUMU=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-341-xoM1WJIKNp2vr8fOQjuANg-1; Sun,
+ 16 Nov 2025 07:00:10 -0500
+X-MC-Unique: xoM1WJIKNp2vr8fOQjuANg-1
+X-Mimecast-MFC-AGG-ID: xoM1WJIKNp2vr8fOQjuANg_1763294408
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8586218AB400;
+	Sun, 16 Nov 2025 12:00:07 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.55])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E002319560A7;
+	Sun, 16 Nov 2025 11:59:59 +0000 (UTC)
+Date: Sun, 16 Nov 2025 19:59:44 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Uday Shankar <ushankar@purestorage.com>,
+	Stefani Seibold <stefani@seibold.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V3 01/27] kfifo: add kfifo_alloc_node() helper for NUMA
+ awareness
+Message-ID: <aRm8sDRh2UEjpYH_@fedora>
+References: <20251112093808.2134129-1-ming.lei@redhat.com>
+ <20251112093808.2134129-2-ming.lei@redhat.com>
+ <CADUfDZrSO5eAwzjzedMf1gHTUv3Bv7JPL-nspqQG4bQE+F=6XA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <aRb0WQJi4rQQ-Zmo@li-dc0c254c-257c-11b2-a85c-98b6c1322444.ibm.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADUfDZrSO5eAwzjzedMf1gHTUv3Bv7JPL-nspqQG4bQE+F=6XA@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Fri, Nov 14, 2025 at 02:50:25PM +0530, Ojaswin Mujoo wrote:
-> On Thu, Nov 13, 2025 at 09:32:11PM +1100, Dave Chinner wrote:
-> > On Thu, Nov 13, 2025 at 11:12:49AM +0530, Ritesh Harjani wrote:
-> > > Christoph Hellwig <hch@lst.de> writes:
-> > > 
-> > > > On Thu, Nov 13, 2025 at 08:56:56AM +1100, Dave Chinner wrote:
-> > > >> On Wed, Nov 12, 2025 at 04:36:03PM +0530, Ojaswin Mujoo wrote:
-> > > >> > This patch adds support to perform single block RWF_ATOMIC writes for
-> > > >> > iomap xfs buffered IO. This builds upon the inital RFC shared by John
-> > > >> > Garry last year [1]. Most of the details are present in the respective 
-> > > >> > commit messages but I'd mention some of the design points below:
-> > > >> 
-> > > >> What is the use case for this functionality? i.e. what is the
-> > > >> reason for adding all this complexity?
-> > > >
-> > > > Seconded.  The atomic code has a lot of complexity, and further mixing
-> > > > it with buffered I/O makes this even worse.  We'd need a really important
-> > > > use case to even consider it.
-> > > 
-> > > I agree this should have been in the cover letter itself. 
-> > > 
-> > > I believe the reason for adding this functionality was also discussed at
-> > > LSFMM too...  
-> > > 
-> > > For e.g. https://lwn.net/Articles/974578/ goes in depth and talks about
-> > > Postgres folks looking for this, since PostgreSQL databases uses
-> > > buffered I/O for their database writes.
-> > 
-> > Pointing at a discussion about how "this application has some ideas
-> > on how it can maybe use it someday in the future" isn't a
-> > particularly good justification. This still sounds more like a
-> > research project than something a production system needs right now.
+On Fri, Nov 14, 2025 at 08:14:29PM -0800, Caleb Sander Mateos wrote:
+> On Wed, Nov 12, 2025 at 1:38 AM Ming Lei <ming.lei@redhat.com> wrote:
+> >
+> > Add __kfifo_alloc_node() by refactoring and reusing __kfifo_alloc(),
+> > and define kfifo_alloc_node() macro to support NUMA-aware memory
+> > allocation.
+> >
+> > The new __kfifo_alloc_node() function accepts a NUMA node parameter
+> > and uses kmalloc_array_node() instead of kmalloc_array() for
+> > node-specific allocation. The existing __kfifo_alloc() now calls
+> > __kfifo_alloc_node() with NUMA_NO_NODE to maintain backward
+> > compatibility.
+> >
+> > This enables users to allocate kfifo buffers on specific NUMA nodes,
+> > which is important for performance in NUMA systems where the kfifo
+> > will be primarily accessed by threads running on specific nodes.
+> >
+> > Cc: Stefani Seibold <stefani@seibold.net>
+> > Cc: Andrew Morton <akpm@linux-foundation.org>
+> > Cc: linux-kernel@vger.kernel.org
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  include/linux/kfifo.h | 27 +++++++++++++++++++++++++++
+> >  lib/kfifo.c           | 13 ++++++++++---
+> >  2 files changed, 37 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/include/linux/kfifo.h b/include/linux/kfifo.h
+> > index fd743d4c4b4b..61d1fe014a6c 100644
+> > --- a/include/linux/kfifo.h
+> > +++ b/include/linux/kfifo.h
+> > @@ -369,6 +369,30 @@ __kfifo_int_must_check_helper( \
+> >  }) \
+> >  )
+> >
+> > +/**
+> > + * kfifo_alloc_node - dynamically allocates a new fifo buffer on a NUMA node
+> > + * @fifo: pointer to the fifo
+> > + * @size: the number of elements in the fifo, this must be a power of 2
+> > + * @gfp_mask: get_free_pages mask, passed to kmalloc()
+> > + * @node: NUMA node to allocate memory on
+> > + *
+> > + * This macro dynamically allocates a new fifo buffer with NUMA node awareness.
+> > + *
+> > + * The number of elements will be rounded-up to a power of 2.
+> > + * The fifo will be release with kfifo_free().
+> > + * Return 0 if no error, otherwise an error code.
+> > + */
+> > +#define kfifo_alloc_node(fifo, size, gfp_mask, node) \
+> > +__kfifo_int_must_check_helper( \
+> > +({ \
+> > +       typeof((fifo) + 1) __tmp = (fifo); \
+> > +       struct __kfifo *__kfifo = &__tmp->kfifo; \
+> > +       __is_kfifo_ptr(__tmp) ? \
+> > +       __kfifo_alloc_node(__kfifo, size, sizeof(*__tmp->type), gfp_mask, node) : \
+> > +       -EINVAL; \
+> > +}) \
+> > +)
+> > +
+> >  /**
+> >   * kfifo_free - frees the fifo
+> >   * @fifo: the fifo to be freed
+> > @@ -902,6 +926,9 @@ __kfifo_uint_must_check_helper( \
+> >  extern int __kfifo_alloc(struct __kfifo *fifo, unsigned int size,
+> >         size_t esize, gfp_t gfp_mask);
+> >
+> > +extern int __kfifo_alloc_node(struct __kfifo *fifo, unsigned int size,
+> > +       size_t esize, gfp_t gfp_mask, int node);
+> > +
+> >  extern void __kfifo_free(struct __kfifo *fifo);
+> >
+> >  extern int __kfifo_init(struct __kfifo *fifo, void *buffer,
+> > diff --git a/lib/kfifo.c b/lib/kfifo.c
+> > index a8b2eed90599..195cf0feecc2 100644
+> > --- a/lib/kfifo.c
+> > +++ b/lib/kfifo.c
+> > @@ -22,8 +22,8 @@ static inline unsigned int kfifo_unused(struct __kfifo *fifo)
+> >         return (fifo->mask + 1) - (fifo->in - fifo->out);
+> >  }
+> >
+> > -int __kfifo_alloc(struct __kfifo *fifo, unsigned int size,
+> > -               size_t esize, gfp_t gfp_mask)
+> > +int __kfifo_alloc_node(struct __kfifo *fifo, unsigned int size,
+> > +               size_t esize, gfp_t gfp_mask, int node)
+> >  {
+> >         /*
+> >          * round up to the next power of 2, since our 'let the indices
+> > @@ -41,7 +41,7 @@ int __kfifo_alloc(struct __kfifo *fifo, unsigned int size,
+> >                 return -EINVAL;
+> >         }
+> >
+> > -       fifo->data = kmalloc_array(esize, size, gfp_mask);
+> > +       fifo->data = kmalloc_array_node(esize, size, gfp_mask, node);
+> >
+> >         if (!fifo->data) {
+> >                 fifo->mask = 0;
+> > @@ -51,6 +51,13 @@ int __kfifo_alloc(struct __kfifo *fifo, unsigned int size,
+> >
+> >         return 0;
+> >  }
+> > +EXPORT_SYMBOL(__kfifo_alloc_node);
+> > +
+> > +int __kfifo_alloc(struct __kfifo *fifo, unsigned int size,
+> > +               size_t esize, gfp_t gfp_mask)
+> > +{
+> > +       return __kfifo_alloc_node(fifo, size, esize, gfp_mask, NUMA_NO_NODE);
+> > +}
+> >  EXPORT_SYMBOL(__kfifo_alloc);
 > 
-> Hi Dave, Christoph,
-> 
-> There were some discussions around use cases for buffered atomic writes
-> in the previous LSFMM covered by LWN here [1]. AFAIK, there are 
-> databases that recommend/prefer buffered IO over direct IO. As mentioned
-> in the article, MongoDB being one that supports both but recommends
-> buffered IO. Further, many DBs support both direct IO and buffered IO
-> well and it may not be fair to force them to stick to direct IO to get
-> the benefits of atomic writes.
-> 
-> [1] https://lwn.net/Articles/1016015/
+> Is it worth keeping __kfifo_alloc() as an extern function? Seems like
+> it would make the executable smaller to turn __kfifo_alloc() into a
+> static inline function that just defers to __kfifo_alloc_node().
 
-You are quoting a discussion about atomic writes that was
-held without any XFS developers present. Given how XFS has driven
-atomic write functionality so far, XFS developers might have some
-..... opinions about how buffered atomic writes in XFS...
+OK, will convert to inline __kfifo_alloc() in next version.
 
-Indeed, go back to the 2024 buffered atomic IO LSFMM discussion,
-where there were XFS developers present. That's the discussion that
-Ritesh referenced, so you should be aware of it.
 
-https://lwn.net/Articles/974578/
+Thanks,
+Ming
 
-Back then I talked about how atomic writes made no sense as
--writeback IO- given the massive window for anything else to modify
-the data in the page cache. There is no guarantee that what the
-application wrote in the syscall is what gets written to disk with
-writeback IO. i.e. anything that can access the page cache can
-"tear" application data that is staged as "atomic data" for later
-writeback.
-
-IOWs, the concept of atomic writes for writeback IO makes almost no
-sense at all - dirty data at rest in the page cache is not protected
-against 3rd party access or modification. The "atomic data IO"
-semantics can only exist in the submitting IO context where
-exclusive access to the user data can be guaranteed.
-
-IMO, the only way semantics that makes sense for buffered atomic
-writes through the page cache is write-through IO. The "atomic"
-context is related directly to user data provided at IO submission,
-and so IO submitted must guarantee exactly that data is being
-written to disk in that IO.
-
-IOWs, we have to guarantee exclusive access between the data copy-in
-and the pages being marked for writeback. The mapping needs to be
-marked as using stable pages to prevent anyone else changing the
-cached data whilst it has an atomic IO pending on it.
-
-That means folios covering atomic IO ranges do not sit in the page
-cache in a dirty state - they *must* immediately transition to the
-writeback state before the folio is unlocked so that *nothing else
-can modify them* before the physical REQ_ATOMIC IO is submitted and
-completed.
-
-If we've got the folios marked as writeback, we can pack them
-immediately into a bio and submit the IO (e.g. via the iomap DIO
-code). There is no need to involve the buffered IO writeback path
-here; we've already got the folios at hand and in the right state
-for IO. Once the IO is done, we end writeback on them and they
-remain clean in the page caceh for anyone else to access and
-modify...
-
-This gives us the same physical IO semantics for buffered and direct
-atomic IO, and it allows the same software fallbacks for larger IO
-to be used as well.
-
-> > Why didn't you use the existing COW buffered write IO path to
-> > implement atomic semantics for buffered writes? The XFS
-> > functionality is already all there, and it doesn't require any
-> > changes to the page cache or iomap to support...
-> 
-> This patch set focuses on HW accelerated single block atomic writes with
-> buffered IO, to get some early reviews on the core design.
-
-What hardware acceleration? Hardware atomic writes are do not make
-IO faster; they only change IO failure semantics in certain corner
-cases. Making buffered writeback IO use REQ_ATOMIC does not change
-the failure semantics of buffered writeback from the point of view
-of an application; the applicaiton still has no idea just how much
-data or what files lost data whent eh system crashes.
-
-Further, writeback does not retain application write ordering, so
-the application also has no control over the order that structured
-data is updated on physical media.  Hence if the application needs
-specific IO ordering for crash recovery (e.g. to avoid using a WAL)
-it cannot use background buffered writeback for atomic writes
-because that does not guarantee ordering.
-
-What happens when you do two atomic buffered writes to the same file
-range? The second on hits the page cache, so now the crash recovery
-semantic is no longer "old or new", it's "some random older version
-or new". If the application rewrites a range frequently enough,
-on-disk updates could skip dozens of versions between "old" and
-"new", whilst other ranges of the file move one version at a time.
-The application has -zero control- of this behaviour because it is
-background writeback that determines when something gets written to
-disk, not the application.
-
-IOWs, the only way to guarantee single version "old or new" atomic
-buffered overwrites for any given write would be to force flushing
-of the data post-write() completion.  That means either O_DSYNC,
-fdatasync() or sync_file_range(). And this turns the atomic writes
-into -write-through- IO, not write back IO...
-
-> Just like we did for direct IO atomic writes, the software fallback with
-> COW and multi block support can be added eventually.
-
-If the reason for this functionality is "maybe someone
-can use it in future", then you're not implementing this
-functionality to optimise an existing workload. It's a research
-project looking for a user.
-
-Work with the database engineers to build a buffered atomic write
-based engine that implements atomic writes with RWF_DSYNC.
-Make it work, and optimise it to be competitive with existing
-database engines, than then show how much faster it is using
-RWF_ATOMIC buffered writes.
-
-Alternatively - write an algorithm that assumes the filesystem is
-using COW for overwrites, and optimise the data integrity algorithm
-based on this knowledge. e.g. use always-cow mode on XFS, or just
-optimise for normal bcachefs or btrfs buffered writes. Use O_DSYNC
-when completion to submission ordering is required. Now you have
-an application algorithm that is optimised for old-or-new behaviour,
-and that can then be acclerated on overwrite-in-place capable
-filesystems by using a direct-to-hw REQ_ATOMIC overwrite to provide
-old-or-new semantics instead of using COW.
-
-Yes, there are corner cases - partial writeback, fragmented files,
-etc - where data will a mix of old and new when using COW without
-RWF_DSYNC.  Those are the the cases that RWF_ATOMIC needs to
-mitigate, but we don't need whacky page cache and writeback stuff to
-implement RWF_ATOMIC semantics in COW capable filesystems.
-
-i.e. enhance the applicaitons to take advantage of native COW
-old-or-new data semantics for buffered writes, then we can look at
-direct-to-hw fast paths to optimise those algorithms.
-
-Trying to go direct-to-hw first without having any clue of how
-applications are going to use such functionality is backwards.
-Design the applicaiton level code that needs highly performant
-old-or-new buffered write guarantees, then we can optimise the data
-paths for it...
-
--Dave.
--- 
-Dave Chinner
-david@fromorbit.com
