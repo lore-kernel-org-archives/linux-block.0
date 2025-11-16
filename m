@@ -1,97 +1,173 @@
-Received: from sg-1-17.ptr.blmpb.com (sg-1-17.ptr.blmpb.com [118.26.132.17])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C269F239E81
-	for <linux-block@vger.kernel.org>; Sun, 16 Nov 2025 02:42:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DFA786331
+	for <linux-block@vger.kernel.org>; Sun, 16 Nov 2025 02:52:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763260926; cv=none; b=pHUSm9LhInBvwjXK9wPxonjvEj0Ezq2AL+E434ujnghAm1o3WtasNeUKVWAfHUNlA5Dkdms6vVssl5x4sFMpGfLGtkx8nMSzfxRqOHzvmgecax00Hggaw3V0a/fovsiBJZtyto7aCrwOoF8PEp3wtoGZQZwiC3uG9N+y5rB//EE=
+	t=1763261556; cv=none; b=AoUU+C87nyl27W/cx4Z2VSP0Txdr2nJvqj5iXxCI54IUxyOCPVDIvjvYwvR0CrYvy+iWrjJNj/JEBJUf5AEUfEKhzg9SWMKRkEb0apNCX/4tQMpQ2KpsujLAEaYcAPMylF6WULYhe69b9PFbpyHPPEAUa29x/KE3EJVDeNhSYKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763260926; c=relaxed/simple;
-	bh=Z7O94oijY3strRk71JNZPL0gx2vdpAvUplzCS8521UU=;
-	h=Mime-Version:Content-Type:From:Message-Id:Date:To:Subject:Cc; b=lBI1XGv4jh85MSgAwodqzE24+3BKj5pCWEBDIZPyO2TCtPeVUbVKBJmvebG0+lOYC7bJi4ddZ9Eg3ZjkC0ELXDl2NBRZR/a2fO2+AybBxDC4r22rkVM2SWkjEYpIbuhaJMm716aja52dBokbfSe4Xj/Ua2JM0MwzLP94jQCG3QI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=none smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=fdan1kug; arc=none smtp.client-ip=118.26.132.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=fnnas.com
+	s=arc-20240116; t=1763261556; c=relaxed/simple;
+	bh=zSyuJQybiCCJq9vJXociC8iWz2WpqebRM2coqMQXreM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=j2s9YjhxX4bmD6cYCAdAM2JVSnA2RejUUdC04SlJwtyY9R6rU6KBGd7ckbNTIZAQFvofYxteoeQgqti//iFoGPfKI41tfWAxQh+iX7ruHYzJ5pVUdI4SN65GZHduvNuR9D07pj5Y8wLvxceISjXUbrfk4wEIbN3KI4yzG9VT2A0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bWypahLe; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="fdan1kug"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1763260913;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=eS9mut2o83UP0P4D/dZojWoRTZN8xQ/HzH88AZpecm8=;
- b=fdan1kug8M3oEWX4R27iBAnqviCE99WQUgangqVVRRjIuua1eVjKa8pMyMyTbkyq26/wRH
- zuFywzpCWJeF5te0T7INcG3Jc2TlyYGyepckU4eMwJBuFKHI3q/Ee6/O8wXPxxr73KqFpi
- JVFj1rRTVkHpj8ryUZFO9ClYMT/UV/lduaEIHMCiZF/zK6el+0LXxGZdObI+uawpXD2sws
- 0FU/94seVnKgZxypYn+C9+9/8pxXPB+jOVyPFCngtSRpb3DnqkiiXQFmQFT6/ZnwPEjLqg
- jPHL6j5kpB9BgOVt8OPs+yOrdxYDWRX4c6qnx3+Pwl/yEdSdG2wcc7Urf0K2KA==
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bWypahLe"
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-7b89c1ce9easo3095078b3a.2
+        for <linux-block@vger.kernel.org>; Sat, 15 Nov 2025 18:52:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763261554; x=1763866354; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Fynmkibx81oHPVZlsDjAwfjnWrDW9I9yhZr9t2s34D4=;
+        b=bWypahLeqU8XVhY7WrJrGKNOq75mOh0EUcbARqiR7cp8IpJMWFXZM2bVN25O6CBXKG
+         VepMX7Wcicankhc8rb1J3CiE0bVexHB6NlHVC3X3T1FGrDIx/rH4IGzGyKSdSKapjEEH
+         QN9b0VLKOKH8idRgb7Z1cC3RQ7BjHGE5aF+QbS395WBmJVk9nTZFp26JPwaaRkXmO7+o
+         cchfbYBcb3BI8OQCXCDB8wJSUx7TPq2D7dc4jmKiI/aCjqXLDOrgK1dT+khYowRHkcFk
+         JeRTh5G/fWZyd4oPYwDqF2lfZl+wXiL7TxhXNQwmvkAddNQ6wtwSnG88+g1Kd0JeuYR8
+         jZ9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763261554; x=1763866354;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Fynmkibx81oHPVZlsDjAwfjnWrDW9I9yhZr9t2s34D4=;
+        b=Qet9QAC2v9how9HfAXxHhTrqAidK5Qwpp1/h3TvOfu9dA1QaySMW4pawBNfvSfzuZO
+         k4z8wHKzaVIbL38lWG8oe04boEE2ZCKOrr3fS+9SPLCi9aS5CZLyZaz9qqOhYeIPYPYG
+         MzPcStT6MOMWKQmcnl/9x5JH/30zKlb92jBy7nZwi6HW4TO7cTkZIlO2jI7o2t/a6Gt0
+         lgS+C/lhNYUSxqW4SXjeqNhLBrsBmS3+RgHWjhvqyHFsmg4JpxfcnLqQF5Gi67bgeFTU
+         Egl8DpmTGgD+aB05Ast474oQ0JqowCTknHNp4dGn2NYB7sKpWY59d3sGfdU8merJgyYb
+         QU1g==
+X-Gm-Message-State: AOJu0YxUYfBcPwk0drspd/1MgdvBcLJq+kFX+aNKEyvDbtMXOlc7pX/O
+	Gye7qMnlt8Po4ntSnczx0iX4DC7VhTHYeBHZFkAuqXvsEObLaQ19s5NsI+xzhg==
+X-Gm-Gg: ASbGncvhYNKeiGcDzzESSI3FIJOVSlXEb9NhFn0ZJUDbIktTdAihb1yzNdb3tZu1i70
+	P0Uf2GiOgpG9SZpYlVFvwLsQAglpsxHWt7ZVICikLfoLHSc0zI7DdsrdRl5GV3cCJGur0GIf/9N
+	mXiK0QOWHerlDpgsb5S7NOEYnD25Ox1LeBJAz0p6Kc3uzyY04FGPPrY2+5GaDPHgmrRU2eboze6
+	iwXaPuxc8IcRLd3lsYZbx+hnBuWbp5u0R1ghWEIw6q7+8VRbYPR8RDzPIajM2hmIMFGuVMJ9uUM
+	u94rMlmrlnztGJqYNk9cS79Rv2UzKVZ5TAFLr+2Wvt3/q6y2bbxrYGvZUkrU3ZY5hDga60QOac8
+	WFWvmPkRgj2yj3fATmyKIsevMg9/CRNh6SYCb0zedemtcMSA8Wr0MaATo6Wb9Vd74kS1J6CXpwI
+	5e88uXdx6/npQL1wmFNFXH6JAXCVmCUi0/XMnWNjWqHdvYXpvzfbwsDG16Tw==
+X-Google-Smtp-Source: AGHT+IGuxCNPGqqDfinwkgjDYRdhsyZ3bAuSi+UqlLLpWa2IXW55TBZS0THPWyrGlc6chAtpNbV6Sw==
+X-Received: by 2002:a05:7022:e0a:b0:11b:bf3f:5251 with SMTP id a92af1059eb24-11bbf3f5610mr1080629c88.16.1763261554225;
+        Sat, 15 Nov 2025 18:52:34 -0800 (PST)
+Received: from localhost (ip70-175-132-216.oc.oc.cox.net. [70.175.132.216])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11b86afe12esm18537183c88.6.2025.11.15.18.52.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 15 Nov 2025 18:52:33 -0800 (PST)
+From: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+To: linux-block@vger.kernel.org
+Cc: axboe@kernel.dk,
+	hch@lst.de,
+	kch@nvidia.com,
+	dlemoal@kernel.org,
+	Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+Subject: [PATCH 1/2] loop: respect REQ_NOWAIT for memory allocation
+Date: Sat, 15 Nov 2025 18:52:28 -0800
+Message-Id: <20251116025229.29136-1-ckulkarnilinux@gmail.com>
+X-Mailer: git-send-email 2.40.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Original-From: Yu Kuai <yukuai@fnnas.com>
-Received: from localhost.localdomain ([39.182.0.135]) by smtp.feishu.cn with ESMTPS; Sun, 16 Nov 2025 10:41:51 +0800
-Content-Type: text/plain; charset=UTF-8
-From: "Yu Kuai" <yukuai@fnnas.com>
-Message-Id: <20251116024134.115685-3-yukuai@fnnas.com>
-X-Lms-Return-Path: <lba+2691939ef+0d2bf5+vger.kernel.org+yukuai@fnnas.com>
-Date: Sun, 16 Nov 2025 10:41:31 +0800
-Content-Transfer-Encoding: 7bit
-To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>, 
-	<linux-kernel@vger.kernel.org>, <tj@kernel.org>, <nilay@linux.ibm.com>, 
-	<ming.lei@redhat.com>
-Subject: [PATCH 2/5] blk-wbt: fix incorrect lock order for rq_qos_mutex and freeze queue
-X-Mailer: git-send-email 2.51.0
-Cc: <yukuai@fnnas.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-wbt_init() can be called from sysfs attribute and wbt_enable_default(),
-however the lock order are inversely.
+loop advertises REQ_NOWAIT support via BLK_FEAT_NOWAIT (set by
+default for all blk-mq devices), but violates REQ_NOWAIT semantics
+by using GFP_NOIO allocations which can block.
 
-- queue_wb_lat_store() freeze queue first, and then wbt_init() hold
-  rq_qos_mutex. In this case queue will be freezed again inside
-  rq_qos_add(), however, in this case freeze queue recursivly is
-  inoperative;
-- wbt_enable_default() from elevator switch will hold rq_qos_mutex
-  first, and then rq_qos_add() will freeze queue;
+BLK_FEAT_NOWAIT is advertised through this call chain:
+  loop_add()
+   blk_mq_alloc_disk(&lim, ...)
+    __blk_mq_alloc_disk()
+     blk_mq_alloc_queue()
+      lim->features |= BLK_FEAT_NOWAIT <-- Set by default for blk-mq
 
-Fix this problem by converting to use new helper rq_qos_add_freezed() in
-wbt_init(), and for wbt_enable_default(), freeze queue before calling
-wbt_init().
+However, the REQ_NOWAIT I/O path violates this contract. For io_uring
+inline submissions, the call chain is:
 
-Fixes: a13bd91be223 ("block/rq_qos: protect rq_qos apis with a new lock")
-Signed-off-by: Yu Kuai <yukuai@fnnas.com>
+  1. Userspace (io_uring setup):
+   io_uring_setup(entries, &params)
+   fd = io_uring_register(IORING_REGISTER_FILES, &zloop_fd, 1)
+
+  2. Userspace (submit I/O with NOWAIT):
+   sqe = io_uring_get_sqe(ring)
+   io_uring_prep_write(sqe, zloop_fd, buf, len, offset)
+   io_uring_submit(ring)  <-- inline submission
+
+  3. io_uring core (inline path):
+   io_submit_sqes()
+    io_submit_sqe()
+     io_queue_sqe()
+      issue_flags = IO_URING_F_NONBLOCK <-- Sets inline/nowait mode
+      io_issue_sqe()
+       io_write()
+        if (force_nonblock)  <-- true for inline submission
+         kiocb->ki_flags |= IOCB_NOWAIT
+
+  4. VFS layer:
+   call_write_iter()
+    blkdev_write_iter()
+     -> propagates IOCB_NOWAIT to REQ_NOWAIT on bio
+     __blkdev_direct_IO_simple() OR
+     __blkdev_direct_IO()        OR
+     __blkdev_direct_IO_async()
+
+  5. Block layer:
+   blk_mq_submit_bio()
+    blk_mq_get_new_requests()
+     __blk_mq_alloc_requests()
+      blk_mq_rq_ctx_init()
+       -> propagates REQ_NOWAIT to request->cmd_flags
+    __blk_mq_try_issue_directly() OR blk_mq_sched_insert_request()
+     blk_mq_run_hw_queue()
+      __blk_mq_delay_run_hw_queue()
+       __blk_mq_run_hw_queue()
+        blk_mq_sched_dispatch_requests()
+
+  6. Loop driver:
+   loop_queue_rq()
+    lo_rw_aio()
+     kmalloc_array(..., GFP_NOIO) <-- BLOCKS (REQ_NOWAIT violation)
+      -> Should use GFP_NOWAIT when rq->cmd_flags & REQ_NOWAIT
+
+Fix by using GFP_NOWAIT when REQ_NOWAIT is set, and return -EAGAIN
+instead of -ENOMEM when NOWAIT allocation fails, allowing io_uring
+to retry the operation with blocking allowed.
+
+Signed-off-by: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
 ---
- block/blk-wbt.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ drivers/block/loop.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index eb8037bae0bd..a784f6d338b4 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -724,8 +724,12 @@ void wbt_enable_default(struct gendisk *disk)
- 	if (!blk_queue_registered(q))
- 		return;
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 13ce229d450c..bad61f41df34 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -350,6 +350,8 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 	unsigned int offset;
+ 	int nr_bvec = 0;
+ 	int ret;
++	bool nowait = rq->cmd_flags & REQ_NOWAIT;
++	gfp_t alloc_flags = nowait ? GFP_NOWAIT : GFP_NOIO;
  
--	if (queue_is_mq(q) && enable)
-+	if (queue_is_mq(q) && enable) {
-+		unsigned int memflags = blk_mq_freeze_queue(q);
-+
- 		wbt_init(disk);
-+		blk_mq_unfreeze_queue(q, memflags);
-+	}
- }
- EXPORT_SYMBOL_GPL(wbt_enable_default);
+ 	rq_for_each_bvec(tmp, rq, rq_iter)
+ 		nr_bvec++;
+@@ -357,9 +359,9 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 	if (rq->bio != rq->biotail) {
  
-@@ -922,7 +926,7 @@ int wbt_init(struct gendisk *disk)
- 	 * Assign rwb and add the stats callback.
- 	 */
- 	mutex_lock(&q->rq_qos_mutex);
--	ret = rq_qos_add(&rwb->rqos, disk, RQ_QOS_WBT, &wbt_rqos_ops);
-+	ret = rq_qos_add_freezed(&rwb->rqos, disk, RQ_QOS_WBT, &wbt_rqos_ops);
- 	mutex_unlock(&q->rq_qos_mutex);
- 	if (ret)
- 		goto err_free;
+ 		bvec = kmalloc_array(nr_bvec, sizeof(struct bio_vec),
+-				     GFP_NOIO);
++				     alloc_flags);
+ 		if (!bvec)
+-			return -EIO;
++			return nowait ? -EAGAIN : -ENOMEM;
+ 		cmd->bvec = bvec;
+ 
+ 		/*
 -- 
-2.51.0
+2.40.0
+
