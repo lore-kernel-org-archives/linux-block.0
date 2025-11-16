@@ -1,18 +1,19 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 246F61CD15;
-	Sun, 16 Nov 2025 03:52:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A1EB1CD15;
+	Sun, 16 Nov 2025 03:52:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763265152; cv=none; b=rVT2xxL2LOziYuf7XhsibQ/O5/9LZK0N5r1x0Y7xWE3y3PAAnFmHGJIadTG3vEbVjOLFauJo5qLg6vMvOftpJgsiUZrFUaZwY7c3eUDCwXk5lVovP5bMyjuwfxtiSM/Hvkmi7Ra0FNFDMekydVIkEZWoSFC0dZYdNvSFmnkf1tQ=
+	t=1763265154; cv=none; b=N5LFcgdr3FqEmljRYcWzQBMF5d44ZUiD5Xm+XdtBqMm3VI03SXzyH+65a5xWEK4bvaoUIsOpbHGRGBXMbGCv/XrEtOms3xqvtcJMkmqPmFVgc2F0cGCtENV/EWwY/S8radMtmVRR9DfhqGf4fJtlXoR92h3oM5o3g0YK4Yogvjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763265152; c=relaxed/simple;
-	bh=bZCnS4hH6wpSpSWSrq2n3TUPrpocZezChVsn/UDK548=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UFBK+qyBo/rUoF+w/i4sPDS7mCwdCspciYzyOX0VOBzFZpvMD/8B2J3p2d9kzfxXWsWCbriVCsnrKvrWV0nBrtVunP1TyWhP2SHyHEdhz/UIuGWPfIgwRYwOUl2/8ksK00hKDbEfRwDgM+uPh9l5Kh2QWXbdp997OOVLfeomxD8=
+	s=arc-20240116; t=1763265154; c=relaxed/simple;
+	bh=hh1bIV/4NJvdi+LJD71lmjTfw9FGPr7RlXla8j+ZY4U=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=FhRJ+t33zmu4YDNGEFKqfgA2G2QoFvgbDqZVHtc13sSerkd8wtOfjdOZBOmSuwoKfI1o98hICJPCaMvFPncY/rO/gHRuEjsRw5V4V+p+N8h3Sv5K7CCDxZQmQLlAq0i12ct+cGyUprjULifcsxlnH9cSs02iqfmPS/3eynRyJhc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20FD5C113D0;
-	Sun, 16 Nov 2025 03:52:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 399A9C19422;
+	Sun, 16 Nov 2025 03:52:32 +0000 (UTC)
 From: Yu Kuai <yukuai@fnnas.com>
 To: axboe@kernel.dk,
 	linux-block@vger.kernel.org,
@@ -20,10 +21,12 @@ To: axboe@kernel.dk,
 Cc: yukuai@fnnas.com,
 	nilay@linux.ibm.com,
 	bvanassche@acm.org
-Subject: [PATCH RESEND v5 0/7] blk-mq: introduce new queue attribute async_depth
-Date: Sun, 16 Nov 2025 11:52:20 +0800
-Message-ID: <20251116035228.119987-1-yukuai@fnnas.com>
+Subject: [PATCH RESEND v5 1/7] block: convert nr_requests to unsigned int
+Date: Sun, 16 Nov 2025 11:52:21 +0800
+Message-ID: <20251116035228.119987-2-yukuai@fnnas.com>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20251116035228.119987-1-yukuai@fnnas.com>
+References: <20251116035228.119987-1-yukuai@fnnas.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -32,58 +35,29 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Changes in v5:
- - just resend with new email server;
-Changes in v4:
- - add review tag for the last patch 3;
- - rebase with my new email address, patches are not changed;
-Changes in v3:
- - use guard()/scope_guard() in patch 3;
- - add review tag other than patch 3;
-Changes in v2:
- - keep limit_depth() method for kyber and mq-deadline in patch 3;
- - add description about sysfs api change for kyber and mq-deadline;
- - improve documentation in patch 7;
- - add review tag for patch 1;
+This value represents the number of requests for elevator tags, or drivers
+tags if elevator is none. The max value for elevator tags is 2048, and
+in drivers at most 16 bits is used for tag.
 
-Background and motivation:
+Signed-off-by: Yu Kuai <yukuai@fnnas.com>
+Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
+---
+ include/linux/blkdev.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-At first, we test a performance regression from 5.10 to 6.6 in
-downstream kernel(described in patch 5), the regression is related to
-async_depth in mq-dealine.
-
-While trying to fix this regression, Bart suggests add a new attribute
-to request_queue, and I think this is a good idea because all elevators
-have similar logical, however only mq-deadline allow user to configure
-async_depth.
-
-patch 1-3 add new queue attribute async_depth;
-patch 4 convert kyber to use request_queue->async_depth;
-patch 5 covnert mq-dedaline to use request_queue->async_depth, also the
-performance regression will be fixed;
-patch 6 convert bfq to use request_queue->async_depth;
-
-Yu Kuai (7):
-  block: convert nr_requests to unsigned int
-  blk-mq-sched: unify elevators checking for async requests
-  blk-mq: add a new queue sysfs attribute async_depth
-  kyber: covert to use request_queue->async_depth
-  mq-deadline: covert to use request_queue->async_depth
-  block, bfq: convert to use request_queue->async_depth
-  blk-mq: add documentation for new queue attribute async_dpeth
-
- Documentation/ABI/stable/sysfs-block | 34 +++++++++++++++
- block/bfq-iosched.c                  | 45 ++++++++-----------
- block/blk-core.c                     |  1 +
- block/blk-mq-sched.h                 |  5 +++
- block/blk-mq.c                       | 64 +++++++++++++++++-----------
- block/blk-sysfs.c                    | 42 ++++++++++++++++++
- block/elevator.c                     |  1 +
- block/kyber-iosched.c                | 33 +++-----------
- block/mq-deadline.c                  | 39 +++--------------
- include/linux/blkdev.h               |  3 +-
- 10 files changed, 152 insertions(+), 115 deletions(-)
-
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 2fff8a80dbd2..bedcaa59feec 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -551,7 +551,7 @@ struct request_queue {
+ 	/*
+ 	 * queue settings
+ 	 */
+-	unsigned long		nr_requests;	/* Max # of requests */
++	unsigned int		nr_requests;	/* Max # of requests */
+ 
+ #ifdef CONFIG_BLK_INLINE_ENCRYPTION
+ 	struct blk_crypto_profile *crypto_profile;
 -- 
 2.51.0
 
