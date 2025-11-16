@@ -1,148 +1,264 @@
-Received: from sg-1-12.ptr.blmpb.com (sg-1-12.ptr.blmpb.com [118.26.132.12])
+Received: from sg-1-11.ptr.blmpb.com (sg-1-11.ptr.blmpb.com [118.26.132.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5151723817D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4839A239E9D
 	for <linux-block@vger.kernel.org>; Sun, 16 Nov 2025 03:21:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.12
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763263269; cv=none; b=GPeK5tqFjsLU6bpS96X6kezYwcIvB9YqX/G3NRL9fVJb/Sr9omU/mMjz79wpkfbSMpLHClxobigxoH2ixxehXKuMA0WVikV8AqTKnEHlNSCUZZK3r7MZp7jj0P+CfIVzxFUPS6ALnkNn/kT/6Sq8mHtRUiZFjsHEHooyKc0viM0=
+	t=1763263270; cv=none; b=lcVfMvpequjnPiu8Lw10NXUVon8FOXR+BMN1Mr7bR+N64+PbGYl3EkYoLA/AWoMql2zFlKFHoU7rGgZjtVSK7iwllDtX7Av+EputpdwHSfbqIu9M1S1ZR4fM7JU6rUAjQ9tv1x663ujlTT4wMbmgw1Yphqc57boTagDB3q5j0eg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763263269; c=relaxed/simple;
-	bh=cbq3/nGBqyWtn+FqQv8Elx9mceqf5mSOyIsszSbvcBI=;
-	h=Date:Mime-Version:Subject:To:Content-Type:Cc:From:Message-Id; b=Kz8F05P0i7K+hzfmVqXd/MR5EtuRWdGldAr2QdWrzHmqajKHUat8kUh+cM9/3b8YotOdR/cRSM4k8xXmgZ70qeEkm7DK+YB/5T7l9AUvE4pC5Fud2z7S2I+xVODzEYHw/o1V4Ja89H/eKH+A7vQXKpPecPDARRS8+ceVW3s+oMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=fail smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=ghFjIrhV; arc=none smtp.client-ip=118.26.132.12
+	s=arc-20240116; t=1763263270; c=relaxed/simple;
+	bh=kHA4oXmL9/mAweXydNo0Qg88n0AOTAhgry/w7il2zhs=;
+	h=To:From:Date:Cc:Subject:Message-Id:Mime-Version:Content-Type; b=clIzxNui9jjd8prwPkA0xOsbbeHAHxDWkiC+I2RZsdUGL/6/cec+Y72AomI1wrQAlUcz16qOX03LfKhbbrnzvHlEh9R6GWZlU8Ab8RgCC0fEhL/h4zknsLlBtYPaxrEIh/GDCdCQ7bjBKwsIcHJ+h2q0K4j28n5jf2gOetAV+jg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=none smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=U3ZXC4I5; arc=none smtp.client-ip=118.26.132.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=fnnas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=fnnas.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="ghFjIrhV"
+	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="U3ZXC4I5"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1763263262;
+ s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1763263260;
   h=from:subject:mime-version:from:date:message-id:subject:to:cc:
  reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=73t4+wm38j9e4ozEFCXBZ8YQ7XMpRf46AJe3alSZuWA=;
- b=ghFjIrhVfDEj/hNsSU1XSRrGbjI1vcV6XFm6CGXMuxNuH87wKgzpCJ+7V29esGGszH/FG7
- xGX5nquWAanNa29/DajeKxueIRZsnH3TDbfBWDf4rXezJbO/sDDKEI77aHKuFt/N3GjHiM
- Ugw8p1rnfKdZrHCicciwx+0G34iIJ5d4EuKclcX0eo0WDXko/83MRCMfk4HAbjobTOleWM
- iUu4B9Jp86lp+NmLGkVp9KRTRVcwIIX80E9fTGB1BvbQylzFeZHHgp3BTGkGOtpk4aZQ2Z
- IjOTDKEtK6XnEpOVzWP4gvqNRglKXo9g5tCJ1p21h397f8sQyrGks+DGQMxbHA==
-Date: Sun, 16 Nov 2025 11:20:38 +0800
+ bh=qp0Art3LJWwugm7EoDTyu6LpDXykNE5jEacbDoVMBIc=;
+ b=U3ZXC4I52PTM+wmB+2x1PeXwC8y7iZ8DQmPuC3yUHhYO4W8nu+PoqBCUs+/TnMCrGOJVTv
+ /yyQIANHoS4wwqMqab1TvLcZz8vjZi711lcEbpFZ4qhUDbgU3ZSEdKpJa9dHO6lpuuemVc
+ XNKfgyWzabcY4W3fIPhCXFlkwhZRwz9PMbaTwYu7Gnxln2U3MYGH0dI41dVb1GqeQ+0A2s
+ 3NqSjZ9JoaJI8Arhw4YiG7cnzRWquNTsufjf+dTit1MH2vNiCyhuUlevcL3yDZnp+pxgA2
+ oIc+8FD2vZNe1cigrd45XKs2fgFmN6+4aWO8mlRVKGnjpOxtccltdCucM+MLxA==
+X-Lms-Return-Path: <lba+26919431a+01bd6e+vger.kernel.org+yukuai@fnnas.com>
+X-Mailer: git-send-email 2.51.0
+To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>, 
+	<linux-kernel@vger.kernel.org>
+From: "Yu Kuai" <yukuai@fnnas.com>
+Date: Sun, 16 Nov 2025 11:20:37 +0800
+Content-Transfer-Encoding: 7bit
+Received: from localhost.localdomain ([39.182.0.135]) by smtp.feishu.cn with ESMTPS; Sun, 16 Nov 2025 11:20:58 +0800
+Cc: <yukuai@fnnas.com>, <nilay@linux.ibm.com>, <bvanassche@acm.org>
+Subject: [PATCH RESEND v4 3/7] blk-mq: add a new queue sysfs attribute async_depth
+X-Original-From: Yu Kuai <yukuai@fnnas.com>
+Message-Id: <20251116032044.118664-4-yukuai@fnnas.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Subject: [PATCH RESEND v4 4/7] kyber: covert to use request_queue->async_depth
-Content-Transfer-Encoding: 7bit
-To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>, 
-	<linux-kernel@vger.kernel.org>
-X-Mailer: git-send-email 2.51.0
 Content-Type: text/plain; charset=UTF-8
-X-Original-From: Yu Kuai <yukuai@fnnas.com>
-X-Lms-Return-Path: <lba+26919431c+b7f90f+vger.kernel.org+yukuai@fnnas.com>
-Cc: <yukuai@fnnas.com>, <nilay@linux.ibm.com>, <bvanassche@acm.org>
-From: "Yu Kuai" <yukuai@fnnas.com>
-Message-Id: <20251116032044.118664-5-yukuai@fnnas.com>
-Received: from localhost.localdomain ([39.182.0.135]) by smtp.feishu.cn with ESMTPS; Sun, 16 Nov 2025 11:20:59 +0800
 
-Instead of the internal async_depth, remove kqd->async_depth and related
-helpers.
+Add a new field async_depth to request_queue and related APIs, this is
+currently not used, following patches will convert elevators to use
+this instead of internal async_depth.
 
-Noted elevator attribute async_depth is now removed, queue attribute
-with the same name is used instead.
+Also factor out a helper blk_mq_limit_depth() to make code cleaner.
 
 Signed-off-by: Yu Kuai <yukuai@fnnas.com>
 Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
 ---
- block/kyber-iosched.c | 33 +++++----------------------------
- 1 file changed, 5 insertions(+), 28 deletions(-)
+ block/blk-core.c       |  1 +
+ block/blk-mq.c         | 64 +++++++++++++++++++++++++-----------------
+ block/blk-sysfs.c      | 42 +++++++++++++++++++++++++++
+ block/elevator.c       |  1 +
+ include/linux/blkdev.h |  1 +
+ 5 files changed, 84 insertions(+), 25 deletions(-)
 
-diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
-index cf243a457175..469dad8a981c 100644
---- a/block/kyber-iosched.c
-+++ b/block/kyber-iosched.c
-@@ -47,9 +47,8 @@ enum {
- 	 * asynchronous requests, we reserve 25% of requests for synchronous
- 	 * operations.
- 	 */
--	KYBER_ASYNC_PERCENT = 75,
-+	KYBER_DEFAULT_ASYNC_PERCENT = 75,
- };
--
- /*
-  * Maximum device-wide depth for each scheduling domain.
-  *
-@@ -157,9 +156,6 @@ struct kyber_queue_data {
- 	 */
- 	struct sbitmap_queue domain_tokens[KYBER_NUM_DOMAINS];
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 14ae73eebe0d..cc5c9ced8e6f 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -463,6 +463,7 @@ struct request_queue *blk_alloc_queue(struct queue_limits *lim, int node_id)
+ 	fs_reclaim_release(GFP_KERNEL);
  
--	/* Number of allowed async requests. */
--	unsigned int async_depth;
--
- 	struct kyber_cpu_latency __percpu *cpu_latency;
+ 	q->nr_requests = BLKDEV_DEFAULT_RQ;
++	q->async_depth = BLKDEV_DEFAULT_RQ;
  
- 	/* Timer for stats aggregation and adjusting domain tokens. */
-@@ -401,10 +397,7 @@ static struct kyber_queue_data *kyber_queue_data_alloc(struct request_queue *q)
+ 	return q;
  
- static void kyber_depth_updated(struct request_queue *q)
- {
--	struct kyber_queue_data *kqd = q->elevator->elevator_data;
--
--	kqd->async_depth = q->nr_requests * KYBER_ASYNC_PERCENT / 100U;
--	blk_mq_set_min_shallow_depth(q, kqd->async_depth);
-+	blk_mq_set_min_shallow_depth(q, q->async_depth);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index b2fdeaac0efb..027abd065cac 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -492,6 +492,38 @@ __blk_mq_alloc_requests_batch(struct blk_mq_alloc_data *data)
+ 	return rq_list_pop(data->cached_rqs);
  }
  
- static int kyber_init_sched(struct request_queue *q, struct elevator_queue *eq)
-@@ -421,6 +414,7 @@ static int kyber_init_sched(struct request_queue *q, struct elevator_queue *eq)
- 
- 	eq->elevator_data = kqd;
- 	q->elevator = eq;
-+	q->async_depth = q->nr_requests * KYBER_DEFAULT_ASYNC_PERCENT / 100;
- 	kyber_depth_updated(q);
- 
- 	return 0;
-@@ -540,15 +534,8 @@ static void rq_clear_domain_token(struct kyber_queue_data *kqd,
- 
- static void kyber_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data *data)
++static void blk_mq_limit_depth(struct blk_mq_alloc_data *data)
++{
++	struct elevator_mq_ops *ops;
++
++	/* If elevator is none, don't limit requests */
++	if (!data->q->elevator) {
++		blk_mq_tag_busy(data->hctx);
++		return;
++	}
++
++	data->rq_flags |= RQF_SCHED_TAGS;
++
++	/*
++	 * Flush/passthrough requests are special and go directly to the
++	 * dispatch list, they don't have limit.
++	 */
++	if ((data->cmd_flags & REQ_OP_MASK) == REQ_OP_FLUSH ||
++	    blk_op_is_passthrough(data->cmd_flags))
++		return;
++
++	WARN_ON_ONCE(data->flags & BLK_MQ_REQ_RESERVED);
++	data->rq_flags |= RQF_USE_SCHED;
++
++	/*
++	 * By default, sync requests have no limit, and async requests is
++	 * limited to async_depth.
++	 */
++	ops = &data->q->elevator->type->ops;
++	if (ops->limit_depth)
++		ops->limit_depth(data->cmd_flags, data);
++}
++
+ static struct request *__blk_mq_alloc_requests(struct blk_mq_alloc_data *data)
  {
--	/*
--	 * We use the scheduler tags as per-hardware queue queueing tokens.
--	 * Async requests can be limited at this stage.
--	 */
--	if (!blk_mq_sched_sync_request(opf)) {
--		struct kyber_queue_data *kqd = data->q->elevator->elevator_data;
+ 	struct request_queue *q = data->q;
+@@ -510,31 +542,7 @@ static struct request *__blk_mq_alloc_requests(struct blk_mq_alloc_data *data)
+ 	data->ctx = blk_mq_get_ctx(q);
+ 	data->hctx = blk_mq_map_queue(data->cmd_flags, data->ctx);
+ 
+-	if (q->elevator) {
+-		/*
+-		 * All requests use scheduler tags when an I/O scheduler is
+-		 * enabled for the queue.
+-		 */
+-		data->rq_flags |= RQF_SCHED_TAGS;
 -
--		data->shallow_depth = kqd->async_depth;
+-		/*
+-		 * Flush/passthrough requests are special and go directly to the
+-		 * dispatch list.
+-		 */
+-		if ((data->cmd_flags & REQ_OP_MASK) != REQ_OP_FLUSH &&
+-		    !blk_op_is_passthrough(data->cmd_flags)) {
+-			struct elevator_mq_ops *ops = &q->elevator->type->ops;
+-
+-			WARN_ON_ONCE(data->flags & BLK_MQ_REQ_RESERVED);
+-
+-			data->rq_flags |= RQF_USE_SCHED;
+-			if (ops->limit_depth)
+-				ops->limit_depth(data->cmd_flags, data);
+-		}
+-	} else {
+-		blk_mq_tag_busy(data->hctx);
 -	}
-+	if (!blk_mq_sched_sync_request(opf))
-+		data->shallow_depth = data->q->async_depth;
+-
++	blk_mq_limit_depth(data);
+ 	if (data->flags & BLK_MQ_REQ_RESERVED)
+ 		data->rq_flags |= RQF_RESV;
+ 
+@@ -4611,6 +4619,7 @@ int blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 	spin_lock_init(&q->requeue_lock);
+ 
+ 	q->nr_requests = set->queue_depth;
++	q->async_depth = set->queue_depth;
+ 
+ 	blk_mq_init_cpu_queues(q, set->nr_hw_queues);
+ 	blk_mq_map_swqueue(q);
+@@ -4977,6 +4986,11 @@ struct elevator_tags *blk_mq_update_nr_requests(struct request_queue *q,
+ 		q->elevator->et = et;
+ 	}
+ 
++	/*
++	 * Preserve relative value, both nr and async_depth are at most 16 bit
++	 * value, no need to worry about overflow.
++	 */
++	q->async_depth = max(q->async_depth * nr / q->nr_requests, 1);
+ 	q->nr_requests = nr;
+ 	if (q->elevator && q->elevator->type->ops.depth_updated)
+ 		q->elevator->type->ops.depth_updated(q);
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 76c47fe9b8d6..18ef3bbb34e3 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -127,6 +127,46 @@ queue_requests_store(struct gendisk *disk, const char *page, size_t count)
+ 	return ret;
  }
  
- static bool kyber_bio_merge(struct request_queue *q, struct bio *bio,
-@@ -944,15 +931,6 @@ KYBER_DEBUGFS_DOMAIN_ATTRS(KYBER_DISCARD, discard)
- KYBER_DEBUGFS_DOMAIN_ATTRS(KYBER_OTHER, other)
- #undef KYBER_DEBUGFS_DOMAIN_ATTRS
- 
--static int kyber_async_depth_show(void *data, struct seq_file *m)
--{
--	struct request_queue *q = data;
--	struct kyber_queue_data *kqd = q->elevator->elevator_data;
--
--	seq_printf(m, "%u\n", kqd->async_depth);
--	return 0;
--}
--
- static int kyber_cur_domain_show(void *data, struct seq_file *m)
++static ssize_t queue_async_depth_show(struct gendisk *disk, char *page)
++{
++	guard(mutex)(&disk->queue->elevator_lock);
++
++	return queue_var_show(disk->queue->async_depth, page);
++}
++
++static ssize_t
++queue_async_depth_store(struct gendisk *disk, const char *page, size_t count)
++{
++	struct request_queue *q = disk->queue;
++	unsigned int memflags;
++	unsigned long nr;
++	int ret;
++
++	if (!queue_is_mq(q))
++		return -EINVAL;
++
++	ret = queue_var_store(&nr, page, count);
++	if (ret < 0)
++		return ret;
++
++	if (nr == 0)
++		return -EINVAL;
++
++	memflags = blk_mq_freeze_queue(q);
++	scoped_guard(mutex, &q->elevator_lock) {
++		if (q->elevator) {
++			q->async_depth = min(q->nr_requests, nr);
++			if (q->elevator->type->ops.depth_updated)
++				q->elevator->type->ops.depth_updated(q);
++		} else {
++			ret = -EINVAL;
++		}
++	}
++	blk_mq_unfreeze_queue(q, memflags);
++
++	return ret;
++}
++
+ static ssize_t queue_ra_show(struct gendisk *disk, char *page)
  {
- 	struct blk_mq_hw_ctx *hctx = data;
-@@ -978,7 +956,6 @@ static const struct blk_mq_debugfs_attr kyber_queue_debugfs_attrs[] = {
- 	KYBER_QUEUE_DOMAIN_ATTRS(write),
- 	KYBER_QUEUE_DOMAIN_ATTRS(discard),
- 	KYBER_QUEUE_DOMAIN_ATTRS(other),
--	{"async_depth", 0400, kyber_async_depth_show},
- 	{},
- };
- #undef KYBER_QUEUE_DOMAIN_ATTRS
+ 	ssize_t ret;
+@@ -542,6 +582,7 @@ static struct queue_sysfs_entry _prefix##_entry = {	\
+ }
+ 
+ QUEUE_RW_ENTRY(queue_requests, "nr_requests");
++QUEUE_RW_ENTRY(queue_async_depth, "async_depth");
+ QUEUE_RW_ENTRY(queue_ra, "read_ahead_kb");
+ QUEUE_LIM_RW_ENTRY(queue_max_sectors, "max_sectors_kb");
+ QUEUE_LIM_RO_ENTRY(queue_max_hw_sectors, "max_hw_sectors_kb");
+@@ -764,6 +805,7 @@ static struct attribute *blk_mq_queue_attrs[] = {
+ 	 */
+ 	&elv_iosched_entry.attr,
+ 	&queue_requests_entry.attr,
++	&queue_async_depth_entry.attr,
+ #ifdef CONFIG_BLK_WBT
+ 	&queue_wb_lat_entry.attr,
+ #endif
+diff --git a/block/elevator.c b/block/elevator.c
+index e2ebfbf107b3..8f510cb881ba 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -601,6 +601,7 @@ static int elevator_switch(struct request_queue *q, struct elv_change_ctx *ctx)
+ 		blk_queue_flag_clear(QUEUE_FLAG_SQ_SCHED, q);
+ 		q->elevator = NULL;
+ 		q->nr_requests = q->tag_set->queue_depth;
++		q->async_depth = q->tag_set->queue_depth;
+ 	}
+ 	blk_add_trace_msg(q, "elv switch: %s", ctx->name);
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index bedcaa59feec..1d7a89d56daf 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -552,6 +552,7 @@ struct request_queue {
+ 	 * queue settings
+ 	 */
+ 	unsigned int		nr_requests;	/* Max # of requests */
++	unsigned int		async_depth;	/* Max # of async requests */
+ 
+ #ifdef CONFIG_BLK_INLINE_ENCRYPTION
+ 	struct blk_crypto_profile *crypto_profile;
 -- 
 2.51.0
