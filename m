@@ -1,99 +1,121 @@
-Received: from sg-1-18.ptr.blmpb.com (sg-1-18.ptr.blmpb.com [118.26.132.18])
+Received: from sg-1-23.ptr.blmpb.com (sg-1-23.ptr.blmpb.com [118.26.132.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 218601946DF
-	for <linux-block@vger.kernel.org>; Sun, 16 Nov 2025 03:21:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A69E3226D1F
+	for <linux-block@vger.kernel.org>; Sun, 16 Nov 2025 03:21:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763263265; cv=none; b=F6mNXmYDhIV1X9L1E7v041OQaAC1uYSlqXz+UUytw84RRvOx03d6kSPAm80GU7fZ2omZFttf0/40JI4SMhcGLJKNRNqYfHDVptaREtZ+BccBG8R/nA3xxAff4pU7/J98GAxxYwsCNE4yG6HWuso5MNf5g9j09BjcItv0CmMMWOg=
+	t=1763263268; cv=none; b=thq7zM/v8Axgf6SGFEY0Lg+yRgFNlbPG5m4fcJe6hHr6abL8JZPPjU7bVsKp3KI+ISJyK+p0lzJuqaWN9GwdYUD8+JaJ1dw5r8owIAtu6TZ1bQjwbTDKA82d4N/0bCDc81JLBX4N+nlBHmrgjx1PAKPMjWCyMi/Vl30tsJXZGnc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763263265; c=relaxed/simple;
-	bh=VjgK2syfSljhRiCLQFmGeAGsZnX5ka0nw8dhvP7kb1k=;
-	h=Subject:Message-Id:From:Content-Type:Mime-Version:Date:To:Cc; b=TMk54FZGlf544GYwZC661CICP+0EX8eaH5/7IafPKuW9U3E9B/3bnVLJIiqNKKeh0QWY/xyyB+z4GAtZuxpAhLQIeqkMUeOR5XusjUdIyxKAqbCvzvx23kJeYFNUNkoEZrnSNT0PN9LMjVc9IlvA8gwCA8sEfCq6szZABVGyUEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=none smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=c+LWoZVR; arc=none smtp.client-ip=118.26.132.18
+	s=arc-20240116; t=1763263268; c=relaxed/simple;
+	bh=RMl+bpZY8STQtEjCpuMjIEBsLfx+SnACPoEuGzH2zdM=;
+	h=From:Message-Id:To:Subject:Mime-Version:Content-Type:Cc:Date; b=SIuYosH6YU33FYOGM8fE8aZ3dtlkqUXdMq7ewnKT2vsiWrWDE6JNb7i9kx7FUnXSSSd3QUXhRynU8Sks7fZ4mG+zyqUpAr4PqluU4BwA1us9sDQGxfr7/B7owN9hJbQv/ji6QwwfI9qM+PJpxLG2d7dhfhIwZFnc7WH+lJl8Mpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=none smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=xHyjbF3a; arc=none smtp.client-ip=118.26.132.23
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=fnnas.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="c+LWoZVR"
+	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="xHyjbF3a"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1763263256;
+ s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1763263259;
   h=from:subject:mime-version:from:date:message-id:subject:to:cc:
  reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=HQz1co1h88XBt3KnhahzJhjr5KXwtbkfJe0/LJVmJW8=;
- b=c+LWoZVRVCvxEXVfeRM4U2ZkFSpNvoPjXbHtbxeaycYX2sN6ns8o6mnQGEk3OIjVYxiuwD
- deCSfEsTILHabYXND4p4atff/ZVJFUre2btTAVt/qXop+oRGp/17vAONG4R7oPEmB1/NPZ
- Ma4gZps8wZZ4Kf8dFvZiUeLLPxERGzc04gkCMBg/GGUDy/+3O5NpauhQ4icvZeNlpAzi7k
- zMbBF6DuF2/9yF8wRsPHyAexcbtIywBdk0D8LIf53iXxa+3CwEzQGZoQqft2WamS1+sRWY
- 2Z9Hk93ujo3YUxxjvw2SiCZ/JNNllIx7jzURQME9pN/d/Q5O84zQhKZBA32lmw==
-Subject: [PATCH RESEND v4 0/7] blk-mq: introduce new queue attribute async_depth
-Message-Id: <20251116032044.118664-1-yukuai@fnnas.com>
+ bh=Q+IOxo4l6kTKykmJS8eiXfUCMNlhCagu+jDYl1pBhrk=;
+ b=xHyjbF3a9kab7LLE94SL+uRg6t/v0O5OIKd+/zDgiqVKe7wGCo7KTu/vdz2csj/IdZJTCI
+ gxNUarGbxc4smIoNC3xJ2GtVgnpsVJBvN21nTYnuhxV5T+fumi4G+yeC81YpwXDkHI8aEI
+ RCMBCJU/KwswR0rsFga7wQ5D1HjMHdM/as+bEGunO9NCeGNZ8clFqnfB0zST0Iq7r9dw5C
+ qZx/0dGeo6CkdY9XZkxhSIZmAOANekbcR8E2akPXaNqx2XAQzq0aB+wvd00FNarU4g25+3
+ 6WVkwzOQ64kMgh21WKoX9YBf0JEJ1sKXmJsKvesMirj5Lvxejtb09XjwMF0kjA==
 From: "Yu Kuai" <yukuai@fnnas.com>
-X-Original-From: Yu Kuai <yukuai@fnnas.com>
 X-Mailer: git-send-email 2.51.0
-Received: from localhost.localdomain ([39.182.0.135]) by smtp.feishu.cn with ESMTPS; Sun, 16 Nov 2025 11:20:53 +0800
-Content-Type: text/plain; charset=UTF-8
+Message-Id: <20251116032044.118664-3-yukuai@fnnas.com>
+X-Lms-Return-Path: <lba+269194319+8824eb+vger.kernel.org+yukuai@fnnas.com>
+Received: from localhost.localdomain ([39.182.0.135]) by smtp.feishu.cn with ESMTPS; Sun, 16 Nov 2025 11:20:56 +0800
+To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>, 
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH RESEND v4 2/7] blk-mq-sched: unify elevators checking for async requests
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-X-Lms-Return-Path: <lba+269194316+05f0c0+vger.kernel.org+yukuai@fnnas.com>
-Date: Sun, 16 Nov 2025 11:20:34 +0800
-Content-Transfer-Encoding: 7bit
-To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>, 
-	<linux-kernel@vger.kernel.org>
+X-Original-From: Yu Kuai <yukuai@fnnas.com>
+Content-Type: text/plain; charset=UTF-8
 Cc: <yukuai@fnnas.com>, <nilay@linux.ibm.com>, <bvanassche@acm.org>
+Date: Sun, 16 Nov 2025 11:20:36 +0800
+Content-Transfer-Encoding: 7bit
 
-Changes in v4:
- - add review tag for the last patch 3;
- - rebase with my new email address, patches are not changed;
-Changes in v3:
- - use guard()/scope_guard() in patch 3;
- - add review tag other than patch 3;
-Changes in v2:
- - keep limit_depth() method for kyber and mq-deadline in patch 3;
- - add description about sysfs api change for kyber and mq-deadline;
- - improve documentation in patch 7;
- - add review tag for patch 1;
+bfq and mq-deadline consider sync writes as async requests and only
+resver tags for sync reads by async_depth, however, kyber doesn't
+consider sync writes as async requests for now.
 
-Background and motivation:
+Consider the case there are lots of dirty pages, and user use fsync to
+flush dirty pages. In this case sched_tags can be exhausted by sync writes
+and sync reads can stuck waiting for tag. Hence let kyber follow what
+mq-deadline and bfq did, and unify async requests checking for all
+elevators.
 
-At first, we test a performance regression from 5.10 to 6.6 in
-downstream kernel(described in patch 5), the regression is related to
-async_depth in mq-dealine.
+Signed-off-by: Yu Kuai <yukuai@fnnas.com>
+Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
+---
+ block/bfq-iosched.c   | 2 +-
+ block/blk-mq-sched.h  | 5 +++++
+ block/kyber-iosched.c | 2 +-
+ block/mq-deadline.c   | 2 +-
+ 4 files changed, 8 insertions(+), 3 deletions(-)
 
-While trying to fix this regression, Bart suggests add a new attribute
-to request_queue, and I think this is a good idea because all elevators
-have similar logical, however only mq-deadline allow user to configure
-async_depth.
-
-patch 1-3 add new queue attribute async_depth;
-patch 4 convert kyber to use request_queue->async_depth;
-patch 5 covnert mq-dedaline to use request_queue->async_depth, also the
-performance regression will be fixed;
-patch 6 convert bfq to use request_queue->async_depth;
-
-Yu Kuai (7):
-  block: convert nr_requests to unsigned int
-  blk-mq-sched: unify elevators checking for async requests
-  blk-mq: add a new queue sysfs attribute async_depth
-  kyber: covert to use request_queue->async_depth
-  mq-deadline: covert to use request_queue->async_depth
-  block, bfq: convert to use request_queue->async_depth
-  blk-mq: add documentation for new queue attribute async_dpeth
-
- Documentation/ABI/stable/sysfs-block | 34 +++++++++++++++
- block/bfq-iosched.c                  | 45 ++++++++-----------
- block/blk-core.c                     |  1 +
- block/blk-mq-sched.h                 |  5 +++
- block/blk-mq.c                       | 64 +++++++++++++++++-----------
- block/blk-sysfs.c                    | 42 ++++++++++++++++++
- block/elevator.c                     |  1 +
- block/kyber-iosched.c                | 33 +++-----------
- block/mq-deadline.c                  | 39 +++--------------
- include/linux/blkdev.h               |  3 +-
- 10 files changed, 152 insertions(+), 115 deletions(-)
-
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 4a8d3d96bfe4..63452e791f98 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -697,7 +697,7 @@ static void bfq_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data *data)
+ 	unsigned int limit, act_idx;
+ 
+ 	/* Sync reads have full depth available */
+-	if (op_is_sync(opf) && !op_is_write(opf))
++	if (blk_mq_sched_sync_request(opf))
+ 		limit = data->q->nr_requests;
+ 	else
+ 		limit = bfqd->async_depths[!!bfqd->wr_busy_queues][op_is_sync(opf)];
+diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+index 8e21a6b1415d..ae747f9053c7 100644
+--- a/block/blk-mq-sched.h
++++ b/block/blk-mq-sched.h
+@@ -103,4 +103,9 @@ static inline void blk_mq_set_min_shallow_depth(struct request_queue *q,
+ 						depth);
+ }
+ 
++static inline bool blk_mq_sched_sync_request(blk_opf_t opf)
++{
++	return op_is_sync(opf) && !op_is_write(opf);
++}
++
+ #endif
+diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
+index 18efd6ef2a2b..cf243a457175 100644
+--- a/block/kyber-iosched.c
++++ b/block/kyber-iosched.c
+@@ -544,7 +544,7 @@ static void kyber_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data *data)
+ 	 * We use the scheduler tags as per-hardware queue queueing tokens.
+ 	 * Async requests can be limited at this stage.
+ 	 */
+-	if (!op_is_sync(opf)) {
++	if (!blk_mq_sched_sync_request(opf)) {
+ 		struct kyber_queue_data *kqd = data->q->elevator->elevator_data;
+ 
+ 		data->shallow_depth = kqd->async_depth;
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index 3e3719093aec..1aef6ce2e78e 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -495,7 +495,7 @@ static void dd_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data *data)
+ 	struct deadline_data *dd = data->q->elevator->elevator_data;
+ 
+ 	/* Do not throttle synchronous reads. */
+-	if (op_is_sync(opf) && !op_is_write(opf))
++	if (blk_mq_sched_sync_request(opf))
+ 		return;
+ 
+ 	/*
 -- 
 2.51.0
