@@ -1,72 +1,99 @@
-Received: from sg-1-19.ptr.blmpb.com (sg-1-19.ptr.blmpb.com [118.26.132.19])
+Received: from sg-1-18.ptr.blmpb.com (sg-1-18.ptr.blmpb.com [118.26.132.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A5AC1DB125
-	for <linux-block@vger.kernel.org>; Sun, 16 Nov 2025 03:21:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 218601946DF
+	for <linux-block@vger.kernel.org>; Sun, 16 Nov 2025 03:21:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763263265; cv=none; b=a+6PY39LkFFi+Nd7qBUJaTQ9AY4dE46YZONkoLw4mOtiUb/v0jwfWY06b/GASMUlwU4haklY+JctbamDAdimlixwaT9j4bf76BuRnDl2XMJvDH2l2rCO7kf3WVi+9aHZB9K+8YGM/lp0JMRnHP6bfbAgJllIZy3Q7A1KPvS42Po=
+	t=1763263265; cv=none; b=F6mNXmYDhIV1X9L1E7v041OQaAC1uYSlqXz+UUytw84RRvOx03d6kSPAm80GU7fZ2omZFttf0/40JI4SMhcGLJKNRNqYfHDVptaREtZ+BccBG8R/nA3xxAff4pU7/J98GAxxYwsCNE4yG6HWuso5MNf5g9j09BjcItv0CmMMWOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1763263265; c=relaxed/simple;
-	bh=hh1bIV/4NJvdi+LJD71lmjTfw9FGPr7RlXla8j+ZY4U=;
-	h=Message-Id:Cc:Subject:Date:Mime-Version:To:Content-Type:From; b=GMZ2KkSmdD0+pSj+DK7eY8GuSQvEA9pzeRw1IxQq+UpL3igJ3pckt8+OSKTTHT5udI2M1wRshSC3/WOvzXChT+Jio7sAI9jcVgIhEgLY70GkXj4kw1l2nT2xwywK/P4BwbbWij0bDapenOar50yDtOxnNdbrQpbvQu+d4lSx5pk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=none smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=j2Suhsat; arc=none smtp.client-ip=118.26.132.19
+	bh=VjgK2syfSljhRiCLQFmGeAGsZnX5ka0nw8dhvP7kb1k=;
+	h=Subject:Message-Id:From:Content-Type:Mime-Version:Date:To:Cc; b=TMk54FZGlf544GYwZC661CICP+0EX8eaH5/7IafPKuW9U3E9B/3bnVLJIiqNKKeh0QWY/xyyB+z4GAtZuxpAhLQIeqkMUeOR5XusjUdIyxKAqbCvzvx23kJeYFNUNkoEZrnSNT0PN9LMjVc9IlvA8gwCA8sEfCq6szZABVGyUEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=none smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=c+LWoZVR; arc=none smtp.client-ip=118.26.132.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=fnnas.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="j2Suhsat"
+	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="c+LWoZVR"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1763263257;
+ s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1763263256;
   h=from:subject:mime-version:from:date:message-id:subject:to:cc:
  reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=kiWLPRK//gF7CQNeGuB/NkfObgOVqylMsxLOgKSLaj4=;
- b=j2SuhsatndCKkAXZIVHmdCB1kqfG38Z1VCFda0GFII9epBs8ZC3JoaBqkz5ilpjoS62lFO
- gs05Rq2ORlPU+s2O70gghpWyNc+5/F3RJ+TKuqkBoBbYLKy3/26ROdsPBOxAplbSqUnxW2
- SZs/HgozO6ijVCWoMHwpd2DvDKsm/a4C6AyCctJxxKIya8FbXwdqiIjOi8v8WVvX0Atw96
- rvSOK0VSewvD3Hz/ncByaL5ad5tqwhHizq2c2QhWXrpt05VZT1FID/Ez8gunnEtpGh7d6e
- G5upv99dQEn5Cyt3S4Qtz53Ov4zKk7uB6HCiB0TxEivZQ9zwqeNlOPmbSqnhng==
-Message-Id: <20251116032044.118664-2-yukuai@fnnas.com>
-Content-Transfer-Encoding: 7bit
-X-Lms-Return-Path: <lba+269194318+ea4df6+vger.kernel.org+yukuai@fnnas.com>
-Cc: <yukuai@fnnas.com>, <nilay@linux.ibm.com>, <bvanassche@acm.org>
-Subject: [PATCH RESEND v4 1/7] block: convert nr_requests to unsigned int
-Date: Sun, 16 Nov 2025 11:20:35 +0800
+ bh=HQz1co1h88XBt3KnhahzJhjr5KXwtbkfJe0/LJVmJW8=;
+ b=c+LWoZVRVCvxEXVfeRM4U2ZkFSpNvoPjXbHtbxeaycYX2sN6ns8o6mnQGEk3OIjVYxiuwD
+ deCSfEsTILHabYXND4p4atff/ZVJFUre2btTAVt/qXop+oRGp/17vAONG4R7oPEmB1/NPZ
+ Ma4gZps8wZZ4Kf8dFvZiUeLLPxERGzc04gkCMBg/GGUDy/+3O5NpauhQ4icvZeNlpAzi7k
+ zMbBF6DuF2/9yF8wRsPHyAexcbtIywBdk0D8LIf53iXxa+3CwEzQGZoQqft2WamS1+sRWY
+ 2Z9Hk93ujo3YUxxjvw2SiCZ/JNNllIx7jzURQME9pN/d/Q5O84zQhKZBA32lmw==
+Subject: [PATCH RESEND v4 0/7] blk-mq: introduce new queue attribute async_depth
+Message-Id: <20251116032044.118664-1-yukuai@fnnas.com>
+From: "Yu Kuai" <yukuai@fnnas.com>
+X-Original-From: Yu Kuai <yukuai@fnnas.com>
+X-Mailer: git-send-email 2.51.0
+Received: from localhost.localdomain ([39.182.0.135]) by smtp.feishu.cn with ESMTPS; Sun, 16 Nov 2025 11:20:53 +0800
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.0
-Received: from localhost.localdomain ([39.182.0.135]) by smtp.feishu.cn with ESMTPS; Sun, 16 Nov 2025 11:20:55 +0800
+X-Lms-Return-Path: <lba+269194316+05f0c0+vger.kernel.org+yukuai@fnnas.com>
+Date: Sun, 16 Nov 2025 11:20:34 +0800
+Content-Transfer-Encoding: 7bit
 To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>, 
 	<linux-kernel@vger.kernel.org>
-X-Original-From: Yu Kuai <yukuai@fnnas.com>
-Content-Type: text/plain; charset=UTF-8
-From: "Yu Kuai" <yukuai@fnnas.com>
+Cc: <yukuai@fnnas.com>, <nilay@linux.ibm.com>, <bvanassche@acm.org>
 
-This value represents the number of requests for elevator tags, or drivers
-tags if elevator is none. The max value for elevator tags is 2048, and
-in drivers at most 16 bits is used for tag.
+Changes in v4:
+ - add review tag for the last patch 3;
+ - rebase with my new email address, patches are not changed;
+Changes in v3:
+ - use guard()/scope_guard() in patch 3;
+ - add review tag other than patch 3;
+Changes in v2:
+ - keep limit_depth() method for kyber and mq-deadline in patch 3;
+ - add description about sysfs api change for kyber and mq-deadline;
+ - improve documentation in patch 7;
+ - add review tag for patch 1;
 
-Signed-off-by: Yu Kuai <yukuai@fnnas.com>
-Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
----
- include/linux/blkdev.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Background and motivation:
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 2fff8a80dbd2..bedcaa59feec 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -551,7 +551,7 @@ struct request_queue {
- 	/*
- 	 * queue settings
- 	 */
--	unsigned long		nr_requests;	/* Max # of requests */
-+	unsigned int		nr_requests;	/* Max # of requests */
- 
- #ifdef CONFIG_BLK_INLINE_ENCRYPTION
- 	struct blk_crypto_profile *crypto_profile;
+At first, we test a performance regression from 5.10 to 6.6 in
+downstream kernel(described in patch 5), the regression is related to
+async_depth in mq-dealine.
+
+While trying to fix this regression, Bart suggests add a new attribute
+to request_queue, and I think this is a good idea because all elevators
+have similar logical, however only mq-deadline allow user to configure
+async_depth.
+
+patch 1-3 add new queue attribute async_depth;
+patch 4 convert kyber to use request_queue->async_depth;
+patch 5 covnert mq-dedaline to use request_queue->async_depth, also the
+performance regression will be fixed;
+patch 6 convert bfq to use request_queue->async_depth;
+
+Yu Kuai (7):
+  block: convert nr_requests to unsigned int
+  blk-mq-sched: unify elevators checking for async requests
+  blk-mq: add a new queue sysfs attribute async_depth
+  kyber: covert to use request_queue->async_depth
+  mq-deadline: covert to use request_queue->async_depth
+  block, bfq: convert to use request_queue->async_depth
+  blk-mq: add documentation for new queue attribute async_dpeth
+
+ Documentation/ABI/stable/sysfs-block | 34 +++++++++++++++
+ block/bfq-iosched.c                  | 45 ++++++++-----------
+ block/blk-core.c                     |  1 +
+ block/blk-mq-sched.h                 |  5 +++
+ block/blk-mq.c                       | 64 +++++++++++++++++-----------
+ block/blk-sysfs.c                    | 42 ++++++++++++++++++
+ block/elevator.c                     |  1 +
+ block/kyber-iosched.c                | 33 +++-----------
+ block/mq-deadline.c                  | 39 +++--------------
+ include/linux/blkdev.h               |  3 +-
+ 10 files changed, 152 insertions(+), 115 deletions(-)
+
 -- 
 2.51.0
