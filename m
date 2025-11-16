@@ -1,106 +1,69 @@
-Received: from sg-1-21.ptr.blmpb.com (sg-1-21.ptr.blmpb.com [118.26.132.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA4A725A33A
-	for <linux-block@vger.kernel.org>; Sun, 16 Nov 2025 03:21:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C06DA12B94
+	for <linux-block@vger.kernel.org>; Sun, 16 Nov 2025 03:44:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763263278; cv=none; b=geodLPaMcU+calp/XVeeGx8NrmZhuK4e5+ccUib5D8m3R2FAbuwUJv4jE4V1/nhwG4dsZz/wiyyvjPqXeThEppI4EtIN9Gwdzt5L0J4GZi3kJ9UQyJkQMm7x3yalVEiBWCKVH6B+wSoRhLZhROSF19hGI7nft7zByII+3EJdCww=
+	t=1763264693; cv=none; b=WihmYGSmnCzsKOZfetsnAvSYvgsWXUC3Q5bS338aIDYQHBEJXStiZFL4EhmQ+0x1B56bTWD7O5YjbRMXX0QQgJfeN4or8+zzy0zrbrnJ64pBihwVa9bFYn6qjw329tl4Mv+smqKW9JlyEUzDlGIm+r55xf/sxzL3os1oyHCWnLo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763263278; c=relaxed/simple;
-	bh=FZNMdtRtUfUxNdy4QdXCSCmt4xOJ7MT8+JdG5v6Ibfc=;
-	h=To:Cc:Subject:Date:Message-Id:Mime-Version:Content-Type:From; b=Srd6aqO2wXs/j0EbwCeWW//NVWXkxXfW9OsFsE2EcgnPktWG1v985BWszymFUK6uoafmplVxJqCpOH37O32sXBqWBq//+Qglel/lpjsh7v7On/XFiroMYd+EHVuoCaHWfpp8PMdC+687rzWfoAEVfjqPJa+PLVgbcUpHATXPaLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=none smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=rK4YoloM; arc=none smtp.client-ip=118.26.132.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=fnnas.com
+	s=arc-20240116; t=1763264693; c=relaxed/simple;
+	bh=ttPRQJsZMRjc+5coyuiKcBuzjOUKFheGTwZbeSxK2pQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=k3juESiCmxq+DrWzgSjz77rqXceWjK9a8zYRD4ydZxG8bVtH6tTM+I/47JTTt0ki22VZJspeKcc+8Yo+/AqMhJWjRZwSnWP35Tz4ekB45XNzp71PSh3bs3hfsP+yEvvLsAWVjscHvXAG7La3bsoLrVgLRAIvto7tG9WhzYkDKTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gKH53nQg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="rK4YoloM"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1763263266;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=V5pD+6bsRTv/jpBF2wM9rdVnX49qLttYqX6g4dDhpiQ=;
- b=rK4YoloMVXpobVImwa42nYhC8n0gu5JH1cpGCo1TUnG7Gc+roMyAoeu0R9ujhBme0vx9yV
- AfmBhd6PlHL/suTLxid0Jt6+2XYvL/iq5/tnPE0Xq3TouJZJgeuGvZItk3CGqyGe0VNlM+
- +md1Tl+pbviwvohMpyDqTrbpWs1oipICB2VgHCeokgzI2CHriFWko4c5352HOFegos1o7U
- 1q8fJMYgpq0zpKU5JL1YBuNFvByh6/efHcqdaXBuDgGlY/TYAmDdI7XQwkHU77RrbnIEQx
- AIIbg0l+zcU3JeZVQHjk0lG0la187P5TwejT3lUgFcD0uI9jRFNIzcOhDRo8Tg==
-To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>, 
-	<linux-kernel@vger.kernel.org>
-Cc: <yukuai@fnnas.com>, <nilay@linux.ibm.com>, <bvanassche@acm.org>
-Subject: [PATCH RESEND v4 7/7] blk-mq: add documentation for new queue attribute async_dpeth
-Date: Sun, 16 Nov 2025 11:20:41 +0800
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <20251116032044.118664-8-yukuai@fnnas.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gKH53nQg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 748D2C113D0;
+	Sun, 16 Nov 2025 03:44:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763264693;
+	bh=ttPRQJsZMRjc+5coyuiKcBuzjOUKFheGTwZbeSxK2pQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=gKH53nQgsGdn2iwTBo+Y0xn7URb0EeeXuW5pJ1/bdGcMpBPu4G5cjOGnPxQev2FKA
+	 7+HfSf2E5mF9KpCsOr8Xun5umDzVRc3BO2bxPjhMHjEvV26IlzrwvcSosDAZmCrPbv
+	 c5+dbnoA8zRoFavPOzB0zHCJVznQv+e80zL2bikecqOLNwkESKuX5lCobuWuZmM2bv
+	 X8iJrtUgUT3rPaDYF9xEMaselic+RzqCTNW5biYAi3AZRwjjbgVludrh+ZSQEEtnv3
+	 gYIWvZwyk5uq0dEf9Imzoeuv4SKb7BZtFKqrYxlfKEdDY99Zdf/aK38fpK+OZG0Rf4
+	 bRUJ+X8cyU+Jw==
+Message-ID: <5631b99a-dd89-4f89-a5ac-e8a445ae954d@kernel.org>
+Date: Sun, 16 Nov 2025 12:44:49 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.0
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] zloop: respect REQ_NOWAIT for memory allocation
+To: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>, linux-block@vger.kernel.org
+Cc: axboe@kernel.dk, hch@lst.de, kch@nvidia.com
+References: <20251116025229.29136-1-ckulkarnilinux@gmail.com>
+ <20251116025229.29136-2-ckulkarnilinux@gmail.com>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <20251116025229.29136-2-ckulkarnilinux@gmail.com>
 Content-Type: text/plain; charset=UTF-8
-X-Original-From: Yu Kuai <yukuai@fnnas.com>
-Received: from localhost.localdomain ([39.182.0.135]) by smtp.feishu.cn with ESMTPS; Sun, 16 Nov 2025 11:21:03 +0800
-From: "Yu Kuai" <yukuai@fnnas.com>
-X-Lms-Return-Path: <lba+269194320+af033c+vger.kernel.org+yukuai@fnnas.com>
+Content-Transfer-Encoding: 7bit
 
-Explain the attribute and the default value in different case.
+On 11/16/25 11:52, Chaitanya Kulkarni wrote:
+>   6. Zloop driver:
+>    zloop_queue_rq()
+>     zloop_rw()
+>      kmalloc_array(..., GFP_NOIO) <-- BLOCKS (REQ_NOWAIT violation)
 
-Signed-off-by: Yu Kuai <yukuai@fnnas.com>
-Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
----
- Documentation/ABI/stable/sysfs-block | 34 ++++++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
+Absolutely not. Please re-read the code and see that zloop_queue_rq() adds the
+request (zloop command) to a workqueue and zloop_rw() is executed within the
+work item context, that is, a different context from zloop_queue_rq.
 
-diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/stabl=
-e/sysfs-block
-index 0ed10aeff86b..aa1e94169666 100644
---- a/Documentation/ABI/stable/sysfs-block
-+++ b/Documentation/ABI/stable/sysfs-block
-@@ -609,6 +609,40 @@ Description:
- 		enabled, and whether tags are shared.
-=20
-=20
-+What:		/sys/block/<disk>/queue/async_depth
-+Date:		August 2025
-+Contact:	linux-block@vger.kernel.org
-+Description:
-+		[RW] Controls how many asynchronous requests may be allocated in the
-+		block layer. The value is always capped at nr_requests.
-+
-+		When no elevator is active (none):
-+		- async_depth is always equal to nr_requests.
-+
-+		For bfq scheduler:
-+		- By default, async_depth is set to 75% of nr_requests.
-+		  Internal limits are then derived from this value:
-+		  * Sync writes: limited to async_depth (=E2=89=8875% of nr_requests).
-+		  * Async I/O: limited to ~2/3 of async_depth (=E2=89=8850% of nr_reques=
-ts).
-+
-+		  If a bfq_queue is weight-raised:
-+		  * Sync writes: limited to ~1/2 of async_depth (=E2=89=8837% of nr_requ=
-ests).
-+		  * Async I/O: limited to ~1/4 of async_depth (=E2=89=8818% of nr_reques=
-ts).
-+
-+		- If the user writes a custom value to async_depth, BFQ will recompute
-+		  these limits proportionally based on the new value.
-+
-+		For Kyber:
-+		- By default async_depth is set to 75% of nr_requests.
-+		- If the user writes a custom value to async_depth, then it override the
-+		  default and directly control the limit for writes and async I/O.
-+
-+		For mq-deadline:
-+		- By default async_depth is set to nr_requests.
-+		- If the user writes a custom value to async_depth, then it override the
-+		  default and directly control the limit for writes and async I/O.
-+
-+
- What:		/sys/block/<disk>/queue/nr_zones
- Date:		November 2018
- Contact:	Damien Le Moal <damien.lemoal@wdc.com>
---=20
-2.51.0
+So this patch is not necessary at all, there is no blocking violation as
+zloop_queue_rq() never blocks.
+
+>       -> Should use GFP_NOWAIT when rq->cmd_flags & REQ_NOWAIT
+
+
+
+-- 
+Damien Le Moal
+Western Digital Research
