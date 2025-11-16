@@ -1,46 +1,87 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D90B1DDC33;
-	Sun, 16 Nov 2025 07:15:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F61B28031C
+	for <linux-block@vger.kernel.org>; Sun, 16 Nov 2025 08:11:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763277300; cv=none; b=um9b1DvMXm1KQ/gVxVAs+2+36sIV2ATtOl6pd0bdYMRaQFdDrUa7OPhDMczWmluMFtkkjqDblNeDXxEyqzIAW1ncp1S5bIOjBY/5j843qpkvf5M54GZak07h/0KtG9U9iDgWaPvtGLleXN/CogbdWD53nUezZr4hIgxNofg7YnY=
+	t=1763280717; cv=none; b=GsBldnQd/5ShiWTUleuimpI4UkyGv5DVluycsO76teQIu4hZ7AN7Izhm10GBMpt8VxXZ97cbAyvmXw00/FZWQF36+vG3gAYPF/6MPl8q0wrdFbck7ronxsVjE/dVnkCweZ1UmsbaJV9sqASaPYmZW1V2Ofc5GIjCau7ZGjOdymg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763277300; c=relaxed/simple;
-	bh=ZwafYmBH3NbvO+pGxsGEYLBD8i7TIkJQ2P+Z2BySlH0=;
+	s=arc-20240116; t=1763280717; c=relaxed/simple;
+	bh=4jwDEm2sAyYHKu+zGh5hRNHcB8FQ+DLUM7X5j7Jlq5E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Um1dGJhGLeHoh+ATRFOPwr7wK+ZPf/HIGjS1RtCgk+r/42npl5ZF7uP/ZaRevaAq4kb9F04sZfjORyoGQMdKCBaoovf/thD60l6tLMj5Gdj2/0MEQptee8I6+jWkebeVnH1lCQqW6YB5Qwq3nSnUcmxCRjAg4+N945ZUzZwHq2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ja9E8EMj; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=tpEJm0ZX0faIXtaKEpl26wcid8jeNdWK/psQzyULdY4XQEf3kZHgXtHJRXnyFFah7ptauZJb34Z/EwdZ2vnNf0SPRhjC8n9JD/9lsnVsAwX5M10+cHELjiq/jaZfp/pplTk4fet9xln1WnuAYwntB3cpUt2t03Zy7UsDEcGLOQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=cbzwDDRp; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ja9E8EMj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65167C113D0;
-	Sun, 16 Nov 2025 07:14:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763277299;
-	bh=ZwafYmBH3NbvO+pGxsGEYLBD8i7TIkJQ2P+Z2BySlH0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Ja9E8EMjT6t6my/i/tmmduWO7YNutYJReSOubODzhOpk2I1XM78V0yytr6D0CpWRL
-	 qN3ZGnmTcn2HzJ711XnpASL4Gbw1K5mA1YwVG2qfxrpkDLz0Jg10HU4tH94RNSg4Ht
-	 p/mL6aGNTpdQVriRJM5FfkvV/WVNWmTY3SmAck49nIB8irHCYJAm4sEk2aLN6sx8pr
-	 n3iZYMy47JY4MAdVAVYAdfW/lL2a16fzV4vjZDUBALEJgHfl2IkcU5WUK8VjRxMtRS
-	 zaYbKpJeIisf++IeDLr4X1OL3EAP1rgv/g9ShSEsrwZID0DTgcsi9BWLVXzcvoGsda
-	 tne3XDB+uH77A==
-Date: Sun, 16 Nov 2025 09:14:54 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: David Laight <david.laight.linux@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Subject: Re: [PATCH 1/2] nvme-pci: Use size_t for length fields to handle
- larger sizes
-Message-ID: <20251116071454.GD147495@unreal>
-References: <20251115-nvme-phys-types-v1-0-c0f2e5e9163d@kernel.org>
- <20251115-nvme-phys-types-v1-1-c0f2e5e9163d@kernel.org>
- <20251115173341.4a59c97f@pumpkin>
- <20251115180547.GC147495@unreal>
- <20251115222850.183b8557@pumpkin>
+	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="cbzwDDRp"
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2958db8ae4fso31139005ad.2
+        for <linux-block@vger.kernel.org>; Sun, 16 Nov 2025 00:11:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1763280714; x=1763885514; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HxFwg3ju+ftuSMqIiYAdOOvZ0OAIJu2EJhRRFE1j4DA=;
+        b=cbzwDDRpkw3DgAJ3PaSrTatxTwbDkfkdswhBitGYCpQlycV6H62giabeUcmpEZdd0/
+         GHsK/NQUeUOOnvuXK8Qanh9NY9E+0qjtAXW4WUejYI5Bz4eFZKZwhzRVqnD7u4RbSeJQ
+         HB5Hm03mGZYK13pfL4ayd6Rw5Ni+OFxI7eVdF+ZHsEeb0yhOwQweDqvjqArD7YTXClsc
+         fxPRjT0QP1cFhaWQMVNXMWcto4SY1t2lIPBeE5dYff6RUBWoX2k1ifkP6elRzlhEyKah
+         cJrbTTWiCA8RQmQ2OCAAv4hY0l/ylzAJmv4Dk+rVTE7/JHheEZ0f62/XuETG1I5c8ezD
+         ywwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763280714; x=1763885514;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HxFwg3ju+ftuSMqIiYAdOOvZ0OAIJu2EJhRRFE1j4DA=;
+        b=GiyR2A+qvCCR5EbAV5AXfIJNrDlfDAoxVufhsLyBf87Bfe4VWVkmDcNnF02V+hbkyo
+         pYneDT+8oiv1aOY6R0liJUtSJjr0OndL/NSIB6tDGRYx4rOfSxlrK2+p38213dKgbHm1
+         E913RN6oKcm9ED9CBYSyB4FAlnvz9WMK1iUPHpzMUORPIz+VNWKlHbmlRpmw/DN+R+Eo
+         C9Mm1n1do7vRi5wpP04vVTm0GH0lhGIGWmeOy4Icku6mrvt0pb/eIG1YJkCAO2ynHzjl
+         xTHN6kt6drRTRo7sOqSQi3gm4xSDHVQMSb2E79rQllm8xC8Crf8570i0RENzjbMhAuJF
+         BJYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVqtfXgT35OFr8QYSeSs9CFuAlTynRjiqfa7Gkv4e7aNYbv0QW+lQfKxh9Hr9VzWWAumMfWj3+hAVQPig==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyymI7NmhZC9yCAkutB+na8hoUsWe7O4DrwQiTPeYweDLj0071M
+	EnbdvTF1pxqTpKp4e5MO5ElAPusErVZ90o7+0FdkWeNT5KJzLsjLyjQwsbU1Pe35YLw=
+X-Gm-Gg: ASbGncvWZ3EGRZtEQfBrkgDHlPNIBR+h/0s/KzWfwDcZYQbOq1dZ9255EDDVIFf/LKI
+	b/2ueKZE80X5gS5dygbfi36IMQvHAuy0rZ5L8djTXsw7Cxa7lML61+Z9Kk029KfaKyof3hfxTb+
+	UPhbVkk2OQFrXCgehZfp79feQtQk5nofmWctXegqTTN3v5jszj7kDRJmmTFsTPEELe5gkJ1ZZlZ
+	FRYPU4aPyQhqKDbAUR6c1KK2g6p8aeS1BZrseiZlz6KOgV/c5hKCpRA7ZhTBn8G5fpnCaMdTSvg
+	UtQ3W8CRYoPraET+bE0N6wnk8ocRT/9XjPxZEjOUUbS/as2A72QsZGmm6nMvclccBkANiOK3Y43
+	TgDAlYJ3dZ/vcbSw6e5WB/mESvoZc4+6cQ6sd69YguObVX2n5uN3+bJw0Sz4od4fgr2X0oLTmf+
+	TjdmErcq83eHi7WheO+Fgnrdxtm4LoKYgrf1+sN//x+bwFB/Dib7c=
+X-Google-Smtp-Source: AGHT+IG4zTCgOyc8q36N6azv8U3/msRqtiTIPYqJrKFmmGWBG01OEhj/Rfjn+kBTPtApfo/xiU3cYQ==
+X-Received: by 2002:a17:903:230a:b0:295:94e1:91da with SMTP id d9443c01a7336-2986a73b093mr100196375ad.33.1763280714289;
+        Sun, 16 Nov 2025 00:11:54 -0800 (PST)
+Received: from dread.disaster.area (pa49-181-58-136.pa.nsw.optusnet.com.au. [49.181.58.136])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2985c234726sm104981205ad.8.2025.11.16.00.11.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 16 Nov 2025 00:11:53 -0800 (PST)
+Received: from dave by dread.disaster.area with local (Exim 4.98.2)
+	(envelope-from <david@fromorbit.com>)
+	id 1vKXrS-0000000BUZh-0XuM;
+	Sun, 16 Nov 2025 19:11:50 +1100
+Date: Sun, 16 Nov 2025 19:11:50 +1100
+From: Dave Chinner <david@fromorbit.com>
+To: Ojaswin Mujoo <ojaswin@linux.ibm.com>
+Cc: Ritesh Harjani <ritesh.list@gmail.com>, Christoph Hellwig <hch@lst.de>,
+	Christian Brauner <brauner@kernel.org>, djwong@kernel.org,
+	john.g.garry@oracle.com, tytso@mit.edu, willy@infradead.org,
+	dchinner@redhat.com, linux-xfs@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-ext4@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, jack@suse.cz,
+	nilay@linux.ibm.com, martin.petersen@oracle.com,
+	rostedt@goodmis.org, axboe@kernel.dk, linux-block@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 0/8] xfs: single block atomic writes for buffered IO
+Message-ID: <aRmHRk7FGD4nCT0s@dread.disaster.area>
+References: <cover.1762945505.git.ojaswin@linux.ibm.com>
+ <aRUCqA_UpRftbgce@dread.disaster.area>
+ <20251113052337.GA28533@lst.de>
+ <87frai8p46.ritesh.list@gmail.com>
+ <aRWzq_LpoJHwfYli@dread.disaster.area>
+ <aRb0WQJi4rQQ-Zmo@li-dc0c254c-257c-11b2-a85c-98b6c1322444.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -49,164 +90,186 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251115222850.183b8557@pumpkin>
+In-Reply-To: <aRb0WQJi4rQQ-Zmo@li-dc0c254c-257c-11b2-a85c-98b6c1322444.ibm.com>
 
-On Sat, Nov 15, 2025 at 10:28:50PM +0000, David Laight wrote:
-> On Sat, 15 Nov 2025 20:05:47 +0200
-> Leon Romanovsky <leon@kernel.org> wrote:
-> 
-> > On Sat, Nov 15, 2025 at 05:33:41PM +0000, David Laight wrote:
-> > > On Sat, 15 Nov 2025 18:22:45 +0200
-> > > Leon Romanovsky <leon@kernel.org> wrote:
-> > >   
-> > > > From: Leon Romanovsky <leonro@nvidia.com>
-> > > > 
-> > > > This patch changes the length variables from unsigned int to size_t.
-> > > > Using size_t ensures that we can handle larger sizes, as size_t is
-> > > > always equal to or larger than the previously used u32 type.  
+On Fri, Nov 14, 2025 at 02:50:25PM +0530, Ojaswin Mujoo wrote:
+> On Thu, Nov 13, 2025 at 09:32:11PM +1100, Dave Chinner wrote:
+> > On Thu, Nov 13, 2025 at 11:12:49AM +0530, Ritesh Harjani wrote:
+> > > Christoph Hellwig <hch@lst.de> writes:
 > > > 
-> > > Where are requests larger than 4GB going to come from?  
-> > 
-> > The main goal is to reuse phys_vec structure. It is going to represent PCI
-> > regions exposed through VFIO DMABUF interface. Their length is more than u32.
-> 
-> Unless you actually need to have the same structure (because some function
-> is used in both places) there isn't really any need to have a single structure
-> for a a phy_addr:length pair.
-
-Actually, we do plan to use them. In RDMA and probably in DMA API also,
-as I was suggested to provide general DMA map function, which will
-perform mapping for array of phys_vecs.
-
-> Indeed keeping them separate can even remove bugs.
-
-Or introduce, it depends on the situation.
-
-> 
-> For instance (I think) blk_map_iter_next() returns an addr:len pair
-> that is only only used for the following sg_set_page() call - which
-> has separate parameters for phys_to_page(addr) and len.
-
-It is temporary, because we needed to use old SG interface. At some
-point of time (after we will finish discussion/implementation of VFIO
-and DMABUF), the blk_rq_map_*_sg() routines that are used for RDMA will 
-be changed to do not use SG at all.
-
-> So unless there are other place it is used it doesn't need to be
-> the same structure at all.
-> (Other people might disagree...)
-
-Yes, VFIO, DMABUF and RDMA are other places, so it is better to move
-that struct phys_vec to general place now, so in next cycle we will
-be able to reuse it.
-
-> 
-> > 
-> > >   
-> > > > Originally, u32 was used because blk-mq-dma code evolved from
-> > > > scatter-gather implementation, which uses unsigned int to describe length.
-> > > > This change will also allow us to reuse the existing struct phys_vec in places
-> > > > that don't need scatter-gather.
-> > > > 
-> > > > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> > > > ---
-> > > >  block/blk-mq-dma.c      | 14 +++++++++-----
-> > > >  drivers/nvme/host/pci.c |  4 ++--
-> > > >  2 files changed, 11 insertions(+), 7 deletions(-)
-> > > > 
-> > > > diff --git a/block/blk-mq-dma.c b/block/blk-mq-dma.c
-> > > > index e9108ccaf4b0..cc3e2548cc30 100644
-> > > > --- a/block/blk-mq-dma.c
-> > > > +++ b/block/blk-mq-dma.c
-> > > > @@ -8,7 +8,7 @@
-> > > >  
-> > > >  struct phys_vec {
-> > > >  	phys_addr_t	paddr;
-> > > > -	u32		len;
-> > > > +	size_t		len;
-> > > >  };
-> > > >  
-> > > >  static bool __blk_map_iter_next(struct blk_map_iter *iter)
-> > > > @@ -112,8 +112,8 @@ static bool blk_rq_dma_map_iova(struct request *req, struct device *dma_dev,
-> > > >  		struct phys_vec *vec)
-> > > >  {
-> > > >  	enum dma_data_direction dir = rq_dma_dir(req);
-> > > > -	unsigned int mapped = 0;
-> > > >  	unsigned int attrs = 0;
-> > > > +	size_t mapped = 0;
-> > > >  	int error;
-> > > >  
-> > > >  	iter->addr = state->addr;
-> > > > @@ -296,8 +296,10 @@ int __blk_rq_map_sg(struct request *rq, struct scatterlist *sglist,
-> > > >  	blk_rq_map_iter_init(rq, &iter);
-> > > >  	while (blk_map_iter_next(rq, &iter, &vec)) {
-> > > >  		*last_sg = blk_next_sg(last_sg, sglist);
-> > > > -		sg_set_page(*last_sg, phys_to_page(vec.paddr), vec.len,
-> > > > -				offset_in_page(vec.paddr));
-> > > > +
-> > > > +		WARN_ON_ONCE(overflows_type(vec.len, unsigned int));  
+> > > > On Thu, Nov 13, 2025 at 08:56:56AM +1100, Dave Chinner wrote:
+> > > >> On Wed, Nov 12, 2025 at 04:36:03PM +0530, Ojaswin Mujoo wrote:
+> > > >> > This patch adds support to perform single block RWF_ATOMIC writes for
+> > > >> > iomap xfs buffered IO. This builds upon the inital RFC shared by John
+> > > >> > Garry last year [1]. Most of the details are present in the respective 
+> > > >> > commit messages but I'd mention some of the design points below:
+> > > >> 
+> > > >> What is the use case for this functionality? i.e. what is the
+> > > >> reason for adding all this complexity?
+> > > >
+> > > > Seconded.  The atomic code has a lot of complexity, and further mixing
+> > > > it with buffered I/O makes this even worse.  We'd need a really important
+> > > > use case to even consider it.
 > > > 
-> > > I'm not at all sure you need that test.
-> > > blk_map_iter_next() has to guarantee that vec.len is valid.
-> > > (probably even less than a page size?)
-> > > Perhaps this code should be using a different type for the addr:len pair?  
-> > 
-> > I added this test for future proof, this is why it doesn't "return" on
-> > overflow, but prints dump stack and continues. It can't happen.
-> 
-> No, on a large number of installed systems it prints the stack an panicks.
-
-It will print such stack if vec.len is more than u32, which is not
-supposed to be. 
-
-> Were it to continue the effect would be all wrong anyway.
-> But blk_map_iter_next() guarantees to return a sane length.
-
-It is not guarantee. If I understand it correctly, the guarantee comes
-from upper layer which limits request size because of SG limitations.
-
-> 
-> > 
-> > >   
-> > > > +		sg_set_page(*last_sg, phys_to_page(vec.paddr),
-> > > > +			    (unsigned int)vec.len, offset_in_page(vec.paddr));  
+> > > I agree this should have been in the cover letter itself. 
 > > > 
-> > > You definitely don't need the explicit cast.  
+> > > I believe the reason for adding this functionality was also discussed at
+> > > LSFMM too...  
+> > > 
+> > > For e.g. https://lwn.net/Articles/974578/ goes in depth and talks about
+> > > Postgres folks looking for this, since PostgreSQL databases uses
+> > > buffered I/O for their database writes.
 > > 
-> > We degrade type from u64 to u32. Why don't we need cast?
+> > Pointing at a discussion about how "this application has some ideas
+> > on how it can maybe use it someday in the future" isn't a
+> > particularly good justification. This still sounds more like a
+> > research project than something a production system needs right now.
 > 
-> Because you don't need to cast pretty much all integer conversions.
-> Any warnings compilers might output for such assignments really are best
-> disabled.
-> The more casts you add to code to remove 'silly' compiler warnings the
-> harder it is to find the ones that actually have a desired effect and/or
-> unwanted effects that are actually bugs.
+> Hi Dave, Christoph,
 > 
-> I'm busy trying to fix a load of min_t(u32, a, b) which mask off high
-> significant bits from u64 values.
-> The casts got added (implicitly by using min_t() instead of min()) because
-> min() required the types match - and in a lot of cases the programmer
-> picked the type of the result not that of the larger parameter.
-> Others are just cut&paste of another line.
-> But the effect is the same, the casts add bugs rather than making the
-> code better.
+> There were some discussions around use cases for buffered atomic writes
+> in the previous LSFMM covered by LWN here [1]. AFAIK, there are 
+> databases that recommend/prefer buffered IO over direct IO. As mentioned
+> in the article, MongoDB being one that supports both but recommends
+> buffered IO. Further, many DBs support both direct IO and buffered IO
+> well and it may not be fair to force them to stick to direct IO to get
+> the benefits of atomic writes.
 > 
-> I've even seen:
-> 	uchar_buf[0] = (unsigned char)(int_val & 0xff);
-> (Presumably written to avoid compiler warnings.)
-> and looked at the object code to find the compiler (not gcc) anded the
-> value with 0xff for the '& 0xff', anded it with 0xff again for the cast
-> and then did a memory write of the low bits.
-> 
-> casts could easily be the next 'bug'...
+> [1] https://lwn.net/Articles/1016015/
 
-I have no such strong feelings about cast here and can remove it.
+You are quoting a discussion about atomic writes that was
+held without any XFS developers present. Given how XFS has driven
+atomic write functionality so far, XFS developers might have some
+..... opinions about how buffered atomic writes in XFS...
 
-Thanks
+Indeed, go back to the 2024 buffered atomic IO LSFMM discussion,
+where there were XFS developers present. That's the discussion that
+Ritesh referenced, so you should be aware of it.
 
+https://lwn.net/Articles/974578/
+
+Back then I talked about how atomic writes made no sense as
+-writeback IO- given the massive window for anything else to modify
+the data in the page cache. There is no guarantee that what the
+application wrote in the syscall is what gets written to disk with
+writeback IO. i.e. anything that can access the page cache can
+"tear" application data that is staged as "atomic data" for later
+writeback.
+
+IOWs, the concept of atomic writes for writeback IO makes almost no
+sense at all - dirty data at rest in the page cache is not protected
+against 3rd party access or modification. The "atomic data IO"
+semantics can only exist in the submitting IO context where
+exclusive access to the user data can be guaranteed.
+
+IMO, the only way semantics that makes sense for buffered atomic
+writes through the page cache is write-through IO. The "atomic"
+context is related directly to user data provided at IO submission,
+and so IO submitted must guarantee exactly that data is being
+written to disk in that IO.
+
+IOWs, we have to guarantee exclusive access between the data copy-in
+and the pages being marked for writeback. The mapping needs to be
+marked as using stable pages to prevent anyone else changing the
+cached data whilst it has an atomic IO pending on it.
+
+That means folios covering atomic IO ranges do not sit in the page
+cache in a dirty state - they *must* immediately transition to the
+writeback state before the folio is unlocked so that *nothing else
+can modify them* before the physical REQ_ATOMIC IO is submitted and
+completed.
+
+If we've got the folios marked as writeback, we can pack them
+immediately into a bio and submit the IO (e.g. via the iomap DIO
+code). There is no need to involve the buffered IO writeback path
+here; we've already got the folios at hand and in the right state
+for IO. Once the IO is done, we end writeback on them and they
+remain clean in the page caceh for anyone else to access and
+modify...
+
+This gives us the same physical IO semantics for buffered and direct
+atomic IO, and it allows the same software fallbacks for larger IO
+to be used as well.
+
+> > Why didn't you use the existing COW buffered write IO path to
+> > implement atomic semantics for buffered writes? The XFS
+> > functionality is already all there, and it doesn't require any
+> > changes to the page cache or iomap to support...
 > 
-> 	David
-> 
-> > 
-> > Thanks
-> 
+> This patch set focuses on HW accelerated single block atomic writes with
+> buffered IO, to get some early reviews on the core design.
+
+What hardware acceleration? Hardware atomic writes are do not make
+IO faster; they only change IO failure semantics in certain corner
+cases. Making buffered writeback IO use REQ_ATOMIC does not change
+the failure semantics of buffered writeback from the point of view
+of an application; the applicaiton still has no idea just how much
+data or what files lost data whent eh system crashes.
+
+Further, writeback does not retain application write ordering, so
+the application also has no control over the order that structured
+data is updated on physical media.  Hence if the application needs
+specific IO ordering for crash recovery (e.g. to avoid using a WAL)
+it cannot use background buffered writeback for atomic writes
+because that does not guarantee ordering.
+
+What happens when you do two atomic buffered writes to the same file
+range? The second on hits the page cache, so now the crash recovery
+semantic is no longer "old or new", it's "some random older version
+or new". If the application rewrites a range frequently enough,
+on-disk updates could skip dozens of versions between "old" and
+"new", whilst other ranges of the file move one version at a time.
+The application has -zero control- of this behaviour because it is
+background writeback that determines when something gets written to
+disk, not the application.
+
+IOWs, the only way to guarantee single version "old or new" atomic
+buffered overwrites for any given write would be to force flushing
+of the data post-write() completion.  That means either O_DSYNC,
+fdatasync() or sync_file_range(). And this turns the atomic writes
+into -write-through- IO, not write back IO...
+
+> Just like we did for direct IO atomic writes, the software fallback with
+> COW and multi block support can be added eventually.
+
+If the reason for this functionality is "maybe someone
+can use it in future", then you're not implementing this
+functionality to optimise an existing workload. It's a research
+project looking for a user.
+
+Work with the database engineers to build a buffered atomic write
+based engine that implements atomic writes with RWF_DSYNC.
+Make it work, and optimise it to be competitive with existing
+database engines, than then show how much faster it is using
+RWF_ATOMIC buffered writes.
+
+Alternatively - write an algorithm that assumes the filesystem is
+using COW for overwrites, and optimise the data integrity algorithm
+based on this knowledge. e.g. use always-cow mode on XFS, or just
+optimise for normal bcachefs or btrfs buffered writes. Use O_DSYNC
+when completion to submission ordering is required. Now you have
+an application algorithm that is optimised for old-or-new behaviour,
+and that can then be acclerated on overwrite-in-place capable
+filesystems by using a direct-to-hw REQ_ATOMIC overwrite to provide
+old-or-new semantics instead of using COW.
+
+Yes, there are corner cases - partial writeback, fragmented files,
+etc - where data will a mix of old and new when using COW without
+RWF_DSYNC.  Those are the the cases that RWF_ATOMIC needs to
+mitigate, but we don't need whacky page cache and writeback stuff to
+implement RWF_ATOMIC semantics in COW capable filesystems.
+
+i.e. enhance the applicaitons to take advantage of native COW
+old-or-new data semantics for buffered writes, then we can look at
+direct-to-hw fast paths to optimise those algorithms.
+
+Trying to go direct-to-hw first without having any clue of how
+applications are going to use such functionality is backwards.
+Design the applicaiton level code that needs highly performant
+old-or-new buffered write guarantees, then we can optimise the data
+paths for it...
+
+-Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
