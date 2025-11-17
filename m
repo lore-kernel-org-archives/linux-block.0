@@ -1,181 +1,103 @@
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF3161DF73A
-	for <linux-block@vger.kernel.org>; Mon, 17 Nov 2025 18:30:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDBE8314B74
+	for <linux-block@vger.kernel.org>; Mon, 17 Nov 2025 18:30:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763404215; cv=none; b=ufqiBxhWpAfUCyjLYhtteQkMchxFrbaNIpeWjDFfy1rXa4nD03HSpiWktPcPNU8MMTYvm/+eRcKmUb1PADPRf1yt6DZORrVHLjipdBDBhFCgBU9PtDHQC21eXAj0CIeN31mlGoO/7tF/pCY3zCOKP9/DfGLzboWvVoF33M1cIS0=
+	t=1763404259; cv=none; b=V25z0S8MdJOCH4LBOrNxcT7caGQKozONsRPIWuhEf8M3yRjbryTjyT7kZ7yngMRl5k1yugXJwp1qXvstdju4Zj2Nw34DTT6e0sM7H4FuE3mLFh9/Byq3O00AGEaFegbJxzWdTbC+6gFEMXae+yu7kFXskFuXxbkGkC8T0IH1mcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763404215; c=relaxed/simple;
-	bh=6ACO230Z61PzkEJMH+xQVxXum9C9jJAnmzUzGdKHsdk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HZwAmtYjBWwU877A4Sj88Fx3uKJSzuVYrHNVtBQcP8WqGGxfyG5an6GcVuKz8EYvqyQNRiXlkqMgTt6py3/MjH35o0XGvO5AaU7/UVXN1eOUBfZMFeSIPbDGMHget0wsMyQwmJSjpLofyxcQPXjTD9EOT2tGjWMCXLc9DHeLK28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=cbFUrs5W; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1763404259; c=relaxed/simple;
+	bh=20lwm6JOtChvlMh74FxsClts7z/ThQcFc5kTgOvXEPc=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=XrccPXU+N1AjYk/ggzk5W5K4OBFluzmNFRbUplnOzU7KfxoG55gGBh3XbEBBJ10M5n0D/CTRxqXA47Q40Te6tB0SsSyhI3zoHnWmIDb1G4kxRjW02la7IEfvZDQ4FI0pN4HGGhZWW5DFCRlI86cpG5IHiJ6Il6ULZwhkY7XGVRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=l9omBSjr; arc=none smtp.client-ip=209.85.166.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="cbFUrs5W"
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-297ea4c2933so3295675ad.0
-        for <linux-block@vger.kernel.org>; Mon, 17 Nov 2025 10:30:13 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="l9omBSjr"
+Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-94895f6b144so193819639f.0
+        for <linux-block@vger.kernel.org>; Mon, 17 Nov 2025 10:30:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1763404213; x=1764009013; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1763404256; x=1764009056; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MzaCLoEtUwEPf+UCdRCiyccMjBUBRj6w3HifvChgOxM=;
-        b=cbFUrs5WT43Oh+EcgfPXNavuOnsZRDb/fSwUGCUS5mSSyceLFI3x6j0QQu01TCRoKE
-         q3HQGcoufyGYn4QkLJvGdO1h1n7I6Yp7bEQj2Umy4ZOCJquY2P4JC0C6grl837AvMERQ
-         2dfWJkxSbIpIhvN9zUazgex0mut8J/ymOlr7Fdv7uV0mLsxq12RPEpQHvLuAmXbZR4CZ
-         aE3vLgqA/Fqimv1qBfCmDbuLNRwCbu0sy/PMr6Uxo+hL5f0YdDlHoBkx3VTGsDvQEaSX
-         qzDlSqlgbI1qokiPu4JJmHjlKPbylyN93lFfSiettD3XLcK5I9rX4Y+SePTTb4a24M0B
-         Ah7w==
+        bh=bqKQSsT6c3z9Bj8qCv27kYuWk8B17EEFfT4KJ4q6GHk=;
+        b=l9omBSjrVV8D9Wdl6IeI069D6mYxCbmqw7FcTTISJylWsT4UVwVmM1/mtsBjWpAU/Y
+         8iLmF7un3LIN981wPHu1BlQdUNjGcLnbLZVlAKsoT6l/PpDbsMzzt0QR31zB1sl7OLEr
+         qwrvQqLySRiMOkglTg6ai1sTzJKhyvP0Ui9qgplOE254fYTQLz7HupP7Y6+eVMz/QsXf
+         8kS59B/yQZ8K+Uaq77M8L7jfOlvnvpuG++UU6UWymek9hVWAKtjnURF1mgdRtCdFWUfF
+         kkOFg/V9t6rx6xA1PUzgvXW22+O7WgoV7804wZoWpMqAjAZV3Xetf8PTCzt/j79dgiON
+         /S+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763404213; x=1764009013;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1763404256; x=1764009056;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=MzaCLoEtUwEPf+UCdRCiyccMjBUBRj6w3HifvChgOxM=;
-        b=oScfdd3FNaTQb8qTHgsCY840PxOTgh50Zi4MtBfxhSLjYjG66UIR2LgXjwbVCgc8hq
-         0DmaFAitoilgreNBbL6QLFJtmzQ1Yy+1aDYFr/iiun0+Z3gALf7pGtxgPa1UPYVpwILb
-         Q4Wcs4KdBZ+ld2j8H3I/niEoasRjri1WE3bX38p+Hj+reMvjb7+kGJQ8O7Szvxq4bppZ
-         mKVDdteryjHuAbCQYDpHGIQiiESbELcvgwKdgfMKjALITVgzUWQOLWPP5rku4mxfEXef
-         xg/6CvOlXQGH9PHAxVyyPvWKBReOXwjk4XlTmCS8DJxpaeNbA6taoFgVA+94mV5vcExc
-         Z7Fw==
-X-Forwarded-Encrypted: i=1; AJvYcCU8loScMvwaY1XyVgDZFql6ZBfcVthsVeYRqUqFnLsemCucdCdGwnjZA4XhYaEOvE9wqzgewZbg3KTkrQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywhr6EK6TxAub/zn6hYa1ET67lTmq4dgTqa5FYA2FgeHbyKyqWH
-	AhSMvPHzpqnf6TdLsQ105+u7KXRHIPWnsp+yXFytMUoBqdbud0KLx6FPS7Zw63sW2/6alUzz3pX
-	s1E/Q8WRHLvi0YGXPkeJI8P5dUZACApKXC513mjvhkQ==
-X-Gm-Gg: ASbGncuNqtYHO2LeLQLysxBGEQTMGgxVUQqApNzdr2WFons/Uw6uPePWwzlCgESyzyB
-	BgJbNDm63LXd9p4+2XSkPzeMZ5SPF6fI00YmKod+GYn1pMrmedZE8bEqZH6/6xB49uzbkTIsHQJ
-	fp0jiHCuOM+4sACo/EMIzs2LSIBbER4HLpj6t/dheyh5uUX+EB6/4l3E04Xr+4lMOIPIqJ70C/d
-	dDe40nRpPBEtQFnnoDCBC8ej7OPeVhhNZp5lCPv9Q8be4HKpIwMbRk5j/OZlOrMmZeie2Sb
-X-Google-Smtp-Source: AGHT+IEtM3Vl6x6oK5FA4rFU6auMdZd0ElEgFDKV7JJBxw7qeWJA8ehrZUnspnptnJ/JZdt74s/qU9MAmBacxjKRaK8=
-X-Received: by 2002:a05:7022:61a9:b0:119:e56a:4ffb with SMTP id
- a92af1059eb24-11b40b36d09mr5551624c88.0.1763404212565; Mon, 17 Nov 2025
- 10:30:12 -0800 (PST)
+        bh=bqKQSsT6c3z9Bj8qCv27kYuWk8B17EEFfT4KJ4q6GHk=;
+        b=LZLNpjZI7j3c7gT/LM1Opn3wXML4PwYS9e7v32SBUNe5jDJU1BUq7Q3gCxR0A+Xvi1
+         8tbRU2C58egEYou5l+bZuzgEWTyy29Wsy7LQ70RBaxQnc9aQlJdhU9LNZBHVPcNpSgPi
+         SxvT4Pc8iejebeJUlgrmCqdbfFGq98/7Z1kBFLfFcwADqc8XAn93W3UK80CU3D0M//qS
+         dJYmQNvem4wpOofAXi6uxe7b/RpCal//kBKHDDFYVWFfJaHyp2JJSz/8PLO78+/iz4Bt
+         60lX8FoqRwnu5kif9mGDap+Aq4H2JJwe0S1UcnYFKEDP9dt2h5z0v93lwcZu6t2Rjzy0
+         dxnA==
+X-Gm-Message-State: AOJu0Yz6JeH92LOl3CMj9xW1Pd/U1NXZMRtNJTkA/l+UIkouD4jZ6cLF
+	hXI/8Cko+MPmBxJuud86KXe+WiT8kA4zLj1GM88+PTjKyTxCSYrHvP+C9cnQZ55NIIV+Yel6Ouf
+	sFt8u
+X-Gm-Gg: ASbGncvtkUTX3zzZV8E+lq+vHrNdB6rxYLj2urobDezK3TlVTyQ/VWBsuyBJF0jbriB
+	b5tObKTW9a7v8uHTAYl7pTxl5ulJ8EmHuzLsqExs9cUxC/w+H7lctnZ87MJ1kap4kAO/fInzMX7
+	PGaNhoPKbML7xp55PZUmGwVC7augJwKVJfMMpw3lqi1qV+UUqcTVRa4IUbYlJ1gnyefjj3YSIIr
+	8Hk/ran8F7MAe8Ni9ftYt1H4iokUNy8KRTDwWuZ7PlMfOoQVWPR9jBC/PusOIJz7gdGC+JwpZTw
+	6p7oSbeXTz1tQtyMuTZxLqSPveZzd5Z9nN1Cpe9PD6pTtwIXdmxF5P4wSNhtT4gnRcYtgVExCQU
+	6dCEHuUIzrsJrY9JdMfqZey23lFhmr4zeKqzAjBapp/yqkDshBIVhEHtHyUJuFwIt82U=
+X-Google-Smtp-Source: AGHT+IGvuhMY4d03HogBUJSIJbGY9sYO14AFhTEAj3WefpBduHEhD1PThR4VVSVrWu3aCSbDyhdMgA==
+X-Received: by 2002:a05:6638:35a7:b0:573:5038:cee6 with SMTP id 8926c6da1cb9f-5b7c9d8b98amr9092982173.12.1763404255881;
+        Mon, 17 Nov 2025 10:30:55 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5b7bd34cd7fsm5045090173.54.2025.11.17.10.30.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Nov 2025 10:30:55 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Li Chen <me@linux.beauty>
+Cc: stable@vger.kernel.org
+In-Reply-To: <20251117053407.70618-1-me@linux.beauty>
+References: <20251117053407.70618-1-me@linux.beauty>
+Subject: Re: [PATCH] block: rate-limit capacity change info log
+Message-Id: <176340425521.222021.13576588245917125051.b4-ty@kernel.dk>
+Date: Mon, 17 Nov 2025 11:30:55 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251112093808.2134129-1-ming.lei@redhat.com> <20251112093808.2134129-7-ming.lei@redhat.com>
- <CADUfDZoSiEjY0w7V1j09u1B=quJsizYKjOBQAGW61PcFtog7GA@mail.gmail.com> <aRm9QLOI5LT9w-HB@fedora>
-In-Reply-To: <aRm9QLOI5LT9w-HB@fedora>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Mon, 17 Nov 2025 10:29:59 -0800
-X-Gm-Features: AWmQ_bkRsJSsk-n1xsukAj908zqwqW--F6sUHHiL4W4gqCShgEEhBKw4BVClpjs
-Message-ID: <CADUfDZoAFQNR4h32b8J4hqEQhLBupeW213h3pT6d6-dZcHk6Qw@mail.gmail.com>
-Subject: Re: [PATCH V3 06/27] ublk: add helper of __ublk_fetch()
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Uday Shankar <ushankar@purestorage.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3
 
-On Sun, Nov 16, 2025 at 4:02=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
-e:
->
-> On Fri, Nov 14, 2025 at 09:21:53PM -0800, Caleb Sander Mateos wrote:
-> > On Wed, Nov 12, 2025 at 1:39=E2=80=AFAM Ming Lei <ming.lei@redhat.com> =
-wrote:
-> > >
-> > > Add helper __ublk_fetch() for refactoring ublk_fetch().
-> > >
-> > > Meantime move ublk_config_io_buf() out of __ublk_fetch() to make
-> > > the code structure cleaner.
-> > >
-> > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > > ---
-> > >  drivers/block/ublk_drv.c | 46 +++++++++++++++++++++-----------------=
---
-> > >  1 file changed, 24 insertions(+), 22 deletions(-)
-> > >
-> > > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > > index 5e83c1b2a69e..dd9c35758a46 100644
-> > > --- a/drivers/block/ublk_drv.c
-> > > +++ b/drivers/block/ublk_drv.c
-> > > @@ -2234,39 +2234,41 @@ static int ublk_check_fetch_buf(const struct =
-ublk_device *ub, __u64 buf_addr)
-> > >         return 0;
-> > >  }
-> > >
-> > > -static int ublk_fetch(struct io_uring_cmd *cmd, struct ublk_device *=
-ub,
-> > > -                     struct ublk_io *io, __u64 buf_addr)
-> > > +static int __ublk_fetch(struct io_uring_cmd *cmd, struct ublk_device=
- *ub,
-> > > +                       struct ublk_io *io)
-> > >  {
-> > > -       int ret =3D 0;
-> > > -
-> > > -       /*
-> > > -        * When handling FETCH command for setting up ublk uring queu=
-e,
-> > > -        * ub->mutex is the innermost lock, and we won't block for ha=
-ndling
-> > > -        * FETCH, so it is fine even for IO_URING_F_NONBLOCK.
-> > > -        */
-> > > -       mutex_lock(&ub->mutex);
-> > >         /* UBLK_IO_FETCH_REQ is only allowed before dev is setup */
-> > > -       if (ublk_dev_ready(ub)) {
-> > > -               ret =3D -EBUSY;
-> > > -               goto out;
-> > > -       }
-> > > +       if (ublk_dev_ready(ub))
-> > > +               return -EBUSY;
-> > >
-> > >         /* allow each command to be FETCHed at most once */
-> > > -       if (io->flags & UBLK_IO_FLAG_ACTIVE) {
-> > > -               ret =3D -EINVAL;
-> > > -               goto out;
-> > > -       }
-> > > +       if (io->flags & UBLK_IO_FLAG_ACTIVE)
-> > > +               return -EINVAL;
-> > >
-> > >         WARN_ON_ONCE(io->flags & UBLK_IO_FLAG_OWNED_BY_SRV);
-> > >
-> > >         ublk_fill_io_cmd(io, cmd);
-> > > -       ret =3D ublk_config_io_buf(ub, io, cmd, buf_addr, NULL);
-> > > -       if (ret)
-> > > -               goto out;
-> > >
-> > >         WRITE_ONCE(io->task, get_task_struct(current));
-> > >         ublk_mark_io_ready(ub);
-> > > -out:
-> > > +
-> > > +       return 0;
-> > > +}
-> > > +
-> > > +static int ublk_fetch(struct io_uring_cmd *cmd, struct ublk_device *=
-ub,
-> > > +                     struct ublk_io *io, __u64 buf_addr)
-> > > +{
-> > > +       int ret;
-> > > +
-> > > +       /*
-> > > +        * When handling FETCH command for setting up ublk uring queu=
-e,
-> > > +        * ub->mutex is the innermost lock, and we won't block for ha=
-ndling
-> > > +        * FETCH, so it is fine even for IO_URING_F_NONBLOCK.
-> > > +        */
-> > > +       mutex_lock(&ub->mutex);
-> > > +       ret =3D __ublk_fetch(cmd, ub, io);
-> > > +       if (!ret)
-> > > +               ret =3D ublk_config_io_buf(ub, io, cmd, buf_addr, NUL=
-L);
-> >
-> > This changes ublk_config_io_buf() to be called *after*
-> > ublk_mark_io_ready(). Is that safe? It seems like io->addr could be
-> > read in ublk_setup_iod() as soon as the ublk device is marked as ready
-> > for I/O.
->
-> disk can't be added unless acquiring ub->mutex, so it is safe.
 
-Okay, I see what you mean. ub->mutex is acquired after
-wait_for_completion_interruptible() in ublk_ctrl_start_dev() and
-ublk_ctrl_end_recovery() before allowing I/O to the ublk device. Then,
+On Mon, 17 Nov 2025 13:34:07 +0800, Li Chen wrote:
+> loop devices under heavy stress-ng loop streessor can trigger many
+> capacity change events in a short time. Each event prints an info
+> message from set_capacity_and_notify(), flooding the console and
+> contributing to soft lockups on slow consoles.
+> 
+> Switch the printk in set_capacity_and_notify() to
+> pr_info_ratelimited() so frequent capacity changes do not spam
+> the log while still reporting occasional changes.
+> 
+> [...]
 
-Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
+Applied, thanks!
+
+[1/1] block: rate-limit capacity change info log
+      commit: 3179a5f7f86bcc3acd5d6fb2a29f891ef5615852
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
