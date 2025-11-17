@@ -1,88 +1,121 @@
-Received: from sender3-pp-f112.zoho.com (sender3-pp-f112.zoho.com [136.143.184.112])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50A3730EF6D;
-	Mon, 17 Nov 2025 05:34:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.184.112
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763357662; cv=pass; b=WHQRMqA81QG7fL19autWaCjXqfkzROM8G2pwKYyqCHCo/Tj5M1osKVS4sFrl6AOCfxv/ykNEe3qyrmqWHJg53wkyHGv9Xy+/DRSUy+utUm41lVpDiRpbjHKuEiRfCnZg7ELsIMwlOKT1JLlpD8xeutAv6rLfLs6Ht9iuVPU5+ag=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763357662; c=relaxed/simple;
-	bh=eJEr5axAgO3pW3woAtrNRmdLqMTSHdl2NDrZu+GGVTs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=h83enjrtlNwVFMmrdvgyPVF3lwTXvCMzBiBwRBYqg1IHh6RnJYV59QED9zQDRgAopz+M93msWj7plIWMQBeFSqBHvTkMgNSpLhRUiEzgYqYSRkhu9SfWPELF6s3VsgKZeP+ETqieQJSl/w9iaspPphdEBNf0Iv6ZfeGhiU5EW4E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.beauty; spf=pass smtp.mailfrom=linux.beauty; dkim=pass (1024-bit key) header.d=linux.beauty header.i=me@linux.beauty header.b=myaOtPV+; arc=pass smtp.client-ip=136.143.184.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.beauty
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.beauty
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 538CA1946DA;
+	Mon, 17 Nov 2025 07:06:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763363193; cv=none; b=cSMN9nzGhfcuNJQuY+5f2aGC96LbOYL0Za7eDB1QDWeY+9niUluBZL3K4fkaY5cZyU1sTr5QOEHra9T+PW95ACPIgbvHKRDUTKxTj3aZaSLy2OddktyWCfQgEQKZicUXkMgeSvKGCwJRKLJnMMsX+j4KAdlcQGdu6+IcyF+sITk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763363193; c=relaxed/simple;
+	bh=KDZd9YTazDXwxaHEWm8apDVEeSXEzTkuHWdA30q5ZJI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qwrhTCyBYk2J5FBVnyWqPJEDtapVx98RPB55/ErPg0YneUpCIw47vFxEYrzvnA7a2RSuujKnX8SDfvHX+qeL9FqQrHGdRJ+QysCR5MoiddE886kIYRhOFIibv6ZdcMCyFQagQUkUGEXd4MpxV177++Fteg7hJjeKmiX+Zy3qk1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ajEn9Lum; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.beauty header.i=me@linux.beauty header.b="myaOtPV+"
-ARC-Seal: i=1; a=rsa-sha256; t=1763357655; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=Ve/zxr50tLIIBD8bFEze1IFjasqsfE+O1SOmaSZyNIDlHAYt8qch1qKUJysmjJ4HeE0mGxgBxEHDwL3JcfD80EIz5MP4t/vbv4YAXLIDtsCdYguRRACQh0bZgnYESoY+QbAMXSkhVqzAKbxL91342gXmkbwirc6ms3KXj6ba1P4=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1763357655; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=zz9E27inqmhoKRBcoJiCQ6d56m1Owtm9pkDIt5HNN9s=; 
-	b=nbVzdh05W+EEA3sYctbaeNnDFba9G9KdP1JMo/kj6VyiFmZEEqcBZYLJSnOQ9CBfJbQpxHQZJMWP2S2/JyQ3Fo1LBURfZdC484M/INbk9p2F5t4olfLhlcS8Bb/wbKjXwcVDbxsHQk57F5MJ3L0WSbhQ0WF7PE6JZydVt9oTSuk=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=linux.beauty;
-	spf=pass  smtp.mailfrom=me@linux.beauty;
-	dmarc=pass header.from=<me@linux.beauty>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1763357655;
-	s=zmail; d=linux.beauty; i=me@linux.beauty;
-	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=zz9E27inqmhoKRBcoJiCQ6d56m1Owtm9pkDIt5HNN9s=;
-	b=myaOtPV+EESPwtU6nlUPK9o3qRN7CaE4o4yCivyjzFHoFkGrse1RC8pmPNZDuHzo
-	l7gUSk73uslalxrJollb8kdHsIkbb6QgISoT05PmJHLmfq5IT94ZMk8SDRRSDn/TX9H
-	Rjwo666D481NxqDgGrmSfeeBH93Gx/UYdwRtsWdo=
-Received: by mx.zohomail.com with SMTPS id 17633576523032.890278833137927;
-	Sun, 16 Nov 2025 21:34:12 -0800 (PST)
-From: Li Chen <me@linux.beauty>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: stable@vger.kernel.org
-Subject: [PATCH] block: rate-limit capacity change info log
-Date: Mon, 17 Nov 2025 13:34:07 +0800
-Message-ID: <20251117053407.70618-1-me@linux.beauty>
-X-Mailer: git-send-email 2.51.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ajEn9Lum"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61424C4CEFB;
+	Mon, 17 Nov 2025 07:06:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763363193;
+	bh=KDZd9YTazDXwxaHEWm8apDVEeSXEzTkuHWdA30q5ZJI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ajEn9LumigFa0k/MwaUalDCto9I/GU9myHvWejQEoX/l4a5N70RlXaG4RM8zdYQ5V
+	 q5AlLAiLHNyw8Auc2iXYWyjirLMUunXwVIJRBBTSm0CsBXfuSu+xp1aeJvKRvQOeP5
+	 IKKHSlAPe9WWC46RAq6JRoE5JZyQo7+xG0bXflZgM0Vh+hwzedx+BQgFK7ZKX1Y8mW
+	 MqbF7TvBfY0nFt0925Qvz0X/J+9PSYlxmYZlqngxcu/xVebBja/rs6K5Vnqat89cNL
+	 a0nVh6f8/YD5O81vU7tSUxSptEbbzIYEPaX4S8SbDgBkl70ZW1Da/53BDrTYOLa7hN
+	 kFR5h3B1TFZxg==
+Message-ID: <af101dba-b02f-4863-a893-789fa08124d0@kernel.org>
+Date: Mon, 17 Nov 2025 08:06:26 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 02/10] uaccess: Add speculation barrier to
+ copy_from_user_iter()
+To: Thomas Gleixner <tglx@linutronix.de>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+ Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
+ Darren Hart <dvhart@infradead.org>, Davidlohr Bueso <dave@stgolabs.net>,
+ Andre Almeida <andrealmeid@igalia.com>,
+ Andrew Morton <akpm@linux-foundation.org>, Eric Dumazet
+ <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Dave Hansen <dave.hansen@linux.intel.com>,
+ Madhavan Srinivasan <maddy@linux.ibm.com>,
+ Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>
+Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org
+References: <cover.1762427933.git.christophe.leroy@csgroup.eu>
+ <598e9ec31716ce351f1456c81eee140477d4ecc4.1762427933.git.christophe.leroy@csgroup.eu>
+ <87jyzr9tuo.ffs@tglx>
+From: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
+Content-Language: fr-FR
+In-Reply-To: <87jyzr9tuo.ffs@tglx>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
 
-From: Li Chen <chenl311@chinatelecom.cn>
 
-loop devices under heavy stress-ng loop streessor can trigger many
-capacity change events in a short time. Each event prints an info
-message from set_capacity_and_notify(), flooding the console and
-contributing to soft lockups on slow consoles.
 
-Switch the printk in set_capacity_and_notify() to
-pr_info_ratelimited() so frequent capacity changes do not spam
-the log while still reporting occasional changes.
+Le 15/11/2025 à 16:51, Thomas Gleixner a écrit :
+> On Thu, Nov 06 2025 at 12:31, Christophe Leroy wrote:
+>> The results of "access_ok()" can be mis-speculated.  The result is that
+>> you can end speculatively:
+>>
+>> 	if (access_ok(from, size))
+>> 		// Right here
+> 
+> This is actually the wrong patch ordering as the barrier is missing in
+> the current code. So please add the missing barrier first.
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Li Chen <chenl311@chinatelecom.cn>
----
- block/genhd.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Patch 1 is there because Linus was worried with the performance 
+degradation brought by the barrier on x86, see [1]
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 9bbc38d12792..bd3a6841e5b5 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -90,7 +90,7 @@ bool set_capacity_and_notify(struct gendisk *disk, sector_t size)
- 	    (disk->flags & GENHD_FL_HIDDEN))
- 		return false;
- 
--	pr_info("%s: detected capacity change from %lld to %lld\n",
-+	pr_info_ratelimited("%s: detected capacity change from %lld to %lld\n",
- 		disk->disk_name, capacity, size);
- 
- 	/*
--- 
-2.51.0
+[1] 
+https://lore.kernel.org/all/CAHk-=wj4P6p1kBVW7aJbWAOGJZkB7fXFmwaXLieBRhjmvnWgvQ@mail.gmail.com/
 
+If we change the order, it means we first degrade performance on x86 
+with patch 1 then we fix that degradation with patch 2. It seems more 
+natural to first ensure that the barrier won't degrade x86 then add the 
+barrier.
+
+An alternative is to squash both patches together, after all they touch 
+the exact same part of the code.
+
+Let me know what you prefer:
+1/ Leave in that order to avoid intermediaite performance degradation on x86
+2/ Change order
+3/ Squash both patches together.
+
+> 
+> As a bonus the subject of the first patch makes actually sense
+> then. Right now it does not because there is nothing to avoid :)
+> 
+> Also please use the same prefix for these two patches which touch the
+> iter code.
+
+Sure I'll do that.
+
+> 
+>> For the same reason as done in copy_from_user() by
+>> commit 74e19ef0ff80 ("uaccess: Add speculation barrier to
+>> copy_from_user()"), add a speculation barrier to copy_from_user_iter().
+>>
+>> See commit 74e19ef0ff80 ("uaccess: Add speculation barrier to
+>> copy_from_user()") for more details.
+> 
+> No need to repeat that. Anyone with more than two braincells can look at
+> that commit, which you mentioned already two lines above already.
+
+Ok
+
+Thanks
+Christophe
