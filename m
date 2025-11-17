@@ -1,108 +1,181 @@
-Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 797E134B419;
-	Mon, 17 Nov 2025 20:45:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D77E3191A7
+	for <linux-block@vger.kernel.org>; Mon, 17 Nov 2025 20:51:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763412315; cv=none; b=OnMmnYjfScxOV8ZMbOYX6yFGsBuNBnL15dUY8G0Y0INTql0H/wPH2Zr6/TDKa/pFWk7ViIp3HaSvu+/zFlcDf5/fbaCOJgDXjvVdPtwuZv1HXBXcuV0K8/OMVqYtw1gJ6++NAuu5FHIHn74hJtd14ciCzVIOp8oEGr+xvpHZKaw=
+	t=1763412695; cv=none; b=p1Pn0wcsPNOh52QMLpEexQPmrJ0CeVlQ4pOhauxhajw4menf3Sr4RdN9kR9+yhNfDI5BpTnKIJM/Ej9MsZXMaftqZmTqyntn8V9hxfAaJUI9Al7mqVyaiyYGiImDxkMAzqzraf/W5HRmK2onmMQPozdujLFMn/8J4R7sB1zsofs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763412315; c=relaxed/simple;
-	bh=20wLWLx00zlyT7qwZ8L720r1nk+yEHfjWa1A8lzQSz8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tW8MesPvgPgWkBHWhnnGUWigM6j8OkYWr4s7bmeNLqoac1wfYFNvmyxCZi8/Al0brr5uOLpcaqY4tzTqk6SRx2/vfjxpM7pdsWQjggvkFwPwMCa4FjtgECtDXpndJ2hNsNjJgPgRfS3D0tbnGs0qdPuv5KvXaIRIflobhxkhW3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=zpaWIXV7; arc=none smtp.client-ip=199.89.3.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1763412695; c=relaxed/simple;
+	bh=MhRuGKREKjnDv5Rvs5Tcu3ha4BQBYTByx2vMFukybAI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Uk9xddWqTJuUAGdtpSVufVWmETDSP/VhYjbrGWLDA60mkQsiY0lH1TNsYpMuuvoJ1WToaszeMkgunxNTi2Z1jdXjOn7Gu8kxXlNlt+2cFafUa0/xYUitYjptEn2NC15PIEopmQdMJeYjvI/wofEWQfPN1al/00makfqlGHZkgC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=k5JggWYP; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="zpaWIXV7"
-Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4d9KWB360SzltwPH;
-	Mon, 17 Nov 2025 20:45:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1763412308; x=1766004309; bh=aYMXFFSsbxMvQfP8puY/troE
-	kX+lmWXsZgsFjJyFPHM=; b=zpaWIXV7O0CZjvUApImiWFlMSyI5mC0YUNlOmVKl
-	deZp2Nw/BJRphZAomiQzT1g1LC6Unnmk6yg69QKhqRW6PB3DEgZTqoML91eIqZdF
-	ueFglJ4aYd+xJthJzMDT9XHzEYnlFZEzLrjFyO9RPN9iQ2VSn4z+RD7sx4UMPHaK
-	s4xgHjtS1TsmLnGlUEp93MNLriC4bIRy7jtdE06oOfs2Z2v5M4uqn2qMoqAbZrqW
-	3Kgk81htcEzX5NL2oXktXJWNCZOBDjg8iszeYUSX+L/PBIWeNM0yMPDw6UHde88p
-	RGM437gcNqpJZXrdGjLwrfg+IhcgqMV4Bemt4Ptg5VYFoQ==
-X-Virus-Scanned: by MailRoute
-Received: from 003.mia.mailroute.net ([127.0.0.1])
- by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id BrXxTSAIq_r4; Mon, 17 Nov 2025 20:45:08 +0000 (UTC)
-Received: from [100.119.48.131] (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4d9KW138D2zltKjY;
-	Mon, 17 Nov 2025 20:45:00 +0000 (UTC)
-Message-ID: <32b831d6-a313-4d8c-9c2e-c24aa2cfeb56@acm.org>
-Date: Mon, 17 Nov 2025 12:44:59 -0800
+	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="k5JggWYP"
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-7b9215e55e6so3058628b3a.2
+        for <linux-block@vger.kernel.org>; Mon, 17 Nov 2025 12:51:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1763412692; x=1764017492; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VzhSFtd1TJYR/cIblKSU+QrS3cy0V4ly+fmhKB6r+qY=;
+        b=k5JggWYPoO+BSCmkWvSENgLSY7VpDkFZpUobtUkiLdyHcfvOVjG/7umvPtVzdDJ6Yt
+         GqYhtxescCO4qPkHW7t/atI3oVslTbgyQArfVL/V7yi9eZGXTmbeKh75jxVkFp6jBKBR
+         uM+mK9A3DAbsRNzaCcTKHa446Br/tBeN8ClPiof63iq6kknLAJeWihVvNt+Z5Oc39ug+
+         sNgufYbP+LieOvVfDnyStlUF9vXgTftwlGOFxEOdALx4yAAJ5wmDahs+nuZqgpRg5HyZ
+         t/XpcIh2k0btXfL358zNgpsPEg9goAYsNZYIoVookT2hpP1/R+cR+G34z2lPDccrh8XN
+         1Hag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763412692; x=1764017492;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VzhSFtd1TJYR/cIblKSU+QrS3cy0V4ly+fmhKB6r+qY=;
+        b=cy6+s88scEclWPUhMakvXWQs9xMX7lwkN+bUvHj3Tk9zWZh+LHR9UF2kfx3V46jMmH
+         wNC/WVu4FiUQ1TIeZzNNoGoCJn/H0u4GqpO8om/x61kzlbl0iOSBFhGHo2z9ySqJwasm
+         Yko8eAe08uWd3twwOfXlWyQwo356djVx868MLBIIoaFT2uAbNSBcdW6Zbb560nAH8Qfr
+         Xovk6ME62N15mEd9CQu7MqSciDJnc3UghR+PbLzKToTKhBhxX82TnKsJNZb3tXF/zT49
+         yfI4f164BYp5hqElQam+nBI0y4Jw2WktQDfuUXRRol3y7k2Cj1AzPZbMxzpbmLtYq/ev
+         4CBQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVKD8g52wzHTxYGI/34XMaBJRfV3c6tAEZi35YtstLtAvd1C9OG/ULz4w62cY4F2HJHKA82WjkHx5ShNw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzcN5TkMo05FAgBwfM/cpAYpyuQLizD4Ug8AaqkgoNqwMis4wLn
+	MluelMWRmKgGa4Ig4B0tFBgrwbe9i7l/cj+xN1o7lDPtm9HXuY7azLR7GcjHdFZNJKk=
+X-Gm-Gg: ASbGncsM2ubYRmNnc3c0bY34Un6jIj75WmL3UByQ4pEQMPxgMTcTTHX8Rv2ml302vLq
+	uAHd8D+G8o2xTx8rkNGQyLIyzTcSovsK2o7eNwSow2J/uwDMyknQ5VymoTe4MnuquoQodfXZDdQ
+	WCqOVO20nOxv27EPSB6pmgJgZr6pRVyScyoWhgciP9I9RnyBTZzjDPq0PxbWGGyHCV94+P1WMXJ
+	VjnFRUp7rvXRtMWcwN2IZvLl++zhuxWmfRaF0hEDBE6bVhTMnLjptjQsEgWDIze2pGAMSLR6sRi
+	/lk7HoEnhaXNiO+2ddiX13UMUcpcE3bBuC4h+m254gY8Hc0x+cqLwd/1t3yEFsTRVxZHpPYwLhI
+	zPJwQPsAsFrDgcmJAQL/fCNsHUjfN30cXNnWW57CkCpGem1MyfYM22jWJjrQgoaEGg411EXhfAl
+	vx+HEaEmj3iSlky4WUAWXnPRbXw6f/39WRkSvLu05P3YwyFArJKLZi5aqR6r2OBw==
+X-Google-Smtp-Source: AGHT+IFmWemPBugDags9Dp2aFdnpOuTH5HosoXLiUasMcQMlSkctA94mD5u3ieiUdMxFP9/1+M2F7w==
+X-Received: by 2002:a05:6a00:982:b0:7b2:2d85:ae59 with SMTP id d2e1a72fcca58-7ba39ecfa9dmr13503855b3a.11.1763412692398;
+        Mon, 17 Nov 2025 12:51:32 -0800 (PST)
+Received: from dread.disaster.area (pa49-181-58-136.pa.nsw.optusnet.com.au. [49.181.58.136])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7b92714df0esm14242994b3a.37.2025.11.17.12.51.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Nov 2025 12:51:31 -0800 (PST)
+Received: from dave by dread.disaster.area with local (Exim 4.98.2)
+	(envelope-from <david@fromorbit.com>)
+	id 1vL6C7-0000000CADH-2ixk;
+	Tue, 18 Nov 2025 07:51:27 +1100
+Date: Tue, 18 Nov 2025 07:51:27 +1100
+From: Dave Chinner <david@fromorbit.com>
+To: John Garry <john.g.garry@oracle.com>
+Cc: Ojaswin Mujoo <ojaswin@linux.ibm.com>,
+	Ritesh Harjani <ritesh.list@gmail.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Christian Brauner <brauner@kernel.org>, djwong@kernel.org,
+	tytso@mit.edu, willy@infradead.org, dchinner@redhat.com,
+	linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org, jack@suse.cz, nilay@linux.ibm.com,
+	martin.petersen@oracle.com, rostedt@goodmis.org, axboe@kernel.dk,
+	linux-block@vger.kernel.org, linux-trace-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 0/8] xfs: single block atomic writes for buffered IO
+Message-ID: <aRuKz4F3xATf8IUp@dread.disaster.area>
+References: <cover.1762945505.git.ojaswin@linux.ibm.com>
+ <aRUCqA_UpRftbgce@dread.disaster.area>
+ <20251113052337.GA28533@lst.de>
+ <87frai8p46.ritesh.list@gmail.com>
+ <aRWzq_LpoJHwfYli@dread.disaster.area>
+ <aRb0WQJi4rQQ-Zmo@li-dc0c254c-257c-11b2-a85c-98b6c1322444.ibm.com>
+ <aRmHRk7FGD4nCT0s@dread.disaster.area>
+ <8d645cb5-7589-4544-a547-19729610d44d@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 2/2] block: Remove queue freezing from several sysfs
- store callbacks
-To: Nilay Shroff <nilay@linux.ibm.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
- Ming Lei <ming.lei@redhat.com>, Martin Wilck <mwilck@suse.com>,
- Benjamin Marzinski <bmarzins@redhat.com>, stable@vger.kernel.org,
- Hannes Reinecke <hare@suse.de>, Damien Le Moal <dlemoal@kernel.org>,
- Chaitanya Kulkarni <kch@nvidia.com>
-References: <20251114210409.3123309-1-bvanassche@acm.org>
- <20251114210409.3123309-3-bvanassche@acm.org>
- <542de632-aace-4ff4-940e-55b57142b496@linux.ibm.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <542de632-aace-4ff4-940e-55b57142b496@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8d645cb5-7589-4544-a547-19729610d44d@oracle.com>
 
-On 11/17/25 1:01 AM, Nilay Shroff wrote:
-> This change look good to me however as I mentioned earlier,
-> introducing __data_racy would break the kernel build. So
-> are you going to raise a separate bug report to fix it?
+On Mon, Nov 17, 2025 at 10:59:55AM +0000, John Garry wrote:
+> On 16/11/2025 08:11, Dave Chinner wrote:
+> > > This patch set focuses on HW accelerated single block atomic writes with
+> > > buffered IO, to get some early reviews on the core design.
+> > What hardware acceleration? Hardware atomic writes are do not make
+> > IO faster; they only change IO failure semantics in certain corner
+> > cases.
 > 
->    AS      .tmp_vmlinux2.kallsyms.o
->    LD      vmlinux.unstripped
->    BTFIDS  vmlinux.unstripped
-> WARN: multiple IDs found for 'task_struct': 116, 10183 - using 116
-> WARN: multiple IDs found for 'module': 190, 10190 - using 190
-> WARN: multiple IDs found for 'vm_area_struct': 324, 10227 - using 324
-> WARN: multiple IDs found for 'inode': 956, 10314 - using 956
-> WARN: multiple IDs found for 'path': 989, 10344 - using 989
-> WARN: multiple IDs found for 'file': 765, 10375 - using 765
-> WARN: multiple IDs found for 'cgroup': 1030, 10409 - using 1030
-> WARN: multiple IDs found for 'seq_file': 1358, 10593 - using 1358
-> WARN: multiple IDs found for 'bpf_prog': 2054, 10984 - using 2054
-> WARN: multiple IDs found for 'bpf_map': 2134, 11012 - using 2134
-> [...]
-> [...]
-> make[2]: *** [scripts/Makefile.vmlinux:72: vmlinux.unstripped] Error 255
-> make[2]: *** Deleting file 'vmlinux.unstripped'
-> make[1]: *** [/home/src/linux/Makefile:1242: vmlinux] Error 2
-> make: *** [Makefile:248: __sub-make] Error 2
+> I think that he references using REQ_ATOMIC-based bio vs xfs software-based
+> atomic writes (which reuse the CoW infrastructure). And the former is
+> considerably faster from my testing (for DIO, obvs). But the latter has not
+> been optimized.
 
-The kernel build is already broken without my patch series. Anyway, I
-have reported this. In the kernel documentation I found the following:
+For DIO, REQ_ATOMIC IO will generally be faster than the software
+fallback because no page cache interactions or data copy is required
+by the DIO REQ_ATOMIC fast path.
 
-**Please do NOT report BPF issues to bugzilla.kernel.org since it
-is a guarantee that the reported issue will be overlooked.**
+But we are considering buffered writes, which *must* do a data copy,
+and so the behaviour and performance differential of doing a COW vs
+trying to force writeback to do REQ_ATOMIC IO is going to be much
+different.
 
-So I sent an email to the BPF mailing list reporting that the kernel
-build fails if both CONFIG_DEBUG_INFO_BTF and CONFIG_KCSAN are enabled
-for Linus' master branch (commit e7c375b18160 ("Merge tag
-'vfs-6.18-rc7.fixes' of gitolite.kernel.org:pub/scm/linux/kernel/git/
-vfs/vfs")). See also
-https://lore.kernel.org/bpf/2412725b-916c-47bd-91c3-c2d57e3e6c7b@acm.org/.
+Consider that the way atomic buffered writes have been implemented
+in writeback - turning off all folio and IO merging.  This means
+writeback efficiency of atomic writes is going to be horrendous
+compared to COW writes that don't use REQ_ATOMIC.
 
-Bart.
+Further, REQ_ATOMIC buffered writes need to turn off delayed
+allocation because if you can't allocate aligned extents then the
+atomic write can *never* be performed. Hence we have to allocate up
+front where we can return errors to userspace immediately, rather
+than just reserve space and punt allocation to writeback. i.e. we
+have to avoid the situation where we have dirty "atomic" data in the
+page cache that cannot be written because physical allocation fails.
+
+The likely outcome of turning off delalloc is that it further
+degrades buffered atomic write writeback efficiency because it
+removes the ability for the filesystem to optimise physical locality
+of writeback IO. e.g. adjacent allocation across multiple small
+files or packing of random writes in a single file to allow them to
+merge at the block layer into one big IO...
+
+REQ_ATOMIC is a natural fit for DIO because DIO is largely a "one
+write syscall, one physical IO" style interface. Buffered writes,
+OTOH, completely decouples application IO from physical IO, and so
+there is no real "atomic" connection between the data being written
+into the page caceh and the physical IO that is performed at some
+time later.
+
+This decoupling of physical IO is what brings all the problems and
+inefficiencies. The filesystem being able to mark the RWF_ATOMIC
+write range as a COW range at submission time creates a natural
+"atomic IO" behaviour without requiring the page cache or writeback
+to even care that the data needs to be written atomically.
+
+From there, we optimise the COW IO path to record that
+the new COW extent was created for the purpose of an atomic write.
+Then when we go to write back data over that extent, the filesystem
+can chose to do a REQ_ATOMIC write to do an atomic overwrite instead
+of allocating a new extent and swapping the BMBT extent pointers at
+IO completion time.
+
+We really don't care if 4x16kB adjacent RWF_ATOMIC writes are
+submitted as 1x64kB REQ_ATOMIC IO or 4 individual 16kB REQ_ATOMIC
+IOs. The former is much more efficient from an IO perspective, and
+the COW path can actually optimise for this because it can track the
+atomic write ranges in cache exactly. If the range is larger (or
+unaligned) than what REQ_ATOMIC can handle, we use COW writeback to
+optimise for maximum writeback bandwidth, otherwise we use
+REQ_ATOMIC to optimise for minimum writeback submission and
+completion overhead...
+
+IOWs, I think that for XFS (and other COW-capable filesystems) we
+should be looking at optimising the COW IO path to use REQ_ATOMIC
+where appropriate to create a direct overwrite fast path for
+RWF_ATOMIC buffered writes. This seems a more natural and a lot less
+intrusive than trying to blast through the page caceh abstractions
+to directly couple userspace IO boundaries to physical writeback IO
+boundaries...
+
+-Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
