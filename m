@@ -1,191 +1,91 @@
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+Received: from exactco.de (exactco.de [176.9.10.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AF08326D6D
-	for <linux-block@vger.kernel.org>; Mon, 17 Nov 2025 09:23:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 840A93246E6
+	for <linux-block@vger.kernel.org>; Mon, 17 Nov 2025 09:56:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.9.10.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763371418; cv=none; b=Lt1RtI8vPs0Np4fPQhRE3JVc0W/Ab0jf+9evYhFxI5YilY59gyKIfUTJmUPtixdsmvhbqIQTLpKwa8AQ1BHH9ouNDdOh+Ua6D2HgHAw+zHkr1ehTuqZmYBYQ99VBzxLnMSZEW1iOB8aTzfcji1ylBGuRgmbLU1Lq0EkvafzNPHY=
+	t=1763373407; cv=none; b=eebZvJbneC/8NBgoVNow23KjJbQopWVs3pnGo2tBxzvWxfcCcG5WuFmL61xNDyGUgKCS+DH2fsGb06ERd1F68pAhCRgPJ3UYc6aDW/SnGCnxjcx+AAsXK09ezxkLJ3bMOPr9y34DErYlnwNFNSBZmzZ1oMNlaLoAUrzQPL0vcOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763371418; c=relaxed/simple;
-	bh=5Le79+xZo0pnPqRtJoLbHkAQdzsDca6tpNt/0CwyC9M=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type:
-	 References; b=IMiC//+gbpTJlj3K6+PQJ+fmkq3hnoGzQzNyf5n2O3dDTqqT5ewX3r8WOcALO60o0/ay7NQjoEP19EAR0bn1mksOnzg2s1UD6uB6uF0TkKThUW39etY7CSBzPsALH6xsYZUOByg1c6p+BOA4a3JBN02uH8v4ESAILkIqloxB8zg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=PvRo0BOK; arc=none smtp.client-ip=203.254.224.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1763373407; c=relaxed/simple;
+	bh=u7U/U9/cUI3hshOC5lSKy+eUpS0XJRL/yT8+ajeFbfw=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=mIB9aBkunFbLb8uAN1XUZrUt118jmyLNAqohX37FFpU5lRiW7+IpyHmGcqkqLz6v/BRwyJRF+N5BSruhCbT2MCyTUbR1BF697zQG3p2u3BjdqOafr09sYaG8ud1e+YqSrBfhM66mxSRPjPWpAlOnYWya69atANAVS6DI+pmeZt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exactco.de; spf=pass smtp.mailfrom=exactco.de; dkim=pass (2048-bit key) header.d=exactco.de header.i=@exactco.de header.b=wiO0/Ebk; arc=none smtp.client-ip=176.9.10.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exactco.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=exactco.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="PvRo0BOK"
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20251117092333epoutp02e76e40bd948821ed343a77d4bc291e86~4wPUdkQLK0976409764epoutp028
-	for <linux-block@vger.kernel.org>; Mon, 17 Nov 2025 09:23:33 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20251117092333epoutp02e76e40bd948821ed343a77d4bc291e86~4wPUdkQLK0976409764epoutp028
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1763371413;
-	bh=0izvina2OzYAXBqg81C+fhf6rBfcPmphJHfa/0+bf+o=;
-	h=From:To:Cc:Subject:Date:References:From;
-	b=PvRo0BOKpu8hQOll56tqkoCsuKa6X0jfD8A+tUJqG0pLWgW5yxxauT3xhAHxJr/Zw
-	 vTJeDaXavhHDegg+LEhUtNHq/HhrIELuwk39pRa7LBYTG+Do/9J5yoyAtTCTwHxgQK
-	 N219RaE9m65FzCJQraQwJVpaBDiMj2iPb3JH44P8=
-Received: from epsnrtp02.localdomain (unknown [182.195.42.154]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTPS id
-	20251117092332epcas5p2da3b920c56548b8c08c218a2181e1cd4~4wPUEt-bR0872708727epcas5p2o;
-	Mon, 17 Nov 2025 09:23:32 +0000 (GMT)
-Received: from epcas5p1.samsung.com (unknown [182.195.38.91]) by
-	epsnrtp02.localdomain (Postfix) with ESMTP id 4d92Ng4vRkz2SSKX; Mon, 17 Nov
-	2025 09:23:31 +0000 (GMT)
-Received: from epsmtip2.samsung.com (unknown [182.195.34.31]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-	20251117085321epcas5p3de0647f01a818db024bea32870f223f4~4v089sQ8o2847328473epcas5p3a;
-	Mon, 17 Nov 2025 08:53:21 +0000 (GMT)
-Received: from node122.. (unknown [109.105.118.122]) by epsmtip2.samsung.com
-	(KnoxPortal) with ESMTPA id
-	20251117085320epsmtip2650ae9842d13f4a70f4eb8a284f4787c~4v08SduAF1001810018epsmtip2c;
-	Mon, 17 Nov 2025 08:53:20 +0000 (GMT)
-From: Xue He <xue01.he@samsung.com>
-To: axboe@kernel.dk, ming.lei@redhat.com
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	yukuai@fnnas.com, hexue <xue01.he@samsung.com>
-Subject: [PATCH v6] block: plug attempts to batch allocate tags multiple
- times
-Date: Mon, 17 Nov 2025 08:48:45 +0000
-Message-Id: <20251117084845.254680-1-xue01.he@samsung.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=exactco.de header.i=@exactco.de header.b="wiO0/Ebk"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=exactco.de;
+	s=x; h=To:References:Message-Id:Content-Transfer-Encoding:Cc:Date:In-Reply-To
+	:From:Subject:Mime-Version:Content-Type:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=k2f3j71BNrxJPRPjOJNmgb3Ao7lLQB6cOVK5xMoEYsU=; b=wiO0/Ebk4YFhyF7YJ6Fo5mMFCk
+	dNCU75YCuCED70S+Dbjb/EIYcBBYLCxiWp2bawVpScC8xo7NyOzIn1jUX8HsN+dEQgbbz+OSMlrsi
+	Eth5v/CnHEHoqN4vHC5XuefAfqPrbSnk4SoZwes5eYYOLcOFJLaijhy34HBGgYJ5M9VVrp9zOy5nj
+	+mboaTSr1mq8XgC4uRl3SvRmy5pFgh2JeLr+l+rpUK9TDilT7dFoR8Ge6Xj/OgQjifXFQXh8UpOHI
+	eZj41Jg35GJyifW1WbWH0jY6w/me9i1mw8akAw/RC1cVaSV+OK8++u2WS9DscOy9liH/8VodERhni
+	fVH3xecA==;
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CMS-MailID: 20251117085321epcas5p3de0647f01a818db024bea32870f223f4
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-cpgsPolicy: CPGSC10-505,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20251117085321epcas5p3de0647f01a818db024bea32870f223f4
-References: <CGME20251117085321epcas5p3de0647f01a818db024bea32870f223f4@epcas5p3.samsung.com>
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.400.131.1.6\))
+Subject: Re: [PATCH] fix floppy for PAGE_SIZE != 4KB
+From: =?utf-8?Q?Ren=C3=A9_Rebe?= <rene@exactco.de>
+In-Reply-To: <20251114.192119.1776060250519701367.rene@exactco.de>
+Date: Mon, 17 Nov 2025 10:56:39 +0100
+Cc: linux-block@vger.kernel.org,
+ efremov@linux.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <708B7962-86CD-489B-AC33-4B929F2902B6@exactco.de>
+References: <b1e17016-3d4d-4fac-b5b0-97db357d0749@kernel.dk>
+ <20251114.172543.20704181754788128.rene@exactco.de>
+ <fec67c88-53f5-4482-aeef-86e1213d187e@kernel.dk>
+ <20251114.192119.1776060250519701367.rene@exactco.de>
+To: axboe@kernel.dk
+X-Mailer: Apple Mail (2.3826.400.131.1.6)
 
-This patch aims to enable batch allocation of sufficient tags after
-batch IO submission with plug mechanism, thereby avoiding the need for
-frequent individual requests when the initial allocation is
-insufficient.
------------------------------------------------------------
-HW:
-16 CPUs/16 poll queues
-Disk: Samsung PM9A3 Gen4 3.84T
+Hi,
 
-CMD:
-[global]
-ioengine=io_uring
-group_reporting=1
-time_based=1
-runtime=1m
-refill_buffers=1
-norandommap=1
-randrepeat=0
-fixedbufs=1
-registerfiles=1
-rw=randread
-iodepth=128
-iodepth_batch_submit=32
-iodepth_batch_complete_min=32
-iodepth_batch_complete_max=128
-iodepth_low=32
-bs=4k
-numjobs=1
-direct=1
-hipri=1
+>> 64k is 4% of a floppy disk! But I hear you, works for you.
+>=20
+> Again, still only 8k or 16k for most of such remaining workstation
+> floppy users.
+>=20
+>>> But if someone wants to refactor this code some more, ... I'm happy =
+to
+>>> test it, too ;-)
+>>=20
+>> I don't think refactoring would be required here, it's probably just
+>> capping that probe read to something constant irrespective of =
+hardware
+>> page sizes.
+>=20
+> Well, the floppy.c __floppy_read_block_0 does:
+>        bio_init(&bio, bdev, &bio_vec, 1, REQ_OP_READ);
+>        __bio_add_page(&bio, page, block_size(bdev), 0);
+>=20
+> Is there an easy way to limit that to less than a page without
+> refactoring it too much? Otherwise we could just apply this hotfix for
+> now.
 
-[job1]
-filename=/dev/nvme0n1
-name=batch_test
-------------------------------------------------------------
-Perf:
-base code: __blk_mq_alloc_requests() 1.47%
-patch: __blk_mq_alloc_requests() 0.78%
-------------------------------------------------------------
 
----
-changes since v1:
-- Modify multiple batch registrations into a single loop to achieve
-  the batch quantity
+Any chance we can get my initial one liner constant PAGE_SIZE fix
+for this over a decade old bug in? I currently don=E2=80=99t have a =
+budget
+to refactor the floppy driver probing for efficiency on bigger PAGE_SIZE
+configs I=E2=80=99m not even having a floppy controller on.
 
-changes since v2:
-- Modify the call location of remainder handling
-- Refactoring sbitmap cleanup time
+Thanks!
 
-changes since v3:
-- Add handle operation in loop
-- Add helper sbitmap_find_bits_in_word
+	Ren=C3=A9
 
-changes since v4:
-- Split blk-mq.c changes from sbitmap
-
-changes since v5:
-- Add workload with perf
-- Modify over-counting bug
-
-Signed-off-by: hexue <xue01.he@samsung.com>
----
- block/blk-mq.c | 39 ++++++++++++++++++++++-----------------
- 1 file changed, 22 insertions(+), 17 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index d626d32f6e57..9e6fca1b5fb7 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -467,26 +467,31 @@ __blk_mq_alloc_requests_batch(struct blk_mq_alloc_data *data)
- 	unsigned long tag_mask;
- 	int i, nr = 0;
- 
--	tag_mask = blk_mq_get_tags(data, data->nr_tags, &tag_offset);
--	if (unlikely(!tag_mask))
--		return NULL;
-+	do {
-+		tag_mask = blk_mq_get_tags(data, data->nr_tags, &tag_offset);
-+		if (unlikely(!tag_mask)) {
-+			if (nr == 0)
-+				return NULL;
-+			break;
-+		}
-+		tags = blk_mq_tags_from_data(data);
-+		for (i = 0; tag_mask; i++) {
-+			if (!(tag_mask & (1UL << i)))
-+				continue;
-+			tag = tag_offset + i;
-+			prefetch(tags->static_rqs[tag]);
-+			tag_mask &= ~(1UL << i);
-+			rq = blk_mq_rq_ctx_init(data, tags, tag);
-+			rq_list_add_head(data->cached_rqs, rq);
-+			data->nr_tags--;
-+			nr++;
-+		}
-+	} while (data->nr_tags);
- 
--	tags = blk_mq_tags_from_data(data);
--	for (i = 0; tag_mask; i++) {
--		if (!(tag_mask & (1UL << i)))
--			continue;
--		tag = tag_offset + i;
--		prefetch(tags->static_rqs[tag]);
--		tag_mask &= ~(1UL << i);
--		rq = blk_mq_rq_ctx_init(data, tags, tag);
--		rq_list_add_head(data->cached_rqs, rq);
--		nr++;
--	}
--	if (!(data->rq_flags & RQF_SCHED_TAGS))
--		blk_mq_add_active_requests(data->hctx, nr);
- 	/* caller already holds a reference, add for remainder */
- 	percpu_ref_get_many(&data->q->q_usage_counter, nr - 1);
--	data->nr_tags -= nr;
-+	if (!(data->rq_flags & RQF_SCHED_TAGS))
-+		blk_mq_add_active_requests(data->hctx, nr);
- 
- 	return rq_list_pop(data->cached_rqs);
- }
--- 
-2.34.1
-
+--=20
+ Ren=C3=A9 Rebe, ExactCODE GmbH, Lietzenburger Str. 42, DE-10789 Berlin
+ https://exactco.de | https://t2linux.com | https://rene.rebe.de=
