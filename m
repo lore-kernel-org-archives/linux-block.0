@@ -1,56 +1,56 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE5203246F7
-	for <linux-block@vger.kernel.org>; Mon, 17 Nov 2025 10:20:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE6C42698AF
+	for <linux-block@vger.kernel.org>; Mon, 17 Nov 2025 11:01:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763374808; cv=none; b=EDRYc8lmVCx/N4qH/Uy7EAvQFr35zn82lfBn8S0prEm4Ka6LrrOSbwdnRVfI3yEYiFs5i4lctlgsoz0ZS677EX0CRkoOg5WCpdLAVXaGNcov6xwgDIU1Gce67lRTYsUO6jnKp7U4zxVSV11BKuhncSUpILweXxzlU9lNGAa2LBo=
+	t=1763377289; cv=none; b=PhLvTu+RMwH8tnGd9odEsYyJDbWn8WPrV5B/hyX+6pgXI4vmFH+7SI2OfVjtLr6byY1bWsf2uNTykpv5+ymg3USRuCtEbEOZw6qxZad8ngzhowTizjA3DShEavq5ZiOPMw83psHxQkRvhgMouEXm5zTIQQyuxbfddtnvfoCfTiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763374808; c=relaxed/simple;
-	bh=bwibJvJLkyc6FQip7uiNg567UrLP3BL61zUuGv4aF0U=;
+	s=arc-20240116; t=1763377289; c=relaxed/simple;
+	bh=N9/lcsM0jr7rZhz8ePGmTdOkwjfQ8AFb+CJXtFVCPi8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h4nY+oqnC30qxeoD9RPYAB9+eoV+TGBKgaons9ebGAQZ8DE5TgKZ2OeO5ctW11gR9WZfcv3Hq47TNl2mfCH9kp2bHewdsMPQNOtWXjxcczCSGTrW55uyRzbQVQQo0VhGuRGFfvGZ//bzBZEDEkYefuYnbCSRi5BeI4GMaGEe/rE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bPl2iTZR; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=ARzBk1e45OmtLH7AtrBQZmUoak2+V1XEilTRtbEFdI7Kh5JcztPuauqzp8fk/n/gqEZRVSPtCQJqFbjadZYRn5yPJfW/J5rVNRovIFsCBMALYqZM/OOXyRT88yArxsF0uG5cBn1iwUIyRGP6x/Oj2NFm081Xt6EC5Xot5c5h31c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GCRcRvji; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bPl2iTZR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GCRcRvji"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763374805;
+	s=mimecast20190719; t=1763377286;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=jWSFS1b8eCV2LAK4lG/dUgCUlWq07WRAkz4T4C61+JM=;
-	b=bPl2iTZRJBG4GKDKzeZ/mFn4KvYICD+RW6O8ZqRIb/LR6D0LnhHCF3VvcrkDskWHtdA2m9
-	in98o1wFiUwOEfzol+L0QAKNYusBbaAtQbZNnPZdw0HOW0kDabbRTj9cZ8o4+qGqZ2U5kc
-	yfyjhC37ISkZSTIt9oF0iIBzds6ZZHk=
+	bh=rsnoMrn4EKFATCbKyLfMnUmzDXGThmJLwfi6jLEmVxM=;
+	b=GCRcRvjiZAKb0KIPHxao5F/EHfiLwJtSgNTFN6cZfeFkS8PleMmxTjVWlJXxC2WLELPouv
+	pFh0mb/1IabojiPAzzRC9h7yDqygCd5tdpImayS393MZJC85CGvCMgbbD8avjQP9kyluU1
+	eYb+MGkGbats5FnJg+/eTpMqEsdKD3Y=
 Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-355-fhPPRLYKNc6d9pzkQZVHnA-1; Mon,
- 17 Nov 2025 05:20:01 -0500
-X-MC-Unique: fhPPRLYKNc6d9pzkQZVHnA-1
-X-Mimecast-MFC-AGG-ID: fhPPRLYKNc6d9pzkQZVHnA_1763374800
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-447-VXLDxIGFN3mlwrIXTFzkZg-1; Mon,
+ 17 Nov 2025 06:01:22 -0500
+X-MC-Unique: VXLDxIGFN3mlwrIXTFzkZg-1
+X-Mimecast-MFC-AGG-ID: VXLDxIGFN3mlwrIXTFzkZg_1763377278
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C3D771956095;
-	Mon, 17 Nov 2025 10:19:59 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B3A2D1956060;
+	Mon, 17 Nov 2025 11:01:17 +0000 (UTC)
 Received: from fedora (unknown [10.72.116.42])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2CC16180049F;
-	Mon, 17 Nov 2025 10:19:55 +0000 (UTC)
-Date: Mon, 17 Nov 2025 18:19:51 +0800
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 72013180035F;
+	Mon, 17 Nov 2025 11:01:13 +0000 (UTC)
+Date: Mon, 17 Nov 2025 19:01:08 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Xue He <xue01.he@samsung.com>
+To: Yu Kuai <yukuai@fnnas.com>
 Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, yukuai@fnnas.com
-Subject: Re: [PATCH v6] block: plug attempts to batch allocate tags multiple
- times
-Message-ID: <aRr2x89ShJa08jNk@fedora>
-References: <CGME20251117085321epcas5p3de0647f01a818db024bea32870f223f4@epcas5p3.samsung.com>
- <20251117084845.254680-1-xue01.he@samsung.com>
+	linux-kernel@vger.kernel.org, tj@kernel.org, nilay@linux.ibm.com
+Subject: Re: [PATCH RESEND 1/5] block/blk-rq-qos: add a new helper
+ rq_qos_add_freezed()
+Message-ID: <aRsAdF3GxNJ3Q1Qv@fedora>
+References: <20251116041024.120500-1-yukuai@fnnas.com>
+ <20251116041024.120500-2-yukuai@fnnas.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -59,145 +59,60 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251117084845.254680-1-xue01.he@samsung.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+In-Reply-To: <20251116041024.120500-2-yukuai@fnnas.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Mon, Nov 17, 2025 at 08:48:45AM +0000, Xue He wrote:
-> This patch aims to enable batch allocation of sufficient tags after
-> batch IO submission with plug mechanism, thereby avoiding the need for
-> frequent individual requests when the initial allocation is
-> insufficient.
-> -----------------------------------------------------------
-> HW:
-> 16 CPUs/16 poll queues
-> Disk: Samsung PM9A3 Gen4 3.84T
+On Sun, Nov 16, 2025 at 12:10:20PM +0800, Yu Kuai wrote:
+> queue should not be freezed under rq_qos_mutex, see example index
+> commit 9730763f4756 ("block: correct locking order for protecting blk-wbt
+> parameters"), which means current implementation of rq_qos_add() is
+> problematic. Add a new helper and prepare to fix this problem in
+> following patches.
 > 
-> CMD:
-> [global]
-> ioengine=io_uring
-> group_reporting=1
-> time_based=1
-> runtime=1m
-> refill_buffers=1
-> norandommap=1
-> randrepeat=0
-> fixedbufs=1
-> registerfiles=1
-> rw=randread
-> iodepth=128
-> iodepth_batch_submit=32
-> iodepth_batch_complete_min=32
-> iodepth_batch_complete_max=128
-> iodepth_low=32
-> bs=4k
-> numjobs=1
-> direct=1
-> hipri=1
-> 
-> [job1]
-> filename=/dev/nvme0n1
-> name=batch_test
-> ------------------------------------------------------------
-> Perf:
-> base code: __blk_mq_alloc_requests() 1.47%
-> patch: __blk_mq_alloc_requests() 0.78%
-> ------------------------------------------------------------
-> 
+> Signed-off-by: Yu Kuai <yukuai@fnnas.com>
 > ---
-> changes since v1:
-> - Modify multiple batch registrations into a single loop to achieve
->   the batch quantity
+>  block/blk-rq-qos.c | 27 +++++++++++++++++++++++++++
+>  block/blk-rq-qos.h |  2 ++
+>  2 files changed, 29 insertions(+)
 > 
-> changes since v2:
-> - Modify the call location of remainder handling
-> - Refactoring sbitmap cleanup time
-> 
-> changes since v3:
-> - Add handle operation in loop
-> - Add helper sbitmap_find_bits_in_word
-> 
-> changes since v4:
-> - Split blk-mq.c changes from sbitmap
-> 
-> changes since v5:
-> - Add workload with perf
-> - Modify over-counting bug
-> 
-> Signed-off-by: hexue <xue01.he@samsung.com>
-> ---
->  block/blk-mq.c | 39 ++++++++++++++++++++++-----------------
->  1 file changed, 22 insertions(+), 17 deletions(-)
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index d626d32f6e57..9e6fca1b5fb7 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -467,26 +467,31 @@ __blk_mq_alloc_requests_batch(struct blk_mq_alloc_data *data)
->  	unsigned long tag_mask;
->  	int i, nr = 0;
+> diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
+> index 654478dfbc20..353397d7e126 100644
+> --- a/block/blk-rq-qos.c
+> +++ b/block/blk-rq-qos.c
+> @@ -322,6 +322,33 @@ void rq_qos_exit(struct request_queue *q)
+>  	mutex_unlock(&q->rq_qos_mutex);
+>  }
 >  
-> -	tag_mask = blk_mq_get_tags(data, data->nr_tags, &tag_offset);
-> -	if (unlikely(!tag_mask))
-> -		return NULL;
-> +	do {
-> +		tag_mask = blk_mq_get_tags(data, data->nr_tags, &tag_offset);
+> +int rq_qos_add_freezed(struct rq_qos *rqos, struct gendisk *disk,
+> +		       enum rq_qos_id id, const struct rq_qos_ops *ops)
+> +{
+> +	struct request_queue *q = disk->queue;
+> +
+> +	WARN_ON_ONCE(q->mq_freeze_depth == 0);
+> +	lockdep_assert_held(&q->rq_qos_mutex);
+> +
+> +	if (rq_qos_id(q, id))
+> +		return -EBUSY;
+> +
+> +	rqos->disk = disk;
+> +	rqos->id = id;
+> +	rqos->ops = ops;
+> +	rqos->next = q->rq_qos;
+> +	q->rq_qos = rqos;
+> +	blk_queue_flag_set(QUEUE_FLAG_QOS_ENABLED, q);
+> +
+> +	if (rqos->ops->debugfs_attrs) {
+> +		mutex_lock(&q->debugfs_mutex);
+> +		blk_mq_debugfs_register_rqos(rqos);
+> +		mutex_unlock(&q->debugfs_mutex);
+> +	}
 
-You may keep the original batch update on `data->nr_tags` by passing
-`data->nr_tags - nr`.
+It will cause more lockdep splat to let q->debugfs_mutex depend on queue freeze,
 
-> +		if (unlikely(!tag_mask)) {
-> +			if (nr == 0)
-> +				return NULL;
-> +			break;
-> +		}
-> +		tags = blk_mq_tags_from_data(data);
-> +		for (i = 0; tag_mask; i++) {
-> +			if (!(tag_mask & (1UL << i)))
-> +				continue;
-> +			tag = tag_offset + i;
-> +			prefetch(tags->static_rqs[tag]);
-> +			tag_mask &= ~(1UL << i);
-> +			rq = blk_mq_rq_ctx_init(data, tags, tag);
-> +			rq_list_add_head(data->cached_rqs, rq);
-> +			data->nr_tags--;
+Also blk_mq_debugfs_register_rqos() does _not_ require queue to be frozen,
+and it should be fine to move blk_mq_debugfs_register_rqos() out of queue
+freeze.
 
-data->nr_tags-- can be killed.
-
-> +			nr++;
-> +		}
-> +	} while (data->nr_tags);
-
-Replace the above check with `data->nr_tags > nr`
-
->  
-> -	tags = blk_mq_tags_from_data(data);
-> -	for (i = 0; tag_mask; i++) {
-> -		if (!(tag_mask & (1UL << i)))
-> -			continue;
-> -		tag = tag_offset + i;
-> -		prefetch(tags->static_rqs[tag]);
-> -		tag_mask &= ~(1UL << i);
-> -		rq = blk_mq_rq_ctx_init(data, tags, tag);
-> -		rq_list_add_head(data->cached_rqs, rq);
-> -		nr++;
-> -	}
-> -	if (!(data->rq_flags & RQF_SCHED_TAGS))
-> -		blk_mq_add_active_requests(data->hctx, nr);
->  	/* caller already holds a reference, add for remainder */
->  	percpu_ref_get_many(&data->q->q_usage_counter, nr - 1);
-> -	data->nr_tags -= nr;
-
-The above line needs to keep.
-
-> +	if (!(data->rq_flags & RQF_SCHED_TAGS))
-> +		blk_mq_add_active_requests(data->hctx, nr);
-
-The above two lines can be kept in original position, then the change
-outside loop can be avoided.
-
-With above update, feel free to add:
-
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
 Thanks,
 Ming
