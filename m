@@ -1,72 +1,107 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7391191F91;
-	Mon, 17 Nov 2025 20:01:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71ED433E373
+	for <linux-block@vger.kernel.org>; Mon, 17 Nov 2025 20:24:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763409703; cv=none; b=UhhLqpO6Mwx4g6QXtIKALeCuPjxsLzj+Ikfwq7NpuTcTP75eQlh2QD69X4hrdqiRVafLe4RHNwIvKQ2HmWua+wM6os4UlV0qJ9tVyjbQ1EaJr/Db99i8LF/0gh5DRj6YVnE9Di6hXmcx8k0SWjTd0ULRLW6r3xTG3+OuRe1Odg4=
+	t=1763411092; cv=none; b=T1fDEXJ+6vFw+U2e0LIScs6E1rRtIrrt/3NZO3gu/6cVspZ/PqvEBZWH1cs87XsKp4iTg1US3BfKn5ShbFOxLDPcw9nQvTbVAnaiQ0WUAhX/WuSmvJWrH5zUwpPUp6eSjzCMvTUB2K6rlmG8HSQ51vyVRhwSeyWd4qtM9buk1Bo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763409703; c=relaxed/simple;
-	bh=lHKjnHmwld4J7UpdFKFeqpdnk+sIlNnF2boW1e9EfYw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nP5Ant4V1qOhBtZbSFdNemjBJbfn8s2ZJ20kMIcaqmz7lSGG70RZYGV30n21D/Eb2DuvbZKhY7l8S3WR9iSINybOC7zH2dOdYN2lMWgdbc+wA9Eu37+DI7WNnYt+Sh/6h7mO4pB99GiD/ybbqAaWThcZ5epJBU4+iuD5a/NQclg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jxz27avf; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763411092; c=relaxed/simple;
+	bh=2fGDOT3hOlNR6C9el0fpIF0YgndGuBe7jS+ChUB49Tc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pLo3uGyfUtowfypmXmYMnT7Etw/uhtJVpFGKpdQJ52l1xLi8vRC1TFJ+BkqqvlcFuSxBxtaJ9hjAHJt85iZkYsLgGXtb1RSUxLB3zdzzLUgMIinl4s0JtmZciW5HW7S9jn+m2xIgvrpqFf1T+kGwsdKcGF2GDSoXgQCLbNY517E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=NenDg1H9; arc=none smtp.client-ip=209.85.215.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jxz27avf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD1A4C4AF0B;
-	Mon, 17 Nov 2025 20:01:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763409703;
-	bh=lHKjnHmwld4J7UpdFKFeqpdnk+sIlNnF2boW1e9EfYw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jxz27avfTpyBV3WFr9fOPyqhVvxz89VNv4Hiz8xg+q0g/Mekwy2Z+jeba4zQFsNJ4
-	 XkmcRiEONR14SZwWBRhhj8ydjJCsDypBS6V4zm+PK2xoDPCcZ+gTRicF/wmJpkzLu7
-	 YwCRujVaWY60OGCR+6TvWC1oIDnHLdmqf0iZFUSSk5DmQc6/W3Z/IAfi9n8ycsx4/o
-	 EWCCP/PVZjf9r3DEHKpU9tG4mBcZ8p7IEWo5uzxoV5iRAhJKqgQBn8maIwEIgsW44J
-	 4zm/2rHXw5z6uavy31Cimy8EhB4sI0pURkBMd55PXbOHOInjA99pZH5gv2annPwy0s
-	 CItIkgbfMqiCA==
-Date: Mon, 17 Nov 2025 22:01:38 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Keith Busch <kbusch@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="NenDg1H9"
+Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-bc59a785697so3687660a12.0
+        for <linux-block@vger.kernel.org>; Mon, 17 Nov 2025 12:24:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1763411084; x=1764015884; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=onsK98uoUhT0XwWIqjQPKdP2gqDAphdg/ek+7mT4eqQ=;
+        b=NenDg1H9iDrFXoJz3ADI32/lpqAvmI2/mA2GekXEP8plOLIRJ61CQiuZ5tybLAXfsK
+         Uz0s31489u/+DybWDsgTgJlYcC+oNem0egFmB5Udg4IqdUHOXgSkjMCeUy1V+4u/Tjbu
+         nLkDrtpVbuTkCgrIiOx0hAb++KsssnX/ZU0sgqW7zLSPz+OMuwrVA63s3JWoBWjP/WEG
+         Le5wY2cj89rmlfeD1R+tXWYnOUXDTBhMfc3BrYc55xv+D6fZ7eQ4cdQVqxHfxcYnCs49
+         GR1eEYUw5qQEi4eNX0/mSa/ryHeG/lxsf+FkGEnRb4aM1RNMe+5O3PWL0DpOglTshV9K
+         UUDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763411084; x=1764015884;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=onsK98uoUhT0XwWIqjQPKdP2gqDAphdg/ek+7mT4eqQ=;
+        b=RXcdCTbMCPAKyixGPxwC8QCVjbJinf4yJOCMMZkaUVdtFqn72oa2kJkpHpnaQoVY8z
+         +yayhfONJKDycMeSD0vjrT93+tZSGy3d7uPTFXheKTdgnV4OybrSbJxRwEOrLO+2q3rv
+         ERulxYCqgkDnMAb0z6WzNUANeylWEIKZ8swvlSnrubJgJytNjdkYwXFyjCj/qeaWKwv8
+         Ap4nndZxa97vM0IYZAviA+gSHVTzyxj0csHDCN/fYtHOglGjJMoiTGISpfV01q2HT6qA
+         98NsdBaFQuWiGH7eB5uFA02N76lErpU+Fo6s4zwjw4PHu+epPh0EzjO+ZXIobjXeq3mv
+         wyzg==
+X-Forwarded-Encrypted: i=1; AJvYcCUjmBIW8S6iq4yKDdY9rQMiyl5nRr0icm9jJ1YY4xC9KlWT9ctfUiA52pC9G+Y65+OeENZ6FIdSV1SChA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyF6E+yPgwSMO4n+wDd+5SpTReqH99FWASx6zs/L7teila0uWvm
+	iv0DBgIGgSz+1B8pNXxHbXn50Vt2tfketE2cZuKhTFujWLOQIiGqUKX1+uX/Cmel3nc=
+X-Gm-Gg: ASbGnctsQVdlMpegncA8Zbaya0zu+yV5oQMGvWRFtLdCTGZzk7Qbi9bfEYPaRea6jj7
+	pSrt5SCcWpexQL43J3+/uaeY0/Zh09RmYTQURTq3qp7EEr9/28EHdQKgHVHL80tXIc8luqxG/Ft
+	fIL73NPHMbhnrLrRDNsHR+EgcJs2/O+8JX1wT7vZFhzMYpEKQp0+8/fXpMaZNg9MxhK4ct2T6lf
+	c5upB8cCZC2a5cIu306rHlMGfoB5rmdcbGyWiO46mq5uI+czB2tCnAxMZL3U14fOvtCHoJm0Vi2
+	SEkk5tFST1rlOgav6qmDw6Bb970Pm7agvUqtDLDE8VDfgbtIa5JiaSNFpBdNNQNOTlR74vjEY1I
+	oDZcQwS9hXSVYKcCBNNSmTvjRtWNpXpCDI43SMr1jT7jPBsYB5/B9XbwZyMUQQrIEipDpi8gUOr
+	h0yOxwHbt3+eZEFfNv5cuZg0Cgvzn9u760yX78Ax5FNKnx
+X-Google-Smtp-Source: AGHT+IEdhFd42XGtdY73xnyG2hr/76Hbk1CjMiITvZ1VDOj8aki8ecB4bkyUXogqVL/y2/Mbq+4Cyw==
+X-Received: by 2002:a05:7300:cc83:b0:2a4:3593:9695 with SMTP id 5a478bee46e88-2a4abb32b86mr5625538eec.18.1763411083462;
+        Mon, 17 Nov 2025 12:24:43 -0800 (PST)
+Received: from apollo.purestorage.com ([208.88.152.253])
+        by smtp.googlemail.com with ESMTPSA id 5a478bee46e88-2a49db7a753sm49298281eec.6.2025.11.17.12.24.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Nov 2025 12:24:43 -0800 (PST)
+From: Mohamed Khalfella <mkhalfella@purestorage.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <kbusch@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
 	Chaitanya Kulkarni <kch@nvidia.com>
-Subject: Re: [PATCH v2 1/2] nvme-pci: Use size_t for length fields to handle
- larger sizes
-Message-ID: <20251117200138.GE147495@unreal>
-References: <20251117-nvme-phys-types-v2-0-c75a60a2c468@nvidia.com>
- <20251117-nvme-phys-types-v2-1-c75a60a2c468@nvidia.com>
- <aRt5DPnMwzDw8_dF@kbusch-mbp>
+Cc: Casey Chen <cachen@purestorage.com>,
+	Vikas Manocha <vmanocha@purestorage.com>,
+	Yuanyuan Zhong <yzhong@purestorage.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Ming Lei <ming.lei@redhat.com>,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Mohamed Khalfella <mkhalfella@purestorage.com>
+Subject: [PATCH v2 0/1] nvme: Convert tag_list mutex to rwsemaphore to avoid deadlock
+Date: Mon, 17 Nov 2025 12:23:52 -0800
+Message-ID: <20251117202414.4071380-1-mkhalfella@purestorage.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aRt5DPnMwzDw8_dF@kbusch-mbp>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Nov 17, 2025 at 12:35:40PM -0700, Keith Busch wrote:
-> On Mon, Nov 17, 2025 at 09:22:43PM +0200, Leon Romanovsky wrote:
-> > diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-> > index e5ca8301bb8b..b61ec62b0ec6 100644
-> > --- a/drivers/nvme/host/pci.c
-> > +++ b/drivers/nvme/host/pci.c
-> > @@ -290,14 +290,14 @@ struct nvme_iod {
-> >  	u8 flags;
-> >  	u8 nr_descriptors;
-> >  
-> > -	unsigned int total_len;
-> > +	size_t total_len;
-> 
-> Changing the generic phys_vec sounds fine, but the nvme driver has a 8MB
-> limitation on how large an IO can be, so I don't think the driver's
-> length needs to match the phys_vec type.
+Changes from v1:
 
-I'm big fan of keeping same types in all places, but can drop nvme changes,
-if you think that it is right thing to do.
+- Keep existing behavior do not freeze newly added "q" when
+  transitioning tagset from unshared to shared.
+- Delete blk_mq_update_tag_set_shared() and explicitly freeze "firstq"
+  and "q" and set their shared status.
+- Add comment explaining why we are downgrading the semaphore before
+  freezing "firstq".
 
-Thanks
+v1: https://lore.kernel.org/all/20251113202320.2530531-1-mkhalfella@purestorage.com/
+
+Mohamed Khalfella (1):
+  nvme: Convert tag_list mutex to rwsemaphore to avoid deadlock
+
+ block/blk-mq-sysfs.c   | 10 ++---
+ block/blk-mq.c         | 95 +++++++++++++++++++++++-------------------
+ include/linux/blk-mq.h |  4 +-
+ 3 files changed, 58 insertions(+), 51 deletions(-)
+
+-- 
+2.51.0
+
