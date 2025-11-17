@@ -1,144 +1,191 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2850431BC8D;
-	Mon, 17 Nov 2025 09:02:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AF08326D6D
+	for <linux-block@vger.kernel.org>; Mon, 17 Nov 2025 09:23:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763370134; cv=none; b=YZ7uQml5WESyJmamta9Poq/aC/oOu5Uu3AAxQEyjnIB16C61AQ8NFrZMpPPdsnPJnjkCBwZ+ImInWpHWiSGe+99bFvpTUQrFRzEmMQk3RN7xv++9RJo7tCgkBmXSmnWiOIyPyyTQJ92dmtI6wTrZlMBurIDvqVZ8EC3B8bINQf8=
+	t=1763371418; cv=none; b=Lt1RtI8vPs0Np4fPQhRE3JVc0W/Ab0jf+9evYhFxI5YilY59gyKIfUTJmUPtixdsmvhbqIQTLpKwa8AQ1BHH9ouNDdOh+Ua6D2HgHAw+zHkr1ehTuqZmYBYQ99VBzxLnMSZEW1iOB8aTzfcji1ylBGuRgmbLU1Lq0EkvafzNPHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763370134; c=relaxed/simple;
-	bh=dg7CXevlIsnuqPReLm3SerOjBmC0kT4dd1RNc42zAMs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SlPTVv/yXS2QEWL8ZfWGzC3OfZLbgtwOLg5Shhl4jMW4c8nLNA4lYKlifzkTT0M82q1nKmVba0fUFt6MgmvXvRsAqxZhKfsyhy6Ptt570Q1fFd3BA2bEYcWVoOwLwGfmX+NHjuFQ+Fi9WSyWl/tP3l+N9s05Ha5m7s/bVXoRcsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=sPGXfE9D; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1763371418; c=relaxed/simple;
+	bh=5Le79+xZo0pnPqRtJoLbHkAQdzsDca6tpNt/0CwyC9M=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type:
+	 References; b=IMiC//+gbpTJlj3K6+PQJ+fmkq3hnoGzQzNyf5n2O3dDTqqT5ewX3r8WOcALO60o0/ay7NQjoEP19EAR0bn1mksOnzg2s1UD6uB6uF0TkKThUW39etY7CSBzPsALH6xsYZUOByg1c6p+BOA4a3JBN02uH8v4ESAILkIqloxB8zg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=PvRo0BOK; arc=none smtp.client-ip=203.254.224.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="sPGXfE9D"
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AGMrSMT031300;
-	Mon, 17 Nov 2025 09:01:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=PwflT1
-	I/Uph07lr+p8RbFYFfClGoEtJaI0hycQ6We+o=; b=sPGXfE9DJ77vo2dOlbZonD
-	2yiFBM54o+40QddlXUxUmN8yK//INEEZ/k+mGxMOwm7Oa/jwU9YnM6ldeqhRIBMr
-	1HjeV5Q83xrEomnwoAR1Etr0gJOPSRdBCH7HbTxNs8AZdNf/gUBmrBZak6J/PpQj
-	3W4JCJRknOdHgF845v28dNJB4snl3DqMFRtzTqusLVSTWpV+qY1SHxHFQuZRpVIr
-	7pTfoaUgtQWk/j0htba/aN+Qz6bf5s0oTYjDcWDovIuJbLaVn9YDRn7KZXrkakUj
-	zTHs1f+1Pm50JmnNHlhy1w1Amoqm64LDKTNoygzJ+diCpjaQu6rg9tDrIzaOCgqw
-	==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aejjvwaem-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 17 Nov 2025 09:01:54 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5AH8nirG017317;
-	Mon, 17 Nov 2025 09:01:53 GMT
-Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4af6j1cma5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 17 Nov 2025 09:01:53 +0000
-Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
-	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5AH91qu330540486
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 17 Nov 2025 09:01:52 GMT
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 353435805A;
-	Mon, 17 Nov 2025 09:01:52 +0000 (GMT)
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CBE655803F;
-	Mon, 17 Nov 2025 09:01:47 +0000 (GMT)
-Received: from [9.61.140.236] (unknown [9.61.140.236])
-	by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 17 Nov 2025 09:01:47 +0000 (GMT)
-Message-ID: <542de632-aace-4ff4-940e-55b57142b496@linux.ibm.com>
-Date: Mon, 17 Nov 2025 14:31:46 +0530
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="PvRo0BOK"
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20251117092333epoutp02e76e40bd948821ed343a77d4bc291e86~4wPUdkQLK0976409764epoutp028
+	for <linux-block@vger.kernel.org>; Mon, 17 Nov 2025 09:23:33 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20251117092333epoutp02e76e40bd948821ed343a77d4bc291e86~4wPUdkQLK0976409764epoutp028
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1763371413;
+	bh=0izvina2OzYAXBqg81C+fhf6rBfcPmphJHfa/0+bf+o=;
+	h=From:To:Cc:Subject:Date:References:From;
+	b=PvRo0BOKpu8hQOll56tqkoCsuKa6X0jfD8A+tUJqG0pLWgW5yxxauT3xhAHxJr/Zw
+	 vTJeDaXavhHDegg+LEhUtNHq/HhrIELuwk39pRa7LBYTG+Do/9J5yoyAtTCTwHxgQK
+	 N219RaE9m65FzCJQraQwJVpaBDiMj2iPb3JH44P8=
+Received: from epsnrtp02.localdomain (unknown [182.195.42.154]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPS id
+	20251117092332epcas5p2da3b920c56548b8c08c218a2181e1cd4~4wPUEt-bR0872708727epcas5p2o;
+	Mon, 17 Nov 2025 09:23:32 +0000 (GMT)
+Received: from epcas5p1.samsung.com (unknown [182.195.38.91]) by
+	epsnrtp02.localdomain (Postfix) with ESMTP id 4d92Ng4vRkz2SSKX; Mon, 17 Nov
+	2025 09:23:31 +0000 (GMT)
+Received: from epsmtip2.samsung.com (unknown [182.195.34.31]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+	20251117085321epcas5p3de0647f01a818db024bea32870f223f4~4v089sQ8o2847328473epcas5p3a;
+	Mon, 17 Nov 2025 08:53:21 +0000 (GMT)
+Received: from node122.. (unknown [109.105.118.122]) by epsmtip2.samsung.com
+	(KnoxPortal) with ESMTPA id
+	20251117085320epsmtip2650ae9842d13f4a70f4eb8a284f4787c~4v08SduAF1001810018epsmtip2c;
+	Mon, 17 Nov 2025 08:53:20 +0000 (GMT)
+From: Xue He <xue01.he@samsung.com>
+To: axboe@kernel.dk, ming.lei@redhat.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	yukuai@fnnas.com, hexue <xue01.he@samsung.com>
+Subject: [PATCH v6] block: plug attempts to batch allocate tags multiple
+ times
+Date: Mon, 17 Nov 2025 08:48:45 +0000
+Message-Id: <20251117084845.254680-1-xue01.he@samsung.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 2/2] block: Remove queue freezing from several sysfs
- store callbacks
-To: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Ming Lei <ming.lei@redhat.com>, Martin Wilck <mwilck@suse.com>,
-        Benjamin Marzinski <bmarzins@redhat.com>, stable@vger.kernel.org,
-        Hannes Reinecke <hare@suse.de>, Damien Le Moal <dlemoal@kernel.org>,
-        Chaitanya Kulkarni <kch@nvidia.com>
-References: <20251114210409.3123309-1-bvanassche@acm.org>
- <20251114210409.3123309-3-bvanassche@acm.org>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20251114210409.3123309-3-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=BanVE7t2 c=1 sm=1 tr=0 ts=691ae482 cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=IPLMIk6eJIHjdk74lYUA:9 a=QEXdDO2ut3YA:10 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTE1MDAzMiBTYWx0ZWRfX9s8WqisTafGS
- XxK4Ht0nQJRu6bAh/Vl+PT93UGRzw7aVWYGIHYmwfMmNp2e1v4RqdZcxEbCw+yD3372iDz9M2WJ
- ZZ60TlMftDL2EudPwzOp9DxRHvPoZO4Dc5+RX8d/LD6NWxnMP+dQ1Z5QY5aPni9QnSCx2C0DAsL
- Y8YRmHEFY3mlgWD+WISpdekc5M/LASTXE/7WPsQG9N8UG7q+JdwcD5Or6ak7d8HvmjTR7q5VQtq
- f4NvLYJKTS7ycnzD/I/hpUP8M1VQfJOmi/khqGSToMzNP0wOK7wzD9Seqy50o36ZqH2n+QlqlDd
- ZblQddHQyArEUuWu3s3dqhbymLnX788bzRA8jMZswy7XUeTMtQoZTHE1qawKiUb02hfJnT+xeI9
- gYSlQM7J5HKLVf4L5VwNymqjQcP5ww==
-X-Proofpoint-GUID: xxppZQWA0lbZxB0SZgZJdBBCYOANrdZM
-X-Proofpoint-ORIG-GUID: xxppZQWA0lbZxB0SZgZJdBBCYOANrdZM
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-17_02,2025-11-13_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 lowpriorityscore=0 suspectscore=0 spamscore=0 impostorscore=0
- priorityscore=1501 clxscore=1015 phishscore=0 bulkscore=0 adultscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511150032
+Content-Transfer-Encoding: 8bit
+X-CMS-MailID: 20251117085321epcas5p3de0647f01a818db024bea32870f223f4
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+cpgsPolicy: CPGSC10-505,Y
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20251117085321epcas5p3de0647f01a818db024bea32870f223f4
+References: <CGME20251117085321epcas5p3de0647f01a818db024bea32870f223f4@epcas5p3.samsung.com>
 
-Hi Bart,
+This patch aims to enable batch allocation of sufficient tags after
+batch IO submission with plug mechanism, thereby avoiding the need for
+frequent individual requests when the initial allocation is
+insufficient.
+-----------------------------------------------------------
+HW:
+16 CPUs/16 poll queues
+Disk: Samsung PM9A3 Gen4 3.84T
 
-On 11/15/25 2:34 AM, Bart Van Assche wrote:
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index 2fff8a80dbd2..cb4ba09959ee 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -495,7 +495,7 @@ struct request_queue {
->  	 */
->  	unsigned long		queue_flags;
->  
-> -	unsigned int		rq_timeout;
-> +	unsigned int __data_racy rq_timeout;
->  
->  	unsigned int		queue_depth;
+CMD:
+[global]
+ioengine=io_uring
+group_reporting=1
+time_based=1
+runtime=1m
+refill_buffers=1
+norandommap=1
+randrepeat=0
+fixedbufs=1
+registerfiles=1
+rw=randread
+iodepth=128
+iodepth_batch_submit=32
+iodepth_batch_complete_min=32
+iodepth_batch_complete_max=128
+iodepth_low=32
+bs=4k
+numjobs=1
+direct=1
+hipri=1
 
-This change look good to me however as I mentioned earlier, 
-introducing __data_racy would break the kernel build. So 
-are you going to raise a separate bug report to fix it? 
+[job1]
+filename=/dev/nvme0n1
+name=batch_test
+------------------------------------------------------------
+Perf:
+base code: __blk_mq_alloc_requests() 1.47%
+patch: __blk_mq_alloc_requests() 0.78%
+------------------------------------------------------------
 
-  AS      .tmp_vmlinux2.kallsyms.o
-  LD      vmlinux.unstripped
-  BTFIDS  vmlinux.unstripped
-WARN: multiple IDs found for 'task_struct': 116, 10183 - using 116
-WARN: multiple IDs found for 'module': 190, 10190 - using 190
-WARN: multiple IDs found for 'vm_area_struct': 324, 10227 - using 324
-WARN: multiple IDs found for 'inode': 956, 10314 - using 956
-WARN: multiple IDs found for 'path': 989, 10344 - using 989
-WARN: multiple IDs found for 'file': 765, 10375 - using 765
-WARN: multiple IDs found for 'cgroup': 1030, 10409 - using 1030
-WARN: multiple IDs found for 'seq_file': 1358, 10593 - using 1358
-WARN: multiple IDs found for 'bpf_prog': 2054, 10984 - using 2054
-WARN: multiple IDs found for 'bpf_map': 2134, 11012 - using 2134
-[...]
-[...]
-make[2]: *** [scripts/Makefile.vmlinux:72: vmlinux.unstripped] Error 255
-make[2]: *** Deleting file 'vmlinux.unstripped'
-make[1]: *** [/home/src/linux/Makefile:1242: vmlinux] Error 2
-make: *** [Makefile:248: __sub-make] Error 2
+---
+changes since v1:
+- Modify multiple batch registrations into a single loop to achieve
+  the batch quantity
 
-Thanks,
---Nilay
+changes since v2:
+- Modify the call location of remainder handling
+- Refactoring sbitmap cleanup time
+
+changes since v3:
+- Add handle operation in loop
+- Add helper sbitmap_find_bits_in_word
+
+changes since v4:
+- Split blk-mq.c changes from sbitmap
+
+changes since v5:
+- Add workload with perf
+- Modify over-counting bug
+
+Signed-off-by: hexue <xue01.he@samsung.com>
+---
+ block/blk-mq.c | 39 ++++++++++++++++++++++-----------------
+ 1 file changed, 22 insertions(+), 17 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index d626d32f6e57..9e6fca1b5fb7 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -467,26 +467,31 @@ __blk_mq_alloc_requests_batch(struct blk_mq_alloc_data *data)
+ 	unsigned long tag_mask;
+ 	int i, nr = 0;
+ 
+-	tag_mask = blk_mq_get_tags(data, data->nr_tags, &tag_offset);
+-	if (unlikely(!tag_mask))
+-		return NULL;
++	do {
++		tag_mask = blk_mq_get_tags(data, data->nr_tags, &tag_offset);
++		if (unlikely(!tag_mask)) {
++			if (nr == 0)
++				return NULL;
++			break;
++		}
++		tags = blk_mq_tags_from_data(data);
++		for (i = 0; tag_mask; i++) {
++			if (!(tag_mask & (1UL << i)))
++				continue;
++			tag = tag_offset + i;
++			prefetch(tags->static_rqs[tag]);
++			tag_mask &= ~(1UL << i);
++			rq = blk_mq_rq_ctx_init(data, tags, tag);
++			rq_list_add_head(data->cached_rqs, rq);
++			data->nr_tags--;
++			nr++;
++		}
++	} while (data->nr_tags);
+ 
+-	tags = blk_mq_tags_from_data(data);
+-	for (i = 0; tag_mask; i++) {
+-		if (!(tag_mask & (1UL << i)))
+-			continue;
+-		tag = tag_offset + i;
+-		prefetch(tags->static_rqs[tag]);
+-		tag_mask &= ~(1UL << i);
+-		rq = blk_mq_rq_ctx_init(data, tags, tag);
+-		rq_list_add_head(data->cached_rqs, rq);
+-		nr++;
+-	}
+-	if (!(data->rq_flags & RQF_SCHED_TAGS))
+-		blk_mq_add_active_requests(data->hctx, nr);
+ 	/* caller already holds a reference, add for remainder */
+ 	percpu_ref_get_many(&data->q->q_usage_counter, nr - 1);
+-	data->nr_tags -= nr;
++	if (!(data->rq_flags & RQF_SCHED_TAGS))
++		blk_mq_add_active_requests(data->hctx, nr);
+ 
+ 	return rq_list_pop(data->cached_rqs);
+ }
+-- 
+2.34.1
+
