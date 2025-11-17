@@ -1,101 +1,121 @@
-Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
+Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5EDE32E692
-	for <linux-block@vger.kernel.org>; Mon, 17 Nov 2025 15:23:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3411B337114
+	for <linux-block@vger.kernel.org>; Mon, 17 Nov 2025 15:23:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763392992; cv=none; b=llPrrMdHKE7HbG8RhdfRfI4+P4CTexPY8T6h2Z7B2ruqhF5Dc4GqT9vHYqiO254NdisSuXxx0pWl86LkV3qagoj8AN5aJYRHke2cRvpd92k9FVZx4FOHytd+mIf0ostrXua4VE99ybQ8DLbAvfPCfJruXujWSf3GzSsjRl9Kc/8=
+	t=1763393017; cv=none; b=XMIsvM1VPrr6x7dll/EkTaBRG4J5qw/WJDuW2cd/qdLdCyE2OyhWw8tquI4gtkNGW3TP3686pNWJEB+M3ZAGTLz004FrnCrypVtUoCUA4FZiuN9P7ryC8DuuhDiyFAukgCClO48/Zmz2kdjCrny2mZAe7P11+Z0B2ewyImI+4GU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763392992; c=relaxed/simple;
-	bh=S1G0GAs6f4Yl0D62HHVdSpqM59XoL6Ln97F2TLqvmAs=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=t1OZkyUvenQcLGm74rT80hDtt2h8YpoLqXbYx3Q+VkYk6bEAn1bRXB1odjTFebBAiQ+LanLMLQ57g6XHvgmeG/8AagGG2xUddk5JIF8hgyP6NiJpZhv3UNmBS46QdJtzQHMgd5+wA5ObchTBwf9Gwc1BPJT3zQt3yKmsiUaOuo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=CQ6no4D8; arc=none smtp.client-ip=209.85.166.182
+	s=arc-20240116; t=1763393017; c=relaxed/simple;
+	bh=xS5tzg74wO36FvpZDrvP5hjlzCRPwA2xARqpXwX/w3k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=a2KAf6SEDZoEDPffmvy3DgVirPKLa30n6gWu9G1F9x9LkAi9cX/vd1NACp5GBsBHqCjeTW2LtPf3M/9R+7MSDSZzmdATqt0iw2tNJ3+sykWfMgQmslNwcJPBDthzv8gvs5suLmek9K87C3viyZDSQk1Nfitmm9CIA8PoAmcLhME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=rgHjwedg; arc=none smtp.client-ip=209.85.166.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="CQ6no4D8"
-Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-4330d2ea04eso17383385ab.3
-        for <linux-block@vger.kernel.org>; Mon, 17 Nov 2025 07:23:08 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="rgHjwedg"
+Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-949022f1c85so72084039f.0
+        for <linux-block@vger.kernel.org>; Mon, 17 Nov 2025 07:23:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1763392988; x=1763997788; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pWqaiG76JaK9k3Kkgqv5RCGqdtPShqXcVrgiohomNNM=;
-        b=CQ6no4D8HxJ4/TQQttY6NN8OB+I4gluWN7bq7+nD7WXhmBesfzwsy6da+4HPpFydk0
-         uKsV+E6LrZFBJ2ewysduFlR+pMag8dDuSvhphZGtL0iWmf0eQyIr6jO9KZ5Q5uDqbB89
-         o8cGuK2qGFwK9xf8rQTxr5L1Qi1tmyrCqgqi8n3DVUyDTwP7i98PqUFjvDYTyxNqpAIQ
-         4j8vpYPbtQqXiFUY6fAAH1roG2QBsYlsJsDL/gyJk4wXVsjRl+7V1ngNzj+4vn2dh4ic
-         MdMkSbWFtJZn7vR9MRl/Ti1q6BtdNsnaofF5dAcvpm62yGJoAIoZKRoCSXfkK+Rnu5Bs
-         b8CQ==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1763393013; x=1763997813; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HKaqk3O11ga6Z5kFnUSa4tDsL6Xj/6nEJ1KOCN1E6t8=;
+        b=rgHjwedgjUUtn1PBUccl8fuljtM3LYcNqFyb2SpLJpxiYpgT4wCzlEyWgQcUw6dVL+
+         3pv4LEg25bR7jhs/6qEou0rWBrCd2RCgWHOKAEfYYjzpWRyRFeE1vXGs57A+WuYMzoVk
+         CdRq+rb6CabTGR1scOCeha3pNlLWW3QJ7tMpWhRUWaFGkdDqhTbYaeGL6IWmY2/ptsu0
+         50yA2bJKMfI51oCfZT/faj10+SZqRVQAyzfvqQLXqPVyzVgGKxXl7uuxOy65LykBSFCd
+         5+5qFqMHIjaUFYGcSS7VJFmE557fpEuy6GjycGtWWdJsYh1abDtyazFWoWwO/BuFr3+O
+         SWhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763392988; x=1763997788;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=pWqaiG76JaK9k3Kkgqv5RCGqdtPShqXcVrgiohomNNM=;
-        b=BLnz96IxVeCP1gxVKJr3ijMUzL+tdYl8bGHZ3rrHbdp8tIY6/E04xZcwVNoMYWDCH6
-         L88vfn1j1NK1tioWigQw+hu5rcNzFxr0EYe6LAaIBWsq8v0g+ofswiXtvQpNoxEoVczY
-         pN3abdBNiPOU07T8Mzj+qpG7PyqtwFqbyd6dje9nrT37r+WwqEQzmdnd7pcxa/hXX+33
-         F+EIt1ZM/ShWdSuRSiAhpP3EfE0SR0Ajt8BtzUPXfLy21y10SYzMxG7xJdHkp4m1cEJS
-         3Gtt73XTUQBRMTflMrifFqeZkDJMXtK3uEOVshG45cydzzBzCDIDn1Bc/I5v5P2b3PLs
-         udjA==
-X-Gm-Message-State: AOJu0YzOFKQUBMc99uxYeARyeEi/ZGgVaR9i1LH90sCl2KSMQWyyjNk/
-	vs5C8dDKi+7r4X+FOysUq/rgbIIhAJxBINvue4cNBNNHa+59dHhdxBSlA2X8JfSpklna+MTeNhc
-	G+HmS
-X-Gm-Gg: ASbGncta9+KPP54NhXUrIvvY/22rhyzEu9xxCTs6rQ8x8g/bhac2ATvoQBeDs79OU+2
-	Y9sDUthiqufMJ4Xarx8QTDcZf+dWJ/1UGkY55MIrqk97ejSDJ4iQ3lKHXVi9J3poH6RBlN/wtLA
-	ZvrLneTkUh46uBCTOFKazekWJapo8nkPpW3R27o7fAKxNacGiCGXgGHyT+anqEbMBnsel4/RtI4
-	EIbJoDLjnnSAWfeqNpTmNbA2woXgvnTbn+R5zw5jbeD7Tj4wp49t2RI08tSYlQq72AlZuxRndHU
-	Jc3/iHTj1Ci7Lh1xZpyBK6jIrtIJoQcZofuKUi14WN0eNrM/ASidRkS7OEI+bu2JojdL99jN0R5
-	EVAqjx2yxIpW6gQ/1peC2vTvHtSEt4FXRLBnonPaMTZ0zxkBOAg9GGjmxYJRP87TNXlAIOCJC0S
-	QHUw==
-X-Google-Smtp-Source: AGHT+IGhsdorf02dVpLr+4v/8H/wRl7iTBgSah6CtzidPU2Hte4GSgJBU1s1194LBvI3toWkd3aArA==
-X-Received: by 2002:a92:730a:0:b0:434:96ea:ff5f with SMTP id e9e14a558f8ab-43496eb0125mr98576525ab.40.1763392987762;
-        Mon, 17 Nov 2025 07:23:07 -0800 (PST)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-434839a49bfsm70008055ab.24.2025.11.17.07.23.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Nov 2025 07:23:07 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Rene Rebe <rene@exactco.de>
-Cc: Denis Efremov <efremov@linux.com>
-In-Reply-To: <20251114.144127.170518024415947073.rene@exactco.de>
-References: <20251114.144127.170518024415947073.rene@exactco.de>
-Subject: Re: [PATCH] fix floppy for PAGE_SIZE != 4KB
-Message-Id: <176339298658.103650.14983967433115454330.b4-ty@kernel.dk>
-Date: Mon, 17 Nov 2025 08:23:06 -0700
+        d=1e100.net; s=20230601; t=1763393013; x=1763997813;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HKaqk3O11ga6Z5kFnUSa4tDsL6Xj/6nEJ1KOCN1E6t8=;
+        b=B8Hoz4XgKPNkKf40Sl5OllxhIWpiKc6lVjpITUiJGZr3NNYw+JQnKAjPMOAf7HjkBW
+         0BDA8zM2oASY/3s63CWQgIXxsbh0KC+xT0DZcz97EXmlUKURAL8ZWVOl/Od83vDLG0Ve
+         RJUG5IKgQ3Ebt4VhuxC6B/wM4+o5NvP0o/1BpSIBSDBd1FbrIwWVXRWawvxtFki5XSQJ
+         /2/0YCZiZ3+nXOaQmRthUvJ3zduXCxz+zrqliKro5ST1bC/cNrieixSivkc3j42jFcp+
+         tJEgRymQ45Of3SxgMKerjXggSqLE6FoqP9TYtjqSBGClorOkibZUbgsrG2vozIXnqcb8
+         Whww==
+X-Gm-Message-State: AOJu0YwCEVKv5/Hh417Dt1nTt+yWTa/swJ78ZwibNqOEGj1ulBYZcJiV
+	dLPGHj6yo4NkmlxUCHzlT5TmrWuAd/TxAl2MSTo1LrT7vxbhov2HB3EvhOSkay4Hu6+aupUJvVo
+	5u1EN
+X-Gm-Gg: ASbGncuCGnlCVMvP4E+4Q11CMxapeRDc90F3sERCrDgSUI6tI4DXVQ5puk9mEWR30KC
+	HSbRESPWx766JiYOHe2TEHrcLK7/4sCNqzCdjIt5WqBdfHq4bEk6pzA2EoRlT/rT12g/p6tpsLo
+	HdpxzMrCrh0lwmunXfFLo/I+gr4lks03X4yt14OlMiQqH0Toub6KDsISPSoKVIzrgP+H4GdV56j
+	E13cWcZbMNOwSOIROIrsXtWxZ1KOaZcQ7JmZ9ebnolKVNdx0QVYDUsLGxHlT2+iDblRlAjurGYN
+	MbrJoLENX1vPx+1f6ns92wxGBzGUtFdzXlyzs9Dfo1IkPVhcnoDTR3NLV9b4+VmU0kAs6yQYLLB
+	o9x+LGbLWxqzYqtXcd5RpsrWOhatsUEyyVGDKusgRtpd2DwHUCFpbIO+C/8Cpq1VMBj5F0TJ1Y2
+	TTkEwfnZg=
+X-Google-Smtp-Source: AGHT+IEqruXPREkKcAv5IjH/MXPgJ364JnUEFE8cIMtlFz0GlZrMB3FUcTcVoVNtbJN0tr/xowiE8A==
+X-Received: by 2002:a05:6638:35a0:b0:5ab:833d:bd56 with SMTP id 8926c6da1cb9f-5b7c9de912emr10186881173.19.1763393013160;
+        Mon, 17 Nov 2025 07:23:33 -0800 (PST)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5b7bd351101sm4877163173.60.2025.11.17.07.23.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 17 Nov 2025 07:23:32 -0800 (PST)
+Message-ID: <65dcdc8e-73e9-482c-8450-23d66a4e2557@kernel.dk>
+Date: Mon, 17 Nov 2025 08:23:31 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] fix floppy for PAGE_SIZE != 4KB
+To: =?UTF-8?Q?Ren=C3=A9_Rebe?= <rene@exactco.de>
+Cc: linux-block@vger.kernel.org, efremov@linux.com
+References: <b1e17016-3d4d-4fac-b5b0-97db357d0749@kernel.dk>
+ <20251114.172543.20704181754788128.rene@exactco.de>
+ <fec67c88-53f5-4482-aeef-86e1213d187e@kernel.dk>
+ <20251114.192119.1776060250519701367.rene@exactco.de>
+ <708B7962-86CD-489B-AC33-4B929F2902B6@exactco.de>
+ <c8cbccc1-964c-43ce-a992-624d2efcfd4a@kernel.dk>
+ <AB0440F0-7D27-44E4-A92A-D7761E062A76@exactco.de>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <AB0440F0-7D27-44E4-A92A-D7761E062A76@exactco.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-
-On Fri, 14 Nov 2025 14:41:27 +0100, Rene Rebe wrote:
-> For years I wondered why the floppy driver does not just work on
-> sparc64, e.g:
+On 11/17/25 6:57 AM, René Rebe wrote:
+> Hi,
 > 
-> root@SUNW_375_0066:# disktype /dev/fd0
-> --- /dev/fd0
-> disktype: Can't open /dev/fd0: No such device or address
+>> On 17. Nov 2025, at 14:23, Jens Axboe <axboe@kernel.dk> wrote:
+>>
+>> On 11/17/25 2:56 AM, Ren? Rebe wrote:
+> ...
+>>> Any chance we can get my initial one liner constant PAGE_SIZE fix
+>>> for this over a decade old bug in? I currently don?t have a budget
+>>> to refactor the floppy driver probing for efficiency on bigger PAGE_SIZE
+>>> configs I?m not even having a floppy controller on.
+>>
+>> Yep we can do that. It'd be great if we could augment the change with
+>> what commit broke it, so it can get backported to stable kernels as
+>> well. Was it:
+>>
+>> commit fe4ec12e1865a2114056b799e4869bf4c30e47df
+>> Author: Christoph Hellwig <hch@lst.de>
+>> Date:   Fri Jun 26 10:01:52 2020 +0200
+>>
+>>    floppy: use block_size
 > 
-> [...]
+> maybe, but I’m not 100% sure. Probably not the best answer
+> for kernel driver development. It might have been broken in
+> other ways for over a decade already. I would need to debug
+> that to be sure, but then I could also see if I can make it easily
+> work without changing the max size constant, ...
 
-Applied, thanks!
+I'll just mark it for stable, then at least it'll go to most of
+the ones we care about.
 
-[1/1] fix floppy for PAGE_SIZE != 4KB
-      (no commit info)
-
-Best regards,
 -- 
 Jens Axboe
-
-
 
