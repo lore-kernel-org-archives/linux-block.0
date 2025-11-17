@@ -1,36 +1,37 @@
 Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B17502FD7CD;
-	Mon, 17 Nov 2025 16:50:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 936A62FBDEE;
+	Mon, 17 Nov 2025 16:50:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763398246; cv=none; b=PTD/yEJhO6CmIhhBHIWqPduWIcMOktt3eKZyOumIsX2JeT512qvfCAhr3tkj+T30DoC/cOyEHs6ZmFizCPgoai0u/PpiiVV/NNbCxNYtupxhY0ecbhcFdQP6XQk4BwPrXJunuT1wXRdfFnsLkafmQeKGfvB4H8JadbekSKh4bWs=
+	t=1763398251; cv=none; b=fJeUHEOlwO5yXRrKDLnAsUy6FWWRTN1WAHEaeA3zbFzDcaftSXBPxGwqs/EQ77I11cN8SnR2uNGms92NZOjomuxtPrp3YfoYEA0s6kld6XPqqIsteRoEDCyZtimxewH/1PUSIg4hs/OCKmqjRLSOlj9xDZMRkUy6/t1MWZbRg8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763398246; c=relaxed/simple;
-	bh=WGqKFA3mz9XHJ6cj5G5VuhtGqL7z2AHwH/JWwrDAKcU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=h4bzKaTle3EF/aEIHzTlaqClA/fKrNlMjpASwAq58HeKNhaVeN1gEisCtUr8qqe7qwHVHsmoIxUC8w5UEAEy0YwL9LTkl85vsmrJ0sWSTkEXfHbZWr2MzeK4FF1M3QvtxlS+O17Req3Mo47f7cKjPbH7j3Mk/DzA562QcJu8O88=
+	s=arc-20240116; t=1763398251; c=relaxed/simple;
+	bh=G9vSR7KnQqIxN+4o+okHL5tWkQyiUXlrPWVzKylp4RY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=faq947fRijeNANQ1bp8OZ4tVWOjK1ufkNcfgqMlRvla/0CbGcIrseY4Q2NTpjDIVocO577KMXJ+X+WYMwX3EvlU/+9yGkz37TVVbEMpgP6i2+YGo2gAxjDb4jQwMC3dWCFITOOG2uCkovzKwXH6s77FLoIMp0193d5JfZLtk3Fo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
 Received: from localhost (mailhub4.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4d9D953HZVz9sSK;
-	Mon, 17 Nov 2025 17:44:09 +0100 (CET)
+	by localhost (Postfix) with ESMTP id 4d9D986Dcjz9sTh;
+	Mon, 17 Nov 2025 17:44:12 +0100 (CET)
 X-Virus-Scanned: amavisd-new at c-s.fr
 Received: from pegase2.c-s.fr ([172.26.127.65])
 	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id iWUAGZWJZEEK; Mon, 17 Nov 2025 17:44:09 +0100 (CET)
+	with ESMTP id ODDw4OUpL3tH; Mon, 17 Nov 2025 17:44:12 +0100 (CET)
 Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4d9D952NXHz9sS8;
-	Mon, 17 Nov 2025 17:44:09 +0100 (CET)
+	by pegase2.c-s.fr (Postfix) with ESMTP id 4d9D98579Gz9sTZ;
+	Mon, 17 Nov 2025 17:44:12 +0100 (CET)
 Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 3CC7E8B769;
-	Mon, 17 Nov 2025 17:44:09 +0100 (CET)
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 9D7F18B763;
+	Mon, 17 Nov 2025 17:44:12 +0100 (CET)
 X-Virus-Scanned: amavisd-new at c-s.fr
 Received: from messagerie.si.c-s.fr ([127.0.0.1])
 	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id TzQbKMy7QXZa; Mon, 17 Nov 2025 17:44:09 +0100 (CET)
+	with ESMTP id hO1787tWgDqo; Mon, 17 Nov 2025 17:44:12 +0100 (CET)
 Received: from PO20335.idsi0.si.c-s.fr (unknown [192.168.235.99])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id C93EF8B763;
-	Mon, 17 Nov 2025 17:44:07 +0100 (CET)
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 7FB1E8B768;
+	Mon, 17 Nov 2025 17:44:11 +0100 (CET)
 From: Christophe Leroy <christophe.leroy@csgroup.eu>
 To: Thomas Gleixner <tglx@linutronix.de>,
 	Peter Zijlstra <peterz@infradead.org>
@@ -60,94 +61,72 @@ Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH v5 0/4] uaccess: Prepare for masked user access on powerpc
-Date: Mon, 17 Nov 2025 17:43:40 +0100
-Message-ID: <cover.1763396724.git.christophe.leroy@csgroup.eu>
+Subject: [PATCH v5 3/4] scm: Convert put_cmsg() to scoped user access
+Date: Mon, 17 Nov 2025 17:43:43 +0100
+Message-ID: <793219313f641eda09a892d06768d2837246bf9f.1763396724.git.christophe.leroy@csgroup.eu>
 X-Mailer: git-send-email 2.49.0
+In-Reply-To: <cover.1763396724.git.christophe.leroy@csgroup.eu>
+References: <cover.1763396724.git.christophe.leroy@csgroup.eu>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3522; i=christophe.leroy@csgroup.eu; h=from:subject:message-id; bh=WGqKFA3mz9XHJ6cj5G5VuhtGqL7z2AHwH/JWwrDAKcU=; b=owGbwMvMwCV2d0KB2p7V54MZT6slMWRKB+x//GA1v1ClgdYODW2ZTXLbzU/ZRjV/eKQu6mewe ZpfUUFuRykLgxgXg6yYIsvx/9y7ZnR9Sc2fuksfZg4rE8gQBi5OAZjIrP2MDE+3/HiwSHXz054e sW9T6m8y2UyYrVbctHBZQWh6hr3ILzlGhs8i3SbnnRO3ckQYW04rkjo930th+7PFh0R8ehe170m JYAEA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1623; i=christophe.leroy@csgroup.eu; h=from:subject:message-id; bh=G9vSR7KnQqIxN+4o+okHL5tWkQyiUXlrPWVzKylp4RY=; b=owGbwMvMwCV2d0KB2p7V54MZT6slMWRKB5y4msa79uMdnvb97Ws8Dr5sdLO50Ghlq90Ym1rzX Ofc1FTWjlIWBjEuBlkxRZbj/7l3zej6kpo/dZc+zBxWJpAhDFycAjARSyVGhpazbZ9+HNTk3i7v amJmo3boZihrUcvNMkv+VxX/Nl/4F8vI8EOU7U+KU0bAKSa/9293WU7XvRW190pY0r+tVmXBk7d a8wMA
 X-Developer-Key: i=christophe.leroy@csgroup.eu; a=openpgp; fpr=10FFE6F8B390DE17ACC2632368A92FEB01B8DD78
 Content-Transfer-Encoding: 8bit
 
-This is v5 of the series "powerpc: Implement masked user access". This
-version only includes the preparatory patches to enable merging of
-powerpc architecture patches that depend on them on next cycle.
+Replace the open coded implementation with the scoped user access
+guards.
 
-It applies on top of commit 6ec821f050e2 (tag: core-scoped-uaccess)
-from tip tree.
+No functional change intended.
 
-Thomas, Peter, could you please take those preparatory patches
-in tip tree for v6.19, then Maddy will take powerpc patches
-into powerpc-next for v6.20.
+Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+---
+v5: New
+---
+ net/core/scm.c | 20 +++++++-------------
+ 1 file changed, 7 insertions(+), 13 deletions(-)
 
-Masked user access avoids the address/size verification by access_ok().
-Allthough its main purpose is to skip the speculation in the
-verification of user address and size hence avoid the need of spec
-mitigation, it also has the advantage to reduce the amount of
-instructions needed so it also benefits to platforms that don't
-need speculation mitigation, especially when the size of the copy is
-not know at build time.
-
-Patches 1 and 2 are preparing to clean-up some redundant barrier_nospec()
-introduced by commit 74e19ef0ff80 ("uaccess: Add speculation barrier
-to copy_from_user()"). To do that, a speculation barrier is added to
-copy_from_user_iter() so that the barrier in powerpc raw_copy_from_user()
-which is redundant with the one in copy_from_user() can be removed. To
-avoid impacting x86, copy_from_user_iter() is first converted to using
-masked user access.
-
-Patch 3 convert put_cmsg() to scoped user access.
-
-Patch 4 replaces remaining wrong calls to masked_user_access_begin()
-with calls to masked_user_read_access_begin() and
-masked_user_write_access_begin() to match with user_read_access_end()
-and user_write_access_end().
-
-Entire series is availiable at https://git.kernel.org/pub/scm/linux/kernel/git/chleroy/linux branch masked-uaccess
-
-Changes in v5:
-- Taken comments from tglx
-- Only include core preparatory patches, powerpc patches are kept for following kernel development cycle
-- Reworded patch 1 to make it more explicit it needs to come before patch 2
-- Added patch 3 to convert put_cmsg() to scoped user access instead of just fixing the direction of the uacess
-- Renamed patch 4 as it now only handles fonctions from lib/strn*.c
-
-Changes in v4:
-- Rebased on top of commit 6ec821f050e2 (tag: core-scoped-uaccess) from tip tree
-- Patch 3: Simplified as masked_user_read_access_begin() and masked_user_write_access_begin() are already there.
-- Patch 10: Simplified mask_user_address_simple() as suggested by Gabriel.
-
-Changes in v3:
-- Rebased on top of v6.18-rc1
-- Patch 3: Impact on recently modified net/core/scm.c
-- Patch 10: Rewrite mask_user_address_simple() for a smaller result on powerpc64, suggested by Gabriel
-
-Changes in v2:
-- Converted copy_from_user_iter() to using masked user access.
-- Cleaned up powerpc uaccess function to minimise code duplication
-when adding masked user access
-- Automated TASK_SIZE calculation to minimise use of BUILD_BUG_ON()
-- Tried to make some commit messages more clean based on feedback from
-version 1 of the series.
-
-Christophe Leroy (4):
-  iov_iter: Convert copy_from_user_iter() to masked user access
-  iov_iter: Add missing speculation barrier to copy_from_user_iter()
-  scm: Convert put_cmsg() to scoped user access
-  lib/strn*,uaccess: Use masked_user_{read/write}_access_begin when
-    required
-
- lib/iov_iter.c          | 22 +++++++++++++++++-----
- lib/strncpy_from_user.c |  2 +-
- lib/strnlen_user.c      |  2 +-
- net/core/scm.c          | 20 +++++++-------------
- 4 files changed, 26 insertions(+), 20 deletions(-)
-
+diff --git a/net/core/scm.c b/net/core/scm.c
+index 66eaee783e8b..cd87f66671aa 100644
+--- a/net/core/scm.c
++++ b/net/core/scm.c
+@@ -273,17 +273,13 @@ int put_cmsg(struct msghdr * msg, int level, int type, int len, void *data)
+ 
+ 		check_object_size(data, cmlen - sizeof(*cm), true);
+ 
+-		if (can_do_masked_user_access())
+-			cm = masked_user_access_begin(cm);
+-		else if (!user_write_access_begin(cm, cmlen))
+-			goto efault;
+-
+-		unsafe_put_user(cmlen, &cm->cmsg_len, efault_end);
+-		unsafe_put_user(level, &cm->cmsg_level, efault_end);
+-		unsafe_put_user(type, &cm->cmsg_type, efault_end);
+-		unsafe_copy_to_user(CMSG_USER_DATA(cm), data,
+-				    cmlen - sizeof(*cm), efault_end);
+-		user_write_access_end();
++		scoped_user_write_access_size(cm, cmlen, efault) {
++			unsafe_put_user(cmlen, &cm->cmsg_len, efault);
++			unsafe_put_user(level, &cm->cmsg_level, efault);
++			unsafe_put_user(type, &cm->cmsg_type, efault);
++			unsafe_copy_to_user(CMSG_USER_DATA(cm), data,
++					    cmlen - sizeof(*cm), efault);
++		}
+ 	} else {
+ 		struct cmsghdr *cm = msg->msg_control;
+ 
+@@ -301,8 +297,6 @@ int put_cmsg(struct msghdr * msg, int level, int type, int len, void *data)
+ 	msg->msg_controllen -= cmlen;
+ 	return 0;
+ 
+-efault_end:
+-	user_write_access_end();
+ efault:
+ 	return -EFAULT;
+ }
 -- 
 2.49.0
 
