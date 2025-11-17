@@ -1,111 +1,130 @@
-Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78D8C2DF714
-	for <linux-block@vger.kernel.org>; Mon, 17 Nov 2025 16:42:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
+Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98C7C2F5337;
+	Mon, 17 Nov 2025 16:50:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763397757; cv=none; b=JMmAXmFhcOL1fYrBuCWIYYxxbVMOZz6s/LQPnDZ0YiffQ1PKsyABXkxkDeVUVg5Vod63l5LsVQ7xHlxro7JJV0HQ+T1qhcmrkSM1mBOQ/+twqMxXapCFzl/Rx5pY839o0/gXMxa2PU110g5kldpOJqW25K4uryAUiCaElA/PwMM=
+	t=1763398237; cv=none; b=Id1ScwIVkpxTWkCTN7w0u+DnodoosTrm9wemE8VXIhpSB0gH1s8T422uaOMXNlqoewobMLNIJUNILRsB+hjoW0rt5EyJd0Eiks9jgyaG+9ZUua2B38VQqGm5FcFnTYvy6tOA+ieJqwCVZJ2HxoaRvS2fjy3911xFHLjRh9vQjDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763397757; c=relaxed/simple;
-	bh=N557UI/PpmRz2VImJUy9zanLU3/nIBnFH+IwXpBLq24=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=u02uO1hHHbTH6eKGSuSkMc6EtDP9mw9hnK0B/SGLOIXiLSbqqLRrpMyNcCKmoJSQnEFUlQVbe/B4YPPzz8lJbq7IGRgLiXqpDKOywSrTBSgFmmuXF1RWJDZ9UA2gTGwIrZuCvPp2GR5h/vbS/LgjICthRT6cypmRpEznmc8IIv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=dOoJikVp; arc=none smtp.client-ip=209.85.166.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="dOoJikVp"
-Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-4336f492d75so23321185ab.1
-        for <linux-block@vger.kernel.org>; Mon, 17 Nov 2025 08:42:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1763397754; x=1764002554; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=x5Wp953EEHU7o1P9grFgRm3cDfisCBXs9FZ8SRXhEq0=;
-        b=dOoJikVpqD4YIaVouvsFRfxFOkmfq2bWZ/xL9V1rNKOs5PuOqSRrTp/Pflz2dOd7LE
-         heZnHCzGgX1/2VKcDp3h1eGmYTOTPfq81MfCzbnxBNIxnko/eA+hxLIOajfo7xNOedWt
-         fiaQxiEzuC3EvIVIMrR7grBm65FJ1+XXFL7F6m4cFaOllReYMEwpYZhgz+vyFGhWN0JF
-         1ZuCJPL6O5rjTBJuPhXkvP+V1wLKO1XetcsJG8zm1/TwerTAN1xdZObFwMgbTF9hnbwl
-         3p4FzeS8by41bth4mSvMF86nCPTUXgJz92Hprb/KkapXs78k03ysA6TPO76sK4o6Q2Xj
-         3d/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763397754; x=1764002554;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=x5Wp953EEHU7o1P9grFgRm3cDfisCBXs9FZ8SRXhEq0=;
-        b=IKof6HU0jlLCrbR+l1W5d9ND9muwaAasPpaBe63QdrW4DxS7Ld63Q3ywmAev6T+hd7
-         Hp3NvxSTGXj39H1Y6+nP43kXj6P/oxMsVPPzSSnnHiw7UQcFxQdLecL7UQpedZsSlk7z
-         dAr2wsy7BhMX0BURbNXNSySkO66Odcodmeu9BdL+FxzXhD1+nuX1bWAJkAiI6uIx4/2r
-         LFnu9+SAL84GaDtf8fgDY5MYP0OgS4dBCt2TPR0hw93jzPaCYGfWGUmmIBjmjxbkKxrF
-         jFXtz6+Uiqnb8ysY3LLNclISI2QpHpdyUzAP342JpvFrwZ10sTfa3+oYLbNxnCdbl+Xh
-         byWg==
-X-Gm-Message-State: AOJu0YzMUx7bWoHkt+Jsjuu0ck9ajaH2j0aYAH1ciEJ2AZ4pN3BmtbEj
-	kSaVR+NRkXg3Q2UTe0ECe6XEGqckwpZVSHvNTXfLT7KV/8sd4IAykTFz6rM0uEBWOI0=
-X-Gm-Gg: ASbGncuxqlZTIHfhOcj6qmtN07dVbtcRMGryRjwk7CU0+CCZcVMrWVIoXA8rst7ixCH
-	ZUbmtLSwOBU4P5BJQR4VbO+xYEutn6vFXmh0P8LDhpnbR4kxGWhV4NYSn0USC5FOPIOyl06ARQK
-	+nC6yXyU11zgHk9trQ0yE/FJDK0fz598b8TxlC0Y0ffAc7xY1tE5M+Xw1KJUkjkRLaAPo4ORaKY
-	XBvHM6xxVlY7O9gLp3LBhAYkdfg2K096lWZPNOxmd/0jmxMhrnaIePZIEEPg1nrQpyI3wM/VY7F
-	4HfZetBAXbquJttHfVTtiWgOTPtvdwZUmJjk6Mu2BoESlzV2bHELHVGKLmgmRqf1gSe3L9n18aI
-	ccrwjR+yqVUt1jXb3mn2v0Z449ZbvcrmFczHXdd84gqOm8H1VDt/0Xy1aPMgQD4YI5Dg=
-X-Google-Smtp-Source: AGHT+IHu9aboOqf5hOvEFQ87DG1B4ADMs0vMRE1oOnbZnpMmMZ3i5Td8ti6aRpG9/oPaddtIEODHpw==
-X-Received: by 2002:a05:6e02:1d91:b0:434:96ea:ff51 with SMTP id e9e14a558f8ab-43496eb0168mr143282845ab.34.1763397754484;
-        Mon, 17 Nov 2025 08:42:34 -0800 (PST)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5b7bd26e131sm4924100173.20.2025.11.17.08.42.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Nov 2025 08:42:33 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Damien Le Moal <dlemoal@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>
-In-Reply-To: <20251115121556.196104-1-dlemoal@kernel.org>
-References: <20251115121556.196104-1-dlemoal@kernel.org>
-Subject: Re: [PATCH 0/6] zloop fixes and improvements
-Message-Id: <176339775341.116629.7410659905760396568.b4-ty@kernel.dk>
-Date: Mon, 17 Nov 2025 09:42:33 -0700
+	s=arc-20240116; t=1763398237; c=relaxed/simple;
+	bh=rLnSkle9gDtzmk+Xzjh4JTt9WyaHRuH0dl6amNgDsgk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Tbz2OI1UwV+wr/s/2xE4aIN+PfcX382okON4ZNviSBjty2K9NnaDtObGnBXiiuSSgGJH+tASVTdEnVMnPYqW0HP1v6qEbk51WMsQlLlK3L0twoXGFyvZcy0bM89+s/cvsg3Jh5E6ZyxBrbYSSX+sVBNuSixVj5KOogOzJHhbFxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
+Received: from localhost (mailhub4.si.c-s.fr [172.26.127.67])
+	by localhost (Postfix) with ESMTP id 4d9D964M8Rz9sTQ;
+	Mon, 17 Nov 2025 17:44:10 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase2.c-s.fr ([172.26.127.65])
+	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id 3rt6ikktw9sm; Mon, 17 Nov 2025 17:44:10 +0100 (CET)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase2.c-s.fr (Postfix) with ESMTP id 4d9D9638tnz9sSL;
+	Mon, 17 Nov 2025 17:44:10 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 540BA8B763;
+	Mon, 17 Nov 2025 17:44:10 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id 7sNQuGfP_LfF; Mon, 17 Nov 2025 17:44:10 +0100 (CET)
+Received: from PO20335.idsi0.si.c-s.fr (unknown [192.168.235.99])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 347AE8B768;
+	Mon, 17 Nov 2025 17:44:09 +0100 (CET)
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+To: Thomas Gleixner <tglx@linutronix.de>,
+	Peter Zijlstra <peterz@infradead.org>
+Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	Jan Kara <jack@suse.cz>,
+	Ingo Molnar <mingo@redhat.com>,
+	Darren Hart <dvhart@infradead.org>,
+	Davidlohr Bueso <dave@stgolabs.net>,
+	"Andre Almeida" <andrealmeid@igalia.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nichlas Piggin <npiggin@gmail.com>,
+	linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH v5 1/4] iov_iter: Convert copy_from_user_iter() to masked user access
+Date: Mon, 17 Nov 2025 17:43:41 +0100
+Message-ID: <58e4b07d469ca68a2b9477fe2c1ccc8a44cef131.1763396724.git.christophe.leroy@csgroup.eu>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <cover.1763396724.git.christophe.leroy@csgroup.eu>
+References: <cover.1763396724.git.christophe.leroy@csgroup.eu>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1538; i=christophe.leroy@csgroup.eu; h=from:subject:message-id; bh=rLnSkle9gDtzmk+Xzjh4JTt9WyaHRuH0dl6amNgDsgk=; b=owGbwMvMwCV2d0KB2p7V54MZT6slMWRKBxw/U/rkPt+bqXsso2+trmi+bHKls0f76bOjvtFBu 98d1L33qqOUhUGMi0FWTJHl+H/uXTO6vqTmT92lDzOHlQlkCAMXpwBMRHkWI8Oc5nubJl3hm2vk sPjTg6ONon2q7p5t0otnK8VZd6aoO8kxMswMeGirabeizWPDTi6RbW2bzzgkp/nacr7ST90TKce xiwsA
+X-Developer-Key: i=christophe.leroy@csgroup.eu; a=openpgp; fpr=10FFE6F8B390DE17ACC2632368A92FEB01B8DD78
+Content-Transfer-Encoding: 8bit
 
+Following patch will add missing barrier_nospec() to
+copy_from_user_iter(). On some architecture like x86 it might
+degrade performance, which would be unfortunate as
+copy_from_user_iter() is a critical function.
 
-On Sat, 15 Nov 2025 21:15:50 +0900, Damien Le Moal wrote:
-> Jens,
-> 
-> The first 2 patches are simple fixes for the zloop driver. The third
-> patch is a simple refactoring. Finally, patch 4 and 5 introduce new
-> configuration parameters that are very useful for testing the block
-> layer zone append emulation done as part of zone write plugging (patch
-> 4) and to test file systems that use zone append (XFS and btrfs) by
-> changing the processing behavior of zone append operations in zloop.
-> 
-> [...]
+Convert copy_from_user_iter() to using masked user access on
+architecture that support it.
 
-Applied, thanks!
+This is similar to what was done for copy_from_user() by
+commit 0fc810ae3ae1 ("x86/uaccess: Avoid barrier_nospec()
+in 64-bit copy_from_user()")
 
-[1/6] zloop: make the write pointer of full zones invalid
-      commit: 866d65745b635927c3d1343ab67e6fd4a99d116d
-[2/6] zloop: fail zone append operations that are targeting full zones
-      commit: cf28f6f923cb1dd2765b5c3d7697bb4dcf2096a0
-[3/6] zloop: simplify checks for writes to sequential zones
-      commit: e3a96ca90462f80d9f58a1236514823334deef39
-[4/6] zloop: introduce the zone_append configuration parameter
-      commit: 9236c5fdd5a8bec2445e834e7e1bbefb2eb62f67
-[5/6] zloop: introduce the ordered_zone_append configuration parameter
-      commit: fcc6eaa3a03a0e94f6f1d0ac455209b520ef8024
-[6/6] Documentation: admin-guide: blockdev: update zloop parameters
-      commit: ade260ca858627b21be87711b1e12a7bf80c0261
+Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+---
+v5: Changed commit message
 
-Best regards,
+v2: New in v2
+---
+ lib/iov_iter.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
+
+diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+index 2fe66a6b8789..a589935bf302 100644
+--- a/lib/iov_iter.c
++++ b/lib/iov_iter.c
+@@ -49,12 +49,16 @@ size_t copy_from_user_iter(void __user *iter_from, size_t progress,
+ 
+ 	if (should_fail_usercopy())
+ 		return len;
+-	if (access_ok(iter_from, len)) {
+-		to += progress;
+-		instrument_copy_from_user_before(to, iter_from, len);
+-		res = raw_copy_from_user(to, iter_from, len);
+-		instrument_copy_from_user_after(to, iter_from, len, res);
+-	}
++	if (can_do_masked_user_access())
++		iter_from = mask_user_address(iter_from);
++	else if (!access_ok(iter_from, len))
++		return res;
++
++	to += progress;
++	instrument_copy_from_user_before(to, iter_from, len);
++	res = raw_copy_from_user(to, iter_from, len);
++	instrument_copy_from_user_after(to, iter_from, len, res);
++
+ 	return res;
+ }
+ 
 -- 
-Jens Axboe
-
-
+2.49.0
 
