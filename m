@@ -1,187 +1,128 @@
-Received: from sg-1-17.ptr.blmpb.com (sg-1-17.ptr.blmpb.com [118.26.132.17])
+Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BBCD2D8DCA
-	for <linux-block@vger.kernel.org>; Mon, 17 Nov 2025 11:59:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32F3D248F64
+	for <linux-block@vger.kernel.org>; Mon, 17 Nov 2025 13:23:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763380801; cv=none; b=Xnd0yrlyS4Oonn48UnqhWNA8cnAoMNGH6XZj9OITMt8/wkVcGD7N7jC98UGhjywgu5DnJx6LP+QjYszP0vThaD+vLoVQN0gPPybOGAK9OFlvDAckXJS6ga3DXkBachFeq3RWF9m4jgy7pWw6feG515/ttoA1OjIprgxig6xn/BQ=
+	t=1763385797; cv=none; b=Au+VuX9hllSrZ9w4VYRSgN1sfjacEvkiqvhMkQAjtHarBZmr44httmG7qBdD4xhIQkoVuLnU0AHCLmnpvpXQsqCWgYWM77FH3++aMOZ2oqw0/imOc0+f3bwBxMKyVcumzAajSiPxQH1LDhbBd1KnBLWBsE5iRcbRqQedy4xamys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763380801; c=relaxed/simple;
-	bh=ScAdWyzR+ifPRaS32GXMuhIx4ajy7jd/eosLdEmgUkg=;
-	h=Message-Id:Mime-Version:To:From:Subject:Date:Content-Type:
-	 In-Reply-To:References:Cc; b=c+O53W3sAwVcTQujhzn5h8GjoAQ2ZGrtFDQXIeRIPPGeKqCkb6gGPaKI6vRqUarSQxzBAHYFVIvrdSwCyZrmGfl44VcDGOa04zIfEKSjBVPCdsV6ZqNWkdgFgv8ZYJNfWfw6Gk2DDDArE6CtD0YDO6yg28DFgrD4aBEUoLzTSO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=fail smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=dSTAZKY9; arc=none smtp.client-ip=118.26.132.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=fnnas.com
+	s=arc-20240116; t=1763385797; c=relaxed/simple;
+	bh=7+SQiYboLqUzU02PRwe3sOndoFYAcj86GWuLWmGAW50=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Q++etxrYrqUrdpCfTf3vX+GwLapHxVi8UIyzUDT0/NiFWLjipt1y6vR/g5Kh+2k6M2XiINXp41wLGjmPJfuXSVViBOJDPHHKLJs/rRVr9M11io8RlOyKT0yjE3uk/uYud08/10gRcPpLhkNk9+bEaTzsS2cj4SgT/4WmGB8eB/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=UZSXbCsg; arc=none smtp.client-ip=209.85.166.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="dSTAZKY9"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1763380793;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=cIWozImjZOMvOu+x5AhhTe+4yoSOYNaoWWmlOYGZVkk=;
- b=dSTAZKY9XZQzqZ2mnIcCnNmAelAPzYCjMeWrmBRLx2g1V1KfDmWbZyoVYeB97XntuFOop0
- 2jI8i5xBG/TGYTMs+FCkT834J6ew2N8G3Mfp3LT5K3tBTs9N3bR4+kkVN64oFfB7zLDhyp
- S9dC1R8LCkj4AgegTV4H1F8HK1ZUmwHzqPDvK6a/l/wARN/+1qH4AIRsnmWGTTgowxdtMv
- 52X2Otp97uY0DZ2q+iVtfx/+NZ/zvzLMaNu/KKB0rujJNAMvChOb3dTON5h881GnNFOaL4
- 6o5Ae+xmp0FVNDCmqVWXpwMqXxoGZjoI8Gp6gOhM7K47D39nxQwnFxf5sdUwXQ==
-Reply-To: yukuai@fnnas.com
-Content-Language: en-US
-User-Agent: Mozilla Thunderbird
-Message-Id: <c03dbc61-6df0-4640-adc7-2e6d01ad42b9@fnnas.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="UZSXbCsg"
+Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-9490a482b7bso39915039f.1
+        for <linux-block@vger.kernel.org>; Mon, 17 Nov 2025 05:23:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1763385793; x=1763990593; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rJlasoPNgct20UbFhWqs9XjquharNVN3bJkeKKlewxw=;
+        b=UZSXbCsgQypZVlXje5UQgqEeKDPfKNGrx6X26BpKV7y0O5ImU7QFQRkHFAmKdt/JMW
+         8m4VNV/fiYRTf3y5p6TZ60VYTrvtlA9GmBwiw9MvsIXaYIiqU0LjIBG8x1cpLRBv9RBE
+         2UHhjhJiTl+m8o6a9yeMDJF8zAoLdahgO8hjU6kyV4yF+D0aOPOtfPIAMI7VJkG+NtK7
+         VrKIBrVyN3F6v0k+5HLO4s0/hSp1O3REfdDnP3Fb5UN8PJfa0jmdNXxJJpejh0xwfEGw
+         9gumvWTJ2xyt5AmE3bhuNfN5NU0V+fMBgbgt7K8Nv1nuHtPVQs8cdS+Sb01oh2x/i94T
+         Q6Og==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763385793; x=1763990593;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rJlasoPNgct20UbFhWqs9XjquharNVN3bJkeKKlewxw=;
+        b=AdDDe0j+b97MTK+sCqrQ0sohLvNUcxjn7z1lZSu+JzgEXeuenp3RLhLPOeGWcpQLNg
+         f3qn+/iNHtNWiwq5eKrHgoQ9M8oZDMAGpH+YxYJZ9iaswzT7uLsoZ2BwRC5bRbiLrbhE
+         UKeXehMhwPjs3HuZv7ZvKSHR3h9Vi+2dUFWc7YKiPGdZgEDIwPIRpNTR29zsS3jFhnb/
+         oNqO7mnjRpZquZipCftiSXrXYjRGfBu3dDxX4y5QwPSZPESWtO547VLu9QhWAFV7pb++
+         djJtMxUa0MLWYLjq1cOg0Zlk0HX1O/qPcs4N3f7l7JSU8Z8vRDpaJKtyPRsLd+LwOLI+
+         hASA==
+X-Gm-Message-State: AOJu0YxAr008zol205zQLnOug0Le64Wj7KGQKKZfWX++W9hMOFNd6DKC
+	1G3zcvw3K5Nor9p2WRx85wqj9ZBUUvtoCxT2MF5Zjsm3aeZGfvx8cU/ezj5iiTL7NYPuEXz/UO+
+	oeFon
+X-Gm-Gg: ASbGnctvoOYQrr5W9BAXJBAFq21Weeu497dn+Z3kaVyG8oj+Ek4K2/l1uU8nCtrYZ5T
+	I7nassJkmnwOYhk0EKgECdsO8hHfBkNgLay0cDhrgOEiUeXaZ39XWYN9HW0IZNaB4cshv9vH/9z
+	AxjT+juQcRNz3oK2iI2aOgYBjV3VMX0/Je8YvlHQktiBTGailbfXHfGNmBQa8G1ZWAlwiFrKd1Z
+	poWmQ+YcfZHkBak3uSDavxvIR9JbZQeZBa3xw1npYlrxwfBPDqY7ERB4AgErRmvqKNaXmvAb99b
+	k+0NAc8d5iZwEpdq6WUkugNnlbtX2nBvohrPdZPUSzYcDwmNM1PLC/wuCvRJvTcP4hXvxIOkaJj
+	K7kkAOMd8pajnxZggudO0csMrR++eNiYwi1Gl1NzjiIA5pwdLswwdUAisyFTYeQgzTEKXBsHMhA
+	==
+X-Google-Smtp-Source: AGHT+IET++AjtZs4125CrwAm18Zh4YEYvUnmvFxxPjkfhWrKOVvHNt+yT626Iu5B5AZ51ofdZDDqxw==
+X-Received: by 2002:a02:c490:0:b0:5b7:d710:661c with SMTP id 8926c6da1cb9f-5b7d71066camr6995756173.23.1763385792996;
+        Mon, 17 Nov 2025 05:23:12 -0800 (PST)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5b7bd3301efsm4665248173.52.2025.11.17.05.23.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 17 Nov 2025 05:23:12 -0800 (PST)
+Message-ID: <c8cbccc1-964c-43ce-a992-624d2efcfd4a@kernel.dk>
+Date: Mon, 17 Nov 2025 06:23:09 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Original-From: Yu Kuai <yukuai@fnnas.com>
-To: "Ming Lei" <ming.lei@redhat.com>
-From: "Yu Kuai" <yukuai@fnnas.com>
-Subject: Re: [PATCH RESEND 1/5] block/blk-rq-qos: add a new helper rq_qos_add_freezed()
-Date: Mon, 17 Nov 2025 19:59:49 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] fix floppy for PAGE_SIZE != 4KB
+To: =?UTF-8?Q?Ren=C3=A9_Rebe?= <rene@exactco.de>
+Cc: linux-block@vger.kernel.org, efremov@linux.com
+References: <b1e17016-3d4d-4fac-b5b0-97db357d0749@kernel.dk>
+ <20251114.172543.20704181754788128.rene@exactco.de>
+ <fec67c88-53f5-4482-aeef-86e1213d187e@kernel.dk>
+ <20251114.192119.1776060250519701367.rene@exactco.de>
+ <708B7962-86CD-489B-AC33-4B929F2902B6@exactco.de>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <708B7962-86CD-489B-AC33-4B929F2902B6@exactco.de>
 Content-Type: text/plain; charset=UTF-8
-In-Reply-To: <aRsM34hifFrUNe6w@fedora>
-X-Lms-Return-Path: <lba+2691b0e37+a0040e+vger.kernel.org+yukuai@fnnas.com>
-References: <20251116041024.120500-1-yukuai@fnnas.com> <20251116041024.120500-2-yukuai@fnnas.com> <aRsAdF3GxNJ3Q1Qv@fedora> <1bd4a77f-399f-4dbe-a6b6-79b07f5e2759@linux.ibm.com> <aRsHVyvL8sMrmDlt@fedora> <8cca91f6-cfe2-4ef7-a072-dd48c3ee243b@fnnas.com> <aRsM34hifFrUNe6w@fedora>
-Cc: "Nilay Shroff" <nilay@linux.ibm.com>, <axboe@kernel.dk>, 
-	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>, 
-	<tj@kernel.org>, "Yu Kuai" <yukuai@fnnas.com>
-Content-Transfer-Encoding: quoted-printable
-Organization: fnnas
-Received: from [192.168.1.104] ([39.182.0.153]) by smtp.feishu.cn with ESMTPS; Mon, 17 Nov 2025 19:59:50 +0800
+Content-Transfer-Encoding: 7bit
 
-Hi,
-
-=E5=9C=A8 2025/11/17 19:54, Ming Lei =E5=86=99=E9=81=93:
-> On Mon, Nov 17, 2025 at 07:39:57PM +0800, Yu Kuai wrote:
->> Hi,
+On 11/17/25 2:56 AM, Ren? Rebe wrote:
+> Hi,
+> 
+>>> 64k is 4% of a floppy disk! But I hear you, works for you.
 >>
->> =E5=9C=A8 2025/11/17 19:30, Ming Lei =E5=86=99=E9=81=93:
->>> On Mon, Nov 17, 2025 at 04:43:11PM +0530, Nilay Shroff wrote:
->>>> On 11/17/25 4:31 PM, Ming Lei wrote:
->>>>> On Sun, Nov 16, 2025 at 12:10:20PM +0800, Yu Kuai wrote:
->>>>>> queue should not be freezed under rq_qos_mutex, see example index
->>>>>> commit 9730763f4756 ("block: correct locking order for protecting bl=
-k-wbt
->>>>>> parameters"), which means current implementation of rq_qos_add() is
->>>>>> problematic. Add a new helper and prepare to fix this problem in
->>>>>> following patches.
->>>>>>
->>>>>> Signed-off-by: Yu Kuai <yukuai@fnnas.com>
->>>>>> ---
->>>>>>    block/blk-rq-qos.c | 27 +++++++++++++++++++++++++++
->>>>>>    block/blk-rq-qos.h |  2 ++
->>>>>>    2 files changed, 29 insertions(+)
->>>>>>
->>>>>> diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
->>>>>> index 654478dfbc20..353397d7e126 100644
->>>>>> --- a/block/blk-rq-qos.c
->>>>>> +++ b/block/blk-rq-qos.c
->>>>>> @@ -322,6 +322,33 @@ void rq_qos_exit(struct request_queue *q)
->>>>>>    	mutex_unlock(&q->rq_qos_mutex);
->>>>>>    }
->>>>>>   =20
->>>>>> +int rq_qos_add_freezed(struct rq_qos *rqos, struct gendisk *disk,
->>>>>> +		       enum rq_qos_id id, const struct rq_qos_ops *ops)
->>>>>> +{
->>>>>> +	struct request_queue *q =3D disk->queue;
->>>>>> +
->>>>>> +	WARN_ON_ONCE(q->mq_freeze_depth =3D=3D 0);
->>>>>> +	lockdep_assert_held(&q->rq_qos_mutex);
->>>>>> +
->>>>>> +	if (rq_qos_id(q, id))
->>>>>> +		return -EBUSY;
->>>>>> +
->>>>>> +	rqos->disk =3D disk;
->>>>>> +	rqos->id =3D id;
->>>>>> +	rqos->ops =3D ops;
->>>>>> +	rqos->next =3D q->rq_qos;
->>>>>> +	q->rq_qos =3D rqos;
->>>>>> +	blk_queue_flag_set(QUEUE_FLAG_QOS_ENABLED, q);
->>>>>> +
->>>>>> +	if (rqos->ops->debugfs_attrs) {
->>>>>> +		mutex_lock(&q->debugfs_mutex);
->>>>>> +		blk_mq_debugfs_register_rqos(rqos);
->>>>>> +		mutex_unlock(&q->debugfs_mutex);
->>>>>> +	}
->>>>> It will cause more lockdep splat to let q->debugfs_mutex depend on qu=
-eue freeze,
->>>>>
->>>> I think we already have that ->debugfs_mutex dependency on ->freeze_lo=
-ck.
->>>> for instance,
->>>>     ioc_qos_write  =3D> freeze-queue
->>>>      blk_iocost_init
->>>>        rq_qos_add
->>> Why is queue freeze needed in above code path?
->>>
->>> Also blk_iolatency_init()/rq_qos_add() doesn't freeze queue.
->> I don't quite understand, rq_qos_add() always require queue freeze, prev=
-ent
->> deference q->rq_qos from IO path concurrently.
+>> Again, still only 8k or 16k for most of such remaining workstation
+>> floppy users.
 >>
->>>> and also,
->>>>     queue_wb_lat_store  =3D> freeze-queue
->>>>       wbt_init
->>>>         rq_qos_add
->>> Not all wbt_enable_default()/wbt_init() is called with queue frozen, bu=
-t Kuai's
->>> patchset changes all to freeze queue before registering debugfs entry, =
-people will
->>> complain new warning.
->> Yes, but the same as above, rq_qos_add() from wbt_init() will always fre=
-eze queue
->> before this set, so I don't understand why is there new warning?
-> The in-tree rq_qos_add() registers debugfs after queue is unfreeze, but
-> your patchset basically moves queue freeze/unfreeze to callsite of rq_qos=
-_add(),
-> then debugfs register is always done with queue frozen.
->
-> Dependency between queue freeze and q->debugfs_mutex is introduced in som=
-e
-> code paths, such as, elevator switch, blk_iolatency_init, ..., this way
-> will trigger warning because it isn't strange to run into memory
-> allocation in debugfs_create_*().
-
-Yes, I realized I do misunderstand in previous email.
-
->
->>>>> Also blk_mq_debugfs_register_rqos() does _not_ require queue to be fr=
-ozen,
->>>>> and it should be fine to move blk_mq_debugfs_register_rqos() out of q=
-ueue
->>>>> freeze.
->>>>>
->>>> Yes correct, but I thought this pacthset is meant only to address inco=
-rrect
->>>> locking order between ->rq_qos_mutex and ->freeze_lock. So do you sugg=
-est
->>>> also refactoring code to avoid ->debugfs_mutex dependency on ->freeze_=
-lock?
->>>> If yes then shouldn't that be handled in a separate patchset?
->>> It is fine to fix in that way, but at least regression shouldn't be cau=
-sed.
+>>>> But if someone wants to refactor this code some more, ... I'm happy to
+>>>> test it, too ;-)
 >>>
->>> More importantly we shouldn't add new unnecessary dependency on queue f=
-reeze.
->> This is correct, I'll work on the v2 set to move debugfs_mutex outside o=
-f freeze
->> queue, however, as you suggested before we should we should fix this inc=
-orrect
->> lock order first. How about I make them in a single set?
-> That is fine, but patches for moving debugfs_mutex should be put before
-> this patchset, which is always friendly for 'git bisect'.
+>>> I don't think refactoring would be required here, it's probably just
+>>> capping that probe read to something constant irrespective of hardware
+>>> page sizes.
+>>
+>> Well, the floppy.c __floppy_read_block_0 does:
+>>        bio_init(&bio, bdev, &bio_vec, 1, REQ_OP_READ);
+>>        __bio_add_page(&bio, page, block_size(bdev), 0);
+>>
+>> Is there an easy way to limit that to less than a page without
+>> refactoring it too much? Otherwise we could just apply this hotfix for
+>> now.
+> 
+> 
+> Any chance we can get my initial one liner constant PAGE_SIZE fix
+> for this over a decade old bug in? I currently don?t have a budget
+> to refactor the floppy driver probing for efficiency on bigger PAGE_SIZE
+> configs I?m not even having a floppy controller on.
 
-Sounds good :)
+Yep we can do that. It'd be great if we could augment the change with
+what commit broke it, so it can get backported to stable kernels as
+well. Was it:
 
-Thanks,
-Kuai
+commit fe4ec12e1865a2114056b799e4869bf4c30e47df
+Author: Christoph Hellwig <hch@lst.de>
+Date:   Fri Jun 26 10:01:52 2020 +0200
 
->
->
-> Thanks,
-> Ming
->
->
+    floppy: use block_size
+
+?
+
+-- 
+Jens Axboe
