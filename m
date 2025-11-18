@@ -1,99 +1,173 @@
-Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBC6822D4DD
-	for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 23:27:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37D632E11BC
+	for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 23:30:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763508473; cv=none; b=orvOK5iSllWQRn9n+igsrT1oBcA5I0tDh3pQ9w96J2lqew+L/+L8dugiQwSp30zhMFrvDVrpcgj0YfGS+lZlP1p7C2P+4btLDV2hZ2NXQLs9BP8R/U3WWxDCZai00F7h7TSgTpM8b+JWwIrXsIML8FjteztYgqOFUa9ymkQgldg=
+	t=1763508640; cv=none; b=iCGBMEt28rRIcBIX7HSPkIKTrAjXE77DSxfan3kkOIWFObJ3hhe2JVXgantnENscRwssrc9nd4+rjpwkQPNbTtoo3Es0Rc5B1cVClTbyqN0Y6dm7Pnu/nlDlHW2ZS7KdL+UeeCGCQ4BfPOlU9X3kCQxak6PojQyCzPQAecoMAaA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763508473; c=relaxed/simple;
-	bh=cFSzgIfeO3z7fAxhJSnJreoGGPDwgCoTFSfEENULLKw=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=NI7ZelP89l/3MPUKx/ZeLa81MfgS34TaF/NVRG6GWR3/aGxHKHluAegZX1/G7NFVRrSo8cQmQaUt8UkIwLKNpIDslMOJpBgJBw/RWNsLVxV3qIx+oYNnf5bmOQ17IMG6Cpum2i55XTqP3FLBi8AH5j4PKSeN8z2DT2yyoxUtrKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=TK8DPd5l; arc=none smtp.client-ip=209.85.166.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1763508640; c=relaxed/simple;
+	bh=Ll890/m+4oA95x8d4X0J/e5b2OUfoKs6Dh9eC3XMaNc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SwnxRrR/HYFQi3lXUgeUgzgejtRbyRMWufS3Wsa8LBj9X80ucwD+0nAvm7DJiKymYP6bjoSwzt6AA+DqNNTz+OEGqfdLivKf5nqaaIl5xqPNB/1m8behTafwWgIovUVgsthpjbG20PMcszGwDICaBKUdgYoEr/8kM1FHhrnp7TU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=rKdfUEVi; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="TK8DPd5l"
-Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-949042bca69so114877839f.1
-        for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 15:27:50 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="rKdfUEVi"
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-295548467c7so70887425ad.2
+        for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 15:30:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1763508470; x=1764113270; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fc1+eVN9QzOvduRcVGM2K6gpUavSX6aETEfOM72doIQ=;
-        b=TK8DPd5l9Yk0m8IyuMtXOGhsqMQ4y27E7Zh0n8tZTK9tCuiamRdW664GyfGcb+vPDz
-         n2BNi5MdV/MRxwER9OEP81bi0qIgR2yJpZxKA5GWcxkP0n+/5HNZ4IClLppfHvTZHNkx
-         tmibw5zULB+H+4jXUBbHQ0NEmbdEcruOQojdiq68pZQpdoNTJPz2aUXXrRftLYRVY0pI
-         VmRL9+32bZ0JZXg4sjFQpbplj3JJE5Cz7g/HPhS3eD3PAkkTnD2WJiYhJNuK9fy3T3jJ
-         R9FRjJ+JEoP4nteVZnVJqjsArHAn/bDBMVGQgQ7T0NU29E/dsO6frhvi4TZ7R/TMjrvp
-         17vA==
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1763508638; x=1764113438; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MnIQ5czAIlDUTiRSsv9UfW61iWVDuRBQUnVcKZcJB1w=;
+        b=rKdfUEViRk2eHns7ezpaBZ3rb6Xn7WELhxhLp9wibrXP37D45/opfQ8U/2wzneLYhX
+         DQ+7yJTZg1ollHP+oUfyBZI59oSSk0ZNaittOqb35qxXB7TYcwqyWkl1mYc3GH5zdQQj
+         DBpmc+wvoeVu45KKzzbWmimB+UiESiDxNl68cfSl0iCRpfZbmCZ8i37HM/G/rrPHkoNc
+         GMinkDCJSMinucjmFt4pUg2qsRFxSAU+W1DBOcCF0bnw6eLIV3AFU5OOtcI2d0+EaLtZ
+         UtHj0jNUF+ADLSBs01d3xl6rmfbMzWVob0j+RJIPAkZcpFOe85R2CIvTuWMo5/rNgalN
+         KFXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763508470; x=1764113270;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=fc1+eVN9QzOvduRcVGM2K6gpUavSX6aETEfOM72doIQ=;
-        b=gUJ6e2hjmufq7IBDJkxoIHMDrxwGjukLZDpMjWBrUXP46AHBDqjDFFBZi9YvQk5zPU
-         bsCzXVvf/hjkDb2C4Tk+KFYZMWytRzqdc73gj9g4T4ixPizIPncf5hn+3RPFg2l96Gu4
-         eizsplLsyk4YCNVkjRCqv/kiW76u3XTiqNwu88ozYpWRIW8ij9uAZNNLW4HZtb0Z99SC
-         5ReyGuc9jrr0gye/1VhR0U29Iw2gGDEMd9J2rc4LpVBiyrU00/Nf8Qb6BljMwWrOR4lO
-         cU1nK3pHzepUShlqSy6zo9W3M7yC446oE0cfaXWRqos5J1r7aSTr/WIxoqI4C0qQKXMI
-         JgxQ==
-X-Gm-Message-State: AOJu0Yx9wo7jB47qB/pDv1KtBhlr8xdqa1t3Iio1kghpJEi6bc9ICLSy
-	+MXDJjcLu//SWnnr2Yh76vSbXaxoiMve2s4pydRJkgTj6XSvzzo0C9eeDIop9En/KDc=
-X-Gm-Gg: ASbGncuUfi3ur02TxzZMtOF53+PbWlwezmc9ON0T70FgJmzPv1hU4S9buji5a34Nwzg
-	4klipGeQsuVW3KEG3/pdOlOpIcJanJeo3VdxxUDAavPLQaYQv/GX9wlHoLVts8BLFQiomqFpr96
-	Jh06yW9h/TCzcxqnrtmEkPa40qASD5lq9zFjWfOlROc57KCVdTVMl69+7rAlQbfr3b0IjEACAAS
-	ni8mwVyzN+B6jglsAlVaWGo8HBy/4ntT7kHPanwx++nTbxaRphFJ8yqDllRMWmjLRHBjgGuohlr
-	ij0PUd7whglmBVnH8DBK+1AVo4iRUOqXjUJfYweS1xUaJC5L97O9K5WLFoTBHDIihrJYzY0DUQF
-	mSxT3eKVXJLwdepOhGzELmo0ZqjXmltZ4DWmQ7g01ETVfdXLxTigvqmk+DPEoFe51V1k/7r1Dii
-	zCzcBedrhiXtfeo3E/ZMGzTl9h
-X-Google-Smtp-Source: AGHT+IFsDKNEtkXrZmlfGUi2j1vQSdSipUOfLhL0JLZJNHYvMtbjeJOpgr7FZEJQgWQeKMI8HGLY1g==
-X-Received: by 2002:a05:6602:168c:b0:949:3ac:512 with SMTP id ca18e2360f4ac-94903ac07b4mr1227116339f.8.1763508469719;
-        Tue, 18 Nov 2025 15:27:49 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-948d2d15ee4sm808126139f.12.2025.11.18.15.27.48
+        d=1e100.net; s=20230601; t=1763508638; x=1764113438;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MnIQ5czAIlDUTiRSsv9UfW61iWVDuRBQUnVcKZcJB1w=;
+        b=SD8MeypE4IzD6NE8XLufUc/tlrSzjiCanctVwsu0zIz/MoBJh+BUKr7CTUgcRoMBcT
+         XB9wBcisjVB8bKAsRSued7PFA4xfFciZdcpzi3+yYIC8hBiR4+a3lDq8BSH9bi8JhBu9
+         RwV79Qben8aY2oaK0aPE3CHj6q5PiEXmK34hWV3gMK7kwI6yZld8Y/EDb9b5hWhB3E3f
+         v1h0Z1gfW02TClBzKNjQAmgaKEis7RcyK10lFxKoL908dJqlzEqfm6QQmwyggTm7cufC
+         bYu2YS/0QzHLaARZRb0hO8iE7TOZxPXspQvR/+ojMSDSpOpJHD6z0W8AUOwa54/WO+zG
+         eCPg==
+X-Forwarded-Encrypted: i=1; AJvYcCWzv819tfARDCJ743n7rUGUx96CiPavNzxf0StcUU5jLhNjcGt5WWHBrjwljrq2fHb7mtmkBsnt6P3RKA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyN0WX2TKozLw6KFCk0szmy5Z3fgj2cq9Pdblm8Pye63qNb0cl6
+	GYuh4PbkzasSrw+LUYftPU+lMgOPU+p7f1HM5qKo2raCpYSu60ANdioniZ2u4Honw5U=
+X-Gm-Gg: ASbGncuCcR97HL7flL4h3qjVRG7zg1OhaM7OZEQ162EEy1twg57vqA37CuxbR5JSTEI
+	IXDddLJLVzK/AEuHS1JxK0ZeueXXEvNM2lPa57BmQkFLN/fASJSS9UfDtZNse2RRxLm8NF6Zl3P
+	kXoKf9705gUr1QGx6iVFVwZxs7pXJ84rfyufBMPgPSFSOG7i0A6QNNlhG7Wka+4h9bVRbdLSL5P
+	JUPLHrJkztDdMp++aOIs8TOEv9k0G41CEt0R3YYXy6L3GtyI1W0ruDR+t4doDIOa/KMMZVCuLCa
+	SFDNawghQaM8YSdmMQc4kDUFKucRjL4MRZXrgXudYf5TArDZTcgeU9EWkw3XaAqhZAGmS/lY+De
+	EbNEE/Bgit+iCfPEo5h3n2gS1RX9LwoEVZEayvzDLj/esX30Q7mbPbVquxZxZhnd9vJ7poZ9Me2
+	LIpNyGIFVX5UkjdMt1LT0D/9EAuPsx0yY3rmWHeps6cqg8tLMU39uYIWlY2iUOt32ppDAa3VGuB
+	EqoGVyaK9Q=
+X-Google-Smtp-Source: AGHT+IG0xrV617/K2Q2zctZIX2rlkSw5B1Jp1MywYakVFhxJ0IxXfb/aHGJIAHe675+ap1LI/Djfwg==
+X-Received: by 2002:a17:90b:570c:b0:340:cb39:74cd with SMTP id 98e67ed59e1d1-345bd413f51mr358384a91.32.1763508637774;
+        Tue, 18 Nov 2025 15:30:37 -0800 (PST)
+Received: from dread.disaster.area (pa49-181-58-136.pa.nsw.optusnet.com.au. [49.181.58.136])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-345bc110a6dsm560282a91.14.2025.11.18.15.30.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Nov 2025 15:27:49 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: chengkaitao <pilgrimtao@gmail.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Chengkaitao <chengkaitao@kylinos.cn>
-In-Reply-To: <20251118012644.61754-1-pilgrimtao@gmail.com>
-References: <20251118012644.61754-1-pilgrimtao@gmail.com>
-Subject: Re: [PATCH] block: remove the declaration of elevator_init_mq
- function
-Message-Id: <176350846860.360001.7321424818334963533.b4-ty@kernel.dk>
-Date: Tue, 18 Nov 2025 16:27:48 -0700
+        Tue, 18 Nov 2025 15:30:37 -0800 (PST)
+Received: from dave by dread.disaster.area with local (Exim 4.98.2)
+	(envelope-from <david@fromorbit.com>)
+	id 1vLV9e-0000000Ceqh-0jNc;
+	Wed, 19 Nov 2025 10:30:34 +1100
+Date: Wed, 19 Nov 2025 10:30:34 +1100
+From: Dave Chinner <david@fromorbit.com>
+To: Ritesh Harjani <ritesh.list@gmail.com>
+Cc: Matthew Wilcox <willy@infradead.org>,
+	Ojaswin Mujoo <ojaswin@linux.ibm.com>,
+	Christian Brauner <brauner@kernel.org>, djwong@kernel.org,
+	john.g.garry@oracle.com, tytso@mit.edu, dchinner@redhat.com,
+	hch@lst.de, linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org, jack@suse.cz, nilay@linux.ibm.com,
+	martin.petersen@oracle.com, rostedt@goodmis.org, axboe@kernel.dk,
+	linux-block@vger.kernel.org, linux-trace-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 2/8] mm: Add PG_atomic
+Message-ID: <aR0BmpbQe0s4B80S@dread.disaster.area>
+References: <cover.1762945505.git.ojaswin@linux.ibm.com>
+ <5f0a7c62a3c787f2011ada10abe3826a94f99e17.1762945505.git.ojaswin@linux.ibm.com>
+ <aRSuH82gM-8BzPCU@casper.infradead.org>
+ <87ecq18azq.ritesh.list@gmail.com>
+ <aRcrwgxV6cBu2_RH@casper.infradead.org>
+ <878qg32u3d.ritesh.list@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <878qg32u3d.ritesh.list@gmail.com>
 
-
-On Tue, 18 Nov 2025 09:26:44 +0800, chengkaitao wrote:
-> In commit 1e44bedbc921 ("block: unifying elevator change"), the
-> elevator_init_mq function was deleted, but its declaration in elevator.h
-> was overlooked. This patch fixes it.
+On Tue, Nov 18, 2025 at 09:47:42PM +0530, Ritesh Harjani wrote:
+> Matthew Wilcox <willy@infradead.org> writes:
 > 
+> > On Fri, Nov 14, 2025 at 10:30:09AM +0530, Ritesh Harjani wrote:
+> >> Matthew Wilcox <willy@infradead.org> writes:
+> >> 
+> >> > On Wed, Nov 12, 2025 at 04:36:05PM +0530, Ojaswin Mujoo wrote:
+> >> >> From: John Garry <john.g.garry@oracle.com>
+> >> >> 
+> >> >> Add page flag PG_atomic, meaning that a folio needs to be written back
+> >> >> atomically. This will be used by for handling RWF_ATOMIC buffered IO
+> >> >> in upcoming patches.
+> >> >
+> >> > Page flags are a precious resource.  I'm not thrilled about allocating one
+> >> > to this rather niche usecase.  Wouldn't this be more aptly a flag on the
+> >> > address_space rather than the folio?  ie if we're doing this kind of write
+> >> > to a file, aren't most/all of the writes to the file going to be atomic?
+> >> 
+> >> As of today the atomic writes functionality works on the per-write
+> >> basis (given it's a per-write characteristic). 
+> >> 
+> >> So, we can have two types of dirty folios sitting in the page cache of
+> >> an inode. Ones which were done using atomic buffered I/O flag
+> >> (RWF_ATOMIC) and the other ones which were non-atomic writes. Hence a
+> >> need of a folio flag to distinguish between the two writes.
+> >
+> > I know, but is this useful?  AFAIK, the files where Postgres wants to
+> > use this functionality are the log files, and all writes to the log
+> > files will want to use the atomic functionality.  What's the usecase
+> > for "I want to mix atomic and non-atomic buffered writes to this file"?
 > 
+> Actually this goes back to the design of how we added support of atomic
+> writes during DIO. So during the initial design phase we decided that
+> this need not be a per-inode attribute or an open flag, but this is a
+> per write I/O characteristic.
+> 
+> So as per the current design, we don't have any open flag or a
+> persistent inode attribute which says kernel should permit _only_ atomic
+> writes I/O to this file. Instead what we support today is DIO atomic
+> writes using RWF_ATOMIC flag in pwritev2 syscall.
 
-Applied, thanks!
+Which, if we can't do with REQ_ATOMIC IO, we fall back to the
+filesystem COW IO path to provide RWF_ATOMIC semantics without
+needing to involve the page cache.
 
-[1/1] block: remove the declaration of elevator_init_mq function
-      commit: 8e1d91c2582d2b60d62616649546bb132fff566b
+IOWs, DIO REQ_ATOMIC writes are simply a fast path for the atomic
+COW IO path inherent in COW-capable filesystems.
 
-Best regards,
+This is no different for buffered RWF_ATOMIC writes. We need to
+ingest the data into the page cache as a COW operation, then at
+writeback time we optimise away the COW operations if REQ_ATOMIC IO
+can be performed instead.
+
+Using COW for buffered RWF_ATOMIC writes means don't need to involve
+the page caceh at all - this can all be implemented at the
+filesystem extent mapping and iomap layers....
+
+> Having said that there can be several policy decision that could still be
+> discussed e.g. make sure any previous dirty data is flushed to disk when a
+> buffered atomic write request is made to an inode. 
+
+We don't need to care about mixed dirty non-atomic/atomic data on the
+same file if REQ_ATOMIC is used as an optimisation for COW-based
+atomic IO.  Filesystems like XFS naturally separate COW and non-COW
+extents. If we combine non-atomic and atomic data into a single
+atomic update at writeback(be it COW or REQ_ATOMIC IO), then we
+have still honoured the requested atomic semantics required to
+persist the data. It just doesn't matter.
+
+IMO, trying to hack atomic physical IO semantics through the page
+cache creates all sorts of issues that simply don't exist when we
+use the atomic overwrite paths present in modern COW capable
+filesystems....
+
+-Dave.
 -- 
-Jens Axboe
-
-
-
+Dave Chinner
+david@fromorbit.com
