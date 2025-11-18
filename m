@@ -1,62 +1,75 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6BF9191F91
-	for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 05:21:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A105B2DAFA7
+	for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 05:22:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763443291; cv=none; b=Fg+PS/KlJoQUuYuHew385fSOooYLxBuGNnx+9hIt6EGScytfjqvJc5SrrGnr0h8VpqQMOwkBEmkNZjtwjp5rXp+CVsVHHDaTOUanPrV+KWXfTzlSk3vq6GHnUn7HAcC7f8QVeVF1J1v8APoAAPB50rCkeIWuZzdUviTtTQi6kcU=
+	t=1763443372; cv=none; b=uzr/Wl/sswWXQbTI68CZpGXms9D/NFfKX5iZMRz/FtedYLTZi+0o/ZIiEYFVwWyjkCcgtJdhjxwW2mpcE72znmS+8xPQ+bhe5V84XQCs6QpxQEoKBij6EuYcAKS9z8ir1zxSQL0Mau2mYEdhCk97wRDC9ei0SSuGoGUVCaJX3Gc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763443291; c=relaxed/simple;
-	bh=yVrA1zd6HywQ6+5O/b+LefqxVFdpnhEXf2TfScmNAVo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sYgT9atJW0E/5djXJ+vLWcopzMIZuMIM5zWqfXywafOPx9UPOZOM9gsDVf45SaGF3AvpnqfCqr7ytnFisRO9Jtewa6bSKb6NnodIuL2NYPCWwgzylxJu+TsJyzQ2Iy6XSMfKbauLGxIZYvB9Ud8U3eGzWkt1xEN21g9pMVEVfYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id B53D7227A88; Tue, 18 Nov 2025 06:21:24 +0100 (CET)
-Date: Tue, 18 Nov 2025 06:21:24 +0100
-From: "hch@lst.de" <hch@lst.de>
-To: Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc: Damien Le Moal <dlemoal@kernel.org>,
-	Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>
-Subject: Re: [PATCH 1/2] loop: respect REQ_NOWAIT for memory allocation
-Message-ID: <20251118052124.GA22100@lst.de>
-References: <20251116025229.29136-1-ckulkarnilinux@gmail.com> <6f76d0ec-a746-4eaf-abe9-86b51d2ff9db@kernel.org> <67472833-fd71-42a7-ac32-26e1da30f3ad@nvidia.com>
+	s=arc-20240116; t=1763443372; c=relaxed/simple;
+	bh=4Q48GvKGVTbBdZAVXAqb/DKb6mVp+XlqjRaPiSr97JI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
+	 Content-Type:References; b=VpqRhkKpL0wK4CNnTdYWLVm/0vuOXefqSpwK7jonhWNQ8y2HfrYPYXnLw5Dee8GXOjrdQnt4pJp3PyR52/T/TguZnM6j9WwCjBsnpvnL3isdHX8WzF9Zxwkz9m2WV8zbXjRN0uaNfC5tVnXzCw5GfCgQc8W9dLRlGKW1XfiDHDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=EuTtQvZJ; arc=none smtp.client-ip=203.254.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="EuTtQvZJ"
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20251118052247epoutp04b2074ce53558e7a6bbe7fbdfc4432991~5AmZNbjec0188501885epoutp04M
+	for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 05:22:47 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20251118052247epoutp04b2074ce53558e7a6bbe7fbdfc4432991~5AmZNbjec0188501885epoutp04M
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1763443367;
+	bh=4Q48GvKGVTbBdZAVXAqb/DKb6mVp+XlqjRaPiSr97JI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=EuTtQvZJmEPkHFliJ19jBSxHcolEp2O4myZPCBLHaS6hUispy4thb2i3tC5PYpA0C
+	 qd6roaf6elo4hztzGJgWgUCkCHZEhUNx+kj2skKfugZxh2btiTvLkqr+La1635ZsGc
+	 oxuV5ymyNHL6fLU6YaLQYZyN87lEzEoAyZapzzHw=
+Received: from epsnrtp04.localdomain (unknown [182.195.42.156]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTPS id
+	20251118052246epcas5p1cb391f7ef1147a130ddcb76d2b89e89a~5AmYK806s2236822368epcas5p1I;
+	Tue, 18 Nov 2025 05:22:46 +0000 (GMT)
+Received: from epcas5p3.samsung.com (unknown [182.195.38.87]) by
+	epsnrtp04.localdomain (Postfix) with ESMTP id 4d9Y0P2RZmz6B9mG; Tue, 18 Nov
+	2025 05:22:45 +0000 (GMT)
+Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+	20251118052223epcas5p17eb1f4c8af3965b28ae89eae33998777~5AmCZHgCf0550305503epcas5p19;
+	Tue, 18 Nov 2025 05:22:23 +0000 (GMT)
+Received: from node122.. (unknown [109.105.118.122]) by epsmtip1.samsung.com
+	(KnoxPortal) with ESMTPA id
+	20251118052222epsmtip130d5a9b29ca730745aeb64c7b00495f2~5AmB0kwab3148531485epsmtip1i;
+	Tue, 18 Nov 2025 05:22:22 +0000 (GMT)
+From: Xue He <xue01.he@samsung.com>
+To: xue01.he@samsung.com
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, ming.lei@redhat.com, yukuai@fnnas.com
+Subject: Re: [PATCH v7] block: plug attempts to batch allocate tags multiple
+ times
+Date: Tue, 18 Nov 2025 05:17:47 +0000
+Message-Id: <20251118051747.260560-1-xue01.he@samsung.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20251117124229.255796-1-xue01.he@samsung.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <67472833-fd71-42a7-ac32-26e1da30f3ad@nvidia.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+X-CMS-MailID: 20251118052223epcas5p17eb1f4c8af3965b28ae89eae33998777
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+cpgsPolicy: CPGSC10-505,Y
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20251118052223epcas5p17eb1f4c8af3965b28ae89eae33998777
+References: <20251117124229.255796-1-xue01.he@samsung.com>
+	<CGME20251118052223epcas5p17eb1f4c8af3965b28ae89eae33998777@epcas5p1.samsung.com>
 
-On Sun, Nov 16, 2025 at 05:43:53AM +0000, Chaitanya Kulkarni wrote:
-> On 11/15/25 19:50, Damien Le Moal wrote:
-> > On 11/16/25 11:52, Chaitanya Kulkarni wrote:
-> >>    6. Loop driver:
-> >>     loop_queue_rq()
-> >>      lo_rw_aio()
-> >>       kmalloc_array(..., GFP_NOIO) <-- BLOCKS (REQ_NOWAIT violation)
-> >>        -> Should use GFP_NOWAIT when rq->cmd_flags & REQ_NOWAIT
-> > Same comment as for zloop. Re-read the code and see that loop_queue_rq() calls
-> > loop_queue_work(). That function has a memory allocation that is already marked
-> > with GFP_NOWAIT, and that this function does not directly execute lo_rw_aio() as
-> > that is done from loop_workfn(), in the work item context.
-> > So again, no blocking violation that I can see here.
-> > As far as I can tell, this patch is not needed.
-> >
-> Thanks for pointing that out. Since REQ_NOWAIT is not valid in the
-> workqueue, then REQ_NOWAIT flag needs to be cleared before
-> handing it over to workqueue ? is that the right interpretation?
+sorry, here was some misunderstanding, please ignore this, I will resend v7 patch.
 
-Having it cleared does seem useful as there is no need to skip blocking
-operations.  I don't think it actually is required, just a lot more
-efficient.
-
+Xue He
