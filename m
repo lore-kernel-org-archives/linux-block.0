@@ -1,101 +1,110 @@
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E530D285041
-	for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 07:24:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 849082EC0B2
+	for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 07:30:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763450689; cv=none; b=oPKRTAvSzsygedsS/V+R+li7MVaQlgpVE8aUAB3lhwNdILFyR6aoUr7cE/RxeWdu0BN4xWD7ueWnbfmZEw1Okh33MIaHbW2BHdR12edF5fWy30n0hJgikIiRhIyQ9iXVmt6glPg4N4Vg/4ldfu5imltqbKLNXV9aPU/UWcW4i2M=
+	t=1763451015; cv=none; b=RSCjj47u2qlDaPLwuWJyoUJ1xEO2cy9DU5o0bhqelqxN8Tm6GQV3i/3WkHPD2isElgrs17qSvC+j+mTt+2oLJvMDfXKFhG8mY7YoFJK9Gk6gTf+hNQBxA25oIE3cmGKMQoZ+Mv/fpWKWIuY3TA8SVBU4SroHbsuiEcd7Kyl2tg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763450689; c=relaxed/simple;
-	bh=so5n5cr9aElIonXCbQhZ4BKrvhg/pXX154iuVxvsx9c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=n58spjR5NPEogf2ssgcFbv3IS5e3ZZluhVq7CM8N4T3IiVLYsA0PXod2ymyru3nLrQHPcGg5SksJQA2yFvQfgZjPPYm0THLcg+gFO+ly6iATXCMAk07vEPWSbEj1dIPrbNlyj+PO3p/hlmNiHZ1LAX+4bAouflqoLocJh4utRDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YgAcAJ/X; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1763451015; c=relaxed/simple;
+	bh=xI+KnSUq3dJUITftvI7gVy3dzy9DTDVvFkokev4h/ig=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NIj5B66DPqnY+dUiGnQ/DU6T1xCZhSiEPjT+aw484zo1PGryINzAAJemUk0e2RE3Fd11OJssoYSO3cQ0VlLE6ByrhDXPLtgKthLJMu4Dq5KBjIMQJG6g/0/F0MinQA484sAkE7/kK10/ITRvSdsM5ZhF1upaIlnAtexU4YJSnJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=UfdGSSem; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YgAcAJ/X"
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-3438231df5fso6155675a91.2
-        for <linux-block@vger.kernel.org>; Mon, 17 Nov 2025 23:24:47 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="UfdGSSem"
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-29568d93e87so46319025ad.2
+        for <linux-block@vger.kernel.org>; Mon, 17 Nov 2025 23:30:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763450687; x=1764055487; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lihc2OJI4/BmSBI1PeX/M2RvoYXLNnpsu4dGzRfakuc=;
-        b=YgAcAJ/X6X+tTEh+Hn/lxWnEl+wPH9uQoru7wlrUaxXpaJ5oKfpkHy3/zPf6e177tf
-         y6J43teAQItS2xDReyOoHMinDLdqCpPpZ3VK9O1KngadTlf8vyVyQFNaPZ+GftE51/jD
-         i2Jp6NEmlAxYaaT0cnvfYIjUOneyqHj78J4yvnh0Yu5sDNtxMx4vz4pQJNGmMAyG7JpV
-         5zNduoVov9egdtRzEqnkDjTRyFmduTqmrRuR5E4xEz9fSVcCpq5P6x5V8FVWOGnbOflF
-         z6ErS4RKLZNAJDjjfcwHl8qSBkzx1bmMSSh3MJHVQL1u7vPG9PBDhZ8xnxqEFLgZWPvY
-         3Ayg==
+        d=chromium.org; s=google; t=1763451013; x=1764055813; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=aEgVdiPNMHoJflPqef6CyPpb7lp1/FKP7uAVKsdFjfo=;
+        b=UfdGSSemwYDzX2jMaZhLnQUO6mluvpYmuV7Pf7ho1MDyzdrIOx8N7gZK5CBZkBKifx
+         MJTztBgNeS4lU0+aw3DtCLsAnJOaRVEOLH4Oh11CHsee+Gl19ddX1eybK42pFA0fY6Bc
+         RFDHmF2tAaXcAcQlrpgC9FnheQ4hPGFiOffX0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763450687; x=1764055487;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=lihc2OJI4/BmSBI1PeX/M2RvoYXLNnpsu4dGzRfakuc=;
-        b=p6tlqdfl2WeXwobdhwXjnNILtela4q305Jq6uFK+U1zUbGD+0MmidmxF+MYgf2Nfda
-         5L1Ip+U8JI+j5gli2wBWw8jaM5m2emfnSHQKQTHII87TdvvYRAFbHs81nj97salBUQlK
-         4f3ZOG5mcj57WZwHGNiC/zH5+FFnPlelVpHgC3BQYAbyRS08xl7sXMFaOEXpodxPOvsA
-         KhwUokIlb8AjXo2NqUaZ0uNY+/r81493ewLNTrVwsm5xD7VHR+nNCdLlhUMeUlE83sQN
-         hqzOAbLAIGoo1AFepxOYyyLwPHdZ1/aqnj9y39UeealUTmbLuf1AJWCCBBBYFy4SBRJy
-         LY3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVfboLSGy925+ACs+/SkoVgzPJLemQmjKNlL6SQNNWDH9VlC6c2RiJQjF6rg58JwdnQ4vnHGcMoMA8q7w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQp6w3U8AOurCEM7zooCAIld3Il+anbr3H71PldYdrzBCd4s08
-	yWNapMKOS0cAKtNoDlNlYBgyh5wK9SSGE1VgGnXyXg1XT57PoG3EEsbzvB5kyWyt5TwPL7yP77P
-	/4ATqJKoQIAKjjCynI6ncQ0jM9ZbD6xI=
-X-Gm-Gg: ASbGncsu3JZQ9zZsydhLvOngHcVE6/Uq9SuSVfzT6fGz91Aig9HKFxcYeaPLLVP91ga
-	v+xh+5ShE0ctM7uJpnnC5DX+5qKXAJTeg6ho91WkFiPuk4Vp6XSJcxoF+8tV8A5XSpdpdRaVWO+
-	iqZkwgYCsZ1Z/MZeo0J7MJAxu/lF11highvKsuNJLi4bgzHhxR94XR1HjVmg+SPYXvcd2uDvCZv
-	Y5SKYNKcKHElFTCXlljY+Ju9T290Gu+dwKC8kNBa6lyiAzme5q7aJiiZoWb9ETRh9I+drHeP5WG
-	HAiF
-X-Google-Smtp-Source: AGHT+IH4h2EdLWs3cUze55kfQ/fAbQZwfPYmGKNCQaoANu+WS3EJRo7hThxa1dJd4YaZwjzMOtpkKPQdyuAKIkH67GA=
-X-Received: by 2002:a17:90b:5904:b0:32d:a0f7:fa19 with SMTP id
- 98e67ed59e1d1-343fa52bd87mr19533123a91.17.1763450687151; Mon, 17 Nov 2025
- 23:24:47 -0800 (PST)
+        d=1e100.net; s=20230601; t=1763451013; x=1764055813;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aEgVdiPNMHoJflPqef6CyPpb7lp1/FKP7uAVKsdFjfo=;
+        b=FB1zGioFGCmxxnGhq3fcTZWp+grDjFtvqHXzBzGmiUXeU9OVaB6gMCuv694JYhRwq4
+         bqWIxrrz6w34c3U2pGDgmiezwBzkG/V4iXlMkOsGWRDMWr6tWV4FtGMd8QVwEWI8UK4l
+         RNIEaCghplnY4ZbHp9r1sPjUTciSmSqwa2PckUoOUXy46YL5ACAIeTlvjQZvsmqGTj7N
+         SLd32sMk4N65jNmMaCB0qKEPR0WV1bOW3XdI9JhDgIaJEzo+hehM0+pMoOfHgRzF9RyU
+         zhXQqv6pJW6qZDz1n1Se80kAkPLrFz/lMulEenrekSFE1eg2hZzpoFGfmEq8Ld07KUp7
+         3kcA==
+X-Forwarded-Encrypted: i=1; AJvYcCVwIl7TwUMa7tm8uutLowrcUsXj/GK6od01nX9v9S3yKUwkYSamf6eeTDrtRpbX5J9guvEqP+LHdrHXOg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/grLCw6m3sUsEKdS1WqXyvTDPEy6vOgjkzmfCvayS3ukGTWSI
+	SNyHatO9oowiRgi7DAULL8iG6uGP+iTPezRvlO0kbKTFA33+6ZJFHMUpm1GB3qNOLA==
+X-Gm-Gg: ASbGncvwuNDg8YpPItz3a/xdJt8HYus5ONuXJHXoeRoITRNjRPeBPJyEg77wFvI9GZ3
+	8rXJYwX2iRne5DD4sRcatQ2PWB/5IXzXSqWZAJNA7bO4/wlprLpfMjFdWGooubXEwrEg+dCRXlY
+	5DQdwj7UVdNHa1wylD8gSsaUqMkSirBn89DlNp8N7X6t7XHBOjRSmf+ZIRCeBAyLQGIzXuKGvgZ
+	N60TMmu5k5cr+xh/nyXfLvL0B8In/lbH9zY4FOqPfRSmjzw5p5tXU9XoSBsrXjsly2hMP7tOAfG
+	Xy/dcRBU5LIwdGcqRVjre+2AoJA8dgFTzUyHfZILyc7h7Ylq90xLq+DhMUYqHAA1ZBYzAor6fUQ
+	HPS81zgU9pBq/Ww1uDKMaatPaJDjKl+HClW1a6UMF3WNveVCNmJt6C+pgkCYAyv18ccMHVV0oko
+	tzilL4SDo7icKUcTypJITpMTbbzHU=
+X-Google-Smtp-Source: AGHT+IHvAN5FTpEAwX09VrPesluOzEdDPyr2GSk8K5mW0HnLaxO7WVj+e+6ZUNER2RJm3RrwKyj1IA==
+X-Received: by 2002:a17:902:ecc3:b0:295:7454:34fd with SMTP id d9443c01a7336-2986a73b7d9mr191714615ad.39.1763451012710;
+        Mon, 17 Nov 2025 23:30:12 -0800 (PST)
+Received: from tigerii.tok.corp.google.com ([2401:fa00:8f:203:beba:22fc:d89b:ce14])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2985c2568ccsm163926215ad.50.2025.11.17.23.30.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Nov 2025 23:30:12 -0800 (PST)
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Minchan Kim <minchan@kernel.org>,
+	Yuwen Chen <ywen.chen@foxmail.com>,
+	Richard Chang <richardycc@google.com>,
+	Brian Geffon <bgeffon@google.com>,
+	Fengyu Lian <licayy@outlook.com>,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-block@vger.kernel.org,
+	Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: [PATCHv4 0/6] zram: introduce writeback bio batching
+Date: Tue, 18 Nov 2025 16:29:54 +0900
+Message-ID: <20251118073000.1928107-1-senozhatsky@chromium.org>
+X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251118012539.61711-1-pilgrimtao@gmail.com> <aRwNVAk1dnoJwYSZ@infradead.org>
-In-Reply-To: <aRwNVAk1dnoJwYSZ@infradead.org>
-From: Tao pilgrim <pilgrimtao@gmail.com>
-Date: Tue, 18 Nov 2025 15:24:36 +0800
-X-Gm-Features: AWmQ_bn81VoueHJPRDWkYRYfkrx_vkJ5_Aau5OnNUhFEG8hv6new05NLSyUz_9A
-Message-ID: <CAAWJmAZi=CA3sysb5N8rLL3qUVWz1tmHSpPtFuYPmEb0F+_UOA@mail.gmail.com>
-Subject: Re: [PATCH v2] block/mq-deadline: Remove redundant hctx pointer
- dereferencing operation
-To: Christoph Hellwig <hch@infradead.org>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Chengkaitao <chengkaitao@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Nov 18, 2025 at 2:08=E2=80=AFPM Christoph Hellwig <hch@infradead.or=
-g> wrote:
->
-> On Tue, Nov 18, 2025 at 09:25:39AM +0800, chengkaitao wrote:
-> > From: Chengkaitao <chengkaitao@kylinos.cn>
-> >
-> > The value of 'hctx->queue' is already stored in '*q' within
-> > dd_insert_requests, we can directly reuse the result instead of
-> > dereferencing hctx again in the dd_insert_request function. This
-> > patch removes the redundant operation and modifies the function's
-> > parameters accordingly. We can eliminate an LDR instruction.
->
-> But you pass additional parameters on the stack.  Aka you're causing
-> churn here with bogus arguments.
+This is a rework of Yuwen's patch [1] that adds writeback bio
+batching support to zram, which can improve throughput of
+writeback operation.
 
-This patch replaces "struct blk_mq_hw_ctx *hctx" with "struct request_queue=
- *q"
-without introducing additional parameters. The total number of parameters f=
-or
-the dd_insert_request function remains unchanged.
+[1] https://lore.kernel.org/linux-block/tencent_0FBBFC8AE0B97BC63B5D47CE1FF2BABFDA09@qq.com/
 
---=20
-Yours,
-Chengkaitao
+v3 -> v4:
+- fixed bdev block id leak (Yuwen)
+- fixed missing pps index assignment (Yuwen)
+- fixed preliminary wb IO completion slot release
+- we now use bit 0 for writeback as well
+- access bdev read slot block id under slot lock
+- some other cleanups
+
+Sergey Senozhatsky (5):
+  zram: add writeback batch size device attr
+  zram: take write lock in wb limit store handlers
+  zram: drop wb_limit_lock
+  zram: rework bdev block allocation
+  zram: read slot block idx under slot lock
+
+Yuwen Chen (1):
+  zram: introduce writeback bio batching support
+
+ drivers/block/zram/zram_drv.c | 452 ++++++++++++++++++++++++++--------
+ drivers/block/zram/zram_drv.h |   2 +-
+ 2 files changed, 348 insertions(+), 106 deletions(-)
+
+--
+2.52.0.rc1.455.g30608eb744-goog
+
