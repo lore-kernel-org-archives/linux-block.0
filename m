@@ -1,300 +1,227 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8F922F99B3
-	for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 07:10:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763449828; cv=none; b=ArHuU7V7ENSMFQ3cqOkeJOSEKjdjAwOktDa7CPbP+TqKM+tQKjHOpwHLNT7cVtk2se6k6s8W35i66NRlxLDF6qiBqrgV4J59riyNqIaVEJoUzMQWtRZFilsj+HHasv8QWrRTJTATV9QjxAu2V53x6LLk+swfujn8jsNzOVx5sxE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763449828; c=relaxed/simple;
-	bh=5O9J6kb476wy6tFSq9knVGHMfsEvnpv6aOLBIYkoiNM=;
-	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To; b=u4txRh9iHQ+MvU7YVUYleAOSTmH/Fa4hIY+p1RxVmAHwD87vpLp+oQ1H6sKqj7tnzo4rR650OJeoitP1SA3UGUICEJ/5Ughqoj9/eE/FUEbcth81QqvMNnxuTmTMG0oW1DQpmsDz1qYaXhBuDRWMzBz05pQLyj5IM0+OIs3OFL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VcRsPcoD; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F02062ECE9E;
+	Tue, 18 Nov 2025 07:11:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763449871; cv=fail; b=dOyyHnByN/IQmRgPXvjG0oRLcUjKvQDADFNupftJG2FdPi6LZRzIIVBLfgz4r8cqVnZmB8z71gzN7P7ysK2kTVsJeaA35OzmlLeYclxXZZBO8tXNY8ewf40yTMzOSi56fpnBItijFhtuRwPMe+RknZLZ9lVym+ZCJj+DjT6JEUA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763449871; c=relaxed/simple;
+	bh=Ac5FAQw0UUZSR0+QhqXokMpCYxXJnXxzLeafKx08K9E=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=tUirvnsJFDLGA8N1ebR/itWFHoRErHaXfkQxdXbjPAF6XHyLZhIvrmgLdA+sbg/soEnfPOF+yhkmRjYzj+pAeNttJNJeYCrARxEGK1xwHIt7f/OTVmVvt6fQYfbKowfxlE8mjgSLFBj41gDBg6I3TQHplTnwk2FstDZOqbwxJPI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=byT2o3Ph; arc=fail smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VcRsPcoD"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-29844c68068so52181785ad.2
-        for <linux-block@vger.kernel.org>; Mon, 17 Nov 2025 23:10:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763449826; x=1764054626; darn=vger.kernel.org;
-        h=in-reply-to:from:content-language:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7RrKPP6z7wU/aXqA253p15IW0r2BB9sLLeqZrFgeML4=;
-        b=VcRsPcoD0cA5EI2lFE0q92N+IqCwC7nHLnEenZwhWYk4eZXASJtW+jPDDhWAXsFdBj
-         mm9IgRKw/q2FF7dd0i6u12SsMGxND6wsljeiJgDMW81XpNiqMyWBzFmHgvqRZOWb7X+h
-         jiDwK3O6jErknoMipzYvgw67LZdUe48H3PADCeQO+tywe4GslezaIJ9bDg+oZsPqbuF/
-         eJkEeRuSZelxK0wtLXv/2z6T0WkhlwLovlntbPlfuKbJIdqmi0XVjfTw7uM8Q+5cnU47
-         ozyFrABS2dkV3l99p5bgFqpKzlGm3jymlpt6jj9tAxKQjbTbFoflI44xxyYfwvrd6gtD
-         xPzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763449826; x=1764054626;
-        h=in-reply-to:from:content-language:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7RrKPP6z7wU/aXqA253p15IW0r2BB9sLLeqZrFgeML4=;
-        b=W6dpPnVwpDs4X7v4ILa4phb9i8HgSCEbxHViStVRf/1UApz4xnrT4tLht6UtZbsW8J
-         7tKPr/f8uR8SHNxBFzyWeXMKbvX4DkwD8s2I4pJmmAazdX+xhAC3ezdDqYVbETZzG6Gn
-         hLDXI6lWy4Mg+MJCVvFNBJ/DiaQUGOKilMGyriHpon59P4dokE6xK08+yYzysfsd7ImV
-         3mktM3kYKYk3/7hImGxfmGUkeSSoR48H6dEH6x7GixrkWpsodUMfaUNOe4pABJ/OWsu3
-         2aGw8PPP+X2L1yLtlbHSKMnrixBU9/hLpkJwL4n3+4/r2955PDdt5zAIWuflOWXDoST8
-         K6ow==
-X-Gm-Message-State: AOJu0YyKyct3sdpoBVu+HOPktenske03PtebPKednoYNPa3m1Hf032Ax
-	LSzWPXvOSftA9fLXKN3UlaVKy8J6EXASHFKQC318/crrbPv7oL1PPpKg
-X-Gm-Gg: ASbGncu/TyFsM1SXigM9FVdjzcYyUrmiwk473vBJVV/xVNZn/H7yKSaAndJ//aZBK4v
-	qBcvjc+CuwYwwaz3aqS0TEidBwA1WuFZncl/jp4LrWM9oo3J8+NNSEgR7ZTmp+hIIKhKpz/qU1Y
-	xiHVVa0LAm5QNWFWNsGwy26fSANqVGhVVZzEXjh7EZ1C7hbfsxHAiYaqHgTcEZjggG490EZUPsU
-	5x8/sOq+L85VCIQ+8UHmntPVVNEGJlyNQBpWYKc5vkm1Q8Cl2nZh9hUJ4KOfgOlB/5CU3GfyYIn
-	YFDV5xm6+huMRDymkBeoUACatgtVYnBLEW3+q6sAnR9LavLK+mZ8XJVHoWSIvwS5t8qw1GsbK3H
-	GB04qmsgRsw2aGYn8fgXLsC1KwCzSdO2hsAKnOlJ9YByBEDhwsxCRc926tQBVuhJM+EGISugEu6
-	ocDUNEREKx/QOgO+YLBdHMnHfxQi8S84UShho4WfaqJaFtwMaVWlY6KsI=
-X-Google-Smtp-Source: AGHT+IHUGeyz8PbVxowr8o/Q+NUhJTHJfWkN1HhW18AL2Jd5L8B99Kv+Dj50R9G61zWEcO/nOBHX3g==
-X-Received: by 2002:a17:902:ef45:b0:295:3a79:e7e5 with SMTP id d9443c01a7336-2986a73bab2mr172368915ad.34.1763449825953;
-        Mon, 17 Nov 2025 23:10:25 -0800 (PST)
-Received: from [10.189.138.37] ([43.224.245.241])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-299daf12fe9sm68927625ad.74.2025.11.17.23.10.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Nov 2025 23:10:25 -0800 (PST)
-Content-Type: multipart/mixed; boundary="------------IGfTg4SY1Onlb2vFZARdg2gO"
-Message-ID: <93a1773e-e30a-469d-bc8f-029773112401@gmail.com>
-Date: Tue, 18 Nov 2025 15:10:20 +0800
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="byT2o3Ph"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763449870; x=1794985870;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=Ac5FAQw0UUZSR0+QhqXokMpCYxXJnXxzLeafKx08K9E=;
+  b=byT2o3PhD2lLax+uIQImtdj1OV2I9ghDIXL1jCWNAVwyXHUZ7qxoQCAx
+   yBwa1cASLSdRynmysG37UyAeaerEL0qIqK0fwYU5Jv1wHWYXYPmxDlmWe
+   BVFF0bmrNx2u78bWs+noLJojrJhjPBSoeVSZE2THKyIZzjGED9jwYbhob
+   8qo56hpYmGFUQByi+cpOnTmC2JRgc6TvdYuyBm7vTfxIXAi+GZQzifR5u
+   pFTCSZCl8uSb9AkBXOanPaV+MV/+5KvSGIHKsCIKFtaBkuGhI1NKGPiTN
+   S+7L6g1Y22FWrFlHsaaQaVUpB7lKwQrySgdCLC8/Cl2U2hvZe5q5HYY+o
+   A==;
+X-CSE-ConnectionGUID: n5Wf+ACzSnm7x0VbP159wg==
+X-CSE-MsgGUID: sgnJV5+5SnK0NTovAx+gRw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11616"; a="88113968"
+X-IronPort-AV: E=Sophos;i="6.19,314,1754982000"; 
+   d="scan'208";a="88113968"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2025 23:11:08 -0800
+X-CSE-ConnectionGUID: JHLj8fDFRyO2yg1jyTN9qg==
+X-CSE-MsgGUID: ATJYK7cWTg6Vx/XnTyGflQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,314,1754982000"; 
+   d="scan'208";a="189942573"
+Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
+  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2025 23:11:07 -0800
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Mon, 17 Nov 2025 23:11:06 -0800
+Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Mon, 17 Nov 2025 23:11:06 -0800
+Received: from CH4PR04CU002.outbound.protection.outlook.com (40.107.201.67) by
+ edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Mon, 17 Nov 2025 23:11:06 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=CIICT8rFi4hrybfQrUc2McrsgL0Ngju3k5vL2rHmYeFk6AEZJu+hdWjbkRtOKFgERTGRcs+1wEbrHQtHFSCSk19Gp+S60TaXjPsGZnq31NaTlrmRHpfHce44quiAxXLS2V+kaUWJeJr+L5jDEHtpVuic+t50bc02bg+E0SV00AJz1w2L+/u9mvdnUZLtx+n7DLXzc2vrLaJm3bE+WUXbnvJo53Kn3EvVBq69SNkxdvfpU/O5CqUt7lJa8xOV/0LaQrRU0iV0+m2K5flr4UqLV/iJ+vWWm9CWLsANdszNDxQde1fFUrVdcGMIxpRbduEjzmSGYac5KRutaSY514kaxA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Ac5FAQw0UUZSR0+QhqXokMpCYxXJnXxzLeafKx08K9E=;
+ b=Cpc/lLCVz50BSTL6JJZ4IUQE0sbG/8AoXIBXoA3ccfgkTI9figwmX7fvtRu92XFAKq/aFhX0U3WWCRkBXGSnJrv70Yi2l3ZIClm2O58vjs1O9BoImmX96jaZvgUNpb45GKiwSFCRyouzSYwWl3dOdN4fLwsFP8dnuEpvrS+6PKADOCzQUUskONNoTKNILGV0JJpj8ks7SYsC97ULNqLHH5/806TZnmANv+eSYRhlkFjDSglCdQ1XLQmmfiOd0eR3YH0xzrA8JLeDP3Zel82g9Hmj3dkJVRiQ2XadNVJiMoJ6rfrKGkGFInuG1AyW7PQec0l5RhosEBlp7pxhIwFXwg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by CO1PR11MB4980.namprd11.prod.outlook.com (2603:10b6:303:98::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.17; Tue, 18 Nov
+ 2025 07:10:59 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::b576:d3bd:c8e0:4bc1]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::b576:d3bd:c8e0:4bc1%5]) with mapi id 15.20.9343.009; Tue, 18 Nov 2025
+ 07:10:58 +0000
+From: "Tian, Kevin" <kevin.tian@intel.com>
+To: Leon Romanovsky <leon@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>, Jens Axboe <axboe@kernel.dk>, "Robin
+ Murphy" <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>, Will Deacon
+	<will@kernel.org>, Marek Szyprowski <m.szyprowski@samsung.com>, "Jason
+ Gunthorpe" <jgg@ziepe.ca>, Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>, Sumit Semwal <sumit.semwal@linaro.org>,
+	=?utf-8?B?Q2hyaXN0aWFuIEvDtm5pZw==?= <christian.koenig@amd.com>, Kees Cook
+	<kees@kernel.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>, "Ankit
+ Agrawal" <ankita@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>, "Shameer
+ Kolothum" <skolothumtho@nvidia.com>, Alex Williamson <alex@shazbot.org>
+CC: Krishnakant Jaju <kjaju@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
+	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>, "linux-mm@kvack.org"
+	<linux-mm@kvack.org>, "linux-doc@vger.kernel.org"
+	<linux-doc@vger.kernel.org>, "linux-media@vger.kernel.org"
+	<linux-media@vger.kernel.org>, "dri-devel@lists.freedesktop.org"
+	<dri-devel@lists.freedesktop.org>, "linaro-mm-sig@lists.linaro.org"
+	<linaro-mm-sig@lists.linaro.org>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "linux-hardening@vger.kernel.org"
+	<linux-hardening@vger.kernel.org>, "Kasireddy, Vivek"
+	<vivek.kasireddy@intel.com>, Alex Mastro <amastro@fb.com>, Nicolin Chen
+	<nicolinc@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>
+Subject: RE: [PATCH v8 07/11] vfio: Export vfio device get and put
+ registration helpers
+Thread-Topic: [PATCH v8 07/11] vfio: Export vfio device get and put
+ registration helpers
+Thread-Index: AQHcUvHChFxcVdm3dUei4Y3GBAL1Y7T4Dttw
+Date: Tue, 18 Nov 2025 07:10:58 +0000
+Message-ID: <BN9PR11MB52764795D6B6405785A2C5228CD6A@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20251111-dmabuf-vfio-v8-0-fd9aa5df478f@nvidia.com>
+ <20251111-dmabuf-vfio-v8-7-fd9aa5df478f@nvidia.com>
+In-Reply-To: <20251111-dmabuf-vfio-v8-7-fd9aa5df478f@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|CO1PR11MB4980:EE_
+x-ms-office365-filtering-correlation-id: 81d4fa21-5ddb-4175-fa34-08de26719f92
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|7416014|366016|1800799024|376014|38070700021|921020;
+x-microsoft-antispam-message-info: =?utf-8?B?Nk13aDBzamRCenp5TDNxbFpTSEZZN2NrNFY5ekZXNWNreHZ3Wkd1b2lQVGF3?=
+ =?utf-8?B?QmU5T3JiZVFnNEk4TEJKVDdlN0pKVmp6TkxMbkJPOEZSSEJac3ZOdTUwaFNT?=
+ =?utf-8?B?TnplbDBwMU8vWm5wZFFveWc4K1cyV2QzREovWGJlQXljZ05nNVRJOUhWZzVy?=
+ =?utf-8?B?RFd6QWM5R0pDZk51VjdPN2RGTWJZYXgyY0xPMnRrVXJhWW9FYm5DQkRaM0xY?=
+ =?utf-8?B?M01PWHBtcDVuc0NWUUNqWHRSTGZBdXhVRUpGT1dIZEtHUVgwL3hxM2hWWFVh?=
+ =?utf-8?B?dkhTOWpjRzdRVG1mOVk5YXpkMEFtM2paZjlEVmc0bEdyNnFMN2IyWmZUcmUv?=
+ =?utf-8?B?M2J5TG9FTFFTNTQ2YWhrUUR2MzZ0bFVkeXhCMm9PZkZ6ZTNCTE02aENMWXU4?=
+ =?utf-8?B?WVJkaXZQc3ZPZ29QdlRvWkRRRDNOOHpPaWF4Nm8zc1VzaGs1dm5VWlJ4YlhW?=
+ =?utf-8?B?ZFhOTitPZ29RdURvTWhzVWFvemc1SEhHd2lXZFVRZE5xaUdicWdQRmRyK2NL?=
+ =?utf-8?B?RHhSOURPa3BQa2dMVUk0YTNrTFF1TkhJMHhBVzlTN1N2ZlpmYzRBNjBzNExL?=
+ =?utf-8?B?UFlFbHdzbXR4NGhkWGZ2YkpMRjF1MUpBVlNFcnZCSU5TcjZGRUZEWG9jWXV0?=
+ =?utf-8?B?UXFqLzZlMjFjL3VTMEZoM3JIWkZzMFF4M3lrVm5ONWJadjFObHFjcVVlOFlj?=
+ =?utf-8?B?cDlBa0t6aFBFMjE5cWdEMExmV0RPYm9JMWxUUDdnUkRQZS9EZlg0K0VYWnFo?=
+ =?utf-8?B?MmpnL1RiVDhNVWR3eWFCb2lJVDI2ekl5ajBhb0J1NlA1SmpncHZCejhEUHp6?=
+ =?utf-8?B?YjFEK0dLSkMwVmRoY0lmZG9wYUZ0Wmx1amJNTHhrZDh5VG5udUkrcGNIZ1p2?=
+ =?utf-8?B?RHErZ1VNcUpXamZUa0NXWDZia0M5eEJ6enB6cklZd2JDQjFkbW5Na0tjVG5L?=
+ =?utf-8?B?QzRCK2NJbGhmOWpDYm80S0hoNXo0YVd4cmI0eHM4ZHFFN1NmNmZJTjZrZXBS?=
+ =?utf-8?B?VklmU0doUzQ2Y0tIemp4QlBxUk02RTdJMGE0d29wVmhrSzdDUUtGTHpGdHQ2?=
+ =?utf-8?B?QnRma2J1bUVmVlpZRzl6RElKaHpMc1AvK0wySkdKclM0akVlUTB5Y21nb1N3?=
+ =?utf-8?B?RHlHOG9lRWNDUGZieC9xYUx2aTFVbXY2Tms0MDA3RUZMOGNKNGlqME0yUUxM?=
+ =?utf-8?B?L3lsRjQxbzhXeiszdStkZWxMeVhmdFR3dzdDRGhZM1hUYXlIbHQrdkZFbEhH?=
+ =?utf-8?B?RjNOVk5hZEg2ODB5YnF4dHEzUllMT3EvcXFkM1Z5OGkzd2lONG15MUY2bEtx?=
+ =?utf-8?B?R2w4dVdyRHZDZHNNNXFadWlTWVhFTnNia255dHYyenNGbjkreCt0cG1GY3N3?=
+ =?utf-8?B?cDYwNXRzamtqcmRJdGF4VFluWm1SMHR3dHc5UkQ0NTRSOXFZam05MWhDeDJC?=
+ =?utf-8?B?ckFVRmh0TFJiZWZpamgwWTZhWHpmUnpuekJlbHFSR3NsVjRycFZuQXpMMVBz?=
+ =?utf-8?B?cTljRnd4ODhhaWVVVkpUVzFEYThCQlBwcVBJekllNVFEVS9IcUlVWWt2MDI3?=
+ =?utf-8?B?anVRcXhsZW5xSHdNUGhQT0RlVnA1MGRzREdxVjJTblk0eG1qTXZHMUI0T1Jh?=
+ =?utf-8?B?WGVwVTA4WDUvajZxNFR5Wk5DNnFYcVgxemFlYjVyMjlQRk1lSmNDWWMxYzRT?=
+ =?utf-8?B?SU9pdnBXcFY5cU1rdUlOOVdrY0FNSUZYR1BQaDFWSy9SKzVCUStKc1JTMGUx?=
+ =?utf-8?B?SDNocWhDSHNiMytmVjh3TURlSlAyenJzZXYrSzJmbEdkS1VrTnZxN05nZTBJ?=
+ =?utf-8?B?cWRTYVF4aDBkRXJ4WVhSWFptSjZ6M2pFNFU2bVk1OHk5Ync1V0dUKzFvWDJt?=
+ =?utf-8?B?UWpGVTJOWFIyYVU4UEQ3RDNaNlJSeXBWNDNSK284MksxRGEwSlF6Zlk5T25K?=
+ =?utf-8?B?UExibFRYaWlsUHBYWlBncGtTcnFhMFloWXpIL0UvSzZKalM3d0NubURvdmY2?=
+ =?utf-8?B?cnovS281V2svdC9yUW9aTThHYWZCVWxGMHFOUzFDbXE1Nnp0NU5DNXlPZ05U?=
+ =?utf-8?B?TXdBU0F5ZnVlcGRKT0ZBYlJnZkJLTEVsMUtBZz09?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(1800799024)(376014)(38070700021)(921020);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?cXZpcE9oeTEzTjQxSlgwNHdQY3FQQU5ZMW0yRy9nUEt5WTBVeWZWbC83Wnp0?=
+ =?utf-8?B?bzZ4ZnVRRVM2VWpGMzhXakJDTzBwNmFrZVhmZjR1UDNxa25HUGlYZHNqTWtN?=
+ =?utf-8?B?MXd1NjNoTkdKTFY0Qm5kRU9zaCt5aTBDN0VOQ3lGeEtRbGI1d2VWVjgreWlR?=
+ =?utf-8?B?QUhUVGdwM2hCdlpOYXoyeXlVVTZuUHI3NS9GQ203cU9kbm5tcUpXcXBjL1Vp?=
+ =?utf-8?B?N2lvQ3RORUVPbVFUcHFzeW4rclJZdVVmbVRZL1VhOGtDcklTcEdNQWdtQzQv?=
+ =?utf-8?B?NmgzWmM4WTd4aEhMMmpJazM4cVR2VjdIUGZYend0WTFybzRpQk9vbEhPWWVN?=
+ =?utf-8?B?VE40ZVllZFFBbUt0U0dyT0YyV1o5bVBvTDNKaHFRajFiVno2WGFPVXZkdk9C?=
+ =?utf-8?B?MXZzQ1BSc1RIaHFRU0VhUG1mSEYxbW14SjVQYUtzeEhtWW8zdUFwL2xqajZv?=
+ =?utf-8?B?bW45cG81dlVhMi9HZkd3cCtRMFk1QnpMK2dQeEo3Ky8yOVVlc0lQTlJuUGda?=
+ =?utf-8?B?VUJVS0RBMllwMkY1NjBXa0xQNWQ2c2g2eGFCS3ZDN1FSbHNQWXd0YlU5cEdK?=
+ =?utf-8?B?NE9NNVF5Q0RSSElkbFBkaEtVdVF3ZjJPNnV6T2F2eEQra0l4LzRoTDNIT3l6?=
+ =?utf-8?B?S1B2OW9HMS8wbVQ3clVHdDY2VEFwUlBxK0RMWTFGbXJnRkdWdUlZbkhOZ2lE?=
+ =?utf-8?B?VTZFbjhjbTBtdVVMdExEdWFRSHV5UHNZWnkwMDQwbTVRam9QdDdRSG84eUQv?=
+ =?utf-8?B?R1FySmNBQTMvUGd0aTN1ZnYrNG8vOHp1SWp0VlNyaktyVlBQa0tkdFdScXJ0?=
+ =?utf-8?B?M1gvN2tUcm1ubEZ0VEpWZWpmVitvdWw4UU5VTTJnb1V6dllILzgvR1pIY0Vy?=
+ =?utf-8?B?QWhid3Q1N1ZnZmpqQUJ3UDNodTZ5bWgzdmtnWUFIeVI0dXVvUG5aNUdEWjNW?=
+ =?utf-8?B?MlJLbWJnUEJ4bk9tVVZLUXJOVU0vcE11em9BVWVvTENEcW5OUFNpN2RCS25y?=
+ =?utf-8?B?aXdKR210RG5ITG9PZ2w0UXN2dnlOOGFWRkw1Z2M2c2taaEMxb04rOGYwL0Fj?=
+ =?utf-8?B?d1A2RDhSOEw1MnFaOVBaZE05MVdMb24wcWZNakRGeTZhRGlWNG9Tb0kzNUwx?=
+ =?utf-8?B?UG5nVU9IL1BsZmM5Ym1PbzJFMEpzNWpzeUVITW4vbHNvVWY1L2dMYndMT0xO?=
+ =?utf-8?B?ZjdQKzZmeHdqQlJKcWs5dU45TWpOZHpEeXI2RHBFL1c4Uk5TZm51dFJNQ1Bz?=
+ =?utf-8?B?VTNQZDBJbjV2UnNvakxaVVMzMGhnSEcxakJLMmUxRUkxV3dJbk5vb0N2dHUy?=
+ =?utf-8?B?eGtGc0ZiMUxIK1NLRW0rZnpVejVlUE1aMjRzVVM5UUx3WFBhSEtXZ3c3dHUw?=
+ =?utf-8?B?THhsQzZ3UUxSNWJhekVTdzN3bmZlQ2dXcnpsRmp6SlhQNWxES3BGdlBkUzdr?=
+ =?utf-8?B?Q2p6ZElPbDI0akYydWZJdEpISHZmakpNZ3lYZ3hDdWdwRkYxZHRJcmw5R1Jk?=
+ =?utf-8?B?RDNzbjFVMUt3QUJraTkrQWRYeDB6NmI4dEdzV2o0VnpHSXpTR0NodFc0Ujho?=
+ =?utf-8?B?YUZheGxEZTdWTUhPKzNEV04zYjhrM0JHdUpIUnBJNjhlRDB3UDg4RSthb2JP?=
+ =?utf-8?B?c1dDQjBqNy9QVmNaVkdKeUxMYmp5blVYNWNMemlXYmcxeWc0WlNqVGdsYVg5?=
+ =?utf-8?B?YjlSd3R4RnNRYVdhVi9LaGxpZGZKU21KdnNJRFA2UVI3QVFPWVR2K1NIS3lJ?=
+ =?utf-8?B?NEpzOW5NRkZwSm52eFZSUXJWMHRFMFFCeWhpKzUzT0tmekdvSHBPdkY0STVD?=
+ =?utf-8?B?OXdkRTBHc1c2a09rQjNyd3FpMUJRVWl6aFlZcWk0N2x4MDduUENCbjNBUDN2?=
+ =?utf-8?B?cExlT016Wm03YkN3U3kxVkZ2Smk0aXZNY3VZRmsrY2lQa2dFUjBmVFJ5NXUy?=
+ =?utf-8?B?b1FZd0xxWVNVdTdudURaK1FieTA4MEp4VTF0RDNiVE1FWWhRSXY5akw5Z0dv?=
+ =?utf-8?B?U1BHQlk3QlFHN3RQcUlEaFFmcXFJVGJ0b0xCRDZ3TGJCOG1UanVWOFVkMmNm?=
+ =?utf-8?B?MHNrRFJOZlo5R2hHM052V1E4aExGT01oU0YwNG9lOHd5NDZjU2VnR05jWHRt?=
+ =?utf-8?Q?yy8JRwwA20VFhlqHLNjvfbYMw?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] loop: don't change loop device under exclusive opener in
- loop_set_status
-To: Raphael Pinsonneault-Thibeault <rpthibeault@gmail.com>, axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, jack@suse.cz,
- cascardo@igalia.com, linux-kernel-mentees@lists.linux.dev,
- skhan@linuxfoundation.org,
- syzbot+3ee481e21fd75e14c397@syzkaller.appspotmail.com,
- Yongpeng Yang <yangyongpeng@xiaomi.com>
-References: <20251114144204.2402336-2-rpthibeault@gmail.com>
-Content-Language: en-US
-From: Yongpeng Yang <yangyongpeng.storage@gmail.com>
-In-Reply-To: <20251114144204.2402336-2-rpthibeault@gmail.com>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 81d4fa21-5ddb-4175-fa34-08de26719f92
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Nov 2025 07:10:58.3170
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: BrWwLupX4PhjxI0esTDIAxUvxtCvwE7yW9IPml9Kt5g8VyXnzlPVjy13mt+IyrEdoLRW2bAPM6vWng+lG3hKrw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB4980
+X-OriginatorOrg: intel.com
 
-This is a multi-part message in MIME format.
---------------IGfTg4SY1Onlb2vFZARdg2gO
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-
-On 11/14/25 22:42, Raphael Pinsonneault-Thibeault wrote:
-> loop_set_status() is allowed to change the loop device while there
-> are other openers of the device, even exclusive ones.
-> 
-> In this case, it causes a KASAN: slab-out-of-bounds Read in
-> ext4_search_dir(), since when looking for an entry in an inlined
-> directory, e_value_offs is changed underneath the filesystem by
-> loop_set_status().
-> 
-> Fix the problem by forbidding loop_set_status() from modifying the loop
-> device while there are exclusive openers of the device. This is similar
-> to the fix in loop_configure() by commit 33ec3e53e7b1 ("loop: Don't
-> change loop device under exclusive opener") alongside commit ecbe6bc0003b
-> ("block: use bd_prepare_to_claim directly in the loop driver").
-> 
-> Reported-by: syzbot+3ee481e21fd75e14c397@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=3ee481e21fd75e14c397
-> Tested-by: syzbot+3ee481e21fd75e14c397@syzkaller.appspotmail.com
-> Signed-off-by: Raphael Pinsonneault-Thibeault <rpthibeault@gmail.com>
-> ---
-> ML thread for previous, misguided patch idea:
-> https://lore.kernel.org/all/20251112185712.2031993-2-rpthibeault@gmail.com/t/
-> 
->   drivers/block/loop.c | 41 ++++++++++++++++++++++++++++++-----------
->   1 file changed, 30 insertions(+), 11 deletions(-)
-> 
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index 053a086d547e..756ee682e767 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -1222,13 +1222,24 @@ static int loop_clr_fd(struct loop_device *lo)
->   }
->   
->   static int
-> -loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
-> +loop_set_status(struct loop_device *lo, blk_mode_t mode,
-> +		struct block_device *bdev, const struct loop_info64 *info)
->   {
->   	int err;
->   	bool partscan = false;
->   	bool size_changed = false;
->   	unsigned int memflags;
->   
-> +	/*
-> +	 * If we don't hold exclusive handle for the device, upgrade to it
-> +	 * here to avoid changing device under exclusive owner.
-> +	 */
-> +	if (!(mode & BLK_OPEN_EXCL)) {
-> +		err = bd_prepare_to_claim(bdev, loop_set_status, NULL);
-> +		if (err)
-> +			goto out_reread_partitions;
-> +	}
-> +
-
-+	if (mode & BLK_OPEN_EXCL) {
-+               struct block_device *whole = bdev_whole(bdev);
-+
-+               BUG_ON(whole->bd_claiming == NULL);
-+       }
-
-I add the above code and do the following test:
-# losetup -f data.1g
-# echo "0 `blockdev --getsz /dev/loop0` linear /dev/loop0 0" | dmsetup
-create my-linear
-# ./ioctl-test /dev/mapper/my-linear // trigger BUG_ON, ioctl-test.c is
-in attachment.
-
-The root causes of BUG_ON:
-1. When creating 'my-linear' device, the mode for opening /dev/loop0
-does not include the BLK_OPEN_EXCL flag.
-table_load
-  - dm_table_create // get_mode() never assign BLK_OPEN_EXCL to {struct
-dm_table *t}->mode
-  - populate_table
-   - dm_table_add_target
-    - linear_ctr
-     - dm_get_device // mode = {struct dm_table *t}->mode, never open
-loop0 with BLK_OPEN_EXCL mode.
-
-2. When 'my-linear' device is opened with the O_EXCL flag, and an ioctl
-is issued to it. The dm_blk_ioctl function calls bdev->bd_disk->fops-
-> ioctl(bdev, mode, cmd, arg), which passes the mode with BLK_OPEN_EXCL
-flag to lo_ioctl.
-
-3. loop0 was not opened by dm_get_device() in BLK_OPEN_EXCL mode. As a
-result, whole->bd_claiming is NULL.
-
-Thus, the BLK_OPEN_EXCL flag in the mode passed to lo_ioctl doesn't
-guarantee the loop device was opened with BLK_OPEN_EXCL.
-
-How about use per-device rw_semaphore instead of 'bd_prepare_to_claim/
-bd_abort_claiming'?
-
-Yongpeng,
-
->   	err = mutex_lock_killable(&lo->lo_mutex);
->   	if (err)
->   		return err;
-> @@ -1270,6 +1281,9 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
->   	}
->   out_unlock:
->   	mutex_unlock(&lo->lo_mutex);
-> +	if (!(mode & BLK_OPEN_EXCL))
-> +		bd_abort_claiming(bdev, loop_set_status);
-> +out_reread_partitions:
->   	if (partscan)
->   		loop_reread_partitions(lo);
->   
-> @@ -1349,7 +1363,9 @@ loop_info64_to_old(const struct loop_info64 *info64, struct loop_info *info)
->   }
->   
->   static int
-> -loop_set_status_old(struct loop_device *lo, const struct loop_info __user *arg)
-> +loop_set_status_old(struct loop_device *lo, blk_mode_t mode,
-> +		    struct block_device *bdev,
-> +		    const struct loop_info __user *arg)
->   {
->   	struct loop_info info;
->   	struct loop_info64 info64;
-> @@ -1357,17 +1373,19 @@ loop_set_status_old(struct loop_device *lo, const struct loop_info __user *arg)
->   	if (copy_from_user(&info, arg, sizeof (struct loop_info)))
->   		return -EFAULT;
->   	loop_info64_from_old(&info, &info64);
-> -	return loop_set_status(lo, &info64);
-> +	return loop_set_status(lo, mode, bdev, &info64);
->   }
->   
->   static int
-> -loop_set_status64(struct loop_device *lo, const struct loop_info64 __user *arg)
-> +loop_set_status64(struct loop_device *lo, blk_mode_t mode,
-> +		  struct block_device *bdev,
-> +		  const struct loop_info64 __user *arg)
->   {
->   	struct loop_info64 info64;
->   
->   	if (copy_from_user(&info64, arg, sizeof (struct loop_info64)))
->   		return -EFAULT;
-> -	return loop_set_status(lo, &info64);
-> +	return loop_set_status(lo, mode, bdev, &info64);
->   }
->   
->   static int
-> @@ -1546,14 +1564,14 @@ static int lo_ioctl(struct block_device *bdev, blk_mode_t mode,
->   	case LOOP_SET_STATUS:
->   		err = -EPERM;
->   		if ((mode & BLK_OPEN_WRITE) || capable(CAP_SYS_ADMIN))
-> -			err = loop_set_status_old(lo, argp);
-> +			err = loop_set_status_old(lo, mode, bdev, argp);
->   		break;
->   	case LOOP_GET_STATUS:
->   		return loop_get_status_old(lo, argp);
->   	case LOOP_SET_STATUS64:
->   		err = -EPERM;
->   		if ((mode & BLK_OPEN_WRITE) || capable(CAP_SYS_ADMIN))
-> -			err = loop_set_status64(lo, argp);
-> +			err = loop_set_status64(lo, mode, bdev, argp);
->   		break;
->   	case LOOP_GET_STATUS64:
->   		return loop_get_status64(lo, argp);
-> @@ -1647,8 +1665,9 @@ loop_info64_to_compat(const struct loop_info64 *info64,
->   }
->   
->   static int
-> -loop_set_status_compat(struct loop_device *lo,
-> -		       const struct compat_loop_info __user *arg)
-> +loop_set_status_compat(struct loop_device *lo, blk_mode_t mode,
-> +		    struct block_device *bdev,
-> +		    const struct compat_loop_info __user *arg)
->   {
->   	struct loop_info64 info64;
->   	int ret;
-> @@ -1656,7 +1675,7 @@ loop_set_status_compat(struct loop_device *lo,
->   	ret = loop_info64_from_compat(arg, &info64);
->   	if (ret < 0)
->   		return ret;
-> -	return loop_set_status(lo, &info64);
-> +	return loop_set_status(lo, mode, bdev, &info64);
->   }
->   
->   static int
-> @@ -1682,7 +1701,7 @@ static int lo_compat_ioctl(struct block_device *bdev, blk_mode_t mode,
->   
->   	switch(cmd) {
->   	case LOOP_SET_STATUS:
-> -		err = loop_set_status_compat(lo,
-> +		err = loop_set_status_compat(lo, mode, bdev,
->   			     (const struct compat_loop_info __user *)arg);
->   		break;
->   	case LOOP_GET_STATUS:
-
---------------IGfTg4SY1Onlb2vFZARdg2gO
-Content-Type: text/x-csrc; charset=UTF-8; name="ioctl-test.c"
-Content-Disposition: attachment; filename="ioctl-test.c"
-Content-Transfer-Encoding: base64
-
-I2luY2x1ZGUgPHN0ZGlvLmg+CiNpbmNsdWRlIDxzdGRsaWIuaD4KI2luY2x1ZGUgPGZjbnRs
-Lmg+CiNpbmNsdWRlIDx1bmlzdGQuaD4KI2luY2x1ZGUgPHN5cy9pb2N0bC5oPgojaW5jbHVk
-ZSA8bGludXgvZnMuaD4KI2luY2x1ZGUgPGVycm5vLmg+CiNpbmNsdWRlIDxzdHJpbmcuaD4K
-I2luY2x1ZGUgPGxpbnV4L2xvb3AuaD4KCmludCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2
-W10pCnsKICAgIGlmIChhcmdjICE9IDIpIHsKICAgICAgICBmcHJpbnRmKHN0ZGVyciwgIlVz
-YWdlOiAlcyBbZGV2IHBhdGhdXG4iLCBhcmd2WzBdKTsKICAgICAgICByZXR1cm4gMTsKICAg
-IH0KCiAgICBjb25zdCBjaGFyICpkZXYgPSBhcmd2WzFdOwogICAgc3RydWN0IGxvb3BfaW5m
-bzY0IGluZm87CiAgICBtZW1zZXQoJmluZm8sIDAsIHNpemVvZihpbmZvKSk7CgogICAgaW50
-IGZkID0gb3BlbihkZXYsIE9fUkRXUiB8IE9fRVhDTCk7CiAgICBpZiAoZmQgPCAwKSB7CiAg
-ICAgICAgZnByaW50ZihzdGRlcnIsICJGYWlsZWQgdG8gb3BlbiAlcyBleGNsdXNpdmVseTog
-JXNcbiIsCiAgICAgICAgICAgICAgICBkZXYsIHN0cmVycm9yKGVycm5vKSk7CiAgICAgICAg
-cmV0dXJuIDE7CiAgICB9CgogICAgaWYgKGlvY3RsKGZkLCBMT09QX1NFVF9TVEFUVVM2NCwg
-JmluZm8pID09IC0xKSB7CiAgICAgICAgcGVycm9yKCJpb2N0bCBlcnJvciIpOwogICAgICAg
-IGNsb3NlKGZkKTsKICAgICAgICByZXR1cm4gMTsKICAgIH0KCiAgICBjbG9zZShmZCk7CiAg
-ICByZXR1cm4gMDsKfQo=
-
---------------IGfTg4SY1Onlb2vFZARdg2gO--
+PiBGcm9tOiBMZW9uIFJvbWFub3Zza3kgPGxlb25Aa2VybmVsLm9yZz4NCj4gU2VudDogVHVlc2Rh
+eSwgTm92ZW1iZXIgMTEsIDIwMjUgNTo1OCBQTQ0KPiANCj4gRnJvbTogVml2ZWsgS2FzaXJlZGR5
+IDx2aXZlay5rYXNpcmVkZHlAaW50ZWwuY29tPg0KPiANCj4gVGhlc2UgaGVscGVycyBhcmUgdXNl
+ZnVsIGZvciBtYW5hZ2luZyBhZGRpdGlvbmFsIHJlZmVyZW5jZXMgdGFrZW4NCj4gb24gdGhlIGRl
+dmljZSBmcm9tIG90aGVyIGFzc29jaWF0ZWQgVkZJTyBtb2R1bGVzLg0KPiANCj4gT3JpZ2luYWwt
+cGF0Y2gtYnk6IEphc29uIEd1bnRob3JwZSA8amdnQG52aWRpYS5jb20+DQo+IFNpZ25lZC1vZmYt
+Ynk6IFZpdmVrIEthc2lyZWRkeSA8dml2ZWsua2FzaXJlZGR5QGludGVsLmNvbT4NCj4gVGVzdGVk
+LWJ5OiBBbGV4IE1hc3RybyA8YW1hc3Ryb0BmYi5jb20+DQo+IFRlc3RlZC1ieTogTmljb2xpbiBD
+aGVuIDxuaWNvbGluY0BudmlkaWEuY29tPg0KPiBTaWduZWQtb2ZmLWJ5OiBMZW9uIFJvbWFub3Zz
+a3kgPGxlb25yb0BudmlkaWEuY29tPg0KDQpSZXZpZXdlZC1ieTogS2V2aW4gVGlhbiA8a2V2aW4u
+dGlhbkBpbnRlbC5jb20+DQo=
