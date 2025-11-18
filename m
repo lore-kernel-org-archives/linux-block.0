@@ -1,257 +1,84 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3E092FFDDB
-	for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 02:11:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A12BD1DC985
+	for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 02:14:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763431907; cv=none; b=sFDol4T0am7x147ZT5rRT7PnSt6i2LazImPbmlAwlqUwwSRIIUWDpYw4a0Yii6a+5b9IRHK2glhKLs38ODxe1la3Nb4UjoB5eROcXuECz6l4lir6Stt34adUMzQ7agQYIt7kx+KByuY1lcTXOuTyjAIbHgJFpr2bXTpGSuRIpb4=
+	t=1763432092; cv=none; b=lj86woZU/yWw8hkPWkuz2UBOXf+049aS3xIf8aF6IuZmoh+y/RAY1mG6aAg0p+DiYquGGp5bQ/hBEARsfpkePpJsWJnYwN/9Hnhn3S+862sbdzZVO5inDedl5T9Cvg44EXqedDCe5YGsnOxCsigjxGuEQCyvfzWsb8GjwxAtFv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763431907; c=relaxed/simple;
-	bh=9IIkXnJOIDh/raZ0B/Reudf6ec3+wFR1u2pBXOfU0OI=;
+	s=arc-20240116; t=1763432092; c=relaxed/simple;
+	bh=Y6k6QIWXKNdEDX219gK0UJwi/R2H4jlzoXyvnxvwbxc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a7xmnkQ5JJ3879RiTt0A7Xb+GfozE1iGMAkDDLH89ouC7EH3QnI5KQSKeZrwF97Rgx2iHapRY+byDsl0ZZrDGijr8HDKi7TCfvi4BstaQDVzoEcgM1Eikm58Dygklgcv5tJ3AKg1kqUiKMy24Ue+65hkRyKJ2ehV3+M/9mDl9tI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NLZ8etJm; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=fTIEBbnc/KNnjX2X5yZLWbyyIKwUUY6GX5TBXBVv7Z5XGfuTq921cgFX4KdfOI07Nc9UdoCVc8j5sPxdEE+PYet95Lmh8w3Cp/gNvJezyNOBTgHod9U+ZEXd2dk1KpMC7PGldLrmJQYn0z6TVhMQkh0/Khsglmkicp+chBap7zY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=Uyr5PB8T; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NLZ8etJm"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763431903;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9kH4/ZrSoq+DYFO2wL1YJXhN0SZjlp31GDT9ACoXaW8=;
-	b=NLZ8etJmQHKarC7UVYZkT01rGPrM+/AdYiG+J2tH5+IlcEuzK1kKjzgST7dL0vvzOl32Fq
-	movhBjRgMFBF5raH6+6dn8ci0xvlP+RH2ypIqvZqfZtuFo64dShy3UplFat6HpklmtwhBN
-	ED6DQ3RUPC2zaXntenYidWcfz/TgFgQ=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-267-g3kzNAvqNdaeeIsMIjCy2g-1; Mon,
- 17 Nov 2025 21:11:41 -0500
-X-MC-Unique: g3kzNAvqNdaeeIsMIjCy2g-1
-X-Mimecast-MFC-AGG-ID: g3kzNAvqNdaeeIsMIjCy2g_1763431900
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CB7F5180035D;
-	Tue, 18 Nov 2025 02:11:40 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.204])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id ACAF71800367;
-	Tue, 18 Nov 2025 02:11:37 +0000 (UTC)
-Date: Tue, 18 Nov 2025 10:11:32 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Uday Shankar <ushankar@purestorage.com>
-Subject: Re: [PATCH V3 09/27] ublk: add new batch command
- UBLK_U_IO_PREP_IO_CMDS & UBLK_U_IO_COMMIT_IO_CMDS
-Message-ID: <aRvV1JWYYnq2nEuw@fedora>
-References: <20251112093808.2134129-1-ming.lei@redhat.com>
- <20251112093808.2134129-10-ming.lei@redhat.com>
- <CADUfDZp3RVr-n4UbiRa=+hDnZh2r-G-fFL0o8PtVD2ERMSfpPw@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Uyr5PB8T"
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-7b7828bf7bcso5112204b3a.2
+        for <linux-block@vger.kernel.org>; Mon, 17 Nov 2025 18:14:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1763432090; x=1764036890; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6sQZXbj1YdX31C03O4RWI6hvbK1qocJ5NOHys4I9+yw=;
+        b=Uyr5PB8TebAPbEkihmTmGi7Fi5NHnBLBwY8fYQThfeJL0kP8WF7tp3z7BXmn3gGjYW
+         eYA3hB89AvJf8FbagdOFBPdVeW0+dg/OEQudArmbvmF0D3YO8duoeJD8WhWoXuNPWFyL
+         HKgoX1ekL9dFxYXH2wULi6JCmFZt6MTZAR7lc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763432090; x=1764036890;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6sQZXbj1YdX31C03O4RWI6hvbK1qocJ5NOHys4I9+yw=;
+        b=paoZYB9AHH+CpB6vL/r/1EHefM2YioFtx9oDx9Pi6NiS4V/0WbC2CFg4ETv/X52uoA
+         kukwNtz4EwHLeXnU634sh5TbJTLppQ8Xc7Z2LG3+WhJOCBfsNpNUtSK784JrZ5cS2kiE
+         jsI8WaaSijVSZhweEpkEG5LGPc71/kwbjdSue1P+Oex8hqUo0SgBFwmyLP+NyEEtCSSF
+         rqo4IHO9h8JJgC3FjzCjIPzbRZYDjrd+J1dQIL8EJnynvMY+Xw7Don1C1wxNddhdR9rT
+         YmTieaw5Rp/jqE0eRhW+gG/KTkYp+gD7N5b+jVMicETCGQKSGeFLVRkKPGquOnQnnuyc
+         QL6A==
+X-Forwarded-Encrypted: i=1; AJvYcCU+YaVIBKUkMXiJ+1v7g+CuEMc9ieBKNl6w+2cBq/o7gTW2OLUAJ6jkAnz4saMO/PXLeqxs6hQ/IntjcQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxygQOJb0US67mMfgCFdzSkPhGf9c9UNKStTHDhdOO2/iNniaTs
+	41qRYZ84INHGNve4MM46pHEvS5KTj3XUmQu0aGGj3CtJ62jMrtPPou5ddLnlAZE7AQ==
+X-Gm-Gg: ASbGncv2vo1j8u0vFoQQ+v7mQNfdVAsNZTNxZrn7V44Rn1gUbDDbM+DNvW8XbnMcome
+	uojAgi4oBcTir4Dr13nZPRcCgmmjLiMVUiKSR/sRj87ZDZKtonDSTkwmPTpeMpFgjufYcaSNXTd
+	Vz49/QkYbfAXGkNWgIpeYIrjEWnT/9UAvcgL/nzZzCImEJbDR1QB+0aGWidy71OuOITNK3Zavwd
+	XR8kp0257obYrByV4MD/FWkk/sSvMci8fPNof5VdWOxovp2Zp3WFXIkj4a0JfQ8SOrQSmTRpfJB
+	e31OBQ2pSf9c37BUQGrOUtrqTOq/+wLArp4CJmhG9Cv7GcaBfYcY7H3aMVM58qnrytQ2dlwqH7Q
+	IEbtPJ75OwepXP47fGGgcBXrXt/h+Fksw95QKbqIdng05MhilK0cXo8od2TmIRfVNg5DqNOOAWg
+	cBCjW9dEfxCGs5OeFdegHW/F0GXA==
+X-Google-Smtp-Source: AGHT+IFnhFnm/WfC6A+BHWhwAiIZ6Bgw+D4M+jdgTMpC0ZuxdGNC3uhzeJpEWoMZ+hyyVF9I1M6Tvg==
+X-Received: by 2002:a05:6a20:258b:b0:35e:c55b:9203 with SMTP id adf61e73a8af0-35ec55ba46bmr7643528637.33.1763432089994;
+        Mon, 17 Nov 2025 18:14:49 -0800 (PST)
+Received: from google.com ([2401:fa00:8f:203:54de:ef1f:fc04:3ba4])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7b924aea0f8sm14739557b3a.5.2025.11.17.18.14.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Nov 2025 18:14:49 -0800 (PST)
+Date: Tue, 18 Nov 2025 11:14:43 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Yuwen Chen <ywen.chen@foxmail.com>
+Cc: bgeffon@google.com, akpm@linux-foundation.org, licayy@outlook.com, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	minchan@google.com, minchan@kernel.org, richardycc@google.com, 
+	senozhatsky@chromium.org
+Subject: Re: [PATCHv3 1/4] zram: introduce writeback bio batching support
+Message-ID: <3nqzi2v72dsef2dte7iqe7wahrbzam33druh7klsh45zvefdm3@ab6stznzdxmh>
+References: <CADyq12zxzi+t727B5sm5z-z3SmRQyMDOmr_tTG1GaMVh6VTWbw@mail.gmail.com>
+ <tencent_547137D7C2F3EDBCD52FB12EE2A202EEE307@qq.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADUfDZp3RVr-n4UbiRa=+hDnZh2r-G-fFL0o8PtVD2ERMSfpPw@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+In-Reply-To: <tencent_547137D7C2F3EDBCD52FB12EE2A202EEE307@qq.com>
 
-On Mon, Nov 17, 2025 at 01:08:56PM -0800, Caleb Sander Mateos wrote:
-> On Wed, Nov 12, 2025 at 1:39 AM Ming Lei <ming.lei@redhat.com> wrote:
-> >
-> > Add new command UBLK_U_IO_PREP_IO_CMDS, which is the batch version of
-> > UBLK_IO_FETCH_REQ.
-> >
-> > Add new command UBLK_U_IO_COMMIT_IO_CMDS, which is for committing io command
-> > result only, still the batch version.
-> >
-> > The new command header type is `struct ublk_batch_io`, and fixed buffer is
-> > required for these two uring_cmd.
-> >
-> > This patch doesn't actually implement these commands yet, just validates the
-> > SQE fields.
-> >
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >  drivers/block/ublk_drv.c      | 107 +++++++++++++++++++++++++++++++++-
-> >  include/uapi/linux/ublk_cmd.h |  49 ++++++++++++++++
-> >  2 files changed, 155 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > index c62b2f2057fe..5f9d7ec9daa4 100644
-> > --- a/drivers/block/ublk_drv.c
-> > +++ b/drivers/block/ublk_drv.c
-> > @@ -85,6 +85,11 @@
-> >          UBLK_PARAM_TYPE_DEVT | UBLK_PARAM_TYPE_ZONED |    \
-> >          UBLK_PARAM_TYPE_DMA_ALIGN | UBLK_PARAM_TYPE_SEGMENT)
-> >
-> > +#define UBLK_BATCH_F_ALL  \
-> > +       (UBLK_BATCH_F_HAS_ZONE_LBA | \
-> > +        UBLK_BATCH_F_HAS_BUF_ADDR | \
-> > +        UBLK_BATCH_F_AUTO_BUF_REG_FALLBACK)
-> > +
-> >  struct ublk_uring_cmd_pdu {
-> >         /*
-> >          * Store requests in same batch temporarily for queuing them to
-> > @@ -108,6 +113,12 @@ struct ublk_uring_cmd_pdu {
-> >         u16 tag;
-> >  };
-> >
-> > +struct ublk_batch_io_data {
-> > +       struct ublk_device *ub;
-> 
-> Is it possible for this to be a const pointer?
+On (25/11/18 10:08), Yuwen Chen wrote:
+> On Mon, 17 Nov 2025 10:19:22 -0500, Sergey Senozhatsky wrote:
+> - index = pps->index;
+>   zram_slot_lock(zram, index);
 
-It isn't, for example, mutex_lock(&data->ub->mutex).
-
-> 
-> > +       struct io_uring_cmd *cmd;
-> > +       struct ublk_batch_io header;
-> > +};
-> > +
-> >  /*
-> >   * io command is active: sqe cmd is received, and its cqe isn't done
-> >   *
-> > @@ -2520,10 +2531,104 @@ static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
-> >         return ublk_ch_uring_cmd_local(cmd, issue_flags);
-> >  }
-> >
-> > +static int ublk_check_batch_cmd_flags(const struct ublk_batch_io *uc)
-> > +{
-> > +       const u16 mask = UBLK_BATCH_F_HAS_BUF_ADDR | UBLK_BATCH_F_HAS_ZONE_LBA;
-> > +       const unsigned header_len = sizeof(struct ublk_elem_header);
-> > +
-> > +       if (uc->flags & ~UBLK_BATCH_F_ALL)
-> > +               return -EINVAL;
-> > +
-> > +       /* UBLK_BATCH_F_AUTO_BUF_REG_FALLBACK requires buffer index */
-> > +       if ((uc->flags & UBLK_BATCH_F_AUTO_BUF_REG_FALLBACK) &&
-> > +                       (uc->flags & UBLK_BATCH_F_HAS_BUF_ADDR))
-> > +               return -EINVAL;
-> > +
-> > +       switch (uc->flags & mask) {
-> > +       case 0:
-> > +               if (uc->elem_bytes != header_len)
-> > +                       return -EINVAL;
-> > +               break;
-> > +       case UBLK_BATCH_F_HAS_ZONE_LBA:
-> > +       case UBLK_BATCH_F_HAS_BUF_ADDR:
-> > +               if (uc->elem_bytes != header_len + sizeof(u64))
-> > +                       return -EINVAL;
-> > +               break;
-> > +       case UBLK_BATCH_F_HAS_ZONE_LBA | UBLK_BATCH_F_HAS_BUF_ADDR:
-> > +               if (uc->elem_bytes != header_len + sizeof(u64) + sizeof(u64))
-> > +                       return -EINVAL;
-> > +               break;
-> > +       }
-> 
-> This could probably be implemented in a less branchy way using
-> conditional moves:
-> unsigned elem_bytes = sizeof(struct ublk_elem_header) +
->         (uc->flags & UBLK_BATCH_F_HAS_ZONE_LBA ? sizeof(u64) : 0) +
->         (uc->flags & UBLK_BATCH_F_HAS_BUF_ADDR ? sizeof(u64) : 0);
-> if (uc->elem_bytes != elem_bytes)
->         return -EINVAL;
-
-I'd start with current more readable way, but the less branchy optimization
-can be left in future.
-
-> 
-> > +
-> > +       return 0;
-> > +}
-> > +
-> > +static int ublk_check_batch_cmd(const struct ublk_batch_io_data *data)
-> > +{
-> > +
-> > +       const struct ublk_batch_io *uc = &data->header;
-> > +
-> > +       if (!(data->cmd->flags & IORING_URING_CMD_FIXED))
-> > +               return -EINVAL;
-> > +
-> > +       if (uc->nr_elem * uc->elem_bytes > data->cmd->sqe->len)
-> > +               return -E2BIG;
-> > +
-> > +       if (uc->nr_elem > data->ub->dev_info.queue_depth)
-> > +               return -E2BIG;
-> > +
-> > +       if ((uc->flags & UBLK_BATCH_F_HAS_ZONE_LBA) &&
-> > +                       !ublk_dev_is_zoned(data->ub))
-> > +               return -EINVAL;
-> > +
-> > +       if ((uc->flags & UBLK_BATCH_F_HAS_BUF_ADDR) &&
-> > +                       !ublk_dev_need_map_io(data->ub))
-> > +               return -EINVAL;
-> > +
-> > +       if ((uc->flags & UBLK_BATCH_F_AUTO_BUF_REG_FALLBACK) &&
-> > +                       !ublk_dev_support_auto_buf_reg(data->ub))
-> > +               return -EINVAL;
-> > +
-> > +       if (uc->reserved || uc->reserved2)
-> > +               return -EINVAL;
-> 
-> These fields aren't actually copied from the uring_cmd, so this check
-> is a no-op.
-
-Good catch, will kill it in next version.
-
-> 
-> > +
-> > +       return ublk_check_batch_cmd_flags(uc);
-> > +}
-> > +
-> >  static int ublk_ch_batch_io_uring_cmd(struct io_uring_cmd *cmd,
-> >                                        unsigned int issue_flags)
-> >  {
-> > -       return -EOPNOTSUPP;
-> > +       const struct ublk_batch_io *uc = io_uring_sqe_cmd(cmd->sqe);
-> > +       struct ublk_device *ub = cmd->file->private_data;
-> > +       struct ublk_batch_io_data data = {
-> > +               .ub  = ub,
-> > +               .cmd = cmd,
-> > +               .header = (struct ublk_batch_io) {
-> > +                       .q_id = READ_ONCE(uc->q_id),
-> > +                       .flags = READ_ONCE(uc->flags),
-> > +                       .nr_elem = READ_ONCE(uc->nr_elem),
-> > +                       .elem_bytes = READ_ONCE(uc->elem_bytes),
-> > +               },
-> > +       };
-> > +       u32 cmd_op = cmd->cmd_op;
-> > +       int ret = -EINVAL;
-> > +
-> > +       if (data.header.q_id >= ub->dev_info.nr_hw_queues)
-> > +               goto out;
-> > +
-> > +       switch (cmd_op) {
-> > +       case UBLK_U_IO_PREP_IO_CMDS:
-> > +       case UBLK_U_IO_COMMIT_IO_CMDS:
-> > +               ret = ublk_check_batch_cmd(&data);
-> > +               if (ret)
-> > +                       goto out;
-> > +               ret = -EOPNOTSUPP;
-> > +               break;
-> > +       default:
-> > +               ret = -EOPNOTSUPP;
-> > +       }
-> > +out:
-> 
-> Is the out label really necessary if there's no cleanup involved? Can
-> we just return the result directly?
-
-Yeah, it isn't necessary, but we have benefit of single exit with `goto`,
-also will avoid extra `return` since command handler is added in following
-patches.
-
-
-Thanks,
-Ming
-
+D'oh, indeed. Thanks for spotting this.
