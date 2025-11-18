@@ -1,87 +1,139 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 257322BEC28;
-	Tue, 18 Nov 2025 14:29:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4FCA314B96
+	for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 14:30:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763476174; cv=none; b=L8OrEyRXAXw/N5cHkOnL+LBkqSNBYoKyL/dsPOkxZgICXzqxDgJzd/UWNzg7enibXyFU7Xbq8dCvETNfjRdAoqie4jiS3lkiz26HgvO5fArqd7NBaXakJgezfsn2Qp62vnOjQ2twPByi7UalwRoRv8Z6JJqv0CLRlXcaAc2IVk4=
+	t=1763476208; cv=none; b=DtwkMohQD+8gT9ust0FvxuhPuP2ZFf9MgSfJJ0oi7u3VtX1zsaUG5wux7mF6xnTQgrkr3LeZ+VJP0LodHh52fooJJsH5ppVKC34i/xkGAIooJ/qcvjrqk6erA4xpLKiaDrPoqvkKHTHBRM+GgppXJ+13XQVsYHgGKFEG/lVjUiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763476174; c=relaxed/simple;
-	bh=bsTGiYCeUGyKymNT/zymuRlkd9lPzEB0+jj26ocRViM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Nn7LEjuUpkZTK+P5ch77gWpWvUC/094llUhjvllCE2VhsrzdlNID8KC6qq76YZrZA3TsbOHTvVp1ipkGiX/Otkhyl0WA7IzCbPozbVGBWr/eqDn9P7Hl8/gUtNtNhQvhCs/IJN9lKEUjeJXkWPDK9SzBp86DEFW5Ze7cqWjnJ+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=UEKPZFD8; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=h/sRwr7x; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	s=arc-20240116; t=1763476208; c=relaxed/simple;
+	bh=Vzm9kAK03gjq3/EFXB7Lf/qLfrswTurpUBT72P7Q9wQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=b9b7qx6IZdZONdAUCJJ2DHH1LmDDEtJI9NhWDLF0tOUVfHCc+8oDJqjWxz78/yXTwHdB25+gXQxdtf58Dhm5qZ7dKC4eC4rFQfE3SsauUuca64KsY+HusH+84hPufWRLyS0woFAoCIrDqbRTm8Pd2PDuzPSnqz1EqoQZTbISb+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=B/WGySyv; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="UEKPZFD8";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="h/sRwr7x"
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1763476171;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0n9UnbJWA0qi+JmKy/6pHK84BHEidvZ9wIicmRWTn88=;
-	b=UEKPZFD8IIH9dBvKhwzK+fXlmTby97FDKBDH31b76QtLz4uD0gbhWa+W7SG6f2imgKHsWF
-	nu7N2cXnD+OCXTKolN3SzKUxx0O8+YMYrf0DJRqkmvAsYU7YQt4xMRIRn31eSNTDdyUdTG
-	IT2upU2s7XedV+LOJih1/IaYmQwaNjbWORnGZX5SwX7NuvSC4KD3ikvjJIvhOM46GhQd01
-	52oJbqmp9xU9wMBK5pfo+VUj795hv5/+DoNV18rIIGuY7Np5J8ffKQgUsoL/5nUfJg3+NS
-	VL74Yn4la+CYnL9s6qvPYaEX2wHWgAZZrqm1x678CcgHB2dDbTcn5wYaPqQxpw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1763476171;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0n9UnbJWA0qi+JmKy/6pHK84BHEidvZ9wIicmRWTn88=;
-	b=h/sRwr7xzeJWCEHSEV2dmP1lyM8HmabFe+SrA74S6/B5KUksS4LoIrxmGid+rFGCLsbVgL
-	qsdlJxY2x7xXHyBw==
-To: Christophe Leroy <christophe.leroy@csgroup.eu>, Peter Zijlstra
- <peterz@infradead.org>
-Cc: Christophe Leroy <christophe.leroy@csgroup.eu>, Alexander Viro
- <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan
- Kara <jack@suse.cz>, Ingo Molnar <mingo@redhat.com>, Darren Hart
- <dvhart@infradead.org>, Davidlohr Bueso <dave@stgolabs.net>, Andre Almeida
- <andrealmeid@igalia.com>, Andrew Morton <akpm@linux-foundation.org>, Eric
- Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Dave Hansen <dave.hansen@linux.intel.com>, Madhavan Srinivasan
- <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>, Nichlas
- Piggin <npiggin@gmail.com>, linux-block@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH v5 0/4] uaccess: Prepare for masked user access on powerpc
-In-Reply-To: <cover.1763396724.git.christophe.leroy@csgroup.eu>
-References: <cover.1763396724.git.christophe.leroy@csgroup.eu>
-Date: Tue, 18 Nov 2025 15:29:29 +0100
-Message-ID: <87y0o35s8m.ffs@tglx>
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="B/WGySyv"
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4ee158187aaso28268301cf.0
+        for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 06:30:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1763476205; x=1764081005; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=gAj/lhLwXUkQIe838UyunLw5D1V/iLtJCJGMnOEEnt8=;
+        b=B/WGySyvLaU8JIymArDTv5WHkDz63O8yjgtHNuDkhXoWlTVVEPwduRMKJRIl0VF0pt
+         8TX3wC2CbRl78X8YvI6a76RvnNUvSap8sF82eEalnIXUMlSH6IQZ2lf/EfXMaqK3D0ge
+         X5WIamr7y8ESnWfA/FuSzY5Ur6gzM7VRfSLkcWXG5ZJT1jx/WSECD5qqvvLR/jW4FtK5
+         lXAqbLAS2gBp1REviCoz1CfM4ZfT1CkwTYXQnaa+Q+f0AhzEUqD9RCYPP7bMY70mYbIq
+         d0nSRxqUw+WlBG8E/FBiGUk4abSaitO3o2hlCXsKqA/G/VWD92vKkCqNV5klizdv4fJN
+         4ByA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763476205; x=1764081005;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gAj/lhLwXUkQIe838UyunLw5D1V/iLtJCJGMnOEEnt8=;
+        b=FJrOIcEgETLD5uj8IFsMKVnDrquW2Qdz07o1RWqCpnOIbpVgRgIc3DTNO7Ge4nbP59
+         /c5JiNXITTKVjygSxzrm9nqLLlqj3HMpdM4f2CEVJ8ef2ELZKVAvmuIRW/THFC/1A4H8
+         nvDHHKbnyowVqMg2IbHxxHaoE905+HPgD6yBs5DnIoVDxNA/cZCvH/J8P2kzhA02xlF3
+         HgJV1pBdugFR+mYWjbrz+c43u23OLjXu6guAQhXW1iKPWqxiU2yCMNwIJCNheFv3ANl8
+         IZPI2yzAuHn2l48t07bNhoNja29sYQJW7r5sk1BY0q1WBReLX70fkhfNcR76IjSwAUvm
+         zpdA==
+X-Forwarded-Encrypted: i=1; AJvYcCVWo2t7a61irdXqLSPcqQ6ab+DFtQQkEZl5i+3CMuNTODVoRV8pTVuPy2ByWXued+bvWDc1oEpXBsQ2jQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0nxGBcTC/rELEVxeylIq0Uvi0DKFK3pZKbTEQlThfDh5Bzdul
+	iMdFoE2RjJT/GDO1kHn+QBb4J1FNCJDdwojB5xbedxutCjSw8Z5TNt4beYgcDo9VGTs=
+X-Gm-Gg: ASbGncvrld8qBXE8fycc4RcXVJ9Lr1Bq2qlkj+sovaai/wSGP991ywdqLdEzI4eTHco
+	UwK1IAXh0DnWtZLiodue/hdp1dEUMruKo8nHHjgPwRnS0ceOaXPnANXuUEbYf3hh8GzozzvJVXQ
+	3aHQM2NnhCBtGr7jdAZTNfujgzVIKg4ubDA6Jy47wtoYjYBVkDyPTLaa1pO7F9Z5AM4t5yzMkbb
+	nfMAiJE7TcHx6ubRuu3SEKcJVqyzWm15BB137jKbu+TJqLot2YZqqFZSLRlN9c0ZV+970XUWuxC
+	byo/A3mKJoN9eB9CUCzhJiwNE+TtyAwXsC28Mnrf09ikjuT33InXj76TBEfb9IJCleX1SySBaGa
+	hdXNAPUMsdDCM0MpmBSjebDXN3QJcpgMxHXtb9xZH62NkkRG6gJ7iiw0mmf3c02vLIa0VFdjV8I
+	u8VcdbNex0DaIcjIssBWABjzbfoUOyz3T698OJhQuhlYNFhfjVUwKPH59vTnjSP8D2tzo=
+X-Google-Smtp-Source: AGHT+IGl2QxjkDkgi5jKGR6lwtLy9hLDUjSd3xhjzd2vh/OGWRtCENW0fUVdt2sQ45uUuO7DIyidjQ==
+X-Received: by 2002:a05:622a:4a15:b0:4ed:df82:ca30 with SMTP id d75a77b69052e-4edfc875136mr206770331cf.13.1763476204719;
+        Tue, 18 Nov 2025 06:30:04 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-882862d0944sm115395396d6.9.2025.11.18.06.30.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Nov 2025 06:30:04 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1vLMiZ-00000000NFZ-1yj6;
+	Tue, 18 Nov 2025 10:30:03 -0400
+Date: Tue, 18 Nov 2025 10:30:03 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Ankit Agrawal <ankita@nvidia.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>, Jens Axboe <axboe@kernel.dk>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+	Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <skolothumtho@nvidia.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex@shazbot.org>,
+	Krishnakant Jaju <kjaju@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
+	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
+	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+	"linaro-mm-sig@lists.linaro.org" <linaro-mm-sig@lists.linaro.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-hardening@vger.kernel.org" <linux-hardening@vger.kernel.org>,
+	Alex Mastro <amastro@fb.com>, Nicolin Chen <nicolinc@nvidia.com>
+Subject: Re: [PATCH v8 11/11] vfio/nvgrace: Support get_dmabuf_phys
+Message-ID: <20251118143003.GH17968@ziepe.ca>
+References: <20251111-dmabuf-vfio-v8-0-fd9aa5df478f@nvidia.com>
+ <20251111-dmabuf-vfio-v8-11-fd9aa5df478f@nvidia.com>
+ <SA1PR12MB7199A8A0D17CDC980F819CC6B0D6A@SA1PR12MB7199.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <SA1PR12MB7199A8A0D17CDC980F819CC6B0D6A@SA1PR12MB7199.namprd12.prod.outlook.com>
 
-On Mon, Nov 17 2025 at 17:43, Christophe Leroy wrote:
-> This is v5 of the series "powerpc: Implement masked user access". This
-> version only includes the preparatory patches to enable merging of
-> powerpc architecture patches that depend on them on next cycle.
->
-> It applies on top of commit 6ec821f050e2 (tag: core-scoped-uaccess)
-> from tip tree.
->
-> Thomas, Peter, could you please take those preparatory patches
-> in tip tree for v6.19, then Maddy will take powerpc patches
-> into powerpc-next for v6.20.
+On Tue, Nov 18, 2025 at 07:59:20AM +0000, Ankit Agrawal wrote:
+> +       if (nvdev->resmem.memlength && region_index == RESMEM_REGION_INDEX) {
+> +               /*
+> +                * The P2P properties of the non-BAR memory is the same as the
+> +                * BAR memory, so just use the provider for index 0. Someday
+> +                * when CXL gets P2P support we could create CXLish providers
+> +                * for the non-BAR memory.
+> +                */
+> +               mem_region = &nvdev->resmem;
+> +       } else if (region_index == USEMEM_REGION_INDEX) {
+> +               /*
+> +                * This is actually cachable memory and isn't treated as P2P in
+> +                * the chip. For now we have no way to push cachable memory
+> +                * through everything and the Grace HW doesn't care what caching
+> +                * attribute is programmed into the SMMU. So use BAR 0.
+> +                */
+> +               mem_region = &nvdev->usemem;
+> +       }
+> +
+> 
+> Can we replace this with nvgrace_gpu_memregion()?
 
-I've applied them to tip core/uaccess, which contains only the uaccess
-related bits. That branch is immutable and could be consumed by PPC if
-required.
+Yes, looks like
 
-Thanks,
+But we need to preserve the comments above as well somehow.
 
-        tglx
+Jason
