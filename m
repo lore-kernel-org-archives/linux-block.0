@@ -1,114 +1,100 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from xmbghk7.mail.qq.com (xmbghk7.mail.qq.com [43.163.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 566D52D46DD;
-	Tue, 18 Nov 2025 08:04:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7AC4309F1F;
+	Tue, 18 Nov 2025 08:16:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.163.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763453075; cv=none; b=bRcdIYdqa+X49PxiHzvFtBLtimTfQTbWFVNlHZ3bM2Il4m8tAlSEW+Loa6zOGZCfKqU29xNZ5ktQoPoHn1jhVkOCc2s3KK4DxeL6pAVdZp60U3zagFw3e4t+YK6H1jC3Jg4mtcRBI14/txwzrvQWgDooURKsHRzNEJxP7c5q5EU=
+	t=1763453764; cv=none; b=hUL1JYtJd6FZP35zlzI7izzxAevje/S3ven4FZUDT1d0nnA0e9R2NICWBKkFAYdHIFqT35WRBdGzcEHWUfA2UgVz6tinAI8GV3rZCE6Omps8ZuESVyXT9SdWJbR7GxLEAV/czJKVSrpU4aQIvyF7pDPt9GTloIWVzkdiwhKfp1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763453075; c=relaxed/simple;
-	bh=mPXKpqB6qHKnSgcmE9DJEPoUQXkPovVQvUnM+auWdpQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u4M2pO5GI0qRikNgWDkabhUka5MInyQGhO5+C+3apZH8OufYKW0ctNbOce1hH1H7BpmjO/SqwEcYVlwCsWEmzeLFW/XQkRGVBklPRbk2hNsAi2Vm04OgNI6RhbLnP1ObsY/zHZxWOyyxPEFbx5cWAp1/PUqevBQa0dk2w71XeP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 4C26167373; Tue, 18 Nov 2025 09:04:27 +0100 (CET)
-Date: Tue, 18 Nov 2025 09:04:27 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
-Cc: linux-block@vger.kernel.org, dm-devel@lists.linux.dev,
-	linux-raid@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
-	axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
-	mpatocka@redhat.com, song@kernel.org, yukuai3@huawei.com,
-	hch@lst.de, sagi@grimberg.me, kch@nvidia.com, jaegeuk@kernel.org,
-	chao@kernel.org, cem@kernel.org
-Subject: Re: [RFC PATCH] block: change __blkdev_issue_discard() return type
- to void
-Message-ID: <20251118080427.GA26299@lst.de>
-References: <20251118074243.636812-1-ckulkarnilinux@gmail.com>
+	s=arc-20240116; t=1763453764; c=relaxed/simple;
+	bh=IB9XynbAqeRmsZxpXYSxny1PWyZ4VZELdGdsmNKC90E=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=E6XZNSxq07D1xdsyg1S9fJfTIWb7Tcrfi4RBqJwykXvMJTglAI5haQ0XcaIXpwuHjqAXVKbCTaHDj1WuPACHzFvpJBB0gaIvFD0wBNlHQN9s3KEeq71hlwaeAmzwNXrmCo5EhZG0zesWXK51ugKmfnzFV5d1dgShLn3VVuaxPXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=KvWvv9U6; arc=none smtp.client-ip=43.163.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="KvWvv9U6"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1763453754;
+	bh=Dgq9GdB+TDgt9ubpi2QIxJvPWQziPEpk10JhrXaywjo=;
+	h=From:To:Cc:Subject:Date;
+	b=KvWvv9U60g+tkussAJeFBfvD7+XPO5vl62rOZVcRlriPXH8fHcZJUomoNvbbW+BUq
+	 STcZc2pin+eTwotA6EBBscVTKEIvoJ02dFBEGpszT1RK9SXAITEeNEMyi5GshPeZ0N
+	 DXuLaItG7x2WAQr0+AZQUi6VTO7iRNMNcEjkBwbk=
+Received: from meizu-Precision-3660.meizu.com ([112.91.84.72])
+	by newxmesmtplogicsvrszb51-0.qq.com (NewEsmtp) with SMTP
+	id 3F3904AA; Tue, 18 Nov 2025 16:15:51 +0800
+X-QQ-mid: xmsmtpt1763453751tb4jwdjo9
+Message-ID: <tencent_2FEBA8888C5B7C3CC495E17C29EFE76BA805@qq.com>
+X-QQ-XMAILINFO: M43YobM9g9iNuzsmc412q5ZBUR8Jmyt41yWOZ/ah1ScleaQUkJu1WSNxFIpu2+
+	 zEQI2tbP2zDTM1Koz8aN0zMJIUcMBpN/da3Vm0RbepEb04IqVomtMs8+FQGNDbwXevM3V4RWZ7+m
+	 BfY0Zsy1X2jEquQ67BGYDPFgxYKAEIWHslbEli9DpC8xdWi532MsiDWyV417xXRb8hYzKvaIv0ya
+	 3QT5nlw+NdUUaNA7ZPDUQhn8NcZtx6SQSEsoVXo4A1jGhojFTBaw+zXqf2HqZD4Iczd4NQNkhibD
+	 Oos7L7iJHA8tTIJFmlhTAOybxe9l87Uh48QCCQt0sR34lKvN/cg3oiyzS17lvlMQPYtm2oNc+IGI
+	 T7pvwqzzKzMuWBMpvK8LyKUD5vyELNP6RdcCwCt3JihUdsdkogJBa/MPE5jR4VuTIEXHw0TBtQ4J
+	 mFpEBCfynWxIbSvxUmIyxBQu9ZC8WPesCa7slZcKiD7V0vQdfMRFqLQTd1kw/aDifEEkAUoB0/HW
+	 QqhdZdmhZ+N1uam2kQuJpQ9Xjswq6Qhf2iCNe6OCrhQj8PoWoRAQH13Fhw2jB/VvbkVR61lliky1
+	 OMKE5drLNg5OJwE0pnoPmYzV5ZkUJPLX4SCpXwWcY67nKNR1RtCjkXlRMo7c0imFlgfVzMY9Xy/4
+	 N18Rwlg/F9ep5kR/tGMM3pGXT2t9lqmSYJw5UBj1j/vdSjGjqFczoP1dvoSoK1dN40ETtKW1FHzg
+	 frLgMC6bMvTLKvjwHXyBh9rHWzFnhuVFuoxZhL5Eg38PTu1thro1rIA2112D6xc1Y+VStaLtb8X9
+	 agZxlT5KIWWvi2hofarshXtwf5FR0lzO6yGyFhtiD6lG3eeV7J4CS+CGBKb7e/SL7Z+uL0q97qWb
+	 VHZwDGxklpE4L8vtm6rLHW1Qil2vO39Z5ddURnWAfHNihxrtUzlWc2lCtQJMN6+vHMH/fi4bdg4b
+	 yUWUT+IWQBr0bW59qamzPkz9+UJXC6auQnqFIbEWgrReFa0NPNfn9bBIo13YbGKT2DlHyOD6LW71
+	 Aw8er9tEoDNjbdBJFZh8nU+y79mKmUoyN3hdPCn0oTWq2pqzFEhdUxqexwIeAds/SvzPc9H2SMhc
+	 NbArsQG59he7ZKwmZ0aityYwMFfBwJrY2RnFBHMsxaO8Dq180xUcDckx7rrnKFEwMfrolz0+/fkz
+	 4Ow8V8dbsUrFH3Uhmajm2X85vN
+X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
+From: Yuwen Chen <ywen.chen@foxmail.com>
+To: senozhatsky@chromium.org
+Cc: akpm@linux-foundation.org,
+	bgeffon@google.com,
+	licayy@outlook.com,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	minchan@kernel.org,
+	richardycc@google.com,
+	ywen.chen@foxmail.com
+Subject: [PATCH v2] zram: Fix the issue that the write - back limits might overflow
+Date: Tue, 18 Nov 2025 16:15:50 +0800
+X-OQ-MSGID: <20251118081550.2809090-1-ywen.chen@foxmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251118074243.636812-1-ckulkarnilinux@gmail.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
 
-On Mon, Nov 17, 2025 at 11:42:43PM -0800, Chaitanya Kulkarni wrote:
-> Due to involvement of all the subsystem making it as an RFC, ideally
-> it shuoldn't be an RFC.
+Since the value of bd_wb_limit is an unsigned number, when the
+page size is larger than 4 KB, it may cause an out-of-bounds situation.
 
-I think best would be a series that drops error checking first,
-and then changes the return type.  That way we can maybe get all
-the callers fixed up in this merge window and then drop the return
-value after -rc1.
->  			gfp_mask)))
->  		*biop = bio_chain_and_submit(*biop, bio);
-> -	return 0;
->  }
->  EXPORT_SYMBOL(__blkdev_issue_discard);
->  
-> @@ -90,8 +89,8 @@ int blkdev_issue_discard(struct block_device *bdev, sector_t sector,
->  	int ret;
->  
->  	blk_start_plug(&plug);
-> -	ret = __blkdev_issue_discard(bdev, sector, nr_sects, gfp_mask, &bio);
-> -	if (!ret && bio) {
-> +	__blkdev_issue_discard(bdev, sector, nr_sects, gfp_mask, &bio);
+This patch fixes the issue by limiting bd_wb_limit to be an
+integer multiple of PAGE_SIZE / 4096.
 
-ret now needs to be initialized to 0 above.
+Fixes: 1d69a3f8ae77e ("zram: idle writeback fixes and cleanup")
+Signed-off-by: Yuwen Chen <ywen.chen@foxmail.com>
+---
+Changes in v2:
+  - Rebase the patch to adapt to the latest version.
 
-> index 8d246b8ca604..f26010c46c33 100644
-> --- a/drivers/nvme/target/io-cmd-bdev.c
-> +++ b/drivers/nvme/target/io-cmd-bdev.c
-> @@ -366,16 +366,11 @@ static u16 nvmet_bdev_discard_range(struct nvmet_req *req,
->  		struct nvme_dsm_range *range, struct bio **bio)
->  {
->  	struct nvmet_ns *ns = req->ns;
-> -	int ret;
->  
-> -	ret = __blkdev_issue_discard(ns->bdev,
-> +	__blkdev_issue_discard(ns->bdev,
->  			nvmet_lba_to_sect(ns, range->slba),
->  			le32_to_cpu(range->nlb) << (ns->blksize_shift - 9),
->  			GFP_KERNEL, bio);
-> -	if (ret && ret != -EOPNOTSUPP) {
-> -		req->error_slba = le64_to_cpu(range->slba);
-> -		return errno_to_nvme_status(req, ret);
-> -	}
->  	return NVME_SC_SUCCESS;
+ drivers/block/zram/zram_drv.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-nvmet_bdev_discard_range can return void now.
-
-> diff --git a/fs/f2fs/segment.c b/fs/f2fs/segment.c
-> index b45eace879d7..e6078176f733 100644
-> --- a/fs/f2fs/segment.c
-> +++ b/fs/f2fs/segment.c
-> @@ -1346,7 +1346,7 @@ static int __submit_discard_cmd(struct f2fs_sb_info *sbi,
->  		if (time_to_inject(sbi, FAULT_DISCARD)) {
->  			err = -EIO;
->  		} else {
-> -			err = __blkdev_issue_discard(bdev,
-> +			__blkdev_issue_discard(bdev,
->  					SECTOR_FROM_BLOCK(start),
->  					SECTOR_FROM_BLOCK(len),
->  					GFP_NOFS, &bio);
-
-Please fold the following 'if (err)' block directly into the injection
-one, and either initialize err to 0, or use a direct return from that
-block to skip the last branch in the function checking err.
-
->  	blk_finish_plug(&plug);
->  
-> -	return error;
-> +	return 0;
-
-Please drop the error return for xfs_discard_extents entirely.
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index 8a13729..5780604 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -579,6 +579,7 @@ static ssize_t writeback_limit_store(struct device *dev,
+ 	if (kstrtoull(buf, 10, &val))
+ 		return ret;
+ 
++	val = val & (~((1UL << (PAGE_SHIFT - 12)) - 1));
+ 	down_write(&zram->init_lock);
+ 	zram->bd_wb_limit = val;
+ 	up_write(&zram->init_lock);
+-- 
+2.34.1
 
