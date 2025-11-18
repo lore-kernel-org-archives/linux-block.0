@@ -1,97 +1,153 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from fout-b5-smtp.messagingengine.com (fout-b5-smtp.messagingengine.com [202.12.124.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7EBF29DB65
-	for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 18:16:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4164E2877F1;
+	Tue, 18 Nov 2025 20:10:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763489797; cv=none; b=WLax0lCHXTgLWvwamiMJPFBLMdaHFlVr15mvPxBfkkCAaJTr6ox/uXMG2YXobZ7Talr5Ot9kBH6fGierS0VptAO/g5MjCYeZlNuru2iUNE0fDMQzx7im+rKc3rYtxWOhNwE5QdrGh0FaYiB+r/KMkLDuOC1Sg12pGYmANmvHt9c=
+	t=1763496656; cv=none; b=JCA8g81SQYc2IKA0I1g7eTw79iQbtHdN7NKEmgwS/+v46D2AH+HaDjHVEbtzqzet5LvBWMPzg8f1legDF0a5EMrXcvUL9x69AgZSOvvuBEm+irz7MpfkI5wgi0iL3XH3+xh7BOahCI9+8L0u/Ya2Bzj5HqQTDDcAIfdRzT/dPPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763489797; c=relaxed/simple;
-	bh=ZXkQ3kPe7AT5UT2l2UWSViuerymT1NythTEpwa8wHAM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MXRShrRDXxjwGBJ9ERUEVQRn51P10VD2QhB/VeeoZ4G7EQs95sMGWvVt6qvL12ySea7o+V1ss+A3fQRBl3/bXPApj7xyZ2aYGqkoRRwVO+Itq07/QnWpKhVPT1krHLhHRjgweOyOWnzKgn9PjMU9JpDnCo9cFUVdeJOpdqLKyKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CJg7LSBD; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1763496656; c=relaxed/simple;
+	bh=1fth7gGrJVrKK4e+LaBq1u2hD9qEZfqURKPU94apF1o=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fnulnLqX4/VfICqcm5wv9BtEQc5MZe5zpRTlcW9l7sFqapZDAZ6hf2vXjpB66Y8xCF0wRLmPEc454vPNH4NmqiH8HR3TBCZCpL7LJKPNLF4d3dxsBbC50KgMBXErxlQboS8yhpot4QSG5oqLBh1LSVAXJF0OmqzGmm538l9c5UI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=dKsiVfIf; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=b4BcgUdY; arc=none smtp.client-ip=202.12.124.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CJg7LSBD"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763489794;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iNv0pqSHRfXuYShbyhGgq8zNuj162daZJfAUfy98etc=;
-	b=CJg7LSBDNq2ItNOJU0sDd0bdziKt2SUparhnqtzJ95y8j6DOLCeDueAJwpDO/2aEGdfJgN
-	msdcyDgXAm/KCvlJdtY+Uep2DPCf4htHghMJe6b1Bz8mLvKSQtcmykuDaXDMItYu1qrDBl
-	8yMZjia8+x4b7ytH0Pj4lJ1n7RLmtb8=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-499-KnqTUGjFOuaMYKkdq5qUGA-1; Tue,
- 18 Nov 2025 13:16:29 -0500
-X-MC-Unique: KnqTUGjFOuaMYKkdq5qUGA-1
-X-Mimecast-MFC-AGG-ID: KnqTUGjFOuaMYKkdq5qUGA_1763489787
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6A1431800250;
-	Tue, 18 Nov 2025 18:16:26 +0000 (UTC)
-Received: from localhost (unknown [10.44.32.14])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BAB87195419F;
-	Tue, 18 Nov 2025 18:16:24 +0000 (UTC)
-Date: Tue, 18 Nov 2025 18:16:23 +0000
-From: "Richard W.M. Jones" <rjones@redhat.com>
-To: Pavel Machek <pavel@ucw.cz>
-Cc: Eric Dumazet <edumazet@google.com>, Josef Bacik <josef@toxicpanda.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-kernel <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org,
-	Eric Dumazet <eric.dumazet@gmail.com>,
-	syzbot+e1cd6bd8493060bd701d@syzkaller.appspotmail.com,
-	Mike Christie <mchristi@redhat.com>,
-	Yu Kuai <yukuai1@huaweicloud.com>, linux-block@vger.kernel.org,
-	nbd@other.debian.org
-Subject: Re: [PATCH] nbd: restrict sockets to TCP and UDP
-Message-ID: <20251118181623.GK1427@redhat.com>
-References: <20250909132243.1327024-1-edumazet@google.com>
- <aRyzUc/WndKJBAz0@duo.ucw.cz>
+	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="dKsiVfIf";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="b4BcgUdY"
+Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
+	by mailfout.stl.internal (Postfix) with ESMTP id 7E23D1D00011;
+	Tue, 18 Nov 2025 15:10:50 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-05.internal (MEProxy); Tue, 18 Nov 2025 15:10:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1763496650;
+	 x=1763583050; bh=JKFcF4a+cNbrtlp+FIdvl2Y5hDbZC7BuoipJJsoD+Xg=; b=
+	dKsiVfIfgRz3kNZHBVLW4w4a09M1An1YvYNcijPZ2AbBFboB1FxX0SwNlWv2rI3m
+	jLV/veDDgOhw9IS/7J8t81UctKoauLfjaXOyWqAp44a4MChEre02HVqGpMlsgIQ5
+	OVDMVHJablLjrzU+B8hL8QqRQ1+FyFvGpkw3BwGVonzwVgBd7NvVAsA+IlLoTNVT
+	kot+Gxju1ZTzga7Bee121GDDqWNUI+lqCGgG89zYk6ckhz8rEtrBbj0mNQhPhOcc
+	4uOd0pLPLZNlB7v3J3DPPBINt8sCnltepxWxkehpeYBA1Harjd8rccj6w8gmbij3
+	nDgGERM8bBQyy2uD5HkTCw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1763496650; x=
+	1763583050; bh=JKFcF4a+cNbrtlp+FIdvl2Y5hDbZC7BuoipJJsoD+Xg=; b=b
+	4BcgUdYcPIovWahMuxFSya7KoSim52uHsgehgqj/ncnPhxE3qTN1l9XUmfH5dLA0
+	nA9E0d7Le0Mc4/Xf7R7J2lQ/+CU38ymtFa6iaGShFA8iMhhJds2uyGYsUrmk0AGZ
+	wwHqhNPuDyy3T1wmEKwJ83vo1u1sv9Rg4GlJkbcIEp90cjcQFPESsb71YSlLcyQd
+	UEAV/QlH64EIJ1lqCiYY4cKUDhQBuK7Z/C878cS9zvqM5xyFNzLBS1ECI4FZmTN2
+	zM7jJStJjqi5FJm842MkyHtQUwl7n/Nil39X0PVzn77HpNlgls3inc0qko2NNjgy
+	yxSKoNtyts9q6kzxUKgCg==
+X-ME-Sender: <xms:yNIcaVSvmDTF8VooyebZ_3iAuWJLF1nEpDYA2SFkLVpCRLI7ry-_yQ>
+    <xme:yNIcaVmEGLCY5Y5fPmoEJKQOT9y5RfkjFiDcjDM82fNtYUukk3d8ZO-gnIlZyOOPP
+    GAmhpj4l6gxq2LE9j06pWjqNlxkgm2Z3bZOzOLp7Twv9NJiGOok>
+X-ME-Received: <xmr:yNIcaTzm8Q6mhtNsmKzPVt9MMUAmwOqIQ5a4gIx8lLQ0mWSG2DA3IJH6>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvvddvvdegucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkjghfgggtgfesthejredttddtvdenucfhrhhomheptehlvgigucgh
+    ihhllhhirghmshhonhcuoegrlhgvgiesshhhrgiisghothdrohhrgheqnecuggftrfgrth
+    htvghrnhepteetudelgeekieegudegleeuvdffgeehleeivddtfeektdekkeehffehudet
+    hffhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
+    hlvgigsehshhgriigsohhtrdhorhhgpdhnsggprhgtphhtthhopeefgedpmhhouggvpehs
+    mhhtphhouhhtpdhrtghpthhtohepkhgvvhhinhdrthhirghnsehinhhtvghlrdgtohhmpd
+    hrtghpthhtoheplhgvohhnsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegshhgvlhhg
+    rggrshesghhoohhglhgvrdgtohhmpdhrtghpthhtoheplhhoghgrnhhgseguvghlthgrth
+    gvvgdrtghomhdprhgtphhtthhopegrgigsohgvsehkvghrnhgvlhdrughkpdhrtghpthht
+    oheprhhosghinhdrmhhurhhphhihsegrrhhmrdgtohhmpdhrtghpthhtohepjhhorhhose
+    eksgihthgvshdrohhrghdprhgtphhtthhopeifihhllheskhgvrhhnvghlrdhorhhgpdhr
+    tghpthhtohepmhdrshiihihprhhofihskhhisehsrghmshhunhhgrdgtohhm
+X-ME-Proxy: <xmx:yNIcaf26KhFFpsUivmrVFhTObM-rKgDaEfC2zz-v9EkVExJppHMvwg>
+    <xmx:yNIcaSxvHZrLpODSMU140Px8A7i2ec7wW6bLtqhUmriZmnVfLlueSA>
+    <xmx:yNIcaQJG6BeoorANBFQ22bf_jmYfsKJ4ShsrttygfX-HrSPLvyCzdg>
+    <xmx:yNIcaY_XYy0V85f_vM-5tra11pYCLKaPoalvR53bkh_Q_lBlGmVbiA>
+    <xmx:ytIcabAqBX1IJkm5xY2Na7fzL8IPkzZ-PxplGx_6mGsuM1UBrv418EQg>
+Feedback-ID: i03f14258:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 18 Nov 2025 15:10:45 -0500 (EST)
+Date: Tue, 18 Nov 2025 13:10:38 -0700
+From: Alex Williamson <alex@shazbot.org>
+To: "Tian, Kevin" <kevin.tian@intel.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+ Logan Gunthorpe <logang@deltatee.com>, Jens Axboe <axboe@kernel.dk>,
+ "Robin Murphy" <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+ Will Deacon <will@kernel.org>,
+ Marek Szyprowski <m.szyprowski@samsung.com>,
+ "Jason Gunthorpe" <jgg@ziepe.ca>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Jonathan Corbet <corbet@lwn.net>, Sumit Semwal <sumit.semwal@linaro.org>,
+ Christian =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+ Kees Cook <kees@kernel.org>,
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ "Ankit Agrawal" <ankita@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>,
+ "Shameer Kolothum" <skolothumtho@nvidia.com>,
+ Krishnakant Jaju <kjaju@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
+ "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+ "linux-mm@kvack.org" <linux-mm@kvack.org>,
+ "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+ "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
+ "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+ "linaro-mm-sig@lists.linaro.org" <linaro-mm-sig@lists.linaro.org>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "linux-hardening@vger.kernel.org" <linux-hardening@vger.kernel.org>,
+ Alex Mastro <amastro@fb.com>, Nicolin Chen <nicolinc@nvidia.com>
+Subject: Re: [PATCH v8 09/11] vfio/pci: Enable peer-to-peer DMA transactions
+ by default
+Message-ID: <20251118131038.32b7804d.alex@shazbot.org>
+In-Reply-To: <BN9PR11MB52767F78317AF3AB94A5B7D38CD6A@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20251111-dmabuf-vfio-v8-0-fd9aa5df478f@nvidia.com>
+	<20251111-dmabuf-vfio-v8-9-fd9aa5df478f@nvidia.com>
+	<BN9PR11MB52767F78317AF3AB94A5B7D38CD6A@BN9PR11MB5276.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aRyzUc/WndKJBAz0@duo.ucw.cz>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Nov 18, 2025 at 06:56:33PM +0100, Pavel Machek wrote:
-> Hi!
-> 
-> > Recently, syzbot started to abuse NBD with all kinds of sockets.
+On Tue, 18 Nov 2025 07:18:36 +0000
+"Tian, Kevin" <kevin.tian@intel.com> wrote:
+
+> > From: Leon Romanovsky <leon@kernel.org>
+> > Sent: Tuesday, November 11, 2025 5:58 PM
 > > 
-> > Commit cf1b2326b734 ("nbd: verify socket is supported during setup")
-> > made sure the socket supported a shutdown() method.
-> > 
-> > Explicitely accept TCP and UNIX stream sockets.
+> > From: Leon Romanovsky <leonro@nvidia.com>  
 > 
-> Note that running nbd server and client on same machine is not safe in
-> read-write mode. It may deadlock under low memory conditions.
+> not required with only your own s-o-b
 > 
-> Thus I'm not sure if we should accept UNIX sockets.
+> > @@ -2090,6 +2092,9 @@ int vfio_pci_core_init_dev(struct vfio_device
+> > *core_vdev)
+> >  	INIT_LIST_HEAD(&vdev->dummy_resources_list);
+> >  	INIT_LIST_HEAD(&vdev->ioeventfds_list);
+> >  	INIT_LIST_HEAD(&vdev->sriov_pfs_item);
+> > +	ret = pcim_p2pdma_init(vdev->pdev);
+> > +	if (ret && ret != -EOPNOTSUPP)
+> > +		return ret;  
+> 
+> Reading the commit msg seems -EOPNOTSUPP is only returned for fake
+> PCI devices, otherwise it implies regression. better add a comment for it?
 
-Both nbd-client and nbdkit have modes where they can mlock themselves
-into RAM.
+I think the commit log is saying that if a device comes along that
+can't support this, we'd quirk the init path to return -EOPNOTSUPP for
+that particular device here.  This path is currently used when
+!CONFIG_PCI_P2PDMA to make this error non-fatal to the device init.
 
-Rich.
+I don't see a regression if such a device comes along and while we
+could survive other types of failures by disabling p2pdma here, I think
+all such cases are sufficient rare out of memory cases to consider them
+catastrophic.  Thanks,
 
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-Fedora Windows cross-compiler. Compile Windows programs, test, and
-build Windows installers. Over 100 libraries supported.
-http://fedoraproject.org/wiki/MinGW
-
+Alex
