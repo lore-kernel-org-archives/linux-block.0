@@ -1,104 +1,122 @@
-Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E22A299959;
-	Mon, 17 Nov 2025 23:45:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B30D25D216
+	for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 01:25:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763423147; cv=none; b=d8js+TXCwef4gmedxiIfwuyojxxZIXvv44JxYdewXxVPsECsdPni+xtko9+MgaO0GyhA+Y832zxEcr9FPTQdwpfNcKUe8veDeFmwoegjXD3pThnmUgo2V0/bG5kBkg0M+suDYIHUZtgL+LMMTU1aW1R21qee9Jm+u4PHwBNiuGw=
+	t=1763429152; cv=none; b=XaJm00ccYihakwcZkDz9siNUxP34vjRMDJGh6E7zbQ5jtPnyysmakqeNqxcRSeXD736qTn40VQwEfUSPQV7B1xDQz43I2Pd+3uq0rQSDgpQ06nPWWjBUQgpwwmzjMt5TDXaW9XELXMGUozgpAM3VSHW2xThsQsVFVaMicrzo6Xs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763423147; c=relaxed/simple;
-	bh=fSrzL469rq5UJzLY4Y4dspONxGp76B9Lzl8uRfX2Kgw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Iot8XtrGt9Doifnit2nJXoPsDJL9k25vs2ci0utkpzi6z82Iep0OVwVtgGSs+GSdQnDBAjK08euU/P+j/sJemd55GM0eNaQz9R/FtZ1QKKIw+tSgXeD0ThAQ5v/ZlJFRrtRROs/gNIwqGjmZBxEakBSud/TO42t8TFNgYBE2RO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=rGm8wVAv; arc=none smtp.client-ip=199.89.3.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1763429152; c=relaxed/simple;
+	bh=XDstMFVLf0fP39sy4/htDz6ee1i4BahZzUlULH/1Prc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=s/bYDQimit7ln2DMUuDK8SajK0GEFk0osxGZ/kC1HrgNB1Z7umZxmJw59pz0rA9RxKN88rJ/ljB4Ov/9nIm6RXQp/V6/IXzvCT5SvOSdGvmSlFR5KMTwCL52MriMpPhLhZv+9T2ukNkMWVd726HX/ZffBvKRmRULfGw30pDxllk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GrFo9VgY; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="rGm8wVAv"
-Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4d9PWY14pmzlv4Vf;
-	Mon, 17 Nov 2025 23:45:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1763423143; x=1766015144; bh=1r2Y5HDZXyyu9gW8fJQLxunD
-	SDvVTAJBOoNfsdF76+s=; b=rGm8wVAvhz1db70SLSJ0XPdnbZwzBxUAizLkdS16
-	b8Jec5uRrqoa2jc5txFLl2HEGsLYM3pLYdY5EbQeAg0T0zG9qQSXtm8NCiPrCOMB
-	J4q5JDoluaCca3oJgtmfsT2inyR/LyDs4TR+cp3OGcNQnkWEWex3irVDeYewgJ82
-	DSSFjp4QSzP/U70zctr93yFwQtp9GBrDlSgZKG7OZPHmxrR/S6MHWzc/b/1bLynu
-	FR7mpDblJeOllyL12ucHJT14LsTrKYHSTG8Jd2o2BJbaQ6E9ilBQSuLfPpfDDcB7
-	V0WKB6jHoFuW9W3jm2vWKvHy3mTAw8ZRWmhuHA+npSMYTw==
-X-Virus-Scanned: by MailRoute
-Received: from 003.mia.mailroute.net ([127.0.0.1])
- by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id DtIn5_1UyuaN; Mon, 17 Nov 2025 23:45:43 +0000 (UTC)
-Received: from [100.119.48.131] (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4d9PWM1xQqzlv4Dp;
-	Mon, 17 Nov 2025 23:45:33 +0000 (UTC)
-Message-ID: <4f3ed928-2fef-469d-8bfc-76041267b1c6@acm.org>
-Date: Mon, 17 Nov 2025 15:45:32 -0800
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GrFo9VgY"
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-7aa2170adf9so4240490b3a.0
+        for <linux-block@vger.kernel.org>; Mon, 17 Nov 2025 17:25:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763429150; x=1764033950; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=oy90XwmtXS5bXn5O2JgnV9Joban47vmmIBqycG2o+zA=;
+        b=GrFo9VgY6Qjx01a3nBvMQkKxC7AF2rZxNt0fR6bbJ9Q3Fr/+8oPOB0k+5ns5p8MUXG
+         pVECXJ57aMiVE5lhvcs1YDKWexk+N9Tnuk7/DUPl3futZwopLmSCSqw1tPsZn5PkvdGZ
+         H6UnAYW2K3MShKqX9DSwPLVgN0UIsi5a4I3AdsNLXLT1ZuntNiAknG88/Tu0Sf78ggGC
+         p78LM8KNTI1aZF5uWmT7+Xj7mpfnaNXZdi23RQT9mnHM6wKzoelfv7HJOMaNokNvaR+W
+         i7EAMuob/xzdNjjEnUuCd7xiXQadmeA73SqFk9QPDYcdg2yP390nu13mygKA2ZUDz8HJ
+         fFaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763429150; x=1764033950;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oy90XwmtXS5bXn5O2JgnV9Joban47vmmIBqycG2o+zA=;
+        b=ixtj3KPhcSQ2rvyyW5O4p9x4L+0hG9idmU5JELRzT5s9dBCmOQkv9Sat+bzvlxmYG8
+         fDU6gTZqvl6wPclzuHN3p55lhSpm28ZQb4Jx3BY3SOr7CE83eo2Skd9crMwait4EwMUe
+         qFhFPE9T/RCU7E8cVGuys12NVya6qwLmhIyDBhXOvEEUvwSH4xcP4BybehMOiV7PjTHX
+         PGJaekBZPX4mwiefk+gMYarb8ntVGrtx5ZbNzO2NsidBNy6S7AOjd3JydWSt7EOyr1P/
+         btrP7gZ+pVXmXbhcRG21qunknUV4/ha8khZcOW7F8rqgK85c4lyc+srTydmSVc2y7qgq
+         1ezA==
+X-Gm-Message-State: AOJu0YzIx3y1VYvJfIqooSWs7kqFr9oB/L2AZ9nY2oGDlr6mihiuIwyi
+	og9BqWEhqPaw9CU7HmxiexC+wDQhkmBpynU9jeggG+QWvkp1NGAXp3Xa
+X-Gm-Gg: ASbGncvCCQF+2NdEf/TM73w14nlg9KwAROq6nyxwQvOedKg2+HDRuuDZAdk95TPRfrk
+	uQ06r2FJaCRgd6z5O+sCvYSoUuGWoDF7FUVC6HJTGj5TyRQm9CtQXxnBPWHKBm+AGBIlyNej4tP
+	/a70qWiscimjhp95UhqpOJ4rXGwy8L5iJ/BuSQbn2mHaKECaNAZEr1V/478jNLszD/7MqiI0TUw
+	wHCcgIqdEp7Mf9dQu5ShrUUJ+O3ejIHlh9khl0lnxxT+oTW8GS9Flg52Y00UDDxrirTHkOMiWnV
+	eG5U27s+gBzmTGFMPZ4nMiP2dUDLg3ytzFptjsnwbrm0cfWSORkb27d8CnJdEtsEnKge5kH00sL
+	YZQD9R+Xq2KjYbPyLqgCw/Y0YM64R0gZ+tyMaFmo6JLojRSd3A9lyMEYa/oCbSaclhDzuf4qpQj
+	KrgKl1l2DLqjJ1FTvDNI4BYzU7K9TTkbr9
+X-Google-Smtp-Source: AGHT+IGhVrl/+ZuzzSTdqJH1tr1q39eDqyR2QaUPM8zIEEp7x4SEyy6ymgaO82H9kmRNFf4ep5dv3A==
+X-Received: by 2002:a05:6a00:178f:b0:7ab:e007:deec with SMTP id d2e1a72fcca58-7ba3cd6d62fmr19306494b3a.32.1763429150530;
+        Mon, 17 Nov 2025 17:25:50 -0800 (PST)
+Received: from localhost.localdomain ([116.128.244.171])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7b924aedb73sm14409054b3a.12.2025.11.17.17.25.48
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 17 Nov 2025 17:25:49 -0800 (PST)
+From: chengkaitao <pilgrimtao@gmail.com>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Chengkaitao <chengkaitao@kylinos.cn>
+Subject: [PATCH v2] block/mq-deadline: Remove redundant hctx pointer dereferencing operation
+Date: Tue, 18 Nov 2025 09:25:39 +0800
+Message-ID: <20251118012539.61711-1-pilgrimtao@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RESEND v5 3/7] blk-mq: add a new queue sysfs attribute
- async_depth
-To: Yu Kuai <yukuai@fnnas.com>, axboe@kernel.dk, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: nilay@linux.ibm.com
-References: <20251116035228.119987-1-yukuai@fnnas.com>
- <20251116035228.119987-4-yukuai@fnnas.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20251116035228.119987-4-yukuai@fnnas.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 11/15/25 7:52 PM, Yu Kuai wrote:
-> +static void blk_mq_limit_depth(struct blk_mq_alloc_data *data)
-> +{
-> +	struct elevator_mq_ops *ops;
-> +
-> +	/* If elevator is none, don't limit requests */
+From: Chengkaitao <chengkaitao@kylinos.cn>
 
-Nobody calls an I/O scheduler an elevator anymore. So I propose to
-change "elevator is none" into "no I/O scheduler has been configured".
+The value of 'hctx->queue' is already stored in '*q' within
+dd_insert_requests, we can directly reuse the result instead of
+dereferencing hctx again in the dd_insert_request function. This
+patch removes the redundant operation and modifies the function's
+parameters accordingly. We can eliminate an LDR instruction.
 
-> +	/*
-> +	 * Flush/passthrough requests are special and go directly to the
-> +	 * dispatch list, they don't have limit.
-> +	 */
-"they don't have a limit" -> "are not subject to the async_depth limit".
+Signed-off-by: Chengkaitao <chengkaitao@kylinos.cn>
+---
+v2:
+  1. Remove the changes related to bfq-iosched.
+  2. Add more commit message.
+v1:
+  https://lore.kernel.org/all/20251016131651.83182-1-pilgrimtao@gmail.com/
+---
+ block/mq-deadline.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-> +	/*
-> +	 * By default, sync requests have no limit, and async requests is
-> +	 * limited to async_depth.
-> +	 */
-
-"is" -> "are"
-
- > -		/*
- > -		 * All requests use scheduler tags when an I/O scheduler is
- > -		 * enabled for the queue.
- > -		 */
- > -		data->rq_flags |= RQF_SCHED_TAGS;
-
-Why has the above comment been removed? I think that it is useful.
-
-Additionally, please split this patch into two patches: a first patch
-that introduces the function blk_mq_limit_depth() and a second patch
-with the remaining changes from this patch.
-
-Thanks,
-
-Bart.
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index 3e741d33142d..5007d811a738 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -633,10 +633,9 @@ static bool dd_bio_merge(struct request_queue *q, struct bio *bio,
+ /*
+  * add rq to rbtree and fifo
+  */
+-static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
++static void dd_insert_request(struct request_queue *q, struct request *rq,
+ 			      blk_insert_t flags, struct list_head *free)
+ {
+-	struct request_queue *q = hctx->queue;
+ 	struct deadline_data *dd = q->elevator->elevator_data;
+ 	const enum dd_data_dir data_dir = rq_data_dir(rq);
+ 	u16 ioprio = req_get_ioprio(rq);
+@@ -694,7 +693,7 @@ static void dd_insert_requests(struct blk_mq_hw_ctx *hctx,
+ 
+ 		rq = list_first_entry(list, struct request, queuelist);
+ 		list_del_init(&rq->queuelist);
+-		dd_insert_request(hctx, rq, flags, &free);
++		dd_insert_request(q, rq, flags, &free);
+ 	}
+ 	spin_unlock(&dd->lock);
+ 
+-- 
+2.50.1 (Apple Git-155)
 
