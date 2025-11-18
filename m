@@ -1,91 +1,76 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 654222F7AAF
-	for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 07:00:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B76BB2DAFB8;
+	Tue, 18 Nov 2025 07:03:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763449240; cv=none; b=rrgQg7HtKF7ALL0f+vI55wE6gUB/gseDmPaFIoPUwbPlvYsvIskw4SmdRZ1qHyon+LBGN8GcOJsYirtTnZd89WYOeBfJVn/XCfgrbFvgrhehFA2Hf8rkpGn7XKMxS8TqB/yhbJU/7X+J6jfQx+0kzlSgHREVCH9s2zGwnLM1rIU=
+	t=1763449408; cv=none; b=IWCYT3zC0Obkjnj0OIBZVMHfg3GhBQTnsV/nCQ/fXgS9Az2XNlibokGzBj6GN8nla8UdxW1/63GGyy9/eiF/aoS5V+aca9cvVN3CZ2dvhNGtwbeW1ihrs6O5x9F3s8nXkqVm73cgFSbZ+TdBNuJCYmPThnplmEJoCX0FBFeo42k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763449240; c=relaxed/simple;
-	bh=vgkyYqpeCoM4Jm/jLy4SLp/Z+mnc5up0isEwH+q7mVY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r+mJrgbszdizeb1kwk96YVtLrrBZQQXcAakFGiLWwrmcGItJXzUVNvv4Kdp5nXfxCw4VVXwvzMiNA5k4KVOGPIPn6rj+H3+nuzGtJAH+dr3oCzebmwOKfcXuV6e0d576/1ZhxT8+WMcaW0mPiO80VuzgDkPpFdYR0uB32jRMlb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=Hn+GgvdT; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1763449408; c=relaxed/simple;
+	bh=AOEvKyVwP+dqRuGZ1bdbCbF2m4xPrwIGn9E8k5eMJE4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gO3jAZjnEEvdd8/ou2VDHXQM+BPzXVJFAcPRqAtKt6cwBfvs8R+d1u2BOxUL7J/eD8rqjx/N+jGqS6erJ7EaH7JyWnXcz3kmSmT6iLBgYV8kMZBDUCMo7BMCwV3fdyPq54wFgZf7I2s9hmw53GCBn17OsrVKsLn5gRZaXqdA44g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ZYwTvaNz; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Hn+GgvdT"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2957850c63bso53184105ad.0
-        for <linux-block@vger.kernel.org>; Mon, 17 Nov 2025 23:00:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1763449239; x=1764054039; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RmTt4bdcSxqSZRCTcBCbSzCGqQ66VU3Pz/goFqi2reY=;
-        b=Hn+GgvdTk5wyjGV0frA1rFFpzt2QAnBOQWDFvW+gxs9hAZ7b2P+3l35qtyVLUtk8It
-         RAxczaAMlrn3bYtabodtFwBBJb1XWvqKrDFJnitb7cvtuaNun11lZGGCkOjzj8Cml6m6
-         JvLVv/vKDiMdgZrhfutR90YrCu/8tYF/bMT/0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763449239; x=1764054039;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RmTt4bdcSxqSZRCTcBCbSzCGqQ66VU3Pz/goFqi2reY=;
-        b=r/G3CQ1ZRtLNHhfunM4AH9J1Na7xbXCN4CtdDQpSPjvtmVT0YjCDvR0zs77mxk/wjP
-         hOuMpH3sNOWiwXlO6A9KaT8jw63BNxMx47aLtIlSPAGqY0bW5dQXIdiiJ5VBb6s8eJr8
-         VUqOqojiOY3UyXYWy93oO9Vw2TTuDB4IIUJHl3ry2pdJEO8WIHHbWYuofUYGmGGi8lBR
-         nOGA8q3mzmbxaHG4a8bkqIDbQDPImUSj++RcmBFoakJPF3EeraGju9BkS3KybIA+n66d
-         p4sy66J8rAQaxgAYo8UfWq+N9Pv3H3gMhwNklByMAFUwgCEmx3kKIiavinZV3fbW9bWH
-         nSGw==
-X-Forwarded-Encrypted: i=1; AJvYcCWuqzAo2sZ5mH6hCo9RRerTjtQSXSpa9fg/LSz+XMqHmWocc/KTQiHNE56uiEO1/haHEthUrUKU36rszQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxTdZb0HxeZYu00fG1ayhN5dzNdVBbFR3BkosC8HlWFEXeYnhJD
-	XdX3+UOd2hObArwpuQQz0czmJGkuCI3rHxltTSU7V4av3IHf7wtHBuQDUpLbKUoABQ==
-X-Gm-Gg: ASbGncs+AE6c8oIJJLZvDEf/TiMI9rIF+eBWn19GPZAhlGgJQNTDXnttw+Qi8NlgLer
-	Swz+DWa6S2XbdtTnC/FhFEmtGl5IYcydtrYDQbfYNRG7vr4v/Pp85WYR61hjldtY+RZbf2g5MnC
-	ljNoxYH25KYZSJxrsCE9nG2jXq4qAEAPJJ8GakPKlquy6v0QEa4nTHIONKlTzla2d6KVsJLHywK
-	/2JTsZYAz3rZ3VfqfYqVrUKnNNmk2YX67U+lWB9xF5SQHjnv8mM30SiNrv72w3orw5vV/iTZ+Kj
-	94KxFHXqf5+z7SM3dvMHwtjDMKMUgnPu1ktBavomTKVReJMkDxkYklAKgOp7ZkLvtvbY5HN+VFf
-	XyPIt8mE2WbWoHNl1grejE9WU3YXN/03CnEO1ejIIA26ax7nUV6Ms/s3U415uY8fVhBTpOVNKUI
-	XZ6pyj
-X-Google-Smtp-Source: AGHT+IF3GB3OuQkSGJQgjd6ndP7i9bypEbEprGds7oNMXJqRWrwJRSq9m+dsDKDeLD7REP6viKq7kw==
-X-Received: by 2002:a17:903:3b88:b0:297:df84:bd18 with SMTP id d9443c01a7336-299f55b8153mr28585875ad.30.1763449238472;
-        Mon, 17 Nov 2025 23:00:38 -0800 (PST)
-Received: from google.com ([2401:fa00:8f:203:beba:22fc:d89b:ce14])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2985c24941csm161791945ad.41.2025.11.17.23.00.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Nov 2025 23:00:37 -0800 (PST)
-Date: Tue, 18 Nov 2025 16:00:32 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, 
-	Minchan Kim <minchan@kernel.org>, Yuwen Chen <ywen.chen@foxmail.com>, 
-	Richard Chang <richardycc@google.com>, Brian Geffon <bgeffon@google.com>, 
-	Fengyu Lian <licayy@outlook.com>, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-block@vger.kernel.org, Minchan Kim <minchan@google.com>
-Subject: Re: [PATCHv3 1/4] zram: introduce writeback bio batching support
-Message-ID: <hbtjgtrba2elesgfxva63y6g2s3ycnwv5yhxlwknrfpulmljte@ghz2eudf3i7r>
-References: <20251115023447.495417-1-senozhatsky@chromium.org>
- <20251115023447.495417-2-senozhatsky@chromium.org>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ZYwTvaNz"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=odUqavZCKNqJVf2YUjCerkDNDeembE185J3//oGXXH0=; b=ZYwTvaNzvF8NI+LbkOjYvHOmWR
+	utPTeNKjKP1uqFZc6TPGpI0wkJPJISNTfcRlmZRqO7VDwd/3CwKS6vPEGoIyn3G1B6cp6Z99i7lrr
+	N8ClU2ZrlJa1JTHL1AE+hc6fxxE9f+mHBF7N9AbI8kxIJfM/kxcGMgnCCYKYGpmDa/VqG4T8f7s7K
+	HOrQEVvpK0TcIyD+mY54zFEE5bKiTd7hMjHRFMX+3QSSfqhslGQmm5bm1Z8UneC0eQuFmVMWjPsIr
+	3WOqhWosnDBqTmoOIzcNu1JEnbKtrlFXZbnzKNNRYKRNrTJnuXXJ1mod8NFg7gw/kD8ILml20E9GH
+	XLv7hAfw==;
+Received: from 2a02-8389-2341-5b80-d601-7564-c2e0-491c.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:d601:7564:c2e0:491c] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vLFkL-0000000HWyG-2Ywn;
+	Tue, 18 Nov 2025 07:03:26 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Damien Le Moal <dlemoal@kernel.org>,
+	Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	linux-block@vger.kernel.org,
+	dm-devel@lists.linux.dev
+Subject: add a flag to allow underordered zoned writes
+Date: Tue, 18 Nov 2025 08:03:07 +0100
+Message-ID: <20251118070321.2367097-1-hch@lst.de>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251115023447.495417-2-senozhatsky@chromium.org>
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On (25/11/15 11:34), Sergey Senozhatsky wrote:
-[..]
-> +static int zram_writeback_complete(struct zram *zram, struct zram_wb_req *req)
-> +{
-> +	u32 index;
-> +	int err;
-> +
-> +	index = req->pps->index;
-> +	release_pp_slot(zram, req->pps);
-> +	req->pps = NULL;
+Hi all,
 
-It's too early to release the pp_slot here.  Will fix in v4.
+currently writes to sequential write zones either need to use Zone
+Append, or have a local queue list to order writes before the
+submission, just for the block layer than having another ordered list
+in the zwplug to issue them one at a time.
+
+This series allows to leverage the zwplug list to create ordering when
+the submitter guarantees that it will fill any resulting gap, i.e. unless
+an I/O error happens there will be no missing I/Os.  Users of zoned
+devices have to do that anyway as they can't leave gaps, but we can't
+guaranteed that for user I/O.  Kernel I/O on the other is trusted and can
+set this flag.
+
+This series adds the support and converts dm-kcopyd as the most trivial
+user.  File system conversion will be a bit more complex as the
+call chains are bit more complex and need a full audit.
+
+Diffstat:
+ block/blk-mq-debugfs.c    |    1 
+ block/blk-zoned.c         |   61 ++++++++++++++++++++++++++++++++++++----------
+ drivers/md/dm-kcopyd.c    |   48 ++++--------------------------------
+ include/linux/bio.h       |   21 +++++++++++++++
+ include/linux/blk_types.h |    2 +
+ 5 files changed, 79 insertions(+), 54 deletions(-)
