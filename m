@@ -1,83 +1,78 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sg-1-14.ptr.blmpb.com (sg-1-14.ptr.blmpb.com [118.26.132.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C16B2D8766
-	for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 05:54:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E77B82D8771
+	for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 05:56:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763445277; cv=none; b=TzAw+fM5OpCL6AzHGRR7iQ+u61Gi0VPCX0xVXFJRYK0NDR2J75aj6/kPL8Jj8h/WI2r94VH/6iLUtJ7OUsd43GnNlj33wi/LezNOlGBPA1iEbv5xjIPdpTTRXyb3kSHVwQ2DX//wNg2m+emBGpRi8WbM8mAZSUFK9q5qz8V7DYU=
+	t=1763445419; cv=none; b=C5YOzmz31bcpNy907domuQdFOwP9mh7wQCZia2gV/E6IwCGLbZ8kj6Xx+UC5rTKMXdMe4tJ6lcE4q71Ld8IE38ci+swyOQFaKvgG8O9K06ogoHimkIvgyWDtltOWQWwzle6+kbinSxWg0fNYUh/8din0VBfcP6PbyIq4PZgIhe0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763445277; c=relaxed/simple;
-	bh=ooXzNww8N1xswd7Cimv1CqSVZ7srtW07tLEVp821wM8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CsEvcJGxnEa8oaTVjZscuVb6dvlWzl6PV7USgwSTnNaOL68u93cAXTSIOOaXNPIdHZ0DGQ+mmMW9OQOt+2I7whu6gtCe25xQooUTy9j7JBsxK+5GIxfBDqphye2TI2yRpGfiNeCN6L5vi2ldG5A1yo4sHD1HK+RFXyks3N9zeCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=UFSQJw+t; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1763445419; c=relaxed/simple;
+	bh=+TTOWBmVVvGm0ThWj7sfk68OK1xH45hMceJ4QiV4yo4=;
+	h=Content-Type:From:Cc:Subject:Message-Id:Mime-Version:In-Reply-To:
+	 References:Date:To; b=jcTgtU83lhdipnT0m7gTeDUKBJNd4/K7LtlYZKMEPohnT2SkzBInquLL3JRvqoWPw9+/yH5zuacL7Hui6b67IS7BYoAAich6Gv3D3EWJeGDhtmVadHa2eLmt0sRN9QzRT1JwhBVlV8eca8IHQLEdFmhyJiHML8fgAymMOeXiuuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=none smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=Eq9hN7Db; arc=none smtp.client-ip=118.26.132.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=fnnas.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UFSQJw+t"
+	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="Eq9hN7Db"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=OawlVXwphR6hIAr5wfhp6tps3i+oxAiVjF6JbfroI7M=; b=UFSQJw+tm3Lf1Pio57wJN7uqrb
-	58L1cJuqBAz0VNwDUt08dUfI8EmuOV6mhEmB6ml/Zqf/m5nYo4onZHelroVnL2IeZTrBQSlhdXIE/
-	s88dW8E90z+EB/uQj38VZTXwZ8TFoWyaMJIHE8Wx2E90cex7/q5RGu4b3DQZDu8SaTB/P6E4LIEZO
-	zC3q8s/mkH9OvSv6nL/Irjaufk/jCx6rtfn5yUrm4ZIUyMemGk8Hy2iUJfmBrVFbVp7L+l7H3H1Rm
-	8EowM0d9ULod+DA/UWkKUblr57Y9gsw971xJtl4TomiojqWxY7H0FlOOXowfLyQCkvuRYv/wImr35
-	mVN0uAKQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vLEfi-0000000HS4S-3cFQ;
-	Tue, 18 Nov 2025 05:54:34 +0000
-Date: Mon, 17 Nov 2025 21:54:34 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Keith Busch <kbusch@kernel.org>
-Cc: Christoph Hellwig <hch@infradead.org>, Keith Busch <kbusch@meta.com>,
-	linux-block@vger.kernel.org, shinichiro.kawasaki@wdc.com
-Subject: Re: [PATCH blktests] create a test for direct io offsets
-Message-ID: <aRwKGvo0CDBR86bo@infradead.org>
-References: <20251014205420.941424-1-kbusch@meta.com>
- <aPIk3Ng8JXs-3Pye@infradead.org>
- <aPZhWIokZf0K-Ma9@kbusch-mbp>
- <aPcZ6ZnAGVwgK1DO@infradead.org>
- <aPf5gAOlnJtVUV6E@kbusch-mbp>
- <aPhhpohu8mc95oLp@infradead.org>
- <aRuZbTBUNu8oTbty@kbusch-mbp>
+ s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1763445405;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=+TTOWBmVVvGm0ThWj7sfk68OK1xH45hMceJ4QiV4yo4=;
+ b=Eq9hN7DbXKT/3p10GoR4gnnSwFB9NnHzePd5zMoYQEDf1WUFl1Cn/ZH/zA2Vmfg8hntTeH
+ +kgSgNFxbMkT4qoM14RGMsbwsa+g/rhQ8LoNgNV6VvTdEvD9WEDKIJhUiZOGzj2cV9wN/D
+ JK8Hpn50WQ22H+YYI601RPXMy8ifPG3FVNFssVJyxK9zbjYwT+MRo1r3Ix0k0h4omJCTcL
+ Xmxc+JA6AOOZ5l+p845WK8Wozs+xZQhgZrAHXAaKAIa32t0MP5ZomAwqwvBD43/aCZVC86
+ KkL1B5L6j15MBU/KlmP1F/Vb3kc3oQaJnLG5Dm5Jb3mem/CtdDjdbuZAXvRQnw==
+X-Lms-Return-Path: <lba+2691c0a9b+69530d+vger.kernel.org+yukuai@fnnas.com>
+Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+Organization: fnnas
+Received: from [192.168.1.104] ([39.182.0.153]) by smtp.feishu.cn with ESMTPS; Tue, 18 Nov 2025 13:56:42 +0800
+From: "Yu Kuai" <yukuai@fnnas.com>
+Cc: <nilay@linux.ibm.com>
+Subject: Re: [PATCH RESEND v5 2/7] blk-mq-sched: unify elevators checking for async requests
+Message-Id: <16e817ab-7444-4da8-bc92-38fa13cb407f@fnnas.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aRuZbTBUNu8oTbty@kbusch-mbp>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Mime-Version: 1.0
+In-Reply-To: <d6073899-710e-450d-9907-1a7a69a4a87d@acm.org>
+References: <20251116035228.119987-1-yukuai@fnnas.com> <20251116035228.119987-3-yukuai@fnnas.com> <d6073899-710e-450d-9907-1a7a69a4a87d@acm.org>
+Content-Transfer-Encoding: quoted-printable
+Reply-To: yukuai@fnnas.com
+Content-Language: en-US
+Date: Tue, 18 Nov 2025 13:56:40 +0800
+X-Original-From: Yu Kuai <yukuai@fnnas.com>
+To: "Bart Van Assche" <bvanassche@acm.org>, <axboe@kernel.dk>, 
+	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>, 
+	"Yu Kuai" <yukuai@fnnas.com>
 
-On Mon, Nov 17, 2025 at 02:53:49PM -0700, Keith Busch wrote:
-> On Tue, Oct 21, 2025 at 09:46:30PM -0700, Christoph Hellwig wrote:
-> > On Tue, Oct 21, 2025 at 03:22:08PM -0600, Keith Busch wrote:
-> > > On Mon, Oct 20, 2025 at 10:28:09PM -0700, Christoph Hellwig wrote:
-> > > > seems like a huge win.  Any chance you could try to get this done ASAP
-> > > > so that we could make the interface fully discoverable before 6.18 is
-> > > > released?
-> > > 
-> > > I just want to make sure I am aligned to what you have in mind. Is this
-> > > something like this what you're looking for? This reports the kernel's
-> > > ability to handle a dio with memory that is discontiguous for a single
-> > > device "sector", and reports the virtual gap requirements.
-> > 
-> > So, I think Christian really did not want more random stuff in statx,
-> > which would lead to using fsxattr instead.
-> 
-> I haven't forgotten about this. I was hoping I would make sense of the
-> request. It looks like only xfs makes use of fsxattr (it's the only one
-> that calls copy_fsxattr_to_user()). Is the intention that every
-> filesystem needs to implement support for fsxattr then?
+Hi,
 
-In addition to XFS, the generic ioctl_fsgetxattr, which is directly
-weird up to FS_IOC_FSGETXATTR processing uses it, XFS only has it
-because it has a special version of that for xattrs.
+=E5=9C=A8 2025/11/18 7:35, Bart Van Assche =E5=86=99=E9=81=93:
+> On 11/15/25 7:52 PM, Yu Kuai wrote:
+>> +static inline bool blk_mq_sched_sync_request(blk_opf_t opf)
+>> +{
+>> +=C2=A0=C2=A0=C2=A0 return op_is_sync(opf) && !op_is_write(opf);
+>> +}
+>
+> The name of this function suggests that it performs an action while it
+> only performs a test. Please consider renaming this function into e.g.
+> blk_mq_is_sync_read(). I think the suggested name reflects much more
+> clearly what this function does than "blk_mq_sched_sync_request()".
+>
+Yes, this sounds good.
 
-->fileattr_get is already implemented by most file systems, so
-FS_IOC_FSGETXATTR works widely.
+> Thanks,
+>
+> Bart.
+>
+
+--=20
+Thanks,
+Kuai
