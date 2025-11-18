@@ -1,242 +1,87 @@
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91E8B273805
-	for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 14:28:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 257322BEC28;
+	Tue, 18 Nov 2025 14:29:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763476135; cv=none; b=b6EvTTBpDFAPoreH4MWdXFAeDTCXi+toPgag1VKbT1Uhf5b99a9CWcPrJkb7GckthjlJnTi29uF7nS1UrkwD7wjxFCLJGXPQUvaNecQ9tTAlb8i7t13f2dNEct4AbODzIBHSdPTczb0D7D2i+pMACjQb8+pbG2ZpZ6hZ5rCxE8s=
+	t=1763476174; cv=none; b=L8OrEyRXAXw/N5cHkOnL+LBkqSNBYoKyL/dsPOkxZgICXzqxDgJzd/UWNzg7enibXyFU7Xbq8dCvETNfjRdAoqie4jiS3lkiz26HgvO5fArqd7NBaXakJgezfsn2Qp62vnOjQ2twPByi7UalwRoRv8Z6JJqv0CLRlXcaAc2IVk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763476135; c=relaxed/simple;
-	bh=Vw+jMoLrz3CPi3RZadAUQ9OZDIQrFYnK7RrpZ+3jFFU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lKC+z7pE3rNhA4ojrhvGv0fFZaXxLx4dTTjkeoVYOj5SXyZCpuAM7JupmnCcdHiq7odwqvDs5SrH0PXYhin9ynuKqV/QskzaB5nAF7MvpyjQ2KPf55Lj2CfsuiVeHyFhPMa0p/WinwI8Ri6yB/D3yiDnLVoxAIYy8bTlnei5jZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=jbgNlztq; arc=none smtp.client-ip=209.85.219.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	s=arc-20240116; t=1763476174; c=relaxed/simple;
+	bh=bsTGiYCeUGyKymNT/zymuRlkd9lPzEB0+jj26ocRViM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Nn7LEjuUpkZTK+P5ch77gWpWvUC/094llUhjvllCE2VhsrzdlNID8KC6qq76YZrZA3TsbOHTvVp1ipkGiX/Otkhyl0WA7IzCbPozbVGBWr/eqDn9P7Hl8/gUtNtNhQvhCs/IJN9lKEUjeJXkWPDK9SzBp86DEFW5Ze7cqWjnJ+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=UEKPZFD8; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=h/sRwr7x; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="jbgNlztq"
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-88249766055so69600726d6.1
-        for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 06:28:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1763476131; x=1764080931; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=35WpspOv1fAWFINmOzi0AcgEQL1oV2/QEYSJcrH4aSg=;
-        b=jbgNlztqEGj3WmXe7Jo3l8FaT1DvF8AaIYPg93dVoF6UZRCE01BN9/Pnq+azINjQid
-         LpaMmzcr/XUyOOp2ThaI47IxSCnWlvwIwG94wN+XZ7LGqOd6cdwVFXyTanROgMLBbQ/6
-         jzJ8MKocS/iXqpfC3Wey6NGpOtxYUOzxcm2sbBZdIsSp05BjVhevLq428KKvAXPl3xL5
-         8RIG9SSDGshJkAbsY3vW7n/jSgIOdS7J00+Bl+R1/qeSCQMNP5hD5M8oSOaDEz/Aheqg
-         FSaz76ZiLI+pEwl6Es2xp9bla/Vfo6GtgTw9bOQLBkvuDaGebbESWQ07NgaAWjGPJun8
-         9Ycw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763476131; x=1764080931;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=35WpspOv1fAWFINmOzi0AcgEQL1oV2/QEYSJcrH4aSg=;
-        b=UhHlTyzHW3r1BLbMFWDDFp3BDtuWVFix+f5/tTRVBlL8KFHyzwLRPtRrQ2W2QYwRaV
-         GwOlrywLtVY104ZfOi5VHB4VkzvtjHiOcXBGBsukfA3QlPMqYD/s4fglTadbAD/bPbDr
-         AybkHLF0fnm4F8CDE0GA9XZeceGW7QDW//FhCogJwAo8FovoC3cAY/yoewg1JS70vgju
-         jDXvbNd43fRa4BvuxbFjmz2Jg7tpS8OgM9IaQrVW8TpOYb39fND/ARlp0jT0Q4Baxeg7
-         W6OfVlvr7NC/OrWkXi1imQanSnS8TFIMLgsCXnagGHs92bBTZf475PUv/ETDk6uLOsOs
-         P7KA==
-X-Forwarded-Encrypted: i=1; AJvYcCUsHGslXnHUMkJA3iEsk+eUt6Z09XmpKWYeNM6vxC5vR/e/lijVf9C9pdc7L3lgIwh0YzeuZ4vwsEM8Sg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz5b1imn2hFuc3mq+vx6MCAenVvRCbqqOVKiap5mN6TyFVzXohY
-	1dxBr9xYNmsOtEiW43oJNoZ4IBMyshcd2OSHyDxfad4/z7ojiEC3siCaylB5TAp1jN0=
-X-Gm-Gg: ASbGncv/QV7xGz9ViEC1QXMLsE1AAonfVVxZzj75b6ZTnXTDwx38iWPqA8mihsRJCvy
-	qhJmnVx7MHVu2X8kB+Qa4T/vD4gX0ZKLH+cRaHRUdyoo/gp2ClCZFDxTJsvTFdNeGQksnJAJs1J
-	fwadxO5rOx24Z3JZfCRDjKouGHwWVc2bC8TAHscIlqy1WrW0IWKgWcTFVs7Zf6nh/QPJveX33Vg
-	DGcMdHo+5QlNMHLIe6YZ0LccdVZEx4UGIvo2Yql2inJBt9WP//VpJeoRUv+BRqMoH+yQFx25a0p
-	+kMLzqd/eg4OvHatb7Zh2up5hZj7fMH45lC5pKe/WNO5NnwP3NzrgpUrRQ5B8cd0Sn83p0FzoHI
-	enQKBWw0+9MF9JNUywUH5QPmp3Hy2jzesO6y0czFhrbcRSmCDGinw2mXnN0GAyLRhRE2pgOWqRI
-	nSL/xCxC+TlKQSCty4WjPOCXu0JwiSXmW4qAxKg5KCoJ6eR/AjQmxfaNv154eYILg2ySA=
-X-Google-Smtp-Source: AGHT+IF+NrfSbYwvwiNh+CC3YngHFJHpwzxC37jBlKkv0sHaTL3i1cld4gWS47y25QRA75BxBaWSvQ==
-X-Received: by 2002:a05:6214:62a:b0:81b:bf92:8df9 with SMTP id 6a1803df08f44-8829269e086mr234228876d6.43.1763476131063;
-        Tue, 18 Nov 2025 06:28:51 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8828652efa4sm114860276d6.39.2025.11.18.06.28.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Nov 2025 06:28:50 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1vLMhN-00000000NEc-3Dxs;
-	Tue, 18 Nov 2025 10:28:49 -0400
-Date: Tue, 18 Nov 2025 10:28:49 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Cc: Leon Romanovsky <leon@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>, Jens Axboe <axboe@kernel.dk>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <skolothumtho@nvidia.com>,
-	Alex Williamson <alex@shazbot.org>,
-	Krishnakant Jaju <kjaju@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
-	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-	"linaro-mm-sig@lists.linaro.org" <linaro-mm-sig@lists.linaro.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-hardening@vger.kernel.org" <linux-hardening@vger.kernel.org>,
-	"Kasireddy, Vivek" <vivek.kasireddy@intel.com>
-Subject: Re: [PATCH v8 10/11] vfio/pci: Add dma-buf export support for MMIO
- regions
-Message-ID: <20251118142849.GG17968@ziepe.ca>
-References: <20251111-dmabuf-vfio-v8-0-fd9aa5df478f@nvidia.com>
- <20251111-dmabuf-vfio-v8-10-fd9aa5df478f@nvidia.com>
- <BN9PR11MB527610F3240E677BE9720C2B8CD6A@BN9PR11MB5276.namprd11.prod.outlook.com>
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="UEKPZFD8";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="h/sRwr7x"
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1763476171;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0n9UnbJWA0qi+JmKy/6pHK84BHEidvZ9wIicmRWTn88=;
+	b=UEKPZFD8IIH9dBvKhwzK+fXlmTby97FDKBDH31b76QtLz4uD0gbhWa+W7SG6f2imgKHsWF
+	nu7N2cXnD+OCXTKolN3SzKUxx0O8+YMYrf0DJRqkmvAsYU7YQt4xMRIRn31eSNTDdyUdTG
+	IT2upU2s7XedV+LOJih1/IaYmQwaNjbWORnGZX5SwX7NuvSC4KD3ikvjJIvhOM46GhQd01
+	52oJbqmp9xU9wMBK5pfo+VUj795hv5/+DoNV18rIIGuY7Np5J8ffKQgUsoL/5nUfJg3+NS
+	VL74Yn4la+CYnL9s6qvPYaEX2wHWgAZZrqm1x678CcgHB2dDbTcn5wYaPqQxpw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1763476171;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0n9UnbJWA0qi+JmKy/6pHK84BHEidvZ9wIicmRWTn88=;
+	b=h/sRwr7xzeJWCEHSEV2dmP1lyM8HmabFe+SrA74S6/B5KUksS4LoIrxmGid+rFGCLsbVgL
+	qsdlJxY2x7xXHyBw==
+To: Christophe Leroy <christophe.leroy@csgroup.eu>, Peter Zijlstra
+ <peterz@infradead.org>
+Cc: Christophe Leroy <christophe.leroy@csgroup.eu>, Alexander Viro
+ <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan
+ Kara <jack@suse.cz>, Ingo Molnar <mingo@redhat.com>, Darren Hart
+ <dvhart@infradead.org>, Davidlohr Bueso <dave@stgolabs.net>, Andre Almeida
+ <andrealmeid@igalia.com>, Andrew Morton <akpm@linux-foundation.org>, Eric
+ Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Dave Hansen <dave.hansen@linux.intel.com>, Madhavan Srinivasan
+ <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>, Nichlas
+ Piggin <npiggin@gmail.com>, linux-block@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH v5 0/4] uaccess: Prepare for masked user access on powerpc
+In-Reply-To: <cover.1763396724.git.christophe.leroy@csgroup.eu>
+References: <cover.1763396724.git.christophe.leroy@csgroup.eu>
+Date: Tue, 18 Nov 2025 15:29:29 +0100
+Message-ID: <87y0o35s8m.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB527610F3240E677BE9720C2B8CD6A@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain
 
-On Tue, Nov 18, 2025 at 07:33:23AM +0000, Tian, Kevin wrote:
-> > From: Leon Romanovsky <leon@kernel.org>
-> > Sent: Tuesday, November 11, 2025 5:58 PM
-> > 
-> > -		if (!new_mem)
-> > +		if (!new_mem) {
-> >  			vfio_pci_zap_and_down_write_memory_lock(vdev);
-> > -		else
-> > +			vfio_pci_dma_buf_move(vdev, true);
-> > +		} else {
-> >  			down_write(&vdev->memory_lock);
-> > +		}
-> 
-> shouldn't we notify move before zapping the bars? otherwise there is
-> still a small window in between where the exporter already has the
-> mapping cleared while the importer still keeps it...
+On Mon, Nov 17 2025 at 17:43, Christophe Leroy wrote:
+> This is v5 of the series "powerpc: Implement masked user access". This
+> version only includes the preparatory patches to enable merging of
+> powerpc architecture patches that depend on them on next cycle.
+>
+> It applies on top of commit 6ec821f050e2 (tag: core-scoped-uaccess)
+> from tip tree.
+>
+> Thomas, Peter, could you please take those preparatory patches
+> in tip tree for v6.19, then Maddy will take powerpc patches
+> into powerpc-next for v6.20.
 
-zapping the VMA and moving/revoking the DMABUF are independent
-operations that can happen in any order. They effect different kinds
-of users. The VMA zap prevents CPU access from userspace, the DMABUF
-move prevents DMA access from devices.
-
-The order has to be like the above because vfio_pci_dma_buf_move()
-must be called under the memory lock and
-vfio_pci_zap_and_down_write_memory_lock() gets the memory lock..
-
-> > +static void vfio_pci_dma_buf_release(struct dma_buf *dmabuf)
-> > +{
-> > +	struct vfio_pci_dma_buf *priv = dmabuf->priv;
-> > +
-> > +	/*
-> > +	 * Either this or vfio_pci_dma_buf_cleanup() will remove from the list.
-> > +	 * The refcount prevents both.
-> 
-> which refcount? I thought it's vdev->memory_lock preventing the race...
-
-Refcount on the dmabuf
-
-> > +int vfio_pci_core_fill_phys_vec(struct dma_buf_phys_vec *phys_vec,
-> > +				struct vfio_region_dma_range *dma_ranges,
-> > +				size_t nr_ranges, phys_addr_t start,
-> > +				phys_addr_t len)
-> > +{
-> > +	phys_addr_t max_addr;
-> > +	unsigned int i;
-> > +
-> > +	max_addr = start + len;
-> > +	for (i = 0; i < nr_ranges; i++) {
-> > +		phys_addr_t end;
-> > +
-> > +		if (!dma_ranges[i].length)
-> > +			return -EINVAL;
-> 
-> Looks redundant as there is already a check in validate_dmabuf_input().
-
-Agree
-
-> > +int vfio_pci_core_feature_dma_buf(struct vfio_pci_core_device *vdev, u32
-> > flags,
-> > +				  struct vfio_device_feature_dma_buf __user
-> > *arg,
-> > +				  size_t argsz)
-> > +{
-> > +	struct vfio_device_feature_dma_buf get_dma_buf = {};
-> > +	struct vfio_region_dma_range *dma_ranges;
-> > +	DEFINE_DMA_BUF_EXPORT_INFO(exp_info);
-> > +	struct vfio_pci_dma_buf *priv;
-> > +	size_t length;
-> > +	int ret;
-> > +
-> > +	if (!vdev->pci_ops || !vdev->pci_ops->get_dmabuf_phys)
-> > +		return -EOPNOTSUPP;
-> > +
-> > +	ret = vfio_check_feature(flags, argsz, VFIO_DEVICE_FEATURE_GET,
-> > +				 sizeof(get_dma_buf));
-> > +	if (ret != 1)
-> > +		return ret;
-> > +
-> > +	if (copy_from_user(&get_dma_buf, arg, sizeof(get_dma_buf)))
-> > +		return -EFAULT;
-> > +
-> > +	if (!get_dma_buf.nr_ranges || get_dma_buf.flags)
-> > +		return -EINVAL;
-> 
-> unknown flag bits get -EOPNOTSUPP.
-
-Agree
-
-> > +
-> > +void vfio_pci_dma_buf_cleanup(struct vfio_pci_core_device *vdev)
-> > +{
-> > +	struct vfio_pci_dma_buf *priv;
-> > +	struct vfio_pci_dma_buf *tmp;
-> > +
-> > +	down_write(&vdev->memory_lock);
-> > +	list_for_each_entry_safe(priv, tmp, &vdev->dmabufs, dmabufs_elm)
-> > {
-> > +		if (!get_file_active(&priv->dmabuf->file))
-> > +			continue;
-> > +
-> > +		dma_resv_lock(priv->dmabuf->resv, NULL);
-> > +		list_del_init(&priv->dmabufs_elm);
-> > +		priv->vdev = NULL;
-> > +		priv->revoked = true;
-> > +		dma_buf_move_notify(priv->dmabuf);
-> > +		dma_resv_unlock(priv->dmabuf->resv);
-> > +		vfio_device_put_registration(&vdev->vdev);
-> > +		fput(priv->dmabuf->file);
-> 
-> dma_buf_put(priv->dmabuf), consistent with other places.
-
-Someone else said this, I don't agree, the above got the get via
-
-get_file_active() instead of a dma_buf version..
-
-So we should pair with get_file_active() vs fput().
-
-Christian rejected the idea of adding a dmabuf wrapper for
-get_file_active(), oh well.
-
-> > +struct vfio_device_feature_dma_buf {
-> > +	__u32	region_index;
-> > +	__u32	open_flags;
-> > +	__u32   flags;
-> 
-> Usually the 'flags' field is put in the start (following argsz if existing).
-
-Yeah, but doesn't really matter.
+I've applied them to tip core/uaccess, which contains only the uaccess
+related bits. That branch is immutable and could be consumed by PPC if
+required.
 
 Thanks,
-Jason
+
+        tglx
