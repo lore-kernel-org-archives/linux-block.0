@@ -1,74 +1,74 @@
-Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FFD42E2DF2
-	for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 15:38:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62EE4364EB2
+	for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 15:38:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763480327; cv=none; b=dxk4wMUST1AInu7mBsyxRgdUA//PRJYO1naXr9PCsqRMQkQla6PZLyU3Hj/PQ/RPkSF3QVZXsgGi9NULpk1a4Gt3kj9x6Jn0uwqleSTJH5FgFENVWQXPSSM4RIwlbVwm0aUhoGeUYuM2viPhaS2QYyy16UqbIwqGhi41kOlw68E=
+	t=1763480327; cv=none; b=oH4YPk2Ju8p9gYi6zeaIDZE3JczYdjhQ1kafPk+sUn3sWvDGVDj56fUaPIGBKhm9PbfCV/r5YNruwCMn+RFD+3onIrH5QmIfTx7kzMhF0TYcBXiCHg/p2T9dzeJMKQ1k7hfyHh6/zd5bo0fWsQlSxb8l2YMDfHPLnGttD+HaLF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1763480327; c=relaxed/simple;
-	bh=hDOXd0eCTllGjlvphmdoQTkCI4o/v1tiBMI/JQFO+Oc=;
+	bh=aen+oC0Mjgw/Hi8fNaWzr5NBAgJMpRWGDxaNwPjp2nY=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=jQnx8v9o+Aqr7Z9lniJZIZT8RUK/GK+FxN5B5wxwhV2wZUQwCxF9kHdo63E27vDWHejUtAePOaD55QhA3fd6/oZDBpt8FO/4B7xTB5XI6NRdBVYvb+uqv1tA2mW7WIsexnCpm9djKkZBkl6yuyw1/7C/70cyXsB0WYZ6A4hShHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=HHqcw1gB; arc=none smtp.client-ip=209.85.166.170
+	 MIME-Version:Content-Type; b=TJAGs/3NILyvZGu4EVtI5aGKe/CSizAcddrWBqJaYnofQbKleD7SqVMiuhdeKpI/vuEAozBl2iUjt/WFQTFNej/auHpCYVw8zJD9uyp8OEr6/UI/Y1n/+0ihmxPjBV3AtF45pkz6y1J6cJEgOF2wAf2WTitlffOvdFbhhdLD13g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Tuy8DMQs; arc=none smtp.client-ip=209.85.166.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="HHqcw1gB"
-Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-43323851d03so21083845ab.0
-        for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 07:38:45 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Tuy8DMQs"
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-43326c74911so31490175ab.2
+        for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 07:38:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1763480324; x=1764085124; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1763480326; x=1764085126; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Mop0BXbeVA7pz+P89+67JHjYtUjDwIbDaVAf0R8oLm4=;
-        b=HHqcw1gBBMRx4taAkSTWpBBwyTdVqwTxIuNPM3SZCvmXQNm+QHLFFhFoG6S2YvaQhC
-         tpqL1nwyku3/VU2gQHGX3mRtU+zhbxbwTDeyjf9jGRJw66WsL4OmjQgdLuZSTFe2+IEi
-         TGZwZXS2d2o/65TUSD69ruBySfEXfulRnaWnoSScu05lk/qAgl7/G7rsFsOnkdOrMxbb
-         W2ZAqZSSx9phKCptfna3YQCnco1+AK8BM/5FzEsRkXsrR88TtN2t6T9xOkt8UEdjmYns
-         yTTAbC9NLAdn7lCGuLiDVYNZhdNr6IcGYwtA/BmpC3FN0mnpo0x5RX5sKUsGdqxVKPnA
-         TW+g==
+        bh=QQZtZQUP7iDlBt71n10+YLz3pZiAQuGTG+NACjojoXo=;
+        b=Tuy8DMQss+gB7vMm7uxGbOPuZi+Cqj4OQj7pSfS2eCoN9CqSQZaS34agKoD42FTx4T
+         0WJDUFP1N4w4a08DPpBBDQQBIknAVbyBlF+IttavRuuyh9xBqDgjxKCfE/9cD9vMMD6c
+         gW1B7WO+gQCkZWxJbw6r+U56RzqbDtlU6CBzKYGTa1XLZ1B7QN2tejXmU1qGT0mkzxw3
+         mXhp1AbEaVempdhS9tN1ehbJBwfpqWZFv7HG32Z7lF2d2pteidH6wN/Y3HjbV7X7TOyZ
+         sau2bQZsnvXYAsLrCNBDGWXilStNr4M2dDM+zqrK6WA1t6DicE4ebaJGCHDS/PEW4qG1
+         glrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763480324; x=1764085124;
+        d=1e100.net; s=20230601; t=1763480326; x=1764085126;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Mop0BXbeVA7pz+P89+67JHjYtUjDwIbDaVAf0R8oLm4=;
-        b=iNCNB4gGMy24ZrwHxjDZPy/L4v9m1Itlq0hBrVkmKHby5mgNwVNKX+HWK77xOg9Ddx
-         Of5hwEj1mjFwD+8GwSRhrWsJ8PcPZdTVzF5PCfa/HCEKbmjwuz5Lp27BthXuw5NsFGLN
-         JMsO1Izy0JFG+Imql2+Hbqri664BRoE6hAIHe68eAkz4ab7L03VxQBYw3HdOhfbJynDv
-         ckrjiegPm/UAy0+zhGNvEWNTZl83fXeWEjODkkKroeeDbJIqVF9OTdLPKzCLTOC8ppE+
-         349rTQpW4CBhlfqXo6QNOUFNcupCeGwmx+VWXQqFMEgYgfiZ500vyTITqYalqJRNIPj/
-         /Q0g==
-X-Gm-Message-State: AOJu0Yx8VcPkKVN/OuHq6QMxobhF4fQRqxZp3vyYIHWzJ90k5OGtLtUk
-	X7OrBDLX/0pcgjphp71pze3tDCq1xD73q316LNCwrpZtpqp4XSUVvf5jPI+m6Xpz5y0=
-X-Gm-Gg: ASbGncuP9CGmnZFAowN2Kv8HExGAPtbdPs7fL2lOGArD7d0mVEdc58X+wCiT+fL7Ofx
-	WoTxFrwxoZLQvXRIikdsBTT7B7anilhJoH0VOrmofqE7Z7F6l+7lfoLP6mFYDKud5iYnTGASpZp
-	uO+VQS3NCeENQVTBOcdO1+6FkLRr0T9EuvhSK9m9+pZ549WA0O+bLqwsxOIW422ebgdknUFCxgf
-	fnaUBHV0UIiU/IJlf/yNqj49WZ+KAi2e8K6RpVgUqNMwNfmFzSJvH/v8uxmjhfgF4b8tPtolybd
-	mmqdQaZUHZNjvo7m8Bq2JcUrIKhUkO3SZP3PQXXUkB1ayQ+mSwEV7rGE/Z4e7pCKcjMMqBorIDS
-	M4AOOgLlwPyZsWse1/VoNvyeUKCdgSkQvxwW6KDliHZyU+wbMz30YKRbJlr3HZrKBKTnsDwYNi8
-	SEMnLjZuFfdPmEBg==
-X-Google-Smtp-Source: AGHT+IG8+S4XnZehtbJh2wZVxg2hQEO6XU1apy+1d/G7wa7Jeq7lGc5uai8Q9QxowXUoeU7qPJOUrA==
-X-Received: by 2002:a05:6e02:1845:b0:434:70bd:8b47 with SMTP id e9e14a558f8ab-4348c8be2acmr204639365ab.11.1763480324489;
-        Tue, 18 Nov 2025 07:38:44 -0800 (PST)
+        bh=QQZtZQUP7iDlBt71n10+YLz3pZiAQuGTG+NACjojoXo=;
+        b=u/ANusZsqqbkUdd35aOmu8j7vZjBn7Nh9hWKQ+aoCWwZD//y6bpbTsgkHUN8SdgOh1
+         aSuLhMM/3F2kFQ6w3HTg1BZqZBcMWdgnjGomVNwRpsOmmk/efUPHabdg+xPE/kJL9M3h
+         75hrd5+QrucNxcMtmhJfdK6tzzyBzmDXu9A1gssDBnwVEPiVH8Zr45Rv8X3t4C63TNh6
+         G4MDk0kfxLxHuwwC0tzsmiUQyPvyMRHAQ+D6MfDvhXGiJQAHXpVb92t8HVvpDF4WlhA7
+         HA+v0Wxms9+ZdcHTpxwWuaHf7aOV+yEiZfM45QbnByl2lb11xg/aFFKYcCgY/0/Cu+q8
+         UPJQ==
+X-Gm-Message-State: AOJu0Yz0UokOvyH1rQr+fMjnZdN56hH4HXrpOJ8oeRb8lOhpfJrKvagX
+	1ebnb5NNgFlTtOT4dBLtvh+qBZIeTT93tzYnZ92AOHnHl5O6u8A6UnZ2/bkbzYTmV/MNWUDUwR/
+	JxD2C
+X-Gm-Gg: ASbGnctOEesrn7j+YEg22uyNfS2WwkaK1v0j7+Ew1Jy+O/lld7M3cI3uqf6sBQAFCSm
+	kMex2cD/PjCFGckHkxGOrF0j6zh+VrusS3MCuBjGt0+i23HWBB0wLn+bR0cqcveoR6rFHkZQsqJ
+	YLjhMCQyQMFZSdtfPIn/d8pos+Ej3CN/cXN29rRdcRx4ordU1hqmh98spxmd6MPEfTOpG0TBv/A
+	HnpaklU0cYWgO0fyEk7Qjg2ZAvM1QnB5RgcLKecfYA6o/F3GYLkr5cZM96HCpdo4u8d3ryEnyjh
+	MMY2okeOjR0CBlaZcu7MU8YL7eKyEJVWp3jECaWVeK4aVr63kOMeAXn3E7ZoAldMQue3R18Q9a4
+	EFQKvSdoaCIFLpBJ31OaVumMpHLErlw2Cn+AdP5yUrUK0ivNNTPUTAebEtTPVkvzPsq0L
+X-Google-Smtp-Source: AGHT+IEeZcvV60mvVdg2S5XFfVy/rWwizYdULD7M/cWgiMQN9Bm6wPPCZXeHffazR6JWeZdNihZorQ==
+X-Received: by 2002:a05:6e02:214f:b0:434:77cf:9df with SMTP id e9e14a558f8ab-4348c94e04dmr238340335ab.32.1763480325708;
+        Tue, 18 Nov 2025 07:38:45 -0800 (PST)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-434833e94f1sm83498515ab.10.2025.11.18.07.38.43
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-434833e94f1sm83498515ab.10.2025.11.18.07.38.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Nov 2025 07:38:43 -0800 (PST)
+        Tue, 18 Nov 2025 07:38:44 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Cc: Mikulas Patocka <mpatocka@redhat.com>, 
- Zhaoyang Huang <zhaoyang.huang@unisoc.com>, 
- Dave Chinner <dchinner@redhat.com>, linux-fsdevel@vger.kernel.org, 
- Christoph Hellwig <hch@lst.de>
-In-Reply-To: <20251015110735.1361261-1-ming.lei@redhat.com>
-References: <20251015110735.1361261-1-ming.lei@redhat.com>
-Subject: Re: [PATCH V5 0/6] loop: improve loop aio perf by IOCB_NOWAIT
-Message-Id: <176348032339.300553.10948808566145680135.b4-ty@kernel.dk>
-Date: Tue, 18 Nov 2025 08:38:43 -0700
+To: Xue He <xue01.he@samsung.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Ming Lei <ming.lei@redhat.com>
+In-Reply-To: <20251118073230.261693-1-xue01.he@samsung.com>
+References: <CGME20251118073708epcas5p141bfdb82151031d41cc4c6c5e606a90f@epcas5p1.samsung.com>
+ <20251118073230.261693-1-xue01.he@samsung.com>
+Subject: Re: [PATCH v7 RESEND] block: plug attempts to batch allocate tags
+ multiple times
+Message-Id: <176348032462.300553.2758635392838520236.b4-ty@kernel.dk>
+Date: Tue, 18 Nov 2025 08:38:44 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -80,32 +80,22 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3
 
 
-On Wed, 15 Oct 2025 19:07:25 +0800, Ming Lei wrote:
-> This patchset improves loop aio perf by using IOCB_NOWAIT for avoiding to queue aio
-> command to workqueue context, meantime refactor lo_rw_aio() a bit.
-> 
-> In my test VM, loop disk perf becomes very close to perf of the backing block
-> device(nvme/mq virtio-scsi).
-> 
-> And Mikulas verified that this way can improve 12jobs sequential readwrite io by
-> ~5X, and basically solve the reported problem together with loop MQ change.
+On Tue, 18 Nov 2025 07:32:30 +0000, Xue He wrote:
+> This patch aims to enable batch allocation of sufficient tags after
+> batch IO submission with plug mechanism, thereby avoiding the need for
+> frequent individual requests when the initial allocation is
+> insufficient.
+> -----------------------------------------------------------
+> HW:
+> 16 CPUs/16 poll queues
+> Disk: Samsung PM9A3 Gen4 3.84T
 > 
 > [...]
 
 Applied, thanks!
 
-[1/6] loop: add helper lo_cmd_nr_bvec()
-      commit: c3e6c11147f6f05c15e9c2d74f5d234a6661013c
-[2/6] loop: add helper lo_rw_aio_prep()
-      commit: fd858d1ca9694c88703a8a936d5c7596c86ada74
-[3/6] loop: add lo_submit_rw_aio()
-      commit: c66e9708f92760147a1ea7f66c7b60ec801f85e3
-[4/6] loop: move command blkcg/memcg initialization into loop_queue_work
-      commit: f4788ae9d7bc01735cb6ada333b038c2e3fff260
-[5/6] loop: try to handle loop aio command via NOWAIT IO first
-      commit: 0ba93a906dda7ede9e7669adefe005ee18f3ff42
-[6/6] loop: add hint for handling aio via IOCB_NOWAIT
-      commit: 837ed303964673cf0c7e6a4624cd68d8cf254827
+[1/1] block: plug attempts to batch allocate tags multiple times
+      commit: ddc32b7f2921c4b9f4f9a98a668b887c3514229b
 
 Best regards,
 -- 
