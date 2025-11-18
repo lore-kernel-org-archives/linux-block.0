@@ -1,62 +1,74 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37C7732C309
-	for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 02:00:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B13EE2ECD1A
+	for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 02:07:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763431249; cv=none; b=O7NmP4qSIqM87JfYUTORTDeU0G/vnnMqVNxR7l8sCvSKM2Ak/wW+65cwCuOkAiEfOJ5GU8QZgjpob0QGa0n8dpJpVhKD3mGA7KV+6ZIuE+qy2jQ3M3EV5hBhyeFjbYri2wtpBhFEGoED449aD3/7jfzmlEfuFp7SBf3xocEtMxo=
+	t=1763431660; cv=none; b=Aw9P0fP7ZMN91IIwyNmdXWHeY4ckiBLLNW/Hq8V0sih4p10OQtRXaBlGWkE9eL7uSiUaK96guOL9p2KATs9mkDqdRrnjot+hIb4sptCbIVH+J8P8DlbMNL028rjdurd8IM03Rj6ionBr14pryISeOGuE2XJH3dzTy/eVTCVHl94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763431249; c=relaxed/simple;
-	bh=OAr3cwov0SbuJeIWmX+B3S+07DGFcfzASEZTWXd/XAo=;
+	s=arc-20240116; t=1763431660; c=relaxed/simple;
+	bh=6P73Fu2n2ybgpsjg+frMe8gtm50pWSpVSEfs0WoHSt8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IVnU5Z284zkyAlCbUitQoxN/UKm1Zi/Oo9h4VJOHUEN2Bc5F9tgh68UG4prtMAShWvjZ+xnKvWM86ruKmtREHAyO1pvOjItwvk0qcvVYX8RXLoiv1y2/eYErhDUZinRwuxHZ+8D3bG6bKHnT2crvC+ATz5vjw9fsNzKqIFJfeQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NRYYLL/A; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=ELfOAjRdsqm9zpBSyooH4vujg2ZIwZf1bYkXIWLoyf1AJ4iXD8fyKEPeGAbdkNG2r+8SFYk/GxwobKG8UasYvX3mjz+4r5lNJkcGKhxRuDlmdS94ITxqdGE3zzHShb/Wvnb3ocXZwRNxEsTrqGMKv6yRqzefXqRdwf0nM52yS0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=NQgwTUdj; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NRYYLL/A"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763431241;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8tybxaoC1HjvCM0UUInHr+nJiy9VXCA2YKrEQwU23f8=;
-	b=NRYYLL/A6d9Vru4O4cPFTtLqqRW1jm+6fW+824PCbsFdmk20JV+N/ePUdQcap6m2gg8Fmo
-	9Yb1+IrdwPB454zeo/jhDsa6TjDaABHmnEkAqWn1tvhnrHt57cqodnjsHSq9vyvjdXj2Od
-	2SlA6XnE9Vu24vaG4riPBMU9ZVlZlBU=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-659-jmbrNQTJNDemdSLKfTbqtA-1; Mon,
- 17 Nov 2025 21:00:34 -0500
-X-MC-Unique: jmbrNQTJNDemdSLKfTbqtA-1
-X-Mimecast-MFC-AGG-ID: jmbrNQTJNDemdSLKfTbqtA_1763431232
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CC0A11800107;
-	Tue, 18 Nov 2025 02:00:31 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.204])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 45F5D180049F;
-	Tue, 18 Nov 2025 02:00:23 +0000 (UTC)
-Date: Tue, 18 Nov 2025 10:00:19 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Mohamed Khalfella <mkhalfella@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Casey Chen <cachen@purestorage.com>,
-	Vikas Manocha <vmanocha@purestorage.com>,
-	Yuanyuan Zhong <yzhong@purestorage.com>,
-	Hannes Reinecke <hare@suse.de>, linux-nvme@lists.infradead.org,
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="NQgwTUdj"
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-641977dc00fso7353438a12.1
+        for <linux-block@vger.kernel.org>; Mon, 17 Nov 2025 18:07:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1763431657; x=1764036457; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=S97KCJ0/M+iebNYM5SPjKQEoYZVp3EkSmik6GozuJgM=;
+        b=NQgwTUdjsWEVevkgCp19cjP5jI7BTCR2IvRwsDks7D4gFmo4rGOuQwsXD4/q3gzeF7
+         mEGuHuVfVHmESOzxEfNiISrGnDRMAbtgCQonQPY+lSFZKu7sHyfv6jmoyMNoUk5T6J/1
+         bwbQa6AA9k0uv2WeYkY1x9oEsCxtsh1Aayq3Ek0VvmEqihr1SgNlgmCwYa/ED/xc8/Jq
+         sJR18iUESjbNbSSi2kgwvYTfA84u/4D2KXvf2oWkkLGPHjUvn7Q0qUlJHzFwGyy826G+
+         zuS+wqXs/xMibb7WR8ZF3FVXWyvuQJmhXPRB/XXA4elSX3cB7+YjFZepCLYutasznMay
+         hxSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763431657; x=1764036457;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=S97KCJ0/M+iebNYM5SPjKQEoYZVp3EkSmik6GozuJgM=;
+        b=eWy+cCIwYKNlViNKZzVK4t8n5c4QBnOof4y424VjEFgf/YFdOO8+krBffhY8R7w9WJ
+         VR3bD1jLba9JWKbUyJixz0QMoYrAXdzvHqcl+gjC1yuH2bUS5rUKc594FwVgqw2wsiUo
+         A16Yoy0cfwNa9VT9EfN46eh2M7/u2VyunYS2XAhQu+xstDfffxlJicrvsaUzIpfXmdnX
+         nVVgP2ifjVjhRdHyM/582F2UhOahwGeP42oWIDFHesOtPUb7RzI16tyUFkq7NPaUsdrz
+         2k+XdJmLc22BL7fw4ejTHMEL/s9OWvC6UfUI+yDC2+eYztzb4uz46doVUw4SAkmDgZhq
+         do+g==
+X-Forwarded-Encrypted: i=1; AJvYcCVCybuZKYrQJwcUKb4wCb/uNfmQu5OwPWaN0LaZQmZOiVPuGouX+C0GmTsXyfyjb7lU5v7jvVzqixo/UA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwKgv/ELB9UPDH0NwyV2+Pj6j39ClFSOaU746Ad6M1fd4ruKq5D
+	vBNQVlbrQNcOc4ulEyDEcqPiVpbfTqfvt1l8bxhw04mfTuugqAFleuS9CWR1kpAeTtA=
+X-Gm-Gg: ASbGncunHlAtDxVmJ5LJO00HB4cjQHsyTKryiGg0ZZvBt0+0PhxHLK/FC7AifmGZ8MY
+	O8ghouxBbfnOGOA8KRCjeKm9gidIs9ckdTFpSIMlAryqguWEwJ1YnRowOhel/FwfK429Fepegn7
+	6C7C5IHLQoUCG+WznAnXp457X+Mm0uOTXChwidnlnYqM42gl46pz9Uo+/O5guRT70LlEK4yGnDP
+	zK2g4OBwzX7jCR0jY7dzefkIVLrisKF53P/R+WtLzR0RrrMMrCm8ZOU+16/seRLeGTOf84ubZx+
+	vDGeL4up7Ed6G8vA/YUUgfK7OGlHUkx/JxXRjuIsv7FVFL0RgOGwTvpu/vUwwtZLmL3qurehnA6
+	p8Fwr1pq7yCBoiLbI626H1FQfVenJj8op7mnlLjNGN8e0S8oc40li3WSectl3cMmYwfxemS3Rvj
+	0JHWc3uZC/B7UxcHZZIyr8KgXjTj9psbY=
+X-Google-Smtp-Source: AGHT+IFbl3JzHP+VT8lA2rcee7YupyauKZyKg+dpdXz8GrX8My5LD9qHQc9USZ3iiBkLaLHMiT9+uw==
+X-Received: by 2002:a17:907:6d29:b0:b73:8b7f:8c48 with SMTP id a640c23a62f3a-b738b7f8f60mr843574666b.37.1763431656972;
+        Mon, 17 Nov 2025 18:07:36 -0800 (PST)
+Received: from medusa.lab.kspace.sh ([208.88.152.253])
+        by smtp.googlemail.com with UTF8SMTPSA id a640c23a62f3a-b734fa80cb6sm1224468466b.7.2025.11.17.18.07.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Nov 2025 18:07:34 -0800 (PST)
+Date: Mon, 17 Nov 2025 18:07:31 -0800
+From: Mohamed Khalfella <mkhalfella@purestorage.com>
+To: Hillf Danton <hdanton@sina.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
+	Waiman Long <llong@redhat.com>, linux-nvme@lists.infradead.org,
 	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [PATCH v2 1/1] nvme: Convert tag_list mutex to rwsemaphore to
  avoid deadlock
-Message-ID: <aRvTM5LbnehQU77-@fedora>
+Message-ID: <20251118020731.GB2197103-mkhalfella@purestorage.com>
 References: <20251117202414.4071380-1-mkhalfella@purestorage.com>
- <20251117202414.4071380-2-mkhalfella@purestorage.com>
+ <20251118013442.9414-1-hdanton@sina.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -65,274 +77,42 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251117202414.4071380-2-mkhalfella@purestorage.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+In-Reply-To: <20251118013442.9414-1-hdanton@sina.com>
 
-On Mon, Nov 17, 2025 at 12:23:53PM -0800, Mohamed Khalfella wrote:
-> blk_mq_{add,del}_queue_tag_set() functions add and remove queues from
-> tagset, the functions make sure that tagset and queues are marked as
-> shared when two or more queues are attached to the same tagset.
-> Initially a tagset starts as unshared and when the number of added
-> queues reaches two, blk_mq_add_queue_tag_set() marks it as shared along
-> with all the queues attached to it. When the number of attached queues
-> drops to 1 blk_mq_del_queue_tag_set() need to mark both the tagset and
-> the remaining queues as unshared.
+On Tue 2025-11-18 09:34:41 +0800, Hillf Danton wrote:
+> On Mon, 17 Nov 2025 12:23:53 -0800 Mohamed Khalfella wrote:
+> >  static void blk_mq_del_queue_tag_set(struct request_queue *q)
+> >  {
+> >  	struct blk_mq_tag_set *set = q->tag_set;
+> > +	struct request_queue *firstq;
+> > +	unsigned int memflags;
+> >  
+> > -	mutex_lock(&set->tag_list_lock);
+> > +	down_write(&set->tag_list_rwsem);
+> >  	list_del(&q->tag_set_list);
+> > -	if (list_is_singular(&set->tag_list)) {
+> > -		/* just transitioned to unshared */
+> > -		set->flags &= ~BLK_MQ_F_TAG_QUEUE_SHARED;
+> > -		/* update existing queue */
+> > -		blk_mq_update_tag_set_shared(set, false);
+> > +	if (!list_is_singular(&set->tag_list)) {
+> > +		up_write(&set->tag_list_rwsem);
+> > +		goto out;
+> >  	}
+> > -	mutex_unlock(&set->tag_list_lock);
+> > +
+> > +	/*
+> > +	 * Transitioning the remaining firstq to unshared.
+> > +	 * Also, downgrade the semaphore to avoid deadlock
+> > +	 * with blk_mq_quiesce_tagset() while waiting for
+> > +	 * firstq to be frozen.
+> > +	 */
+> > +	set->flags &= ~BLK_MQ_F_TAG_QUEUE_SHARED;
+> > +	downgrade_write(&set->tag_list_rwsem);
 > 
-> Both functions need to freeze current queues in tagset before setting on
-> unsetting BLK_MQ_F_TAG_QUEUE_SHARED flag. While doing so, both functions
-> hold set->tag_list_lock mutex, which makes sense as we do not want
-> queues to be added or deleted in the process. This used to work fine
-> until commit 98d81f0df70c ("nvme: use blk_mq_[un]quiesce_tagset")
-> made the nvme driver quiesce tagset instead of quiscing individual
-> queues. blk_mq_quiesce_tagset() does the job and quiesce the queues in
-> set->tag_list while holding set->tag_list_lock also.
-> 
-> This results in deadlock between two threads with these stacktraces:
-> 
->   __schedule+0x48e/0xed0
->   schedule+0x5a/0xc0
->   schedule_preempt_disabled+0x11/0x20
->   __mutex_lock.constprop.0+0x3cc/0x760
->   blk_mq_quiesce_tagset+0x26/0xd0
->   nvme_dev_disable_locked+0x77/0x280 [nvme]
->   nvme_timeout+0x268/0x320 [nvme]
->   blk_mq_handle_expired+0x5d/0x90
->   bt_iter+0x7e/0x90
->   blk_mq_queue_tag_busy_iter+0x2b2/0x590
->   ? __blk_mq_complete_request_remote+0x10/0x10
->   ? __blk_mq_complete_request_remote+0x10/0x10
->   blk_mq_timeout_work+0x15b/0x1a0
->   process_one_work+0x133/0x2f0
->   ? mod_delayed_work_on+0x90/0x90
->   worker_thread+0x2ec/0x400
->   ? mod_delayed_work_on+0x90/0x90
->   kthread+0xe2/0x110
->   ? kthread_complete_and_exit+0x20/0x20
->   ret_from_fork+0x2d/0x50
->   ? kthread_complete_and_exit+0x20/0x20
->   ret_from_fork_asm+0x11/0x20
-> 
->   __schedule+0x48e/0xed0
->   schedule+0x5a/0xc0
->   blk_mq_freeze_queue_wait+0x62/0x90
->   ? destroy_sched_domains_rcu+0x30/0x30
->   blk_mq_exit_queue+0x151/0x180
->   disk_release+0xe3/0xf0
->   device_release+0x31/0x90
->   kobject_put+0x6d/0x180
->   nvme_scan_ns+0x858/0xc90 [nvme_core]
->   ? nvme_scan_work+0x281/0x560 [nvme_core]
->   nvme_scan_work+0x281/0x560 [nvme_core]
->   process_one_work+0x133/0x2f0
->   ? mod_delayed_work_on+0x90/0x90
->   worker_thread+0x2ec/0x400
->   ? mod_delayed_work_on+0x90/0x90
->   kthread+0xe2/0x110
->   ? kthread_complete_and_exit+0x20/0x20
->   ret_from_fork+0x2d/0x50
->   ? kthread_complete_and_exit+0x20/0x20
->   ret_from_fork_asm+0x11/0x20
-> 
-> The top stacktrace is showing nvme_timeout() called to handle nvme
-> command timeout. timeout handler is trying to disable the controller and
-> as a first step, it needs to blk_mq_quiesce_tagset() to tell blk-mq not
-> to call queue callback handlers. The thread is stuck waiting for
-> set->tag_list_lock as it tires to walk the queues in set->tag_list.
-> 
-> The lock is held by the second thread in the bottom stack which is
-> waiting for one of queues to be frozen. The queue usage counter will
-> drop to zero after nvme_timeout() finishes, and this will not happen
-> because the thread will wait for this mutex forever.
-> 
-> Convert set->tag_list_lock mutex to set->tag_list_rwsem rwsemaphore to
-> avoid the deadlock. Update blk_mq_[un]quiesce_tagset() to take the
-> semaphore for read since this is enough to guarantee no queues will be
-> added or removed. Update blk_mq_{add,del}_queue_tag_set() to take the
-> semaphore for write while updating set->tag_list and downgrade it to
-> read while freezing the queues. It should be safe to update set->flags
-> and hctx->flags while holding the semaphore for read since the queues
-> are already frozen.
-> 
-> Fixes: 98d81f0df70c ("nvme: use blk_mq_[un]quiesce_tagset")
-> Signed-off-by: Mohamed Khalfella <mkhalfella@purestorage.com>
-> ---
->  block/blk-mq-sysfs.c   | 10 ++---
->  block/blk-mq.c         | 95 +++++++++++++++++++++++-------------------
->  include/linux/blk-mq.h |  4 +-
->  3 files changed, 58 insertions(+), 51 deletions(-)
-> 
-> diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-> index 58ec293373c6..f474781654fb 100644
-> --- a/block/blk-mq-sysfs.c
-> +++ b/block/blk-mq-sysfs.c
-> @@ -230,13 +230,13 @@ int blk_mq_sysfs_register(struct gendisk *disk)
->  
->  	kobject_uevent(q->mq_kobj, KOBJ_ADD);
->  
-> -	mutex_lock(&q->tag_set->tag_list_lock);
-> +	down_read(&q->tag_set->tag_list_rwsem);
->  	queue_for_each_hw_ctx(q, hctx, i) {
->  		ret = blk_mq_register_hctx(hctx);
->  		if (ret)
->  			goto out_unreg;
->  	}
-> -	mutex_unlock(&q->tag_set->tag_list_lock);
-> +	up_read(&q->tag_set->tag_list_rwsem);
->  	return 0;
->  
->  out_unreg:
-> @@ -244,7 +244,7 @@ int blk_mq_sysfs_register(struct gendisk *disk)
->  		if (j < i)
->  			blk_mq_unregister_hctx(hctx);
->  	}
-> -	mutex_unlock(&q->tag_set->tag_list_lock);
-> +	up_read(&q->tag_set->tag_list_rwsem);
->  
->  	kobject_uevent(q->mq_kobj, KOBJ_REMOVE);
->  	kobject_del(q->mq_kobj);
-> @@ -257,10 +257,10 @@ void blk_mq_sysfs_unregister(struct gendisk *disk)
->  	struct blk_mq_hw_ctx *hctx;
->  	unsigned long i;
->  
-> -	mutex_lock(&q->tag_set->tag_list_lock);
-> +	down_read(&q->tag_set->tag_list_rwsem);
->  	queue_for_each_hw_ctx(q, hctx, i)
->  		blk_mq_unregister_hctx(hctx);
-> -	mutex_unlock(&q->tag_set->tag_list_lock);
-> +	up_read(&q->tag_set->tag_list_rwsem);
->  
->  	kobject_uevent(q->mq_kobj, KOBJ_REMOVE);
->  	kobject_del(q->mq_kobj);
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index d626d32f6e57..9211d32ce820 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -335,12 +335,12 @@ void blk_mq_quiesce_tagset(struct blk_mq_tag_set *set)
->  {
->  	struct request_queue *q;
->  
-> -	mutex_lock(&set->tag_list_lock);
-> +	down_read(&set->tag_list_rwsem);
->  	list_for_each_entry(q, &set->tag_list, tag_set_list) {
->  		if (!blk_queue_skip_tagset_quiesce(q))
->  			blk_mq_quiesce_queue_nowait(q);
->  	}
-> -	mutex_unlock(&set->tag_list_lock);
-> +	up_read(&set->tag_list_rwsem);
->  
->  	blk_mq_wait_quiesce_done(set);
->  }
-> @@ -350,12 +350,12 @@ void blk_mq_unquiesce_tagset(struct blk_mq_tag_set *set)
->  {
->  	struct request_queue *q;
->  
-> -	mutex_lock(&set->tag_list_lock);
-> +	down_read(&set->tag_list_rwsem);
->  	list_for_each_entry(q, &set->tag_list, tag_set_list) {
->  		if (!blk_queue_skip_tagset_quiesce(q))
->  			blk_mq_unquiesce_queue(q);
->  	}
-> -	mutex_unlock(&set->tag_list_lock);
-> +	up_read(&set->tag_list_rwsem);
->  }
->  EXPORT_SYMBOL_GPL(blk_mq_unquiesce_tagset);
->  
-> @@ -4274,56 +4274,63 @@ static void queue_set_hctx_shared(struct request_queue *q, bool shared)
->  	}
->  }
->  
-> -static void blk_mq_update_tag_set_shared(struct blk_mq_tag_set *set,
-> -					 bool shared)
-> -{
-> -	struct request_queue *q;
-> -	unsigned int memflags;
-> -
-> -	lockdep_assert_held(&set->tag_list_lock);
-> -
-> -	list_for_each_entry(q, &set->tag_list, tag_set_list) {
-> -		memflags = blk_mq_freeze_queue(q);
-> -		queue_set_hctx_shared(q, shared);
-> -		blk_mq_unfreeze_queue(q, memflags);
-> -	}
-> -}
-> -
->  static void blk_mq_del_queue_tag_set(struct request_queue *q)
->  {
->  	struct blk_mq_tag_set *set = q->tag_set;
-> +	struct request_queue *firstq;
-> +	unsigned int memflags;
->  
-> -	mutex_lock(&set->tag_list_lock);
-> +	down_write(&set->tag_list_rwsem);
->  	list_del(&q->tag_set_list);
-> -	if (list_is_singular(&set->tag_list)) {
-> -		/* just transitioned to unshared */
-> -		set->flags &= ~BLK_MQ_F_TAG_QUEUE_SHARED;
-> -		/* update existing queue */
-> -		blk_mq_update_tag_set_shared(set, false);
-> +	if (!list_is_singular(&set->tag_list)) {
-> +		up_write(&set->tag_list_rwsem);
-> +		goto out;
->  	}
-> -	mutex_unlock(&set->tag_list_lock);
-> +
-> +	/*
-> +	 * Transitioning the remaining firstq to unshared.
-> +	 * Also, downgrade the semaphore to avoid deadlock
-> +	 * with blk_mq_quiesce_tagset() while waiting for
-> +	 * firstq to be frozen.
-> +	 */
-> +	set->flags &= ~BLK_MQ_F_TAG_QUEUE_SHARED;
-> +	downgrade_write(&set->tag_list_rwsem);
-> +	firstq = list_first_entry(&set->tag_list, struct request_queue,
-> +				  tag_set_list);
-> +	memflags = blk_mq_freeze_queue(firstq);
-> +	queue_set_hctx_shared(firstq, false);
-> +	blk_mq_unfreeze_queue(firstq, memflags);
-> +	up_read(&set->tag_list_rwsem);
-> +out:
->  	INIT_LIST_HEAD(&q->tag_set_list);
->  }
->  
->  static void blk_mq_add_queue_tag_set(struct blk_mq_tag_set *set,
->  				     struct request_queue *q)
->  {
-> -	mutex_lock(&set->tag_list_lock);
-> +	struct request_queue *firstq;
-> +	unsigned int memflags;
->  
-> -	/*
-> -	 * Check to see if we're transitioning to shared (from 1 to 2 queues).
-> -	 */
-> -	if (!list_empty(&set->tag_list) &&
-> -	    !(set->flags & BLK_MQ_F_TAG_QUEUE_SHARED)) {
-> -		set->flags |= BLK_MQ_F_TAG_QUEUE_SHARED;
-> -		/* update existing queue */
-> -		blk_mq_update_tag_set_shared(set, true);
-> -	}
-> -	if (set->flags & BLK_MQ_F_TAG_QUEUE_SHARED)
-> -		queue_set_hctx_shared(q, true);
-> -	list_add_tail(&q->tag_set_list, &set->tag_list);
-> +	down_write(&set->tag_list_rwsem);
-> +	if (!list_is_singular(&set->tag_list)) {
-> +		if (set->flags & BLK_MQ_F_TAG_QUEUE_SHARED)
-> +			queue_set_hctx_shared(q, true);
-> +		list_add_tail(&q->tag_set_list, &set->tag_list);
-> +		up_write(&set->tag_list_rwsem);
-> +		return;
-> +	}
->  
-> -	mutex_unlock(&set->tag_list_lock);
-> +	/* Transitioning firstq and q to shared. */
-> +	set->flags |= BLK_MQ_F_TAG_QUEUE_SHARED;
-> +	list_add_tail(&q->tag_set_list, &set->tag_list);
-> +	downgrade_write(&set->tag_list_rwsem);
-> +	queue_set_hctx_shared(q, true);
+> If the first lock waiter is for write, it could ruin your downgrade trick.
 
-queue_set_hctx_shared(q, true) should be moved into write critical area
-because this queue has been added to the list.
-
-
-Thanks, 
-Ming
+How is that possible? If the first waiter or the only waiter is for
+write then they should not take the semaphore because it has not been
+fully released yet, right?
 
