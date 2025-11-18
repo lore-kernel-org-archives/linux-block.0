@@ -1,112 +1,134 @@
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B65452EF66E
-	for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 10:51:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AA0523EA98
+	for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 12:55:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763463069; cv=none; b=oLqd4VZE28grey3VvCfIsIWpNQXxv1Bl2pMCPmA5oW6SIpueizDmxSzRc1rlMRKhSC1fFikxWYyet5SzTv0aIP0MI0wcw1GDzV1Ibd0r5JCtA0j1gYKGd5tge406KCvMzVZZNUPjjGyyMF6TAifoQ6dUe/Dq9lgu39Tiu6xvYC8=
+	t=1763470560; cv=none; b=kHZGYs26q4yGqff6zdsrYH/+bMVVCosX3qhNV86yNqMY8TInS3PC1HgC2EIqwtPrXmRW6Yz4nUSPa0EvE6q4F1/pSWSXpTdhQTbXyAxTNxpHOtuiTzRGMr6vsZ2p9jwmxeYtpzFxNNiDJEqlBBQh4Dm59Cr/vpMKYYJ+V4WlCYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763463069; c=relaxed/simple;
-	bh=6shwcW6vxfbPyUO+4LON7yqfRMppLSv3cCqoWlpmI1s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mGJAARLX6SJ0j1Iddz7lHw2K10emGQBTge9/kgm585eCnpmHGMUyMPSUqXNHUp+NjIeuSgmQ2Te0zA01Rp6GIHcwTNIRAd+uzoFsZu7ou7E4GOoc629KBqE0jAJokn32GvBezx9QVgH3E1FuLEGCHhFC+Um7820r/0XtLfvL8lg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b=w4RlXiKJ; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
+	s=arc-20240116; t=1763470560; c=relaxed/simple;
+	bh=lmIU4dJ8YNpHWVTMmfiND8CwlczZGnQ+nZ73SDmDCpQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NmGyRGcF/U2LpU+ZWR5sU5BO6Ou+iSj2Awb/BObyQ6EryGisxIaLlMPvFff3zFE35o2T6jJrvjLfvpsF6ndNLgBBH+FYezHFU0w11uLz+c4lsmQqktmT86ylvkUdNPBrQiCnI7tI49ZFoETvYzQmr/TibOYmIVWGhrKui7/Tp7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XUxC5c5K; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=e+TtFDs9; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b="w4RlXiKJ"
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-640b0639dabso9375907a12.3
-        for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 02:51:05 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XUxC5c5K";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="e+TtFDs9"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763470558;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5Fc9QzHwqwCPN8psk/oOw+0uctePk68TJ3HFsDWmmro=;
+	b=XUxC5c5K7lFUeraNBdaC4xmleZon2BODNkaOHuoO+MB/Ydv3EUEvzkT/f7Kc5ylPtpnXzO
+	XfHEwwj6vq7PoVzzqJwRqSjWwLil9zneh+iLYB63fPtpZ5THsvTagKtlRoLVOS502CPgcF
+	FadGolyQO99Iuoti/bjhU4Tj4/Y3cZY=
+Received: from mail-vs1-f69.google.com (mail-vs1-f69.google.com
+ [209.85.217.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-503-mzY_pQ9zN-GfHy-Tt0o-7Q-1; Tue, 18 Nov 2025 07:55:57 -0500
+X-MC-Unique: mzY_pQ9zN-GfHy-Tt0o-7Q-1
+X-Mimecast-MFC-AGG-ID: mzY_pQ9zN-GfHy-Tt0o-7Q_1763470556
+Received: by mail-vs1-f69.google.com with SMTP id ada2fe7eead31-5dfc0924900so11643790137.2
+        for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 04:55:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20230601.gappssmtp.com; s=20230601; t=1763463064; x=1764067864; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jGdM1wJoXGQz7bm128xRbuaPqwpiMtIqZbrUwM7E1+I=;
-        b=w4RlXiKJCD0yuZX9nkOseE2b155WLu7SHExaqQL6pG3JT4+3fpUrmFSRaQMmh0/qIT
-         mxqFfuvIdLoRBq7D5Aj+ZKGfFXHGPX+DqSQznQUXr9eyGX1XB0fm8jhrFGJDOWOayvmZ
-         eW+Y2oAOL3sW0xebXqp2miXhu5cqCf8qSHvD/SVjxzXmSshtzcdYd3CW0ifeuDi+t/HZ
-         qqx1RAuFRAqRYE2S4Het35T5qLvHSvrnVEr/k0NJQz4MZ2juVpPPSUtm9DXxlhp4ovyr
-         HyFTAbLiAIM127ipxSQK2zYR8rfb+Iwrri0dDkMVn7CZyeqzeTDlCPcSxNGZJu7S2493
-         CgVA==
+        d=redhat.com; s=google; t=1763470556; x=1764075356; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5Fc9QzHwqwCPN8psk/oOw+0uctePk68TJ3HFsDWmmro=;
+        b=e+TtFDs9JCYVRaC6LmN6X9VHdwDwBTRuyDG3JrcM532+qI/ni8wew10K271EWpfR4J
+         cDeNTaCqyfoGRshkzdyrKEuPlRC5NZ6ye/a5hkmkxFU3dNsrYuxySce7IQyC28QW+mtT
+         JcpT4rha1n8usBpne69lwfC6keSs6/W9RcxpzSJ4vAtwUfLlwyL1WHBSLUSICIdVU0gb
+         qi4JAPEErLxnSrRwixKAlhY97ep5B3od4Xn9FMMuRNZ7S9WnlULEC5Ztj269lNxb0o9+
+         MYC9HqzxyUeEVwxuSWIBkfxKheU50AaL/UN361TlIiOCG3sfBgjFyCMudkyXwDpNoAW0
+         dHZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763463064; x=1764067864;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jGdM1wJoXGQz7bm128xRbuaPqwpiMtIqZbrUwM7E1+I=;
-        b=raOQWuU98emHMOddvQgr0Xrkt7YASgVyO1dsYPC+uPm8TkkDKA2VZxDUNnMBW2cNon
-         p4Bn4WKcfGzhXMd9jd9tHobjjPhxXOZs7eAsm2vcQD6o95JjGqA/4pluGtgtz7uVheg0
-         dazJVBKojkLUIA1BWf3PXhTKu+4amj8xtZXlXu5bT8DlOGRE7tbWB4ArFmAlFdzCio7C
-         LnczYv2tQ+UtGZov691W3OTBzwMAPBvWT3tFa52eip9ZyaopHQriSMFqI4900fnYmmj8
-         4yb8Fjcpckuhhro6CqTXhWuA9RQ5CN+lmIIkpuME2ZU4mfG5cq9sBiebmaxuOn01XDHk
-         LY3g==
-X-Forwarded-Encrypted: i=1; AJvYcCUemEHkBQjWQzuwqlLDibMhKmsOIOseJC1dznAXWIzBsiXKOcf3Bb66Jjzuj2wFbOHoyoioi3viP9kEVg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzmoMXDCLtk6i7oxXKO63Uyj0O1CMB9H/jDPmhKKq78RajrL+CL
-	W7rCedypkO1NKY89rd5i+NGBIYfKwUl/R5VKR0Msw0SqkFB1k5YaxTsdGg0oqleQa4Q=
-X-Gm-Gg: ASbGncureC3Kj1jaKDm0WjDfeat2MQ5VtS92a/dLvJ7g8OZraHT9qg19oG8l9XkyFBZ
-	r5+EmqIHXj4iw39uQfY/Bx0xuWLJEHk+wgqdeT9C4kl77RZwCeOF0EaFypXCFfjhufS1L50vBDY
-	1HDLXodGCbCwW4Ob/2VUh7zjpor5cauJqqOs9Mxxa3or7RzlVL3+an5SPBO9irIbKjTTTzqIpLr
-	dMnQcEmIVqfBUojnOHcugZE9xOmS3VBVe1bOOYb0zyiStZVNb6bpELvgJbTpg76WKJ5cZ6uKkEN
-	1plLO3I13kl3y7IN6MGKiDuAafGLlUFmUX7yVM0aPbLCsyL5gBdIxIRJqt6r29NmI75NVdFm/y5
-	aVG/Fm1UcbjjTkhZq7rSOVA0/kt9+lomUA7D8pkZqnHyeGi9sT4sTafWqNiP6oyJxRBPBE2wyei
-	0uRmHlp2IFQPdTOeQe/gFY8pS0HNU25O6DN1CUBkwHkIuoDvWTSZFxuBPYRAda1eMZGTqg95Yjp
-	KUfXmMvIe0eEw==
-X-Google-Smtp-Source: AGHT+IEWZK62eDgqge0iEYvyjOKSQ1p48XfRz0kdjUFIlAsN6sWTmoc4BYjlcjTS9bPeI5jtRT4qFw==
-X-Received: by 2002:a17:907:3d52:b0:b72:d9f1:75e5 with SMTP id a640c23a62f3a-b73678d9a41mr1737837266b.20.1763463063991;
-        Tue, 18 Nov 2025 02:51:03 -0800 (PST)
-Received: from [192.168.178.55] (h082218028181.host.wavenet.at. [82.218.28.181])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b734fad456bsm1351037766b.21.2025.11.18.02.51.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Nov 2025 02:51:03 -0800 (PST)
-Message-ID: <11f8aaaa-b5de-44dc-9263-5bdb506923ac@linbit.com>
-Date: Tue, 18 Nov 2025 11:51:02 +0100
+        d=1e100.net; s=20230601; t=1763470556; x=1764075356;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=5Fc9QzHwqwCPN8psk/oOw+0uctePk68TJ3HFsDWmmro=;
+        b=Q5leoFRSCVNnGinBroGgliejKteJrWv0UkG2yas60QLoX37psZqhj/O1qL4EQQCFl9
+         rJsNDD8bJCTGsQLyqdUrhj6o2W6sIhmRV0dINgOd2xgYmNgz3b4bL3gsXJR+/GjIv/H8
+         Nzl6e4OxdH1xGlhEVkYT9E7ad1Q5Fqmx45QZG4OKH/ASmE5HF0tewPmOHMdRbxPZvAwO
+         HAhNpWyAslxcp1cwZDdYSKYtssV4F6Cf6EovEu/Gla3fSxIEK+oHxwoh4oKVboDmKn5G
+         zp/74ti2IO8IdJ/KRKOWng9hCxYKqBJxaT/XGJ+LfVJHnowB8a/Thn2A7dcAt/cpTsaa
+         hjrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXxQ0uhEEBmRcrNT98ROIB5EpYN/KcsbXKbF9icADNE1U8Jd1OJwaFCCKmcZTgEdzjNMYxVKWPahI7aSg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+91yAMohMsaWXOyY+QvXkAm3GiLoj8k7ON42lspKDA4G5MRIn
+	nvmFLJmKJYkD4OyWo/WlVdEpe44oX1sxIO5bUKwhrMlieupXTqdoNrShw/mCnOlT2M1diNPocHO
+	+wI/O8wCQkC67VAKY2w9iITtseKB9/dCsEIdPzKKvsvIiaGsHAp37oM87OBMopt6xilevhhYgGR
+	nshGeYFQjZSJvEGcbfW5SdW/CJ5U7HFZTJ3GE4zJU=
+X-Gm-Gg: ASbGncumfYCB70avDmsRwj0L3g6RAyjmGogd7PFHs70+bW0RX7lx2xZC8MXquj7DL+Q
+	x9zBFS+EciuxyFfkrlOKDgxr7OiV7ZTEnb7asIYI5MuSEG5dthoHFc3mOYB/T68br5RKoXjUSuX
+	thAdWlLeEkpj1b2kHnoFaPpnGSSLgc7Cq3PpTRKhKM8/ysv8E7WrdoKvTy
+X-Received: by 2002:a05:6102:f0e:b0:5d5:f6ae:38ee with SMTP id ada2fe7eead31-5dfc5bcd631mr5861778137.37.1763470556396;
+        Tue, 18 Nov 2025 04:55:56 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGggoAwNLD7qoBxaLa9hRuYfYH4dkVq/JJ8RpPcw949GPP/ke6lOGR0gxRJ+LgZCGTJ7HGV2cjSg32NhHTTDTo=
+X-Received: by 2002:a05:6102:f0e:b0:5d5:f6ae:38ee with SMTP id
+ ada2fe7eead31-5dfc5bcd631mr5861773137.37.1763470555989; Tue, 18 Nov 2025
+ 04:55:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] drbd: turn bitmap I/O comments into regular block
- comments
-To: Sukrut Heroorkar <hsukrut3@gmail.com>,
- Philipp Reisner <philipp.reisner@linbit.com>,
- Lars Ellenberg <lars.ellenberg@linbit.com>, Jens Axboe <axboe@kernel.dk>,
- "open list:DRBD DRIVER" <drbd-dev@lists.linbit.com>,
- "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
- open list <linux-kernel@vger.kernel.org>
-Cc: shuah@kernel.org, david.hunter.linux@gmail.com
-References: <20251118090753.390818-1-hsukrut3@gmail.com>
-From: =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
-Content-Language: en-US
-In-Reply-To: <20251118090753.390818-1-hsukrut3@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20251015110735.1361261-1-ming.lei@redhat.com>
+In-Reply-To: <20251015110735.1361261-1-ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+Date: Tue, 18 Nov 2025 20:55:44 +0800
+X-Gm-Features: AWmQ_bkMXSxdfduGkjESg1ynruIWs4HY2ohtTvtSrm3enUkgrPdfO3Ne2r9d0t0
+Message-ID: <CAFj5m9+UFxDg9=RwiHd5v2jhHaCcpRd+nLF6S3QhTy4v37W2tw@mail.gmail.com>
+Subject: Re: [PATCH V5 0/6] loop: improve loop aio perf by IOCB_NOWAIT
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Cc: Mikulas Patocka <mpatocka@redhat.com>, Zhaoyang Huang <zhaoyang.huang@unisoc.com>, 
+	Dave Chinner <dchinner@redhat.com>, linux-fsdevel@vger.kernel.org, 
+	Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Am 18.11.25 um 10:07 schrieb Sukrut Heroorkar:
-> W=1 build warns because the bitmap I/O comments use '/**', which
-> marks them as kernel-doc comments even though these functions do not
-> document an external API.
-> 
-> Convert these comments to regular block comments so kernel-doc no
-> longer parses them.
-> 
-> Signed-off-by: Sukrut Heroorkar <hsukrut3@gmail.com>
-> ---
-> See: https://lore.kernel.org/all/20251117172557.355797-1-hsukrut3@gmail.com/t/
-> 
->  drivers/block/drbd/drbd_bitmap.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
+On Wed, Oct 15, 2025 at 7:07=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrot=
+e:
+>
+> Hello Jens,
+>
+> This patchset improves loop aio perf by using IOCB_NOWAIT for avoiding to=
+ queue aio
+> command to workqueue context, meantime refactor lo_rw_aio() a bit.
+>
+> In my test VM, loop disk perf becomes very close to perf of the backing b=
+lock
+> device(nvme/mq virtio-scsi).
+>
+> And Mikulas verified that this way can improve 12jobs sequential readwrit=
+e io by
+> ~5X, and basically solve the reported problem together with loop MQ chang=
+e.
+>
+> https://lore.kernel.org/linux-block/a8e5c76a-231f-07d1-a394-847de930f638@=
+redhat.com/
+>
+> Zhaoyang Huang also mentioned it may fix their performance issue on Andro=
+id
+> use case.
+>
+> The loop MQ change will be posted as standalone patch, because it needs
+> UAPI change.
+>
+> V5:
+>         - only try nowait in case that backing file supports it (Yu Kuai)
+>         - fix one lockdep assert (syzbot)
+>         - improve comment log (Christoph)
 
-Thanks.
+Hi Jens,
 
-Acked-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
+Ping...
 
--- 
-Christoph Böhmwalder
-LINBIT | Keeping the Digital World Running
-DRBD HA —  Disaster Recovery — Software defined Storage
+thanks,
 
