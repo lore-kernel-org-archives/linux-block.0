@@ -1,209 +1,196 @@
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CFE6537E9
-	for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 07:52:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763538745; cv=none; b=AMGlwFvTDFhOPt7Slbm14gEMtAQx6S+Y964jAYf/jnZrBhj5qI0by/63OIX+TDStUIBoaO8FUtiE2BGOrOQcOffNTgxVLZSASU6wXnUf3bQVI62VCg1t+l8wcu1OjITWqo1DQil91QBTlpvt2vBuLbjhU4/Gx1GeuZtHVtsUw8g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763538745; c=relaxed/simple;
-	bh=ZClN6Xz44AR1oj+MkQ9yHVWlob5caPKzOEopuIQciMk=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=jpZwx+YOD3RvjC8Iz0FY/Z2kzUJV1Hos3icu3aXbct8BKh/+bv5pMqmmjBCOWez2x7/aBm8BbMUVYskejB63NSSE5NarWJKLr3881QKvi6vSrTshspHRAE5CGrtE0laBBtZe0o6z8T07juO0S/1NQP9ZOz3iYza1WZktkIl9cfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=yYM+k1lM; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06E672DF12F
+	for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 07:56:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.143.124
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763539001; cv=fail; b=W+Lxry8r5XfJTAfKyvuKGk+BRP7zbxfBBgg9dqzCsVcl4pMJJOYJq8854jBo/+fig089U1WQKSeF93P2vLckd3yArlZ4jn81ayHRoZbD5r0Zsl3x7dsv9sJJpzi6wV0qTxgOqU8ozQyoSJJA+BfjCIhURVSpCdX2cku/U3ibjwY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763539001; c=relaxed/simple;
+	bh=UhSxlq6gqPNp14SM1n6IGk6G+ETsAdqWxc+Sjshljcs=;
+	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Q2AUWOQUMCXDEOil8+G59FdFk8Nuf4ZRzavAGdzhMg7eL4YYtlhUsGpwD0QKWXLvG+jCKCPaJouqofPYF/zU3obbKFMb8iaEekVs9ygquyY0Qfj4fMBhRmdFXPUj4FCTttM0PJBsJUaQ8Ok3S+afvrCxSJR+MtQkqqeJz70xLOk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=p0Hbg1FS; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=VVnwPCF+; arc=fail smtp.client-ip=68.232.143.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yYM+k1lM"
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4779a637712so27396055e9.1
-        for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 23:52:22 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="p0Hbg1FS";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="VVnwPCF+"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1763538999; x=1795074999;
+  h=from:to:subject:date:message-id:references:in-reply-to:
+   content-id:content-transfer-encoding:mime-version;
+  bh=UhSxlq6gqPNp14SM1n6IGk6G+ETsAdqWxc+Sjshljcs=;
+  b=p0Hbg1FS3oHNpJWTnA7ecJXpTg7rLBnbNiqdYO9b11Vq5cI+7dSp0SOV
+   EwWTGJZH7k05hBm+Bnbi0nPFNZdD510ao9MHPYVrH/kE9eprKMXOF4yPS
+   V/kuJR3VlUsXPhS1aFYNIBAwZQFQ0ihbK64LFkSOjU8UHQ2pz2wxhF7ol
+   DcQiPgupRGe+qc12wGd/nPPf8UYchYNR/bEWmzJS8xQS02ObXIAhAhXrh
+   f6BdaUA7UwminLfe00V5M0YnPH9U4QISxqiCfEX8LOTgPuHCsLfYo1BZY
+   NI1WDsajTMRTk19h00ZdP92bvZsLfnuclhjP1B4FUt6zRAAU/qDn8MJbz
+   A==;
+X-CSE-ConnectionGUID: SIDQftlmTKeOiEKRIJqmEg==
+X-CSE-MsgGUID: txsZ5BLcSKKZjbgSY17OkA==
+X-IronPort-AV: E=Sophos;i="6.19,315,1754928000"; 
+   d="scan'208";a="136705688"
+Received: from mail-southcentralusazon11013043.outbound.protection.outlook.com (HELO SA9PR02CU001.outbound.protection.outlook.com) ([40.93.196.43])
+  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 19 Nov 2025 15:56:31 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=EOeqsuDBsUIVvw4GQOV1JZer0mlJMF1lZOaYOdp4aoxN9wVk/IHCaDGnyb7ziYdsxYsWMWC1cHmaTBADhBGnsJS4PDAsH3jMKPMqFOJbiDb9DPwEW6WF/4muDTx4d70PU1o4JLhxfQYW3DbcwnNalqM2vSHmDJSZDRK4HIjF9fJCzuih6Mo6OamEIp0e5DKh7JDnhzNbwlcWgySZBudviJUvY9dfwhQgjr88Iw0kCJp4qXfzBDXXTyNdnE6Y5SeCOOu3j8QajI9cMh20nABsaqlWmiVKOeRixfIBrbcmxlAWtgt8/VH/0MkhCH4oxaO6YlGRnvGp2KjkGcCRwUMSEw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=UhSxlq6gqPNp14SM1n6IGk6G+ETsAdqWxc+Sjshljcs=;
+ b=ONAy4EvtaECJ+nWaB1CF1HnD2NTpqMNq5dH2w8IsuUNo7G7n4/YHHzutQzLhQ8FUGcLqKXU3yxzdAUd9qq4g7ZjFklxAfR8i+Y/MZafFJCgUFlD3Xq3V8wsMJR8Z9VUN62hMrL3XX5ihlnKcYtCIQCAJCPNq+DG16HS0yEw3moH1OnQZPGlSFftmNymkzYDE1Vd6wRA3mkNHgwgWrMNA8fgVXphRmVoGl0CKjD6Qg3UZk96/sv209Sa+AWoRFisRwsU2W3U0xlGUsDi2mmZkQ2sRquwXo8CWfaXR6InjpOndb+p7gBMkTvPLI/Jc8YYf7L8EDXOIcJf7lcKsi+HNWQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1763538741; x=1764143541; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YNgPnJegfbBM1R0OxD00ZxLYsFJ2T5xFsaSC1Zt/hjE=;
-        b=yYM+k1lM9haIYhvIf9+B9LIlIlZy/vfdXK5+Q8Zh3CtOZdCgGKuK4EgDUC7S65BIdp
-         9jF4l6uNhAULQBRynrtXD3gVqKz+2YRpu2lR0uWSumyVsrL3JjzXIYaChoTZqPcD5h4x
-         DG278ac124Eqjsj5YtujzI3HFwiV+bCI1UmT8qDnkmpgPH9oaGJyA5wrQvbEMOnYIqgK
-         5hYxCTX1HxN4EhU2PkzSt6I5TEKzDO1nCLCQYOZhy4iqwctoxlMuABm3GOxA+GANmZZq
-         wK+qlp9+D3KKpA5w3HuG80+ZDp2UZlQDlLPa+kHrYyUbgbiur6Xlnyz5rypDoJu8Fhsn
-         Colg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763538741; x=1764143541;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YNgPnJegfbBM1R0OxD00ZxLYsFJ2T5xFsaSC1Zt/hjE=;
-        b=LEKlqEE3k6g8219JY74YWl0TuXF36uW5YEe2h/LEO22kqFgYK3V29v2uNwxHD4a8Ep
-         4a/fZyfdVqwtK2lCUNHNa1exXf3qcGtPfQ/D153dnsX7BUwmVnXfWaaaa62P26cCx1ur
-         r6ljNYA6jzPChsf/3uvKD6oKYOR0pKTstN5Cdsyd/AGcyxH9lz3Psa1vcyUiqFvjEWkF
-         TwL7i5ssE7XGNbjYxSPfszgYxOGNgdPH3XwouGLMksMrbBmk63HftMvZkfprag8BQVz1
-         gZiNVKvmZ7n4BvSUdmaU6zoyag5btPClw82czTJ6ItPKQR0U3JBPTOq1Cq7Qw7krsQQF
-         3Jgg==
-X-Gm-Message-State: AOJu0YxTcL99/HogqgAcGl+1gX5rH30c21L4FjJGaGRBw92/HmbouH8T
-	ho1+tbh8YC3sK46viTnwYXWdCrHwl+wpecbn0T3sAy1h7aOLGsg6nVMCmOpqH4yaxjs=
-X-Gm-Gg: ASbGnctrrRXtFd9bwG/3KDeeFwlL85fmQgSXgGXZsC62HmXbFQnC5o97uCJ6njww8Py
-	/Dwu2YgUnzh3rLAFoMLGMyhTXUQ7BOftzxVe/l1IbC7VTFf7vyo/T/VxkhaAVTz/1eb5ZAZsgMR
-	INvk/HA3bt+5LiI5GOYsB/5Vbq0fU0aZ+Akr5lTR/ZQ/5zBmu+ds919vFsJ1AJHQ+SfPDdhuOBg
-	yhfinxuqES367stvarwWlZS6pFN+m87K8jl45FZdLOpjfnPFsx5BkbMCBGZnifRT557ZNRUJnkY
-	EPg+2tQuGVPw1XI05fZz4IL2E5j0JiiXAJcIAlnVc49Fftx27h7J8B0nHqzCAELHATGRn7XnbxP
-	6A3UKrjz+znX+tzO42eqoOSqapc3x1VoDXfnMBrfpYAmwBdRVTOI6/1DqNxpZbiOKyGslSxTSmv
-	gxR1HJrR2h+du36FgmqdXMbfYJ7n8=
-X-Google-Smtp-Source: AGHT+IF4/drEwAVK1TrntzQuWNj9FeuWFT8RM9rP3JkekS/n+4BI+9g9JqVfVUQen4EenRtzBCpHHQ==
-X-Received: by 2002:a05:600c:474b:b0:477:a21c:2066 with SMTP id 5b1f17b1804b1-477a21c2122mr97165555e9.5.1763538740871;
-        Tue, 18 Nov 2025 23:52:20 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-42b53e7ae47sm35292243f8f.4.2025.11.18.23.52.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Nov 2025 23:52:20 -0800 (PST)
-Date: Wed, 19 Nov 2025 10:52:17 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Yuwen Chen <ywen.chen@foxmail.com>
-Cc: linux-block@vger.kernel.org
-Subject: [bug report] zram: introduce writeback bio batching support
-Message-ID: <aR13MX98YwyyvUlH@stanley.mountain>
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UhSxlq6gqPNp14SM1n6IGk6G+ETsAdqWxc+Sjshljcs=;
+ b=VVnwPCF+8AZfc0NSGOKwLDEHw7n1vO9qsltSQoqIdh+FLNsBWfLkw48i4P+dVOyxm1jnvHQaIh6fp7exC40NP8O31Q0enx7piS5VjtmkrtE+O0iQikw2EJngCFFyvCCyxgaabogBgavYVlRK/UmNh9oCES4mq8nW8yBpvmb8o/c=
+Received: from SA0PR04MB7418.namprd04.prod.outlook.com (2603:10b6:806:e7::18)
+ by CH3PR04MB8925.namprd04.prod.outlook.com (2603:10b6:610:1a6::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.21; Wed, 19 Nov
+ 2025 07:56:30 +0000
+Received: from SA0PR04MB7418.namprd04.prod.outlook.com
+ ([fe80::17f4:5aba:f655:afe9]) by SA0PR04MB7418.namprd04.prod.outlook.com
+ ([fe80::17f4:5aba:f655:afe9%3]) with mapi id 15.20.9320.021; Wed, 19 Nov 2025
+ 07:56:30 +0000
+From: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH 1/2] MAINTAINERS: add missing block layer user API header
+ files
+Thread-Topic: [PATCH 1/2] MAINTAINERS: add missing block layer user API header
+ files
+Thread-Index: AQHcWQGKG34lzybBW0yFL9Rd5yt1w7T5ogQA
+Date: Wed, 19 Nov 2025 07:56:30 +0000
+Message-ID: <1bb72fb2-fd97-4d00-92a1-e4d7ade5a1f0@wdc.com>
+References: <20251119030220.1611413-1-dlemoal@kernel.org>
+ <20251119030220.1611413-2-dlemoal@kernel.org>
+In-Reply-To: <20251119030220.1611413-2-dlemoal@kernel.org>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA0PR04MB7418:EE_|CH3PR04MB8925:EE_
+x-ms-office365-filtering-correlation-id: 9d1653f8-5fc1-4a8d-d2fb-08de27412687
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|19092799006|10070799003|376014|1800799024|366016|38070700021;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?N21TR05FOGdtVkdlbytoSzIwYjducmdQb0V4VEM4TFBGVHJmWk0rNzV5VWVV?=
+ =?utf-8?B?MFUwelRrNklpYnZtTVRQNGhOYzFHbE9MUWViN29rS3JlOEpLRmVlUExRWDFT?=
+ =?utf-8?B?NEZoNUdVRHlJT1EyVEdoVW0xZE5Oc1k1SWF6TTF3cHlONExwRG5NT2NsZnZM?=
+ =?utf-8?B?T2pyTzl3a0phQzJ0dGprSnd1bUJ3dDVuMHY5aFpvZXJFZG1MMEdzVWEzdlhD?=
+ =?utf-8?B?dWRydlRKdGN1N21hNzV2cUtrTFZNZGNnd20rUC9KMmRTMktwemhRLzFIYjVq?=
+ =?utf-8?B?Wk5SWG5keUR4TjNwcmVrZUpEYm1vckt4aE44QUwwa3ZJdzJadUt2ek5CSFAy?=
+ =?utf-8?B?Q3FuQnRNWXc0TXA5L1VqU0UrajdmV0lmaTFnNm44YmJWbVNGRnZvSEpKMmtq?=
+ =?utf-8?B?dWozNndOSDl1NDdtRkhtY1g0alhoRmkraXFIWHdtRUE2YzVrU3BiYmtDOGw0?=
+ =?utf-8?B?ZkhGTGlHNGcyK3lhZEJSdkV3T281VUp0TFpZN3hUQXJYQkhKT2o3UXg1dXFw?=
+ =?utf-8?B?dm5URXd0R1M4V0dxUk5ISFJLVGlhYmVlYWljNDVlaGZSbnFzVm12REdPdUc3?=
+ =?utf-8?B?ZUgyZVlQNTRONElvTk5PYWRFbTJYay9za1JGYmcrMHhHOGllWEQ0RVNjZHRC?=
+ =?utf-8?B?OFFVNE9TOHJFL3IrSVFxMG56NUtqZnFVRThTaUV0eUQ3SjVKb202UzlWbXg5?=
+ =?utf-8?B?cEdiU2gzbFlZY2NWTm4rMTVoclVLVmV4OUlLenNnSHliRFgxamdkZFF3UEwz?=
+ =?utf-8?B?b04rMmcxRjA0VUZWT2srQkRpRjN3NXBWR0hQNURnK2o1SUJ2dHdTK2pQRElS?=
+ =?utf-8?B?dmJ3S1piQlVjbXkzS3lua0VqbUtmb1NmV2V6RjB2U0FPOXF6WTNVWjNkOUVH?=
+ =?utf-8?B?VHJ4aG94YklZd0pBZTFDNHZ2UVIxYi8vWnZIZ1MrbVdFK2xaZTFSd0pKVE5z?=
+ =?utf-8?B?SDRPdU5yQlljdkZYNUJmdjJnSFVNbm9nMnlzRnp5a2ozNEgvMjRrZkNneHJ6?=
+ =?utf-8?B?ZDFmUmdNQ3lEVTkxb3V4TCtNckVJVVNsWGZ5RlV5cmFuM2dVZFkwRENmWGFQ?=
+ =?utf-8?B?alpkYXdXZm5SUVQ4dHBxbnlBalU2Q1NNOWJrc0RqNjMvYk5FcUt6ejh3SVNX?=
+ =?utf-8?B?ckR0SUlac0l2SFBsR0dQaEtIMWVrOTNOQzhkTTFqMFcrb0p2Z1d4aWk4R0xp?=
+ =?utf-8?B?YWFENjI0cENNbVp4TC93aGJGVUJRVkFMd1FzSVpXdEJTczlkYU5HNTJGQXVH?=
+ =?utf-8?B?dkhSNzFsTUtMYnc0VUFPb210WDYzWk9OS29DTXBmWVVFd2VncW1PTlFQUWpm?=
+ =?utf-8?B?L0JOdVJsTEdMRVhSTUZ6cmhlNHFJUEhiMjIwdFZOVjZnUStSeTY2SGZaOVow?=
+ =?utf-8?B?UUcyenlyRDhURENteU9iMjh0NXJoa3g4T294Vm1MRkh1VmFwN1VqMXJCbHVP?=
+ =?utf-8?B?UnFsVW5BQ2dDTUwwNmpQNjMrN0hOMFRWVFhoN1BOZlRqVzAxbTAydVhVQURV?=
+ =?utf-8?B?Wk5CakJSbXo2U3BLR1RVZFdIT05acXZlUkUxR2oyZnVNSUFqKzBWc0J0NmEr?=
+ =?utf-8?B?QTVYRW1YL2Z0RFNPSTlzWmVpdU9qcDErdS92QnlHMjdrRi85clpYUUV3L2Uw?=
+ =?utf-8?B?a01YbkNsa3RKSEJNOGdFQ3V4VGo2TFRid2dLYXdyUkhxT01ncCtVYTBiSGQ4?=
+ =?utf-8?B?ZlJZRTByTTQrOU9rVytrdVdkemw1OFFmNUJVOVFpNDh1ZzdpV2dSY04zVlJz?=
+ =?utf-8?B?Q3FTdUFNUlRBRTY3Q1MrTXpGNTNLdUhPVUZSbGFRTVF2NnNWVDhVNXc5TlNJ?=
+ =?utf-8?B?enNtdjVIdUtyNUluYkZXTFQxNGFkZi82NENMcGQzNzhkZEtkbmFCOXZDMFZQ?=
+ =?utf-8?B?TDNPYlRJcklFREhWK05VVXE1L0N0ell0MHVjSzR3WHQwQi9TOXRwYXNKVjN0?=
+ =?utf-8?B?Kzg1UGdVamwwRmJKSnd5WVVZZ1g5aC9rTDl0ck1wSHRzeG1qWThoSXBUdDFR?=
+ =?utf-8?B?bWdtRWIrcDJMVENMbUJRWlBUUGVaOU1XTzhYenlQdTY4QWIzdjNiNmZQSEs0?=
+ =?utf-8?Q?dhrtl/?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA0PR04MB7418.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(10070799003)(376014)(1800799024)(366016)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?ME1uZ1hzY0pobllVUWNUOFA3WW9zb0ZwSWVyeFQ1R1JnRlRCTFU0dm9rK3RP?=
+ =?utf-8?B?SC9BV25CZTdHbWtXbDdMSjBrS0RDcDVLbnpEWjM3ZWQ2Zy9FTzNxdWN1ZnFC?=
+ =?utf-8?B?N0hLUjlNaUE4UWlIRlYxQkRhYXk4eTVjdzIvT3EyWDg5L09Wcncxb29iN0N5?=
+ =?utf-8?B?RVBQUVU0ajczNVlWdmFWWjhyUWhBamNJZ3FEb0h1L0wwVThOekhlcnNiL2d2?=
+ =?utf-8?B?UGM0WG1UMC84ZjZNUXg0ZStGSWJyS3hJbnFzOU5CcXRQdndCaE5kYkZPOXQy?=
+ =?utf-8?B?UTgzbkN0VlVBL1JIN1hlZnh6b0dnWUdRSUpwY3VRditKeVZFL1k3K2VqY05F?=
+ =?utf-8?B?WklNSktrdFVlYlBoNnRhdGI1dnVCK0tmNzRjdEl0SHJCb0tDdmRqUTBROWxZ?=
+ =?utf-8?B?WWw4ZlhTQU9JeXF5VE9CcW40aXRMczRFcU1iaHVROWZzRVBoZWpiQWdBTUda?=
+ =?utf-8?B?MmFLa0ZUK29BVDR5YWF5T2M0N1Z5Y0x5ekROVk82SEtKQzhsbUtpNHpNTkYr?=
+ =?utf-8?B?NW5icVJ5S3p3cXBzR2hvY0xOalVhcmhTMzl2RkZyZjdvRGI5VTNEbjZQaW1J?=
+ =?utf-8?B?MklEa29CdkRBTkM2Q3JqWDhBQW1XeG9NcTA4K2FyejE4YmlmbVlLWEgvTG04?=
+ =?utf-8?B?T0NPWmJTVHMyeHpPVk1NT3VObDR5cmh5VnViMXVFRm9hdTJEYTBuTHVQRSs2?=
+ =?utf-8?B?bmprOG84UHBoeFludlRZYWJqSm40TWlmNWhrcHlzM3VSYmR1NTFlWXlHbWlC?=
+ =?utf-8?B?SjVVYXc3K3o2aHNrYnVmdXpXOEtLSzdTTGU3K0VJWlZwVmNEYXljRm9zY3Jz?=
+ =?utf-8?B?R0NUZk9zajFwUEMwV3g5NGV2SFRvRy9HZTh5dzlPMG9oNit6aHppUG1pRVA4?=
+ =?utf-8?B?eXlqZko5NWx4UStRQURqUVkzbFJWNzUwWEYramlNRUhwKzlmRHo3UHdvSlNT?=
+ =?utf-8?B?WHcvQzdSZU9aWmxIdm1FU3BQTG9FMlplcit3bWRia2NBNW5uSllLb2NOeXpX?=
+ =?utf-8?B?bWQ2Y0RsdkpGVEo0a0lXNGxqWm4va1NnOERxc1czVmpqUUtaR1EvNDVYNklB?=
+ =?utf-8?B?RkJtbDBjbTRXWGV5cC9MYlRUL2pEaWo4ZHBhSm5uZ2plbDRqYkZkY0NMZjBE?=
+ =?utf-8?B?cHpZT0tJNjJray9DMXM5WFRQWThGMFcxT2txRHpnc3NEVDVQYXptZG9ielpi?=
+ =?utf-8?B?S05PNm0wMWoxMTk5SVhiVVhySC90VmI1bnZtQUVrcEdCZW0wbldlZXJQRm9Z?=
+ =?utf-8?B?WDEzK0o0bzlzYlNaeUNhLzhzMjJkU2RyZU5NOTB3ZGRjM3hOQ1FLNzhKUjhJ?=
+ =?utf-8?B?bmp5T3RkZmxPcmpuR1BWRjNoYWR2RUE5R2R5WmU2YVRsOUgwa3k2ZFlKRFA4?=
+ =?utf-8?B?Vi85L0lWMnJrU3VUMlNOVkxBZHdrc1FRSnk1NjRJQTZJcDNOdEx4UnhUT3BI?=
+ =?utf-8?B?azBJL1B6MmptWXg4SHNuVUZsOGpjRXRYa2hDY3V1WE9CL2NDYWxYbkRZaGhz?=
+ =?utf-8?B?a28rV285OWs2c0syNUhsNHRvb2xISGxEd3pZMGF2Q1VmSHVyM0pEd0d3aHpa?=
+ =?utf-8?B?RGJSdDNnNng3MFZYRmcxYnRuMzYxcm9SY1BrK1M2aWFvaGNYL3lrR1FiWktT?=
+ =?utf-8?B?UGt4UzJHVU1lekJZbkk5MXJCUC9tQUthNjhNOEMzNmdJTWVWZk1GOHZGZ1BW?=
+ =?utf-8?B?eDV2OGtXT2M0YitwRGtCN2xHcXBjdVoyY09tOEQ3bU56cFRWVFBMVGVmZ0ZW?=
+ =?utf-8?B?NlNRdW92VGVvZlV4ckxHRFlJSy9BQ0FFN2owQlR2Ukh2Sit3eVYvNnJqcFoy?=
+ =?utf-8?B?aHNOVFEyUGwxSjJGQjdUNjFzWDF5NTZWK1o5MlB0U1RucEE3bjlPbTZEY3lh?=
+ =?utf-8?B?YnFDZmRFT0sybHNMbWFYNnFTT3drYndIamhLNFBVY0k1VDUvRWxsYzVIb0tC?=
+ =?utf-8?B?Smg0SUZuNTczTjRMRk8wKzlQV0ZyWXBZRW5zcThLWjRtZllycjhiM3VROGlI?=
+ =?utf-8?B?RmM3eWo5alRBWG5lSGNHK25DZjM3OHVqaDVzSzFubDRkQUgwRGc3bmNwOEJN?=
+ =?utf-8?B?bDBxMS9kZXJMZ3BJMGtmeUNaQUFiT2xWL2owNjl0V0pqZHNMa3hyWVRqeHBt?=
+ =?utf-8?B?blFmNXJoVmZPV0pEUVRjRlRaTEQxbDZUVCtxaGFMMEpSNkk4ejZVV0lJbEpC?=
+ =?utf-8?B?UE5NaXJmbjYvSnBSWk5CVWRLZFgvNjlqbVI5Q0R1bFIybjVZVkhnOE45cm12?=
+ =?utf-8?B?WmFsRmQwcnE1MFVFRSthSkVDSG1BPT0=?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <07051B198B7E4A45AE177BBDBAE56B0A@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	wgaWT1Xta6YZpar++B1hZAmqdPfyA6Gs8APcIjtgL7kIDLb/k0OqMnEXDCY37iTst5voPXvm4ozf8mubC45jZAbjGvM1cQ0dFRtkJ99Izyp1jixKJ+/+aG/IVAxPtBGHqiFPY1JlfkAZzI1GcIEYLHSGMNQ0fZrGuGo4qWca+t9xYIbegOofkeUmTRnOxqMPEpHRuhfjzYvoGHegKtyWtZ1xvL4B8vNYcmqTIhAbJv39rxiWuCD5iccXiVoQ9hp76lX233QxxrUa3TsO74XLnQezk12KLi+862ljfu37rFVbXativElBQ5UAMweLB5YDwezFEZDa/4V9Wq+bNp52hgwbQNGKjTE/3qTg3dRGY4IThia3H78nw1lfKX7Zry0SfMs84grOvDczhLrQ20obnvu76ZSgbZyaq7L29R7pM8zl7A4RwJKqZweINbOr5VsC58bOKXs4KLKmkfTC7qvl4N2kVm1Ro5PQg7K019mjnbk8dP1EWkKhq/mj3GfWusz7gyLmim+Wl9xmf94TKg1mtQqvddQltchZDC851+z+Ny8U5nPKkWX6H8Dd1d2DoyUUzcqF466btyiChw9Md8J3AuQDY6fOd81eOpaYU2dbrhNwx1GYZYiUY2iWx4dxKNj/
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA0PR04MB7418.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9d1653f8-5fc1-4a8d-d2fb-08de27412687
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Nov 2025 07:56:30.5449
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: KD1cN8gfohnCZL9XWOb4ZQhBYIJaBFmcWrpUgGdPDzHqW22/lHhkS0jwRMIENob7HKEWii6e5NulFcMYcbvem0RouDf5p2Tf6JGmuHkWssY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR04MB8925
 
-Hello Yuwen Chen,
-
-Commit 01516d2d32bf ("zram: introduce writeback bio batching
-support") from Nov 13, 2025 (linux-next), leads to the following
-Smatch static checker warning:
-
-	drivers/block/zram/zram_drv.c:1284 writeback_store()
-	error: we previously assumed 'wb_ctl' could be null (see line 1211)
-
-drivers/block/zram/zram_drv.c
-    1174 static ssize_t writeback_store(struct device *dev,
-    1175                                struct device_attribute *attr,
-    1176                                const char *buf, size_t len)
-    1177 {
-    1178         struct zram *zram = dev_to_zram(dev);
-    1179         u64 nr_pages = zram->disksize >> PAGE_SHIFT;
-    1180         unsigned long lo = 0, hi = nr_pages;
-    1181         struct zram_pp_ctl *pp_ctl = NULL;
-    1182         struct zram_wb_ctl *wb_ctl = NULL;
-    1183         char *args, *param, *val;
-    1184         ssize_t ret = len;
-    1185         int err, mode = 0;
-    1186 
-    1187         down_read(&zram->init_lock);
-    1188         if (!init_done(zram)) {
-    1189                 up_read(&zram->init_lock);
-    1190                 return -EINVAL;
-    1191         }
-    1192 
-    1193         /* Do not permit concurrent post-processing actions. */
-    1194         if (atomic_xchg(&zram->pp_in_progress, 1)) {
-    1195                 up_read(&zram->init_lock);
-    1196                 return -EAGAIN;
-    1197         }
-    1198 
-    1199         if (!zram->backing_dev) {
-    1200                 ret = -ENODEV;
-    1201                 goto release_init_lock;
-
-wb_ctl is NULL.
-
-    1202         }
-    1203 
-    1204         pp_ctl = init_pp_ctl();
-    1205         if (!pp_ctl) {
-    1206                 ret = -ENOMEM;
-    1207                 goto release_init_lock;
-    1208         }
-    1209 
-    1210         wb_ctl = init_wb_ctl(zram);
-    1211         if (!wb_ctl) {
-    1212                 ret = -ENOMEM;
-    1213                 goto release_init_lock;
-    1214         }
-    1215 
-    1216         args = skip_spaces(buf);
-    1217         while (*args) {
-    1218                 args = next_arg(args, &param, &val);
-    1219 
-    1220                 /*
-    1221                  * Workaround to support the old writeback interface.
-    1222                  *
-    1223                  * The old writeback interface has a minor inconsistency and
-    1224                  * requires key=value only for page_index parameter, while the
-    1225                  * writeback mode is a valueless parameter.
-    1226                  *
-    1227                  * This is not the case anymore and now all parameters are
-    1228                  * required to have values, however, we need to support the
-    1229                  * legacy writeback interface format so we check if we can
-    1230                  * recognize a valueless parameter as the (legacy) writeback
-    1231                  * mode.
-    1232                  */
-    1233                 if (!val || !*val) {
-    1234                         err = parse_mode(param, &mode);
-    1235                         if (err) {
-    1236                                 ret = err;
-    1237                                 goto release_init_lock;
-    1238                         }
-    1239 
-    1240                         scan_slots_for_writeback(zram, mode, lo, hi, pp_ctl);
-    1241                         break;
-    1242                 }
-    1243 
-    1244                 if (!strcmp(param, "type")) {
-    1245                         err = parse_mode(val, &mode);
-    1246                         if (err) {
-    1247                                 ret = err;
-    1248                                 goto release_init_lock;
-    1249                         }
-    1250 
-    1251                         scan_slots_for_writeback(zram, mode, lo, hi, pp_ctl);
-    1252                         break;
-    1253                 }
-    1254 
-    1255                 if (!strcmp(param, "page_index")) {
-    1256                         err = parse_page_index(val, nr_pages, &lo, &hi);
-    1257                         if (err) {
-    1258                                 ret = err;
-    1259                                 goto release_init_lock;
-    1260                         }
-    1261 
-    1262                         scan_slots_for_writeback(zram, mode, lo, hi, pp_ctl);
-    1263                         continue;
-    1264                 }
-    1265 
-    1266                 if (!strcmp(param, "page_indexes")) {
-    1267                         err = parse_page_indexes(val, nr_pages, &lo, &hi);
-    1268                         if (err) {
-    1269                                 ret = err;
-    1270                                 goto release_init_lock;
-    1271                         }
-    1272 
-    1273                         scan_slots_for_writeback(zram, mode, lo, hi, pp_ctl);
-    1274                         continue;
-    1275                 }
-    1276         }
-    1277 
-    1278         err = zram_writeback_slots(zram, pp_ctl, wb_ctl);
-    1279         if (err)
-    1280                 ret = err;
-    1281 
-    1282 release_init_lock:
-    1283         release_pp_ctl(zram, pp_ctl);
---> 1284         release_wb_ctl(wb_ctl);
-                                ^^^^^^
-Dead.
-
-    1285         atomic_set(&zram->pp_in_progress, 0);
-    1286         up_read(&zram->init_lock);
-    1287 
-    1288         return ret;
-    1289 }
-
-regards,
-dan carpenter
+T24gMTEvMTkvMjUgNDowNiBBTSwgRGFtaWVuIExlIE1vYWwgd3JvdGU6DQo+IGxpc3Qgb2YgbWF0
+Y2hpbmcgZmlsZSBwYXR0ZXJucyBmb3IgSmVuJ3MgYmxvY2sgbGF5ZXIgZW50cnkuDQoNCkplbnMn
+DQoNCg0KT3RoZXJ3aXNlLA0KDQpSZXZpZXdlZC1ieTogSm9oYW5uZXMgVGh1bXNoaXJuIDxqb2hh
+bm5lcy50aHVtc2hpcm5Ad2RjLmNvbT4NCg0K
