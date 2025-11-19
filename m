@@ -1,71 +1,75 @@
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67AF141AAC
-	for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 23:22:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD9D741AAC
+	for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 23:22:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763594561; cv=none; b=q4YsHLMQy9bjZxhBkV6pUDzaE1tbiamIxnG2tWoN0fYq9P64OlBsgKtlLrnsk6rjegxtCJkFOkfjm/fod4AXc/Qh1NoztOJVBhYv2TyfzAru7yAsYVSFG1cvCH++Ur3lsq2e2pwJH0ex4XfhPnABccYRvseFYg1xc2mjvZegQzY=
+	t=1763594564; cv=none; b=iRd3jNTARndQyV6R6lS9qpZTcinVFuVVy8eW3BFyhroS3YtoNzzxdU17oCYtz8esl+3AILlnvXaxbt5MKdmmjJHJXeNKIYxqtow+k/eAjUG1bbzzbgmstITP41oV7XVzEcumbjjsM6TRkA0HJjJBp3T4R/TK9CZN67HcaguUz+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763594561; c=relaxed/simple;
-	bh=QjugR5of39jyv4CYlRDPb9mvII2SNe3SzE1+UVNXefI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Cdqh/AmjNcJiT9/mJk5SXKzjziek3RcZ9a7PueqlNqp7gL1k6hV24yeDweTYYOg9FWDTIvUnfn/IUabxBKm3wVRHXD++Mkx2S3VrCc3iUNOXdmye9n22QafLW9/gk1Y/DH5UuqvD10IBqjNYthUTz8buzCnGLRm1a5D0hfwcqmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dR4jSj4L; arc=none smtp.client-ip=209.85.215.182
+	s=arc-20240116; t=1763594564; c=relaxed/simple;
+	bh=0FGShSFtRq2vVZa/FLv4CCVQlJggDUDPzj31PEcbTSs=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=fl25XULGA1lW5DNVhYipbvpVbftye3Xu0TQ14Y7hSfRaHG7jb/BFx7mEWwJes+ga2B4+E3cWxkMIZbEM4F7Vz2cwhTZX36H2gk8boVxShAQFAeKFpcZWHm/QiKOxkRVTkfbhCpWI6uDKQzFIfIG7trL5ZimJx5/W0tTNpbsRfhU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ljy1ACWF; arc=none smtp.client-ip=209.85.210.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dR4jSj4L"
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-b9a5b5b47bfso201818a12.1
-        for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 15:22:40 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ljy1ACWF"
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-7b75e366866so110506b3a.2
+        for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 15:22:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763594560; x=1764199360; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=mKxf4jmktf31j02xupmRKH5dO3VmWiI7NlK/tcxwOro=;
-        b=dR4jSj4L0zTP4EwcfDXfFArMRNFC/JOcD5+OItjdp/i2O+CxGbt4vswtgZrZ0QIksj
-         SS+FAul/+tu306JYJBQzvr0BTF2dKn3jVMs2D+daFGjWsDw2p60B/K+QzCwVqVYUR+4T
-         Sm7lWSidZb1Oee3nDdOSpZWQKTVaR9geZIbzlhMHHLBHAvtBQO6FeMTC0K3M8WzSh7yI
-         CtLPsSFH5DPar/a03z8f4XMnQbXyn0jdNLJUcg7PM4h0lFDK4VYB3ZYzpykMBxBskhcH
-         iF6/odPyhd5rTQO2jPhEm+vwG5Ad1fOVq3puVa157xPVuRZjnXmDhh9igreelhpGH4cR
-         NKVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763594560; x=1764199360;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1763594562; x=1764199362; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mKxf4jmktf31j02xupmRKH5dO3VmWiI7NlK/tcxwOro=;
-        b=LML7OILMgFyqimL1JyECiiJAvFP7xBqqsxq3RQRLhoJIPYxITITLTeHWZLrVXLr2Xu
-         p+OLujFYXNcb27LbAwaTfpP3OflkEKI0Ul63wKZj442MU+SGZBEI9cvX+pu4Yqd3NSFi
-         7JJq18XLKpnFCxBEw4TPmegZkZxSzmjNGmfzGzJvl5Tyx+CyhQOQkLdGfN7TsDg+0Lju
-         cNOYtNFH2Z/8xABGPX7C2J0rdgdlqIAx59oO2XkeQQ7IydITye40Vxp3on65WIoMqATx
-         p71KicGUTkhtPaT1rbYlTtJW1K2YUk5qs1GS8xrLEtKIRRi8iJAo6agrl8bxX7yj7Qsm
-         0HAw==
-X-Gm-Message-State: AOJu0Yy8eGzZTbVJXjoMaN8KWEDMYnqw3Wqden/tqWUzkM3Wihb3kdpK
-	QA8IRzjuq2T5euasQRgvFRar5hQsAH4mDB2zovsiRNJksQxH6ntvn92b
-X-Gm-Gg: ASbGncukk8Vgj/7dQftF4+OCMJ/XqX+xBF/B18pfRjmQ8XhW5YO2qVnYadvc8ByOeEU
-	7XQuQqQ7HVMC9a7vS1HBZDI6MvFZY41ow1/gVr2ijuYLrxh52JeghJPsFIWgGhiwBHdXxMtbZ9h
-	uWK4BksAeFBC+syz6IstK8f+dRTkGvLqhtL63A+PI+U+yl2u0nmoHrLWKQEFEpNVHKjbXtI+a05
-	J/FL4kCfS2F1BJaKBOeOkVdn7VEXg3TuTL3MJNNzsOp71pScy8NKo9G05e2+GKir/b2TU2judy2
-	QlzSlJFXNk2TimDdcM4rikS+/vf/quIB/H5fTi29+h4yoI+XlHCiPbtAp2OLwdzatX+Mr8OO5Dl
-	hVuHCzO13MwYp99hguUZw0zuuYUpvs9C4zq1Ea4FEsAhro/OtPcZORn7o19Yg33c8aMA3im0bud
-	vDMgEDP88et5Dqs+ywiPOdpVnTSqqosHIO8wrYZCfBRodwj5E=
-X-Google-Smtp-Source: AGHT+IEu9NS43G5dTpzF29TFKFJjzLvlEqhCkgDpeD2wjKV1j+aJmZWCmxn+NXLDTVlQ4pp1Qgzlig==
-X-Received: by 2002:a05:693c:4085:b0:2a4:3594:d552 with SMTP id 5a478bee46e88-2a6fd17de07mr337854eec.31.1763594559435;
-        Wed, 19 Nov 2025 15:22:39 -0800 (PST)
+        bh=y/ArKJUZQmA06yg9FqEojH0cZqvhzHJY9akF8FwKHE8=;
+        b=Ljy1ACWFke1290heWKGyH0Fg6M0xQtAA2saW+vYq3Oa1dZRW/Ks+Cf7iod+kPe5z5z
+         EQauVpTM9dXlzWBxhJn5fYe/zjRgwYWqp5uLBKj7SeotIZX8r7xg++tT7f7gli3R6x9g
+         JJpYq98cakArWimY6tlEamQG7cruNvA+hv7fch0maTDLRn9/2G16qdkPqeBSznzzGb6m
+         cYqfrNy768fgajkKvD+BLuZUG1Tap30zGR40MLNuzPMo3m48ooFs+uofKvhMjvYK7dzM
+         5gdtDMy7sXEEjja1RzxM5QZv2dIGKCkQWXDFwpEaB+srGHoSXc9J/7luSKmrFhr25k0y
+         ugRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763594562; x=1764199362;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=y/ArKJUZQmA06yg9FqEojH0cZqvhzHJY9akF8FwKHE8=;
+        b=H0cKs5ir01ChhpuUm+4ne/jwYIErmmH+LYErefiz3Z0C5NHOccANtIcVpTfo5NuJOB
+         XKWQgc62S1Yono8RDe3Bg8Keo0z2gcvZYvFTWPgYbAk7n6d0tH6Q1Ft8Dukj7HeHFG+B
+         8R1rcA3q/9N14o9S38/mYIRPrKoe4cpeQ4UcV4dJh7gKKUp40QMyrOvkfXaM3KlplPNl
+         ckdCl2WVFLys2Dz23S4txI5sgjQ09pVuCKqqQeuQvKTopVgs22DEPrqY4LgnK8iYsKeM
+         dFcQ9IDmoNQHHEocHnKfpQr9gZuQoGhOPeF1upBFAfi4q/+uei5/vnZmmCmYGFo/uisL
+         rq+w==
+X-Gm-Message-State: AOJu0YxUrUG3dLD+Ht5WxYY9ledUB4ii4D03t2pkfr32/MG0oSFFnoYd
+	9YNfi9b442O8lqgRHUek+7aN9gz4+eaZ6guFh+EjWzJAEBpGi7awUJok
+X-Gm-Gg: ASbGncttkS/whYosYYVT3r5hDV12DKtNXRdth+mfcVwlb9yLUbJkXQO28II1DTsKk4Q
+	MKHaT/VthONvMeF9EDT+nXXOdfSHS8xdSW1NjzZ/Y3pBm+lXFIahpX4+JpVUY8v6Kx8L6OGZnsd
+	TIrEr3LDBZDWGQNQ3TYwIgif5To3Uvs+ePLg0jL9oxqQvoNy2sXttZYNHdSTu6rMZWZkRtG2UWY
+	Tmig2xPsLkoDVdsCrtRGBmNhnwhoRv9/5oFmNvYEfqq5QPpuzKFDz6pL/Xl0B5q5l1J5C2fMG2y
+	O1KHibJrz/uy2Rpb8NvPfGoKJkNlKkh329dON3tyAmvLSikD6wZ6SQEAmSM2gFz3GpcQiGQTaQD
+	fFR0Wiv7qqA5I5u9e435pvOKE6uIQQGxLADRDJaTm7Ka1KkuX7kbeaVgWLpVQ/R4tl3eD3aNU0Y
+	23/i5YNoaE6THLNkcOnqs29LMBibE1VvJetumwzG0ck+PCtcomZCpRNrfgsWFeF9oCZ/4T
+X-Google-Smtp-Source: AGHT+IGBF4WqCbSUbuCc+HgtqM4IoB61LGPOVfGMTE1GA3t1nARtDH14IKI7p8i20djFsMblXSTLZw==
+X-Received: by 2002:a05:7022:e98e:b0:119:e55a:9beb with SMTP id a92af1059eb24-11c93810b81mr368010c88.7.1763594561752;
+        Wed, 19 Nov 2025 15:22:41 -0800 (PST)
 Received: from localhost (ip70-175-132-216.oc.oc.cox.net. [70.175.132.216])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2a6fc5e3750sm2550279eec.6.2025.11.19.15.22.38
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11c93e6da4dsm1997083c88.9.2025.11.19.15.22.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Nov 2025 15:22:39 -0800 (PST)
+        Wed, 19 Nov 2025 15:22:41 -0800 (PST)
 From: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
 To: axboe@kernel.dk,
 	dlemoal@kernel.org,
 	hch@lst.de
 Cc: linux-block@vger.kernel.org,
 	Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
-Subject: [PATCH V2 1/2] loop: clear nowait flag in workqueue context
-Date: Wed, 19 Nov 2025 15:22:33 -0800
-Message-Id: <20251119232234.9969-1-ckulkarnilinux@gmail.com>
+Subject: [PATCH V2 2/2] zloop: clear nowait flag in workqueue context
+Date: Wed, 19 Nov 2025 15:22:34 -0800
+Message-Id: <20251119232234.9969-2-ckulkarnilinux@gmail.com>
 X-Mailer: git-send-email 2.40.0
+In-Reply-To: <20251119232234.9969-1-ckulkarnilinux@gmail.com>
+References: <20251119232234.9969-1-ckulkarnilinux@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -74,9 +78,9 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The loop driver advertises REQ_NOWAIT support through BLK_FEAT_NOWAIT
+The zloop driver advertises REQ_NOWAIT support through BLK_FEAT_NOWAIT
 (enabled by default for all blk-mq devices), and honors the nowait
-behavior throughout loop_queue_rq().
+behavior throughout zloop_queue_rq().
 
 However, actual I/O to the backing file is performed in a workqueue,
 where blocking is allowed.
@@ -106,24 +110,24 @@ Date:   Wed Nov 5 18:24:17 2025 -0700
 
 
 ---
- drivers/block/loop.c | 4 ++++
+ drivers/block/zloop.c | 4 ++++
  1 file changed, 4 insertions(+)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 13ce229d450c..ebe751f39742 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1908,6 +1908,10 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
- 		goto failed;
- 	}
+diff --git a/drivers/block/zloop.c b/drivers/block/zloop.c
+index 92be9f0af00a..1a97b21f5fed 100644
+--- a/drivers/block/zloop.c
++++ b/drivers/block/zloop.c
+@@ -498,6 +498,10 @@ static void zloop_handle_cmd(struct zloop_cmd *cmd)
+ 	struct request *rq = blk_mq_rq_from_pdu(cmd);
+ 	struct zloop_device *zlo = rq->q->queuedata;
  
 +	/* We can block in this context, so ignore REQ_NOWAIT. */
 +	if (rq->cmd_flags & REQ_NOWAIT)
 +		rq->cmd_flags &= ~REQ_NOWAIT;
 +
- 	if (cmd_blkcg_css)
- 		kthread_associate_blkcg(cmd_blkcg_css);
- 	if (cmd_memcg_css)
+ 	switch (req_op(rq)) {
+ 	case REQ_OP_READ:
+ 	case REQ_OP_WRITE:
 -- 
 2.40.0
 
