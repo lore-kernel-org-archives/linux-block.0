@@ -1,219 +1,133 @@
-Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010024.outbound.protection.outlook.com [40.93.198.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61F99EADC;
-	Wed, 19 Nov 2025 00:06:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.24
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763510793; cv=fail; b=dysMOUjPgUm2CczZ6FbAod8mG+TgYNFl9j6lbI1QjAAJQFtCegPBxi7p5hxQAJwmqXy7Ek7D7TFDL9T1IbTVO/UH6XIokmrhFFiYqa59uFPlLtuIiZvfWOFZFutVn1BpEy2HGdMFEB+hZ6cYk9Dv94YaAqkjgSg0V5TWyAzhi4A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763510793; c=relaxed/simple;
-	bh=yBKEoi8kQ/ilXMgV+VCHjyJ5+gf0zintZb9YCwVqsVA=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JV+RyAKG0n4lJeGtVnz1o1pE+nJk7fTfH9nuVSrt5VadnzJSxWHtD6MrTzTr7a1I98gvMx9pZLsnXQC3d1gnyLPUTbWWQh79xjMHZnxYCPyreaxLggWFnCXq3wn7gAP0rkZZxjTKV4/D6ZYxeGU1Ed1en0oNflL58VoDJGyLIiQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=U2Urw14K; arc=fail smtp.client-ip=40.93.198.24
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AE391C84DC
+	for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 00:36:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1763512616; cv=none; b=GxMwZbLm7KDWYaXgCxpESZzLsgMfm4lTu+rNoUQ+ptsu88/mCewAWntc3gsfOBoEo99jJq8rEtP79p3DTwMz8pMAzTGSNOk8Dbg52Wt4GgU48N4aB/ylh7K5+JGXqO96Q1VJpcghpZZW6n5PaZgMg1VXQaX2Hcg4OW8ejDxiUQw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1763512616; c=relaxed/simple;
+	bh=5D029cnt+WTHwAu/MUWrYfxjKBz0PGlwHpM5B6oBJx0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Kp0yFy7H9VWsKZI0P2eJh1UO9LvJ+SLxwIpPV0e0nxlXXdaPqDawo7x7xSybVsj+HDP1vWbZd18ghV9+sECVnIVgJMe1mVzpOKkyU33HW6XtsUmZpas0zCr8Grg99Rf3PASAlWQOZ8DHpRcU7Qf0F4efOMuQPQ/0qGYEU1LHVT0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c7OlZNmp; arc=none smtp.client-ip=209.85.215.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="U2Urw14K"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fzUTSyQuiLfORfKX4LI3X8yvZcGDJfGPUSktAKBfjYYRq1g56DORDZcH0LneYpWpweR54S961+xc7+v+8jUCsD4obvc7/G2dEfEGREME3kMT7l+0CW3GBKzdk/u93wme7jZjETC7OiiCi2+HWkenEuOxlgHH5JacMj7h0yZW3nXrpuWNSjBLBoCThR1Ty+EFbsJ4U2bvPbBYP4T3bvL/FlOnl6R3DbdGKcmuG2whuWC9F182Tn2eUJPR6WUvwjEFLL4Pmde+821kwK6qZgbgr8TNlV2ZdOpgzg+nHPqzS/62hv0hY5FIBKJJFgF4BgmEr8yXaDyiPlMJJNN/zZ7afQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=d/5PWLvdd1WeJ4W7zy8OAcBghdLi8K9u6ZsUNgm6aoQ=;
- b=Pnm4XZ1vAJuVnhTW0JuRoALR+6gZ2i2xghn7DZjIfTYBZmfUdcTCMn9x2Myzarg/TsabwK0L00aCw+vGQ6qwsP5G325dQaTD7vpN1TtVAiAWhDUJrRO2nfpsqYUATCyTSt+2EpTmQ/EHlC4hX7hTpsM42GgxDiwxEI0YSwIyjGr8rNRvrCp7JuzuZ153zYWeTaKsUt5PIxDZAaSPsU37FvTTPsYhyOiiIEumLvoiVYwyJj1hTZ/vC0lLv5DmlqUp3/gGqK/3GlFuZnyRiQgocWO/W8uXa0ZborQIn9flOtFP/xrnQnjaezSoViMvGdDRBKMZoPQaEsPtNj6qpLSENA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=d/5PWLvdd1WeJ4W7zy8OAcBghdLi8K9u6ZsUNgm6aoQ=;
- b=U2Urw14Ko2+/JJeYYi2XiQOHuCm9bRJWUnU3odkLPjnFdrmy51bEUc5iUzP42CAqZqDryRSseNuWikpMtlGMhS5FuJeMvd6sWz7xsjzh84qup23Vf8lgPDWyd+zu3U6hWbH1LtokVBe9mpr5anMeCQO33f/atHJMrefPsFDJoeJPQogwBmsDeyMgWnML/wtaDwz206VM3IGZmH/laT2kExJ0/ZFQaO0W6z/n3/s9XGWtzYSiXzXHnaPg0B+BDoFPeXBvw/pOPRgwImo6AlL3GHwbDUfDK+a5bUeGUVEvZxJcJ2jDQH239dzkXBviM3xEPP1yfLCKi1OGBD3D9x5ejg==
-Received: from MN2PR05CA0023.namprd05.prod.outlook.com (2603:10b6:208:c0::36)
- by LV3PR12MB9266.namprd12.prod.outlook.com (2603:10b6:408:21b::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.10; Wed, 19 Nov
- 2025 00:06:28 +0000
-Received: from BL6PEPF0001AB4C.namprd04.prod.outlook.com
- (2603:10b6:208:c0:cafe::e8) by MN2PR05CA0023.outlook.office365.com
- (2603:10b6:208:c0::36) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9343.10 via Frontend Transport; Wed,
- 19 Nov 2025 00:06:28 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- BL6PEPF0001AB4C.mail.protection.outlook.com (10.167.242.70) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9343.9 via Frontend Transport; Wed, 19 Nov 2025 00:06:28 +0000
-Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 18 Nov
- 2025 16:06:14 -0800
-Received: from drhqmail201.nvidia.com (10.126.190.180) by
- drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.20; Tue, 18 Nov 2025 16:06:14 -0800
-Received: from Asurada-Nvidia (10.127.8.11) by mail.nvidia.com
- (10.126.190.180) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
- Transport; Tue, 18 Nov 2025 16:06:12 -0800
-Date: Tue, 18 Nov 2025 16:06:11 -0800
-From: Nicolin Chen <nicolinc@nvidia.com>
-To: Leon Romanovsky <leon@kernel.org>
-CC: Bjorn Helgaas <bhelgaas@google.com>, Logan Gunthorpe
-	<logang@deltatee.com>, Jens Axboe <axboe@kernel.dk>, Robin Murphy
-	<robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>, Will Deacon
-	<will@kernel.org>, Marek Szyprowski <m.szyprowski@samsung.com>, "Jason
- Gunthorpe" <jgg@ziepe.ca>, Andrew Morton <akpm@linux-foundation.org>,
-	"Jonathan Corbet" <corbet@lwn.net>, Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>, Kees Cook
-	<kees@kernel.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>, "Ankit
- Agrawal" <ankita@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>, "Shameer
- Kolothum" <skolothumtho@nvidia.com>, Kevin Tian <kevin.tian@intel.com>, "Alex
- Williamson" <alex@shazbot.org>, Krishnakant Jaju <kjaju@nvidia.com>, Matt
- Ochs <mochs@nvidia.com>, <linux-pci@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-	<iommu@lists.linux.dev>, <linux-mm@kvack.org>, <linux-doc@vger.kernel.org>,
-	<linux-media@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
-	<linaro-mm-sig@lists.linaro.org>, <kvm@vger.kernel.org>,
-	<linux-hardening@vger.kernel.org>, Alex Mastro <amastro@fb.com>
-Subject: Re: [PATCH v8 06/11] dma-buf: provide phys_vec to scatter-gather
- mapping routine
-Message-ID: <aR0J8zHtfe/j4ajU@Asurada-Nvidia>
-References: <20251111-dmabuf-vfio-v8-0-fd9aa5df478f@nvidia.com>
- <20251111-dmabuf-vfio-v8-6-fd9aa5df478f@nvidia.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c7OlZNmp"
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-b6ceb3b68eeso4745021a12.2
+        for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 16:36:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763512614; x=1764117414; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=W3lcy2UqBeKot8mViXkim4uY5huIXlEfp/tRFv8N8cI=;
+        b=c7OlZNmpEiNAay1kdgMPy1/DWVL6w6/esXzzD9qgwcOLysPHsGjqgksUYBRQhf/6T7
+         okdiYQes+MhoxozNYPE+lRxh6kO23WyReSFItO3cLW5iv9KpGkdFxg1F72hLcs3TG6Xt
+         7Nhiyyp319bZn6ORH2o85V148fkIuOaL58Tl17H/8YA3TIGOOgMB4wxbdMELD36Ikrsg
+         AMrIWzkBBUTcAIHK7q5vXIwNN4w1bju1vXyVzo2+Ha8mQHMQxk+l3N4XwoG5RSpfkAI0
+         46E0V944y5xskoHFGIrIg2b38mS8yS/YwfuoUa1MAYnz51wOXY+FMH+k581UOSS7GkWK
+         w6Tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763512614; x=1764117414;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=W3lcy2UqBeKot8mViXkim4uY5huIXlEfp/tRFv8N8cI=;
+        b=SdNw99lPKuGrdlVphovCdiT5KXpAqjfs9c8z4UEq3Pct4PCnApgSscVnkPAXe8wVkn
+         kxaK3w+JlRitw0nAS3ZNvB+he9v9CS+g5B2BSqsnhfsmKYZjJSNb8sleKBNwWZwKdE5o
+         wmWiCCLXKxUCUHsIY2GH054dpkPgk1udLaqpfHDUvXCDSUKBqY2CTIQJv7Ojuax96R66
+         uq79p0X+nBHxLTNPs3YVjKpRjkMQrpInJC0YEpnhwZx/beexo+vkCs2dvdcvPBItavou
+         BbEmydAT+xqmL2dvcPtlHrV6p69caw1N+NhUHloz15+s4RjurfeWX0OczqE9kkdYE7iO
+         OOYQ==
+X-Gm-Message-State: AOJu0YxXlN1Oo6oWEiiYAKbgYyFpqIfnKbgfdXJP7sDU4Q37uIScO7ct
+	Jb1vqVyqp6kZYAZqhgq7ogMJoxhfUASyNQMGa4Xg09ExfNlcvsAkFM59
+X-Gm-Gg: ASbGncvVY00N37I/qTrKb2aB6GojIG6xwHjkjSNrDIntbj6j4GW/pU6+fBIU4VtaciP
+	VcdKlaLoMSrXZo4u8oE3bO3t6tx71oqiLh4tchS3NX+uGNsPHN9MUGGVZcCfdI35rrXN7zLFibV
+	F6ErDPpOnxTPXV5/gSRvqmiOzKtu1tevkZMFMG5YbJd0a2g9D6/YaGFGVkWMwThZvbwu39A6NQZ
+	Kqk1je5UqK+kMcQ67sjfFzGYVglIVaBcaTRiD4q8ArBLXQoGx1f6cMaUBoLPKoFF/0sBAHyRcQM
+	3UWb84zswcjZgnt44ObXTKu0yxctloDmdpFs7/NGUjJdLULxKI8ytXCoxUVQoJZLDY80/NPBA8k
+	dG4W1+t06vAaUCEtUszsZOPtq5AnV/neIQ8/Vri5gF0Zp0Gj45nRxOiK3nk10X0AFKr9DTeAOKI
+	WO3CqH7geoO9vPplXlZCadhd8S5JXw20UKM1cXccCWbq/XadMxHvWMSEyzQg==
+X-Google-Smtp-Source: AGHT+IHqd0BPCLlpiwKFcFWmC4coRHXIHSf3S0jQT/Cn1AqXojRQpRpoo+iDFuz0NhlFNjmWz0Huvg==
+X-Received: by 2002:a05:7300:d089:b0:2a4:3594:d548 with SMTP id 5a478bee46e88-2a4abb115b8mr9244006eec.21.1763512614282;
+        Tue, 18 Nov 2025 16:36:54 -0800 (PST)
+Received: from localhost (ip70-175-132-216.oc.oc.cox.net. [70.175.132.216])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2a49dad0aefsm48448557eec.3.2025.11.18.16.36.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Nov 2025 16:36:53 -0800 (PST)
+From: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+To: axboe@kernel.dk,
+	dlemoal@kernel.org,
+	hch@lst.de
+Cc: linux-block@vger.kernel.org,
+	Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+Subject: [PATCH 1/2] loop: clear REQ_NOWAIT before workqueue submission
+Date: Tue, 18 Nov 2025 16:36:46 -0800
+Message-Id: <20251119003647.156537-1-ckulkarnilinux@gmail.com>
+X-Mailer: git-send-email 2.40.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20251111-dmabuf-vfio-v8-6-fd9aa5df478f@nvidia.com>
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB4C:EE_|LV3PR12MB9266:EE_
-X-MS-Office365-Filtering-Correlation-Id: ebe9b90d-7b73-4436-d0c9-08de26ff7cc5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|7416014|36860700013|376014|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?UPeB8HywBeXH9UFWWV9lGgJ2/MmtmJ4OOyC+g0tDe5AHpwAMQ8xrS6GCm95t?=
- =?us-ascii?Q?lypTQjm9hVAlB61Ih4p3RTpPf13nZlWDKGOZj19RdiO18GyUP1p7pfyw1P48?=
- =?us-ascii?Q?DXUHpHO9McNgpIZhwS1APsZaNVzGsVSp14ZRnxyhOIDxuWxYGQGPfz+atpK/?=
- =?us-ascii?Q?4ug6gssdfpdangpl1z7ssWwhAsPLc0Z8nkqvNyhWd+ldBXksv3/ZR8B35Qwu?=
- =?us-ascii?Q?i3lSev3/2gBEuYkLxuZmB/sVeEpJ/q64JHCJUJoDVL2HESYtNpyOefxwJiym?=
- =?us-ascii?Q?DrKTV2harBdf5XwDZLyPRZ5kBqKy+ZNTUVHLrqa2DqhS7Unh6/c+6ago9AoA?=
- =?us-ascii?Q?+QEIAQqtAq6gzg92gGK1CJe7AUS39HRMI+J64p8kSaPwdmdbLvbppgRJ1e+C?=
- =?us-ascii?Q?hB8ooQDk1gO4i0SZbgzyuXFcwaKWf9eH5I4cFbHKgr/33JC9Yn9x9K3zyD2v?=
- =?us-ascii?Q?1jTHhTUVa9WTVDPv60wC8oY1gqnKpb1a93TlygocYhNWyhq7B9gWPhLL2lo/?=
- =?us-ascii?Q?tmoCpLG3iRDCRtrD67CIQiHAj4zzrlRZoF0oqQR7GlyqKK+Dc5mlVe4sRike?=
- =?us-ascii?Q?HEX1IuS5zvM9n45fWFfwLAwOQjTZ4RwjJVb1HbQDrYVtNmC7v8Yz6u6gcfDH?=
- =?us-ascii?Q?x4pLbWuS0Em961+4bv8aCOi7Qf/2J1/eZgMF5VC/Kh1V3g+GvzSI5j1lGV/U?=
- =?us-ascii?Q?0ccMSGm39fyt5SkU3exrIVpuRTHXXo859Z8OBNeRGnoWv1JabHFpOebfbwgo?=
- =?us-ascii?Q?PwWBoRSLQFHPmNDejZ2M/+lPWp8ttIEEP9+lg+7l6oRU7c5arWg6+r7gOmjR?=
- =?us-ascii?Q?FdFqHArzm4QoVDXm4Kch3bpkGswMlpPl/fBJgjDY27IfCXYY+Q55e0nLcB21?=
- =?us-ascii?Q?K9Aw6kXoyDqllhEMVyrrk0KEeyHIP/v8Od+9kqLrZbDGna+DXSrEjZ/AczXL?=
- =?us-ascii?Q?kKrAaDaRioqnBWRj37hqeErWmbLyOUEDuf4RXqWRCyvJsvm0bLGfJ7abRPhG?=
- =?us-ascii?Q?CPRmmOwAjBnad1pg3iv2T61/pnNOZ1c7IhbhMJHvbzdcCqemkdQ08zTK9dup?=
- =?us-ascii?Q?I1qY3aJ3833cvAXLC69+sInbaPEI2AI1ZjJJRq9YpVcvg7OUTVypKr4k9PF3?=
- =?us-ascii?Q?1i7AWhnkvtLwjiQGUW13YrS4wAydlvjfFvtmhppWhjesEDX6ZFO6Ch20tg3B?=
- =?us-ascii?Q?kkoaxLa01pU231Oinyaxb29CtdYeM8btVDFQUJIxIuE+Gb/XtAM8G7HLfvoI?=
- =?us-ascii?Q?YP4Wr2fAvvgsmL7/uRRWmLgpuU2D5V59T6nbRSXleWHUjX7yaI8sbQYqPZxw?=
- =?us-ascii?Q?vx0xqCn8tolsxteGT2vI1X9uuNAooDuB11+0VKpf9H1r33DR6pRjjfsIxaDJ?=
- =?us-ascii?Q?A2q9p4r++4Pw8+u5VFml2hI+ruoYzfopgj0+M9lsFra16JF7Sst8Bb1u2E2A?=
- =?us-ascii?Q?uPF5hj+K0By4f1OVN+erk0Zy3aiucAvTVCJqHm/e5uT2wtpAbd4K6vSE+hG0?=
- =?us-ascii?Q?Fy9nREql+PdPKhNhqn70EwFh1cbyLrx0nstSyZWL+N1cv08E7ejQndAseUQz?=
- =?us-ascii?Q?JQXESL5OXwu5dsUf+ZU=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(36860700013)(376014)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Nov 2025 00:06:28.3462
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ebe9b90d-7b73-4436-d0c9-08de26ff7cc5
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL6PEPF0001AB4C.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9266
+Content-Transfer-Encoding: 8bit
 
-On Tue, Nov 11, 2025 at 11:57:48AM +0200, Leon Romanovsky wrote:
-> From: Leon Romanovsky <leonro@nvidia.com>
-> 
-> Add dma_buf_map() and dma_buf_unmap() helpers to convert an array of
-> MMIO physical address ranges into scatter-gather tables with proper
-> DMA mapping.
-> 
-> These common functions are a starting point and support any PCI
-> drivers creating mappings from their BAR's MMIO addresses. VFIO is one
-> case, as shortly will be RDMA. We can review existing DRM drivers to
-> refactor them separately. We hope this will evolve into routines to
-> help common DRM that include mixed CPU and MMIO mappings.
-> 
-> Compared to the dma_map_resource() abuse this implementation handles
-> the complicated PCI P2P scenarios properly, especially when an IOMMU
-> is enabled:
-> 
->  - Direct bus address mapping without IOVA allocation for
->    PCI_P2PDMA_MAP_BUS_ADDR, using pci_p2pdma_bus_addr_map(). This
->    happens if the IOMMU is enabled but the PCIe switch ACS flags allow
->    transactions to avoid the host bridge.
-> 
->    Further, this handles the slightly obscure, case of MMIO with a
->    phys_addr_t that is different from the physical BAR programming
->    (bus offset). The phys_addr_t is converted to a dma_addr_t and
->    accommodates this effect. This enables certain real systems to
->    work, especially on ARM platforms.
-> 
->  - Mapping through host bridge with IOVA allocation and DMA_ATTR_MMIO
->    attribute for MMIO memory regions (PCI_P2PDMA_MAP_THRU_HOST_BRIDGE).
->    This happens when the IOMMU is enabled and the ACS flags are forcing
->    all traffic to the IOMMU - ie for virtualization systems.
-> 
->  - Cases where P2P is not supported through the host bridge/CPU. The
->    P2P subsystem is the proper place to detect this and block it.
-> 
-> Helper functions fill_sg_entry() and calc_sg_nents() handle the
-> scatter-gather table construction, splitting large regions into
-> UINT_MAX-sized chunks to fit within sg->length field limits.
-> 
-> Since the physical address based DMA API forbids use of the CPU list
-> of the scatterlist this will produce a mangled scatterlist that has
-> a fully zero-length and NULL'd CPU list. The list is 0 length,
-> all the struct page pointers are NULL and zero sized. This is stronger
-> and more robust than the existing mangle_sg_table() technique. It is
-> a future project to migrate DMABUF as a subsystem away from using
-> scatterlist for this data structure.
-> 
-> Tested-by: Alex Mastro <amastro@fb.com>
-> Tested-by: Nicolin Chen <nicolinc@nvidia.com>
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+loop advertises REQ_NOWAIT support via BLK_FEAT_NOWAIT (set by default
+for all blk-mq devices), but delegates I/O processing to workqueues
+where blocking operations are allowed.
 
-Reviewed-by: Nicolin Chen <nicolinc@nvidia.com>
+Since REQ_NOWAIT is not valid in the workqueue context, clear the
+REQ_NOWAIT flag before handing the request over to the workqueue. This
+avoids unnecessary non-blocking constraints in a context where blocking
+is acceptable.
 
-With a nit:
+Signed-off-by: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+---
 
-> +err_unmap_dma:
-> +	if (!i || !dma->state) {
-> +		; /* Do nothing */
-> +	} else if (dma_use_iova(dma->state)) {
-> +		dma_iova_destroy(attach->dev, dma->state, mapped_len, dir,
-> +				 DMA_ATTR_MMIO);
-> +	} else {
-> +		for_each_sgtable_dma_sg(&dma->sgt, sgl, i)
-> +			dma_unmap_phys(attach->dev, sg_dma_address(sgl),
-> +				       sg_dma_len(sgl), dir, DMA_ATTR_MMIO);
+Hi,
 
-Would it be safer to skip dma_unmap_phys() the range [i, nents)?
+Patches are generated on base commit in linux-block/for-next :-
+
+commit 6dbcc40ec7aa17ed3dd1f798e4201e75ab7d7447 (origin/for-next)
+Merge: 58625d626327 ba13710ddd1f
+Author: Jens Axboe <axboe@kernel.dk>
+Date:   Wed Nov 5 18:24:17 2025 -0700
+
+    Merge branch 'for-6.19/block' into for-next
+
+    * for-6.19/block:
+      rust: block: update ARef and AlwaysRefCounted imports from sync::aref
+
+-ck
+
+---
+ drivers/block/loop.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 13ce229d450c..9d931ff456e7 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -797,6 +797,7 @@ static inline int queue_on_root_worker(struct cgroup_subsys_state *css)
+ 
+ static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
+ {
++	struct request *rq = blk_mq_rq_from_pdu(cmd);
+ 	struct rb_node **node, *parent = NULL;
+ 	struct loop_worker *cur_worker, *worker = NULL;
+ 	struct work_struct *work;
+@@ -860,6 +861,9 @@ static void loop_queue_work(struct loop_device *lo, struct loop_cmd *cmd)
+ 		work = &lo->rootcg_work;
+ 		cmd_list = &lo->rootcg_cmd_list;
+ 	}
++
++	rq->cmd_flags &= ~REQ_NOWAIT;
++
+ 	list_add_tail(&cmd->list_entry, cmd_list);
+ 	queue_work(lo->workqueue, work);
+ 	spin_unlock_irq(&lo->lo_work_lock);
+-- 
+2.40.0
+
