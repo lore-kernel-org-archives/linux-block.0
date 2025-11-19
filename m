@@ -1,67 +1,67 @@
-Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F5D12E8B66
-	for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 17:01:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 473E431AF2C
+	for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 19:21:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763571671; cv=none; b=sZG2JRYVXRjVfYJ+LZyNAXpoYCAEOtAnAbt5zyzPVZtHIHYZEcoQMcKIj8Y+EK9glKeRozQu9QXcWddRMXaLZLPBcwWBo9BTuc0AEGdKEm6JyigtxAKOcAkFhg9Y44qfFVwgajDzuTLDPOmAfEFQl9b5z1GY66jbtQeZ3nH3Coc=
+	t=1763580110; cv=none; b=cpgY4wKcBLRB1JggaNMJEU73OaiDpsp+lOZZxWS4Tq4S327Nwb5SBnUxxizPwKlc+Xlwy7KxkKtIemH6t0s/Wdr03XGEf9zOxMIuQL3YOFkPwqBgTd+snp19ANFk6nUb9YiV6sNqAdAr8Kpu8YQOOAVNlYL5X/5pvqih0zVOCNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763571671; c=relaxed/simple;
-	bh=S+g2O7p94RosAqIDLahmLjRW/MydzsAFbfENsPa65W8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kaBibh+AoNDXQ9brV5cZ3p1CW9qsY4pD0WDHZgePWV1L6VepALwGlbVVwq+gBMkOnYUJObHCbF7bWYYcKly61ib93gGNmZ9L1yhYjgSwiiRHcHHhs19tsobwyjr6UrShA7wIVZTI2nEnBf05Q64q6PJukI6fhUm1+KEq23+u6Vc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=2J9ar4+b; arc=none smtp.client-ip=209.85.166.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1763580110; c=relaxed/simple;
+	bh=WTED/YYDZWox+2hg9SHvLPbN2cHQFlAfv8SPK2SrDus=;
+	h=Content-Type:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To; b=u7nNNStqgrFz/6L+sm5CY4eS76UvgaXAPnX99NinvMU8Iw7FVuQgIIMGl5aaGoknkiL+br8L8qpsZAX8KDXhDGRV0wo61ooThW3Kc7v5Pen/lRU8BeedMA25rKQuECHsgRp8MMBm00HKnszmok9SfMFCDLjqbBB5RGzjzbCnihM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JFOZ8x9i; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="2J9ar4+b"
-Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-94905c3e2a4so46061339f.1
-        for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 09:01:09 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JFOZ8x9i"
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-7b8bbf16b71so67103b3a.2
+        for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 11:21:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1763571668; x=1764176468; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=cPw9uCkFvNA6PQCNX1TL4ZbkMo01ysJzYJr/l6U8Vyk=;
-        b=2J9ar4+bvL6JUu3IwzjT/+5nXBeigKRCJ/2Z0FigQH99srL8ApqOMZYkap+Eg6Gj/t
-         KvBameeHCKeSwP8O0SOm8NHL/GhiWaB+GJOC6+ayH9G9V98KcvfFuQW/GSQ+kEgdT+mT
-         UMdLMrV1xPPET5vTOHv27ezT4bUeaLSXU/ej6SfWAAXRN5MbqJumDD+0/y9ObnZl8ETG
-         rNy3L73+/Yn/dwH2jdgzZiYSaChxMkwfFZ/TSrgclaUDqVenocJrs25K9A1hh8pMkkLS
-         F2RFK6HEhKzUhyYmZSB/VMjM7WARShkuRabXM/uFCOcoTUJwGzNzFC2X1KdE2t3BFqKg
-         /J5Q==
+        d=gmail.com; s=20230601; t=1763580104; x=1764184904; darn=vger.kernel.org;
+        h=in-reply-to:from:content-language:subject:references:cc:to
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WTED/YYDZWox+2hg9SHvLPbN2cHQFlAfv8SPK2SrDus=;
+        b=JFOZ8x9i4MhDaZi6SzOVgQm5qlSfIw2UZmxv1LWFB/3gw6fj5VkmBxkhTkvbxbn9LZ
+         myNx0canRmmxGtn06AKMVsbFV7Ok3pH0g+wahEYXLhcF2AD3G8S1rwFth/LgUIGGvJaj
+         cLS/QJTAqc3isgWv2r4v8n1yXOk6zt+Og9LPXtLPExQEUaJ4ULXqzOwUta/7kF3TL5t0
+         vXMDRXXqRY7uNuIcINCx1q+dSvc3n7QmiNselafhtK8JEOmIZqmEkUJRpqM1ZjnIVTZA
+         S1DqueYsoONfbL3SwSw4mlc8f1tOMhEG9OJDvLnTdRGcey20ZIo54/hmtOknaZB0SqGf
+         MyfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763571668; x=1764176468;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cPw9uCkFvNA6PQCNX1TL4ZbkMo01ysJzYJr/l6U8Vyk=;
-        b=UTJ6QnWjtMr57povfTUccVbGWvHR/L/c6RUbovlE3aQiPKHWX2MGmKQzoUtVLeP75b
-         BwzUvPw0jZbSg/Yz+N/nHMuTezxnjWqNjH3k0nzxaPXcJT2weksa9WeTJavULU4TMczq
-         CXheBnGh7Mk2Hl6/c203gEW9WZU4xqW0uGvbN5jbmXtbH+WoF3MJd7CtWPFcFjxkL2Bc
-         Rfm4fi2qVpuSQhKZpSV30YpNQ1BQutH7TO9UKOupGdAzFRK4x+mT9Lx9mM16yzV/o4RX
-         l/h73XcLUhb59w8MpclaeuHXPQ2L/FkqqVCQt3TCWLZ+yO8YnviSoukBVVrL6m2iIbNh
-         A+nQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV0+W0GE3YxZojf6Tpe3vDzKwJt1pfSjqOGh3RVzDs80u7sQRGyOeJ9WMN6RLBMm1bXUBtYho33nEoeqA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwrHf20fgahBn1/epB6xKIBxNcM8TunGRR1M06LvnEvXi1PneBF
-	T8HaAumTLDHoCdltoNrDcnm8Mco01pSJzb0U+RKXw3MdlmHtc7fCA8krwBwbiva4OXo=
-X-Gm-Gg: ASbGncuubsBr0reW31+8GuOsvRrISUM28tmAa3Esi82r7j+HMJNmBxTWtEzQ8T3SUSp
-	wZvbeDY1wN+Wnd7kFYOz1LNfdSrIkyHexXKHyN27uIexPUNtRnzh8zLnX591xWWcYjfC36vn349
-	e/A6sAFDQ9aj8NKhk04O41gE9gNk9VGdhLxFmfFbWJnG1oyeEtyEq7GXI724RuIXAtqJxSHNevy
-	2SSWt0l999WDkwnzlA9g0PeSCUdPXFdcqManKtQRj4puUXG9GHleWBe95IKBZoxCVBNP6c8ZdF2
-	8Ubbk+MTr1bxKQTrRv7s56kLtCoE0yTCj4gxK24b++6wdh+f1asgp+Eh4zBXOsb/6zQlt0G4kFJ
-	bbizPajbk6YeQbwgn5wTCwrRsy6Rj8n0Ys8UUv3lLhL5G8y+LamuEFCa6BiY+fviTzxKUA5zCbG
-	rRCykDYPY=
-X-Google-Smtp-Source: AGHT+IE2kxjS0yAG6GVYp2OCmpVNdv4loPq+aa5O9jQG6Qcw+IMJqxGOrGh2WjEVj74aOlxlbHQ9xw==
-X-Received: by 2002:a05:6638:c1e8:b0:562:6587:e697 with SMTP id 8926c6da1cb9f-5b80c3bc4d6mr3251546173.2.1763571654771;
-        Wed, 19 Nov 2025 09:00:54 -0800 (PST)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5b7bd32e141sm7591110173.44.2025.11.19.09.00.53
+        d=1e100.net; s=20230601; t=1763580104; x=1764184904;
+        h=in-reply-to:from:content-language:subject:references:cc:to
+         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WTED/YYDZWox+2hg9SHvLPbN2cHQFlAfv8SPK2SrDus=;
+        b=Z3zisprHeR2vOdFVELvXdU7GOqDvvR83SoYmiP4cJyo+eZ0Dz0uCZFN6lnjvidpvmm
+         1Lej8FK+RIYF4M7kDpcsOZ/F9N0vwf2aKbydGGXTOuUkMMHqTK7RkNzmHfaXlm8vRd8I
+         7sZo4QLXljCMJtnYQpamFzvCb8liVJQotZW8f8plddJBDZJMNiPbpHkX970+q8C03VwX
+         ZfvIS3vX/h0tkZ10YcbhAwuhfoSdVTZIF+LRcnnKMoZTNzJIvr3nKFKD5T3cyL6T4tpP
+         cOcZbTbq5M3nu2LtGRiuAbgXrGruxUoKL172gsh0Bk9KOdQeUmTkiViR1BM1I9N0NJlD
+         zGHw==
+X-Forwarded-Encrypted: i=1; AJvYcCXROyYZL5bkImDonuRPE3tehABugzmWzLkWkC0uOTt1G6JfOwuOBzLGTJqJd2c3gFUuK3dzGdWCwjVtWA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNlS0Eg87asnpvwL4OGB0tA2aDEAmMlgHI8xQFSsw9dKwPpLjD
+	HYACDyqg8k4ic8M+/a14Sv6qekECNCXjxhIq8LSAj0gwPtjSDRT/fiR8
+X-Gm-Gg: ASbGncuIA+ICOLRVv2gl5NU03ef/X8vjokYP6xWB5TuUeRFP6TvDG+b+GV6d/0gf6Mu
+	QNWPw7N7+DAIJNTYny1qk5U8oXzK/VA8p32lv//tSHVqZqV2Zc1ay0/vzSMAM+Ux0yzUhcSzmJN
+	UBxwEmjRfygz1IvEOF+7QI342YTm7wmRmL7MSthWJpznKrSxWqZGZTlRghtRtP07QVoJDImQGDM
+	yz7+WtY/sXhJeABVp8f4iU892IEim7dCzfgMVZB+EhCMtDCeuwGB+GBp/gG5qxCAgswn6MSYV/3
+	lKDprz9YGPdinjeQ2+q0s/HozvS4QI5NuvLUfr9+tR7jTPcPHrhyOYHNUejes2nFIM9yC5sxgtM
+	brEGbsc8FuA1plyxJl1KnviMASvB8jnn4TKHwWZVOf8Q6iXqVGw4yvzDRNQF1s6UTXnL7TpCxQp
+	TCdzJVgTVSWqjixX6RHpF3Swlgrxj/sAPYeDBaS3AoyJ09YXkiHg9QjWU=
+X-Google-Smtp-Source: AGHT+IFLbC/rztisIiXYjC/ez7d9Iv7d5pLuzLJRTo4hY6XRNpZ6MEkTYf0tAhhUqPyepq3Nhwgexw==
+X-Received: by 2002:a05:6a00:852:b0:781:c54:4d12 with SMTP id d2e1a72fcca58-7c3efb55cbcmr236128b3a.13.1763580103752;
+        Wed, 19 Nov 2025 11:21:43 -0800 (PST)
+Received: from ?IPV6:2405:201:31:d869:f90c:b1d6:a722:7f9d? ([2405:201:31:d869:f90c:b1d6:a722:7f9d])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7c3f0b62e95sm117707b3a.49.2025.11.19.11.21.41
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Nov 2025 09:00:54 -0800 (PST)
-Message-ID: <7cf8b8de-0ed9-4182-aa84-de29f16f37f0@kernel.dk>
-Date: Wed, 19 Nov 2025 10:00:51 -0700
+        Wed, 19 Nov 2025 11:21:43 -0800 (PST)
+Content-Type: multipart/mixed; boundary="------------zqXZ6heSUwwpYluG4WpryJIn"
+Message-ID: <b19fc9a6-61e3-4c1e-8272-ea63f0d074ae@gmail.com>
+Date: Thu, 20 Nov 2025 00:51:39 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -69,45 +69,76 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: add a flag to allow underordered zoned writes
-To: Christoph Hellwig <hch@lst.de>, Bart Van Assche <bvanassche@acm.org>
-Cc: Damien Le Moal <dlemoal@kernel.org>, Mike Snitzer <snitzer@kernel.org>,
- Mikulas Patocka <mpatocka@redhat.com>, linux-block@vger.kernel.org,
- dm-devel@lists.linux.dev
-References: <20251118070321.2367097-1-hch@lst.de>
- <f385de59-5bef-4ddf-b363-edf76f88d855@acm.org>
- <20251119075800.GA23083@lst.de>
+To: syzbot+905d785c4923bea2c1db@syzkaller.appspotmail.com
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+References: <0000000000003d3747060ed5e859@google.com>
+Subject: Re: [syzbot] [block?] KMSAN: kernel-infoleak in filemap_read
 Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20251119075800.GA23083@lst.de>
-Content-Type: text/plain; charset=UTF-8
+From: shaurya <ssranevjti@gmail.com>
+In-Reply-To: <0000000000003d3747060ed5e859@google.com>
+
+This is a multi-part message in MIME format.
+--------------zqXZ6heSUwwpYluG4WpryJIn
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 11/19/25 12:58 AM, Christoph Hellwig wrote:
-> On Tue, Nov 18, 2025 at 10:10:33PM -0800, Bart Van Assche wrote:
->> Is the following deadlock inherent to this approach?
->> - Several bios are present on zwplug->bio_list and these bios cannot be
->>   submitted because their starting offset is past the write pointer.
->> - No new bios can be allocated because all memory is in use.
->> - A deadlock occurs because none of the queued bios can be submitted
->>   and no new bio can be allocated.
-> 
-> This can if the number of in-flight bios is larger than bio mempool
-> reserve.  Which is real, but we also have this in various other
-> submitters that hold bios to submit in a list.  This suggests it is
-> mostly theoretical, but I'd still love to address it for all these
-> cases.
+#syz test:
+git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
 
-The default bio pool size is 2 entries, which is perfectly fine for the
-"normal" alloc-and-submit cases. But yes if you're doing a bunch of
-allocations before submitting, then it could certainly deadlock if the
-normal allocation fails and we end up sleeping in the mempool waiting
-for previous unsubmitted IO to finish.
+--------------zqXZ6heSUwwpYluG4WpryJIn
+Content-Type: text/x-patch; charset=UTF-8;
+ name="0001-hfsplus-fix-uninit-value-in-hfsplus_cat_build_record.patch"
+Content-Disposition: attachment;
+ filename*0="0001-hfsplus-fix-uninit-value-in-hfsplus_cat_build_record.pa";
+ filename*1="tch"
+Content-Transfer-Encoding: base64
 
-It's certainly a bit tricky to handle... But definitely something we
-should take a stab at, as it basically voids the forward progress
-guarantee and is surely something that will cause production workload
-deadlocks if REQ_ZWPLUG_UNORDERED is used.
+RnJvbSAxMzM2YjIyYmI5ZjNmZjRlMTQ0YzQxMjJhNGI0YjEzYzUzZTY4MmE3IE1vbiBTZXAg
+MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBTaGF1cnlhIFJhbmUgPHNzcmFuZV9iMjNAZWUudmp0
+aS5hYy5pbj4KRGF0ZTogVGh1LCAyMCBOb3YgMjAyNSAwMDo0NDoyMSArMDUzMApTdWJqZWN0
+OiBbUEFUQ0hdIGhmc3BsdXM6IGZpeCB1bmluaXQtdmFsdWUgaW4gaGZzcGx1c19jYXRfYnVp
+bGRfcmVjb3JkCgpUaGUgcm9vdCBjYXVzZSBpcyBpbiBoZnNwbHVzX2NhdF9idWlsZF9yZWNv
+cmQoKSwgd2hpY2ggYnVpbGRzIGNhdGFsb2cKZW50cmllcyB1c2luZyB0aGUgdW5pb24gaGZz
+cGx1c19jYXRfZW50cnkuIFRoaXMgdW5pb24gY29udGFpbnMgdGhyZWUKbWVtYmVycyB3aXRo
+IHNpZ25pZmljYW50bHkgZGlmZmVyZW50IHNpemVzOgoKICBzdHJ1Y3QgaGZzcGx1c19jYXRf
+Zm9sZGVyIGZvbGRlcjsgICAgKDg4IGJ5dGVzKQogIHN0cnVjdCBoZnNwbHVzX2NhdF9maWxl
+IGZpbGU7ICAgICAgICAoMjQ4IGJ5dGVzKQogIHN0cnVjdCBoZnNwbHVzX2NhdF90aHJlYWQg
+dGhyZWFkOyAgICAoNTIwIGJ5dGVzKQoKVGhlIGZ1bmN0aW9uIHdhcyBvbmx5IHplcm9pbmcg
+dGhlIHNwZWNpZmljIG1lbWJlciBiZWluZyB1c2VkIChmb2xkZXIgb3IKZmlsZSksIG5vdCB0
+aGUgZW50aXJlIHVuaW9uLiBUaGlzIGxlZnQgc2lnbmlmaWNhbnQgdW5pbml0aWFsaXplZCBk
+YXRhOgoKICBGb3IgZm9sZGVyczogNTIwIC0gODggID0gNDMyIGJ5dGVzIHVuaW5pdGlhbGl6
+ZWQKICBGb3IgZmlsZXM6ICAgNTIwIC0gMjQ4ID0gMjcyIGJ5dGVzIHVuaW5pdGlhbGl6ZWQK
+ClRoaXMgdW5pbml0aWFsaXplZCBkYXRhIHdhcyB0aGVuIHdyaXR0ZW4gdG8gZGlzayB2aWEg
+aGZzX2JyZWNfaW5zZXJ0KCksCnJlYWQgYmFjayB0aHJvdWdoIHRoZSBsb29wIGRldmljZSwg
+YW5kIGV2ZW50dWFsbHkgY29waWVkIHRvIHVzZXJzcGFjZQp2aWEgZmlsZW1hcF9yZWFkKCks
+IHJlc3VsdGluZyBpbiBhIGxlYWsgb2Yga2VybmVsIHN0YWNrIG1lbW9yeS4KRml4IHRoaXMg
+YnkgemVyb2luZyB0aGUgZW50aXJlIHVuaW9uIGJlZm9yZSBpbml0aWFsaXppbmcgdGhlIHNw
+ZWNpZmljCm1lbWJlci4gVGhpcyBlbnN1cmVzIG5vIHVuaW5pdGlhbGl6ZWQgYnl0ZXMgcmVt
+YWluLgoKUmVwb3J0ZWQtYnk6IHN5emJvdCs5MDVkNzg1YzQ5MjNiZWEyYzFkYkBzeXprYWxs
+ZXIuYXBwc3BvdG1haWwuY29tCkNsb3NlczogaHR0cHM6Ly9zeXprYWxsZXIuYXBwc3BvdC5j
+b20vYnVnP2V4dGlkPTkwNWQ3ODVjNDkyM2JlYTJjMWRiCkZpeGVzOiAxZGExNzdlNGMzZjQK
+ClNpZ25lZC1vZmYtYnk6IFNoYXVyeWEgUmFuZSA8c3NyYW5lX2IyM0BlZS52anRpLmFjLmlu
+PgotLS0KIGZzL2hmc3BsdXMvY2F0YWxvZy5jIHwgNiArKysrLS0KIDEgZmlsZSBjaGFuZ2Vk
+LCA0IGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZnMvaGZz
+cGx1cy9jYXRhbG9nLmMgYi9mcy9oZnNwbHVzL2NhdGFsb2cuYwppbmRleCAwMmMxZWVlNGE0
+YjguLjRkNDJlNzEzOWYzYiAxMDA2NDQKLS0tIGEvZnMvaGZzcGx1cy9jYXRhbG9nLmMKKysr
+IGIvZnMvaGZzcGx1cy9jYXRhbG9nLmMKQEAgLTExMSw3ICsxMTEsOCBAQCBzdGF0aWMgaW50
+IGhmc3BsdXNfY2F0X2J1aWxkX3JlY29yZChoZnNwbHVzX2NhdF9lbnRyeSAqZW50cnksCiAJ
+CXN0cnVjdCBoZnNwbHVzX2NhdF9mb2xkZXIgKmZvbGRlcjsKIAogCQlmb2xkZXIgPSAmZW50
+cnktPmZvbGRlcjsKLQkJbWVtc2V0KGZvbGRlciwgMCwgc2l6ZW9mKCpmb2xkZXIpKTsKKwkJ
+LyogWmVybyB0aGUgZW50aXJlIHVuaW9uIHRvIGF2b2lkIGxlYWtpbmcgdW5pbml0aWFsaXpl
+ZCBkYXRhICovCisJCW1lbXNldChlbnRyeSwgMCwgc2l6ZW9mKCplbnRyeSkpOwogCQlmb2xk
+ZXItPnR5cGUgPSBjcHVfdG9fYmUxNihIRlNQTFVTX0ZPTERFUik7CiAJCWlmICh0ZXN0X2Jp
+dChIRlNQTFVTX1NCX0hGU1gsICZzYmktPmZsYWdzKSkKIAkJCWZvbGRlci0+ZmxhZ3MgfD0g
+Y3B1X3RvX2JlMTYoSEZTUExVU19IQVNfRk9MREVSX0NPVU5UKTsKQEAgLTEzMCw3ICsxMzEs
+OCBAQCBzdGF0aWMgaW50IGhmc3BsdXNfY2F0X2J1aWxkX3JlY29yZChoZnNwbHVzX2NhdF9l
+bnRyeSAqZW50cnksCiAJCXN0cnVjdCBoZnNwbHVzX2NhdF9maWxlICpmaWxlOwogCiAJCWZp
+bGUgPSAmZW50cnktPmZpbGU7Ci0JCW1lbXNldChmaWxlLCAwLCBzaXplb2YoKmZpbGUpKTsK
+KwkJLyogWmVybyB0aGUgZW50aXJlIHVuaW9uIHRvIGF2b2lkIGxlYWtpbmcgdW5pbml0aWFs
+aXplZCBkYXRhICovCisJCW1lbXNldChlbnRyeSwgMCwgc2l6ZW9mKCplbnRyeSkpOwogCQlm
+aWxlLT50eXBlID0gY3B1X3RvX2JlMTYoSEZTUExVU19GSUxFKTsKIAkJZmlsZS0+ZmxhZ3Mg
+PSBjcHVfdG9fYmUxNihIRlNQTFVTX0ZJTEVfVEhSRUFEX0VYSVNUUyk7CiAJCWZpbGUtPmlk
+ID0gY3B1X3RvX2JlMzIoY25pZCk7Ci0tIAoyLjM0LjEKCg==
 
--- 
-Jens Axboe
+--------------zqXZ6heSUwwpYluG4WpryJIn--
