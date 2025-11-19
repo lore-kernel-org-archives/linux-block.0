@@ -1,53 +1,72 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6888331B133
-	for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 07:58:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A95D325724
+	for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 08:04:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763539087; cv=none; b=rBuEWKTlHJNhvp+SP2/K9qWzFiPlkMmxbRKV5noOgyERzBUMp5AOaP4Vf06o3Am6535qEhe0lbQyZYTprLlCmnmZpfm1gNfxuySB3VvWSKNthlx1dtwO5q6mBLS0yEX+yc3JvyTSKoXTFn2HFiv4ycP4fG1EGNBdntRU0ii73yw=
+	t=1763539453; cv=none; b=lNuhNcCtA1IQT8mkMROhbMYNm5dtWTjs6GQd8K8Yt9Nfo/uAakQ27qxHbpk1nG1ZIg2LvQXG6znskeFQU4KLELJ3ITRd90GwenVDTvJHcunJGVwgJ8hTrvSqZRwP6Z5H+YhNd0zCVvxSUlUPmOrhKvp3cIuIboa3dqmpi/XPxWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763539087; c=relaxed/simple;
-	bh=ourgBo/ceXjTrvEgL3aRaw/TM8Fffy+aaFrlBtQa5iA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TI8eldvis4MJQ84oR9cBG0XQhnicVFwu9PBw84p3PN1uNAMVXsHVeaRqQRoVUy1VA8aJFvVvHMztUvz5/bfG2q/4wVW3ZcAQ1Ed7w6NbZ4rtTwllBLDpx8BzEgCudiI7gnrT65Q5BdQJjqRg8dyoXbbBStc0VHMM5yBjoPI9HXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 91FA868AFE; Wed, 19 Nov 2025 08:58:00 +0100 (CET)
-Date: Wed, 19 Nov 2025 08:58:00 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>, linux-block@vger.kernel.org,
-	dm-devel@lists.linux.dev
-Subject: Re: add a flag to allow underordered zoned writes
-Message-ID: <20251119075800.GA23083@lst.de>
-References: <20251118070321.2367097-1-hch@lst.de> <f385de59-5bef-4ddf-b363-edf76f88d855@acm.org>
+	s=arc-20240116; t=1763539453; c=relaxed/simple;
+	bh=OnMCBfabKStP5y5P+q+/nLbXAg305LkJvEN5H3jYcb8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=XWnrjBiTJImMwQPbq7pQtPyChfVtQoXQ3kl2aGYTitiacfi0o7+CjvG1qciKrclN3K+0QXs71YRBtBZCNt6G+loFd3QQsAHIelHTu9fxCtIROrcOpci9mZbHTCwYwk4tfcdMtdE4+lx7KosBWWu1/kNqjw4mSniBCPUD98ArrMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KLPl6wkz; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KLPl6wkz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9A15C16AAE;
+	Wed, 19 Nov 2025 08:04:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763539452;
+	bh=OnMCBfabKStP5y5P+q+/nLbXAg305LkJvEN5H3jYcb8=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=KLPl6wkzekHq3+H40vblPk1+zLu6yKT5pWlNEedDkjk5V16BDl0bj2purX5kutSTX
+	 sfXPucvPZ3eKeP4G0EMFGvMdHSCOLzFkmTnUEFR8vTKR+kWc00L6kdQibsUdL0edHS
+	 dNqiO98x/Arg5e8IfsJFlUmHnozkUydZgh9SMdHt7AgxTzdkBPS1itueBo5prwZnD6
+	 NZG0OunrkQ3TLiVgRs5KC4jgbyMhc/M6WF/Gv6N6xjcd8SWonmteCwKXMT+JN/LWEi
+	 +t+2yMF1z3Vr/WaCpLdovKoz0ZdqrPKkJwnZOVBhGD7i3GDze9OKQcjmGtdC+UWFJ9
+	 HnlEsdiiaItTQ==
+Message-ID: <79cd818f-42d2-4c08-89bd-da9dd3c84af8@kernel.org>
+Date: Wed, 19 Nov 2025 17:04:10 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f385de59-5bef-4ddf-b363-edf76f88d855@acm.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] MAINTAINERS: add missing block layer user API header
+ files
+To: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+ Jens Axboe <axboe@kernel.dk>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <20251119030220.1611413-1-dlemoal@kernel.org>
+ <20251119030220.1611413-2-dlemoal@kernel.org>
+ <1bb72fb2-fd97-4d00-92a1-e4d7ade5a1f0@wdc.com>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <1bb72fb2-fd97-4d00-92a1-e4d7ade5a1f0@wdc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Nov 18, 2025 at 10:10:33PM -0800, Bart Van Assche wrote:
-> Is the following deadlock inherent to this approach?
-> - Several bios are present on zwplug->bio_list and these bios cannot be
->   submitted because their starting offset is past the write pointer.
-> - No new bios can be allocated because all memory is in use.
-> - A deadlock occurs because none of the queued bios can be submitted
->   and no new bio can be allocated.
+On 11/19/25 16:56, Johannes Thumshirn wrote:
+> On 11/19/25 4:06 AM, Damien Le Moal wrote:
+>> list of matching file patterns for Jen's block layer entry.
+> 
+> Jens'
 
-This can if the number of in-flight bios is larger than bio mempool
-reserve.  Which is real, but we also have this in various other
-submitters that hold bios to submit in a list.  This suggests it is
-mostly theoretical, but I'd still love to address it for all these
-cases.
+Arg. Did it again.
+Jens, ,y apologies for the typo. Should I resend ?
+
+> 
+> 
+> Otherwise,
+> 
+> Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+> 
+
+
+-- 
+Damien Le Moal
+Western Digital Research
