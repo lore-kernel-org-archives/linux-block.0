@@ -1,124 +1,89 @@
-Received: from outpost1.zedat.fu-berlin.de (outpost1.zedat.fu-berlin.de [130.133.4.66])
+Received: from out162-62-58-216.mail.qq.com (out162-62-58-216.mail.qq.com [162.62.58.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD3D32F5A22;
-	Wed, 19 Nov 2025 08:48:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.133.4.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF704307AC8
+	for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 08:51:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763542121; cv=none; b=UIhGxSsXSddWnOiH+kHLW6HK75fd1X/An2U4og3RtIMda8tJ+CikDeMZwKI0IG6F4uxQ7AiOqfq0ICO4FhqMEyYdVwOlNeR2cVubzWmBRnniIy6E97JYkQdP8VRhFxtKm50gHRdspq4ucLmPIjK5+1CLU6lgQJydLLlQbkN/8nY=
+	t=1763542269; cv=none; b=rMB5IrX7+5j3wFjJYeOldtY8DrUpmN0/RYWENrkxfFjDw8Ije4m6shZXTnbsOoH+QeoC8afQm/ytwUCHh3M2AcTbkQohaGcm3Us1DExaATHquIG4lHGQkqGvUCPe/ilZkfRGGAh/ykIIQvDn13+Hr2l9tdAXq5KHxlx6poAq5Z8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763542121; c=relaxed/simple;
-	bh=ZXDJCTG0a3wVBGkMR+gySyKqlObDwQn/SbGAsOSvlsc=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=aijpIE+vbn8DeUn0fO2WOr1zDmz+VdWb7S9YWx2WEXkSZU3s+LjPcYBJM5vTTwSsCrj1V84kGy89XgvjA1xMUJHOkgOhu5GLrVRGyoSR/SEcgAcyUG+Ih8zMSrEY4roh+JvVQPmDy3+W7Mx4ofzEA7OHqonnhcmXiL6O5BW9X9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=physik.fu-berlin.de; spf=pass smtp.mailfrom=zedat.fu-berlin.de; dkim=pass (2048-bit key) header.d=fu-berlin.de header.i=@fu-berlin.de header.b=n05BBwMM; arc=none smtp.client-ip=130.133.4.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=physik.fu-berlin.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zedat.fu-berlin.de
+	s=arc-20240116; t=1763542269; c=relaxed/simple;
+	bh=AQ+2CxvCiM88ZhmPzjJ0Jhx+cilMoeuKk70Qolj25Gg=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=m01I8jNZaosrn4waAsnX1DfwPolGo5D3Fv4+btNNTKLhX2yU7Uipqykosw7IPpccvfvGmVGcwUq6ZHVv0A+wzDLL33+NE76hTntoQAbcRXWaBL22EIhJPewXOYnYDzBfq8JsaY3bS48guh34exZ8SNjxxg1dG5ub7rhNPOiEdTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=HG5RDAL6; arc=none smtp.client-ip=162.62.58.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fu-berlin.de header.i=@fu-berlin.de header.b="n05BBwMM"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=fu-berlin.de; s=fub01; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:From:
-	Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:In-Reply-To:
-	References; bh=ufP6pvj4SMFKi7WHnDZB+3cQCZeOtNt9XW3iW+AYQSI=; t=1763542117;
-	x=1764146917; b=n05BBwMMMbOTne81dp8UlC7tW1JMMbcP/04eVh9MvUkxm6KU7zdd9gllxvhmu
-	Yo3Ut6DARy2s7gxViPpfHuG964QEOo4LeXN2iuSjQTFIF6tiwG3Pm1bXq8afEJBavc6EBV0Er/bPC
-	LXBtreCutjZBT9SAbDjTe/8ZSm9qTpEduHSyEp9q5NpJWJcpUzLjuLTBsipq7KFxqtyTCNqFiPeKF
-	uIugfEGEkWrq3kbHZ7Nsjzlf+8pSjDohbkapmIcgVhL0u2SlUcldd6rVnbI/GVA69V9UadUxRonko
-	E86ZcCQ4LdtembBwZuegzCkWT4ztblb/mhQr6E8Jgb6I0pUxeg==;
-Received: from inpost2.zedat.fu-berlin.de ([130.133.4.69])
-          by outpost.zedat.fu-berlin.de (Exim 4.98)
-          with esmtps (TLS1.3)
-          tls TLS_AES_256_GCM_SHA384
-          (envelope-from <glaubitz@zedat.fu-berlin.de>)
-          id 1vLdrY-00000001IS2-2p4x; Wed, 19 Nov 2025 09:48:28 +0100
-Received: from tmo-084-142.customers.d1-online.com ([80.187.84.142] helo=[172.20.10.2])
-          by inpost2.zedat.fu-berlin.de (Exim 4.98)
-          with esmtpsa (TLS1.3)
-          tls TLS_AES_256_GCM_SHA384
-          (envelope-from <glaubitz@physik.fu-berlin.de>)
-          id 1vLdrY-00000001YKa-1o91; Wed, 19 Nov 2025 09:48:28 +0100
-Message-ID: <bb9b0a6720b8bba08981fb0d0d0de5e61b0cbb2d.camel@physik.fu-berlin.de>
-Subject: Re: PROBLEM: errors mounting /dev/fd0 on sparc64 (regression)
-From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-To: Nick Bowler <nbowler@draconx.ca>, linux-block@vger.kernel.org, 
-	sparclinux@vger.kernel.org
-Cc: Christoph Hellwig <hch@lst.de>, regressions@lists.linux.dev
-Date: Wed, 19 Nov 2025 09:48:24 +0100
-In-Reply-To: <u3aaz4bx7xwlboyppeg4y3eixzgxbcodlmw7cwqloskmg6oqw2@j437p47sfww6>
-References: 
-	<u3aaz4bx7xwlboyppeg4y3eixzgxbcodlmw7cwqloskmg6oqw2@j437p47sfww6>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.1 
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="HG5RDAL6"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1763542261;
+	bh=M1IN3WYuyjmzCW1pnmbDsQ2nmNIg6F2DxLfbwYll45c=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=HG5RDAL6Mm5vG66hpMuTJDVPOgSDNn8tNYBz0F9IMscmUd/CVnvIXDnRPZp2Be5tL
+	 Lv1HoUIUhmtIVoGD47KNZ7Ism3vDk+opZtheXK4I+qxjiJQ8B9gcf3P7TlxWNhrhxO
+	 hF1Uv03tntCwFmVEpMBuic4YvO5T/qwwwdFt/pNY=
+Received: from meizu-Precision-3660.meizu.com ([14.21.33.152])
+	by newxmesmtplogicsvrsza56-0.qq.com (NewEsmtp) with SMTP
+	id CBB958BF; Wed, 19 Nov 2025 16:50:59 +0800
+X-QQ-mid: xmsmtpt1763542259tbwh2ie8l
+Message-ID: <tencent_58CEBDF202BF42BA908A9EB9D5C7FB5C6B09@qq.com>
+X-QQ-XMAILINFO: NA8WCMn5GQiMi196/3kq/QNfqwzZAqecL1l1v4viMFGCiip/dH/13xM2EINemo
+	 bCBiM0iSZjcqtSuGUZSF/jROyWiTSJhNPZ6wNCr4j1fOV0YpJaElAhaKaVMFvG/2Q7IobAB/fKdx
+	 Vd7FwzjM6HWhGXIGWJBPTLBfNJDq+E1YbVZ1RtsVCclWQ6UDGqKdJdoSn7oVzs/I7BSHCDnaSPcq
+	 x3nTNPjhfnWgbKinc46QP5omWW4DyiiwVzGEzEPhc2uBG1PmqtO1Vb+Yio9aqwul7fr87uSvWICR
+	 eFkVpC/aQ7Q8ki8nSBHuvLjxJdBE70zZqEAUKtQOBfoVXV8VJPa1VbLimtGJ3TdvVdXNsRt8TQ5+
+	 jJi82eOlecsXWdGjFQXa9z8bqmx4OMxr1oVD3hDRP0/NkQ3BIjYDnXtIyQwjp2p79dauW0ZytfzH
+	 J/zBKgGgtpYtJqsts8uHAB9umSzOcvXk/96ANgVBXkCjZfkZXvAazWILPLzJNAC+cHMLOJa/JIx3
+	 keZEbx2Vedky9MzNWXZqwj7p5zE/ekXn/aUxpLKnp72FziIRcg6rXAHfPIvWGpzAeWCIGRlUBoZH
+	 4oxYK/aIxgq2b4SvhIoeWBqW98Ge2BP9EG1VLXEWJ2QiWuCNKkXShczpAL3/K43S1Q2QqVYGeQBE
+	 MnZuyiDcD0AdgjnvsTChWc6IaKuS0tnLc4VAN5oPKE82eEsQIu1Q4rx5Lub3FIC9EeHlfcB61QXW
+	 dDRndmkdzx1aLjUSdsdw1KN3vgMrbLCdioyWknZL04p9owAhbj9Y4Q/INRfGcaAIMYPGQ4U2pS+T
+	 D1NOs2i+HuN8IcSVV5WfaVq6zMyqSb2Ed7wwXFoyNB1D6KuxyI8/TRMe4XlRNMWAPtLHhdnn97mU
+	 ycaOAI6HFWtxjyOAf2NkSMB1ZeBLZwQ0jA+/SYcGA8go+8TLzsbgSf51OhHneceHnkApOryqWyDQ
+	 M9fSTYwOoOszzJQ0VoHaAcpqa95OxpQsFGpfn0DYCPEaOt8pjngLWzkVXbORQPqp6ikqSnkcgGI0
+	 iiKwnpLViqMnUY8/aU5xZirlT9dDbZAVrutAIZdcmjLilLLlkX7V4hcAKCm5pNe1o93BdYErNbuT
+	 ZXUe3Mnq3OksQHRuuMGDY2PFuzBNv/jbqnZbh7uEsdwuaNbHjCZUbi8M5/Tg==
+X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
+From: Yuwen Chen <ywen.chen@foxmail.com>
+To: ywen.chen@foxmail.com
+Cc: dan.carpenter@linaro.org,
+	linux-block@vger.kernel.org,
+	senozhatsky@chromium.org
+Subject: [bug report] zram: introduce writeback bio batching support
+Date: Wed, 19 Nov 2025 16:50:59 +0800
+X-OQ-MSGID: <20251119085059.2935387-1-ywen.chen@foxmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <tencent_EF2ECF2226EEB0712DD7EFF3963CE1AF9107@qq.com>
+References: <tencent_EF2ECF2226EEB0712DD7EFF3963CE1AF9107@qq.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Original-Sender: glaubitz@physik.fu-berlin.de
-X-ZEDAT-Hint: PO
+Content-Transfer-Encoding: 8bit
 
-Hi Nick,
+Hello Sergey Senozhatsky:
 
-On Wed, 2025-11-19 at 03:04 -0500, Nick Bowler wrote:
-> With current kernels on my sparc64 system, I can no longer mount floppy
-> disks via /dev/fd0.  Mounting the specific-format device /dev/fd0u1440
-> works ok, and if I do that once then /dev/fd0 works afterwards.
->=20
->   # mount -t vfat /dev/fd0 /mnt
->   mount: mounting /dev/fd0 on /mnt failed: No such device or address
->=20
->   # dmesg
->   [...]
->   mount: attempt to access beyond end of device
->   fd0: rw=3D0, sector=3D0, nr_sectors =3D 16 limit=3D8
->   floppy: error 10 while reading block 0
->   /dev/fd0: Can't open blockdev
->=20
->   # mount -t vfat /dev/fd0u1440 /mnt
->   [works]
->=20
->   # umount /mnt
->   # mount -t vfat /dev/fd0 /mnt
->   [works]
->=20
-> I bisected the failure to this old commit:
->=20
->   commit 74d46992e0d9dee7f1f376de0d56d31614c8a17a
->   Author: Christoph Hellwig <hch@lst.de>
->   Date:   Wed Aug 23 19:10:32 2017 +0200
->  =20
->       block: replace bi_bdev with a gendisk pointer and partitions index
->=20
-> And digging in a bit further, prior to this commit the maxsector value
-> in bio_check_eod (which prints this error) was calculated as 0, which
-> would seem to effectively disable the check, but now it is 8.  This 8
-> is coming from the set_capacity call in floppy_open, which in turn
-> comes from the entry in the floppy_sizes table which is initially
-> set to MAX_DISK_SIZE*2 (a constant 8).
->=20
-> Using the latest 6.18-rc6, if I change the definition of MAX_DISK_SIZE
-> in floppy.c from 4 to 8, then mounting /dev/fd0 works again, but I'm
-> unsure if this is a proper fix.
+Regarding this issue, do I need to submit a patch for correction or
+resubmit the following series of patches?
 
-This is a known problem and documented here [1] in the sparclinux issue tra=
-cker.
+https://lore.kernel.org/all/20251118073000.1928107-1-senozhatsky@chromium.org/
 
-The problem is basically that the floppy driver assumes that the page size =
-is
-always 4k which fails on any target using larger page sizes such as SPARC w=
-here
-the default page size is 8k.
+Thinks
 
-Adrian
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index fff9e45..30c7636 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -818,6 +818,9 @@ static void release_wb_req(struct zram_wb_req *req)
+ 
+ static void release_wb_ctl(struct zram_wb_ctl *wb_ctl)
+ {
++       if (!wb_ctl)
++               return;
++
+        /* We should never have inflight requests at this point */
+        WARN_ON(!list_empty(&wb_ctl->inflight_reqs));
 
-> [1] https://github.com/sparclinux/issues/issues/18
-
---=20
- .''`.  John Paul Adrian Glaubitz
-: :' :  Debian Developer
-`. `'   Physicist
-  `-    GPG: 62FF 8A75 84E0 2956 9546  0006 7426 3B37 F5B5 F913
