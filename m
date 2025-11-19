@@ -1,162 +1,145 @@
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 589A6351FDE
-	for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 13:35:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E29B82BE04C
+	for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 13:36:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763559334; cv=none; b=cV0nPdwRqhWGuPVEuUu5gMJ6tcThshhVCou7dvrnbt7COYb1PQAOVS/+yH8HDfapOnLnHiR7IIWoGTzvTFyTwuQMuO2Ql+9lf/GfWZXRnSlwVzIzLtQ4fxMtQz3XUCA3jBiiLdHpE9l2y10Tqf3uh9Ez8Lf8gP6JGcsBc8ayV5A=
+	t=1763559380; cv=none; b=liktwNboUM1Ebyp2UHkIssRv7HjhreVbcczb498zudPgRNvuTkXFM9s4p4E7FBLqHfYOuwfB3BOwoJovWMTk3/TEMkXJoJGG6OxSBZ0iP/KWfmiD+dNEsrD58W8VQqzNcWvbIicfHKRqGcKZHVkvCvcKzmDMOvFeWhFDpatVCPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763559334; c=relaxed/simple;
-	bh=JbbhmQiTlI31d28XPGRBqj9eq2p7XGaOpuCDuXLlBNA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ABinw5B/kUvhOhKEqy+opI24sUlBtdHlDTZroQJg8C21xkk3rMos0wbZoE5eUyCgyz8bt4C2FUGzOBRdQcOVrXxuRiClD5nsKsfHwwk283zc0isOVe9wLXeCCBjv6ikAz96UgpqUerZV2vk//0KL9+MWHRYYKRMZLpIqmSqZ8P0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=Q0A2KJ7+; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	s=arc-20240116; t=1763559380; c=relaxed/simple;
+	bh=NES7ghcCP3m1ExfoU/vAhaTBSd5OHINmQXVjgEbzWRc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BpA2s9+O4i69xqRzG0SivsPWU4fF16jtzn7HW46WX9erepT04raltgWTqFdVAmg74VAPUiYIOgdS8fLrhd7Pp/PpMQ8b2UDNSYF18eHCaaNv42DJERC7z5AHwoe5GgNmxO3NAoyGCuipyrM5Ksih8IJAgIU4B+V+rKkfz/Lzq/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aPMKhCJs; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="Q0A2KJ7+"
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4ed82e82f0fso62605161cf.1
-        for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 05:35:32 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aPMKhCJs"
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-477619f8ae5so45369575e9.3
+        for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 05:36:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1763559331; x=1764164131; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=72A2miNlT6HYTvn6gfrMP1LsN3+/rcjlJPwocEiTvrs=;
-        b=Q0A2KJ7+QNz7Du+Iu0DMoQYF9BPquUCs/jIMwr6j8yjAJYCoUd2gtuG8vQUjR8XFmz
-         BWU0OXFasN+uYXzui5ccF9deC4HtKGvvT+DRuxn1jSOtubFSQSTLMDOCI0v+OkrmnQo9
-         j30dh3Ui+99KMkOenB22DloIr/bkj7hqXrn/VjYcH8e78vnEJUMWflxtjGpc5bOYPhAo
-         KXmcPuwjhRA8P5J/K6B3nGGLubDNoWabMG9R/EXoYaFsaHe68biGjnve1stMiZBlv7Em
-         nn9dpCi4NhEsLSnTb4JJW9K645HB/HQBjJ/ZBpJ8CfKLpA3GNs2AkNnBXK9kcFhw5d1U
-         l8iw==
+        d=gmail.com; s=20230601; t=1763559377; x=1764164177; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=c7Vh9iH410ocW2kXRvDe/advl/kXNqnUGcQOJSCBMWA=;
+        b=aPMKhCJsOa4CIu7MSY5XLAVo/IFxiUZLkb+BjsMVPj2GaPEdhmsBK4qOFB7/JvTL3U
+         SLNTHS8HwSQe810mcdC91TTBJNWyK9I02561CrCzpS/H9rlJuz/hvrgS3vJV2krHUYhW
+         Av60yvxhfm3g3aJSpVeroGHvj14GJ43xijwIjYW62QgkecohOGoRQqEvDz8Y6A10DXPr
+         JtxT7bjGhtNa2j5i01iInPqp0amjta1lQTQfsDf78b3J8L1+uy1luJ3cJ479Rvksc5WP
+         y0kqyZPCIg+hb4LbEQFK/T7aZCTrmRKDOfAoAxIACfDf6ri8H/T/e3Hqh87Ohn7UqVX8
+         bOww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763559331; x=1764164131;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=72A2miNlT6HYTvn6gfrMP1LsN3+/rcjlJPwocEiTvrs=;
-        b=Gb1YRC7zhmvJdThOW7Aww/XYC9yfxboa+CT9mhWBt0JpX5aDHt5IhiQ3PLVIb11mvo
-         VsNGbHWxpvb6xW2Y9xc9vRGxzAcvO4gT5Lo18DsEb7WBmZb9G3df0iCaPFQeO5KhQeSu
-         6fybqj+5e6UTaN8nySZQDJFi+8XXSSfrKbxoI2IJRkJC95dwA370ABcBPhPGy4dqkUh0
-         OqoB3BNlt4bXpDimgPLFoyTzCwVYlwAq523hfParbi5l7IS0rlFmckun4Jx5SDcBk1pu
-         RBOsxFlkOKSnN4OpT8ldgsH1bn0h89NctAGQIlvyrs+dVtJyoNeURrWuxeber5pNRXDk
-         V0Ag==
-X-Forwarded-Encrypted: i=1; AJvYcCUKaRTgcGFap497xkxs0sHdfYVJjqqKZqG5EP2d+f1kMX+4k/EGxI0Qg+YrLJb5ahL6v0WcDVHEvUhs2A==@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywyt9HAaossvLV+/jCXtBoA3c2idmo3DbS0zJei0lBaPU/gQY2X
-	OrzfRzqxH2PFHXUj+1WM5z6U7zvNlAU9h7yXBOikTHvcTDossASKBpqjwJuwqGwZvAg=
-X-Gm-Gg: ASbGncsYC9WAsDNnz22wo60Y275yNSW/O7t6BDZqK4t0NkSSfhuGZMZXwaX6h7kZitS
-	2aeJnDgNZMZEE65RQ0TxUkQvNJtNQCpAq6kXfja1O0AVrzx0REOn30regs7N81O4ReQbMV6GU06
-	Ltsd7B4OHAWVOUdmYk6UWdnCw+QxmQXietlkg09yhQtxDR+jcrey8wzVe5RbWgGjviWD1uZ7vZ1
-	mYEaTUqpWod8EHzw+8tU+8fxqRO0c6pMATfmWGeInZvC01tvQ9EIJ8Nr4mnfT+yH3/3nFw0Tqye
-	6pPbvo4lNbjd2SjGaQaQnpXAgntN+HVWn6asDye6iPulvMxz00M1szuh5/L5um9ZjVSZFKOoVe9
-	FMvwq4WFhO32K0mhySjowyuEJn1I0b4ng1Bn3GpLxDD5nKqN+BpcFOVZbispfSpDskBPcOgeJtM
-	1OulmozkmRgziWATv575T3Rp/5iUW42n7XNFPJcPsB/g54G1se4nSAkpV/
-X-Google-Smtp-Source: AGHT+IE7dgToIwQMvgHU78QddWp+ZiJRe5Ch8SPXRMVN2DOwf2T1NT7zeC+YapS6FYUcpx8f/T/2tw==
-X-Received: by 2002:a05:622a:256:b0:4ee:16a8:dd0 with SMTP id d75a77b69052e-4ee16a8d595mr193299331cf.53.1763559331028;
-        Wed, 19 Nov 2025 05:35:31 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ede86b376dsm127986771cf.7.2025.11.19.05.35.30
+        d=1e100.net; s=20230601; t=1763559377; x=1764164177;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=c7Vh9iH410ocW2kXRvDe/advl/kXNqnUGcQOJSCBMWA=;
+        b=LH5w7jerTjJxxVlOJRj2EokzIc0YTTdddiOngsI69UP5A5PGtGpqISeMkjXyJR7sWM
+         JphrpP1o9EwTt7BQPs5zvhk2D6Y65+KM8oBZl4qdonFfMWiVh+TY8JYv/ikMuL/QL0QN
+         +VbgJj/Xmm5ym8bj5kpFwqeU9cRJ0Ec/GhiWTeW7HIU1rx9ELZsZZYmxtHgB7hzSoDI2
+         xDGm0sypPDYCjzxM61YqdTR51uWW5y9AFJaog4Y4k/+D/1YSRTMKyiDxcGbo6oaed87Z
+         EoQMfo5udEHPxkXfvLFs8RQaDzcWUEzowaeSSoYSyV+FU0vEGK7/ePPWwkM/2oYVipKr
+         dyMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWfeYkikVOGb8Kl17dK9X0tg8rg5jYxXx3yFJkPNWKVwz3a7U0y8i4PNmCp1ajftSnu2T/naIe2bJmOmQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9lKuJD6QHeYwhhSoT3Il3kJLgdQR+G/TaMJgIA8xyONVpPYxA
+	Y+edfUL5URq0+EIUPuspb02iPtyDLw4JIW/vT0LtTk6hmiAJj2oEog3J
+X-Gm-Gg: ASbGncvsh/lJBXMPcELaX8Qa/jECffhVc1T48pUP+W1O5JZ6iUJixIx7kkljwJAuINW
+	Jy4R2DhQpqF1tpguG8f0m9qRgl7Jk1jETPSAy6hLITpEFjeowj/5ksKD6Xjgid3rx/7noXML3Uv
+	9uR5af6ms2eilLAvGFTct9wBqEQ8pedVf7AASaXYLvKJnB9EIQlBarcyldnX+7fJPTS4BgrJkEe
+	s7omn19LqqHV2tDuMc30cW4d1xMnNZOi7XWaQi5b5OOYS6sdFfgpqwmVPPVGnKT0aLVkDNVxU+c
+	nuUGXSkc9gHDVKUbh7cA7qswuDX+rSC34ct8n/Gor18DZo8XCIF1BstZdUvuSvuLcrSnFYPNruE
+	jMWvNr5KkGKsh6UkqquBlw671Nf74GQiG3iFi33SRj32oU4PB2aFzzPJVWcEK2uiuborzB52xIe
+	A5yvxEl1uyf0teu4+t9mByUTAVp2vVQyDBZe98Bb3BilkzcI8Nkzj6BvTPTiBQ0iE=
+X-Google-Smtp-Source: AGHT+IE3Y1AoF6Zbsj6EnPiZSX/ljTgCnU9UJMmTnq9iwUTestBp2d1ByiGJgV/xm8MwNcR4oa6vPw==
+X-Received: by 2002:a05:600c:3ba8:b0:471:9da:524c with SMTP id 5b1f17b1804b1-477b198ca22mr26146925e9.12.1763559376963;
+        Wed, 19 Nov 2025 05:36:16 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477b1012a92sm49026715e9.4.2025.11.19.05.36.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Nov 2025 05:35:30 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1vLiLJ-00000000Z9b-1C3G;
-	Wed, 19 Nov 2025 09:35:29 -0400
-Date: Wed, 19 Nov 2025 09:35:29 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>
-Cc: Leon Romanovsky <leon@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>, Jens Axboe <axboe@kernel.dk>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Sumit Semwal <sumit.semwal@linaro.org>, Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <skolothumtho@nvidia.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex@shazbot.org>,
-	Krishnakant Jaju <kjaju@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
-	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, iommu@lists.linux.dev,
-	linux-mm@kvack.org, linux-doc@vger.kernel.org,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linaro-mm-sig@lists.linaro.org, kvm@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v8 05/11] PCI/P2PDMA: Document DMABUF model
-Message-ID: <20251119133529.GL17968@ziepe.ca>
-References: <20251111-dmabuf-vfio-v8-0-fd9aa5df478f@nvidia.com>
- <20251111-dmabuf-vfio-v8-5-fd9aa5df478f@nvidia.com>
- <9798b34c-618b-4e89-82b0-803bc655c82b@amd.com>
+        Wed, 19 Nov 2025 05:36:16 -0800 (PST)
+Date: Wed, 19 Nov 2025 13:36:15 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Keith
+ Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-nvme@lists.infradead.org, Chaitanya Kulkarni <kch@nvidia.com>
+Subject: Re: [PATCH v2 1/2] nvme-pci: Use size_t for length fields to handle
+ larger sizes
+Message-ID: <20251119133615.2eefb7db@pumpkin>
+In-Reply-To: <20251119095516.GA13783@unreal>
+References: <20251117-nvme-phys-types-v2-0-c75a60a2c468@nvidia.com>
+	<20251117-nvme-phys-types-v2-1-c75a60a2c468@nvidia.com>
+	<20251118050311.GA21569@lst.de>
+	<20251119095516.GA13783@unreal>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <9798b34c-618b-4e89-82b0-803bc655c82b@amd.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 19, 2025 at 10:18:08AM +0100, Christian König wrote:
-> > +As this is not well-defined or well-supported in real HW the kernel defaults to
-> > +blocking such routing. There is an allow list to allow detecting known-good HW,
-> > +in which case P2P between any two PCIe devices will be permitted.
->
-> That section sounds not correct to me. 
+On Wed, 19 Nov 2025 11:55:16 +0200
+Leon Romanovsky <leon@kernel.org> wrote:
 
-It is correct in that it describes what the kernel does right now.
-
-See calc_map_type_and_dist(), host_bridge_whitelist(), cpu_supports_p2pdma().
-
-> This is well supported in current HW, it's just not defined in some
-> official specification.
-
-Only AMD HW.
-
-Intel HW is a bit hit and miss.
-
-ARM SOCs are frequently not supporting even on server CPUs.
-
-> > +At the lowest level the P2P subsystem offers a naked struct p2p_provider that
-> > +delegates lifecycle management to the providing driver. It is expected that
-> > +drivers using this option will wrap their MMIO memory in DMABUF and use DMABUF
-> > +to provide an invalidation shutdown.
+> On Tue, Nov 18, 2025 at 06:03:11AM +0100, Christoph Hellwig wrote:
+> > On Mon, Nov 17, 2025 at 09:22:43PM +0200, Leon Romanovsky wrote:  
+> > > From: Leon Romanovsky <leonro@nvidia.com>
+> > > 
+> > > This patch changes the length variables from unsigned int to size_t.
+> > > Using size_t ensures that we can handle larger sizes, as size_t is
+> > > always equal to or larger than the previously used u32 type.
+> > > 
+> > > Originally, u32 was used because blk-mq-dma code evolved from
+> > > scatter-gather implementation, which uses unsigned int to describe length.
+> > > This change will also allow us to reuse the existing struct phys_vec in places
+> > > that don't need scatter-gather.
+> > > 
+> > > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> > > Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+> > > ---
+> > >  block/blk-mq-dma.c      | 8 ++++++--
+> > >  drivers/nvme/host/pci.c | 4 ++--
+> > >  2 files changed, 8 insertions(+), 4 deletions(-)
+> > > 
+> > > diff --git a/block/blk-mq-dma.c b/block/blk-mq-dma.c
+> > > index e9108ccaf4b0..e7d9b54c3eed 100644
+> > > --- a/block/blk-mq-dma.c
+> > > +++ b/block/blk-mq-dma.c
+> > > @@ -8,7 +8,7 @@
+> > >  
+> > >  struct phys_vec {
+> > >  	phys_addr_t	paddr;
+> > > -	u32		len;
+> > > +	size_t		len;
+> > >  };  
+> > 
+> > So we're now going to increase memory usage by 50% again after just
+> > reducing it by removing the scatterlist?  
 > 
-> > These MMIO pages have no struct page, and
+> It is slightly less.
 > 
-> Well please drop "pages" here. Just say MMIO addresses.
+> Before this change: 96 bits
 
-"These MMIO addresses have no struct page, and"
+Did you actually look?
+There will normally be 4 bytes of padding at the end of the structure.
 
-> > +Building on this, the subsystem offers a layer to wrap the MMIO in a ZONE_DEVICE
-> > +pgmap of MEMORY_DEVICE_PCI_P2PDMA to create struct pages. The lifecycle of
-> > +pgmap ensures that when the pgmap is destroyed all other drivers have stopped
-> > +using the MMIO. This option works with O_DIRECT flows, in some cases, if the
-> > +underlying subsystem supports handling MEMORY_DEVICE_PCI_P2PDMA through
-> > +FOLL_PCI_P2PDMA. The use of FOLL_LONGTERM is prevented. As this relies on pgmap
-> > +it also relies on architecture support along with alignment and minimum size
-> > +limitations.
+About the only place where it will be 12 bytes is a 32bit system with
+64bit phyaddr that aligns 64bit items on 32bit boundaries - so x86.
+
+	David
+
+> After this change (on 64bits system): 128 bits.
 > 
-> Actually that is up to the exporter of the DMA-buf what approach is used.
+> It is 33% increase per-structure.
+> 
+> So what is the resolution? Should I drop this patch or not?
+> 
+> Thanks 
+> 
 
-The above is not talking about DMA-buf, it is describing the existing
-interface that is all struct page based. The driver invoking the
-P2PDMA APIs gets to pick if it uses the stuct page based interface
-described above or the lower level p2p provider interface this series
-introduces.
-
-> For the P2PDMA API it should be irrelevant if struct pages are used or not.
-
-Only for the lowest level p2p provider based P2PDMA API - there is a
-higher level API family within P2PDMA's API that is all about creating
-and managing ZONE_DEVICE struct pages and a pgmap, the above describes
-that family.
-
-Thanks,
-Jason
