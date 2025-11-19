@@ -1,109 +1,58 @@
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28BBD1E51EB
-	for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 22:26:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E6E2330B14;
+	Wed, 19 Nov 2025 22:42:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763591220; cv=none; b=lPskweDSQDFiSdkpptD2lfckYJnBAt3eJyVVUjVuoxChVqMC4ZCDq29X+yDwxvoZ0BygsTxlQdaCedWqkWc3q+/tgEr4p6neVRCiiLWtuDkeYWqZ+fycp16Jp41rjYle32F2rI4/vtFvgA1Jh4++ot5WdDeRzZlWTnIbVJzpcRw=
+	t=1763592171; cv=none; b=rpTVZHUugwAWTSZydNYyjPtD5yanw93Z3aDSftD5wz9H8Y4BcXPZNZXDQJJrAsMGRopFS69zUnw7kTzlUATt1n2hJzWRmmNlE3McTVdiZRjzcUcVokImjowlugNx3REljSXBX6vhuVtDa2hMQlroZZPP9qu1gHFibvgHxg0wCNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763591220; c=relaxed/simple;
-	bh=qOnnawt4egcjVD3EMm4ADkZ2z7Vo9vrDOjzvgdq3kes=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EeBurcFnV3v08ev3CAhDhWnL//5U5/Wlg3OM7upqz+9o0/+OJXfs1g0Sr1aj6O7s0CwBecTfvrziQA0zfgxQiciHtMFhnHbz41RZPXmyfXCcuCNNHUUX1f7OJW86UsWqGzfPEsoBmzcdOv4aJP6qVHwvr65y9aTrTrQ1wrpcxzU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R8k/DZ8/; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1763592171; c=relaxed/simple;
+	bh=ZZNNuTRuiX53llVmFMgKwGGhIW58g3kFCa2xIK5PUCc=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=T0t7jY0T/rfF1FRueCZ8ZlJOzV4HTFTUawUbteJ/pjagJuTKHfpY7qt1ckTkctFLzRz6OOoUjho8wZn5F4COJ21WHRaitzHKEcx9wK/+ramk8ew+OtjBe2BZ2BCA0b3WfwDyZFjS9F9s4r9QkCzvQUEMTkMw7Y/IzHeqeyOnv9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=runbox.com; dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b=GkUoEl0B; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=runbox.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R8k/DZ8/"
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5957f617ff0so215756e87.2
-        for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 14:26:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763591216; x=1764196016; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IBHV1EUw0WBXSKlFcI/NhGu5XRuHQn0XLzAOgD+DTYU=;
-        b=R8k/DZ8/ZkWu1ODdCi03BUhd0F6wJ+SI26jz55vpEOV1pSnPERLev3IwAQeGU9Ksnb
-         xjiOXUCNbqNR3md5yGCT9dIVKjPaIS3mpoLpkuyO+XWoQLOU2mnh+9SDElRz5SHfHh3Q
-         B0Wp03c6n0pUeFnj//hlczVj1aLV2ivD34FgWCLm3Wp2rJmju2T6TENUxfmee1/qUvse
-         xHh5AEGWJi1knuZfskaA8eIhL5PpmlkU5smszODFrAzYd+ZNUXTteOUwRFrOEC4wNHEL
-         l9c+nmG/rJdGmgVVAigFNQxltkX3V8NVu3TMSbQcqLexwAuvZ+VR2gIcAI3nv0pI67PG
-         Rfkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763591216; x=1764196016;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=IBHV1EUw0WBXSKlFcI/NhGu5XRuHQn0XLzAOgD+DTYU=;
-        b=d4v/KDbhc3AbjE9SU/nw4afICow79PfRVr7To+tcrPoqPxYDlpaEFFaiqOihX9P/Si
-         /cg8GzlS/howtWXt5Tap1/UPTvwBXmohISC8bYufFZpFOehV6Vpy06/PoxTOLkRedvfe
-         BtqxbaG/zSivq/3tLgytp6iQ+mFxADPQvQ9Z0QVwnewBjCLFjxbGiAJaqc5OijRRDKBv
-         IgYzTm4t3CPHyNGLmJ+pKPaBT4hWcpSZAma5tzTBt5MI8yWz6/AB//rdjegHAMb2JrYr
-         Rg4D554FaH8AbrR4NhjqSdg/gXtIUw1LUuwgqsq4564CGmYQHOxa+aPuuCsjQSsq6oYd
-         U21g==
-X-Forwarded-Encrypted: i=1; AJvYcCUhsTBnFeIpTx1v9lY3CwnHsgkDnvhLp8YvpT0iM7b2yM/Br/AliPF1LEXNQ+S+W05g43umca0pa68fPw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyN5t5WwpIb7zh1VxNGkUcpwsCeicFNp14jxfwfR9GDjcoh6rqI
-	kTAnFEITAfnAOj/fmPSF2WsvBgDSRZEYeoeaS0w/ZnFMsRIqMA+F84M7
-X-Gm-Gg: ASbGncv4sgbaw0CmJikrNuMZFtp3kIfg56p9AGIyYkgE6ED0E19eML2CvDnY3ev3Nf+
-	6Q4iSUP1vWEfW3HxXUAhli6P6lRBv17ty0sJ3df7OYLZ7VwbVzOmzkdqxGREa62py2VtVP8q6Pe
-	IAwKV2aKHM469C+Cdy7m776BToQMFtHzUwZrOhVKwvsS/by28t8KeHnnyf/c7Be5qZn3l+qCvhV
-	6NWxdhcuLDJXb9luEPgXahpXDMRPIIRTCAPs3X2rdnzYK64VIJ2+wqzYS0DQrdrAdMVr0Nf4hvF
-	c9l4hDFtzEX1VOvbYkXTahcvZU+wzOKtrPe+mL8gb2dUkBFHo1Fbq9zekXqDmFthUfiEhhvpSXG
-	kOsn0wnnRqnXDIpaZydG3pr+sSZgPGZf7G/YHaQLUNEf6aqrHKs9Hj2qvg0xnrIl4WRC64gH7NY
-	+iu+ub3QI9
-X-Google-Smtp-Source: AGHT+IFgA9RKL+uFTnctiFZKqulaPxewVQd+eAgCSkyCWbVEq5Iah76Q4RixKmx92rXz16tT6l4F2g==
-X-Received: by 2002:a05:6512:3d08:b0:594:25e6:8a3a with SMTP id 2adb3069b0e04-5969e2e74d7mr178185e87.20.1763591216022;
-        Wed, 19 Nov 2025 14:26:56 -0800 (PST)
-Received: from localhost ([109.167.240.218])
-        by smtp.gmail.com with UTF8SMTPSA id 2adb3069b0e04-5969db8989csm168021e87.39.2025.11.19.14.26.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Nov 2025 14:26:54 -0800 (PST)
-From: Askar Safin <safinaskar@gmail.com>
-To: linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Al Viro <viro@zeniv.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	Andy Shevchenko <andy.shevchenko@gmail.com>,
-	Aleksa Sarai <cyphar@cyphar.com>,
-	=?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>,
-	Julian Stecklina <julian.stecklina@cyberus-technology.de>,
-	Gao Xiang <hsiangkao@linux.alibaba.com>,
-	Art Nikpal <email2tema@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Alexander Graf <graf@amazon.com>,
-	Rob Landley <rob@landley.net>,
-	Lennart Poettering <mzxreary@0pointer.de>,
-	linux-arch@vger.kernel.org,
+	dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b="GkUoEl0B"
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <david.laight.linux_spam@runbox.com>)
+	id 1vLqsw-006kvx-LU; Wed, 19 Nov 2025 23:42:46 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=runbox.com;
+	 s=selector1; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To
+	:Message-Id:Date:Subject:Cc:To:From;
+	bh=Vhn8/vbnFTBTrLe40in1hyrWt+hwUetOS1daXHrGJRI=; b=GkUoEl0BxUcro5HrumgEhz6q7S
+	ABk1zCOGPsPuJyp1ZRIagRRuwzkOCh0X4FJqoA+gb+WH43yS/9/fELw+4L+cMrKm286TWzaluczUD
+	kmvzWGSBWmdHpO3mEp3toCKbeQ86UNgVPKKUiwQwfOpMaXOExV5xSOVtSklsVRJBUezKxOfJMeT5C
+	Sy5jmu2eU1AXBMVmKlNkEb7n13V9qpNc3vRdyP0HdznRtS/x6QzaRGq2rxSzIN9g297yPBdk2jDtM
+	WqrenPTlhBjHV2g2szbJ7y0zTVdf/yAXs98gfKaSlJ8/75ShkB42ktGPXLIyvMDkVFbRCGxyhEJ0O
+	faXr9lTA==;
+Received: from [10.9.9.74] (helo=submission03.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <david.laight.linux_spam@runbox.com>)
+	id 1vLqsw-00085q-81; Wed, 19 Nov 2025 23:42:46 +0100
+Received: by submission03.runbox with esmtpsa  [Authenticated ID (1493616)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1vLqsa-00Fos6-9U; Wed, 19 Nov 2025 23:42:24 +0100
+From: david.laight.linux@gmail.com
+To: linux-kernel@vger.kernel.org,
+	cgroups@vger.kernel.org,
 	linux-block@vger.kernel.org,
-	initramfs@vger.kernel.org,
-	linux-api@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	Michal Simek <monstr@monstr.eu>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Kees Cook <kees@kernel.org>,
-	Thorsten Blum <thorsten.blum@linux.dev>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Dave Young <dyoung@redhat.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Borislav Petkov <bp@alien8.de>,
-	Jessica Clarke <jrtc27@jrtc27.com>,
-	Nicolas Schichan <nschichan@freebox.fr>,
-	David Disseldorp <ddiss@suse.de>,
-	patches@lists.linux.dev
-Subject: [PATCH v4 3/3] init: remove /proc/sys/kernel/real-root-dev
-Date: Wed, 19 Nov 2025 22:24:07 +0000
-Message-ID: <20251119222407.3333257-4-safinaskar@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251119222407.3333257-1-safinaskar@gmail.com>
-References: <20251119222407.3333257-1-safinaskar@gmail.com>
+	linux-efi@vger.kernel.org
+Cc: Davidlohr Bueso <dave@stgolabs.net>,
+	Jens Axboe <axboe@kernel.dk>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Tejun Heo <tj@kernel.org>,
+	David Laight <david.laight.linux@gmail.com>
+Subject: [PATCH 12/44] block: use min() instead of min_t()
+Date: Wed, 19 Nov 2025 22:41:08 +0000
+Message-Id: <20251119224140.8616-13-david.laight.linux@gmail.com>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20251119224140.8616-1-david.laight.linux@gmail.com>
+References: <20251119224140.8616-1-david.laight.linux@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -112,80 +61,70 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-It is not used anymore.
+From: David Laight <david.laight.linux@gmail.com>
 
-Signed-off-by: Askar Safin <safinaskar@gmail.com>
+min_t(unsigned int, a, b) casts an 'unsigned long' to 'unsigned int'.
+Use min(a, b) instead as it promotes any 'unsigned int' to 'unsigned long'
+and so cannot discard significant bits.
+
+In this case the 'unsigned long' value is small enough that the result
+is ok.
+
+(Similarly for max_t() and clamp_t().)
+
+Detected by an extra check added to min_t().
+
+Signed-off-by: David Laight <david.laight.linux@gmail.com>
 ---
- Documentation/admin-guide/sysctl/kernel.rst |  6 ------
- include/uapi/linux/sysctl.h                 |  1 -
- init/do_mounts_initrd.c                     | 20 --------------------
- 3 files changed, 27 deletions(-)
+ block/blk-iocost.c     | 6 ++----
+ block/blk-settings.c   | 2 +-
+ block/partitions/efi.c | 3 +--
+ 3 files changed, 4 insertions(+), 7 deletions(-)
 
-diff --git a/Documentation/admin-guide/sysctl/kernel.rst b/Documentation/admin-guide/sysctl/kernel.rst
-index f3ee807b5d8b..218265babaf9 100644
---- a/Documentation/admin-guide/sysctl/kernel.rst
-+++ b/Documentation/admin-guide/sysctl/kernel.rst
-@@ -1215,12 +1215,6 @@ that support this feature.
- ==  ===========================================================================
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index 5bfd70311359..a0416927d33d 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -2334,10 +2334,8 @@ static void ioc_timer_fn(struct timer_list *timer)
+ 			else
+ 				usage_dur = max_t(u64, now.now - ioc->period_at, 1);
  
+-			usage = clamp_t(u32,
+-				DIV64_U64_ROUND_UP(usage_us * WEIGHT_ONE,
+-						   usage_dur),
+-				1, WEIGHT_ONE);
++			usage = clamp(DIV64_U64_ROUND_UP(usage_us * WEIGHT_ONE, usage_dur),
++				      1, WEIGHT_ONE);
  
--real-root-dev
--=============
--
--See Documentation/admin-guide/initrd.rst.
--
--
- reboot-cmd (SPARC only)
- =======================
+ 			/*
+ 			 * Already donating or accumulated enough to start.
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index d74b13ec8e54..4e0c23e68fac 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -472,7 +472,7 @@ int blk_validate_limits(struct queue_limits *lim)
+ 		seg_size = lim->max_segment_size;
+ 	else
+ 		seg_size = lim->seg_boundary_mask + 1;
+-	lim->min_segment_size = min_t(unsigned int, seg_size, PAGE_SIZE);
++	lim->min_segment_size = min(seg_size, PAGE_SIZE);
  
-diff --git a/include/uapi/linux/sysctl.h b/include/uapi/linux/sysctl.h
-index 63d1464cb71c..1c7fe0f4dca4 100644
---- a/include/uapi/linux/sysctl.h
-+++ b/include/uapi/linux/sysctl.h
-@@ -92,7 +92,6 @@ enum
- 	KERN_DOMAINNAME=8,	/* string: domainname */
- 
- 	KERN_PANIC=15,		/* int: panic timeout */
--	KERN_REALROOTDEV=16,	/* real root device to mount after initrd */
- 
- 	KERN_SPARC_REBOOT=21,	/* reboot command on Sparc */
- 	KERN_CTLALTDEL=22,	/* int: allow ctl-alt-del to reboot */
-diff --git a/init/do_mounts_initrd.c b/init/do_mounts_initrd.c
-index fe335dbc95e0..892e69ab41c4 100644
---- a/init/do_mounts_initrd.c
-+++ b/init/do_mounts_initrd.c
-@@ -8,31 +8,11 @@
- 
- unsigned long initrd_start, initrd_end;
- int initrd_below_start_ok;
--static unsigned int real_root_dev;	/* do_proc_dointvec cannot handle kdev_t */
- static int __initdata mount_initrd = 1;
- 
- phys_addr_t phys_initrd_start __initdata;
- unsigned long phys_initrd_size __initdata;
- 
--#ifdef CONFIG_SYSCTL
--static const struct ctl_table kern_do_mounts_initrd_table[] = {
--	{
--		.procname       = "real-root-dev",
--		.data           = &real_root_dev,
--		.maxlen         = sizeof(int),
--		.mode           = 0644,
--		.proc_handler   = proc_dointvec,
--	},
--};
--
--static __init int kernel_do_mounts_initrd_sysctls_init(void)
--{
--	register_sysctl_init("kernel", kern_do_mounts_initrd_table);
--	return 0;
--}
--late_initcall(kernel_do_mounts_initrd_sysctls_init);
--#endif /* CONFIG_SYSCTL */
--
- static int __init no_initrd(char *str)
- {
- 	pr_warn("noinitrd option is deprecated and will be removed soon\n");
+ 	/*
+ 	 * We require drivers to at least do logical block aligned I/O, but
+diff --git a/block/partitions/efi.c b/block/partitions/efi.c
+index 7acba66eed48..638261e9f2fb 100644
+--- a/block/partitions/efi.c
++++ b/block/partitions/efi.c
+@@ -215,8 +215,7 @@ static int is_pmbr_valid(legacy_mbr *mbr, sector_t total_sectors)
+ 		sz = le32_to_cpu(mbr->partition_record[part].size_in_lba);
+ 		if (sz != (uint32_t) total_sectors - 1 && sz != 0xFFFFFFFF)
+ 			pr_debug("GPT: mbr size in lba (%u) different than whole disk (%u).\n",
+-				 sz, min_t(uint32_t,
+-					   total_sectors - 1, 0xFFFFFFFF));
++				 sz, (uint32_t)min(total_sectors - 1, 0xFFFFFFFF));
+ 	}
+ done:
+ 	return ret;
 -- 
-2.47.3
+2.39.5
 
