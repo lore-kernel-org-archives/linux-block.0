@@ -1,96 +1,342 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C00B3446C2;
-	Wed, 19 Nov 2025 09:55:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 752CC3451D7
+	for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 09:56:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763546123; cv=none; b=Amz0jYJE/Fwag7sePY24qTfC0/c5OU9bBmA6abSlSLrFnwRlPEm+QlIFx86dhVzWxJsws2yNAW+p/l/3XoIphxCGtEjcrTT997Q0vowqUOPNFLow8JCliw9wRG41Y4p+S9SMS+gPkeO0VkbN98T1L2Usw5dCISnWuP2g5Q2+DPM=
+	t=1763546213; cv=none; b=sJCXHqRUXZL0VW8HsVwfMmMxrlFpEEOFJmI1tsZhmkxDKVWJlyucpoCO/3UdqcdUBpaLovtvbl3lkU7QpAQmInphPzUIEKbqyoboZ0k8jS3dw4MriW6hSU3IqJzqjEa1X4Ya887ziZlpVv9wEIdoAzbBymtcD4xmBE6z5EDjYwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763546123; c=relaxed/simple;
-	bh=mrVGDGmdBwi9bp1Ejm5GWoCivDI1+7VKZSTga3B+PrE=;
+	s=arc-20240116; t=1763546213; c=relaxed/simple;
+	bh=Jj6tEG9SIcIGLjtTYMzVitCLY7yNOLenqZrsBpOikWI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BhoChP+5gAgqRAkozpGTOmc1+UCjQ6oYbLACv0QF6pPKiNfpYi/RBKKRuJCuztQGcZToMPTC9Gf5PtWxOLCVIxcXhbp7FbAsOKJ1XJ0auY5s8HtOdAMlYQazya1uDxGw+VwMNbq2JmQHKQy7iR8G1t3XD3eY6BWdg/YjJgyQ094=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=alOJWxNc; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=oU1dPrjIY/A02/xR3RtuZaHDYbd5R3lfWtMw3TDisbUzGEW0r3eEOXMkeZs+5Ytmqtdc+8nuixffE18zUJNVllJaUpJOw3Oo6tKBqqYzSC11qMWL2TugXTm4qtNU1dl/TSHWr0Oqo2KZE+V7u904SEVjeca+V8gKkg0kJJNJbh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NupjaSfM; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="alOJWxNc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E9E4C2BCB8;
-	Wed, 19 Nov 2025 09:55:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763546122;
-	bh=mrVGDGmdBwi9bp1Ejm5GWoCivDI1+7VKZSTga3B+PrE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=alOJWxNcB+IkVtIDy2pVEUyd3HFS7OmaPY1pgPwYQvu0rHyh4x9n+9brKyMNnQv/v
-	 Qq/pe+VC1Nn/fpd6n+LbqNwfMRfVwcZyFTRG9+u0KDEVY3w/5Nv8tE9d3P22QKl/hD
-	 ztmwVEfvJ0g6Z2VTO63PE09RkTkimEuutWrCDWxFDze1ym4BLGuNL9hxxXIht6x24v
-	 CYHHKFl99vhFfpGb9egB0srcRsR/HhSNEixF0MUs7KHQ+lo8AjkCSqBApb9DMnEPwH
-	 M8L5MtlUI6wysxhIXBD2Z4QIm/rkq6+k+Vo8w9R9p7oCQKVHOUgpNF1oEmeNXonWg1
-	 E0y9b6mcngrEQ==
-Date: Wed, 19 Nov 2025 11:55:16 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-	Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-	Chaitanya Kulkarni <kch@nvidia.com>
-Subject: Re: [PATCH v2 1/2] nvme-pci: Use size_t for length fields to handle
- larger sizes
-Message-ID: <20251119095516.GA13783@unreal>
-References: <20251117-nvme-phys-types-v2-0-c75a60a2c468@nvidia.com>
- <20251117-nvme-phys-types-v2-1-c75a60a2c468@nvidia.com>
- <20251118050311.GA21569@lst.de>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NupjaSfM"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763546207;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8/eBYlNHSBvxkKD7+aFQpr8u/Gl4MjCUDZle0nkmExI=;
+	b=NupjaSfMY49CQhUp4AUTjuvGdlA5w3E0i9H/jJDxb2B7+YmXhzWvHgAv/ywh4Sc+Wzdfaw
+	NGZbUQErd8MtEfWk2kNN3dGC59CLSgkVSb6qE22226wRaEvF/dKYxyjRojuwVPqTSLyhbl
+	4iymSXEuB6cAJfkq30JzG94R03dq92Y=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-130-UZdYUVx3PDCDS15CfuGDnA-1; Wed,
+ 19 Nov 2025 04:56:31 -0500
+X-MC-Unique: UZdYUVx3PDCDS15CfuGDnA-1
+X-Mimecast-MFC-AGG-ID: UZdYUVx3PDCDS15CfuGDnA_1763546190
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D9B301800EF6;
+	Wed, 19 Nov 2025 09:56:29 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.74])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B3CC4180047F;
+	Wed, 19 Nov 2025 09:56:21 +0000 (UTC)
+Date: Wed, 19 Nov 2025 17:56:15 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Uday Shankar <ushankar@purestorage.com>
+Subject: Re: [PATCH V3 10/27] ublk: handle UBLK_U_IO_PREP_IO_CMDS
+Message-ID: <aR2UPxAROdH09mv-@fedora>
+References: <20251112093808.2134129-1-ming.lei@redhat.com>
+ <20251112093808.2134129-11-ming.lei@redhat.com>
+ <CADUfDZr88twJJLTJ0bx-OP4Rz54hF9enuw=8vYkPuhzOab1rEQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20251118050311.GA21569@lst.de>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADUfDZr88twJJLTJ0bx-OP4Rz54hF9enuw=8vYkPuhzOab1rEQ@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Tue, Nov 18, 2025 at 06:03:11AM +0100, Christoph Hellwig wrote:
-> On Mon, Nov 17, 2025 at 09:22:43PM +0200, Leon Romanovsky wrote:
-> > From: Leon Romanovsky <leonro@nvidia.com>
-> > 
-> > This patch changes the length variables from unsigned int to size_t.
-> > Using size_t ensures that we can handle larger sizes, as size_t is
-> > always equal to or larger than the previously used u32 type.
-> > 
-> > Originally, u32 was used because blk-mq-dma code evolved from
-> > scatter-gather implementation, which uses unsigned int to describe length.
-> > This change will also allow us to reuse the existing struct phys_vec in places
-> > that don't need scatter-gather.
-> > 
-> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> > Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+On Tue, Nov 18, 2025 at 06:49:57PM -0800, Caleb Sander Mateos wrote:
+> On Wed, Nov 12, 2025 at 1:39 AM Ming Lei <ming.lei@redhat.com> wrote:
+> >
+> > This commit implements the handling of the UBLK_U_IO_PREP_IO_CMDS command,
+> > which allows userspace to prepare a batch of I/O requests.
+> >
+> > The core of this change is the `ublk_walk_cmd_buf` function, which iterates
+> > over the elements in the uring_cmd fixed buffer. For each element, it parses
+> > the I/O details, finds the corresponding `ublk_io` structure, and prepares it
+> > for future dispatch.
+> >
+> > Add per-io lock for protecting concurrent delivery and committing.
+> >
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > > ---
-> >  block/blk-mq-dma.c      | 8 ++++++--
-> >  drivers/nvme/host/pci.c | 4 ++--
-> >  2 files changed, 8 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/block/blk-mq-dma.c b/block/blk-mq-dma.c
-> > index e9108ccaf4b0..e7d9b54c3eed 100644
-> > --- a/block/blk-mq-dma.c
-> > +++ b/block/blk-mq-dma.c
-> > @@ -8,7 +8,7 @@
-> >  
-> >  struct phys_vec {
-> >  	phys_addr_t	paddr;
-> > -	u32		len;
-> > +	size_t		len;
+> >  drivers/block/ublk_drv.c      | 205 +++++++++++++++++++++++++++++++++-
+> >  include/uapi/linux/ublk_cmd.h |   5 +
+> >  2 files changed, 209 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > index 5f9d7ec9daa4..84d838df18cb 100644
+> > --- a/drivers/block/ublk_drv.c
+> > +++ b/drivers/block/ublk_drv.c
+> > @@ -117,6 +117,7 @@ struct ublk_batch_io_data {
+> >         struct ublk_device *ub;
+> >         struct io_uring_cmd *cmd;
+> >         struct ublk_batch_io header;
+> > +       unsigned int issue_flags;
 > >  };
+> >
+> >  /*
+> > @@ -201,6 +202,7 @@ struct ublk_io {
+> >         unsigned task_registered_buffers;
+> >
+> >         void *buf_ctx_handle;
+> > +       spinlock_t lock;
+> >  } ____cacheline_aligned_in_smp;
+> >
+> >  struct ublk_queue {
+> > @@ -270,6 +272,16 @@ static inline bool ublk_dev_support_batch_io(const struct ublk_device *ub)
+> >         return false;
+> >  }
+> >
+> > +static inline void ublk_io_lock(struct ublk_io *io)
+> > +{
+> > +       spin_lock(&io->lock);
+> > +}
+> > +
+> > +static inline void ublk_io_unlock(struct ublk_io *io)
+> > +{
+> > +       spin_unlock(&io->lock);
+> > +}
+> > +
+> >  static inline struct ublksrv_io_desc *
+> >  ublk_get_iod(const struct ublk_queue *ubq, unsigned tag)
+> >  {
+> > @@ -2531,6 +2543,183 @@ static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
+> >         return ublk_ch_uring_cmd_local(cmd, issue_flags);
+> >  }
+> >
+> > +static inline __u64 ublk_batch_buf_addr(const struct ublk_batch_io *uc,
+> > +                                       const struct ublk_elem_header *elem)
+> > +{
+> > +       const void *buf = elem;
+> > +
+> > +       if (uc->flags & UBLK_BATCH_F_HAS_BUF_ADDR)
+> > +               return *(__u64 *)(buf + sizeof(*elem));
+> > +       return 0;
+> > +}
+> > +
+> > +static struct ublk_auto_buf_reg
+> > +ublk_batch_auto_buf_reg(const struct ublk_batch_io *uc,
+> > +                       const struct ublk_elem_header *elem)
+> > +{
+> > +       struct ublk_auto_buf_reg reg = {
+> > +               .index = elem->buf_index,
+> > +               .flags = (uc->flags & UBLK_BATCH_F_AUTO_BUF_REG_FALLBACK) ?
+> > +                       UBLK_AUTO_BUF_REG_FALLBACK : 0,
+> > +       };
+> > +
+> > +       return reg;
+> > +}
+> > +
+> > +/*
+> > + * 48 can hold any type of buffer element(8, 16 and 24 bytes) because
+> > + * it is the least common multiple(LCM) of 8, 16 and 24
+> > + */
+> > +#define UBLK_CMD_BATCH_TMP_BUF_SZ  (48 * 10)
+> > +struct ublk_batch_io_iter {
+> > +       /* copy to this buffer from iterator first */
+> > +       unsigned char buf[UBLK_CMD_BATCH_TMP_BUF_SZ];
+> > +       struct iov_iter iter;
+> > +       unsigned done, total;
+> > +       unsigned char elem_bytes;
+> > +};
+> > +
+> > +static inline int
+> > +__ublk_walk_cmd_buf(struct ublk_queue *ubq,
+> > +                   struct ublk_batch_io_iter *iter,
+> > +                   const struct ublk_batch_io_data *data,
+> > +                   unsigned bytes,
+> > +                   int (*cb)(struct ublk_queue *q,
+> > +                           const struct ublk_batch_io_data *data,
+> > +                           const struct ublk_elem_header *elem))
+> > +{
+> > +       int i, ret = 0;
 > 
-> So we're now going to increase memory usage by 50% again after just
-> reducing it by removing the scatterlist?
+> unsigned i to avoid comparisons between signed and unsigned values?
 
-It is slightly less.
+OK.
 
-Before this change: 96 bits
-After this change (on 64bits system): 128 bits.
+> 
+> > +
+> > +       for (i = 0; i < bytes; i += iter->elem_bytes) {
+> > +               const struct ublk_elem_header *elem =
+> > +                       (const struct ublk_elem_header *)&iter->buf[i];
+> > +
+> > +               if (unlikely(elem->tag >= data->ub->dev_info.queue_depth)) {
+> > +                       ret = -EINVAL;
+> > +                       break;
+> > +               }
+> > +
+> > +               ret = cb(ubq, data, elem);
+> > +               if (unlikely(ret))
+> > +                       break;
+> > +       }
+> > +
+> > +       /* revert unhandled bytes in case of failure */
+> > +       if (ret)
+> > +               iov_iter_revert(&iter->iter, bytes - i);
+> > +
+> > +       iter->done += i;
+> > +       return ret;
+> > +}
+> > +
+> > +static int ublk_walk_cmd_buf(struct ublk_batch_io_iter *iter,
+> > +                            const struct ublk_batch_io_data *data,
+> > +                            int (*cb)(struct ublk_queue *q,
+> > +                                    const struct ublk_batch_io_data *data,
+> > +                                    const struct ublk_elem_header *elem))
+> > +{
+> > +       struct ublk_queue *ubq = ublk_get_queue(data->ub, data->header.q_id);
+> > +       int ret = 0;
+> > +
+> > +       while (iter->done < iter->total) {
+> > +               unsigned int len = min(sizeof(iter->buf), iter->total - iter->done);
+> > +
+> > +               ret = copy_from_iter(iter->buf, len, &iter->iter);
+> 
+> Would make more sense to store this as an unsigned value.
 
-It is 33% increase per-structure.
+OK.
 
-So what is the resolution? Should I drop this patch or not?
+BTW, it has been changed to plain copy_from_user() in my local version by
+dropping fixed buffer for commit/prep ios command.
 
-Thanks 
+There is also one big bug fix in patch 'ublk: add batch I/O dispatch infrastructure',
+
+Do you prefer to continuing to review on V3 or the coming V4?
+
+If you prefer to V4, I can prepare and send it soon.
+
+> 
+> > +               if (ret != len) {
+> > +                       pr_warn("ublk%d: read batch cmd buffer failed %u/%u\n",
+> > +                                       data->ub->dev_info.dev_id, ret, len);
+> > +                       ret = -EINVAL;
+> > +                       break;
+> 
+> Just return -EINVAL?
+> 
+> > +               }
+> > +
+> > +               ret = __ublk_walk_cmd_buf(ubq, iter, data, len, cb);
+> > +               if (ret)
+> > +                       break;
+> 
+> Just return ret?
+> 
+> > +       }
+> > +       return ret;
+> > +}
+> > +
+> > +static int ublk_batch_unprep_io(struct ublk_queue *ubq,
+> > +                               const struct ublk_batch_io_data *data,
+> > +                               const struct ublk_elem_header *elem)
+> > +{
+> > +       struct ublk_io *io = &ubq->ios[elem->tag];
+> > +
+> > +       data->ub->nr_io_ready--;
+> > +       ublk_io_lock(io);
+> > +       io->flags = 0;
+> > +       ublk_io_unlock(io);
+> > +       return 0;
+> > +}
+> > +
+> > +static void ublk_batch_revert_prep_cmd(struct ublk_batch_io_iter *iter,
+> > +                                      const struct ublk_batch_io_data *data)
+> > +{
+> > +       int ret;
+> > +
+> > +       if (!iter->done)
+> > +               return;
+> > +
+> > +       iov_iter_revert(&iter->iter, iter->done);
+> > +       iter->total = iter->done;
+> > +       iter->done = 0;
+> > +
+> > +       ret = ublk_walk_cmd_buf(iter, data, ublk_batch_unprep_io);
+> > +       WARN_ON_ONCE(ret);
+> > +}
+> > +
+> > +static int ublk_batch_prep_io(struct ublk_queue *ubq,
+> > +                             const struct ublk_batch_io_data *data,
+> > +                             const struct ublk_elem_header *elem)
+> > +{
+> > +       struct ublk_io *io = &ubq->ios[elem->tag];
+> > +       const struct ublk_batch_io *uc = &data->header;
+> > +       union ublk_io_buf buf = { 0 };
+> > +       int ret;
+> > +
+> > +       if (ublk_dev_support_auto_buf_reg(data->ub))
+> > +               buf.auto_reg = ublk_batch_auto_buf_reg(uc, elem);
+> > +       else if (ublk_dev_need_map_io(data->ub)) {
+> > +               buf.addr = ublk_batch_buf_addr(uc, elem);
+> > +
+> > +               ret = ublk_check_fetch_buf(data->ub, buf.addr);
+> > +               if (ret)
+> > +                       return ret;
+> > +       }
+> > +
+> > +       ublk_io_lock(io);
+> > +       ret = __ublk_fetch(data->cmd, data->ub, io);
+> > +       if (!ret)
+> > +               io->buf = buf;
+> > +       ublk_io_unlock(io);
+> > +
+> > +       return ret;
+> > +}
+> > +
+> > +static int ublk_handle_batch_prep_cmd(const struct ublk_batch_io_data *data)
+> > +{
+> > +       const struct ublk_batch_io *uc = &data->header;
+> > +       struct io_uring_cmd *cmd = data->cmd;
+> > +       struct ublk_batch_io_iter iter = {
+> > +               .total = uc->nr_elem * uc->elem_bytes,
+> > +               .elem_bytes = uc->elem_bytes,
+> > +       };
+> > +       int ret;
+> > +
+> > +       ret = io_uring_cmd_import_fixed(cmd->sqe->addr, iter.total,
+> 
+> sqe-> addr should be accessed with READ_ONCE() since it may point to
+> user-mapped memory.
+
+OK.
+
+> 
+> > +                       WRITE, &iter.iter, cmd, data->issue_flags);
+> > +       if (ret)
+> > +               return ret;
+> > +
+> > +       mutex_lock(&data->ub->mutex);
+> > +       ret = ublk_walk_cmd_buf(&iter, data, ublk_batch_prep_io);
+> > +
+> > +       if (ret && iter.done)
+> > +               ublk_batch_revert_prep_cmd(&iter, data);
+> 
+> Mentioned this on V1 as well, but the iter.done check is duplicated in
+> ublk_batch_revert_prep_cmd().
+
+OK, will drop the check in ublk_batch_revert_prep_cmd().
+
+Thanks,
+Ming
+
