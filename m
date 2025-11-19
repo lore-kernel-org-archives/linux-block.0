@@ -1,61 +1,79 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D672424886E;
-	Wed, 19 Nov 2025 11:07:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37B9B33C1A0
+	for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 12:09:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763550423; cv=none; b=JkRHebt+3+inqhX3p9//0C9TKmSwE6kpvSeTv3dsuRcBGWarxwwC4JIGubwyaTqWyUMYzR0878tLM+Sq0kaKSvwfhu5BtyGDmTbGgKH5UJLIXnI43YIKb4gtX+YfFTA5ADTGaidYvnvEvEhJamzC6BOAHs2PsmOYcvf+u0AvkpU=
+	t=1763554195; cv=none; b=PxSVNGzVixiQpur8mYQmB7cGQhaKVSPWuxPs51YdandspFT3BFUaSWk8UneACitSVvMJgtqWTRoPRVOY/Ma7h/I0eJLcaat8z8pQ/osGwRXO/2gluAMk0moIctcBYljIEYYkxG1IV5TLPwFf9NXpoO4kRdg5/QRZXUotN4I3hwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763550423; c=relaxed/simple;
-	bh=S3zTVStBoLYGmYGmxZC0NIadrgUI21u3no3kP3JU4m0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rnRgqSsT+gAP6+8Esa3te7RgPle+WiH8wurpm8bGslerzI8GD8CAjE37J2AqfNPsWVokE/LMH/ZwvPcjV41fxSUspTPQJHhOrkK83zxJz+uJhNNV4rrwK0epUfQ4gGokp9SzOEOiL/PmFlF9eGgEjU7qLa8bld+7csMrHzgYsjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V2oXOGb+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763554195; c=relaxed/simple;
+	bh=Md0U8PnYx3hpZSRjVTmfIBRRxHHpEemGpxJgcea3/fM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=T9zYuxb3yQaAR+B2IzL5PX4UVpqE58p2eJH2s4X9xDftL/DWPDfnOcVm0ARD46uBn9DDdtRmz8/dYh9WbOi1YYGZWzIs5avQS66UXPBBFBhPKq3KusuwJcDJRndAnMA54zSzWm4jm0OuLf825zG2Y03UOwQVESTrEk+cAWQ/CpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J+PQEwgM; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V2oXOGb+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E385C19422;
-	Wed, 19 Nov 2025 11:07:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763550422;
-	bh=S3zTVStBoLYGmYGmxZC0NIadrgUI21u3no3kP3JU4m0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=V2oXOGb+nSFmMH/C3fHQdKnLwI+dzInHFjDWDiM9Y2GgvnvftKQCcFuAyKUirvzps
-	 9vh779mzu/HLXKFzPlOHSHr4efcZMbp2dHAa+G1OCa3KpqQ8Mk+4QRvgIrnuUGUgSW
-	 DjyECJHD1IL/sDvMXLtjOvlnxK2sIR+7MQkEHp6KZ6WQ/lBN8KsQbS/8dQg+fSePBd
-	 q4LhLgHlFkt9y/fctoQ7oAXFSNR2oT4e82MLX5bUr3kW9+JBNzbs05xXjsDsVFGgrj
-	 C4RWQYbz0re4CmM/BortuOyD27zlQtDCtH91QfGy/mkvkxw/nDGn6fBeRfCpiP5+Nl
-	 RFNNSmrETZ2vA==
-Date: Wed, 19 Nov 2025 13:06:55 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-	Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-	Chaitanya Kulkarni <kch@nvidia.com>
-Subject: Re: [PATCH v2 1/2] nvme-pci: Use size_t for length fields to handle
- larger sizes
-Message-ID: <20251119110655.GB13783@unreal>
-References: <20251117-nvme-phys-types-v2-0-c75a60a2c468@nvidia.com>
- <20251117-nvme-phys-types-v2-1-c75a60a2c468@nvidia.com>
- <20251118050311.GA21569@lst.de>
- <20251119095516.GA13783@unreal>
- <20251119101048.GA26266@lst.de>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J+PQEwgM"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763554193;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=WUR3hRDWZrQyzE5ZOTPtliWhNphRCp4lcYgm6h8yHP4=;
+	b=J+PQEwgMWGOTC4NLvMPLScZxdbF15ST5iFitjdJet5roVUv7BNOKhy3VFIrrnHkvxM6nzB
+	u0PuNaIV89j+KYndh4Ovxnxc3oatf+c6kwKgGdayWMq6WBp04QsB5kQhXoMHismPs0ZWW4
+	jV9cJnQeXk1T8d7wp605n8w6ONkpExo=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-613-_yqT4mizOLCVNfaujVJ_6A-1; Wed,
+ 19 Nov 2025 07:09:51 -0500
+X-MC-Unique: _yqT4mizOLCVNfaujVJ_6A-1
+X-Mimecast-MFC-AGG-ID: _yqT4mizOLCVNfaujVJ_6A_1763554190
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 35F4919560A3;
+	Wed, 19 Nov 2025 12:09:50 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.74])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1263A195608E;
+	Wed, 19 Nov 2025 12:09:48 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 0/3] loop: nowait aio bug fixes
+Date: Wed, 19 Nov 2025 20:09:32 +0800
+Message-ID: <20251119120937.3424475-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251119101048.GA26266@lst.de>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Wed, Nov 19, 2025 at 11:10:48AM +0100, Christoph Hellwig wrote:
-> On Wed, Nov 19, 2025 at 11:55:16AM +0200, Leon Romanovsky wrote:
-> > So what is the resolution? Should I drop this patch or not?
-> 
-> I think it should be dropped.  I don't think having to use one 96-bit
-> structure per 4GB worth of memory should be a deal breaker.
+Hi Jens,
 
-No problem, will drop.
+The 1st two patches fix error handling code paths for nowait aio.
+
+The last patch fixes IO hang issue because of writeback throttle.
+
+V2:
+	- use QUEUE_FLAG_DISABLE_WBT_DEF to disable wbt, so that
+	  check of QUEUE_FLAG_QOS_ENABLED can work as expected
+
+Ming Lei (3):
+  loop: move kiocb_start_write to aio prep phase
+  loop: fix error handling in aio functions
+  loop: disable writeback throttling and fix nowait support
+
+ drivers/block/loop.c | 28 +++++++++++++++++++---------
+ 1 file changed, 19 insertions(+), 9 deletions(-)
+
+-- 
+2.47.0
+
