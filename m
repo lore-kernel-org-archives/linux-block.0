@@ -1,113 +1,118 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4A2A35770B
-	for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 12:10:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA09435BDBE
+	for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 12:45:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763554213; cv=none; b=fIXFC8YSK3pwI5jW5ajVvAfu4OzUQ5dlHcuInDnQ61ercpYhGHTCMePaDAfVahNY1GEqj9T0DbqyBEvAt+KfYG2EETRzLl2iHtnJHWgd7aybzAMK+qGCetrYm6phXJrTWtsgUcxVbOgr1HJ1QpfbCpjFI3zNtPtdqlhD3r2uSeQ=
+	t=1763556353; cv=none; b=D2dJ/6pk3BHFQLFGOHQsryAbF+ebEwSC8Tb0bGg7adz5Z1GoKwhHRpmXY7zWPpb6Uy39QwPGGji98KL+yURCoLJXsWVYS4Gg8rJUmn9vPyqjhin0tr0uu48yWUvp5sSd+i2wEHvpa5DNU8ejGzRnlHkcqBZJsmxwIS8KMuYyK1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763554213; c=relaxed/simple;
-	bh=1S/lt9Zam29xp7fhhSXIuuxD/tpk0FikNEvIj8JPyeQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KrS0uT+jvlqE6RfTMqAOE1Xxoanv4HcC6Rhfd8Df/mchqq5CXmhYL0HJ/G+R7gMQyuYA3w7K39uIOLNpl7TqG9+EWSxGPeHwpXUuNMMOUbYIVlPzX1JYR/SW1rZjOlKWN/zZI+Z4D0Q9VKUbbydPm9zsg44GsxzuuHzgR5MAzSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gzLCwU/K; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1763556353; c=relaxed/simple;
+	bh=ng/O2QW3MktSvdXoUCnhJKqwF78VlPya4qWkFXgX3rU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kbxf/Fr0JZUPAPbRo1B+rwBnkKq/Oheocnnd+aF4nQ0nuGFzCJi9ziTfltJSWZp64SWUzEGntFeLV4UoabPJD17YBbwfSwke/KqNbrMnjRudPj1N5CWVkq8uk7f5k5iqr9acPK+8OmdLv0wN2GP3rNQ+EH5FBtesXrKxZekVid8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YLhJAeeb; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gzLCwU/K"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763554210;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QaSk3JrpUYV231Lwa3T+F5uuk1xJEkIDmNk7nRGb8Rg=;
-	b=gzLCwU/K5Z2j/Lebmp1SrkTdw7feNVV9CaVZwHdp9DlVgWyZJRsbhf+1EuAv27pjy+fJ1k
-	3OmdRPGQ37AAES2dpwTgTTPdjB9a4QP13dRWH2/d1inNd+ssVoE83jChGIrImM68Hauio4
-	jBiTbtbmerPH7BpmpZl957E9tjo85dA=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-433-3M4w_OJANfmrxpjskoh-dg-1; Wed,
- 19 Nov 2025 07:10:09 -0500
-X-MC-Unique: 3M4w_OJANfmrxpjskoh-dg-1
-X-Mimecast-MFC-AGG-ID: 3M4w_OJANfmrxpjskoh-dg_1763554208
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2F2E71956063;
-	Wed, 19 Nov 2025 12:10:08 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.74])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 858E418004A3;
-	Wed, 19 Nov 2025 12:10:06 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YLhJAeeb"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763556349; x=1795092349;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ng/O2QW3MktSvdXoUCnhJKqwF78VlPya4qWkFXgX3rU=;
+  b=YLhJAeebXk9Xqik2Qfba1ajbiTAfI9fncRxWJWnf2vf1nMBZOnlRY9CJ
+   fQ3TQ2TaYnDA/1wbIKU9ego7Q8vXjgGlBA60bhprJTVGygWmCtvcCGiSp
+   eYSxlduWtAhavhNQ69r+H9RAaxRl8oG2+/svB/CdNSS9bdatJV5s8zOoL
+   iRWqN4nokOgiocfY5gLp6FJ5cYX2Y5Lq0lCYnGkyf2sP4jVjW7Q4G+DaU
+   Eh3zEFwiG7/DgI9NLaxkL9NqfDrbDddWoNW7phIkVSMJ3ltJLnotCfF4V
+   8jv1DW72C9tf1xkE1Mmiu5tBfxUWoe87bL5Zc2ShAltuwGvuQcU7d2/5+
+   A==;
+X-CSE-ConnectionGUID: 1L9onZ6LRVSU4/NPqepYJQ==
+X-CSE-MsgGUID: eqnAx9eDT7mvL6dHH6aMBQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11617"; a="91070272"
+X-IronPort-AV: E=Sophos;i="6.19,315,1754982000"; 
+   d="scan'208";a="91070272"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2025 04:45:48 -0800
+X-CSE-ConnectionGUID: Qi6JUvjLTHSszI2JgmCboQ==
+X-CSE-MsgGUID: J8lDMOAfQEyaPBIHH5ePiQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,315,1754982000"; 
+   d="scan'208";a="190708390"
+Received: from lkp-server01.sh.intel.com (HELO adf6d29aa8d9) ([10.239.97.150])
+  by fmviesa007.fm.intel.com with ESMTP; 19 Nov 2025 04:45:45 -0800
+Received: from kbuild by adf6d29aa8d9 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1vLhZ9-0002sl-2D;
+	Wed, 19 Nov 2025 12:45:43 +0000
+Date: Wed, 19 Nov 2025 20:45:16 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 3/3] loop: disable writeback throttling and fix nowait support
-Date: Wed, 19 Nov 2025 20:09:35 +0800
-Message-ID: <20251119120937.3424475-4-ming.lei@redhat.com>
-In-Reply-To: <20251119120937.3424475-1-ming.lei@redhat.com>
-References: <20251119120937.3424475-1-ming.lei@redhat.com>
+Cc: oe-kbuild-all@lists.linux.dev, Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH 3/3] loop: disable writeback throttling and fix nowait
+ support
+Message-ID: <202511192025.ApZLv3Ly-lkp@intel.com>
+References: <20251119093855.3405421-4-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251119093855.3405421-4-ming.lei@redhat.com>
 
-Disable writeback throttling by default for loop devices to avoid deadlock
-scenarios when RQOS features are enabled. This way is fine for loop
-because the backing device covers writeback throttle too.
+Hi Ming,
 
-Update lo_backfile_support_nowait() to check both backing file's
-FMODE_NOWAIT support and the queue's QOS enablement status. This prevents
-deadlocks in submit_bio() code path when RQOS takes online wait and blocks
-backing file IOs.
+kernel test robot noticed the following build errors:
 
-Fixes: 0ba93a906dda ("loop: try to handle loop aio command via NOWAIT IO first")
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/loop.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+[auto build test ERROR on axboe/for-next]
+[also build test ERROR on next-20251119]
+[cannot apply to linus/master v6.18-rc6]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 705373b9668d..31be3db02caa 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -443,9 +443,18 @@ static int lo_submit_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- 	return ret;
- }
- 
-+/*
-+ * Allow NOWAIT only if the backing file supports it, and loop disk's
-+ * RQOS feature isn't enabled.
-+ *
-+ * RQOS takes online wait in submit_bio() code path, and IOs to backing
-+ * file may be blocked, then deadlock is caused, see
-+ * submit_bio_noacct_nocheck().
-+ */
- static bool lo_backfile_support_nowait(const struct loop_device *lo)
- {
--	return lo->lo_backing_file->f_mode & FMODE_NOWAIT;
-+	return (lo->lo_backing_file->f_mode & FMODE_NOWAIT) &&
-+		!test_bit(QUEUE_FLAG_QOS_ENABLED, &lo->lo_queue->queue_flags);
- }
- 
- static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
-@@ -2205,6 +2214,8 @@ static int loop_add(int i)
- 	}
- 	lo->lo_queue = lo->lo_disk->queue;
- 
-+	blk_queue_flag_set(QUEUE_FLAG_DISABLE_WBT_DEF, lo->lo_queue);
-+
- 	/*
- 	 * Disable partition scanning by default. The in-kernel partition
- 	 * scanning can be requested individually per-device during its
+url:    https://github.com/intel-lab-lkp/linux/commits/Ming-Lei/loop-move-kiocb_start_write-to-aio-prep-phase/20251119-174659
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git for-next
+patch link:    https://lore.kernel.org/r/20251119093855.3405421-4-ming.lei%40redhat.com
+patch subject: [PATCH 3/3] loop: disable writeback throttling and fix nowait support
+config: nios2-allnoconfig (https://download.01.org/0day-ci/archive/20251119/202511192025.ApZLv3Ly-lkp@intel.com/config)
+compiler: nios2-linux-gcc (GCC) 11.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251119/202511192025.ApZLv3Ly-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202511192025.ApZLv3Ly-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from block/elevator.c:45:
+>> block/blk-wbt.h:19:20: error: static declaration of 'wbt_disable_default' follows non-static declaration
+      19 | static inline void wbt_disable_default(struct gendisk *disk)
+         |                    ^~~~~~~~~~~~~~~~~~~
+   In file included from block/elevator.c:28:
+   include/linux/blkdev.h:452:6: note: previous declaration of 'wbt_disable_default' with type 'void(struct gendisk *)'
+     452 | void wbt_disable_default(struct gendisk *disk);
+         |      ^~~~~~~~~~~~~~~~~~~
+
+
+vim +/wbt_disable_default +19 block/blk-wbt.h
+
+e34cbd307477ae Jens Axboe        2016-11-09  18  
+04aad37be1a88d Christoph Hellwig 2023-02-03 @19  static inline void wbt_disable_default(struct gendisk *disk)
+e34cbd307477ae Jens Axboe        2016-11-09  20  {
+e34cbd307477ae Jens Axboe        2016-11-09  21  }
+04aad37be1a88d Christoph Hellwig 2023-02-03  22  static inline void wbt_enable_default(struct gendisk *disk)
+e34cbd307477ae Jens Axboe        2016-11-09  23  {
+e34cbd307477ae Jens Axboe        2016-11-09  24  }
+e34cbd307477ae Jens Axboe        2016-11-09  25  
+
 -- 
-2.47.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
