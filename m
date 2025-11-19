@@ -1,52 +1,56 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37B9B33C1A0
-	for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 12:09:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 990E7357731
+	for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 12:09:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763554195; cv=none; b=PxSVNGzVixiQpur8mYQmB7cGQhaKVSPWuxPs51YdandspFT3BFUaSWk8UneACitSVvMJgtqWTRoPRVOY/Ma7h/I0eJLcaat8z8pQ/osGwRXO/2gluAMk0moIctcBYljIEYYkxG1IV5TLPwFf9NXpoO4kRdg5/QRZXUotN4I3hwE=
+	t=1763554200; cv=none; b=rtTWJuxv1qqohpegMMvZfJ4GdrFjYnixQuY8asOFFoL3u4K7HwBZ3Co7MwMPt8UTsjB5pP0aqwtqlMkT6gGzLK/9Jz4qfEw0baO6pKeX4K4d66ZGjG1C45+lyFRzz30nXFQxqmfFOn5ivbMgWWptsq4uF8fEl5ES6fCCXHcaC70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763554195; c=relaxed/simple;
-	bh=Md0U8PnYx3hpZSRjVTmfIBRRxHHpEemGpxJgcea3/fM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=T9zYuxb3yQaAR+B2IzL5PX4UVpqE58p2eJH2s4X9xDftL/DWPDfnOcVm0ARD46uBn9DDdtRmz8/dYh9WbOi1YYGZWzIs5avQS66UXPBBFBhPKq3KusuwJcDJRndAnMA54zSzWm4jm0OuLf825zG2Y03UOwQVESTrEk+cAWQ/CpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J+PQEwgM; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1763554200; c=relaxed/simple;
+	bh=7ZM+iUxpYJU5OoPZPKU66pJryakGaXvujNH2tvfTIDk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=THzqxovyrnOKNOkOassxAikVZ6ty3TFwb8SeeJ6c4M5mwTysCN3R+jUJWyxoGvNxfPZ9Yvo0LryhVmQCIXnRI5DeHEb5Bto6BpPnHKW9sxqsQvEhk8DyZj8W4nq3O5hPUeAfGdAidCJRSzIe4PL7lJCIY1bI8BrmzvnHvqvjdts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Yx63SI1k; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J+PQEwgM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yx63SI1k"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763554193;
+	s=mimecast20190719; t=1763554197;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=WUR3hRDWZrQyzE5ZOTPtliWhNphRCp4lcYgm6h8yHP4=;
-	b=J+PQEwgMWGOTC4NLvMPLScZxdbF15ST5iFitjdJet5roVUv7BNOKhy3VFIrrnHkvxM6nzB
-	u0PuNaIV89j+KYndh4Ovxnxc3oatf+c6kwKgGdayWMq6WBp04QsB5kQhXoMHismPs0ZWW4
-	jV9cJnQeXk1T8d7wp605n8w6ONkpExo=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wy6G2kh5eV8l/uL4P2RMMnpb+ZvKskVlTmh/lU/7n1k=;
+	b=Yx63SI1krl7wlu2Dt0xxCpUysnYKf9IuzSwgivPbFbB0xHnMKJhjXDy01f4vpU/n2+9B6+
+	BSMkBGY9TNMSP4MVxnpK9ompPKOoCCWGixrPavp2dsTjGESLAiPDb1h7xFgA2hlLWhYdbi
+	6FeN7ngSkzs2dNbqk8DZj25kK/M/2yM=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-613-_yqT4mizOLCVNfaujVJ_6A-1; Wed,
- 19 Nov 2025 07:09:51 -0500
-X-MC-Unique: _yqT4mizOLCVNfaujVJ_6A-1
-X-Mimecast-MFC-AGG-ID: _yqT4mizOLCVNfaujVJ_6A_1763554190
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-637-oFSaHYtQNkWsWp-dA1arpw-1; Wed,
+ 19 Nov 2025 07:09:56 -0500
+X-MC-Unique: oFSaHYtQNkWsWp-dA1arpw-1
+X-Mimecast-MFC-AGG-ID: oFSaHYtQNkWsWp-dA1arpw_1763554195
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 35F4919560A3;
-	Wed, 19 Nov 2025 12:09:50 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3DA7518AB406;
+	Wed, 19 Nov 2025 12:09:55 +0000 (UTC)
 Received: from localhost (unknown [10.72.116.74])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1263A195608E;
-	Wed, 19 Nov 2025 12:09:48 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3DE2719560B0;
+	Wed, 19 Nov 2025 12:09:53 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
 Cc: Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 0/3] loop: nowait aio bug fixes
-Date: Wed, 19 Nov 2025 20:09:32 +0800
-Message-ID: <20251119120937.3424475-1-ming.lei@redhat.com>
+Subject: [PATCH V2 1/3] loop: move kiocb_start_write to aio prep phase
+Date: Wed, 19 Nov 2025 20:09:33 +0800
+Message-ID: <20251119120937.3424475-2-ming.lei@redhat.com>
+In-Reply-To: <20251119120937.3424475-1-ming.lei@redhat.com>
+References: <20251119120937.3424475-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -54,26 +58,48 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Hi Jens,
+Move the kiocb_start_write() call from lo_submit_rw_aio() to lo_rw_aio_prep()
+to initialize write accounting earlier in the I/O preparation phase rather
+than during submission.
 
-The 1st two patches fix error handling code paths for nowait aio.
+Make sure both kiocb_start_write() and kiocb_end_write() are called just once.
 
-The last patch fixes IO hang issue because of writeback throttle.
+Fixes: 0ba93a906dda ("loop: try to handle loop aio command via NOWAIT IO first")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/block/loop.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-V2:
-	- use QUEUE_FLAG_DISABLE_WBT_DEF to disable wbt, so that
-	  check of QUEUE_FLAG_QOS_ENABLED can work as expected
-
-Ming Lei (3):
-  loop: move kiocb_start_write to aio prep phase
-  loop: fix error handling in aio functions
-  loop: disable writeback throttling and fix nowait support
-
- drivers/block/loop.c | 28 +++++++++++++++++++---------
- 1 file changed, 19 insertions(+), 9 deletions(-)
-
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 9b842d767381..64295c141b97 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -402,6 +402,9 @@ static int lo_rw_aio_prep(struct loop_device *lo, struct loop_cmd *cmd,
+ 		cmd->iocb.ki_complete = NULL;
+ 		cmd->iocb.ki_flags = 0;
+ 	}
++
++	if (req_op(rq) == REQ_OP_WRITE)
++		kiocb_start_write(&cmd->iocb);
+ 	return 0;
+ }
+ 
+@@ -431,11 +434,9 @@ static int lo_submit_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 	}
+ 	atomic_set(&cmd->ref, 2);
+ 
+-
+-	if (rw == ITER_SOURCE) {
+-		kiocb_start_write(&cmd->iocb);
++	if (rw == ITER_SOURCE)
+ 		ret = file->f_op->write_iter(&cmd->iocb, &iter);
+-	} else
++	else
+ 		ret = file->f_op->read_iter(&cmd->iocb, &iter);
+ 
+ 	lo_rw_aio_do_completion(cmd);
 -- 
 2.47.0
 
