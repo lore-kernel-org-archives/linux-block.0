@@ -1,74 +1,69 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F23363702F2
-	for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 03:06:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 635AB20013A;
+	Wed, 19 Nov 2025 03:09:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763521587; cv=none; b=VxH2zM2n2fNLOc8RLs+Nj+Jd6FZ5ew4GWNnR/L/rpBIPih+h/d6RGS0KS+RiLrtO5xXOH8Fcd66ggl2IhODbMVU7Gbx+IfG8QeMKI2jlA+CiE6/j98ju1FTs+FTzyj6Bbf2jioUdCyvL+nFei+qTQM/T5nU5g8rLpy7CznoEncI=
+	t=1763521763; cv=none; b=Vi6JteFg3T8jvpyg6ibREkD75nS56sMEQK6bgj+XrNyxS7AhSqxXFZ8HIOILL+P8pfBerqCJ0RHQDCZbFV0nGdF4JAFn9q9UnuWxDZJ8bsNXdRDjHIqjvUMfYdbxWEaUw7h10ZVBHsBHD43fqZwLGqSp+BoXZLaJAnsIbWwYYo0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763521587; c=relaxed/simple;
-	bh=6gyuz9tf0hIcgg0bU/0HP/4zUnzh/1Aby046pI6j7Zc=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rZ9bRxhaRlc1B5o7BD7iO3Jy8WuBoFJn4ucyzxJfjZQeiL9r9F3tjIjfGa2Q4w00i667MxPw6nTQFquyqpx20qxoqoHEgnJyQHba1bhBmCcfUbfmmOrO+xlMGq+YjYI7wHYqm5TCy1Dle6/1I97z9rVwPYGLt0nrcBS7nTH9zyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cuYQ4djE; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763521763; c=relaxed/simple;
+	bh=IY1ZSGuNVG8n3akLPyxT/m6RozNuxx45nMvrXGrtQPw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gQsGuhxn7EYWYpQ4cxtSjqAeYny/ywNJdKo/H1Ek8Ww6sRONRw+gH7HvRlA0C91XkV0XdoBEze72D8z3yMym+QdrXfgejEfIZhBkN9SVdHu2FrFQMVdgRvLkHm/dgLs2i6BhifS9lyyIUoDTXp71O/8qiQAtE+vJsS6VLrBPjIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ip0wh9H+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cuYQ4djE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9F68C19425;
-	Wed, 19 Nov 2025 03:06:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ip0wh9H+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A08B4C4AF0F;
+	Wed, 19 Nov 2025 03:09:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763521586;
-	bh=6gyuz9tf0hIcgg0bU/0HP/4zUnzh/1Aby046pI6j7Zc=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=cuYQ4djEUOxe1UXChYZimFlTMlANClR9STpuTynePIN4lgcF9VpCd9W2l0pCasQXm
-	 YYeUritb8HDGQPCt+zF7Lp6O+EX/3DoN0jmEqwqV8n30WPswf6nKg28D5d1AUszTaf
-	 nwMi+7KTTYdNcD1If4jNyMHVeaqVnPzQiZpHf5VdOZjZ7/KtzVvCBpIDD7CXxUofKC
-	 0egPYJn1PEP0H7b9rmM1GzH8lYGhw7FmynMJgJ9rKzTKxAhT4SUjY3nYg9XEpC9Qxr
-	 XLy8LuLpjtheXMSJkBwcNNcVid7HrxJ8s0ttUXzcHOSObDRzyCBi9mPQscxeUNX5Wy
-	 ZSYMtx6EoTq2w==
-From: Damien Le Moal <dlemoal@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Subject: [PATCH 2/2] MAINTAINERS: add a maintainer for zoned block device support
-Date: Wed, 19 Nov 2025 12:02:20 +0900
-Message-ID: <20251119030220.1611413-3-dlemoal@kernel.org>
-X-Mailer: git-send-email 2.51.1
-In-Reply-To: <20251119030220.1611413-1-dlemoal@kernel.org>
-References: <20251119030220.1611413-1-dlemoal@kernel.org>
+	s=k20201202; t=1763521762;
+	bh=IY1ZSGuNVG8n3akLPyxT/m6RozNuxx45nMvrXGrtQPw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ip0wh9H+yC7Q2BkyXn5mdBy6UTTCZZofqyquBVMQctO1/kDVqhaoxGTcXakgi9k2C
+	 FPlwFuSHx2hnPRG27iLaTks21NFpQxvL4twVy0x7TceHRxYZN/ArNuN97WvQAVO5o4
+	 3UQSSND3sB3Ux6KwZZHAzAN1MuXA0xK2drz0XyH0TXZXZOw4kFg8PhCFounEASO533
+	 zHYICf/yOkW0gWDshyI1OkHW/OiHtnSMAjn1OX0OhGe9uXicugmBdIP5kIh7YtGZDX
+	 xduKP4ELxoiZTQUC0HdH5GtuHp3yU+4hvM0/ExCX+RnfFIDcuyHgqle98krXccbrSh
+	 vpnfUk2/xcq7w==
+Message-ID: <66d29741-13a6-42a5-bf34-ddbcb32975d0@kernel.org>
+Date: Wed, 19 Nov 2025 12:09:19 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] block: add a bio_list_add_sorted helper
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: Mike Snitzer <snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>,
+ linux-block@vger.kernel.org, dm-devel@lists.linux.dev
+References: <20251118070321.2367097-1-hch@lst.de>
+ <20251118070321.2367097-2-hch@lst.de>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <20251118070321.2367097-2-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Add myself as the maintainer of the block layer support for the zoned
-block device code and user API.
+On 11/18/25 16:03, Christoph Hellwig wrote:
+> Add a helper to insert a bio into a bio_list so that the list remains
+> sorted by bi_sector.
+> 
+> While it is on the upper hand of the size for an inline function, it is a
+> trade off for having it with the common helpers, but not bloating the
+> kernel unless the so far only user is enabled.  If it gets more widely
+> used moving it out of line should be considered.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
----
- MAINTAINERS | 7 +++++++
- 1 file changed, 7 insertions(+)
+Looks good to me.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 037275e53cc5..7157e41e3fa1 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -28313,6 +28313,13 @@ L:	linux-kernel@vger.kernel.org
- S:	Maintained
- F:	arch/x86/kernel/cpu/zhaoxin.c
- 
-+ZONED BLOCK DEVICE (BLOCK LAYER)
-+M:	Damien Le Moal <dlemoal@kernel.org>
-+L:	linux-block@vger.kernel.org
-+S:	Maintained
-+F:	block/blk-zoned.c
-+F:	include/uapi/linux/blkzoned.h
-+
- ZONED LOOP DEVICE
- M:	Damien Le Moal <dlemoal@kernel.org>
- R:	Christoph Hellwig <hch@lst.de>
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+
+
 -- 
-2.51.1
-
+Damien Le Moal
+Western Digital Research
