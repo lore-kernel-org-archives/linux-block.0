@@ -1,113 +1,317 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC8BD22AE7A
-	for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 01:52:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BFE22882B7
+	for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 02:37:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763517172; cv=none; b=roA+l1JF8Rle6HHB9HpKJITGjkv7OOfSUXBXgjlIKBUZ5hmYUiddRksJEEwrcJqjLTh1lDAgwGtiJrP9lo9XF2y3K/vwrnVYVIMO9Wc36Ab3Vi3AcaAJrVHkm56Syd7alBrlkBE9cj/JODRavemu2PnepvDOZgePryF2CzcLBm8=
+	t=1763519851; cv=none; b=OSe17LcAfJ3dhW4pAW+MT4B7xHUgPxVQ1Gz81SXRWd5/H6PVP/pE9mHeHvvzUJrEJViw6DCCBXSA8S+wzWKYrVe/kUTXP+UsMfTtLWXzuDLDo8irY/M9xhUHLBwAeYn3uWtUuvYc/4IMvor5xzXJd6r+0HEvn/RdaR3xLYSSULQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763517172; c=relaxed/simple;
-	bh=LEzpLo1hUxryXT8cMpe80ker7J7M+LCuwGcuDq4/zvM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZDsh1eB1ZZ2DW/eAX3hfl9R4enXuxGhHnAvssvF+YTjIxA3aIY+3xSoh/EpqhwrY6T82B/ss5ZAjsZhXKJyVO4g1JvueBx4bQtPOF5V1P9XkbuqwdvTON5N5r3iEeqXSDb/k9mXtRH/FijvdlxiswEALXXs/4ovDN66jj0R/iC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fndKsSeX; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1763519851; c=relaxed/simple;
+	bh=jLA0oS70U6WFwOAOgyGdmGf6Q1SXV0r4dYhOs21QcaE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KiR1lmPICd1xKY/aLummvnAUYIpw7f+qxYe6li7hHbz9gbx9iBEh8kWQkAeA47EK3fZ6x1ISKUMO1MPTp1fDSXgAUpY/CJz3BS2LnMaVy7lCaW5fc1jVHD6hlo8RSO+gbBBOrlUPKD1bArBioTgIZPwc+dCMQZUL3xjEAHa8zyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=GMb63uDx; arc=none smtp.client-ip=209.85.215.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fndKsSeX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763517168;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aj/ywx73k81CNsOcA+I92pYtR8bwljudVgYjAUUAFmg=;
-	b=fndKsSeXSCtyRz6iPvU2W1zfpR682l7SaorvsFCBSb8l23ErFwbgmamXKSAwLHv9WzSauO
-	CGlOJe5ScaSIPOu0plhSPa1b3eqJMI6myeLyv3Aexgw7sgUK5/agdKqtEr/uPUrT5en5qN
-	swsR5PAQo1RI3R3jLtwASFnB16gnHV4=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-101-vRIljo3vNcaB4O5-uj7jAg-1; Tue,
- 18 Nov 2025 20:52:42 -0500
-X-MC-Unique: vRIljo3vNcaB4O5-uj7jAg-1
-X-Mimecast-MFC-AGG-ID: vRIljo3vNcaB4O5-uj7jAg_1763517160
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 38F9718AB400;
-	Wed, 19 Nov 2025 01:52:39 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.74])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BFC67195608E;
-	Wed, 19 Nov 2025 01:52:30 +0000 (UTC)
-Date: Wed, 19 Nov 2025 09:52:25 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: "Guo, Wangyang" <wangyang.guo@intel.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@fb.com>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-	virtualization@lists.linux-foundation.org,
-	linux-block@vger.kernel.org, Tianyou Li <tianyou.li@intel.com>,
-	Tim Chen <tim.c.chen@linux.intel.com>,
-	Dan Liang <dan.liang@intel.com>
-Subject: Re: [PATCH RESEND] lib/group_cpus: make group CPU cluster aware
-Message-ID: <aR0i2f91VGv47swo@fedora>
-References: <20251111020608.1501543-1-wangyang.guo@intel.com>
- <aRKssW96lHFrT2ZN@fedora>
- <b94a0d74-0770-4751-9064-2ef077fada14@intel.com>
- <aRMnR5DRdsU8lGtU@fedora>
- <a101fe80-ca0b-4b4b-94b1-f08db1b164fc@intel.com>
- <aRU2sC5q5hCmS_eM@fedora>
- <da1d6b4e-038c-48dc-830d-5eadb3ac943f@intel.com>
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="GMb63uDx"
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-b983fbc731bso446324a12.2
+        for <linux-block@vger.kernel.org>; Tue, 18 Nov 2025 18:37:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1763519849; x=1764124649; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vPSStqyxtxRHfFDVIG7+UAyDlwAk26RCYvcKQTsYows=;
+        b=GMb63uDxkZ1tainaxc0eJbfsAqt87KqX4vUYlCQQePx99RgEZVmrJmsLxW3syrsFsl
+         sf85CuGxHwzqSdLdAMkKnMvnUIkiOevo1HxutOwbDVDMg6NbOiXu8qVHoDPMbnqOzrbi
+         Xo2Og5UNPtrzuzCmS6yXraTe/7d04K25zItCkGSz6EtJGMhrQGz+g343iphZv2FpbtlQ
+         cNe9BEdvEksZ5FnRKv9XN3yx0S3SsBEA3PoaLE+jhpRjmtGNB4smtGdcpmPfeg/U4ClX
+         zm1h5lhv+0dVBzWZt699gdqgwuQauZoGBvRKCRP+C2IqyuIviFOTpBBWpKnigZOscQo2
+         Itkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763519849; x=1764124649;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=vPSStqyxtxRHfFDVIG7+UAyDlwAk26RCYvcKQTsYows=;
+        b=NmmvMJSoaaFKMsfKrdjAIH58QT1hOE507DkfxxWMasoeCjFlxlj8RxdQmiiRJbiJqI
+         hn+HBmr0hvUAWS3PBnSJHIAbGhqVzYLwlF2fofMh4Qs2v8CK+VOlXLHm2sQKp879msNu
+         accNd0WAtEKClWZEoADYt25+AYuLP6SxtnxN58bGnCebkqp/UyiP8ZOIsLWBviygVc4I
+         C16taD9dIW3thb6eUYN+UOY8EykuSTUJdckx46YHlx/MRNWTCUC6jJJpQcSkKZY87cdQ
+         E/C+lpkKnmy14DFVBdm/V0T8OzIDYtVzYdVcV7eTaV/VnqE7iBmcL9CquKI6BU5H6zb3
+         VsKg==
+X-Forwarded-Encrypted: i=1; AJvYcCVm9hA5O6kbHGpi9POya83yfOg6r3rkGpIhsO+BP4AD60M9u2GxmffGZ5gj0QWCoG0xubQqiiiT+Ryrlw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8uerUSrMQLZROg1s7eIsZ2MSfnIUhS4QjXjN/wMIhOcwQo0Pv
+	B/mPqeoPsEgo5xd5OpzgBgZyD45CGKhNBpzxLM1/fhVzAcxwdQqneSOPEtvCtv159PyPLkFxazL
+	xEoMvy4kpj3RUrDe2XD+BFmhCA2UiiaMZT60ch9FP3A==
+X-Gm-Gg: ASbGncuAhFL9a037wAG+zB8D5yRCFq5JgdMZCpUYy81fGoIRDF0yRNjuGq/+TIvKrr2
+	5Mo/QjVw2ck7qJNU1xyS+jXORceU9w5APf/l5I42qt4I3o4fjmq1l75UseRDEcxUkpzB2QM8/Gw
+	a3oUm8nKI0hNmxl3108Nr4pHgJZdXiJFXkKFMM/f72bb4T0/knAsRmHtV3IZgrUejpbIx1JaPFc
+	37lWfZFy8nHhG8Qw3vzCPSrIvUQYfOTN85mtAhyC8Cgj20EtujPTRnFjTTbKqUQRttsTEDQR7tL
+	a4nh3tg=
+X-Google-Smtp-Source: AGHT+IFJbgiDdokeJVn7Ca0hYaCr4pYTTAgFMYW16RXAUMP6qdt/ET7w/cVZVhhKBCTP8TVGjTNWf7ZNmOWhIQRrrQA=
+X-Received: by 2002:a05:7022:61a9:b0:119:e56a:4ffb with SMTP id
+ a92af1059eb24-11b40b36d09mr7576320c88.0.1763519848412; Tue, 18 Nov 2025
+ 18:37:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <da1d6b4e-038c-48dc-830d-5eadb3ac943f@intel.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+References: <20251112093808.2134129-1-ming.lei@redhat.com> <20251112093808.2134129-10-ming.lei@redhat.com>
+In-Reply-To: <20251112093808.2134129-10-ming.lei@redhat.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Tue, 18 Nov 2025 18:37:17 -0800
+X-Gm-Features: AWmQ_bmUzT5gDAjXTPsskXs1gSmJDb7fOU9DeEsXH9a4wOMhW1w-Zeat2nwN00o
+Message-ID: <CADUfDZpoeUF+dAm4AtjzC-+BOwwZr2CnTgcZoPAE_4KNNsmoXw@mail.gmail.com>
+Subject: Re: [PATCH V3 09/27] ublk: add new batch command UBLK_U_IO_PREP_IO_CMDS
+ & UBLK_U_IO_COMMIT_IO_CMDS
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	Uday Shankar <ushankar@purestorage.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 18, 2025 at 02:29:20PM +0800, Guo, Wangyang wrote:
-> On 11/13/2025 9:38 AM, Ming Lei wrote:
-> > On Wed, Nov 12, 2025 at 11:02:47AM +0800, Guo, Wangyang wrote:
-> > > On 11/11/2025 8:08 PM, Ming Lei wrote:
-> > > > On Tue, Nov 11, 2025 at 01:31:04PM +0800, Guo, Wangyang wrote:
-> > > > They still should share same L3 cache, and cpus_share_cache() should be
-> > > > true when the IO completes on the CPU which belong to different L2 with the
-> > > > submission CPU, and remote completion via IPI won't be triggered.
-> > > Yes, remote IPI not triggered.
-> > 
-> > OK, in my test on AMD zen4, NVMe performance can be dropped to 1/2 - 1/3 if
-> > remote IPI is triggered in case of crossing L3, which is understandable.
-> > 
-> > I will check if topo cluster can cover L3, if yes, the patch still can be
-> > simplified a lot by introducing sub-node spread by changing build_node_to_cpumask()
-> > and adding nr_sub_nodes.
-> 
-> Do you mean using cluster as "NUMA" nodes to spread CPU, instead of two
-> level NUMA-cluster spreading?
+On Wed, Nov 12, 2025 at 1:39=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
+e:
+>
+> Add new command UBLK_U_IO_PREP_IO_CMDS, which is the batch version of
+> UBLK_IO_FETCH_REQ.
+>
+> Add new command UBLK_U_IO_COMMIT_IO_CMDS, which is for committing io comm=
+and
+> result only, still the batch version.
+>
+> The new command header type is `struct ublk_batch_io`, and fixed buffer i=
+s
+> required for these two uring_cmd.
+>
+> This patch doesn't actually implement these commands yet, just validates =
+the
+> SQE fields.
+>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  drivers/block/ublk_drv.c      | 107 +++++++++++++++++++++++++++++++++-
+>  include/uapi/linux/ublk_cmd.h |  49 ++++++++++++++++
+>  2 files changed, 155 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index c62b2f2057fe..5f9d7ec9daa4 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -85,6 +85,11 @@
+>          UBLK_PARAM_TYPE_DEVT | UBLK_PARAM_TYPE_ZONED |    \
+>          UBLK_PARAM_TYPE_DMA_ALIGN | UBLK_PARAM_TYPE_SEGMENT)
+>
+> +#define UBLK_BATCH_F_ALL  \
+> +       (UBLK_BATCH_F_HAS_ZONE_LBA | \
+> +        UBLK_BATCH_F_HAS_BUF_ADDR | \
+> +        UBLK_BATCH_F_AUTO_BUF_REG_FALLBACK)
+> +
+>  struct ublk_uring_cmd_pdu {
+>         /*
+>          * Store requests in same batch temporarily for queuing them to
+> @@ -108,6 +113,12 @@ struct ublk_uring_cmd_pdu {
+>         u16 tag;
+>  };
+>
+> +struct ublk_batch_io_data {
+> +       struct ublk_device *ub;
+> +       struct io_uring_cmd *cmd;
+> +       struct ublk_batch_io header;
+> +};
+> +
+>  /*
+>   * io command is active: sqe cmd is received, and its cqe isn't done
+>   *
+> @@ -2520,10 +2531,104 @@ static int ublk_ch_uring_cmd(struct io_uring_cmd=
+ *cmd, unsigned int issue_flags)
+>         return ublk_ch_uring_cmd_local(cmd, issue_flags);
+>  }
+>
+> +static int ublk_check_batch_cmd_flags(const struct ublk_batch_io *uc)
+> +{
+> +       const u16 mask =3D UBLK_BATCH_F_HAS_BUF_ADDR | UBLK_BATCH_F_HAS_Z=
+ONE_LBA;
+> +       const unsigned header_len =3D sizeof(struct ublk_elem_header);
+> +
+> +       if (uc->flags & ~UBLK_BATCH_F_ALL)
+> +               return -EINVAL;
+> +
+> +       /* UBLK_BATCH_F_AUTO_BUF_REG_FALLBACK requires buffer index */
+> +       if ((uc->flags & UBLK_BATCH_F_AUTO_BUF_REG_FALLBACK) &&
+> +                       (uc->flags & UBLK_BATCH_F_HAS_BUF_ADDR))
+> +               return -EINVAL;
+> +
+> +       switch (uc->flags & mask) {
+> +       case 0:
+> +               if (uc->elem_bytes !=3D header_len)
+> +                       return -EINVAL;
+> +               break;
+> +       case UBLK_BATCH_F_HAS_ZONE_LBA:
+> +       case UBLK_BATCH_F_HAS_BUF_ADDR:
+> +               if (uc->elem_bytes !=3D header_len + sizeof(u64))
+> +                       return -EINVAL;
+> +               break;
+> +       case UBLK_BATCH_F_HAS_ZONE_LBA | UBLK_BATCH_F_HAS_BUF_ADDR:
+> +               if (uc->elem_bytes !=3D header_len + sizeof(u64) + sizeof=
+(u64))
+> +                       return -EINVAL;
+> +               break;
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+> +static int ublk_check_batch_cmd(const struct ublk_batch_io_data *data)
+> +{
+> +
+> +       const struct ublk_batch_io *uc =3D &data->header;
+> +
+> +       if (!(data->cmd->flags & IORING_URING_CMD_FIXED))
+> +               return -EINVAL;
+> +
+> +       if (uc->nr_elem * uc->elem_bytes > data->cmd->sqe->len)
 
-Yes, I think the change may be minimized by introducing sub-numa-node for
-covering it, what do you think of this approach?
+sqe->len should be accessed with READ_ONCE() since it may point to
+user-mapped memory.
 
-However, it is bad to use cluster as sub-numa-node at default, because cluster
-is aligned with CPUs sharing L2 cache, so there could be too many clusters
-for many systems in which one cluster just includes two CPUs, then the finally
-calculated mapping crosses clusters inevitably because nr_queues is
-less than nr_clusters.
+Best,
+Caleb
 
-I'd suggest to map CPUs sharing L3 cache into one sub-numa-node.
-
-For your case, either adding one kernel parameter, or adding group_cpus_cluster()
-API for the unusual case by sharing single code path.
-
-
-Thanks,
-Ming
-
+> +               return -E2BIG;
+> +
+> +       if (uc->nr_elem > data->ub->dev_info.queue_depth)
+> +               return -E2BIG;
+> +
+> +       if ((uc->flags & UBLK_BATCH_F_HAS_ZONE_LBA) &&
+> +                       !ublk_dev_is_zoned(data->ub))
+> +               return -EINVAL;
+> +
+> +       if ((uc->flags & UBLK_BATCH_F_HAS_BUF_ADDR) &&
+> +                       !ublk_dev_need_map_io(data->ub))
+> +               return -EINVAL;
+> +
+> +       if ((uc->flags & UBLK_BATCH_F_AUTO_BUF_REG_FALLBACK) &&
+> +                       !ublk_dev_support_auto_buf_reg(data->ub))
+> +               return -EINVAL;
+> +
+> +       if (uc->reserved || uc->reserved2)
+> +               return -EINVAL;
+> +
+> +       return ublk_check_batch_cmd_flags(uc);
+> +}
+> +
+>  static int ublk_ch_batch_io_uring_cmd(struct io_uring_cmd *cmd,
+>                                        unsigned int issue_flags)
+>  {
+> -       return -EOPNOTSUPP;
+> +       const struct ublk_batch_io *uc =3D io_uring_sqe_cmd(cmd->sqe);
+> +       struct ublk_device *ub =3D cmd->file->private_data;
+> +       struct ublk_batch_io_data data =3D {
+> +               .ub  =3D ub,
+> +               .cmd =3D cmd,
+> +               .header =3D (struct ublk_batch_io) {
+> +                       .q_id =3D READ_ONCE(uc->q_id),
+> +                       .flags =3D READ_ONCE(uc->flags),
+> +                       .nr_elem =3D READ_ONCE(uc->nr_elem),
+> +                       .elem_bytes =3D READ_ONCE(uc->elem_bytes),
+> +               },
+> +       };
+> +       u32 cmd_op =3D cmd->cmd_op;
+> +       int ret =3D -EINVAL;
+> +
+> +       if (data.header.q_id >=3D ub->dev_info.nr_hw_queues)
+> +               goto out;
+> +
+> +       switch (cmd_op) {
+> +       case UBLK_U_IO_PREP_IO_CMDS:
+> +       case UBLK_U_IO_COMMIT_IO_CMDS:
+> +               ret =3D ublk_check_batch_cmd(&data);
+> +               if (ret)
+> +                       goto out;
+> +               ret =3D -EOPNOTSUPP;
+> +               break;
+> +       default:
+> +               ret =3D -EOPNOTSUPP;
+> +       }
+> +out:
+> +       return ret;
+>  }
+>
+>  static inline bool ublk_check_ubuf_dir(const struct request *req,
+> diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.=
+h
+> index ec77dabba45b..2ce5a496b622 100644
+> --- a/include/uapi/linux/ublk_cmd.h
+> +++ b/include/uapi/linux/ublk_cmd.h
+> @@ -102,6 +102,10 @@
+>         _IOWR('u', 0x23, struct ublksrv_io_cmd)
+>  #define        UBLK_U_IO_UNREGISTER_IO_BUF     \
+>         _IOWR('u', 0x24, struct ublksrv_io_cmd)
+> +#define        UBLK_U_IO_PREP_IO_CMDS  \
+> +       _IOWR('u', 0x25, struct ublk_batch_io)
+> +#define        UBLK_U_IO_COMMIT_IO_CMDS        \
+> +       _IOWR('u', 0x26, struct ublk_batch_io)
+>
+>  /* only ABORT means that no re-fetch */
+>  #define UBLK_IO_RES_OK                 0
+> @@ -525,6 +529,51 @@ struct ublksrv_io_cmd {
+>         };
+>  };
+>
+> +struct ublk_elem_header {
+> +       __u16 tag;      /* IO tag */
+> +
+> +       /*
+> +        * Buffer index for incoming io command, only valid iff
+> +        * UBLK_F_AUTO_BUF_REG is set
+> +        */
+> +       __u16 buf_index;
+> +       __s32 result;   /* I/O completion result (commit only) */
+> +};
+> +
+> +/*
+> + * uring_cmd buffer structure for batch commands
+> + *
+> + * buffer includes multiple elements, which number is specified by
+> + * `nr_elem`. Each element buffer is organized in the following order:
+> + *
+> + * struct ublk_elem_buffer {
+> + *     // Mandatory fields (8 bytes)
+> + *     struct ublk_elem_header header;
+> + *
+> + *     // Optional fields (8 bytes each, included based on flags)
+> + *
+> + *     // Buffer address (if UBLK_BATCH_F_HAS_BUF_ADDR) for copying data
+> + *     // between ublk request and ublk server buffer
+> + *     __u64 buf_addr;
+> + *
+> + *     // returned Zone append LBA (if UBLK_BATCH_F_HAS_ZONE_LBA)
+> + *     __u64 zone_lba;
+> + * }
+> + *
+> + * Used for `UBLK_U_IO_PREP_IO_CMDS` and `UBLK_U_IO_COMMIT_IO_CMDS`
+> + */
+> +struct ublk_batch_io {
+> +       __u16  q_id;
+> +#define UBLK_BATCH_F_HAS_ZONE_LBA      (1 << 0)
+> +#define UBLK_BATCH_F_HAS_BUF_ADDR      (1 << 1)
+> +#define UBLK_BATCH_F_AUTO_BUF_REG_FALLBACK     (1 << 2)
+> +       __u16   flags;
+> +       __u16   nr_elem;
+> +       __u8    elem_bytes;
+> +       __u8    reserved;
+> +       __u64   reserved2;
+> +};
+> +
+>  struct ublk_param_basic {
+>  #define UBLK_ATTR_READ_ONLY            (1 << 0)
+>  #define UBLK_ATTR_ROTATIONAL           (1 << 1)
+> --
+> 2.47.0
+>
