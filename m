@@ -1,144 +1,155 @@
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 473E431AF2C
-	for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 19:21:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B97336CDE3
+	for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 19:31:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763580110; cv=none; b=cpgY4wKcBLRB1JggaNMJEU73OaiDpsp+lOZZxWS4Tq4S327Nwb5SBnUxxizPwKlc+Xlwy7KxkKtIemH6t0s/Wdr03XGEf9zOxMIuQL3YOFkPwqBgTd+snp19ANFk6nUb9YiV6sNqAdAr8Kpu8YQOOAVNlYL5X/5pvqih0zVOCNQ=
+	t=1763580685; cv=none; b=looaUMyZbpcxwYuCyVFz9oH0cEb892Wip9GXPIkEsUDCazL7CbF0crrOjXYm2OWXQF250ID2fzHiMfqBaM7AXXxouBfXnrSQVYzNf5Z4T3NLx4grTcynfQMU5oL+vxkEoLDcyhWQGEQWpNB8x0T1rn0hUoI76Uv96TYs3E+m1aA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763580110; c=relaxed/simple;
-	bh=WTED/YYDZWox+2hg9SHvLPbN2cHQFlAfv8SPK2SrDus=;
-	h=Content-Type:Message-ID:Date:MIME-Version:To:Cc:References:
-	 Subject:From:In-Reply-To; b=u7nNNStqgrFz/6L+sm5CY4eS76UvgaXAPnX99NinvMU8Iw7FVuQgIIMGl5aaGoknkiL+br8L8qpsZAX8KDXhDGRV0wo61ooThW3Kc7v5Pen/lRU8BeedMA25rKQuECHsgRp8MMBm00HKnszmok9SfMFCDLjqbBB5RGzjzbCnihM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JFOZ8x9i; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1763580685; c=relaxed/simple;
+	bh=31o43Jiq7+42iBKuCHD0EJijctYU11Xzmoh7F9+p7aA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XVTpvNzZEVFvhBtb+88oQd1qvnJmh68mhO2CDLJXOP8vp1QKO9x7dhgssuczIOoqaZvpvscHNnkVpi918KWIGYWlwNGNml2ZDG05/qrwBjToKRbn61iHkdj2UL/Jd5i/xELCaCTtGbpXU+NsL3D4uwy7yVyjDMW0mQYFg+nKZco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=XdlJDak+; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JFOZ8x9i"
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-7b8bbf16b71so67103b3a.2
-        for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 11:21:44 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="XdlJDak+"
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4ee2014c228so741441cf.2
+        for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 11:31:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763580104; x=1764184904; darn=vger.kernel.org;
-        h=in-reply-to:from:content-language:subject:references:cc:to
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WTED/YYDZWox+2hg9SHvLPbN2cHQFlAfv8SPK2SrDus=;
-        b=JFOZ8x9i4MhDaZi6SzOVgQm5qlSfIw2UZmxv1LWFB/3gw6fj5VkmBxkhTkvbxbn9LZ
-         myNx0canRmmxGtn06AKMVsbFV7Ok3pH0g+wahEYXLhcF2AD3G8S1rwFth/LgUIGGvJaj
-         cLS/QJTAqc3isgWv2r4v8n1yXOk6zt+Og9LPXtLPExQEUaJ4ULXqzOwUta/7kF3TL5t0
-         vXMDRXXqRY7uNuIcINCx1q+dSvc3n7QmiNselafhtK8JEOmIZqmEkUJRpqM1ZjnIVTZA
-         S1DqueYsoONfbL3SwSw4mlc8f1tOMhEG9OJDvLnTdRGcey20ZIo54/hmtOknaZB0SqGf
-         MyfQ==
+        d=ziepe.ca; s=google; t=1763580676; x=1764185476; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=h7MnLKcAx1SQL4BtR2OdhLpsdZ14wJj1fNMBVXMaHpI=;
+        b=XdlJDak+5BK913SU3JuefgTys0Pu3jagmK7yJRyg0hso6vBbEnNWrP/4T4ol0frYeQ
+         v72slbgWiUzUkvc5J9nruxngr4U8bjd49BPaZVmvFk3nVkQeWMFAA9u86tKqv9X1hNhK
+         MlqYYLa9OWUP32XsBcZxKrfLx3/P5R6PJ+h5hBO1AY350/0bZcNA4a3VB+Mm2EZq+tuy
+         2zW8VsnOjICqJWrFFskAlkKYKVrHI+m3LVPh9ZWULCzK0B6ii9jOvGUvNr+rAbET5gKT
+         aIqFqtGZMVR1/oWhdLlQH/aHK4RI3YFZ+ToY0lGX/NpOTOSRqsVtdilqIlqws45I3kGI
+         vpCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763580104; x=1764184904;
-        h=in-reply-to:from:content-language:subject:references:cc:to
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WTED/YYDZWox+2hg9SHvLPbN2cHQFlAfv8SPK2SrDus=;
-        b=Z3zisprHeR2vOdFVELvXdU7GOqDvvR83SoYmiP4cJyo+eZ0Dz0uCZFN6lnjvidpvmm
-         1Lej8FK+RIYF4M7kDpcsOZ/F9N0vwf2aKbydGGXTOuUkMMHqTK7RkNzmHfaXlm8vRd8I
-         7sZo4QLXljCMJtnYQpamFzvCb8liVJQotZW8f8plddJBDZJMNiPbpHkX970+q8C03VwX
-         ZfvIS3vX/h0tkZ10YcbhAwuhfoSdVTZIF+LRcnnKMoZTNzJIvr3nKFKD5T3cyL6T4tpP
-         cOcZbTbq5M3nu2LtGRiuAbgXrGruxUoKL172gsh0Bk9KOdQeUmTkiViR1BM1I9N0NJlD
-         zGHw==
-X-Forwarded-Encrypted: i=1; AJvYcCXROyYZL5bkImDonuRPE3tehABugzmWzLkWkC0uOTt1G6JfOwuOBzLGTJqJd2c3gFUuK3dzGdWCwjVtWA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNlS0Eg87asnpvwL4OGB0tA2aDEAmMlgHI8xQFSsw9dKwPpLjD
-	HYACDyqg8k4ic8M+/a14Sv6qekECNCXjxhIq8LSAj0gwPtjSDRT/fiR8
-X-Gm-Gg: ASbGncuIA+ICOLRVv2gl5NU03ef/X8vjokYP6xWB5TuUeRFP6TvDG+b+GV6d/0gf6Mu
-	QNWPw7N7+DAIJNTYny1qk5U8oXzK/VA8p32lv//tSHVqZqV2Zc1ay0/vzSMAM+Ux0yzUhcSzmJN
-	UBxwEmjRfygz1IvEOF+7QI342YTm7wmRmL7MSthWJpznKrSxWqZGZTlRghtRtP07QVoJDImQGDM
-	yz7+WtY/sXhJeABVp8f4iU892IEim7dCzfgMVZB+EhCMtDCeuwGB+GBp/gG5qxCAgswn6MSYV/3
-	lKDprz9YGPdinjeQ2+q0s/HozvS4QI5NuvLUfr9+tR7jTPcPHrhyOYHNUejes2nFIM9yC5sxgtM
-	brEGbsc8FuA1plyxJl1KnviMASvB8jnn4TKHwWZVOf8Q6iXqVGw4yvzDRNQF1s6UTXnL7TpCxQp
-	TCdzJVgTVSWqjixX6RHpF3Swlgrxj/sAPYeDBaS3AoyJ09YXkiHg9QjWU=
-X-Google-Smtp-Source: AGHT+IFLbC/rztisIiXYjC/ez7d9Iv7d5pLuzLJRTo4hY6XRNpZ6MEkTYf0tAhhUqPyepq3Nhwgexw==
-X-Received: by 2002:a05:6a00:852:b0:781:c54:4d12 with SMTP id d2e1a72fcca58-7c3efb55cbcmr236128b3a.13.1763580103752;
-        Wed, 19 Nov 2025 11:21:43 -0800 (PST)
-Received: from ?IPV6:2405:201:31:d869:f90c:b1d6:a722:7f9d? ([2405:201:31:d869:f90c:b1d6:a722:7f9d])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7c3f0b62e95sm117707b3a.49.2025.11.19.11.21.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Nov 2025 11:21:43 -0800 (PST)
-Content-Type: multipart/mixed; boundary="------------zqXZ6heSUwwpYluG4WpryJIn"
-Message-ID: <b19fc9a6-61e3-4c1e-8272-ea63f0d074ae@gmail.com>
-Date: Thu, 20 Nov 2025 00:51:39 +0530
+        d=1e100.net; s=20230601; t=1763580676; x=1764185476;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=h7MnLKcAx1SQL4BtR2OdhLpsdZ14wJj1fNMBVXMaHpI=;
+        b=r98aCPNxXpIC7Cn8gYwfuTgzAvvSLA/PSe+r+EUsJXOtVb2tIRnO0Ck50ptYj5z2rD
+         8xed7G2c0e5bpOoUcT23YPeevly20M4iJrsCyYd5kgHVwWJF5iLAYyURI9pVyNzOeLVv
+         jfLeiSt9Eth95/p9jTmhcuf/kbvz9zk6kYA1M+fE9hry9lYYayHmMIkKeEJuZ72y6YyC
+         4uBIzPkbhJo95nKnKUUPUC3WmZFoTjmJPfTEzoc1Huie7ygW1FvfSeYYhbHDuxuYsaEL
+         LskNhS2yLz4UKurFjq1Ij444zkjADiU+m/0Q2pP+iXY39Il1ATMUDYX7OcsFYtfvgfNV
+         uflQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVC8GMGdYT++Bfbqt7phi2j0MTfE+bT0BBQjHbqAOMnu5qDIJTlKjYryUC1fYx4X3nGoZ2aUS+3lVlNOA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz3r0m7/UJocKilNJFsS5SjjulVe5RCEtBa3heNtHPVVHqpAw2Z
+	Z6EjvtU4TmAvb+njAKqzaLqfedO1Q75wwyQ857FvF0OA69lHNNxHcd2neQVng5Rupkc=
+X-Gm-Gg: ASbGnct7q+JbTa7dSK9u6RtdAdjubSPMpvKjLHXyFeaqSmhE+Wjb24zpiLrew+WT6F8
+	zPBZzBBhtnF9lu8ZHkRQP7BCPQmH8DViI3Ng0bgDHGmFCZQyGa8VV4AgVVdlaBeA78k/OJtBZwB
+	1gPAOvnVFTPR4M4vqWVSeCVbpQxURWv4V7UpXe8++6m2Fmk/tCLuCoMHndgGjUT801ZEloeuX4p
+	CkTDavcIXniykRQUF068spOKOsTgKEVrJlPC38X4TwaQ9/MOWVhXp0QZEV9ofB5+1MCkZOIPFHN
+	ygzadT1lNKOI7Xz+2HvffkML8Jmt+XwUnNtLCFQCtVqwe13tVKApfnStFHhvekJu3kgp9B+6xcH
+	NZGVLE32SU2wsLpNlyjocP2UejhOBCtePlOEtt45NziGVRKK4PoEMXByB6JTdrBCC0L4T1DpZ86
+	YuKUurOc+XmLs6ONseb31NfJRcCjmZtp/Fr5Q9QS9lDyo7CztD6J1utcluXa4nHlvhk8Y=
+X-Google-Smtp-Source: AGHT+IH0hpvR5twkqRmVGMRtAcrCxesRIOb4Xizv2z5I0TXHRJV8nSPA0Y9PLt873fJAl178vHWixw==
+X-Received: by 2002:ac8:7e4c:0:b0:4ee:4a3a:bd18 with SMTP id d75a77b69052e-4ee4a3abe64mr1136891cf.76.1763580675980;
+        Wed, 19 Nov 2025 11:31:15 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ee48e46ed0sm2807721cf.20.2025.11.19.11.31.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Nov 2025 11:31:15 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1vLnta-00000000bWq-3r3x;
+	Wed, 19 Nov 2025 15:31:14 -0400
+Date: Wed, 19 Nov 2025 15:31:14 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>, Jens Axboe <axboe@kernel.dk>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Sumit Semwal <sumit.semwal@linaro.org>, Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <skolothumtho@nvidia.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex@shazbot.org>,
+	Krishnakant Jaju <kjaju@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
+	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, iommu@lists.linux.dev,
+	linux-mm@kvack.org, linux-doc@vger.kernel.org,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org, kvm@vger.kernel.org,
+	linux-hardening@vger.kernel.org, Alex Mastro <amastro@fb.com>,
+	Nicolin Chen <nicolinc@nvidia.com>
+Subject: Re: [Linaro-mm-sig] [PATCH v8 06/11] dma-buf: provide phys_vec to
+ scatter-gather mapping routine
+Message-ID: <20251119193114.GP17968@ziepe.ca>
+References: <20251111-dmabuf-vfio-v8-0-fd9aa5df478f@nvidia.com>
+ <20251111-dmabuf-vfio-v8-6-fd9aa5df478f@nvidia.com>
+ <8a11b605-6ac7-48ac-8f27-22df7072e4ad@amd.com>
+ <20251119132511.GK17968@ziepe.ca>
+ <69436b2a-108d-4a5a-8025-c94348b74db6@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: syzbot+905d785c4923bea2c1db@syzkaller.appspotmail.com
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-References: <0000000000003d3747060ed5e859@google.com>
-Subject: Re: [syzbot] [block?] KMSAN: kernel-infoleak in filemap_read
-Content-Language: en-US
-From: shaurya <ssranevjti@gmail.com>
-In-Reply-To: <0000000000003d3747060ed5e859@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <69436b2a-108d-4a5a-8025-c94348b74db6@amd.com>
 
-This is a multi-part message in MIME format.
---------------zqXZ6heSUwwpYluG4WpryJIn
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+On Wed, Nov 19, 2025 at 02:42:18PM +0100, Christian König wrote:
 
-#syz test:
-git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
+> >>> +	case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
+> >>> +		dma->state = kzalloc(sizeof(*dma->state), GFP_KERNEL);
+> >>> +		if (!dma->state) {
+> >>> +			ret = -ENOMEM;
+> >>> +			goto err_free_dma;
+> >>> +		}
+> >>> +
+> >>> +		dma_iova_try_alloc(attach->dev, dma->state, 0, size);
+> >>
+> >> Oh, that is a clear no-go for the core DMA-buf code.
+> >>
+> >> It's intentionally up to the exporter how to create the DMA
+> >> addresses the importer can work with.
+> > 
+> > I can't fully understand this remark?
+> 
+> The exporter should be able to decide if it actually wants to use
+> P2P when the transfer has to go through the host bridge (e.g. when
+> IOMMU/bridge routing bits are enabled).
 
---------------zqXZ6heSUwwpYluG4WpryJIn
-Content-Type: text/x-patch; charset=UTF-8;
- name="0001-hfsplus-fix-uninit-value-in-hfsplus_cat_build_record.patch"
-Content-Disposition: attachment;
- filename*0="0001-hfsplus-fix-uninit-value-in-hfsplus_cat_build_record.pa";
- filename*1="tch"
-Content-Transfer-Encoding: base64
+Sure, but this is a simplified helper for exporters that don't have
+choices where the memory comes from.
 
-RnJvbSAxMzM2YjIyYmI5ZjNmZjRlMTQ0YzQxMjJhNGI0YjEzYzUzZTY4MmE3IE1vbiBTZXAg
-MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBTaGF1cnlhIFJhbmUgPHNzcmFuZV9iMjNAZWUudmp0
-aS5hYy5pbj4KRGF0ZTogVGh1LCAyMCBOb3YgMjAyNSAwMDo0NDoyMSArMDUzMApTdWJqZWN0
-OiBbUEFUQ0hdIGhmc3BsdXM6IGZpeCB1bmluaXQtdmFsdWUgaW4gaGZzcGx1c19jYXRfYnVp
-bGRfcmVjb3JkCgpUaGUgcm9vdCBjYXVzZSBpcyBpbiBoZnNwbHVzX2NhdF9idWlsZF9yZWNv
-cmQoKSwgd2hpY2ggYnVpbGRzIGNhdGFsb2cKZW50cmllcyB1c2luZyB0aGUgdW5pb24gaGZz
-cGx1c19jYXRfZW50cnkuIFRoaXMgdW5pb24gY29udGFpbnMgdGhyZWUKbWVtYmVycyB3aXRo
-IHNpZ25pZmljYW50bHkgZGlmZmVyZW50IHNpemVzOgoKICBzdHJ1Y3QgaGZzcGx1c19jYXRf
-Zm9sZGVyIGZvbGRlcjsgICAgKDg4IGJ5dGVzKQogIHN0cnVjdCBoZnNwbHVzX2NhdF9maWxl
-IGZpbGU7ICAgICAgICAoMjQ4IGJ5dGVzKQogIHN0cnVjdCBoZnNwbHVzX2NhdF90aHJlYWQg
-dGhyZWFkOyAgICAoNTIwIGJ5dGVzKQoKVGhlIGZ1bmN0aW9uIHdhcyBvbmx5IHplcm9pbmcg
-dGhlIHNwZWNpZmljIG1lbWJlciBiZWluZyB1c2VkIChmb2xkZXIgb3IKZmlsZSksIG5vdCB0
-aGUgZW50aXJlIHVuaW9uLiBUaGlzIGxlZnQgc2lnbmlmaWNhbnQgdW5pbml0aWFsaXplZCBk
-YXRhOgoKICBGb3IgZm9sZGVyczogNTIwIC0gODggID0gNDMyIGJ5dGVzIHVuaW5pdGlhbGl6
-ZWQKICBGb3IgZmlsZXM6ICAgNTIwIC0gMjQ4ID0gMjcyIGJ5dGVzIHVuaW5pdGlhbGl6ZWQK
-ClRoaXMgdW5pbml0aWFsaXplZCBkYXRhIHdhcyB0aGVuIHdyaXR0ZW4gdG8gZGlzayB2aWEg
-aGZzX2JyZWNfaW5zZXJ0KCksCnJlYWQgYmFjayB0aHJvdWdoIHRoZSBsb29wIGRldmljZSwg
-YW5kIGV2ZW50dWFsbHkgY29waWVkIHRvIHVzZXJzcGFjZQp2aWEgZmlsZW1hcF9yZWFkKCks
-IHJlc3VsdGluZyBpbiBhIGxlYWsgb2Yga2VybmVsIHN0YWNrIG1lbW9yeS4KRml4IHRoaXMg
-YnkgemVyb2luZyB0aGUgZW50aXJlIHVuaW9uIGJlZm9yZSBpbml0aWFsaXppbmcgdGhlIHNw
-ZWNpZmljCm1lbWJlci4gVGhpcyBlbnN1cmVzIG5vIHVuaW5pdGlhbGl6ZWQgYnl0ZXMgcmVt
-YWluLgoKUmVwb3J0ZWQtYnk6IHN5emJvdCs5MDVkNzg1YzQ5MjNiZWEyYzFkYkBzeXprYWxs
-ZXIuYXBwc3BvdG1haWwuY29tCkNsb3NlczogaHR0cHM6Ly9zeXprYWxsZXIuYXBwc3BvdC5j
-b20vYnVnP2V4dGlkPTkwNWQ3ODVjNDkyM2JlYTJjMWRiCkZpeGVzOiAxZGExNzdlNGMzZjQK
-ClNpZ25lZC1vZmYtYnk6IFNoYXVyeWEgUmFuZSA8c3NyYW5lX2IyM0BlZS52anRpLmFjLmlu
-PgotLS0KIGZzL2hmc3BsdXMvY2F0YWxvZy5jIHwgNiArKysrLS0KIDEgZmlsZSBjaGFuZ2Vk
-LCA0IGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZnMvaGZz
-cGx1cy9jYXRhbG9nLmMgYi9mcy9oZnNwbHVzL2NhdGFsb2cuYwppbmRleCAwMmMxZWVlNGE0
-YjguLjRkNDJlNzEzOWYzYiAxMDA2NDQKLS0tIGEvZnMvaGZzcGx1cy9jYXRhbG9nLmMKKysr
-IGIvZnMvaGZzcGx1cy9jYXRhbG9nLmMKQEAgLTExMSw3ICsxMTEsOCBAQCBzdGF0aWMgaW50
-IGhmc3BsdXNfY2F0X2J1aWxkX3JlY29yZChoZnNwbHVzX2NhdF9lbnRyeSAqZW50cnksCiAJ
-CXN0cnVjdCBoZnNwbHVzX2NhdF9mb2xkZXIgKmZvbGRlcjsKIAogCQlmb2xkZXIgPSAmZW50
-cnktPmZvbGRlcjsKLQkJbWVtc2V0KGZvbGRlciwgMCwgc2l6ZW9mKCpmb2xkZXIpKTsKKwkJ
-LyogWmVybyB0aGUgZW50aXJlIHVuaW9uIHRvIGF2b2lkIGxlYWtpbmcgdW5pbml0aWFsaXpl
-ZCBkYXRhICovCisJCW1lbXNldChlbnRyeSwgMCwgc2l6ZW9mKCplbnRyeSkpOwogCQlmb2xk
-ZXItPnR5cGUgPSBjcHVfdG9fYmUxNihIRlNQTFVTX0ZPTERFUik7CiAJCWlmICh0ZXN0X2Jp
-dChIRlNQTFVTX1NCX0hGU1gsICZzYmktPmZsYWdzKSkKIAkJCWZvbGRlci0+ZmxhZ3MgfD0g
-Y3B1X3RvX2JlMTYoSEZTUExVU19IQVNfRk9MREVSX0NPVU5UKTsKQEAgLTEzMCw3ICsxMzEs
-OCBAQCBzdGF0aWMgaW50IGhmc3BsdXNfY2F0X2J1aWxkX3JlY29yZChoZnNwbHVzX2NhdF9l
-bnRyeSAqZW50cnksCiAJCXN0cnVjdCBoZnNwbHVzX2NhdF9maWxlICpmaWxlOwogCiAJCWZp
-bGUgPSAmZW50cnktPmZpbGU7Ci0JCW1lbXNldChmaWxlLCAwLCBzaXplb2YoKmZpbGUpKTsK
-KwkJLyogWmVybyB0aGUgZW50aXJlIHVuaW9uIHRvIGF2b2lkIGxlYWtpbmcgdW5pbml0aWFs
-aXplZCBkYXRhICovCisJCW1lbXNldChlbnRyeSwgMCwgc2l6ZW9mKCplbnRyeSkpOwogCQlm
-aWxlLT50eXBlID0gY3B1X3RvX2JlMTYoSEZTUExVU19GSUxFKTsKIAkJZmlsZS0+ZmxhZ3Mg
-PSBjcHVfdG9fYmUxNihIRlNQTFVTX0ZJTEVfVEhSRUFEX0VYSVNUUyk7CiAJCWZpbGUtPmlk
-ID0gY3B1X3RvX2JlMzIoY25pZCk7Ci0tIAoyLjM0LjEKCg==
+I fully expet to see changes to this to support more use cases,
+including the one above. We should do those changes along with users
+making use of them so we can evaluate what works best.
 
---------------zqXZ6heSUwwpYluG4WpryJIn--
+> But only take that as Acked-by, I would need at least a day (or
+> week) of free time to wrap my head around all the technical details
+> again. And that is something I won't have before January or even
+> later.
+
+Sure, it is alot, and I think DRM community in general should come up
+to speed on the new DMA API and how we are pushing to see P2P work
+within Linux.
+
+So thanks, we can take the Acked-by and progress here. Interested
+parties can pick it up from this point when time allows.
+
+We can also have a mini-community call to give a summary/etc on these
+topics.
+
+Thanks,
+Jason
