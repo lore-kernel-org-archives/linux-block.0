@@ -1,96 +1,57 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 530EE366DAF;
-	Wed, 19 Nov 2025 16:33:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CFD32F691B
+	for <linux-block@vger.kernel.org>; Wed, 19 Nov 2025 16:50:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763570012; cv=none; b=U51JieKwrHARvUpu+V6rWx7tBOASc8FMgAWfzbfKWCIvx3z8QEpGBDCN9PyZS0W3jWsOtV8bYkskPRvbsb3MtLMve5VpK/XcO1ibYF+qqH5cURaHVNt43rqCO9K/O0XlHwunFa6xL/Qso1J2nZlz0oeKQzInhZuH+VzFaoE3Gxs=
+	t=1763571021; cv=none; b=NufZJ5yPyHj//VYa1iZp/p8LjWL+4td+LKbaD48BIcOAo/txYfNq889QQ55WvUvvLdaB21gfPCyOeoPk6U4MawecIZBnH3+zc4xaBnGeY1Ig1zrRi0ZW6BodiEwxMuaQsCXg2mBtnAH2Dy5leEA3/rHZJ0Sl92gluto/qE1Bxw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763570012; c=relaxed/simple;
-	bh=SQB43V1lcm01gCfrVBWXeZWkfWYzDLNLnZu9KWeWJcg=;
+	s=arc-20240116; t=1763571021; c=relaxed/simple;
+	bh=i/tqtLHwRXy4TGbzogaANNSAIeuWEHfCiNP12W5X6TM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mWVcMbYRgRQ0OxvJt5Q2L1zzYl59np6SjBhwVxDw4WjuLxelLFVtRQzu3BbLVx0QMpzBE5Jc/EFv6pZgX+iBz1EzJhZqFRn6l+x4dAck7hnLLnG3J0Um6sX6K/qia/WLgO0SiV6gevGzh6cfZLjbc2PpuMeiTKWSqO6xFAIFIgQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mafG8ZOF; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=JZtkjndhCkfY7f6UwGVx/CP61AHARG6WJxJFZeX0rgAu93pWad8spWyJvxhPi3UQ4fDir6D2e5aMIQjEV96GIB2skb6vIwbLTHt7ft6uxyou8z834c5GKrTZncV83Qpe7oLo91mp4BaeZSsSo38ohpSa2pXeyPyIZq/vO1tYgl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=emMshKLK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mafG8ZOF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48D05C116B1;
-	Wed, 19 Nov 2025 16:33:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="emMshKLK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44A7FC4CEF5;
+	Wed, 19 Nov 2025 16:50:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763570012;
-	bh=SQB43V1lcm01gCfrVBWXeZWkfWYzDLNLnZu9KWeWJcg=;
+	s=k20201202; t=1763571020;
+	bh=i/tqtLHwRXy4TGbzogaANNSAIeuWEHfCiNP12W5X6TM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mafG8ZOF8WzHpM0Ap0HV10HNQ+V26iii16RmNEh8xlVGt/3Fyif1MM/ooh0K/pfIz
-	 szK/RWtsKgEJUAwJCF4Ei2amklh14ZMnM9irxppUQrCUJkvt/EZVFJcbPn28NcqEGY
-	 H5mQcoOTZFTUtioKEvXhb//Hd+eC/e25r6Py2bHgQa/vmQ3b9ezpxZIBWcXV9ncmwt
-	 7e2asxChIzWsMtQIBzyz1HCL0UngdmumU3R+J6sfLJMWs0oS7ZF4iSIBsph8VRgCK0
-	 +t4iS375piSkus/kTsSOX82JCK0IrwbeeJvL9xKC8TF2BvGIttU+8sQ9kfioC2gTlg
-	 KCxDuQf1gZvsw==
-Date: Wed, 19 Nov 2025 18:33:26 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>
-Cc: Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>, Jens Axboe <axboe@kernel.dk>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Sumit Semwal <sumit.semwal@linaro.org>, Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <skolothumtho@nvidia.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex@shazbot.org>,
-	Krishnakant Jaju <kjaju@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
-	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, iommu@lists.linux.dev,
-	linux-mm@kvack.org, linux-doc@vger.kernel.org,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linaro-mm-sig@lists.linaro.org, kvm@vger.kernel.org,
-	linux-hardening@vger.kernel.org, Alex Mastro <amastro@fb.com>,
-	Nicolin Chen <nicolinc@nvidia.com>
-Subject: Re: [Linaro-mm-sig] [PATCH v8 06/11] dma-buf: provide phys_vec to
- scatter-gather mapping routine
-Message-ID: <20251119163326.GL18335@unreal>
-References: <20251111-dmabuf-vfio-v8-0-fd9aa5df478f@nvidia.com>
- <20251111-dmabuf-vfio-v8-6-fd9aa5df478f@nvidia.com>
- <8a11b605-6ac7-48ac-8f27-22df7072e4ad@amd.com>
- <20251119134245.GD18335@unreal>
- <6714dc49-6b5c-4d58-9a43-95bb95873a97@amd.com>
- <20251119145007.GJ18335@unreal>
- <26d7ecab-33ed-4aab-82d5-954b0d1d1718@amd.com>
+	b=emMshKLKeeYh1CMHFhWgSW7OA6gL93esq9b2yElSW43t4yVPnZ3uEbJlBgRowMwuI
+	 xbcCLjgyLBdXkrflj0p6h+eBFVfmezMaE4lw0SwyRDHcMY8AL/dTDDDlXMToyN7bue
+	 WG4WzULEkqOB2TsG7E9ehQOH6Kr9WwCJnoIuMwIgtHqHYn07BLvJ1h8rVqYv7MuWI6
+	 AU0C0mNsx5TowFQtU9QUSbnMsVWwf31ZaIOWWWJKTXZqbXmnXyqsd44nLFLrTPbX4p
+	 V2ppiwW5OemOElBrTKMq+If2XS9Jmz2QfqjR61Rii/kP2Ol65nudKl7TdzGnwkI1RX
+	 zxZ6z+XTscG6g==
+Date: Wed, 19 Nov 2025 09:50:18 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc: Keith Busch <kbusch@meta.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"hch@lst.de" <hch@lst.de>,
+	"shinichiro.kawasaki@wdc.com" <shinichiro.kawasaki@wdc.com>
+Subject: Re: [PATCH blktests] io_uring user metadata offset test
+Message-ID: <aR31SloN2N15LodB@kbusch-mbp>
+References: <20251107231836.1280881-1-kbusch@meta.com>
+ <5d630378-6653-4b2b-b3ec-946bf2671849@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <26d7ecab-33ed-4aab-82d5-954b0d1d1718@amd.com>
+In-Reply-To: <5d630378-6653-4b2b-b3ec-946bf2671849@nvidia.com>
 
-On Wed, Nov 19, 2025 at 03:53:30PM +0100, Christian König wrote:
-
-<...>
-
-> >>>>> +struct sg_table *dma_buf_map(struct dma_buf_attachment *attach,
-> >>>>
-> >>>> That is clearly not a good name for this function. We already have overloaded the term *mapping* with something completely different.
-> >>>
-> >>> This function performs DMA mapping, so what name do you suggest instead of dma_buf_map()?
-> >>
-> >> Something like dma_buf_phys_vec_to_sg_table(). I'm not good at naming either.
-> > 
-> > Can I call it simply dma_buf_mapping() as I plan to put that function in dma_buf_mapping.c
-> > file per-your request.
+On Sat, Nov 08, 2025 at 02:09:33AM +0000, Chaitanya Kulkarni wrote:
+> On 11/7/25 15:18, Keith Busch wrote:
 > 
-> No, just completely drop the term "mapping" here. This is about phys_vector to sg_table conversion and nothing else.
+> this requires a specific kernel version or higher for
+> IO_URING to have this metadata support ? OR any version
+> of kernel would work ?
 
-In order to progress, I renamed these functions to be
-dma_buf_phys_vec_to_sgt() and dma_buf_free_sgt(), and put everything in dma_buf_mapping.c file.
-
-Thanks
+It does require io_uring pi attributes, which was introduced in 6.13.
