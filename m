@@ -1,127 +1,98 @@
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC27C224B04
-	for <linux-block@vger.kernel.org>; Thu, 20 Nov 2025 18:14:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 926A12D9ECF;
+	Thu, 20 Nov 2025 23:44:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763662446; cv=none; b=NrGywXRfBfgsZ1rv3j5uc7eVQT0Bie/3ZxURFFr6lT0iKi5ZXQfM8hkpqN0Csai/oye7qDb5XpNaj5BaRv79RGtu8TBD60kReltqG/AR6OJWRVmfED4Ft54tHaEwlrFOlk96QCgja2PtQ59Sk5R+wKPPUMMta5lobvIUwyVO2gQ=
+	t=1763682273; cv=none; b=khYF3qqrZ/hltGF78hsG1JWaNog5C/HnnG+uSrFxYLEkQ1u/T/ocl9wcJTWk+A5mt/T3g0oPfwsu9XPfR2+6gsMxgCabDwM4GJEpJhR18UO7wWn1CHubm9OMe7rFRekihCMhX2JhRpOktOlG2WIk+9DpT/e6zlLarZHqT4nXO0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763662446; c=relaxed/simple;
-	bh=ypMmf60cBj4WQcSI9KfUl7Er5f1ixoXnX0jlrFpr0x8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Nb0aXfwMa2xAFFdoW4MlmxpzjW5m2nc1m2/c6idCLsYJU1yFbACd2XkHAEIXCgjD25mSlbZ6Sq4p4IQQJkhl4SVuqmiz2gtQzgU7Zp7l9FVcrj4Shs6FamcLLqiPDfPtyMNz3cizxs4RFHTt/8kL8uZx8wCLC9MEVDXLIWrCNZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Du2xO4Zw; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1763682273; c=relaxed/simple;
+	bh=4L45HTjGHrfEl6i1ILnnDzqWPjChLXdsXz8M9gQYW4A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Z4tSaDM7Hv8UW1FhNpBN7VOd5tnH2E/lMMgkTobY78UguvIyJMD1WBwumjsUuC9TSl22L9hLFo3KpYRGobp+t9BxcU/C7WTq0wG/cb75/Uaiyjp6lNhcNkF6DJZxIjcjEdK2WTnZnOFfeVGojnXFopZo95OVc2PXMQkxslByLIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ePMfY4jR; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Du2xO4Zw"
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-297e13bf404so12395ad.0
-        for <linux-block@vger.kernel.org>; Thu, 20 Nov 2025 10:14:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763662444; x=1764267244; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qnAwwRG1xi5brVg3f34AJJJ2ozsmQIQit6jyVLGvFj8=;
-        b=Du2xO4ZwgTm5gWrmd6hAi66EboeGGng7saqzyZMX5/3DZQwxdyhyc4xMvjtFCDP6FY
-         C4eE/eIXYWTVfRZfBtNFLKF4y8rFfFuBh3ZtSwF60sXwuFl0DklV+D28wYLb3m5X5+pz
-         0hCj2e9yyITwRb+CUyZU1/fW2fIMq318nlS8O8KVD6NmSogrJRS0mv0q6XiUvx/ZZngB
-         vGhtyK1p6Dj5Gq1n8yAA1iF4ay55ALZJiB6pygV4FsZuhYAibmOrg5QHSCd4QEoGv350
-         sCIGBIRjMR9CAuRqGpWAtiBDkKW8pOdOTV6qRzgPuCkNKsufUFrlbpzYuECbPgi6fmJ5
-         9J/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763662444; x=1764267244;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=qnAwwRG1xi5brVg3f34AJJJ2ozsmQIQit6jyVLGvFj8=;
-        b=Ri8Q+NwPiaHm0gTd7udbm5vgW1QTw2sX22BPALeL40AY6XC1wXUDq7WLStYjUKxBJI
-         GkFTRQz4JRWH7d7aA5xMxENosOD6IOyyevl5w52/wgHLASyTLl0o12Rr2jD3Bwhv2yDV
-         u2hiXWkAXuuYUXUSYvugD+lEdGI4IubEMzkxJsSg/uDNMKermG9Lzk+JFCOsQAoHjIHk
-         GkQczmymxowNsiomoLy/4qFKrjk3gcly7ENxtxgbhVtJpBvjYaBFBACVZHnAUSMfJZTN
-         0c6c5C34Hw/cgGWt1nzW2K81pTKXQlq9xC25XQteTGV7TWo0nAGvMW+eQpfeOosXDpdU
-         WbsA==
-X-Forwarded-Encrypted: i=1; AJvYcCVhnlRIeQt3vtqY9Q9z6bAz3AQt1/KDHSetgAhB4pwk7U0zKU1fsY6uhblZfjUG5CuRg6W9TFEyY8PHfQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyU/WQMyuvCLpRQwfvgPXj0HoVAy9PN5t3SSQYkVnBL4wELVw33
-	CStqmUS73wdbiswSdoKeM0Q0S4xmwMNSiPHQ/pQoYDSZqk8nPDUMoprVvrWIZUQu03iW7SX4IaI
-	2vCnd9XAnF8AcNxwY7+LJLYoq1eIzIlObSkRFUHIa
-X-Gm-Gg: ASbGnct4Ca4Rt224KgSqRA6ldnj8T3Zj71IEtsHPEe9ID8vjhHxe78LtsQuXLQ15x1Z
-	WDB9HffOYnYm6aT73++GmtuyrQv6Vehu6TPwYyEFupHLQc1Vi+bIeR6OX+LTk1XG11hBWIhC5ea
-	lhK/97fP0CGwVDGinxiCIg9Lp9cqK59JIUcIUtBlZPuCqg22xSPX33AM/arIAyVUsywrSVTfzpQ
-	XcGHZO3cfh0E+Ng78BVpSeqytpZPtl5TOZd21jq64sgWENXrLfFX6fJkxUH6WIBKj2SCqQFCURZ
-	wdm6kRtr6zG7aO1A1CBDh6N0zz/Jg2gW9MqQyif/Nam1PZ3+90yOr0k=
-X-Google-Smtp-Source: AGHT+IEJ6cqaG6MxrDd8DOBVpTVgsb8olGtjFPzybXpMgpdvGH1Vhu3k2CqvjEEfwDleme6JIj7dMMORoMIFPxwwh7Q=
-X-Received: by 2002:a17:902:f68d:b0:295:1351:f63e with SMTP id
- d9443c01a7336-29b6a3ecb55mr12825ad.10.1763662443808; Thu, 20 Nov 2025
- 10:14:03 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ePMfY4jR"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=30SBch2rBM61MOy0/thJ71GnBVIcmzjKN0wPaFWE0Ts=; b=ePMfY4jRRP6nkfuZgr/ljc8yzz
+	m//rNXmWwXad1uRggB0KRx9WsnFl0/cqCalj/16lHerWSLcK1q52cEtl7s48HmBGWUVpoDTJdVuh0
+	go/eTdGZ6OZSVjHpj9g6SfuiPB7rmYSQohKpv//KpmZvgkgMSLxk9x2EvOOPo+nWPF4/LhAodcvz1
+	KTC7N3nsyWBu60Z1URVS08mvMyWKrWd+js2pwwi9Yw69ib2yA1KwgzT2EjRP0dyyphnLct+6wI56d
+	JJNHUaeE23/sQSLbMq+E2u5cwCN8htwtU4WWXAL54p54xbl3/agd3JXHDKjLUfy6dxGc+dKJEw/2k
+	Z8fYCpGg==;
+Received: from [50.53.43.113] (helo=[192.168.254.34])
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vMEK8-00000007aBg-1VuK;
+	Thu, 20 Nov 2025 23:44:24 +0000
+Message-ID: <5c3c4233-3572-4842-850e-0a88ce16eee3@infradead.org>
+Date: Thu, 20 Nov 2025 15:44:23 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251120152126.3126298-1-senozhatsky@chromium.org> <20251120152126.3126298-7-senozhatsky@chromium.org>
-In-Reply-To: <20251120152126.3126298-7-senozhatsky@chromium.org>
-From: Brian Geffon <bgeffon@google.com>
-Date: Thu, 20 Nov 2025 13:13:27 -0500
-X-Gm-Features: AWmQ_bmSMHceSjxinDeE8mTZc06D2U4HleB3jocgu3xFUGTZUMDr9Qt-L6LI5Ok
-Message-ID: <CADyq12xmCgX1_KA+bKt=r=MWRKSX6N3bsuxBn4LRy7M1K9=1mg@mail.gmail.com>
-Subject: Re: [RFC PATCHv5 6/6] zram: read slot block idx under slot lock
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Minchan Kim <minchan@kernel.org>, 
-	Yuwen Chen <ywen.chen@foxmail.com>, Richard Chang <richardycc@google.com>, 
-	Fengyu Lian <licayy@outlook.com>, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/3] init: remove deprecated "load_ramdisk" and
+ "prompt_ramdisk" command line parameters
+To: Askar Safin <safinaskar@gmail.com>, linux-fsdevel@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Christian Brauner <brauner@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>,
+ Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>,
+ Jens Axboe <axboe@kernel.dk>, Andy Shevchenko <andy.shevchenko@gmail.com>,
+ Aleksa Sarai <cyphar@cyphar.com>,
+ =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>,
+ Julian Stecklina <julian.stecklina@cyberus-technology.de>,
+ Gao Xiang <hsiangkao@linux.alibaba.com>, Art Nikpal <email2tema@gmail.com>,
+ Andrew Morton <akpm@linux-foundation.org>, Alexander Graf <graf@amazon.com>,
+ Rob Landley <rob@landley.net>, Lennart Poettering <mzxreary@0pointer.de>,
+ linux-arch@vger.kernel.org, linux-block@vger.kernel.org,
+ initramfs@vger.kernel.org, linux-api@vger.kernel.org,
+ linux-doc@vger.kernel.org, Michal Simek <monstr@monstr.eu>,
+ Luis Chamberlain <mcgrof@kernel.org>, Kees Cook <kees@kernel.org>,
+ Thorsten Blum <thorsten.blum@linux.dev>, Heiko Carstens <hca@linux.ibm.com>,
+ Arnd Bergmann <arnd@arndb.de>, Dave Young <dyoung@redhat.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Krzysztof Kozlowski <krzk@kernel.org>, Borislav Petkov <bp@alien8.de>,
+ Jessica Clarke <jrtc27@jrtc27.com>, Nicolas Schichan <nschichan@freebox.fr>,
+ David Disseldorp <ddiss@suse.de>, patches@lists.linux.dev
+References: <20251119222407.3333257-1-safinaskar@gmail.com>
+ <20251119222407.3333257-2-safinaskar@gmail.com>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20251119222407.3333257-2-safinaskar@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 20, 2025 at 10:22=E2=80=AFAM Sergey Senozhatsky
-<senozhatsky@chromium.org> wrote:
->
-> Read slot's block id under slot-lock.  We release the
-> slot-lock for bdev read so, technically, slot still can
-> get freed in the meantime, but at least we will read
-> bdev block (page) that holds previous know slot data,
-> not from slot->handle bdev block, which can be anything
-> at that point.
->
-> Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+
+
+On 11/19/25 2:24 PM, Askar Safin wrote:
+> ...which do nothing. They were deprecated (in documentation) in
+> 6b99e6e6aa62 ("Documentation/admin-guide: blockdev/ramdisk: remove use of
+> "rdev"") in 2020 and in kernel messages in c8376994c86c ("initrd: remove
+> support for multiple floppies") in 2020.
+> 
+> Signed-off-by: Askar Safin <safinaskar@gmail.com>
+
+Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
+
+Thanks.
+
 > ---
->  drivers/block/zram/zram_drv.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.=
-c
-> index ecbd9b25dfed..1f2867cd587e 100644
-> --- a/drivers/block/zram/zram_drv.c
-> +++ b/drivers/block/zram/zram_drv.c
-> @@ -1994,14 +1994,14 @@ static int zram_read_page(struct zram *zram, stru=
-ct page *page, u32 index,
->                 ret =3D zram_read_from_zspool(zram, page, index);
->                 zram_slot_unlock(zram, index);
->         } else {
-> +               unsigned long blk_idx =3D zram_get_handle(zram, index);
-> +
->                 /*
->                  * The slot should be unlocked before reading from the ba=
-cking
->                  * device.
->                  */
->                 zram_slot_unlock(zram, index);
-> -
-> -               ret =3D read_from_bdev(zram, page, zram_get_handle(zram, =
-index),
-> -                                    parent);
-> +               ret =3D read_from_bdev(zram, page, blk_idx, parent);
+>  Documentation/admin-guide/kernel-parameters.txt | 4 ----
+>  arch/arm/configs/neponset_defconfig             | 2 +-
+>  init/do_mounts.c                                | 7 -------
+>  init/do_mounts_rd.c                             | 7 -------
+>  4 files changed, 1 insertion(+), 19 deletions(-)
 
-This patch doesn't really change things in a meaningful way, wouldn't
-it be more correct to take the slot lock again after the read and
-confirm the handle is the same and it's still ZRAM_WB?
 
->         }
->
->         /* Should NEVER happen. Return bio error if it does. */
-> --
-> 2.52.0.rc1.455.g30608eb744-goog
->
+-- 
+~Randy
