@@ -1,73 +1,73 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72EE03570A5
-	for <linux-block@vger.kernel.org>; Thu, 20 Nov 2025 15:58:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE201351FDB
+	for <linux-block@vger.kernel.org>; Thu, 20 Nov 2025 16:03:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763654299; cv=none; b=eSTW9rZCVIEicn0CegiznTrQw6e18PypULKNQPFn90Jw311txch7caTTTK/SSdK40uwslN0esGF9kImWOkKhQSpGz3MQ07U7regBKHjCvMQ+RmZqqmEh03rNkjg9WIjQxSFmK6zKZizkTdbfeUQlwEjnlQK00K6j+539EIMIouQ=
+	t=1763654623; cv=none; b=Oel0+qV35OJkt7+euo6V3/MK6Fgb/9JJrYl/FIT7dEegD/xcgQ5nc1ZPURKnbyS9pjYp+1t5yoYplT/CSCh8ROeLfN8aA5Ncs5/EQsPQ7IVjQcGY4gGo1MJ9EtYEJwOwV0cR83y8ECLZyj70CJrdpMFkX3TGaIjlgfaUxoq2eGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763654299; c=relaxed/simple;
-	bh=1yTPLsSuIoA5w5GAb2TfPYu4qw+V1sm/wHXzyNjKbNg=;
+	s=arc-20240116; t=1763654623; c=relaxed/simple;
+	bh=cG/szksZMK3/qUmHh0BLsP1xvN4DM1w7cRtZWEpDzVE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CO2fWjTWuiiWr6NXeNrvbsl/xqS/FEpC5Zq0tBRCtfFv+hTJ51aXrGiGSzo5gq7Kg3OuXTA4fJ+R4ziiziy/F6mC8zokXjLW+9W58cCzHDnF2nzRo90ad1PeLtCPKEukAfxT8fx0FE1JDqGTdM4qk4DRsesEznWTNyIsZegd9RY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=W54x2TmL; arc=none smtp.client-ip=209.85.214.180
+	 To:Cc:Content-Type; b=RMprRZyqV0jt0NneKaZjvbVRC1UKLeNpmY1GYLDJyStDgrST3YcwX8GIYZTDGGD++JtKbQKROzQQZh7jGPO799KSaaDjCIcQxa5u+uN1l0HoAy4mLWf4Iy3nhxoJ2jeWYqqyxZLG8KdlE3GH8wNYA4rfQ+ZaA7TE4ZmiponSJMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BPsa/4Nc; arc=none smtp.client-ip=209.85.214.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="W54x2TmL"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2980343d9d1so173865ad.1
-        for <linux-block@vger.kernel.org>; Thu, 20 Nov 2025 07:58:17 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BPsa/4Nc"
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2980343d9d1so175145ad.1
+        for <linux-block@vger.kernel.org>; Thu, 20 Nov 2025 08:03:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763654296; x=1764259096; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1763654621; x=1764259421; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FM+Mb2yZG4S4vNNa7mZRT19UBjXjaSiTW+UNdByxGbk=;
-        b=W54x2TmLxv6/vDsiiChqpdgv5sOfMNB+pLmuEe2hNE1GZ61k7jZiQFAdaOmk2gR/K+
-         bG7EvPTt8ed420QS+NY9uBBMBETpUZUwwkxrLnOHYBAXEKlpVqa6SXAbaqUP3mayZVFF
-         7z+xx+W303rayL5aZdE1HEWnjxC5Kp+fsJTqWXojrF+PXaIVQvCY4LoDVLJblP+yHGd7
-         b6eEIiz/6B47wa6L4KfHyIcYwAkcKRHa/YkQRkyoUQ0Ah9qWG7BuICQvgxhna3kXLoux
-         u1GV3mal6hHVjNEOKB9k0AwVllCbh3eVHbEn9zdAq0Rry7itfqCi8k1q+C7iXRFoIYFM
-         7YRg==
+        bh=aZoJ5T7qCxoqJ0PzPFIxBpO8OSKGlINQNrAGkZu6Ryk=;
+        b=BPsa/4Ncy5EOC/6Qqs3+Wb+RiVngUII5/LWrGHKtHrWy5fv4IKKwbtamXkxbaLoPe/
+         frt4Eh0u2Fih6yY6Fwi4Y7GMLEAHTdzG4zvDDhlg88MuLeBzjgnyOvYCli7gb89zXk2V
+         F1832BDau6whBXCLrVR2Bcwwh9BaVqlXSaAEHHnpO3/ur1aAyotMoFXbKgDDcPvB0W1s
+         Vj2adciFxcLO39FOgUvBAcKCKcy31rstqlgcf/+ZqKaGyv83UC+9ZLgGUOgQvIWeCzAM
+         gtQ9Gpct+mmdWvMP6K9iuVRuvf16zi2GtQf2H7xZDHQJzAmdOtnx/sB/iu/5aYZ3ulrA
+         IMBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763654296; x=1764259096;
+        d=1e100.net; s=20230601; t=1763654621; x=1764259421;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=FM+Mb2yZG4S4vNNa7mZRT19UBjXjaSiTW+UNdByxGbk=;
-        b=kPRx+rb0jPz46+6RPAePmnEN4Q/QeBzSU6d6mgl2vH16adm7VGJigs3kZTTlYOAT2T
-         JpiCYfC9NkxIGFEsGhpv482m92Ui8EQpoKxIdlHFoQCFe4XLpgGOA822rnTrb+LBiU5s
-         tUJuhmkzuGhtgLBsCGtazSwS8s3euuLGe0R+ILszDWNAvkRpdsEAwgEWdNAHGw1vOxYR
-         5C5AjmSZcBEHkquzF+5Rext+dNY84xzn/4qhVkFjEkWaWFcukp4FO5/GKomfuyL4wfXq
-         y3PN5DTvjDY8hGH3cQyzXEnIvfH+C6Kdtxi8j/vDAZ9epo6elikSzv6xeTUzrI/7sdC0
-         PKRw==
-X-Forwarded-Encrypted: i=1; AJvYcCXOVZUNZIDMKzC9driuNUiTCvElkHwyNYJvFVtNNZMQvwOas//mWjuR7yGqbV+FAku3GaHL0Xa2BpyE3w==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy9Cn03kxV/0tlulqzPbIAXcf8bZYqBUjooT5CsSDDoHz4kxzYj
-	aBrwZhcD/dZXoNCx17r/ijNb+O4RxBWQRxwGJYCvMMzGEvC4Q03TvVloz4Jr3X1zRGKQA0QkgE9
-	TcuX45ngZ9iesGSI7akO22JMfHcRb9GPYyWAG0d/Z
-X-Gm-Gg: ASbGncuMgssUJ7AgHAU819TzBFCts1LieFeyNiCbX57eDv6hh00kCOvChsuNumhqV4C
-	D3BfgoPTzQn4JGY0F+Ng3QN+DvCR6AqUzzPrAaGds525fYz5vrcFjYHZAM9OYnQW6G8JrYFlH1N
-	ZeGj8Z4sA4x1JDYyOOg87NQPfDrKv5T8m26K1Hsa5xzmZp7SHG45gveFKQJCt+GrJZnIIFBtccp
-	Uzas5xXO3R6S1Gys9Z8/XH6o4mcp+6nidJm3gRZpyYxccukDTjxUGsERyzdmZ8j1rdB69caPrfr
-	3Fl57BU/sbQPTcPVqQ42K+biJdSceDQ8+S5xJTdWx0ammskeivBbJa4=
-X-Google-Smtp-Source: AGHT+IEN0NULaP+VnPL1/fDLZYNjF8Hd/VUeot/flqRIzbz+bFM8hMgL+i6VUxvXySk8BrtVEFw6k33qRAE2TH0TEa4=
-X-Received: by 2002:a17:903:2f81:b0:29a:7af:b3c9 with SMTP id
- d9443c01a7336-29b5c5951d8mr2842585ad.16.1763654296382; Thu, 20 Nov 2025
- 07:58:16 -0800 (PST)
+        bh=aZoJ5T7qCxoqJ0PzPFIxBpO8OSKGlINQNrAGkZu6Ryk=;
+        b=nzPI9Opc6tf4DlQUpsG9Rj6Y2RIowpGUTWbr7CoXvqxt0VFLGCMYRm3QNPFoiV62ya
+         dYvCZMNEHU+BgeTAnjep1kQ8siUtVVtAeKgNS3Eed605qTRy4UWYNFKHdUVSCziKgbz/
+         la2Zc5rM8t5lZwzIrtIINvnk7tzwNJWJUZ/k0x6L5XXIOZQAa1KmtzCL760YYJA8AJZa
+         1SujKUIsOUq2hD0ErL7FsYNuwBgEggohT0a3yPDdgOqX2j6i/E+9oR5hdmp4JAqYzXSw
+         AjLrE0LX/2bX8TbIaUrxPGpMD4/6D3XTWdZ2qpSDCkn756hUQowUu4P5wm5m/WccHgYB
+         3zuA==
+X-Forwarded-Encrypted: i=1; AJvYcCUhV6MZ2AdLJxY5Pk9G5k8a17n+3g/ipPfQ9jj4pGg+BLtnuaqtzqZKlweDx5dIrduGcDsLK9d5eiPqTw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyk1sfyqIogbDUeYTMSTLTFU7HNqYfa5J5EclbsJwe8se9Utw2G
+	uQpWhEymj70N1ONTbKgZnmDpGNzAQxlmrBX5/N8d077dap11PsdqyFEL71tRVgYFP7sC77Kc27D
+	NRAUBv6a4qPl+a5oEG7AsyN0K+4aP46aPV3K3rxAO
+X-Gm-Gg: ASbGncs5qMA5QWoLPQJP9KNowFdOMqik4uKWGkVFZiLi9aVlKQ6M7HLs/6f6VQe2Myy
+	y4cDuEeaEcj+O2iq2720iP/GUKY13WJskK6yMJ6Lta8dGaiV23VgAwf1vNNn7Djh0iMYdRDwZJC
+	x/YYdrbDNCvonV8bD724cPn8HTvRz4bnx7mLk3tyEOCJ2sQZvLJkFFPCitJm/ssy7gTrez48hID
+	hi0FoVuFGig0mwgbocmA7pjBLdu1ILadKwgJq4+5ViELNuqmG0PSnWF/hPw9u75bns7ji0ng0JP
+	LjXDhrTshEwX1+Q0Z8z9Z1kDBzhTWNnpCojtO5yl4Ry+O4ZFy/NAJKM=
+X-Google-Smtp-Source: AGHT+IF7lqOPqoBO+y+4EA6lJ6hn3ZHzn/3In/H2O8AR7c1Wu4vPP8NEpom98N1Q146cEr1Yqb+p7fQVYifcTojWkAI=
+X-Received: by 2002:a17:902:c94c:b0:290:dd42:eb5f with SMTP id
+ d9443c01a7336-29b5c597629mr3075335ad.12.1763654620864; Thu, 20 Nov 2025
+ 08:03:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251120152126.3126298-1-senozhatsky@chromium.org> <20251120152126.3126298-3-senozhatsky@chromium.org>
-In-Reply-To: <20251120152126.3126298-3-senozhatsky@chromium.org>
+References: <20251120152126.3126298-1-senozhatsky@chromium.org> <20251120152126.3126298-4-senozhatsky@chromium.org>
+In-Reply-To: <20251120152126.3126298-4-senozhatsky@chromium.org>
 From: Brian Geffon <bgeffon@google.com>
-Date: Thu, 20 Nov 2025 10:57:39 -0500
-X-Gm-Features: AWmQ_bnVrwcH8-BKVi3_n9EW4M0i9C_Im6NDofM4Llka_8QMk4wUrZfCfTLCF0M
-Message-ID: <CADyq12ypYai3Q2QntCjvp26U_J3xWpO4J_DSV+UwCqLFinkcGg@mail.gmail.com>
-Subject: Re: [RFC PATCHv5 2/6] zram: add writeback batch size device attr
+Date: Thu, 20 Nov 2025 11:03:04 -0500
+X-Gm-Features: AWmQ_blfFP1VArS6ZsRCtg105hCt75V1EorH-fow_aw4WlQEnVbTUnPSVIx7GRw
+Message-ID: <CADyq12zV=HkDOzvfngY_5yCCavdq4n-k6XeVFJBKkVSX_eP8yw@mail.gmail.com>
+Subject: Re: [RFC PATCHv5 3/6] zram: take write lock in wb limit store handlers
 To: Sergey Senozhatsky <senozhatsky@chromium.org>
 Cc: Andrew Morton <akpm@linux-foundation.org>, Minchan Kim <minchan@kernel.org>, 
 	Yuwen Chen <ywen.chen@foxmail.com>, Richard Chang <richardycc@google.com>, 
@@ -79,137 +79,85 @@ Content-Transfer-Encoding: quoted-printable
 On Thu, Nov 20, 2025 at 10:22=E2=80=AFAM Sergey Senozhatsky
 <senozhatsky@chromium.org> wrote:
 >
-> Introduce writeback_batch_size device attribute so that
-> the maximum number of in-flight writeback bio requests
-> can be configured at run-time per-device.  This essentially
-> enables batched bio writeback.
+> Write device attrs handlers should take write zram init_lock.
+> While at it, fixup coding styles.
 >
 > Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+
+Reviewed-by: Brian Geffon <bgeffon@google.com>
+
 > ---
->  drivers/block/zram/zram_drv.c | 48 ++++++++++++++++++++++++++++++-----
->  drivers/block/zram/zram_drv.h |  1 +
->  2 files changed, 43 insertions(+), 6 deletions(-)
+>  drivers/block/zram/zram_drv.c | 17 ++++++++++-------
+>  1 file changed, 10 insertions(+), 7 deletions(-)
 >
 > diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.=
 c
-> index 37c1416ac902..7904159e9226 100644
+> index 7904159e9226..71f37b960812 100644
 > --- a/drivers/block/zram/zram_drv.c
 > +++ b/drivers/block/zram/zram_drv.c
-> @@ -588,6 +588,42 @@ static ssize_t writeback_limit_show(struct device *d=
-ev,
->         return sysfs_emit(buf, "%llu\n", val);
+> @@ -519,7 +519,8 @@ struct zram_wb_req {
+>  };
+>
+>  static ssize_t writeback_limit_enable_store(struct device *dev,
+> -               struct device_attribute *attr, const char *buf, size_t le=
+n)
+> +                                           struct device_attribute *attr=
+,
+> +                                           const char *buf, size_t len)
+>  {
+>         struct zram *zram =3D dev_to_zram(dev);
+>         u64 val;
+> @@ -528,18 +529,19 @@ static ssize_t writeback_limit_enable_store(struct =
+device *dev,
+>         if (kstrtoull(buf, 10, &val))
+>                 return ret;
+>
+> -       down_read(&zram->init_lock);
+> +       down_write(&zram->init_lock);
+>         spin_lock(&zram->wb_limit_lock);
+>         zram->wb_limit_enable =3D val;
+>         spin_unlock(&zram->wb_limit_lock);
+> -       up_read(&zram->init_lock);
+> +       up_write(&zram->init_lock);
+>         ret =3D len;
+>
+>         return ret;
 >  }
 >
-> +static ssize_t writeback_batch_size_store(struct device *dev,
-> +                                         struct device_attribute *attr,
-> +                                         const char *buf, size_t len)
-> +{
-> +       struct zram *zram =3D dev_to_zram(dev);
-> +       u32 val;
-> +       ssize_t ret =3D -EINVAL;
-> +
-> +       if (kstrtouint(buf, 10, &val))
-> +               return ret;
-> +
-> +       if (!val)
-> +               val =3D 1;
-
-IMO a value of 0 for the batch size doesn't make sense, -EINVAL?
-
-> +
-> +       down_read(&zram->init_lock);
-> +       zram->wb_batch_size =3D val;
-> +       up_read(&zram->init_lock);
-> +       ret =3D len;
-> +
-> +       return ret;
-> +}
-> +
-> +static ssize_t writeback_batch_size_show(struct device *dev,
-> +                                        struct device_attribute *attr,
-> +                                        char *buf)
-> +{
-> +       u32 val;
-> +       struct zram *zram =3D dev_to_zram(dev);
-> +
-> +       down_read(&zram->init_lock);
-> +       val =3D zram->wb_batch_size;
-> +       up_read(&zram->init_lock);
-> +
-> +       return sysfs_emit(buf, "%u\n", val);
-> +}
-> +
->  static void reset_bdev(struct zram *zram)
+>  static ssize_t writeback_limit_enable_show(struct device *dev,
+> -               struct device_attribute *attr, char *buf)
+> +                                          struct device_attribute *attr,
+> +                                          char *buf)
 >  {
->         if (!zram->backing_dev)
-> @@ -779,10 +815,7 @@ static void release_wb_ctl(struct zram_wb_ctl *wb_ct=
-l)
->         kfree(wb_ctl);
+>         bool val;
+>         struct zram *zram =3D dev_to_zram(dev);
+> @@ -554,7 +556,8 @@ static ssize_t writeback_limit_enable_show(struct dev=
+ice *dev,
 >  }
 >
-> -/* XXX: should be a per-device sysfs attr */
-> -#define ZRAM_WB_REQ_CNT 32
-> -
-> -static struct zram_wb_ctl *init_wb_ctl(void)
-> +static struct zram_wb_ctl *init_wb_ctl(struct zram *zram)
+>  static ssize_t writeback_limit_store(struct device *dev,
+> -               struct device_attribute *attr, const char *buf, size_t le=
+n)
+> +                                    struct device_attribute *attr,
+> +                                    const char *buf, size_t len)
 >  {
->         struct zram_wb_ctl *wb_ctl;
->         int i;
-> @@ -797,7 +830,7 @@ static struct zram_wb_ctl *init_wb_ctl(void)
->         init_waitqueue_head(&wb_ctl->done_wait);
->         spin_lock_init(&wb_ctl->done_lock);
+>         struct zram *zram =3D dev_to_zram(dev);
+>         u64 val;
+> @@ -563,11 +566,11 @@ static ssize_t writeback_limit_store(struct device =
+*dev,
+>         if (kstrtoull(buf, 10, &val))
+>                 return ret;
 >
-> -       for (i =3D 0; i < ZRAM_WB_REQ_CNT; i++) {
-> +       for (i =3D 0; i < zram->wb_batch_size; i++) {
->                 struct zram_wb_req *req;
+> -       down_read(&zram->init_lock);
+> +       down_write(&zram->init_lock);
+>         spin_lock(&zram->wb_limit_lock);
+>         zram->bd_wb_limit =3D val;
+>         spin_unlock(&zram->wb_limit_lock);
+> -       up_read(&zram->init_lock);
+> +       up_write(&zram->init_lock);
+>         ret =3D len;
 >
->                 /*
-> @@ -1197,7 +1230,7 @@ static ssize_t writeback_store(struct device *dev,
->                 goto release_init_lock;
->         }
->
-> -       wb_ctl =3D init_wb_ctl();
-> +       wb_ctl =3D init_wb_ctl(zram);
->         if (!wb_ctl) {
->                 ret =3D -ENOMEM;
->                 goto release_init_lock;
-> @@ -2840,6 +2873,7 @@ static DEVICE_ATTR_RW(backing_dev);
->  static DEVICE_ATTR_WO(writeback);
->  static DEVICE_ATTR_RW(writeback_limit);
->  static DEVICE_ATTR_RW(writeback_limit_enable);
-> +static DEVICE_ATTR_RW(writeback_batch_size);
->  #endif
->  #ifdef CONFIG_ZRAM_MULTI_COMP
->  static DEVICE_ATTR_RW(recomp_algorithm);
-> @@ -2861,6 +2895,7 @@ static struct attribute *zram_disk_attrs[] =3D {
->         &dev_attr_writeback.attr,
->         &dev_attr_writeback_limit.attr,
->         &dev_attr_writeback_limit_enable.attr,
-> +       &dev_attr_writeback_batch_size.attr,
->  #endif
->         &dev_attr_io_stat.attr,
->         &dev_attr_mm_stat.attr,
-> @@ -2922,6 +2957,7 @@ static int zram_add(void)
->
->         init_rwsem(&zram->init_lock);
->  #ifdef CONFIG_ZRAM_WRITEBACK
-> +       zram->wb_batch_size =3D 32;
->         spin_lock_init(&zram->wb_limit_lock);
->  #endif
->
-> diff --git a/drivers/block/zram/zram_drv.h b/drivers/block/zram/zram_drv.=
-h
-> index 6cee93f9c0d0..1a647f42c1a4 100644
-> --- a/drivers/block/zram/zram_drv.h
-> +++ b/drivers/block/zram/zram_drv.h
-> @@ -129,6 +129,7 @@ struct zram {
->         struct file *backing_dev;
->         spinlock_t wb_limit_lock;
->         bool wb_limit_enable;
-> +       u32 wb_batch_size;
->         u64 bd_wb_limit;
->         struct block_device *bdev;
->         unsigned long *bitmap;
+>         return ret;
 > --
 > 2.52.0.rc1.455.g30608eb744-goog
 >
