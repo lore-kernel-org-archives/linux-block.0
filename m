@@ -1,103 +1,127 @@
-Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
+Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B90434403E
-	for <linux-block@vger.kernel.org>; Thu, 20 Nov 2025 14:52:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A4137081F
+	for <linux-block@vger.kernel.org>; Thu, 20 Nov 2025 15:01:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763650377; cv=none; b=qgcm08KSwTNuGdJcimA8ZT5S7Mftn1WIoCoIdqlDrCb5uQKvqdXReJCCNdQi+P5X6Psi7IAAvvAlr7dhcCX54d0zVyqx5AFEK5DzVwXShkNxEuEStn3VL3yopXXRn9yAwwWRhQjR2ICoiRe+w1jRZ7YfT497laMHrtAdIZLkHx4=
+	t=1763650901; cv=none; b=u3T5YzzK3OEGtHztmhjK5vlg43yRIm2BqWJt/kpkvxXzutT1PSftyl2os0JwRfvkBEl6zJe9N70oHWsHJpmK3Zt4WbPP06FnMIhWxdqywp0WBW94dzUcwkZBLe4bgl1t0lu+pe8RkMClLFom3hMtSp86qFWUJX5FTu7XrtzpJVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763650377; c=relaxed/simple;
-	bh=l/Hl17ccyEKJ+drcSXmwodd1cT2WmN6u3xBpFnrM2s0=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=O8ZsKMLsR7lZHB+6dbaAslmUpHFDqrJVUgfX9GTofbznQKcRWGPCpREjRbsUVmQsN6QPV13EtW7KkRSZ8F1DqVsUfKrCXuoJ8iCIa/khzRl3U0yklLxqFKASVCH0wNSTkSyqSzdM4k/9bNFhEUCDm6vWOD9go7kS+xiZcW6lZ6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Kmv2JgWK; arc=none smtp.client-ip=209.85.166.51
+	s=arc-20240116; t=1763650901; c=relaxed/simple;
+	bh=i7+z/ltNygDaEsok5KxXK0dj4UVl1aNJuWbKb2K6wi8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OkZXGd6UZsGOPtU6sAAcqFkbhlb4C+8ZczALEqgNQisRaGGQBcRYQaM3OAUWg2625tojjlv7fSYoOntghBM/LouztK10RhlTg6XOeiyO2axMiUBFGpwlwknwyvi4/oLi0DvgbFb+iMU6GRxWvBdHOT/YHKZXWB/1zT59l4KpAUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=n6AXODaL; arc=none smtp.client-ip=209.85.166.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Kmv2JgWK"
-Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-9491571438cso43117939f.0
-        for <linux-block@vger.kernel.org>; Thu, 20 Nov 2025 06:52:51 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="n6AXODaL"
+Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-4330d2ea04eso4099445ab.3
+        for <linux-block@vger.kernel.org>; Thu, 20 Nov 2025 07:01:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1763650368; x=1764255168; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SMlcXFH3jslvGm0AuLGN1rdhcCi22oTjck4ffuNviBY=;
-        b=Kmv2JgWKTJODqCPbQCmAVwkbpHtzifBWydMI2bTE06BeY7Q49hnAdpnJo0rdnylQpU
-         36tJsnKrZRUnu47a7i3cXIFIkHnEyltBqiH9CcahvQCDEggAvmAedd4PaR5NhlzLUOKq
-         LatmUtQfKJfw9lkMRsEEeFclrlHhMi1AJD+JiuD3w0xJy4i8/c3xPAGU8hdGe5j/dye5
-         TqO2AdgUxngddn4hUrqSWlF1+i6kA5jZA8z6i44v6zxZ75ZogNxlKJyBCLjKd6k8ah7b
-         tCZZVdLSbvD+mPNXRK5ThyX+nm6aGe3sWlgzwvfmkVW27YSmlOANlY0ts/vRTr2VTU+Z
-         54qQ==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1763650898; x=1764255698; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LSDxdZVcIR29RyQwmW4yTqg5tQo8W9h4CxDjkRHZbCM=;
+        b=n6AXODaLVpbO1ypoaTakIOYTXdQlwbo8iDVFc1ZIN9FFHyJSZWmbT0C3Qoen/2l7G3
+         bG4QzLu8976h8Z959/TDeNmmRC0si/ELJhniCZ70IOiTqHHyAE6IKXi2K7p0yIfee0Pu
+         XUvS1r8Zx1AqksX1WM5iGiGOKchRw5VV/+J0vqzczmVnvRuJh+hR+k9b2RddPhVsoYlY
+         5jewNi6+UCZEqfQE+G5vQWwXLJLkKPIavQRg9j561qcGrATBOXLEDuLQ3SXc/inRSM8V
+         RriWB37G0WIhQ8xJOX2cKV4X7y4yOtjyrbc3vatanwfs5sBLO6TDTZAzkS3Ual/9kv0k
+         /MXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763650368; x=1764255168;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=SMlcXFH3jslvGm0AuLGN1rdhcCi22oTjck4ffuNviBY=;
-        b=nOoe9nc+qUPj7cvkfyPtbFbuNZeErdj1adoYIXKJlmJwBVmZniSnqw+y0CqyDL1+rU
-         pAb1rZoXdgQJBOcT2W2rFRdGVQmmelipGPHAl/Xey8eTCgigirRXUxtKNe2annMLgXRl
-         jYADuh0+ZaKAl0Of49zCaoiCSMt+jZq1j/vVXSzrbTPwLJPDf4V/bqUw4LPk6KnaAZdb
-         3pbgPeesFO02N2KMsV9aGmEfqUlTpjGZTQv6F8/Ho+JGIKBjRUKnHBvN2FmTNGE63z2a
-         L+umzHQy3lddCQsW9WEj4/8JzUV1M3k5hpLTpI1RC8itsnk9DVuSbodd0kSWzNyOwQ+w
-         7X7A==
-X-Gm-Message-State: AOJu0YyBUUJ3L3BVjPVa7GoazZANGKNGrUb3hWEGjavaHMPPntle25Sq
-	g+pRAKyL335Jwzmzrt6mJ4MVXES9LQMKF5M1+3aQ72ZxyiIrUNTG0cS+KNn3PioH19M=
-X-Gm-Gg: ASbGnct/TRix+5S08DAxCPe8FqRG/o05PSF4d/X3QNVPVfBoXtZpvuNEyWtYyVAZ0Gf
-	GhJB7MTjYfc9XOFaLcKHOSGDxr66evH0rzegZ0+/JiN2dqxiShL4kmAV696wpsUvYeSDzxAnUKZ
-	Kttlo2pDlub3+JR95SVkVvKGK4NY/NV7xHt1esTjCod+bNO7EGiNxV/i70wQHWy7xHRFxdpP3Dv
-	zbY+japQmk4JDxnDLOFAWpqkPEYbVjlRHIpU5GlzDy4ieC1NdA/3G5OLUsvL9j9Uv47w2BjKLrL
-	bDw2FI6ySkTAmDTmUlsq0L/fl3APfN+dPt133+U4EBJulrtGOZvHI1/N8Nnb/W75gR9OyJ+5YPg
-	ZKqA3TMlFOlTy0WLNf71xFgiC1a+ZeBN82SyIwlSKlxtzCzvxu//0Tm0LsEnx1cwZOZcyqCnOyR
-	OFpA==
-X-Google-Smtp-Source: AGHT+IHpyJxDTPgPvA5uSnFKBx2eenXg/cSUHpqpFzspGQpS+E0PNyTR3Es91yy0PbSr4OtbCuNVVA==
-X-Received: by 2002:a05:6638:2211:b0:5b7:d710:661e with SMTP id 8926c6da1cb9f-5b9541d7337mr2679877173.21.1763650368210;
-        Thu, 20 Nov 2025 06:52:48 -0800 (PST)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5b954b207d7sm1008611173.33.2025.11.20.06.52.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Nov 2025 06:52:47 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: dlemoal@kernel.org, hch@lst.de, 
- Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
-Cc: linux-block@vger.kernel.org
-In-Reply-To: <20251119232234.9969-1-ckulkarnilinux@gmail.com>
-References: <20251119232234.9969-1-ckulkarnilinux@gmail.com>
-Subject: Re: [PATCH V2 1/2] loop: clear nowait flag in workqueue context
-Message-Id: <176365036730.566630.1797291060556948800.b4-ty@kernel.dk>
-Date: Thu, 20 Nov 2025 07:52:47 -0700
+        d=1e100.net; s=20230601; t=1763650898; x=1764255698;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LSDxdZVcIR29RyQwmW4yTqg5tQo8W9h4CxDjkRHZbCM=;
+        b=pk+NWpDHq5VrwopFGD4jjoK1gUe5ML2wFDOzVFdHkXw/d5eWUrXPPOX7nK8xW1oXIx
+         0b5R65z6U2reF7GWToNYkB0kASRjPWzwgWezXm+wavBEdbiss0ZIl/kul78JjPvnTagD
+         iPaiGPkrnrTL+jOo0OogCbwWsa6ynixupft4khk/6QLiZP7kKTYGfEUxmNEX5X6Rb4ky
+         ZMEUJlB6ekROcD2GxUYNpLlG0Wot3i9oiziD0qUEwo9earQjWEfYC57NMSb3pIcrBA6a
+         geGDpylSo/wvOVcTFjAGHIdwb6a7eUYAHo2kR5yqu/4b0efOCGagOqW6D6pcdlK/4YL5
+         4CuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVsStUxBmJGG1b0drXhCGeBUlLnXlzorksFocawBi4Spkvb9Kc5921+cKgOEOZJL/j77UlbPHmYlWhTag==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzjVKAUUebQ38XzXXpUv5StuVpb/gxVoTummCkhau90N6NsH/+s
+	x5GQRVO6CcPuHIA/UuoqAzHQk8REsTuZYIOI4NA4teL8d1Mo7aEgRcW0NHkxVBDkxNc=
+X-Gm-Gg: ASbGncsgPr9Ps/xoDWJQ0j1hJajHMOnagU1eeI80jW+SOswVyGQfp75D/iipuUNCwrn
+	L5yDc4noQospD8wAp3zbBMkaJKG4mDHt32RIA18OxzMcOOD4L/VyGs4+osXLwBmDMBuFBZaJGuE
+	LY1pmjDO+6gJ4WsMJWk2FRsxesqxy8YelB9i2ZuMH6qLAIA1LnMmkvDv3RF7OtxF7kNRBYSJ5ZJ
+	U4JT0IVBAsvugS+vfc/TzZTpqZLpQ9EV09ygSUFjA3tZoT373vNiNdQeTObj0lpy29o54PK9vEm
+	e+EUX3MhhQ4BQvhPk3R2IjzE35SCpsYj4aYAzn320iuMhDkoHPUidU/3nszfCF7fitVLooSkPGZ
+	6//PYUQgpYGTep3i/NRKB99Tqq0/fk/XUXdgc+OSYas5aHwVUkBqrz12gyQtsjYB/Clg=
+X-Google-Smtp-Source: AGHT+IF9pA8fiysc4Hl7hdjzMkPNNGnxmNPLweWW+SrgIIlEz+A3x3KG5QLYzwBs/R37Gi6WOjPr3g==
+X-Received: by 2002:a05:6e02:3a03:b0:433:7e2f:839d with SMTP id e9e14a558f8ab-435a9074d95mr28325845ab.21.1763650897829;
+        Thu, 20 Nov 2025 07:01:37 -0800 (PST)
+Received: from [192.168.1.96] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-435a8fc0020sm11590255ab.0.2025.11.20.07.01.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 Nov 2025 07:01:36 -0800 (PST)
+Message-ID: <d01e0be0-6c4e-4308-8663-b408ab74a911@kernel.dk>
+Date: Thu, 20 Nov 2025 08:01:34 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] blk-mq: fix potential uaf for 'queue_hw_ctx'
+To: Fengnan Chang <fengnanchang@gmail.com>, linux-block@vger.kernel.org,
+ ming.lei@redhat.com, hare@suse.de, hch@lst.de, yukuai3@huawei.com
+Cc: Fengnan Chang <changfengnan@bytedance.com>
+References: <20251120031626.92425-1-fengnanchang@gmail.com>
+ <20251120031626.92425-3-fengnanchang@gmail.com>
+From: Jens Axboe <axboe@kernel.dk>
+Content-Language: en-US
+In-Reply-To: <20251120031626.92425-3-fengnanchang@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index eed12fab3484..82195f22befd 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -4524,7 +4524,12 @@ static void __blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+>  		if (hctxs)
+>  			memcpy(new_hctxs, hctxs, q->nr_hw_queues *
+>  			       sizeof(*hctxs));
+> -		q->queue_hw_ctx = new_hctxs;
+> +		rcu_assign_pointer(q->queue_hw_ctx, new_hctxs);
+> +		/*
+> +		 * Make sure reading the old queue_hw_ctx from other
+> +		 * context concurrently won't trigger uaf.
+> +		 */
+> +		synchronize_rcu();
+>  		kfree(hctxs);
+>  		hctxs = new_hctxs;
 
-On Wed, 19 Nov 2025 15:22:33 -0800, Chaitanya Kulkarni wrote:
-> The loop driver advertises REQ_NOWAIT support through BLK_FEAT_NOWAIT
-> (enabled by default for all blk-mq devices), and honors the nowait
-> behavior throughout loop_queue_rq().
-> 
-> However, actual I/O to the backing file is performed in a workqueue,
-> where blocking is allowed.
-> 
-> [...]
+Might make sense to use the expedited version here, to avoid odd ball
+cases that end up doing this for tons of devices.
 
-Applied, thanks!
+> diff --git a/block/blk-mq.h b/block/blk-mq.h
+> index 80a3f0c2bce7..ccd8c08524a4 100644
+> --- a/block/blk-mq.h
+> +++ b/block/blk-mq.h
+> @@ -87,6 +87,17 @@ static inline struct blk_mq_hw_ctx *blk_mq_map_queue_type(struct request_queue *
+>  	return q->queue_hw_ctx[q->tag_set->map[type].mq_map[cpu]];
+>  }
+>  
+> +static inline struct blk_mq_hw_ctx *queue_hctx(struct request_queue *q, int id)
+> +{
+> +	struct blk_mq_hw_ctx *hctx;
+> +
+> +	rcu_read_lock();
+> +	hctx = *(rcu_dereference(q->queue_hw_ctx) + id);
+> +	rcu_read_unlock();
+> +
+> +	return hctx;
+> +}
 
-[1/2] loop: clear nowait flag in workqueue context
-      commit: b11e483a1cc32e7b557ff680e9bfb4ff11dea9c1
-[2/2] zloop: clear nowait flag in workqueue context
-      commit: e8f0abdd49baacee3886d5827f113514fcd9fd05
+I think that'd read a lot better if the type was **hctx and you just
+return *hctx instead.
 
-Best regards,
 -- 
 Jens Axboe
-
-
-
