@@ -1,125 +1,75 @@
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ACE03396F8
-	for <linux-block@vger.kernel.org>; Thu, 20 Nov 2025 13:20:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B4AE1DE8A4
+	for <linux-block@vger.kernel.org>; Thu, 20 Nov 2025 14:33:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763644850; cv=none; b=YH2D8JOoYamJXwaUSJ4c36YZLzzBxGqFi+dl6LM+7FMHM0Z/NUp0r8WKpcZaU1KYPDwGqLKrGsWldoq5UZQeeGCPU1avJJmU+FzKiBpbXoMfduoJZPoO89/rWinZ/TRDsgMjk4goiD/XkHB5jUQrJ0UCWSweD69WBqxwPdxrHHE=
+	t=1763649180; cv=none; b=mwTnjrDx3VW3Plp7+enoN5Y9g+ZAVVoSJK5/hBaedY7hYiwaagXBRPM7LQdhW98VCJq6J7bUTGToNDdmjUY1lKft0YuBoX5NhtbPyX5CH4LiTFpT9xTvj8CDZyijFaxxwWFtnFy9JQQreQDPXjfRDEkLc8CF9phbzNO+4kvLOhs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763644850; c=relaxed/simple;
-	bh=FAIy2u4gJscDNGUshiInImCPqOKl3iOKQJH6e6Bc4JI=;
+	s=arc-20240116; t=1763649180; c=relaxed/simple;
+	bh=O76e0p2UNSe9qHMSPG42biK8dHTwC/AH3JfNGWExta0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j73Is1L1y/hYZPTLGyM2b1FX5oE11NPoP8+GHXxjSWSqBJH27j8ZTcBuYQpTPxx8s89sj6hK9gFFbTcg/VLnnJyL8Sm+PsBYyh31534V6ZvDQGhhe6Qsa3um+YLkIJDjJAjQLj+dnsHS2VnMEcHVUFzESOclAKx5+ex52iYODVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=jMJVlNB8; arc=none smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	 Content-Type:Content-Disposition:In-Reply-To; b=aNoISfK1hgnOG1x5nuq8xrj4A+EpVwdfNjRZaZ4MNsnPtkZtep1OCcxhFJmIupfp4fsaTtLqEtTJyXHZ2+YKv2GmtzdIztzI+wcr1eITqR+Ru3pNUbCtWgS21dw/cMH9eQH0eBtcC4ciOHi9YdrA6oBXFDRZHSlvMd7CfpVEPdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tJYHlchB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="jMJVlNB8"
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-8b2e530a748so73587085a.0
-        for <linux-block@vger.kernel.org>; Thu, 20 Nov 2025 05:20:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1763644847; x=1764249647; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=GaI8T1P9V7HUSR5GC1P83jhUObFww+4fRanAKkUJgJM=;
-        b=jMJVlNB8LyM4AYZyl088cBiSIlJ90Q1dm2hb+qOJix1EHdJs4siUbnVhSfjdoo+d8b
-         CpJ6KfO7u7JniZDhdoBs1zVrqavLhdwn31rKFf/kVN8vkyxieUH5wcPJTih/9lZw+PEX
-         fzdm1aYuxKCanV8/aYUVsuP51mR3HV9FaHggDK4qYX5m3Eht6ufYvvO9vptn0SOijTOl
-         cfmQgVoxaFFQaCv0MtR3VFkL7VdP7LsWZJMB5e2tkAY+4CqMtLl57rP2UzUjo5ld0ad3
-         Ew7cnRVtQJOT76Gc3wbQzgtVC/yQSTJ4MullMwUuBOCRwifmwR9JypsEhj+RRVt4akF1
-         VX3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763644847; x=1764249647;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GaI8T1P9V7HUSR5GC1P83jhUObFww+4fRanAKkUJgJM=;
-        b=JT/SXHjoPfbxQ5di/2H3gvSsUZlf5p09umObamHcOzWjoSli7n1zgW6ykVV4VBVd+u
-         2rWa42ePYSz6tMaJx+7NrsJ1OTsdco639SeAKHmeF+93W65eUUymACn9uIfuVW5hvRzn
-         +sKHqS3sgZ3bjexTXK2HhgaccYTIk3kBmasU4G61pSle7lAzOOv0RO9znRFKvo9txeKY
-         N0iQLl6WlGn6oTGHmdjMvR3ursjtFB4P6CCF0yBO6mU0aSF48MvsqJooNuJ5SvHHUzny
-         AYpDQ6uDvV5RvtNLPOQ8uXjwLgoeMJ1KzkfFnmRTIkQsxL8uRXyLiY3CLOCyUjbb8+lx
-         m7jw==
-X-Forwarded-Encrypted: i=1; AJvYcCVOxwTLvWi41rZdvS8x7LWqDnQIHdnWsMZdF8CJUciE3dNijv4joWg2pu+UqmxQ3ToxMN0oUnwYNXSjqg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKZc2MDqvPoRd2amyvogU5JWZtXrSpf+lWXy3sZBzIkPTeY685
-	QvD2nmgWZYIhnzKPQn53RpKQ04tHkrQu1w6dPS2jJqtfkKju/3/6749dZfj0w7rfzEw=
-X-Gm-Gg: ASbGncvWL2WlqNI26FE2ta+xqNJGJkIREWfCelZ7/CFa8wxiPKaafee09p0Ttb4M7g4
-	jIRQw/IU5876Fvkz1/IIU3dFFudW2GzxJkFuoIDN0qxI5fB0NGQf8RYt6nyAWOoInRSFiQAfL6B
-	SQqgfJfOPY4V5Gow3q5Uj7tNsrAUcaMs/Qq4UhT0wTQHEaGhiEAVPwnuJFeJyex85/TuibrD3N4
-	t48AmGVdTZ7yLRcblQBlDqpCB+s4OUbm7/C2C5w3ap9ihchcGq9VrPSmobecL87Bv9UYXuOAYNp
-	GP1cUaw8YhrgxFxd1Fnv7GKswEzsjVl5VilVs+Ipl8acD0e52susXsYR71EfUW8rVrlry6GzsYP
-	342xtifUh+mj1Gt2ZpgCojz2iutNSF/pDN5l+TpQqSxF1zboorHElI/dRbW34ykMtKC+n8k4WnV
-	F9c8cg9J8ZwKh/euTBY7+3+E1bnKalCnzHzoJ/tQ4FuSA8qEa78CK8Yzbw
-X-Google-Smtp-Source: AGHT+IHQ4fmxCAI4/D2tK1B8sYqUFbudidu6PckWMercsX/iRS90WBjHNHkg95yPWC8b179KW1QKQA==
-X-Received: by 2002:a05:620a:318a:b0:89f:27dc:6536 with SMTP id af79cd13be357-8b32a193b85mr303322785a.54.1763644847316;
-        Thu, 20 Nov 2025 05:20:47 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8b3295c13ccsm148498285a.26.2025.11.20.05.20.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Nov 2025 05:20:46 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1vM4ac-00000000gLM-0tBz;
-	Thu, 20 Nov 2025 09:20:46 -0400
-Date: Thu, 20 Nov 2025 09:20:46 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>
-Cc: Leon Romanovsky <leon@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>, Jens Axboe <axboe@kernel.dk>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Sumit Semwal <sumit.semwal@linaro.org>, Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <skolothumtho@nvidia.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex@shazbot.org>,
-	Krishnakant Jaju <kjaju@nvidia.com>, Matt Ochs <mochs@nvidia.com>,
-	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, iommu@lists.linux.dev,
-	linux-mm@kvack.org, linux-doc@vger.kernel.org,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linaro-mm-sig@lists.linaro.org, kvm@vger.kernel.org,
-	linux-hardening@vger.kernel.org, Alex Mastro <amastro@fb.com>,
-	Nicolin Chen <nicolinc@nvidia.com>
-Subject: Re: [Linaro-mm-sig] [PATCH v8 06/11] dma-buf: provide phys_vec to
- scatter-gather mapping routine
-Message-ID: <20251120132046.GU17968@ziepe.ca>
-References: <20251111-dmabuf-vfio-v8-0-fd9aa5df478f@nvidia.com>
- <20251111-dmabuf-vfio-v8-6-fd9aa5df478f@nvidia.com>
- <8a11b605-6ac7-48ac-8f27-22df7072e4ad@amd.com>
- <20251119132511.GK17968@ziepe.ca>
- <69436b2a-108d-4a5a-8025-c94348b74db6@amd.com>
- <20251119193114.GP17968@ziepe.ca>
- <c115432c-b63d-4b99-be18-0bf96398e153@amd.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tJYHlchB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3C0DC4CEF1;
+	Thu, 20 Nov 2025 14:32:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763649180;
+	bh=O76e0p2UNSe9qHMSPG42biK8dHTwC/AH3JfNGWExta0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=tJYHlchBWS2bygNRIW/OOaQtTv/FW3PBKEgpByED2qbKWm7tpO8KY7/yb2aEw2LDz
+	 CastRgmoGWFkVkaRsZT+sucn5T/uRUeQ8mQdrI/drM615BOZdC2/zlg0tjpIH2utSV
+	 kT5X/XgQcon0g5K3csBMiZZwD6wJorcG8hXqvmOSbSOuHaxWUUd6+pt1dm4GyoU4CF
+	 kC8kiGnDe3h9omw51LJ9KylJZSn8q+OC636O7l+zzuXhWkxWqB9LJ3vbe81W7NWdmJ
+	 OdIlCrsFSaaqptmK19xijb34Tn2OdbT+BTNMpSGwe9lM5RVoPnMLcd0I1BEbHM8/C6
+	 S7ehezn2JUHkg==
+Date: Thu, 20 Nov 2025 07:32:58 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc: Keith Busch <kbusch@meta.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"shinichiro.kawasaki@wdc.com" <shinichiro.kawasaki@wdc.com>
+Subject: Re: [PATCHv2 1/2] blktests: test direct io offsets
+Message-ID: <aR8mmpmwSf6QRgwm@kbusch-mbp>
+References: <20251119195449.2922332-1-kbusch@meta.com>
+ <20251119195449.2922332-2-kbusch@meta.com>
+ <ddda3d01-b95e-4798-b21d-a0c526b5b5a8@nvidia.com>
+ <aR5ZyoBaX-47tgNn@kbusch-mbp>
+ <d97a75e3-2ba9-488c-a22c-9cb505cb2ce8@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c115432c-b63d-4b99-be18-0bf96398e153@amd.com>
+In-Reply-To: <d97a75e3-2ba9-488c-a22c-9cb505cb2ce8@nvidia.com>
 
-On Thu, Nov 20, 2025 at 08:08:27AM +0100, Christian König wrote:
-> >> The exporter should be able to decide if it actually wants to use
-> >> P2P when the transfer has to go through the host bridge (e.g. when
-> >> IOMMU/bridge routing bits are enabled).
-> > 
-> > Sure, but this is a simplified helper for exporters that don't have
-> > choices where the memory comes from.
+On Thu, Nov 20, 2025 at 12:56:36AM +0000, Chaitanya Kulkarni wrote:
+> On 11/19/25 15:59, Keith Busch wrote:
+> > On Wed, Nov 19, 2025 at 11:48:47PM +0000, Chaitanya Kulkarni wrote:
+> >> On 11/19/25 11:54, Keith Busch wrote:
+> >>> +        ret = pwritev(test_fd, iov, vecs, 0);
+> >>> +        if (ret < 0)
+> >>> +		err(errno, "%s: failed to read buf", __func__);
+> >>> +
+> >>
+> >> is pwritev correct above or it should be preadv () ?
+> > Good eye, it should have been preadv. This part is currently unreachable
+> > though, as it requires byte-aligned dma limits and the kernel doesn't
+> > report such a value. But if this were to run, the test would have
+> > falsely declared data corruption.
 > 
-> That is extremely questionable as justification to put that in common DMA-buf code.
+> how about ?
+> 
+> 1. Keep the code but disable it until kernel gets that support ? OR
+> 2. add an ability to autodetect if kernel has a support before running the
+>     test else skip test_invalid_dma_vector_length() ?
 
-FWIW we already have patches for a RDMA exporter lined up to use it as
-well. That's two users already...
-
-Jason
+It already does the second one. This test function checks the device's
+dma alignment requirements and purposefully dispatches a command that is
+expected to fail before it reaches this part.
