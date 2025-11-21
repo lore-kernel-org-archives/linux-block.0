@@ -1,125 +1,146 @@
-Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0339530FC3D;
-	Fri, 21 Nov 2025 12:43:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FE8228F948
+	for <linux-block@vger.kernel.org>; Fri, 21 Nov 2025 16:13:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763729035; cv=none; b=Xr1+ku6iXnlc3wZ6ve1ouG8E4i7NZINhJa3FZmyEus5gYA1HRNTuZLXZNVRam50fReWkiI1FOO0io8Noj0KeaKKIXRMeKCrigHxvquwfZLpOJMwxmDd3ZJSD+5vB9CJumI9HqtZoYdcI7KiqCA4e72eOjzRyOB1Ifj5jCZn2U8s=
+	t=1763741618; cv=none; b=f4kgXbvfR5tFM7p/SO5eD6t5oaPzTK35zAy1wdYbpAUl1oj8XcQ7Lpa+H/bsK5VlBTJd7G+sOAMhRV3tt8QERIqkOcZAuhhHonY2xu7V8GmcfhedmVORosalDBA9mahCsiVlFCo6guRvgn1rcB9B2C0J+fRUXSfbZ538OoHMvXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763729035; c=relaxed/simple;
-	bh=SseNgIZp6gPDgR2IeWAnrRjcKo5B1YeAinQknMrLT9w=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Io3g+/in4IGzoRsO4AFNbs0ecFVN/TFEBDuTans37zHGZhPIHEvlLsBpRsEXdXleMG5mBrdh5+8qN3+xTLktRvFltBWfdOtRE3UcfSMVdR9rVa1GI4gmwMq+BDOm91P9nrfz+My5G52WfceIidMRQvpM/Lka1Pmo8lab1mvDdJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=HvE3C/FR; arc=none smtp.client-ip=115.124.30.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	s=arc-20240116; t=1763741618; c=relaxed/simple;
+	bh=dMK0oCGPkhBORnYflGD+Nd/wtsiqo9P9q5j0HWkQypo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uwm/A+ZnV9mloJM84aKIegSYeTiikaN1g1Bp6q8VSOTk/3ik/DpLFvaa9x0w3QvuJ3zIObc9qTWhTJp6pj8kLN92kRQLqdSkPjeXFgcW3eFDSDft5vMf8PRjw3qiaRZKiRPkQPhhqefMkMgepfE6rsv/QxxOzdX75Y4i83tZWjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LcNQhhhh; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=M70S74UA; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="HvE3C/FR"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1763729027; h=Message-ID:Date:MIME-Version:Subject:From:To:Content-Type;
-	bh=UXNEr7vcm3thFtEulF8bEeGgEGO9nmCn0v+aGXpJLHk=;
-	b=HvE3C/FRH/Xk4hMHhYrsjTgfGuCHjuldYsbPVZiT9+R1HALhq9/Wci5N2DVw+ygHkzlU/TpxNLH+Rci3CW6k8VxkFqTFkD87gQKOt7VJlaqanJKma0QQzz1ol1r2f7ehf0/qPJTDNbL/uTJMTyv3yTIJW9wSsKsMKpCFNzqMI/A=
-Received: from 30.170.82.147(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0Wt003i5_1763729026 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Fri, 21 Nov 2025 20:43:46 +0800
-Message-ID: <d7140963-3b21-4b51-9a9c-bcf8362bf1da@linux.alibaba.com>
-Date: Fri, 21 Nov 2025 20:43:45 +0800
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LcNQhhhh";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="M70S74UA"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763741615;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hh93R5tPjAC6W1rTnWq/i2ZvU4feR2Tgy6yZhs+i3/0=;
+	b=LcNQhhhhpJ9wRd7zseKWpTJ3jS4xzTdefbyazCyQs6KiM94uuKs5frKIxOWAOiyiQVTRl5
+	FpwZDTgFDVXCxw2WRUxWRkZShZSpeqkihAI/XF1Y49UN16KSOoxRo7x9rYkpuLLoPj1BeB
+	CbyfCBjqxyvVVqsEpfXvtMqk4aivARs=
+Received: from mail-yw1-f199.google.com (mail-yw1-f199.google.com
+ [209.85.128.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-608-yKJDMmo-OyChKNKSE1MBQg-1; Fri, 21 Nov 2025 11:13:32 -0500
+X-MC-Unique: yKJDMmo-OyChKNKSE1MBQg-1
+X-Mimecast-MFC-AGG-ID: yKJDMmo-OyChKNKSE1MBQg_1763741612
+Received: by mail-yw1-f199.google.com with SMTP id 00721157ae682-787ee7b3ddfso31748917b3.1
+        for <linux-block@vger.kernel.org>; Fri, 21 Nov 2025 08:13:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1763741612; x=1764346412; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hh93R5tPjAC6W1rTnWq/i2ZvU4feR2Tgy6yZhs+i3/0=;
+        b=M70S74UAnBIG9N5oZ9Rp2ATpXZS8B6FvPCAAaLGqm5/qTsp/1gFY8X5SPmDoPjcspL
+         Y4EUL5PYHLbLPWLtiTOoxs72iavnvlIrB4VAHjhIS7ZRBpfxRr3R3oFexj6B0eTNUuR3
+         z77yVc9iiGZsAW5e8NLmHF+n4YmVxPvC31PV8MtambFu3uABQ5pc3a4VvqI+gt9gSxaW
+         SHnQT3XhDb6HOHIsuzkkyl9Z/qIr3JFbxv67XKmxg+5hrKsPTKO3PM7ABTz/qwarBeFp
+         BiThZo7VqoDugCS8t8GaCyRE6FTX1BlnQBilUIpxOetJe0EtpscTXAnK3xjlfQVz8z1H
+         nRLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763741612; x=1764346412;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=hh93R5tPjAC6W1rTnWq/i2ZvU4feR2Tgy6yZhs+i3/0=;
+        b=pz4J0oZ0Vzlho61qsfTdsGPFdykQcBLO6XKiQmwSSCRprVglCsEiSRN0iReqRBO7Q5
+         5tWmTcoS/alQH4tYif24k/kcXZl+IA5xxezjOsWfqHmnuSv81R/khoKAkrcRc0RahQb4
+         TRv93Uv8HiG7G/2U/9Rn9X+Ylg/4aMYisoWcRYMjhw3jWz4duKX43h6EOudvNaiAizRT
+         /ueklKHJsm1k8ON2u7k3/JaSDOZMkUjGpxUSQOjJRMPESHmIOwGK9TleUa1SNmCufH+C
+         wks+VeNNEo58o4b68LrW52BXV/UmCvhuzdVc7p4rN8uEW9MOYpSOLKgCPIx9cubW9ggP
+         eAWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUrO5oBoklmmnEUTDkiqySk+Px2ATbubrx0//nwXNqCmBEqmmsjb7icbb6BUMTl5+m+aH9wG77Ok+jS3Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz18wBRY85pzzvYGNmFfFquSRfZtuSj52dJExb7eGjGETJFlXTM
+	yi7354k12tUE98yS/8qvPiW5yuEw5DvRYPPTX4On2e/gVb/8Y2TFf07o+wwzXZ/P51dpSVAlONL
+	Fgyw0ZYihMORnymD7Nm98SA0Bo+iSkA1RcqrlPUdcErjAQduBzzRITSZC+8jynWN4vCYycaA8xY
+	rIk39lnQiDHDPQ9SimA4gCOBegxSSuSZikzVq8Xug=
+X-Gm-Gg: ASbGncus4msGMYV6oIhPusIJ24e/Kn4cuoaT+QKwAiLTPUer1SDpZHfxj2c56KGapvc
+	tCHI/MByuI56IqZYO/lswO/O8i3404Ayb7MLwyiOlsDy+kqBU6Ko6Y+AsU2dme7X21rj76TFvOI
+	EODJFhM/WUdOiqp69nwR7q+Vv4NjGZQB1pDAYXOHVYd0tbOoLlXbyEl+MIPnd2T5Tj
+X-Received: by 2002:a05:690e:1699:b0:641:f5bc:6979 with SMTP id 956f58d0204a3-64302b122d9mr1963774d50.85.1763741612191;
+        Fri, 21 Nov 2025 08:13:32 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFQHJg27kBmo+3qPSDwMS0FzdloscgwgQdqDmCn0XCLoSgo3nmRsjJwwBETY525KvvMg6grxlgTavlZWQ/uK4U=
+X-Received: by 2002:a05:690e:1699:b0:641:f5bc:6979 with SMTP id
+ 956f58d0204a3-64302b122d9mr1963750d50.85.1763741611792; Fri, 21 Nov 2025
+ 08:13:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCHv5 0/6] zram: introduce writeback bio batching
-From: Gao Xiang <hsiangkao@linux.alibaba.com>
-To: Sergey Senozhatsky <senozhatsky@chromium.org>,
- Yuwen Chen <ywen.chen@foxmail.com>
-Cc: akpm@linux-foundation.org, bgeffon@google.com, licayy@outlook.com,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, minchan@kernel.org, richardycc@google.com
-References: <ts32xzxrpxmwf3okxo4bu2ynbgnfe6mehf5h6eibp7dp3r6jp7@4f7oz6tzqwxn>
- <tencent_865DD78A73BC3C9CAFCBAEBE222B6EA5F107@qq.com>
- <buckmtxvdfnpgo56owip3fjqbzraws2wvtomzfkywhczckoqlt@fifgyl5fjpbt>
- <8c596737-95c1-4274-9834-1fe06558b431@linux.alibaba.com>
-In-Reply-To: <8c596737-95c1-4274-9834-1fe06558b431@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20251121081748.1443507-1-zhangshida@kylinos.cn>
+ <20251121081748.1443507-2-zhangshida@kylinos.cn> <aSA_dTktkC85K39o@infradead.org>
+In-Reply-To: <aSA_dTktkC85K39o@infradead.org>
+From: Andreas Gruenbacher <agruenba@redhat.com>
+Date: Fri, 21 Nov 2025 17:13:20 +0100
+X-Gm-Features: AWmQ_bmosC4btoZ-wa-ksr6NsYAdeqQOhz6k6QYvia4F3jK6NJjmea5Iy6uFTHo
+Message-ID: <CAHc6FU7NpnmbOGZB8Z7VwOBoZLm8jZkcAk_2yPANy9=DYS67-A@mail.gmail.com>
+Subject: Re: [PATCH 1/9] block: fix data loss and stale date exposure problems
+ during append write
+To: Christoph Hellwig <hch@infradead.org>
+Cc: zhangshida <starzhangzsd@gmail.com>, linux-kernel@vger.kernel.org, 
+	linux-block@vger.kernel.org, nvdimm@lists.linux.dev, 
+	virtualization@lists.linux.dev, linux-nvme@lists.infradead.org, 
+	gfs2@lists.linux.dev, ntfs3@lists.linux.dev, linux-xfs@vger.kernel.org, 
+	zhangshida@kylinos.cn
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Nov 21, 2025 at 11:38=E2=80=AFAM Christoph Hellwig <hch@infradead.o=
+rg> wrote:
+> On Fri, Nov 21, 2025 at 04:17:40PM +0800, zhangshida wrote:
+> > From: Shida Zhang <zhangshida@kylinos.cn>
+> >
+> > Signed-off-by: Shida Zhang <zhangshida@kylinos.cn>
+> > ---
+> >  block/bio.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/block/bio.c b/block/bio.c
+> > index b3a79285c27..55c2c1a0020 100644
+> > --- a/block/bio.c
+> > +++ b/block/bio.c
+> > @@ -322,7 +322,7 @@ static struct bio *__bio_chain_endio(struct bio *bi=
+o)
+> >
+> >  static void bio_chain_endio(struct bio *bio)
+> >  {
+> > -     bio_endio(__bio_chain_endio(bio));
+> > +     bio_endio(bio);
+>
+> I don't see how this can work.  bio_chain_endio is called literally
+> as the result of calling bio_endio, so you recurse into that.
 
+Hmm, I don't actually see where: bio_endio() only calls
+__bio_chain_endio(), which is fine.
 
-On 2025/11/21 20:21, Gao Xiang wrote:
-> 
-> 
-> On 2025/11/21 17:12, Sergey Senozhatsky wrote:
->> On (25/11/21 16:23), Yuwen Chen wrote:
-> 
-> ..
-> 
-> 
->>>> I think page-fault latency of a written-back page is expected to be
->>>> higher, that's a trade-off that we agree on.  Off the top of my head,
->>>> I don't think we can do anything about it.
->>>>
->>>> Is loop device always used as for writeback targets?
->>>
->>> On the Android platform, currently only the loop device is supported as
->>> the backend for writeback, possibly for security reasons. I noticed that
->>> EROFS has implemented a CONFIG_EROFS_FS_BACKED_BY_FILE to reduce this
->>> latency. I think ZRAM might also be able to do this.
->>
->> I see.  Do you use S/W or H/W compression?
-> 
-> No, I'm pretty sure it's impossible for zram to access
-> file I/Os without another thread context (e.g. workqueue),
-> especially for write I/Os, which is unlike erofs:
-> 
-> EROFS can do because EROFS is a specific filesystem, you
-> could see it's a seperate fs, and it can only read (no
-> write context) backing files in erofs and/or other fses,
-> which is much like vfs/overlayfs read_iter() directly
-> going into the backing fses without nested contexts.
-> (Even if loop is used, it will create its own thread
-> contexts with workqueues, which is safe.)
-> 
->   In the other hand, zram/loop can act as a virtual block
-> device which is rather different, which means you could
-> format an ext4 filesystem and backing another ext4/btrfs,
-> like this:
-> 
->    zram(ext4) -> backing ext4/btrfs
-> 
-> It's unsafe (in addition to GFP_NOIO allocation
-> restriction) since zram cannot manage those ext4/btrfs
-> existing contexts:
-> 
->   - Take one detailed example, if the upper zram ext4
-> assigns current->journal_info = xxx, and submit_bio() to
-> zram, which will confuse the backing ext4 since it should
-> assume current->journal_info == NULL, so the virtual block
-> devices need another thread context to isolate those two
-> different uncontrolled contexts.
-> 
-> So I don't think it's feasible for block drivers to act
-> like this, especially mixing with writing to backing fses
-> operations.
+Once bio_chain_endio() only calls bio_endio(), it can probably be
+removed in a follow-up patch.
 
-In other words, a fs claims it can do file-backed-mounts
-without a new context only if:
+Also, loosely related, what I find slightly odd is this code in
+__bio_chain_endio():
 
-  - Its own implementation can be safely applied to any
-    other kernel filesystem (e.g., it shouldn't change
-    current->journal_info or do context save/restore before
-    handing over, for example); and its own implementation
-    can safely mount itself with file-backed mounts.
+        if (bio->bi_status && !parent->bi_status)
+                parent->bi_status =3D bio->bi_status;
 
-So it's filesystem-specific internals to make sure it can
-work like this (for example ext4 on erofs, ext4 still uses
-loop to mount). The virtual block device layer knows
-nothing about what the upper filesystem did before the
-execution passes through, so it's unsafe to work like this.
+I don't think it really matters whether or not parent->bi_status is
+already set here?
+
+Also, multiple completions can race setting bi_status, so shouldn't we
+at least have a WRITE_ONCE() here and in the other places that set
+bi_status?
 
 Thanks,
-Gao Xiang
+Andreas
+
