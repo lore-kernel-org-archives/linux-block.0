@@ -1,77 +1,179 @@
-Received: from sg-1-19.ptr.blmpb.com (sg-1-19.ptr.blmpb.com [118.26.132.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from wxsgout04.xfusion.com (wxsgout04.xfusion.com [36.139.87.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C073E1D5160
-	for <linux-block@vger.kernel.org>; Fri, 21 Nov 2025 12:28:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23B592D8372;
+	Fri, 21 Nov 2025 12:30:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=36.139.87.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763728138; cv=none; b=jle3EJRiwvKc4p/AdyXRh03NvJrgxq4LkbCoAg4bSO9xJmpb6j6LjWlkbkQYxTF0VL4R5+isJip5rwnPJL5QbFqlR5VePDDqRB8A/lEQy3oHH/e5Pajzrja3qHlwEy1maxJNuSc8b5QWcVIAO5di2mdNYbu5D+89HWjLqKRiXIw=
+	t=1763728215; cv=none; b=XF+0ngLV+1CQCAJNORHn8aBNgpqw4BtiJg/kcFxSDt31HDE0KMlhAxgddC3GxGjTRtI59L5OQrbG1c0B73DZOsvR2zV0l8UwWS8zknvpXrPEUN1O44MvJ8eucMOvHrYVXpa3EtBwDTJk8OGvEcHKDXFSRCbMznLeMGukREMAbh4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763728138; c=relaxed/simple;
-	bh=7+X1TkiRBs2rYXrvwnRamg0PGczo9rUONGNaLGCzprg=;
-	h=Content-Type:Subject:Message-Id:Mime-Version:In-Reply-To:
-	 References:To:From:Date; b=T1B3NOKJzs9AkieWwdjQtWaov4nlFHak5BCj8jlJhSpf1O26adPQHM22ZNBUGE/XEkyDv720uzkIUYKuO2TW9hFL0o+NeV0A4plsL0Gy9+vxnPnm554PNBqjtRTwtl4fK9rCsPhZpL2VNHpI0OZi/PhVdTPSqa7FA+EMu5pNTG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=pass smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=dLo0Qt11; arc=none smtp.client-ip=118.26.132.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fnnas.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="dLo0Qt11"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1763728121;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=7+X1TkiRBs2rYXrvwnRamg0PGczo9rUONGNaLGCzprg=;
- b=dLo0Qt11yBaEBJtvgUjt9t7ujnEozF31k6ZvccJPLcTCpuHrmCzclsMaSxEMDFNbERQYQf
- k4ByiHIxHGxBPpSRVBDRw4ctPvZIwi8ZcRM4LLOw0eGdpnZcEyst7b1EKWZekAR8RFU1Qd
- PDLkbSK0W2umCOn7kfCW898MgI4zwAG0wrmLoy2luXgWgVu1oidGG216lHN6oeYqAcqBCl
- NQO2NF6sNJDsweyzz0bJyGCCuEkaNe/6DGbz0SvqcJVSniSh1StGbetd2bLLPmWTnpaUcg
- m0av67iqgjlm4x8t+57M/PC+znVyyjN9oFv0h86QT4kLmuaLgKKoDyMCYIms8g==
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 6/8] mq-deadline: covert to use request_queue->async_depth
-Message-Id: <1c2e8761-5344-4300-a2bf-9e80b3983968@fnnas.com>
+	s=arc-20240116; t=1763728215; c=relaxed/simple;
+	bh=yF+ompH0xGWuhwu6i5fvry9KOhCDQ3cyABFc23+hK/k=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=FbMAzwwVTEJrGF5xi2kS7f9k09KId3wkdHJI0pfF/fFNsO/ApPdZLPC75c9FLVVTKMGe2yyxDZamnIMXKKyDsMandaJbxbLsDFwsB8XjNPJ+KD876CaERnRYYA+Lgy3GGynnWstuZT5V71eFAjsxN3xkiVmQ14IDDo3y3z8B1u0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xfusion.com; spf=pass smtp.mailfrom=xfusion.com; arc=none smtp.client-ip=36.139.87.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xfusion.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xfusion.com
+Received: from wuxpheds03048.xfusion.com (unknown [10.32.143.30])
+	by wxsgout04.xfusion.com (SkyGuard) with ESMTPS id 4dCYrh5NbNzBDh3v;
+	Fri, 21 Nov 2025 20:08:04 +0800 (CST)
+Received: from DESKTOP-Q8I2N5U.xfusion.com (10.82.130.100) by
+ wuxpheds03048.xfusion.com (10.32.143.30) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_RSA_WITH_AES_128_CBC_SHA256) id 15.2.2562.20;
+ Fri, 21 Nov 2025 20:10:53 +0800
+From: shechenglong <shechenglong@xfusion.com>
+To: <axboe@kernel.dk>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<stone.xulei@xfusion.com>, <chenjialong@xfusion.com>, shechenglong
+	<shechenglong@xfusion.com>
+Subject: [PATCH] null_blk: Align struct nullb_device field types with module parameters
+Date: Fri, 21 Nov 2025 20:10:42 +0800
+Message-ID: <20251121121043.978-1-shechenglong@xfusion.com>
+X-Mailer: git-send-email 2.37.1.windows.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-In-Reply-To: <c93e88cd-ade4-4264-8d80-a6669e361c32@suse.de>
-Reply-To: yukuai@fnnas.com
-References: <20251121052901.1341976-1-yukuai@fnnas.com> <20251121052901.1341976-7-yukuai@fnnas.com> <c93e88cd-ade4-4264-8d80-a6669e361c32@suse.de>
-X-Lms-Return-Path: <lba+269205af7+7c334d+vger.kernel.org+yukuai@fnnas.com>
-To: "Hannes Reinecke" <hare@suse.de>, <axboe@kernel.dk>, 
-	<nilay@linux.ibm.com>, <bvanassche@acm.org>, 
-	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>, 
-	"Yu Kuai" <yukuai@fnnas.com>
-From: "Yu Kuai" <yukuai@fnnas.com>
-Organization: fnnas
-Date: Fri, 21 Nov 2025 20:28:36 +0800
-X-Original-From: Yu Kuai <yukuai@fnnas.com>
-Received: from [192.168.1.104] ([39.182.0.153]) by smtp.feishu.cn with ESMTPS; Fri, 21 Nov 2025 20:28:38 +0800
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: wuxpheds03047.xfusion.com (10.32.141.63) To
+ wuxpheds03048.xfusion.com (10.32.143.30)
 
-Hi,
+The struct nullb_device previously used generic int types for several
+fields that represent boolean flags, unsigned counters, or large size
+values. This patch updates the field types to improve type safety and
+match the corresponding module parameters:
 
-=E5=9C=A8 2025/11/21 15:18, Hannes Reinecke =E5=86=99=E9=81=93:
-> ... and this is now the opposite. We are removing an existing attribute
-> (raising questions about userland ABI stability).
-> Wouldn't it be better to use the generic infrastructure (ie having a
-> per-request queue async_depth variable), but keep the per-elevator
-> sysfs attributes (which then just would display the per-queue variable).
->
-The problem is we can't make this api inside elevator writable as it
-used to be, and if user do use this, they will probably write it to
-limit async requests.
+- Change boolean fields to bool (e.g., no_sched, virt_boundary)
+- Change counters and queue-related fields to unsigned int
+- Change size-related fields (size, cache_size, zone_size, zone_capacity)
+  to unsigned long
 
-And I feel it will be acceptable for this kind of user api compatibility,
-replace it elsewhere with the same functionality when kernel version is
-updated.
+This ensures consistency between module_param declarations and internal
+data structures, prevents negative values for unsigned parameters.
+The output of modinfo before and after applying this patch is as follows:
 
-> That way we won't break userland and get around the awkward issue
-> of presenting a dummy attribute when no elevator is loaded.=20
+Before:
+[...]
+parm:           no_sched:No io scheduler (int)
+parm:           submit_queues:Number of submission queues (int)
+parm:           poll_queues:Number of IOPOLL submission queues (int)
+parm:           home_node:Home node for the device (int)
+[...]
+parm:           gb:Size in GB (int)
+parm:           bs:Block size (in bytes) (int)
+parm:           max_sectors:Maximum size of a command
+		(in 512B sectors) (int)
+[...]
+parm:           hw_queue_depth:Queue depth for each hardware queue. 
+		Default: 64 (int)
+[...]
+parm:           zone_append_max_sectors:Maximum size of a zone append 
+		command (in 512B sectors). Specify 0 for zone append
+		emulation (int)
 
---=20
-Thanks,
-Kuai
+After:
+[...]
+parm:           no_sched:No io scheduler (bool)
+parm:           submit_queues:Number of submission queues (uint)
+parm:           poll_queues:Number of IOPOLL submission queues (uint)
+parm:           home_node:Home node for the device (uint)
+[...]
+parm:           gb:Size in GB (ulong)
+parm:           bs:Block size (in bytes) (uint)
+parm:           max_sectors:Maximum size of a command
+		(in 512B sectors) (uint)
+[...]
+parm:           hw_queue_depth:Queue depth for each hardware queue.
+		Default: 64 (uint)
+[...]
+parm:           zone_append_max_sectors:Maximum size of a zone append
+		command (in 512B sectors). Specify 0 for zone append
+		emulation (uint)
+Signed-off-by: shechenglong <shechenglong@xfusion.com>
+---
+ drivers/block/null_blk/main.c | 36 +++++++++++++++++------------------
+ 1 file changed, 18 insertions(+), 18 deletions(-)
+
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index 0ee55f889cfd..544009297458 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -81,20 +81,20 @@ static bool g_virt_boundary;
+ module_param_named(virt_boundary, g_virt_boundary, bool, 0444);
+ MODULE_PARM_DESC(virt_boundary, "Require a virtual boundary for the device. Default: False");
+ 
+-static int g_no_sched;
+-module_param_named(no_sched, g_no_sched, int, 0444);
++static bool g_no_sched;
++module_param_named(no_sched, g_no_sched, bool, 0444);
+ MODULE_PARM_DESC(no_sched, "No io scheduler");
+ 
+-static int g_submit_queues = 1;
+-module_param_named(submit_queues, g_submit_queues, int, 0444);
++static unsigned int g_submit_queues = 1;
++module_param_named(submit_queues, g_submit_queues, uint, 0444);
+ MODULE_PARM_DESC(submit_queues, "Number of submission queues");
+ 
+-static int g_poll_queues = 1;
+-module_param_named(poll_queues, g_poll_queues, int, 0444);
++static unsigned int g_poll_queues = 1;
++module_param_named(poll_queues, g_poll_queues, uint, 0444);
+ MODULE_PARM_DESC(poll_queues, "Number of IOPOLL submission queues");
+ 
+-static int g_home_node = NUMA_NO_NODE;
+-module_param_named(home_node, g_home_node, int, 0444);
++static unsigned int g_home_node = NUMA_NO_NODE;
++module_param_named(home_node, g_home_node, uint, 0444);
+ MODULE_PARM_DESC(home_node, "Home node for the device");
+ 
+ #ifdef CONFIG_BLK_DEV_NULL_BLK_FAULT_INJECTION
+@@ -157,16 +157,16 @@ static const struct kernel_param_ops null_queue_mode_param_ops = {
+ device_param_cb(queue_mode, &null_queue_mode_param_ops, &g_queue_mode, 0444);
+ MODULE_PARM_DESC(queue_mode, "Block interface to use (0=bio,1=rq,2=multiqueue)");
+ 
+-static int g_gb = 250;
+-module_param_named(gb, g_gb, int, 0444);
++static unsigned long g_gb = 250;
++module_param_named(gb, g_gb, ulong, 0444);
+ MODULE_PARM_DESC(gb, "Size in GB");
+ 
+-static int g_bs = 512;
+-module_param_named(bs, g_bs, int, 0444);
++static unsigned int g_bs = 512;
++module_param_named(bs, g_bs, uint, 0444);
+ MODULE_PARM_DESC(bs, "Block size (in bytes)");
+ 
+-static int g_max_sectors;
+-module_param_named(max_sectors, g_max_sectors, int, 0444);
++static unsigned int g_max_sectors;
++module_param_named(max_sectors, g_max_sectors, uint, 0444);
+ MODULE_PARM_DESC(max_sectors, "Maximum size of a command (in 512B sectors)");
+ 
+ static unsigned int nr_devices = 1;
+@@ -205,8 +205,8 @@ static unsigned long g_completion_nsec = 10000;
+ module_param_named(completion_nsec, g_completion_nsec, ulong, 0444);
+ MODULE_PARM_DESC(completion_nsec, "Time in ns to complete a request in hardware. Default: 10,000ns");
+ 
+-static int g_hw_queue_depth = 64;
+-module_param_named(hw_queue_depth, g_hw_queue_depth, int, 0444);
++static unsigned int g_hw_queue_depth = 64;
++module_param_named(hw_queue_depth, g_hw_queue_depth, uint, 0444);
+ MODULE_PARM_DESC(hw_queue_depth, "Queue depth for each hardware queue. Default: 64");
+ 
+ static bool g_use_per_node_hctx;
+@@ -257,8 +257,8 @@ static unsigned int g_zone_max_active;
+ module_param_named(zone_max_active, g_zone_max_active, uint, 0444);
+ MODULE_PARM_DESC(zone_max_active, "Maximum number of active zones when block device is zoned. Default: 0 (no limit)");
+ 
+-static int g_zone_append_max_sectors = INT_MAX;
+-module_param_named(zone_append_max_sectors, g_zone_append_max_sectors, int, 0444);
++static unsigned int g_zone_append_max_sectors = INT_MAX;
++module_param_named(zone_append_max_sectors, g_zone_append_max_sectors, uint, 0444);
+ MODULE_PARM_DESC(zone_append_max_sectors,
+ 		 "Maximum size of a zone append command (in 512B sectors). Specify 0 for zone append emulation");
+ 
+-- 
+2.33.0
+
