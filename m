@@ -1,105 +1,176 @@
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from sg-1-110.ptr.blmpb.com (sg-1-110.ptr.blmpb.com [118.26.132.110])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F114D3385B8
-	for <linux-block@vger.kernel.org>; Fri, 21 Nov 2025 07:58:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9CBA2EA485
+	for <linux-block@vger.kernel.org>; Fri, 21 Nov 2025 08:12:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.110
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763711928; cv=none; b=YYqj7hp4euL6nxB0mGO/XPNm0Aq9xb/TDHEFCK0+15WLaqTHRp7bCJJvz4M5Tq67f+CNAF67q51pBROpgNCXDWNp3rw4DJndn1GlfFi3txm3uAqtt55MRtqRnR/JPw5qUMA5jsJWgLhkYtkQs6fLhNPtTG8C2JVUNbtHaBCf/2c=
+	t=1763712736; cv=none; b=uQUZPHqRJC8gWisMuLiFUKE5eR+CLk/M3Nsl/yx7k2Hl3n0loJ6YbL0TOKMzXWolFH6hJ6XbfUx8KeTDgBbJMGtjv3VzOOKBFk1DI1e4wyJ5FS1+0QtF+JopsBvy5iJMcWRgdGAZsIbOPZPrbRapsZmcdkiZRbw23HF1Nj1eS1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763711928; c=relaxed/simple;
-	bh=nwE8YCPVNZ28lrH7hSXOu7NmJ8vcWDs3VtzUQRGqXGw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=caFzVPZi7UyzTAOHJoOBU4h7PyKZ8mdiQYS4lY125DuBpbMF26Xahc3MZaihwQTfKOXRntPUcrBIlcJqfa1eHRbWPKzgrpTwKKjeu2022VzinrZR75i2f5W9KL6qS0Sp2j60DInCaPys0J6Alj7MyFbyHUt3fWiCr3SA5FE2Gzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=RAWGectf; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1763712736; c=relaxed/simple;
+	bh=uiSb+J2w507d+dFrZpFQw+b55iS46t8jZ3mFz/UxFHc=;
+	h=Message-Id:To:Subject:References:In-Reply-To:Content-Type:Date:Cc:
+	 From:Mime-Version; b=Uzat8/fKLy3M6lPqanjSiw6xrVKF/wfp6j6n16N1kN9aJe1g3D4bWby1xQd+YgTHYX7770p02EEpx6mMjyzQjKCs89H5VrG78LQOMaeXuYmohjrvhpuEoIobOcljw56rvuZrd7DT4RmNwvcqObOhq8aSzDcKI+Gy2XW2qqM7bIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=ON5mbVWp; arc=none smtp.client-ip=118.26.132.110
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="RAWGectf"
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-7bc0cd6a13aso1177285b3a.0
-        for <linux-block@vger.kernel.org>; Thu, 20 Nov 2025 23:58:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1763711926; x=1764316726; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ULtA7+no79tQHYGo+HGcPlA57KIY7uM5/EPUmiOFSmo=;
-        b=RAWGectfa588WAMVmpAlKpRYyTq91Q3g/fuZ17pt+ooCiEXzHn/jL9ya2mbl2tgD9L
-         oPdwhGLl9CpryIj0d6+j5kmot3usXmEVkoMTtxnbyLCfU/Mkv8UM73oobNUt5T64VPEI
-         1ZbTcniIcQA+TtDaTSV0FISmO1oC/ZPqgALjk=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763711926; x=1764316726;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ULtA7+no79tQHYGo+HGcPlA57KIY7uM5/EPUmiOFSmo=;
-        b=dHrMNn4y/XTwym1Bqs10XbtX1WTGRR3IhwuHeJJZ1Tu5Y0XwFS5YNiDZMSuI8XdwIU
-         GWiNj23NXn36s1cFCf/dYeW5m1xzW0fUJ27O1QA32/yj1OL++0aH2rL6BHzcLJakMSQv
-         duttlSekQq7mdY9ghmTryol/T+U6LRYCWru3026prmtzMv1A0sb6slWs1ztTRrZS/rtt
-         xr0272jMfyAjptDfXMzKnc+R18SunFo5IA1r/KZZ+MLHhnmwhuS0YXUkrhUisCY1TIzB
-         aDmm8hUANx7UBQvCGBT9rSeg6GcEVfqCT23ckI8RwLsXNMGsYYfwmp/KSJWgU1aIMFZk
-         bnNw==
-X-Forwarded-Encrypted: i=1; AJvYcCVuJ1swl17SdVlzhvenJox6as6xr5O9Y8dU4zFtwfRxFN5LuFRHMNJb3AIuhvIbuGHHsd9tVAMZT+JGMA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxpVDjSl4CLbrb4EoSP13wNqonInFnxcc2H8jtxbXijvvtBKdw7
-	eaCvwlA2/A9rr0C+AjSVkYktcZ8uHsxa1kduSBCsW7LGRqYLacz/i3CA92hxYUD2kQ==
-X-Gm-Gg: ASbGncvVZCUAMw3oopJjuUYYzLfAouwv26Ua1Vtrs2UIDEga65VUhKJ0GODfthSOb36
-	MgF63OxaOLj+S9XDHdy2+7ugdA7vG0GlI/8KrCLVaDJjGSnNVGFq3kw3tcm0RJ9K1Ici24U2JA+
-	DjbKK/ses78OfxqoZAnh1WpbbDIIyuoNO1CAr2eoiBpqfG86SRCI2ngrhkfVvwUhNtOCVnGMm51
-	hrJ2wfObr1h34nWQZ9C0+pd1qmyoiSDMd7e2U600KZmacrrT40CD/U/HEGQYqdgCSg0dKN60ONf
-	RfSQ1uRWuOLs+dBEbFs/KXsR7mDWQRH3ibGfg+3nC8Av62AkDfXUh+7Gy6dJRTGsjIOhMD8SZhN
-	kw2Ha6fJAuNgSbm+Wliemrg12vj/NZ/reCxXz0o4GTeGdmBco4vWlGHegF/XLYDmBwWbUQBxKdc
-	DxY7xwwSJaLMl7e/bM4bHP6oD1
-X-Google-Smtp-Source: AGHT+IF8r+u0PMm2TNqKDmt9NgdUlfFVT/4Cdqlq2JQX3RkS5uXvuVrL+4bKtdDMN2zzv+JF+RTdLA==
-X-Received: by 2002:a05:6a20:7289:b0:2cb:519b:33fe with SMTP id adf61e73a8af0-3614f506763mr1920075637.21.1763711926304;
-        Thu, 20 Nov 2025 23:58:46 -0800 (PST)
-Received: from google.com ([2401:fa00:8f:203:b321:53f:aff8:76e2])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7c3ed47b388sm5171421b3a.27.2025.11.20.23.58.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Nov 2025 23:58:45 -0800 (PST)
-Date: Fri, 21 Nov 2025 16:58:41 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Yuwen Chen <ywen.chen@foxmail.com>
-Cc: senozhatsky@chromium.org, akpm@linux-foundation.org, 
-	bgeffon@google.com, licayy@outlook.com, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, minchan@kernel.org, richardycc@google.com
-Subject: Re: [RFC PATCHv5 0/6] zram: introduce writeback bio batching
-Message-ID: <ts32xzxrpxmwf3okxo4bu2ynbgnfe6mehf5h6eibp7dp3r6jp7@4f7oz6tzqwxn>
-References: <upyms2wnksojg6ix7dha74bjm2gfhv6ieef65k3f2our4r6fp4@kjtpmu4mtbay>
- <tencent_7F5D453FDCFFE315AE59E73779635F865D08@qq.com>
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="ON5mbVWp"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=2212171451; d=bytedance.com; t=1763712719; h=from:subject:
+ mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
+ mime-version:in-reply-to:message-id;
+ bh=uiSb+J2w507d+dFrZpFQw+b55iS46t8jZ3mFz/UxFHc=;
+ b=ON5mbVWpFi0E8UtB+qzUp5ZFFHc7iPArxCbDmruyuX9Yk2CzAIRAElojff8vHcUWl3Y3Mt
+ /OA2nRccI7+WXz6r6eKLYy1IQE7MOcOl/chKnjN2HCzBqHX//bNTAdQijEg4a0FGgXqDv9
+ Mr7Tyep+fXqerQyAugazX91VRmS5Miri7cQxLGUjKGObgxLA4Vxhiv2+GKPkm5u+Tr2yyc
+ x3gxhQrGfTPZJkeLkA1Be7R3IUntTAYWdg73POCt/EOa63I1+4IuBrG8LfCsmck6h/6bif
+ XWGW2jk+rZOilnTCOrgriPvJF//dMnERR8QipAX+Yho51+Ws6wUEseU84eKrCw==
+Message-Id: <d9210bcdf73fbe1ac8b6ec132865609a3ed68688.ff6bf04a.edf6.4fe8.aab9.a78110a1d5f8@bytedance.com>
+To: "Jens Axboe" <axboe@kernel.dk>
+Subject: Re: [PATCH 2/2] blk-mq: fix potential uaf for 'queue_hw_ctx'
+References: <20251120031626.92425-1-fengnanchang@gmail.com> <20251120031626.92425-3-fengnanchang@gmail.com>
+	<d01e0be0-6c4e-4308-8663-b408ab74a911@kernel.dk>
+In-Reply-To: <d01e0be0-6c4e-4308-8663-b408ab74a911@kernel.dk>
+X-Lms-Return-Path: <lba+169201ecd+8cfadf+vger.kernel.org+changfengnan@bytedance.com>
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 21 Nov 2025 16:11:56 +0800
+Cc: "Fengnan Chang" <fengnanchang@gmail.com>, <linux-block@vger.kernel.org>, 
+	<ming.lei@redhat.com>, <hare@suse.de>, <hch@lst.de>, 
+	<yukuai3@huawei.com>
+From: "changfengnan" <changfengnan@bytedance.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <tencent_7F5D453FDCFFE315AE59E73779635F865D08@qq.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 
-On (25/11/21 15:44), Yuwen Chen wrote:
-> On Fri, 21 Nov 2025 16:32:27 +0900, Sergey Senozhatsky wrote:
-> > Is "before" blk-plug based approach and "after" this new approach?
-> 
-> Sorry, I got the before and after mixed up.
 
-No problem.  I wonder if the effect is more visible on larger data sets.
-0.3 second sounds like a very short write.  In my VM tests I couldn't get
-more than 2 inflight requests at a time, I guess because decompression
-was much slower than IO.  I wonder how many inflight requests you had in
-your tests.
+> From: "Jens Axboe"<axboe@kernel.dk>
+> Date:=C2=A0 Thu, Nov 20, 2025, 23:01
+> Subject:=C2=A0 Re: [PATCH 2/2] blk-mq: fix potential uaf for 'queue_hw_ct=
+x'
+> To: "Fengnan Chang"<fengnanchang@gmail.com>, <linux-block@vger.kernel.org=
+>, <ming.lei@redhat.com>, <hare@suse.de>, <hch@lst.de>, <yukuai3@huawei.com=
+>
+> Cc: "Fengnan Chang"<changfengnan@bytedance.com>
+> > diff --git a/block/blk-mq.c b/block/blk-mq.c
 
-> In addition, I also have some related questions to consult:
-> 
-> 1. Will page fault exceptions be delayed during the writeback processing?
+> > index eed12fab3484..82195f22befd 100644
 
-I don't think our reads are blocked by writes.
+> > --- a/block/blk-mq.c
 
-> 2. Since the loop device uses a work queue to handle requests, when
-> the system load is relatively high, will it have a relatively large
-> impact on the latency of page fault exceptions? Is there any way to solve
-> this problem?
+> > +++ b/block/blk-mq.c
 
-I think page-fault latency of a written-back page is expected to be
-higher, that's a trade-off that we agree on.  Off the top of my head,
-I don't think we can do anything about it.
+> > @@ -4524,7 +4524,12 @@ static void __blk_mq_realloc_hw_ctxs(struct blk_=
+mq_tag_set *set,
 
-Is loop device always used as for writeback targets?
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (hctxs=
+)
+
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0memcpy(new_hctxs, hctxs, q->nr_hw_queues *
+
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 sizeof(*hctxs));
+
+> > - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0q->queue_hw_ct=
+x =3D new_hctxs;
+
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0rcu_assign_poi=
+nter(q->queue_hw_ctx, new_hctxs);
+
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/*
+
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 * Make sure r=
+eading the old queue_hw_ctx from other
+
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 * context con=
+currently won't trigger uaf.
+
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 */
+
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0synchronize_rc=
+u();
+
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0kfree(hct=
+xs);
+
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0hctxs =3D=
+ new_hctxs;
+
+>=C2=A0
+> Might make sense to use the expedited version here, to avoid odd ball
+
+> cases that end up doing this for tons of devices.
+
+>=C2=A0
+> > diff --git a/block/blk-mq.h b/block/blk-mq.h
+
+> > index 80a3f0c2bce7..ccd8c08524a4 100644
+
+> > --- a/block/blk-mq.h
+
+> > +++ b/block/blk-mq.h
+
+> > @@ -87,6 +87,17 @@ static inline struct blk_mq_hw_ctx *blk_mq_map_queue=
+_type(struct request_queue *
+
+> > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return q->queue_hw_ctx[q->tag_set->ma=
+p[type].mq_map[cpu]];
+
+> > =C2=A0}
+
+> > =C2=A0
+
+> > +static inline struct blk_mq_hw_ctx *queue_hctx(struct request_queue *q=
+, int id)
+
+> > +{
+
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0struct blk_mq_hw_ctx *hctx;
+
+> > +
+
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0rcu_read_lock();
+
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0hctx =3D *(rcu_dereference(q->queue_hw_ctx=
+) + id);
+
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0rcu_read_unlock();
+
+> > +
+
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0return hctx;
+
+> > +}
+
+>=C2=A0
+> I think that'd read a lot better if the type was **hctx and you just
+
+> return *hctx instead.
+
+Do you means like this ?=C2=A0
+static inline struct blk_mq_hw_ctx *queue_hctx(struct request_queue *q, int=
+ id)
+{
+=C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0 struct blk_mq_hw_ctx **hctx;
+
+=C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0 rcu_read_lock();
+=C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0 hctx =3D rcu_dereference(q->queue_hw_ctx) =
++ id);=C2=A0
+=C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0 rcu_read_unlock();
+
+=C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0 return *hctx;
+}
+
+It's seems not right, queue_hw_ctx is protected, after unlock to
+access may cause UAF.=C2=A0
+How about=C2=A0 rcu_dereference(q->queue_hw_ctx)[id]; ?=C2=A0
+>=C2=A0
+> --=C2=A0
+
+> Jens Axboe
+>=C2=A0
