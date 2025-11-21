@@ -1,134 +1,100 @@
-Received: from esa2.hc1455-7.c3s2.iphmx.com (esa2.hc1455-7.c3s2.iphmx.com [207.54.90.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D93C146588
-	for <linux-block@vger.kernel.org>; Fri, 21 Nov 2025 01:37:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.54.90.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CA3024338F
+	for <linux-block@vger.kernel.org>; Fri, 21 Nov 2025 01:55:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763689031; cv=none; b=ApVEEGMNI/PSxTkAj9Dd3sFGdgvsuJqHBWSwwU3Vm98R+vBKxnUmsc6SH4aNtVkKjUYsUOFITYPOMhU4GXRMwnZj0E0gslcT5QHnIFA1yniIzW1IAlg6DaiAfxOOi/4aQnetuWy9I+OJYrVCtla+spl9tCbnrnPfyG+CPz3zV8A=
+	t=1763690117; cv=none; b=Pm8XyISYB6IDy5Pykp/dgjuKUf3txG/dPdN2QUTogHKvhZg+WsHeRo8rSyyTNrdU0kbM052VdeiUvKyfHAsA6WEoGDq/iMOLdrkmVBuxYudjkZdegQkb+9TVgAowvghh+S8u3dzifCS1Im0Ec7jvip3IEnayqiyjXIDsSfQIZ94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763689031; c=relaxed/simple;
-	bh=Uc7jIkrMgAl9SH4f+7NR2MK8dm0clE7gu5zabJEqs54=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VGpmzsV6GgM4aFx9giFBvPF3inMf5Kp2zjGDNB3QHVq59m6YVaBBVP7IWFBSjk2SydTamRdbi3+UsoBYQZdV/3Z8ylhTyuka+jHujoq2sESk+3QUR8vafv6PhkBdHSERCqKuEL+YwefdRfJF/wwgP7ge5Fr1iaXWwmGTjT0BnDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=RDF1FEP+; arc=none smtp.client-ip=207.54.90.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
+	s=arc-20240116; t=1763690117; c=relaxed/simple;
+	bh=+qp1klWv+x4IOOwqhFckbtaaE8dkPlFlSIKi9XLSLeI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MBmNKYGgljBgVtTHVaxSbxROzyXQ1EeS0hOKyl6uyZF8cq9zHEi2Qtx0k8l3oNRGpLfb2d+zmZ/Zb1oGGaJgBmRzwFOuj6ZE3bB76Qns9xmgk183aYQSm2oYkowO+YeF/XljLp5fX5+v/2y588P9aDXBgkvv5iu+smJtm1Nj3Ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=nH9ToF73; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="RDF1FEP+"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
-  t=1763689030; x=1795225030;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Uc7jIkrMgAl9SH4f+7NR2MK8dm0clE7gu5zabJEqs54=;
-  b=RDF1FEP+mLSkLnVxe5tS6cWjLcY9OZPlveDsbawZu24Fl5UevgAilcAa
-   jF7Yb9CYWo8CYteMVM0PwgJzpthVu5YcW1ZhnVj7jCR8ikuy2g2MFQSpS
-   F6FwX2sfinLp6LQ71W4LNexh5olwxkUv3YKVNfGmJGlFq0LXdyL6Atfe0
-   nyRwD1CUaAnit6GaHLRVZHaPrv2DveNGYjeAcwSXCSG3/c4Rm5URCkWUa
-   i4wfk2mkZ6WnNubNgNi53xrDnqrjbjFCqc2d+55vcAcudF7gr7/DxycWF
-   7My9Tq0jriEke4uoTNmN4RqgWJkK6ZOH6ktv1rnNxhUPtdy+xkyI2HpbL
-   A==;
-X-CSE-ConnectionGUID: CGM6vfnzSJmbHsiW0DsGqg==
-X-CSE-MsgGUID: 0OmboDmhSXOeEl19LMVH+g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11619"; a="219922714"
-X-IronPort-AV: E=Sophos;i="6.20,214,1758553200"; 
-   d="scan'208";a="219922714"
-Received: from unknown (HELO az2nlsmgr3.o.css.fujitsu.com) ([51.138.80.169])
-  by esa2.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2025 10:36:00 +0900
-Received: from az2nlsmgm3.fujitsu.com (unknown [10.150.26.205])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by az2nlsmgr3.o.css.fujitsu.com (Postfix) with ESMTPS id 7576B1000353
-	for <linux-block@vger.kernel.org>; Fri, 21 Nov 2025 01:36:00 +0000 (UTC)
-Received: from az2nlsmom1.o.css.fujitsu.com (az2nlsmom1.o.css.fujitsu.com [10.150.26.198])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by az2nlsmgm3.fujitsu.com (Postfix) with ESMTPS id 363311809AD9
-	for <linux-block@vger.kernel.org>; Fri, 21 Nov 2025 01:36:00 +0000 (UTC)
-Received: from iaas-rdma.. (unknown [10.167.135.44])
-	by az2nlsmom1.o.css.fujitsu.com (Postfix) with ESMTP id 9BCDB829F00;
-	Fri, 21 Nov 2025 01:35:57 +0000 (UTC)
-From: Li Zhijian <lizhijian@fujitsu.com>
-To: linux-block@vger.kernel.org
-Cc: shinichiro.kawasaki@wdc.com,
-	Li Zhijian <lizhijian@fujitsu.com>
-Subject: [PATCH blktests] test/throtl: Adjust scsi_debug sector_size for large PAGE_SIZE hosts
-Date: Fri, 21 Nov 2025 09:38:20 +0800
-Message-ID: <20251121013820.3854576-1-lizhijian@fujitsu.com>
-X-Mailer: git-send-email 2.44.0
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="nH9ToF73"
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7aace33b75bso1383083b3a.1
+        for <linux-block@vger.kernel.org>; Thu, 20 Nov 2025 17:55:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1763690115; x=1764294915; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0cRcbbQEo02KH4rKMcz4LZIg4tF9mtZw5O21Ocz75yQ=;
+        b=nH9ToF73+6jG6kcuypVwtXS15OchbZFgH2oWd81SQq1bHBqeY7Q2OpvLiCqYomsPQs
+         vKY+sEfYtbzwDQAhCvMozADJYGOFuHV7gxZUExLnmOHyqlJi1ZTurme25oxB8NxgOcFF
+         WmLcz4mSHeIzE/9MNEiH7v43eIgNEHK0cq0kI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763690115; x=1764294915;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0cRcbbQEo02KH4rKMcz4LZIg4tF9mtZw5O21Ocz75yQ=;
+        b=s9IH8+3AQoWWIDEpSddkj2CiXsF4pGYIlFVXf6tjQYDEfHnJ+F2gTiF+UbubrZbDe3
+         iO9tb/SLzlrfXbSXBnsSKGVFORV+bA8ans9ITfuXegSTGmlbvk6lC8Ktz/T5sZRTD9jD
+         ePkaXqawir5wiJbrxhS1DpbhoyPD85Moz/po+B0BBBgZtNGcC1ioRhADY9RpPxnkZ8EB
+         B186cdbTZJQmrNoC0xjRpVcGDvt3J2nievKI5jMO6k6e4A1287hP+1SPdo7HcSiPm3lZ
+         wXb77N+xMeeBImXw2JHg85npQidyaWmRPyUhtrJOU7mZeySKktNe22SbS14K52+OgCnz
+         bOwA==
+X-Forwarded-Encrypted: i=1; AJvYcCUsl5y84czLdmRWcukahGQhhHlEq+9wAvwk9EIX7tTs2F5SoQBYgE74pmnt7AfBYDjA8WUGl8lbyAvjCA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwkSApmap6QlPp5yNsnpVkSwZPjQmcgFWPbeUnQx8vC1FVhrtrZ
+	GpBChRXoczqa2+cribOxsZURVA9uhsRMO81t9i0pCFHMWX6HYEpQCHWpDnTiPBqngQ==
+X-Gm-Gg: ASbGnctk119hSEeFDychH+HTX6rH7kRuqCSyOycSpPnrnWhPMN1bClXQ7x+Iu8GvkqA
+	RpSjXQcI565F8RB4SpYXsP+6/eVzCVunEkxtVv6t2LvypDssjByItx/cH7moC7TwSnBSWqtXyKQ
+	MpJXmLqmeEw0lnNiaZhqfAX9Nf5NkslYYNr2Eoi9pcO/3O+dl1v8LR9tRhwVnItmgc+059VRmF/
+	zbM/pIlH0OS9gMN/aGdXiSX/4O2YZrmv+bxobkBD1ZPs81KtVc00X6lLg6RS2ERl15VT/Q0X+XI
+	E4oRuiMFzBcst/od8Lb8zS9joZRSJNT+fnlIFjh7qp+iGJyVmhenFAYOJ3mTEk1MkvTu58VsaE0
+	aQYroLX4f1M9whF65QQ6fB/Q6Whv6djf4mDWhDZZZqBZmdUjOlqunkJW1ZHBIFYSBd/2Ej8OP0p
+	XEnqZ2rFbjVMWqD+U=
+X-Google-Smtp-Source: AGHT+IEvvkY/BeYS5a/KZXMhWOVlpWXxEj6JWJCOYUYmnHxLc5zFggPXEr/viHMNnTU+HaR8K5bXkg==
+X-Received: by 2002:a05:6a20:5483:b0:343:6f53:e97 with SMTP id adf61e73a8af0-36150f2e004mr354483637.48.1763690115547;
+        Thu, 20 Nov 2025 17:55:15 -0800 (PST)
+Received: from google.com ([2401:fa00:8f:203:6762:7dba:8487:43a1])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7c3ed37ab3fsm4187857b3a.22.2025.11.20.17.55.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Nov 2025 17:55:15 -0800 (PST)
+Date: Fri, 21 Nov 2025 10:55:10 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Minchan Kim <minchan@kernel.org>, Yuwen Chen <ywen.chen@foxmail.com>, 
+	Richard Chang <richardycc@google.com>, Brian Geffon <bgeffon@google.com>, 
+	Fengyu Lian <licayy@outlook.com>, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-block@vger.kernel.org
+Subject: Re: [PATCHv4 2/6] zram: add writeback batch size device attr
+Message-ID: <birguuoazoxjeijvnnxjlpv2avd5cgptf4cylmdaj2a2sdhhem@svegzn74fjr7>
+References: <20251118073000.1928107-1-senozhatsky@chromium.org>
+ <20251118073000.1928107-3-senozhatsky@chromium.org>
+ <20251120171738.84516c55e4aaeea0bf3b7725@linux-foundation.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251120171738.84516c55e4aaeea0bf3b7725@linux-foundation.org>
 
-Currently, `scsi_debug` only supported a maximum `sector_size` of 4096
-bytes. However, on systems with a `PAGE_SIZE` greater than 4KB, some
-`throtl` tests (002, 003, and 007) attempt to load `scsi_debug`
-with `sector_size=$PAGE_SIZE`.
+On (25/11/20 17:17), Andrew Morton wrote:
+> > +static ssize_t writeback_batch_size_store(struct device *dev,
+> > +					  struct device_attribute *attr,
+> > +					  const char *buf, size_t len)
+> > +{
+> > +	struct zram *zram = dev_to_zram(dev);
+> > +	u32 val;
+> > +	ssize_t ret = -EINVAL;
+> > +
+> > +	if (kstrtouint(buf, 10, &val))
+> > +		return ret;
+> > +
+> > +	if (!val)
+> > +		val = 1;
+> > +
+> > +	down_read(&zram->init_lock);
+> 
+> down_write()?
 
-This mismatch causes `scsi_debug` module loading to fail, resulting in
-test failures such as:
-
-throtl/003 (sdebug) (bps limit over IO split)                [failed]
-    runtime  0.147s  ...  0.146s
-    --- tests/throtl/003.out    2025-04-04 04:36:43.175999880 +0800
-    +++ /root/blktests/results/nodev_sdebug/throtl/003.out.bad  2025-11-16 09:26:07.287964459 +0800
-    @@ -1,4 +1,3 @@
-     Running throtl/003
-    -1
-    -1
-    -Test complete
-    +modprobe: ERROR: could not insert 'scsi_debug': Invalid argument
-    +Loading scsi_debug dev_size_mb=1024 sector_size=65536 failed
-
-To address this, introduce a `fixup_sedebug_sector_size` helper function.
-This function checks the requested `sector_size` for `scsi_debug`. If the
-value exceeds 4096, it defaults to a supported value of 2048 to ensure
-successful module loading and test execution on hosts with larger
-`PAGE_SIZE`.
-
-Signed-off-by: Li Zhijian <lizhijian@fujitsu.com>
----
- tests/throtl/rc | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
-
-diff --git a/tests/throtl/rc b/tests/throtl/rc
-index d1afefd..fd83fb9 100644
---- a/tests/throtl/rc
-+++ b/tests/throtl/rc
-@@ -41,6 +41,17 @@ _set_throtl_blkdev_type() {
- 	COND_DESC="${throtl_blkdev_type}"
- }
- 
-+# Only 512, 1024, 2048, 4096 are supported, see drivers/scsi/scsi_debug.c
-+fixup_sdebug_sector_size() {
-+	local sector_size=$1
-+
-+	if [[ $sector_size -gt 4096 ]]; then
-+		echo 2048
-+	else
-+		echo $sector_size
-+	fi
-+}
-+
- # Prepare null_blk or scsi_debug device to test, based on throtl_blkdev_type.
- _configure_throtl_blkdev() {
- 	local sector_size=0 memory_backed=0
-@@ -76,7 +87,8 @@ _configure_throtl_blkdev() {
- 		;;
- 	sdebug)
- 		args=(dev_size_mb=1024)
--		((sector_size)) && args+=(sector_size="${sector_size}")
-+		((sector_size)) &&
-+		args+=(sector_size="$(fixup_sdebug_sector_size $sector_size)")
- 		if _configure_scsi_debug "${args[@]}"; then
- 			THROTL_DEV=${SCSI_DEBUG_DEVICES[0]}
- 			return
--- 
-2.44.0
-
+Indeed.  Thanks!
