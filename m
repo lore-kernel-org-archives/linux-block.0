@@ -1,179 +1,125 @@
-Received: from wxsgout04.xfusion.com (wxsgout04.xfusion.com [36.139.87.180])
+Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23B592D8372;
-	Fri, 21 Nov 2025 12:30:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=36.139.87.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0339530FC3D;
+	Fri, 21 Nov 2025 12:43:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763728215; cv=none; b=XF+0ngLV+1CQCAJNORHn8aBNgpqw4BtiJg/kcFxSDt31HDE0KMlhAxgddC3GxGjTRtI59L5OQrbG1c0B73DZOsvR2zV0l8UwWS8zknvpXrPEUN1O44MvJ8eucMOvHrYVXpa3EtBwDTJk8OGvEcHKDXFSRCbMznLeMGukREMAbh4=
+	t=1763729035; cv=none; b=Xr1+ku6iXnlc3wZ6ve1ouG8E4i7NZINhJa3FZmyEus5gYA1HRNTuZLXZNVRam50fReWkiI1FOO0io8Noj0KeaKKIXRMeKCrigHxvquwfZLpOJMwxmDd3ZJSD+5vB9CJumI9HqtZoYdcI7KiqCA4e72eOjzRyOB1Ifj5jCZn2U8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763728215; c=relaxed/simple;
-	bh=yF+ompH0xGWuhwu6i5fvry9KOhCDQ3cyABFc23+hK/k=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=FbMAzwwVTEJrGF5xi2kS7f9k09KId3wkdHJI0pfF/fFNsO/ApPdZLPC75c9FLVVTKMGe2yyxDZamnIMXKKyDsMandaJbxbLsDFwsB8XjNPJ+KD876CaERnRYYA+Lgy3GGynnWstuZT5V71eFAjsxN3xkiVmQ14IDDo3y3z8B1u0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xfusion.com; spf=pass smtp.mailfrom=xfusion.com; arc=none smtp.client-ip=36.139.87.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xfusion.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xfusion.com
-Received: from wuxpheds03048.xfusion.com (unknown [10.32.143.30])
-	by wxsgout04.xfusion.com (SkyGuard) with ESMTPS id 4dCYrh5NbNzBDh3v;
-	Fri, 21 Nov 2025 20:08:04 +0800 (CST)
-Received: from DESKTOP-Q8I2N5U.xfusion.com (10.82.130.100) by
- wuxpheds03048.xfusion.com (10.32.143.30) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_RSA_WITH_AES_128_CBC_SHA256) id 15.2.2562.20;
- Fri, 21 Nov 2025 20:10:53 +0800
-From: shechenglong <shechenglong@xfusion.com>
-To: <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<stone.xulei@xfusion.com>, <chenjialong@xfusion.com>, shechenglong
-	<shechenglong@xfusion.com>
-Subject: [PATCH] null_blk: Align struct nullb_device field types with module parameters
-Date: Fri, 21 Nov 2025 20:10:42 +0800
-Message-ID: <20251121121043.978-1-shechenglong@xfusion.com>
-X-Mailer: git-send-email 2.37.1.windows.1
+	s=arc-20240116; t=1763729035; c=relaxed/simple;
+	bh=SseNgIZp6gPDgR2IeWAnrRjcKo5B1YeAinQknMrLT9w=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Io3g+/in4IGzoRsO4AFNbs0ecFVN/TFEBDuTans37zHGZhPIHEvlLsBpRsEXdXleMG5mBrdh5+8qN3+xTLktRvFltBWfdOtRE3UcfSMVdR9rVa1GI4gmwMq+BDOm91P9nrfz+My5G52WfceIidMRQvpM/Lka1Pmo8lab1mvDdJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=HvE3C/FR; arc=none smtp.client-ip=115.124.30.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="HvE3C/FR"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1763729027; h=Message-ID:Date:MIME-Version:Subject:From:To:Content-Type;
+	bh=UXNEr7vcm3thFtEulF8bEeGgEGO9nmCn0v+aGXpJLHk=;
+	b=HvE3C/FRH/Xk4hMHhYrsjTgfGuCHjuldYsbPVZiT9+R1HALhq9/Wci5N2DVw+ygHkzlU/TpxNLH+Rci3CW6k8VxkFqTFkD87gQKOt7VJlaqanJKma0QQzz1ol1r2f7ehf0/qPJTDNbL/uTJMTyv3yTIJW9wSsKsMKpCFNzqMI/A=
+Received: from 30.170.82.147(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0Wt003i5_1763729026 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Fri, 21 Nov 2025 20:43:46 +0800
+Message-ID: <d7140963-3b21-4b51-9a9c-bcf8362bf1da@linux.alibaba.com>
+Date: Fri, 21 Nov 2025 20:43:45 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCHv5 0/6] zram: introduce writeback bio batching
+From: Gao Xiang <hsiangkao@linux.alibaba.com>
+To: Sergey Senozhatsky <senozhatsky@chromium.org>,
+ Yuwen Chen <ywen.chen@foxmail.com>
+Cc: akpm@linux-foundation.org, bgeffon@google.com, licayy@outlook.com,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-mm@kvack.org, minchan@kernel.org, richardycc@google.com
+References: <ts32xzxrpxmwf3okxo4bu2ynbgnfe6mehf5h6eibp7dp3r6jp7@4f7oz6tzqwxn>
+ <tencent_865DD78A73BC3C9CAFCBAEBE222B6EA5F107@qq.com>
+ <buckmtxvdfnpgo56owip3fjqbzraws2wvtomzfkywhczckoqlt@fifgyl5fjpbt>
+ <8c596737-95c1-4274-9834-1fe06558b431@linux.alibaba.com>
+In-Reply-To: <8c596737-95c1-4274-9834-1fe06558b431@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: wuxpheds03047.xfusion.com (10.32.141.63) To
- wuxpheds03048.xfusion.com (10.32.143.30)
 
-The struct nullb_device previously used generic int types for several
-fields that represent boolean flags, unsigned counters, or large size
-values. This patch updates the field types to improve type safety and
-match the corresponding module parameters:
 
-- Change boolean fields to bool (e.g., no_sched, virt_boundary)
-- Change counters and queue-related fields to unsigned int
-- Change size-related fields (size, cache_size, zone_size, zone_capacity)
-  to unsigned long
 
-This ensures consistency between module_param declarations and internal
-data structures, prevents negative values for unsigned parameters.
-The output of modinfo before and after applying this patch is as follows:
+On 2025/11/21 20:21, Gao Xiang wrote:
+> 
+> 
+> On 2025/11/21 17:12, Sergey Senozhatsky wrote:
+>> On (25/11/21 16:23), Yuwen Chen wrote:
+> 
+> ..
+> 
+> 
+>>>> I think page-fault latency of a written-back page is expected to be
+>>>> higher, that's a trade-off that we agree on.  Off the top of my head,
+>>>> I don't think we can do anything about it.
+>>>>
+>>>> Is loop device always used as for writeback targets?
+>>>
+>>> On the Android platform, currently only the loop device is supported as
+>>> the backend for writeback, possibly for security reasons. I noticed that
+>>> EROFS has implemented a CONFIG_EROFS_FS_BACKED_BY_FILE to reduce this
+>>> latency. I think ZRAM might also be able to do this.
+>>
+>> I see.  Do you use S/W or H/W compression?
+> 
+> No, I'm pretty sure it's impossible for zram to access
+> file I/Os without another thread context (e.g. workqueue),
+> especially for write I/Os, which is unlike erofs:
+> 
+> EROFS can do because EROFS is a specific filesystem, you
+> could see it's a seperate fs, and it can only read (no
+> write context) backing files in erofs and/or other fses,
+> which is much like vfs/overlayfs read_iter() directly
+> going into the backing fses without nested contexts.
+> (Even if loop is used, it will create its own thread
+> contexts with workqueues, which is safe.)
+> 
+>   In the other hand, zram/loop can act as a virtual block
+> device which is rather different, which means you could
+> format an ext4 filesystem and backing another ext4/btrfs,
+> like this:
+> 
+>    zram(ext4) -> backing ext4/btrfs
+> 
+> It's unsafe (in addition to GFP_NOIO allocation
+> restriction) since zram cannot manage those ext4/btrfs
+> existing contexts:
+> 
+>   - Take one detailed example, if the upper zram ext4
+> assigns current->journal_info = xxx, and submit_bio() to
+> zram, which will confuse the backing ext4 since it should
+> assume current->journal_info == NULL, so the virtual block
+> devices need another thread context to isolate those two
+> different uncontrolled contexts.
+> 
+> So I don't think it's feasible for block drivers to act
+> like this, especially mixing with writing to backing fses
+> operations.
 
-Before:
-[...]
-parm:           no_sched:No io scheduler (int)
-parm:           submit_queues:Number of submission queues (int)
-parm:           poll_queues:Number of IOPOLL submission queues (int)
-parm:           home_node:Home node for the device (int)
-[...]
-parm:           gb:Size in GB (int)
-parm:           bs:Block size (in bytes) (int)
-parm:           max_sectors:Maximum size of a command
-		(in 512B sectors) (int)
-[...]
-parm:           hw_queue_depth:Queue depth for each hardware queue. 
-		Default: 64 (int)
-[...]
-parm:           zone_append_max_sectors:Maximum size of a zone append 
-		command (in 512B sectors). Specify 0 for zone append
-		emulation (int)
+In other words, a fs claims it can do file-backed-mounts
+without a new context only if:
 
-After:
-[...]
-parm:           no_sched:No io scheduler (bool)
-parm:           submit_queues:Number of submission queues (uint)
-parm:           poll_queues:Number of IOPOLL submission queues (uint)
-parm:           home_node:Home node for the device (uint)
-[...]
-parm:           gb:Size in GB (ulong)
-parm:           bs:Block size (in bytes) (uint)
-parm:           max_sectors:Maximum size of a command
-		(in 512B sectors) (uint)
-[...]
-parm:           hw_queue_depth:Queue depth for each hardware queue.
-		Default: 64 (uint)
-[...]
-parm:           zone_append_max_sectors:Maximum size of a zone append
-		command (in 512B sectors). Specify 0 for zone append
-		emulation (uint)
-Signed-off-by: shechenglong <shechenglong@xfusion.com>
----
- drivers/block/null_blk/main.c | 36 +++++++++++++++++------------------
- 1 file changed, 18 insertions(+), 18 deletions(-)
+  - Its own implementation can be safely applied to any
+    other kernel filesystem (e.g., it shouldn't change
+    current->journal_info or do context save/restore before
+    handing over, for example); and its own implementation
+    can safely mount itself with file-backed mounts.
 
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index 0ee55f889cfd..544009297458 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -81,20 +81,20 @@ static bool g_virt_boundary;
- module_param_named(virt_boundary, g_virt_boundary, bool, 0444);
- MODULE_PARM_DESC(virt_boundary, "Require a virtual boundary for the device. Default: False");
- 
--static int g_no_sched;
--module_param_named(no_sched, g_no_sched, int, 0444);
-+static bool g_no_sched;
-+module_param_named(no_sched, g_no_sched, bool, 0444);
- MODULE_PARM_DESC(no_sched, "No io scheduler");
- 
--static int g_submit_queues = 1;
--module_param_named(submit_queues, g_submit_queues, int, 0444);
-+static unsigned int g_submit_queues = 1;
-+module_param_named(submit_queues, g_submit_queues, uint, 0444);
- MODULE_PARM_DESC(submit_queues, "Number of submission queues");
- 
--static int g_poll_queues = 1;
--module_param_named(poll_queues, g_poll_queues, int, 0444);
-+static unsigned int g_poll_queues = 1;
-+module_param_named(poll_queues, g_poll_queues, uint, 0444);
- MODULE_PARM_DESC(poll_queues, "Number of IOPOLL submission queues");
- 
--static int g_home_node = NUMA_NO_NODE;
--module_param_named(home_node, g_home_node, int, 0444);
-+static unsigned int g_home_node = NUMA_NO_NODE;
-+module_param_named(home_node, g_home_node, uint, 0444);
- MODULE_PARM_DESC(home_node, "Home node for the device");
- 
- #ifdef CONFIG_BLK_DEV_NULL_BLK_FAULT_INJECTION
-@@ -157,16 +157,16 @@ static const struct kernel_param_ops null_queue_mode_param_ops = {
- device_param_cb(queue_mode, &null_queue_mode_param_ops, &g_queue_mode, 0444);
- MODULE_PARM_DESC(queue_mode, "Block interface to use (0=bio,1=rq,2=multiqueue)");
- 
--static int g_gb = 250;
--module_param_named(gb, g_gb, int, 0444);
-+static unsigned long g_gb = 250;
-+module_param_named(gb, g_gb, ulong, 0444);
- MODULE_PARM_DESC(gb, "Size in GB");
- 
--static int g_bs = 512;
--module_param_named(bs, g_bs, int, 0444);
-+static unsigned int g_bs = 512;
-+module_param_named(bs, g_bs, uint, 0444);
- MODULE_PARM_DESC(bs, "Block size (in bytes)");
- 
--static int g_max_sectors;
--module_param_named(max_sectors, g_max_sectors, int, 0444);
-+static unsigned int g_max_sectors;
-+module_param_named(max_sectors, g_max_sectors, uint, 0444);
- MODULE_PARM_DESC(max_sectors, "Maximum size of a command (in 512B sectors)");
- 
- static unsigned int nr_devices = 1;
-@@ -205,8 +205,8 @@ static unsigned long g_completion_nsec = 10000;
- module_param_named(completion_nsec, g_completion_nsec, ulong, 0444);
- MODULE_PARM_DESC(completion_nsec, "Time in ns to complete a request in hardware. Default: 10,000ns");
- 
--static int g_hw_queue_depth = 64;
--module_param_named(hw_queue_depth, g_hw_queue_depth, int, 0444);
-+static unsigned int g_hw_queue_depth = 64;
-+module_param_named(hw_queue_depth, g_hw_queue_depth, uint, 0444);
- MODULE_PARM_DESC(hw_queue_depth, "Queue depth for each hardware queue. Default: 64");
- 
- static bool g_use_per_node_hctx;
-@@ -257,8 +257,8 @@ static unsigned int g_zone_max_active;
- module_param_named(zone_max_active, g_zone_max_active, uint, 0444);
- MODULE_PARM_DESC(zone_max_active, "Maximum number of active zones when block device is zoned. Default: 0 (no limit)");
- 
--static int g_zone_append_max_sectors = INT_MAX;
--module_param_named(zone_append_max_sectors, g_zone_append_max_sectors, int, 0444);
-+static unsigned int g_zone_append_max_sectors = INT_MAX;
-+module_param_named(zone_append_max_sectors, g_zone_append_max_sectors, uint, 0444);
- MODULE_PARM_DESC(zone_append_max_sectors,
- 		 "Maximum size of a zone append command (in 512B sectors). Specify 0 for zone append emulation");
- 
--- 
-2.33.0
+So it's filesystem-specific internals to make sure it can
+work like this (for example ext4 on erofs, ext4 still uses
+loop to mount). The virtual block device layer knows
+nothing about what the upper filesystem did before the
+execution passes through, so it's unsafe to work like this.
 
+Thanks,
+Gao Xiang
