@@ -1,47 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEA70258ED1
-	for <linux-block@vger.kernel.org>; Fri, 21 Nov 2025 02:00:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2832A2E0914
+	for <linux-block@vger.kernel.org>; Fri, 21 Nov 2025 02:00:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763690452; cv=none; b=Uuw/baTjzc51h6IwBoksuB9/lRm96QDRUttKzGorP0CLBWW1oksyYsfJ8qMAYlEdLmPalu7FPSEXQWkziLeoLDv6cBOd+0yKyafVsL56KnWQUraZZmhM0dgdfw+ktqMXAq4MOjBoI+zg+ybYB6BJITzEQEINdXKC5tIHjg62fGQ=
+	t=1763690456; cv=none; b=t5hugoG4nC/JPeXFCoFEp/0RQLESO0k/d8dscbXf/QPYtOCUP+IYNM1Vx9XqQBWPnrVxd0lENWB9OzWIzfxUX9q7xT/BZmI4S8wQiLxelGMb2mGdeZETf9GIZbo8X8lu/xLFWl7gl2zlf7i5Ri+bhFg3J4LxbidXV5SUjlNnwt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763690452; c=relaxed/simple;
-	bh=0YiZ2Y84rU5lfo5m+i04VaZBD5DjMht7Ah3qPqgITq0=;
+	s=arc-20240116; t=1763690456; c=relaxed/simple;
+	bh=+lj4XH59eLy07Pif77Sg8M6BrlekF/3Csdp6qluJgDo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EjGW7CdeWvSJh2iVDlESxh2ohsCpVJKLfR/P1CHrb0iS2gw82m6u+7/Z5LdpeDEqZLMnZJf8lU5RT4HRa96IacomNdLNLymqLMPyHtTlXa0pvsobhvDXQof9qzIlCZQcp0dkesfLrU7LODVqxzy+eMpg2UM2PA9vO1IFGslDDB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TVxNc6L7; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=NiijzLqkLTC+ZVQHyVju6PI0DRijMOlynaN12jsRCPMZMhEK9eBl1Ct6qwFyXyJp/He+Su8PeWREaTCa1W/PllLfIX9oyNmQ8BfvBJAKw6P70ZBNFTIIV6O6K10vQjsx/LKE7ul5ISpbmMFYrni+9TAfLsqFEzA2Ww76Z0CgrME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a+EhGprI; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TVxNc6L7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a+EhGprI"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763690449;
+	s=mimecast20190719; t=1763690453;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=rJ9+bjNk9l3ZWyw+GB/6UrQf0WcvmWDX5OqUGGkYIGU=;
-	b=TVxNc6L7gmMnuRRmpfVkiMDGQcwy33/pQmqkxvdAw/ji7aKCjeLENzGPZQcsIk6JRvs0hD
-	IX14aEuh3gl0Eyk95v70Sus7SeVxbS2/6ZDOVw7CJN08PSY2mG9SEVyJiRSD7F7W3NKMFt
-	GHB5eRBKx8RDvjBdMciaaYgppyij4IU=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=XnIP039ix3jbD37KSqwje17mbJ/g+phy83hpuyRLDwE=;
+	b=a+EhGprIdwkZbo/fYEjhRPXRal7l6yoVQCsYo/Y0qlXdkibkRhxq5QXJO9K7NA6fVDLP9P
+	Of0k1bBHtPqg08d/hPHux8Xfu/cvy7CyTHiQFRHqZc36GoP9Lu5QM7G9YpunqXNn4Ct7N5
+	w7wp3/T2LkDwLSDTHkRYadOtX3fd930=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-328-bAKQdnctPPe5SGkU09aQ_A-1; Thu,
- 20 Nov 2025 21:00:45 -0500
-X-MC-Unique: bAKQdnctPPe5SGkU09aQ_A-1
-X-Mimecast-MFC-AGG-ID: bAKQdnctPPe5SGkU09aQ_A_1763690444
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-98-BgRO1fFAPQmiWhz_YqvEoQ-1; Thu,
+ 20 Nov 2025 21:00:49 -0500
+X-MC-Unique: BgRO1fFAPQmiWhz_YqvEoQ-1
+X-Mimecast-MFC-AGG-ID: BgRO1fFAPQmiWhz_YqvEoQ_1763690448
 Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7B10E18002C8;
-	Fri, 21 Nov 2025 02:00:44 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 356001956046;
+	Fri, 21 Nov 2025 02:00:48 +0000 (UTC)
 Received: from localhost (unknown [10.72.116.211])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3C76E1956045;
-	Fri, 21 Nov 2025 02:00:42 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 45C981956045;
+	Fri, 21 Nov 2025 02:00:46 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
@@ -51,9 +51,9 @@ Cc: Caleb Sander Mateos <csander@purestorage.com>,
 	Andrew Morton <akpm@linux-foundation.org>,
 	linux-kernel@vger.kernel.org,
 	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 25/27] selftests: ublk: handle UBLK_U_IO_FETCH_IO_CMDS
-Date: Fri, 21 Nov 2025 09:58:47 +0800
-Message-ID: <20251121015851.3672073-26-ming.lei@redhat.com>
+Subject: [PATCH V4 26/27] selftests: ublk: add --batch/-b for enabling F_BATCH_IO
+Date: Fri, 21 Nov 2025 09:58:48 +0800
+Message-ID: <20251121015851.3672073-27-ming.lei@redhat.com>
 In-Reply-To: <20251121015851.3672073-1-ming.lei@redhat.com>
 References: <20251121015851.3672073-1-ming.lei@redhat.com>
 Precedence: bulk
@@ -65,285 +65,238 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Add support for UBLK_U_IO_FETCH_IO_CMDS to enable efficient batch
-fetching of I/O commands using multishot io_uring operations.
+Add --batch/-b for enabling F_BATCH_IO.
 
-Key improvements:
-- Implement multishot UBLK_U_IO_FETCH_IO_CMDS for continuous command fetching
-- Add fetch buffer management with page-aligned, mlocked buffers
-- Process fetched I/O command tags from kernel-provided buffers
-- Integrate fetch operations with existing batch I/O infrastructure
-- Significantly reduce uring_cmd issuing overhead through batching
+Add generic_14 for covering its basic function.
 
-The implementation uses two fetch buffers per thread with automatic
-requeuing to maintain continuous I/O command flow. Each fetch operation
-retrieves multiple command tags in a single syscall, dramatically
-improving performance compared to individual command fetching.
-
-Technical details:
-- Fetch buffers are page-aligned and mlocked for optimal performance
-- Uses IORING_URING_CMD_MULTISHOT for continuous operation
-- Automatic buffer management and requeuing on completion
-- Enhanced CQE handling for fetch command completions
+Add stress_06 and stress_07 for covering stress test.
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- tools/testing/selftests/ublk/batch.c | 134 ++++++++++++++++++++++++++-
- tools/testing/selftests/ublk/kublk.c |  14 ++-
- tools/testing/selftests/ublk/kublk.h |  13 +++
- 3 files changed, 157 insertions(+), 4 deletions(-)
+ tools/testing/selftests/ublk/Makefile         |  3 ++
+ tools/testing/selftests/ublk/kublk.c          | 13 +++++-
+ .../testing/selftests/ublk/test_generic_14.sh | 32 +++++++++++++
+ .../testing/selftests/ublk/test_stress_06.sh  | 45 +++++++++++++++++++
+ .../testing/selftests/ublk/test_stress_07.sh  | 44 ++++++++++++++++++
+ 5 files changed, 136 insertions(+), 1 deletion(-)
+ create mode 100755 tools/testing/selftests/ublk/test_generic_14.sh
+ create mode 100755 tools/testing/selftests/ublk/test_stress_06.sh
+ create mode 100755 tools/testing/selftests/ublk/test_stress_07.sh
 
-diff --git a/tools/testing/selftests/ublk/batch.c b/tools/testing/selftests/ublk/batch.c
-index e240d4decedf..7db91f910944 100644
---- a/tools/testing/selftests/ublk/batch.c
-+++ b/tools/testing/selftests/ublk/batch.c
-@@ -140,15 +140,63 @@ void ublk_batch_prepare(struct ublk_thread *t)
- 			t->nr_bufs);
- }
+diff --git a/tools/testing/selftests/ublk/Makefile b/tools/testing/selftests/ublk/Makefile
+index a724276622d0..cbf57113b1a6 100644
+--- a/tools/testing/selftests/ublk/Makefile
++++ b/tools/testing/selftests/ublk/Makefile
+@@ -21,6 +21,7 @@ TEST_PROGS += test_generic_10.sh
+ TEST_PROGS += test_generic_11.sh
+ TEST_PROGS += test_generic_12.sh
+ TEST_PROGS += test_generic_13.sh
++TEST_PROGS += test_generic_14.sh
  
-+static void free_batch_fetch_buf(struct ublk_thread *t)
-+{
-+	int i;
-+
-+	for (i = 0; i < UBLKS_T_NR_FETCH_BUF; i++) {
-+		io_uring_free_buf_ring(&t->ring, t->fetch[i].br, 1, i);
-+		munlock(t->fetch[i].fetch_buf, t->fetch[i].fetch_buf_size);
-+		free(t->fetch[i].fetch_buf);
-+	}
-+}
-+
-+static int alloc_batch_fetch_buf(struct ublk_thread *t)
-+{
-+	/* page aligned fetch buffer, and it is mlocked for speedup delivery */
-+	unsigned pg_sz = getpagesize();
-+	unsigned buf_size = round_up(t->dev->dev_info.queue_depth * 2, pg_sz);
-+	int ret;
-+	int i = 0;
-+
-+	for (i = 0; i < UBLKS_T_NR_FETCH_BUF; i++) {
-+		t->fetch[i].fetch_buf_size = buf_size;
-+
-+		if (posix_memalign((void **)&t->fetch[i].fetch_buf, pg_sz,
-+					t->fetch[i].fetch_buf_size))
-+			return -ENOMEM;
-+
-+		/* lock fetch buffer page for fast fetching */
-+		if (mlock(t->fetch[i].fetch_buf, t->fetch[i].fetch_buf_size))
-+			ublk_err("%s: can't lock fetch buffer %s\n", __func__,
-+				strerror(errno));
-+		t->fetch[i].br = io_uring_setup_buf_ring(&t->ring, 1,
-+			i, IOU_PBUF_RING_INC, &ret);
-+		if (!t->fetch[i].br) {
-+			ublk_err("Buffer ring register failed %d\n", ret);
-+			return ret;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- int ublk_batch_alloc_buf(struct ublk_thread *t)
- {
-+	int ret;
-+
- 	ublk_assert(t->nr_commit_buf < 16);
--	return alloc_batch_commit_buf(t);
-+
-+	ret = alloc_batch_commit_buf(t);
-+	if (ret)
-+		return ret;
-+	return alloc_batch_fetch_buf(t);
- }
+ TEST_PROGS += test_null_01.sh
+ TEST_PROGS += test_null_02.sh
+@@ -39,6 +40,8 @@ TEST_PROGS += test_stress_02.sh
+ TEST_PROGS += test_stress_03.sh
+ TEST_PROGS += test_stress_04.sh
+ TEST_PROGS += test_stress_05.sh
++TEST_PROGS += test_stress_06.sh
++TEST_PROGS += test_stress_07.sh
  
- void ublk_batch_free_buf(struct ublk_thread *t)
- {
- 	free_batch_commit_buf(t);
-+	free_batch_fetch_buf(t);
- }
+ TEST_GEN_PROGS_EXTENDED = kublk
  
- static void ublk_init_batch_cmd(struct ublk_thread *t, __u16 q_id,
-@@ -199,6 +247,76 @@ static void ublk_setup_commit_sqe(struct ublk_thread *t,
- 	cmd->flags |= t->cmd_flags;
- }
- 
-+static void ublk_batch_queue_fetch(struct ublk_thread *t,
-+				   struct ublk_queue *q,
-+				   unsigned short buf_idx)
-+{
-+	unsigned short nr_elem = t->fetch[buf_idx].fetch_buf_size / 2;
-+	struct io_uring_sqe *sqe;
-+
-+	io_uring_buf_ring_add(t->fetch[buf_idx].br, t->fetch[buf_idx].fetch_buf,
-+			t->fetch[buf_idx].fetch_buf_size,
-+			0, 0, 0);
-+	io_uring_buf_ring_advance(t->fetch[buf_idx].br, 1);
-+
-+	ublk_io_alloc_sqes(t, &sqe, 1);
-+
-+	ublk_init_batch_cmd(t, q->q_id, sqe, UBLK_U_IO_FETCH_IO_CMDS, 2, nr_elem,
-+			buf_idx);
-+
-+	sqe->rw_flags= IORING_URING_CMD_MULTISHOT;
-+	sqe->buf_group = buf_idx;
-+	sqe->flags |= IOSQE_BUFFER_SELECT;
-+
-+	t->fetch[buf_idx].fetch_buf_off = 0;
-+}
-+
-+void ublk_batch_start_fetch(struct ublk_thread *t,
-+			    struct ublk_queue *q)
-+{
-+	int i;
-+
-+	for (i = 0; i < UBLKS_T_NR_FETCH_BUF; i++)
-+		ublk_batch_queue_fetch(t, q, i);
-+}
-+
-+static unsigned short ublk_compl_batch_fetch(struct ublk_thread *t,
-+				   struct ublk_queue *q,
-+				   const struct io_uring_cqe *cqe)
-+{
-+	unsigned short buf_idx = user_data_to_tag(cqe->user_data);
-+	unsigned start = t->fetch[buf_idx].fetch_buf_off;
-+	unsigned end = start + cqe->res;
-+	void *buf = t->fetch[buf_idx].fetch_buf;
-+	int i;
-+
-+	if (cqe->res < 0)
-+		return buf_idx;
-+
-+       if ((end - start) / 2 > q->q_depth) {
-+               ublk_err("%s: fetch duplicated ios offset %u count %u\n", __func__, start, cqe->res);
-+
-+               for (i = start; i < end; i += 2) {
-+                       unsigned short tag = *(unsigned short *)(buf + i);
-+
-+                       ublk_err("%u ", tag);
-+               }
-+               ublk_err("\n");
-+       }
-+
-+	for (i = start; i < end; i += 2) {
-+		unsigned short tag = *(unsigned short *)(buf + i);
-+
-+		if (tag >= q->q_depth)
-+			ublk_err("%s: bad tag %u\n", __func__, tag);
-+
-+		if (q->tgt_ops->queue_io)
-+			q->tgt_ops->queue_io(t, q, tag);
-+	}
-+	t->fetch[buf_idx].fetch_buf_off = end;
-+	return buf_idx;
-+}
-+
- int ublk_batch_queue_prep_io_cmds(struct ublk_thread *t, struct ublk_queue *q)
- {
- 	unsigned short nr_elem = q->q_depth;
-@@ -258,12 +376,26 @@ void ublk_batch_compl_cmd(struct ublk_thread *t,
- 			  const struct io_uring_cqe *cqe)
- {
- 	unsigned op = user_data_to_op(cqe->user_data);
-+	struct ublk_queue *q;
-+	unsigned buf_idx;
-+	unsigned q_id;
- 
- 	if (op == _IOC_NR(UBLK_U_IO_PREP_IO_CMDS) ||
- 			op == _IOC_NR(UBLK_U_IO_COMMIT_IO_CMDS)) {
- 		ublk_batch_compl_commit_cmd(t, cqe, op);
- 		return;
- 	}
-+
-+	/* FETCH command is per queue */
-+	q_id = user_data_to_q_id(cqe->user_data);
-+	q = &t->dev->q[q_id];
-+	buf_idx = ublk_compl_batch_fetch(t, q, cqe);
-+
-+	if (cqe->res < 0 && cqe->res != -ENOBUFS) {
-+		 t->state |= UBLKS_T_STOPPING;
-+	} else if (!(cqe->flags & IORING_CQE_F_MORE) || cqe->res == -ENOBUFS) {
-+		ublk_batch_queue_fetch(t, q, buf_idx);
-+	}
- }
- 
- void ublk_batch_commit_io_cmds(struct ublk_thread *t)
 diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftests/ublk/kublk.c
-index 6565e804679c..cb329c7aebc4 100644
+index cb329c7aebc4..4c45482a847c 100644
 --- a/tools/testing/selftests/ublk/kublk.c
 +++ b/tools/testing/selftests/ublk/kublk.c
-@@ -493,6 +493,10 @@ static int ublk_thread_init(struct ublk_thread *t, unsigned long long extra_flag
- 	int ring_depth = dev->tgt.sq_depth, cq_depth = dev->tgt.cq_depth;
- 	int ret;
+@@ -1476,6 +1476,7 @@ static int cmd_dev_get_features(void)
+ 		FEAT_NAME(UBLK_F_QUIESCE),
+ 		FEAT_NAME(UBLK_F_PER_IO_DAEMON),
+ 		FEAT_NAME(UBLK_F_BUF_REG_OFF_DAEMON),
++		FEAT_NAME(UBLK_F_BATCH_IO),
+ 	};
+ 	struct ublk_dev *dev;
+ 	__u64 features = 0;
+@@ -1571,6 +1572,7 @@ static void __cmd_create_help(char *exe, bool recovery)
+ 	printf("\t[--foreground] [--quiet] [-z] [--auto_zc] [--auto_zc_fallback] [--debug_mask mask] [-r 0|1 ] [-g]\n");
+ 	printf("\t[-e 0|1 ] [-i 0|1] [--no_ublk_fixed_fd]\n");
+ 	printf("\t[--nthreads threads] [--per_io_tasks]\n");
++	printf("\t[--batch|-b]\n");
+ 	printf("\t[target options] [backfile1] [backfile2] ...\n");
+ 	printf("\tdefault: nr_queues=2(max 32), depth=128(max 1024), dev_id=-1(auto allocation)\n");
+ 	printf("\tdefault: nthreads=nr_queues");
+@@ -1633,6 +1635,7 @@ int main(int argc, char *argv[])
+ 		{ "nthreads",		1,	NULL,  0 },
+ 		{ "per_io_tasks",	0,	NULL,  0 },
+ 		{ "no_ublk_fixed_fd",	0,	NULL,  0 },
++		{ "batch",              0,      NULL, 'b'},
+ 		{ 0, 0, 0, 0 }
+ 	};
+ 	const struct ublk_tgt_ops *ops = NULL;
+@@ -1654,9 +1657,12 @@ int main(int argc, char *argv[])
  
-+	/* FETCH_IO_CMDS is multishot, so increase cq depth for BATCH_IO */
-+	if (ublk_dev_batch_io(dev))
-+		cq_depth += dev->dev_info.queue_depth;
-+
- 	ret = ublk_setup_ring(&t->ring, ring_depth, cq_depth,
- 			IORING_SETUP_COOP_TASKRUN |
- 			IORING_SETUP_SINGLE_ISSUER |
-@@ -797,7 +801,7 @@ static void ublk_handle_cqe(struct ublk_thread *t,
- 	unsigned q_id = user_data_to_q_id(cqe->user_data);
- 	unsigned cmd_op = user_data_to_op(cqe->user_data);
- 
--	if (cqe->res < 0 && cqe->res != -ENODEV)
-+	if (cqe->res < 0 && cqe->res != -ENODEV && cqe->res != -ENOBUFS)
- 		ublk_err("%s: res %d userdata %llx thread state %x\n", __func__,
- 				cqe->res, cqe->user_data, t->state);
- 
-@@ -922,9 +926,13 @@ static __attribute__((noinline)) int __ublk_io_handler_fn(struct ublk_thread_inf
- 	if (!ublk_thread_batch_io(&t)) {
- 		/* submit all io commands to ublk driver */
- 		ublk_submit_fetch_commands(&t);
--	} else if (!t.idx) {
-+	} else {
-+		struct ublk_queue *q = &t.dev->q[t.idx];
-+
- 		/* prepare all io commands in the 1st thread context */
--		ublk_batch_setup_queues(&t);
-+		if (!t.idx)
-+			ublk_batch_setup_queues(&t);
-+		ublk_batch_start_fetch(&t, q);
+ 	opterr = 0;
+ 	optind = 2;
+-	while ((opt = getopt_long(argc, argv, "t:n:d:q:r:e:i:s:gaz",
++	while ((opt = getopt_long(argc, argv, "t:n:d:q:r:e:i:s:gazb",
+ 				  longopts, &option_idx)) != -1) {
+ 		switch (opt) {
++		case 'b':
++			ctx.flags |= UBLK_F_BATCH_IO;
++			break;
+ 		case 'a':
+ 			ctx.all = 1;
+ 			break;
+@@ -1737,6 +1743,11 @@ int main(int argc, char *argv[])
+ 		}
  	}
  
- 	do {
-diff --git a/tools/testing/selftests/ublk/kublk.h b/tools/testing/selftests/ublk/kublk.h
-index 0a355653d64c..222501048c24 100644
---- a/tools/testing/selftests/ublk/kublk.h
-+++ b/tools/testing/selftests/ublk/kublk.h
-@@ -190,6 +190,13 @@ struct batch_commit_buf {
- 	unsigned short count;
- };
- 
-+struct batch_fetch_buf {
-+	struct io_uring_buf_ring *br;
-+	void *fetch_buf;
-+	unsigned int fetch_buf_size;
-+	unsigned int fetch_buf_off;
-+};
++	if (ctx.per_io_tasks && (ctx.flags & UBLK_F_BATCH_IO)) {
++		ublk_err("per_io_task and F_BATCH_IO conflict\n");
++		return -EINVAL;
++	}
 +
- struct ublk_thread {
- 	struct ublk_dev *dev;
- 	unsigned idx;
-@@ -216,6 +223,9 @@ struct ublk_thread {
- #define UBLKS_T_COMMIT_BUF_INV_IDX  ((unsigned short)-1)
- 	struct allocator commit_buf_alloc;
- 	struct batch_commit_buf commit;
-+	/* FETCH_IO_CMDS buffer */
-+#define UBLKS_T_NR_FETCH_BUF 	2
-+	struct batch_fetch_buf fetch[UBLKS_T_NR_FETCH_BUF];
- 
- 	struct io_uring ring;
- };
-@@ -468,6 +478,9 @@ static inline unsigned short ublk_batch_io_buf_idx(
- 
- /* Queue UBLK_U_IO_PREP_IO_CMDS for a specific queue with batch elements */
- int ublk_batch_queue_prep_io_cmds(struct ublk_thread *t, struct ublk_queue *q);
-+/* Start fetching I/O commands using multishot UBLK_U_IO_FETCH_IO_CMDS */
-+void ublk_batch_start_fetch(struct ublk_thread *t,
-+			    struct ublk_queue *q);
- /* Handle completion of batch I/O commands (prep/commit) */
- void ublk_batch_compl_cmd(struct ublk_thread *t,
- 			  const struct io_uring_cqe *cqe);
+ 	/* auto_zc_fallback depends on F_AUTO_BUF_REG & F_SUPPORT_ZERO_COPY */
+ 	if (ctx.auto_zc_fallback &&
+ 	    !((ctx.flags & UBLK_F_AUTO_BUF_REG) &&
+diff --git a/tools/testing/selftests/ublk/test_generic_14.sh b/tools/testing/selftests/ublk/test_generic_14.sh
+new file mode 100755
+index 000000000000..e197961b07f1
+--- /dev/null
++++ b/tools/testing/selftests/ublk/test_generic_14.sh
+@@ -0,0 +1,32 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++
++. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
++
++TID="generic_14"
++ERR_CODE=0
++
++if ! _have_feature "BATCH_IO"; then
++	exit "$UBLK_SKIP_CODE"
++fi
++
++_prep_test "generic" "test basic function of UBLK_F_BATCH_IO"
++
++_create_backfile 0 256M
++_create_backfile 1 256M
++
++dev_id=$(_add_ublk_dev -t loop -q 2 -b "${UBLK_BACKFILES[0]}")
++_check_add_dev $TID $?
++
++if ! _mkfs_mount_test /dev/ublkb"${dev_id}"; then
++	_cleanup_test "generic"
++	_show_result $TID 255
++fi
++
++dev_id=$(_add_ublk_dev -t stripe -b --auto_zc "${UBLK_BACKFILES[0]}" "${UBLK_BACKFILES[1]}")
++_check_add_dev $TID $?
++_mkfs_mount_test /dev/ublkb"${dev_id}"
++ERR_CODE=$?
++
++_cleanup_test "generic"
++_show_result $TID $ERR_CODE
+diff --git a/tools/testing/selftests/ublk/test_stress_06.sh b/tools/testing/selftests/ublk/test_stress_06.sh
+new file mode 100755
+index 000000000000..190db0b4f2ad
+--- /dev/null
++++ b/tools/testing/selftests/ublk/test_stress_06.sh
+@@ -0,0 +1,45 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++
++. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
++TID="stress_06"
++ERR_CODE=0
++
++ublk_io_and_remove()
++{
++	run_io_and_remove "$@"
++	ERR_CODE=$?
++	if [ ${ERR_CODE} -ne 0 ]; then
++		echo "$TID failure: $*"
++		_show_result $TID $ERR_CODE
++	fi
++}
++
++if ! _have_program fio; then
++	exit "$UBLK_SKIP_CODE"
++fi
++
++if ! _have_feature "ZERO_COPY"; then
++	exit "$UBLK_SKIP_CODE"
++fi
++if ! _have_feature "AUTO_BUF_REG"; then
++	exit "$UBLK_SKIP_CODE"
++fi
++if ! _have_feature "BATCH_IO"; then
++	exit "$UBLK_SKIP_CODE"
++fi
++
++_prep_test "stress" "run IO and remove device(zero copy)"
++
++_create_backfile 0 256M
++_create_backfile 1 128M
++_create_backfile 2 128M
++
++ublk_io_and_remove 8G -t null -q 4 -b &
++ublk_io_and_remove 256M -t loop -q 4 --auto_zc -b "${UBLK_BACKFILES[0]}" &
++ublk_io_and_remove 256M -t stripe -q 4 --auto_zc -b "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
++ublk_io_and_remove 8G -t null -q 4 -z --auto_zc --auto_zc_fallback -b &
++wait
++
++_cleanup_test "stress"
++_show_result $TID $ERR_CODE
+diff --git a/tools/testing/selftests/ublk/test_stress_07.sh b/tools/testing/selftests/ublk/test_stress_07.sh
+new file mode 100755
+index 000000000000..1b6bdb31da03
+--- /dev/null
++++ b/tools/testing/selftests/ublk/test_stress_07.sh
+@@ -0,0 +1,44 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++
++. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
++TID="stress_07"
++ERR_CODE=0
++
++ublk_io_and_kill_daemon()
++{
++	run_io_and_kill_daemon "$@"
++	ERR_CODE=$?
++	if [ ${ERR_CODE} -ne 0 ]; then
++		echo "$TID failure: $*"
++		_show_result $TID $ERR_CODE
++	fi
++}
++
++if ! _have_program fio; then
++	exit "$UBLK_SKIP_CODE"
++fi
++if ! _have_feature "ZERO_COPY"; then
++	exit "$UBLK_SKIP_CODE"
++fi
++if ! _have_feature "AUTO_BUF_REG"; then
++	exit "$UBLK_SKIP_CODE"
++fi
++if ! _have_feature "BATCH_IO"; then
++	exit "$UBLK_SKIP_CODE"
++fi
++
++_prep_test "stress" "run IO and kill ublk server(zero copy)"
++
++_create_backfile 0 256M
++_create_backfile 1 128M
++_create_backfile 2 128M
++
++ublk_io_and_kill_daemon 8G -t null -q 4 -z -b &
++ublk_io_and_kill_daemon 256M -t loop -q 4 --auto_zc -b "${UBLK_BACKFILES[0]}" &
++ublk_io_and_kill_daemon 256M -t stripe -q 4 -b "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
++ublk_io_and_kill_daemon 8G -t null -q 4 -z --auto_zc --auto_zc_fallback -b &
++wait
++
++_cleanup_test "stress"
++_show_result $TID $ERR_CODE
 -- 
 2.47.0
 
