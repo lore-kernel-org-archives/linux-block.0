@@ -1,47 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21163280338
-	for <linux-block@vger.kernel.org>; Fri, 21 Nov 2025 01:59:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82D9E283682
+	for <linux-block@vger.kernel.org>; Fri, 21 Nov 2025 01:59:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763690369; cv=none; b=TP5iit2szvHgAQLErkmE8af4p0brfnKlCqu5Ws5WA5TOuR4B50xBthHdpu+moQ52UPn1PkfEgCgECEW0oH1gENn4ewMNvVM+rCo+EPCEtLpkUPPLzHzrkyNUwDBbpDNm3P3Vjc0x3sXXUeMECwf+5wo8V4xDiKECThueNwbE02A=
+	t=1763690371; cv=none; b=t5a4UuIspkgm/rAvyZsUJxhpXAvg8z/7ifLogF8VPFJNrSHqvT+1lQuSIjQk3sF17bqpYGLKjGPOO2CdE2Fd/CkUs5rERi8uokLDEMvA9x2kCw+fTuusBUa3aAMkMaZRas4oyp0amUlrETFPBrMQGvIocwUboPZTMqPq/aDC/Ec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763690369; c=relaxed/simple;
-	bh=ID3VdaatVF2sSDoX38s0c3b1u8IK71WzWOR198pdGR4=;
+	s=arc-20240116; t=1763690371; c=relaxed/simple;
+	bh=2sEs+ptW36m+FbqKF4ySBIhs1E5oCnMNQ3hLz1W9yQo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=j+Vc46z4m4Jgs4y2AMVPvtkDa9Mi1cLe6het0o3+tcth4S1hD/BdCmb07rEvyWPoLRJqbGYrfgKt751mtdwspw4JkrlhJ8//5KsiUoU9gRTAP1KkuIad924Z0khv5Lf4HxQLDyqqI47G6IHJjDzwEisiiaz9JElOdDEg0pAxw24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=De5352Ol; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=uexCCyIOnj/7zutL0zzRt1wBQf/C0fGDmxr2dDtZ9uOZN75zmS1x00YDh0ceLy/k1nPIjpnOzXMHLKtXtqywQOkjrH5HGY/eXN2+PtZjpgyREbLHQ5Ou1iRM72As+jEJws2v1n8/Lqa2G2REMM/qJV7sSydGlHnri37L/t+CtnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PNUC0mis; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="De5352Ol"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PNUC0mis"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763690366;
+	s=mimecast20190719; t=1763690368;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=iVoBVCrQUYZ9ilGjyioJ6sWCbx0PTCJ/7FPYB9TJGCc=;
-	b=De5352OlTvgp0QNDwpn4hWB2wMgyYTIv3CuzdkH7/CKm3+cl3tCVEC/A206YA/XWSWjfxy
-	ASMr+k7oKFNvW4FGWbkdk5xpSVb/VrTN+lZHp606Y1syUxOU7/6CN80zUwu+ulul9XyZOV
-	wNRUZuzTCktwQUsggG3ZWBn8lDepTj0=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+	bh=yzFM7RscsZAkx5obOZIu/ddnHKngMYodVSIc+DQ/QEg=;
+	b=PNUC0misRW4tKL/R/+4eq3/T1AMbIVHPRGOKQNfkN/qHDigdxKuzbogQ7i3xSRhPh4PL8y
+	cAbLpAji5AdW/8ZmSJ1FbvvVu7nktZLstwfqpMDWZC2M1/hz1lWw0Zrb2ouMwYC8ywgOSq
+	QRWJNg1vBNqV9XThimGMGzDTl2jHWtk=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-333-fP1sLXXWNf2FS94u3rdpjg-1; Thu,
- 20 Nov 2025 20:59:19 -0500
-X-MC-Unique: fP1sLXXWNf2FS94u3rdpjg-1
-X-Mimecast-MFC-AGG-ID: fP1sLXXWNf2FS94u3rdpjg_1763690357
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-635-8CSPvGiLNzedJsKOTZQ5Xg-1; Thu,
+ 20 Nov 2025 20:59:23 -0500
+X-MC-Unique: 8CSPvGiLNzedJsKOTZQ5Xg-1
+X-Mimecast-MFC-AGG-ID: 8CSPvGiLNzedJsKOTZQ5Xg_1763690362
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EF1B21956088;
-	Fri, 21 Nov 2025 01:59:16 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 50EDA195609F;
+	Fri, 21 Nov 2025 01:59:21 +0000 (UTC)
 Received: from localhost (unknown [10.72.116.211])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E648830044DB;
-	Fri, 21 Nov 2025 01:59:15 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0D33D1956045;
+	Fri, 21 Nov 2025 01:59:19 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
@@ -51,9 +51,9 @@ Cc: Caleb Sander Mateos <csander@purestorage.com>,
 	Andrew Morton <akpm@linux-foundation.org>,
 	linux-kernel@vger.kernel.org,
 	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 03/27] ublk: add `union ublk_io_buf` with improved naming
-Date: Fri, 21 Nov 2025 09:58:25 +0800
-Message-ID: <20251121015851.3672073-4-ming.lei@redhat.com>
+Subject: [PATCH V4 04/27] ublk: refactor auto buffer register in ublk_dispatch_req()
+Date: Fri, 21 Nov 2025 09:58:26 +0800
+Message-ID: <20251121015851.3672073-5-ming.lei@redhat.com>
 In-Reply-To: <20251121015851.3672073-1-ming.lei@redhat.com>
 References: <20251121015851.3672073-1-ming.lei@redhat.com>
 Precedence: bulk
@@ -63,151 +63,139 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Add `union ublk_io_buf` for naming the anonymous union of struct ublk_io's
-addr and buf fields, meantime apply it to `struct ublk_io` for storing either
-ublk auto buffer register data or ublk server io buffer address.
+Refactor auto buffer register code and prepare for supporting batch IO
+feature, and the main motivation is to put 'ublk_io' operation code
+together, so that per-io lock can be applied for the code block.
 
-The union uses clear field names:
-- `addr`: for regular ublk server io buffer addresses
-- `auto_reg`: for ublk auto buffer registration data
+The key changes are:
+- Rename ublk_auto_buf_reg() as ublk_do_auto_buf_reg()
+- Introduce an enum `auto_buf_reg_res` to represent the result of
+  the buffer registration attempt (FAIL, FALLBACK, OK).
+- Split the existing `ublk_do_auto_buf_reg` function into two:
+  - `__ublk_do_auto_buf_reg`: Performs the actual buffer registration
+    and returns the `auto_buf_reg_res` status.
+  - `ublk_do_auto_buf_reg`: A wrapper that calls the internal function
+    and handles the I/O preparation based on the result.
+- Introduce `ublk_prep_auto_buf_reg_io` to encapsulate the logic for
+  preparing the I/O for completion after buffer registration.
+- Pass the `tag` directly to `ublk_auto_buf_reg_fallback` to avoid
+  recalculating it.
 
-This eliminates confusing access patterns and improves code readability.
+This refactoring makes the control flow clearer and isolates the different
+stages of the auto buffer registration process.
 
 Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/ublk_drv.c | 40 ++++++++++++++++++++++------------------
- 1 file changed, 22 insertions(+), 18 deletions(-)
+ drivers/block/ublk_drv.c | 64 +++++++++++++++++++++++++++-------------
+ 1 file changed, 43 insertions(+), 21 deletions(-)
 
 diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 2884e0687e31..f1fa5ceacdf6 100644
+index f1fa5ceacdf6..b36cd55eceb0 100644
 --- a/drivers/block/ublk_drv.c
 +++ b/drivers/block/ublk_drv.c
-@@ -155,12 +155,13 @@ struct ublk_uring_cmd_pdu {
-  */
- #define UBLK_REFCOUNT_INIT (REFCOUNT_MAX / 2)
+@@ -1168,17 +1168,37 @@ static inline void __ublk_abort_rq(struct ublk_queue *ubq,
+ }
  
-+union ublk_io_buf {
-+	__u64	addr;
-+	struct ublk_auto_buf_reg auto_reg;
+ static void
+-ublk_auto_buf_reg_fallback(const struct ublk_queue *ubq, struct ublk_io *io)
++ublk_auto_buf_reg_fallback(const struct ublk_queue *ubq, unsigned tag)
+ {
+-	unsigned tag = io - ubq->ios;
+ 	struct ublksrv_io_desc *iod = ublk_get_iod(ubq, tag);
+ 
+ 	iod->op_flags |= UBLK_IO_F_NEED_REG_BUF;
+ }
+ 
+-static bool ublk_auto_buf_reg(const struct ublk_queue *ubq, struct request *req,
+-			      struct ublk_io *io, struct io_uring_cmd *cmd,
+-			      unsigned int issue_flags)
++enum auto_buf_reg_res {
++	AUTO_BUF_REG_FAIL,
++	AUTO_BUF_REG_FALLBACK,
++	AUTO_BUF_REG_OK,
 +};
 +
- struct ublk_io {
--	/* userspace buffer address from io cmd */
--	union {
--		__u64	addr;
--		struct ublk_auto_buf_reg buf;
--	};
-+	union ublk_io_buf buf;
- 	unsigned int flags;
- 	int res;
- 
-@@ -498,7 +499,7 @@ static blk_status_t ublk_setup_iod_zoned(struct ublk_queue *ubq,
- 	iod->op_flags = ublk_op | ublk_req_build_flags(req);
- 	iod->nr_sectors = blk_rq_sectors(req);
- 	iod->start_sector = blk_rq_pos(req);
--	iod->addr = io->addr;
-+	iod->addr = io->buf.addr;
- 
- 	return BLK_STS_OK;
- }
-@@ -981,7 +982,7 @@ static unsigned int ublk_map_io(const struct ublk_queue *ubq,
- 		struct iov_iter iter;
- 		const int dir = ITER_DEST;
- 
--		import_ubuf(dir, u64_to_user_ptr(io->addr), rq_bytes, &iter);
-+		import_ubuf(dir, u64_to_user_ptr(io->buf.addr), rq_bytes, &iter);
- 		return ublk_copy_user_pages(req, 0, &iter, dir);
- 	}
- 	return rq_bytes;
-@@ -1002,7 +1003,7 @@ static unsigned int ublk_unmap_io(bool need_map,
- 
- 		WARN_ON_ONCE(io->res > rq_bytes);
- 
--		import_ubuf(dir, u64_to_user_ptr(io->addr), io->res, &iter);
-+		import_ubuf(dir, u64_to_user_ptr(io->buf.addr), io->res, &iter);
- 		return ublk_copy_user_pages(req, 0, &iter, dir);
- 	}
- 	return rq_bytes;
-@@ -1068,7 +1069,7 @@ static blk_status_t ublk_setup_iod(struct ublk_queue *ubq, struct request *req)
- 	iod->op_flags = ublk_op | ublk_req_build_flags(req);
- 	iod->nr_sectors = blk_rq_sectors(req);
- 	iod->start_sector = blk_rq_pos(req);
--	iod->addr = io->addr;
-+	iod->addr = io->buf.addr;
- 
- 	return BLK_STS_OK;
- }
-@@ -1182,9 +1183,9 @@ static bool ublk_auto_buf_reg(const struct ublk_queue *ubq, struct request *req,
++static void ublk_prep_auto_buf_reg_io(const struct ublk_queue *ubq,
++				      struct request *req, struct ublk_io *io,
++				      struct io_uring_cmd *cmd,
++				      enum auto_buf_reg_res res)
++{
++	if (res == AUTO_BUF_REG_OK) {
++		io->task_registered_buffers = 1;
++		io->buf_ctx_handle = io_uring_cmd_ctx_handle(cmd);
++		io->flags |= UBLK_IO_FLAG_AUTO_BUF_REG;
++	}
++	ublk_init_req_ref(ubq, io);
++	__ublk_prep_compl_io_cmd(io, req);
++}
++
++static enum auto_buf_reg_res
++__ublk_do_auto_buf_reg(const struct ublk_queue *ubq, struct request *req,
++		       struct ublk_io *io, struct io_uring_cmd *cmd,
++		       unsigned int issue_flags)
+ {
  	int ret;
  
- 	ret = io_buffer_register_bvec(cmd, req, ublk_io_release,
--				      io->buf.index, issue_flags);
-+				      io->buf.auto_reg.index, issue_flags);
+@@ -1186,29 +1206,27 @@ static bool ublk_auto_buf_reg(const struct ublk_queue *ubq, struct request *req,
+ 				      io->buf.auto_reg.index, issue_flags);
  	if (ret) {
--		if (io->buf.flags & UBLK_AUTO_BUF_REG_FALLBACK) {
-+		if (io->buf.auto_reg.flags & UBLK_AUTO_BUF_REG_FALLBACK) {
- 			ublk_auto_buf_reg_fallback(ubq, io);
- 			return true;
+ 		if (io->buf.auto_reg.flags & UBLK_AUTO_BUF_REG_FALLBACK) {
+-			ublk_auto_buf_reg_fallback(ubq, io);
+-			return true;
++			ublk_auto_buf_reg_fallback(ubq, req->tag);
++			return AUTO_BUF_REG_FALLBACK;
  		}
-@@ -1473,7 +1474,7 @@ static void ublk_queue_reinit(struct ublk_device *ub, struct ublk_queue *ubq)
- 		 */
- 		io->flags &= UBLK_IO_FLAG_CANCELED;
- 		io->cmd = NULL;
--		io->addr = 0;
-+		io->buf.addr = 0;
- 
- 		/*
- 		 * old task is PF_EXITING, put it now
-@@ -2034,13 +2035,16 @@ static inline int ublk_check_cmd_op(u32 cmd_op)
- 
- static inline int ublk_set_auto_buf_reg(struct ublk_io *io, struct io_uring_cmd *cmd)
- {
--	io->buf = ublk_sqe_addr_to_auto_buf_reg(READ_ONCE(cmd->sqe->addr));
-+	struct ublk_auto_buf_reg buf;
-+
-+	buf = ublk_sqe_addr_to_auto_buf_reg(READ_ONCE(cmd->sqe->addr));
- 
--	if (io->buf.reserved0 || io->buf.reserved1)
-+	if (buf.reserved0 || buf.reserved1)
- 		return -EINVAL;
- 
--	if (io->buf.flags & ~UBLK_AUTO_BUF_REG_F_MASK)
-+	if (buf.flags & ~UBLK_AUTO_BUF_REG_F_MASK)
- 		return -EINVAL;
-+	io->buf.auto_reg = buf;
- 	return 0;
- }
- 
-@@ -2062,7 +2066,7 @@ static int ublk_handle_auto_buf_reg(struct ublk_io *io,
- 		 * this ublk request gets stuck.
- 		 */
- 		if (io->buf_ctx_handle == io_uring_cmd_ctx_handle(cmd))
--			*buf_idx = io->buf.index;
-+			*buf_idx = io->buf.auto_reg.index;
+ 		blk_mq_end_request(req, BLK_STS_IOERR);
+-		return false;
++		return AUTO_BUF_REG_FAIL;
  	}
  
- 	return ublk_set_auto_buf_reg(io, cmd);
-@@ -2090,7 +2094,7 @@ ublk_config_io_buf(const struct ublk_device *ub, struct ublk_io *io,
- 	if (ublk_dev_support_auto_buf_reg(ub))
- 		return ublk_handle_auto_buf_reg(io, cmd, buf_idx);
- 
--	io->addr = buf_addr;
-+	io->buf.addr = buf_addr;
- 	return 0;
+-	io->task_registered_buffers = 1;
+-	io->buf_ctx_handle = io_uring_cmd_ctx_handle(cmd);
+-	io->flags |= UBLK_IO_FLAG_AUTO_BUF_REG;
+-	return true;
++	return AUTO_BUF_REG_OK;
  }
  
-@@ -2287,7 +2291,7 @@ static bool ublk_get_data(const struct ublk_queue *ubq, struct ublk_io *io,
- 	 */
- 	io->flags &= ~UBLK_IO_FLAG_NEED_GET_DATA;
- 	/* update iod->addr because ublksrv may have passed a new io buffer */
--	ublk_get_iod(ubq, req->tag)->addr = io->addr;
-+	ublk_get_iod(ubq, req->tag)->addr = io->buf.addr;
- 	pr_devel("%s: update iod->addr: qid %d tag %d io_flags %x addr %llx\n",
- 			__func__, ubq->q_id, req->tag, io->flags,
- 			ublk_get_iod(ubq, req->tag)->addr);
+-static bool ublk_prep_auto_buf_reg(struct ublk_queue *ubq,
+-				   struct request *req, struct ublk_io *io,
+-				   struct io_uring_cmd *cmd,
+-				   unsigned int issue_flags)
++static void ublk_do_auto_buf_reg(const struct ublk_queue *ubq, struct request *req,
++				 struct ublk_io *io, struct io_uring_cmd *cmd,
++				 unsigned int issue_flags)
+ {
+-	ublk_init_req_ref(ubq, io);
+-	if (ublk_support_auto_buf_reg(ubq) && ublk_rq_has_data(req))
+-		return ublk_auto_buf_reg(ubq, req, io, cmd, issue_flags);
++	enum auto_buf_reg_res res = __ublk_do_auto_buf_reg(ubq, req, io, cmd,
++			issue_flags);
+ 
+-	return true;
++	if (res != AUTO_BUF_REG_FAIL) {
++		ublk_prep_auto_buf_reg_io(ubq, req, io, cmd, res);
++		io_uring_cmd_done(cmd, UBLK_IO_RES_OK, issue_flags);
++	}
+ }
+ 
+ static bool ublk_start_io(const struct ublk_queue *ubq, struct request *req,
+@@ -1281,8 +1299,12 @@ static void ublk_dispatch_req(struct ublk_queue *ubq,
+ 	if (!ublk_start_io(ubq, req, io))
+ 		return;
+ 
+-	if (ublk_prep_auto_buf_reg(ubq, req, io, io->cmd, issue_flags))
++	if (ublk_support_auto_buf_reg(ubq) && ublk_rq_has_data(req)) {
++		ublk_do_auto_buf_reg(ubq, req, io, io->cmd, issue_flags);
++	} else {
++		ublk_init_req_ref(ubq, io);
+ 		ublk_complete_io_cmd(io, req, UBLK_IO_RES_OK, issue_flags);
++	}
+ }
+ 
+ static void ublk_cmd_tw_cb(struct io_uring_cmd *cmd,
 -- 
 2.47.0
 
