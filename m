@@ -1,19 +1,19 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C1C63191C4
-	for <linux-block@vger.kernel.org>; Fri, 21 Nov 2025 06:28:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A62DA2D949F
+	for <linux-block@vger.kernel.org>; Fri, 21 Nov 2025 06:28:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763706524; cv=none; b=jiqID6UNcZ+EEhTztOjcJrj026JDSdsjWBreoBHKIAeSnp6vi3scU0H4xK9uh8cb3jEF0F/N8Xjuua6grteR93LLKaAu5UpJdqkrI5otH7Qit0nY/Bq1ohMOtY5BqyB6uz+qiOTjbIoc9Ko6y3SSmkzoIpFl/UNuj75nvPz9WHc=
+	t=1763706527; cv=none; b=I5Ns+dZwI/pexJI94hDVsLA1cZNIYA/h5mXTiBoHKAbZaPIMEZy6PhZJgFBknTLYItMk+7lCU8jbv9gORN6sjFU3UlzQ8ccRY8E0pRF2V+IyA2B5hX+3ETnmNTGvNjoAmY/PGMjtJ9PLLqCQyDllqwH8nMGNY7NJipcNy2i9Jcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763706524; c=relaxed/simple;
-	bh=obY+ADyZeTl/i8qaVGxzUr52hxpiHhwKYKbZAixu6V8=;
+	s=arc-20240116; t=1763706527; c=relaxed/simple;
+	bh=c3aLZjvDp6l3olq8KrGp4TqLW3JuGKAI7BwQXlM8CyM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=S13wlainP12Kw7bwD3/ckSDfpc4uEnONDqCNQP9fllQeQdzvlDRzWhLFVXHkTqgh1vHd99oJdPQYrg6mzDDeRmqOHf24s5qxq8NYoPNxUfZYB+bYxvXepwxEqgJJK3aJ3WvWqZEsj6itqRS5dlM17zd8T7SAGlAGwCx8W2N2fio=
+	 MIME-Version; b=Gi2O99pTgTbaGnnfc1/TuKhbITjsMTXsn/hw8M39t3aVSuVINQDfX1HTwDof+McafX77bCOWBop/5Sury4akOhlkeRRxCMBm1cLBchzkKvXC3uhO+6i40KwgyF4YYQc9QA8+iZ4VyR0zJOZpBVNRsAYOIs2Vtey6kWjf6v9Z/Jw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53CEAC116D0;
-	Fri, 21 Nov 2025 06:28:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84204C4CEFB;
+	Fri, 21 Nov 2025 06:28:44 +0000 (UTC)
 From: Yu Kuai <yukuai@fnnas.com>
 To: axboe@kernel.dk,
 	linux-block@vger.kernel.org,
@@ -22,9 +22,9 @@ To: axboe@kernel.dk,
 	ming.lei@redhat.com,
 	bvanassche@acm.org
 Cc: yukuai@fnnas.com
-Subject: [PATCH v2 5/9] block/blk-rq-qos: add a new helper rq_qos_add_frozen()
-Date: Fri, 21 Nov 2025 14:28:25 +0800
-Message-ID: <20251121062829.1433332-6-yukuai@fnnas.com>
+Subject: [PATCH v2 6/9] blk-wbt: fix incorrect lock order for rq_qos_mutex and freeze queue
+Date: Fri, 21 Nov 2025 14:28:26 +0800
+Message-ID: <20251121062829.1433332-7-yukuai@fnnas.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251121062829.1433332-1-yukuai@fnnas.com>
 References: <20251121062829.1433332-1-yukuai@fnnas.com>
@@ -36,63 +36,51 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-queue should not be frozen under rq_qos_mutex, see example from
-commit 9730763f4756 ("block: correct locking order for protecting blk-wbt
-parameters"), which means current implementation of rq_qos_add() is
-problematic. Add a new helper and prepare to fix this problem in
-following patches.
+wbt_init() can be called from sysfs attribute and wbt_enable_default(),
+however the lock order are inversely.
 
+- queue_wb_lat_store() freeze queue first, and then wbt_init() hold
+  rq_qos_mutex. In this case queue will be frozen again inside
+  rq_qos_add(), however, in this case freeze queue recursively is
+  inoperative;
+- wbt_enable_default() from elevator switch will hold rq_qos_mutex
+  first, and then rq_qos_add() will freeze queue;
+
+Fix this problem by converting to use new helper rq_qos_add_frozen() in
+wbt_init(), and for wbt_enable_default(), freeze queue before calling
+wbt_init().
+
+Fixes: a13bd91be223 ("block/rq_qos: protect rq_qos apis with a new lock")
 Signed-off-by: Yu Kuai <yukuai@fnnas.com>
 ---
- block/blk-rq-qos.c | 21 +++++++++++++++++++++
- block/blk-rq-qos.h |  2 ++
- 2 files changed, 23 insertions(+)
+ block/blk-wbt.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
-index d7ce99ce2e80..c1a94c2a9742 100644
---- a/block/blk-rq-qos.c
-+++ b/block/blk-rq-qos.c
-@@ -322,6 +322,27 @@ void rq_qos_exit(struct request_queue *q)
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index b1ab0f297f24..5e7e481103a1 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -725,7 +725,11 @@ void wbt_enable_default(struct gendisk *disk)
+ 		return;
+ 
+ 	if (queue_is_mq(q) && enable) {
++		unsigned int memflags = blk_mq_freeze_queue(q);
++
+ 		wbt_init(disk);
++		blk_mq_unfreeze_queue(q, memflags);
++
+ 		mutex_lock(&q->debugfs_mutex);
+ 		blk_mq_debugfs_register_rq_qos(q);
+ 		mutex_unlock(&q->debugfs_mutex);
+@@ -926,7 +930,7 @@ int wbt_init(struct gendisk *disk)
+ 	 * Assign rwb and add the stats callback.
+ 	 */
+ 	mutex_lock(&q->rq_qos_mutex);
+-	ret = rq_qos_add(&rwb->rqos, disk, RQ_QOS_WBT, &wbt_rqos_ops);
++	ret = rq_qos_add_frozen(&rwb->rqos, disk, RQ_QOS_WBT, &wbt_rqos_ops);
  	mutex_unlock(&q->rq_qos_mutex);
- }
- 
-+int rq_qos_add_frozen(struct rq_qos *rqos, struct gendisk *disk,
-+		      enum rq_qos_id id, const struct rq_qos_ops *ops)
-+{
-+	struct request_queue *q = disk->queue;
-+
-+	WARN_ON_ONCE(q->mq_freeze_depth == 0);
-+	lockdep_assert_held(&q->rq_qos_mutex);
-+
-+	if (rq_qos_id(q, id))
-+		return -EBUSY;
-+
-+	rqos->disk = disk;
-+	rqos->id = id;
-+	rqos->ops = ops;
-+	rqos->next = q->rq_qos;
-+	q->rq_qos = rqos;
-+	blk_queue_flag_set(QUEUE_FLAG_QOS_ENABLED, q);
-+
-+	return 0;
-+}
-+
- int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
- 		const struct rq_qos_ops *ops)
- {
-diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
-index b538f2c0febc..8d9fb10ae526 100644
---- a/block/blk-rq-qos.h
-+++ b/block/blk-rq-qos.h
-@@ -87,6 +87,8 @@ static inline void rq_wait_init(struct rq_wait *rq_wait)
- 
- int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
- 		const struct rq_qos_ops *ops);
-+int rq_qos_add_frozen(struct rq_qos *rqos, struct gendisk *disk,
-+		      enum rq_qos_id id, const struct rq_qos_ops *ops);
- void rq_qos_del(struct rq_qos *rqos);
- 
- typedef bool (acquire_inflight_cb_t)(struct rq_wait *rqw, void *private_data);
+ 	if (ret)
+ 		goto err_free;
 -- 
 2.51.0
 
