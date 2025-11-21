@@ -1,81 +1,67 @@
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out162-62-57-49.mail.qq.com (out162-62-57-49.mail.qq.com [162.62.57.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD8FA33FE17
-	for <linux-block@vger.kernel.org>; Fri, 21 Nov 2025 08:18:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B62262E8B67;
+	Fri, 21 Nov 2025 08:24:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763713116; cv=none; b=JgvpO9mXlhz17nDxH5KoPD5ZBzm0b3/BoCoAKVeCua2jGLhye/JsMS4lmZDRZQapXXVFoPTIdre6KdG5Ngbv/dwacLGBaUCMyAPLNO8O9ZmP4IaTKgzyUVpTG4/Hb+iNYmN0dpfxhWJJQ7+PiWOnrQ55NxNlimLdVm/VWKJ1TGg=
+	t=1763713451; cv=none; b=pZ4Z56I2XHS5wGObjqP7AwUmQpXsFO3T15aYvtD/cWjqz2zikm7D6pWcP6Q8jAluZtDXdQNwAK7xan//+jPH1PCOGBL9+QMqB/bm9I83zMHc205UlgE9sPQlbG/5pO/E8+4+eBIy2PiVJJiwdFOKF3eEj6P/glZC8MgQ0VU6Sd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763713116; c=relaxed/simple;
-	bh=EqzE5eAUrOzw5wQ1NpDCM3tWSo+9dLaAmuNQNwJKJDw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=OYP2K94VWZtrnuyacn409sAEe4j7OfgM77PTtrTOpxmH3RYMLP5HVb7zjMea7NPCDhoGEppWOn85L2mNET5O1lOPpx2sW3mJscazVle3Cn33yE+xqGlEcAGYRfQMrESxyPAYg9pRrOT9ETvDM+37gibpvYBE4Tq9sNXAPJOPkaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jf5PxmMV; arc=none smtp.client-ip=209.85.215.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1763713451; c=relaxed/simple;
+	bh=TStxGiNgvL1+ngJwiGzkfkd49VJAD8GIA924LTHuLR8=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=GnCU4+BU953WDUG4jg52OeUYn9kyNUqrGgL3fRkalIeQQ4RMKGzqivcBOiUejOThZokXZ6z/puVsqi3faHIx+gyseFVzmn8c6wteWM/TlhYFdK1WsXqhyrUA8KU5rsnwrPlofLFUkiwcBHfltcsf7a5CQw6JkWCA/Ac2o8HGVeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=RKQrA+iO; arc=none smtp.client-ip=162.62.57.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jf5PxmMV"
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-b55517e74e3so1284675a12.2
-        for <linux-block@vger.kernel.org>; Fri, 21 Nov 2025 00:18:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763713114; x=1764317914; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Yt1oIqGxOTrmRU0wY5Kf2stOafiOCOsnZEA0d2AzsC4=;
-        b=Jf5PxmMVKdZPIpOS27Gp2bT1edFpEnhYtoCvSiSIWYwJQ+px8/qs6G89l+VdieseNR
-         8pS4DgXx/zUR0yZ0t0Rv2pjisuK+RTrenRE1YTBaTzpYJmxlcy+D3qwNg1dWKh1ivesL
-         qE4OfiRpmf5yjkZy47enau1EGnGMtCl3o17powjA/ClXoUpn/m+j7t1hg/7T/0HIuaLE
-         N7vP5Rv5ROXaf/2U4yziUg0xI9xioRu77EIgRPbkzJEz534T8HJG/Tzns5aO8V9y5ZOi
-         Pt+MLp4E1KQ9oQa8R1GN4NondOKA426cEiBaE6zzFWvJuycXQy7dPL1VXItcXaddtwBL
-         AJsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763713114; x=1764317914;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Yt1oIqGxOTrmRU0wY5Kf2stOafiOCOsnZEA0d2AzsC4=;
-        b=sigxKXRrffqnClZNp+s4MsHm69hV+FVp2aGxwXEN5koLx7UjuSLd71geK+OhhsE5pa
-         /+kNvNfeXqhCDbACMYGnxq8cuKETd193YeaB5AIyYiFTT5botSDF6DrAHL+Dfx4gTSaw
-         Ztg1/wUPT2nuDeKqeQG8rycXLDogeWgd51WOoXGlitXTdepb/9l0TQJHpFWI/Q89QKTK
-         XFH7W37gVoP75Z9ayY3Qxh2ZNZMXAySLMcvnBKdtAEJyC5pSz4QSaGvZQQS6pUyE/6nz
-         ySlykNDHo9y/TLO9Fa528vYsMRZcbPcMTZiIbNIoi/L7s2sT4o34XGi2GFiuIg80wgPg
-         mEww==
-X-Gm-Message-State: AOJu0YxwyQnb5TURjtAdI1jPm2Ek4bzAe6t1wYg5cAzbqB+F15XeN6Ej
-	y/dNtDC4HM1F0V4PnS/abjbYhJqvIDWy58dmAfjyJ7Z6VjBlaYTD2Zc7
-X-Gm-Gg: ASbGncvzokbKsCaED+q2YyPLMuvusIPazWZbP5vWyiZ4KR/Na/6bk1v/XR+3cPS3bN8
-	GuKyHkK5zEf1NAiSl1y+zFffmiLu0bPNpIMWhf/CuUFMuLjcMSyJA2+7JpPJ9pAyZ/uri2yeIsg
-	cAXsJQ8MNsKwvgTNPFr+OEVjih/X+UeEhUUoknNO+N4sn94ILtuxN9W30DvELyXnmO1s04H0ykv
-	n4qtFFxmomLUJZAH5sisg+IokmVFm5URPB9UrUwaFPWJph6XRDxURoDd/Y168OoQLeDEpWfjEv4
-	p76XX+SmsmmX9xN6VPGiZENx96ifiHC5MQJaEoJfkmJSMz7Lj0/Iww2xfbLW8pA+ujIwfJbu96G
-	Z9MkOOZAsoaGb4MuoC7Pi2z1QHxkQO1fJd2waOtpVtCYwJc3JJXeND9neWjaBHqyapBalLoU8Hz
-	mE8JT7EzZHN9L9SuNhxCsA2PkitYB/M4qY2Y8W
-X-Google-Smtp-Source: AGHT+IGjQz6D1HhxF/O38ExwwmQdYex30Wle92q1+zy1HDlDdyzSrgD/kMDXWQtHpmE2DiVpd2L90Q==
-X-Received: by 2002:a05:7300:238e:b0:2a4:3593:c7c9 with SMTP id 5a478bee46e88-2a7194d07b7mr663198eec.9.1763713114130;
-        Fri, 21 Nov 2025 00:18:34 -0800 (PST)
-Received: from localhost.localdomain ([104.128.72.43])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11c93e55af3sm20997352c88.7.2025.11.21.00.18.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Nov 2025 00:18:33 -0800 (PST)
-From: zhangshida <starzhangzsd@gmail.com>
-X-Google-Original-From: zhangshida <zhangshida@kylinos.cn>
-To: linux-kernel@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	nvdimm@lists.linux.dev,
-	virtualization@lists.linux.dev,
-	linux-nvme@lists.infradead.org,
-	gfs2@lists.linux.dev,
-	ntfs3@lists.linux.dev,
-	linux-xfs@vger.kernel.org,
-	zhangshida@kylinos.cn,
-	starzhangzsd@gmail.com
-Subject: [PATCH 9/9] nvdimm: use bio_chain_and_submit for simplification
-Date: Fri, 21 Nov 2025 16:17:48 +0800
-Message-Id: <20251121081748.1443507-10-zhangshida@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20251121081748.1443507-1-zhangshida@kylinos.cn>
-References: <20251121081748.1443507-1-zhangshida@kylinos.cn>
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="RKQrA+iO"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1763713441;
+	bh=pQLrOq0QQR+4eVsM8YUr1bTz3EqZ74x8PaNds/2DexI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=RKQrA+iOdCisookcvk14Z5yjxEmikMT3jFLMqCKPt4+GHVxIt5S81rrwrH0uEdnP6
+	 pDuFjHcaURvWaok1m5L3XzTvVTbpvbEvZ6LSer899JgzfGRrZiMZyuDCGg1DptHrcJ
+	 1emf01+1NNBEZcRVMxpDFc9fvAw2dIPjOm2CIyv4=
+Received: from meizu-Precision-3660.meizu.com ([112.91.84.72])
+	by newxmesmtplogicsvrszc50-0.qq.com (NewEsmtp) with SMTP
+	id 5FB1F4E2; Fri, 21 Nov 2025 16:23:59 +0800
+X-QQ-mid: xmsmtpt1763713439tj8u89r6n
+Message-ID: <tencent_865DD78A73BC3C9CAFCBAEBE222B6EA5F107@qq.com>
+X-QQ-XMAILINFO: OeJ9zRfntlNP/nfJC+X1lO5CmizeW4R30yyEPSi+ZAOnF15s818bIUMKTLMFn2
+	 7DXMfvxYVYiae95vc2wW1xWCDIMZzPkAgZlIkb5rzh2/JGLDZF9XSWHj5j/M1qaCu1AtVTFFjDIF
+	 O28CWP1CSOQ3k8Jb8COVsS4Ig3DDTERdRt2/Ooy4mEVwg4o2vzZOBTxQnzS0+PkBjMa+85rnHstk
+	 kVjmZTiAWY+JySl7u68j+maZDOOS9JCmQGBiHlTYvMlh801ypfiEnV8cCDz4o7BbB5ZHLuyk7ziH
+	 hooCTHufT1M0D23oQCvYW0jh6xGfPp1oP+8dFZ7F+KdTpaNkCWicrCVzrT3k6n92IO0Nyq+r8Q8Z
+	 C07AirQ3Z3pe5uoOO/zFXnWr3gr9tz3HqBdxPeaKTlW1y4oAzgOckWNpmx8jGy36K/Q+XrquUp21
+	 UfOJHH6ykFXaOrEj0DmR2ySRx9m4hPCuOzMqewHyzbWPj2G6uRQ3St7Fort4UT7sfyYUKayEfxiN
+	 0uDLFsRcQhyCSsCtpAry6fMfTuyAvvpBQZyeuMZs2ICo1TeMkzHdiSNUPziNQq99c3MrP8WUcOJd
+	 As5txDvdJrKaBNh1FF7XBPPtKktzN1ubcgQukzFcmtP8HuRa7UgBRDOc+IcHe6+gXXW5LXtfO7tk
+	 O4yJUHvRGGxulFxHQwIpgs3sgZekQ14hyo0XLoMeoWl1WuB8gobQqE3/9bGCVG6rVFpbjNkca5Q+
+	 DDK4aKbojVkDKK2bYl2DiU24R4nZCZwNfeAyOyvys/YQrGKWhJdk4rnoaYgTjXnnNGLfG2XoNaCr
+	 K+1c/9puY8rEb5KEBACZqDdWzjbJCZw+f8I/WmmfGCWbPD7pKyhKAKtaHLh3sikZayCIIZGK1fXb
+	 TjQFw/+kWWqPvErQJZG/MpsmOEnTvT1YNDrGEvABOfxuZ9hhchRee+NWMiOYpI4mm/i+wwZ9S4aW
+	 FLDQYud6juRugTSEfB/9XFn6qJ6QtMG/nXwK2DOWbV7a4A5SUyL+RgdyVhWEx92TxI7FZRpQiwqu
+	 4Q+TYgH0moYERRYOHs5vn6bv9BVzPPPpXMXVog3oh723JmWumNdWK5gWfHQKYeCt2fSGc2H89str
+	 bb/bdA9A28WRci2xS0TBKpQCkNcgRt5wjdfe+AmkfyWvYdaDGpEM7WBBUtig==
+X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
+From: Yuwen Chen <ywen.chen@foxmail.com>
+To: senozhatsky@chromium.org
+Cc: akpm@linux-foundation.org,
+	bgeffon@google.com,
+	licayy@outlook.com,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	minchan@kernel.org,
+	richardycc@google.com,
+	ywen.chen@foxmail.com
+Subject: Re: [RFC PATCHv5 0/6] zram: introduce writeback bio batching
+Date: Fri, 21 Nov 2025 16:23:58 +0800
+X-OQ-MSGID: <20251121082358.3003848-1-ywen.chen@foxmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <ts32xzxrpxmwf3okxo4bu2ynbgnfe6mehf5h6eibp7dp3r6jp7@4f7oz6tzqwxn>
+References: <ts32xzxrpxmwf3okxo4bu2ynbgnfe6mehf5h6eibp7dp3r6jp7@4f7oz6tzqwxn>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -84,27 +70,55 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Shida Zhang <zhangshida@kylinos.cn>
+On Fri, 21 Nov 2025 16:58:41 +0900, Sergey Senozhatsky wrote:
+> No problem.  I wonder if the effect is more visible on larger data sets.
+> 0.3 second sounds like a very short write.  In my VM tests I couldn't get
+> more than 2 inflight requests at a time, I guess because decompression
+> was much slower than IO.  I wonder how many inflight requests you had in
+> your tests.
 
-Signed-off-by: Shida Zhang <zhangshida@kylinos.cn>
----
- drivers/nvdimm/nd_virtio.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+I used the following code for testing here, and the result was 32.
 
-diff --git a/drivers/nvdimm/nd_virtio.c b/drivers/nvdimm/nd_virtio.c
-index c3f07be4aa2..e6ec7ceee9b 100644
---- a/drivers/nvdimm/nd_virtio.c
-+++ b/drivers/nvdimm/nd_virtio.c
-@@ -122,8 +122,7 @@ int async_pmem_flush(struct nd_region *nd_region, struct bio *bio)
- 			return -ENOMEM;
- 		bio_clone_blkg_association(child, bio);
- 		child->bi_iter.bi_sector = -1;
--		bio_chain(child, bio);
--		submit_bio(child);
-+		bio_chain_and_submit(child, bio);
- 		return 0;
- 	}
- 	if (virtio_pmem_flush(nd_region))
--- 
-2.34.1
+code:
+@@ -983,6 +983,7 @@ static int zram_writeback_slots(struct zram *zram,
+        struct zram_pp_slot *pps;
+        int ret = 0, err = 0;
+        u32 index = 0;
++       int inflight = 0;
+ 
+        while ((pps = select_pp_slot(ctl))) {
+                spin_lock(&zram->wb_limit_lock);
+@@ -993,6 +994,9 @@ static int zram_writeback_slots(struct zram *zram,
+                }
+                spin_unlock(&zram->wb_limit_lock);
+ 
++               if (inflight < atomic_read(&wb_ctl->num_inflight))
++                       inflight = atomic_read(&wb_ctl->num_inflight);
++
+                while (!req) {
+                        req = zram_select_idle_req(wb_ctl);
+                        if (req)
+@@ -1074,6 +1078,7 @@ next:
+                        ret = err;
+        }
+ 
++       pr_err("%s: inflight max: %d\n", __func__, inflight);
+        return ret;
+ }
+
+log: 
+[3741949.842927] zram: zram_writeback_slots: inflight max: 32
+
+Changing ZRAM_WB_REQ_CNT to 64 didn't shorten the overall time.
+
+> I think page-fault latency of a written-back page is expected to be
+> higher, that's a trade-off that we agree on.  Off the top of my head,
+> I don't think we can do anything about it.
+>
+> Is loop device always used as for writeback targets?
+
+On the Android platform, currently only the loop device is supported as
+the backend for writeback, possibly for security reasons. I noticed that
+EROFS has implemented a CONFIG_EROFS_FS_BACKED_BY_FILE to reduce this
+latency. I think ZRAM might also be able to do this.
 
