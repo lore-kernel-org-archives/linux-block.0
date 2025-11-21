@@ -1,139 +1,87 @@
-Received: from fhigh-b5-smtp.messagingengine.com (fhigh-b5-smtp.messagingengine.com [202.12.124.156])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED34AD5A;
-	Fri, 21 Nov 2025 00:40:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52B1D4964F;
+	Fri, 21 Nov 2025 01:17:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763685643; cv=none; b=lfGso0vwobjLiJ849eG46CE1OWwQZom/kXCXM54kqtXVdFL3OY1TcZHNnGcRC1GQ7Sr3ZeK0B3G57EHBPv0mpkIPKst3NzWylARTucReFBbkOakPX3RbQ0YVLgaPVXwNzF7OkDPi4jZQY2qCo8k0YCqzS+dJ1OW9IaLKaWSDm7s=
+	t=1763687860; cv=none; b=JiZq1KlKwW/jBO94psGfaoTe0q0QZ1yhUK6bDo9VMyz3fb16Y8rdbkydTQskN1tCAf3yweHL/qXY9xaEBSDV+quaT/zm5OF5iQRZRBd51UmlHIrEdsorlsAiIYHK5Awv3E8r/J5yYOuQNAXel5yj9QH3mCy2/iHVa+puIlRGHuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763685643; c=relaxed/simple;
-	bh=iVVPaKj7SONUFL2eBemOPm2YOD5z0DLJTWCoYsT1zmE=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=sHh7bSlXuhmB/tZWGm5T+uT2pteZESDt5Kznv9GrP2EzorZb6OCLnT/7Zu2YEZNw185CiliEZ5Z3zax1BQ/rneiTB2DAegoim/NvWgdDU9mauLYYgQq00cCZFKW+5suW+VMNyh2/FjyPZ1S/zEkJMYAj5VVJ61oU5jOgHZF3HcE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org; spf=pass smtp.mailfrom=shazbot.org; dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b=bQ/usSFT; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=W6/D/Imp; arc=none smtp.client-ip=202.12.124.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=shazbot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shazbot.org
+	s=arc-20240116; t=1763687860; c=relaxed/simple;
+	bh=ZT6q0M63/4cXHdV+BClRzPOJA/u0+wdnrOMc5HYUXIw=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=lafpNZBve87+uxPIXcT8ui+kDJVwEhFETLcm3evj9JkBgIZkcKuZs7vaqyF+Vyy2gHNa3jSa6V8EDth8/I0684dpbm952WzUh7I8KhskKz7etSm/oJ58zpThEiayMrgWp+uV5arxpMbR6/+fOFgC8e5/IXnKsKNTII6v9kIKubQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=Cowy9MsB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shazbot.org header.i=@shazbot.org header.b="bQ/usSFT";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="W6/D/Imp"
-Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 4F1D37A014B;
-	Thu, 20 Nov 2025 19:40:38 -0500 (EST)
-Received: from phl-imap-18 ([10.202.2.89])
-  by phl-compute-02.internal (MEProxy); Thu, 20 Nov 2025 19:40:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shazbot.org; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1763685638;
-	 x=1763772038; bh=BWrF0R3qQL8kwm9npP1EvAhcAZRE+BA2fEO0OQij6hY=; b=
-	bQ/usSFT6o+GWegKvvd8h3PcSB2A1hCVejwJtF7wsEdC7CwzuBGsDiHZbmkxFhTZ
-	d3UIol3MggwYKtr3/7m8xHyYxFZEfi8xy9RcSPvxuCsyc0MdounLwdBO/jy+bF8Q
-	QMRupKehNfw8HmjuvCCa78xT+NL7tm00BrGzRYcDVClQyvRaUh5RVCfj/DJfA9BN
-	x5s86jNR+3qTFD9TYEPKOzH5TaocL4t+30TypdxjRYVGuCBSF89ZL3JYk8ybXWdP
-	2HBXxNDUNKIY52H6XFTtq5eDJxYKvYA3BepZULCxBk8xlDM0LYJhphJ4jbnaB2do
-	BBa9XXH1Lha6uliQ1SziTA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1763685638; x=
-	1763772038; bh=BWrF0R3qQL8kwm9npP1EvAhcAZRE+BA2fEO0OQij6hY=; b=W
-	6/D/ImpsP6E8UHOnHw0GHkvwQhWlYdOrwXFehCZFo9BlwYpK5+GOeFWB33eaI72c
-	o2iReqsiKaZ6t9qjAjpN0Xy115KlGnR65KX+g5UzbVBd/rcQlaiz8hiLAqer98qQ
-	XFoirt/2+8WdsP7ETLVokZeBr04/nTxLN1HgtZrk2DDl7wrTRs8onknGjWKUWLnj
-	5TIODtgQLz3kfaCb4wP0kgI7O8Hg2ukyYnBZhW4Sf5Xwx3Si8Z8pE8LMGUWysWV9
-	EbfxOHrI0s9K+yzOiA+ZKd4nSgH24XQr7oMuDcKfWL0sRgLVy6W4btuveDFkKOyb
-	MNY477StKsGD7B911h8LA==
-X-ME-Sender: <xms:BLUfaTcu-W1ZbFNKOZl9hEoK5kM2iKVgFY7hi_qwxdijBO8eYSBaQA>
-    <xme:BLUfaUDr4NrEmO5B9_8l2v3n4jQbNvi6XEqlmD-9LLSydDnUnrnRawFKgPpvTMRYP
-    Y7434dwhOkYoKdQMRD7qq4WJ2pf5tck8RcL6wMx-_En2tJAQ-vQQQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvvdekheehucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehlvgig
-    ucghihhllhhirghmshhonhdfuceorghlvgigsehshhgriigsohhtrdhorhhgqeenucggtf
-    frrghtthgvrhhnpefgfeeflefggfffveffteetiedvtedtgfdvieevfeejfeefffevteej
-    tedufffgveenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhroh
-    hmpegrlhgvgiesshhhrgiisghothdrohhrghdpnhgspghrtghpthhtohepfeefpdhmohgu
-    vgepshhmthhpohhuthdprhgtphhtthhopehjohhroheskegshihtvghsrdhorhhgpdhrtg
-    hpthhtoheptghhrhhishhtihgrnhdrkhhovghnihhgsegrmhgurdgtohhmpdhrtghpthht
-    oheprhhosghinhdrmhhurhhphhihsegrrhhmrdgtohhmpdhrtghpthhtoheplhhoghgrnh
-    hgseguvghlthgrthgvvgdrtghomhdprhgtphhtthhopegshhgvlhhgrggrshesghhoohhg
-    lhgvrdgtohhmpdhrtghpthhtohepkhgvvhhinhdrthhirghnsehinhhtvghlrdgtohhmpd
-    hrtghpthhtohepvhhivhgvkhdrkhgrshhirhgvugguhiesihhnthgvlhdrtghomhdprhgt
-    phhtthhopegrgigsohgvsehkvghrnhgvlhdrughkpdhrtghpthhtohepghhushhtrghvoh
-    grrhhssehkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:BLUfaf3IMN_DjSt37FnR5cC7cKZKzm-Evis2a5redpwD9gpwNa4Mgw>
-    <xmx:BLUfabfYFOLIxRZxj2GcfZQhMAJrV3AvzpNs5lf-FrATezIBt46vVw>
-    <xmx:BLUfab6kKk0AxJC9j7DElLBpacsb7lCfW4srcPj5EWec1IZ1DQymrg>
-    <xmx:BLUfaYhbHXAT2tIz3nE8TBsZFON8yBhxofv_cAOU6AX3rp4HzrS3QQ>
-    <xmx:BrUfaRbHrZD02fwIphP49SQDR9cZINb17knsJOrpHoo-8nVEkFZAnwDT>
-Feedback-ID: i03f14258:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id BD7C115C0053; Thu, 20 Nov 2025 19:40:36 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="Cowy9MsB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B856C4CEF1;
+	Fri, 21 Nov 2025 01:17:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+	s=korg; t=1763687859;
+	bh=ZT6q0M63/4cXHdV+BClRzPOJA/u0+wdnrOMc5HYUXIw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Cowy9MsBY3XZQQ1HS6JF8Te3k7jLI7mAAtVWJHKLH7sU5r8T7sHapjoFGr8TgJGdi
+	 yWCas/O3bmgijmoco3s2D2Kg/fLcA/crWp4RBM9gmBFBeyxeJn6z+TEQKuU95dr0wH
+	 nZXfIF3ABlJnTwV7lSgzMRlWv1z2ekjrnzK39HuA=
+Date: Thu, 20 Nov 2025 17:17:38 -0800
+From: Andrew Morton <akpm@linux-foundation.org>
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Minchan Kim <minchan@kernel.org>, Yuwen Chen <ywen.chen@foxmail.com>,
+ Richard Chang <richardycc@google.com>, Brian Geffon <bgeffon@google.com>,
+ Fengyu Lian <licayy@outlook.com>, linux-kernel@vger.kernel.org,
+ linux-mm@kvack.org, linux-block@vger.kernel.org
+Subject: Re: [PATCHv4 2/6] zram: add writeback batch size device attr
+Message-Id: <20251120171738.84516c55e4aaeea0bf3b7725@linux-foundation.org>
+In-Reply-To: <20251118073000.1928107-3-senozhatsky@chromium.org>
+References: <20251118073000.1928107-1-senozhatsky@chromium.org>
+	<20251118073000.1928107-3-senozhatsky@chromium.org>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-ThreadId: AE6BP-1UiBv7
-Date: Thu, 20 Nov 2025 17:40:15 -0700
-From: "Alex Williamson" <alex@shazbot.org>
-To: "Jason Gunthorpe" <jgg@ziepe.ca>
-Cc: "Leon Romanovsky" <leon@kernel.org>,
- "Bjorn Helgaas" <bhelgaas@google.com>,
- "Logan Gunthorpe" <logang@deltatee.com>, "Jens Axboe" <axboe@kernel.dk>,
- "Robin Murphy" <robin.murphy@arm.com>, "Joerg Roedel" <joro@8bytes.org>,
- "Will Deacon" <will@kernel.org>,
- "Marek Szyprowski" <m.szyprowski@samsung.com>,
- "Andrew Morton" <akpm@linux-foundation.org>,
- "Jonathan Corbet" <corbet@lwn.net>,
- "Sumit Semwal" <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- "Kees Cook" <kees@kernel.org>,
- "Gustavo A. R. Silva" <gustavoars@kernel.org>,
- "Ankit Agrawal" <ankita@nvidia.com>, "Yishai Hadas" <yishaih@nvidia.com>,
- "Shameer Kolothum" <skolothumtho@nvidia.com>,
- "Kevin Tian" <kevin.tian@intel.com>,
- "Krishnakant Jaju" <kjaju@nvidia.com>, "Matt Ochs" <mochs@nvidia.com>,
- linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-block@vger.kernel.org, iommu@lists.linux.dev, linux-mm@kvack.org,
- linux-doc@vger.kernel.org, linux-media@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
- kvm@vger.kernel.org, linux-hardening@vger.kernel.org,
- "Vivek Kasireddy" <vivek.kasireddy@intel.com>
-Message-Id: <cd6f8c6b-6950-4b06-8f2d-bb4ead660ead@app.fastmail.com>
-In-Reply-To: <20251121002344.GC233636@ziepe.ca>
-References: <20251120-dmabuf-vfio-v9-0-d7f71607f371@nvidia.com>
- <20251120-dmabuf-vfio-v9-10-d7f71607f371@nvidia.com>
- <20251120170413.050ccbb5.alex@shazbot.org> <20251121002344.GC233636@ziepe.ca>
-Subject: Re: [PATCH v9 10/11] vfio/pci: Add dma-buf export support for MMIO regions
-Content-Type: text/plain
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 20, 2025, at 5:23 PM, Jason Gunthorpe wrote:
-> On Thu, Nov 20, 2025 at 05:04:13PM -0700, Alex Williamson wrote:
->
->> @@ -2501,7 +2501,7 @@ static int vfio_pci_dev_set_hot_reset(struct vfio_device_set *dev_set,
->>  err_undo:
->>         list_for_each_entry_from_reverse(vdev, &dev_set->device_list,
->>                                          vdev.dev_set_list) {
->> -               if (__vfio_pci_memory_enabled(vdev))
->> +               if (vdev->vdev.open_count && __vfio_pci_memory_enabled(vdev))
->>                         vfio_pci_dma_buf_move(vdev, false);
->>                 up_write(&vdev->memory_lock);
->>         }
->> 
->> Any other suggestions?  This should be the only reset path with this
->> nuance of affecting non-opened devices.  Thanks,
->
-> Seems reasonable, but should it be in __vfio_pci_memory_enabled() just
-> to be robust?
+On Tue, 18 Nov 2025 16:29:56 +0900 Sergey Senozhatsky <senozhatsky@chromium.org> wrote:
 
-__vfio_pci_memory_enabled() currently only requires holding memory_lock, I don't think we want to create a dependency on dev_set->lock for this unique call path.  Thanks,
+> Introduce writeback_batch_size device attribute so that
+> the maximum number of in-flight writeback bio requests
+> can be configured at run-time per-device.  This essentially
+> enables batched bio writeback.
+> 
+> ...
+>
+> --- a/drivers/block/zram/zram_drv.c
+> +++ b/drivers/block/zram/zram_drv.c
+> @@ -588,6 +588,42 @@ static ssize_t writeback_limit_show(struct device *dev,
+>  	return sysfs_emit(buf, "%llu\n", val);
+>  }
+>  
+> +static ssize_t writeback_batch_size_store(struct device *dev,
+> +					  struct device_attribute *attr,
+> +					  const char *buf, size_t len)
+> +{
+> +	struct zram *zram = dev_to_zram(dev);
+> +	u32 val;
+> +	ssize_t ret = -EINVAL;
+> +
+> +	if (kstrtouint(buf, 10, &val))
+> +		return ret;
+> +
+> +	if (!val)
+> +		val = 1;
+> +
+> +	down_read(&zram->init_lock);
 
-Alex
+down_write()?
+
+> +	zram->wb_batch_size = val;
+> +	up_read(&zram->init_lock);
+> +	ret = len;
+> +
+> +	return ret;
+> +}
+
