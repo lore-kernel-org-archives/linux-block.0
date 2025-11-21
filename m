@@ -1,45 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F127D22541B
-	for <linux-block@vger.kernel.org>; Fri, 21 Nov 2025 01:59:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A83B246788
+	for <linux-block@vger.kernel.org>; Fri, 21 Nov 2025 01:59:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763690352; cv=none; b=mtX2Ilt4XpjBhYzzClUzGiSXmJDkI2ScUxXBMbf+tNoKS2v3qiNFSTY13GUXZpA+w+N5DSFSdFzEBZXziKNcKT+1YjC/AND6ai8Y5NGWbNNV9LF0f6Ys4p7b7Z2aPy69gRpJjE9P5i5iwuPrEtx5w3K8U7P9qzDRLChkNR7l01g=
+	t=1763690355; cv=none; b=f29vzytkmU4cUqzcMs+caLX3rdn0V7THAys/Iy95p5d203dCmKo7CBDOAf8cdJhpn8GMra/hcIx/rA0wgKWgurCSZGH8KLp5UHCddsO4ai7UHT1bEPEyYVTTX8HCQCF04EoZBOerXGkSIYcOu+sRwZWnS7M/yi6Le6JKfg51ScE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763690352; c=relaxed/simple;
-	bh=iUktVEyVexZ3EBgfmJQKB7wO8HTboUXEIR0kxis5E4I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=byLIz4q/INfQbW0IaCYtdL2o9nFa5BLnOufZ5BVudFddJ33UuJNzloHyztsG1Nk58zecDGok6QBXgrk6n56rTuvxv6dce6/FHa18C5bNtzkC+PMXHH9YMQr+nj4GMkqLc0DXohFnZ8YXtLrepnQjmF5qqiMXanuTRn50Yju+fNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IKJWqnXl; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1763690355; c=relaxed/simple;
+	bh=A+Ci1L9h0yO7Ol7an2BcEr6Bgg9KUfw1d0OxivMPq6I=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=FD4QNjwtX5Y+DQp5n0xn4Mr+IgleV85uoeifGDEBox4lRy4SzXKC2m9wZjaW72DOr9+RZY5VCfGflSyPlkuo6JpDS19qDU1vH6M2gxXlbIOhir1TuDTIa85NRVBDeprhKggedR+3dxO46jAna2gT15qnA9KixMdYJa+G4nAL2Ec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gmmuUc2T; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IKJWqnXl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gmmuUc2T"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763690347;
+	s=mimecast20190719; t=1763690352;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=riyYp0QIykanlxTB5WL9dg3Xji/x+29u+OT+gvbocpE=;
-	b=IKJWqnXlsIVULsLb14N65qiHOCBXj4dwDkEFD54mPW4FyD1dIIT7hBYexGaFrs/IwG/NIk
-	zLvvOJpFqe8YU09ZN+fT2jAjt4/s1dbjuHn0D6/8nYYVALDyXFKiG5m6Yp2MqP2iQpw+R4
-	ErVY/nuZgztAIN0b/fazMTLciYm5QVs=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SKVrOLGglcyGcmX+exd2HinbN0ONxMUnNRMW45Q/QCE=;
+	b=gmmuUc2TuRBeVe5KHLLZdQz319zFAqt1FTB3RnrbcI3GnEa/zNTt9apvWIGz7u1MHPCvrO
+	J2HCqd0lbYTZp+waSeEdDWJgX0OV+fV03zPzYWoELwACZvXlIiToR+tCwBYovvWNftTjDY
+	1v2B+ZXaxotFudvFjq0oKIVur7NlBGo=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-397-yZXE4H4XOYufhti-13ZnPA-1; Thu,
- 20 Nov 2025 20:59:06 -0500
-X-MC-Unique: yZXE4H4XOYufhti-13ZnPA-1
-X-Mimecast-MFC-AGG-ID: yZXE4H4XOYufhti-13ZnPA_1763690345
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-315-fFOdtJ4-MXOTTUWc3lEypQ-1; Thu,
+ 20 Nov 2025 20:59:10 -0500
+X-MC-Unique: fFOdtJ4-MXOTTUWc3lEypQ-1
+X-Mimecast-MFC-AGG-ID: fFOdtJ4-MXOTTUWc3lEypQ_1763690348
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6DB091956096;
-	Fri, 21 Nov 2025 01:59:04 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A22961800473;
+	Fri, 21 Nov 2025 01:59:08 +0000 (UTC)
 Received: from localhost (unknown [10.72.116.211])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D9DC51956045;
-	Fri, 21 Nov 2025 01:59:02 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8516E30044DB;
+	Fri, 21 Nov 2025 01:59:06 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
@@ -49,9 +51,11 @@ Cc: Caleb Sander Mateos <csander@purestorage.com>,
 	Andrew Morton <akpm@linux-foundation.org>,
 	linux-kernel@vger.kernel.org,
 	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 00/27] ublk: add UBLK_F_BATCH_IO
-Date: Fri, 21 Nov 2025 09:58:22 +0800
-Message-ID: <20251121015851.3672073-1-ming.lei@redhat.com>
+Subject: [PATCH V4 01/27] kfifo: add kfifo_alloc_node() helper for NUMA awareness
+Date: Fri, 21 Nov 2025 09:58:23 +0800
+Message-ID: <20251121015851.3672073-2-ming.lei@redhat.com>
+In-Reply-To: <20251121015851.3672073-1-ming.lei@redhat.com>
+References: <20251121015851.3672073-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -59,152 +63,116 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Hello,
+Add __kfifo_alloc_node() by refactoring and reusing __kfifo_alloc(),
+and define kfifo_alloc_node() macro to support NUMA-aware memory
+allocation.
 
-This patchset adds UBLK_F_BATCH_IO feature for communicating between kernel and ublk
-server in batching way:
+The new __kfifo_alloc_node() function accepts a NUMA node parameter
+and uses kmalloc_array_node() instead of kmalloc_array() for
+node-specific allocation. The existing __kfifo_alloc() now calls
+__kfifo_alloc_node() with NUMA_NO_NODE to maintain backward
+compatibility.
 
-- Per-queue vs Per-I/O: Commands operate on queues rather than individual I/Os
+This enables users to allocate kfifo buffers on specific NUMA nodes,
+which is important for performance in NUMA systems where the kfifo
+will be primarily accessed by threads running on specific nodes.
 
-- Batch processing: Multiple I/Os are handled in single operation
+Cc: Stefani Seibold <stefani@seibold.net>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ include/linux/kfifo.h | 34 ++++++++++++++++++++++++++++++++--
+ lib/kfifo.c           |  8 ++++----
+ 2 files changed, 36 insertions(+), 6 deletions(-)
 
-- Multishot commands: Use io_uring multishot for reducing submission overhead
-
-- Flexible task assignment: Any task can handle any I/O (no per-I/O daemons)
-
-- Better load balancing: Tasks can adjust their workload dynamically
-
-- help for future optimizations:
-	- blk-mq batch tags free
-  	- support io-poll
-	- per-task batch for avoiding per-io lock
-	- fetch command priority
-
-- simplify command cancel process with per-queue lock
-
-selftest are provided.
-
-
-Performance test result(IOPS) on V3:
-
-- page copy
-
-tools/testing/selftests/ublk//kublk add -t null -q 16 [-b]
-
-- zero copy(--auto_zc)
-tools/testing/selftests/ublk//kublk add -t null -q 16 --auto_zc [-b]
-
-- IO test
-taskset -c 0-31 fio/t/io_uring -p0 -n $JOBS -r 30 /dev/ublkb0
-
-1) 16 jobs IO
-- page copy:  			37.77M vs. 42.40M(BATCH_IO), +12%
-- zero copy(--auto_zc): 42.83M vs. 44.43M(BATCH_IO), +3.7%
-
-
-2) single job IO
-- page copy:  			2.54M vs. 2.6M(BATCH_IO),   +2.3%
-- zero copy(--auto_zc): 3.13M vs. 3.35M(BATCH_IO),  +7%
-
-
-V4:
-	- fix handling in case of running out of mshot buffer, request has to
-	  be un-prepared for zero copy
-	- don't expose unused tag to userspace
-	- replace fixed buffer with plain user buffer for
-	  UBLK_U_IO_PREP_IO_CMDS and UBLK_U_IO_COMMIT_IO_CMDS
-	- replace iov iterator with plain copy_from_user() for
-	  ublk_walk_cmd_buf(), code is simplified with performance improvement
-	- don't touch sqe->len for UBLK_U_IO_PREP_IO_CMDS and
-	  UBLK_U_IO_COMMIT_IO_CMDS(Caleb Sander Mateos)
-	- use READ_ONCE() for access sqe->addr (Caleb Sander Mateos)
-	- all kinds of patch style fix(Caleb Sander Mateos)
-	- inline __kfifo_alloc() (Caleb Sander Mateos)
-
-
-V3:
-	- rebase on for-6.19/block
-	- use blk_mq_end_request_batch() to free requests in batch, only for
-	  page copy
-	- fix one IO hang issue because of memory barrier order, comments on
-	the memory barrier pairing
-	- add NUMA ware kfifo_alloc_node()
-	- fix one build warning reported by 0-DAY CI
-	- selftests improvement & fix
-
-V2:
-	- ublk_config_io_buf() vs. __ublk_fetch() order
-	- code style clean
-	- use READ_ONCE() to cache sqe data because sqe copy becomes
-	  conditional recently
-	- don't use sqe->len for UBLK_U_IO_PREP_IO_CMDS &
-	  UBLK_U_IO_COMMIT_IO_CMDS
-	- fix one build warning
-	- fix build_user_data()
-	- run performance analysis, and find one bug in
-	  io_uring_cmd_buffer_select(), fix is posted already
-
-Ming Lei (27):
-  kfifo: add kfifo_alloc_node() helper for NUMA awareness
-  ublk: add parameter `struct io_uring_cmd *` to
-    ublk_prep_auto_buf_reg()
-  ublk: add `union ublk_io_buf` with improved naming
-  ublk: refactor auto buffer register in ublk_dispatch_req()
-  ublk: pass const pointer to ublk_queue_is_zoned()
-  ublk: add helper of __ublk_fetch()
-  ublk: define ublk_ch_batch_io_fops for the coming feature F_BATCH_IO
-  ublk: prepare for not tracking task context for command batch
-  ublk: add new batch command UBLK_U_IO_PREP_IO_CMDS &
-    UBLK_U_IO_COMMIT_IO_CMDS
-  ublk: handle UBLK_U_IO_PREP_IO_CMDS
-  ublk: handle UBLK_U_IO_COMMIT_IO_CMDS
-  ublk: add io events fifo structure
-  ublk: add batch I/O dispatch infrastructure
-  ublk: add UBLK_U_IO_FETCH_IO_CMDS for batch I/O processing
-  ublk: abort requests filled in event kfifo
-  ublk: add new feature UBLK_F_BATCH_IO
-  ublk: document feature UBLK_F_BATCH_IO
-  ublk: implement batch request completion via
-    blk_mq_end_request_batch()
-  selftests: ublk: fix user_data truncation for tgt_data >= 256
-  selftests: ublk: replace assert() with ublk_assert()
-  selftests: ublk: add ublk_io_buf_idx() for returning io buffer index
-  selftests: ublk: add batch buffer management infrastructure
-  selftests: ublk: handle UBLK_U_IO_PREP_IO_CMDS
-  selftests: ublk: handle UBLK_U_IO_COMMIT_IO_CMDS
-  selftests: ublk: handle UBLK_U_IO_FETCH_IO_CMDS
-  selftests: ublk: add --batch/-b for enabling F_BATCH_IO
-  selftests: ublk: support arbitrary threads/queues combination
-
- Documentation/block/ublk.rst                  |   60 +-
- drivers/block/ublk_drv.c                      | 1312 +++++++++++++++--
- include/linux/kfifo.h                         |   34 +-
- include/uapi/linux/ublk_cmd.h                 |   85 ++
- lib/kfifo.c                                   |    8 +-
- tools/testing/selftests/ublk/Makefile         |    7 +-
- tools/testing/selftests/ublk/batch.c          |  604 ++++++++
- tools/testing/selftests/ublk/common.c         |    2 +-
- tools/testing/selftests/ublk/file_backed.c    |   11 +-
- tools/testing/selftests/ublk/kublk.c          |  143 +-
- tools/testing/selftests/ublk/kublk.h          |  195 ++-
- tools/testing/selftests/ublk/null.c           |   18 +-
- tools/testing/selftests/ublk/stripe.c         |   17 +-
- .../testing/selftests/ublk/test_generic_14.sh |   32 +
- .../testing/selftests/ublk/test_generic_15.sh |   30 +
- .../testing/selftests/ublk/test_generic_16.sh |   30 +
- .../testing/selftests/ublk/test_stress_06.sh  |   45 +
- .../testing/selftests/ublk/test_stress_07.sh  |   44 +
- tools/testing/selftests/ublk/utils.h          |   64 +
- 19 files changed, 2563 insertions(+), 178 deletions(-)
- create mode 100644 tools/testing/selftests/ublk/batch.c
- create mode 100755 tools/testing/selftests/ublk/test_generic_14.sh
- create mode 100755 tools/testing/selftests/ublk/test_generic_15.sh
- create mode 100755 tools/testing/selftests/ublk/test_generic_16.sh
- create mode 100755 tools/testing/selftests/ublk/test_stress_06.sh
- create mode 100755 tools/testing/selftests/ublk/test_stress_07.sh
-
+diff --git a/include/linux/kfifo.h b/include/linux/kfifo.h
+index fd743d4c4b4b..8b81ac74829c 100644
+--- a/include/linux/kfifo.h
++++ b/include/linux/kfifo.h
+@@ -369,6 +369,30 @@ __kfifo_int_must_check_helper( \
+ }) \
+ )
+ 
++/**
++ * kfifo_alloc_node - dynamically allocates a new fifo buffer on a NUMA node
++ * @fifo: pointer to the fifo
++ * @size: the number of elements in the fifo, this must be a power of 2
++ * @gfp_mask: get_free_pages mask, passed to kmalloc()
++ * @node: NUMA node to allocate memory on
++ *
++ * This macro dynamically allocates a new fifo buffer with NUMA node awareness.
++ *
++ * The number of elements will be rounded-up to a power of 2.
++ * The fifo will be release with kfifo_free().
++ * Return 0 if no error, otherwise an error code.
++ */
++#define kfifo_alloc_node(fifo, size, gfp_mask, node) \
++__kfifo_int_must_check_helper( \
++({ \
++	typeof((fifo) + 1) __tmp = (fifo); \
++	struct __kfifo *__kfifo = &__tmp->kfifo; \
++	__is_kfifo_ptr(__tmp) ? \
++	__kfifo_alloc_node(__kfifo, size, sizeof(*__tmp->type), gfp_mask, node) : \
++	-EINVAL; \
++}) \
++)
++
+ /**
+  * kfifo_free - frees the fifo
+  * @fifo: the fifo to be freed
+@@ -899,8 +923,14 @@ __kfifo_uint_must_check_helper( \
+ )
+ 
+ 
+-extern int __kfifo_alloc(struct __kfifo *fifo, unsigned int size,
+-	size_t esize, gfp_t gfp_mask);
++extern int __kfifo_alloc_node(struct __kfifo *fifo, unsigned int size,
++	size_t esize, gfp_t gfp_mask, int node);
++
++static inline int __kfifo_alloc(struct __kfifo *fifo, unsigned int size,
++				size_t esize, gfp_t gfp_mask)
++{
++	return __kfifo_alloc_node(fifo, size, esize, gfp_mask, NUMA_NO_NODE);
++}
+ 
+ extern void __kfifo_free(struct __kfifo *fifo);
+ 
+diff --git a/lib/kfifo.c b/lib/kfifo.c
+index a8b2eed90599..525e66f8294c 100644
+--- a/lib/kfifo.c
++++ b/lib/kfifo.c
+@@ -22,8 +22,8 @@ static inline unsigned int kfifo_unused(struct __kfifo *fifo)
+ 	return (fifo->mask + 1) - (fifo->in - fifo->out);
+ }
+ 
+-int __kfifo_alloc(struct __kfifo *fifo, unsigned int size,
+-		size_t esize, gfp_t gfp_mask)
++int __kfifo_alloc_node(struct __kfifo *fifo, unsigned int size,
++		size_t esize, gfp_t gfp_mask, int node)
+ {
+ 	/*
+ 	 * round up to the next power of 2, since our 'let the indices
+@@ -41,7 +41,7 @@ int __kfifo_alloc(struct __kfifo *fifo, unsigned int size,
+ 		return -EINVAL;
+ 	}
+ 
+-	fifo->data = kmalloc_array(esize, size, gfp_mask);
++	fifo->data = kmalloc_array_node(esize, size, gfp_mask, node);
+ 
+ 	if (!fifo->data) {
+ 		fifo->mask = 0;
+@@ -51,7 +51,7 @@ int __kfifo_alloc(struct __kfifo *fifo, unsigned int size,
+ 
+ 	return 0;
+ }
+-EXPORT_SYMBOL(__kfifo_alloc);
++EXPORT_SYMBOL(__kfifo_alloc_node);
+ 
+ void __kfifo_free(struct __kfifo *fifo)
+ {
 -- 
 2.47.0
 
