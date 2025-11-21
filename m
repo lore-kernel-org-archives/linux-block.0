@@ -1,19 +1,19 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1980C2F3C25;
-	Fri, 21 Nov 2025 05:29:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14803274FC1;
+	Fri, 21 Nov 2025 05:29:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763702951; cv=none; b=CVHnUEC2C7FNFA/a1P2neptbYmSClowozLiByRGZ4QxywJKt9lsFvIH0w2JQWaC9z/kNz16dQDuoYjlWqPzuLscHJpI293b3FvDer8kIwj5RsvVfVFRSVlfT4IZ7pHHyCdewZwfkVyLnzy7Oh9wyUw+jAv94IvFes8QiId5h/vs=
+	t=1763702953; cv=none; b=JfZovredfvKkOYnNZ71ZmZcSSpe16TXXOAFL7QhDuWTM6ARqKsqHiwh19tVpHn6i/vfEdIS+3Dd81Y3PhZvVEeuJx+0by1FPMJMKVfhGfWPT70iwqZL08UFy5q22GPQXl8LnMW9d6Lmq+05WAWhCIoDlvvnTSp0MweW9+HRPe6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763702951; c=relaxed/simple;
-	bh=2SYVMAkHeDw7C9g9Y+5XW1vaMycGDebGX7q51sKGAUk=;
+	s=arc-20240116; t=1763702953; c=relaxed/simple;
+	bh=zkjh/O0OgNa9iuTJbXMvEMEbwAiES0st4Y742djBilM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TEarWrRdCsKg9kr3DpgomQdxYHyIpvVyFhP4ZItLjulOIj0SlC+6aL7ZcRcLIlRf3SqKLeH/o+kTEPuvriuXuP8HpxqrUWFUktF6IWXiWIJQSa7lYth164lFOKg09QrQQWcu/XYNUohfArQqAeirY1P7grzV69kFCtZIGkImDmA=
+	 MIME-Version; b=l2jgtKrXd2vvR5dyNp+BLmAMwZ/NPVZfIi4vMNk3Jk5Yfb1XURy5BLrwCBcywm5Kxn4ECzsAm0r5ZGcGW/EDYq/2ro3/5kmkaOHG6tMeteSqocN6um0AK3L6SmbxyZ4n4Jpjytcf7eANeJiZfTLkhzXXO0jkvycw3rXJP4X3oIg=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBEF6C116D0;
-	Fri, 21 Nov 2025 05:29:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE0EBC4CEFB;
+	Fri, 21 Nov 2025 05:29:10 +0000 (UTC)
 From: Yu Kuai <yukuai@fnnas.com>
 To: axboe@kernel.dk,
 	nilay@linux.ibm.com,
@@ -21,9 +21,9 @@ To: axboe@kernel.dk,
 	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 Cc: yukuai@fnnas.com
-Subject: [PATCH v6 2/8] blk-mq-sched: unify elevators checking for async requests
-Date: Fri, 21 Nov 2025 13:28:49 +0800
-Message-ID: <20251121052901.1341976-3-yukuai@fnnas.com>
+Subject: [PATCH v6 3/8] blk-mq: factor out a helper blk_mq_limit_depth()
+Date: Fri, 21 Nov 2025 13:28:50 +0800
+Message-ID: <20251121052901.1341976-4-yukuai@fnnas.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251121052901.1341976-1-yukuai@fnnas.com>
 References: <20251121052901.1341976-1-yukuai@fnnas.com>
@@ -35,78 +35,93 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-bfq and mq-deadline consider sync writes as async requests and only
-reserve tags for sync reads by async_depth, however, kyber doesn't
-consider sync writes as async requests for now.
-
-Consider the case there are lots of dirty pages, and user use fsync to
-flush dirty pages. In this case sched_tags can be exhausted by sync writes
-and sync reads can stuck waiting for tag. Hence let kyber follow what
-mq-deadline and bfq did, and unify async requests checking for all
-elevators.
+There are no functional changes, just make code cleaner.
 
 Signed-off-by: Yu Kuai <yukuai@fnnas.com>
-Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
 ---
- block/bfq-iosched.c   | 2 +-
- block/blk-mq-sched.h  | 5 +++++
- block/kyber-iosched.c | 2 +-
- block/mq-deadline.c   | 2 +-
- 4 files changed, 8 insertions(+), 3 deletions(-)
+ block/blk-mq.c | 62 ++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 37 insertions(+), 25 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 4a8d3d96bfe4..35f1a5de48f3 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -697,7 +697,7 @@ static void bfq_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data *data)
- 	unsigned int limit, act_idx;
- 
- 	/* Sync reads have full depth available */
--	if (op_is_sync(opf) && !op_is_write(opf))
-+	if (blk_mq_is_sync_read(opf))
- 		limit = data->q->nr_requests;
- 	else
- 		limit = bfqd->async_depths[!!bfqd->wr_busy_queues][op_is_sync(opf)];
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index 02c40a72e959..5678e15bd33c 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -137,4 +137,9 @@ static inline void blk_mq_set_min_shallow_depth(struct request_queue *q,
- 						depth);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index f2650c97a75e..6c505ebfab65 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -497,6 +497,42 @@ __blk_mq_alloc_requests_batch(struct blk_mq_alloc_data *data)
+ 	return rq_list_pop(data->cached_rqs);
  }
  
-+static inline bool blk_mq_is_sync_read(blk_opf_t opf)
++static void blk_mq_limit_depth(struct blk_mq_alloc_data *data)
 +{
-+	return op_is_sync(opf) && !op_is_write(opf);
++	struct elevator_mq_ops *ops;
++
++	/* If no I/O scheduler has been configured, don't limit requests */
++	if (!data->q->elevator) {
++		blk_mq_tag_busy(data->hctx);
++		return;
++	}
++
++	/*
++	 * All requests use scheduler tags when an I/O scheduler is
++	 * enabled for the queue.
++	 */
++	data->rq_flags |= RQF_SCHED_TAGS;
++
++	/*
++	 * Flush/passthrough requests are special and go directly to the
++	 * dispatch list, they are not subject to the async_depth limit.
++	 */
++	if ((data->cmd_flags & REQ_OP_MASK) == REQ_OP_FLUSH ||
++	    blk_op_is_passthrough(data->cmd_flags))
++		return;
++
++	WARN_ON_ONCE(data->flags & BLK_MQ_REQ_RESERVED);
++	data->rq_flags |= RQF_USE_SCHED;
++
++	/*
++	 * By default, sync requests have no limit, and async requests are
++	 * limited to async_depth.
++	 */
++	ops = &data->q->elevator->type->ops;
++	if (ops->limit_depth)
++		ops->limit_depth(data->cmd_flags, data);
 +}
 +
- #endif
-diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
-index c1b36ffd19ce..2b3f5b8959af 100644
---- a/block/kyber-iosched.c
-+++ b/block/kyber-iosched.c
-@@ -556,7 +556,7 @@ static void kyber_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data *data)
- 	 * We use the scheduler tags as per-hardware queue queueing tokens.
- 	 * Async requests can be limited at this stage.
- 	 */
--	if (!op_is_sync(opf)) {
-+	if (!blk_mq_is_sync_read(opf)) {
- 		struct kyber_queue_data *kqd = data->q->elevator->elevator_data;
+ static struct request *__blk_mq_alloc_requests(struct blk_mq_alloc_data *data)
+ {
+ 	struct request_queue *q = data->q;
+@@ -515,31 +551,7 @@ static struct request *__blk_mq_alloc_requests(struct blk_mq_alloc_data *data)
+ 	data->ctx = blk_mq_get_ctx(q);
+ 	data->hctx = blk_mq_map_queue(data->cmd_flags, data->ctx);
  
- 		data->shallow_depth = kqd->async_depth;
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 3e3719093aec..29d00221fbea 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -495,7 +495,7 @@ static void dd_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data *data)
- 	struct deadline_data *dd = data->q->elevator->elevator_data;
+-	if (q->elevator) {
+-		/*
+-		 * All requests use scheduler tags when an I/O scheduler is
+-		 * enabled for the queue.
+-		 */
+-		data->rq_flags |= RQF_SCHED_TAGS;
+-
+-		/*
+-		 * Flush/passthrough requests are special and go directly to the
+-		 * dispatch list.
+-		 */
+-		if ((data->cmd_flags & REQ_OP_MASK) != REQ_OP_FLUSH &&
+-		    !blk_op_is_passthrough(data->cmd_flags)) {
+-			struct elevator_mq_ops *ops = &q->elevator->type->ops;
+-
+-			WARN_ON_ONCE(data->flags & BLK_MQ_REQ_RESERVED);
+-
+-			data->rq_flags |= RQF_USE_SCHED;
+-			if (ops->limit_depth)
+-				ops->limit_depth(data->cmd_flags, data);
+-		}
+-	} else {
+-		blk_mq_tag_busy(data->hctx);
+-	}
+-
++	blk_mq_limit_depth(data);
+ 	if (data->flags & BLK_MQ_REQ_RESERVED)
+ 		data->rq_flags |= RQF_RESV;
  
- 	/* Do not throttle synchronous reads. */
--	if (op_is_sync(opf) && !op_is_write(opf))
-+	if (blk_mq_is_sync_read(opf))
- 		return;
- 
- 	/*
 -- 
 2.51.0
 
