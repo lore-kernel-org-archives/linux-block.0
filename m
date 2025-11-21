@@ -1,19 +1,19 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A62DA2D949F
-	for <linux-block@vger.kernel.org>; Fri, 21 Nov 2025 06:28:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 107F6319864
+	for <linux-block@vger.kernel.org>; Fri, 21 Nov 2025 06:28:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763706527; cv=none; b=I5Ns+dZwI/pexJI94hDVsLA1cZNIYA/h5mXTiBoHKAbZaPIMEZy6PhZJgFBknTLYItMk+7lCU8jbv9gORN6sjFU3UlzQ8ccRY8E0pRF2V+IyA2B5hX+3ETnmNTGvNjoAmY/PGMjtJ9PLLqCQyDllqwH8nMGNY7NJipcNy2i9Jcw=
+	t=1763706529; cv=none; b=F11Kl+vU3f76Y908uoVV55Kcp+WZ8z2TJrFrU9tyCbRYhExF0wS5IgJUMlF6NrbUJY04P9iuaTWmWHPWen5xisMMQBqHQFhauJZ+6KQPl4JAWdfhaRsj1ciYhXRnVXfFp3CkGDHPWJOkFfq36IU5vBlFsF/fBARtiKK3M79C0eo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763706527; c=relaxed/simple;
-	bh=c3aLZjvDp6l3olq8KrGp4TqLW3JuGKAI7BwQXlM8CyM=;
+	s=arc-20240116; t=1763706529; c=relaxed/simple;
+	bh=lRAm4mIV1mhuhhONUvfdwMbIDrB765nfdfgyzmGPQsk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Gi2O99pTgTbaGnnfc1/TuKhbITjsMTXsn/hw8M39t3aVSuVINQDfX1HTwDof+McafX77bCOWBop/5Sury4akOhlkeRRxCMBm1cLBchzkKvXC3uhO+6i40KwgyF4YYQc9QA8+iZ4VyR0zJOZpBVNRsAYOIs2Vtey6kWjf6v9Z/Jw=
+	 MIME-Version; b=WWh+0T/1wQNalJXT7wGGBn2f4VXEc2vnSU3VVYTI8Wg+arnBddUgrLxuRO4h+ravUjZUmfXa8RdOBmPUF0gfgWjJLhNWhPYRmLQasQ+3oCwjziYhm7MDMM8aioLwbJdzxS/uuMUSpqtra3fqMTdiXTt8hu47KYZt+K8+mdv56TI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84204C4CEFB;
-	Fri, 21 Nov 2025 06:28:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4888C116D0;
+	Fri, 21 Nov 2025 06:28:46 +0000 (UTC)
 From: Yu Kuai <yukuai@fnnas.com>
 To: axboe@kernel.dk,
 	linux-block@vger.kernel.org,
@@ -22,9 +22,9 @@ To: axboe@kernel.dk,
 	ming.lei@redhat.com,
 	bvanassche@acm.org
 Cc: yukuai@fnnas.com
-Subject: [PATCH v2 6/9] blk-wbt: fix incorrect lock order for rq_qos_mutex and freeze queue
-Date: Fri, 21 Nov 2025 14:28:26 +0800
-Message-ID: <20251121062829.1433332-7-yukuai@fnnas.com>
+Subject: [PATCH v2 7/9] blk-iocost: fix incorrect lock order for rq_qos_mutex and freeze queue
+Date: Fri, 21 Nov 2025 14:28:27 +0800
+Message-ID: <20251121062829.1433332-8-yukuai@fnnas.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251121062829.1433332-1-yukuai@fnnas.com>
 References: <20251121062829.1433332-1-yukuai@fnnas.com>
@@ -36,51 +36,88 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-wbt_init() can be called from sysfs attribute and wbt_enable_default(),
-however the lock order are inversely.
+Like wbt, rq_qos_add() can be called from two path and the lock order
+are inversely:
 
-- queue_wb_lat_store() freeze queue first, and then wbt_init() hold
-  rq_qos_mutex. In this case queue will be frozen again inside
-  rq_qos_add(), however, in this case freeze queue recursively is
-  inoperative;
-- wbt_enable_default() from elevator switch will hold rq_qos_mutex
-  first, and then rq_qos_add() will freeze queue;
+- From ioc_qos_write(), queue is already frozen before rq_qos_add();
+- From ioc_cost_model_write(), rq_qos_add() is called directly;
 
-Fix this problem by converting to use new helper rq_qos_add_frozen() in
-wbt_init(), and for wbt_enable_default(), freeze queue before calling
-wbt_init().
+Fix this problem by converting to use blkg_conf_open_bdev_frozen()
+from ioc_cost_model_write(), then since all rq_qos_add() callers
+already freeze queue, convert to use rq_qos_add_frozen().
 
-Fixes: a13bd91be223 ("block/rq_qos: protect rq_qos apis with a new lock")
 Signed-off-by: Yu Kuai <yukuai@fnnas.com>
 ---
- block/blk-wbt.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ block/blk-iocost.c | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index b1ab0f297f24..5e7e481103a1 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -725,7 +725,11 @@ void wbt_enable_default(struct gendisk *disk)
- 		return;
- 
- 	if (queue_is_mq(q) && enable) {
-+		unsigned int memflags = blk_mq_freeze_queue(q);
-+
- 		wbt_init(disk);
-+		blk_mq_unfreeze_queue(q, memflags);
-+
- 		mutex_lock(&q->debugfs_mutex);
- 		blk_mq_debugfs_register_rq_qos(q);
- 		mutex_unlock(&q->debugfs_mutex);
-@@ -926,7 +930,7 @@ int wbt_init(struct gendisk *disk)
- 	 * Assign rwb and add the stats callback.
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index 5bfd70311359..c375a7e19789 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -2927,7 +2927,7 @@ static int blk_iocost_init(struct gendisk *disk)
+ 	 * called before policy activation completion, can't assume that the
+ 	 * target bio has an iocg associated and need to test for NULL iocg.
  	 */
- 	mutex_lock(&q->rq_qos_mutex);
--	ret = rq_qos_add(&rwb->rqos, disk, RQ_QOS_WBT, &wbt_rqos_ops);
-+	ret = rq_qos_add_frozen(&rwb->rqos, disk, RQ_QOS_WBT, &wbt_rqos_ops);
- 	mutex_unlock(&q->rq_qos_mutex);
+-	ret = rq_qos_add(&ioc->rqos, disk, RQ_QOS_COST, &ioc_rqos_ops);
++	ret = rq_qos_add_frozen(&ioc->rqos, disk, RQ_QOS_COST, &ioc_rqos_ops);
  	if (ret)
- 		goto err_free;
+ 		goto err_free_ioc;
+ 
+@@ -3410,7 +3410,7 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
+ {
+ 	struct blkg_conf_ctx ctx;
+ 	struct request_queue *q;
+-	unsigned int memflags;
++	unsigned long memflags;
+ 	struct ioc *ioc;
+ 	u64 u[NR_I_LCOEFS];
+ 	bool user;
+@@ -3419,9 +3419,11 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
+ 
+ 	blkg_conf_init(&ctx, input);
+ 
+-	ret = blkg_conf_open_bdev(&ctx);
+-	if (ret)
++	memflags = blkg_conf_open_bdev_frozen(&ctx);
++	if (IS_ERR_VALUE(memflags)) {
++		ret = memflags;
+ 		goto err;
++	}
+ 
+ 	body = ctx.body;
+ 	q = bdev_get_queue(ctx.bdev);
+@@ -3438,7 +3440,6 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
+ 		ioc = q_to_ioc(q);
+ 	}
+ 
+-	memflags = blk_mq_freeze_queue(q);
+ 	blk_mq_quiesce_queue(q);
+ 
+ 	spin_lock_irq(&ioc->lock);
+@@ -3490,20 +3491,18 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
+ 	spin_unlock_irq(&ioc->lock);
+ 
+ 	blk_mq_unquiesce_queue(q);
+-	blk_mq_unfreeze_queue(q, memflags);
+ 
+-	blkg_conf_exit(&ctx);
++	blkg_conf_exit_frozen(&ctx, memflags);
+ 	return nbytes;
+ 
+ einval:
+ 	spin_unlock_irq(&ioc->lock);
+ 
+ 	blk_mq_unquiesce_queue(q);
+-	blk_mq_unfreeze_queue(q, memflags);
+ 
+ 	ret = -EINVAL;
+ err:
+-	blkg_conf_exit(&ctx);
++	blkg_conf_exit_frozen(&ctx, memflags);
+ 	return ret;
+ }
+ 
 -- 
 2.51.0
 
