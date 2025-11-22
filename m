@@ -1,230 +1,136 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5477825A642
-	for <linux-block@vger.kernel.org>; Sat, 22 Nov 2025 07:46:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DFC62D0292
+	for <linux-block@vger.kernel.org>; Sat, 22 Nov 2025 10:07:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763797609; cv=none; b=Dpv/fCQBkTAo2LclqNhaWP3NoKM1vhwRDvf/XAojrqFqVykAQkHk/3//1s72BHx+ZwpESCLUSTf5rqpoVZ/6As23SM1Qux99yHUVecz3aX1bBcQ9bseGORLpjGslmp+DVNhH8mTYhAPspQdSq4keQlhl6ADXoUgo9g3OBe+0Lz8=
+	t=1763806066; cv=none; b=rNUSqbkgta7CzzG09+l37Oj9UZ1WTUfXBoqDJO2BeaUfLGDUTlyeUD4P0kKkRAHINAZ1aj34ziSk+Dv+8Df6Rpgco0PqxTmq0tOqA4vJk/GhG6hbuk7YVEuw9pqrQohZvMYs25RVKZHYb5pSCPxtMccN0uBnkSAeBvMyMHnQw7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763797609; c=relaxed/simple;
-	bh=Q2I4fYvh4oepaGQS7zTzvtbJbgRyZjD4TiTFO6vRTII=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Kr5uUh0ccdWx+YuHX9q8SHzSt3ZdDqPAelj6ayISiwQeBQk2BkGT/bhfRU6YBW0/w82Vuqc2kH3U0L9G9Ps2C8ypwh40ZXS9OLjWusYa/H+nOhYv9Xe2NZnhE4lanFVnnLtUEqhjP/vhrXa7OrF3D4NehXT8ZAEwOxeMhpRGbcE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=btVQHxpN; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=jvBE+9Ki; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1763806066; c=relaxed/simple;
+	bh=YC6JASOKhDeq+v1c3niPp2jV/65g8GLXWjzEC/6bKhw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NVxMipDtOL/G6HgjlbdzwETSUSAoat0Zsw9ZhgGo8ZqMLhIaC3sIU6Susqy50hm/FxQwLW+xZ+gPOh1wAGmXZ+l9QdgTAjnKwVgtY9OX9bBRQ4DQKGiqahu8p8wWDDPW24agAWnYbdkzcB2zPnERSUqG5zqKcy817yz98vqnuSI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=Y0ks8rgh; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="btVQHxpN";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="jvBE+9Ki"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763797605;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NzKDrDr19qM8qzMg2r6gHYZungvxwnQDvei/yhzW154=;
-	b=btVQHxpNSnXvvHDWf/zdL3mq9DNbbGHXc547awZeTjsutml/uogLt9G2FpIvCXesqcFZK6
-	tKAfZA7j/mkNgaiywFrzRtEzLNfln7VjkpGD3oXPBtYmblXbwqKTLqH8/n8sKSC9lxDeva
-	33rtHDq61SX2fXorzgoWucC/AhX5h78=
-Received: from mail-yx1-f70.google.com (mail-yx1-f70.google.com
- [74.125.224.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-206-5kORTRCpPM6YddEW8wJ0vg-1; Sat, 22 Nov 2025 02:46:42 -0500
-X-MC-Unique: 5kORTRCpPM6YddEW8wJ0vg-1
-X-Mimecast-MFC-AGG-ID: 5kORTRCpPM6YddEW8wJ0vg_1763797601
-Received: by mail-yx1-f70.google.com with SMTP id 956f58d0204a3-63e1cca3558so3234558d50.1
-        for <linux-block@vger.kernel.org>; Fri, 21 Nov 2025 23:46:42 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Y0ks8rgh"
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-340e525487eso1878855a91.3
+        for <linux-block@vger.kernel.org>; Sat, 22 Nov 2025 02:07:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763797601; x=1764402401; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NzKDrDr19qM8qzMg2r6gHYZungvxwnQDvei/yhzW154=;
-        b=jvBE+9KiR/qk0BjuwJj0M63YlGTxc+AwlmsBRL4RydplaE2XnAz2oJZXIyKmud4oh9
-         V5gHw36tYQaYrV2aN9HmMDnp+fYLSbvr7EgEcvHR+7I87ODi+pikf0jOJnvZcGIbj4ki
-         AmLOlqN57QdknXt2jCMMujRawo41qw9qTHDmVASodllliXI0mYh5yyK33iAVokggdI5H
-         HsWzlomfPfkbPm2qbN7UrMzip//2zW0wtsJcf9YYqFnWD1K1MhkNv8TeCC4chOiGsP0b
-         meqNmQnn7SYCKUfP0gCOSo+u1zS0QDVxFhgmOwfEaJDF+jrgw4oEAq3Upl5cFT3Ik0nj
-         maLQ==
+        d=chromium.org; s=google; t=1763806065; x=1764410865; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=mQ4gPN6s8Xd/11O+MQ8+DSVbaktr3U4P884klWVkPdQ=;
+        b=Y0ks8rgh5GGKxYkvTxmejFyxGsMTQy13IfH1PxgP8XdEyttE3SMNUDaXCmLLhw7j0o
+         wBio9RCptwC3+UzE1GgHXJC6kgDZxQrENuWQ/Um55cEc/LVf4FsYMYkYcnk7KSjQemJb
+         Ld9WukOshNpiaUK7AVVWJ6O5rDycokfchLN4A=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763797601; x=1764402401;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=NzKDrDr19qM8qzMg2r6gHYZungvxwnQDvei/yhzW154=;
-        b=Tn1rNhxB1xZfieyEiMZcBfVRg/cZpp8pWiVWKBYmBHQnQIk+pW9e7KOJqnsas261tj
-         O4AxjoSHLPJWNSF4RRhOF8/Q/+yvUhBhWpxZ30Fm1MADyYV5gdWXywJjYY2RnyO/yyHu
-         yjEFzRvn2TyutNC7lWZiwWmocaEaDwSDuAyjs758c4sd6D1TKRupbOzPshMOv/uHkvUV
-         rVTwJ0WvVPJFm6sKJxj9OCRK2L9AAi6ryqvkRnsuUOIGs7VIhklspSEQk7HckybJG/Lq
-         HSXTYNDM6bXo6Ls3WVuC8Bmik19kxu3uTu593S0S3AW2YFQP9RQ23L2ixGHMqiDP97YN
-         8GKA==
-X-Forwarded-Encrypted: i=1; AJvYcCW/6FrAam/Kh1bXUhqMqrrYCyVlbbXhjC0WecrfDo3Vqydj5CUTpjNZjiv8V3jRgdEkR3W/0y2L7q391w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzadtlegO6tGRtOVFhRxTQOkR+KirChehf5/CX0wopJ965FzCDe
-	vbTJ9YXyhmee322FCwAOiojm4ohvkb2/0Z7bhXJ7XmlXWguiOJUCsl1sFcOU0QnUeDLdMUeelNN
-	jTcwKFl9KcYiKU3DBL/s+oV8fPlABnEJ0K1eOxktBGwJo4OySafdzBzJ0yH88nhJvT7tu4nbjCQ
-	7NAzvilrMLwF4w2OqLgXwmRnavTAOrCUoeVN6RAwY=
-X-Gm-Gg: ASbGncuRS0RJDXp3SOPx5jj8aAienSAk7pTKSagJ9dSBJTQn7gM+8O56RANf5+ESuCc
-	V3Jh16nBXxEvB7PQ4+sQpO6LqaTglyuJcUsDOdhfOA/eo8f8Ax4Zmuogo/PF6LSQqwX9mB7LlZZ
-	J/+oqMMHGIFzBnm0YYQk6c9Ic8d77snfbn3hNwWK/QqqPHx21oGPfbh6nQ3HUhVC5M
-X-Received: by 2002:a05:690c:b98:b0:781:64f:2b1a with SMTP id 00721157ae682-78a8b56828cmr79989307b3.60.1763797600938;
-        Fri, 21 Nov 2025 23:46:40 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHT6ReihqZuKDslp4v6LlKyjNYk5cYZ5oqfMTnv4XvlKobsBj9Saq/UGtRReN9JAQWVmvP6mmp+/fX9V/OmqWs=
-X-Received: by 2002:a05:690c:b98:b0:781:64f:2b1a with SMTP id
- 00721157ae682-78a8b56828cmr79989177b3.60.1763797600562; Fri, 21 Nov 2025
- 23:46:40 -0800 (PST)
+        d=1e100.net; s=20230601; t=1763806065; x=1764410865;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mQ4gPN6s8Xd/11O+MQ8+DSVbaktr3U4P884klWVkPdQ=;
+        b=qyxo5Irpj82F9nyBvYMwsGi8d1ECJaWnecPPgx0ogKF++FSWx4r97IpkIfCBrqr7XW
+         3lgWE6MsQSUGiMOdbcSZOPAK5b5zlPutMAzhERWy+WHDwE2i/2I7SB94jgJX9fQMFVOw
+         LkZBky8lvlpr75eyFKme8Q0aCo26fKtUW3rOf8UJapVqdXG1w4ndZQMFwxlL2KsgNoWJ
+         dutu6HG7RHJhcWEWV+7n4Uh8iHIUlp72hnO1nQTkeuCOk54E8JgJRtj0nbSPRnVeFLQR
+         BHE7jq1hkTZl7FBZCy1AW2RQHZMWtycbBmlRB+lmrpCwHgtWIPoC/C8LRoKTMjsaD0tn
+         GyHA==
+X-Forwarded-Encrypted: i=1; AJvYcCV4MM59deN4bBPCrHbJj+dhGb4pPOFiCnytReAxXUdRsVSFqioDmBR9/B7zrkAO0LakX3KHgTZFoYvjSQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5q0YZl2T2P5oOIKrpHzujoQk4Xs/Ixnj3Kw6YzgcIKmRGz7De
+	zExgn+k1qRScwYCJt/cM5GPSdbWX2Zp/bi6N/rolGVQSi1+0vNpFKPiEoskfZMvhJA==
+X-Gm-Gg: ASbGncsRglgz7Q1eD07CVOE8PsHia5mpLTju+yrLXeX3DpziHftGLyh7nPkSZ/hGv2A
+	4OP0wQ6fkxMILRUteMIdK1EE/K4tsmRte4dfwSULsjDVFmIAkpqkV1BPNjU4oyg9HJKxRyd8AbK
+	XhoFwYucnOvOBhlCjXNE5pNfSLowgp1kKtfS7LpltPPisXGvyh2PZNuhaIIQWtJ4JVMWP2STtqx
+	RMcUlPUbXZ/n0CxVvPdUnthjK5Jo+V5aPEIFvU0bo3vZ71dp1PotZbO+VSC3J5AWlTGb9C4YEgE
+	JWjrjfBRmBjBQK2+lYhwheaDWZv3mtre6+zINedclZJFPOuKp1V9gV9SBzJtiFelQtFW5aft765
+	lOi2cdIDy+17j1UKIimIww5VMb7RD7cY2NriXrZuYy+8Ui5zKyek909jDkQpt2B5EBZRIqc+R80
+	UFDuZVrz7RhYa+76HbsaaAiKPqfeGe5sVDU381MEfd/yI5+FElZoE=
+X-Google-Smtp-Source: AGHT+IF9STMF1f3EeytoDQYWwe6bTpFK7Jtci+bPHUYf/65uMEfrVs9GVfGDvjF8U9gEVKfwR/cOkQ==
+X-Received: by 2002:a17:90b:384f:b0:341:8c8e:38b5 with SMTP id 98e67ed59e1d1-34733f3e483mr5344655a91.25.1763806064741;
+        Sat, 22 Nov 2025 02:07:44 -0800 (PST)
+Received: from google.com ([2a00:79e0:2031:6:948e:149d:963b:f660])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-347267a1231sm8047177a91.6.2025.11.22.02.07.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 22 Nov 2025 02:07:44 -0800 (PST)
+Date: Sat, 22 Nov 2025 19:07:39 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Gao Xiang <hsiangkao@linux.alibaba.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Yuwen Chen <ywen.chen@foxmail.com>, akpm@linux-foundation.org, bgeffon@google.com, 
+	licayy@outlook.com, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, minchan@kernel.org, richardycc@google.com
+Subject: Re: [RFC PATCHv5 0/6] zram: introduce writeback bio batching
+Message-ID: <kvgy5ms2xlkcjuzuq7xx5lmjwx3frguosve7sqbp6wh3gpih5k@kjuwfbdd2cqz>
+References: <ts32xzxrpxmwf3okxo4bu2ynbgnfe6mehf5h6eibp7dp3r6jp7@4f7oz6tzqwxn>
+ <tencent_865DD78A73BC3C9CAFCBAEBE222B6EA5F107@qq.com>
+ <buckmtxvdfnpgo56owip3fjqbzraws2wvtomzfkywhczckoqlt@fifgyl5fjpbt>
+ <8c596737-95c1-4274-9834-1fe06558b431@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251121081748.1443507-1-zhangshida@kylinos.cn>
- <aSEvg8z9qxSwJmZn@fedora> <CANubcdULTQo5jF7hGSWFqXw6v5DhEg=316iFNipMbsyz64aneg@mail.gmail.com>
-In-Reply-To: <CANubcdULTQo5jF7hGSWFqXw6v5DhEg=316iFNipMbsyz64aneg@mail.gmail.com>
-From: Andreas Gruenbacher <agruenba@redhat.com>
-Date: Sat, 22 Nov 2025 08:46:29 +0100
-X-Gm-Features: AWmQ_bkNPMPKGc9hcr0WMHGjLmVXZ8Lp-bk_Jm40n6CY0-WAnMeo9R7n5uUvirQ
-Message-ID: <CAHc6FU5ofV7s3Q4KBGFJ3gExwsMpbaZ9Vj0FEHqrOreqvQMswQ@mail.gmail.com>
-Subject: Re: Fix potential data loss and corruption due to Incorrect BIO Chain Handling
-To: Stephen Zhang <starzhangzsd@gmail.com>
-Cc: Ming Lei <ming.lei@redhat.com>, linux-kernel@vger.kernel.org, 
-	linux-block@vger.kernel.org, nvdimm@lists.linux.dev, 
-	virtualization@lists.linux.dev, linux-nvme@lists.infradead.org, 
-	gfs2@lists.linux.dev, ntfs3@lists.linux.dev, linux-xfs@vger.kernel.org, 
-	zhangshida@kylinos.cn
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8c596737-95c1-4274-9834-1fe06558b431@linux.alibaba.com>
 
-On Sat, Nov 22, 2025 at 7:52=E2=80=AFAM Stephen Zhang <starzhangzsd@gmail.c=
-om> wrote:
-> Ming Lei <ming.lei@redhat.com> =E4=BA=8E2025=E5=B9=B411=E6=9C=8822=E6=97=
-=A5=E5=91=A8=E5=85=AD 11:35=E5=86=99=E9=81=93=EF=BC=9A
-> >
-> > On Fri, Nov 21, 2025 at 04:17:39PM +0800, zhangshida wrote:
-> > > From: Shida Zhang <zhangshida@kylinos.cn>
-> > >
-> > > Hello everyone,
-> > >
-> > > We have recently encountered a severe data loss issue on kernel versi=
-on 4.19,
-> > > and we suspect the same underlying problem may exist in the latest ke=
-rnel versions.
-> > >
-> > > Environment:
-> > > *   **Architecture:** arm64
-> > > *   **Page Size:** 64KB
-> > > *   **Filesystem:** XFS with a 4KB block size
-> > >
-> > > Scenario:
-> > > The issue occurs while running a MySQL instance where one thread appe=
-nds data
-> > > to a log file, and a separate thread concurrently reads that file to =
-perform
-> > > CRC checks on its contents.
-> > >
-> > > Problem Description:
-> > > Occasionally, the reading thread detects data corruption. Specificall=
-y, it finds
-> > > that stale data has been exposed in the middle of the file.
-> > >
-> > > We have captured four instances of this corruption in our production =
-environment.
-> > > In each case, we observed a distinct pattern:
-> > >     The corruption starts at an offset that aligns with the beginning=
- of an XFS extent.
-> > >     The corruption ends at an offset that is aligned to the system's =
-`PAGE_SIZE` (64KB in our case).
-> > >
-> > > Corruption Instances:
-> > > 1.  Start:`0x73be000`, **End:** `0x73c0000` (Length: 8KB)
-> > > 2.  Start:`0x10791a000`, **End:** `0x107920000` (Length: 24KB)
-> > > 3.  Start:`0x14535a000`, **End:** `0x145b70000` (Length: 8280KB)
-> > > 4.  Start:`0x370d000`, **End:** `0x3710000` (Length: 12KB)
-> > >
-> > > After analysis, we believe the root cause is in the handling of chain=
-ed bios, specifically
-> > > related to out-of-order io completion.
-> > >
-> > > Consider a bio chain where `bi_remaining` is decremented as each bio =
-in the chain completes.
-> > > For example,
-> > > if a chain consists of three bios (bio1 -> bio2 -> bio3) with
-> > > bi_remaining count:
-> > > 1->2->2
-> >
-> > Right.
-> >
-> > > if the bio completes in the reverse order, there will be a problem.
-> > > if bio 3 completes first, it will become:
-> > > 1->2->1
-> >
-> > Yes.
-> >
-> > > then bio 2 completes:
-> > > 1->1->0
+On (25/11/21 20:21), Gao Xiang wrote:
+> > > > I think page-fault latency of a written-back page is expected to be
+> > > > higher, that's a trade-off that we agree on.  Off the top of my head,
+> > > > I don't think we can do anything about it.
+> > > > 
+> > > > Is loop device always used as for writeback targets?
+> > > 
+> > > On the Android platform, currently only the loop device is supported as
+> > > the backend for writeback, possibly for security reasons. I noticed that
+> > > EROFS has implemented a CONFIG_EROFS_FS_BACKED_BY_FILE to reduce this
+> > > latency. I think ZRAM might also be able to do this.
+> > 
+> > I see.  Do you use S/W or H/W compression?
+> 
+> No, I'm pretty sure it's impossible for zram to access
+> file I/Os without another thread context (e.g. workqueue),
+> especially for write I/Os, which is unlike erofs:
+> 
+> EROFS can do because EROFS is a specific filesystem, you
+> could see it's a seperate fs, and it can only read (no
+> write context) backing files in erofs and/or other fses,
+> which is much like vfs/overlayfs read_iter() directly
+> going into the backing fses without nested contexts.
+> (Even if loop is used, it will create its own thread
+> contexts with workqueues, which is safe.)
+> 
+>  In the other hand, zram/loop can act as a virtual block
+> device which is rather different, which means you could
+> format an ext4 filesystem and backing another ext4/btrfs,
+> like this:
+> 
+>   zram(ext4) -> backing ext4/btrfs
+> 
+> It's unsafe (in addition to GFP_NOIO allocation
+> restriction) since zram cannot manage those ext4/btrfs
+> existing contexts:
+> 
+>  - Take one detailed example, if the upper zram ext4
+> assigns current->journal_info = xxx, and submit_bio() to
+> zram, which will confuse the backing ext4 since it should
+> assume current->journal_info == NULL, so the virtual block
+> devices need another thread context to isolate those two
+> different uncontrolled contexts.
+> 
+> So I don't think it's feasible for block drivers to act
+> like this, especially mixing with writing to backing fses
+> operations.
 
-Currently, bio_chain_endio() will actually not decrement
-__bi_remaining but it will call bio_put(bio 2) and bio_endio(parent),
-which will lead to 1->2->0. And when bio 1 completes, bio 2 won't
-exist anymore.
+Sorry, I don't completely understand your point, but backing
+device is never expected to have any fs on it.  So from your
+email:
 
-> > No, it is supposed to be 1->1->1.
-> >
-> > When bio 1 completes, it will become 0->0->0
-> >
-> > bio3's `__bi_remaining` won't drop to zero until bio2's reaches
-> > zero, and bio2 won't be done until bio1 is ended.
-> >
-> > Please look at bio_endio():
-> >
-> > void bio_endio(struct bio *bio)
-> > {
-> > again:
-> >         if (!bio_remaining_done(bio))
-> >                 return;
-> >         ...
-> >         if (bio->bi_end_io =3D=3D bio_chain_endio) {
-> >                 bio =3D __bio_chain_endio(bio);
-> >         goto again;
-> >         }
-> >         ...
-> > }
-> >
->
-> Exactly, bio_endio handle the process perfectly, but it seems to forget
-> to check if the very first  `__bi_remaining` drops to zero and proceeds t=
-o
-> the next bio:
-> -----
-> static struct bio *__bio_chain_endio(struct bio *bio)
-> {
->         struct bio *parent =3D bio->bi_private;
->
->         if (bio->bi_status && !parent->bi_status)
->                 parent->bi_status =3D bio->bi_status;
->         bio_put(bio);
->         return parent;
-> }
->
-> static void bio_chain_endio(struct bio *bio)
-> {
->         bio_endio(__bio_chain_endio(bio));
-> }
-> ----
+> zram(ext4) -> backing ext4/btrfs
 
-This bug could be fixed as follows:
-
- static void bio_chain_endio(struct bio *bio)
- {
-+        if (!bio_remaining_done(bio))
-+                return;
-         bio_endio(__bio_chain_endio(bio));
- }
-
-but bio_endio() already does all that, so bio_chain_endio() might just
-as well just call bio_endio(bio) instead.
-
-Thanks,
-Andreas
-
+This is not a valid configuration, as far as I'm concerned.
+Unless I'm missing your point.
