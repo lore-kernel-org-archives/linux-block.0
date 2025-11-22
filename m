@@ -1,129 +1,177 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C0BD2848AA
-	for <linux-block@vger.kernel.org>; Sat, 22 Nov 2025 10:28:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27CF736D503
+	for <linux-block@vger.kernel.org>; Sat, 22 Nov 2025 12:01:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763807332; cv=none; b=s0OquD1u67CJwowNuItLu7ZPEPrtQ55Vi7wDMCzXatA5zn/x59v2vPn39HTlOFx5JgsR8CwSz6hcV715nAC+BIqFnrNx9jYtL38L+BYlSJn+gGwjcoicoaHhIyh/BLooNojTjtB9i6UzaFzlfofEzFZu4BFazscoOOLJo6pF0iA=
+	t=1763812892; cv=none; b=kJ2HO6516l0LE0ii6H0Xq1XenENM0gXZOleWy0nOsB5mqGtH0tWcctEk8BaHO7kbs697RVF8epdbeY3xA7YvD5vohB+lk5o1bbp6IddWLUuQth7oXlg4ciJ/wxaUZmZAVk6ReJPRaFifghM3pQ4ogJF337Fdbwemi0q4N6t3fOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763807332; c=relaxed/simple;
-	bh=iySq58Lxfld8udENzmzwD01KWqtTxbFvsCk44McFfHs=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=XF7IKthjTGN5SGF3dOkxVCrgbSEISwRM7wmLjctyfN3krm5SMYcW/6fqp53h4BWw/jyBJ6pN6bgu4VHGa2LCxNK6Wupb2+HEtYi5xW6EZzdv68offPu58hbzsOLJRHLNpEhym6pRRcQwTOLLkrNm12zEDrKYxgf8IxPJGDkwvck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eXCkgCj+; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1763812892; c=relaxed/simple;
+	bh=4nWgX9ww33bsVkN80fxqeJv7BBG+H91O9D+0SVq5PiQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=q39oTxJV3tIblGgKhEWm1gLGtDAHyewsmdMgMZkWp7zDqKxc3q2TiEmCcLa5myfRZWM7cBXqbiqcyFx0tiyoTcWMVVxU1si0pqn2BaYbscZkxLuRkVebkT3lt7uQb5Kjr1lU9zgUZ84fErNrWPdd80czEEG0VarVdnifaA9BEMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Kd4dLs2t; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eXCkgCj+"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-477b1cc8fb4so16645675e9.1
-        for <linux-block@vger.kernel.org>; Sat, 22 Nov 2025 02:28:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763807327; x=1764412127; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:subject:references:cc:to:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=iySq58Lxfld8udENzmzwD01KWqtTxbFvsCk44McFfHs=;
-        b=eXCkgCj+Sg3JSER668/MoSsvS9/9e0lJ64FcBSiOhc+Yzpa+4Jq29xzs+W0SepW4B9
-         OpgMOczWcRSZtwOSpKHNJqIS3dKMWZYrLe+L3W1nacf/7rsfgdS0mwKRqhSPf53LtncO
-         caMF75TOt4LgmAKPavvPdFU9qTO47G87eNGtdRw1gRJ99rmm40apbXQk1thG2J2MGKGv
-         EsrIfYiUiQDTmvM3wyjh4JPKKw8UcSKyWH38m7OIVoEXXNR9gidVtJ58nmpO9QuzMqpp
-         PPUcmT1C87cBHEOvrEM6G1gxhshfjTCETQCYW/rFnx7xcTXrlLwLXXxtmuh3AY8EYeY+
-         NBjA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763807327; x=1764412127;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:subject:references:cc:to:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iySq58Lxfld8udENzmzwD01KWqtTxbFvsCk44McFfHs=;
-        b=AhL2x9P6Z4c+EWyXshVd9VKffY1nEN8QF8TefJu/7j8srkctKAnRYpZUOMoSmSQmO5
-         LoMyEjYP1FpmepKddrrLHMPvTaUtJSu7JAS9JuZtgV200BdvirSgjPXvYaEv7WKPn1hX
-         3AVjc1DkkZZhZDKLymToGNOfNhBu3DoO1oF/m6NwHHycMQDo8YLNHWLox7648v3140no
-         I1v9E59iMO/BQ0fNdUqH4Od35S+4M9gumQmPJcc0hl55AcGRe8WQ/nnSv2uRYk5wUeU1
-         NbtKqIETuVllmL7K6wvApt0aUU4i7i8ZRdZLYgV0MxXKXy34JLdDU5x6h87119kZ2W4F
-         kRWg==
-X-Forwarded-Encrypted: i=1; AJvYcCU2yYwSoVu9bGUGSxRvCsTBarhCQ7CQosdOAD9LuI/qj6xGtkDJoFk1J1s0yNxrRpRen5fRalhpJ/Xb5A==@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywy4VckX8nvTnyJ0BqQ+aOTkXTG9ERcBs9kqeTaezsoE5NXXMMl
-	AodImoRCHRHmC/fLFD1ZA4WD67j+nXiLAbRrfhJHNLySijboFlFZh6vO
-X-Gm-Gg: ASbGncsGP1Fr2IsLDiCLRr4+s4Ba7EXteFoZjCzfOrQy6Ylm4tW0Av6yhQa6KOiPil9
-	aHkkzY4jauXSRucWUvQqODonOLbLiSGqqmzGmF1cXw+LFXtMCV2nxLtWnM6U/0bMAlR7Ksgd5xZ
-	JUSHFOUCNYowsfgKvp436eSFUUercMb1xHbkjXH+02Jdm0zN/3P0N8MkWNLgfndu8gDxFtWEmvm
-	Z3GkooR1IfpNgb/5mxL62WPtBZ4jjls2lEfe2t+ir9A+4BuZOjDkucna4bMPIp9Goxqb60Ui7uh
-	vVCpmRictmvU2aC9rjNjn/m2wcep+F6+bTnAWycZyNGck3R8QiAjRhRSQ3w42qjySyqfbz6tT0b
-	4DcHHkJmIkagTsN3mgB4pXBfNHEyL7PtA5v7cnTR+AYa+1I7KwmK8doKe+gfuDkhR/u/FV2nSYX
-	P42lshH0IA7FDoevy8Sm3Xkkb8Pf51OfwGwxeV04MAiXcpqP1ZmNojKxKS
-X-Google-Smtp-Source: AGHT+IEZ1TPSuzVZ+M10PT6f48UHg7uZlgCS/jOlWJf9pDjCbYrpdcX4dNWueIQk/WSIW5o0InM4kA==
-X-Received: by 2002:a05:600c:548b:b0:475:de68:3c30 with SMTP id 5b1f17b1804b1-477c01c0c91mr59121485e9.16.1763807326741;
-        Sat, 22 Nov 2025 02:28:46 -0800 (PST)
-Received: from ?IPV6:2a02:168:575a:f00d:ecda:ab22:8304:63a1? ([2a02:168:575a:f00d:ecda:ab22:8304:63a1])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-477bf1df334sm87486425e9.3.2025.11.22.02.28.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 22 Nov 2025 02:28:45 -0800 (PST)
-Message-ID: <2b67964f-22f0-4d38-9df0-fe50b9b9436d@gmail.com>
-Date: Sat, 22 Nov 2025 11:28:44 +0100
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kd4dLs2t"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763812889;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JuZK2beRgEq+MC2I+vh3JTOKDyroWbZXDvE+0QrmUyk=;
+	b=Kd4dLs2tgmiYO8Y+Z48xHQ43qIz9qULKW57xbA5m2Wj2plwk+nyEf1j4RkOWXahL56KU2b
+	94eT5JjxUGOMlMa81brHxzXWkzVK4oHH4uT+dVgZybKnAQG7wMiPBrSu6GrsmrkF8O/PIo
+	v6yXLC+0kuJYVSQMGKq4a502TJQ20uo=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-653-VC8oek4GOGiDUqoXurM1bg-1; Sat,
+ 22 Nov 2025 07:01:26 -0500
+X-MC-Unique: VC8oek4GOGiDUqoXurM1bg-1
+X-Mimecast-MFC-AGG-ID: VC8oek4GOGiDUqoXurM1bg_1763812885
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 28B171956080;
+	Sat, 22 Nov 2025 12:01:24 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.33])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 873C01940E82;
+	Sat, 22 Nov 2025 12:01:14 +0000 (UTC)
+Date: Sat, 22 Nov 2025 20:01:08 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Stephen Zhang <starzhangzsd@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	nvdimm@lists.linux.dev, virtualization@lists.linux.dev,
+	linux-nvme@lists.infradead.org, gfs2@lists.linux.dev,
+	ntfs3@lists.linux.dev, linux-xfs@vger.kernel.org,
+	zhangshida@kylinos.cn
+Subject: Re: Fix potential data loss and corruption due to Incorrect BIO
+ Chain Handling
+Message-ID: <aSGmBAP0BA_2D3Po@fedora>
+References: <20251121081748.1443507-1-zhangshida@kylinos.cn>
+ <aSEvg8z9qxSwJmZn@fedora>
+ <CANubcdULTQo5jF7hGSWFqXw6v5DhEg=316iFNipMbsyz64aneg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: rene@exactco.de
-Cc: efremov@linux.com, linux-block@vger.kernel.org
-References: <20251114.144127.170518024415947073.rene@exactco.de>
-Subject: Re: [PATCH] fix floppy for PAGE_SIZE != 4KB
-Content-Language: en-GB
-From: Gregor Riepl <onitake@gmail.com>
-Autocrypt: addr=onitake@gmail.com; keydata=
- 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
- qAI1ww==
-In-Reply-To: <20251114.144127.170518024415947073.rene@exactco.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANubcdULTQo5jF7hGSWFqXw6v5DhEg=316iFNipMbsyz64aneg@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-You can add a Tested-by: from me, if you like.
-My Ultra 10 can read floppies again!
+On Sat, Nov 22, 2025 at 02:42:43PM +0800, Stephen Zhang wrote:
+> Ming Lei <ming.lei@redhat.com> 于2025年11月22日周六 11:35写道：
+> >
+> > On Fri, Nov 21, 2025 at 04:17:39PM +0800, zhangshida wrote:
+> > > From: Shida Zhang <zhangshida@kylinos.cn>
+> > >
+> > > Hello everyone,
+> > >
+> > > We have recently encountered a severe data loss issue on kernel version 4.19,
+> > > and we suspect the same underlying problem may exist in the latest kernel versions.
+> > >
+> > > Environment:
+> > > *   **Architecture:** arm64
+> > > *   **Page Size:** 64KB
+> > > *   **Filesystem:** XFS with a 4KB block size
+> > >
+> > > Scenario:
+> > > The issue occurs while running a MySQL instance where one thread appends data
+> > > to a log file, and a separate thread concurrently reads that file to perform
+> > > CRC checks on its contents.
+> > >
+> > > Problem Description:
+> > > Occasionally, the reading thread detects data corruption. Specifically, it finds
+> > > that stale data has been exposed in the middle of the file.
+> > >
+> > > We have captured four instances of this corruption in our production environment.
+> > > In each case, we observed a distinct pattern:
+> > >     The corruption starts at an offset that aligns with the beginning of an XFS extent.
+> > >     The corruption ends at an offset that is aligned to the system's `PAGE_SIZE` (64KB in our case).
+> > >
+> > > Corruption Instances:
+> > > 1.  Start:`0x73be000`, **End:** `0x73c0000` (Length: 8KB)
+> > > 2.  Start:`0x10791a000`, **End:** `0x107920000` (Length: 24KB)
+> > > 3.  Start:`0x14535a000`, **End:** `0x145b70000` (Length: 8280KB)
+> > > 4.  Start:`0x370d000`, **End:** `0x3710000` (Length: 12KB)
+> > >
+> > > After analysis, we believe the root cause is in the handling of chained bios, specifically
+> > > related to out-of-order io completion.
+> > >
+> > > Consider a bio chain where `bi_remaining` is decremented as each bio in the chain completes.
+> > > For example,
+> > > if a chain consists of three bios (bio1 -> bio2 -> bio3) with
+> > > bi_remaining count:
+> > > 1->2->2
+> >
+> > Right.
+> >
+> > > if the bio completes in the reverse order, there will be a problem.
+> > > if bio 3 completes first, it will become:
+> > > 1->2->1
+> >
+> > Yes.
+> >
+> > > then bio 2 completes:
+> > > 1->1->0
+> >
+> > No, it is supposed to be 1->1->1.
+> >
+> > When bio 1 completes, it will become 0->0->0
+> >
+> > bio3's `__bi_remaining` won't drop to zero until bio2's reaches
+> > zero, and bio2 won't be done until bio1 is ended.
+> >
+> > Please look at bio_endio():
+> >
+> > void bio_endio(struct bio *bio)
+> > {
+> > again:
+> >         if (!bio_remaining_done(bio))
+> >                 return;
+> >         ...
+> >         if (bio->bi_end_io == bio_chain_endio) {
+> >                 bio = __bio_chain_endio(bio);
+> >         goto again;
+> >         }
+> >         ...
+> > }
+> >
+> 
+> Exactly, bio_endio handle the process perfectly, but it seems to forget
+> to check if the very first  `__bi_remaining` drops to zero and proceeds to
+> the next bio:
+> -----
+> static struct bio *__bio_chain_endio(struct bio *bio)
+> {
+>         struct bio *parent = bio->bi_private;
+> 
+>         if (bio->bi_status && !parent->bi_status)
+>                 parent->bi_status = bio->bi_status;
+>         bio_put(bio);
+>         return parent;
+> }
+> 
+> static void bio_chain_endio(struct bio *bio)
+> {
+>         bio_endio(__bio_chain_endio(bio));
+> }
 
-For the record: I only had a handful of 3.5" 1.44MB PC disks lying around for testing, but I don't think it will make any difference.
+bio_chain_endio() never gets called really, which can be thought as `flag`,
+and it should have been defined as `WARN_ON_ONCE(1);` for not confusing people.
+
+So I don't think upstream kernel has the issue you described.
+
+
+Thanks,
+Ming
+
