@@ -1,131 +1,99 @@
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC881221F0A
-	for <linux-block@vger.kernel.org>; Sat, 22 Nov 2025 22:47:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8AD0F9D9
+	for <linux-block@vger.kernel.org>; Sat, 22 Nov 2025 23:49:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763851677; cv=none; b=JD89Z5Vo1JfTWoUoEsURDF2B+gwxQCOMzZO/riljx3x4pw5LZjekQ0O/ll4p4B66gKU0VxXhmXzGUiT86bOdDh20q7cSeIJkY62YDedPtSBnwtxT7/XenmwQeABg4vjbVdGwznqDjUc80E0lxFsRDU7kf/QsbdDW4O/SmVdKyQo=
+	t=1763855365; cv=none; b=VMZNyYLSP3E7qqWEAnXOxjMOwazi4LyWXz4d2f2r5n3ccsY/GTDHeoj+ySifWRji0imRW3xtMmQEtdcp92wSAmcf7kKiM4jboz/f1MYZGz5AX3zbaPDCFX2ijUwkYknz0+aIYWlxHVfabOJ4pLm27sD1mYTtd9L5wHE+PkipfAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763851677; c=relaxed/simple;
-	bh=mDmOqDRRV1GxRTkt03uYnfvm5YBI/u/mWZasnkUTwrI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eqMx0ATyO9eAgm8yyaWYKa316lAasp9AImXBB5EGKXCeeSXxQf6MQd/UumainAb4Iu9UX76JRovqr0gqQVba13R4uIIw+3Hpi1Qx56uV44yywl+C0spky1Iaggv5yfjMP3t5pmFvqMa16qo6nz4qgTSrgsj0vkqH1KKrL2gyd4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m4EYqLjM; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1763855365; c=relaxed/simple;
+	bh=SxkaGFZiEyjaDXsfQ3YzJYKoAByRV7CVdKBdh2zTqPg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QDNlJHRd7WhmgxLPlk4B6vJ3pCPc87d+E7MCir8Rpj35JbaEADxkE74d7Bds2kD+JUKTw4Rm78n5IskplS96D3X2pPmpz1xcDZIJvdUu527CT5V1sd4q6OBbAWsV8h4Md+fscX+HmtfHAxwHIE3krgf9IL3ozLanpMvaSbUNxNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=MjotCAy2; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m4EYqLjM"
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-595819064cdso4439229e87.0
-        for <linux-block@vger.kernel.org>; Sat, 22 Nov 2025 14:47:55 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="MjotCAy2"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-29806bd47b5so19407785ad.3
+        for <linux-block@vger.kernel.org>; Sat, 22 Nov 2025 15:49:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763851674; x=1764456474; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mm9cJVhutkedd51ycbYwKmMqp19QwPFiX/ffFg8rVcg=;
-        b=m4EYqLjMnZAClasW5oW/RKRiG7pn1i/2sd87a2+bGT5arzuzX2s9OWunw3ssNpcdIL
-         Rt3hNDSuFUBrtfbXvhjdipl2gBlBuevvx/2V/Sci3GW099P+W5/rd7vFyuWpyVXP1yQP
-         MK62n9rzpZxAKODtmj7axGjtZm2iPhssZ7V5ietC61jcOyFvK9Nmes+GYZJ0bfVVY9W3
-         HhsNbNtfDCgWUxgyoFMe3TEbEmFHKPlLJzBCay6GBLVkLziLLWupjzRTYCBTQvVTCNtC
-         PCE0gN7ui5o9znFYb9NWADBrbgacrALeEnX1YBs7J3e4rCG9ErcZLONAjVpKnh7gKzq8
-         xDnA==
+        d=chromium.org; s=google; t=1763855363; x=1764460163; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=UW+eRDPoYF+KU6Xqx6zCWEO1tEVVIaZy0NmGDfMcUDM=;
+        b=MjotCAy299chgGAXq30l1doPKW279Ovgswd1+zyDwyoDI0stT7uk9Rj55CYcnaigSF
+         sqQVcOowX9DaMDenY/8R7cugzv019qr2dxUib5kxkUA4r39N6dFcpeKigVk8mSY/RS7g
+         t583Wf2ROfjgo4H/rHgzFiR4MKEgs6RhXgxqE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763851674; x=1764456474;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=mm9cJVhutkedd51ycbYwKmMqp19QwPFiX/ffFg8rVcg=;
-        b=PH/IdBFb3ffrKEG9zZJSDq0wfnfguacaiWhoAB2Q7ZBBxv6JqoahQRCxzVpNJnB2Pr
-         yJdDs67S6yH9F2jxnYoMayNHiSB4qxrzUIntH2AkR2QuyhVtHIR378c1YUz3vtpL5MUM
-         2Nmtz/TqyUAFiSBS1nhgx+HADSOxTf9mKia4ErTIRXgT07pvjNJpraNIJ83OiLs+82Kn
-         X28uotHTIjS/sbXDZdSWLBBQ9/3wPwQQLXKo7k/Uc1UpB/7mVxkwv9DEN7euMdI/ULAu
-         TSSpjH4ZjfULluCBzG49UzSRtMBpMR3pvcadduBiQp2h3iqiMiqPLXwyG9UeBiBg8/CR
-         2HXA==
-X-Forwarded-Encrypted: i=1; AJvYcCWKYX6/2K5XwfTHLeb+UdbDF3eiA2RCU0hm7lNmZ82Xt7ECP4RjYtXt38fLai6FnB5gLseukAqk6LEVpA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxTu0XS9HNM2s+w0aGiScTcgrDaljUFh4gVr2tANnEOoZimfVB3
-	kVrS/l/KG7Z0/Pb5nOkSxgFn4x0yzH/+BfZwDO1jBbBRwSTzUB3ip3Vr
-X-Gm-Gg: ASbGnct4s6dSEQ5isn0Hhxzp8vvm8yqg7oFlF6GzdYsxC8fm1zgqr9t45LmIXP/tgeP
-	KA+GE0hswvbZeV4ZpbI+MhAs8+tAhE944HUPPFXvqe0eywfh8OpysnRVNY1gTWsjqLHhlaU6ffU
-	nUO3CvORR1R7CNlpzAobU3aI1I+hqkxINi/GK0wUs2FUYjKKGpi9+OTfD9fG6kzlHIWsOj5z+6e
-	PTNcO7BBbpS7fTQw8g1JY09b34/FZOZdtaBnwrdwLmaHUkzeap1yqagEjTrAJpbOaSf7jCKQdpt
-	Rnr10LZUBmE3KhNgNjsPBpztBK+sNrIojbvlCJhXJTZ5cbTM9ZFqQwslioj5OAa+JHsMgaxEFEK
-	n5eL8WCEgBg8NQuyKTxUhA8M5kIpw8fDoYP36gqNxSmhBkhqd5Z2no7tsmFHiwDKao54IsO42MU
-	QbTzjZwp+xKg==
-X-Google-Smtp-Source: AGHT+IG25dEQnHwaBToxpvBjTeZ/3RB3yCymIb0k9rzfOt31nS8ruDCrSu8IePguUMWt0EMXA9m5xw==
-X-Received: by 2002:a05:6512:308c:b0:596:a000:596 with SMTP id 2adb3069b0e04-596a0000a2bmr3428587e87.10.1763851673743;
-        Sat, 22 Nov 2025 14:47:53 -0800 (PST)
-Received: from localhost ([109.167.240.218])
-        by smtp.gmail.com with UTF8SMTPSA id 2adb3069b0e04-5969dbc5988sm2742367e87.78.2025.11.22.14.47.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 22 Nov 2025 14:47:52 -0800 (PST)
-From: Askar Safin <safinaskar@gmail.com>
-To: mpatocka@redhat.com
-Cc: Dell.Client.Kernel@dell.com,
-	agk@redhat.com,
-	brauner@kernel.org,
-	dm-devel@lists.linux.dev,
-	ebiggers@kernel.org,
-	kix@kix.es,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-lvm@lists.linux.dev,
-	linux-mm@kvack.org,
-	linux-pm@vger.kernel.org,
-	linux-raid@vger.kernel.org,
-	lvm-devel@lists.linux.dev,
-	milan@mazyland.cz,
-	msnitzer@redhat.com,
-	mzxreary@0pointer.de,
-	nphamcs@gmail.com,
-	pavel@ucw.cz,
-	rafael@kernel.org,
-	ryncsn@gmail.com,
-	safinaskar@gmail.com,
-	torvalds@linux-foundation.org
-Subject: Re: [PATCH 1/2] pm-hibernate: flush disk cache when suspending
-Date: Sun, 23 Nov 2025 01:47:48 +0300
-Message-ID: <20251122224748.3724202-1-safinaskar@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <c44942f2-cf4d-04c2-908f-d16e2e60aae2@redhat.com>
-References: <c44942f2-cf4d-04c2-908f-d16e2e60aae2@redhat.com>
+        d=1e100.net; s=20230601; t=1763855363; x=1764460163;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UW+eRDPoYF+KU6Xqx6zCWEO1tEVVIaZy0NmGDfMcUDM=;
+        b=hIWOpVmd1S8hptTckON//6/wkeA1J/1S87/1X1MPL302ES0Q67HQdYoaknWn5HFqjW
+         hHldFrum2BKHvYSWSWW9BfBcIW8ht/p4Fe+0zr/L3riMRQOghL5GuI7KaSDmdCc1dbYL
+         yTmEEnmnliFl+9f2rz425EMPZpegZKviFRBdzdAGbud4w+/fdIMkENS7ARovC4Hw32pO
+         s50q9kPEcjZwAF9ZtxmbJmWYvBi4AQzOWOtimq3xsc0D+iBfYrVNqlXkRehHCVIxVpNe
+         3m6PME7cYgKjBlDbJLbCIa0GiJLh7gHKXvt4mi+tjJtPAbmkb8w54NgsqW2suhlCfM61
+         7T/A==
+X-Forwarded-Encrypted: i=1; AJvYcCXGeJCQdCcDHFky0D+HXIaRtEOzNZOLdBDfVt7a2lrqbn0BRVxHR15Q1d1H539FX6g3JcadqwpICX9oGA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyncMcob5e9zrlWE4u74AR86NmhTmOlvJScoaA/YbVdLaNngaSG
+	gVy5rewPsIPycf6Wo+dnIUI04dnbma+l8vUGXWYddHyGIfuC8jO0gNXdssspdkwHSvbcQPBKFfw
+	Y5Lk=
+X-Gm-Gg: ASbGnctJuZ41q1jTN+8bUjSj35dY+wF/TU2Aca6wdxTcg+EXIF8un2NEwr73xlmPex1
+	4kPkGajKIINW0KUgnER+DgPYjEeuh0X3QhqVhczuqcipw49CVUFrNLiUbB6edbmWZPZ/VLo/LOg
+	P1pj7zVaMJeUqf0zpUNgMZp9qRA3jaCRP3SuI9PsysWkPmT/U3qrG9De+/MouxoicO8exsY8A9R
+	sXXlh0Lvy4IXzQEsM6j9jsdSJufQTH869Fk0jIbuORNPXs4qsTlJCBWbSre/9jgGCDEQ0o0acGr
+	/mgUNqn9GdhvFDgaabyNFYcsJNPPYoZh923hA3KjLypnFSOAwsDmdiJO7Gf/YaIEj62yIKDDBYB
+	BExCV53LsCqCoQz10v4DmnHuBoyHEHvz2RKmzK0harnDJlIFBnRMYmvcte4x4IkaI6MsmBcAkR/
+	RRJA66ULxejlJJJRomDNNnnaQ/tXix3amDCj77YXktgAPldj5meg==
+X-Google-Smtp-Source: AGHT+IH4jcS+xtBExdkrUh/PqxDOHrrG0hrcKbrp/NkX8lIW/tOBtidSFRn6HKRqk6RmeBK/ozSTYg==
+X-Received: by 2002:a17:903:40ca:b0:299:dd98:fac2 with SMTP id d9443c01a7336-29b6c6b2646mr95443735ad.54.1763855362961;
+        Sat, 22 Nov 2025 15:49:22 -0800 (PST)
+Received: from google.com ([2a00:79e0:2031:6:296e:57d:751e:5598])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29b5b25c20dsm94265595ad.59.2025.11.22.15.49.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 22 Nov 2025 15:49:22 -0800 (PST)
+Date: Sun, 23 Nov 2025 08:49:17 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Minchan Kim <minchan@kernel.org>, Yuwen Chen <ywen.chen@foxmail.com>, 
+	Richard Chang <richardycc@google.com>, Brian Geffon <bgeffon@google.com>, 
+	Fengyu Lian <licayy@outlook.com>, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-block@vger.kernel.org
+Subject: Re: [PATCHv6 0/6] zram: introduce writeback bio batching
+Message-ID: <wdju2lsmlwvz7oqaku5xe6gl22t3pdbgcpgkdcxxeqavwxgc7o@4bmil6a3zsgp>
+References: <20251122074029.3948921-1-senozhatsky@chromium.org>
+ <20251122135406.dd38efa8bad778bce0daa046@linux-foundation.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251122135406.dd38efa8bad778bce0daa046@linux-foundation.org>
 
-Mikulas Patocka <mpatocka@redhat.com>:
-> [PATCH 1/2] pm-hibernate: flush disk cache when suspending
+On (25/11/22 13:54), Andrew Morton wrote:
+> On Sat, 22 Nov 2025 16:40:23 +0900 Sergey Senozhatsky <senozhatsky@chromium.org> wrote:
 > 
-> There was reported failure that suspend doesn't work with dm-integrity.
-> The reason for the failure is that the suspend code doesn't issue the
-> FLUSH bio - the data still sits in the dm-integrity cache and they are
-> lost when poweroff happens.
+> > As writeback is becoming more and more common the longstanding
+> > limitations of zram writeback throughput are becoming more
+> > visible.  Introduce writeback bio batching so that multiple
+> > writeback bio-s can be processed simultaneously.
+> 
+> Thanks, I updated mm.git's mm-unstable branch to this version.
+> 
+> > v5 -> v6:
+> > - added some comments to make code clearer
+> > - use write lock for batch size limit store (Andrew)
+> > - err on 0 batch size (Brian)
+> > - pickup reviewed-by tags (Brian)
+> 
+> Here's how this v6 series altered mm-unstable:
 
-I tested this patchset (in Qemu). It works.
-
-Here is script I used for testing:
-
-https://zerobin.net/?66669be7d2404586#xWufhCq7zCoOk3LJcJCj7W4k3vYT3U4vhGutTN3p8m0=
-
-Here are logs:
-
-https://zerobin.net/?5d4a2abbad751890#WMcQl4FAZC9KqcAuJU3TSVr7wuVnPFwI7dlinA9QHOo=
-
-Tested-By: Askar Safin <safinaskar@gmail.com>
-
-There was no any reason to wait for me. You could easily test using script above.
-
-Also: Linux shows this scary message when booting in Qemu:
-
-[    0.512581] sd 0:0:0:0: [sda] Write cache: enabled, read cache: enabled, doesn't support DPO or FUA
-
-So, FUA is not supported? Does it mean that this patch is wrong, and works purely
-by chance?
-
--- 
-Askar Safin
+Looks right.  Thanks!
