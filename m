@@ -1,136 +1,129 @@
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DFC62D0292
-	for <linux-block@vger.kernel.org>; Sat, 22 Nov 2025 10:07:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C0BD2848AA
+	for <linux-block@vger.kernel.org>; Sat, 22 Nov 2025 10:28:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763806066; cv=none; b=rNUSqbkgta7CzzG09+l37Oj9UZ1WTUfXBoqDJO2BeaUfLGDUTlyeUD4P0kKkRAHINAZ1aj34ziSk+Dv+8Df6Rpgco0PqxTmq0tOqA4vJk/GhG6hbuk7YVEuw9pqrQohZvMYs25RVKZHYb5pSCPxtMccN0uBnkSAeBvMyMHnQw7o=
+	t=1763807332; cv=none; b=s0OquD1u67CJwowNuItLu7ZPEPrtQ55Vi7wDMCzXatA5zn/x59v2vPn39HTlOFx5JgsR8CwSz6hcV715nAC+BIqFnrNx9jYtL38L+BYlSJn+gGwjcoicoaHhIyh/BLooNojTjtB9i6UzaFzlfofEzFZu4BFazscoOOLJo6pF0iA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763806066; c=relaxed/simple;
-	bh=YC6JASOKhDeq+v1c3niPp2jV/65g8GLXWjzEC/6bKhw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NVxMipDtOL/G6HgjlbdzwETSUSAoat0Zsw9ZhgGo8ZqMLhIaC3sIU6Susqy50hm/FxQwLW+xZ+gPOh1wAGmXZ+l9QdgTAjnKwVgtY9OX9bBRQ4DQKGiqahu8p8wWDDPW24agAWnYbdkzcB2zPnERSUqG5zqKcy817yz98vqnuSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=Y0ks8rgh; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1763807332; c=relaxed/simple;
+	bh=iySq58Lxfld8udENzmzwD01KWqtTxbFvsCk44McFfHs=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=XF7IKthjTGN5SGF3dOkxVCrgbSEISwRM7wmLjctyfN3krm5SMYcW/6fqp53h4BWw/jyBJ6pN6bgu4VHGa2LCxNK6Wupb2+HEtYi5xW6EZzdv68offPu58hbzsOLJRHLNpEhym6pRRcQwTOLLkrNm12zEDrKYxgf8IxPJGDkwvck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eXCkgCj+; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Y0ks8rgh"
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-340e525487eso1878855a91.3
-        for <linux-block@vger.kernel.org>; Sat, 22 Nov 2025 02:07:45 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eXCkgCj+"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-477b1cc8fb4so16645675e9.1
+        for <linux-block@vger.kernel.org>; Sat, 22 Nov 2025 02:28:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1763806065; x=1764410865; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mQ4gPN6s8Xd/11O+MQ8+DSVbaktr3U4P884klWVkPdQ=;
-        b=Y0ks8rgh5GGKxYkvTxmejFyxGsMTQy13IfH1PxgP8XdEyttE3SMNUDaXCmLLhw7j0o
-         wBio9RCptwC3+UzE1GgHXJC6kgDZxQrENuWQ/Um55cEc/LVf4FsYMYkYcnk7KSjQemJb
-         Ld9WukOshNpiaUK7AVVWJ6O5rDycokfchLN4A=
+        d=gmail.com; s=20230601; t=1763807327; x=1764412127; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:subject:references:cc:to:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=iySq58Lxfld8udENzmzwD01KWqtTxbFvsCk44McFfHs=;
+        b=eXCkgCj+Sg3JSER668/MoSsvS9/9e0lJ64FcBSiOhc+Yzpa+4Jq29xzs+W0SepW4B9
+         OpgMOczWcRSZtwOSpKHNJqIS3dKMWZYrLe+L3W1nacf/7rsfgdS0mwKRqhSPf53LtncO
+         caMF75TOt4LgmAKPavvPdFU9qTO47G87eNGtdRw1gRJ99rmm40apbXQk1thG2J2MGKGv
+         EsrIfYiUiQDTmvM3wyjh4JPKKw8UcSKyWH38m7OIVoEXXNR9gidVtJ58nmpO9QuzMqpp
+         PPUcmT1C87cBHEOvrEM6G1gxhshfjTCETQCYW/rFnx7xcTXrlLwLXXxtmuh3AY8EYeY+
+         NBjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763806065; x=1764410865;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mQ4gPN6s8Xd/11O+MQ8+DSVbaktr3U4P884klWVkPdQ=;
-        b=qyxo5Irpj82F9nyBvYMwsGi8d1ECJaWnecPPgx0ogKF++FSWx4r97IpkIfCBrqr7XW
-         3lgWE6MsQSUGiMOdbcSZOPAK5b5zlPutMAzhERWy+WHDwE2i/2I7SB94jgJX9fQMFVOw
-         LkZBky8lvlpr75eyFKme8Q0aCo26fKtUW3rOf8UJapVqdXG1w4ndZQMFwxlL2KsgNoWJ
-         dutu6HG7RHJhcWEWV+7n4Uh8iHIUlp72hnO1nQTkeuCOk54E8JgJRtj0nbSPRnVeFLQR
-         BHE7jq1hkTZl7FBZCy1AW2RQHZMWtycbBmlRB+lmrpCwHgtWIPoC/C8LRoKTMjsaD0tn
-         GyHA==
-X-Forwarded-Encrypted: i=1; AJvYcCV4MM59deN4bBPCrHbJj+dhGb4pPOFiCnytReAxXUdRsVSFqioDmBR9/B7zrkAO0LakX3KHgTZFoYvjSQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw5q0YZl2T2P5oOIKrpHzujoQk4Xs/Ixnj3Kw6YzgcIKmRGz7De
-	zExgn+k1qRScwYCJt/cM5GPSdbWX2Zp/bi6N/rolGVQSi1+0vNpFKPiEoskfZMvhJA==
-X-Gm-Gg: ASbGncsRglgz7Q1eD07CVOE8PsHia5mpLTju+yrLXeX3DpziHftGLyh7nPkSZ/hGv2A
-	4OP0wQ6fkxMILRUteMIdK1EE/K4tsmRte4dfwSULsjDVFmIAkpqkV1BPNjU4oyg9HJKxRyd8AbK
-	XhoFwYucnOvOBhlCjXNE5pNfSLowgp1kKtfS7LpltPPisXGvyh2PZNuhaIIQWtJ4JVMWP2STtqx
-	RMcUlPUbXZ/n0CxVvPdUnthjK5Jo+V5aPEIFvU0bo3vZ71dp1PotZbO+VSC3J5AWlTGb9C4YEgE
-	JWjrjfBRmBjBQK2+lYhwheaDWZv3mtre6+zINedclZJFPOuKp1V9gV9SBzJtiFelQtFW5aft765
-	lOi2cdIDy+17j1UKIimIww5VMb7RD7cY2NriXrZuYy+8Ui5zKyek909jDkQpt2B5EBZRIqc+R80
-	UFDuZVrz7RhYa+76HbsaaAiKPqfeGe5sVDU381MEfd/yI5+FElZoE=
-X-Google-Smtp-Source: AGHT+IF9STMF1f3EeytoDQYWwe6bTpFK7Jtci+bPHUYf/65uMEfrVs9GVfGDvjF8U9gEVKfwR/cOkQ==
-X-Received: by 2002:a17:90b:384f:b0:341:8c8e:38b5 with SMTP id 98e67ed59e1d1-34733f3e483mr5344655a91.25.1763806064741;
-        Sat, 22 Nov 2025 02:07:44 -0800 (PST)
-Received: from google.com ([2a00:79e0:2031:6:948e:149d:963b:f660])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-347267a1231sm8047177a91.6.2025.11.22.02.07.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 22 Nov 2025 02:07:44 -0800 (PST)
-Date: Sat, 22 Nov 2025 19:07:39 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Gao Xiang <hsiangkao@linux.alibaba.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Yuwen Chen <ywen.chen@foxmail.com>, akpm@linux-foundation.org, bgeffon@google.com, 
-	licayy@outlook.com, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, minchan@kernel.org, richardycc@google.com
-Subject: Re: [RFC PATCHv5 0/6] zram: introduce writeback bio batching
-Message-ID: <kvgy5ms2xlkcjuzuq7xx5lmjwx3frguosve7sqbp6wh3gpih5k@kjuwfbdd2cqz>
-References: <ts32xzxrpxmwf3okxo4bu2ynbgnfe6mehf5h6eibp7dp3r6jp7@4f7oz6tzqwxn>
- <tencent_865DD78A73BC3C9CAFCBAEBE222B6EA5F107@qq.com>
- <buckmtxvdfnpgo56owip3fjqbzraws2wvtomzfkywhczckoqlt@fifgyl5fjpbt>
- <8c596737-95c1-4274-9834-1fe06558b431@linux.alibaba.com>
+        d=1e100.net; s=20230601; t=1763807327; x=1764412127;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:subject:references:cc:to:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iySq58Lxfld8udENzmzwD01KWqtTxbFvsCk44McFfHs=;
+        b=AhL2x9P6Z4c+EWyXshVd9VKffY1nEN8QF8TefJu/7j8srkctKAnRYpZUOMoSmSQmO5
+         LoMyEjYP1FpmepKddrrLHMPvTaUtJSu7JAS9JuZtgV200BdvirSgjPXvYaEv7WKPn1hX
+         3AVjc1DkkZZhZDKLymToGNOfNhBu3DoO1oF/m6NwHHycMQDo8YLNHWLox7648v3140no
+         I1v9E59iMO/BQ0fNdUqH4Od35S+4M9gumQmPJcc0hl55AcGRe8WQ/nnSv2uRYk5wUeU1
+         NbtKqIETuVllmL7K6wvApt0aUU4i7i8ZRdZLYgV0MxXKXy34JLdDU5x6h87119kZ2W4F
+         kRWg==
+X-Forwarded-Encrypted: i=1; AJvYcCU2yYwSoVu9bGUGSxRvCsTBarhCQ7CQosdOAD9LuI/qj6xGtkDJoFk1J1s0yNxrRpRen5fRalhpJ/Xb5A==@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywy4VckX8nvTnyJ0BqQ+aOTkXTG9ERcBs9kqeTaezsoE5NXXMMl
+	AodImoRCHRHmC/fLFD1ZA4WD67j+nXiLAbRrfhJHNLySijboFlFZh6vO
+X-Gm-Gg: ASbGncsGP1Fr2IsLDiCLRr4+s4Ba7EXteFoZjCzfOrQy6Ylm4tW0Av6yhQa6KOiPil9
+	aHkkzY4jauXSRucWUvQqODonOLbLiSGqqmzGmF1cXw+LFXtMCV2nxLtWnM6U/0bMAlR7Ksgd5xZ
+	JUSHFOUCNYowsfgKvp436eSFUUercMb1xHbkjXH+02Jdm0zN/3P0N8MkWNLgfndu8gDxFtWEmvm
+	Z3GkooR1IfpNgb/5mxL62WPtBZ4jjls2lEfe2t+ir9A+4BuZOjDkucna4bMPIp9Goxqb60Ui7uh
+	vVCpmRictmvU2aC9rjNjn/m2wcep+F6+bTnAWycZyNGck3R8QiAjRhRSQ3w42qjySyqfbz6tT0b
+	4DcHHkJmIkagTsN3mgB4pXBfNHEyL7PtA5v7cnTR+AYa+1I7KwmK8doKe+gfuDkhR/u/FV2nSYX
+	P42lshH0IA7FDoevy8Sm3Xkkb8Pf51OfwGwxeV04MAiXcpqP1ZmNojKxKS
+X-Google-Smtp-Source: AGHT+IEZ1TPSuzVZ+M10PT6f48UHg7uZlgCS/jOlWJf9pDjCbYrpdcX4dNWueIQk/WSIW5o0InM4kA==
+X-Received: by 2002:a05:600c:548b:b0:475:de68:3c30 with SMTP id 5b1f17b1804b1-477c01c0c91mr59121485e9.16.1763807326741;
+        Sat, 22 Nov 2025 02:28:46 -0800 (PST)
+Received: from ?IPV6:2a02:168:575a:f00d:ecda:ab22:8304:63a1? ([2a02:168:575a:f00d:ecda:ab22:8304:63a1])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-477bf1df334sm87486425e9.3.2025.11.22.02.28.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 22 Nov 2025 02:28:45 -0800 (PST)
+Message-ID: <2b67964f-22f0-4d38-9df0-fe50b9b9436d@gmail.com>
+Date: Sat, 22 Nov 2025 11:28:44 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8c596737-95c1-4274-9834-1fe06558b431@linux.alibaba.com>
+User-Agent: Mozilla Thunderbird
+To: rene@exactco.de
+Cc: efremov@linux.com, linux-block@vger.kernel.org
+References: <20251114.144127.170518024415947073.rene@exactco.de>
+Subject: Re: [PATCH] fix floppy for PAGE_SIZE != 4KB
+Content-Language: en-GB
+From: Gregor Riepl <onitake@gmail.com>
+Autocrypt: addr=onitake@gmail.com; keydata=
+ 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
+ qAI1ww==
+In-Reply-To: <20251114.144127.170518024415947073.rene@exactco.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On (25/11/21 20:21), Gao Xiang wrote:
-> > > > I think page-fault latency of a written-back page is expected to be
-> > > > higher, that's a trade-off that we agree on.  Off the top of my head,
-> > > > I don't think we can do anything about it.
-> > > > 
-> > > > Is loop device always used as for writeback targets?
-> > > 
-> > > On the Android platform, currently only the loop device is supported as
-> > > the backend for writeback, possibly for security reasons. I noticed that
-> > > EROFS has implemented a CONFIG_EROFS_FS_BACKED_BY_FILE to reduce this
-> > > latency. I think ZRAM might also be able to do this.
-> > 
-> > I see.  Do you use S/W or H/W compression?
-> 
-> No, I'm pretty sure it's impossible for zram to access
-> file I/Os without another thread context (e.g. workqueue),
-> especially for write I/Os, which is unlike erofs:
-> 
-> EROFS can do because EROFS is a specific filesystem, you
-> could see it's a seperate fs, and it can only read (no
-> write context) backing files in erofs and/or other fses,
-> which is much like vfs/overlayfs read_iter() directly
-> going into the backing fses without nested contexts.
-> (Even if loop is used, it will create its own thread
-> contexts with workqueues, which is safe.)
-> 
->  In the other hand, zram/loop can act as a virtual block
-> device which is rather different, which means you could
-> format an ext4 filesystem and backing another ext4/btrfs,
-> like this:
-> 
->   zram(ext4) -> backing ext4/btrfs
-> 
-> It's unsafe (in addition to GFP_NOIO allocation
-> restriction) since zram cannot manage those ext4/btrfs
-> existing contexts:
-> 
->  - Take one detailed example, if the upper zram ext4
-> assigns current->journal_info = xxx, and submit_bio() to
-> zram, which will confuse the backing ext4 since it should
-> assume current->journal_info == NULL, so the virtual block
-> devices need another thread context to isolate those two
-> different uncontrolled contexts.
-> 
-> So I don't think it's feasible for block drivers to act
-> like this, especially mixing with writing to backing fses
-> operations.
+You can add a Tested-by: from me, if you like.
+My Ultra 10 can read floppies again!
 
-Sorry, I don't completely understand your point, but backing
-device is never expected to have any fs on it.  So from your
-email:
-
-> zram(ext4) -> backing ext4/btrfs
-
-This is not a valid configuration, as far as I'm concerned.
-Unless I'm missing your point.
+For the record: I only had a handful of 3.5" 1.44MB PC disks lying around for testing, but I don't think it will make any difference.
