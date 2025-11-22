@@ -1,121 +1,100 @@
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC7B127144B;
-	Sat, 22 Nov 2025 12:24:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92D89224AE0
+	for <linux-block@vger.kernel.org>; Sat, 22 Nov 2025 13:43:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763814295; cv=none; b=XEk/wubXZL8YwBEBilt0iRsp1glvH5mR2YyfyNvO/ct2nFOA2tbabD1mpJT41lh+tCicIedKbVj0eBixyFnS1JUVYq08rHNgcZLAR/eebWEde3/tGLYgSIzFDkkp2JQMcen1svIhLc4EZicbNLaMee1ejcH1nxLrfEPZwgIuEu0=
+	t=1763819038; cv=none; b=AJsloUHx9TaXXObHWHRxDE2rcwHZvn6an5VqCs1Gz0dqelhZPfc3cEhs/BJUD3bPEk2a28iBUkoIXxP7O3LqSFQEhOgyawAMspNX/RPxEr2DRpA89R+l+JC17dMoqhGaIeefH0DnX7gFKhD7KyHMor7En9FbvlYGEaSSXt6L4xU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763814295; c=relaxed/simple;
-	bh=RDQVVA6kQF5LQw40jyDuW9rNtASfS5/UmHvMsmmPqeI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hHaGHNF0kQzPyUSuXkhYxAiQN5UmwIdJOh82aADDslv3YMO+cYu/wvT27xqLqxIrjZrXx/0SD+ub/uhMnFr0WapsHmgyF7U/Reieo5tUE19/Kp5m0KirVH/oDTu0840kJEl/Mn96jTWmL04NA06IWRVTb1WjRbD5OG54zsjhDGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ss3Nk22c; arc=none smtp.client-ip=115.124.30.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	s=arc-20240116; t=1763819038; c=relaxed/simple;
+	bh=aBd+0zebpJp55IvtTmGEu2d8Ku6AwF+koShb3hRpOw0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XR99snQxohuq4Hnr4ZuiKZuoIDVNr5hXoRryHG8r23fosGb7Zl4VWX/l2w+zogxR9lDg1pUi2uLN0mqQnFRy9RQBOevvshLHwCVRZCg1j/ZMiaEGF3eZ9qt3owjd6cW2fKxQ7m/N0G0ipHDso85pnJKkpXy+Xq7ZV4Xj8AR1ANg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=N4fLoF6M; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ss3Nk22c"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1763814282; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=QlWKRfdPev+JE8xmARtuY3t4ko4RyH2k7HvUC9+LEHw=;
-	b=ss3Nk22cEV4HH7Af2fUMZQGlq7Ypg1P38UrnSy0DW+EWLahp6M2P4SAb8b3pRn9H+8oP4tZhgx+vh96xhccDRUY1rChEdBjDhIl/Noay+e6aabWsrl8ZhSmsfMa4zMIuoKpbEojBF/yYJBe/puuCxrruxPxpaM2liHLNc6vfu4U=
-Received: from 30.170.82.147(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0Wt4IUZV_1763814281 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Sat, 22 Nov 2025 20:24:42 +0800
-Message-ID: <853796e3-fd44-4fc2-8fd2-5810342a6ebe@linux.alibaba.com>
-Date: Sat, 22 Nov 2025 20:24:40 +0800
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="N4fLoF6M"
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-34381ec9197so2646551a91.1
+        for <linux-block@vger.kernel.org>; Sat, 22 Nov 2025 05:43:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1763819034; x=1764423834; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=skEifoSnF8Rut80XhCz/YHjVueIg7ytLGu1hExe5Elw=;
+        b=N4fLoF6MfGOtCHDtM6EQmkBtxqpwu1zUND5uVsdHDF+Fm9l9sykmun9NzAM+BZnQjY
+         6ranpQH84hTbPOVcDTWp0tv6mXI4pHMWzimuaDhXwY63eAWbU7zVRAH+WXZbJKM24wF2
+         6XYqmGGyBEhVQ6fKiSYdcBxxNwi5Kde/D7HJc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763819034; x=1764423834;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=skEifoSnF8Rut80XhCz/YHjVueIg7ytLGu1hExe5Elw=;
+        b=FTZP3s+9QGW+IusJ8D7CcAPtXw+jaC+Z1/R1Iz3Es0F3dh/3HKxjIaTBt7SSN3UOJ+
+         w6h8v6OWjI5LikKzFqjQwq3X8u3In7c7Lb635paS2ga8xCYcsqDaqlKSeUGm5fNXGGlL
+         b4LeSr4q5WYLNY9HArrNwIapoGVRCw/QZhHT7Y0tNArRqqzZ8lFoOCXSdCFKOX8ar54J
+         gScM0dh9fo+wWMCpEQswI4EEfXOAVj70Q5hZZiPosMsM5QavZmTttU5sugD3zljzJDOE
+         L00sklGi+Jm2K/n0SGis65Xo1rcwzXD2O+guDWBkRPUNhRR4/wCAc/q7idIbctX3OkSI
+         QAJw==
+X-Forwarded-Encrypted: i=1; AJvYcCUUuIFKxQyBe7zt8MysN5RELi6h84RT8vFaYxfG7kye0OeRFgYicp+3pMdus51nKWgYaXbn+8QBZSzo3g==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyp3Z4s5WgrfgONM4isugtYSqUJPZXM1GRYGLcsyNnoFJaZYyBl
+	M9QyUMcDbAWO+Y+O9h+NIZwXu7NW1wgFr9N6pRpmQDlYNDHsdW8OY64H1h3EOTXmwQ==
+X-Gm-Gg: ASbGnctrG9Q5rQLRBb3eFHotxoLA618DOhykF0+xA9ymi7/4I3PKFLCO0NlPs/a153N
+	RYM1IFcquol3HD3EIRf1T07xH/gi/equEz41VDxHDSAHJyAp25uPK38UthPHj4qqTwXzx9T4RRz
+	YYaR6b8v44mrepJq+5qHmuSgKDPP6CvGXjRpY61Xy5ftFj6prDaaOWLKAc7HVEfexZFiyRIoww2
+	H2WmLIB+F8vVgvfhzcn+iPxM/wxBpdqs0+hbAD+N7n7oGweXraoBYpGUh1thqRvM0j2o9a+LFld
+	QgX2scylhUFnwiqtXeh4ayOf/wvJ0jFLA09X4/sVgfDQRjoT0mxrngUMCzzM/zNkN1Hptto/fHj
+	EC0hl6Fy9T/8vE3GXUR3aJblSQMfbM52Mna+CuDfvVtvyNEXdPc2uAySuw2HPuiRlcNIvGmWtc4
+	ZxfFRDmrQ/VCiv8ZcRQzL5Be0G7RnOrqm0R+yv8zS92fAOYM/lxh4=
+X-Google-Smtp-Source: AGHT+IFEAzXxpBMN4+Cvpnq9Wz3bF/ejan4xQv2Z6/vy+0j3hfTRsuEa6ttfw6fKfrdggqzCKIk7CQ==
+X-Received: by 2002:a17:90b:4ec7:b0:341:88d5:a74e with SMTP id 98e67ed59e1d1-34733f4ac35mr5395298a91.29.1763819033721;
+        Sat, 22 Nov 2025 05:43:53 -0800 (PST)
+Received: from google.com ([2a00:79e0:2031:6:948e:149d:963b:f660])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-345b047616bsm5856992a91.9.2025.11.22.05.43.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 22 Nov 2025 05:43:53 -0800 (PST)
+Date: Sat, 22 Nov 2025 22:43:48 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Gao Xiang <hsiangkao@linux.alibaba.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Yuwen Chen <ywen.chen@foxmail.com>, akpm@linux-foundation.org, bgeffon@google.com, 
+	licayy@outlook.com, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, minchan@kernel.org, richardycc@google.com
+Subject: Re: [RFC PATCHv5 0/6] zram: introduce writeback bio batching
+Message-ID: <ztqfbzq7fwa5znw5ur45qlbnupgepaptzjaw2izsftbtth6zca@db4ruyaulqab>
+References: <ts32xzxrpxmwf3okxo4bu2ynbgnfe6mehf5h6eibp7dp3r6jp7@4f7oz6tzqwxn>
+ <tencent_865DD78A73BC3C9CAFCBAEBE222B6EA5F107@qq.com>
+ <buckmtxvdfnpgo56owip3fjqbzraws2wvtomzfkywhczckoqlt@fifgyl5fjpbt>
+ <8c596737-95c1-4274-9834-1fe06558b431@linux.alibaba.com>
+ <kvgy5ms2xlkcjuzuq7xx5lmjwx3frguosve7sqbp6wh3gpih5k@kjuwfbdd2cqz>
+ <853796e3-fd44-4fc2-8fd2-5810342a6ebe@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCHv5 0/6] zram: introduce writeback bio batching
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Yuwen Chen <ywen.chen@foxmail.com>, akpm@linux-foundation.org,
- bgeffon@google.com, licayy@outlook.com, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org, minchan@kernel.org,
- richardycc@google.com
-References: <ts32xzxrpxmwf3okxo4bu2ynbgnfe6mehf5h6eibp7dp3r6jp7@4f7oz6tzqwxn>
- <tencent_865DD78A73BC3C9CAFCBAEBE222B6EA5F107@qq.com>
- <buckmtxvdfnpgo56owip3fjqbzraws2wvtomzfkywhczckoqlt@fifgyl5fjpbt>
- <8c596737-95c1-4274-9834-1fe06558b431@linux.alibaba.com>
- <kvgy5ms2xlkcjuzuq7xx5lmjwx3frguosve7sqbp6wh3gpih5k@kjuwfbdd2cqz>
-From: Gao Xiang <hsiangkao@linux.alibaba.com>
-In-Reply-To: <kvgy5ms2xlkcjuzuq7xx5lmjwx3frguosve7sqbp6wh3gpih5k@kjuwfbdd2cqz>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <853796e3-fd44-4fc2-8fd2-5810342a6ebe@linux.alibaba.com>
 
-
-
-On 2025/11/22 18:07, Sergey Senozhatsky wrote:
-> On (25/11/21 20:21), Gao Xiang wrote:
->>>>> I think page-fault latency of a written-back page is expected to be
->>>>> higher, that's a trade-off that we agree on.  Off the top of my head,
->>>>> I don't think we can do anything about it.
->>>>>
->>>>> Is loop device always used as for writeback targets?
->>>>
->>>> On the Android platform, currently only the loop device is supported as
->>>> the backend for writeback, possibly for security reasons. I noticed that
->>>> EROFS has implemented a CONFIG_EROFS_FS_BACKED_BY_FILE to reduce this
->>>> latency. I think ZRAM might also be able to do this.
->>>
->>> I see.  Do you use S/W or H/W compression?
->>
->> No, I'm pretty sure it's impossible for zram to access
->> file I/Os without another thread context (e.g. workqueue),
->> especially for write I/Os, which is unlike erofs:
->>
->> EROFS can do because EROFS is a specific filesystem, you
->> could see it's a seperate fs, and it can only read (no
->> write context) backing files in erofs and/or other fses,
->> which is much like vfs/overlayfs read_iter() directly
->> going into the backing fses without nested contexts.
->> (Even if loop is used, it will create its own thread
->> contexts with workqueues, which is safe.)
->>
->>   In the other hand, zram/loop can act as a virtual block
->> device which is rather different, which means you could
->> format an ext4 filesystem and backing another ext4/btrfs,
->> like this:
->>
->>    zram(ext4) -> backing ext4/btrfs
->>
->> It's unsafe (in addition to GFP_NOIO allocation
->> restriction) since zram cannot manage those ext4/btrfs
->> existing contexts:
->>
->>   - Take one detailed example, if the upper zram ext4
->> assigns current->journal_info = xxx, and submit_bio() to
->> zram, which will confuse the backing ext4 since it should
->> assume current->journal_info == NULL, so the virtual block
->> devices need another thread context to isolate those two
->> different uncontrolled contexts.
->>
->> So I don't think it's feasible for block drivers to act
->> like this, especially mixing with writing to backing fses
->> operations.
+On (25/11/22 20:24), Gao Xiang wrote:
+> zram(ext4) means zram device itself is formated as ext4.
 > 
-> Sorry, I don't completely understand your point, but backing
-> device is never expected to have any fs on it.  So from your
-> email:
-
-zram(ext4) means zram device itself is formated as ext4.
-
+> > 
+> > > zram(ext4) -> backing ext4/btrfs
+> > 
+> > This is not a valid configuration, as far as I'm concerned.
+> > Unless I'm missing your point.
 > 
->> zram(ext4) -> backing ext4/btrfs
-> 
-> This is not a valid configuration, as far as I'm concerned.
-> Unless I'm missing your point.
+> Why it's not valid? zram can be used as a regular virtual
+> block device, and format with any fs, and mount the zram
+> then.
 
-Why it's not valid? zram can be used as a regular virtual
-block device, and format with any fs, and mount the zram
-then.
-
-Thanks,
-Gao Xiang
-
+I thought you were talking about the backing device being
+ext4/btrfs.  Sorry, I don't have enough context/knowledge
+to understand what you're getting at.  zram has been doing
+writeback for ages, I really don't know what you mean by
+"to act like this".
