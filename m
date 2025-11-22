@@ -1,126 +1,144 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sg-1-12.ptr.blmpb.com (sg-1-12.ptr.blmpb.com [118.26.132.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 807152459C9
-	for <linux-block@vger.kernel.org>; Sat, 22 Nov 2025 14:57:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6822F242D7D
+	for <linux-block@vger.kernel.org>; Sat, 22 Nov 2025 16:04:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763823434; cv=none; b=LqwbwomZeNID9kh6ePDOlL6AfUFTVq8SJ5X1Un3y5YnKe9+WnW8okUEqPcyDnhETxzaK9rFAMd37wpyfUJcBes8b1rdSPypsjsRon0CaJp+vvZahGoIuBPfCNRDWGN3iE503fVh2RBoekw8r8mLWw/gkp4H4AgPvoKPT+CK86Lc=
+	t=1763827473; cv=none; b=ARG9dg/ZYHCnK3Upwaeqy2qPZVTbwurU9ZNNJTKqV3zSK8TkvY/ypTL3Ai2kfQLvNTR5EX+YfKBq3mghnc0k/dVFVRqo3qy+A26nHT5kmAmB4a8pBiD6AemxlQyjvzlY0YQBp+4lVJ9CwxVrY0cqXGDCmsYeuxHEwW1Uiqyl8ng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763823434; c=relaxed/simple;
-	bh=hFzOPcepuM2226lVzyXCQ+m40VlkuCq0KyoZ7KBoHiA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=I2H4l6drgnBLtM88wJbVJ1z9AT0SLVAG2YRCUjx/8RS6m3jX2VqHwsZeRR2Bs8ns079QBrXwWtFnH4zybOp1RhDZoN2jlzS5Re1feTi7HmAbEl+7zcKAwvRqg4RLHo6d3PD8fDYXYVr2GqTDMHeJNy6ehAqZajDqHPjrIEd0zhM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ww+pl2V8; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=eIUpwg3T; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1763827473; c=relaxed/simple;
+	bh=CP+DOOUsxxAr5t/VfNU4vfTImuW6LnfUGi60HhXLvF4=;
+	h=Cc:References:Subject:Mime-Version:In-Reply-To:To:From:Date:
+	 Message-Id:Content-Type; b=EG0+gv6Qhz+COCKb/7LC+6TPBx102X2KCb0gi8X5T/SdQsKp0OV0DIxnZDjBpfjX8nANKlB94H7AeBkfByqsS30NnS9ujyogSXrIcfUpIvndwno9owvyTDB7W6D4gb2Vi9jzpt6YYKBddswHZp2DZrvTmRUZUY10+CJxDkgKYyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=pass smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=bpVKXDMd; arc=none smtp.client-ip=118.26.132.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fnnas.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ww+pl2V8";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="eIUpwg3T"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1763823431;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AoeYwuTA2OCKqGileGsNd+ysqL+d5N6ZH/jsAbQy4b0=;
-	b=Ww+pl2V8p/Ei8G2LzFV0Deobf6rlBBVDxLzff6He1jfpnj1M04DKWVfZQ+XqvRbOlZmz8t
-	kFxRioFV+A5LnAWmYpehcfFaoxVPGIGVPu3qfIfviRNQhDPPwrdEm5NP+R5X1ZzY9CuqgT
-	8rhuzLn6Usy+xBddmA8twGr0aR66cNY=
-Received: from mail-yw1-f197.google.com (mail-yw1-f197.google.com
- [209.85.128.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-80-zJ83LoqnO2CizYHyGlB3Sw-1; Sat, 22 Nov 2025 09:57:09 -0500
-X-MC-Unique: zJ83LoqnO2CizYHyGlB3Sw-1
-X-Mimecast-MFC-AGG-ID: zJ83LoqnO2CizYHyGlB3Sw_1763823429
-Received: by mail-yw1-f197.google.com with SMTP id 00721157ae682-787ea29b1bbso26921147b3.1
-        for <linux-block@vger.kernel.org>; Sat, 22 Nov 2025 06:57:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1763823429; x=1764428229; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AoeYwuTA2OCKqGileGsNd+ysqL+d5N6ZH/jsAbQy4b0=;
-        b=eIUpwg3TENYqF2cj0uP3AhWKJPeVSJmQPzIP8J5oJWK+SkaEmNWigdDjlsNEXw1rfh
-         +vNENborw5BVXytVoEHHZ9bRt+nJrsnppH+ga8wtSPC8qRnXkCEZHlA9Aq0rFvB9YAd3
-         kdks1ZYh4HuVqWAoq1rct6FdVT0BuNbXpGWqeR2rqX/zSVDbj3wFQlo99cKoW+0AYl6Q
-         1yAtMWquachuYZHU33aLZByiMvWn6rw+EFL3uZ3/W9l86alVE5D6/HUSu4ByJO6Ov1Dz
-         KStmc1tutsaRz/FlYeYX/sEo3P1bJBOIE0S9syZ2ifUutAy1oEVicMQI9aHDsO0+gNOn
-         eFdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763823429; x=1764428229;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=AoeYwuTA2OCKqGileGsNd+ysqL+d5N6ZH/jsAbQy4b0=;
-        b=OoQEEvdsgD6AD8AvnJgIf1vPBCmzzfYozxDTquZYs6xdwiQN1SJ+Dpb4yZAyB4c1pm
-         /+WqjuBLgeBPKVD6l06AySG3I1Pj7ONgf+Y+pv5lrBelG8+5nRd/NlydHczxckfYefPI
-         FHBUNestLyBEROakPiD6fwMXOsRZfe+syh0gke8RLo7gXpaEfiytXaJ1R9TPB0gm3xhi
-         GCE2Q2teWJLEYXjQFBTLW730jERy0sn3fbGRymfdMbHZs/wE+t8i2YXA067CC6KJOO0n
-         16hKjAgQf9ZMgd/0crybKJP61ydBokq+tFCgR5g4jG4NHh01Za/G8jRry7Wi6gNHZO3s
-         Vfmw==
-X-Forwarded-Encrypted: i=1; AJvYcCWxQ5nzn8/ut8zXUu5TC32Oy94cLPImnDUZBUSqhtBneuq4LSYUSUJ3twFd7sT75TB3JBbl7KJTBbHFhQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwkDsabioN30zzvkaN5FJCHXiM/fmDTUA2H+E/ZXgyvWTAXFRIU
-	aWFOty0PWbt2yhTLJkQ38PudpZPXUxs5jbR5X4NIAGqdPz1zqFogAZ0atFjZ6cOGGQclfaiCvbn
-	9HJYq6UaqDrOIUAkl5vkMILEBv0LtfaDooEcBi1bB/Ije3CZ1GPHJ6yKRPKaBTbs2fn18XEgzrG
-	MKGsNmqe7BkE1ZadNNMLJLLEDTEAmYjMdiuoAAoaw=
-X-Gm-Gg: ASbGncs/8jOf/01WuR5u8lu2uz9+AfQLYpUToFrT8dMBTxrsUnP6NcgtemwU0SBcBhj
-	l6GxRLoOnRrk94VSxZdfBx20JwKJKQoz32E4016j099TjNgRp8AFtaQ7uhYBdOD9XLzbLFGEZH7
-	31+4NoS07GwBEuHJxANZAaD44FHwbX/ud11FAH+6zlTrvvuTPCNYWtH2Ma6lDsYd5w
-X-Received: by 2002:a05:690e:1511:b0:63f:a324:bbf3 with SMTP id 956f58d0204a3-64302ab18damr4335092d50.42.1763823429378;
-        Sat, 22 Nov 2025 06:57:09 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFJA7IrsaRMoz4Q/MV8XxAm6kxOszSooFbnuk2I2D2sSCVAvxGo1WW7Hp8NfZ+CGh7b65wTnbGGciN5n9h/Z58=
-X-Received: by 2002:a05:690e:1511:b0:63f:a324:bbf3 with SMTP id
- 956f58d0204a3-64302ab18damr4335087d50.42.1763823429039; Sat, 22 Nov 2025
- 06:57:09 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="bpVKXDMd"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1763827449;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=zoUq4Cr5cdpTxrnkkGYLJgacGfzgTMRdhiNi9B0nUG8=;
+ b=bpVKXDMdM4OH13IPNaq5TOJ9I6olSl36Pt0v1SULQkZcXLeWbmKL2hClUfPG21HQXPiYiu
+ KqFiDLah9ImSAW4rg+YIJHLtJhQWIceBvYrqnsfH7idYtHDwDcOWICwvQNrCSfzGQhTxdN
+ CABY9HpZXWbMq+Xi4VIS+wr/7/tHIDRDR7HlfVuUBwCLogc7FJIl23oqoY89DcKUtT/51a
+ HSp19P0hbPOWTPtcQXOt67NS5Yt+pPIXpYd3y2XTDbqcrGqSgAiEw1yrQpEPHoEWSaTTQt
+ QLTRNuGEG7wTNEmZyIkbSfwsIBnZEGN2XfxzApBq6s9JL4yMVgsoUsOLhw98OA==
+User-Agent: Mozilla Thunderbird
+Content-Transfer-Encoding: quoted-printable
+X-Lms-Return-Path: <lba+26921def8+c3522d+vger.kernel.org+yukuai@fnnas.com>
+Received: from [192.168.1.104] ([39.182.0.153]) by smtp.feishu.cn with ESMTPS; Sun, 23 Nov 2025 00:04:07 +0800
+X-Original-From: Yu Kuai <yukuai@fnnas.com>
+Cc: <llvm@lists.linux.dev>, <oe-kbuild-all@lists.linux.dev>
+Content-Language: en-US
+References: <20251121062829.1433332-5-yukuai@fnnas.com> <202511221056.dAY0duWw-lkp@intel.com>
+Subject: Re: [PATCH v2 4/9] blk-mq-debugfs: warn about possible deadlock
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20251121081748.1443507-1-zhangshida@kylinos.cn>
- <aSEvg8z9qxSwJmZn@fedora> <CANubcdULTQo5jF7hGSWFqXw6v5DhEg=316iFNipMbsyz64aneg@mail.gmail.com>
- <aSGmBAP0BA_2D3Po@fedora>
-In-Reply-To: <aSGmBAP0BA_2D3Po@fedora>
-From: Andreas Gruenbacher <agruenba@redhat.com>
-Date: Sat, 22 Nov 2025 15:56:58 +0100
-X-Gm-Features: AWmQ_bkhaeO27ks2qTqUvx9zYAyPvR45fmibJyAeax_P7fjCjfN3MMivydMdvis
-Message-ID: <CAHc6FU7+riVQBX7L2uk64A355rF+DfQ6xhP425ruQ76d_SDPGA@mail.gmail.com>
-Subject: Re: Fix potential data loss and corruption due to Incorrect BIO Chain Handling
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Stephen Zhang <starzhangzsd@gmail.com>, linux-kernel@vger.kernel.org, 
-	linux-block@vger.kernel.org, nvdimm@lists.linux.dev, 
-	virtualization@lists.linux.dev, linux-nvme@lists.infradead.org, 
-	gfs2@lists.linux.dev, ntfs3@lists.linux.dev, linux-xfs@vger.kernel.org, 
-	zhangshida@kylinos.cn
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+In-Reply-To: <202511221056.dAY0duWw-lkp@intel.com>
+Reply-To: yukuai@fnnas.com
+To: "kernel test robot" <lkp@intel.com>, <axboe@kernel.dk>, 
+	<linux-block@vger.kernel.org>, <tj@kernel.org>, <nilay@linux.ibm.com>, 
+	<ming.lei@redhat.com>, <bvanassche@acm.org>
+From: "Yu Kuai" <yukuai@fnnas.com>
+Organization: fnnas
+Date: Sun, 23 Nov 2025 00:04:05 +0800
+Message-Id: <97ab71d4-43da-49cf-8d8a-53279b90ec89@fnnas.com>
+Content-Type: text/plain; charset=UTF-8
 
-On Sat, Nov 22, 2025 at 1:07=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrot=
-e:
-> > static void bio_chain_endio(struct bio *bio)
-> > {
-> >         bio_endio(__bio_chain_endio(bio));
-> > }
+Hi,
+
+
+=E5=9C=A8 2025/11/22 10:50, kernel test robot =E5=86=99=E9=81=93:
+> Hi Yu,
 >
-> bio_chain_endio() never gets called really, which can be thought as `flag=
-`,
+> kernel test robot noticed the following build errors:
+>
+> [auto build test ERROR on axboe/for-next]
+> [also build test ERROR on linus/master v6.18-rc6 next-20251121]
+> [If your patch is applied to the wrong git tree, kindly drop us a note.
+> And when submitting patch, we suggest to use '--base' as documented in
+> https://git-scm.com/docs/git-format-patch#_base_tree_information]
+>
+> url:    https://github.com/intel-lab-lkp/linux/commits/Yu-Kuai/blk-mq-deb=
+ugfs-factor-out-a-helper-to-register-debugfs-for-all-rq_qos/20251121-143315
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git f=
+or-next
+> patch link:    https://lore.kernel.org/r/20251121062829.1433332-5-yukuai%=
+40fnnas.com
+> patch subject: [PATCH v2 4/9] blk-mq-debugfs: warn about possible deadloc=
+k
+> config: sparc64-defconfig (https://download.01.org/0day-ci/archive/202511=
+22/202511221056.dAY0duWw-lkp@intel.com/config)
+> compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0=
+227cb60147a26a1eeb4fb06e3b505e9c7261)
+> reproduce (this is a W=3D1 build): (https://download.01.org/0day-ci/archi=
+ve/20251122/202511221056.dAY0duWw-lkp@intel.com/reproduce)
+>
+> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
+ion of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202511221056.dAY0duWw-lkp=
+@intel.com/
+>
+> All errors (new ones prefixed by >>):
+>
+>>> block/blk-mq-debugfs.c:628:30: error: no member named 'blkcg_mutex' in =
+'struct request_queue'
+>       628 |         lockdep_assert_not_held(&q->blkcg_mutex);
+>           |                                  ~  ^
+>     include/linux/lockdep.h:393:49: note: expanded from macro 'lockdep_as=
+sert_not_held'
+>       393 | #define lockdep_assert_not_held(l)              do { (void)(l=
+); } while (0)
+>           |                                                             ^
+>     1 error generated.
+>
+>
+> vim +628 block/blk-mq-debugfs.c
+>
+>     612=09
+>     613	static void debugfs_create_files(struct request_queue *q, struct =
+dentry *parent,
+>     614					 void *data,
+>     615					 const struct blk_mq_debugfs_attr *attr)
+>     616	{
+>     617		/*
+>     618		 * Creating new debugfs entries with queue freezed has the risk =
+of
+>     619		 * deadlock.
+>     620		 */
+>     621		WARN_ON_ONCE(q->mq_freeze_depth !=3D 0);
+>     622		/*
+>     623		 * debugfs_mutex should not be nested under other locks that can=
+ be
+>     624		 * grabbed while queue is frozen.
+>     625		 */
+>     626		lockdep_assert_not_held(&q->elevator_lock);
+>     627		lockdep_assert_not_held(&q->rq_qos_mutex);
+>   > 628		lockdep_assert_not_held(&q->blkcg_mutex);
+>     629=09
+>     630		if (IS_ERR_OR_NULL(parent))
+>     631			return;
+>     632=09
+>     633		for (; attr->name; attr++)
+>     634			debugfs_create_file_aux(attr->name, attr->mode, parent,
+>     635					    (void *)attr, data, &blk_mq_debugfs_fops);
+>     636	}
+>     637=09
 
-That's probably where this stops being relevant for the problem
-reported by Stephen Zhang.
+Thanks for the test, this set was build on the top of my other thread to in=
+troduce
+blkcg_mutex, I'll rebase in the next version.
 
-> and it should have been defined as `WARN_ON_ONCE(1);` for not confusing p=
-eople.
 
-But shouldn't bio_chain_endio() still be fixed to do the right thing
-if called directly, or alternatively, just BUG()? Warning and still
-doing the wrong thing seems a bit bizarre.
-
-I also see direct bi_end_io calls in erofs_fileio_ki_complete(),
-erofs_fscache_bio_endio(), and erofs_fscache_submit_bio(), so those
-are at least confusing.
-
+--=20
 Thanks,
-Andreas
-
+Kuai
