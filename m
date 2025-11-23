@@ -1,63 +1,63 @@
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61D6829D29F
-	for <linux-block@vger.kernel.org>; Sun, 23 Nov 2025 22:52:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0A0D2BEC31
+	for <linux-block@vger.kernel.org>; Sun, 23 Nov 2025 22:52:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763938327; cv=none; b=gSq2Phs3kB5EaEIA07vldfUXnhmgkPVaeSaLj7xQXs/tcH+a8olqJlR/7hQztAs0NkOQEXrdDW7+tlHObcSjmbU/+qZK+f8UNswL5g0xtV1AQDSt0Z3cpPRlTyr6Scwp0rXZXGcGl3/sDy+85td5jkHYS7I6Bm2JmAHD0NlQEVI=
+	t=1763938328; cv=none; b=aroRcqMS+bWT9tb63duXUMcNwpAYie64qjYpCc0Dut7BbfyyOxxZYTKY7TxcAdfFoY9eFBNZd4cbV2Pr1pSnvyahRjdfR2TKcUZWUHvpFrgLEV5xBdqLPlAmRm6J6b10yv2mLHk3Muja/VmdBLkwaj+JgGKXTi95EnspQgJrbhw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763938327; c=relaxed/simple;
-	bh=3Yw5gnORHPUkwdVq0k9YaTZDeI1SsW0ivfxZGTZP3Cc=;
+	s=arc-20240116; t=1763938328; c=relaxed/simple;
+	bh=EXYOheJb4cgW5yVlz0jhAvYk6zmI9HBqPvYTaeMxyhc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=m0DP+/Zwc7DEsznaBMt6PoQnY+XNHHC6OFX2CPPFcrU8BJeVUPt4dfT9Ju9VgsxRGdykuRvxItNZYvGDpKbOLSyk4hhjTEQaaKhJHjZ+QZHYZLfwfdiqKJJSaWMQLVZYpZ8i075HvcimuS026Ox5hHt4zf5zohdCWeK/CgCAcMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g7doDkH8; arc=none smtp.client-ip=209.85.221.50
+	 MIME-Version; b=WutuEjW/jx34kvs2MAxCtLFCLwr4X8kGurkPZmUgryAu7dyO+dw9wcQSNZYMB73E0y+Td6G41K+xzgckkecvIlANsziMwow2f8y3tQwLbF9c3kxZDZfQ14P4DeiyNY/4lNwwc9a/MxtSUQjuDq/ZYFPfxu6gxISpQyIFKy6YHOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P4NZQWfe; arc=none smtp.client-ip=209.85.128.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g7doDkH8"
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-42b3108f41fso2154210f8f.3
-        for <linux-block@vger.kernel.org>; Sun, 23 Nov 2025 14:52:05 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P4NZQWfe"
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-47789cd2083so21273295e9.2
+        for <linux-block@vger.kernel.org>; Sun, 23 Nov 2025 14:52:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763938323; x=1764543123; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1763938325; x=1764543125; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=I7U8WjZVUJLujU3iF7ZJF1k1wei+IEPh96Vfasq7vRA=;
-        b=g7doDkH8grU2riP18oRUs8e7YFeVqVJgtvrGYpXTDCrFt7l5LfFbbFQV7UU8gCdyGp
-         MR6NYn3HA3mxPoK15qLVKYWUrVqa2sfDDOUxXfAGmwHbFMC18bSE8YvzGj5tDWtryPks
-         8UjKawvGHRUpM86YqWkTWDXnmohwApBm1LnKVh3jC1QLu2SO9zJQF3JDzKeLlqccltMn
-         yxQ8bnOZ3aomzXJKG1yB8F/V0ziKDadgldKdoc8BkUl0YoTBEp6N1E1oUQC4rlfmCYD2
-         uEJYUbT5DBWpVja9JCdof68MIXMc9ZEXqxDvtxe2FrU50U4bMf6S5XVfC7o8b74QdMq6
-         LbeA==
+        bh=IjKpkoDBMFXqwI53pRDJnxFi7xwhurS0a3ahU0JbCgI=;
+        b=P4NZQWfeyO45qY/ul+V8nOpW0TduYosMmKvc9jP8E//7n1Kuz9XEHBR4MP35H2QEL5
+         sQRRFXi6orkEra+c606COFw3gtGmyj+6yzk5qdWcWgLrcu7x0zgXa+NzdmCe1X5WBxd5
+         2TQg4+n65KIoUGwQsJv1jNvtjWulO90MfvFO+JXnPVSvGvILHUjAwEhKzhHOkaVdbdeS
+         e04WvpRe3TwvvPvNrTEMEhZNSNtaZR2OkwX3c5bhUE0WbdPku1toldN1q+KJgEb9N77S
+         PJlAGJjHMosHvFnc+GocB72N9HRjxpKmslvSu2l9TXToP1nIWZQ2KQCLN8jmO+0NsQx4
+         7bOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763938323; x=1764543123;
+        d=1e100.net; s=20230601; t=1763938325; x=1764543125;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=I7U8WjZVUJLujU3iF7ZJF1k1wei+IEPh96Vfasq7vRA=;
-        b=wGWwUro0d5dBuIJjLdAKPfdo8aEmKXEF6+J1h5CGp1xs3yYnHTDy2UX/MymQT10IjM
-         sT19DQVcTHsDMQ7OIh5DcLNi+pY/09R6OeRHYx5Eu6iQciLq/Hl/dGopFo3QEyJlwFUc
-         VTX95yZM5NHkugzhwKwuVS+l9tZ5M2CPnieGgGNnD79AvWmCWLxFectLiHUFcebkRG8e
-         v9XjBjMhBBYbTfgxSbPVDxua5+VW0k9PDb4IwpVK1j9yBSYcReGncawuUHbulw1eRyxd
-         J2sEXjR0Q/7c8PXerEDDK9Wu+TWwXF9yNeB7q1hsQOVocndGUd1eYZO9eNj6u0YEaI6g
-         GgsQ==
-X-Gm-Message-State: AOJu0YyMFoOSGppE7CkWkL92GjK5c4oe0YGCj/22VdorX0KPxIPJtuLM
-	zPYXUGyFHvSm8JOu8tUNx5H7g9gYyiAhjP5aIIVuwi2nj7IeLaGEJyZjim8JmA==
-X-Gm-Gg: ASbGncsCnDY5PkCnupGjOUSui7I7r8sdWT6hn71INwPXR/fPJNdg1TL/6hYgpbhflpL
-	mXgFoEbv6gsjuanGxfrAHL2QiR+gZFBjteR+wdi6hVGMB9nu1yQc/OYXI/wMXSTF00xD3tCmdKo
-	ClMWh53U2h8YcgtBGsPm5xZ5EwIJ1AtuxW/yyqOz+dgucgVn3s1DS+lFp+PN7k34J+dSwN5yras
-	lBMM+f6felfT7Dzw/aSGrjqLNCxoBhipNbc3Lm8XvjWL6WmAZmbUY9WjrQZk835uZiErMsYZDZo
-	qkpz+/Qo1oc3e9rX6cfBVBHqv93dEclvCRvyArV+SDbaRKXFllnQu9ztGPRmIBJC9xqz4vcIYNG
-	ahdLwGYWUDjuTjCL+JMBf/BB26wnwzGV32p6QoHUQIkdyGqXjEVYxRgm7sqWhWMIectiOYzc+Md
-	25JJZZiuVhNa445A==
-X-Google-Smtp-Source: AGHT+IHP6prALX51tQ6Iw6dY96wePGFkgrZhEc+sNQdx04+GPwBJksTSC7+04SaYBCnud+M1CKHhfg==
-X-Received: by 2002:a05:6000:430e:b0:42b:2e94:5a94 with SMTP id ffacd0b85a97d-42cc1cf4540mr9370759f8f.29.1763938323162;
-        Sun, 23 Nov 2025 14:52:03 -0800 (PST)
+        bh=IjKpkoDBMFXqwI53pRDJnxFi7xwhurS0a3ahU0JbCgI=;
+        b=gM8b+BuYEGrnTrp7bCZkEkuUybLdFFAFV6tDbv7WIx/x71quDZUHoXlbd/FJlL+rhC
+         0H9l6J7fA2O9skGlILAE89ch3ZeFOJ7XDdLuOSCI2Qxb2jl44MwNQodaWjlSvbmtaB/R
+         zQPD4UWYobVU3AaTAG6TzoJiQJzqE1aymnGEURF3nEWbwkjuCkDP3mCA9XG06ABJMAza
+         UixoyVvNCPldUvbNfO/ACQsPEgAdwnZotSoftcpl6KubX+ROvj9Kv+AtVqTysYUx3CfN
+         5fKYUZ8munFsWZyo9tJGKmGqHWsRw0cFoXTIq8dZczByVuorxch5qvWOj3OxkPVLIM9f
+         DTKg==
+X-Gm-Message-State: AOJu0Yyqg4bfZoePfbJP75uFWZzRslCzXQMtbcTh8Lz/PoUmUWlrD12O
+	ZOUDtK4Ghx5Ph9YZBJ8MnlaXsAav5pSe+jmah3Tfz48teRaInUuL4+FnXe1eWQ==
+X-Gm-Gg: ASbGncsS4v46ONWTtqH2tPUbwqVJLIqWNMirtG4GSEV5lnXih3HoFmJ5oOM72SQkuYo
+	3p09SjBUHtHmSaEE6fG6QeytGkjVuHfu0/siyxm+4XkmO5V/I2SkrUi9xMD0iiJKSaoDc1/rerv
+	Cd3vw2ctqYhxWcQhEgmgv+MTr5fbC9KZiNav4C3+TQRITR1FtbH2US/pPnclV6ezWx3B1pOFZbb
+	/2mOflnpGhdE4R5+cBJ40cATxJLV3rxGM3yES6pMc9Om66jE3aA+t9E8/pqoN+roGo5WiEvCkBx
+	Slz35NAnVBL4ksUjIiIZthSd27HLbgJU5ojUlNDN/i5BAgDqRx6D5IpiUcYzun6MXf31kdUL+zu
+	GbCSojCBuJ980N6GamiB+2882YQsGa8BNX4bk2wEASHWx/5qG5nUs6b9S7P52PQ2t3Nij359dyE
+	jVpoBEIL8zyxlDqA==
+X-Google-Smtp-Source: AGHT+IG0SGMWMdVe66Rksvn6v5FBe6opsohs/EM0p8y743GggDbgal5u09Oo75v6mEVGyS+Z85JlHQ==
+X-Received: by 2002:a05:600c:8b35:b0:477:832c:86ae with SMTP id 5b1f17b1804b1-477c111b94fmr113406075e9.12.1763938324588;
+        Sun, 23 Nov 2025 14:52:04 -0800 (PST)
 Received: from 127.mynet ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7fb9190sm24849064f8f.33.2025.11.23.14.51.59
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7fb9190sm24849064f8f.33.2025.11.23.14.52.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 23 Nov 2025 14:52:01 -0800 (PST)
+        Sun, 23 Nov 2025 14:52:03 -0800 (PST)
 From: Pavel Begunkov <asml.silence@gmail.com>
 To: linux-block@vger.kernel.org,
 	io-uring@vger.kernel.org
@@ -80,9 +80,9 @@ Cc: Vishal Verma <vishal1.verma@intel.com>,
 	dri-devel@lists.freedesktop.org,
 	linaro-mm-sig@lists.linaro.org,
 	David Wei <dw@davidwei.uk>
-Subject: [RFC v2 10/11] io_uring/rsrc: add dmabuf-backed buffer registeration
-Date: Sun, 23 Nov 2025 22:51:30 +0000
-Message-ID: <b38f2c3af8c03ee4fc5f67f97b4412ecd8588924.1763725388.git.asml.silence@gmail.com>
+Subject: [RFC v2 11/11] io_uring/rsrc: implement dmabuf regbuf import
+Date: Sun, 23 Nov 2025 22:51:31 +0000
+Message-ID: <44e4ad8c4bd72856379c368e4303090c44c9e98e.1763725388.git.asml.silence@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <cover.1763725387.git.asml.silence@gmail.com>
 References: <cover.1763725387.git.asml.silence@gmail.com>
@@ -94,170 +94,142 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add an ability to register a dmabuf backed io_uring buffer. It also
-needs know which device to use for attachment, for that it takes
-target_fd and extracts the device through the new file op. Unlike normal
-buffers, it also retains the target file so that any imports from
-ineligible requests can be rejected in next patches.
+Allow importing dmabuf backed registered buffers. It's an opt-in feature
+for requests and they need to pass a flag allowing it. Furthermore,
+the import will fail if the request's file doesn't match the file for
+which the buffer for registered. This way, it's also limited to files
+that support the feature by implementing the corresponding file op.
+Enable it for read/write requests.
 
-Suggested-by: Vishal Verma <vishal1.verma@intel.com>
 Suggested-by: David Wei <dw@davidwei.uk>
+Suggested-by: Vishal Verma <vishal1.verma@intel.com>
 Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 ---
- io_uring/rsrc.c | 106 +++++++++++++++++++++++++++++++++++++++++++++++-
- io_uring/rsrc.h |   1 +
- 2 files changed, 106 insertions(+), 1 deletion(-)
+ io_uring/rsrc.c | 36 +++++++++++++++++++++++++++++-------
+ io_uring/rsrc.h | 16 +++++++++++++++-
+ io_uring/rw.c   |  4 ++--
+ 3 files changed, 46 insertions(+), 10 deletions(-)
 
 diff --git a/io_uring/rsrc.c b/io_uring/rsrc.c
-index 691f9645d04c..7dfebf459dd0 100644
+index 7dfebf459dd0..a5d88dae536e 100644
 --- a/io_uring/rsrc.c
 +++ b/io_uring/rsrc.c
-@@ -10,6 +10,8 @@
- #include <linux/compat.h>
- #include <linux/io_uring.h>
- #include <linux/io_uring/cmd.h>
-+#include <linux/dma-buf.h>
-+#include <linux/dma_token.h>
- 
- #include <uapi/linux/io_uring.h>
- 
-@@ -802,6 +804,106 @@ bool io_check_coalesce_buffer(struct page **page_array, int nr_pages,
- 	return true;
+@@ -1201,9 +1201,27 @@ static int io_import_kbuf(int ddir, struct iov_iter *iter,
+ 	return 0;
  }
  
-+struct io_regbuf_dma {
-+	struct dma_token		*token;
-+	struct file			*target_file;
-+	struct dma_buf			*dmabuf;
-+};
-+
-+static void io_release_reg_dmabuf(void *priv)
+-static int io_import_fixed(int ddir, struct iov_iter *iter,
++static int io_import_dmabuf(struct io_kiocb *req,
++			   int ddir, struct iov_iter *iter,
+ 			   struct io_mapped_ubuf *imu,
+-			   u64 buf_addr, size_t len)
++			   size_t len, size_t offset)
 +{
-+	struct io_regbuf_dma *db = priv;
++	struct io_regbuf_dma *db = imu->priv;
 +
-+	dma_token_release(db->token);
-+	dma_buf_put(db->dmabuf);
-+	fput(db->target_file);
-+	kfree(db);
++	if (!len)
++		return -EFAULT;
++	if (req->file != db->target_file)
++		return -EBADF;
++
++	iov_iter_dma_token(iter, ddir, db->token, offset, len);
++	return 0;
 +}
 +
-+static struct io_rsrc_node *io_register_dmabuf(struct io_ring_ctx *ctx,
-+						struct io_uring_reg_buffer *rb,
-+						struct iovec *iov)
-+{
-+	struct dma_token_params params = {};
-+	struct io_rsrc_node *node = NULL;
-+	struct io_mapped_ubuf *imu = NULL;
-+	struct io_regbuf_dma *regbuf = NULL;
-+	struct file *target_file = NULL;
-+	struct dma_buf *dmabuf = NULL;
-+	struct dma_token *token;
-+	int ret;
-+
-+	if (iov->iov_base || iov->iov_len)
-+		return ERR_PTR(-EFAULT);
-+
-+	node = io_rsrc_node_alloc(ctx, IORING_RSRC_BUFFER);
-+	if (!node) {
-+		ret = -ENOMEM;
-+		goto err;
-+	}
-+
-+	imu = io_alloc_imu(ctx, 0);
-+	if (!imu) {
-+		ret = -ENOMEM;
-+		goto err;
-+	}
-+
-+	regbuf = kzalloc(sizeof(*regbuf), GFP_KERNEL);
-+	if (!regbuf) {
-+		ret = -ENOMEM;
-+		goto err;
-+	}
-+
-+	target_file = fget(rb->target_fd);
-+	if (!target_file) {
-+		ret = -EBADF;
-+		goto err;
-+	}
-+
-+	dmabuf = dma_buf_get(rb->dmabuf_fd);
-+	if (IS_ERR(dmabuf)) {
-+		ret = PTR_ERR(dmabuf);
-+		dmabuf = NULL;
-+		goto err;
-+	}
-+
-+	params.dmabuf = dmabuf;
-+	params.dir = DMA_BIDIRECTIONAL;
-+	token = dma_token_create(target_file, &params);
-+	if (IS_ERR(token)) {
-+		ret = PTR_ERR(token);
-+		goto err;
-+	}
-+
-+	regbuf->target_file = target_file;
-+	regbuf->token = token;
-+	regbuf->dmabuf = dmabuf;
-+
-+	imu->nr_bvecs = 1;
-+	imu->ubuf = 0;
-+	imu->len = dmabuf->size;
-+	imu->folio_shift = 0;
-+	imu->release = io_release_reg_dmabuf;
-+	imu->priv = regbuf;
-+	imu->flags = IO_IMU_F_DMA;
-+	imu->dir = IO_IMU_DEST | IO_IMU_SOURCE;
-+	refcount_set(&imu->refs, 1);
-+	node->buf = imu;
-+	return node;
-+err:
-+	if (regbuf)
-+		kfree(regbuf);
-+	if (imu)
-+		io_free_imu(ctx, imu);
-+	if (node)
-+		io_cache_free(&ctx->node_cache, node);
-+	if (target_file)
-+		fput(target_file);
-+	if (dmabuf)
-+		dma_buf_put(dmabuf);
-+	return ERR_PTR(ret);
-+}
-+
- static struct io_rsrc_node *io_sqe_buffer_register(struct io_ring_ctx *ctx,
- 						   struct io_uring_reg_buffer *rb,
- 						   struct iovec *iov,
-@@ -817,7 +919,7 @@ static struct io_rsrc_node *io_sqe_buffer_register(struct io_ring_ctx *ctx,
- 	bool coalesced = false;
- 
- 	if (rb->dmabuf_fd != -1 || rb->target_fd != -1)
--		return NULL;
-+		return io_register_dmabuf(ctx, rb, iov);
- 
- 	if (!iov->iov_base)
- 		return NULL;
-@@ -1117,6 +1219,8 @@ static int io_import_fixed(int ddir, struct iov_iter *iter,
++static int io_import_fixed(struct io_kiocb *req,
++			   int ddir, struct iov_iter *iter,
++			   struct io_mapped_ubuf *imu,
++			   u64 buf_addr, size_t len,
++			   unsigned import_flags)
+ {
+ 	const struct bio_vec *bvec;
+ 	size_t folio_mask;
+@@ -1219,8 +1237,11 @@ static int io_import_fixed(int ddir, struct iov_iter *iter,
  
  	offset = buf_addr - imu->ubuf;
  
-+	if (imu->flags & IO_IMU_F_DMA)
-+		return -EOPNOTSUPP;
+-	if (imu->flags & IO_IMU_F_DMA)
+-		return -EOPNOTSUPP;
++	if (imu->flags & IO_IMU_F_DMA) {
++		if (!(import_flags & IO_REGBUF_IMPORT_ALLOW_DMA))
++			return -EFAULT;
++		return io_import_dmabuf(req, ddir, iter, imu, len, offset);
++	}
  	if (imu->flags & IO_IMU_F_KBUF)
  		return io_import_kbuf(ddir, iter, imu, len, offset);
  
+@@ -1274,16 +1295,17 @@ inline struct io_rsrc_node *io_find_buf_node(struct io_kiocb *req,
+ 	return NULL;
+ }
+ 
+-int io_import_reg_buf(struct io_kiocb *req, struct iov_iter *iter,
++int __io_import_reg_buf(struct io_kiocb *req, struct iov_iter *iter,
+ 			u64 buf_addr, size_t len, int ddir,
+-			unsigned issue_flags)
++			unsigned issue_flags, unsigned import_flags)
+ {
+ 	struct io_rsrc_node *node;
+ 
+ 	node = io_find_buf_node(req, issue_flags);
+ 	if (!node)
+ 		return -EFAULT;
+-	return io_import_fixed(ddir, iter, node->buf, buf_addr, len);
++	return io_import_fixed(req, ddir, iter, node->buf, buf_addr, len,
++				import_flags);
+ }
+ 
+ /* Lock two rings at once. The rings must be different! */
 diff --git a/io_uring/rsrc.h b/io_uring/rsrc.h
-index 7c1128a856ec..280d3988abf3 100644
+index 280d3988abf3..e0eafce976f3 100644
 --- a/io_uring/rsrc.h
 +++ b/io_uring/rsrc.h
-@@ -30,6 +30,7 @@ enum {
- 
- enum {
- 	IO_IMU_F_KBUF			= 1,
-+	IO_IMU_F_DMA			= 2,
+@@ -33,6 +33,10 @@ enum {
+ 	IO_IMU_F_DMA			= 2,
  };
  
++enum {
++	IO_REGBUF_IMPORT_ALLOW_DMA		= 1,
++};
++
  struct io_mapped_ubuf {
+ 	u64		ubuf;
+ 	unsigned int	len;
+@@ -66,9 +70,19 @@ int io_rsrc_data_alloc(struct io_rsrc_data *data, unsigned nr);
+ 
+ struct io_rsrc_node *io_find_buf_node(struct io_kiocb *req,
+ 				      unsigned issue_flags);
++int __io_import_reg_buf(struct io_kiocb *req, struct iov_iter *iter,
++			u64 buf_addr, size_t len, int ddir,
++			unsigned issue_flags, unsigned import_flags);
++
++static inline
+ int io_import_reg_buf(struct io_kiocb *req, struct iov_iter *iter,
+ 			u64 buf_addr, size_t len, int ddir,
+-			unsigned issue_flags);
++			unsigned issue_flags)
++{
++	return __io_import_reg_buf(req, iter, buf_addr, len, ddir,
++				   issue_flags, 0);
++}
++
+ int io_import_reg_vec(int ddir, struct iov_iter *iter,
+ 			struct io_kiocb *req, struct iou_vec *vec,
+ 			unsigned nr_iovs, unsigned issue_flags);
+diff --git a/io_uring/rw.c b/io_uring/rw.c
+index a3eb4e7bf992..0d9d99695801 100644
+--- a/io_uring/rw.c
++++ b/io_uring/rw.c
+@@ -374,8 +374,8 @@ static int io_init_rw_fixed(struct io_kiocb *req, unsigned int issue_flags,
+ 	if (io->bytes_done)
+ 		return 0;
+ 
+-	ret = io_import_reg_buf(req, &io->iter, rw->addr, rw->len, ddir,
+-				issue_flags);
++	ret = __io_import_reg_buf(req, &io->iter, rw->addr, rw->len, ddir,
++				  issue_flags, IO_REGBUF_IMPORT_ALLOW_DMA);
+ 	iov_iter_save_state(&io->iter, &io->iter_state);
+ 	return ret;
+ }
 -- 
 2.52.0
 
