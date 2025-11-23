@@ -1,31 +1,31 @@
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
+Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F7C68479;
-	Sun, 23 Nov 2025 01:23:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 106AAA927;
+	Sun, 23 Nov 2025 01:39:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763861019; cv=none; b=DVN45hKikqG1KSxFquiUM+fp9eI3tSDHtp6KpwTakVxXeYBadan3GZd3FFbfcFMlwRF7yx2aAqGw36SUFlxkHPUaFeqlvMBE3Stk9HV2OAGTekhaND2B5JcQk9d6+BhQ8lxstUy2WKjh5Znzk9XPKpkPqr/QsZEXNnWDvmytxzc=
+	t=1763861976; cv=none; b=GwSFw4+QjX2nGtFA7FVBl/vOlQ6MeI33xM6pLcAVP9KxcY0WAAL6vtu9ys+wExxEtRufz3MaMlq/OuiBBrVbzRGSD3d//cnEhVvuk2S02Met4hRXXj1nHn4A7pcQFVcy835UUR5/SgjAgPUSCsXuxvhLGAV7KqyYjOorH6cOP0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763861019; c=relaxed/simple;
-	bh=xeeOy9Y9AfZHjdQ419M8o1x6xYIid00dkdAZDe44HXo=;
+	s=arc-20240116; t=1763861976; c=relaxed/simple;
+	bh=9/N7pBRpE3vQz2DsaPGyGq4ZXC1fDMZRo83NmQFplLs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Q5JOi1rqhMooziS3zGXQoqceGmrGtHdjfsnsgGXAvwIHUbz5BxSTH63zvYlqFE+B10f40QO/G8MgZ7QzuX4XjAP/NoQwezislGOGjKcO0qGaxjHQMGZQLg0eNFr2l6aUKe2ZabqNPLOk/S2NOLrxVS8jriusMuLfpuITOUg7Fgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=iq7nSKs/; arc=none smtp.client-ip=115.124.30.110
+	 In-Reply-To:Content-Type; b=hiA3nak5YajfbDKxpIASuYWxEUsVPpXjUi84ZTFkaz6nQuFxMfSzTTxkpfqwOiKD84x6ZPRVOVbaUUx+Qbyg37DPzgfZxGDVb4WboOQR+QEyG03e/LgKYqA4V1YCTHDrK/+FQPVMeLaHv7sP4KIFifUd7XV5DvAjtO1xdYrvTLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=WeyHqbHM; arc=none smtp.client-ip=115.124.30.98
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="iq7nSKs/"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="WeyHqbHM"
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=linux.alibaba.com; s=default;
-	t=1763861013; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=VCIF5DLiQMx6oN9DUx9P7XFgjwtiupQtB75jei15lO8=;
-	b=iq7nSKs/oouky7FRG2MwTRD41R0/nCUFP8w5WyTRhRfU9V1d6ro26yPJvGwVIGUS30x6C2Kbwl/hVrbr7bl9gv67nYgrjR6YGvktq7QbXP4dPsBF0YNl4JvzuKJqyzfFGE6scbAXFY8J96zm2PdKRozmnpIem+15Iltez2KO0bo=
-Received: from 30.170.82.147(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0Wt66DMu_1763861012 cluster:ay36)
+	t=1763861963; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=R0FaNTVmYaM0SpQ82sulzhFW6ARj1Mibc6jdHQb9PbE=;
+	b=WeyHqbHM8R00ktJ7mO3FtPCwN4Ve83bVstJQKbpJM+F/Q1XJ/i4zsAZvNVF2ahk0phhqAWCrK1aed6fHe0tMAh193hQh/PWumBM5X1gNTZFgpHIiJw5ZwGQDfS9D0DAFKF0U/YWTIv3dWYi5k2QaYE6uO7JNVsKD6JdXOg79DTc=
+Received: from 30.170.82.147(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0Wt66ic3_1763861962 cluster:ay36)
           by smtp.aliyun-inc.com;
-          Sun, 23 Nov 2025 09:23:33 +0800
-Message-ID: <d3c01e18-c556-4892-8283-08765c5e6cb9@linux.alibaba.com>
-Date: Sun, 23 Nov 2025 09:23:31 +0800
+          Sun, 23 Nov 2025 09:39:23 +0800
+Message-ID: <45155eea-2fde-4a72-8ea1-353bc4e14a7e@linux.alibaba.com>
+Date: Sun, 23 Nov 2025 09:39:21 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -45,38 +45,39 @@ References: <ts32xzxrpxmwf3okxo4bu2ynbgnfe6mehf5h6eibp7dp3r6jp7@4f7oz6tzqwxn>
  <8c596737-95c1-4274-9834-1fe06558b431@linux.alibaba.com>
  <kvgy5ms2xlkcjuzuq7xx5lmjwx3frguosve7sqbp6wh3gpih5k@kjuwfbdd2cqz>
  <853796e3-fd44-4fc2-8fd2-5810342a6ebe@linux.alibaba.com>
- <ztqfbzq7fwa5znw5ur45qlbnupgepaptzjaw2izsftbtth6zca@db4ruyaulqab>
- <2c6906d1-132e-401f-830f-ae771fe836c5@linux.alibaba.com>
- <nx6o4gwpetxjeyfbu4xyibulvldr3xz6lyfjrar62cidy5gxum@xmx4ojyq3mbf>
+ <d652n6zrqbkt4oltusd5egbnrvd5xz3k4kbmqnfuwuatdyuekn@22jscte4mx7m>
 From: Gao Xiang <hsiangkao@linux.alibaba.com>
-In-Reply-To: <nx6o4gwpetxjeyfbu4xyibulvldr3xz6lyfjrar62cidy5gxum@xmx4ojyq3mbf>
+In-Reply-To: <d652n6zrqbkt4oltusd5egbnrvd5xz3k4kbmqnfuwuatdyuekn@22jscte4mx7m>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 
-On 2025/11/23 08:08, Sergey Senozhatsky wrote:
-> On (25/11/22 22:09), Gao Xiang wrote:
->>> I thought you were talking about the backing device being
->>> ext4/btrfs.  Sorry, I don't have enough context/knowledge
->>> to understand what you're getting at.  zram has been doing
->>> writeback for ages, I really don't know what you mean by
->>> "to act like this".
+On 2025/11/23 08:22, Sergey Senozhatsky wrote:
+> On (25/11/22 20:24), Gao Xiang wrote:
+>>>
+>>>> zram(ext4) -> backing ext4/btrfs
+>>>
+>>> This is not a valid configuration, as far as I'm concerned.
+>>> Unless I'm missing your point.
 >>
->> I mean, if zram is formatted as ext4, and then mount it;
->> and then there is a backing file which is also in another
->> ext4, you'd need a workqueue to do writeback I/Os (or needs
->> a loop device to transit), was that the original question
->> raised by Yuwen?
+>> Why it's not valid? zram can be used as a regular virtual
+>> block device, and format with any fs, and mount the zram
+>> then.
 > 
-> We take pages of data from zram0 and write them straight to
-> the backing device.  Those writes don't go through vfs/fs so
-> fs on the backing device will simply be corrupted, as far as
-> I can tell.  This is not intendant use case for zram writeback.
+> If you want to move data between two filesystems, then just
+> mount both devices and cp/mv data between them.  zram is not
+> going to do that for you, zram writeback is for different
+> purpose.
 
-I'm pretty sure you don't understand what I meant.
-
-I won't reply this anymore, good luck.
+No, I know what zram writeback is and I was definitely not
+saying using zram writeback device to mount something (if
+you have interest, just check out my first reply, it's
+already clear.  Also you can know why loop devices need a
+workqueue or a kthread since pre-v2.6 in the first place
+just because of the same reason).  I want to stop here
+because it's none of my business.
 
 Thanks,
 Gao Xiang
+
