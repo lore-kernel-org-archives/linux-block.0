@@ -1,61 +1,61 @@
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 319BF163
-	for <linux-block@vger.kernel.org>; Sun, 23 Nov 2025 00:08:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA5F072627
+	for <linux-block@vger.kernel.org>; Sun, 23 Nov 2025 00:22:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763856513; cv=none; b=jlSetYtgK75rjN8xQGW/DRAqOSSrNVZID3dt5AwXiYJVPONoV/vr91a6u+HvqijwaSn7BF/LG23y07337AnM8Ph3q+NinlG101Lj+V+1njmkaIqg5UGO3X9tCczEcdnCmWwxR/6PShXn9khVCpRtVPCZPTnr5Z1mp7qmW5DRqNE=
+	t=1763857376; cv=none; b=J0erP7zCPoaDCTR0LXCmPvndP2f33nm9omhEb/cBcJYUC7mXKP1QEao9Ltw0CAe/ZZ6MlhrdHCCU68JoRulBHR4jgFR8wNqgRBMDbBxIHU8hIOwfV9bjhDFoIymobR5skQ8ZfwGY6LSC4yu9YGfq8aZIjhoH03NrHYvfrJNgoAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763856513; c=relaxed/simple;
-	bh=bfMP2Or8DYbGDeFbBYIms1w/uF2Mcu1FRwx9qTFL2/Y=;
+	s=arc-20240116; t=1763857376; c=relaxed/simple;
+	bh=Pa2Q/64gwzQEYgQ2lnM49u7vlqs/sI8fDQA8hvtV1Hw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ljH4GCGhszI6nFgpg4vTMgaDfjnVO6DKQLM+XKLGKuQkh3zs4Yd20uscKyOdgtpvmhz5Mf8EnLtO8OKgu5sgi3j8D8ogpOiC/H9RZhjPSpS5nFtTmR6NxhGoeLA1TONse7NKtBCXxgH8ymnYNaHT2o9U/7rypwSltbWa7J+23IE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=DdUAI22/; arc=none smtp.client-ip=209.85.210.174
+	 Content-Type:Content-Disposition:In-Reply-To; b=dzn3mI6ITg2igKIgOqSw9A8sINCa4T6UapwP4jzG4Fg7YVoES0RBu08CGeSvfk7W77z8HzHMNW0zAvBFNcHr683RQ18+e1SplXjOJsizw3spE1U1riemnUjWaZ1xS/rLitxg4BVEUPnH37DpatxGM5yEJtGexUCIezWU/QtYxEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=NHXyKWaB; arc=none smtp.client-ip=209.85.216.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="DdUAI22/"
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-7aa9be9f03aso2631439b3a.2
-        for <linux-block@vger.kernel.org>; Sat, 22 Nov 2025 16:08:32 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="NHXyKWaB"
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-34374febdefso3424890a91.0
+        for <linux-block@vger.kernel.org>; Sat, 22 Nov 2025 16:22:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1763856511; x=1764461311; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1763857374; x=1764462174; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2muAciBOaE/k7xfizoYb3tuAX3qHAGDCvnzhObdNAnA=;
-        b=DdUAI22/HcVfvgPryNayYk/ZsGvkIgWnQKYtUkC59UGeH6JDcBdVytTHkA92jt+aA4
-         a/mXP5guNgK+00QiZcb30WFcENACKeSc+EAGL/nY7RCusoeqiL9JN9z2n31NjRQJwgfd
-         LL9MgNwapG9k4zioemdsY1uj1eCkyPNvIhIAY=
+        bh=FHAiZmWkDhnXuoPqEc1Nf7Paa0Td/r7W/5Ao6DSoK3w=;
+        b=NHXyKWaB+kD/sZP9vftuyYRLivUGzm2I0T6kP1PyBvQvosrdd+6tH1ONtxqfFYw2eb
+         XDPs5De5trT7+/UGtB0j167zlSIPi7dQKz+RGj3PtCyfLGJG7CCV/yQ2I1m0/fBAaHEB
+         dTOmfnA32mEoERDh/Ec08vbDnnQCn6vsvsTQM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763856511; x=1764461311;
+        d=1e100.net; s=20230601; t=1763857374; x=1764462174;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2muAciBOaE/k7xfizoYb3tuAX3qHAGDCvnzhObdNAnA=;
-        b=xH6LTPDNdiHqb6DR/eA4/Thf1D8RAZ+TcYqpL++DtQq41KH6d4RYHS6pQoMOV20oet
-         vfufcKh43cKl4xh/HqCFD5lIHINBe68qWSkayyA0CYBGSTACSoBjvrVeoB11OX5EqyaB
-         QjzsnZsaLeEE8GcwV+RgofM5PRG7cWAno4lmD8/2RJJ+I5A4aI13eyPaE+c8CYDZbM7O
-         dJSLgq1oHyWaJOKvWKZLN2GQinsp69UwwmvURHnDG/Y68WU4HTHKoXzel+9WABULGgZC
-         RdQR/12EJ1EX5nWQqxogVC1dO1PwH8LNr9Wl9UpFavmNLpkyFv8H2GtSgBCH+Wnpja78
-         t+3g==
-X-Forwarded-Encrypted: i=1; AJvYcCXLese6G8ujTekktpQV+GopuKDAlS+aKLdvme6Q/yPhPxRtasiWC48gTM3YGjzLLQdzogHA4VFZI1oGsg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzloSMTIA7xWeewxWdv+4EZBKM7lUvXdadFFGvwnE6uQUaOrz+1
-	+xSvfoALBR7Rq0CqGkMoxPKl5UAY13dUas0hWw6kNjm829ZcuWwCEfoy2ORf355x/g==
-X-Gm-Gg: ASbGncuSZtvgqrL26KgVvu6o+bw+tAaLAE3ruQpxdaY02Ug9lA/FmGDO7kBJcbCVEit
-	EjouxbzR6wAeF1HMAstA5X0I/VBheX0FppuHfveT86JjhEmhTaz6LhrmIyRWdhIl73IZ3piEiis
-	xdzz0dLEKrXoPIb74CEyYy52/t3csgvuwshUDgZNJ+05UBMCKimpU2VcNQrgewV7ZM1GIApkhIP
-	aHkTRBCDCO7LFBWbyuLRFRGpsqFWOZJMeJ2SihPRecauW5BJN7FMwOkMPntcrzC7p1+K+qYP9Sj
-	Uxb+Nsi3jQa8W6JP8e+BmlhXP/GEDlluPziwJylIwEDmRTOuICTwVF9V/YCt0gSmM9RBIWPqNdI
-	eE0A2uoh2Nu7azz+Yv0htFJwvwmyKk5eORWlXX9XDIuwaNh+hi3hgdQXgcvf4gGDlMmV8tReONW
-	EiSi601kU5cSJw1jPagtv8nUhYbIrdRGtMv1LbfHNLLzDnMBsk+Q==
-X-Google-Smtp-Source: AGHT+IGDke1OPproyf8Ea7+53qXNHLy3i8Pk7zk6unoaUI5Yq/mG08AMT5TtfH2aktdVFzwpQF96lg==
-X-Received: by 2002:a05:6a00:1ad1:b0:7ac:9d93:3efa with SMTP id d2e1a72fcca58-7c58c2b0f28mr7440867b3a.7.1763856511542;
-        Sat, 22 Nov 2025 16:08:31 -0800 (PST)
+        bh=FHAiZmWkDhnXuoPqEc1Nf7Paa0Td/r7W/5Ao6DSoK3w=;
+        b=ucHfL//QJzz0KiPG7sN9S7eg6fYBOmid2F26ZvEBBEGG1EXEQIUcP7hzFq7TlNIodH
+         +iVyVJFtTp/tq9k1X+gmqCTRONGUqJCKGf86LBh/RBuWb250HP3HVZwXMM4+yNxamou8
+         eGNdWX6hR9oYC6uEo3zDhzjQ4KkWGnSqnfgJDmaSW3OERm8Q492eyg4TqSHlMmpoEJ7J
+         XvyB5B02/VSzv79q4F2SxZ7Dh3p3tGJK32SYQzbNMQOOIZWpNse+78zWjwOlmPICPuJL
+         RDJP1Wcy3MYAY2phXCsoFY2/JtsYdNItVVQvaYb34zVQnAu5KF+b4VE70JiBqbs9+X/G
+         O8dg==
+X-Forwarded-Encrypted: i=1; AJvYcCVECRkqFNtqycVecaN1CNqRICtWxloyXZCWH5QqV0CTqAm5azaYLIzrAkQk/31qqC19IM6Rzcak/VK2pA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy2k7G93XObwZ2izglnVoXAE3Fnea/9dtNtaMb0pl6HycVXIDZd
+	WdYc0Z/UVWDYjma2hNRfcLiR+NiDoDtItkYP0r1SRGUOzKr0zfEvZDBL79OyAaoUGw==
+X-Gm-Gg: ASbGnctUM5uNIPcIou8DanGRMcgEfzuhVhtR++j+ok/zUB1Mnf3gDqMBYF8OgtJ1YY2
+	LUvUiiPZnzz9Oemvkjonqja+UpY9Usts87OCIJkgpWMpT6AsryqhfI3AGwoBOzUc5/2uxbVNY8q
+	ywekRTAqzYQXWcCoAnbwoFTiEh22jgFpV45rRH+cd+wcvlKsvPuewX3FBk4MM4z/ev0Sc0FGlxu
+	GfIZT4j/tH5CN5gZQlzi1kahHQy/4zm+7bsxIfok/0HN3BP1pSC5XwGJVwmop9F9IhbkWlJOpgb
+	AbW2rkrjy2gWW9jKorNmrJ/tPHjdropiOxwdskoiYt4cHLGO78tQGGmypytTkMAmdC8ePoQUGm6
+	X6BPg/PdbvwTqGhOVXU5AeuKMTtmn/qrcTfa97LQS8lddmbKXpAhDZNvloFNA/tPoM6zHi0L86g
+	mGsIxScSX//jeny2jKYkriKA2EDgC16LntdVcKQicCFMuK8otv4SLQB01TShzz
+X-Google-Smtp-Source: AGHT+IH8FBGlGeoQlTTcY2Ds1x+EIg6ekEamifVS+TUuaNagUXwwLXZoC86g7wj7iuLp7+iUaAexuA==
+X-Received: by 2002:a05:6300:8b0f:b0:35f:9743:f4a with SMTP id adf61e73a8af0-36150ea9786mr8054586637.26.1763857374220;
+        Sat, 22 Nov 2025 16:22:54 -0800 (PST)
 Received: from google.com ([2a00:79e0:2031:6:296e:57d:751e:5598])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7c3ecf7d70asm10039686b3a.13.2025.11.22.16.08.28
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-bd76129de4dsm9097957a12.36.2025.11.22.16.22.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 22 Nov 2025 16:08:31 -0800 (PST)
-Date: Sun, 23 Nov 2025 09:08:25 +0900
+        Sat, 22 Nov 2025 16:22:53 -0800 (PST)
+Date: Sun, 23 Nov 2025 09:22:48 +0900
 From: Sergey Senozhatsky <senozhatsky@chromium.org>
 To: Gao Xiang <hsiangkao@linux.alibaba.com>
 Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
@@ -63,15 +63,13 @@ Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
 	licayy@outlook.com, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	linux-mm@kvack.org, minchan@kernel.org, richardycc@google.com
 Subject: Re: [RFC PATCHv5 0/6] zram: introduce writeback bio batching
-Message-ID: <nx6o4gwpetxjeyfbu4xyibulvldr3xz6lyfjrar62cidy5gxum@xmx4ojyq3mbf>
+Message-ID: <d652n6zrqbkt4oltusd5egbnrvd5xz3k4kbmqnfuwuatdyuekn@22jscte4mx7m>
 References: <ts32xzxrpxmwf3okxo4bu2ynbgnfe6mehf5h6eibp7dp3r6jp7@4f7oz6tzqwxn>
  <tencent_865DD78A73BC3C9CAFCBAEBE222B6EA5F107@qq.com>
  <buckmtxvdfnpgo56owip3fjqbzraws2wvtomzfkywhczckoqlt@fifgyl5fjpbt>
  <8c596737-95c1-4274-9834-1fe06558b431@linux.alibaba.com>
  <kvgy5ms2xlkcjuzuq7xx5lmjwx3frguosve7sqbp6wh3gpih5k@kjuwfbdd2cqz>
  <853796e3-fd44-4fc2-8fd2-5810342a6ebe@linux.alibaba.com>
- <ztqfbzq7fwa5znw5ur45qlbnupgepaptzjaw2izsftbtth6zca@db4ruyaulqab>
- <2c6906d1-132e-401f-830f-ae771fe836c5@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -80,22 +78,20 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2c6906d1-132e-401f-830f-ae771fe836c5@linux.alibaba.com>
+In-Reply-To: <853796e3-fd44-4fc2-8fd2-5810342a6ebe@linux.alibaba.com>
 
-On (25/11/22 22:09), Gao Xiang wrote:
-> > I thought you were talking about the backing device being
-> > ext4/btrfs.  Sorry, I don't have enough context/knowledge
-> > to understand what you're getting at.  zram has been doing
-> > writeback for ages, I really don't know what you mean by
-> > "to act like this".
+On (25/11/22 20:24), Gao Xiang wrote:
+> > 
+> > > zram(ext4) -> backing ext4/btrfs
+> > 
+> > This is not a valid configuration, as far as I'm concerned.
+> > Unless I'm missing your point.
 > 
-> I mean, if zram is formatted as ext4, and then mount it;
-> and then there is a backing file which is also in another
-> ext4, you'd need a workqueue to do writeback I/Os (or needs
-> a loop device to transit), was that the original question
-> raised by Yuwen?
+> Why it's not valid? zram can be used as a regular virtual
+> block device, and format with any fs, and mount the zram
+> then.
 
-We take pages of data from zram0 and write them straight to
-the backing device.  Those writes don't go through vfs/fs so
-fs on the backing device will simply be corrupted, as far as
-I can tell.  This is not intendant use case for zram writeback.
+If you want to move data between two filesystems, then just
+mount both devices and cp/mv data between them.  zram is not
+going to do that for you, zram writeback is for different
+purpose.
