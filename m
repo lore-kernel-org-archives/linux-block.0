@@ -1,213 +1,1139 @@
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6445F314A7B
-	for <linux-block@vger.kernel.org>; Mon, 24 Nov 2025 15:50:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E23EF313E3F
+	for <linux-block@vger.kernel.org>; Mon, 24 Nov 2025 16:17:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763999447; cv=none; b=Q2Qj+YN509eW/Ntt9wGVb9N+jeamooQhRr9KCm5NMpEU1QvKMTN3rxA6AWZYslJQr3AtS09G5uQLZXEEFZkvnU6L7bbt6JDnKEIg1PmDYAkKFWnGm4kuGUWOp03H5QQK65EfYtXX5CfV/46olRyhhnw5/57/mSVFQs5fTstjyYY=
+	t=1764001044; cv=none; b=sYx8+lRIZ4oaeBEeLdYmAXB8q5utbOLNZTDRwYjD9Trf3roTf8pgSkrmXSpAK/daH+CsdblPJ/go+DRGZUxZuOlu3AkLE+OUxesa37iC7ImuMXIGNDCkUS3WKTXwDhPUUcqDgLP/R8neXK44dxM0bgMOR3lwLA8UyqGJRkFeSHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763999447; c=relaxed/simple;
-	bh=kpIziwM6fc35ywrlgO1hCEEaSZA0AfjA9qspEpbc+VY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=F4j9qeMgxN5VKqs241Goh8jGZs7pofXDUhW02B51WRPqX4CXxprb50ecUhBnt45xK0kEZrqnYOSKs9WK01w2IlWudgwDFksAf/sckJhoxoZK3lC8vhKzg2S22LjYm2rCN7GQyce+Kz5Aullc9Wc4r+Hw2MvTJwXZ+6Ih7j0VZv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aBxVN8WF; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1764001044; c=relaxed/simple;
+	bh=nHqXSPrM3C3HxgLJx8CFZ5M5vnVutZT1f4qnq/FGB+U=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=eNtcN3VRtuxl7s60zcdRqJP54mkyB3J7pigUYXT/LW2WLVMtf0cvx6IDbH4/fChF6uargtPqFZRI5trRTfjC5R8nin3IcgN7drio0uHINu5OsFU95gkHKwtCzrZzyJybbtVxnf/zj7s1avHB7okIVUgCOs03s+UGXekCU2NhfDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=FkJ2u5aH; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aBxVN8WF"
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-295c64cb951so390175ad.0
-        for <linux-block@vger.kernel.org>; Mon, 24 Nov 2025 07:50:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763999445; x=1764604245; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=daIbgNggw5+RIWaqSAyn3PLOejh0silfLJm2gZrCAxI=;
-        b=aBxVN8WFZAAT6Cr8UML6VsaiePXVtQ02jcHHxL6nQ1VDPb4PDkCJ+FRC22GEhEmjmM
-         y11/98U/BsLYo+43qLUzQYmFLkI1OWEBxpYFtQ7PFcuC+Ci848zWB72SGtaUN7w/M9w1
-         ogzHOmUQRH8sF6FOBawYEyPeQFJzrIvdmJILDKmayb4VTBDmTmoPXZ/jNcVChuJv2fy2
-         MgzaOADMoVtk/1ScHs6WlZDulDIPEZVTgHfHYG1mPIP9xT7zu0ZWpSbqiPDbAXmSW1iq
-         ItqWPqUIJSgqiEfqb+rtzD6Em7Lf9mErrj3orpxo3sa5TLO5ofObiNKBi9HWtvClRxrq
-         cWvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763999445; x=1764604245;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=daIbgNggw5+RIWaqSAyn3PLOejh0silfLJm2gZrCAxI=;
-        b=DJ0lmeo6VX5Amq2o6nEXAPUkRgF7gB6ds/Px5GjWKkQkPR/T6hY8rMwiTorjR8hFRA
-         wS5jsGJBHX1RKUD8iUfJMG2jZQ/zimb3myP/gggBDSZq/9QMFGMcs6MNWHqAlWCWYQIa
-         CWMxfQMpdO0vbSPkofR7Q1V4/aInj8/PgmmGkCIOzSCFHoGEhcyygaBkKayjjr3iII1n
-         QReQN7mvU96GyK6QxZOm14Irz6hgQ3EJuvdB53SmvrhEPLYHdc5EU6qO2uQE7Tjz5nRV
-         kL8d8T0VV4oPkIWdPd1W6wTfhm4wckAQ0OVRpcjgxobh5qmgohANCkLTGdel/dAxkFL5
-         Kapg==
-X-Forwarded-Encrypted: i=1; AJvYcCVJJszqXu2+1s1yay91KAjNeRELgK4PZfehN4CeMwlabJmFVqA3NWMqVxNVAn1PkRMI1nbQ/Mnl/TN+/g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwqaDfPLcyTOZPDaArSALBv9q+dpv8anlps2F+6Aj1rLDI1lC8U
-	GdqqycrLitmjI+6KrXt9U48YbmzoSxB2NFbBK1rtx+TjnrfCqDcrr82pnV+Cik78vBGkjojLoeR
-	r1ZWeBv19+N4KnTJtFPBUz/PlqQrfm4/ozAuooyVg
-X-Gm-Gg: ASbGncuo8+EB8wPrNhhhgcicDul6oB9TGjWC47ZmWzkSCCrmQ0T9Co35jmk3HaaT3VI
-	1Xi9enVUutpyt4nMsm5nLDAPSXhH683FHm9liJD+jytqnbssR/1STG9VBzNIPHZ7V/zAQciqZUU
-	oGGcG/nG9w593//SuV18G1wmPnR4lYb07Wuk1NKXPLeQppYAiM5+75CDaIFTW3OZLSDnxLGY30H
-	Zd/cJhVRBMOMgfctZ0VEllxJ2ZKnmuYt0MfPrGtYcbNSB70oa1VhJRrU9uYtXO3XAFG4phrHPC1
-	XXxndIMQMI2WoQIi+TPn+nk68wxHQ0EAxy/YWNXDPv0HjFQ84QKS+VE=
-X-Google-Smtp-Source: AGHT+IEy/LSMFk8iYVjgbAAJEenGWYAnGVnyxU/V1Cyq6eFwuiYf/UkhIX/FxJSWiRguk8dihSpeKWklTDThpq99c2g=
-X-Received: by 2002:a17:903:2307:b0:274:1a09:9553 with SMTP id
- d9443c01a7336-29b7b0e360cmr4771155ad.6.1763999444236; Mon, 24 Nov 2025
- 07:50:44 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="FkJ2u5aH"
+Received: from pps.filterd (m0148461.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5AOEnTLd1240151
+	for <linux-block@vger.kernel.org>; Mon, 24 Nov 2025 08:17:21 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2025-q2; bh=F8hZO0dYyLJTwe5Csv
+	+U4UEEuaA7TtACgFYK8FJgxfo=; b=FkJ2u5aHrrjfP2o/YSHwR+NhdiNQ+vulAD
+	ieHPIFk5BiiJcYBH8PW5gPbv6Mp0kYX1cOTO2xaKxXztnsMDD6HLupY7xcK2HYKZ
+	98S5H+ZrfkvIhcui1bk9JyNyTqrGjmbX46tUEmUvDKjzcCLuNbWAEDOErSQowVGB
+	kXh54gUbs9FfToeHLcPFj0egRy099DXSLCV87HghNUuq1qBvt0OqhDy0PRBomSE7
+	9aJpAM1zV9jfKY5EEH0Q48hH73bpmbxDQpTVkBok00Mb1I9/7wNThbA4OV6+X/xx
+	y7owYlL8v09icSQF3U8wEadPU/1V1Gj5ADycZ2cTk1jrTsb0LOeA==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4amsfe0prn-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Mon, 24 Nov 2025 08:17:20 -0800 (PST)
+Received: from twshared13861.04.snb2.facebook.com (2620:10d:c0a8:1c::11) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.29; Mon, 24 Nov 2025 16:17:18 +0000
+Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
+	id 9CE4B41CC6A9; Mon, 24 Nov 2025 08:17:07 -0800 (PST)
+From: Keith Busch <kbusch@meta.com>
+To: <linux-block@vger.kernel.org>, <axboe@kernel.dk>, <hch@lst.de>
+CC: <ebiggers@kernel.org>, Keith Busch <kbusch@kernel.org>,
+        "Martin K.
+ Petersen" <martin.petersen@oracle.com>
+Subject: [PATCHv6] blk-integrity: support arbitrary buffer alignment
+Date: Mon, 24 Nov 2025 08:17:07 -0800
+Message-ID: <20251124161707.3491456-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251122074029.3948921-1-senozhatsky@chromium.org> <20251122074029.3948921-3-senozhatsky@chromium.org>
-In-Reply-To: <20251122074029.3948921-3-senozhatsky@chromium.org>
-From: Brian Geffon <bgeffon@google.com>
-Date: Mon, 24 Nov 2025 10:50:07 -0500
-X-Gm-Features: AWmQ_bnhIJCH4WCGbQ-G4XcJu6360z_7NhMLl3znPaAnQ2dVfHn7kg9jFhMwxaQ
-Message-ID: <CADyq12wLaGjbPqpXbWOsiAD3SUD1NKZvzZayFYx3TPECptXC8A@mail.gmail.com>
-Subject: Re: [PATCHv6 2/6] zram: add writeback batch size device attr
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Minchan Kim <minchan@kernel.org>, 
-	Yuwen Chen <ywen.chen@foxmail.com>, Richard Chang <richardycc@google.com>, 
-	Fengyu Lian <licayy@outlook.com>, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-GUID: 6fhBpiE-_OW9cRBDEKaLbbLsG8YkrIMS
+X-Authority-Analysis: v=2.4 cv=RLe+3oi+ c=1 sm=1 tr=0 ts=69248510 cx=c_pps
+ a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
+ a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=yPCof4ZbAAAA:8
+ a=xHMqUeLr-KbIvyXNY5YA:9
+X-Proofpoint-ORIG-GUID: 6fhBpiE-_OW9cRBDEKaLbbLsG8YkrIMS
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTI0MDE0MiBTYWx0ZWRfXwYuhEEJOxBEF
+ 0EWHUuFN1hxq6wxFn/GpomjVmCJYvfaHYcbsYK+yxwhXdUk0HwLfOBAJ6sD4JDQReBYYBAQBwVW
+ 5iN5atrUbszFLZ02yrPqmo5Q+z8M3dZpjRWfvU/Ppg/VG1WLpFbLc3sMQL9hj6sepaliGZAPffB
+ KwMaJFg2fsGYMCNzWtNRZJf7lX0BSpjuv6JE9VPTNCKlI0uHCbjmNk/xZKD5KEYDnz9IEQeAD/0
+ Hd/W373+9XPtuOVg8CkuVUO0oGDOArT0aj4A13xyS16858MM4XJUvelyY5VCq/MVoifM7y8oEnR
+ BD05MCqMvVYfpYkwozO9iHl8bJ3Mu2sSeB+hy29HfLr4QBodgiPv8lWvcShjjUAKKAIThL8vAGf
+ 0BpJciig9jEtFmFqMdZfAvU1KOu/IQ==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-24_06,2025-11-24_01,2025-10-01_01
 
-On Sat, Nov 22, 2025 at 2:40=E2=80=AFAM Sergey Senozhatsky
-<senozhatsky@chromium.org> wrote:
->
-> Introduce writeback_batch_size device attribute so that
-> the maximum number of in-flight writeback bio requests
-> can be configured at run-time per-device.  This essentially
-> enables batched bio writeback.
->
-> Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+From: Keith Busch <kbusch@kernel.org>
 
-Reviewed-by: Brian Geffon <bgeffon@google.com>
+A bio segment may have partial interval block data with the rest continui=
+ng
+into the next segments because direct-io data payloads only need to align=
+ed in
+memory to the device's DMA limits.
 
-> ---
->  drivers/block/zram/zram_drv.c | 46 ++++++++++++++++++++++++++++++-----
->  drivers/block/zram/zram_drv.h |  1 +
->  2 files changed, 41 insertions(+), 6 deletions(-)
->
-> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.=
-c
-> index 06ea56f0a00f..5906ba061165 100644
-> --- a/drivers/block/zram/zram_drv.c
-> +++ b/drivers/block/zram/zram_drv.c
-> @@ -590,6 +590,40 @@ static ssize_t writeback_limit_show(struct device *d=
-ev,
->         return sysfs_emit(buf, "%llu\n", val);
->  }
->
-> +static ssize_t writeback_batch_size_store(struct device *dev,
-> +                                         struct device_attribute *attr,
-> +                                         const char *buf, size_t len)
-> +{
-> +       struct zram *zram =3D dev_to_zram(dev);
-> +       u32 val;
-> +
-> +       if (kstrtouint(buf, 10, &val))
-> +               return -EINVAL;
-> +
-> +       if (!val)
-> +               return -EINVAL;
-> +
-> +       down_write(&zram->init_lock);
-> +       zram->wb_batch_size =3D val;
-> +       up_write(&zram->init_lock);
-> +
-> +       return len;
-> +}
-> +
-> +static ssize_t writeback_batch_size_show(struct device *dev,
-> +                                        struct device_attribute *attr,
-> +                                        char *buf)
-> +{
-> +       u32 val;
-> +       struct zram *zram =3D dev_to_zram(dev);
-> +
-> +       down_read(&zram->init_lock);
-> +       val =3D zram->wb_batch_size;
-> +       up_read(&zram->init_lock);
-> +
-> +       return sysfs_emit(buf, "%u\n", val);
-> +}
-> +
->  static void reset_bdev(struct zram *zram)
->  {
->         if (!zram->backing_dev)
-> @@ -781,10 +815,7 @@ static void release_wb_ctl(struct zram_wb_ctl *wb_ct=
-l)
->         kfree(wb_ctl);
->  }
->
-> -/* XXX: should be a per-device sysfs attr */
-> -#define ZRAM_WB_REQ_CNT 32
-> -
-> -static struct zram_wb_ctl *init_wb_ctl(void)
-> +static struct zram_wb_ctl *init_wb_ctl(struct zram *zram)
->  {
->         struct zram_wb_ctl *wb_ctl;
->         int i;
-> @@ -799,7 +830,7 @@ static struct zram_wb_ctl *init_wb_ctl(void)
->         init_waitqueue_head(&wb_ctl->done_wait);
->         spin_lock_init(&wb_ctl->done_lock);
->
-> -       for (i =3D 0; i < ZRAM_WB_REQ_CNT; i++) {
-> +       for (i =3D 0; i < zram->wb_batch_size; i++) {
->                 struct zram_wb_req *req;
->
->                 /*
-> @@ -1200,7 +1231,7 @@ static ssize_t writeback_store(struct device *dev,
->                 goto release_init_lock;
->         }
->
-> -       wb_ctl =3D init_wb_ctl();
-> +       wb_ctl =3D init_wb_ctl(zram);
->         if (!wb_ctl) {
->                 ret =3D -ENOMEM;
->                 goto release_init_lock;
-> @@ -2843,6 +2874,7 @@ static DEVICE_ATTR_RW(backing_dev);
->  static DEVICE_ATTR_WO(writeback);
->  static DEVICE_ATTR_RW(writeback_limit);
->  static DEVICE_ATTR_RW(writeback_limit_enable);
-> +static DEVICE_ATTR_RW(writeback_batch_size);
->  #endif
->  #ifdef CONFIG_ZRAM_MULTI_COMP
->  static DEVICE_ATTR_RW(recomp_algorithm);
-> @@ -2864,6 +2896,7 @@ static struct attribute *zram_disk_attrs[] =3D {
->         &dev_attr_writeback.attr,
->         &dev_attr_writeback_limit.attr,
->         &dev_attr_writeback_limit_enable.attr,
-> +       &dev_attr_writeback_batch_size.attr,
->  #endif
->         &dev_attr_io_stat.attr,
->         &dev_attr_mm_stat.attr,
-> @@ -2925,6 +2958,7 @@ static int zram_add(void)
->
->         init_rwsem(&zram->init_lock);
->  #ifdef CONFIG_ZRAM_WRITEBACK
-> +       zram->wb_batch_size =3D 32;
->         spin_lock_init(&zram->wb_limit_lock);
->  #endif
->
-> diff --git a/drivers/block/zram/zram_drv.h b/drivers/block/zram/zram_drv.=
+At the same time, the protection information may also be split in
+multiple segments. The most likely way that may happen is if two
+requests merge, or if we're directly using the io_uring user metadata.
+The generate/verify, however, only ever accessed the first bip_vec.
+
+Further, it may be possible to unalign the protection fields from the
+user space buffer, or if there are odd additional opaque bytes in front
+or in back of the protection information metadata region.
+
+Change up the iteration to allow spanning multiple segments. This patch
+is mostly a re-write of the protection information handling to allow any
+arbitrary alignments, so it's probably easier to review the end result
+rather than the diff.
+
+Martin reports many SCSI controllers are not able to handle interval
+data composed of multiple segments when PI is used, so this patch
+introduces a new integrity limit that a low level driver can set to
+notify that it is capable of handling that, default to false. The nvme
+driver is the first one to enable it in this patch. Everyone else will
+force DMA alignment to the logical block size to ensure interval data is
+always aligned within a single segment.
+
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+v5->v6:
+
+  Changed the new queue limit from a bool to a flag and took an
+  available bit for it.
+
+  Also ensure the limit is stacked as needed.
+
+ block/blk-settings.c          |  12 +-
+ block/t10-pi.c                | 825 +++++++++++++++++++---------------
+ drivers/nvme/host/core.c      |   1 +
+ include/linux/blk-integrity.h |   1 +
+ 4 files changed, 473 insertions(+), 366 deletions(-)
+
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 51401f08ce05b..86e04ea895ea0 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -198,11 +198,11 @@ static int blk_validate_integrity_limits(struct que=
+ue_limits *lim)
+ 		bi->interval_exp =3D ilog2(lim->logical_block_size);
+=20
+ 	/*
+-	 * The PI generation / validation helpers do not expect intervals to
+-	 * straddle multiple bio_vecs.  Enforce alignment so that those are
++	 * Some IO controllers can not handle data intervals straddling
++	 * multiple bio_vecs.  For those, enforce alignment so that those are
+ 	 * never generated, and that each buffer is aligned as expected.
+ 	 */
+-	if (bi->csum_type) {
++	if (!(bi->flags & BLK_SPLIT_INTERVAL_CAPABLE) && bi->csum_type) {
+ 		lim->dma_alignment =3D max(lim->dma_alignment,
+ 					(1U << bi->interval_exp) - 1);
+ 	}
+@@ -1001,10 +1001,14 @@ bool queue_limits_stack_integrity(struct queue_li=
+mits *t,
+ 		if ((ti->flags & BLK_INTEGRITY_REF_TAG) !=3D
+ 		    (bi->flags & BLK_INTEGRITY_REF_TAG))
+ 			goto incompatible;
++		if ((ti->flags & BLK_SPLIT_INTERVAL_CAPABLE) &&
++		    !(bi->flags & BLK_SPLIT_INTERVAL_CAPABLE))
++			ti->flags &=3D ~BLK_SPLIT_INTERVAL_CAPABLE;
+ 	} else {
+ 		ti->flags =3D BLK_INTEGRITY_STACKED;
+ 		ti->flags |=3D (bi->flags & BLK_INTEGRITY_DEVICE_CAPABLE) |
+-			     (bi->flags & BLK_INTEGRITY_REF_TAG);
++			     (bi->flags & BLK_INTEGRITY_REF_TAG) |
++			     (bi->flags & BLK_SPLIT_INTERVAL_CAPABLE);
+ 		ti->csum_type =3D bi->csum_type;
+ 		ti->pi_tuple_size =3D bi->pi_tuple_size;
+ 		ti->metadata_size =3D bi->metadata_size;
+diff --git a/block/t10-pi.c b/block/t10-pi.c
+index 0c4ed97021460..a5756efc13e9d 100644
+--- a/block/t10-pi.c
++++ b/block/t10-pi.c
+@@ -12,462 +12,563 @@
+ #include <linux/unaligned.h>
+ #include "blk.h"
+=20
++#define APP_TAG_ESCAPE 0xffff
++#define REF_TAG_ESCAPE 0xffffffff
++
++/*
++ * This union is used for onstack allocations when the pi field is split=
+ across
++ * segments. blk_validate_integrity_limits() guarantees pi_tuple_size ma=
+tches
++ * the sizeof one of these two types.
++ */
++union pi_tuple {
++	struct crc64_pi_tuple	crc64_pi;
++	struct t10_pi_tuple	t10_pi;
++};
++
+ struct blk_integrity_iter {
+-	void			*prot_buf;
+-	void			*data_buf;
+-	sector_t		seed;
+-	unsigned int		data_size;
+-	unsigned short		interval;
+-	const char		*disk_name;
++	struct bio			*bio;
++	struct bio_integrity_payload	*bip;
++	struct blk_integrity		*bi;
++	struct bvec_iter		data_iter;
++	struct bvec_iter		prot_iter;
++	unsigned int			interval_remaining;
++	u64				seed;
++	u64				csum;
+ };
+=20
+-static __be16 t10_pi_csum(__be16 csum, void *data, unsigned int len,
+-		unsigned char csum_type)
++static void blk_calculate_guard(struct blk_integrity_iter *iter, void *d=
+ata,
++				unsigned int len)
+ {
+-	if (csum_type =3D=3D BLK_INTEGRITY_CSUM_IP)
+-		return (__force __be16)ip_compute_csum(data, len);
+-	return cpu_to_be16(crc_t10dif_update(be16_to_cpu(csum), data, len));
++	switch (iter->bi->csum_type) {
++	case BLK_INTEGRITY_CSUM_CRC64:
++		iter->csum =3D crc64_nvme(iter->csum, data, len);
++		break;
++	case BLK_INTEGRITY_CSUM_CRC:
++		iter->csum =3D crc_t10dif_update(iter->csum, data, len);
++		break;
++	case BLK_INTEGRITY_CSUM_IP:
++		iter->csum =3D (__force u32)csum_partial(data, len,
++						(__force __wsum)iter->csum);
++		break;
++	default:
++		WARN_ON_ONCE(1);
++		iter->csum =3D U64_MAX;
++		break;
++	}
++}
++
++static void blk_integrity_csum_finish(struct blk_integrity_iter *iter)
++{
++	switch (iter->bi->csum_type) {
++	case BLK_INTEGRITY_CSUM_IP:
++		iter->csum =3D (__force u16)csum_fold((__force __wsum)iter->csum);
++		break;
++	default:
++		break;
++	}
+ }
+=20
+ /*
+- * Type 1 and Type 2 protection use the same format: 16 bit guard tag,
+- * 16 bit app tag, 32 bit reference tag. Type 3 does not define the ref
+- * tag.
++ * Update the csum for formats that have metadata padding in front of th=
+e data
++ * integrity field
+  */
+-static void t10_pi_generate(struct blk_integrity_iter *iter,
+-		struct blk_integrity *bi)
++static void blk_integrity_csum_offset(struct blk_integrity_iter *iter)
++{
++	unsigned int offset =3D iter->bi->pi_offset;
++	struct bio_vec *bvec =3D iter->bip->bip_vec;
++
++	while (offset > 0) {
++		struct bio_vec pbv =3D mp_bvec_iter_bvec(bvec, iter->prot_iter);
++		unsigned int len =3D min(pbv.bv_len, offset);
++		void *prot_buf =3D bvec_kmap_local(&pbv);
++
++		blk_calculate_guard(iter, prot_buf, len);
++		kunmap_local(prot_buf);
++		offset -=3D len;
++		bvec_iter_advance_single(bvec, &iter->prot_iter, len);
++	}
++	blk_integrity_csum_finish(iter);
++}
++
++static void blk_integrity_copy_from_tuple(struct bio_integrity_payload *=
+bip,
++					  struct bvec_iter *iter, void *tuple,
++					  unsigned int tuple_size)
+ {
+-	u8 offset =3D bi->pi_offset;
+-	unsigned int i;
++	void *prot_buf;
+=20
+-	for (i =3D 0 ; i < iter->data_size ; i +=3D iter->interval) {
+-		struct t10_pi_tuple *pi =3D iter->prot_buf + offset;
++	while (tuple_size) {
++		struct bio_vec pbv =3D mp_bvec_iter_bvec(bip->bip_vec, *iter);
++		unsigned int len =3D min(tuple_size, pbv.bv_len);
+=20
+-		pi->guard_tag =3D t10_pi_csum(0, iter->data_buf, iter->interval,
+-				bi->csum_type);
+-		if (offset)
+-			pi->guard_tag =3D t10_pi_csum(pi->guard_tag,
+-					iter->prot_buf, offset, bi->csum_type);
+-		pi->app_tag =3D 0;
++		prot_buf =3D bvec_kmap_local(&pbv);
++		memcpy(prot_buf, tuple, len);
++		kunmap_local(prot_buf);
+=20
+-		if (bi->flags & BLK_INTEGRITY_REF_TAG)
+-			pi->ref_tag =3D cpu_to_be32(lower_32_bits(iter->seed));
+-		else
+-			pi->ref_tag =3D 0;
++		bvec_iter_advance_single(bip->bip_vec, iter, len);
++		tuple_size -=3D len;
++		tuple +=3D len;
++	}
++}
+=20
+-		iter->data_buf +=3D iter->interval;
+-		iter->prot_buf +=3D bi->metadata_size;
+-		iter->seed++;
++static void blk_integrity_copy_to_tuple(struct bio_integrity_payload *bi=
+p,
++					struct bvec_iter *iter, void *tuple,
++					unsigned int tuple_size)
++{
++	void *prot_buf;
++
++	while (tuple_size) {
++		struct bio_vec pbv =3D mp_bvec_iter_bvec(bip->bip_vec, *iter);
++		unsigned int len =3D min(tuple_size, pbv.bv_len);
++
++		prot_buf =3D bvec_kmap_local(&pbv);
++		memcpy(tuple, prot_buf, len);
++		kunmap_local(prot_buf);
++
++		bvec_iter_advance_single(bip->bip_vec, iter, len);
++		tuple_size -=3D len;
++		tuple +=3D len;
+ 	}
+ }
+=20
+-static blk_status_t t10_pi_verify(struct blk_integrity_iter *iter,
+-		struct blk_integrity *bi)
+-{
+-	u8 offset =3D bi->pi_offset;
+-	unsigned int i;
+-
+-	for (i =3D 0 ; i < iter->data_size ; i +=3D iter->interval) {
+-		struct t10_pi_tuple *pi =3D iter->prot_buf + offset;
+-		__be16 csum;
+-
+-		if (bi->flags & BLK_INTEGRITY_REF_TAG) {
+-			if (pi->app_tag =3D=3D T10_PI_APP_ESCAPE)
+-				goto next;
+-
+-			if (be32_to_cpu(pi->ref_tag) !=3D
+-			    lower_32_bits(iter->seed)) {
+-				pr_err("%s: ref tag error at location %llu " \
+-				       "(rcvd %u)\n", iter->disk_name,
+-				       (unsigned long long)
+-				       iter->seed, be32_to_cpu(pi->ref_tag));
+-				return BLK_STS_PROTECTION;
+-			}
+-		} else {
+-			if (pi->app_tag =3D=3D T10_PI_APP_ESCAPE &&
+-			    pi->ref_tag =3D=3D T10_PI_REF_ESCAPE)
+-				goto next;
++static bool ext_pi_ref_escape(const u8 ref_tag[6])
++{
++	static const u8 ref_escape[6] =3D { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff =
+};
++
++	return memcmp(ref_tag, ref_escape, sizeof(ref_escape)) =3D=3D 0;
++}
++
++static blk_status_t blk_verify_ext_pi(struct blk_integrity_iter *iter,
++				      struct crc64_pi_tuple *pi)
++{
++	u64 seed =3D lower_48_bits(iter->seed);
++	u64 guard =3D get_unaligned_be64(&pi->guard_tag);
++	u64 ref =3D get_unaligned_be48(pi->ref_tag);
++	u16 app =3D get_unaligned_be16(&pi->app_tag);
++
++	if (iter->bi->flags & BLK_INTEGRITY_REF_TAG) {
++		if (app =3D=3D APP_TAG_ESCAPE)
++			return BLK_STS_OK;
++		if (ref !=3D seed) {
++			pr_err("%s: ref tag error at location %llu (rcvd %llu)\n",
++				iter->bio->bi_bdev->bd_disk->disk_name, seed,
++				ref);
++			return BLK_STS_PROTECTION;
+ 		}
++	} else if (app =3D=3D APP_TAG_ESCAPE && ext_pi_ref_escape(pi->ref_tag))=
+ {
++		return BLK_STS_OK;
++	}
++
++	if (guard !=3D iter->csum) {
++		pr_err("%s: guard tag error at sector %llu (rcvd %016llx, want %016llx=
+)\n",
++			iter->bio->bi_bdev->bd_disk->disk_name, iter->seed,
++			guard, iter->csum);
++		return BLK_STS_PROTECTION;
++	}
+=20
+-		csum =3D t10_pi_csum(0, iter->data_buf, iter->interval,
+-				bi->csum_type);
+-		if (offset)
+-			csum =3D t10_pi_csum(csum, iter->prot_buf, offset,
+-					bi->csum_type);
+-
+-		if (pi->guard_tag !=3D csum) {
+-			pr_err("%s: guard tag error at sector %llu " \
+-			       "(rcvd %04x, want %04x)\n", iter->disk_name,
+-			       (unsigned long long)iter->seed,
+-			       be16_to_cpu(pi->guard_tag), be16_to_cpu(csum));
++	return BLK_STS_OK;
++}
++
++static blk_status_t blk_verify_pi(struct blk_integrity_iter *iter,
++				      struct t10_pi_tuple *pi, u16 guard)
++{
++	u32 seed =3D lower_32_bits(iter->seed);
++	u32 ref =3D get_unaligned_be32(&pi->ref_tag);
++	u16 app =3D get_unaligned_be16(&pi->app_tag);
++
++	if (iter->bi->flags & BLK_INTEGRITY_REF_TAG) {
++		if (app =3D=3D APP_TAG_ESCAPE)
++			return BLK_STS_OK;
++		if (ref !=3D seed) {
++			pr_err("%s: ref tag error at location %u (rcvd %u)\n",
++				iter->bio->bi_bdev->bd_disk->disk_name, seed,
++				ref);
+ 			return BLK_STS_PROTECTION;
+ 		}
++	} else if (app =3D=3D APP_TAG_ESCAPE && ref =3D=3D REF_TAG_ESCAPE) {
++		return BLK_STS_OK;
++	}
+=20
+-next:
+-		iter->data_buf +=3D iter->interval;
+-		iter->prot_buf +=3D bi->metadata_size;
+-		iter->seed++;
++	if (guard !=3D (u16)iter->csum) {
++		pr_err("%s: guard tag error at sector %llu (rcvd %04x, want %04x)\n",
++			iter->bio->bi_bdev->bd_disk->disk_name, iter->seed,
++			guard, (u16)iter->csum);
++		return BLK_STS_PROTECTION;
+ 	}
+=20
+ 	return BLK_STS_OK;
+ }
+=20
+-/**
+- * t10_pi_type1_prepare - prepare PI prior submitting request to device
+- * @rq:              request with PI that should be prepared
+- *
+- * For Type 1/Type 2, the virtual start sector is the one that was
+- * originally submitted by the block layer for the ref_tag usage. Due to
+- * partitioning, MD/DM cloning, etc. the actual physical start sector is
+- * likely to be different. Remap protection information to match the
+- * physical LBA.
+- */
+-static void t10_pi_type1_prepare(struct request *rq)
++static blk_status_t blk_verify_t10_pi(struct blk_integrity_iter *iter,
++				      struct t10_pi_tuple *pi)
+ {
+-	struct blk_integrity *bi =3D &rq->q->limits.integrity;
+-	const int tuple_sz =3D bi->metadata_size;
+-	u32 ref_tag =3D t10_pi_ref_tag(rq);
+-	u8 offset =3D bi->pi_offset;
+-	struct bio *bio;
++	u16 guard =3D get_unaligned_be16(&pi->guard_tag);
+=20
+-	__rq_for_each_bio(bio, rq) {
+-		struct bio_integrity_payload *bip =3D bio_integrity(bio);
+-		u32 virt =3D bip_get_seed(bip) & 0xffffffff;
+-		struct bio_vec iv;
+-		struct bvec_iter iter;
++	return blk_verify_pi(iter, pi, guard);
++}
+=20
+-		/* Already remapped? */
+-		if (bip->bip_flags & BIP_MAPPED_INTEGRITY)
+-			break;
++static blk_status_t blk_verify_ip_pi(struct blk_integrity_iter *iter,
++				     struct t10_pi_tuple *pi)
++{
++	u16 guard =3D get_unaligned((u16 *)&pi->guard_tag);
+=20
+-		bip_for_each_vec(iv, bip, iter) {
+-			unsigned int j;
+-			void *p;
+-
+-			p =3D bvec_kmap_local(&iv);
+-			for (j =3D 0; j < iv.bv_len; j +=3D tuple_sz) {
+-				struct t10_pi_tuple *pi =3D p + offset;
+-
+-				if (be32_to_cpu(pi->ref_tag) =3D=3D virt)
+-					pi->ref_tag =3D cpu_to_be32(ref_tag);
+-				virt++;
+-				ref_tag++;
+-				p +=3D tuple_sz;
+-			}
+-			kunmap_local(p);
+-		}
++	return blk_verify_pi(iter, pi, guard);
++}
+=20
+-		bip->bip_flags |=3D BIP_MAPPED_INTEGRITY;
++static blk_status_t blk_integrity_verify(struct blk_integrity_iter *iter=
+,
++					 union pi_tuple *tuple)
++{
++	switch (iter->bi->csum_type) {
++	case BLK_INTEGRITY_CSUM_CRC64:
++		return blk_verify_ext_pi(iter, &tuple->crc64_pi);
++	case BLK_INTEGRITY_CSUM_CRC:
++		return blk_verify_t10_pi(iter, &tuple->t10_pi);
++	case BLK_INTEGRITY_CSUM_IP:
++		return blk_verify_ip_pi(iter, &tuple->t10_pi);
++	default:
++		return BLK_STS_OK;
+ 	}
+ }
+=20
+-/**
+- * t10_pi_type1_complete - prepare PI prior returning request to the blk=
+ layer
+- * @rq:              request with PI that should be prepared
+- * @nr_bytes:        total bytes to prepare
+- *
+- * For Type 1/Type 2, the virtual start sector is the one that was
+- * originally submitted by the block layer for the ref_tag usage. Due to
+- * partitioning, MD/DM cloning, etc. the actual physical start sector is
+- * likely to be different. Since the physical start sector was submitted
+- * to the device, we should remap it back to virtual values expected by =
+the
+- * block layer.
+- */
+-static void t10_pi_type1_complete(struct request *rq, unsigned int nr_by=
+tes)
++static void blk_set_ext_pi(struct blk_integrity_iter *iter,
++			   struct crc64_pi_tuple *pi)
+ {
+-	struct blk_integrity *bi =3D &rq->q->limits.integrity;
+-	unsigned intervals =3D nr_bytes >> bi->interval_exp;
+-	const int tuple_sz =3D bi->metadata_size;
+-	u32 ref_tag =3D t10_pi_ref_tag(rq);
+-	u8 offset =3D bi->pi_offset;
+-	struct bio *bio;
++	put_unaligned_be64(iter->csum, &pi->guard_tag);
++	put_unaligned_be16(0, &pi->app_tag);
++	put_unaligned_be48(iter->seed, &pi->ref_tag);
++}
+=20
+-	__rq_for_each_bio(bio, rq) {
+-		struct bio_integrity_payload *bip =3D bio_integrity(bio);
+-		u32 virt =3D bip_get_seed(bip) & 0xffffffff;
+-		struct bio_vec iv;
+-		struct bvec_iter iter;
+-
+-		bip_for_each_vec(iv, bip, iter) {
+-			unsigned int j;
+-			void *p;
+-
+-			p =3D bvec_kmap_local(&iv);
+-			for (j =3D 0; j < iv.bv_len && intervals; j +=3D tuple_sz) {
+-				struct t10_pi_tuple *pi =3D p + offset;
+-
+-				if (be32_to_cpu(pi->ref_tag) =3D=3D ref_tag)
+-					pi->ref_tag =3D cpu_to_be32(virt);
+-				virt++;
+-				ref_tag++;
+-				intervals--;
+-				p +=3D tuple_sz;
+-			}
+-			kunmap_local(p);
+-		}
++static void blk_set_pi(struct blk_integrity_iter *iter,
++		       struct t10_pi_tuple *pi, __be16 csum)
++{
++	put_unaligned(csum, &pi->guard_tag);
++	put_unaligned_be16(0, &pi->app_tag);
++	put_unaligned_be32(iter->seed, &pi->ref_tag);
++}
++
++static void blk_set_t10_pi(struct blk_integrity_iter *iter,
++			   struct t10_pi_tuple *pi)
++{
++	blk_set_pi(iter, pi, cpu_to_be16((u16)iter->csum));
++}
++
++static void blk_set_ip_pi(struct blk_integrity_iter *iter,
++			  struct t10_pi_tuple *pi)
++{
++	blk_set_pi(iter, pi, (__force __be16)(u16)iter->csum);
++}
++
++static void blk_integrity_set(struct blk_integrity_iter *iter,
++			      union pi_tuple *tuple)
++{
++	switch (iter->bi->csum_type) {
++	case BLK_INTEGRITY_CSUM_CRC64:
++		return blk_set_ext_pi(iter, &tuple->crc64_pi);
++	case BLK_INTEGRITY_CSUM_CRC:
++		return blk_set_t10_pi(iter, &tuple->t10_pi);
++	case BLK_INTEGRITY_CSUM_IP:
++		return blk_set_ip_pi(iter, &tuple->t10_pi);
++	default:
++		WARN_ON_ONCE(1);
++		return;
+ 	}
+ }
+=20
+-static __be64 ext_pi_crc64(u64 crc, void *data, unsigned int len)
++static blk_status_t blk_integrity_interval(struct blk_integrity_iter *it=
+er,
++					   bool verify)
+ {
+-	return cpu_to_be64(crc64_nvme(crc, data, len));
++	blk_status_t ret =3D BLK_STS_OK;
++	union pi_tuple tuple;
++	void *ptuple =3D &tuple;
++	struct bio_vec pbv;
++
++	blk_integrity_csum_offset(iter);
++	pbv =3D mp_bvec_iter_bvec(iter->bip->bip_vec, iter->prot_iter);
++	if (pbv.bv_len >=3D iter->bi->pi_tuple_size) {
++		ptuple =3D bvec_kmap_local(&pbv);
++		bvec_iter_advance_single(iter->bip->bip_vec, &iter->prot_iter,
++				iter->bi->metadata_size - iter->bi->pi_offset);
++	} else if (verify) {
++		blk_integrity_copy_to_tuple(iter->bip, &iter->prot_iter,
++				ptuple, iter->bi->pi_tuple_size);
++	}
++
++	if (verify)
++		ret =3D blk_integrity_verify(iter, ptuple);
++	else
++		blk_integrity_set(iter, ptuple);
++
++	if (likely(ptuple !=3D &tuple)) {
++		kunmap_local(ptuple);
++	} else if (!verify) {
++		blk_integrity_copy_from_tuple(iter->bip, &iter->prot_iter,
++				ptuple, iter->bi->pi_tuple_size);
++	}
++
++
++	iter->interval_remaining =3D 1 << iter->bi->interval_exp;
++	iter->csum =3D 0;
++	iter->seed++;
++
++	return ret;
+ }
+=20
+-static void ext_pi_crc64_generate(struct blk_integrity_iter *iter,
+-		struct blk_integrity *bi)
++static void blk_integrity_iterate(struct bio *bio, struct bvec_iter *dat=
+a_iter,
++				  bool verify)
+ {
+-	u8 offset =3D bi->pi_offset;
+-	unsigned int i;
++	struct blk_integrity *bi =3D blk_get_integrity(bio->bi_bdev->bd_disk);
++	struct bio_integrity_payload *bip =3D bio_integrity(bio);
++	struct blk_integrity_iter iter =3D {
++		.bio =3D bio,
++		.bip =3D bip,
++		.bi =3D bi,
++		.data_iter =3D *data_iter,
++		.prot_iter =3D bip->bip_iter,
++		.interval_remaining =3D 1 << bi->interval_exp,
++		.seed =3D data_iter->bi_sector,
++		.csum =3D 0,
++	};
++	blk_status_t ret =3D BLK_STS_OK;
++
++	while (iter.data_iter.bi_size && ret =3D=3D BLK_STS_OK) {
++		struct bio_vec bv =3D mp_bvec_iter_bvec(iter.bio->bi_io_vec,
++						      iter.data_iter);
++		void *kaddr =3D bvec_kmap_local(&bv);
++		void *data =3D kaddr;
++		unsigned int len;
++
++		bvec_iter_advance_single(iter.bio->bi_io_vec, &iter.data_iter,
++					 bv.bv_len);
++		while (bv.bv_len && ret =3D=3D BLK_STS_OK) {
++			len =3D min(iter.interval_remaining, bv.bv_len);
++			blk_calculate_guard(&iter, data, len);
++			bv.bv_len -=3D len;
++			data +=3D len;
++			iter.interval_remaining -=3D len;
++			if (!iter.interval_remaining)
++				ret =3D blk_integrity_interval(&iter, verify);
++		}
++		kunmap_local(kaddr);
++	}
++
++	if (ret)
++		bio->bi_status =3D ret;
++}
+=20
+-	for (i =3D 0 ; i < iter->data_size ; i +=3D iter->interval) {
+-		struct crc64_pi_tuple *pi =3D iter->prot_buf + offset;
++void blk_integrity_generate(struct bio *bio)
++{
++	struct blk_integrity *bi =3D blk_get_integrity(bio->bi_bdev->bd_disk);
+=20
+-		pi->guard_tag =3D ext_pi_crc64(0, iter->data_buf, iter->interval);
+-		if (offset)
+-			pi->guard_tag =3D ext_pi_crc64(be64_to_cpu(pi->guard_tag),
+-					iter->prot_buf, offset);
+-		pi->app_tag =3D 0;
++	switch (bi->csum_type) {
++	case BLK_INTEGRITY_CSUM_CRC64:
++	case BLK_INTEGRITY_CSUM_CRC:
++	case BLK_INTEGRITY_CSUM_IP:
++		blk_integrity_iterate(bio, &bio->bi_iter, false);
++		break;
++	default:
++		break;
++	}
++}
+=20
+-		if (bi->flags & BLK_INTEGRITY_REF_TAG)
+-			put_unaligned_be48(iter->seed, pi->ref_tag);
+-		else
+-			put_unaligned_be48(0ULL, pi->ref_tag);
++void blk_integrity_verify_iter(struct bio *bio, struct bvec_iter *saved_=
+iter)
++{
++	struct blk_integrity *bi =3D blk_get_integrity(bio->bi_bdev->bd_disk);
+=20
+-		iter->data_buf +=3D iter->interval;
+-		iter->prot_buf +=3D bi->metadata_size;
+-		iter->seed++;
++	switch (bi->csum_type) {
++	case BLK_INTEGRITY_CSUM_CRC64:
++	case BLK_INTEGRITY_CSUM_CRC:
++	case BLK_INTEGRITY_CSUM_IP:
++		blk_integrity_iterate(bio, saved_iter, true);
++		break;
++	default:
++		break;
+ 	}
+ }
+=20
+-static bool ext_pi_ref_escape(const u8 ref_tag[6])
++/*
++ * Advance @iter past the protection offset for protection formats that
++ * contain front padding on the metadata region.
++ */
++static void blk_pi_advance_offset(struct blk_integrity *bi,
++				  struct bio_integrity_payload *bip,
++				  struct bvec_iter *iter)
+ {
+-	static const u8 ref_escape[6] =3D { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff =
+};
++	unsigned int offset =3D bi->pi_offset;
+=20
+-	return memcmp(ref_tag, ref_escape, sizeof(ref_escape)) =3D=3D 0;
++	while (offset > 0) {
++		struct bio_vec bv =3D mp_bvec_iter_bvec(bip->bip_vec, *iter);
++		unsigned int len =3D min(bv.bv_len, offset);
++
++		bvec_iter_advance_single(bip->bip_vec, iter, len);
++		offset -=3D len;
++	}
+ }
+=20
+-static blk_status_t ext_pi_crc64_verify(struct blk_integrity_iter *iter,
+-		struct blk_integrity *bi)
+-{
+-	u8 offset =3D bi->pi_offset;
+-	unsigned int i;
+-
+-	for (i =3D 0; i < iter->data_size; i +=3D iter->interval) {
+-		struct crc64_pi_tuple *pi =3D iter->prot_buf + offset;
+-		u64 ref, seed;
+-		__be64 csum;
+-
+-		if (bi->flags & BLK_INTEGRITY_REF_TAG) {
+-			if (pi->app_tag =3D=3D T10_PI_APP_ESCAPE)
+-				goto next;
+-
+-			ref =3D get_unaligned_be48(pi->ref_tag);
+-			seed =3D lower_48_bits(iter->seed);
+-			if (ref !=3D seed) {
+-				pr_err("%s: ref tag error at location %llu (rcvd %llu)\n",
+-					iter->disk_name, seed, ref);
+-				return BLK_STS_PROTECTION;
+-			}
+-		} else {
+-			if (pi->app_tag =3D=3D T10_PI_APP_ESCAPE &&
+-			    ext_pi_ref_escape(pi->ref_tag))
+-				goto next;
+-		}
++static void *blk_tuple_remap_begin(union pi_tuple *tuple,
++				   struct blk_integrity *bi,
++				   struct bio_integrity_payload *bip,
++				   struct bvec_iter *iter)
++{
++	struct bvec_iter titer;
++	struct bio_vec pbv;
+=20
+-		csum =3D ext_pi_crc64(0, iter->data_buf, iter->interval);
+-		if (offset)
+-			csum =3D ext_pi_crc64(be64_to_cpu(csum), iter->prot_buf,
+-					    offset);
++	blk_pi_advance_offset(bi, bip, iter);
++	pbv =3D mp_bvec_iter_bvec(bip->bip_vec, *iter);
++	if (likely(pbv.bv_len >=3D bi->pi_tuple_size))
++		return bvec_kmap_local(&pbv);
+=20
+-		if (pi->guard_tag !=3D csum) {
+-			pr_err("%s: guard tag error at sector %llu " \
+-			       "(rcvd %016llx, want %016llx)\n",
+-				iter->disk_name, (unsigned long long)iter->seed,
+-				be64_to_cpu(pi->guard_tag), be64_to_cpu(csum));
+-			return BLK_STS_PROTECTION;
+-		}
++	/*
++	 * We need to preserve the state of the original iter for the
++	 * copy_from_tuple at the end, so make a temp iter for here.
++	 */
++	titer =3D *iter;
++	blk_integrity_copy_to_tuple(bip, &titer, tuple, bi->pi_tuple_size);
++	return tuple;
++}
+=20
+-next:
+-		iter->data_buf +=3D iter->interval;
+-		iter->prot_buf +=3D bi->metadata_size;
+-		iter->seed++;
++static void blk_tuple_remap_end(union pi_tuple *tuple, void *ptuple,
++				struct blk_integrity *bi,
++				struct bio_integrity_payload *bip,
++				struct bvec_iter *iter)
++{
++	unsigned int len =3D bi->metadata_size - bi->pi_offset;
++
++	if (likely(ptuple !=3D tuple)) {
++		kunmap_local(ptuple);
++	} else {
++		blk_integrity_copy_from_tuple(bip, iter, ptuple,
++				bi->pi_tuple_size);
++		len -=3D bi->pi_tuple_size;
+ 	}
+=20
+-	return BLK_STS_OK;
++	bvec_iter_advance(bip->bip_vec, iter, len);
+ }
+=20
+-static void ext_pi_type1_prepare(struct request *rq)
++static void blk_set_ext_unmap_ref(struct crc64_pi_tuple *pi, u64 virt,
++				  u64 ref_tag)
+ {
+-	struct blk_integrity *bi =3D &rq->q->limits.integrity;
+-	const int tuple_sz =3D bi->metadata_size;
+-	u64 ref_tag =3D ext_pi_ref_tag(rq);
+-	u8 offset =3D bi->pi_offset;
+-	struct bio *bio;
++	u64 ref =3D get_unaligned_be48(&pi->ref_tag);
+=20
+-	__rq_for_each_bio(bio, rq) {
+-		struct bio_integrity_payload *bip =3D bio_integrity(bio);
+-		u64 virt =3D lower_48_bits(bip_get_seed(bip));
+-		struct bio_vec iv;
+-		struct bvec_iter iter;
++	if (ref =3D=3D lower_48_bits(ref_tag) && ref !=3D lower_48_bits(virt))
++		put_unaligned_be48(virt, pi->ref_tag);
++}
+=20
+-		/* Already remapped? */
+-		if (bip->bip_flags & BIP_MAPPED_INTEGRITY)
+-			break;
++static void blk_set_t10_unmap_ref(struct t10_pi_tuple *pi, u32 virt,
++				  u32 ref_tag)
++{
++	u32 ref =3D get_unaligned_be32(&pi->ref_tag);
+=20
+-		bip_for_each_vec(iv, bip, iter) {
+-			unsigned int j;
+-			void *p;
+-
+-			p =3D bvec_kmap_local(&iv);
+-			for (j =3D 0; j < iv.bv_len; j +=3D tuple_sz) {
+-				struct crc64_pi_tuple *pi =3D p +  offset;
+-				u64 ref =3D get_unaligned_be48(pi->ref_tag);
+-
+-				if (ref =3D=3D virt)
+-					put_unaligned_be48(ref_tag, pi->ref_tag);
+-				virt++;
+-				ref_tag++;
+-				p +=3D tuple_sz;
+-			}
+-			kunmap_local(p);
+-		}
++	if (ref =3D=3D ref_tag && ref !=3D virt)
++		put_unaligned_be32(virt, &pi->ref_tag);
++}
+=20
+-		bip->bip_flags |=3D BIP_MAPPED_INTEGRITY;
++static void blk_reftag_remap_complete(struct blk_integrity *bi,
++				      union pi_tuple *tuple, u64 virt, u64 ref)
++{
++	switch (bi->csum_type) {
++	case BLK_INTEGRITY_CSUM_CRC64:
++		blk_set_ext_unmap_ref(&tuple->crc64_pi, virt, ref);
++		break;
++	case BLK_INTEGRITY_CSUM_CRC:
++	case BLK_INTEGRITY_CSUM_IP:
++		blk_set_t10_unmap_ref(&tuple->t10_pi, virt, ref);
++		break;
++	default:
++		WARN_ON_ONCE(1);
++		break;
+ 	}
+ }
+=20
+-static void ext_pi_type1_complete(struct request *rq, unsigned int nr_by=
+tes)
++static void blk_set_ext_map_ref(struct crc64_pi_tuple *pi, u64 virt,
++				u64 ref_tag)
+ {
+-	struct blk_integrity *bi =3D &rq->q->limits.integrity;
+-	unsigned intervals =3D nr_bytes >> bi->interval_exp;
+-	const int tuple_sz =3D bi->metadata_size;
+-	u64 ref_tag =3D ext_pi_ref_tag(rq);
+-	u8 offset =3D bi->pi_offset;
+-	struct bio *bio;
++	u64 ref =3D get_unaligned_be48(&pi->ref_tag);
+=20
+-	__rq_for_each_bio(bio, rq) {
+-		struct bio_integrity_payload *bip =3D bio_integrity(bio);
+-		u64 virt =3D lower_48_bits(bip_get_seed(bip));
+-		struct bio_vec iv;
+-		struct bvec_iter iter;
+-
+-		bip_for_each_vec(iv, bip, iter) {
+-			unsigned int j;
+-			void *p;
+-
+-			p =3D bvec_kmap_local(&iv);
+-			for (j =3D 0; j < iv.bv_len && intervals; j +=3D tuple_sz) {
+-				struct crc64_pi_tuple *pi =3D p + offset;
+-				u64 ref =3D get_unaligned_be48(pi->ref_tag);
+-
+-				if (ref =3D=3D ref_tag)
+-					put_unaligned_be48(virt, pi->ref_tag);
+-				virt++;
+-				ref_tag++;
+-				intervals--;
+-				p +=3D tuple_sz;
+-			}
+-			kunmap_local(p);
+-		}
+-	}
++	if (ref =3D=3D lower_48_bits(virt) && ref !=3D ref_tag)
++		put_unaligned_be48(ref_tag, pi->ref_tag);
+ }
+=20
+-void blk_integrity_generate(struct bio *bio)
++static void blk_set_t10_map_ref(struct t10_pi_tuple *pi, u32 virt, u32 r=
+ef_tag)
+ {
+-	struct blk_integrity *bi =3D blk_get_integrity(bio->bi_bdev->bd_disk);
+-	struct bio_integrity_payload *bip =3D bio_integrity(bio);
+-	struct blk_integrity_iter iter;
+-	struct bvec_iter bviter;
+-	struct bio_vec bv;
+-
+-	iter.disk_name =3D bio->bi_bdev->bd_disk->disk_name;
+-	iter.interval =3D 1 << bi->interval_exp;
+-	iter.seed =3D bio->bi_iter.bi_sector;
+-	iter.prot_buf =3D bvec_virt(bip->bip_vec);
+-	bio_for_each_segment(bv, bio, bviter) {
+-		void *kaddr =3D bvec_kmap_local(&bv);
++	u32 ref =3D get_unaligned_be32(&pi->ref_tag);
+=20
+-		iter.data_buf =3D kaddr;
+-		iter.data_size =3D bv.bv_len;
+-		switch (bi->csum_type) {
+-		case BLK_INTEGRITY_CSUM_CRC64:
+-			ext_pi_crc64_generate(&iter, bi);
+-			break;
+-		case BLK_INTEGRITY_CSUM_CRC:
+-		case BLK_INTEGRITY_CSUM_IP:
+-			t10_pi_generate(&iter, bi);
+-			break;
+-		default:
+-			break;
+-		}
+-		kunmap_local(kaddr);
++	if (ref =3D=3D virt && ref !=3D ref_tag)
++		put_unaligned_be32(ref_tag, &pi->ref_tag);
++}
++
++static void blk_reftag_remap_prepare(struct blk_integrity *bi,
++				     union pi_tuple *tuple,
++				     u64 virt, u64 ref)
++{
++	switch (bi->csum_type) {
++	case BLK_INTEGRITY_CSUM_CRC64:
++		blk_set_ext_map_ref(&tuple->crc64_pi, virt, ref);
++		break;
++	case BLK_INTEGRITY_CSUM_CRC:
++	case BLK_INTEGRITY_CSUM_IP:
++		blk_set_t10_map_ref(&tuple->t10_pi, virt, ref);
++		break;
++	default:
++		WARN_ON_ONCE(1);
++		break;
+ 	}
+ }
+=20
+-void blk_integrity_verify_iter(struct bio *bio, struct bvec_iter *saved_=
+iter)
++static void __blk_reftag_remap(struct bio *bio, struct blk_integrity *bi=
+,
++			       unsigned *intervals, u64 *ref, bool prep)
+ {
+-	struct blk_integrity *bi =3D blk_get_integrity(bio->bi_bdev->bd_disk);
+ 	struct bio_integrity_payload *bip =3D bio_integrity(bio);
+-	struct blk_integrity_iter iter;
+-	struct bvec_iter bviter;
+-	struct bio_vec bv;
++	struct bvec_iter iter =3D bip->bip_iter;
++	u64 virt =3D bip_get_seed(bip);
++	union pi_tuple *ptuple;
++	union pi_tuple tuple;
+=20
+-	/*
+-	 * At the moment verify is called bi_iter has been advanced during spli=
+t
+-	 * and completion, so use the copy created during submission here.
+-	 */
+-	iter.disk_name =3D bio->bi_bdev->bd_disk->disk_name;
+-	iter.interval =3D 1 << bi->interval_exp;
+-	iter.seed =3D saved_iter->bi_sector;
+-	iter.prot_buf =3D bvec_virt(bip->bip_vec);
+-	__bio_for_each_segment(bv, bio, bviter, *saved_iter) {
+-		void *kaddr =3D bvec_kmap_local(&bv);
+-		blk_status_t ret =3D BLK_STS_OK;
++	if (prep && bip->bip_flags & BIP_MAPPED_INTEGRITY) {
++		*ref +=3D bio->bi_iter.bi_size >> bi->interval_exp;
++		return;
++	}
+=20
+-		iter.data_buf =3D kaddr;
+-		iter.data_size =3D bv.bv_len;
+-		switch (bi->csum_type) {
+-		case BLK_INTEGRITY_CSUM_CRC64:
+-			ret =3D ext_pi_crc64_verify(&iter, bi);
+-			break;
+-		case BLK_INTEGRITY_CSUM_CRC:
+-		case BLK_INTEGRITY_CSUM_IP:
+-			ret =3D t10_pi_verify(&iter, bi);
+-			break;
+-		default:
+-			break;
+-		}
+-		kunmap_local(kaddr);
++	while (iter.bi_size && *intervals) {
++		ptuple =3D blk_tuple_remap_begin(&tuple, bi, bip, &iter);
+=20
+-		if (ret) {
+-			bio->bi_status =3D ret;
+-			return;
+-		}
++		if (prep)
++			blk_reftag_remap_prepare(bi, ptuple, virt, *ref);
++		else
++			blk_reftag_remap_complete(bi, ptuple, virt, *ref);
++
++		blk_tuple_remap_end(&tuple, ptuple, bi, bip, &iter);
++		(*intervals)--;
++		(*ref)++;
++		virt++;
+ 	}
++
++	if (prep)
++		bip->bip_flags |=3D BIP_MAPPED_INTEGRITY;
+ }
+=20
+-void blk_integrity_prepare(struct request *rq)
++static void blk_integrity_remap(struct request *rq, unsigned int nr_byte=
+s,
++				bool prep)
+ {
+ 	struct blk_integrity *bi =3D &rq->q->limits.integrity;
++	u64 ref =3D blk_rq_pos(rq) >> (bi->interval_exp - SECTOR_SHIFT);
++	unsigned intervals =3D nr_bytes >> bi->interval_exp;
++	struct bio *bio;
+=20
+ 	if (!(bi->flags & BLK_INTEGRITY_REF_TAG))
+ 		return;
+=20
+-	if (bi->csum_type =3D=3D BLK_INTEGRITY_CSUM_CRC64)
+-		ext_pi_type1_prepare(rq);
+-	else
+-		t10_pi_type1_prepare(rq);
++	__rq_for_each_bio(bio, rq) {
++		__blk_reftag_remap(bio, bi, &intervals, &ref, prep);
++		if (!intervals)
++			break;
++	}
+ }
+=20
+-void blk_integrity_complete(struct request *rq, unsigned int nr_bytes)
++void blk_integrity_prepare(struct request *rq)
+ {
+-	struct blk_integrity *bi =3D &rq->q->limits.integrity;
+-
+-	if (!(bi->flags & BLK_INTEGRITY_REF_TAG))
+-		return;
++	blk_integrity_remap(rq, blk_rq_bytes(rq), true);
++}
+=20
+-	if (bi->csum_type =3D=3D BLK_INTEGRITY_CSUM_CRC64)
+-		ext_pi_type1_complete(rq, nr_bytes);
+-	else
+-		t10_pi_type1_complete(rq, nr_bytes);
++void blk_integrity_complete(struct request *rq, unsigned int nr_bytes)
++{
++	blk_integrity_remap(rq, nr_bytes, false);
+ }
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 7bf228df6001f..fa534f1d6b27a 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -1874,6 +1874,7 @@ static bool nvme_init_integrity(struct nvme_ns_head=
+ *head,
+ 		break;
+ 	}
+=20
++	bi->flags |=3D BLK_SPLIT_INTERVAL_CAPABLE;
+ 	bi->metadata_size =3D head->ms;
+ 	if (bi->csum_type) {
+ 		bi->pi_tuple_size =3D head->pi_size;
+diff --git a/include/linux/blk-integrity.h b/include/linux/blk-integrity.=
 h
-> index 6cee93f9c0d0..1a647f42c1a4 100644
-> --- a/drivers/block/zram/zram_drv.h
-> +++ b/drivers/block/zram/zram_drv.h
-> @@ -129,6 +129,7 @@ struct zram {
->         struct file *backing_dev;
->         spinlock_t wb_limit_lock;
->         bool wb_limit_enable;
-> +       u32 wb_batch_size;
->         u64 bd_wb_limit;
->         struct block_device *bdev;
->         unsigned long *bitmap;
-> --
-> 2.52.0.460.gd25c4c69ec-goog
->
+index a6b84206eb94c..1f937373e56b6 100644
+--- a/include/linux/blk-integrity.h
++++ b/include/linux/blk-integrity.h
+@@ -19,6 +19,7 @@ enum blk_integrity_flags {
+ 	BLK_INTEGRITY_DEVICE_CAPABLE	=3D 1 << 2,
+ 	BLK_INTEGRITY_REF_TAG		=3D 1 << 3,
+ 	BLK_INTEGRITY_STACKED		=3D 1 << 4,
++	BLK_SPLIT_INTERVAL_CAPABLE	=3D 1 << 5,
+ };
+=20
+ const char *blk_integrity_profile_name(struct blk_integrity *bi);
+--=20
+2.47.3
+
