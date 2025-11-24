@@ -1,50 +1,33 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 839CF2EA481;
-	Mon, 24 Nov 2025 07:58:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E233C2F12B2;
+	Mon, 24 Nov 2025 08:57:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763971098; cv=none; b=Zyiyoe2BXebs+nZzYsNSYA/vql7bXIKPHEUKnpJ9y3LoDTidyVZbpcc6d4MoS5kzsJSka3vmvyzx5gMM05HDJeXjAs8cQxpAxz2CtXQtpk5Y9xo5LqiHzBOJWKpG/SDwiqrjVB5SrY6Ku2zNImLVnI02u/AnJ3HrSmFdm1IHdtc=
+	t=1763974666; cv=none; b=je43V7ep1IRUMaZckXXTFUwmMpB36kdAmReHDVOy3jrJojIgyJXPiA037rVe0gCSRDc6VQaWz+z1ILFu35pU8HxxFd9i7s3n0jUdmye4t6mdBzVIlbaEwdLiwZx8aVdKsKN3COYK+HqAo+fgxEYAh2MHbVBLoG9+ep2mssSviUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763971098; c=relaxed/simple;
-	bh=Ae5tX+v5RROh+5aoVNw1pnY6DIZTMmbqs28uiQWG/8c=;
+	s=arc-20240116; t=1763974666; c=relaxed/simple;
+	bh=QegpaO11GCZwLyZUCLWpPq4lqTvaN3NAgvqh9JCiPAo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=A5fRPiwve49iNqPotIjuZvfUw3B7/VeC/g9Gr03XGSV5HMupuuSgmXjXW3r9E0i0rt8Rxk4Zhb5GKXmMK4k6ptg6XjW3gvPJz//xw35MB458+dOAoXTJ51AGajfoi6iXqRhVeSxPP9zKMUMyuJIAF3EMH+YuxJKYOx9IHrOWIdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Zk+LcMQF; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 In-Reply-To:Content-Type; b=QTx8Qizxu8HLniHVMednpCOph6hxdrdgemtXYERMtGalnwN+nQLeSBlUAFQN6NXM+vPVaaySu8+txBDsrAKtHkVxZZyclcmd85WS2pRsnAZ5EFCE9FwuqN5tHRcxaKo3MP0KS6R1dV5IwmJLrvdDNPxx8hUSo2LFLNelTxAr9zs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N6/GBmOz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Zk+LcMQF"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1763971096; x=1795507096;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Ae5tX+v5RROh+5aoVNw1pnY6DIZTMmbqs28uiQWG/8c=;
-  b=Zk+LcMQFtzmUGloTLYdqyrWyOriMlVTXhdl+pP0YTfg+T7HljWY4HdKi
-   4w+Is5nFou9wK9M4epbxYJPGiXNpkcRdctI+VZhFqzmswL0zWsI0GuAHX
-   e7fZS5OdaG69bXmF3FEd1TXWkU/dbsIngqUUdEmr/CjxYA2WXO49myYi/
-   s2YFlBus99rh3udJdohHob8H4Z4LPdxUdCLdTVgu9AGZHD2GYoIQWZRVt
-   yd3PGaVONli2Nkmbh5QK6vi0mAa8XGwIb4whW/cyMvcopuxd8mqXfcxjE
-   92NVq98o8FjJzk9TxeR0AUV2lU0TmzCfVqZlVNZ5R+mKJ9xNmS/js275G
-   A==;
-X-CSE-ConnectionGUID: XU6aEVzoRkGbGCehoEcgiQ==
-X-CSE-MsgGUID: 6Rbg50cbS+eUfquWJ1bOqQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11622"; a="65857410"
-X-IronPort-AV: E=Sophos;i="6.20,222,1758610800"; 
-   d="scan'208";a="65857410"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2025 23:58:15 -0800
-X-CSE-ConnectionGUID: v2GhJ8LmTGKX2i6H1+66kw==
-X-CSE-MsgGUID: zeRrEEwyQDuIfIET5XUXwQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,222,1758610800"; 
-   d="scan'208";a="222913548"
-Received: from guowangy-mobl.ccr.corp.intel.com (HELO [10.124.242.244]) ([10.124.242.244])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2025 23:58:12 -0800
-Message-ID: <7ec85f26-25fa-4c77-9e46-347261723d95@intel.com>
-Date: Mon, 24 Nov 2025 15:58:01 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N6/GBmOz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08C7CC4CEF1;
+	Mon, 24 Nov 2025 08:57:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763974665;
+	bh=QegpaO11GCZwLyZUCLWpPq4lqTvaN3NAgvqh9JCiPAo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=N6/GBmOzkkwJr8NviB2gRdtRZU+EGGIPsnZiAITn1Z5Brsjb4MPZKsGOnGasIHEkj
+	 EZE4u6WndqnR6Qws7wD3MJXmYu1fJ5FWuWlyeeFYGUmm3nT01ZK80QnVJe9ZeNQ824
+	 lrDC2qJ203CpW5QtzKPx8DEk10nGkUae1eDyjny8l68iDFMTIhUgH0QFQPBdVxpRdZ
+	 6+KiasxPe+MCwA0B4uj9DZY+6UgtrLiHbBKwzhwfB9gQ09TJCGyCLi8rTu5IV5uL5P
+	 T9aJfgiJ4TFvEDGxVH51Dzhgw1dGUNe+hzi4os05Tnh5krz5MWsV0LtAXDLksmzK5+
+	 qcapMl2y+CB2w==
+Message-ID: <daa2dfb3-91f6-413e-af38-2998d3a96806@kernel.org>
+Date: Mon, 24 Nov 2025 17:57:42 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -52,77 +35,72 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RESEND] lib/group_cpus: make group CPU cluster aware
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
- Thomas Gleixner <tglx@linutronix.de>, Keith Busch <kbusch@kernel.org>,
- Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
- Sagi Grimberg <sagi@grimberg.me>, linux-kernel@vger.kernel.org,
- linux-nvme@lists.infradead.org, virtualization@lists.linux-foundation.org,
- linux-block@vger.kernel.org, Tianyou Li <tianyou.li@intel.com>,
- Tim Chen <tim.c.chen@linux.intel.com>, Dan Liang <dan.liang@intel.com>
-References: <20251111020608.1501543-1-wangyang.guo@intel.com>
- <aRKssW96lHFrT2ZN@fedora> <b94a0d74-0770-4751-9064-2ef077fada14@intel.com>
- <aRMnR5DRdsU8lGtU@fedora> <a101fe80-ca0b-4b4b-94b1-f08db1b164fc@intel.com>
- <aRU2sC5q5hCmS_eM@fedora> <da1d6b4e-038c-48dc-830d-5eadb3ac943f@intel.com>
- <aR0i2f91VGv47swo@fedora>
+Subject: Re: [RESEND PATCH blktrace v3 03/20] blktrace: add definitions for
+ BLKTRACESETUP2
+To: Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+ "axboe@kernel.dk" <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+ Christoph Hellwig <hch@lst.de>,
+ Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ Naohiro Aota <naohiro.aota@wdc.com>, Niklas Cassel <cassel@kernel.org>,
+ linux-btrace@vger.kernel.org
+References: <20251124073739.513212-1-johannes.thumshirn@wdc.com>
+ <20251124073739.513212-4-johannes.thumshirn@wdc.com>
+From: Damien Le Moal <dlemoal@kernel.org>
 Content-Language: en-US
-From: "Guo, Wangyang" <wangyang.guo@intel.com>
-In-Reply-To: <aR0i2f91VGv47swo@fedora>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Organization: Western Digital Research
+In-Reply-To: <20251124073739.513212-4-johannes.thumshirn@wdc.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 11/19/2025 9:52 AM, Ming Lei wrote:
-> On Tue, Nov 18, 2025 at 02:29:20PM +0800, Guo, Wangyang wrote:
->> On 11/13/2025 9:38 AM, Ming Lei wrote:
->>> On Wed, Nov 12, 2025 at 11:02:47AM +0800, Guo, Wangyang wrote:
->>>> On 11/11/2025 8:08 PM, Ming Lei wrote:
->>>>> On Tue, Nov 11, 2025 at 01:31:04PM +0800, Guo, Wangyang wrote:
->>>>> They still should share same L3 cache, and cpus_share_cache() should be
->>>>> true when the IO completes on the CPU which belong to different L2 with the
->>>>> submission CPU, and remote completion via IPI won't be triggered.
->>>> Yes, remote IPI not triggered.
->>>
->>> OK, in my test on AMD zen4, NVMe performance can be dropped to 1/2 - 1/3 if
->>> remote IPI is triggered in case of crossing L3, which is understandable.
->>>
->>> I will check if topo cluster can cover L3, if yes, the patch still can be
->>> simplified a lot by introducing sub-node spread by changing build_node_to_cpumask()
->>> and adding nr_sub_nodes.
->>
->> Do you mean using cluster as "NUMA" nodes to spread CPU, instead of two
->> level NUMA-cluster spreading?
+On 2025/11/24 16:37, Johannes Thumshirn wrote:
+> Add definitions for a new BLKTRACESETUP2 ioctl(2).
 > 
-> Yes, I think the change may be minimized by introducing sub-numa-node for
-> covering it, what do you think of this approach?
+> This new ioctl(2) will request a new, updated structure layout from the
+> kernel which enhances the storage size of the 'action' field in order to
+> store additional tracepoints.
 > 
-> However, it is bad to use cluster as sub-numa-node at default, because cluster
-> is aligned with CPUs sharing L2 cache, so there could be too many clusters
-> for many systems in which one cluster just includes two CPUs, then the finally
-> calculated mapping crosses clusters inevitably because nr_queues is
-> less than nr_clusters.
+> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+> ---
+>  blktrace_api.h | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
 > 
-> I'd suggest to map CPUs sharing L3 cache into one sub-numa-node.
-> 
-> For your case, either adding one kernel parameter, or adding group_cpus_cluster()
-> API for the unusual case by sharing single code path.
+> diff --git a/blktrace_api.h b/blktrace_api.h
+> index 172b4c2..ecffe6e 100644
+> --- a/blktrace_api.h
+> +++ b/blktrace_api.h
+> @@ -139,9 +139,25 @@ struct blk_user_trace_setup {
+>  	__u32 pid;
+>  };
+>  
+> +/*
+> + * User setup structure passed with BLKTRACESETUP2
+> + */
+> +struct blk_user_trace_setup2 {
+> +	char name[64];			/* output */
+> +	__u64 act_mask;			/* input */
+> +	__u32 buf_size;			/* input */
+> +	__u32 buf_nr;			/* input */
+> +	__u64 start_lba;
+> +	__u64 end_lba;
+> +	__u32 pid;
+> +	__u32 flags;			/* currently unused */
+> +	__u64 reserved[11];
+> +};
 
-Yes, it will make the change simpler, but no matter using cluster or L3 
-cache as sub-numa-node, as CPU core count increase, there is potential 
-risk that nr_queues < nr_sub_numa_node, which will make CPU spreading no 
-affinity at all.
+Any particular reason to go for 192B ? Why not 128B with a __u64 reserved[3] at
+the end ? Not enough to future proof it ?
 
-I think we need to keep two level NUMA/sub-NUMA spreading to avoid such 
-regression.
+> +
+>  #define BLKTRACESETUP _IOWR(0x12,115,struct blk_user_trace_setup)
+>  #define BLKTRACESTART _IO(0x12,116)
+>  #define BLKTRACESTOP _IO(0x12,117)
+>  #define BLKTRACETEARDOWN _IO(0x12,118)
+> +#define BLKTRACESETUP2 _IOWR(0x12, 142, struct blk_user_trace_setup2)
+>  
+>  #endif
 
-For most platforms, there is no need for 2nd level spreading since L2 is 
-not shared between physical cores and L3 mapping is the same as NUMA. I 
-think we can add a platform specified configuration: by default, only 
-NUMA spreading is used; if platform like Intel Xeon E or some AMD 
-platform need second level spreading, we can config it to use L3 or 
-cluster as sub-numa-node for 2nd level spreading.
 
-How does that sound to you?
-
-BR
-Wangyang
+-- 
+Damien Le Moal
+Western Digital Research
