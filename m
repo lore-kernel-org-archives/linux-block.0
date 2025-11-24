@@ -1,52 +1,52 @@
 Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 977DB3191C3
-	for <linux-block@vger.kernel.org>; Mon, 24 Nov 2025 17:09:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CE36314B7A
+	for <linux-block@vger.kernel.org>; Mon, 24 Nov 2025 17:09:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764004157; cv=none; b=adM1px42IsIYBoaEI/uzCW1VTg1n2YU905Z+Xny7P4IdxwpIqRcwZrsdLimQWGtaRZ2KWWwMaZl/134n8vI7IeIIp17809DxXWru6cIDE2Yfft/lxJKjpkcn6Awbveb660MKwBBXLZrlLVmKHVrITA+4BslpLqTVnU3s/6bjV1M=
+	t=1764004165; cv=none; b=mwjYueSc5UJwa4z97zJLPJa66b17ilYz8zYPqBm/GXTSzz9DfHRId22jqisFN8MPkc6b4ctPolLHAD5HConLAtecNiqOsWIcXo8y2pzeyh5l5GQ8G0/uv9DQPCIn9F7yvcF2RyHIR7VPLd5Qj2NjB7CMQwhoh5qb+sdpKX2Pols=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764004157; c=relaxed/simple;
-	bh=GUTI/dBbtapq20oXcvVgyKRPg2YJGOlQosAXXZ9IE9w=;
+	s=arc-20240116; t=1764004165; c=relaxed/simple;
+	bh=qIouyY3fKmuViCEeKZxTjLce/wKwht8J40XAeImObcA=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bRrMlgUz+7si/b1qlkdbEJYnsedkUZdXcCwtDOB4JzBTN+WbpBuL0FbReow61p3LGdv/Ps90bL19d+XPgTehl4inZk9WIPASKLoJGP9LbJNTybBb989/poR/jS0VBsOkN1sNs+E74H//lQ42xbxZm8907xtnUFWGEia2wzkeXNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=VTCDwjud; arc=none smtp.client-ip=67.231.145.42
+	 MIME-Version:Content-Type; b=K8zM+Yv6qaStnNszZDoiPTbPel8nH0m2BVi/eaXX9ibpUxcqdFYUFRDnJDcSuxs+pTAe5mpD+WWq/VTv5LiRZlsAMP2cn0U2wCcGq+nxweUwnqPmx3nS2ZyESP0bnRKGtIQaKq7xnLBM4aABy9Y301adTNCPjOZy4GxsVWlcxSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=RyGQ53QU; arc=none smtp.client-ip=67.231.145.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="VTCDwjud"
-Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5AOGFGsO568796
-	for <linux-block@vger.kernel.org>; Mon, 24 Nov 2025 09:09:15 -0800
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="RyGQ53QU"
+Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5AOB2lWJ1041403
+	for <linux-block@vger.kernel.org>; Mon, 24 Nov 2025 09:09:22 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=mqKT7/LioCJJBGWv0S4iF0MaE937RGrix8IdKPTbw2M=; b=VTCDwjudO4U/
-	Gc1QLHSwKM03GReN2sJf/gsAgYhu01McpfxpfI+BBbVG2FAjw4flqcPRAnVKsTNP
-	KhlFhc30uiy9tFCm9VOeJ1PiEv9piF0dI97gCiDGiaSTpaa36gjPRiF/RVnwMZfd
-	iJLdYiii4KyLTIYIcxZiTmtXPknyQfiHZ2firwcjZ8aVjxMIa6DGILp9C9KW5RTQ
-	Y6+/RzKy2pu5ApHZ0tW3+L7LYruRpHhHGX/DcoiGk+97Se73Y1R/+96xe2X3sT4F
-	MNrZx68VxGMlnLnjYT3ZQmEXHwwE/zNYE8+rgzz0a60bRdQT1WRgPPygoLepR+8D
-	1zR5xqiOyw==
+	 bh=e3O4DzHwT2aUh+ZzPv0ZOqRBYBNwIQBl0Mi1HJ6BUMI=; b=RyGQ53QU2k5S
+	rI3FkG0md2Jhq/rGP36irZBUp30jO6dgc17FkShaoMxf2+pUnwhc8hl1oM6E0nYy
+	Vm9abrSJQohVBhB+JfB8IW2WB8vbIg1CvWh0CzLPDrhTivWGGDnNDOoA0CGMpd+X
+	1I7mmycCeq4KvbNvjvCJAT6hATRow7dlM8LCO9siWb1rEtqsGrk53s4nLgmDSPAM
+	hKn2y0KgKPc4wHWU0UpQmCG2YYaRSlXIQIQN2Hjd4yJo3A1Rlrl/IR2TUCdhIWnA
+	yisd65W0hmZFOKCCQnKgn/CrGhC6l4P/jGe3dNgffHcHSkJDCcdPiU8qfYYL3JsH
+	Ra+Q68P+iA==
 Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4amtqjgfw8-3
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4amp53ak6x-8
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Mon, 24 Nov 2025 09:09:14 -0800 (PST)
-Received: from twshared40939.15.frc2.facebook.com (2620:10d:c085:108::150d) by
+	for <linux-block@vger.kernel.org>; Mon, 24 Nov 2025 09:09:22 -0800 (PST)
+Received: from twshared13861.04.snb2.facebook.com (2620:10d:c085:108::4) by
  mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.29; Mon, 24 Nov 2025 17:09:13 +0000
+ 15.2.2562.29; Mon, 24 Nov 2025 17:09:20 +0000
 Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
-	id 4C78F41D0F4F; Mon, 24 Nov 2025 09:09:08 -0800 (PST)
+	id 4B6F041D0F4E; Mon, 24 Nov 2025 09:09:08 -0800 (PST)
 From: Keith Busch <kbusch@meta.com>
 To: <dm-devel@lists.linux.dev>, <linux-block@vger.kernel.org>,
         <snitzer@kernel.org>, <hch@lst.de>, <axboe@kernel.dk>,
         <ebiggers@kernel.org>
 CC: Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv2 3/3] dm-crypt: dynamic scatterlist for many segments
-Date: Mon, 24 Nov 2025 09:09:03 -0800
-Message-ID: <20251124170903.3931792-4-kbusch@meta.com>
+Subject: [PATCHv2 2/3] dm-crypt: allow unaligned bio_vecs for direct io
+Date: Mon, 24 Nov 2025 09:09:02 -0800
+Message-ID: <20251124170903.3931792-3-kbusch@meta.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20251124170903.3931792-1-kbusch@meta.com>
 References: <20251124170903.3931792-1-kbusch@meta.com>
@@ -59,178 +59,222 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=EMULElZC c=1 sm=1 tr=0 ts=6924913a cx=c_pps
+X-Authority-Analysis: v=2.4 cv=BdzVE7t2 c=1 sm=1 tr=0 ts=69249142 cx=c_pps
  a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
  a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8
- a=TomXjiwf8yvF16FIC5MA:9
-X-Proofpoint-GUID: y_BUIcHpOlvt5gDeu071zIYGMnFwNaMh
-X-Proofpoint-ORIG-GUID: y_BUIcHpOlvt5gDeu071zIYGMnFwNaMh
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTI0MDE1MCBTYWx0ZWRfX7/kUuC0dKo+x
- PEgKnQLWIn9/MI7TyQbPpY6GkeqLbuManyazWkph14EWr2YtmDbBVMeQJSqoopzdQ4lazlI2VbM
- CquVsUnQFfIU0ELJ8P0x5R8SajRAEf++7K9V1o4Lgqs/gHB61mdEHigkbRngQvo1F+oFESTcbwc
- isqyKp2By0nlb33FfhZbFaaC3USi/IQgRy98/al13ZBPKnMn5IGu4tG5hnblw1Nm/9cJhDhkoaJ
- L/hdrUytaoZj8an1fE/2R5v5bwG7e+Zz6HE1GlqKSqgz5BsoKn1WlNkSYmf23S6PjVpWIdO4Wvk
- zEfhoKYTL9A0eJkvT4lLBB5Myy1nyMdBUhBGGTgC5WlHLrx8uBqSR+wi3+TxRneH+NRADgjj03i
- R8J4UXytyUHtyEJV1XSWhY8mG0bYqg==
+ a=_h08JpkXp4QKfwmzJH8A:9
+X-Proofpoint-ORIG-GUID: CHhBa84OiwisZn5EKOo7d1sQceRxmy6X
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTI0MDE1MCBTYWx0ZWRfX4Gx8kcwwGx2y
+ WTatCq7Guu0XrfuDQ+GK81tdEhm7xaprHuy+TFKNwmAhMH0HOZ3AT87TtCwu1EQT/QSLTg2Gl5f
+ 9+hNxytJfU3a3X2kkWVh1wtiJP90xc3zSuKK3ygKGcvfVoXMsEUEruS1n/0cxcDDRMZhNnbyQES
+ TogCILCjlP3T7a/k6yI+h9msCcc6/5HwprO77WC0lo9S5wGS6gSXBrtWLd2fjd+aDhAEYbGG7wr
+ 58z9hK4qcpto0Etb+asuEjJ/CcinzulV77ccx4b0DsY7+6MyjHrQN9AjVs2RQz55xqxlj0msHiU
+ Wuk/yFP/hfRehVgbNRG+JrjIWrfxOUK14MJtZMl/XkbhTQ61MwJ7j5Ma18NKEOnV1MpMyinV494
+ EYAhwtYe7Pg+HUpU890Nyul1xxW9gw==
+X-Proofpoint-GUID: CHhBa84OiwisZn5EKOo7d1sQceRxmy6X
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
  definitions=2025-11-24_06,2025-11-24_02,2025-10-01_01
 
 From: Keith Busch <kbusch@kernel.org>
 
-In the unlikely case where the base bio uses a highly fragmented vector,
-the four inline scatterlist elements may not be enough, so allocate a
-temporary scatterlist for the cause.
+Many storage devices can handle DMA for data that is not aligned to the
+sector block size. The block and filesystem layers have introduced
+updates to allow that kind of memory alignment flexibility when
+possible.
+
+dm-crypt, however, currently constrains itself to aligned memory because
+it sends a single scatterlist element for the input ot the encrypt and
+decrypt algorithms. This forces applications that have unaligned data to
+copy through a bounce buffer, increasing CPU and memory utilization.
+
+Use multiple scatterlist elements to relax the memory alignment
+requirement. To keep this simple, this lower constraint is enabled only
+for certain encryption and initialization vector types, specifically the
+ones that don't had additional use for the request base scatterlist
+elements beyond holding decrypted data.
 
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- drivers/md/dm-crypt.c | 48 +++++++++++++++++++++++++++++++++++--------
- 1 file changed, 39 insertions(+), 9 deletions(-)
+ drivers/md/dm-crypt.c | 73 ++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 55 insertions(+), 18 deletions(-)
 
 diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-index 0b3f5411695ac..a634881a490ce 100644
+index 5ef43231fe77f..0b3f5411695ac 100644
 --- a/drivers/md/dm-crypt.c
 +++ b/drivers/md/dm-crypt.c
-@@ -97,6 +97,8 @@ struct dm_crypt_request {
- 	struct convert_context *ctx;
- 	struct scatterlist sg_in[4];
- 	struct scatterlist sg_out[4];
-+	struct scatterlist *__sg_in;
-+	struct scatterlist *__sg_out;
- 	u64 iv_sector;
- };
+@@ -214,6 +214,7 @@ struct crypt_config {
+ 	unsigned int key_extra_size; /* additional keys length */
+ 	unsigned int key_mac_size;   /* MAC key size for authenc(...) */
 =20
-@@ -1346,6 +1348,8 @@ static int crypt_convert_block_aead(struct crypt_co=
-nfig *cc,
- 	if (test_bit(CRYPT_IV_LARGE_SECTORS, &cc->cipher_flags))
- 		dmreq->iv_sector >>=3D cc->sector_shift;
- 	dmreq->ctx =3D ctx;
-+	dmreq->__sg_in =3D NULL;
-+	dmreq->__sg_out =3D NULL;
-=20
- 	*org_tag_of_dmreq(cc, dmreq) =3D tag_offset;
-=20
-@@ -1425,18 +1429,22 @@ static int crypt_convert_block_aead(struct crypt_=
++	unsigned int dio_alignment;
+ 	unsigned int integrity_tag_size;
+ 	unsigned int integrity_iv_size;
+ 	unsigned int used_tag_size;
+@@ -1424,22 +1425,49 @@ static int crypt_convert_block_aead(struct crypt_=
 config *cc,
  	return r;
  }
 =20
--static int crypt_build_sgl(struct crypt_config *cc, struct scatterlist *=
-sg,
 +static int crypt_build_sgl(struct crypt_config *cc, struct scatterlist *=
-*psg,
- 			   struct bvec_iter *iter, struct bio *bio,
- 			   int max_segs)
- {
- 	unsigned int bytes =3D cc->sector_size;
-+	struct scatterlist *sg =3D *psg;
- 	struct bvec_iter tmp =3D *iter;
- 	int segs, i =3D 0;
-=20
- 	bio_advance_iter(bio, &tmp, bytes);
- 	segs =3D tmp.bi_idx - iter->bi_idx + !!tmp.bi_bvec_done;
--	if (segs > max_segs)
--		return -EIO;
-+	if (segs > max_segs) {
-+		sg =3D kmalloc_array(segs, sizeof(struct scatterlist), GFP_NOIO);
-+		if (!sg)
-+			return -ENOMEM;
-+	}
-=20
- 	sg_init_table(sg, segs);
- 	do {
-@@ -1446,7 +1454,7 @@ static int crypt_build_sgl(struct crypt_config *cc,=
- struct scatterlist *sg,
- 		/* Reject unexpected unaligned bio. */
- 		if (unlikely((len | bv.bv_offset) &
- 				bdev_dma_alignment(cc->dev->bdev)))
--			return -EIO;
-+			goto error;
-=20
- 		sg_set_page(&sg[i++], bv.bv_page, len, bv.bv_offset);
- 		bio_advance_iter_single(bio, iter, len);
-@@ -1454,8 +1462,13 @@ static int crypt_build_sgl(struct crypt_config *cc=
-, struct scatterlist *sg,
- 	} while (bytes);
-=20
- 	if (WARN_ON_ONCE(i !=3D segs))
--		return -EINVAL;
-+		goto error;
-+	*psg =3D sg;
- 	return 0;
-+error:
-+	if (sg !=3D *psg)
-+		kfree(sg);
-+	return -EIO;
- }
-=20
+sg,
++			   struct bvec_iter *iter, struct bio *bio,
++			   int max_segs)
++{
++	unsigned int bytes =3D cc->sector_size;
++	struct bvec_iter tmp =3D *iter;
++	int segs, i =3D 0;
++
++	bio_advance_iter(bio, &tmp, bytes);
++	segs =3D tmp.bi_idx - iter->bi_idx + !!tmp.bi_bvec_done;
++	if (segs > max_segs)
++		return -EIO;
++
++	sg_init_table(sg, segs);
++	do {
++		struct bio_vec bv =3D mp_bvec_iter_bvec(bio->bi_io_vec, *iter);
++		int len =3D min(bytes, bv.bv_len);
++
++		/* Reject unexpected unaligned bio. */
++		if (unlikely((len | bv.bv_offset) &
++				bdev_dma_alignment(cc->dev->bdev)))
++			return -EIO;
++
++		sg_set_page(&sg[i++], bv.bv_page, len, bv.bv_offset);
++		bio_advance_iter_single(bio, iter, len);
++		bytes -=3D len;
++	} while (bytes);
++
++	if (WARN_ON_ONCE(i !=3D segs))
++		return -EINVAL;
++	return 0;
++}
++
  static int crypt_convert_block_skcipher(struct crypt_config *cc,
-@@ -1484,18 +1497,26 @@ static int crypt_convert_block_skcipher(struct cr=
+ 					struct convert_context *ctx,
+ 					struct skcipher_request *req,
+ 					unsigned int tag_offset)
+ {
+-	struct bio_vec bv_in =3D bio_iter_iovec(ctx->bio_in, ctx->iter_in);
+-	struct bio_vec bv_out =3D bio_iter_iovec(ctx->bio_out, ctx->iter_out);
+ 	struct scatterlist *sg_in, *sg_out;
+ 	struct dm_crypt_request *dmreq;
+ 	u8 *iv, *org_iv, *tag_iv;
+ 	__le64 *sector;
+-	int r =3D 0;
+-
+-	/* Reject unexpected unaligned bio. */
+-	if (unlikely(bv_in.bv_len & (cc->sector_size - 1)))
+-		return -EIO;
++	int r;
+=20
+ 	dmreq =3D dmreq_of_req(cc, req);
+ 	dmreq->iv_sector =3D ctx->cc_sector;
+@@ -1456,15 +1484,18 @@ static int crypt_convert_block_skcipher(struct cr=
 ypt_config *cc,
  	sector =3D org_sector_of_dmreq(cc, dmreq);
  	*sector =3D cpu_to_le64(ctx->cc_sector - cc->iv_offset);
 =20
-+	dmreq->__sg_in =3D NULL;
-+	dmreq->__sg_out =3D NULL;
+-	/* For skcipher we use only the first sg item */
  	sg_in  =3D &dmreq->sg_in[0];
  	sg_out =3D &dmreq->sg_out[0];
 =20
--	r =3D crypt_build_sgl(cc, sg_in, &ctx->iter_in, ctx->bio_in,
-+	r =3D crypt_build_sgl(cc, &sg_in, &ctx->iter_in, ctx->bio_in,
- 			    ARRAY_SIZE(dmreq->sg_in));
- 	if (r < 0)
- 		return r;
-+	else if (sg_in !=3D dmreq->sg_in)
-+		dmreq->__sg_in =3D sg_in;
+-	sg_init_table(sg_in, 1);
+-	sg_set_page(sg_in, bv_in.bv_page, cc->sector_size, bv_in.bv_offset);
++	r =3D crypt_build_sgl(cc, sg_in, &ctx->iter_in, ctx->bio_in,
++			    ARRAY_SIZE(dmreq->sg_in));
++	if (r < 0)
++		return r;
 =20
--	r =3D crypt_build_sgl(cc, sg_out, &ctx->iter_out, ctx->bio_out,
-+	r =3D crypt_build_sgl(cc, &sg_out, &ctx->iter_out, ctx->bio_out,
- 			    ARRAY_SIZE(dmreq->sg_out));
--	if (r < 0)
-+	if (r < 0) {
-+		kfree(dmreq->__sg_in);
- 		return r;
-+	} else if (sg_out !=3D dmreq->sg_out) {
-+		dmreq->__sg_in =3D sg_out;
-+	}
+-	sg_init_table(sg_out, 1);
+-	sg_set_page(sg_out, bv_out.bv_page, cc->sector_size, bv_out.bv_offset);
++	r =3D crypt_build_sgl(cc, sg_out, &ctx->iter_out, ctx->bio_out,
++			    ARRAY_SIZE(dmreq->sg_out));
++	if (r < 0)
++		return r;
 =20
  	if (cc->iv_gen_ops) {
  		/* For READs use IV stored in integrity metadata */
-@@ -1504,7 +1525,7 @@ static int crypt_convert_block_skcipher(struct cryp=
+@@ -1495,9 +1526,6 @@ static int crypt_convert_block_skcipher(struct cryp=
 t_config *cc,
- 		} else {
- 			r =3D cc->iv_gen_ops->generator(cc, org_iv, dmreq);
- 			if (r < 0)
--				return r;
-+				goto out;
- 			/* Data can be already preprocessed in generator */
- 			if (test_bit(CRYPT_ENCRYPT_PREPROCESS, &cc->cipher_flags))
- 				sg_in =3D sg_out;
-@@ -1526,6 +1547,13 @@ static int crypt_convert_block_skcipher(struct cry=
-pt_config *cc,
  	if (!r && cc->iv_gen_ops && cc->iv_gen_ops->post)
  		r =3D cc->iv_gen_ops->post(cc, org_iv, dmreq);
 =20
-+out:
-+	if (r =3D=3D -EINPROGRESS && r =3D=3D -EBUSY) {
-+		kfree(dmreq->__sg_in);
-+		kfree(dmreq->__sg_out);
-+		dmreq->__sg_in =3D NULL;
-+		dmreq->__sg_out =3D NULL;
-+	}
+-	bio_advance_iter(ctx->bio_in, &ctx->iter_in, cc->sector_size);
+-	bio_advance_iter(ctx->bio_out, &ctx->iter_out, cc->sector_size);
+-
  	return r;
  }
 =20
-@@ -2301,6 +2329,8 @@ static void kcryptd_async_done(void *data, int erro=
-r)
- 	} else if (error < 0)
- 		io->error =3D BLK_STS_IOERR;
+@@ -2829,10 +2857,12 @@ static void crypt_dtr(struct dm_target *ti)
+ static int crypt_ctr_ivmode(struct dm_target *ti, const char *ivmode)
+ {
+ 	struct crypt_config *cc =3D ti->private;
++	bool unaligned_allowed =3D true;
 =20
-+	kfree(dmreq->__sg_in);
-+	kfree(dmreq->__sg_out);
- 	crypt_free_req(cc, req_of_dmreq(cc, dmreq), io->base_bio);
+-	if (crypt_integrity_aead(cc))
++	if (crypt_integrity_aead(cc)) {
+ 		cc->iv_size =3D crypto_aead_ivsize(any_tfm_aead(cc));
+-	else
++		unaligned_allowed =3D false;
++	} else
+ 		cc->iv_size =3D crypto_skcipher_ivsize(any_tfm(cc));
 =20
- 	if (!atomic_dec_and_test(&ctx->cc_pending))
+ 	if (cc->iv_size)
+@@ -2868,6 +2898,7 @@ static int crypt_ctr_ivmode(struct dm_target *ti, c=
+onst char *ivmode)
+ 		if (cc->key_extra_size > ELEPHANT_MAX_KEY_SIZE)
+ 			return -EINVAL;
+ 		set_bit(CRYPT_ENCRYPT_PREPROCESS, &cc->cipher_flags);
++		unaligned_allowed =3D false;
+ 	} else if (strcmp(ivmode, "lmk") =3D=3D 0) {
+ 		cc->iv_gen_ops =3D &crypt_iv_lmk_ops;
+ 		/*
+@@ -2880,10 +2911,12 @@ static int crypt_ctr_ivmode(struct dm_target *ti,=
+ const char *ivmode)
+ 			cc->key_parts++;
+ 			cc->key_extra_size =3D cc->key_size / cc->key_parts;
+ 		}
++		unaligned_allowed =3D false;
+ 	} else if (strcmp(ivmode, "tcw") =3D=3D 0) {
+ 		cc->iv_gen_ops =3D &crypt_iv_tcw_ops;
+ 		cc->key_parts +=3D 2; /* IV + whitening */
+ 		cc->key_extra_size =3D cc->iv_size + TCW_WHITENING_SIZE;
++		unaligned_allowed =3D false;
+ 	} else if (strcmp(ivmode, "random") =3D=3D 0) {
+ 		cc->iv_gen_ops =3D &crypt_iv_random_ops;
+ 		/* Need storage space in integrity fields. */
+@@ -2893,6 +2926,8 @@ static int crypt_ctr_ivmode(struct dm_target *ti, c=
+onst char *ivmode)
+ 		return -EINVAL;
+ 	}
+=20
++	if (unaligned_allowed)
++		cc->dio_alignment =3D 3;
+ 	return 0;
+ }
+=20
+@@ -3286,6 +3321,7 @@ static int crypt_ctr(struct dm_target *ti, unsigned=
+ int argc, char **argv)
+ 	cc->key_size =3D key_size;
+ 	cc->sector_size =3D (1 << SECTOR_SHIFT);
+ 	cc->sector_shift =3D 0;
++	cc->dio_alignment =3D 0;
+=20
+ 	ti->private =3D cc;
+=20
+@@ -3750,7 +3786,8 @@ static void crypt_io_hints(struct dm_target *ti, st=
+ruct queue_limits *limits)
+ 	limits->physical_block_size =3D
+ 		max_t(unsigned int, limits->physical_block_size, cc->sector_size);
+ 	limits->io_min =3D max_t(unsigned int, limits->io_min, cc->sector_size)=
+;
+-	limits->dma_alignment =3D limits->logical_block_size - 1;
++	limits->dma_alignment =3D min_not_zero(limits->logical_block_size - 1,
++					     cc->dio_alignment);
+=20
+ 	/*
+ 	 * For zoned dm-crypt targets, there will be no internal splitting of
 --=20
 2.47.3
 
