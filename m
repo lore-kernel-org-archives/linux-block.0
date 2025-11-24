@@ -1,66 +1,38 @@
-Received: from xmbghk7.mail.qq.com (xmbghk7.mail.qq.com [43.163.128.44])
+Received: from wxsgout04.xfusion.com (wxsgout03.xfusion.com [36.139.52.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A78B665;
-	Mon, 24 Nov 2025 02:17:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.163.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B46018B0A;
+	Mon, 24 Nov 2025 02:19:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=36.139.52.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763950637; cv=none; b=gg8VCxOIh46gOHAqhg7TK0rTjFzkduaImZkonSK5wRjY+ORBoIdVwb3Jm55/klu7zHcxdz3W6CYM36T1VvK+X2c7EYSny8x859PhJLZAtElnVNA0r+IrzB8V71UDaIWQ44RRI4Ckb2GbsvGzTTMWmODos/drtsP9IhB4qB439U0=
+	t=1763950800; cv=none; b=pV42jjVeBJH5LtiWK3BWvNrMnkdgzL7bkROC8tWAAQi/47gJzMpE0G36cZkHL7YWBr+BEIf4Yp8P2uobh8I1W82seAIJVlqkCiCuc4bXGz1Dna/++pvfBTE/HvknpkqJfnNBWT+XOA2NmOC1FxmvMwJ89L4k9uxwa9FKIoFFNps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763950637; c=relaxed/simple;
-	bh=hoKyFBac0Hi02axSaC+uFfLbPtwQnZqMFqtTaSGbuvo=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=NZcQL6UzBrG1SuwQgu7PHxy+Rri5nWLeNqirMNvytXzjgvZFw70RHdpU2tel66y9pHi3kUdXGNhHfgMVpbg8xdSvINgkyrEXCuNHnks/Lwr+xKGEaO8bEZq+Q1z4gAQGNP92sKTicQbliiZGJCSXTYyMAJxlnjZDsSgjYE4N24A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=mx9DbTTp; arc=none smtp.client-ip=43.163.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="mx9DbTTp"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1763950626;
-	bh=OEpCFJTxEykakEQhXdWAaRkM4i1m/KY/WMgpb4SGF2g=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=mx9DbTTpQYC9kiEmAmH6uc2skzSWawJ0Uo7dZKtanXVKEnqt+UswgpyYL4JmbnE5X
-	 67vRcANxDcRA+1ab+Xr2pjOQX8YIAYk6m1hgNU/x/jZG5k9kuJaGTryx2CM76SU6CD
-	 mecqBiQM6Ip0wxFLyaGYEgQgwNB92kRhvsqjgDb0=
-Received: from meizu-Precision-3660.meizu.com ([112.91.84.72])
-	by newxmesmtplogicsvrszc41-0.qq.com (NewEsmtp) with SMTP
-	id 3F1A727C; Mon, 24 Nov 2025 10:15:49 +0800
-X-QQ-mid: xmsmtpt1763950549tws4d5g73
-Message-ID: <tencent_D7ED79431EC0D75957539121B7CC7897EB06@qq.com>
-X-QQ-XMAILINFO: MhK4DKsBP06ii71TEOq87p7FvDy87u8ynN7Ft6iv+kVx9MZzpZ5FmND4pWYFHH
-	 BGu7NCx9cQZMYOIVKjKa2hoMcTSKC92p84/T3CREAPd+AJv5LJ2FGcBkOSwmn3vbSVGTq5Dnlw05
-	 EXye9Vzvw3rjGypXXG1Qjd2EfGsoT0mWHrU00oI6b1ZU30l3BhXRUcX7V6GJeSXEaEUkZRbx9nCV
-	 iImtDkTScReJs0r5Eqiol1oTnJ19Y+ieszKJkmQT64q/0nscO8sNmkzAuOyKgH68Blirhk7SdS/L
-	 70CO/5Hz3uxBKiQIP6brF077IxW+kTo+lnruf6o9XhJEJbAizTjz8eCRZdI/X42VnNaEDFeJnxwR
-	 OcHmmHat/oNfq/IaNX1ZKCzbJVGyVfD5+2RhzKks58sIZraN0IB/jIC8PQI9zFGeBLs40fqSp+JD
-	 L5vwCLIwbm0VipblWFn6aGHhQhnLa6j84I4NWriT3nvWbSH2sxS1bm0ytdxKXashakPswDTc8iOH
-	 WvBzom/UOOxpGaLwgO3LJjcy0DYnlvq9Ts5wQzpyJb/ifPO5S0azVRNL/qQyW1Bm+LGoTjb8XqLm
-	 HhxCEz3u0lsk5698Vz/ZfIaDoooJQ2rtYJqm07eXfszM2vHr26oOf958dzLgACfZgeuitXHOth8/
-	 9Id2nWz/J0Nw2J8CPQLiLy5tTVqKRKRwFJdi6lrQ/Vbpu2L+hqNWwPVlQsT/cIfd6nP/EIJVcmRa
-	 vTXiitx7Z3NM5frYe3Wa1l2fnYgJqldmtJjc9IXoQqvop3hpAy/DfAb74L2UtTETCDQjDbxUkCDX
-	 vzW44OPDzmnolFQx4B/VcH2ZoLFzBstMlq/fmmFTDbtYOWdsbHNK/Y/hPkuUE690Q7+1+hAhXCLb
-	 iEE7PJb6JcWi7TZkzyc7xHs6sLPqVkbMwUSxDM+S03qIf7J/DnAHTOf4/Ic0+6OPkyg0lUFGAFZV
-	 Y1BYMHMeT8pfXwq0WciJtwsLvoQ4QrDJUsMJPIDCWbiKUe0RuWYEVFX4mDokSIBDKje4ZzJ1B8sN
-	 jljy1fVnL037Ga8uoHP1GJ7B55HdH2aQ01pmvilA==
-X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
-From: Yuwen Chen <ywen.chen@foxmail.com>
-To: senozhatsky@chromium.org
-Cc: akpm@linux-foundation.org,
-	bgeffon@google.com,
-	licayy@outlook.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	minchan@kernel.org,
-	richardycc@google.com,
-	ywen.chen@foxmail.com
-Subject: 
-Date: Mon, 24 Nov 2025 10:15:49 +0800
-X-OQ-MSGID: <20251124021549.3636182-1-ywen.chen@foxmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <buckmtxvdfnpgo56owip3fjqbzraws2wvtomzfkywhczckoqlt@fifgyl5fjpbt>
-References: <buckmtxvdfnpgo56owip3fjqbzraws2wvtomzfkywhczckoqlt@fifgyl5fjpbt>
+	s=arc-20240116; t=1763950800; c=relaxed/simple;
+	bh=ie0gj8wY77Jlfqx4kJJF+9LMvcIjxzq8ymFXAV6j3Cs=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TEf5igM2/eIIydsCk7Dye5cOWxfBIGD43+W8eSQJpj8ULJ3wf710+zMKdoXnzlPXzys6b61YUX3xKJZHCJQsOVV2ZHxCSWe8k5ghT2gnFOVr9oDJLBUol6hMhloNLuQlL6MZ+dU+aBRAm12Qa56QlViOCpDUOjQoyhuYI4ZlQLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xfusion.com; spf=pass smtp.mailfrom=xfusion.com; arc=none smtp.client-ip=36.139.52.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xfusion.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xfusion.com
+Received: from wuxpheds03048.xfusion.com (unknown [10.32.143.30])
+	by wxsgout04.xfusion.com (SkyGuard) with ESMTPS id 4dF8G81fNQzB6C7F;
+	Mon, 24 Nov 2025 10:02:08 +0800 (CST)
+Received: from DESKTOP-Q8I2N5U.xfusion.com (10.82.130.100) by
+ wuxpheds03048.xfusion.com (10.32.143.30) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_RSA_WITH_AES_128_CBC_SHA256) id 15.2.2562.20;
+ Mon, 24 Nov 2025 10:03:10 +0800
+From: shechenglong <shechenglong@xfusion.com>
+To: <axboe@kernel.dk>, <hch@infradead.org>
+CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<kch@nvidia.com>, <stone.xulei@xfusion.com>, <chenjialong@xfusion.com>,
+	shechenglong <shechenglong@xfusion.com>
+Subject: [PATCH v2 1/1] block: fix typos in comments and strings in blk-core
+Date: Mon, 24 Nov 2025 10:02:58 +0800
+Message-ID: <20251124020258.1022-2-shechenglong@xfusion.com>
+X-Mailer: git-send-email 2.37.1.windows.1
+In-Reply-To: <20251124020258.1022-1-shechenglong@xfusion.com>
+References: <20251104123500.1330-2-shechenglong@xfusion.com>
+ <20251124020258.1022-1-shechenglong@xfusion.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -68,67 +40,71 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: wuxpheds03047.xfusion.com (10.32.141.63) To
+ wuxpheds03048.xfusion.com (10.32.143.30)
 
-Subject: Re: [RFC PATCHv5 0/6] zram: introduce writeback bio batching
+This patch fixes multiple spelling mistakes in comments and documentation
+in the file block/blk-core.c.
 
-On Fri, 21 Nov 2025 18:12:29 +0900, Sergey Senozhatsky wrote:
-> I had a version of the patch that had different main loop. It would
-> always first complete finished requests.  I think this one will give
-> accurate ->inflight number.
+No functional changes intended.
 
-Using the following patch, the final measured result is 32. Using 32
-here might be a relatively reasonable value.
+Suggested-by: Christoph Hellwig <hch@infradead.org>
+Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+Signed-off-by: shechenglong <shechenglong@xfusion.com>
+---
+ block/blk-core.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
- /* XXX: should be a per-device sysfs attr */
--#define ZRAM_WB_REQ_CNT 32
-+#define ZRAM_WB_REQ_CNT 64
- 
- static struct zram_wb_ctl *init_wb_ctl(void)
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 14ae73eebe0d..8387fe50ea15 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -662,13 +662,13 @@ static void __submit_bio(struct bio *bio)
+  *    bio_list of new bios to be added.  ->submit_bio() may indeed add some more
+  *    bios through a recursive call to submit_bio_noacct.  If it did, we find a
+  *    non-NULL value in bio_list and re-enter the loop from the top.
+- *  - In this case we really did just take the bio of the top of the list (no
++ *  - In this case we really did just take the bio off the top of the list (no
+  *    pretending) and so remove it from bio_list, and call into ->submit_bio()
+  *    again.
+  *
+  * bio_list_on_stack[0] contains bios submitted by the current ->submit_bio.
+  * bio_list_on_stack[1] contains bios that were submitted before the current
+- *	->submit_bio, but that haven't been processed yet.
++ *	->submit_bio(), but that haven't been processed yet.
+  */
+ static void __submit_bio_noacct(struct bio *bio)
  {
-@@ -983,6 +983,7 @@ static int zram_writeback_slots(struct zram *zram,
-        struct zram_pp_slot *pps;
-        int ret = 0, err = 0;
-        u32 index = 0;
-+       int inflight = 0;
- 
-        while ((pps = select_pp_slot(ctl))) {
-                spin_lock(&zram->wb_limit_lock);
-@@ -993,14 +994,10 @@ static int zram_writeback_slots(struct zram *zram,
-                }
-                spin_unlock(&zram->wb_limit_lock);
- 
--               while (!req) {
--                       req = zram_select_idle_req(wb_ctl);
--                       if (req)
--                               break;
--
--                       wait_event(wb_ctl->done_wait,
--                                  !list_empty(&wb_ctl->done_reqs));
-+               if (inflight < atomic_read(&wb_ctl->num_inflight))
-+                       inflight = atomic_read(&wb_ctl->num_inflight);
- 
-+               while (!req) {
-                        err = zram_complete_done_reqs(zram, wb_ctl);
-                        /*
-                         * BIO errors are not fatal, we continue and simply
-@@ -1012,6 +1009,13 @@ static int zram_writeback_slots(struct zram *zram,
-                         */
-                        if (err)
-                                ret = err;
-+
-+                       req = zram_select_idle_req(wb_ctl);
-+                       if (req)
-+                               break;
-+
-+                       wait_event(wb_ctl->done_wait,
-+                                  !list_empty(&wb_ctl->done_reqs));
-                }
- 
-                if (!blk_idx) {
-@@ -1074,6 +1078,7 @@ next:
-                        ret = err;
-        }
- 
-+       pr_err("%s: inflight max: %d\n", __func__, inflight);
-        return ret;
+@@ -743,8 +743,8 @@ void submit_bio_noacct_nocheck(struct bio *bio, bool split)
+ 	/*
+ 	 * We only want one ->submit_bio to be active at a time, else stack
+ 	 * usage with stacked devices could be a problem.  Use current->bio_list
+-	 * to collect a list of requests submited by a ->submit_bio method while
+-	 * it is active, and then process them after it returned.
++	 * to collect a list of requests submitted by a ->submit_bio method
++	 * while it is active, and then process them after it returned.
+ 	 */
+ 	if (current->bio_list) {
+ 		if (split)
+@@ -901,7 +901,7 @@ static void bio_set_ioprio(struct bio *bio)
+  *
+  * submit_bio() is used to submit I/O requests to block devices.  It is passed a
+  * fully set up &struct bio that describes the I/O that needs to be done.  The
+- * bio will be send to the device described by the bi_bdev field.
++ * bio will be sent to the device described by the bi_bdev field.
+  *
+  * The success/failure status of the request, along with notification of
+  * completion, is delivered asynchronously through the ->bi_end_io() callback
+@@ -991,7 +991,7 @@ int iocb_bio_iopoll(struct kiocb *kiocb, struct io_comp_batch *iob,
+ 	 * point to a freshly allocated bio at this point.  If that happens
+ 	 * we have a few cases to consider:
+ 	 *
+-	 *  1) the bio is beeing initialized and bi_bdev is NULL.  We can just
++	 *  1) the bio is being initialized and bi_bdev is NULL.  We can just
+ 	 *     simply nothing in this case
+ 	 *  2) the bio points to a not poll enabled device.  bio_poll will catch
+ 	 *     this and return 0
+-- 
+2.33.0
 
