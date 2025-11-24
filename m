@@ -1,65 +1,90 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D29967260D;
-	Mon, 24 Nov 2025 09:05:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B18C87260D;
+	Mon, 24 Nov 2025 09:05:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763975148; cv=none; b=oIfgQqNQTivhfLa2v6fkA2oDnYuJQ5h+F2k3z+Gtw8f2LyaOtwC/3hkq4nLCvR1ggfO4G0+MZbPQeyFiwfrrILDnbiJUujFJerteEagQ68yosnCMbD156/5FV7FF7M9tRWZw/SjeQWAPZwETR7/e+QGeV1lztSJ/OSkLg3y60F0=
+	t=1763975152; cv=none; b=dQ9RAt1OCwJsKgXJzBfbYsiXjjyh6LgEi/9WCP7J166m0dGdH9S52R6ZjbC+6mxIP1WwMjFwkYEPkfBeThDdyTUUZuvkZ1MBC7Ef/u1CLQ+iluVfzTpOx8qaMssGjLyhIeboz1FiCLvTzyt81HvKF/x/e7O3aoC9W+bWQbKVhDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763975148; c=relaxed/simple;
-	bh=AK76nE90dSO0iHGuan8JBKTy30j793qgrKQnd92RYd8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=h8eYwdv2D3K6MrSLzttaU9KQ5HbOdQCeCXj9RCu4K1SxiAeB7ZiS+4duHVtvs0fF/iE0Q2LYkEgmhC9nngK0GqEfOqUtSNpCrmAC2QsLVYweaWVTmHMLOigyTcXGdVFSb52M/8STZRPIOYnF8NNxCtAVe9pTkAq0wV3HQvJgun0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q8L6nh8G; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763975152; c=relaxed/simple;
+	bh=igpNggHLjat6VkcqnkhQ2+JHg8zdgs7JFd0aarYxg0E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GlhjG07fV34LVwNmtIUcknl2L/M5XeeFOA3/TcB8CHSL5xkGsmeRiZIammviPwdg/AyuakJx+YeV4LBCMQDeepIrU9KG2k7JMu3WJVTIY0r4f+iDh4I7pYEkYSExGzE5lMxLQ0tVEpQ5x9p7sxmUatJYJWAKhdHm7THx+hTu4fw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Jth+pbiK; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q8L6nh8G"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 187A4C4CEF1;
-	Mon, 24 Nov 2025 09:05:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763975148;
-	bh=AK76nE90dSO0iHGuan8JBKTy30j793qgrKQnd92RYd8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=q8L6nh8GSIHxc40G6YjJc267+RI+Vi2nSF0fhCSr0ZDSck0OzOSCh1/+dgzdDVD86
-	 HxqPbmEKX48zhSuqFQr4NRODLAbFrQ3LAIvt1ETb5iPTznD0dfp5L3pH8NoYGbahrL
-	 +xwxxXauleedYiP6CYsoUFhVHWTui67KwQFZhXNtQCB+UVVabZs3/Rb7rwjOtKTA2U
-	 KWg8HY1hXT3vtlsQxQnf1qvZh58jzZ9NODgr+4gM0kKRs/j3iDC41B+IcYZxExu5JF
-	 02pykSEMUpIzRchQoSGINTOx7wftYdinhcUMzVHJlvSsVV8Eqy18hBnap6J+N68aZz
-	 kOfjc3mt+Y0QA==
-Message-ID: <2f7c7ab9-35ba-4266-895b-cf24d3f8210c@kernel.org>
-Date: Mon, 24 Nov 2025 18:05:45 +0900
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Jth+pbiK"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=Ta3in+nZ0jcLh5+n6gKE3wiAJ+TnQJQrZa4m8Ta5yv8=; b=Jth+pbiKqkts57x866+EMNehsu
+	FZ4vNXW0eYjR7Tn3gSfO+iM1aqnM0NNeHDt2HIxBZcPWCmz1WkEejPx8i7H1ibiGQ3PCYq9sQNqg8
+	woV/KX2GeQW1Cuirw3R5mv742YCSLECy1G9x3zDplqwRZxCW9O37PEbqnjZIzwpeAVn4/QyW6W+te
+	C4KIhbqbOlJXakVErk2IJwSJ5Yq6sRVEp6vKemwzwhrCAETI/8Hgva+DIwt5FdoGETXoObTD4fXSk
+	mpapNlFhCL6MGkOWlf4glFiGhj4q/3tAaABW/cEFO3Tlpfta3J301Dl89/3igwkgFx7XhKOOqjv7k
+	D8316xnw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vNSW2-0000000BJGp-37YI;
+	Mon, 24 Nov 2025 09:05:46 +0000
+Date: Mon, 24 Nov 2025 01:05:46 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, Mikulas Patocka <mpatocka@redhat.com>,
+	Zhaoyang Huang <zhaoyang.huang@unisoc.com>,
+	Dave Chinner <dchinner@redhat.com>, linux-fsdevel@vger.kernel.org
+Subject: Re: calling into file systems directly from ->queue_rq, was Re:
+ [PATCH V5 0/6] loop: improve loop aio perf by IOCB_NOWAIT
+Message-ID: <aSQf6gMFzn-4ohrh@infradead.org>
+References: <20251015110735.1361261-1-ming.lei@redhat.com>
+ <aSP3SG_KaROJTBHx@infradead.org>
+ <aSQfC2rzoCZcMfTH@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RESEND PATCH blktrace v3 10/20] blkparse: skip unsupported
- protocol versions
-To: Johannes Thumshirn <johannes.thumshirn@wdc.com>,
- "axboe@kernel.dk" <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Chaitanya Kulkarni <chaitanyak@nvidia.com>,
- Christoph Hellwig <hch@lst.de>,
- Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- Naohiro Aota <naohiro.aota@wdc.com>, Niklas Cassel <cassel@kernel.org>,
- linux-btrace@vger.kernel.org
-References: <20251124073739.513212-1-johannes.thumshirn@wdc.com>
- <20251124073739.513212-11-johannes.thumshirn@wdc.com>
-From: Damien Le Moal <dlemoal@kernel.org>
-Content-Language: en-US
-Organization: Western Digital Research
-In-Reply-To: <20251124073739.513212-11-johannes.thumshirn@wdc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aSQfC2rzoCZcMfTH@fedora>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On 2025/11/24 16:37, Johannes Thumshirn wrote:
-> Skip unsupported protocol versions for now.
+On Mon, Nov 24, 2025 at 05:02:03PM +0800, Ming Lei wrote:
+> On Sun, Nov 23, 2025 at 10:12:24PM -0800, Christoph Hellwig wrote:
+> > FYI, with this series I'm seeing somewhat frequent stack overflows when
+> > using loop on top of XFS on top of stacked block devices.
 > 
-> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+> Can you share your setting?
+> 
+> BTW, there are one followup fix:
+> 
+> https://lore.kernel.org/linux-block/20251120160722.3623884-1-ming.lei@redhat.com/
+> 
+> I just run 'xfstests -q quick' on loop on top of XFS on top of dm-stripe,
+> not see stack overflow with the above fix against -next.
 
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+This was with a development tree with lots of local code.  So the
+messages aren't applicable (and probably a hint I need to reduce my
+stack usage).  The observations is that we now stack through from block
+submission context into the file system write path, which is bad for a
+lot of reasons.  journal_info being the most obvious one.
 
--- 
-Damien Le Moal
-Western Digital Research
+> > In other words:  I don't think issuing file system I/O from the
+> > submission thread in loop can work, and we should drop this again.
+> 
+> I don't object to drop it one more time.
+> 
+> However, can we confirm if it is really a stack overflow because of
+> calling into FS from ->queue_rq()?
+
+Yes.
+
+> If yes, it could be dead end to improve loop in this way, then I can give up.
+
+I think calling directly into the lower file system without a context
+switch is very problematic, so IMHO yes, it is a dead end.
+
