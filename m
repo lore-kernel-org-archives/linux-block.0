@@ -1,66 +1,93 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAE9BF4F1
-	for <linux-block@vger.kernel.org>; Mon, 24 Nov 2025 17:57:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 377732BEC3A;
+	Mon, 24 Nov 2025 18:22:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764007056; cv=none; b=NS1Ni+E/WU9suRqgozaxbWJYe3tjDE3h+1DQ9zMf764PojhqWuuTtrhlZEuKlm9OwwIlAgAsF6XJ9KoYUtz4G49v+ZteJECrFpZSN5Eqvw/NkreO0u9JNhwB4xj7+rRuYqS7Tl5ZijlUaLfcm/tGRo1lDkpYwWCupb0wgW9v3wc=
+	t=1764008548; cv=none; b=FUwYqr6mXNuO2u5oRH2gf82K/wTaGdU6YEaeJICc/BcPhxS/m7uURQ3N42IsqNsOoH2Msd30HQfoMtjojA5vZhOHAMPRG2GV//LK5bLzVtgEiwMdw27iLNHZR8hkyi5wTHf8AHUk7G/ccM7NqqfNLMb6vqE1FgRFMFwHYzHe8Wo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764007056; c=relaxed/simple;
-	bh=7bWWvU78tdaLgOmVn+BQPQmlP7VUP04s4RF1lWpBC2w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a0EqY6ci2Srj3P4TmFzqPa2RWM7OUkWsK5ZDg6Y2V+qB+2pgy3BpKKvhDzttG8SpwCdZuT13XeLrdyLjnLpruJCd+4k21na3B0wylUG6zzi3VlZqR0ErBDWjogCtvNfgqE+K1Sarae/ax584Oa8t8E4iei1478d5cxXtWEulgH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aIdgsuso; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764008548; c=relaxed/simple;
+	bh=knUnB1Fd7cRbDXio3Uw98H9CG37EwlCHBjIoOfyIEVo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uMP6QZn5OU0C/L7wTLe6+dHHgIqo3+67KpkZAFz0TiajqyZSeELhuYdLoE8pt0103vIkj16OYgMwcWeeB1X8wBNiT4xZypuGjTJ4h0Z2OoYtxpE71glJVhqlIhgnsfw2QX0pjLwx0oG8m3sr8CTyRERatz2HLfY+N/ub8gLPAyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=pW4E5A+L; arc=none smtp.client-ip=199.89.3.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aIdgsuso"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A248C4CEF1;
-	Mon, 24 Nov 2025 17:57:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764007056;
-	bh=7bWWvU78tdaLgOmVn+BQPQmlP7VUP04s4RF1lWpBC2w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aIdgsusoIyToqOntrVo16vpDkArUNiZyxfVd8GCOf821KrSglbuK6J9+azljQ/5Hh
-	 UG6w3e77Wf5aGBKLahRZ3Jl9Ese+Zlyl1Bz/RE1FJyJHamQc6NT9D3QejPNne2J8mT
-	 8O4cj4PLZqgGO0wajAw68SSUuQtejadBfcA2hQNXIU80uM6o4VFKhX+gvhJbo4CRyj
-	 lM+0PZhgKmcbv5WKKBNZlKnVIQyrdfRbQTG24NvOkdwn+Lnz9i8Y/Q+nEvYRv9SOdE
-	 CJpl3/cSK8ki1VbX104xpdIkKZY9GH91WW2BuiHzd+WICDNm8rEDlmnBt0qV1s0VzT
-	 b0zejcRqjV+LA==
-Date: Mon, 24 Nov 2025 10:57:34 -0700
-From: Keith Busch <kbusch@kernel.org>
-To: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-	axboe@kernel.dk, hch@lst.de, ebiggers@kernel.org
-Subject: Re: [PATCHv6] blk-integrity: support arbitrary buffer alignment
-Message-ID: <aSScjjoOZswC35nR@kbusch-mbp>
-References: <20251124161707.3491456-1-kbusch@meta.com>
- <yq1o6or2y11.fsf@ca-mkp.ca.oracle.com>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="pW4E5A+L"
+Received: from localhost (localhost [127.0.0.1])
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4dFZ174cVQzlgqVQ;
+	Mon, 24 Nov 2025 18:22:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:mime-version:x-mailer:message-id:date
+	:date:subject:subject:from:from:received:received; s=mr01; t=
+	1764008538; x=1766600539; bh=m3SJ6N9BE2mpq64gRQmr5sbRsPBag4iwWkt
+	SCwBv2IM=; b=pW4E5A+LInpC4sFKiN5iPbT57sULKIs8bhXKD45hwm1WatrwkNU
+	QiKwbbeC4uLrbBoiKF7VK4S0sPwVr3tJMzsC4C7nW5MDoknFjokc7ezptTWmJnP5
+	JzYhxgoQ7R+Zr6l9p/pPGQ+5oUtx9CmAD2p5K51/O20e5KB+Yj+6w5GLLxd1ZURP
+	knHHaUHVY/nAVLYh8EH6RoqqVvGVQND+ETUHkItlFQqLQa7X4V4LjeWG4q0TD1rW
+	oMd/zkgSNP/HjvtBhv4Cw9aAkT32MWGWJjtv2IOjg4M/zkMpQabbZarbnxssrW6E
+	9THiIDGYBMNQXKToDIUpc5Eiu67QG8feJNw==
+X-Virus-Scanned: by MailRoute
+Received: from 003.mia.mailroute.net ([127.0.0.1])
+ by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id wT3lUb14wuHL; Mon, 24 Nov 2025 18:22:18 +0000 (UTC)
+Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4dFZ122ngMzlgqTs;
+	Mon, 24 Nov 2025 18:22:13 +0000 (UTC)
+From: Bart Van Assche <bvanassche@acm.org>
+To: "Martin K . Petersen" <martin.petersen@oracle.com>
+Cc: linux-scsi@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	John Garry <john.g.garry@oracle.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH v2 0/5] Increase SCSI IOPS
+Date: Mon, 24 Nov 2025 10:21:55 -0800
+Message-ID: <20251124182201.737160-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.52.0.487.g5c8c507ade-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <yq1o6or2y11.fsf@ca-mkp.ca.oracle.com>
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 24, 2025 at 11:31:54AM -0500, Martin K. Petersen wrote:
-> > A bio segment may have partial interval block data with the rest
-> > continuing into the next segments because direct-io data payloads only
-> > need to aligned in memory to the device's DMA limits.
-> 
-> No objections from me if NVMe needs this.
+Hi Martin,
 
-Truthfully, the users I'm enabling rely on the NVMe io_uring passthrough
-interface, so much of this path isn't in the path. I just want to remove
-the dma_alignment limit when a csum is used because the incoming data is
-naturally unaligned in memory to the lba size. Most of this patch is
-prep work to safely modify one line of code :) But I'm still really
-happy with the result!
+This patch series increases scsi_debug IOPS by 5% on my test setup by dis=
+abling
+SCSI budget management if it is not needed. This patch series improves th=
+e
+performance of many SCSI LLDs, including the UFS and ATA drivers.
 
-This should fix a real bug too: requests with data integrity and merged
-bio's would fail without this. It's unlikely you could merge such bio's
-due to integrity segment and virtual boundary limits so it's not
-surprising issues haven't come up, but there are patches staged for 6.19
-that make it easier to do that for capable NVMe devices.
+Please consider this patch series for the next merge window.
+
+Thanks,
+
+Bart.
+
+Changes compared to v1:
+ - Fixed a hang during LUN scanning for ATA devices.
+
+Bart Van Assche (5):
+  block: Introduce __blk_mq_tagset_iter()
+  block: Introduce blk_mq_tagset_iter()
+  libata: Stop using cmd->budget_token
+  scsi: core: Generalize scsi_device_busy()
+  scsi: core: Improve IOPS in case of host-wide tags
+
+ block/blk-mq-tag.c         | 51 ++++++++++++++++++++++++++++----------
+ drivers/ata/libata-scsi.c  | 18 +++++---------
+ drivers/scsi/scsi.c        |  6 ++---
+ drivers/scsi/scsi_lib.c    | 38 ++++++++++++++++++++++++++++
+ drivers/scsi/scsi_scan.c   | 18 +++++++++++++-
+ include/linux/blk-mq.h     |  2 ++
+ include/scsi/scsi_device.h |  5 +---
+ 7 files changed, 104 insertions(+), 34 deletions(-)
+
