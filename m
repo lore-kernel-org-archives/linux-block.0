@@ -1,38 +1,91 @@
-Received: from wxsgout04.xfusion.com (wxsgout03.xfusion.com [36.139.52.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B46018B0A;
-	Mon, 24 Nov 2025 02:19:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=36.139.52.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 787CC2980A8
+	for <linux-block@vger.kernel.org>; Mon, 24 Nov 2025 02:57:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763950800; cv=none; b=pV42jjVeBJH5LtiWK3BWvNrMnkdgzL7bkROC8tWAAQi/47gJzMpE0G36cZkHL7YWBr+BEIf4Yp8P2uobh8I1W82seAIJVlqkCiCuc4bXGz1Dna/++pvfBTE/HvknpkqJfnNBWT+XOA2NmOC1FxmvMwJ89L4k9uxwa9FKIoFFNps=
+	t=1763953067; cv=none; b=NG3OiT9/1lwaoPIf+bFfKDteCvkdMbkDzxhT8smEkEzGoForQ4/3u8f3PRPYA+sATXQ1BhQoT5AFokQzX/nA2YqXt8EeaK1qhCfTB3kQVN9eUk02YEAmEahaSqBG09XKmzzH7pveovbbLNP1ipdMqM4wb0fzJ1BI5+3d8Ae5qGg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763950800; c=relaxed/simple;
-	bh=ie0gj8wY77Jlfqx4kJJF+9LMvcIjxzq8ymFXAV6j3Cs=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TEf5igM2/eIIydsCk7Dye5cOWxfBIGD43+W8eSQJpj8ULJ3wf710+zMKdoXnzlPXzys6b61YUX3xKJZHCJQsOVV2ZHxCSWe8k5ghT2gnFOVr9oDJLBUol6hMhloNLuQlL6MZ+dU+aBRAm12Qa56QlViOCpDUOjQoyhuYI4ZlQLE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xfusion.com; spf=pass smtp.mailfrom=xfusion.com; arc=none smtp.client-ip=36.139.52.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xfusion.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xfusion.com
-Received: from wuxpheds03048.xfusion.com (unknown [10.32.143.30])
-	by wxsgout04.xfusion.com (SkyGuard) with ESMTPS id 4dF8G81fNQzB6C7F;
-	Mon, 24 Nov 2025 10:02:08 +0800 (CST)
-Received: from DESKTOP-Q8I2N5U.xfusion.com (10.82.130.100) by
- wuxpheds03048.xfusion.com (10.32.143.30) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_RSA_WITH_AES_128_CBC_SHA256) id 15.2.2562.20;
- Mon, 24 Nov 2025 10:03:10 +0800
-From: shechenglong <shechenglong@xfusion.com>
-To: <axboe@kernel.dk>, <hch@infradead.org>
-CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<kch@nvidia.com>, <stone.xulei@xfusion.com>, <chenjialong@xfusion.com>,
-	shechenglong <shechenglong@xfusion.com>
-Subject: [PATCH v2 1/1] block: fix typos in comments and strings in blk-core
-Date: Mon, 24 Nov 2025 10:02:58 +0800
-Message-ID: <20251124020258.1022-2-shechenglong@xfusion.com>
-X-Mailer: git-send-email 2.37.1.windows.1
-In-Reply-To: <20251124020258.1022-1-shechenglong@xfusion.com>
-References: <20251104123500.1330-2-shechenglong@xfusion.com>
- <20251124020258.1022-1-shechenglong@xfusion.com>
+	s=arc-20240116; t=1763953067; c=relaxed/simple;
+	bh=W39EvEsOKZnDPgVc3vjL1URC280/rs9OxMSKpDWz+C0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=GBaHX6QiqeQg5/PWSEmxlN5jJKEwz0gtGup8IUV8AfTZd7YwazWkcxTZUH1+oCtOoPqoE2Q+02U7YqCGXm4xzNTg5OCbKpzPPb7YaLFOaXuQ5LQUulT59DVhAPLC4wb+d6wEv0YGDHGeobOlE8W2kGWJwRSizNhp1a4tXX6admY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=es3r2e5j; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="es3r2e5j"
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-29516a36affso54378495ad.3
+        for <linux-block@vger.kernel.org>; Sun, 23 Nov 2025 18:57:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763953064; x=1764557864; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RkWhYF4f1lhsSHEbmYsrWUEDoM/XD4r0C+XpnxkiI8c=;
+        b=es3r2e5jxI9XJcfPMggIH8P8nNDiDjsJ0Me9LddzgHyb1i3TMSJtaOT3/jRq3q83mZ
+         O5R7VNra46ae/nXXcqHGRvbakFLvXVvWpqHttaumyNkJLv4Zb+XqcrO9csRKskEcZyrv
+         zhSoSAEjliIrWF/OsSQq/t/1hosJJam+Butbg/YZhSj6E8yc6gSq1lWWg4Cw3sBgkg1M
+         0we5vkxSFzU1RmteCbQwkMDswnkYpujwZsa6/YCxINQBoGxFgr5FFGrfPMRUG/vSjZ0o
+         ASgA9iSHxvsS2dFmSUo1PjqiW7Utmp9ZrcYM66hXfsmuMnrQrO8uuH6nB0cm7EDVLIdt
+         ImsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763953064; x=1764557864;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=RkWhYF4f1lhsSHEbmYsrWUEDoM/XD4r0C+XpnxkiI8c=;
+        b=TViz1BB1BQzHuPx6aKHeVnGC/W2URN4NfQZO0FEXgNqziNovAywnjnRzmgyyAeoDqE
+         lAnIDCLRG/Z9BM2amJNVziAUchmStb9IlwTUI8KqaxQboeWgeoaXebp18DarLzS2El/E
+         q+FuCMG8HLROb0yabXxzI4mHTuEv9cWIDrkv/8diQC2AuFc2cgTQCKEgC+q1yvxcHQRk
+         FGPYmBO9ZXPP1NwjKYNeuxQ+KNDoumYOAXK03JYZNwR48nWSnuq1570FrWuFzgDWUd68
+         DyDSwgzNup6/mg5oqmIgdfvTuZKw2Mv99SdSm+ANyW5EDZEP56fWKcNE43YVbETiwL+N
+         vruw==
+X-Gm-Message-State: AOJu0Yx/qeOqx2h//1GyCd29LrJE1nWViwiUTr/Ix05ON3yOnhqiYRj1
+	CHsEtqKJ5rZnaOyJ4d3b4hjdyHT1nADVqc/s9NnJwl2Vsbdjqd1kmPmt
+X-Gm-Gg: ASbGncuZK1o/v3C5URaHbFABxrkAj/1KZA9T81aRF5f+Yrg52qH+qzhCKtjDIHdT4YX
+	cfWQYxov4laCv5mJMt8J9ISF5WTRsgPhAZQg/JgYdg+WdUCh7bQbA4ehQpudPseSIGlbgnnj2sp
+	19lwr3vPjqoH2FEsA6XWW+pu+Wq1OZ1fKCirQZebw34RcIcWwUkT+depe4flM7+ZoTY92GBCBKl
+	zDAvBhKVgfmiRg3F8myoboG4b3Yxr2M+dM91ygVmOn+Kwx7w3qJHfrCW9K5Kfk3bJ027EynFH/u
+	06LAXFjl7EeW0ju83R4fSkkPgsdCn935T4mUZZ8Zk3mSxD6rRXg97gP3k5bb9Rl9Ymlmbj7Hm6a
+	BmMc2cnZBkhwGGnm1hQ+1GqmMDvbSvp1knET1ApA1hNhB/1RyWcpkU/g9Hh44AzyYup2QgBrqR0
+	E777rL+kcXmKGKP9CRejcHUCUHjng1ToYAjhCq7m3Oiby2Oq4=
+X-Google-Smtp-Source: AGHT+IH2vl9a4qHa0wFFFsUNbzMzey1IZwx6tJlzdt+jREZgI3T8WYYR2vo3qAu15ZJ2v/Ev109wPg==
+X-Received: by 2002:a05:701b:2803:b0:11b:2138:476a with SMTP id a92af1059eb24-11c9d8539eamr4726588c88.27.1763953064432;
+        Sun, 23 Nov 2025 18:57:44 -0800 (PST)
+Received: from localhost (ip70-175-132-216.oc.oc.cox.net. [70.175.132.216])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11c93e6dbc8sm65938624c88.10.2025.11.23.18.57.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 23 Nov 2025 18:57:44 -0800 (PST)
+From: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+To: axboe@kernel.dk,
+	agk@redhat.com,
+	snitzer@kernel.org,
+	mpatocka@redhat.com,
+	song@kernel.org,
+	yukuai@fnnas.com,
+	hch@lst.de,
+	sagi@grimberg.me,
+	kch@nvidia.com,
+	jaegeuk@kernel.org,
+	chao@kernel.org,
+	cem@kernel.org
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	dm-devel@lists.linux.dev,
+	linux-raid@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-f2fs-devel@lists.sourceforge.net,
+	linux-xfs@vger.kernel.org,
+	bpf@vger.kernel.org,
+	Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+Subject: [PATCH V2 1/5] block: ignore discard return value
+Date: Sun, 23 Nov 2025 18:57:33 -0800
+Message-Id: <20251124025737.203571-2-ckulkarnilinux@gmail.com>
+X-Mailer: git-send-email 2.40.0
+In-Reply-To: <20251124025737.203571-1-ckulkarnilinux@gmail.com>
+References: <20251124025737.203571-1-ckulkarnilinux@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -40,71 +93,39 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: wuxpheds03047.xfusion.com (10.32.141.63) To
- wuxpheds03048.xfusion.com (10.32.143.30)
 
-This patch fixes multiple spelling mistakes in comments and documentation
-in the file block/blk-core.c.
+__blkdev_issue_discard() always returns 0, making the error check
+in blkdev_issue_discard() dead code.
 
-No functional changes intended.
+In function blkdev_issue_discard() initialize ret = 0, remove ret
+assignment from __blkdev_issue_discard(), rely on bio == NULL check to
+call submit_bio_wait(), preserve submit_bio_wait() error handling, and
+preserve -EOPNOTSUPP to 0 mapping.
 
-Suggested-by: Christoph Hellwig <hch@infradead.org>
-Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
-Signed-off-by: shechenglong <shechenglong@xfusion.com>
+Signed-off-by: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
 ---
- block/blk-core.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ block/blk-lib.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 14ae73eebe0d..8387fe50ea15 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -662,13 +662,13 @@ static void __submit_bio(struct bio *bio)
-  *    bio_list of new bios to be added.  ->submit_bio() may indeed add some more
-  *    bios through a recursive call to submit_bio_noacct.  If it did, we find a
-  *    non-NULL value in bio_list and re-enter the loop from the top.
-- *  - In this case we really did just take the bio of the top of the list (no
-+ *  - In this case we really did just take the bio off the top of the list (no
-  *    pretending) and so remove it from bio_list, and call into ->submit_bio()
-  *    again.
-  *
-  * bio_list_on_stack[0] contains bios submitted by the current ->submit_bio.
-  * bio_list_on_stack[1] contains bios that were submitted before the current
-- *	->submit_bio, but that haven't been processed yet.
-+ *	->submit_bio(), but that haven't been processed yet.
-  */
- static void __submit_bio_noacct(struct bio *bio)
+diff --git a/block/blk-lib.c b/block/blk-lib.c
+index 3030a772d3aa..19e0203cc18a 100644
+--- a/block/blk-lib.c
++++ b/block/blk-lib.c
+@@ -87,11 +87,11 @@ int blkdev_issue_discard(struct block_device *bdev, sector_t sector,
  {
-@@ -743,8 +743,8 @@ void submit_bio_noacct_nocheck(struct bio *bio, bool split)
- 	/*
- 	 * We only want one ->submit_bio to be active at a time, else stack
- 	 * usage with stacked devices could be a problem.  Use current->bio_list
--	 * to collect a list of requests submited by a ->submit_bio method while
--	 * it is active, and then process them after it returned.
-+	 * to collect a list of requests submitted by a ->submit_bio method
-+	 * while it is active, and then process them after it returned.
- 	 */
- 	if (current->bio_list) {
- 		if (split)
-@@ -901,7 +901,7 @@ static void bio_set_ioprio(struct bio *bio)
-  *
-  * submit_bio() is used to submit I/O requests to block devices.  It is passed a
-  * fully set up &struct bio that describes the I/O that needs to be done.  The
-- * bio will be send to the device described by the bi_bdev field.
-+ * bio will be sent to the device described by the bi_bdev field.
-  *
-  * The success/failure status of the request, along with notification of
-  * completion, is delivered asynchronously through the ->bi_end_io() callback
-@@ -991,7 +991,7 @@ int iocb_bio_iopoll(struct kiocb *kiocb, struct io_comp_batch *iob,
- 	 * point to a freshly allocated bio at this point.  If that happens
- 	 * we have a few cases to consider:
- 	 *
--	 *  1) the bio is beeing initialized and bi_bdev is NULL.  We can just
-+	 *  1) the bio is being initialized and bi_bdev is NULL.  We can just
- 	 *     simply nothing in this case
- 	 *  2) the bio points to a not poll enabled device.  bio_poll will catch
- 	 *     this and return 0
+ 	struct bio *bio = NULL;
+ 	struct blk_plug plug;
+-	int ret;
++	int ret = 0;
+ 
+ 	blk_start_plug(&plug);
+-	ret = __blkdev_issue_discard(bdev, sector, nr_sects, gfp_mask, &bio);
+-	if (!ret && bio) {
++	__blkdev_issue_discard(bdev, sector, nr_sects, gfp_mask, &bio);
++	if (bio) {
+ 		ret = submit_bio_wait(bio);
+ 		if (ret == -EOPNOTSUPP)
+ 			ret = 0;
 -- 
-2.33.0
+2.40.0
 
