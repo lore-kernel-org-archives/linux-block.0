@@ -1,44 +1,48 @@
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BB5B217736;
-	Mon, 24 Nov 2025 06:12:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 523C9256D;
+	Mon, 24 Nov 2025 06:22:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763964752; cv=none; b=uSYZpDvuSQ8FDCMVxjbc+Kg3IvPZcfBpGmz344yfrnLD5jMMYHVwdz9nAa1rHGknN6F2i+LK4mnSszq/wJATTqsnwcHuGH2M1Dbanikhuk93N8oKSgfLOoDnDIJedNq8UF4vjYLHdNF8V3/Itp4sPr7m+qvabnK/09Pe7gDUKzE=
+	t=1763965366; cv=none; b=JghcO8rNclcvUWRionGltQSG3HtdABmfQWC33zwZr4RXKzwUH7oI5YjeZvNAFaKU3jyrE6bJWg2u4sPBb+8lSgNTYuKfn1OIyzFq+XzHiXvDdrZ3mRmP3HQlAvXMXEeHDiFd0gN9XoDq130SHqYN0yHNxPvjIzgdYBqLo2OPh4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763964752; c=relaxed/simple;
-	bh=INSVYBbb1E6CIB2V0nuUCar+mTYYmoNlpmuEOEMDuLA=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=Upl47gxXZJJk/0xcbaNAI/5yNKEPtbNwPwvPMoHJN2JIqIQF9ZdKu04pYI3//Mzxk9w80EaqYS/3TcHgD8LsOis9b7EfIihxJj4WVqTwwZpUbcSrcIgrBsNwIGvNTek/jKE+/8GJb2olzWgKaiU69Iu79lDXuIb3H4saXAI+RkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=gB0r2+qY; arc=none smtp.client-ip=198.137.202.133
+	s=arc-20240116; t=1763965366; c=relaxed/simple;
+	bh=nx3VukjuuMOBSyaDA6zUnfhDxdBh573OnuZhnglTync=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PJiX7bPuFhNENBY7+czpzWSp46MMmaOpMJP/pqBLeaMv5vcOq0Nk2moo/xJR+lAA1Oc6G96efujyUZ1qIP4jYCSu98fT4rT6ELKn5mkOmfF+Osu2ZF03biQ10SzjEUGw2MKZKsvrk0d7F6t3XAWFllWOSw+D0unkt1oP+127VZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=qH8qp2/x; arc=none smtp.client-ip=198.137.202.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gB0r2+qY"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qH8qp2/x"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding
-	:Content-ID:Content-Description:References;
-	bh=Z4mpNf1BIRqsb//AvdOD24l+kOdTjNMLa/8oJp+WiNI=; b=gB0r2+qYFrX2fpYnAbAqE6haFb
-	RfJMzle8EyHBPLt39T/J1EKj29mR8d3AE1mR3n8CE3Si4nD1HAm45+idOFExtUaIlu16pBvBa86l/
-	w96yrlHj5gRKg/WnFqkqueXTXDXBtI1Sp6kB4JZqAjn9XUIv1NBIZ9xi5d1uIXWcsd8xEkVM/kOq4
-	3gOkrPC6kf11pS9aRUFka8n4YjJTtj7RiO80SCF7G+/vXP0psKiehJTFTfOt4rcVyHkb+z1uMBUlf
-	dJl52wPwBvmQhmlsOs7N6YVAnnw2E91r3cpoDF7S0WRptRczxcPfBTrqwXacK26EkY/ipETMW3YPa
-	crnVygFA==;
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=dp3mlPd1tGPSHjwalGRl3+OXBzlUltt5c2g4rrDWar4=; b=qH8qp2/x9cZUMrdILRqeU862Zl
+	rY+YcfF4XPEPXN/zjHR+j1pwqvCwhGipGukmvP7MEANpCrlePLgfvo+05kOyRgrrA3iEWaXcdkfwy
+	n5MFvlXTOYs8cCMXaPqm2NJrQn6ejYfHPXF6Fk+6S1lNaAbGp001jBuqd3Yx8ixJeykV21c62OgO9
+	IxdMSY6IQXNeDIUGXAoKu3y67wRgr7iijuqp1G/8PN73v/lq0LzcuS/sL2NNnuTiZz+ePoC33OgqI
+	5JyrqgQXsohfKx04w9wzb+dCx2vOLMZs814+VxsjteBNXfNEM5E8FFaII+89JtbsMIzbCxoUqIaPn
+	6AjZf4SA==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vNPoG-0000000B8JO-3nwL;
-	Mon, 24 Nov 2025 06:12:24 +0000
-Date: Sun, 23 Nov 2025 22:12:24 -0800
+	id 1vNPyE-0000000B90n-31B1;
+	Mon, 24 Nov 2025 06:22:42 +0000
+Date: Sun, 23 Nov 2025 22:22:42 -0800
 From: Christoph Hellwig <hch@infradead.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	Zhaoyang Huang <zhaoyang.huang@unisoc.com>,
-	Dave Chinner <dchinner@redhat.com>, linux-fsdevel@vger.kernel.org
-Subject: calling into file systems directly from ->queue_rq, was Re: [PATCH
- V5 0/6] loop: improve loop aio perf by IOCB_NOWAIT
-Message-ID: <aSP3SG_KaROJTBHx@infradead.org>
+To: Stephen Zhang <starzhangzsd@gmail.com>
+Cc: Christoph Hellwig <hch@infradead.org>, linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org, nvdimm@lists.linux.dev,
+	virtualization@lists.linux.dev, linux-nvme@lists.infradead.org,
+	gfs2@lists.linux.dev, ntfs3@lists.linux.dev,
+	linux-xfs@vger.kernel.org, zhangshida@kylinos.cn
+Subject: Re: Fix potential data loss and corruption due to Incorrect BIO
+ Chain Handling
+Message-ID: <aSP5svsQfFe8x8Fb@infradead.org>
+References: <20251121081748.1443507-1-zhangshida@kylinos.cn>
+ <aSBA4xc9WgxkVIUh@infradead.org>
+ <CANubcdVjXbKc88G6gzHAoJCwwxxHUYTzexqH+GaWAhEVrwr6Dg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -47,19 +51,25 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251015110735.1361261-1-ming.lei@redhat.com>
+In-Reply-To: <CANubcdVjXbKc88G6gzHAoJCwwxxHUYTzexqH+GaWAhEVrwr6Dg@mail.gmail.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-FYI, with this series I'm seeing somewhat frequent stack overflows when
-using loop on top of XFS on top of stacked block devices.
+On Sat, Nov 22, 2025 at 02:38:59PM +0800, Stephen Zhang wrote:
+> ======code analysis======
+> In kernel version 4.19, XFS handles extent I/O using the ioend structure,
 
-This seems to be because this can now issue I/O directly from ->queue_rq
-instead of breaking the stack chain, i.e. we can build much deeper call
-stacks now.
+Linux 4.19 is more than four years old, and both the block I/O code
+and the XFS/iomap code changed a lot since then.
 
-Also this now means a file systems using current->journal_info can call
-into another file system trying to use, making things blow up even worse.
+> changes the logic. Since there are still many code paths that use
+> bio_chain, I am including these cleanups with the fix. This provides a reason
+> to CC all related communities. That way, developers who are monitoring
+> this can help identify similar problems if someone asks for help in the future,
+> if that is the right analysis and fix.
 
-In other words:  I don't think issuing file system I/O from the
-submission thread in loop can work, and we should drop this again.
+As many pointed out something in the analysis doesn't end up.  How do
+you even managed to call bio_chain_endio as almost no one should be
+calling it.  Are you using bcache?  Are the others callers in the
+obsolete kernel you are using?  Are they calling it without calling
+bio_endio first (which the bcache case does, and which is buggy).
 
