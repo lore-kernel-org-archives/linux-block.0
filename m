@@ -1,63 +1,63 @@
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69ACB2FCC1D
-	for <linux-block@vger.kernel.org>; Mon, 24 Nov 2025 23:48:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 907312FE07F
+	for <linux-block@vger.kernel.org>; Mon, 24 Nov 2025 23:48:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764028108; cv=none; b=gPgWK83bHTf/3S+NbY0rZBWOEb25kksapWM8uH+1nlzz1iIGqkrZOe4JrgL+m2fhpov0B2apZC6whM1LpsKKfuPU5sJhzytM6qqA+FSjoxioqBu05WcfTN1LSGBWX1m04XkqwVhv+YNnJoz18bjCQqtVtnr6dNTXEeV/ttc+Y7c=
+	t=1764028109; cv=none; b=N8EVYWwR2ML0f1tLQdrPGbQ+/0FuAOuj589mWJbyOTArfjGlHdLinl8I5cyneIWMT1cbK4remieUFm881M1lly1sx7yNlCB4vy9yN1v8wLZdlvQmKRcNhnyJPuPXCxWT8n/TBEnqwXe301IB7jA629KR0zoKXWFZ6vByVvHm2EE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764028108; c=relaxed/simple;
-	bh=LiJgbQPzVCy/nNKtdgxFtiNJpUa7IyMaSDSo31f8t5g=;
+	s=arc-20240116; t=1764028109; c=relaxed/simple;
+	bh=AU6gZMWoUejzxWtNerSxKMr0ZxfAoqmaTtwAxnvaFgQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=WbHyln55CEqw3dksK1oMLNNsgC+qsCRAqEGbTUA2oXoC9sqO6d9yV5v/18GVVCXSAuI137Blru1nsWv2fF/DaFH6t7CgGbl8ijpLr7zCG8GIN8+ieG+MKVZ2hnNyTRxCyPYvhFsAYIcyU6+9iuP3ES2I0K1Vlx7DF1CtsWOuznU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QWk8Up6s; arc=none smtp.client-ip=209.85.214.172
+	 MIME-Version; b=lQVb1K02LO9ChTbWV51nI5ykyCfPljM3RorMdFo7zZIsmC2eDTERUO9MY4wa3/gqTu4x4DTanEsvf5DYYc7w+2UgKAlZzI/FPcROpZuZ5tLy7BR2W8bHxishtOPHlRYmUam0eM2w3DWLLbfqSXlDukAcGZTGVHzTE/1l5K0cIY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lq6ugxMm; arc=none smtp.client-ip=209.85.215.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QWk8Up6s"
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2956d816c10so57195995ad.1
-        for <linux-block@vger.kernel.org>; Mon, 24 Nov 2025 15:48:26 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lq6ugxMm"
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-bc169af247eso4140042a12.2
+        for <linux-block@vger.kernel.org>; Mon, 24 Nov 2025 15:48:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764028105; x=1764632905; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1764028107; x=1764632907; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=x5IpKKGvYwA44MA2SdIRqzoysh0eqDWrauHh/IuigN8=;
-        b=QWk8Up6sn3lYBV/iB9lZxGmffbRvzawOFw5BgJ2PYx9NHD+dLKfyI3JTqNp513mBEV
-         vrxwKhuZvodq3ta/8e4Xw5HFvIU3H7v0KYCuuUctkaSPfrE0kSCNUQgtQ+u9zI4mJNlR
-         9JXIbL7tPP5otS/iH/1e1KJW/G0Fae76007IVjPvsLWohUyZ/1bqGEzeiRa5Sr5fu9S1
-         6c2+gnEtNhBQpacrDuwF0WcYEIRDiSmoF3icXb3ZZUFcoh31hsAyvty0UVz/c3gHwQQh
-         UpRwTviaUPAqYFlZrZd5CHzBVfcGHREOtF3zC0bY4WYeylVTQn3LlTzZSOnjHYrK0m0T
-         TsjA==
+        bh=KD9mOy62HqGMPaOYo+qJ4jLF6S4k7Y6n0q2fK45fvpw=;
+        b=lq6ugxMmUsfcFcfrN2hI2q5uo3qKC0lcYsCcmMVQlglmNFMZsZRxQws1LIAEQ9d4uR
+         Tcq2enPC5f2a7pXnih0YZW2TCZ70XI3wUfkMuTfGib69MOF1JzD6Fs6/LIU5vH/d4+Ch
+         ag08aC00IeRf+xW32sBk5KEYF8m+h61nwsZ+/7bcxsYi+ssrYvgeM1IEqKzclY1OpKQ2
+         6UiFw7foQTpFGzCqj5bJD24hwUyzhCoOZkRfXW/xL6M6YXRlHXdGNKSFJVoIflMnPM+Q
+         8s+3cLIZa+ljYHSQ0HeJqVyMMK5yi1YdC9xLId/M2CrxGewIQJ2b+ufHsNxGMIDiP4wa
+         0K4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764028105; x=1764632905;
+        d=1e100.net; s=20230601; t=1764028107; x=1764632907;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=x5IpKKGvYwA44MA2SdIRqzoysh0eqDWrauHh/IuigN8=;
-        b=K+qGQfbxxH35KPTZBbA9ZWQvtWpEFY0n4+NGXzQ2I0dF/DM3IsXBs/DZeN0ZV/Gfk+
-         msAFMUuwAetPkYHAg4WB/GlE/E05+ghQitNb5l4WiBDgTH00FL3mNLuwnEj3MabzcQaW
-         Gs/XZzb6PRE46bOy0myycdXgGf/tqsASZ2/4opRXXXxF9UmvHal4KsPazlydGaCvL0cr
-         Wl3frP5UFWx/tAagqCaS37eKAwATKYd29E7Ogf+icyjGJFAyunNCyXXLvSSc2T+V/yF+
-         JOa/0xB/jBEIpJwhIz5/8sBzdnhDHLP0HDpc3TbIy+bNBfr8Pis3HSNXUfsbIIimkGO6
-         bvSw==
-X-Gm-Message-State: AOJu0YxeTFqANBLcd01iK1BoYuELipL7VZv0BtNIbLiDFxOSjJvnM06a
-	WSfL8FIDMy9YO3/Vbh1mSKMEYiUd50qZAxkhU5Q4TfeLBylEXLhbPTaS
-X-Gm-Gg: ASbGnctiejlebZz+G97Vy9r+Pr8Sn3SUNfHMm97pP9VwW4yqzY39J3vqwCl9nHOXjiv
-	/cl/8iUM5R1wEnF440NeMtfTh2Z/id3DY5sCVxjhOfZ0smH1EBxvXN5hMHOdWQ8d6Jf3HKtHG0D
-	ymngRPeoYI7fPyiZ95zG2zwFfZcGLPhXW6R9uzqYCdHWpDmmOGMOHvLo4vOG+7y7kmqaHam/dR3
-	Q0JQsgc60Sw68jIb0XqPrZI4mNBb9dfI63dnHp9DGCvyXBCYSjbL1+IO8sWwo5prrI9dtJqOhs5
-	Mjcoiv6Oy1srD7XVhxmqXuZW1ds5R8yAlYLZJD5w2W3cr9i1Ia8pEyWOKdYdjd7O4fE9LLGjU02
-	MrOrNRJwbnZdRdgepLq3ubimmIUVrArpEavz7KLDmuL7XahQe2LHgcGczVAEAW5+mVsoypj+z0g
-	AUW8dTq9YpRfHXDKYQtOlFDkIJzKv9nJqVvqdsst/QMGsgwHRU9NgMBHlHCA==
-X-Google-Smtp-Source: AGHT+IGUjnYuQU4uZ65RexnKMVsIkRo4SljblPDkF73f7cjoVp9uAJMvqcbsbNcZ8FiTC+XwEcc2Xg==
-X-Received: by 2002:a05:7022:6610:b0:11b:9386:a37b with SMTP id a92af1059eb24-11c9d870ef7mr10566206c88.42.1764028105314;
-        Mon, 24 Nov 2025 15:48:25 -0800 (PST)
+        bh=KD9mOy62HqGMPaOYo+qJ4jLF6S4k7Y6n0q2fK45fvpw=;
+        b=UAhfPj4J2zJTH3dpwd/8Li/A0MJ3j21vZOxEX30aafXb5f2UZ1T/qibSY6KocEmRzQ
+         DbX0zbq3PAhYuRN8zZCzQ3kulqapxDio1vbE/1uK/Vi1R9bCtGu00XFe69qOO7LwtqMS
+         CiVhQ2rzZCRrPWKDUH5Ks6kYRmOr16fVGQ2Y+0Q84iYErDmtPvl1sFIhyUfgZEkQDn1Z
+         7Z/tLo4oiSAI6pfOU5rY64MXu6mrqMXuvI89qCxeoQ/4ORIdCMpjNhRfWCXKDTj16SH5
+         beOpUcYmUaOxcQK5vWcu65v2hCuk4vmgtgJE/ZpRRM8+64nGy0MlQ+JwIgnukZ8E5m+2
+         3VFA==
+X-Gm-Message-State: AOJu0YwVaopBFmQWfOESp4ht3TNIpsOVrwHo2tgomjyQ69O1Mu2pEXoN
+	qzUYcHf6OCJ8Tt3TzxRUeZH/MlHhsokeFgHSe4qVfi50dMyDd3J2ESHV
+X-Gm-Gg: ASbGncsi1XWsivrhfCZx2OLUDa5UIlpYFruEt0eUoxZkRLyu95B48KMlIz6m3MhzNmY
+	lFCmMjEWEJUyta7jL/TEOhkvoweWdGQTNPa5BEXMpJ1C85jdtp+zJdvwgFWIJ5j9wJ4DH9VTQPn
+	ASA5y0vdwQG5WGDF04zFkWNufxkRu06vvJmfPIw7cCITjRvlLSFsW82/ctBPnatm4yUgm34Atkj
+	lAQPQViMmltzlLyz8rR/oXmzTLOMGu4pJ0DWXLCRhHIlRAP3mB9TjMLsqkJRa9TrxZbVtaLirxW
+	PqkeTEoSpsZGFhJG+00w+mpqKuRF2EXNUHmcBsEq3AL0+bobBnHnNd6q9iEwZurCg9VW1Gtfb9v
+	i75wViP+LrE4pSXx5xkHcpKBAUJR0Mfk8QDnmcuxvWDiNtFpZZHqm7lbkOkPHzBwhLuYKa7/W9a
+	vTgzr34H+nbmRgR+tc6neoO354g/uv9MRjoubDlv0FQq+5yEM=
+X-Google-Smtp-Source: AGHT+IGqGWPp3dbaz9P/oMvxkH8tM768OBnx1ym9H6OndIwxHy5XjYnjyPQDBtMIVrKtoM7S3ehYMw==
+X-Received: by 2002:a05:693c:810c:b0:2a4:3593:9697 with SMTP id 5a478bee46e88-2a719279965mr8848102eec.20.1764028106837;
+        Mon, 24 Nov 2025 15:48:26 -0800 (PST)
 Received: from localhost (ip70-175-132-216.oc.oc.cox.net. [70.175.132.216])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11c93de6d5csm50934572c88.4.2025.11.24.15.48.24
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2a6fc5b122dsm56253333eec.5.2025.11.24.15.48.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Nov 2025 15:48:25 -0800 (PST)
+        Mon, 24 Nov 2025 15:48:26 -0800 (PST)
 From: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
 To: axboe@kernel.dk,
 	agk@redhat.com,
@@ -82,9 +82,9 @@ Cc: linux-block@vger.kernel.org,
 	Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
 	"Martin K . Petersen" <martin.petersen@oracle.com>,
 	Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH V3 3/6] dm: ignore discard return value
-Date: Mon, 24 Nov 2025 15:48:03 -0800
-Message-Id: <20251124234806.75216-4-ckulkarnilinux@gmail.com>
+Subject: [PATCH V3 4/6] nvmet: ignore discard return value
+Date: Mon, 24 Nov 2025 15:48:04 -0800
+Message-Id: <20251124234806.75216-5-ckulkarnilinux@gmail.com>
 X-Mailer: git-send-email 2.40.0
 In-Reply-To: <20251124234806.75216-1-ckulkarnilinux@gmail.com>
 References: <20251124234806.75216-1-ckulkarnilinux@gmail.com>
@@ -96,64 +96,73 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-__blkdev_issue_discard() always returns 0, making all error checking
-at call sites dead code.
+__blkdev_issue_discard() always returns 0, making the error checking
+in nvmet_bdev_discard_range() dead code.
 
-For dm-thin change issue_discard() return type to void, in
-passdown_double_checking_shared_status() remove the r assignment from
-return value of the issue_discard(), for end_discard() hardcode value of 
-r to 0 that matches only value returned from __blkdev_issue_discard().
+Kill the function nvmet_bdev_discard_range() and call
+__blkdev_issue_discard() directly from nvmet_bdev_execute_discard(),
+since no error handling is needed anymore for __blkdev_issue_discard()
+call.
 
 Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
 ---
- drivers/md/dm-thin.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+ drivers/nvme/target/io-cmd-bdev.c | 28 +++++++---------------------
+ 1 file changed, 7 insertions(+), 21 deletions(-)
 
-diff --git a/drivers/md/dm-thin.c b/drivers/md/dm-thin.c
-index c84149ba4e38..77c76f75c85f 100644
---- a/drivers/md/dm-thin.c
-+++ b/drivers/md/dm-thin.c
-@@ -395,13 +395,13 @@ static void begin_discard(struct discard_op *op, struct thin_c *tc, struct bio *
- 	op->bio = NULL;
+diff --git a/drivers/nvme/target/io-cmd-bdev.c b/drivers/nvme/target/io-cmd-bdev.c
+index 8d246b8ca604..ca7731048940 100644
+--- a/drivers/nvme/target/io-cmd-bdev.c
++++ b/drivers/nvme/target/io-cmd-bdev.c
+@@ -362,29 +362,14 @@ u16 nvmet_bdev_flush(struct nvmet_req *req)
+ 	return 0;
  }
  
--static int issue_discard(struct discard_op *op, dm_block_t data_b, dm_block_t data_e)
-+static void issue_discard(struct discard_op *op, dm_block_t data_b, dm_block_t data_e)
+-static u16 nvmet_bdev_discard_range(struct nvmet_req *req,
+-		struct nvme_dsm_range *range, struct bio **bio)
+-{
+-	struct nvmet_ns *ns = req->ns;
+-	int ret;
+-
+-	ret = __blkdev_issue_discard(ns->bdev,
+-			nvmet_lba_to_sect(ns, range->slba),
+-			le32_to_cpu(range->nlb) << (ns->blksize_shift - 9),
+-			GFP_KERNEL, bio);
+-	if (ret && ret != -EOPNOTSUPP) {
+-		req->error_slba = le64_to_cpu(range->slba);
+-		return errno_to_nvme_status(req, ret);
+-	}
+-	return NVME_SC_SUCCESS;
+-}
+-
+ static void nvmet_bdev_execute_discard(struct nvmet_req *req)
  {
- 	struct thin_c *tc = op->tc;
- 	sector_t s = block_to_sectors(tc->pool, data_b);
- 	sector_t len = block_to_sectors(tc->pool, data_e - data_b);
++	struct nvmet_ns *ns = req->ns;
+ 	struct nvme_dsm_range range;
+ 	struct bio *bio = NULL;
++	sector_t nr_sects;
+ 	int i;
+-	u16 status;
++	u16 status = NVME_SC_SUCCESS;
  
--	return __blkdev_issue_discard(tc->pool_dev->bdev, s, len, GFP_NOIO, &op->bio);
-+	__blkdev_issue_discard(tc->pool_dev->bdev, s, len, GFP_NOIO, &op->bio);
- }
+ 	for (i = 0; i <= le32_to_cpu(req->cmd->dsm.nr); i++) {
+ 		status = nvmet_copy_from_sgl(req, i * sizeof(range), &range,
+@@ -392,9 +377,10 @@ static void nvmet_bdev_execute_discard(struct nvmet_req *req)
+ 		if (status)
+ 			break;
  
- static void end_discard(struct discard_op *op, int r)
-@@ -1113,9 +1113,7 @@ static void passdown_double_checking_shared_status(struct dm_thin_new_mapping *m
- 				break;
- 		}
- 
--		r = issue_discard(&op, b, e);
--		if (r)
--			goto out;
-+		issue_discard(&op, b, e);
- 
- 		b = e;
+-		status = nvmet_bdev_discard_range(req, &range, &bio);
+-		if (status)
+-			break;
++		nr_sects = le32_to_cpu(range.nlb) << (ns->blksize_shift - 9);
++		__blkdev_issue_discard(ns->bdev,
++				nvmet_lba_to_sect(ns, range.slba), nr_sects,
++				GFP_KERNEL, &bio);
  	}
-@@ -1188,8 +1186,8 @@ static void process_prepared_discard_passdown_pt1(struct dm_thin_new_mapping *m)
- 		struct discard_op op;
  
- 		begin_discard(&op, tc, discard_parent);
--		r = issue_discard(&op, m->data_block, data_end);
--		end_discard(&op, r);
-+		issue_discard(&op, m->data_block, data_end);
-+		end_discard(&op, 0);
- 	}
- }
- 
+ 	if (bio) {
 -- 
 2.40.0
 
