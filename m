@@ -1,89 +1,168 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77D992741AC
-	for <linux-block@vger.kernel.org>; Mon, 24 Nov 2025 22:56:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 251B926F28F
+	for <linux-block@vger.kernel.org>; Mon, 24 Nov 2025 23:48:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764024975; cv=none; b=NY07QQNFNLDIXVZP5Bruh0fbWsDyJ9gsinCUceJXfYyAoL+ZFI8qPPrXiWm5UKFzDdq2a/hR6cLyOwuk1GZUKx2F8moaJlbqBSdKvvjF4tmrUqAbTZLqMaH29Ni9Q+qyBIOmEuIqUXPsDr4mLi70TnAFXTXvMjTW1uuEmPTwmD0=
+	t=1764028105; cv=none; b=ssSd2OzHiEQdDaMBK9U4DXpgKGin3ZkO7uRq8yH2JxhasLMvkyshfZD/j1arxKMf+A17QvviUkfv9CDLwozFME4Nh5FZE6JabfPwYbjYk89VCSfFs1bc643JH9SnZQGBs7WTKLHNgsJ8UbBgkpg9nwzwIITlkE0UlRUO9JX00vw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764024975; c=relaxed/simple;
-	bh=IUfF3YONEI5olGC76f01yrZXqBWlAnR21kE+xhP9VuI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mwOfLC3KBORZi8xcv49gdbJC3l/Ugxg5eN1SEKimzmjDSf50wTEBHyPEF6B0GtD/AwRX13q8Rm8AfWYyJhG9Wvx/dXo6S02bpPht3wDjbYK0nUkKp5Ahe/KBFAPh0cBYlTfmBmGlMD7vh9HAJEBJYIvnUVHv8nL4r9EAca8iI5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ji78YdxP; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764028105; c=relaxed/simple;
+	bh=0HZiUPVVqiDv8ZEl67pEJba49nGpbGLpzJLHrHVWkJs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GcXb96zPyJyV0X4JyLjpkoCArhPYV0hYmfHTGErVz32ALrL+m8K7hZrJC9Cq3XH+2WKGVNfru5eRysCG3MKTzbWn+tMPaTHVTQq3vyZu+BxMF60tdHDtkEVt+EWcywIhzmBLYaZS+2L7/l2zHn8xjZzDAcjBLWthZtg9f9PAoew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bPL86y/i; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ji78YdxP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8177C4CEF1;
-	Mon, 24 Nov 2025 22:56:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764024974;
-	bh=IUfF3YONEI5olGC76f01yrZXqBWlAnR21kE+xhP9VuI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ji78YdxPFWzXb3Jj6oQBuTYMGlQL9TxDcsi+M3iV64SohfnsOcgNokWHXg+Y51RJd
-	 h/7JDODRR17+UScb9F2A6pG++75Bw8pnQonERxUW9J9+ZlWQzKy0WT6NCL0wQ3wm5J
-	 vXCIsKyLwsNSrKpItN2KkyLMFqzKRGYbQM0th7pdJxfnu0BTtZAFA3hHU1mfTq6pk+
-	 jWrNaEDbID0dW65OJHzBl1p3wRImIeKgN2YG7rt6gh5D9pFIFabyh9Zfr3dIebGp44
-	 O8lxbLbP5qJK/CSbxFgptU1e7FuTUC5mdvP2UpScgj5O8cz+dQVdhpPAHt6x8SKEqZ
-	 hXLpDFd98tmug==
-Date: Mon, 24 Nov 2025 15:56:11 -0700
-From: Keith Busch <kbusch@kernel.org>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-	axboe@kernel.dk, hch@lst.de, ebiggers@kernel.org,
-	"Martin K. Petersen" <martin.petersen@oracle.com>
-Subject: Re: [PATCHv6] blk-integrity: support arbitrary buffer alignment
-Message-ID: <aSTii9KbN6wQCvOt@kbusch-mbp>
-References: <20251124161707.3491456-1-kbusch@meta.com>
- <CADUfDZqrpJXLLU9V3eFJvRgth45-ht-yi4cSpmrBdnbfQGtWYw@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bPL86y/i"
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-7bf0ad0cb87so4737349b3a.2
+        for <linux-block@vger.kernel.org>; Mon, 24 Nov 2025 15:48:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764028101; x=1764632901; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=L8zwVcuAssRnEQZ8e7ewIMIsPfvOXMAA4RWGmHyZ+Rs=;
+        b=bPL86y/iBZjOidhBAl6VEV+QifNIHQrW4C3Ep/nwnKCbwUYO59IpTBFsDTtTEXt8yx
+         FJpoB8nln2MJ0VffyNsLuxsbAfCrlFlqVQdFMMBONxF0RNtxGWy73OnTLTVzfvdxyT/l
+         1a5MQ5SILc0M6AkSTMRTtkdDAAw9Lhar88tFes+HRhPfsfPrH0YQpWIRbMdqpN8JxpT5
+         pn89jOdNkpwNkPjwlZ7wuYN9CfRt97F+rlWz4bReRFYlh2UbtSsd3m2VD8CYzxEdUPwJ
+         1hrdyU71mzSM4j22YMWsrdkPTHruHM0KynglrtZuDsfqrhVEhrIXc/umLfuVoTM6pkLZ
+         4c1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764028101; x=1764632901;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=L8zwVcuAssRnEQZ8e7ewIMIsPfvOXMAA4RWGmHyZ+Rs=;
+        b=SVPXERHvnPfO3srdUagIds4JhwujzzDJNPSwAjxuy64S8DTkcP+rcPdqGqhiNvWhT4
+         hKcv3+LNUaPNQZseY0aWpvH8C80hBKesks10+PPiQyYSja6ai/q1datw60vpiY3hbHD9
+         oLhoc0dwEMm0PAGE6Lhbsx6+FEV3U7KLyxhzAXdCRiTSGrjSlw6WJlsmn0sfwKNz0RqV
+         QJAOAI60dIXw8jPlBgmh47NGUAFgb/txH3IpDUWOYty445njayF5ybUtqaWhpflgsDTd
+         ADHE48l3yapCx50V1yaScOOAMyEIqmC6N43vlRffGmQSQfdi3UsTNlHRo7LPB5C5CzF+
+         0vFQ==
+X-Gm-Message-State: AOJu0YyKyxs34FHD3rQ9MNjdm/lY1fh4jJhAILPERhA3L7+y67ycIHDy
+	nhVDUR3yWnNgi6Etj7tips3CO9fx9lLH2uS9EOB5ydO/GBuLY2JZZk17UJ4JHg==
+X-Gm-Gg: ASbGncul+61hzmGW9JsIZd5CQSulXTPKRGsAN9H8isz7E5FmPnYTF4fvTfJYD8Qdz4k
+	IOwhfbR07vcc+Dek+Ktlc+odS90gktWZvgy1fwJU2giJ3mv78HqklD8Y4OXyrVD0xUgtAyddnls
+	ZbdKUf9yomGXt32tYH9rmbAbyHvSECzzvYmD9A6MGMfAr7+Oz0rkz6Ebjlv05q5WSJkrQNKO3Rg
+	x/8MSEnkPk/kPS1KdLCo7KcqVYiYApUG74m16ZL5cG/+YMAZgHNRySv+9hiI2DUUa6mjd3BGZtx
+	+/Tbm+kcXiwsyeSK6U7c2GE3r9V99CffMDmK2KALI/Bc5T7mcxyTIIvOYCgiZXWu5bP9B7HkvIS
+	GUp4Dz6WcUyBbGxKz4xImDYdx7RAcPdkX/eFt7CB7uYlMNqntV+51KGtdK4WRT5oBPDhzshm96R
+	lhDWSsRW7eM6zYEHIc80IhpqTWbYrpILvY6wkNIK5FSW6GsEI=
+X-Google-Smtp-Source: AGHT+IEWVgvs7HfQh1Jftv0/sg1EMetPp1p1pbe1p7lp0IBRgw/xws/S7S4QHSHoK5/x2kKFyy9WJQ==
+X-Received: by 2002:a05:7022:1093:b0:11a:2ec0:dd02 with SMTP id a92af1059eb24-11c9d85fed4mr7996088c88.33.1764028101157;
+        Mon, 24 Nov 2025 15:48:21 -0800 (PST)
+Received: from localhost (ip70-175-132-216.oc.oc.cox.net. [70.175.132.216])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11c93db556csm74670928c88.1.2025.11.24.15.48.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Nov 2025 15:48:20 -0800 (PST)
+From: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+To: axboe@kernel.dk,
+	agk@redhat.com,
+	snitzer@kernel.org,
+	mpatocka@redhat.com,
+	song@kernel.org,
+	yukuai@fnnas.com,
+	hch@lst.de,
+	sagi@grimberg.me,
+	kch@nvidia.com,
+	jaegeuk@kernel.org,
+	chao@kernel.org,
+	cem@kernel.org
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	dm-devel@lists.linux.dev,
+	linux-raid@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-f2fs-devel@lists.sourceforge.net,
+	linux-xfs@vger.kernel.org,
+	bpf@vger.kernel.org,
+	Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+Subject: [PATCH V3 0/6] block: ignore __blkdev_issue_discard() ret value
+Date: Mon, 24 Nov 2025 15:48:00 -0800
+Message-Id: <20251124234806.75216-1-ckulkarnilinux@gmail.com>
+X-Mailer: git-send-email 2.40.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADUfDZqrpJXLLU9V3eFJvRgth45-ht-yi4cSpmrBdnbfQGtWYw@mail.gmail.com>
 
-On Mon, Nov 24, 2025 at 01:34:03PM -0800, Caleb Sander Mateos wrote:
-> On Mon, Nov 24, 2025 at 8:18 AM Keith Busch <kbusch@meta.com> wrote:
-> >
-> > From: Keith Busch <kbusch@kernel.org>
-> >
-> > A bio segment may have partial interval block data with the rest continuing
-> > into the next segments because direct-io data payloads only need to aligned in
-> 
-> "need to be aligned"?
+Hi,
 
-In the original text, s/aligned/align
+__blkdev_issue_discard() only returns value 0, that makes post call
+error checking code dead. This patch series revmoes this dead code at
+all the call sites and adjust the callers.
+
+Please note that it doesn't change the return type of the function from
+int to void in this series, it will be done once this series gets merged
+smoothly.
+
+For f2fs and xfs I've ran following test which includes discard
+they produce same PASS and FAIL output with and without this patch
+series.
+
+  for-next (lblk-fnext)    discard-ret (lblk-discard)
+  ---------------------    --------------------------
+  FAIL f2fs/008            FAIL f2fs/008
+  FAIL f2fs/014            FAIL f2fs/014
+  FAIL f2fs/015            FAIL f2fs/015
+  PASS f2fs/017            PASS f2fs/017
+  PASS xfs/016             PASS xfs/016
+  PASS xfs/288             PASS xfs/288
+  PASS xfs/432             PASS xfs/432
+  PASS xfs/449             PASS xfs/449
+  PASS xfs/513             PASS xfs/513
+  PASS generic/033         PASS generic/033
+  PASS generic/038         PASS generic/038
+  PASS generic/098         PASS generic/098
+  PASS generic/224         PASS generic/224
+  PASS generic/251         PASS generic/251
+  PASS generic/260         PASS generic/260
+  PASS generic/288         PASS generic/288
+  PASS generic/351         PASS generic/351
+  PASS generic/455         PASS generic/455
+  PASS generic/457         PASS generic/457
+  PASS generic/470         PASS generic/470
+  PASS generic/482         PASS generic/482
+  PASS generic/500         PASS generic/500
+  PASS generic/537         PASS generic/537
+  PASS generic/608         PASS generic/608
+  PASS generic/619         PASS generic/619
+  PASS generic/746         PASS generic/746
+  PASS generic/757         PASS generic/757
  
-> > +       while (offset > 0) {
-> > +               struct bio_vec pbv = mp_bvec_iter_bvec(bvec, iter->prot_iter);
-> > +               unsigned int len = min(pbv.bv_len, offset);
-> > +               void *prot_buf = bvec_kmap_local(&pbv);
-> 
-> Is it valid to use bvec_kmap_local() on a multi-page bvec? 
+For NVMeOF taret I've testing blktest with nvme_trtype=nvme_loop
+and all the testcases are passing.
 
-If it wasn't valid, there'd be a major problem with large folios.
+ -ck
 
-> It calls
-> kmap_local_page() internally, which will only map the first page,
-> right?
+Changes from V2:-
 
-Compare kmap_local_page() with kmap_local_folio(). They both resolve to
-the same lower level mapping function, and folios have no problem
-spanning pages.
- 
-> > @@ -1874,6 +1874,7 @@ static bool nvme_init_integrity(struct nvme_ns_head *head,
-> >                 break;
-> >         }
-> >
-> > +       bi->flags |= BLK_SPLIT_INTERVAL_CAPABLE;
-> 
-> Can just be = instead of |= since bi is zeroed above.
+1. Add Reviewed-by: tags.
+2. Split patch 2 into two separate patches dm and md.
+3. Condense __blkdev_issue_discard() parameters for in nvmet patch.
+4. Condense __blkdev_issue_discard() parameters for in f2fs patch.
 
-It can, but these kinds of syntax are a courtesty to future changes so
-that you don't need to change this line later. You can also end a struct
-initialization without a trailing "," too, but that's just mean.
+Chaitanya Kulkarni (6):
+  block: ignore discard return value
+  md: ignore discard return value
+  dm: ignore discard return value
+  nvmet: ignore discard return value
+  f2fs: ignore discard return value
+  xfs: ignore discard return value
+
+ block/blk-lib.c                   |  6 +++---
+ drivers/md/dm-thin.c              | 12 +++++-------
+ drivers/md/md.c                   |  4 ++--
+ drivers/nvme/target/io-cmd-bdev.c | 28 +++++++---------------------
+ fs/f2fs/segment.c                 | 10 +++-------
+ fs/xfs/xfs_discard.c              | 27 +++++----------------------
+ fs/xfs/xfs_discard.h              |  2 +-
+ 7 files changed, 26 insertions(+), 63 deletions(-)
+
+-- 
+2.40.0
+
