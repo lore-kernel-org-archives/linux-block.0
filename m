@@ -1,42 +1,60 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97E171BBBE5;
-	Tue, 25 Nov 2025 02:49:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF5A23C38
+	for <linux-block@vger.kernel.org>; Tue, 25 Nov 2025 03:00:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764038977; cv=none; b=bdUFNAI906qKVt2Eo+0caZmt9PA12jlpPIXuehzvAZ3Snh/oHb2O+7R4h5jzjJtW4B+J+oWWloBpulK74wXFifIBnHNPxxNBPxQo9sMvA5zhuNETRvkyNb4tDoE96hFK6bo0gEiEL/1wSPXg+db12l+YIlCW9VBSZObp1utoxJU=
+	t=1764039620; cv=none; b=dB99e1cWWxK4pQ86dVfAy0dOWyW8HSAduRRiIvzTyjbWDc+vN7o3D4UzXmwwcI0KV5Wt/cTJGIM87h1Fw3r90aJt92pW8oBRqn2KySc0e3DmnlAZeNBB5kh40c8+as4DmClsNoyyCUZf6tEsD4LBkyfkdc5kLEM2VyXsU3qHC3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764038977; c=relaxed/simple;
-	bh=6gQjztsDDlh8n/eTljRDdlDWD5jAcdxxhM0F5+hbMUU=;
+	s=arc-20240116; t=1764039620; c=relaxed/simple;
+	bh=CXBOFv5E0W/8VeuJx2GyYI3qA8Ap+kQi6fxiDxbI+lU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i6gW9Zo5P6jF7CIrnW0jTvrmWn2eT72PZSuOzQpc4KJexos4pqHz7PyuS76V/cmjuFwvUOxYvmRZ81y5O+I8X/lWbQBBk9c6RJbFCNrpdaEBKVVHcpJr5lZDCtx29ze9z7a8RgypNj6DltA2BLidkBhyZ3/FUMWVUGtFFVRajFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O60DemiN; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=e9fXxVR9rlSVi2bal2DwLkjga4IcCYBz1/QtieFl7c+7+XR3hTvWF7d6ZhPaoL0V0/cuRmrbE6UO1izBvW2kXl2uJnWmRKw24ccopEK9XA5errOdqmdnqY8YEWcKYyH8G421H97gh4Eiuf+gjx56B5EXRC2FtD0PT3tVaZyRkBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VNI++UhS; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O60DemiN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB22FC4CEFB;
-	Tue, 25 Nov 2025 02:49:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764038977;
-	bh=6gQjztsDDlh8n/eTljRDdlDWD5jAcdxxhM0F5+hbMUU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=O60DemiNA5KuF1BgeDQzAvVVBaj+pyx9Kg8vxWVP8gVszGkzdj6AnTEtIZSp7Q4r8
-	 hCX9AB55IF6+0tkPPYq0Vkg5rAAweSqFyMHh7y/4n39Qf/AXahyQzhgpKqmN9qWlLB
-	 ocV8J0wcBiz3EuvCt1QW0uRMpVsuIzbjBGCTpB/xf5xeFVEvU0eVUzDmKRPnWS46MT
-	 P94e/PZGyr+s7po/ovXM4mwBanFJ6O64V6eHMrR2CeIK/VgjguAoXZUyqepu6y1x10
-	 2iQ4QrH8G5790i2Lp8U/vRxpmSwQJEKGthtvnknz8VhuC/+ykgAaS9gU63uonAGtVT
-	 T2DfM34cA/0/g==
-Date: Mon, 24 Nov 2025 19:49:35 -0700
-From: Keith Busch <kbusch@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <kbusch@meta.com>, dm-devel@lists.linux.dev,
-	linux-block@vger.kernel.org, snitzer@kernel.org, axboe@kernel.dk,
-	ebiggers@kernel.org
-Subject: Re: [PATCHv2 1/3] block: remove stacking default dma_alignment
-Message-ID: <aSUZP6yP8mvi-q7v@kbusch-mbp>
-References: <20251124170903.3931792-1-kbusch@meta.com>
- <20251124170903.3931792-2-kbusch@meta.com>
- <20251124171230.GA29490@lst.de>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VNI++UhS"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764039617;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=b22+7QsDRFeCLadpvkPvdFY550gmWfw5/V4565hkPxU=;
+	b=VNI++UhSatQ3lnw8wELxDDpNNreR96mMnE4Fpt86UqhYGWqhk+fhR/PQh1fpO8uW1lUdar
+	Pyxz/gklrDtam2jagik6JStzNZ1INcY8rb2KVrhmM7ATI4qaerzXYjYwh80cKGwXRqKyzD
+	X4I9tmiE0YEn+DHImz63k9QF6kno3I4=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-533-o31QrOWoN_iqYnP4tcoyjA-1; Mon,
+ 24 Nov 2025 22:00:14 -0500
+X-MC-Unique: o31QrOWoN_iqYnP4tcoyjA-1
+X-Mimecast-MFC-AGG-ID: o31QrOWoN_iqYnP4tcoyjA_1764039613
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1F64C18005A7;
+	Tue, 25 Nov 2025 03:00:12 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.210])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CAF781800451;
+	Tue, 25 Nov 2025 03:00:05 +0000 (UTC)
+Date: Tue, 25 Nov 2025 11:00:00 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Zhaoyang Huang <zhaoyang.huang@unisoc.com>,
+	Dave Chinner <dchinner@redhat.com>, linux-fsdevel@vger.kernel.org
+Subject: Re: calling into file systems directly from ->queue_rq, was Re:
+ [PATCH V5 0/6] loop: improve loop aio perf by IOCB_NOWAIT
+Message-ID: <aSUbsDjHnQl0jZde@fedora>
+References: <20251015110735.1361261-1-ming.lei@redhat.com>
+ <aSP3SG_KaROJTBHx@infradead.org>
+ <aSQfC2rzoCZcMfTH@fedora>
+ <aSQf6gMFzn-4ohrh@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -45,20 +63,51 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251124171230.GA29490@lst.de>
+In-Reply-To: <aSQf6gMFzn-4ohrh@infradead.org>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Mon, Nov 24, 2025 at 06:12:30PM +0100, Christoph Hellwig wrote:
-> On Mon, Nov 24, 2025 at 09:09:01AM -0800, Keith Busch wrote:
-> > From: Keith Busch <kbusch@kernel.org>
+On Mon, Nov 24, 2025 at 01:05:46AM -0800, Christoph Hellwig wrote:
+> On Mon, Nov 24, 2025 at 05:02:03PM +0800, Ming Lei wrote:
+> > On Sun, Nov 23, 2025 at 10:12:24PM -0800, Christoph Hellwig wrote:
+> > > FYI, with this series I'm seeing somewhat frequent stack overflows when
+> > > using loop on top of XFS on top of stacked block devices.
 > > 
-> > The dma_alignment becomes 511 anyway if the caller doesn't explicitly
-> > set it. But setting this default prevents the stacked device from
-> > requesting a lower value even if it can handle lower alignments.
+> > Can you share your setting?
+> > 
+> > BTW, there are one followup fix:
+> > 
+> > https://lore.kernel.org/linux-block/20251120160722.3623884-1-ming.lei@redhat.com/
+> > 
+> > I just run 'xfstests -q quick' on loop on top of XFS on top of dm-stripe,
+> > not see stack overflow with the above fix against -next.
 > 
-> Given how much trouble we had with drivers doing software processing
-> and unaligned buffers I'd feel more comfortable keeping this default
-> limitation.  Drivers that want to relax it can still trivially do
-> that right after calling blk_set_stacking_limits.
+> This was with a development tree with lots of local code.  So the
+> messages aren't applicable (and probably a hint I need to reduce my
+> stack usage).  The observations is that we now stack through from block
+> submission context into the file system write path, which is bad for a
+> lot of reasons.  journal_info being the most obvious one.
+> 
+> > > In other words:  I don't think issuing file system I/O from the
+> > > submission thread in loop can work, and we should drop this again.
+> > 
+> > I don't object to drop it one more time.
+> > 
+> > However, can we confirm if it is really a stack overflow because of
+> > calling into FS from ->queue_rq()?
+> 
+> Yes.
+> 
+> > If yes, it could be dead end to improve loop in this way, then I can give up.
+> 
+> I think calling directly into the lower file system without a context
+> switch is very problematic, so IMHO yes, it is a dead end.
 
-That should have the same result, but it's totally fine with me if you
-prefer the caller overwrite the default instead.
+Hi Jens,
+
+Can you drop or revert the patchset of "loop: improve loop aio perf by IOCB_NOWAIT"
+from for-6.19/block?
+
+
+Thanks,
+Ming
+
