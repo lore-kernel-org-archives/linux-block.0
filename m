@@ -1,227 +1,198 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5AED1A9B58
-	for <linux-block@vger.kernel.org>; Tue, 25 Nov 2025 12:19:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FB4731DDB6
+	for <linux-block@vger.kernel.org>; Tue, 25 Nov 2025 12:33:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764073156; cv=none; b=Dy2mWU9MHzloRM56iyYPygSB5qT3q7jJYBMf7kBzvXrSF5Uyq4lX1UMQpLHEGkLhOfYPGzmJ8DN+n1dS5Nimji4Y9shj00g9yKU9NM8f6Oj+T/7azpJxXySYaZlK83mn4v254MhFQLt1oL5eAc/I8zd7+If9J13gtT8dDxqNgOY=
+	t=1764074036; cv=none; b=dYBadlWHY7L2Os9WfxL54k+nWywP58GYQw7Nw5ig1SGzYUUqfZFdFovcnoY0tHK5JJ8hcnoyT/1TKRI/UOwOykuTaE5HQ1zq3XeM31UCd6YLQqKPyUyTjP/kPslAaM1nCVjwdJ3qgOCx4RBckWibX7BGZMEpgj0WfsoqhqNEGDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764073156; c=relaxed/simple;
-	bh=lgoOPaKPXztfjj98p3vcOUq62BZpQ8lIYzng5I9rylM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VHVLu1MILSRr4DOyPenhw1Fmq6O1hNXYJ9KwAP8NuMyps4mrHy3shmzWYKk/CAFEKji7Tz+ymiPX/lvzg15EysY8Vkj0wB5wGNMIMu2uDGefY7NZ0RuA0S11y/wj2dox2jtV8sg0UrR0rxGPzlUC7qSj/kRo1aIfyHB67xBvk3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=go1wcuRn; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1764074036; c=relaxed/simple;
+	bh=belAiWPyO9Bo80ibgfsOGQoG2yNGG/WNRIvedl9xroM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PoB5wHBKt9G9LBZ1SuQp8iib6K+AoMtTzKmiTZF5hGfu/96ouTqgh23fcTOJ996hSb3f+hc/fNQ5fh/PzZGVDAXQNsDKARvIfvlG1KXg7bgTstK8GE4EC6WWFbZDD35tueOZfe4o0wOmdCX2PSFKTolIqg2YSC2+mGoqqqbU7nU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=uLChw0LO; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=BWJrJ9zB; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=uLChw0LO; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=BWJrJ9zB; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="go1wcuRn"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764073153;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rykTlfNsj1/E5Fo/PWign2TZV68m9oO/+87UHCcO/EQ=;
-	b=go1wcuRneNVIHPJUisdoVLRXV0vEbL9FX0AzuBIfAmNRbnOTo2mEaTx8PN2minNqOKJ+W/
-	1IQL0rSPTtIZ2RzehP2Y8v8zWlGyHDGgHtXIi1tuPYyCDkIafrDS0NwcFvjfyjTeWReEiE
-	lqpJUrwoijuGVtUYMuUZ/d3s/EF2PLc=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-452-opdar_KeMIqiS0Mjt5NOyA-1; Tue,
- 25 Nov 2025 07:19:10 -0500
-X-MC-Unique: opdar_KeMIqiS0Mjt5NOyA-1
-X-Mimecast-MFC-AGG-ID: opdar_KeMIqiS0Mjt5NOyA_1764073149
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="uLChw0LO";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="BWJrJ9zB";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="uLChw0LO";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="BWJrJ9zB"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 113E6180049F;
-	Tue, 25 Nov 2025 12:19:08 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.210])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 15517195608E;
-	Tue, 25 Nov 2025 12:19:01 +0000 (UTC)
-Date: Tue, 25 Nov 2025 20:18:51 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Gao Xiang <hsiangkao@linux.alibaba.com>
-Cc: Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	Zhaoyang Huang <zhaoyang.huang@unisoc.com>,
-	Dave Chinner <dchinner@redhat.com>, linux-fsdevel@vger.kernel.org,
-	Jens Axboe <axboe@kernel.dk>
-Subject: Re: calling into file systems directly from ->queue_rq, was Re:
- [PATCH V5 0/6] loop: improve loop aio perf by IOCB_NOWAIT
-Message-ID: <aSWeq4dN69WsH2EI@fedora>
-References: <aSQfC2rzoCZcMfTH@fedora>
- <aSQf6gMFzn-4ohrh@infradead.org>
- <aSUbsDjHnQl0jZde@fedora>
- <db90b7b3-bf94-4531-8329-d9e0dbc6a997@linux.alibaba.com>
- <aSV0sDZGDoS-tLlp@fedora>
- <00bc891e-4137-4d93-83a5-e4030903ffab@linux.alibaba.com>
- <aSWHx3ynP9Z_6DeY@fedora>
- <4a5ec383-540b-461d-9e53-15593a22a61a@linux.alibaba.com>
- <aSWXeIVjArYsAbyf@fedora>
- <dbff8d43-3313-459b-9c9f-d431fcae0249@linux.alibaba.com>
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 843325BE71;
+	Tue, 25 Nov 2025 12:33:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1764074026; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6H3ZohGhsJTuXJwPtJPtAzAFvIuUq1M/+91P5tuAAAM=;
+	b=uLChw0LO71V8jndqtzmCZ7btu5AMbJbgubtEdv0GIKDaqoHjwVDgBBqkT80YhxrmY41/3A
+	I4NaNNP9hPTA9aNe+m2aMs1ITNji68siNBFjSprR8c9yh5KSLeApJ3dzK7yNnOw6WmJMre
+	sJAj3AD6gk99KhiMA7rWm6GZLKI/2Ug=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1764074026;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6H3ZohGhsJTuXJwPtJPtAzAFvIuUq1M/+91P5tuAAAM=;
+	b=BWJrJ9zBNbn0awaKiCsT2NIXmz/r5xo6ywZ8pzCZ6GPksVfOP9fK57rWvgFjYSJi70Lo8D
+	lsHJmjos8g2rsjDg==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=uLChw0LO;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=BWJrJ9zB
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1764074026; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6H3ZohGhsJTuXJwPtJPtAzAFvIuUq1M/+91P5tuAAAM=;
+	b=uLChw0LO71V8jndqtzmCZ7btu5AMbJbgubtEdv0GIKDaqoHjwVDgBBqkT80YhxrmY41/3A
+	I4NaNNP9hPTA9aNe+m2aMs1ITNji68siNBFjSprR8c9yh5KSLeApJ3dzK7yNnOw6WmJMre
+	sJAj3AD6gk99KhiMA7rWm6GZLKI/2Ug=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1764074026;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6H3ZohGhsJTuXJwPtJPtAzAFvIuUq1M/+91P5tuAAAM=;
+	b=BWJrJ9zBNbn0awaKiCsT2NIXmz/r5xo6ywZ8pzCZ6GPksVfOP9fK57rWvgFjYSJi70Lo8D
+	lsHJmjos8g2rsjDg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 22FA83EA63;
+	Tue, 25 Nov 2025 12:33:45 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id g5PzAymiJWkIdAAAD6G6ig
+	(envelope-from <hare@suse.de>); Tue, 25 Nov 2025 12:33:45 +0000
+Message-ID: <718aae86-a8dd-4b1d-9666-8d3a2bc5bc49@suse.de>
+Date: Tue, 25 Nov 2025 13:33:44 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dbff8d43-3313-459b-9c9f-d431fcae0249@linux.alibaba.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC blktests fix PATCH] tcp: use GFP_ATOMIC in tcp_disconnect
+To: Nilay Shroff <nilay@linux.ibm.com>, Christoph Hellwig <hch@lst.de>
+Cc: Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+ Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
+ "kbusch@kernel.org" <kbusch@kernel.org>, "sagi@grimberg.me"
+ <sagi@grimberg.me>, "axboe@kernel.dk" <axboe@kernel.dk>,
+ "dlemoal@kernel.org" <dlemoal@kernel.org>, "wagi@kernel.org"
+ <wagi@kernel.org>, "mpatocka@redhat.com" <mpatocka@redhat.com>,
+ "yukuai3@huawei.com" <yukuai3@huawei.com>, "xni@redhat.com"
+ <xni@redhat.com>, "linan122@huawei.com" <linan122@huawei.com>,
+ "bmarzins@redhat.com" <bmarzins@redhat.com>,
+ "john.g.garry@oracle.com" <john.g.garry@oracle.com>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "ncardwell@google.com" <ncardwell@google.com>,
+ "kuniyu@google.com" <kuniyu@google.com>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "dsahern@kernel.org" <dsahern@kernel.org>, "kuba@kernel.org"
+ <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+ "horms@kernel.org" <horms@kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <20251125061142.18094-1-ckulkarnilinux@gmail.com>
+ <aSVMXYCiEGpETx-X@infradead.org>
+ <ea2958c9-4571-4169-8060-6456892e6b15@nvidia.com>
+ <0caa9d00-3f69-4ade-b93b-eea307fe6f72@linux.ibm.com>
+ <20251125112111.GA22545@lst.de>
+ <234bab6c-6d31-4c93-8a69-5b3687ba9b85@linux.ibm.com>
+ <20251125113009.GA22874@lst.de>
+ <c6e88bc3-8cc9-4503-a472-7692468ac218@linux.ibm.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <c6e88bc3-8cc9-4503-a472-7692468ac218@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 843325BE71
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	URIBL_BLOCKED(0.00)[suse.de:email,suse.de:mid,suse.de:dkim];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[nvidia.com,gmail.com,kernel.org,grimberg.me,kernel.dk,redhat.com,huawei.com,oracle.com,google.com,davemloft.net,vger.kernel.org,lists.infradead.org];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	R_RATELIMIT(0.00)[to_ip_from(RLykmtnuwwt3p9ueb9muqcqoc7)];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:email,suse.de:mid,suse.de:dkim]
+X-Rspamd-Action: no action
+X-Spam-Flag: NO
+X-Spam-Score: -4.51
+X-Spam-Level: 
 
-On Tue, Nov 25, 2025 at 07:58:09PM +0800, Gao Xiang wrote:
+On 11/25/25 12:54, Nilay Shroff wrote:
 > 
 > 
-> On 2025/11/25 19:48, Ming Lei wrote:
-> > On Tue, Nov 25, 2025 at 06:57:15PM +0800, Gao Xiang wrote:
-> > > 
-> > > 
-> > > On 2025/11/25 18:41, Ming Lei wrote:
-> > > > On Tue, Nov 25, 2025 at 05:39:17PM +0800, Gao Xiang wrote:
-> > > > > Hi Ming,
-> > > > > 
-> > > > > On 2025/11/25 17:19, Ming Lei wrote:
-> > > > > > On Tue, Nov 25, 2025 at 03:26:39PM +0800, Gao Xiang wrote:
-> > > > > > > Hi Ming and Christoph,
-> > > > > > > 
-> > > > > > > On 2025/11/25 11:00, Ming Lei wrote:
-> > > > > > > > On Mon, Nov 24, 2025 at 01:05:46AM -0800, Christoph Hellwig wrote:
-> > > > > > > > > On Mon, Nov 24, 2025 at 05:02:03PM +0800, Ming Lei wrote:
-> > > > > > > > > > On Sun, Nov 23, 2025 at 10:12:24PM -0800, Christoph Hellwig wrote:
-> > > > > > > > > > > FYI, with this series I'm seeing somewhat frequent stack overflows when
-> > > > > > > > > > > using loop on top of XFS on top of stacked block devices.
-> > > > > > > > > > 
-> > > > > > > > > > Can you share your setting?
-> > > > > > > > > > 
-> > > > > > > > > > BTW, there are one followup fix:
-> > > > > > > > > > 
-> > > > > > > > > > https://lore.kernel.org/linux-block/20251120160722.3623884-1-ming.lei@redhat.com/
-> > > > > > > > > > 
-> > > > > > > > > > I just run 'xfstests -q quick' on loop on top of XFS on top of dm-stripe,
-> > > > > > > > > > not see stack overflow with the above fix against -next.
-> > > > > > > > > 
-> > > > > > > > > This was with a development tree with lots of local code.  So the
-> > > > > > > > > messages aren't applicable (and probably a hint I need to reduce my
-> > > > > > > > > stack usage).  The observations is that we now stack through from block
-> > > > > > > > > submission context into the file system write path, which is bad for a
-> > > > > > > > > lot of reasons.  journal_info being the most obvious one.
-> > > > > > > > > 
-> > > > > > > > > > > In other words:  I don't think issuing file system I/O from the
-> > > > > > > > > > > submission thread in loop can work, and we should drop this again.
-> > > > > > > > > > 
-> > > > > > > > > > I don't object to drop it one more time.
-> > > > > > > > > > 
-> > > > > > > > > > However, can we confirm if it is really a stack overflow because of
-> > > > > > > > > > calling into FS from ->queue_rq()?
-> > > > > > > > > 
-> > > > > > > > > Yes.
-> > > > > > > > > 
-> > > > > > > > > > If yes, it could be dead end to improve loop in this way, then I can give up.
-> > > > > > > > > 
-> > > > > > > > > I think calling directly into the lower file system without a context
-> > > > > > > > > switch is very problematic, so IMHO yes, it is a dead end.
-> > > > > > > I've already explained the details in
-> > > > > > > https://lore.kernel.org/r/8c596737-95c1-4274-9834-1fe06558b431@linux.alibaba.com
-> > > > > > > 
-> > > > > > > to zram folks why block devices act like this is very
-> > > > > > > risky (in brief, because virtual block devices don't
-> > > > > > > have any way (unlike the inner fs itself) to know enough
-> > > > > > > about whether the inner fs already did something without
-> > > > > > > context save (a.k.a side effect) so a new task context
-> > > > > > > is absolutely necessary for virtual block devices to
-> > > > > > > access backing fses for stacked usage.
-> > > > > > > 
-> > > > > > > So whether a nested fs can success is intrinsic to
-> > > > > > > specific fses (because either they assure no complex
-> > > > > > > journal_info access or save all effected contexts before
-> > > > > > > transiting to the block layer.  But that is not bdev can
-> > > > > > > do since they need to do any block fs.
-> > > > > > 
-> > > > > > IMO, task stack overflow could be the biggest trouble.
-> > > > > > 
-> > > > > > block layer has current->blk_plug/current->bio_list, which are
-> > > > > > dealt with in the following patches:
-> > > > > > 
-> > > > > > https://lore.kernel.org/linux-block/20251120160722.3623884-4-ming.lei@redhat.com/
-> > > > > > https://lore.kernel.org/linux-block/20251120160722.3623884-5-ming.lei@redhat.com/
-> > > > > 
-> > > > > I think it's the simplist thing for this because the
-> > > > > context of "current->blk_plug/current->bio_list" is
-> > > > > _owned_ by the block layer, so of course the block
-> > > > > layer knows how to (and should) save and restore
-> > > > > them.
-> > > > 
-> > > > Strictly speaking, all per-task context data is owned by task, instead
-> > > > of subsystems, otherwise, it needn't to be stored in `task_struct` except
-> > > > for some case just wants per-task storage.
-> > > > 
-> > > > For example of current->blk_plug, it is used by many subsystems(io_uring, FS,
-> > > > mm, block layer, md/dm, drivers, ...).
-> > > > 
-> > > > > 
-> > > > > > 
-> > > > > > I am curious why FS task context can't be saved/restored inside block
-> > > > > > layer when calling into new FS IO? Given it is just per-task info.
-> > > > > 
-> > > > > The problem is a block driver don't know what the upper FS
-> > > > > (sorry about the terminology) did before calling into block
-> > > > > layer (the task_struct and journal_info side effect is just
-> > > > > the obvious one), because all FSes (mainly the write path)
-> > > > > doesn't assume the current context will be transited into
-> > > > > another FS context, and it could introduce any fs-specific
-> > > > > context before calling into the block layer.
-> > > > > 
-> > > > > So it's the fs's business to save / restore contexts since
-> > > > > they change the context and it's none of the block layer
-> > > > > business to save and restore because the block device knows
-> > > > > nothing about the specific fs behavior, it should deal with
-> > > > > all block FSes.
-> > > > > 
-> > > > > Let's put it into another way, thinking about generic
-> > > > > calling convention[1], which includes caller-saved contexts
-> > > > > and callee-saved contexts.  I think the problem is here
-> > > > > overally similiar, for loop devices, you know none of lower
-> > > > > or upper FS behaves (because it doesn't directly know either
-> > > > 
-> > > > loop just need to know which data to save/restore.
-> > > 
-> > > I've said there is no clear list of which data needs to be
-> > > saved/restored.
-> > > 
-> > > FSes can do _anything_. Maybe something in `current` needs
-> > > to be saved, but anything that uses `current`/PID as
-> > > a mapping key also needs to be saved, e.g., arbitrary
-> > > 
-> > > `hash_table[current]` or `context_table[current->pid]`.
-> > > 
-> > > Again, because not all filesystems allow nesting by design:
-> > > Linux kernel doesn't need block filesystem to be nested.
-> > 
-> > OK, got it, thanks for the sharing.
-> > 
-> > BTW, block layer actually uses current->bio_list to avoid nested bio
-> > submission.
-> > 
-> > The similar trick could be played on FS ->read_iter/->write_iter() over
-> > `kiocb` for avoiding nested FS IO too, but not sure if there is real
-> > big use case.
+> On 11/25/25 5:00 PM, Christoph Hellwig wrote:
+>> On Tue, Nov 25, 2025 at 04:58:32PM +0530, Nilay Shroff wrote:
+>>> >From git history, I see that was added to avoid memory reclaim  to avoid
+>>> possible circular locking dependency. This commit 83e1226b0ee2 ("nvme-tcp:
+>>> fix possible circular locking when deleting a controller under memory
+>>> pressure") adds it.
+>>
+>> I suspect this was intended to be noio, and we should just switch to
+>> that.
+>>
+> Yeah, I agree that this should be changed to noio. However, it seems that
+> this alone may not be sufficient to fix the lockdep splat reported here.
+> Since the real work of fput() might be deferred to another thread, using a noio
+> scope in this path may not have the intended effect and could end up being
+> redundant.
 > 
-> I don't think it's much similar, `current->bio_list` just deals
-> with the single BIO concept, but what nested fses need to deal
+> That said, I noticed another fix from Chaitanya [1], where fput() is replaced
+> with __fput_sync(). With that change in place, combining the noio scope adjustment
+> with the switch to __fput_sync() should indeed address the lockdep issue. Given
+> that both problems have very similar lockdep signatures, it might make sense to
+> merge these two changes into a single fix.
+> 
+> [1] https://lore.kernel.org/all/20251125005950.41046-1-ckulkarnilinux@gmail.com/
+> 
+Yes, we should.
+Both address similar symptoms, and I wouldn't be surprised both turn out
+to address the same issue.
+(Frame #0 from here is basically identical to frame #2 in the referenced
+issue).
 
-No, it is not, it can be one tree of BIOs in case of dm/md.
+So please roll both into one patch.
 
-> with is much complicated.
+Cheers,
 
-Care for sharing why/what the complicated is?
-
-Anyway it is just one raw idea, and the devil is always in the details.
-
-
-Thanks, 
-Ming
-
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
