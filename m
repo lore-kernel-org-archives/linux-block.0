@@ -1,48 +1,65 @@
-Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1918A329E66;
-	Tue, 25 Nov 2025 17:15:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD983218596
+	for <linux-block@vger.kernel.org>; Tue, 25 Nov 2025 17:38:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764090911; cv=none; b=VXMpMyPOczCqKF87+jisYJ+Nvbf0a5AEv1Sa8yZrnSNki+68ojJcehyawJ8XRNd+x4Yj6JP43uuE5LhhqbDj2dB1fJ1fao0lBI7zu7cL05I97vhwiUSfutmZNqIsxRMe4RvJm8+TabFvprX8DvrnRxwQDv665/TXI/p0MhwfXb0=
+	t=1764092298; cv=none; b=tduEhbCp6qzMK1G1GwbHEDi0P2og/ZPbkCt0jSWR4y4kQ7MXXhH7dEctDfmz2eYNO+yq6LX1N/rwvcBqoelTwCg3uNfw8ZBkZbCTgqMvl07kjlls03pZfVDWe5lTec5eKYAzSiUY+OX2gNWQ7vPxquGT4wWWyplG8ygustvH6/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764090911; c=relaxed/simple;
-	bh=OcwrmxPc8idBxxhd80HaC+UsrAFUT5hpiUULCLR459g=;
+	s=arc-20240116; t=1764092298; c=relaxed/simple;
+	bh=iPGMl91c7t5RGa6luUsGuLLK2Y4Uq1XKEbahe9phnZw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qWkD+GHA7rSGrW1IBS9gijkV9Rsa+r6+7cjMGgM+0UXinsqH4kI70XOqrhNYYD+FzLCYSwOLJqaShGFeW7aLfaGqwYinQ62VKXtUJs9A5qypk3TcMSGNYanW9ZDHiIV4s7Emt5otbsqjKHazGfUqV+Yxm0vDmURsYuLkAncjHiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=mvobnqUY; arc=none smtp.client-ip=199.89.3.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	 In-Reply-To:Content-Type; b=PjXmBwE2/wHTj9Vi9Jz0Q7o7ufPxyYpvZBmTfwLjkPa//L6FZh61Zl8PgX0iuvk+x7ppNpgCvklnbAWtcnuY1xNqGODCW+niljpt1w2ZDnCnta+fPFYl0FYsbwHGD6UhTuU3T7OhunlUz6VRs1LBhqPrOdixgGBov6894aB8YPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=MP3eRqnj; arc=none smtp.client-ip=209.85.166.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="mvobnqUY"
-Received: from localhost (localhost [127.0.0.1])
-	by 004.mia.mailroute.net (Postfix) with ESMTP id 4dG8T66TnNzm1Dsn;
-	Tue, 25 Nov 2025 17:15:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1764090904; x=1766682905; bh=LyWyCloUdHrGYWyY72Ay1h0C
-	NqbHDupZm7mkxO17fOo=; b=mvobnqUYMHhsXNQz+esGp80A+xfDYSeph1PZmA/+
-	wZIy6+btAgam1tTSjutBM6uPrAYcAQd5q4WMDbRp5kqvQlhOPCnFiTC03D7G1cEn
-	F+Cp7psmJQWa09mld78NJlB7DdQTolj6u+Zi0BQxKyQxEN/JESIbR/Pqsy9VBX8S
-	2bBWS5kVPkdm1X5KqIWJSiDHX/LeCfD4KB2Uahk2cNTWPMNQdrnmSuwUxlJR3XZ1
-	t2eRUfzoYyYtBmhMzhUGoQTuuf0AYozSM3tI/Kl+Xgh0o50q+ra94lSgjIzAeyvw
-	MRKRJn6XewU5Ewuilt2pCCtg+aXrPLc1VvAvpUl8HvzYMg==
-X-Virus-Scanned: by MailRoute
-Received: from 004.mia.mailroute.net ([127.0.0.1])
- by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 8U4GFbvDuEgn; Tue, 25 Nov 2025 17:15:04 +0000 (UTC)
-Received: from [100.119.48.131] (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4dG8Sz741Fzm1Hbg;
-	Tue, 25 Nov 2025 17:14:59 +0000 (UTC)
-Message-ID: <ab007560-7ccd-4ffe-9bc1-53f858c4c771@acm.org>
-Date: Tue, 25 Nov 2025 09:14:57 -0800
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="MP3eRqnj"
+Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-948da744f87so214038139f.1
+        for <linux-block@vger.kernel.org>; Tue, 25 Nov 2025 09:38:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1764092296; x=1764697096; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Y/RYkXbjr0Zws5PkDP81koxcOw7wQafJJolXOcPbtL0=;
+        b=MP3eRqnjDMu+VfgIgoXsIjZip2LrEx1us53r4meudiB9JGUbZ72aOCwHVqeWpcZFMf
+         brjS7X4GVj403fOyNyRKQvVZgImprMv3zy3CchjzM+GyfO9KuAvEZRo5BLVq7yb1JW5q
+         SDs7kehGdkBeTBcTdxTsopwd7wvwVVqvy408yKdzW0gEqgdkhuketmjwGMzY7tz/Z1Oo
+         RAYaSxGergG2kfyxRGyXiE5ezp35bLfalGIF4hzgKt+PdBqUIvuhfIChYxFmyuaIhCVf
+         CD81Odhm44Ln9mP2TZF0/SRi6UX6k8xoOAJQc44N7ZQHA+ovauUoXEg2ucKX0zVJe694
+         35EA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764092296; x=1764697096;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Y/RYkXbjr0Zws5PkDP81koxcOw7wQafJJolXOcPbtL0=;
+        b=SrUt1m3dO+79RIOSK7uKlujzSy0qW1hBsvB0I4RlWsmkAVherk8TbY/utbjA0MhBSd
+         RsMCkT4z4EIYA6ZoSkIOtYd/4bH8CQgDipu2UwHlBzClQ1abJZcmPF4Er5wwMK5rjB2+
+         6lFUt0fpa0q98p1ZVXVP3M0rA82/tfBpJ+Y4sSH1SJfw0XuwsmRHYBELksomG12JamgK
+         j5eKAgVuHckNMPDXElnUeTXR7cUHszlobn+HO+hppEJRIj0D9Jtkcs/3EGg6jvltQ2fE
+         n0DNK6q6B0DHWdGLz6wSX/JvvprgSWDBeyMOijlngyQdDJIxjutzhPkBUkWfxO/Rzi9t
+         mwwQ==
+X-Gm-Message-State: AOJu0Yz9dhtjbI8R0FP5c4seoUofJ9ptn3fg6OCCHGg2BzyW+vgmtana
+	VgT9n87JsVxF2aATudKIVekZs5+wqPYgv6cVD4DkDXjgaVz+844S+kzgNo+jZ95g+qY=
+X-Gm-Gg: ASbGncv76kmZutXAvH8c2vI6/JiYNwGV0uu25nifq004WgDrNFsi8uuMD6hfodqvNKq
+	AMD7RvYHovWBXlkfNcusf/B+NYs07PGutCYNYOMQQv3+xhE6yxqgmiO5kAUsy7+skxObJcX9K9K
+	b+xS4FI9uTxFZl5WdDCqL198j5kwnm84enlRHRZwMv0kpaI38yofUjPSK8dyTACA25sZ5rMfe6f
+	X32aorZtNG8e1zWHkogobWOtIupcn67kYivXwmDRz3FXz9tVdKh+6kRCgrlyzi+8lWSTAK5Upgf
+	SSI8Zl1ffJ6//IIHhvbjDgLhyd/yhvOh13H9MomKaJqGh5/mrZGxcPSEm4POben+NaJnA8fSkoQ
+	FoLopPv47gIEE/RaG+EG4gsTJAf7Qfxkify+3aPemwz7BbxDuQP8hgghlqmQ8lcSL2O0=
+X-Google-Smtp-Source: AGHT+IEIHRk7SwMmVS4xtcTCAS6Qp+OrN5pgC4aYwqKQ9jNrDNwsm/zNssFdQ4CwiXZVR7EmZb+prg==
+X-Received: by 2002:a05:6638:c0fb:b0:5ac:cd9a:4c4c with SMTP id 8926c6da1cb9f-5b999555c41mr3179432173.2.1764092295677;
+        Tue, 25 Nov 2025 09:38:15 -0800 (PST)
+Received: from [192.168.1.99] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5b954b48bdcsm6970840173.45.2025.11.25.09.38.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Nov 2025 09:38:15 -0800 (PST)
+Message-ID: <e3f09e0c-63f4-4887-8e3a-1fb24963b627@kernel.dk>
+Date: Tue, 25 Nov 2025 10:38:13 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,98 +67,31 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/5] libata: Stop using cmd->budget_token
-To: Damien Le Moal <dlemoal@kernel.org>,
+Subject: Re: [PATCH V3 1/6] block: ignore discard return value
+To: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>, agk@redhat.com,
+ snitzer@kernel.org, mpatocka@redhat.com, song@kernel.org, yukuai@fnnas.com,
+ hch@lst.de, sagi@grimberg.me, kch@nvidia.com, jaegeuk@kernel.org,
+ chao@kernel.org, cem@kernel.org
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ dm-devel@lists.linux.dev, linux-raid@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-f2fs-devel@lists.sourceforge.net,
+ linux-xfs@vger.kernel.org, bpf@vger.kernel.org,
+ Johannes Thumshirn <johannes.thumshirn@wdc.com>,
  "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc: linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
- John Garry <john.g.garry@oracle.com>, Hannes Reinecke <hare@suse.de>,
- Niklas Cassel <cassel@kernel.org>, Christoph Hellwig <hch@lst.de>
-References: <20251124182201.737160-1-bvanassche@acm.org>
- <20251124182201.737160-4-bvanassche@acm.org>
- <597e6678-d62f-48d0-8a4d-225d4a6013d8@kernel.org>
+References: <20251124234806.75216-1-ckulkarnilinux@gmail.com>
+ <20251124234806.75216-2-ckulkarnilinux@gmail.com>
 Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <597e6678-d62f-48d0-8a4d-225d4a6013d8@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20251124234806.75216-2-ckulkarnilinux@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 11/24/25 9:35 PM, Damien Le Moal wrote:
-> On 11/25/25 3:21 AM, Bart Van Assche wrote:
->> Since a single hardware queue is used by ATA drivers, the request tag
->> uniquely identifies in-flight commands. Stop using the SCSI budget token
->> to prepare for no longer allocating a budget token if possible. The
->> modified code was introduced by commit 4f1a22ee7b57 ("libata: Improve ATA
->> queued command allocation").
->>
->> Cc: Damien Le Moal <dlemoal@kernel.org>
->> Cc: Niklas Cassel <cassel@kernel.org>
->> Cc: John Garry <john.g.garry@oracle.com>
->> Cc: Christoph Hellwig <hch@lst.de>
->> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> 
-> It is very hard to review this without the cover letter and the other patches
-> to give context.
-> 
-> So as-is, without trying to find where the other patches are, this is a big no
-> from me: this will break drivers for SAS HBAs that use libsas, and so libata as
-> their SAT implementation. In this case, the tag of a scsi command request is
-> the HBA tag, NOT the device tag. So this simply does not work at all.
-> 
-> Maybe you fixed that in other patches of this series. I don't know. If you want
-> a proper review with context, please send everything to the people from whom
-> you expect a review.
+On 11/24/25 4:48 PM, Chaitanya Kulkarni wrote:
+> __blkdev_issue_discard() always returns 0, making the error check
+> in blkdev_issue_discard() dead code.
 
-Hi Damien,
+Shouldn't it be a void instead then?
 
-Thank you for having provided feedback on this patch.
+-- 
+Jens Axboe
 
-This patch series will have to be resent. When I resend it I will Cc you
-on the entire patch series including the cover letter. If you would like
-to take a look now at the cover letter and the other patches in this
-series, these are available here:
-https://lore.kernel.org/linux-scsi/20251124182201.737160-1-bvanassche@acm.org/
-
-How about excluding ATA and SAS kernel drivers from this patch series by
-dropping this patch and by applying something like the patch below on
-top of this patch series?
-
-diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-scsi.c
-@@ -4493,6 +4499,7 @@ int ata_scsi_add_hosts(struct ata_host *host, 
-const struct scsi_host_template *s
-  		shost->max_lun = 1;
-  		shost->max_channel = 1;
-  		shost->max_cmd_len = 32;
-+		shost->needs_budget_token = true;
-
-  		/* Schedule policy is determined by ->qc_defer()
-  		 * callback and it needs to see every deferred qc.
-diff --git a/drivers/scsi/scsi_scan.c b/drivers/scsi/scsi_scan.c
-@@ -217,6 +217,8 @@ static void scsi_unlock_floptical(struct scsi_device 
-*sdev,
-
-  static bool scsi_needs_budget_map(struct Scsi_Host *shost, unsigned 
-int depth)
-  {
-+	if (shost->needs_budget_token)
-+		return true;
-  	if (shost->host_tagset || shost->tag_set.nr_hw_queues == 1)
-  		return depth < shost->can_queue;
-  	return true;
-diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
-index e87cf7eadd26..2b3fc8dcbf0b 100644
---- a/include/scsi/scsi_host.h
-+++ b/include/scsi/scsi_host.h
-@@ -695,6 +695,9 @@ struct Scsi_Host {
-  	/* The transport requires the LUN bits NOT to be stored in CDB[1] */
-  	unsigned no_scsi2_lun_in_cdb:1;
-
-+	/* Whether the LLD uses cmd->budget_token */
-+	unsigned needs_budget_token:1;
-+
-  	/*
-  	 * Optional work queue to be utilized by the transport
-  	 */
-
-Thanks,
-
-Bart.
