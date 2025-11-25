@@ -1,33 +1,31 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF0172D838E;
-	Tue, 25 Nov 2025 07:11:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08BB1284894;
+	Tue, 25 Nov 2025 07:26:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764054716; cv=none; b=bdsEJVDXnLB/eGB++yQ6SPC19TJRfRgKMbFDTduFKYdkh3dCM35up0uJRLEKdRyNArtA2YjmDHhTskzIOlyzFfwPDPeYAhIzvL39Cu3UyVt/Kq0jboc9zaq1DpFl9ApIOw4MVK4crdqVwjNN3ZgXgqYSkD+cYqIMamPI0i45mr4=
+	t=1764055607; cv=none; b=brlwTWdjHa8Og4r2+vqrts2I+6NC23w//nT8dwERW/pI+fQSZrzsmN1Zo30q6k74IyUd4emPQMHeaam7TT1+tagFOxfbDZ/+QHYipetQiv1TxADLVk2nb+ngpN9VMzd0EUc7dSsriimR7iVl+WnMBeeUfNCOQvSNVsXhai4IyI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764054716; c=relaxed/simple;
-	bh=xflNeMqf7k1tQ8p2f9Vf/KT0VAo9WTDVCCFoPk6I900=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=ZL7uILjyrulsuty3d2j5/i0iskabaGEehkM2SNzF6DPgznKzU5Go470rtSjasXEOml+AWafqEv3mD4KeuJAZ2R9RLmBYf8Q94kciAL2YL8COUkDjRZfVF/W/+7fBSAfH4pvdVSFcAAkmhinSJJXFckAoo4nHXliDNMeVEGR7k64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vRW5r56j; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764055607; c=relaxed/simple;
+	bh=9mdsxCvmPORP6x/kkAzRpRo8wfCkIdAbgUXDrADFtXc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=m6I6jlFvUXebfo72ysMhsgTLZ3ruAstK7aJ8PL5xwDKBYS07rP3pq3Sxn8CL68SIthDx5xJJU4if8yzzZuHy568nVoWejmzIrICFzaWWMzqUcJEmVn22oVjYVYabrP8JcbfsCmrPNJHJUHzoNJBttZZ7Vhm+1Fh0Zq4+RZE4vus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ajmyGoTx; arc=none smtp.client-ip=115.124.30.97
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vRW5r56j"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40CDCC4CEF1;
-	Tue, 25 Nov 2025 07:11:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764054715;
-	bh=xflNeMqf7k1tQ8p2f9Vf/KT0VAo9WTDVCCFoPk6I900=;
-	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
-	b=vRW5r56jcgqXMxVPd0wuo6Asj/WFwwlD1sbbJn+TM5uvyv+LFWmulSpnq8gsEcoDB
-	 9xM6Mo7+lurS8TbEynkUIWlNAssF1pYUcO0AklxAJ+AAiZl5seSlhrDuq68Kq/O2cn
-	 cHh+bXZftIVMPHCe7c9IY57WuTMskj05VfhK5sKqpFNxgsSia9lA6h97quJQs3MzpF
-	 T7eu7PHpjPa3mU7joudmxeoqPhsF+fvS6NPNj3DVzheWD1k8VSZpn7yTtlVBZCuOvs
-	 aF8wrighi/0KfXj8IFm/XZmSEbiYeHktZXuy5rGJEVPsAvPHwmWoCB41m7uEAJI68x
-	 uy5QFKvIGSBwQ==
-Message-ID: <8e98a473-7991-43ae-a758-8ad324bb9393@kernel.org>
-Date: Tue, 25 Nov 2025 15:11:57 +0800
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ajmyGoTx"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1764055601; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=0Uxmp0g/ndfq0DIx8Uvjc1YRe5YIKKC7/SKltPqqPDU=;
+	b=ajmyGoTxfmBiII1MGqSsORXnwXaD9QVbnD3sUtDvorwLjzp+FotHgCWhHE+6Y4w0HUZXTh0fd0iXZtoL3K0gTq61MDw07gGo3yUKyETEm731Gd/XkXppjLKDFj1YGj8hO6aZ/cD2WH3Tmd6qjl3nPIn6zazYSuHdDi+iz+FE738=
+Received: from 30.221.132.26(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0WtMd-uA_1764055600 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 25 Nov 2025 15:26:40 +0800
+Message-ID: <db90b7b3-bf94-4531-8329-d9e0dbc6a997@linux.alibaba.com>
+Date: Tue, 25 Nov 2025 15:26:39 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,37 +33,78 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Cc: chao@kernel.org, Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
- axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org, mpatocka@redhat.com,
- song@kernel.org, yukuai@fnnas.com, sagi@grimberg.me, kch@nvidia.com,
- cem@kernel.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- dm-devel@lists.linux.dev, linux-raid@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-f2fs-devel@lists.sourceforge.net,
- linux-xfs@vger.kernel.org, bpf@vger.kernel.org,
- "Martin K . Petersen" <martin.petersen@oracle.com>,
- Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: Re: [PATCH V3 5/6] f2fs: ignore discard return value
-To: Christoph Hellwig <hch@lst.de>, jaegeuk@kernel.org
-References: <20251124234806.75216-1-ckulkarnilinux@gmail.com>
- <20251124234806.75216-6-ckulkarnilinux@gmail.com>
- <9c8a6b5f-74c8-4e9f-ae46-24e1df5fe4e0@kernel.org>
- <20251125063358.GA14801@lst.de>
-Content-Language: en-US
-From: Chao Yu <chao@kernel.org>
-In-Reply-To: <20251125063358.GA14801@lst.de>
+Subject: Re: calling into file systems directly from ->queue_rq, was Re:
+ [PATCH V5 0/6] loop: improve loop aio perf by IOCB_NOWAIT
+To: Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@infradead.org>
+Cc: linux-block@vger.kernel.org, Mikulas Patocka <mpatocka@redhat.com>,
+ Zhaoyang Huang <zhaoyang.huang@unisoc.com>,
+ Dave Chinner <dchinner@redhat.com>, linux-fsdevel@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>
+References: <20251015110735.1361261-1-ming.lei@redhat.com>
+ <aSP3SG_KaROJTBHx@infradead.org> <aSQfC2rzoCZcMfTH@fedora>
+ <aSQf6gMFzn-4ohrh@infradead.org> <aSUbsDjHnQl0jZde@fedora>
+From: Gao Xiang <hsiangkao@linux.alibaba.com>
+In-Reply-To: <aSUbsDjHnQl0jZde@fedora>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 11/25/2025 2:33 PM, Christoph Hellwig wrote:
-> On Tue, Nov 25, 2025 at 09:10:00AM +0800, Chao Yu wrote:
->> Reviewed-by: Chao Yu <chao@kernel.org>
-> 
-> Sending these all as a series might be confusing - it would be good
-> if the individual patches get picked through the subsystem trees
-> so that the function signature can be cleaned up after -rc1.
-> 
-> Can we get this queued up in the f2fs tree?
+Hi Ming and Christoph,
 
-Yes, I think it's clean to queue this patch into f2fs tree.
+On 2025/11/25 11:00, Ming Lei wrote:
+> On Mon, Nov 24, 2025 at 01:05:46AM -0800, Christoph Hellwig wrote:
+>> On Mon, Nov 24, 2025 at 05:02:03PM +0800, Ming Lei wrote:
+>>> On Sun, Nov 23, 2025 at 10:12:24PM -0800, Christoph Hellwig wrote:
+>>>> FYI, with this series I'm seeing somewhat frequent stack overflows when
+>>>> using loop on top of XFS on top of stacked block devices.
+>>>
+>>> Can you share your setting?
+>>>
+>>> BTW, there are one followup fix:
+>>>
+>>> https://lore.kernel.org/linux-block/20251120160722.3623884-1-ming.lei@redhat.com/
+>>>
+>>> I just run 'xfstests -q quick' on loop on top of XFS on top of dm-stripe,
+>>> not see stack overflow with the above fix against -next.
+>>
+>> This was with a development tree with lots of local code.  So the
+>> messages aren't applicable (and probably a hint I need to reduce my
+>> stack usage).  The observations is that we now stack through from block
+>> submission context into the file system write path, which is bad for a
+>> lot of reasons.  journal_info being the most obvious one.
+>>
+>>>> In other words:  I don't think issuing file system I/O from the
+>>>> submission thread in loop can work, and we should drop this again.
+>>>
+>>> I don't object to drop it one more time.
+>>>
+>>> However, can we confirm if it is really a stack overflow because of
+>>> calling into FS from ->queue_rq()?
+>>
+>> Yes.
+>>
+>>> If yes, it could be dead end to improve loop in this way, then I can give up.
+>>
+>> I think calling directly into the lower file system without a context
+>> switch is very problematic, so IMHO yes, it is a dead end.
+I've already explained the details in
+https://lore.kernel.org/r/8c596737-95c1-4274-9834-1fe06558b431@linux.alibaba.com
+
+to zram folks why block devices act like this is very
+risky (in brief, because virtual block devices don't
+have any way (unlike the inner fs itself) to know enough
+about whether the inner fs already did something without
+context save (a.k.a side effect) so a new task context
+is absolutely necessary for virtual block devices to
+access backing fses for stacked usage.
+
+So whether a nested fs can success is intrinsic to
+specific fses (because either they assure no complex
+journal_info access or save all effected contexts before
+transiting to the block layer.  But that is not bdev can
+do since they need to do any block fs.
+
+But they seem they don't get any point, so I gave up.
 
 Thanks,
+Gao Xiang
+
