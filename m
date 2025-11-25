@@ -1,107 +1,108 @@
-Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
+Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEDED333453
-	for <linux-block@vger.kernel.org>; Tue, 25 Nov 2025 19:19:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 739DE2C08CC
+	for <linux-block@vger.kernel.org>; Tue, 25 Nov 2025 19:20:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764098355; cv=none; b=P55KHAWpVtCWeWojT7thmXbPJ8l2ij0iZl8ryAkkzrRjUzxWp3eghjXUToorCnyO/ryHKUGJQZVJHa+zuLvWkIIJuFyREmKSsALGYvRm+V9QQ1t4v4dKoxV4uAL/V9esN8lnZXg4Qze5rA4CUy5xm0187xNsIDq3Rvt4V2wLEHo=
+	t=1764098408; cv=none; b=F256pLZZON9voy/zfwDhYnHYb3JB2h2mKJaRNElLPW0nUYyFmiBNJ50CF9f+MdqaIoj3qO4HgpGu0APt/UpAtjdaZjqer/jga+z4TTcjCkql+d8fUKmwy/ZQSIHS38c2DGLcaNSFR3t7U8xIBERacxZyCFHmNYdvtA/eO1pjMOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764098355; c=relaxed/simple;
-	bh=45sbcsoq0xhsn+W5aOkv0g/ik59ollw7OK4nkRDzkZo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dKyZ6VA1n0f8vC9xei2iaGs7LhsDAi9E0k4v4GAhbQdVGff9TlBDZPLpIfjfYChPPmtA0oRgmw/eNZJHIpcvselhMOYaBDsVKaBdeZslJGVATTXa3eE6ecfUMHxe2Zq0VKgcHW/jnGOy1CxMDPYAqhXTosV6XDiwYgGoHPKEeXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=0RfdHa56; arc=none smtp.client-ip=209.85.166.177
+	s=arc-20240116; t=1764098408; c=relaxed/simple;
+	bh=weoF253YS0RDYDNFjzSDJ5tIChF4WqxAAq+yZqEKh9c=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=NgbHXjNe9TyZ4py5p912wCYrrjAtPmt2+IGbPVK53l9GsK2fhMFoMpfj8ZLlNUJpci5/JbBoCgXSp0W4FAGz868hr1G+DU7dI0pXsx8CQXNwawyDc3z+242GEdg8r3OWMhWja21suofEcpY1quOewT/TIcK2+A2Uaw2FJL4VhhI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Ou4yP+cP; arc=none smtp.client-ip=209.85.166.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="0RfdHa56"
-Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-433261f2045so25089785ab.3
-        for <linux-block@vger.kernel.org>; Tue, 25 Nov 2025 11:19:13 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Ou4yP+cP"
+Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-948f8fa9451so172128039f.3
+        for <linux-block@vger.kernel.org>; Tue, 25 Nov 2025 11:20:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1764098352; x=1764703152; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mUfqGNY8yNMCOlzV27bzhMu4chO9eJxWxW9kWFtTcZI=;
-        b=0RfdHa56HkCqjGft6ZM3f9ZRGWqMxVLGvBYSDJcNW0xBHEb50rtnCPR7S4M8THVjsK
-         hqKTu0JqV8a2FMQU6KwQFEdyWHwhVeDhDgtbygr/OSIPPZfgipOsHRVinPBzGrr4VT5o
-         KDfEeaM/jqJUiis23wNz2bL1fewwXy7gesBFA6mM1XIdygxsbFF0n5Os1a4GwY0r6l0U
-         dP0WR6SJPOFFSUNngFQfQaZwAvGgExdn78Hb/RhCc6mAWeHn7mPINdByL+ZKfjhK9hZQ
-         SZizayExk5WDnrH0+TIG5ruvfmevVCu8XY5GvJQKgL1zMi/ngzL5HpSEdTfl1J4FZ0b9
-         YrWA==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1764098406; x=1764703206; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Wynpj+E5fG2Oh1abG+WZEscR5HBvHm5298AKLCuUClg=;
+        b=Ou4yP+cPskomYMeVdRXei3aGe4CA8qWru7OsQP6BwdThf2GaArI8DOmVuUTM/9jgv8
+         7yfb3c/0JmSqRsVHmB9X6Phme2s4crzBqQXAGysf6khbNn9GegUtUQKxVlcAy26vQYp6
+         kl4sPUIwsjVQr7ahV4j/Ysgjpa1LobItHW3YSAHaxTCkylGkOFUf13dApdSBcuce3quJ
+         ddfICYEQhhFNAtAxjqjafE/HQviesUSIZ0VFAkfuiWwoW2sMZmGf6ATN89T2oU4YONDk
+         y6k1rY57h3ydl5s0+qPDswY0JwxaJs8RBzn4/NiEMU3SkXxLKVYxTQp/dmil0NkNCP06
+         IxPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764098352; x=1764703152;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mUfqGNY8yNMCOlzV27bzhMu4chO9eJxWxW9kWFtTcZI=;
-        b=Em5OS46mzK8teXUvyqkE60Q9EvzeF7/B42fXx8TjRCkhu8f2VWC837Cy7KFDOb0n8/
-         hjdaaZceTTuP97p2SBzF/aoXOwxSTrzfKXpCFE+XiBV0OuTJrhmWl96TKKVEJ7qNDxPp
-         6HYd8f8tPNmNMYTPd5oPPO/+Z0yBDE5RcPJKyOCGWfYhLeklVhI60omv69mzrviZajxC
-         CgRIq4U9MTGONWKvJlU4Sv+Fb0acRjQaubA5eERk3MoZR0Pl79jpx4/PbL1NGuZzDXJa
-         JPyF3dyVQJPnjigQYhrA3870zRboiivNDA1yCvZ+eMl/p2qjHfispwUIILoymG33lKLE
-         83Xw==
-X-Gm-Message-State: AOJu0YwAFyJCm47ZASLbdEKm86PMloKKZfhOhQhSNd1pM90BB5Cv66eL
-	M8IzLK/d+d+ro+8R9c41etUG6EcDHOMojCiU9AYIorl88lEvIh0lB8NdFoPFdAAofpE=
-X-Gm-Gg: ASbGncsJr6ETK8Ku5E5dnp/7qUqoL7/eImCFAUjKd5kd2pX935nKRsVdOEZNSkvzLBf
-	VBaKR5AsP/bFixQAo8YDkif502Ei4yqCNXtrtoGXMiL0j7HACRRSpo6nWpBV6UjSGnyTh+Rnvp0
-	0y58vtY52HUY4VovydqINI5AC6lJTvge3zgK6gMAH4YOoErgZA/BlclSlgVBJrxDPIwFk1enFrV
-	vxPt5KmJPmhnFkMQwbN7eNInXZkpd+BHg1M3fX3e4nYb/7OgzSKpb6euuFPusVcM5rQXIG8gJtv
-	7EsF5sKm/nCbuODHFsYw+Bf0Pt7KZyzGP0lnYgs7eDWcG99MfK0XrwtfCj+Ccw9kkJL7RFzK0De
-	WlREDeKO7m5VrPZxHXas+1n92sMP0Yj0XruJ+iUQiZZtAHhR3/glBEq/yVbpK4uQvmWWYd8Md/1
-	G6OaeREg==
-X-Google-Smtp-Source: AGHT+IFQEaswkUqFfWJbDMiqY0I1VozYHdfo1ZahjMrEfHe7a5FmQfgVW6+5KRthy6ytF5ENx/5MzA==
-X-Received: by 2002:a05:6e02:330e:b0:434:70cd:e27d with SMTP id e9e14a558f8ab-435b8e6957fmr145921635ab.24.1764098352527;
-        Tue, 25 Nov 2025 11:19:12 -0800 (PST)
-Received: from [192.168.1.99] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5b954b48ed9sm7452092173.50.2025.11.25.11.19.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Nov 2025 11:19:11 -0800 (PST)
-Message-ID: <a192b8dd-6d67-475c-972e-a88d6d8b8e5a@kernel.dk>
-Date: Tue, 25 Nov 2025 12:19:10 -0700
+        d=1e100.net; s=20230601; t=1764098406; x=1764703206;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Wynpj+E5fG2Oh1abG+WZEscR5HBvHm5298AKLCuUClg=;
+        b=u3Aq5SQeoub/4FFNf8x5iAflw/DYM5DpAghWhAZ9F0Ht3+AVYJatJigOszRrQbtykM
+         9XNmyMPThK5IzNu45uHeZoqk+dhOYDFKMC+zCQwUkYT7RG3HdfmksB65ToaR7BcQme1Q
+         BcrY+gPteI8+c2doQw7ipZiMJmFjcyKwVzyZnyr/i3gmtLXR/wqRUPbwYrR7WsIDMbsb
+         wHl4Va0HtYme0Ep9vNrOgxBAvuvbPkTsy/q2atu1Nt5IxZW7WsUA0b90/UdfRUY5MlKD
+         AfF5N9XtmwCzmL9NziEghxmFwk/lPwo6w62n+U4f6+5fhbmYu8J2Ip+zzBZqUONrmxim
+         TLzw==
+X-Gm-Message-State: AOJu0YxilBsv7W5pdTJhUBJbsuqiqx1y7B6Us8jrRV5kTnGoqujxduwt
+	qSeFjVSylLAAHW5ngPf41zBB4M728eSIj4U3S0m3uZX9Fo7+x5OzU0c5ax2EfQbVU88=
+X-Gm-Gg: ASbGnctyxhBFaHE764BP+8nsrsfuq5m0ySEzfehCRxdUX5f6K0+yzX+bUV5K5Q0siqf
+	NiAtXG4RPX95xYQjeH3txybTlAlHbNpS4PPDZ0xJdObIdlv13U78QfAv0Y7XfAEjNOetivNRaIQ
+	qFR+wykvmzm0Jx8GsB6UL78nX2e5fqRqczQyl0bnigPQsKdXn/2cocQMlVemb2KJkzZx5c1xC68
+	Z04dyNrtBFuxl+BOT6eCU0GExR+HbfeL2/wKMBg0U379ifpQO8qGJ3GjyImVpJ748KRghCTCFgq
+	mG8tc8AB5VXzFrxNSearonZGQr/p0NeQEvCmadeYum+l1Yb7hZs/kRxaiLmDnuBxvQeL576nOPV
+	/EwX2Gg9FskeOSZuCH8/CKrdFtEa16c2wROyZO09Z9pfcJIIXcAp5RlgKS9a2/a5KEXOLlpns3s
+	5WlA==
+X-Google-Smtp-Source: AGHT+IEoSNUPWsr6TkiMj1VyTgtSM+H2mYKN8PQqct0sy21hTM0OQb7u5ZARk6n0QLi/CE7kBBB/xg==
+X-Received: by 2002:a05:6602:690d:b0:948:a32b:b6c4 with SMTP id ca18e2360f4ac-949473eb047mr1023076839f.3.1764098406436;
+        Tue, 25 Nov 2025 11:20:06 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-949385c2405sm668551239f.6.2025.11.25.11.20.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Nov 2025 11:20:05 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: agk@redhat.com, snitzer@kernel.org, mpatocka@redhat.com, 
+ song@kernel.org, yukuai@fnnas.com, hch@lst.de, sagi@grimberg.me, 
+ kch@nvidia.com, jaegeuk@kernel.org, chao@kernel.org, cem@kernel.org, 
+ Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ dm-devel@lists.linux.dev, linux-raid@vger.kernel.org, 
+ linux-nvme@lists.infradead.org, linux-f2fs-devel@lists.sourceforge.net, 
+ linux-xfs@vger.kernel.org, bpf@vger.kernel.org
+In-Reply-To: <20251124234806.75216-1-ckulkarnilinux@gmail.com>
+References: <20251124234806.75216-1-ckulkarnilinux@gmail.com>
+Subject: Re: (subset) [PATCH V3 0/6] block: ignore __blkdev_issue_discard()
+ ret value
+Message-Id: <176409840493.40095.8097031483064544929.b4-ty@kernel.dk>
+Date: Tue, 25 Nov 2025 12:20:04 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V3 1/6] block: ignore discard return value
-To: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>, agk@redhat.com,
- snitzer@kernel.org, mpatocka@redhat.com, song@kernel.org, yukuai@fnnas.com,
- hch@lst.de, sagi@grimberg.me, kch@nvidia.com, jaegeuk@kernel.org,
- chao@kernel.org, cem@kernel.org
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- dm-devel@lists.linux.dev, linux-raid@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-f2fs-devel@lists.sourceforge.net,
- linux-xfs@vger.kernel.org, bpf@vger.kernel.org,
- Johannes Thumshirn <johannes.thumshirn@wdc.com>,
- "Martin K . Petersen" <martin.petersen@oracle.com>
-References: <20251124234806.75216-1-ckulkarnilinux@gmail.com>
- <20251124234806.75216-2-ckulkarnilinux@gmail.com>
- <e3f09e0c-63f4-4887-8e3a-1fb24963b627@kernel.dk>
- <851516d5-a5e8-47dd-82e0-3e34090e600d@gmail.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <851516d5-a5e8-47dd-82e0-3e34090e600d@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3
 
-On 11/25/25 12:09 PM, Chaitanya Kulkarni wrote:
-> On 11/25/25 09:38, Jens Axboe wrote:
->> On 11/24/25 4:48 PM, Chaitanya Kulkarni wrote:
->>> __blkdev_issue_discard() always returns 0, making the error check
->>> in blkdev_issue_discard() dead code.
->> Shouldn't it be a void instead then?
->>
-> Yes, we have decided to clean up the callers first [1]. Once they are
-> merged safely, after rc1 I'll send a patch [2] to make it void since
-> it touches many different subsystems.
 
-OK, that make sense. I'll queue patch 1.
+On Mon, 24 Nov 2025 15:48:00 -0800, Chaitanya Kulkarni wrote:
+> __blkdev_issue_discard() only returns value 0, that makes post call
+> error checking code dead. This patch series revmoes this dead code at
+> all the call sites and adjust the callers.
+> 
+> Please note that it doesn't change the return type of the function from
+> int to void in this series, it will be done once this series gets merged
+> smoothly.
+> 
+> [...]
 
+Applied, thanks!
+
+[1/6] block: ignore discard return value
+      (no commit info)
+
+Best regards,
 -- 
 Jens Axboe
+
+
 
