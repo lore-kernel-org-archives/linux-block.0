@@ -1,102 +1,72 @@
-Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7A3D2D8773;
-	Tue, 25 Nov 2025 07:52:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.141.245
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9358E2D2384;
+	Tue, 25 Nov 2025 08:20:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764057162; cv=none; b=iQ74BCkU3hnarkNV1tprNGnvC/jDEkYm+DTJZkZQLSc7p2b8LfnjexNCsgX0Yv6hXDyPGOSO3LVQKn8tw7o0tZ/QKHuBnGITzEQboX6TryD4S+x3scX4XgL7V47PHD55+Q9srxsNPc+NKVf1uBEdbhlSTRSI41qQ4TMW0RbizGc=
+	t=1764058825; cv=none; b=CYZk05J/HIRmMOPcl9cMOBu8t9mhCIousymCafiazLIpJqQkVj2ve6+WRolrq492DtqLVgQma+sLuubfdFXo29uZSOqeLaBU7dJ/I7dqxB23hxn2oAFwbnt80IrR6M4FTOF99TmclAasrWkrJ97UMlSuXlxZab4Xn3mhP3IpGZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764057162; c=relaxed/simple;
-	bh=8aDF/jdFHu/yBIZxwSPDVPrCQ6q0N9Ht8S73CaPHLOg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Aw+muX05YIIFOHMr16/BgyzuS/s1vJjmhpeAzGKKMubbEtcsPfnb2tijnqS/SQV0WUMVOZ9vi0+c2UiOQO5hukpr2+pbv2cfOFfFPGEqsM9XFH0ynHKAv3Nxz+apby6UtM11ULsKvTppSt6vgSnlkzCaqzX33GN9CK+5rwSz2fg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=PqYvoNR6; arc=none smtp.client-ip=68.232.141.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	s=arc-20240116; t=1764058825; c=relaxed/simple;
+	bh=lcOpoPYv+NRnxQY8W/oWlW2Bjz+gFrcw+b5Ftw2ox2k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IlI0WXcxFKZEpON8Zq/rJfzIPHTkcWezwAuwyazxQT30Z19Df/mtuw4AX7SfWHx0zl9smlFxIihpuk1u9GQcU6Ww0qVKnvf5LmA2difr61MOBgJ+NVVc362toJf0FZYonVoubzXejU7cz3HvMedHuSdPUBdmgaUINJeTX8Z/gGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a+N6Lxul; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="PqYvoNR6"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1764057160; x=1795593160;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=8aDF/jdFHu/yBIZxwSPDVPrCQ6q0N9Ht8S73CaPHLOg=;
-  b=PqYvoNR6fYuTOYL4JAjtDgs50YvFKqspSRJV6Q87bphi6a8/eB6EX1dX
-   AJ6iJ6Aa5w0NbXXSym9oJtnmNeixlykiWsGc//w+Fom/hmviNrRFUjcXb
-   hKnJj1YNFw1fDKyTkDvyY8KgWDfAtVdBhPhvdzMPsgGKDytaKF7JL1YRJ
-   tOz4MluA+cGVfeMB2uwamLYDMiopzfCunv0nFtE2xBIJsWNa3JbOzLr3R
-   jf+Ttv9jYUUytqDWXnf+AX95sJA43IHHn1LKORiVhC5P4AX7NFC09i6k0
-   1DNfi26Gggcd/33em8dcurQpMl4m3OGa/L7d2E+wJ8elVDT89M3+sjpg4
-   A==;
-X-CSE-ConnectionGUID: wTloQon+SnOlESsbFsauDA==
-X-CSE-MsgGUID: AEeKdIodTJiBg1uU4JLugw==
-X-IronPort-AV: E=Sophos;i="6.20,224,1758556800"; 
-   d="scan'208";a="135749830"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 25 Nov 2025 15:52:40 +0800
-IronPort-SDR: 69256048_+eCvFySyTsd7RRQO3QpCQ/hlOSuJQfglbLSJvElO2mCfuAr
- 2hxZcf11OIjH70cpCTtHUjkSG+3DZwaOUvqcARg==
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 24 Nov 2025 23:52:40 -0800
-WDCIronportException: Internal
-Received: from unknown (HELO redsun91.ssa.fujisawa.hgst.com) ([10.149.66.6])
-  by uls-op-cesaip02.wdc.com with ESMTP; 24 Nov 2025 23:52:40 -0800
-From: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-To: "axboe@kernel.dk" <axboe@kernel.dk>
-Cc: Niklas Cassel <cassel@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	linux-block@vger.kernel.org,
-	linux-btrace@vger.kernel.org,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH v4 20/20] blktrace: support protocol version 8
-Date: Mon, 24 Nov 2025 23:52:06 -0800
-Message-ID: <20251125075206.876902-21-johannes.thumshirn@wdc.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251125075206.876902-1-johannes.thumshirn@wdc.com>
-References: <20251125075206.876902-1-johannes.thumshirn@wdc.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a+N6Lxul"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B343C4CEF1;
+	Tue, 25 Nov 2025 08:20:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764058824;
+	bh=lcOpoPYv+NRnxQY8W/oWlW2Bjz+gFrcw+b5Ftw2ox2k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=a+N6LxulZt9R4oOOqKDhp/dN63qEAr8s/Quv5+6ArIrCDERT+axQSRwP2ZEm+jcD7
+	 d7b36PAhTyt+naiaYlSAnfcRzeCNNMGJjBMWt4UofeLbTECRckqxV9deQ9rJBHcu9U
+	 rUMf/KkMkmxg+5TB3PfCtUd4fnpjtZs0bSEYrnstS5vpQu+bFr4p6p2su5u6SH1mJa
+	 txrnLKmbexr2jJG3PxPdLaT3hoazTlVxyf5hqk/oLu0MjqgKfXgg37J8JXzoC1rxeY
+	 oEN8VsaNvBvguTRZqk6VI9s64U011u8YCCd3rtV7e6cxOl39CCoFzxlO/pGpWU9Zor
+	 vhceiY7SVQ0Ww==
+Date: Tue, 25 Nov 2025 09:20:20 +0100
+From: Niklas Cassel <cassel@kernel.org>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
+	linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+	John Garry <john.g.garry@oracle.com>,
+	Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH v2 0/5] Increase SCSI IOPS
+Message-ID: <aSVmxETXzs5kOVG3@ryzen>
+References: <20251124182201.737160-1-bvanassche@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251124182201.737160-1-bvanassche@acm.org>
 
-Also support protocol version 8 in conjunction with protocol version 7.
+On Mon, Nov 24, 2025 at 10:21:55AM -0800, Bart Van Assche wrote:
+> Hi Martin,
+> 
+> This patch series increases scsi_debug IOPS by 5% on my test setup by disabling
+> SCSI budget management if it is not needed. This patch series improves the
+> performance of many SCSI LLDs, including the UFS and ATA drivers.
+> 
+> Please consider this patch series for the next merge window.
 
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
----
- blktrace.h | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Hello Bart,
 
-diff --git a/blktrace.h b/blktrace.h
-index 0281088..ba06237 100644
---- a/blktrace.h
-+++ b/blktrace.h
-@@ -70,6 +70,7 @@ extern struct timespec abs_start_time;
- 
- #define CHECK_MAGIC(magic)		(((magic) & 0xffffff00) == BLK_IO_TRACE_MAGIC)
- #define SUPPORTED_VERSION	(0x07)
-+#define SUPPORTED_VERSION2	(0x08)
- 
- #if __BYTE_ORDER == __LITTLE_ENDIAN
- #define be16_to_cpu(x)		__bswap_16(x)
-@@ -99,7 +100,8 @@ static inline int verify_trace(__u32 magic)
- 	}
- 
- 	version = magic & 0xff;
--	if (version != SUPPORTED_VERSION) {
-+	if (version != SUPPORTED_VERSION &&
-+	    version != SUPPORTED_VERSION2) {
- 		fprintf(stderr, "unsupported trace version %x\n", version);
- 		return 1;
- 	}
--- 
-2.51.1
+The subject is:
+[PATCH v2 0/5] Increase SCSI IOPS
 
+AFAICT, you already sent a v2 series a few days ago:
+https://lore.kernel.org/linux-scsi/20251117225205.2024479-1-bvanassche@acm.org/
+
+I assume that you simply forgot to increase the version count.
+
+If you respin, perhaps label it as v4, to make things less confusing.
+
+
+Kind regards,
+Niklas
