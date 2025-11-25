@@ -1,51 +1,55 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A62233148CC;
-	Tue, 25 Nov 2025 11:08:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA1EF314A60;
+	Tue, 25 Nov 2025 11:10:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764068924; cv=none; b=CvWejNb3Rww75blezDUgup5lfIeXXH9bIukSkuAXmtDQMVDhM4Emw3zVrEedXTg0I8HZEdLYAcBgxFr7EI2jQN+4ScDJk6WjMjfgq7XndqOTAdvrHigfDZvsfcrZBCPQU84pLjG/SWIJvuGTx+5YEekbAdGyuBdqt44s4xG155U=
+	t=1764069017; cv=none; b=U018OdTYxaOjHb6KRdn9VKK+OkGWlf7GEkch1CAAcsnBfzsGKfAq/X1yGZU7OXY8OmVttyKsXxiEWxHVIai8f+PQ2LuWy8E59Hj01LZlaz/XFW8C2S6gyGsdoHEPi0F9WBn+zDsZODjcnEqrFamqmdVQexNUXodR7J/38/uIIfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764068924; c=relaxed/simple;
-	bh=mnWsJRtsit8l+N2bvO4h2qSdtW3RMQ+5m+IJsAYTWUc=;
+	s=arc-20240116; t=1764069017; c=relaxed/simple;
+	bh=rVqhgIHkhh4tkrPvGkGQeFxF4BxMrIdBfKQD7LZrxJc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lElpsRn41OpriwTk//xqEEPnl6mtJnXPTRFoBGQUbsRZPijYQL8x9rx+elduFCDR+2gavM16aLcPmBnxO20Ieryj5TPGpXispZhEfbMqy1GaEPi/dUbuoU11O1IghXUwH+haZKrihyAJ+Oz4oktw2n0dGNMIWayha368TRVEjMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 2D3DF68B05; Tue, 25 Nov 2025 12:08:37 +0100 (CET)
-Date: Tue, 25 Nov 2025 12:08:37 +0100
-From: "hch@lst.de" <hch@lst.de>
-To: Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
-	"kbusch@kernel.org" <kbusch@kernel.org>, "hch@lst.de" <hch@lst.de>,
-	"hare@suse.de" <hare@suse.de>,
-	"sagi@grimberg.me" <sagi@grimberg.me>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"dlemoal@kernel.org" <dlemoal@kernel.org>,
-	"wagi@kernel.org" <wagi@kernel.org>,
-	"mpatocka@redhat.com" <mpatocka@redhat.com>,
-	"yukuai3@huawei.com" <yukuai3@huawei.com>,
-	"xni@redhat.com" <xni@redhat.com>,
-	"linan122@huawei.com" <linan122@huawei.com>,
-	"bmarzins@redhat.com" <bmarzins@redhat.com>,
-	"john.g.garry@oracle.com" <john.g.garry@oracle.com>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"ncardwell@google.com" <ncardwell@google.com>,
-	"kuniyu@google.com" <kuniyu@google.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"dsahern@kernel.org" <dsahern@kernel.org>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"horms@kernel.org" <horms@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [RFC blktests fix PATCH] tcp: use GFP_ATOMIC in tcp_disconnect
-Message-ID: <20251125110836.GA22313@lst.de>
-References: <20251125061142.18094-1-ckulkarnilinux@gmail.com> <aSVMXYCiEGpETx-X@infradead.org> <ea2958c9-4571-4169-8060-6456892e6b15@nvidia.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=CD39SqnJ/Npq5Gk/dik6MZIJfTz0EGc/YTHlHpPlLkyyMo8SKko4DajDTeMHT4K99jPDorMHp5OfczLJiEnJm0tkF1OGNDOdcn0MjZLfbDqrzopLpVYgjqoVzNE42JGaTrLXObCsgoVDwfoTG731axSFp63a/zsZLy7460lttAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=w8rc7S3f; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="w8rc7S3f"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=UaUIsgvhtJzJr4Zje3paOAITbSG1D1YJ5U0VZcRpzY8=; b=w8rc7S3fuiLes7ipunrhNyMV6W
+	wZrNPXLpGX3q6DLMeywpPIIzFPtgWriKbXvt+i9P2GowHkGiYPRF1Q4Mxvg58nylIowzPvPdlFpLd
+	HSrCS8XoAn582cJVRH+FqS7CTpgWdKllRiV/C69F3iT8YXyOAhOo0emK8UFtiszIEXILwuu0rXj8o
+	X19WyV/9NKUncgIPLYRyJ9+bcgxDae/o2O43QXRWR5FVRyx7F3VTBXIfgKZDNDwRFExjBdr12R/SB
+	r/Gd2Tx6xK0BnnQI2t/0uuY+2x9cSuGAnNImQm7vTjkjh2wiLLtlvP0DAVwPe2qGSqSIhRdbezCqK
+	BsoI5eJw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vNqvx-0000000DBqb-3yPZ;
+	Tue, 25 Nov 2025 11:10:09 +0000
+Date: Tue, 25 Nov 2025 03:10:09 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Gao Xiang <hsiangkao@linux.alibaba.com>
+Cc: Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@infradead.org>,
+	linux-block@vger.kernel.org, Mikulas Patocka <mpatocka@redhat.com>,
+	Zhaoyang Huang <zhaoyang.huang@unisoc.com>,
+	Dave Chinner <dchinner@redhat.com>, linux-fsdevel@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>
+Subject: Re: calling into file systems directly from ->queue_rq, was Re:
+ [PATCH V5 0/6] loop: improve loop aio perf by IOCB_NOWAIT
+Message-ID: <aSWOkcLPxuIdshrn@infradead.org>
+References: <20251015110735.1361261-1-ming.lei@redhat.com>
+ <aSP3SG_KaROJTBHx@infradead.org>
+ <aSQfC2rzoCZcMfTH@fedora>
+ <aSQf6gMFzn-4ohrh@infradead.org>
+ <aSUbsDjHnQl0jZde@fedora>
+ <db90b7b3-bf94-4531-8329-d9e0dbc6a997@linux.alibaba.com>
+ <aSV0sDZGDoS-tLlp@fedora>
+ <00bc891e-4137-4d93-83a5-e4030903ffab@linux.alibaba.com>
+ <aSWHx3ynP9Z_6DeY@fedora>
+ <4a5ec383-540b-461d-9e53-15593a22a61a@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -54,12 +58,23 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ea2958c9-4571-4169-8060-6456892e6b15@nvidia.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <4a5ec383-540b-461d-9e53-15593a22a61a@linux.alibaba.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Tue, Nov 25, 2025 at 07:28:45AM +0000, Chaitanya Kulkarni wrote:
-> are you saying something like this ?
+On Tue, Nov 25, 2025 at 06:57:15PM +0800, Gao Xiang wrote:
+> I've said there is no clear list of which data needs to be
+> saved/restored.
+> 
+> FSes can do _anything_. Maybe something in `current` needs
+> to be saved, but anything that uses `current`/PID as
+> a mapping key also needs to be saved, e.g., arbitrary
+> 
+> `hash_table[current]` or `context_table[current->pid]`.
+> 
+> Again, because not all filesystems allow nesting by design:
+> Linux kernel doesn't need block filesystem to be nested.
 
-Yes, something like this.  I wonder if there's a way to avoid the nested
-flag saving, though.
+Yes.  Various other PF_ flags also come to mind.  Or Kent's
+magic fault disabling flag (although with bcachefs gone we can
+probably remove that, thinking of it).
 
