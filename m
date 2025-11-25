@@ -1,110 +1,140 @@
-Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08BB1284894;
-	Tue, 25 Nov 2025 07:26:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33B2B13AA2D;
+	Tue, 25 Nov 2025 07:27:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.154.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764055607; cv=none; b=brlwTWdjHa8Og4r2+vqrts2I+6NC23w//nT8dwERW/pI+fQSZrzsmN1Zo30q6k74IyUd4emPQMHeaam7TT1+tagFOxfbDZ/+QHYipetQiv1TxADLVk2nb+ngpN9VMzd0EUc7dSsriimR7iVl+WnMBeeUfNCOQvSNVsXhai4IyI0=
+	t=1764055658; cv=none; b=KhZlWUuvFCTT1Wmz4qtCRfPkEEeTTb4bXecmyOZGk0Y8/wn2p3SRci4xuw0HM8NgrtUBYTJc9HWXhHQiuIcqeo+XAi9Fb/CCkcpeFdAIqLTLrljvs0DhwR2zL2N+97nYIEVSvyBpUmp5PgOz/T8CdoFzLWsSyUHAW2cJWSeuxcU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764055607; c=relaxed/simple;
-	bh=9mdsxCvmPORP6x/kkAzRpRo8wfCkIdAbgUXDrADFtXc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=m6I6jlFvUXebfo72ysMhsgTLZ3ruAstK7aJ8PL5xwDKBYS07rP3pq3Sxn8CL68SIthDx5xJJU4if8yzzZuHy568nVoWejmzIrICFzaWWMzqUcJEmVn22oVjYVYabrP8JcbfsCmrPNJHJUHzoNJBttZZ7Vhm+1Fh0Zq4+RZE4vus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ajmyGoTx; arc=none smtp.client-ip=115.124.30.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+	s=arc-20240116; t=1764055658; c=relaxed/simple;
+	bh=x58Lv3xROJ9erYhL8HQjspBsV6Z4cpBGpnI+bRWH4xQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=SuHsk9+lQoXYyFSjPP/5zGiTB+IiOpYKXKqeqLbHGm4eAsAivQ/wTXwf/rtiBRxbVYI87Uddj7RAKnz3IPKybtNtEDUq/uVyZCNjwOxxvxAMjVzMYi9rKCyHPTq3JVbfBGom6jLRZ8IANMFwwU7qlElHTpKGvjL+kb0vTJbZSFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=KHyvYeeK; arc=none smtp.client-ip=216.71.154.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ajmyGoTx"
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1764055601; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=0Uxmp0g/ndfq0DIx8Uvjc1YRe5YIKKC7/SKltPqqPDU=;
-	b=ajmyGoTxfmBiII1MGqSsORXnwXaD9QVbnD3sUtDvorwLjzp+FotHgCWhHE+6Y4w0HUZXTh0fd0iXZtoL3K0gTq61MDw07gGo3yUKyETEm731Gd/XkXppjLKDFj1YGj8hO6aZ/cD2WH3Tmd6qjl3nPIn6zazYSuHdDi+iz+FE738=
-Received: from 30.221.132.26(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0WtMd-uA_1764055600 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 25 Nov 2025 15:26:40 +0800
-Message-ID: <db90b7b3-bf94-4531-8329-d9e0dbc6a997@linux.alibaba.com>
-Date: Tue, 25 Nov 2025 15:26:39 +0800
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="KHyvYeeK"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1764055657; x=1795591657;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=x58Lv3xROJ9erYhL8HQjspBsV6Z4cpBGpnI+bRWH4xQ=;
+  b=KHyvYeeKVzw5/sQaMlrBfZCrjjxjBGURurySbcP0IGI9qHfyXlfJeYBA
+   anTy0VqDcDAGvZsU8t1L59i0irCarAt82NLcCj0uMIPdyh7Ni5E1rZ17R
+   oWZW6A5GKGvFGKVTm4Tt2YjGAsuEx3TUCoGsbN3rnH9IqakWZPbU3MM+3
+   pXX9Jw05rlbI43RkIDzaMhXn3Q/7MdMt8jl6+Pv8hsbHbvqwzlR+uGWri
+   z54mMzA/2+H/jtud2p+EdzuACvGHqBVm7qOrqa/ANdBD1CJiK09AXO9nM
+   cr4YWF75XERpW5jWjOFh2OSqFvppwkqzorGa3Ds7cFaRj8UJUwBmQSgzM
+   Q==;
+X-CSE-ConnectionGUID: wajHUJYnQnGSBfEcnl4uxA==
+X-CSE-MsgGUID: fvkP4X6OSHy8n9Mm3T6N8A==
+X-IronPort-AV: E=Sophos;i="6.20,224,1758556800"; 
+   d="scan'208";a="135337501"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 25 Nov 2025 15:27:36 +0800
+IronPort-SDR: 69255a68_iIEP00Bji2IyyanSDf3Q665q+u9B9IgPrEUcO+b6ki7mdL1
+ aidLINhkwsnP3HfhbEjclACK70CobzRfdzUz2VQ==
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 24 Nov 2025 23:27:36 -0800
+WDCIronportException: Internal
+Received: from ft4m3x2.ad.shared (HELO neo.wdc.com) ([10.224.28.72])
+  by uls-op-cesaip01.wdc.com with ESMTP; 24 Nov 2025 23:27:33 -0800
+From: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+To: "axboe@kernel.dk" <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+	Naohiro Aota <naohiro.aota@wdc.com>,
+	Niklas Cassel <cassel@kernel.org>,
+	linux-btrace@vger.kernel.org,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH v4 00/20] blktrace: Add user-space support for zoned command tracing
+Date: Tue, 25 Nov 2025 08:27:10 +0100
+Message-ID: <20251125072730.39196-1-johannes.thumshirn@wdc.com>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: calling into file systems directly from ->queue_rq, was Re:
- [PATCH V5 0/6] loop: improve loop aio perf by IOCB_NOWAIT
-To: Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@infradead.org>
-Cc: linux-block@vger.kernel.org, Mikulas Patocka <mpatocka@redhat.com>,
- Zhaoyang Huang <zhaoyang.huang@unisoc.com>,
- Dave Chinner <dchinner@redhat.com>, linux-fsdevel@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>
-References: <20251015110735.1361261-1-ming.lei@redhat.com>
- <aSP3SG_KaROJTBHx@infradead.org> <aSQfC2rzoCZcMfTH@fedora>
- <aSQf6gMFzn-4ohrh@infradead.org> <aSUbsDjHnQl0jZde@fedora>
-From: Gao Xiang <hsiangkao@linux.alibaba.com>
-In-Reply-To: <aSUbsDjHnQl0jZde@fedora>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Ming and Christoph,
 
-On 2025/11/25 11:00, Ming Lei wrote:
-> On Mon, Nov 24, 2025 at 01:05:46AM -0800, Christoph Hellwig wrote:
->> On Mon, Nov 24, 2025 at 05:02:03PM +0800, Ming Lei wrote:
->>> On Sun, Nov 23, 2025 at 10:12:24PM -0800, Christoph Hellwig wrote:
->>>> FYI, with this series I'm seeing somewhat frequent stack overflows when
->>>> using loop on top of XFS on top of stacked block devices.
->>>
->>> Can you share your setting?
->>>
->>> BTW, there are one followup fix:
->>>
->>> https://lore.kernel.org/linux-block/20251120160722.3623884-1-ming.lei@redhat.com/
->>>
->>> I just run 'xfstests -q quick' on loop on top of XFS on top of dm-stripe,
->>> not see stack overflow with the above fix against -next.
->>
->> This was with a development tree with lots of local code.  So the
->> messages aren't applicable (and probably a hint I need to reduce my
->> stack usage).  The observations is that we now stack through from block
->> submission context into the file system write path, which is bad for a
->> lot of reasons.  journal_info being the most obvious one.
->>
->>>> In other words:  I don't think issuing file system I/O from the
->>>> submission thread in loop can work, and we should drop this again.
->>>
->>> I don't object to drop it one more time.
->>>
->>> However, can we confirm if it is really a stack overflow because of
->>> calling into FS from ->queue_rq()?
->>
->> Yes.
->>
->>> If yes, it could be dead end to improve loop in this way, then I can give up.
->>
->> I think calling directly into the lower file system without a context
->> switch is very problematic, so IMHO yes, it is a dead end.
-I've already explained the details in
-https://lore.kernel.org/r/8c596737-95c1-4274-9834-1fe06558b431@linux.alibaba.com
+This patch series extends the user-space blktrace tools to support the new
+trace events for zoned block device commands introduced in the corresponding
+kernel patch series.
 
-to zram folks why block devices act like this is very
-risky (in brief, because virtual block devices don't
-have any way (unlike the inner fs itself) to know enough
-about whether the inner fs already did something without
-context save (a.k.a side effect) so a new task context
-is absolutely necessary for virtual block devices to
-access backing fses for stacked usage.
+The updates include:
 
-So whether a nested fs can success is intrinsic to
-specific fses (because either they assure no complex
-journal_info access or save all effected contexts before
-transiting to the block layer.  But that is not bdev can
-do since they need to do any block fs.
+- Introduction of a new ioctl requesting the v2 version of the trace
+- Definitions for new zoned operation trace events.
+- Parsing support in blkparse for these events.
+- Display of the new events with clear labeling (e.g., ZO, ZA, ZR).
+- Backward-compatible changes that do not affect existing functionality.
 
-But they seem they don't get any point, so I gave up.
+These changes complement the kernel patches and allow full visibility into
+zone management commands in blktrace output, enabling better analysis and
+debugging of zoned storage workloads.
 
-Thanks,
-Gao Xiang
+The updated blktrace utility will first issue the BLKTRACESETUP2 ioctl and if
+it fails transpartently fall back to BLKTRACESETUP allowing backwards
+compatibility.
+
+Feedback and testing on additional device types are appreciated.
+
+Link to v3: https://lore.kernel.org/linux-btrace/20251124073739.513212-1-johannes.thumshirn@wdc.com
+Changes to v3:
+- Move patch "blktrace: support protocol version 8" last in series
+- Add Damien's and Martin's Reviewed-by
+- Document patch "blktrace: rename trace_to_cpu to bit_trace_to_cpu"
+
+Changes to v2:
+- Sync with kernel changes
+- Drop the Zone Management trace action
+
+Changes to v1:
+- Incorporated feedback from Chaitanya
+- Add patch fixing a compiler warning at the beginning
+
+Johannes Thumshirn (20):
+  blktrace: fix comment for struct blk_trace_setup:
+  blkparse: fix compiler warning
+  blktrace: add definitions for BLKTRACESETUP2
+  blktrace: change size of action to 64 bits
+  blktrace: add definitions for blk_io_trace2
+  blkparse: pass magic to get_magic
+  blkparse: read 'magic' first
+  blkparse: factor out reading of a singe blk_io_trace event
+  blkparse: skip unsupported protocol versions
+  blkparse: make get_pdulen() take the pdu_len
+  blkiomon: read 'magic' first
+  blktrace: pass magic to CHECK_MAGIC macro
+  blktrace: pass magic to verify_trace
+  blktrace: rename trace_to_cpu to bit_trace_to_cpu
+  blkparse: use blk_io_trace2 internally
+  blkparse: natively parse blk_io_trace2
+  blkparse: parse zone (un)plug actions
+  blkparse: add zoned commands to fill_rwbs()
+  blktrace: call BLKTRACESETUP2 ioctl per default to setup a trace
+  blktrace: support protocol version 8
+
+ act_mask.c     |   4 +-
+ blkiomon.c     |  15 +-
+ blkparse.c     | 446 +++++++++++++++++++++++++++++++++----------------
+ blkparse_fmt.c |  83 ++++++---
+ blkrawverify.c |  14 +-
+ blktrace.c     |  40 ++++-
+ blktrace.h     |  64 +++++--
+ blktrace_api.h |  58 ++++++-
+ 8 files changed, 535 insertions(+), 189 deletions(-)
+
+-- 
+2.51.1
 
