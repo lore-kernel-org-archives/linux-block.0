@@ -1,114 +1,102 @@
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 864051487E9
-	for <linux-block@vger.kernel.org>; Tue, 25 Nov 2025 16:33:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDD8C235045
+	for <linux-block@vger.kernel.org>; Tue, 25 Nov 2025 16:42:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764088426; cv=none; b=F/IwulHYBG4V76gqAbAXCM3Y4NDcBW6Ry6pjZCSQJOxMsVHJ690RNsH6C+ffacVrsj/g0D/Jy/BAxn5zKTB60MknKfExW7/sPherv7FsGm/CADEsE7B+xQvQmqUWJqMRwOA4tNnJe0/B07wGgVC8GtirWip/bHSfbj9gPrhuQY4=
+	t=1764088974; cv=none; b=RqwYFE16g9OJsXjaLVnT4C+B/QRT+ZUNrEoVBd9kAYsp+gmXr4PEmT5opG2K+t7g+QwMPJ2RXbx+I9YE8Wtd78f/78G3pO1mURSW52tZOUlralUHOsCTYo2nn4awyiBGOPHhmgz34jU4IpF1EqcBCKs1TgD8/tZT0Rg9mRrM34U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764088426; c=relaxed/simple;
-	bh=/MKVdZuni/Te6fIz+o62Jy7JaM786KTHt14gdDi+1To=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=roIqSjA8xdldu2VU4r5ywST7r8tD4nGdYGGy4xmV3gFKPyMn1VH3xESk7quSiuNXrOepPdYlflffTZphD775D5EBFE+8AC17YZNFch/NqQV5VyiDYeG1BIx/3WyLRjDmbQOU68NRBik7X2V2zkBsRQKj9HWgjEZRpuYw2+zrPR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=WHHk4xrN; arc=none smtp.client-ip=209.85.215.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1764088974; c=relaxed/simple;
+	bh=dWvTqNwI7PZoHHcTET1FAV9AyIdB76+N00neVcHhFdI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IC28I3lMmrYE4vTN8dZ6c28dMjM2JwQEBPNOjQpQeOrGHM0tmXFnq6gqWhpv+1lcbtDzbd8wrn5As2V7323BjoNvaSk1lCrAODUdEV81H2xBB5UuS2YCtc49uNzDjmg84+6zlDAZEuJrafCdXDdqAY7sg8WOtQFI6IyNYzqhP5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PsvukiPx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="WHHk4xrN"
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-bd5cf88d165so324807a12.1
-        for <linux-block@vger.kernel.org>; Tue, 25 Nov 2025 08:33:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1764088424; x=1764693224; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PAAgrHnwc0Uw+tyk/0PGollu1/xHO3jxKmRu9vaSYtQ=;
-        b=WHHk4xrNyNaxRN5o36PsX/rp1lRU1EGXvYemelTPADrk4R2hvNQsY0lwdnyW0zOd7I
-         mIwm23d4VRp38exylCi7pX/pQ5KMj5H0dIrBDP8KlnOvYx/ciwawyGAe+SWfFBnZL2s+
-         UlltvbTY1uNTFlPMecs8+T7P/IsfAkxh4WAjytmo/WAb3FOQjbf2pWRRH3XtAiTlK8ry
-         daBKFuFTigvA5mu9mir6Q8A7f6vobnI967LLQEbsUIc5wDd3r+ebyvjxUK1yn6Fym349
-         zqTBjUl9ZQPIE4t54dOrnzKWKYrVMBJVyS+cxYS3l5FwfKxICuBTzz8mdxC2AYlJfCup
-         YMWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764088424; x=1764693224;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=PAAgrHnwc0Uw+tyk/0PGollu1/xHO3jxKmRu9vaSYtQ=;
-        b=MTouCdbVMUZbnwTwVb4/FqL3EXuPVSZbUG2x8gazbHc2tPjTbVHQGN7DmzeH0Klh8y
-         gDa8A8iKbyUyvwLC3yANYkAkpfrHYk7FbJ6kaZUP0bhSFwao1dHiCG8tNCKjeuITZpVN
-         ob4z9F1yX00ltr+f+geimPnVAIY8NTtuymJ+8qtzTk6A5uTxk4hkAs1mPp4AZQVPMkoA
-         kK0uA488XS0A0P8t2j0ry0bRZBaEBcH0sDFnUs/88Xy+LAH8ATWn6EkRkSTZcoWL86md
-         N2bg+JIAea4GmY0dqLwKnspuqnrBwdcMu4iCbTZxkePkGfXmRrWk5PrqgvUHbFOwMzfy
-         TyVw==
-X-Forwarded-Encrypted: i=1; AJvYcCWdPhy4G3Q6WqOSW+U8UQBFKsHyT7uapT8ORbpuCN+Abiz+L/d9jaSoRZZkjo087qgBoOAWIQ7PaSnMnA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxtQakiY7mINzkBirS/yiF+KSSM2p8l/t1Eq5yj4BCBbmfAwl/J
-	nOlMZNLPyQ5b6sjv+cLTDbfW5wMDQQb+oaZ13TD354VtysLaXaOSoz6XCDZU2lRKWz91VljZu27
-	1gPRaMsBf9M3/IogrciRXz2Iyc+8sUb1gR/3T4tJpOA==
-X-Gm-Gg: ASbGncsM6Pm46UtpDiMbhx6NPVJWxNC51emzdDRRbRDDatj9vejL6vKLhVZ2lU5Rmik
-	9SqD6zdCvBn1fK1VGHFlFhD0uEIlxXeI4N3U9pUI7OqyT9zW0WNVye7H+/cvMBWkRn7ZSn900Ru
-	QbmivAfIowh6SONo5aGzHm7dzc4JU4GpLy9ogUE8VAmC9a+NM1cG2RT9epsXJtOOPpZrBfUASee
-	5umJO0SS0mqkIH5JELpnHHWaQEETm8cFBEGRLgIH1tDUctQFug/SOFhmH4yb9vTUy01
-X-Google-Smtp-Source: AGHT+IHiUx7hG71zkWmvHWr7ctB0boEFrMluOA8S8GVDzt6RonmFY5TCRAeAdiSwoAN/jTkHUTHn3o+LGKgUuySc9IM=
-X-Received: by 2002:a05:7022:ea46:10b0:119:e55a:95a1 with SMTP id
- a92af1059eb24-11c9d8678famr7935265c88.3.1764088423562; Tue, 25 Nov 2025
- 08:33:43 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PsvukiPx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54E29C4CEF1;
+	Tue, 25 Nov 2025 16:42:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764088973;
+	bh=dWvTqNwI7PZoHHcTET1FAV9AyIdB76+N00neVcHhFdI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PsvukiPxoXR69qNTemIbYd9rurWkWvOoTHxZbZP19kjlDFpz2h3cKDLP+HEzHJWLK
+	 +IlA+uJCWD0Kwc9V9sr49epOTodsc3tqBywF9vL9hd8SVXyAb0m4d0cJm689a9fpSQ
+	 DbcOKFE+Vc3dvbFiewUSwCtdisvzZpipshJOof7RrIhv4OqE14hyQ7g2pAtK5SGWBM
+	 qUyyakiRazB/bOCcOyepgoq+t6aF66H9nw173Lxeu0pSE8Uh/vWhjzGYYqYJWKz9EQ
+	 O9Xy8Buo9LwZ2CedmlckBgP9e9Bq2Zeifgideui4Sa+p35BaJ/hI36/aHQA8okzuGm
+	 aC4rIf8b33Rxg==
+Date: Tue, 25 Nov 2025 09:42:51 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: Keith Busch <kbusch@meta.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"chaitanyak@nvidia.com" <chaitanyak@nvidia.com>
+Subject: Re: [PATCHv2 1/2] blktests: test direct io offsets
+Message-ID: <aSXci0u7c9Ppnjbd@kbusch-mbp>
+References: <20251119195449.2922332-1-kbusch@meta.com>
+ <20251119195449.2922332-2-kbusch@meta.com>
+ <y744um3exsnhtf5u4iabfipzwkexcz5t3xqe4vvspa7z7hfuws@y5mbl2oszpuy>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251125130704.5953-1-fushuai.wang@linux.dev>
-In-Reply-To: <20251125130704.5953-1-fushuai.wang@linux.dev>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Tue, 25 Nov 2025 08:33:31 -0800
-X-Gm-Features: AWmQ_bmJp9XHPG_oR3oFvveKJi44wiVWYY7j1lhb73csJirRImsz6ii4uu4ISTc
-Message-ID: <CADUfDZoaXZE4D4L5+M4m2=b6j4_PYKN4zNZR=MxegzU5BkS7kQ@mail.gmail.com>
-Subject: Re: [PATCH] block: Use size_add() and array_size() for safe memory allocation
-To: Fushuai Wang <fushuai.wang@linux.dev>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	wangfushuai@baidu.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <y744um3exsnhtf5u4iabfipzwkexcz5t3xqe4vvspa7z7hfuws@y5mbl2oszpuy>
 
-On Tue, Nov 25, 2025 at 5:09=E2=80=AFAM Fushuai Wang <fushuai.wang@linux.de=
-v> wrote:
->
-> Dynamic size calculations should not be performed in memory
-> allocator due to the risk of overflowing. So use size_add()
+On Tue, Nov 25, 2025 at 11:26:31AM +0000, Shinichiro Kawasaki wrote:
+> On Nov 19, 2025 / 11:54, Keith Busch wrote:
+> > From: Keith Busch <kbusch@kernel.org>
+> > 
+> > Tests various direct IO memory and length alignments against the
+> > device's queue limits reported from sysfs.
+> > 
+> > Signed-off-by: Keith Busch <kbusch@kernel.org>
+> > ---
+> [...]
+> > diff --git a/src/dio-offsets.c b/src/dio-offsets.c
+> > new file mode 100644
+> > index 0000000..8e46091
+> > --- /dev/null
+> > +++ b/src/dio-offsets.c
+> [...]
+> > +static void init_buffers()
+> > +{
+> > +	unsigned long lb_mask = logical_block_size - 1;
+> > +	int fd, ret;
+> > +
+> > +	buf_size = max_bytes * max_segments / 2;
+> > +	if (buf_size < logical_block_size * max_segments)
+> > +		err(EINVAL, "%s: logical block size is too big", __func__);
+> > +
+> > +	if (buf_size < logical_block_size * 1024 * 4)
+> > +		buf_size = logical_block_size * 1024 * 4;
+> > +
+> > +	if (buf_size & lb_mask)
+> > +		buf_size = (buf_size + lb_mask) & ~(lb_mask);
+> 
+> I investigated why this new test case fails with my QEMU SATA device and noticed
+> that the device has 128MiB size. The calculation above sets buf_size = 192MiB.
+> Then pwrite() in test_full_size_aligned() is called with 192MiB size and it was
+> truncated to 128MiB. Then the following compare() check failed.
+> 
+> Is it okay to cap the buf_size with the device size? If so, I suggest the change
+> below. With this change, the test case passes with the device. If you are okay
+> with the change, I can fold it in when I apply the patch.
 
-nr_vecs is an unsigned short and sizeof(struct bio_vec) is 16. I don't
-see how the multiplication could possibly overflow a size_t.
+Yeah, totally fine. Much of the sizes were just made up as I went along,
+but it should probably be programatically calculated based on the device
+under test.
 
-> and array_size(), which have overflow checks, in bio_kmalloc()
-> for safe size calculation.
->
-> Signed-off-by: Fushuai Wang <wangfushuai@baidu.com>
-> ---
->  block/bio.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/block/bio.c b/block/bio.c
-> index b3a79285c278..c7789469c892 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -617,8 +617,9 @@ struct bio *bio_kmalloc(unsigned short nr_vecs, gfp_t=
- gfp_mask)
->
->         if (nr_vecs > BIO_MAX_INLINE_VECS)
->                 return NULL;
-> -       return kmalloc(sizeof(*bio) + nr_vecs * sizeof(struct bio_vec),
-> -                       gfp_mask);
-> +       return kmalloc(size_add(sizeof(*bio),
-> +                               array_size(nr_vecs, sizeof(struct bio_vec=
-))),
-> +                      gfp_mask);
->  }
->  EXPORT_SYMBOL(bio_kmalloc);
->
-> --
-> 2.36.1
->
->
+> > +#!/bin/bash
+> 
+> Is it okay to add any GPL SPDX license and your copyright here? It is not ideal
+> that I add your copyright and license, but if you specify them in this thread, I
+> will add the Link to this thread in the commit message and fold-in the specifed
+> SPDX license and your copyright.
+
+Yes, sorry, it should have been there. I added those to some files, but
+missed this one.
