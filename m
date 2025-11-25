@@ -1,113 +1,148 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF5A23C38
-	for <linux-block@vger.kernel.org>; Tue, 25 Nov 2025 03:00:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4315C26F2B6
+	for <linux-block@vger.kernel.org>; Tue, 25 Nov 2025 03:41:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764039620; cv=none; b=dB99e1cWWxK4pQ86dVfAy0dOWyW8HSAduRRiIvzTyjbWDc+vN7o3D4UzXmwwcI0KV5Wt/cTJGIM87h1Fw3r90aJt92pW8oBRqn2KySc0e3DmnlAZeNBB5kh40c8+as4DmClsNoyyCUZf6tEsD4LBkyfkdc5kLEM2VyXsU3qHC3c=
+	t=1764042089; cv=none; b=T4LriirP8ABeeSjdEsSIrH0iRYK+CUjKE7EavCmMC6CwvRz7LqghoapYpx6VTYyPI8whX3CDusJ1uprUej2FRktmIYLGjX3c7scYIS+0BFeV1iAeDmtPYxr1lepsvxEkRUErZXd+bkFirqYIWokSzEa9gDSokXM9kbBJIziMLc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764039620; c=relaxed/simple;
-	bh=CXBOFv5E0W/8VeuJx2GyYI3qA8Ap+kQi6fxiDxbI+lU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e9fXxVR9rlSVi2bal2DwLkjga4IcCYBz1/QtieFl7c+7+XR3hTvWF7d6ZhPaoL0V0/cuRmrbE6UO1izBvW2kXl2uJnWmRKw24ccopEK9XA5errOdqmdnqY8YEWcKYyH8G421H97gh4Eiuf+gjx56B5EXRC2FtD0PT3tVaZyRkBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VNI++UhS; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1764042089; c=relaxed/simple;
+	bh=6hX4p+pcHQX2zRBwuyuMz7wPOUrb/MLLAa4YYHu7zhA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cER2sT/hTWGWWm1BcgXwFqpN5kYY1c4/JpyK6oN6bclgzbPmZsax2yNuNfgFY0I6ZDTTB8Ev57FzbacyWPukk+M8yECb5zeMyGvaKBjSeuA0+dOX9TLIFxky7wgwnz6n7Mt/BDW/Us4pbTErXhEsl7XIGxNUDyO5j2D/8/9CBfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=XyZrS6da; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VNI++UhS"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764039617;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=b22+7QsDRFeCLadpvkPvdFY550gmWfw5/V4565hkPxU=;
-	b=VNI++UhSatQ3lnw8wELxDDpNNreR96mMnE4Fpt86UqhYGWqhk+fhR/PQh1fpO8uW1lUdar
-	Pyxz/gklrDtam2jagik6JStzNZ1INcY8rb2KVrhmM7ATI4qaerzXYjYwh80cKGwXRqKyzD
-	X4I9tmiE0YEn+DHImz63k9QF6kno3I4=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-533-o31QrOWoN_iqYnP4tcoyjA-1; Mon,
- 24 Nov 2025 22:00:14 -0500
-X-MC-Unique: o31QrOWoN_iqYnP4tcoyjA-1
-X-Mimecast-MFC-AGG-ID: o31QrOWoN_iqYnP4tcoyjA_1764039613
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1F64C18005A7;
-	Tue, 25 Nov 2025 03:00:12 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.210])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CAF781800451;
-	Tue, 25 Nov 2025 03:00:05 +0000 (UTC)
-Date: Tue, 25 Nov 2025 11:00:00 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	Zhaoyang Huang <zhaoyang.huang@unisoc.com>,
-	Dave Chinner <dchinner@redhat.com>, linux-fsdevel@vger.kernel.org
-Subject: Re: calling into file systems directly from ->queue_rq, was Re:
- [PATCH V5 0/6] loop: improve loop aio perf by IOCB_NOWAIT
-Message-ID: <aSUbsDjHnQl0jZde@fedora>
-References: <20251015110735.1361261-1-ming.lei@redhat.com>
- <aSP3SG_KaROJTBHx@infradead.org>
- <aSQfC2rzoCZcMfTH@fedora>
- <aSQf6gMFzn-4ohrh@infradead.org>
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="XyZrS6da"
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-7ab689d3fa0so627143b3a.0
+        for <linux-block@vger.kernel.org>; Mon, 24 Nov 2025 19:41:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1764042087; x=1764646887; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8STTHMEQ2FtY02yQMAJz7yi3iZVqLGCCDlJuLpB1khM=;
+        b=XyZrS6daRjPiD/Of1Kxd51fIUVMb3nUk1bI5Oxj7ULeiv5JZ/V2jauXEVDJcs3cnJJ
+         ENCrvHflQKa16IzDGvtwNPjRIdihMeLgh5LfXV2TL/CrFXuskX7RFEjeixF7ITO8TZdS
+         7+Ewnh0/0APCVCm3l/MECu0hrzisvEb2gXxpvcme2ZMEltbpgnJoRFthqVaREG+fnJOY
+         kjT05Dp632xAhnJs6gME4FzyhrH6loMnVkeR1UtTbP7h7D8FHJIMK5pOgW4aG/u4hMWl
+         wuX+gAfA1xoRWmPkLydwP/XHVMsCHCGW9WZf79WvGit7aGa6yC8ONhz4Qt6U0XgIqrvD
+         CuZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764042087; x=1764646887;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=8STTHMEQ2FtY02yQMAJz7yi3iZVqLGCCDlJuLpB1khM=;
+        b=lI40zOnkC9+BM/gr2JhHJ88S8Ayw12GpELO0WTQb9j2YxzMxbNqoCmbXRXYKC/+Uqu
+         Uab2UojTfyQys279JxUI+GsDV3sQZTN0t9t1EDdkslIHldL7NkxzJPXB/ygvPfu6rL8G
+         rloKkq++Rd5VhqEsBVla/XSiz42iiA7UENVgwh/QQ5g1Gj6HIuF6dK/BUrvvNG5k3NHi
+         Mu/hhAecsJCLWBZT1zN/48/AClDTe5B5XqJlo5jYrbNdgZMFUnM3xWC5u1xLNfzZ/wQU
+         T2W9tK3efqJe6YNLM7Mp+rMgJPfquU+IRYWzYT7MEBerwVNSA7hhMZWmffwERETUuBMN
+         uOoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWlP284GJbJ4rDqU4gChsLqVS+/xuj/SdB9YmVqoTG5nU4cOklpi7TLLa1kQZAfPRhXRoLEheHnalh/VA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzglR5gimIOKzwtct4zn1hYxb7yzlJLxYtpzKMjHpLG/gzjAM+/
+	fE8uN7j5DgkcIglO18xQrn+vy9ui/gNxbgxWY0cRId06S6iX13r9WpcxBlJAjz765LI7YYUi2V3
+	mO4pTtawqxa0PeHkWOizaoT2hpaK2YloxImEXsi2pa1m8Z01Ahll4uXNnHQ==
+X-Gm-Gg: ASbGncvu5jwS5vDwr/bUkfAW7wdg/C9zoq6++tilL5gOAVTJSPasu5glDq84Sl7a7Z3
+	arcPPggjP03o/PeeAFF0YNae1out8QFl5xWWvZJ2K4fGBXS5URjo8O9dfJrs4quYzTAoMi6ZTSU
+	PX4xUfYtte/ziwO6IZwu+TrHzQiQlEzMzUUQlC7ix8vap2b138qub0pt20qbUjA9/PhJ+eNIcH4
+	wIM5vdpNXF9zvgdDuPRoVeut/3Zc99USBeqzgcWBPe5FLPcI86USHYxT8uNrFHFIyHALNS/
+X-Google-Smtp-Source: AGHT+IH+7zTYmr0hGesLktBGUY+BvfoHVBlKCdV0+qaszs+Zxui4HvB146gLlXrtBqOod00+sWNqOoYpTx6cmbl451A=
+X-Received: by 2002:a05:7022:68a1:b0:11b:862d:8031 with SMTP id
+ a92af1059eb24-11c9f216eccmr8320215c88.0.1764042087326; Mon, 24 Nov 2025
+ 19:41:27 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aSQf6gMFzn-4ohrh@infradead.org>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+References: <20251124161707.3491456-1-kbusch@meta.com> <CADUfDZqrpJXLLU9V3eFJvRgth45-ht-yi4cSpmrBdnbfQGtWYw@mail.gmail.com>
+ <aSTii9KbN6wQCvOt@kbusch-mbp>
+In-Reply-To: <aSTii9KbN6wQCvOt@kbusch-mbp>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Mon, 24 Nov 2025 19:41:16 -0800
+X-Gm-Features: AWmQ_bnhWPpqG4nkwCkfwn4WNk3IdO-Vf51YR6PdN3XnDxWBafjhoaenDhNR3bw
+Message-ID: <CADUfDZogsF53MENLLyd0iCGKUoSqap3bEfSbt72KPifO4tvzfA@mail.gmail.com>
+Subject: Re: [PATCHv6] blk-integrity: support arbitrary buffer alignment
+To: Keith Busch <kbusch@kernel.org>
+Cc: Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org, axboe@kernel.dk, 
+	hch@lst.de, ebiggers@kernel.org, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 24, 2025 at 01:05:46AM -0800, Christoph Hellwig wrote:
-> On Mon, Nov 24, 2025 at 05:02:03PM +0800, Ming Lei wrote:
-> > On Sun, Nov 23, 2025 at 10:12:24PM -0800, Christoph Hellwig wrote:
-> > > FYI, with this series I'm seeing somewhat frequent stack overflows when
-> > > using loop on top of XFS on top of stacked block devices.
-> > 
-> > Can you share your setting?
-> > 
-> > BTW, there are one followup fix:
-> > 
-> > https://lore.kernel.org/linux-block/20251120160722.3623884-1-ming.lei@redhat.com/
-> > 
-> > I just run 'xfstests -q quick' on loop on top of XFS on top of dm-stripe,
-> > not see stack overflow with the above fix against -next.
-> 
-> This was with a development tree with lots of local code.  So the
-> messages aren't applicable (and probably a hint I need to reduce my
-> stack usage).  The observations is that we now stack through from block
-> submission context into the file system write path, which is bad for a
-> lot of reasons.  journal_info being the most obvious one.
-> 
-> > > In other words:  I don't think issuing file system I/O from the
-> > > submission thread in loop can work, and we should drop this again.
-> > 
-> > I don't object to drop it one more time.
-> > 
-> > However, can we confirm if it is really a stack overflow because of
-> > calling into FS from ->queue_rq()?
-> 
-> Yes.
-> 
-> > If yes, it could be dead end to improve loop in this way, then I can give up.
-> 
-> I think calling directly into the lower file system without a context
-> switch is very problematic, so IMHO yes, it is a dead end.
+On Mon, Nov 24, 2025 at 2:56=E2=80=AFPM Keith Busch <kbusch@kernel.org> wro=
+te:
+>
+> On Mon, Nov 24, 2025 at 01:34:03PM -0800, Caleb Sander Mateos wrote:
+> > On Mon, Nov 24, 2025 at 8:18=E2=80=AFAM Keith Busch <kbusch@meta.com> w=
+rote:
+> > >
+> > > From: Keith Busch <kbusch@kernel.org>
+> > >
+> > > A bio segment may have partial interval block data with the rest cont=
+inuing
+> > > into the next segments because direct-io data payloads only need to a=
+ligned in
+> >
+> > "need to be aligned"?
+>
+> In the original text, s/aligned/align
 
-Hi Jens,
+That works.
 
-Can you drop or revert the patchset of "loop: improve loop aio perf by IOCB_NOWAIT"
-from for-6.19/block?
+>
+> > > +       while (offset > 0) {
+> > > +               struct bio_vec pbv =3D mp_bvec_iter_bvec(bvec, iter->=
+prot_iter);
+> > > +               unsigned int len =3D min(pbv.bv_len, offset);
+> > > +               void *prot_buf =3D bvec_kmap_local(&pbv);
+> >
+> > Is it valid to use bvec_kmap_local() on a multi-page bvec?
+>
+> If it wasn't valid, there'd be a major problem with large folios.
+>
+> > It calls
+> > kmap_local_page() internally, which will only map the first page,
+> > right?
+>
+> Compare kmap_local_page() with kmap_local_folio(). They both resolve to
+> the same lower level mapping function, and folios have no problem
+> spanning pages.
 
+Documentation/mm/highmem.rst seems to suggest that kmap_local_folio()
+only maps the page that contains the specified offset, not the whole
+folio:
+The only differences between them consist in the first taking a pointer
+to a struct page and the second taking a pointer to struct folio and the by=
+te
+offset within the folio which identifies the page.
 
-Thanks,
-Ming
+And this is consistent with the implementation, which passes
+__kmap_local_page_prot() the page at the given offset into the folio.
 
+Of course, both are no-ops for non-CONFIG_HIGHMEM systems, so it may
+be difficult to observe the difference on most systems these days...
+
+>
+> > > @@ -1874,6 +1874,7 @@ static bool nvme_init_integrity(struct nvme_ns_=
+head *head,
+> > >                 break;
+> > >         }
+> > >
+> > > +       bi->flags |=3D BLK_SPLIT_INTERVAL_CAPABLE;
+> >
+> > Can just be =3D instead of |=3D since bi is zeroed above.
+>
+> It can, but these kinds of syntax are a courtesty to future changes so
+> that you don't need to change this line later. You can also end a struct
+> initialization without a trailing "," too, but that's just mean.
+
+Sure, either way is fine.
+
+Best,
+Caleb
