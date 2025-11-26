@@ -1,180 +1,88 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B99782DD60E
-	for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 12:36:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ABFB30EF85;
+	Wed, 26 Nov 2025 12:48:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764160600; cv=none; b=qqknr6NrKBHj3WUusMjOQERp+AQO7Q3OHmqZY2JgafaT46ymQoIv6Lpiqwne5Ot0bnpTEOhBJLeJ7DUu7YMU/7xYQLVKTCamhjGUM+QmXxHWLIRTpDQ2bkKHD0uLhLfdDofGHPF6pP2f3v/nYYGJRwKE2JhkRlFISGihBvIO1H4=
+	t=1764161326; cv=none; b=fjMlKjypQUPnDSWH/LL1wvPadgHbh2vHaEBt95hHXEH26fG7xY36ZJ3IzzACLscxxl0cmNpkNL8V2osdCqMy3ub3fjmIGTzybYxh5MJIKz8yOASiai/AFUuOG9u6Lj9OcouaFxbY9/HSaPXQ6Apa4YrFkKFyO7pNk1kjLfN/SGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764160600; c=relaxed/simple;
-	bh=VQ5W/IivQX6ySVdR6+HU6YxREt8RSQR+q3L/k25ce4E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=T8g6IRdYhiXXSfD1P4CZKTeQMLnj5+teafG2XENYGNEhdNlixz8BcwtT/XBaJbEVJyUYjbAIW5INf7gnUlc7Gf0eXhr7YPe88+HmClDDz+croLLlJmsNxx4F3RkYdZezEAfE54lvmeYm29f4hHXTxWuANopwyuoIEECUIOf1pR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eh8Bo7Ep; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eh8Bo7Ep"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6240CC113D0
-	for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 12:36:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764160600;
-	bh=VQ5W/IivQX6ySVdR6+HU6YxREt8RSQR+q3L/k25ce4E=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=eh8Bo7EpY5GL9k4DvHYoipLZADtw9PynJ/kmJLXyqBchrUYuu/juII0/OJpF6/Soi
-	 rFZL8xjBHZ2hXCW1ddODnFQ1bPaZvTC/X6FVzEKm6waZx9SemQh7Z/RtcRX4VJ+IBq
-	 Z7xFU+FfhWQ9Gg3zp8MiGM5hd5ovIv9eiOCk36DVtSxNuXsYIK+B4Sp7LlkiETI0GN
-	 JYtg9rqcCS/oJRemSXm5PJspG9jUnloc7oJpxE/cgz7+CO3DeYA3EFYAgFsDkRjiaM
-	 QnYLs2oitIq4GZJFjbHtS5gPjcze4v6EZBkYAb5qHzl/bfK/onrcVScSXT07e/JKsO
-	 GxP2eaZ0IEBbA==
-Received: by mail-oo1-f54.google.com with SMTP id 006d021491bc7-65366485678so2791926eaf.2
-        for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 04:36:40 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCU4J0W2Oso0FrGufjf0FRnAZ3CmJ+mLqbkcmuvgG12xsRRFsts5yUymYy/h9oEG2aBEWxouWbuHOZooSA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmRXpK3fGd9VGK2Sv9ycnNDFfTVa5LdnRIK6Mgit2A1UiqlN7c
-	TPBUDL+QxP4FRwiacWotCrMV+HpN8ZAV7GQBgIUmwBe5Yz2eoVBxgWq+8K4x90Byy/kZIRWckee
-	O0UW/jqwclHrApA3dBUcHVPS7f2c/u8s=
-X-Google-Smtp-Source: AGHT+IGRhII15BLODu2RdGGrhNcoEQzXNo2xzbeqp/C1TrF8HVVvEragjCdCH6HQ7bq+XqgQqG7pDHkOhpFdOS8w9fQ=
-X-Received: by 2002:a05:6820:6ae1:b0:656:9202:58ca with SMTP id
- 006d021491bc7-657bdb961c7mr2268306eaf.3.1764160599562; Wed, 26 Nov 2025
- 04:36:39 -0800 (PST)
+	s=arc-20240116; t=1764161326; c=relaxed/simple;
+	bh=/Xm1X1BUjzRmFUV+A5jOmP4KHHBSuIG59uEQl4KZrI8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=umtMEHzcUUp9PN4MLSnkfGg0gfyDZak9GOQrbMY3e5AfCKaj30jAp/lFhSBymL94XqkrG+YXh5TqTt3erE41QAHrfqFqSmcGgai+NfNM/jO2dSiz54l2g6T3zC+VLAyq5V4aUWXM9MaacfCCKGjFGAIR+67y6mTpfB2zUxrFRgI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2E266168F;
+	Wed, 26 Nov 2025 04:48:36 -0800 (PST)
+Received: from e123572-lin.arm.com (e123572-lin.cambridge.arm.com [10.1.194.54])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A40E83F73B;
+	Wed, 26 Nov 2025 04:48:42 -0800 (PST)
+From: Kevin Brodsky <kevin.brodsky@arm.com>
+To: linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Kevin Brodsky <kevin.brodsky@arm.com>,
+	Ali Utku Selen <ali.utku.selen@arm.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] ublk: prevent invalid access with DEBUG
+Date: Wed, 26 Nov 2025 12:48:35 +0000
+Message-ID: <20251126124835.1132852-1-kevin.brodsky@arm.com>
+X-Mailer: git-send-email 2.51.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251126101636.205505-1-yang.yang@vivo.com> <20251126101636.205505-2-yang.yang@vivo.com>
- <CAJZ5v0i1YLiri9oiiq2W6_KSbqGuWOqdrMPrOf=do-DdW=_rfA@mail.gmail.com> <1a2d2059-0548-4c5f-a986-5081447c3325@vivo.com>
-In-Reply-To: <1a2d2059-0548-4c5f-a986-5081447c3325@vivo.com>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Wed, 26 Nov 2025 13:36:27 +0100
-X-Gmail-Original-Message-ID: <CAJZ5v0iSgrLzsjh+bvF2=rxxhYcBetJ6V-joWaQud4ahkm1GkQ@mail.gmail.com>
-X-Gm-Features: AWmQ_bkQ071GAbhsiapueetSI1vC1HOk8W4hrSvgPJMMZr3hIOzqI4-BHY_pk_M
-Message-ID: <CAJZ5v0iSgrLzsjh+bvF2=rxxhYcBetJ6V-joWaQud4ahkm1GkQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] PM: runtime: Fix I/O hang due to race between resume
- and runtime disable
-To: YangYang <yang.yang@vivo.com>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>, Jens Axboe <axboe@kernel.dk>, Pavel Machek <pavel@kernel.org>, 
-	Len Brown <lenb@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Danilo Krummrich <dakr@kernel.org>, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-pm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 26, 2025 at 12:59=E2=80=AFPM YangYang <yang.yang@vivo.com> wrot=
-e:
->
-> On 2025/11/26 19:30, Rafael J. Wysocki wrote:
-> > On Wed, Nov 26, 2025 at 11:17=E2=80=AFAM Yang Yang <yang.yang@vivo.com>=
- wrote:
-> >>
-> >> We observed the following hung task during our test:
-> >>
-> >> [ 3987.095999] INFO: task "kworker/u32:7":239 blocked for more than 18=
-8 seconds.
-> >> [ 3987.096017] task:kworker/u32:7   state:D stack:0     pid:239   tgid=
-:239   ppid:2      flags:0x00000408
-> >> [ 3987.096042] Workqueue: writeback wb_workfn (flush-254:59)
-> >> [ 3987.096069] Call trace:
-> >> [ 3987.096073]  __switch_to+0x1a0/0x318
-> >> [ 3987.096089]  __schedule+0xa38/0xf9c
-> >> [ 3987.096104]  schedule+0x74/0x10c
-> >> [ 3987.096118]  __bio_queue_enter+0xb8/0x178
-> >> [ 3987.096132]  blk_mq_submit_bio+0x104/0x728
-> >> [ 3987.096145]  __submit_bio+0xa0/0x23c
-> >> [ 3987.096159]  submit_bio_noacct_nocheck+0x164/0x330
-> >> [ 3987.096173]  submit_bio_noacct+0x348/0x468
-> >> [ 3987.096186]  submit_bio+0x17c/0x198
-> >> [ 3987.096199]  f2fs_submit_write_bio+0x44/0xe8
-> >> [ 3987.096211]  __submit_merged_bio+0x40/0x11c
-> >> [ 3987.096222]  __submit_merged_write_cond+0xcc/0x1f8
-> >> [ 3987.096233]  f2fs_write_data_pages+0xbb8/0xd0c
-> >> [ 3987.096246]  do_writepages+0xe0/0x2f4
-> >> [ 3987.096255]  __writeback_single_inode+0x44/0x4ac
-> >> [ 3987.096272]  writeback_sb_inodes+0x30c/0x538
-> >> [ 3987.096289]  __writeback_inodes_wb+0x9c/0xec
-> >> [ 3987.096305]  wb_writeback+0x158/0x440
-> >> [ 3987.096321]  wb_workfn+0x388/0x5d4
-> >> [ 3987.096335]  process_scheduled_works+0x1c4/0x45c
-> >> [ 3987.096346]  worker_thread+0x32c/0x3e8
-> >> [ 3987.096356]  kthread+0x11c/0x1b0
-> >> [ 3987.096372]  ret_from_fork+0x10/0x20
-> >>
-> >>   T1:                                   T2:
-> >>   blk_queue_enter
-> >>   blk_pm_resume_queue
-> >>   pm_request_resume
-> >
-> > Shouldn't this be pm_runtime_resume() rather?
->
-> I'm not sure about that, I'll check if pm_runtime_resume() should be
-> used here instead.
+ublk_ch_uring_cmd_local() may jump to the out label before
+initialising the io pointer. This will cause trouble if DEBUG is
+defined, because the pr_devel() call dereferences io. Clang reports:
 
-Well, the code as is now schedules an async resume of the device and
-then waits for it to complete.  It would be more straightforward to
-resume the device synchronously IMV.
+drivers/block/ublk_drv.c:2403:6: error: variable 'io' is used uninitialized whenever 'if' condition is true [-Werror,-Wsometimes-uninitialized]
+ 2403 |         if (tag >= ub->dev_info.queue_depth)
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+drivers/block/ublk_drv.c:2492:32: note: uninitialized use occurs here
+ 2492 |                         __func__, cmd_op, tag, ret, io->flags);
+      |
 
-> >
-> >>   __pm_runtime_resume(dev, RPM_ASYNC)
-> >>   rpm_resume                            __pm_runtime_disable
-> >>   dev->power.request_pending =3D true     dev->power.disable_depth++
-> >>   queue_work(pm_wq, &dev->power.work)   __pm_runtime_barrier
-> >>   wait_event                            cancel_work_sync(&dev->power.w=
-ork)
-> >>
-> >> T1 queues the work item, which is then cancelled by T2 before it start=
-s
-> >> execution. As a result, q->dev cannot be resumed, and T1 waits here fo=
-r
-> >> a long time.
-> >>
-> >> Signed-off-by: Yang Yang <yang.yang@vivo.com>
-> >> ---
-> >>   drivers/base/power/runtime.c | 3 ++-
-> >>   include/linux/pm.h           | 1 +
-> >>   2 files changed, 3 insertions(+), 1 deletion(-)
-> >>
-> >> diff --git a/drivers/base/power/runtime.c b/drivers/base/power/runtime=
-.c
-> >> index 1b11a3cd4acc..fc9bf3fb3bb7 100644
-> >> --- a/drivers/base/power/runtime.c
-> >> +++ b/drivers/base/power/runtime.c
-> >> @@ -1533,7 +1533,8 @@ void __pm_runtime_disable(struct device *dev, bo=
-ol check_resume)
-> >>           * means there probably is some I/O to process and disabling =
-runtime PM
-> >>           * shouldn't prevent the device from processing the I/O.
-> >>           */
-> >> -       if (check_resume && dev->power.request_pending &&
-> >> +       if ((check_resume || dev->power.force_check_resume) &&
-> >> +           dev->power.request_pending &&
-> >>              dev->power.request =3D=3D RPM_REQ_RESUME) {
-> >>                  /*
-> >>                   * Prevent suspends and idle notifications from being=
- carried
-> >
-> > There are only two cases in which false is passed to
-> > __pm_runtime_disable(), one is in device_suspend_late() and I don't
-> > think that's relevant here, and the other is in pm_runtime_remove()
-> > and that's get called when the device is going away.
-> >
-> > So apparently, blk_pm_resume_queue() races with the device going away.
-> > Is this expected to happen even?
-> >
-> > If so, wouldn't it be better to modify pm_runtime_remove() to pass
-> > true to __pm_runtime_disable() instead of making these ad hoc changes?
-> >
->
-> Sorry, I didn't make it clear in my previous message.
-> I can confirm that __pm_runtime_disable() is called from
-> device_suspend_late(), and this issue occurs during system suspend.
+Fix this by initialising io to NULL and checking it before
+dereferencing it.
 
-Interesting because the runtime PM workqueue is frozen at this point,
-so waiting for a work item in it to complete is pointless.
+Signed-off-by: Kevin Brodsky <kevin.brodsky@arm.com>
+---
+Cc: Ali Utku Selen <ali.utku.selen@arm.com>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+---
+ drivers/block/ublk_drv.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-What the patch does is to declare that the device can be
-runtime-resumed in device_suspend_late(), but this is kind of a hack
-IMV as it potentially affects the device's parent etc.
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 0c74a41a6753..359564c40cb5 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -2367,7 +2367,7 @@ static int ublk_ch_uring_cmd_local(struct io_uring_cmd *cmd,
+ 	u16 buf_idx = UBLK_INVALID_BUF_IDX;
+ 	struct ublk_device *ub = cmd->file->private_data;
+ 	struct ublk_queue *ubq;
+-	struct ublk_io *io;
++	struct ublk_io *io = NULL;
+ 	u32 cmd_op = cmd->cmd_op;
+ 	u16 q_id = READ_ONCE(ub_src->q_id);
+ 	u16 tag = READ_ONCE(ub_src->tag);
+@@ -2488,7 +2488,7 @@ static int ublk_ch_uring_cmd_local(struct io_uring_cmd *cmd,
+ 
+  out:
+ 	pr_devel("%s: complete: cmd op %d, tag %d ret %x io_flags %x\n",
+-			__func__, cmd_op, tag, ret, io->flags);
++			__func__, cmd_op, tag, ret, io ? io->flags : 0);
+ 	return ret;
+ }
+ 
 
-If the device cannot stay in runtime suspend across the entire system
-suspend transition, it should be resumed (synchronously) earlier, in
-device_suspend() or in device_prepare() even.
+base-commit: ac3fd01e4c1efce8f2c054cdeb2ddd2fc0fb150d
+-- 
+2.51.2
+
