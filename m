@@ -1,126 +1,158 @@
-Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60A2E2777FC;
-	Wed, 26 Nov 2025 18:06:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25DF730B51A;
+	Wed, 26 Nov 2025 18:07:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764180407; cv=none; b=IiVcWVgFMTDuNsLJesYFilY1oXsr1VXY5LlOGV3w8F96kYkKTxjZmqMCE9liP+dZRGZx1bGCSp5KUtOmHiD34oiVI4ckXnOeA6HrTG5r8m98wkC1D9sICw4rsS/dCr0KrABpXGU9euML+bstclWGftq2TJEhxXRAljlXv+uv+bc=
+	t=1764180438; cv=none; b=luJtC5/hJPGIaqCyQPmBfZ8wNJtr4Qh4vFvZqVPcSjIXDRw5aytW102mx56mH972WctGJQWRX7vox8udiSIjQbYyfbCj0YEF9iz7+juYphh/96PzstXChCkWf7yLtCKPcr7CO7PkG83cjKdyu3qWWfUCnsWnxg4g9QzzPL4aTL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764180407; c=relaxed/simple;
-	bh=qiAEPo6bUlTbnEwSxlQZOcEid+NdlVZAsk/GSoGNkoY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FMEIKBV0eZL3C3QIpRgVAi25Mtr3Fs4WMV7TJ02lDIkDEZDSYd92GS0WgRWnSzvC2Sn05Il8zrUUFV4oENL2iTuuXpeTgzhCEmf1NllX8tm2k7kBxl7yqda2R6JSDm9QVwwYRWulB/MXWFX7eQcsz0dF9ye8pIYKNrtSPWUWmGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=NzjIMmTO; arc=none smtp.client-ip=199.89.3.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1764180438; c=relaxed/simple;
+	bh=ZxPVD2OX+mWyP8KER+7TTW6fM/MAUm90+J80CBazzDI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u2SGUBTA1XE0adApFPeGcdXgguylhF5AxGm+C81AsYj74koMftHPGPcXH5x0SL9pPf8sz8dOgiUHOnWvTzIsxn5siJXoEVZTK4PelApAPmwrhr1S4FXHeubh7A91sXKD0h8ScW6dWTMi2jGAMbAFnSEqvosfGliDvqoxFx6UEGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Vhf2rmyr; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="NzjIMmTO"
-Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4dGnZD2zBTzlgqjZ;
-	Wed, 26 Nov 2025 18:06:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1764180402; x=1766772403; bh=aVK2hHm1cgb3RtYqbaZmKtmo
-	Yt+aEzoWqlX5VZ43Uss=; b=NzjIMmTOQ6LPu75TeB4gL0+GxukzAIW1TdslrDLb
-	taf74Hr3tMzXAmYxJk07Pg6bsGTKt1E4EVJcH3BLiC235y46u2E6zTrNJGkZmGTT
-	/1vgMtqFhizLkXDTfuBkVG0Ra2NmZq0SF7wMlhHfE8cKYEa+S6eax/7pofnhWXMI
-	nMP5/vxc8nGXuJBlpApj863hdoLy2tp5LOcO2Vi9pXel7sotZ7Rn9tw5yQYdp6cE
-	vvJE2FS5Rlw0NNl36Go9Ycd79sy4YFz3JpC3qle+p36L5PCH8Hu913uD6noyMHTA
-	ZXXaUgxSaVUYY9YJBR3g/BTXsnFuisxT4Zh9oPsrYxjwFg==
-X-Virus-Scanned: by MailRoute
-Received: from 003.mia.mailroute.net ([127.0.0.1])
- by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id tQqhY0iQRbrZ; Wed, 26 Nov 2025 18:06:42 +0000 (UTC)
-Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4dGnYz44MgzlgqjW;
-	Wed, 26 Nov 2025 18:06:30 +0000 (UTC)
-Message-ID: <6373a999-f19a-450c-9e83-7448fb70a772@acm.org>
-Date: Wed, 26 Nov 2025 10:06:29 -0800
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Vhf2rmyr"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1764180437; x=1795716437;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ZxPVD2OX+mWyP8KER+7TTW6fM/MAUm90+J80CBazzDI=;
+  b=Vhf2rmyrw0q9mxSzAZyQEIfuFAIJ7eUjXrf5hK7p7d3EB0Mm96DI/X9+
+   vJXYltRIkGZuaqArSYGDyfMsQHkryuEnj/v6yuqn4WU8cFwSiB/f4GdGQ
+   UkZKprLancr8RiH1YknZgWOoXjgtNy4nZKPCkEMULsGg3OcxYw3RvBZh9
+   QSeM0FNxpl9XnKwVK693HcwP/2tZ4thOnqUroqEyZc0upRuOIxBUvCTxB
+   LEFv8QHnNUmqLLzOe7WsZTW798Rn0gbwiQcoFCmpscWmiK9YNCI1i6jPk
+   Z1xYZysDqzfOCyhLrpCHBT3HSVjEJdL+G/pYkoO0oTbuIwLjE4DyAbY9x
+   A==;
+X-CSE-ConnectionGUID: vDADToWTSwCG7L8ixFjIlQ==
+X-CSE-MsgGUID: mWdWA913QiWU7p1FzedRHw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11625"; a="65412766"
+X-IronPort-AV: E=Sophos;i="6.20,229,1758610800"; 
+   d="scan'208";a="65412766"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2025 10:07:16 -0800
+X-CSE-ConnectionGUID: k/fLjEWGQQq0kjdeccpQHA==
+X-CSE-MsgGUID: 1Ys4OkOBRJ2TYAKR0MgXIg==
+X-ExtLoop1: 1
+Received: from lkp-server01.sh.intel.com (HELO 4664bbef4914) ([10.239.97.150])
+  by fmviesa003.fm.intel.com with ESMTP; 26 Nov 2025 10:07:13 -0800
+Received: from kbuild by 4664bbef4914 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vOJv5-000000003Dx-1cf2;
+	Wed, 26 Nov 2025 18:07:11 +0000
+Date: Thu, 27 Nov 2025 02:06:52 +0800
+From: kernel test robot <lkp@intel.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, linux-block@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-kernel@vger.kernel.org,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	Mike Christie <michael.christie@oracle.com>,
+	Jens Axboe <axboe@kernel.dk>, linux-nvme@lists.infradead.org,
+	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	linux-scsi@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+	Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH 3/4] block: add IOC_PR_READ_KEYS ioctl
+Message-ID: <202511270125.CJ6M2RHv-lkp@intel.com>
+References: <20251126163600.583036-4-stefanha@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] PM: runtime: Fix I/O hang due to race between resume
- and runtime disable
-To: "Rafael J. Wysocki" <rafael@kernel.org>, Yang Yang <yang.yang@vivo.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Pavel Machek <pavel@kernel.org>,
- Len Brown <lenb@kernel.org>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, Danilo Krummrich <dakr@kernel.org>,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-pm@vger.kernel.org
-References: <20251126101636.205505-1-yang.yang@vivo.com>
- <20251126101636.205505-2-yang.yang@vivo.com>
- <CAJZ5v0i1YLiri9oiiq2W6_KSbqGuWOqdrMPrOf=do-DdW=_rfA@mail.gmail.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <CAJZ5v0i1YLiri9oiiq2W6_KSbqGuWOqdrMPrOf=do-DdW=_rfA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251126163600.583036-4-stefanha@redhat.com>
 
-On 11/26/25 3:30 AM, Rafael J. Wysocki wrote:
-> On Wed, Nov 26, 2025 at 11:17=E2=80=AFAM Yang Yang <yang.yang@vivo.com>=
- wrote:
->>   T1:                                   T2:
->>   blk_queue_enter
->>   blk_pm_resume_queue
->>   pm_request_resume
->=20
-> Shouldn't this be pm_runtime_resume() rather?
+Hi Stefan,
 
-I tried to make that change on an Android device. As a result, the
-kernel complaint shown below appeared. My understanding is that sleeping
-in atomic context can trigger a deadlock and hence is not allowed.
+kernel test robot noticed the following build warnings:
 
-[   13.728890][    T1] WARNING: CPU: 6 PID: 1 at=20
-kernel/sched/core.c:9714 __might_sleep+0x78/0x84
-[   13.758800][    T1] Call trace:
-[   13.759027][    T1]  __might_sleep+0x78/0x84
-[   13.759340][    T1]  __pm_runtime_resume+0x40/0xb8
-[   13.759781][    T1]  __bio_queue_enter+0xc0/0x1cc
-[   13.760153][    T1]  blk_mq_submit_bio+0x884/0xadc
-[   13.760548][    T1]  __submit_bio+0x2c8/0x49c
-[   13.760879][    T1]  __submit_bio_noacct_mq+0x38/0x88
-[   13.761242][    T1]  submit_bio_noacct_nocheck+0x4fc/0x7b8
-[   13.761631][    T1]  submit_bio+0x214/0x4c0
-[   13.761941][    T1]  mpage_readahead+0x1b8/0x1fc
-[   13.762284][    T1]  blkdev_readahead+0x18/0x28
-[   13.762660][    T1]  page_cache_ra_unbounded+0x310/0x4d8
-[   13.763072][    T1]  page_cache_ra_order+0xc0/0x5b0
-[   13.763434][    T1]  page_cache_sync_ra+0x17c/0x268
-[   13.763782][    T1]  filemap_read+0x4c4/0x12f4
-[   13.764125][    T1]  blkdev_read_iter+0x100/0x164
-[   13.764475][    T1]  vfs_read+0x188/0x348
-[   13.764789][    T1]  __se_sys_pread64+0x84/0xc8
-[   13.765180][    T1]  __arm64_sys_pread64+0x1c/0x2c
-[   13.765556][    T1]  invoke_syscall+0x58/0xf0
-[   13.765876][    T1]  do_el0_svc+0x8c/0xe0
-[   13.766172][    T1]  el0_svc+0x50/0xd4
-[   13.766583][    T1]  el0t_64_sync_handler+0x20/0xf4
-[   13.766932][    T1]  el0t_64_sync+0x1bc/0x1c0
-[   13.767294][    T1] irq event stamp: 2589614
-[   13.767592][    T1] hardirqs last  enabled at (2589613):=20
-[<ffffffc0800eaf24>] finish_lock_switch+0x70/0x108
-[   13.768283][    T1] hardirqs last disabled at (2589614):=20
-[<ffffffc0814b66f4>] el1_dbg+0x24/0x80
-[   13.768875][    T1] softirqs last  enabled at (2589370):=20
-[<ffffffc080082a7c>] ____do_softirq+0x10/0x20
-[   13.769529][    T1] softirqs last disabled at (2589349):=20
-[<ffffffc080082a7c>] ____do_softirq+0x10/0x20
+[auto build test WARNING on mkp-scsi/for-next]
+[also build test WARNING on axboe/for-next jejb-scsi/for-next linus/master v6.18-rc7 next-20251126]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-I think that the filemap_invalidate_lock_shared() call in
-page_cache_ra_unbounded() forbids sleeping in submit_bio().
+url:    https://github.com/intel-lab-lkp/linux/commits/Stefan-Hajnoczi/scsi-sd-reject-invalid-pr_read_keys-num_keys-values/20251127-003756
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/mkp/scsi.git for-next
+patch link:    https://lore.kernel.org/r/20251126163600.583036-4-stefanha%40redhat.com
+patch subject: [PATCH 3/4] block: add IOC_PR_READ_KEYS ioctl
+config: loongarch-allnoconfig (https://download.01.org/0day-ci/archive/20251127/202511270125.CJ6M2RHv-lkp@intel.com/config)
+compiler: clang version 22.0.0git (https://github.com/llvm/llvm-project 9e9fe08b16ea2c4d9867fb4974edf2a3776d6ece)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251127/202511270125.CJ6M2RHv-lkp@intel.com/reproduce)
 
-Thanks,
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202511270125.CJ6M2RHv-lkp@intel.com/
 
-Bart.
+All warnings (new ones prefixed by >>):
 
+>> block/ioctl.c:443:21: warning: result of comparison of constant 2305843009213693951 with expression of type '__u32' (aka 'unsigned int') is always false [-Wtautological-constant-out-of-range-compare]
+     443 |         if (inout.num_keys > -sizeof(*keys_info) / sizeof(keys_info->keys[0]))
+         |             ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   1 warning generated.
+
+
+vim +443 block/ioctl.c
+
+   426	
+   427	static int blkdev_pr_read_keys(struct block_device *bdev, blk_mode_t mode,
+   428			struct pr_read_keys __user *arg)
+   429	{
+   430		const struct pr_ops *ops = bdev->bd_disk->fops->pr_ops;
+   431		struct pr_keys *keys_info __free(kfree) = NULL;
+   432		struct pr_read_keys inout;
+   433		int ret;
+   434	
+   435		if (!blkdev_pr_allowed(bdev, mode))
+   436			return -EPERM;
+   437		if (!ops || !ops->pr_read_keys)
+   438			return -EOPNOTSUPP;
+   439	
+   440		if (copy_from_user(&inout, arg, sizeof(inout)))
+   441			return -EFAULT;
+   442	
+ > 443		if (inout.num_keys > -sizeof(*keys_info) / sizeof(keys_info->keys[0]))
+   444			return -EINVAL;
+   445	
+   446		size_t keys_info_len = struct_size(keys_info, keys, inout.num_keys);
+   447	
+   448		keys_info = kzalloc(keys_info_len, GFP_KERNEL);
+   449		if (!keys_info)
+   450			return -ENOMEM;
+   451	
+   452		keys_info->num_keys = inout.num_keys;
+   453	
+   454		ret = ops->pr_read_keys(bdev, keys_info);
+   455		if (ret)
+   456			return ret;
+   457	
+   458		/* Copy out individual keys */
+   459		u64 __user *keys_ptr = u64_to_user_ptr(inout.keys_ptr);
+   460		u32 num_copy_keys = min(inout.num_keys, keys_info->num_keys);
+   461		size_t keys_copy_len = num_copy_keys * sizeof(keys_info->keys[0]);
+   462	
+   463		if (copy_to_user(keys_ptr, keys_info->keys, keys_copy_len))
+   464			return -EFAULT;
+   465	
+   466		/* Copy out the arg struct */
+   467		inout.generation = keys_info->generation;
+   468		inout.num_keys = keys_info->num_keys;
+   469	
+   470		if (copy_to_user(arg, &inout, sizeof(inout)))
+   471			return -EFAULT;
+   472		return ret;
+   473	}
+   474	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
