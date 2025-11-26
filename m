@@ -1,72 +1,98 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from gnu.wildebeest.org (gnu.wildebeest.org [45.83.234.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55A762FFDF3
-	for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 11:31:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7CF23246EA;
+	Wed, 26 Nov 2025 11:55:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.83.234.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764156686; cv=none; b=hYq6lkEVxkRpA62D4exE9W8aYnW392dH7uy4qjYUr01e8Ar+2PL24klSvNrCvPUp6RAZynrsflMEvi7VUgFWRosnRnnbVya4BVwPrHYSyc9LXac3/nHCGHXJQp6DzUbRHMDqaQkTDU8RJzzE9d41N+QtVoI+PzMEXM1GTxUNX6U=
+	t=1764158130; cv=none; b=RSz3LWXIpsp3Sqd9/hFSSai9Pat8HmJAgiOuSYORvG9BN1BeCv4njRw/2eKeVUq0EfUaz6O6wb6XVQH2oQ2hbXEn5jqzN1oPyaxFkfKjysiUuTkXuAVANT/Rf4AgwcKRNIMn+pzCwlnZQrQ7KjTmUUrt5DmNPk40h5vN/ozTblI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764156686; c=relaxed/simple;
-	bh=Fz1h1hp5wiEAzprxBqkpGc0mfgeBRwY4AooaFcWtZdE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uBpnzqzujGnvL+6dVFlda1zHSsPToCcY//Df2G++qukQGmVWJa7oN9mDU1yjWpKIT//Hc2ep5d5Wq8O7369SuJ1o+gcxQpRWe9JNhoRMuy60gRlufuLaVIsXkl6m1OFz01HWmi3sci0WbIyygIpQxqkGSAG6RgeldxbD9JzXAgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r4dH+6wh; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r4dH+6wh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 061FCC113D0
-	for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 11:31:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764156686;
-	bh=Fz1h1hp5wiEAzprxBqkpGc0mfgeBRwY4AooaFcWtZdE=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=r4dH+6whmnqjPY/raUy8dkW2z1k1Hb7NCCCCQagQOMECPPEwzF9//dUkY4T9T5Oto
-	 AZj4cJ67RGMCs0rdrMwOg6TPUD5HkMqbvCOIu4zcA4HQpB4OXqZj2Gr6Tq8Z9wyy0l
-	 VgAxn5s9wghVU2NJqnuuzAvTbnnRsLHKC69eXqRCYH20/MaZGViMkea/HwZ8CtioEH
-	 rbQOKT+hRF30/LOyy2OIeG5TzZG5Sj2IN/RRGX9v5RkAlgnMaWNS0WBgyDyjwRZeba
-	 uGCXd/E3tCN+FWyK9av9uoXcCVohUoZoDUF1noy0lHfQ5KUqxuZVKYAZuZtfsioSaW
-	 9KjAn1gSTwEPQ==
-Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-4510974a6bbso985267b6e.3
-        for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 03:31:26 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWLz6q2GUSSFZGNcabr9d3y1LJ3EQ9AKiCweyBpwajZJwhnuHh4rpZEAqDFYKIPpDfEaWsEOAo/oKYmzw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyRBVvbRjYHVcn4maDRV4LHbffOgacoi4jc9TRMEh9tmimjBEP+
-	1Bc70eZwzfEQT3FQQZJpkTnuQNEWmOeq1m0AU2Cjg+PjldpKvDtPpDKndlqw2OyKN4hAft28eWd
-	Fx9e/s+LUtHcPuMX3IYuDZO918uLgXjM=
-X-Google-Smtp-Source: AGHT+IE4NggPrXNFo2cmtQKshfyTQB3WRTZfkzjp3WItjLKG/5sjuYXyzLcfPNWXM2bsFcKp5sZ7PhDOEdS3KKSr8n8=
-X-Received: by 2002:a05:6808:c2d3:b0:450:125d:d9e with SMTP id
- 5614622812f47-451159c7a91mr6809637b6e.21.1764156685328; Wed, 26 Nov 2025
- 03:31:25 -0800 (PST)
+	s=arc-20240116; t=1764158130; c=relaxed/simple;
+	bh=mAzzMf4sOW+uxqfTrdpo0kgUwsdMto751Gn6hAWJ4A4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=vAf2k3u00NA55UntB1jaUS69H8rzSAifa/YfZ6JpKjDlLHxHX2ENgtJP7sxxNQurBMcNgyPr2/zP2OVojoEKjB5OBciVQqCWTeazDhPpjs/1sl3wKSjq7oSjBNmj8COHIa9cSXH0G5Q1NJQ7VMDWHyGIIsfBHRNBVWmfing3+kI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=klomp.org; spf=pass smtp.mailfrom=klomp.org; arc=none smtp.client-ip=45.83.234.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=klomp.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=klomp.org
+Received: by gnu.wildebeest.org (Postfix, from userid 1000)
+	id 7A09F3141369; Wed, 26 Nov 2025 12:47:23 +0100 (CET)
+Date: Wed, 26 Nov 2025 12:47:23 +0100
+From: Mark Wielaard <mark@klomp.org>
+To: strace development discussions <strace-devel@lists.strace.io>
+Cc: Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	Amir Goldstein <amir73il@gmail.com>, linux-fsdevel@vger.kernel.org,
+	Josef Bacik <josef@toxicpanda.com>,
+	Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>,
+	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>,
+	Lennart Poettering <mzxreary@0pointer.de>,
+	Daan De Meyer <daan.j.demeyer@gmail.com>,
+	Aleksa Sarai <cyphar@cyphar.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
+	netdev@vger.kernel.org, libc-alpha@sourceware.org,
+	"Dmitry V. Levin" <ldv@strace.io>,
+	address-sanitizer <address-sanitizer@googlegroups.com>
+Subject: Re: Stability of ioctl constants in the UAPI (Re: [PATCH 01/32]
+ pidfs: validate extensible ioctls)
+Message-ID: <20251126114723.GL11602@gnu.wildebeest.org>
+References: <20250910-work-namespace-v1-0-4dd56e7359d8@kernel.org>
+ <20250910-work-namespace-v1-1-4dd56e7359d8@kernel.org>
+ <lhu7bvd6u03.fsf_-_@oldenburg.str.redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251126101636.205505-1-yang.yang@vivo.com>
-In-Reply-To: <20251126101636.205505-1-yang.yang@vivo.com>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Wed, 26 Nov 2025 12:31:13 +0100
-X-Gmail-Original-Message-ID: <CAJZ5v0jsdsyVd3hPWni1Vj+daQS8PdWJCjboJHHHbBjBMeSxzg@mail.gmail.com>
-X-Gm-Features: AWmQ_bk0lkjd4wgJ4f1n4iXpMFQZ77WG6i-5RV0nYJqcwu3OGBKWxcMUjXu2F4s
-Message-ID: <CAJZ5v0jsdsyVd3hPWni1Vj+daQS8PdWJCjboJHHHbBjBMeSxzg@mail.gmail.com>
-Subject: Re: [PATCH 0/2] PM: runtime: Fix potential I/O hang
-To: Yang Yang <yang.yang@vivo.com>
-Cc: Jens Axboe <axboe@kernel.dk>, "Rafael J. Wysocki" <rafael@kernel.org>, Pavel Machek <pavel@kernel.org>, 
-	Len Brown <lenb@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Danilo Krummrich <dakr@kernel.org>, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-pm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <lhu7bvd6u03.fsf_-_@oldenburg.str.redhat.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On Wed, Nov 26, 2025 at 11:17=E2=80=AFAM Yang Yang <yang.yang@vivo.com> wro=
-te:
->
->
-> Yang Yang (2):
->   PM: runtime: Fix I/O hang due to race between resume and runtime
->     disable
->   blk-mq: Fix I/O hang caused by incomplete device resume
+Hi,
 
-This is a no-go as far as I'm concerned.
+On Wed, Nov 26, 2025 at 10:08:44AM +0100, Florian Weimer wrote:
+> Is this really the right direction?  This implies that the ioctl
+> constants change as the structs get extended.  At present, this impacts
+> struct pidfd_info and PIDFD_GET_INFO.
+> 
+> I think this is a deparature from the previous design, where (low-level)
+> userspace did not have not worry about the internal structure of ioctl
+> commands and could treat them as opaque bit patterns.  With the new
+> approach, we have to dissect some of the commands in the same way
+> extensible_ioctl_valid does it above.
+> 
+> So far, this impacts glibc ABI tests.  Looking at the strace sources, it
+> doesn't look to me as if the ioctl handler is prepared to deal with this
+> situation, either, because it uses the full ioctl command for lookups.
+> 
+> The sanitizers could implement generic ioctl checking with the embedded
+> size information in the ioctl command, but the current code structure is
+> not set up to handle this because it's indexed by the full ioctl
+> command, not the type.  I think in some cases, the size is required to
+> disambiguate ioctl commands because the type field is not unique across
+> devices.  In some cases, the sanitizers would have to know the exact
+> command (not just the size), to validate points embedded in the struct
+> passed to the ioctl.  So I don't think changing ioctl constants when
+> extensible structs change is obviously beneficial to the sanitizers,
+> either.
 
-Please address the issue differently.
+Same for valgrind memcheck handling of ioctls.
+
+> I would prefer if the ioctl commands could be frozen and decoupled from
+> the structs.  As far as I understand it, there is no requirement that
+> the embedded size matches what the kernel deals with.
+
+Yes please.
+
+Thanks,
+
+Mark
