@@ -1,162 +1,213 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E3CC315D2B
-	for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 09:09:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD1153054E9
+	for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 09:14:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764148150; cv=none; b=Re99YSuDjGfHSjWpnWNySxpG76BIMC5lICqArUtwKj6rkYIHzQVFAccFdhic//kuyy/2Pne9KrELsNq4wzOTj1NPzyLRqUE/fZlB9qxBmYJkCO+kQUCXfCOi/K4kwHr68IJFRECGcyoBRbK7+XOScMoszENpd6CX0jGkHxWaMCM=
+	t=1764148493; cv=none; b=jF1IIBm5jStGpweVGEe7+FNkJ7ZvVzbVVi9M8mAmC7suMwuTZ4XpaGDi92LKdcHzAf+/Kybzl6yQ2YsIz53bK9zfhUgQUXjWHN/MLD27PGjIemJf2xUmpdolyUDodJU2d80GZJDDdl3ZGsapM0+Oh9c3L7beHbi8fJiToqc5ChU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764148150; c=relaxed/simple;
-	bh=6w7rkWZMm2OzZs1d4tCa6J3Sjb91QF8PMCdGPkKWBoM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=LzLM42AJudto5xrfv4wIV/HgWobYY+S8HfJ9mu3yjvEFHSHaY6qev4/MahG/FAAV+doE59lRuGjdGNWTmtorePNA32Ikx4Re5o8xuCSZhV1KfRca1x5kRCrkgHvkxMM/XoSLPoO0z0hY9hLju6ScaHHlVXX/fpVdy1XHkjcKV08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Wqdxp7xy; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1764148493; c=relaxed/simple;
+	bh=C7u5TaIFYxCrpu4dYTWLHkvOWIUo764ll9nIVkmUeUE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MyPlY4I4GyZQ1PCIbXquBNa6c4QXPe6pNQRLrRBURR1UjAVKX4wBjEVkqNE3jm0n5+/w3J6IzKRdnqaQh9b6SzTJ2vZ1D0miyZ533clNnLzN4T1qfsONPqYfev5oXs/BgNyp8CIEl+7UydVdegiKk/VPH5N7SWYVWhZ4qqTObnU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Uy3BemnR; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wqdxp7xy"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764148146;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QioLbPIbEdhHQpe6rbAMDZ2orQalmMmfV24sYZuRkpM=;
-	b=Wqdxp7xy4+Os0DcgohpI+IhukFCTVK0rGUSvqVRv8BLZfeGpU1i2hwC0nxwc8i691Om1m3
-	eg4ZlyVYT/19A8sLOSA8frnM8WUQI2PujsyKTE+adOW1p/VLnmhuNNzWBbUv56UuoAzbwk
-	u6j6oFikFAVEHAwURFEXxQTAbz2j1KE=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-610-9NRKrjBsMOyjmcTaAx-1rg-1; Wed,
- 26 Nov 2025 04:09:02 -0500
-X-MC-Unique: 9NRKrjBsMOyjmcTaAx-1rg-1
-X-Mimecast-MFC-AGG-ID: 9NRKrjBsMOyjmcTaAx-1rg_1764148138
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 432561956096;
-	Wed, 26 Nov 2025 09:08:57 +0000 (UTC)
-Received: from fweimer-oldenburg.csb.redhat.com (unknown [10.44.32.146])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F32D63001E83;
-	Wed, 26 Nov 2025 09:08:46 +0000 (UTC)
-From: Florian Weimer <fweimer@redhat.com>
-To: Christian Brauner <brauner@kernel.org>
-Cc: Jan Kara <jack@suse.cz>,  Amir Goldstein <amir73il@gmail.com>,
- linux-fsdevel@vger.kernel.org,  Josef Bacik <josef@toxicpanda.com>,
- Jeff Layton <jlayton@kernel.org>,  Mike Yuan <me@yhndnzj.com>,
- Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>,
- Lennart Poettering <mzxreary@0pointer.de>,
- Daan De Meyer <daan.j.demeyer@gmail.com>,
- Aleksa Sarai <cyphar@cyphar.com>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Jens Axboe <axboe@kernel.dk>,  Tejun Heo <tj@kernel.org>,
- Johannes Weiner <hannes@cmpxchg.org>,
- Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>,  Eric Dumazet
- <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>,
- Chuck Lever <chuck.lever@oracle.com>,  linux-nfs@vger.kernel.org,
- linux-kselftest@vger.kernel.org,  linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org,  cgroups@vger.kernel.org,
- netdev@vger.kernel.org, libc-alpha@sourceware.org, Dmitry V. Levin
- <ldv@strace.io>, address-sanitizer <address-sanitizer@googlegroups.com>,
- strace-devel@lists.strace.io
-Subject: Stability of ioctl constants in the UAPI (Re: [PATCH 01/32] pidfs:
- validate extensible ioctls)
-In-Reply-To: <20250910-work-namespace-v1-1-4dd56e7359d8@kernel.org> (Christian
-	Brauner's message of "Wed, 10 Sep 2025 16:36:46 +0200")
-References: <20250910-work-namespace-v1-0-4dd56e7359d8@kernel.org>
-	<20250910-work-namespace-v1-1-4dd56e7359d8@kernel.org>
-Date: Wed, 26 Nov 2025 10:08:44 +0100
-Message-ID: <lhu7bvd6u03.fsf_-_@oldenburg.str.redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Uy3BemnR"
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-794e300e20dso374713b3a.1
+        for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 01:14:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764148491; x=1764753291; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=FsAxxdgt6IXuSxrdWBozCg8XdMM7lBgDlsl70F68Y1Y=;
+        b=Uy3BemnRhp93t3By2uJPWoAgD4iwm0ztHeTg4uNKLR3KLhfWjKaxtuEssCd6b9jHxl
+         uXBlDm+ZEQtwbfCbhQvjfMa0MDuCJIXuJtLE3CYojhDjeX4p+TI+1Uav2gJT03IulEo7
+         0lzeFgZFnKaq7Rf4+paJpbtf5S2NdewY5c6CIOnGWvluHH7E6rXjdFlXhK5peRtQWusR
+         ylsf9OV3RlQZP5QOogfiPyaRy9nv8QS6vtggDEQIEtzNPDQMb8lCfaEAHlCvjFxV5UVy
+         3AgRdbDazMiOxW/6G8mp420ryyFaWm0bxhmMeu3XGNREY/VXZkTZEJYHeCt+aQTDA/6Q
+         g+nw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764148491; x=1764753291;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FsAxxdgt6IXuSxrdWBozCg8XdMM7lBgDlsl70F68Y1Y=;
+        b=wTPUkNphc+LzDSdFotaQpHFgEvMyXZ02vKXjTKTdNffsXs167xbtXyvmGwu5D6jmL1
+         dNt7SljxqSX8ZKpNZqxm0fR+oWGYRibUrSLza9EGOGmpMwJSOXKgg8715p7CS5lBoMHZ
+         DsQLeGynEJYSqT1pXKYDCAzt8tZn3XDovlmxz6xHdSHzCipCCu3bNaZcGVGhsYNgYy/8
+         OllrxP6fB9h7TMOOyajftt6fFQVAgzNLfqb7V+DHQNT99OuW5jTenpdjEZ65AtB9milA
+         Y7TnxJMx2UabaA4T5iNOnntSwYivTgSrLzr7DL2bAXT5cdoUvPdn1dV7RnAg5XATQiYc
+         5l4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUEhIlo9g+RrVkmTf+vqjsaZjcQFQHnY+LJcDMbc5WhomMFZa8ocjSqWyaVvfh2HiHNrt5DaKImJBy9uQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwgO5rjI+8Cjr9EOtXXb5/IDUsiRK0xEJGnTI4ijPZBUzMGe4K/
+	UZT9L1edq+SjthsRy2tO27nfeZV5jfFvmivH8BhaFrs3RoXKKH2RSjuS
+X-Gm-Gg: ASbGncuueqedpMNUoSwyxRkgHdYv2zWMFglHVYIeVMWBD3IFWhRLNF44t69mnkigDHE
+	HCIEOGBOucl01ZB6ypuuATB3vJ/0cp4tpIS4hbt4+ANWSX7jMIqiMHsO6ZqKMtPPI8YnmnM84Uj
+	AiUHvg8rFxgp4qiCOi+rcgIrA2ZqFrseqzJJSVtamXwAB78rgLKF22tIeV4djBTsi1qTKVQmajo
+	JXNG3pfkawpUZlOHbbanOz0dAvFQFKpkwcdeygZxRqwqYwS5ikNeAJTkE6KZcMpomVHofQgLHi3
+	KrxkvSxdEI7cs1aYux6BGfQ861x8lUVXloFycFVWDI0HkRArjerBvlVqi6/ya7US4qEhteluisW
+	9EoAEgPyrDkd/KmNaXs6uuCFEtejA9IY/sXzHPNv7gDt30nWDjuagEFer8Xu6VYNBLiR/ha3wBQ
+	OLIIt8A74Gezwj0LrbKWi8AZNnPQm2Ug==
+X-Google-Smtp-Source: AGHT+IGT8gd70TCQi63rsPWx+UIJ4mcNla5iKtS6p8pWOc51DUh5MCPHup9N3N3lGRYqyvIBZTUYDg==
+X-Received: by 2002:a05:6a20:a114:b0:342:fa5:8b20 with SMTP id adf61e73a8af0-3614f5aec2cmr19183971637.30.1764148490926;
+        Wed, 26 Nov 2025 01:14:50 -0800 (PST)
+Received: from [10.189.138.37] ([43.224.245.241])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7c3ecf7d849sm20690335b3a.14.2025.11.26.01.14.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 26 Nov 2025 01:14:50 -0800 (PST)
+Message-ID: <2da95607-9b21-4d21-8926-9463021a6f33@gmail.com>
+Date: Wed, 26 Nov 2025 17:14:44 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+User-Agent: Mozilla Thunderbird
+Subject: Re: [f2fs-dev] [PATCH V3 6/6] xfs: ignore discard return value
+To: Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+ Yongpeng Yang <yangyongpeng.storage@gmail.com>,
+ Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
+ "axboe@kernel.dk" <axboe@kernel.dk>, "agk@redhat.com" <agk@redhat.com>,
+ "snitzer@kernel.org" <snitzer@kernel.org>,
+ "mpatocka@redhat.com" <mpatocka@redhat.com>,
+ "song@kernel.org" <song@kernel.org>, "yukuai@fnnas.com" <yukuai@fnnas.com>,
+ "hch@lst.de" <hch@lst.de>, "sagi@grimberg.me" <sagi@grimberg.me>,
+ "jaegeuk@kernel.org" <jaegeuk@kernel.org>, "chao@kernel.org"
+ <chao@kernel.org>, "cem@kernel.org" <cem@kernel.org>
+Cc: "dm-devel@lists.linux.dev" <dm-devel@lists.linux.dev>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+ Yongpeng Yang <yangyongpeng@xiaomi.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ "linux-f2fs-devel@lists.sourceforge.net"
+ <linux-f2fs-devel@lists.sourceforge.net>,
+ "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+ "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>
+References: <20251124234806.75216-1-ckulkarnilinux@gmail.com>
+ <20251124234806.75216-7-ckulkarnilinux@gmail.com>
+ <b18c489f-d6ee-4986-94be-a9aade7d3a47@gmail.com>
+ <218f0cd0-61bf-4afa-afb0-a559cd085d4a@nvidia.com>
+Content-Language: en-US
+From: Yongpeng Yang <yangyongpeng.storage@gmail.com>
+In-Reply-To: <218f0cd0-61bf-4afa-afb0-a559cd085d4a@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-* Christian Brauner:
+On 11/26/25 16:07, Chaitanya Kulkarni via Linux-f2fs-devel wrote:
+> On 11/25/25 18:37, Yongpeng Yang wrote:
+>>> diff --git a/fs/xfs/xfs_discard.c b/fs/xfs/xfs_discard.c
+>>> index 6917de832191..b6ffe4807a11 100644
+>>> --- a/fs/xfs/xfs_discard.c
+>>> +++ b/fs/xfs/xfs_discard.c
+>>> @@ -108,7 +108,7 @@ xfs_discard_endio(
+>>>     * list. We plug and chain the bios so that we only need a single
+>>> completion
+>>>     * call to clear all the busy extents once the discards are complete.
+>>>     */
+>>> -int
+>>> +void
+>>>    xfs_discard_extents(
+>>>        struct xfs_mount    *mp,
+>>>        struct xfs_busy_extents    *extents)
+>>> @@ -116,7 +116,6 @@ xfs_discard_extents(
+>>>        struct xfs_extent_busy    *busyp;
+>>>        struct bio        *bio = NULL;
+>>>        struct blk_plug        plug;
+>>> -    int            error = 0;
+>>>          blk_start_plug(&plug);
+>>>        list_for_each_entry(busyp, &extents->extent_list, list) {
+>>> @@ -126,18 +125,10 @@ xfs_discard_extents(
+>>>              trace_xfs_discard_extent(xg, busyp->bno, busyp->length);
+>>>    -        error = __blkdev_issue_discard(btp->bt_bdev,
+>>> +        __blkdev_issue_discard(btp->bt_bdev,
+>>>                    xfs_gbno_to_daddr(xg, busyp->bno),
+>>>                    XFS_FSB_TO_BB(mp, busyp->length),
+>>>                    GFP_KERNEL, &bio);
+>>
+>> If blk_alloc_discard_bio() fails to allocate a bio inside
+>> __blkdev_issue_discard(), this may lead to an invalid loop in
+>> list_for_each_entry{}. Instead of using __blkdev_issue_discard(), how
+>> about allocate and submit the discard bios explicitly in
+>> list_for_each_entry{}?
+>>
+>> Yongpeng,
+> 
+> 
+> Calling __blkdev_issue_discard() keeps managing all the bio with the
+> appropriate GFP mask, so the semantics stay the same. You are just
+> moving memory allocation to the caller and potentially looking at
+> implementing retry on bio allocation failure.
+> 
+> The retry for discard bio memory allocation is not desired I think,
+> since it's only a hint to the controller.
 
-> Validate extensible ioctls stricter than we do now.
->
-> Signed-off-by: Christian Brauner <brauner@kernel.org>
-> ---
->  fs/pidfs.c         |  2 +-
->  include/linux/fs.h | 14 ++++++++++++++
->  2 files changed, 15 insertions(+), 1 deletion(-)
->
-> diff --git a/fs/pidfs.c b/fs/pidfs.c
-> index edc35522d75c..0a5083b9cce5 100644
-> --- a/fs/pidfs.c
-> +++ b/fs/pidfs.c
-> @@ -440,7 +440,7 @@ static bool pidfs_ioctl_valid(unsigned int cmd)
->  		 * erronously mistook the file descriptor for a pidfd.
->  		 * This is not perfect but will catch most cases.
->  		 */
-> -		return (_IOC_TYPE(cmd) == _IOC_TYPE(PIDFD_GET_INFO));
-> +		return extensible_ioctl_valid(cmd, PIDFD_GET_INFO, PIDFD_INFO_SIZE_VER0);
->  	}
->  
->  	return false;
-> diff --git a/include/linux/fs.h b/include/linux/fs.h
-> index d7ab4f96d705..2f2edc53bf3c 100644
-> --- a/include/linux/fs.h
-> +++ b/include/linux/fs.h
-> @@ -4023,4 +4023,18 @@ static inline bool vfs_empty_path(int dfd, const char __user *path)
->  
->  int generic_atomic_write_valid(struct kiocb *iocb, struct iov_iter *iter);
->  
-> +static inline bool extensible_ioctl_valid(unsigned int cmd_a,
-> +					  unsigned int cmd_b, size_t min_size)
-> +{
-> +	if (_IOC_DIR(cmd_a) != _IOC_DIR(cmd_b))
-> +		return false;
-> +	if (_IOC_TYPE(cmd_a) != _IOC_TYPE(cmd_b))
-> +		return false;
-> +	if (_IOC_NR(cmd_a) != _IOC_NR(cmd_b))
-> +		return false;
-> +	if (_IOC_SIZE(cmd_a) < min_size)
-> +		return false;
-> +	return true;
-> +}
-> +
->  #endif /* _LINUX_FS_H */
+Agreed. I'm not trying to retry bio allocation inside the
+list_for_each_entry{} loop. Instead, since blk_alloc_discard_bio()
+returning NULL cannot reliably indicate whether the failure is due to
+bio allocation failure, it could also be caused by 'bio_sects == 0', I'd
+like to allocate the bio explicitly.
 
-Is this really the right direction?  This implies that the ioctl
-constants change as the structs get extended.  At present, this impacts
-struct pidfd_info and PIDFD_GET_INFO.
+> 
+> This patch is simply cleaning up dead error-handling branches at the
+> callers no behavioral changes intended.
+> 
+> What maybe useful is to stop iterating once we fail to allocate the
+> bio [1].
+> 
+> -ck
+> 
+> [1] Potential addition on the top of this to exit early in discard loop
+>       on bio allocation failure.
+> 
+> diff --git a/fs/xfs/xfs_discard.c b/fs/xfs/xfs_discard.c
+> index b6ffe4807a11..1519f708bb79 100644
+> --- a/fs/xfs/xfs_discard.c
+> +++ b/fs/xfs/xfs_discard.c
+> @@ -129,6 +129,13 @@ xfs_discard_extents(
+>                                   xfs_gbno_to_daddr(xg, busyp->bno),
+>                                   XFS_FSB_TO_BB(mp, busyp->length),
+>                                   GFP_KERNEL, &bio);
+> +               /*
+> +                * We failed to allocate bio instead of continuing the loop
+> +                * so it will lead to inconsistent discards to the disk
+> +                * exit early and jump into xfs_discard_busy_clear().
+> +                */
+> +               if (!bio)
+> +                       break;
 
-I think this is a deparature from the previous design, where (low-level)
-userspace did not have not worry about the internal structure of ioctl
-commands and could treat them as opaque bit patterns.  With the new
-approach, we have to dissect some of the commands in the same way
-extensible_ioctl_valid does it above.
+I noticed that as long as XFS_FSB_TO_BB(mp, busyp->length) is greater
+than 0 and there is no bio allocation failure, __blkdev_issue_discard()
+will never return NULL. I'm not familiar with this part of the xfs, so
+I'm not sure whether there are cases where 'XFS_FSB_TO_BB(mp,
+busyp->length)' could be 0. If such cases do not exist, then
+checking whether the bio is NULL should be sufficient.
 
-So far, this impacts glibc ABI tests.  Looking at the strace sources, it
-doesn't look to me as if the ioctl handler is prepared to deal with this
-situation, either, because it uses the full ioctl command for lookups.
+Yongpeng,
 
-The sanitizers could implement generic ioctl checking with the embedded
-size information in the ioctl command, but the current code structure is
-not set up to handle this because it's indexed by the full ioctl
-command, not the type.  I think in some cases, the size is required to
-disambiguate ioctl commands because the type field is not unique across
-devices.  In some cases, the sanitizers would have to know the exact
-command (not just the size), to validate points embedded in the struct
-passed to the ioctl.  So I don't think changing ioctl constants when
-extensible structs change is obviously beneficial to the sanitizers,
-either.
+>           }
+>    
+>           if (bio) {
+> > If we keep looping after the first bio == NULL, the rest of the range is
+> guaranteed to be inconsistent anyways, because every subsequent iteration
+> will fall into one of three cases:
+> 
+> - The allocator keeps returning NULL, so none of the remaining LBAs receive
+>     discard.
+> - Rest of the allocator succeeds, but we’ve already skipped a chunk, leaving
+>     a hole in the discard range.
+> - We get intermittent successes, which produces alternating chunks of
+>     discarded and undiscarded blocks.
+> 
+> In each of those scenarios, the disk ends up with a partially discarded
+> range, so the correct fix is to break out of the loop immediately and
+> proceed to xfs_discard_busy_clear() once the very first allocation fails.
 
-I would prefer if the ioctl commands could be frozen and decoupled from
-the structs.  As far as I understand it, there is no requirement that
-the embedded size matches what the kernel deals with.
-
-Thanks,
-Florian
 
