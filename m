@@ -1,105 +1,102 @@
-Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E667232395
-	for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 20:32:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3FA545BE3;
+	Wed, 26 Nov 2025 21:10:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764189182; cv=none; b=lArcPBJffkxFhmNpAe+STMHY90+EYPDD0UGtCxU+GnbhfgrjesQWfaHIdIdJQlpGgUGa+l1i3N0msXXYbz9JbqSgFMd2wxcqKK1B0AyPziqQ81wP3fZn+a+J7ijf9/HP6j/BosMJVd6PvDfhdwnx1zDQt9L5M8ZOcv/5RrLsaOc=
+	t=1764191461; cv=none; b=m9f8DNM49JtKCjwEC/rCVf2oNYye5soxPkWo4aXD0KYYNSkn5UFdCQgJNvTPn5nvUC/8sz8LSczjgFW6ffJ/aPapnCgdiyLP1paG8wqkWgiCKZFyXLPnhebJB1g/tugnZEyqGWHV/jGc5ZomBfbV/74QfgP5Q0qG99Vu3zI8d9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764189182; c=relaxed/simple;
-	bh=Ta0Z6ecZ1xEpHRI8AxdSApMBFh5bPltks5hMVeQPQC8=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=G7raBd1nIUKm5oLQX7h30NvVCUBxHjpSOMiFVSjr+tBniunDjWiNIfePvbww4sQVwamcgTNDj7IsjAR3KgyQVsBtFUj8RNZIEJiJjD+ANArvTk0YAIhm9f7ws8sDVd/PMtzynLTXIY5rb3wBOwKvzRL2okWtwKItGkLIqWmPHwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=qUBmE0JE; arc=none smtp.client-ip=209.85.166.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1764191461; c=relaxed/simple;
+	bh=6jZ2UjY6CdyDRO7VbKwwRYo8BI5Ykkbi3FfuqFwAO4E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ji/T6ZvngUOlAqzQvWOPs38kxqncUhwANPPNDJ3mDX2JpOhev1AshARx7vAKHQqIRc2VcbbjNoWhZjR317ZU3V5fbSZUFUuGfJPJbfHB3kmVrdxkqsoWK1WWAnTET3nrFhg03E3XTNoF0Fvt1PY7/1VGS839Jgxf1LfKz28DClc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=ZaXwlZd0; arc=none smtp.client-ip=199.89.3.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="qUBmE0JE"
-Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-9486354dcb2so7393339f.3
-        for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 12:32:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1764189179; x=1764793979; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mvbLU2KxSL+PVmyfGbl6AHNj5wIoRz/QnY/WOuyHFnk=;
-        b=qUBmE0JEqMFNqMV3bE3gL+HxLp9nIj1FNqk6SUfj22EZIbbRxvORuQbCbhpyLP5kjO
-         SDruFXJkdCgKXBUCjZF+H/bXaHLeOjtqvI7YNNfThLBIZ8J4B1+XmdBl0mqdH1f8YxDA
-         ZVCLWk6QaClRV8GvE0Jv+SYCCk8QAO13x0gq3m32RzLYoyNpJiBu7BoQ/dNezPI91jc7
-         3Sco6CGDo9mtShd6JFni43Wy7EyaYscsvUVM+Obqur3XhL4MR0P0lCiq98Vls8/JS+CJ
-         xwqLhyp+SNnIhR5PqLH0p2gY3SiBp8Cpz54thYmyXwUqyU+snmPjD2E2o6pYGU+s+/ex
-         Z97A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764189179; x=1764793979;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=mvbLU2KxSL+PVmyfGbl6AHNj5wIoRz/QnY/WOuyHFnk=;
-        b=GicRKIAxYf0l9tX9OVI8sJlyBpxi2iuQ+cYGWmOgcXNfvVUSJYcaoxVJQjZrKTAPIC
-         G7Uq7A9sGiEuEctoXGTNdfk/XHaldCEGi2vxpO9tUWfViNeI8JDN6XOIZm+bYIOph/DU
-         l913YG7MAtzgqLNsuKyCz4mKneTD71W0JUQ+SrqFvv/3fZnNZVCDdjRSk8f0wH8nZANi
-         8fimGT0hqvanPlhWZRzuFlsvO57t7dSBmVhNweH4qJa+Jlk9nPbot5t6ZnlDu3nG8wMr
-         iyZbxrOKhgQfKyLr7xSwE2jDehV0W7tPazazaA/zuE7olIKcLOTfJ1CAyNhFBzvkYK/I
-         KHlw==
-X-Gm-Message-State: AOJu0Yx8ZzK3v4oTO2j2vTnX7ttNNHiw6yaJ0q3ds3sAFUKei1Y9cX/k
-	Pjr4E/1i+pr4jL51+3MSXCSH8CadJhPYq5bwl2iS5xPL+13KvQDcWJGAYxmKgDg7haQ=
-X-Gm-Gg: ASbGnctnAyKN1NpArLCXJg2+1ywzJIdjZJDVGRySGvsBcJ0e+FjfKXpV4+dMdHMnt9W
-	G6aUl8Q575kyaj6zr98epLHLMD8vXA43WM3+02phfM8qUZ5CO/pIuc9iQ4KZ5mAK8ue/mmB28nb
-	IpOr7WcKjPMB31zCHephrJTB6E6W+Nzx8aAw1W9T4W6t8gfId6tVO2dyqgRyAItShz/yIOBRrES
-	UHxrZwFhnXydpOS6Ih5Fq6eCyt6vx7w0heCPYIk9wA7YFxT61FlxjT9FG5TyGAlucZH45XmzeWx
-	pZufbrdBJJhsJ7iBTU5gzEDG/Zb+9FLPBp5I1vGIjn57NYI1OtRVv4NrzxUYMyKRBFGhpQgfQ+h
-	HvGNrMbthuVd2SLPU7e2zwPuA0JKKX7Zu0LOONwMACyO/gVWLeopvPRITVIcsQIW6R961KbGzRE
-	sXIg==
-X-Google-Smtp-Source: AGHT+IGxqTDO11S7cEKz6FB96hhQqVC8TnmsZcNrAUt65WKunZ+dWDgHj7t2MvpitI0d2AW43rZKYg==
-X-Received: by 2002:a6b:580c:0:b0:93f:fc9a:ef0f with SMTP id ca18e2360f4ac-949473f5f17mr1500397639f.2.1764189178708;
-        Wed, 26 Nov 2025 12:32:58 -0800 (PST)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-949386d8f05sm765869439f.19.2025.11.26.12.32.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Nov 2025 12:32:58 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Kevin Brodsky <kevin.brodsky@arm.com>
-Cc: linux-kernel@vger.kernel.org, Ali Utku Selen <ali.utku.selen@arm.com>, 
- Ming Lei <ming.lei@redhat.com>
-In-Reply-To: <20251126124835.1132852-1-kevin.brodsky@arm.com>
-References: <20251126124835.1132852-1-kevin.brodsky@arm.com>
-Subject: Re: [PATCH] ublk: prevent invalid access with DEBUG
-Message-Id: <176418917794.112345.305526865203772039.b4-ty@kernel.dk>
-Date: Wed, 26 Nov 2025 13:32:57 -0700
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="ZaXwlZd0"
+Received: from localhost (localhost [127.0.0.1])
+	by 004.mia.mailroute.net (Postfix) with ESMTP id 4dGsfp3j70zm1LJR;
+	Wed, 26 Nov 2025 21:10:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1764191456; x=1766783457; bh=4eKSvwSTrdgaIITxMvr6DUjr
+	XDaM2duNCkPlaoOCYGY=; b=ZaXwlZd054vlfSvNYjBeQptiLli1Vfwej8e3bG6O
+	rQkceSJwlfKPO1swHq1S/2+jqP9Y+xItGO4V/JyJQF+e2Ei6cSiCrwHUE3/u91HA
+	agx/q3s3mdJIm7arzU4DJUPnhc85Z93B4QC97wQkqi/5NMkosyI2thEuqxrcRTlb
+	zW36G5MrBGDGJy+oALaS2eRTGe7AisozJv/pNxguZ/stHoMQtsr9ZijagFDXQJ6Z
+	eZ/KX6KLhpYVpgjPjGI/1lNx1aGdqVD3OlKtFeX6rTH6ZmgNU80B6k3eg//NNekR
+	JB7S9hzxEvPLeQwgYB2kR7CNQy08lEVK1AU8fqyS+qyysg==
+X-Virus-Scanned: by MailRoute
+Received: from 004.mia.mailroute.net ([127.0.0.1])
+ by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id yk1xAddWqc_q; Wed, 26 Nov 2025 21:10:56 +0000 (UTC)
+Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4dGsfc13QMzm0N9y;
+	Wed, 26 Nov 2025 21:10:47 +0000 (UTC)
+Message-ID: <dc4dba4f-8334-40ea-8c53-6e8d135f1d41@acm.org>
+Date: Wed, 26 Nov 2025 13:10:46 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] PM: runtime: Fix I/O hang due to race between resume
+ and runtime disable
+To: "Rafael J. Wysocki" <rafael@kernel.org>
+Cc: Yang Yang <yang.yang@vivo.com>, Jens Axboe <axboe@kernel.dk>,
+ Pavel Machek <pavel@kernel.org>, Len Brown <lenb@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Danilo Krummrich <dakr@kernel.org>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org
+References: <20251126101636.205505-1-yang.yang@vivo.com>
+ <CAJZ5v0jiLAgHCQ51cYqUX-xjir7ooAC3xKH9wMbwrebOEuxFdw@mail.gmail.com>
+ <CAJZ5v0hKpGbwFmxcH8qe=DPf_5GX=LD=Fqj3dgOApUoE1RmJAQ@mail.gmail.com>
+ <4697314.LvFx2qVVIh@rafael.j.wysocki>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <4697314.LvFx2qVVIh@rafael.j.wysocki>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
 
+On 11/26/25 12:17 PM, Rafael J. Wysocki wrote:
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -309,6 +309,8 @@ int blk_queue_enter(struct request_queue
+>   		if (flags & BLK_MQ_REQ_NOWAIT)
+>   			return -EAGAIN;
+>   
+> +		/* if necessary, resume .dev (assume success). */
+> +		blk_pm_resume_queue(pm, q);
+>   		/*
+>   		 * read pair of barrier in blk_freeze_queue_start(), we need to
+>   		 * order reading __PERCPU_REF_DEAD flag of .q_usage_counter and
 
-On Wed, 26 Nov 2025 12:48:35 +0000, Kevin Brodsky wrote:
-> ublk_ch_uring_cmd_local() may jump to the out label before
-> initialising the io pointer. This will cause trouble if DEBUG is
-> defined, because the pr_devel() call dereferences io. Clang reports:
-> 
-> drivers/block/ublk_drv.c:2403:6: error: variable 'io' is used uninitialized whenever 'if' condition is true [-Werror,-Wsometimes-uninitialized]
->  2403 |         if (tag >= ub->dev_info.queue_depth)
->       |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> drivers/block/ublk_drv.c:2492:32: note: uninitialized use occurs here
->  2492 |                         __func__, cmd_op, tag, ret, io->flags);
->       |
-> 
-> [...]
+blk_queue_enter() may be called from the suspend path so I don't think
+that the above change will work. As an example, the UFS driver submits a
+SCSI START STOP UNIT command from its runtime suspend callback. The call
+chain is as follows:
 
-Applied, thanks!
+   ufshcd_wl_runtime_suspend()
+     __ufshcd_wl_suspend()
+       ufshcd_set_dev_pwr_mode()
+         ufshcd_execute_start_stop()
+           scsi_execute_cmd()
+             scsi_alloc_request()
+               blk_queue_enter()
+             blk_execute_rq()
+             blk_mq_free_request()
+               blk_queue_exit()
 
-[1/1] ublk: prevent invalid access with DEBUG
-      (no commit info)
+Thanks,
 
-Best regards,
--- 
-Jens Axboe
-
-
-
+Bart.
