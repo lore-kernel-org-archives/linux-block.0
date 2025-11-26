@@ -1,158 +1,86 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25DF730B51A;
-	Wed, 26 Nov 2025 18:07:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40B64286400;
+	Wed, 26 Nov 2025 18:40:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764180438; cv=none; b=luJtC5/hJPGIaqCyQPmBfZ8wNJtr4Qh4vFvZqVPcSjIXDRw5aytW102mx56mH972WctGJQWRX7vox8udiSIjQbYyfbCj0YEF9iz7+juYphh/96PzstXChCkWf7yLtCKPcr7CO7PkG83cjKdyu3qWWfUCnsWnxg4g9QzzPL4aTL4=
+	t=1764182457; cv=none; b=dT36aaLWqiXy8VDyekQDtPdzVY0V5wdTCt1O40YSsxEMXlowBdd2TBwMBNVh0SRPZn+6yLYiLiQcfIYUF+qjCsb6xVFPu08MslHA3m/f2Hw3hZKpIc+EDGLJDLbAzK0Zc8gvuCP/FlSsyV4U7uhuwwuwFyvqnNK3T7fjU7j5w74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764180438; c=relaxed/simple;
-	bh=ZxPVD2OX+mWyP8KER+7TTW6fM/MAUm90+J80CBazzDI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u2SGUBTA1XE0adApFPeGcdXgguylhF5AxGm+C81AsYj74koMftHPGPcXH5x0SL9pPf8sz8dOgiUHOnWvTzIsxn5siJXoEVZTK4PelApAPmwrhr1S4FXHeubh7A91sXKD0h8ScW6dWTMi2jGAMbAFnSEqvosfGliDvqoxFx6UEGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Vhf2rmyr; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1764182457; c=relaxed/simple;
+	bh=5jLS1N/2ywUk86CuNRXBOI15IpbaXR6QtQfFQQBoXog=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lxEk23ccf3SMLQ3bqFpGgqD0C5jbQ0NU2jwllFcNrVNbqXylY0J7CfQD6F9iHFxzzNjAsLb16/InYoFwkrt8MFug+dVSnGkCOHUSDgYa/C1uB4rIe43gdUTdaYlDiYY3FV4fKBFTf0AezTulanyruty3Z4mDHkll16rSLBKq7lg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=WtE9dbTf; arc=none smtp.client-ip=199.89.3.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Vhf2rmyr"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764180437; x=1795716437;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ZxPVD2OX+mWyP8KER+7TTW6fM/MAUm90+J80CBazzDI=;
-  b=Vhf2rmyrw0q9mxSzAZyQEIfuFAIJ7eUjXrf5hK7p7d3EB0Mm96DI/X9+
-   vJXYltRIkGZuaqArSYGDyfMsQHkryuEnj/v6yuqn4WU8cFwSiB/f4GdGQ
-   UkZKprLancr8RiH1YknZgWOoXjgtNy4nZKPCkEMULsGg3OcxYw3RvBZh9
-   QSeM0FNxpl9XnKwVK693HcwP/2tZ4thOnqUroqEyZc0upRuOIxBUvCTxB
-   LEFv8QHnNUmqLLzOe7WsZTW798Rn0gbwiQcoFCmpscWmiK9YNCI1i6jPk
-   Z1xYZysDqzfOCyhLrpCHBT3HSVjEJdL+G/pYkoO0oTbuIwLjE4DyAbY9x
-   A==;
-X-CSE-ConnectionGUID: vDADToWTSwCG7L8ixFjIlQ==
-X-CSE-MsgGUID: mWdWA913QiWU7p1FzedRHw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11625"; a="65412766"
-X-IronPort-AV: E=Sophos;i="6.20,229,1758610800"; 
-   d="scan'208";a="65412766"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2025 10:07:16 -0800
-X-CSE-ConnectionGUID: k/fLjEWGQQq0kjdeccpQHA==
-X-CSE-MsgGUID: 1Ys4OkOBRJ2TYAKR0MgXIg==
-X-ExtLoop1: 1
-Received: from lkp-server01.sh.intel.com (HELO 4664bbef4914) ([10.239.97.150])
-  by fmviesa003.fm.intel.com with ESMTP; 26 Nov 2025 10:07:13 -0800
-Received: from kbuild by 4664bbef4914 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vOJv5-000000003Dx-1cf2;
-	Wed, 26 Nov 2025 18:07:11 +0000
-Date: Thu, 27 Nov 2025 02:06:52 +0800
-From: kernel test robot <lkp@intel.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, linux-block@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-kernel@vger.kernel.org,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	Mike Christie <michael.christie@oracle.com>,
-	Jens Axboe <axboe@kernel.dk>, linux-nvme@lists.infradead.org,
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	linux-scsi@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-	Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH 3/4] block: add IOC_PR_READ_KEYS ioctl
-Message-ID: <202511270125.CJ6M2RHv-lkp@intel.com>
-References: <20251126163600.583036-4-stefanha@redhat.com>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="WtE9dbTf"
+Received: from localhost (localhost [127.0.0.1])
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4dGpKf1xmzzlgqjY;
+	Wed, 26 Nov 2025 18:40:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1764182452; x=1766774453; bh=LBr/H9thucmkz+XG3TYqhVuu
+	Nh3PUalzinUiqZMAjPU=; b=WtE9dbTfZj+tkEHajz+1hPmAZfFx2vNNJ72XGaSN
+	NjVFi8BTCAgQ5yl0xzTob95FArYB9uOaqxJ17EDYX+28tlJbtoNr2FvyB0LHISzo
+	G7Pb+561nDvAWKUuKViFIuPxtVFm+r/C8c17f056d1UbPSgdvMuwYXM3JFDsBiF9
+	jFux+xO/eXtEq/J3jbVA/6huZ3suPtzTnOM8VDd8XDt1O/6AalW6Cw3uRzIAu7oZ
+	FyhMLhur+7ej4E3Gleb/ez13wIbwiOrh2NNX13c6+8BIZSuIsEpDvTL7RXtVcGtk
+	7s3jDArioqd75tu9PIY/wBrhR0F4tpFoSSv3NgyK4IPc+g==
+X-Virus-Scanned: by MailRoute
+Received: from 003.mia.mailroute.net ([127.0.0.1])
+ by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id IIEdmQhFngAr; Wed, 26 Nov 2025 18:40:52 +0000 (UTC)
+Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4dGpKJ3xFzzlgqjQ;
+	Wed, 26 Nov 2025 18:40:35 +0000 (UTC)
+Message-ID: <6df79ec0-f5b3-4d75-95b1-03e488d45e7f@acm.org>
+Date: Wed, 26 Nov 2025 10:40:34 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251126163600.583036-4-stefanha@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] PM: runtime: Fix I/O hang due to race between resume
+ and runtime disable
+To: "Rafael J. Wysocki" <rafael@kernel.org>
+Cc: YangYang <yang.yang@vivo.com>, Jens Axboe <axboe@kernel.dk>,
+ Pavel Machek <pavel@kernel.org>, Len Brown <lenb@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Danilo Krummrich <dakr@kernel.org>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org
+References: <20251126101636.205505-1-yang.yang@vivo.com>
+ <20251126101636.205505-2-yang.yang@vivo.com>
+ <CAJZ5v0i1YLiri9oiiq2W6_KSbqGuWOqdrMPrOf=do-DdW=_rfA@mail.gmail.com>
+ <1a2d2059-0548-4c5f-a986-5081447c3325@vivo.com>
+ <CAJZ5v0iSgrLzsjh+bvF2=rxxhYcBetJ6V-joWaQud4ahkm1GkQ@mail.gmail.com>
+ <9b6e7d55-6a1f-490e-98c7-3c04f85f7444@acm.org>
+ <CAJZ5v0hJw0WdHpqgUc5bz5qCSUNNKHg7i5-sNYeZcDYwRj21qw@mail.gmail.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <CAJZ5v0hJw0WdHpqgUc5bz5qCSUNNKHg7i5-sNYeZcDYwRj21qw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Stefan,
+On 11/26/25 7:41 AM, Rafael J. Wysocki wrote:
+> As it stands, you have a basic problem with respect to system
+> suspend/hibernation.  As I said before, the PM workqueue is frozen
+> during system suspend/hibernation transitions, so waiting for an async
+> resume request to complete then is pointless.
 
-kernel test robot noticed the following build warnings:
+Agreed. I noticed that any attempt to call request_firmware() from
+driver system resume callback functions causes a deadlock if these
+calls happen before the block device has been resumed.
 
-[auto build test WARNING on mkp-scsi/for-next]
-[also build test WARNING on axboe/for-next jejb-scsi/for-next linus/master v6.18-rc7 next-20251126]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Thanks,
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Stefan-Hajnoczi/scsi-sd-reject-invalid-pr_read_keys-num_keys-values/20251127-003756
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/mkp/scsi.git for-next
-patch link:    https://lore.kernel.org/r/20251126163600.583036-4-stefanha%40redhat.com
-patch subject: [PATCH 3/4] block: add IOC_PR_READ_KEYS ioctl
-config: loongarch-allnoconfig (https://download.01.org/0day-ci/archive/20251127/202511270125.CJ6M2RHv-lkp@intel.com/config)
-compiler: clang version 22.0.0git (https://github.com/llvm/llvm-project 9e9fe08b16ea2c4d9867fb4974edf2a3776d6ece)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251127/202511270125.CJ6M2RHv-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202511270125.CJ6M2RHv-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> block/ioctl.c:443:21: warning: result of comparison of constant 2305843009213693951 with expression of type '__u32' (aka 'unsigned int') is always false [-Wtautological-constant-out-of-range-compare]
-     443 |         if (inout.num_keys > -sizeof(*keys_info) / sizeof(keys_info->keys[0]))
-         |             ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   1 warning generated.
-
-
-vim +443 block/ioctl.c
-
-   426	
-   427	static int blkdev_pr_read_keys(struct block_device *bdev, blk_mode_t mode,
-   428			struct pr_read_keys __user *arg)
-   429	{
-   430		const struct pr_ops *ops = bdev->bd_disk->fops->pr_ops;
-   431		struct pr_keys *keys_info __free(kfree) = NULL;
-   432		struct pr_read_keys inout;
-   433		int ret;
-   434	
-   435		if (!blkdev_pr_allowed(bdev, mode))
-   436			return -EPERM;
-   437		if (!ops || !ops->pr_read_keys)
-   438			return -EOPNOTSUPP;
-   439	
-   440		if (copy_from_user(&inout, arg, sizeof(inout)))
-   441			return -EFAULT;
-   442	
- > 443		if (inout.num_keys > -sizeof(*keys_info) / sizeof(keys_info->keys[0]))
-   444			return -EINVAL;
-   445	
-   446		size_t keys_info_len = struct_size(keys_info, keys, inout.num_keys);
-   447	
-   448		keys_info = kzalloc(keys_info_len, GFP_KERNEL);
-   449		if (!keys_info)
-   450			return -ENOMEM;
-   451	
-   452		keys_info->num_keys = inout.num_keys;
-   453	
-   454		ret = ops->pr_read_keys(bdev, keys_info);
-   455		if (ret)
-   456			return ret;
-   457	
-   458		/* Copy out individual keys */
-   459		u64 __user *keys_ptr = u64_to_user_ptr(inout.keys_ptr);
-   460		u32 num_copy_keys = min(inout.num_keys, keys_info->num_keys);
-   461		size_t keys_copy_len = num_copy_keys * sizeof(keys_info->keys[0]);
-   462	
-   463		if (copy_to_user(keys_ptr, keys_info->keys, keys_copy_len))
-   464			return -EFAULT;
-   465	
-   466		/* Copy out the arg struct */
-   467		inout.generation = keys_info->generation;
-   468		inout.num_keys = keys_info->num_keys;
-   469	
-   470		if (copy_to_user(arg, &inout, sizeof(inout)))
-   471			return -EFAULT;
-   472		return ret;
-   473	}
-   474	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Bart.
