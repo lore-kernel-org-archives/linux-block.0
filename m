@@ -1,186 +1,139 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A71433DEF7
-	for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 16:20:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B288B33E378
+	for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 16:20:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764174047; cv=none; b=fuJCPnUY3RVkmbgtn9INFkW8i1Bv8HGQqZMASjm0TXLhj/pYBI81ECvvdacs+Z35/qIZfE2BgRzaKek15B6FoRF/3d8UitI3zcgsKWBIGr6PSb7tqO66KRRzSGl8+mcTiYNeqv1ZepzeREPjZ1SDkkRzg1vrjg1vz3sKeUAqPfs=
+	t=1764174059; cv=none; b=TLBPinDmaw/DS1MEtBORreNLSoBB1N5qiAcpbTnJ2zj2HLWT2vJ75XtrUBrqtVlDe012eEZ2JtOLgona/9N4Ygs4lIy0KcJ11t/SZIjKuVRvbD9eSmjveWpzNFkTzcDc9FGpmPYL45OApVDzqz/lOGOS6Lw5L7VrZwyBmLrW00M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764174047; c=relaxed/simple;
-	bh=7HVe38fGf9O0P+2M/aGTe3AqoeP1IVHjJywuyxqp+YA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=boJS5jsWzHeXcHaOXxN9rKKN/t6ussvJ0YrP8c8Zsl9vJPWwKltd2tTIWk6JcVQfHXsK4eFEwbBXSk7ANYBg9DFIXth/ZiSbPKqitNQNJNi20j174F0+Guv0L/mqHoT1Qp+LECNHpnPj+tYp+MeJ4W9WnbpCQSH/WsnS/P2XfXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=l0zC9X77; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=l0zC9X77; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1764174059; c=relaxed/simple;
+	bh=9/fzzR0ccxAYPHIaEFQW/obSMmtYUaiy1gon5tDa1vs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=J9l/Ihksx0VREaq9B9+zilCrtNs42TEh1g9Gh/7A7QPlfX3k2eEnyGZdLt1sAH/51xD2GKdv6eJnV92xRs0/6aEieKpA0ToWxHvhsgl4iNAzC9B/ERHns1tC0ICByOJKNpBK4gJO8PYaBcYbkY5DCNH/lFnbJbe5Ua2ukoguGZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=EI+oA3vx; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="l0zC9X77";
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="l0zC9X77"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id DBECD5BEC2;
-	Wed, 26 Nov 2025 16:20:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1764174043; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=E6NZNgwK7uASRwAaTsoHBOWL98m36NgtcvOr7XBJKRI=;
-	b=l0zC9X77WtSe+c5FbHImlnHMtbOibieEEfMRboxeXFi5BU9T27zN8fuGdXK1uSAf3ULU+V
-	PyU4c+g3ACt9WmH8gHSUXl3I58wrqKvnvRSBre9A8SpMA8Xino0Snw40OjxvJaIOZZBMZ3
-	l8UsEYOmTkcMChn6NQ/hDRsk6koxVow=
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1764174043; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=E6NZNgwK7uASRwAaTsoHBOWL98m36NgtcvOr7XBJKRI=;
-	b=l0zC9X77WtSe+c5FbHImlnHMtbOibieEEfMRboxeXFi5BU9T27zN8fuGdXK1uSAf3ULU+V
-	PyU4c+g3ACt9WmH8gHSUXl3I58wrqKvnvRSBre9A8SpMA8Xino0Snw40OjxvJaIOZZBMZ3
-	l8UsEYOmTkcMChn6NQ/hDRsk6koxVow=
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 863573EA63;
-	Wed, 26 Nov 2025 16:20:43 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 6F1NH9soJ2kELgAAD6G6ig
-	(envelope-from <jgross@suse.com>); Wed, 26 Nov 2025 16:20:43 +0000
-From: Juergen Gross <jgross@suse.com>
-To: linux-kernel@vger.kernel.org,
-	x86@kernel.org,
-	linux-block@vger.kernel.org
-Cc: Juergen Gross <jgross@suse.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Denis Efremov <efremov@linux.com>,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 4/5] block/floppy: Don't use REALLY_SLOW_IO for delays
-Date: Wed, 26 Nov 2025 17:20:17 +0100
-Message-ID: <20251126162018.5676-5-jgross@suse.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251126162018.5676-1-jgross@suse.com>
-References: <20251126162018.5676-1-jgross@suse.com>
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="EI+oA3vx"
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-7bb2fa942daso818406b3a.1
+        for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 08:20:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1764174057; x=1764778857; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4be/ZUWvLP5yKyHdTZEenu+CsKk3oo4+92NC6C4XhD4=;
+        b=EI+oA3vxSrtKPobRUOfMf7FSzWgJ4TXIMC5ZYSHU5KXx9Kyb+xUplUjhvbn8DGWWLp
+         h+hAFGzF5rTHyLC8UMFZcrYz51QDCD4wpbHYvJr22Y03LZjShMQGsvL4iTjoeB4HNyOr
+         XnMZxvHcfASKs/knOkyxgzl2JjrXRP97ddDehFIDK05d1LbwI3e4RpXEtOcpOrUfjc8l
+         e5/feFwA60Jw7nFY+0z164fkjn9GGYwSXORuBxWJ6DIY1ZVQ7Mu86gqCMNiTLUqzRmgd
+         P/4i1ye0MxSfFvDfMPrO5AuIsrM5zDOhVU3819YtNMCJtw3w9GQrpAlsj7gg3VaQbfEl
+         s7Dw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764174057; x=1764778857;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=4be/ZUWvLP5yKyHdTZEenu+CsKk3oo4+92NC6C4XhD4=;
+        b=v1maOWh4tM+UGdPZfrUZo0vDrUJTQKVcweYWIj5hqm4AwP5J5Zresed4z45jOQkxsW
+         ZId0hAgMdr7B/9V2XDG2RwdTALwFaRNhccsBLPFYr0bPek9W2ZfrYZFAjlPDrZAu5AkV
+         P6+LyqsB0zLmQ1KVo0w2vXqzshAFKC4Qo5RoQPUjveZJO4o4Esu2il718Ia8mJ3YfNT/
+         FReZf6DFhbPiRi5C4kpdtQCsnAqs5e1uP6BVShcjVyG7ODI0FDymK4R+EYnnuJhqwGmI
+         j/9mAsefwa6JO+ZiPe274aw5PB+zAoj5FGSLQCZjfIM36qCfhb1gZwqAF2RtNOCw7Rzj
+         QCUw==
+X-Gm-Message-State: AOJu0Yx4UIDemxWEub2Nwm1dEo274/Tg7b3CSseoJe+ayeONfjmA3F3D
+	SoAxkpx/36QdQqItmIURBj22sB7yK2+59jIhzqDqouZl9D1NqfCGH+uUNxvdmj3KOWtwgbFfk0k
+	iy73zPBhAiq4tN0RqvnTKl8n2564Wy3jZaSrYrFZoBw==
+X-Gm-Gg: ASbGncv8o/NbIb+nSPrlBXAPZtuuErZJ4ByyCjfVBpNESKJsMoW51sWxvn1MZPbts6i
+	+ERs2alNSJOocIelvfRftfdR1RoTdxA7lkc6vcTHjx0wzemcQr6VmskdOtJlIuMSC7RAHngkJap
+	jw4VAHw3tbiNe5Fxd9e8+tH/1C0aeq/cFDZLinqla/LqSJ0+iQv14BGgz8z9lz49/nUtveYPsU6
+	q+U9mfUthelb7PKi2on6LFcpefWTmhTjMG5waXty/KnqiktGMrwqLsnGLSRadAdruSwhxxR
+X-Google-Smtp-Source: AGHT+IFZ7FBb8upfv2PMo8Ylc2BDObXteu7uneiDIhnyYuTEbEMDCsl08kUKj0MCgU/61TTZ4AhiHwFhxMfgAIPUDrE=
+X-Received: by 2002:a05:7023:c007:b0:11b:ad6a:6e39 with SMTP id
+ a92af1059eb24-11c9f3a16demr7691230c88.5.1764174056662; Wed, 26 Nov 2025
+ 08:20:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -6.80
-X-Spam-Level: 
-X-Spamd-Result: default: False [-6.80 / 50.00];
-	REPLY(-4.00)[];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_COUNT_TWO(0.00)[2];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.com:email,suse.com:mid];
-	DKIM_SIGNED(0.00)[suse.com:s=susede1];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_TLS_ALL(0.00)[]
+References: <20251126124835.1132852-1-kevin.brodsky@arm.com>
+In-Reply-To: <20251126124835.1132852-1-kevin.brodsky@arm.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Wed, 26 Nov 2025 08:20:45 -0800
+X-Gm-Features: AWmQ_bkkPww6M3lStNIvMTw9pHmAW8EdDzOFfoo5kOGXg6nZDDHEzcaESjvPAbk
+Message-ID: <CADUfDZqsFSsA4UNxmB=LQwqor+enD35bNVFgT2_gMt1_2uwOqA@mail.gmail.com>
+Subject: Re: [PATCH] ublk: prevent invalid access with DEBUG
+To: Kevin Brodsky <kevin.brodsky@arm.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Ali Utku Selen <ali.utku.selen@arm.com>, Ming Lei <ming.lei@redhat.com>, 
+	Jens Axboe <axboe@kernel.dk>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Instead of defining REALLY_SLOW_IO before including io.h, add the
-required additional calls of native_io_delay() to the related functions
-in arch/x86/include/asm/floppy.h.
+On Wed, Nov 26, 2025 at 4:48=E2=80=AFAM Kevin Brodsky <kevin.brodsky@arm.co=
+m> wrote:
+>
+> ublk_ch_uring_cmd_local() may jump to the out label before
+> initialising the io pointer. This will cause trouble if DEBUG is
+> defined, because the pr_devel() call dereferences io. Clang reports:
+>
+> drivers/block/ublk_drv.c:2403:6: error: variable 'io' is used uninitializ=
+ed whenever 'if' condition is true [-Werror,-Wsometimes-uninitialized]
+>  2403 |         if (tag >=3D ub->dev_info.queue_depth)
+>       |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> drivers/block/ublk_drv.c:2492:32: note: uninitialized use occurs here
+>  2492 |                         __func__, cmd_op, tag, ret, io->flags);
+>       |
+>
+> Fix this by initialising io to NULL and checking it before
+> dereferencing it.
+>
+> Signed-off-by: Kevin Brodsky <kevin.brodsky@arm.com>
 
-This will remove the last place where REALLY_SLOW_IO is being defined.
+Looks like this could use a Fixes tag:
+Fixes: 71f28f3136af ("ublk_drv: add io_uring based userspace block driver")
 
-Signed-off-by: Juergen Gross <jgross@suse.com>
----
- arch/x86/include/asm/floppy.h | 27 ++++++++++++++++++++++-----
- drivers/block/floppy.c        |  2 --
- 2 files changed, 22 insertions(+), 7 deletions(-)
+Other than that,
+Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
 
-diff --git a/arch/x86/include/asm/floppy.h b/arch/x86/include/asm/floppy.h
-index e7a244051c62..8d1e86687b98 100644
---- a/arch/x86/include/asm/floppy.h
-+++ b/arch/x86/include/asm/floppy.h
-@@ -29,9 +29,6 @@
- #define CSW fd_routine[can_use_virtual_dma & 1]
- 
- 
--#define fd_inb(base, reg)		inb_p((base) + (reg))
--#define fd_outb(value, base, reg)	outb_p(value, (base) + (reg))
--
- #define fd_request_dma()	CSW._request_dma(FLOPPY_DMA, "floppy")
- #define fd_free_dma()		CSW._free_dma(FLOPPY_DMA)
- #define fd_enable_irq()		enable_irq(FLOPPY_IRQ)
-@@ -49,6 +46,26 @@ static char *virtual_dma_addr;
- static int virtual_dma_mode;
- static int doing_pdma;
- 
-+static inline u8 fd_inb(u16 base, u16 reg)
-+{
-+	u8 ret = inb_p(base + reg);
-+
-+	native_io_delay();
-+	native_io_delay();
-+	native_io_delay();
-+
-+	return ret;
-+}
-+
-+static inline void fd_outb(u8 value, u16 base, u16 reg)
-+{
-+	outb_p(value, base + reg);
-+
-+	native_io_delay();
-+	native_io_delay();
-+	native_io_delay();
-+}
-+
- static irqreturn_t floppy_hardint(int irq, void *dev_id)
- {
- 	unsigned char st;
-@@ -79,9 +96,9 @@ static irqreturn_t floppy_hardint(int irq, void *dev_id)
- 			if (st != (STATUS_DMA | STATUS_READY))
- 				break;
- 			if (virtual_dma_mode)
--				outb_p(*lptr, virtual_dma_port + FD_DATA);
-+				fd_outb(*lptr, virtual_dma_port, FD_DATA);
- 			else
--				*lptr = inb_p(virtual_dma_port + FD_DATA);
-+				*lptr = fd_inb(virtual_dma_port, FD_DATA);
- 		}
- 		virtual_dma_count = lcount;
- 		virtual_dma_addr = lptr;
-diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-index 5336c3c5ca36..cda36a8f9a05 100644
---- a/drivers/block/floppy.c
-+++ b/drivers/block/floppy.c
-@@ -145,8 +145,6 @@
-  * Better audit of register_blkdev.
-  */
- 
--#define REALLY_SLOW_IO
--
- #define DEBUGT 2
- 
- #define DPRINT(format, args...) \
--- 
-2.51.0
-
+> ---
+> Cc: Ali Utku Selen <ali.utku.selen@arm.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Jens Axboe <axboe@kernel.dk>
+> ---
+>  drivers/block/ublk_drv.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 0c74a41a6753..359564c40cb5 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -2367,7 +2367,7 @@ static int ublk_ch_uring_cmd_local(struct io_uring_=
+cmd *cmd,
+>         u16 buf_idx =3D UBLK_INVALID_BUF_IDX;
+>         struct ublk_device *ub =3D cmd->file->private_data;
+>         struct ublk_queue *ubq;
+> -       struct ublk_io *io;
+> +       struct ublk_io *io =3D NULL;
+>         u32 cmd_op =3D cmd->cmd_op;
+>         u16 q_id =3D READ_ONCE(ub_src->q_id);
+>         u16 tag =3D READ_ONCE(ub_src->tag);
+> @@ -2488,7 +2488,7 @@ static int ublk_ch_uring_cmd_local(struct io_uring_=
+cmd *cmd,
+>
+>   out:
+>         pr_devel("%s: complete: cmd op %d, tag %d ret %x io_flags %x\n",
+> -                       __func__, cmd_op, tag, ret, io->flags);
+> +                       __func__, cmd_op, tag, ret, io ? io->flags : 0);
+>         return ret;
+>  }
+>
+>
+> base-commit: ac3fd01e4c1efce8f2c054cdeb2ddd2fc0fb150d
+> --
+> 2.51.2
+>
+>
