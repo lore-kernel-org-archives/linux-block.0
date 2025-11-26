@@ -1,41 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 508351FECCD
-	for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 17:22:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7212F27B50C
+	for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 17:34:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764177724; cv=none; b=p8KnjGfpTh3CCPHOI5hyBR/wpWu2JVIA9fSRfnzrQs+nBd6wIo5L2lG9Xpltrt3k/xeh9u1zhZZfXqluken7l2bHbFS3q+oYQrvfDYvRbJf80a9E1aZ8Ca1a+RVNPaw/jPKpwHHBRuqB6fWF+mnxdRNZ2umVPvOIpmLWua7Y4iY=
+	t=1764178487; cv=none; b=gY9yyeG8a8/rwF4kUS3FJJallEVGO04KLXKyTVgSZDVGTDoHkzS8Cws2wFspHPkotL4JcEsO88hmb+WFBDqo4kUfDFCtp66zmf13fxzDNs1ycq6OgrD0sVL2jysKPiXr9btya5FPv4UflGzpXOMbS4heU5qSXbWFGq8Wnt5xKLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764177724; c=relaxed/simple;
-	bh=R2yF5gstqSqKlLjKnQdQN3gZ9Hk2ux76iIdAlBEEuhs=;
+	s=arc-20240116; t=1764178487; c=relaxed/simple;
+	bh=d+5eLHGelfVC6+3ruoOXVL3MYFu4i+Y7T4i8SmirhIQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nUCpmQ5VBCdrF2Vr/7b4ZfR0Sz7NOu5QwLJUgTBDaWsJyTC0X+5pgZL7zr2zxnkp+P7z5dvzCimPe45fzepOX7L1hzIoR+9QkepUVcTVH8T1+yES7F9PUQW/uFyrUnyH/lT9PgrEPlEtdxum0bU7Zv3y4alYS9mi3wpBRG7oQig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q9PnFZ65; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=qN+c7JcFUdGWFKX7321ScYrTDZR7qZ6Unqa/VEnW5syCXBU5bhkYipC49ZABhScDp9Y+AxPUZyfx9oj9jZyaGH1VihSm3B9G8ozmwTvehk9YyXK731CxSyyoaG55x0BTDs1fTUOYZBjPrecxcMGJHhb2oRhGKPyZWMDs8uSOGMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VL/3CFQp; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q9PnFZ65"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BCA4C16AAE
-	for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 17:22:04 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VL/3CFQp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B684C4CEF8
+	for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 17:34:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764177724;
-	bh=R2yF5gstqSqKlLjKnQdQN3gZ9Hk2ux76iIdAlBEEuhs=;
+	s=k20201202; t=1764178487;
+	bh=d+5eLHGelfVC6+3ruoOXVL3MYFu4i+Y7T4i8SmirhIQ=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=Q9PnFZ656P4i/DcsTL98nFHWsoJkKHRgBSsjtW4IGAlPMZJmNoccVegF1rqNZqVjW
-	 5pXibz2LN5V3wm9SqbQ1qBxhZ0onF1gXIsIa8o/Nr4EpRX8mp0vpQ252Lt54mOt0LY
-	 dh2WnskI9KmKBbVP4GLn7KDIzkBjooCP/zrjfYRsKQMQgRjT3TM6p2CaFtv4IF7v/g
-	 QmLsIUHn5KrlxqqCyRaAI5ILZx+xyBWPf1tqbBSDOV5tUelqBu7CpXjyUTJblyUoRZ
-	 hLbv+SGRHrXwJlQkaoguwnfoYWbKj4jbzf1GD1gglQ7NzHsBTjSoV5mLvUA9OYSUfd
-	 4ATel96pL138w==
-Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-450154aa53fso2786189b6e.2
-        for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 09:22:04 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXcxlqIqatlkO/GfC8PDwLNodaa6yPXZIfGdIRoGrjfRYvqt9DYoSJRe6mChqS1OlEDkdQQIdSlv9aXkg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxW6c6xoC1RJFhtRMZY4/nPg8ijlxehAejwqtX0I790SmDhTxyU
-	baaEhn2XBAeGolcvJK0WHQytqiIQJ5ZvFigX8AT/ixfGVqM/ldBHU35HrAhDsfkw6vo9lAFxUjM
-	SmMuPRBbkAZVzJogzk6HMWPAfWU3p334=
-X-Google-Smtp-Source: AGHT+IEaqAwm7Am1qpwAEG19Ej9ScCFve6fv9+Cy+INznHe5EXu1pIYmJtEI4M03U9rDcPVGe2Ym2VhUkGHLdPgcXCo=
-X-Received: by 2002:a05:6808:1507:b0:450:32d4:3d17 with SMTP id
- 5614622812f47-4514e7a23d4mr3081635b6e.44.1764177723504; Wed, 26 Nov 2025
- 09:22:03 -0800 (PST)
+	b=VL/3CFQpEj76r0fmtd0ZRXp1LOUqgbjJGjjBQfZ1CN8v6o1PNTcRahS9x0WrPKZmy
+	 k2hgRlhdEnacCD2zzqO41kdDo1meOZHBJlb+L269b78RiPmbfQQBbdDuWlMvcZjNLB
+	 x0yey6FL1x+D3YmyB7XQPTvYissod187Q1XLpvIPJVuBVNs4i13Abf9HTv6rDOsBzW
+	 JuQNd/bHPTqOUu78eXEd1cA2ObuxR4BDqPhXZFzqmHaalqBu6qh4YZX4I44zreUKgn
+	 qLekwKUvOLgHjLUCfAn6wXyRqFEXx3EAy8jJ7DCrsWpuQ1Bfo3VI8VgfN/IE2uyq5q
+	 qEOiijKJo+3fg==
+Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-7c75b829eb6so60640a34.1
+        for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 09:34:47 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUAjhQj+fXD0b0+7sKIb1yS7Q6QGnUs7eRu+2e01fEjkV00qruAbVeuhC8NW4xYHAMkR8QSyP0FYBEi7Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywd1SuaRTb8Q1KECoc7my1rxjRcdQc2OB4xcT7BpDmi3VzdDUZ4
+	x06BYbMeb05CtcIRAT38gtC10CdLRDvavh+HXQ6C0VJZ8WHBU9mkY8mtrsnwfw3Yl+6du0FMO5K
+	N772blL7f/cIaO+NFyYJiXXKwB8+uX7Q=
+X-Google-Smtp-Source: AGHT+IEIBURXGZHKEBbMUkoHCwHsucn4kU4tx8r2Wbyx0cXNG/3XKjH4HKIfEpYz44KNRRiFgV5k7Yvs0MwaO0VP+n0=
+X-Received: by 2002:a05:6808:c165:b0:450:ccef:c00c with SMTP id
+ 5614622812f47-45115b887d2mr6572765b6e.48.1764178486508; Wed, 26 Nov 2025
+ 09:34:46 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -44,60 +44,73 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20251126101636.205505-1-yang.yang@vivo.com> <CAJZ5v0jsdsyVd3hPWni1Vj+daQS8PdWJCjboJHHHbBjBMeSxzg@mail.gmail.com>
  <94c6680c-1b86-4cee-8e9c-860daf629b59@acm.org> <CAJZ5v0gbmXKrUi6RzW5jHLedCpDcMwCj=+4zZzq0pXwnFMkDEA@mail.gmail.com>
-In-Reply-To: <CAJZ5v0gbmXKrUi6RzW5jHLedCpDcMwCj=+4zZzq0pXwnFMkDEA@mail.gmail.com>
+ <CAJZ5v0g36Ea-XNBmsMSJxkAKz8zZNzWr_HA7AJOtS2NZOqAfEA@mail.gmail.com>
+In-Reply-To: <CAJZ5v0g36Ea-XNBmsMSJxkAKz8zZNzWr_HA7AJOtS2NZOqAfEA@mail.gmail.com>
 From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Wed, 26 Nov 2025 18:21:51 +0100
-X-Gmail-Original-Message-ID: <CAJZ5v0g36Ea-XNBmsMSJxkAKz8zZNzWr_HA7AJOtS2NZOqAfEA@mail.gmail.com>
-X-Gm-Features: AWmQ_bl9F0HoUPezUimC6UlUvQSXqnexcofdGFdW4xwOP8HpgFC86m-OuDTNiRA
-Message-ID: <CAJZ5v0g36Ea-XNBmsMSJxkAKz8zZNzWr_HA7AJOtS2NZOqAfEA@mail.gmail.com>
+Date: Wed, 26 Nov 2025 18:34:35 +0100
+X-Gmail-Original-Message-ID: <CAJZ5v0jwKaCDjzgo-AP62DDd=Nww9KbYp6tUxuQQ-Hp11PXMig@mail.gmail.com>
+X-Gm-Features: AWmQ_bmyQz1o80LRrXoB8uHkgLpYOP-4vFv5uz2byQWkcx9IpINhYmdilQCISnI
+Message-ID: <CAJZ5v0jwKaCDjzgo-AP62DDd=Nww9KbYp6tUxuQQ-Hp11PXMig@mail.gmail.com>
 Subject: Re: [PATCH 0/2] PM: runtime: Fix potential I/O hang
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Yang Yang <yang.yang@vivo.com>, Jens Axboe <axboe@kernel.dk>, Pavel Machek <pavel@kernel.org>, 
-	Len Brown <lenb@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Danilo Krummrich <dakr@kernel.org>, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+To: Bart Van Assche <bvanassche@acm.org>, Yang Yang <yang.yang@vivo.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Pavel Machek <pavel@kernel.org>, Len Brown <lenb@kernel.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Danilo Krummrich <dakr@kernel.org>, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	linux-pm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 26, 2025 at 5:59=E2=80=AFPM Rafael J. Wysocki <rafael@kernel.or=
+On Wed, Nov 26, 2025 at 6:21=E2=80=AFPM Rafael J. Wysocki <rafael@kernel.or=
 g> wrote:
 >
-> On Wed, Nov 26, 2025 at 4:48=E2=80=AFPM Bart Van Assche <bvanassche@acm.o=
-rg> wrote:
+> On Wed, Nov 26, 2025 at 5:59=E2=80=AFPM Rafael J. Wysocki <rafael@kernel.=
+org> wrote:
 > >
-> > On 11/26/25 3:31 AM, Rafael J. Wysocki wrote:
-> > > Please address the issue differently.
+> > On Wed, Nov 26, 2025 at 4:48=E2=80=AFPM Bart Van Assche <bvanassche@acm=
+.org> wrote:
+> > >
+> > > On 11/26/25 3:31 AM, Rafael J. Wysocki wrote:
+> > > > Please address the issue differently.
+> > >
+> > > It seems unfortunate to me that __pm_runtime_barrier() can cause pm_r=
+equest_resume() to hang.
 > >
-> > It seems unfortunate to me that __pm_runtime_barrier() can cause pm_req=
-uest_resume() to hang.
+> > I wouldn't call it a hang.
+> >
+> > __pm_runtime_barrier() removes the work item queued by
+> > pm_request_resume(), but at the time when it is called, which is
+> > device_suspend_late(), the work item queued by pm_request_resume()
+> > cannot make progress anyway.  It will only be able to make progress
+> > when the PM workqueue is unfrozen at the end of the system resume
+> > transition.
+> >
+> > > Would it be safe to remove the
+> > > cancel_work_sync() call from __pm_runtime_barrier() since
+> > > pm_runtime_work() calls functions that check disable_depth
+> > > when processing RPM_REQ_SUSPEND and RPM_REQ_AUTOSUSPEND? Would
+> > > this be sufficient to fix the reported deadlock?
+> >
+> > If you want the resume work item to survive the system suspend/resume
+> > cycle, __pm_runtime_disable() may be changed to make that happen, but
+> > this still will not allow the work to make progress until the system
+> > resume ends.
+> >
+> > I'm not sure if this would help to address the issue at hand though.
 >
-> I wouldn't call it a hang.
+> I actually have a better idea: Why don't we resume all devices that
+> have runtime resume work items pending at the time when
+> device_suspend() is called?
 >
-> __pm_runtime_barrier() removes the work item queued by
-> pm_request_resume(), but at the time when it is called, which is
-> device_suspend_late(), the work item queued by pm_request_resume()
-> cannot make progress anyway.  It will only be able to make progress
-> when the PM workqueue is unfrozen at the end of the system resume
-> transition.
->
-> > Would it be safe to remove the
-> > cancel_work_sync() call from __pm_runtime_barrier() since
-> > pm_runtime_work() calls functions that check disable_depth
-> > when processing RPM_REQ_SUSPEND and RPM_REQ_AUTOSUSPEND? Would
-> > this be sufficient to fix the reported deadlock?
->
-> If you want the resume work item to survive the system suspend/resume
-> cycle, __pm_runtime_disable() may be changed to make that happen, but
-> this still will not allow the work to make progress until the system
-> resume ends.
->
-> I'm not sure if this would help to address the issue at hand though.
+> Arguably, somebody wanted them to runtime-resume, so they should be
+> resumed before being prepared for system suspend and that will
+> eliminate the issue at hand (because devices cannot suspend during
+> system suspend/resume).
 
-I actually have a better idea: Why don't we resume all devices that
-have runtime resume work items pending at the time when
-device_suspend() is called?
+Wait, there is a pm_runtime_barrier() call in device_suspend() that
+does just that and additionally it calls __pm_runtime_barrier(), so
+all of the pending runtime PM work items should be cancelled by it.
 
-Arguably, somebody wanted them to runtime-resume, so they should be
-resumed before being prepared for system suspend and that will
-eliminate the issue at hand (because devices cannot suspend during
-system suspend/resume).
+So it looks like the device in question is runtime-suspended at that
+point and only later blk_pm_resume_queue() is called to resume it.
+I'm wondering where it is called from.  And maybe pm_runtime_resume()
+should be called for it from its ->suspend() callback?
