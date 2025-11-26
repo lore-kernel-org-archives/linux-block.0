@@ -1,116 +1,160 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7212F27B50C
-	for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 17:34:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9490A1F5820
+	for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 17:47:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764178487; cv=none; b=gY9yyeG8a8/rwF4kUS3FJJallEVGO04KLXKyTVgSZDVGTDoHkzS8Cws2wFspHPkotL4JcEsO88hmb+WFBDqo4kUfDFCtp66zmf13fxzDNs1ycq6OgrD0sVL2jysKPiXr9btya5FPv4UflGzpXOMbS4heU5qSXbWFGq8Wnt5xKLU=
+	t=1764179276; cv=none; b=HzyGxaBIaSqyZEbjkKgDoB/xytcBlar6Xmsn9mlYT2Jy4AcCt864lfHGynd82h+gCkmaXXwvfKaAqDahqICaPgKxtkYJJcEuudndoZVmBRLVUfu7jgSuM+gWziWGOuByDEmNeP2Sl5rCGwHeoLbjXj6ADaagzgrrGATN/mOVdxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764178487; c=relaxed/simple;
-	bh=d+5eLHGelfVC6+3ruoOXVL3MYFu4i+Y7T4i8SmirhIQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qN+c7JcFUdGWFKX7321ScYrTDZR7qZ6Unqa/VEnW5syCXBU5bhkYipC49ZABhScDp9Y+AxPUZyfx9oj9jZyaGH1VihSm3B9G8ozmwTvehk9YyXK731CxSyyoaG55x0BTDs1fTUOYZBjPrecxcMGJHhb2oRhGKPyZWMDs8uSOGMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VL/3CFQp; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764179276; c=relaxed/simple;
+	bh=FJl4K/OEujc2ZzLeEya106sEqJFkkF7QO56YI6CXvNY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dGDTRxK1y0kZP3wTiTuVYMgxwhJjVRojdt5oIlx0/mPw4UP9XUXsCPHtDcMfrU5kjzWBKCaR+wWzwTTgFKL7iEJbrJEw790X+pw8XkeGz7m3ZYGVv7EmnKYwE55p8AUmx4dSCRX4C7JZ1EySdTYlOvCdlQ5U20FShwTRjglWjSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=aoa7lSiu; arc=none smtp.client-ip=199.89.3.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VL/3CFQp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B684C4CEF8
-	for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 17:34:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764178487;
-	bh=d+5eLHGelfVC6+3ruoOXVL3MYFu4i+Y7T4i8SmirhIQ=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=VL/3CFQpEj76r0fmtd0ZRXp1LOUqgbjJGjjBQfZ1CN8v6o1PNTcRahS9x0WrPKZmy
-	 k2hgRlhdEnacCD2zzqO41kdDo1meOZHBJlb+L269b78RiPmbfQQBbdDuWlMvcZjNLB
-	 x0yey6FL1x+D3YmyB7XQPTvYissod187Q1XLpvIPJVuBVNs4i13Abf9HTv6rDOsBzW
-	 JuQNd/bHPTqOUu78eXEd1cA2ObuxR4BDqPhXZFzqmHaalqBu6qh4YZX4I44zreUKgn
-	 qLekwKUvOLgHjLUCfAn6wXyRqFEXx3EAy8jJ7DCrsWpuQ1Bfo3VI8VgfN/IE2uyq5q
-	 qEOiijKJo+3fg==
-Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-7c75b829eb6so60640a34.1
-        for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 09:34:47 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUAjhQj+fXD0b0+7sKIb1yS7Q6QGnUs7eRu+2e01fEjkV00qruAbVeuhC8NW4xYHAMkR8QSyP0FYBEi7Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywd1SuaRTb8Q1KECoc7my1rxjRcdQc2OB4xcT7BpDmi3VzdDUZ4
-	x06BYbMeb05CtcIRAT38gtC10CdLRDvavh+HXQ6C0VJZ8WHBU9mkY8mtrsnwfw3Yl+6du0FMO5K
-	N772blL7f/cIaO+NFyYJiXXKwB8+uX7Q=
-X-Google-Smtp-Source: AGHT+IEIBURXGZHKEBbMUkoHCwHsucn4kU4tx8r2Wbyx0cXNG/3XKjH4HKIfEpYz44KNRRiFgV5k7Yvs0MwaO0VP+n0=
-X-Received: by 2002:a05:6808:c165:b0:450:ccef:c00c with SMTP id
- 5614622812f47-45115b887d2mr6572765b6e.48.1764178486508; Wed, 26 Nov 2025
- 09:34:46 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="aoa7lSiu"
+Received: from localhost (localhost [127.0.0.1])
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4dGn5C5FmRzlgqjW;
+	Wed, 26 Nov 2025 17:45:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1764179101; x=1766771102; bh=aY560T2fZUcicLcM/TjNKorD
+	8bkvVCAZ2pJYtGV8Hs8=; b=aoa7lSiuLH9Rzm541to4Pipw1/CgGvXTSJzhEp01
+	TceRBxpqNSgOtpVi8f4Lp+WR61zYzr0Y5aIo+RRt2uLBUW7OmdWTD4w9CsTavHW/
+	i02kHtipz6Jk8EG4mdqHnst7h43Wk42eP9CaK0Cdrhkk6rXqQft7WbeoSUprgwAs
+	6MIelLMkSCV+ElLDt5vE/M9jt6yOhMJ14YSi/Ut/rthjqA+pR00+sSl/DoLi865M
+	TL/QwxtFWc53Y+q0z61zsmeKiGiWGqI3AOFXaKnuPFcUMs+di7fErrmgKUzBqfvn
+	CJ+5iBEVEcaGDNasniVt3pHlrlwClG3JW/D7RmaS+gZA4A==
+X-Virus-Scanned: by MailRoute
+Received: from 003.mia.mailroute.net ([127.0.0.1])
+ by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id GJMa-J9gw7Gq; Wed, 26 Nov 2025 17:45:01 +0000 (UTC)
+Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4dGn524TlYzlgqjV;
+	Wed, 26 Nov 2025 17:44:53 +0000 (UTC)
+Message-ID: <a38bbe68-97e8-4476-a406-5c5228167e96@acm.org>
+Date: Wed, 26 Nov 2025 09:44:52 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251126101636.205505-1-yang.yang@vivo.com> <CAJZ5v0jsdsyVd3hPWni1Vj+daQS8PdWJCjboJHHHbBjBMeSxzg@mail.gmail.com>
- <94c6680c-1b86-4cee-8e9c-860daf629b59@acm.org> <CAJZ5v0gbmXKrUi6RzW5jHLedCpDcMwCj=+4zZzq0pXwnFMkDEA@mail.gmail.com>
- <CAJZ5v0g36Ea-XNBmsMSJxkAKz8zZNzWr_HA7AJOtS2NZOqAfEA@mail.gmail.com>
-In-Reply-To: <CAJZ5v0g36Ea-XNBmsMSJxkAKz8zZNzWr_HA7AJOtS2NZOqAfEA@mail.gmail.com>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Wed, 26 Nov 2025 18:34:35 +0100
-X-Gmail-Original-Message-ID: <CAJZ5v0jwKaCDjzgo-AP62DDd=Nww9KbYp6tUxuQQ-Hp11PXMig@mail.gmail.com>
-X-Gm-Features: AWmQ_bmyQz1o80LRrXoB8uHkgLpYOP-4vFv5uz2byQWkcx9IpINhYmdilQCISnI
-Message-ID: <CAJZ5v0jwKaCDjzgo-AP62DDd=Nww9KbYp6tUxuQQ-Hp11PXMig@mail.gmail.com>
-Subject: Re: [PATCH 0/2] PM: runtime: Fix potential I/O hang
-To: Bart Van Assche <bvanassche@acm.org>, Yang Yang <yang.yang@vivo.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Pavel Machek <pavel@kernel.org>, Len Brown <lenb@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Danilo Krummrich <dakr@kernel.org>, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-pm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/2] blktests: replace module removal with patient
+ module removal
+To: Luis Chamberlain <mcgrof@kernel.org>, shinichiro.kawasaki@wdc.com
+Cc: linux-block@vger.kernel.org, patches@lists.linux.dev,
+ gost.dev@samsung.com, sw.prabhu6@gmail.com, kernel@pankajraghav.com,
+ Chaitanya Kulkarni <kch@nvidia.com>
+References: <20251126171102.3663957-1-mcgrof@kernel.org>
+ <20251126171102.3663957-2-mcgrof@kernel.org>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20251126171102.3663957-2-mcgrof@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 26, 2025 at 6:21=E2=80=AFPM Rafael J. Wysocki <rafael@kernel.or=
-g> wrote:
->
-> On Wed, Nov 26, 2025 at 5:59=E2=80=AFPM Rafael J. Wysocki <rafael@kernel.=
-org> wrote:
-> >
-> > On Wed, Nov 26, 2025 at 4:48=E2=80=AFPM Bart Van Assche <bvanassche@acm=
-.org> wrote:
-> > >
-> > > On 11/26/25 3:31 AM, Rafael J. Wysocki wrote:
-> > > > Please address the issue differently.
-> > >
-> > > It seems unfortunate to me that __pm_runtime_barrier() can cause pm_r=
-equest_resume() to hang.
-> >
-> > I wouldn't call it a hang.
-> >
-> > __pm_runtime_barrier() removes the work item queued by
-> > pm_request_resume(), but at the time when it is called, which is
-> > device_suspend_late(), the work item queued by pm_request_resume()
-> > cannot make progress anyway.  It will only be able to make progress
-> > when the PM workqueue is unfrozen at the end of the system resume
-> > transition.
-> >
-> > > Would it be safe to remove the
-> > > cancel_work_sync() call from __pm_runtime_barrier() since
-> > > pm_runtime_work() calls functions that check disable_depth
-> > > when processing RPM_REQ_SUSPEND and RPM_REQ_AUTOSUSPEND? Would
-> > > this be sufficient to fix the reported deadlock?
-> >
-> > If you want the resume work item to survive the system suspend/resume
-> > cycle, __pm_runtime_disable() may be changed to make that happen, but
-> > this still will not allow the work to make progress until the system
-> > resume ends.
-> >
-> > I'm not sure if this would help to address the issue at hand though.
->
-> I actually have a better idea: Why don't we resume all devices that
-> have runtime resume work items pending at the time when
-> device_suspend() is called?
->
-> Arguably, somebody wanted them to runtime-resume, so they should be
-> resumed before being prepared for system suspend and that will
-> eliminate the issue at hand (because devices cannot suspend during
-> system suspend/resume).
+On 11/26/25 9:11 AM, Luis Chamberlain wrote:
+> Long ago a WAIT option for module removal was added... that was then
+> removed as it was deemed not needed as folks couldn't figure out when
+> these races happened. The races are actually pretty easy to trigger, it
+> was just never properly documented. A simpe blkdev_open() will easily
+> bump a module refcnt, and these days many thing scan do that sort of
+> thing.
 
-Wait, there is a pm_runtime_barrier() call in device_suspend() that
-does just that and additionally it calls __pm_runtime_barrier(), so
-all of the pending runtime PM work items should be cancelled by it.
+It would be appreciated if "thing" could be replaced with a more
+specific description of what actually happens.
+> The proper solution is to implement then a patient module removal
+> on kmod and that has been merged now as modprobe --wait=MSEC option.
+> We need a work around to open code a similar solution for users of
+> old versions of kmod. An open coded solution for fstests exists
+> there for over a year now. This now provides the respective blktests
+> implementation.
 
-So it looks like the device in question is runtime-suspended at that
-point and only later blk_pm_resume_queue() is called to resume it.
-I'm wondering where it is called from.  And maybe pm_runtime_resume()
-should be called for it from its ->suspend() callback?
+How can it be concluded what the proper solution is without explaining
+the root cause first? Please add an explanation of the root cause. I
+assume that the root cause is that some references are dropped
+asynchronously after module removal has been requested for the first
+time?
+> +_has_modprobe_patient()
+> +{
+> +	modprobe --help >& /dev/null || return 1
+> +	modprobe --help | grep -q "\-\-wait" || return 1
+> +	return 0
+> +}
+
+Please combine the above two modprobe invocations into a single
+invocation and leave out the superfluous return statements, e.g. as
+follows:
+
+	modprobe --help |& grep -q -- --wait
+
+Additionally, wouldn't has_modprobe_wait be a better name for this
+function?
+
+> +# Check whether modprobe --wait is supported and set up the patient module
+> +# remover command. This is evaluated at source time, so we need to handle
+
+remover -> removal?
+
+> +# checks the refcount and returns 0 if we can safely remove the module. rmmod
+> +# does this check for us, but we can use this to also iterate checking for this
+> +# refcount before we even try to remove the module. This is useful when using
+> +# debug test modules which take a while to quiesce.
+> +_patient_rmmod_check_refcnt()
+> +{
+> +	local module=$1
+> +	local refcnt=0
+> +
+> +	refcnt=$(cat "/sys/module/$module/refcnt" 2>/dev/null)
+> +	if [[ $? -ne 0 || $refcnt -eq 0 ]]; then
+> +		return 0
+> +	fi
+> +	return 1
+> +}
+
+The refcnt initializer can be removed safely and the return statements
+can be removed too.
+
+> +	# Check if module is built-in or not loaded
+> +	if [[ ! -d "/sys/module/$module_sys" ]]; then
+> +		return 0
+> +	fi
+
+Is the comment above the if-statement correct? /sys/module/${module_sys}
+is also created for built-in kernel drivers that set the .owner field,
+isn't it? See also the sysfs_create_link(... "module") calls in
+drivers/base/.
+
+> +	max_tries=$max_tries_max
+> +
+> +	while [[ "$max_tries" != "0" ]]; do
+> +		if _patient_rmmod_check_refcnt "$module_sys"; then
+> +			refcnt_is_zero=1
+> +			break
+> +		fi
+> +		sleep 1
+> +		((max_tries--))
+> +	done
+
+Has it been considered to use a for-loop for the above code? E.g.
+something like
+
+   for ((max_tries=max_tries_max; max_tries != 0; max_tries--)); do
+     ...
+   done
+
+Thanks,
+
+Bart.
+
