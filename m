@@ -1,179 +1,82 @@
-Received: from wxsgout04.xfusion.com (wxsgout04.xfusion.com [36.139.87.180])
+Received: from 004.mia.mailroute.net (004.mia.mailroute.net [199.89.3.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93C383043C4;
-	Wed, 26 Nov 2025 14:41:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=36.139.87.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2292123372C;
+	Wed, 26 Nov 2025 15:34:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764168068; cv=none; b=OsDQZr8q1W00IjM965Y93htkMOFLqQ3iF5N2H6SsP1D41w3BnZ4UFRH7IuKu3CZHVra2MBEFekQhfsXKU+5jz/W4IpFlrseujSCJrR5Mx6Q0zsXo6e7lDm5N5tXL5CeoAaTbfrMjiGBpz8BhK6ypHxqkc/7Lel5arDH5CTogkE0=
+	t=1764171261; cv=none; b=Y0jLDgL6JR+UtDV5C0D2Go0Gxdvu89BswST9vLZCvIwUU+LjR9U92C4eBsdD+kf+7pMr2dlZIu6JBn2MpgpnFEnZwOgp0jguL8bJe2TrNKrw6RRLI3nk8YluPiUXLCFoiC2A0eROiejux5kWIz0p6zeadZhbbKpQKxmcUADcX/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764168068; c=relaxed/simple;
-	bh=kAcLms6LyJfgj/Yr9T5p2bImI6V6VkPM21oqIfO8+jo=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AyEQJUEBhvxtl9CUuKCc7Fiinm5Zpx8H9CEriE4aQ21bLVAWwth8K0I1rIBXxO2qv8qhtHc4k9P2+YCBebZzi0gPhdkc9kan4aFavSfXlsS8yyAW0u4Qbhd0TisqDlgZBnJtE78n94eUFqnDjQafRwsaIz1S/nCoxO+gDFLwefo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xfusion.com; spf=pass smtp.mailfrom=xfusion.com; arc=none smtp.client-ip=36.139.87.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xfusion.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xfusion.com
-Received: from wuxpheds03048.xfusion.com (unknown [10.32.143.30])
-	by wxsgout04.xfusion.com (SkyGuard) with ESMTPS id 4dGhxF3JHYzBDTTC;
-	Wed, 26 Nov 2025 22:37:53 +0800 (CST)
-Received: from DESKTOP-Q8I2N5U.xfusion.com (10.82.130.100) by
- wuxpheds03048.xfusion.com (10.32.143.30) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_RSA_WITH_AES_128_CBC_SHA256) id 15.2.2562.20;
- Wed, 26 Nov 2025 22:40:48 +0800
-From: shechenglong <shechenglong@xfusion.com>
-To: <axboe@kernel.dk>
-CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<stone.xulei@xfusion.com>, <chenjialong@xfusion.com>, shechenglong
-	<shechenglong@xfusion.com>
-Subject: [RESEND PATCH] null_blk: align struct nullb_device field types with module parameters
-Date: Wed, 26 Nov 2025 22:39:57 +0800
-Message-ID: <20251126143957.1085-1-shechenglong@xfusion.com>
-X-Mailer: git-send-email 2.37.1.windows.1
+	s=arc-20240116; t=1764171261; c=relaxed/simple;
+	bh=paKrs7yXqi9ntWtPsmuVhsk6+zHX1rvw13z0IhPUBUQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=p+UJvjpZr00ublCpqjw4+sCKMDu2Q/SB4IwT+rGmbI/S7W6DbLXcQNGFsOse3EK7m93TCb9WYgoFx/h8CHuFdTGnU/EoU0LMbcunI1R/gd9FnYXyGum0Zyeo0XZkRJZEj4Iqh04fm0hY2YiKVpN/R3nm5FaRnUrxe7R+TzW1XTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=u6sODHKa; arc=none smtp.client-ip=199.89.3.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="u6sODHKa"
+Received: from localhost (localhost [127.0.0.1])
+	by 004.mia.mailroute.net (Postfix) with ESMTP id 4dGkBF2Q44zm1Hc4;
+	Wed, 26 Nov 2025 15:34:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1764171251; x=1766763252; bh=XsWD+FfiDmZSdZWNNBeoyZ7+
+	as6zrRAU4D5VAHLXwHc=; b=u6sODHKaaW7byFI0aMx5DzmeP+HZ/bFnu48EgdYC
+	EozerBCeUvYqI6rWeEw/6LoxnxNSbmbk6Dfmi7OTehWPHOFhNbtuM3o5Vq8WxT85
+	yVq5GWSEOyvNxwE2yRir5lLpWSVQJHxVTS5QJoKY1zdNNgB14+SJhWL9FtRaFjPU
+	EoxNDxGJgjYu+8/Ias+iTQbnT0cq5Fd9LgPTZ3lM6gauifSBZ6japxoKI5/e0POu
+	jYzWcexM+i48YzvwVhyOS/7siOqCd9ZLuZSC7r202ZwTlwVCacyyNMm+jwHpU7um
+	OF0CsZcw467b7+xs/7DIzhEY6YgHnox083c6DOvNLVTFvw==
+X-Virus-Scanned: by MailRoute
+Received: from 004.mia.mailroute.net ([127.0.0.1])
+ by localhost (004.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id JFad-4fXKcap; Wed, 26 Nov 2025 15:34:11 +0000 (UTC)
+Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 004.mia.mailroute.net (Postfix) with ESMTPSA id 4dGkB118dGzm0XCV;
+	Wed, 26 Nov 2025 15:34:00 +0000 (UTC)
+Message-ID: <9b6e7d55-6a1f-490e-98c7-3c04f85f7444@acm.org>
+Date: Wed, 26 Nov 2025 07:33:58 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: wuxpheds03045.xfusion.com (10.32.131.99) To
- wuxpheds03048.xfusion.com (10.32.143.30)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] PM: runtime: Fix I/O hang due to race between resume
+ and runtime disable
+To: "Rafael J. Wysocki" <rafael@kernel.org>, YangYang <yang.yang@vivo.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Pavel Machek <pavel@kernel.org>,
+ Len Brown <lenb@kernel.org>, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, Danilo Krummrich <dakr@kernel.org>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-pm@vger.kernel.org
+References: <20251126101636.205505-1-yang.yang@vivo.com>
+ <20251126101636.205505-2-yang.yang@vivo.com>
+ <CAJZ5v0i1YLiri9oiiq2W6_KSbqGuWOqdrMPrOf=do-DdW=_rfA@mail.gmail.com>
+ <1a2d2059-0548-4c5f-a986-5081447c3325@vivo.com>
+ <CAJZ5v0iSgrLzsjh+bvF2=rxxhYcBetJ6V-joWaQud4ahkm1GkQ@mail.gmail.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <CAJZ5v0iSgrLzsjh+bvF2=rxxhYcBetJ6V-joWaQud4ahkm1GkQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The struct nullb_device previously used generic int types for several
-fields that represent boolean flags, unsigned counters, or large size
-values. This patch updates the field types to improve type safety and
-match the corresponding module parameters:
+On 11/26/25 4:36 AM, Rafael J. Wysocki wrote:
+> Well, the code as is now schedules an async resume of the device and
+> then waits for it to complete.  It would be more straightforward to
+> resume the device synchronously IMV.
 
-- Change boolean fields to bool (e.g., no_sched, virt_boundary)
-- Change counters and queue-related fields to unsigned int
-- Change size-related fields (size, cache_size, zone_size, zone_capacity)
-  to unsigned long
+That would increase the depth of the call stack significantly. I'm not
+sure that's safe in this context.
 
-This ensures consistency between module_param declarations and internal
-data structures, prevents negative values for unsigned parameters.
-The output of modinfo before and after applying this patch is as follows:
+Thanks,
 
-Before:
-[...]
-parm:           no_sched:No io scheduler (int)
-parm:           submit_queues:Number of submission queues (int)
-parm:           poll_queues:Number of IOPOLL submission queues (int)
-parm:           home_node:Home node for the device (int)
-[...]
-parm:           gb:Size in GB (int)
-parm:           bs:Block size (in bytes) (int)
-parm:           max_sectors:Maximum size of a command
-                (in 512B sectors) (int)
-[...]
-parm:           hw_queue_depth:Queue depth for each hardware queue. 
-                Default: 64 (int)
-[...]
-parm:           zone_append_max_sectors:Maximum size of a zone append 
-                command (in 512B sectors). Specify 0 for zone append
-                emulation (int)
-
-After:
-[...]
-parm:           no_sched:No io scheduler (bool)
-parm:           submit_queues:Number of submission queues (uint)
-parm:           poll_queues:Number of IOPOLL submission queues (uint)
-parm:           home_node:Home node for the device (uint)
-[...]
-parm:           gb:Size in GB (ulong)
-parm:           bs:Block size (in bytes) (uint)
-parm:           max_sectors:Maximum size of a command
-                (in 512B sectors) (uint)
-[...]
-parm:           hw_queue_depth:Queue depth for each hardware queue.
-                Default: 64 (uint)
-[...]
-parm:           zone_append_max_sectors:Maximum size of a zone append
-                command (in 512B sectors). Specify 0 for zone append
-                emulation (uint)
-Signed-off-by: shechenglong <shechenglong@xfusion.com>
----
- drivers/block/null_blk/main.c | 36 +++++++++++++++++------------------
- 1 file changed, 18 insertions(+), 18 deletions(-)
-
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index 0ee55f889cfd..544009297458 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -81,20 +81,20 @@ static bool g_virt_boundary;
- module_param_named(virt_boundary, g_virt_boundary, bool, 0444);
- MODULE_PARM_DESC(virt_boundary, "Require a virtual boundary for the device. Default: False");
- 
--static int g_no_sched;
--module_param_named(no_sched, g_no_sched, int, 0444);
-+static bool g_no_sched;
-+module_param_named(no_sched, g_no_sched, bool, 0444);
- MODULE_PARM_DESC(no_sched, "No io scheduler");
- 
--static int g_submit_queues = 1;
--module_param_named(submit_queues, g_submit_queues, int, 0444);
-+static unsigned int g_submit_queues = 1;
-+module_param_named(submit_queues, g_submit_queues, uint, 0444);
- MODULE_PARM_DESC(submit_queues, "Number of submission queues");
- 
--static int g_poll_queues = 1;
--module_param_named(poll_queues, g_poll_queues, int, 0444);
-+static unsigned int g_poll_queues = 1;
-+module_param_named(poll_queues, g_poll_queues, uint, 0444);
- MODULE_PARM_DESC(poll_queues, "Number of IOPOLL submission queues");
- 
--static int g_home_node = NUMA_NO_NODE;
--module_param_named(home_node, g_home_node, int, 0444);
-+static unsigned int g_home_node = NUMA_NO_NODE;
-+module_param_named(home_node, g_home_node, uint, 0444);
- MODULE_PARM_DESC(home_node, "Home node for the device");
- 
- #ifdef CONFIG_BLK_DEV_NULL_BLK_FAULT_INJECTION
-@@ -157,16 +157,16 @@ static const struct kernel_param_ops null_queue_mode_param_ops = {
- device_param_cb(queue_mode, &null_queue_mode_param_ops, &g_queue_mode, 0444);
- MODULE_PARM_DESC(queue_mode, "Block interface to use (0=bio,1=rq,2=multiqueue)");
- 
--static int g_gb = 250;
--module_param_named(gb, g_gb, int, 0444);
-+static unsigned long g_gb = 250;
-+module_param_named(gb, g_gb, ulong, 0444);
- MODULE_PARM_DESC(gb, "Size in GB");
- 
--static int g_bs = 512;
--module_param_named(bs, g_bs, int, 0444);
-+static unsigned int g_bs = 512;
-+module_param_named(bs, g_bs, uint, 0444);
- MODULE_PARM_DESC(bs, "Block size (in bytes)");
- 
--static int g_max_sectors;
--module_param_named(max_sectors, g_max_sectors, int, 0444);
-+static unsigned int g_max_sectors;
-+module_param_named(max_sectors, g_max_sectors, uint, 0444);
- MODULE_PARM_DESC(max_sectors, "Maximum size of a command (in 512B sectors)");
- 
- static unsigned int nr_devices = 1;
-@@ -205,8 +205,8 @@ static unsigned long g_completion_nsec = 10000;
- module_param_named(completion_nsec, g_completion_nsec, ulong, 0444);
- MODULE_PARM_DESC(completion_nsec, "Time in ns to complete a request in hardware. Default: 10,000ns");
- 
--static int g_hw_queue_depth = 64;
--module_param_named(hw_queue_depth, g_hw_queue_depth, int, 0444);
-+static unsigned int g_hw_queue_depth = 64;
-+module_param_named(hw_queue_depth, g_hw_queue_depth, uint, 0444);
- MODULE_PARM_DESC(hw_queue_depth, "Queue depth for each hardware queue. Default: 64");
- 
- static bool g_use_per_node_hctx;
-@@ -257,8 +257,8 @@ static unsigned int g_zone_max_active;
- module_param_named(zone_max_active, g_zone_max_active, uint, 0444);
- MODULE_PARM_DESC(zone_max_active, "Maximum number of active zones when block device is zoned. Default: 0 (no limit)");
- 
--static int g_zone_append_max_sectors = INT_MAX;
--module_param_named(zone_append_max_sectors, g_zone_append_max_sectors, int, 0444);
-+static unsigned int g_zone_append_max_sectors = INT_MAX;
-+module_param_named(zone_append_max_sectors, g_zone_append_max_sectors, uint, 0444);
- MODULE_PARM_DESC(zone_append_max_sectors,
- 		 "Maximum size of a zone append command (in 512B sectors). Specify 0 for zone append emulation");
- 
--- 
-2.33.0
-
+Bart.
