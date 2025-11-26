@@ -1,204 +1,161 @@
-Received: from mail-ua1-f48.google.com (mail-ua1-f48.google.com [209.85.222.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48D5231D756
-	for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 11:08:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE2B8322C65
+	for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 11:30:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764155319; cv=none; b=YClathH4TWtvxPDAApj62MFKvpjn4xUvCj7O3fLAsOmhMyM4n+Y/F4soBezWAnu9rhfZ5Y2dF+ljzN9o+cMrabZjQf0TyVo6f78xMUoUrW9GbesbmUKNXnMRnY8VMq4n+qWuDU5k8N4pBr7B8V+9dBjvzaY2YrOw154GCCOULSQ=
+	t=1764156641; cv=none; b=H0VbUzGTDD4F/Y0aB3kx3WEtkqTJFI0Cl2EtDTr1JZk0P6P/1jnUxttFYZ2ACwy6U50L5qt0ijr6Je7/9lIZG6z3eQUEDu0Uaj3T2vxXGsb5T7bQvZMQtv7HDrtUC+J5dc7WYuoeSBGjYLgWISKgDu0s0hMhzU+Yuut4fnQDIQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764155319; c=relaxed/simple;
-	bh=9C2/NcVvxt77/Yvodh6sQQ91tjV62bpYwTZQswBcUMU=;
+	s=arc-20240116; t=1764156641; c=relaxed/simple;
+	bh=YlHXYC6LfJ/ry7GrBuAN0glshz1B+/T6723f0KetEBs=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=shDpjgext0guqUrkOipILSw09Bynx5E4qI+W7dWoammHIIlYydK6wntXj/qyyokiJqL6hgFbhRL2CsoxKrh8VjjLSxpKqYeRaRknGurpKfN/uL8p6phTY5gepmrZHZg1es9O7MX+Qj3nMj396qBPEdy55GcOgHa2QRGBeR7pDZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FrRzVqce; arc=none smtp.client-ip=209.85.222.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=i2v85bLomGt5JwCFquIHrEpbDK8P2OcGS1tk4TQwMKT1MkzwY0DaeGY2m3FlbFF+XhJRPsKZs3fBo8JBWLMhlDBFI9aEstmvt/nVfBs1mpqmGLCkds1dX0fstxps/pEK/Bj7BI7Moir2IGGaOziHmz8EntMQttOj6ru6rpPDxP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vHRFsgzo; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FrRzVqce"
-Received: by mail-ua1-f48.google.com with SMTP id a1e0cc1a2514c-937262a397eso1899908241.1
-        for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 03:08:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764155315; x=1764760115; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8AY2VIxT/dP2zuoIFV4agaRzfXW2PN18+pOYnpq4lu8=;
-        b=FrRzVqcePfu5JwvhG3ZHfWKuSCBMUoiTE1M5a61ltF6Tt5E0Agpsut92xfLdvlRCB1
-         Q9JRflN+6uRQsWArNCGVRyf43EUW4Me20mUbl+S+JrCCk+3OfpamB4S+liBzlm1JJp1Y
-         om7nhRmF1Lxxyo0bP9Ob365wwCmBF4b8rV4E89WMkH7WXmQz6eJ3w54fWY1Qq8JIFYEE
-         DmYP+YN5tISvv2JSiVCjeB+NRwXgySVgz7j9p8deX3SnMS5Ri1fDVLev45KkJXot1r3y
-         UB81ZQosinKeHS8XylSfbJ4BOGvg2tC/Q3Iopp5vQUBO8mtfVgGQO3YV646Tehd66lwy
-         zRww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764155315; x=1764760115;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=8AY2VIxT/dP2zuoIFV4agaRzfXW2PN18+pOYnpq4lu8=;
-        b=fxNTB0o4OPQhiiYPpMyh4W0Huf7dFPfuraqIWBcnxe46zavRaNkbpfZS/8PuAmnoUY
-         TAnCJzMX0GsQgDYTuB2PDU3wbxdDNhgdLjXM+TyNi1ewQP7ER0GirLjtMF+ZDTc5htYu
-         TGpImT7fhzVFqGLY+pu1hmqwmnUflMoHqYiTL6XZdMHRsi7Na0zVKJKgs+1pv+Bgyy/R
-         qfmUmdlHUISPuzbtFAT4d9EsqnIqsWUDuaQoX5HOA+AypaEzh4kGQtbiMbpvq5PY3Z+F
-         gEolPwsNYL/ZbFx7kVx/pQmKPRW1/9/KVmugdY2saQjy38tKuAKJ1TmFkqPJipvkjwt7
-         jFrA==
-X-Forwarded-Encrypted: i=1; AJvYcCWcD7GEqz5NlLmerDHh9iaDQ4yRCvU6jzc5rITQ5IFksDERrIsZsKNTVT6fba2LVzIZXylFmQ+916O5uQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzru3oRIweL7qzLQTrZGh4QncF0iJJh2t8PMULCRwqq8zkE9r0G
-	/KkwzM2/j1fu/sdT8IuEN//mZQu/P5XJlHbpiZnEnjnER8uvow4qyNKMUpePWoLFUD0Tr/M5qh8
-	bQ+fZCT9EZBnJzRZUYrQYpvjBs8Bn7ro=
-X-Gm-Gg: ASbGnctHW8J/UDO/Q1XFuFE75kNOEt8zKHpdr3hCyF1zDVfK5KmqAaljr8hTqJoO+mN
-	YGo2muzLttyF9XWSVv5rohLhFHy5fUbRntUrIMOqBYKEmkqLO2kN8SSsfTac4LGP1xoHojmID0o
-	VOWrQp86F89/vf8cFitmtvBGMxKp4mlrKqOeQrMWItC8YKv4MvcVYu/hCe+gNNGVn4V5M6CS6gL
-	rBZZRKUtcLTgC0PVgj8Zl67PHBdRDAGQyv5qvfqG0/aOic5L3P+x0mdNfQJNT7sdgWAUg==
-X-Google-Smtp-Source: AGHT+IFyeGO9PCJAArYeLtA1vX9hBXW0orN309Zq4TLy61tzphZeZ6pHB9w2iCTvgTRkhX0dfeBF1Lynujv3elQnrKg=
-X-Received: by 2002:a05:6102:a4e:b0:5db:3111:9330 with SMTP id
- ada2fe7eead31-5e1de3c0e97mr6296792137.27.1764155314876; Wed, 26 Nov 2025
- 03:08:34 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vHRFsgzo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9247CC19423
+	for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 11:30:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764156640;
+	bh=YlHXYC6LfJ/ry7GrBuAN0glshz1B+/T6723f0KetEBs=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=vHRFsgzo2kulXWnuwVDhQ4nMYkVVrYsaVkiLwujyVk5Frle2fKp9Psd/DanLUJR0q
+	 yeeCdQDhzslxTM9QaHO8gjzdPEiYKejAjDYY8xrgOIPlaFVDnsQSZfs2l5z/LEx0Q5
+	 oWE0a8Fbn1V18066KHJOwaJT9pgMTGzAkoHsGJsXm9Yc8gIv+lkvGobqQLxdEKc59D
+	 rO1aQy8zDdwmTCFsGAU4Jw9D+0zjZLKO4LD0jH+hIw5NF/AqlNEz5UGdL6hV4YEevD
+	 MU1Fhzqeuvp4tjERsbVnPbVyFCJfYhQL/VRIF6E2FCUA90UvU0h/gtOzUBWxYxnMX2
+	 wRK+HzDy38YiQ==
+Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-3eae4e590a4so2176117fac.1
+        for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 03:30:40 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCU6oNvQMwL2U8GJjpzlTvaMNLcFfPUWEYlY7KG0ocxIEpDZqG1r+JWfQmUFjZVeb6GzYGjhjbKMcHapcg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXgLgukyB4pSSVRluq3KpjItHNPX3QzFj238CfZohH4yJD3utt
+	krRjM0tgvWXISJY3k+EkRs8xLmUTyK2qyMOQOuUszrsUWuqRu9KYkvz10mAvVhlA+eSMIsQoaJt
+	zP+smYTAaY61nNsun2AZyMnkzMOph7js=
+X-Google-Smtp-Source: AGHT+IEF1TZKMUnsR9oNvymAECHY//8wFXOR3I1Sl7VA/ljiIXWBpHVIUvkOiBPq2J11Cpsg/LyZ9Gorn+CByUZ0Ht8=
+X-Received: by 2002:a05:6808:2223:b0:450:d5cf:2f49 with SMTP id
+ 5614622812f47-4511585e787mr7796823b6e.17.1764156639811; Wed, 26 Nov 2025
+ 03:30:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250910-work-namespace-v1-0-4dd56e7359d8@kernel.org>
- <20250910-work-namespace-v1-1-4dd56e7359d8@kernel.org> <lhu7bvd6u03.fsf_-_@oldenburg.str.redhat.com>
-In-Reply-To: <lhu7bvd6u03.fsf_-_@oldenburg.str.redhat.com>
-From: Eugene Syromyatnikov <evgsyr@gmail.com>
-Date: Wed, 26 Nov 2025 12:08:19 +0100
-X-Gm-Features: AWmQ_blH6F5dTImS9T2yEKSQi7mTbsqdURayo9P3HSzLI7PhinkAeFA2QqkHgpo
-Message-ID: <CACGkJdun_DfF8VRXHRazyZn+dVqiHwKD2Ys9L0Oh-Znr-2d_dQ@mail.gmail.com>
-Subject: Re: Stability of ioctl constants in the UAPI (Re: [PATCH 01/32]
- pidfs: validate extensible ioctls)
-To: strace development discussions <strace-devel@lists.strace.io>
-Cc: Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
-	Amir Goldstein <amir73il@gmail.com>, linux-fsdevel@vger.kernel.org, 
-	Josef Bacik <josef@toxicpanda.com>, Jeff Layton <jlayton@kernel.org>, Mike Yuan <me@yhndnzj.com>, 
-	=?UTF-8?Q?Zbigniew_J=C4=99drzejewski=2DSzmek?= <zbyszek@in.waw.pl>, 
-	Lennart Poettering <mzxreary@0pointer.de>, Daan De Meyer <daan.j.demeyer@gmail.com>, 
-	Aleksa Sarai <cyphar@cyphar.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
-	=?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Chuck Lever <chuck.lever@oracle.com>, linux-nfs@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, netdev@vger.kernel.org, 
-	libc-alpha@sourceware.org, "Dmitry V. Levin" <ldv@strace.io>, 
-	address-sanitizer <address-sanitizer@googlegroups.com>
+References: <20251126101636.205505-1-yang.yang@vivo.com> <20251126101636.205505-2-yang.yang@vivo.com>
+In-Reply-To: <20251126101636.205505-2-yang.yang@vivo.com>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Wed, 26 Nov 2025 12:30:28 +0100
+X-Gmail-Original-Message-ID: <CAJZ5v0i1YLiri9oiiq2W6_KSbqGuWOqdrMPrOf=do-DdW=_rfA@mail.gmail.com>
+X-Gm-Features: AWmQ_blIypH8FZGJ5t5wdWLfBeMA5iXhZrD2pRpYMNCq-N4-fkTvsGfZYLj3cyk
+Message-ID: <CAJZ5v0i1YLiri9oiiq2W6_KSbqGuWOqdrMPrOf=do-DdW=_rfA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] PM: runtime: Fix I/O hang due to race between resume
+ and runtime disable
+To: Yang Yang <yang.yang@vivo.com>
+Cc: Jens Axboe <axboe@kernel.dk>, "Rafael J. Wysocki" <rafael@kernel.org>, Pavel Machek <pavel@kernel.org>, 
+	Len Brown <lenb@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Danilo Krummrich <dakr@kernel.org>, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-pm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 26, 2025 at 10:19=E2=80=AFAM Florian Weimer <fweimer@redhat.com=
-> wrote:
+On Wed, Nov 26, 2025 at 11:17=E2=80=AFAM Yang Yang <yang.yang@vivo.com> wro=
+te:
 >
-> * Christian Brauner:
+> We observed the following hung task during our test:
 >
-> > Validate extensible ioctls stricter than we do now.
-> >
-> > Signed-off-by: Christian Brauner <brauner@kernel.org>
-> > ---
-> >  fs/pidfs.c         |  2 +-
-> >  include/linux/fs.h | 14 ++++++++++++++
-> >  2 files changed, 15 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/fs/pidfs.c b/fs/pidfs.c
-> > index edc35522d75c..0a5083b9cce5 100644
-> > --- a/fs/pidfs.c
-> > +++ b/fs/pidfs.c
-> > @@ -440,7 +440,7 @@ static bool pidfs_ioctl_valid(unsigned int cmd)
-> >                * erronously mistook the file descriptor for a pidfd.
-> >                * This is not perfect but will catch most cases.
-> >                */
-> > -             return (_IOC_TYPE(cmd) =3D=3D _IOC_TYPE(PIDFD_GET_INFO));
-> > +             return extensible_ioctl_valid(cmd, PIDFD_GET_INFO, PIDFD_=
-INFO_SIZE_VER0);
-> >       }
-> >
-> >       return false;
-> > diff --git a/include/linux/fs.h b/include/linux/fs.h
-> > index d7ab4f96d705..2f2edc53bf3c 100644
-> > --- a/include/linux/fs.h
-> > +++ b/include/linux/fs.h
-> > @@ -4023,4 +4023,18 @@ static inline bool vfs_empty_path(int dfd, const=
- char __user *path)
-> >
-> >  int generic_atomic_write_valid(struct kiocb *iocb, struct iov_iter *it=
-er);
-> >
-> > +static inline bool extensible_ioctl_valid(unsigned int cmd_a,
-> > +                                       unsigned int cmd_b, size_t min_=
-size)
-> > +{
-> > +     if (_IOC_DIR(cmd_a) !=3D _IOC_DIR(cmd_b))
-> > +             return false;
-> > +     if (_IOC_TYPE(cmd_a) !=3D _IOC_TYPE(cmd_b))
-> > +             return false;
-> > +     if (_IOC_NR(cmd_a) !=3D _IOC_NR(cmd_b))
-> > +             return false;
-> > +     if (_IOC_SIZE(cmd_a) < min_size)
-> > +             return false;
-> > +     return true;
-> > +}
-> > +
-> >  #endif /* _LINUX_FS_H */
+> [ 3987.095999] INFO: task "kworker/u32:7":239 blocked for more than 188 s=
+econds.
+> [ 3987.096017] task:kworker/u32:7   state:D stack:0     pid:239   tgid:23=
+9   ppid:2      flags:0x00000408
+> [ 3987.096042] Workqueue: writeback wb_workfn (flush-254:59)
+> [ 3987.096069] Call trace:
+> [ 3987.096073]  __switch_to+0x1a0/0x318
+> [ 3987.096089]  __schedule+0xa38/0xf9c
+> [ 3987.096104]  schedule+0x74/0x10c
+> [ 3987.096118]  __bio_queue_enter+0xb8/0x178
+> [ 3987.096132]  blk_mq_submit_bio+0x104/0x728
+> [ 3987.096145]  __submit_bio+0xa0/0x23c
+> [ 3987.096159]  submit_bio_noacct_nocheck+0x164/0x330
+> [ 3987.096173]  submit_bio_noacct+0x348/0x468
+> [ 3987.096186]  submit_bio+0x17c/0x198
+> [ 3987.096199]  f2fs_submit_write_bio+0x44/0xe8
+> [ 3987.096211]  __submit_merged_bio+0x40/0x11c
+> [ 3987.096222]  __submit_merged_write_cond+0xcc/0x1f8
+> [ 3987.096233]  f2fs_write_data_pages+0xbb8/0xd0c
+> [ 3987.096246]  do_writepages+0xe0/0x2f4
+> [ 3987.096255]  __writeback_single_inode+0x44/0x4ac
+> [ 3987.096272]  writeback_sb_inodes+0x30c/0x538
+> [ 3987.096289]  __writeback_inodes_wb+0x9c/0xec
+> [ 3987.096305]  wb_writeback+0x158/0x440
+> [ 3987.096321]  wb_workfn+0x388/0x5d4
+> [ 3987.096335]  process_scheduled_works+0x1c4/0x45c
+> [ 3987.096346]  worker_thread+0x32c/0x3e8
+> [ 3987.096356]  kthread+0x11c/0x1b0
+> [ 3987.096372]  ret_from_fork+0x10/0x20
 >
-> Is this really the right direction?  This implies that the ioctl
-> constants change as the structs get extended.  At present, this impacts
-> struct pidfd_info and PIDFD_GET_INFO.
+>  T1:                                   T2:
+>  blk_queue_enter
+>  blk_pm_resume_queue
+>  pm_request_resume
 
-Well, some classes of ioctls are indeed designed like that (drm comes
-to mind), but I agree that it is something that preferably should be
-decided at the initial interface design stage (including the
-constants, for example, evdev is probably a good example of handling
-them), as otherwise there will be userspace code that assumes that the
-size doesn't change.
+Shouldn't this be pm_runtime_resume() rather?
 
-> I think this is a deparature from the previous design, where (low-level)
-> userspace did not have not worry about the internal structure of ioctl
-> commands and could treat them as opaque bit patterns.  With the new
-> approach, we have to dissect some of the commands in the same way
-> extensible_ioctl_valid does it above.
+>  __pm_runtime_resume(dev, RPM_ASYNC)
+>  rpm_resume                            __pm_runtime_disable
+>  dev->power.request_pending =3D true     dev->power.disable_depth++
+>  queue_work(pm_wq, &dev->power.work)   __pm_runtime_barrier
+>  wait_event                            cancel_work_sync(&dev->power.work)
 >
-> So far, this impacts glibc ABI tests.  Looking at the strace sources, it
-> doesn't look to me as if the ioctl handler is prepared to deal with this
-> situation, either, because it uses the full ioctl command for lookups.
-
-strace usually handles this opportunistically, but indeed ioctls which
-don't have fixed size across kernel version require additional care in
-terms of handling, decoding, and printing.
-
-> The sanitizers could implement generic ioctl checking with the embedded
-> size information in the ioctl command, but the current code structure is
-> not set up to handle this because it's indexed by the full ioctl
-> command, not the type.  I think in some cases, the size is required to
-> disambiguate ioctl commands because the type field is not unique across
-> devices.
-
-In terms of disambiguation, one needs to look at the fd in question,
-and even that is oftentimes not enough (again, in drm, one needs to
-figure out what driver backs a specific fd in order to determine the
-ioctl semantics properly).
-
-> In some cases, the sanitizers would have to know the exact
-> command (not just the size), to validate points embedded in the struct
-> passed to the ioctl.  So I don't think changing ioctl constants when
-> extensible structs change is obviously beneficial to the sanitizers,
-> either.
+> T1 queues the work item, which is then cancelled by T2 before it starts
+> execution. As a result, q->dev cannot be resumed, and T1 waits here for
+> a long time.
 >
-> I would prefer if the ioctl commands could be frozen and decoupled from
-> the structs.  As far as I understand it, there is no requirement that
-> the embedded size matches what the kernel deals with.
+> Signed-off-by: Yang Yang <yang.yang@vivo.com>
+> ---
+>  drivers/base/power/runtime.c | 3 ++-
+>  include/linux/pm.h           | 1 +
+>  2 files changed, 3 insertions(+), 1 deletion(-)
 >
-> Thanks,
-> Florian
->
+> diff --git a/drivers/base/power/runtime.c b/drivers/base/power/runtime.c
+> index 1b11a3cd4acc..fc9bf3fb3bb7 100644
+> --- a/drivers/base/power/runtime.c
+> +++ b/drivers/base/power/runtime.c
+> @@ -1533,7 +1533,8 @@ void __pm_runtime_disable(struct device *dev, bool =
+check_resume)
+>          * means there probably is some I/O to process and disabling runt=
+ime PM
+>          * shouldn't prevent the device from processing the I/O.
+>          */
+> -       if (check_resume && dev->power.request_pending &&
+> +       if ((check_resume || dev->power.force_check_resume) &&
+> +           dev->power.request_pending &&
+>             dev->power.request =3D=3D RPM_REQ_RESUME) {
+>                 /*
+>                  * Prevent suspends and idle notifications from being car=
+ried
+
+There are only two cases in which false is passed to
+__pm_runtime_disable(), one is in device_suspend_late() and I don't
+think that's relevant here, and the other is in pm_runtime_remove()
+and that's get called when the device is going away.
+
+So apparently, blk_pm_resume_queue() races with the device going away.
+Is this expected to happen even?
+
+If so, wouldn't it be better to modify pm_runtime_remove() to pass
+true to __pm_runtime_disable() instead of making these ad hoc changes?
+
+> diff --git a/include/linux/pm.h b/include/linux/pm.h
+> index cc7b2dc28574..4eb20569cdbc 100644
+> --- a/include/linux/pm.h
+> +++ b/include/linux/pm.h
+> @@ -708,6 +708,7 @@ struct dev_pm_info {
+>         bool                    use_autosuspend:1;
+>         bool                    timer_autosuspends:1;
+>         bool                    memalloc_noio:1;
+> +       bool                    force_check_resume:1;
+>         unsigned int            links_count;
+>         enum rpm_request        request;
+>         enum rpm_status         runtime_status;
 > --
-> Strace-devel mailing list
-> Strace-devel@lists.strace.io
-> https://lists.strace.io/mailman/listinfo/strace-devel
-
-
-
---=20
-Eugene Syromyatnikov
-mailto:evgsyr@gmail.com
-xmpp:esyr@jabber.{ru|org}
