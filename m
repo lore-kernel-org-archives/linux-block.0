@@ -1,59 +1,61 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82E38331A57
-	for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 16:20:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A71433DEF7
+	for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 16:20:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764174024; cv=none; b=jolHtNCb4KH28XlftHF8zvb22ly2HRkD13mQSd3CVOOq6forG5wGBP/5BgUzWqfgOs0IErSlFx4UWvl+mRS7l/kWpuwSY2nzQbCTkpAZXjyGhktSYXApIkdt6uOeaZPSxJREWnt2WhQIG0jVkzhhT4k8Kvy5eGsBMp5sDzXAPBU=
+	t=1764174047; cv=none; b=fuJCPnUY3RVkmbgtn9INFkW8i1Bv8HGQqZMASjm0TXLhj/pYBI81ECvvdacs+Z35/qIZfE2BgRzaKek15B6FoRF/3d8UitI3zcgsKWBIGr6PSb7tqO66KRRzSGl8+mcTiYNeqv1ZepzeREPjZ1SDkkRzg1vrjg1vz3sKeUAqPfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764174024; c=relaxed/simple;
-	bh=wXjGUZeMOz1hGLe5c+VRMASjy7GTN2NrGP86qqIgpX8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JAYN4g6BmiRdZnv5KwsbLEuqeZOKvce0l3pGCk6xeB8Dt015bhZhCF9MNwNruQvWdv7JMiQWz3v7h5mB5uR3sQpMwqh0PmxuVAQeMA+0BOkdJtRC0dlMrnCa2op73xoXLrcklJ06KCFoX/0JPjWvsd8G68fxv2Aza+toBmQ2RR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=kIa4u0in; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=kIa4u0in; arc=none smtp.client-ip=195.135.223.130
+	s=arc-20240116; t=1764174047; c=relaxed/simple;
+	bh=7HVe38fGf9O0P+2M/aGTe3AqoeP1IVHjJywuyxqp+YA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=boJS5jsWzHeXcHaOXxN9rKKN/t6ussvJ0YrP8c8Zsl9vJPWwKltd2tTIWk6JcVQfHXsK4eFEwbBXSk7ANYBg9DFIXth/ZiSbPKqitNQNJNi20j174F0+Guv0L/mqHoT1Qp+LECNHpnPj+tYp+MeJ4W9WnbpCQSH/WsnS/P2XfXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=l0zC9X77; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=l0zC9X77; arc=none smtp.client-ip=195.135.223.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="kIa4u0in";
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="kIa4u0in"
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="l0zC9X77";
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="l0zC9X77"
 Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id CFF0022D57;
-	Wed, 26 Nov 2025 16:20:20 +0000 (UTC)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id DBECD5BEC2;
+	Wed, 26 Nov 2025 16:20:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1764174020; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=Edyr3JIcssZPzLUBYOKLIR47asUKGoc/LXSm51c/xFM=;
-	b=kIa4u0inAxEFPkTeqGZCkDZ4D2vt01np+F6+w+3qFtF+GGEHwE9ugJfZ6Z3Yo6AjO61FjP
-	3v9F9272z8Wn2iVrpu9JGA1rtfCfw9Nhmk6iBUbyc1P5Bz5G/72+JtiyzYyEz22PWWq8SE
-	T15t07/DIftfkmL6PisqLwrZhtKDMks=
-Authentication-Results: smtp-out1.suse.de;
+	t=1764174043; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=E6NZNgwK7uASRwAaTsoHBOWL98m36NgtcvOr7XBJKRI=;
+	b=l0zC9X77WtSe+c5FbHImlnHMtbOibieEEfMRboxeXFi5BU9T27zN8fuGdXK1uSAf3ULU+V
+	PyU4c+g3ACt9WmH8gHSUXl3I58wrqKvnvRSBre9A8SpMA8Xino0Snw40OjxvJaIOZZBMZ3
+	l8UsEYOmTkcMChn6NQ/hDRsk6koxVow=
+Authentication-Results: smtp-out2.suse.de;
 	none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1764174020; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=Edyr3JIcssZPzLUBYOKLIR47asUKGoc/LXSm51c/xFM=;
-	b=kIa4u0inAxEFPkTeqGZCkDZ4D2vt01np+F6+w+3qFtF+GGEHwE9ugJfZ6Z3Yo6AjO61FjP
-	3v9F9272z8Wn2iVrpu9JGA1rtfCfw9Nhmk6iBUbyc1P5Bz5G/72+JtiyzYyEz22PWWq8SE
-	T15t07/DIftfkmL6PisqLwrZhtKDMks=
+	t=1764174043; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=E6NZNgwK7uASRwAaTsoHBOWL98m36NgtcvOr7XBJKRI=;
+	b=l0zC9X77WtSe+c5FbHImlnHMtbOibieEEfMRboxeXFi5BU9T27zN8fuGdXK1uSAf3ULU+V
+	PyU4c+g3ACt9WmH8gHSUXl3I58wrqKvnvRSBre9A8SpMA8Xino0Snw40OjxvJaIOZZBMZ3
+	l8UsEYOmTkcMChn6NQ/hDRsk6koxVow=
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 3572C3EA63;
-	Wed, 26 Nov 2025 16:20:20 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 863573EA63;
+	Wed, 26 Nov 2025 16:20:43 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 6YWpC8QoJ2lbLQAAD6G6ig
-	(envelope-from <jgross@suse.com>); Wed, 26 Nov 2025 16:20:20 +0000
+	id 6F1NH9soJ2kELgAAD6G6ig
+	(envelope-from <jgross@suse.com>); Wed, 26 Nov 2025 16:20:43 +0000
 From: Juergen Gross <jgross@suse.com>
 To: linux-kernel@vger.kernel.org,
 	x86@kernel.org,
-	virtualization@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-hwmon@vger.kernel.org,
 	linux-block@vger.kernel.org
 Cc: Juergen Gross <jgross@suse.com>,
 	Thomas Gleixner <tglx@linutronix.de>,
@@ -61,21 +63,14 @@ Cc: Juergen Gross <jgross@suse.com>,
 	Borislav Petkov <bp@alien8.de>,
 	Dave Hansen <dave.hansen@linux.intel.com>,
 	"H. Peter Anvin" <hpa@zytor.com>,
-	Ajay Kaher <ajay.kaher@broadcom.com>,
-	Alexey Makhalov <alexey.makhalov@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-	xen-devel@lists.xenproject.org,
-	Jean Delvare <jdelvare@suse.com>,
-	Guenter Roeck <linux@roeck-us.net>,
 	Denis Efremov <efremov@linux.com>,
 	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 0/5] x86: Cleanups around slow_down_io()
-Date: Wed, 26 Nov 2025 17:20:13 +0100
-Message-ID: <20251126162018.5676-1-jgross@suse.com>
+Subject: [PATCH 4/5] block/floppy: Don't use REALLY_SLOW_IO for delays
+Date: Wed, 26 Nov 2025 17:20:17 +0100
+Message-ID: <20251126162018.5676-5-jgross@suse.com>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20251126162018.5676-1-jgross@suse.com>
+References: <20251126162018.5676-1-jgross@suse.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -83,65 +78,109 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-2.80 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spam-Flag: NO
+X-Spam-Score: -6.80
+X-Spam-Level: 
+X-Spamd-Result: default: False [-6.80 / 50.00];
+	REPLY(-4.00)[];
+	BAYES_HAM(-3.00)[100.00%];
 	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	NEURAL_HAM_SHORT(-0.20)[-1.000];
 	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	ARC_NA(0.00)[];
-	DKIM_SIGNED(0.00)[suse.com:s=susede1];
-	URIBL_BLOCKED(0.00)[suse.com:mid,imap1.dmz-prg2.suse.org:helo];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_TWO(0.00)[2];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:mid,imap1.dmz-prg2.suse.org:helo];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.com:email,suse.com:mid];
+	DKIM_SIGNED(0.00)[suse.com:s=susede1];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_TLS_ALL(0.00)[]
-X-Spam-Level: 
-X-Spam-Score: -2.80
-X-Spam-Flag: NO
 
-While looking at paravirt cleanups I stumbled over slow_down_io() and
-the related REALLY_SLOW_IO define.
+Instead of defining REALLY_SLOW_IO before including io.h, add the
+required additional calls of native_io_delay() to the related functions
+in arch/x86/include/asm/floppy.h.
 
-Especially REALLY_SLOW_IO is a mess, which is proven by 2 completely
-wrong use cases.
+This will remove the last place where REALLY_SLOW_IO is being defined.
 
-Do several cleanups, resulting in a deletion of REALLY_SLOW_IO and the
-io_delay() paravirt function hook.
+Signed-off-by: Juergen Gross <jgross@suse.com>
+---
+ arch/x86/include/asm/floppy.h | 27 ++++++++++++++++++++++-----
+ drivers/block/floppy.c        |  2 --
+ 2 files changed, 22 insertions(+), 7 deletions(-)
 
-Patches 2 and 3 are not changing any functionality, but maybe they
-should? As the potential bug has been present for more than a decade
-now, I went with just deleting the useless "#define REALLY_SLOW_IO".
-The alternative would be to do something similar as in patch 5.
-
-Juergen Gross (5):
-  x86/paravirt: Replace io_delay() hook with a bool
-  hwmon/lm78: Drop REALLY_SLOW_IO setting
-  hwmon/w83781d: Drop REALLY_SLOW_IO setting
-  block/floppy: Don't use REALLY_SLOW_IO for delays
-  x86/io: Remove REALLY_SLOW_IO handling
-
- arch/x86/include/asm/floppy.h         | 27 ++++++++++++++++++++++-----
- arch/x86/include/asm/io.h             | 12 +++++-------
- arch/x86/include/asm/paravirt.h       | 11 +----------
- arch/x86/include/asm/paravirt_types.h |  3 +--
- arch/x86/kernel/cpu/vmware.c          |  2 +-
- arch/x86/kernel/kvm.c                 |  8 +-------
- arch/x86/kernel/paravirt.c            |  3 +--
- arch/x86/xen/enlighten_pv.c           |  6 +-----
- drivers/block/floppy.c                |  2 --
- drivers/hwmon/lm78.c                  |  5 +++--
- drivers/hwmon/w83781d.c               |  5 +++--
- 11 files changed, 39 insertions(+), 45 deletions(-)
-
+diff --git a/arch/x86/include/asm/floppy.h b/arch/x86/include/asm/floppy.h
+index e7a244051c62..8d1e86687b98 100644
+--- a/arch/x86/include/asm/floppy.h
++++ b/arch/x86/include/asm/floppy.h
+@@ -29,9 +29,6 @@
+ #define CSW fd_routine[can_use_virtual_dma & 1]
+ 
+ 
+-#define fd_inb(base, reg)		inb_p((base) + (reg))
+-#define fd_outb(value, base, reg)	outb_p(value, (base) + (reg))
+-
+ #define fd_request_dma()	CSW._request_dma(FLOPPY_DMA, "floppy")
+ #define fd_free_dma()		CSW._free_dma(FLOPPY_DMA)
+ #define fd_enable_irq()		enable_irq(FLOPPY_IRQ)
+@@ -49,6 +46,26 @@ static char *virtual_dma_addr;
+ static int virtual_dma_mode;
+ static int doing_pdma;
+ 
++static inline u8 fd_inb(u16 base, u16 reg)
++{
++	u8 ret = inb_p(base + reg);
++
++	native_io_delay();
++	native_io_delay();
++	native_io_delay();
++
++	return ret;
++}
++
++static inline void fd_outb(u8 value, u16 base, u16 reg)
++{
++	outb_p(value, base + reg);
++
++	native_io_delay();
++	native_io_delay();
++	native_io_delay();
++}
++
+ static irqreturn_t floppy_hardint(int irq, void *dev_id)
+ {
+ 	unsigned char st;
+@@ -79,9 +96,9 @@ static irqreturn_t floppy_hardint(int irq, void *dev_id)
+ 			if (st != (STATUS_DMA | STATUS_READY))
+ 				break;
+ 			if (virtual_dma_mode)
+-				outb_p(*lptr, virtual_dma_port + FD_DATA);
++				fd_outb(*lptr, virtual_dma_port, FD_DATA);
+ 			else
+-				*lptr = inb_p(virtual_dma_port + FD_DATA);
++				*lptr = fd_inb(virtual_dma_port, FD_DATA);
+ 		}
+ 		virtual_dma_count = lcount;
+ 		virtual_dma_addr = lptr;
+diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+index 5336c3c5ca36..cda36a8f9a05 100644
+--- a/drivers/block/floppy.c
++++ b/drivers/block/floppy.c
+@@ -145,8 +145,6 @@
+  * Better audit of register_blkdev.
+  */
+ 
+-#define REALLY_SLOW_IO
+-
+ #define DEBUGT 2
+ 
+ #define DPRINT(format, args...) \
 -- 
 2.51.0
 
