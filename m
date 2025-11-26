@@ -1,202 +1,223 @@
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A7273595D;
-	Wed, 26 Nov 2025 00:18:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6384D2F2918
+	for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 02:37:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764116337; cv=none; b=X0UpguotiXezDmp1gJAbu4PiLqw1tpt6O1y5L5piMnCIoBZeXXR2U5ZwpjbejDpeO+dYSJuEocwDQ6+yHpQdvOgDfnXcLDwhu0iuoEETujVdRHoA+1RsLHXww81YzRwTUPDewR1bMl+WazLlaeSzWrpgZhTnq95vw+Quv4RfMKQ=
+	t=1764124639; cv=none; b=gssiDoqdq84xk5A9CUO5I81bOlnBQI5ik5zsR6oksB031xr2nKbZJMLWrHiaq3gBwVU6pFNgaAxfU6w2F+wAaTbLeljoa8U26oU2PA3C1f1zWqzvUAbmPKh5pgbfD+jcj0PfttO8M5tWdH9hiWlH7geopyMIb/cID09cF7TS2ns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764116337; c=relaxed/simple;
-	bh=gwii+iVdBVKbWCyCdr/+zthLuTAXebNs8mhXSw/5DRY=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uhYN7UrKDcWDvpjp3/K6SAxCcl3yX/XEguV7lgNTb0Fr4ebsDBAg6PNiZk+xVTk3UXFgimlzxhqG/fKj6G2A/ek4ZguPF4BBbrFvIz9N5VzLKXzRhxF/UU9Kk+42wJiA8cFfu6OABwK7jrDi5nUJ/3P6e02n/McHdMWOpKATu9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b=W+AKvPIc; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fb.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+	s=arc-20240116; t=1764124639; c=relaxed/simple;
+	bh=pxuO7lo4RNzUGyMrbTrssQJXkAqOwV8BIy37TFUn0yo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TI14WHR+Tk0p39bHNHVj4S5lOJy6O9BjbX7TFnhlAT8q06Yl/fov/5Em89GEMLnY5Oc1geo0V/o4pnAvlmc7ZnRGXOpdhNTaGvytIC8TgmYfR3983YE5QXXNVPn3+u9QNpUm/nTUy/zjj05Vo+JD20d7aM6G2ki2En9cB1eTh8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ePDQuscH; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fb.com header.i=@fb.com header.b="W+AKvPIc"
-Received: from pps.filterd (m0148461.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5APKA97n1087396;
-	Tue, 25 Nov 2025 16:18:10 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=qGBFfom64ubwAcHLmi0kGY4idgptPgMMsGDiFpmxSnI=; b=W+AKvPIcq+Gs
-	i3tYYc6MNSXntK0NmrX6mDMiJh2f1He+waI1tJUFw9eep8toqFOiXcXgv1d9N8HG
-	PGdbn6/fGl6qS46R20vtpCyrMHLj0wH4JK9pXWvIXkrNgijhiczlYtlomrwOthSj
-	zml1ieuFYLYIUzuWZ91PR3D7DWCyaUSc0LCurvPCQxAzzat402xRMP4oyeWdz0ty
-	1EYyma4UMfnDB7SWN7UNyv49rng7qo94JM/vlLrbdULgh6NjCeHD1lakMZtk49rg
-	EGdIyMsuzoL8EN2ERVeIEmaZ0+aXHHcjPKQINfA5NEORkyA0TfReyUgtpSsOkjBL
-	M3cSvkYsxQ==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4ank8qsk46-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Tue, 25 Nov 2025 16:18:10 -0800 (PST)
-Received: from devgpu015.cco6.facebook.com (2620:10d:c085:108::4) by
- mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.29; Wed, 26 Nov 2025 00:18:08 +0000
-Date: Tue, 25 Nov 2025 16:18:03 -0800
-From: Alex Mastro <amastro@fb.com>
-To: Leon Romanovsky <leon@kernel.org>
-CC: Bjorn Helgaas <bhelgaas@google.com>,
-        Logan Gunthorpe
-	<logang@deltatee.com>, Jens Axboe <axboe@kernel.dk>,
-        Robin Murphy
-	<robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-        Will Deacon
-	<will@kernel.org>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Jason
- Gunthorpe <jgg@ziepe.ca>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jonathan
- Corbet <corbet@lwn.net>,
-        Sumit Semwal <sumit.semwal@linaro.org>,
-        Christian
- =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-        Kees Cook
-	<kees@kernel.org>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Ankit
- Agrawal <ankita@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>,
-        Shameer
- Kolothum <skolothumtho@nvidia.com>,
-        Kevin Tian <kevin.tian@intel.com>, Alex
- Williamson <alex@shazbot.org>,
-        Krishnakant Jaju <kjaju@nvidia.com>, Matt Ochs
-	<mochs@nvidia.com>,
-        <linux-pci@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <iommu@lists.linux.dev>,
-        <linux-mm@kvack.org>, <linux-doc@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
-        <linaro-mm-sig@lists.linaro.org>, <kvm@vger.kernel.org>,
-        <linux-hardening@vger.kernel.org>, Nicolin Chen <nicolinc@nvidia.com>,
-        Jason
- Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH v9 06/11] dma-buf: provide phys_vec to scatter-gather
- mapping routine
-Message-ID: <aSZHO6otK0Heh+Qj@devgpu015.cco6.facebook.com>
-References: <20251120-dmabuf-vfio-v9-0-d7f71607f371@nvidia.com>
- <20251120-dmabuf-vfio-v9-6-d7f71607f371@nvidia.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ePDQuscH"
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-7bb3092e4d7so6744457b3a.0
+        for <linux-block@vger.kernel.org>; Tue, 25 Nov 2025 18:37:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764124637; x=1764729437; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Qt1MZpNKWoqgVDxQoUbhRRb+/kXBWmuaotwFheQ1vHc=;
+        b=ePDQuscHlpeVYlTJjupu6ow0HHp3S8MZ7E2BF6UN689I9U0gWf7p3l2fOUrLSbMrvM
+         cU4xbPXAaI/QtabkcyYat7C/pby0aVq5YbpwenEV3zVMH6yRYXDjb09w38JfSoL5PaDA
+         E3G5cKs0ypI4vqifsWl+dI4BpqGoIYeboRTaAHNs3tXPBFOUGW13dgMh2bzj1VfE3YQh
+         ydmjF8d2UCjbqhs6Y1UvOq6cFAk2dNmuNZw5VJA99TaM6vDgGf9XG1bmOAuZd1wOSNl4
+         PfPLBdE+N1K+20tKWUPcPBpXOVOmnCJe+s2s+QtTfOZjpsZzxnKo3IJldP2Lxvkp9TJp
+         W86g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764124637; x=1764729437;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Qt1MZpNKWoqgVDxQoUbhRRb+/kXBWmuaotwFheQ1vHc=;
+        b=SwzTCoEellWGxr+Aw6cABoZajtoU9GjOnX6eeeRq27VxSTEFWcCqhXI5Zlsjv4WAb1
+         /3hngQPYYy0TvLmTKm7zl6xocg/mLEUF9CKbKkRU8gUSv+AFFIsvLiQi7mhWJXPmj866
+         2N9oQiFmgdhWQBOmy1U1ilxftTR+2fvRyHJtC6WZJ9FMglDkoYUWLOvcHznSbYo9Gw30
+         rtSf8t0i+Z/pa8VzVoNNeCBl/fvczWtWBeXjSirztp7k5uQi8ZM8I+fGvqZvlQGWaKeP
+         46WFE8kn7OOLWWnG2Ewew3kHCJRKweUpWZ1LDd1eX4k7qIZjlxyEahCC0hsxAbbG33P3
+         iMyA==
+X-Forwarded-Encrypted: i=1; AJvYcCUpYthsmjfPwt3AHk3Eq9mJxDCGoVl+S36k1s6MMx3UV8it/Vnelj22DNVI1xkMGLICShlK5QbwXLORMA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyWHSRJorBJN8oQM+EF+zgl/a0BNDGd+R7Q8kn6aHN73bWG6GAY
+	g5xa4yXIG5ZJTfzdOF1IFJdfFY5et0LTfIsABDBCbG63ANg+542jGvCP
+X-Gm-Gg: ASbGncudZT8PLBA1t3VHFJxlMFUWmUwsZN7VVn0K/Smy2ZREelkzUb1b53yNOZMoAbZ
+	jogtd2Wsv0dwGrG9D7jUNBtkH+Nq0gnhbzYFzg6cbAmzYp55CxTQn6OUaTe1SadykNnCzwVUDy5
+	mcLhPPmZQnIUnvkMbhaZ4gF89g8jsRSgqDZ+rQJtrSFPvCuzZoqKGk4NBqPfMCXWHXjyGwPTCd5
+	hx3fCRSuC27QRtYTgFqpfL89fN8Jom4rOsy48vIez++FAFAqzFUnL9vw8E+ruOaUlmL2lkTqKLk
+	W9vIr2SMTT3BIBlQFEyTcY7676OfoTc2afr0qlwiq4h3vnuKU2EQCkSIAKlSjSK+WdODNe6kK6w
+	tMrlVTmxhBlATIf2RVbSehh8qzj+oeexx6aajtWDszW3EqXRaIsHtzjS4kC/RD6nu09qIpbhIDb
+	cwgZItS4ImRytNxKMD9UmfwargBlM85A==
+X-Google-Smtp-Source: AGHT+IFMPVdPASuME6boYfK9CSm7iGISD/qVZKhPKWlRPsY/Zck4GXkccO8MN1rBK0lovp98a7V31w==
+X-Received: by 2002:a05:6a00:3906:b0:77f:efd:829b with SMTP id d2e1a72fcca58-7c58e602dcdmr17676868b3a.22.1764124636518;
+        Tue, 25 Nov 2025 18:37:16 -0800 (PST)
+Received: from [10.189.138.37] ([43.224.245.241])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7c3f1262364sm19518773b3a.58.2025.11.25.18.37.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Nov 2025 18:37:16 -0800 (PST)
+Message-ID: <b18c489f-d6ee-4986-94be-a9aade7d3a47@gmail.com>
+Date: Wed, 26 Nov 2025 10:37:10 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251120-dmabuf-vfio-v9-6-d7f71607f371@nvidia.com>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTI2MDAwMCBTYWx0ZWRfX4aU+4yoxvGRI
- fn5uIgo4phoyJLcsXRpkIiEbPHjmDvXjee+0hL5hZTnMf7KiIbVFpuPgNNxmzJnPoXlqYrYFVCb
- EPyFD9HoNuq9bFWOWGD9jm+tH6jYX1bWvVVFfP7wmtxUCfM6nyWp9RhEW4F3WyT2gvOl06d0Lit
- II5EZrklZ4kZ6ZccZ6uI5fnA2fhf1sXF7BU/xkJ1DrQkkrbuth2BkU2ET85sZ92FJE5mmeSgTwT
- 8QOBncjhE4/DUMlusLJDyljY4I1YOkD69BDnY6LZhPAqbK1Ws3OXJ/OhGSqPOvK63g6mktQG9A/
- 4TjZvhvYG6pYNypXlNsc0JrFDrM/97nZlDYVEtn7wlUXLxFDOXnHdS+vQBslO6M76Dlb+/Whxi6
- 97TQYdVHP7oL0xprhG3cL4XfcOc0nA==
-X-Proofpoint-ORIG-GUID: 5DCeEKEPh0Lq0c0QeLIVINEpDK6-Nmfl
-X-Proofpoint-GUID: 5DCeEKEPh0Lq0c0QeLIVINEpDK6-Nmfl
-X-Authority-Analysis: v=2.4 cv=VfT6/Vp9 c=1 sm=1 tr=0 ts=69264742 cx=c_pps
- a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
- a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VwQbUJbxAAAA:8 a=3j4BkbkPAAAA:8 a=qThf3vN7FU90BnacfoAA:9 a=3ZKOabzyN94A:10
- a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-25_02,2025-11-25_01,2025-10-01_01
+User-Agent: Mozilla Thunderbird
+Subject: Re: [f2fs-dev] [PATCH V3 6/6] xfs: ignore discard return value
+To: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>, axboe@kernel.dk,
+ agk@redhat.com, snitzer@kernel.org, mpatocka@redhat.com, song@kernel.org,
+ yukuai@fnnas.com, hch@lst.de, sagi@grimberg.me, kch@nvidia.com,
+ jaegeuk@kernel.org, chao@kernel.org, cem@kernel.org
+Cc: dm-devel@lists.linux.dev, linux-raid@vger.kernel.org,
+ Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+ linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+ linux-f2fs-devel@lists.sourceforge.net, linux-block@vger.kernel.org,
+ bpf@vger.kernel.org, linux-xfs@vger.kernel.org,
+ Yongpeng Yang <yangyongpeng@xiaomi.com>
+References: <20251124234806.75216-1-ckulkarnilinux@gmail.com>
+ <20251124234806.75216-7-ckulkarnilinux@gmail.com>
+Content-Language: en-US
+From: Yongpeng Yang <yangyongpeng.storage@gmail.com>
+In-Reply-To: <20251124234806.75216-7-ckulkarnilinux@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 20, 2025 at 11:28:25AM +0200, Leon Romanovsky wrote:
-> +static struct scatterlist *fill_sg_entry(struct scatterlist *sgl, size_t length,
-> +					 dma_addr_t addr)
-> +{
-> +	unsigned int len, nents;
-> +	int i;
-> +
-> +	nents = DIV_ROUND_UP(length, UINT_MAX);
-> +	for (i = 0; i < nents; i++) {
-> +		len = min_t(size_t, length, UINT_MAX);
-> +		length -= len;
-> +		/*
-> +		 * DMABUF abuses scatterlist to create a scatterlist
-> +		 * that does not have any CPU list, only the DMA list.
-> +		 * Always set the page related values to NULL to ensure
-> +		 * importers can't use it. The phys_addr based DMA API
-> +		 * does not require the CPU list for mapping or unmapping.
-> +		 */
-> +		sg_set_page(sgl, NULL, 0, 0);
-> +		sg_dma_address(sgl) = addr + i * UINT_MAX;
 
-(i * UINT_MAX) happens in 32-bit before being promoted to dma_addr_t for
-addition with addr. Overflows for i >=2 when length >= 8 GiB. Needs a cast:
+On 11/25/25 07:48, Chaitanya Kulkarni wrote:
+> __blkdev_issue_discard() always returns 0, making all error checking
+> in XFS discard functions dead code.
+> 
+> Change xfs_discard_extents() return type to void, remove error variable,
+> error checking, and error logging for the __blkdev_issue_discard() call
+> in same function.
+> 
+> Update xfs_trim_perag_extents() and xfs_trim_rtgroup_extents() to
+> ignore the xfs_discard_extents() return value and error checking
+> code.
+> 
+> Update xfs_discard_rtdev_extents() to ignore __blkdev_issue_discard()
+> return value and error checking code.
+> 
+> Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+> ---
+>   fs/xfs/xfs_discard.c | 27 +++++----------------------
+>   fs/xfs/xfs_discard.h |  2 +-
+>   2 files changed, 6 insertions(+), 23 deletions(-)
+> 
+> diff --git a/fs/xfs/xfs_discard.c b/fs/xfs/xfs_discard.c
+> index 6917de832191..b6ffe4807a11 100644
+> --- a/fs/xfs/xfs_discard.c
+> +++ b/fs/xfs/xfs_discard.c
+> @@ -108,7 +108,7 @@ xfs_discard_endio(
+>    * list. We plug and chain the bios so that we only need a single completion
+>    * call to clear all the busy extents once the discards are complete.
+>    */
+> -int
+> +void
+>   xfs_discard_extents(
+>   	struct xfs_mount	*mp,
+>   	struct xfs_busy_extents	*extents)
+> @@ -116,7 +116,6 @@ xfs_discard_extents(
+>   	struct xfs_extent_busy	*busyp;
+>   	struct bio		*bio = NULL;
+>   	struct blk_plug		plug;
+> -	int			error = 0;
+>   
+>   	blk_start_plug(&plug);
+>   	list_for_each_entry(busyp, &extents->extent_list, list) {
+> @@ -126,18 +125,10 @@ xfs_discard_extents(
+>   
+>   		trace_xfs_discard_extent(xg, busyp->bno, busyp->length);
+>   
+> -		error = __blkdev_issue_discard(btp->bt_bdev,
+> +		__blkdev_issue_discard(btp->bt_bdev,
+>   				xfs_gbno_to_daddr(xg, busyp->bno),
+>   				XFS_FSB_TO_BB(mp, busyp->length),
+>   				GFP_KERNEL, &bio);
 
-		sg_dma_address(sgl) = addr + (dma_addr_t)i * UINT_MAX;
+If blk_alloc_discard_bio() fails to allocate a bio inside
+__blkdev_issue_discard(), this may lead to an invalid loop in
+list_for_each_entry{}. Instead of using __blkdev_issue_discard(), how
+about allocate and submit the discard bios explicitly in
+list_for_each_entry{}?
 
-Discovered this while debugging why dma-buf import was failing for
-an 8 GiB dma-buf using my earlier toy program [1]. It was surfaced by
-ib_umem_find_best_pgsz() returning 0 due to malformed scatterlist, which bubbles
-up as an EINVAL.
+Yongpeng,
 
-$ ./test_dmabuf 0000:05:00.0 3 4 0 0x200000000
-opening 0000:05:00.0 via /dev/vfio/56
-allocating dma_buf bar_idx=4, bar_offset=0x0, size=0x200000000
-allocated dma_buf fd=6
-discovered 4 ibv devices: mlx5_0 mlx5_1 mlx5_2 mlx5_3
-opened ibv device 3: mlx5_3
-test_dmabuf.c:154 Condition failed: 'mr' (errno=22: Invalid argument)
+> -		if (error && error != -EOPNOTSUPP) {
+> -			xfs_info(mp,
+> -	 "discard failed for extent [0x%llx,%u], error %d",
+> -				 (unsigned long long)busyp->bno,
+> -				 busyp->length,
+> -				 error);
+> -			break;
+> -		}
+>   	}
+>   
+>   	if (bio) {
+> @@ -148,8 +139,6 @@ xfs_discard_extents(
+>   		xfs_discard_endio_work(&extents->endio_work);
+>   	}
+>   	blk_finish_plug(&plug);
+> -
+> -	return error;
+>   }
+>   
+>   /*
+> @@ -385,9 +374,7 @@ xfs_trim_perag_extents(
+>   		 * list  after this function call, as it may have been freed by
+>   		 * the time control returns to us.
+>   		 */
+> -		error = xfs_discard_extents(pag_mount(pag), extents);
+> -		if (error)
+> -			break;
+> +		xfs_discard_extents(pag_mount(pag), extents);
+>   
+>   		if (xfs_trim_should_stop())
+>   			break;
+> @@ -496,12 +483,10 @@ xfs_discard_rtdev_extents(
+>   
+>   		trace_xfs_discard_rtextent(mp, busyp->bno, busyp->length);
+>   
+> -		error = __blkdev_issue_discard(bdev,
+> +		__blkdev_issue_discard(bdev,
+>   				xfs_rtb_to_daddr(mp, busyp->bno),
+>   				XFS_FSB_TO_BB(mp, busyp->length),
+>   				GFP_NOFS, &bio);
+> -		if (error)
+> -			break;
+>   	}
+>   	xfs_discard_free_rtdev_extents(tr);
+>   
+> @@ -741,9 +726,7 @@ xfs_trim_rtgroup_extents(
+>   		 * list  after this function call, as it may have been freed by
+>   		 * the time control returns to us.
+>   		 */
+> -		error = xfs_discard_extents(rtg_mount(rtg), tr.extents);
+> -		if (error)
+> -			break;
+> +		xfs_discard_extents(rtg_mount(rtg), tr.extents);
+>   
+>   		low = tr.restart_rtx;
+>   	} while (!xfs_trim_should_stop() && low <= high);
+> diff --git a/fs/xfs/xfs_discard.h b/fs/xfs/xfs_discard.h
+> index 2b1a85223a56..8c5cc4af6a07 100644
+> --- a/fs/xfs/xfs_discard.h
+> +++ b/fs/xfs/xfs_discard.h
+> @@ -6,7 +6,7 @@ struct fstrim_range;
+>   struct xfs_mount;
+>   struct xfs_busy_extents;
+>   
+> -int xfs_discard_extents(struct xfs_mount *mp, struct xfs_busy_extents *busy);
+> +void xfs_discard_extents(struct xfs_mount *mp, struct xfs_busy_extents *busy);
+>   int xfs_ioc_trim(struct xfs_mount *mp, struct fstrim_range __user *fstrim);
+>   
+>   #endif /* XFS_DISCARD_H */
 
-$ sudo retsnoop -e mlx5_ib_reg_user_mr_dmabuf -a 'mlx5*' -a 'ib_umem*' -a '*umr*' -a 'vfio_pci*' -a 'dma_buf_*' -x EINVAL -T
-Receiving data...
-13:56:22.257907 -> 13:56:22.258275 TID/PID 948895/948895 (test_dmabuf/test_dmabuf):
-FUNCTION CALLS                                 RESULT                 DURATION
---------------------------------------------   --------------------  ---------
-→ mlx5_ib_reg_user_mr_dmabuf
-    ↔ mlx5r_umr_resource_init                  [0]                     2.224us
-    → ib_umem_dmabuf_get
-        → ib_umem_dmabuf_get_with_dma_device
-            ↔ dma_buf_get                      [0xff11012a6a098c00]    0.972us
-            → dma_buf_dynamic_attach
-                ↔ vfio_pci_dma_buf_attach      [0]                     2.003us
-            ← dma_buf_dynamic_attach           [0xff1100012793e400]   10.566us
-        ← ib_umem_dmabuf_get_with_dma_device   [0xff110127a6c74480]   15.794us
-    ← ib_umem_dmabuf_get                       [0xff110127a6c74480]   25.258us
-    → mlx5_ib_init_dmabuf_mr
-        → ib_umem_dmabuf_map_pages
-            → dma_buf_map_attachment
-                → vfio_pci_dma_buf_map
-                    ↔ dma_buf_map              [0xff1100012977f700]    4.918us
-                ← vfio_pci_dma_buf_map         [0xff1100012977f700]    8.362us
-            ← dma_buf_map_attachment           [0xff1100012977f700]   10.956us
-        ← ib_umem_dmabuf_map_pages             [0]                    17.336us
-        ↔ ib_umem_find_best_pgsz               [0]                     6.280us
-        → ib_umem_dmabuf_unmap_pages
-            → dma_buf_unmap_attachment
-                → vfio_pci_dma_buf_unmap
-                    ↔ dma_buf_unmap            [void]                  2.023us
-                ← vfio_pci_dma_buf_unmap       [void]                  6.700us
-            ← dma_buf_unmap_attachment         [void]                  8.142us
-        ← ib_umem_dmabuf_unmap_pages           [void]                 14.953us
-    ← mlx5_ib_init_dmabuf_mr                   [-EINVAL]              67.272us
-    → mlx5r_umr_revoke_mr
-        → mlx5r_umr_post_send_wait
-            → mlx5r_umr_post_send
-                ↔ mlx5r_begin_wqe              [0]                     1.703us
-                ↔ mlx5r_finish_wqe             [void]                  1.633us
-                ↔ mlx5r_ring_db                [void]                  1.312us
-            ← mlx5r_umr_post_send              [0]                    27.451us
-        ← mlx5r_umr_post_send_wait             [0]                   126.541us
-    ← mlx5r_umr_revoke_mr                      [0]                   141.925us
-    → ib_umem_release
-        → ib_umem_dmabuf_release
-            ↔ ib_umem_dmabuf_revoke            [void]                  1.582us
-            ↔ dma_buf_detach                   [void]                  3.765us
-            ↔ dma_buf_put                      [void]                  0.531us
-        ← ib_umem_dmabuf_release               [void]                 23.315us
-    ← ib_umem_release                          [void]                 40.301us
-← mlx5_ib_reg_user_mr_dmabuf                   [-EINVAL]             363.280us
-
-[1] https://lore.kernel.org/all/aQkLcAxEn4qmF3c4@devgpu015.cco6.facebook.com/
-
-Alex
