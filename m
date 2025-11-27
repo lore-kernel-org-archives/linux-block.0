@@ -1,162 +1,148 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE07E33858A
-	for <linux-block@vger.kernel.org>; Thu, 27 Nov 2025 15:54:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E4E2F0689
+	for <linux-block@vger.kernel.org>; Thu, 27 Nov 2025 18:03:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764258885; cv=none; b=KnDgTA/ZShPawNkLC2urCp7WBIAOcLKfLMOeuhpUiXX06MHmuKWmm0/JLAOJ5N5FOgNECZUGnJnR4MLgpo8FV1oH16cDfUsGk4lQCZm+6+VZ/fWTumA/cbTAjco19t0Y0UhTotvP3lD6sHCZY83jz16EZNPv6NQvqjevMr1nqdA=
+	t=1764266636; cv=none; b=W4Wj3QNpyW3Sgo8+/wTjlETbfbdRD3w6ZF5cC58TqmITVnQpTHqpGqUclak4areReigARGAzkF0mUkP/iYGJYjchyg1yAI+tnz6PfEjzbdXQ6/CXvqisyaeFaYUZoyq388RwiRQeeAXhgX0QEdhV7Ie7HUBW3YOkulbWoy10Olg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764258885; c=relaxed/simple;
-	bh=UnK2ntYweN/+uoHx/cZ35NmP35Rk3AuyNeP3XG/hKoM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FUstdwtJ574pHe1FWa+8V9Zcj0JOddl79Qh7H4IUTIVX18rPxl9kvzVaHD1aqwJJJmbddZG9aipwBC07+ft6iI2iaaLTf7F7BoGT74QFayat/UNTekaykpRAT7kRxxiiUwIandJxA/+2aG0+hGzWsu+7zRUdMD3y0b1sGwy/tiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cCNikULP; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1764266636; c=relaxed/simple;
+	bh=vkUHQROeX/mQl2Wj/R4EOZpNwjo0OQ7Z5Rt0f0IXsYI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SWwQYmfd+Xr4dGPbvfYv1JwzAaidaADM584H04OZBmesGerJwM6vVo8tiOMa+kcCTf7cnIEPQ5n9HqJH2+gnId8YyYAC/SJMvnlSFzQ7jtqWi+N2KTJxQyyLzecNmyqoMZ5TxN660SSRpdS7RHs1Rh6zJS1h5mZkz5vbpyKwP0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=mQi2lsqh; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=JImYMuvY; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ZJg3kSoC; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=fUi6AXHs; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cCNikULP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764258882;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="mQi2lsqh";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="JImYMuvY";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ZJg3kSoC";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="fUi6AXHs"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id E9A23336A4;
+	Thu, 27 Nov 2025 18:03:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1764266632; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=DJlFUMlUmKnKN3LsYjfFmXO2vVL0XSZBtqZZGvyT5E0=;
-	b=cCNikULP6zyfw+m7xWn7vWibdnqXEV3yxkBMLvmnQq48BZNcC1OigBpeNeR4eKv3KsAQnK
-	7YmNcOW9+fXByYGH0gGGMyLWHGiPfr891sxqeNowvfP0wT29SPjufdGsK/a7pxldAANXgc
-	PONO46fBVKW7dXGOIRgFviRwz5v8zns=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-444-moWsFbkRM5u0v3XJFm7rjA-1; Thu,
- 27 Nov 2025 10:54:39 -0500
-X-MC-Unique: moWsFbkRM5u0v3XJFm7rjA-1
-X-Mimecast-MFC-AGG-ID: moWsFbkRM5u0v3XJFm7rjA_1764258877
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	bh=UXwOJqPQn7tI1KgWPuA2BrBC2jrBW1HxngC1Xi1a91I=;
+	b=mQi2lsqh49h6oESXXOAmMchwCcvTGOaqPhGefxY1VXOWHqV3ZOa7ZPoz++rgeEU8nweFqY
+	Ohzo1aFNxFthLYyB/ZiisFZvL8Xetd9WG2IFscr9YA4qcszHc42Dh32b+Ru1VjK57dN3eb
+	aHqu1uKKfrjhNVitLqbJf118D08xfYY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1764266632;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UXwOJqPQn7tI1KgWPuA2BrBC2jrBW1HxngC1Xi1a91I=;
+	b=JImYMuvYdKON4oiSf/wJxQ6gUJ34OLb5icpD9AekipxqnZyMqM+Hld71rnwAToJJgzBxsz
+	thk5AALAGdXLtcDQ==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1764266631; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UXwOJqPQn7tI1KgWPuA2BrBC2jrBW1HxngC1Xi1a91I=;
+	b=ZJg3kSoCn20Hr4CNrS49ssji512WmJLHCX/RuUJWGL4JjpWqKqjoDDTZBYGSCNBz539QKY
+	4dhcd5lhU3u5BAFGTAgBrdWYNWXliOqUvwZPLZEKHhxCs8Bjhje9+2lltHoKxNotjS6cMR
+	NywImEGgiEv75/Er6HYPI0ZNvDrzKHM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1764266631;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UXwOJqPQn7tI1KgWPuA2BrBC2jrBW1HxngC1Xi1a91I=;
+	b=fUi6AXHsPl8Gf5n9ra0dzrJz5N3bY89LF/LDJ5umaV3nbGJRPOVGSa9MnGQKnZ+vnGdlh8
+	Ppl9VkI5IPTuXVDQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 591101800358;
-	Thu, 27 Nov 2025 15:54:37 +0000 (UTC)
-Received: from localhost (unknown [10.2.16.53])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 65D4B195608E;
-	Thu, 27 Nov 2025 15:54:36 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: linux-block@vger.kernel.org
-Cc: Keith Busch <kbusch@kernel.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	linux-kernel@vger.kernel.org,
-	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Mike Christie <michael.christie@oracle.com>,
-	linux-nvme@lists.infradead.org,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-scsi@vger.kernel.org,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Hannes Reinecke <hare@suse.de>
-Subject: [PATCH v2 4/4] block: add IOC_PR_READ_RESERVATION ioctl
-Date: Thu, 27 Nov 2025 10:54:24 -0500
-Message-ID: <20251127155424.617569-5-stefanha@redhat.com>
-In-Reply-To: <20251127155424.617569-1-stefanha@redhat.com>
-References: <20251127155424.617569-1-stefanha@redhat.com>
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 81C593EA63;
+	Thu, 27 Nov 2025 18:03:51 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id RH4QHoeSKGnhXgAAD6G6ig
+	(envelope-from <hare@suse.de>); Thu, 27 Nov 2025 18:03:51 +0000
+Message-ID: <4eb8b77a-6553-42ec-ab85-a1cddb7d8f23@suse.de>
+Date: Thu, 27 Nov 2025 19:03:51 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/4] scsi: sd: reject invalid pr_read_keys() num_keys
+ values
+To: Stefan Hajnoczi <stefanha@redhat.com>, linux-block@vger.kernel.org
+Cc: Keith Busch <kbusch@kernel.org>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ linux-kernel@vger.kernel.org,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ Christoph Hellwig <hch@lst.de>, Mike Christie <michael.christie@oracle.com>,
+ linux-nvme@lists.infradead.org, Jens Axboe <axboe@kernel.dk>,
+ linux-scsi@vger.kernel.org, Sagi Grimberg <sagi@grimberg.me>
+References: <20251127155424.617569-1-stefanha@redhat.com>
+ <20251127155424.617569-2-stefanha@redhat.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20251127155424.617569-2-stefanha@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+X-Spam-Flag: NO
+X-Spam-Score: -4.30
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:mid,imap1.dmz-prg2.suse.org:helo]
 
-Add a Persistent Reservations ioctl to read the current reservation.
-This calls the pr_ops->read_reservation() function that was previously
-added in commit c787f1baa503 ("block: Add PR callouts for read keys and
-reservation") but was only used by the in-kernel SCSI target so far.
-
-The IOC_PR_READ_RESERVATION ioctl is necessary so that userspace
-applications that rely on Persistent Reservations ioctls have a way of
-inspecting the current state. Cluster managers and validation tests need
-this functionality.
-
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+On 11/27/25 16:54, Stefan Hajnoczi wrote:
+> The pr_read_keys() interface has a u32 num_keys parameter. The SCSI
+> PERSISTENT RESERVE IN command has a maximum READ KEYS service action
+> size of 65536 bytes. Reject num_keys values that are too large to fit
+> into the SCSI command.
+> 
+> This will become important when pr_read_keys() is exposed to untrusted
+> userspace via an <linux/pr.h> ioctl.
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>   drivers/scsi/sd.c | 11 ++++++++++-
+>   1 file changed, 10 insertions(+), 1 deletion(-)
+> 
 Reviewed-by: Hannes Reinecke <hare@suse.de>
----
- include/uapi/linux/pr.h |  7 +++++++
- block/ioctl.c           | 28 ++++++++++++++++++++++++++++
- 2 files changed, 35 insertions(+)
 
-diff --git a/include/uapi/linux/pr.h b/include/uapi/linux/pr.h
-index fcb74eab92c80..847f3051057af 100644
---- a/include/uapi/linux/pr.h
-+++ b/include/uapi/linux/pr.h
-@@ -62,6 +62,12 @@ struct pr_read_keys {
- 	__u64	keys_ptr;
- };
- 
-+struct pr_read_reservation {
-+	__u64	key;
-+	__u32	generation;
-+	__u32	type;
-+};
-+
- #define PR_FL_IGNORE_KEY	(1 << 0)	/* ignore existing key */
- 
- #define IOC_PR_REGISTER		_IOW('p', 200, struct pr_registration)
-@@ -71,5 +77,6 @@ struct pr_read_keys {
- #define IOC_PR_PREEMPT_ABORT	_IOW('p', 204, struct pr_preempt)
- #define IOC_PR_CLEAR		_IOW('p', 205, struct pr_clear)
- #define IOC_PR_READ_KEYS	_IOWR('p', 206, struct pr_read_keys)
-+#define IOC_PR_READ_RESERVATION	_IOR('p', 207, struct pr_read_reservation)
- 
- #endif /* _UAPI_PR_H */
-diff --git a/block/ioctl.c b/block/ioctl.c
-index 63b942392b234..a51628236fc7f 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -480,6 +480,32 @@ static int blkdev_pr_read_keys(struct block_device *bdev, blk_mode_t mode,
- 	return ret;
- }
- 
-+static int blkdev_pr_read_reservation(struct block_device *bdev,
-+		blk_mode_t mode, struct pr_read_reservation __user *arg)
-+{
-+	const struct pr_ops *ops = bdev->bd_disk->fops->pr_ops;
-+	struct pr_held_reservation rsv = {};
-+	struct pr_read_reservation out = {};
-+	int ret;
-+
-+	if (!blkdev_pr_allowed(bdev, mode))
-+		return -EPERM;
-+	if (!ops || !ops->pr_read_reservation)
-+		return -EOPNOTSUPP;
-+
-+	ret = ops->pr_read_reservation(bdev, &rsv);
-+	if (ret)
-+		return ret;
-+
-+	out.key = rsv.key;
-+	out.generation = rsv.generation;
-+	out.type = rsv.type;
-+
-+	if (copy_to_user(arg, &out, sizeof(out)))
-+		return -EFAULT;
-+	return 0;
-+}
-+
- static int blkdev_flushbuf(struct block_device *bdev, unsigned cmd,
- 		unsigned long arg)
- {
-@@ -703,6 +729,8 @@ static int blkdev_common_ioctl(struct block_device *bdev, blk_mode_t mode,
- 		return blkdev_pr_clear(bdev, mode, argp);
- 	case IOC_PR_READ_KEYS:
- 		return blkdev_pr_read_keys(bdev, mode, argp);
-+	case IOC_PR_READ_RESERVATION:
-+		return blkdev_pr_read_reservation(bdev, mode, argp);
- 	default:
- 		return blk_get_meta_cap(bdev, cmd, argp);
- 	}
+Cheers,
+
+Hannes
 -- 
-2.52.0
-
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
