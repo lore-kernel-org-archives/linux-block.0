@@ -1,132 +1,110 @@
-Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93D4C188713;
-	Wed, 26 Nov 2025 22:47:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD0B9217F24
+	for <linux-block@vger.kernel.org>; Thu, 27 Nov 2025 01:39:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764197238; cv=none; b=WX2/10ziwnKH1PUBTcKzyCpFW09w5wfsY5D36Wjvl9wGOrJRDbk6rKSc3yM6hyvjSBzesmcQfqJ66X+f636mt5P9Qj2T8lkazsR6V+e4+acGJBcqNcj05ZGo8dvBWUnZPMJcg+rC3qvU+nz7J6N8HeYZV0WI1irYRthubt2kb6w=
+	t=1764207559; cv=none; b=RksZoxWB96VtHc3FrKCzLofho4oGy3Uamk6WB+/LBWxGHwlHneSKWsIiUiunbPsgAyJzQMlvvtm9rKlu7HfB8iicLlt0/tb0NQCU6sGHLWdlM0gyGDC57yKc7Zfb3Q+UJroB2K4jGQP2vrOY4ItHUu0XLTop/p61+I6dqW00T9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764197238; c=relaxed/simple;
-	bh=l9m56dnY9zEKhVS6I5N8OD52DaGq3RpUKZC/EnB4wag=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fvxr0wIzaGg0iGma8kt0tCtiDDOzuiWry/p7HnGSQ2LVuugzwlFxgMxNvL3l/Bpl7oVDgjOE9qSgUQydvQGrk6l0KFZ16IjihyTVP4wTFNYcTbeNlmn8CIHT858ahcRS2vHBxJENfqcSJuOH8escC9dR/bpOCpdaFP9XzQbDBeU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=1tsNxD1K; arc=none smtp.client-ip=199.89.3.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1764207559; c=relaxed/simple;
+	bh=bJ9HiDBPUwBaMJQclgBWO5wdkiPelY80UVWQeIsC01Q=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=svFR3c7D7nanJIfAEqVOJrNQAMeznzGoUyMgnaG5jjgQOTBgwlVfrAaNmulxJXAUDGWuUXw2pwvBhyGwQu5uMIvjNNqf2voYSPqvfsiFvWMZ6H2TA3xOL1nmLpGM25qD1RCOrFnAeWpyxtEazue+RAk032YQvrbNdl5RYW2tb0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kub6fWoG; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="1tsNxD1K"
-Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4dGvnv3jcyzlgqjf;
-	Wed, 26 Nov 2025 22:47:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1764197233; x=1766789234; bh=Mp/cEDtWWtAcdcao4aqwN7nq
-	8Or7ohIFJ9e1ToUKxPE=; b=1tsNxD1K6fkcY/dCnnG1RhLd4G9RDcYBxuVs6bGJ
-	Z7UpJRB5F5eCIc9Ac4dOlVLhuMyVr5v6408tbulPbyX3+0PfYzQTPWQKVNoizdye
-	C+aCsbCD1K5VMU68VG5/nuvt3iSxlqmdzQzWV03a4kVrS0ddPu1wbmnYuARZvs26
-	fMpD3NHYSoA+y2uHLEZAzxN7xjFMFv3xpSVQQpdaKtGNE0FhmWYs9+z55Xo3FbBC
-	cPBvyEFCrIw2V59Bd171SsvEyaIhONdmb4m8IEPVxAB9M+2QRC0cwito9kgoFQUu
-	uDvJdYLhPGI6SGFWi7em5nRO75eib7ZxrtiPtamwxlwS+w==
-X-Virus-Scanned: by MailRoute
-Received: from 003.mia.mailroute.net ([127.0.0.1])
- by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id B6KlyphCrugl; Wed, 26 Nov 2025 22:47:13 +0000 (UTC)
-Received: from [192.168.51.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4dGvnh3PHSzlgqjY;
-	Wed, 26 Nov 2025 22:47:03 +0000 (UTC)
-Message-ID: <1e7583e8-9ae9-4641-8ec2-7c62a637c9fc@acm.org>
-Date: Wed, 26 Nov 2025 14:47:01 -0800
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kub6fWoG"
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-297dc3e299bso3592575ad.1
+        for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 17:39:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764207557; x=1764812357; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OcUOZJMFbmvct+2rc0kf2MpUvY7Rm9JZKzksiGf/aoA=;
+        b=Kub6fWoGZmJTWx41j+BeC/wGEOveXjPnpidIIe2hAYi9TWtabddoex1KPY6/EuiRx9
+         AkppQzRNUi8RhoM39gQXakjxRwqZZboeApoLDd43/vsTJJwH8SCyix0TwGpEv/zeSAPu
+         yCv6uqm0VjlrW0cmUws6Bvx8m409vZ5PKW+5k59kzps3DG6Q3yDMSaZg/Qc9KKy4Mutb
+         yr/ERfkDShLYoSn5mBY7pOZHqoufFvNjEZiHKnZOTEyA5T50zEWfFHMS8un8kRxo9v6j
+         w2SDsUR77dKdXh0UEn+SVkVF2DNAN6pfPwyazI2rksEX1G8LzUs+llunTtCH40EfZuTz
+         BafQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764207557; x=1764812357;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OcUOZJMFbmvct+2rc0kf2MpUvY7Rm9JZKzksiGf/aoA=;
+        b=cRf21e9wxJ7I0CpgyNH4702cow1aY8ZfT5fTwXUpR4wntwyy9B6jstdHM5n38CdF7o
+         X2MpK89g/a3llk6EijHNuVzNcEuC19EPG67Ewn4lFJvbyKiHYYpXRHAqPJwbf7i7pIQA
+         bjx11KWk6EARg0Faw2fZfD53E2jF2+dkToTPvzvdvqgY3keRV756Up/lgoxAyIfwDOhF
+         x0Ftl3jqrIPljeZruAeZLdSl68ftHFWyng9jJ7nhnDfUnkXhYCsAk/4XH96G7p+1lwkZ
+         vW8cG76mZ1zUVnIltbJFrUA/VHLajmAcpH04QhV9TV6+jDv57E3veWxntHbOXYs4PzFH
+         uS9g==
+X-Forwarded-Encrypted: i=1; AJvYcCUPXod0xw8sJnkHQ11prOiZDZeEivAuIvI+ZmTww+74miVdvdX/a4d/P49HIeqwO9f5bKsTKY8oRXYMQw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5GIYyxyg5WCJoLyfUR4Ieu1nun6MTmpDsPl+KfrRYJq5r/PMB
+	oFO4XeelFkI1lCLA0GjyuWKZj1+OmRuI3GmhtR0hcSA6uNHr83+AUwSwo1yl8g==
+X-Gm-Gg: ASbGncsVuBfcts5iEu/1y0RVM4WJqXhsHwwg2PMBO2pxlkBsvJdFM7cbEuCRjyM5WT4
+	JiuqYpgtiAGxFnu5rWWaqmAE0GPa41FWnpy+822BoRltEBTfzpgoUJ1Vfqf7Np5RJkhcrjgZ5l7
+	plWP1mcSVst7UaxDpXBzkHe/s80DBL8XcgzCCy2O9R70MQgOArApM0DqimbOIN1LIVdz8Q720HK
+	S4ob0ZP2iKcjGq6osZ6f5wytfz/nBusH2y19st/FbWFCneJupzP6DO951ef1/fEp6O64vm5Or8X
+	BquEkb/6VoHe2N2EZk60bSqI8Cp4vBu6Wj2i/h2tmQpk78ZBkK6ZA5wFnxBkbGSFsjZTsOHEug9
+	HaPuNf34zktGmlDYnrRdbg7Ew1DaA/8TMDnMtyI0Rcv1LUoj3h3F901pqnOwNiP/w+Pi7NYS0WO
+	RSNhgEalM866Yw5lxSNqHHUqEZqlC4kQIfo7xjTQ==
+X-Google-Smtp-Source: AGHT+IFk98XWHAUGr65cVN7wtb0vMquhdnfPdlUn2g07hFesnnCjyEN+j4z7OoOuD8FzSa+xROuG/Q==
+X-Received: by 2002:a17:903:2412:b0:297:f0a8:e84c with SMTP id d9443c01a7336-29bab1d73ebmr96072805ad.52.1764207556658;
+        Wed, 26 Nov 2025 17:39:16 -0800 (PST)
+Received: from localhost.localdomain ([101.71.133.196])
+        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-29b5b107cc2sm212427815ad.16.2025.11.26.17.39.14
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Wed, 26 Nov 2025 17:39:16 -0800 (PST)
+From: Fengnan Chang <fengnanchang@gmail.com>
+To: axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	ming.lei@redhat.com,
+	hare@suse.de,
+	hch@lst.de,
+	yukuai3@huawei.com
+Cc: Fengnan Chang <changfengnan@bytedance.com>
+Subject: [PATCH v2 0/2] blk-mq: use array manage hctx map instead of xarray
+Date: Thu, 27 Nov 2025 09:39:06 +0800
+Message-Id: <20251127013908.66118-1-fengnanchang@gmail.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] PM: runtime: Fix I/O hang due to race between resume
- and runtime disable
-To: "Rafael J. Wysocki" <rafael@kernel.org>
-Cc: Yang Yang <yang.yang@vivo.com>, Jens Axboe <axboe@kernel.dk>,
- Pavel Machek <pavel@kernel.org>, Len Brown <lenb@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Danilo Krummrich <dakr@kernel.org>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org
-References: <20251126101636.205505-1-yang.yang@vivo.com>
- <CAJZ5v0jiLAgHCQ51cYqUX-xjir7ooAC3xKH9wMbwrebOEuxFdw@mail.gmail.com>
- <CAJZ5v0hKpGbwFmxcH8qe=DPf_5GX=LD=Fqj3dgOApUoE1RmJAQ@mail.gmail.com>
- <4697314.LvFx2qVVIh@rafael.j.wysocki>
- <dc4dba4f-8334-40ea-8c53-6e8d135f1d41@acm.org>
- <CAJZ5v0jV-80kfk-AY70b5pQtyXxUtU_ACBVP_TeTAnaY0Up8Lw@mail.gmail.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <CAJZ5v0jV-80kfk-AY70b5pQtyXxUtU_ACBVP_TeTAnaY0Up8Lw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On 11/26/25 1:30 PM, Rafael J. Wysocki wrote:
-> On Wed, Nov 26, 2025 at 10:11=E2=80=AFPM Bart Van Assche <bvanassche@ac=
-m.org> wrote:
->>
->> On 11/26/25 12:17 PM, Rafael J. Wysocki wrote:
->>> --- a/block/blk-core.c
->>> +++ b/block/blk-core.c
->>> @@ -309,6 +309,8 @@ int blk_queue_enter(struct request_queue
->>>                if (flags & BLK_MQ_REQ_NOWAIT)
->>>                        return -EAGAIN;
->>>
->>> +             /* if necessary, resume .dev (assume success). */
->>> +             blk_pm_resume_queue(pm, q);
->>>                /*
->>>                 * read pair of barrier in blk_freeze_queue_start(), w=
-e need to
->>>                 * order reading __PERCPU_REF_DEAD flag of .q_usage_co=
-unter and
->>
->> blk_queue_enter() may be called from the suspend path so I don't think
->> that the above change will work.
->=20
-> Why would the existing code work then?
+From: Fengnan Chang <changfengnan@bytedance.com>
 
-The existing code works reliably on a very large number of devices.
-Maybe there is a misunderstanding? RQF_PM / BLK_MQ_REQ_PM are set for
-requests that should be processed even if the power status is changing
-(RPM_SUSPENDING or RPM_RESUMING). The meaning of the 'pm' variable is
-as follows: process this request even if a power state change is
-ongoing.
-> Are you suggesting that q->rpm_status should still be checked before
-> calling pm_runtime_resume() or do you mean something else?
-The purpose of the code changes from a previous email is not entirely
-clear to me so I'm not sure what the code should look like. But to
-answer your question, calling blk_pm_resume_queue() if the runtime
-status is RPM_SUSPENDED should be safe.
->> As an example, the UFS driver submits a
->> SCSI START STOP UNIT command from its runtime suspend callback. The ca=
-ll
->> chain is as follows:
->>
->>     ufshcd_wl_runtime_suspend()
->>       __ufshcd_wl_suspend()
->>         ufshcd_set_dev_pwr_mode()
->>           ufshcd_execute_start_stop()
->>             scsi_execute_cmd()
->>               scsi_alloc_request()
->>                 blk_queue_enter()
->>               blk_execute_rq()
->>               blk_mq_free_request()
->>                 blk_queue_exit()
->=20
-> In any case, calling pm_request_resume() from blk_pm_resume_queue() in
-> the !pm case is a mistake.
-  Hmm ... we may disagree about this. Does what I wrote above make clear
-why blk_pm_resume_queue() is called if pm =3D=3D false?
+After commit 4e5cc99e1e48 ("blk-mq: manage hctx map via xarray"), we use
+an xarray instead of array to store hctx, but in poll mode, each time
+in blk_mq_poll, we need use xa_load to find corresponding hctx, this
+introduce some costs. In my test, xa_load may cost 3.8% cpu.
 
-Thanks,
+After revert previous change, eliminates the overhead of xa_load and can
+result in a 3% performance improvement.
 
-Bart.
+potentital use-after-free on q->queue_hw_ctx can be fixed by use rcu to
+avoid, same as Yu Kuai did in [1].
+
+[1] https://lore.kernel.org/all/20220225072053.2472431-1-yukuai3@huawei.com/
+
+Fengnan Chang (2):
+  blk-mq: use array manage hctx map instead of xarray
+  blk-mq: fix potential uaf for 'queue_hw_ctx'
+
+ block/blk-mq-tag.c     |  2 +-
+ block/blk-mq.c         | 63 ++++++++++++++++++++++++++++--------------
+ block/blk-mq.h         | 13 ++++++++-
+ include/linux/blk-mq.h |  3 +-
+ include/linux/blkdev.h |  2 +-
+ 5 files changed, 58 insertions(+), 25 deletions(-)
+
+
+base-commit: 4941a17751c99e17422be743c02c923ad706f888
+-- 
+2.39.5 (Apple Git-154)
+
