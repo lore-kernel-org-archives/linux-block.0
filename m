@@ -1,157 +1,76 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15249313E0F
-	for <linux-block@vger.kernel.org>; Thu, 27 Nov 2025 07:07:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A0BF313E2F;
+	Thu, 27 Nov 2025 07:14:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764227278; cv=none; b=GAacXsc3uCa9RVkQhLOchSxIyp4one78i91xKxWUGqM+Hd/KZCsNNNpr5vRGUrTng0EZI09QhT5nmgGRt2g1LCh4BEJFYDtxVAWSLuxg+/mjrn36qZo0X1tpXYC6HQcRSygGl5hxczDbiXlPVQubKzo+dzszuBUvjPPvMaxmUEg=
+	t=1764227670; cv=none; b=mzSTKUcBZTzxBIdd2bEzKZxISxhaxvgigbrMZUSERG5USGrS6xW8rUdRm8VnHk/4RzkR3WXUYflZuSTOryPOQUJDekuy9zde3acprgs3XkB8Kc4USB7/nmiwqe13uPTdfnVGemhBz+G4nr+3D3sq6jktvLOUCgCQD0x2skxt/x0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764227278; c=relaxed/simple;
-	bh=gnT74m22lzfBx6uRJGriIbQr4/cmzQTeuv/tw5r84Qc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Q0axLY/JtU23e408WU8Yb+4TfeBo7OcD/G6KES29ykdf6Ku28OeP/dItspni+94JK+obAtdz9lsfk/LCnrq9RHz6rbzsiomNWmoznZMd7HwtQFEbg7vfzx6EffcOWzzruz5Wraz/9Zlv75Rk8C+u1h7TDbZc8cDxi7DPBp2ZfQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=P+Gaf5wc; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=TTYm7y4G; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=P+Gaf5wc; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=TTYm7y4G; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1764227670; c=relaxed/simple;
+	bh=Dg0LO8VGcXvLC+hqSiLBkFrgUGx89nIpGsekD4cXYxs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wj9U2pOSYFJCLNPYYSKd9jgnr/0wnjTRzMQlPSA5SqmvzP6ztAZBeie3WUJeN9/kq8Re3BhUfxDmujb4KZR0KyaiSO5sraeWFzzUjiNydwZ3NDJyoiuDJ9Q/UBk88GRUUWyDGFhS/Oikg9oKF2uxxoBCn6/hlwy2UMvyrwm7mpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=zg1oGhwM; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="P+Gaf5wc";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="TTYm7y4G";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="P+Gaf5wc";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="TTYm7y4G"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 247735BCC4;
-	Thu, 27 Nov 2025 07:07:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1764227274; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FxH/K4xBnPW3Iqo9dVisbX3HnJSJaYk0+vOsyJRDm54=;
-	b=P+Gaf5wcjYAsVrFWf/W+zBNHIGQrKRDpztAkgHv1Kok+RNLSFqQTsBzRrdvE/hwct9pg/b
-	2u2GmhTMG9MI9XWcdhwZtup6mZ+kOmWUEnOXpCoqf2eFMajgWW3+Z4U/MWEIqHN72TlHlm
-	64IGHdGEDvx3Bh8husmKUNVEMieRVXk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1764227274;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FxH/K4xBnPW3Iqo9dVisbX3HnJSJaYk0+vOsyJRDm54=;
-	b=TTYm7y4GhTBLXldK7PxlSrKL9IjT2R8fUwB13oCOrkEWk/tzqoXWjC+K+ggrBjl8vfvKQQ
-	pxMLQaI4W0GfOnDA==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=P+Gaf5wc;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=TTYm7y4G
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1764227274; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FxH/K4xBnPW3Iqo9dVisbX3HnJSJaYk0+vOsyJRDm54=;
-	b=P+Gaf5wcjYAsVrFWf/W+zBNHIGQrKRDpztAkgHv1Kok+RNLSFqQTsBzRrdvE/hwct9pg/b
-	2u2GmhTMG9MI9XWcdhwZtup6mZ+kOmWUEnOXpCoqf2eFMajgWW3+Z4U/MWEIqHN72TlHlm
-	64IGHdGEDvx3Bh8husmKUNVEMieRVXk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1764227274;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FxH/K4xBnPW3Iqo9dVisbX3HnJSJaYk0+vOsyJRDm54=;
-	b=TTYm7y4GhTBLXldK7PxlSrKL9IjT2R8fUwB13oCOrkEWk/tzqoXWjC+K+ggrBjl8vfvKQQ
-	pxMLQaI4W0GfOnDA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A36823EA63;
-	Thu, 27 Nov 2025 07:07:53 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id NpkXJsn4J2mkWwAAD6G6ig
-	(envelope-from <hare@suse.de>); Thu, 27 Nov 2025 07:07:53 +0000
-Message-ID: <1379c3f9-cdde-4733-b1e9-7e761628d0d3@suse.de>
-Date: Thu, 27 Nov 2025 08:07:53 +0100
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="zg1oGhwM"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=Mg+PdZwdO0sia44+fBnEmBbsN7z3KLsWp8ZG90Kr2co=; b=zg1oGhwMXKXGpM+xN5wCmVjIwM
+	W8o/ZRV8Sk/82xVCZfXa0NPWzZO/OCbW9F3gQ/C5UCbbIFFD4HxDx734V3/wQXOtgEtMkowhrn57p
+	ry68pe8OtSiFnM64iVFWSLyVxBYc4kWQ5uAo3zcSMQlTJbnFCm0YRTmhefnY/0pui7Fvsumi+Sm4T
+	D034uORhocYZRN0N0Cp6kCWN/8ojGWdoUkIX6v2104g4Vzjgaf5iNvL0+kHczzoenAomSvHRPI6bi
+	Kz/W2mREv6tu4NCYbCRF5RpV9bHXp0TLv1nVxpcfwbol1vNTYCdaLRCp3hWi29HC7yLCGA3fJRU1I
+	GNig/OVQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vOWCt-0000000G6bt-2k36;
+	Thu, 27 Nov 2025 07:14:23 +0000
+Date: Wed, 26 Nov 2025 23:14:23 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Stephen Zhang <starzhangzsd@gmail.com>
+Cc: Christoph Hellwig <hch@infradead.org>, Ming Lei <ming.lei@redhat.com>,
+	Andreas Gruenbacher <agruenba@redhat.com>,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	nvdimm@lists.linux.dev, virtualization@lists.linux.dev,
+	linux-nvme@lists.infradead.org, gfs2@lists.linux.dev,
+	ntfs3@lists.linux.dev, linux-xfs@vger.kernel.org,
+	zhangshida@kylinos.cn
+Subject: Re: Fix potential data loss and corruption due to Incorrect BIO
+ Chain Handling
+Message-ID: <aSf6T6z6f2YqQRPH@infradead.org>
+References: <20251121081748.1443507-1-zhangshida@kylinos.cn>
+ <aSBA4xc9WgxkVIUh@infradead.org>
+ <CANubcdVjXbKc88G6gzHAoJCwwxxHUYTzexqH+GaWAhEVrwr6Dg@mail.gmail.com>
+ <aSP5svsQfFe8x8Fb@infradead.org>
+ <CANubcdVgeov2fhcgDLwOmqW1BNDmD392havRRQ7Jz5P26+8HrQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/4] block: add IOC_PR_READ_RESERVATION ioctl
-To: Stefan Hajnoczi <stefanha@redhat.com>, linux-block@vger.kernel.org
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
- linux-kernel@vger.kernel.org,
- "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
- Mike Christie <michael.christie@oracle.com>, Jens Axboe <axboe@kernel.dk>,
- linux-nvme@lists.infradead.org, Keith Busch <kbusch@kernel.org>,
- Sagi Grimberg <sagi@grimberg.me>, linux-scsi@vger.kernel.org,
- Christoph Hellwig <hch@lst.de>
-References: <20251126163600.583036-1-stefanha@redhat.com>
- <20251126163600.583036-5-stefanha@redhat.com>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20251126163600.583036-5-stefanha@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:dkim,suse.de:email];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Spam-Level: 
-X-Spam-Score: -4.51
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Queue-Id: 247735BCC4
-X-Rspamd-Action: no action
-X-Spam-Flag: NO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANubcdVgeov2fhcgDLwOmqW1BNDmD392havRRQ7Jz5P26+8HrQ@mail.gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On 11/26/25 17:36, Stefan Hajnoczi wrote:
-> Add a Persistent Reservations ioctl to read the current reservation.
-> This calls the pr_ops->read_reservation() function that was previously
-> added in commit c787f1baa503 ("block: Add PR callouts for read keys and
-> reservation") but was only used by the in-kernel SCSI target so far.
-> 
-> The IOC_PR_READ_RESERVATION ioctl is necessary so that userspace
-> applications that rely on Persistent Reservations ioctls have a way of
-> inspecting the current state. Cluster managers and validation tests need
-> this functionality.
-> 
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->   include/uapi/linux/pr.h |  7 +++++++
->   block/ioctl.c           | 28 ++++++++++++++++++++++++++++
->   2 files changed, 35 insertions(+)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+On Thu, Nov 27, 2025 at 03:05:29PM +0800, Stephen Zhang wrote:
+> No, they are not using bcache.
 
-Cheers,
+Then please figure out how bio_chain_endio even gets called in this
+setup.  I think for mainline the approach should be to fix bcache
+and eorfs to not call into ->bi_end_io and add a BUG_ON() to
+bio_chain_endio to ensure no new callers appear.  I
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+> If there are no further objections or other insights regarding this issue,
+> I will proceed with creating a v2 of this series.
+
+Not sure how that is helpful.  You have a problem on a kernel from stone
+age, can't explain what actually happens and propose something that is
+mostly a no-op in mainline, with the callers that could even reach the
+area being clear API misuse.
+
