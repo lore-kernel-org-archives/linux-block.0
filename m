@@ -1,67 +1,67 @@
-Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
+Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97CFC35979
-	for <linux-block@vger.kernel.org>; Thu, 27 Nov 2025 02:47:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52828213254
+	for <linux-block@vger.kernel.org>; Thu, 27 Nov 2025 02:49:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764211631; cv=none; b=tJ3N300bIsggJZREU/yFIozpovb0ichzmHeqZixxhUW2QCc1O0VN+bS2E4H7XPWkBBF9YGD3q7dR8JdC8jW5UtVS+FVJ4/etLOVMYXvP9GfWhVeBoUE2NIWtTUneUjLB6UQCzzG+4iEKZK873UKpnH62CSj/4M63tvgmK7B8VtE=
+	t=1764211771; cv=none; b=sX85cAUR4w6uE+XLWfjpI9QV98pgTAXxsbagDItx6gKMs6uTq4Dmm7B+O4FU/5PPeLgo/NklppRCIaPaHg9paeOZWEJKeXgPO+guw3fAKtuO+yumsTSgH+zbZT+pv6qhtwcXmejnfuBWjZDrn2wrznjmCBb6FRL8Vt1HcnNOpqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764211631; c=relaxed/simple;
-	bh=ihbqWsGCwDzXFCb0D2cdE+6dW31NKUbgW1uM4LkFMmM=;
+	s=arc-20240116; t=1764211771; c=relaxed/simple;
+	bh=YBSfdUK1Na6s5st1li1/YbDbuf/FaJeJWi9KOUaZZ4M=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CVO/ixLkN08jWyjAe3xc/l1VsmSR/GndaL03HvdJESRALU3xR8laaC3CmtcoUuvqyzkeP4Z2xTjw99uipgNCHE/krZPdeKwaSlbMjBKAxWhu1WLc/mzFhYnHRE81xa2upgNKI8XtwXvmno+98eHmWZsfTladetFDU66KjXJmUb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=nSmcwmbp; arc=none smtp.client-ip=209.85.166.54
+	 In-Reply-To:Content-Type; b=WIdAyUnntuxvODuVOR69mvuywUcmTOgeuXpjf+w0s4q6YNOZrQZ4Kfa6Ie0jExRO7d2W2ZHaTvnU+Y+e/Uuc+j5v2IcwGOaQ8JkFLCZSTtlEuMdjpL11klEK1XUXcIE7MTObA9HybJIRjUbNAPHEA9Sq76gM9sML2071XMg4UdA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=fS0XcNK+; arc=none smtp.client-ip=209.85.166.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="nSmcwmbp"
-Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-948614ceac0so18018139f.0
-        for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 18:47:06 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="fS0XcNK+"
+Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-433217b58d9so2390055ab.1
+        for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 18:49:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1764211625; x=1764816425; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1764211767; x=1764816567; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=gfEtl3WHcPt8pXCfObmqCBecPErvS+4p/iCXCHXK3RA=;
-        b=nSmcwmbpYHjPhaxNaQ3etHUqu7cyDjDK+vAgjqFdbKOV7q5S1eqI5X/VTyOS10ME0k
-         XPrfgEG6A73sYJWegJuHKTNod4KTftXyU8I4Th3entYkgLnqe0fz9NPW30hkyLhRm2EC
-         wh2GJmbWzsfwjr0Oeybix0hSIzAs1K5vIj41QMwRERu2SXH0Q3WMWX5lt8x5Tl9F6xPS
-         QHcFdkRXkouumSEux0Uo+N/3js9kS836er1eJWXI6/7bNZo89OndSS1dKXUprY5VNyM/
-         x9TIPr2Zp5W1VQl6fwf3QK/dxB6X7Tr4gQ39G5LrykJZYl7ptSTbpZ/d4i2KYz8Us0UH
-         CjuA==
+        bh=gEC7MQMEWTMqZkr1wpkXMaWU9u11UUKRFRMEMd42Q5A=;
+        b=fS0XcNK+FROkACUJafXNGIyAijyOn0T1BN+G8FA78vPyrNOKVQahsB5FDM5alHmGvZ
+         z9TUhq6g+uugfSn4sqpXPjMQmdG7xRP19s9krTufoRYs1Bn5ZvyrCJY6gdqjZHB2VnJP
+         KP8utuUwfE4yvXMclMpMtOBcD6outJOiFfqwjzeCWb1EYU9oqR34ZQR7YPh5LqJjpy6F
+         9sDh2iYFcpilZSxyeY8udWrw6PSMxS2MNzwSitUvx5bMwWI1BfcGoD57UMiXowjSAvdu
+         IA8f51FpHWOF99iF2O39IfGKzNtU8ayQ3Xf8u51IQ2BrUHNY6fDRB0YlCLgC8hHwAloU
+         CNpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764211625; x=1764816425;
+        d=1e100.net; s=20230601; t=1764211767; x=1764816567;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=gfEtl3WHcPt8pXCfObmqCBecPErvS+4p/iCXCHXK3RA=;
-        b=RknqMc+9lA1b6YuQuWT5SZoXPR19FGiB+2V+kgY+ClYDbKfxbDWKaUUKDzb0aLkcKa
-         hHxEV4DO5ZYHv7A/HxfJ3CEga4As+BkpCxT6y1jZNFgqVoobnpDngskGgdxi1FrjXyXJ
-         LmaFTbCh4ZLj3wH9bNMfayy/evNWQcoRJbadAokfWOSOfEFpPSnXlul+qkqE/j/onRa9
-         8cptV71Gd0bsnkQPLQEINzAhuaoYj8sWbgyrC+xCYpRerXLAS1ol+YKtnD1GeGFur6zj
-         5Mk0B8tXUqIJo/qAxA5uv9Q33DNQS7amTDSpimXnrIS1DlNLbrDi09RsEztyg8fwVltO
-         OL+g==
-X-Forwarded-Encrypted: i=1; AJvYcCWsLZDw7N0bRojScRGe25SFy0jB1dmfBbatovTVTy0VTwi5YC181XcYKq6/7xGDTFAH0yUeREJgtC1ROw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxq2Nw5Y2XJxCyrqAX8Zf08jief5+wFzPYiuEF76C2sMrpv97rb
-	CXLX9XUYej5SGNVGx/q4Ep19yCfh0NjER62ZdsQZgjyEkDhkVlBDb/h7xX3KAk6kOa0=
-X-Gm-Gg: ASbGncsrrRqTiKy40qbHy6uicOoTSQ3rleegGZVqFewaFo4yKea5tdCK7idwuPFauwz
-	CtNadMrYJXus+AgF9GC6B0g6t+xLrboCffE7Ez86HkVX4KCziwEJL2ep5LT2nDf3YktLL9H7IM7
-	xVuYQzZ/5M45FQEHCnvPYN1MSiRXTan9PDCe86/PbPdT6bVOVkyFFBojC5J6VZE6eKs1dBKefy0
-	diB7M0X/h9oDkbk8Dgqdreia4CozM+igkD8KNnu8Ww2XQzKr/gHIUBfFI1jDaNsUYZ7j1Ib0RG5
-	l+4GYu1MzYEVXLBsGC+Ab3S8RFcRMIFm0Rb6KV9GRofaD8ppUmYXk65jLFtmxhPxQI/4384koKL
-	gDMBpPK7Ighd7KytRt9S7jZqSFyz3kJ8rObDSYzoyoMu9VXFVMu1B9Dqu+1On0atfL6s5QX/NZv
-	MX+hfln/33XEJ5BNj4x9A=
-X-Google-Smtp-Source: AGHT+IHGyv86TwjQjgAijemD23kIZH/Z6bm++NMEAbLQPsVSJUHQ3EBOcudp4W1PMMs6RBmWlAw8Yg==
-X-Received: by 2002:a05:6638:1ee:b0:5b9:9bd2:6193 with SMTP id 8926c6da1cb9f-5b99bd262a3mr5044984173.10.1764211625366;
-        Wed, 26 Nov 2025 18:47:05 -0800 (PST)
+        bh=gEC7MQMEWTMqZkr1wpkXMaWU9u11UUKRFRMEMd42Q5A=;
+        b=qGDcR26dxmp/IUbx2gptMG6sJcdLbyv4kcv742DHzPT6AG5sk8FMnwknSOZ/Qf0YZR
+         Kh6SaLoCrZvOcxDihbpcUS272MQY9/SMl9jtepHnHTe8xsjMqgUD+1yeDOA8+5AcWL1K
+         ZkTLVz/fkfuf2ZVxr6hB4VYVn/dW6quMLaHhUm6/tVMcWu165vSMR3FLIZscvjQsy6qT
+         zdD2jqiBm/wd7nO7PcN91lmez834SnahtvdJ1QmICcSnId5662VmkurJYfGJsGYwITtb
+         2JZ8PMrWWfJABz52qJf5gvlK5goS3dG8s1FXMg1JIoL7VSu0mjx+Kk0b7CjJgnA+4DWe
+         s1tQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWCztlILlJ4v7o8x9fEB/XKhSCFqJhGCbDiBPinlDqAunMTA8WQEG6qQfBRxnDh2ui/qZwhJcWRexGXaQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxIsXppRNftHonJR2Zk6NHihZW37cDBWqZE81RLralWfzgSIVtZ
+	q1MepPOH0q7R4wh7/dnZ3kU5VSZtMdoLnitn+ObQ7NCsxpqK3ntJHgHMYRYaKVIqUxU=
+X-Gm-Gg: ASbGnctTW0RhCZsUySF69Fsx2puo1McDISCgFZFeDVUoQDvGdAPyNiDQXk2wiBWaLDD
+	ZH1ttWyrN3XH1tK/kfBwXiEEFy/w64TEg/OGv8Bzwcyf/mxmoMBB+ZEF1i4at1V11blUYAcLitw
+	SQvJGvCkRWr8xaIt+K/+uc5Ir6lPE4vWiHlRnMBh3M8t9cFQMl1wWvKkLJL9MK1dIYsH5AC+2v3
+	l9EN3zpznEAT4YXW80Ew+RW08Dnsis2pTMaju2bX4tm33nxCBq5Z+Yyep8Nm1XLQCEURKoWfsTH
+	rBRtpVHrOPNoEW6MNN9c8zy0BvfXdl/rvqEjstcQdK+Fq43RGLT4tNhWQjSpczG/cKn6foBQgeT
+	3KkaHjmRYe4MwUUwIb71ybg5iXOiFxwPgrO32TFY9RsYv+d4PZcjgL56x7XlZvTg1BkVhcGNR83
+	jNPk0VV9Y5
+X-Google-Smtp-Source: AGHT+IEzYXmXayDgt/IWjIckeiALWYy5af5OlWlc2br/tplg9mWmuvZtJuvJ5IaYTXvR4m23bcBzjQ==
+X-Received: by 2002:a05:6e02:1102:b0:433:71a9:8f9e with SMTP id e9e14a558f8ab-435dd050f46mr65258015ab.7.1764211767402;
+        Wed, 26 Nov 2025 18:49:27 -0800 (PST)
 Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5b9bc79c0e3sm42672173.53.2025.11.26.18.47.04
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-436b85c5301sm1458805ab.26.2025.11.26.18.49.25
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Nov 2025 18:47:04 -0800 (PST)
-Message-ID: <448a22ed-b28d-4cf3-bb8d-956df0660533@kernel.dk>
-Date: Wed, 26 Nov 2025 19:47:03 -0700
+        Wed, 26 Nov 2025 18:49:26 -0800 (PST)
+Message-ID: <f7a406c0-ca24-4367-9e0d-fb7bfe91df3d@kernel.dk>
+Date: Wed, 26 Nov 2025 19:49:25 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -72,8 +72,8 @@ User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v2 0/2] blk-mq: use array manage hctx map instead of
  xarray
 To: Fengnan Chang <fengnanchang@gmail.com>, linux-block@vger.kernel.org,
- ming.lei@redhat.com, hare@suse.de, hch@lst.de, yukuai3@huawei.com
-Cc: Fengnan Chang <changfengnan@bytedance.com>
+ ming.lei@redhat.com, hare@suse.de, hch@lst.de
+Cc: Fengnan Chang <changfengnan@bytedance.com>, Yu Kuai <yukuai@fnnas.com>
 References: <20251127013908.66118-1-fengnanchang@gmail.com>
 Content-Language: en-US
 From: Jens Axboe <axboe@kernel.dk>
@@ -96,9 +96,23 @@ On 11/26/25 6:39 PM, Fengnan Chang wrote:
 > avoid, same as Yu Kuai did in [1].
 > 
 > [1] https://lore.kernel.org/all/20220225072053.2472431-1-yukuai3@huawei.com/
+> 
+> Fengnan Chang (2):
+>   blk-mq: use array manage hctx map instead of xarray
+>   blk-mq: fix potential uaf for 'queue_hw_ctx'
+> 
+>  block/blk-mq-tag.c     |  2 +-
+>  block/blk-mq.c         | 63 ++++++++++++++++++++++++++++--------------
+>  block/blk-mq.h         | 13 ++++++++-
+>  include/linux/blk-mq.h |  3 +-
+>  include/linux/blkdev.h |  2 +-
+>  5 files changed, 58 insertions(+), 25 deletions(-)
+> 
+> 
+> base-commit: 4941a17751c99e17422be743c02c923ad706f888
 
-What changed in v2? Neither this cover letter nor the patches have any
-mention of that.
+Adding correct Yu address, was also wrong for v1 and somehow not
+corrected?
 
 -- 
 Jens Axboe
