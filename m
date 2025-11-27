@@ -1,170 +1,143 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EF85254AE1
-	for <linux-block@vger.kernel.org>; Thu, 27 Nov 2025 07:02:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0BEC3148DD
+	for <linux-block@vger.kernel.org>; Thu, 27 Nov 2025 07:06:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764226952; cv=none; b=MBV+vVohGP6ZSTpniSwSibWggrQynzzs1TCqQ4cATN4fHoBGpY2gTnO0cqrM4i5kJFy4/mdwkwk3jkNpgJiGZkipBmJJq4q/f8I5jDx20na1rjTlT36MSF8/G7y7y8ZehEaYU6S8EOdwUasjBHZ4KMQ9oF23s57HthwfELWAdHw=
+	t=1764227169; cv=none; b=JFz9GDkvOMFd/p76nyur8JxUOGJugP7bk2Dl0W4X99d0tky67jGbXQ4tEjKBmZBACSZzxDNifVeOxMI37GQJeM1Si+Oafwfi86q/tfgGgDX2/odm8C1HpupajWQIkuwT7d+xdRSnqH/N+m7Uwa1FV9p/w8lMmArjFiHWuPXqHLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764226952; c=relaxed/simple;
-	bh=ndShU3PvKioFbG17aBoY489sHzU89qEcPutYWJCq0JI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qTHdeWbLAbNxW6sVggbVmLXYH+iqV8H87Z915jnR+PGwkuKVxcBqld14fxPeQBxm4zRopCBkvHQC/9/ClycvKGUGQd7oRuEClb0NGvtgb9J9gZJQqhkWGNYICxWska17caSHP5f7kaAITz8OuJmIHVP4QAsD55DAtM0aoXlhb+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=NzPfVyj2; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=1jL2r0fd; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=NzPfVyj2; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=1jL2r0fd; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1764227169; c=relaxed/simple;
+	bh=CMn8Ph+lvXBEATa6Qkf2qs1z8fpeEQ8hfjfQnD544JE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Kc76gFzmJX10tBMlBplKJiF4lulg4tnysNib+FUlZ0SNpxuLss5MRq6NdyKHHFcvZ9ZtdUfw/fRTRIzvEf0JsRQL8Q8H++18ZajSk42a8mV8YJjH/kzOGNR8zlYks++VonLnf7lI5QWJGsuxoOxl31PDVELAlRrLw+vtSNsDX0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=esGNtgYD; arc=none smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="NzPfVyj2";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="1jL2r0fd";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="NzPfVyj2";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="1jL2r0fd"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id B3B3222C33;
-	Thu, 27 Nov 2025 07:02:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1764226948; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=n8Nbit1EMMLZ3ow7dnTuT1uhbqNHJbPA4hh4qESRAyE=;
-	b=NzPfVyj2rE+bLlq8Tw2xriTPSOYQhZ17QVHGFV+S9rTUVCLCStINtO2xjuai1VmwEmllrz
-	94eIev7pMh06CLDab2V8vJV2udIYdLdKEhNcVXjf8psVx3GX3VIz6tEouTIre1G4gS9Tt+
-	ucsxoP1n/YqyPKGhWhplVLjpOjflT1s=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1764226948;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=n8Nbit1EMMLZ3ow7dnTuT1uhbqNHJbPA4hh4qESRAyE=;
-	b=1jL2r0fdcjpm6dOy7h5U0r7+b/8C5h9WvfOMXBNbbZcGMkq7/Yw6H24yMTbX0EfeF60qfp
-	OfU+ppmxH/bZaEAQ==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=NzPfVyj2;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=1jL2r0fd
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1764226948; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=n8Nbit1EMMLZ3ow7dnTuT1uhbqNHJbPA4hh4qESRAyE=;
-	b=NzPfVyj2rE+bLlq8Tw2xriTPSOYQhZ17QVHGFV+S9rTUVCLCStINtO2xjuai1VmwEmllrz
-	94eIev7pMh06CLDab2V8vJV2udIYdLdKEhNcVXjf8psVx3GX3VIz6tEouTIre1G4gS9Tt+
-	ucsxoP1n/YqyPKGhWhplVLjpOjflT1s=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1764226948;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=n8Nbit1EMMLZ3ow7dnTuT1uhbqNHJbPA4hh4qESRAyE=;
-	b=1jL2r0fdcjpm6dOy7h5U0r7+b/8C5h9WvfOMXBNbbZcGMkq7/Yw6H24yMTbX0EfeF60qfp
-	OfU+ppmxH/bZaEAQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id B64B63EA63;
-	Thu, 27 Nov 2025 07:02:27 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id E4fjIYP3J2leVgAAD6G6ig
-	(envelope-from <hare@suse.de>); Thu, 27 Nov 2025 07:02:27 +0000
-Message-ID: <c678bfcb-4872-4f3f-8aeb-3956c2e7a1c8@suse.de>
-Date: Thu, 27 Nov 2025 08:02:27 +0100
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="esGNtgYD"
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4ee4c64190cso4948931cf.0
+        for <linux-block@vger.kernel.org>; Wed, 26 Nov 2025 23:06:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764227165; x=1764831965; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NWx41fjiYDvxJBDcxhBox+FSm0FMogENCux+016VrYw=;
+        b=esGNtgYDyNXlf0RzmTfrH2Px8jiojYxfKOFOCAOtgMF3JLkpyqffNhS2axVozhCEuT
+         R0SbQ6SKq109clRPJ+E7EfoWSH8UX5nQN+4VtVegaVzpFzsbPLTUoR7DN7xOpNQv9qvP
+         dJ/AnFHCn5qMw+591IW9tCVsbHVAYKTy6bYglAAdU1QFbMFhBTQBh6yWj3lmQkgshohP
+         OHSLzXLdIbYuYISAlk7zrXDuGewwx8gheeHHv5mvBZ4wdtAO08bRe49LIiDZhCsG+xrF
+         Ft6cgAZZvl7xXwLy05uO+K/TG232oEI5K2rlJYJOZWgGWSfWtwwXqHueY1RLg4ZoWlsT
+         TuPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764227165; x=1764831965;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=NWx41fjiYDvxJBDcxhBox+FSm0FMogENCux+016VrYw=;
+        b=TC6Tnf1Q+0tN766qV3gI4GIyOICWsNY6PpGWg885UtWL5tiUL4wacE44Rad+WZFZg/
+         94AjfthdJPW8ir2r5fe0INAaraXB3jjuTmhj5RG1FnSUNiLL7U+BbkXbzf+fmuj9p8ZR
+         M29yI4+Z6Um9b5B/g1nELFHbFpWeowzaGEAcOTCGr9k0fo2YcFSl7lrrib6QIHkdoqvZ
+         1mljKCBNPYqknggRko7422a1gV4oh+OIFeCX6E+WZg+d9okYlYHLVM6gPIHYt2lffXSC
+         o0Fd7PBAvSRRdDDhBPkO1kyq3rYOMb2JFIAq/lJ1Yw8EyhILH48aWw/IeeugmCBpyJL6
+         P1Rw==
+X-Forwarded-Encrypted: i=1; AJvYcCV8DwHxsTorhTl0ULbbDqhKCVi49I3a0SDZuuiLeyJ2TL6AfEDTl0t/7HCY3WbxzNEKeFbFXz6seh3YHg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwGYNfITt9ARXznB0BU1lAlMFq/mDemNVki23OVyjmtdYdxZZAW
+	YVPmek/ELdf8tQKXcVBTPyPbTgYWhwtR9w1Lkb6fP8urZnj7UnVE46wls622meiIljkcXKXIg+k
+	9WbwbHsuIMs4ltveWCF5ViCnK87RLdwM=
+X-Gm-Gg: ASbGncvRygt1hcUWgW4D+vqBWFkxDgTlNiUnBZE5YdF1f1/io2bRGDfZ0Is5HoqWK4D
+	mbJ6beU4jJqK7vSISGagIY3ijXgm7gQxKS6OmNawQVeMdUlqKjkQ7TE6HzkDOi08MWHj0NZirYQ
+	/uBs/85vMojhOhJoudTHnWCXHjSUH7cj2jyGAsavDm0uEJoDJ+MDRrixNa902xSZ+DuB/WFF6/i
+	flm227+kB1CkoPbZT8E06dxeKLhgK1MbUtJwuVNQFRKIvx6ksjKEvagDDJ+ldh5JsEZOJpSNwaI
+	Gfy06w==
+X-Google-Smtp-Source: AGHT+IHzM3mMsS8tgLfoKGHhBY7XCjpG2AMXOtnZwN9X/T1/YsQGgtSmkxVAO42GtcErC0+dnzj4kMOng2ojzVjt/kM=
+X-Received: by 2002:ac8:5ac4:0:b0:4ed:aa7b:e1a6 with SMTP id
+ d75a77b69052e-4ee58b06ceemr313796031cf.81.1764227165447; Wed, 26 Nov 2025
+ 23:06:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/4] nvme: reject invalid pr_read_keys() num_keys values
-To: Stefan Hajnoczi <stefanha@redhat.com>, linux-block@vger.kernel.org
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
- linux-kernel@vger.kernel.org,
- "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
- Mike Christie <michael.christie@oracle.com>, Jens Axboe <axboe@kernel.dk>,
- linux-nvme@lists.infradead.org, Keith Busch <kbusch@kernel.org>,
- Sagi Grimberg <sagi@grimberg.me>, linux-scsi@vger.kernel.org,
- Christoph Hellwig <hch@lst.de>
-References: <20251126163600.583036-1-stefanha@redhat.com>
- <20251126163600.583036-3-stefanha@redhat.com>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20251126163600.583036-3-stefanha@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:dkim,suse.de:email];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Spam-Level: 
-X-Spam-Score: -4.51
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Queue-Id: B3B3222C33
-X-Rspamd-Action: no action
-X-Spam-Flag: NO
+References: <20251121081748.1443507-1-zhangshida@kylinos.cn>
+ <aSBA4xc9WgxkVIUh@infradead.org> <CANubcdVjXbKc88G6gzHAoJCwwxxHUYTzexqH+GaWAhEVrwr6Dg@mail.gmail.com>
+ <aSP5svsQfFe8x8Fb@infradead.org>
+In-Reply-To: <aSP5svsQfFe8x8Fb@infradead.org>
+From: Stephen Zhang <starzhangzsd@gmail.com>
+Date: Thu, 27 Nov 2025 15:05:29 +0800
+X-Gm-Features: AWmQ_bk_Q7JOTiSFa20fvKvOS6m3SqnDBEgFzZo8VoXEPgg04GUPVW1qbNBOsHU
+Message-ID: <CANubcdVgeov2fhcgDLwOmqW1BNDmD392havRRQ7Jz5P26+8HrQ@mail.gmail.com>
+Subject: Re: Fix potential data loss and corruption due to Incorrect BIO Chain Handling
+To: Christoph Hellwig <hch@infradead.org>, Ming Lei <ming.lei@redhat.com>, 
+	Andreas Gruenbacher <agruenba@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
+	nvdimm@lists.linux.dev, virtualization@lists.linux.dev, 
+	linux-nvme@lists.infradead.org, gfs2@lists.linux.dev, ntfs3@lists.linux.dev, 
+	linux-xfs@vger.kernel.org, zhangshida@kylinos.cn
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/26/25 17:35, Stefan Hajnoczi wrote:
-> The pr_read_keys() interface has a u32 num_keys parameter. The NVMe
-> Reservation Report command has a u32 maximum length. Reject num_keys
-> values that are too large to fit.
-> 
-> This will become important when pr_read_keys() is exposed to untrusted
-> userspace via an <linux/pr.h> ioctl.
-> 
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->   drivers/nvme/host/pr.c | 5 +++++
->   1 file changed, 5 insertions(+)
-> 
-> diff --git a/drivers/nvme/host/pr.c b/drivers/nvme/host/pr.c
-> index ca6a74607b139..476a0518a11ca 100644
-> --- a/drivers/nvme/host/pr.c
-> +++ b/drivers/nvme/host/pr.c
-> @@ -233,6 +233,11 @@ static int nvme_pr_read_keys(struct block_device *bdev,
->   	int ret, i;
->   	bool eds;
->   
-> +	/* Check that keys fit into u32 rse_len */
-> +	if (num_keys > -(u32)offsetof(typeof(*rse), regctl_eds) /
-> +	               sizeof(rse->regctl_eds[0]))
-> +		return -EINVAL;
-> +
->   	/*
->   	 * Assume we are using 128-bit host IDs and allocate a buffer large
->   	 * enough to get enough keys to fill the return keys buffer.
+Christoph Hellwig <hch@infradead.org> =E4=BA=8E2025=E5=B9=B411=E6=9C=8824=
+=E6=97=A5=E5=91=A8=E4=B8=80 14:22=E5=86=99=E9=81=93=EF=BC=9A
+>
+> On Sat, Nov 22, 2025 at 02:38:59PM +0800, Stephen Zhang wrote:
+> > =3D=3D=3D=3D=3D=3Dcode analysis=3D=3D=3D=3D=3D=3D
+> > In kernel version 4.19, XFS handles extent I/O using the ioend structur=
+e,
+>
+> Linux 4.19 is more than four years old, and both the block I/O code
+> and the XFS/iomap code changed a lot since then.
+>
+> > changes the logic. Since there are still many code paths that use
+> > bio_chain, I am including these cleanups with the fix. This provides a =
+reason
+> > to CC all related communities. That way, developers who are monitoring
+> > this can help identify similar problems if someone asks for help in the=
+ future,
+> > if that is the right analysis and fix.
+>
+> As many pointed out something in the analysis doesn't end up.  How do
+> you even managed to call bio_chain_endio as almost no one should be
+> calling it.  Are you using bcache?  Are the others callers in the
+> obsolete kernel you are using?  Are they calling it without calling
+> bio_endio first (which the bcache case does, and which is buggy).
+>
 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+No, they are not using bcache.
+This problem is now believed to be related to the following commit:
+-------------
+commit 9f9bc034b84958523689347ee2bdd9c660008e5e
+Author: Brian Foster <bfoster@redhat.com>
+Date:   Fri Feb 1 09:14:22 2019 -0800
 
-Cheers,
+xfs: update fork seq counter on data fork changes
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+diff --git a/fs/xfs/libxfs/xfs_iext_tree.c b/fs/xfs/libxfs/xfs_iext_tree.c
+index 771dd072015d..bc690f2409fa 100644
+--- a/fs/xfs/libxfs/xfs_iext_tree.c
++++ b/fs/xfs/libxfs/xfs_iext_tree.c
+@@ -614,16 +614,15 @@ xfs_iext_realloc_root(
+ }
+
+ static inline void xfs_iext_inc_seq(struct xfs_ifork *ifp, int state)
+ {
+-       if (state & BMAP_COWFORK)
+-               WRITE_ONCE(ifp->if_seq, READ_ONCE(ifp->if_seq) + 1);
++       WRITE_ONCE(ifp->if_seq, READ_ONCE(ifp->if_seq) + 1);
+ }
+----------
+Link: https://lore.kernel.org/linux-xfs/20190201143256.43232-3-bfoster@redh=
+at.com/
+---------
+Without this commit, a race condition can occur between the EOF trim
+worker, sequential buffer writes, and writeback. This race causes writeback
+to use a stale iomap, which leads to I/O being sent to sectors that have
+already been trimmed.
+
+If there are no further objections or other insights regarding this issue,
+I will proceed with creating a v2 of this series.
+
+Thanks,
+shida
