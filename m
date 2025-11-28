@@ -1,75 +1,88 @@
-Received: from SEYPR02CU001.outbound.protection.outlook.com (mail-koreacentralazon11013025.outbound.protection.outlook.com [40.107.44.25])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF60E2D6608;
-	Fri, 28 Nov 2025 07:20:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.44.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8AA927B32C;
+	Fri, 28 Nov 2025 07:53:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764314428; cv=fail; b=ZTXJuPfFHHIJPpvLr+E8RZsADnGLHX3qYHlM3DjR25aw2lZiMD/DopaXDZG5b2A1iMFhfjk86+Y0M48VP6/fELSec/rM/ot4J8mFbhfM9jdoXNLJ9iAw/UxZrbBpJ5QzHeAudEwuDN2/GNCJ3nKwTtYSqq3T0S+XeYs0ggLdvUg=
+	t=1764316431; cv=fail; b=nkRXVaBqR50vGIBi/9SHUQiz5RuwEcKAo9dEW1tU2xL2caQ3Q2a0xTm+Wqjs4vUMeBVs0y2oS+25IoHzcD7gpg1WEgWKs3ZjrtWk1S5mD4DR2AgZolS4JhaSXlKot5i3RkhWhKuupLhe8lzTIjJYWKF88RJNLW/8MoAuxN68O3I=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764314428; c=relaxed/simple;
-	bh=olvJl5LrvZm1XjIpMUV9tFsH+RLJ5crUOVMo/zI/Xas=;
+	s=arc-20240116; t=1764316431; c=relaxed/simple;
+	bh=eMZO3r3Z6ghJPws+cDwHxLgG1jMgTfGyHMADF+PgIZE=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=lmYeuwCBdqiBTRtO7hEx/DOgsXpwH7FcDFhZ6+jcsypLd4l+4WE6S727fyjJBV5OBi/8l1QGcfFBjeWCqS5oXXWiZB2cHmsJtQNSjzp5CpnSF1VZL1efDweAifrOOwWXoqv1RB+0kicZ+1/zVWH6pxNdv/TL1jOb42BKVh7Yx2w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com; spf=pass smtp.mailfrom=vivo.com; dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b=NRN6JAQt; arc=fail smtp.client-ip=40.107.44.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivo.com
+	 Content-Type:MIME-Version; b=Rvv2wMjEL8SBdQebHDYiasx5rWOreMEM/gEw44o4Qaq2RGT1+P0ngsFaVRM3f0kiVeMI318YB5Jw5oMjFEVWq1O5O8Oegn+U0hKnX9Y1qf7tngLIdnl3Q+/I6y0/tvoqY6A/S60MtqTvOlVu8dn2MYQ8v++itYKyiN9Rxt6XDKU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=p9Z5FOl8; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=cw/A77P7; arc=fail smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b="NRN6JAQt"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="p9Z5FOl8";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="cw/A77P7"
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5AS3LrNv2479112;
+	Fri, 28 Nov 2025 07:53:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=
+	corp-2025-04-25; bh=e5L72eFLvc33b582yKUe8l7ZITCQhCnZbotZONYz9ak=; b=
+	p9Z5FOl8HrOcGbjLoHbVK/ce9qStp9/jQWhYpWoyOb/b+UMzWBaicYmGALkEvLbV
+	lfobRMreePuk76PD1GMVz8IdZP73nF6wL18NWDeaLhXJYOgkdscN/V/cZzOZc61L
+	6yaifw+M1wyhTn9R+L/kH/MnAMLeQEFBuyUdIt28uLIh3zBY6XZdl/mG7CYsUFd8
+	7vqn+WI72L7XuXPNu8hjiO3wrGMhO8NypFXnrHuSLb6qy5fnVdVqX2t2BrGDPori
+	/Wdbr4Ebp/NGOtFwSKaBONKgfDVqWrseZDzZYbDAj9OlBE5mfbdpAF9/+5ax9sGg
+	CQOC7t3Tj760o2IX7eiNUw==
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4aq3s287qa-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 28 Nov 2025 07:53:42 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5AS6bfXb022165;
+	Fri, 28 Nov 2025 07:53:41 GMT
+Received: from sn4pr0501cu005.outbound.protection.outlook.com (mail-southcentralusazon11011009.outbound.protection.outlook.com [40.93.194.9])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4ak3mgs0k4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 28 Nov 2025 07:53:41 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=GBYoCB4rpD9tvnG0AwlD2xs5J4qQMHbFonKopv7jbFv/1Ud56KmFyt6LKvXhIuBuhNi9MW5eMRDpoK1I9RxPvG68WNcEybypElKERyRtU3oAPOwnIPVictxebWB5bod71Ryp5oRzBdXZt3tehNr0O80yro0Py8P7jW3rbl136Y0mgrXKxxFMWxptzGYJ+V49gYetc5zO5H2cBQzqYc5wYCQ5TbFWXx3lTABu3dWnxQfgd4dU9UQ2PKyrdJnm2+H+dO5Wpfnk41oqNc3i8wClH3jlZEGrq5nYmMD6oXc/EohFTRu8pYX2CSeThis76Tz5eISZrzbA0L9RIJV3a+TOhg==
+ b=QuRGJLZLJe68iGnG84YuIqJDa3HFfPzZl7Xqfw6JN3j3KP5X3aANDuHMelDkz+3KtJP9E6w2zd6DzpUhiXgb8UNlv04EmE1XlRAyv31uIOJcANEx/RQkj272OTqmIq4B17KVTIHb/RntpnWSv4JKVq0Cr6tHopQFVormHGKstUUD4vko0pjwFQLykTsYTtjl+DHzXl4bf5vGalW6sb5id7hJs5nUuylcG8WB4EwuQdYvJGKBAtZwXihd/eiGamEknSJOwi2B6g3gcR6/T//3sD7lfjD02QUZZHvhURl1o3tJQnGaqIzsMdk6lhYWVNEIVSSm2TRcB4zWdIR2+gNF5A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=t4Jwb/pbMVcJr8uTSM/t5DgK6ilzDeNpjfHjneD04Ms=;
- b=pTiPqhHZegZJybobZsotCAmviSYPvR7q25qsqy3FtNT9N6TkHpLehbeF8tmDH34F21mC4celkfdszdREyuMkPIcXKOotl6Am4IqJvXdYta8AYSMwQw69rFub86pfytWDkvE8+jvc5A6mH9rKS7sut30ciDcWRoCgj78LuMspqwdQiVhRnd0l3iYhR772ZyV+BTGzPZQTwMHT7GuAsey41c1H7OU3P7fH36eHNv/OE2sDPys5HAnwu3G3sjLzVMqF4ltyXTYa+bNHmT0XDxBs1Dr7Cul5BckUyPE6Tad0/u5xWCoAQllzaEV1sHjKlE6soOu1VecxY7kY6ssE2LXBSw==
+ bh=e5L72eFLvc33b582yKUe8l7ZITCQhCnZbotZONYz9ak=;
+ b=REW0/LCvdoynEpx8G8XDwcHZ/JFZ5m3+HrjnixU3PR+ZLjVvY13tYRUDYyS99z4Ll9Rv+nRPgCktj9zHNriqOdvzN8uW/MUYdiPUR76Z8rESW+qM5ralnbQzJ8EwDitOX+QiCMy9VuvQ1ymr2oJEsuajx4qRPHz5cs9sYBYzudS/0sOP2s/tS7o5JvQbSk5VUjgWSTw/0UuBIHzYVDEXq6M15RWa4lzeQCIpsQq2jcrZi0xDK9T1LO84rcNcdqjQF5r/Qat3TP7l/t6tFlcnxU98OFJEeF7HLjJRjdP9aQ/jovKw7ry0EuV9z6n0vV2WsRl3zxiVjvrMPIJP/L/N2A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
- dkim=pass header.d=vivo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=t4Jwb/pbMVcJr8uTSM/t5DgK6ilzDeNpjfHjneD04Ms=;
- b=NRN6JAQtJGLot6lx6GF/zILJhYPdR+1LEGngC3sdUesNLp0iOZ1emnUz40ozVW2J49NCN7Wj3JFF0LrBCjL2sijJ/x42P/vDMkmB5qV0Hr5opCfddvsI7X3mrs5PsjqYXpsMK51z/vu3fKyaWXhVnVZXOpKvrhDn7ORz+bi1m+5p4yJEa/Tjh4erZXxjVDF6BEL/pTBPUumFQ305TC+tKWxnsmbQHnFX0Cilm5N+mDi2SOj7i6G76zzPpzT2shl6eG8C/hgfDkL4+xJZkG7LqGiOumdQ2MOdfPQbeleSI/8NJyOOfYkvZQNVbqbri0/sviCHwpZ+ooC0U3qMin5WPw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=vivo.com;
-Received: from KL1PR06MB7401.apcprd06.prod.outlook.com (2603:1096:820:146::12)
- by SEYPR06MB8222.apcprd06.prod.outlook.com (2603:1096:101:2f5::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.15; Fri, 28 Nov
- 2025 07:20:20 +0000
-Received: from KL1PR06MB7401.apcprd06.prod.outlook.com
- ([fe80::6f03:984f:82ec:6846]) by KL1PR06MB7401.apcprd06.prod.outlook.com
- ([fe80::6f03:984f:82ec:6846%7]) with mapi id 15.20.9366.012; Fri, 28 Nov 2025
- 07:20:20 +0000
-Message-ID: <18d454ab-1a14-4e7c-90e7-831ec4d7ddae@vivo.com>
-Date: Fri, 28 Nov 2025 15:20:16 +0800
+ bh=e5L72eFLvc33b582yKUe8l7ZITCQhCnZbotZONYz9ak=;
+ b=cw/A77P7I8ZoViCoCBFaJTVQBFzQa/KroIGcv4Bq4XDRK43u/qhameTuA4wnY42gRUv4lLw4ys3vpsgSxkG4TNwnS7XyR4qDdfmxeczlVVtUWMEE3QD9XLJUMzCjYX1tPjR5PiZjkCTIFzTSVaoSVUBVlgiABfp2ZpPIBGxVTeo=
+Received: from DS0PR10MB6271.namprd10.prod.outlook.com (2603:10b6:8:d1::15) by
+ CH2PR10MB4376.namprd10.prod.outlook.com (2603:10b6:610:a7::14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9366.16; Fri, 28 Nov 2025 07:53:39 +0000
+Received: from DS0PR10MB6271.namprd10.prod.outlook.com
+ ([fe80::940b:88ca:dd2d:6b0c]) by DS0PR10MB6271.namprd10.prod.outlook.com
+ ([fe80::940b:88ca:dd2d:6b0c%7]) with mapi id 15.20.9366.012; Fri, 28 Nov 2025
+ 07:53:39 +0000
+Message-ID: <a9643691-f456-4414-a13f-a50abf1ac8b4@oracle.com>
+Date: Fri, 28 Nov 2025 07:53:34 +0000
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] PM: runtime: Fix I/O hang due to race between resume
- and runtime disable
-Content-Language: en-US
-To: "Rafael J. Wysocki" <rafael@kernel.org>
-Cc: Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
- Pavel Machek <pavel@kernel.org>, Len Brown <lenb@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Danilo Krummrich <dakr@kernel.org>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org
-References: <20251126101636.205505-1-yang.yang@vivo.com>
- <20251126101636.205505-2-yang.yang@vivo.com>
- <CAJZ5v0i1YLiri9oiiq2W6_KSbqGuWOqdrMPrOf=do-DdW=_rfA@mail.gmail.com>
- <1a2d2059-0548-4c5f-a986-5081447c3325@vivo.com>
- <CAJZ5v0iSgrLzsjh+bvF2=rxxhYcBetJ6V-joWaQud4ahkm1GkQ@mail.gmail.com>
- <9b6e7d55-6a1f-490e-98c7-3c04f85f7444@acm.org>
- <CAJZ5v0hJw0WdHpqgUc5bz5qCSUNNKHg7i5-sNYeZcDYwRj21qw@mail.gmail.com>
- <6df79ec0-f5b3-4d75-95b1-03e488d45e7f@acm.org>
- <4f4dea0a-21b1-438c-94ae-9a785ad42569@vivo.com>
- <CAJZ5v0h-Dsi=Z2cRye39PVxgw3fyNdfsZynvzo2QaYrT-nNnow@mail.gmail.com>
-From: YangYang <yang.yang@vivo.com>
-In-Reply-To: <CAJZ5v0h-Dsi=Z2cRye39PVxgw3fyNdfsZynvzo2QaYrT-nNnow@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: Re: kernel build failure when CONFIG_DEBUG_INFO_BTF and CONFIG_KCSAN
+ are enabled
+To: Nilay Shroff <nilay@linux.ibm.com>, Jiri Olsa <olsajiri@gmail.com>
+Cc: bpf@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <42a1b4b0-83d0-4dda-b1df-15a1b7c7638d@linux.ibm.com>
+ <aSgz3h0Ywa6i3gKT@krava> <214308ce-763c-47a8-8719-70564b3ef49c@oracle.com>
+ <65e3ff98-4490-413e-a075-c1df8e7b2bd1@linux.ibm.com>
+Content-Language: en-GB
+From: Alan Maguire <alan.maguire@oracle.com>
+In-Reply-To: <65e3ff98-4490-413e-a075-c1df8e7b2bd1@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SI2PR06CA0017.apcprd06.prod.outlook.com
- (2603:1096:4:186::15) To KL1PR06MB7401.apcprd06.prod.outlook.com
- (2603:1096:820:146::12)
+X-ClientProxiedBy: LO6P123CA0045.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:2fe::14) To DS0PR10MB6271.namprd10.prod.outlook.com
+ (2603:10b6:8:d1::15)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -77,196 +90,270 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: KL1PR06MB7401:EE_|SEYPR06MB8222:EE_
-X-MS-Office365-Filtering-Correlation-Id: 36e3878c-15e5-4aac-e85b-08de2e4e9679
+X-MS-TrafficTypeDiagnostic: DS0PR10MB6271:EE_|CH2PR10MB4376:EE_
+X-MS-Office365-Filtering-Correlation-Id: fa858a92-a1e4-4529-c563-08de2e533e08
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|3122999012;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?cUdiU0hFMmxNVW9jSWZZYU9Eb3daQU1wdlEyTWhHSDRqTmY3ZC9DN0ZQNnpM?=
- =?utf-8?B?eVlVblpXTGw5ZDA0TUJSbWRGUTdyUmJYQjdmQUh0ZTFyNlpKbml2VTRUeW42?=
- =?utf-8?B?MEt5K2FjNWhtZjdGOGY5U3B5VHpJRGx1QmZQcWVXeXZmT1VrOGNsalR2QWpY?=
- =?utf-8?B?dDQ1NFZIbFB0UTVLZjNYNm5OVVozVDNsUE5KUEZ2YUJHQ3FwNnpyclRqRlZ2?=
- =?utf-8?B?TkhSVkF1ak9oMDRlb0ZPN1dJZjlxRnljTENzR3FwVzYxM1krbTQwTkdxSVJX?=
- =?utf-8?B?V2Z1OUpZakxFK1JJQXExNkZKYmtLRW5JSHp1OVVkTEtNbDBLNUNuYkdxcjFY?=
- =?utf-8?B?eHYyT1krSVBwa1MydlpUQ0tPUEFyMkVCcFUwNldrcUcya2gxNGZHM28zcnBD?=
- =?utf-8?B?azh0S0ZqdFdqbjFSSXVKdTlRQ0hCUzI4cENSSWNVL3psdUxoT0NDVFNPQkVa?=
- =?utf-8?B?Nytid25kWmJOM1pRYThwNjc3WjNObEZEcE50WmhwelJzZkZYOWtKd2xlMVow?=
- =?utf-8?B?QkViTDJ3U20rT21FVUh1eHh6cVl3MkhlcWMvKzg0d1p1eXNQclVORlhZczI3?=
- =?utf-8?B?R1FHL28ydmw2WkQ1dXB5NHR1Z3VIY1BORzFjcUg2aU5zVmduYXkrQW1NYlZX?=
- =?utf-8?B?R2Q4RGhuUVNVbnpCUkpTTUJuMUcyWUtxbk1NZ2hzRWdCdmNmTjhROUl4OG9Q?=
- =?utf-8?B?YWsyYmo0ZmtMaFp3d2Vmd3UwWjRoOUoxek5kdnlMUlhLdHV2cnN6TTZtZVYv?=
- =?utf-8?B?Qm51OERpcTVHck5XM2R1amxjT0FENVNpOEwvelNoeEVwelNBRkVLcWVTbDNm?=
- =?utf-8?B?dGZiaWVqRjAzQ2NuUmtPd3AxZkR3NCsvSzllYzA0YmtXekFVaUlrK2JGWnFj?=
- =?utf-8?B?c2w5RlpFMmk4bkgvSGhRMW9rdThNSmUreDJFMDB0Rk9rUzFRdHZxbHZsTGsr?=
- =?utf-8?B?bVpQR1lwZnpsNUdXMDkrQ3lseTRVZnU0RVNZRy9ab2lQeFNubktGOTAxSkdN?=
- =?utf-8?B?VTh2MDJtL21wTlVHZHJ1b3Q5K0JVWFFMeStuODl2SVo4bW16bTZHaFdqTTlD?=
- =?utf-8?B?dVNuWENhQ01zSEhpVUFSK2l0Wm9zSDNISzJoMjRqVERrOVAvMHA2ZE5yOWFX?=
- =?utf-8?B?emkyN2NzRXJVWEZlcVJYdXcyZklTcVNaT2dGMkVHYXlpNkFYRUZUYjBhcE1L?=
- =?utf-8?B?ZThadnBrVXpYUm11TzZPQUR4OEtZMTZoelZqcmRmb3dHN1JzUmZCOEVNc0N3?=
- =?utf-8?B?d3d6UThpQm13dnhWOFpZVHhmQkJlUElUVytFdVNjSmF2SFpoME1DdFNtcTFT?=
- =?utf-8?B?SGFHSEVLVTh0WVNZV09yNmhkYzhwRk9yQnVpSlhJanVUdlJYK2Uxa3pPZnhE?=
- =?utf-8?B?NGY1R3RncnMxcFdpTWpiN1NkMklzcGRNVXRZTVVZNnRPZTVtNjRJTnRlNE9B?=
- =?utf-8?B?WXlaUS9zTTYzN0lFd0ZPRXVPeFZyL0pGNVpvMHZ2WGFISEY4TUU3Q1BGTTcw?=
- =?utf-8?B?Q2ZPYXExbm93ZWQ5N2FSaDV1bThGRHk5VndudytCTjJSYmI1a0toYWk0YjlU?=
- =?utf-8?B?SU4vci91R0FQMmljZGVHcStsVEY0VjdSWFFuQlhmNG5JNzc0YnM3bEFtTURj?=
- =?utf-8?B?NnhvRk9xOUsvRFRwZm1UaGp0VklWMzQxRW85RDRjVmh0TXpIZE0vclJINTZE?=
- =?utf-8?B?MjN0cm56Y1RsaHJKNUdRdFBJUEZZTUhYOWtkOGN3QUF4N2JPWEY2U2pkVW4z?=
- =?utf-8?B?a1JPcGsyenFlakZsUVkzOVc2NzNVR0VqbmU5KzR4blZESkgvaWx1NHlpYWlQ?=
- =?utf-8?B?ZzJ5a0NGWFJTUXBjbFNZb2VINDlCalVNSGptMW5zUTBUQ0NyYk4yUzFCNFJt?=
- =?utf-8?B?aE1HcUhSS1lFZ0x0b002YmlBbTIzZElFRVpvazkveU9uR3Yyc212U1Nyc29n?=
- =?utf-8?Q?ffDa/7POLRcGHLCRf7wQUFEM03+BSKlE?=
+	=?utf-8?B?bG44eDEvQzFGSHN3ZWVEc003SG1ZMnV1RXJRcEF3N2p0QWNtYVNNTFpxbk9B?=
+ =?utf-8?B?ZndwQmZPU1RuaWRPZ2FjN2VCUU5EV2g5eE5WVWZjb3U5clEvZExnOTU0c1Ex?=
+ =?utf-8?B?MVZpTFhHbGJDMHkzNEcycTd2Uk4wZ1F2Rkc4bjZINUx5d1pWWlpSbldxbG5H?=
+ =?utf-8?B?MGJmTkNVMlZBdGZXY2N3STAyRmxCOWpvaWphdVhmaTJnWHhrNU1OWGxJYy9Y?=
+ =?utf-8?B?RE45eElrZ3hrWXJXTXUrSGJQdUhXWGZhejF5M0oxRk0yREY3TGNFVWl0NC9N?=
+ =?utf-8?B?ODMyWlNScEVPcnpHdFlIbSs1MFRTZWl6WDNiekRoRkFzY1pwdXl0MEwwQzM4?=
+ =?utf-8?B?TGFMd3Y4VGVVejJHOHU1ckpzcmd2U0RvajU0WDF4TjcrOUFIaGlGT3NKOGl1?=
+ =?utf-8?B?bHk1T3MxMFlta1lhODBkeFFVU0FmNXY4Vy9TSWVoeEU2R24xQVAwVGxoWXJa?=
+ =?utf-8?B?UDJPdkdHZk4weXgzVlB1MGpoSVJYYnY0UHZrUXRoVmZKNko5TXpxMVRvUzUx?=
+ =?utf-8?B?NUNrQ0dyYzVxUmhQd1NCOENUdGc4OEdvQ1lnZnZiR1hZcDRZRnZoUGtZNXJR?=
+ =?utf-8?B?UTdLNXB5V09YZVV0R0FhdHRCdi9scDlUVzAzTnVsckhVYmY5cmhHZjNQcERJ?=
+ =?utf-8?B?cE1ES2JuK1hJNktHT3UzN0ExM3d5V2NWQ1gxckFmdkRoOGl2QXBESm1SdFZy?=
+ =?utf-8?B?UE9aK3lrWEYwNG43dXhnempzSGxaZFNMclBZa25KTll4bm84LytUaTJQS082?=
+ =?utf-8?B?ZTNoa1JPYzdQN3Bva0dYb1d4U2FNZWdROEFBTDErQ3ZOS1czWUVzVVgyeE15?=
+ =?utf-8?B?N2wxWklPcWdjVnhRZGNNZ28zUFg4T0QvejRwem9ObUorbHNROUZZaU84QlpQ?=
+ =?utf-8?B?cW5GdUp4R2JOc3B3TGZxUnJMZHgzZlBYTTZEcmt0bEU2TnBuZEgySzhyVXRy?=
+ =?utf-8?B?TjRTQzhRNDgxMEJqd3FveW5kUTAyTzQ0OU1yVjVCK3ZYbktlTWYvYTlvdGNM?=
+ =?utf-8?B?ZExFbzh1SU04UkU0cmozWXpkTldkTVBaUjJIK2I3RkhiQmwvbU9hZGxLKzJl?=
+ =?utf-8?B?b3h2OXFRSU91L2hEeDFPcjFnTHBvTjk5VjJtVWZkdHNUK1BoKzBzeEt2blVK?=
+ =?utf-8?B?RG8wNzdlaDc2UHFrWUVBMGZrMHMrS0Y2YndXcUVpczZDSlg3R1F2RC9vZURm?=
+ =?utf-8?B?clpkQk9PRFNyNXFONXEvY2lsWDVJaTVDMkJDMy9FNWVCRFhnK2lsbzJIY0l5?=
+ =?utf-8?B?VithYjFXdzNncXZTYVlXMnRJd2RFYXloN0piajdobEJTLzFZUjVmWFdlbjVz?=
+ =?utf-8?B?TWdTRGdhSEtrZ3ppUHA5VkhyYkllbFBVSzJaMXh5TTI5d1lvTktOejNaNGx5?=
+ =?utf-8?B?OEhwYWxEK2hmUTA3RVBaMHpUejYxTUcrTEdHWjZGRUtOSGRySTVIWTFxanQ3?=
+ =?utf-8?B?Z3JjWHlJRWpqRG5nT2prQm1NVVNleEdSK2djNGVrS0F6NEYrRzBIWjJGaVcr?=
+ =?utf-8?B?Mnhoa0s5MGhKYlV2Tzk5dUd0cUkxb21SRVBmRXJIK0grRkI2SFN3WDNrM1hT?=
+ =?utf-8?B?djM4dTJ1a1lpVjdtQWFQUi84NFRrVmtrWkdvYjdRVkpHV2I2NDlHT3VUa3hj?=
+ =?utf-8?B?SzYwdlUzOHd1UEphWEhSWWhUNFFxTE8wcmU3SXNCc094aXl4cDhidVovS2dR?=
+ =?utf-8?B?ZERWbDRTUjFKVW5tOGtmYTN3SmNPaUpaejB4aDlHRmZhWnBhSWo0VnFOb2Y0?=
+ =?utf-8?B?anZvQWZxaEpsTVowUExYdVFtckZrQWZ3TEtUUzFkMlIxckkrNlEyOVBTdUVT?=
+ =?utf-8?B?enRpMStUbTdHZURyN0ltYVB4VHRJVUpGbFpzaWpXUWNGUUl0Zkhwb1dzenJz?=
+ =?utf-8?B?Ynh0TlhBSG91K0hpVXNsTS80eTQ1V2o5a2M4cTVwcWp4TTQ1ZmdKVi9HOWs2?=
+ =?utf-8?B?bDQ1TWJzNlF5ajNwYnE5THRFcmd6OGdvUEJ5bDJGcVQ2Tklmcmd1WDc5bmdO?=
+ =?utf-8?B?TnRmei92a1d3PT0=?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:KL1PR06MB7401.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR10MB6271.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(3122999012);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?SFFYSjJ0WURraVBZL3Z4bGwxdFQ4TVUzaGFmak1XelZ2TVQ3Qk40N3BtRkNU?=
- =?utf-8?B?d3RjZ2NBS0RiRk1jMVJYNytsRU9VVnFzKzZFVXcyaUNMOStQOEkzU2JLL29H?=
- =?utf-8?B?ZDdiaUt3bG8xeUduZjV2amozMUR6Y3Z2QlZ5MVZXcFVOR09kSDNENHpWTFpS?=
- =?utf-8?B?czAwMVlmOFE3WmlmMnNlek5uZjZjOUlOOVEvT2NwVDA1dXYyQkhXbzlBaGhm?=
- =?utf-8?B?Ylg0TDIveEYwVXRveXZoMWJMV3Q2Q2g3TEk0L0t4ZGYya1dnM0pvMkZaZmxj?=
- =?utf-8?B?eWxBeVJuTXVLVXpQYWduOGFNMTY4SThDbDR0alRNUWhsVTJxR1BtalptL2tV?=
- =?utf-8?B?dndDUlhPVXZ2aVprc2VBUzVaNTJTS2x0VkRJeEhwWWJNaklOOTI1cTJIcHI3?=
- =?utf-8?B?Sk5mak55eW83V1YwWjlGeUx3RmpDZEo2YXNGVDZibk0yek5BZ1MxMVRMN2g4?=
- =?utf-8?B?RkxHWE5NTjJzNmJYYUtQY1kxVlZOaWdVVjA5VkIySU5OUVRScDEyZWxhU2x5?=
- =?utf-8?B?N1VUVGJ2aWZ0Ry9kL1lJVW9DQ1RoaGw4NWYvcDJUWTE0L1N3Z0lzbEgxWlpN?=
- =?utf-8?B?Z0UzUld2NWJFVnpBQ1k0a0NFVk8wMW9maGY4UEtidU9mTSt4MWhIZ2pycjNX?=
- =?utf-8?B?MnRsUWpEUUVKYTFEWTNYcm04elNnR3VEV0VNVEo3ZHowTE94MjNWZUs3em8r?=
- =?utf-8?B?MVRSUHV6L3F6VjdnT1VyZElLZWg1c0tlV3ZxYm9JYnZuNmw1SDYxSnJkS2Nv?=
- =?utf-8?B?czc0NEtackZPNzA4UzlJU1RMeDBTL0hqMSsrdGZPTGRRWVYwY3RTbW5WeHdh?=
- =?utf-8?B?c3EwMUJHUjdpT1d5dSt1NkF3Z0VtczNsT29vR3EyME1kSjBwVWkzS0ZCSFhG?=
- =?utf-8?B?dHdQc2dEdXBHeGVwVDlCM2RoMHJnRDhWMFVxd3FVZ0VpRlhLS2ozbEVjV0dW?=
- =?utf-8?B?UUxBbTBFRCt4TTNBMFpRcWFhUWx3VEdJRlk5dk9sV2lINTVPbFQxK2pLdFo4?=
- =?utf-8?B?SE90b3pWTGhaZ0NUaHRwclBlRlNlT2hCcGw0Z1l4YVBpejJWbndVMXVzNGRV?=
- =?utf-8?B?bnRxOGtZODE4V2tSVkdZUlRWQmdRN0tmVUV4VCtrQlhNUEpIM3RybGtEaG12?=
- =?utf-8?B?UlFTajdlYWF3VWNsTU0xbFo5VUo2ZTM4a052QmtubUM1d1JoWW0zQmhMUVJs?=
- =?utf-8?B?OFB2b3FYOVRwMG5UeE9GS254d1pNMU15endCenpWeGRPWEFod2JReFIvVStv?=
- =?utf-8?B?YjA3T1BDRGl5OU13aVZobmxaZmVJV0Y2aDgzR1hqQys3SmMxUkVOa0tNRXpK?=
- =?utf-8?B?WHhpdWI3YWxCTmkyQVJDVTMxYTByejgyNVJvN3ZGMlp4OFRoVkIxQjIrNncw?=
- =?utf-8?B?eDJQNFp5eEVLN1hSalRNMk9mNGdiMDdLSEtMM0ZxdDhxTlprRlJzRGpsSXFQ?=
- =?utf-8?B?ZWF3Z3V5U3QvR2dPMWZKekdMWFM0ODFzMU9GVnBGTHVXSjRWbS9JbVdMTXoz?=
- =?utf-8?B?enVxeW5DSmFLVlRBWEw3S2M1eXdGT1ZWbTJPTWxhMnE1Z1E1bEFkQ0VFaTVl?=
- =?utf-8?B?bUhBUkpSWkNQZDd5NGlaUkRrdXBrajRzZ0N4VTdDTlRMbkZLQmZHMWJwQTlo?=
- =?utf-8?B?bnIwQWFLMzBFSTVRaHZyZ0x6d1ROTHN3TU5jR3N2a0p0YnR4b0JHUjJjQis3?=
- =?utf-8?B?a1M1bTFiTjdaeDJ2bVBaeWlqbm9rdkYzaks4Wmh0VmhnMTFWcCtwVjlQVHlu?=
- =?utf-8?B?ZEZ0NXZNVUdQU0xrY2hURkFoMkRWNnVBMFBvd0l6RnJUYVpVemhtKzdpM2lD?=
- =?utf-8?B?cVJtY0ZkS3JlN1pvMW8zNkNsMUl5NGdSRk8wZTFLZHd1QWxKUEdFaTFsZWpW?=
- =?utf-8?B?MElOcUNST3FyNmtFY3BRem1zS0EyRllUb3BDOHhBMG5TYkhHYVF6akJkWnJh?=
- =?utf-8?B?eDd1dG9OdVlxRjdBL3BGd0xLZk9oTVlJeTJIQ2tjc1BQbWtFVjhNMVZCQytt?=
- =?utf-8?B?TkZZdTVkaDA4SE5rU2l1OTEwcFp2SGo3akxsOXVXd1JBTEFYYTJmbGRnbVox?=
- =?utf-8?B?UWsyUnJHV25oK3IwUmV0SHRnc2RrY0Nib1I3aFBwMHJSdElaN2ZoRHVpV05m?=
- =?utf-8?Q?r5+CKIlGUyuJmWgk5QFlBWEu5?=
-X-OriginatorOrg: vivo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 36e3878c-15e5-4aac-e85b-08de2e4e9679
-X-MS-Exchange-CrossTenant-AuthSource: KL1PR06MB7401.apcprd06.prod.outlook.com
+	=?utf-8?B?SnhMcnJSN2hKd0VWOGprbVZBenBNTlpZVFJxU1BRZk4yeDg3NTcwWWIzOFRJ?=
+ =?utf-8?B?aE1CVUVZWUFqUlJCcXRtVGVscmFvMVhJcjNXZ1UvczNSYjlsSmFMMEtUaGUv?=
+ =?utf-8?B?M05tQzY1VVBPUTQ3cDBYWFNWRXZkNE1vVU9PbzB3WG1tbkMvZ3BYTjZaZkEr?=
+ =?utf-8?B?K2pGbG54WVo0NVVZeFFLUHZ4NS8xQ0xDOVhyLzB1OGRWL2dTY25OaGRuL2k5?=
+ =?utf-8?B?YkpGNVpQQkx1R2FFQXpYTVJIOFpVUmVValhJL0xFZWVpWnUrallSaDNoWGw3?=
+ =?utf-8?B?V1RpK01oa1R2TGY4UFRHSjR3MU85Z1I1WXA0ZDE3VjU3ampDQStzZk01emVU?=
+ =?utf-8?B?OWw0UnBtZTlMOG5palYwVDY1aWhIYzFYQ0Q3WGFmS0NRRFpnSnlzRjJoWS9w?=
+ =?utf-8?B?YWxjdkU2aUJFOFc4bVNQUXZVZy9vZFIrNHpsTlR5NzNFSlJLL0dwTUtIMkZp?=
+ =?utf-8?B?b0J0QmdqS3FyQ3VXQXQ2Z3BBMVQrWkVzZ1BJR200ZG4vd29hV2xRV2dsV25w?=
+ =?utf-8?B?SDMwNTlvQmpwWklhWnQ5dkFZakpwOHNEdmt3dk01a0ZzaDVYQjBQQW9ZTVZy?=
+ =?utf-8?B?ZTQ5a3pITldsdGl0UlpPVFZGR3hBeTRqdUVlZTZ0YzgyN0dvMzBoTXEvN2VV?=
+ =?utf-8?B?d3Y0L3JEUWcrbjlhVUFEczJjVjVXRm12UE12UkF6M1VBeTNqajRuZEFOdlhU?=
+ =?utf-8?B?V1pvb3pTSkk0ZDExay9PSG0zRkorYXZzK1ZYYnE1a1hCcjNsN0c2dzRMOXc0?=
+ =?utf-8?B?ZVJTbGVvemUrRkZLQ3ZyVlQ1N0FlcndJNit0UHJBM3RmRzlWa3phOGdnMmNC?=
+ =?utf-8?B?bTRoWkNZdDVyaS9wYW5LZnRmcFc5aHdjYW5UNTFxODFnNEtONTk0a2REWVN0?=
+ =?utf-8?B?Z245L2ZRQm9uMGd5M1lHU25QcWN2UmR2V3dkbUZUUXZ4OVNWNi9Wak5zcGtF?=
+ =?utf-8?B?bG5XUzhYT2FUYlhGZE0yOENaTzBzS1BEdHFRYmduS01YZGRzb2xycC93UmY1?=
+ =?utf-8?B?NEUvQ0FyV0c4ZjlVR2lGTEdWc1lMVjZ6QTB2VVVocHA3dnBsakFCcG0yUGRC?=
+ =?utf-8?B?ZkJTNTVMV3dLcUY1dlVtcVVTUUJhcW1YTHNDSFIzRGV0dzRkTXd2NTZRajJ5?=
+ =?utf-8?B?Z2c4S2FMdzRDcStGcXZTTlU4UnMyek9lOWZOY0NGb1lBNXBWd0o3R1lWZ1h0?=
+ =?utf-8?B?dFl2cGJ4MDVWVVlORUFEYTA5NUhrZmxlOGY4RTlNdzhJejBlRW1OMVBvQlM0?=
+ =?utf-8?B?dzlhRnhac0JBOFNVWmRHWm50bnFKZm4rS28zVHlncy9keFp3WXNuZWZpNlFE?=
+ =?utf-8?B?c1hoU1N4S0FZZ09CWTBKL2V0NGsxeGVvdm9mcThoU2tvMmVXNHNXQTFxalJz?=
+ =?utf-8?B?eTRoSGxKaEFXZWkwam1EZXprS1g0WjBKYmdGQkg2Q3hSS3hLcFBHYnRBS3R1?=
+ =?utf-8?B?VWpuMTFOVUZqbVQ0ZjdQYlo0aHNkTWRDMmhkOWg5OWd3NFpvUW5PWWcwdTZt?=
+ =?utf-8?B?YnUyZVZOTVpTWThqQWdEcE8ra1ZQczBlckxncklDampjell6RmVkQ0E1ZGJU?=
+ =?utf-8?B?aHI3N2RLNUdaMTdRUUZiUE9ITFNlQUkwSVZPTnhQOC96SlR2d0Q0NHZVN1FO?=
+ =?utf-8?B?cy9SOUVGeHVaejBHUTFnbjhJbnZKdXVEY0lPRDNabHVmUU5zdlFjUnpOaExh?=
+ =?utf-8?B?R3VjZ2pDam1xcno3aVFJY1N2bVFobk4yRzM5YW9WUUhySnArQUR3M1N2clZQ?=
+ =?utf-8?B?bWRCRm9tTldGUTROS2tUUjdtazZoaG1WQmFwR3o3dXpvOGZpMHpacTV4TGsx?=
+ =?utf-8?B?bDk5YzQ2My9SRDVIMDQyWlpHNmlhdDkyK1l3MzNsUzYvMzMxc3NGWXVLLzJi?=
+ =?utf-8?B?MXZLUmZIWFN3WXVoZjlLdU5TSzJsK29Ta3ZzU3ZObDRtMDcwc2JZdWNDQkdm?=
+ =?utf-8?B?a3g5cEZJNW03Zmtubyt2aEpYenZnRVhMc0ZrY3I2Skc0ODM3NlFlMm5rUVFW?=
+ =?utf-8?B?U09OaXl1UlFjUjAvQXpFNS85aGpUenVuODlENW5RSjlwNVNjRlZlcUdjZjU4?=
+ =?utf-8?B?eTNTaFJ0YytmSlJvU20wdS9HZ21lUlBpclp1dTBsNnBaMDMzWlVLZzZ4YldR?=
+ =?utf-8?B?R055RVV1MktjZ000SERpTFZvQjJqeVNiVnZNNEtUZit1UnNaeCtiOVk5Ukw2?=
+ =?utf-8?B?dnc9PQ==?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	AE3MMc5zxFheUg+KklIlcwCBzdm7bgMQXz23LUhxnn/RlRvXcEmUEjlHV3YihaJzbRsdNuR1q1PNc+p46mRlOHusLHLxiI2YJ4wLB48d1UXSbRM/LK7u4u4qBshhxi1eDjCUumrojTaQ3Yhe/XmZLbG09Tz468D6e1OIrY4sp6cWwAmHBNjxFKjC23p8nbwa6jjbXepEK1dLOOhzk2MuIiEBZykJ2Qhk1epQ03IibOtaZadlFA4Tn7GNXOsp583kLXjpxDZcpJOF44D/APKkIA8ksbdlO0yUZ1lmEEUuIvBSXIeAmNA4HGkiX92/GHhJaL+Iy5XumXMOMbZpy/mrtcdnBUCXSPmBB+/6a1r+CAFnXAM18l5oBmA1ttE8WVf2+p7QDd/yoRfpfJUF9gMLd5Bd9OeIz2g0W/VfhcSbfpPPE1gf2FD7GKMXK22g6yqLrqOLrR2nAyF/UBdkSw36QQnZZXWFVzrW/C36qWksP71KZbXKk9yXaaAMYgUgg2ikFU2hEJQwGg7gnXbK/VkvNM6Iee9Ksvqs3bY1K932G3wJNLlE45ucFcF5tduDodAe+7gZj9zA2C9NmnWOGnSjCQPmJjVcG7AKIKsvYdOLAko=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fa858a92-a1e4-4529-c563-08de2e533e08
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR10MB6271.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Nov 2025 07:20:20.2509
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Nov 2025 07:53:39.3075
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7tCoNq5/fPg70z/1iGmFGuMnBdkG7J0Dw08AN9CPnYRQkkqtjjXTLII/WZOU5/vsrJ7L0prQF4D2IXRcMDDKpw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEYPR06MB8222
+X-MS-Exchange-CrossTenant-UserPrincipalName: MGeE6RhMe/lnNXfquCa6/qDnikFp94/bkFvXUpm6Hepv3OQ3SdWCRFhwaS0DeO4MWUc8KEhrIDAdhvkNjNN33w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR10MB4376
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-25_02,2025-11-27_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=999
+ bulkscore=0 malwarescore=0 phishscore=0 suspectscore=0 spamscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2510240000 definitions=main-2511280056
+X-Proofpoint-ORIG-GUID: ueCyNdCr5-b8VwmN70fm0IzbmJVrfcrj
+X-Proofpoint-GUID: ueCyNdCr5-b8VwmN70fm0IzbmJVrfcrj
+X-Authority-Analysis: v=2.4 cv=SLJPlevH c=1 sm=1 tr=0 ts=69295506 b=1 cx=c_pps
+ a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17
+ a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
+ a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
+ a=6UeiqGixMTsA:10 a=GoEa3M9JfhUA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8 a=yPCof4ZbAAAA:8 a=g1_aQYOHg78x2AqTch8A:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 cc=ntf awl=host:12098
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTI4MDA1NiBTYWx0ZWRfXyVU8BNQpMDT6
+ b0fAn/LfMF2s+AaD6/jM5+y2YHqTmmhLQgiDR/E2Vw2QO0ZhU3CVRTlAzJCMlILc7g9zyuhREaJ
+ ujl3M4PaPUlVhzhc6mvIyC+wmwk7cx7S1ZGICZW9pr+xzJlDQSuCl6qQyJNIBJ/K87l4JXosV/c
+ kpGb+GAUv9EF5AmnWEX0OXQ+u8ioBBn8l3j8p8mGx+JPQXDjz69E4ZxDMOI5ykPiBuoLu6EGw25
+ 0dlXQlotM3Y4VIjWD1YENfTPy6g4GeoC3Xfe1qKMTqpxztjTYCFNMJeVzV4cVleUAJINtUAhwl+
+ L8K0S/LjNnfodTJtIkHT+1k3WQjxcLylCNnJSaR0pzqXX55sphrGOeD2pcYC+qwcQoXi28oZsCh
+ T9W8Jgljnq47Z8FZ7bwNLZawCyu4dFnux4wBG93L2wxBjuF2tD4=
 
-On 2025/11/27 20:44, Rafael J. Wysocki wrote:
-> On Thu, Nov 27, 2025 at 12:29 PM YangYang <yang.yang@vivo.com> wrote:
->>
->> On 2025/11/27 2:40, Bart Van Assche wrote:
->>> On 11/26/25 7:41 AM, Rafael J. Wysocki wrote:
->>>> As it stands, you have a basic problem with respect to system
->>>> suspend/hibernation.  As I said before, the PM workqueue is frozen
->>>> during system suspend/hibernation transitions, so waiting for an async
->>>> resume request to complete then is pointless.
->>>
->>> Agreed. I noticed that any attempt to call request_firmware() from
->>> driver system resume callback functions causes a deadlock if these
->>> calls happen before the block device has been resumed.
->>>
->>> Thanks,
->>>
->>> Bart.
->>
->> Does this patch look reasonable to you? It hasn't been fully tested
->> yet, but the resume is now performed synchronously.
->>
->> diff --git a/block/blk-core.c b/block/blk-core.c
->> index 66fb2071d..041d29ba4 100644
->> --- a/block/blk-core.c
->> +++ b/block/blk-core.c
->> @@ -323,12 +323,15 @@ int blk_queue_enter(struct request_queue *q,
->> blk_mq_req_flags_t flags)
->>                    * reordered.
->>                    */
->>                   smp_rmb();
->> -               wait_event(q->mq_freeze_wq,
->> -                          (!q->mq_freeze_depth &&
->> -                           blk_pm_resume_queue(pm, q)) ||
->> -                          blk_queue_dying(q));
->> +check:
->> +               wait_event(q->mq_freeze_wq, !q->mq_freeze_depth);
+On 28/11/2025 06:27, Nilay Shroff wrote:
 > 
-> I think that you still need to check blk_queue_dying(q) under
-> wait_even() or you may not stop waiting when this happens.
+> Hi Alan,
 > 
-
-Got it.
-
+> On 11/27/25 9:06 PM, Alan Maguire wrote:
+>> On 27/11/2025 11:19, Jiri Olsa wrote:
+>>> On Wed, Nov 26, 2025 at 03:59:28PM +0530, Nilay Shroff wrote:
+>>>> Hi,
+>>>>
+>>>> I am encountering the following build failures when compiling the kernel source checked out
+>>>> from the for-6.19/block branch [1]:
+>>>>
+>>>>   KSYMS   .tmp_vmlinux2.kallsyms.S
+>>>>   AS      .tmp_vmlinux2.kallsyms.o
+>>>>   LD      vmlinux.unstripped
+>>>>   BTFIDS  vmlinux.unstripped
+>>>> WARN: multiple IDs found for 'task_struct': 110, 3046 - using 110
+>>>> WARN: multiple IDs found for 'module': 170, 3055 - using 170
+>>>> WARN: multiple IDs found for 'file': 697, 3130 - using 697
+>>>> WARN: multiple IDs found for 'vm_area_struct': 714, 3140 - using 714
+>>>> WARN: multiple IDs found for 'seq_file': 1060, 3167 - using 1060
+>>>> WARN: multiple IDs found for 'cgroup': 2355, 3304 - using 2355
+>>>> WARN: multiple IDs found for 'inode': 553, 3339 - using 553
+>>>> WARN: multiple IDs found for 'path': 586, 3369 - using 586
+>>>> WARN: multiple IDs found for 'bpf_prog': 2565, 3640 - using 2565
+>>>> WARN: multiple IDs found for 'bpf_map': 2657, 3837 - using 2657
+>>>> WARN: multiple IDs found for 'bpf_link': 2849, 3965 - using 2849
+>>>> [...]
+>>>> make[2]: *** [scripts/Makefile.vmlinux:72: vmlinux.unstripped] Error 255
+>>>> make[2]: *** Deleting file 'vmlinux.unstripped'
+>>>> make[1]: *** [/home/src/linux/Makefile:1242: vmlinux] Error 2
+>>>> make: *** [Makefile:248: __sub-make] Error 2
+>>>>
+>>>>
+>>>> The build failure appears after commit 42adb2d4ef24 (“fs: Add the __data_racy annotation
+>>>> to backing_dev_info.ra_pages”) and commit 935a20d1bebf (“block: Remove queue freezing
+>>>> from several sysfs store callbacks”). However, the root cause does not seem to be specific
+>>>
+>>> yep, looks like __data_racy macro that adds 'volatile' to struct member is causing
+>>> the mismatch during deduplication
+>>>
+>>> when you enable KCSAN some objects may opt out from it (via KCSAN_SANITIZE := n or
+>>> such) and they will be compiled without __SANITIZE_THREAD__ macro defined which means
+>>> __data_racy will be empty .. and we will get 2 versions of 'struct backing_dev_info'
+>>> which cascades up to the task_struct and others
+>>>
+>>> not sure what's the best solution in here.. could we ignore volatile for
+>>> the field in the struct during deduplication? 
+>>>
+>>
+>> Yeah, it seems like a slightly looser form of equivalence matching might be needed.
+>> The following libbpf change ignores modifiers in type equivalence comparison and 
+>> resolves the issue for me. It might be too big a hammer though, what do folks think?
+>>
+>> From 160fb6610d75d3cdc38a9729cc17875a302a7189 Mon Sep 17 00:00:00 2001
+>> From: Alan Maguire <alan.maguire@oracle.com>
+>> Date: Thu, 27 Nov 2025 15:22:04 +0000
+>> Subject: [RFC bpf-next] libbpf: BTF dedup should ignore modifiers in type
+>>  equivalence checks
+>>
+>> We see identical type problems in [1] as a result of an occasionally
+>> applied volatile modifier to kernel data structures. Such things can
+>> result from different header include patterns, explicit Makefile
+>> rules etc.  As a result consider types with modifiers (const, volatile,
+>> restrict, type tag) as equivalent for dedup equivalence testing purposes.
+>>
+>> [1] https://lore.kernel.org/bpf/42a1b4b0-83d0-4dda-b1df-15a1b7c7638d@linux.ibm.com/
+>>
+>> Reported-by: Nilay Shroff <nilay@linux.ibm.com>
+>> Signed-off-by: Alan Maguire <alan.maguire@oracle.com>
+>> ---
+>>  tools/lib/bpf/btf.c | 27 +++++++++++++++++++++------
+>>  1 file changed, 21 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/tools/lib/bpf/btf.c b/tools/lib/bpf/btf.c
+>> index e5003885bda8..384194a6cdae 100644
+>> --- a/tools/lib/bpf/btf.c
+>> +++ b/tools/lib/bpf/btf.c
+>> @@ -4678,12 +4678,10 @@ static int btf_dedup_is_equiv(struct btf_dedup *d, __u32 cand_id,
+>>  	cand_kind = btf_kind(cand_type);
+>>  	canon_kind = btf_kind(canon_type);
+>>  
+>> -	if (cand_type->name_off != canon_type->name_off)
+>> -		return 0;
+>> -
+>>  	/* FWD <--> STRUCT/UNION equivalence check, if enabled */
+>> -	if ((cand_kind == BTF_KIND_FWD || canon_kind == BTF_KIND_FWD)
+>> -	    && cand_kind != canon_kind) {
+>> +	if ((cand_kind == BTF_KIND_FWD || canon_kind == BTF_KIND_FWD) &&
+>> +	    cand_type->name_off == canon_type->name_off &&
+>> +	    cand_kind != canon_kind) {
+>>  		__u16 real_kind;
+>>  		__u16 fwd_kind;
+>>  
+>> @@ -4700,7 +4698,24 @@ static int btf_dedup_is_equiv(struct btf_dedup *d, __u32 cand_id,
+>>  		return fwd_kind == real_kind;
+>>  	}
+>>  
+>> -	if (cand_kind != canon_kind)
+>> +	/*
+>> +	 * Types are considered equivalent if modifiers (const, volatile,
+>> +	 * restrict, type tag) are present for one but not the other.
+>> +	 */
+>> +	if (cand_kind != canon_kind) {
+>> +		__u32 next_cand_id = cand_id;
+>> +		__u32 next_canon_id = canon_id;
 >> +
->>                   if (blk_queue_dying(q))
->>                           return -ENODEV;
->> +               if (!blk_pm_resume_queue(pm, q)) {
->> +                       pm_runtime_resume(q->dev);
->> +                       goto check;
->> +               }
->>           }
->>
->>           rwsem_acquire_read(&q->q_lockdep_map, 0, 0, _RET_IP_);
->> @@ -356,12 +359,15 @@ int __bio_queue_enter(struct request_queue *q,
->> struct bio *bio)
->>                    * reordered.
->>                    */
->>                   smp_rmb();
->> -               wait_event(q->mq_freeze_wq,
->> -                          (!q->mq_freeze_depth &&
->> -                           blk_pm_resume_queue(false, q)) ||
->> -                          test_bit(GD_DEAD, &disk->state));
->> +check:
->> +               wait_event(q->mq_freeze_wq, !q->mq_freeze_depth);
-> 
-> Analogously here, you may not stop waiting when test_bit(GD_DEAD,
-> &disk->state) is true.
-> 
-
-Got it.
-
+>> +		if (btf_is_mod(cand_type))
+>> +			next_cand_id = cand_type->type;
+>> +		if (btf_is_mod(canon_type))
+>> +			next_canon_id = canon_type->type;
+>> +		if (cand_id == next_cand_id && canon_id == next_canon_id)
+>> +			return 0;
+>> +		return btf_dedup_is_equiv(d, next_cand_id, next_canon_id);
+>> +	}
 >> +
->>                   if (test_bit(GD_DEAD, &disk->state))
->>                           goto dead;
->> +               if (!blk_pm_resume_queue(false, q)) {
->> +                       pm_runtime_resume(q->dev);
->> +                       goto check;
->> +               }
->>           }
->>
->>           rwsem_acquire_read(&q->io_lockdep_map, 0, 0, _RET_IP_);
->> diff --git a/block/blk-pm.h b/block/blk-pm.h
->> index 8a5a0d4b3..c28fad105 100644
->> --- a/block/blk-pm.h
->> +++ b/block/blk-pm.h
->> @@ -12,7 +12,6 @@ static inline int blk_pm_resume_queue(const bool pm,
->> struct request_queue *q)
->>                   return 1;       /* Nothing to do */
->>           if (pm && q->rpm_status != RPM_SUSPENDED)
->>                   return 1;       /* Request allowed */
->> -       pm_request_resume(q->dev);
->>           return 0;
->>    }
+>> +	if (cand_type->name_off != canon_type->name_off)
+>>  		return 0;
+>>  
+>>  	switch (cand_kind) {
 > 
-> And I would rename blk_pm_resume_queue() to something like
-> blk_pm_queue_active() because it is a bit confusing as it stands.
+> Thanks for your patch! I just applied it on my tree and rebuild the 
+> tree. However I am still seeing the same compilation warnings. I am
+> using the latest for-6.19/block branch[1].
 > 
-> Apart from the above remarks this makes sense to me FWIW.
+> [1] https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git/log/?h=for-6.19/block 
+> 
 
-Got it. I'll fix these in the next version and run some tests before 
-sending it out. Thanks for the review.
+hi Nilay,
+
+The tricky part with testing this is ensure that pahole is using the updated libbpf 
+rather than just the kernel itself. Did you  "make install" the modified libbpf and 
+ensure that pahole was using it by building pahole with the cmake option 
+-DLIBBPF_EMBEDDED=OFF ? That's the easiest way to ensure the change makes it into pahole; 
+you can check shared library usage using  "ldd /usr/local/bin/pahole". The other option 
+is to apply the change to the embedded libbpf in the lib/bpf directory in pahole.
+
+I tested the for-6.19/block branch with your config before and after making the
+above change and applying it to pahole and things woorked. If that's doable from your
+side that would be great. Thanks!
+
+Alan
+
+
+> Thanks,
+> --Nilay
+> 
 
