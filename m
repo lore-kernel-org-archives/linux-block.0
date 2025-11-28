@@ -1,74 +1,72 @@
-Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
+Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2923A22F389
-	for <linux-block@vger.kernel.org>; Fri, 28 Nov 2025 16:22:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38ED0279917
+	for <linux-block@vger.kernel.org>; Fri, 28 Nov 2025 16:22:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764346974; cv=none; b=Bq6YO0OW0OSc8iIL+b0sVlsN4tjdUh1baDh6wsrqG3ZqoGWmknRfyo+ZlRAEZfM91+rjk/gizvcKm2QDTy/C7dXf3DN7mlT7ZMZWjZ8lZqZDldHAe7aehopjHGiJxR1u5sYymN9JzUDm3NI9gK21s7uDDwuBXAS4xCnC/OLN9m0=
+	t=1764346975; cv=none; b=VT0eupKekMkvIyxQ96E0zLnMiPaBtorxM6v5R8eElmn0Bl3bEt5ym4lQX2mq6RCEHG088PK5jhgy2NDi8KG5JbhZC+lpAMRaNobc6vTt5csqovEszNXnDQJhkDocFCAEq6yhee7hjOphW/gsmkOSY2j6kT/VjMePo1/wPc5wHg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764346974; c=relaxed/simple;
-	bh=7SeOUGT/CxlqtFUY91dMnIywIga6b6GgbUl9xxojROc=;
+	s=arc-20240116; t=1764346975; c=relaxed/simple;
+	bh=8jch7V5/JV7pNdEal+YzMwz2CniBpBDtTRI2AVqi67c=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=qL92J84xiUcDD0/UL9+1RJ38YOG4d+o2ZvxqxpftGPoodl9y01b0IXJsWFo6F2qOVVDPg9yN0z2GldkplCI4Mtf5KRdYNM2/TVM4mKmqhbNUwwp+N9N2YKYrW/R/pYA/R4/eAp5eIKAIX9D3TcHVyidRixSx+Va5vYTZPyg1qmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=qdUmQ1P1; arc=none smtp.client-ip=209.85.166.53
+	 MIME-Version:Content-Type; b=ZV7jGcvpwEewVv5XpgmNMbjy3vyGaZaeQjbHeBlQCMHTbiHABE6TYVJpICx9nklbhy+v6O1y3uORcCAQZMZBjVP5NEKt+7gzD2Lqw30w74kU4CdPmHFnm1reWmEfOlp+tZi60t+FoD3gyk6jvc5o6sr1KyELMXpmlzEaft4J7fE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=KD7Z1scj; arc=none smtp.client-ip=209.85.166.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="qdUmQ1P1"
-Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-949042bca69so81796139f.1
-        for <linux-block@vger.kernel.org>; Fri, 28 Nov 2025 08:22:52 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="KD7Z1scj"
+Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-9487e2b9622so86489639f.2
+        for <linux-block@vger.kernel.org>; Fri, 28 Nov 2025 08:22:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1764346972; x=1764951772; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1764346973; x=1764951773; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0mKIUNGvk8dLdgudoSCXMpUc7SRNB/NSnUYncxD4AMU=;
-        b=qdUmQ1P1+xPTHxETHIgaYuhovmCMeO+DHzh/DvZpas9oZtXAuPbSZisLd6FsiuZPkU
-         tGS5n0MT9fAMZcSwA1QRiD45hd3INX3mZEY0p09TeEYc28Jmh8UDxhVwBygRqI7Ba6xN
-         szDxNSlLEj5U/HAIOx5aV4sarenGYC+AB7WUM3kvwq1DgW3EoGSm7oTOmfStJv0akrm0
-         WOs1/CDFnsfO+qUDnZjKptn+GrPu5OhGI2TAFG4FkCjOtsMDQ+KZbwOk/9I2niANzUG9
-         rMmTYvCh4o2PTWkw2xWyfxiYjEPUQuRSQoj5I+98IUIAwAFLyGLyi8xkv7RtQ6lQMv0t
-         KF3A==
+        bh=pbCPSFIm3kgm0R08DPiBcTmi2Y4a9LGKVt7fazZIKo8=;
+        b=KD7Z1scjwAh4PRLxuH/QRH85ucnTTj6exYCwkHkbh+n2qK6mrbOGslQ7FanGOCNLNx
+         Mwndd11ZGGi8YuvkGItFl9aui3gCPszhI9KwX3pNVPzdK64jui3BjItyDpocEm+HqlMm
+         8SyXrhv2P1Mk5roR9zqT5kG/izIP3DMW7QN8f2yDZ30rFJdi9Toge9ZwUFKaMlBOuToF
+         7YJUiV++M7teRzJfCZyulBV6+achQkv2bnNUUNF0Rmp36te1/Li2nIOtbLWVPYMlS9Tx
+         yMypIAx967AI+2gQxk8ujhZIS+jYj+DBEPsW5RxjviPvXS3efcVKNUMxLcOO0mDeS7S3
+         KpYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764346972; x=1764951772;
+        d=1e100.net; s=20230601; t=1764346973; x=1764951773;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=0mKIUNGvk8dLdgudoSCXMpUc7SRNB/NSnUYncxD4AMU=;
-        b=tajydyOPgWaf7dKgDHxapwzVXDKTnEqIw2nnK8yOZVW1wIQROXrRHGYm82mzSFhy8N
-         Dl8xnM5okYcxlwiq1RbLqlJ22jGs5ZIiFoYFg/UmPyfpmoxfeMMNKohwJttNOq5Fvw+/
-         8vACiL9i80LZHVv95HYZ5XuZQnRJg4x3T5BQKj2w0FqKgkwBmAxi5zhGxozZ6UVCd257
-         qfTI1vPQnPdk0r3OyLb9C8AL59D9QZreaV+zMDw0ffxO+N7L+zbm2Pnt1IK1OFlVaW3q
-         i24tJVHcBpx3ae8f0g7p8PxeKOcbf64pyUUWZDDD42tafnr6Oj3QYEHsNWD6QH32jPpK
-         1spQ==
-X-Gm-Message-State: AOJu0YxWgBUJVMa3BcHBLFCbXMvPDIuz7IXWuLGHyM4QAMJNpx+Xo6in
-	Ae0Ai5Ea3Vwltacd7lOj/xegdtlqgty/LKjXbpOZcUdSbSB0I6XI3pVetFKOrRwO0HM=
-X-Gm-Gg: ASbGnctXUOQYfx7n6+EyxxlZwOhsPUEdPP/FRjNUfZtQnlkbrF3F1jBBYBqCVBdsTEz
-	nYgjNs6UIQKBU/kpbstOKBfyixczW+zM7Q0PS7BwTaND3cRMiWE4q6DkCOk03UbQbqNHG2EXy8S
-	wcbqgwy4KUfZop48BSNrY/DabXg5xUd50fE8rRFLVdbeEBtPAYKV2K01gx5SNjufEqnOqPke5VY
-	9lPak6rt1o5f4iaZoCPgqk3m+j61uR3sy51vkd8D4wDjpZuSkg6Pz2lHJU7tOKI5xqlmZqK3QVT
-	QCvxR404tmAfe8frT+G+ZXPniI6/tnR3UZAXFrI/yGCk13/NMBPOttpDZmVSt4tlGKuQ6SzBWP+
-	Y71FLvjw6FMzGyWy9Vtz6JZxtNNgwW+zgxYTpsiW+mrdJ0B0cJF7E+zSjsH9B+qG5O7wawxY9//
-	lTvVekGnDEAD1ZRg==
-X-Google-Smtp-Source: AGHT+IH3b5IpSwY1DEO4gp5a0lvCLjp9Rg6AhMxZaNJz48FpO6tQj4Be0x22QMsx+VtaKkxfiP7qIg==
-X-Received: by 2002:a02:cac2:0:b0:5b7:1c20:4903 with SMTP id 8926c6da1cb9f-5b9995f4087mr9937798173.3.1764346972234;
-        Fri, 28 Nov 2025 08:22:52 -0800 (PST)
+        bh=pbCPSFIm3kgm0R08DPiBcTmi2Y4a9LGKVt7fazZIKo8=;
+        b=Kl+SRcMbPeNYFtDUBo7up33uRfsDOmthwJlxPfys3V1Wy3NzP/Y3QbW0ZtUPHV1bt9
+         RpOus/mwbiFghY8gOTBUppa/gxrQTj2KQuXRgNYVtRxp+QD5rjBtMtlVjW7MAeDKyxfk
+         nLNy0GE+fgX4zyV9yJc1gnlJf0qBUIOc4ccju6cuhlKvJqds1ICXAM1dJpRvylaOskT3
+         uX3WVSwyX2rnHLqVSlfpns67uGyR2SwcThdpsCIl/GZfV7pwHy3H7JiwjsufPAji4UVM
+         XZc5eHdvjRtu/vhIQpDeUF+D0UKCNJxesCybpbpEjw9z30ro7YVXu6qnn2AWhWCZ2NBu
+         3g8w==
+X-Gm-Message-State: AOJu0YzpE7XNnibZl+dkczBBK5svAvX1roT4qp5qSq2RbmQmaEmPbzZj
+	XISiN709mZ4BmzASSkahXK317+gJs/0C2Ghc7vb2NPT1qYlC0lh20cf0MsSaosN2u0U8tUyMbnP
+	g54wmdtM=
+X-Gm-Gg: ASbGncve4yrLLomozztjrVIRsXe7Yq9dFTNb9m2JooqRQsiwsFF6rLKaNl2X8MrhHhK
+	0uUttPtUHpXBXWJASBlGDRXBt/xQQfUibB0EGbW11ls9sqzTp2IpuPTE/R19i0s5hzJXpWFgbmq
+	fwtWkdlA1y/uAF9fzDBwPp4KBtQSNMr0BxCLdC4m9+fQZg3/oXjqbChTDUWSe5aVLMEiQgFzgS7
+	cnR07j3NnFRycG1K3N/crwbb/8H3IHW8LUjQbkaRurFGoIWlqdve8b2NsDjoBpbRocMfbwwsPls
+	arjtgSpI9oNc3AF9Fk6pA4lBquOw+fibmg9saJi2gmcC1u4LqVmgjqYyDOA4eMaLEtEPZK+GwV5
+	iSpNQ3LQUFQV7FjsvzqUEH0RVlOqeIaWimMSDgqq2tjQFr1/55YQl6w5CO5A1EO0BdSAGXix9Zn
+	QFixQ=
+X-Google-Smtp-Source: AGHT+IEzLH2PgdJ+clAV7iqxn+tiNnDdz1u88CVZIgev3c4rFiAfZjrRe8sj7LScL/nBQPb+PyvTog==
+X-Received: by 2002:a05:6602:1549:b0:948:cbd2:3b84 with SMTP id ca18e2360f4ac-9497786e4bdmr1299156839f.11.1764346973209;
+        Fri, 28 Nov 2025 08:22:53 -0800 (PST)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5b9bc78113esm2309257173.40.2025.11.28.08.22.51
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5b9bc78113esm2309257173.40.2025.11.28.08.22.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Nov 2025 08:22:51 -0800 (PST)
+        Fri, 28 Nov 2025 08:22:52 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Cc: Caleb Sander Mateos <csander@purestorage.com>, 
- Uday Shankar <ushankar@purestorage.com>, 
- Stefani Seibold <stefani@seibold.net>, 
- Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org
-In-Reply-To: <20251121015851.3672073-1-ming.lei@redhat.com>
-References: <20251121015851.3672073-1-ming.lei@redhat.com>
-Subject: Re: (subset) [PATCH V4 00/27] ublk: add UBLK_F_BATCH_IO
-Message-Id: <176434697117.231521.16540370411311557296.b4-ty@kernel.dk>
-Date: Fri, 28 Nov 2025 09:22:51 -0700
+To: linux-kernel@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>
+Cc: linux-block@vger.kernel.org
+In-Reply-To: <20251128065754.916467-1-rdunlap@infradead.org>
+References: <20251128065754.916467-1-rdunlap@infradead.org>
+Subject: Re: [PATCH] sbitmap: fix all kernel-doc warnings
+Message-Id: <176434697237.231521.5722721037211301653.b4-ty@kernel.dk>
+Date: Fri, 28 Nov 2025 09:22:52 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -80,30 +78,22 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3
 
 
-On Fri, 21 Nov 2025 09:58:22 +0800, Ming Lei wrote:
-> This patchset adds UBLK_F_BATCH_IO feature for communicating between kernel and ublk
-> server in batching way:
+On Thu, 27 Nov 2025 22:57:54 -0800, Randy Dunlap wrote:
+> Modify kernel-doc comments in sbitmap.h to prevent warnings:
 > 
-> - Per-queue vs Per-I/O: Commands operate on queues rather than individual I/Os
-> 
-> - Batch processing: Multiple I/Os are handled in single operation
+> Warning: include/linux/sbitmap.h:84 struct member 'alloc_hint' not
+>  described in 'sbitmap'
+> Warning: include/linux/sbitmap.h:151 struct member 'ws_active' not
+>  described in 'sbitmap_queue'
+> Warning: include/linux/sbitmap.h:552 No description found for
+>  return value of 'sbq_wait_ptr'
 > 
 > [...]
 
 Applied, thanks!
 
-[01/27] kfifo: add kfifo_alloc_node() helper for NUMA awareness
-        commit: 9574b21e952256d4fa3c8797c94482a240992d18
-[02/27] ublk: add parameter `struct io_uring_cmd *` to ublk_prep_auto_buf_reg()
-        commit: 3035b9b46b0611898babc0b96ede65790d3566f7
-[03/27] ublk: add `union ublk_io_buf` with improved naming
-        commit: 8d61ece156bd4f2b9e7d3b2a374a26d42c7a4a06
-[04/27] ublk: refactor auto buffer register in ublk_dispatch_req()
-        commit: 0a9beafa7c633e6ff66b05b81eea78231b7e6520
-[05/27] ublk: pass const pointer to ublk_queue_is_zoned()
-        commit: 3443bab2f8e44e00adaf76ba677d4219416376f2
-[06/27] ublk: add helper of __ublk_fetch()
-        commit: 28d7a371f021419cb6c3a243f5cf167f88eb51b9
+[1/1] sbitmap: fix all kernel-doc warnings
+      commit: 418de94e7593081c29066555bf9059f1f7dd9d79
 
 Best regards,
 -- 
