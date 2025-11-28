@@ -1,103 +1,96 @@
-Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38ED0279917
-	for <linux-block@vger.kernel.org>; Fri, 28 Nov 2025 16:22:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1E3F285C84
+	for <linux-block@vger.kernel.org>; Fri, 28 Nov 2025 17:05:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764346975; cv=none; b=VT0eupKekMkvIyxQ96E0zLnMiPaBtorxM6v5R8eElmn0Bl3bEt5ym4lQX2mq6RCEHG088PK5jhgy2NDi8KG5JbhZC+lpAMRaNobc6vTt5csqovEszNXnDQJhkDocFCAEq6yhee7hjOphW/gsmkOSY2j6kT/VjMePo1/wPc5wHg0=
+	t=1764349515; cv=none; b=jCyAyiRpmNv47TXCHV4B2lr7CnouHmO0cLl0iu2BJxO0VJGbBi2nGQjYWJfxxvG9JyGrFftf3foEcOc7c0OEG5vd+knvuflqTgQcAf0lUdk3M94W+zSpgOIWS0hVWMCP9+pn/l3e53Pxje5vu5hzJm2gqeELvQn5CsaPUOTiKYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764346975; c=relaxed/simple;
-	bh=8jch7V5/JV7pNdEal+YzMwz2CniBpBDtTRI2AVqi67c=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=ZV7jGcvpwEewVv5XpgmNMbjy3vyGaZaeQjbHeBlQCMHTbiHABE6TYVJpICx9nklbhy+v6O1y3uORcCAQZMZBjVP5NEKt+7gzD2Lqw30w74kU4CdPmHFnm1reWmEfOlp+tZi60t+FoD3gyk6jvc5o6sr1KyELMXpmlzEaft4J7fE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=KD7Z1scj; arc=none smtp.client-ip=209.85.166.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1764349515; c=relaxed/simple;
+	bh=KyZJyyLsn2XWhRjPG/8OgZWmaYkGwV4gdnUK3aswyjw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bbsOQA4ae/AEotvzEAYvwwNMuDdb+1OVIkms0dp9GOaV4C8vHVMFEND4n5p+gpApUZrBxWkI4z2xMsk/v4R5UuXYyEhCu4rsb8QZB5NIqw7mIDpZXZ470JF280Ul0b1InGcn5wJf+OsU4+GDAJkS0h2/5IhRGpi1nddkeTI+HTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=FyCxuEYO; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="KD7Z1scj"
-Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-9487e2b9622so86489639f.2
-        for <linux-block@vger.kernel.org>; Fri, 28 Nov 2025 08:22:54 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="FyCxuEYO"
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-7b9c17dd591so1897027b3a.3
+        for <linux-block@vger.kernel.org>; Fri, 28 Nov 2025 09:05:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1764346973; x=1764951773; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pbCPSFIm3kgm0R08DPiBcTmi2Y4a9LGKVt7fazZIKo8=;
-        b=KD7Z1scjwAh4PRLxuH/QRH85ucnTTj6exYCwkHkbh+n2qK6mrbOGslQ7FanGOCNLNx
-         Mwndd11ZGGi8YuvkGItFl9aui3gCPszhI9KwX3pNVPzdK64jui3BjItyDpocEm+HqlMm
-         8SyXrhv2P1Mk5roR9zqT5kG/izIP3DMW7QN8f2yDZ30rFJdi9Toge9ZwUFKaMlBOuToF
-         7YJUiV++M7teRzJfCZyulBV6+achQkv2bnNUUNF0Rmp36te1/Li2nIOtbLWVPYMlS9Tx
-         yMypIAx967AI+2gQxk8ujhZIS+jYj+DBEPsW5RxjviPvXS3efcVKNUMxLcOO0mDeS7S3
-         KpYg==
+        d=chromium.org; s=google; t=1764349513; x=1764954313; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5gHDOsFG83iDIKKsmQJJxjvLwkokZvWuQS7kXsZY8RE=;
+        b=FyCxuEYOLV9d4uHescUYsTw2OYk8sWuo7BYu67hMlyt1Rt2KfM6ObTt7k3mAQpzHTE
+         ewnpRDtSuNbXczEYXjbzVI0oOvYlBy7Vl5ZVNfZewEKLYU85w/4NoflB51KBJrDx3aJ3
+         ga1yNv9YJ32isHQYN9quZa4uyR2GBpIswoVx0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764346973; x=1764951773;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=pbCPSFIm3kgm0R08DPiBcTmi2Y4a9LGKVt7fazZIKo8=;
-        b=Kl+SRcMbPeNYFtDUBo7up33uRfsDOmthwJlxPfys3V1Wy3NzP/Y3QbW0ZtUPHV1bt9
-         RpOus/mwbiFghY8gOTBUppa/gxrQTj2KQuXRgNYVtRxp+QD5rjBtMtlVjW7MAeDKyxfk
-         nLNy0GE+fgX4zyV9yJc1gnlJf0qBUIOc4ccju6cuhlKvJqds1ICXAM1dJpRvylaOskT3
-         uX3WVSwyX2rnHLqVSlfpns67uGyR2SwcThdpsCIl/GZfV7pwHy3H7JiwjsufPAji4UVM
-         XZc5eHdvjRtu/vhIQpDeUF+D0UKCNJxesCybpbpEjw9z30ro7YVXu6qnn2AWhWCZ2NBu
-         3g8w==
-X-Gm-Message-State: AOJu0YzpE7XNnibZl+dkczBBK5svAvX1roT4qp5qSq2RbmQmaEmPbzZj
-	XISiN709mZ4BmzASSkahXK317+gJs/0C2Ghc7vb2NPT1qYlC0lh20cf0MsSaosN2u0U8tUyMbnP
-	g54wmdtM=
-X-Gm-Gg: ASbGncve4yrLLomozztjrVIRsXe7Yq9dFTNb9m2JooqRQsiwsFF6rLKaNl2X8MrhHhK
-	0uUttPtUHpXBXWJASBlGDRXBt/xQQfUibB0EGbW11ls9sqzTp2IpuPTE/R19i0s5hzJXpWFgbmq
-	fwtWkdlA1y/uAF9fzDBwPp4KBtQSNMr0BxCLdC4m9+fQZg3/oXjqbChTDUWSe5aVLMEiQgFzgS7
-	cnR07j3NnFRycG1K3N/crwbb/8H3IHW8LUjQbkaRurFGoIWlqdve8b2NsDjoBpbRocMfbwwsPls
-	arjtgSpI9oNc3AF9Fk6pA4lBquOw+fibmg9saJi2gmcC1u4LqVmgjqYyDOA4eMaLEtEPZK+GwV5
-	iSpNQ3LQUFQV7FjsvzqUEH0RVlOqeIaWimMSDgqq2tjQFr1/55YQl6w5CO5A1EO0BdSAGXix9Zn
-	QFixQ=
-X-Google-Smtp-Source: AGHT+IEzLH2PgdJ+clAV7iqxn+tiNnDdz1u88CVZIgev3c4rFiAfZjrRe8sj7LScL/nBQPb+PyvTog==
-X-Received: by 2002:a05:6602:1549:b0:948:cbd2:3b84 with SMTP id ca18e2360f4ac-9497786e4bdmr1299156839f.11.1764346973209;
-        Fri, 28 Nov 2025 08:22:53 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5b9bc78113esm2309257173.40.2025.11.28.08.22.52
+        d=1e100.net; s=20230601; t=1764349513; x=1764954313;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5gHDOsFG83iDIKKsmQJJxjvLwkokZvWuQS7kXsZY8RE=;
+        b=SD4JXQ63Kizf1ifeMpHh/4G4UmAZMpdWvOAPCuyZ1HKkEl0WDnK8jZNsops9ovZyTe
+         QcUSLoi+r2xwsRbFoinD8ox2LDmwnZXj8bIzbpg6ZMJBYftCISDN5dbS6mdbudSZpMu7
+         vEFSAWx+Nue3Y8IMKpnbmoAHji7CsQaRJXca1ext4hN+j2O4FrOswBDVJEVCbkErZWCr
+         B0MzerAS+/EEtRrEwFHsUxfPOPlT9Ky02AuuCkbqJvQ0miwAB39lBQD3Vi2GFjmLlmLw
+         GWr1LgoiBHb/LoXZl5lUCMRdUbwNYV53EaLIsYSN1Oey81xG3Me/+Zwwuh4TlDLACNcQ
+         jrig==
+X-Forwarded-Encrypted: i=1; AJvYcCX5zJM+R/PD0127M2Lnqh+b9Y/drBHpMvgNgd3UWKRTF3+7tEH+NJsJuoucOmnwu2Q2R0q6yjgQzEXrfA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJaCkT3TEixaC1IlnFNG3EqNIXS7z0HO5OFmit1LQS02vlvVIY
+	xUrWr5tglhjuFr9uNsQqup17LpLUystz3sV/kH0wbET5Glc8Ou4ZxmOrL2jzR8O5vw==
+X-Gm-Gg: ASbGncv8un9lmGrMgInmtvy/Rrvwk4rd4vxLzQBYjKwQnDnnaOyNgESesMimz3HuuUg
+	n3p3JAA6qrr0D43Ry85mUTXw+3T0C12CDPOP2mf+3Eu9zsS6/72YS7kMtQjSACF19kVvAHj05sH
+	UeKXtmqp90TAaoZ+HUPqAdAXnVDVa5D+DJIWm/Wj5VGjfMjPhIDnNE6PFl1rEuNXgj2+dVA3Xf7
+	YAB1wvOjw8Wn8k/u4YY+0G1FEq93KzXjykrqWdUxxir/TVAtzHftS6v9fZqCKwhCPiuvaWxJq3X
+	dGVdahiTYHxfy8rajz/PinpgF3jHZ8ioJ/a4a3DEu93vROQIRcL+uMYuaAiRN/yCzKaP6hVvnkb
+	2LPya/JHJbkzGbV1q/U5ccWlXqp9Pvlr1w9LBA1iOx6EPqvUFrJtfW9axX+QTPrINiCp1S2xQGy
+	+TA49tTEv/aEMNTDGLXytShyTjRMZopTmlUqfJd4mG3l+a9556f8Vw3LwH+PegBmnPzBisqCJ5U
+	YXzACiaKOXL
+X-Google-Smtp-Source: AGHT+IE6t6L5aaKbxaT3dZ25iRzUTepkjauFQFax/3eE7D/nAmf1/UU/2rIe75MhhwGWaFeuU3AClQ==
+X-Received: by 2002:a05:6a20:e211:b0:35f:27d:2ded with SMTP id adf61e73a8af0-3637db539ecmr16627880637.25.1764349512883;
+        Fri, 28 Nov 2025 09:05:12 -0800 (PST)
+Received: from tigerii.tok.corp.google.com ([2a00:79e0:2031:6:5b9f:6c7b:4d09:6126])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7d150c5e611sm5568242b3a.6.2025.11.28.09.05.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Nov 2025 08:22:52 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-kernel@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>
-Cc: linux-block@vger.kernel.org
-In-Reply-To: <20251128065754.916467-1-rdunlap@infradead.org>
-References: <20251128065754.916467-1-rdunlap@infradead.org>
-Subject: Re: [PATCH] sbitmap: fix all kernel-doc warnings
-Message-Id: <176434697237.231521.5722721037211301653.b4-ty@kernel.dk>
-Date: Fri, 28 Nov 2025 09:22:52 -0700
+        Fri, 28 Nov 2025 09:05:12 -0800 (PST)
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Richard Chang <richardycc@google.com>
+Cc: Brian Geffon <bgeffon@google.com>,
+	Minchan Kim <minchan@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-block@vger.kernel.org,
+	Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: [PATCH 0/2] zram: introduce compressed data writeback
+Date: Sat, 29 Nov 2025 02:04:40 +0900
+Message-ID: <20251128170442.2988502-1-senozhatsky@chromium.org>
+X-Mailer: git-send-email 2.52.0.487.g5c8c507ade-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
+Content-Transfer-Encoding: 8bit
 
+As writeback becomes more common there is another shortcoming
+that needs to be addressed - compressed data writeback.  Currently
+zram does uncompressed data writeback which is not optimal due to
+potential CPU and battery wastage.  This series changes suboptimal
+uncompressed writeback to a more optimal compressed data writeback.
 
-On Thu, 27 Nov 2025 22:57:54 -0800, Randy Dunlap wrote:
-> Modify kernel-doc comments in sbitmap.h to prevent warnings:
-> 
-> Warning: include/linux/sbitmap.h:84 struct member 'alloc_hint' not
->  described in 'sbitmap'
-> Warning: include/linux/sbitmap.h:151 struct member 'ws_active' not
->  described in 'sbitmap_queue'
-> Warning: include/linux/sbitmap.h:552 No description found for
->  return value of 'sbq_wait_ptr'
-> 
-> [...]
+Richard Chang (1):
+  zram: introduce compressed data writeback
 
-Applied, thanks!
+Sergey Senozhatsky (1):
+  zram: rename zram_free_page()
 
-[1/1] sbitmap: fix all kernel-doc warnings
-      commit: 418de94e7593081c29066555bf9059f1f7dd9d79
+ drivers/block/zram/zram_drv.c | 260 ++++++++++++++++++++++++++--------
+ 1 file changed, 202 insertions(+), 58 deletions(-)
 
-Best regards,
 -- 
-Jens Axboe
-
-
+2.52.0.487.g5c8c507ade-goog
 
