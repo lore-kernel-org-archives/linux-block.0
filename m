@@ -1,73 +1,72 @@
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFE3C18DB0D
-	for <linux-block@vger.kernel.org>; Sat, 29 Nov 2025 19:19:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16DCB18DB0D
+	for <linux-block@vger.kernel.org>; Sat, 29 Nov 2025 19:47:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764443961; cv=none; b=Q8VDIQa806GWJSGxoiLILjv5aWpeZDre9yuuy1OPQOyJJjD58WrZypZkUODnASesv6nMt7o15WBrdRzAsqYAGxJsa3M9zb7ms3XcB1rlZ8xp/7bnVXsgtIKZhbz+hgJc4zSQGLBULRUczB95Dz/yDpV1hRagZnC0lQA404YcSuU=
+	t=1764445634; cv=none; b=MV7ZZqaEa9QBbcT0sWk0qJTHqpB7XJ8l/GpEi/ywRjgg411pHMPuIzrklGXcMMcMzZa0jpTJ7lj8lOZOxjKBDTciTjalGAUv9YAgEWB3rPW+K6XSPx/UiLuVKeBb2ncKD/sKxSDQBu4aVzGTLu9AJcDqS9cS6JGdfmPNILFz7No=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764443961; c=relaxed/simple;
-	bh=0XIaWSSbg5QfLlpak7V4yFJmHNHjwqKjDM1XIzeoHXw=;
+	s=arc-20240116; t=1764445634; c=relaxed/simple;
+	bh=6bsVq7UapP8Tp3I09+rmtPRnmyVRKZ4tfZztBiqXLJo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TvmrUNL4DWUuih31vC1JAb5OAjNNhofVaRsMZDpiK/9+KWT7WjwBj5pIq2xiX5TceMWfdQGtARzXFMlkHMtxP8OqXCe1Yv6aifixAS4K1sPE1ZW1h9cs2RHyZtrZB8jf00J5iiIK7RB8FjNr+baigAbO79Z4kfbKM3eWUc+Yq3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Jdie+8JS; arc=none smtp.client-ip=209.85.216.51
+	 To:Cc:Content-Type; b=LtGssOKOyQxKuCMDxw2HdB2fJegqG98ksjHprGyrvyl559H21cC0h4ye+z2x7xIkLxQQGQoeOMqswQ3AvbMgAANtGHNf0S1S4U7z1c9LPHn+i1kPJBKZCHxyUxZ0ocQWUlw1aLOuuV+c0TKhARlep0GAd9p3pF2KoQIFdfPhc1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=BixTnBoq; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Jdie+8JS"
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-343641ceb62so353679a91.1
-        for <linux-block@vger.kernel.org>; Sat, 29 Nov 2025 11:19:18 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="BixTnBoq"
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-297f2c718a8so5135765ad.3
+        for <linux-block@vger.kernel.org>; Sat, 29 Nov 2025 11:47:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1764443958; x=1765048758; darn=vger.kernel.org;
+        d=purestorage.com; s=google2022; t=1764445632; x=1765050432; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=x6lW1p3B3NleT/BDih956D9+j7/6y6NwWTW1MFy+IBk=;
-        b=Jdie+8JSNJruH5npwChZM4LAKlDFU8kPTlThD7MZMKKyHizQnQhWV0bo8VsfONTXzV
-         T8ar5dHHuTmjuvBuV6iC0qAVoHjZwfOm5HVWgQeh4ZlxRyZ1wnaLwSbcU5Ptp46ZZthD
-         YsQYHfAuSBgli0MORO3f6cEazjkHv7kaWhh7btsYjG2bFE7FvfFzTIh8AuDKGirO7zxE
-         QI6YB6ywVPpC7drLOONm7xlXzpNR0hxeniFIgT9YQwqalCtuIBlPXaqtP8/m3poBs4xM
-         Z7p/K284dj+38NnvneSicJX/09+ffeRFdsb7xnLXovAMdgSbo3BPUuNvm6u8PA13auju
-         2+jQ==
+        bh=zXf+3zVaD6MrAMV7tqcum5KrFpSbiIQrYcV4qYRTCi8=;
+        b=BixTnBoqilNN1wVyxfbCb3fDbE08zNYsB0dLLGZsrvYd/mhgfOwO67W2FFBRdPfn1+
+         eCYIMMQUwm0XMgns/nWfXPj30ybwr+IfiXjEKTIELgmAwl7CEfgIS67QZMJ30eXen4ra
+         eiLFkYIyXlitsVq1+39L+n5d1ca+Gqs32E2v5aLb/Hse+4uBHG0RNHts0WdlP+406pTx
+         0kxyzlx4qihuAqJB61x3glYXoSN67WL5Ugne1UhNHNjMOba7K62Cx8DWrGt96h1FC6+F
+         uiVpwJBGKczxyOOmafpKTal421DQOTxdmPs3p1O3yZQQzV/dBju7+9P0rXsaMzNykW9P
+         MPNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764443958; x=1765048758;
+        d=1e100.net; s=20230601; t=1764445632; x=1765050432;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=x6lW1p3B3NleT/BDih956D9+j7/6y6NwWTW1MFy+IBk=;
-        b=vg8VtPYY+Uj7un29/ktf2iSx3YMeFVhOprRlbz5mQqHXWpEcOSvmBAumdIGX21IbEz
-         bVCh2hP+9DKSoeUcnXK1Oj3bctTdso0S6Mw41x4WvE5A90shBgHmbRoSYOfIs+HWOSLg
-         HOaC3Ax0IDJZKgAfAYJJKZOv5PlDJfpsn4GjA6IIU+IYX/xBMD+NDcsD/AiNw/KiHWQE
-         h9Y6FiB3sDZOhuFhDudWLpZp3D6/NHfSXT2HyNc0C5Qhslyv0nKUDD/bXr7H1sRbcv8g
-         qutd4rAm8ZDT7h4NIKqnTD1IAt2b+ErgHPSM/1EpWVwqOXFgzeR+Fhsww299uA4Z91nw
-         Q+jg==
-X-Forwarded-Encrypted: i=1; AJvYcCXER2/GwtkO9/z2B776nIeTK2JFat3bl/UiBYJ3ofDtYPpZW52B0+wVhsEOdZtg1zNGWNittLcBk9mWjw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywgk7ecvJL3qVeUZkR72hKtMHD7tu9ocxf9oKEZFozchTNyHklg
-	+/iUXqtTXvkZ5DLcsvDNBhQ1hz1KzfjeuDWAoDEZTrVdeDrZaOD9CFAsni2jTV6Qv52oPqBPqiM
-	a+KWHm7fwkwDRR4lwv0F31iXeAUleRjJvAmVdXEV1rrN9DGYcb05/xgM=
-X-Gm-Gg: ASbGnctZvwl8uEiEzi7kGyX1tpPV6y/47U5KYO+J80Lk1ugPC7c71ZftNwcr55jFZ/y
-	5UP483UnJLlA4ne13HC3jpaYi5eDGXxCmVnvHOaTIcLk35F5tX5lMCIO0qPPilLhzc/fFHqbF6W
-	s+XPXnRHEg/FHzAvi34QmNc7b31e0k5dkfkfm+OkDzvITRODuWlArygIU5rh/t9+qI/4P82BVdB
-	9wADHo3b6/yU/DPkP42CT2vV+5fajFiqtwyjzBdQdz39UmuUvp5HswrfcN4w9qo8Qhht4ml
-X-Google-Smtp-Source: AGHT+IGdQa9QIBK3xIwCln2tFRW1tsBXsI15focEbB8x2ukfjpaviuD09eefLp35+/eIa4BBQy9mfEYoTxi6pXu2eno=
-X-Received: by 2002:a05:7022:c8c:b0:11a:5cb2:24a0 with SMTP id
- a92af1059eb24-11c9d709e67mr15200064c88.1.1764443957659; Sat, 29 Nov 2025
- 11:19:17 -0800 (PST)
+        bh=zXf+3zVaD6MrAMV7tqcum5KrFpSbiIQrYcV4qYRTCi8=;
+        b=vO6YatzWj+FLqGwatOApXkmm4XWTJfWTuZt1QKDhv49mrNCc6b+v7xE90DyjZCd5yZ
+         Q/jwDgb1rmHETv85Tl+S5jTpMFGhlyMnuRF3H6h0Nu4wxx62oU1CUDi+8pYbPJQ8zqKq
+         dEYnss4rsgA+KvH+fsW/9YMWOmywOq5ymg7B5ObQDaXmrBY7lrYFcAOCYTMsP33broFT
+         LiJVPn9D101mrsG2j6TMBuX48GyxKo0tCQqh9UPEHUXFARp0Zit1C2ntW4aUFOrvKzWN
+         5thWvjEIPZg1WbSqSVf9NGfilGF20rV88Sc7IWBAklSJ+ABZtuGlvSz7QbaSHMIdB2uF
+         gbqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUOJsCr2PY9cKsT4b4tx1RqzNCMdRCATYtO/Noz3aNq9z0Jy1B/W4XvPvNbuR5K+0q68N6+xt6bpp6XJg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5gJ4FUzi0/EQKHByayXxVkjg7N6Hk4WJgTBMY0JT6m9vo707v
+	LqR+YfP2uRZWtGFiK8puW+QTeP9TYxI4Zt091l2pidmhy13+OH61y9bms4eX029bb7ugwVWSR0Z
+	+pXsrjs2QnVDvf1ktIHwNhh1AhhM4k4twF5ePH8d6Bg==
+X-Gm-Gg: ASbGnctuKnOH+7+3oELMMeTyAgYTl+Emn3nACQHBKB524MwuioWkB02tDamLkAQ7+YT
+	gstDBGevs+t/RTNdJ+4O0Wlmu7T5seG/oXkE5VUUwSTqteKuHhn7lF6unJP/TYHL/hvPH2qos1q
+	gvyXn54b+0JMmzV8zOVdMkyVjFEUewNDgwkiRCHdgP2yDFaBAnZL/qwgrFi6gWQhPXqlfLAKWSe
+	1j7TuXmoKHzr88kVYwhFmFgjG/el0yMnmNBaN5abyPqsU4VUyuymtGcTegkBDyrGJV9cIVQ
+X-Google-Smtp-Source: AGHT+IFjXRgS8Lm20MOd3i7zvnjg80qalr7SZpp7KcdQS1YkBES/inSn2iYd9/Dj98vceyjVrhqHlbnlczSvE15Rmxc=
+X-Received: by 2002:a05:7022:429e:b0:119:e56b:46b9 with SMTP id
+ a92af1059eb24-11c9f3806d4mr19781283c88.3.1764445631910; Sat, 29 Nov 2025
+ 11:47:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251121015851.3672073-1-ming.lei@redhat.com> <20251121015851.3672073-10-ming.lei@redhat.com>
-In-Reply-To: <20251121015851.3672073-10-ming.lei@redhat.com>
+References: <20251121015851.3672073-1-ming.lei@redhat.com> <20251121015851.3672073-11-ming.lei@redhat.com>
+In-Reply-To: <20251121015851.3672073-11-ming.lei@redhat.com>
 From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Sat, 29 Nov 2025 11:19:05 -0800
-X-Gm-Features: AWmQ_bkcNQPpJYoq7z7jKlkrWh5Ltskwm8o59l4aVrIeOGW4czgai8JLra7Cl9E
-Message-ID: <CADUfDZo2Wg8hTv7zkzywGHomycxx0mxwDtAr5zxradxqAoNRAw@mail.gmail.com>
-Subject: Re: [PATCH V4 09/27] ublk: add new batch command UBLK_U_IO_PREP_IO_CMDS
- & UBLK_U_IO_COMMIT_IO_CMDS
+Date: Sat, 29 Nov 2025 11:47:00 -0800
+X-Gm-Features: AWmQ_bk8aVLGNzpqKQfy2TIdOj6qkwJm6vd79ROkO68ZQ8-MkkMDHMaCGAWv6a8
+Message-ID: <CADUfDZqqV05adB=ERn=CiaXfrPq8J5m1avOM2dChyyxpByerhQ@mail.gmail.com>
+Subject: Re: [PATCH V4 10/27] ublk: handle UBLK_U_IO_PREP_IO_CMDS
 To: Ming Lei <ming.lei@redhat.com>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
 	Uday Shankar <ushankar@purestorage.com>, Stefani Seibold <stefani@seibold.net>, 
@@ -78,212 +77,329 @@ Content-Transfer-Encoding: quoted-printable
 On Thu, Nov 20, 2025 at 5:59=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrot=
 e:
 >
-> Add new command UBLK_U_IO_PREP_IO_CMDS, which is the batch version of
-> UBLK_IO_FETCH_REQ.
+> This commit implements the handling of the UBLK_U_IO_PREP_IO_CMDS command=
+,
+> which allows userspace to prepare a batch of I/O requests.
 >
-> Add new command UBLK_U_IO_COMMIT_IO_CMDS, which is for committing io comm=
-and
-> result only, still the batch version.
+> The core of this change is the `ublk_walk_cmd_buf` function, which iterat=
+es
+> over the elements in the uring_cmd fixed buffer. For each element, it par=
+ses
+> the I/O details, finds the corresponding `ublk_io` structure, and prepare=
+s it
+> for future dispatch.
 >
-> The new command header type is `struct ublk_batch_io`.
->
-> This patch doesn't actually implement these commands yet, just validates =
-the
-> SQE fields.
+> Add per-io lock for protecting concurrent delivery and committing.
 >
 > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-
-Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
-
 > ---
->  drivers/block/ublk_drv.c      | 85 ++++++++++++++++++++++++++++++++++-
->  include/uapi/linux/ublk_cmd.h | 49 ++++++++++++++++++++
->  2 files changed, 133 insertions(+), 1 deletion(-)
+>  drivers/block/ublk_drv.c      | 193 +++++++++++++++++++++++++++++++++-
+>  include/uapi/linux/ublk_cmd.h |   5 +
+>  2 files changed, 197 insertions(+), 1 deletion(-)
 >
 > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index c62b2f2057fe..21890947ceec 100644
+> index 21890947ceec..66c77daae955 100644
 > --- a/drivers/block/ublk_drv.c
 > +++ b/drivers/block/ublk_drv.c
-> @@ -85,6 +85,11 @@
->          UBLK_PARAM_TYPE_DEVT | UBLK_PARAM_TYPE_ZONED |    \
->          UBLK_PARAM_TYPE_DMA_ALIGN | UBLK_PARAM_TYPE_SEGMENT)
->
-> +#define UBLK_BATCH_F_ALL  \
-> +       (UBLK_BATCH_F_HAS_ZONE_LBA | \
-> +        UBLK_BATCH_F_HAS_BUF_ADDR | \
-> +        UBLK_BATCH_F_AUTO_BUF_REG_FALLBACK)
-> +
->  struct ublk_uring_cmd_pdu {
->         /*
->          * Store requests in same batch temporarily for queuing them to
-> @@ -108,6 +113,12 @@ struct ublk_uring_cmd_pdu {
->         u16 tag;
+> @@ -117,6 +117,7 @@ struct ublk_batch_io_data {
+>         struct ublk_device *ub;
+>         struct io_uring_cmd *cmd;
+>         struct ublk_batch_io header;
+> +       unsigned int issue_flags;
+
+This looks unused in this commit. Move it to the previous commit
+introducing struct ublk_batch_io_data, or the next commit that uses
+issue_flags?
+
+Other than that,
+Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
+
 >  };
 >
-> +struct ublk_batch_io_data {
-> +       struct ublk_device *ub;
-> +       struct io_uring_cmd *cmd;
-> +       struct ublk_batch_io header;
-> +};
-> +
 >  /*
->   * io command is active: sqe cmd is received, and its cqe isn't done
->   *
-> @@ -2520,10 +2531,82 @@ static int ublk_ch_uring_cmd(struct io_uring_cmd =
+> @@ -201,6 +202,7 @@ struct ublk_io {
+>         unsigned task_registered_buffers;
+>
+>         void *buf_ctx_handle;
+> +       spinlock_t lock;
+>  } ____cacheline_aligned_in_smp;
+>
+>  struct ublk_queue {
+> @@ -270,6 +272,16 @@ static inline bool ublk_dev_support_batch_io(const s=
+truct ublk_device *ub)
+>         return false;
+>  }
+>
+> +static inline void ublk_io_lock(struct ublk_io *io)
+> +{
+> +       spin_lock(&io->lock);
+> +}
+> +
+> +static inline void ublk_io_unlock(struct ublk_io *io)
+> +{
+> +       spin_unlock(&io->lock);
+> +}
+> +
+>  static inline struct ublksrv_io_desc *
+>  ublk_get_iod(const struct ublk_queue *ubq, unsigned tag)
+>  {
+> @@ -2531,6 +2543,171 @@ static int ublk_ch_uring_cmd(struct io_uring_cmd =
 *cmd, unsigned int issue_flags)
 >         return ublk_ch_uring_cmd_local(cmd, issue_flags);
 >  }
 >
-> +static int ublk_check_batch_cmd_flags(const struct ublk_batch_io *uc)
+> +static inline __u64 ublk_batch_buf_addr(const struct ublk_batch_io *uc,
+> +                                       const struct ublk_elem_header *el=
+em)
 > +{
-> +       unsigned elem_bytes =3D sizeof(struct ublk_elem_header);
+> +       const void *buf =3D elem;
 > +
-> +       if (uc->flags & ~UBLK_BATCH_F_ALL)
-> +               return -EINVAL;
-> +
-> +       /* UBLK_BATCH_F_AUTO_BUF_REG_FALLBACK requires buffer index */
-> +       if ((uc->flags & UBLK_BATCH_F_AUTO_BUF_REG_FALLBACK) &&
-> +                       (uc->flags & UBLK_BATCH_F_HAS_BUF_ADDR))
-> +               return -EINVAL;
-> +
-> +       elem_bytes +=3D (uc->flags & UBLK_BATCH_F_HAS_ZONE_LBA ? sizeof(u=
-64) : 0) +
-> +               (uc->flags & UBLK_BATCH_F_HAS_BUF_ADDR ? sizeof(u64) : 0)=
-;
-> +       if (uc->elem_bytes !=3D elem_bytes)
-> +               return -EINVAL;
+> +       if (uc->flags & UBLK_BATCH_F_HAS_BUF_ADDR)
+> +               return *(__u64 *)(buf + sizeof(*elem));
 > +       return 0;
 > +}
 > +
-> +static int ublk_check_batch_cmd(const struct ublk_batch_io_data *data)
+> +static struct ublk_auto_buf_reg
+> +ublk_batch_auto_buf_reg(const struct ublk_batch_io *uc,
+> +                       const struct ublk_elem_header *elem)
 > +{
+> +       struct ublk_auto_buf_reg reg =3D {
+> +               .index =3D elem->buf_index,
+> +               .flags =3D (uc->flags & UBLK_BATCH_F_AUTO_BUF_REG_FALLBAC=
+K) ?
+> +                       UBLK_AUTO_BUF_REG_FALLBACK : 0,
+> +       };
 > +
-> +       const struct ublk_batch_io *uc =3D &data->header;
-> +
-> +       if (uc->nr_elem > data->ub->dev_info.queue_depth)
-> +               return -E2BIG;
-> +
-> +       if ((uc->flags & UBLK_BATCH_F_HAS_ZONE_LBA) &&
-> +                       !ublk_dev_is_zoned(data->ub))
-> +               return -EINVAL;
-> +
-> +       if ((uc->flags & UBLK_BATCH_F_HAS_BUF_ADDR) &&
-> +                       !ublk_dev_need_map_io(data->ub))
-> +               return -EINVAL;
-> +
-> +       if ((uc->flags & UBLK_BATCH_F_AUTO_BUF_REG_FALLBACK) &&
-> +                       !ublk_dev_support_auto_buf_reg(data->ub))
-> +               return -EINVAL;
-> +
-> +       return ublk_check_batch_cmd_flags(uc);
+> +       return reg;
 > +}
 > +
->  static int ublk_ch_batch_io_uring_cmd(struct io_uring_cmd *cmd,
->                                        unsigned int issue_flags)
->  {
-> -       return -EOPNOTSUPP;
-> +       const struct ublk_batch_io *uc =3D io_uring_sqe_cmd(cmd->sqe);
-> +       struct ublk_device *ub =3D cmd->file->private_data;
-> +       struct ublk_batch_io_data data =3D {
-> +               .ub  =3D ub,
-> +               .cmd =3D cmd,
-> +               .header =3D (struct ublk_batch_io) {
-> +                       .q_id =3D READ_ONCE(uc->q_id),
-> +                       .flags =3D READ_ONCE(uc->flags),
-> +                       .nr_elem =3D READ_ONCE(uc->nr_elem),
-> +                       .elem_bytes =3D READ_ONCE(uc->elem_bytes),
-> +               },
+> +/*
+> + * 48 can hold any type of buffer element(8, 16 and 24 bytes) because
+> + * it is the least common multiple(LCM) of 8, 16 and 24
+> + */
+> +#define UBLK_CMD_BATCH_TMP_BUF_SZ  (48 * 10)
+> +struct ublk_batch_io_iter {
+> +       void __user *uaddr;
+> +       unsigned done, total;
+> +       unsigned char elem_bytes;
+> +       /* copy to this buffer from user space */
+> +       unsigned char buf[UBLK_CMD_BATCH_TMP_BUF_SZ];
+> +};
+> +
+> +static inline int
+> +__ublk_walk_cmd_buf(struct ublk_queue *ubq,
+> +                   struct ublk_batch_io_iter *iter,
+> +                   const struct ublk_batch_io_data *data,
+> +                   unsigned bytes,
+> +                   int (*cb)(struct ublk_queue *q,
+> +                           const struct ublk_batch_io_data *data,
+> +                           const struct ublk_elem_header *elem))
+> +{
+> +       unsigned int i;
+> +       int ret =3D 0;
+> +
+> +       for (i =3D 0; i < bytes; i +=3D iter->elem_bytes) {
+> +               const struct ublk_elem_header *elem =3D
+> +                       (const struct ublk_elem_header *)&iter->buf[i];
+> +
+> +               if (unlikely(elem->tag >=3D data->ub->dev_info.queue_dept=
+h)) {
+> +                       ret =3D -EINVAL;
+> +                       break;
+> +               }
+> +
+> +               ret =3D cb(ubq, data, elem);
+> +               if (unlikely(ret))
+> +                       break;
+> +       }
+> +
+> +       iter->done +=3D i;
+> +       return ret;
+> +}
+> +
+> +static int ublk_walk_cmd_buf(struct ublk_batch_io_iter *iter,
+> +                            const struct ublk_batch_io_data *data,
+> +                            int (*cb)(struct ublk_queue *q,
+> +                                    const struct ublk_batch_io_data *dat=
+a,
+> +                                    const struct ublk_elem_header *elem)=
+)
+> +{
+> +       struct ublk_queue *ubq =3D ublk_get_queue(data->ub, data->header.=
+q_id);
+> +       int ret =3D 0;
+> +
+> +       while (iter->done < iter->total) {
+> +               unsigned int len =3D min(sizeof(iter->buf), iter->total -=
+ iter->done);
+> +
+> +               if (copy_from_user(iter->buf, iter->uaddr + iter->done, l=
+en)) {
+> +                       pr_warn("ublk%d: read batch cmd buffer failed\n",
+> +                                       data->ub->dev_info.dev_id);
+> +                       return -EFAULT;
+> +               }
+> +
+> +               ret =3D __ublk_walk_cmd_buf(ubq, iter, data, len, cb);
+> +               if (ret)
+> +                       return ret;
+> +       }
+> +       return 0;
+> +}
+> +
+> +static int ublk_batch_unprep_io(struct ublk_queue *ubq,
+> +                               const struct ublk_batch_io_data *data,
+> +                               const struct ublk_elem_header *elem)
+> +{
+> +       struct ublk_io *io =3D &ubq->ios[elem->tag];
+> +
+> +       data->ub->nr_io_ready--;
+> +       ublk_io_lock(io);
+> +       io->flags =3D 0;
+> +       ublk_io_unlock(io);
+> +       return 0;
+> +}
+> +
+> +static void ublk_batch_revert_prep_cmd(struct ublk_batch_io_iter *iter,
+> +                                      const struct ublk_batch_io_data *d=
+ata)
+> +{
+> +       int ret;
+> +
+> +       /* Re-process only what we've already processed, starting from be=
+ginning */
+> +       iter->total =3D iter->done;
+> +       iter->done =3D 0;
+> +
+> +       ret =3D ublk_walk_cmd_buf(iter, data, ublk_batch_unprep_io);
+> +       WARN_ON_ONCE(ret);
+> +}
+> +
+> +static int ublk_batch_prep_io(struct ublk_queue *ubq,
+> +                             const struct ublk_batch_io_data *data,
+> +                             const struct ublk_elem_header *elem)
+> +{
+> +       struct ublk_io *io =3D &ubq->ios[elem->tag];
+> +       const struct ublk_batch_io *uc =3D &data->header;
+> +       union ublk_io_buf buf =3D { 0 };
+> +       int ret;
+> +
+> +       if (ublk_dev_support_auto_buf_reg(data->ub))
+> +               buf.auto_reg =3D ublk_batch_auto_buf_reg(uc, elem);
+> +       else if (ublk_dev_need_map_io(data->ub)) {
+> +               buf.addr =3D ublk_batch_buf_addr(uc, elem);
+> +
+> +               ret =3D ublk_check_fetch_buf(data->ub, buf.addr);
+> +               if (ret)
+> +                       return ret;
+> +       }
+> +
+> +       ublk_io_lock(io);
+> +       ret =3D __ublk_fetch(data->cmd, data->ub, io);
+> +       if (!ret)
+> +               io->buf =3D buf;
+> +       ublk_io_unlock(io);
+> +
+> +       return ret;
+> +}
+> +
+> +static int ublk_handle_batch_prep_cmd(const struct ublk_batch_io_data *d=
+ata)
+> +{
+> +       const struct ublk_batch_io *uc =3D &data->header;
+> +       struct io_uring_cmd *cmd =3D data->cmd;
+> +       struct ublk_batch_io_iter iter =3D {
+> +               .uaddr =3D u64_to_user_ptr(READ_ONCE(cmd->sqe->addr)),
+> +               .total =3D uc->nr_elem * uc->elem_bytes,
+> +               .elem_bytes =3D uc->elem_bytes,
 > +       };
-> +       u32 cmd_op =3D cmd->cmd_op;
-> +       int ret =3D -EINVAL;
+> +       int ret;
 > +
-> +       if (data.header.q_id >=3D ub->dev_info.nr_hw_queues)
-> +               goto out;
+> +       mutex_lock(&data->ub->mutex);
+> +       ret =3D ublk_walk_cmd_buf(&iter, data, ublk_batch_prep_io);
 > +
-> +       switch (cmd_op) {
-> +       case UBLK_U_IO_PREP_IO_CMDS:
-> +       case UBLK_U_IO_COMMIT_IO_CMDS:
+> +       if (ret && iter.done)
+> +               ublk_batch_revert_prep_cmd(&iter, data);
+> +       mutex_unlock(&data->ub->mutex);
+> +       return ret;
+> +}
+> +
+>  static int ublk_check_batch_cmd_flags(const struct ublk_batch_io *uc)
+>  {
+>         unsigned elem_bytes =3D sizeof(struct ublk_elem_header);
+> @@ -2587,6 +2764,7 @@ static int ublk_ch_batch_io_uring_cmd(struct io_uri=
+ng_cmd *cmd,
+>                         .nr_elem =3D READ_ONCE(uc->nr_elem),
+>                         .elem_bytes =3D READ_ONCE(uc->elem_bytes),
+>                 },
+> +               .issue_flags =3D issue_flags,
+>         };
+>         u32 cmd_op =3D cmd->cmd_op;
+>         int ret =3D -EINVAL;
+> @@ -2596,6 +2774,11 @@ static int ublk_ch_batch_io_uring_cmd(struct io_ur=
+ing_cmd *cmd,
+>
+>         switch (cmd_op) {
+>         case UBLK_U_IO_PREP_IO_CMDS:
 > +               ret =3D ublk_check_batch_cmd(&data);
 > +               if (ret)
 > +                       goto out;
-> +               ret =3D -EOPNOTSUPP;
+> +               ret =3D ublk_handle_batch_prep_cmd(&data);
 > +               break;
-> +       default:
-> +               ret =3D -EOPNOTSUPP;
-> +       }
-> +out:
-> +       return ret;
->  }
+>         case UBLK_U_IO_COMMIT_IO_CMDS:
+>                 ret =3D ublk_check_batch_cmd(&data);
+>                 if (ret)
+> @@ -2770,7 +2953,7 @@ static int ublk_init_queue(struct ublk_device *ub, =
+int q_id)
+>         struct ublk_queue *ubq;
+>         struct page *page;
+>         int numa_node;
+> -       int size;
+> +       int size, i;
 >
->  static inline bool ublk_check_ubuf_dir(const struct request *req,
+>         /* Determine NUMA node based on queue's CPU affinity */
+>         numa_node =3D ublk_get_queue_numa_node(ub, q_id);
+> @@ -2795,6 +2978,9 @@ static int ublk_init_queue(struct ublk_device *ub, =
+int q_id)
+>         }
+>         ubq->io_cmd_buf =3D page_address(page);
+>
+> +       for (i =3D 0; i < ubq->q_depth; i++)
+> +               spin_lock_init(&ubq->ios[i].lock);
+> +
+>         ub->queues[q_id] =3D ubq;
+>         ubq->dev =3D ub;
+>         return 0;
+> @@ -3021,6 +3207,11 @@ static int ublk_ctrl_start_dev(struct ublk_device =
+*ub,
+>                 return -EINVAL;
+>
+>         mutex_lock(&ub->mutex);
+> +       /* device may become not ready in case of F_BATCH */
+> +       if (!ublk_dev_ready(ub)) {
+> +               ret =3D -EINVAL;
+> +               goto out_unlock;
+> +       }
+>         if (ub->dev_info.state =3D=3D UBLK_S_DEV_LIVE ||
+>             test_bit(UB_STATE_USED, &ub->state)) {
+>                 ret =3D -EEXIST;
 > diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.=
 h
-> index ec77dabba45b..2ce5a496b622 100644
+> index 2ce5a496b622..c96c299057c3 100644
 > --- a/include/uapi/linux/ublk_cmd.h
 > +++ b/include/uapi/linux/ublk_cmd.h
-> @@ -102,6 +102,10 @@
+> @@ -102,6 +102,11 @@
 >         _IOWR('u', 0x23, struct ublksrv_io_cmd)
 >  #define        UBLK_U_IO_UNREGISTER_IO_BUF     \
 >         _IOWR('u', 0x24, struct ublksrv_io_cmd)
-> +#define        UBLK_U_IO_PREP_IO_CMDS  \
-> +       _IOWR('u', 0x25, struct ublk_batch_io)
-> +#define        UBLK_U_IO_COMMIT_IO_CMDS        \
-> +       _IOWR('u', 0x26, struct ublk_batch_io)
->
->  /* only ABORT means that no re-fetch */
->  #define UBLK_IO_RES_OK                 0
-> @@ -525,6 +529,51 @@ struct ublksrv_io_cmd {
->         };
->  };
->
-> +struct ublk_elem_header {
-> +       __u16 tag;      /* IO tag */
-> +
-> +       /*
-> +        * Buffer index for incoming io command, only valid iff
-> +        * UBLK_F_AUTO_BUF_REG is set
-> +        */
-> +       __u16 buf_index;
-> +       __s32 result;   /* I/O completion result (commit only) */
-> +};
 > +
 > +/*
-> + * uring_cmd buffer structure for batch commands
-> + *
-> + * buffer includes multiple elements, which number is specified by
-> + * `nr_elem`. Each element buffer is organized in the following order:
-> + *
-> + * struct ublk_elem_buffer {
-> + *     // Mandatory fields (8 bytes)
-> + *     struct ublk_elem_header header;
-> + *
-> + *     // Optional fields (8 bytes each, included based on flags)
-> + *
-> + *     // Buffer address (if UBLK_BATCH_F_HAS_BUF_ADDR) for copying data
-> + *     // between ublk request and ublk server buffer
-> + *     __u64 buf_addr;
-> + *
-> + *     // returned Zone append LBA (if UBLK_BATCH_F_HAS_ZONE_LBA)
-> + *     __u64 zone_lba;
-> + * }
-> + *
-> + * Used for `UBLK_U_IO_PREP_IO_CMDS` and `UBLK_U_IO_COMMIT_IO_CMDS`
+> + * return 0 if the command is run successfully, otherwise failure code
+> + * is returned
 > + */
-> +struct ublk_batch_io {
-> +       __u16  q_id;
-> +#define UBLK_BATCH_F_HAS_ZONE_LBA      (1 << 0)
-> +#define UBLK_BATCH_F_HAS_BUF_ADDR      (1 << 1)
-> +#define UBLK_BATCH_F_AUTO_BUF_REG_FALLBACK     (1 << 2)
-> +       __u16   flags;
-> +       __u16   nr_elem;
-> +       __u8    elem_bytes;
-> +       __u8    reserved;
-> +       __u64   reserved2;
-> +};
-> +
->  struct ublk_param_basic {
->  #define UBLK_ATTR_READ_ONLY            (1 << 0)
->  #define UBLK_ATTR_ROTATIONAL           (1 << 1)
+>  #define        UBLK_U_IO_PREP_IO_CMDS  \
+>         _IOWR('u', 0x25, struct ublk_batch_io)
+>  #define        UBLK_U_IO_COMMIT_IO_CMDS        \
 > --
 > 2.47.0
 >
