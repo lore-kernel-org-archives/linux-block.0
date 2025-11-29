@@ -1,111 +1,139 @@
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 238CB1C8626
-	for <linux-block@vger.kernel.org>; Sat, 29 Nov 2025 09:55:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C9A2262FC1;
+	Sat, 29 Nov 2025 14:31:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764410149; cv=none; b=IamvlpzqY6zZhjE3o/pFyVMhx/N9b/Tw2SeVGtpc60CHUfjNiioTCFZGl1hr3THr5HaDmPoiTcy8ilnrYoXQIG5IiwXiKFqawP/Rs2tMmxnT+1Gv16xi9iSAcsrEIqUGstUQmFoTAnhTf58UOkx+D4/HyI8OIPAGxbeE7wAbzaM=
+	t=1764426717; cv=none; b=qApaM9Ow9o/FnFsJQS8FvGKytewRmmKtUd1I919DFWdVRakXV1P5UJZDc+1d6PY8gQl+hLHo6Ymi69Ww0tkbweUa5jvYIXR18GGLHeKwYOkB7Dg+VzavUnjBHCl+QfxW2hYhbyoQQPf/BnHs7ksaHkUD14X9edW9XYjApSfWoTQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764410149; c=relaxed/simple;
-	bh=zJ3kmKNfcWPPfnA7WDaF/iaM3rS2BzY8PEgOscaFHV0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UTlPpbXIobTQGGDBVVYjN4yA6lMmCk/k8snM2CdmmRyCBkXiZ1PXowl7i3lMiwKc7U0l0vqthJ9X0KfDAGtzf576kXm8ldzSsxjnQ9lqKTFnwpb4pCLeDk301xiEo3bE3fv15KOy2XcuZeTL/hTp1/iXPu1MaiQOp8/fKQtF2ck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g4usSwCr; arc=none smtp.client-ip=209.85.222.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1764426717; c=relaxed/simple;
+	bh=b9WvgFAubhzEgsS0DvAfHxvKsNmcEmEcmJNVo2OtCOw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DvfLfVvzMh0SzyJKlW7710dzIdBo4qfrVKxUjdKM+FK74s4H6kLYwBHDMvwVd+JOFHwj5XZhpG1cUx2iYAOKVrrK49kRD+QnnZCDVPKlaXxZDQFCVscRxGVjWrqsMPiAHNzmHBnIAmH0hmQmLM12K0QmxPOS23Y1cb8S8TJkQno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BZQd7Dh8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g4usSwCr"
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-8b29ff9d18cso234733485a.3
-        for <linux-block@vger.kernel.org>; Sat, 29 Nov 2025 01:55:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764410146; x=1765014946; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=A/iI/7t6PfyA3Rj5l4epnBiBSTkgBrMrR31O4MqJqbk=;
-        b=g4usSwCrKKZusAg3AB94IRyybVKnAKZ1Li6OyWnymL4k6OmePmaD58GGjKHKiR12/V
-         Ps6haV/FP9PxC7TKiSz/wAWpl8DcNSHLFnSYB5sk6mNQbJLSq0NwzzHiLyytDzCbya7n
-         nngfp3uo9ImZLmDm9ikHZArtw1rU4CXIK0oLKbv8c46zJFrAxWYtyCrhuk33WgdcNK59
-         LRJy9qpoqGhBzDhEavGhkMmCQK077hXK7p0Su+q64W7pc2dr/3hGpCD7eYrZR2Q5TloS
-         gHcOk0wM/8G22tbNsHiuZBmMOl1YPaAwlHVT33TBnYNa2CpmlPebimwm83WgPOYByLz5
-         eZYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764410146; x=1765014946;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=A/iI/7t6PfyA3Rj5l4epnBiBSTkgBrMrR31O4MqJqbk=;
-        b=vyccBTSsJxm9ly5ldnQiC/VY0PH6KIhoxjpbYrodVa4LWi4F83N8tmMoHM5EvKoN3z
-         /p3OsCs2oN19xmQBwYsHPWq4sfcAgBrzJQzKikvZK6CT5KoQJjsZ6hrYslHIkOOSp+uW
-         ySm55FgM+EL6kRdVlim55TPb5lx+LrucQRFP+BB6IzigYM4aPq+YoHGBD7tIcO0iD4J/
-         AfBkVhrJsIK0wkcqMbuEAtTR1UK3dBUebjWAn1bfqTV1yWwvLfP+6XqW05k+3rjfTxnN
-         mryBKnAo9Yj3CYDRtFfrfcqjVv/px3bXPv8EATBwiBJtDI+Bl3ZmqvQsKip7opArp4LN
-         53FQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWAryyofyPLiZeuu+EZBKXUEc/FOUMtT1iDjdVJFBM8fpPrI0dEfIy222txQrG2vI5dKhy0wu+rgBDeLg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUnkCxRKeoRyIxUPwdCEdTu5th3xN3LQLXnJmB56kkvlNHkv/d
-	KqgbYkK505Htd3sZqhuR7FT1xj7txuGFdpXnUDTBAbLC/eDIJiN2xpVhrntTG+yivWFqazRpugo
-	RwKVWGGYe8NsSFdpLfNP5Ksn99r+R3eA=
-X-Gm-Gg: ASbGncu+u9i/mZdHoADT+8CV4/njy74lDTiYFzfhwJoHhFCzY3dSkLacQJy7lSjhBDB
-	WEs8JnfPyRG0FrW2qCxM7Z/b4lcSgxyRtlS2uOBipm0PxprPyl2aLWibnFT6degOQkWjRIwEyaF
-	GYRN5cTXDd5R4KfFRNpNAt80AS0GQ68w2AI/y7wXa019Nfn5jJr7dk0FgW9xmCnGoQyHoNO5OjM
-	Wct8HkhfaKnzLkzsEWakFH5qw6NttrBUky3hdpV6IdHwqSxDQy3nRVr0Tp+NqeS1eDsyA==
-X-Google-Smtp-Source: AGHT+IEx5FnoQSqVYE5HkJ4qekuzm872dkwjAjVY0fHIWVwgKTd65EFg6KIctq8t+ydqSEQkx43JpdHpLLiwggx8mXM=
-X-Received: by 2002:a05:620a:19a7:b0:8b3:36d5:7544 with SMTP id
- af79cd13be357-8b33d4873e4mr4187792385a.82.1764410145912; Sat, 29 Nov 2025
- 01:55:45 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BZQd7Dh8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30437C4CEF7;
+	Sat, 29 Nov 2025 14:31:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764426716;
+	bh=b9WvgFAubhzEgsS0DvAfHxvKsNmcEmEcmJNVo2OtCOw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=BZQd7Dh8bF2OS6cYEGrhzmxXIcbNiT8gpCTAcLhVIAbfZeCtUTciycL5zPRZmot14
+	 0A0baN2tUIbod/XxTzjPDvGpHLxhEUmPu1e2rLwLhpezv8Qo0CIQER+bOwfuO7jZiX
+	 PUJraJXZRLUDp47BHEfBWQtSTja8GI7j/KFz5SUQhPSECKUCJUgfBILMCUrQhZc4zk
+	 tEqn60v7NRbmTPwQrfq6T2C14zDLcONAfm6awFySOCrsfMiUryOL/x1G+Y5gziZjUT
+	 HErr2i1GjGHk5EnaQueBh1rADNmVILMtIbcoEjUTOtDoOPXYWxLE+rtfAUrRmzZUa8
+	 dMB1WBjsvCvZA==
+Message-ID: <84343571-2b89-4fa1-8b52-5b6ff1d33e88@kernel.org>
+Date: Sat, 29 Nov 2025 15:31:52 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251128170442.2988502-1-senozhatsky@chromium.org> <20251128170442.2988502-2-senozhatsky@chromium.org>
-In-Reply-To: <20251128170442.2988502-2-senozhatsky@chromium.org>
-From: Barry Song <21cnbao@gmail.com>
-Date: Sat, 29 Nov 2025 17:55:34 +0800
-X-Gm-Features: AWmQ_bm_Hlx6yp0bfipy7ZUUjseiYqdoZMYw-HX6eiK9JohZ6_rLqyBX_3QwRGM
-Message-ID: <CAGsJ_4yUAw_tzX7z8iizToMB8SDJPNOhFRZNXva_ae46q5vRwg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] zram: introduce compressed data writeback
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Richard Chang <richardycc@google.com>, 
-	Brian Geffon <bgeffon@google.com>, Minchan Kim <minchan@kernel.org>, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, linux-block@vger.kernel.org, 
-	Minchan Kim <minchan@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/4] block: add IOC_PR_READ_KEYS ioctl
+To: Stefan Hajnoczi <stefanha@redhat.com>, linux-block@vger.kernel.org
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+ linux-kernel@vger.kernel.org,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ Mike Christie <michael.christie@oracle.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-nvme@lists.infradead.org, Keith Busch <kbusch@kernel.org>,
+ Sagi Grimberg <sagi@grimberg.me>, linux-scsi@vger.kernel.org,
+ Christoph Hellwig <hch@lst.de>
+References: <20251126163600.583036-1-stefanha@redhat.com>
+ <20251126163600.583036-4-stefanha@redhat.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <20251126163600.583036-4-stefanha@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sat, Nov 29, 2025 at 1:06=E2=80=AFAM Sergey Senozhatsky
-<senozhatsky@chromium.org> wrote:
->
-> From: Richard Chang <richardycc@google.com>
->
+On 26/11/2025 17:35, Stefan Hajnoczi wrote:
+> +
+>  #define PR_FL_IGNORE_KEY	(1 << 0)	/* ignore existing key */
+>  
+>  #define IOC_PR_REGISTER		_IOW('p', 200, struct pr_registration)
+> @@ -64,5 +70,6 @@ struct pr_clear {
+>  #define IOC_PR_PREEMPT		_IOW('p', 203, struct pr_preempt)
+>  #define IOC_PR_PREEMPT_ABORT	_IOW('p', 204, struct pr_preempt)
+>  #define IOC_PR_CLEAR		_IOW('p', 205, struct pr_clear)
+> +#define IOC_PR_READ_KEYS	_IOWR('p', 206, struct pr_read_keys)
+>  
+>  #endif /* _UAPI_PR_H */
+> diff --git a/block/ioctl.c b/block/ioctl.c
+> index d7489a56b33c3..e87c424c15ae9 100644
+> --- a/block/ioctl.c
+> +++ b/block/ioctl.c
+> @@ -1,5 +1,6 @@
+>  // SPDX-License-Identifier: GPL-2.0
+>  #include <linux/capability.h>
+> +#include <linux/cleanup.h>
+>  #include <linux/compat.h>
+>  #include <linux/blkdev.h>
+>  #include <linux/export.h>
+> @@ -423,6 +424,54 @@ static int blkdev_pr_clear(struct block_device *bdev, blk_mode_t mode,
+>  	return ops->pr_clear(bdev, c.key);
+>  }
+>  
+> +static int blkdev_pr_read_keys(struct block_device *bdev, blk_mode_t mode,
+> +		struct pr_read_keys __user *arg)
+> +{
+> +	const struct pr_ops *ops = bdev->bd_disk->fops->pr_ops;
+> +	struct pr_keys *keys_info __free(kfree) = NULL;
 
-Hi Richard, Sergey,
 
-Thanks a lot for developing this. For years, people have been looking for
-compressed data writeback to reduce I/O, such as compacting multiple compre=
-ssed
-blocks into a single page on block devices. I guess this patchset hasn=E2=
-=80=99t reached
-that point yet, right?
+This is an undesired syntax explicitly documented as one to avoid. You
+need here proper assignment, not NULL. Please don't use cleanup.h if you
+do not intend to follow it because it does not make the code simpler.
 
-> zram stores all written back slots raw, which implies that
-> during writeback zram first has to decompress slots (except
-> for ZRAM_HUGE slots, which are raw already).  The problem
-> with this approach is that not every written back page gets
-> read back (either via read() or via page-fault), which means
-> that zram basically wastes CPU cycles and battery decompressing
-> such slots.  This changes with introduction of decompression
 
-If a page is swapped out and never read again, does that actually indicate
-a memory leak in userspace?
 
-So the main benefit of this patch so far is actually avoiding decompression
-for "leaked" anon pages, which might still have a pointer but are
-never accessed again?
-
-> on demand, in other words decompression on read()/page-fault.
-
-Thanks
-Barry
+Best regards,
+Krzysztof
