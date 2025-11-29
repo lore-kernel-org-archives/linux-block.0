@@ -1,118 +1,135 @@
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 017EF28B7EA
-	for <linux-block@vger.kernel.org>; Sat, 29 Nov 2025 09:02:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BA732AE78;
+	Sat, 29 Nov 2025 09:07:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764406940; cv=none; b=l2yvjtQGcn7YgQ6HdTPHo9UT/L+2il7DGWYsQeojo712y3MhC5OlOxjFTDaQ/jyeG9BW0vQgLqYStknQzUpwbFwXJLGQ0M3FmypWdLa1IWHmKbybX1bKcR4g7sAtiVEmgDxVDB6nUZjvaGDWLhjrcsLuFaquakcfAKrL3V0cJ+U=
+	t=1764407279; cv=none; b=RDZsq704WU/mW5T/VJZMIhcVe3C6RFFr98USJb6itU/R8IDVBqIkmv+T6BAhHniYEwhZPyb03vqre4i1atYCcf70j+vn0U+EB9LTFmv4az7FOSxP3e12MVNbW99K26ZiIVaOtf2lOQjbNUON4LopKsx92DPzaYfaJYNrN/YNG08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764406940; c=relaxed/simple;
-	bh=MIUxfeIlXsLJb7D1x07khmxiQaV6FMQZLzsNI6cDMOY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=EIX7S9zsVhKzizBpEptHkyyZM45oL9XHk0W4GvFY0nXthJyt92DuFU18iWKcriZckMvIbdnsuJ3yHZERSjw3eIuWO4Ex0dwrXlWsFZzN1gSyxqCojZ88BQop1TkH8UNafdLfneoCnWBjAFS3+RUNQGh55FJXOwKzLrLvyVASSSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LWAD7FOh; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1764407279; c=relaxed/simple;
+	bh=LaFWmCSuL4KQQ+UT/MEIhGMRgAIrz8Sy2tDbRWfHTC8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ePmtTWW7xkAoPbT/Nnd2D/26bm3wQgpJJU4u1Mi6+RlL7IwhWODZhMSZ+S6eXLPptzuAUtv8TLWFrTg739C7clIN8Z0vkFjsFXwy0Bceg4Pav904d3WXFcpVdwvEfU3YB4X5ghNJFkS77BVei4/C5RQP0aHdPSElHTkDpqS8rE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=k/vN6QfU; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LWAD7FOh"
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-7a9cdf62d31so3371960b3a.3
-        for <linux-block@vger.kernel.org>; Sat, 29 Nov 2025 01:02:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764406937; x=1765011737; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rZsPDOjyUTRUehf6LhbOb026Dy93eapwVzPzgOc2prg=;
-        b=LWAD7FOhwxa9hK+N/TjbMpaozNTbYaOFlFfBFIkFx3IRXMvFPQxK0dBvqeuprMX8hQ
-         WtWIKhyhJdL7tgKbRz4kjA9XtQ0xCyuZ7Us8cRZuTSRdyYizUVED7L6DNAzm15FBB5+X
-         G5asqaq3DDVlM/G0dBAPwI0DSmb1ll6qtEwsg2iCDXZi+WJJDMh8w+iMQwrmlH1fUp0M
-         ZU8ghg2rx/1HT1LpWHFAMP66d0PvkRhjwjyR9UzTcYnZTtVjAi+zUY+A8WK5JSkbXJwd
-         i6e5F7qsIkGgfsqQ4oj8zEgP7PtrSoMRVbyWUr+snjj7SZqW95SR+gLU9WacDEe61W7m
-         +8+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764406937; x=1765011737;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=rZsPDOjyUTRUehf6LhbOb026Dy93eapwVzPzgOc2prg=;
-        b=KGvlny5D+97nr2wD9J1oMhoTKkTaIs1wLu2xIKtsr1VHJ/+dAOJfhvgQKWRFaLZIr7
-         Gy4g4BBLy7vwqGE70Xm7pFnmv/11LLn6XWr67dTjSRX33ALNM1vsNqlRdqCujHMWTBAB
-         FJMuKHWHPzrZAvNU/djFzawHcS4cNPPFL7+Idy1yBFBy6wRVZCxqzlQOHSX5mAfszmgI
-         JGQNhSle594s2+DeTHMeNrsZvRES61q4q7Pdy5GHnp/j6g8gaTxaznhEK9zDHHDpGzL6
-         XcTOSq1rOmMCLtm48Hz6e3xt+AFi9KyyJwuIFyLyVqWrCYS7PF4PR58sPhKZoR1nkQc/
-         OcLg==
-X-Gm-Message-State: AOJu0YyBVYGZ0xMFmzmk9uKiVEslmSZJm0NzLJrXgX5ebVqrK72fO8Ez
-	55DSB65b/kB4rZyIykMLLm9R5hPpQYHOAcVejIaHKUE8zttGEnvpSa4V
-X-Gm-Gg: ASbGncv4dzQXX97nF3tw2TWDKRbkknvAvqF1UTu16NSI0MiH/x85dV4Yed6dfM7nlt9
-	YKbYGKUvVRLc373mKvfZHFXSc3av7SIfi5A+5wTqd+0cLrF1fCUwVewlWcjfeJrkirqoFFH/Ojf
-	BNiHqxUM7I3QHsjQZ21N9DV1OHn2f+rHO793IN/8Wg1l2Cdf7yl99fVleo/FLmFDoL1gL4iQYgy
-	oj6+2321uX0jG1H9rZIAAMVc0WRhDdYe5iYkC8jo0k1Gf/fKtZEbaSiZPhzssr6hBpTzK6L3jNJ
-	ycFbbbjnqt42NSKN5orKVRKMkk9nPBj50ylUsv5C5uFX/tTAWahnLsPcvu0bU9EnV+sxxspNiYq
-	5k+A/2isLPyKrYCxc2H26ZwGwcBrZRNdSp2etrL8q1FtUNT1/YGUqufkXjKrdmGv9ZJW7xixtnB
-	g9tE6kBUAdoOVPXp3KTluSgPcImJw3OkU4WkjJ
-X-Google-Smtp-Source: AGHT+IHpE1uuYkahAmmHKZA5JS6JfSHwBl8orO/VCsXf8iMEXJ8J7PutjW87+hKd6ib1GUoYGhEBPQ==
-X-Received: by 2002:a05:7022:41:b0:11b:b1ce:277a with SMTP id a92af1059eb24-11c9d8482b1mr17984181c88.28.1764406937164;
-        Sat, 29 Nov 2025 01:02:17 -0800 (PST)
-Received: from localhost.localdomain ([104.128.72.44])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11dcae73bedsm28114394c88.0.2025.11.29.01.02.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 29 Nov 2025 01:02:16 -0800 (PST)
-From: zhangshida <starzhangzsd@gmail.com>
-X-Google-Original-From: zhangshida <zhangshida@kylinos.cn>
-To: Johannes.Thumshirn@wdc.com,
-	hch@infradead.org,
-	agruenba@redhat.com,
-	ming.lei@redhat.com,
-	hsiangkao@linux.alibaba.com,
-	csander@purestorage.com
-Cc: linux-block@vger.kernel.org,
-	linux-bcache@vger.kernel.org,
-	nvdimm@lists.linux.dev,
-	virtualization@lists.linux.dev,
-	ntfs3@lists.linux.dev,
-	linux-xfs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	zhangshida@kylinos.cn,
-	starzhangzsd@gmail.com
-Subject: [PATCH v3 9/9] nvdimm: Replace the repetitive bio chaining code patterns
-Date: Sat, 29 Nov 2025 17:01:22 +0800
-Message-Id: <20251129090122.2457896-10-zhangshida@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20251129090122.2457896-1-zhangshida@kylinos.cn>
-References: <20251129090122.2457896-1-zhangshida@kylinos.cn>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="k/vN6QfU"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1764407277; x=1795943277;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=LaFWmCSuL4KQQ+UT/MEIhGMRgAIrz8Sy2tDbRWfHTC8=;
+  b=k/vN6QfU4CBWujrdj/sHFhpODHlC5EHgnpQH6lkFiEPbYG3kyQFVrPgp
+   3gMz9adH9SlIcWMIWnzv69rPt6dQ44eIazTCiws+vB2BctZKO3lHCLFcE
+   QJ7BcrwGlGgDAVRfTJWqw1TjT17YJ38/SA15WRXeyx9isGuq7W5TOg6uq
+   j2tHOXlIwSHHQDG/MV8F3Co+I3E7zr6JaBHlJtriowcRJBkqDyLLSJeJn
+   JNN28Qq488MGqGY4+fHGYYNw2td2GrhE/qhaai8YOX9sqkrYKv9Lc0wq8
+   u61N+EZqCmLA43Y9Fv2FbJ1+BUQZaZSjKWAR/FPlDIsB5dAYrmFO0IrAF
+   A==;
+X-CSE-ConnectionGUID: o+5XY5E1SfeTH8XAbKl22A==
+X-CSE-MsgGUID: KH2H2Eg+TGqkNUlEMGfXuQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11627"; a="65419288"
+X-IronPort-AV: E=Sophos;i="6.20,236,1758610800"; 
+   d="scan'208";a="65419288"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2025 01:07:56 -0800
+X-CSE-ConnectionGUID: fmPpZhEQRmiKI3VGGnD6Uw==
+X-CSE-MsgGUID: Iv5FX28QRx6kcI6sEUS0Pw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,236,1758610800"; 
+   d="scan'208";a="193289632"
+Received: from lkp-server01.sh.intel.com (HELO 4664bbef4914) ([10.239.97.150])
+  by fmviesa007.fm.intel.com with ESMTP; 29 Nov 2025 01:07:54 -0800
+Received: from kbuild by 4664bbef4914 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vPGvo-0000000074r-1bCf;
+	Sat, 29 Nov 2025 09:07:52 +0000
+Date: Sat, 29 Nov 2025 17:07:17 +0800
+From: kernel test robot <lkp@intel.com>
+To: Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Richard Chang <richardycc@google.com>
+Cc: oe-kbuild-all@lists.linux.dev,
+	Linux Memory Management List <linux-mm@kvack.org>,
+	Brian Geffon <bgeffon@google.com>, Minchan Kim <minchan@kernel.org>,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: Re: [PATCH 1/2] zram: introduce compressed data writeback
+Message-ID: <202511291628.NZif1jdx-lkp@intel.com>
+References: <20251128170442.2988502-2-senozhatsky@chromium.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251128170442.2988502-2-senozhatsky@chromium.org>
 
-From: Shida Zhang <zhangshida@kylinos.cn>
+Hi Sergey,
 
-Replace duplicate bio chaining logic with the common
-bio_chain_and_submit helper function.
+kernel test robot noticed the following build warnings:
 
-Signed-off-by: Shida Zhang <zhangshida@kylinos.cn>
----
- drivers/nvdimm/nd_virtio.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+[auto build test WARNING on akpm-mm/mm-everything]
+[also build test WARNING on next-20251128]
+[cannot apply to axboe/for-next linus/master v6.18-rc7]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-diff --git a/drivers/nvdimm/nd_virtio.c b/drivers/nvdimm/nd_virtio.c
-index c3f07be4aa2..e6ec7ceee9b 100644
---- a/drivers/nvdimm/nd_virtio.c
-+++ b/drivers/nvdimm/nd_virtio.c
-@@ -122,8 +122,7 @@ int async_pmem_flush(struct nd_region *nd_region, struct bio *bio)
- 			return -ENOMEM;
- 		bio_clone_blkg_association(child, bio);
- 		child->bi_iter.bi_sector = -1;
--		bio_chain(child, bio);
--		submit_bio(child);
-+		bio_chain_and_submit(child, bio);
- 		return 0;
- 	}
- 	if (virtio_pmem_flush(nd_region))
+url:    https://github.com/intel-lab-lkp/linux/commits/Sergey-Senozhatsky/zram-introduce-compressed-data-writeback/20251129-010716
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm.git mm-everything
+patch link:    https://lore.kernel.org/r/20251128170442.2988502-2-senozhatsky%40chromium.org
+patch subject: [PATCH 1/2] zram: introduce compressed data writeback
+config: x86_64-randconfig-011-20251129 (https://download.01.org/0day-ci/archive/20251129/202511291628.NZif1jdx-lkp@intel.com/config)
+compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251129/202511291628.NZif1jdx-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202511291628.NZif1jdx-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/block/zram/zram_drv.c:2099:12: warning: 'zram_read_from_zspool_raw' defined but not used [-Wunused-function]
+    2099 | static int zram_read_from_zspool_raw(struct zram *zram, struct page *page,
+         |            ^~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+vim +/zram_read_from_zspool_raw +2099 drivers/block/zram/zram_drv.c
+
+  2098	
+> 2099	static int zram_read_from_zspool_raw(struct zram *zram, struct page *page,
+  2100					     u32 index)
+  2101	{
+  2102		struct zcomp_strm *zstrm;
+  2103		unsigned long handle;
+  2104		unsigned int size;
+  2105		void *src;
+  2106	
+  2107		handle = zram_get_handle(zram, index);
+  2108		size = zram_get_obj_size(zram, index);
+  2109	
+  2110		/*
+  2111		 * We need to get stream just for ->local_copy buffer, in
+  2112		 * case if object spans two physical pages. No decompression
+  2113		 * takes place here, as we read raw compressed data.
+  2114		 */
+  2115		zstrm = zcomp_stream_get(zram->comps[ZRAM_PRIMARY_COMP]);
+  2116		src = zs_obj_read_begin(zram->mem_pool, handle, zstrm->local_copy);
+  2117		memcpy_to_page(page, 0, src, size);
+  2118		zs_obj_read_end(zram->mem_pool, handle, src);
+  2119		zcomp_stream_put(zstrm);
+  2120	
+  2121		return 0;
+  2122	}
+  2123	
+
 -- 
-2.34.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
