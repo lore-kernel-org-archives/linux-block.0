@@ -1,96 +1,118 @@
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6C8B27E7DA
-	for <linux-block@vger.kernel.org>; Fri, 28 Nov 2025 21:21:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CABBC1898F8
+	for <linux-block@vger.kernel.org>; Sat, 29 Nov 2025 01:20:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764364891; cv=none; b=Kg6/kI7PpwgmhZYUfK6d8shaRTVUHBmcWw2bllUk0yp4PdvexZkI1dOGPvB05Ixz5FRA7Lid8ZnYz/GjX/BSqI94KExLZlG6OH3jgaoESpEnlIC/XpkdNTa9XiSM1F6+xA3gCmof13y+YKaIBBi6Xvw6BpbDqI0mfrQ3WSCt+z4=
+	t=1764379206; cv=none; b=SSNw6owN28aYIJ00dqYtefHxQO4kzOkA/6zr8kHO2va70cvCPkSrLMjrbMZyQivlU7vTn0OvUFG6e9MJmM38B7uaohO+D+jD8tJaRw0ilX1yRwMUjq4LHapIvFVBVaxQTcQBQOmUjkKndsbdWgT7DpV5sNhXGhnvcDK5IPeZxgI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764364891; c=relaxed/simple;
-	bh=+1YWrD8pC2hntLaATQy27tuKtBXcG3lRmimS3LwvTKc=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=fykAelZkgPOfBO52j2uyA6VXEyj8mpU13XBm2ecuNpsP2aOT6rjySrVlS9CbENnJqWmO3pzF57eCmmm3LiJjfAj3r6ZiJfUV7KlI0rabqE3ejpKNCrUwTHTLem+OtFH1FYTcmS7aJZ1xykhKVnf6xgBSRtntH1yOPQyNscYQ6Jw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-9486f0954daso111097639f.0
-        for <linux-block@vger.kernel.org>; Fri, 28 Nov 2025 13:21:29 -0800 (PST)
+	s=arc-20240116; t=1764379206; c=relaxed/simple;
+	bh=CQ4gu5qwHISanFuymuvKH3qflMdaqJ/uuGBrjJ6tlTI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZwqH3Biia6oTk9M7d5OZx2NeHqaPS6vJOvEgqSx1cVVMt6zsxVfb8RkgN6krLeXIi97jLhemjkOtsJJiIrns3eVrbtQnDdK+/EKFSM1qHTM3YmL1Av6v7a3S02dGcQxrufTuIVCDXX7Hr+/E6Hfc+8GbVYvo4jz3c7Ew5EqestA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mx1oiJ55; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mx1oiJ55"
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4ee19b1fe5dso28497911cf.0
+        for <linux-block@vger.kernel.org>; Fri, 28 Nov 2025 17:20:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764379204; x=1764984004; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Fs0ohHvC2dybiBLIXiSQxGJyUXrOOQGSRM7UOWCS5dA=;
+        b=Mx1oiJ55XOPXMyCAiN/Br5JFA3l1n2xcoNVlmgHTqEMYK+hrtl5bY6f7CurTScUiUz
+         yRo6zDSIsPseHekpeKZlMJEnTeZPKLEVk4bJUHMUeeGWtVjHwyxC7NfzstE02D7PhQZe
+         cUuVXgAensM9BqOkyuN1JmUc+x478me9YpEmKsW8oEB7sX37qyXCjNPI6QqGdmS8YiAt
+         XoUo5REunWFNrEbtzHsRTuJftl5Z85x4meYDc4yQLp8zvQ4WPoq39zoCDnx41WOhWYTL
+         uiZ6qVuE4mtikutYXDXrISPMG5kIpN1XYJqGpye5MMY1HxFHrPfiH+fLJzpajKKWwxsD
+         oP/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764364889; x=1764969689;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jxOH3j5WMMLzYDZCUCFbnamKyZDKYf5WCQO7SYniTQg=;
-        b=UC6jglO8tZl7olPk4vCjxKpYdH+P6j1bbj+bkV9JYrOlN7QVw8Jaf7WrQttm8Rd6jF
-         D4C5fmBk42FD8NfbcftAqSmcsK4fcs3LN8zIEih5GLp7QxxXzLaCBq58qMuoH2eEBjKq
-         n07J+sJHAwSUF48hwcYphQVmCvct1KuPFNHEwKOiZNTa9UOHFfljdURgkJmUj9vwxkMl
-         v/CBHLxnUwzcI33Haz3apPnMClmY5TVquvDa+DHARydmDRW2vFJpigN5MKjzRFUeCOO0
-         3X2EU2u2TTTtJRTAxLNAqJERK0V4p7zn6X+K0k0VSF4xGsB1kpcipO4bLIKBjG+DzMqr
-         SlGA==
-X-Gm-Message-State: AOJu0YzUu5VPcm5/YeJ6i3zS5ex+fRrEbsofSRGwDf4VSYH91xKZ4xKD
-	dsfBTi4K1L4l9c4OUIIHwDGxwq7zclL3gbrpG3K33pyFt8KsnXNWEwHMywON38FExBN08p9yJpj
-	DVwJK+Qw8nkvp+5Yt8If+b7wNfz98vZETwbsGeOxOs8ETSWPn727+IA35Bq8=
-X-Google-Smtp-Source: AGHT+IHbs9mQNKUAXSYdZXsI/GCOTQlbzZaHiczhooqSbNHSoZqnyOV0hlqK4O04t/5EVryzb1/ho1ixlhURgig2JFziH/rDBy1p
+        d=1e100.net; s=20230601; t=1764379204; x=1764984004;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Fs0ohHvC2dybiBLIXiSQxGJyUXrOOQGSRM7UOWCS5dA=;
+        b=EEPiYccQjJ8k+VjwwlDO0UXyqQ3akyBYRRVj0qdwpBj2XiDNflrJv0xIvD54VavYvw
+         8TgO5GSS7nuTw22LCzY4QPWDlw4G2OL8ELhAeYuYqmgwgJ1ckuOYvMtFsGQPnmNLIt57
+         roxO6kT2JSouIvkfQ+aiMn22NZ8H+6jQnNTV9xw8MKwDLT1EJluSUlnedE+lDf2mo8ku
+         +bfOyDske8Emxl/Am2h4HTMbXpnIwXor5pJHfUP42S+bH0i8/G+BTkT4MwP01VQGfWlL
+         OfgmwvGE0zYxtH9CSsUjgsVfNOvQ4TIgyBRVC7F9W0/WTv80hB+/+oBVz0651QKwS5Mk
+         MLWQ==
+X-Gm-Message-State: AOJu0YxbxqsdFyca4M2t6PhRCiofkIWGtwc5NKcD4RLuubFRiKU81v/e
+	+8LMP9muLTWSqlSlAZ5rhYJ/mfQxh7PJZ0zuGOIPXDkKDeRPvKHIlzF5J/7SJH4gE2NVr0eGrV1
+	LGwUp2IX7KfpU2woNnxYG/aeD0zdEU2U=
+X-Gm-Gg: ASbGncsqvuEwz0lD0ion27gHs59ObXibH2lPmLbEIUXhUAQU+a5RAGV3L+e3VKkb1Za
+	v0ZEmQgkOQx53Dla0uzzgIrHdjXca8YnMs38gPAHU+wdgorOS/6FOB4PsdXSLMdNkM1pvNDgj+w
+	TMUPWW1chUwHyYKFam8z3miLQXolhHePrmU0TSrl/gO+3z1oa/XPQ4D63rz8xwfJFs7IPpnPCKb
+	YCHZOxftAMJdmrH/EKAQ68gBrH60lpssWXVUSGXitm9hOGpJ/YsgtAhh5YAqGZvoK2QWQ==
+X-Google-Smtp-Source: AGHT+IGvVajIc41VyAxCuPyxqWUXb2OrVTIXZXouCyBBkNWEtauVL8pGUlccoVwLRAWDPyhKgINw+5nh517v8WUU60c=
+X-Received: by 2002:ac8:7c43:0:b0:4ed:b1fe:f87f with SMTP id
+ d75a77b69052e-4efbda3957amr254551091cf.20.1764379203672; Fri, 28 Nov 2025
+ 17:20:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:12c5:b0:435:9247:12d5 with SMTP id
- e9e14a558f8ab-435b8e864famr292501825ab.33.1764364889019; Fri, 28 Nov 2025
- 13:21:29 -0800 (PST)
-Date: Fri, 28 Nov 2025 13:21:29 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <692a1259.a70a0220.d98e3.014c.GAE@google.com>
-Subject: [syzbot] Monthly block report (Nov 2025)
-From: syzbot <syzbot+listf4192d0e34ab0efda345@syzkaller.appspotmail.com>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
+References: <20251128083219.2332407-1-zhangshida@kylinos.cn> <20251128083219.2332407-13-zhangshida@kylinos.cn>
+In-Reply-To: <20251128083219.2332407-13-zhangshida@kylinos.cn>
+From: Stephen Zhang <starzhangzsd@gmail.com>
+Date: Sat, 29 Nov 2025 09:19:27 +0800
+X-Gm-Features: AWmQ_bn06KtcfeC8pChk4HEBjz19bArSXx8IRJxxttyX3p2OYoBSLr0JgGawFZU
+Message-ID: <CANubcdXJyE6Y5J3C5Zgc1jA7qSXk+_Hb0pm8Q-8cTb3Z_eM4sA@mail.gmail.com>
+Subject: Re: [PATCH v2 12/12] nvmet: use bio_chain_and_submit to simplify bio chaining
+To: Johannes.Thumshirn@wdc.com, hch@infradead.org, gruenba@redhat.com, 
+	ming.lei@redhat.com, Gao Xiang <hsiangkao@linux.alibaba.com>
+Cc: linux-block@vger.kernel.org, linux-bcache@vger.kernel.org, 
+	nvdimm@lists.linux.dev, virtualization@lists.linux.dev, 
+	linux-nvme@lists.infradead.org, gfs2@lists.linux.dev, ntfs3@lists.linux.dev, 
+	linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	zhangshida@kylinos.cn
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello block maintainers/developers,
+zhangshida <starzhangzsd@gmail.com> =E4=BA=8E2025=E5=B9=B411=E6=9C=8828=E6=
+=97=A5=E5=91=A8=E4=BA=94 16:33=E5=86=99=E9=81=93=EF=BC=9A
+>
+> From: Shida Zhang <zhangshida@kylinos.cn>
+>
+> Replace repetitive bio chaining patterns with bio_chain_and_submit.
+> Note that while the parameter order (prev vs new) differs from the
+> original code, the chaining order does not affect bio chain
+> functionality.
+>
+> Signed-off-by: Shida Zhang <zhangshida@kylinos.cn>
+> ---
+>  drivers/nvme/target/io-cmd-bdev.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>
+> diff --git a/drivers/nvme/target/io-cmd-bdev.c b/drivers/nvme/target/io-c=
+md-bdev.c
+> index 8d246b8ca60..4af45659bd2 100644
+> --- a/drivers/nvme/target/io-cmd-bdev.c
+> +++ b/drivers/nvme/target/io-cmd-bdev.c
+> @@ -312,8 +312,7 @@ static void nvmet_bdev_execute_rw(struct nvmet_req *r=
+eq)
+>                                         opf, GFP_KERNEL);
+>                         bio->bi_iter.bi_sector =3D sector;
+>
+> -                       bio_chain(bio, prev);
+> -                       submit_bio(prev);
+> +                       bio_chain_and_submit(prev, bio);
+>                 }
+>
 
-This is a 31-day syzbot report for the block subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/block
+My apologies.  I think the order really matters here, will drop this patch.
 
-During the period, 1 new issues were detected and 0 were fixed.
-In total, 42 issues are still open and 105 have already been fixed.
+Thanks,
+shida
 
-Some of the still happening issues:
-
-Ref  Crashes Repro Title
-<1>  6246    No    INFO: task hung in read_part_sector (2)
-                   https://syzkaller.appspot.com/bug?extid=82de77d3f217960f087d
-<2>  2620    Yes   INFO: task hung in bdev_release
-                   https://syzkaller.appspot.com/bug?extid=4da851837827326a7cd4
-<3>  2474    Yes   INFO: task hung in bdev_open
-                   https://syzkaller.appspot.com/bug?extid=5c6179f2c4f1e111df11
-<4>  1931    Yes   INFO: task hung in sync_bdevs (3)
-                   https://syzkaller.appspot.com/bug?extid=97bc0b256218ed6df337
-<5>  1692    Yes   INFO: task hung in blkdev_fallocate
-                   https://syzkaller.appspot.com/bug?extid=39b75c02b8be0a061bfc
-<6>  636     Yes   possible deadlock in elevator_change
-                   https://syzkaller.appspot.com/bug?extid=ccae337393ac17091c34
-<7>  237     No    INFO: task hung in queue_limits_commit_update_frozen
-                   https://syzkaller.appspot.com/bug?extid=f272bbfbf8498ddadea5
-<8>  87      Yes   WARNING in blk_register_tracepoints
-                   https://syzkaller.appspot.com/bug?extid=c54ded83396afee31eb1
-<9>  44      Yes   INFO: rcu detected stall in wb_workfn (4)
-                   https://syzkaller.appspot.com/bug?extid=5b4f4f81240931b16844
-<10> 31      Yes   general protection fault in rtlock_slowlock_locked
-                   https://syzkaller.appspot.com/bug?extid=08df3e4c9b304b37cb04
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+>                 sector +=3D sg->length >> 9;
+> --
+> 2.34.1
+>
