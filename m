@@ -1,19 +1,19 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28C6C212F89
-	for <linux-block@vger.kernel.org>; Sun, 30 Nov 2025 02:44:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3757D212F89
+	for <linux-block@vger.kernel.org>; Sun, 30 Nov 2025 02:44:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764470655; cv=none; b=F+nlSJjdtz2Juq0BBjOtXTitUwF6F3M1cjxJpxsdm9E1S26tehuTPNf9bnHykq1okzF5mIWj74Gi1lr9uwUan7XYgQnuXIPu5/NUXCaaaNrXPKNAbTjJE+2y4ZsoqeGKK7PcBkA8tmpRAAEkxonMj8av48T+wRT/WYUbJt34GuA=
+	t=1764470656; cv=none; b=JcapYU/g4lyeKlsMrvFQg3WnFBVO3jTtJ9nzW/Cj1NXXCry6qw2B07WAv93+ElTekwpKFgdSQw7EoywrDUyBjmDmmeeuHlXUfdpeDDb6yp3KIy1NLgQEQWsfnxaJ6Yy5jgdFFXfuNgAsG3rwevjPa3gRkVzjUiPa5c7H/aC+8Iw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764470655; c=relaxed/simple;
-	bh=8bEebxUT5T0KT86XHVPir30hLHc/5eLWBieQba87z+o=;
+	s=arc-20240116; t=1764470656; c=relaxed/simple;
+	bh=nBVcxhPO2cGU9yBUqreFZVxCpmGiIyW2v6+OBp53gHQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kNk++9xZcEBKhirkW9LARd8yPkNwQarnsPkSV7VYU4BxbkKF2Dx8DoRrfc8liVb2hpjUOb41NH2+qZquguITZBSe0BC3GLTBynfW3meDOu2qHi8MXHcS9ZeXkBP460eQavS9PpD4o5bJqyRQj4e9JzzSYOpwxvkVlXvoc68A3MM=
+	 MIME-Version; b=oVU2v+RXSyOdHGC3JcoPsRdiwlopuelwqEzXERlSy7UhURLTcicXhsTIIQ42esCOSGe4Fh9KGP818+Vl8j0Up+g0JtxkaTzexLJQ3zzXVUdHzpg/qSG8ANNx758D1d/T7O+kFMmINyfqoJVJ9UJyBTREJmvvSyBMV2Quncp0AjA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC9BAC4CEF7;
-	Sun, 30 Nov 2025 02:44:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 283F9C113D0;
+	Sun, 30 Nov 2025 02:44:13 +0000 (UTC)
 From: Yu Kuai <yukuai@fnnas.com>
 To: axboe@kernel.dk,
 	linux-block@vger.kernel.org,
@@ -22,9 +22,9 @@ To: axboe@kernel.dk,
 	ming.lei@redhat.com,
 	bvanassche@acm.org
 Cc: yukuai@fnnas.com
-Subject: [PATCH v3 09/10] blk-throttle: remove useless queue frozen
-Date: Sun, 30 Nov 2025 10:43:48 +0800
-Message-ID: <20251130024349.2302128-10-yukuai@fnnas.com>
+Subject: [PATCH v3 10/10] block/blk-rq-qos: cleanup rq_qos_add()
+Date: Sun, 30 Nov 2025 10:43:49 +0800
+Message-ID: <20251130024349.2302128-11-yukuai@fnnas.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251130024349.2302128-1-yukuai@fnnas.com>
 References: <20251130024349.2302128-1-yukuai@fnnas.com>
@@ -36,72 +36,125 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-blk-throttle is still holding rq_qos_mutex before freezing queue from
-blk_throtl_init().
-
-However blk_throtl_bio() can be called before grabbing q_usage_counter
-hence freeze queue really doesn't stop new IO issuing to blk-throtl.
-
-Also use READ_ONCE and WRITE_ONCE for q->td because blk_throtl_init()
-can concurrent with issuing IO.
+Now that there is no caller of rq_qos_add(), remove it, and also rename
+rq_qos_add_frozen() back to rq_qos_add().
 
 Signed-off-by: Yu Kuai <yukuai@fnnas.com>
 ---
- block/blk-throttle.c | 11 ++---------
- block/blk-throttle.h |  3 ++-
- 2 files changed, 4 insertions(+), 10 deletions(-)
+ block/blk-iocost.c    |  2 +-
+ block/blk-iolatency.c |  4 ++--
+ block/blk-rq-qos.c    | 35 ++---------------------------------
+ block/blk-rq-qos.h    |  2 --
+ block/blk-wbt.c       |  2 +-
+ 5 files changed, 6 insertions(+), 39 deletions(-)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 97188a795848..6c63b9714afa 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -1310,7 +1310,6 @@ static int blk_throtl_init(struct gendisk *disk)
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index 929fc1421d7e..0359a5b65202 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -2925,7 +2925,7 @@ static int blk_iocost_init(struct gendisk *disk)
+ 	 * called before policy activation completion, can't assume that the
+ 	 * target bio has an iocg associated and need to test for NULL iocg.
+ 	 */
+-	ret = rq_qos_add_frozen(&ioc->rqos, disk, RQ_QOS_COST, &ioc_rqos_ops);
++	ret = rq_qos_add(&ioc->rqos, disk, RQ_QOS_COST, &ioc_rqos_ops);
+ 	if (ret)
+ 		goto err_free_ioc;
+ 
+diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+index 1558afbf517b..5b18125e21c9 100644
+--- a/block/blk-iolatency.c
++++ b/block/blk-iolatency.c
+@@ -764,8 +764,8 @@ static int blk_iolatency_init(struct gendisk *disk)
+ 	if (!blkiolat)
+ 		return -ENOMEM;
+ 
+-	ret = rq_qos_add_frozen(&blkiolat->rqos, disk, RQ_QOS_LATENCY,
+-				&blkcg_iolatency_ops);
++	ret = rq_qos_add(&blkiolat->rqos, disk, RQ_QOS_LATENCY,
++			 &blkcg_iolatency_ops);
+ 	if (ret)
+ 		goto err_free;
+ 	ret = blkcg_activate_policy(disk, &blkcg_policy_iolatency);
+diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
+index c1a94c2a9742..8de7dae3273e 100644
+--- a/block/blk-rq-qos.c
++++ b/block/blk-rq-qos.c
+@@ -322,8 +322,8 @@ void rq_qos_exit(struct request_queue *q)
+ 	mutex_unlock(&q->rq_qos_mutex);
+ }
+ 
+-int rq_qos_add_frozen(struct rq_qos *rqos, struct gendisk *disk,
+-		      enum rq_qos_id id, const struct rq_qos_ops *ops)
++int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
++	       const struct rq_qos_ops *ops)
  {
  	struct request_queue *q = disk->queue;
- 	struct throtl_data *td;
+ 
+@@ -343,37 +343,6 @@ int rq_qos_add_frozen(struct rq_qos *rqos, struct gendisk *disk,
+ 	return 0;
+ }
+ 
+-int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
+-		const struct rq_qos_ops *ops)
+-{
+-	struct request_queue *q = disk->queue;
 -	unsigned int memflags;
- 	int ret;
- 
- 	td = kzalloc_node(sizeof(*td), GFP_KERNEL, q->node);
-@@ -1320,22 +1319,16 @@ static int blk_throtl_init(struct gendisk *disk)
- 	INIT_WORK(&td->dispatch_work, blk_throtl_dispatch_work_fn);
- 	throtl_service_queue_init(&td->service_queue);
- 
--	memflags = blk_mq_freeze_queue(disk->queue);
--	blk_mq_quiesce_queue(disk->queue);
 -
--	q->td = td;
-+	WRITE_ONCE(q->td, td);
- 	td->queue = q;
- 
- 	/* activate policy, blk_throtl_activated() will return true */
- 	ret = blkcg_activate_policy(disk, &blkcg_policy_throtl);
- 	if (ret) {
--		q->td = NULL;
-+		WRITE_ONCE(q->td, NULL);
- 		kfree(td);
- 	}
- 
--	blk_mq_unquiesce_queue(disk->queue);
--	blk_mq_unfreeze_queue(disk->queue, memflags);
+-	lockdep_assert_held(&q->rq_qos_mutex);
 -
- 	return ret;
- }
+-	rqos->disk = disk;
+-	rqos->id = id;
+-	rqos->ops = ops;
+-
+-	/*
+-	 * No IO can be in-flight when adding rqos, so freeze queue, which
+-	 * is fine since we only support rq_qos for blk-mq queue.
+-	 */
+-	memflags = blk_mq_freeze_queue(q);
+-
+-	if (rq_qos_id(q, rqos->id))
+-		goto ebusy;
+-	rqos->next = q->rq_qos;
+-	q->rq_qos = rqos;
+-	blk_queue_flag_set(QUEUE_FLAG_QOS_ENABLED, q);
+-
+-	blk_mq_unfreeze_queue(q, memflags);
+-	return 0;
+-ebusy:
+-	blk_mq_unfreeze_queue(q, memflags);
+-	return -EBUSY;
+-}
+-
+ void rq_qos_del(struct rq_qos *rqos)
+ {
+ 	struct request_queue *q = rqos->disk->queue;
+diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
+index 8d9fb10ae526..b538f2c0febc 100644
+--- a/block/blk-rq-qos.h
++++ b/block/blk-rq-qos.h
+@@ -87,8 +87,6 @@ static inline void rq_wait_init(struct rq_wait *rq_wait)
  
-diff --git a/block/blk-throttle.h b/block/blk-throttle.h
-index 9d7a42c039a1..3d177b20f9e1 100644
---- a/block/blk-throttle.h
-+++ b/block/blk-throttle.h
-@@ -162,7 +162,8 @@ static inline bool blk_throtl_activated(struct request_queue *q)
- 	 * blkcg_policy_enabled() guarantees that the policy is activated
- 	 * in the request_queue.
+ int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
+ 		const struct rq_qos_ops *ops);
+-int rq_qos_add_frozen(struct rq_qos *rqos, struct gendisk *disk,
+-		      enum rq_qos_id id, const struct rq_qos_ops *ops);
+ void rq_qos_del(struct rq_qos *rqos);
+ 
+ typedef bool (acquire_inflight_cb_t)(struct rq_wait *rqw, void *private_data);
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index 5e7e481103a1..0f90d9a97ef4 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -930,7 +930,7 @@ int wbt_init(struct gendisk *disk)
+ 	 * Assign rwb and add the stats callback.
  	 */
--	return q->td != NULL && blkcg_policy_enabled(q, &blkcg_policy_throtl);
-+	return READ_ONCE(q->td) &&
-+	       blkcg_policy_enabled(q, &blkcg_policy_throtl);
- }
- 
- static inline bool blk_should_throtl(struct bio *bio)
+ 	mutex_lock(&q->rq_qos_mutex);
+-	ret = rq_qos_add_frozen(&rwb->rqos, disk, RQ_QOS_WBT, &wbt_rqos_ops);
++	ret = rq_qos_add(&rwb->rqos, disk, RQ_QOS_WBT, &wbt_rqos_ops);
+ 	mutex_unlock(&q->rq_qos_mutex);
+ 	if (ret)
+ 		goto err_free;
 -- 
 2.51.0
 
