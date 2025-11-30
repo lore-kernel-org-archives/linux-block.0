@@ -1,226 +1,97 @@
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08B65221290
-	for <linux-block@vger.kernel.org>; Sun, 30 Nov 2025 10:09:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9073C14F70
+	for <linux-block@vger.kernel.org>; Sun, 30 Nov 2025 13:33:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764497357; cv=none; b=An3SG7m6N92hfRLfRpDEIcBmF9K531BNxTKN+snCtEOg/UWkHBLPUFF2GI1MjgeZlJCUwJBdKUUkW3WVLlayfmuRA9xGZGi7S/KjshHCjKKEFrxQAq2P4Zqk272qLMs36L/JECflCpkRXPuRqIDTHpyKiWvOlHb9RW74kbohmbs=
+	t=1764509612; cv=none; b=POfK1Drm1Azu5Ep+cWegV8OnaR77boaKgSSrWM1sIQZPMCrxgjrEMTh66I7kWlg8EM6oftfoJSOSsXj4zgPcDSKUKJmxg3X739ZFkHLh0aAFGcDBMwHKM87ijoQCEqtROE6BpUr6TSb6Lr82/g0KbLstTvvww9XmUiP6p1KZywg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764497357; c=relaxed/simple;
-	bh=Gz+2kWf1+95+w1WSTlnGOVv8ju3VWs0EItnNzi8WPcU=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=feRCriFzpRglV86MGDkfKiCzhzrooRCP87qbA0+ZzlDX9W4fZv5ehzmXdLwoK7MlfylDykSLxnBTlNB2Q66uIa8jIqgbRdQyH4ATcWmdbhN8xwWEcpN9pVSKYWhzKT80p3akoPWfQvyhbZbW5jdSLpuSLJ+iC3uN95m1YcQgNoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-9490672b7aeso180706439f.3
-        for <linux-block@vger.kernel.org>; Sun, 30 Nov 2025 02:09:15 -0800 (PST)
+	s=arc-20240116; t=1764509612; c=relaxed/simple;
+	bh=Zkt4szfcjXQpdS0Kyi9aT8siaek87I1lRU8rr+TdT7Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KHqliqG9/f41jimJ8E2IfIe3MwIiLihPnBJYnslmY9a3/yRY8XJqm4OOyRNDIHyotIeCXzFD1XLCIUb4Ci7AwopaI2VqY65vJP3MOG7evHeZS76RkZAoW9v/LqxPUE+W1vy/GJm8whFKdpRwdEQKN+1WUzc9om+Fi2QRvD8Wyz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=rTjWR71X; arc=none smtp.client-ip=209.85.166.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="rTjWR71X"
+Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-94903ea3766so122306339f.3
+        for <linux-block@vger.kernel.org>; Sun, 30 Nov 2025 05:33:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1764509609; x=1765114409; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GTU1/x7Dfi7RpaKWDbcpvMWRGnF9c2LffZ90taw7x9M=;
+        b=rTjWR71XR2p8j1JgZ8rZXPp6q/ZpiqkhHLaZNEsqsURLaEnTwYrbdQ42R7CbjSB469
+         es2UPupOdf4DL4nW8GZfN3R1qZxUYRSxpotgY+M5r/jA+DTj1X8jfHQRost4bWnTV6Cj
+         60rp6g1in2N+sepK6hig54IpcGOSM/i5XG/2EpQWbnfWTnzatj7iKNfTKHHEEWiefnrt
+         LU4mBVeO9s7zuToHQFzTsx8yM31j+6DcoHERSveo+8TyddK9aYmSyZZzfrdqphVE1JPI
+         T38ydBzNK8WMWtm8B3dHPFzUF6HMLulQpU06Tw35uuiLTmPOXvhfKWEtSbBtcNtAt64d
+         ctfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764497355; x=1765102155;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hSyYDI9Ld7nEOkUcND+wehpRu9HROUmXA7RSdL3KNXM=;
-        b=a/eCHXusSCYtqrtPL1AElra5LNtGo92x9YKtH5vuWfy2YkKpWZIpexv3jmMnO6EDK+
-         4sZ36GGKYBYrBjTLPkpm3im8zCMOM/3K163MR1qxM/hWqi1Nojg+8BaNz8B0Dzlw5LG4
-         TUmHaEdod2okZ2YZfVutO8Dy6dM09SEfJFjStrDOqSmDyXFfa+v3Fm/HbIvvWoWyocAN
-         mnZbiRpAhQVt4mrYRiPEk0TES3UACnON8YN4ZH25pO6CuER1T7iJeC7IBYA9AUZqothe
-         Qn54WdNYV3C9x0dTjD/LLMuMzO42qqsBAelE4EMZaO4+CoynEfP1B2NiZfG2CDL2afQI
-         127g==
-X-Forwarded-Encrypted: i=1; AJvYcCWtWdvoUw3TxIqxX4eHzcxDOdOcN5ORnqliuUAcTmJ5qpkSZZBUM3IoCAg4AxfXVmpKWXiORkTaeoGyMg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9z8QS17Bxlm8p5sXwE5x9EIAYUhqasV0IeDEQBgmDRt7dK4D4
-	4sSev2TDD7vwkCQG6VSXoxjjq6m2kLRq8zaHQ7ol9HCitg0gmllgFJgUkWYTzPio8ewPyhLoTE6
-	BJrTFJ1Rtpz68hzu4NJfGjr9HanaN2GQ5bP9HIN90YRQsjVBwH0Y2AxrnHHY=
-X-Google-Smtp-Source: AGHT+IFuh9Lz+aDpw3mNofCpcJ9e+FS7qnDGlNGtg1mthgwEylImNO+gRVd3Cw7LZIrduQTLFunb3qo+TuvOlJ6tllyNw2bn+aYX
+        d=1e100.net; s=20230601; t=1764509609; x=1765114409;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GTU1/x7Dfi7RpaKWDbcpvMWRGnF9c2LffZ90taw7x9M=;
+        b=aEY6wOsSsT0Frzfrl36FMbjvlEKcij0n9Rzl9iXKxVSjmzUAAngCCQBZ2MRY8XuYqZ
+         fXOqL72Gdp/YEr1CToLxpg0kjTzTeQKcr1KzogjqKRHsZEPHXARi5ILcYcJIGwl+oNmx
+         SmOOjKjWIDKb2F1/tHfxZZCzyj+KUPYgfg5+cEdWUpZWL9ToTB14yi/ipC5To+DPjcxr
+         aGBwLKbBAP0lHhq2C/U2COPEYrD8mzLUao7WRkxlY0Y3ConTtbK+bjpoWKH7GHQgCVNn
+         t4QgHmjjfExu0Nz5ZdWuyulYcag1kLH1ZGk3PSN/58ZA5nXplmfKAtxlp9wN6zWkm9HM
+         eV1A==
+X-Forwarded-Encrypted: i=1; AJvYcCUuyKqVB6aS6n+4SVaVSZDhf3dvW74oNp5UeHmS3Jli3qTh+ipCyJIXqFJJw6Hmi8dZ53uiW4/UwCbmoA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxRY3EM/zmqHQBd3qAMO0yl1a3qtIB+Gxl36tvVfwbLaTQuB1fW
+	cDJBbbA7Mj3LPdI9YO0Zpc8O0aOVs2WMLfHt3GvviBLHBubsqHQS14+eTCSAydzlbo4=
+X-Gm-Gg: ASbGncu7akdBLxaUvpsO1Uu9MoUi/lcPbwV123mvlEo3KEJuXCfxkK6bhPAnkbPPSu7
+	YcnSvUwcek2eKuDn6HL2V6aoieWy9pESJqR4r8pktVOxuazwTaZRglt6Ck7/M0FpE3kQ0wWi0zS
+	Qb2rKdoKjELiNKCgQCSbND13KtTi5Qly+ZkqvZuCoaEoKYerbCorrWpKOi8LV3vgHutdedfiWGl
+	Ip8Qj8eR3QEuyd4N7JEaBKqb9Md2F7HHaS0KmWl4nTdNfuhqrhrdMGJrmjBu+rseLgHtcyfDwqj
+	7tU46rzqw425HpPS8pAlWZm4NtB8+NPq5t53f2ObkD5HrRqzTd/x0/1OHPYYQ8PiLBqSYm8UcFQ
+	qdGkPRZp/mJ7kv+LlAciUSU1owOIqnz3X5PjaUrsUPbQoJikxcXKlEJc3ViU7ZKOBZqUmEsoQN4
+	f74uCAOk/v
+X-Google-Smtp-Source: AGHT+IEvv02cH7Vlkoj6zC4v3f5s15CRrLwA+XHiOAO3o4Gb+7fiYXTJRfgjgxvm7W1M5ld7511cSQ==
+X-Received: by 2002:a05:6638:8106:b0:5b7:c66b:a3f0 with SMTP id 8926c6da1cb9f-5b99976c8f1mr14535060173.18.1764509609421;
+        Sun, 30 Nov 2025 05:33:29 -0800 (PST)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5b9bc30f928sm4723806173.6.2025.11.30.05.33.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 30 Nov 2025 05:33:28 -0800 (PST)
+Message-ID: <13fdf4c3-5a3c-438e-b607-294c8ea032cf@kernel.dk>
+Date: Sun, 30 Nov 2025 06:33:26 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a23:b0:433:4ac7:13bb with SMTP id
- e9e14a558f8ab-435b8c324damr304251825ab.11.1764497354965; Sun, 30 Nov 2025
- 02:09:14 -0800 (PST)
-Date: Sun, 30 Nov 2025 02:09:14 -0800
-In-Reply-To: <20251130024349.2302128-1-yukuai@fnnas.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <692c17ca.a70a0220.d98e3.016c.GAE@google.com>
-Subject: [syzbot ci] Re: blk-mq: fix possible deadlocks
-From: syzbot ci <syzbot+cifc73f799778e73e7@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, bvanassche@acm.org, linux-block@vger.kernel.org, 
-	ming.lei@redhat.com, nilay@linux.ibm.com, tj@kernel.org, yukuai@fnnas.com
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [GIT PULL] md-6.19-20251130
+To: Yu Kuai <yukuai@fnnas.com>, linux-block@vger.kernel.org,
+ linux-raid@vger.kernel.org
+Cc: tarunsahu@google.com
+References: <20251130030653.2302439-1-yukuai@fnnas.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20251130030653.2302439-1-yukuai@fnnas.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-syzbot ci has tested the following series
+On 11/29/25 8:06 PM, Yu Kuai wrote:
+> Hi, Jens
+> 
+> Please consider pulling following changes on your for-6.19/block branch,
+> this pull request contain:
+> 
+> - fix null-ptr-dereference regression for dm-raid0 (Yu Kuai)
+> - fix IO hang for raid5 when array is broken with IO inflight (Yu Kuai)
+> - remove legacy 1s delay to speed up system shutdown (Tarun Sahu)
 
-[v3] blk-mq: fix possible deadlocks
-https://lore.kernel.org/all/20251130024349.2302128-1-yukuai@fnnas.com
-* [PATCH v3 01/10] blk-mq-debugfs: factor out a helper to register debugfs for all rq_qos
-* [PATCH v3 02/10] blk-rq-qos: fix possible debugfs_mutex deadlock
-* [PATCH v3 03/10] blk-mq-debugfs: make blk_mq_debugfs_register_rqos() static
-* [PATCH v3 04/10] blk-mq-debugfs: warn about possible deadlock
-* [PATCH v3 05/10] block/blk-rq-qos: add a new helper rq_qos_add_frozen()
-* [PATCH v3 06/10] blk-wbt: fix incorrect lock order for rq_qos_mutex and freeze queue
-* [PATCH v3 07/10] blk-iocost: fix incorrect lock order for rq_qos_mutex and freeze queue
-* [PATCH v3 08/10] blk-iolatency: fix incorrect lock order for rq_qos_mutex and freeze queue
-* [PATCH v3 09/10] blk-throttle: remove useless queue frozen
-* [PATCH v3 10/10] block/blk-rq-qos: cleanup rq_qos_add()
+Pulled, thanks.
 
-and found the following issue:
-possible deadlock in pcpu_alloc_noprof
+-- 
+Jens Axboe
 
-Full report is available here:
-https://ci.syzbot.org/series/1aec77f0-c53f-4b3b-93fb-b3853983b6bd
-
-***
-
-possible deadlock in pcpu_alloc_noprof
-
-tree:      linux-next
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/next/linux-next
-base:      7d31f578f3230f3b7b33b0930b08f9afd8429817
-arch:      amd64
-compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-config:    https://ci.syzbot.org/builds/70dca9e4-6667-4930-9024-150d656e503e/config
-
-soft_limit_in_bytes is deprecated and will be removed. Please report your usecase to linux-mm@kvack.org if you depend on this functionality.
-======================================================
-WARNING: possible circular locking dependency detected
-syzkaller #0 Not tainted
-------------------------------------------------------
-syz-executor/6047 is trying to acquire lock:
-ffffffff8e04f760 (fs_reclaim){+.+.}-{0:0}, at: prepare_alloc_pages+0x152/0x650
-
-but task is already holding lock:
-ffffffff8e02dde8 (pcpu_alloc_mutex){+.+.}-{4:4}, at: pcpu_alloc_noprof+0x25b/0x1750
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #2 (pcpu_alloc_mutex){+.+.}-{4:4}:
-       __mutex_lock+0x187/0x1350
-       pcpu_alloc_noprof+0x25b/0x1750
-       blk_stat_alloc_callback+0xd5/0x220
-       wbt_init+0xa3/0x500
-       wbt_enable_default+0x25d/0x350
-       blk_register_queue+0x36a/0x3f0
-       __add_disk+0x677/0xd50
-       add_disk_fwnode+0xfc/0x480
-       loop_add+0x7f0/0xad0
-       loop_init+0xd9/0x170
-       do_one_initcall+0x1fb/0x820
-       do_initcall_level+0x104/0x190
-       do_initcalls+0x59/0xa0
-       kernel_init_freeable+0x334/0x4b0
-       kernel_init+0x1d/0x1d0
-       ret_from_fork+0x599/0xb30
-       ret_from_fork_asm+0x1a/0x30
-
--> #1 (&q->q_usage_counter(io)#17){++++}-{0:0}:
-       blk_alloc_queue+0x538/0x620
-       __blk_mq_alloc_disk+0x15c/0x340
-       loop_add+0x411/0xad0
-       loop_init+0xd9/0x170
-       do_one_initcall+0x1fb/0x820
-       do_initcall_level+0x104/0x190
-       do_initcalls+0x59/0xa0
-       kernel_init_freeable+0x334/0x4b0
-       kernel_init+0x1d/0x1d0
-       ret_from_fork+0x599/0xb30
-       ret_from_fork_asm+0x1a/0x30
-
--> #0 (fs_reclaim){+.+.}-{0:0}:
-       __lock_acquire+0x15a6/0x2cf0
-       lock_acquire+0x117/0x340
-       fs_reclaim_acquire+0x72/0x100
-       prepare_alloc_pages+0x152/0x650
-       __alloc_frozen_pages_noprof+0x123/0x370
-       __alloc_pages_noprof+0xa/0x30
-       pcpu_populate_chunk+0x182/0xb30
-       pcpu_alloc_noprof+0xcb6/0x1750
-       xt_percpu_counter_alloc+0x161/0x220
-       translate_table+0x1323/0x2040
-       ip6t_register_table+0x106/0x7d0
-       ip6table_nat_table_init+0x43/0x2e0
-       xt_find_table_lock+0x30c/0x3e0
-       xt_request_find_table_lock+0x26/0x100
-       do_ip6t_get_ctl+0x730/0x1180
-       nf_getsockopt+0x26e/0x290
-       ipv6_getsockopt+0x1ed/0x290
-       do_sock_getsockopt+0x2b4/0x3d0
-       __x64_sys_getsockopt+0x1a5/0x250
-       do_syscall_64+0xfa/0xf80
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-other info that might help us debug this:
-
-Chain exists of:
-  fs_reclaim --> &q->q_usage_counter(io)#17 --> pcpu_alloc_mutex
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(pcpu_alloc_mutex);
-                               lock(&q->q_usage_counter(io)#17);
-                               lock(pcpu_alloc_mutex);
-  lock(fs_reclaim);
-
- *** DEADLOCK ***
-
-1 lock held by syz-executor/6047:
- #0: ffffffff8e02dde8 (pcpu_alloc_mutex){+.+.}-{4:4}, at: pcpu_alloc_noprof+0x25b/0x1750
-
-stack backtrace:
-CPU: 0 UID: 0 PID: 6047 Comm: syz-executor Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl+0x189/0x250
- print_circular_bug+0x2e2/0x300
- check_noncircular+0x12e/0x150
- __lock_acquire+0x15a6/0x2cf0
- lock_acquire+0x117/0x340
- fs_reclaim_acquire+0x72/0x100
- prepare_alloc_pages+0x152/0x650
- __alloc_frozen_pages_noprof+0x123/0x370
- __alloc_pages_noprof+0xa/0x30
- pcpu_populate_chunk+0x182/0xb30
- pcpu_alloc_noprof+0xcb6/0x1750
- xt_percpu_counter_alloc+0x161/0x220
- translate_table+0x1323/0x2040
- ip6t_register_table+0x106/0x7d0
- ip6table_nat_table_init+0x43/0x2e0
- xt_find_table_lock+0x30c/0x3e0
- xt_request_find_table_lock+0x26/0x100
- do_ip6t_get_ctl+0x730/0x1180
- nf_getsockopt+0x26e/0x290
- ipv6_getsockopt+0x1ed/0x290
- do_sock_getsockopt+0x2b4/0x3d0
- __x64_sys_getsockopt+0x1a5/0x250
- do_syscall_64+0xfa/0xf80
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7feba799150a
-Code: ff c3 66 0f 1f 44 00 00 48 c7 c2 a8 ff ff ff f7 d8 64 89 02 b8 ff ff ff ff eb b8 0f 1f 44 00 00 49 89 ca b8 37 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 06 c3 0f 1f 44 00 00 48 c7 c2 a8 ff ff ff f7
-RSP: 002b:00007fff14c6a9e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000037
-RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007feba799150a
-RDX: 0000000000000040 RSI: 0000000000000029 RDI: 0000000000000003
-RBP: 0000000000000029 R08: 00007fff14c6aa0c R09: ffffffffff000000
-R10: 00007feba7bb6368 R11: 0000000000000246 R12: 00007feba7a30907
-R13: 00007feba7bb7e60 R14: 00007feba7bb6368 R15: 00007feba7bb6360
- </TASK>
-
-
-***
-
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
-
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
