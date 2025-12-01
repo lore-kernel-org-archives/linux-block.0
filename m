@@ -1,72 +1,72 @@
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DFCC2877D2
-	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 21:46:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F1912773D9
+	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 21:55:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764625597; cv=none; b=Cl+DJz3mMRxwLvmJ+9hJxoEotBtzYpZ+KYQaaVxaVqZcUjhPlaOSggD4HsoMgGaSxVSecdI4A9Sf4Udg8p366h3p0/ZtHYzj5DLrxkfrz0Td/krzslXSdhEM6XIGX2Hp4ccmr8MP1f67Tc+f2kf2dk99j6QhABqOy887vFX8EXM=
+	t=1764626118; cv=none; b=V891u4njmDRxVjbvQshYcPB1xjOTiuvGhbOLSxZ3MkKUGKTC32ZoQOquFbaD8gC2o3sse3mhABS9H8HGinBMf7mWwJxVj2/MTHVGMxZFVyl5s4iEKtG9IbCRWwIEzbTRoTMZl1OV/mFuvkj8O37+acNWMPRL07jKhDkA4GvsJgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764625597; c=relaxed/simple;
-	bh=ZkhsYoYTTZj2bwIj7+BU0r1fHO1h+7QQM/v84LTz/14=;
+	s=arc-20240116; t=1764626118; c=relaxed/simple;
+	bh=NogvjGdxvUnv4VxpWOypj4wgWsOJCV9HGiSpdtLQ6qY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=J3h1SG7ymveKFm30/V2xgqo2hgHJ9X8gRpzKzxBG+PKzs7wfP7vnZc8Q2AIyCMIjMH6oqNEx6eAU1LhzhXI3lBS3ZylpEJznW927CEEonsQRMExiuxcJKxa6IznWg3jtUZEsdWh0noXM2XxpcbIq2wRucXqowkUq4/YqWAmlnsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=SfEcsdox; arc=none smtp.client-ip=209.85.210.172
+	 To:Cc:Content-Type; b=epOjXmV5uGh2qKFHQ9I4J6DnVKaG9CqIFebMcR2TYs9yd2RefXUUsZ4mFXHuuSlFvjyc0vmDouqzA6VvfyQZhjTINNyEpZ6uz6jd4dtsUyPQH1rDzpZMHGIM7OKFW2HrHx9iWVSpHuxp/ffmSv39FuaZbPnn/XH8MWXQvI4Ceh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Xyugk6M2; arc=none smtp.client-ip=209.85.210.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="SfEcsdox"
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7bb2fa942daso560888b3a.1
-        for <linux-block@vger.kernel.org>; Mon, 01 Dec 2025 13:46:35 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Xyugk6M2"
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7c9011d6039so347070b3a.2
+        for <linux-block@vger.kernel.org>; Mon, 01 Dec 2025 13:55:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1764625595; x=1765230395; darn=vger.kernel.org;
+        d=purestorage.com; s=google2022; t=1764626115; x=1765230915; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=I93G5VdWwmlpA0A+emy+r9LF4uarQGNOGo/MRz4Leo8=;
-        b=SfEcsdoxArFZv7cay5MpGBFwHgfsd/IQYe7QnN/txnUbQO292ppdrciX5i3bVmHpR4
-         p66iwlst/LkrexUpg20osdCtPZvtZOZI0GY8RblpORt6GTYYTTS7Bo+sVNlUpYx8A3jw
-         vu6RF2bsHD2ewXYVF9R3EPvmhLn28BKWxC0FSZ7oKxiBWs0A3ZM1u1Sd0sW7iH7OZ2q3
-         Dy0RZqz5ksti2rBv8cUdF9TBwPCQsBR7yTDepE94As6kDA5BNcx6udLfLPnK5ON78T8E
-         wLi/3cod8W860zvVfdOXeKi2REDyFvOECPyMaITZ85K72emdygfI32GZikZZ8qRuYqG9
-         8ZTw==
+        bh=epMNbb4ZJjNAxXGbG21OthNJNmZvmsqFGbfOtKvTivU=;
+        b=Xyugk6M2tMFCksWcDdY7R92bMphVXEs89aKiUMGaHOqETBwBPSd8LINbOvHmXgnXRn
+         0sNWLN7CnbygfEFaMNObgOSpnC/NfDWOlSvEq4NM0MXbJfAvwfxihYAHpVvyQUHLVKou
+         IVkvxvlOckea4LS82tg9a1DpvPJzTXjEE2KiZc/zIAn1CH7WzZ2CplyAJQSColhVA1K6
+         t86p4xMXxJFqexJNY5YcN5dxErW1bJTTqEUR/O1nS18BAEj+ds0aa3CTrZgj453x1u9G
+         LKEemB0jgQ+7Yjt4azJVZIWIsCqFk2Xvb+1JRDw/zjVvo2ltH0XwGZAPhTKvA9EFuB+D
+         E27Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764625595; x=1765230395;
+        d=1e100.net; s=20230601; t=1764626115; x=1765230915;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=I93G5VdWwmlpA0A+emy+r9LF4uarQGNOGo/MRz4Leo8=;
-        b=iRanpU7K/Fz7RVKDZ3NE6ajQ6TcQc470/xlkgdIk/EBVZkumZsYSyTlAWyS83vgJw6
-         0shSbugg8y89vtucUT8zUHXDKR4V4nhJbEBXo+qli11sX9brVsgq9jE+fGB4bqNqt5WS
-         7olNFgfT12+OhrSXKLqqgrhEiqqeIlMSR6biHN1y8FjFMMsBVT0+r0q+GinA+UD8m6Ao
-         j2Fh6JtVAzJGQj3pCrsHtMTehytqJZQYgiPMCjpXHot/ayZmDvCdErwRwICXryYfcEMn
-         Y88pkGC8ZJDqWxUseOmIEN/U1A2N64gI53SXZTCM2/G3pN4leVbSH1WO61KOU7m96qz4
-         I6pw==
-X-Forwarded-Encrypted: i=1; AJvYcCUKQjT2dIda2JBTebfpzt9S5RFEDqz1t6YCtoBb43SB3FHMDmeV0YMKJEt4carJ+KxMHKqnlzxXkr+1Og==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzhjDc7RobrO69dHNrUfc9l7KZqZSbOxdF2w/wPXSLRyqIN/8Dc
-	FqSVprIeVrc7R+cLs9ly/dy3nPvMVLmsNDQseIRYwtImpBHLEWCPAShpwflVVej6dQJfJIgYJFY
-	faFxojwG+xW6rmFWmUYPVMd7VocQBUfaFc2UdlTIynA==
-X-Gm-Gg: ASbGncskPdaHxMdiSXHXTY/KReG5oO+QJZqNBWHBFWU7Oe+n8Dgp2bGsTJ1RGQ7SqOo
-	X0BwTaH1QRK/eP0D/VzLg6+snCs8pwND7ZatTX0P0YNAb+pVnB2jjbCqf8EUFtr1s2pQH1DzH0Q
-	0TUH60h1qQw8cSMa5sfZQNCMghYAMlX3eSNneZ8U+o+3K1LbVFuMfd+LrmbbUKI+5KahtThLM1v
-	zn9vpF6hsmlpsxc8xEbWgOd3vBzkpocJRnnPVO9coCimr9OW3dq57K7vZQRQ+Cyei+bsYXJ
-X-Google-Smtp-Source: AGHT+IGQFxaCwplKK6WeTRil0GfkdcuZNSqAllmqIKTSMEyZBTya2crcvluN5IyypuQ3/bNpXxrvqnFT3MfYrPkYECQ=
-X-Received: by 2002:a05:7022:f902:20b0:119:e56b:46b7 with SMTP id
- a92af1059eb24-11c9f303bbdmr17585145c88.1.1764625590397; Mon, 01 Dec 2025
- 13:46:30 -0800 (PST)
+        bh=epMNbb4ZJjNAxXGbG21OthNJNmZvmsqFGbfOtKvTivU=;
+        b=tLAwZPw71NUR7mEbFBZ5xfwJ849H0W6NLU5bXMmQKU04ajZyCcc3FLxOzHhKbj4bCw
+         842coDOQPwgiu1GXmPgG083/wIgl1GduizQaWPppYkhup4eNCDOfB1wo83gP3xpz5nW4
+         K5mm/0bIrOntDglLgXLdmQct8iEx+sPnpG5a70zaW/nwdV1ewCE2xhvmbtX+mh/KwrAv
+         Sm/a1sWWSmTdezVxaVnUYiNsY8kneOXJoG8j9YLiZB+BaFzr2CdYj+SFrNpaFOk/Cthp
+         iEMQDsiUsSshIpcfbZYvIji3g1naSr44cwFBuY2PgnXzew3FXWY7WIjWYPu0SWt3oV3P
+         Ft4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVPhNUGrABILBvlTRAWxfzFf7thkqnZ4yn2yYCcIMowo0+c7K3gRzzhFIIq1HcXD67SnFj7dOYVR6DDEQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzdjjBoySpe3VUU/l5qmBx0n6OOVKdbP+uS1KlSNDYEo5mCFXX2
+	HQDgBTE6ERvtcPqb4XdmtS8CIrC0DbuYFxjpiuyQKRdPFzAsAXQYrA41g6OkhHXUuKwliYd5mhS
+	TiBlzMy+czA0NBydNtErQyL8OtLxSFVevoUb3auGKuA==
+X-Gm-Gg: ASbGncsB4Y8JpoKKfkxgJ/q/yDM4V3MWGM9PQYTJLXzdPIFRy0fg+hkIL9IKqGpttPn
+	0IRcBY4BpIS2GnxqV92Y2it2cAlAgZNbxq5fCkVwMrSuYuHejIGU+YFwEMCi8X0SFnbyLfpGa1B
+	imZzb1HKtq9GmhB8XmEZA2ldVbbquedxxkyO8TKH1ZbGy5Uw88Rra/6YCMHVFVuQiCCfnW91r/B
+	GzAC4w2O6RsL9j2U/q5FJO73W+UvO70tQ3HABrGbqAeU1raiMp6f0WY+8cOR3lqFHFYRqU5
+X-Google-Smtp-Source: AGHT+IE2SI04CXAtat8Fo9++vrjY9CSGoAhlmNs+yaXPKgDUB4dcdk7vYRzR5dlWbOUP8KnoRNJZoIjxNbaeEAeSLb4=
+X-Received: by 2002:a05:7022:c8c:b0:11a:5cb2:24a0 with SMTP id
+ a92af1059eb24-11c9d709e67mr18649288c88.1.1764626114566; Mon, 01 Dec 2025
+ 13:55:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251121015851.3672073-1-ming.lei@redhat.com> <20251121015851.3672073-18-ming.lei@redhat.com>
-In-Reply-To: <20251121015851.3672073-18-ming.lei@redhat.com>
+References: <20251121015851.3672073-1-ming.lei@redhat.com> <20251121015851.3672073-19-ming.lei@redhat.com>
+In-Reply-To: <20251121015851.3672073-19-ming.lei@redhat.com>
 From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Mon, 1 Dec 2025 13:46:19 -0800
-X-Gm-Features: AWmQ_bkz_LxbGenWTFRQRtjc8pnlCWzh5ktsBlqYXOQvTCxNC1qr2G3juxsVs5E
-Message-ID: <CADUfDZoDJhJqGpsYdoNUcPKOHeBAA8M+ow5ok4ySnKaU+XNQ3w@mail.gmail.com>
-Subject: Re: [PATCH V4 17/27] ublk: document feature UBLK_F_BATCH_IO
+Date: Mon, 1 Dec 2025 13:55:02 -0800
+X-Gm-Features: AWmQ_bk6ivBl3mWFC3jDlbhfi81i9Bq_aWXjX7GQHtiMKaXBkh0KiSoyIMEWFVM
+Message-ID: <CADUfDZpR-vUvn73ke3bLfb6UMMzbROYd95Fgq4HvsBfP2kpoZg@mail.gmail.com>
+Subject: Re: [PATCH V4 18/27] ublk: implement batch request completion via blk_mq_end_request_batch()
 To: Ming Lei <ming.lei@redhat.com>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
 	Uday Shankar <ushankar@purestorage.com>, Stefani Seibold <stefani@seibold.net>, 
@@ -77,137 +77,161 @@ Content-Transfer-Encoding: quoted-printable
 On Thu, Nov 20, 2025 at 6:00=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrot=
 e:
 >
-> Document feature UBLK_F_BATCH_IO.
+> Reduce overhead when completing multiple requests in batch I/O mode by
+> accumulating them in an io_comp_batch structure and completing them
+> together via blk_mq_end_request_batch(). This minimizes per-request
+> completion overhead and improves performance for high IOPS workloads.
+>
+> The implementation adds an io_comp_batch pointer to struct ublk_io and
+> initializes it in __ublk_fetch(). For batch I/O, the pointer is set to
+> the batch structure in ublk_batch_commit_io(). The __ublk_complete_rq()
+> function uses io->iob to call blk_mq_add_to_batch() for batch mode.
+> After processing all batch I/Os, the completion callback is invoked in
+> ublk_handle_batch_commit_cmd() to complete all accumulated requests
+> efficiently.
+>
+> So far just covers direct completion. For deferred completion(zero copy,
+> auto buffer reg), ublk_io_release() is often delayed in freeing buffer
+> consumer io_uring request's code path, so this patch often doesn't work,
+> also it is hard to pass the per-task 'struct io_comp_batch' for deferred
+> completion.
 >
 > Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > ---
->  Documentation/block/ublk.rst | 60 +++++++++++++++++++++++++++++++++---
->  1 file changed, 56 insertions(+), 4 deletions(-)
+>  drivers/block/ublk_drv.c | 30 ++++++++++++++++++++++--------
+>  1 file changed, 22 insertions(+), 8 deletions(-)
 >
-> diff --git a/Documentation/block/ublk.rst b/Documentation/block/ublk.rst
-> index 8c4030bcabb6..09a5604f8e10 100644
-> --- a/Documentation/block/ublk.rst
-> +++ b/Documentation/block/ublk.rst
-> @@ -260,9 +260,12 @@ The following IO commands are communicated via io_ur=
-ing passthrough command,
->  and each command is only for forwarding the IO and committing the result
->  with specified IO tag in the command data:
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 90cd1863bc83..a5606c7111a4 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -130,6 +130,7 @@ struct ublk_batch_io_data {
+>         struct io_uring_cmd *cmd;
+>         struct ublk_batch_io header;
+>         unsigned int issue_flags;
+> +       struct io_comp_batch *iob;
+>  };
 >
-> -- ``UBLK_IO_FETCH_REQ``
-> +Traditional Per-I/O Commands
-> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>  /*
+> @@ -642,7 +643,12 @@ static blk_status_t ublk_setup_iod_zoned(struct ublk=
+_queue *ubq,
+>  #endif
 >
-> -  Sent from the server IO pthread for fetching future incoming IO reques=
-ts
-> +- ``UBLK_U_IO_FETCH_REQ``
+>  static inline void __ublk_complete_rq(struct request *req, struct ublk_i=
+o *io,
+> -                                     bool need_map);
+> +                                     bool need_map, struct io_comp_batch=
+ *iob);
 > +
-> +  Sent from the server I/O pthread for fetching future incoming I/O requ=
-ests
->    destined to ``/dev/ublkb*``. This command is sent only once from the s=
-erver
->    IO pthread for ublk driver to setup IO forward environment.
->
-> @@ -278,7 +281,7 @@ with specified IO tag in the command data:
->    supported by the driver, daemons must be per-queue instead - i.e. all =
-I/Os
->    associated to a single qid must be handled by the same task.
->
-> -- ``UBLK_IO_COMMIT_AND_FETCH_REQ``
-> +- ``UBLK_U_IO_COMMIT_AND_FETCH_REQ``
->
->    When an IO request is destined to ``/dev/ublkb*``, the driver stores
->    the IO's ``ublksrv_io_desc`` to the specified mapped area; then the
-> @@ -293,7 +296,7 @@ with specified IO tag in the command data:
->    requests with the same IO tag. That is, ``UBLK_IO_COMMIT_AND_FETCH_REQ=
-``
->    is reused for both fetching request and committing back IO result.
->
-> -- ``UBLK_IO_NEED_GET_DATA``
-> +- ``UBLK_U_IO_NEED_GET_DATA``
->
->    With ``UBLK_F_NEED_GET_DATA`` enabled, the WRITE request will be first=
-ly
->    issued to ublk server without data copy. Then, IO backend of ublk serv=
-er
-> @@ -322,6 +325,55 @@ with specified IO tag in the command data:
->    ``UBLK_IO_COMMIT_AND_FETCH_REQ`` to the server, ublkdrv needs to copy
->    the server buffer (pages) read to the IO request pages.
->
-> +Batch I/O Commands (UBLK_F_BATCH_IO)
-> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> +
-> +The ``UBLK_F_BATCH_IO`` feature provides an alternative high-performance
-> +I/O handling model that replaces the traditional per-I/O commands with
-> +per-queue batch commands. This significantly reduces communication overh=
-ead
-> +and enables better load balancing across multiple server tasks.
-> +
-> +Key differences from traditional mode:
-> +
-> +- **Per-queue vs Per-I/O**: Commands operate on queues rather than indiv=
-idual I/Os
-> +- **Batch processing**: Multiple I/Os are handled in single operations
-> +- **Multishot commands**: Use io_uring multishot for reduced submission =
-overhead
-> +- **Flexible task assignment**: Any task can handle any I/O (no per-I/O =
-daemons)
-> +- **Better load balancing**: Tasks can adjust their workload dynamically
-> +
-> +Batch I/O Commands:
-> +
-> +- ``UBLK_U_IO_PREP_IO_CMDS``
-> +
-> +  Prepares multiple I/O commands in batch. The server provides a buffer
-> +  containing multiple I/O descriptors that will be processed together.
-> +  This reduces the number of individual command submissions required.
-> +
-> +- ``UBLK_U_IO_COMMIT_IO_CMDS``
-> +
-> +  Commits results for multiple I/O operations in batch. The server provi=
-des
+> +static void ublk_complete_batch(struct io_comp_batch *iob)
+> +{
+> +       blk_mq_end_request_batch(iob);
+> +}
 
-And prepares the I/O descriptors to accept new requests?
+Don't see the need for this function, just use blk_mq_end_request_batch ins=
+tead?
 
-> +  a buffer containing the results of multiple completed I/Os, allowing
-> +  efficient bulk completion of requests.
-> +
-> +- ``UBLK_U_IO_FETCH_IO_CMDS``
-> +
-> +  **Multishot command** for fetching I/O commands in batch. This is the =
-key
-> +  command that enables high-performance batch processing:
-> +
-> +  * Uses io_uring multishot capability for reduced submission overhead
-> +  * Single command can fetch multiple I/O requests over time
-> +  * Buffer size determines maximum batch size per operation
-> +  * Multiple fetch commands can be submitted for load balancing
-> +  * Only one fetch command is active at any time per queue
+Otherwise,
+Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
 
-Can you clarify what the lifetime of the fetch command is? It looks
-like as long as the buffer selection and posting of the multishot CQE
-succeeds, the same UBLK_U_IO_FETCH_IO_CMDS will continue to be used.
-If additional UBLK_U_IO_FETCH_IO_CMDS commands are issued to the queue
-(e.g. by other threads), they won't be used until the first one fails
-to select a buffer or post the CQE? Seems like this would make it
-difficult to load-balance incoming requests on a single ublk queue
-between multiple threads.
-
-Best,
-Caleb
-
-> +  * Supports dynamic load balancing across multiple server tasks
+>
+>  static dev_t ublk_chr_devt;
+>  static const struct class ublk_chr_class =3D {
+> @@ -912,7 +918,7 @@ static inline void ublk_put_req_ref(struct ublk_io *i=
+o, struct request *req)
+>                 return;
+>
+>         /* ublk_need_map_io() and ublk_need_req_ref() are mutually exclus=
+ive */
+> -       __ublk_complete_rq(req, io, false);
+> +       __ublk_complete_rq(req, io, false, NULL);
+>  }
+>
+>  static inline bool ublk_sub_req_ref(struct ublk_io *io)
+> @@ -1251,7 +1257,7 @@ static inline struct ublk_uring_cmd_pdu *ublk_get_u=
+ring_cmd_pdu(
+>
+>  /* todo: handle partial completion */
+>  static inline void __ublk_complete_rq(struct request *req, struct ublk_i=
+o *io,
+> -                                     bool need_map)
+> +                                     bool need_map, struct io_comp_batch=
+ *iob)
+>  {
+>         unsigned int unmapped_bytes;
+>         blk_status_t res =3D BLK_STS_OK;
+> @@ -1288,8 +1294,11 @@ static inline void __ublk_complete_rq(struct reque=
+st *req, struct ublk_io *io,
+>
+>         if (blk_update_request(req, BLK_STS_OK, io->res))
+>                 blk_mq_requeue_request(req, true);
+> -       else if (likely(!blk_should_fake_timeout(req->q)))
+> +       else if (likely(!blk_should_fake_timeout(req->q))) {
+> +               if (blk_mq_add_to_batch(req, iob, false, ublk_complete_ba=
+tch))
+> +                       return;
+>                 __blk_mq_end_request(req, BLK_STS_OK);
+> +       }
+>
+>         return;
+>  exit:
+> @@ -2249,7 +2258,7 @@ static void __ublk_fail_req(struct ublk_device *ub,=
+ struct ublk_io *io,
+>                 blk_mq_requeue_request(req, false);
+>         else {
+>                 io->res =3D -EIO;
+> -               __ublk_complete_rq(req, io, ublk_dev_need_map_io(ub));
+> +               __ublk_complete_rq(req, io, ublk_dev_need_map_io(ub), NUL=
+L);
+>         }
+>  }
+>
+> @@ -2986,7 +2995,7 @@ static int ublk_ch_uring_cmd_local(struct io_uring_=
+cmd *cmd,
+>                 if (req_op(req) =3D=3D REQ_OP_ZONE_APPEND)
+>                         req->__sector =3D addr;
+>                 if (compl)
+> -                       __ublk_complete_rq(req, io, ublk_dev_need_map_io(=
+ub));
+> +                       __ublk_complete_rq(req, io, ublk_dev_need_map_io(=
+ub), NULL);
+>
+>                 if (ret)
+>                         goto out;
+> @@ -3321,11 +3330,11 @@ static int ublk_batch_commit_io(struct ublk_queue=
+ *ubq,
+>         if (req_op(req) =3D=3D REQ_OP_ZONE_APPEND)
+>                 req->__sector =3D ublk_batch_zone_lba(uc, elem);
+>         if (compl)
+> -               __ublk_complete_rq(req, io, ublk_dev_need_map_io(data->ub=
+));
+> +               __ublk_complete_rq(req, io, ublk_dev_need_map_io(data->ub=
+), data->iob);
+>         return 0;
+>  }
+>
+> -static int ublk_handle_batch_commit_cmd(const struct ublk_batch_io_data =
+*data)
+> +static int ublk_handle_batch_commit_cmd(struct ublk_batch_io_data *data)
+>  {
+>         const struct ublk_batch_io *uc =3D &data->header;
+>         struct io_uring_cmd *cmd =3D data->cmd;
+> @@ -3334,10 +3343,15 @@ static int ublk_handle_batch_commit_cmd(const str=
+uct ublk_batch_io_data *data)
+>                 .total =3D uc->nr_elem * uc->elem_bytes,
+>                 .elem_bytes =3D uc->elem_bytes,
+>         };
+> +       DEFINE_IO_COMP_BATCH(iob);
+>         int ret;
+>
+> +       data->iob =3D &iob;
+>         ret =3D ublk_walk_cmd_buf(&iter, data, ublk_batch_commit_io);
+>
+> +       if (iob.complete)
+> +               iob.complete(&iob);
 > +
-> +  Each task can submit ``UBLK_U_IO_FETCH_IO_CMDS`` with different buffer
-> +  sizes to control how much work it handles. This enables sophisticated
-> +  load balancing strategies in multi-threaded servers.
-> +
-> +Migration: Applications using traditional commands (``UBLK_U_IO_FETCH_RE=
-Q``,
-> +``UBLK_U_IO_COMMIT_AND_FETCH_REQ``) cannot use batch mode simultaneously=
-.
-> +
->  Zero copy
->  ---------
+>         return iter.done =3D=3D 0 ? ret : iter.done;
+>  }
 >
 > --
 > 2.47.0
