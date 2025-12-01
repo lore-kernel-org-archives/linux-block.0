@@ -1,111 +1,143 @@
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 691153002DA
-	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 09:10:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0B90301472
+	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 09:34:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764580240; cv=none; b=A/NokSWm2gBokOIGWRigni4AHT7TZeeJqSfU1fH12VwKSKIxhB4vjQ9Mi0K/9R79JDaZYlb/HFHUtA6QJbDup5+STWh77jcTfiVCm1tRD9SkRZwhoZ8HBbpw7Lo3oUA1QHI6xodxQQShUrBODMmrY4DC++/n03RAA+ohjahuLdc=
+	t=1764581699; cv=none; b=hthIqWhoEdFt8+d4CUXC5LNRq0uJ3TSBNd7+S6NP+kuIHG3gHKOu3uYrilBH6gKFdPWLrxX7g6NCQAZKt/64tkJFkiOrJ45AgR5zK9d/oWspSfDaleGPa33gIQqoWXJUykgls9DvSSBWbbmOBV2Ubl0mwDXTsdDUXaDfRqV4KNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764580240; c=relaxed/simple;
-	bh=vrkYxg4jrv0zJxao8OHdBZZZZF5agpkwIKLKOgwZfGg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y0wWnUGRBk9WD5YnDRvO0GjP4kxVMqG/y0VNmxQAPPNLV/kx16Bzx7PDh0+iJSgvpLtpxdZdOnQu3D7mK2rL6CU9rdto7CJav6r2jl4gF8zbqsPejsnoIfYzGUOs3DkKn6aF0eX1KgFRddSdWs46pudHfnordpH44j4B1sMXHWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=TjtMRk04; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1764581699; c=relaxed/simple;
+	bh=T52AtHPElaPUhvMaiSySl1nDPtYlKqOJljlXi1j8qDY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WWOXiaEW4ergbu+rGI/6WKHM5OW93cXkfFuIg9yIPUpU2bski/c5jIQK7WTBkqfuchnqWY8WIfebGX4HcfUCxmEPKVeEE3vIGqsYX0hWHJAsnBpShfKIOw543Ly6slB1yN6CopzNTU/OQ6KCwvacbiv7IQ4Tu9zT9Q4XmNpQav4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ALEMn52L; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=kgnj2fEK; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="TjtMRk04"
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2984dfae0acso62499815ad.0
-        for <linux-block@vger.kernel.org>; Mon, 01 Dec 2025 01:10:38 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ALEMn52L";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="kgnj2fEK"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764581695;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7YnXOTrBkDWFfUknE1oxAp7HDSV9l35AiIkERLzX4GY=;
+	b=ALEMn52LkVGMdVZw1cOdZkrogcPm3olbB4eJIMoTFdNRSkr6sbY+kAEjRNwA7qSXQjDQAp
+	pvo3u/28/aeiq+oDsgNGMfMzIoM/tI9dQJY9Y3v1GfpX55klag5Yakw/WQJWYWK/rc9SmD
+	9sQQz5yox3TCajC+45HNHAnMQhvxwRE=
+Received: from mail-yw1-f199.google.com (mail-yw1-f199.google.com
+ [209.85.128.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-156-iYWnQ0LZMq2Go_L4mrf11A-1; Mon, 01 Dec 2025 04:34:53 -0500
+X-MC-Unique: iYWnQ0LZMq2Go_L4mrf11A-1
+X-Mimecast-MFC-AGG-ID: iYWnQ0LZMq2Go_L4mrf11A_1764581693
+Received: by mail-yw1-f199.google.com with SMTP id 00721157ae682-7868561eb2dso48181937b3.3
+        for <linux-block@vger.kernel.org>; Mon, 01 Dec 2025 01:34:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1764580238; x=1765185038; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/xH/xl4gTjMEdzE/YKcmGTPtK0Ad9BuJAHEgDFNDw3I=;
-        b=TjtMRk04oO++KMwkdyKvt8wPe2EytlyYOnTW8drsVSroACtxl/6Zsbxy75/nc5xmt3
-         QcUcMxRtaRNBCFQcKKDujsbYjkqy9j8TJ4DOmXfXoHfDBJ48B4jAv75mGEMdJbqp0xq6
-         GrAJTr76JBKa60F9ub4kE2UUos+mRoe7glPWU=
+        d=redhat.com; s=google; t=1764581693; x=1765186493; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7YnXOTrBkDWFfUknE1oxAp7HDSV9l35AiIkERLzX4GY=;
+        b=kgnj2fEKyuJ6SrAFR9hQ+Z0PhkkELMpCJhItlNnTYxDRqDZf1Y/ZnZPXaxsue3IUSm
+         2xCowS2Hnz6IdyCBUd7At94+M80Jeyvj45r3Lit8Bc3G+2N1CYkv01DwDRgR0uPCCXx9
+         JhhJdT9ARMyV18LfrwU/Ep+V3vlv0dTNHGhB/UBhabH9zTpxJrUrC6tzBIwBVvP9Colg
+         P1sqvp6R2PUlyN77eR4a2Y9Ezwt3lrA7d1GmpGqN461SZHOV+4HCnh5h0WVLp5hNWBJX
+         HBOd9H6HFQJGwa+5SHIHNBLl9M4h2j8/2Euea8hYkUBJ/iOmqV004Ny9oVaxn468bRN4
+         1UOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764580238; x=1765185038;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/xH/xl4gTjMEdzE/YKcmGTPtK0Ad9BuJAHEgDFNDw3I=;
-        b=fZJ+vqDHsNaUSbDZzfGTdkk22ZYzwh3ohZcWmVvcZJW+lBgkNNDP9AtI9/TtQUlxxu
-         srOhjT0owWoCG7DFvJqB/yySAi2oTgFMUCAJ09sox5ktYvL9rSfpXrzzZrLJ1Y31FkcC
-         ONSvqoDvZbAOBDynAf+aAFp+ZscSMd8MbqWFZcoICh0XPX6hpR1aXckWj2GmXFQ3yEy7
-         tlc6Er+tnmISXkvohYVU6kYMjCqqW2V3COYQ/dO5hB4p8FDYP2WYy0HF+8ub/KP9rbXu
-         kZMBcEC624cQCX1z6y4Dz30HrQzsqWmUKP4b2VeWdjNWU0G4j9lMoeDAa9KwGXNHF8eC
-         Q3mg==
-X-Forwarded-Encrypted: i=1; AJvYcCXCZwfwutgkHUIyF+r1x26nVYbZFHG+FmXGqb1S8ZiG4ASdnadQlx33aAUlcGeAWMh9Mt/ubEL63LV2Vw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz1Mv2ODaWPXw0uk4y70KzC4TNGNIdpybfHGwSAmQ3R3QE0Njjo
-	HBDIeT53EItfZ+tmfGoL1Tg/scFsf6Ocy3WQ6EB4sK/K/uIS/rum5cHySc3L5ERFtA==
-X-Gm-Gg: ASbGncvcTZIdzzxvpmoutLw6nEu9MHOq44qJL9DId3xGq0z0qG4TgKptE/3EIggBh1Y
-	N2w2gxWEDpRJllYk1Z54TFoDrjauy+fmcQyoqqtlD8yTpOoj4s5aJ9LvmudtdHDt3oHpTtM5D8X
-	t9j/2nkr/w24bSnuo6yVkf+gNZHh/NhEBUVk7zic3GsNU6M+mTMgZQP+yTt6r0NdOiX1j3j+/km
-	HFNH6mw+aJ8yF2c4c0s3hLcB419sKsJ1hL0folPyJanqg1p/iy6hJ8mK4bwgf8bnJwi4js1nRxe
-	Sjmxn9NnYd9XLiXv6cjIi4I6MU9Iw6xdY0r/Dir1EGfGr9xYQuBRPYE1qy0+uoEEil/EnKFqaOU
-	HXSFJpZKIgzCWacGFjx99qHzHsHcuQrG26g+MHGa67edQpXVsi5O+N/imLLNoPd9eCXORh10lZj
-	lfXb4+8bLSK3kzlnjYPga8AQH7mCzw6sa9cY3WKc9Nyp6/dvUtyHs=
-X-Google-Smtp-Source: AGHT+IE0IPVwLtIcqmJPMQYCZMufINocvo6ueSZaKn00EQEiT6g2KuSYP5RewdIVgIypUPwe2Riu3w==
-X-Received: by 2002:a17:903:1108:b0:295:8da5:c634 with SMTP id d9443c01a7336-29baae422b7mr220139295ad.9.1764580237703;
-        Mon, 01 Dec 2025 01:10:37 -0800 (PST)
-Received: from google.com ([2a00:79e0:2031:6:943c:f651:f00f:2459])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29bce41afe1sm115517985ad.1.2025.12.01.01.10.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Dec 2025 01:10:37 -0800 (PST)
-Date: Mon, 1 Dec 2025 18:10:32 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: kernel test robot <lkp@intel.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, Richard Chang <richardycc@google.com>, 
-	oe-kbuild-all@lists.linux.dev, Linux Memory Management List <linux-mm@kvack.org>, 
-	Brian Geffon <bgeffon@google.com>, Minchan Kim <minchan@kernel.org>, linux-kernel@vger.kernel.org, 
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH 1/2] zram: introduce compressed data writeback
-Message-ID: <tykowgjsd2gogsufmlz5vrh4eov4gnwsawrqx65ckf2s24cqwm@utqeq2m3cgw3>
-References: <20251128170442.2988502-2-senozhatsky@chromium.org>
- <202511291628.NZif1jdx-lkp@intel.com>
+        d=1e100.net; s=20230601; t=1764581693; x=1765186493;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=7YnXOTrBkDWFfUknE1oxAp7HDSV9l35AiIkERLzX4GY=;
+        b=aWorQMvh+HtQ60hGUECDEWIEAl495fT3m5ZSt4vegsHtc8fHo0dr3ECXDyQJob2m9P
+         Da0DSXRfx6ufolcIrrdwX4PWGWyZ14VLaWSGgrun4NZsWgEicwg+douUep5XDKGjiQuT
+         wcqsj0dsd7Pwt//ch8CqONSskaSdt0HbdrPOez/UWkcYFN+/nOVieupNmhHdIv/fdAuB
+         mVJaFOJ8Y7oMhV6csd9+zvy251lmewP/qjHubcwvyDaI698wurYzNTH4IRX49M4DP5J6
+         XDpQ5KaLf1yFmhU4sHTF7Xq1awG+DaDiPWjLrV0Wh5SMXMlPh12PusQIMb6xDeCb7oSu
+         GbEw==
+X-Forwarded-Encrypted: i=1; AJvYcCX115asosOTdqba3lK2fhTMnN78sA9iqeuIoTYKKMCF3ASDuDfFL3W2yLfPrMkXFh7+wWNmX4yRQPWlRg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSOTI3dGbnz1sKA/JdPKB5R5C5d5bKEntrxPKIjLc71+kSTAp/
+	3iqv/vFlFR/m61uISU1JRSOWdMQoMlDN64l6qNZj2+qKC/fLuTotg55GBhYbRwTQQce3t9X+kYm
+	XsfpZ1mU9qy/z5twhxMksnD8HhV7AV9LeCrPXUNrXjLMpXStrNZEvV7dR2Cxw8AiERA62pKYeUq
+	Alnvi63SO32D117/z4RWlfCbIWZKd4Rsfgd/GXJk4=
+X-Gm-Gg: ASbGncvnDJFtlQ5Ts7EVsP+FiBVqWPiY2fYGRThPWrbJgSvkS9hb+ZaLsm25RfP9Q7K
+	EO04Il625e1EHfsj/yx4J5rLVjF4O7YKGR2DOGKEZqs3R3TyI5fV6cn6wIuzZZB0rY1X4eCNYOQ
+	R/ljHpSYWPeowpdZ8Btukzd1Z6ja91ndpGHBZA5ehGY1OtKuwJCo4OuueF4RZLKI68
+X-Received: by 2002:a05:690c:4b89:b0:789:6c45:5ee with SMTP id 00721157ae682-78a8b529321mr327732237b3.42.1764581693225;
+        Mon, 01 Dec 2025 01:34:53 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEE+ydvQLXLWR4PLDlpL5sDe/7ms/CBFUiYi8OzSrRwSjG/eFnKOHmSMbzUo+6JiXvQr8GsLl9rt2B5meQ6+yY=
+X-Received: by 2002:a05:690c:4b89:b0:789:6c45:5ee with SMTP id
+ 00721157ae682-78a8b529321mr327732007b3.42.1764581692913; Mon, 01 Dec 2025
+ 01:34:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202511291628.NZif1jdx-lkp@intel.com>
+References: <20251201090442.2707362-1-zhangshida@kylinos.cn> <20251201090442.2707362-3-zhangshida@kylinos.cn>
+In-Reply-To: <20251201090442.2707362-3-zhangshida@kylinos.cn>
+From: Andreas Gruenbacher <agruenba@redhat.com>
+Date: Mon, 1 Dec 2025 10:34:42 +0100
+X-Gm-Features: AWmQ_bkx-ahSOMJme7sYbH0k3cAGQiXM2JSUj318w4dIuYwRxb1qdF2fgZVmzjo
+Message-ID: <CAHc6FU53qroW6nj_ToKrSJoMZG4xrucq=jMJhc2qMr22UAWMCw@mail.gmail.com>
+Subject: Re: [PATCH v4 2/3] block: prohibit calls to bio_chain_endio
+To: zhangshida <starzhangzsd@gmail.com>
+Cc: Johannes.Thumshirn@wdc.com, hch@infradead.org, ming.lei@redhat.com, 
+	hsiangkao@linux.alibaba.com, csander@purestorage.com, colyli@fnnas.com, 
+	linux-block@vger.kernel.org, linux-bcache@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, zhangshida@kylinos.cn, 
+	Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On (25/11/29 17:07), kernel test robot wrote:
-> Hi Sergey,
-> 
-> kernel test robot noticed the following build warnings:
-> 
-> [auto build test WARNING on akpm-mm/mm-everything]
-> [also build test WARNING on next-20251128]
-> [cannot apply to axboe/for-next linus/master v6.18-rc7]
-> [If your patch is applied to the wrong git tree, kindly drop us a note.
-> And when submitting patch, we suggest to use '--base' as documented in
-> https://git-scm.com/docs/git-format-patch#_base_tree_information]
-> 
-> url:    https://github.com/intel-lab-lkp/linux/commits/Sergey-Senozhatsky/zram-introduce-compressed-data-writeback/20251129-010716
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm.git mm-everything
-> patch link:    https://lore.kernel.org/r/20251128170442.2988502-2-senozhatsky%40chromium.org
-> patch subject: [PATCH 1/2] zram: introduce compressed data writeback
-> config: x86_64-randconfig-011-20251129 (https://download.01.org/0day-ci/archive/20251129/202511291628.NZif1jdx-lkp@intel.com/config)
-> compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251129/202511291628.NZif1jdx-lkp@intel.com/reproduce)
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202511291628.NZif1jdx-lkp@intel.com/
-> 
-> All warnings (new ones prefixed by >>):
-> 
-> >> drivers/block/zram/zram_drv.c:2099:12: warning: 'zram_read_from_zspool_raw' defined but not used [-Wunused-function]
->     2099 | static int zram_read_from_zspool_raw(struct zram *zram, struct page *page,
->          |            ^~~~~~~~~~~~~~~~~~~~~~~~~
+On Mon, Dec 1, 2025 at 10:05=E2=80=AFAM zhangshida <starzhangzsd@gmail.com>=
+ wrote:
+> From: Shida Zhang <zhangshida@kylinos.cn>
+>
+> Now that all potential callers of bio_chain_endio have been
+> eliminated, completely prohibit any future calls to this function.
+>
+> Suggested-by: Ming Lei <ming.lei@redhat.com>
+> Suggested-by: Andreas Gruenbacher <agruenba@redhat.com>
+> Suggested-by: Christoph Hellwig <hch@infradead.org>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Shida Zhang <zhangshida@kylinos.cn>
+> ---
+>  block/bio.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+>
+> diff --git a/block/bio.c b/block/bio.c
+> index b3a79285c27..1b5e4577f4c 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -320,9 +320,13 @@ static struct bio *__bio_chain_endio(struct bio *bio=
+)
+>         return parent;
+>  }
+>
+> +/**
+> + * This function should only be used as a flag and must never be called.
+> + * If execution reaches here, it indicates a serious programming error.
+> + */
+>  static void bio_chain_endio(struct bio *bio)
+>  {
+> -       bio_endio(__bio_chain_endio(bio));
+> +       BUG_ON(1);
 
-Fixed in v2.  Thanks.
+Just 'BUG()'.
+
+>  }
+>
+>  /**
+
+> --
+> 2.34.1
+>
+
+Andreas
+
