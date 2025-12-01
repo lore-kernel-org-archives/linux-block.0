@@ -1,387 +1,118 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A106EF9D9
-	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 02:32:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4F721DE2A5
+	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 02:41:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764556346; cv=none; b=H8hvD1kN3t8zovfisXadW3XkTQtYZn4SF4o0S83i3hESf96e5mBy2N7Uiv0VnTPqKSTvhIG2zyYYaUxmMAxnrAm9GDBN6iTHE4IIXo7F94g/XCoXVscBaqBduxv7ZjPtTkNcY2IweM6lPb0ZfejIbekyqQBUDsZ6ATdi3B0vFho=
+	t=1764556907; cv=none; b=L+hiKApbQHtCDiLcs5xedFJfstUIyX/Cd33qY1HkDAN+CGwFlZFPVC4k06qhiWPqkruK9uQAmyGI+PLu2b20xIU1FbrFMAYor5SQ+QEC4Ks6w/elL5RVPGMLT27Ku8FVI8TqDORZ0BcV322bZl3ZvSUpEYRyg0numrxXnyoaOUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764556346; c=relaxed/simple;
-	bh=Qn1/tFfe/nKDcFVWjQu85BaOPphZtSYVLKVIz7/n97E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iCacWg5jdouFlLSD3USYool36m+xhOVgbEezLOBuNtpm11I4c7YNlAlp8GHcEtEbxs76oC3woxt6zNMz6I5DVkHwtyC+X80zDZhix9vTdSdor8oZGjue4URtzm1R6G+Dq0+yAWRqArL7Fy+yw99yxPUXJ8/Dg0gsmbS0aQ3Vspo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T7jLTaZM; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1764556907; c=relaxed/simple;
+	bh=bVTMBZipQSey4Fgvkem7K+oGHQCM1N5D+geGZc1LQG4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uPsXoDvjj3UM8d8NdOaPblVv/ggC/8P1kwu4BmHISj6wgcvpeUi87vzStsrgItJFfELXvEWoc06KeW+aXgHq0OlJ54iPjy/3aV5sv2XaE4Bfx/yWFMDNJYfYSQ0Gby0NRCscpXA5xqzoCqBX/bI1Kb0ypPwxmHYmbgi0XhT0aCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HMU8ccvF; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T7jLTaZM"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764556343;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xsy47gOVXF295PDw6td5A7WFjcIylY5ZmKRFoRC/Kq8=;
-	b=T7jLTaZMySUtiQKMl6tSD3G3/SD4wB9YZDJbceyxHfWtj8d7KxsDhRXv605nrxlIo8jqQq
-	7USlrP2cHnTKUzzcYA/P7cxZYtb1UbjQcvUwWtLgVcppVIhlIHmzL34J74HvbnlV65+ZWb
-	snT7Jy+D5ZvCuudkMutyEJZygOwCggE=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-38-lxj42qQ_O1GNqzmzzGvJ-A-1; Sun,
- 30 Nov 2025 21:32:19 -0500
-X-MC-Unique: lxj42qQ_O1GNqzmzzGvJ-A-1
-X-Mimecast-MFC-AGG-ID: lxj42qQ_O1GNqzmzzGvJ-A_1764556338
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 29A311800350;
-	Mon,  1 Dec 2025 02:32:18 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.20])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CAE241800451;
-	Mon,  1 Dec 2025 02:32:12 +0000 (UTC)
-Date: Mon, 1 Dec 2025 10:32:07 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Uday Shankar <ushankar@purestorage.com>,
-	Stefani Seibold <stefani@seibold.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V4 13/27] ublk: add batch I/O dispatch infrastructure
-Message-ID: <aSz-J4BhqwrkmGgs@fedora>
-References: <20251121015851.3672073-1-ming.lei@redhat.com>
- <20251121015851.3672073-14-ming.lei@redhat.com>
- <CADUfDZrsH_Bhhs_r0YqEU=3i6DcQCWVt-aEmbu1ouzX=e3WqYg@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HMU8ccvF"
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4edf1be4434so24865171cf.1
+        for <linux-block@vger.kernel.org>; Sun, 30 Nov 2025 18:41:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764556904; x=1765161704; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Z4ueRZDGEmZN3pKdDV+VUbfm/GEWq1+GkEBdKVjZOtc=;
+        b=HMU8ccvFVJ+OWkPxTVDXXZ6/nVErhPiyzCUNotBWsByIDtbO/TuA0uGn6ReZxP4REe
+         v9GHH6zsGJFhNIYb/mVB8VRkwIZi6ZVfu4pjyBZMER8ccKdNOtAxHHlIQdfF6odjWErl
+         hWwbr++SWpIOCVcI3tNEhwYqICh8V26iezv8dshZBjwp26C2WXWK1udu1hTwYwbg5fNQ
+         KJJE16qROMWMY7Krr0zgBXe3RX2VKnOlY5mhYFfq4XOh702JA7ZuPawaQx1Gd98yCvNv
+         nF5vuUVPNA7SzGvpKDNbvta2gMfbkVI7e/dSXDHnRL0/4LCUI1Mv7TCccGj1Puu72hMw
+         sYSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764556904; x=1765161704;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Z4ueRZDGEmZN3pKdDV+VUbfm/GEWq1+GkEBdKVjZOtc=;
+        b=pqer2RfZhb2PBdLaI3us3DgAMY9MzfHLFPU5jLp1Rrw47I0qeXYJuSFdlM/I/7mNo1
+         5FqUk1H/T+Qddpw5aBQW+nJby5Xgzl5V84d9CcjcECrz+bz85XFk1yI+0xjRGIMKh/jT
+         txwrWA5PzQdsC+BsVD5hklpmzrB0aQctihlMe1GhmhgAzqFeD4ywv2Y3EAV1waUxmYzS
+         GfVOx0PNK8JpqIcWPfqKH1+mT8aasmXAvXrPQjW5yt2gDf+86iK0OgAexeAVDMQ4XTk/
+         DX9+0UBX8lpuC5+/MoZNHeTN9WvfDsWW1Z1sDZxB9BFHzJ+/P6GHiTUX6JkDvydKDf9Q
+         QMHw==
+X-Forwarded-Encrypted: i=1; AJvYcCXF2eXx3g01Oczej1rOI7JAnuzipz74jhgOYs97dqm+jwufPuWcmUTP9qPWGSx0weq598h0akTb5S7JBg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yykro2gaPrUhgwR6oY2Up3UIcr1wFecucf6KHLUrCCpUspGSyhN
+	PwuGW8FyZDZATcxOSpw0uDHU64qidg/v0clsm5oPV0FMIRfPiJ2XVwoUwS3DVwC1QHKnVW/lme7
+	zrJGKfmqqJOQvKbhF4zSymnU45L8fZkY=
+X-Gm-Gg: ASbGnct5bTXxiYDW3aHrPcgevo4jxdCF8I/07h32ZKEWXL8lLC1MZnrQsQw7ubLARLE
+	ABx+6KQttsySgG6/T8XD858vxZ/fEHaxlKHQe6zh++ILcSXn5Ock6R/nPruyyS4JzM5CD5lf4Pk
+	5TPgknGhissk94VFTcdOsDQzNqrRDKzzpbhD4frb5DUM5VBs8+hN80KszEuSOq4MHoybc8CehX3
+	pBCrf4yUhdfW3QaueJy0Ok4DR0A4gY+49Wu4yJ6hIMUqBa12uW4vYO2FVIrHPveENzfy7Y=
+X-Google-Smtp-Source: AGHT+IEmvBJytrUYv3PRff54NTqLEiIVWOTOdu8c+jgIKKnb+TW+2xLZqLXPCQhWGcR80rf7EC5pZtRoolK6Jl03Lrg=
+X-Received: by 2002:a05:622a:14ce:b0:4ee:ce1:ed8a with SMTP id
+ d75a77b69052e-4efbd91573emr353928791cf.16.1764556903722; Sun, 30 Nov 2025
+ 18:41:43 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADUfDZrsH_Bhhs_r0YqEU=3i6DcQCWVt-aEmbu1ouzX=e3WqYg@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+References: <20251128083219.2332407-1-zhangshida@kylinos.cn>
+ <20251128083219.2332407-13-zhangshida@kylinos.cn> <b33b3587-edb0-4f30-a8ee-baaa2b631ed9@grimberg.me>
+In-Reply-To: <b33b3587-edb0-4f30-a8ee-baaa2b631ed9@grimberg.me>
+From: Stephen Zhang <starzhangzsd@gmail.com>
+Date: Mon, 1 Dec 2025 10:41:06 +0800
+X-Gm-Features: AWmQ_blj_C1mdvu7tNb0hVlGGZGM9DWXbWPpg6J4BwD_02XuZ0ipoM_caXqdy_E
+Message-ID: <CANubcdWAk2Mh5b9stjTh8N84jq+XAgaR3n2-VYRinU9ERtJLUw@mail.gmail.com>
+Subject: Re: [PATCH v2 12/12] nvmet: use bio_chain_and_submit to simplify bio chaining
+To: Sagi Grimberg <sagi@grimberg.me>
+Cc: Johannes.Thumshirn@wdc.com, hch@infradead.org, ming.lei@redhat.com, 
+	linux-block@vger.kernel.org, linux-bcache@vger.kernel.org, 
+	nvdimm@lists.linux.dev, virtualization@lists.linux.dev, 
+	linux-nvme@lists.infradead.org, gfs2@lists.linux.dev, ntfs3@lists.linux.dev, 
+	linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	zhangshida@kylinos.cn, Andreas Gruenbacher <agruenba@redhat.com>, 
+	Gao Xiang <hsiangkao@linux.alibaba.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, Nov 30, 2025 at 11:24:12AM -0800, Caleb Sander Mateos wrote:
-> On Thu, Nov 20, 2025 at 6:00 PM Ming Lei <ming.lei@redhat.com> wrote:
-> >
-> > Add infrastructure for delivering I/O commands to ublk server in batches,
-> > preparing for the upcoming UBLK_U_IO_FETCH_IO_CMDS feature.
-> >
-> > Key components:
-> >
-> > - struct ublk_batch_fcmd: Represents a batch fetch uring_cmd that will
-> >   receive multiple I/O tags in a single operation, using io_uring's
-> >   multishot command for efficient ublk IO delivery.
-> >
-> > - ublk_batch_dispatch(): Batch version of ublk_dispatch_req() that:
-> >   * Pulls multiple request tags from the events FIFO (lock-free reader)
-> >   * Prepares each I/O for delivery (including auto buffer registration)
-> >   * Delivers tags to userspace via single uring_cmd notification
-> >   * Handles partial failures by restoring undelivered tags to FIFO
-> >
-> > The batch approach significantly reduces notification overhead by aggregating
-> > multiple I/O completions into single uring_cmd, while maintaining the same
-> > I/O processing semantics as individual operations.
-> >
-> > Error handling ensures system consistency: if buffer selection or CQE
-> > posting fails, undelivered tags are restored to the FIFO for retry,
-> > meantime IO state has to be restored.
-> >
-> > This runs in task work context, scheduled via io_uring_cmd_complete_in_task()
-> > or called directly from ->uring_cmd(), enabling efficient batch processing
-> > without blocking the I/O submission path.
-> >
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >  drivers/block/ublk_drv.c | 189 +++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 189 insertions(+)
-> >
-> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > index 6ff284243630..cc9c92d97349 100644
-> > --- a/drivers/block/ublk_drv.c
-> > +++ b/drivers/block/ublk_drv.c
-> > @@ -91,6 +91,12 @@
-> >          UBLK_BATCH_F_HAS_BUF_ADDR | \
-> >          UBLK_BATCH_F_AUTO_BUF_REG_FALLBACK)
-> >
-> > +/* ublk batch fetch uring_cmd */
-> > +struct ublk_batch_fcmd {
-> 
-> I would prefer "fetch_cmd" instead of "fcmd" for clarity
-> 
-> > +       struct io_uring_cmd *cmd;
-> > +       unsigned short buf_group;
-> > +};
-> > +
-> >  struct ublk_uring_cmd_pdu {
-> >         /*
-> >          * Store requests in same batch temporarily for queuing them to
-> > @@ -168,6 +174,9 @@ struct ublk_batch_io_data {
-> >   */
-> >  #define UBLK_REFCOUNT_INIT (REFCOUNT_MAX / 2)
-> >
-> > +/* used for UBLK_F_BATCH_IO only */
-> > +#define UBLK_BATCH_IO_UNUSED_TAG       ((unsigned short)-1)
-> > +
-> >  union ublk_io_buf {
-> >         __u64   addr;
-> >         struct ublk_auto_buf_reg auto_reg;
-> > @@ -616,6 +625,32 @@ static wait_queue_head_t ublk_idr_wq;      /* wait until one idr is freed */
-> >  static DEFINE_MUTEX(ublk_ctl_mutex);
-> >
-> >
-> > +static void ublk_batch_deinit_fetch_buf(const struct ublk_batch_io_data *data,
-> > +                                       struct ublk_batch_fcmd *fcmd,
-> > +                                       int res)
-> > +{
-> > +       io_uring_cmd_done(fcmd->cmd, res, data->issue_flags);
-> > +       fcmd->cmd = NULL;
-> > +}
-> > +
-> > +static int ublk_batch_fetch_post_cqe(struct ublk_batch_fcmd *fcmd,
-> > +                                    struct io_br_sel *sel,
-> > +                                    unsigned int issue_flags)
-> > +{
-> > +       if (io_uring_mshot_cmd_post_cqe(fcmd->cmd, sel, issue_flags))
-> > +               return -ENOBUFS;
-> > +       return 0;
-> > +}
-> > +
-> > +static ssize_t ublk_batch_copy_io_tags(struct ublk_batch_fcmd *fcmd,
-> > +                                      void __user *buf, const u16 *tag_buf,
-> > +                                      unsigned int len)
-> > +{
-> > +       if (copy_to_user(buf, tag_buf, len))
-> > +               return -EFAULT;
-> > +       return len;
-> > +}
-> > +
-> >  #define UBLK_MAX_UBLKS UBLK_MINORS
-> >
-> >  /*
-> > @@ -1378,6 +1413,160 @@ static void ublk_dispatch_req(struct ublk_queue *ubq,
-> >         }
-> >  }
-> >
-> > +static bool __ublk_batch_prep_dispatch(struct ublk_queue *ubq,
-> > +                                      const struct ublk_batch_io_data *data,
-> > +                                      unsigned short tag)
-> > +{
-> > +       struct ublk_device *ub = data->ub;
-> > +       struct ublk_io *io = &ubq->ios[tag];
-> > +       struct request *req = blk_mq_tag_to_rq(ub->tag_set.tags[ubq->q_id], tag);
-> > +       enum auto_buf_reg_res res = AUTO_BUF_REG_FALLBACK;
-> > +       struct io_uring_cmd *cmd = data->cmd;
-> > +
-> > +       if (!ublk_start_io(ubq, req, io))
-> 
-> This doesn't look correct for UBLK_F_NEED_GET_DATA. If that's not
-> supported in batch mode, then it should probably be disallowed when
-> creating a batch-mode ublk device. The ublk_need_get_data() check in
-> ublk_batch_commit_io_check() could also be dropped.
+Sagi Grimberg <sagi@grimberg.me> =E4=BA=8E2025=E5=B9=B412=E6=9C=881=E6=97=
+=A5=E5=91=A8=E4=B8=80 07:03=E5=86=99=E9=81=93=EF=BC=9A
+>
+> Acked-by: Sagi Grimberg <sagi@grimberg.me>
 
-OK.
+Hello,
 
-BTW UBLK_F_NEED_GET_DATA isn't necessary any more since user copy.
+I already dropped this patch in v3:
+https://lore.kernel.org/all/20251129090122.2457896-1-zhangshida@kylinos.cn/
+The reason is that the order of operations is critical. In the original cod=
+e::
+----------------
+...
+bio->bi_end_io =3D nvmet_bio_done;
 
-It is only for handling WRITE io command, and ublk server can copy data to
-new buffer by user copy.
+for_each_sg(req->sg, sg, req->sg_cnt, i) {
+...
+          struct bio *prev =3D bio;
+....
+          bio_chain(bio, prev);
+          submit_bio(prev);
+}
+----------------
 
-> 
-> > +               return false;
-> > +
-> > +       if (ublk_support_auto_buf_reg(ubq) && ublk_rq_has_data(req))
-> > +               res = __ublk_do_auto_buf_reg(ubq, req, io, cmd,
-> > +                               data->issue_flags);
-> 
-> __ublk_do_auto_buf_reg() reads io->buf.auto_reg. That seems racy
-> without holding the io spinlock.
+the oldest bio (i.e., prev) retains the real bi_end_io function:
 
-The io lock isn't needed.  Now the io state is guaranteed to be ACTIVE,
-so UBLK_U_IO_COMMIT_IO_CMDS can't commit anything for this io.
+bio -> bio -> ... -> prev
+However, using bio_chain_and_submit(prev, bio) would create the reverse cha=
+in:
 
-> 
-> > +
-> > +       if (res == AUTO_BUF_REG_FAIL)
-> > +               return false;
-> 
-> Could be moved into the if (ublk_support_auto_buf_reg(ubq) &&
-> ublk_rq_has_data(req)) statement since it won't be true otherwise?
+prev -> prev -> ... -> bio
 
-OK.
-
-> 
-> > +
-> > +       ublk_io_lock(io);
-> > +       ublk_prep_auto_buf_reg_io(ubq, req, io, cmd, res);
-> > +       ublk_io_unlock(io);
-> > +
-> > +       return true;
-> > +}
-> > +
-> > +static bool ublk_batch_prep_dispatch(struct ublk_queue *ubq,
-> > +                                    const struct ublk_batch_io_data *data,
-> > +                                    unsigned short *tag_buf,
-> > +                                    unsigned int len)
-> > +{
-> > +       bool has_unused = false;
-> > +       int i;
-> 
-> unsigned?
-> 
-> > +
-> > +       for (i = 0; i < len; i += 1) {
-> 
-> i++?
-> 
-> > +               unsigned short tag = tag_buf[i];
-> > +
-> > +               if (!__ublk_batch_prep_dispatch(ubq, data, tag)) {
-> > +                       tag_buf[i] = UBLK_BATCH_IO_UNUSED_TAG;
-> > +                       has_unused = true;
-> > +               }
-> > +       }
-> > +
-> > +       return has_unused;
-> > +}
-> > +
-> > +/*
-> > + * Filter out UBLK_BATCH_IO_UNUSED_TAG entries from tag_buf.
-> > + * Returns the new length after filtering.
-> > + */
-> > +static unsigned int ublk_filter_unused_tags(unsigned short *tag_buf,
-> > +                                           unsigned int len)
-> > +{
-> > +       unsigned int i, j;
-> > +
-> > +       for (i = 0, j = 0; i < len; i++) {
-> > +               if (tag_buf[i] != UBLK_BATCH_IO_UNUSED_TAG) {
-> > +                       if (i != j)
-> > +                               tag_buf[j] = tag_buf[i];
-> > +                       j++;
-> > +               }
-> > +       }
-> > +
-> > +       return j;
-> > +}
-> > +
-> > +#define MAX_NR_TAG 128
-> > +static int __ublk_batch_dispatch(struct ublk_queue *ubq,
-> > +                                const struct ublk_batch_io_data *data,
-> > +                                struct ublk_batch_fcmd *fcmd)
-> > +{
-> > +       unsigned short tag_buf[MAX_NR_TAG];
-> > +       struct io_br_sel sel;
-> > +       size_t len = 0;
-> > +       bool needs_filter;
-> > +       int ret;
-> > +
-> > +       sel = io_uring_cmd_buffer_select(fcmd->cmd, fcmd->buf_group, &len,
-> > +                                        data->issue_flags);
-> > +       if (sel.val < 0)
-> > +               return sel.val;
-> > +       if (!sel.addr)
-> > +               return -ENOBUFS;
-> > +
-> > +       /* single reader needn't lock and sizeof(kfifo element) is 2 bytes */
-> > +       len = min(len, sizeof(tag_buf)) / 2;
-> 
-> sizeof(unsigned short) instead of 2?
-
-OK
-
-> 
-> > +       len = kfifo_out(&ubq->evts_fifo, tag_buf, len);
-> > +
-> > +       needs_filter = ublk_batch_prep_dispatch(ubq, data, tag_buf, len);
-> > +       /* Filter out unused tags before posting to userspace */
-> > +       if (unlikely(needs_filter)) {
-> > +               int new_len = ublk_filter_unused_tags(tag_buf, len);
-> > +
-> > +               if (!new_len)
-> > +                       return len;
-> 
-> Is the purpose of this return value just to make ublk_batch_dispatch()
-> retry __ublk_batch_dispatch()? Otherwise, it seems like a strange
-> value to return.
-
-If `new_len` becomes zero, it means all these requests are handled already,
-either fail or requeue, so return `len` to tell the caller to move on. I
-can comment this behavior.
-
-> 
-> Also, shouldn't this path release the selected buffer to avoid leaking it?
-
-Good catch, but io_kbuf_recycle() isn't exported, we may have to call
-io_uring_mshot_cmd_post_cqe() by zeroing sel->val.
-
-> 
-> > +               len = new_len;
-> > +       }
-> > +
-> > +       sel.val = ublk_batch_copy_io_tags(fcmd, sel.addr, tag_buf, len * 2);
-> 
-> sizeof(unsigned short)?
-
-OK
-
-> 
-> > +       ret = ublk_batch_fetch_post_cqe(fcmd, &sel, data->issue_flags);
-> > +       if (unlikely(ret < 0)) {
-> > +               int i, res;
-> > +
-> > +               /*
-> > +                * Undo prep state for all IOs since userspace never received them.
-> > +                * This restores IOs to pre-prepared state so they can be cleanly
-> > +                * re-prepared when tags are pulled from FIFO again.
-> > +                */
-> > +               for (i = 0; i < len; i++) {
-> > +                       struct ublk_io *io = &ubq->ios[tag_buf[i]];
-> > +                       int index = -1;
-> > +
-> > +                       ublk_io_lock(io);
-> > +                       if (io->flags & UBLK_IO_FLAG_AUTO_BUF_REG)
-> > +                               index = io->buf.auto_reg.index;
-> 
-> This is missing the io->buf_ctx_handle == io_uring_cmd_ctx_handle(cmd)
-> check from ublk_handle_auto_buf_reg().
-
-As you replied, it isn't needed because it is the same multishot command
-for registering bvec buf.
-
-> 
-> > +                       io->flags &= ~(UBLK_IO_FLAG_OWNED_BY_SRV | UBLK_IO_FLAG_AUTO_BUF_REG);
-> > +                       io->flags |= UBLK_IO_FLAG_ACTIVE;
-> > +                       ublk_io_unlock(io);
-> > +
-> > +                       if (index != -1)
-> > +                               io_buffer_unregister_bvec(data->cmd, index,
-> > +                                               data->issue_flags);
-> > +               }
-> > +
-> > +               res = kfifo_in_spinlocked_noirqsave(&ubq->evts_fifo,
-> > +                       tag_buf, len, &ubq->evts_lock);
-> > +
-> > +               pr_warn("%s: copy tags or post CQE failure, move back "
-> > +                               "tags(%d %zu) ret %d\n", __func__, res, len,
-> > +                               ret);
-> > +       }
-> > +       return ret;
-> > +}
-> > +
-> > +static __maybe_unused int
-> 
-> The return value looks completely unused. Just return void instead?
-
-Yes, looks it is removed in following patch.
-
+where the newest bio would hold the real bi_end_io function, which does not
+match the required behavior in this context.
 
 Thanks,
-Ming
-
+Shida
