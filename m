@@ -1,62 +1,62 @@
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6245B30216C
-	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 09:48:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF14B2F3617
+	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 09:48:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764582499; cv=none; b=RVd6m0+TOhxFq8wgCaPcjLvrXu4aRnDpOueO8ToGXxrEjzuWAYqgbQprdrXZj5TltK3K4x/rVCEgbnkE72u9sRH/VD39Tv6nRlbwgJoA/dns41tjc6LmSNIer0j3i/ubvtnXH2N49TateltA/tUS1cji+264FK38N1S+80Y0ENY=
+	t=1764582501; cv=none; b=EZMNHGcTO5nc08dGULoG6AdHT8/8gPAZswbb+PE+yN1aZNKVbfarnOhGw3uHVm/dj06s4AO5UQNErOkwgQwo+ok+rj2idAU9twONxz9Cc/Ms/R/Kb4C2p6z7mbqchVaKXhXf/9UWGPo1VlXFJtZra09O0rKMXlwNmIAnvQvHqJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764582499; c=relaxed/simple;
-	bh=+u6s6RCpy6sbmxn7iBizLf84Ie3MOO3BbWEG6PneCSE=;
+	s=arc-20240116; t=1764582501; c=relaxed/simple;
+	bh=xlsl7fcFBFTHsBmJdkpI7L599I938927GYF6kB/g+60=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VoX7OpeWunJzNKYhFeOu0NIU5rCbRkTiE9wt25TyLnKrYchVu3k2irvCX50etG82RD+B0KFaooupFB98rqyM1M2QvxazatqFuuP5/PdF1feJBTldZgXzlVFXI0f/dNzjynogMTv0+7pqtZYj6h6Z/OSQ00bjSBpVKSp+lt4OXII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=kFQ87Ki+; arc=none smtp.client-ip=209.85.210.173
+	 MIME-Version; b=tH9oGstPbmEc9pl+nvkOet1KQb6tGk0555RtFLnBoh5OpzHlTio98tdrtIgGidL3HHw41sxgM96vLqGReMCA4PzuVw4lSBsUfLdcxFnMSXwW8CaYnIf5z80NPFACoeB5KFjCSd0iVCyM50AahWe318JZKYn1PpbDV68bz+gwucM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=KCSo5w5p; arc=none smtp.client-ip=209.85.210.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="kFQ87Ki+"
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7bb710d1d1dso6322410b3a.1
-        for <linux-block@vger.kernel.org>; Mon, 01 Dec 2025 01:48:17 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="KCSo5w5p"
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-7b6dd81e2d4so3676285b3a.0
+        for <linux-block@vger.kernel.org>; Mon, 01 Dec 2025 01:48:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1764582496; x=1765187296; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1764582499; x=1765187299; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MFPCMT/DEG4vuNOqo+8qbFXraYHdGAlN+ITtNxeLbtw=;
-        b=kFQ87Ki+taeoI5yC5k3YX+1oGLEEUTmAE9aYdH7+dKkC4FcW8HSJNZd2c5LmYI5uwN
-         VS3bV1Y/1mK20Qn1p+9S+9x8rwYO32BTowy4lX0AmgSllhTMYogoPhDy+xhaKxLunbRN
-         6orgX12vA7zZtd7D0c9747TJlufSZ4aHunWAE=
+        bh=906KZFo6t+2ci7ZTeYqhBL02BUrFYEeLcrZCiOSXlDQ=;
+        b=KCSo5w5p2+5E3ePWRmV71XYVhEewvQuAx/iLkMdWYQNSUz4aNScRPUTkxAWUikgybT
+         Fh9Jftr1BNnWJJctiNkIbJEJMedKjLviwz8Yhuq62nTAmdvevwin3DIYFZgwQdsfZore
+         2nol+eiPeGBUzAUFF5SRgBcj++wXVlqe60YWQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764582496; x=1765187296;
+        d=1e100.net; s=20230601; t=1764582499; x=1765187299;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=MFPCMT/DEG4vuNOqo+8qbFXraYHdGAlN+ITtNxeLbtw=;
-        b=ZgEOgwic+px31okbBO9v5+YK38kdB8hNAiv7PO+CDbke/RIejkvFYJWGzNd3WdKMxb
-         eLZEJoRQkzKsax18eftZjn+6E7xsC7+Dfsza+spLZKiC/0SQlld9gs36yMqE6S27Jf1P
-         Gci79t6hIBdbQ+bKyVJsoNW+Mlugj4GWXKjsV2gwi14c8mJxxnWRyNuEStxT41jKIfFA
-         Vfz19RXNOrApaPfOWQzUA1axRzYXACdws+P+fsrAZS3h/Z5FHK5h5Tis/DIiRwUhwnKQ
-         aenfXSOXkkPEfSEwlaJ1IQs49NGryZ0GJ9CZfTAEt+caIzIeFs2758545dqw8NtS517D
-         tAUg==
-X-Forwarded-Encrypted: i=1; AJvYcCXmF+BLXlUrDy0P2T95ALvnWySSz4R6s7bOxCx/iwV8iYHcygtr4hcyH6QxhePjCg2nVKIQyRWnFwJ+GQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQeb8SApMaIBmf6T5rGaKMs7VvBupMA0lELNrE/EaCMU6jfgs9
-	3V1e80kXXCpkOkF4IrPBQlOkMEY/dXsMTIFuL/9+sYgYLu0s27IQ4RBm8sRf+QBrag==
-X-Gm-Gg: ASbGncsDlGZ3TeAjV6NM0Vw/I+RchivYXzh318gvgS0FMPkWcScMLrbhvQVpqx0yiYi
-	9p1FMIFdQ2Bf4h9uZMgHz73kUaxKz5dRQRO7Y1fUKx/hlDXdTdGUCwrXcNm3J7kA5RA8dXERgum
-	EXjdhHide1uvgndFyp/J7h+fg2U083QCQVD6f1C0h4wYErOnRGuqvQeUC0ddQQrS9EDdbbg/lo9
-	Pk9h1pA5sH+9zEwwVCXl31SxEnO4dg/H+uZnXfDhucKQR7VfKpeQl15IRQCqA+BjYh6ZsJkUrk5
-	RKwhXSEANnA6VZKGwG2tLsQfag74pZjWonb6T+yLjw7jNVehmqPZ7odX40XSW8/ZAGRFK2coccj
-	ATBDZq9bj4j5RuXVYe6aSZVasj+ttk8y38iH6XzvKM4GKLQSfHVHvoFo9sgoVAxudSA9qM3V8VM
-	1586ZhM5PyGvEOzsbKSgG6yAEzVI3/dQLJ39wQq449EjJ8QaBQP69hjfugKFfy0vH/NEtuhd0/e
-	A==
-X-Google-Smtp-Source: AGHT+IFlrnHAUO0MwvM1aa8kkuCDrVgQUWK4lsCQPDK031ojL9Sillo7MDoVjBI+gYL8H8kP47VqCA==
-X-Received: by 2002:a05:6a00:4b4d:b0:7a2:7a93:f8c9 with SMTP id d2e1a72fcca58-7ca89a6c1d3mr23814778b3a.27.1764582496654;
-        Mon, 01 Dec 2025 01:48:16 -0800 (PST)
+        bh=906KZFo6t+2ci7ZTeYqhBL02BUrFYEeLcrZCiOSXlDQ=;
+        b=IkrMqSr0WuIvsGh8nAqCbYJIAeRl9MXJ0ebxG/kYYsUPCWRkNDtaPKF7TbuUDpn2Nf
+         b3gD6qV5O36POeB+aCI+z2T2SeEkecRjWmk7OtO7BUw5wPteSZVQcuAIgiI0BnsbJZe+
+         kBSB6k+Cj7tvu+bKLwVWRmSV5CLqQaH898Y+j6BiSjWGxdBBaBiRWIIIVk4TzOYGmzwv
+         L276E7XO0tJT0OfMkFyZSgfOeZHS3PMm7RMGrnjcNM4aBuWcAm1Rx4VzxLxuXI1UfLY5
+         RzboMK3s142aRXwmG/uehRIq2C+T4+Rr3LBxZ16UFyYp7P331CDzgZbY3wIxH3bHEPk2
+         bu3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV3I6JkAlNFT0CD1MT14W2MfYbVmqs4/7uuVkIV6PnzMc+BnK+JPU4FIFjrrYbUc72F8sCSYOkxceZkhw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwEQy7VejB+MjAvbVqLuw78zTQ5a9EAqxJIv2wUhLSvwsebZ/42
+	sfP7ZTNGD6XxBDxHmzkjZrFJw9xCBAAhtKIG+aX0jMZHiDUKUEVFOKtZaX6OjPD7kQ==
+X-Gm-Gg: ASbGncsRAzaOf1Shqf0ag0Th3giVCjcZAOui3O2RkybBNS8minA4KweKA3fC3CwV+Ax
+	WFlAhwhn9uQ2mIR6YWXIDm/PFp9aBmWQSBN79HW8klDL8EumYA5hlxsEn1d2x90ZaiXCJm0gyhg
+	mB/xvxJhE8IGm3uw35GJyuFhuqbqfPDh5YqW2b1JxzYRU6bqzxotilyAlb7QMPdWdLRSKy4YsUn
+	CGIdh+2nMkZqrl2UtkMf4W5ldGOc5IvE8fkE28pWdhSh5CfR4/MBLTVxxWfxxkufTmAMN5KE8La
+	h+4UYZJxOQ7JpwzremVnsZpT6tgBqykTmQ+eO7dwJC19EzhahmL2zL2EeizpxcnwzmAkrNhCAr/
+	9dMd9zPJi0Jx6YmOdgFB+qTIzCKvP3awIXfBeunX2+7885OxY30QpN3sH/LMivXvBFmSAsDggRs
+	79TS121OrflvBD1RPL4cAY/MW7wstcMDnKT7irRSxvKvEF8yWuievumWTrQ9AAwdY4WD/W9o+dP
+	w==
+X-Google-Smtp-Source: AGHT+IG5hlJsokfKmtpNDiN4BN25b26b4ht4eT8qU8v1pYMGVVntb+93khKGuBzf5xFszcfk+RGLmg==
+X-Received: by 2002:a05:6a00:9508:b0:7aa:9ca5:da9c with SMTP id d2e1a72fcca58-7c58e50cc8dmr37751171b3a.22.1764582499116;
+        Mon, 01 Dec 2025 01:48:19 -0800 (PST)
 Received: from tigerii.tok.corp.google.com ([2a00:79e0:2031:6:943c:f651:f00f:2459])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7d15e7db577sm12882074b3a.31.2025.12.01.01.48.14
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7d15e7db577sm12882074b3a.31.2025.12.01.01.48.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Dec 2025 01:48:16 -0800 (PST)
+        Mon, 01 Dec 2025 01:48:18 -0800 (PST)
 From: Sergey Senozhatsky <senozhatsky@chromium.org>
 To: Andrew Morton <akpm@linux-foundation.org>,
 	Richard Chang <richardycc@google.com>,
@@ -67,9 +67,9 @@ Cc: Brian Geffon <bgeffon@google.com>,
 	linux-mm@kvack.org,
 	linux-block@vger.kernel.org,
 	Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: [PATCHv2 4/7] zram: move bd_stat to writeback section
-Date: Mon,  1 Dec 2025 18:47:51 +0900
-Message-ID: <20251201094754.4149975-5-senozhatsky@chromium.org>
+Subject: [PATCHv2 5/7] zram: rename zram_free_page()
+Date: Mon,  1 Dec 2025 18:47:52 +0900
+Message-ID: <20251201094754.4149975-6-senozhatsky@chromium.org>
 X-Mailer: git-send-email 2.52.0.487.g5c8c507ade-goog
 In-Reply-To: <20251201094754.4149975-1-senozhatsky@chromium.org>
 References: <20251201094754.4149975-1-senozhatsky@chromium.org>
@@ -81,109 +81,109 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Move bd_stat function and attribute declaration to
-existing CONFIG_WRITEBACK ifdef-sections.
+We don't free page in zram_free_page(), not all slots even
+have any memory associated with them (e.g. ZRAM_SAME).  We
+free the slot (or reset it), rename the function accordingly.
 
 Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
 ---
- drivers/block/zram/zram_drv.c | 48 +++++++++++++++--------------------
- 1 file changed, 21 insertions(+), 27 deletions(-)
+ drivers/block/zram/zram_drv.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 3cc03c3f7389..1a0f550219b1 100644
+index 1a0f550219b1..615756d5d05d 100644
 --- a/drivers/block/zram/zram_drv.c
 +++ b/drivers/block/zram/zram_drv.c
-@@ -539,6 +539,24 @@ struct zram_rb_req {
- 	u32 index;
- };
+@@ -56,7 +56,7 @@ static size_t huge_class_size;
  
-+#define FOUR_K(x) ((x) * (1 << (PAGE_SHIFT - 12)))
-+static ssize_t bd_stat_show(struct device *dev, struct device_attribute *attr,
-+			    char *buf)
-+{
-+	struct zram *zram = dev_to_zram(dev);
-+	ssize_t ret;
-+
-+	down_read(&zram->init_lock);
-+	ret = sysfs_emit(buf,
-+			 "%8llu %8llu %8llu\n",
-+			 FOUR_K((u64)atomic64_read(&zram->stats.bd_count)),
-+			 FOUR_K((u64)atomic64_read(&zram->stats.bd_reads)),
-+			 FOUR_K((u64)atomic64_read(&zram->stats.bd_writes)));
-+	up_read(&zram->init_lock);
-+
-+	return ret;
-+}
-+
- static ssize_t writeback_compressed_store(struct device *dev,
- 					  struct device_attribute *attr,
- 					  const char *buf, size_t len)
-@@ -1976,28 +1994,8 @@ static ssize_t mm_stat_show(struct device *dev,
- 	return ret;
+ static const struct block_device_operations zram_devops;
+ 
+-static void zram_free_page(struct zram *zram, size_t index);
++static void zram_slot_free(struct zram *zram, u32 index);
+ #define slot_dep_map(zram, index) (&(zram)->table[(index)].dep_map)
+ 
+ static void zram_slot_lock_init(struct zram *zram, u32 index)
+@@ -984,7 +984,7 @@ static int zram_writeback_complete(struct zram *zram, struct zram_wb_req *req)
+ 		huge = zram_test_flag(zram, index, ZRAM_HUGE);
+ 	}
+ 
+-	zram_free_page(zram, index);
++	zram_slot_free(zram, index);
+ 	zram_set_flag(zram, index, ZRAM_WB);
+ 	zram_set_handle(zram, index, req->blk_idx);
+ 
+@@ -2025,7 +2025,7 @@ static void zram_meta_free(struct zram *zram, u64 disksize)
+ 
+ 	/* Free all pages that are still in this zram device */
+ 	for (index = 0; index < num_pages; index++)
+-		zram_free_page(zram, index);
++		zram_slot_free(zram, index);
+ 
+ 	zs_destroy_pool(zram->mem_pool);
+ 	vfree(zram->table);
+@@ -2057,7 +2057,7 @@ static bool zram_meta_alloc(struct zram *zram, u64 disksize)
+ 	return true;
  }
  
--#ifdef CONFIG_ZRAM_WRITEBACK
--#define FOUR_K(x) ((x) * (1 << (PAGE_SHIFT - 12)))
--static ssize_t bd_stat_show(struct device *dev,
--		struct device_attribute *attr, char *buf)
--{
--	struct zram *zram = dev_to_zram(dev);
--	ssize_t ret;
--
--	down_read(&zram->init_lock);
--	ret = sysfs_emit(buf,
--			"%8llu %8llu %8llu\n",
--			FOUR_K((u64)atomic64_read(&zram->stats.bd_count)),
--			FOUR_K((u64)atomic64_read(&zram->stats.bd_reads)),
--			FOUR_K((u64)atomic64_read(&zram->stats.bd_writes)));
--	up_read(&zram->init_lock);
--
--	return ret;
--}
--#endif
--
- static ssize_t debug_stat_show(struct device *dev,
--		struct device_attribute *attr, char *buf)
-+			       struct device_attribute *attr, char *buf)
+-static void zram_free_page(struct zram *zram, size_t index)
++static void zram_slot_free(struct zram *zram, u32 index)
  {
- 	int version = 1;
- 	struct zram *zram = dev_to_zram(dev);
-@@ -2015,9 +2013,6 @@ static ssize_t debug_stat_show(struct device *dev,
+ 	unsigned long handle;
  
- static DEVICE_ATTR_RO(io_stat);
- static DEVICE_ATTR_RO(mm_stat);
--#ifdef CONFIG_ZRAM_WRITEBACK
--static DEVICE_ATTR_RO(bd_stat);
--#endif
- static DEVICE_ATTR_RO(debug_stat);
+@@ -2256,7 +2256,7 @@ static int write_same_filled_page(struct zram *zram, unsigned long fill,
+ 				  u32 index)
+ {
+ 	zram_slot_lock(zram, index);
+-	zram_free_page(zram, index);
++	zram_slot_free(zram, index);
+ 	zram_set_flag(zram, index, ZRAM_SAME);
+ 	zram_set_handle(zram, index, fill);
+ 	zram_slot_unlock(zram, index);
+@@ -2294,7 +2294,7 @@ static int write_incompressible_page(struct zram *zram, struct page *page,
+ 	kunmap_local(src);
  
- static void zram_meta_free(struct zram *zram, u64 disksize)
-@@ -3079,6 +3074,7 @@ static DEVICE_ATTR_WO(mem_used_max);
- static DEVICE_ATTR_WO(idle);
- static DEVICE_ATTR_RW(comp_algorithm);
- #ifdef CONFIG_ZRAM_WRITEBACK
-+static DEVICE_ATTR_RO(bd_stat);
- static DEVICE_ATTR_RW(backing_dev);
- static DEVICE_ATTR_WO(writeback);
- static DEVICE_ATTR_RW(writeback_limit);
-@@ -3102,6 +3098,7 @@ static struct attribute *zram_disk_attrs[] = {
- 	&dev_attr_idle.attr,
- 	&dev_attr_comp_algorithm.attr,
- #ifdef CONFIG_ZRAM_WRITEBACK
-+	&dev_attr_bd_stat.attr,
- 	&dev_attr_backing_dev.attr,
- 	&dev_attr_writeback.attr,
- 	&dev_attr_writeback_limit.attr,
-@@ -3111,9 +3108,6 @@ static struct attribute *zram_disk_attrs[] = {
- #endif
- 	&dev_attr_io_stat.attr,
- 	&dev_attr_mm_stat.attr,
--#ifdef CONFIG_ZRAM_WRITEBACK
--	&dev_attr_bd_stat.attr,
--#endif
- 	&dev_attr_debug_stat.attr,
- #ifdef CONFIG_ZRAM_MULTI_COMP
- 	&dev_attr_recomp_algorithm.attr,
+ 	zram_slot_lock(zram, index);
+-	zram_free_page(zram, index);
++	zram_slot_free(zram, index);
+ 	zram_set_flag(zram, index, ZRAM_HUGE);
+ 	zram_set_handle(zram, index, handle);
+ 	zram_set_obj_size(zram, index, PAGE_SIZE);
+@@ -2359,7 +2359,7 @@ static int zram_write_page(struct zram *zram, struct page *page, u32 index)
+ 	zcomp_stream_put(zstrm);
+ 
+ 	zram_slot_lock(zram, index);
+-	zram_free_page(zram, index);
++	zram_slot_free(zram, index);
+ 	zram_set_handle(zram, index, handle);
+ 	zram_set_obj_size(zram, index, comp_len);
+ 	zram_slot_unlock(zram, index);
+@@ -2581,7 +2581,7 @@ static int recompress_slot(struct zram *zram, u32 index, struct page *page,
+ 	zs_obj_write(zram->mem_pool, handle_new, zstrm->buffer, comp_len_new);
+ 	zcomp_stream_put(zstrm);
+ 
+-	zram_free_page(zram, index);
++	zram_slot_free(zram, index);
+ 	zram_set_handle(zram, index, handle_new);
+ 	zram_set_obj_size(zram, index, comp_len_new);
+ 	zram_set_priority(zram, index, prio);
+@@ -2784,7 +2784,7 @@ static void zram_bio_discard(struct zram *zram, struct bio *bio)
+ 
+ 	while (n >= PAGE_SIZE) {
+ 		zram_slot_lock(zram, index);
+-		zram_free_page(zram, index);
++		zram_slot_free(zram, index);
+ 		zram_slot_unlock(zram, index);
+ 		atomic64_inc(&zram->stats.notify_free);
+ 		index++;
+@@ -2892,7 +2892,7 @@ static void zram_slot_free_notify(struct block_device *bdev,
+ 		return;
+ 	}
+ 
+-	zram_free_page(zram, index);
++	zram_slot_free(zram, index);
+ 	zram_slot_unlock(zram, index);
+ }
+ 
 -- 
 2.52.0.487.g5c8c507ade-goog
 
