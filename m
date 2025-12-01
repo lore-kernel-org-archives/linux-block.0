@@ -1,107 +1,142 @@
-Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f226.google.com (mail-pf1-f226.google.com [209.85.210.226])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B72AE27E7EC
-	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 21:41:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F9B12773EE
+	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 21:41:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764625276; cv=none; b=Mfn7ySgimqm0p7CymYVeK11iGdprxKxfBSc/v40ZFKVrjfb3sL6v8ESZTtJ7xu2bCIfxto3Uph6BjfYHR9PhWKAkYx7+InXFK6nsMDmLj6KcK+QkK1P7kz0pVnB6gHE5Pbsn5AqPNHoyxd0gC+idOnFVs88QXw0eXKiVktU/CKU=
+	t=1764625312; cv=none; b=pFGJLnPfzRxTqN7x21CiQ8GUgTlAUPYCCS9miLQTEWBoujKvB2JKOMtWkMLNz2CiNDjIhnHXMzNkfLTkh5R7uhbj+3PcpfLdZw8q+BNwQ6YU56Yu63T/UqXzKNqOw1JeLOX3QZO40eksRBPsLamj+P7VZEiwSuxULHU/FpyUCPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764625276; c=relaxed/simple;
-	bh=j1NU4+NGiQ7RutjyajLr9mG7Ukgl0BNXMrZuBj/dANI=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=IRl+kYIsEQRek8CSGAVEVJLlWmOJ8oeiUMyEXoYC8aXrYRDEc75JAmAayhRUmePBjPoL8e56lbhxLkKeI7wqBwBYagG88GtHM3ARva9t7VjcafPJz/eMvjWWIhMINgtvFk9AXMdUkbk1p1D6x8hgrFcW3pUInAinmBR+cDCRLlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=m/c+rAnX; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+	s=arc-20240116; t=1764625312; c=relaxed/simple;
+	bh=yFQfCz9Rtps4/E7qo/hMIjax8jZd30ye8qUXJyXi/Co=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EZinhVfh15js8sPAX4pJzmQCMJD3v/ANzNT4kz/NloXdY9oR2orFEYcnUvBZnYHMigM9G3hm7lPZYzfj3i0c0RanCgN5nAaidMLI1Usy/YXhGMX2WPH6FC9PvCtdN3DVkDoXQS2yQ0urO0fD3QWNr3kAT6TWF2aJCAjwoIJ+Cg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=gl92UDIj; arc=none smtp.client-ip=209.85.210.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="m/c+rAnX"
-Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
-	by m0089730.ppops.net (8.18.1.11/8.18.1.11) with ESMTP id 5B1LcceM2417578
-	for <linux-block@vger.kernel.org>; Mon, 1 Dec 2025 13:41:13 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=s2048-2025-q2; bh=NkTsw9i8Jm1BHcUsDq
-	jFFna8TOhgouYji46exI5azp8=; b=m/c+rAnXt9SEu4uIVi+Qu2JaGL8ZHEpsfM
-	CzzuVwcy8GBKlLsnM5hd23BPx/KkZfVQsAXJ/be9CYigYO6wMQO5BJRWGx6DKLhc
-	IxrU+lMqcjarUGtFRNS5WCWIc2VvvvPqFQASCu08kJwTVL5rO1lIzl6APB0VSa6y
-	wYVGy2SrbXvHEIIJ/r9ZiNQkH4IHqkwiK3ebOKMatIWJ0fk3jQ8GMUOKGax8jRkx
-	F6UPz3A3g1ry+a4Mct2WMFg1swvfKOGPr9CV325ZzqrtTNYCdBUlPi/uV4mKhRiC
-	cY1UIGQ1O4DV58HQN2mvbDdSDc/hOCBK5GgfeLR4e8V8L5Vwsscw==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by m0089730.ppops.net (PPS) with ESMTPS id 4ask4480p4-6
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Mon, 01 Dec 2025 13:41:13 -0800 (PST)
-Received: from twshared31947.34.frc3.facebook.com (2620:10d:c085:208::7cb7) by
- mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.29; Mon, 1 Dec 2025 21:41:11 +0000
-Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
-	id A947E45AA89F; Mon,  1 Dec 2025 13:40:56 -0800 (PST)
-From: Keith Busch <kbusch@meta.com>
-To: <dm-devel@lists.linux.dev>, <snitzer@kernel.org>, <hch@lst.de>,
-        <ebiggers@kernel.org>
-CC: <linux-block@vger.kernel.org>, <axboe@kernel.dk>,
-        Keith Busch
-	<kbusch@kernel.org>
-Subject: [PATCHv3 0/2] dm-crypt: support relaxed memory alignment
-Date: Mon, 1 Dec 2025 13:40:50 -0800
-Message-ID: <20251201214052.1531952-1-kbusch@meta.com>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="gl92UDIj"
+Received: by mail-pf1-f226.google.com with SMTP id d2e1a72fcca58-7a9fb70f7a9so341959b3a.1
+        for <linux-block@vger.kernel.org>; Mon, 01 Dec 2025 13:41:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1764625307; x=1765230107; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=EnODA/nSVnwUuGroTkDbfXfMnw+yrill5Xwwc4at+HI=;
+        b=gl92UDIjal4Vt6SyDRNGlwgaTBIDP5lpxh58zM93h2lM/DsEHWGCX0VNztT1CDK+xg
+         Nnv/SSRoF5QMzeaOqQ7kr3Uwjjaoml4lt8dch5U9FlQhrzpFB6eUZCWlkJqL/jcyNIJb
+         DhW1xiRR4RwzXC+AY8lXo9eoPgzKPMhZVS02KxqA94I6Om8eXBWng8YRQ6MrCr0MdljN
+         6N6VRgeSNpbIj+0geRTgA7kp6pqtqxd0rOakEnpdp486HmEzlniB/kNACX8gU7rSswm5
+         JfreL8TG9aCYwrI4U899eaCGRO2kfSwiiGEPQaTEHwwASjDRTolLUaudBxXSF28zOQe8
+         FPkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764625307; x=1765230107;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EnODA/nSVnwUuGroTkDbfXfMnw+yrill5Xwwc4at+HI=;
+        b=grcnTJbLyPdNppUzXvbB+mHqA7k436f5QQGpSZU4Gv/4r4sH4zdORn/vp+FsswxWCT
+         /l08Hl4NfWP3sG8Ky6+I14hwJ1WVVfcd/oGZHOQcQWp0g5xf1C3pytmrfUjIqYqXej6b
+         cLJBNjH4JiWEj4TsrmM+bYPyUxtfXYb7v4plAFTw5d6RK0S1W1cLdzFOmhFGvWpOgF2+
+         Fp7czoyUrVQx9ylwW+iDOqwd+FL4i4F8Xb1YxLHPkHjFCmOzMkbePI864yIZvbY3xTxT
+         aXr1y8K7kZhr10XfDb91IEGkqNrCTVYqh4Zx1vej6i7OH7MN6/8u8C7+tjc3YaNqejD/
+         PC5A==
+X-Forwarded-Encrypted: i=1; AJvYcCUu0WSYA38/ivClN8W03DAwgqyqZgqrmOuEVmz8KcpWHokxkw05WbUvQrIQS4r1Zfbzws9sSrSs+ARORQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVFnleyWJSEDpLP0Bsw/ytUD/hrhBgZF60/1KXRYK2eKOehm1p
+	fOaxMwFMm+xU2fD1gJgEjwcYO9DPn/H3xhRaZQ1wbF+O6NuR7Za+FxAAj4rUVQw5jgFlTPId/9V
+	kQE+zeGXoYAgF4MkiqYB/GGIc8OsTd4oDmEJPxUb0cVqB4YOg7S0z
+X-Gm-Gg: ASbGncuf0a6Q4RpGp6weNKw/jM7xALw7cW7wlTOkdR4A4rznU9dtuV1T50Y5pSzTltu
+	jHR+6ez/Za+4xlIFD3zA9MJ1x3El5tvMpkDV/r3WvqNvTj7UUK7FYYS7SztzeMfXsTHOz/BBCWC
+	9fqyWlqd13x7RnUopjMjbIh58mJ3yRBDkXxZh95gAHbGytK8CP/BW1xZrTAZn+wrE+mA9NkYgMt
+	uJBiV7gw5PHeWzhtVgnvI3ovEhDA5BzV7jsNz9YN8+KUjZWlB+K0UoRjiPATQ5wL5RbiwpSJ08K
+	poN/tD0bfgN8TSbipyvarG2qzBdardwGFqi4UKonQ6tSlCDQ+KyB/HFl3Gp8CN+UKGkwPZ8SYsR
+	V9PzLERpuvJi53xFsDtz6+ysNgy0=
+X-Google-Smtp-Source: AGHT+IGhdoJ0rWEut5PwNocj6uSZ3kC1AEB2+wuql1IwB0NPDS4GhlNgxykt52XD7wxG6IL3WwdxNqf/xGHL
+X-Received: by 2002:a05:7022:4a6:b0:11a:344f:7a74 with SMTP id a92af1059eb24-11c9d8668f8mr21469721c88.3.1764625307106;
+        Mon, 01 Dec 2025 13:41:47 -0800 (PST)
+Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
+        by smtp-relay.gmail.com with ESMTPS id a92af1059eb24-11dcb03f38fsm1689257c88.6.2025.12.01.13.41.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Dec 2025 13:41:47 -0800 (PST)
+X-Relaying-Domain: purestorage.com
+Received: from dev-csander.dev.purestorage.com (unknown [IPv6:2620:125:9007:640:ffff::1199])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 5C177340185;
+	Mon,  1 Dec 2025 14:41:46 -0700 (MST)
+Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
+	id 50CCEE41ABA; Mon,  1 Dec 2025 14:41:46 -0700 (MST)
+From: Caleb Sander Mateos <csander@purestorage.com>
+To: Ming Lei <ming.lei@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Caleb Sander Mateos <csander@purestorage.com>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] ublk: allow non-blocking ctrl cmds in IO_URING_F_NONBLOCK issue
+Date: Mon,  1 Dec 2025 14:41:44 -0700
+Message-ID: <20251201214145.3183381-1-csander@purestorage.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjAxMDE3MyBTYWx0ZWRfXwSkZvSne5otO
- 4yAn5UTkByF0DZD6+NKiRnkdJFjQ5VbniAPNCMRx8p3c3VqWefRUda+6QQNWWsvcCLOPkLS+CNV
- hnbCZ+xUm5Gr45YLLr9aOY1cpCWWKUGOdDhN2tYR86TcxSiZPpI+xUixFKdPNTPQs5oZN91czIm
- tfJ4k/aY6o+FKU456cKvao+XYFZuFuQGoe6Ah+0Br+gJK79iKIpW3aI5gBlFjO0ayb53g5tWKZq
- HOZVfbofogX5+JZngKr7HGLDae1BICx544hQZcN1OQqtzE4iaLrf9XSG0UcBe/FoZM9tyFYPnIi
- bfYr4Zu1mAWoc5KtNVPi8CT/k4g9dHwU6/SOu/MA6Q46QBMszI2OqwQ5fE+u5DwcZf7OyiQ2w5t
- fh4kLRIs6DRRsagY1F4JkP+n9ZubsA==
-X-Authority-Analysis: v=2.4 cv=LYExKzfi c=1 sm=1 tr=0 ts=692e0b79 cx=c_pps
- a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
- a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8
- a=vQmTTPZ8llsbAUrI6W4A:9
-X-Proofpoint-GUID: _O0luuUViqL8RHPutYiXkKMUjuknMsDe
-X-Proofpoint-ORIG-GUID: _O0luuUViqL8RHPutYiXkKMUjuknMsDe
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-28_08,2025-11-27_02,2025-10-01_01
+Content-Transfer-Encoding: 8bit
 
-From: Keith Busch <kbusch@kernel.org>
+Handling most of the ublksrv_ctrl_cmd opcodes require locking a mutex,
+so ublk_ctrl_uring_cmd() bails out with EAGAIN when called with the
+IO_URING_F_NONBLOCK issue flag. However, several opcodes can be handled
+without blocking:
+- UBLK_CMD_GET_QUEUE_AFFINITY
+- UBLK_CMD_GET_DEV_INFO
+- UBLK_CMD_GET_DEV_INFO2
+- UBLK_U_CMD_GET_FEATURES
 
-Direct-io can support any memory alignment the hardware allows. Device
-mappers don't need to impose any software constraints on memory
-alignment, so this series removes one of those limitations the dm-crypt
-mapper.
+Handle these opcodes synchronously instead of returning EAGAIN so
+io_uring doesn't need to issue the command via the worker thread pool.
 
-Changes from v2:
+Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+---
+ drivers/block/ublk_drv.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
- * Don't change the default stacking limit to allow the relaxed memory
-   alignment requirements; have the caller do it instead.
-
- * Fixed scatterlist memory leaks when handling the case that can't
-   use the inline scatterlist.
-
- * Fixed segment boundary check to use the crypt_config rather than the
-   lower level block device's dma_alignment, which may not be the same
-   size as the cc->sector_size which was used before, or the newly
-   enabled 4-byte alignment this patch set allows in certain
-   circumstances.=20
-
-Keith Busch (2):
-  dm-crypt: allow unaligned bio_vecs for direct io
-  dm-crypt: dynamic scatterlist for many segments
-
- drivers/md/dm-crypt.c | 114 ++++++++++++++++++++++++++++++++++--------
- drivers/md/dm-table.c |   1 +
- 2 files changed, 94 insertions(+), 21 deletions(-)
-
---=20
-2.47.3
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index c2250172de4c..3d6d5f568779 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -3671,19 +3671,33 @@ static int ublk_ctrl_uring_cmd_permission(struct ublk_device *ub,
+ exit:
+ 	kfree(dev_path);
+ 	return ret;
+ }
+ 
++static bool ublk_ctrl_uring_cmd_may_sleep(u32 cmd_op)
++{
++	switch (_IOC_NR(cmd_op)) {
++	case UBLK_CMD_GET_QUEUE_AFFINITY:
++	case UBLK_CMD_GET_DEV_INFO:
++	case UBLK_CMD_GET_DEV_INFO2:
++	case _IOC_NR(UBLK_U_CMD_GET_FEATURES):
++		return false;
++	default:
++		return true;
++	}
++}
++
+ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
+ 		unsigned int issue_flags)
+ {
+ 	const struct ublksrv_ctrl_cmd *header = io_uring_sqe_cmd(cmd->sqe);
+ 	struct ublk_device *ub = NULL;
+ 	u32 cmd_op = cmd->cmd_op;
+ 	int ret = -EINVAL;
+ 
+-	if (issue_flags & IO_URING_F_NONBLOCK)
++	if (ublk_ctrl_uring_cmd_may_sleep(cmd_op) &&
++	    issue_flags & IO_URING_F_NONBLOCK)
+ 		return -EAGAIN;
+ 
+ 	ublk_ctrl_cmd_dump(cmd);
+ 
+ 	if (!(issue_flags & IO_URING_F_SQE128))
+-- 
+2.45.2
 
