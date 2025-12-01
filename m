@@ -1,91 +1,230 @@
-Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A8F043147
-	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 02:50:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D93D1917F1
+	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 03:04:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764557439; cv=none; b=M8jpNDY/FsJLOWfSeu59isrZmuepUwjgkscTT9WIxPRM3wEgWtiSvn4ILfotg05uU+9a12wpHYwan6ASeLhNUR/1uuyQyCdugYUB9TMsnOSAtY/VuRr3bQS6JE40ZZShA7C4PvU1EfxVPb9JQhaPmWnRAkhp2LJNBQOwnhpFerM=
+	t=1764558282; cv=none; b=af7Y7oNSqcWM779rcCe05urD4gUHfnJF2lc4faLUBwQxXdWTA3wsagfcJRkDkdr5aeA1OY6LcFhjaGaNlhb/QOwo/lNM1xX6aQwoYxv4b3ZUwHUCG/GkGX2X5Sj2+JkhFwE6XAVU1M9+Ief8Yhy34sa5FYy8XBePjw99+bOTJzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764557439; c=relaxed/simple;
-	bh=McahQMX4npFaztqn+I6uavKzDZJGL5e4QOv1p6qUxKc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nUYvmxfefdym0D9nERHGbOPO8CbytcOARSup1mcVJiOi0NkNLbgiY0Oc5rix5luT/Aq63Lb/fzNli7sVCEh6SBVPZmeFfkhabU7L3762S9lq95IUVXTDNVe/zbfUjWSnGVNk3Ex664RDnPP9R16FMF441UeSg0VcDiMCHDFsv4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=jFfL8auS; arc=none smtp.client-ip=209.85.166.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1764558282; c=relaxed/simple;
+	bh=82TQz7BpisGdgCQ5LbzZc3uxrJs2It9EUmWn0mPWO1s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Uq1/+aUypW7Z5ztMPaUIyhUvmg9zDhOqP7EWolNyZKecuesTo7uQdQl5C3bC8BXEI7oU7goqX+e9S4KUyBfBMgNfZx1cGRaaKUnvFOlodjPcVc258zNoDco+cEGD9La22aeeZyx7k9ZJAL/R/pRnILqmPttQnPCAEzoD3oeOqEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GO5d6oKk; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="jFfL8auS"
-Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-4331709968fso17992765ab.2
-        for <linux-block@vger.kernel.org>; Sun, 30 Nov 2025 18:50:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1764557436; x=1765162236; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9+/1o+9VIMQkz7uLQx3rrNKYhBslArlEWQEAso4I+Lk=;
-        b=jFfL8auS9cSVJfT/bjTXjWY5XWlIJPcbFJKEHjANuQcYqUUW8rHqa450lPuznaMKwS
-         rpy7BkeZlpQda/JHErNUCSbR/N3S2gJC/PqgxRsVq63S/2BfvCPUOs2Rv3286z6fpthZ
-         FvcorUwojEpU5gMRA6s/SNdYUrBcoZMx88+Fuz4oPPBarVM6SE3yK5+6WVj6enw+PoMl
-         wqzPsRREqmUhYGtcj0vrYnNN/Q96Mihk+/mcrK5BAcpxhvNTCK802nC7H0sEmDl9GHuw
-         Ll2eX+UUPQTP9R2RuCGNqceePp0Gwkpx+KSmLNzR2tJl+yeIdI7AyTpjfgsi/ZqXTBTy
-         CbWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764557436; x=1765162236;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9+/1o+9VIMQkz7uLQx3rrNKYhBslArlEWQEAso4I+Lk=;
-        b=FwaFIVITDKlD5Lf6HehJ8jO9nOg40UqAY5orLBUXEGiJ+zNDlkozNEk8gSfexhP2Jm
-         o0TCZ5YzBOh17QhSDURJ4KVpav7Onu99tegNfNqhXgkBOAa4ZbnoolL6jfUtB/G3GCKx
-         W0z+5dMP/vAPDxvC+9NJiaiRvvB3VibO1wd1I7IEB4gRAdPEXBVKygrNRkQclfcvTYDH
-         Tg1lzbPoyb8KM/TIjhehkGMSatd4HUe4Iry8drJqaWPQlGHgo3cUCk48tKdRtVHB7Dih
-         AeuNmCQ0Ejn4RcFvZFIWH+VPTAJXOaaHcCQqQvyU27CCJH2S0oxWx0Y9bjcBGNTB9A+D
-         K9/g==
-X-Forwarded-Encrypted: i=1; AJvYcCVhrnGLY6GBzcdlWIhxy0XOfKvDEjETCC8T36dUJ0GnxfWbq4uX8qGvCAregAglxyDJKWt64QGfAID6Ww==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzjrO74xaqY9QDgcRW7DcI2aV/hEtOLeanwMUC40rFqW9WspBc3
-	CYwfBBbqZHhNDD3FlmmyTuWP9RKWr2t5ODVVn50dOsqRta4jodTIcK9dbvXqL0ZEcbE=
-X-Gm-Gg: ASbGnctxhJfjf4U3ISP2DVWytZrg+7ZW0SKRf8Wy/44eYEyQY9FaMTVRwu1xVypyA7q
-	xyHzdgkGDaUG736pxHT26VYPXfTfV/OaA+KxSOrGw5lORKfUz7noJqXXTktOzd18TGaT5uGIVjh
-	LAmEQPt1SMEJroQHMGc/vCq6mFZum4Q1dq8ws2fqkfFW3xyL4eTWBxnv/JCjH+Dy0ByMw/dUkmu
-	GolQpqOC1Zm+aRL/6l3lH9EewlTXDEAZBO3W+Js1xmRzuHrpxfLV52L3V+4fby2mWUKDhRtC1/k
-	xZvHWHistaYvROnbQfdXmW0w9cKIPn0bSZP0zGE1fJNtJ0B5Ez70PlZDp8h+UzJrNXmBF1HDbd3
-	QRq1TjLXnuzUOGAMfI0bnIyHjrUwy38RTmo+ap4z9BTeHOQzdmG+9XIszpDDupBNJGW63hdkgO7
-	JUMwg25TTO
-X-Google-Smtp-Source: AGHT+IERTo1jrLZ06qBryle/a1O2Lf9QepMt3lraKHUarGFdKcdPhN8siNqlrIDujVyGAYjAU4BM7A==
-X-Received: by 2002:a05:6e02:2787:b0:433:7a94:6fcc with SMTP id e9e14a558f8ab-435b8c17ffamr308574535ab.2.1764557436053;
-        Sun, 30 Nov 2025 18:50:36 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-436b85c5193sm59530935ab.25.2025.11.30.18.50.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 30 Nov 2025 18:50:35 -0800 (PST)
-Message-ID: <c79547eb-bbc5-41cc-8fa0-fe7ec951c988@kernel.dk>
-Date: Sun, 30 Nov 2025 19:50:33 -0700
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GO5d6oKk"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764558278;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xbQthsR/1ur/34Ya3Fg/bq2vJkt9LYT4D2EV/lNYgy8=;
+	b=GO5d6oKkzlnBVB36kGFwf9NxMXZxuTYIdDC1Xk5dNavAM2dZDxuB2MMztvkcUvN9zWhjXF
+	iSUzUC++buIVc/F5siYBzccjQYpculbEC4jUdtBJM7QCut9mjH3y0XGNxjGfPyNxnm24de
+	O8PZmPqgm8WPcpF28DkSsxbdHfvEDHc=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-424-I7kvaYQCOeex_L1xw_3yrg-1; Sun,
+ 30 Nov 2025 22:04:35 -0500
+X-MC-Unique: I7kvaYQCOeex_L1xw_3yrg-1
+X-Mimecast-MFC-AGG-ID: I7kvaYQCOeex_L1xw_3yrg_1764558274
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 87AD21800359;
+	Mon,  1 Dec 2025 03:04:33 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.20])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4143030001B9;
+	Mon,  1 Dec 2025 03:04:27 +0000 (UTC)
+Date: Mon, 1 Dec 2025 11:04:22 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Uday Shankar <ushankar@purestorage.com>,
+	Stefani Seibold <stefani@seibold.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V4 12/27] ublk: add io events fifo structure
+Message-ID: <aS0FtmO5LhltDG5-@fedora>
+References: <20251121015851.3672073-1-ming.lei@redhat.com>
+ <20251121015851.3672073-13-ming.lei@redhat.com>
+ <CADUfDZrfo7RzNZ7hGxOwK9fTWrwA4JEunahZQPvfO3EXT=1cTQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/1] nvme: Convert tag_list mutex to rwsemaphore to
- avoid deadlock
-To: Hillf Danton <hdanton@sina.com>,
- Mohamed Khalfella <mkhalfella@purestorage.com>
-Cc: Keith Busch <kbusch@kernel.org>, Ming Lei <ming.lei@redhat.com>,
- linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20251117202414.4071380-1-mkhalfella@purestorage.com>
- <20251117202414.4071380-2-mkhalfella@purestorage.com>
- <aSPYT6JuQLCE3E7K@fedora> <20251201013625.9583-1-hdanton@sina.com>
-From: Jens Axboe <axboe@kernel.dk>
-Content-Language: en-US
-In-Reply-To: <20251201013625.9583-1-hdanton@sina.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADUfDZrfo7RzNZ7hGxOwK9fTWrwA4JEunahZQPvfO3EXT=1cTQ@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Hillf, if you have nothing constructive to add, please just keep quiet.
+On Sun, Nov 30, 2025 at 08:53:03AM -0800, Caleb Sander Mateos wrote:
+> On Thu, Nov 20, 2025 at 5:59 PM Ming Lei <ming.lei@redhat.com> wrote:
+> >
+> > Add ublk io events fifo structure and prepare for supporting command
+> > batch, which will use io_uring multishot uring_cmd for fetching one
+> > batch of io commands each time.
+> >
+> > One nice feature of kfifo is to allow multiple producer vs single
+> > consumer. We just need lock the producer side, meantime the single
+> > consumer can be lockless.
+> >
+> > The producer is actually from ublk_queue_rq() or ublk_queue_rqs(), so
+> > lock contention can be eased by setting proper blk-mq nr_queues.
+> >
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  drivers/block/ublk_drv.c | 65 ++++++++++++++++++++++++++++++++++++----
+> >  1 file changed, 60 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > index ea992366af5b..6ff284243630 100644
+> > --- a/drivers/block/ublk_drv.c
+> > +++ b/drivers/block/ublk_drv.c
+> > @@ -44,6 +44,7 @@
+> >  #include <linux/task_work.h>
+> >  #include <linux/namei.h>
+> >  #include <linux/kref.h>
+> > +#include <linux/kfifo.h>
+> >  #include <uapi/linux/ublk_cmd.h>
+> >
+> >  #define UBLK_MINORS            (1U << MINORBITS)
+> > @@ -217,6 +218,22 @@ struct ublk_queue {
+> >         bool fail_io; /* copy of dev->state == UBLK_S_DEV_FAIL_IO */
+> >         spinlock_t              cancel_lock;
+> >         struct ublk_device *dev;
+> > +
+> > +       /*
+> > +        * Inflight ublk request tag is saved in this fifo
+> > +        *
+> > +        * There are multiple writer from ublk_queue_rq() or ublk_queue_rqs(),
+> > +        * so lock is required for storing request tag to fifo
+> > +        *
+> > +        * Make sure just one reader for fetching request from task work
+> > +        * function to ublk server, so no need to grab the lock in reader
+> > +        * side.
+> 
+> Can you clarify that this is only used for batch mode?
 
--- 
-Jens Axboe
+Yes.
+
+> 
+> > +        */
+> > +       struct {
+> > +               DECLARE_KFIFO_PTR(evts_fifo, unsigned short);
+> > +               spinlock_t evts_lock;
+> > +       }____cacheline_aligned_in_smp;
+> > +
+> >         struct ublk_io ios[] __counted_by(q_depth);
+> >  };
+> >
+> > @@ -282,6 +299,32 @@ static inline void ublk_io_unlock(struct ublk_io *io)
+> >         spin_unlock(&io->lock);
+> >  }
+> >
+> > +/* Initialize the queue */
+> 
+> "queue" -> "events queue"? Otherwise, it sounds like it's referring to
+> struct ublk_queue.
+
+OK.
+
+> 
+> > +static inline int ublk_io_evts_init(struct ublk_queue *q, unsigned int size,
+> > +                                   int numa_node)
+> > +{
+> > +       spin_lock_init(&q->evts_lock);
+> > +       return kfifo_alloc_node(&q->evts_fifo, size, GFP_KERNEL, numa_node);
+> > +}
+> > +
+> > +/* Check if queue is empty */
+> > +static inline bool ublk_io_evts_empty(const struct ublk_queue *q)
+> > +{
+> > +       return kfifo_is_empty(&q->evts_fifo);
+> > +}
+> > +
+> > +/* Check if queue is full */
+> > +static inline bool ublk_io_evts_full(const struct ublk_queue *q)
+> 
+> Function is unused?
+
+Yes, will remove it.
+
+> 
+> > +{
+> > +       return kfifo_is_full(&q->evts_fifo);
+> > +}
+> > +
+> > +static inline void ublk_io_evts_deinit(struct ublk_queue *q)
+> > +{
+> > +       WARN_ON_ONCE(!kfifo_is_empty(&q->evts_fifo));
+> > +       kfifo_free(&q->evts_fifo);
+> > +}
+> > +
+> >  static inline struct ublksrv_io_desc *
+> >  ublk_get_iod(const struct ublk_queue *ubq, unsigned tag)
+> >  {
+> > @@ -3038,6 +3081,9 @@ static void ublk_deinit_queue(struct ublk_device *ub, int q_id)
+> >         if (ubq->io_cmd_buf)
+> >                 free_pages((unsigned long)ubq->io_cmd_buf, get_order(size));
+> >
+> > +       if (ublk_dev_support_batch_io(ub))
+> > +               ublk_io_evts_deinit(ubq);
+> > +
+> >         kvfree(ubq);
+> >         ub->queues[q_id] = NULL;
+> >  }
+> > @@ -3062,7 +3108,7 @@ static int ublk_init_queue(struct ublk_device *ub, int q_id)
+> >         struct ublk_queue *ubq;
+> >         struct page *page;
+> >         int numa_node;
+> > -       int size, i;
+> > +       int size, i, ret = -ENOMEM;
+> >
+> >         /* Determine NUMA node based on queue's CPU affinity */
+> >         numa_node = ublk_get_queue_numa_node(ub, q_id);
+> > @@ -3081,18 +3127,27 @@ static int ublk_init_queue(struct ublk_device *ub, int q_id)
+> >
+> >         /* Allocate I/O command buffer on local NUMA node */
+> >         page = alloc_pages_node(numa_node, gfp_flags, get_order(size));
+> > -       if (!page) {
+> > -               kvfree(ubq);
+> > -               return -ENOMEM;
+> > -       }
+> > +       if (!page)
+> > +               goto fail_nomem;
+> >         ubq->io_cmd_buf = page_address(page);
+> >
+> >         for (i = 0; i < ubq->q_depth; i++)
+> >                 spin_lock_init(&ubq->ios[i].lock);
+> >
+> > +       if (ublk_dev_support_batch_io(ub)) {
+> > +               ret = ublk_io_evts_init(ubq, ubq->q_depth, numa_node);
+> > +               if (ret)
+> > +                       goto fail;
+> > +       }
+> >         ub->queues[q_id] = ubq;
+> >         ubq->dev = ub;
+> > +
+> >         return 0;
+> > +fail:
+> > +       ublk_deinit_queue(ub, q_id);
+> 
+> This is a no-op since ub->queues[q_id] hasn't been assigned yet?
+
+Good catch, __ublk_deinit_queue(ub, ubq) can be added for solving the
+failure handling.
+
+
+Thanks,
+Ming
+
