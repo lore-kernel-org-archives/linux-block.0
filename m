@@ -1,119 +1,155 @@
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A64F68F5B
-	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 18:01:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4619C21B9DA
+	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 18:36:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764612066; cv=none; b=bvJnELwD8xXHhYpR56tHvueXN6puo2MI4RbtwwfDLK2AuxYCMvgeLx8GRywQwdmStKc+uFFExRcHTls8iavw0q8gUxrTpBw/mbIaU9QvU0SCPtSxrTfzMpT5AwmpnaH2ahKJ2DYjq14WeH421l0FO75DTt3K4kIDqCN5zxDxJXA=
+	t=1764614195; cv=none; b=UUm5iCG6d7NIpve72Lr9WNZ2SUGssWRKcVqShvqK0LatMCGY+FN/cVSK32yM1k3Znj3S1syLlXmtRUh61Hr6eQSbXQfR2rZMTOffzrcMcu8+o33fgvYVoXOiNNo5LLb9AbX1vWwwi3kqPeWBBsk1OV6k96reofPyZcclOTzz0yE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764612066; c=relaxed/simple;
-	bh=XtCV8sgrIkC0bXHON+/YLnd0Wg/b5cBse0VLPEK2NYU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fM0CXuZsxKz4dosxdkvPUQwiyuO6XfIy+JYnD/FFejalHwr7zsCmKw7JxmWatRyPJazrXjN+lfduHQUu76A426aIH8lD415NMBdoBlnqos9ziyM68JMkObplmLf+6XXzGhosbIkvdEEPWNDC2LIdzVzCUUZGBAh1UnUKGODoNng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rs6mO9/9; arc=none smtp.client-ip=209.85.219.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1764614195; c=relaxed/simple;
+	bh=NrH/y+fQnUKXOiPZ55IULiatXMoFSssdpHc9s0BB6uo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lFbPVsuZ240HYm8BkHc7w6p7DvUPQGoxevvANxE91qTaahqqUvXoJtflx4dCKL+FclYC+Ly3PQvXVJTVzELUV0QcikPVxtGdkBAcNSr8JQbfIpokhNzA52mzYtzooeZ77ghkfPJ5MDs9meTb3K5qGZl3QUE0i40oJPX0ywm6nDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SjAyIcI/; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rs6mO9/9"
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-882360ca0e2so33249336d6.0
-        for <linux-block@vger.kernel.org>; Mon, 01 Dec 2025 10:01:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764612063; x=1765216863; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0Cv5hDUAgknH/+rZStNh6n5unAovZ/kZYUXY/NK3DbU=;
-        b=Rs6mO9/9HJt9eLQz9Hx3J9TuT/oc9caAy3X+rw+WtBT7MC9wWee5cUnjsm/5eWtBVZ
-         41VHOx0DzFTp5UFK0h085MnXGmpS+pFwUNn7oQSMHfUREvqcaL2c5sEtKUeKJ8Fs5xWl
-         zjBBNOygN4X0RA7r99cPFWpzfPo/c4LECAKiGT3CY+aowurrGT5W3KkhxQoEk1u8zLPG
-         LlttVLQK9faOPEB+gta12NUU5/20YxZ1qECo5NNVVcgVgmIjyt2oLuch6OXGht33sF88
-         2aOXKHoEhv7GdTnktbwGwERPO9bE/SkJ1cvyE1gqp+UjtCar24mFlIvkRuDUV0JmeEdU
-         +6xw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764612063; x=1765216863;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=0Cv5hDUAgknH/+rZStNh6n5unAovZ/kZYUXY/NK3DbU=;
-        b=FBYu/MXVezV84eSVY0o7n2KgsU0kfOR2GWmRAWkI9OcHMN2yZ4EmdpHURgqtB5vrXs
-         pJQaxV7DeuXeWXEAHBNFcxqsu3Vz2/Pi225uQk7xQDMR72Wywt1HjF/HDd0BnsHqV8Ee
-         wUBtREZDRpTQzT0XWQUCjzKSA/HT0heECKsHOja2z2NN6TpeS5kIOyYsJcUS0lZrfY8F
-         uYjc9cbqtDpmqEWj0ndrR6KioztsWdZ/ugqomax0wVGEQWJAFBlARNWUf5sz8NiqNWLZ
-         pjhZT8SLFJRaXSebbkLr9uUSc07GY3WqgMxe2m4GJzzpxsDZS7Utt/hYFnth/KVTGTuY
-         vHQw==
-X-Forwarded-Encrypted: i=1; AJvYcCUoq1KtvQ0krb6aq+rle2H+La8atRwNrIG/oRUxw9js4HlTD/53JFupjoUv7H359A3EqlKBWcEakqjJzQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8gymgwDIlOvLUyjUR4HePsWBPWZ5CbEj8XVteIXT0MTB+pAv+
-	0rG5vK9NrTMSafTGCYl2cxjN5tSjw5BYs2eMvJ6ZZUiwwhPvZNo0o+lCeZ/lJxsnYFWM+KhCXv5
-	OTCqshamtyVzGHgSSA2Ds6q14rkKdqiY=
-X-Gm-Gg: ASbGncvj2OSHUQOf0AOwTAYRYsovqIZBzfmGPc+CdEYTN7U5pG959bMu8wRms4/AJLh
-	2nQxRPJ9DOsQCUGAIj+ZMvLDYvdMAQldztJ25Gt74RrGRtREhG7XM/ZbhMdwSgKQ5EX2/gUO3sw
-	PBySTKxUnudzIxPfkhL8YOMgm0if8vcBOuai8oA/8b2Tn+WxdCf+TnSGE0vuHs9YaBTt+k96dkp
-	GURuDuFiOGBPstczZ971Rq1TLBcvnxe/Z5mMEFtOU+qd4AcNk/gHw4uH3t4OPaQqXsmAQ==
-X-Google-Smtp-Source: AGHT+IEnbOkdigYB1iQj98S7F9jaLUo3QrdAuXRWdOjI7a48x+UUey6Gq/+jQWJtLQkGjxtXLM65e/8D5hG4jxJawic=
-X-Received: by 2002:a05:6214:21e3:b0:880:4bdd:eb99 with SMTP id
- 6a1803df08f44-8847c535ee0mr555865046d6.50.1764612054032; Mon, 01 Dec 2025
- 10:00:54 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SjAyIcI/"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764614193;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=y68PE+8MIkJ1RsOV+m+uznVl4WPgZ4iLffSkfESDJys=;
+	b=SjAyIcI/GEHFnUV8fcoS6YMjh+uxSThj9nIkn+V4Q21ACR+ngwv+7aOqRgKrvc8fZyAYIx
+	7TM7PHPDhmzSKN251NJQCngukAlV8aAyPISzXjf/HujSgPSc1FS8CMjsaw6xdJbcMmsIen
+	h0OCiwKyQyfeZy0I9fmDR2Ro/bl8J9w=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-167-NAmDLMHrM864mT_0ya8-qw-1; Mon,
+ 01 Dec 2025 13:36:27 -0500
+X-MC-Unique: NAmDLMHrM864mT_0ya8-qw-1
+X-Mimecast-MFC-AGG-ID: NAmDLMHrM864mT_0ya8-qw_1764614185
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9170B18002D7;
+	Mon,  1 Dec 2025 18:36:24 +0000 (UTC)
+Received: from localhost (unknown [10.2.16.172])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A47C4195608E;
+	Mon,  1 Dec 2025 18:36:22 +0000 (UTC)
+Date: Mon, 1 Dec 2025 13:36:21 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-kernel@vger.kernel.org,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	Mike Christie <michael.christie@oracle.com>,
+	Jens Axboe <axboe@kernel.dk>, linux-nvme@lists.infradead.org,
+	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	linux-scsi@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 3/4] block: add IOC_PR_READ_KEYS ioctl
+Message-ID: <20251201183621.GA919572@fedora>
+References: <20251126163600.583036-1-stefanha@redhat.com>
+ <20251126163600.583036-4-stefanha@redhat.com>
+ <cfd7cace-563b-4fcb-9415-72ac0eb3e811@suse.de>
+ <89bdc184-363c-4d14-bad6-dd4ab65b80d9@kernel.org>
+ <20251201150636.GA866564@fedora>
+ <fadbd728-6810-49de-905d-214c2f72a857@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251128170442.2988502-1-senozhatsky@chromium.org>
- <20251128170442.2988502-2-senozhatsky@chromium.org> <CAGsJ_4yUAw_tzX7z8iizToMB8SDJPNOhFRZNXva_ae46q5vRwg@mail.gmail.com>
- <hgk3zp5hwlcxo6ufiqasvte3hoksy2wb2kta3fime5rprq4org@xaprrqdabvgh>
- <CAGsJ_4z6kSvA+Yzqx=JQ4n3jhQRWn4zYMr364-V2Wjyb2wXE0A@mail.gmail.com> <dt632m4jh2jt5fhnddcbgtdndxh6552hcbwpqeklfx6z7oaihz@lnhskip6whc6>
-In-Reply-To: <dt632m4jh2jt5fhnddcbgtdndxh6552hcbwpqeklfx6z7oaihz@lnhskip6whc6>
-From: Barry Song <21cnbao@gmail.com>
-Date: Tue, 2 Dec 2025 02:00:40 +0800
-X-Gm-Features: AWmQ_blsT8-0VU02RXHfc5H-laUM9-z7RbHLEIjCAqeNoGAxk8cxOLe97lp3ias
-Message-ID: <CAGsJ_4zeqWSZP_xujhbWvjK_jUsPrJDJJ4j4QSgjfUvYtqP+mw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] zram: introduce compressed data writeback
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Richard Chang <richardycc@google.com>, 
-	Brian Geffon <bgeffon@google.com>, Minchan Kim <minchan@kernel.org>, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, linux-block@vger.kernel.org, 
-	Minchan Kim <minchan@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="xpXfsTqxKRlXxqC4"
+Content-Disposition: inline
+In-Reply-To: <fadbd728-6810-49de-905d-214c2f72a857@kernel.org>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+
+
+--xpXfsTqxKRlXxqC4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 1, 2025 at 5:09=E2=80=AFPM Sergey Senozhatsky
-<senozhatsky@chromium.org> wrote:
->
-> On (25/12/01 16:59), Barry Song wrote:
-> > On Mon, Dec 1, 2025 at 11:56=E2=80=AFAM Sergey Senozhatsky
-> > <senozhatsky@chromium.org> wrote:
-> > [...]
-> > > > > zram stores all written back slots raw, which implies that
-> > > > > during writeback zram first has to decompress slots (except
-> > > > > for ZRAM_HUGE slots, which are raw already).  The problem
-> > > > > with this approach is that not every written back page gets
-> > > > > read back (either via read() or via page-fault), which means
-> > > > > that zram basically wastes CPU cycles and battery decompressing
-> > > > > such slots.  This changes with introduction of decompression
-> > > >
-> > > > If a page is swapped out and never read again, does that actually i=
-ndicate
-> > > > a memory leak in userspace?
-> > >
-> > > No, it just means that there is no page-fault on that page.  E.g. we
-> > > swapped out an unused browser tab and never come back to it within th=
-e
-> > > session: e.g. user closed the tab/app, or logged out of session, or
-> > > rebooted the device, or simply powered off (desktop/laptop).
-> >
-> > Thanks, Sergey. That makes sense to me. On Android, users don=E2=80=99t=
- have a
-> > close button, yet apps can still be OOM-killed; those pages are never
-> > swapped in.
->
-> I see.  I suppose on android you still can swipe up and terminate
-> un-needed apps, wouldn't this be the same?  Well, apart from that,
+On Mon, Dec 01, 2025 at 05:26:27PM +0100, Krzysztof Kozlowski wrote:
+> On 01/12/2025 16:06, Stefan Hajnoczi wrote:
+> > On Sat, Nov 29, 2025 at 03:32:35PM +0100, Krzysztof Kozlowski wrote:
+> >> On 27/11/2025 08:07, Hannes Reinecke wrote:
+> >>>
+> >>>> +	size_t keys_info_len =3D struct_size(keys_info, keys, inout.num_ke=
+ys);
+> >>>> +
+> >>>> +	keys_info =3D kzalloc(keys_info_len, GFP_KERNEL);
+> >>>> +	if (!keys_info)
+> >>>> +		return -ENOMEM;
+> >>>> +
+> >>>> +	keys_info->num_keys =3D inout.num_keys;
+> >>>> +
+> >>>> +	ret =3D ops->pr_read_keys(bdev, keys_info);
+> >>>> +	if (ret)
+> >>>> +		return ret;
+> >>>> +
+> >>>> +	/* Copy out individual keys */
+> >>>> +	u64 __user *keys_ptr =3D u64_to_user_ptr(inout.keys_ptr);
+> >>>> +	u32 num_copy_keys =3D min(inout.num_keys, keys_info->num_keys);
+> >>>> +	size_t keys_copy_len =3D num_copy_keys * sizeof(keys_info->keys[0]=
+);
+> >>>
+> >>> We just had the discussion about variable declarations on the ksummit=
+=20
+> >>> lists; I really would prefer to have all declarations at the start of=
+=20
+> >>> the scope (read: at the start of the function here).
+> >>
+> >> Then also cleanup.h should not be used here.
+> >=20
+> > Hi Krzysztof,
+> > The documentation in cleanup.h says:
+> >=20
+> >  * Given that the "__free(...) =3D NULL" pattern for variables defined =
+at
+> >  * the top of the function poses this potential interdependency problem
+> >  * the recommendation is to always define and assign variables in one
+> >        ^^^^^^^^^^^^^^
+> >  * statement and not group variable definitions at the top of the
+> >  * function when __free() is used.
+> >=20
+> > This is a recommendation, not mandatory. It is also describing a
+> > scenario that does not apply here.
+>=20
+> If you have actual argument, so allocation in some if branch, the of cour=
+se.
 
-That=E2=80=99s true, although it=E2=80=99s not typical user behavior :-)
+I'm pointing out that the documentation uses the word "recommendation",
+which is usually not considered mandatory but a suggestion.
 
-> zram is not android-specific, some distros use it on desktops/laptops
-> as well.
+Please update the documentation to clarify that __free() _must_ be
+assigned the real value (no NULL initialization) so that it's clear this
+is not a suggestion but mandatory.
 
-Yes, absolutely.
+Stefan
+
+--xpXfsTqxKRlXxqC4
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmkt4CUACgkQnKSrs4Gr
+c8jLDwf/eWxDE5uirmFhIp1judTLNN8oBJ2XAI8bBsjv2vTN64KlNTUqvQt4fsNu
+5DwI6lkNvDuez34Wkg5kLTvQMPUhMJnPHb1s4KD2UvgbBq+dp1jmJ8VfzoglSkyk
+k2CT1CgvgoJmUnhngtldfKqHiu5j6e/2Dx8xyqLF5GUq+OrAn+xog+P3tIRvi5yn
+BuijC0Wd48jO1W0o3xNS9tPVJSchLWTuaO5LCIsKYq6NMGkUQmUpBx64tMCWwVuD
+NYOTP3vEaJxEUlg2Shqx2xNjPLgQX/Yi6uzdDeT/+WwFoT9E8OUD1nlJvLiUKWJ4
+2/Udb13YeFPSBBxBkeaESVyPZbcFOQ==
+=QIpw
+-----END PGP SIGNATURE-----
+
+--xpXfsTqxKRlXxqC4--
+
