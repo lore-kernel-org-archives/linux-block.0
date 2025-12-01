@@ -1,101 +1,104 @@
-Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
+Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9974E3B186
-	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 14:18:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DB383B186
+	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 14:21:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764598689; cv=none; b=M1r1Se3KJ4NkPtBdNLXi7cHTE+O4kvN0UAL37lnWCQPiYZjOiUFwMoU9c3ZO6/fmpMmNw7zYawDpNC8B0AzhVhPcgYfmsoLTElTlktj0j62DDxaYC5A4DWR/mRlTpoH54RgGEPkxLuhx9McVXkEh7DmEAJlU8ZSWcz4nY6XPK+Y=
+	t=1764598895; cv=none; b=YjD3FcUTR+jq4pulAgxhGUshEVwZAcl7q87BeGysZfRqtR+h9h08B8FVO9qssM1gLCuO2nbfEQ8kroYFo5BNlD4R4N2ck7u0VDJ9MzUnVe3ScJdx2TGGUBGUOeGPnm8AfdCjudVGZUUu8sdyI8uUeR2y0kTnNgE+n91mvJfPk3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764598689; c=relaxed/simple;
-	bh=h3rbZP3fV0IHuVr1GQKmxQeLDqhbQnnVkhaz+tvSvRs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CvMxTBBzFgFAkDBscbZ77jXr7PxUAPlqg/s6cFMl7akWwl5Ybo5GhZDkW2dMtT+kX+KY4gVLu3qmuO4NpffBUuAvWp0mwnzvBwMFQi53jlBitRaVXYO/Ev/Mx3F29PGW0/aAQ9KcGwlBVGeqzgbY6znlmrB07uILTth2GIweKlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=M8TwWvT0; arc=none smtp.client-ip=209.85.166.44
+	s=arc-20240116; t=1764598895; c=relaxed/simple;
+	bh=y8k9WCia62/gkCcjzQcWLXGsG9zvI5l+jCmdvO7PtPQ=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=A6H31T94yp47Gm/IMPpO+yeE9d51j9gU0gCzkSDvdNUZ3bs7TD+zUSsKWQOD59m5KdDuvbLuCRNOq+CkiauYkQ7X0bHGS9ceLXtSqrddmGkBdfejFh7tNOaz25dbv8Z8mC7wUlvJjKEKxQr6SMQ2cvhLn7dVB4veurndPfptElg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=AiPxYkEj; arc=none smtp.client-ip=209.85.166.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="M8TwWvT0"
-Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-9486354dcb2so181924039f.3
-        for <linux-block@vger.kernel.org>; Mon, 01 Dec 2025 06:18:05 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="AiPxYkEj"
+Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-88703c873d5so178561839f.3
+        for <linux-block@vger.kernel.org>; Mon, 01 Dec 2025 06:21:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1764598684; x=1765203484; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=F/6CFxxBHG/WIoG6WEATxfC9c0gYCxW+OS9tRPY2quM=;
-        b=M8TwWvT04Cjo2FCeweu0nzG3j/SLwq+ogNeAtzdJl06AG8+YM1SscNWe1AT/wis1nw
-         XGJd6svYmojkTckTV2NcSS5Gv2MPad2NBnwNx5VkDNbR275wRa1e+xinlVLrqKGKLml9
-         DxgvRyaR7dRzXyyQdGUZIzAvXM3hoXmaId39l7e2wX52bna+8g+FsFaomfnisbhlhSUF
-         eqgb4B2NfN9MHsFMGhHJ/tXvMt85tCGeeU8C9UvAuj3qEzfEVwVkJMn6ubaxwKgNkAJh
-         8BT4pKIC6OxGqdU0sxX+peFjS6UIQK9HGlmxpDpmLLvKbDqljFgEsAbuyXkogwSm4rzR
-         lgFw==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1764598892; x=1765203692; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fMvJB+evqyspXm/yMhRRd1PE5P7nqg4yls1DZRWNZsk=;
+        b=AiPxYkEjWZzSBT/+imFewX7Lj9nRg6N944JgNg8FIv6yxYixggFJrGToZpr5rGYTYH
+         8+o/9WHdYGga/RsSswqrjrv7Zw/HagVMZP0zmrE3h6TlQEWM3QoM5TzTjiD20sFs9s/3
+         /ZjWyIRazo7AH0uXIb3KANirYvHIY4UrCeXMrfrJPue9iLMl8Uk+iDpT8nwkmyGohdCP
+         QnNtH89zJn5fYHoo7UnmrfRXardxmeTKLB4FJCsXtlJIz/CmdeFpL61K5r4eKpCCTWHu
+         iXp9gkGZ1baxsTmRP6sdyfx1Q8qiLXEoUvlOZ82fq1OuOHTqYWbaNkdHeS5cKofxFJOi
+         zcJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764598684; x=1765203484;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=F/6CFxxBHG/WIoG6WEATxfC9c0gYCxW+OS9tRPY2quM=;
-        b=ZVoAMHtD3OOKhG3xyuLz6aXSc/jhEw6UvH/5gul1ffSw+hKCXPMiCDJMBJNeCfAlG0
-         OTS+H2u6FL4UD0FMLrgur1bwy0ug/20/BgzbR63HdMspfZe1AtYZAvfi3hEAjHOi7dVt
-         IDzqHV+1JR26VpvoaenLClGVGebfmCnZ7CVwAWK8tBQvecloCAHJ7OLiLbgCdohUTaxJ
-         8OWOW/OwHiBFqVmwfTKeIYQV2mR8NPGj/bx6NCpDvP1ebSbVuTaj/gZvRH7xhVWvzT1Z
-         G7O1ofx5o7XD2mVSdPWuvscxCRQwDyN7a5CsWsLFFngwp0w1TDdRfTbgK6QB/zaL2z5H
-         nJjQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXMH1FomxVm3pe6S6Oz8pNd+gmE+YHSrFAyzQfln2uHHW7E9z4gxo56v/cLinswoQtwTpDN1axIJXRZXA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/+6EQiDbe3wDQxdcQGrvAo8+Ar7pNqqRARDvXAaldPnnNHAgP
-	pREwqHrOMxd94ZqskPDD5KCM1Y9AJESDLnx5LQAiQgwHJ6sAHI7o9oMCigOflLJdLMo=
-X-Gm-Gg: ASbGnctFUmovcCv5VJWISfsdbmtAHEuP9BjEXmCqHcCkaqMP7lTm4hpXwfxBEqDookO
-	nN75qtegAr56R7GweAcU/X/Op0kcLG8ZAy2bqXHJwKv89VEtxu6LOS3XzcDDXegzz8NSyLJTyjL
-	8JHkRTvZPkXBDTqpVwCv5n0Nz1wKaJ3E4CnfD0wYze1X2OpI46TJSmo26Dq3RzELctVp55DXC8U
-	67gkWW7phW1h/BhtChjwsjM5xMfF1YMJCFMZ/XvAK7LuWm1j5vNn44kCm5KvOSg/GmJwbgFcyJS
-	h0o4ZYRxfRlH1YfBSAmfIO9bIYvLXg7rx+48YJn8j4dSBblwyuo5YaBBb9WohZvWL1MteHTwNNj
-	tYMWvkS+yOrdqJ/DDH752k++YIHy1ghGjC6FCy3s3+G8ZB3t4MtAezJXtPHZSxuJN5/+MnVNdaZ
-	PN3/9Ysg==
-X-Google-Smtp-Source: AGHT+IF3G9KyDrcr/dsaGOdHNybcvbHc9D/O83zkxW0e7cuWx4cN9hmlcRysu39o8lsbeH4dxl9jFQ==
-X-Received: by 2002:a02:c995:0:b0:5b7:d710:662b with SMTP id 8926c6da1cb9f-5b967ac8e72mr28523100173.22.1764598684358;
-        Mon, 01 Dec 2025 06:18:04 -0800 (PST)
-Received: from [192.168.1.99] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5b9bc768ae9sm5966579173.37.2025.12.01.06.18.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 Dec 2025 06:18:03 -0800 (PST)
-Message-ID: <b5f09d4e-5e46-473a-b7e4-f4ea06793551@kernel.dk>
-Date: Mon, 1 Dec 2025 07:18:02 -0700
+        d=1e100.net; s=20230601; t=1764598892; x=1765203692;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=fMvJB+evqyspXm/yMhRRd1PE5P7nqg4yls1DZRWNZsk=;
+        b=eU4aRDhbzYwBAf2x4kBuQZ2hpEpdH7EhjLrsknf501bIntj4sMhWle30Rxf/xlaxHs
+         NBOGCy39lpcVW9aKHUZcjYiQqoYsu7S7M6guYoseZo751vgIvWRKKLcoIAhiFU3Vm01X
+         ySyMhRgxIP0k08T84ZHWo4gfEIU+IT7zhpO0hqPpmXnVIHn47v+zkQUmI4jCwkFnyzhq
+         /+8ey0XXic54zgWueOoVfjZQQjOwFRMB/GXQ54+NCOyDMNMT3iGWgyZzUfaYFofHkfv1
+         gfaWIXAeKdf4DbvYuCxwlqiMcKTrnXtm+pyvQDeQfBKIVFBRoqTBIJv530niaEy7tY6p
+         6MKg==
+X-Forwarded-Encrypted: i=1; AJvYcCXy5Y6waQvs16dZohftaHK+yIcXHkF9py4r+cBh9wuZzFCvl1YJ46GEyosJ5Qd0sgDXTX6g0DK5W8SFMw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3NKf+V4UwPp7NIl0QYU/QUi51PXqEJj8qyWLAlXza/EY7gO8i
+	8Q7zdfD6sy0dAhggUfec33dEHANW4CcUE8Rb0E5DWzcfv48bfTQkIh3xoT123aTALNv6fHWhIp+
+	JgOvvqS8=
+X-Gm-Gg: ASbGncvL0mRpaELbMMePKUCom5WTsaq4wNtYoTI7EupXQdm92ZV5AEV0Q5XaWBRX4g0
+	atlWJUgOqwdMuUZWofw5yhI018KqSoQIK6Qrc6bJvb3hcgaPYVMVRLmfE/E3iJXjdG0cD+fHvGh
+	SakMgTqjmrK4TBOfd3ptvSdA/px8/iTTrbEQEe6JPlmLBlGODYp5E83xd5NBPcfzGcU2I2CHt1O
+	aM/Jm9sbRu1mKCyrkW/g141XjdDwP0VA2wcCY4XnwpGBTcZK4DeCuvfHGEhIRqWfn3VxfzQkKmE
+	jbIxzykimIVggi0vTiQzD/tBNjWYJgp6BkBRTdvxPCb89VzqCjLEs7mMiYF4QHMbT+VqFcrK46m
+	LXTHLRh+SB5UvDv4uw4tpUKY4yqxaDjIhZYGwSiYjG+7GtOz2e2AFakEMx3CbTqr+hDm4CEINN0
+	UtoA==
+X-Google-Smtp-Source: AGHT+IHk5DhaLu0KiORZNqJo9ph3+2qdgovs2WpXvQOdOKHfJUlwS1KeMZLCaK0ugHxnIENRCeKAcg==
+X-Received: by 2002:a02:cd2d:0:b0:5b7:bacb:803 with SMTP id 8926c6da1cb9f-5b99948c395mr15692273173.0.1764598892403;
+        Mon, 01 Dec 2025 06:21:32 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5b9bc3716e2sm5795794173.25.2025.12.01.06.21.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Dec 2025 06:21:31 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-kernel@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>
+Cc: "Md. Haris Iqbal" <haris.iqbal@ionos.com>, 
+ Jack Wang <jinpu.wang@ionos.com>, linux-block@vger.kernel.org
+In-Reply-To: <20251129223542.2047020-1-rdunlap@infradead.org>
+References: <20251129223542.2047020-1-rdunlap@infradead.org>
+Subject: Re: [PATCH] block/rnbd: correct all kernel-doc complaints
+Message-Id: <176459889163.423001.1675303366643422403.b4-ty@kernel.dk>
+Date: Mon, 01 Dec 2025 07:21:31 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] blk-mq: use queue_hctx in blk_mq_map_queue_type
-To: Fengnan Chang <fengnanchang@gmail.com>, linux-block@vger.kernel.org,
- ming.lei@redhat.com, hare@suse.de, hch@lst.de, yukuai@fnnas.com
-Cc: Fengnan Chang <changfengnan@bytedance.com>
-References: <20251201122504.64439-1-changfengnan@bytedance.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20251201122504.64439-1-changfengnan@bytedance.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3
 
-On 12/1/25 5:25 AM, Fengnan Chang wrote:
-> Some caller of blk_mq_map_queue_type now didn't grab
-> 'q_usage_counter', such as blk_mq_cpu_mapped_to_hctx, so we need
-> protect 'queue_hw_ctx' through rcu.
+
+On Sat, 29 Nov 2025 14:35:42 -0800, Randy Dunlap wrote:
+> Fix all kernel-doc warnings in rnbd-proto.h:
+> - use correct enum name in kdoc comment
+> - mark several struct members as "/* private: */" so that no kdoc is
+>   required for them
+> - don't use "/**" for a non-kernel-doc comment
+> - use the correct struct member name for "dev_name"
+> - use " *" for a blank kernel-doc line
 > 
-> Also checked all other functions, no more missed cases.
-> 
-> Fixes: 89e1fb7ceffd ("blk-mq: fix potential uaf for 'queue_hw_ctx'")
-> Signed-off-by: Fengnan Chang <changfengnan@bytedance.com>
+> [...]
 
-Reported-by: Jens Axboe <axboe@kernel.dk>
+Applied, thanks!
 
-?
+[1/1] block/rnbd: correct all kernel-doc complaints
+      commit: d211a2803551c8ffdf0b97d129388f7d9cc129b5
 
-I'll queue it up.
-
+Best regards,
 -- 
 Jens Axboe
+
+
 
