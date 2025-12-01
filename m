@@ -1,107 +1,125 @@
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6E9D1E7660
-	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 08:59:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01A782C030E
+	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 09:04:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764579573; cv=none; b=lfQEuyfjnki1XyfK++J/QmQF3qf4V+rsD7npQ1GRRa4SVZLQTfYSXh45j5TB6OCFNHqJUf5keNZIDV6NGUxWpNqJrHkuUpyGoyAK39SCe9Ces/4x37zHfLQmZwtAESVHJNSnuvpVKRNH/alTS7fcyEtNC536i5PFbcxmgimfV2M=
+	t=1764579898; cv=none; b=J91+KjYSoT32cGXqaUP6EI19Fn/amu5Pmj11q4vg7iolgHbhY/a90a6v9qXdCq7A1erNdqFoP3jbV/aD66SJjurRiI/w8hukDXgkddhe54Z0CNfBjgZ2zGKalf2luGhGy00c1M9hGTdRfy+umNDmee5qsUF7PAZezujI85ssWCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764579573; c=relaxed/simple;
-	bh=Bv+hwRhAL6bK3ZTLOyqAu71a8n0tTmZKJIk6rA4Hla8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EVVS/wOgnz9BgohSB+BDHZag0WF0X41rtxwmA6RsQWMFfZCSpduoUzbCnS9YqJNb24HKysiYlN8UHz7tPM1uoFmh8KgmZ9W6uKYoSEy2nA4SadOGDro4JRWAWer/xRVoQ638U+824ubJeb1x1yG558BqPxZMKJP5hIUfenI5c5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jCNOozFm; arc=none smtp.client-ip=209.85.222.169
+	s=arc-20240116; t=1764579898; c=relaxed/simple;
+	bh=wWI0hn55fvTvrLDkP5A9I3pEc/gcCNnN7tnCnxLnN0w=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GFWMMxgyvtqBC7oTg3myiD07OvJ/WI8sLj62OA8wb4oXSu8CIhPYkOfrBe2bcY2NTM3Y8kmBhF9Rcow1ef31eXP7wF5IeAYoKvuk1qDLWkBm+Fuou4MlQh6orhf3YNtkyAXWSymRspvlYC1KKjlVPfotWWUcFe3kcMqv1IqNFIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZtBy0pek; arc=none smtp.client-ip=209.85.210.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jCNOozFm"
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-8b1f2fbaed7so361682185a.2
-        for <linux-block@vger.kernel.org>; Mon, 01 Dec 2025 00:59:31 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZtBy0pek"
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7d26a7e5639so4021057b3a.1
+        for <linux-block@vger.kernel.org>; Mon, 01 Dec 2025 01:04:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764579571; x=1765184371; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nIanSllFqG33Sgl7Ezxh92IDocVsN6LhPgRC6hyS9uI=;
-        b=jCNOozFmaeXJgxWmIYq3s1VzP3DneWQwYkNScS5poGKLpedKBlh1roERr3DFLw25Cf
-         oqWQXqlSRGrIyMqPU/mMecb8oLZ8JmXh1c9Cdc5KFuz0hKLUY2z80PBgy0oP4Ap3ZIS5
-         y3rsMtMH+htInoHFaj623RvJvy1G7JM6DJJ+r0T4IeluSBJWzFjXm8KlrndiIEy5gV6u
-         llRZbvYDFaMKPMWTu8vaLSRDqO/kUxw/Yu9ZwkdKL4q7SPDmshA9wbmnC+5XP2p349iF
-         sPxjShGcnaD0vkASDL+fq7DCiLyTY4mSYOVG+B86o2vrC219DExDNVpKlfpf10A2Ya60
-         xPwQ==
+        d=gmail.com; s=20230601; t=1764579896; x=1765184696; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kfhO4t45NNnLyH8RgYmrHOJVhdz/vqMYLwrTLqjFvMk=;
+        b=ZtBy0pekBD/gUg8jySnBVBNbx69k6M2G26ckUriUnPI7WozVcodiDpH/u8mTtfxOLD
+         cUbX0TSpX5ySIc1//GgFIY9PDN8WAnGYakxTFh2t/tbX/VESJhOOBVQz4hznfmjn4BzP
+         813bAOyweS7A89C8e2u7EMbbIZLfil+U06/231ktfMTXvDqXndhgKCOF8LIN1v/OebMJ
+         Ffgz1/79HHW0wSFROdOEZEWBuF40/Yn8BDKEyQHgZf/MJ0zD5OyjsdZhwg3lNW8MieIZ
+         3wMGIsYi9jXwcsx2DJ33gCQQJdOWB0gtS0hP0QCpsw7wJg7l9QijzTdc2FwUmHpyVG6c
+         YnPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764579571; x=1765184371;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=nIanSllFqG33Sgl7Ezxh92IDocVsN6LhPgRC6hyS9uI=;
-        b=EUxtCPjWQsNGaSprHsE9Vams1ICtR0hXuxdUnKqASLrWcMbFviPbznVGUo3SZivS9I
-         pEoPDPOEEJx9bvJBLguaGXZAkEmxnKQ9Ox1KWnxhutuFUZ85AyEFhbnFeEBVQfcAzFu+
-         Wf5hz4c4/eN5pkFtbskoDgt7IZ5z3TghGov/8cdda0Nrds9QkAqG0WFBDee1N59PL8cO
-         SnvamcbUFRXBNmewAgYSXlg7p+VrgNAORz7WyNHnSubxt70s+oFAliTnoAHsmhcD/h2w
-         /snGYGp2DDpM7woCARxLJ+xTE2PUJmDaLk5vn6N6vj+4V484cv5UOIx2xLrTazqiIZW0
-         jcRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUdzr1m7+NYj+vbSRjWAByi/d+s0Ck+Ry9LrPgWk1VqjBsBNZOxbVZGCrmjsxZ9RDntxmMRz5Wzy29g5A==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxk6Loo3Tv3CqZasc9QStxTTDvdWt5p4tSnExrRWyHd/NqlxCCx
-	fYLmDbWpuLeyR8JCKb3AV4Mw8gmRtSRJhHfzcQa63AVLsPegEPS3vjqe7UFMsmUXgz+UMP0YHbP
-	N9SlxyJvI10ITEyR66jK8IGcS7dNP3ks=
-X-Gm-Gg: ASbGnct3ATQh8o/pTJGsQCEF6pmQfD7jW2gqO2iR5RPZCRHhAJN37q8s6Zsav2zKF97
-	3h1kBPErJqU3h3mG1DkphU0/X5/GJ7evdpKCZO8WoOpEfK1qdp2gjy/9cxCaqvIU8VcR1fDHlyO
-	WlTxBus13nEynaVNIHzJ9uTlLZBZ18K1rP5wY4J84Q3puOlMH9RHcdlI6OJjqcUgeMqsHI0tQQg
-	XMBgtR/tBhtS6q4c4wJt7zTNpvmZNcH7LB+dgkApBfMtur/m22bAY6gMvIA2bsl0URISlhIiG8G
-	FFmL
-X-Google-Smtp-Source: AGHT+IGtLr3Nq4rRMA1kWvJ23/JQGdN/w3P80vB49a36eyFlSN2VSyqO5InE1vq6DOeQouP27k8n6K4eGa5Bo1kqhjk=
-X-Received: by 2002:a05:620a:450d:b0:8b2:f26e:3226 with SMTP id
- af79cd13be357-8b33d23c358mr4556062185a.2.1764579570507; Mon, 01 Dec 2025
- 00:59:30 -0800 (PST)
+        d=1e100.net; s=20230601; t=1764579896; x=1765184696;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kfhO4t45NNnLyH8RgYmrHOJVhdz/vqMYLwrTLqjFvMk=;
+        b=VnmmSgdgAWldSgGC+HR6pi0iQulaUWmi4egBgUlkuzRJ0ntz3N+Lf9Jtl24pulP4cS
+         WZlE2tEmJdwBusDEnuRKwSDWfpBmKWL4srMX0hW2ZnfdtJbTy9336/Mapgpl/Ilf7vlB
+         HdHCOt8bbPGxzJZmrwXpCK8PbW+wzF6tavVZchSD1tq0AzBwuk6B+0Su1yVzOIjYTnGj
+         VeUPmRJEolaVzMsmYOObhBT067/HELj8S8vbIIP04KzbvyhRpoR5hdAlc9s0Pvs86Lcv
+         db9wUUWPkQnRTmGtlb6Ivx6vhYKd3wZz2WAuCRSNhKaRmbqW9fC/giENU1Z0ncNlEZiX
+         25Jw==
+X-Gm-Message-State: AOJu0Yx8jOoLQptXNh4tcOmRc3dqlcGF0ez9jOJogzmMKFmRWjLwLpGr
+	8hyx1tNXR9GMh2CIm+9uq/4eKd210zCSNtuqWb3wZT4k+7ufd7KYe69T
+X-Gm-Gg: ASbGncvcC+8CiIEXqyHPGJDQ2ngWGr+0M1EqyNMWrZIVYBx5sepi6ISu2Lae15s9OZ/
+	Ab6CyrPCpx+in/ptu7I4ha92KIl3PqXrgkQNEb8oPkpfAAxJipBf+pOkaXPYM9PmhhkWIYQNb25
+	2z3sE5OQuUWrUaagJK3hChBRBwCJcdyjS6ZBPGNoo73Vx/TbryPmnHv6SFAA763PUolGhT0pyqd
+	DTifFzMcwKS9Qulb1XADGwq/tzOL3fNvp+hjQ32by1Syxm40rVaMVAwDoa7nXakIydnkqlASdCP
+	gYoveMZOQnXKY3ZY6KHLs1F2wgdnJZLTXm4T3DU1AqQ5hpKzjwGR1Y09lTOn32cV04hQseY21R7
+	aDvferj0nQDWxmclTETjaZxoD4dLS4BWdCAW+sH66FoLqE8YD6SmXsH/oZ/Yc4D9Hn/wKUUA7oG
+	PZHRYqLVXyuLD9dhpsAPtX/iA6vQ==
+X-Google-Smtp-Source: AGHT+IEacD7nIRpWHZXiz4TsORsmjqaoL0X94j8cSIbshETof7GukRtdYu3CFoH/ye5Jv7+JumoDAQ==
+X-Received: by 2002:a05:7022:2393:b0:119:e569:fbb4 with SMTP id a92af1059eb24-11c9d864e98mr25000325c88.35.1764579896080;
+        Mon, 01 Dec 2025 01:04:56 -0800 (PST)
+Received: from localhost.localdomain ([104.128.72.44])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11dcae73bedsm54908307c88.0.2025.12.01.01.04.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Dec 2025 01:04:55 -0800 (PST)
+From: zhangshida <starzhangzsd@gmail.com>
+X-Google-Original-From: zhangshida <zhangshida@kylinos.cn>
+To: Johannes.Thumshirn@wdc.com,
+	hch@infradead.org,
+	agruenba@redhat.com,
+	ming.lei@redhat.com,
+	hsiangkao@linux.alibaba.com,
+	csander@purestorage.com,
+	colyli@fnnas.com
+Cc: linux-block@vger.kernel.org,
+	linux-bcache@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	zhangshida@kylinos.cn,
+	starzhangzsd@gmail.com
+Subject: [PATCH v4 0/3] Fix bio chain related issues
+Date: Mon,  1 Dec 2025 17:04:39 +0800
+Message-Id: <20251201090442.2707362-1-zhangshida@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251128170442.2988502-1-senozhatsky@chromium.org>
- <20251128170442.2988502-2-senozhatsky@chromium.org> <CAGsJ_4yUAw_tzX7z8iizToMB8SDJPNOhFRZNXva_ae46q5vRwg@mail.gmail.com>
- <hgk3zp5hwlcxo6ufiqasvte3hoksy2wb2kta3fime5rprq4org@xaprrqdabvgh>
-In-Reply-To: <hgk3zp5hwlcxo6ufiqasvte3hoksy2wb2kta3fime5rprq4org@xaprrqdabvgh>
-From: Barry Song <21cnbao@gmail.com>
-Date: Mon, 1 Dec 2025 16:59:19 +0800
-X-Gm-Features: AWmQ_blOS7Nucw2YNUQvfG1rNrEP4YVyGX1irEsw0vGItmVtTPTGRytfhTT1B2o
-Message-ID: <CAGsJ_4z6kSvA+Yzqx=JQ4n3jhQRWn4zYMr364-V2Wjyb2wXE0A@mail.gmail.com>
-Subject: Re: [PATCH 1/2] zram: introduce compressed data writeback
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Richard Chang <richardycc@google.com>, 
-	Brian Geffon <bgeffon@google.com>, Minchan Kim <minchan@kernel.org>, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, linux-block@vger.kernel.org, 
-	Minchan Kim <minchan@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Dec 1, 2025 at 11:56=E2=80=AFAM Sergey Senozhatsky
-<senozhatsky@chromium.org> wrote:
-[...]
-> > > zram stores all written back slots raw, which implies that
-> > > during writeback zram first has to decompress slots (except
-> > > for ZRAM_HUGE slots, which are raw already).  The problem
-> > > with this approach is that not every written back page gets
-> > > read back (either via read() or via page-fault), which means
-> > > that zram basically wastes CPU cycles and battery decompressing
-> > > such slots.  This changes with introduction of decompression
-> >
-> > If a page is swapped out and never read again, does that actually indic=
-ate
-> > a memory leak in userspace?
->
-> No, it just means that there is no page-fault on that page.  E.g. we
-> swapped out an unused browser tab and never come back to it within the
-> session: e.g. user closed the tab/app, or logged out of session, or
-> rebooted the device, or simply powered off (desktop/laptop).
+From: Shida Zhang <zhangshida@kylinos.cn>
 
-Thanks, Sergey. That makes sense to me. On Android, users don=E2=80=99t hav=
-e a
-close button, yet apps can still be OOM-killed; those pages are never
-swapped in.
+This series addresses incorrect usage of bio_chain_endio().
 
-Thanks
-Barry
+Note: Patch 2 must depends on changes introduced in patch 1. Therefore,
+patch 1 is still included in this series even though Coly suggested
+sending it directly to the bcache mailing list:
+https://lore.kernel.org/all/20251201082611.2703889-1-zhangshida@kylinos.cn/
+
+v4:
+- Removed unnecessary cleanups from the series.
+
+v3:
+- Remove the dead code in bio_chain_endio and drop patch 1 in v2 
+- Refined the __bio_chain_endio changes with minor modifications (was
+  patch 02 in v2).
+- Dropped cleanup patches 06 and 12 from v2 due to an incorrect 'prev'
+  and 'new' order.
+https://lore.kernel.org/all/20251129090122.2457896-1-zhangshida@kylinos.cn/
+
+v2:
+- Added fix for bcache.
+- Added BUG_ON() in bio_chain_endio().
+- Enhanced commit messages for each patch
+https://lore.kernel.org/all/20251128083219.2332407-1-zhangshida@kylinos.cn/
+
+v1:
+https://lore.kernel.org/all/20251121081748.1443507-1-zhangshida@kylinos.cn/
+
+Shida Zhang (3):
+  bcache: fix improper use of bi_end_io
+  block: prohibit calls to bio_chain_endio
+  block: prevent race condition on bi_status in __bio_chain_endio
+
+ block/bio.c                 | 11 ++++++++---
+ drivers/md/bcache/request.c |  6 +++---
+ 2 files changed, 11 insertions(+), 6 deletions(-)
+
+-- 
+2.34.1
+
