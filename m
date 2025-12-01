@@ -1,48 +1,36 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CD1B1A9FB0;
-	Mon,  1 Dec 2025 06:15:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5760F1E47C5;
+	Mon,  1 Dec 2025 06:34:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764569747; cv=none; b=IdI1NZMISiHTq1A/iBKjZsY48Ahnp//10F7nSwGreJj5DFXmJli81b0hH3HSZ3ZRSkgycvp/WX3JavvBvw/Mry+sd5uaNWYespdidFVMEDNS/s0PHzNMjXwvxwgSVhlo64Hv24RkzhLMrWxdyJ2/v3JlEpj8Ogn6J9sMe9MIZuQ=
+	t=1764570861; cv=none; b=nx3k9CTUEBXYK+w8SmPVLuAsP2bOXCfHDGNEE4FuY6zXsXeVDAF4Y4tNDhiMWXd+Itflcce+hvyvSNfycnv/LoDj4qwQhkOL/Xl7yZz+4GQ++gAg8IY5/HI09phtHkJ9D5JZQ+9ED+1VvaGh5WJdhvqb51lFnR3qG8OrpFbt1nA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764569747; c=relaxed/simple;
-	bh=8BeP7dCRLUpJbdAnQWZOc328WL4PHqtN2z6xx/aoD+o=;
+	s=arc-20240116; t=1764570861; c=relaxed/simple;
+	bh=9fy2pdBLtxtN/URqI42dorbO/wX0U6FVflZmAtnWLRU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mEDspUNIkwj3nK3st5QshkD8wCEyoOcqsBwEGcBxxCmxSaoOwGTIbef9HmDvlGG2P+wGiRxDGMzV5rBasvTaG2DMP6TWSmAXMy3Ehs45bc4UEsx7MvKjh0CLhKKGjanAyLjy1WR7TmeTLWhpESXz9zEZVt1Kj2KGk4xPfhfnA9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=WGktu9Av; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WGktu9Av"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=8BeP7dCRLUpJbdAnQWZOc328WL4PHqtN2z6xx/aoD+o=; b=WGktu9Av2hQifd3jzigEM1xiJF
-	vkDhkAaEJYFMCVm+Btx07+CTpEG4PBlomAxEU2vsRpVcC0lWiSZqoB/RF4TwhbQ+gdo5j/C6vddEX
-	1B+E1kC7/YCZ/DsvpteDJlyFI0yWKQAwiuzQfgUAuihKzuveYrLTIZKGAH4Z0Xg95Kt5SzPI3RwNR
-	tU6Q2wKCmYpEWpCig0iXSDuXGy5xpWaYYATs+AmsLgm7wZydA65aZNoIc8zbRISPOeZE3C7G/8EhK
-	U9j7gTAqv3iNgjaRZNu+XrlgW0KeNMEEuHhJd1PDGkjOTzhQUkUKxvq5mI+9fpnOMc6xB2zEup61F
-	tDrg9YoA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vPxCF-00000002xgA-0chY;
-	Mon, 01 Dec 2025 06:15:39 +0000
-Date: Sun, 30 Nov 2025 22:15:39 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: zhangshida <starzhangzsd@gmail.com>
-Cc: Johannes.Thumshirn@wdc.com, hch@infradead.org, agruenba@redhat.com,
-	ming.lei@redhat.com, hsiangkao@linux.alibaba.com,
-	csander@purestorage.com, linux-block@vger.kernel.org,
-	linux-bcache@vger.kernel.org, nvdimm@lists.linux.dev,
-	virtualization@lists.linux.dev, ntfs3@lists.linux.dev,
-	linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
-	zhangshida@kylinos.cn
-Subject: Re: [PATCH v3 4/9] block: export bio_chain_and_submit
-Message-ID: <aS0yizTv8hTzXPAQ@infradead.org>
-References: <20251129090122.2457896-1-zhangshida@kylinos.cn>
- <20251129090122.2457896-5-zhangshida@kylinos.cn>
+	 Content-Type:Content-Disposition:In-Reply-To; b=dO7tCVgBdHBlKpoQTVS6Ada3J4cnkNC7gOY4N1yBQ/zl8pGHzgUzBXaZwy9KTrz7Mg443AsPVAun5nZ/4N/txzxS2VtgUbOO0Lgyx2dFxcoHzaPvZYLW7ckcIQYmNxlFWd6q7TAWubpf4MQSBsvgsbBj+w686xMSVWfkyAaCDmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 69E736732A; Mon,  1 Dec 2025 07:34:14 +0100 (CET)
+Date: Mon, 1 Dec 2025 07:34:13 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-kernel@vger.kernel.org,
+	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Mike Christie <michael.christie@oracle.com>,
+	linux-nvme@lists.infradead.org, Jens Axboe <axboe@kernel.dk>,
+	linux-scsi@vger.kernel.org, Sagi Grimberg <sagi@grimberg.me>
+Subject: Re: [PATCH v2 1/4] scsi: sd: reject invalid pr_read_keys()
+ num_keys values
+Message-ID: <20251201063413.GA19461@lst.de>
+References: <20251127155424.617569-1-stefanha@redhat.com> <20251127155424.617569-2-stefanha@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -51,9 +39,25 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251129090122.2457896-5-zhangshida@kylinos.cn>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20251127155424.617569-2-stefanha@redhat.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-Please split this and the remainder into a separate series, to be
-resubmitted after -rc1.
+On Thu, Nov 27, 2025 at 10:54:21AM -0500, Stefan Hajnoczi wrote:
+> +	/*
+> +	 * Each reservation key takes 8 bytes and there is an 8-byte header
+> +	 * before the reservation key list. The total size must fit into the
+> +	 * 16-bit ALLOCATION LENGTH field.
+> +	 */
+> +	if (num_keys > (USHRT_MAX / 8) - 1)
+> +		return -EINVAL;
+> +
+> +	data_len = num_keys * 8 + 8;
+
+Having the same arithmerics express here in two different ways is a bit
+odd.
+
+I'd expected this to be something like:
+
+	if (check_mul_overflow(num_keys, 8, &data_len) || data_len > USHRT_MAX)
+		return -EINVAL;
 
