@@ -1,19 +1,19 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 081EF2D0606
-	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 08:34:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E22F633985
+	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 08:34:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764578067; cv=none; b=EhkK09c8doIIrXwXxMoN+OQzciwjHbtBeS5vVMC1/g2y+Ql0mLd99Kb5Nsmt9KX6pethG8Vy2ZhWt11twKjvKBX8umKPqshTfLAM4iCi5g/tnqL/xLS4hlIpapOiAaGXsd6PuTm53NRR6iWwiwNz94B+Vvrholrh7hCBjGU9BfM=
+	t=1764578068; cv=none; b=EP09zcFHE6EE0oX/BdMEuC9GJpumh+KH3pNycm5NQrvYCh6hx39egjlkXMkmjMiV69iSxI38YQSRTsA19NLThbkW+H7ibIO4NNqUF+dXd1nlXSMhiLcCZKPdx1rS75tyxb6uUXlnmpxUPg6kkRWtuNl4RxJorqgsajL/FkioRfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764578067; c=relaxed/simple;
-	bh=Isbs/git6yKNS9kWV0zpq/v59/84eBFia6ZDTcAX8R0=;
+	s=arc-20240116; t=1764578068; c=relaxed/simple;
+	bh=7io5gauzaLWGYdMCWcfKV2yUhVgtNcFmCCxTnMgMlF0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NB+s/lODWd6ag8l0eFtyxxw+AP9lLO5/TvfsYSetCMGNaqpiIlsJ6Y2x9oTwjnDK+onYaxoW/OIXnbm9J4W1yVuYC8lckYhStGGaiBcEYDV3x89ygyDV67qGYsIWkPl8NkCuT5Pabm4UtxA2lpXX+S70m2/Kzmo59Co6gmOSP7U=
+	 MIME-Version; b=WH9rlOxBKYjRMA7zolaZbUcdZ0Ys6aSO5yGHq8Ik3ref+hvw9pWxcTMOIHqfGVGrisjwJ04RIp+OA16LYRhLLeztQsH0wE/mwuVCX/8WW1dyjHOENFQb0z4XWN5r0q60WuIBIWLYVjbtX9SMPYnn30CdJUN4KkXYlmTef37TLFg=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F6B8C4CEF1;
-	Mon,  1 Dec 2025 08:34:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 059FEC19421;
+	Mon,  1 Dec 2025 08:34:26 +0000 (UTC)
 From: Yu Kuai <yukuai@fnnas.com>
 To: axboe@kernel.dk,
 	linux-block@vger.kernel.org,
@@ -22,9 +22,9 @@ To: axboe@kernel.dk,
 	ming.lei@redhat.com,
 	bvanassche@acm.org
 Cc: yukuai@fnnas.com
-Subject: [PATCH v4 04/12] blk-rq-qos: fix possible debugfs_mutex deadlock
-Date: Mon,  1 Dec 2025 16:34:07 +0800
-Message-ID: <20251201083415.2407888-5-yukuai@fnnas.com>
+Subject: [PATCH v4 05/12] blk-mq-debugfs: make blk_mq_debugfs_register_rqos() static
+Date: Mon,  1 Dec 2025 16:34:08 +0800
+Message-ID: <20251201083415.2407888-6-yukuai@fnnas.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251201083415.2407888-1-yukuai@fnnas.com>
 References: <20251201083415.2407888-1-yukuai@fnnas.com>
@@ -36,72 +36,58 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Currently rq-qos debugfs entries are created from rq_qos_add(), while
-rq_qos_add() can be called while queue is still frozen. This can
-deadlock because creating new entries can trigger fs reclaim.
-
-Fix this problem by delaying creating rq-qos debugfs entries after queue
-is unfrozen.
-
-- For wbt, 1) it can be initialized by default, fix it by calling new
-  helper after wbt_init() from wbt_enable_default; 2) it can be
-  initialized by sysfs, fix it by calling new helper after queue is
-  unfrozen from queue_wb_lat_store().
-- For iocost and iolatency, they can only be initialized by blkcg
-  configuration, however, they don't have debugfs entries for now, hence
-  they are not handled yet.
+Because it's only used inside blk-mq-debugfs.c now.
 
 Signed-off-by: Yu Kuai <yukuai@fnnas.com>
 ---
- block/blk-rq-qos.c |  7 -------
- block/blk-wbt.c    | 10 +++++++++-
- 2 files changed, 9 insertions(+), 8 deletions(-)
+ block/blk-mq-debugfs.c | 4 +++-
+ block/blk-mq-debugfs.h | 5 -----
+ 2 files changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
-index 654478dfbc20..d7ce99ce2e80 100644
---- a/block/blk-rq-qos.c
-+++ b/block/blk-rq-qos.c
-@@ -347,13 +347,6 @@ int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
- 	blk_queue_flag_set(QUEUE_FLAG_QOS_ENABLED, q);
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 128d2aa6a20d..99466595c0a4 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -14,6 +14,8 @@
+ #include "blk-mq-sched.h"
+ #include "blk-rq-qos.h"
  
- 	blk_mq_unfreeze_queue(q, memflags);
--
--	if (rqos->ops->debugfs_attrs) {
--		mutex_lock(&q->debugfs_mutex);
--		blk_mq_debugfs_register_rqos(rqos);
--		mutex_unlock(&q->debugfs_mutex);
--	}
--
- 	return 0;
- ebusy:
- 	blk_mq_unfreeze_queue(q, memflags);
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index 3777255b99ad..c471d11b756f 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -758,8 +758,12 @@ void wbt_enable_default(struct gendisk *disk)
- 	if (queue_is_mq(q) && enable) {
- 		struct rq_wb *rwb = wbt_alloc();
- 
--		if (rwb)
-+		if (rwb) {
- 			wbt_init(disk, rwb);
-+			mutex_lock(&q->debugfs_mutex);
-+			blk_mq_debugfs_register_rq_qos(q);
-+			mutex_unlock(&q->debugfs_mutex);
-+		}
- 	}
- }
- EXPORT_SYMBOL_GPL(wbt_enable_default);
-@@ -999,5 +1003,9 @@ int wbt_set_lat(struct gendisk *disk, s64 val)
- 	blk_mq_unquiesce_queue(q);
- out:
- 	blk_mq_unfreeze_queue(q, memflags);
-+	mutex_lock(&q->debugfs_mutex);
-+	blk_mq_debugfs_register_rq_qos(q);
-+	mutex_unlock(&q->debugfs_mutex);
++static void blk_mq_debugfs_register_rqos(struct rq_qos *rqos);
 +
- 	return ret;
+ static int queue_poll_stat_show(void *data, struct seq_file *m)
+ {
+ 	return 0;
+@@ -758,7 +760,7 @@ void blk_mq_debugfs_unregister_rqos(struct rq_qos *rqos)
+ 	rqos->debugfs_dir = NULL;
+ }
+ 
+-void blk_mq_debugfs_register_rqos(struct rq_qos *rqos)
++static void blk_mq_debugfs_register_rqos(struct rq_qos *rqos)
+ {
+ 	struct request_queue *q = rqos->disk->queue;
+ 	const char *dir_name = rq_qos_id_to_name(rqos->id);
+diff --git a/block/blk-mq-debugfs.h b/block/blk-mq-debugfs.h
+index 54948a266889..d94daa66556b 100644
+--- a/block/blk-mq-debugfs.h
++++ b/block/blk-mq-debugfs.h
+@@ -34,7 +34,6 @@ void blk_mq_debugfs_register_sched_hctx(struct request_queue *q,
+ void blk_mq_debugfs_unregister_sched_hctx(struct blk_mq_hw_ctx *hctx);
+ 
+ void blk_mq_debugfs_register_rq_qos(struct request_queue *q);
+-void blk_mq_debugfs_register_rqos(struct rq_qos *rqos);
+ void blk_mq_debugfs_unregister_rqos(struct rq_qos *rqos);
+ #else
+ static inline void blk_mq_debugfs_register(struct request_queue *q)
+@@ -75,10 +74,6 @@ static inline void blk_mq_debugfs_unregister_sched_hctx(struct blk_mq_hw_ctx *hc
+ {
+ }
+ 
+-static inline void blk_mq_debugfs_register_rqos(struct rq_qos *rqos)
+-{
+-}
+-
+ static inline void blk_mq_debugfs_register_rq_qos(struct request_queue *q)
+ {
  }
 -- 
 2.51.0
