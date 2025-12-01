@@ -1,75 +1,201 @@
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D9D4248893
-	for <linux-block@vger.kernel.org>; Sun, 30 Nov 2025 23:03:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B01D36D503
+	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 00:26:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764543823; cv=none; b=JopWgAXWcUqqRnczUL07opjPZie5VIeT5T8AORl7LIaC/J5TgSKNyWlwoukpFya8fBMRuexfELyW5NYn7JMUahQ2PKuRnpbJ8hluRrreQUjqf07CO7zFUwwloSROfNgiGCGeB49dhnTb/VjtUOfIhSTNqvrqzbH7Z4/xvbtQHfg=
+	t=1764548821; cv=none; b=T/QPddV1q3lZpOl4MLM5tJc6+g4uMe7rcGfCK1BW4faG/TRhJQ3+BODpS+1c5l2O+osB80vBGXv2krXBRWj0cevngjf1zvu5xnYrdYI7kAHKH6GQKlcymAhbhDPLxZP3TTLGg4q+N+DH3k4OZ3X+/6CWGHeDK0WLYbsj71irgK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764543823; c=relaxed/simple;
-	bh=+KhrMhcJSvItbb/04gtqwcqQ9SN2qd7j6u0HCMyKS6E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=R6ubpOGQCBsiB4K6DO/Ns7Jq5daS3IUAXlPS7qFzap3CiOAc779seUlDNyRJGltkmqGq8GHrayi1SH6/sI+rayXLtaPB7oemax7OEhL/X5N0RkQmKA4PRNfUxF1f2Ls8GvCzMJQgJmxzhrI716EZSd8xjB1ikigrpEwCeobpEWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-42e2cf93f7dso656998f8f.1
-        for <linux-block@vger.kernel.org>; Sun, 30 Nov 2025 15:03:41 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764543820; x=1765148620;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+KhrMhcJSvItbb/04gtqwcqQ9SN2qd7j6u0HCMyKS6E=;
-        b=X4zy+ravowk9P9oOHbpOGOxljFd/DvYQPuGgFfzmqCWOkOZoZ3zCCQ1jMnPSHh/tE6
-         YCRCGziKCO+pI4tZQN6DqIRz4Thy76ey3JCKrxUfyC7u0mriHDrAziduf30njGjkOYFX
-         So7gJYyyMQ3kA/03unLEvIUsg1AdInhxPPFOhW9D39CPLRT/Ev/mgo0V/1tnoez6Rd3/
-         FwZh5iGTGqnUuyoKTPnl5eIO0E7egRwVZiGJSksi0a5J6kHrjuaM0JAX8WVEAmw1R8UM
-         RtfXKw07Og3jnluwgGPR2EOnJKEa2KhSbGwPj5qRQk2HjPL8CWwa0Z/Dqdjth3Jgipjg
-         W9Ug==
-X-Gm-Message-State: AOJu0Yx99ISRBUEzXih2IRPdwzJA73UeHfyUusbiQhktW5GAo5lIWYPW
-	kkfm0nM6KO+W7I11VIFhfKMRkYHBEMPqvF81rN0Q6bY4UBEX8OiWwk24
-X-Gm-Gg: ASbGncsHOJl3v4ajfgM3xcXwiuksKcbEA+q4qIUvUbUhymLm5T8TtaVvO0yvqCV4pg1
-	9rRnzNkwTLOx3zSmFqVRhR/I7HqrebOw+U74og5FnWnvhd5uO1RGSJSRl6PKptx+bedby1xT5HH
-	kJ3sDappuvT1CgEonFUSeXDh2fD1P9ZjlNDKoMlGjVu6jqtlBhySjufDvZIqyLpIy3xnjeR79fx
-	f1E26MWHVWZnqjgPmdKa0ML9vXMyvRE/rBXRe5u8NRYEp6AFUTM5me5rQGLg7uHtZfBncwFyV7J
-	XlArxHDLBGPzp6vD7PcDv+GFw3O0q2UzrJS6kDGtqvaP5fDgbmHr6iFBZDQAPYGJhyHlzjIbwS6
-	ecvzi+VeO5o05IBMXa0/hqmvkTRH5Pp/GX45wydQ3MqOweQyoXdVXRScxsGPn7fYk1k7sfXToeL
-	jxSQXcR6PgzO1qLm32cMGY17r4jlo9VGUTdQYWlS0N
-X-Google-Smtp-Source: AGHT+IG0kUJO7SYN4V6YpXy8uJxkqAm9wDLe/yTWTady0nKXHIsEefrNGBZg2POKGw5qhetClLnvgw==
-X-Received: by 2002:a05:6000:2484:b0:42c:a449:d68c with SMTP id ffacd0b85a97d-42cc1d0cf34mr37257663f8f.30.1764543820316;
-        Sun, 30 Nov 2025 15:03:40 -0800 (PST)
-Received: from [10.100.102.74] (89-138-71-2.bb.netvision.net.il. [89.138.71.2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42e1caae37esm22401721f8f.40.2025.11.30.15.03.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 30 Nov 2025 15:03:39 -0800 (PST)
-Message-ID: <b33b3587-edb0-4f30-a8ee-baaa2b631ed9@grimberg.me>
-Date: Mon, 1 Dec 2025 01:03:37 +0200
+	s=arc-20240116; t=1764548821; c=relaxed/simple;
+	bh=vsOGfrQzQL2f5q2Tu3FjKWqtT1syS1Ahw0I8b6xuyRY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S1u3g/vBN8JiyK75EMjZu6CwHPYTS9FT/EEYSK3yMIafd54u5CFDAEGp/ksPcZJdpyg1Q2lIjfmHd5mHWNiZqwiqui0ClQLfKO+pmXFTFdfogLVF3a8NLHqaM9+KmtsLX2xAzJsaoqolnVKHDMWNMoNfVBRgIyi4iKlmYrTKucI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=L6LMih4K; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L6LMih4K"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764548818;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fd4h/FUgUJM96qwVG508VBNXscpnOt58b1YzYn2vCdg=;
+	b=L6LMih4KBIMjXISltrGS0wp+vhDbd44hbSwkuIz6CWFer/JGwZup+MyvnX6KnurcaaYz/Z
+	eE2MJnUc9NCUGAPcsqzJd5PMx//KpYoaTstAAuYQKGke3BO358ESm8CYvprcGiVkKywhqP
+	LuyWeNwVe4xn91kI1sMbhliV7VMIhq0=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-62-xTnCGx7POYSAhW3AWFR1zA-1; Sun,
+ 30 Nov 2025 19:26:55 -0500
+X-MC-Unique: xTnCGx7POYSAhW3AWFR1zA-1
+X-Mimecast-MFC-AGG-ID: xTnCGx7POYSAhW3AWFR1zA_1764548813
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1FAAA1800447;
+	Mon,  1 Dec 2025 00:26:53 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.20])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5DADB1800346;
+	Mon,  1 Dec 2025 00:26:46 +0000 (UTC)
+Date: Mon, 1 Dec 2025 08:26:41 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Yu Kuai <yukuai@fnnas.com>
+Cc: syzbot ci <syzbot+cifc73f799778e73e7@syzkaller.appspotmail.com>,
+	axboe@kernel.dk, bvanassche@acm.org, linux-block@vger.kernel.org,
+	nilay@linux.ibm.com, tj@kernel.org, syzbot@lists.linux.dev,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot ci] Re: blk-mq: fix possible deadlocks
+Message-ID: <aSzgwai7vSElcjLo@fedora>
+References: <692c17ca.a70a0220.d98e3.016c.GAE@google.com>
+ <18d6c3dc-2a86-46cd-972d-0158d7c3c461@fnnas.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 12/12] nvmet: use bio_chain_and_submit to simplify bio
- chaining
-To: zhangshida <starzhangzsd@gmail.com>, Johannes.Thumshirn@wdc.com,
- hch@infradead.org, gruenba@redhat.com, ming.lei@redhat.com,
- siangkao@linux.alibaba.com
-Cc: linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
- nvdimm@lists.linux.dev, virtualization@lists.linux.dev,
- linux-nvme@lists.infradead.org, gfs2@lists.linux.dev, ntfs3@lists.linux.dev,
- linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org,
- zhangshida@kylinos.cn
-References: <20251128083219.2332407-1-zhangshida@kylinos.cn>
- <20251128083219.2332407-13-zhangshida@kylinos.cn>
-Content-Language: en-US
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20251128083219.2332407-13-zhangshida@kylinos.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <18d6c3dc-2a86-46cd-972d-0158d7c3c461@fnnas.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Acked-by: Sagi Grimberg <sagi@grimberg.me>
+On Mon, Dec 01, 2025 at 03:50:22AM +0800, Yu Kuai wrote:
+> Hi,
+> 
+> 在 2025/11/30 18:09, syzbot ci 写道:
+> > syzbot ci has tested the following series
+> >
+> > [v3] blk-mq: fix possible deadlocks
+> > https://lore.kernel.org/all/20251130024349.2302128-1-yukuai@fnnas.com
+> > * [PATCH v3 01/10] blk-mq-debugfs: factor out a helper to register debugfs for all rq_qos
+> > * [PATCH v3 02/10] blk-rq-qos: fix possible debugfs_mutex deadlock
+> > * [PATCH v3 03/10] blk-mq-debugfs: make blk_mq_debugfs_register_rqos() static
+> > * [PATCH v3 04/10] blk-mq-debugfs: warn about possible deadlock
+> > * [PATCH v3 05/10] block/blk-rq-qos: add a new helper rq_qos_add_frozen()
+> > * [PATCH v3 06/10] blk-wbt: fix incorrect lock order for rq_qos_mutex and freeze queue
+> > * [PATCH v3 07/10] blk-iocost: fix incorrect lock order for rq_qos_mutex and freeze queue
+> > * [PATCH v3 08/10] blk-iolatency: fix incorrect lock order for rq_qos_mutex and freeze queue
+> > * [PATCH v3 09/10] blk-throttle: remove useless queue frozen
+> > * [PATCH v3 10/10] block/blk-rq-qos: cleanup rq_qos_add()
+> >
+> > and found the following issue:
+> > possible deadlock in pcpu_alloc_noprof
+> >
+> > Full report is available here:
+> > https://ci.syzbot.org/series/1aec77f0-c53f-4b3b-93fb-b3853983b6bd
+> >
+> > ***
+> >
+> > possible deadlock in pcpu_alloc_noprof
+> >
+> > tree:      linux-next
+> > URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/next/linux-next
+> > base:      7d31f578f3230f3b7b33b0930b08f9afd8429817
+> > arch:      amd64
+> > compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+> > config:    https://ci.syzbot.org/builds/70dca9e4-6667-4930-9024-150d656e503e/config
+> >
+> > soft_limit_in_bytes is deprecated and will be removed. Please report your usecase to linux-mm@kvack.org if you depend on this functionality.
+> > ======================================================
+> > WARNING: possible circular locking dependency detected
+> > syzkaller #0 Not tainted
+> > ------------------------------------------------------
+> > syz-executor/6047 is trying to acquire lock:
+> > ffffffff8e04f760 (fs_reclaim){+.+.}-{0:0}, at: prepare_alloc_pages+0x152/0x650
+> >
+> > but task is already holding lock:
+> > ffffffff8e02dde8 (pcpu_alloc_mutex){+.+.}-{4:4}, at: pcpu_alloc_noprof+0x25b/0x1750
+> >
+> > which lock already depends on the new lock.
+> >
+> >
+> > the existing dependency chain (in reverse order) is:
+> >
+> > -> #2 (pcpu_alloc_mutex){+.+.}-{4:4}:
+> >         __mutex_lock+0x187/0x1350
+> >         pcpu_alloc_noprof+0x25b/0x1750
+> >         blk_stat_alloc_callback+0xd5/0x220
+> >         wbt_init+0xa3/0x500
+> >         wbt_enable_default+0x25d/0x350
+> >         blk_register_queue+0x36a/0x3f0
+> >         __add_disk+0x677/0xd50
+> >         add_disk_fwnode+0xfc/0x480
+> >         loop_add+0x7f0/0xad0
+> >         loop_init+0xd9/0x170
+> >         do_one_initcall+0x1fb/0x820
+> >         do_initcall_level+0x104/0x190
+> >         do_initcalls+0x59/0xa0
+> >         kernel_init_freeable+0x334/0x4b0
+> >         kernel_init+0x1d/0x1d0
+> >         ret_from_fork+0x599/0xb30
+> >         ret_from_fork_asm+0x1a/0x30
+> >
+> > -> #1 (&q->q_usage_counter(io)#17){++++}-{0:0}:
+> >         blk_alloc_queue+0x538/0x620
+> >         __blk_mq_alloc_disk+0x15c/0x340
+> >         loop_add+0x411/0xad0
+> >         loop_init+0xd9/0x170
+> >         do_one_initcall+0x1fb/0x820
+> >         do_initcall_level+0x104/0x190
+> >         do_initcalls+0x59/0xa0
+> >         kernel_init_freeable+0x334/0x4b0
+> >         kernel_init+0x1d/0x1d0
+> >         ret_from_fork+0x599/0xb30
+> >         ret_from_fork_asm+0x1a/0x30
+> >
+> > -> #0 (fs_reclaim){+.+.}-{0:0}:
+> >         __lock_acquire+0x15a6/0x2cf0
+> >         lock_acquire+0x117/0x340
+> >         fs_reclaim_acquire+0x72/0x100
+> >         prepare_alloc_pages+0x152/0x650
+> >         __alloc_frozen_pages_noprof+0x123/0x370
+> >         __alloc_pages_noprof+0xa/0x30
+> >         pcpu_populate_chunk+0x182/0xb30
+> >         pcpu_alloc_noprof+0xcb6/0x1750
+> >         xt_percpu_counter_alloc+0x161/0x220
+> >         translate_table+0x1323/0x2040
+> >         ip6t_register_table+0x106/0x7d0
+> >         ip6table_nat_table_init+0x43/0x2e0
+> >         xt_find_table_lock+0x30c/0x3e0
+> >         xt_request_find_table_lock+0x26/0x100
+> >         do_ip6t_get_ctl+0x730/0x1180
+> >         nf_getsockopt+0x26e/0x290
+> >         ipv6_getsockopt+0x1ed/0x290
+> >         do_sock_getsockopt+0x2b4/0x3d0
+> >         __x64_sys_getsockopt+0x1a5/0x250
+> >         do_syscall_64+0xfa/0xf80
+> >         entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> >
+> > other info that might help us debug this:
+> >
+> > Chain exists of:
+> >    fs_reclaim --> &q->q_usage_counter(io)#17 --> pcpu_alloc_mutex
+> >
+> >   Possible unsafe locking scenario:
+> >
+> >         CPU0                    CPU1
+> >         ----                    ----
+> >    lock(pcpu_alloc_mutex);
+> >                                 lock(&q->q_usage_counter(io)#17);
+> >                                 lock(pcpu_alloc_mutex);
+> >    lock(fs_reclaim);
+> 
+> This does not look like introduced by this set, wbt_init() will hold
+> pcpu_alloc_mutex, and it can be called with queue frozen without this
+> set.
+
+It is introduced by your patch 6 in which blk_mq_freeze_queue() is added
+before calling wb_init() from wbt_enable_default(), then the warning is
+triggered.
+
+
+
+Thanks,
+Ming
+
