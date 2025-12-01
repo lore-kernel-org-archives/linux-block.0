@@ -1,309 +1,233 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AB061B423B
-	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 21:16:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9E841E3DED
+	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 21:41:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764623780; cv=none; b=u6qln2rda4U/XhuY7usWpnYxI1Zvzqr5R2v6h2mqwqasKXIDyKF08AWeNnNKTA5BTzf0wEKnAWeArw802YwH/FN1GJbin3JJmroxRhuGFCOvds/c4tZkK7d0PhtAs871cjDb0kwNOKFJkEj4pr8Q+zrhABL+RW2OMHuDaSQbcy8=
+	t=1764625274; cv=none; b=qrrwfGQzR7F5Haf5Lnbbgcr7CkwzXB0YkNxf7OKvVsBWauaG5/K1Y2XKuGECDhL5Tbt49HuI4540HUfLW82RKPrFC67Z6luW7GT6wN0OptzqHfPnO7vljsEjo4hhMp80lPG/HlKKADV0Cefmdovg17BTmIbgQaSKzVW9n3RDCFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764623780; c=relaxed/simple;
-	bh=4BJsawf23WaYBPw+2quriHFleiT8UwKpJysJk2IsiY0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mEuWxmkTX2yVEu59yV4/EfL0B2OCpnO4fURirkNo5JALvMScF9l+Ciflqn8xerwcbAJGIBWtunbA+pVpdLeY9Mi1gr2FBiOscDkVMCJgJwxo4KBIBUwbFAO0/4WR+TOi3OYSsQ0+0VTn/xOKVSZKybIEu1K9BCLW9ZZhqaQ3uRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=evHdO1cn; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1764625274; c=relaxed/simple;
+	bh=T8weHn8otMphpEreUJWqv5SlzDSbz8VmMVimy7muyEw=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=K0oIx+bPYE7c0adEiGeOVFmi5WwTd/ErNhCvEv4RBQr8G87tO4uJ/J4mGqoTwXNNo6vuL4fkkzgtt4CxArc82ZFQzNSU7K7JWcoDbriwoSGjlW+XAzU26fVtaMMVr6FIKGTel3zJXMb5cbeYrY3WNZa5td2OAwcw3htPGpFuQRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=V+TkjIr7; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="evHdO1cn"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-297d6c0fe27so5211505ad.2
-        for <linux-block@vger.kernel.org>; Mon, 01 Dec 2025 13:16:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1764623778; x=1765228578; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=inc9xEM0xtxWIiXbPVBas+bir2/LUZdUnnfmfmYr6D0=;
-        b=evHdO1cn8xnj6BUYgjI5/cXX8ZtFdBJA2VheM2lugipt/ge8SpliM5xmphX+1O67jw
-         gSIOAihzXxy3GLtyaNBycQvWiG5fO8gfXVqI87iGpJK0NmP1flLQFo2rqIPbBfhF/bvh
-         xl3hun5wrHkLUK8YCyb1rVvEoAVJSIxSB2cGI+xI7PopZ2PYgJsaKDstWEVNSyE2QbLF
-         E2u2rYxQGP4snECHbLLyGc3tL3uZ/FzS0LtJlqejweVRjQYYF+EJ+SxEAxb7E2UzIAA0
-         THQCf2ON6972Ggai1Zv5YteNb5MilWKuLuuxoniVl0XBWz0cUuvn/oSQFOgMQQUeQ8t6
-         0Tmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764623778; x=1765228578;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=inc9xEM0xtxWIiXbPVBas+bir2/LUZdUnnfmfmYr6D0=;
-        b=JE92K8+C2C0tFu7O9XfYWZ5sAxWUZ7THf08qkCFNRnBzRLhZAyXM7cIJ9oHez0c/+e
-         SxAI05qZZBIDJUCvvxtd/auANMT/wfjdlUIAAv47nGKrUiGdDrsmvB1v+Hm4Gw8CKwNV
-         eAuK1E8/nSpe/w5tTakfiNHGnP995VVq/hTG089dKO9bX/ScDDbhLYK0psUT8HpWtBTz
-         xnAnCB+oWfvzOwBe1JeilEqPEXy8Zf8AJNENcwkYTIzmMbx4b6IxaBegBPJPyLBuVozK
-         tVdsWHnerUmC1Av/6RwdMknfkTSF4g3QzGvnV2dt00jlKQy8q/5DFCXo69MuLPZnT/I3
-         pRFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUVs9sRBU4P87YzpPHjoHeZS3HUP5IEgIYmKy9tY0+Bu+o2BJK0T2HFqGQs39OTDf2zRXcipAYMU9BdpA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbCk7Y7d1lfNv0EYmnLhnA7mCeku+CJXwfWgRAyp2Afp87j1+E
-	RLeIL+YhtjTboYTY9y+pUoyjukv2o6FtrFdnS46nQoSYoqsk7IJAHROXRF/9k3ER9pNsVV+RCUO
-	8ugykWV/AMeIVmQcRhWRhHMmY0a0XC+f7ST7hA30sP6v3iGNBg6vaiE37tw==
-X-Gm-Gg: ASbGncuNjhqjz2wNyUVxLBL6UFnzBwLVuTzf/BafsE9WXjmSFovi9Ul7pap1JHIUJV2
-	rOgD02q4y18qdwUXlDyEV9AwjaaITiJZNFd5FeX/qeTtiH4/DIaiP0e5E7O7/N7F/BTER9WpTYp
-	0znNzVtdCLAgxnulmJxi1HDkMQKbi8OnFF7FgC7xcjdBMraB/jTOYtQTVEKCwdZXK3FT4yIli7v
-	G5IznkFdOhzfvavuIt+fjNk/gATZuf51YqIQ2yz6zpyF+vh+FAWS8sQCfMwnc2tTfxHbD8w
-X-Google-Smtp-Source: AGHT+IFGX0Fu3nQPXZJi5KYagCbiXTbkfWqIh81SR4ivLc0TmvSBwbp7Soi9KpEfqSWJmrLKWYiLbQ++24osQzV8EV8=
-X-Received: by 2002:a05:7300:e80a:b0:2a4:3593:5fc6 with SMTP id
- 5a478bee46e88-2a718b198bemr25442906eec.0.1764623777272; Mon, 01 Dec 2025
- 13:16:17 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="V+TkjIr7"
+Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
+	by m0089730.ppops.net (8.18.1.11/8.18.1.11) with ESMTP id 5B1LcceI2417578
+	for <linux-block@vger.kernel.org>; Mon, 1 Dec 2025 13:41:11 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
+	 bh=l/N0oNZdrOxC+sMk7wLBt3mzHipkA8OrRZGOO0xO1fI=; b=V+TkjIr7KWZb
+	sRdL8/VOJPGgPW2bL/cMGaS/KBRtFcoKOttu+76x4hqtNMLkdpqHKW3v+QqUPRiF
+	oxZRhhbX9SNSV9sOdtDFClD+M3F9xLwSMco23ZZlHuJZLdgrPT3PzP8q7YZ7B/AB
+	vv5ecjvYwPinfcyN3yt3PpPjff8C7qj0jRtJw/cCukmFG+jKaPh7DDuWU7V+qHJq
+	RCQ12lMGh/XVa/fVsyvBXNRteMBV8JmZ/lf6gC4ZixKOCYZ9Eghqe2qFl2qVEhx6
+	m49T5XFMtWYsR6QlXkS9EG/L+y6fwPGyORjkHssnBZQBI/IgtNh7/iPIH2vrylPR
+	I1EWs/1guw==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by m0089730.ppops.net (PPS) with ESMTPS id 4ask4480p4-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Mon, 01 Dec 2025 13:41:11 -0800 (PST)
+Received: from twshared71707.17.frc2.facebook.com (2620:10d:c085:108::4) by
+ mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.29; Mon, 1 Dec 2025 21:41:09 +0000
+Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
+	id AC0FF45AA8A1; Mon,  1 Dec 2025 13:40:56 -0800 (PST)
+From: Keith Busch <kbusch@meta.com>
+To: <dm-devel@lists.linux.dev>, <snitzer@kernel.org>, <hch@lst.de>,
+        <ebiggers@kernel.org>
+CC: <linux-block@vger.kernel.org>, <axboe@kernel.dk>,
+        Keith Busch
+	<kbusch@kernel.org>
+Subject: [PATCHv3 2/2] dm-crypt: dynamic scatterlist for many segments
+Date: Mon, 1 Dec 2025 13:40:52 -0800
+Message-ID: <20251201214052.1531952-3-kbusch@meta.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20251201214052.1531952-1-kbusch@meta.com>
+References: <20251201214052.1531952-1-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251121015851.3672073-1-ming.lei@redhat.com> <20251121015851.3672073-17-ming.lei@redhat.com>
-In-Reply-To: <20251121015851.3672073-17-ming.lei@redhat.com>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Mon, 1 Dec 2025 13:16:04 -0800
-X-Gm-Features: AWmQ_bklgvKWRISSzDpMkiJLXtlOWAoBRWvtbmT9Y7vpxiCGijErGtQR3BeR-Gg
-Message-ID: <CADUfDZoXKATH_nQ0TEqj6BrN+e-Shkd11CUJaJJ_FKbrTrv=GQ@mail.gmail.com>
-Subject: Re: [PATCH V4 16/27] ublk: add new feature UBLK_F_BATCH_IO
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Uday Shankar <ushankar@purestorage.com>, Stefani Seibold <stefani@seibold.net>, 
-	Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjAxMDE3MyBTYWx0ZWRfX55tdIC3EvAD7
+ sMoKzGUg2PaXnxNVBaoWUJ8MWLUfFlLTU4zIHhF5F8IgNmIxwAkC1KZ7b8oq2VQDtCGH6rb+N7P
+ EUhpNi+eJCAUlJN417CGZrCVN9vQbogq2l1tK+QbEqEkV5bR3bfXnR4QbFMrPjNc1znbT6qInmc
+ bib9NxINC8y90YliSMgrHGeF3nlRNBdZrrucLlOMJfJWVo2wyLy45goAJ2zW6HDlQHhUl0q97zK
+ oJpVbV3R9ISPG/M9vRBTBQ3dP3jnwlMIiQN/WrbJw3bZAAJmCaeeFP3CAoYY62inhDA424dD6GL
+ hYHMLTFAst4ImDif0D+5MFBv0iii5c8fW4IeJhcDUtPDLAagkxFnt+B9Bk+mcguRgZ261fFrWzg
+ 6j01vvboElln0+5X5tiYZn2LkStXww==
+X-Authority-Analysis: v=2.4 cv=LYExKzfi c=1 sm=1 tr=0 ts=692e0b77 cx=c_pps
+ a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
+ a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8
+ a=uKr_gk69WBrFS6epR-gA:9
+X-Proofpoint-GUID: QXaQBOQCEmA5buoU6Ii-tg0AgQ-cxpvu
+X-Proofpoint-ORIG-GUID: QXaQBOQCEmA5buoU6Ii-tg0AgQ-cxpvu
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-28_08,2025-11-27_02,2025-10-01_01
 
-On Thu, Nov 20, 2025 at 6:00=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrot=
-e:
->
-> Add new feature UBLK_F_BATCH_IO which replaces the following two
-> per-io commands:
->
->         - UBLK_U_IO_FETCH_REQ
->
->         - UBLK_U_IO_COMMIT_AND_FETCH_REQ
->
-> with three per-queue batch io uring_cmd:
->
->         - UBLK_U_IO_PREP_IO_CMDS
->
->         - UBLK_U_IO_COMMIT_IO_CMDS
->
->         - UBLK_U_IO_FETCH_IO_CMDS
->
-> Then ublk can deliver batch io commands to ublk server in single
-> multishort uring_cmd, also allows to prepare & commit multiple
-> commands in batch style via single uring_cmd, communication cost is
-> reduced a lot.
->
-> This feature also doesn't limit task context any more for all supported
-> commands, so any allowed uring_cmd can be issued in any task context.
-> ublk server implementation becomes much easier.
->
-> Meantime load balance becomes much easier to support with this feature.
-> The command `UBLK_U_IO_FETCH_IO_CMDS` can be issued from multiple task
-> contexts, so each task can adjust this command's buffer length or number
-> of inflight commands for controlling how much load is handled by current
-> task.
->
-> Later, priority parameter will be added to command `UBLK_U_IO_FETCH_IO_CM=
-DS`
-> for improving load balance support.
->
-> UBLK_U_IO_GET_DATA isn't supported in batch io yet, but it may be
+From: Keith Busch <kbusch@kernel.org>
 
-UBLK_U_IO_NEED_GET_DATA?
+In the unlikely case where the base bio uses a highly fragmented vector,
+the four inline scatterlist elements may not be enough, so allocate a
+temporary scatterlist when needed.
 
-> enabled in future via its batch pair.
->
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  drivers/block/ublk_drv.c      | 58 ++++++++++++++++++++++++++++++++---
->  include/uapi/linux/ublk_cmd.h | 16 ++++++++++
->  2 files changed, 69 insertions(+), 5 deletions(-)
->
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index 849199771f86..90cd1863bc83 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -74,7 +74,8 @@
->                 | UBLK_F_AUTO_BUF_REG \
->                 | UBLK_F_QUIESCE \
->                 | UBLK_F_PER_IO_DAEMON \
-> -               | UBLK_F_BUF_REG_OFF_DAEMON)
-> +               | UBLK_F_BUF_REG_OFF_DAEMON \
-> +               | UBLK_F_BATCH_IO)
->
->  #define UBLK_F_ALL_RECOVERY_FLAGS (UBLK_F_USER_RECOVERY \
->                 | UBLK_F_USER_RECOVERY_REISSUE \
-> @@ -320,12 +321,12 @@ static void ublk_batch_dispatch(struct ublk_queue *=
-ubq,
->
->  static inline bool ublk_dev_support_batch_io(const struct ublk_device *u=
-b)
->  {
-> -       return false;
-> +       return ub->dev_info.flags & UBLK_F_BATCH_IO;
->  }
->
->  static inline bool ublk_support_batch_io(const struct ublk_queue *ubq)
->  {
-> -       return false;
-> +       return ubq->flags & UBLK_F_BATCH_IO;
->  }
->
->  static inline void ublk_io_lock(struct ublk_io *io)
-> @@ -3450,6 +3451,41 @@ static int ublk_validate_batch_fetch_cmd(struct ub=
-lk_batch_io_data *data,
->         return 0;
->  }
->
-> +static int ublk_handle_non_batch_cmd(struct io_uring_cmd *cmd,
-> +                                    unsigned int issue_flags)
-> +{
-> +       const struct ublksrv_io_cmd *ub_cmd =3D io_uring_sqe_cmd(cmd->sqe=
-);
-> +       struct ublk_device *ub =3D cmd->file->private_data;
-> +       unsigned tag =3D READ_ONCE(ub_cmd->tag);
-> +       unsigned q_id =3D READ_ONCE(ub_cmd->q_id);
-> +       unsigned index =3D READ_ONCE(ub_cmd->addr);
-> +       struct ublk_queue *ubq;
-> +       struct ublk_io *io;
-> +       int ret =3D -EINVAL;
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ drivers/md/dm-crypt.c | 51 +++++++++++++++++++++++++++++++++----------
+ 1 file changed, 40 insertions(+), 11 deletions(-)
 
-I think it would be clearer to just return -EINVAL instead of adding
-this variable, but up to you
+diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+index 5304954b4574b..d659ea4573192 100644
+--- a/drivers/md/dm-crypt.c
++++ b/drivers/md/dm-crypt.c
+@@ -98,6 +98,8 @@ struct dm_crypt_request {
+ 	struct scatterlist sg_in[4];
+ 	struct scatterlist sg_out[4];
+ 	u64 iv_sector;
++	struct scatterlist *__sg_in;
++	struct scatterlist *__sg_out;
+ };
+=20
+ struct crypt_config;
+@@ -1426,18 +1428,32 @@ static int crypt_convert_block_aead(struct crypt_=
+config *cc,
+ 	return r;
+ }
+=20
+-static int crypt_build_sgl(struct crypt_config *cc, struct scatterlist *=
+sg,
++static void crypt_free_sgls(struct dm_crypt_request *dmreq)
++{
++	if (dmreq->__sg_in !=3D dmreq->sg_in)
++		kfree(dmreq->__sg_in);
++	if (dmreq->__sg_out !=3D dmreq->sg_out)
++		kfree(dmreq->__sg_out);
++	dmreq->__sg_in =3D NULL;
++	dmreq->__sg_out =3D NULL;
++}
++
++static int crypt_build_sgl(struct crypt_config *cc, struct scatterlist *=
+*psg,
+ 			   struct bvec_iter *iter, struct bio *bio,
+ 			   int max_segs)
+ {
+ 	unsigned int bytes =3D cc->sector_size;
++	struct scatterlist *sg =3D *psg;
+ 	struct bvec_iter tmp =3D *iter;
+ 	int segs, i =3D 0;
+=20
+ 	bio_advance_iter(bio, &tmp, bytes);
+ 	segs =3D tmp.bi_idx - iter->bi_idx + !!tmp.bi_bvec_done;
+-	if (segs > max_segs)
+-		return -EIO;
++	if (segs > max_segs) {
++		sg =3D kmalloc_array(segs, sizeof(struct scatterlist), GFP_NOIO);
++		if (!sg)
++			return -ENOMEM;
++	}
+=20
+ 	sg_init_table(sg, segs);
+ 	do {
+@@ -1446,7 +1462,7 @@ static int crypt_build_sgl(struct crypt_config *cc,=
+ struct scatterlist *sg,
+=20
+ 		/* Reject unexpected unaligned bio. */
+ 		if (unlikely((len | bv.bv_offset) & cc->io_alignment))
+-			return -EIO;
++			goto error;
+=20
+ 		sg_set_page(&sg[i++], bv.bv_page, len, bv.bv_offset);
+ 		bio_advance_iter_single(bio, iter, len);
+@@ -1454,8 +1470,13 @@ static int crypt_build_sgl(struct crypt_config *cc=
+, struct scatterlist *sg,
+ 	} while (bytes);
+=20
+ 	if (WARN_ON_ONCE(i !=3D segs))
+-		return -EIO;
++		goto error;
++	*psg =3D sg;
+ 	return 0;
++error:
++	if (sg !=3D *psg)
++		kfree(sg);
++	return -EIO;
+ }
+=20
+ static int crypt_convert_block_skcipher(struct crypt_config *cc,
+@@ -1484,18 +1505,21 @@ static int crypt_convert_block_skcipher(struct cr=
+ypt_config *cc,
+ 	sector =3D org_sector_of_dmreq(cc, dmreq);
+ 	*sector =3D cpu_to_le64(ctx->cc_sector - cc->iv_offset);
+=20
+-	sg_in  =3D &dmreq->sg_in[0];
+-	sg_out =3D &dmreq->sg_out[0];
++	dmreq->__sg_in =3D &dmreq->sg_in[0];
++	dmreq->__sg_out =3D &dmreq->sg_out[0];
+=20
+-	r =3D crypt_build_sgl(cc, sg_in, &ctx->iter_in, ctx->bio_in,
++	r =3D crypt_build_sgl(cc, &dmreq->__sg_in, &ctx->iter_in, ctx->bio_in,
+ 			    ARRAY_SIZE(dmreq->sg_in));
+ 	if (r < 0)
+ 		return r;
+=20
+-	r =3D crypt_build_sgl(cc, sg_out, &ctx->iter_out, ctx->bio_out,
++	r =3D crypt_build_sgl(cc, &dmreq->__sg_out, &ctx->iter_out, ctx->bio_ou=
+t,
+ 			    ARRAY_SIZE(dmreq->sg_out));
+ 	if (r < 0)
+-		return r;
++		goto out;
++
++	sg_in =3D dmreq->__sg_in;
++	sg_out =3D dmreq->__sg_out;
+=20
+ 	if (cc->iv_gen_ops) {
+ 		/* For READs use IV stored in integrity metadata */
+@@ -1504,7 +1528,7 @@ static int crypt_convert_block_skcipher(struct cryp=
+t_config *cc,
+ 		} else {
+ 			r =3D cc->iv_gen_ops->generator(cc, org_iv, dmreq);
+ 			if (r < 0)
+-				return r;
++				goto out;
+ 			/* Data can be already preprocessed in generator */
+ 			if (test_bit(CRYPT_ENCRYPT_PREPROCESS, &cc->cipher_flags))
+ 				sg_in =3D sg_out;
+@@ -1525,6 +1549,9 @@ static int crypt_convert_block_skcipher(struct cryp=
+t_config *cc,
+=20
+ 	if (!r && cc->iv_gen_ops && cc->iv_gen_ops->post)
+ 		r =3D cc->iv_gen_ops->post(cc, org_iv, dmreq);
++out:
++	if (r !=3D -EINPROGRESS && r !=3D -EBUSY)
++		crypt_free_sgls(dmreq);
+=20
+ 	return r;
+ }
+@@ -1590,7 +1617,9 @@ static void crypt_free_req_skcipher(struct crypt_co=
+nfig *cc,
+ 				    struct skcipher_request *req, struct bio *base_bio)
+ {
+ 	struct dm_crypt_io *io =3D dm_per_bio_data(base_bio, cc->per_bio_data_s=
+ize);
++	struct dm_crypt_request *dmreq =3D dmreq_of_req(cc, req);
+=20
++	crypt_free_sgls(dmreq);
+ 	if ((struct skcipher_request *)(io + 1) !=3D req)
+ 		mempool_free(req, &cc->req_pool);
+ }
+--=20
+2.47.3
 
-> +
-> +       if (!ub)
-> +               return ret;
-
-How is this case possible?
-
-> +
-> +       if (q_id >=3D ub->dev_info.nr_hw_queues)
-> +               return ret;
-> +
-> +       ubq =3D ublk_get_queue(ub, q_id);
-> +       if (tag >=3D ubq->q_depth)
-
-Can avoid the likely cache miss here by using ub->dev_info.queue_depth
-instead, analogous to ublk_ch_uring_cmd_local()
-
-> +               return ret;
-> +
-> +       io =3D &ubq->ios[tag];
-> +
-> +       switch (cmd->cmd_op) {
-> +       case UBLK_U_IO_REGISTER_IO_BUF:
-> +               return ublk_register_io_buf(cmd, ub, q_id, tag, io, index=
-,
-> +                               issue_flags);
-> +       case UBLK_U_IO_UNREGISTER_IO_BUF:
-> +               return ublk_unregister_io_buf(cmd, ub, index, issue_flags=
-);
-> +       default:
-> +               return -EOPNOTSUPP;
-> +       }
-> +}
-> +
->  static int ublk_ch_batch_io_uring_cmd(struct io_uring_cmd *cmd,
->                                        unsigned int issue_flags)
->  {
-> @@ -3497,7 +3533,8 @@ static int ublk_ch_batch_io_uring_cmd(struct io_uri=
-ng_cmd *cmd,
->                 ret =3D ublk_handle_batch_fetch_cmd(&data);
->                 break;
->         default:
-> -               ret =3D -EOPNOTSUPP;
-> +               ret =3D ublk_handle_non_batch_cmd(cmd, issue_flags);
-
-We should probably skip the if (data.header.q_id >=3D
-ub->dev_info.nr_hw_queues) check for a non-batch command?
-
-> +               break;
->         }
->  out:
->         return ret;
-> @@ -4163,9 +4200,13 @@ static int ublk_ctrl_add_dev(const struct ublksrv_=
-ctrl_cmd *header)
->
->         ub->dev_info.flags |=3D UBLK_F_CMD_IOCTL_ENCODE |
->                 UBLK_F_URING_CMD_COMP_IN_TASK |
-> -               UBLK_F_PER_IO_DAEMON |
-> +               (ublk_dev_support_batch_io(ub) ? 0 : UBLK_F_PER_IO_DAEMON=
-) |
-
-Seems redundant with the logic below to clear UBLK_F_PER_IO_DAEMON if
-(ublk_dev_support_batch_io(ub))?
-
->                 UBLK_F_BUF_REG_OFF_DAEMON;
->
-> +       /* So far, UBLK_F_PER_IO_DAEMON won't be exposed for BATCH_IO */
-> +       if (ublk_dev_support_batch_io(ub))
-> +               ub->dev_info.flags &=3D ~UBLK_F_PER_IO_DAEMON;
-> +
->         /* GET_DATA isn't needed any more with USER_COPY or ZERO COPY */
->         if (ub->dev_info.flags & (UBLK_F_USER_COPY | UBLK_F_SUPPORT_ZERO_=
-COPY |
->                                 UBLK_F_AUTO_BUF_REG))
-> @@ -4518,6 +4559,13 @@ static int ublk_wait_for_idle_io(struct ublk_devic=
-e *ub,
->         unsigned int elapsed =3D 0;
->         int ret;
->
-> +       /*
-> +        * For UBLK_F_BATCH_IO ublk server can get notified with existing
-> +        * or new fetch command, so needn't wait any more
-> +        */
-> +       if (ublk_dev_support_batch_io(ub))
-> +               return 0;
-> +
->         while (elapsed < timeout_ms && !signal_pending(current)) {
->                 unsigned int queues_cancelable =3D 0;
->                 int i;
-> diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.=
-h
-> index cd894c1d188e..5e8b1211b7f4 100644
-> --- a/include/uapi/linux/ublk_cmd.h
-> +++ b/include/uapi/linux/ublk_cmd.h
-> @@ -335,6 +335,22 @@
->   */
->  #define UBLK_F_BUF_REG_OFF_DAEMON (1ULL << 14)
->
-> +
-> +/*
-> + * Support the following commands for delivering & committing io command
-> + * in batch.
-> + *
-> + *     - UBLK_U_IO_PREP_IO_CMDS
-> + *     - UBLK_U_IO_COMMIT_IO_CMDS
-> + *     - UBLK_U_IO_FETCH_IO_CMDS
-> + *     - UBLK_U_IO_REGISTER_IO_BUF
-> + *     - UBLK_U_IO_UNREGISTER_IO_BUF
-
-Seems like it might make sense to provided batched versions of
-UBLK_U_IO_REGISTER_IO_BUF and UBLK_U_IO_UNREGISTER_IO_BUF. That could
-be done in the future, I guess, but it might simplify
-ublk_ch_batch_io_uring_cmd() to only have to handle struct
-ublk_batch_io.
-
-> + *
-> + * The existing UBLK_U_IO_FETCH_REQ, UBLK_U_IO_COMMIT_AND_FETCH_REQ and
-> + * UBLK_U_IO_GET_DATA uring_cmd are not supported for this feature.
-
-UBLK_U_IO_NEED_GET_DATA?
-
-Best,
-Caleb
-
-> + */
-> +#define UBLK_F_BATCH_IO                (1ULL << 15)
-> +
->  /* device state */
->  #define UBLK_S_DEV_DEAD        0
->  #define UBLK_S_DEV_LIVE        1
-> --
-> 2.47.0
->
