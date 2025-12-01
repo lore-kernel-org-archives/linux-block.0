@@ -1,114 +1,214 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from sg-1-22.ptr.blmpb.com (sg-1-22.ptr.blmpb.com [118.26.132.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 927D51A3179
-	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 03:56:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FA5D1E7C23
+	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 04:43:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764561394; cv=none; b=j2g4a21hvlJQ3K6JTq8G57gXpPoOQJyaMnd1F0NA3DR4h4BEVOu4A6KOy8Qd340L2gY3l9ROnHTeZvBx8FInAUA3AiRkoWToNo6R3TU0FCMdg39I1wWMLB3bXwqC5/HPeJm94GYnPpZfPT8vBxROwhEcNKjfyu/mEg/+0/zLShE=
+	t=1764564207; cv=none; b=MN8AwKo81Ve8YQsXl24Ow68errCfyZGLvYe6ojy4NvLCGj2hlKrpF5kkMgumXWgfA+Dg2zF/7cVgPQg4LV5bGb3EFqyiMZQmMx0wXQRvvsqv4u75MvfvdSsAtOSQ99aapzkX36fLWpefg2064cD1AVNLWCHiz0T1tgP7f6kUuZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764561394; c=relaxed/simple;
-	bh=McOQTipQ2vTbXjA++68RW1XSamDCymkjaiQI9zBUL6Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IdOK7fAWAUYPzyyuZud3grG/XR0aKgvE/vwLI6k8cOJdJU5bbJxYD8Lc+GDoZi/VDv9Ov53LrlBTELlzCwoVDLanlH5JqPn0ChczeYrT0S38EDt/ap93Ex8I7LvB0r+V3e/MaQlpfwnDQONmFOgVhRPiMy5oh/QJg3j77Ig6eu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=KA+2EXoi; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1764564207; c=relaxed/simple;
+	bh=6xy6KfWbznYZWOUyBONr635zqqNGsE7Sm/2A3nSsnkI=;
+	h=From:References:Message-Id:Mime-Version:Content-Type:Subject:Date:
+	 Cc:In-Reply-To:To; b=scA1ReiCSWdzWqLWyoxzH+LhpCAucNo4aDTbZyviWDkf7GsLaBPa4+JE6HnkgQ/eA5w87aJb4LPgK2eBrxqAflnR+NiSSeob6AxNwolOgI5/eJK1tfTfwUWKe7JZZQSeBiuMgh+L3O8aLbYsguZoiEO7GjMi8Jj6Awv1p/PKQVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=none smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=pPcLvvK8; arc=none smtp.client-ip=118.26.132.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=fnnas.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="KA+2EXoi"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-29844c68068so41848325ad.2
-        for <linux-block@vger.kernel.org>; Sun, 30 Nov 2025 19:56:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1764561392; x=1765166192; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=qB+a+p4MqPixn1RqoqUzTdFtWB/99ITR4DTLW8S81nM=;
-        b=KA+2EXoiv0vcoRjBg18xuiaEdyO55JHQLhQw3hfQPXUQlyzJ3ec/sOySAmCVvNXWF9
-         6kNTrKIafAU7nHKBV1pEQ9ITrXOk1miYX5eHAmAJuDhyILVWQ78mFD6ehAOWKMmzxAoN
-         sBPCtaJ9hFcx+dJzf69S195fpBwAhAz8Tsu8c=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764561392; x=1765166192;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qB+a+p4MqPixn1RqoqUzTdFtWB/99ITR4DTLW8S81nM=;
-        b=trgf3TRoKHAIy4ZzOKPgH/1R3OJREMz8suf5MSWpCndRPr8d3PkFjZruk+HnDjDiom
-         CmQtwGYXJZvI0/8GCQIQvwQogK4cwtCScgY/ZP0S3OZRMmOJc7IfQbPoT8+Fd4qMNUH+
-         L6pLudc4wRO8Y+0XW6UClgcwHaV3wxaQ7a64IUJVzjC77nc+tzIoOQAMf9oyTOKpMVPp
-         e3J7R6VJnt3+36as4fvwn7u5UvMoxMMn81cdL1X7Dx4EZjZ8EaOaT3+ZFNL9RmhgThYa
-         vllCiyJIjFmuXnHwqKKEmeCm/SYxUedZUokpQh5w4oMqx4BABVQfaO3voei/T4e82om/
-         qloA==
-X-Forwarded-Encrypted: i=1; AJvYcCWUV5dPy67UGciKP1VfW/y8I0Sgf85kY1bMYUkf1YUsA68Y67vSWV8/t/McePxEQnCR+/ne9aqJu1rRJg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwaUe3jbLQ/51SDqcL1TxQZPWIooYcQjlfR/beJ+N6/ubz2LPkK
-	5WyA9QV+18LyhoctkHOC1FmMac3e86y3sQDPNHw7+XPClgnhdNBlZ97x2g2CMRRfbw==
-X-Gm-Gg: ASbGncsiwwOaLQDAu6OLZoXMZ02Nke5j6oBma9zMidUPc+mnW2rXs7h6OH8zxOJcWu+
-	g3RJBJG8w6shobvzw4vqn4M+AklB++5nZ2s5yfxEMPhpRfashAzhd26/ZvySX8DPPPF7gBxUxyK
-	7q3m7KhCHhsuPm271NJGsKbQ8ZwoM9TDuDt8up8pj+u+rx53l94mzIYLnV7cCDpvZvVUqMuwM9G
-	URW+zVRwDijEniJb9zp18GCQeW7vY8j55C2gp/G+ClvUQp9s2I0NBPuUiFJWNsRBSIEPNMwOn/5
-	+Jt7Nm67nowzBHYJ3zSyZqgK6CDJ2Zst39vbo/E8W8ZiD3I1A8u5vwUD5TvQPRkM2v/keN61tv7
-	hCYH7KHJKTua8ugAtbOT7o0AI6CagceD9RJCXPPfYScJRTq1A/cflnUO0lkDSUm3cZBVpctXNx4
-	2K14sHaTfDtObvwC/oG5uZSHCTfPoZoI240aGo++uddodffw3oJe4=
-X-Google-Smtp-Source: AGHT+IGKqD632RpKl5VzEYBMQpnYan4XzgzGuzvbee48YOC0K/yn1Egh3tF2peeJh4TbkCddTQ/sWA==
-X-Received: by 2002:a17:902:ef07:b0:294:cc1d:e2b6 with SMTP id d9443c01a7336-29b6bf9c727mr383590675ad.59.1764561391784;
-        Sun, 30 Nov 2025 19:56:31 -0800 (PST)
-Received: from google.com ([2a00:79e0:2031:6:943c:f651:f00f:2459])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29bceb450cfsm106014465ad.74.2025.11.30.19.56.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 30 Nov 2025 19:56:31 -0800 (PST)
-Date: Mon, 1 Dec 2025 12:56:25 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Barry Song <21cnbao@gmail.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, Richard Chang <richardycc@google.com>, 
-	Brian Geffon <bgeffon@google.com>, Minchan Kim <minchan@kernel.org>, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, linux-block@vger.kernel.org, Minchan Kim <minchan@google.com>
-Subject: Re: [PATCH 1/2] zram: introduce compressed data writeback
-Message-ID: <hgk3zp5hwlcxo6ufiqasvte3hoksy2wb2kta3fime5rprq4org@xaprrqdabvgh>
-References: <20251128170442.2988502-1-senozhatsky@chromium.org>
- <20251128170442.2988502-2-senozhatsky@chromium.org>
- <CAGsJ_4yUAw_tzX7z8iizToMB8SDJPNOhFRZNXva_ae46q5vRwg@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="pPcLvvK8"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1764564188;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=1VddponRGVNPku2nmOO6NM5OzN1VovjTnki9d+Nto9A=;
+ b=pPcLvvK8Nm9ZHbOqzegX9T7R/11lGktikaaPrlYGmVna/K1c1+Ghb8/dqzroWKOnIVBLJ3
+ qbgN23hQsZhrI9weqJjAHCFNOtp2NKoZFHjGKBWixavKINVKt7Cxq+Md8NfdrYdszWiYs+
+ QVerewzXlU40Ckjpo5dNeMavV55msJnRvEMyPfQXDNsknIp6+2kchveB/LXfKUEMHLUvL/
+ llLVBXJlKAs4D2SGpvdlcqfitcHZuNag2bWQLrdsu7D9Lyn8fsReiOke88t8XodLfGmmN/
+ 1D2UOYofIiYibMswL9d1w5YCj7C4FNt7Q9LlOz07Pp2Pi+PmtTy51LSGH2bl4w==
+Organization: fnnas
+X-Original-From: Yu Kuai <yukuai@fnnas.com>
+From: "Yu Kuai" <yukuai@fnnas.com>
+X-Lms-Return-Path: <lba+2692d1cda+006fa9+vger.kernel.org+yukuai@fnnas.com>
+References: <692c17ca.a70a0220.d98e3.016c.GAE@google.com> <18d6c3dc-2a86-46cd-972d-0158d7c3c461@fnnas.com> <aSzgwai7vSElcjLo@fedora>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <af82c6b9-e1da-499c-b01f-42f748787044@fnnas.com>
+Content-Language: en-US
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAGsJ_4yUAw_tzX7z8iizToMB8SDJPNOhFRZNXva_ae46q5vRwg@mail.gmail.com>
+Mime-Version: 1.0
+Received: from [192.168.1.104] ([39.182.0.153]) by smtp.feishu.cn with ESMTPS; Mon, 01 Dec 2025 12:43:05 +0800
+User-Agent: Mozilla Thunderbird
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [syzbot ci] Re: blk-mq: fix possible deadlocks
+Date: Mon, 1 Dec 2025 12:43:03 +0800
+Cc: "syzbot ci" <syzbot+cifc73f799778e73e7@syzkaller.appspotmail.com>, 
+	<axboe@kernel.dk>, <bvanassche@acm.org>, <linux-block@vger.kernel.org>, 
+	<nilay@linux.ibm.com>, <tj@kernel.org>, <syzbot@lists.linux.dev>, 
+	<syzkaller-bugs@googlegroups.com>, "Yu Kuai" <yukuai@fnnas.com>
+In-Reply-To: <aSzgwai7vSElcjLo@fedora>
+Reply-To: yukuai@fnnas.com
+To: "Ming Lei" <ming.lei@redhat.com>
 
-Hi Barry,
+Hi,
 
-On (25/11/29 17:55), Barry Song wrote:
-> On Sat, Nov 29, 2025 at 1:06 AM Sergey Senozhatsky
-> <senozhatsky@chromium.org> wrote:
-> >
-> > From: Richard Chang <richardycc@google.com>
-> >
-> 
-> Hi Richard, Sergey,
-> 
-> Thanks a lot for developing this. For years, people have been looking for
-> compressed data writeback to reduce I/O, such as compacting multiple compressed
-> blocks into a single page on block devices. I guess this patchset hasn’t reached
-> that point yet, right?
+=E5=9C=A8 2025/12/1 8:26, Ming Lei =E5=86=99=E9=81=93:
+> On Mon, Dec 01, 2025 at 03:50:22AM +0800, Yu Kuai wrote:
+>> Hi,
+>>
+>> =E5=9C=A8 2025/11/30 18:09, syzbot ci =E5=86=99=E9=81=93:
+>>> syzbot ci has tested the following series
+>>>
+>>> [v3] blk-mq: fix possible deadlocks
+>>> https://lore.kernel.org/all/20251130024349.2302128-1-yukuai@fnnas.com
+>>> * [PATCH v3 01/10] blk-mq-debugfs: factor out a helper to register debu=
+gfs for all rq_qos
+>>> * [PATCH v3 02/10] blk-rq-qos: fix possible debugfs_mutex deadlock
+>>> * [PATCH v3 03/10] blk-mq-debugfs: make blk_mq_debugfs_register_rqos() =
+static
+>>> * [PATCH v3 04/10] blk-mq-debugfs: warn about possible deadlock
+>>> * [PATCH v3 05/10] block/blk-rq-qos: add a new helper rq_qos_add_frozen=
+()
+>>> * [PATCH v3 06/10] blk-wbt: fix incorrect lock order for rq_qos_mutex a=
+nd freeze queue
+>>> * [PATCH v3 07/10] blk-iocost: fix incorrect lock order for rq_qos_mute=
+x and freeze queue
+>>> * [PATCH v3 08/10] blk-iolatency: fix incorrect lock order for rq_qos_m=
+utex and freeze queue
+>>> * [PATCH v3 09/10] blk-throttle: remove useless queue frozen
+>>> * [PATCH v3 10/10] block/blk-rq-qos: cleanup rq_qos_add()
+>>>
+>>> and found the following issue:
+>>> possible deadlock in pcpu_alloc_noprof
+>>>
+>>> Full report is available here:
+>>> https://ci.syzbot.org/series/1aec77f0-c53f-4b3b-93fb-b3853983b6bd
+>>>
+>>> ***
+>>>
+>>> possible deadlock in pcpu_alloc_noprof
+>>>
+>>> tree:      linux-next
+>>> URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/nex=
+t/linux-next
+>>> base:      7d31f578f3230f3b7b33b0930b08f9afd8429817
+>>> arch:      amd64
+>>> compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1=
+~exp1~20250708183702.136), Debian LLD 20.1.8
+>>> config:    https://ci.syzbot.org/builds/70dca9e4-6667-4930-9024-150d656=
+e503e/config
+>>>
+>>> soft_limit_in_bytes is deprecated and will be removed. Please report yo=
+ur usecase to linux-mm@kvack.org if you depend on this functionality.
+>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D
+>>> WARNING: possible circular locking dependency detected
+>>> syzkaller #0 Not tainted
+>>> ------------------------------------------------------
+>>> syz-executor/6047 is trying to acquire lock:
+>>> ffffffff8e04f760 (fs_reclaim){+.+.}-{0:0}, at: prepare_alloc_pages+0x15=
+2/0x650
+>>>
+>>> but task is already holding lock:
+>>> ffffffff8e02dde8 (pcpu_alloc_mutex){+.+.}-{4:4}, at: pcpu_alloc_noprof+=
+0x25b/0x1750
+>>>
+>>> which lock already depends on the new lock.
+>>>
+>>>
+>>> the existing dependency chain (in reverse order) is:
+>>>
+>>> -> #2 (pcpu_alloc_mutex){+.+.}-{4:4}:
+>>>          __mutex_lock+0x187/0x1350
+>>>          pcpu_alloc_noprof+0x25b/0x1750
+>>>          blk_stat_alloc_callback+0xd5/0x220
+>>>          wbt_init+0xa3/0x500
+>>>          wbt_enable_default+0x25d/0x350
+>>>          blk_register_queue+0x36a/0x3f0
+>>>          __add_disk+0x677/0xd50
+>>>          add_disk_fwnode+0xfc/0x480
+>>>          loop_add+0x7f0/0xad0
+>>>          loop_init+0xd9/0x170
+>>>          do_one_initcall+0x1fb/0x820
+>>>          do_initcall_level+0x104/0x190
+>>>          do_initcalls+0x59/0xa0
+>>>          kernel_init_freeable+0x334/0x4b0
+>>>          kernel_init+0x1d/0x1d0
+>>>          ret_from_fork+0x599/0xb30
+>>>          ret_from_fork_asm+0x1a/0x30
+>>>
+>>> -> #1 (&q->q_usage_counter(io)#17){++++}-{0:0}:
+>>>          blk_alloc_queue+0x538/0x620
+>>>          __blk_mq_alloc_disk+0x15c/0x340
+>>>          loop_add+0x411/0xad0
+>>>          loop_init+0xd9/0x170
+>>>          do_one_initcall+0x1fb/0x820
+>>>          do_initcall_level+0x104/0x190
+>>>          do_initcalls+0x59/0xa0
+>>>          kernel_init_freeable+0x334/0x4b0
+>>>          kernel_init+0x1d/0x1d0
+>>>          ret_from_fork+0x599/0xb30
+>>>          ret_from_fork_asm+0x1a/0x30
+>>>
+>>> -> #0 (fs_reclaim){+.+.}-{0:0}:
+>>>          __lock_acquire+0x15a6/0x2cf0
+>>>          lock_acquire+0x117/0x340
+>>>          fs_reclaim_acquire+0x72/0x100
+>>>          prepare_alloc_pages+0x152/0x650
+>>>          __alloc_frozen_pages_noprof+0x123/0x370
+>>>          __alloc_pages_noprof+0xa/0x30
+>>>          pcpu_populate_chunk+0x182/0xb30
+>>>          pcpu_alloc_noprof+0xcb6/0x1750
+>>>          xt_percpu_counter_alloc+0x161/0x220
+>>>          translate_table+0x1323/0x2040
+>>>          ip6t_register_table+0x106/0x7d0
+>>>          ip6table_nat_table_init+0x43/0x2e0
+>>>          xt_find_table_lock+0x30c/0x3e0
+>>>          xt_request_find_table_lock+0x26/0x100
+>>>          do_ip6t_get_ctl+0x730/0x1180
+>>>          nf_getsockopt+0x26e/0x290
+>>>          ipv6_getsockopt+0x1ed/0x290
+>>>          do_sock_getsockopt+0x2b4/0x3d0
+>>>          __x64_sys_getsockopt+0x1a5/0x250
+>>>          do_syscall_64+0xfa/0xf80
+>>>          entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>>>
+>>> other info that might help us debug this:
+>>>
+>>> Chain exists of:
+>>>     fs_reclaim --> &q->q_usage_counter(io)#17 --> pcpu_alloc_mutex
+>>>
+>>>    Possible unsafe locking scenario:
+>>>
+>>>          CPU0                    CPU1
+>>>          ----                    ----
+>>>     lock(pcpu_alloc_mutex);
+>>>                                  lock(&q->q_usage_counter(io)#17);
+>>>                                  lock(pcpu_alloc_mutex);
+>>>     lock(fs_reclaim);
+>> This does not look like introduced by this set, wbt_init() will hold
+>> pcpu_alloc_mutex, and it can be called with queue frozen without this
+>> set.
+> It is introduced by your patch 6 in which blk_mq_freeze_queue() is added
+> before calling wb_init() from wbt_enable_default(), then the warning is
+> triggered.
 
-Right.
+Yes, I know this, I mean it's the same before this set from queue_wb_lat_st=
+ore(),
+where freeze queue is already called before wbt_init(), and this is not a n=
+ew
+problem.
 
-> > zram stores all written back slots raw, which implies that
-> > during writeback zram first has to decompress slots (except
-> > for ZRAM_HUGE slots, which are raw already).  The problem
-> > with this approach is that not every written back page gets
-> > read back (either via read() or via page-fault), which means
-> > that zram basically wastes CPU cycles and battery decompressing
-> > such slots.  This changes with introduction of decompression
-> 
-> If a page is swapped out and never read again, does that actually indicate
-> a memory leak in userspace?
-
-No, it just means that there is no page-fault on that page.  E.g. we
-swapped out an unused browser tab and never come back to it within the
-session: e.g. user closed the tab/app, or logged out of session, or
-rebooted the device, or simply powered off (desktop/laptop).
+>
+>
+> Thanks,
+> Ming
+>
+>
+--=20
+Thanks,
+Kuai
