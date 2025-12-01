@@ -1,326 +1,349 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from OS8PR02CU002.outbound.protection.outlook.com (mail-japanwestazon11012049.outbound.protection.outlook.com [40.107.75.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 350FB2DA76F
-	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 12:38:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764592724; cv=none; b=VcXw4Ju/FikI92Ns6eLCRsKkCFAS8cBKC+zj1pkymawgGIaKM8ScqpfCBWEP8hUFyO+cEACQwoPphnII9qXyD8yaQNryM37en9IJQbFi8tcaQU+Clfnzje9z9BBCe0EuptipRTDlyjdc+EkCS2DbdWkfP+pjznD8dakbNuI1Eok=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764592724; c=relaxed/simple;
-	bh=HPhXohUXMX3bLp0fiuXQAO1Ec8vBG53c/gH1VBgkQCg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Pxt6D3QdM52YXeosiTbvv15feF4a/Ibd1LaQE+F/YFJNc5Qei+XqgtTaE6kUK02KXSNpCZb8VGBJqH6YHyNFXkGh32TO5J0cAf4hpE1pHcKT9uFgug0RGM84HPqRR1TsJsoVb6JgM39xc9Uywx6uSbZ0/k4Z0FpgQRh4v+hbFsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=K+sy+yda; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=a0R3DQwj; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=ejm3FPg1; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=MfEu9VYf; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6C102EFD88;
+	Mon,  1 Dec 2025 12:56:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.75.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764593780; cv=fail; b=YChdGlfirspMjkh292i1zO/daeqYwNCqOWA8ItIxxbR2IaLgg0fGhtAgxaurpLflZKq6LA18AkxttE8NpkxsoDL746ojvmN9Tuwz/Ariaj5TTYplZdtFRIrhebNoeNwl7xjN5c2SF11zIeXbFiiXHitHc8n6AyVQmOLUHaBJEi8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764593780; c=relaxed/simple;
+	bh=b/NJqw3EMcySXusf2sdQx8gYqNiYnTnVYT1Th4PsxgE=;
+	h=Message-ID:Date:Subject:From:To:Cc:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Nk4zrZqko/WIjQ8+JFcxaetz1W2+r4a0K8V4DtGzekCJL+SE/ok8BdSCFbXMHh8IBB2RT9fJb7enozMXDctoGCCN3tCiFcPx9zDYidlIILbwpV7+qX8pgJ5apE7FYVmIJbtwBjjawPEfRt8eLlMB1hOTAtG4HYTLVNrUg4XO60I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com; spf=pass smtp.mailfrom=vivo.com; dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b=gaVSkTsO; arc=fail smtp.client-ip=40.107.75.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivo.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="K+sy+yda";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="a0R3DQwj";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="ejm3FPg1";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="MfEu9VYf"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 09D725BE24;
-	Mon,  1 Dec 2025 12:38:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1764592719; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8BfaEsrvD1JMtEXJhTZyAxeHU0dIRAcHJ6hrnWXs9eQ=;
-	b=K+sy+ydaFjmj0u6reXFx3JQvxeSzNMWNgRjHueHUlMBjiP4j4+eX6NMP0YkkVTNv+LCX/e
-	wPEA7C2Fjw/PEVB4/oKmKaQ6uWsxaDYDzh7QN9PG7L09C1lNCbBNr3QpAXovHHkz1Ibpti
-	mz4f2xZgYr8LIktWb54le20y/2cbdCk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1764592719;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8BfaEsrvD1JMtEXJhTZyAxeHU0dIRAcHJ6hrnWXs9eQ=;
-	b=a0R3DQwj9JL8AbHcQhVBJz2jaw1rd3IV8VUdvCDiACvA/C8TNFiyxIQQ2jDLIIOqiuF3mo
-	h68NbQA5UNhghTDg==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=ejm3FPg1;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=MfEu9VYf
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1764592718; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8BfaEsrvD1JMtEXJhTZyAxeHU0dIRAcHJ6hrnWXs9eQ=;
-	b=ejm3FPg1EXXFCvEIZfJEaNW6ddxpu9Uqj3EZpVGDtyFeT5YBIly73XNKvVK2TsT+RM+Smb
-	ZAxqpDiT2Hxte621D1G9aABy7wrlqyClwJ8hCW9w8gvAbbviWyKaUuid3942o6uHX4G4VD
-	Ses7dmCNeHNVtsOLEanEfZkN+95YXBY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1764592718;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8BfaEsrvD1JMtEXJhTZyAxeHU0dIRAcHJ6hrnWXs9eQ=;
-	b=MfEu9VYfPtVIN3CnTktwZT8GRU28FkaqozQtL2P5KVqhkyvGdwyq+KG3l0J07fnYPSmb/+
-	zUm/VIDWWiLwc0Dg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id DEB493EA63;
-	Mon,  1 Dec 2025 12:38:37 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id hvNXNk2MLWm1BwAAD6G6ig
-	(envelope-from <jack@suse.cz>); Mon, 01 Dec 2025 12:38:37 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 354D3A09A3; Mon,  1 Dec 2025 13:38:37 +0100 (CET)
-Date: Mon, 1 Dec 2025 13:38:37 +0100
-From: Jan Kara <jack@suse.cz>
-To: Yongpeng Yang <yangyongpeng.storage@gmail.com>
-Cc: Raphael Pinsonneault-Thibeault <rpthibeault@gmail.com>, 
-	axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	jack@suse.cz, cascardo@igalia.com, linux-kernel-mentees@lists.linux.dev, 
-	skhan@linuxfoundation.org, syzbot+3ee481e21fd75e14c397@syzkaller.appspotmail.com, 
-	Yongpeng Yang <yangyongpeng@xiaomi.com>
-Subject: Re: [PATCH] loop: don't change loop device under exclusive opener in
- loop_set_status
-Message-ID: <zoc2xguhdvjkon36d67usvf2wpufcreiti22sjgekhbhtkvdkp@iezwglvxdw4t>
-References: <20251114144204.2402336-2-rpthibeault@gmail.com>
- <93a1773e-e30a-469d-bc8f-029773112401@gmail.com>
+	dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b="gaVSkTsO"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=e7YOsEbvfKvEpaL3OYqskBimvW0UiBzxNiz+0SOzgFVTmYEfz9r23wa98wx8MgqgrMxSxiQQKzmnw7CoHuz9QMz8Pxb3emXSIe2JSopDyG48lykK6a+AhclfRBBJG/D/DBmP2pN6ESAG7RuocYTx7RIosaUrseV2ngiDcN+kLbKMU9MJ9pKFfrFGGyOUyDceAQukL35NE9bfB5VSh7l/ylJxm7s0+FG46KgNBZaKjwojpDEJpsjUPEP/VSvvBbTUyL1BRDgeAIK1vw0mQfQu/hHhB5CEUsI/QqahkBJpPxibuIniIUkeo/o9wVDHd2WJxpXs05niLVnLHbtHsS2OcQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=nMCMqQbT4/h/c1ymO0l3gr7E1qHFD1HMYvIIt4MeL8k=;
+ b=Y6fnu/ldUPqa3QeZYtRJ6/YhbIrn33mnWoUOF57/8N4uamTh35IeqCM1XTQ3980J0hutOyuuZ8LebqgBdPLsS4D4x2DU2VVJ7nW7Z5bkjRM7w4SO8LtPGj5Gd3uU/0beMQYvWMZffe5aqud2+5QoXyfgh+d/vuvQSkIOK19P0yd2HbasXAoc0RNJY0TSQAbRb938GQ6RMMdhL4poBBvSfDRPhm3iCZuTmpVRp5UJmNN4FPjRFgAT0Im5C4+NHye0pyuH9d2+o2tq3jUO6FLiC03xMECFrwkKANVMX1x26Cy/rk1AvelRCwtjUgNbFIhvLf4UUY+YB1c7NpxS/BSVKA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
+ dkim=pass header.d=vivo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nMCMqQbT4/h/c1ymO0l3gr7E1qHFD1HMYvIIt4MeL8k=;
+ b=gaVSkTsO+++/kS8MYgP6riAq9FfDMFduka/wuYKxnz6EaTrBC3zDRzIBHE05kQz8LOwGhB8X6nhsfZphZfpAuOWHOUf5iTgrxTpoj9OfHqEmodBMfuO6QxsPlGjrVZBydcWsvMKjfD3XWorGo0DVuEEFuWAaqIPdgoGyRuNGpz9dzABIU175W+qNWSPEAjND9Imowh8neWq8fV48v4ZkVWKUdBefk3fPJpvyHXxbFALNqKEIzGiAoLFzD1BmcS3EuZ7PBfOSHipCdNiLfzkBvQ2OjKx7QDsSFFFaiCv42m8tKJ2mppIaPKYsWP9nUY7v6mpo+iups4FlqYtkFOnvPg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=vivo.com;
+Received: from KL1PR06MB7401.apcprd06.prod.outlook.com (2603:1096:820:146::12)
+ by TYZPR06MB6307.apcprd06.prod.outlook.com (2603:1096:400:41b::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.17; Mon, 1 Dec
+ 2025 12:56:10 +0000
+Received: from KL1PR06MB7401.apcprd06.prod.outlook.com
+ ([fe80::6f03:984f:82ec:6846]) by KL1PR06MB7401.apcprd06.prod.outlook.com
+ ([fe80::6f03:984f:82ec:6846%7]) with mapi id 15.20.9366.012; Mon, 1 Dec 2025
+ 12:56:10 +0000
+Message-ID: <8fa4023f-50f2-4e25-9f9b-4e5236015e27@vivo.com>
+Date: Mon, 1 Dec 2025 20:56:06 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] PM: runtime: Fix I/O hang due to race between resume
+ and runtime disable
+Content-Language: en-US
+From: YangYang <yang.yang@vivo.com>
+To: "Rafael J. Wysocki" <rafael@kernel.org>,
+ Bart Van Assche <bvanassche@acm.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Pavel Machek <pavel@kernel.org>,
+ Len Brown <lenb@kernel.org>, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, Danilo Krummrich <dakr@kernel.org>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-pm@vger.kernel.org
+References: <20251126101636.205505-1-yang.yang@vivo.com>
+ <CAJZ5v0jiLAgHCQ51cYqUX-xjir7ooAC3xKH9wMbwrebOEuxFdw@mail.gmail.com>
+ <CAJZ5v0hKpGbwFmxcH8qe=DPf_5GX=LD=Fqj3dgOApUoE1RmJAQ@mail.gmail.com>
+ <4697314.LvFx2qVVIh@rafael.j.wysocki>
+ <dc4dba4f-8334-40ea-8c53-6e8d135f1d41@acm.org>
+ <CAJZ5v0jV-80kfk-AY70b5pQtyXxUtU_ACBVP_TeTAnaY0Up8Lw@mail.gmail.com>
+ <1e7583e8-9ae9-4641-8ec2-7c62a637c9fc@acm.org>
+ <CAJZ5v0hKe+2orwKP352dBe_PB1pZqMehMo8tSDv5G+cdaJ=OsQ@mail.gmail.com>
+ <82bcdf73-54c5-4220-86c0-540a5cb59bb7@vivo.com>
+In-Reply-To: <82bcdf73-54c5-4220-86c0-540a5cb59bb7@vivo.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SI2PR01CA0003.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:191::16) To KL1PR06MB7401.apcprd06.prod.outlook.com
+ (2603:1096:820:146::12)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <93a1773e-e30a-469d-bc8f-029773112401@gmail.com>
-X-Spam-Flag: NO
-X-Spam-Score: -2.51
-X-Rspamd-Queue-Id: 09D725BE24
-X-Spamd-Result: default: False [-2.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_COUNT_THREE(0.00)[3];
-	URIBL_BLOCKED(0.00)[suse.cz:dkim,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,syzkaller.appspot.com:url,suse.com:email];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_RCPT(0.00)[3ee481e21fd75e14c397];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.dk,vger.kernel.org,suse.cz,igalia.com,lists.linux.dev,linuxfoundation.org,syzkaller.appspotmail.com,xiaomi.com];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.com:email,suse.cz:dkim,syzkaller.appspot.com:url,appspotmail.com:email]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Level: 
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: KL1PR06MB7401:EE_|TYZPR06MB6307:EE_
+X-MS-Office365-Filtering-Correlation-Id: bc815c91-2ccc-41c6-20a0-08de30d90063
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?SlJaTytJb1k2MFdpWHBYUHQzb2hxb2I3Y0o1bFUvYVVlT2xXUUZ1TnpMVEJp?=
+ =?utf-8?B?ZTNKUHhQdTRnNnV4YjE0ekJQaTh1MUdUL3NQMHlpTE56YWtoY2piek4rMVgz?=
+ =?utf-8?B?VnlGRkVyZ1dJcGZXOXFwcjRmRi9mdXlJaGZUTjk0bVBaUk9rNDRXVjFmSnB3?=
+ =?utf-8?B?elBiZ0QxSXFEVmdxdkttUlpHNm9HTFE1NlR3aEJIdkoxV0ZsQUV1M2N4b1BD?=
+ =?utf-8?B?aVhOZ282azI2U0paeWhRZVI2Sm5GMGtuS2JCZ0dLaWE0OTdYQW5IRWxlSytj?=
+ =?utf-8?B?YVZsWTZkWENaMDVmaFU3L0dPMmJwOTJEN2YvQ2dSUUtFaVhwZERIWVZNWlVZ?=
+ =?utf-8?B?cFNYa2hWMjhGaVdlQnhHN1NzQWRzOXBuRUlpQnZZQzVKNnMrUFE0NDREOVFj?=
+ =?utf-8?B?TW5CTUF5K09pR3pwTHVBbkhDK0U4eWZVWStsKzlrenNqaFZWREZQUXpkcEo4?=
+ =?utf-8?B?RVloYmdycXRDMmpPQzhSUGVscy9hNUpTcFNLMVdkMWN6V3RQbUgzT1haUC8w?=
+ =?utf-8?B?UmFkV0pMZXM5cGkrUVVPRUtEVlp5aWF1VmpHY1hoOG5kQUQ4eGtOS25UUHV1?=
+ =?utf-8?B?ODVMY2YyVVJST2Fyb0FZc3VYL2hZdjVFY08xRFJIaVozRXdVK3RzT25hbTVZ?=
+ =?utf-8?B?SHRGNkhDNHRLTXUzQnN4TnV0RjB6d1d6cEdkcGFlWnd6aTdSenlJakJhVGJn?=
+ =?utf-8?B?a1dkckdxNk5wU01YY09XMFVlRlN3QU04UmhQb0grZGJBSFFTOHFsUndhTVg4?=
+ =?utf-8?B?ZXFsTGtSMXFkS3VrcnVhWFVtcXl2M05sWjUrS2dCUzlpeGV5Q0NIUEI5ZTNn?=
+ =?utf-8?B?TVJwVGNqOEdWTnpxcUNvNUZLZ25qNHNLUlBsOC9WZTg2SzMxYjVkNEV6eXFO?=
+ =?utf-8?B?VmN1MXNIeFBnVG13L2pqWkEwakRiRnl6VXpkWGxpVUpOWEUyUUpZdnRoTzZH?=
+ =?utf-8?B?eVJ5L2EvRWhGOW04SzdzTElqVWRNL2M1QWtGeEsrcTZLWHNmNWIvd1Mxb3lY?=
+ =?utf-8?B?My81a1BxYjk2Ry9ZQVVhNnBJT21EMWR3aGRaRlU1R0ZUNEl1NDRRZUVXZFU5?=
+ =?utf-8?B?Vit3dE1aU1E0OWRkRklnbFhwVERIdERRL3BVTU1OYTFmcUpabkRSVDl6WjJH?=
+ =?utf-8?B?TEpkN2wwQXBQaHJXTDIrYlpSQ3hoQ0UyN1lxZmtiZXJiOHJnUFQ2RGdJVGRG?=
+ =?utf-8?B?NkNUQlBSMllXRUZuN2lzWGRSRE9JNXZBbTdlSDd2bWJGOXVRamNRZXArdU9D?=
+ =?utf-8?B?Y0hoczEyTlFtd1EwRHRHMEtvVWZZWit3Q0NUWUw1WU1adTlVSUc4WEhJUWtD?=
+ =?utf-8?B?M3I2L2gvRzlEUnJESFBjUjlVaFcreTZxNjc5UXRLaGxSNkZtclVxZWZ0dGFZ?=
+ =?utf-8?B?NituUDkrbHk2L3JRVjBGYS9HLzJXNjdaRWRNQmMzTC9NWHg1QjBxQ2xXT1Zv?=
+ =?utf-8?B?OURISEcrV3ZEVWhSS3RXRDVOVnRvcDNaaVppaUE4Zm9ERWVJdDJnZ05IYVAv?=
+ =?utf-8?B?Tk1lMjF2ZlZ3Q3FzaUJzSzJQMFZnS1BSSVZ3clJxZW1XeHBCaTVldG1yRTdJ?=
+ =?utf-8?B?TkFEYytQUmxEdTJLWmg3SkFjbXZLOHVRNU9CaFd5STk5NjdKYUllYW5pQW9k?=
+ =?utf-8?B?b3Z3YUJjY2tNc0IxcWhWTnVOa0RxdVlxU3B3cm42UUJZNzc1Z2VLeTVVMW9h?=
+ =?utf-8?B?NjBXM2U0N3d3dy9KTjVKWHl1emltU1VTV2IxOE42SU01QVZTamhGVDZpTTJG?=
+ =?utf-8?B?M3A3bXU0M2N5Z0gva3pHaXJLZGY1YmkyUTI1aWYzZ1lFV2ZjVGxMRDcyOUNN?=
+ =?utf-8?B?QkFNeHVwbU9JRnduSzhkVnYzN2R2NDNZNFhUZVkrTVVXN292aUs4SFFaR3lZ?=
+ =?utf-8?B?S0xSM1RiUlFzTFdPUi9hdmVFVExodjBCQW9Kdmd2TEQ1b2loQjZwYWZPMSs4?=
+ =?utf-8?Q?IEhANSsosOmaqGIQvK3dacwmtcl6JNK+?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:KL1PR06MB7401.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?MVV3S1RDTVRwQUFVbnp5VFJTZjVzRUpSRXlFYU56Q1Y5YlhWZGNGdFhXbndI?=
+ =?utf-8?B?N0ZzQWtiQWZXSG5aanRwNWw1NnRkbDltam9XR2p2Q252OVh4ZlZWNkx6bHp6?=
+ =?utf-8?B?aW5vRFN2SzBYTVZJSytjNnBYZksxZmlVRUVMTEs1Wm00NW9JdEEwVE1yTDRl?=
+ =?utf-8?B?Wk5zbWJweWV1aFlmcEpIeGMrVnp0M3hWbGtzaGJ4N1R6a0cxZzUzaXU2bC9S?=
+ =?utf-8?B?YWJMWXpCNFk0THJzY3NvVUJDenpWeWFYcTVna1BMTVdNUmJqUm1HRzZNVnVF?=
+ =?utf-8?B?dkN1OURYN2FRRERLS1o3T2dtdm1DZHVqbTRrYmx5TGU2djN2UnRrSnROcGI2?=
+ =?utf-8?B?NlBoUkt2N0NnVlVCbzhzOEdlQ3pNcXVjT3hyekpEa3QyK2FIVytQWWlGRU5E?=
+ =?utf-8?B?NU9qT0d5RHl1M0VHUVNna0FzODJ2R21kSVhhQU9RQXcxRGhiSk56NFRnOFJa?=
+ =?utf-8?B?d0lsTG85SktHY3dtK2N6WVFJekJnNVV1V1VFK0NmOHJKeXFrWGQxVzM5OWVP?=
+ =?utf-8?B?NytRZmdNMXExYllKQXhwOVZ4ZFFrTGxMZlFUUlByY1ExK04yZm10Q0ZMbmdi?=
+ =?utf-8?B?YmlFUnAyanBzNmRMTmljL25WMmR4c1R1VHUydDVVTmhPYkxIOWhQcGFYR0lt?=
+ =?utf-8?B?b2FYQUxRLzVib0prZEQ5ZUtJaWFIeE83STRFQ3pNWllKcGZrWjZHYWZONW5q?=
+ =?utf-8?B?TzZrQ1EySDhUWjI1S0pNVndnSDk2ei8rMmxjMVNwbGx1TjJEbFI4SjhUZmJs?=
+ =?utf-8?B?UFZKMTZQR0RCUUYwMVJoMHdoM25Ed3V3UXZCZU43dzVPeUkwVG1XeTIxYVh2?=
+ =?utf-8?B?K0gybGNHa096a2lxYjg1c2w3MmwyS0l0dW1jUDVLSzdac2xueDZGeGJKL096?=
+ =?utf-8?B?RUFRT2ZSKzZQTW5vMlNtRFFFU0lKc2w2VEFqU1RXejRuNlhxMVpPenplNHVX?=
+ =?utf-8?B?M3VMRUM1NTRZZmV5WFU2aWZQSExHbCtYVGpiOWJlWlRBcjJ4U2VXS3VaRU9X?=
+ =?utf-8?B?c0VJTjMrWVV0Z0k0K3dYNkxXb0tHa2dRbXJMNzcxM2V6RU9mMXVwU2NYcEho?=
+ =?utf-8?B?WHcyM2RxVWt1NEZRL0hsY2lXSkR5T01mNTJOdHlwUFd6Nk10dmFVREhxc3Ri?=
+ =?utf-8?B?T3VOVzEwNGRhMWhOVi9jajNIKzdxMk1vZ09KOUtrN2JxWi9YbVdXcm5UTWQ1?=
+ =?utf-8?B?dlQ0VzAvU04zR2RPMUMvY01hNVZpL0Q1WjhSTUdITzlMTGxydG5wbHEzTGpI?=
+ =?utf-8?B?YXpiYi9yNlRZZEJFNndNMmk1ZnZhVk9sN2o1bDdUOEhDRUVpbGJOTU81czBo?=
+ =?utf-8?B?a3UrUjg4QmRzbEdtZngvcUxkNFhOc3FMZ0d4ZjVSalZhNHMwMStTc0lrSXhh?=
+ =?utf-8?B?Z25rcC9FSEExNUlLUnJzZmsxZ2JGaWZDQ3BiZ1dDbTlaTlJ1VVFUVEJ2OWha?=
+ =?utf-8?B?cXRiYU9yUXVKZ1RJOGdiaG1uOFRUaGxQT0NuWEtFQ25LODkwMDVYTzlaNFFr?=
+ =?utf-8?B?eHZpNUx1M1h1S2RpQkI4RzBGbWdoQS8wakF5Q1RGWkFyZ21vMzc0K1dTM2V5?=
+ =?utf-8?B?UlpjdkRpRlJ2Y3pLUUpqT2FrMVVxbmVWK2I5YkZwQURqUnRldmVuY0cvcDlD?=
+ =?utf-8?B?eHYwUVArMXI1cUh1bXJqNmQyWERjR3oxZjZzQTBxODd1V2hRM2NFVng3QjZw?=
+ =?utf-8?B?Z1QxUjFWeFBGbHZMbDhUY0QyRFBTTlhwc0c0K2xWSGlINUdkNTdjRVhUUGRE?=
+ =?utf-8?B?YlBEUEZzK3VPS3lqVmxTTCtHaEl5Q1FWaDNSVUt1citpN1UxNGhHMU0xVGdj?=
+ =?utf-8?B?RlNlYktjZTZHaXhRZTVSVmNZbExkYXBTaGgxdVhJQlVhZnBnWGpqcGZjWEtv?=
+ =?utf-8?B?TjM0NlVBNk1QdjZsT2lDdXpQTnE2cVNORXI3VHgvbmhuK3psaStBQTlMTmNP?=
+ =?utf-8?B?VjJsalIyd1hnYUtnRFA3K2pkS1dSQ0NHRytsS1FuRjIxeG9helFZUlY4ZFNj?=
+ =?utf-8?B?YUZvVlF2ajhjeDdnNlBxalNtWHllQ3drdFJNOFF3eFA4OEZXSzV4Y21SZ3RR?=
+ =?utf-8?B?MEJnQ0ZyeThwUHdlbUFESVRueERhZklkbkRiUmhzZ3RWM1l1QzIxRnh1cjlT?=
+ =?utf-8?Q?TrrY0NtruGsctzyiSndMFJXOh?=
+X-OriginatorOrg: vivo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bc815c91-2ccc-41c6-20a0-08de30d90063
+X-MS-Exchange-CrossTenant-AuthSource: KL1PR06MB7401.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Dec 2025 12:56:10.7255
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kOmW2oPq0L3gfp5jJklX1/CBOX6K3XuIrrd9sNgS6SQ6iZMx2vVQVhzZuvCsqd1HOn5+HrEczfV86UkTig1b+Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYZPR06MB6307
 
-On Tue 18-11-25 15:10:20, Yongpeng Yang wrote:
-> On 11/14/25 22:42, Raphael Pinsonneault-Thibeault wrote:
-> > loop_set_status() is allowed to change the loop device while there
-> > are other openers of the device, even exclusive ones.
-> > 
-> > In this case, it causes a KASAN: slab-out-of-bounds Read in
-> > ext4_search_dir(), since when looking for an entry in an inlined
-> > directory, e_value_offs is changed underneath the filesystem by
-> > loop_set_status().
-> > 
-> > Fix the problem by forbidding loop_set_status() from modifying the loop
-> > device while there are exclusive openers of the device. This is similar
-> > to the fix in loop_configure() by commit 33ec3e53e7b1 ("loop: Don't
-> > change loop device under exclusive opener") alongside commit ecbe6bc0003b
-> > ("block: use bd_prepare_to_claim directly in the loop driver").
-> > 
-> > Reported-by: syzbot+3ee481e21fd75e14c397@syzkaller.appspotmail.com
-> > Closes: https://syzkaller.appspot.com/bug?extid=3ee481e21fd75e14c397
-> > Tested-by: syzbot+3ee481e21fd75e14c397@syzkaller.appspotmail.com
-> > Signed-off-by: Raphael Pinsonneault-Thibeault <rpthibeault@gmail.com>
-> > ---
-> > ML thread for previous, misguided patch idea:
-> > https://lore.kernel.org/all/20251112185712.2031993-2-rpthibeault@gmail.com/t/
-> > 
-> >   drivers/block/loop.c | 41 ++++++++++++++++++++++++++++++-----------
-> >   1 file changed, 30 insertions(+), 11 deletions(-)
-> > 
-> > diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> > index 053a086d547e..756ee682e767 100644
-> > --- a/drivers/block/loop.c
-> > +++ b/drivers/block/loop.c
-> > @@ -1222,13 +1222,24 @@ static int loop_clr_fd(struct loop_device *lo)
-> >   }
-> >   static int
-> > -loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
-> > +loop_set_status(struct loop_device *lo, blk_mode_t mode,
-> > +		struct block_device *bdev, const struct loop_info64 *info)
-> >   {
-> >   	int err;
-> >   	bool partscan = false;
-> >   	bool size_changed = false;
-> >   	unsigned int memflags;
-> > +	/*
-> > +	 * If we don't hold exclusive handle for the device, upgrade to it
-> > +	 * here to avoid changing device under exclusive owner.
-> > +	 */
-> > +	if (!(mode & BLK_OPEN_EXCL)) {
-> > +		err = bd_prepare_to_claim(bdev, loop_set_status, NULL);
-> > +		if (err)
-> > +			goto out_reread_partitions;
-> > +	}
-> > +
+On 2025/12/1 17:46, YangYang wrote:
+> On 2025/11/27 20:34, Rafael J. Wysocki wrote:
+>> On Wed, Nov 26, 2025 at 11:47 PM Bart Van Assche <bvanassche@acm.org> wrote:
+>>>
+>>> On 11/26/25 1:30 PM, Rafael J. Wysocki wrote:
+>>>> On Wed, Nov 26, 2025 at 10:11 PM Bart Van Assche <bvanassche@acm.org> wrote:
+>>>>>
+>>>>> On 11/26/25 12:17 PM, Rafael J. Wysocki wrote:
+>>>>>> --- a/block/blk-core.c
+>>>>>> +++ b/block/blk-core.c
+>>>>>> @@ -309,6 +309,8 @@ int blk_queue_enter(struct request_queue
+>>>>>>                 if (flags & BLK_MQ_REQ_NOWAIT)
+>>>>>>                         return -EAGAIN;
+>>>>>>
+>>>>>> +             /* if necessary, resume .dev (assume success). */
+>>>>>> +             blk_pm_resume_queue(pm, q);
+>>>>>>                 /*
+>>>>>>                  * read pair of barrier in blk_freeze_queue_start(), we need to
+>>>>>>                  * order reading __PERCPU_REF_DEAD flag of .q_usage_counter and
+>>>>>
+>>>>> blk_queue_enter() may be called from the suspend path so I don't think
+>>>>> that the above change will work.
+>>>>
+>>>> Why would the existing code work then?
+>>>
+>>> The existing code works reliably on a very large number of devices.
+>>
+>> Well, except that it doesn't work during system suspend and
+>> hibernation when the PM workqueue is frozen.  I think that we agree
+>> here.
+>>
+>> This needs to be addressed because it may very well cause system
+>> suspend to deadlock.
+>>
+>> There are two possible ways to address it I can think of:
+>>
+>> 1. Changing blk_pm_resume_queue() and its users to carry out a
+>> synchronous resume of q->dev instead of calling pm_request_resume()
+>> and (effectively) waiting for the queued-up runtime resume of q->dev
+>> to take effect.
+>>
+>> This would be my preferred option, but at this point I'm not sure if
+>> it's viable.
+>>
 > 
-> +	if (mode & BLK_OPEN_EXCL) {
-> +               struct block_device *whole = bdev_whole(bdev);
-> +
-> +               BUG_ON(whole->bd_claiming == NULL);
-> +       }
+> After __pm_runtime_disable() is called from device_suspend_late(), dev->power.disable_depth is set, preventing 
+> rpm_resume() from making progress until the system resume completes, regardless of whether rpm_resume() is invoked 
+> synchronously or asynchronously.
+> Performing a synchronous resume of q->dev seems to have a similar effect to removing the following code block from 
+> __pm_runtime_barrier(), which is invoked by __pm_runtime_disable():
 > 
-> I add the above code and do the following test:
-> # losetup -f data.1g
-> # echo "0 `blockdev --getsz /dev/loop0` linear /dev/loop0 0" | dmsetup
-> create my-linear
-> # ./ioctl-test /dev/mapper/my-linear // trigger BUG_ON, ioctl-test.c is
-> in attachment.
+> 1428     if (dev->power.request_pending) {
+> 1429         dev->power.request = RPM_REQ_NONE;
+> 1430         spin_unlock_irq(&dev->power.lock);
+> 1431
+> 1432         cancel_work_sync(&dev->power.work);
+> 1433
+> 1434         spin_lock_irq(&dev->power.lock);
+> 1435         dev->power.request_pending = false;
+> 1436     }
 > 
-> The root causes of BUG_ON:
-> 1. When creating 'my-linear' device, the mode for opening /dev/loop0
-> does not include the BLK_OPEN_EXCL flag.
-> table_load
->  - dm_table_create // get_mode() never assign BLK_OPEN_EXCL to {struct
-> dm_table *t}->mode
->  - populate_table
->   - dm_table_add_target
->    - linear_ctr
->     - dm_get_device // mode = {struct dm_table *t}->mode, never open
-> loop0 with BLK_OPEN_EXCL mode.
 
-BLK_OPEN_EXCL is added by bdev_open() whenever it is called with non-NULL
-holder. And DM code (open_table_device()) calls bdev_file_open_by_dev() with
-_dm_claim_ptr as the holder. So all opens from DM should be exclusive ones.
-The question obviously is what is broken in this that your reproducer still
-works...
+Since both synchronous and asynchronous resumes face similar issues,
+it may be sufficient to keep using the asynchronous resume path as long as
+pending work items are not canceled while the PM workqueue is frozen.
+This allows the pending work to proceed normally once the PM workqueue
+is unfrozen.
 
-								Honza
+---
+  drivers/base/power/main.c    |  2 +-
+  drivers/base/power/runtime.c | 17 +++++++++++------
+  include/linux/pm_runtime.h   |  6 +++---
+  3 files changed, 15 insertions(+), 10 deletions(-)
 
-> 2. When 'my-linear' device is opened with the O_EXCL flag, and an ioctl
-> is issued to it. The dm_blk_ioctl function calls bdev->bd_disk->fops-
-> > ioctl(bdev, mode, cmd, arg), which passes the mode with BLK_OPEN_EXCL
-> flag to lo_ioctl.
-> 
-> 3. loop0 was not opened by dm_get_device() in BLK_OPEN_EXCL mode. As a
-> result, whole->bd_claiming is NULL.
-> 
-> Thus, the BLK_OPEN_EXCL flag in the mode passed to lo_ioctl doesn't
-> guarantee the loop device was opened with BLK_OPEN_EXCL.
-> 
-> How about use per-device rw_semaphore instead of 'bd_prepare_to_claim/
-> bd_abort_claiming'?
-> 
-> Yongpeng,
-> 
-> >   	err = mutex_lock_killable(&lo->lo_mutex);
-> >   	if (err)
-> >   		return err;
-> > @@ -1270,6 +1281,9 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
-> >   	}
-> >   out_unlock:
-> >   	mutex_unlock(&lo->lo_mutex);
-> > +	if (!(mode & BLK_OPEN_EXCL))
-> > +		bd_abort_claiming(bdev, loop_set_status);
-> > +out_reread_partitions:
-> >   	if (partscan)
-> >   		loop_reread_partitions(lo);
-> > @@ -1349,7 +1363,9 @@ loop_info64_to_old(const struct loop_info64 *info64, struct loop_info *info)
-> >   }
-> >   static int
-> > -loop_set_status_old(struct loop_device *lo, const struct loop_info __user *arg)
-> > +loop_set_status_old(struct loop_device *lo, blk_mode_t mode,
-> > +		    struct block_device *bdev,
-> > +		    const struct loop_info __user *arg)
-> >   {
-> >   	struct loop_info info;
-> >   	struct loop_info64 info64;
-> > @@ -1357,17 +1373,19 @@ loop_set_status_old(struct loop_device *lo, const struct loop_info __user *arg)
-> >   	if (copy_from_user(&info, arg, sizeof (struct loop_info)))
-> >   		return -EFAULT;
-> >   	loop_info64_from_old(&info, &info64);
-> > -	return loop_set_status(lo, &info64);
-> > +	return loop_set_status(lo, mode, bdev, &info64);
-> >   }
-> >   static int
-> > -loop_set_status64(struct loop_device *lo, const struct loop_info64 __user *arg)
-> > +loop_set_status64(struct loop_device *lo, blk_mode_t mode,
-> > +		  struct block_device *bdev,
-> > +		  const struct loop_info64 __user *arg)
-> >   {
-> >   	struct loop_info64 info64;
-> >   	if (copy_from_user(&info64, arg, sizeof (struct loop_info64)))
-> >   		return -EFAULT;
-> > -	return loop_set_status(lo, &info64);
-> > +	return loop_set_status(lo, mode, bdev, &info64);
-> >   }
-> >   static int
-> > @@ -1546,14 +1564,14 @@ static int lo_ioctl(struct block_device *bdev, blk_mode_t mode,
-> >   	case LOOP_SET_STATUS:
-> >   		err = -EPERM;
-> >   		if ((mode & BLK_OPEN_WRITE) || capable(CAP_SYS_ADMIN))
-> > -			err = loop_set_status_old(lo, argp);
-> > +			err = loop_set_status_old(lo, mode, bdev, argp);
-> >   		break;
-> >   	case LOOP_GET_STATUS:
-> >   		return loop_get_status_old(lo, argp);
-> >   	case LOOP_SET_STATUS64:
-> >   		err = -EPERM;
-> >   		if ((mode & BLK_OPEN_WRITE) || capable(CAP_SYS_ADMIN))
-> > -			err = loop_set_status64(lo, argp);
-> > +			err = loop_set_status64(lo, mode, bdev, argp);
-> >   		break;
-> >   	case LOOP_GET_STATUS64:
-> >   		return loop_get_status64(lo, argp);
-> > @@ -1647,8 +1665,9 @@ loop_info64_to_compat(const struct loop_info64 *info64,
-> >   }
-> >   static int
-> > -loop_set_status_compat(struct loop_device *lo,
-> > -		       const struct compat_loop_info __user *arg)
-> > +loop_set_status_compat(struct loop_device *lo, blk_mode_t mode,
-> > +		    struct block_device *bdev,
-> > +		    const struct compat_loop_info __user *arg)
-> >   {
-> >   	struct loop_info64 info64;
-> >   	int ret;
-> > @@ -1656,7 +1675,7 @@ loop_set_status_compat(struct loop_device *lo,
-> >   	ret = loop_info64_from_compat(arg, &info64);
-> >   	if (ret < 0)
-> >   		return ret;
-> > -	return loop_set_status(lo, &info64);
-> > +	return loop_set_status(lo, mode, bdev, &info64);
-> >   }
-> >   static int
-> > @@ -1682,7 +1701,7 @@ static int lo_compat_ioctl(struct block_device *bdev, blk_mode_t mode,
-> >   	switch(cmd) {
-> >   	case LOOP_SET_STATUS:
-> > -		err = loop_set_status_compat(lo,
-> > +		err = loop_set_status_compat(lo, mode, bdev,
-> >   			     (const struct compat_loop_info __user *)arg);
-> >   		break;
-> >   	case LOOP_GET_STATUS:
+diff --git a/drivers/base/power/main.c b/drivers/base/power/main.c
+index 1de1cd72b616..d5c3d7a6777e 100644
+--- a/drivers/base/power/main.c
++++ b/drivers/base/power/main.c
+@@ -1635,7 +1635,7 @@ static void device_suspend_late(struct device *dev, pm_message_t state, bool asy
+  	 * Disable runtime PM for the device without checking if there is a
+  	 * pending resume request for it.
+  	 */
+-	__pm_runtime_disable(dev, false);
++	__pm_runtime_disable(dev, false, true);
 
+  	if (dev->power.syscore)
+  		goto Skip;
+diff --git a/drivers/base/power/runtime.c b/drivers/base/power/runtime.c
+index 1b11a3cd4acc..ff3fdfba2dc8 100644
+--- a/drivers/base/power/runtime.c
++++ b/drivers/base/power/runtime.c
+@@ -1421,11 +1421,16 @@ EXPORT_SYMBOL_GPL(__pm_runtime_set_status);
+   *
+   * Should be called under dev->power.lock with interrupts disabled.
+   */
+-static void __pm_runtime_barrier(struct device *dev)
++static void __pm_runtime_barrier(struct device *dev, bool frozen)
+  {
+  	pm_runtime_deactivate_timer(dev);
 
+-	if (dev->power.request_pending) {
++	/*
++	 * If the PM workqueue has already been frozen, the following
++	 * operations are unnecessary. This allows any pending work to
++	 * continue execution once the PM workqueue is unfrozen.
++	 */
++	if (!frozen && dev->power.request_pending) {
+  		dev->power.request = RPM_REQ_NONE;
+  		spin_unlock_irq(&dev->power.lock);
+
+@@ -1485,7 +1490,7 @@ int pm_runtime_barrier(struct device *dev)
+  		retval = 1;
+  	}
+
+-	__pm_runtime_barrier(dev);
++	__pm_runtime_barrier(dev, false);
+
+  	spin_unlock_irq(&dev->power.lock);
+  	pm_runtime_put_noidle(dev);
+@@ -1519,7 +1524,7 @@ void pm_runtime_unblock(struct device *dev)
+  	spin_unlock_irq(&dev->power.lock);
+  }
+
+-void __pm_runtime_disable(struct device *dev, bool check_resume)
++void __pm_runtime_disable(struct device *dev, bool check_resume, bool frozen)
+  {
+  	spin_lock_irq(&dev->power.lock);
+
+@@ -1550,7 +1555,7 @@ void __pm_runtime_disable(struct device *dev, bool check_resume)
+  	update_pm_runtime_accounting(dev);
+
+  	if (!dev->power.disable_depth++) {
+-		__pm_runtime_barrier(dev);
++		__pm_runtime_barrier(dev, frozen);
+  		dev->power.last_status = dev->power.runtime_status;
+  	}
+
+@@ -1893,7 +1898,7 @@ void pm_runtime_reinit(struct device *dev)
+   */
+  void pm_runtime_remove(struct device *dev)
+  {
+-	__pm_runtime_disable(dev, false);
++	__pm_runtime_disable(dev, false, false);
+  	pm_runtime_reinit(dev);
+  }
+
+diff --git a/include/linux/pm_runtime.h b/include/linux/pm_runtime.h
+index 0b436e15f4cd..102060a9ebc7 100644
+--- a/include/linux/pm_runtime.h
++++ b/include/linux/pm_runtime.h
+@@ -80,7 +80,7 @@ extern int pm_runtime_barrier(struct device *dev);
+  extern bool pm_runtime_block_if_disabled(struct device *dev);
+  extern void pm_runtime_unblock(struct device *dev);
+  extern void pm_runtime_enable(struct device *dev);
+-extern void __pm_runtime_disable(struct device *dev, bool check_resume);
++extern void __pm_runtime_disable(struct device *dev, bool check_resume, bool frozen);
+  extern void pm_runtime_allow(struct device *dev);
+  extern void pm_runtime_forbid(struct device *dev);
+  extern void pm_runtime_no_callbacks(struct device *dev);
+@@ -288,7 +288,7 @@ static inline int pm_runtime_barrier(struct device *dev) { return 0; }
+  static inline bool pm_runtime_block_if_disabled(struct device *dev) { return true; }
+  static inline void pm_runtime_unblock(struct device *dev) {}
+  static inline void pm_runtime_enable(struct device *dev) {}
+-static inline void __pm_runtime_disable(struct device *dev, bool c) {}
++static inline void __pm_runtime_disable(struct device *dev, bool c, bool f) {}
+  static inline bool pm_runtime_blocked(struct device *dev) { return true; }
+  static inline void pm_runtime_allow(struct device *dev) {}
+  static inline void pm_runtime_forbid(struct device *dev) {}
+@@ -775,7 +775,7 @@ static inline int pm_runtime_set_suspended(struct device *dev)
+   */
+  static inline void pm_runtime_disable(struct device *dev)
+  {
+-	__pm_runtime_disable(dev, true);
++	__pm_runtime_disable(dev, true, false);
+  }
+
+  /**
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+
