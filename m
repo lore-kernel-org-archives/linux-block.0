@@ -1,788 +1,301 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from OS8PR02CU002.outbound.protection.outlook.com (mail-japanwestazon11012047.outbound.protection.outlook.com [40.107.75.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDC5230147A
-	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 09:42:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764582138; cv=none; b=OwkcOiTnSnYCRX+SZMgjuBWWZN0WK+jsHyszv4oVoSwrOWpJsm/QPvduuzDHAtPkSH/57+NNHwvGMrFP1rl6+3TkVFzaa+WpC+qoV56ePzeZJq7ajCvRt3MvtFgdGK0ytU1+BZyfU3+kkQSMPN329m+egPAYnw3ofE72mNo1/6w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764582138; c=relaxed/simple;
-	bh=qbBYf37UhHjmia4DEok4Q4bOjCek/bdZJaIXf0U8CuY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uMDroWE0A63Sbgrb31mlbiuQ3KyeGAgb86iirUqug0/tAjswXt0eGi7DlX7O0qi5AjZzrgNp/HJOCHU4DcIkGsY9bRUkYmFCsX6FJ8TE90PSxpSUmHAgNx+FJrKPoMCbp3UCKF2TLlYykjDB2DZ7QK445fl7UwlnNW5lLbcxVcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=C516lQp4; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A59E1A55;
+	Mon,  1 Dec 2025 09:46:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.75.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764582418; cv=fail; b=n77zgHh0dbsVvlPZO/Y2r6Axff50HNxgn/hchcEoTMZZg5cE/68QKSSS7PcyBCjW2ETKt6LLbKGlhC+xMUzwBRooB85Jy8WljFVDf138ZvYL7rNxXTio2eOpZBxvWcCuLJLrINTjY9HLqjvgIqU3ufE2h2/TmjBhST4DlrELjSk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764582418; c=relaxed/simple;
+	bh=fArevK4bT2LAsWao0KJfMvUIvNMfeDOsaow2+spHBiE=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=p+c8p+U9MiJyPs39oITUEkb3LIaXfquKaiQJ3UaZY1t4vi6lA+loCFiZRJWeEgAdbZWCIJDx7HOngAvX+tKrBTY7yapsk6ADSbsczj8IE+6EBVS7WNGT2CY4s47uvqxw4eoyNEGZt7rx6xMy4u0Wo9NrTS7JGiHG9z5dWH01Ev8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com; spf=pass smtp.mailfrom=vivo.com; dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b=Wl8N8BTm; arc=fail smtp.client-ip=40.107.75.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivo.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C516lQp4"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764582134;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZBWjvwFSSvXwVb2B1b5M+TBWV3hxW2ZKtOJcMYKQ91c=;
-	b=C516lQp4WV7VqPI+K10vUBsdAXVPAFXhRX8PE9JO1h4IwkJVEnwwAZIrXGRrAVL4TKBRKq
-	gJm7rVyMf0mYyltQXw0mQSXnG+d3fum8C7xVeqPPCJag/AxEItlK1TMzcloUTCHJxjDGJc
-	cW/K3yUge/azXzPPEzGmvQVEXSwZX20=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-101-sFPUo5PNPhyVanxgIGqh6g-1; Mon,
- 01 Dec 2025 04:42:09 -0500
-X-MC-Unique: sFPUo5PNPhyVanxgIGqh6g-1
-X-Mimecast-MFC-AGG-ID: sFPUo5PNPhyVanxgIGqh6g_1764582128
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BCEE31955E77;
-	Mon,  1 Dec 2025 09:42:07 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.20])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 94080180047F;
-	Mon,  1 Dec 2025 09:42:00 +0000 (UTC)
-Date: Mon, 1 Dec 2025 17:41:53 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Uday Shankar <ushankar@purestorage.com>,
-	Stefani Seibold <stefani@seibold.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V4 14/27] ublk: add UBLK_U_IO_FETCH_IO_CMDS for batch I/O
- processing
-Message-ID: <aS1i4RoP_mJXQiXk@fedora>
-References: <20251121015851.3672073-1-ming.lei@redhat.com>
- <20251121015851.3672073-15-ming.lei@redhat.com>
- <CADUfDZqOHRxnNjeb064XGOH-EqLgp2XCiHiRNTzxYCQuihx90Q@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b="Wl8N8BTm"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Ur/eJ7W5cGHdmXFWUOgwQGJ9NSGidPYV9tb1dU052WgydA8JaP0S61nbC2fpPAq/tkbMxtdn0LchyCqgYgf5u7OI6ht3tz+qn7KKHSq06zpFRK9fEizO4jpMBCCua1SO+UnJiU5o+7tVhFxZiFwR3cbSJGQyUB9MOiS5ytEEDcjjVFCa5pIwReK2vatcB9ryZgU4rrlAwTZQIXzsiMETwkaq7Qsuz8/iuG9GYs3TWYfsX9JZE52lewsdmkST+Q9ZHNLJ80fWm8fNgOF47xZt5GZSa/Ak1Df67ZbvFBXPwpblOyAYVd7AnePIXk3/JtarMt8NiLD0+rlVwbuwQCkqbg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=SF6pITUhtI0Xj9evQ49LumDIFMp2hY7FwktSx5toPco=;
+ b=vJpllvif4MgxJl9UWiFm00UMVELS+eI4wxbiLg1EzV8kjs6+1aFaGSVrxODCTW2jldINzJG7yeKIguLQdRkbt7PjGJZQDcOyVIRsDFPGjuNBAy/I3SEoMiB7r16utZT69WEfTIX3zSEhhbOZhQxy4QvEORquczSvQZR+WbhWHYSQf0T51d0aI4NO+lUHCbC7ymBB76gZRbe26mSoU06RiN211MLoVY5ya0zw13/tUMqU9196AnVX046EeeE5nG7Jfu4JSBYMMD9K0KxKb9Xs4/DNk/06REoQBzQ/3s0m8Qf67dMc+yFEOBGpQ5RBMEboSHe/ozjq4WAVEHCyL1/67w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
+ dkim=pass header.d=vivo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SF6pITUhtI0Xj9evQ49LumDIFMp2hY7FwktSx5toPco=;
+ b=Wl8N8BTmqGB2eyZ4gUbyXNS//WipNufNsOrTxHDBEuuJ28VokmqJEpzoB34J8CKrnm7Q0PoYihcMNuSJacnDyZnScKX7fLcjpu+CU1pzlW1ieMvcxFEVkc43jbevwaATgYLwiwxSDlFqNDBeloFoQlBoDBobN8vKgnA92tF2qVQ2rp6sQxqOcUyJ6FOVwiHi06hpyuJ5mzOvQRJpYEU+FJfvMLisTMJtVpAJCY3G12fYZzYOtjrOu1t2hhP1mbJLk8d2gfN1noOhrk1qnBAyibY3Nxe2H0vgrrSSyVxDSKjgVsH0YeqI1Xe9yviOC5hemtglywsMvRbAXFJF2qgKBw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=vivo.com;
+Received: from KL1PR06MB7401.apcprd06.prod.outlook.com (2603:1096:820:146::12)
+ by SEYPR06MB6082.apcprd06.prod.outlook.com (2603:1096:101:d7::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9343.14; Mon, 1 Dec
+ 2025 09:46:49 +0000
+Received: from KL1PR06MB7401.apcprd06.prod.outlook.com
+ ([fe80::6f03:984f:82ec:6846]) by KL1PR06MB7401.apcprd06.prod.outlook.com
+ ([fe80::6f03:984f:82ec:6846%7]) with mapi id 15.20.9366.012; Mon, 1 Dec 2025
+ 09:46:49 +0000
+Message-ID: <82bcdf73-54c5-4220-86c0-540a5cb59bb7@vivo.com>
+Date: Mon, 1 Dec 2025 17:46:45 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] PM: runtime: Fix I/O hang due to race between resume
+ and runtime disable
+Content-Language: en-US
+To: "Rafael J. Wysocki" <rafael@kernel.org>,
+ Bart Van Assche <bvanassche@acm.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Pavel Machek <pavel@kernel.org>,
+ Len Brown <lenb@kernel.org>, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, Danilo Krummrich <dakr@kernel.org>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-pm@vger.kernel.org
+References: <20251126101636.205505-1-yang.yang@vivo.com>
+ <CAJZ5v0jiLAgHCQ51cYqUX-xjir7ooAC3xKH9wMbwrebOEuxFdw@mail.gmail.com>
+ <CAJZ5v0hKpGbwFmxcH8qe=DPf_5GX=LD=Fqj3dgOApUoE1RmJAQ@mail.gmail.com>
+ <4697314.LvFx2qVVIh@rafael.j.wysocki>
+ <dc4dba4f-8334-40ea-8c53-6e8d135f1d41@acm.org>
+ <CAJZ5v0jV-80kfk-AY70b5pQtyXxUtU_ACBVP_TeTAnaY0Up8Lw@mail.gmail.com>
+ <1e7583e8-9ae9-4641-8ec2-7c62a637c9fc@acm.org>
+ <CAJZ5v0hKe+2orwKP352dBe_PB1pZqMehMo8tSDv5G+cdaJ=OsQ@mail.gmail.com>
+From: YangYang <yang.yang@vivo.com>
+In-Reply-To: <CAJZ5v0hKe+2orwKP352dBe_PB1pZqMehMo8tSDv5G+cdaJ=OsQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: TYCP286CA0174.JPNP286.PROD.OUTLOOK.COM
+ (2603:1096:400:3c6::15) To KL1PR06MB7401.apcprd06.prod.outlook.com
+ (2603:1096:820:146::12)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADUfDZqOHRxnNjeb064XGOH-EqLgp2XCiHiRNTzxYCQuihx90Q@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: KL1PR06MB7401:EE_|SEYPR06MB6082:EE_
+X-MS-Office365-Filtering-Correlation-Id: e7d7154d-8376-4bbe-5a7d-08de30be8c79
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|366016|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?Q1A1RVErSUx0b1g2UE9yTXBBZnNVb3ZXd2tOaGFxUXdNTzJEOUROS1gyN3E2?=
+ =?utf-8?B?dFgrRTdLdGNzWjFHK0JTdlFVT2l6ODVudmtqQ3VmdWVzUXZhVk42Qm82TTkz?=
+ =?utf-8?B?bkMwRDNjMWRCVGpvOHZoQkd0NkViWjY3ZzdNZGwxZFhka08rZEdjZE80aGNs?=
+ =?utf-8?B?QnRneWRRRGptWHpuUTNvdDJvZW9yeFFxUm0xSzZ2L2hFK3cvYTNwMHB0b0wv?=
+ =?utf-8?B?Y0VaVTNjQjBQb3JKSUtSYlNLNmkvcXVyaDJVallSa1luNkJHN1ZqaXZiWW5L?=
+ =?utf-8?B?WnpJbG93Zm5HdUxDZHFtVkoxQzRhUkN1Wm8wRkdFWnM1dzBQeklaM2RDK3Ir?=
+ =?utf-8?B?S0g5bGJCTWtDVTF6MkJKTmU1OW5sT3RtMDNwUTdRaDFzNVlxUThtWkUzL2Y2?=
+ =?utf-8?B?dHZBQ1g2cGZvOGtQYmVVRXFsQ2FaenBHaEN2S0Q2amJadCtWUCtNbXl5T292?=
+ =?utf-8?B?TTFvbXlvWFBOS1U3RlFMRHZnZnIrVC91RXQ1WTgxV2FTbndxSnRvTlMyeGVB?=
+ =?utf-8?B?ZytvQy95ZXpNdXZTOTdkd0dVVGRxcC81UmVmRnkzU0tVSXFoejIyN0JXSk9Z?=
+ =?utf-8?B?SE1uT0JGV05qSVFoTEVwc1ZNWmI4WXdRL1ZrNlQ4MitwUlNiaUdOejNCdGl1?=
+ =?utf-8?B?SzdYQzc2Q2w1QUxlaElEYXk3cTFXdXdLYTRoUCtmazd1S3pUb3JqZnhKLy9T?=
+ =?utf-8?B?bEh5azAwQ3Z3SURLckN6bS9LZ3JJT0RRVUpocEVKbVRQVFRoSXVDaHE0WURU?=
+ =?utf-8?B?Qit0Q3l5cHNSTDEzZnJtMkZSaVhybWtmL2dwOU85TEVDR3ppWFJoVCtrMzNI?=
+ =?utf-8?B?ZVhwdFVTSk9ZcVBzTThGWldkTlc0cnJDRWMxSzduOHJCTTZBYkRmZkJuT2xq?=
+ =?utf-8?B?UEFOeEh4WTdlbjlCQXRPTTBrTjBlZllrZWdORnQ0djZUMjc1WWppRnJieWpY?=
+ =?utf-8?B?ZmV2dUNKZEdQYnNTeFhOWTJtSXhwL2QvMG9Qb3dncmh6bUV3d3BFQVdOQWQr?=
+ =?utf-8?B?SlRoRmFzY2UwWFJ4aGVuV3M1Rk5WNllIa1hWdElReFNWVDhNNTNHenM2WExO?=
+ =?utf-8?B?SDBHVjIxc1ZtZk1pMnIrMUpXb3I5MEF6aTkwbDQ2MktUbTI3dVdKNVdNSXFH?=
+ =?utf-8?B?ZHZnb3E1bkoyUDVodzZEQnJ0SWhvMmh5VWJRZjdkemxiQngyNUluaXhRVDdo?=
+ =?utf-8?B?NVBBU1BlN3VQWUNDTkN1SXJicVBLZnRURUlVYU41eW15VW90L2prbURzQjVv?=
+ =?utf-8?B?dFFsUHFNV0pUMVExbUlNYllPNGpkQThaZVowY3dGdXFhVzB3d0tlSjZLNi9r?=
+ =?utf-8?B?VkNKVFZZT0Z4dnJBeStRQ1lOUGFrWTFOZmlzK3U2YlFRS21mdmJhc1dHeE5y?=
+ =?utf-8?B?SDEzd25jQ3dxcGRXSSs5VlR5UjNQek1qZUUvWGk2MDB5aWhQMytjNVUyNyt1?=
+ =?utf-8?B?L3hubVQ5RWhUZjR0YnhmT08rcmdUWmM2UTF2MEFDTUU0YkxMVWxKN2dWaC9V?=
+ =?utf-8?B?Ri9XczBwZWFNdVJtUWtTN29McmFBQjZaOWdlZ3FpbVEzSUNKdktLclhRTkFO?=
+ =?utf-8?B?V2xBak1Rc1MvTlRINGRqYU03ZHZ1bkxSTHp2d28wdFBQK1ZDU0ZHMTB6aXh6?=
+ =?utf-8?B?aVBuRlFjZmR0bzNsaFN2dk9uRW8vSEhCWjQ5a2hZaC9WbnArc1BvQUNvZ2lo?=
+ =?utf-8?B?dlpQVk5Nb3V6WnhQWjMxRDUrVzVsdXNiT0MyRWtLdkxicEVIQmdWMzJ1VmVN?=
+ =?utf-8?B?c2lkUFY1VnFDOVpWY1o3NU5OZW5UenMyMXo0NnRiN0VEcVZmT2pvVDJBeFRH?=
+ =?utf-8?B?OVFOaU9lSFBPUHUyakNBYWREcDBMakJReWVGMjkrazVXNFdkWHJYcnd0Zldh?=
+ =?utf-8?B?SGQyZ3k2QXZvQWZBTDlESDIvZlZPdjBpVFBmTjEyV243OW1YN3RzZHNpanNy?=
+ =?utf-8?Q?dXqBr4Xujhhh35ntsKyq8+sEgyG/uII9?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:KL1PR06MB7401.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Q0NCSzE5UnhPN01GRS9PZ3h0VjNacjdjbGlxdC9KNFNmZlhNWVVPblJYelJT?=
+ =?utf-8?B?L2czUi9Yb1N6ZGw5Ri9TYkpKaXIrV2dXZjhBSEtwTzArVndhaFVCaUlGdEZ4?=
+ =?utf-8?B?UzBKakwxckpOd3IxRFpQRGs5cnBjeDc2SWpMdzRtQkowK0J6QUgxQ3Eyb1pv?=
+ =?utf-8?B?ZWpMbTNDNktPSjcrOXl4MkF3OXJyaGxrSVRLSFZNWGhnc3ZXWjdyRk03eUhS?=
+ =?utf-8?B?UTlnKzdmMld3QnJRMjE5QVBOSnkzaTFkbG1nSTh3L2lKbGtVNWNpSVg3VXBl?=
+ =?utf-8?B?N1JCQURKRkVBd3lZZXM2MGhwcC9aTURzRjJWMWxQY05XVDl3RE9MR29acjNo?=
+ =?utf-8?B?WmJVbjUzdHc5QnM3allMeTB3djlYdzdHejVkZkxUUnkyU1I5ZnR1QnFIelU5?=
+ =?utf-8?B?YzE0SDhwWGpmZWNVQlBUSE5RR0FXSGtBWWgxaUdodkUwWHZJNXBuMXJsNkU3?=
+ =?utf-8?B?Zm50dUM0bHFRUFBwOFIrTVRzeDJwakVadlJNdktScC9ZbFJvOHE1dWNubWpQ?=
+ =?utf-8?B?am5IempQd2s0bm1OZEt0Q0orQjViek1mYXRWVzNJVnlQcVNHbGZWTmEvWGgr?=
+ =?utf-8?B?dTNjVG05Zi9KSk0rY0ZCR0YwOVVLL1d6N1pwNWFWV2QwcVZ2SkVpbVpEZ3lq?=
+ =?utf-8?B?UUZmcXFuMXYxZDJ1TndzSWhscVUxOUJNdWg2dk8xQmVaUTJDMGxCN05veFJ0?=
+ =?utf-8?B?TWtvZnYrRTFnNGd5cUNwekhaalZOWjU2R3NRNXA5bU9TQjUvQm9WczRxOUNZ?=
+ =?utf-8?B?KzFrSG9wNUoweWkrQzRmSjlvelBka0xYWlJaanoybUs4S05uc3lBUzl0YmVB?=
+ =?utf-8?B?RFZMNi9UQ3Y3NGI2RCtrdkdQN1NoUkRtT3lnWnBLRC9tV3EyVzBFZGhLTzlt?=
+ =?utf-8?B?ajZ2N04rWFZzb2ZxQTFveERXenpPZDdwb1NxYnc2bUpMMmJlRmRBblRKRCtP?=
+ =?utf-8?B?M1NjbnM2MGpobGF6YU1VY0UxcFR4Q0FSanZERENNZjAvWExlR0RpdFc2eDJZ?=
+ =?utf-8?B?a3Ntd0ZtbHlQcXo0R04yQzI2cXUrZG9EUTRTUUZ1a3hPSkRQMUhzbVFQOFMw?=
+ =?utf-8?B?bVVEYmtxdy9HVzZ2T0xSRHYrc1hzNFk3bDBCYzVHL0wvQWRiSkp5MTFUbWdR?=
+ =?utf-8?B?SWdSQUNybDErY2JQWHUvTEpZWjVVcEVBMG81c1BUdVpCb2tOK01PdzRHY2kx?=
+ =?utf-8?B?NHVFbUN3Sy9PK2xScEkrRjBLTXo3MElwWnc0ZW1IdEZTNWVSOWFYUkpuNXBj?=
+ =?utf-8?B?YjNqNlRIT2ExQ2IvWVZ5NTF6RzlPUk9sUDF2VG5zZEdwdThqMVpDTTBxeU1B?=
+ =?utf-8?B?eVZweGhvNk4vVTdSbXlkbU9IU0Z2MC8wMlZTUW1VSC90YXhuNGlHRDhxbXc3?=
+ =?utf-8?B?K0xxU3BOem11aUZhRytDa0o1OXc2WUtEdkQvaEdBU2RZL21JTnIvZmg5Slcz?=
+ =?utf-8?B?bUxsVEhNeDVJY1p2TmhkQzN1K3ZzWXRuMzkvOXRST0xKcVBSem1NUTRLZ3dw?=
+ =?utf-8?B?TTRQZVhJRDNxdzRqelBqOUNSMzdFOGZmbDVOdnRhOVBVWkNQNjZaRW9vT1JX?=
+ =?utf-8?B?TElQdmNCRjlhSjFONndabVd0QmlPeXpBWjd3bGphcCtuZkFiZTRkZnVEQjhI?=
+ =?utf-8?B?b2dYUWNXMFByT2lRQVhCZ1JQNG0rS3BtRVBzRitkVFZCTW04SVQwenZQMS9R?=
+ =?utf-8?B?aWYzMW9MTFduKzU3ODdianVkM1oyRTJJWjYya2ZuazVId3BwMjluZXZCdzZY?=
+ =?utf-8?B?NEpmUld2bU1sY1BJbis1NWRtZmtoa2k5NWdDKzk3N0ZpODA2cks4TXFoMFpS?=
+ =?utf-8?B?dVlhNHFUK0RrL3kwZHRnT3JKMk9uVm9rVGluTVZ2TFJoeEZpWUtySnZEUlR5?=
+ =?utf-8?B?VnlKNFBGQjhBZWU2T1RGNEd5N3ZTbzlYTjZiOGx2NStlSlVsN3hNWjNjOU9O?=
+ =?utf-8?B?djBtK1dpRTJKMHZqVGdDbXQ0Q0ZnTVh1QWJidGZucmx3eEZqM1gyQkg2MGtL?=
+ =?utf-8?B?UFlWTGtQcGV1NHZpMlo0SS9mdENsS3ZRcUZMTWlpdWt1eW4vMndEZG8vWDZt?=
+ =?utf-8?B?RStlLzZvcU5wdXJxOG8yQ0gzVWZzNlRQSzRMU0tnaTB4TjFMWVBDcS9PQmlp?=
+ =?utf-8?Q?sI4HKnz66j9oqpMB6jBNIykEp?=
+X-OriginatorOrg: vivo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e7d7154d-8376-4bbe-5a7d-08de30be8c79
+X-MS-Exchange-CrossTenant-AuthSource: KL1PR06MB7401.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Dec 2025 09:46:49.4232
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: vMnjtvO6o1hn8sDGo+rRmfEC6pC3NJ1HqqHwZ6wfel48mmCeGEvd0NcwuWhv6p8ejEpRCBbPQkh6Gd43YtQTBg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEYPR06MB6082
 
-On Sun, Nov 30, 2025 at 09:55:47PM -0800, Caleb Sander Mateos wrote:
-> On Thu, Nov 20, 2025 at 6:00 PM Ming Lei <ming.lei@redhat.com> wrote:
-> >
-> > Add UBLK_U_IO_FETCH_IO_CMDS command to enable efficient batch processing
-> > of I/O requests. This multishot uring_cmd allows the ublk server to fetch
-> > multiple I/O commands in a single operation, significantly reducing
-> > submission overhead compared to individual FETCH_REQ* commands.
-> >
-> > Key Design Features:
-> >
-> > 1. Multishot Operation: One UBLK_U_IO_FETCH_IO_CMDS can fetch many I/O
-> >    commands, with the batch size limited by the provided buffer length.
-> >
-> > 2. Dynamic Load Balancing: Multiple fetch commands can be submitted
-> >    simultaneously, but only one is active at any time. This enables
-> >    efficient load distribution across multiple server task contexts.
-> >
-> > 3. Implicit State Management: The implementation uses three key variables
-> >    to track state:
-> >    - evts_fifo: Queue of request tags awaiting processing
-> >    - fcmd_head: List of available fetch commands
-> >    - active_fcmd: Currently active fetch command (NULL = none active)
-> >
-> >    States are derived implicitly:
-> >    - IDLE: No fetch commands available
-> >    - READY: Fetch commands available, none active
-> >    - ACTIVE: One fetch command processing events
-> >
-> > 4. Lockless Reader Optimization: The active fetch command can read from
-> >    evts_fifo without locking (single reader guarantee), while writers
-> >    (ublk_queue_rq/ublk_queue_rqs) use evts_lock protection. The memory
-> >    barrier pairing plays key role for the single lockless reader
-> >    optimization.
-> >
-> > Implementation Details:
-> >
-> > - ublk_queue_rq() and ublk_queue_rqs() save request tags to evts_fifo
-> > - __ublk_pick_active_fcmd() selects an available fetch command when
-> >   events arrive and no command is currently active
+On 2025/11/27 20:34, Rafael J. Wysocki wrote:
+> On Wed, Nov 26, 2025 at 11:47 PM Bart Van Assche <bvanassche@acm.org> wrote:
+>>
+>> On 11/26/25 1:30 PM, Rafael J. Wysocki wrote:
+>>> On Wed, Nov 26, 2025 at 10:11 PM Bart Van Assche <bvanassche@acm.org> wrote:
+>>>>
+>>>> On 11/26/25 12:17 PM, Rafael J. Wysocki wrote:
+>>>>> --- a/block/blk-core.c
+>>>>> +++ b/block/blk-core.c
+>>>>> @@ -309,6 +309,8 @@ int blk_queue_enter(struct request_queue
+>>>>>                 if (flags & BLK_MQ_REQ_NOWAIT)
+>>>>>                         return -EAGAIN;
+>>>>>
+>>>>> +             /* if necessary, resume .dev (assume success). */
+>>>>> +             blk_pm_resume_queue(pm, q);
+>>>>>                 /*
+>>>>>                  * read pair of barrier in blk_freeze_queue_start(), we need to
+>>>>>                  * order reading __PERCPU_REF_DEAD flag of .q_usage_counter and
+>>>>
+>>>> blk_queue_enter() may be called from the suspend path so I don't think
+>>>> that the above change will work.
+>>>
+>>> Why would the existing code work then?
+>>
+>> The existing code works reliably on a very large number of devices.
 > 
-> What is __ublk_pick_active_fcmd()? I don't see a function with that name.
-
-It is renamed as __ublk_acquire_fcmd(), and its counter pair is
-__ublk_release_fcmd().
-
+> Well, except that it doesn't work during system suspend and
+> hibernation when the PM workqueue is frozen.  I think that we agree
+> here.
 > 
-> > - ublk_batch_dispatch() moves tags from evts_fifo to the fetch command's
-> >   buffer and posts completion via io_uring_mshot_cmd_post_cqe()
-> > - State transitions are coordinated via evts_lock to maintain consistency
-> >
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >  drivers/block/ublk_drv.c      | 412 +++++++++++++++++++++++++++++++---
-> >  include/uapi/linux/ublk_cmd.h |   7 +
-> >  2 files changed, 388 insertions(+), 31 deletions(-)
-> >
-> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > index cc9c92d97349..2e5e392c939e 100644
-> > --- a/drivers/block/ublk_drv.c
-> > +++ b/drivers/block/ublk_drv.c
-> > @@ -93,6 +93,7 @@
-> >
-> >  /* ublk batch fetch uring_cmd */
-> >  struct ublk_batch_fcmd {
-> > +       struct list_head node;
-> >         struct io_uring_cmd *cmd;
-> >         unsigned short buf_group;
-> >  };
-> > @@ -117,7 +118,10 @@ struct ublk_uring_cmd_pdu {
-> >          */
-> >         struct ublk_queue *ubq;
-> >
-> > -       u16 tag;
-> > +       union {
-> > +               u16 tag;
-> > +               struct ublk_batch_fcmd *fcmd; /* batch io only */
-> > +       };
-> >  };
-> >
-> >  struct ublk_batch_io_data {
-> > @@ -229,18 +233,36 @@ struct ublk_queue {
-> >         struct ublk_device *dev;
-> >
-> >         /*
-> > -        * Inflight ublk request tag is saved in this fifo
-> > +        * Batch I/O State Management:
-> > +        *
-> > +        * The batch I/O system uses implicit state management based on the
-> > +        * combination of three key variables below.
-> > +        *
-> > +        * - IDLE: list_empty(&fcmd_head) && !active_fcmd
-> > +        *   No fetch commands available, events queue in evts_fifo
-> > +        *
-> > +        * - READY: !list_empty(&fcmd_head) && !active_fcmd
-> > +        *   Fetch commands available but none processing events
-> >          *
-> > -        * There are multiple writer from ublk_queue_rq() or ublk_queue_rqs(),
-> > -        * so lock is required for storing request tag to fifo
-> > +        * - ACTIVE: active_fcmd
-> > +        *   One fetch command actively processing events from evts_fifo
-> >          *
-> > -        * Make sure just one reader for fetching request from task work
-> > -        * function to ublk server, so no need to grab the lock in reader
-> > -        * side.
-> > +        * Key Invariants:
-> > +        * - At most one active_fcmd at any time (single reader)
-> > +        * - active_fcmd is always from fcmd_head list when non-NULL
-> > +        * - evts_fifo can be read locklessly by the single active reader
-> > +        * - All state transitions require evts_lock protection
-> > +        * - Multiple writers to evts_fifo require lock protection
-> >          */
-> >         struct {
-> >                 DECLARE_KFIFO_PTR(evts_fifo, unsigned short);
-> >                 spinlock_t evts_lock;
-> > +
-> > +               /* List of fetch commands available to process events */
-> > +               struct list_head fcmd_head;
-> > +
-> > +               /* Currently active fetch command (NULL = none active) */
-> > +               struct ublk_batch_fcmd  *active_fcmd;
-> >         }____cacheline_aligned_in_smp;
-> >
-> >         struct ublk_io ios[] __counted_by(q_depth);
-> > @@ -292,12 +314,20 @@ static void ublk_abort_queue(struct ublk_device *ub, struct ublk_queue *ubq);
-> >  static inline struct request *__ublk_check_and_get_req(struct ublk_device *ub,
-> >                 u16 q_id, u16 tag, struct ublk_io *io, size_t offset);
-> >  static inline unsigned int ublk_req_build_flags(struct request *req);
-> > +static void ublk_batch_dispatch(struct ublk_queue *ubq,
-> > +                               struct ublk_batch_io_data *data,
-> > +                               struct ublk_batch_fcmd *fcmd);
-> >
-> >  static inline bool ublk_dev_support_batch_io(const struct ublk_device *ub)
-> >  {
-> >         return false;
-> >  }
-> >
-> > +static inline bool ublk_support_batch_io(const struct ublk_queue *ubq)
-> > +{
-> > +       return false;
-> > +}
-> > +
-> >  static inline void ublk_io_lock(struct ublk_io *io)
-> >  {
-> >         spin_lock(&io->lock);
-> > @@ -624,13 +654,45 @@ static wait_queue_head_t ublk_idr_wq;     /* wait until one idr is freed */
-> >
-> >  static DEFINE_MUTEX(ublk_ctl_mutex);
-> >
-> > +static struct ublk_batch_fcmd *
-> > +ublk_batch_alloc_fcmd(struct io_uring_cmd *cmd)
-> > +{
-> > +       struct ublk_batch_fcmd *fcmd = kzalloc(sizeof(*fcmd), GFP_NOIO);
+> This needs to be addressed because it may very well cause system
+> suspend to deadlock.
 > 
-> An allocation in the I/O path seems unfortunate. Is there not room to
-> store the struct ublk_batch_fcmd in the io_uring_cmd pdu?
-
-It is allocated once for one mshot request, which covers many IOs.
-
-It can't be held in uring_cmd pdu, but the allocation can be optimized in
-future. Not a big deal in enablement stage.
-
-> > +
-> > +       if (fcmd) {
-> > +               fcmd->cmd = cmd;
-> > +               fcmd->buf_group = READ_ONCE(cmd->sqe->buf_index);
+> There are two possible ways to address it I can think of:
 > 
-> Is it necessary to store sample this here just to pass it back to the
-> io_uring layer? Wouldn't the io_uring layer already have access to it
-> in struct io_kiocb's buf_index field?
-
-->buf_group is used by io_uring_cmd_buffer_select(), and this way also
-follows ->buf_index uses in both io_uring/net.c and io_uring/rw.c.
-
-More importantly req->buf_index is used in io_uring/kbuf.c internally, see
-io_ring_buffer_select(), so we can't reuse req->buf_index here.
-
+> 1. Changing blk_pm_resume_queue() and its users to carry out a
+> synchronous resume of q->dev instead of calling pm_request_resume()
+> and (effectively) waiting for the queued-up runtime resume of q->dev
+> to take effect.
 > 
-> > +       }
-> > +       return fcmd;
-> > +}
-> > +
-> > +static void ublk_batch_free_fcmd(struct ublk_batch_fcmd *fcmd)
-> > +{
-> > +       kfree(fcmd);
-> > +}
-> > +
-> > +static void __ublk_release_fcmd(struct ublk_queue *ubq)
-> > +{
-> > +       WRITE_ONCE(ubq->active_fcmd, NULL);
-> > +}
-> >
-> > -static void ublk_batch_deinit_fetch_buf(const struct ublk_batch_io_data *data,
-> > +/*
-> > + * Nothing can move on, so clear ->active_fcmd, and the caller should stop
-> > + * dispatching
-> > + */
-> > +static void ublk_batch_deinit_fetch_buf(struct ublk_queue *ubq,
-> > +                                       const struct ublk_batch_io_data *data,
-> >                                         struct ublk_batch_fcmd *fcmd,
-> >                                         int res)
-> >  {
-> > +       spin_lock(&ubq->evts_lock);
-> > +       list_del(&fcmd->node);
-> > +       WARN_ON_ONCE(fcmd != ubq->active_fcmd);
-> > +       __ublk_release_fcmd(ubq);
-> > +       spin_unlock(&ubq->evts_lock);
-> > +
-> >         io_uring_cmd_done(fcmd->cmd, res, data->issue_flags);
-> > -       fcmd->cmd = NULL;
-> > +       ublk_batch_free_fcmd(fcmd);
-> >  }
-> >
-> >  static int ublk_batch_fetch_post_cqe(struct ublk_batch_fcmd *fcmd,
-> > @@ -1491,6 +1553,8 @@ static int __ublk_batch_dispatch(struct ublk_queue *ubq,
-> >         bool needs_filter;
-> >         int ret;
-> >
-> > +       WARN_ON_ONCE(data->cmd != fcmd->cmd);
-> > +
-> >         sel = io_uring_cmd_buffer_select(fcmd->cmd, fcmd->buf_group, &len,
-> >                                          data->issue_flags);
-> >         if (sel.val < 0)
-> > @@ -1548,23 +1612,94 @@ static int __ublk_batch_dispatch(struct ublk_queue *ubq,
-> >         return ret;
-> >  }
-> >
-> > -static __maybe_unused int
-> > -ublk_batch_dispatch(struct ublk_queue *ubq,
-> > -                   const struct ublk_batch_io_data *data,
-> > -                   struct ublk_batch_fcmd *fcmd)
-> > +static struct ublk_batch_fcmd *__ublk_acquire_fcmd(
-> > +               struct ublk_queue *ubq)
-> > +{
-> > +       struct ublk_batch_fcmd *fcmd;
-> > +
-> > +       lockdep_assert_held(&ubq->evts_lock);
-> > +
-> > +       /*
-> > +        * Ordering updating ubq->evts_fifo and checking ubq->active_fcmd.
-> > +        *
-> > +        * The pair is the smp_mb() in ublk_batch_dispatch().
-> > +        *
-> > +        * If ubq->active_fcmd is observed as non-NULL, the new added tags
-> > +        * can be visisible in ublk_batch_dispatch() with the barrier pairing.
-> > +        */
-> > +       smp_mb();
-> > +       if (READ_ONCE(ubq->active_fcmd)) {
-> > +               fcmd = NULL;
-> > +       } else {
-> > +               fcmd = list_first_entry_or_null(&ubq->fcmd_head,
-> > +                               struct ublk_batch_fcmd, node);
-> > +               WRITE_ONCE(ubq->active_fcmd, fcmd);
-> > +       }
-> > +       return fcmd;
-> > +}
-> > +
-> > +static void ublk_batch_tw_cb(struct io_uring_cmd *cmd,
-> > +                          unsigned int issue_flags)
-> > +{
-> > +       struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(cmd);
-> > +       struct ublk_batch_fcmd *fcmd = pdu->fcmd;
-> > +       struct ublk_batch_io_data data = {
-> > +               .ub = pdu->ubq->dev,
-> > +               .cmd = fcmd->cmd,
-> > +               .issue_flags = issue_flags,
-> > +       };
-> > +
-> > +       WARN_ON_ONCE(pdu->ubq->active_fcmd != fcmd);
-> > +
-> > +       ublk_batch_dispatch(pdu->ubq, &data, fcmd);
-> > +}
-> > +
-> > +static void ublk_batch_dispatch(struct ublk_queue *ubq,
-> > +                               struct ublk_batch_io_data *data,
-> > +                               struct ublk_batch_fcmd *fcmd)
-> >  {
-> > +       struct ublk_batch_fcmd *new_fcmd;
+> This would be my preferred option, but at this point I'm not sure if
+> it's viable.
 > 
-> Is the new_fcmd variable necessary? Can fcmd be reused instead?
-> 
-> > +       void *handle;
-> > +       bool empty;
-> >         int ret = 0;
-> >
-> > +again:
-> >         while (!ublk_io_evts_empty(ubq)) {
-> >                 ret = __ublk_batch_dispatch(ubq, data, fcmd);
-> >                 if (ret <= 0)
-> >                         break;
-> >         }
-> >
-> > -       if (ret < 0)
-> > -               ublk_batch_deinit_fetch_buf(data, fcmd, ret);
-> > +       if (ret < 0) {
-> > +               ublk_batch_deinit_fetch_buf(ubq, data, fcmd, ret);
-> > +               return;
-> > +       }
-> >
-> > -       return ret;
-> > +       handle = io_uring_cmd_ctx_handle(fcmd->cmd);
-> > +       __ublk_release_fcmd(ubq);
-> > +       /*
-> > +        * Order clearing ubq->active_fcmd from __ublk_release_fcmd() and
-> > +        * checking ubq->evts_fifo.
-> > +        *
-> > +        * The pair is the smp_mb() in __ublk_acquire_fcmd().
-> > +        */
-> > +       smp_mb();
-> > +       empty = ublk_io_evts_empty(ubq);
-> > +       if (likely(empty))
-> 
-> nit: empty variable seems unnecessary
-> 
-> > +               return;
-> > +
-> > +       spin_lock(&ubq->evts_lock);
-> > +       new_fcmd = __ublk_acquire_fcmd(ubq);
-> > +       spin_unlock(&ubq->evts_lock);
-> > +
-> > +       if (!new_fcmd)
-> > +               return;
-> > +       if (handle == io_uring_cmd_ctx_handle(new_fcmd->cmd)) {
-> 
-> This check seems to be meant to decide whether the new and old
-> UBLK_U_IO_FETCH_IO_CMDS commands can execute in the same task work?
 
-Actually not.
+After __pm_runtime_disable() is called from device_suspend_late(), 
+dev->power.disable_depth is set, preventing rpm_resume() from making 
+progress until the system resume completes, regardless of whether 
+rpm_resume() is invoked synchronously or asynchronously.
+Performing a synchronous resume of q->dev seems to have a similar 
+effect to removing the following code block from 
+__pm_runtime_barrier(), which is invoked by __pm_runtime_disable():
 
-> But belonging to the same io_uring context doesn't necessarily mean
-> that the same task issued them. It seems like it would be safer to
-> always dispatch new_fcmd->cmd to task work.
+1428     if (dev->power.request_pending) {
+1429         dev->power.request = RPM_REQ_NONE;
+1430         spin_unlock_irq(&dev->power.lock);
+1431
+1432         cancel_work_sync(&dev->power.work);
+1433
+1434         spin_lock_irq(&dev->power.lock);
+1435         dev->power.request_pending = false;
+1436     }
 
-What matters is just that ctx->uring_lock & issue_flag matches from ublk
-viewpoint, so it is safe to do so.
-
-However, given it is hit in slow path, so starting new dispatch
-is easier.
-
+> 2. Stop freezing the PM workqueue before system suspend/hibernation
+> and adapt device_suspend_late() to that.
 > 
-> > +               data->cmd = new_fcmd->cmd;
-> > +               fcmd = new_fcmd;
-> > +               goto again;
-> > +       }
-> > +       io_uring_cmd_complete_in_task(new_fcmd->cmd, ublk_batch_tw_cb);
-> >  }
-> >
-> >  static void ublk_cmd_tw_cb(struct io_uring_cmd *cmd,
-> > @@ -1576,13 +1711,27 @@ static void ublk_cmd_tw_cb(struct io_uring_cmd *cmd,
-> >         ublk_dispatch_req(ubq, pdu->req, issue_flags);
-> >  }
-> >
-> > -static void ublk_queue_cmd(struct ublk_queue *ubq, struct request *rq)
-> > +static void ublk_queue_cmd(struct ublk_queue *ubq, struct request *rq, bool last)
-> >  {
-> > -       struct io_uring_cmd *cmd = ubq->ios[rq->tag].cmd;
-> > -       struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(cmd);
-> > +       if (ublk_support_batch_io(ubq)) {
-> > +               unsigned short tag = rq->tag;
-> > +               struct ublk_batch_fcmd *fcmd = NULL;
-> >
-> > -       pdu->req = rq;
-> > -       io_uring_cmd_complete_in_task(cmd, ublk_cmd_tw_cb);
-> > +               spin_lock(&ubq->evts_lock);
-> > +               kfifo_put(&ubq->evts_fifo, tag);
-> > +               if (last)
-> > +                       fcmd = __ublk_acquire_fcmd(ubq);
-> > +               spin_unlock(&ubq->evts_lock);
-> > +
-> > +               if (fcmd)
-> > +                       io_uring_cmd_complete_in_task(fcmd->cmd, ublk_batch_tw_cb);
-> > +       } else {
-> > +               struct io_uring_cmd *cmd = ubq->ios[rq->tag].cmd;
-> > +               struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(cmd);
-> > +
-> > +               pdu->req = rq;
-> > +               io_uring_cmd_complete_in_task(cmd, ublk_cmd_tw_cb);
-> > +       }
-> >  }
-> >
-> >  static void ublk_cmd_list_tw_cb(struct io_uring_cmd *cmd,
-> > @@ -1600,14 +1749,44 @@ static void ublk_cmd_list_tw_cb(struct io_uring_cmd *cmd,
-> >         } while (rq);
-> >  }
-> >
-> > -static void ublk_queue_cmd_list(struct ublk_io *io, struct rq_list *l)
-> > +static void ublk_batch_queue_cmd_list(struct ublk_queue *ubq, struct rq_list *l)
-> >  {
-> > -       struct io_uring_cmd *cmd = io->cmd;
-> > -       struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(cmd);
-> > +       unsigned short tags[MAX_NR_TAG];
-> > +       struct ublk_batch_fcmd *fcmd;
-> > +       struct request *rq;
-> > +       unsigned cnt = 0;
-> > +
-> > +       spin_lock(&ubq->evts_lock);
-> > +       rq_list_for_each(l, rq) {
-> > +               tags[cnt++] = (unsigned short)rq->tag;
-> > +               if (cnt >= MAX_NR_TAG) {
-> > +                       kfifo_in(&ubq->evts_fifo, tags, cnt);
-> > +                       cnt = 0;
-> > +               }
-> > +       }
-> > +       if (cnt)
-> > +               kfifo_in(&ubq->evts_fifo, tags, cnt);
-> > +       fcmd = __ublk_acquire_fcmd(ubq);
-> > +       spin_unlock(&ubq->evts_lock);
-> >
-> > -       pdu->req_list = rq_list_peek(l);
-> >         rq_list_init(l);
-> > -       io_uring_cmd_complete_in_task(cmd, ublk_cmd_list_tw_cb);
-> > +       if (fcmd)
-> > +               io_uring_cmd_complete_in_task(fcmd->cmd, ublk_batch_tw_cb);
-> > +}
-> > +
-> > +static void ublk_queue_cmd_list(struct ublk_queue *ubq, struct ublk_io *io,
-> > +                               struct rq_list *l, bool batch)
-> > +{
-> > +       if (batch) {
-> > +               ublk_batch_queue_cmd_list(ubq, l);
-> > +       } else {
-> > +               struct io_uring_cmd *cmd = io->cmd;
-> > +               struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(cmd);
-> > +
-> > +               pdu->req_list = rq_list_peek(l);
-> > +               rq_list_init(l);
-> > +               io_uring_cmd_complete_in_task(cmd, ublk_cmd_list_tw_cb);
-> > +       }
-> >  }
-> >
-> >  static enum blk_eh_timer_return ublk_timeout(struct request *rq)
-> > @@ -1686,7 +1865,7 @@ static blk_status_t ublk_queue_rq(struct blk_mq_hw_ctx *hctx,
-> >                 return BLK_STS_OK;
-> >         }
-> >
-> > -       ublk_queue_cmd(ubq, rq);
-> > +       ublk_queue_cmd(ubq, rq, bd->last);
-> >         return BLK_STS_OK;
-> >  }
-> >
-> > @@ -1698,11 +1877,25 @@ static inline bool ublk_belong_to_same_batch(const struct ublk_io *io,
-> >                 (io->task == io2->task);
-> >  }
-> >
-> > -static void ublk_queue_rqs(struct rq_list *rqlist)
-> > +static void ublk_commit_rqs(struct blk_mq_hw_ctx *hctx)
-> > +{
-> > +       struct ublk_queue *ubq = hctx->driver_data;
-> > +       struct ublk_batch_fcmd *fcmd;
-> > +
-> > +       spin_lock(&ubq->evts_lock);
-> > +       fcmd = __ublk_acquire_fcmd(ubq);
-> > +       spin_unlock(&ubq->evts_lock);
-> > +
-> > +       if (fcmd)
-> > +               io_uring_cmd_complete_in_task(fcmd->cmd, ublk_batch_tw_cb);
-> > +}
-> > +
-> > +static void __ublk_queue_rqs(struct rq_list *rqlist, bool batch)
-> >  {
-> >         struct rq_list requeue_list = { };
-> >         struct rq_list submit_list = { };
-> >         struct ublk_io *io = NULL;
-> > +       struct ublk_queue *ubq = NULL;
-> >         struct request *req;
-> >
-> >         while ((req = rq_list_pop(rqlist))) {
-> > @@ -1716,16 +1909,27 @@ static void ublk_queue_rqs(struct rq_list *rqlist)
-> >
-> >                 if (io && !ublk_belong_to_same_batch(io, this_io) &&
-> >                                 !rq_list_empty(&submit_list))
-> > -                       ublk_queue_cmd_list(io, &submit_list);
-> > +                       ublk_queue_cmd_list(ubq, io, &submit_list, batch);
+> This should be doable, even though it is a bit risky because it may
+> uncover some latent bugs (the freezing of the PM workqueue has been
+> there forever), but it wouldn't address the problem entirely because
+> device_suspend_late() would still need to disable runtime PM for the
+> device (and for some devices it is disabled earlier), so
+> pm_request_resume() would just start to fail at that point and if
+> blk_queue_enter() were called after that point for a device supporting
+> runtime PM, it might deadlock.
 > 
-> This seems to assume that all the requests belong to the same
-> ublk_queue, which isn't required
-
-Here, it is required for BATCH_IO, which needs new __ublk_queue_rqs()
-implementation now.
-
-Nice catch!
-
+>> Maybe there is a misunderstanding? RQF_PM / BLK_MQ_REQ_PM are set for
+>> requests that should be processed even if the power status is changing
+>> (RPM_SUSPENDING or RPM_RESUMING). The meaning of the 'pm' variable is
+>> as follows: process this request even if a power state change is
+>> ongoing.
 > 
-> >                 io = this_io;
-> > +               ubq = this_q;
-> >                 rq_list_add_tail(&submit_list, req);
-> >         }
-> >
-> >         if (!rq_list_empty(&submit_list))
-> > -               ublk_queue_cmd_list(io, &submit_list);
-> > +               ublk_queue_cmd_list(ubq, io, &submit_list, batch);
+> I see.
 > 
-> Same here
+> The behavior depends on whether or not q->pm_only is set.  If it is
+> not set, both blk_queue_enter() and __bio_queue_enter() will allow the
+> request to be processed.
 > 
-> >         *rqlist = requeue_list;
-> >  }
-> >
-> > +static void ublk_queue_rqs(struct rq_list *rqlist)
-> > +{
-> > +       __ublk_queue_rqs(rqlist, false);
-> > +}
-> > +
-> > +static void ublk_batch_queue_rqs(struct rq_list *rqlist)
-> > +{
-> > +       __ublk_queue_rqs(rqlist, true);
-> > +}
-> > +
-> >  static int ublk_init_hctx(struct blk_mq_hw_ctx *hctx, void *driver_data,
-> >                 unsigned int hctx_idx)
-> >  {
-> > @@ -1743,6 +1947,14 @@ static const struct blk_mq_ops ublk_mq_ops = {
-> >         .timeout        = ublk_timeout,
-> >  };
-> >
-> > +static const struct blk_mq_ops ublk_batch_mq_ops = {
-> > +       .commit_rqs     = ublk_commit_rqs,
-> > +       .queue_rq       = ublk_queue_rq,
-> > +       .queue_rqs      = ublk_batch_queue_rqs,
-> > +       .init_hctx      = ublk_init_hctx,
-> > +       .timeout        = ublk_timeout,
-> > +};
-> > +
-> >  static void ublk_queue_reinit(struct ublk_device *ub, struct ublk_queue *ubq)
-> >  {
-> >         int i;
-> > @@ -2120,6 +2332,56 @@ static void ublk_cancel_cmd(struct ublk_queue *ubq, unsigned tag,
-> >                 io_uring_cmd_done(io->cmd, UBLK_IO_RES_ABORT, issue_flags);
-> >  }
-> >
-> > +static void ublk_batch_cancel_cmd(struct ublk_queue *ubq,
-> > +                                 struct ublk_batch_fcmd *fcmd,
-> > +                                 unsigned int issue_flags)
-> > +{
-> > +       bool done;
-> > +
-> > +       spin_lock(&ubq->evts_lock);
-> > +       done = (ubq->active_fcmd != fcmd);
+> If q->pm_only is set, __bio_queue_enter() will wait until it gets
+> cleared and in that case pm_request_resume(q->dev) is called to make
+> that happen (did I get it right?).  This is a bit fragile because what
+> if the async resume of q->dev fails for some reason?  You deadlock
+> instead of failing the request.
 > 
-> Needs to use READ_ONCE() since __ublk_release_fcmd() can be called
-> without holding evts_lock?
-
-OK.
-
+> Unlike __bio_queue_enter(), blk_queue_enter() additionally checks the
+> runtime PM status of the queue if q->pm_only is set and it will allow
+> the request to be processed in that case so long as q->rpm_status is
+> not RPM_SUSPENDED.  However, if the queue status is RPM_SUSPENDED,
+> pm_request_resume(q->dev) will be called like in the
+> __bio_queue_enter() case.
 > 
-> > +       if (done)
-> > +               list_del(&fcmd->node);
-> > +       spin_unlock(&ubq->evts_lock);
-> > +
-> > +       if (done) {
-> > +               io_uring_cmd_done(fcmd->cmd, UBLK_IO_RES_ABORT, issue_flags);
-> > +               ublk_batch_free_fcmd(fcmd);
-> > +       }
-> > +}
-> > +
-> > +static void ublk_batch_cancel_queue(struct ublk_queue *ubq)
-> > +{
-> > +       LIST_HEAD(fcmd_list);
-> > +
-> > +       spin_lock(&ubq->evts_lock);
-> > +       ubq->force_abort = true;
-> > +       list_splice_init(&ubq->fcmd_head, &fcmd_list);
-> > +       if (ubq->active_fcmd)
-> > +               list_move(&ubq->active_fcmd->node, &ubq->fcmd_head);
+> I'm not sure why pm_request_resume(q->dev) needs to be called from
+> within blk_pm_resume_queue().  Arguably, it should be sufficient to
+> call it once before using the wait_event() macro, if the conditions
+> checked by blk_pm_resume_queue() are not met.
 > 
-> Similarly, needs READ_ONCE()?
-
-OK.
-
-But this one may not be necessary, since now everything is just quiesced,
-and the lockless code path won't hit any more.
-
+>>> Are you suggesting that q->rpm_status should still be checked before
+>>> calling pm_runtime_resume() or do you mean something else?
+>> The purpose of the code changes from a previous email is not entirely
+>> clear to me so I'm not sure what the code should look like. But to
+>> answer your question, calling blk_pm_resume_queue() if the runtime
+>> status is RPM_SUSPENDED should be safe.
+>>>> As an example, the UFS driver submits a
+>>>> SCSI START STOP UNIT command from its runtime suspend callback. The call
+>>>> chain is as follows:
+>>>>
+>>>>      ufshcd_wl_runtime_suspend()
+>>>>        __ufshcd_wl_suspend()
+>>>>          ufshcd_set_dev_pwr_mode()
+>>>>            ufshcd_execute_start_stop()
+>>>>              scsi_execute_cmd()
+>>>>                scsi_alloc_request()
+>>>>                  blk_queue_enter()
+>>>>                blk_execute_rq()
+>>>>                blk_mq_free_request()
+>>>>                  blk_queue_exit()
+>>>
+>>> In any case, calling pm_request_resume() from blk_pm_resume_queue() in
+>>> the !pm case is a mistake.
+>>    Hmm ... we may disagree about this. Does what I wrote above make clear
+>> why blk_pm_resume_queue() is called if pm == false?
 > 
-> > +       spin_unlock(&ubq->evts_lock);
-> > +
-> > +       while (!list_empty(&fcmd_list)) {
-> > +               struct ublk_batch_fcmd *fcmd = list_first_entry(&fcmd_list,
-> > +                               struct ublk_batch_fcmd, node);
-> > +
-> > +               ublk_batch_cancel_cmd(ubq, fcmd, IO_URING_F_UNLOCKED);
-> > +       }
-> > +}
-> > +
-> > +static void ublk_batch_cancel_fn(struct io_uring_cmd *cmd,
-> > +                                unsigned int issue_flags)
-> > +{
-> > +       struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(cmd);
-> > +       struct ublk_batch_fcmd *fcmd = pdu->fcmd;
-> > +       struct ublk_queue *ubq = pdu->ubq;
-> > +
-> > +       if (!ubq->canceling)
-> 
-> Is it not racy to access ubq->canceling without any lock held?
-
-OK, will switch to call ublk_start_cancel() unconditionally.
-
-> 
-> > +               ublk_start_cancel(ubq->dev);
-> > +
-> > +       ublk_batch_cancel_cmd(ubq, fcmd, issue_flags);
-> > +}
-> > +
-> >  /*
-> >   * The ublk char device won't be closed when calling cancel fn, so both
-> >   * ublk device and queue are guaranteed to be live
-> > @@ -2171,6 +2433,11 @@ static void ublk_cancel_queue(struct ublk_queue *ubq)
-> >  {
-> >         int i;
-> >
-> > +       if (ublk_support_batch_io(ubq)) {
-> > +               ublk_batch_cancel_queue(ubq);
-> > +               return;
-> > +       }
-> > +
-> >         for (i = 0; i < ubq->q_depth; i++)
-> >                 ublk_cancel_cmd(ubq, i, IO_URING_F_UNLOCKED);
-> >  }
-> > @@ -3091,6 +3358,74 @@ static int ublk_check_batch_cmd(const struct ublk_batch_io_data *data)
-> >         return ublk_check_batch_cmd_flags(uc);
-> >  }
-> >
-> > +static int ublk_batch_attach(struct ublk_queue *ubq,
-> > +                            struct ublk_batch_io_data *data,
-> > +                            struct ublk_batch_fcmd *fcmd)
-> > +{
-> > +       struct ublk_batch_fcmd *new_fcmd = NULL;
-> > +       bool free = false;
-> > +
-> > +       spin_lock(&ubq->evts_lock);
-> > +       if (unlikely(ubq->force_abort || ubq->canceling)) {
-> > +               free = true;
-> > +       } else {
-> > +               list_add_tail(&fcmd->node, &ubq->fcmd_head);
-> > +               new_fcmd = __ublk_acquire_fcmd(ubq);
-> > +       }
-> > +       spin_unlock(&ubq->evts_lock);
-> > +
-> > +       /*
-> > +        * If the two fetch commands are originated from same io_ring_ctx,
-> > +        * run batch dispatch directly. Otherwise, schedule task work for
-> > +        * doing it.
-> > +        */
-> > +       if (new_fcmd && io_uring_cmd_ctx_handle(new_fcmd->cmd) ==
-> > +                       io_uring_cmd_ctx_handle(fcmd->cmd)) {
-> > +               data->cmd = new_fcmd->cmd;
-> > +               ublk_batch_dispatch(ubq, data, new_fcmd);
-> > +       } else if (new_fcmd) {
-> > +               io_uring_cmd_complete_in_task(new_fcmd->cmd,
-> > +                               ublk_batch_tw_cb);
-> > +       }
-> 
-> Return early if (!new_fcmd) to reduce indentation?
-> 
-> > +
-> > +       if (free) {
-> > +               ublk_batch_free_fcmd(fcmd);
-> > +               return -ENODEV;
-> > +       }
-> 
-> Move the if (free) check directly after spin_unlock(&ubq->evts_lock)?
-
-Yeah, this is better.
-
-> 
-> > +       return -EIOCBQUEUED;
-> 
-> > +}
-> > +
-> > +static int ublk_handle_batch_fetch_cmd(struct ublk_batch_io_data *data)
-> > +{
-> > +       struct ublk_queue *ubq = ublk_get_queue(data->ub, data->header.q_id);
-> > +       struct ublk_batch_fcmd *fcmd = ublk_batch_alloc_fcmd(data->cmd);
-> > +       struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(data->cmd);
-> > +
-> > +       if (!fcmd)
-> > +               return -ENOMEM;
-> > +
-> > +       pdu->ubq = ubq;
-> > +       pdu->fcmd = fcmd;
-> > +       io_uring_cmd_mark_cancelable(data->cmd, data->issue_flags);
-> > +
-> > +       return ublk_batch_attach(ubq, data, fcmd);
-> > +}
-> > +
-> > +static int ublk_validate_batch_fetch_cmd(struct ublk_batch_io_data *data,
-> > +                                        const struct ublk_batch_io *uc)
-> > +{
-> > +       if (!(data->cmd->flags & IORING_URING_CMD_MULTISHOT))
-> > +               return -EINVAL;
-> > +
-> > +       if (uc->elem_bytes != sizeof(__u16))
-> > +               return -EINVAL;
-> > +
-> > +       if (uc->flags != 0)
-> > +               return -E2BIG;
-> > +
-> > +       return 0;
-> > +}
-> > +
-> >  static int ublk_ch_batch_io_uring_cmd(struct io_uring_cmd *cmd,
-> >                                        unsigned int issue_flags)
-> >  {
-> > @@ -3113,6 +3448,11 @@ static int ublk_ch_batch_io_uring_cmd(struct io_uring_cmd *cmd,
-> >         if (data.header.q_id >= ub->dev_info.nr_hw_queues)
-> >                 goto out;
-> >
-> > +       if (unlikely(issue_flags & IO_URING_F_CANCEL)) {
-> > +               ublk_batch_cancel_fn(cmd, issue_flags);
-> > +               return 0;
-> > +       }
-> 
-> Move this to the top of the function before the other logic that's not
-> necessary in the cancel case?
-
-Yeah, looks better.
-
-
-Thanks,
-Ming
+> Yes, it does, thanks!
 
