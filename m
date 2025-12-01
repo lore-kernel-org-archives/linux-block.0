@@ -1,162 +1,156 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4898622836C
-	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 18:55:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30A3323F422
+	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 19:00:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764615344; cv=none; b=dRerV5hiHKY8ihW31BeThRUvSQCQcWytKfhalqpapAF7llwRIZ+I2IwpvvuVraaluAkuqfKxvJakUxMvc5G47KPaSDMvOzXupVkbMxKebPnYqAYi0oCc6e2+PAPjausjSrTjSwh08UQ0EWMOQR7UD9Xof7QddXga4kRtqcQ3tTI=
+	t=1764615628; cv=none; b=pmtbMA1KtQvgIYmql2WbmA19IioDnk6PWnQFi+FNCykFBd/7v8UwNhHZgIyUEWZ8TcAmLCH7DkwB0MKCArdhx7uxUzSzVGAceiXFyCFgRAm0R3cwpLQW4jMIEgt1Ne7FRO+clJ0Jk0uv3ScYwMBMq6q3U8shvWepthpsnDNEyMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764615344; c=relaxed/simple;
-	bh=BJ2QAtb/JngB4ZVpKmkoLTPpIpJvhEqR8k+Jbd4rlQ4=;
+	s=arc-20240116; t=1764615628; c=relaxed/simple;
+	bh=9AWf5vbTHAWWuvTwgvN9Gj1hj02TRojnnRmmmBS0lZQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OqrIWoeA+eXedPTLn1T3j/nH3yM7aPLESXzVRo8k2FQ2HeA293hIzptLMgbsj9xUUumCds/2InNTHp4fnmXHMwuyaOs/xY8nMztMmu0MVdHG9SoxDSepnX4O01eXBfPEayDnBOG8H20lc0K9J6L9TwvStx17lt4dijQbfbEHAnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BTaJJnjQ; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=JjRM7tRv9RgidY3s9zZujgXi91zcucLlQ91vjglILyoFFTx4TFEoQpWZPrnxHeFYUEWQEr0m/TKniEXa5KyC8hUqN/uG7qf3EnUyFcN/AldeVnr971tbK/1F0XRx9zyyiQ7zYHiBQbutWlxu/mcMGigvIsdLSdsnvQ5J+PQHJvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Kej3MKuX; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BTaJJnjQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF5FAC19422
-	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 18:55:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764615344;
-	bh=BJ2QAtb/JngB4ZVpKmkoLTPpIpJvhEqR8k+Jbd4rlQ4=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=BTaJJnjQ5qlFKV8oUxGJMAGCK7uQdE2BlnVKzBYwTk4sUdMB4ZUpc88AaHzVSgGaC
-	 KcHkoaVQHMR4uVuWojmZWZpAlJ/HAOqioVVrbFqwfBzH1I0Wtf+4VG+PqCFjyDfEaj
-	 e3969POd9TKHd1iBbILy0Jo1ag6cQNOCGKH1MYI0s/Mf4Q4KhOkT+dnA0C5VkEVzs9
-	 H8t/7fOYG2zmUwcNLU5FXGim3RiwLK9Mj7bbNSgLEPS7vSDbw1mvKrPSgVfGsVmJXp
-	 weaI7cSHlNpDRYEtCJ7rUy+LXipNxoZy1l4bpXYkBBrwCCyPy+qdcK5e1OU6LGz2CJ
-	 n7nvpnNn8TmLw==
-Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-3e3dac349easo3248089fac.2
-        for <linux-block@vger.kernel.org>; Mon, 01 Dec 2025 10:55:43 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUiGu8UIwwZD60QJNgaimn6vWDI6PIbMkn9+9WFMBsRba//DKWobo25zUBLU8C8uDo3p+cYh1ZJukSVdQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzC1VhVa7lVKaBnQA8cT6+imHhbs/VDeHpfU5Wyt1FxVnePY3Nj
-	mPkHFQLH0UQp8rhPGt/l8HrUPCTLS+O3OMEGmjo27L2AxeVUQe/SZY3ko6HcVARwOWNtx9+jMBy
-	sO+z5n60Pu5N+amBJM3tn2D9kPOesQE4=
-X-Google-Smtp-Source: AGHT+IEaUC/6POahoQxGNijkuOF2uREv010/iuql4oUBg5ecE+gke9+TivoRfWOgpkOivd6EkfciT1qA1PsN2Rb6Efg=
-X-Received: by 2002:a05:6808:1891:b0:44f:e61d:189f with SMTP id
- 5614622812f47-45115865582mr15784991b6e.13.1764615343277; Mon, 01 Dec 2025
- 10:55:43 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Kej3MKuX"
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-b9da0ae5763so320839a12.0
+        for <linux-block@vger.kernel.org>; Mon, 01 Dec 2025 11:00:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1764615615; x=1765220415; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=F+5ZZusDifZJpTmOBK3SWpR3xAND9tCnGPIiSfEMP4Y=;
+        b=Kej3MKuXYaLV/rtNALs65BXMXCd2cChDpv46IeulQ9OBb0rcRYT09ZSHcyFGOM9uLq
+         UbQQttjYEY9SUNwShJI0OFrOelY6wLC/gDSvkj8/tZhj9jyRoqpfvjZtf85tDB+GTYXN
+         Z6/fdkitrePAm0AtiPdpiYtKQGIH44IzhztglIGEerzGZsnxcAbRjoACsYtOCHx4ig3g
+         QxXbtIimhlgzDpDEsWZyJLd3moTSmLui3wsb5igeN0SJlvCx2ewsfCet22+q3hPk9gVY
+         RZTeqBljS1zLc/HYKTpsZrfBC7jnXsMLK+baVrax894qMj7BUJDlVK6WWyQyC0954A1i
+         sWhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764615615; x=1765220415;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=F+5ZZusDifZJpTmOBK3SWpR3xAND9tCnGPIiSfEMP4Y=;
+        b=kQw2Wpupu7j0fYNaDTNxmanvy3YsQZoG8InUVDh3c+cnvuloStSlyuG5GyqTte6XyS
+         tlJPY+Kh2RfzzKHAFeYDHJ6jeAiQv+aOgNGFGSQ7UM57s6EbnbJ+hhPimwj1fk5h/pYi
+         W1sEZVScbOddkEgQiAMdT5Xjx+7M30kDn8S6hrEURz6TjDzEU1gTUGk+bZbV/TO9JaC/
+         FhPnUCgFCkgxop7KkLpKHV99H5Mq6CFjfHQZ7+qW3vKfWsOBGBOu2jf0GE6al/mKpCnf
+         LKo7Xy6RKX7fpugEtHMjrb6Tx+U8gdrr5yIVbFJw4UPO1zElAwNv5JG/Y56LQG+BMcp/
+         KnzQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWkvYziEtn5VJe9/7mqhMeeObrFYmD2xgXLrfyfiAqfOW2T8glIoJSqhUr3+lO5GmP1A8ChReyXLXyIAA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVgNtn/GIBKsateYCi/57Lw9cI+u+oXXJDGkMKK0rneh+4rU9d
+	hDs+1fHaHAgwHkaJlDQmtgyRtpx3GhRVZAIoBKgVILsR5V+yEGt+kHFj7G+PgPOAtKVrCVToEiQ
+	40EJ/1xXCak8mWTNUBF+NdnB7NT0HKgF4prYOT3iocg==
+X-Gm-Gg: ASbGnct3KnW6XrJvQyO+qGowT4tBKxzvpCLMU2d9vMtf+jP20VjUfHFf1cKqrFVr7xt
+	mEWn2OOYSxw3rIsweqrM1U2hOawGIY8wL6JTZ1/vJwqAMVrk/Jy3PoiIK1h3Cwn6S4ogsX1TSit
+	Q2XkW/W6kPg/mSWZ1XcdWSCvkTUJ4wh0J4m23mIXm2yTTyu/6f5IlEsOmylBnyVjUrG9/a9ufPN
+	5ZhaWmM0+XTOTRd2NLi1t5+F0b41fHGMeFg/XYbOPXFzG0AffKVyBMpXJfs4FaO/0/fwkjP
+X-Google-Smtp-Source: AGHT+IHXVLPSz9cfkNLZDabTSsQ2qowAKPhIcPIBMbZL4q4rqJkWtWHbX7Kr0d2f3zXF1NiWsszp4sjl3xvo/4v8HQI=
+X-Received: by 2002:a05:7022:ea48:10b0:11b:aff2:4cd5 with SMTP id
+ a92af1059eb24-11c9d717ef2mr17645537c88.2.1764615615041; Mon, 01 Dec 2025
+ 11:00:15 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251126101636.205505-1-yang.yang@vivo.com> <CAJZ5v0jiLAgHCQ51cYqUX-xjir7ooAC3xKH9wMbwrebOEuxFdw@mail.gmail.com>
- <CAJZ5v0hKpGbwFmxcH8qe=DPf_5GX=LD=Fqj3dgOApUoE1RmJAQ@mail.gmail.com>
- <4697314.LvFx2qVVIh@rafael.j.wysocki> <dc4dba4f-8334-40ea-8c53-6e8d135f1d41@acm.org>
- <CAJZ5v0jV-80kfk-AY70b5pQtyXxUtU_ACBVP_TeTAnaY0Up8Lw@mail.gmail.com>
- <1e7583e8-9ae9-4641-8ec2-7c62a637c9fc@acm.org> <CAJZ5v0hKe+2orwKP352dBe_PB1pZqMehMo8tSDv5G+cdaJ=OsQ@mail.gmail.com>
- <82bcdf73-54c5-4220-86c0-540a5cb59bb7@vivo.com> <8fa4023f-50f2-4e25-9f9b-4e5236015e27@vivo.com>
-In-Reply-To: <8fa4023f-50f2-4e25-9f9b-4e5236015e27@vivo.com>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Mon, 1 Dec 2025 19:55:27 +0100
-X-Gmail-Original-Message-ID: <CAJZ5v0i+BhxX54wyogVR4_fmTJHVFfozNrP5LN4pGDPnnL=EDQ@mail.gmail.com>
-X-Gm-Features: AWmQ_bmnSQKJ36X5vY0ihxlgWqyQr-ftkYt6rNfH4EJ2Nj6tgHt7-ETI4VPKYjk
-Message-ID: <CAJZ5v0i+BhxX54wyogVR4_fmTJHVFfozNrP5LN4pGDPnnL=EDQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] PM: runtime: Fix I/O hang due to race between resume
- and runtime disable
-To: YangYang <yang.yang@vivo.com>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>, Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>, 
-	Pavel Machek <pavel@kernel.org>, Len Brown <lenb@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Danilo Krummrich <dakr@kernel.org>, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-pm@vger.kernel.org
+References: <20251121015851.3672073-1-ming.lei@redhat.com> <20251121015851.3672073-16-ming.lei@redhat.com>
+In-Reply-To: <20251121015851.3672073-16-ming.lei@redhat.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Mon, 1 Dec 2025 11:00:03 -0800
+X-Gm-Features: AWmQ_bmhRUF1eWGy7-En1_856BmeNfxxKcPTqJvh_FOdDVA9v_eLPYVOunqLx8A
+Message-ID: <CADUfDZoTueDL9ReuGO0TntffmT4JfpUdt0=QfepBJYKVRWwDyA@mail.gmail.com>
+Subject: Re: [PATCH V4 15/27] ublk: abort requests filled in event kfifo
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	Uday Shankar <ushankar@purestorage.com>, Stefani Seibold <stefani@seibold.net>, 
+	Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 1, 2025 at 1:56=E2=80=AFPM YangYang <yang.yang@vivo.com> wrote:
+On Thu, Nov 20, 2025 at 6:00=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrot=
+e:
 >
-> On 2025/12/1 17:46, YangYang wrote:
-> > On 2025/11/27 20:34, Rafael J. Wysocki wrote:
-> >> On Wed, Nov 26, 2025 at 11:47=E2=80=AFPM Bart Van Assche <bvanassche@a=
-cm.org> wrote:
-> >>>
-> >>> On 11/26/25 1:30 PM, Rafael J. Wysocki wrote:
-> >>>> On Wed, Nov 26, 2025 at 10:11=E2=80=AFPM Bart Van Assche <bvanassche=
-@acm.org> wrote:
-> >>>>>
-> >>>>> On 11/26/25 12:17 PM, Rafael J. Wysocki wrote:
-> >>>>>> --- a/block/blk-core.c
-> >>>>>> +++ b/block/blk-core.c
-> >>>>>> @@ -309,6 +309,8 @@ int blk_queue_enter(struct request_queue
-> >>>>>>                 if (flags & BLK_MQ_REQ_NOWAIT)
-> >>>>>>                         return -EAGAIN;
-> >>>>>>
-> >>>>>> +             /* if necessary, resume .dev (assume success). */
-> >>>>>> +             blk_pm_resume_queue(pm, q);
-> >>>>>>                 /*
-> >>>>>>                  * read pair of barrier in blk_freeze_queue_start(=
-), we need to
-> >>>>>>                  * order reading __PERCPU_REF_DEAD flag of .q_usag=
-e_counter and
-> >>>>>
-> >>>>> blk_queue_enter() may be called from the suspend path so I don't th=
-ink
-> >>>>> that the above change will work.
-> >>>>
-> >>>> Why would the existing code work then?
-> >>>
-> >>> The existing code works reliably on a very large number of devices.
-> >>
-> >> Well, except that it doesn't work during system suspend and
-> >> hibernation when the PM workqueue is frozen.  I think that we agree
-> >> here.
-> >>
-> >> This needs to be addressed because it may very well cause system
-> >> suspend to deadlock.
-> >>
-> >> There are two possible ways to address it I can think of:
-> >>
-> >> 1. Changing blk_pm_resume_queue() and its users to carry out a
-> >> synchronous resume of q->dev instead of calling pm_request_resume()
-> >> and (effectively) waiting for the queued-up runtime resume of q->dev
-> >> to take effect.
-> >>
-> >> This would be my preferred option, but at this point I'm not sure if
-> >> it's viable.
-> >>
-> >
-> > After __pm_runtime_disable() is called from device_suspend_late(), dev-=
->power.disable_depth is set, preventing
-> > rpm_resume() from making progress until the system resume completes, re=
-gardless of whether rpm_resume() is invoked
-> > synchronously or asynchronously.
-> > Performing a synchronous resume of q->dev seems to have a similar effec=
-t to removing the following code block from
-> > __pm_runtime_barrier(), which is invoked by __pm_runtime_disable():
-> >
-> > 1428     if (dev->power.request_pending) {
-> > 1429         dev->power.request =3D RPM_REQ_NONE;
-> > 1430         spin_unlock_irq(&dev->power.lock);
-> > 1431
-> > 1432         cancel_work_sync(&dev->power.work);
-> > 1433
-> > 1434         spin_lock_irq(&dev->power.lock);
-> > 1435         dev->power.request_pending =3D false;
-> > 1436     }
-> >
+> In case of BATCH_IO, any request filled in event kfifo, they don't get
+> chance to be dispatched any more when releasing ublk char device, so
+> we have to abort them too.
 >
-> Since both synchronous and asynchronous resumes face similar issues,
+> Add ublk_abort_batch_queue() for aborting this kind of requests.
+>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  drivers/block/ublk_drv.c | 26 +++++++++++++++++++++++++-
+>  1 file changed, 25 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 2e5e392c939e..849199771f86 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -2241,7 +2241,8 @@ static int ublk_ch_mmap(struct file *filp, struct v=
+m_area_struct *vma)
+>  static void __ublk_fail_req(struct ublk_device *ub, struct ublk_io *io,
+>                 struct request *req)
+>  {
+> -       WARN_ON_ONCE(io->flags & UBLK_IO_FLAG_ACTIVE);
+> +       WARN_ON_ONCE(!ublk_dev_support_batch_io(ub) &&
+> +                       io->flags & UBLK_IO_FLAG_ACTIVE);
+>
+>         if (ublk_nosrv_should_reissue_outstanding(ub))
+>                 blk_mq_requeue_request(req, false);
+> @@ -2251,6 +2252,26 @@ static void __ublk_fail_req(struct ublk_device *ub=
+, struct ublk_io *io,
+>         }
+>  }
+>
+> +/*
+> + * Request tag may just be filled to event kfifo, not get chance to
+> + * dispatch, abort these requests too
+> + */
+> +static void ublk_abort_batch_queue(struct ublk_device *ub,
+> +                                  struct ublk_queue *ubq)
+> +{
+> +       while (true) {
+> +               struct request *req;
+> +               short tag;
+> +
+> +               if (!kfifo_out(&ubq->evts_fifo, &tag, 1))
+> +                       break;
 
-No, they don't.
+This loop could also be written a bit more simply as while
+(kfifo_out(&ubq->evts_fifo, &tag, 1)).
 
-> it may be sufficient to keep using the asynchronous resume path as long a=
+Best,
+Caleb
+
+> +
+> +               req =3D blk_mq_tag_to_rq(ub->tag_set.tags[ubq->q_id], tag=
+);
+> +               if (req && blk_mq_request_started(req))
+> +                       __ublk_fail_req(ub, &ubq->ios[tag], req);
+> +       }
+> +}
+> +
+>  /*
+>   * Called from ublk char device release handler, when any uring_cmd is
+>   * done, meantime request queue is "quiesced" since all inflight request=
 s
-> pending work items are not canceled while the PM workqueue is frozen.
-
-Except for two things:
-
-1. If blk_queue_enter() or __bio_queue_enter() is allowed to race with
-disabling runtime PM, queuing up the resume work item may fail in the
-first place.
-
-2. If a device runtime resume work item is queued up before the whole
-system is suspended, it may not make sense to run that work item after
-resuming the whole system because the state of the system as a whole
-is generally different at that point.
-
-> This allows the pending work to proceed normally once the PM workqueue
-> is unfrozen.
-
-Not really.
+> @@ -2269,6 +2290,9 @@ static void ublk_abort_queue(struct ublk_device *ub=
+, struct ublk_queue *ubq)
+>                 if (io->flags & UBLK_IO_FLAG_OWNED_BY_SRV)
+>                         __ublk_fail_req(ub, io, io->req);
+>         }
+> +
+> +       if (ublk_support_batch_io(ubq))
+> +               ublk_abort_batch_queue(ub, ubq);
+>  }
+>
+>  static void ublk_start_cancel(struct ublk_device *ub)
+> --
+> 2.47.0
+>
