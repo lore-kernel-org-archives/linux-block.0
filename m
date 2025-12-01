@@ -1,157 +1,201 @@
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B3EA1EFF9B
-	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 05:58:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 964191C84C0
+	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 06:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764568703; cv=none; b=M5qyefys+hnbiItdHDPxPcre2Gyc/B8bqgpJUfsmw+bhBwOsghu4ez3//9+TwgcjgMttEq5NOwaWJLCKAyGvUfGuFidWVnwfGNKLTAkzdcdlGR8IzEq5ndNXyiyF/xIAqykwhI7zmT+YO8ERJSzSQy515bsbpBpvGohUTInYv4A=
+	t=1764569431; cv=none; b=Mr/FuH7okihtuLwvDrSaytoEAhXku4wOyUlI/MhD3lsl1llIOzpcu7s9SC+KEdVyMOXnUeBdoK0NJrWwFlRbpI/dBVb9I2Cg7d3wdpdm72yBxfVuvsun+9W3qtS8N+oTVPR+F7LvcRAm2z5jIzz79ZA3omjdmnk3lWLNOTNWh5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764568703; c=relaxed/simple;
-	bh=aImZKz6ZAeMtXOu12x1GpTS3RXvMiBtnNRdUGUH/wNQ=;
+	s=arc-20240116; t=1764569431; c=relaxed/simple;
+	bh=dK6LVvZXtJcO3+hTxExNGu6YS83HhsurIDNEZdxpBjA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hkwqwS1TmPA4mtNYLZiQ+PBLf3iO/CL8TlCZkTJgq9cBqwKXNEAmXR4WFX+d+D6nT6zxqjeKUbWjxWElVSdYuqs8fpt12fhWMiNX9kNozlWWhcWmSkxD2IYl2MHX5CEKyqduAFFNxYvK6g//+oGjxRWXLIRMjhOECO9ONID64jk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Oe0uAtqo; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	 To:Cc:Content-Type; b=V1PStbsEGZqUcWsHAG8cT8vMAIVtwFgN7EgEmefcTrpurUa28zCspCsz0ryngTGpU/V3Z5h04FtpWWTwVFNzwkS92e7u44hnTGT+eRiZulCmcCUgJimfy82CU8/VnSrfzo808hoSXt/u6DnBS3EfGbNdgBzMczyjebEHaToFSYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=LdKFBICK; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Oe0uAtqo"
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-29806bd4776so6642175ad.0
-        for <linux-block@vger.kernel.org>; Sun, 30 Nov 2025 21:58:21 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="LdKFBICK"
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-b7672a12eb8so41664066b.3
+        for <linux-block@vger.kernel.org>; Sun, 30 Nov 2025 22:10:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1764568701; x=1765173501; darn=vger.kernel.org;
+        d=ionos.com; s=google; t=1764569427; x=1765174227; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ynFk6sjjY/clNnonF5CdKjbMTq2F6Or6gkxvJspqSRU=;
-        b=Oe0uAtqoLa6DmZy9ndUVuvyRK4wpSdmliqX8RSbeKUJlvN7Rd268iXHb395O3mpyt2
-         zbSvoFknnpVBg0I7xVpUPNtPsE9JY3k+zgOvW/OhBn6+W8X4kByVmPLK0KJY6UrQXosg
-         Vm3UV7zqk1Ep7hfQvUxWvO4+00cQp0Up4mkUwLvkdDhprn2U0gazt2ntljgjjjn/LPk/
-         THiv31zCoX7t8K00N7ePi0g0S1eDBCJ5QiQockpPFNSuHLEdiRI2e4uUxEn/rIrvTQfG
-         KJ9JdhTPnI7/dA2Q7P+GrhYhXU+0uAvlOSen+GOrEX2tX1h8oDlu0VS4J89Kkr4RR5dW
-         i3HA==
+        bh=cUWCoa2TvJeZ2qLBkbaS38Pj3t7SDQQs7GmbeHyTJ7k=;
+        b=LdKFBICKAo7oPWaWfoW6Zw/gIDXu1BRUWu0cuVrK+VJBfPgTWAaELajnkPCsYGZoe0
+         xYi+NPOTH3ILCKMzlWGY8YdroQl8g8pk/dQ9VfyCRvkMTvkBkthfVYVwdL9INE2GblXe
+         QdQPdJ9EYV9BzuHxTg9J8mTqFOLFL1c7Jm0YlSu9KCUaSbLYbooYOFNvSWqZaOWVTVs9
+         e0veSCRw9vqoCtGhbCU6hYCAAa3imTjXPx+OZCkcRngpTC8BOhfNu/aIkwak2i9n8F6B
+         FeEUSdY3272m8YxkYCbMUX+X/Ki4PY/VPBgKuAHN9YhZ1mTYlrb2/x2UNIbb+8nfbOUG
+         U+NQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764568701; x=1765173501;
+        d=1e100.net; s=20230601; t=1764569427; x=1765174227;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=ynFk6sjjY/clNnonF5CdKjbMTq2F6Or6gkxvJspqSRU=;
-        b=A67J+wZGjdBaWgL5dzZndQWsBXXLcjckBbmhLl5jt+wYh9mt9NcQ6kqpfJYE0KbmMV
-         UPBPxAIvQSAE6BYk2BycFg1GdUMxFoxG5404HZzj8GP7oK8YMSjrXpJrqmj4m+K4Lse7
-         u1ze1OoRKOOWCPDHE5iUvIkbv28P/r1uH018Xvc5lnZ1S4EHcaAGu+Gp4GMv6yvoed1+
-         7lW8AYwOBvqIZ14uResq0kkC5x3py2pM3J2FewHcnE4mUaHfoeQb59joPHnxOGlBSpBe
-         1dUpvjzj4WDAGUoDLwK2QQhYwfNXm5hSOgbJbOy5KfkKRFoVyMsnq6THwYtM7klqE1QY
-         NRyw==
-X-Forwarded-Encrypted: i=1; AJvYcCVffoPnFBOX6VMqvRiXHnNxT85KcK7e2+fjzt8Dpzh9Vq4LyP7W0PdYAZC/VxGaZrBzHuVkJ8PfulT2XA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZIeqjFJ6a+auSjnhW7bYpg9eqccePsuJwA5aZTkA+wu1B2S1F
-	tuZp25gdApBntQzXW3Erg4INLl0mE0MRBO6PZziSh4WL9EgwWc/y0tFczdCaa5cI7/W6S9+Adv2
-	9uwiynNzbkzj3iyJr0lSRRtDoIDFmODsFer/J4ittiw==
-X-Gm-Gg: ASbGncu7I/MU9hC6VLGFZ5iekvr/ynzrek6OvoEQ0E2au+LG9a8g6FkiJW3T/jQlXmk
-	4IYcnxphan3fppDda1m5bRK/oX9WHhBqPcyIwqdnYnlg1iV26Nn+X+r766EODk4aMh4nOkUsWkA
-	jn7IMmbZFBi+rfsG9jiHW8DBRnQPySomPDlvmXuZEPFTNbmGi4Ms8baWb7Xei7Wmz67voykcBP4
-	v/ENwStLv4SFxa/b/Hredls7bgqjJiJEFwcs4YGbEmAp+P1ZOe9z0sFusiImOFozbb4qSJE
-X-Google-Smtp-Source: AGHT+IE4J3mB1vmb+l2kleEK/k0qPOX5WcsiH5cESjNzC8LWsclbyPhXJ4BFyz7GF0V7JPAZjnc8nJOg/8doVROIOZs=
-X-Received: by 2002:a05:7022:24a7:b0:119:e55a:95a3 with SMTP id
- a92af1059eb24-11c9d87d64dmr20444793c88.5.1764568700651; Sun, 30 Nov 2025
- 21:58:20 -0800 (PST)
+        bh=cUWCoa2TvJeZ2qLBkbaS38Pj3t7SDQQs7GmbeHyTJ7k=;
+        b=ILWWoHIO6PH33mP5prWb1CaA298bKKUiqaowBoakt7U4jpxGD7XIgI475EPpglbdPH
+         /ysOX6EH5C60kF3uJoeVyyq2KbqnauaybfKulzaKBOL22C7dIq4BQqps1oUTi2x75AtH
+         WwK+2BwmnUeq/Zn9dCkEYAFptGzmEWiWQd6zTAm1FKFQwBfsOWPCQ+yEpk5TP1t/o6Zg
+         3oI8WsFiDfqhrjIXQ+MVhUkw021BJm9SAEIdCpcRhifwzCaBtoNzkVFhwyxX6W9cUmRk
+         7E+zOt1G3MjlhhrGeAFTAum7fNSVMCbiR9hLRp2xDnVYwFhPM2k+Q5u3WM5qopCpa5CU
+         Ipng==
+X-Forwarded-Encrypted: i=1; AJvYcCUm7nAaljC1qOefJNDSLntgDfLIeIpdOfDGFr2Xo83cGK6zaVR2Nwy5ymsymvqwdfHzwK4Mw2OwbaF0Yw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPmSJwwcehtGSozrpMfRImFAwIELtk2wO5OKfWHY29/dP6p1fn
+	oH5kKalu5+XawJgZgtJxbq4B6aezO1GIwMqt0jiwAA2+ia17FnvQwxMBH+gjxBbZMYDTHvvxQKU
+	8KwpEByTfm9dE1XvQ+ZganfvOxl9vU23fNdEyFIG7mQ==
+X-Gm-Gg: ASbGncte6wQ8TG2sI+vqEXqf3IjzzjanlqtrRGnkKYgr/2HGG5ZrBDA5xW3Anq5nzfp
+	qZXGpcsTR9Ly9c7Olgh55P8JVkUhjSp6Gy3asF4ME1Lo2Hmh3zujuPLVEXRb8HtAfYMWXgXnd7X
+	IxJVYz56lQ43Plq4xHiSc4Q8eXj1v4mWS9laAAdoOlWxnwxiF0+MwEm+fUdI4oKgBSsAG92ohgA
+	YHE4ZBa9gpBfpSU/3C0WKM4Z7Z/OF5Ade1xY1A2+SmgEyJN4ur95sHsJw1W/2NzZ1TWWSK7XFp8
+	kd9t07rIAgvbzUUThdgpOgD8MgEkUPaAxFsyJg==
+X-Google-Smtp-Source: AGHT+IHqqqMjmc4wSiCvdPeDjLhjJjNzUr00dgfhvujlYXR3jO65w9ihcJlLxt0oK7WULfte9njzaDqdENDWu4rQyEA=
+X-Received: by 2002:a17:907:3c84:b0:b76:3d45:51d9 with SMTP id
+ a640c23a62f3a-b7676ce0db2mr2462621666b.0.1764569426831; Sun, 30 Nov 2025
+ 22:10:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251121015851.3672073-1-ming.lei@redhat.com> <20251121015851.3672073-2-ming.lei@redhat.com>
- <CADUfDZramMrqZ1=ZH2xXcT=n-p-QsdQ2nOpAeWGzxEpjc-9-Rg@mail.gmail.com> <aSzzdFRAVAGpBMpr@fedora>
-In-Reply-To: <aSzzdFRAVAGpBMpr@fedora>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Sun, 30 Nov 2025 21:58:07 -0800
-X-Gm-Features: AWmQ_bnrOeqUi3OvYYFoBPMWMhSAE1kVUIHaZFswZDOYqBXZrcB13LzK13GdDNA
-Message-ID: <CADUfDZr0GqyWj=Zyq4WQ2T3wULrC_L4ZX_LB_CRbRj7TS=pmSg@mail.gmail.com>
-Subject: Re: [PATCH V4 01/27] kfifo: add kfifo_alloc_node() helper for NUMA awareness
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Uday Shankar <ushankar@purestorage.com>, Stefani Seibold <stefani@seibold.net>, 
-	Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org
+References: <20251129223542.2047020-1-rdunlap@infradead.org>
+In-Reply-To: <20251129223542.2047020-1-rdunlap@infradead.org>
+From: Jinpu Wang <jinpu.wang@ionos.com>
+Date: Mon, 1 Dec 2025 07:10:15 +0100
+X-Gm-Features: AWmQ_bltb3w3qL1GKkSPcer9suF2lTNugSWu7BhoxL5x0gWJjXwQcdy_R-KPQMk
+Message-ID: <CAMGffEkEU4obSxbtRUNaK8F03jQEaX2VDqHyWmsYSidDsf_94g@mail.gmail.com>
+Subject: Re: [PATCH] block/rnbd: correct all kernel-doc complaints
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: linux-kernel@vger.kernel.org, "Md. Haris Iqbal" <haris.iqbal@ionos.com>, 
+	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Nov 30, 2025 at 5:46=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrot=
-e:
+On Sat, Nov 29, 2025 at 11:35=E2=80=AFPM Randy Dunlap <rdunlap@infradead.or=
+g> wrote:
 >
-> On Sat, Nov 29, 2025 at 11:12:43AM -0800, Caleb Sander Mateos wrote:
-> > On Thu, Nov 20, 2025 at 5:59=E2=80=AFPM Ming Lei <ming.lei@redhat.com> =
-wrote:
-> > >
-> > > Add __kfifo_alloc_node() by refactoring and reusing __kfifo_alloc(),
-> > > and define kfifo_alloc_node() macro to support NUMA-aware memory
-> > > allocation.
-> > >
-> > > The new __kfifo_alloc_node() function accepts a NUMA node parameter
-> > > and uses kmalloc_array_node() instead of kmalloc_array() for
-> > > node-specific allocation. The existing __kfifo_alloc() now calls
-> > > __kfifo_alloc_node() with NUMA_NO_NODE to maintain backward
-> > > compatibility.
-> > >
-> > > This enables users to allocate kfifo buffers on specific NUMA nodes,
-> > > which is important for performance in NUMA systems where the kfifo
-> > > will be primarily accessed by threads running on specific nodes.
-> > >
-> > > Cc: Stefani Seibold <stefani@seibold.net>
-> > > Cc: Andrew Morton <akpm@linux-foundation.org>
-> > > Cc: linux-kernel@vger.kernel.org
-> > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > > ---
-> > >  include/linux/kfifo.h | 34 ++++++++++++++++++++++++++++++++--
-> > >  lib/kfifo.c           |  8 ++++----
-> > >  2 files changed, 36 insertions(+), 6 deletions(-)
-> > >
-> > > diff --git a/include/linux/kfifo.h b/include/linux/kfifo.h
-> > > index fd743d4c4b4b..8b81ac74829c 100644
-> > > --- a/include/linux/kfifo.h
-> > > +++ b/include/linux/kfifo.h
-> > > @@ -369,6 +369,30 @@ __kfifo_int_must_check_helper( \
-> > >  }) \
-> > >  )
-> > >
-> > > +/**
-> > > + * kfifo_alloc_node - dynamically allocates a new fifo buffer on a N=
-UMA node
-> > > + * @fifo: pointer to the fifo
-> > > + * @size: the number of elements in the fifo, this must be a power o=
-f 2
-> > > + * @gfp_mask: get_free_pages mask, passed to kmalloc()
-> > > + * @node: NUMA node to allocate memory on
-> > > + *
-> > > + * This macro dynamically allocates a new fifo buffer with NUMA node=
- awareness.
-> > > + *
-> > > + * The number of elements will be rounded-up to a power of 2.
-> > > + * The fifo will be release with kfifo_free().
-> > > + * Return 0 if no error, otherwise an error code.
-> > > + */
-> > > +#define kfifo_alloc_node(fifo, size, gfp_mask, node) \
-> > > +__kfifo_int_must_check_helper( \
-> > > +({ \
-> > > +       typeof((fifo) + 1) __tmp =3D (fifo); \
-> > > +       struct __kfifo *__kfifo =3D &__tmp->kfifo; \
-> > > +       __is_kfifo_ptr(__tmp) ? \
-> > > +       __kfifo_alloc_node(__kfifo, size, sizeof(*__tmp->type), gfp_m=
-ask, node) : \
-> > > +       -EINVAL; \
-> > > +}) \
-> > > +)
-> >
-> > Looks like we could avoid some code duplication by defining
-> > kfifo_alloc(fifo, size, gfp_mask) as kfifo_alloc_node(fifo, size,
-> > gfp_mask, NUMA_NO_NODE). Otherwise, this looks good to me.
+> Fix all kernel-doc warnings in rnbd-proto.h:
+> - use correct enum name in kdoc comment
+> - mark several struct members as "/* private: */" so that no kdoc is
+>   required for them
+> - don't use "/**" for a non-kernel-doc comment
+> - use the correct struct member name for "dev_name"
+> - use " *" for a blank kernel-doc line
 >
-> It is just a single-line inline, and shouldn't introduce any code
-> duplication. Switching to kfifo_alloc_node() doesn't change result of
-> `size vmlinux` actually.
-
-Right, I know they expand to the same thing. I'm just saying we can
-avoid repeating the nearly identical implementations by writing
-kfifo_alloc() in terms of kfifo_alloc_node().
-
-Best,
-Caleb
+> Fixes these warnings:
+> Warning: drivers/block/rnbd/rnbd-proto.h:41 expecting prototype for
+>  enum rnbd_msg_types. Prototype was for enum rnbd_msg_type instead
+> Warning: drivers/block/rnbd/rnbd-proto.h:50 struct member '__padding'
+>  not described in 'rnbd_msg_hdr'
+> Warning: drivers/block/rnbd/rnbd-proto.h:53 This comment starts with
+>  '/**', but isn't a kernel-doc comment.
+>  * We allow to map RO many times and RW only once. We allow to map yet an=
+other
+> Warning: drivers/block/rnbd/rnbd-proto.h:81 struct member 'reserved'
+>  not described in 'rnbd_msg_sess_info'
+> Warning: drivers/block/rnbd/rnbd-proto.h:92 struct member 'reserved'
+>  not described in 'rnbd_msg_sess_info_rsp'
+> Warning: drivers/block/rnbd/rnbd-proto.h:107 struct member 'resv1'
+>  not described in 'rnbd_msg_open'
+> Warning: drivers/block/rnbd/rnbd-proto.h:107 struct member 'dev_name'
+>  not described in 'rnbd_msg_open'
+> Warning: drivers/block/rnbd/rnbd-proto.h:107 struct member 'reserved'
+>  not described in 'rnbd_msg_open'
+> Warning: drivers/block/rnbd/rnbd-proto.h:158 struct member 'reserved'
+>  not described in 'rnbd_msg_open_rsp'
+> Warning: drivers/block/rnbd/rnbd-proto.h:189 bad line:
+>
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+lgtm, thx!
+Acked-by: Jack Wang <jinpu.wang@ionos.com>
+> ---
+> Cc: Md. Haris Iqbal <haris.iqbal@ionos.com>
+> Cc: Jack Wang <jinpu.wang@ionos.com>
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Cc: linux-block@vger.kernel.org
+> ---
+>  drivers/block/rnbd/rnbd-proto.h |   15 +++++++++++----
+>  1 file changed, 11 insertions(+), 4 deletions(-)
+>
+> --- linux-next-20251128.orig/drivers/block/rnbd/rnbd-proto.h
+> +++ linux-next-20251128/drivers/block/rnbd/rnbd-proto.h
+> @@ -24,7 +24,7 @@
+>  #define RTRS_PORT 1234
+>
+>  /**
+> - * enum rnbd_msg_types - RNBD message types
+> + * enum rnbd_msg_type - RNBD message types
+>   * @RNBD_MSG_SESS_INFO:        initial session info from client to serve=
+r
+>   * @RNBD_MSG_SESS_INFO_RSP:    initial session info from server to clien=
+t
+>   * @RNBD_MSG_OPEN:             open (map) device request
+> @@ -47,10 +47,11 @@ enum rnbd_msg_type {
+>   */
+>  struct rnbd_msg_hdr {
+>         __le16          type;
+> +       /* private: */
+>         __le16          __padding;
+>  };
+>
+> -/**
+> +/*
+>   * We allow to map RO many times and RW only once. We allow to map yet a=
+nother
+>   * time RW, if MIGRATION is provided (second RW export can be required f=
+or
+>   * example for VM migration)
+> @@ -78,6 +79,7 @@ static const __maybe_unused struct {
+>  struct rnbd_msg_sess_info {
+>         struct rnbd_msg_hdr hdr;
+>         u8              ver;
+> +       /* private: */
+>         u8              reserved[31];
+>  };
+>
+> @@ -89,6 +91,7 @@ struct rnbd_msg_sess_info {
+>  struct rnbd_msg_sess_info_rsp {
+>         struct rnbd_msg_hdr hdr;
+>         u8              ver;
+> +       /* private: */
+>         u8              reserved[31];
+>  };
+>
+> @@ -97,13 +100,16 @@ struct rnbd_msg_sess_info_rsp {
+>   * @hdr:               message header
+>   * @access_mode:       the mode to open remote device, valid values see:
+>   *                     enum rnbd_access_mode
+> - * @device_name:       device path on remote side
+> + * @dev_name:          device path on remote side
+>   */
+>  struct rnbd_msg_open {
+>         struct rnbd_msg_hdr hdr;
+>         u8              access_mode;
+> +       /* private: */
+>         u8              resv1;
+> +       /* public: */
+>         s8              dev_name[NAME_MAX];
+> +       /* private: */
+>         u8              reserved[3];
+>  };
+>
+> @@ -155,6 +161,7 @@ struct rnbd_msg_open_rsp {
+>         __le16                  secure_discard;
+>         u8                      obsolete_rotational;
+>         u8                      cache_policy;
+> +       /* private: */
+>         u8                      reserved[10];
+>  };
+>
+> @@ -187,7 +194,7 @@ struct rnbd_msg_io {
+>   * @RNBD_OP_DISCARD:        discard sectors
+>   * @RNBD_OP_SECURE_ERASE:   securely erase sectors
+>   * @RNBD_OP_WRITE_ZEROES:   write zeroes sectors
+> -
+> + *
+>   * @RNBD_F_SYNC:            request is sync (sync write or read)
+>   * @RNBD_F_FUA:             forced unit access
+>   */
