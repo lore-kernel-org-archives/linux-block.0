@@ -1,60 +1,73 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D93D1917F1
-	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 03:04:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 927D51A3179
+	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 03:56:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764558282; cv=none; b=af7Y7oNSqcWM779rcCe05urD4gUHfnJF2lc4faLUBwQxXdWTA3wsagfcJRkDkdr5aeA1OY6LcFhjaGaNlhb/QOwo/lNM1xX6aQwoYxv4b3ZUwHUCG/GkGX2X5Sj2+JkhFwE6XAVU1M9+Ief8Yhy34sa5FYy8XBePjw99+bOTJzQ=
+	t=1764561394; cv=none; b=j2g4a21hvlJQ3K6JTq8G57gXpPoOQJyaMnd1F0NA3DR4h4BEVOu4A6KOy8Qd340L2gY3l9ROnHTeZvBx8FInAUA3AiRkoWToNo6R3TU0FCMdg39I1wWMLB3bXwqC5/HPeJm94GYnPpZfPT8vBxROwhEcNKjfyu/mEg/+0/zLShE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764558282; c=relaxed/simple;
-	bh=82TQz7BpisGdgCQ5LbzZc3uxrJs2It9EUmWn0mPWO1s=;
+	s=arc-20240116; t=1764561394; c=relaxed/simple;
+	bh=McOQTipQ2vTbXjA++68RW1XSamDCymkjaiQI9zBUL6Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Uq1/+aUypW7Z5ztMPaUIyhUvmg9zDhOqP7EWolNyZKecuesTo7uQdQl5C3bC8BXEI7oU7goqX+e9S4KUyBfBMgNfZx1cGRaaKUnvFOlodjPcVc258zNoDco+cEGD9La22aeeZyx7k9ZJAL/R/pRnILqmPttQnPCAEzoD3oeOqEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GO5d6oKk; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=IdOK7fAWAUYPzyyuZud3grG/XR0aKgvE/vwLI6k8cOJdJU5bbJxYD8Lc+GDoZi/VDv9Ov53LrlBTELlzCwoVDLanlH5JqPn0ChczeYrT0S38EDt/ap93Ex8I7LvB0r+V3e/MaQlpfwnDQONmFOgVhRPiMy5oh/QJg3j77Ig6eu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=KA+2EXoi; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GO5d6oKk"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764558278;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xbQthsR/1ur/34Ya3Fg/bq2vJkt9LYT4D2EV/lNYgy8=;
-	b=GO5d6oKkzlnBVB36kGFwf9NxMXZxuTYIdDC1Xk5dNavAM2dZDxuB2MMztvkcUvN9zWhjXF
-	iSUzUC++buIVc/F5siYBzccjQYpculbEC4jUdtBJM7QCut9mjH3y0XGNxjGfPyNxnm24de
-	O8PZmPqgm8WPcpF28DkSsxbdHfvEDHc=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-424-I7kvaYQCOeex_L1xw_3yrg-1; Sun,
- 30 Nov 2025 22:04:35 -0500
-X-MC-Unique: I7kvaYQCOeex_L1xw_3yrg-1
-X-Mimecast-MFC-AGG-ID: I7kvaYQCOeex_L1xw_3yrg_1764558274
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 87AD21800359;
-	Mon,  1 Dec 2025 03:04:33 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.20])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4143030001B9;
-	Mon,  1 Dec 2025 03:04:27 +0000 (UTC)
-Date: Mon, 1 Dec 2025 11:04:22 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Uday Shankar <ushankar@purestorage.com>,
-	Stefani Seibold <stefani@seibold.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V4 12/27] ublk: add io events fifo structure
-Message-ID: <aS0FtmO5LhltDG5-@fedora>
-References: <20251121015851.3672073-1-ming.lei@redhat.com>
- <20251121015851.3672073-13-ming.lei@redhat.com>
- <CADUfDZrfo7RzNZ7hGxOwK9fTWrwA4JEunahZQPvfO3EXT=1cTQ@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="KA+2EXoi"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-29844c68068so41848325ad.2
+        for <linux-block@vger.kernel.org>; Sun, 30 Nov 2025 19:56:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1764561392; x=1765166192; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=qB+a+p4MqPixn1RqoqUzTdFtWB/99ITR4DTLW8S81nM=;
+        b=KA+2EXoiv0vcoRjBg18xuiaEdyO55JHQLhQw3hfQPXUQlyzJ3ec/sOySAmCVvNXWF9
+         6kNTrKIafAU7nHKBV1pEQ9ITrXOk1miYX5eHAmAJuDhyILVWQ78mFD6ehAOWKMmzxAoN
+         sBPCtaJ9hFcx+dJzf69S195fpBwAhAz8Tsu8c=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764561392; x=1765166192;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qB+a+p4MqPixn1RqoqUzTdFtWB/99ITR4DTLW8S81nM=;
+        b=trgf3TRoKHAIy4ZzOKPgH/1R3OJREMz8suf5MSWpCndRPr8d3PkFjZruk+HnDjDiom
+         CmQtwGYXJZvI0/8GCQIQvwQogK4cwtCScgY/ZP0S3OZRMmOJc7IfQbPoT8+Fd4qMNUH+
+         L6pLudc4wRO8Y+0XW6UClgcwHaV3wxaQ7a64IUJVzjC77nc+tzIoOQAMf9oyTOKpMVPp
+         e3J7R6VJnt3+36as4fvwn7u5UvMoxMMn81cdL1X7Dx4EZjZ8EaOaT3+ZFNL9RmhgThYa
+         vllCiyJIjFmuXnHwqKKEmeCm/SYxUedZUokpQh5w4oMqx4BABVQfaO3voei/T4e82om/
+         qloA==
+X-Forwarded-Encrypted: i=1; AJvYcCWUV5dPy67UGciKP1VfW/y8I0Sgf85kY1bMYUkf1YUsA68Y67vSWV8/t/McePxEQnCR+/ne9aqJu1rRJg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwaUe3jbLQ/51SDqcL1TxQZPWIooYcQjlfR/beJ+N6/ubz2LPkK
+	5WyA9QV+18LyhoctkHOC1FmMac3e86y3sQDPNHw7+XPClgnhdNBlZ97x2g2CMRRfbw==
+X-Gm-Gg: ASbGncsiwwOaLQDAu6OLZoXMZ02Nke5j6oBma9zMidUPc+mnW2rXs7h6OH8zxOJcWu+
+	g3RJBJG8w6shobvzw4vqn4M+AklB++5nZ2s5yfxEMPhpRfashAzhd26/ZvySX8DPPPF7gBxUxyK
+	7q3m7KhCHhsuPm271NJGsKbQ8ZwoM9TDuDt8up8pj+u+rx53l94mzIYLnV7cCDpvZvVUqMuwM9G
+	URW+zVRwDijEniJb9zp18GCQeW7vY8j55C2gp/G+ClvUQp9s2I0NBPuUiFJWNsRBSIEPNMwOn/5
+	+Jt7Nm67nowzBHYJ3zSyZqgK6CDJ2Zst39vbo/E8W8ZiD3I1A8u5vwUD5TvQPRkM2v/keN61tv7
+	hCYH7KHJKTua8ugAtbOT7o0AI6CagceD9RJCXPPfYScJRTq1A/cflnUO0lkDSUm3cZBVpctXNx4
+	2K14sHaTfDtObvwC/oG5uZSHCTfPoZoI240aGo++uddodffw3oJe4=
+X-Google-Smtp-Source: AGHT+IGKqD632RpKl5VzEYBMQpnYan4XzgzGuzvbee48YOC0K/yn1Egh3tF2peeJh4TbkCddTQ/sWA==
+X-Received: by 2002:a17:902:ef07:b0:294:cc1d:e2b6 with SMTP id d9443c01a7336-29b6bf9c727mr383590675ad.59.1764561391784;
+        Sun, 30 Nov 2025 19:56:31 -0800 (PST)
+Received: from google.com ([2a00:79e0:2031:6:943c:f651:f00f:2459])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29bceb450cfsm106014465ad.74.2025.11.30.19.56.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 30 Nov 2025 19:56:31 -0800 (PST)
+Date: Mon, 1 Dec 2025 12:56:25 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Barry Song <21cnbao@gmail.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, Richard Chang <richardycc@google.com>, 
+	Brian Geffon <bgeffon@google.com>, Minchan Kim <minchan@kernel.org>, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, linux-block@vger.kernel.org, Minchan Kim <minchan@google.com>
+Subject: Re: [PATCH 1/2] zram: introduce compressed data writeback
+Message-ID: <hgk3zp5hwlcxo6ufiqasvte3hoksy2wb2kta3fime5rprq4org@xaprrqdabvgh>
+References: <20251128170442.2988502-1-senozhatsky@chromium.org>
+ <20251128170442.2988502-2-senozhatsky@chromium.org>
+ <CAGsJ_4yUAw_tzX7z8iizToMB8SDJPNOhFRZNXva_ae46q5vRwg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -64,167 +77,38 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADUfDZrfo7RzNZ7hGxOwK9fTWrwA4JEunahZQPvfO3EXT=1cTQ@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+In-Reply-To: <CAGsJ_4yUAw_tzX7z8iizToMB8SDJPNOhFRZNXva_ae46q5vRwg@mail.gmail.com>
 
-On Sun, Nov 30, 2025 at 08:53:03AM -0800, Caleb Sander Mateos wrote:
-> On Thu, Nov 20, 2025 at 5:59 PM Ming Lei <ming.lei@redhat.com> wrote:
+Hi Barry,
+
+On (25/11/29 17:55), Barry Song wrote:
+> On Sat, Nov 29, 2025 at 1:06 AM Sergey Senozhatsky
+> <senozhatsky@chromium.org> wrote:
 > >
-> > Add ublk io events fifo structure and prepare for supporting command
-> > batch, which will use io_uring multishot uring_cmd for fetching one
-> > batch of io commands each time.
+> > From: Richard Chang <richardycc@google.com>
 > >
-> > One nice feature of kfifo is to allow multiple producer vs single
-> > consumer. We just need lock the producer side, meantime the single
-> > consumer can be lockless.
-> >
-> > The producer is actually from ublk_queue_rq() or ublk_queue_rqs(), so
-> > lock contention can be eased by setting proper blk-mq nr_queues.
-> >
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >  drivers/block/ublk_drv.c | 65 ++++++++++++++++++++++++++++++++++++----
-> >  1 file changed, 60 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > index ea992366af5b..6ff284243630 100644
-> > --- a/drivers/block/ublk_drv.c
-> > +++ b/drivers/block/ublk_drv.c
-> > @@ -44,6 +44,7 @@
-> >  #include <linux/task_work.h>
-> >  #include <linux/namei.h>
-> >  #include <linux/kref.h>
-> > +#include <linux/kfifo.h>
-> >  #include <uapi/linux/ublk_cmd.h>
-> >
-> >  #define UBLK_MINORS            (1U << MINORBITS)
-> > @@ -217,6 +218,22 @@ struct ublk_queue {
-> >         bool fail_io; /* copy of dev->state == UBLK_S_DEV_FAIL_IO */
-> >         spinlock_t              cancel_lock;
-> >         struct ublk_device *dev;
-> > +
-> > +       /*
-> > +        * Inflight ublk request tag is saved in this fifo
-> > +        *
-> > +        * There are multiple writer from ublk_queue_rq() or ublk_queue_rqs(),
-> > +        * so lock is required for storing request tag to fifo
-> > +        *
-> > +        * Make sure just one reader for fetching request from task work
-> > +        * function to ublk server, so no need to grab the lock in reader
-> > +        * side.
 > 
-> Can you clarify that this is only used for batch mode?
-
-Yes.
-
+> Hi Richard, Sergey,
 > 
-> > +        */
-> > +       struct {
-> > +               DECLARE_KFIFO_PTR(evts_fifo, unsigned short);
-> > +               spinlock_t evts_lock;
-> > +       }____cacheline_aligned_in_smp;
-> > +
-> >         struct ublk_io ios[] __counted_by(q_depth);
-> >  };
-> >
-> > @@ -282,6 +299,32 @@ static inline void ublk_io_unlock(struct ublk_io *io)
-> >         spin_unlock(&io->lock);
-> >  }
-> >
-> > +/* Initialize the queue */
+> Thanks a lot for developing this. For years, people have been looking for
+> compressed data writeback to reduce I/O, such as compacting multiple compressed
+> blocks into a single page on block devices. I guess this patchset hasn’t reached
+> that point yet, right?
+
+Right.
+
+> > zram stores all written back slots raw, which implies that
+> > during writeback zram first has to decompress slots (except
+> > for ZRAM_HUGE slots, which are raw already).  The problem
+> > with this approach is that not every written back page gets
+> > read back (either via read() or via page-fault), which means
+> > that zram basically wastes CPU cycles and battery decompressing
+> > such slots.  This changes with introduction of decompression
 > 
-> "queue" -> "events queue"? Otherwise, it sounds like it's referring to
-> struct ublk_queue.
+> If a page is swapped out and never read again, does that actually indicate
+> a memory leak in userspace?
 
-OK.
-
-> 
-> > +static inline int ublk_io_evts_init(struct ublk_queue *q, unsigned int size,
-> > +                                   int numa_node)
-> > +{
-> > +       spin_lock_init(&q->evts_lock);
-> > +       return kfifo_alloc_node(&q->evts_fifo, size, GFP_KERNEL, numa_node);
-> > +}
-> > +
-> > +/* Check if queue is empty */
-> > +static inline bool ublk_io_evts_empty(const struct ublk_queue *q)
-> > +{
-> > +       return kfifo_is_empty(&q->evts_fifo);
-> > +}
-> > +
-> > +/* Check if queue is full */
-> > +static inline bool ublk_io_evts_full(const struct ublk_queue *q)
-> 
-> Function is unused?
-
-Yes, will remove it.
-
-> 
-> > +{
-> > +       return kfifo_is_full(&q->evts_fifo);
-> > +}
-> > +
-> > +static inline void ublk_io_evts_deinit(struct ublk_queue *q)
-> > +{
-> > +       WARN_ON_ONCE(!kfifo_is_empty(&q->evts_fifo));
-> > +       kfifo_free(&q->evts_fifo);
-> > +}
-> > +
-> >  static inline struct ublksrv_io_desc *
-> >  ublk_get_iod(const struct ublk_queue *ubq, unsigned tag)
-> >  {
-> > @@ -3038,6 +3081,9 @@ static void ublk_deinit_queue(struct ublk_device *ub, int q_id)
-> >         if (ubq->io_cmd_buf)
-> >                 free_pages((unsigned long)ubq->io_cmd_buf, get_order(size));
-> >
-> > +       if (ublk_dev_support_batch_io(ub))
-> > +               ublk_io_evts_deinit(ubq);
-> > +
-> >         kvfree(ubq);
-> >         ub->queues[q_id] = NULL;
-> >  }
-> > @@ -3062,7 +3108,7 @@ static int ublk_init_queue(struct ublk_device *ub, int q_id)
-> >         struct ublk_queue *ubq;
-> >         struct page *page;
-> >         int numa_node;
-> > -       int size, i;
-> > +       int size, i, ret = -ENOMEM;
-> >
-> >         /* Determine NUMA node based on queue's CPU affinity */
-> >         numa_node = ublk_get_queue_numa_node(ub, q_id);
-> > @@ -3081,18 +3127,27 @@ static int ublk_init_queue(struct ublk_device *ub, int q_id)
-> >
-> >         /* Allocate I/O command buffer on local NUMA node */
-> >         page = alloc_pages_node(numa_node, gfp_flags, get_order(size));
-> > -       if (!page) {
-> > -               kvfree(ubq);
-> > -               return -ENOMEM;
-> > -       }
-> > +       if (!page)
-> > +               goto fail_nomem;
-> >         ubq->io_cmd_buf = page_address(page);
-> >
-> >         for (i = 0; i < ubq->q_depth; i++)
-> >                 spin_lock_init(&ubq->ios[i].lock);
-> >
-> > +       if (ublk_dev_support_batch_io(ub)) {
-> > +               ret = ublk_io_evts_init(ubq, ubq->q_depth, numa_node);
-> > +               if (ret)
-> > +                       goto fail;
-> > +       }
-> >         ub->queues[q_id] = ubq;
-> >         ubq->dev = ub;
-> > +
-> >         return 0;
-> > +fail:
-> > +       ublk_deinit_queue(ub, q_id);
-> 
-> This is a no-op since ub->queues[q_id] hasn't been assigned yet?
-
-Good catch, __ublk_deinit_queue(ub, ubq) can be added for solving the
-failure handling.
-
-
-Thanks,
-Ming
-
+No, it just means that there is no page-fault on that page.  E.g. we
+swapped out an unused browser tab and never come back to it within the
+session: e.g. user closed the tab/app, or logged out of session, or
+rebooted the device, or simply powered off (desktop/laptop).
