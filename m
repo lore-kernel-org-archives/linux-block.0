@@ -1,119 +1,79 @@
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 249002D97A9
-	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 08:30:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68EE2296BCF
+	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 08:34:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764577821; cv=none; b=QBeTcnWT/ds+04x9zwvyLkc+VbLeiBAkqILvOX1pVzasniIxRRofKnESDP8LFXY+DgTE73KjVLcYjrw5jRrNnQguTG79Lhww8WD+l7jTpUMIgOtZQHMAYJYcGIN5xCWKIWNRl9evqMFu+rt74IlC47GPKDJ8J7d5TqtXYt27qlU=
+	t=1764578059; cv=none; b=GzTChzL6NCNnWnLVm1G8w76hmn+hBDHVKYx1rT06zkkACOc4Ipayp4oKu35JZ0R68HkyQyvHA3Wy8qffFxKumPIRhQ+kAz3GBQNTmW6T9zsqmzyo53M1fZiXcAms7/aCcvX2/XWUSeXfWgxGVrlnsOVIV6BNJD/+LUaMcgYk7MA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764577821; c=relaxed/simple;
-	bh=SwVqI6MJM5Lrg97Ok9vpLMdiyd5GgCZUgGLi9eNg6mQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=i9C6bo7DPQw+aadP8snrq73BhaSk/yX6KURYUKE9Zfi4RNDvWnGKAgVjqCUDvvEIDBe+QQFGiHgcvxtkECRonXMkkp0WpBij69kEmhaACeX0QLwPSrtZnaTV+j4JyKIIT2g5NBA+CQuIDNreCjQRjDW89GbKB20w/C6nCzmgNE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T3Qh7cAB; arc=none smtp.client-ip=209.85.219.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T3Qh7cAB"
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-8823dfa84c5so41142066d6.3
-        for <linux-block@vger.kernel.org>; Mon, 01 Dec 2025 00:30:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764577816; x=1765182616; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2eJc3g3YpMCQbgaI10ZHeYIFEHAk4BHGKD03PpLocf4=;
-        b=T3Qh7cAB45/DpmST+9oRFHxmslGeoYmVjzx/YUVq+LY/QMEUPNRhzetvVDrPMljeQX
-         UpilVG/cNZP8C1HoEA9NHWW8t5VzYFMLOzpZHnfWeCIT5plKCPYKS3ZBcvOwrVw/620I
-         HWu9Wb8faSnEL+VY9zGXkeJuXiz5uS/j+FHnDPYDT1q4sG2dQVC4HSqGnSoRoEZ9R1P6
-         jI4Qo73InDRtLjuv0hi8RWak9TUQwSxde+ExHdwgQ3vJbWsBBOA4nWlzFQ5SX/OXMc4b
-         v+0lYSjX+faFk3s86bM1VWKzadoIlKGZ+dGsFhNDY6eY6M5esYUxdVA3ZXGeSP7WtCcy
-         yPhw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764577816; x=1765182616;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=2eJc3g3YpMCQbgaI10ZHeYIFEHAk4BHGKD03PpLocf4=;
-        b=ARemB+v3AUlw3tLMolvji1dzxDSkH3QXKXE1cc0anDrB5OtcuQcsC4DRFOSax9M1DK
-         T/RpO9RM3xyrmAqRvPnmx5A1+whnayMzmFObvcCnZ37rbF7pLVF6V9fBKWhIoitCmsuT
-         vCO44jIK5KTxikzKzzV8aPCwQZYNeEuBnXA2Qmu6OP0YYHWA/qlYimo0Uet77SGjk1u0
-         9411SaaHct+wRqUf9WjKK3mxYl+prM3/E/2pM8oyyCrkh6r6Z6vbF43Knc+oJ46KYDiw
-         MG07apussVaxTvo92B/ilyH0Wu9Kwyub6bPYUUZL3KfLoitEvQBSSrs+t0wtU5Szs1+1
-         5PMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVwC0c5TxPtmHNL29sXQRGaEJqpiVdDu9wGs749KlRkITCK+Qdy7/P6aAQp7MV1uJgaSYskx+24HR7Vew==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9R86ZaezlfKv0Os3tn3Cv176j2Ajn5sH+g7gBKpWDcwSEBC6g
-	igJILIlaga3O2VlHgP17Gk8VY6QaLEbWzYiSncy1ovqWpBknMLGXr9LTX+uDQE+6JoJCfft4pMD
-	/bEwTf3q8ba1BdbUMKRixtTU4x7/s7Ww=
-X-Gm-Gg: ASbGncvx8KRXFpYVZRQ8zPp2Miyoj87hUh7kAqPUEOd/ox9z4nJB//IO8g6CgjTgSZG
-	BwvNeu68VacL2tDQbN7fpD9oRBS9C2MxzFc/5W2zgHBx1aHl1Am7/ljVYQpqmTWjoHYsP4gDaoK
-	R5IH2jssszQGGIxqZJ8TBKW+WeiiHUu8X83hoipUDWkB1BSqy/sbauamMQDyki1abIZMmi0W2Zy
-	rD/ujOAdnC7BrQliMvGB+xmJMbB2da1TNNUrk0PDNrm8LhVxptayQaXagIGkvNeCU2cmdU=
-X-Google-Smtp-Source: AGHT+IHsCmYuVPkQVfU+yWs4legJ9LdKct4F60FxyJiLbura9Wp1LF6O9gYr9xGvWJ06vP7t0LTxtkuDR8IlXcjYyW0=
-X-Received: by 2002:a05:622a:392:b0:4ee:2bfb:1658 with SMTP id
- d75a77b69052e-4ee588e099cmr550604311cf.45.1764577816018; Mon, 01 Dec 2025
- 00:30:16 -0800 (PST)
+	s=arc-20240116; t=1764578059; c=relaxed/simple;
+	bh=WaNYIzMECKizr3HVMRtlLUAd/VmiGZetIR5JZt9VyyI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nMDrryJNI2CEUjwHho+G1ra+94WfjC0UUDSdcDcQEyDptS1qC9uFh5LIaBgRy1QheQUBmnE9yOkiAWSllylDDfZ4ts4kThDMdsrrF8cixtss/rXT1GdDUsMbDmRRqjpy6X+GzUfQhbn178XHiC/UKxIvl2fxCbVmnBsZWMAsJCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F201C4CEF1;
+	Mon,  1 Dec 2025 08:34:17 +0000 (UTC)
+From: Yu Kuai <yukuai@fnnas.com>
+To: axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	tj@kernel.org,
+	nilay@linux.ibm.com,
+	ming.lei@redhat.com,
+	bvanassche@acm.org
+Cc: yukuai@fnnas.com
+Subject: [PATCH v4 00/12] blk-mq: fix possible deadlocks
+Date: Mon,  1 Dec 2025 16:34:03 +0800
+Message-ID: <20251201083415.2407888-1-yukuai@fnnas.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251129090122.2457896-1-zhangshida@kylinos.cn>
- <20251129090122.2457896-2-zhangshida@kylinos.cn> <DFAC6F10-B224-4524-9D8F-506B5312A2E8@coly.li>
-In-Reply-To: <DFAC6F10-B224-4524-9D8F-506B5312A2E8@coly.li>
-From: Stephen Zhang <starzhangzsd@gmail.com>
-Date: Mon, 1 Dec 2025 16:29:40 +0800
-X-Gm-Features: AWmQ_bnNbz0I6L6p96dlX3gePB04hX8D_DO2J9xuy2-homPgSXL859tuVJ_3RFk
-Message-ID: <CANubcdWbKoC3RgPz1Eb=auxfnq-4_tMoqWiRaZiPcZUxNHYwVQ@mail.gmail.com>
-Subject: Re: [PATCH v3 1/9] md: bcache: fix improper use of bi_end_io
-To: Coly Li <colyli@fnnas.com>
-Cc: Johannes.Thumshirn@wdc.com, hch@infradead.org, agruenba@redhat.com, 
-	ming.lei@redhat.com, hsiangkao@linux.alibaba.com, csander@purestorage.com, 
-	linux-block@vger.kernel.org, linux-bcache@vger.kernel.org, 
-	nvdimm@lists.linux.dev, virtualization@lists.linux.dev, ntfs3@lists.linux.dev, 
-	linux-xfs@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	zhangshida@kylinos.cn
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Coly Li <colyli@fnnas.com> =E4=BA=8E2025=E5=B9=B412=E6=9C=881=E6=97=A5=E5=
-=91=A8=E4=B8=80 13:45=E5=86=99=E9=81=93=EF=BC=9A
->
-> > 2025=E5=B9=B411=E6=9C=8829=E6=97=A5 17:01=EF=BC=8Czhangshida <starzhang=
-zsd@gmail.com> =E5=86=99=E9=81=93=EF=BC=9A
-> >
-> > From: Shida Zhang <zhangshida@kylinos.cn>
-> >
-> > Don't call bio->bi_end_io() directly. Use the bio_endio() helper
-> > function instead, which handles completion more safely and uniformly.
-> >
-> > Suggested-by: Christoph Hellwig <hch@infradead.org>
-> > Signed-off-by: Shida Zhang <zhangshida@kylinos.cn>
-> > ---
-> > drivers/md/bcache/request.c | 6 +++---
-> > 1 file changed, 3 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-> > index af345dc6fde..82fdea7dea7 100644
-> > --- a/drivers/md/bcache/request.c
-> > +++ b/drivers/md/bcache/request.c
->
-> [snipped]
->
-> The patch is good. Please modify the patch subject to:  bcache: fix impro=
-per use of bi_end_io
->
-> You may directly send the refined version to linux-bcache mailing list, I=
- will take it.
->
+changes in v4:
+ - add patch 1,2 to fix a new deadlock;
+changes in v3:
+ - remove changes for blk-iolatency and blk-iocost in patch 2, since
+   they don't have debugfs entries.
+ - add patch 9 to fix lock order for blk-throttle.
+changes in v2:
+ - combine two set into one;
 
-Thank you. This has now been taken care of.
+patch 1-2 fix deadlock pcpu_alloc_mutex under q_usage_counter;
+patch 3-6 fix deadlock debugfs_mutex under q_usage_counter;
+patch 7-12 fix deadlock q_usage_counter under rq_qos_mutex;
 
-Thanks,
-Shida
+Yu Kuai (12):
+  blk-wbt: factor out a helper wbt_set_lat()
+  blk-wbt: fix possible deadlock to nest pcpu_alloc_mutex under
+    q_usage_counter
+  blk-mq-debugfs: factor out a helper to register debugfs for all rq_qos
+  blk-rq-qos: fix possible debugfs_mutex deadlock
+  blk-mq-debugfs: make blk_mq_debugfs_register_rqos() static
+  blk-mq-debugfs: warn about possible deadlock
+  block/blk-rq-qos: add a new helper rq_qos_add_frozen()
+  blk-wbt: fix incorrect lock order for rq_qos_mutex and freeze queue
+  blk-iocost: fix incorrect lock order for rq_qos_mutex and freeze queue
+  blk-iolatency: fix incorrect lock order for rq_qos_mutex and freeze
+    queue
+  blk-throttle: remove useless queue frozen
+  block/blk-rq-qos: cleanup rq_qos_add()
 
-> Thanks.
->
-> Coly Li
+ block/blk-iocost.c     |  15 ++---
+ block/blk-iolatency.c  |  11 ++--
+ block/blk-mq-debugfs.c |  57 +++++++++++-----
+ block/blk-mq-debugfs.h |   4 +-
+ block/blk-rq-qos.c     |  27 ++------
+ block/blk-sysfs.c      |  39 +----------
+ block/blk-throttle.c   |  11 +---
+ block/blk-throttle.h   |   3 +-
+ block/blk-wbt.c        | 145 +++++++++++++++++++++++++++++++----------
+ block/blk-wbt.h        |   8 +--
+ 10 files changed, 181 insertions(+), 139 deletions(-)
+
+-- 
+2.51.0
+
