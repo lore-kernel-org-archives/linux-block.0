@@ -1,82 +1,152 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C80C030496A
-	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 09:54:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AE0921CC4F
+	for <linux-block@vger.kernel.org>; Mon,  1 Dec 2025 10:22:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764582878; cv=none; b=dIYq7/g6zj2Dx19Xp+B35aBoLBsbxtpvCuO9q+21EJRGR0skFB24mTQat2eI4m/OLQ1fFCB5JrMsBm2muHKg183M4DS0ScRMsEK0pIDTq35sptxWsiqVpxwX8u3NtIzRO62eyqtCUARTnMK9IHTKVuVcNfrJeVLQ1kAfIAmFT7A=
+	t=1764584568; cv=none; b=qWmIAwlbOj3RioWjWUEI+KWC0tIiZU2dOHQFMCZ91FMbmSBMNazMeeUqfapXpEYd6ds+DRlaDnpuMI1WAbvtu3+4udWpOvtUgca6kU/bp+W4tGjj0R7N3ZJQVIiVfiBMhHgTb3wQJvImUos6Rjz5018mCQugIxQFuz82F8SNvZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764582878; c=relaxed/simple;
-	bh=MzdPFRAa+ie0qCQYawM/QZeNS/AqI5HkwFUm+H8HLu0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C0nX2J+PihD0+8F2+yeqjOT5qqZR3n5QSNRfB5QhUMIHBWk5dLaDBdaBNY421iM9cuHcfm+2gsZ6hU8MATJn2aGs7VclfOYLJ9JFQktHtPArQBWMCX01SlSm6Xz+D0lYNSGjw+ssT+PJQXoQJW5mIByh+W+Spezwxgr/vJJ4e74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MegJCiHK; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764584568; c=relaxed/simple;
+	bh=GHynjB11VydlixiHXe9VOWVM5ovQLhUkAeX8048lzP8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gHzPNg3FN7S2Ou2Yp/mvNUgZ9AoRSZzTOT0N3mdFEJpXxc+qYWUxaQkAmbnJw3h+fagaPkB6ofPKt8KGPAs0oNgkAEplR0BZ+1HpddMH97fazTqicwhe8/K4aHUA7T8c9KAQtUVVxM8FSnKlUf8j3bxzW5fEa/rZOUjWgpZZxtI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aLIDVGbZ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=EVPq57cj; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MegJCiHK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2C39C113D0;
-	Mon,  1 Dec 2025 09:54:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764582878;
-	bh=MzdPFRAa+ie0qCQYawM/QZeNS/AqI5HkwFUm+H8HLu0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MegJCiHKAelA4frNd5KDXMSrDhTH5xtTSIJ0uiGkuweRm4i/DeDM6TzvT/SlM7tfK
-	 OIwddrojnpb+WOQOocKbHMeJewG9CvdrVil3C6V6xKdQqgdRPo0QVlMgcyz8RT6Qz7
-	 iUxEZhBrer8PY3A1JcePAEPTbFNHoRtxoXDxcD5jSpiUMXGH6VW3/F3oLTy2Fkx98J
-	 TQopf2/PDQhPvnaVgi/4DX1Cu2NJGMOL3K8rqtuR5+k7kvWvKQuDw1aU0SZ/yImZ6U
-	 ZNTKbpVNe010NMevkQ52QMYxW0nbVGYy605Qp5G6c0PhTC4zvZaHNSevlRW0gzN3YI
-	 oV6Bjn1UckflA==
-Date: Mon, 1 Dec 2025 10:54:34 +0100
-From: Niklas Cassel <cassel@kernel.org>
-To: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
-Cc: linux-block@vger.kernel.org, axboe@kernel.dk, hch@lst.de,
-	kch@nvidia.com, dlemoal@kernel.org
-Subject: Re: [PATCH V2] blk-mq: add blk_rq_nr_bvec() helper
-Message-ID: <aS1l2pr50kXzsjuc@ryzen>
-References: <20251111232252.24941-1-ckulkarnilinux@gmail.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aLIDVGbZ";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="EVPq57cj"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764584565;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iYMXl2leQV6rV+opabS8EJEKmnrywYVBBQqDTRyLKxA=;
+	b=aLIDVGbZH8BAoigwNLXgfXcD+WxSqc/jrTmugEz0NKlpY/A5uCmwNIY3OyHl2/57p8dOjQ
+	ixiAaOHnSFv2bZyqi/0eW5FKblPibZ2kagWY7X0M0HKLvSaHHdrTz7w6q4Xa4nNfBIIn5h
+	InEgGi0gvWD7A/yd1IwV8NitAq8/37E=
+Received: from mail-yw1-f200.google.com (mail-yw1-f200.google.com
+ [209.85.128.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-513-IdwBvERLOyGaU0o_h4bN0g-1; Mon, 01 Dec 2025 05:22:44 -0500
+X-MC-Unique: IdwBvERLOyGaU0o_h4bN0g-1
+X-Mimecast-MFC-AGG-ID: IdwBvERLOyGaU0o_h4bN0g_1764584564
+Received: by mail-yw1-f200.google.com with SMTP id 00721157ae682-787e31befddso47399827b3.0
+        for <linux-block@vger.kernel.org>; Mon, 01 Dec 2025 02:22:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1764584564; x=1765189364; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iYMXl2leQV6rV+opabS8EJEKmnrywYVBBQqDTRyLKxA=;
+        b=EVPq57cjizCJDmih777btcD4UD+a6PCkPCczM3+v8RfZ7at5xeYmbtYu3u0eXzuNKj
+         a52bL0mll6/7do+N4zu2hiYfiZMFtdHiDVAn4LYOEur8scoDJLfU/kxWaRicW7kqNoCJ
+         h4RcnBpqWQEFznnufg5F0H525XAl6tox7V/Hw2MzMAUb1MdojiCKhmnOR7+u8X5iWXIH
+         YQ6dxuVTwdpVICJVFgD12Y3tEapTACnlu9xS94ZAHzQzQajnDdiBOIPqPEjLUKWmNhia
+         QzYTwGW0JUP349DFTWVN7w1Xwp14WlejhVTi0eDTa50BTUe2lov2wBR6q9uzIW5nNjV+
+         lkug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764584564; x=1765189364;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=iYMXl2leQV6rV+opabS8EJEKmnrywYVBBQqDTRyLKxA=;
+        b=bL9+SCNU2uhBlh7kcJ9L30elkAIUa/51ptvJdtYuwX6dfbWtVO45ARxe7taiDr801K
+         ytaqKbK5JUkwEeDA0fpcKfstnVfF6y0MH9zPJNrerLSYDqcdRizqa1cM96iowkFnd25J
+         NgSoyyYXegWA+1nUua4MNh91z6dJgDV3RvXQjAy1oZVkSNMczPUmw8qzihZmowfWsD1W
+         SwNxQd1Gu3Uo/PkSWk3lfS13FSwQAUMDszOj8je+ks4bRwfRLVWrj7yHBVhb3gkMCm3a
+         yf4LTcQNySoQg9scYn94r9MD3PaWI+F0+MhdUR3gJIswuF6CVSk5Ze9jodSuXvrQtbux
+         CQsQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUiLoCmZYfCkroCccJ5NrRLZTtkk/mCEHn7BN3jnHoAQPnR+YcJKntCArqaAB/ERJ+nW2A3QH9Y4UbeZg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx2zJVUW50jyTj2HIAoHa0phTej66kd6rgVw/NuavpdahmdLIv8
+	5/zFNAk2hIbj3pQ6kfpTzDx51C0cAPlPcVOIo3EjQbC+qmcMCMq8Zeur+BgZngeLo7ioow2V84H
+	DtOvcyjrE9YjyYp84iwzQRD3wHJz6EUV4td8Jdqw2N8Is3HtwbOFxUHnXnMj16oullNEp0c1X6R
+	FPccBkiOpTruACBBe3fQ5V0Y4vvhFCpvE7RE5UmNs=
+X-Gm-Gg: ASbGnctd4W6u7iN7IGiYZ+2FMtL0wSs3UMxQLZb4uQCg8xlYA1GbGHfwTmpIVTdhmnl
+	ndNJ63WhlYxS7oTQCbRi4VA5srNVmCdZONF4Vq0o07wngOIXlYK3vBvCwIiq4foLixQIYxjsPYc
+	xgg3l1uBgoOo7HVJlNiAKI+YHlghVo8Wr8j4EI4kIiW0QpfSxdfGSG4ip/lNvS7cIk
+X-Received: by 2002:a05:690c:6605:b0:786:5620:faf8 with SMTP id 00721157ae682-78a8b54b2ecmr302188007b3.47.1764584563663;
+        Mon, 01 Dec 2025 02:22:43 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGS71cctF98/tpuQ7bluHnJLOFwFlKy0to+fHor5jid4UKgwl/ohRzDnSdvSv1QOzcDeFP7RVMS4MQ6iYFWx04=
+X-Received: by 2002:a05:690c:6605:b0:786:5620:faf8 with SMTP id
+ 00721157ae682-78a8b54b2ecmr302187817b3.47.1764584563288; Mon, 01 Dec 2025
+ 02:22:43 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251111232252.24941-1-ckulkarnilinux@gmail.com>
+References: <20251201090442.2707362-1-zhangshida@kylinos.cn> <20251201090442.2707362-4-zhangshida@kylinos.cn>
+In-Reply-To: <20251201090442.2707362-4-zhangshida@kylinos.cn>
+From: Andreas Gruenbacher <agruenba@redhat.com>
+Date: Mon, 1 Dec 2025 11:22:32 +0100
+X-Gm-Features: AWmQ_bkqho-CvFePzaqDAhJz1XgBGxgdhL1q7VGK-N0FA5fVPePnp-svBeyw9Ns
+Message-ID: <CAHc6FU4o8Wv+6TQti4NZJRUQpGF9RWqiN9fO6j55p4xgysM_3g@mail.gmail.com>
+Subject: Re: [PATCH v4 3/3] block: prevent race condition on bi_status in __bio_chain_endio
+To: zhangshida <starzhangzsd@gmail.com>
+Cc: Johannes.Thumshirn@wdc.com, hch@infradead.org, ming.lei@redhat.com, 
+	hsiangkao@linux.alibaba.com, csander@purestorage.com, colyli@fnnas.com, 
+	linux-block@vger.kernel.org, linux-bcache@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, zhangshida@kylinos.cn, 
+	Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 11, 2025 at 03:22:52PM -0800, Chaitanya Kulkarni wrote:
-> Add a new helper function blk_rq_nr_bvec() that returns the number of
-> bvecs in a request. This count represents the number of iterations
-> rq_for_each_bvec() would perform on a request.
-> 
-> Drivers need to pre-allocate bvec arrays before iterating through
-> a request's bvecs. Currently, they manually count bvecs using
-> rq_for_each_bvec() in a loop, which is repetitive. The new helper
-> centralizes this logic.
-> 
-> This pattern exists in loop and zloop drivers, where multi-bio requests
-> require copying bvecs into a contiguous array before creating
-> an iov_iter for file operations.
-> 
-> Update loop and zloop drivers to use the new helper, eliminating
-> duplicate code.
-> 
-> This patch also provides a clear API to avoid any potential misuse of
-> blk_nr_phys_segments() for calculating the bvecs since, one bvec can
-> have more than one segments and use of blk_nr_phys_segments() can
-> lead to extra memory allocation :-
-> 
-> [ 6155.673749] nullb_bio: 128K bio as ONE bvec: sector=0, size=131072
-> [ 6155.673846] null_blk: #### null_handle_data_transfer:1375
-> [ 6155.673850] null_blk: nr_bvec=1 blk_rq_nr_phys_segments=2
-> [ 6155.674263] null_blk: #### null_handle_data_transfer:1375
-> [ 6155.674267] null_blk: nr_bvec=1 blk_rq_nr_phys_segments=1
-> 
-> Signed-off-by: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+On Mon, Dec 1, 2025 at 10:05=E2=80=AFAM zhangshida <starzhangzsd@gmail.com>=
+ wrote:
+> From: Shida Zhang <zhangshida@kylinos.cn>
+>
+> Andreas point out that multiple completions can race setting
+> bi_status.
+>
+> The check (parent->bi_status) and the subsequent write are not an
+> atomic operation. The value of parent->bi_status could have changed
+> between the time you read it for the if check and the time you write
+> to it. So we use cmpxchg to fix the race, as suggested by Christoph.
+>
+> Suggested-by: Andreas Gruenbacher <agruenba@redhat.com>
+> Suggested-by: Christoph Hellwig <hch@infradead.org>
+> Suggested-by: Caleb Sander Mateos <csander@purestorage.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Shida Zhang <zhangshida@kylinos.cn>
 > ---
+>  block/bio.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/block/bio.c b/block/bio.c
+> index 1b5e4577f4c..097c1cd2054 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -314,8 +314,9 @@ static struct bio *__bio_chain_endio(struct bio *bio)
+>  {
+>         struct bio *parent =3D bio->bi_private;
+>
+> -       if (bio->bi_status && !parent->bi_status)
+> -               parent->bi_status =3D bio->bi_status;
+> +       if (bio->bi_status)
+> +               cmpxchg(&parent->bi_status, 0, bio->bi_status);
 
-What is the status of this patch?
+Hmm. I don't think cmpxchg() actually is of any value here: for all
+the chained bios, bi_status is initialized to 0, and it is only set
+again (to a non-0 value) when a failure occurs. When there are
+multiple failures, we only need to make sure that one of those
+failures is eventually reported, but for that, a simple assignment is
+enough here. The cmpxchg() won't guarantee that a specific error value
+will survive; it all still depends on the timing. The cmpxchg() only
+makes it look like something special is happening here with respect to
+ordering.
 
+> +
+>         bio_put(bio);
+>         return parent;
+>  }
+> --
+> 2.34.1
+>
 
-FWIW, looks good to me:
-Reviewed-by: Niklas Cassel <cassel@kernel.org>
+Thanks,
+Andreas
+
