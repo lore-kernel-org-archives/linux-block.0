@@ -1,339 +1,277 @@
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A7E0270557
-	for <linux-block@vger.kernel.org>; Tue,  2 Dec 2025 16:05:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C21F52DC349
+	for <linux-block@vger.kernel.org>; Tue,  2 Dec 2025 19:37:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764691531; cv=none; b=PLtFVyVJysRP7R96XFrsu7g414te2YniKz0KK4iX/i0HZsgGyuYJ5hsuBMt85EgJYHFyk6mq2ka3+V72TrGaw90g/5Dsgezck0t4Qyi5LCvfe7mbM9kDFcGbAQip5BaJhNY015YVU511sDRW0M+iDjjxfZI9rWTA6Dvot3qcEv8=
+	t=1764704273; cv=none; b=YMxZpgfmVNnWOjG1SHZ7p+EPiEOq3n2T8lCxZsM2XYeZzOOfejikr15uV0VFPgGbVRWju/bnDe1fLNlXfUEsmj/3U6nIIDn+MJZpDoqfV7KjVtf9zUvDmi7t7Q0JC0dT92LgdqkFKCCUPUYCi03vgfQFx+L2VztLkJDyf0O7MAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764691531; c=relaxed/simple;
-	bh=YO++vEL+OZ1dPvx0RD6jialYGenmC47/E92WntkMBAY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TLdKpWI3GZbYisHZCe6xWCFVIa7daXW5z4J2R5NIBPxZJyP5IO+5HflD2uB6n5jge8zy206Jf/n23/o798m/Ddzf3cAPeWkTuDlOJ+iU7dbp+6i5csNsHeQ9/hcmwyXou9rkdk1mX9Zw1cQUCSf9yhuXVUnzgZkXV6FVFPfdbDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=gYMETgLv; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1764704273; c=relaxed/simple;
+	bh=W8ZblEwgjuL8jZJ36a/bhPpyurnqnpzkgPSqnenEdCA=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=cA36V9Bn7P+ogqS1CSU7iyrOBjfhWw+357padHjPD6ZlZlrBs8q3fv/xSUxRi/YRXDnBbJSoS/3DO0v3Ag+fbGieWSwkLCsG4nVma760KB6EIIRv3y3VtOGodR62YsvQyWQKhtJihU4vOuGMUdX4iyW3WcDmbaNpbAS6pJcOH+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kip3Lc9z; arc=none smtp.client-ip=209.85.221.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="gYMETgLv"
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-b983fbc731bso418166a12.2
-        for <linux-block@vger.kernel.org>; Tue, 02 Dec 2025 08:05:29 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kip3Lc9z"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-42e2e448d01so1972686f8f.1
+        for <linux-block@vger.kernel.org>; Tue, 02 Dec 2025 11:37:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1764691528; x=1765296328; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ixD6EDHW7WmuD/smIh00HSb5BUDNC5j73qGSOJezWLg=;
-        b=gYMETgLvB0HbW67yQA3dZQqxPhCk78PxwCJvyw8qqJ6RZiMClM6w7NevthzPbvy4Xm
-         EyWVQoisR+mM97U+1+sGb/V/TUrDmcEBHfR8KpNOMnaLaPzfpuNlYsDXeRUnt6Ovr1ru
-         SIA5HZcNbYWKYygSdHu3IXhIS4L0xxzrRWl4JA3Vm+pdmGu03TgrnjvKTHaIM/GvPHqW
-         sQjiDdnQ7mtYS28kHQ33MDLR6UQw9aokWsWD7KfXbayrlHdVu/3krjNoqgRx/OvBZiOI
-         Az4fKjsV+1y1ymN0oPwK8u06N2GGHIjlJN7u2ElWSc16NlIZumb6YbLuz8Oibr3oEUhn
-         Rm3w==
+        d=google.com; s=20230601; t=1764704269; x=1765309069; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=zhJ/66bq3Dhg0Aw+wAsmTfNgUiWxLNmyfbE+xmpzX9c=;
+        b=kip3Lc9zeKn8FFLlcaLuTFCWl9jrb34d6WKCg5JjmA0h723skcbKHQg7jkZ5BvxMPk
+         eAnzgDz6VzBUQpP7AiwHo0AxoJ1OrhaEDQbGZimYGWXRn0iFUOQVQtLCHV/KNfmcEWW/
+         SfhWDoN8raJAy4VlVWYQ7ThW3/CF36+yY5aoZoYfubUHdrdSDlFoE7AobKrJg81uuH1W
+         GZbiktG0oOguoOj8ocECp5unUNyMaGNIRe/0OMH3FFCCWFXNq9uiPlBPpU3tyx0kaJpj
+         aflM5LXo8+OCIeJSStj4CBmCRU6SlhtMB4Owdj0apaUU781s8fIMTFAKLDg71IeXjr67
+         wweA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764691528; x=1765296328;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ixD6EDHW7WmuD/smIh00HSb5BUDNC5j73qGSOJezWLg=;
-        b=FstNegTduTkBvovGXZip9o7FZkwOQsxlQWJdzXX2wpU3sZY+50r7/KNcVhkOKpmSPO
-         yZpbF6mptVi2hhx00YOloJRFXXd8F6VnTvq33W4DaIP9FkXMu7ZldvVHaCGZ+zBoJUYx
-         HIXO3zQRa+Uj1ZUQH7B3Zf7ddYll7FRqJXGBO+7aXZGptD5WYu3QFrr6bbV/6MR7Az/+
-         85pUL1ONwj9P8b7pAcuMIQjgT+AzIktvl8RC5RZ55XXgvEWfDkZHSXrx3rqlOFHgMT0E
-         7Cl7o/+2IEVOLGg66rV1Dp/PWEpnNoecooQwU1FMeTAGxQcNaXm5Foev+PWI1AhOLVL5
-         Clhw==
-X-Forwarded-Encrypted: i=1; AJvYcCVbpJC4OtTqsi+iZIhbw1fG9f1NnejZE87D2ZJMCh7ARkywEpnoFLBsqGetx2JSAjVRnMpL4ihpY8wF6Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx9DeMcZmuG6RnRlx0qeHxfmX+078f8GYb/iVbac6+fsOK8KbNQ
-	ltm7ATIK0GqgY4XyHOYhLF5nG+w9VNhKuRZ60pOA4K+1kx2Mq17xjyCs3P7d2AQP+7ITyrbd7SU
-	PaA6Yqm89VB6hBo9rF+w8WpDYqCm/4DdrgQjOZjD34npre7vaVYHh4IkVFg==
-X-Gm-Gg: ASbGncubUBk9xz0HE/J9t8ai9x7TW9lMkIa2EB+F9ZyP1DopA3cuGsgLWMDPCQxqUYM
-	IPYE440VbcmkYjkRD2jj5BYxdar88/yWKNlMyjp/CoVCfGcONOsKQhUsq0vHtn/yBGhubzRTIGk
-	I9ZY3DaykJzWVQUjSQq16gy+RfZTBibsYQT9I1uYFnY3VlY+1gcZ3oAXSH5ALT2jMiGnubisuT8
-	oXyG2Riz+X+1j0T83YSQCh9UOG3qr6zhOjEEsGyjQYuAUeV065hXUudfPpG+WRVkWCBAIj9
-X-Google-Smtp-Source: AGHT+IFFeS7lgv0kjZZI3sIt+15nLopgUN5HGcR4HtKQMon6W2xJPTZz2X3+kZFtQThdFPjGVMlCTtxyXO4ccaTXJlw=
-X-Received: by 2002:a05:7022:69a9:b0:119:e56a:4ffb with SMTP id
- a92af1059eb24-11c9d5538e8mr27956585c88.0.1764691528143; Tue, 02 Dec 2025
- 08:05:28 -0800 (PST)
+        d=1e100.net; s=20230601; t=1764704269; x=1765309069;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zhJ/66bq3Dhg0Aw+wAsmTfNgUiWxLNmyfbE+xmpzX9c=;
+        b=BN9oXJBjkLjD57kPp4zPuvcx2BWEoAKHhnLK+fw1xRxbvkg+7KhccN4z8p1En5QiBI
+         m1cPzILbryPNNfjoA9Wx3V+c+nN85IKox8hnGpmWz0kFFdnp6n3KBY4AoS2y1mvO6ML0
+         NFpbtAx+3bYUQQOo/FD9Y6eRk8lqR6F3GJhQXpvhlpXPR6jVl70RlPWmK5hvIzM0BU/C
+         lUaRFCAtI1qx0K4WFScmfD2WtJYYazueOEY/fzRlsNi/OtGANu232CYL2tP6fIxvNiAd
+         zMoHahoDSv0qlcamedrwbw9sWaGi9FmLm12EONIGX8hKk2sC9OSJH/TNIDE+BmgW9Md5
+         iC7w==
+X-Forwarded-Encrypted: i=1; AJvYcCXwfrUZba8g8wyI5zuPktos544QYjR3EBQGUqqqyLysawgChZYx/yp9xjIGcq9owGqEGwDWy8xc9jcm/g==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw2tAWbExQVbpfS8tASdzdGjTgBYaVufJUOxC1sIcixa8AXbfTI
+	BH4MRmGiW6CAIjn2N9111TYexWhKKQiPaMD5ioVlJJjGZWaPUcn8KQ2lqJVxak8tgEuIkCyg8Pc
+	MNOosKqkqS6I9tZMJAA==
+X-Google-Smtp-Source: AGHT+IHLoORxJFIMnvNaTR7esNyOMYjh5IgIdqpmM1jiNlaGB5DkF31Koo1mWN1Y6iCnVsE9Qgyw7dzDpU2Msvk=
+X-Received: from wruh15.prod.google.com ([2002:a5d:688f:0:b0:42b:3951:1b])
+ (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6000:288b:b0:425:73c9:7159 with SMTP id ffacd0b85a97d-42e0f344080mr31795438f8f.33.1764704268795;
+ Tue, 02 Dec 2025 11:37:48 -0800 (PST)
+Date: Tue, 02 Dec 2025 19:37:24 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20251121015851.3672073-1-ming.lei@redhat.com> <20251121015851.3672073-17-ming.lei@redhat.com>
- <CADUfDZoXKATH_nQ0TEqj6BrN+e-Shkd11CUJaJJ_FKbrTrv=GQ@mail.gmail.com> <aS5EgbJQFa2fm6GR@fedora>
-In-Reply-To: <aS5EgbJQFa2fm6GR@fedora>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Tue, 2 Dec 2025 08:05:17 -0800
-X-Gm-Features: AWmQ_bnfgXpFEUsp-Gr5hGayT8VExqrRelvC56Oqx-5hTjfG4iuJi2xvUGeyclQ
-Message-ID: <CADUfDZqRQ3WmwswwfQf_vhP84OVmwU3LGMF8Rb8mShQSjnZAJQ@mail.gmail.com>
-Subject: Re: [PATCH V4 16/27] ublk: add new feature UBLK_F_BATCH_IO
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Uday Shankar <ushankar@purestorage.com>, Stefani Seibold <stefani@seibold.net>, 
-	Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+X-B4-Tracking: v=1; b=H4sIAPU/L2kC/x2MSwqAMAwFryJZG2iVUvEq4sJPagNSJVURxLsb3
+ AwMzHsPZBKmDG3xgNDFmbekYssCpjikhZBndahM5awCZwqcCOXMB0ZadxIMfnS1bWxtjAcd7qL N/Z92/ft+At1vUmQAAAA=
+X-Change-Id: 20251202-define-rust-helper-f7b531813007
+X-Developer-Key: i=aliceryhl@google.com; a=openpgp; fpr=49F6C1FAA74960F43A5B86A1EE7A392FDE96209F
+X-Developer-Signature: v=1; a=openpgp-sha256; l=7075; i=aliceryhl@google.com;
+ h=from:subject:message-id; bh=W8ZblEwgjuL8jZJ36a/bhPpyurnqnpzkgPSqnenEdCA=;
+ b=owEBbQKS/ZANAwAKAQRYvu5YxjlGAcsmYgBpL0AAbiS38ffQuRjq4nMNsCbAsC2Z0/xEFskYI
+ a7cs/y+HK6JAjMEAAEKAB0WIQSDkqKUTWQHCvFIvbIEWL7uWMY5RgUCaS9AAAAKCRAEWL7uWMY5
+ RljtD/0fz1OjaXVHkkiWZGm1MTTTeoRD7MZeZtSJpWwEp10zfQcriF9Tz7TiY8DRVjupa7ieL6W
+ K+QIimSfxkf0pF+U85RZt8x5R0zrrPA7a0r4Czw2u898rjuZSvXB9rsMsd8s49K2iNGlMl8no4n
+ 8dLlxYWEysWLhXoCLey0TdCeJgWmZWEtLRFaN6a3PtKGsKPj5IDQPwWCgiJcyBf9skYFC8xnLoN
+ myrtxskJJ3xSky7n1TIOas7ooGu8EP6L1qP0CCGnHx3PR9GtRbSahp4lABH8jI74mWyxI75KaqA
+ e9yf1n+e6sDD4Miar5xu7Waav7mh4Wlvpm+FSeBd0t7yox6QRDaIfb300TNnYzo1UMbkA4TsjSu
+ jitafYyHMfHqSaZ8Hw25YynM0XiSR4dLFJXhzu6X6CIEFlbZbNx++pCQngoNk0Iidbvfmj1MwRy
+ JBZM2bXi/bb6e6iBnyXdGbM+VMwGo9ik6yIiLbuEi0MdhQ1SQbz9kEaJXP2rfRSiJxCIobwXnwA
+ zcbWzlULfAo1IcQ75R/0IuuuYUNlgfzaNl2x/c5ODo5ZVsxdgIMF9rF1905CYwuTY0YH222qCZ0
+ fao/NDvnvYrOIhSBHgNknvBcn+HM6CoE2Hycm48/DGMTeSqNxcbw9tlPWj5SJ+DhS/1mHLW0MMy +rvrgaUoICXqdBg==
+X-Mailer: b4 0.14.2
+Message-ID: <20251202-define-rust-helper-v1-0-a2e13cbc17a6@google.com>
+Subject: [PATCH 00/46] Allow inlining C helpers into Rust when using LTO
+From: Alice Ryhl <aliceryhl@google.com>
+To: rust-for-linux@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Alice Ryhl <aliceryhl@google.com>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Dave Ertman <david.m.ertman@intel.com>, 
+	Ira Weiny <ira.weiny@intel.com>, Leon Romanovsky <leon@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Boqun Feng <boqun.feng@gmail.com>, 
+	Elle Rhumsaa <elle@weathered-steel.dev>, Carlos Llamas <cmllamas@google.com>, 
+	Yury Norov <yury.norov@gmail.com>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	linux-block@vger.kernel.org, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+	Miguel Ojeda <ojeda@kernel.org>, Michael Turquette <mturquette@baylibre.com>, 
+	Stephen Boyd <sboyd@kernel.org>, linux-clk@vger.kernel.org, 
+	Benno Lossin <lossin@kernel.org>, Danilo Krummrich <dakr@kernel.org>, 
+	Thomas Gleixner <tglx@linutronix.de>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Viresh Kumar <viresh.kumar@linaro.org>, linux-pm@vger.kernel.org, 
+	Paul Moore <paul@paul-moore.com>, Serge Hallyn <sergeh@kernel.org>, 
+	linux-security-module@vger.kernel.org, 
+	Daniel Almeida <daniel.almeida@collabora.com>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, 
+	Robin Murphy <robin.murphy@arm.com>, Lyude Paul <lyude@redhat.com>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
+	linux-fsdevel@vger.kernel.org, Josh Poimboeuf <jpoimboe@kernel.org>, 
+	Jason Baron <jbaron@akamai.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	Ard Biesheuvel <ardb@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, 
+	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, linux-kselftest@vger.kernel.org, 
+	Andrew Morton <akpm@linux-foundation.org>, "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
+	Andrew Ballance <andrewjballance@gmail.com>, maple-tree@lists.infradead.org, 
+	linux-mm@kvack.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
+	Uladzislau Rezki <urezki@gmail.com>, Vitaly Wool <vitaly.wool@konsulko.se>, 
+	Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>, devicetree@vger.kernel.org, 
+	Bjorn Helgaas <bhelgaas@google.com>, 
+	"=?utf-8?q?Krzysztof_Wilczy=C5=84ski?=" <kwilczynski@kernel.org>, linux-pci@vger.kernel.org, 
+	Remo Senekowitsch <remo@buenzli.dev>, "Paul E. McKenney" <paulmck@kernel.org>, rcu@vger.kernel.org, 
+	Will Deacon <will@kernel.org>, Fiona Behrens <me@kloenk.dev>, Gary Guo <gary@garyguo.net>, 
+	Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
+	Alexandre Courbot <acourbot@nvidia.com>, Vlastimil Babka <vbabka@suse.cz>, Christoph Lameter <cl@gentwo.org>, 
+	David Rientjes <rientjes@google.com>, Ingo Molnar <mingo@redhat.com>, Waiman Long <longman@redhat.com>, 
+	Mitchell Levy <levymitchell0@gmail.com>, Frederic Weisbecker <frederic@kernel.org>, 
+	Anna-Maria Behnsen <anna-maria@linutronix.de>, John Stultz <jstultz@google.com>, linux-usb@vger.kernel.org, 
+	Tejun Heo <tj@kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>, 
+	Matthew Wilcox <willy@infradead.org>, Tamir Duberstein <tamird@gmail.com>
+Content-Type: text/plain; charset="utf-8"
 
-On Mon, Dec 1, 2025 at 5:44=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrote=
-:
->
-> On Mon, Dec 01, 2025 at 01:16:04PM -0800, Caleb Sander Mateos wrote:
-> > On Thu, Nov 20, 2025 at 6:00=E2=80=AFPM Ming Lei <ming.lei@redhat.com> =
-wrote:
-> > >
-> > > Add new feature UBLK_F_BATCH_IO which replaces the following two
-> > > per-io commands:
-> > >
-> > >         - UBLK_U_IO_FETCH_REQ
-> > >
-> > >         - UBLK_U_IO_COMMIT_AND_FETCH_REQ
-> > >
-> > > with three per-queue batch io uring_cmd:
-> > >
-> > >         - UBLK_U_IO_PREP_IO_CMDS
-> > >
-> > >         - UBLK_U_IO_COMMIT_IO_CMDS
-> > >
-> > >         - UBLK_U_IO_FETCH_IO_CMDS
-> > >
-> > > Then ublk can deliver batch io commands to ublk server in single
-> > > multishort uring_cmd, also allows to prepare & commit multiple
-> > > commands in batch style via single uring_cmd, communication cost is
-> > > reduced a lot.
-> > >
-> > > This feature also doesn't limit task context any more for all support=
-ed
-> > > commands, so any allowed uring_cmd can be issued in any task context.
-> > > ublk server implementation becomes much easier.
-> > >
-> > > Meantime load balance becomes much easier to support with this featur=
-e.
-> > > The command `UBLK_U_IO_FETCH_IO_CMDS` can be issued from multiple tas=
-k
-> > > contexts, so each task can adjust this command's buffer length or num=
-ber
-> > > of inflight commands for controlling how much load is handled by curr=
-ent
-> > > task.
-> > >
-> > > Later, priority parameter will be added to command `UBLK_U_IO_FETCH_I=
-O_CMDS`
-> > > for improving load balance support.
-> > >
-> > > UBLK_U_IO_GET_DATA isn't supported in batch io yet, but it may be
-> >
-> > UBLK_U_IO_NEED_GET_DATA?
->
-> Yeah.
->
-> >
-> > > enabled in future via its batch pair.
-> > >
-> > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > > ---
-> > >  drivers/block/ublk_drv.c      | 58 ++++++++++++++++++++++++++++++++-=
---
-> > >  include/uapi/linux/ublk_cmd.h | 16 ++++++++++
-> > >  2 files changed, 69 insertions(+), 5 deletions(-)
-> > >
-> > > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > > index 849199771f86..90cd1863bc83 100644
-> > > --- a/drivers/block/ublk_drv.c
-> > > +++ b/drivers/block/ublk_drv.c
-> > > @@ -74,7 +74,8 @@
-> > >                 | UBLK_F_AUTO_BUF_REG \
-> > >                 | UBLK_F_QUIESCE \
-> > >                 | UBLK_F_PER_IO_DAEMON \
-> > > -               | UBLK_F_BUF_REG_OFF_DAEMON)
-> > > +               | UBLK_F_BUF_REG_OFF_DAEMON \
-> > > +               | UBLK_F_BATCH_IO)
-> > >
-> > >  #define UBLK_F_ALL_RECOVERY_FLAGS (UBLK_F_USER_RECOVERY \
-> > >                 | UBLK_F_USER_RECOVERY_REISSUE \
-> > > @@ -320,12 +321,12 @@ static void ublk_batch_dispatch(struct ublk_que=
-ue *ubq,
-> > >
-> > >  static inline bool ublk_dev_support_batch_io(const struct ublk_devic=
-e *ub)
-> > >  {
-> > > -       return false;
-> > > +       return ub->dev_info.flags & UBLK_F_BATCH_IO;
-> > >  }
-> > >
-> > >  static inline bool ublk_support_batch_io(const struct ublk_queue *ub=
-q)
-> > >  {
-> > > -       return false;
-> > > +       return ubq->flags & UBLK_F_BATCH_IO;
-> > >  }
-> > >
-> > >  static inline void ublk_io_lock(struct ublk_io *io)
-> > > @@ -3450,6 +3451,41 @@ static int ublk_validate_batch_fetch_cmd(struc=
-t ublk_batch_io_data *data,
-> > >         return 0;
-> > >  }
-> > >
-> > > +static int ublk_handle_non_batch_cmd(struct io_uring_cmd *cmd,
-> > > +                                    unsigned int issue_flags)
-> > > +{
-> > > +       const struct ublksrv_io_cmd *ub_cmd =3D io_uring_sqe_cmd(cmd-=
->sqe);
-> > > +       struct ublk_device *ub =3D cmd->file->private_data;
-> > > +       unsigned tag =3D READ_ONCE(ub_cmd->tag);
-> > > +       unsigned q_id =3D READ_ONCE(ub_cmd->q_id);
-> > > +       unsigned index =3D READ_ONCE(ub_cmd->addr);
-> > > +       struct ublk_queue *ubq;
-> > > +       struct ublk_io *io;
-> > > +       int ret =3D -EINVAL;
-> >
-> > I think it would be clearer to just return -EINVAL instead of adding
-> > this variable, but up to you
-> >
-> > > +
-> > > +       if (!ub)
-> > > +               return ret;
-> >
-> > How is this case possible?
->
-> Will remove the check.
->
-> >
-> > > +
-> > > +       if (q_id >=3D ub->dev_info.nr_hw_queues)
-> > > +               return ret;
-> > > +
-> > > +       ubq =3D ublk_get_queue(ub, q_id);
-> > > +       if (tag >=3D ubq->q_depth)
-> >
-> > Can avoid the likely cache miss here by using ub->dev_info.queue_depth
-> > instead, analogous to ublk_ch_uring_cmd_local()
->
-> OK.
->
-> >
-> > > +               return ret;
-> > > +
-> > > +       io =3D &ubq->ios[tag];
-> > > +
-> > > +       switch (cmd->cmd_op) {
-> > > +       case UBLK_U_IO_REGISTER_IO_BUF:
-> > > +               return ublk_register_io_buf(cmd, ub, q_id, tag, io, i=
-ndex,
-> > > +                               issue_flags);
-> > > +       case UBLK_U_IO_UNREGISTER_IO_BUF:
-> > > +               return ublk_unregister_io_buf(cmd, ub, index, issue_f=
-lags);
-> > > +       default:
-> > > +               return -EOPNOTSUPP;
-> > > +       }
-> > > +}
-> > > +
-> > >  static int ublk_ch_batch_io_uring_cmd(struct io_uring_cmd *cmd,
-> > >                                        unsigned int issue_flags)
-> > >  {
-> > > @@ -3497,7 +3533,8 @@ static int ublk_ch_batch_io_uring_cmd(struct io=
-_uring_cmd *cmd,
-> > >                 ret =3D ublk_handle_batch_fetch_cmd(&data);
-> > >                 break;
-> > >         default:
-> > > -               ret =3D -EOPNOTSUPP;
-> > > +               ret =3D ublk_handle_non_batch_cmd(cmd, issue_flags);
-> >
-> > We should probably skip the if (data.header.q_id >=3D
-> > ub->dev_info.nr_hw_queues) check for a non-batch command?
->
-> It is true only for UBLK_IO_UNREGISTER_IO_BUF.
+This patch series adds __rust_helper to every single rust helper. The
+patches do not depend on each other, so maintainers please go ahead and
+pick up any patches relevant to your subsystem! Or provide your Acked-by
+so that Miguel can pick them up.
 
-My point was that this relies on the q_id field being located at the
-same offset in struct ublksrv_io_cmd and struct ublk_batch_io, which
-seems quite subtle. I think it would make more sense not to read the
-SQE as a struct ublk_batch_io for the non-batch commands.
+These changes were generated by adding __rust_helper and running
+ClangFormat. Unrelated formatting changes were removed manually.
 
-Best,
-Caleb
+Why is __rust_helper needed?
+============================
 
->
-> >
-> > > +               break;
-> > >         }
-> > >  out:
-> > >         return ret;
-> > > @@ -4163,9 +4200,13 @@ static int ublk_ctrl_add_dev(const struct ublk=
-srv_ctrl_cmd *header)
-> > >
-> > >         ub->dev_info.flags |=3D UBLK_F_CMD_IOCTL_ENCODE |
-> > >                 UBLK_F_URING_CMD_COMP_IN_TASK |
-> > > -               UBLK_F_PER_IO_DAEMON |
-> > > +               (ublk_dev_support_batch_io(ub) ? 0 : UBLK_F_PER_IO_DA=
-EMON) |
-> >
-> > Seems redundant with the logic below to clear UBLK_F_PER_IO_DAEMON if
-> > (ublk_dev_support_batch_io(ub))?
->
-> Good catch.
->
-> >
-> > >                 UBLK_F_BUF_REG_OFF_DAEMON;
-> > >
-> > > +       /* So far, UBLK_F_PER_IO_DAEMON won't be exposed for BATCH_IO=
- */
-> > > +       if (ublk_dev_support_batch_io(ub))
-> > > +               ub->dev_info.flags &=3D ~UBLK_F_PER_IO_DAEMON;
-> > > +
-> > >         /* GET_DATA isn't needed any more with USER_COPY or ZERO COPY=
- */
-> > >         if (ub->dev_info.flags & (UBLK_F_USER_COPY | UBLK_F_SUPPORT_Z=
-ERO_COPY |
-> > >                                 UBLK_F_AUTO_BUF_REG))
-> > > @@ -4518,6 +4559,13 @@ static int ublk_wait_for_idle_io(struct ublk_d=
-evice *ub,
-> > >         unsigned int elapsed =3D 0;
-> > >         int ret;
-> > >
-> > > +       /*
-> > > +        * For UBLK_F_BATCH_IO ublk server can get notified with exis=
-ting
-> > > +        * or new fetch command, so needn't wait any more
-> > > +        */
-> > > +       if (ublk_dev_support_batch_io(ub))
-> > > +               return 0;
-> > > +
-> > >         while (elapsed < timeout_ms && !signal_pending(current)) {
-> > >                 unsigned int queues_cancelable =3D 0;
-> > >                 int i;
-> > > diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_=
-cmd.h
-> > > index cd894c1d188e..5e8b1211b7f4 100644
-> > > --- a/include/uapi/linux/ublk_cmd.h
-> > > +++ b/include/uapi/linux/ublk_cmd.h
-> > > @@ -335,6 +335,22 @@
-> > >   */
-> > >  #define UBLK_F_BUF_REG_OFF_DAEMON (1ULL << 14)
-> > >
-> > > +
-> > > +/*
-> > > + * Support the following commands for delivering & committing io com=
-mand
-> > > + * in batch.
-> > > + *
-> > > + *     - UBLK_U_IO_PREP_IO_CMDS
-> > > + *     - UBLK_U_IO_COMMIT_IO_CMDS
-> > > + *     - UBLK_U_IO_FETCH_IO_CMDS
-> > > + *     - UBLK_U_IO_REGISTER_IO_BUF
-> > > + *     - UBLK_U_IO_UNREGISTER_IO_BUF
-> >
-> > Seems like it might make sense to provided batched versions of
-> > UBLK_U_IO_REGISTER_IO_BUF and UBLK_U_IO_UNREGISTER_IO_BUF. That could
-> > be done in the future, I guess, but it might simplify
-> > ublk_ch_batch_io_uring_cmd() to only have to handle struct
-> > ublk_batch_io.
->
-> Agree, and it can be added in future.
->
->
->
->
-> Thanks,
-> Ming
->
+Currently, C helpers cannot be inlined into Rust even when using LTO
+because LLVM detects slightly different options on the codegen units.
+
+* LLVM doesn't want to inline functions compiled with
+  `-fno-delete-null-pointer-checks` with code compiled without. The C
+  CGUs all have this enabled and Rust CGUs don't. Inlining is okay since
+  this is one of the hardening features that does not change the ABI,
+  and we shouldn't have null pointer dereferences in these helpers.
+
+* LLVM doesn't want to inline functions with different list of builtins. C
+  side has `-fno-builtin-wcslen`; `wcslen` is not a Rust builtin, so
+  they should be compatible, but LLVM does not perform inlining due to
+  attributes mismatch.
+
+* clang and Rust doesn't have the exact target string. Clang generates
+  `+cmov,+cx8,+fxsr` but Rust doesn't enable them (in fact, Rust will
+  complain if `-Ctarget-feature=+cmov,+cx8,+fxsr` is used). x86-64
+  always enable these features, so they are in fact the same target
+  string, but LLVM doesn't understand this and so inlining is inhibited.
+  This can be bypassed with `--ignore-tti-inline-compatible`, but this
+  is a hidden option.
+
+(This analysis was written by Gary Guo.)
+
+How is this fixed?
+==================
+
+To fix this we need to add __always_inline to all helpers when compiling
+with LTO. However, it should not be added when running bindgen as
+bindgen will ignore functions marked inline. To achieve this, we are
+using a #define called __rust_helper that is defined differently
+depending on whether bindgen is running or not.
+
+Note that __rust_helper is currently always #defined to nothing.
+Changing it to __always_inline will happen separately in another patch
+series.
+
+Signed-off-by: Alice Ryhl <aliceryhl@google.com>
+---
+Alice Ryhl (46):
+      rust: auxiliary: add __rust_helper to helpers
+      rust: barrier: add __rust_helper to helpers
+      rust: binder: add __rust_helper to helpers
+      rust: bitmap: add __rust_helper to helpers
+      rust: bitops: add __rust_helper to helpers
+      rust: blk: add __rust_helper to helpers
+      rust: bug: add __rust_helper to helpers
+      rust: clk: add __rust_helper to helpers
+      rust: completion: add __rust_helper to helpers
+      rust: cpu: add __rust_helper to helpers
+      rust: cpufreq: add __rust_helper to helpers
+      rust: cpumask: add __rust_helper to helpers
+      rust: cred: add __rust_helper to helpers
+      rust: device: add __rust_helper to helpers
+      rust: dma: add __rust_helper to helpers
+      rust: drm: add __rust_helper to helpers
+      rust: err: add __rust_helper to helpers
+      rust: fs: add __rust_helper to helpers
+      rust: io: add __rust_helper to helpers
+      rust: irq: add __rust_helper to helpers
+      rust: jump_label: add __rust_helper to helpers
+      rust: kunit: add __rust_helper to helpers
+      rust: maple_tree: add __rust_helper to helpers
+      rust: mm: add __rust_helper to helpers
+      rust: of: add __rust_helper to helpers
+      rust: pci: add __rust_helper to helpers
+      rust: pid_namespace: add __rust_helper to helpers
+      rust: platform: add __rust_helper to helpers
+      rust: poll: add __rust_helper to helpers
+      rust: processor: add __rust_helper to helpers
+      rust: property: add __rust_helper to helpers
+      rust: rbtree: add __rust_helper to helpers
+      rust: rcu: add __rust_helper to helpers
+      rust: refcount: add __rust_helper to helpers
+      rust: regulator: add __rust_helper to helpers
+      rust: scatterlist: add __rust_helper to helpers
+      rust: security: add __rust_helper to helpers
+      rust: slab: add __rust_helper to helpers
+      rust: sync: add __rust_helper to helpers
+      rust: task: add __rust_helper to helpers
+      rust: time: add __rust_helper to helpers
+      rust: uaccess: add __rust_helper to helpers
+      rust: usb: add __rust_helper to helpers
+      rust: wait: add __rust_helper to helpers
+      rust: workqueue: add __rust_helper to helpers
+      rust: xarray: add __rust_helper to helpers
+
+ rust/helpers/auxiliary.c     |  6 +++--
+ rust/helpers/barrier.c       |  6 ++---
+ rust/helpers/binder.c        | 13 ++++-----
+ rust/helpers/bitmap.c        |  6 +++--
+ rust/helpers/bitops.c        | 11 +++++---
+ rust/helpers/blk.c           |  4 +--
+ rust/helpers/bug.c           |  4 +--
+ rust/helpers/build_bug.c     |  2 +-
+ rust/helpers/clk.c           | 24 +++++++++--------
+ rust/helpers/completion.c    |  2 +-
+ rust/helpers/cpu.c           |  2 +-
+ rust/helpers/cpufreq.c       |  3 ++-
+ rust/helpers/cpumask.c       | 32 +++++++++++++---------
+ rust/helpers/cred.c          |  4 +--
+ rust/helpers/device.c        | 16 +++++------
+ rust/helpers/dma.c           | 15 ++++++-----
+ rust/helpers/drm.c           |  7 ++---
+ rust/helpers/err.c           |  6 ++---
+ rust/helpers/fs.c            |  2 +-
+ rust/helpers/io.c            | 64 +++++++++++++++++++++++---------------------
+ rust/helpers/irq.c           |  6 +++--
+ rust/helpers/jump_label.c    |  2 +-
+ rust/helpers/kunit.c         |  2 +-
+ rust/helpers/maple_tree.c    |  3 ++-
+ rust/helpers/mm.c            | 20 +++++++-------
+ rust/helpers/mutex.c         | 13 ++++-----
+ rust/helpers/of.c            |  2 +-
+ rust/helpers/page.c          |  9 ++++---
+ rust/helpers/pci.c           | 13 +++++----
+ rust/helpers/pid_namespace.c |  8 +++---
+ rust/helpers/platform.c      |  2 +-
+ rust/helpers/poll.c          |  5 ++--
+ rust/helpers/processor.c     |  2 +-
+ rust/helpers/property.c      |  2 +-
+ rust/helpers/rbtree.c        |  5 ++--
+ rust/helpers/rcu.c           |  4 +--
+ rust/helpers/refcount.c      | 10 +++----
+ rust/helpers/regulator.c     | 24 ++++++++++-------
+ rust/helpers/scatterlist.c   | 12 +++++----
+ rust/helpers/security.c      | 26 ++++++++++--------
+ rust/helpers/signal.c        |  2 +-
+ rust/helpers/slab.c          | 14 +++++-----
+ rust/helpers/spinlock.c      | 13 ++++-----
+ rust/helpers/sync.c          |  4 +--
+ rust/helpers/task.c          | 24 ++++++++---------
+ rust/helpers/time.c          | 12 ++++-----
+ rust/helpers/uaccess.c       |  8 +++---
+ rust/helpers/usb.c           |  3 ++-
+ rust/helpers/vmalloc.c       |  7 ++---
+ rust/helpers/wait.c          |  2 +-
+ rust/helpers/workqueue.c     |  8 +++---
+ rust/helpers/xarray.c        | 10 +++----
+ 52 files changed, 280 insertions(+), 226 deletions(-)
+---
+base-commit: 54e3eae855629702c566bd2e130d9f40e7f35bde
+change-id: 20251202-define-rust-helper-f7b531813007
+
+Best regards,
+-- 
+Alice Ryhl <aliceryhl@google.com>
+
