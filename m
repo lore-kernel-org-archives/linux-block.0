@@ -1,283 +1,298 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FB8A221FB4
-	for <linux-block@vger.kernel.org>; Tue,  2 Dec 2025 08:14:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13BB0307AC3
+	for <linux-block@vger.kernel.org>; Tue,  2 Dec 2025 09:03:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764663292; cv=none; b=TC7W6+zS0JRP7E/GF5nBklSqLCh9/VswV8kFkoziLWihwkLuXjx5bOEKmbvZHobpi7UXRDFYvpxlY0ZElE85/DUuvmUBpaxLc2vzyrYquLhmgGkKeyet7m0WHKAtyTURHk5yu4lKW1t2IoB9E1cgixFKOH5tFLqxEq/2EUp5CRo=
+	t=1764666205; cv=none; b=RO6mTf+SCNzIxL0b4tTa29Udx4+iOVLxvy6ZqE7D5SeMPvX/BqZrgwu4z2RDKsVcAJDD+kcjkn6cUqHs9zH34itXQqwrxTgoQNgSmkOIPQapaFx/Ewdbe43BHmHUja6IU+jRi9KOpdFtr0y4qXG5gJpb5E74J4M+jioYgnOnzW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764663292; c=relaxed/simple;
-	bh=6bPfFGYEpIBBdAOUVc05TVdQl/PLkWZc0KU4TT+Pp50=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LSyPkRhK/IpnN/WFPQPtLBUMUo9efcUOH46QtDIIZ2McYFoFKGbq4xDqJeHivoxOv+SXXX7K4wohuMd9kwdusa6NxRmWqQ9oAWWVvgj7sa+phTHDu0A2v/zt39ym9cXeZoxZk9qk5sZHe+DgrsofTUJmecBsEkimZQ5cpiFpdzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ccXnHBJF; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1764666205; c=relaxed/simple;
+	bh=Kxc3xymhYJf5rYA3ZiRBFHXTfPFg781MVylumAf2VB8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fFO7HAP6OCGn64VdlTvi34/5QPVt8U6OiDoHZAc2Iv5Jee7MFCSkZVZ1of2jX7k0A9KQz6auGpLD2g4K54Y1hLMEL8DxleYUAkkxva5NkHSpfVNezR2ljeRVLjz3DTPvGPjmGi6xlVTltm1nrKcYsYeFD7CA9oqlAYpMbtcQkPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cO7CIA3w; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ccXnHBJF"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764663289;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ql38+fpnogM91ZVtxTpB9vpWkIK9Wk3eVB/XiwaqyJM=;
-	b=ccXnHBJFVHT7hZfUao7+Sme87vqnJt87OXD3XwI8HEA/0/6LsK2NlRPhlsA2lZr5BJlTDB
-	qNrHti6BVrB5A66RzkRXT8KFxXJEU8WqLTPMhyVQAgdSzhFNq6PG+urQh8JwjLpSfe0F0O
-	LjRvShzlGCxHJORBeIp+A1Htd+f4G80=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-27-qz_jy1CvOf-AXP1vahJGfQ-1; Tue,
- 02 Dec 2025 03:14:48 -0500
-X-MC-Unique: qz_jy1CvOf-AXP1vahJGfQ-1
-X-Mimecast-MFC-AGG-ID: qz_jy1CvOf-AXP1vahJGfQ_1764663286
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4F51D195605C;
-	Tue,  2 Dec 2025 08:14:46 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.20])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9D575195608E;
-	Tue,  2 Dec 2025 08:14:40 +0000 (UTC)
-Date: Tue, 2 Dec 2025 16:14:35 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Uday Shankar <ushankar@purestorage.com>,
-	Stefani Seibold <stefani@seibold.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V4 14/27] ublk: add UBLK_U_IO_FETCH_IO_CMDS for batch I/O
- processing
-Message-ID: <aS6f68KVuyRxZitY@fedora>
-References: <20251121015851.3672073-1-ming.lei@redhat.com>
- <20251121015851.3672073-15-ming.lei@redhat.com>
- <CADUfDZqOHRxnNjeb064XGOH-EqLgp2XCiHiRNTzxYCQuihx90Q@mail.gmail.com>
- <aS1i4RoP_mJXQiXk@fedora>
- <CADUfDZo0N22fp5+Si8eBE5SgRkCMsMa1VDTiLO_+zLWfUOVc9g@mail.gmail.com>
- <aS5AZjizRDt7ql3T@fedora>
- <CADUfDZomo+Jz5oiQkU99+RZhxDqAjdt8B1tg_gj-O7thzqVbhw@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cO7CIA3w"
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-7b6dd81e2d4so4897527b3a.0
+        for <linux-block@vger.kernel.org>; Tue, 02 Dec 2025 01:03:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764666203; x=1765271003; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=eUwxnFDkbLisSCXIciGjEpDUp8k4vSFIWpq6DQ0hRis=;
+        b=cO7CIA3wsYWAlBb9fwjRRrmW66enLdDEBc+DkHuQw7joo/GU0HGaVTqxOjf7j8f/xg
+         Pc8LM3C9Dzh5C8pylCq2uUMtbH//dc68SvXqHyKI7CnhXC/Y9kp9prSSlKicasBBcINY
+         g6w4+A6QHVSubMjxUTvHTav2UUvJMtA2vkN0R3cUqjj+JzwrBBkImKrb+lt/gPX4Mr75
+         qduIwOeOpHWX7NDsg3vPua4kc7KHFmH9lFhDnTBsAHCW0yuf9/GwlM7pCq7s0NXrjmYl
+         k6j8QNaAhbpOya/Hj9svDaLg/m2W+t+oD0xZcHvSfdqDhHlAcOEAzRu3bo+mz4JtWSq4
+         MJUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764666203; x=1765271003;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eUwxnFDkbLisSCXIciGjEpDUp8k4vSFIWpq6DQ0hRis=;
+        b=gbSU0h69W8UZy12b2oJAVeD4T2juEN4gB0+QCQyEfSl3/UQKezCxFCTUufFa0TewVi
+         18+iZC6fPvqrBpj5sNLDRMXwypfNa5KIQYOo7QhqWu+ybF9+WybCY18ZzACZfw+7ZEbi
+         +CiKZDDpgJoZEkNeB+Uy6KWmgUOn3z00ruajy1zZnh8zcvsmOJ0rheeigg4lIL0GFciZ
+         6H98YWkAoY4ZYuFiEVOo3qUvzuMhatKpt/wdWmYKlWjAugELPrfIydUqhYupxV2vuVlE
+         GVa03dI74gkenNb+Xsp2yzvlXbvF7HZC4EfT/drD1iiM3OsrCHrltUULMI7OoDBl5/Ty
+         6dgw==
+X-Forwarded-Encrypted: i=1; AJvYcCWw4Qm8AAwPzLW0WDdj4PX/o7PNMjJwbwf2OpgOQl3ZPCKef4IqzLf2Yhkgzy2nmUvx/zP/Wc8YOWdPPg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzgEDCov+SmmltygFFS04Vjw6AY6Q4KcjOj5VrQFGMXZz6Ak78D
+	e7rJ2+dDFszdNq4hUu3eyyUmVCq4DskQYhD2pFPsr5E/ON9l4d9AWIUq
+X-Gm-Gg: ASbGncuVAG1VXKals2YuN3Qzlq+Q3SQj6LNVW5Iu0QxFtcNvMUAJVPzMchHv87OpVqW
+	+TljmK9h0Xqt2E4RbzNbA94KQ0Au40uNHwkd3F1n581uBZRUfj5OPKvY9GHeXaSotclYZ3YMIni
+	4kETW/xAFjvF4hMQFIa0cTJgP6Eo9Sez5FrnfXiW73ePm8+cw+dpU63eF+mFMD+zxRSDfm71r2f
+	rh11qy37Pt5iKj/UOvJuSQrfEJYAMT4VThHz6yRbUn/Yt/aPE5UpYj+kj06qE+ioxeePhLwWCC5
+	13a/dWtrgYsk/EmiwQRwdu1hAh7tVSHkza4sUr2/12nsO2PwqR+m+2d61Vmds9Krxdm6itzuXjw
+	k3YGeGvuCLu0imGlaywlUrZr2dzf6poF6a6a9lxMH3NNRg5am3gFF5o4X8Ri2F7YpmI8FFNoOEw
+	IcwK6lL18k5DBPQhUEdt+vuLQtyX8kLQ==
+X-Google-Smtp-Source: AGHT+IFLI8VC/mfV4i6+8S8PhOxrX54j/G5nldjMLpfgRiK7v1GagPZl3ft3/qYJdbFyDH0KLW3FPQ==
+X-Received: by 2002:a05:6a20:9146:b0:343:6c90:77b5 with SMTP id adf61e73a8af0-3614eb83deamr48178691637.15.1764666203057;
+        Tue, 02 Dec 2025 01:03:23 -0800 (PST)
+Received: from [10.189.138.37] ([43.224.245.241])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-be4fb248be1sm14671106a12.3.2025.12.02.01.03.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Dec 2025 01:03:22 -0800 (PST)
+Message-ID: <7fac334b-17d3-4c48-8303-2d7e73ff281b@gmail.com>
+Date: Tue, 2 Dec 2025 17:03:14 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADUfDZomo+Jz5oiQkU99+RZhxDqAjdt8B1tg_gj-O7thzqVbhw@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] loop: don't change loop device under exclusive opener in
+ loop_set_status
+To: Jan Kara <jack@suse.cz>, Yongpeng Yang <yangyongpeng.storage@gmail.com>
+Cc: Raphael Pinsonneault-Thibeault <rpthibeault@gmail.com>, axboe@kernel.dk,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ cascardo@igalia.com, linux-kernel-mentees@lists.linux.dev,
+ skhan@linuxfoundation.org,
+ syzbot+3ee481e21fd75e14c397@syzkaller.appspotmail.com,
+ Yongpeng Yang <yangyongpeng@xiaomi.com>
+References: <20251114144204.2402336-2-rpthibeault@gmail.com>
+ <93a1773e-e30a-469d-bc8f-029773112401@gmail.com>
+ <zoc2xguhdvjkon36d67usvf2wpufcreiti22sjgekhbhtkvdkp@iezwglvxdw4t>
+Content-Language: en-US
+From: Yongpeng Yang <yangyongpeng.storage@gmail.com>
+In-Reply-To: <zoc2xguhdvjkon36d67usvf2wpufcreiti22sjgekhbhtkvdkp@iezwglvxdw4t>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Dec 01, 2025 at 05:39:29PM -0800, Caleb Sander Mateos wrote:
-> On Mon, Dec 1, 2025 at 5:27 PM Ming Lei <ming.lei@redhat.com> wrote:
-> >
-> > On Mon, Dec 01, 2025 at 09:51:59AM -0800, Caleb Sander Mateos wrote:
-> > > On Mon, Dec 1, 2025 at 1:42 AM Ming Lei <ming.lei@redhat.com> wrote:
-> > > >
-> > > > On Sun, Nov 30, 2025 at 09:55:47PM -0800, Caleb Sander Mateos wrote:
-> > > > > On Thu, Nov 20, 2025 at 6:00 PM Ming Lei <ming.lei@redhat.com> wrote:
-> > > > > >
-> > > > > > Add UBLK_U_IO_FETCH_IO_CMDS command to enable efficient batch processing
-> > > > > > of I/O requests. This multishot uring_cmd allows the ublk server to fetch
-> > > > > > multiple I/O commands in a single operation, significantly reducing
-> > > > > > submission overhead compared to individual FETCH_REQ* commands.
-> > > > > >
-> > > > > > Key Design Features:
-> > > > > >
-> > > > > > 1. Multishot Operation: One UBLK_U_IO_FETCH_IO_CMDS can fetch many I/O
-> > > > > >    commands, with the batch size limited by the provided buffer length.
-> > > > > >
-> > > > > > 2. Dynamic Load Balancing: Multiple fetch commands can be submitted
-> > > > > >    simultaneously, but only one is active at any time. This enables
-> > > > > >    efficient load distribution across multiple server task contexts.
-> > > > > >
-> > > > > > 3. Implicit State Management: The implementation uses three key variables
-> > > > > >    to track state:
-> > > > > >    - evts_fifo: Queue of request tags awaiting processing
-> > > > > >    - fcmd_head: List of available fetch commands
-> > > > > >    - active_fcmd: Currently active fetch command (NULL = none active)
-> > > > > >
-> > > > > >    States are derived implicitly:
-> > > > > >    - IDLE: No fetch commands available
-> > > > > >    - READY: Fetch commands available, none active
-> > > > > >    - ACTIVE: One fetch command processing events
-> > > > > >
-> > > > > > 4. Lockless Reader Optimization: The active fetch command can read from
-> > > > > >    evts_fifo without locking (single reader guarantee), while writers
-> > > > > >    (ublk_queue_rq/ublk_queue_rqs) use evts_lock protection. The memory
-> > > > > >    barrier pairing plays key role for the single lockless reader
-> > > > > >    optimization.
-> > > > > >
-> > > > > > Implementation Details:
-> > > > > >
-> > > > > > - ublk_queue_rq() and ublk_queue_rqs() save request tags to evts_fifo
-> > > > > > - __ublk_pick_active_fcmd() selects an available fetch command when
-> > > > > >   events arrive and no command is currently active
-> > > > >
-> > > > > What is __ublk_pick_active_fcmd()? I don't see a function with that name.
-> > > >
-> > > > It is renamed as __ublk_acquire_fcmd(), and its counter pair is
-> > > > __ublk_release_fcmd().
-> > >
-> > > Okay, update the commit message then?
-> > >
-> > > >
-> > > > >
-> > > > > > - ublk_batch_dispatch() moves tags from evts_fifo to the fetch command's
-> > > > > >   buffer and posts completion via io_uring_mshot_cmd_post_cqe()
-> > > > > > - State transitions are coordinated via evts_lock to maintain consistency
-> > > > > >
-> > > > > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > > > > > ---
-> > > > > >  drivers/block/ublk_drv.c      | 412 +++++++++++++++++++++++++++++++---
-> > > > > >  include/uapi/linux/ublk_cmd.h |   7 +
-> > > > > >  2 files changed, 388 insertions(+), 31 deletions(-)
-> > > > > >
-> > > > > > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > > > > > index cc9c92d97349..2e5e392c939e 100644
-> > > > > > --- a/drivers/block/ublk_drv.c
-> > > > > > +++ b/drivers/block/ublk_drv.c
-> > > > > > @@ -93,6 +93,7 @@
-> > > > > >
-> > > > > >  /* ublk batch fetch uring_cmd */
-> > > > > >  struct ublk_batch_fcmd {
-> > > > > > +       struct list_head node;
-> > > > > >         struct io_uring_cmd *cmd;
-> > > > > >         unsigned short buf_group;
-> > > > > >  };
-> > > > > > @@ -117,7 +118,10 @@ struct ublk_uring_cmd_pdu {
-> > > > > >          */
-> > > > > >         struct ublk_queue *ubq;
-> > > > > >
-> > > > > > -       u16 tag;
-> > > > > > +       union {
-> > > > > > +               u16 tag;
-> > > > > > +               struct ublk_batch_fcmd *fcmd; /* batch io only */
-> > > > > > +       };
-> > > > > >  };
-> > > > > >
-> > > > > >  struct ublk_batch_io_data {
-> > > > > > @@ -229,18 +233,36 @@ struct ublk_queue {
-> > > > > >         struct ublk_device *dev;
-> > > > > >
-> > > > > >         /*
-> > > > > > -        * Inflight ublk request tag is saved in this fifo
-> > > > > > +        * Batch I/O State Management:
-> > > > > > +        *
-> > > > > > +        * The batch I/O system uses implicit state management based on the
-> > > > > > +        * combination of three key variables below.
-> > > > > > +        *
-> > > > > > +        * - IDLE: list_empty(&fcmd_head) && !active_fcmd
-> > > > > > +        *   No fetch commands available, events queue in evts_fifo
-> > > > > > +        *
-> > > > > > +        * - READY: !list_empty(&fcmd_head) && !active_fcmd
-> > > > > > +        *   Fetch commands available but none processing events
-> > > > > >          *
-> > > > > > -        * There are multiple writer from ublk_queue_rq() or ublk_queue_rqs(),
-> > > > > > -        * so lock is required for storing request tag to fifo
-> > > > > > +        * - ACTIVE: active_fcmd
-> > > > > > +        *   One fetch command actively processing events from evts_fifo
-> > > > > >          *
-> > > > > > -        * Make sure just one reader for fetching request from task work
-> > > > > > -        * function to ublk server, so no need to grab the lock in reader
-> > > > > > -        * side.
-> > > > > > +        * Key Invariants:
-> > > > > > +        * - At most one active_fcmd at any time (single reader)
-> > > > > > +        * - active_fcmd is always from fcmd_head list when non-NULL
-> > > > > > +        * - evts_fifo can be read locklessly by the single active reader
-> > > > > > +        * - All state transitions require evts_lock protection
-> > > > > > +        * - Multiple writers to evts_fifo require lock protection
-> > > > > >          */
-> > > > > >         struct {
-> > > > > >                 DECLARE_KFIFO_PTR(evts_fifo, unsigned short);
-> > > > > >                 spinlock_t evts_lock;
-> > > > > > +
-> > > > > > +               /* List of fetch commands available to process events */
-> > > > > > +               struct list_head fcmd_head;
-> > > > > > +
-> > > > > > +               /* Currently active fetch command (NULL = none active) */
-> > > > > > +               struct ublk_batch_fcmd  *active_fcmd;
-> > > > > >         }____cacheline_aligned_in_smp;
-> > > > > >
-> > > > > >         struct ublk_io ios[] __counted_by(q_depth);
-> > > > > > @@ -292,12 +314,20 @@ static void ublk_abort_queue(struct ublk_device *ub, struct ublk_queue *ubq);
-> > > > > >  static inline struct request *__ublk_check_and_get_req(struct ublk_device *ub,
-> > > > > >                 u16 q_id, u16 tag, struct ublk_io *io, size_t offset);
-> > > > > >  static inline unsigned int ublk_req_build_flags(struct request *req);
-> > > > > > +static void ublk_batch_dispatch(struct ublk_queue *ubq,
-> > > > > > +                               struct ublk_batch_io_data *data,
-> > > > > > +                               struct ublk_batch_fcmd *fcmd);
-> > > > > >
-> > > > > >  static inline bool ublk_dev_support_batch_io(const struct ublk_device *ub)
-> > > > > >  {
-> > > > > >         return false;
-> > > > > >  }
-> > > > > >
-> > > > > > +static inline bool ublk_support_batch_io(const struct ublk_queue *ubq)
-> > > > > > +{
-> > > > > > +       return false;
-> > > > > > +}
-> > > > > > +
-> > > > > >  static inline void ublk_io_lock(struct ublk_io *io)
-> > > > > >  {
-> > > > > >         spin_lock(&io->lock);
-> > > > > > @@ -624,13 +654,45 @@ static wait_queue_head_t ublk_idr_wq;     /* wait until one idr is freed */
-> > > > > >
-> > > > > >  static DEFINE_MUTEX(ublk_ctl_mutex);
-> > > > > >
-> > > > > > +static struct ublk_batch_fcmd *
-> > > > > > +ublk_batch_alloc_fcmd(struct io_uring_cmd *cmd)
-> > > > > > +{
-> > > > > > +       struct ublk_batch_fcmd *fcmd = kzalloc(sizeof(*fcmd), GFP_NOIO);
-> > > > >
-> > > > > An allocation in the I/O path seems unfortunate. Is there not room to
-> > > > > store the struct ublk_batch_fcmd in the io_uring_cmd pdu?
-> > > >
-> > > > It is allocated once for one mshot request, which covers many IOs.
-> > > >
-> > > > It can't be held in uring_cmd pdu, but the allocation can be optimized in
-> > > > future. Not a big deal in enablement stage.
-> > >
-> > > Okay, seems fine to optimize it in the future.
-> > >
-> > > >
-> > > > > > +
-> > > > > > +       if (fcmd) {
-> > > > > > +               fcmd->cmd = cmd;
-> > > > > > +               fcmd->buf_group = READ_ONCE(cmd->sqe->buf_index);
-> > > > >
-> > > > > Is it necessary to store sample this here just to pass it back to the
-> > > > > io_uring layer? Wouldn't the io_uring layer already have access to it
-> > > > > in struct io_kiocb's buf_index field?
-> > > >
-> > > > ->buf_group is used by io_uring_cmd_buffer_select(), and this way also
-> > > > follows ->buf_index uses in both io_uring/net.c and io_uring/rw.c.
-> > > >
-> > > >
-> > > > io_ring_buffer_select(), so we can't reuse req->buf_index here.
-> > >
-> > > But io_uring/net.c and io_uring/rw.c both retrieve the buf_group value
-> > > from req->buf_index instead of the SQE, for example:
-> > > if (req->flags & REQ_F_BUFFER_SELECT)
-> > >         sr->buf_group = req->buf_index;
-> > >
-> > > Seems like it would make sense to do the same for
-> > > UBLK_U_IO_FETCH_IO_CMDS. That also saves one pointer dereference here.
-> >
-> > IMO we shouldn't encourage driver to access `io_kiocb`, however, cmd->sqe
-> > is exposed to driver explicitly.
+On 12/1/25 20:38, Jan Kara wrote:
+> On Tue 18-11-25 15:10:20, Yongpeng Yang wrote:
+>> On 11/14/25 22:42, Raphael Pinsonneault-Thibeault wrote:
+>>> loop_set_status() is allowed to change the loop device while there
+>>> are other openers of the device, even exclusive ones.
+>>>
+>>> In this case, it causes a KASAN: slab-out-of-bounds Read in
+>>> ext4_search_dir(), since when looking for an entry in an inlined
+>>> directory, e_value_offs is changed underneath the filesystem by
+>>> loop_set_status().
+>>>
+>>> Fix the problem by forbidding loop_set_status() from modifying the loop
+>>> device while there are exclusive openers of the device. This is similar
+>>> to the fix in loop_configure() by commit 33ec3e53e7b1 ("loop: Don't
+>>> change loop device under exclusive opener") alongside commit ecbe6bc0003b
+>>> ("block: use bd_prepare_to_claim directly in the loop driver").
+>>>
+>>> Reported-by: syzbot+3ee481e21fd75e14c397@syzkaller.appspotmail.com
+>>> Closes: https://syzkaller.appspot.com/bug?extid=3ee481e21fd75e14c397
+>>> Tested-by: syzbot+3ee481e21fd75e14c397@syzkaller.appspotmail.com
+>>> Signed-off-by: Raphael Pinsonneault-Thibeault <rpthibeault@gmail.com>
+>>> ---
+>>> ML thread for previous, misguided patch idea:
+>>> https://lore.kernel.org/all/20251112185712.2031993-2-rpthibeault@gmail.com/t/
+>>>
+>>>    drivers/block/loop.c | 41 ++++++++++++++++++++++++++++++-----------
+>>>    1 file changed, 30 insertions(+), 11 deletions(-)
+>>>
+>>> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+>>> index 053a086d547e..756ee682e767 100644
+>>> --- a/drivers/block/loop.c
+>>> +++ b/drivers/block/loop.c
+>>> @@ -1222,13 +1222,24 @@ static int loop_clr_fd(struct loop_device *lo)
+>>>    }
+>>>    static int
+>>> -loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+>>> +loop_set_status(struct loop_device *lo, blk_mode_t mode,
+>>> +		struct block_device *bdev, const struct loop_info64 *info)
+>>>    {
+>>>    	int err;
+>>>    	bool partscan = false;
+>>>    	bool size_changed = false;
+>>>    	unsigned int memflags;
+>>> +	/*
+>>> +	 * If we don't hold exclusive handle for the device, upgrade to it
+>>> +	 * here to avoid changing device under exclusive owner.
+>>> +	 */
+>>> +	if (!(mode & BLK_OPEN_EXCL)) {
+>>> +		err = bd_prepare_to_claim(bdev, loop_set_status, NULL);
+>>> +		if (err)
+>>> +			goto out_reread_partitions;
+>>> +	}
+>>> +
+>>
+>> +	if (mode & BLK_OPEN_EXCL) {
+>> +               struct block_device *whole = bdev_whole(bdev);
+>> +
+>> +               BUG_ON(whole->bd_claiming == NULL);
+>> +       }
+>>
+>> I add the above code and do the following test:
+>> # losetup -f data.1g
+>> # echo "0 `blockdev --getsz /dev/loop0` linear /dev/loop0 0" | dmsetup
+>> create my-linear
+>> # ./ioctl-test /dev/mapper/my-linear // trigger BUG_ON, ioctl-test.c is
+>> in attachment.
+>>
+>> The root causes of BUG_ON:
+>> 1. When creating 'my-linear' device, the mode for opening /dev/loop0
+>> does not include the BLK_OPEN_EXCL flag.
+>> table_load
+>>   - dm_table_create // get_mode() never assign BLK_OPEN_EXCL to {struct
+>> dm_table *t}->mode
+>>   - populate_table
+>>    - dm_table_add_target
+>>     - linear_ctr
+>>      - dm_get_device // mode = {struct dm_table *t}->mode, never open
+>> loop0 with BLK_OPEN_EXCL mode.
 > 
-> Right, but we can add a helper in include/linux/io_uring/cmd.h to
-> encapsulate accessing the io_kiocb field.
+> BLK_OPEN_EXCL is added by bdev_open() whenever it is called with non-NULL
+> holder. And DM code (open_table_device()) calls bdev_file_open_by_dev() with
+> _dm_claim_ptr as the holder. So all opens from DM should be exclusive ones.
+> The question obviously is what is broken in this that your reproducer still
+> works...
+> 
+> 								Honza
+> 
 
-OK, however I'd suggest to do it as one followup optimization for avoiding
-cross-tree change.
+Yes, I was mistaken. When loop0's whole->bd_claiming is NULL,
+bdev->bd_holder is set to _dm_claim_ptr by bd_finish_claiming. When the
+my-linear device is opened with BLK_OPEN_EXCL, its ioctls are handled
+normally. If the my-linear device is opened without BLK_OPEN_EXCL, the
+ioctl call returns -EBUSY, which is the expected behavior.
 
+bdev_open
+     - bd_prepare_to_claim //whole->bd_claiming = _dm_claim_ptr;
+     - bd_finish_claiming // whole->bd_holder = bd_may_claim; 
+bdev->bd_holder = _dm_claim_ptr;
+         - bd_clear_claiming // whole->bd_claiming = NULL;
 
-Thanks,
-Ming
+Tested-by: Yongpeng Yang <yangyongpeng@xiaomi.com>
+
+Yongpeng,
+
+>> 2. When 'my-linear' device is opened with the O_EXCL flag, and an ioctl
+>> is issued to it. The dm_blk_ioctl function calls bdev->bd_disk->fops-
+>>> ioctl(bdev, mode, cmd, arg), which passes the mode with BLK_OPEN_EXCL
+>> flag to lo_ioctl.
+>>
+>> 3. loop0 was not opened by dm_get_device() in BLK_OPEN_EXCL mode. As a
+>> result, whole->bd_claiming is NULL.
+>>
+>> Thus, the BLK_OPEN_EXCL flag in the mode passed to lo_ioctl doesn't
+>> guarantee the loop device was opened with BLK_OPEN_EXCL.
+>>
+>> How about use per-device rw_semaphore instead of 'bd_prepare_to_claim/
+>> bd_abort_claiming'?
+>>
+>> Yongpeng,
+>>
+>>>    	err = mutex_lock_killable(&lo->lo_mutex);
+>>>    	if (err)
+>>>    		return err;
+>>> @@ -1270,6 +1281,9 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+>>>    	}
+>>>    out_unlock:
+>>>    	mutex_unlock(&lo->lo_mutex);
+>>> +	if (!(mode & BLK_OPEN_EXCL))
+>>> +		bd_abort_claiming(bdev, loop_set_status);
+>>> +out_reread_partitions:
+>>>    	if (partscan)
+>>>    		loop_reread_partitions(lo);
+>>> @@ -1349,7 +1363,9 @@ loop_info64_to_old(const struct loop_info64 *info64, struct loop_info *info)
+>>>    }
+>>>    static int
+>>> -loop_set_status_old(struct loop_device *lo, const struct loop_info __user *arg)
+>>> +loop_set_status_old(struct loop_device *lo, blk_mode_t mode,
+>>> +		    struct block_device *bdev,
+>>> +		    const struct loop_info __user *arg)
+>>>    {
+>>>    	struct loop_info info;
+>>>    	struct loop_info64 info64;
+>>> @@ -1357,17 +1373,19 @@ loop_set_status_old(struct loop_device *lo, const struct loop_info __user *arg)
+>>>    	if (copy_from_user(&info, arg, sizeof (struct loop_info)))
+>>>    		return -EFAULT;
+>>>    	loop_info64_from_old(&info, &info64);
+>>> -	return loop_set_status(lo, &info64);
+>>> +	return loop_set_status(lo, mode, bdev, &info64);
+>>>    }
+>>>    static int
+>>> -loop_set_status64(struct loop_device *lo, const struct loop_info64 __user *arg)
+>>> +loop_set_status64(struct loop_device *lo, blk_mode_t mode,
+>>> +		  struct block_device *bdev,
+>>> +		  const struct loop_info64 __user *arg)
+>>>    {
+>>>    	struct loop_info64 info64;
+>>>    	if (copy_from_user(&info64, arg, sizeof (struct loop_info64)))
+>>>    		return -EFAULT;
+>>> -	return loop_set_status(lo, &info64);
+>>> +	return loop_set_status(lo, mode, bdev, &info64);
+>>>    }
+>>>    static int
+>>> @@ -1546,14 +1564,14 @@ static int lo_ioctl(struct block_device *bdev, blk_mode_t mode,
+>>>    	case LOOP_SET_STATUS:
+>>>    		err = -EPERM;
+>>>    		if ((mode & BLK_OPEN_WRITE) || capable(CAP_SYS_ADMIN))
+>>> -			err = loop_set_status_old(lo, argp);
+>>> +			err = loop_set_status_old(lo, mode, bdev, argp);
+>>>    		break;
+>>>    	case LOOP_GET_STATUS:
+>>>    		return loop_get_status_old(lo, argp);
+>>>    	case LOOP_SET_STATUS64:
+>>>    		err = -EPERM;
+>>>    		if ((mode & BLK_OPEN_WRITE) || capable(CAP_SYS_ADMIN))
+>>> -			err = loop_set_status64(lo, argp);
+>>> +			err = loop_set_status64(lo, mode, bdev, argp);
+>>>    		break;
+>>>    	case LOOP_GET_STATUS64:
+>>>    		return loop_get_status64(lo, argp);
+>>> @@ -1647,8 +1665,9 @@ loop_info64_to_compat(const struct loop_info64 *info64,
+>>>    }
+>>>    static int
+>>> -loop_set_status_compat(struct loop_device *lo,
+>>> -		       const struct compat_loop_info __user *arg)
+>>> +loop_set_status_compat(struct loop_device *lo, blk_mode_t mode,
+>>> +		    struct block_device *bdev,
+>>> +		    const struct compat_loop_info __user *arg)
+>>>    {
+>>>    	struct loop_info64 info64;
+>>>    	int ret;
+>>> @@ -1656,7 +1675,7 @@ loop_set_status_compat(struct loop_device *lo,
+>>>    	ret = loop_info64_from_compat(arg, &info64);
+>>>    	if (ret < 0)
+>>>    		return ret;
+>>> -	return loop_set_status(lo, &info64);
+>>> +	return loop_set_status(lo, mode, bdev, &info64);
+>>>    }
+>>>    static int
+>>> @@ -1682,7 +1701,7 @@ static int lo_compat_ioctl(struct block_device *bdev, blk_mode_t mode,
+>>>    	switch(cmd) {
+>>>    	case LOOP_SET_STATUS:
+>>> -		err = loop_set_status_compat(lo,
+>>> +		err = loop_set_status_compat(lo, mode, bdev,
+>>>    			     (const struct compat_loop_info __user *)arg);
+>>>    		break;
+>>>    	case LOOP_GET_STATUS:
+> 
+> 
 
