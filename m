@@ -1,110 +1,104 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B824B311C0C
-	for <linux-block@vger.kernel.org>; Tue,  2 Dec 2025 12:29:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D4C9315777
+	for <linux-block@vger.kernel.org>; Tue,  2 Dec 2025 13:30:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764678586; cv=none; b=bWWc2nTTspwiVdsY2dlZiLNZrou1lWYFvd6S7dtfX68TBgpYX1uLuH6+7oYrFH6uv6zOf/J1NJijYkpHGQ22YD8Tu9gnvvMZiZ2I9qZrdu6wZS5U8Jcge5Kev6WNTA4XWKIKAIET6tquc1RZK35znmiudiropqAWbFdaa+80ei8=
+	t=1764682203; cv=none; b=IqmsZb+HwK5TZ9/rhf2afy3R3hDnUB4xJY4OYjyWzUsBVBT0ykKYbvN8mIrVHHOkNp2XQtA5iKV7mIU9K4YMEZjInfVLgZyYWxSTEZn9ozh/SGEGGAKmGXIHTvO6Fj0DuADTPPYFbo3bgXCENGkbXlnO5hIBH8GvxxDG8yCzRKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764678586; c=relaxed/simple;
-	bh=TF8nWUFVuVBGUHo5tIDl1wDlfnyt6FWtSp2znY+xa/w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TynIRDOaRdgm+6aP4syUhwwAS1bnnAYJFRogByJiU5zbirVt/GOgS0sdHeRVQR225FJmPcda5irR8h7HGxb4KlcZxp7xgGQywDqVDFuQSP00b0onrof3InVmvkcbf+uEd5Xj/aRsiq1M/t3pvsrKe5vQjYYSw2wCxS86we0qW9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XZXFCCzY; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1764682203; c=relaxed/simple;
+	bh=TS4r+qjprUed/M1R7jCn4HKF//CDYXUigfSbXpKk5gM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=POIoka2A0p0BLjxCynzmAxC4ogTB73Cwg8Vp6I5r+DFRMkIoIRDo1xYnWP7a6gxdZqaoz5Cex2tFApXNVS3gvWX500T8yIRyS6Why2GSn6XYnHjjDHM8OKImXVi7B6kBYnp4oltoo/0N75wySBdxs+H7BUXjAQ4P4lHe26uMj1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n1BXZmM6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XZXFCCzY"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764678583;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=x8tjEPao00usBvup5VM9VHSHTHPBO1xju8audPJ9uA4=;
-	b=XZXFCCzYXQFIyVxY6NGoyLWcjmdkwNDVut0UPgksJ28k4UB3CIMjVQaVBXHaRx+qKs/DCM
-	9EvyLxxF8wR40Qz7e2i1vs0w5G0deykiWAHknc6YefODJcQHBhh8242TAVeAlXQuFIwXwP
-	SQBNla4sLD/7OY3VjAMIfdCPtNCLIaE=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-564-LVROzGl0MFmCECPB-GhdBw-1; Tue,
- 02 Dec 2025 07:29:38 -0500
-X-MC-Unique: LVROzGl0MFmCECPB-GhdBw-1
-X-Mimecast-MFC-AGG-ID: LVROzGl0MFmCECPB-GhdBw_1764678577
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 14927195605C;
-	Tue,  2 Dec 2025 12:29:37 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.20])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D0E793001E83;
-	Tue,  2 Dec 2025 12:29:29 +0000 (UTC)
-Date: Tue, 2 Dec 2025 20:29:14 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Cong Zhang <cong.zhang@oss.qualcomm.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Daniel Wagner <dwagner@suse.de>,
-	Hannes Reinecke <hare@suse.de>, linux-arm-msm@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	pavan.kondeti@oss.qualcomm.com
-Subject: Re: [PATCH] blk-mq: Abort suspend when wakeup events are pending
-Message-ID: <aS7bmjmqBEV2CTEy@fedora>
-References: <20251202-blkmq_skip_waiting-v1-1-f73d8a977ce0@oss.qualcomm.com>
- <aS6vYCg2Gks2BGHn@fedora>
- <d010fa56-3c7d-428a-810c-02ff8b1091a1@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n1BXZmM6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 376EEC19421
+	for <linux-block@vger.kernel.org>; Tue,  2 Dec 2025 13:30:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764682203;
+	bh=TS4r+qjprUed/M1R7jCn4HKF//CDYXUigfSbXpKk5gM=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=n1BXZmM6ln+hR0TRjcDyh7zuWHsHdtv4X36PwD0AWr4w9/RbYSsT1ivvrVFQpQsUf
+	 z7uvdXtjVhiuq8Hiyh16fxhAXh1Nj4e7D4fy6MdaMHMdBjvpb71MlZabLiN62pt5/q
+	 wrnqyTI5k+J6q4Hw2lNxbKHtJZ+y7qU2SorCdCe7RY0+wfuXmDFYiA7fF5QvU7bzSA
+	 fzsj3tjBEeDa6gN3610zh4uzpEOoNe2PZBT/3c0Sk41yGqqzyHPUncTy3kqUENbUnz
+	 0N7WEkb1IlJlTfOaZ2ff50IRMGMoKV0KjCif+stbg6p51qOcxs4YPMPQBogpovjgBC
+	 AwRVkp2SY21Sg==
+Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-7c75fd8067fso3211995a34.2
+        for <linux-block@vger.kernel.org>; Tue, 02 Dec 2025 05:30:03 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWC9f0mqKCCFAauJ5f7bScAm9BK7QMP3Js0EP2kv4tGcaVDShxDRKJwzAhfT6Wbtpy/b3j8EqWMtEdm1A==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/AGoatUtui40MFFpZtAJ1EAJvdxhXklKjXtq3mPTRCijRIcE0
+	yITZv+YlVe/+SxNZ019SAQDhRfro7/eMguTh//MZjb183gMvrSA8otQ79YaIAfMgoruVqXJD/cA
+	4FUcLZIwlB6xKcC+6DdNxhsG0rIZYNP4=
+X-Google-Smtp-Source: AGHT+IF3yHoW2CVTJCfN9++rhwnnOq/mOV/84E7HmhnO1NEI0oNASrxDzkiHFFKvEYxqO7tXjcuUCGmqOqQRdi445oA=
+X-Received: by 2002:a05:6830:440e:b0:7c6:e92f:41ca with SMTP id
+ 46e09a7af769-7c7c42a837fmr21459327a34.8.1764682202512; Tue, 02 Dec 2025
+ 05:30:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d010fa56-3c7d-428a-810c-02ff8b1091a1@oss.qualcomm.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+References: <20251126101636.205505-1-yang.yang@vivo.com> <82bcdf73-54c5-4220-86c0-540a5cb59bb7@vivo.com>
+ <CAJZ5v0hm=jfSyBXF0qMYnpATJf56JTxQ-+4JBy3YMjS0cMUMHg@mail.gmail.com>
+ <6216669.lOV4Wx5bFT@rafael.j.wysocki> <a461add5-95a0-4750-8d66-850cce2fe9fb@acm.org>
+ <CAJZ5v0g6ELEFDeTXaWxLAH7wO1eZ+to8xcXd9Nnv8dZYmhg7GQ@mail.gmail.com>
+In-Reply-To: <CAJZ5v0g6ELEFDeTXaWxLAH7wO1eZ+to8xcXd9Nnv8dZYmhg7GQ@mail.gmail.com>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Tue, 2 Dec 2025 14:29:51 +0100
+X-Gmail-Original-Message-ID: <CAJZ5v0iNGq-O9pbKaGGiqiY-xD7qndXkJ8oCdTxkuWE8CxLQ=w@mail.gmail.com>
+X-Gm-Features: AWmQ_bnFbEwf3mTy_EZR8Kp-QEspdSrFnxUC-99gc4UoW0TwogPKtkTVVVn0XEk
+Message-ID: <CAJZ5v0iNGq-O9pbKaGGiqiY-xD7qndXkJ8oCdTxkuWE8CxLQ=w@mail.gmail.com>
+Subject: Re: [PATCH v1] PM: sleep: Do not flag runtime PM workqueue as freezable
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: YangYang <yang.yang@vivo.com>, Jens Axboe <axboe@kernel.dk>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Danilo Krummrich <dakr@kernel.org>, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-pm@vger.kernel.org, Ulf Hansson <ulf.hansson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 02, 2025 at 05:48:21PM +0800, Cong Zhang wrote:
-> 
-> 
-> On 12/2/2025 5:20 PM, Ming Lei wrote:
-> > On Tue, Dec 02, 2025 at 11:56:12AM +0800, Cong Zhang wrote:
-> >> During system suspend, wakeup capable IRQs for block device can be
-> >> delayed, which can cause blk_mq_hctx_notify_offline() to hang
-> >> indefinitely while waiting for pending request to complete.
-> >> Skip the request waiting loop and abort suspend when wakeup events are
-> >> pending to prevent the deadlock.
-> >>
-> >> Fixes: bf0beec0607d ("blk-mq: drain I/O when all CPUs in a hctx are offline")
-> >> Signed-off-by: Cong Zhang <cong.zhang@oss.qualcomm.com>
-> >> ---
-> >> The issue was found during system suspend with a no_soft_reset
-> >> virtio-blk device. Here is the detailed analysis:
-> >> - When system suspend starts and no_soft_reset is enabled, virtio-blk
-> >>   does not call its suspend callback.
-> >> - Some requests are dispatched and queued. After sending the virtqueue
-> >>   notifier, the kernel waits for an IRQ to complete the request.
-> >> - The virtio-blk IRQ is wakeup-capable. When the IRQ is triggered, it
-> >>   remains pending because the device is in the suspend process.
-> > 
-> > Can you explain a bit for above point? Why does the IRQ remains pending
-> > and not get handled?
-> > 
-> 
-> The wakeup capable IRQ is not masked during suspend. When the IRQ is
-> triggered, the kernel does not call its IRQ handler, instead kernel only
-> marks the IRQ as a wakeup event in pm_system_irq_wakeup(). By checking
-> pm_wakeup_pending() suspend process can abort if a wakeup event is
-> detected. That means the actual IRQ handler is not called during the
-> checking of blk_mq_hctx_has_requests, which cause the issue.
+On Tue, Dec 2, 2025 at 12:53=E2=80=AFPM Rafael J. Wysocki <rafael@kernel.or=
+g> wrote:
+>
+> On Tue, Dec 2, 2025 at 2:06=E2=80=AFAM Bart Van Assche <bvanassche@acm.or=
+g> wrote:
+> >
+> > On 12/1/25 11:58 AM, Rafael J. Wysocki wrote:
+> > > So I've been testing the patch below for a few days and it will elimi=
+nate
+> > > the latter, but even after this patch runtime PM will be disabled in
+> > > device_suspend_late() and if the problem you are facing is still ther=
+e
+> > > after this patch, it will need to dealt with at the driver level.
+> > >
+> > > Generally speaking, driver involvement is needed to make runtime PM a=
+nd
+> > > system suspend/resume work together in the majority of cases.
+> >
+> > Thank you for having developed and shared this patch. Is the following
+> > quote from the Linux kernel documentation still correct with this patch
+> > applied or should an update for Documentation/power/runtime_pm.rst
+> > perhaps be included in this patch?
+> >
+> >   "The power management workqueue pm_wq in which bus types and device
+> > drivers can
+> >    put their PM-related work items.  It is strongly recommended that
+> > pm_wq be
+> >    used for queuing all work items related to runtime PM, because this
+> > allows
+> >    them to be synchronized with system-wide power transitions (suspend
+> > to RAM,
+> >    hibernation and resume from system sleep states).  pm_wq is declared=
+ in
+> >    include/linux/pm_runtime.h and defined in kernel/power/main.c."
+>
+> It doesn't say what the synchronization mechanism is in particular and
+> some synchronization is still provided after this patch, via the
+> pm_runtime_barrier() in device_suspend(), for example.
 
-Thanks for the explanation!
-
-Can you document it around `if (pm_wakeup_pending)`?
-
-Otherwise, this patch looks fine for me.
-
-
-Thanks,
-Ming
-
+Though there is another piece of documentation that needs updating to
+reflect the changes in this patch, so I'll send a v2 at one point.
