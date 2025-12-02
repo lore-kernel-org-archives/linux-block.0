@@ -1,277 +1,241 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97FE328CF6F
-	for <linux-block@vger.kernel.org>; Tue,  2 Dec 2025 10:07:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764670031; cv=none; b=TavdU83T5wSM0LwAvyl0mirmbpE6ExXQ0Jjxt3E4ScQsLAy8QNHALUx4eA1DuWsLLNc7eAiX8cTE6xrUgPOnZBwlqLUvTYpUSwTBQsrXzPyZAhMYeQk64xeuEF3Urb4Zek8MaOLdAqrkYnHm48+JjcrP8WqAybYSaFej3AW6Fjo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764670031; c=relaxed/simple;
-	bh=D9hK6+alUGiHPuK5szo5jhFNIugok8q4d/OF6vO/d5Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o5MpU4oqmx9BIqHXd4C0kD48h8jlvUmV98fMIrV3/wbG0CGAaYt8QKgBTLNWz5085SeWzJvewFRuAsNoTAqh8asM4ctFH45uZpOr2bEC9GEfbS6J6ppzp1yPkxTGUE0BrYa7+c/8+DAawoGoi0NVqhLklUisQ1JnQu4Gv4AHHm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=EMh+VjBE; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=Jf33t27h; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=EMh+VjBE; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=Jf33t27h; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48FDB30E831
+	for <linux-block@vger.kernel.org>; Tue,  2 Dec 2025 10:22:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.143.124
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764670959; cv=fail; b=aCQKpcuZsflsGWXB5Q5CuPgF+xiqwkBLrhKBhj7/t+rsQHUcefGbRS8lrDmpzl8MEDAZQ2J4aYrUkCKJA+Pc2HcJggAOKzwuIvUk6wMiOjUcx7uxmwaBEm8Y1pgKb/2ZHWQYjJDtbLxFCUHbKUnh/mL5iMbT4zxbaJCph3m/ZCk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764670959; c=relaxed/simple;
+	bh=aDnj/dr5INNND9Mqr6Nwgx5/NpxjRRRBdV3pxI5m7cY=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=CUnbYuolIJ8BLjpttTKzjk3AnSw4wsYF3R7y95RRgrwy3ERRo6xpCxhyhqik3wUIB8dIw5ucLFwvqp1TJXQkaMEfa9pCzOu0SoF0MrcpdySEL2jM8gVx338BhpIgt/TvAjWI3clvdS530PypCn7XpaO43JFvpR/R43WVM9nC1p4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=lZELUZFU; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=P55TeNUe; arc=fail smtp.client-ip=68.232.143.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="EMh+VjBE";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="Jf33t27h";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="EMh+VjBE";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="Jf33t27h"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id ADD0E5BD10;
-	Tue,  2 Dec 2025 10:07:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1764670026; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=r+O7GcXkNiD+d56/fCYcZxMq0g4Dvf48J9PDE9ibk08=;
-	b=EMh+VjBE3bA4wP9+OnDt5CS0gGxVGHLHbw7rW8siO3u+O9vH6r+GvARPLLc1CmCCF7NVFj
-	hP4Jr6lHN1RCioz2UupZWOQSLp1hm3zZqGMcKmORfPAgi1p1CtobhykI8fDxroTSNVYfru
-	Lzxdjp0foxf9er+BDyRezbUlNkZOR8U=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1764670026;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=r+O7GcXkNiD+d56/fCYcZxMq0g4Dvf48J9PDE9ibk08=;
-	b=Jf33t27h5LYvbqy5eJfyK6wuW9C7ruVwYq7e4HvUBkZ0imtzJMzJ2LfqCv5kQh00IzQfoe
-	tADoTmMuirvctsCA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1764670026; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=r+O7GcXkNiD+d56/fCYcZxMq0g4Dvf48J9PDE9ibk08=;
-	b=EMh+VjBE3bA4wP9+OnDt5CS0gGxVGHLHbw7rW8siO3u+O9vH6r+GvARPLLc1CmCCF7NVFj
-	hP4Jr6lHN1RCioz2UupZWOQSLp1hm3zZqGMcKmORfPAgi1p1CtobhykI8fDxroTSNVYfru
-	Lzxdjp0foxf9er+BDyRezbUlNkZOR8U=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1764670026;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=r+O7GcXkNiD+d56/fCYcZxMq0g4Dvf48J9PDE9ibk08=;
-	b=Jf33t27h5LYvbqy5eJfyK6wuW9C7ruVwYq7e4HvUBkZ0imtzJMzJ2LfqCv5kQh00IzQfoe
-	tADoTmMuirvctsCA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9E7BB3EA63;
-	Tue,  2 Dec 2025 10:07:06 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id ypKrJkq6LmlMBQAAD6G6ig
-	(envelope-from <jack@suse.cz>); Tue, 02 Dec 2025 10:07:06 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 3EABBA09DA; Tue,  2 Dec 2025 11:07:06 +0100 (CET)
-Date: Tue, 2 Dec 2025 11:07:06 +0100
-From: Jan Kara <jack@suse.cz>
-To: Raphael Pinsonneault-Thibeault <rpthibeault@gmail.com>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, jack@suse.cz, cascardo@igalia.com, 
-	linux-kernel-mentees@lists.linux.dev, skhan@linuxfoundation.org, 
-	syzbot+3ee481e21fd75e14c397@syzkaller.appspotmail.com
-Subject: Re: [PATCH] loop: don't change loop device under exclusive opener in
- loop_set_status
-Message-ID: <i5xuxe6prso72euxxo4jludbb5fb2juh2ofbgf32ts7aruyesc@na6btym6jats>
-References: <20251114144204.2402336-2-rpthibeault@gmail.com>
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="lZELUZFU";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="P55TeNUe"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1764670957; x=1796206957;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=aDnj/dr5INNND9Mqr6Nwgx5/NpxjRRRBdV3pxI5m7cY=;
+  b=lZELUZFUPJLlhTWcZeFNNNaOYSVL12q33PeSf5aUcElEJ3pAn3tNWmRV
+   lQ/ETLAFcbEtTEVKGGOw/0x3uVCrKt4Z/V/CLhy8j1+WBK/T4CxXAsWfF
+   tMt7W9aVbUqaPfW4M7Cyv+7BNbR99J6vDanZviI0kXLRU6vR0F4sYGkcV
+   /uEbkudHJuidAGE6Vg50kzCnBFibHUuAVryIfWjohaSANbDcYeJm/iyVs
+   BDYhnmmWsW8DI2Eb5NUnulPBZkUzYOzf2U8EHXuSXFCJGx5UFVKCC8xuy
+   8Mt/BzeCR42xD36PU4bxZ94v7bPsAdYGm/wav1DGpFWNprnIVS3q443Nf
+   A==;
+X-CSE-ConnectionGUID: kx5Gb6BIQr+eFVeGLP6NDw==
+X-CSE-MsgGUID: VKMlPkYXT5yFsTEgh5gUmg==
+X-IronPort-AV: E=Sophos;i="6.20,242,1758556800"; 
+   d="scan'208";a="137502996"
+Received: from mail-westus2azon11012064.outbound.protection.outlook.com (HELO MW6PR02CU001.outbound.protection.outlook.com) ([52.101.48.64])
+  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 02 Dec 2025 18:22:35 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=BVXHJXpe0MW4hJ3WNQndrWvBikcpVgjh+CZVrLFe8h7MopTkn7qrSAMlmhuW6/YbqlNAv0ZD6LKuBHARf5DcxRVi10ACWFmXkJ8Xbv/vs4NHjmw4VWAGVQ85io0lv0G+AFGyeUuEnyVawtv04vH77AZTJzMaplGQNTQbxumuBL6b9meYZjhgqoTOv+67TZQlEU+9V2vpywH+lhn+HdL9F+bFSc+W5whor4JSuIVcfTl8jJw4jGk7ZmlfygddT1CC2NqXClU1Q+tXhJoGZIBMVMQvx3Zb1QEDrTUWlzwI1Z4kYQZ21Zv0iab9yVLMV8RRtw2YR9tbkga+zeHFOig3Lw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8Hw5kk3GFJA6iXmzJ//6OYG12I4oQ0zdp92tfhAbj5I=;
+ b=BOswEyJ51/GoBVeP248Cc/NfBLTmZqd0pL+VCNXC2jkq/sijHTCwIKmgLqqJqnLZs9EhzGUHhZt+Bd5J+dQJT6veR3jORL5x8kyfmtVJYqHuReGZ14shMjvuAJNuxUA42gm1/KnphnYIRmJhKJKulINlVqA49SapQCUTe1x3kati4Td3TFN//JgdBYG2bpc96N7iQ46T2m+huBMj8oz4zQaWz20uJYrdt6WNCRt89R1TktCcapDk9Zg6v8xK+8mB05xSchcL5H+PGDsy8XNxjm/WimtpPBXMeEZ2adcUPhxHZO3xLXm7903jNPQ/RQT57uSHLXRPrU0+rez2DX9wuw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8Hw5kk3GFJA6iXmzJ//6OYG12I4oQ0zdp92tfhAbj5I=;
+ b=P55TeNUeq7OYuDlhIYsIVxTW7SXNczt9mr7t5z9+wN3wt5mLEzg399pcE/HD+1yLnQo0NvzxWH9EbKx2SKe+OOEZbpaBOi4BFU2BkBdXh5qRaB9mfgvPtQk4mPKCP2QjkEkZuWc1gyPMxguhHoorq8bF/rVteif4AEhm0lCD0hc=
+Received: from SN7PR04MB8532.namprd04.prod.outlook.com (2603:10b6:806:350::6)
+ by PH0PR04MB7351.namprd04.prod.outlook.com (2603:10b6:510:a::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9388.9; Tue, 2 Dec
+ 2025 10:22:33 +0000
+Received: from SN7PR04MB8532.namprd04.prod.outlook.com
+ ([fe80::4e14:94e7:a9b3:a4d4]) by SN7PR04MB8532.namprd04.prod.outlook.com
+ ([fe80::4e14:94e7:a9b3:a4d4%7]) with mapi id 15.20.9366.012; Tue, 2 Dec 2025
+ 10:22:33 +0000
+From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: Keith Busch <kbusch@kernel.org>
+CC: Keith Busch <kbusch@meta.com>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "chaitanyak@nvidia.com"
+	<chaitanyak@nvidia.com>
+Subject: Re: [PATCHv2 1/2] blktests: test direct io offsets
+Thread-Topic: [PATCHv2 1/2] blktests: test direct io offsets
+Thread-Index: AQHcWY5oK4YlIertQUeyjLZiqQGMbLUDSZMAgABYZICACpYPAA==
+Date: Tue, 2 Dec 2025 10:22:33 +0000
+Message-ID: <5wzzqmgu5mnq7ijpozsrhnn6g6hepmchvxz2wxm23obc36l7za@rjoew5uzuipj>
+References: <20251119195449.2922332-1-kbusch@meta.com>
+ <20251119195449.2922332-2-kbusch@meta.com>
+ <y744um3exsnhtf5u4iabfipzwkexcz5t3xqe4vvspa7z7hfuws@y5mbl2oszpuy>
+ <aSXci0u7c9Ppnjbd@kbusch-mbp>
+In-Reply-To: <aSXci0u7c9Ppnjbd@kbusch-mbp>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SN7PR04MB8532:EE_|PH0PR04MB7351:EE_
+x-ms-office365-filtering-correlation-id: 5981cce1-53c1-4f95-9c60-08de318cb4e7
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|376014|1800799024|19092799006|38070700021;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?xgN856i/4XlK5wEqfhjCvas0NtvsHfuEU8NqqM4RYXBZDmTvngBgxTmQ+OSq?=
+ =?us-ascii?Q?Hs1zwsXg75zxo9q9YtDYUgkIObZtJZFPNq21bWkrNx+Hnwg7s3lieFNl52rW?=
+ =?us-ascii?Q?I8fs2NPzO0h7iUh7R1qKzBYc2BPTtzCwOBs5787GBSem4B+ll4Go9iy+Pl1O?=
+ =?us-ascii?Q?K2bOl1zslkIH0zhKt9mC3rGm55bE8piLqflf9wR/izoQlCIxWH8iMCjGCMne?=
+ =?us-ascii?Q?pblyR8Z3j4/W2MmI6qgsUQm/UsCcJbdHlJCa7gvn60JHvqL/cDqIZAN230si?=
+ =?us-ascii?Q?rkywS47LL2UFbH1eH5zGpmXTvFv5sjuCumqIaxi121hKLneMvNFX6DzsHARa?=
+ =?us-ascii?Q?M5sQoPfKX6OV8WrAgicKZEr96dBi62BW2ytf6HH6Bdd1KnYJrsjT8cpXkiV3?=
+ =?us-ascii?Q?Y0PfumLta0AErmkDbDnMr8n3lUwcMx0BtlDgvsTEDsgoyVTFXCjolnGNNdv2?=
+ =?us-ascii?Q?+/usPazJ2fpeTIdnCAjfyP2Gc8Jzm+svN0SnYB70x62xKOuwzrV7Df/JI1Ql?=
+ =?us-ascii?Q?80F+zybwS8CvTvIX4CNfkbPJtvfbUfNKqHgS3f1fakUvxevgMepVV2u6x2lq?=
+ =?us-ascii?Q?oQmph1qNpwOIuo5I+9SgmgtBtYpO6Qx+ynhodjFrQwpjaaz18giV18xkN0ty?=
+ =?us-ascii?Q?WNuaSpiJCrKZtC9AU77WSiXXBVXeeYhQLDK37x4AaZSFUy81eP2NEizwU/hl?=
+ =?us-ascii?Q?QzLjEwU7xvbxuOwX/uiUTFpLgtva/QVX7CEAU/N7LE9r0V932Ojbez40J0TB?=
+ =?us-ascii?Q?4W1QSP+F5zraPLnKSIUuOfEaWL1o+XOIP9QK7AcAOudhw3g6nq1FThvguNNc?=
+ =?us-ascii?Q?z5Zzs1vyP9DZYLUtS9HTmfyFd0mnG93bm4by4qMvSxJo25v4v37wiwJGaQdu?=
+ =?us-ascii?Q?qKrzHe35HJYv4S23BLmwgph1hqoQe6MphVr/ec+Z8ps9FaePQrBUFORAJLQd?=
+ =?us-ascii?Q?0FImtXexranqPmFXJkQ0Xk+u4E0Ak9c3cppU7sVjQio9kt1K7oYlXVMLAcwI?=
+ =?us-ascii?Q?4aFXz/jv0+UsZTx56ARKLTGvcTRXaL/fGN12S7dnhnebeUbgBYAypUgarNen?=
+ =?us-ascii?Q?f1QAVLW3oSO++90PkSZmFwvNaUUpThq4V5fAZwbESmblcOgb4fhgndaKzn7N?=
+ =?us-ascii?Q?tcv8XmWVh8dcB7mLzzC7/RG3icshqxgcMJTWLF1hhkBE+ivRbVNdMkwZEibt?=
+ =?us-ascii?Q?4NkV04CPWloO6in7nQJNIWBsX3OmlzeZlfAM59oD55aHLQXh55esEhLCbP+J?=
+ =?us-ascii?Q?pHEpSDMbEJrhbDmZExTzpwSl+Er7zmk9BNdatsxy0Hc8mIsiQ/N4qUczg536?=
+ =?us-ascii?Q?lrvMS0VztuRQBMQ5lfc4/RJnPF4cixQVVgDXQUCGId9YgbgS7yzVClpzND9a?=
+ =?us-ascii?Q?HXcUc+BVenREnlM0FEy4eysh6mbipYON3TqEHywMPakRjIPcC1nQCXGAPjLy?=
+ =?us-ascii?Q?hP/0DOecckXlnPJYnbsWp/nesA3tKzvNOOTX+Cxu6nzBvGkTlFjt/6LIpzQ+?=
+ =?us-ascii?Q?Bn6R4bx/k2M1VtyrsIAhBdoT7guX5jl6FzO5?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR04MB8532.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(19092799006)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?l8yJ83rB8RFkZQ1DcN+xSLrQ07/rOIpUGnG7G+EO242bu64bNNcBTfUSeWHE?=
+ =?us-ascii?Q?8MKqPKNyj0Dae0hv1bHz8pD5EFbojtipVp0YLiKKqxp7bIIRG9s18/k/CmWz?=
+ =?us-ascii?Q?nECOijGm4LgoLcPR1hpttTmygGBof4QyNUE762SbMpIbj/Yr1bqUKCV6ajhQ?=
+ =?us-ascii?Q?pJHdL6z97Gq2nL9Gwf/zi3XsDMHidBMD7kTUFZB/mueXHI10aehsuzBFRNDX?=
+ =?us-ascii?Q?HJouot3iwKL8m6o5FHe25gHHQlyJHDknmzWjrYGEHRCZKq5yT8qP1HvcMomf?=
+ =?us-ascii?Q?Njt5j03yj1eGTWPl2VvVHkLoicY5rmINQ+dRuKRKCh74sr3UaUTMx54KX+u9?=
+ =?us-ascii?Q?P2i81gx9BGCo0ycaTQ50sE1eo5EA2e4jPXZiEQw4cYP5kAWasQAfhO0DZQ8k?=
+ =?us-ascii?Q?ncls6NwUlGRWtGXghFOxpy2ZaDHZxUaHDsMYO0IMC3Kl4EQAF43ZtStxEJDn?=
+ =?us-ascii?Q?rxPCtF1nmomrqE8hg3pye+d0Hu2Q4PSPs/ARB+nl7YXWD9X+Ly2c0iMkBlXx?=
+ =?us-ascii?Q?4VGwFyxN342106PSeh6j2UeYvNBSR+IBXRkPzYAxm25yIhTuaB4y5pwBnNpY?=
+ =?us-ascii?Q?K5K4QjBTEgSQY3USkTQJ/eIUthzg/pnQXMwZHNoy4WbrgsCTIY0XoMobW0ME?=
+ =?us-ascii?Q?nAlsdpuqIsCQ8SCtKpflaXGZDH9j9x811jYf9Z+pvUT/IXMFCzK14wU82Uzi?=
+ =?us-ascii?Q?OnPOmlsvAe01gsjl556+dtUdRsE7/LFb2hnSh+3kmp4ajfvOD1/58UICX3Ik?=
+ =?us-ascii?Q?74F/qBkUR22P0VYX6BLAcSkrVABAeO+1FqglwS5updJlHBjBcGcE/5dj2fvQ?=
+ =?us-ascii?Q?EqEPgfYcu7gOd6m4AF1NI+6qhYk9GNi+HUbFhWTnHcHj+FuOqv1ZCD/flhRH?=
+ =?us-ascii?Q?M80LfxWqZYH6atJEMMfB3i9DSPIEut8UqjnGfMnf0UVjlJsDkfhki2u+er7M?=
+ =?us-ascii?Q?D3lNExDnFw6TEZ42gxqS+i3eryFyb/5rOCECdUwmLOs11XAQzyUrGBPNy1Kv?=
+ =?us-ascii?Q?Jj5hiLSQhATfiH868Mi5X5OhGx89l3YWlj5QZwtoRMxQ4IrJTcZkpCxGsv76?=
+ =?us-ascii?Q?IdmfUYUCHTDzLKW3yqYaoHriI4Y3yB/XWdUFcDKzanv6Cxr0Tg07Kaq3G+u2?=
+ =?us-ascii?Q?saAirVGb2f3y8Ttp3uM8EKYf0HFaEm4BKAC2vn6+R19QeCL+bWHQQSjdTp/F?=
+ =?us-ascii?Q?yvoVfVCPONethNqrDpz8eE75/l3tw25ThgpmW3TPON2FXMkcGRvNbtj0lfRu?=
+ =?us-ascii?Q?Mm+22zsn8rMeKaGwUb8r5DLg8km3dGhiPhjvTnfgVX0RlyIxsAg0gqW7GN17?=
+ =?us-ascii?Q?/nuftg2GpcT4VgssddIVfPgsH26r75QQi52YZ3YmPFqcefWxgdF+Ei2I1qHE?=
+ =?us-ascii?Q?JId5eMfWn2CD0vMsBr78CW5FJp8gW84Ys20XXAG4N2xRkoBiZ4eeSEm0vD9r?=
+ =?us-ascii?Q?0Uud9jaPbCreUb/f1OopRPsiXeDAPepD0cKnts+NdQPIqlKzrDggFUYy9q6E?=
+ =?us-ascii?Q?T/U4s/3DwFkAcqOUDuGyF2xIQ7pyHUtXd1QWBMTy6d61onJGGeuZHChstq++?=
+ =?us-ascii?Q?AeWDbstjyJaOmVh3W7jzLokSsCXEVigp2vFHIfoDMxxa/cFm7xcg6GIQYCEN?=
+ =?us-ascii?Q?h27ROl5k2fCdg16ae/6S1VM=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <E7660DC4B577524997000B7C0B0503EB@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251114144204.2402336-2-rpthibeault@gmail.com>
-X-Spam-Flag: NO
-X-Spam-Score: -2.30
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_RCPT(0.00)[3ee481e21fd75e14c397];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_TLS_LAST(0.00)[];
-	URIBL_BLOCKED(0.00)[syzkaller.appspot.com:url,suse.com:email,imap1.dmz-prg2.suse.org:helo,suse.cz:email];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:email,syzkaller.appspot.com:url,imap1.dmz-prg2.suse.org:helo,appspotmail.com:email,suse.com:email]
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	e6V2+2Oa+juvBCa8Qo7753lPQ4pbIJVSkaJO8XvAEYiYOXaO/rTEx1E5uafOmCOxPHVNDe13rlM+cKztnmlec0ijG3lRAbgyrxMDGfRJiwcfSmnmO11//JUOveZ5MvtyveVYv8xQ/vJApXzSpYdOHhYKG8BQE+jJSciVA3udVikjcEFddS4M0bc+6W6yh8ikbVnIhdFJ3uy48yqJ+jsK0Qfih/ATOjr9USuCxwjjfzHR42vnqW/NihervQ0/rz2vtfEbQnHgvbf9nZbHikYqmCDZzIAaSVU0qKwYy9j9kOL2xCXQBK8zSBcx7MVECjyoCF4+OmTPqjlvcOlWUr0PcXLiu6eh9KYkl8trwrbIN4v2eccVm+ZjwkkQDriZy/1kgeWTtEPg+Yq3u+svGaTvqVfg40SiR/gbpwvhLfC0a4QJLni4GQ2yfaesHlfkQPp7BfEEdKw0YHHZot5xVp3nJyf6fx9hkph/G0JkICR6yrvLs7ECPTy3Gpt/quiIqOQCnNkJlX5k7Z4Dzq1KL5yTUNM/Ro+ia7/ndvpSBZcshGo5sB8uak56nWplz4DnDPHexfHPh6TW0y4CxEvqcXJJvy+GWnQTupeToR0flzsL8n6tyewpPauWDttyFRuPhdjg
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR04MB8532.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5981cce1-53c1-4f95-9c60-08de318cb4e7
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Dec 2025 10:22:33.3036
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 9CthUMfSbiFrWBj4ypnYJxqDulKnlQP9hHjhQ9VGHnz5vWhvqOTzYdAQHawdcCebIamDo1f/1xXgO2LbZ849Vn8Lbee7yagPfUV5VuNqewE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR04MB7351
 
-On Fri 14-11-25 09:42:05, Raphael Pinsonneault-Thibeault wrote:
-> loop_set_status() is allowed to change the loop device while there
-> are other openers of the device, even exclusive ones.
-> 
-> In this case, it causes a KASAN: slab-out-of-bounds Read in
-> ext4_search_dir(), since when looking for an entry in an inlined
-> directory, e_value_offs is changed underneath the filesystem by
-> loop_set_status().
-> 
-> Fix the problem by forbidding loop_set_status() from modifying the loop
-> device while there are exclusive openers of the device. This is similar
-> to the fix in loop_configure() by commit 33ec3e53e7b1 ("loop: Don't
-> change loop device under exclusive opener") alongside commit ecbe6bc0003b
-> ("block: use bd_prepare_to_claim directly in the loop driver").
-> 
-> Reported-by: syzbot+3ee481e21fd75e14c397@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=3ee481e21fd75e14c397
-> Tested-by: syzbot+3ee481e21fd75e14c397@syzkaller.appspotmail.com
-> Signed-off-by: Raphael Pinsonneault-Thibeault <rpthibeault@gmail.com>
+On Nov 25, 2025 / 09:42, Keith Busch wrote:
+> On Tue, Nov 25, 2025 at 11:26:31AM +0000, Shinichiro Kawasaki wrote:
+> > On Nov 19, 2025 / 11:54, Keith Busch wrote:
+> > > From: Keith Busch <kbusch@kernel.org>
+> > >=20
+> > > Tests various direct IO memory and length alignments against the
+> > > device's queue limits reported from sysfs.
+> > >=20
+> > > Signed-off-by: Keith Busch <kbusch@kernel.org>
+> > > ---
+> > [...]
+> > > diff --git a/src/dio-offsets.c b/src/dio-offsets.c
+> > > new file mode 100644
+> > > index 0000000..8e46091
+> > > --- /dev/null
+> > > +++ b/src/dio-offsets.c
+> > [...]
+> > > +static void init_buffers()
+> > > +{
+> > > +	unsigned long lb_mask =3D logical_block_size - 1;
+> > > +	int fd, ret;
+> > > +
+> > > +	buf_size =3D max_bytes * max_segments / 2;
+> > > +	if (buf_size < logical_block_size * max_segments)
+> > > +		err(EINVAL, "%s: logical block size is too big", __func__);
+> > > +
+> > > +	if (buf_size < logical_block_size * 1024 * 4)
+> > > +		buf_size =3D logical_block_size * 1024 * 4;
+> > > +
+> > > +	if (buf_size & lb_mask)
+> > > +		buf_size =3D (buf_size + lb_mask) & ~(lb_mask);
+> >=20
+> > I investigated why this new test case fails with my QEMU SATA device an=
+d noticed
+> > that the device has 128MiB size. The calculation above sets buf_size =
+=3D 192MiB.
+> > Then pwrite() in test_full_size_aligned() is called with 192MiB size an=
+d it was
+> > truncated to 128MiB. Then the following compare() check failed.
+> >=20
+> > Is it okay to cap the buf_size with the device size? If so, I suggest t=
+he change
+> > below. With this change, the test case passes with the device. If you a=
+re okay
+> > with the change, I can fold it in when I apply the patch.
+>=20
+> Yeah, totally fine. Much of the sizes were just made up as I went along,
+> but it should probably be programatically calculated based on the device
+> under test.
+>=20
+> > > +#!/bin/bash
+> >=20
+> > Is it okay to add any GPL SPDX license and your copyright here? It is n=
+ot ideal
+> > that I add your copyright and license, but if you specify them in this =
+thread, I
+> > will add the Link to this thread in the commit message and fold-in the =
+specifed
+> > SPDX license and your copyright.
+>=20
+> Yes, sorry, it should have been there. I added those to some files, but
+> missed this one.
 
-This patch looks mostly good to me. Just one comment:
-
-> -loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
-> +loop_set_status(struct loop_device *lo, blk_mode_t mode,
-> +		struct block_device *bdev, const struct loop_info64 *info)
->  {
->  	int err;
->  	bool partscan = false;
->  	bool size_changed = false;
->  	unsigned int memflags;
->  
-> +	/*
-> +	 * If we don't hold exclusive handle for the device, upgrade to it
-> +	 * here to avoid changing device under exclusive owner.
-> +	 */
-> +	if (!(mode & BLK_OPEN_EXCL)) {
-> +		err = bd_prepare_to_claim(bdev, loop_set_status, NULL);
-> +		if (err)
-> +			goto out_reread_partitions;
-> +	}
-> +
-
-So now any LOOP_SET_STATUS call will fail for device that is already
-exclusively open. There are some operations (like modifying the AUTOCLEAR
-flag or loop device name) that are safe even for a device with a mounted
-filesystem. I wouldn't probably bother with that now but I wanted to note
-that there may be valid uses of LOOP_SET_STATUS even for an exclusively
-open loop device and if there are users of that out there we might need to
-refine this a bit. Anyway for now feel free to add:
-
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-								Honza
-
-
->  	err = mutex_lock_killable(&lo->lo_mutex);
->  	if (err)
->  		return err;
-> @@ -1270,6 +1281,9 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
->  	}
->  out_unlock:
->  	mutex_unlock(&lo->lo_mutex);
-> +	if (!(mode & BLK_OPEN_EXCL))
-> +		bd_abort_claiming(bdev, loop_set_status);
-> +out_reread_partitions:
->  	if (partscan)
->  		loop_reread_partitions(lo);
->  
-> @@ -1349,7 +1363,9 @@ loop_info64_to_old(const struct loop_info64 *info64, struct loop_info *info)
->  }
->  
->  static int
-> -loop_set_status_old(struct loop_device *lo, const struct loop_info __user *arg)
-> +loop_set_status_old(struct loop_device *lo, blk_mode_t mode,
-> +		    struct block_device *bdev,
-> +		    const struct loop_info __user *arg)
->  {
->  	struct loop_info info;
->  	struct loop_info64 info64;
-> @@ -1357,17 +1373,19 @@ loop_set_status_old(struct loop_device *lo, const struct loop_info __user *arg)
->  	if (copy_from_user(&info, arg, sizeof (struct loop_info)))
->  		return -EFAULT;
->  	loop_info64_from_old(&info, &info64);
-> -	return loop_set_status(lo, &info64);
-> +	return loop_set_status(lo, mode, bdev, &info64);
->  }
->  
->  static int
-> -loop_set_status64(struct loop_device *lo, const struct loop_info64 __user *arg)
-> +loop_set_status64(struct loop_device *lo, blk_mode_t mode,
-> +		  struct block_device *bdev,
-> +		  const struct loop_info64 __user *arg)
->  {
->  	struct loop_info64 info64;
->  
->  	if (copy_from_user(&info64, arg, sizeof (struct loop_info64)))
->  		return -EFAULT;
-> -	return loop_set_status(lo, &info64);
-> +	return loop_set_status(lo, mode, bdev, &info64);
->  }
->  
->  static int
-> @@ -1546,14 +1564,14 @@ static int lo_ioctl(struct block_device *bdev, blk_mode_t mode,
->  	case LOOP_SET_STATUS:
->  		err = -EPERM;
->  		if ((mode & BLK_OPEN_WRITE) || capable(CAP_SYS_ADMIN))
-> -			err = loop_set_status_old(lo, argp);
-> +			err = loop_set_status_old(lo, mode, bdev, argp);
->  		break;
->  	case LOOP_GET_STATUS:
->  		return loop_get_status_old(lo, argp);
->  	case LOOP_SET_STATUS64:
->  		err = -EPERM;
->  		if ((mode & BLK_OPEN_WRITE) || capable(CAP_SYS_ADMIN))
-> -			err = loop_set_status64(lo, argp);
-> +			err = loop_set_status64(lo, mode, bdev, argp);
->  		break;
->  	case LOOP_GET_STATUS64:
->  		return loop_get_status64(lo, argp);
-> @@ -1647,8 +1665,9 @@ loop_info64_to_compat(const struct loop_info64 *info64,
->  }
->  
->  static int
-> -loop_set_status_compat(struct loop_device *lo,
-> -		       const struct compat_loop_info __user *arg)
-> +loop_set_status_compat(struct loop_device *lo, blk_mode_t mode,
-> +		    struct block_device *bdev,
-> +		    const struct compat_loop_info __user *arg)
->  {
->  	struct loop_info64 info64;
->  	int ret;
-> @@ -1656,7 +1675,7 @@ loop_set_status_compat(struct loop_device *lo,
->  	ret = loop_info64_from_compat(arg, &info64);
->  	if (ret < 0)
->  		return ret;
-> -	return loop_set_status(lo, &info64);
-> +	return loop_set_status(lo, mode, bdev, &info64);
->  }
->  
->  static int
-> @@ -1682,7 +1701,7 @@ static int lo_compat_ioctl(struct block_device *bdev, blk_mode_t mode,
->  
->  	switch(cmd) {
->  	case LOOP_SET_STATUS:
-> -		err = loop_set_status_compat(lo,
-> +		err = loop_set_status_compat(lo, mode, bdev,
->  			     (const struct compat_loop_info __user *)arg);
->  		break;
->  	case LOOP_GET_STATUS:
-> -- 
-> 2.43.0
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Thanks for the confirmations. I have applied the patches. I took the libert=
+y to
+make follow-up commits for minor clean-ups, hoping they are fine for you.=
