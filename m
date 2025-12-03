@@ -1,175 +1,67 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from outbound.st.icloud.com (p-east2-cluster5-host3-snip4-10.eps.apple.com [57.103.79.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4D0C2737F3
-	for <linux-block@vger.kernel.org>; Tue,  2 Dec 2025 21:15:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22F6C1C84BC
+	for <linux-block@vger.kernel.org>; Wed,  3 Dec 2025 01:16:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.79.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764710135; cv=none; b=e+QFQTQqvUib0tJq5mOK07APU9q2XsiBLAvmQUagsXLK0AFYeG/KxsDH80Ub7+cpXS8z3EHrt3ys9Es1GZWJ/E6D+SEULN2OzmDgaHrpkiYaQpqZ4af1Dy238qg9we51vRBlf3G0Yv/RtrAiSUXt4b9IsJOkEhMhumjCzXHin4o=
+	t=1764724563; cv=none; b=s4VaNHKbSdoTzbvwwECN05Fos0KEtbx+TqjGQxMS67NSBUdANYW/pksR6SYLhQ4cIHQS0oH1EeoIrb5My9Z7NUmvPmdIuCnSdarCkkyOUsg6XHGPjrvYZA3AH4f4hX7as3pVT4+hlW5RUOyt1Ef1d5tHz/N4S6YdRfd1w5wbJ48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764710135; c=relaxed/simple;
-	bh=hSJAG6LqPOB7r60cQCXbOcqgiTCj34wNVnz/GzFCNiQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=H5ziSCQd+7Y5j3uYIec24oQjpY/GuS3kGtOMfO2dIjHhHjyNT02s70FlQ8sHpJ53ev4SuysqweLGXadOTS0RJ5shEv0nh3KhnKESJWxGkV/qgTPLHsmPVSk3utZNfLARF9cJkPn0O3iduYKrv29PJoyWw3YiVu/4DKZ02XBeQSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Pd8ELGu2; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=aut8n+bn; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1764724563; c=relaxed/simple;
+	bh=5tWJUJG6SnYBuBZeZZq8cJ7glHx18gRawtEfzjWMsRI=;
+	h=Content-Type:From:Mime-Version:Date:Subject:Message-Id:Cc:To; b=ZCoHpZXDo2stdbKh4MjueUPe4xmOOlDuQTphemiAtN1k/zF9IJhZh61Tg7Wl/FDzWFsWIgg382/BI0DSDb+v0fpNc9hY2GSDqgO7c5hPoqmvHQpSPRXji6ziHysWP3oSwFNQDp3t+8xk2ftkwa1xIuqvjOw6MHwkhKiWfMnIKOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=JkH6seBa; arc=none smtp.client-ip=57.103.79.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pd8ELGu2";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="aut8n+bn"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764710132;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lpUIvQ+034yOcee5egVJA2ANWXFdHSKuoF2BHUlEcog=;
-	b=Pd8ELGu2ynTPDToZs9H/MRl62zczIJa7dFvmeYdntOKWzTln2Ilk5t2ePc3knvZ/0WrVGW
-	AyV7wQZU0HDOqdzxfjxLxpuQf/9vbeFUC0HkKKCwdYIoBpTYpslpwE89SBP7/ahM2lVDyE
-	WqZGSXD9zEbtaEEg5zOsAuQ9xc1QgY4=
-Received: from mail-yx1-f72.google.com (mail-yx1-f72.google.com
- [74.125.224.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-76-v2h_7ZPrP6uG576gE07rzQ-1; Tue, 02 Dec 2025 16:15:31 -0500
-X-MC-Unique: v2h_7ZPrP6uG576gE07rzQ-1
-X-Mimecast-MFC-AGG-ID: v2h_7ZPrP6uG576gE07rzQ_1764710131
-Received: by mail-yx1-f72.google.com with SMTP id 956f58d0204a3-63dcbe3d18dso2759579d50.3
-        for <linux-block@vger.kernel.org>; Tue, 02 Dec 2025 13:15:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1764710131; x=1765314931; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lpUIvQ+034yOcee5egVJA2ANWXFdHSKuoF2BHUlEcog=;
-        b=aut8n+bnAkRyrn8IoCi9FpWAfue/G996S/zSj6u8JeIDMhzHVfWegm/qFWgvXEapRy
-         C4hCn0BhQwhWIDVcmL7KtR22s2T1MK8Xv3+kWNRjDUAqJX/0EaTHrymQoNNlvvPoqak+
-         +P7zDfC9lARkCurSqyB2KBlpHX8pWDqMJmclsvBmcxQoGzNkxSSnCkCtakD3DuCmkbUn
-         vOnrwFEbC0ESsG98574XuJ8XOtlFyLr08YHJPksFO6NybXpRc/k5AEUgRpllsNpXNpj1
-         hdmGOTVCKiTCtPs0ESQlhuq5wIhRnsZhhQt64nHTxKA3WtUucqKuRXv2QqfSd+LXdg/u
-         KYzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764710131; x=1765314931;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=lpUIvQ+034yOcee5egVJA2ANWXFdHSKuoF2BHUlEcog=;
-        b=pE1BG926Zl5O5NHFqTiusI7GI1LAWmqR3yv+OCjpaxZsYRtEP5yCQ5tmEF0gcGDnDh
-         T5xeFgmOjP5HT7447uhJRe2fq/cMUZHJxDgVYcQBLEiJnL1kcS1RvAflOKP3LhXvHl+2
-         8vHQy2BU8AAudb8Xoc1SfFVmi9zD17JYv1CW2ExKOYpCAiSyzW954DHmPrhVSejlWY8M
-         P8gEplXEB9mcJ0N/TlSdKdigeBPyiFSObPV2WyTZIb+l67dmVN2C7YftAjhYYNE6rGD5
-         JtcCWg3eRZO1tOAnce0dEk3Oarizouuruo/1vgGtsVDpHS9HWEit48Vug+CvAVaqwmEN
-         sazg==
-X-Forwarded-Encrypted: i=1; AJvYcCVb3V4EeuYCkq4bSFWcVPyipOiW0WjiCpUbhNmtDRzJJRYnuXxVldTo0siQAFG2JM5iUCfnTXzVlxXtig==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyuVjA5ewTht1Q7BM/kCzYXoI6+VTKCurpEarA30vhhqA5o3crU
-	YDVQiZ4FyUdc35jyD37oGX6VDcwiRJy9ZZQj5bYqywnRNe+0E2Pu2Mt4t1HDA3yqKFQtN9/+9wU
-	geHJ60dZi10JkGZ9omob1NsMeHpecbAVQWEeyieHsbtXNF9bx1HGahv5U7bsIR0psP2rwb/kE3Z
-	tc/JGQPkA7XkLEZD/kacp6FoGLMX5vlEXWl6UWfbreW5zwXgHqyw==
-X-Gm-Gg: ASbGnctbTKRfly6Ma8C6vVQI2i1FxgQqP+rwzKt5JF+A1g5qxdzHNFJmuV2y5wrqojY
-	p7/fdz9/dMugXDde0uJJAE71SxOwkhuUFzNxltVICR1cfMHKaWJ548UEtqfOHFltB97JyaX5/fm
-	yWpMA7fd2HHSiKAcaWs9uEjem2vsaLcGZaAIrc+UkVEZW0ZhZwpHSCuzGpXPjX5Yfi
-X-Received: by 2002:a05:690e:1c19:b0:644:2e0f:4158 with SMTP id 956f58d0204a3-64436fb40bfmr157114d50.25.1764710130877;
-        Tue, 02 Dec 2025 13:15:30 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFy28A6VJcPbVSh5fL1qoiSxgrGoPRFkJcOjOIvadzD/gFVkIqW6MfGx4MoJat0TQW6yn8VkhbElC9CtOOg+3w=
-X-Received: by 2002:a05:690e:1c19:b0:644:2e0f:4158 with SMTP id
- 956f58d0204a3-64436fb40bfmr157092d50.25.1764710130510; Tue, 02 Dec 2025
- 13:15:30 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="JkH6seBa"
+Received: from outbound.st.icloud.com (unknown [127.0.0.2])
+	by p00-icloudmta-asmtp-us-east-1a-100-percent-15 (Postfix) with ESMTPS id 3818218001BD;
+	Wed,  3 Dec 2025 01:16:00 +0000 (UTC)
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com; s=1a1hai; bh=5tWJUJG6SnYBuBZeZZq8cJ7glHx18gRawtEfzjWMsRI=; h=Content-Type:From:Mime-Version:Date:Subject:Message-Id:To:x-icloud-hme; b=JkH6seBafZxmRVUdqc3Y+w/lZStjRgzre3CmqC5FHW7oU2xRXWeyjA7HZd6I0qd6Ewa+kwC6VjyH0rOEXwZ9HihSzTRDDCb0o0ox53/njNu3gwO1drb8Xk3WysoxUNfRzwIORbMru9cAUTAi/VuQHez/h4xji/rsLsuLC6YYzjtB7PqKCZIMcjkt2bvoHpkHhRkioVBXKgCy+Hv0kqs72RSk383rBZyckO1OOBZB6i5c9NBTaC2nf3IjxBQrO6on7dBfoV6hEmWaJrfLW9nHQZzw/5A4JVjE289m/OkoAPZEkP42w1b4Y5lm/ycr9cIew7iu8CPLRBvj4/vIR6WrPQ==
+Received: from smtpclient.apple (unknown [17.42.251.67])
+	by p00-icloudmta-asmtp-us-east-1a-100-percent-15 (Postfix) with ESMTPSA id 742FF18002A2;
+	Wed,  3 Dec 2025 01:15:59 +0000 (UTC)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: base64
+From: Abdullah Alamri <alboodalamri13@icloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20251201090442.2707362-1-zhangshida@kylinos.cn>
- <20251201090442.2707362-4-zhangshida@kylinos.cn> <CAHc6FU4o8Wv+6TQti4NZJRUQpGF9RWqiN9fO6j55p4xgysM_3g@mail.gmail.com>
- <aS17LOwklgbzNhJY@infradead.org> <CAHc6FU7k7vH5bJaM6Hk6rej77t4xijBESDeThdDe1yCOqogjtA@mail.gmail.com>
- <20251202054841.GC15524@lst.de>
-In-Reply-To: <20251202054841.GC15524@lst.de>
-From: Andreas Gruenbacher <agruenba@redhat.com>
-Date: Tue, 2 Dec 2025 22:15:19 +0100
-X-Gm-Features: AWmQ_blB9WwRmpWnf-ymSCKQHeFw0T9WISk1loqMRlFNqqfSUUqLagqIZTqBuzc
-Message-ID: <CAHc6FU6B6ip8e-+VXaAiPN+oqJTW2Tuoh0Vv-E96Baf2SSbt7w@mail.gmail.com>
-Subject: Re: [PATCH v4 3/3] block: prevent race condition on bi_status in __bio_chain_endio
-To: Christoph Hellwig <hch@lst.de>
-Cc: zhangshida <starzhangzsd@gmail.com>, Johannes.Thumshirn@wdc.com, ming.lei@redhat.com, 
-	hsiangkao@linux.alibaba.com, csander@purestorage.com, colyli@fnnas.com, 
-	linux-block@vger.kernel.org, linux-bcache@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, zhangshida@kylinos.cn
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0 (1.0)
+Date: Wed, 3 Dec 2025 04:15:46 +0300
+Subject: Re: Maintainers / Kernel Summit 2021 planning kick-off
+Message-Id: <FE7FB0D0-6CD8-4D1A-90B5-DE5487E378B3@icloud.com>
+Cc: James.Bottomley@hansenpartnership.com, cl@gentwo.de, david@redhat.com,
+ greg@kroah.com, jikos@kernel.org, ksummit@lists.linux.dev,
+ linux-api@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org, lkml@metux.net,
+ netdev@vger.kernel.org, tytso@mit.edu
+To: torvalds@linux-foundation.org
+X-Mailer: iPhone Mail (22G100)
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjAzMDAwNyBTYWx0ZWRfX0CBsIh7m/AhI
+ FhNy9OzFBRQ6lTdilYWlw4niVyHgZMB7p7sqUjhg7sYgMXFbCpcuXUkxXQP7bUNVhQT5A4mVhGL
+ aTDsXoMI94SJ3kbKufVDAQSNfd29YBw1+3dDV72x2UvvDWI7Ii+VvoDbwpi3/xF9TvBId2l4+Rc
+ 32t58DeXW9SSJ/VpkJSZ9cWKen7G0nJ/b0JoTZmImWFe+ITLPO5d3CRz/3zcAlEc2e6DJvOhwl5
+ MaIfAqOUxAn65qV7sN9zyYXhUDARNcdYdedPQSS8PGC5F7HKkc9GAaXBjcYDRN2IumQS9Dvdnb4
+ Enc7JD+t8mfq2shPGrT
+X-Proofpoint-GUID: es_qhwUAhhCMzL-D7iYTN7TCo308goSO
+X-Proofpoint-ORIG-GUID: es_qhwUAhhCMzL-D7iYTN7TCo308goSO
+X-Authority-Info: v=2.4 cv=J5ynLQnS c=1 sm=1 tr=0 ts=692f8f50 cx=c_apl:c_pps
+ a=YrL12D//S6tul8v/L+6tKg==:117 a=YrL12D//S6tul8v/L+6tKg==:17
+ a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=x7bEGLp0ZPQA:10 a=-KdL-90ardkA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=HyzYxv5D6p1NO4_E8OwA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-12-01_01,2025-11-27_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
+ adultscore=0 mlxlogscore=666 spamscore=0 bulkscore=0 malwarescore=0
+ phishscore=0 suspectscore=0 clxscore=1011 classifier=spam authscore=0
+ adjust=0 reason=mlx scancount=1 engine=8.22.0-2510240001
+ definitions=main-2512030007
+X-JNJ: AAAAAAABcBUMmKYEjepPQWO9oz0fKF0xJR4oEUJJJhwb5ynuO3cAT5TqKmi5gvBxr6b+Pia+G2rXYHxNYB3vI9ZpznaL1pqVzmaGJF23x5psdUMBBcAWXvbSTGq/VJOIzbNDcy8vftXrsq5zR0BUygpb0/6VN3p871Ph1ut7tgYelUYZQbdXnFdO25/QKR20Quhjct26nmPnzwIIBPH1w/WgvRsl8hpGxnZu2szp3h9brZwli5v/9Il4K80B/3AtevYJChN/GIgKGNHAwMG1f9THHkrw2Y4+BIofgjwEtO46FHwMqkKmnmOyzHlJZIH/3WTRw5IjXHu9sGIClaXy0ViVT7lKpO2qytvQ9oRNaL4nwfFlRyS4jJOXayBnbv4WOizprxRrfZRg38cFMgKpEpdv/Vy7radCRRgdmGUcT3/tK3QDaf/H3CretHZ8k6yzLy3nhe20SzqVdzLDgSbwGeNN1JXJEJyC6uy/mQZ8xUOHGyWCnotv0w+abcoO8WMeTx8UJcl7HVhlxcqVwqpFcQqOzf66fBBzfoljzvrzMMlGk40i0bfOaU+xJgUZUvcgZ39/Bdq/rgCqzDsX+cNteNdYu8GASjdLKYaWgQ7HGzuP4BT/BwYgsyCAKh5eBgaALzV4CWUO2Fq/fu41Ha/Un+hrqWh9uETR7L5XM7++iFVl/jqr6WBvVXgbpEgzltgVgUeUxkmmb4cnFuz3BIaFNao4OoW9Fvuyu+tw9rHyb8qCGWmrNuPdEr8jmBn1wDyexpk4Lbo7ENAdhWx9phpMfvTyBpIgW4WFtso=
 
-On Tue, Dec 2, 2025 at 6:48=E2=80=AFAM Christoph Hellwig <hch@lst.de> wrote=
-:
-> On Mon, Dec 01, 2025 at 02:07:07PM +0100, Andreas Gruenbacher wrote:
-> > On Mon, Dec 1, 2025 at 12:25=E2=80=AFPM Christoph Hellwig <hch@infradea=
-d.org> wrote:
-> > > On Mon, Dec 01, 2025 at 11:22:32AM +0100, Andreas Gruenbacher wrote:
-> > > > > -       if (bio->bi_status && !parent->bi_status)
-> > > > > -               parent->bi_status =3D bio->bi_status;
-> > > > > +       if (bio->bi_status)
-> > > > > +               cmpxchg(&parent->bi_status, 0, bio->bi_status);
-> > > >
-> > > > Hmm. I don't think cmpxchg() actually is of any value here: for all
-> > > > the chained bios, bi_status is initialized to 0, and it is only set
-> > > > again (to a non-0 value) when a failure occurs. When there are
-> > > > multiple failures, we only need to make sure that one of those
-> > > > failures is eventually reported, but for that, a simple assignment =
-is
-> > > > enough here.
-> > >
-> > > A simple assignment doesn't guarantee atomicy.
-> >
-> > Well, we've already discussed that bi_status is a single byte and so
-> > tearing won't be an issue. Otherwise, WRITE_ONCE() would still be
-> > enough here.
->
-> No.  At least older alpha can tear byte updates as they need a
-> read-modify-write cycle.
-
-I know this used to be a thing in the past, but to see that none of
-that is relevant anymore today, have a look at where [*] quotes the
-C11 standard:
-
-        memory location
-                either an object of scalar type, or a maximal sequence
-                of adjacent bit-fields all having nonzero width
-
-                NOTE 1: Two threads of execution can update and access
-                separate memory locations without interfering with
-                each other.
-
-                NOTE 2: A bit-field and an adjacent non-bit-field member
-                are in separate memory locations. The same applies
-                to two bit-fields, if one is declared inside a nested
-                structure declaration and the other is not, or if the two
-                are separated by a zero-length bit-field declaration,
-                or if they are separated by a non-bit-field member
-                declaration. It is not safe to concurrently update two
-                bit-fields in the same structure if all members declared
-                between them are also bit-fields, no matter what the
-                sizes of those intervening bit-fields happen to be.
-
-[*] Documentation/memory-barriers.txt
-
-> But even on normal x86 the check and the update would be racy.
-
-There is no check and update (RMW), though. Quoting what I wrote
-earlier in this thread:
-
-On Mon, Dec 1, 2025 at 11:22=E2=80=AFAM Andreas Gruenbacher <agruenba@redha=
-t.com> wrote:
-> Hmm. I don't think cmpxchg() actually is of any value here: for all
-> the chained bios, bi_status is initialized to 0, and it is only set
-> again (to a non-0 value) when a failure occurs. When there are
-> multiple failures, we only need to make sure that one of those
-> failures is eventually reported, but for that, a simple assignment is
-> enough here. The cmpxchg() won't guarantee that a specific error value
-> will survive; it all still depends on the timing. The cmpxchg() only
-> makes it look like something special is happening here with respect to
-> ordering.
-
-So with or without the cmpxchg(), if there are multiple errors, we
-won't know which bi_status code will survive, but we do know that we
-will end up with one of those error codes.
-
-Andreas
-
+DQrigKvYo9mP2LHYs9mE2Kog2YXZhiDYp9mE2YAgaVBob25l4oCs
