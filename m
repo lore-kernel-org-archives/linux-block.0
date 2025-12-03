@@ -1,187 +1,237 @@
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A61481BC2A
-	for <linux-block@vger.kernel.org>; Wed,  3 Dec 2025 01:51:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A86722CBC0
+	for <linux-block@vger.kernel.org>; Wed,  3 Dec 2025 02:21:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764726705; cv=none; b=UkkLpBMbNWoZRgnUNqws183FLdj6IKh4JcQFLdC8QvE/+TS7LEjsYbc7YDGaaKQKWAAaxO1audF5srIQXT+WJw+I0MlUeyGHIpU9q5V6jqAfJ+ebVdJD1s6jOAYPz0TWmO7ORCz0xr4JWe+2n55sbNBHX8Zz8WdpdBhccJIIQK8=
+	t=1764728520; cv=none; b=Q9of0QPjnx8VhVkZXyXdIZ4cF8HyAS1C4PHZge7VrtIMqLRjljxoQR4NG21T8xlPa6IiU5eXxZoBkKbp3KmcNu8M8QYA3nMva1s1vlCcXeAkUgORjzbpidkJEuUoM+t334x7CQTYc6bXe7iSoJCG7Fb/M+rbEBy/LDwKL0vJLV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764726705; c=relaxed/simple;
-	bh=9dM7t/x9Pd+ZbM9rUoMJiiZhZigihD98RMT1wtBkj2s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OSySkR5Ls+bD4MPV1JvtnEOL1PciWqCZZWf3+/D+WOArp4Mcy8RSW7DxCdS4fx27j7S8s/rvr/F6E/m9A5rqaLfNw9eqCGS+/kvHu7DK4N5NI39Kmanl/EQE+DlDMvH17+pTqTR2LUOruYyk9UBjvOcUp24Mwb4CRDyWVK/xmng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IBIlYA6l; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1764728520; c=relaxed/simple;
+	bh=lX7krLrYeW62fvJTJqXel1TOGcfzbtPALwT8ddSg9Ws=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VEoyBwSNQouP9OTAeQCR4oHXeyujzK9z3f06j9pIj1zwGTlsg8PztWSQiOJzQh0C71Hql3jgll65pzUeac3fxoQ8+cryit15/PLDzN6ellPqfJa0BHRvWEcFukbej3A6N7AGLcBx7uMj6GUEPx06LSAiKD21F6rjTW6KStKB2AM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D9WWtAnC; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IBIlYA6l"
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4ed82e82f0fso48737781cf.1
-        for <linux-block@vger.kernel.org>; Tue, 02 Dec 2025 17:51:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764726702; x=1765331502; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=29HfRhtowelPyFq0bm7t4v7lXxLMZQ3G+lwt5TZkuog=;
-        b=IBIlYA6lg78c1qPhUH6r/N7sB3CaIC3qyvfIGJR1udvgTFDTBtfaCnw80TVplJPQCp
-         lUFmX4yn6ZAMgdblZIelDmm8WNBH0YvkbA2MFQTAt5EiFc977l3/gm/kh154MxI/wJbX
-         0ZRBbw8HuWo1o8y4D/eeU4yvXEnqxG+T0tziI1SOkaVhai4xhEH32Woq/3fPnvYSU6R4
-         sAnT/PySdjYCHUEMy8FPudyYVma4xR3SVqfqJbNS9E69JzleiI4T2iOVErkAbahf6H7n
-         L8NeJE8l3epIFWKlORm9soh+KfE+9+cOmRLWkKcfqqJzgC7UiJNmsG6oJ2UO1++ldxgB
-         CNBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764726702; x=1765331502;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=29HfRhtowelPyFq0bm7t4v7lXxLMZQ3G+lwt5TZkuog=;
-        b=sAnbmPkgT18dp+a9Xez1B2wyia/ILBnnjg4QNkH8Ap8XyM2H1G/GDV9NkJVeirG+Zd
-         B/Q/ufHHuNR0849EKJvwCqbQW8rGhss+z1rrb7gPY6FV80kM/Az1mB5Jd4WQSIbrLWcp
-         0x+8i1RJgFBISFqCLHrrSYrumMwhbhFW/taHCD/rjgIy3H7vzJQKyNTLpXOODlYcWIiM
-         TKefG1b4kbz/UKF4juYyVyUOO1JH9JTsCPxEkTmnDou48UNYQEC7gUytqQqPxM5sgw7R
-         AVGK8OujPE1UJU/iz94HXaNbKjIb9sDVujuVgNBytiAb5pSDnYyocBXALvMWhCAHCZ8f
-         LYFw==
-X-Forwarded-Encrypted: i=1; AJvYcCUtX5iSfVSQtcQ18MobwGvY3gDf89ziE4itLLMgY+AXHEnKSy69vwiPTuF+5xnPKhhZoIrd77QbqVxXqg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3bE0AYiMVZKF/PSM5Y/AnCzjjB0IF0k57b0GIN1CVQwLnpdG8
-	HHxX7hS9KUObZWO+j0Rx56CMz9yzwpUyvEEgSjL9oz6NzsBws13nHcA6AjvjNWXOMYt9vbYlzJ4
-	eWBh0aA+duKIxYHhtvhEcXNlknPmewgk=
-X-Gm-Gg: ASbGncsujQ204oQVW5hkqHbWziqKGkaqhjiEdKSPMIsYAjKzGo7F9/1E4XUr3ACx4C0
-	SCFYB87l2jqaqLn78o2UdxnktWQM7Y/VB4ARGUMJf+s9tzX82aSSDc8bi76TQvaEcTMdMW6zhyv
-	rCoytpvYmWCa+wHU0QQLQCKts7cN/m2rQd2XfyB8jMpUnJB7pDmpsb17T7BifV/68WOo1muj9au
-	SmziBWJNe3RlTQ8kBPHg+67DBAaAcj6bX19cb/mwzTuPOekks4TXFZ5IQLvJs5WAPg/UXA=
-X-Google-Smtp-Source: AGHT+IG7vBpednoopH1DKxZOoSo8zpv84EdVF+k41o0sX1zR/8W3FEVNG8uFv3gmerv3xFbLF+STWsZgh/6ESAaBVno=
-X-Received: by 2002:a05:622a:30d:b0:4eb:a0aa:28e with SMTP id
- d75a77b69052e-4f0176566f0mr9901431cf.64.1764726702214; Tue, 02 Dec 2025
- 17:51:42 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D9WWtAnC"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764728516;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GfB2uZsQEd1yMEgRnUcfGl3vHtAWfdtHqQECJ71veEs=;
+	b=D9WWtAnCz+at0bF486NmxHnVWZtjdrtpljdesn4rTFvvK+/TsweKJ/cMyIOFcNW+YNxDOR
+	0XqooX3aoQuoxq8Eqs9n1Y83FX5BQrNGokjIg67wDk0sQPvcEKOECJdME8VEpfiN7PvScL
+	/a9bqlvwm+xlkxfbkmFtHDsplnI18Ao=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-74-2eyl1k3JPyWu12P2D83i8Q-1; Tue,
+ 02 Dec 2025 21:21:51 -0500
+X-MC-Unique: 2eyl1k3JPyWu12P2D83i8Q-1
+X-Mimecast-MFC-AGG-ID: 2eyl1k3JPyWu12P2D83i8Q_1764728510
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B58BF180048E;
+	Wed,  3 Dec 2025 02:21:49 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.20])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B3A6C1800947;
+	Wed,  3 Dec 2025 02:21:44 +0000 (UTC)
+Date: Wed, 3 Dec 2025 10:21:39 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Uday Shankar <ushankar@purestorage.com>,
+	Stefani Seibold <stefani@seibold.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V4 16/27] ublk: add new feature UBLK_F_BATCH_IO
+Message-ID: <aS-es2I_f6d_H_C9@fedora>
+References: <20251121015851.3672073-1-ming.lei@redhat.com>
+ <20251121015851.3672073-17-ming.lei@redhat.com>
+ <CADUfDZoXKATH_nQ0TEqj6BrN+e-Shkd11CUJaJJ_FKbrTrv=GQ@mail.gmail.com>
+ <aS5EgbJQFa2fm6GR@fedora>
+ <CADUfDZqRQ3WmwswwfQf_vhP84OVmwU3LGMF8Rb8mShQSjnZAJQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251201090442.2707362-1-zhangshida@kylinos.cn>
- <20251201090442.2707362-4-zhangshida@kylinos.cn> <CAHc6FU4o8Wv+6TQti4NZJRUQpGF9RWqiN9fO6j55p4xgysM_3g@mail.gmail.com>
- <aS17LOwklgbzNhJY@infradead.org> <CAHc6FU7k7vH5bJaM6Hk6rej77t4xijBESDeThdDe1yCOqogjtA@mail.gmail.com>
- <20251202054841.GC15524@lst.de> <CAHc6FU6B6ip8e-+VXaAiPN+oqJTW2Tuoh0Vv-E96Baf2SSbt7w@mail.gmail.com>
-In-Reply-To: <CAHc6FU6B6ip8e-+VXaAiPN+oqJTW2Tuoh0Vv-E96Baf2SSbt7w@mail.gmail.com>
-From: Stephen Zhang <starzhangzsd@gmail.com>
-Date: Wed, 3 Dec 2025 09:51:06 +0800
-X-Gm-Features: AWmQ_bk3Wx_6JA9rlYJqME-wTYEbXZg-BK2IuYtOy-m-WqmSKhAL-wpGdfR7pkk
-Message-ID: <CANubcdWHor3Jx+5yeY84nx0yFe3JosqVG4wGdVkpMfbQLVAWpQ@mail.gmail.com>
-Subject: Re: [PATCH v4 3/3] block: prevent race condition on bi_status in __bio_chain_endio
-To: Andreas Gruenbacher <agruenba@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>, Johannes.Thumshirn@wdc.com, ming.lei@redhat.com, 
-	hsiangkao@linux.alibaba.com, csander@purestorage.com, colyli@fnnas.com, 
-	linux-block@vger.kernel.org, linux-bcache@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, zhangshida@kylinos.cn
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADUfDZqRQ3WmwswwfQf_vhP84OVmwU3LGMF8Rb8mShQSjnZAJQ@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Andreas Gruenbacher <agruenba@redhat.com> =E4=BA=8E2025=E5=B9=B412=E6=9C=88=
-3=E6=97=A5=E5=91=A8=E4=B8=89 05:15=E5=86=99=E9=81=93=EF=BC=9A
->
-> On Tue, Dec 2, 2025 at 6:48=E2=80=AFAM Christoph Hellwig <hch@lst.de> wro=
-te:
-> > On Mon, Dec 01, 2025 at 02:07:07PM +0100, Andreas Gruenbacher wrote:
-> > > On Mon, Dec 1, 2025 at 12:25=E2=80=AFPM Christoph Hellwig <hch@infrad=
-ead.org> wrote:
-> > > > On Mon, Dec 01, 2025 at 11:22:32AM +0100, Andreas Gruenbacher wrote=
-:
-> > > > > > -       if (bio->bi_status && !parent->bi_status)
-> > > > > > -               parent->bi_status =3D bio->bi_status;
-> > > > > > +       if (bio->bi_status)
-> > > > > > +               cmpxchg(&parent->bi_status, 0, bio->bi_status);
-> > > > >
-> > > > > Hmm. I don't think cmpxchg() actually is of any value here: for a=
-ll
-> > > > > the chained bios, bi_status is initialized to 0, and it is only s=
-et
-> > > > > again (to a non-0 value) when a failure occurs. When there are
-> > > > > multiple failures, we only need to make sure that one of those
-> > > > > failures is eventually reported, but for that, a simple assignmen=
-t is
-> > > > > enough here.
-> > > >
-> > > > A simple assignment doesn't guarantee atomicy.
-> > >
-> > > Well, we've already discussed that bi_status is a single byte and so
-> > > tearing won't be an issue. Otherwise, WRITE_ONCE() would still be
-> > > enough here.
+On Tue, Dec 02, 2025 at 08:05:17AM -0800, Caleb Sander Mateos wrote:
+> On Mon, Dec 1, 2025 at 5:44 PM Ming Lei <ming.lei@redhat.com> wrote:
 > >
-> > No.  At least older alpha can tear byte updates as they need a
-> > read-modify-write cycle.
->
-> I know this used to be a thing in the past, but to see that none of
-> that is relevant anymore today, have a look at where [*] quotes the
-> C11 standard:
->
->         memory location
->                 either an object of scalar type, or a maximal sequence
->                 of adjacent bit-fields all having nonzero width
->
->                 NOTE 1: Two threads of execution can update and access
->                 separate memory locations without interfering with
->                 each other.
->
->                 NOTE 2: A bit-field and an adjacent non-bit-field member
->                 are in separate memory locations. The same applies
->                 to two bit-fields, if one is declared inside a nested
->                 structure declaration and the other is not, or if the two
->                 are separated by a zero-length bit-field declaration,
->                 or if they are separated by a non-bit-field member
->                 declaration. It is not safe to concurrently update two
->                 bit-fields in the same structure if all members declared
->                 between them are also bit-fields, no matter what the
->                 sizes of those intervening bit-fields happen to be.
->
-> [*] Documentation/memory-barriers.txt
->
-> > But even on normal x86 the check and the update would be racy.
->
-> There is no check and update (RMW), though. Quoting what I wrote
-> earlier in this thread:
->
-> On Mon, Dec 1, 2025 at 11:22=E2=80=AFAM Andreas Gruenbacher <agruenba@red=
-hat.com> wrote:
-> > Hmm. I don't think cmpxchg() actually is of any value here: for all
-> > the chained bios, bi_status is initialized to 0, and it is only set
-> > again (to a non-0 value) when a failure occurs. When there are
-> > multiple failures, we only need to make sure that one of those
-> > failures is eventually reported, but for that, a simple assignment is
-> > enough here. The cmpxchg() won't guarantee that a specific error value
-> > will survive; it all still depends on the timing. The cmpxchg() only
-> > makes it look like something special is happening here with respect to
-> > ordering.
->
-> So with or without the cmpxchg(), if there are multiple errors, we
-> won't know which bi_status code will survive, but we do know that we
-> will end up with one of those error codes.
->
+> > On Mon, Dec 01, 2025 at 01:16:04PM -0800, Caleb Sander Mateos wrote:
+> > > On Thu, Nov 20, 2025 at 6:00 PM Ming Lei <ming.lei@redhat.com> wrote:
+> > > >
+> > > > Add new feature UBLK_F_BATCH_IO which replaces the following two
+> > > > per-io commands:
+> > > >
+> > > >         - UBLK_U_IO_FETCH_REQ
+> > > >
+> > > >         - UBLK_U_IO_COMMIT_AND_FETCH_REQ
+> > > >
+> > > > with three per-queue batch io uring_cmd:
+> > > >
+> > > >         - UBLK_U_IO_PREP_IO_CMDS
+> > > >
+> > > >         - UBLK_U_IO_COMMIT_IO_CMDS
+> > > >
+> > > >         - UBLK_U_IO_FETCH_IO_CMDS
+> > > >
+> > > > Then ublk can deliver batch io commands to ublk server in single
+> > > > multishort uring_cmd, also allows to prepare & commit multiple
+> > > > commands in batch style via single uring_cmd, communication cost is
+> > > > reduced a lot.
+> > > >
+> > > > This feature also doesn't limit task context any more for all supported
+> > > > commands, so any allowed uring_cmd can be issued in any task context.
+> > > > ublk server implementation becomes much easier.
+> > > >
+> > > > Meantime load balance becomes much easier to support with this feature.
+> > > > The command `UBLK_U_IO_FETCH_IO_CMDS` can be issued from multiple task
+> > > > contexts, so each task can adjust this command's buffer length or number
+> > > > of inflight commands for controlling how much load is handled by current
+> > > > task.
+> > > >
+> > > > Later, priority parameter will be added to command `UBLK_U_IO_FETCH_IO_CMDS`
+> > > > for improving load balance support.
+> > > >
+> > > > UBLK_U_IO_GET_DATA isn't supported in batch io yet, but it may be
+> > >
+> > > UBLK_U_IO_NEED_GET_DATA?
+> >
+> > Yeah.
+> >
+> > >
+> > > > enabled in future via its batch pair.
+> > > >
+> > > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > > > ---
+> > > >  drivers/block/ublk_drv.c      | 58 ++++++++++++++++++++++++++++++++---
+> > > >  include/uapi/linux/ublk_cmd.h | 16 ++++++++++
+> > > >  2 files changed, 69 insertions(+), 5 deletions(-)
+> > > >
+> > > > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > > > index 849199771f86..90cd1863bc83 100644
+> > > > --- a/drivers/block/ublk_drv.c
+> > > > +++ b/drivers/block/ublk_drv.c
+> > > > @@ -74,7 +74,8 @@
+> > > >                 | UBLK_F_AUTO_BUF_REG \
+> > > >                 | UBLK_F_QUIESCE \
+> > > >                 | UBLK_F_PER_IO_DAEMON \
+> > > > -               | UBLK_F_BUF_REG_OFF_DAEMON)
+> > > > +               | UBLK_F_BUF_REG_OFF_DAEMON \
+> > > > +               | UBLK_F_BATCH_IO)
+> > > >
+> > > >  #define UBLK_F_ALL_RECOVERY_FLAGS (UBLK_F_USER_RECOVERY \
+> > > >                 | UBLK_F_USER_RECOVERY_REISSUE \
+> > > > @@ -320,12 +321,12 @@ static void ublk_batch_dispatch(struct ublk_queue *ubq,
+> > > >
+> > > >  static inline bool ublk_dev_support_batch_io(const struct ublk_device *ub)
+> > > >  {
+> > > > -       return false;
+> > > > +       return ub->dev_info.flags & UBLK_F_BATCH_IO;
+> > > >  }
+> > > >
+> > > >  static inline bool ublk_support_batch_io(const struct ublk_queue *ubq)
+> > > >  {
+> > > > -       return false;
+> > > > +       return ubq->flags & UBLK_F_BATCH_IO;
+> > > >  }
+> > > >
+> > > >  static inline void ublk_io_lock(struct ublk_io *io)
+> > > > @@ -3450,6 +3451,41 @@ static int ublk_validate_batch_fetch_cmd(struct ublk_batch_io_data *data,
+> > > >         return 0;
+> > > >  }
+> > > >
+> > > > +static int ublk_handle_non_batch_cmd(struct io_uring_cmd *cmd,
+> > > > +                                    unsigned int issue_flags)
+> > > > +{
+> > > > +       const struct ublksrv_io_cmd *ub_cmd = io_uring_sqe_cmd(cmd->sqe);
+> > > > +       struct ublk_device *ub = cmd->file->private_data;
+> > > > +       unsigned tag = READ_ONCE(ub_cmd->tag);
+> > > > +       unsigned q_id = READ_ONCE(ub_cmd->q_id);
+> > > > +       unsigned index = READ_ONCE(ub_cmd->addr);
+> > > > +       struct ublk_queue *ubq;
+> > > > +       struct ublk_io *io;
+> > > > +       int ret = -EINVAL;
+> > >
+> > > I think it would be clearer to just return -EINVAL instead of adding
+> > > this variable, but up to you
+> > >
+> > > > +
+> > > > +       if (!ub)
+> > > > +               return ret;
+> > >
+> > > How is this case possible?
+> >
+> > Will remove the check.
+> >
+> > >
+> > > > +
+> > > > +       if (q_id >= ub->dev_info.nr_hw_queues)
+> > > > +               return ret;
+> > > > +
+> > > > +       ubq = ublk_get_queue(ub, q_id);
+> > > > +       if (tag >= ubq->q_depth)
+> > >
+> > > Can avoid the likely cache miss here by using ub->dev_info.queue_depth
+> > > instead, analogous to ublk_ch_uring_cmd_local()
+> >
+> > OK.
+> >
+> > >
+> > > > +               return ret;
+> > > > +
+> > > > +       io = &ubq->ios[tag];
+> > > > +
+> > > > +       switch (cmd->cmd_op) {
+> > > > +       case UBLK_U_IO_REGISTER_IO_BUF:
+> > > > +               return ublk_register_io_buf(cmd, ub, q_id, tag, io, index,
+> > > > +                               issue_flags);
+> > > > +       case UBLK_U_IO_UNREGISTER_IO_BUF:
+> > > > +               return ublk_unregister_io_buf(cmd, ub, index, issue_flags);
+> > > > +       default:
+> > > > +               return -EOPNOTSUPP;
+> > > > +       }
+> > > > +}
+> > > > +
+> > > >  static int ublk_ch_batch_io_uring_cmd(struct io_uring_cmd *cmd,
+> > > >                                        unsigned int issue_flags)
+> > > >  {
+> > > > @@ -3497,7 +3533,8 @@ static int ublk_ch_batch_io_uring_cmd(struct io_uring_cmd *cmd,
+> > > >                 ret = ublk_handle_batch_fetch_cmd(&data);
+> > > >                 break;
+> > > >         default:
+> > > > -               ret = -EOPNOTSUPP;
+> > > > +               ret = ublk_handle_non_batch_cmd(cmd, issue_flags);
+> > >
+> > > We should probably skip the if (data.header.q_id >=
+> > > ub->dev_info.nr_hw_queues) check for a non-batch command?
+> >
+> > It is true only for UBLK_IO_UNREGISTER_IO_BUF.
+> 
+> My point was that this relies on the q_id field being located at the
+> same offset in struct ublksrv_io_cmd and struct ublk_batch_io, which
+> seems quite subtle. I think it would make more sense not to read the
+> SQE as a struct ublk_batch_io for the non-batch commands.
 
-Thank you for sharing your insights=E2=80=94I found the discussion very enl=
-ightening.
+OK, got it, then the check can be moved to ublk_check_batch_cmd() and
+ublk_validate_batch_fetch_cmd(). It can be one delta fix for V5.
 
-While I agree with Andreas=E2=80=99s perspective, I also very much apprecia=
-te
-the clarity
-and precision offered by the cmpxchg() approach. That=E2=80=99s why when Ch=
-ristoph
-suggested it, I was happy to incorporate it into the code.
-
-But a cmpxchg is a little bit redundant here.
-so we will change it to the simple assignment:
-
--       if (bio->bi_status && !parent->bi_status)
-                 parent->bi_status =3D bio->bi_status;
-+       if (bio->bi_status)
-                 parent->bi_status =3D bio->bi_status;
-
-I will integrate this discussion into the commit message, it is very insigh=
-tful.
 
 Thanks,
-Shida
+Ming
 
-> Andreas
->
