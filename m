@@ -1,126 +1,125 @@
 Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9774723AB87
-	for <linux-block@vger.kernel.org>; Wed,  3 Dec 2025 03:34:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63C0723D294
+	for <linux-block@vger.kernel.org>; Wed,  3 Dec 2025 03:38:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764732873; cv=none; b=VopEqRCSAu+hDURrXhua2JhSi0yShVwBaNKJhjkPyHACqWKAK8OW1rtXb3p6Bdx744wsq4dhb4YjwObvVKuttsP/zLOyycKzELY32NlAZTW+tnc40TUoQ4iLogToOF/yDHAoH2PNrVlgBuwJpPTaG41hkEeXggxjkJWGA31/iM4=
+	t=1764733139; cv=none; b=R1tIAQclqzKxLrXMuJPl82T8rdkkgZnVobPrFaqJ4kclPhOMNSoaFwlsqSRBwrsUfB3+2VMq1EG3pV9a9EvaAlOEjQLCPy2sd3JRLt50Xx+9PNAxK6SCJFJr4m7r6Jc6VjlDJPtSZ/Dpo4j1UAcfi0H27tYxTVzpTk/xA6x9Gug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764732873; c=relaxed/simple;
-	bh=Hkd7AV0mcZXdrCRANgzOpqK7f3uUB46n0tDbwg22va0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=RlfnLNilS90JcnC8xcbHh8fQqR5uqx0u0X2yEGurg5d3NY0+gBXG15k0Kq/lqBUO2PtMOP1lm752Y0k6VIYNMgfjOuafo2WrP7+tcTXjBQbIs9vagGOXTx3+MTzkK1+OhGR0qcCc7sxd3XFxUdXfaZdV93fEdgdeU8zNJfGaze8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=eF8ci6yl; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=GyvKj7xW; arc=none smtp.client-ip=205.220.168.131
+	s=arc-20240116; t=1764733139; c=relaxed/simple;
+	bh=be2b0468lQFmUwNQm895C5OTlX65Q56XoJN+b9VdIqQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cjhRczpxlnrOMmyz2KbF5Bgxe54TPM9B84CC8ev70huLSkRZ1lTXwNBVGoJdnbrxvJA9xkZEkl37PI0YaB2i2evEQED79ZFpxy48CtUuH+XYgnGoaY92rxe7Bp17yGBx3tPIWbquxIZW5rCmruV1Wm0BIC8sQSvcXvBEQhfTWOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=ILqbO5+d; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=XApMPvkU; arc=none smtp.client-ip=205.220.168.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="eF8ci6yl";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="GyvKj7xW"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="ILqbO5+d";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="XApMPvkU"
 Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5B2ISr5V4130466
-	for <linux-block@vger.kernel.org>; Wed, 3 Dec 2025 03:34:30 GMT
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5B2IT2ui4130766
+	for <linux-block@vger.kernel.org>; Wed, 3 Dec 2025 03:38:57 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=bz2PVVc6pyisZcO39uCSlu
-	cE5ii1uplsTgIJhS9nSSU=; b=eF8ci6ylachen0RdxF9aU9WUOtH8M4A3IwSJ6m
-	+g91OSM/oN7jQJ7HF5lLfKDGMulQJCya/1eDmQ+zTEGDnXuT9Q56lAZHL+y7ftsQ
-	czcHjl8cFvNxLoPGNrqWBbCVFKRLmmwwg33xaqgnyHlnxI9jnFmDTvGGFv8nxMpF
-	m0DSX17AH1wGDNIPCeDtwBzzJMOH/Rfq2rmHtQJDOM0Qo0369N/f9biCELSQrbxq
-	wB7QJIWXTTOYABLqKu7NQht+0iy/s8zp2FLWjiQhhmDdU27IK6hh9Bjs4JNfMjsw
-	fJkzT+DGry5QAh0pGyTQvEtYzB+qDWboAbgyLigQVI/R1n+w==
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com [209.85.216.69])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4at5e79an0-1
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	O2b/KG4xxXm4JvsuNL1P2eQaTenX/vdWmfZj/ux0mL8=; b=ILqbO5+d2Zna4slU
+	11MdNDvgXoKzIA8mqyQjwEmZagndPZPwk/5hp6CFs2ZeYXz8nhZLP2Bkq2BGKfTL
+	N131KQUMbN6K0n+KrV4IhNaSyYPfmZOltwOY9CvMwp6IVPy6WAtG3rnY5ArnEWUW
+	TN5CK5rqpsKj5CfgpoikA7Mc3zfnHlJN9l4NGXbR0QF3uVhBM4hA8Gh9TGgbqADR
+	FT+cB8+D/Q/QbxrAJ3XMHYfMyp/Ae8VdgjAY4QluyQNUsgnJ7riTtUHZ/ozHG3wW
+	Zjo0obYx5dBKyAWJBMUESullCNCizLsKHG/SNy8Zi7ITddhhGpOIbWOpjtojLaJS
+	FMLo2A==
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com [209.85.214.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4at5e79b18-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Wed, 03 Dec 2025 03:34:30 +0000 (GMT)
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-3416dc5754fso11230679a91.1
-        for <linux-block@vger.kernel.org>; Tue, 02 Dec 2025 19:34:30 -0800 (PST)
+	for <linux-block@vger.kernel.org>; Wed, 03 Dec 2025 03:38:57 +0000 (GMT)
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-29809acd049so109984115ad.3
+        for <linux-block@vger.kernel.org>; Tue, 02 Dec 2025 19:38:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1764732870; x=1765337670; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=bz2PVVc6pyisZcO39uCSlucE5ii1uplsTgIJhS9nSSU=;
-        b=GyvKj7xW7xJ33Rct9yKvO39RZKatBBquJEQPt8zxpnaW5IbpVUR3/eo+zM/VRaKpPx
-         lDzIBy1mYF9c/BYuG/cpXBXs4IXYjGXbxQq4K3xjFC5tajb1DYn6Pg+SpLP66tJd/7xR
-         gVtPRgIVh5YJZSfMcNSpif2XkneDUCOUpbM9mDDwXLF1gyLlmYFd/doLcMdaFAq87kkp
-         slLU2LQY834zvFncPg8+EVQ42jqyrhtljuI9ht4ktCxZThhMSOWYiS159LjBdazD2wpy
-         N4cxiPEFObdRLZz70x41SSaiKmuSCFYV2/d6nfurTf8DugE59uHNbwkoQz6oxKm+XIy5
-         rpIA==
+        d=oss.qualcomm.com; s=google; t=1764733137; x=1765337937; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=O2b/KG4xxXm4JvsuNL1P2eQaTenX/vdWmfZj/ux0mL8=;
+        b=XApMPvkUlT5nE7Pp+TdhI1JSFBUZAVDGBcZbUVU2CU3t7v6XkW6C68T/2f6HeExcJ/
+         AK+kqX6X26vPpepIb6Q8WhtsODJ2emA1QijzdmF+D9gyTgnwH/2iTZc5h3hwePqhyFvu
+         LCdVWjofZ3FMpa7mXBw9SJUCBsAp9PBo7/ADhrD4+hMOxg6uybzwRbuyfhBzaOVyZBxs
+         qVcEQtRu26MQrOKT2yPeDybT3r8aS+/Bd98fqKZadvMIrE+m39xZa0kms4PDuyCTc27g
+         keOTbSwuOy9DnEbrhQC69MQnZYbYyu6Ts3f46CEOqydyL20zQs0YYOKbluRX9fCRxl2t
+         k9ag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764732870; x=1765337670;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bz2PVVc6pyisZcO39uCSlucE5ii1uplsTgIJhS9nSSU=;
-        b=nrtXIdr3tGOAZjbNA25ogrfQGcIi6WTKZJ9N0nRA/c8DEsHvjXcWRmULIiXrJvUYGY
-         4NGCCZSdY1pFpqrKQtMwyg3uYvWevdDs1aEw3oWNF/2Uj6fWKXdz548TUeeJ1qEtV7Bp
-         9qYuOTTf5MnzHSg0+HgqCzjmc+xWv7SNvuubtMMnpCJCgx3yp7CG7tCPDXWyQyI/Jymc
-         vC0J9gdf6pkATWj9U3JUsZxlYGpWbXOH1E32nalrkhRDqUZx6UBG/cZSFNumvLkh3f30
-         +SfXLM4e8XP7fJGlQxapBbwYOMe97Gr4DK5gxNjbsb9xBTXD5b6LfoKoZSb0DJ5rACzz
-         emAg==
-X-Forwarded-Encrypted: i=1; AJvYcCXv/Jl/sXL2Hwi26aVws3cSCT/wrBlkhADpst1289ibkCXOXbBOO6FYNpBsh+HeRO71ZDVR+TZIvIZhRw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpY0BBRq0natopUADD5hdYq6kw64iTV4qQRGJ75pjb9mEhwq0F
-	4HMV/QB9OXsQ1wR4RtHaxI59gUVut9fpciWrsX5VVzM6LkGDqkQVxonxgE8cGBUf67TFw8XH7xQ
-	zvHlilb75zMPkYgwWjfhox9qCBFHYdC/2W3cRd92R7MPBoJFADqU/c6KaP/FiaijdZg==
-X-Gm-Gg: ASbGnct14e+QnJRHupUzTDsn/kd5vHBJpqY8IGSDMzr1wvWAx7BCLqq6VzbSLW+E52I
-	7iey+LQSW7LTqdJoawDwJzpHoHB1MNLUY6rN6agK/bIhnvH4Tzh98aRUYFtR/DVjoIuWNKhCD9F
-	4tzH5sOQxM68xPOnSv+2kFZguWL+5IPk5SS2/0zGKQkA2Vc1tUJkxSA6K5I0F5k/vJItcZTiOC2
-	3gId/dmUr5AAh8SSAP9gutJzEeCFxrb09EhQZD0HzdBX1sV4+1BkMdTql6XDex8PNqHeQ//IrM/
-	jhEvfcwbbo3ldxh9wmMlFvmfwiwIswQ5BVT3aL4BYge7sRlIaNlUMWj39EvkYPtY1dVx9H33qYO
-	q6mFDw7iaVvrAhwbqWdvOQvp//wmQpWniREXXjGJlyrjwhg5j857q6WEAIVeU9f/PKxzFQ709xb
-	6OG7Q=
-X-Received: by 2002:a17:90b:5143:b0:340:bb51:17eb with SMTP id 98e67ed59e1d1-34912607f64mr1105721a91.15.1764732869899;
-        Tue, 02 Dec 2025 19:34:29 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHRDk3lWNW37Ugzbg6j15n4JIdIohJWbFDAW8A3aR2F9lCXFDA5nQG7/QDdhXr/Cb/RsH2icg==
-X-Received: by 2002:a17:90b:5143:b0:340:bb51:17eb with SMTP id 98e67ed59e1d1-34912607f64mr1105699a91.15.1764732869373;
-        Tue, 02 Dec 2025 19:34:29 -0800 (PST)
-Received: from congzhan02.ap.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com. [103.229.16.4])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7d150c618e7sm18533036b3a.3.2025.12.02.19.34.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Dec 2025 19:34:28 -0800 (PST)
-From: Cong Zhang <cong.zhang@oss.qualcomm.com>
-Date: Wed, 03 Dec 2025 11:34:21 +0800
-Subject: [PATCH v2] blk-mq: Abort suspend when wakeup events are pending
+        d=1e100.net; s=20230601; t=1764733137; x=1765337937;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=O2b/KG4xxXm4JvsuNL1P2eQaTenX/vdWmfZj/ux0mL8=;
+        b=H00ULvjTIocimekvGXrbZdAEgi1nuNw80mtZl42f+9rI7deqqjrJfrUcg1xe/bPDAP
+         8/9QqM/t3Cjwk3CDTSE3TeBbqoDWutvZ1OGXkDwZUXSJzt8No7JqfJZjITgj4OPtfQNv
+         vxj7qO5MDxY3svXlSEYWvRGWXevh3bXBqkROxjD0eBDSmineOhiAcqrMusc92RKLPGqQ
+         LayZsdla6P4bVOYFUrWd4LgXIWOiId+ReYQOzyFf1YvUpxufaDxLNjO+ZSn94tDiI4ON
+         M1LwvznxDeREEII8OdA6InsxaC8LkaWQS9KQ9FsNoH8EjWrXlJKIPcwgOszhQGsG86va
+         VKhQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXuopOEqV1sV4nfZeWNOVcXFFWZxFaXUO+vGPjst4pHjbz/ac9wugahacp557Xmil3AEH0NbdVdG+s5MQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOXnLLpalP1rYQXMeENuc0qS/7TLsu+CvKVAgeCVFMjd+p6PQe
+	6liFtg6CuzDBc/YnLCbyh6B1FJq7Ergn8xp2U32ix1ENQTW5FxuNH2NcagEeq3ms7TCEM2rGbem
+	3W5YkBZIY3aS+fV/lAtA6qI9souTy5jEnwk+qD6eQuex2hZynWtpSuov4JfiCDtoKNFbGpOxQXK
+	WYq6k=
+X-Gm-Gg: ASbGncuFWB4Uhghrzk+y7Gq4vVnivn0+m5kZU4WJ6PFSsOVAGI/qXWZ4olWWJnzxvOw
+	GeXh4dag4zZHs/xh4HinNxPa1vTyUb9+r3+32kS7ywoZwGKp/EZjowV+9DbFPpwrHU8GiSbZRRe
+	hURyIjXC1JzpXgm6o7PBwpKnpURJXJWcOMXbsR0KiF0bGn/7b2vDI6dfZ/cWIUe5yk+Ivgy2B2e
+	WVaemuNmODRJzRT0hE1hT9fGueNHshAanSfa0uds34LWV9X5VDUoazvGUrEj1leCvRtj/ypvNYs
+	2gyblhpl5y4R9b0b8YslrBrgRwKkHU356UbYrlWDwI6y/e80sHvPB4z4ugej5rXCqrynCZGQL6R
+	433lVoWLMJnXR33cr+5J71VMYbwb27il5subYdxpnee6sb7wQVtDP58+XKCIBFkqATd9ehHEV9h
+	uJnKc=
+X-Received: by 2002:a17:902:e785:b0:294:fc1d:9d0 with SMTP id d9443c01a7336-29d683b001bmr11936825ad.40.1764733136683;
+        Tue, 02 Dec 2025 19:38:56 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGMjJ0MJu0/XDzPkMG7W1UbyoF5C/GcKgUGk1mDfhAcedcMCurYvLCL0rql5MFXz0/Phjo50Q==
+X-Received: by 2002:a17:902:e785:b0:294:fc1d:9d0 with SMTP id d9443c01a7336-29d683b001bmr11936635ad.40.1764733136238;
+        Tue, 02 Dec 2025 19:38:56 -0800 (PST)
+Received: from [10.249.22.154] (tpe-colo-wan-fw-bordernet.qualcomm.com. [103.229.16.4])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-be508bfd8ffsm16315106a12.17.2025.12.02.19.38.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Dec 2025 19:38:55 -0800 (PST)
+Message-ID: <5d71468a-e5c3-4a85-b985-466bae6af70e@oss.qualcomm.com>
+Date: Wed, 3 Dec 2025 11:38:52 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] blk-mq: Abort suspend when wakeup events are pending
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Daniel Wagner <dwagner@suse.de>,
+        Hannes Reinecke <hare@suse.de>, linux-arm-msm@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pavan.kondeti@oss.qualcomm.com
+References: <20251202-blkmq_skip_waiting-v1-1-f73d8a977ce0@oss.qualcomm.com>
+ <aS6vYCg2Gks2BGHn@fedora>
+ <d010fa56-3c7d-428a-810c-02ff8b1091a1@oss.qualcomm.com>
+ <aS7bmjmqBEV2CTEy@fedora>
+From: Cong Zhang <cong.zhang@oss.qualcomm.com>
+Content-Language: en-US
+In-Reply-To: <aS7bmjmqBEV2CTEy@fedora>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251203-blkmq_skip_waiting-v2-1-aaf38fa5883d@oss.qualcomm.com>
-X-B4-Tracking: v=1; b=H4sIALyvL2kC/22NywqDMBREf0XuuhETkWhX/Y8iEpOoFx/RXGtbx
- H9varfdDJyBObMDWY+W4Brt4O2GhG4KIC4R6E5NrWVoAoNIRMa5yFk99ONSUY9z9VS44tQymQq
- j6iJT2tQQhrO3Db5O6b0M3CGtzr/Pj41/258uxD/dxhlnjUxNrgoptU1ujiheHmrQbhzjEFAex
- /EBWz6PmLsAAAA=
-X-Change-ID: 20251128-blkmq_skip_waiting-732dab95acdb
-To: Jens Axboe <axboe@kernel.dk>, Daniel Wagner <dwagner@suse.de>,
-        Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>
-Cc: linux-arm-msm@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pavan.kondeti@oss.qualcomm.com,
-        Cong Zhang <cong.zhang@oss.qualcomm.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1764732866; l=3492;
- i=cong.zhang@oss.qualcomm.com; s=20250926; h=from:subject:message-id;
- bh=Hkd7AV0mcZXdrCRANgzOpqK7f3uUB46n0tDbwg22va0=;
- b=shPdgQveRpk5HFJvvpktDef8I8kdmX67GF5KyoJXdwiAysQE/aRjM9Fx/5ifSDco2eiRah4rs
- IY0ZfdOA8qGABYttQPvJ9h1EhyU0dUtqHfNts8+LIagvNt2Q82L/3ar
-X-Developer-Key: i=cong.zhang@oss.qualcomm.com; a=ed25519;
- pk=8SBh3ey5igz2nlW+UFC6khFvaNPgG7MmbWtAeO2s6n8=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjAzMDAyNSBTYWx0ZWRfXzjYG/LSJLEb9
- ePDCBKHdU/CAzKEs44t84zt9X0Gc/NQe5xLV1RUShzi7Vi3ONoeXbDdpYamsVOaht5uC/JK7Vb1
- slGOGff5/KcIxzi7LgeYcMzB8XbmQGRLveUbbfBiHiCEl3vwHcS9w9fZzFLdlKRtkXYJpM9dJPx
- 6ST9AjkStgnsvDR/otkjH8d3yJ3hvAOlgG1lIau9MAR1FXc58Exq2LDomhGfA820g8qK3/0S7A3
- 0498b+a2rq9Dy3lWyZy6h5DI1Pq3QHmXNf6X3lBUBV1x04WzC1u9b7fBSwn/hN4PZS5kbLTFALm
- FebYKPrxcZEDg/nrFNI4N4gMytZOYSeuFamB+ibw5JZv/99Sr8LI70SVoh0Y+GX0+7fdp+aCxpA
- nWc8mXmfhCUoWMYb8PDLIS+ZSFGXPA==
-X-Authority-Analysis: v=2.4 cv=KcrfcAYD c=1 sm=1 tr=0 ts=692fafc6 cx=c_pps
- a=vVfyC5vLCtgYJKYeQD43oA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjAzMDAyNiBTYWx0ZWRfX9KlEgeLgjSD+
+ qjHHmX5nAtjKSdqvoibP42OMq263uMp6des9sdp9xPpZcTp3u6JPDLgmdIFoffsSGUCj1sDqXFc
+ NvJBihucCmh8healXIP4fCG1AXlAheX9NMN0kFxYP2fCjiP4TnIJkVaYTYAMv8Oe0ywAC5WqxQU
+ pklRt3Yi3w/1tmdv+bHZSBrIUPoyOm7xol9mjM3m+A/88OvslPcdtAe+dldhKoSe+UvgDgQpjdm
+ jrmNSiSA89p03kSdbJOEP+3U05uJ0JVoOtZ7LDwCtXY/DMSBv91avCNm2fEsD3LOJlzLlDUnH1f
+ aZUaU7xdmjshnpceTIC0vO+DyLXcHyGx5zh2jSsRcU6AeC1b17OOVvsfM4NVZn57h0QZleJgeYc
+ c2YXh3sG5EPfJq1G/VCmGN3zh3mxtg==
+X-Authority-Analysis: v=2.4 cv=KcrfcAYD c=1 sm=1 tr=0 ts=692fb0d1 cx=c_pps
+ a=JL+w9abYAAE89/QcEU+0QA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
  a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8
- a=5OloznZfUM2DqOS4epIA:9 a=QEXdDO2ut3YA:10 a=rl5im9kqc5Lf4LNbBjHf:22
-X-Proofpoint-GUID: 4OTo4PyDqaVsg6m88gu9bhEXM9XWcrWE
-X-Proofpoint-ORIG-GUID: 4OTo4PyDqaVsg6m88gu9bhEXM9XWcrWE
+ a=VkNPw1HP01LnGYTKEx00:22 a=EUspDBNiAAAA:8 a=STW2nHLoXGP7JFEkyEgA:9
+ a=QEXdDO2ut3YA:10 a=324X-CrmTo6CU4MGRt3R:22
+X-Proofpoint-GUID: pGkbZDZ6gihF9N2x1hv6Ff7hh1GvYKqM
+X-Proofpoint-ORIG-GUID: pGkbZDZ6gihF9N2x1hv6Ff7hh1GvYKqM
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
  definitions=2025-12-01_01,2025-11-27_02,2025-10-01_01
@@ -128,98 +127,56 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  impostorscore=0 spamscore=0 adultscore=0 malwarescore=0 suspectscore=0
  priorityscore=1501 lowpriorityscore=0 clxscore=1015 bulkscore=0 phishscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2512030025
+ reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2512030026
 
-During system suspend, wakeup capable IRQs for block device can be
-delayed, which can cause blk_mq_hctx_notify_offline() to hang
-indefinitely while waiting for pending request to complete.
-Skip the request waiting loop and abort suspend when wakeup events are
-pending to prevent the deadlock.
 
-Fixes: bf0beec0607d ("blk-mq: drain I/O when all CPUs in a hctx are offline")
-Signed-off-by: Cong Zhang <cong.zhang@oss.qualcomm.com>
----
-The issue was found during system suspend with a no_soft_reset
-virtio-blk device. Here is the detailed analysis:
-- When system suspend starts and no_soft_reset is enabled, virtio-blk
-  does not call its suspend callback.
-- Some requests are dispatched and queued. After sending the virtqueue
-  notifier, the kernel waits for an IRQ to complete the request.
-- The virtio-blk IRQ is wakeup-capable. When the IRQ is triggered, it
-  remains pending because the device is in the suspend process.
-- While checking blk_mq_hctx_has_requests(), it detects that there are
-  still pending requests.
-- Since there is no way to complete these requests, the kernel gets
-  stuck in the CPU hotplug thread.
 
-We believe this could be a common issue. If the kernel enters the
-blk_mq_hctx_has_requests() loop during suspend, wakeup-capable IRQs
-cannot be processed, which can lead to a deadlock in this scenario.
-This also improves the latency for wakup-capable IRQs. If a non-block
-wakeup IRQ is pending, suspend is going to be abort anyway after this
-step. Returning early avoids unnecessary delay and improve the suspend
-latency.
----
-Changes in v2:
-- Add commmets for `if (pm_wakeup_pending)`
-- Link to v1: https://lore.kernel.org/20251202-blkmq_skip_waiting-v1-1-f73d8a977ce0@oss.qualcomm.com
----
- block/blk-mq.c | 18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
+On 12/2/2025 8:29 PM, Ming Lei wrote:
+> On Tue, Dec 02, 2025 at 05:48:21PM +0800, Cong Zhang wrote:
+>>
+>>
+>> On 12/2/2025 5:20 PM, Ming Lei wrote:
+>>> On Tue, Dec 02, 2025 at 11:56:12AM +0800, Cong Zhang wrote:
+>>>> During system suspend, wakeup capable IRQs for block device can be
+>>>> delayed, which can cause blk_mq_hctx_notify_offline() to hang
+>>>> indefinitely while waiting for pending request to complete.
+>>>> Skip the request waiting loop and abort suspend when wakeup events are
+>>>> pending to prevent the deadlock.
+>>>>
+>>>> Fixes: bf0beec0607d ("blk-mq: drain I/O when all CPUs in a hctx are offline")
+>>>> Signed-off-by: Cong Zhang <cong.zhang@oss.qualcomm.com>
+>>>> ---
+>>>> The issue was found during system suspend with a no_soft_reset
+>>>> virtio-blk device. Here is the detailed analysis:
+>>>> - When system suspend starts and no_soft_reset is enabled, virtio-blk
+>>>>   does not call its suspend callback.
+>>>> - Some requests are dispatched and queued. After sending the virtqueue
+>>>>   notifier, the kernel waits for an IRQ to complete the request.
+>>>> - The virtio-blk IRQ is wakeup-capable. When the IRQ is triggered, it
+>>>>   remains pending because the device is in the suspend process.
+>>>
+>>> Can you explain a bit for above point? Why does the IRQ remains pending
+>>> and not get handled?
+>>>
+>>
+>> The wakeup capable IRQ is not masked during suspend. When the IRQ is
+>> triggered, the kernel does not call its IRQ handler, instead kernel only
+>> marks the IRQ as a wakeup event in pm_system_irq_wakeup(). By checking
+>> pm_wakeup_pending() suspend process can abort if a wakeup event is
+>> detected. That means the actual IRQ handler is not called during the
+>> checking of blk_mq_hctx_has_requests, which cause the issue.
+> 
+> Thanks for the explanation!
+> 
+> Can you document it around `if (pm_wakeup_pending)`?
+> 
+> Otherwise, this patch looks fine for me.
+> 
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index d626d32f6e576f95bc68495c467a9d9c7b73a581..33a0062f9e56d3915b7d06f133548c16e1ca9aa6 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -23,6 +23,7 @@
- #include <linux/cache.h>
- #include <linux/sched/topology.h>
- #include <linux/sched/signal.h>
-+#include <linux/suspend.h>
- #include <linux/delay.h>
- #include <linux/crash_dump.h>
- #include <linux/prefetch.h>
-@@ -3707,6 +3708,7 @@ static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_node *node)
- {
- 	struct blk_mq_hw_ctx *hctx = hlist_entry_safe(node,
- 			struct blk_mq_hw_ctx, cpuhp_online);
-+	int ret = 0;
- 
- 	if (blk_mq_hctx_has_online_cpu(hctx, cpu))
- 		return 0;
-@@ -3727,12 +3729,24 @@ static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_node *node)
- 	 * frozen and there are no requests.
- 	 */
- 	if (percpu_ref_tryget(&hctx->queue->q_usage_counter)) {
--		while (blk_mq_hctx_has_requests(hctx))
-+		while (blk_mq_hctx_has_requests(hctx)) {
-+			/*
-+			 * The wakeup capable IRQ handler of block device is
-+			 * not called during suspend. Skip the loop by checking
-+			 * pm_wakeup_pending to prevent the deadlock and improve
-+			 * suspend latency.
-+			 */
-+			if (pm_wakeup_pending()) {
-+				clear_bit(BLK_MQ_S_INACTIVE, &hctx->state);
-+				ret = -EBUSY;
-+				break;
-+			}
- 			msleep(5);
-+		}
- 		percpu_ref_put(&hctx->queue->q_usage_counter);
- 	}
- 
--	return 0;
-+	return ret;
- }
- 
- /*
+Thanks for your comments! Update in the new patchset.
 
----
-base-commit: e538109ac71d801d26776af5f3c54f548296c29c
-change-id: 20251128-blkmq_skip_waiting-732dab95acdb
-
-Best regards,
--- 
-Cong Zhang <cong.zhang@oss.qualcomm.com>
+> 
+> Thanks,
+> Ming
+> 
 
