@@ -1,83 +1,71 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 157421E7C08
-	for <linux-block@vger.kernel.org>; Wed,  3 Dec 2025 06:13:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E839C1FFC59;
+	Wed,  3 Dec 2025 06:14:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764742383; cv=none; b=N5bRQkoXsnabkTTIELpIjQ8fadxKYCrw+Gc7S6UVAsP2HsuMzw4lOWTDuKYb+MVzFBChmshVg8uxksNJa8VtIU9b/V9uU3sNhiZXm96OFoYjSWqKLg2RaMaZT1V0XxpcUx3ytx6SkayKU7JjsxY0UJkb3Zw3uMKpIaiGfOlaGnQ=
+	t=1764742450; cv=none; b=m4UREpRacBDbWhI6t+WoqNGIdpooi6cSGcrYtgML5wyu9/gB/+1Nbao+TiymSg4EtW+m3EcETWrl4+wR7oDYnzbXggSbtf+Te4GKw8B9GrE7GYtPpFQI31j+Hd5ORhvmNxIXM8yB742sq7/WWktzrWAFa5Ftg7b9U1EBcrugzT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764742383; c=relaxed/simple;
-	bh=jqeNUozN4U7UOKZtPl+SPcdPlivLnSxvhLlrdM8ZG9c=;
+	s=arc-20240116; t=1764742450; c=relaxed/simple;
+	bh=/u1H3TxmuYD3SuHYqYM3U/2R/m8Fg/gP0U8T1C7keJ4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dVO/m0QyxYo047flBV0qPHQnbYf8f51QrVYsCdap2YDGj6agFwZRGjlImeN3bHe8cELd1uHVqdVyryftr23TN9kEmRRaYc0cCq7MY+m6OUfOy8PzYAf3zG+K5OmIGcEKQpAZqiyLNGdOsXRpXYtrbKZAm9YLI2UB1miMMqQO5+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HjqjdQiu; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HjqjdQiu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44021C4CEFB;
-	Wed,  3 Dec 2025 06:13:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764742382;
-	bh=jqeNUozN4U7UOKZtPl+SPcdPlivLnSxvhLlrdM8ZG9c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HjqjdQiu3qFiyzHkGqSgh7HmcbB2MwAr1UOKGFIgTha2U1C/O85Bo3IM0LALBxKTH
-	 VK88V9KcxEjwnhIHq0YCwpIv13J9qYijsDwXPxj6OhtmAhnXmxeqjBHjVnb7TAxi20
-	 5v+vrb+CZOZ0QYp70UoNP76348rl6LtDA2EHzwI6y2MQgRYq1/gdqcPUKm0p5eRLSp
-	 Tsif8Dmm/wZMXZs9jVQI7YOlTAK5ERv2WDor4GSar14+Cu7T17sOdBOhMuz9ddvmk0
-	 qri4TY5y7noZbRW25K8dTqIQl1fqmLjpzXDM6oFlr4KIqKApqoSTGYcxGpNpet5sls
-	 Hd3U6YfU/BGIw==
-Date: Wed, 3 Dec 2025 07:12:58 +0100
-From: Niklas Cassel <cassel@kernel.org>
-To: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
-Cc: kbusch@kernel.org, axboe@kernel.dk, hch@lst.de, dlemoal@kernel.org,
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH V3] blk-mq: add blk_rq_nr_bvec() helper
-Message-ID: <aS_U6m9ZzQHFqE23@ryzen>
-References: <20251203035809.30610-1-ckulkarnilinux@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=BnlZwokULt7Dv3uP5L19RNLTrv+DJiT0Mlfg7h/FW0wMOz9JjKxGWlGOZRjoyeWqdVc7E9GOg7F8kluCfmh4b/pGXzg1e+YzvFm5M2h+9INtCVlC6MDFhL+QXPMItfNcPLuOnr9KvcNXl0OWUBR/6WJKqGPWTZWpWrW0FBgA+XM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id F30DC68B05; Wed,  3 Dec 2025 07:14:03 +0100 (CET)
+Date: Wed, 3 Dec 2025 07:14:03 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Stephen Zhang <starzhangzsd@gmail.com>
+Cc: Andreas Gruenbacher <agruenba@redhat.com>,
+	Christoph Hellwig <hch@lst.de>, Johannes.Thumshirn@wdc.com,
+	ming.lei@redhat.com, hsiangkao@linux.alibaba.com,
+	csander@purestorage.com, colyli@fnnas.com,
+	linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
+	linux-kernel@vger.kernel.org, zhangshida@kylinos.cn
+Subject: Re: [PATCH v4 3/3] block: prevent race condition on bi_status in
+ __bio_chain_endio
+Message-ID: <20251203061403.GA16604@lst.de>
+References: <20251201090442.2707362-1-zhangshida@kylinos.cn> <20251201090442.2707362-4-zhangshida@kylinos.cn> <CAHc6FU4o8Wv+6TQti4NZJRUQpGF9RWqiN9fO6j55p4xgysM_3g@mail.gmail.com> <aS17LOwklgbzNhJY@infradead.org> <CAHc6FU7k7vH5bJaM6Hk6rej77t4xijBESDeThdDe1yCOqogjtA@mail.gmail.com> <20251202054841.GC15524@lst.de> <CAHc6FU6B6ip8e-+VXaAiPN+oqJTW2Tuoh0Vv-E96Baf2SSbt7w@mail.gmail.com> <CANubcdWHor3Jx+5yeY84nx0yFe3JosqVG4wGdVkpMfbQLVAWpQ@mail.gmail.com> <CANubcdWBF5tCfrutAOiUkFaZb=9s4=bMKzi7dSwQxTGbC_3_1Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20251203035809.30610-1-ckulkarnilinux@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANubcdWBF5tCfrutAOiUkFaZb=9s4=bMKzi7dSwQxTGbC_3_1Q@mail.gmail.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Tue, Dec 02, 2025 at 07:58:09PM -0800, Chaitanya Kulkarni wrote:
-> Add a new helper function blk_rq_nr_bvec() that returns the number of
-> bvecs in a request. This count represents the number of iterations
-> rq_for_each_bvec() would perform on a request.
+On Wed, Dec 03, 2025 at 11:09:36AM +0800, Stephen Zhang wrote:
 > 
-> Drivers need to pre-allocate bvec arrays before iterating through
-> a request's bvecs. Currently, they manually count bvecs using
-> rq_for_each_bvec() in a loop, which is repetitive. The new helper
-> centralizes this logic.
+> I’ve been reconsidering the two approaches for the upcoming patch revision.
+> Essentially, we’re comparing two methods:
+> A:
+>         if (bio->bi_status)
+>                    parent->bi_status = bio->bi_status;
+> B:
+>         if (bio->bi_status)
+>                 cmpxchg(&parent->bi_status, 0, bio->bi_status);
 > 
-> This pattern exists in loop and zloop drivers, where multi-bio requests
-> require copying bvecs into a contiguous array before creating
-> an iov_iter for file operations.
-> 
-> Update loop and zloop drivers to use the new helper, eliminating
-> duplicate code.
-> 
-> This patch also provides a clear API to avoid any potential misuse of
-> blk_nr_phys_segments() for calculating the bvecs since, one bvec can
-> have more than one segments and use of blk_nr_phys_segments() can
-> lead to extra memory allocation :-
-> 
-> [ 6155.673749] nullb_bio: 128K bio as ONE bvec: sector=0, size=131072
-> [ 6155.673846] null_blk: #### null_handle_data_transfer:1375
-> [ 6155.673850] null_blk: nr_bvec=1 blk_rq_nr_phys_segments=2
-> [ 6155.674263] null_blk: #### null_handle_data_transfer:1375
-> [ 6155.674267] null_blk: nr_bvec=1 blk_rq_nr_phys_segments=1
-> 
-> Reviewed-by: Niklas Cassel<cassel@kernel.org>
+> Both appear correct, but B seems a little bit redundant here.
 
-Missing space before '<'.
+A is not correct.  You at least needs READ_ONCE/WRITE_ONCE here.
 
-Perhaps Jens can fix up when applying if you get no further comments.
+B solves all these issues.
 
+> Upon further reflection, I’ve noticed a subtle difference:
+> A unconditionally writes to parent->bi_status when bio->bi_status is non-zero,
+> regardless of the current value of parent->bi_status.
+> B uses cmpxchg to only update parent->bi_status if it is still zero.
+> 
+> Thus, B could avoid unnecessary writes in cases where parent->bi_status has
+> already been set to a non-zero value.
 
-Kind regards,
-Niklas
+The unnecessary writes don't really matter, we're in an error slow path
+here.
+
