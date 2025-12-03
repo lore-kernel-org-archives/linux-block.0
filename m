@@ -1,182 +1,247 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63C0723D294
-	for <linux-block@vger.kernel.org>; Wed,  3 Dec 2025 03:38:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09E98231827
+	for <linux-block@vger.kernel.org>; Wed,  3 Dec 2025 03:58:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764733139; cv=none; b=R1tIAQclqzKxLrXMuJPl82T8rdkkgZnVobPrFaqJ4kclPhOMNSoaFwlsqSRBwrsUfB3+2VMq1EG3pV9a9EvaAlOEjQLCPy2sd3JRLt50Xx+9PNAxK6SCJFJr4m7r6Jc6VjlDJPtSZ/Dpo4j1UAcfi0H27tYxTVzpTk/xA6x9Gug=
+	t=1764734294; cv=none; b=dcu4ceiTkrJqHGvhjvxa8zYMu3LOmxPpnWfW7HP8CHVi1NZ9X6+X4Q+9Uf0/sLM1++/BQSygu7MG7R3v4+jdTIi7/ntdIjE72EzPIWGRfti4iJYqNABhIxhV6xzGsIfY1V5+cissDz9h13bK8Z5oZ3OomHmOoa6xcMr/0OTPuD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764733139; c=relaxed/simple;
-	bh=be2b0468lQFmUwNQm895C5OTlX65Q56XoJN+b9VdIqQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cjhRczpxlnrOMmyz2KbF5Bgxe54TPM9B84CC8ev70huLSkRZ1lTXwNBVGoJdnbrxvJA9xkZEkl37PI0YaB2i2evEQED79ZFpxy48CtUuH+XYgnGoaY92rxe7Bp17yGBx3tPIWbquxIZW5rCmruV1Wm0BIC8sQSvcXvBEQhfTWOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=ILqbO5+d; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=XApMPvkU; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1764734294; c=relaxed/simple;
+	bh=jA7ppoL2btYpLD56UmAahdXqlhGBlNes4HeuDdKQUaw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=g+nkXEFHxcvRS6ah5MBHiDD1yXY6ZL5prcrbfHE6XuE9xYuTryiHMhveeAxFa/R65Ijow9mfPQEXmrxrv++Eyj2XWT9aHaPXt0Ak+pUkRQBVXRlrQoaIfUuh/sIBDbGFdBwMp56igb4KVdRmck+FAVp34xzM59gOlYTKdw5zvyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lpEzhEnq; arc=none smtp.client-ip=209.85.215.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="ILqbO5+d";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="XApMPvkU"
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5B2IT2ui4130766
-	for <linux-block@vger.kernel.org>; Wed, 3 Dec 2025 03:38:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	O2b/KG4xxXm4JvsuNL1P2eQaTenX/vdWmfZj/ux0mL8=; b=ILqbO5+d2Zna4slU
-	11MdNDvgXoKzIA8mqyQjwEmZagndPZPwk/5hp6CFs2ZeYXz8nhZLP2Bkq2BGKfTL
-	N131KQUMbN6K0n+KrV4IhNaSyYPfmZOltwOY9CvMwp6IVPy6WAtG3rnY5ArnEWUW
-	TN5CK5rqpsKj5CfgpoikA7Mc3zfnHlJN9l4NGXbR0QF3uVhBM4hA8Gh9TGgbqADR
-	FT+cB8+D/Q/QbxrAJ3XMHYfMyp/Ae8VdgjAY4QluyQNUsgnJ7riTtUHZ/ozHG3wW
-	Zjo0obYx5dBKyAWJBMUESullCNCizLsKHG/SNy8Zi7ITddhhGpOIbWOpjtojLaJS
-	FMLo2A==
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com [209.85.214.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4at5e79b18-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Wed, 03 Dec 2025 03:38:57 +0000 (GMT)
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-29809acd049so109984115ad.3
-        for <linux-block@vger.kernel.org>; Tue, 02 Dec 2025 19:38:57 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lpEzhEnq"
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-b996c8db896so7304892a12.3
+        for <linux-block@vger.kernel.org>; Tue, 02 Dec 2025 19:58:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1764733137; x=1765337937; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=O2b/KG4xxXm4JvsuNL1P2eQaTenX/vdWmfZj/ux0mL8=;
-        b=XApMPvkUlT5nE7Pp+TdhI1JSFBUZAVDGBcZbUVU2CU3t7v6XkW6C68T/2f6HeExcJ/
-         AK+kqX6X26vPpepIb6Q8WhtsODJ2emA1QijzdmF+D9gyTgnwH/2iTZc5h3hwePqhyFvu
-         LCdVWjofZ3FMpa7mXBw9SJUCBsAp9PBo7/ADhrD4+hMOxg6uybzwRbuyfhBzaOVyZBxs
-         qVcEQtRu26MQrOKT2yPeDybT3r8aS+/Bd98fqKZadvMIrE+m39xZa0kms4PDuyCTc27g
-         keOTbSwuOy9DnEbrhQC69MQnZYbYyu6Ts3f46CEOqydyL20zQs0YYOKbluRX9fCRxl2t
-         k9ag==
+        d=gmail.com; s=20230601; t=1764734292; x=1765339092; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9wtT80laZZr2EVLtVh+9yjeQK2HScm71Gn/qBdsOPts=;
+        b=lpEzhEnq+ku8EgcXmg+yaNB3kNBmIAPKHPPBjOfE5LRhVnQF32VVQ4oTyIIjpFmXv/
+         y0JedtMjqA4NfK4m0/0VGZTwZsRGNKx6kRVr0+10NQy15M0qE1L7F6nfygX5FblAjH5g
+         K0IK8wayl6V0O9sdnLhV8dudxOIuvR/kt8Q9FVNSeBK0UtoWiXwaihrSzrBctZtaOAfJ
+         SNcL+zHxbB41lSf0H5zgS7fdu/iApG3T8yzaOxckWiSQap5jsyVLtBtR14Jx/4gU9Dm9
+         l2EahPtT9akVRYsiK8V/zviKmZNQvtJXcc6Rw4mofmVd41vje0CejdntOTos9LzRjRGR
+         3uow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764733137; x=1765337937;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=O2b/KG4xxXm4JvsuNL1P2eQaTenX/vdWmfZj/ux0mL8=;
-        b=H00ULvjTIocimekvGXrbZdAEgi1nuNw80mtZl42f+9rI7deqqjrJfrUcg1xe/bPDAP
-         8/9QqM/t3Cjwk3CDTSE3TeBbqoDWutvZ1OGXkDwZUXSJzt8No7JqfJZjITgj4OPtfQNv
-         vxj7qO5MDxY3svXlSEYWvRGWXevh3bXBqkROxjD0eBDSmineOhiAcqrMusc92RKLPGqQ
-         LayZsdla6P4bVOYFUrWd4LgXIWOiId+ReYQOzyFf1YvUpxufaDxLNjO+ZSn94tDiI4ON
-         M1LwvznxDeREEII8OdA6InsxaC8LkaWQS9KQ9FsNoH8EjWrXlJKIPcwgOszhQGsG86va
-         VKhQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXuopOEqV1sV4nfZeWNOVcXFFWZxFaXUO+vGPjst4pHjbz/ac9wugahacp557Xmil3AEH0NbdVdG+s5MQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOXnLLpalP1rYQXMeENuc0qS/7TLsu+CvKVAgeCVFMjd+p6PQe
-	6liFtg6CuzDBc/YnLCbyh6B1FJq7Ergn8xp2U32ix1ENQTW5FxuNH2NcagEeq3ms7TCEM2rGbem
-	3W5YkBZIY3aS+fV/lAtA6qI9souTy5jEnwk+qD6eQuex2hZynWtpSuov4JfiCDtoKNFbGpOxQXK
-	WYq6k=
-X-Gm-Gg: ASbGncuFWB4Uhghrzk+y7Gq4vVnivn0+m5kZU4WJ6PFSsOVAGI/qXWZ4olWWJnzxvOw
-	GeXh4dag4zZHs/xh4HinNxPa1vTyUb9+r3+32kS7ywoZwGKp/EZjowV+9DbFPpwrHU8GiSbZRRe
-	hURyIjXC1JzpXgm6o7PBwpKnpURJXJWcOMXbsR0KiF0bGn/7b2vDI6dfZ/cWIUe5yk+Ivgy2B2e
-	WVaemuNmODRJzRT0hE1hT9fGueNHshAanSfa0uds34LWV9X5VDUoazvGUrEj1leCvRtj/ypvNYs
-	2gyblhpl5y4R9b0b8YslrBrgRwKkHU356UbYrlWDwI6y/e80sHvPB4z4ugej5rXCqrynCZGQL6R
-	433lVoWLMJnXR33cr+5J71VMYbwb27il5subYdxpnee6sb7wQVtDP58+XKCIBFkqATd9ehHEV9h
-	uJnKc=
-X-Received: by 2002:a17:902:e785:b0:294:fc1d:9d0 with SMTP id d9443c01a7336-29d683b001bmr11936825ad.40.1764733136683;
-        Tue, 02 Dec 2025 19:38:56 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGMjJ0MJu0/XDzPkMG7W1UbyoF5C/GcKgUGk1mDfhAcedcMCurYvLCL0rql5MFXz0/Phjo50Q==
-X-Received: by 2002:a17:902:e785:b0:294:fc1d:9d0 with SMTP id d9443c01a7336-29d683b001bmr11936635ad.40.1764733136238;
-        Tue, 02 Dec 2025 19:38:56 -0800 (PST)
-Received: from [10.249.22.154] (tpe-colo-wan-fw-bordernet.qualcomm.com. [103.229.16.4])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-be508bfd8ffsm16315106a12.17.2025.12.02.19.38.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Dec 2025 19:38:55 -0800 (PST)
-Message-ID: <5d71468a-e5c3-4a85-b985-466bae6af70e@oss.qualcomm.com>
-Date: Wed, 3 Dec 2025 11:38:52 +0800
+        d=1e100.net; s=20230601; t=1764734292; x=1765339092;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9wtT80laZZr2EVLtVh+9yjeQK2HScm71Gn/qBdsOPts=;
+        b=I6EZF+zhSWwpqfhp7AQcPnvlBUfgGXtygmgTfnR83V2/MLU/l7IwvtSTUBuWWbyOwX
+         3bq7e7Q6YprbLhnd3pjaQ+3aEIN/AyOQNYRaQpa3EtzlhU6mFEqgJ0YxLjQWwALmkAy/
+         lpe/NLNEWLvY2wc/2CduInpX2T8e2rxwUr+/aFnA1wNp7YgOPSyJP9XpjGocFunz6DFP
+         3v9WpVdRnps1hDwGOOX/2BGeppKUaQUAJMqRLoLV7t1JFaeQOKS4CNHnIMZWhsAIlDx6
+         6ItpA0hwtQzwOGwsPPhnGtR+jfhrbhShlccDaoVyFIOMjN9eOw1ueUTHsrohGQcQq8hQ
+         iBmQ==
+X-Gm-Message-State: AOJu0YwOBXebCe3TdHfR2buVTvvbXeTyySeWkOzhW6CcOrI/zRMkFczO
+	Eq5nkH/zLkQsC1AyIdSjNi/vgxkJ85rNGWKiWdQ5rPGu/m5V68zvapqX
+X-Gm-Gg: ASbGnctFCrrIq5w8oopC4jEpAxBIofoOJ/dwzB7QXtZ1FUm/EvDaDclcSrwRKNaKzQF
+	kK9yfO1RFnVbG6zQZDgEBhYKoorQt6OwHpWTndshOrGmEw5Ql7d1Ngju/8gIM3iQqW+P0KyJ3GB
+	fw6ObNuXbQT/mHo/lFz0oL5zSbiTT5eyL9p/FsAvpm2EUHS6dC6oSw1qkA7pJ9CCTpASYuVmNgP
+	To+gi5iNLd6WVxj2fQAX4DeSn7no4lrcs4UqB2NtvUvtYhffMRhyRItQrwYmpBi6nzp7m1LenaQ
+	42M9ttuz/mKG3WJQod8ylDgjgleUCIBmBgkZn15RoC5pNVaDTpRii13xc/mJSniNi4hgQJ95rvK
+	2bvUgUEVQPQ92o2KmzdmhghgyfW/o+G+NXeN3dfxkzpJ5ME2WiHL+dEE4fD28AkPCAJqCOSLnUW
+	7TQSssbC8VGq2QuUsjgoDLuZ2x
+X-Google-Smtp-Source: AGHT+IEOgV2/DUMz8fOTczj8KB7JctvBHrGTDKjtmIFIh7aboBfyER5OaL/OMoztpNMtKRnzNYRCeQ==
+X-Received: by 2002:a05:693c:2d81:b0:2a4:3592:cf71 with SMTP id 5a478bee46e88-2ab92e23131mr699686eec.21.1764734292149;
+        Tue, 02 Dec 2025 19:58:12 -0800 (PST)
+Received: from localhost ([165.85.49.192])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2a965b47caasm63705317eec.6.2025.12.02.19.58.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Dec 2025 19:58:11 -0800 (PST)
+From: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+To: kbusch@kernel.org,
+	axboe@kernel.dk,
+	hch@lst.de,
+	dlemoal@kernel.org
+Cc: linux-block@vger.kernel.org,
+	Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
+	Niklas Cassel <cassel@kernel.org>
+Subject: [PATCH V3] blk-mq: add blk_rq_nr_bvec() helper
+Date: Tue,  2 Dec 2025 19:58:09 -0800
+Message-Id: <20251203035809.30610-1-ckulkarnilinux@gmail.com>
+X-Mailer: git-send-email 2.40.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] blk-mq: Abort suspend when wakeup events are pending
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Daniel Wagner <dwagner@suse.de>,
-        Hannes Reinecke <hare@suse.de>, linux-arm-msm@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pavan.kondeti@oss.qualcomm.com
-References: <20251202-blkmq_skip_waiting-v1-1-f73d8a977ce0@oss.qualcomm.com>
- <aS6vYCg2Gks2BGHn@fedora>
- <d010fa56-3c7d-428a-810c-02ff8b1091a1@oss.qualcomm.com>
- <aS7bmjmqBEV2CTEy@fedora>
-From: Cong Zhang <cong.zhang@oss.qualcomm.com>
-Content-Language: en-US
-In-Reply-To: <aS7bmjmqBEV2CTEy@fedora>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjAzMDAyNiBTYWx0ZWRfX9KlEgeLgjSD+
- qjHHmX5nAtjKSdqvoibP42OMq263uMp6des9sdp9xPpZcTp3u6JPDLgmdIFoffsSGUCj1sDqXFc
- NvJBihucCmh8healXIP4fCG1AXlAheX9NMN0kFxYP2fCjiP4TnIJkVaYTYAMv8Oe0ywAC5WqxQU
- pklRt3Yi3w/1tmdv+bHZSBrIUPoyOm7xol9mjM3m+A/88OvslPcdtAe+dldhKoSe+UvgDgQpjdm
- jrmNSiSA89p03kSdbJOEP+3U05uJ0JVoOtZ7LDwCtXY/DMSBv91avCNm2fEsD3LOJlzLlDUnH1f
- aZUaU7xdmjshnpceTIC0vO+DyLXcHyGx5zh2jSsRcU6AeC1b17OOVvsfM4NVZn57h0QZleJgeYc
- c2YXh3sG5EPfJq1G/VCmGN3zh3mxtg==
-X-Authority-Analysis: v=2.4 cv=KcrfcAYD c=1 sm=1 tr=0 ts=692fb0d1 cx=c_pps
- a=JL+w9abYAAE89/QcEU+0QA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
- a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=EUspDBNiAAAA:8 a=STW2nHLoXGP7JFEkyEgA:9
- a=QEXdDO2ut3YA:10 a=324X-CrmTo6CU4MGRt3R:22
-X-Proofpoint-GUID: pGkbZDZ6gihF9N2x1hv6Ff7hh1GvYKqM
-X-Proofpoint-ORIG-GUID: pGkbZDZ6gihF9N2x1hv6Ff7hh1GvYKqM
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-12-01_01,2025-11-27_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 spamscore=0 adultscore=0 malwarescore=0 suspectscore=0
- priorityscore=1501 lowpriorityscore=0 clxscore=1015 bulkscore=0 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2512030026
+Content-Transfer-Encoding: 8bit
 
+Add a new helper function blk_rq_nr_bvec() that returns the number of
+bvecs in a request. This count represents the number of iterations
+rq_for_each_bvec() would perform on a request.
 
+Drivers need to pre-allocate bvec arrays before iterating through
+a request's bvecs. Currently, they manually count bvecs using
+rq_for_each_bvec() in a loop, which is repetitive. The new helper
+centralizes this logic.
 
-On 12/2/2025 8:29 PM, Ming Lei wrote:
-> On Tue, Dec 02, 2025 at 05:48:21PM +0800, Cong Zhang wrote:
->>
->>
->> On 12/2/2025 5:20 PM, Ming Lei wrote:
->>> On Tue, Dec 02, 2025 at 11:56:12AM +0800, Cong Zhang wrote:
->>>> During system suspend, wakeup capable IRQs for block device can be
->>>> delayed, which can cause blk_mq_hctx_notify_offline() to hang
->>>> indefinitely while waiting for pending request to complete.
->>>> Skip the request waiting loop and abort suspend when wakeup events are
->>>> pending to prevent the deadlock.
->>>>
->>>> Fixes: bf0beec0607d ("blk-mq: drain I/O when all CPUs in a hctx are offline")
->>>> Signed-off-by: Cong Zhang <cong.zhang@oss.qualcomm.com>
->>>> ---
->>>> The issue was found during system suspend with a no_soft_reset
->>>> virtio-blk device. Here is the detailed analysis:
->>>> - When system suspend starts and no_soft_reset is enabled, virtio-blk
->>>>   does not call its suspend callback.
->>>> - Some requests are dispatched and queued. After sending the virtqueue
->>>>   notifier, the kernel waits for an IRQ to complete the request.
->>>> - The virtio-blk IRQ is wakeup-capable. When the IRQ is triggered, it
->>>>   remains pending because the device is in the suspend process.
->>>
->>> Can you explain a bit for above point? Why does the IRQ remains pending
->>> and not get handled?
->>>
->>
->> The wakeup capable IRQ is not masked during suspend. When the IRQ is
->> triggered, the kernel does not call its IRQ handler, instead kernel only
->> marks the IRQ as a wakeup event in pm_system_irq_wakeup(). By checking
->> pm_wakeup_pending() suspend process can abort if a wakeup event is
->> detected. That means the actual IRQ handler is not called during the
->> checking of blk_mq_hctx_has_requests, which cause the issue.
-> 
-> Thanks for the explanation!
-> 
-> Can you document it around `if (pm_wakeup_pending)`?
-> 
-> Otherwise, this patch looks fine for me.
-> 
+This pattern exists in loop and zloop drivers, where multi-bio requests
+require copying bvecs into a contiguous array before creating
+an iov_iter for file operations.
 
-Thanks for your comments! Update in the new patchset.
+Update loop and zloop drivers to use the new helper, eliminating
+duplicate code.
 
-> 
-> Thanks,
-> Ming
-> 
+This patch also provides a clear API to avoid any potential misuse of
+blk_nr_phys_segments() for calculating the bvecs since, one bvec can
+have more than one segments and use of blk_nr_phys_segments() can
+lead to extra memory allocation :-
+
+[ 6155.673749] nullb_bio: 128K bio as ONE bvec: sector=0, size=131072
+[ 6155.673846] null_blk: #### null_handle_data_transfer:1375
+[ 6155.673850] null_blk: nr_bvec=1 blk_rq_nr_phys_segments=2
+[ 6155.674263] null_blk: #### null_handle_data_transfer:1375
+[ 6155.674267] null_blk: nr_bvec=1 blk_rq_nr_phys_segments=1
+
+Reviewed-by: Niklas Cassel<cassel@kernel.org>
+Signed-off-by: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+---
+
+V3:-
+1. Rebased and Added Reviewed-by tag. (Niklas)
+
+Hi,
+
+During bio submission, the block layer may split a single bvec into
+multiple physical segments based on device limits:
+    submit_bio()
+      -> submit_bio_noacct()
+        -> __submit_bio_noacct()
+          -> __submit_bio()
+            -> blk_mq_submit_bio()
+              -> __bio_split_to_limits()
+                -> bio_split_rw()
+                  -> bio_split_rw_at()
+                    -> bio_split_io_at()
+                      -> bio_for_each_bvec()
+                        -> [Fast path] nsegs++ (1 bvec = 1 segment)
+                        -> [Slow path] bvec_split_segs()
+
+The bvec_split_segs() function handles the case where a single bvec must
+be split into multiple segments:
+
+    /**
+     * bvec_split_segs - verify whether or not a bvec should be split in the
+     *                   middle
+     * ...
+     * When splitting a bio, it can happen that a bvec is encountered that is
+     * too big to fit in a single segment and hence that it has to be split in
+     * the middle.
+     */
+    static bool bvec_split_segs(...)
+    {
+        while (len && *nsegs < max_segs) {
+            seg_size = get_max_segment_size(...);
+            (*nsegs)++;
+            total_len += seg_size;
+            len -= seg_size;
+        }
+        *bytes += total_len;
+        return (len > 0);
+    }
+
+Splitting occurs when a bvec exceeds:
+- max_segment_size
+- segment_boundary_mask (DMA boundary constraints)
+- max_segments limit
+
+Result after bio_split_io_at():
+- nr_bvec (what rq_for_each_bvec iterates): **1**
+- rq->nr_phys_segments: 2
+
+*[ 6155.673749] nullb_bio: 128K bio as ONE bvec: sector=0, size=131072
+*[ 6155.673846] null_blk: #### null_handle_data_transfer:1375*
+*[ 6155.673850] null_blk: nr_bvec=1 blk_rq_nr_phys_segments=2*
+*[ 6155.674263] null_blk: #### null_handle_data_transfer:1375*
+*[ 6155.674267] null_blk: nr_bvec=1 blk_rq_nr_phys_segments=1*
+
+-ck
+---
+ drivers/block/loop.c   |  5 ++---
+ drivers/block/zloop.c  |  5 ++---
+ include/linux/blk-mq.h | 18 ++++++++++++++++++
+ 3 files changed, 22 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index ebe751f39742..272bc608e528 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -348,11 +348,10 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 	struct file *file = lo->lo_backing_file;
+ 	struct bio_vec tmp;
+ 	unsigned int offset;
+-	int nr_bvec = 0;
++	unsigned int nr_bvec;
+ 	int ret;
+ 
+-	rq_for_each_bvec(tmp, rq, rq_iter)
+-		nr_bvec++;
++	nr_bvec = blk_rq_nr_bvec(rq);
+ 
+ 	if (rq->bio != rq->biotail) {
+ 
+diff --git a/drivers/block/zloop.c b/drivers/block/zloop.c
+index 3f50321aa4a7..77bd6081b244 100644
+--- a/drivers/block/zloop.c
++++ b/drivers/block/zloop.c
+@@ -394,7 +394,7 @@ static void zloop_rw(struct zloop_cmd *cmd)
+ 	struct bio_vec tmp;
+ 	unsigned long flags;
+ 	sector_t zone_end;
+-	int nr_bvec = 0;
++	unsigned int nr_bvec;
+ 	int ret;
+ 
+ 	atomic_set(&cmd->ref, 2);
+@@ -487,8 +487,7 @@ static void zloop_rw(struct zloop_cmd *cmd)
+ 		spin_unlock_irqrestore(&zone->wp_lock, flags);
+ 	}
+ 
+-	rq_for_each_bvec(tmp, rq, rq_iter)
+-		nr_bvec++;
++	nr_bvec = blk_rq_nr_bvec(rq);
+ 
+ 	if (rq->bio != rq->biotail) {
+ 		struct bio_vec *bvec;
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index eb7254b3dddd..cae9e857aea4 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -1213,6 +1213,24 @@ static inline unsigned short blk_rq_nr_discard_segments(struct request *rq)
+ 	return max_t(unsigned short, rq->nr_phys_segments, 1);
+ }
+ 
++/**
++ * blk_rq_nr_bvec - return number of bvecs in a request
++ * @rq: request to calculate bvecs for
++ *
++ * Returns the number of bvecs.
++ */
++static inline unsigned int blk_rq_nr_bvec(struct request *rq)
++{
++	struct req_iterator rq_iter;
++	struct bio_vec bv;
++	unsigned int nr_bvec = 0;
++
++	rq_for_each_bvec(bv, rq, rq_iter)
++		nr_bvec++;
++
++	return nr_bvec;
++}
++
+ int __blk_rq_map_sg(struct request *rq, struct scatterlist *sglist,
+ 		struct scatterlist **last_sg);
+ static inline int blk_rq_map_sg(struct request *rq, struct scatterlist *sglist)
+-- 
+2.40.0
 
