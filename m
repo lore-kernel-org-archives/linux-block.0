@@ -1,247 +1,254 @@
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09E98231827
-	for <linux-block@vger.kernel.org>; Wed,  3 Dec 2025 03:58:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2107415A86D
+	for <linux-block@vger.kernel.org>; Wed,  3 Dec 2025 04:34:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764734294; cv=none; b=dcu4ceiTkrJqHGvhjvxa8zYMu3LOmxPpnWfW7HP8CHVi1NZ9X6+X4Q+9Uf0/sLM1++/BQSygu7MG7R3v4+jdTIi7/ntdIjE72EzPIWGRfti4iJYqNABhIxhV6xzGsIfY1V5+cissDz9h13bK8Z5oZ3OomHmOoa6xcMr/0OTPuD8=
+	t=1764736466; cv=none; b=AtEWg2x8WT0ewGmvbpapLkhTXQMRpQoT7D+n11FppqFlK3pTl/23TG80FLvpGJwnFiNP1MYiI5Yqmw4vqOzDe1vB47ZxwPx0UuJgFgKn0+fudcX5x6A/2JJsj24VmGu0tojScqR/tDpFRlm8dGeRXSkmVto5uTuJgezzoh5pxnk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764734294; c=relaxed/simple;
-	bh=jA7ppoL2btYpLD56UmAahdXqlhGBlNes4HeuDdKQUaw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=g+nkXEFHxcvRS6ah5MBHiDD1yXY6ZL5prcrbfHE6XuE9xYuTryiHMhveeAxFa/R65Ijow9mfPQEXmrxrv++Eyj2XWT9aHaPXt0Ak+pUkRQBVXRlrQoaIfUuh/sIBDbGFdBwMp56igb4KVdRmck+FAVp34xzM59gOlYTKdw5zvyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lpEzhEnq; arc=none smtp.client-ip=209.85.215.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1764736466; c=relaxed/simple;
+	bh=J3ud9c+B59CpaGcXxCgeLWI/I7zbSGuZCKk9VSUdFk4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Beq241yMwTERjQhH1reyWE4vqYjq1g05umh1SBk1i+yIsIYoOfSevUEgEx5M7y9GI09qXspaPz3XHrRFS07lV+aIX+kTF9X/PqrHQ3f5147+V3DIrESMizSrgC7nEuyrpL7jXzZPDEGXNh8x8rMQ9xKvZXEs6sqEcVjHVM7x9LU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=ZpX6ZY62; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lpEzhEnq"
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-b996c8db896so7304892a12.3
-        for <linux-block@vger.kernel.org>; Tue, 02 Dec 2025 19:58:12 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="ZpX6ZY62"
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7a9fb70f7a9so544634b3a.1
+        for <linux-block@vger.kernel.org>; Tue, 02 Dec 2025 20:34:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764734292; x=1765339092; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=9wtT80laZZr2EVLtVh+9yjeQK2HScm71Gn/qBdsOPts=;
-        b=lpEzhEnq+ku8EgcXmg+yaNB3kNBmIAPKHPPBjOfE5LRhVnQF32VVQ4oTyIIjpFmXv/
-         y0JedtMjqA4NfK4m0/0VGZTwZsRGNKx6kRVr0+10NQy15M0qE1L7F6nfygX5FblAjH5g
-         K0IK8wayl6V0O9sdnLhV8dudxOIuvR/kt8Q9FVNSeBK0UtoWiXwaihrSzrBctZtaOAfJ
-         SNcL+zHxbB41lSf0H5zgS7fdu/iApG3T8yzaOxckWiSQap5jsyVLtBtR14Jx/4gU9Dm9
-         l2EahPtT9akVRYsiK8V/zviKmZNQvtJXcc6Rw4mofmVd41vje0CejdntOTos9LzRjRGR
-         3uow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764734292; x=1765339092;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=purestorage.com; s=google2022; t=1764736464; x=1765341264; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9wtT80laZZr2EVLtVh+9yjeQK2HScm71Gn/qBdsOPts=;
-        b=I6EZF+zhSWwpqfhp7AQcPnvlBUfgGXtygmgTfnR83V2/MLU/l7IwvtSTUBuWWbyOwX
-         3bq7e7Q6YprbLhnd3pjaQ+3aEIN/AyOQNYRaQpa3EtzlhU6mFEqgJ0YxLjQWwALmkAy/
-         lpe/NLNEWLvY2wc/2CduInpX2T8e2rxwUr+/aFnA1wNp7YgOPSyJP9XpjGocFunz6DFP
-         3v9WpVdRnps1hDwGOOX/2BGeppKUaQUAJMqRLoLV7t1JFaeQOKS4CNHnIMZWhsAIlDx6
-         6ItpA0hwtQzwOGwsPPhnGtR+jfhrbhShlccDaoVyFIOMjN9eOw1ueUTHsrohGQcQq8hQ
-         iBmQ==
-X-Gm-Message-State: AOJu0YwOBXebCe3TdHfR2buVTvvbXeTyySeWkOzhW6CcOrI/zRMkFczO
-	Eq5nkH/zLkQsC1AyIdSjNi/vgxkJ85rNGWKiWdQ5rPGu/m5V68zvapqX
-X-Gm-Gg: ASbGnctFCrrIq5w8oopC4jEpAxBIofoOJ/dwzB7QXtZ1FUm/EvDaDclcSrwRKNaKzQF
-	kK9yfO1RFnVbG6zQZDgEBhYKoorQt6OwHpWTndshOrGmEw5Ql7d1Ngju/8gIM3iQqW+P0KyJ3GB
-	fw6ObNuXbQT/mHo/lFz0oL5zSbiTT5eyL9p/FsAvpm2EUHS6dC6oSw1qkA7pJ9CCTpASYuVmNgP
-	To+gi5iNLd6WVxj2fQAX4DeSn7no4lrcs4UqB2NtvUvtYhffMRhyRItQrwYmpBi6nzp7m1LenaQ
-	42M9ttuz/mKG3WJQod8ylDgjgleUCIBmBgkZn15RoC5pNVaDTpRii13xc/mJSniNi4hgQJ95rvK
-	2bvUgUEVQPQ92o2KmzdmhghgyfW/o+G+NXeN3dfxkzpJ5ME2WiHL+dEE4fD28AkPCAJqCOSLnUW
-	7TQSssbC8VGq2QuUsjgoDLuZ2x
-X-Google-Smtp-Source: AGHT+IEOgV2/DUMz8fOTczj8KB7JctvBHrGTDKjtmIFIh7aboBfyER5OaL/OMoztpNMtKRnzNYRCeQ==
-X-Received: by 2002:a05:693c:2d81:b0:2a4:3592:cf71 with SMTP id 5a478bee46e88-2ab92e23131mr699686eec.21.1764734292149;
-        Tue, 02 Dec 2025 19:58:12 -0800 (PST)
-Received: from localhost ([165.85.49.192])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2a965b47caasm63705317eec.6.2025.12.02.19.58.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Dec 2025 19:58:11 -0800 (PST)
-From: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
-To: kbusch@kernel.org,
-	axboe@kernel.dk,
-	hch@lst.de,
-	dlemoal@kernel.org
-Cc: linux-block@vger.kernel.org,
-	Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
-	Niklas Cassel <cassel@kernel.org>
-Subject: [PATCH V3] blk-mq: add blk_rq_nr_bvec() helper
-Date: Tue,  2 Dec 2025 19:58:09 -0800
-Message-Id: <20251203035809.30610-1-ckulkarnilinux@gmail.com>
-X-Mailer: git-send-email 2.40.0
+        bh=nxg6NZLOv9ZCG/sjoM6MZuhlX+NYCjdQCAFs3JbKTvw=;
+        b=ZpX6ZY62rTnA4qp7sExNCrOPP425el2xtwYFD2N+o+4KsnD3WRibgAd2f/k5npQnJp
+         wmM5g3RE24lcP/Hc1swtsctzcUb/Bas3qxmb6ug033VBVi/JEjAShcP/fyN2GUD5A741
+         BqKQ98amNGtHeH/wUL5FWdZLW1GUcYd0a4upNAbnH6B8c8SSLFs66mHXQX/hv95n6ekS
+         dT5uc0fGkW/zijOxIf9RXia1Hla6Y1F96WB72CWHLTbce86qTpl1CtZQUws7kZ7xAIQt
+         AxucJ32nNSpvSnU5UYEDJMWAKBqXElw++Rez27lQo55WIiSHrT1V7B92d2B/tYNCP7HZ
+         dcwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764736464; x=1765341264;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=nxg6NZLOv9ZCG/sjoM6MZuhlX+NYCjdQCAFs3JbKTvw=;
+        b=M5fG731oGxYmvhcsuFXWMWTKinxMM2MA6pAAbcn/VD2WuI/91JBbm9jBlYEB9iA8ZS
+         BK9o2Z5M/RdocJhI0rC1b+JGuGbXmbFXuCRVnKvdSDyvHjf4lgpf/prkz47P34/zFcrH
+         f/n/o3m2P3h5I0H7DoT7VUUYROodIeff3aQA5njPK6WcsjAj9ifkJ5B8lz7Nc3v7mJ24
+         kq//VKlCCOdtP4RctKJyjfdGQdjYtNIcqqLeJza6DZcKEft1egByU6x3Aa/0YC08LlzC
+         P7e3EGOzXx9TutV7z9J6aecVfDCHR+ISPmE77LxYsiWg5ucHaifp9BNicqTN50nU/OUq
+         tB6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXyI4dYXtGMhIWC3Sx8Al04sfHaVkI9nPy5AOMgBz72EhtGuczrRQLpfjVk0jbmsfJbFU7ZnPPGiCRZ2A==@vger.kernel.org
+X-Gm-Message-State: AOJu0YylBIDcjMPGlqBlV2HO78nr29Y22IpCaXlj+ivPTCyouAJAmRIg
+	XGt7Cw0m1v+1UUi2yAXOHFxh8ifNEeV5SvNxR4VZrSdRHnrfFMBzFOcFD6e3Gu1UAcNlkGKZE8d
+	dWXOyXhhTMaYf3VJ/9f0GiKeEq/MYwL6XtuQLmJaM8Q==
+X-Gm-Gg: ASbGncvnOyYLRp4GjHoLwYfV/jCl3NvOvlRKVg89NZugKmz76QwNmIFRfj7CShjc6rZ
+	0fr/bUA2YdtPEfmAoGwGDaijjtxh3Z+tBMeqqI01ulQ72LNRx4ItaUsroCos01GSQd3e5G6gxcD
+	6hywUPio9OZrc1JL7cGTTAJ0t9/iW6nrNgdaJChyU5EpoW5tFM2/9x2o8iZntr82atC0LHKlmYw
+	8T2eKROVfQoELGIN54yOuTRupaBipA1YGqTywHLaOQ4qRos1QKPPUf6u2bNxzK0p1e0HZ3P
+X-Google-Smtp-Source: AGHT+IECnDzApJ5NyNLW8rGHiHxtldS0FYY+rhs6YCEvY55DQGZQH4fAIX45fRAqvDe7ic9LbXXirxdXMRcmPw0X94E=
+X-Received: by 2002:a05:7022:f902:10b0:119:e56a:4ffb with SMTP id
+ a92af1059eb24-11df2491f44mr64587c88.0.1764736464174; Tue, 02 Dec 2025
+ 20:34:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20251201090442.2707362-1-zhangshida@kylinos.cn>
+ <20251201090442.2707362-4-zhangshida@kylinos.cn> <CAHc6FU4o8Wv+6TQti4NZJRUQpGF9RWqiN9fO6j55p4xgysM_3g@mail.gmail.com>
+ <aS17LOwklgbzNhJY@infradead.org> <CAHc6FU7k7vH5bJaM6Hk6rej77t4xijBESDeThdDe1yCOqogjtA@mail.gmail.com>
+ <20251202054841.GC15524@lst.de> <CAHc6FU6B6ip8e-+VXaAiPN+oqJTW2Tuoh0Vv-E96Baf2SSbt7w@mail.gmail.com>
+ <CANubcdWHor3Jx+5yeY84nx0yFe3JosqVG4wGdVkpMfbQLVAWpQ@mail.gmail.com> <CANubcdWBF5tCfrutAOiUkFaZb=9s4=bMKzi7dSwQxTGbC_3_1Q@mail.gmail.com>
+In-Reply-To: <CANubcdWBF5tCfrutAOiUkFaZb=9s4=bMKzi7dSwQxTGbC_3_1Q@mail.gmail.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Tue, 2 Dec 2025 20:34:11 -0800
+X-Gm-Features: AWmQ_bm3LS7Up9zs78OFsHjIPFx_Ldz_doIQ0KD7HcFfO0Yxjj_mgU4AGtQS6xg
+Message-ID: <CADUfDZoWjSHRVFnxh=QK7HkQSB5zBZvePjkV-+2Esrf8jtnekg@mail.gmail.com>
+Subject: Re: [PATCH v4 3/3] block: prevent race condition on bi_status in __bio_chain_endio
+To: Stephen Zhang <starzhangzsd@gmail.com>
+Cc: Andreas Gruenbacher <agruenba@redhat.com>, Christoph Hellwig <hch@lst.de>, Johannes.Thumshirn@wdc.com, 
+	ming.lei@redhat.com, hsiangkao@linux.alibaba.com, colyli@fnnas.com, 
+	linux-block@vger.kernel.org, linux-bcache@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, zhangshida@kylinos.cn
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add a new helper function blk_rq_nr_bvec() that returns the number of
-bvecs in a request. This count represents the number of iterations
-rq_for_each_bvec() would perform on a request.
+On Tue, Dec 2, 2025 at 7:10=E2=80=AFPM Stephen Zhang <starzhangzsd@gmail.co=
+m> wrote:
+>
+> Stephen Zhang <starzhangzsd@gmail.com> =E4=BA=8E2025=E5=B9=B412=E6=9C=883=
+=E6=97=A5=E5=91=A8=E4=B8=89 09:51=E5=86=99=E9=81=93=EF=BC=9A
+> >
+> > Andreas Gruenbacher <agruenba@redhat.com> =E4=BA=8E2025=E5=B9=B412=E6=
+=9C=883=E6=97=A5=E5=91=A8=E4=B8=89 05:15=E5=86=99=E9=81=93=EF=BC=9A
+> > >
+> > > On Tue, Dec 2, 2025 at 6:48=E2=80=AFAM Christoph Hellwig <hch@lst.de>=
+ wrote:
+> > > > On Mon, Dec 01, 2025 at 02:07:07PM +0100, Andreas Gruenbacher wrote=
+:
+> > > > > On Mon, Dec 1, 2025 at 12:25=E2=80=AFPM Christoph Hellwig <hch@in=
+fradead.org> wrote:
+> > > > > > On Mon, Dec 01, 2025 at 11:22:32AM +0100, Andreas Gruenbacher w=
+rote:
+> > > > > > > > -       if (bio->bi_status && !parent->bi_status)
+> > > > > > > > -               parent->bi_status =3D bio->bi_status;
+> > > > > > > > +       if (bio->bi_status)
+> > > > > > > > +               cmpxchg(&parent->bi_status, 0, bio->bi_stat=
+us);
+> > > > > > >
+> > > > > > > Hmm. I don't think cmpxchg() actually is of any value here: f=
+or all
+> > > > > > > the chained bios, bi_status is initialized to 0, and it is on=
+ly set
+> > > > > > > again (to a non-0 value) when a failure occurs. When there ar=
+e
+> > > > > > > multiple failures, we only need to make sure that one of thos=
+e
+> > > > > > > failures is eventually reported, but for that, a simple assig=
+nment is
+> > > > > > > enough here.
+> > > > > >
+> > > > > > A simple assignment doesn't guarantee atomicy.
+> > > > >
+> > > > > Well, we've already discussed that bi_status is a single byte and=
+ so
+> > > > > tearing won't be an issue. Otherwise, WRITE_ONCE() would still be
+> > > > > enough here.
+> > > >
+> > > > No.  At least older alpha can tear byte updates as they need a
+> > > > read-modify-write cycle.
+> > >
+> > > I know this used to be a thing in the past, but to see that none of
+> > > that is relevant anymore today, have a look at where [*] quotes the
+> > > C11 standard:
+> > >
+> > >         memory location
+> > >                 either an object of scalar type, or a maximal sequenc=
+e
+> > >                 of adjacent bit-fields all having nonzero width
+> > >
+> > >                 NOTE 1: Two threads of execution can update and acces=
+s
+> > >                 separate memory locations without interfering with
+> > >                 each other.
+> > >
+> > >                 NOTE 2: A bit-field and an adjacent non-bit-field mem=
+ber
+> > >                 are in separate memory locations. The same applies
+> > >                 to two bit-fields, if one is declared inside a nested
+> > >                 structure declaration and the other is not, or if the=
+ two
+> > >                 are separated by a zero-length bit-field declaration,
+> > >                 or if they are separated by a non-bit-field member
+> > >                 declaration. It is not safe to concurrently update tw=
+o
+> > >                 bit-fields in the same structure if all members decla=
+red
+> > >                 between them are also bit-fields, no matter what the
+> > >                 sizes of those intervening bit-fields happen to be.
+> > >
+> > > [*] Documentation/memory-barriers.txt
+> > >
+> > > > But even on normal x86 the check and the update would be racy.
+> > >
+> > > There is no check and update (RMW), though. Quoting what I wrote
+> > > earlier in this thread:
+> > >
+> > > On Mon, Dec 1, 2025 at 11:22=E2=80=AFAM Andreas Gruenbacher <agruenba=
+@redhat.com> wrote:
+> > > > Hmm. I don't think cmpxchg() actually is of any value here: for all
+> > > > the chained bios, bi_status is initialized to 0, and it is only set
+> > > > again (to a non-0 value) when a failure occurs. When there are
+> > > > multiple failures, we only need to make sure that one of those
+> > > > failures is eventually reported, but for that, a simple assignment =
+is
+> > > > enough here. The cmpxchg() won't guarantee that a specific error va=
+lue
+> > > > will survive; it all still depends on the timing. The cmpxchg() onl=
+y
+> > > > makes it look like something special is happening here with respect=
+ to
+> > > > ordering.
+> > >
+> > > So with or without the cmpxchg(), if there are multiple errors, we
+> > > won't know which bi_status code will survive, but we do know that we
+> > > will end up with one of those error codes.
+> > >
+> >
+> > Thank you for sharing your insights=E2=80=94I found the discussion very=
+ enlightening.
+> >
+> > While I agree with Andreas=E2=80=99s perspective, I also very much appr=
+eciate
+> > the clarity
+> > and precision offered by the cmpxchg() approach. That=E2=80=99s why whe=
+n Christoph
+> > suggested it, I was happy to incorporate it into the code.
+> >
+> > But a cmpxchg is a little bit redundant here.
+> > so we will change it to the simple assignment:
+> >
+> > -       if (bio->bi_status && !parent->bi_status)
+> >                  parent->bi_status =3D bio->bi_status;
+> > +       if (bio->bi_status)
+> >                  parent->bi_status =3D bio->bi_status;
+> >
+> > I will integrate this discussion into the commit message, it is very in=
+sightful.
+> >
+>
+> Hi,
+>
+> I=E2=80=99ve been reconsidering the two approaches for the upcoming patch=
+ revision.
+> Essentially, we=E2=80=99re comparing two methods:
+> A:
+>         if (bio->bi_status)
+>                    parent->bi_status =3D bio->bi_status;
+> B:
+>         if (bio->bi_status)
+>                 cmpxchg(&parent->bi_status, 0, bio->bi_status);
+>
+> Both appear correct, but B seems a little bit redundant here.
+> Upon further reflection, I=E2=80=99ve noticed a subtle difference:
+> A unconditionally writes to parent->bi_status when bio->bi_status is non-=
+zero,
+> regardless of the current value of parent->bi_status.
+> B uses cmpxchg to only update parent->bi_status if it is still zero.
+>
+> Thus, B could avoid unnecessary writes in cases where parent->bi_status h=
+as
+> already been set to a non-zero value.
+>
+> Do you think this optimization would be beneficial in practice, or is
+> the difference
+> negligible?
 
-Drivers need to pre-allocate bvec arrays before iterating through
-a request's bvecs. Currently, they manually count bvecs using
-rq_for_each_bvec() in a loop, which is repetitive. The new helper
-centralizes this logic.
+cmpxchg() is much more expensive than a plain write, as it compiles
+into an atomic instruction (or load-linked/store-conditional pair on
+architectures that don't provide such an instruction). This requires
+the processor to take exclusive access of the cache line for the
+duration of the operation (or check whether the cache line has been
+invalidated during the operation). On x86, cmpxchg() marks the cache
+line as modified regardless of whether the compare succeeds and the
+value is updated. So it doesn't actually avoid the cost of a write.
+However, the original code's check of parent->bi_status before writing
+to it *does* avoid the write if parent->bi_status is already nonzero.
+So the optimization you're looking for is already implemented :)
+If __bio_chain_endio() can be called concurrently from multiple
+threads accessing the same parent bio, it should be using WRITE_ONCE()
+(and READ_ONCE(), if applicable) to access parent->bi_status to avoid
+the data race. On x86 and ARM these macros produce the same
+instruction as a normal write, but they may be required on other
+architectures to avoid tearing, as well as to prevent the compiler
+from adding or removing memory accesses based on the assumption that
+the values aren't being accessed concurrently by other threads.
 
-This pattern exists in loop and zloop drivers, where multi-bio requests
-require copying bvecs into a contiguous array before creating
-an iov_iter for file operations.
-
-Update loop and zloop drivers to use the new helper, eliminating
-duplicate code.
-
-This patch also provides a clear API to avoid any potential misuse of
-blk_nr_phys_segments() for calculating the bvecs since, one bvec can
-have more than one segments and use of blk_nr_phys_segments() can
-lead to extra memory allocation :-
-
-[ 6155.673749] nullb_bio: 128K bio as ONE bvec: sector=0, size=131072
-[ 6155.673846] null_blk: #### null_handle_data_transfer:1375
-[ 6155.673850] null_blk: nr_bvec=1 blk_rq_nr_phys_segments=2
-[ 6155.674263] null_blk: #### null_handle_data_transfer:1375
-[ 6155.674267] null_blk: nr_bvec=1 blk_rq_nr_phys_segments=1
-
-Reviewed-by: Niklas Cassel<cassel@kernel.org>
-Signed-off-by: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
----
-
-V3:-
-1. Rebased and Added Reviewed-by tag. (Niklas)
-
-Hi,
-
-During bio submission, the block layer may split a single bvec into
-multiple physical segments based on device limits:
-    submit_bio()
-      -> submit_bio_noacct()
-        -> __submit_bio_noacct()
-          -> __submit_bio()
-            -> blk_mq_submit_bio()
-              -> __bio_split_to_limits()
-                -> bio_split_rw()
-                  -> bio_split_rw_at()
-                    -> bio_split_io_at()
-                      -> bio_for_each_bvec()
-                        -> [Fast path] nsegs++ (1 bvec = 1 segment)
-                        -> [Slow path] bvec_split_segs()
-
-The bvec_split_segs() function handles the case where a single bvec must
-be split into multiple segments:
-
-    /**
-     * bvec_split_segs - verify whether or not a bvec should be split in the
-     *                   middle
-     * ...
-     * When splitting a bio, it can happen that a bvec is encountered that is
-     * too big to fit in a single segment and hence that it has to be split in
-     * the middle.
-     */
-    static bool bvec_split_segs(...)
-    {
-        while (len && *nsegs < max_segs) {
-            seg_size = get_max_segment_size(...);
-            (*nsegs)++;
-            total_len += seg_size;
-            len -= seg_size;
-        }
-        *bytes += total_len;
-        return (len > 0);
-    }
-
-Splitting occurs when a bvec exceeds:
-- max_segment_size
-- segment_boundary_mask (DMA boundary constraints)
-- max_segments limit
-
-Result after bio_split_io_at():
-- nr_bvec (what rq_for_each_bvec iterates): **1**
-- rq->nr_phys_segments: 2
-
-*[ 6155.673749] nullb_bio: 128K bio as ONE bvec: sector=0, size=131072
-*[ 6155.673846] null_blk: #### null_handle_data_transfer:1375*
-*[ 6155.673850] null_blk: nr_bvec=1 blk_rq_nr_phys_segments=2*
-*[ 6155.674263] null_blk: #### null_handle_data_transfer:1375*
-*[ 6155.674267] null_blk: nr_bvec=1 blk_rq_nr_phys_segments=1*
-
--ck
----
- drivers/block/loop.c   |  5 ++---
- drivers/block/zloop.c  |  5 ++---
- include/linux/blk-mq.h | 18 ++++++++++++++++++
- 3 files changed, 22 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index ebe751f39742..272bc608e528 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -348,11 +348,10 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- 	struct file *file = lo->lo_backing_file;
- 	struct bio_vec tmp;
- 	unsigned int offset;
--	int nr_bvec = 0;
-+	unsigned int nr_bvec;
- 	int ret;
- 
--	rq_for_each_bvec(tmp, rq, rq_iter)
--		nr_bvec++;
-+	nr_bvec = blk_rq_nr_bvec(rq);
- 
- 	if (rq->bio != rq->biotail) {
- 
-diff --git a/drivers/block/zloop.c b/drivers/block/zloop.c
-index 3f50321aa4a7..77bd6081b244 100644
---- a/drivers/block/zloop.c
-+++ b/drivers/block/zloop.c
-@@ -394,7 +394,7 @@ static void zloop_rw(struct zloop_cmd *cmd)
- 	struct bio_vec tmp;
- 	unsigned long flags;
- 	sector_t zone_end;
--	int nr_bvec = 0;
-+	unsigned int nr_bvec;
- 	int ret;
- 
- 	atomic_set(&cmd->ref, 2);
-@@ -487,8 +487,7 @@ static void zloop_rw(struct zloop_cmd *cmd)
- 		spin_unlock_irqrestore(&zone->wp_lock, flags);
- 	}
- 
--	rq_for_each_bvec(tmp, rq, rq_iter)
--		nr_bvec++;
-+	nr_bvec = blk_rq_nr_bvec(rq);
- 
- 	if (rq->bio != rq->biotail) {
- 		struct bio_vec *bvec;
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index eb7254b3dddd..cae9e857aea4 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -1213,6 +1213,24 @@ static inline unsigned short blk_rq_nr_discard_segments(struct request *rq)
- 	return max_t(unsigned short, rq->nr_phys_segments, 1);
- }
- 
-+/**
-+ * blk_rq_nr_bvec - return number of bvecs in a request
-+ * @rq: request to calculate bvecs for
-+ *
-+ * Returns the number of bvecs.
-+ */
-+static inline unsigned int blk_rq_nr_bvec(struct request *rq)
-+{
-+	struct req_iterator rq_iter;
-+	struct bio_vec bv;
-+	unsigned int nr_bvec = 0;
-+
-+	rq_for_each_bvec(bv, rq, rq_iter)
-+		nr_bvec++;
-+
-+	return nr_bvec;
-+}
-+
- int __blk_rq_map_sg(struct request *rq, struct scatterlist *sglist,
- 		struct scatterlist **last_sg);
- static inline int blk_rq_map_sg(struct request *rq, struct scatterlist *sglist)
--- 
-2.40.0
-
+Best,
+Caleb
