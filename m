@@ -1,91 +1,126 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA80133ADB9
-	for <linux-block@vger.kernel.org>; Thu,  4 Dec 2025 11:04:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764846252; cv=none; b=huA+83ApeumZVqMrk1i5iBRL3g+qRipEFPuRc8B9FqCG0rHvWqAGI3QytohjCNNltgQb2Kl9zv565uxKsso5CSla6EIxdyBSRh3dc9yJuRm3T9jBlq+hcchDT7CK8qeICeVH2QPREuzi1NalGgRTeSlboCN9yLb1qFTPP4yK57o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764846252; c=relaxed/simple;
-	bh=AwQg7zKWtZ3I3Vkv9FvnT0yAYY49svdZgq5yh6NptFs=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=uYDaf0p6GtuzdhL/6rUj6LfLhUj6l7nrpLCAOhb5Mgd30t5lNy736X2996T2uQqgVIx7xPGK0s0kquauOf+2sufQiLOTfYXEDTGtAZp3XrAPZnPdl+8nEx5OjEze3ZLDzr4vQaSoNqkRQcDTVXA2IGE74jNiAMDgUvMxVhkfokE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ULzrNjSi; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ULzrNjSi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A89E8C16AAE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EF15324713;
 	Thu,  4 Dec 2025 11:04:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764846251;
-	bh=AwQg7zKWtZ3I3Vkv9FvnT0yAYY49svdZgq5yh6NptFs=;
-	h=From:To:Subject:Date:From;
-	b=ULzrNjSikxwbuHVwlk+IzXEL2kshV7KAHSUHxHBxeS4WrgwIh0WjDXLg6eN5d9CHo
-	 gZPGiU5YxMTS0h6yJAuIJpock9hmEqL9hScBuSjJQd+UA03QVVYvBGmcsLVmzptEhC
-	 qgjOMbbNJ4DZoT30LOeXdDWk0uk7VqISGf8UwDZMpCCBAJuR3UnkmcaCyYMwKcVz4z
-	 BADf0oPhuOVHXXzdAdpXODhj+j+/TMJsyTmi4xBZy87qPrH0ZYKNSKGrPImlTxRjEZ
-	 plw2C9aY8e6+XHWGjWoDvyopw3Th4P6FsLxtgfBdR3BZsi+VAHvnjtvP5C3HiDTbxV
-	 BYbs1L7s3ETKw==
-From: Damien Le Moal <dlemoal@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Subject: [PATCH] block: Clear BLK_ZONE_WPLUG_PLUGGED when aborting plugged BIOs
-Date: Thu,  4 Dec 2025 19:59:52 +0900
-Message-ID: <20251204105952.178201-1-dlemoal@kernel.org>
-X-Mailer: git-send-email 2.52.0
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764846256; cv=none; b=tYHPBwjK42ZZRH8iRq5SpN1AaIQblFiQiXlH2r2uYUUXT+0dwuHSpbDa8cQdP+6G8EZWL05zj1piGmOSCyo6tr6Z/cuo2hYsuCQhLlAZz5e3oR4i8k9DW99hBWL/7NYQ5XpvtrIhE6+7ReiEkXMQz+6+DKsBpxhQCQI6yn/kYIg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764846256; c=relaxed/simple;
+	bh=TzysilqXOjLtCrRuSuiyww3cknmFSg1raJptQ/Up+VU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hsyhHVXgtrb3nNRM7owh29qoIMVVtNBuFt1niJ91euiJJ3geZbFSfMs6fkb/wnrxP9C14H+Z8Uen4c9yR0AMbYfYJtK75jh3jVrljRDgDGNnyh/nBgohY2VguHNEr/r0JBssoGy30cRrmVKiZwGdVVNvwoXDe46WIIx6WUrDme8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=mDHHlQMb; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="mDHHlQMb"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=QdqWywYRLnjOqYVHKgtj3N4//GIROBVw9oqa0ZS355g=; b=mDHHlQMbDwfREYyLCJJdJ8aJmE
+	6GyenRcqCkKxRoFrZtrTAzkuJmDPx9SnpyYywEoSFynjyN9SklwoSdmSDfowZxY50W3FqzmHljPQU
+	t5KiPaxqmH4Y/15kkfsN8pB9jttHPhePJxU9O3HOA3hfVi9o1hxy4/01QC2VUpNfRusoh7Di2sD66
+	gFWlkzoJleKZVr4brAQNrUvATdbJsXvfyJhCjOsX55GYdogNpXnCY701gwoLKGR0dWMyhhxMmY1lC
+	Ua2kSeQx5lg+kXy0hUoSBoAj8KgiZtc9wukhjkjBc+5wjKEn6sKI8Li0GmY91Ro/0uVhETp3HSqbU
+	84isKhKQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vR784-00000007tIE-2op0;
+	Thu, 04 Dec 2025 11:04:08 +0000
+Date: Thu, 4 Dec 2025 03:04:08 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+	Vishal Verma <vishal1.verma@intel.com>, tushar.gohad@intel.com,
+	Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org
+Subject: Re: [RFC v2 07/11] nvme-pci: implement dma_token backed requests
+Message-ID: <aTFqqNMR9i89puxB@infradead.org>
+References: <cover.1763725387.git.asml.silence@gmail.com>
+ <a86bbe2d8d105ed2c342749cd46ece2d1c537821.1763725388.git.asml.silence@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a86bbe2d8d105ed2c342749cd46ece2d1c537821.1763725388.git.asml.silence@gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Commit fe0418eb9bd6 ("block: Prevent potential deadlocks in zone write
-plug error recovery") added a WARN check in disk_put_zone_wplug() to
-verify that when the last reference to a zone write plug is dropped,
-this zone write plug does not have the BLK_ZONE_WPLUG_PLUGGED flag set,
-that is, that it is not plugged.
+> +static void nvme_sync_dma(struct nvme_dev *nvme_dev, struct request *req,
+> +			  enum dma_data_direction dir)
+> +{
+> +	struct blk_mq_dma_map *map = req->dma_map;
+> +	int length = blk_rq_payload_bytes(req);
+> +	bool for_cpu = dir == DMA_FROM_DEVICE;
+> +	struct device *dev = nvme_dev->dev;
+> +	dma_addr_t *dma_list = map->private;
+> +	struct bio *bio = req->bio;
+> +	int offset, map_idx;
+> +
+> +	offset = bio->bi_iter.bi_bvec_done;
+> +	map_idx = offset / NVME_CTRL_PAGE_SIZE;
+> +	length += offset & (NVME_CTRL_PAGE_SIZE - 1);
+> +
+> +	while (length > 0) {
+> +		u64 dma_addr = dma_list[map_idx++];
+> +
+> +		if (for_cpu)
+> +			__dma_sync_single_for_cpu(dev, dma_addr,
+> +						  NVME_CTRL_PAGE_SIZE, dir);
+> +		else
+> +			__dma_sync_single_for_device(dev, dma_addr,
+> +						     NVME_CTRL_PAGE_SIZE, dir);
+> +		length -= NVME_CTRL_PAGE_SIZE;
+> +	}
 
-However, the function disk_zone_wplug_abort(), which is called for zone
-reset and zone finish operations, does not clear this flag after
-emptying a zone write plug BIO list. This can result in the
-disk_put_zone_wplug() warning to trigger if the user (erroneously as
-that is bad pratcice) issues zone reset or zone finish operations while
-the target zone still has plugged BIOs.
+This looks really inefficient.  Usually the ranges in the dmabuf should
+be much larger than a controller page.
 
-Modify disk_put_zone_wplug() to clear the BLK_ZONE_WPLUG_PLUGGED flag.
-And while at it, also add a lockdep annotation to ensure that this
-function is called with the zone write plug spinlock held.
 
-Fixes: fe0418eb9bd6 ("block: Prevent potential deadlocks in zone write plug error recovery")
-Cc: stable@vger.kernel.org
-Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
----
- block/blk-zoned.c | 4 ++++
- 1 file changed, 4 insertions(+)
+> +static void nvme_unmap_premapped_data(struct nvme_dev *dev,
+> +				      struct request *req)
+> +{
+> +	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
+> +
+> +	if (rq_data_dir(req) == READ)
+> +		nvme_sync_dma(dev, req, DMA_FROM_DEVICE);
+> +	if (!(iod->flags & IOD_SINGLE_SEGMENT))
+> +		nvme_free_descriptors(req);
+> +}
 
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index dcc295721c2c..394d8d74bba9 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -741,6 +741,8 @@ static void disk_zone_wplug_abort(struct blk_zone_wplug *zwplug)
- {
- 	struct bio *bio;
- 
-+	lockdep_assert_held(&zwplug->lock);
-+
- 	if (bio_list_empty(&zwplug->bio_list))
- 		return;
- 
-@@ -748,6 +750,8 @@ static void disk_zone_wplug_abort(struct blk_zone_wplug *zwplug)
- 			    zwplug->disk->disk_name, zwplug->zone_no);
- 	while ((bio = bio_list_pop(&zwplug->bio_list)))
- 		blk_zone_wplug_bio_io_error(zwplug, bio);
-+
-+	zwplug->flags &= ~BLK_ZONE_WPLUG_PLUGGED;
- }
- 
- /*
--- 
-2.52.0
+This doesn't really unmap anything :)
+
+Also the dma ownership rules say that you always need to call the
+sync_to_device helpers before I/O and the sync_to_cpu helpers after I/O,
+no matters if it is a read or write.  The implementations then makes
+them a no-op where possible.
+
+> +
+> +	offset = bio->bi_iter.bi_bvec_done;
+> +	map_idx = offset / NVME_CTRL_PAGE_SIZE;
+> +	offset &= (NVME_CTRL_PAGE_SIZE - 1);
+> +
+> +	prp1_dma = dma_list[map_idx++] + offset;
+> +
+> +	length -= (NVME_CTRL_PAGE_SIZE - offset);
+> +	if (length <= 0) {
+> +		prp2_dma = 0;
+
+Urgg, why is this building PRPs instead of SGLs?  Yes, SGLs are an
+optional feature, but for devices where you want to micro-optimize
+like this I think we should simply require them.  This should cut
+down on both the memory use and the amount of special mapping code.
 
