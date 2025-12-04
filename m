@@ -1,73 +1,72 @@
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 894183148A8
-	for <linux-block@vger.kernel.org>; Thu,  4 Dec 2025 03:11:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2533F30FF06
+	for <linux-block@vger.kernel.org>; Thu,  4 Dec 2025 03:16:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764817922; cv=none; b=sWeFC42DYHBMsn6wPaNX/8FwDOr9WxDlSZcrtYO4u5uV+vAO0iYghp9uxommQVPrQ8uM6U4DQqVidIa8KU8jsWk1uBPkCfJ3Bm9TObmh+nSY/nohHQnYm9L2lI0bGkfTobU51ThOtkyRRDyXpZBkQ0GGte+pcKr/UL4p1r+RMTA=
+	t=1764818211; cv=none; b=BkFuVcYCPxll4Km426D/mf6I50r14CBiZt7/gWGB/63k01yPca4Fo2JxlbW+/pT8cwwe/V/oK3w5FIUv5OB6FiAz8gtaCb5N6br7TZHd6K2v9k11Us9W/FAquTq0szZbd/Vvj3OqFhixLoc6vZ1S+ECetD1BwgwEkmAdRiPfSo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764817922; c=relaxed/simple;
-	bh=f0Oq3PGKk2mPGjPKREeyXV87NUVBIXHz7ZTSfizPfwI=;
+	s=arc-20240116; t=1764818211; c=relaxed/simple;
+	bh=IHYSXpdTacB+eRYN7jRfloRznWY8dSuQ+NfPDbhIiTM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Dvjj2suPjp3b1I368+uChizyyIlNjeIcRBR0uKv4YolCr5ZYQKQWaTN/QZo/UEiDDOCv2ealVPvt3zz//21O1B8gOCfa2cK2wxSA+o+AfjL2cnl1vivqxcqybz44+bDU06Dix1ajnrB22vK3uv8B6KZGIvP5kqLYvvcy5c9yaZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=flv+cpqp; arc=none smtp.client-ip=209.85.215.172
+	 To:Cc:Content-Type; b=inFy1Fsm4Kibsl1zOCCowWHalhTWiVOn/p4mrvSkW49fTk6DCmyT+5IxzArA281ibcCeUN7CvHulIrBeb6tU+7uGAcvVowKS/8hmXJ8lUwALXucGBmUW+nkC6bZwIcVAWyKXzc53xZIKu52ls56wmLlGB8ocu0AMh2exLoOjAbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=BvA+zBzr; arc=none smtp.client-ip=209.85.210.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="flv+cpqp"
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-b9da0ae5763so15918a12.0
-        for <linux-block@vger.kernel.org>; Wed, 03 Dec 2025 19:11:57 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="BvA+zBzr"
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7b90db89b09so54033b3a.0
+        for <linux-block@vger.kernel.org>; Wed, 03 Dec 2025 19:16:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1764817917; x=1765422717; darn=vger.kernel.org;
+        d=purestorage.com; s=google2022; t=1764818207; x=1765423007; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yUc1Bp8d0WHYMovXDR/7gJjEBOkG2gXSQN5TMf8QUos=;
-        b=flv+cpqp2/0iCLjrMB1H8L3LoWgXWplGojlkDjxmp+xSKcQfW232NpoLj4PiS994da
-         W6t9eA0JBJmYZmS5qivdQ+aQqGPepqmRGAFgbAqDpzaEhAp2NN72uVDLHe0/8bR4dLUt
-         VchI8376xRTS3WesNSMQveC+rWYhZcLvI5N8UZQL1o0JrFZYNUccx2zXM2kD5BuigVFU
-         RAqspBl4gy7x2t8TJpPrmgoW0Uv2ZJ3rRSq+W+49tHummRL4pEWJfRtcwgIUq5Yp/bni
-         5Oiw8NhdfM9X1sBW8ByE3K90rqWVopySSvQIwIyjwNsYmfzvk0AXS/JhnJWXUh2fN6ZP
-         +7YA==
+        bh=B+r2Dxf1xibFUIUn/dFkdTyeoUAAg84C6r8L9PUO4m0=;
+        b=BvA+zBzrTAis5sHsiwVkYYMMK6grUmCAWjO57rX1HpmfQLhLQsvI8eR5mCAHfw9p3J
+         K8DEpuI/D2XJsyZ3wyyOI0gP5BbekU1VlTqbToIWyOaxWIu7p4TvqEaTeXX6cLDbnE+v
+         Fzu0h4Jer7wG7O65c5cjaoQVwo00XHeJtdJo6WE26/abd2WABt5ltSojJqZ8f97M/H+7
+         5xkgsX10lQugeUd+omhEpB9An/TshW8eQw/apOwFDGoI/GKIOTRCNGAcTj8gvPR7YiN0
+         9A25QWWQDQSNbQZaIrN6ksp1aeRix23ZOslz3Fe0IZTLDD+bs2fX6AQs189tjciG1MZx
+         bDSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764817917; x=1765422717;
+        d=1e100.net; s=20230601; t=1764818207; x=1765423007;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=yUc1Bp8d0WHYMovXDR/7gJjEBOkG2gXSQN5TMf8QUos=;
-        b=BxyLgpUBjKIQuv77l0BxhRwF52mAjJNFbSjNUwCQYQ6O9VfCos/19ZxZfJpNpvJDJM
-         RJOtEeGEYGYka4DREp6FipB8ZqSlUzlseIBWZvqjxQBu7w3M97sK6XZ5AqhFqQUQdk3h
-         Fkja86KORqmYbrwanLpZunVv7LF8nlOu2gddkECXa72QYGsH9ViipQ6OlIDX0/5XLZZt
-         hfdVKl2IYUjTmmjo0ne9ZCTa4idKTXsTZur+Vil31RSK59EPwJT+WfiNh/vRoMqhFP8e
-         WQzcATo7OYBmfVr6ztUNwpZh7XzEpJqMKYtVNa2bfUFkusLmIpBHMYrFfDyI3nl+0HXn
-         50Lg==
-X-Forwarded-Encrypted: i=1; AJvYcCVRDGiEoXcTnQiS6868ZpKaXHe3ZGZCr45FZyD3hfQh5TQX6s9lkBZ0/8qGYKK/JWnzNe1IXpxtv3dVGw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGA+gWI/6rYCJlBGzPsnkJjupSIntywPFvNNPNDEocp6A97Boc
-	UIl2yeVXqIjMJeI8x5N5CGzYbrb5LK/EjL6mZaS1eWWdiUFExl3gtQi0LcpLwaNOm7Z3WaIsVMV
-	Pn0T0AEqSrH8vOCDspuK2kV6EXsO44gjr82u1urdQJQ==
-X-Gm-Gg: ASbGnctMGvYuQ3MgAgLhg4tI8zUnBbm8cYAxLmwflRM1B+TpS7h1Dqql4fRdP4n4kfz
-	aLp82VoCEGTFiHcf5+8QdMIZ4voIrkoOYVWAoE40wuVbr/oM5hAlBnYC2SX59y+HJy0GjDy9UM5
-	9U6QJI0r0en3BtaY9uO5OD27v+701dYFyV7iCQxLwxayQ+omm9MEYNVQslXIeJSAv6SSx6w7Tza
-	G+LcVHtKzYWwpD3WsI01p34ZokMUwIUJMPSs12vEwNKNTr78wtnFCAbA2aRjVfMPAM1a0grecex
-	caaYfO8=
-X-Google-Smtp-Source: AGHT+IE8pWgHZiziUNc8GOC9mqhvx5OIF3LZ7YqFD5rQcLGoqryjlQ7X3Jig+n0wegvYheRCKf2n8FU04yTJdiY5oi4=
-X-Received: by 2002:a05:7022:f410:b0:11a:5cb2:24a0 with SMTP id
- a92af1059eb24-11df252cba1mr2562291c88.1.1764817916303; Wed, 03 Dec 2025
- 19:11:56 -0800 (PST)
+        bh=B+r2Dxf1xibFUIUn/dFkdTyeoUAAg84C6r8L9PUO4m0=;
+        b=jCWN8amBv8c4mIk0ispZRqng2R9Rz5w0NE339CPO81tU+sac+oV4zLjO0BzHknYV83
+         DKtl2VB8hQXDkz56fIHA9xwmkrZWhuZOPgT14dIxU3AR4ideDnpGIpD61xwXeOTOZc5r
+         158TKrBysx4cPb8leFjVdNVTSNMeETNGaVib81sPW9JSq8Hyte4IQe0MguwebliKFc5Q
+         kv2fIoqLbVYaMwIEZuKNeEs5i8WPdhxQuh9HPvpFfShK48wOrKJ3iOe8svttwY1eyTgT
+         /Eet6NbiIGf8zhGwNiRalMFG7k4oquf1qLg7BigcMxvZBSHfTx/lM1H26NeT1/L0leTr
+         867g==
+X-Forwarded-Encrypted: i=1; AJvYcCX1GaxH2qKhpYUJhT/3yo4HDqr3lsppkbo/Kq7+HuWIlbFUDP4fl5Z9n1i+llD3HD79AqAtDSgqvbYdSA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9HEEpw6hYWTuZQDl6NMI2mqgPfPxXCS9nJx6A0nNor4ZyFnVT
+	g3pzbzageawqrBkEsWD33PodsDs6YlQyjxuhTQzLnWM3EefCsWLvreryxig4LiRH/tevjA/k9Wu
+	hCYfjhGqUegZvFWEQbW7f4lToOYulLK/y/FzMkWdhVQ==
+X-Gm-Gg: ASbGncuCcBtImkP2xmsvayjfr+1ReHCynemrlgnWN6i6EIpZ90+BKr4hnK9rMwjJ0oM
+	4gZJ1B03BPYRt2eNQWFusYDzVeoox3luMfnwlrT/JK0V2SrQoGZAW4tnC6+mz0DNYuOq2ydd+Jf
+	CkJb/VhiNfF2PwXIKFcP4YCKC2Ta6IAH1h+7cKEAx81hFKoKshcAmCBfVLeQUxtPrPc4io+34bs
+	6XQjZBJQlZmT2TYhzhSpsNZHb0hBgkum2qf2C7OqzoV0TcT9J4Z52XC69Zl5sRytNE7PYuH
+X-Google-Smtp-Source: AGHT+IFYYHyof16iI3CEpar5veG2Jj2ej/bB0kqylsZJYmb2j2rSxMM8RCE31Y3R06xnWYaGhipO9KTekNBDw7eYEkw=
+X-Received: by 2002:a05:7022:3d0f:b0:119:e56b:46b9 with SMTP id
+ a92af1059eb24-11df0cd2596mr2925698c88.3.1764818206825; Wed, 03 Dec 2025
+ 19:16:46 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251202121917.1412280-1-ming.lei@redhat.com> <20251202121917.1412280-6-ming.lei@redhat.com>
-In-Reply-To: <20251202121917.1412280-6-ming.lei@redhat.com>
+References: <20251202121917.1412280-1-ming.lei@redhat.com> <20251202121917.1412280-7-ming.lei@redhat.com>
+In-Reply-To: <20251202121917.1412280-7-ming.lei@redhat.com>
 From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Wed, 3 Dec 2025 19:11:45 -0800
-X-Gm-Features: AWmQ_bkigaJ53DKn6jy05pUXX7yddnR-o-0O465Z9vlhQA7DHDgbdSJVXenksUE
-Message-ID: <CADUfDZofqWppGZzBqOaAuddRTQ0FZqvFm567pbZWbwOKDhOLQg@mail.gmail.com>
-Subject: Re: [PATCH V5 05/21] ublk: handle UBLK_U_IO_COMMIT_IO_CMDS
+Date: Wed, 3 Dec 2025 19:16:35 -0800
+X-Gm-Features: AWmQ_bm-wmMJoqvXtyIxOVVq_BkmHVtcmyM0eMA5wGXyZJIdfmjdRC5slwP2utw
+Message-ID: <CADUfDZovPb3SZHHxK2FgSyQK7PQ4afjEqQt8dgRCiynS-v40nQ@mail.gmail.com>
+Subject: Re: [PATCH V5 06/21] ublk: add io events fifo structure
 To: Ming Lei <ming.lei@redhat.com>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
 	Uday Shankar <ushankar@purestorage.com>
@@ -77,214 +76,164 @@ Content-Transfer-Encoding: quoted-printable
 On Tue, Dec 2, 2025 at 4:20=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrote=
 :
 >
-> Handle UBLK_U_IO_COMMIT_IO_CMDS by walking the uring_cmd fixed buffer:
+> Add ublk io events fifo structure and prepare for supporting command
+> batch, which will use io_uring multishot uring_cmd for fetching one
+> batch of io commands each time.
 >
-> - read each element into one temp buffer in batch style
+> One nice feature of kfifo is to allow multiple producer vs single
+> consumer. We just need lock the producer side, meantime the single
+> consumer can be lockless.
 >
-> - parse and apply each element for committing io result
+> The producer is actually from ublk_queue_rq() or ublk_queue_rqs(), so
+> lock contention can be eased by setting proper blk-mq nr_queues.
 >
 > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  drivers/block/ublk_drv.c      | 103 +++++++++++++++++++++++++++++++++-
->  include/uapi/linux/ublk_cmd.h |   8 +++
->  2 files changed, 109 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index 380553a6f299..5cc95e13295d 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -2098,7 +2098,7 @@ static inline int ublk_set_auto_buf_reg(struct ublk=
-_io *io, struct io_uring_cmd
->         return 0;
->  }
->
-> -static int ublk_handle_auto_buf_reg(struct ublk_io *io,
-> +static void ublk_clear_auto_buf_reg(struct ublk_io *io,
->                                     struct io_uring_cmd *cmd,
->                                     u16 *buf_idx)
->  {
-> @@ -2118,7 +2118,13 @@ static int ublk_handle_auto_buf_reg(struct ublk_io=
- *io,
->                 if (io->buf_ctx_handle =3D=3D io_uring_cmd_ctx_handle(cmd=
-))
->                         *buf_idx =3D io->buf.auto_reg.index;
->         }
-> +}
->
-> +static int ublk_handle_auto_buf_reg(struct ublk_io *io,
-> +                                   struct io_uring_cmd *cmd,
-> +                                   u16 *buf_idx)
-> +{
-> +       ublk_clear_auto_buf_reg(io, cmd, buf_idx);
->         return ublk_set_auto_buf_reg(io, cmd);
->  }
->
-> @@ -2553,6 +2559,17 @@ static inline __u64 ublk_batch_buf_addr(const stru=
-ct ublk_batch_io *uc,
->         return 0;
->  }
->
-> +static inline __u64 ublk_batch_zone_lba(const struct ublk_batch_io *uc,
-> +                                       const struct ublk_elem_header *el=
-em)
-> +{
-> +       const void *buf =3D elem;
-> +
-> +       if (uc->flags & UBLK_BATCH_F_HAS_ZONE_LBA)
-> +               return *(const __u64 *)(buf + sizeof(*elem) +
-> +                               8 * !!(uc->flags & UBLK_BATCH_F_HAS_BUF_A=
-DDR));
-> +       return -1;
-> +}
-> +
->  static struct ublk_auto_buf_reg
->  ublk_batch_auto_buf_reg(const struct ublk_batch_io *uc,
->                         const struct ublk_elem_header *elem)
-> @@ -2708,6 +2725,84 @@ static int ublk_handle_batch_prep_cmd(const struct=
- ublk_batch_io_data *data)
->         return ret;
->  }
->
-> +static int ublk_batch_commit_io_check(const struct ublk_queue *ubq,
-> +                                     struct ublk_io *io,
-> +                                     union ublk_io_buf *buf)
-> +{
-> +       if (io->flags & UBLK_IO_FLAG_ACTIVE)
 
-I think this needs to check for UBLK_IO_FLAG_OWNED_BY_SRV instead.
-Otherwise, it will allow committing ublk_io's that have never been
-fetched.
-
-Other than that,
 Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
 
-> +               return -EBUSY;
+> ---
+>  drivers/block/ublk_drv.c | 69 ++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 63 insertions(+), 6 deletions(-)
+>
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 5cc95e13295d..670233f0ec2a 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -44,6 +44,7 @@
+>  #include <linux/task_work.h>
+>  #include <linux/namei.h>
+>  #include <linux/kref.h>
+> +#include <linux/kfifo.h>
+>  #include <uapi/linux/ublk_cmd.h>
+>
+>  #define UBLK_MINORS            (1U << MINORBITS)
+> @@ -217,6 +218,24 @@ struct ublk_queue {
+>         bool fail_io; /* copy of dev->state =3D=3D UBLK_S_DEV_FAIL_IO */
+>         spinlock_t              cancel_lock;
+>         struct ublk_device *dev;
 > +
-> +       /* BATCH_IO doesn't support UBLK_F_NEED_GET_DATA */
-> +       if (ublk_need_map_io(ubq) && !buf->addr)
-> +               return -EINVAL;
-> +       return 0;
-> +}
+> +       /*
+> +        * For supporting UBLK_F_BATCH_IO only.
+> +        *
+> +        * Inflight ublk request tag is saved in this fifo
+> +        *
+> +        * There are multiple writer from ublk_queue_rq() or ublk_queue_r=
+qs(),
+> +        * so lock is required for storing request tag to fifo
+> +        *
+> +        * Make sure just one reader for fetching request from task work
+> +        * function to ublk server, so no need to grab the lock in reader
+> +        * side.
+> +        */
+> +       struct {
+> +               DECLARE_KFIFO_PTR(evts_fifo, unsigned short);
+> +               spinlock_t evts_lock;
+> +       }____cacheline_aligned_in_smp;
 > +
-> +static int ublk_batch_commit_io(struct ublk_queue *ubq,
-> +                               const struct ublk_batch_io_data *data,
-> +                               const struct ublk_elem_header *elem)
+>         struct ublk_io ios[] __counted_by(q_depth);
+>  };
+>
+> @@ -282,6 +301,26 @@ static inline void ublk_io_unlock(struct ublk_io *io=
+)
+>         spin_unlock(&io->lock);
+>  }
+>
+> +/* Initialize the event queue */
+> +static inline int ublk_io_evts_init(struct ublk_queue *q, unsigned int s=
+ize,
+> +                                   int numa_node)
 > +{
-> +       struct ublk_io *io =3D &ubq->ios[elem->tag];
-> +       const struct ublk_batch_io *uc =3D &data->header;
-> +       u16 buf_idx =3D UBLK_INVALID_BUF_IDX;
-> +       union ublk_io_buf buf =3D { 0 };
-> +       struct request *req =3D NULL;
-> +       bool auto_reg =3D false;
-> +       bool compl =3D false;
-> +       int ret;
-> +
-> +       if (ublk_dev_support_auto_buf_reg(data->ub)) {
-> +               buf.auto_reg =3D ublk_batch_auto_buf_reg(uc, elem);
-> +               auto_reg =3D true;
-> +       } else if (ublk_dev_need_map_io(data->ub))
-> +               buf.addr =3D ublk_batch_buf_addr(uc, elem);
-> +
-> +       ublk_io_lock(io);
-> +       ret =3D ublk_batch_commit_io_check(ubq, io, &buf);
-> +       if (!ret) {
-> +               io->res =3D elem->result;
-> +               io->buf =3D buf;
-> +               req =3D ublk_fill_io_cmd(io, data->cmd);
-> +
-> +               if (auto_reg)
-> +                       ublk_clear_auto_buf_reg(io, data->cmd, &buf_idx);
-> +               compl =3D ublk_need_complete_req(data->ub, io);
-> +       }
-> +       ublk_io_unlock(io);
-> +
-> +       if (unlikely(ret)) {
-> +               pr_warn_ratelimited("%s: dev %u queue %u io %u: commit fa=
-ilure %d\n",
-> +                       __func__, data->ub->dev_info.dev_id, ubq->q_id,
-> +                       elem->tag, ret);
-> +               return ret;
-> +       }
-> +
-> +       /* can't touch 'ublk_io' any more */
-> +       if (buf_idx !=3D UBLK_INVALID_BUF_IDX)
-> +               io_buffer_unregister_bvec(data->cmd, buf_idx, data->issue=
-_flags);
-> +       if (req_op(req) =3D=3D REQ_OP_ZONE_APPEND)
-> +               req->__sector =3D ublk_batch_zone_lba(uc, elem);
-> +       if (compl)
-> +               __ublk_complete_rq(req, io, ublk_dev_need_map_io(data->ub=
-));
-> +       return 0;
+> +       spin_lock_init(&q->evts_lock);
+> +       return kfifo_alloc_node(&q->evts_fifo, size, GFP_KERNEL, numa_nod=
+e);
 > +}
 > +
-> +static int ublk_handle_batch_commit_cmd(const struct ublk_batch_io_data =
-*data)
+> +/* Check if event queue is empty */
+> +static inline bool ublk_io_evts_empty(const struct ublk_queue *q)
 > +{
-> +       const struct ublk_batch_io *uc =3D &data->header;
-> +       struct io_uring_cmd *cmd =3D data->cmd;
-> +       struct ublk_batch_io_iter iter =3D {
-> +               .uaddr =3D u64_to_user_ptr(READ_ONCE(cmd->sqe->addr)),
-> +               .total =3D uc->nr_elem * uc->elem_bytes,
-> +               .elem_bytes =3D uc->elem_bytes,
-> +       };
-> +       int ret;
-> +
-> +       ret =3D ublk_walk_cmd_buf(&iter, data, ublk_batch_commit_io);
-> +
-> +       return iter.done =3D=3D 0 ? ret : iter.done;
+> +       return kfifo_is_empty(&q->evts_fifo);
 > +}
 > +
->  static int ublk_check_batch_cmd_flags(const struct ublk_batch_io *uc)
+> +static inline void ublk_io_evts_deinit(struct ublk_queue *q)
+> +{
+> +       WARN_ON_ONCE(!kfifo_is_empty(&q->evts_fifo));
+> +       kfifo_free(&q->evts_fifo);
+> +}
+> +
+>  static inline struct ublksrv_io_desc *
+>  ublk_get_iod(const struct ublk_queue *ubq, unsigned tag)
 >  {
->         unsigned elem_bytes =3D sizeof(struct ublk_elem_header);
-> @@ -2783,7 +2878,7 @@ static int ublk_ch_batch_io_uring_cmd(struct io_uri=
-ng_cmd *cmd,
->                 ret =3D ublk_check_batch_cmd(&data);
->                 if (ret)
->                         goto out;
-> -               ret =3D -EOPNOTSUPP;
-> +               ret =3D ublk_handle_batch_commit_cmd(&data);
->                 break;
->         default:
->                 ret =3D -EOPNOTSUPP;
-> @@ -3444,6 +3539,10 @@ static int ublk_ctrl_add_dev(const struct ublksrv_=
-ctrl_cmd *header)
->                                 UBLK_F_AUTO_BUF_REG))
->                 ub->dev_info.flags &=3D ~UBLK_F_NEED_GET_DATA;
+> @@ -3003,14 +3042,10 @@ static const struct file_operations ublk_ch_batch=
+_io_fops =3D {
+>         .mmap =3D ublk_ch_mmap,
+>  };
 >
-> +       /* UBLK_F_BATCH_IO doesn't support GET_DATA */
+> -static void ublk_deinit_queue(struct ublk_device *ub, int q_id)
+> +static void __ublk_deinit_queue(struct ublk_device *ub, struct ublk_queu=
+e *ubq)
+>  {
+> -       struct ublk_queue *ubq =3D ub->queues[q_id];
+>         int size, i;
+>
+> -       if (!ubq)
+> -               return;
+> -
+>         size =3D ublk_queue_cmd_buf_size(ub);
+>
+>         for (i =3D 0; i < ubq->q_depth; i++) {
+> @@ -3024,7 +3059,20 @@ static void ublk_deinit_queue(struct ublk_device *=
+ub, int q_id)
+>         if (ubq->io_cmd_buf)
+>                 free_pages((unsigned long)ubq->io_cmd_buf, get_order(size=
+));
+>
 > +       if (ublk_dev_support_batch_io(ub))
-> +               ub->dev_info.flags &=3D ~UBLK_F_NEED_GET_DATA;
+> +               ublk_io_evts_deinit(ubq);
 > +
->         /*
->          * Zoned storage support requires reuse `ublksrv_io_cmd->addr` fo=
-r
->          * returning write_append_lba, which is only allowed in case of
-> diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.=
-h
-> index c96c299057c3..295ec8f34173 100644
-> --- a/include/uapi/linux/ublk_cmd.h
-> +++ b/include/uapi/linux/ublk_cmd.h
-> @@ -109,6 +109,14 @@
->   */
->  #define        UBLK_U_IO_PREP_IO_CMDS  \
->         _IOWR('u', 0x25, struct ublk_batch_io)
-> +/*
-> + * If failure code is returned, nothing in the command buffer is handled=
-.
-> + * Otherwise, the returned value means how many bytes in command buffer
-> + * are handled actually, then number of handled IOs can be calculated wi=
-th
-> + * `elem_bytes` for each IO. IOs in the remained bytes are not committed=
-,
-> + * userspace has to check return value for dealing with partial committi=
-ng
-> + * correctly.
-> + */
->  #define        UBLK_U_IO_COMMIT_IO_CMDS        \
->         _IOWR('u', 0x26, struct ublk_batch_io)
+>         kvfree(ubq);
+> +}
+> +
+> +static void ublk_deinit_queue(struct ublk_device *ub, int q_id)
+> +{
+> +       struct ublk_queue *ubq =3D ub->queues[q_id];
+> +
+> +       if (!ubq)
+> +               return;
+> +
+> +       __ublk_deinit_queue(ub, ubq);
+>         ub->queues[q_id] =3D NULL;
+>  }
 >
+> @@ -3048,7 +3096,7 @@ static int ublk_init_queue(struct ublk_device *ub, =
+int q_id)
+>         struct ublk_queue *ubq;
+>         struct page *page;
+>         int numa_node;
+> -       int size, i;
+> +       int size, i, ret;
+>
+>         /* Determine NUMA node based on queue's CPU affinity */
+>         numa_node =3D ublk_get_queue_numa_node(ub, q_id);
+> @@ -3076,9 +3124,18 @@ static int ublk_init_queue(struct ublk_device *ub,=
+ int q_id)
+>         for (i =3D 0; i < ubq->q_depth; i++)
+>                 spin_lock_init(&ubq->ios[i].lock);
+>
+> +       if (ublk_dev_support_batch_io(ub)) {
+> +               ret =3D ublk_io_evts_init(ubq, ubq->q_depth, numa_node);
+> +               if (ret)
+> +                       goto fail;
+> +       }
+>         ub->queues[q_id] =3D ubq;
+>         ubq->dev =3D ub;
+> +
+>         return 0;
+> +fail:
+> +       __ublk_deinit_queue(ub, ubq);
+> +       return ret;
+>  }
+>
+>  static void ublk_deinit_queues(struct ublk_device *ub)
 > --
 > 2.47.0
 >
