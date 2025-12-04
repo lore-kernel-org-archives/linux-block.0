@@ -1,71 +1,91 @@
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com [209.85.167.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0546727FD59
-	for <linux-block@vger.kernel.org>; Thu,  4 Dec 2025 17:28:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 765C6350A16;
+	Thu,  4 Dec 2025 17:55:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764869285; cv=none; b=F0TFnrtNRFzkFEHArdQQeftHbEvtFPqMSwsTr9IF8OXma48Mj8e5dV9MbcziaKAKYip03BP4q6ARDoa2/kc9RZC2MrhqhPSd8JBL3vvNfuVyw+LocLVAInwC0FOY8F0B6wcjn0rN8Rd3Mxd0qcmwsgrxjpDeAD2oHytJ0Clvq9I=
+	t=1764870943; cv=none; b=t+QkfxVqmsNjQjO1udkkhHnbGT8krxe/BzjtPGy9cxGo47hmL6FflKzLrEIoIMVAXX/kjxW2qIUaUZCSEjUbO2yIdt5kdVVdLnEuIPr+jINsgHMkJNqg9IRbPi/50agjqAwq/SfyM+Xww+HS9rC2iHb3rMVMvkGyegky0DYH3tM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764869285; c=relaxed/simple;
-	bh=X1J9JFfrl6Va9rGwEZpEAcfvoR7nNJU9J6zUJwJpRWQ=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=Marvwo6gvVF23a+dxaNyPck09mFlTpwVXch1xWyZ77LS0tmT+1yXLJOqQrocVYd83GFV9YYACtcn56ABsv3p9i2tEA0jivC9JI/qGjH6gdMuM+NOLCoFmEsf0UFzJkc1Fve5K7MB1k+CYFBa1Tk4sq1oMc6aIfcaMao4JeSxPFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-45033344baeso2575120b6e.1
-        for <linux-block@vger.kernel.org>; Thu, 04 Dec 2025 09:28:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764869283; x=1765474083;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eg88QLnpbQGqCmDqs8aHwn8d8fh+Yxp19+KXKS3AaQU=;
-        b=hT/NWc3z+H2amW+QBUnDPmhT/XeY4lh5y8bxeg/UUhLuxX3LP8fbysSekotlvS9T/Y
-         rjwn6Jc5DxB039hVldGzhrgVGStDh9WQlhjtdw35pJJuArRVQF0Fz4xm6dLMH/9g2Dla
-         u6ckP9kXz4yrNsbtRA371TjJ7ywQOBENK1+nyCYkoELaw7FSxcYzU9kbN9CBjDZtCtvX
-         opJwgDkE7J0DsJD/md8js7UJfSuJ17d/iLNyQf8jLkmCRFM+hk7Qz4Y7TGxp6DcB5j9M
-         dP/CGI6OjZY3Y+hC9HYFdx9VSNDS4DDox/31CQc8Pq/gmnFEk2R2rKhTG9Rg2NjAggcy
-         IgHw==
-X-Gm-Message-State: AOJu0YyHbeO8E00Hdgp1Q9ibsO2XJWW3wMAbQ+4ysYUuXxhV9/lz2Zee
-	zci/Aj+STctjgYpbSDeio9gbTtrYIi624giFJjh8drilJ59YaCIFdD0pFC3yh0iocHJWyo1zavD
-	/16IWZu7ay1aic1YnmHfhxhQMS2qJIx2qzVVLS1LwwoNyZxs09qQ2rvVOI8Y=
-X-Google-Smtp-Source: AGHT+IEp5P2A/cN1vti5GA8ZDFc89JmA/iG6HXO876ErJESnVci6BYb3eFuYV2Jb9bwv1THxhQUrRoDImxERS/swe4E3w9hVeqph
+	s=arc-20240116; t=1764870943; c=relaxed/simple;
+	bh=cWH4lfdD74O2lLdgOIp1vzZuReu/JSCmyStEbDHm3jI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Di1z59pF7ZQPsKg5ieOiTArWuiLG3YkRIFyQqoZ+7ilmhDolwmhPMzCa8QHQtMHtordCBQCIy2KIyvyiGL8GMDQg4+cejwyOvvkAVjG2dEHy69uP67CK9RmWeBtzLb/wZHsG1icP/CyA4ERTzNNczR4aCcU1GNFJgBTmxym3bqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gpVnvSsp; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gpVnvSsp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C9AFC4CEFB;
+	Thu,  4 Dec 2025 17:55:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764870943;
+	bh=cWH4lfdD74O2lLdgOIp1vzZuReu/JSCmyStEbDHm3jI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gpVnvSsppX0MSlbAJytC0vo+vslia2qfybseG9ks5XSlanVrfRdZuXYfyIZq9Kpnz
+	 ppce43qD7zX8Ocxw6z04hSN+GgLj3e+q1NrXidqWnhRW+lR+Mbhk9g0DgWDN3StIVu
+	 b0f6m21YcJK378JUez9Y76zkWaPeK61E1O/rCLy7Yr5TtIDhYLcSyh6c9JGWmBnk7h
+	 sBDCmjWakvha6AewcxJH2QEzGimC8IixydSkEV9nnEynL1m35FMokjYwOf9iv17IWX
+	 Vh+8+QY9UcLpJ3BGYFzow60WmIGnfyGZY0aDT/z+kbRswMx86A0gMaUDh5a8PjWtka
+	 U3NP+IoTgDj2Q==
+Date: Thu, 4 Dec 2025 10:55:40 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: shaurya <ssranevjti@gmail.com>
+Cc: syzbot+527a7e48a3d3d315d862@syzkaller.appspotmail.com,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [block?] [udf?] memory leak in __blkdev_issue_zero_pages
+Message-ID: <aTHLHGtXXrtDumEy@kbusch-mbp>
+References: <6931abe7.a70a0220.2ea503.00e0.GAE@google.com>
+ <23fde58b-ef8f-4420-b0a8-5ae87dfe0bc4@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:6a94:b0:450:bcc7:18d7 with SMTP id
- 5614622812f47-4536e391ff0mr4105903b6e.2.1764869283224; Thu, 04 Dec 2025
- 09:28:03 -0800 (PST)
-Date: Thu, 04 Dec 2025 09:28:03 -0800
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 In-Reply-To: <23fde58b-ef8f-4420-b0a8-5ae87dfe0bc4@gmail.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6931c4a3.a70a0220.d98e3.01d9.GAE@google.com>
-Subject: Re: [syzbot] [block?] [udf?] memory leak in __blkdev_issue_zero_pages
-From: syzbot <syzbot+527a7e48a3d3d315d862@syzkaller.appspotmail.com>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	ssranevjti@gmail.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+On Thu, Dec 04, 2025 at 09:42:38PM +0530, shaurya wrote:
+> Move the fatal signal check before bio_alloc() to prevent a memory
+> leak when BLKDEV_ZERO_KILLABLE is set and a fatal signal is pending.
+> 
+> Previously, the bio was allocated before checking for a fatal signal.
+> If a signal was pending, the code would break out of the loop without
+> freeing or chaining the just-allocated bio, causing a memory leak.
+> 
+> This matches the pattern already used in __blkdev_issue_write_zeroes()
+> where the signal check precedes the allocation.
+> 
+> Signed-off-by: Shaurya Rane <ssrane_b23@ee.vjti.ac.in>
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+Looks good.
 
-Reported-by: syzbot+527a7e48a3d3d315d862@syzkaller.appspotmail.com
-Tested-by: syzbot+527a7e48a3d3d315d862@syzkaller.appspotmail.com
+Reviewed-by: Keith Busch <kbusch@kernel.org>
 
-Tested on:
-
-commit:         559e608c Merge tag 'ntfs3_for_6.19' of https://github...
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1787eab4580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=3bdbe6509b080086
-dashboard link: https://syzkaller.appspot.com/bug?extid=527a7e48a3d3d315d862
-compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=11f2301a580000
-
-Note: testing is done by a robot and is best-effort only.
+> ---
+>  block/blk-lib.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/block/blk-lib.c b/block/blk-lib.c
+> index 3030a772d3aa..352e3c0f8a7d 100644
+> --- a/block/blk-lib.c
+> +++ b/block/blk-lib.c
+> @@ -202,13 +202,13 @@ static void __blkdev_issue_zero_pages(struct block_device *bdev,
+>  		unsigned int nr_vecs = __blkdev_sectors_to_bio_pages(nr_sects);
+>  		struct bio *bio;
+>  
+> -		bio = bio_alloc(bdev, nr_vecs, REQ_OP_WRITE, gfp_mask);
+> -		bio->bi_iter.bi_sector = sector;
+> -
+>  		if ((flags & BLKDEV_ZERO_KILLABLE) &&
+>  		    fatal_signal_pending(current))
+>  			break;
+>  
+> +		bio = bio_alloc(bdev, nr_vecs, REQ_OP_WRITE, gfp_mask);
+> +		bio->bi_iter.bi_sector = sector;
+> +
+>  		do {
+>  			unsigned int len;
+>  
+> -- 
