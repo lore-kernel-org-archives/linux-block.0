@@ -1,122 +1,105 @@
-Received: from mail-pl1-f194.google.com (mail-pl1-f194.google.com [209.85.214.194])
+Received: from mail-oa1-f42.google.com (mail-oa1-f42.google.com [209.85.160.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 854803590D1
-	for <linux-block@vger.kernel.org>; Thu,  4 Dec 2025 18:13:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC4D5271A71
+	for <linux-block@vger.kernel.org>; Thu,  4 Dec 2025 18:20:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764872009; cv=none; b=qHTN9HX5MqMZ//FNGfKgNWbsuxoyyy6ZY0SPsrHNNAW5i7l3bMifY8Pjew6h78TSknnsvlOlZZET6zQC7IWdIEWPaCsmLTLuEoWF+muX/Dytq26z7LJ2TaLM3G+uoPoQxnC121JLULVrfLqYJDy/55Y7Fqc8oim5pEuTM41sp9A=
+	t=1764872441; cv=none; b=PrLscQCPEK+TPJQT7TJr8K7wAcDd96OcIMi2Af3IyUPcBGASsxXS7OnyGNKs34D1Usw28EtrVfXOEyMuF56QeDWxPlWbuvZzDfCT/Vc1FBRatOyirdwDuhb8zqXWNXfzHBLwiN8I6dA31SHoq3bnaKup8PJT5v1VEeOF1Pb7+Z4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764872009; c=relaxed/simple;
-	bh=2n8n/CrRkMQeGaIqTUKOtM84mqt2m1JWgo3BQ7O8D2Y=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=crRh7GKEcgTVH+vfwKsBeO4Db9IDWVr8lxCS6WKBBE/l+2fJeXUPQB/3AcWFPLPTHA/63cYOYgDw6FMK/I+KOEJ7gu3bPxDbST+jtgxM6xXz1yII76wgTbCZDhPhlxQYdgls4Uq3zZyFHGzBjvnWmYOzeB/dT+QcGNsqxJ1RJic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ee.vjti.ac.in; spf=none smtp.mailfrom=ee.vjti.ac.in; dkim=pass (1024-bit key) header.d=vjti.ac.in header.i=@vjti.ac.in header.b=M3wADcFv; arc=none smtp.client-ip=209.85.214.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ee.vjti.ac.in
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ee.vjti.ac.in
+	s=arc-20240116; t=1764872441; c=relaxed/simple;
+	bh=E4iaRlftraDlwmQqHLKR3EzuMkbythAKaPWIWuwk/3s=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=GjzOsUbY7rHWX4gpVYShU3UKWzHb4v9KoORnLk2NCnNrmVYz9wYPw9JI5/z+zfPUd84G4wWNqISD/Y4JX95Cy+VLgzfT6EyxpNmEaDgxnBXEQqqist3Do/rPMF68KIADplOj+1toK7N2dbDQHSAD4jfCK5EaFzpLqmNP7V/cAhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Kj0rt2pU; arc=none smtp.client-ip=209.85.160.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vjti.ac.in header.i=@vjti.ac.in header.b="M3wADcFv"
-Received: by mail-pl1-f194.google.com with SMTP id d9443c01a7336-2958db8ae4fso13345335ad.2
-        for <linux-block@vger.kernel.org>; Thu, 04 Dec 2025 10:13:27 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Kj0rt2pU"
+Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-3ed15120e55so941250fac.2
+        for <linux-block@vger.kernel.org>; Thu, 04 Dec 2025 10:20:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vjti.ac.in; s=google; t=1764872007; x=1765476807; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=PJvk/IXEAZzbwVmhdAwefI1fSD0T2f/TxkPdH+E3Fkc=;
-        b=M3wADcFvZrxU3adDbJTATHIrCOyHJXadbAianGSwUwco/rW00sePOeFq5yJsVQrjkA
-         nUbpHxETsHEko2NojHSPJYxJDuq5U30umuar4KMkTmeCxk2YbObksOHn8Pq3dVCnotEO
-         Bvgq1FgRNSmsNYDILwd6arY4Al+BhYsPJ7EhA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764872007; x=1765476807;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1764872439; x=1765477239; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=PJvk/IXEAZzbwVmhdAwefI1fSD0T2f/TxkPdH+E3Fkc=;
-        b=mKIo3LQE+pXdrp89IB8NX52yxRPUdhu1hCxBnt3fEeJscgBEDFhkX1odGKAA09VSah
-         drobwPHJmKUZfK2RiQUcPMtPuV7tw4dPczlcdEn2Q462SdBdX8G/gtCOBz1qu2JxA0Bh
-         yy7rSAQBrSUl1KhAm0e1GOF+6d6wquKXosTq2EEVCdRjJCg8zfTobADFPIANHf/mWRgx
-         U6UF1sypmWU0d/NFLct9ktCzgOi7Hql4ku5l7igYg8gOpR3RwUrwUsAu8YtU0RUuzGw4
-         dRpEIPy2saNXoiwda+LzRqZdtxApPVbi3+HaUU3u1JVtS42gByt+4sb12BnEbfKcWez7
-         1FzA==
-X-Gm-Message-State: AOJu0YxdWzRjtmZku3Xo2YY+p1kXVqr9dW9ZBXfdRs/2EZI+BKM9MvLm
-	5Zsb+ZBE2po4hSW9GGHkEC3nxX554w/fJp80jH1DGpfRvy1FtNukqJbYoo8D+3J0kvs=
-X-Gm-Gg: ASbGncuexSAIYvpL2iX+YubqwYIj5yNvvtepYoZi5rWvQwAZaCQ+9SDgRNeSdHoRkpj
-	NqM9EhWDBXjU87kLcXtuxeEj3SrbS95K2d4+6AMZx+BUzu4BRomkwPc2ZiVV2sNf4KXPf11ASL0
-	UaN4JlSO5msXOjCPBdR4xmsOvUQr/vfVLV6zKgOHFafxQ5bSWKKTnyy7X0RQWAUusur2PnLtfKJ
-	FcLGj44rvDBBAff7ZlZ9LkXdcPReveQWwpdDfvlYZ6KJHs6qYEh2rLCSGw9HvSA7mOdGHy24tMm
-	FbDD5YUFPoTJ4bS8eNwK2PgMrY9inlPCO686kHt1+nKaxyOL2bCc1tyR46/oJUOY/WjI71aec0P
-	Ia8onb/ypjAtUdtcnpWcIVxhmJ34iNbJHPoE1dgSGTvKajosFfsghg1l/LT6aHodKGVdLbFJA7p
-	SQP+MP8ltBCesBLN7dsZleDW0/7SFRwnbFaysAGJA0g8Ggn40wYyjNhRjPmtiXRU+v
-X-Google-Smtp-Source: AGHT+IHW9Dzu/UH+wU35yc2U6yxRXsHH+wAiiYWkaNyB2KGKUs8KlgR+i4pk3Vixmtau8Xk1OhNnpA==
-X-Received: by 2002:a17:903:245:b0:295:6c26:933b with SMTP id d9443c01a7336-29d682be6a7mr84675015ad.1.1764872006465;
-        Thu, 04 Dec 2025 10:13:26 -0800 (PST)
-Received: from ranegod-HP-ENVY-x360-Convertible-13-bd0xxx.. ([2409:40c0:1055:766e:b9ed:27c1:5f4a:4f11])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29dae99effasm26060155ad.57.2025.12.04.10.13.20
+        bh=7l4Bvsh5Fm7h+h3RAFW2TekuY5Wvnkm4pZdsrpvY+08=;
+        b=Kj0rt2pU4+pwhHu5foOTezR3MGP5Bvk1aeXvCvHZiiFg3F1Qbzm6aESjPtJKW00T3F
+         k4Zlsv19Q0H9YU54qYvw7SYMANXj6c/dx1Zov43sIJLgQN9mtgwYNUm4DgawMlqYrCMH
+         U2UMm/AXMu79pXJ8eSabwkaKkYaVCOFbX6DwY7SCIc2BMsSM5kV0zWsUAnIkrlI41QAZ
+         njL0vZQR5LfpTOTwkJTQnZv0Q/qIoguTLF5oV3WpomUu8tT8jhYAbiGdE5yPYOr+wam4
+         91JozWCeowsb05eiyoCDJOZeRYORCEyni742h6JHwbFdq2ByNG1rDfMJpsuKdtXau/5X
+         pv2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764872439; x=1765477239;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=7l4Bvsh5Fm7h+h3RAFW2TekuY5Wvnkm4pZdsrpvY+08=;
+        b=fNw/m1FRDSxRo1rXZlQ9vTBycmixefjI5s0pyozZbAK+25zyJDWxTUEK9q2OToNX5g
+         s3ANtQxWytcglXU0FFrZxrRYiUkm6LpFGidPh+qXzg7vFemBQqJBIhufoVdCmXgZQK/A
+         4qf9URYwoBFs9DrjPt3XOUDca+zKQQBxZkoq8nB383OL8YkKTaYOWw/aSf6qMOqShDh1
+         5+zEVtLnI7Q548tsfBs9cpxDmkmOXIHquBqIRPjlIxnx7GTIb+DgAKEwmf3S/2q/2sUX
+         94gFZFJm0Jzg3vgRqTlUkzDct/JJ0eDeBT92BHGOOSt1ERzF0AJLS1sJO5IvpovLA6c5
+         O+KQ==
+X-Gm-Message-State: AOJu0YykiUr+9zkxm37kU91e5upfbAsNrqSFjcmOCy0KhMNr1kQLMpeQ
+	hn2HYsF3ejqc1vjYG/vmN+3oKwrBnuKjUidSQo9NnWfi16YB7Z3j4C6GXIigVUV+qnyI/FCb+Wu
+	Eufye5h8=
+X-Gm-Gg: ASbGncvG3OTGSTcm4qx99uzaEFA7HVzu6r+Wt6nR0JYKPzElgA8jgPT+hhn9tFvdauv
+	93dtAR0WhkPVFCj07Tlcksu+runxRG82xyuAqs53d19HPFFUN7Q/ES0BgGZXqQPuXawLDZoouA0
+	0er/v2SHOKaGUyrn/Ep7ZBJ+KFwqQXYVlwu6Ft0DbVLtc8rwpsPqgZz91BMoY5rvlX40fzqcK9L
+	YXaq+bzJm6kZiDjLIiTZ/Mb+on7JXZfxA6g3A4IS6+T+9pM+x4+3nYNOG86unBlIpQUQ3PvOBMe
+	ZXotrdkG+R6/MrHWtQAYCUEsqDPqg56/v3+kYXnrmsDSuDp1TbXWNLBZ088bfSKcOSWnH/3PKOi
+	BXqz2+DsfJxMuXgqx49rTz3rO+amwQbaeB85hd9K1HZiNzP1dKeHg/FqHqUYVWEnQ0bYrAboEnt
+	rBwA==
+X-Google-Smtp-Source: AGHT+IFXxmNxHx1/RwmCgScmOCKtrUl6+EjSkjYkHMQhz5CWSvRh2Fg8NSX5nfMZGX4uxn4SYwvcwg==
+X-Received: by 2002:a05:6808:d48:b0:444:4086:4524 with SMTP id 5614622812f47-4536e4f420cmr4009135b6e.31.1764872438741;
+        Thu, 04 Dec 2025 10:20:38 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-4537f8a02b6sm992180b6e.4.2025.12.04.10.20.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Dec 2025 10:13:25 -0800 (PST)
-From: Shaurya Rane <ssrane_b23@ee.vjti.ac.in>
-To: axboe@kernel.dk,
-	martin.petersen@oracle.com
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	skhan@linuxfoundation.org,
-	linux-kernel-mentees@lists.linux.dev,
-	david.hunter.linux@gmail.com,
-	khalid@kernel.org,
-	Shaurya Rane <ssrane_b23@ee.vjti.ac.in>,
-	syzbot+527a7e48a3d3d315d862@syzkaller.appspotmail.com,
-	Keith Busch <kbusch@kernel.org>
-Subject: [PATCH] block: fix memory leak in __blkdev_issue_zero_pages
-Date: Thu,  4 Dec 2025 23:42:59 +0530
-Message-Id: <20251204181259.23864-1-ssrane_b23@ee.vjti.ac.in>
-X-Mailer: git-send-email 2.34.1
+        Thu, 04 Dec 2025 10:20:38 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: martin.petersen@oracle.com, Shaurya Rane <ssrane_b23@ee.vjti.ac.in>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ skhan@linuxfoundation.org, linux-kernel-mentees@lists.linux.dev, 
+ david.hunter.linux@gmail.com, khalid@kernel.org, 
+ syzbot+527a7e48a3d3d315d862@syzkaller.appspotmail.com, 
+ Keith Busch <kbusch@kernel.org>
+In-Reply-To: <20251204181259.23864-1-ssrane_b23@ee.vjti.ac.in>
+References: <20251204181259.23864-1-ssrane_b23@ee.vjti.ac.in>
+Subject: Re: [PATCH] block: fix memory leak in __blkdev_issue_zero_pages
+Message-Id: <176487243751.985814.383120227280182840.b4-ty@kernel.dk>
+Date: Thu, 04 Dec 2025 11:20:37 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3
 
-Move the fatal signal check before bio_alloc() to prevent a memory
-leak when BLKDEV_ZERO_KILLABLE is set and a fatal signal is pending.
 
-Previously, the bio was allocated before checking for a fatal signal.
-If a signal was pending, the code would break out of the loop without
-freeing or chaining the just-allocated bio, causing a memory leak.
+On Thu, 04 Dec 2025 23:42:59 +0530, Shaurya Rane wrote:
+> Move the fatal signal check before bio_alloc() to prevent a memory
+> leak when BLKDEV_ZERO_KILLABLE is set and a fatal signal is pending.
+> 
+> Previously, the bio was allocated before checking for a fatal signal.
+> If a signal was pending, the code would break out of the loop without
+> freeing or chaining the just-allocated bio, causing a memory leak.
+> 
+> [...]
 
-This matches the pattern already used in __blkdev_issue_write_zeroes()
-where the signal check precedes the allocation.
+Applied, thanks!
 
-Fixes: bf86bcdb4012 ("blk-lib: check for kill signal in ioctl BLKZEROOUT")
-Reported-by: syzbot+527a7e48a3d3d315d862@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=527a7e48a3d3d315d862
-Signed-off-by: Shaurya Rane <ssrane_b23@ee.vjti.ac.in>
-Reviewed-by: Keith Busch <kbusch@kernel.org>
----
- block/blk-lib.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+[1/1] block: fix memory leak in __blkdev_issue_zero_pages
+      commit: 220d82ee063a38fcdc658b8d4274f59de4398dd0
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index 3030a772d3aa..352e3c0f8a7d 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -202,13 +202,13 @@ static void __blkdev_issue_zero_pages(struct block_device *bdev,
- 		unsigned int nr_vecs = __blkdev_sectors_to_bio_pages(nr_sects);
- 		struct bio *bio;
- 
--		bio = bio_alloc(bdev, nr_vecs, REQ_OP_WRITE, gfp_mask);
--		bio->bi_iter.bi_sector = sector;
--
- 		if ((flags & BLKDEV_ZERO_KILLABLE) &&
- 		    fatal_signal_pending(current))
- 			break;
- 
-+		bio = bio_alloc(bdev, nr_vecs, REQ_OP_WRITE, gfp_mask);
-+		bio->bi_iter.bi_sector = sector;
-+
- 		do {
- 			unsigned int len;
- 
+Best regards,
 -- 
-2.34.1
+Jens Axboe
+
+
 
