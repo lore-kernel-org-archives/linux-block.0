@@ -1,137 +1,130 @@
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89C6B40855
-	for <linux-block@vger.kernel.org>; Thu,  4 Dec 2025 01:18:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A49D2F9D85
+	for <linux-block@vger.kernel.org>; Thu,  4 Dec 2025 02:48:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764811119; cv=none; b=LaP9NmHUywdGNNztMYZoTzGqCAlrvqCa2s9hdzMUAtyChMgfA3zISpmYNm3JG0TdczOou1EEYbM2h2NIg2fCEhF37zZLMedqYmsmP5VceIFNzEe4e0ao1HBzDYGNVhwmVkuvX1OEzLFxmk2+L3kUaEHysOOYHySRdZt+7iORHdw=
+	t=1764816499; cv=none; b=uxI0amDuHZRS0fbyAG2myACkjXSSHhvBqcMbcIbKjYEmdA7Gs1ukFy5H8lauW0K5UhdosegeXXsyQyA7i8b/7lGQzsLKRuzYO1ZAR7x3JONUIJ6lztGaQGqswrwJcG9b0/wSupO0aSeQL5/IwCCdEK8y/CLshH2hvDo+3FAiEew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764811119; c=relaxed/simple;
-	bh=wC9lqEIoN8sq5g8JhY/4krcB2BXJ+ZczTeStEg6GGck=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ha6tN/OYigIdmzBD17A5rk00o483++WjpnApBDFNuYOOW0ZTDA/2XadTot9+n4XT/CF5/+xMSY5xvGhjZXg4ZQ0AFntRzCQHTG+Be0oaq7J8vYHkXhfkpnG1Drlx9tq3pe/dLJuHbvMHm8K+3DAOZJJYk7E6yum6bOVeHuOdL6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jg10WYTv; arc=none smtp.client-ip=209.85.219.48
+	s=arc-20240116; t=1764816499; c=relaxed/simple;
+	bh=X+yZ/K1ZTsaoVE0DJ49j3nn1ER6Lnivz4II/94xrrZ0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jQuASSZFTmVMATnvgs7TXWjwht/AoLBn6NFd7Gks783mvf1KVBQEETvW4HrqAywpXoIiHjqraTNQW4icI871gU7OrtPQ5mQ/saFXv91Osvp2m8mLhG+OwRq3ylnc89k3VftWyB+09cHVTbhM0lpP8EHEUZxyTbo+1VIuBdDz0ek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nDBaazNW; arc=none smtp.client-ip=209.85.210.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jg10WYTv"
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-88056cab4eeso2601106d6.2
-        for <linux-block@vger.kernel.org>; Wed, 03 Dec 2025 17:18:36 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nDBaazNW"
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7b9c17dd591so320245b3a.3
+        for <linux-block@vger.kernel.org>; Wed, 03 Dec 2025 18:48:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764811115; x=1765415915; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=laiLiH0/HusFXriU7bmpWTj4dFA6FGxaKSRdrze3lyk=;
-        b=jg10WYTv/Gxt0kev0zd5DS0NUc1IGgJUBqIMeveG88ohVK8YRsB7cwi3Ip623lNGP/
-         Y5b+d/ve92R9ABd5u0WHl6VCMHsUMYft2twvvH0JIoHXS5DOFsJ23SEEMsG6QTVpQq4R
-         rH3cZkX7eVvmXkn/RxqWSOs/9x1g0gFYDx7YqtgVAroEhWZ0lJPP1cHP+YhMOBQSSKV0
-         xwLN0+z9NtfR3qB44+LU9dbShdAM9KEygAbRxiCpLeX7Dth/dg9urZ3ZI5VcESsRvPf8
-         tJss4UKUGJvjFzQc2EwcWITabdxcaZOkVL9hGuZFXQ14x1sQ5D3+AFgpGQQqY72HgYYO
-         Gfcw==
+        d=gmail.com; s=20230601; t=1764816494; x=1765421294; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=k7UnwontmyLPrQKRk7Kie3LanJLCzBGPcKe/gr+3MdM=;
+        b=nDBaazNWiZOU1HPZ8pFLoHwD0HmeGoP9iqZ5tWirFav0/oGio4gtM2FJ3uP+nledvv
+         0Q0BMEJ0Q8NyLJw/CduVHi/u+ch03MFkBQnc8vwRA8NNBdmEnB9jqS4VdwXQTFYg9vXO
+         oeRBVmvsV4RFVMbvfzf+RcLPjwN9tMzRqXuq/5xIbdA01AF+I6u2xq2JMHjwCzvE3xqX
+         XiGiaV/n7jEPgVrVTBgQhKT5MSEgqmZgNEu+Z2HB3Vo8VfQWMIH80ArCGOAkX+0fyb5q
+         THr0pym2eg8NhmkoFSURd830JL93hyPqk3peNAYtAOGgL3g0SzRYJ3nHzqMSatSAq25m
+         tKYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764811115; x=1765415915;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=laiLiH0/HusFXriU7bmpWTj4dFA6FGxaKSRdrze3lyk=;
-        b=bdGFsDPuRAtuK13MG+gqV8rtsK2L9FNOBKs/sE3UooOqYuri2SXiQZCUl2OlxjKLBC
-         lM+QSx/R3H2z7hEKt40c5GRN8Hwovk/21Iz4GV1ZZDKhMoZnMvc4pKWJ7J5u6lOEw2vK
-         TIvgj8Vk0BcIDr1Hr5KfDQQpGS8E0jzCPdXSo8oH5pg0eH9IcgjGm+mFNdt3uJ2ygvJx
-         hp/sOzZa3pMC2wtRxvdUvPge6amc0cPsDVqUDd8loHrebygz2B0XcfMVakpWB8KoHQNF
-         mcIglPsbp7okEJqamtf7M9wAcY8k2PM6ggI8hsD6sCftjn+r+Uu010Gl007s2YB/9wUO
-         1zxw==
-X-Forwarded-Encrypted: i=1; AJvYcCUDltsS1x/PAyMck2C4FsOkZW1QZHpoiW7erhYVpIP9g8zRZaym8YTgu0E3TGS8TzdFfViH4V8iAvURFA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YywTSZ/6gkS/Q4osoKzef1vHPxJZ+Ou3ibi1HorqJDSUC/7A5WO
-	pvXuN+Ym99wDpyBP4dID4zzoayCFGKYCa0/XH4LiHoQO96ezy93zqVZCT1YQb5C7tFYnt1zW7jI
-	ZzM8B22hrnzzKQJd7UjmFTC3hO6CBenY=
-X-Gm-Gg: ASbGnct62aoCvLNm3fh9ak6zbnHzZ8rGiKzJMyeCXN8loxTpT3ZYDjsW0RQWHJoF0P4
-	mFI7F+yqO7V33/VNLrs60M1/dVlpV5B/kZT+OquKS/6M1HYAp/oj5UsLg0JBVTZCsCungXbblVd
-	pgYCKGxGOeXQNlMrYuE9HqYFbL4V/BTQLddwXa1MqbCKuv3HoaB6RmnQOG5p6plsSu6NsUHJ95J
-	BIIp+jlOkbDuygEQ+/vgGiYwuDeYwCUQGc1P+9d64SubovtzaTjzYn2HDeFVXemA9g+vcm3B2+u
-	Q2xmAg==
-X-Google-Smtp-Source: AGHT+IE21KasvmyCNqhdEgk2h7QhOUH0VPEKE5ffxcK3aRkFD34vSJuFO2kCq2OVEl95+NlsaexaOS6OAQX65H8UXlY=
-X-Received: by 2002:ac8:5a46:0:b0:4ed:a9c0:1e30 with SMTP id
- d75a77b69052e-4f023a12961mr18362611cf.25.1764811115311; Wed, 03 Dec 2025
- 17:18:35 -0800 (PST)
+        d=1e100.net; s=20230601; t=1764816494; x=1765421294;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=k7UnwontmyLPrQKRk7Kie3LanJLCzBGPcKe/gr+3MdM=;
+        b=QGslc6MZG2oXJNqYauwFSWq8OhXgtWb2JgbWobzBD64/sWFcx2L0sfzJAQXHOiYpSv
+         REJtEyH2ffTaQIjeFbtmg0qeUT1NE0X8XHwMMjZ0Yik3rocNJD6j3FWlOXir35QQ/Rnz
+         BhDBYIXS6LFdLqJDi3OASso5PK5Jfe2oPfFxaHUK6lkposqhNrmwB2PvnBkKG1QmDrey
+         kykFv0yuwHEj5zZVpMUVZyzto5kC6qT4z9rr712y9DobUXUlViGGLHq8uO4Dl71amsKV
+         WLO89AwhugeiGo/SZOoE5EYdtAtXE/j4kuNG2Er96+IBY75QqgAXy/qDzo5an7WR8mqa
+         5Khw==
+X-Gm-Message-State: AOJu0YykOe1AQ/0oRsjKE3DSMUUx+AeehCCUm512GIdkzFHZPOmMXbao
+	Rq9Go7tNUraerWz2yhWU/zB188bsBFcgrDDnZuqpZFf5LQ7VYCnSB8Zo
+X-Gm-Gg: ASbGncu8rbLHKzm3K15ERn41DTr+yw4GW1ytFBATl22GRmWwPuJNLS3QzQ4xlcWgneh
+	fY4A4Vl80zBgFbpIguoSa+3ue2lyGcdqT0LDWjDMvMxqhENlZbCfLkivxKy/pPjfmfc08VRfWWI
+	xX7XBkP2O6WMlyw8UxewTaPV5Lydr5IC8XRgbTXMp4b9yGPzALYmT4jAEAFEAjz1ev9i3VLpNgL
+	Xeu8bnX+G1fdtSETO03Hq3528tC3nGafjgdY8A+wn9m1RENqhxAkrZcqJTjZRSSkh7y6PgzO0lY
+	FVeJ8GicD3WMSIe+N9HhqfxH7jmWchECDM5dzonwkUnBQn49YNXIXkXvDcTw9tXZfFQgHOBLc+o
+	WQK+mBfSOvdE9HJVGKDAf3r0l2Fde410wv2eWDOUJQXnFgTd0wbzfbgf346I6LXSDW/IjN3Rd7D
+	jHOykQwW5s0pgLd63yJh3LGVJg0w==
+X-Google-Smtp-Source: AGHT+IFOKtCW31i4FdwWaXVGRlDrC9YoWC6jwT8zUUWeS8OToViJXaHXySQmsIjV9v+TS3YVMPQbKg==
+X-Received: by 2002:a05:7022:ea4a:b0:119:e56b:98a7 with SMTP id a92af1059eb24-11df6463f28mr613468c88.14.1764816493587;
+        Wed, 03 Dec 2025 18:48:13 -0800 (PST)
+Received: from localhost.localdomain ([104.128.72.41])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11df76e2f3csm1838847c88.5.2025.12.03.18.48.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Dec 2025 18:48:13 -0800 (PST)
+From: zhangshida <starzhangzsd@gmail.com>
+X-Google-Original-From: zhangshida <zhangshida@kylinos.cn>
+To: Johannes.Thumshirn@wdc.com,
+	hch@infradead.org,
+	agruenba@redhat.com,
+	ming.lei@redhat.com,
+	hsiangkao@linux.alibaba.com,
+	csander@purestorage.com,
+	colyli@fnnas.com
+Cc: linux-block@vger.kernel.org,
+	linux-bcache@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	zhangshida@kylinos.cn,
+	starzhangzsd@gmail.com
+Subject: [PATCH v5 0/3] Fix bio chain related issues
+Date: Thu,  4 Dec 2025 10:47:45 +0800
+Message-Id: <20251204024748.3052502-1-zhangshida@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251201090442.2707362-1-zhangshida@kylinos.cn>
- <20251201090442.2707362-3-zhangshida@kylinos.cn> <CAHc6FU53qroW6nj_ToKrSJoMZG4xrucq=jMJhc2qMr22UAWMCw@mail.gmail.com>
-In-Reply-To: <CAHc6FU53qroW6nj_ToKrSJoMZG4xrucq=jMJhc2qMr22UAWMCw@mail.gmail.com>
-From: Stephen Zhang <starzhangzsd@gmail.com>
-Date: Thu, 4 Dec 2025 09:17:58 +0800
-X-Gm-Features: AWmQ_bniayhQIzEfyEULK5EZFSw6I1TPfQlUIuPrClXqSdR1WYg5VtjGIi4Mihg
-Message-ID: <CANubcdVXUS_i79=1Zx5R7cGC7JwHrUXRCZoQ0kes7gdZUTW0Dg@mail.gmail.com>
-Subject: Re: [PATCH v4 2/3] block: prohibit calls to bio_chain_endio
-To: Andreas Gruenbacher <agruenba@redhat.com>
-Cc: Johannes.Thumshirn@wdc.com, hch@infradead.org, ming.lei@redhat.com, 
-	hsiangkao@linux.alibaba.com, csander@purestorage.com, colyli@fnnas.com, 
-	linux-block@vger.kernel.org, linux-bcache@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, zhangshida@kylinos.cn, 
-	Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Andreas Gruenbacher <agruenba@redhat.com> =E4=BA=8E2025=E5=B9=B412=E6=9C=88=
-1=E6=97=A5=E5=91=A8=E4=B8=80 17:34=E5=86=99=E9=81=93=EF=BC=9A
->
-> On Mon, Dec 1, 2025 at 10:05=E2=80=AFAM zhangshida <starzhangzsd@gmail.co=
-m> wrote:
-> > From: Shida Zhang <zhangshida@kylinos.cn>
-> >
-> > Now that all potential callers of bio_chain_endio have been
-> > eliminated, completely prohibit any future calls to this function.
-> >
-> > Suggested-by: Ming Lei <ming.lei@redhat.com>
-> > Suggested-by: Andreas Gruenbacher <agruenba@redhat.com>
-> > Suggested-by: Christoph Hellwig <hch@infradead.org>
-> > Reviewed-by: Christoph Hellwig <hch@lst.de>
-> > Signed-off-by: Shida Zhang <zhangshida@kylinos.cn>
-> > ---
-> >  block/bio.c | 6 +++++-
-> >  1 file changed, 5 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/block/bio.c b/block/bio.c
-> > index b3a79285c27..1b5e4577f4c 100644
-> > --- a/block/bio.c
-> > +++ b/block/bio.c
-> > @@ -320,9 +320,13 @@ static struct bio *__bio_chain_endio(struct bio *b=
-io)
-> >         return parent;
-> >  }
-> >
-> > +/**
-> > + * This function should only be used as a flag and must never be calle=
-d.
-> > + * If execution reaches here, it indicates a serious programming error=
-.
-> > + */
-> >  static void bio_chain_endio(struct bio *bio)
-> >  {
-> > -       bio_endio(__bio_chain_endio(bio));
-> > +       BUG_ON(1);
->
-> Just 'BUG()'.
->
+From: Shida Zhang <zhangshida@kylinos.cn>
 
-Yeah, that=E2=80=99s much clearer now. I'll resend the updated version.
+This series addresses incorrect usage of bio_chain_endio().
 
-Thanks,
-Shida
+Note: Patch 2 depends on changes introduced in patch 1. Therefore, patch
+1 is still included in this series even though Coly suggested sending it
+directly to the bcache mailing list:
+https://lore.kernel.org/all/20251201082611.2703889-1-zhangshida@kylinos.cn/
 
-> >  }
-> >
-> >  /**
->
-> > --
-> > 2.34.1
-> >
->
-> Andreas
->
+V5:
+- Patch 2: Replaced BUG_ON(1) with BUG().
+- Patch 3: Rephrased the commit message.
+
+v4:
+- Removed unnecessary cleanups from the series.
+https://lore.kernel.org/all/20251201090442.2707362-1-zhangshida@kylinos.cn/
+
+v3:
+- Remove the dead code in bio_chain_endio and drop patch 1 in v2 
+- Refined the __bio_chain_endio changes with minor modifications (was
+  patch 02 in v2).
+- Dropped cleanup patches 06 and 12 from v2 due to an incorrect 'prev'
+  and 'new' order.
+https://lore.kernel.org/all/20251129090122.2457896-1-zhangshida@kylinos.cn/
+
+v2:
+- Added fix for bcache.
+- Added BUG_ON() in bio_chain_endio().
+- Enhanced commit messages for each patch
+https://lore.kernel.org/all/20251128083219.2332407-1-zhangshida@kylinos.cn/
+
+v1:
+https://lore.kernel.org/all/20251121081748.1443507-1-zhangshida@kylinos.cn/
+
+Shida Zhang (3):
+  bcache: fix improper use of bi_end_io
+  block: prohibit calls to bio_chain_endio
+  block: prevent race condition on bi_status in __bio_chain_endio
+
+ block/bio.c                 | 11 ++++++++---
+ drivers/md/bcache/request.c |  6 +++---
+ 2 files changed, 11 insertions(+), 6 deletions(-)
+
+-- 
+2.34.1
+
