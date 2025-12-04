@@ -1,63 +1,63 @@
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46E862FB97E
-	for <linux-block@vger.kernel.org>; Thu,  4 Dec 2025 02:48:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADCFA2FF179
+	for <linux-block@vger.kernel.org>; Thu,  4 Dec 2025 02:48:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764816504; cv=none; b=sfv8uXV6e6RfMklktPh/XxIJM9TtJQKM251JqUwc/n6N7u0EocMQFHXVmCId8FYk8qKvaCoVleNqOHmjiOBFM5M5wmfTtLh9TnjrxXSUTa+zp6Xn2ZPbbbFOtcaqSSWIa/qDYDl2AKT8BG06UmSwX0fGVSWjLStkZIHOhnVOod0=
+	t=1764816508; cv=none; b=ltMWDR9KDthwfzoKFoooJ/uVLjjABjpF767CUHWmFfAchTbqZPeFgXz/LLBJcTTXIAhqOwtlfbgW+YIeRmnZJO8J7WKxTw4QeWPRwVm56ryOTcP8RrqIEedIuVIZ18yZ+DSJQpJOPoA/9OawqsxgnLJiVnKo4JfdmaxSf4tYl2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764816504; c=relaxed/simple;
-	bh=JLIdNXPMejF737Jv1xzF5GicNRibkuRDb9iX4pmjoI8=;
+	s=arc-20240116; t=1764816508; c=relaxed/simple;
+	bh=KDrm5Wl7SwMy/FVrOjYy2K/P2b0W6LVDtJkcurNDtq8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=UKQYnhzUD/KuwFTTGzVa4OzNw9B6wTyIhWaGWNm7KBjZyUkPedqBufo0EC27XcBSWBMhSBG5PxPdBNk1J7KeW11DyNm9fk+zYs5ThWT0dhtpkbppx6iLBja/nGqq9tHcjtaB6HPDnyM/0G21tog/0AoM11Nan9JcuOpyjtvODs4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XnTVzxer; arc=none smtp.client-ip=209.85.210.179
+	 MIME-Version; b=kta45QAtQYMqF6Sol5FUxxrNC8aOANX8fGXFRbLgphLtgt3ABD1m0JiNMrDcKU+w/ESHQhfgmjn/nkdn0+CDaUy94uQ5ieQuoIRObjcjO3+9grdU1D1W6ffZ5ZcKYM3QIcXyAbn7gHKyRfG2qpIXMnUUFEvE1jV3yzzyEtUeM2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lso3dq6X; arc=none smtp.client-ip=209.85.210.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XnTVzxer"
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7d26a7e5639so507944b3a.1
-        for <linux-block@vger.kernel.org>; Wed, 03 Dec 2025 18:48:20 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lso3dq6X"
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-7aae5f2633dso429048b3a.3
+        for <linux-block@vger.kernel.org>; Wed, 03 Dec 2025 18:48:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764816498; x=1765421298; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1764816502; x=1765421302; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3B+NwUppxNtx5dO3GeNOAlGv3QVGc2Q+cteUdMRhiTw=;
-        b=XnTVzxergD/1zjfx76F9BSZzo9o/r0VE4vDIgGpatGyKsylXlNTt8/JfEdgckLk/yr
-         hkAFbZxasrhonowS2EDvdXciSVHsxS1pEeEoP8/jsN6c7EPCX8LgKfwHQRs00HoSy2lW
-         l12VjGbzqTnuNwEfsX86Syi2dqwsBOwXG2OkPQ2C7m0Ym3ecytJMD5lRVQzeeZM6WiDF
-         YZ3I4Jkqy2+DnLqyB2X1lej4eHSaRDqc1WxWgmdHns7VwFDY5nktnDDFdGLEaN3S2uln
-         pQUl2mHUkCIasI1iUL6cJgi0HACsN38Yqbt/y36jBJ8IlOtC91rjigv9uWygK4qKoKyr
-         nj9A==
+        bh=/NLLZx+mFtUT/k/qGnCVEA9+fBUA5GMxbqrpW9T4NgE=;
+        b=lso3dq6XMltP2n7vWp4NPUbzMAfBgjugOkewORA9IYtCLD0Qm7p3CdpvoETtMh9a+m
+         MBvF8Yj44J5+J63A82m8WTed8Ns0OJvb3ulg1dS8O/y6HXaeRmlf242bY1FHExZo0OMV
+         Htn1K2T3RcTBkWyxFn1PAb0dimTUEfsVMQyoegLDXHKnvehNYaHjYR2bHAcB/I/1+gst
+         urR1i0OWxp8pppG02FU8OoX3e4JUMqYGurXta/+tUadZAKNXYmPzusDBXpqMVW7bKYLl
+         lRyTF7Bx4Sy6Bf674MWmNaPGM3iZS+e5EfojPWCaT6LD9v1gv2U4I7uj/zRpzKG1tjUf
+         IS9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764816498; x=1765421298;
+        d=1e100.net; s=20230601; t=1764816502; x=1765421302;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=3B+NwUppxNtx5dO3GeNOAlGv3QVGc2Q+cteUdMRhiTw=;
-        b=UVqPnjFnjG8LNYMFjj80B2LcUJKvXV74SE6XQ0APl+xKN4oFIHeWA+YawalCnRyEoY
-         R2yUy84rYrO2RJ7RNB6ENyh7xatokBw9WxOq2nGx2M0TyE1EPehOmSSjXYVAek4AVY0d
-         q9SoU97b2OUYdt01W9Kz75EjOtHWsRxl4BsUnzntDsyYgWq6w6C0cwMSF/vVi+4VEBmA
-         UGGUerqY8WclZmb939khzpKq9N1a4YUj+NMwFbeWbrIaLNTahx6EC657X1zB1LvFqo3A
-         7a1yKa/Sf1QefidTe0g4GCMs2R0bEsgs8Px/EgAoyfIQL7pJKl8M0dxAboHb/iZKH6Ol
-         eUHg==
-X-Gm-Message-State: AOJu0YyFfc5Fi26WljH3T1ZndE38EJ2ttjWjN3WPiY03lMhGVYR8riZs
-	b59z19z1uUHQ/K1WYIFdH5GdEeER/dYuJmW7mpuRGX/7javz9d/vz9qq
-X-Gm-Gg: ASbGncvmspGo8dTxiiNo6fcl3U60WsoVo3/H+cyqNlfGf5OV0AVqDCIfl3l/4R+8fPb
-	DshWgIOH0yYAyRA8Cil4vTIQRXxT7nZoqVFHRwL9gG+WzisYQiy8pWnR4/gMsShXd8EvmtjxyAa
-	0nYnVkZziOSD/dB9UR7s5LPZXoh22S+5zOS6/Rx48lbCxi63rGh33lBQgXwwAHwKT8M3PE1JhTw
-	wAjeZqAJXUFo/Wl41r2bQjnEeT01fXhrkn8ZM4KJGJpytH40stz7L2Z/FDWNYpmJMlHYI+C+nwv
-	cPzJiq244NkM/TNEYP9AhXvKOQFRx7kJcCpkWgQlka+5854BEPLArzUQFz6Uf+rB8LbsqkiwF08
-	Z0UUy4yIvi0GUbYKj/fNz/FkAQpi+LDr8fd5gbNGpU+YuC8Y82UhfIeA48ES12yt67SdmeMtVMD
-	T/mdP4MrwPdhNWwydJjX9tdrGH1A==
-X-Google-Smtp-Source: AGHT+IEThN9cBQeL3cXuDOIc1+uCaHf9ep2wDNPFjuh/TeOr5B3FR/bA1QanG4XfS+l/fJbBKZDCrQ==
-X-Received: by 2002:a05:7022:4595:b0:11d:f441:6c9b with SMTP id a92af1059eb24-11df4417192mr2091918c88.22.1764816497778;
-        Wed, 03 Dec 2025 18:48:17 -0800 (PST)
+        bh=/NLLZx+mFtUT/k/qGnCVEA9+fBUA5GMxbqrpW9T4NgE=;
+        b=ff4KS0NG0KBmQg6vEyt3+RgRTHw8npR7ojYXgqVjOs7DPPKS6z8fxf0GxLOd788hEi
+         ShX2bR7vwzhI2RVLvWbeAoe7CI8d9No89F22y5s2kKpQhlEMAVbCqOzF7OmA7VGSfW03
+         iQLUtoVtLxj5IE1lKNo3+P1iyV5W7ma7EgKimSs7/UsNL47/w7OQZyxPXOmMwlh4QJnG
+         4LA8kO2EvYkhHcgZRpeQtcB+QiCG4+FtS5YyRTrGvSuE98tUzP6szAn3LSd2bhGR9MSM
+         7w6nnmLn46JSOZGWXh/IXKUgBQ4mQ1bl3d0Bk/yPOzS9/FIQluELoSZQ79CNg7bxgt3h
+         cwdQ==
+X-Gm-Message-State: AOJu0Yz05yzqC6JYQK5HPur0ce2ogVhKksHcITyj61BaLjCs03KnshQx
+	HVgTeEUe0jhfqf1Mkni1Q4l32XrmedQkIS+W51dKXPW4g5MJgqgaOLIJ
+X-Gm-Gg: ASbGncvHDpb7tDi2BenwtVXUf+MypaBUQ9Yc2gUrc/OqMi9yXUo4RGxXopkO3YGm60q
+	ByfGbGVPwonFESDeRsjulyMQNBJhqv/652dJuHPwmVUHVqOO5MYi/hnQYjlv4SmddNSrOcsoAkJ
+	lfySCqW90IUjXlFHExs8LelRjXlOgVJtZQgy7tF31BCVXhn+HOmcXkUFlMbYEI3VNEKeXax+0+c
+	FWkiD0DdvO4LPTKBUuWT4DWUFFamRCWXTrWEclI0iuCDhJ2xNYhMSnFfBwNxnQ+0GPFMTUz5N52
+	Sv552/2Of9hKFTTLp9y0+la4PwxYlMd3s36PBQQzS834sEhlVUPDmv3+NRI0+uRRZkm9g3YFuWG
+	tCXQQkYDtywzCcRc4t5X+g+MPIkYfkfZoMPg6+Ce1aPKffCkHPj4aBZ8ZL3KhFDAR9zRlcI9DDL
+	M+8S+Y2T0LIRKn4wm+Iu27WZyjJQ==
+X-Google-Smtp-Source: AGHT+IGYitTygcS9mzGlf9GhlZLT0eKknjI9LuN1aruThHXctHluTBM9GZL0ssswaZE5KQJhhrzPjA==
+X-Received: by 2002:a05:7022:fd04:b0:11a:a20a:4413 with SMTP id a92af1059eb24-11df0c3c92emr3346889c88.31.1764816501932;
+        Wed, 03 Dec 2025 18:48:21 -0800 (PST)
 Received: from localhost.localdomain ([104.128.72.41])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11df76e2f3csm1838847c88.5.2025.12.03.18.48.13
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11df76e2f3csm1838847c88.5.2025.12.03.18.48.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Dec 2025 18:48:17 -0800 (PST)
+        Wed, 03 Dec 2025 18:48:21 -0800 (PST)
 From: zhangshida <starzhangzsd@gmail.com>
 X-Google-Original-From: zhangshida <zhangshida@kylinos.cn>
 To: Johannes.Thumshirn@wdc.com,
@@ -72,9 +72,9 @@ Cc: linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	zhangshida@kylinos.cn,
 	starzhangzsd@gmail.com
-Subject: [PATCH v5 1/3] bcache: fix improper use of bi_end_io
-Date: Thu,  4 Dec 2025 10:47:46 +0800
-Message-Id: <20251204024748.3052502-2-zhangshida@kylinos.cn>
+Subject: [PATCH v5 2/3] block: prohibit calls to bio_chain_endio
+Date: Thu,  4 Dec 2025 10:47:47 +0800
+Message-Id: <20251204024748.3052502-3-zhangshida@kylinos.cn>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20251204024748.3052502-1-zhangshida@kylinos.cn>
 References: <20251204024748.3052502-1-zhangshida@kylinos.cn>
@@ -88,46 +88,36 @@ Content-Transfer-Encoding: 8bit
 
 From: Shida Zhang <zhangshida@kylinos.cn>
 
-Don't call bio->bi_end_io() directly. Use the bio_endio() helper
-function instead, which handles completion more safely and uniformly.
+Now that all potential callers of bio_chain_endio have been
+eliminated, completely prohibit any future calls to this function.
 
+Suggested-by: Ming Lei <ming.lei@redhat.com>
+Suggested-by: Andreas Gruenbacher <agruenba@redhat.com>
 Suggested-by: Christoph Hellwig <hch@infradead.org>
 Signed-off-by: Shida Zhang <zhangshida@kylinos.cn>
 ---
- drivers/md/bcache/request.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ block/bio.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index af345dc6fde..82fdea7dea7 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -1104,7 +1104,7 @@ static void detached_dev_end_io(struct bio *bio)
- 	}
- 
- 	kfree(ddip);
--	bio->bi_end_io(bio);
-+	bio_endio(bio);
+diff --git a/block/bio.c b/block/bio.c
+index b3a79285c27..cfb751dfcf5 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -320,9 +320,13 @@ static struct bio *__bio_chain_endio(struct bio *bio)
+ 	return parent;
  }
  
- static void detached_dev_do_request(struct bcache_device *d, struct bio *bio,
-@@ -1121,7 +1121,7 @@ static void detached_dev_do_request(struct bcache_device *d, struct bio *bio,
- 	ddip = kzalloc(sizeof(struct detached_dev_io_private), GFP_NOIO);
- 	if (!ddip) {
- 		bio->bi_status = BLK_STS_RESOURCE;
--		bio->bi_end_io(bio);
-+		bio_endio(bio);
- 		return;
- 	}
- 
-@@ -1136,7 +1136,7 @@ static void detached_dev_do_request(struct bcache_device *d, struct bio *bio,
- 
- 	if ((bio_op(bio) == REQ_OP_DISCARD) &&
- 	    !bdev_max_discard_sectors(dc->bdev))
--		bio->bi_end_io(bio);
-+		detached_dev_end_io(bio);
- 	else
- 		submit_bio_noacct(bio);
++/**
++ * This function should only be used as a flag and must never be called.
++ * If execution reaches here, it indicates a serious programming error.
++ */
+ static void bio_chain_endio(struct bio *bio)
+ {
+-	bio_endio(__bio_chain_endio(bio));
++	BUG();
  }
+ 
+ /**
 -- 
 2.34.1
 
