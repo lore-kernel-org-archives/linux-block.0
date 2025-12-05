@@ -1,82 +1,108 @@
-Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C06AF361DDF;
-	Fri,  5 Dec 2025 19:11:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3896218AB9
+	for <linux-block@vger.kernel.org>; Fri,  5 Dec 2025 21:18:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764961868; cv=none; b=gtMqP2aYkh8VqcYgej9HWaz2P+5zXRIh0YakWqQwOuDb9QJyvzNA9ACzB61ncfwf984ji3/38H5ikmVVs8uhsbseBCeWEdmkzjiJ56jvbd0mKFj5umJ/kvxuv/Mngw+cXW3pgixwx5pgR2xQmVZAzh/alKNH5Aiogh1SL6Z/0Z4=
+	t=1764969484; cv=none; b=GeqXRS0y+HdNZ2mSuzh0v5GSqqi4NEuAm8wb/FEwEAkwJTqpYjyN3oFSVrIKXOpxTkTtioSSRnkiPGsuwi61q9IjwYzxxdtN9e9I3bkilzDakPMEv7bHR89q4wNqHiB3tcdnB5clkEmXg2ue+ojMjH3HOUafn1y/el9p5DHAJW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764961868; c=relaxed/simple;
-	bh=FO8T7T0HEA6hQYAF6mbvsg6qNElGXGcpj71e9atwVYo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PF5AFcitF7RRBOfRIzkD2ZXO5UrpesGkmVptBqQKptq3L6S58KbFbxHuIRBD92NUR3Xz4bSHnOT2XmvL+Fa/q5lQjayolPu9X+v9JBOFtTK3UbliyvlzyDS6qMicNDLEnOj8SMHTGBukOvTEiy80mPK3FRS7mHNfx/6mYmFGblE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=huymwV+4; arc=none smtp.client-ip=199.89.1.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1764969484; c=relaxed/simple;
+	bh=fRZOm+nn81nPeAI8N3yxexSk41jbLfzqyhBcC20QVPs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ccl/NKUBQE8hxXHMv5NNmZzW3lR1jxeYUuyEII9nA+ZvTvcjuxlOScDxJkLRWn+JNOAaoeTw9YoiT/7n08upamoj8h+BhtYrS7rL+5PpXW1ax9TubGC798ZWxzLwlFhB2BhXpY2LZ3ASklse3MBxaz7tRq2sdimQlw+ROlZn2FE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=cnU16/Yn; arc=none smtp.client-ip=209.85.215.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="huymwV+4"
-Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4dNLZG1CfMz1XMFZZ;
-	Fri,  5 Dec 2025 19:11:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1764961860; x=1767553861; bh=FO8T7T0HEA6hQYAF6mbvsg6q
-	NElGXGcpj71e9atwVYo=; b=huymwV+4qcQuM87ifual2chkmny3UdcX2nUXCKjT
-	74+vNGUH0YGsTxMhVAolrBgkmuOBpQ3wk5BcTcuAAcTFK+jz0XrRicOZNSoyMeN4
-	pkgLeeXswZuMFPp8h1jJPK/NtEhB/rtrXniZa6kFIqbibjXxV9h3Khe2sjCZHd0a
-	TC3ZHx5c5V17BE7ZclsCdxGiqvuC8qQ0etjuBfS1tfKWPa7YyCa9ca7zlzWngLNd
-	0X8n/4v2Ue8UiPDS6OuH7IUxdBEQLb1sYdrH0Mmc8TNHh2iSyQ0CzPpZ5u53FAYK
-	b9USL+zVOTvigTxbZIC/u/jcGhCgPhqYluIb78FTelYz8Q==
-X-Virus-Scanned: by MailRoute
-Received: from 011.lax.mailroute.net ([127.0.0.1])
- by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id ds6b7kWJl2dK; Fri,  5 Dec 2025 19:11:00 +0000 (UTC)
-Received: from [100.68.58.56] (syn-076-081-111-211.biz.spectrum.com [76.81.111.211])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4dNLZ71lk1z1XLwXH;
-	Fri,  5 Dec 2025 19:10:54 +0000 (UTC)
-Message-ID: <fcecd822-a2ec-43e6-8dc4-290516e2187d@acm.org>
-Date: Fri, 5 Dec 2025 09:10:51 -1000
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="cnU16/Yn"
+Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-bc2abdcfc6fso1590725a12.2
+        for <linux-block@vger.kernel.org>; Fri, 05 Dec 2025 13:18:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1764969482; x=1765574282; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qLr78IWpZsH9cRJ6KPlqEXZYrcnfDvKEUz40bjS2UZY=;
+        b=cnU16/YnSDlkXnh0czFQHfkLupbMh2xbI2z2n59po4uD8yIqwrlJmzFKAol1Npw5/i
+         eubkw4A9d4+XRvNPNxWYUekh9oE/k5Ci+wh7FhkMng1nt3baCfBrvEkyk73ys1ozHFoK
+         PZB3hfAVk77nepubtwOSf2FxkBYGNpY2krVIPuZeOkijCP2KQRBCfMPX6Dec6PTLref7
+         Y4hLe8HyLXMC5smFsFi5rD9bxwkm2rnGgW/hbcdtSQJTG98wRaiH9ioj8sIL9YfPI4kT
+         wYU/tWY7WIYtFRWqbLFScP/NcWYyZUcBnHetrM67jP5L6O6jRpPx2xiJ5KjLOH1nlGvw
+         +3IQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764969482; x=1765574282;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qLr78IWpZsH9cRJ6KPlqEXZYrcnfDvKEUz40bjS2UZY=;
+        b=J7zDTiGD2HE2yo3zaQ+PIMiQk0hVeZb51ohgDXIKtBL3/d0HdtVw1XDF1lDpA6dPaz
+         T0uXbmdABnqV1XSxxGYDa0CplBL1XX+N7HLIhLXWr4nt8+9DAKpdKmDAGH8Fu2QTNGUe
+         LDGKZN92/1x3IBPtUQcFn7Hw9+XAPsGoPpDdYEVl1DvDtZ6liYERYRZNR3DkvhM7B2ab
+         wQno+vaA6i0+WpdzCcmO74fU8quWpLaCAjDK/WKAtCSf+wZMRkB4kJfcO5/V40MkwHPl
+         aPnF08o2pb8Km9QpJKbmawijZXrnXZYM1hFxHUsWGvLglhZN4NaqnP1l8pKLB394vEiw
+         3EDA==
+X-Forwarded-Encrypted: i=1; AJvYcCVgKWMWM9ovJeZTgQUEvoi19Wb3wvGGdnes1IBcB/8oqo5PakbOEHuBkTrsv6kSOJjQSzu2yNrPzzXtbQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YziZyv+IuR3NMOETjzB89SBM+uQK7nEejTHe6MLUnm3Uiei6E+m
+	hsmUojHFVoffrShqocqHVYnUCzFHeOUF35JTrGWTQ94k5c73Rbh38JhMFrnXQ7DhX0A=
+X-Gm-Gg: ASbGnctFhY7NV/TUqvnILK/mSs8qGjy2BQGEv1bx9RXSVUkZ/off4sOmAhxoR3z0jSN
+	YgYWph7lCr4ArGURDhcmNYBN7KVXG2rIEMxuELbIL9MdFzZjKQgeR+5dNFANt+atku94Sn1Wouj
+	9dOVKZb6JuP81GUSv+j2LsRXlM+06ZTk9ok7G42Xc2UoFxkfMsaJlPjIEBtkbnf7W9yQnlMHGGY
+	IcIfcFSuylqnKRcqQjjy/y+jSpbosYisDvZOfMqswbvEVyuWuvRfirnibvWMfyGNbMuRqKle8Gh
+	dl8Zn+jLZIkTsI+eDG0bxLTL81wkrMxHCh+sIkvAb27fK2QYUS/z2F++xsSfXewOzWkOVbVPaUk
+	Dfeqqx8gVC+eWNGOVgPQBp/I7wAzJfFKJrpCNd2kOv0K2heBAkN5XQyXMFme6+3fxTbaKfHaqr9
+	kDZPwqIK3gaScFDvPn5pkBHxL00zN8CYq9QA==
+X-Google-Smtp-Source: AGHT+IHgbtRzljq2X9udI6Q97+gwmHZiZ3ufXgUMLj3UuDiJA4sZb94uuPtC80v9mSCYDgdTAcYmcg==
+X-Received: by 2002:a05:7300:d0a1:b0:2a7:83e:7b17 with SMTP id 5a478bee46e88-2abc712d0a3mr394259eec.12.1764969481828;
+        Fri, 05 Dec 2025 13:18:01 -0800 (PST)
+Received: from apollo.purestorage.com ([208.88.152.253])
+        by smtp.googlemail.com with ESMTPSA id 5a478bee46e88-2aba8395d99sm25546318eec.1.2025.12.05.13.18.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Dec 2025 13:18:01 -0800 (PST)
+From: Mohamed Khalfella <mkhalfella@purestorage.com>
+To: Chaitanya Kulkarni <kch@nvidia.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <kbusch@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>
+Cc: Casey Chen <cachen@purestorage.com>,
+	Yuanyuan Zhong <yzhong@purestorage.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Ming Lei <ming.lei@redhat.com>,
+	Waiman Long <llong@redhat.com>,
+	Hillf Danton <hdanton@sina.com>,
+	linux-nvme@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Mohamed Khalfella <mkhalfella@purestorage.com>
+Subject: [PATCH v4 0/1] block: Use RCU in blk_mq_[un]quiesce_tagset() instead of set->tag_list_lock
+Date: Fri,  5 Dec 2025 13:17:01 -0800
+Message-ID: <20251205211738.1872244-1-mkhalfella@purestorage.com>
+X-Mailer: git-send-email 2.51.2
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] PM: sleep: Do not flag runtime PM workqueue as
- freezable
-To: "Rafael J. Wysocki" <rafael@kernel.org>, linux-pm@vger.kernel.org
-Cc: YangYang <yang.yang@vivo.com>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- Ulf Hansson <ulf.hansson@linaro.org>
-References: <20251126101636.205505-1-yang.yang@vivo.com>
- <82bcdf73-54c5-4220-86c0-540a5cb59bb7@vivo.com>
- <CAJZ5v0hm=jfSyBXF0qMYnpATJf56JTxQ-+4JBy3YMjS0cMUMHg@mail.gmail.com>
- <12794222.O9o76ZdvQC@rafael.j.wysocki>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <12794222.O9o76ZdvQC@rafael.j.wysocki>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 12/5/25 5:24 AM, Rafael J. Wysocki wrote:
-> For example, it has been reported that blk_queue_enter() may deadlock
-> during a system suspend transition because of the pm_request_resume()
-> usage in it [1].
+Changes from v3:
+- Fixed typos in commit message.
+- Updated stacktrace in commit message with one taken from recent kernel.
+- Added Fixes: tag to commit message.
+- Deleted synchronize_rcu() (added in v3) and pre-existing
+  INIT_LIST_HEAD(&q->tag_set_list) call in blk_mq_del_queue_tag_set().
+- Updated the commit message to mention why it is safe to delete
+  INIT_LIST_HEAD(&q->tag_set_list) in blk_mq_del_queue_tag_set().
 
-System resume is also affected. If pm_request_resume() is called before
-the device it applies to is resumed by the system resume code then the
-pm_request_resume() call also hangs.
+v3 - https://lore.kernel.org/all/20251204181212.1484066-1-mkhalfella@purestorage.com/
 
-Otherwise this patch looks good to me.
+Mohamed Khalfella (1):
+  block: Use RCU in blk_mq_[un]quiesce_tagset() instead of
+    set->tag_list_lock
 
-Thanks,
+ block/blk-mq.c | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
-Bart.
+-- 
+2.51.2
+
