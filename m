@@ -1,84 +1,157 @@
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com [209.85.167.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDF05281504
-	for <linux-block@vger.kernel.org>; Fri,  5 Dec 2025 13:52:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB747331A6A;
+	Fri,  5 Dec 2025 15:24:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764942756; cv=none; b=YgprFzHstDIMkWFa4Vl0aZaPWrF/mmojNsN7dRukEvMKehF2Nd81e/Dr/C12BLU5XLmw24ZaWRaLzOk36Zzvvjt426n2zBPw9QhuMYSm87YYsR6pCKKillYnRAmXQ8FLHCls0jGq59BqI1D/eHd8FfISkC+mqlQzvYnpXU7oXPk=
+	t=1764948250; cv=none; b=WtOna90e4zLRVMwCW7Fw449uwoveAdJQWybRXXwsYrHZf8EUyBTjwLT9AYY4ltcXQ8n0cQ09lxcF/J9gt8sXbrDqEAvJzxB590/xbhbfxaPVeS7ViEi4AyyeGAoQBgKv5cW7+El1UX/4o9kJSPXiUhFf7LE3w4zRlBc9YDkq1Iw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764942756; c=relaxed/simple;
-	bh=LN1D7Bq91SowiKwetxukNtSVNembL/zSEfUsqynK2qc=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=RdI3ZrhazDEx+kthFMgewuRokanHh0kYbwefNuxE5h0TugQ1Yrm8JVzK2/O4lnVPApqaEfgWu2ptzsCBh5NZoHPA1k0IkLlHekB53xksoHceWxr/qTGFmZPZzGIpk47CPjUhPZpIhCHh2dLWBLcwRwHbm11YfRpEcD7leOt8o6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-45396d397e0so223048b6e.3
-        for <linux-block@vger.kernel.org>; Fri, 05 Dec 2025 05:52:33 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764942752; x=1765547552;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=v2NJsbOFgjDMjMXuTTthPeUQ4SXsnG37aVsP6Rf2Hfw=;
-        b=tqhF7NnqvX0dMF1sRMI9+9q3cj+Z6Pbxx+xCLvglFJ+cXbxPLChKkxC/zFHeVU//OR
-         fsiobEHhv5EmIEznmezZjPXuJW7qip+/AxoDNkMA/Sgvig5ywe7vrIFB9bG7tUjOsC/+
-         sJpMWMEgHKRRSPPpYbNhIwm7BONVeblkdHcpHzLwe97Lj7xE3y4wz0cu1QBl6r36e0ju
-         UyWOkDQPZ4XDUuIeBKQd5dceZ92mByS5Mfq9BTD4FcSnq/QX4ySM5WfJRd/RSSP+9k0q
-         jUl0JByr3HM4FdzVOBfSmiK0fM8QLq/JxfzhcZDbPX/4Y6mmcn5C0CXk1j4KTnnMVyhX
-         tq9A==
-X-Forwarded-Encrypted: i=1; AJvYcCWalzvxI5OCIAPXdwT48f2sPq1nI0N1cstCGCVAuwOzTatoI3nJa7pGTYrD7dNZNyImV3rHGmXlNDyYTg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+US2RE8SAU8+2uBT4zt/ZUh67wTKDxfMizUML6Rf5PE0vtfcw
-	ZynYuz4HktrE3cPM6adPcbFmgnq6Xlkp7hOSoiKOjxO+T3qdssUKMwn1nAKzxd7018F6wOeX9Bn
-	mYFMrWiUiHk1d4BNCQpQNMQo5Z1Km8igrYeH2DfXqACzbnmHiO/zXNMrhLz0=
-X-Google-Smtp-Source: AGHT+IHWFKnCnOqu89ScSwCSTHdi2z9hmBNOjlHIHVufF/6YxQ2sdGEhrDokhnEXojx9qkfHff8TrfeUNSK2uLZcRH4nqUL/6+jr
+	s=arc-20240116; t=1764948250; c=relaxed/simple;
+	bh=VPZBz6gUJ9/Kuvek85aJy2KGAjCQmppoXJ2P9Ttxe4Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LtE/osVGFbIxPByi2vlsaAMAbd0020uFDZBxihrtzEhPRHiKEqtyo/0V9CI53WHXombxLchebAK+14N2Wzdi2jTJtlNuNnCrF2PSTjKal/Fhz957KtQ7u317cWbjsubAT+UfcsPSjE8DMkIwGYBGfyjdfjyYr7XBSrbqLHpRW0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R4H2N0E5; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R4H2N0E5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C475C4CEF1;
+	Fri,  5 Dec 2025 15:24:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764948249;
+	bh=VPZBz6gUJ9/Kuvek85aJy2KGAjCQmppoXJ2P9Ttxe4Y=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=R4H2N0E5kaXEWyNdz7TW/2aV4hmPW8nwUIsW4TbpTD2SkXyrTxCsCp2+upWEg2s0o
+	 MkpDB6yyx3/zGdqp5u6Mpum/zXjXl59bS2HSdWFBwuv/i7J26pYOHsoMHSW31qH/xl
+	 Rv9hiB61iuJiNqnOqJDyffq4Unu/QuV27Z2kWeVu/MhMgZbhcaZPkDnLojUqMlZpeb
+	 tmPmqY+SvRR+oChWfZKod1a1KA7VIQyFF2QYhAx4Xf4xQKSJdjUXGjIP/aLRAl6dPl
+	 0wiFDzbsrHwWIIeiUkvVEtU0SeFTdXXo/Sl6Wki+cCbqGENl8CnreDZXwN+JJVmK44
+	 1pNQrfYUBPZ6w==
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+To: linux-pm@vger.kernel.org
+Cc: YangYang <yang.yang@vivo.com>, Bart Van Assche <bvanassche@acm.org>,
+ Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Ulf Hansson <ulf.hansson@linaro.org>
+Subject: [PATCH v2] PM: sleep: Do not flag runtime PM workqueue as freezable
+Date: Fri, 05 Dec 2025 16:24:05 +0100
+Message-ID: <12794222.O9o76ZdvQC@rafael.j.wysocki>
+Organization: Linux Kernel Development
+In-Reply-To:
+ <CAJZ5v0hm=jfSyBXF0qMYnpATJf56JTxQ-+4JBy3YMjS0cMUMHg@mail.gmail.com>
+References:
+ <20251126101636.205505-1-yang.yang@vivo.com>
+ <82bcdf73-54c5-4220-86c0-540a5cb59bb7@vivo.com>
+ <CAJZ5v0hm=jfSyBXF0qMYnpATJf56JTxQ-+4JBy3YMjS0cMUMHg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:221a:b0:442:522:41a3 with SMTP id
- 5614622812f47-4536e5de194mr5174327b6e.60.1764942752324; Fri, 05 Dec 2025
- 05:52:32 -0800 (PST)
-Date: Fri, 05 Dec 2025 05:52:32 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6932e3a0.a70a0220.243dc6.000a.GAE@google.com>
-Subject: [syzbot] Monthly nbd report (Dec 2025)
-From: syzbot <syzbot+list151df4a5fb9739ee568a@syzkaller.appspotmail.com>
-To: josef@toxicpanda.com, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, nbd@other.debian.org, 
-	syzkaller-bugs@googlegroups.com
+Content-Transfer-Encoding: 7Bit
 Content-Type: text/plain; charset="UTF-8"
 
-Hello nbd maintainers/developers,
+From: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
 
-This is a 31-day syzbot report for the nbd subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/nbd
+Till now, the runtime PM workqueue has been flagged as freezable, so it
+does not process work items during system-wide PM transitions like
+system suspend and resume.  The original reason to do that was to
+reduce the likelihood of runtime PM getting in the way of system-wide
+PM processing, but now it is mostly an optimization because (1) runtime
+suspend of devices is prevented by bumping up their runtime PM usage
+counters in device_prepare() and (2) device drivers are expected to
+disable runtime PM for the devices handled by them before they embark
+on system-wide PM activities that may change the state of the hardware
+or otherwise interfere with runtime PM.  However, it prevents
+asynchronous runtime resume of devices from working during system-wide
+PM transitions, which is confusing because synchronous runtime resume
+is not prevented at the same time, and it also sometimes turns out to
+be problematic.
 
-During the period, 0 new issues were detected and 0 were fixed.
-In total, 5 issues are still open and 8 have already been fixed.
+For example, it has been reported that blk_queue_enter() may deadlock
+during a system suspend transition because of the pm_request_resume()
+usage in it [1].  That happens because the asynchronous runtime resume
+of the given device is not processed due to the freezing of the runtime
+PM workqueue.  While it may be better to address this particular issue
+in the block layer, the very presence of it means that similar problems
+may be expected to occur elsewhere.
 
-Some of the still happening issues:
+For this reason, remove the WQ_FREEZABLE flag from the runtime PM
+workqueue and make device_suspend_late() use the generic variant of
+pm_runtime_disable() that will carry out runtime PM of the device
+synchronously if there is pending resume work for it.
 
-Ref Crashes Repro Title
-<1> 2556    Yes   possible deadlock in pcpu_alloc_noprof (2)
-                  https://syzkaller.appspot.com/bug?extid=91771b3fb86ec2dd7227
-<2> 353     Yes   INFO: task hung in nbd_queue_rq
-                  https://syzkaller.appspot.com/bug?extid=30c16035531e3248dcbc
-<3> 67      Yes   possible deadlock in nbd_queue_rq
-                  https://syzkaller.appspot.com/bug?extid=3dbc6142c85cc77eaf04
+Also update the comment before the pm_runtime_disable() call in
+device_suspend_late(), to document the fact that the runtime PM
+should not be expected to work for the device until the end of
+device_resume_early(), and update the related documentation.
+
+This change may, even though it is not expected to, uncover some
+latent issues related to queuing up asynchronous runtime resume
+work items during system suspend or hibernation.  However, they
+should be limited to the interference between runtime resume and
+system-wide PM callbacks in the cases when device drivers start
+to handle system-wide PM before disabling runtime PM as described
+above.
+
+Link: https://lore.kernel.org/linux-pm/20251126101636.205505-2-yang.yang@vivo.com/
+Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+Reviewed-by: Ulf Hansson <ulf.hansson@linaro.org>
+---
+
+v1 -> v2:
+   * Update documentation in runtime_pm.rst.
+   * Add R-by from Ulf.
 
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ Documentation/power/runtime_pm.rst |    7 +++----
+ drivers/base/power/main.c          |    7 ++++---
+ kernel/power/main.c                |    2 +-
+ 3 files changed, 8 insertions(+), 8 deletions(-)
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+--- a/Documentation/power/runtime_pm.rst
++++ b/Documentation/power/runtime_pm.rst
+@@ -714,10 +714,9 @@ out the following operations:
+   * During system suspend pm_runtime_get_noresume() is called for every device
+     right before executing the subsystem-level .prepare() callback for it and
+     pm_runtime_barrier() is called for every device right before executing the
+-    subsystem-level .suspend() callback for it.  In addition to that the PM core
+-    calls __pm_runtime_disable() with 'false' as the second argument for every
+-    device right before executing the subsystem-level .suspend_late() callback
+-    for it.
++    subsystem-level .suspend() callback for it.  In addition to that, the PM
++    core disables runtime PM for every device right before executing the
++    subsystem-level .suspend_late() callback for it.
+ 
+   * During system resume pm_runtime_enable() and pm_runtime_put() are called for
+     every device right after executing the subsystem-level .resume_early()
+--- a/drivers/base/power/main.c
++++ b/drivers/base/power/main.c
+@@ -1647,10 +1647,11 @@ static void device_suspend_late(struct d
+ 		goto Complete;
+ 
+ 	/*
+-	 * Disable runtime PM for the device without checking if there is a
+-	 * pending resume request for it.
++	 * After this point, any runtime PM operations targeting the device
++	 * will fail until the corresponding pm_runtime_enable() call in
++	 * device_resume_early().
+ 	 */
+-	__pm_runtime_disable(dev, false);
++	pm_runtime_disable(dev);
+ 
+ 	if (dev->power.syscore)
+ 		goto Skip;
+--- a/kernel/power/main.c
++++ b/kernel/power/main.c
+@@ -1125,7 +1125,7 @@ EXPORT_SYMBOL_GPL(pm_wq);
+ 
+ static int __init pm_start_workqueues(void)
+ {
+-	pm_wq = alloc_workqueue("pm", WQ_FREEZABLE | WQ_UNBOUND, 0);
++	pm_wq = alloc_workqueue("pm", WQ_UNBOUND, 0);
+ 	if (!pm_wq)
+ 		return -ENOMEM;
+ 
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
 
-You may send multiple commands in a single email message.
+
