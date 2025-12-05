@@ -1,148 +1,84 @@
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com [209.85.167.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C975331218
-	for <linux-block@vger.kernel.org>; Fri,  5 Dec 2025 12:47:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDF05281504
+	for <linux-block@vger.kernel.org>; Fri,  5 Dec 2025 13:52:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764938872; cv=none; b=a0rEtrNOZ++CRa39vo8DDHqAt+6M6pDvkOs79TCOBFjUFBath9YbqYcb1Jv8u9a8sE2SoJtTd0IZabp+aYubFMdMYjp8ajAThK4X49og8NswDj/R9yIt/txl2FRSzGSkPCURqo19j53eurCRGNT+FTZtsRm6yWBUjZ3J/3EGU+I=
+	t=1764942756; cv=none; b=YgprFzHstDIMkWFa4Vl0aZaPWrF/mmojNsN7dRukEvMKehF2Nd81e/Dr/C12BLU5XLmw24ZaWRaLzOk36Zzvvjt426n2zBPw9QhuMYSm87YYsR6pCKKillYnRAmXQ8FLHCls0jGq59BqI1D/eHd8FfISkC+mqlQzvYnpXU7oXPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764938872; c=relaxed/simple;
-	bh=5SSPz2SLDwoONCWBZv9zOIYgjOhMjDjio63D3lzTC/g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TYy/AtLiH6gHGhKpCSeLl0NniJrX1ZNr/gUjbdoB//PyJrTRN49Eh/sl93KQ8KzYG7jKA6RYxB8BlfVKSIoMTbisSIVlagA2/V90sPyffHqDfgOec6eCC9ggUQTx2+eE3qJm3bo7FPaaa0YqYDKW0lEWFTA4c+RgTemtLfouIiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=dggGbubS; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="dggGbubS"
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-42e2b78d45bso984734f8f.0
-        for <linux-block@vger.kernel.org>; Fri, 05 Dec 2025 04:47:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google; t=1764938861; x=1765543661; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=saho5eSDILZ2ExK/DCzZE5yuBnal9crTCSPX6cuFxv8=;
-        b=dggGbubSP5EKQJEWHvx0yIRAqxkQCvIfr9OE6W+TXWGyNvCbLjZH6sWjCTlXRB2r/M
-         q5h5fJd7lh2pltPxJMT/4LSHAErnW/FWrc4BSrCLtW3yARSOdhjPn56xulWZuH4r+zoY
-         WvMBrUmmScNzgtfpLzw0Z9s1a+PC+mVacOrXFEDYQ6O94qFjJcCkFV1UALdq72eEpPjZ
-         NqCWEXaEno6wSdl7F8W9jDte1kVtlaQmI/wulkrMdo/Z8sjyyiOMdQXlguQwTHFaefdo
-         U8N3mbAIlzHdwbWbcg6GyDUsb4TtdJWJFTBWaM3rIwQctQIrzb+krqGa6QBZAFEL98nx
-         qWdA==
+	s=arc-20240116; t=1764942756; c=relaxed/simple;
+	bh=LN1D7Bq91SowiKwetxukNtSVNembL/zSEfUsqynK2qc=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=RdI3ZrhazDEx+kthFMgewuRokanHh0kYbwefNuxE5h0TugQ1Yrm8JVzK2/O4lnVPApqaEfgWu2ptzsCBh5NZoHPA1k0IkLlHekB53xksoHceWxr/qTGFmZPZzGIpk47CPjUhPZpIhCHh2dLWBLcwRwHbm11YfRpEcD7leOt8o6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-45396d397e0so223048b6e.3
+        for <linux-block@vger.kernel.org>; Fri, 05 Dec 2025 05:52:33 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764938861; x=1765543661;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=saho5eSDILZ2ExK/DCzZE5yuBnal9crTCSPX6cuFxv8=;
-        b=P49Z9OmEKOuKu6ixJGw3d73T2F+O0Vx+lkqELsxcGkCJ8ZFhzr+YMATddSY1I93V1J
-         zYmvpn1OwbeM3cs2j5T3eM/1eM7oDvImpNZSNY2AMT9qwsxwvlZqsYXK4LAOvkOHEExu
-         zGKtG89tTWBUhLpakcs+KAGsrA0LS5B/DwGSuQZK7byUlDm4IdAF/VOjH2ZxN9kxoFf/
-         qRUOvJIqm10pZt/++XIobxiunDXOFN4W4DLobyCYc61e6CBCBYnCs81sSor2Wp5U9K5a
-         5cQrc1TOkOAnCLSkcERZfbDAwGLJoUAEymm9ZQhae4rOaoZX7j9vq528MBGXG0iCo9Mc
-         o1AQ==
-X-Gm-Message-State: AOJu0YzR9vM6zqBqn47/Z4E9xWmbbvifuxXNTDF9vsxe+UztJZLfKreT
-	KBYd960I1yzc6+6iig7L3wcMk+PYPCN4U2ANoQsGBJxegRuUaTunypYBZUVrEk4Hr0QUhBQhlfN
-	rmPvu
-X-Gm-Gg: ASbGnct4gyLrGyBuIHCzgLdfRTqmlmWrCB8gr5jHqk7P/cZqN10IaX4tyU0ARa+N68B
-	UtrbM2i/ouvpXyYd+urm0ovU0mCKtTYqlwKHgN6nQE0qt91BrwBZcSabzFyEqwiVA2c/Ylq5rMW
-	XtY4cfIZ/kKAytTpdyXH7hrcuElNwX8t+vI71QmlX8z2vyRblphicYDVPAGgdTyf/fifPzaWyOp
-	x51Udz+of4DFyO4Zg9wMcGoQKNLd7B91roqUmuOYWIENMnS6K+tL+SveZgs/fULrwQlejHTcO/Z
-	zg2jFqY4nCnzrEwbOEtL/55elXzFkeLT8MZhl4Fyi8/fXZmwP5ON23iTCnrr3IpgEQNZx7sJ6ri
-	aXpw2i24gc/+RiNTqITZscY7qDpPuWX/5W3MK7DK4vRBauFAgThNiWYR7A/R8B+C2vAr1zcbl3Y
-	bkHG1zlX8rNOtKY6m/l/WCPAdJhvtuLAAUOczHVhjRCtRYcsERA9pIbEmPt3256NFgsm42HxnOC
-	0iRNXa6/jUo7A==
-X-Google-Smtp-Source: AGHT+IFKD5rQKG1QNWrLIOn87LBIz2QWD6fQdwSUYI2UO04V8XOnLQnvvvpQqe5W2CEmVpdt2Fm2gg==
-X-Received: by 2002:adf:f211:0:b0:429:ca7f:8d5a with SMTP id ffacd0b85a97d-42f731a4e3dmr8578214f8f.37.1764938861422;
-        Fri, 05 Dec 2025 04:47:41 -0800 (PST)
-Received: from lb03189.speedport.ip (p200300f00f28af70a31ee45bb042915f.dip0.t-ipconnect.de. [2003:f0:f28:af70:a31e:e45b:b042:915f])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42f7cbfee66sm8540037f8f.11.2025.12.05.04.47.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Dec 2025 04:47:41 -0800 (PST)
-From: Md Haris Iqbal <haris.iqbal@ionos.com>
-To: linux-block@vger.kernel.org
-Cc: axboe@kernel.dk,
-	hch@lst.de,
-	sagi@grimberg.me,
-	bvanassche@acm.org,
-	haris.iqbal@ionos.com,
-	jinpu.wang@ionos.com,
-	grzegorz.prajsner@ionos.com
-Subject: [PATCH 4/6] rnbd-srv: fix the trace format for flags
-Date: Fri,  5 Dec 2025 13:47:31 +0100
-Message-ID: <20251205124733.26358-5-haris.iqbal@ionos.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20251205124733.26358-1-haris.iqbal@ionos.com>
-References: <20251205124733.26358-1-haris.iqbal@ionos.com>
+        d=1e100.net; s=20230601; t=1764942752; x=1765547552;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=v2NJsbOFgjDMjMXuTTthPeUQ4SXsnG37aVsP6Rf2Hfw=;
+        b=tqhF7NnqvX0dMF1sRMI9+9q3cj+Z6Pbxx+xCLvglFJ+cXbxPLChKkxC/zFHeVU//OR
+         fsiobEHhv5EmIEznmezZjPXuJW7qip+/AxoDNkMA/Sgvig5ywe7vrIFB9bG7tUjOsC/+
+         sJpMWMEgHKRRSPPpYbNhIwm7BONVeblkdHcpHzLwe97Lj7xE3y4wz0cu1QBl6r36e0ju
+         UyWOkDQPZ4XDUuIeBKQd5dceZ92mByS5Mfq9BTD4FcSnq/QX4ySM5WfJRd/RSSP+9k0q
+         jUl0JByr3HM4FdzVOBfSmiK0fM8QLq/JxfzhcZDbPX/4Y6mmcn5C0CXk1j4KTnnMVyhX
+         tq9A==
+X-Forwarded-Encrypted: i=1; AJvYcCWalzvxI5OCIAPXdwT48f2sPq1nI0N1cstCGCVAuwOzTatoI3nJa7pGTYrD7dNZNyImV3rHGmXlNDyYTg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+US2RE8SAU8+2uBT4zt/ZUh67wTKDxfMizUML6Rf5PE0vtfcw
+	ZynYuz4HktrE3cPM6adPcbFmgnq6Xlkp7hOSoiKOjxO+T3qdssUKMwn1nAKzxd7018F6wOeX9Bn
+	mYFMrWiUiHk1d4BNCQpQNMQo5Z1Km8igrYeH2DfXqACzbnmHiO/zXNMrhLz0=
+X-Google-Smtp-Source: AGHT+IHWFKnCnOqu89ScSwCSTHdi2z9hmBNOjlHIHVufF/6YxQ2sdGEhrDokhnEXojx9qkfHff8TrfeUNSK2uLZcRH4nqUL/6+jr
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6808:221a:b0:442:522:41a3 with SMTP id
+ 5614622812f47-4536e5de194mr5174327b6e.60.1764942752324; Fri, 05 Dec 2025
+ 05:52:32 -0800 (PST)
+Date: Fri, 05 Dec 2025 05:52:32 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6932e3a0.a70a0220.243dc6.000a.GAE@google.com>
+Subject: [syzbot] Monthly nbd report (Dec 2025)
+From: syzbot <syzbot+list151df4a5fb9739ee568a@syzkaller.appspotmail.com>
+To: josef@toxicpanda.com, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, nbd@other.debian.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-From: Jack Wang <jinpu.wang@ionos.com>
+Hello nbd maintainers/developers,
 
-The __print_flags helper meant for bitmask, while the rnbd_rw_flags is
-mixed with bitmask and enum, to avoid confusion, just print the data
-as it is.
+This is a 31-day syzbot report for the nbd subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/nbd
 
-Signed-off-by: Jack Wang <jinpu.wang@ionos.com>
-Reviewed-by: Md Haris Iqbal <haris.iqbal@ionos.com>
-Signed-off-by: Grzegorz Prajsner <grzegorz.prajsner@ionos.com>
+During the period, 0 new issues were detected and 0 were fixed.
+In total, 5 issues are still open and 8 have already been fixed.
+
+Some of the still happening issues:
+
+Ref Crashes Repro Title
+<1> 2556    Yes   possible deadlock in pcpu_alloc_noprof (2)
+                  https://syzkaller.appspot.com/bug?extid=91771b3fb86ec2dd7227
+<2> 353     Yes   INFO: task hung in nbd_queue_rq
+                  https://syzkaller.appspot.com/bug?extid=30c16035531e3248dcbc
+<3> 67      Yes   possible deadlock in nbd_queue_rq
+                  https://syzkaller.appspot.com/bug?extid=3dbc6142c85cc77eaf04
+
 ---
- drivers/block/rnbd/rnbd-srv-trace.h | 22 ++--------------------
- 1 file changed, 2 insertions(+), 20 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/block/rnbd/rnbd-srv-trace.h b/drivers/block/rnbd/rnbd-srv-trace.h
-index 89d0bcb17195..18ae2ed5537a 100644
---- a/drivers/block/rnbd/rnbd-srv-trace.h
-+++ b/drivers/block/rnbd/rnbd-srv-trace.h
-@@ -44,24 +44,6 @@ DEFINE_EVENT(rnbd_srv_link_class, name, \
- DEFINE_LINK_EVENT(create_sess);
- DEFINE_LINK_EVENT(destroy_sess);
- 
--TRACE_DEFINE_ENUM(RNBD_OP_READ);
--TRACE_DEFINE_ENUM(RNBD_OP_WRITE);
--TRACE_DEFINE_ENUM(RNBD_OP_FLUSH);
--TRACE_DEFINE_ENUM(RNBD_OP_DISCARD);
--TRACE_DEFINE_ENUM(RNBD_OP_SECURE_ERASE);
--TRACE_DEFINE_ENUM(RNBD_F_SYNC);
--TRACE_DEFINE_ENUM(RNBD_F_FUA);
--
--#define show_rnbd_rw_flags(x) \
--	__print_flags(x, "|", \
--		{ RNBD_OP_READ,		"READ" }, \
--		{ RNBD_OP_WRITE,	"WRITE" }, \
--		{ RNBD_OP_FLUSH,	"FLUSH" }, \
--		{ RNBD_OP_DISCARD,	"DISCARD" }, \
--		{ RNBD_OP_SECURE_ERASE,	"SECURE_ERASE" }, \
--		{ RNBD_F_SYNC,		"SYNC" }, \
--		{ RNBD_F_FUA,		"FUA" })
--
- TRACE_EVENT(process_rdma,
- 	TP_PROTO(struct rnbd_srv_session *srv,
- 		 const struct rnbd_msg_io *msg,
-@@ -97,7 +79,7 @@ TRACE_EVENT(process_rdma,
- 		__entry->usrlen = usrlen;
- 	),
- 
--	TP_printk("I/O req: sess: %s, type: %s, ver: %d, devid: %u, sector: %llu, bsize: %u, flags: %s, ioprio: %d, datalen: %u, usrlen: %zu",
-+	TP_printk("I/O req: sess: %s, type: %s, ver: %d, devid: %u, sector: %llu, bsize: %u, flags: %u, ioprio: %d, datalen: %u, usrlen: %zu",
- 		   __get_str(sessname),
- 		   __print_symbolic(__entry->dir,
- 			 { READ,  "READ" },
-@@ -106,7 +88,7 @@ TRACE_EVENT(process_rdma,
- 		   __entry->device_id,
- 		   __entry->sector,
- 		   __entry->bi_size,
--		   show_rnbd_rw_flags(__entry->flags),
-+		   __entry->flags,
- 		   __entry->ioprio,
- 		   __entry->datalen,
- 		   __entry->usrlen
--- 
-2.43.0
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
