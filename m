@@ -1,109 +1,153 @@
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89079324B34
-	for <linux-block@vger.kernel.org>; Fri,  5 Dec 2025 07:46:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07D4A27F00A
+	for <linux-block@vger.kernel.org>; Fri,  5 Dec 2025 08:15:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764920787; cv=none; b=gpr5Or79t5b1MMcQEftEvyCbuDFsoEWoctFJhovIgl+LKznyhqmlS+saCg/HFI9UGFpwpaymip689BtbRMA6VgeUB4mqBoow0sba9Trg1f2IVGA4MSv+42OR0GRJ4Phvrr03hykBxAmqjfG/4NkJIlB1wCkXCXshdpagDFdXWOk=
+	t=1764922520; cv=none; b=RbNHspzPLOaqWgv9U3NvzPrztHDTwhfU59V0O8EHupVnRHWpd7oSvNtxj3pq6aNcSi+ORXew2uiPHcofYP1obZkRu1okR77zIMO6FeXigFkuDhkjpyj3yNroZ2+QzltUtF2AaKW4zGFOBu0yVlG29uanmK12wXj1ND0j8sFwHnc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764920787; c=relaxed/simple;
-	bh=HXtSwPAI2lC/ImQNYqZw2xOGmU6O3GtB13oXE7vjpQ4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NzIXxJtAGr7T8EXTRn4oe8gMj9HdIPSMZ1LF33T0BTGUkbfYPjaNf+37EJW+ceyz4D2FAH5ptvmQyPfTiGelwfXRtDR/69JXTM9fWCnOXGLNgfqj+HUuFkwQGcj0oWl22EZQxTcbpow2oOVXUlzNj7W569CpvE3sqCmg8KhX9ok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CIUg0V2J; arc=none smtp.client-ip=209.85.160.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1764922520; c=relaxed/simple;
+	bh=xwiVecgt1sLDYfV+QEgdpoP1LUTUXUzksYnF7YkxbTw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UyncOgnGUhjPh8LUfcBRt7nB9FxDizFjTf4fwHqxKnV7DS4G0pPPEZM6a2nXZuERrUYJKvof14rOfwEP5W8/Y0/z8QXbp6/OPUTE6s8Jsfz//ikFCOcKD8fOLKD7u5eeMjgU39SXGaxSeQ1xo1H4bqvbZKeoQQkvp+++I1Ra76s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=t1jce6GR; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=YpnOsifs; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Z8tGcheH; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=y7mnHG4x; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CIUg0V2J"
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4ee1879e6d9so21076201cf.1
-        for <linux-block@vger.kernel.org>; Thu, 04 Dec 2025 23:46:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764920762; x=1765525562; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HXtSwPAI2lC/ImQNYqZw2xOGmU6O3GtB13oXE7vjpQ4=;
-        b=CIUg0V2JCjbHzU6ZgNrXL+2mqVIMDpb1IdmtbxtfnZytV22IH7UwGHwoviMMW/F+5F
-         mvWYMXJ8iYXTuTkp17az4Tbr3aOdT/tAm0wBsJ71KFdrlf3H6u8UdDzGENzaEIT2J4jQ
-         cZvELfdybc8PUSZO+i4HqoEJ/VeNRIRAPdjuizdDzp3BNuvnw0Zv0S/lFHCIywOWnpUu
-         uSraOQuqQvStJBboIXJeewQR0mPOs1mkVlXAu+QvtbgfVY2QYsD1xkg+cqvdTc1ZEp9Q
-         w2HaXk9ADarjsh1zIszaafX9d35TLjLSbsw3ynNDNJHN9Ej8SU1pn95ZpfPt1mv/XW1m
-         3+wA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764920762; x=1765525562;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=HXtSwPAI2lC/ImQNYqZw2xOGmU6O3GtB13oXE7vjpQ4=;
-        b=Zh4urdyIwIr0RifIe0ne2SlAPPjX2jAlprPWvwdnmGokKG2YLlyjgcwqyZ8jMUr+ga
-         7UwXyJZsglhruKAnmCYKWgmJ9eysolM1xeIl17ZyTSKPndLJyDgK4axYl1xaeF1JKECE
-         Yja3nFhSt+2mJ0qCyS3hUZ536JWTOX9K4swpTnTz5rF0BlPeoGOGB+45jXCoA/HL52k8
-         fJYdOR0st9jEOR+MDvVnBX1r7F2ohBzhlSYkAjeZTn5hjbWl8W+OEqae9cg6S+67y7L5
-         xdGAt3fccCxzw9hBWbhSnIKa4KozjycH/v6ZvJssITmLYvfxKZykPszyrLSFlBgMzhyE
-         GenQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXf7EohGEBcHJBCK81AZoBfHuexh16dN/+VuwodK2eUpiBwobjkCjCAr+mZqZLTYrjSwUjjETffRiSZRA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzhoqU4r7h+VzOVXSSibFE7/xZ+OqpqKO8e/I+ihcx1M5W6xuJ2
-	9c4OayOTW3jyqUtzpDoJ58SxZz0ta5fxfEqABnVeAHWp/RLXF5x/w6KpUoQruwEQcmDgkVsrEnq
-	mky/X83NheuEyQDo5TAxQXbcs/l/OsltPId3D
-X-Gm-Gg: ASbGncvC8w35nI8Z627KQ2M72TBkHy/ZW33RluBnz5JqdZZWahKdO+Zro7LasnB1eP3
-	4Sw3tUg4eCg81ix9NPZEL75MolYRiQpjPSt7b28LZ0ePGCQJCRO2cHvUkHBfDEzbwhUAOaJeH7F
-	Z90KOURxfgn+0dkS3PjHy1iYzcDhYdsMMyjBKNIhXuLttgfwgjkumYzKTtULCxFrDcZuyRJ8xvB
-	3k0MFxYMRpqmiK5TsuU+YdXmNwoL8RjHHVF4mST7IHkYvM+utg8zf+xBVS1dDuuzOkTANZA0tkd
-	D4w1/g==
-X-Google-Smtp-Source: AGHT+IGno4YCEk34HtoQAUN6GrFl01k867Kp7tydcNcb8xmuE9aFUTESOSk0G3T3M/y8W6zfCnRmuyMISYmpdGJqEvo=
-X-Received: by 2002:a05:622a:5c6:b0:4ed:2164:5018 with SMTP id
- d75a77b69052e-4f01770bf40mr116570781cf.80.1764920762038; Thu, 04 Dec 2025
- 23:46:02 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="t1jce6GR";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="YpnOsifs";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Z8tGcheH";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="y7mnHG4x"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id AFC3F336CD;
+	Fri,  5 Dec 2025 08:15:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1764922507; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=L4+NBn5xZiXZq84M6fBwyTKsyKKa+lPaIlWOSdiCedw=;
+	b=t1jce6GR2x/cQq+ZayWmBdHGqP7PT/KVNlpTdjUmtnQ3GCJmIkrtDsDzUd3cJTBLUk1YD/
+	oqu9Pb8cjw7yr8ukr4ryHg7wvHCYblwLxZXVY7gQoSpVXQ8y+747DVWIaj6Cwx7atBYYx+
+	0A1lh/9Icr67ee9u6sdIMqDj86Y95w0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1764922507;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=L4+NBn5xZiXZq84M6fBwyTKsyKKa+lPaIlWOSdiCedw=;
+	b=YpnOsifsbq4ENLzlw796pJBN3QUcVySSPOvP0hNM4817FxT4tqJ3osj46ybnLjTa4+C9CI
+	DVmLqBQ2BabRn5Cg==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=Z8tGcheH;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=y7mnHG4x
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1764922505; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=L4+NBn5xZiXZq84M6fBwyTKsyKKa+lPaIlWOSdiCedw=;
+	b=Z8tGcheH5nH+26ocBXYShqOzfpacOqFJUuruq0gYSU7xQI4lARNmYdaqzduExDNxw01Yfa
+	6cazyb9rCrKE7obu+elfXHucwRlT9E9iaRbtjqy/LtZyvJbpUn55XUXAh0Cp2ceYEIrm8q
+	t1nhkfbh5L+BeqMviYHwXq/dwbXDa5o=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1764922505;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=L4+NBn5xZiXZq84M6fBwyTKsyKKa+lPaIlWOSdiCedw=;
+	b=y7mnHG4xASOMc6qknoEkXNcc4WBvWdlhZtqE4AuPpzU7PNKJBCeDGe6I/UZ8XQXIqeee8F
+	UNO5V2VxYFMDLaAQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 8A6063EA63;
+	Fri,  5 Dec 2025 08:15:05 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id YzKbIImUMmn5LAAAD6G6ig
+	(envelope-from <hare@suse.de>); Fri, 05 Dec 2025 08:15:05 +0000
+Message-ID: <4c28a2fc-20ea-47c7-b1e8-21dd1e07e875@suse.de>
+Date: Fri, 5 Dec 2025 09:15:05 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251128083219.2332407-1-zhangshida@kylinos.cn>
- <20251128083219.2332407-7-zhangshida@kylinos.cn> <CANubcdUtncH7OxYg0+4ax0v9OmbuV337AM5DQHOpsBVa-A1cbA@mail.gmail.com>
- <CAHc6FU5DAhrRKyYjuZ+qF84rCsUDiPo3iPoZ67NvN-pbunJH4A@mail.gmail.com> <CAHc6FU57xqs1CTSOd-oho_m52aCTorRVJQKKyVAGJ=rbfh5VxQ@mail.gmail.com>
-In-Reply-To: <CAHc6FU57xqs1CTSOd-oho_m52aCTorRVJQKKyVAGJ=rbfh5VxQ@mail.gmail.com>
-From: Stephen Zhang <starzhangzsd@gmail.com>
-Date: Fri, 5 Dec 2025 15:45:25 +0800
-X-Gm-Features: AWmQ_bnqjBxuauDVJJL96EAzZiNCKi7bmfbcq5aA841m6f5U8UUuamAPefRv5L8
-Message-ID: <CANubcdVuRNfygyGwnXQpsb2GsHy4=yrzcLC06paUbAMS60+qyA@mail.gmail.com>
-Subject: Re: [PATCH v2 06/12] gfs2: Replace the repetitive bio chaining code patterns
-To: Andreas Gruenbacher <agruenba@redhat.com>
-Cc: Johannes.Thumshirn@wdc.com, hch@infradead.org, ming.lei@redhat.com, 
-	Gao Xiang <hsiangkao@linux.alibaba.com>, linux-block@vger.kernel.org, 
-	linux-bcache@vger.kernel.org, nvdimm@lists.linux.dev, 
-	virtualization@lists.linux.dev, linux-nvme@lists.infradead.org, 
-	gfs2@lists.linux.dev, ntfs3@lists.linux.dev, linux-xfs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, zhangshida@kylinos.cn
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [syzbot] [block?] [udf?] memory leak in __blkdev_issue_zero_pages
+To: shaurya <ssranevjti@gmail.com>,
+ syzbot+527a7e48a3d3d315d862@syzkaller.appspotmail.com
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzkaller-bugs@googlegroups.com
+References: <6931abe7.a70a0220.2ea503.00e0.GAE@google.com>
+ <23fde58b-ef8f-4420-b0a8-5ae87dfe0bc4@gmail.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <23fde58b-ef8f-4420-b0a8-5ae87dfe0bc4@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-3.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,syzkaller.appspotmail.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:dkim,suse.de:mid,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received,2a07:de40:b281:104:10:150:64:97:from];
+	DWL_DNSWL_BLOCKED(0.00)[suse.de:dkim];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[527a7e48a3d3d315d862];
+	SUBJECT_HAS_QUESTION(0.00)[]
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spam-Level: 
+X-Rspamd-Queue-Id: AFC3F336CD
+X-Spam-Flag: NO
+X-Spam-Score: -3.01
 
-Andreas Gruenbacher <agruenba@redhat.com> =E4=BA=8E2025=E5=B9=B412=E6=9C=88=
-4=E6=97=A5=E5=91=A8=E5=9B=9B 17:37=E5=86=99=E9=81=93=EF=BC=9A
->
-> On Mon, Dec 1, 2025 at 11:31=E2=80=AFAM Andreas Gruenbacher <agruenba@red=
-hat.com> wrote:
-> > On Sat, Nov 29, 2025 at 3:48=E2=80=AFAM Stephen Zhang <starzhangzsd@gma=
-il.com> wrote:
-> > > This one should also be dropped because the 'prev' and 'new' are in
-> > > the wrong order.
-> >
-> > Ouch. Thanks for pointing this out.
->
-> Linus has merged the fix for this bug now, so this patch can be
-> updated / re-added.
->
+On 12/4/25 17:12, shaurya wrote:
+> #syz test:
+> git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
+ >
 
-Thank you for the update. I'm not clear on what specifically has been
-merged or how to verify it.
-Could you please clarify which fix was merged, and if I should now
-resubmit the cleanup patches?
+Please send the patch as the mail body, not as attachment.
+Otherwise bots will have issues picking it up properly.
+Other than that:
 
-Thanks,
-Shida
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-> Thanks,
-> Andreas
->
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
