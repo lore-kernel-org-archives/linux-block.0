@@ -1,17 +1,17 @@
 Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2F28327200;
-	Fri,  5 Dec 2025 07:20:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E26EE31CA46;
+	Fri,  5 Dec 2025 07:20:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764919286; cv=none; b=TNXO3rycqoty0Ov8JRERIHcfZY/f+UmWgjy8fBI1wqJwnHQvvER1QMs9a44BWNO+/pEVBhi+HsMvBNX/4Et9UCD8vHZF+7/c+7HxGfL+c7fHEhWLpsykzEZx0iqBO/FrqoIivos2QjsNF0lbP29Hvz7fTKeh5ihfghOKstIQ/1s=
+	t=1764919281; cv=none; b=QD2fM/RqpZh/g0YCX5tfvMAlAM5M4QGqsJ1OBkOvIs7GpADgq+NYluTtyBTk9hWyhfFA3iyMmfcY4DrNV/NgzLZ195GB7M3EUSPbn+lJyXvW5m1Qhs4w58MWcIrVVrW8gj3FYgfchX7P0Rtw/prZEw3tmsGkDSlmv0UXvndxzt8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764919286; c=relaxed/simple;
-	bh=314TpUAkZxMvbV2pk3wlciVKMbaC2tgJL1bvCZ48Y0A=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=K/ZXH7TPhy13IvsmzFwY3FnmoFxG26nPQ4UBjfgsN0s1FXjQF6VLaCKTI7/hJvAsRz4XTf/V6Q1stWN4wmOtd4sEA3lWXQ8Z3wWEJ6/OQwKS9iHsvI37qUheTw8kq3rYZeFnNeW3ma9Ix2Wiz83hJeVbLek7EtTJQ7dnJb3w3rs=
+	s=arc-20240116; t=1764919281; c=relaxed/simple;
+	bh=ZzgJZGS1Zfmf9DoSYkDLhcEEZ40CTW0WckDgtNV4WWQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=EMo97qnIJXPGNp18RJj1HdZxFMHz2Go/wSVdVWnRh9aaKY2I5yfqP7oo35GQQhuj/ZgRFmqiI+vAkt6acjFZqyAJacyUiUNM+92a7KhlEt2jM5AkZWzjG98K/NyS5520uUt01DucX0NP1YSq3b2QRFR34piiF7vKMtuWkm+ogWI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-c45ff70000001609-c6-6932877297a9
+X-AuditID: a67dfc5b-c45ff70000001609-6c-69328771e8c3
 From: Byungchul Park <byungchul@sk.com>
 To: linux-kernel@vger.kernel.org
 Cc: kernel_team@skhynix.com,
@@ -178,45 +178,44 @@ Cc: kernel_team@skhynix.com,
 	aliceryhl@google.com,
 	tmgross@umich.edu,
 	rust-for-linux@vger.kernel.org
-Subject: [PATCH v18 32/42] completion, dept: introduce init_completion_dmap() API
-Date: Fri,  5 Dec 2025 16:18:45 +0900
-Message-Id: <20251205071855.72743-33-byungchul@sk.com>
+Subject: [PATCH v18 29/42] dept: make dept aware of lockdep_set_lock_cmp_fn() annotation
+Date: Fri,  5 Dec 2025 16:18:42 +0900
+Message-Id: <20251205071855.72743-30-byungchul@sk.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20251205071855.72743-1-byungchul@sk.com>
 References: <20251205071855.72743-1-byungchul@sk.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSa0xTZxjH955bTytNTioZZ7qFrQuZ01DBiHk+LNPEXV4zjVO3fdAls5ET
-	OaEgaS2XMZPWiVydTU2L0o2b2jE4AjlgJkK1A+xwiBY10k0Bi4wNC2NWLqHIXGHz2y/P//n/
-	ni8PS2ru06tYMfOwYMzUG7SMilJNxtQmmgo3iEnDo0q4Z/VSMDNdRMG3TRIDi64fFVAkn6Gh
-	Z+AoBf7GBgTDM0UI5hZcJCzafQqYnr+vAIcVwXOPD4Gz305CwH+VBKnVSkCoK4zAERxloHzc
-	SsGUuwzB5HA7DQOzEwjco/8QMOotRBBy/s3AQt8tEsodfgQ1wUESwuMPEbT6hhD8brtIwl/N
-	DPTfCCH4+mwTA87vZAraHl5WQH/oGQEPnHYCGuQd0GurJaK3GHBcaCdg3l2vALclAUbqKhQw
-	eNJBQePkLRquD92jITRmZ0D+9RqC6btBAqSyMRLkR9HA89s6qDl+joIzlQ8Y6PBcp8B3aYSA
-	suaLNAxJz2mwuOZo8Ht7aWj6I0BAr6+H2pKKC24vMliqlBBeiNgRLrBFqWtiisTHWnKwZ7aa
-	wr/U8vhccYTAbRWDClwtm3FL3Vp8tmOcwDXhGRrL9cUMlsN2xceJe1XvpAoGMVswrn93vyrt
-	fJOLyfK8ndv91IYsKBJfgpQsz23kT7eeoF5wsDeMlpjh3uIDgXlyiWO51/mWE2N0CVKxJHcn
-	ni+c/yYasOxKbhf/+GTK0g7FJfDlQfdyV81t4mfLuv93xvMNzd5ljzI6dwxEllnDpfBVJXPL
-	Tp77XslfqW5F/xVe4X+qC1A2pK5GL9UjjZiZnaEXDRt1aXmZYq7uwKEMGUVfzn3k2b5LKOzf
-	04k4Fmlj1N6cZFFD67NNeRmdiGdJbax6wpAkatSp+rwvBeOhL4xmg2DqRKtZShun3jCbk6rh
-	DuoPC+mCkCUYX6QEq1xlQSuclwcMTz4yp5jvVuYX19HmI7oE6dPGN2ML8O6afMtW70pN0aAu
-	uXT3nkef3Jz+ak3G/sdJ78esiSRU0duPVb3286b2bX3pI5+Xfmh8ujkrd1/LTsn1cofId74X
-	t/jEl6/R9um24kBp/A8TPfZTf5oPbpmq+CC9Szr6KhR/9oZ1rj1JS5nS9MlrSaNJ/y8NsqoD
-	bgMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAAzVSbUxTZxT2vV+9NFZuKgl3LgtLE2NmgoKh5sw5Hf4Yb7bMaMziNBqp80Yu
-	lI+0CpQELWADotParK1aFWTSGKiCrQ5QG7Boo2MEGCr4gUDSsVVAFmhLWqisYPxz8pzzfOT5
-	cVhS3kKvYsW8I4ImT6VWMFJKuv2rimRN5QYxpdX4GVQZjsPrYR8Nz8s6KAgGqii41ORgIGpr
-	kUCV8wINjwfKKei92YhgOFiFYHbORoKhbYGCqMkrgUD4lQTMZQgW3F4Elj4TCYO97SQ4bpcR
-	MNP8noHxzmkE5lEfA1Z/GQVT9tMILo7ZJOB/lAGTw/doWBj6h4CB0AQCu+89Ab6OSgRRSw7U
-	1Llidst/DMx195BgNfciuDo6RMK0fwTBbe8bBO7r5Qz8bbxDQr9vBTwNTjHwxHyKgcm+SwS8
-	a2agttxNQ9+f4wgu20wIxl66Caj4rYkBy2UnBW0jdyXQNz5PwGuLiYBG5w8wbB+joMtYR8Tq
-	xlS3EsFmrSBi418CzDfuERC2N0i+qUd41nCGwg2u3wls+CvKYMcVB8JzERPCgfoKEhuMsbVz
-	YorEJ1xFuL5rgsGR4DMGu0O1FP6jjsfXTkYIfK47GbddHJLsSN8r3XxIUIuFgmb9lkxpVn2T
-	jSlwf1H8cMaI9CiSVI3iWJ5L40e7ptEiZrg1/OBgmFzECdznvOuXMboaSVmS60/iK8NnYgTL
-	ruR28m/PKhc1FLeat47al7wybiMfOv2Q+pCZxDc2dyzlxMXu5oHIEpZzSr6mepY2ImktWtaA
-	EsS8wlyVqFau0+Zk6fLE4nU/5+c6Ueyd7KXz51pRoD/DgzgWKZbLOopSRTmtKtTqcj2IZ0lF
-	gmxCnSLKZYdUuhJBk39Ac1QtaD3oU5ZSJMq+2y1kyrnDqiNCjiAUCJqPLMHGrdKj4/md0/s3
-	WnhdyX1vaFw4tvqqN/vr3LMuPx0OvTp/YVt556Zfv9WXlkhd4OH2rHek1/I9p5KzD2ZHrDjJ
-	v4tVzswlNBpbdJOYOJ8RMKS074j/XnTqg/a0lfplax37hn5892Bhq3JXfOikhyh6Ef3kJ++X
-	baU1L05sl8TTTYZMBaXNUqWuJTVa1f8LVNtlSgMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSa0iTcRTG+7/XbTl6WUFvCSmjsLIspeIQGX3ww5tfKgoqFWrkm47mrFlO
+	i7K85CU1k9TczLvLdF7aLEoyzWpEaiZ2WfNuNROzRJ02ndlc9O13nuc5h3PgCHCJhVwrkCvP
+	8yqlTCGlRIRo3K1kqyrZT77dPuEOvQNfSfh4rYUA23QKAQV1egpSDPkkzM5rcVjINtEwbe+h
+	YbHJhEDfcA2Dqfo/FIy9mESQM/SVgl+6dAQaq9YZ6RvBoKjU6HRzJyiY7+jEIS/nHYLJ0UEE
+	DaZ+BN+yHuLw3vaLgvGuAgx+1lNQHN9EQlf7GAKrpQmDhLI6CnLvGgh4MthIQ9eYA4MBnZWA
+	tqxSDPJGneaD1aDN+46BXVdFQ3tZLwHDlRoaHEO+sFgcCabqERpqxztJGLNmU2D4/Mq5eLoV
+	h5RGGwGGLx9JaLJ4Q8n1cgLyC3ud5y5MIzA9Hsagu7GAgvT6hyT06xdJqBsxY9Bmek1AT8dN
+	Gjoba0gwdrTjMJPpvi+Um03KJLgq4yOM0xfqETc/l4246YoEnEvKcpaJRjVX0faD4uZsHyju
+	TSnLlafOYdwTTR/NJT6z0Fyx4QKX+HKc5IyVmw/6BYn2hPIKeTSv2rb3pCh88G0bdjbXK+bO
+	zw1XkcYjDQkFLLOD7Z8ow/9zkbaTXmKK8WLNZrtLX8V4ssYMK5mGRAKc6fZgk+2ZLmMlc4z9
+	ZEvDlphgNrBPa3RoicXMLjZ+8Db9b6gHW13f4soLnXrOpzkXS5idbFHarGsoy9wTsoWOPOpf
+	wxr2eaWZyELiYrSsCknkyugImVyxwyc8VimP8TkVGWFAzo/TXXYEP0aT7w63IkaApG7iFrWv
+	XELKoqNiI1oRK8Clq8Q/FNvlEnGoLPYir4o8obqg4KNakbuAkK4W+82oQyVMmOw8f4bnz/Kq
+	/y4mEK69ilLP+W86Gua57srbL6kzgWiFdsiSrGj4bEEre3f737d43kloKakJESm9SFmNz62E
+	rgrToWaLZjTuQXPsVE/M4mRtdPD+JDbnN3EjsDrw9aWGjO5navK2Q73lwPHuI+apSIN33N2A
+	lzFbg4VHQsLe9KlhY8amAMdyve/6uObTAflBUiIqXOa7GVdFyf4Co+nbDW0DAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSe2xLcRTH/X739t6uVq6auBkyKeKV0WFyxJtkLolH4g/iEWu4sVo3tLMH
+	8eimNhvSNdrZis5YyR42nddMWSYWzFgNHTatqM2y2YZ1tU1NN/HPyeec7/d8c/44QkJyRxAs
+	VMTG8apYuVJKiUjRuoUpoftT5yhkna3TIE17FBqdbgG81VSS4OlOI+F8SREFPtMdGtKs2QJ4
+	4kgmoe56IQKnJw2Bt99EgLZ8gASfvpqG7t4PNBg0CAZs1QiMdj0BDXUPCSi6qcHws/QPBW2P
+	fiAwfHJTkNWqIaHTcgpBTrOJhtbHq+Cbs0IAA00tGBw97Qgs7j8Y3JWpCHzGaDDnlfnXjV0U
+	9Ne+JCDLUIfg0qcmAn60uhDcrP6IwHYtmYIvulsE1LtHwGtPJwVPDRkUfLOfx9BRSkFusk0A
+	9udtCC6Y9Aia39swpFwuocB4wUpCueseDfa23xgajXoMhda14LQ0k1Cjy8P+c/2uG2PBlJWC
+	/eUrBkNxBYZeSwG9LB9xXu0Zkisou4057SsfxRVdLEJcf58ecd35KQSn1fnbR+2dBHe8LIHL
+	r2mnuD7PG4qz9eSS3LM8lrtysg9zmbWhXHlOE71h+RbRol28UhHPq2YviRRFuV7U4H3GqYnn
+	OqYcQzkh6ShAyDLzWLPpJT3IFDOVbWjoJQY5iJnIlp1uFqQjkZBg6kPY1N4zQ8JoZjPr8KTj
+	QSaZKez9YgsaZDEzn012naX/hYawhaWVQ/4A/9zg6BtiCRPOmtO9Ah0S5aJhBShIERsfI1co
+	w2epo6OSYhWJs3bujbEi/ztZDv/OvIu661dVIUaIpIHiyoQwhUQgj1cnxVQhVkhIg8TtSplC
+	It4lTzrIq/buUB1Q8uoqNE5ISseK12ziIyXMbnkcH83z+3jVfxULA4KPoSrZO2/GxsiljtWv
+	3/bYuezt4S0rkhYfrs92abZFjFqhC5zg3Rr4feXn1WHVCzbKZqLPZtGDlt3OuJ+NiYaLZl/J
+	pHk7PyzJxNkVjhHLJp+Y9KskVBZxqtbxPfd6xKHZwdbA4d4HGRldHSfix0/f8zjAe3L8qIQj
+	XVfWXx0zsrg0sW7uKympjpKHzSBUavlfDbu1g0oDAAA=
 X-CFilter-Loop: Reflected
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -224,157 +223,158 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
-Currently, dept uses dept's map embedded in task_struct to track
-dependencies related to wait_for_completion() and its family.  So it
-doesn't need an explicit map basically.
+commit eb1cfd09f788e ("lockdep: Add lock_set_cmp_fn() annotation") has
+been added to address the issue that lockdep was not able to detect a
+true deadlock like the following:
 
-However, for those who want to set the maps with customized class or
-key, introduce a new API to use external maps.
+   https://lore.kernel.org/lkml/20220510232633.GA18445@X58A-UD3R/
+
+The approach is only for lockdep but dept should work being aware of it
+because the new annotation is already used to avoid false positive of
+lockdep in the code.
+
+Make dept aware of the new lockdep annotation.
 
 Signed-off-by: Byungchul Park <byungchul@sk.com>
 ---
- include/linux/completion.h | 40 +++++++++++++++++++++-----------------
- 1 file changed, 22 insertions(+), 18 deletions(-)
+ include/linux/dept.h     | 10 +++++++++
+ kernel/dependency/dept.c | 48 +++++++++++++++++++++++++++++++++++-----
+ kernel/locking/lockdep.c |  1 +
+ 3 files changed, 53 insertions(+), 6 deletions(-)
 
-diff --git a/include/linux/completion.h b/include/linux/completion.h
-index 4d8fb1d95c0a..e50f7d9b4b97 100644
---- a/include/linux/completion.h
-+++ b/include/linux/completion.h
-@@ -27,17 +27,15 @@
- struct completion {
- 	unsigned int done;
- 	struct swait_queue_head wait;
-+	struct dept_map *dmap;
- };
+diff --git a/include/linux/dept.h b/include/linux/dept.h
+index 7d5e01f56e8e..bbcb48f6140a 100644
+--- a/include/linux/dept.h
++++ b/include/linux/dept.h
+@@ -53,6 +53,11 @@ struct dept_map {
+ 	const char			*name;
+ 	struct dept_key			*keys;
  
--#define init_completion(x)				\
--do {							\
--	__init_completion(x);				\
--} while (0)
-+#define init_completion(x) init_completion_dmap(x, NULL)
- 
- /*
-- * XXX: No use cases for now. Fill the body when needed.
-+ * XXX: This usage using lockdep's map should be deprecated.
-  */
--#define init_completion_map(x, m) init_completion(x)
-+#define init_completion_map(x, m) init_completion_dmap(x, NULL)
- 
- static inline void complete_acquire(struct completion *x, long timeout)
- {
-@@ -48,8 +46,11 @@ static inline void complete_release(struct completion *x)
- }
- 
- #define COMPLETION_INITIALIZER(work) \
--	{ 0, __SWAIT_QUEUE_HEAD_INITIALIZER((work).wait), }
-+	{ 0, __SWAIT_QUEUE_HEAD_INITIALIZER((work).wait), .dmap = NULL, }
- 
-+/*
-+ * XXX: This usage using lockdep's map should be deprecated.
-+ */
- #define COMPLETION_INITIALIZER_ONSTACK_MAP(work, map) \
- 	(*({ init_completion_map(&(work), &(map)); &(work); }))
- 
-@@ -90,15 +91,18 @@ static inline void complete_release(struct completion *x)
++	/*
++	 * keep lockdep map to handle lockdep_set_lock_cmp_fn().
++	 */
++	void				*lockdep_map;
++
+ 	/*
+ 	 * subclass that can be set from user
+ 	 */
+@@ -79,6 +84,7 @@ struct dept_map {
+ {									\
+ 	.name = #n,							\
+ 	.keys = (struct dept_key *)(k),					\
++	.lockdep_map = NULL,						\
+ 	.sub_u = 0,							\
+ 	.map_key = { .classes = { NULL, } },				\
+ 	.wgen = 0U,							\
+@@ -179,6 +185,8 @@ extern void dept_softirqs_on_ip(unsigned long ip);
+ extern void dept_hardirqs_on(void);
+ extern void dept_softirqs_off(void);
+ extern void dept_hardirqs_off(void);
++
++#define dept_set_lockdep_map(m, lockdep_m) ({ (m)->lockdep_map = lockdep_m; })
+ #else /* !CONFIG_DEPT */
+ struct dept_key { };
+ struct dept_map { };
+@@ -221,5 +229,7 @@ struct dept_ext_wgen { };
+ #define dept_hardirqs_on()				do { } while (0)
+ #define dept_softirqs_off()				do { } while (0)
+ #define dept_hardirqs_off()				do { } while (0)
++
++#define dept_set_lockdep_map(m, lockdep_m)		do { } while (0)
  #endif
- 
- /**
-- * __init_completion - Initialize a dynamically allocated completion
-+ * init_completion_dmap - Initialize a dynamically allocated completion
-  * @x:  pointer to completion structure that is to be initialized
-+ * @dmap:  pointer to external dept's map to be used as a separated map
-  *
-  * This inline function will initialize a dynamically created completion
-  * structure.
-  */
--static inline void __init_completion(struct completion *x)
-+static inline void init_completion_dmap(struct completion *x,
-+		struct dept_map *dmap)
- {
- 	x->done = 0;
-+	x->dmap = dmap;
- 	init_swait_queue_head(&x->wait);
+ #endif /* __LINUX_DEPT_H */
+diff --git a/kernel/dependency/dept.c b/kernel/dependency/dept.c
+index 1c6eb0a6d0a6..a0eb4b108de0 100644
+--- a/kernel/dependency/dept.c
++++ b/kernel/dependency/dept.c
+@@ -1615,9 +1615,39 @@ static int next_wgen(void)
+ 	return atomic_inc_return(&wgen) ?: atomic_inc_return(&wgen);
  }
  
-@@ -136,13 +140,13 @@ extern void complete_all(struct completion *);
+-static void add_wait(struct dept_class *c, unsigned long ip,
+-		     const char *w_fn, int sub_l, bool sched_sleep,
+-		     bool timeout)
++/*
++ * XXX: This is a temporary patch needed until lockdep stops tracking
++ * dependency in wrong way.  lockdep has added an annotation to specify
++ * a callback to determin whether the given lock aquisition order is
++ * okay or not in its own way.  Even though dept is already working
++ * correctly with sub class on that issue, it needs to be aware of the
++ * annotation anyway.
++ */
++static bool lockdep_cmp_fn(struct dept_map *prev, struct dept_map *next)
++{
++	/*
++	 * Assumes the cmp_fn thing comes from struct lockdep_map.
++	 */
++	struct lockdep_map *p_lock = (struct lockdep_map *)prev->lockdep_map;
++	struct lockdep_map *n_lock = (struct lockdep_map *)next->lockdep_map;
++	struct lock_class *p_class = p_lock ? p_lock->class_cache[0] : NULL;
++	struct lock_class *n_class = n_lock ? n_lock->class_cache[0] : NULL;
++
++	if (!p_class || !n_class)
++		return false;
++
++	if (p_class != n_class)
++		return false;
++
++	if (!p_class->cmp_fn)
++		return false;
++
++	return p_class->cmp_fn(p_lock, n_lock) < 0;
++}
++
++static void add_wait(struct dept_map *m, struct dept_class *c,
++		unsigned long ip, const char *w_fn, int sub_l,
++		bool sched_sleep, bool timeout)
+ {
+ 	struct dept_task *dt = dept_task();
+ 	struct dept_wait *w;
+@@ -1658,8 +1688,13 @@ static void add_wait(struct dept_class *c, unsigned long ip,
+ 		if (!eh->ecxt)
+ 			continue;
  
- #define wait_for_completion(x)						\
- ({									\
--	sdt_might_sleep_start_timeout(NULL, -1L);			\
-+	sdt_might_sleep_start_timeout((x)->dmap, -1L);			\
- 	__wait_for_completion(x);					\
- 	sdt_might_sleep_end();						\
- })
- #define wait_for_completion_io(x)					\
- ({									\
--	sdt_might_sleep_start_timeout(NULL, -1L);			\
-+	sdt_might_sleep_start_timeout((x)->dmap, -1L);			\
- 	__wait_for_completion_io(x);					\
- 	sdt_might_sleep_end();						\
- })
-@@ -150,7 +154,7 @@ extern void complete_all(struct completion *);
- ({									\
- 	int __ret;							\
- 									\
--	sdt_might_sleep_start_timeout(NULL, -1L);			\
-+	sdt_might_sleep_start_timeout((x)->dmap, -1L);			\
- 	__ret = __wait_for_completion_interruptible(x);			\
- 	sdt_might_sleep_end();						\
- 	__ret;								\
-@@ -159,7 +163,7 @@ extern void complete_all(struct completion *);
- ({									\
- 	int __ret;							\
- 									\
--	sdt_might_sleep_start_timeout(NULL, -1L);			\
-+	sdt_might_sleep_start_timeout((x)->dmap, -1L);			\
- 	__ret = __wait_for_completion_killable(x);			\
- 	sdt_might_sleep_end();						\
- 	__ret;								\
-@@ -168,7 +172,7 @@ extern void complete_all(struct completion *);
- ({									\
- 	int __ret;							\
- 									\
--	sdt_might_sleep_start_timeout(NULL, -1L);			\
-+	sdt_might_sleep_start_timeout((x)->dmap, -1L);			\
- 	__ret = __wait_for_completion_state(x, s);			\
- 	sdt_might_sleep_end();						\
- 	__ret;								\
-@@ -177,7 +181,7 @@ extern void complete_all(struct completion *);
- ({									\
- 	unsigned long __ret;						\
- 									\
--	sdt_might_sleep_start_timeout(NULL, t);				\
-+	sdt_might_sleep_start_timeout((x)->dmap, t);			\
- 	__ret = __wait_for_completion_timeout(x, t);			\
- 	sdt_might_sleep_end();						\
- 	__ret;								\
-@@ -186,7 +190,7 @@ extern void complete_all(struct completion *);
- ({									\
- 	unsigned long __ret;						\
- 									\
--	sdt_might_sleep_start_timeout(NULL, t);				\
-+	sdt_might_sleep_start_timeout((x)->dmap, t);			\
- 	__ret = __wait_for_completion_io_timeout(x, t);			\
- 	sdt_might_sleep_end();						\
- 	__ret;								\
-@@ -195,7 +199,7 @@ extern void complete_all(struct completion *);
- ({									\
- 	long __ret;							\
- 									\
--	sdt_might_sleep_start_timeout(NULL, t);				\
-+	sdt_might_sleep_start_timeout((x)->dmap, t);			\
- 	__ret = __wait_for_completion_interruptible_timeout(x, t);	\
- 	sdt_might_sleep_end();						\
- 	__ret;								\
-@@ -204,7 +208,7 @@ extern void complete_all(struct completion *);
- ({									\
- 	long __ret;							\
- 									\
--	sdt_might_sleep_start_timeout(NULL, t);				\
-+	sdt_might_sleep_start_timeout((x)->dmap, t);			\
- 	__ret = __wait_for_completion_killable_timeout(x, t);		\
- 	sdt_might_sleep_end();						\
- 	__ret;								\
+-		if (eh->ecxt->class != c || eh->sub_l == sub_l)
+-			add_dep(eh->ecxt, w);
++		if (eh->ecxt->class == c && eh->sub_l != sub_l)
++			continue;
++
++		if (i == dt->ecxt_held_pos - 1 && lockdep_cmp_fn(eh->map, m))
++			continue;
++
++		add_dep(eh->ecxt, w);
+ 	}
+ 
+ 	wg = next_wgen();
+@@ -2145,6 +2180,7 @@ void dept_map_init(struct dept_map *m, struct dept_key *k, int sub_u,
+ 	m->name = n;
+ 	m->wgen = 0U;
+ 	m->nocheck = !valid_key(k);
++	m->lockdep_map = NULL;
+ 
+ 	dept_exit_recursive(flags);
+ }
+@@ -2366,7 +2402,7 @@ static void __dept_wait(struct dept_map *m, unsigned long w_f,
+ 		if (!c)
+ 			continue;
+ 
+-		add_wait(c, ip, w_fn, sub_l, sched_sleep, timeout);
++		add_wait(m, c, ip, w_fn, sub_l, sched_sleep, timeout);
+ 	}
+ }
+ 
+diff --git a/kernel/locking/lockdep.c b/kernel/locking/lockdep.c
+index 39b9e3e27c0b..c99f91f7a54d 100644
+--- a/kernel/locking/lockdep.c
++++ b/kernel/locking/lockdep.c
+@@ -5035,6 +5035,7 @@ void lockdep_set_lock_cmp_fn(struct lockdep_map *lock, lock_cmp_fn cmp_fn,
+ 		class->print_fn = print_fn;
+ 	}
+ 
++	dept_set_lockdep_map(&lock->dmap, lock);
+ 	lockdep_recursion_finish();
+ 	raw_local_irq_restore(flags);
+ }
 -- 
 2.17.1
 
