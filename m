@@ -1,17 +1,17 @@
-Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6276D398F9D;
-	Fri,  5 Dec 2025 07:20:35 +0000 (UTC)
+Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 876B5330B33;
+	Fri,  5 Dec 2025 07:20:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764919251; cv=none; b=rAtCIgQemeq/zr0rYKzNYD3nUQ1DO11OnW74RS0eoRouNlfZA1BDR5o03lhaTFcufbs9ZYO4G4vQrtEEOaUu6k11utZNpFhV9tq3LaFVuT6hluXjRbwf82eeRVitHlYEXMgi4w/nGIZbSmjA/tFhvdGqVsHjVE/XiQpi4pQ20Hk=
+	t=1764919280; cv=none; b=CX0BugB9lyNP8f4TwlvaDBp69sEdXuJ5UXCYI5qgcf+mICmHKwm6XvHy92RVJAunqHlsZpp/VSUOYgTAcat6MEy5OFOtP2dvVXm8G8yXB+Yn+sm0WOzRdBJsLkU46H4xkDhGA8EukQOUIqCeHCyCH9HEY7Bggp42fb+N0tjLiIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764919251; c=relaxed/simple;
-	bh=PAgX+XFFVcrRCuZJksm1avuMBgGWXywEurxn0c5Q3Ww=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=lIwP3Bdo+pxAvLwplffJGZFzJ7LVO25ucmu42lsS5xCDLyBOVIrHdS7PU7m5msMi/Dp3QYHR2Ou3yinpmJlZHwWrBYBPH2IqsPzVjwiw6iCkymWXoAfJRAQbzIGMRQ6XKA/WApo8Q78AE+b/Xe3ztrWtDoIWaDNQrSwHjxWbKnU=
+	s=arc-20240116; t=1764919280; c=relaxed/simple;
+	bh=lEQDSxhQOw8+/qRMSSctJdIPDLmFiZCn43/uyjFJeKo=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=maYVq+GW9OsP3Z1lAVDtCbkQ2jVLKNYc8rbIJsKeMF0GW/vVBGjY770+siAewAuOk1mSMA7OGYbLyWGv/ATlFbzYhJVWQRhsT0l8n0B293tvjGc+fQSnJ0/c0ws9ebrz8R6uqqGZKVPQqtJ3CHq351cNwzOBhZW9bACkX6JxZIQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-c45ff70000001609-97-69328770b747
+X-AuditID: a67dfc5b-c2dff70000001609-e5-693287725ac1
 From: Byungchul Park <byungchul@sk.com>
 To: linux-kernel@vger.kernel.org
 Cc: kernel_team@skhynix.com,
@@ -178,44 +178,44 @@ Cc: kernel_team@skhynix.com,
 	aliceryhl@google.com,
 	tmgross@umich.edu,
 	rust-for-linux@vger.kernel.org
-Subject: [PATCH v18 22/42] dept: track PG_locked with dept
-Date: Fri,  5 Dec 2025 16:18:35 +0900
-Message-Id: <20251205071855.72743-23-byungchul@sk.com>
+Subject: [PATCH v18 33/42] dept: introduce a new type of dependency tracking between multi event sites
+Date: Fri,  5 Dec 2025 16:18:46 +0900
+Message-Id: <20251205071855.72743-34-byungchul@sk.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20251205071855.72743-1-byungchul@sk.com>
 References: <20251205071855.72743-1-byungchul@sk.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSeUxTeRDH+b2rpaHJs5L41Bi1CZpgUPDKhGyMJrvJSzZEE6NR+WO3gZfl
-	SSlYLAWjkS5XJUhqDSA85arURop06ZIVEEKB4IEoXlAJh0S3bAP1KC0NVGRLd/1n8pmZ73xn
-	/hgxLhsnN4l51XlOrVIo5ZSEkHiiGuKySvby8aNXtoG+6DKM6noJ8Pv0BKwIf4ng0djvBIzc
-	a0Yw7dcjCAQFHFaMgyKo0CFY7R5EYP1Th8GC7RsFc/1eBFVuHQE1LkEEnukuElYnZzEYW5xH
-	YP7wDYO6RntIV/mZguDwcxy87ncI/ja04/Da/4mCjzYKbglGBAWmVgo63nWKYKLSiMG02UXA
-	kKERA6GqYC38g0FFSxcGS+a7IjDnx8DXmQRYrc+EOZeRgumHxST4Xs9gYC1z4dD2fpSE7vFd
-	0FB8m4Dq2gkK9Cs+BGW2dhLyhQAJrbNODIYGHxHwvLOFhKaxFxjYh5/isFi+GVo+NoZOXjTj
-	8LZqPrTN/0kEOoeJAMuXKhJcb4qxw6lsoKicYIterlCstdaK2OCyEbG+pgKcLTKE0kK7lm0a
-	mqfYZf8bir02HMd21EyK2MKecRFb36ZhCwc8JGu3xLKmB27sWNwZyQ+pnJLP4dR7Dv0qSatt
-	sOBZk5m59hszeD66nVyKIsUMvZ+5bpkiv3PP5wVsjSl6J+N0LuFrHE1vY+xXXSGNRIzTr7Yy
-	JUvl4cZ6OpG5M2IOM0HHME/dnjBL6YPME7Mb/890K9Ns6w1zZKheMbYcZhl9gKkrDYRNGbou
-	kqlZePv/wEbGYXESBiStRxF3kYxX5WQoeOX+3Wl5Kj53d0pmRhsKfZz50tfk+8g7crwP0WIk
-	j5L2ahN4GanIyc7L6EOMGJdHS+eV8bxMmqrIu8CpM39Ra5Rcdh/aLCbkG6R7F7WpMvo3xXku
-	neOyOPX3LiaO3JSPqs+dVcRPDVrTGa2JSRqYOKeJ8ArjF3l1xEtv+8krTmf7jtwT6SkO37BD
-	tS422J8UYzi92p/4szGxRLPlx50pmrbHB2xHHT/1lQUuL9xvbjjy4bBJOKUVziR7Ymb12thn
-	wavRlRfWFUex2xOSjNXrfXOlsuS81rpJvLX/5h9T++REdpoiIRZXZyv+BUbg3HxtAwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSbUxScRTG+997uSBFu6HNW33Q0XubVi7b6WXN+lB3bb2sPrSVLVndkoni
-	IE1bLyIhpuWMBpSUqenN1FLBSjPKqFylLcxKV5JZZDI1m0LMt4xofTn7nfM859n5cAS4uJ43
-	VyBLOsoqk6RyCSkkhNvXaSIUuijZCpcnGrK1p6Gr28WD9+omAryebAKuVFeRMGm+x4dsy2Ue
-	PO/IJMBxuxJBtzcbgW/cjIO2YYqASX0zHzyjH/lgUCOYsjUjMLbpceh0PMKhqk6NwUjNbxL6
-	nwwjMPS4SDC51QQMcecQFPSa+eB+tgUGuxt5MOX8jkHHrwEEnOs3Bq4mHYJJYwJcK7H6140/
-	SRh/9RoHk8GBoLjHicOw+zOCuuZPCGzlmSR8y7+DQ7trJrz1DpHwwpBLwmDbFQx+1JBQlGnj
-	QVtrP4KrZj2C3g82DDTXq0kwXrUQ0PD5Ph/a+icw6DLqMai0bINurpeAlvwSzH+u31UbCmaT
-	BvOXPgwMtxoxGOUq+DFliPFp8wimwnoXY7RvJkmmqrAKMeNjesR4yjQ4o833t08GhnDmjPUY
-	U9YyQDJj3nckY/tVRDAvS2im9OwYxlx4FcE0FDj5OzfuFa4/xMplqaxy+YY4YXxhcTme7FSk
-	WS/14BmodF8OChLQ1Cr64c8R7C+T1GK6s3MU/8shVDhtPd/Ly0FCAU61h9G60byAEEytpW84
-	uAAT1EK61T0YYBG1mn7JufF/oWF0ZU1TgIP8c0PHWIDFVDR9LcfHy0fCIjStAoXIklITpTJ5
-	dKQqIT49SZYWeVCRaEH+f+JOTlyoR572LXZECZBkhqjp2EqZmCdNVaUn2hEtwCUhogH5CplY
-	dEiafpxVKg4oU+Ssyo7mCQhJqGjrHjZOTB2RHmUTWDaZVf5XMUHQ3AwUF9uSkqHwPajZXWlf
-	sNlUnpWbFjW4KJiJKCIty1NTyu9ynp7Gp0tilWeSfX0LCnaEBw13PZtYF1o6fd/SNRU5ycj6
-	yKyLPBWc+3GxKZaYLapXO3bVZnDzv7q8h1uXho4kOGeJoh/vv1jfhz34ElZ9YtN4nz0mypg1
-	h9LoThavvikhVPHSlctwpUr6B2hhE7BLAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSa0xTdxjG9z93OjtPqnNHNGGpyhI3GBAwb+JdP3gyr9Fki3PGdXJcz1Yu
+	aQXBhUiFlpsiYIpKxdYhBYQNUsIig2ohs0JckYtQggjBaDejBcaoCC1qi+Hb732eN8/7fHgZ
+	XDZAhjJi4klBnahQySkJIfEsuR6hyYkRo/IufAwDWjsBHa6zBIx6cxHM+Iw4zJc4aHhrcyAY
+	7L6Dw4TlHALPaAsJPucDHJ4VNeHQ9/QjeOidoKDTUEDBeAMFPX+/QFBuLEHgHrJhkFVRT0Fp
+	uZUA46UsDIzOPhKeVJfR4B+LhrfmJHDU/kPD754HJIze05Mw/XAMA9vQ53Bdf4OAK9eGKWi1
+	dRLQ9+dVCjKNMyTcd3QQ0FlWQ8Aj5wUaKl09GFi8EzT02s0YaNsqCHD36zFwmFdAQ3bgUo2p
+	CkGJe4qGe+ftGFROj+OQ828LBRd7zRQ0Wg04TJW/IaG2hwCDP5cCo7YQQYGulICG/6oo0P4/
+	iiB7OA58rwMdCrt2wW/zAwiMd0fobdt4Xe88xdddq0O8b64E8dOVWTivKwqMc95+ir+RN4fx
+	xc4IvrnsMc2brSl89l8ekm+sXs9XtD7H+KEXm3nrzTyKH+/qog/Iv5VsihdUYqqg/nLL9xKl
+	y69ILj6edteqpzNR8YF8FMJwbCxXmFOLLbLFVkUGmWI/4wYHZ/EgL2c/5RrPuwO6hMHZvjAu
+	Z7YwYDDMMvYEpx1bE9wh2HXcpHOcDspSdgNnqDnyPjKMq22wL8SEBGXX3ALL2DjOlD+zEMmx
+	phDO9HKxw0qurXqQKEJSM/rgJpKJiakJClEVG6lMTxTTIo8nJVhR4NssGf4jt9BU96F2xDJI
+	vkRqPxUtykhFqiY9oR1xDC5fLn2pihJl0nhF+mlBnXRMnaISNO1oFUPIP5HGvDoVL2N/VJwU
+	fhaEZEG96GJMSGgm2veDxeVP7j/xiFXGKNtS9vZfkawdC336U7LYHDlSfzkp9n4LtjVztuLQ
+	L7Lwg03hq9MkCaHbdQaLz23/Y0/ujhGvzvCruDQ8yzysF6yHLVGzG3dOSlYsizDtPny7o/uo
+	8syeW998nbH/i6/qLsblUybP5oNrnvfsnizI2EiGtaz88Ds5oVEqotfjao3iHZtWiuFpAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAAzVSWUwTURT1zUxnhsbqWEkcNQrWGHFB0bjcqHH5cqLR+GHU6AcOMMqEFrBF
+	BJdIqbW4Bpq0RCsKKFWhCLagIqk2KMSNWESlLmymooQiRAuEAmKr8efm3HPOPTkfl8bl1ZIZ
+	tJicJqiTeaWClBLS7Wt10WrDcjGmo38x5OhPwud2rwTea10EDPhzCLhSYSNhzHKfghz7JQk8
+	a8kmwH2nDEH7QA6CoRELDvqacQLGjA0U+Ic/UWDSIhh3NiAwNxlx8Lgf42Cr0mLwq/I3CT1P
+	fiIwdXpJyO/WEtBnPY/gcpeFgu76zdDbXiuB8dZvGLQM+hBYvb8x8LoMCMbMSXCt2BE8N/eT
+	MNL4God8kxtBUWcrDj+7OxBUNbQhcN7KJuFrbjUOzd5J8Hagj4TnpnMk9DZdweBHJQmF2U4J
+	NL3qQVBgMSLo+ujEQHe9ggRzgZ2Amo6HFDT1jGLw2WzEoMy+DdqtXQS8zC3GgnWDrrvTwJKv
+	w4LjOwam8loMhq2l1MYSxA3pLxJcqeMexunfjJGc7aoNcSMBI+L8JTqc0+cG1ye+Ppw75TjC
+	lbz0kVxg4B3JOQcLCe5FMcvdOBPAuLzGaK7mciu1Y9Ne6boEQSmmC+ql6/dLE1tG+dS8+Ix6
+	+2kqC+XtOIvCaJZZwVqdNyUhTDLzWY9nGA/hcCaSdVzoCvJSGmeaI1jD8MWgQNNTmQOstnNu
+	yEMw89j+xh9UiJYxq1jT7X3/IiPYskrX35iwEN0S+IvlzEr22tkhSS6SFqIJpShcTE5X8aJy
+	5RJNUmJmspixJD5FZUfBZ7KeGM17gPzNm+sQQyPFRJnryDJRLuHTNZmqOsTSuCJc5lPGiHJZ
+	Ap95VFCnxKoPKwVNHZpJE4ppsi27hf1y5iCfJiQJQqqg/q9idNiMLBSVFL3LMPP4oQ1ZsbOm
+	tx076b8wb/4ro2rrkK3QcKN8tmdPZHfFqjXH1xXgX2R90UuPqkQPQbra3O6nHSkZ2XGnx6cE
+	pk6it3p9j/zKernG6YjJX/AxalFE3M4PbG9kCrM6taiRL8q0Dm4Lm+yzMm3xVQWviedpETsX
+	xB56N0e3WkFoEvllC3G1hv8DvAV2HUgDAAA=
 X-CFilter-Loop: Reflected
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -223,416 +223,418 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
-Makes dept able to track PG_locked waits and events, which will be
-useful in practice.  See the following link that shows dept worked with
-PG_locked and detected real issues in practice:
+It's worth reporting wait-event circular dependency even if it doesn't
+lead to an actual deadlock, because it's a good information about a
+circular dependency anyway.  However, it should be suppressed once
+turning out it doesn't lead an actual deadlock, for instance, there are
+other wake-up(or event) paths.
 
-   https://lore.kernel.org/lkml/1674268856-31807-1-git-send-email-byungchul.park@lge.com/
+The report needs to be suppressed by annotating that an event can be
+recovered by other sites triggering the desired wake-up, using a newly
+introduced API, dept_recover_event() specifying an event site and its
+recover site.
+
+By the introduction, need of a new type of dependency tracking arises
+since a loop of recover dependency could trigger another type of
+deadlock.  So implement a logic to track the new type of dependency
+between multi event sites for a single wait.
+
+Lastly, to make sure that recover sites must be used in code, introduce
+a section '.dept.event_sites' to mark it as 'used' only if used in code,
+and warn it if dept_recover_event()s are annotated with recover sites,
+not used in code.
 
 Signed-off-by: Byungchul Park <byungchul@sk.com>
 ---
- include/linux/mm_types.h   |   2 +
- include/linux/page-flags.h | 125 +++++++++++++++++++++++++++++++++----
- include/linux/pagemap.h    |  37 ++++++++++-
- mm/filemap.c               |  34 ++++++++++
- mm/mm_init.c               |   2 +
- 5 files changed, 187 insertions(+), 13 deletions(-)
+ include/asm-generic/vmlinux.lds.h |  13 +-
+ include/linux/dept.h              |  91 ++++++++++++++
+ kernel/dependency/dept.c          | 196 ++++++++++++++++++++++++++++++
+ 3 files changed, 299 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
-index 3b7d05e7169c..42b6959882b3 100644
---- a/include/linux/mm_types.h
-+++ b/include/linux/mm_types.h
-@@ -22,6 +22,7 @@
- #include <linux/types.h>
- #include <linux/rseq_types.h>
- #include <linux/bitmap.h>
-+#include <linux/dept.h>
- 
- #include <asm/mmu.h>
- 
-@@ -219,6 +220,7 @@ struct page {
- 	struct page *kmsan_shadow;
- 	struct page *kmsan_origin;
+diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
+index a464ff6c1a61..2680f85b677a 100644
+--- a/include/asm-generic/vmlinux.lds.h
++++ b/include/asm-generic/vmlinux.lds.h
+@@ -717,6 +717,16 @@
+ #define KERNEL_CTORS()
  #endif
-+	struct dept_ext_wgen pg_locked_wgen;
- } _struct_page_alignment;
- 
- /*
-diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
-index f7a0e4af0c73..8ab39823ea31 100644
---- a/include/linux/page-flags.h
-+++ b/include/linux/page-flags.h
-@@ -198,6 +198,61 @@ enum pageflags {
- 
- #ifndef __GENERATING_BOUNDS_H
  
 +#ifdef CONFIG_DEPT
-+#include <linux/kernel.h>
-+#include <linux/dept.h>
-+
-+extern struct dept_map pg_locked_map;
-+
-+/*
-+ * Place the following annotations in its suitable point in code:
-+ *
-+ *	Annotate dept_page_set_bit() around firstly set_bit*()
-+ *	Annotate dept_page_clear_bit() around clear_bit*()
-+ *	Annotate dept_page_wait_on_bit() around wait_on_bit*()
-+ */
-+
-+static inline void dept_page_set_bit(struct page *p, int bit_nr)
-+{
-+	if (bit_nr == PG_locked)
-+		dept_request_event(&pg_locked_map, &p->pg_locked_wgen);
-+}
-+
-+static inline void dept_page_clear_bit(struct page *p, int bit_nr)
-+{
-+	if (bit_nr == PG_locked)
-+		dept_event(&pg_locked_map, 1UL, _RET_IP_, __func__, &p->pg_locked_wgen);
-+}
-+
-+static inline void dept_page_wait_on_bit(struct page *p, int bit_nr)
-+{
-+	if (bit_nr == PG_locked)
-+		dept_wait(&pg_locked_map, 1UL, _RET_IP_, __func__, 0, -1L);
-+}
-+
-+static inline void dept_folio_set_bit(struct folio *f, int bit_nr)
-+{
-+	dept_page_set_bit(&f->page, bit_nr);
-+}
-+
-+static inline void dept_folio_clear_bit(struct folio *f, int bit_nr)
-+{
-+	dept_page_clear_bit(&f->page, bit_nr);
-+}
-+
-+static inline void dept_folio_wait_on_bit(struct folio *f, int bit_nr)
-+{
-+	dept_page_wait_on_bit(&f->page, bit_nr);
-+}
++#define DEPT_EVNET_SITES_USED()						\
++	. = ALIGN(8);							\
++	__dept_event_sites_start = .;					\
++	KEEP(*(.dept.event_sites))					\
++	__dept_event_sites_end = .;
 +#else
-+#define dept_page_set_bit(p, bit_nr)		do { } while (0)
-+#define dept_page_clear_bit(p, bit_nr)		do { } while (0)
-+#define dept_page_wait_on_bit(p, bit_nr)	do { } while (0)
-+#define dept_folio_set_bit(f, bit_nr)		do { } while (0)
-+#define dept_folio_clear_bit(f, bit_nr)		do { } while (0)
-+#define dept_folio_wait_on_bit(f, bit_nr)	do { } while (0)
++#define DEPT_EVNET_SITES_USED()
 +#endif
 +
- #ifdef CONFIG_HUGETLB_PAGE_OPTIMIZE_VMEMMAP
- DECLARE_STATIC_KEY_FALSE(hugetlb_optimize_vmemmap_key);
+ /* init and exit section handling */
+ #define INIT_DATA							\
+ 	KEEP(*(SORT(___kentry+*)))					\
+@@ -741,7 +751,8 @@
+ 	EARLYCON_TABLE()						\
+ 	LSM_TABLE()							\
+ 	EARLY_LSM_TABLE()						\
+-	KUNIT_INIT_TABLE()
++	KUNIT_INIT_TABLE()						\
++	DEPT_EVNET_SITES_USED()
  
-@@ -419,27 +474,51 @@ static __always_inline bool folio_test_##name(const struct folio *folio) \
+ #define INIT_TEXT							\
+ 	*(.init.text .init.text.*)					\
+diff --git a/include/linux/dept.h b/include/linux/dept.h
+index 8b41f7a65abb..44083e6651ab 100644
+--- a/include/linux/dept.h
++++ b/include/linux/dept.h
+@@ -142,6 +142,82 @@ struct dept_ext_wgen {
+ 	unsigned int wgen;
+ };
  
- #define FOLIO_SET_FLAG(name, page)					\
- static __always_inline void folio_set_##name(struct folio *folio)	\
--{ set_bit(PG_##name, folio_flags(folio, page)); }
-+{									\
-+	set_bit(PG_##name, folio_flags(folio, page));			\
-+	dept_folio_set_bit(folio, PG_##name);				\
-+}
- 
- #define FOLIO_CLEAR_FLAG(name, page)					\
- static __always_inline void folio_clear_##name(struct folio *folio)	\
--{ clear_bit(PG_##name, folio_flags(folio, page)); }
-+{									\
-+	clear_bit(PG_##name, folio_flags(folio, page));			\
-+	dept_folio_clear_bit(folio, PG_##name);				\
-+}
- 
- #define __FOLIO_SET_FLAG(name, page)					\
- static __always_inline void __folio_set_##name(struct folio *folio)	\
--{ __set_bit(PG_##name, folio_flags(folio, page)); }
-+{									\
-+	__set_bit(PG_##name, folio_flags(folio, page));			\
-+	dept_folio_set_bit(folio, PG_##name);				\
-+}
- 
- #define __FOLIO_CLEAR_FLAG(name, page)					\
- static __always_inline void __folio_clear_##name(struct folio *folio)	\
--{ __clear_bit(PG_##name, folio_flags(folio, page)); }
-+{									\
-+	__clear_bit(PG_##name, folio_flags(folio, page));		\
-+	dept_folio_clear_bit(folio, PG_##name);				\
-+}
- 
- #define FOLIO_TEST_SET_FLAG(name, page)					\
- static __always_inline bool folio_test_set_##name(struct folio *folio)	\
--{ return test_and_set_bit(PG_##name, folio_flags(folio, page)); }
-+{									\
-+	bool __ret = test_and_set_bit(PG_##name, folio_flags(folio, page)); \
-+									\
-+	if (!__ret)							\
-+		dept_folio_set_bit(folio, PG_##name);			\
-+	return __ret;							\
-+}
- 
- #define FOLIO_TEST_CLEAR_FLAG(name, page)				\
- static __always_inline bool folio_test_clear_##name(struct folio *folio) \
--{ return test_and_clear_bit(PG_##name, folio_flags(folio, page)); }
-+{									\
-+	bool __ret = test_and_clear_bit(PG_##name, folio_flags(folio, page)); \
-+									\
-+	if (__ret)							\
-+		dept_folio_clear_bit(folio, PG_##name);			\
-+	return __ret;							\
-+}
- 
- #define FOLIO_FLAG(name, page)						\
- FOLIO_TEST_FLAG(name, page)						\
-@@ -454,32 +533,54 @@ static __always_inline int Page##uname(const struct page *page)		\
- #define SETPAGEFLAG(uname, lname, policy)				\
- FOLIO_SET_FLAG(lname, FOLIO_##policy)					\
- static __always_inline void SetPage##uname(struct page *page)		\
--{ set_bit(PG_##lname, &policy(page, 1)->flags.f); }
-+{									\
-+	set_bit(PG_##lname, &policy(page, 1)->flags.f);			\
-+	dept_page_set_bit(page, PG_##lname);				\
-+}
- 
- #define CLEARPAGEFLAG(uname, lname, policy)				\
- FOLIO_CLEAR_FLAG(lname, FOLIO_##policy)					\
- static __always_inline void ClearPage##uname(struct page *page)		\
--{ clear_bit(PG_##lname, &policy(page, 1)->flags.f); }
-+{									\
-+	clear_bit(PG_##lname, &policy(page, 1)->flags.f);			\
-+	dept_page_clear_bit(page, PG_##lname);				\
-+}
- 
- #define __SETPAGEFLAG(uname, lname, policy)				\
- __FOLIO_SET_FLAG(lname, FOLIO_##policy)					\
- static __always_inline void __SetPage##uname(struct page *page)		\
--{ __set_bit(PG_##lname, &policy(page, 1)->flags.f); }
-+{									\
-+	__set_bit(PG_##lname, &policy(page, 1)->flags.f);			\
-+	dept_page_set_bit(page, PG_##lname);				\
-+}
- 
- #define __CLEARPAGEFLAG(uname, lname, policy)				\
- __FOLIO_CLEAR_FLAG(lname, FOLIO_##policy)				\
- static __always_inline void __ClearPage##uname(struct page *page)	\
--{ __clear_bit(PG_##lname, &policy(page, 1)->flags.f); }
-+{									\
-+	__clear_bit(PG_##lname, &policy(page, 1)->flags.f);		\
-+	dept_page_clear_bit(page, PG_##lname);				\
-+}
- 
- #define TESTSETFLAG(uname, lname, policy)				\
- FOLIO_TEST_SET_FLAG(lname, FOLIO_##policy)				\
- static __always_inline int TestSetPage##uname(struct page *page)	\
--{ return test_and_set_bit(PG_##lname, &policy(page, 1)->flags.f); }
-+{									\
-+	bool ret = test_and_set_bit(PG_##lname, &policy(page, 1)->flags.f);\
-+	if (!ret)							\
-+		dept_page_set_bit(page, PG_##lname);			\
-+	return ret;							\
-+}
- 
- #define TESTCLEARFLAG(uname, lname, policy)				\
- FOLIO_TEST_CLEAR_FLAG(lname, FOLIO_##policy)				\
- static __always_inline int TestClearPage##uname(struct page *page)	\
--{ return test_and_clear_bit(PG_##lname, &policy(page, 1)->flags.f); }
-+{									\
-+	bool ret = test_and_clear_bit(PG_##lname, &policy(page, 1)->flags.f);\
-+	if (ret)							\
-+		dept_page_clear_bit(page, PG_##lname);			\
-+	return ret;							\
-+}
- 
- #define PAGEFLAG(uname, lname, policy)					\
- 	TESTPAGEFLAG(uname, lname, policy)				\
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index e601a3144f28..3abb45c5557c 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -1111,7 +1111,12 @@ void folio_unlock(struct folio *folio);
-  */
- static inline bool folio_trylock(struct folio *folio)
- {
--	return likely(!test_and_set_bit_lock(PG_locked, folio_flags(folio, 0)));
-+	bool ret = !test_and_set_bit_lock(PG_locked, folio_flags(folio, 0));
++struct dept_event_site {
++	/*
++	 * event site name
++	 */
++	const char			*name;
 +
-+	if (ret)
-+		dept_page_set_bit(&folio->page, PG_locked);
++	/*
++	 * function name where the event is triggered in
++	 */
++	const char			*func_name;
 +
-+	return likely(ret);
++	/*
++	 * for associating its recover dependencies
++	 */
++	struct list_head		dep_head;
++	struct list_head		dep_rev_head;
++
++	/*
++	 * for BFS
++	 */
++	unsigned int			bfs_gen;
++	struct dept_event_site		*bfs_parent;
++	struct list_head		bfs_node;
++
++	/*
++	 * flag indicating the event is not only declared but also
++	 * actually used in code
++	 */
++	bool				used;
++};
++
++struct dept_event_site_dep {
++	struct dept_event_site		*evt_site;
++	struct dept_event_site		*recover_site;
++
++	/*
++	 * for linking to dept_event objects
++	 */
++	struct list_head		dep_node;
++	struct list_head		dep_rev_node;
++};
++
++#define DEPT_EVENT_SITE_INITIALIZER(es)					\
++{									\
++	.name = #es,							\
++	.func_name = NULL,						\
++	.dep_head = LIST_HEAD_INIT((es).dep_head),			\
++	.dep_rev_head = LIST_HEAD_INIT((es).dep_rev_head),		\
++	.bfs_gen = 0,							\
++	.bfs_parent = NULL,						\
++	.bfs_node = LIST_HEAD_INIT((es).bfs_node),			\
++	.used = false,							\
++}
++
++#define DEPT_EVENT_SITE_DEP_INITIALIZER(esd)				\
++{									\
++	.evt_site = NULL,						\
++	.recover_site = NULL,						\
++	.dep_node = LIST_HEAD_INIT((esd).dep_node),			\
++	.dep_rev_node = LIST_HEAD_INIT((esd).dep_rev_node),		\
++}
++
++struct dept_event_site_init {
++	struct dept_event_site *evt_site;
++	const char *func_name;
++};
++
++#define dept_event_site_used(es)					\
++do {									\
++	static struct dept_event_site_init _evtinit __initdata =	\
++		{ .evt_site = (es), .func_name = __func__ };		\
++	static struct dept_event_site_init *_evtinitp __used		\
++		__attribute__((__section__(".dept.event_sites"))) =	\
++		&_evtinit;						\
++} while (0)
++
+ extern void dept_stop_emerg(void);
+ extern void dept_on(void);
+ extern void dept_off(void);
+@@ -179,6 +255,14 @@ static inline void dept_ecxt_enter_nokeep(struct dept_map *m)
+ extern void dept_key_init(struct dept_key *k);
+ extern void dept_key_destroy(struct dept_key *k);
+ extern void dept_map_ecxt_modify(struct dept_map *m, unsigned long e_f, struct dept_key *new_k, unsigned long new_e_f, unsigned long new_ip, const char *new_c_fn, const char *new_e_fn, int new_sub_l);
++extern void __dept_recover_event(struct dept_event_site_dep *esd, struct dept_event_site *es, struct dept_event_site *rs);
++
++#define dept_recover_event(es, rs)					\
++do {									\
++	static struct dept_event_site_dep _esd = DEPT_EVENT_SITE_DEP_INITIALIZER(_esd);\
++									\
++	__dept_recover_event(&_esd, es, rs);				\
++} while (0)
+ 
+ extern void dept_softirq_enter(void);
+ extern void dept_hardirq_enter(void);
+@@ -192,8 +276,10 @@ extern void dept_hardirqs_off(void);
+ struct dept_key { };
+ struct dept_map { };
+ struct dept_ext_wgen { };
++struct dept_event_site { };
+ 
+ #define DEPT_MAP_INITIALIZER(n, k) { }
++#define DEPT_EVENT_SITE_INITIALIZER(es) { }
+ 
+ #define dept_stop_emerg()				do { } while (0)
+ #define dept_on()					do { } while (0)
+@@ -224,6 +310,7 @@ struct dept_ext_wgen { };
+ #define dept_key_init(k)				do { (void)(k); } while (0)
+ #define dept_key_destroy(k)				do { (void)(k); } while (0)
+ #define dept_map_ecxt_modify(m, e_f, n_k, n_e_f, n_ip, n_c_fn, n_e_fn, n_sl) do { (void)(n_k); (void)(n_c_fn); (void)(n_e_fn); } while (0)
++#define dept_recover_event(es, rs)			do { } while (0)
+ 
+ #define dept_softirq_enter()				do { } while (0)
+ #define dept_hardirq_enter()				do { } while (0)
+@@ -234,4 +321,8 @@ struct dept_ext_wgen { };
+ 
+ #define dept_set_lockdep_map(m, lockdep_m)		do { } while (0)
+ #endif
++
++#define DECLARE_DEPT_EVENT_SITE(es) extern struct dept_event_site (es)
++#define DEFINE_DEPT_EVENT_SITE(es) struct dept_event_site (es) = DEPT_EVENT_SITE_INITIALIZER(es)
++
+ #endif /* __LINUX_DEPT_H */
+diff --git a/kernel/dependency/dept.c b/kernel/dependency/dept.c
+index 1de61306418b..b14400c4f83b 100644
+--- a/kernel/dependency/dept.c
++++ b/kernel/dependency/dept.c
+@@ -973,6 +973,117 @@ static void bfs(void *root, struct bfs_ops *ops, void *in, void **out)
+ 	}
  }
  
++/*
++ * Recover dependency between event sites
++ * =====================================================================
++ * Even though an event is in a chain of wait-event circular dependency,
++ * the corresponding wait might be woken up by another site triggering
++ * the desired event.  To reflect that, dept allows to annotate the
++ * recover relationship between event sites using __dept_recover_event().
++ * However, that requires to track a new type of dependency between the
++ * event sites.
++ */
++
++/*
++ * Print all events in the circle.
++ */
++static void print_recover_circle(struct dept_event_site *es)
++{
++	struct dept_event_site *from = es->bfs_parent;
++	struct dept_event_site *to = es;
++
++	dept_outworld_enter();
++
++	pr_warn("===================================================\n");
++	pr_warn("DEPT: Circular recover dependency has been detected.\n");
++	pr_warn("%s %.*s %s\n", init_utsname()->release,
++		(int)strcspn(init_utsname()->version, " "),
++		init_utsname()->version,
++		print_tainted());
++	pr_warn("---------------------------------------------------\n");
++
++	do {
++		print_spc(1, "event site(%s@%s)\n", from->name, from->func_name);
++		print_spc(1, "-> event site(%s@%s)\n", to->name, to->func_name);
++		to = from;
++		from = from->bfs_parent;
++
++		if (to != es)
++			pr_warn("\n");
++	} while (to != es);
++
++	pr_warn("---------------------------------------------------\n");
++	pr_warn("information that might be helpful\n");
++	pr_warn("---------------------------------------------------\n");
++	dump_stack();
++
++	dept_outworld_exit();
++}
++
++static void bfs_init_recover(void *node, void *in, void **out)
++{
++	struct dept_event_site *root = (struct dept_event_site *)node;
++	struct dept_event_site_dep *new = (struct dept_event_site_dep *)in;
++
++	root->bfs_gen = bfs_gen;
++	new->recover_site->bfs_parent = new->evt_site;
++}
++
++static void bfs_extend_recover(struct list_head *h, void *node)
++{
++	struct dept_event_site *cur = (struct dept_event_site *)node;
++	struct dept_event_site_dep *esd;
++
++	list_for_each_entry(esd, &cur->dep_head, dep_node) {
++		struct dept_event_site *next = esd->recover_site;
++
++		if (bfs_gen == next->bfs_gen)
++			continue;
++		next->bfs_parent = cur;
++		next->bfs_gen = bfs_gen;
++		list_add_tail(&next->bfs_node, h);
++	}
++}
++
++static void *bfs_dequeue_recover(struct list_head *h)
++{
++	struct dept_event_site *es;
++
++	DEPT_WARN_ON(list_empty(h));
++
++	es = list_first_entry(h, struct dept_event_site, bfs_node);
++	list_del(&es->bfs_node);
++	return es;
++}
++
++static enum bfs_ret cb_check_recover_dl(void *node, void *in, void **out)
++{
++	struct dept_event_site *cur = (struct dept_event_site *)node;
++	struct dept_event_site_dep *new = (struct dept_event_site_dep *)in;
++
++	if (cur == new->evt_site) {
++		print_recover_circle(new->recover_site);
++		return BFS_DONE;
++	}
++
++	return BFS_CONTINUE;
++}
++
++/*
++ * NOTE: Must be called with dept_lock held.
++ */
++static void check_recover_dl_bfs(struct dept_event_site_dep *esd)
++{
++	struct bfs_ops ops = {
++		.bfs_init = bfs_init_recover,
++		.extend = bfs_extend_recover,
++		.dequeue = bfs_dequeue_recover,
++		.callback = cb_check_recover_dl,
++	};
++
++	bfs((void *)esd->recover_site, &ops, (void *)esd, NULL);
++}
++
  /*
-@@ -1147,6 +1152,16 @@ static inline bool trylock_page(struct page *page)
- static inline void folio_lock(struct folio *folio)
- {
- 	might_sleep();
-+
-+	/*
-+	 * dept_page_wait_on_bit() will be called if __folio_lock() goes
-+	 * through a real wait path.  However, for better job to detect
-+	 * *potential* deadlocks, let's assume that folio_lock() always
-+	 * goes through wait so that dept can take into account all the
-+	 * potential cases.
-+	 */
-+	dept_page_wait_on_bit(&folio->page, PG_locked);
-+
- 	if (!folio_trylock(folio))
- 		__folio_lock(folio);
- }
-@@ -1167,6 +1182,15 @@ static inline void lock_page(struct page *page)
- 	struct folio *folio;
- 	might_sleep();
- 
-+	/*
-+	 * dept_page_wait_on_bit() will be called if __folio_lock() goes
-+	 * through a real wait path.  However, for better job to detect
-+	 * *potential* deadlocks, let's assume that lock_page() always
-+	 * goes through wait so that dept can take into account all the
-+	 * potential cases.
-+	 */
-+	dept_page_wait_on_bit(page, PG_locked);
-+
- 	folio = page_folio(page);
- 	if (!folio_trylock(folio))
- 		__folio_lock(folio);
-@@ -1185,6 +1209,17 @@ static inline void lock_page(struct page *page)
- static inline int folio_lock_killable(struct folio *folio)
- {
- 	might_sleep();
-+
-+	/*
-+	 * dept_page_wait_on_bit() will be called if
-+	 * __folio_lock_killable() goes through a real wait path.
-+	 * However, for better job to detect *potential* deadlocks,
-+	 * let's assume that folio_lock_killable() always goes through
-+	 * wait so that dept can take into account all the potential
-+	 * cases.
-+	 */
-+	dept_page_wait_on_bit(&folio->page, PG_locked);
-+
- 	if (!folio_trylock(folio))
- 		return __folio_lock_killable(folio);
- 	return 0;
-diff --git a/mm/filemap.c b/mm/filemap.c
-index dfc8a31f1222..d7e567af3261 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -48,6 +48,7 @@
- #include <linux/rcupdate_wait.h>
- #include <linux/sched/mm.h>
- #include <linux/sysctl.h>
-+#include <linux/dept.h>
- #include <asm/pgalloc.h>
- #include <asm/tlbflush.h>
- #include "internal.h"
-@@ -1145,6 +1146,7 @@ static int wake_page_function(wait_queue_entry_t *wait, unsigned mode, int sync,
- 		if (flags & WQ_FLAG_CUSTOM) {
- 			if (test_and_set_bit(key->bit_nr, &key->folio->flags.f))
- 				return -1;
-+			dept_page_set_bit(&key->folio->page, key->bit_nr);
- 			flags |= WQ_FLAG_DONE;
- 		}
+  * Main operations
+  * =====================================================================
+@@ -3166,8 +3277,78 @@ static void migrate_per_cpu_pool(void)
  	}
-@@ -1185,6 +1187,13 @@ static void folio_wake_bit(struct folio *folio, int bit_nr)
- 	key.bit_nr = bit_nr;
- 	key.page_match = 0;
- 
-+	/*
-+	 * dept_page_clear_bit() being called multiple times is harmless.
-+	 * The worst case is to miss some dependencies but it's okay.
-+	 */
-+	if (bit_nr == PG_locked)
-+		dept_page_clear_bit(&folio->page, bit_nr);
-+
- 	spin_lock_irqsave(&q->lock, flags);
- 	__wake_up_locked_key(q, TASK_NORMAL, &key);
- 
-@@ -1228,6 +1237,7 @@ static inline bool folio_trylock_flag(struct folio *folio, int bit_nr,
- 	if (wait->flags & WQ_FLAG_EXCLUSIVE) {
- 		if (test_and_set_bit(bit_nr, &folio->flags.f))
- 			return false;
-+		dept_page_set_bit(&folio->page, bit_nr);
- 	} else if (test_bit(bit_nr, &folio->flags.f))
- 		return false;
- 
-@@ -1235,6 +1245,9 @@ static inline bool folio_trylock_flag(struct folio *folio, int bit_nr,
- 	return true;
  }
  
-+struct dept_map __maybe_unused pg_locked_map = DEPT_MAP_INITIALIZER(pg_locked_map, NULL);
-+EXPORT_SYMBOL(pg_locked_map);
++static bool dept_recover_ready;
 +
- static inline int folio_wait_bit_common(struct folio *folio, int bit_nr,
- 		int state, enum behavior behavior)
++void __dept_recover_event(struct dept_event_site_dep *esd,
++		struct dept_event_site *es, struct dept_event_site *rs)
++{
++	struct dept_task *dt = dept_task();
++	unsigned long flags;
++
++	if (unlikely(!dept_working()))
++		return;
++
++	if (dt->recursive)
++		return;
++
++	if (!esd || !es || !rs) {
++		DEPT_WARN_ONCE("All the parameters should be !NULL.\n");
++		return;
++	}
++
++	/*
++	 * Check locklessly if another already has done it for us.
++	 */
++	if (READ_ONCE(esd->evt_site))
++		return;
++
++	if (!dept_recover_ready) {
++		DEPT_WARN("Should be called once dept_recover_ready.\n");
++		return;
++	}
++
++	flags = dept_enter();
++	if (unlikely(!dept_lock()))
++		goto exit;
++
++	/*
++	 * Check if another already has done it for us with lock held.
++	 */
++	if (esd->evt_site)
++		goto unlock;
++
++	/*
++	 * Can be used as an indicator of whether this
++	 * __dept_recover_event() has been processed or not as well as
++	 * for storing its associated events.
++	 */
++	WRITE_ONCE(esd->evt_site, es);
++	esd->recover_site = rs;
++
++	if (!es->used || !rs->used) {
++		if (!es->used)
++			DEPT_INFO("dept_event_site %s has never been used.\n", es->name);
++		if (!rs->used)
++			DEPT_INFO("dept_event_site %s has never been used.\n", rs->name);
++
++		DEPT_WARN("Cannot track recover dependency with events that never used.\n");
++		goto unlock;
++	}
++
++	list_add(&esd->dep_node, &es->dep_head);
++	list_add(&esd->dep_rev_node, &rs->dep_rev_head);
++	check_recover_dl_bfs(esd);
++unlock:
++	dept_unlock();
++exit:
++	dept_exit(flags);
++}
++EXPORT_SYMBOL_GPL(__dept_recover_event);
++
+ #define B2KB(B) ((B) / 1024)
+ 
++extern char __dept_event_sites_start[], __dept_event_sites_end[];
++
+ /*
+  * Should be called after setup_per_cpu_areas() and before no non-boot
+  * CPUs have been on.
+@@ -3175,6 +3356,21 @@ static void migrate_per_cpu_pool(void)
+ void __init dept_init(void)
  {
-@@ -1246,6 +1259,8 @@ static inline int folio_wait_bit_common(struct folio *folio, int bit_nr,
- 	unsigned long pflags;
- 	bool in_thrashing;
- 
-+	dept_page_wait_on_bit(&folio->page, bit_nr);
+ 	size_t mem_total = 0;
++	struct dept_event_site_init **evtinitpp;
 +
- 	if (bit_nr == PG_locked &&
- 	    !folio_test_uptodate(folio) && folio_test_workingset(folio)) {
- 		delayacct_thrashing_start(&in_thrashing);
-@@ -1339,6 +1354,23 @@ static inline int folio_wait_bit_common(struct folio *folio, int bit_nr,
- 		break;
- 	}
- 
 +	/*
-+	 * dept_page_set_bit() might have been called already in
-+	 * folio_trylock_flag(), wake_page_function() or somewhere.
-+	 * However, call it again to reset the wgen of dept to ensure
-+	 * dept_page_wait_on_bit() is called prior to
-+	 * dept_page_set_bit().
-+	 *
-+	 * Remind dept considers all the waits between
-+	 * dept_page_set_bit() and dept_page_clear_bit() as potential
-+	 * event disturbers. Ensure the correct sequence so that dept
-+	 * can make correct decisions:
-+	 *
-+	 *	wait -> acquire(set bit) -> release(clear bit)
++	 * dept recover dependency tracking works from now on.
 +	 */
-+	if (wait->flags & WQ_FLAG_DONE)
-+		dept_page_set_bit(&folio->page, bit_nr);
-+
- 	/*
- 	 * If a signal happened, this 'finish_wait()' may remove the last
- 	 * waiter from the wait-queues, but the folio waiters bit will remain
-@@ -1496,6 +1528,7 @@ void folio_unlock(struct folio *folio)
- 	BUILD_BUG_ON(PG_waiters != 7);
- 	BUILD_BUG_ON(PG_locked > 7);
- 	VM_BUG_ON_FOLIO(!folio_test_locked(folio), folio);
-+	dept_page_clear_bit(&folio->page, PG_locked);
- 	if (folio_xor_flags_has_waiters(folio, 1 << PG_locked))
- 		folio_wake_bit(folio, PG_locked);
- }
-@@ -1526,6 +1559,7 @@ void folio_end_read(struct folio *folio, bool success)
++	for (evtinitpp = (struct dept_event_site_init **)__dept_event_sites_start;
++	     evtinitpp < (struct dept_event_site_init **)__dept_event_sites_end;
++	     evtinitpp++) {
++		(*evtinitpp)->evt_site->used = true;
++		(*evtinitpp)->evt_site->func_name = (*evtinitpp)->func_name;
++		pr_info("dept_event %s@%s is initialized.\n",
++				(*evtinitpp)->evt_site->name,
++				(*evtinitpp)->evt_site->func_name);
++	}
++	dept_recover_ready = true;
  
- 	if (likely(success))
- 		mask |= 1 << PG_uptodate;
-+	dept_page_clear_bit(&folio->page, PG_locked);
- 	if (folio_xor_flags_has_waiters(folio, mask))
- 		folio_wake_bit(folio, PG_locked);
- }
-diff --git a/mm/mm_init.c b/mm/mm_init.c
-index 7712d887b696..f1d3e4afd43b 100644
---- a/mm/mm_init.c
-+++ b/mm/mm_init.c
-@@ -32,6 +32,7 @@
- #include <linux/vmstat.h>
- #include <linux/kexec_handover.h>
- #include <linux/hugetlb.h>
-+#include <linux/dept.h>
- #include "internal.h"
- #include "slab.h"
- #include "shuffle.h"
-@@ -587,6 +588,7 @@ void __meminit __init_single_page(struct page *page, unsigned long pfn,
- 	atomic_set(&page->_mapcount, -1);
- 	page_cpupid_reset_last(page);
- 	page_kasan_tag_reset(page);
-+	dept_ext_wgen_init(&page->pg_locked_wgen);
- 
- 	INIT_LIST_HEAD(&page->lru);
- #ifdef WANT_PAGE_VIRTUAL
+ 	local_irq_disable();
+ 	dept_per_cpu_ready = 1;
 -- 
 2.17.1
 
