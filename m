@@ -1,186 +1,214 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68CE32EA481
-	for <linux-block@vger.kernel.org>; Fri,  5 Dec 2025 07:07:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFC281EA65
+	for <linux-block@vger.kernel.org>; Fri,  5 Dec 2025 07:13:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764918440; cv=none; b=T/dTPb5bDL4L6Hwk5lhDaCvwviP6BTkdHkRCyW7vV/Youqw8QdnIQwY4/BZS57BQS2LkKL9L229YQQ/eVWlAS36j5HkvvucyXvpYVF2g8i4UUJ9hGJGncYh6imxaekEB1ihVi4SddtNAe8W8mw3VjbJSQyVMapaEVoHS32++hJg=
+	t=1764918828; cv=none; b=MaQ3X42N6iyF4SUAVSJFYRuasNoIiq26Nm2fzgSgstwdNuzKTU1ugiwGJgG4quaaNTzNLs5OxpPQSLR+sph6WfWXA5G1Pgcl3KEx5X/gbtcCpRbakxFsGIQ56wI9HQojzU6MeQ7Q4eJh8v8aQSl1IqbzG6V+cSZoJTC+z86osFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764918440; c=relaxed/simple;
-	bh=GhJfP9l9lj1qjUG+JI29fes7oqCn16v13hAgHQfV+7g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZyaZUfTcuhGJyy3W6GMw3QVwysoKEB1XIcXP6WZknvBCnkEsJ8qFkGDFjEqIfWQp71vRs7HFTAo25qBNeiMRKPsRlfhnCeTcRgRbXiM+qf8b3WpTq6AJ9JHoWCDtBHVNW6T9MHAsDheFRluBMXz1xgXyWPtjfX0j9Vc4v2s8lb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=kNzNapB+; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=k2dfgsum; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=E9F6Nyn7; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=NvO9+8Nm; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1764918828; c=relaxed/simple;
+	bh=Pwy8IpSMRvV4pLYbOFuG1E10Sbp1P4ndJix3SkClrEQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sRck0BI3j55U8ayG+lwnEM/MpukOcTQ9w5n9o7Ot67rbDvq4vl4Y/UJYP1r93FQU+FyyE7Pf0lcBL22EWTOkYOVxq4JYM47ntnfaUdeagFQGg9KjybO29NnKJeaiPWgJHyo98I3ye8RERKBLacMqqVpdpPb81AeiqawEzW1H17A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QdiGj0Zs; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="kNzNapB+";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="k2dfgsum";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="E9F6Nyn7";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="NvO9+8Nm"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 001A35BD1C;
-	Fri,  5 Dec 2025 07:07:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1764918435; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WO8EQkDW2LhZqqGmSLjd5kat0wnUxySmCxEH9ttL3qc=;
-	b=kNzNapB+kaCpW50ZiDAA9Ym5FT6uxJW3ZRs4jrlmo/aM1fADBcYOlNr6NmAynFuJ9Daxf5
-	1axcgeFV39Rwdq0yfn0NMoktZMjXv9bTClOf9U3ckqEhzGSoPvICHTF7xNHJ3381sCjZLp
-	YUkt9TFZScrHtbDn91hqrBO9xiMBuXk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1764918435;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WO8EQkDW2LhZqqGmSLjd5kat0wnUxySmCxEH9ttL3qc=;
-	b=k2dfgsumakU63bptU+oPUUTy7M9gbGtZ3Hpz/IJQgNaz3DBXx9vcdpkePlyRF6BGiqmjFY
-	e10LaY+gO7QPisAw==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=E9F6Nyn7;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=NvO9+8Nm
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1764918434; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WO8EQkDW2LhZqqGmSLjd5kat0wnUxySmCxEH9ttL3qc=;
-	b=E9F6Nyn7jidAt+05kn8ZEvvhvF/pXB+gB+F6fhJ9PZTfGL0qfijH9WcUjdSc/FgbReRoL5
-	nqNHas9qHx4UCXZaU4E6jey6pQaIRrblkCSI2QPF+HPXhIPP16aX8YU4IQ6BBe0RU/HFI7
-	oJr+E8jxgzVM6cEMMdaID6GUtFw3w/M=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1764918434;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WO8EQkDW2LhZqqGmSLjd5kat0wnUxySmCxEH9ttL3qc=;
-	b=NvO9+8NmDKUxwJ14LI2fGkDWLGzywJKKFH4obnCqUhuBw4jZ6CX+/bjqapvqNERgMsot83
-	GiBH52ULjSso9VDw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C30183EA63;
-	Fri,  5 Dec 2025 07:07:13 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id jATCLaGEMmmibgAAD6G6ig
-	(envelope-from <hare@suse.de>); Fri, 05 Dec 2025 07:07:13 +0000
-Message-ID: <89f8fe1d-bd1f-48d7-b056-333cb176260b@suse.de>
-Date: Fri, 5 Dec 2025 08:07:13 +0100
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QdiGj0Zs"
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4ee14ba3d9cso16657271cf.1
+        for <linux-block@vger.kernel.org>; Thu, 04 Dec 2025 23:13:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764918825; x=1765523625; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZZsthjM36AzHfzJRPv+fucYmlyEL9uQqlbDBpqCCaLU=;
+        b=QdiGj0Zsubu18EeDMdJMOc0rVl8qh588fVqBx4OqCAaJweWObgWjqkiVjS+uQxqBu4
+         oZsntiEqSqKoloiwI3yGO0pcKeGfYSFSRWIlULTYOdLlOVik4U5luPzwweRqJCxvHHdP
+         0a2c6mK5CQ16EQQevgGm5tdW8FFxG5XK8L0Aj8VGXS0SUlAdFanRgxR8BQZMoaiXBV/6
+         LDwCTEG0W5pUwhgLCX8fM4bkvemFDaD5RKfVxZxQK6z1Zs1volK6++tlOqHYp/UQl9is
+         hsFjkl8w4KXKGdOC9CneYFvkZ1zUHGdXfan6ZyEdypmqHDXAquisqQ+KdLZFMSckZ9xt
+         5EVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764918825; x=1765523625;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ZZsthjM36AzHfzJRPv+fucYmlyEL9uQqlbDBpqCCaLU=;
+        b=gmohNsIR4Jfwm3VLiilcl+0OmURQMbk8QM8WSr+0W1OXi+vGqHgV4xl+6USEzAvXhb
+         fFTGNiMdT8EGiLXbQ5C1WjF3vDWYoqhH5CLRhI5gXCizgT7XylZ3QJxSgwI3b+X6eKVf
+         4QML9uYxN8wcJtMES99n3T4Zxzr6aY+7MtSASuN9BX8kUzy1FvL9IufNAfiiNmzfaH3A
+         llRep0/xStMvRiubsYCLNkr1IVTi+h65cAALjbtGjJ6Z7r7NlRBMhPzCePvADI/ZF8un
+         4NiGWVQfUmC+9GhjrE7iduGKliPFBAk/e2L1T9qxEYRadXxJhJWzIHqUJafZHNIqAgyd
+         VsIg==
+X-Forwarded-Encrypted: i=1; AJvYcCVkO1pDJDb/81mooKR1B9e0WM91kgqEmq1EPtd7SnlI9pheSOEmfoxB4JPpvH+nEb0YrFV0WMb4ktkmqQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVvLjOyng2LULmX4OPNlCAgoc1EnAJbmfypVQBao73lNm7gGSx
+	nB0JV+G4r/Pyu6s3njbHp6Luv8qPEffMkpZuU7AXov1gx8DnRcM9VMfLurDZpsCsuh1xvCbIwvA
+	kY02TGkBsdfXBsY4ZpoyevR4RHMDaUBb9wfVn
+X-Gm-Gg: ASbGnctqnTCQ24SwibEK8IdqlxkGGnh2Yle/h4J4944frdLx7mvxFAbQTubS7ShudLn
+	zBrw2p4kJI3PvlUu1Et0lHa98DrejIm/J8vMm+IomAv9CFfe8ojtEtUDeUljnIzg9AF+wdl2WRC
+	ABpW7cJ1XP026fTWnUm++xingxUjzz9gys5qzCAmvynDMy2jQ4vqYHs2X3uGDoJlceDjfvF9YdE
+	zwXdJ61k9r91Ojnt9KeOzfiTNQvKGr/wG4vtDfnsotBcPHvM22o0osWsjKwqibFHOcHh34=
+X-Google-Smtp-Source: AGHT+IHJYWyI1mjiCTADN5mDPLjPn3O9aCgQQv/47u89Ok6QQjz9aaYuj5efWq8w321nH+Wx4kCBL9g4Yv4MqXDmCBE=
+X-Received: by 2002:a05:622a:50a:b0:4ed:8264:9199 with SMTP id
+ d75a77b69052e-4f01765302bmr128016701cf.67.1764918825449; Thu, 04 Dec 2025
+ 23:13:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH blktests v2] scsi/004: Remove reliance on deprecated
- /proc/scsi/scsi_debug
-To: Li Zhijian <lizhijian@fujitsu.com>, linux-block@vger.kernel.org
-Cc: shinichiro.kawasaki@wdc.com, Bart Van Assche <bvanassche@acm.org>
-References: <20251205031053.624317-1-lizhijian@fujitsu.com>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20251205031053.624317-1-lizhijian@fujitsu.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -4.51
-X-Rspamd-Queue-Id: 001A35BD1C
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-0.998];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	DWL_DNSWL_BLOCKED(0.00)[suse.de:dkim];
-	RCVD_TLS_ALL(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[fujitsu.com:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:mid,suse.de:dkim,suse.de:email];
-	URIBL_BLOCKED(0.00)[acm.org:email,fujitsu.com:email,suse.de:mid,suse.de:dkim,suse.de:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Level: 
+References: <20251204024748.3052502-1-zhangshida@kylinos.cn>
+ <20251204024748.3052502-4-zhangshida@kylinos.cn> <CAHc6FU5KQBpJOWcx0uiE1U5vJoON147wFMUn0oWzUmzSQajirw@mail.gmail.com>
+In-Reply-To: <CAHc6FU5KQBpJOWcx0uiE1U5vJoON147wFMUn0oWzUmzSQajirw@mail.gmail.com>
+From: Stephen Zhang <starzhangzsd@gmail.com>
+Date: Fri, 5 Dec 2025 15:13:09 +0800
+X-Gm-Features: AWmQ_bmJlyuWuTYYPV6iO6_S52PTzlNhO3cILZ9KpXHKGaOmepcVIhpJGge9aIk
+Message-ID: <CANubcdVgSO1RwAU+mp5AguaZk78SqrBRS-eWbgz1mNLs7JA_uA@mail.gmail.com>
+Subject: Re: [PATCH v5 3/3] block: prevent race condition on bi_status in __bio_chain_endio
+To: Andreas Gruenbacher <agruenba@redhat.com>
+Cc: Johannes.Thumshirn@wdc.com, hch@infradead.org, ming.lei@redhat.com, 
+	hsiangkao@linux.alibaba.com, csander@purestorage.com, colyli@fnnas.com, 
+	linux-block@vger.kernel.org, linux-bcache@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, zhangshida@kylinos.cn, 
+	Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 12/5/25 04:10, Li Zhijian wrote:
-> The Kconfig option `SCSI_PROC_FS`, which provides the
-> `/proc/scsi/scsi_debug` interface, has been deprecated for a long time.
-> 
-> Instead of adding SCSI_PROC_FS as a requirement, refactor out the script
-> to remove the scsi host to ensure all pending I/O has finished.
-> 
-> Prevent the following error report:
-> scsi/004 (ensure repeated TASK SET FULL results in EIO on timing out command) [failed]
->      runtime  1.743s  ...  1.935s
->      --- tests/scsi/004.out      2025-04-04 04:36:43.171999880 +0800
->      +++ /root/blktests/results/nodev/scsi/004.out.bad   2025-11-13 12:46:33.807994845 +0800
->      @@ -1,3 +1,4 @@
->       Running scsi/004
->       Input/output error
->      +grep: /proc/scsi/scsi_debug/0: No such file or directory
->       Test complete
-> 
-> Cc: Hannes Reinecke <hare@suse.de>
-> Cc: Bart Van Assche <bvanassche@acm.org>
-> Signed-off-by: Li Zhijian <lizhijian@fujitsu.com>
-> ---
-> V2: The new idea comes from Bart. Thank Bart and Shinichiro for valuable suggestions.
-> ---
->   tests/scsi/004 | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/tests/scsi/004 b/tests/scsi/004
-> index 7d0af54..72c9663 100755
-> --- a/tests/scsi/004
-> +++ b/tests/scsi/004
-> @@ -39,9 +39,9 @@ test() {
->   	# stop injection
->   	echo 0 > /sys/bus/pseudo/drivers/scsi_debug/opts
->   	# dd closing SCSI disk causes implicit TUR also being delayed once
-> -	while grep -q -F "in_use_bm BUSY:" "/proc/scsi/scsi_debug/${SCSI_DEBUG_HOSTS[0]}"; do
-> -		sleep 1
-> -	done
-> +	# Remove the SCSI host to ensure all the pending I/O has finished.
-> +	host_cnt=$(cat /sys/bus/pseudo/drivers/scsi_debug/add_host)
-> +	echo -"$host_cnt" > /sys/bus/pseudo/drivers/scsi_debug/add_host
->   	echo 1 > /sys/bus/pseudo/drivers/scsi_debug/ndelay
->   	_exit_scsi_debug
->   
-Hmm. That will remove all scsi_debug hosts until that index; so let's
-hope we're the only user of it.
-But can't be helped; scsi_debug doesn't allow to selectively remove
-hosts. One could do a patch for it, but not sure it's worth it.
+Andreas Gruenbacher <agruenba@redhat.com> =E4=BA=8E2025=E5=B9=B412=E6=9C=88=
+4=E6=97=A5=E5=91=A8=E5=9B=9B 20:01=E5=86=99=E9=81=93=EF=BC=9A
+>
+> On Thu, Dec 4, 2025 at 3:48=E2=80=AFAM zhangshida <starzhangzsd@gmail.com=
+> wrote:
+> > From: Shida Zhang <zhangshida@kylinos.cn>
+> >
+> > Andreas point out that multiple completions can race setting
+> > bi_status.
+>
+> What I've actually  pointed out is that the '!parent->bi_status' check
+> in this statement is an unnecessary optimization that can be removed.
+> But this is not what this discussion is mainly about anymore.
+>
+> In the current code, multiple completions can race setting bi_status,
+> but that is fine as long as bi_status is never set to 0 during bio
+> completion. The effect is that when there are multiple errors, the
+> bi_error field of the final bio will eventually be set to an error
+> code, but we don't know which error code will win. This all works
+> correctly today, and there is no race to fix because the race is
+> intentional.
+>
+> > If __bio_chain_endio() is called concurrently from multiple threads
+> > accessing the same parent bio, it should use WRITE_ONCE()/READ_ONCE()
+> > to access parent->bi_status and avoid data races.
+> >
+> > On x86 and ARM, these macros compile to the same instruction as a
+> > normal write, but they may be required on other architectures to
+> > prevent tearing, and to ensure the compiler does not add or remove
+> > memory accesses under the assumption that the values are not accessed
+> > concurrently.
+>
+> WRITE_ONCE() and READ_ONCE() also prevent the compiler from reordering
+> operations. Even when the compiler doesn't seem to do anything nasty
+> at the moment, it would probably still be worthwhile to use
+> WRITE_ONCE() for setting bi_status throughout the code. But that's
+> beyond the scope of this patch, and it calls for more than a global
+> search and replace job.
+>
+> > Adopting a cmpxchg approach, as used in other code paths, resolves all
+> > these issues, as suggested by Christoph.
+>
+> No, the cmpxchg() doesn't actually achieve anything, it only makes
+> things worse. For example, when there is an A -> B chain, we can end
+> up with the following sequence of events:
+>
+>   - A fails, sets A->bi_status, and calls bio_endio(A).
+>   - B->status is still 0, so bio_endio(A) sets B->bi_status to A->bi_stat=
+us.
+>   - B fails and sets B->bi_status, OVERRIDING the value of A->bi_status.
+>   - bio_endio(B) calls B->bi_end_io().
+>
+> Things get worse in an A -> B -> C chain, but I've already mentioned
+> that earlier in this thread.
+>
+> So again, the cmpxchg() is unnecessary, but it is also harmless
+> because it suggests that there is some form of synchronization that
+> doesn't exist. The btrfs code that the cmpxchg() was taken from seems
+> to implement actual first-failure-wins semantics, but this patch does
+> not.
+>
+> The underlying question here is whether we want to change things so
+> that bi_status is set to the first error that occurs (probably first
+> in time, not first in the chain). If that is the goal, then we should
+> be explicit about it. Right now, I don't see the need.
+>
 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+Thank you for the thorough discussion on this matter. Based on my
+understanding, there appear to be two main viewpoints:
 
-Cheers,
+Side 1 (S1) argues:
+A. Using cmpxchg() addresses all the issues that
+READ_ONCE()/WRITE_ONCE() can solve. That said, cmpxchg()
+appears to provide a comprehensive solution.
+B. While cmpxchg() introduces some additional overhead, this may not
+be significant since it occurs in a slow error-handling path.
+Or nondeterministic order of overriding, Which is not a problem.
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+Side 2 (S2) argues:
+A. While READ_ONCE()/WRITE_ONCE()-style protections may be
+needed, addressing them in this specific patch may not be appropriate.
+B. The cmpxchg() approach adds unnecessary complexity without clear
+benefits.
+
+The trade-off between S1B and S2B seems somewhat balanced, with
+no clear winner.
+However, regarding S1A versus S2A, I wonder:
+
+If we agree that READ_ONCE()/WRITE_ONCE() protections are required
+here, is there a specific reason we couldn't address just this code snippet
+in this patch? We could then follow the S1 approach and use cmpxchg().
+
+However, If this change remains controversial, I'd be happy to drop it and
+resend v6 without this modification.
+
+Thanks,
+Shida
+
+
+
+
+
+> Thanks,
+> Andreas
+>
+> > Suggested-by: Andreas Gruenbacher <agruenba@redhat.com>
+> > Suggested-by: Christoph Hellwig <hch@infradead.org>
+> > Suggested-by: Caleb Sander Mateos <csander@purestorage.com>
+> > Reviewed-by: Christoph Hellwig <hch@lst.de>
+> > Signed-off-by: Shida Zhang <zhangshida@kylinos.cn>
+> > ---
+> >  block/bio.c | 5 +++--
+> >  1 file changed, 3 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/block/bio.c b/block/bio.c
+> > index cfb751dfcf5..51b57f9d8bd 100644
+> > --- a/block/bio.c
+> > +++ b/block/bio.c
+> > @@ -314,8 +314,9 @@ static struct bio *__bio_chain_endio(struct bio *bi=
+o)
+> >  {
+> >         struct bio *parent =3D bio->bi_private;
+> >
+> > -       if (bio->bi_status && !parent->bi_status)
+> > -               parent->bi_status =3D bio->bi_status;
+> > +       if (bio->bi_status)
+> > +               cmpxchg(&parent->bi_status, 0, bio->bi_status);
+> > +
+> >         bio_put(bio);
+> >         return parent;
+> >  }
+> > --
+> > 2.34.1
+> >
+>
