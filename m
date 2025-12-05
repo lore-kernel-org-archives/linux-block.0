@@ -1,17 +1,18 @@
 Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CC1F332EDE;
-	Fri,  5 Dec 2025 07:21:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 477B2335BD5;
+	Fri,  5 Dec 2025 07:21:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764919282; cv=none; b=aDsS5/OhkfSOdx8mYleUumNy6pHYkzPiOQSu50mYaxpqdZphyojBE8AS2Uluc5nB5yqT71sy2syL3JozGbrUoJzlDjXiWvNcl+VeYjW0xYdzwUKekjAy+V7DBxkJ72j/7Uy7N5rI/+HlvEQhyTfLxPMnhiJpt+cyadjjDdzHwkU=
+	t=1764919298; cv=none; b=mw+ND7GUw4cOK5W1K/rmzUWclKwOjnRwCll9hv8o2vCp4IN7+E4Y9qlSJvLaAwDXg4diTn/7MLhXlHDj1ez9mLT+qcxdr2nPdhZICieK+JWe8DRb5+yzLKWm8oSzd4qgBeV/40F/qzfDT61VT6AaT3t/bMn0X5e8mpzAVnTpASI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764919282; c=relaxed/simple;
-	bh=AaEy5ZLg/iuY0kANSq4E0z3GYTuvShw7zb+zRcBRAcs=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=qb2Cw/o278h1aVS23G7iv2pZ/BRUAvtLAHnnTQwe80n83tzUdSsbVOuaquZKyY4kPuOJfLh0oH8MNMwRwjlhoF41oRP/FzqyfC2gRWflkDZcDkAKwQLOMcwdUvyevJ0ByxZAWibpaXYiyN2/B0xZ+l6KQdnn3D+9T8uXOOwX5wg=
+	s=arc-20240116; t=1764919298; c=relaxed/simple;
+	bh=jhmrpwTM08yBA9ZoPplcfQMQcK3SVeR5SdyXR0h1+Bo=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lL6ZgAIFB9x8L+O39eYeEm31ulBiSmR2mXU0xJo87LkCXgOpiYeOQGm+D0PEvur7yWJptXoK7PuOZI7fXqU65pu6XrCT5puldA9Ta898RARljhI+hGxJrqlr0kYZ/gANm1APi+nL0NR9Xsvdu92d7iXNJYPGNpGEr7EMTkllYW4=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-c2dff70000001609-82-69328775d3b1
+X-AuditID: a67dfc5b-c2dff70000001609-de-693287767d46
 From: Byungchul Park <byungchul@sk.com>
 To: linux-kernel@vger.kernel.org
 Cc: kernel_team@skhynix.com,
@@ -178,275 +179,113 @@ Cc: kernel_team@skhynix.com,
 	aliceryhl@google.com,
 	tmgross@umich.edu,
 	rust-for-linux@vger.kernel.org
-Subject: [PATCH v18 38/42] rcu/update: fix same dept key collision between various types of RCU
-Date: Fri,  5 Dec 2025 16:18:51 +0900
-Message-Id: <20251205071855.72743-39-byungchul@sk.com>
+Subject: [PATCH v18 41/42] SUNRPC: relocate struct rcu_head to the first field of struct rpc_xprt
+Date: Fri,  5 Dec 2025 16:18:54 +0900
+Message-Id: <20251205071855.72743-42-byungchul@sk.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20251205071855.72743-1-byungchul@sk.com>
 References: <20251205071855.72743-1-byungchul@sk.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSW0xTdxzH9z+X/zlUi2ediUd9QJuoCXMITs1vybw8uHFeZkiWzHjZXCMn
-	42gB1xYUMxeIYTjGzZp2GYPRCgq0TASEqdClNsIUBytCSpVW7IZFUopaS0epzhWMb598b09f
-	llS46VWslKMTNTkqtRLLKFlwqfm9vJLNUqrdvBFcRXYKalpbMDgvWRGMz55BEI6OMWAoQvDK
-	1ofAOKQnweCbwPDjVBEF1f6fGZjqTYfgeDcNo5FpBBP2EgR15zswBIxP4zGDE4HZ5yXhSt8D
-	BI+qOkkYnkiEkdknGIJDNQScrm/FYKxtp+Daw+sMDAVeEOAx6gn4s95DwcXCdfDKlAveSgMF
-	tx+4aAj49Rhs99+FMy/DCMoud9LgtN+hYWygkoELo0MEuKseITg340fQbBvA0FzXiEDvDzEQ
-	aohQ8Ee5nYCSx90YvmtoI+BCU5CGfu9zBs7dNWGY916lwaWvw9A/30/A3xXBeK32PxqKy6IM
-	xOZqMFQMpkNtOA3CVguGmaowvWuXYOnoIoTiuy+x0PJLCxJsERMl9J/nhWvVXkYwtecJHU3J
-	Qn3PFCGYQ7O0cD+wXWi3fI8Fc+wxKZQGRwjB4+rBwszgIJOxdr/sw0xRLeWLmk07vpRlzc1f
-	Yo6N7DjxLJJYiP5KLUUJLM9t4Ysa7+E3XNbmpBcYcxt4tztKLvBybg3fUe6P6zKW5IaT+JJo
-	xaLxDneIt3huoQWmuHV8b3d1nFlWzm3jrWPfvt5M4q2X7YvxhLhsGJ1fZAW3la8r/Xdxk+fq
-	E/jpwkbmdWElf6PJTVUhuQm9ZUEKKSc/WyWpt6RkFeRIJ1IO52a3o/jfLp56ceAqCjk/dSCO
-	RcqlcvvxNElBq/K1BdkOxLOkcrl8Wp0qKeSZqoKToib3kCZPLWodaDVLKVfIN0eOZyq4r1Q6
-	8agoHhM1b1yCTVhViE4enKR8sbVXYrd1A1//tm9nZeIHyU/GP+/a6P1i90/aTwzLbNrVulu+
-	UxHFnfSjv8M/e9iZtqSP3fizyd7Z8NmnxEcZuh/o0FzGr/v2bm94P9p1Q1w/fDB28/qSSWNz
-	Oui3Hih+PuHp2aR0tFa+HdhzxMX5+qzf7IzsTnF0lkuewxVKSpulSksmNVrV/1uhCitrAwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSbUhTcRTG+997d+91NL0soZt9qAZRBJlFxYFMDHq5Fb1AbxBRjrzlcJux
-	laWQNW1pZTFHm+QqdeaKaeVLWSarpWSWWTOrWWkqLF9wZdmmbrbsavTl8DvP85zD+XBoXFoj
-	iqIV6qO8Ri1XykgxId66KmvxsexlipjR59MhR38KOro8IvigcxLg9+UQcPVuOQkhywMKcqqu
-	iKDJnUmA604Zgi5/DoLRcQsO+toJAkLGRgp8gc8UmHQIJhyNCMytRhzaXU9wKL+nw+BXxR8S
-	BhuGEZh6PCTkD+gIGLLlIijotVAw8GwDfOuqE8FEZx8G7hEvApvnDwYeZzaCkDkZCq3Vwrj5
-	BwnjLW9wyDe5EBT3dOIwPNCN4F7jFwSOW5kkfDXcx6HNEw7v/EMkvDBdIOFb61UMvleQUJTp
-	EEHrq0EE1yxGBL2fHBhkldwlwXytioDa7kcUtA7+xqDDbMSgrGoLdNl6CWg2WDHhXCFVORMs
-	+VmYUPoxMN2uwyBgs1PxpYgb1V8iOHt1Dcbp34ZIrvx6OeLGg0bE+UqzcE5vENoG7xDOnak+
-	zpU2e0ku6H9Pco6RIoJ7aWW5G+eCGJfXspirLeiktq/ZK45N5JWKVF6zJC5BnDQWvEMdeRd3
-	4udI+Gn0JuY8CqNZZjmbW+kSTTLJLGDb2wP4JEcyc9nqi72CLqZxpm0Omx24NGXMYA6w9o4m
-	NMkEM599VlcgME1LmJVs2eeMfzvnsGUVzql4mCCb3MEpljIr2MLzoyIDEhehaXYUqVCnquQK
-	5YpobXJSmlpxIvpgiqoKCd9kO/k77yHytW2oRwyNZNMlzuNLFVKRPFWbpqpHLI3LIiVeZYxC
-	KkmUp6XzmpQDmmNKXluPZtOEbKZk0x4+Qcoclh/lk3n+CK/572J0WNRp9LRvy6sWkyN9s7Rv
-	7ay+1Y9vmfE4dbJV4nbVDE87tWm/lBnbvMMYEb7GsHDb5YW3x/iP0XnuWEnHoTNNexfIXhz2
-	Xdbpetqw/bPiI/YtL1mnyldtPEet25nNFjfgduv8wUwmN4X8Htj1pb95d/cu3vk6kc7I8M6L
-	jV8fezPkP9ssI7RJ8qWLcI1W/heZU/cPSQMAAA==
-X-CFilter-Loop: Reflected
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0yTZxSA9373NjT5rIa90hhJE7fMCxN15mCMqfv1xfljyf7skmV+kS+0
+	saApNzEzQ6GldorYBRqKl8IGIpdRqxDF1gEiCYS6ggoMLZdoqggFbLEKQ7GFLPPPm+c95zzn
+	nLx5OVJZySRwuowsyZAh6tWMnJIH4yq35BRt021dbPwEzMZf4HxTAwNmVzkNvj/rEYy+MiMw
+	3lyi4K21i4UlTxeCsj4rCZN3QghsEycomKk5jSA4eouGJf8zAp62FSGYLJtlwFbqQ1A57ich
+	NDGG4HrXCAJP7UkGukt/ZWDaycCFCiuCx2VWAipsBbHjOQHzNXUsVHjv07A4ngxzD8YJMLe+
+	osD1ZIAGz/AmqDT9QYHb001Bf72Pgkfesyz83dpIQ/VgHwG+c2doaJyuYmAyUkNCf5uDgNqX
+	NhoCD00EXPF4GehyxIM1EGKh+S8jAlP4HQ23zWMENAXukFBdG6Thmf0CAT3+MAvXXKUkDFgv
+	MbBw+W70JU7PR7W7r1lwvrzMwInwKILpkjlaoxGM/W8ZoeFiAxL+XbAiYa66gBSMJdGrJ+Kg
+	hJ4qLJzzbhFu2v2sUHh7mBUcrmyhsDNIC7+7JwjBVXeKER4PuBlh+t499mv19/LdqZJelyMZ
+	Pt9zQK7tvbL3iGfV0ULrj/loRmFBHIf5HXj4icaCZMv4wjlMxJjhP8VDQ/NkjNfwifjamQBt
+	QXKO5O+vx0XzxcuJ1byIJ8JTTIwpfgMOjYxTMVbwO/E/v80RK03X43pn23K9LBovHVxYZiX/
+	Bb5keU2v1K/C3eVPqdg+ZHRw00VlLExG1YLmCjI2F/MjMuzubyFXeq7F7bVDVAni7R/o9v91
+	+we6A5F1SKnLyEkXdfodSdq8DN3RpIOH010o+nFrji/+cAOFfN90IJ5D6jhFW26yTkmLOZl5
+	6R0Ic6R6jWJKv1WnVKSKecckw+GfDNl6KbMDqThK/bFiWyQ3VcmniVnSIUk6Ihn+yxKcLCEf
+	OU8pzN/t7lMKadlVxQ9f5G8Oth+f2eBvT7J3BtdFNsYnfRspmC3LTXG8+dnUMmBbbdHzg729
+	gZQ9zds7zPtUyabWAzwd2jTYmRAfHnPnB7/UvJv1PppKO1a+a6Zxv+ozLd6vuqqVyTWJidd7
+	io0p8izD+a+K/XFOUWXpbdn3kZrK1IrJG0lDpvgeQnsaDLQDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SbUxTVxjHPffce3tpvHrtSLhTo67GuJjoZBnLE3VGv+h1UdRkyYzZJo29
+	SkMB0zKERaNQKxXUYJcWvbWIKI2WbmDxDU21gQ3n1AyGGy8TgaQyC8VOaMHyIt5iFv1y8jvP
+	8/uf83x4GKyaoOYyuqwc0ZCl0atpJalMXW1anlv0qW5lo5MCi/kQPOkOUPB3gZ+EaMRCwtka
+	Dw2TjhsKsHjPUPBbWyEJzT9XI+iOWhCMjjswmOunSJi0NikgEvtHAbYCBFO+JgT2FiuG9ua7
+	GDxXCwgYrn1Nw0DjEAJbb4CGsmABCWHXcQRSn0MBwV83wmD3bQqmuv4loG0khMAVeE1AwF+E
+	YNKeAecq6+S4/T8axh/9gaHM1ozgfG8XhqFgD4KrTU8R+C4V0vCs9BqG1sAseBwN03DfVkLD
+	YMtZAl7U0lBR6KOg5eEAAqfDiqCv00eA6UINDXanl4T6nlsKaBmYIOCJ3UpAtXcLdLv6SHhQ
+	WknI48rWlSRwlJkI+XhOgO2n2wTEXG7FuiokjJpPkoK77johmP+cpAVPuQcJ42NWJESqTFgw
+	l8rXxlAYC0fq9gtVD0K0MBb9ixZ8IxWk8HslL1w8NkYIpx4tF+qlLsW29TuVa7SiXpcrGj5Z
+	m6ZMf3h5/T7fnLwj1m8PozBbjBIYnvuM76/tJOJMc0v59vYYjnMit4ivO9FHFSMlg7nWhXxR
+	7OR04wNOwweHQ3ScSW4JP/S0l4wzy33Od/wYId4+upCvrvVP+wly3dY2Ns0qLoU/VzxKvfXn
+	8PfPBOQsI3+wlK8pV8XLWI6arjlwKWKl9yzpnSW9Z1Ug7EaJuqzcTI1On7LCmJGen6XLW7E7
+	O9OL5J10HZw4dRNFWjc2II5B6pmsf3+yTkVpco35mQ2IZ7A6kQ3pV+pUrFaT/4NoyN5l+F4v
+	GhvQPIZUJ7Fffi2mqbi9mhwxQxT3iYb/uwSTMPcw6nyV8UV2dJOpavTjjus7FvRfvPO415oz
+	Q5JubnC+7J+f73U74cqqxJLsj/Zou0La4VUWIe/Od4de+ljX7JgntXzmL5ulo+7kA5sstxbv
+	Zi8ot4bX4CTvV3vd1L00NlV6Vfbssn173uDd537tYOuinmPf6MV789pHSj48vTiYXjnUqCaN
+	6ZrkZdhg1LwBtNOU7o8DAAA=
+X-CFilter-Loop: Reflected
 
-From: Yunseong Kim <ysk@kzalloc.com>
+While compiling Linux kernel with DEPT on, the following error was
+observed:
 
-The current implementation shares the same dept key for multiple
-synchronization points, which can lead to false positive reports in
-dependency tracking and potential confusion in debugging.  For example,
-both normal RCU and tasks trace RCU synchronization points use the same
-dept key.  Specifically:
+   ./include/linux/rcupdate.h:1084:17: note: in expansion of macro
+   ‘BUILD_BUG_ON’
+   1084 | BUILD_BUG_ON(offsetof(typeof(*(ptr)), rhf) >= 4096);	\
+        | ^~~~~~~~~~~~
+   ./include/linux/rcupdate.h:1047:29: note: in expansion of macro
+   'kvfree_rcu_arg_2'
+   1047 | #define kfree_rcu(ptr, rhf) kvfree_rcu_arg_2(ptr, rhf)
+        |                             ^~~~~~~~~~~~~~~~
+   net/sunrpc/xprt.c:1856:9: note: in expansion of macro 'kfree_rcu'
+   1856 | kfree_rcu(xprt, rcu);
+        | ^~~~~~~~~
+    CC net/kcm/kcmproc.o
+   make[4]: *** [scripts/Makefile.build:203: net/sunrpc/xprt.o] Error 1
 
-   1. synchronize_rcu() uses a dept key embedded in __wait_rcu_gp():
+Since kfree_rcu() assumes 'offset of struct rcu_head in a rcu-managed
+struct < 4096', the offest of struct rcu_head in struct rpc_xprt should
+not exceed 4096 but does, due to the debug information added by DEPT.
 
-      synchronize_rcu()
-         synchronize_rcu_normal()
-            _wait_rcu_gp()
-               __wait_rcu_gp() <- the key as static variable
+Relocate struct rcu_head to the first field of struct rpc_xprt from an
+arbitrary location to avoid the issue and meet the assumption.
 
-   2. synchronize_rcu_tasks_trace() uses the dept key, too:
-
-      synchronize_rcu_tasks_trace()
-         synchronize_rcu_tasks_generic()
-            _wait_rcu_gp()
-               __wait_rcu_gp() <- the key as static variable
-
-Since the both rely on the same dept key, dept may report false positive
-circular dependency.  To resolve this, separate dept keys and maps
-should be assigned to each struct rcu_synchronize.
-
-   ===================================================
-   DEPT: Circular dependency has been detected.
-   6.15.0-rc6-00042-ged94bafc6405 #2 Not tainted
-   ---------------------------------------------------
-   summary
-   ---------------------------------------------------
-   *** DEADLOCK ***
-
-   context A
-      [S] lock(cpu_hotplug_lock:0)
-      [W] __wait_rcu_gp(<sched>:0)
-      [E] unlock(cpu_hotplug_lock:0)
-
-   context B
-      [S] (unknown)(<sched>:0)
-      [W] lock(cpu_hotplug_lock:0)
-      [E] try_to_wake_up(<sched>:0)
-
-   [S]: start of the event context
-   [W]: the wait blocked
-   [E]: the event not reachable
-   ---------------------------------------------------
-   context A's detail
-   ---------------------------------------------------
-   context A
-      [S] lock(cpu_hotplug_lock:0)
-      [W] __wait_rcu_gp(<sched>:0)
-      [E] unlock(cpu_hotplug_lock:0)
-
-   [S] lock(cpu_hotplug_lock:0):
-   [<ffff8000802ce964>] cpus_read_lock+0x14/0x20
-   stacktrace:
-         percpu_down_read.constprop.0+0x88/0x2ec
-         cpus_read_lock+0x14/0x20
-         cgroup_procs_write_start+0x164/0x634
-         __cgroup_procs_write+0xdc/0x4d0
-         cgroup_procs_write+0x34/0x74
-         cgroup_file_write+0x25c/0x670
-         kernfs_fop_write_iter+0x2ec/0x498
-         vfs_write+0x574/0xc30
-         ksys_write+0x124/0x244
-         __arm64_sys_write+0x70/0xa4
-         invoke_syscall+0x88/0x2e0
-         el0_svc_common.constprop.0+0xe8/0x2e0
-         do_el0_svc+0x44/0x60
-         el0_svc+0x50/0x188
-         el0t_64_sync_handler+0x10c/0x140
-         el0t_64_sync+0x198/0x19c
-
-   [W] __wait_rcu_gp(<sched>:0):
-   [<ffff8000804ce88c>] __wait_rcu_gp+0x324/0x498
-   stacktrace:
-         schedule+0xcc/0x348
-         schedule_timeout+0x1a4/0x268
-         __wait_for_common+0x1c4/0x3f0
-         __wait_for_completion_state+0x20/0x38
-         __wait_rcu_gp+0x35c/0x498
-         synchronize_rcu_normal+0x200/0x218
-         synchronize_rcu+0x234/0x2a0
-         rcu_sync_enter+0x11c/0x300
-         percpu_down_write+0xb4/0x3e0
-         cgroup_procs_write_start+0x174/0x634
-         __cgroup_procs_write+0xdc/0x4d0
-         cgroup_procs_write+0x34/0x74
-         cgroup_file_write+0x25c/0x670
-         kernfs_fop_write_iter+0x2ec/0x498
-         vfs_write+0x574/0xc30
-         ksys_write+0x124/0x244
-
-   [E] unlock(cpu_hotplug_lock:0):
-   (N/A)
-   ---------------------------------------------------
-   context B's detail
-   ---------------------------------------------------
-   context B
-      [S] (unknown)(<sched>:0)
-      [W] lock(cpu_hotplug_lock:0)
-      [E] try_to_wake_up(<sched>:0)
-
-   [S] (unknown)(<sched>:0):
-   (N/A)
-
-   [W] lock(cpu_hotplug_lock:0):
-   [<ffff8000802ce964>] cpus_read_lock+0x14/0x20
-   stacktrace:
-         percpu_down_read.constprop.0+0x6c/0x2ec
-         cpus_read_lock+0x14/0x20
-         check_all_holdout_tasks_trace+0x90/0xa30
-         rcu_tasks_wait_gp+0x47c/0x938
-         rcu_tasks_one_gp+0x75c/0xef8
-         rcu_tasks_kthread+0x180/0x1dc
-         kthread+0x3ac/0x74c
-         ret_from_fork+0x10/0x20
-
-   [E] try_to_wake_up(<sched>:0):
-   [<ffff8000804233b8>] complete+0xb8/0x1e8
-   stacktrace:
-         try_to_wake_up+0x374/0x1164
-         complete+0xb8/0x1e8
-         wakeme_after_rcu+0x14/0x20
-         rcu_tasks_invoke_cbs+0x218/0xaa8
-         rcu_tasks_one_gp+0x834/0xef8
-         rcu_tasks_kthread+0x180/0x1dc
-         kthread+0x3ac/0x74c
-         ret_from_fork+0x10/0x20
-   (wait to wake up)
-   stacktrace:
-         __schedule+0xf64/0x3614
-         schedule+0xcc/0x348
-         schedule_timeout+0x1a4/0x268
-         __wait_for_common+0x1c4/0x3f0
-         __wait_for_completion_state+0x20/0x38
-         __wait_rcu_gp+0x35c/0x498
-         synchronize_rcu_tasks_generic+0x14c/0x220
-         synchronize_rcu_tasks_trace+0x24/0x8c
-         rcu_init_tasks_generic+0x168/0x194
-         do_one_initcall+0x174/0xa00
-         kernel_init_freeable+0x744/0x7dc
-         kernel_init+0x78/0x220
-         ret_from_fork+0x10/0x20
-
-Separating the dept key and map for each of struct rcu_synchronize,
-ensuring proper tracking for each execution context.
-
-Signed-off-by: Yunseong Kim <ysk@kzalloc.com>
-[ Rewrote the changelog. ]
+Reported-by: Yunseong Kim <ysk@kzalloc.com>
 Signed-off-by: Byungchul Park <byungchul@sk.com>
 ---
- include/linux/rcupdate_wait.h | 13 ++++++++-----
- kernel/rcu/rcu.h              |  1 +
- kernel/rcu/update.c           |  5 +++--
- 3 files changed, 12 insertions(+), 7 deletions(-)
+ include/linux/sunrpc/xprt.h | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/rcupdate_wait.h b/include/linux/rcupdate_wait.h
-index 4c92d4291cce..ee598e70b4bc 100644
---- a/include/linux/rcupdate_wait.h
-+++ b/include/linux/rcupdate_wait.h
-@@ -19,17 +19,20 @@ struct rcu_synchronize {
+diff --git a/include/linux/sunrpc/xprt.h b/include/linux/sunrpc/xprt.h
+index f46d1fb8f71a..666e42a17a31 100644
+--- a/include/linux/sunrpc/xprt.h
++++ b/include/linux/sunrpc/xprt.h
+@@ -211,6 +211,14 @@ enum xprt_transports {
  
- 	/* This is for debugging. */
- 	struct rcu_gp_oldstate oldstate;
-+	struct dept_map dmap;
-+	struct dept_key dkey;
- };
- void wakeme_after_rcu(struct rcu_head *head);
- 
- void __wait_rcu_gp(bool checktiny, unsigned int state, int n, call_rcu_func_t *crcu_array,
--		   struct rcu_synchronize *rs_array);
-+		   struct rcu_synchronize *rs_array, struct dept_key *dkey);
- 
- #define _wait_rcu_gp(checktiny, state, ...) \
--do {												\
--	call_rcu_func_t __crcu_array[] = { __VA_ARGS__ };					\
--	struct rcu_synchronize __rs_array[ARRAY_SIZE(__crcu_array)];				\
--	__wait_rcu_gp(checktiny, state, ARRAY_SIZE(__crcu_array), __crcu_array, __rs_array);	\
-+do {													\
-+	call_rcu_func_t __crcu_array[] = { __VA_ARGS__ };						\
-+	static struct dept_key __key;									\
-+	struct rcu_synchronize __rs_array[ARRAY_SIZE(__crcu_array)];					\
-+	__wait_rcu_gp(checktiny, state, ARRAY_SIZE(__crcu_array), __crcu_array, __rs_array, &__key);	\
- } while (0)
- 
- #define wait_rcu_gp(...) _wait_rcu_gp(false, TASK_UNINTERRUPTIBLE, __VA_ARGS__)
-diff --git a/kernel/rcu/rcu.h b/kernel/rcu/rcu.h
-index 9cf01832a6c3..c0d8ea139596 100644
---- a/kernel/rcu/rcu.h
-+++ b/kernel/rcu/rcu.h
-@@ -12,6 +12,7 @@
- 
- #include <linux/slab.h>
- #include <trace/events/rcu.h>
-+#include <linux/dept_sdt.h>
- 
- /*
-  * Grace-period counter management.
-diff --git a/kernel/rcu/update.c b/kernel/rcu/update.c
-index dfeba9b35395..6b7ede219433 100644
---- a/kernel/rcu/update.c
-+++ b/kernel/rcu/update.c
-@@ -409,7 +409,7 @@ void wakeme_after_rcu(struct rcu_head *head)
- EXPORT_SYMBOL_GPL(wakeme_after_rcu);
- 
- void __wait_rcu_gp(bool checktiny, unsigned int state, int n, call_rcu_func_t *crcu_array,
--		   struct rcu_synchronize *rs_array)
-+		   struct rcu_synchronize *rs_array, struct dept_key *dkey)
- {
- 	int i;
- 	int j;
-@@ -426,7 +426,8 @@ void __wait_rcu_gp(bool checktiny, unsigned int state, int n, call_rcu_func_t *c
- 				break;
- 		if (j == i) {
- 			init_rcu_head_on_stack(&rs_array[i].head);
--			init_completion(&rs_array[i].completion);
-+			sdt_map_init_key(&rs_array[i].dmap, dkey);
-+			init_completion_dmap(&rs_array[i].completion, &rs_array[i].dmap);
- 			(crcu_array[i])(&rs_array[i].head, wakeme_after_rcu);
- 		}
- 	}
+ struct rpc_sysfs_xprt;
+ struct rpc_xprt {
++	/*
++	 * Place struct rcu_head within the first 4096 bytes of struct
++	 * rpc_xprt if sizeof(struct rpc_xprt) > 4096, so that
++	 * kfree_rcu() can simply work assuming that.  See the comment
++	 * in kfree_rcu().
++	 */
++	struct rcu_head		rcu;
++
+ 	struct kref		kref;		/* Reference count */
+ 	const struct rpc_xprt_ops *ops;		/* transport methods */
+ 	unsigned int		id;		/* transport id */
+@@ -317,7 +325,6 @@ struct rpc_xprt {
+ #if IS_ENABLED(CONFIG_SUNRPC_DEBUG)
+ 	struct dentry		*debugfs;		/* debugfs directory */
+ #endif
+-	struct rcu_head		rcu;
+ 	const struct xprt_class	*xprt_class;
+ 	struct rpc_sysfs_xprt	*xprt_sysfs;
+ 	bool			main; /*mark if this is the 1st transport */
 -- 
 2.17.1
 
