@@ -1,17 +1,17 @@
 Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D6983002D3;
-	Fri,  5 Dec 2025 07:19:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E4C330497A;
+	Fri,  5 Dec 2025 07:19:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764919182; cv=none; b=ZG+HvO4o1Ply6tE4le3nJ9r6pWbyXbscGIrkVKJK8bSEYPCTOzA451AzHaqLQF2Jz4Q05UrQeLolWP0VKfeSMiA/+ZHVda09DZVhq+b6dgWQnIWxuDe/7TK3AomGj6v7CtxxaHbCzgDQ/Ai+FP/9LIE2pKlvLfbAStcIdetgxKI=
+	t=1764919199; cv=none; b=l7JaNg2GJEPFZut/RsBm+MLjDHeNdddfsAk/Wvt0PGtE31CYwjEhNOx1iA6q2qziuO4xkkZpS3RRb0ciZW8OYi8aqYdrCroRCLqgmc5MXhmx9QD18zODEeC4fQ/Mzecbp7yvn1Ttm4RALIsDSBFGbXgy2DbiW1sSu/4Lg94fz2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764919182; c=relaxed/simple;
-	bh=OrmCL7AMrlriaPZyremlA931PaCPQXdxGExlE/vjDx8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=L6xqeiKu9CpqCkwWziA6Opt4xRPw3LFEjkUryygHP7XXJ3ya6bd8D4iTDQy2zZKEEu9tYJWx9MWJCgbjn8eL7ls//78wasZmRsEu3+PxgnuCE4jhNUqFR3jt7Vxy6t4esCjpUDEIUryQ5YXGPi0RgWyDNCFQgDwytN6BqCva4Hs=
+	s=arc-20240116; t=1764919199; c=relaxed/simple;
+	bh=+bd9WiorYKiALUTe/ZE9Twmt5uX3p97amk10CfbvR3w=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=Q4/Gjv9zOaID4lkR9Lp7tHhosb4iZnQLxNlb1Xi4fa/cgFFXLoo7ZxRhYlKSDVo/Nz6JNvB5I69r8VqBA+DcrFedZ8K/7tEwixvXuDSePfOPPYnQpiVv679MsWfES1DnSBlvaFj0b5oLkwK5CffbDrPYQBlkyTA4T8ziNPxI4cc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-c45ff70000001609-06-6932876c3129
+X-AuditID: a67dfc5b-c2dff70000001609-84-6932876dcce4
 From: Byungchul Park <byungchul@sk.com>
 To: linux-kernel@vger.kernel.org
 Cc: kernel_team@skhynix.com,
@@ -178,45 +178,44 @@ Cc: kernel_team@skhynix.com,
 	aliceryhl@google.com,
 	tmgross@umich.edu,
 	rust-for-linux@vger.kernel.org
-Subject: [PATCH v18 09/42] dept: record the latest one out of consecutive waits of the same class
-Date: Fri,  5 Dec 2025 16:18:22 +0900
-Message-Id: <20251205071855.72743-10-byungchul@sk.com>
+Subject: [PATCH v18 13/42] dept: apply sdt_might_sleep_{start,end}() to hashed-waitqueue wait
+Date: Fri,  5 Dec 2025 16:18:26 +0900
+Message-Id: <20251205071855.72743-14-byungchul@sk.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20251205071855.72743-1-byungchul@sk.com>
 References: <20251205071855.72743-1-byungchul@sk.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAAzXSbUxTZxQH8D33PvfettLlrmK8sgRN0ZgwETG4nA9zGpZsz/xgTKYR4YN2
-	coWGgqblRTYlAnN0DBBqKhkVLSBIaHlJwQWBxspmdbKGqyxSXHkzBUQlIwg4Co5Bjd9+Of9z
-	/p+OjFYNMWEybXqGqE/X6NSsAiumQ6qj0gp3a3fV2ELBN+Jn4EmeC8P8nBHD1RY7Cw8G8jGM
-	zBsRvDW5OVhxuhF4pTs02NvzKHjd+h8LL3+bRWAe87NQMZWH4Z/6YgSVExYOpu59BStDkxT4
-	XYUIljx9NLS7hxE4G/JZGC+7RUO//0P4w/wzC9Z8JwNVFhOCiadOCgpqW1i4UuXAcHu0k4NH
-	L5cp8F0xUdBbVkOBpaKAAnNTFwWL9Y0cWDz9DDxrqORgeSwG3LZJDoYumTE0T/cx4Bi8h2Du
-	rzEK7MUTNBg75zE4n34C1T/ewPDLNR8LxrdzCNwdzygobr3FwLB9hQHJ1cvAY5uEoWXSS8Hf
-	nksc9HU2MVA38IiCsVEvA22eP2mQyksY8JaNo/1J5M3FUkzs1+yILAVMiMzVFdDkh7ZsUtf7
-	iiUPawRS7okityuHOGJ1ZJK2hkhS2z1FEUfjTyxxzJo4Ur30nCa+J93soagExWdJok6bJeqj
-	Pz+hSOkaqcJnxtedHbaWcxfQ7/IiJJcJfKyw0DKI37vWP0+vmeW3C17vYtCh/BahrWSCKUIK
-	Gc33bxYKF0uDwXpeI/RPPmfXjPltglQ9w61ZyX8quCqWmXelmwVbqyu4L1+dmwcCQav4PcL1
-	ojfBUoG3yIXO9hn63cEm4W6DF5chpRV90IhU2vSsNI1WF7szJSdde3bnydNpDrT6dPXnlxM7
-	0Kz0TQ/iZUgdonRlx2hVjCbLkJPWgwQZrQ5VvtLt0qqUSZqc70T96eP6TJ1o6EEfy7B6o3L3
-	QnaSik/WZIiponhG1L9PKZk87AL6KHU7HxKQ5BnskfupX4QbStni5l+TFSnhEdga2B8pnv/2
-	MohOaZBtPnwOv7h4dN+p3IgNYUdy7TF7bVu/xl05pf7xc8mj8ZnRZHrH9xW8dJOLsMVGj5q6
-	khOP+VaauvdKgYNf5kcdGkwoz/33zsnZjviIuHXG9gMuVSSVGPdQjQ0pmphIWm/Q/A+W/F0p
-	cAMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSWUwTcRDG/e/ZVqtrJWHFB7XRmBA8MB5jPIK+sGi8HoiJL7KRjayUI62C
-	mKgcNiAqQk1bpaAIUhCKYIsHkMYGFW8FqtIgUDEFJaAoUgjlsmB8mfxmvm++zMNIcMUjMkgi
-	xp8Q1PG8SknJCNm+rRmrVZnrxXVtZcsgS3sOOtweEj6lOQjwDmcRUFBtoWDS9JCGLOt1El60
-	pRPQfLcSgdubhWB03ISDtm6agEldEw3DY59p0KchmLY3ITC06HBwNT/GwVKbhsGfmikK+p8M
-	IdB3eygw9qURMGi+hCC/10RD37Nw+OFuIGG68xsGbSMDCMyeKQw8jkwEk4ZYuFls868bflEw
-	/vY9DkZ9M4Jb3Z04DPV9QVDb1IXAXp5OQU/ufRycnvnwwTtIwUv9RQp+tBRg8LOGgqJ0Owkt
-	b/oRFJp0CHrb7RhklFRTYCi0ElD3pZ6Glv4JDDoMOgwqrXvBbe4l4HVuMeY/1++6FwgmYwbm
-	L98x0Fc1YDBmrqDDShE3qs0huArbA4zTtk5SnOWGBXHjPh3ihkszcE6b62+fDAzi3HlbMlf6
-	eoDifN6PFGcfKSK4V8Usd/uCD+Py3q7m6vI76QM7D8u2RQsqMUlQr90RJYtpcBcSiT1zT3UV
-	5dGp6Kk0G0klLLOBLfF48RmmmFWsyzU2ywHMMtZ2uZfMRjIJzjiXspljObPCIoZnnd++UzNM
-	MCvZ5lu/6BmWM5tYh3GC/Be6lK2sccz6pf65vs03ywpmI3sze5TMRbIiNKcCBYjxSXG8qNq4
-	RhMbkxIvnlpzNCHOivz/ZD4zkfcIDTvDGxEjQcp5ckdyqKgg+SRNSlwjYiW4MkA+oFonKuTR
-	fMppQZ1wRH1SJWga0RIJoQyU7z4kRCmYY/wJIVYQEgX1fxWTSINS0ZboEGNVZoHrxfHlwtk9
-	tWf2WqwJW3bB4nDzAsXBz+NL7jzX5mzYOTIYRosPtuObo1pbxa/dPeW7nCH7I9QKmeZaEKkP
-	iJxfGBpxxZVfZtNPVya9T429WlP/2xCpaFcvxLj6uAP8045reSsi3kljfoeKo+0LDmvKki8G
-	uxLDfPuUhCaGDw3G1Rr+L3xIHd1LAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAAzXSW0wTaRQHcL6Zr98Mjd2Mlcgsmug2u1Ehihg0Z41RY0ych83GxCdXjY4y
+	sdW2kKIoxM1WsVK5VMSwulakUFgJF2lajFzUIEQg5WZFpQJVNKawKzRYKwTrjWJ8OfnlXP5P
+	h6WVw7I4VqM/Jhn0olZF5Fg+uaBstT5nnWZtqEwBZtNfYHb+I4PQ7DADtQ2nKXjn+EzgTXsQ
+	wVW/lYHScheBcG8/DQOvf4CAg0C2vZ7A3yVODE2jzQx0F5ZTYL2cHSnjFBTXtVDQYx/B8PFl
+	EnTUjDFwc7JfBm/8RQRuG0cZcD57gMDc/B7D3aEEMH8KIehofEXBQPM1AkbrjAzqx7wUdHd0
+	YRjuvcBA5aCHgpejXhm4entomLYsgbpAOYFLAT+CR602CvxPzlHQYVsMRf4gA8GKaQydBa0U
+	5Iy3EBix/I/h8bMWBPfMoxS0v5+gwO17x4DLWUzD06JSAu4PbgpeWSYZMOXPMlDjwWA9bUHg
+	eHuDQEkoCUI11QQChSEZWB88Z7ZuFWZMFizUXq9FQqgymxZMhXOq7J4gQtNVHyOcvTfECDbn
+	ccFVFS/Y7/xHCc7q80QoC4/TwsjTO0QI9PUxQteVMBbKjMX0zp/+kG9KkbSaDMmQuPmAXN3Q
+	cx6lvWBP2h/W00b0guSiaJbnknnHmQb03SO+AiZiwq3gvd5ZOuIYbjnvKvDLcpGcpbmBZXzO
+	rGV+sIjbx18f7McRY+4X3u/NoyJWcBv4uvAN5lvoMr7G0Tq/Hz3XLx78MG8lt54vzZ2ZD+W5
+	0mh+pm8Mfzv4kb9f5cWFSGFDUdVIqdFn6ESNNnmNOlOvObnmUKrOieZe7t8/P+5pRMGHu9oQ
+	xyLVAkXriSSNUiZmpGfq2hDP0qoYxYR2rUapSBEzsyRD6n7Dca2U3oaWsFgVq1g3fSJFyR0W
+	j0lHJSlNMnyfUmx0nBHt3EYrpn6GCqHpiu5+sKtx3JNin/rNunLH3vzJawvZith89fo6f94p
+	o/Gzpx/RT35P2PJryZgz6uBlz9Kq3cnbV+HdR87m7U19W2mKsh5p9m37Eo5z+EybhxLdWRaj
+	zr0i9ksWXJRvnOoUd126Zc+wqG0DRRf2uNrlWeLdBjFOhdPVYlI8bUgXvwJU5006bgMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAAzWSe0hTcRTH+917d+91ubithZeKFoMIAi2l5EQPKigvvZCCgiBy5CUvTqtt
+	+Sgi3Vqaqelgk1qlaa7wkeajshoNI+lhumXlKNe01kycGTYTt8ym0T+Hzznf7/ly/jg0Ln0g
+	WkQL6Vpena5UKUgxId6zXh+dlhcnrG4PrYB8w1no83hF8D7XTsB4IJ+Aqw11JExZ7lOQ33RZ
+	BM97dQQ47tQi8IznI5gIWXAwtE0TMGXsoCAw+ZECUy6CaVsHArPTiIPL8QSHupZcDH42/iFh
+	+OkYAtOAl4SyoVwCRq2FCK74LBQMPUuAEc8jEUy7BzHo/eVHYPX+wcBrz0MwZU6F8srm8Lr5
+	Bwmh1904lJkcCG4MuHEYG+pH0NLxCYHtto6EryWtOPR458Hb8VESXpgukjDivIrB90YSKnQ2
+	ETg7hxFcsxgR+D7YMNBXNZBgvtZEQFv/Qwqcw78x6DMbMaht2g0eq4+AVyWVWPjcsOtuFFjK
+	9Fi4fMPAVP8Ig0lrDbW5GnEThmKCq2m+h3GGN1MkV3e9DnGhoBFxgWo9zhlKwu1T/yjOnWvO
+	5Kpf+UkuOP6O5Gy/KgjuZSXL3bwQxLjS19Fc2xU3lbjloHhDMq8SMnj1qk1J4pSWzgvouIfO
+	qnI04DnIQxagCJpl1rB97iJqhklmBetyTeIzLGOWsc1FPlEBEtM40yNn8yaLZ4UFzCH2em83
+	McMEs5z1uS5iMyxh4tn60C3qX6icrW20z/ojwnNTb3CWpcxatrxgQlSCxBVoTg2SCekZaUpB
+	tTZGk5qSnS5kxRw5ltaEwv9kPfO79AEK9CS0I4ZGikiJPTNWkIqUGZrstHbE0rhCJvGrVgtS
+	SbIy+xSvPnZYfVLFa9rRYppQREl2HOCTpMxRpZZP5fnjvPq/itERi3LQ6a7WpdHnE8c+j50s
+	Ly4U9nbFc8MbLer4wcZCR0DsXyr0lC5ftemElnHmZCXEF408s8fN10s2xAYLd92IXJLhWqM7
+	pXJWyEN7Ytw6uvTS462R3+7VLJvQFuMyy8G5+5OGMnfK1x2R7/sZyospd50t2KaVtQ3WH+7M
+	jOv/st2YuFBBaFKUsStxtUb5FyE0OqdLAwAA
 X-CFilter-Loop: Reflected
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -224,54 +223,41 @@ List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 
-The current code records all the waits for later use to track relation
-between waits and events within each context.  However, since the same
-class is handled the same way, it'd be okay to record only one on behalf
-of the others if they all have the same class.
-
-Even though it's the ideal to search the whole history buffer for that,
-since it'd cost too high, alternatively, let's keep the latest one when
-the same class'ed waits consecutively appear.
+Make dept able to track dependencies by hashed-waitqueue waits.
 
 Signed-off-by: Byungchul Park <byungchul@sk.com>
 ---
- kernel/dependency/dept.c | 21 ++++++++++++++++++++-
- 1 file changed, 20 insertions(+), 1 deletion(-)
+ include/linux/wait_bit.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/kernel/dependency/dept.c b/kernel/dependency/dept.c
-index 1b16a6095b3c..f4c08758f8db 100644
---- a/kernel/dependency/dept.c
-+++ b/kernel/dependency/dept.c
-@@ -1486,9 +1486,28 @@ static struct dept_wait_hist *new_hist(void)
- 	return wh;
- }
+diff --git a/include/linux/wait_bit.h b/include/linux/wait_bit.h
+index 9e29d79fc790..179a616ad245 100644
+--- a/include/linux/wait_bit.h
++++ b/include/linux/wait_bit.h
+@@ -6,6 +6,7 @@
+  * Linux wait-bit related types and methods:
+  */
+ #include <linux/wait.h>
++#include <linux/dept_sdt.h>
  
-+static struct dept_wait_hist *last_hist(void)
-+{
-+	int pos_n = hist_pos_next();
-+	struct dept_wait_hist *wh_n = hist(pos_n);
-+
-+	/*
-+	 * This is the first try.
-+	 */
-+	if (!pos_n && !wh_n->wait)
-+		return NULL;
-+
-+	return hist(pos_n + DEPT_MAX_WAIT_HIST - 1);
-+}
-+
- static void add_hist(struct dept_wait *w, unsigned int wg, unsigned int ctxt_id)
- {
--	struct dept_wait_hist *wh = new_hist();
-+	struct dept_wait_hist *wh;
-+
-+	wh = last_hist();
-+
-+	if (!wh || wh->wait->class != w->class || wh->ctxt_id != ctxt_id)
-+		wh = new_hist();
+ struct wait_bit_key {
+ 	unsigned long		*flags;
+@@ -257,6 +258,7 @@ extern wait_queue_head_t *__var_waitqueue(void *p);
+ 	struct wait_bit_queue_entry __wbq_entry;			\
+ 	long __ret = ret; /* explicit shadow */				\
+ 									\
++	sdt_might_sleep_start(NULL);					\
+ 	init_wait_var_entry(&__wbq_entry, var,				\
+ 			    exclusive ? WQ_FLAG_EXCLUSIVE : 0);		\
+ 	for (;;) {							\
+@@ -274,6 +276,7 @@ extern wait_queue_head_t *__var_waitqueue(void *p);
+ 		cmd;							\
+ 	}								\
+ 	finish_wait(__wq_head, &__wbq_entry.wq_entry);			\
++	sdt_might_sleep_end();						\
+ __out:	__ret;								\
+ })
  
- 	if (likely(wh->wait))
- 		put_wait(wh->wait);
 -- 
 2.17.1
 
