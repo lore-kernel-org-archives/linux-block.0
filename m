@@ -1,72 +1,73 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D45D2D7DF3
-	for <linux-block@vger.kernel.org>; Sun,  7 Dec 2025 07:45:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DFF33FFD
+	for <linux-block@vger.kernel.org>; Sun,  7 Dec 2025 08:16:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765093509; cv=none; b=mNdUnrimE0zJFhdEDWpFu3WoCT8uU0JmNDQ5QMeWBRW/vBhaQCFA/NJ5jEmi0iwS44zmafH/4mxyyKGxEZKERq9zQheLucFL90IvG7MQaGGD4g0nIw0DrX98lH+eKVrTcreW9KcrjWaZDRd2nNRli21Z8GTgsZXPSLC57e5Kuts=
+	t=1765095409; cv=none; b=nsdBlFIAnqbhBrvrqMSKE282AL+3BTjltacOMmKpOS9DvklkdIr9Sx9U5ks5f7yHK++Ynh9MHdpkpgMo5Yb/yMUK4o9tegdIv82lH5SV/KzhfWjqtQ3WTuaed6oJtEK1LeGBLWD9+4juvhXuvCEQnXTmBSPevRxdoxs+mx2QJIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765093509; c=relaxed/simple;
-	bh=xE18S0HTScxsy8TOmsZHqOxcR52s9PfaVSET2eKkGak=;
+	s=arc-20240116; t=1765095409; c=relaxed/simple;
+	bh=B6u+BjB5dmB+fsqPy6mrYnYMOoGnZni7qRYHXTF4llA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sDd8eUFIJQF5UsPDijSVQUzGyQbJXstlfYfs7cZ11JWf29/vfzC+iz/GJmNWTa81bAlhscwIp/yBrrA7Zl5qpayd1dvi3xlDlLhEou8wAFscSSO2Fdw6pH6bBwO8Qe3WxuubBMaUvAdxXmcO+lqNDQ+idAX6mGpjkv/Q6yUhkMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Wrr5BVzI; arc=none smtp.client-ip=209.85.216.54
+	 To:Cc:Content-Type; b=N0VCWfohH/QagFT4JHzgJUTjhN+mj9LO4xoOO6P5VuMHyxST9Wd38uLT/LoO/aYFIxGh5yEb3Rpq0llaAfDsJ8hMshHolED4iL65UMbSudzDWqTrA5kD8rR120GCIb7skc3E8gT+G6dFKH6WjBxItbOJa4k/Pfo+WJOj+Plnp6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=WO9nEMi2; arc=none smtp.client-ip=209.85.215.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Wrr5BVzI"
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-3436b2dbfb9so549790a91.0
-        for <linux-block@vger.kernel.org>; Sat, 06 Dec 2025 23:45:07 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="WO9nEMi2"
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-b997ae045b7so237102a12.2
+        for <linux-block@vger.kernel.org>; Sun, 07 Dec 2025 00:16:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1765093507; x=1765698307; darn=vger.kernel.org;
+        d=purestorage.com; s=google2022; t=1765095407; x=1765700207; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ogpv9VihoW4RCSF67gmJdVNoxbffZh1qEXc6QJ6HPIk=;
-        b=Wrr5BVzIp3BrMahYS3PXP535Y6EwazbXm18ilV29EM71wCGwCMoUR04FGUT8GavfLh
-         09JquAknk7fZf7smP9Q2q0/QXNYEUyPRLeQWbbDwuj1BSWcavMRzIxgzJE5tY0G4wshY
-         KIoDlZInRPTcnGmkbMCHl2zFaKa3NAQ/EW761CDUh4xTms4VdHb95UG8ySw7Zb0LXVo3
-         AmKBt8CpD1Hq2c+qhKOsC9NHIEqxvx9TDoB2MsOZ3wUWhQ8jNsnlKD7SV+hWbcltwfrl
-         n12pQSeNzNO7w5BHzPgXbk7Ell7GsXCy5bAM0RY1A5Wcu3JnWDHz7JJyMbLEsjk5TgFn
-         J0XQ==
+        bh=Hwrke6JzMXtJ5GVvCGaMIbP8/r1ZFAhQpEV0JKnWnl4=;
+        b=WO9nEMi23N4idII69r4vhhOLAJHHPstgx5O1sKY0F/Aus3MMzdu0FgR+lwCWfIi8wl
+         jzz02I0GieQ51TqxrrNTUTHNt8Qu01RI+eQXqfJXAyOBFZZt6RqruG5NxQy45477RPKg
+         dqzQVBm9UREMGVRYP9hmXuhSAOSlu5zqV4/U9UilLjELteLMaTJuiYAqt0BwwJe1Gywy
+         NR/Q6bi7TomWVYRej5e5Y8pRyhVV/IVVB8W1ExTlS9tJ9e5MuMeHxuMJRvTAc8H9Q6Xy
+         e4i3C4WHLP71j9DA4oShNlgOeiSN+CqSSkR2SShKPxsRqX6GYDe28i2rsXX6+4WbpSuN
+         OOPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765093507; x=1765698307;
+        d=1e100.net; s=20230601; t=1765095407; x=1765700207;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Ogpv9VihoW4RCSF67gmJdVNoxbffZh1qEXc6QJ6HPIk=;
-        b=O2q5enuK+JgBZwh0nh74bhToWyawN6mZ78uVDpI4RAIiC1xiYghXSYoTB09bXL3/a6
-         FukUs00Ow+UWLQIJ+ifPw+7RgqG8baG+utyvj5cYJJwyigouwUhjK6kVRNC1sGQibV/w
-         wMsd61lveV/qaF+T0HYqPuhBdalsD+r+q8svt9biCi31KP/rHeGluVL/tm9pQdwswoPj
-         bkchztBePHsTMUUfYZ3ND1cgpY7C3I46xucFWmfuRfOqoXeS3Q5MkvVX/sPiP/6GC0Ew
-         K72RP2QtxGvDyb5a92tkgdraaz5X6p+ZUNmxSIAfkadvInITSohzyoo+LdpU3n5CjJeN
-         P6Yw==
-X-Forwarded-Encrypted: i=1; AJvYcCW7ksfmEOCa/j4LK7yfItn+AW/BQR8Uomgp6b6E+lx3DCeiX4UqIM8jbI43WH33Ur+Wxenq/b2ylbzBEA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcmIomdsQEh3LnvdwGS0jlwCu2J6jQo4F2XyH6AMiBatVlRhYo
-	tKgl6eFHfXCliJqojk86FFuob9u9nFtLnRBsSfaIE6wJVG8qs4Tgeyk7g5JqXybY2RtCjlNeTYu
-	gWFATg72YAYPQV12MW+T+8R+DkzAPiuWCdocgR1snRg==
-X-Gm-Gg: ASbGncsykojbgYHcrx4nqMDCZbeCPmvUm72ij0mmIHxRE1wH0TJygt11Wbm90nJF4TL
-	HvO9tO45EFa1CC43QzlHaELi20PjS9ZkvcphAjgl4gPJ/wEhzdxlUo1lbx7+gcch7kcQqzKZfRc
-	qvq1vkBLkTx4b3o8bNKQiPc5lnEDpQTEBK4UGdDSXGJEq3Dl8QBqme8ruwqY7JfiLf0VXYV0COZ
-	BiXoz0/bhCDgTlZgFGo9uiQZSx7v734aTNiCvakpze5NqAzjY9WtZxjeA4/LER7hXoHvN8C
-X-Google-Smtp-Source: AGHT+IFee9PQZ/ZyrNRqbYGSKIF9LPCMQWimGxNwSXR0blfGR8bGMHoKq3u+m5r59we88KqaWvyd1XtgPnopQjLdJuU=
-X-Received: by 2002:a05:7022:6624:b0:119:e55a:95a0 with SMTP id
- a92af1059eb24-11e0326c0bdmr2101684c88.2.1765093506452; Sat, 06 Dec 2025
- 23:45:06 -0800 (PST)
+        bh=Hwrke6JzMXtJ5GVvCGaMIbP8/r1ZFAhQpEV0JKnWnl4=;
+        b=SZWW15qXAje91bHOMZ97sjksUkfoPulUHg9hQFQAeuImd4sF+RqHCBKpFHCNq1QgJK
+         I+FO6S9ng1aSib93E/uOKrSk2RZ+hgNFTKffMPMJvaZv6dWWH0b8ZKuo9tRdr3tBJ/8O
+         8/h4huVD9kr8ivHtSwSKpPQzlIFArwsOX/yYo7JUyqwjVgKp4jALrDJaJ+mhW+bEU4Yd
+         K9IX8HOIL+7mV6+iFkus4U4qV/gwxp51DU6OmYUNGJx/Jg7gK+CaY0PMggGVCFGCvD+j
+         J//vtrHaKBcJc0EfoFQ+sN3jUdmIXtPTr8RkO7N57A4UTfqU8FtJhX5tIIghJRZKkPsM
+         N9aA==
+X-Forwarded-Encrypted: i=1; AJvYcCUnD9F8+vlX8LRlOK5EmwBOQ1P1ZJ+rkehd1J6xIsoV/gddS89WL2auAbb/KgE5TX3Xev1I8W9qnFSyLA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1V2i1A633aYNkyTXvWn+pFkq9GNFxH9HJg2qApYXWTbElLWPX
+	lHCiuUSb/RIYfzCFTjulwDS3mV3xSwP6FOL89qjQRDIU3WNCALAlLcbEPaGDylkY1Rvfu11Fqnw
+	11AWl/vMXudOqibR1Bido/F7nl57MskMHcJHs8BT+jA==
+X-Gm-Gg: ASbGncsS5V+T9NHfu9iV5y+DulX+CGSzxHn0nqEqVwS8Hb0Fto+0HR26yxGrELOJN4l
+	TvMIa49T3PDpNRJu0BT5UZnZSWhVa9eDyAjyyDOSs+CPszT7x/AckCcC32kuX15HmmcVcsTgghb
+	0NxjQCbbUVTB5Hlm5JUviMaJ5ISbiXdopbXgBR/EWNhQyvw7HAOB3MQUg8Grn45DKjcDadJGb2Q
+	2PqwgJDpCRXQjLU+Z0I+ZBa7jc1UhoaIN9M8I4bE+RUbYx6GOAWSA2rjvtQqytnfbeYsY404RbV
+	yoQ0hGE=
+X-Google-Smtp-Source: AGHT+IG71r1tbqkUOyv85T8MuZocWL2L7PVjKWERYAnslxiRj8CGf+3oa7eaRDkhqHF/tgg50rT+Zm1Qu0T8petfhug=
+X-Received: by 2002:a05:7300:641c:b0:2a6:cb65:1974 with SMTP id
+ 5a478bee46e88-2abc710e51amr1788661eec.1.1765095406474; Sun, 07 Dec 2025
+ 00:16:46 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251202121917.1412280-1-ming.lei@redhat.com> <20251202121917.1412280-10-ming.lei@redhat.com>
-In-Reply-To: <20251202121917.1412280-10-ming.lei@redhat.com>
+References: <20251202121917.1412280-1-ming.lei@redhat.com> <20251202121917.1412280-11-ming.lei@redhat.com>
+In-Reply-To: <20251202121917.1412280-11-ming.lei@redhat.com>
 From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Sat, 6 Dec 2025 23:44:55 -0800
-X-Gm-Features: AQt7F2rTodG4grH1-6mrIV9iNejLvj1YsJcaX6ugjxZfUY-538X6BzP616F5Kwk
-Message-ID: <CADUfDZqqR4TBsVdAqd5_MbeBdM3MeB6QtP+9Z38O5S5Ztv_MUA@mail.gmail.com>
-Subject: Re: [PATCH V5 09/21] ublk: abort requests filled in event kfifo
+Date: Sun, 7 Dec 2025 00:16:35 -0800
+X-Gm-Features: AQt7F2rV6Dwkwvus8vcQB4_pMvC4eDVigEomoiIAbTaUQIJDJJARUi3WnIVUw04
+Message-ID: <CADUfDZpN+QWKzhRnS9y1Hvn-jgQ2kd+6GxX5YyNU8gi4sCmpaA@mail.gmail.com>
+Subject: Re: [PATCH V5 10/21] ublk: add new feature UBLK_F_BATCH_IO
 To: Ming Lei <ming.lei@redhat.com>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
 	Uday Shankar <ushankar@purestorage.com>
@@ -76,73 +77,204 @@ Content-Transfer-Encoding: quoted-printable
 On Tue, Dec 2, 2025 at 4:21=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrote=
 :
 >
-> In case of BATCH_IO, any request filled in event kfifo, they don't get
-> chance to be dispatched any more when releasing ublk char device, so
-> we have to abort them too.
+> Add new feature UBLK_F_BATCH_IO which replaces the following two
+> per-io commands:
 >
-> Add ublk_abort_batch_queue() for aborting this kind of requests.
+>         - UBLK_U_IO_FETCH_REQ
+>
+>         - UBLK_U_IO_COMMIT_AND_FETCH_REQ
+>
+> with three per-queue batch io uring_cmd:
+>
+>         - UBLK_U_IO_PREP_IO_CMDS
+>
+>         - UBLK_U_IO_COMMIT_IO_CMDS
+>
+>         - UBLK_U_IO_FETCH_IO_CMDS
+>
+> Then ublk can deliver batch io commands to ublk server in single
+> multishort uring_cmd, also allows to prepare & commit multiple
+> commands in batch style via single uring_cmd, communication cost is
+> reduced a lot.
+>
+> This feature also doesn't limit task context any more for all supported
+> commands, so any allowed uring_cmd can be issued in any task context.
+> ublk server implementation becomes much easier.
+>
+> Meantime load balance becomes much easier to support with this feature.
+> The command `UBLK_U_IO_FETCH_IO_CMDS` can be issued from multiple task
+> contexts, so each task can adjust this command's buffer length or number
+> of inflight commands for controlling how much load is handled by current
+> task.
+>
+> Later, priority parameter will be added to command `UBLK_U_IO_FETCH_IO_CM=
+DS`
+> for improving load balance support.
+>
+> UBLK_U_IO_NEED_GET_DATA isn't supported in batch io yet, but it may be
+> enabled in future via its batch pair.
 >
 > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-
-Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
-
 > ---
->  drivers/block/ublk_drv.c | 24 +++++++++++++++++++++++-
->  1 file changed, 23 insertions(+), 1 deletion(-)
+>  drivers/block/ublk_drv.c      | 53 +++++++++++++++++++++++++++++------
+>  include/uapi/linux/ublk_cmd.h | 16 +++++++++++
+>  2 files changed, 61 insertions(+), 8 deletions(-)
 >
 > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index de6ce0e17b1b..3865edabe1e6 100644
+> index 3865edabe1e6..034420e8df55 100644
 > --- a/drivers/block/ublk_drv.c
 > +++ b/drivers/block/ublk_drv.c
-> @@ -2265,7 +2265,8 @@ static int ublk_ch_mmap(struct file *filp, struct v=
-m_area_struct *vma)
->  static void __ublk_fail_req(struct ublk_device *ub, struct ublk_io *io,
->                 struct request *req)
->  {
-> -       WARN_ON_ONCE(io->flags & UBLK_IO_FLAG_ACTIVE);
-> +       WARN_ON_ONCE(!ublk_dev_support_batch_io(ub) &&
-> +                       io->flags & UBLK_IO_FLAG_ACTIVE);
+> @@ -74,7 +74,8 @@
+>                 | UBLK_F_AUTO_BUF_REG \
+>                 | UBLK_F_QUIESCE \
+>                 | UBLK_F_PER_IO_DAEMON \
+> -               | UBLK_F_BUF_REG_OFF_DAEMON)
+> +               | UBLK_F_BUF_REG_OFF_DAEMON \
+> +               | UBLK_F_BATCH_IO)
 >
->         if (ublk_nosrv_should_reissue_outstanding(ub))
->                 blk_mq_requeue_request(req, false);
-> @@ -2275,6 +2276,24 @@ static void __ublk_fail_req(struct ublk_device *ub=
-, struct ublk_io *io,
->         }
+>  #define UBLK_F_ALL_RECOVERY_FLAGS (UBLK_F_USER_RECOVERY \
+>                 | UBLK_F_USER_RECOVERY_REISSUE \
+> @@ -331,12 +332,12 @@ static void ublk_batch_dispatch(struct ublk_queue *=
+ubq,
+>
+>  static inline bool ublk_dev_support_batch_io(const struct ublk_device *u=
+b)
+>  {
+> -       return false;
+> +       return ub->dev_info.flags & UBLK_F_BATCH_IO;
 >  }
 >
-> +/*
-> + * Request tag may just be filled to event kfifo, not get chance to
-> + * dispatch, abort these requests too
-> + */
-> +static void ublk_abort_batch_queue(struct ublk_device *ub,
-> +                                  struct ublk_queue *ubq)
+>  static inline bool ublk_support_batch_io(const struct ublk_queue *ubq)
+>  {
+> -       return false;
+> +       return ubq->flags & UBLK_F_BATCH_IO;
+>  }
+>
+>  static inline void ublk_io_lock(struct ublk_io *io)
+> @@ -3462,6 +3463,35 @@ static int ublk_validate_batch_fetch_cmd(struct ub=
+lk_batch_io_data *data,
+>         return 0;
+>  }
+>
+> +static int ublk_handle_non_batch_cmd(struct io_uring_cmd *cmd,
+> +                                    unsigned int issue_flags)
 > +{
-> +       unsigned short tag;
+> +       const struct ublksrv_io_cmd *ub_cmd =3D io_uring_sqe_cmd(cmd->sqe=
+);
+> +       struct ublk_device *ub =3D cmd->file->private_data;
+> +       unsigned tag =3D READ_ONCE(ub_cmd->tag);
+> +       unsigned q_id =3D READ_ONCE(ub_cmd->q_id);
+> +       unsigned index =3D READ_ONCE(ub_cmd->addr);
+> +       struct ublk_queue *ubq;
+> +       struct ublk_io *io;
 > +
-> +       while (kfifo_out(&ubq->evts_fifo, &tag, 1)) {
-> +               struct request *req =3D blk_mq_tag_to_rq(
-> +                               ub->tag_set.tags[ubq->q_id], tag);
+> +       if (cmd->cmd_op =3D=3D UBLK_U_IO_UNREGISTER_IO_BUF)
+> +               return ublk_unregister_io_buf(cmd, ub, index, issue_flags=
+);
 > +
-> +               if (!WARN_ON_ONCE(!req || !blk_mq_request_started(req)))
-> +                       __ublk_fail_req(ub, &ubq->ios[tag], req);
-> +       }
+> +       if (q_id >=3D ub->dev_info.nr_hw_queues)
+> +               return -EINVAL;
+> +
+> +       if (tag >=3D ub->dev_info.queue_depth)
+> +               return -EINVAL;
+> +
+> +       if (cmd->cmd_op !=3D UBLK_U_IO_REGISTER_IO_BUF)
+> +               return -EOPNOTSUPP;
+> +
+> +       ubq =3D ublk_get_queue(ub, q_id);
+> +       io =3D &ubq->ios[tag];
+> +       return ublk_register_io_buf(cmd, ub, q_id, tag, io, index,
+> +                       issue_flags);
 > +}
 > +
->  /*
->   * Called from ublk char device release handler, when any uring_cmd is
->   * done, meantime request queue is "quiesced" since all inflight request=
-s
-> @@ -2293,6 +2312,9 @@ static void ublk_abort_queue(struct ublk_device *ub=
-, struct ublk_queue *ubq)
->                 if (io->flags & UBLK_IO_FLAG_OWNED_BY_SRV)
->                         __ublk_fail_req(ub, io, io->req);
+>  static int ublk_ch_batch_io_uring_cmd(struct io_uring_cmd *cmd,
+>                                        unsigned int issue_flags)
+>  {
+> @@ -3509,7 +3539,8 @@ static int ublk_ch_batch_io_uring_cmd(struct io_uri=
+ng_cmd *cmd,
+>                 ret =3D ublk_handle_batch_fetch_cmd(&data);
+>                 break;
+>         default:
+> -               ret =3D -EOPNOTSUPP;
+> +               ret =3D ublk_handle_non_batch_cmd(cmd, issue_flags);
+
+It looks like the non-batch commands still perform the if
+(data.header.q_id >=3D ub->dev_info.nr_hw_queues) check in
+ublk_ch_batch_io_uring_cmd() even though they use struct
+ublksrv_io_cmd instead of struct ublk_batch_io. I think it would be
+preferable to move that check to ublk_check_batch_cmd() and
+ublk_handle_batch_fetch_cmd().
+
+> +               break;
 >         }
-> +
-> +       if (ublk_support_batch_io(ubq))
-> +               ublk_abort_batch_queue(ub, ubq);
->  }
+>  out:
+>         return ret;
+> @@ -4179,10 +4210,9 @@ static int ublk_ctrl_add_dev(const struct ublksrv_=
+ctrl_cmd *header)
+>          */
+>         ub->dev_info.flags &=3D UBLK_F_ALL;
 >
->  static void ublk_start_cancel(struct ublk_device *ub)
+> -       ub->dev_info.flags |=3D UBLK_F_CMD_IOCTL_ENCODE |
+> -               UBLK_F_URING_CMD_COMP_IN_TASK |
+> -               UBLK_F_PER_IO_DAEMON |
+> -               UBLK_F_BUF_REG_OFF_DAEMON;
+
+Why are these reported features removed? This will break ublk servers
+that check for these features in the ublk device flags.
+
+Best,
+Caleb
+
+> +       /* So far, UBLK_F_PER_IO_DAEMON won't be exposed for BATCH_IO */
+> +       if (ublk_dev_support_batch_io(ub))
+> +               ub->dev_info.flags &=3D ~UBLK_F_PER_IO_DAEMON;
+>
+>         /* GET_DATA isn't needed any more with USER_COPY or ZERO COPY */
+>         if (ub->dev_info.flags & (UBLK_F_USER_COPY | UBLK_F_SUPPORT_ZERO_=
+COPY |
+> @@ -4540,6 +4570,13 @@ static int ublk_wait_for_idle_io(struct ublk_devic=
+e *ub,
+>         unsigned int elapsed =3D 0;
+>         int ret;
+>
+> +       /*
+> +        * For UBLK_F_BATCH_IO ublk server can get notified with existing
+> +        * or new fetch command, so needn't wait any more
+> +        */
+> +       if (ublk_dev_support_batch_io(ub))
+> +               return 0;
+> +
+>         while (elapsed < timeout_ms && !signal_pending(current)) {
+>                 unsigned int queues_cancelable =3D 0;
+>                 int i;
+> diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.=
+h
+> index cd894c1d188e..a64b7ee578fb 100644
+> --- a/include/uapi/linux/ublk_cmd.h
+> +++ b/include/uapi/linux/ublk_cmd.h
+> @@ -335,6 +335,22 @@
+>   */
+>  #define UBLK_F_BUF_REG_OFF_DAEMON (1ULL << 14)
+>
+> +
+> +/*
+> + * Support the following commands for delivering & committing io command
+> + * in batch.
+> + *
+> + *     - UBLK_U_IO_PREP_IO_CMDS
+> + *     - UBLK_U_IO_COMMIT_IO_CMDS
+> + *     - UBLK_U_IO_FETCH_IO_CMDS
+> + *     - UBLK_U_IO_REGISTER_IO_BUF
+> + *     - UBLK_U_IO_UNREGISTER_IO_BUF
+> + *
+> + * The existing UBLK_U_IO_FETCH_REQ, UBLK_U_IO_COMMIT_AND_FETCH_REQ and
+> + * UBLK_U_IO_NEED_GET_DATA uring_cmd are not supported for this feature.
+> + */
+> +#define UBLK_F_BATCH_IO                (1ULL << 15)
+> +
+>  /* device state */
+>  #define UBLK_S_DEV_DEAD        0
+>  #define UBLK_S_DEV_LIVE        1
 > --
 > 2.47.0
 >
