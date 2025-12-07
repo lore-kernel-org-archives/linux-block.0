@@ -1,169 +1,80 @@
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE6131E991B
-	for <linux-block@vger.kernel.org>; Sun,  7 Dec 2025 10:04:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 273EE22C32D
+	for <linux-block@vger.kernel.org>; Sun,  7 Dec 2025 11:23:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765101872; cv=none; b=BOr9RX/fnfPyAqwDtSuucqJJOi6GQyNaxw4D8VtriUWHILPvkidiIRtFWTxkcr6NxtZAtkbW4beC0o3bpD8krAEKJkU4evlbtMKQZQss9fYRjzPhTz5Rd4OgTRQUQdTvBcHDX4pHP3hP6ioFmftuigXc1KPtJTRPr5PT72bhlfo=
+	t=1765106596; cv=none; b=O5UgbBH1xt1+iZ9HJnkBm+FNGdVaeHu55K0WnyjMTspOgY6dRQH3pWqWuIs4LnBJOrn5Q6JAHHtyhc2nV1ZAUdgDoSlUK9OnC23v//JYzENNdChbAFS52fNjoyrcD/1R+obrGIDbj495UwKpcE9iMmkXPh4IA4gMcl9CR0GxJMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765101872; c=relaxed/simple;
-	bh=oU+vvCeHMKSGHwu1ci54jpS3s8eATvZ3aiVnEThBVIc=;
+	s=arc-20240116; t=1765106596; c=relaxed/simple;
+	bh=e9HBNQgjUh1rsH/YnTHVmfpzTgApm/xoqNTylAfXTcg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Y5/X/ar3ZsiFvUt/L9PxqeW6j6PVEPDVcsuqG+cNmkxuMAoFwoVR93iEWkCTrWqZg5ts4IOSTnR+BXkEq4uNisDmfQVTVs2G9rIcaCupxEfU/sTPEFZV5ys3th45aTeUZFun2XCPp10IKpvvzNmm4nWBHIx4jDiEbEGCoJ8hRQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RSQIzmnW; arc=none smtp.client-ip=209.85.222.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=p4Nk1c8JQpGhidy8d5OEuFg1lg/1VCj/oNk90QctwGYt/2mviMNJHtwEI/X+vv+Dfjqy0NPLOE0L+j5KwbVVUITSxlT/cAk3KLYV4uI9vdGFoLSD9worQypmfzsdRCM7RN0Sfuc9qH4E1OiQ7hjKgchwhr+586Fga4uWk9+CNSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nowSBs0H; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RSQIzmnW"
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-8b2627269d5so293010985a.2
-        for <linux-block@vger.kernel.org>; Sun, 07 Dec 2025 02:04:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765101870; x=1765706670; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oU+vvCeHMKSGHwu1ci54jpS3s8eATvZ3aiVnEThBVIc=;
-        b=RSQIzmnWj4khIOTf0dWLfD3/Kb647t/nCWk2E4sHXhw+mItmDj9ehTOnAUPSQE0U04
-         h7ubqgDAHGu4fblNFF8M4DsRTwJ/fMtrS+aMJkIbmkFcIYudx9JHLrhvhRQ5T7mBBcaD
-         3ATRVYkW9o5UxUypUahcEjFc0IzsUWPOU8ziilHmECruvt6zvSdNnzQLW82BWsRyWrEX
-         82vUbCk4zTJTIzu3XdvKgpQLcNUFKIl5CnjJHW/0mjyhxGlH4YjgAv3xJ9dy4gKJ0Vbv
-         qzywEokoZv9Vem/8ztVxKyS3FuyLzJlkwP9FX0WoYD0tlWfzdXppkLD5rLIfek7uMvbn
-         7MWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765101870; x=1765706670;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=oU+vvCeHMKSGHwu1ci54jpS3s8eATvZ3aiVnEThBVIc=;
-        b=bLio4c8Ag3mF6Oh6Wbrn4YokWB/Y4PB4hz9KMXCbA+2t/hCPzFd21swzlekewkKt8I
-         cODu1FmBt4LO0PsZ4cWNhkk1Z6hy3Q4BhzNvST9wXz7x4p0Gdw25yUlMy+fyNhuDvi+P
-         aSzDgU9SFpmgupaNbCBcvc7goFUIEBUlznhJWfEjFdel0Xf7w6VnlsDJJsTouzNjUR2o
-         jtxkn5YirNmg6dTa/2fEv6bJJ4DKwVrEOU3X4b4IHSuMBJrnBTxMiA5OL3txtEY277lv
-         Q/cTH3+iITI7gpeGmxLdwsKo4Yfjnz9WjYSE82GwJWS1YpUEq0Wx33a68OVAoEDK+riL
-         kevg==
-X-Forwarded-Encrypted: i=1; AJvYcCU6FYItVm0lYr2ImVs0eF8QcBr0QR/pF1D+qDdGEz6PH6M8wwNzukPW8/jwUBlXsmK56Sc7JZx+o8j4NQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwfnwWdBeLboU40kBFE3ArLFXhw8jbruGiC6tNZMfsSt2wthGM2
-	OU82FJI7srNcmPc15mZoRAkm9yKKmV9/VQh2b9VSuFDQxkzeyzDDdjuo2YXQTijgl7iOB2Kzrm8
-	/uJ3eGZZW6+4u9qzMIa4o4A6EF0UbwOc=
-X-Gm-Gg: ASbGncsqdvbO0sUU25iC8oPIi1zYuyeNryGW9SM1TI8N/DRhS0sKQhW2UCISy8CBbJz
-	/QQt8BoyWeUsMrshf8TGMfwVfNvVuoAqQXdONs2XjyUkv3H7kukkI97eL8Du/pw7sZgegv0bvF9
-	RDbrUWUWZeblTpEDfy7om6rMERwn1sy6MXAh+oFIVTJK9k8SO6oW5lFnSX6thZb4zL3Ay2T12Cx
-	JXggev9IMRZ+HG5aM1jITKRt6fAputp7O3LitTbnmCiUR0uWRwtgHDL8RCcv9U1YpNzMq4=
-X-Google-Smtp-Source: AGHT+IFyS19gciaAgZhRx4HvH1R1sNPMXGO05IWdCy0tyufd5AG5DROw9tSZhuIt2ZeFQYvOMOepLj8Zf3YwFI1IGTs=
-X-Received: by 2002:a05:622a:1249:b0:4ed:aeaa:ec4d with SMTP id
- d75a77b69052e-4f03ff48c23mr65405971cf.77.1765101869874; Sun, 07 Dec 2025
- 02:04:29 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nowSBs0H"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CED0FC19421
+	for <linux-block@vger.kernel.org>; Sun,  7 Dec 2025 11:23:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765106595;
+	bh=e9HBNQgjUh1rsH/YnTHVmfpzTgApm/xoqNTylAfXTcg=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=nowSBs0HbbS4urUlI7eYDqEYmuJDXW8ZrfFhjgtwu2Xq75ZoEXRhR45fhM+VFoDXc
+	 uL5cqzoV+VaeQ57grcpYNykmZbgf/SYkCYh/W59pWZecf1WkbWYlqoVe99AklzrWwj
+	 sIkmKamplwlPjg/Bl32KqFP3sQEM0igjAbV/4zRqiAzeaNM3LK4U83lOvYveYucBTK
+	 tPWLkvfpOQf0E/a/JIp0PCedL0D68FkTx8FiFMbBBNtMRu12q+p8AGM7qLl31QY/cd
+	 7g4Cm0qsFaZfIGyWh+5vj7+8S98xN6xKbpItlu/uJD4l+p3OO2ycoKxmy2O4BH5ULn
+	 iL83ZPjLfsfgA==
+Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-7c6dbdaced8so3113965a34.1
+        for <linux-block@vger.kernel.org>; Sun, 07 Dec 2025 03:23:15 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWHE+btry/WxX4d4QGrWbk8YRRgQHJHz9nSm5oGIoXzmZDQK6kVoi0yUlk2TpdaOtsDzeAFAh7QYEePtg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7oBCBhk6rc8NiMO9NNTPWW+chPoIDj/LP5S9BAqSLq/Z2zxLY
+	oKNAdwc831lxkozp04aW3IHIhbPHlYN62GgdLRmKR0cXRfAkrZRzNcwugriyry3lkm3IQOtoZZQ
+	ybB5KgGNomOcDUO1lC4BsTeNEyOdq2uo=
+X-Google-Smtp-Source: AGHT+IFOqX6bOvqk1FUQ9VHLw8abr4UWv14E6gdAhuKmEwnGkoicIKL75B0LBMR8Kohk2nJgzKZB1a/DQtki1s71fcA=
+X-Received: by 2002:a05:6820:1b19:b0:659:9a49:8f3f with SMTP id
+ 006d021491bc7-6599a999b0emr2140301eaf.80.1765106595174; Sun, 07 Dec 2025
+ 03:23:15 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251128083219.2332407-1-zhangshida@kylinos.cn>
- <20251128083219.2332407-7-zhangshida@kylinos.cn> <CANubcdUtncH7OxYg0+4ax0v9OmbuV337AM5DQHOpsBVa-A1cbA@mail.gmail.com>
- <CAHc6FU5DAhrRKyYjuZ+qF84rCsUDiPo3iPoZ67NvN-pbunJH4A@mail.gmail.com>
- <CAHc6FU57xqs1CTSOd-oho_m52aCTorRVJQKKyVAGJ=rbfh5VxQ@mail.gmail.com>
- <CANubcdVuRNfygyGwnXQpsb2GsHy4=yrzcLC06paUbAMS60+qyA@mail.gmail.com> <CAHc6FU4G+5QnSgXoMN726DOTF9R-d88-CrfYMof0kME6P_o-7w@mail.gmail.com>
-In-Reply-To: <CAHc6FU4G+5QnSgXoMN726DOTF9R-d88-CrfYMof0kME6P_o-7w@mail.gmail.com>
-From: Stephen Zhang <starzhangzsd@gmail.com>
-Date: Sun, 7 Dec 2025 18:03:53 +0800
-X-Gm-Features: AQt7F2r1YNFWGA2Q9VwdNr_tG5KYi4lqES_2HjNJQ6tE7fdz6CI5_Dt06IQV2e4
-Message-ID: <CANubcdVAitTW_aBqwxC=TV77rg_iie0uX54_qEtMCjgdN+zeig@mail.gmail.com>
-Subject: Re: [PATCH v2 06/12] gfs2: Replace the repetitive bio chaining code patterns
-To: Andreas Gruenbacher <agruenba@redhat.com>, sashal@kernel.org
-Cc: Johannes.Thumshirn@wdc.com, hch@infradead.org, ming.lei@redhat.com, 
-	Gao Xiang <hsiangkao@linux.alibaba.com>, linux-block@vger.kernel.org, 
-	linux-bcache@vger.kernel.org, nvdimm@lists.linux.dev, 
-	virtualization@lists.linux.dev, linux-nvme@lists.infradead.org, 
-	gfs2@lists.linux.dev, ntfs3@lists.linux.dev, linux-xfs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, zhangshida@kylinos.cn
+References: <20251126101636.205505-1-yang.yang@vivo.com> <82bcdf73-54c5-4220-86c0-540a5cb59bb7@vivo.com>
+ <CAJZ5v0hm=jfSyBXF0qMYnpATJf56JTxQ-+4JBy3YMjS0cMUMHg@mail.gmail.com>
+ <12794222.O9o76ZdvQC@rafael.j.wysocki> <fcecd822-a2ec-43e6-8dc4-290516e2187d@acm.org>
+In-Reply-To: <fcecd822-a2ec-43e6-8dc4-290516e2187d@acm.org>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Sun, 7 Dec 2025 12:23:04 +0100
+X-Gmail-Original-Message-ID: <CAJZ5v0iT_SgQPP6R8Ys37h80Db7aDu7o0UaVW1EeiN=TtV+Lbg@mail.gmail.com>
+X-Gm-Features: AQt7F2oRevcA5FNEmmTCrFU3lKMiva1wqDaOG8IVl98MO5Xc4XUdEPXLwm3X7zc
+Message-ID: <CAJZ5v0iT_SgQPP6R8Ys37h80Db7aDu7o0UaVW1EeiN=TtV+Lbg@mail.gmail.com>
+Subject: Re: [PATCH v2] PM: sleep: Do not flag runtime PM workqueue as freezable
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: "Rafael J. Wysocki" <rafael@kernel.org>, linux-pm@vger.kernel.org, 
+	YangYang <yang.yang@vivo.com>, Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Ulf Hansson <ulf.hansson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Andreas Gruenbacher <agruenba@redhat.com> =E4=BA=8E2025=E5=B9=B412=E6=9C=88=
-5=E6=97=A5=E5=91=A8=E4=BA=94 16:55=E5=86=99=E9=81=93=EF=BC=9A
+On Fri, Dec 5, 2025 at 8:11=E2=80=AFPM Bart Van Assche <bvanassche@acm.org>=
+ wrote:
 >
-> On Fri, Dec 5, 2025 at 8:46=E2=80=AFAM Stephen Zhang <starzhangzsd@gmail.=
-com> wrote:
-> > Andreas Gruenbacher <agruenba@redhat.com> =E4=BA=8E2025=E5=B9=B412=E6=
-=9C=884=E6=97=A5=E5=91=A8=E5=9B=9B 17:37=E5=86=99=E9=81=93=EF=BC=9A
-> > >
-> > > On Mon, Dec 1, 2025 at 11:31=E2=80=AFAM Andreas Gruenbacher <agruenba=
-@redhat.com> wrote:
-> > > > On Sat, Nov 29, 2025 at 3:48=E2=80=AFAM Stephen Zhang <starzhangzsd=
-@gmail.com> wrote:
-> > > > > This one should also be dropped because the 'prev' and 'new' are =
-in
-> > > > > the wrong order.
-> > > >
-> > > > Ouch. Thanks for pointing this out.
-> > >
-> > > Linus has merged the fix for this bug now, so this patch can be
-> > > updated / re-added.
-> > >
-> >
-> > Thank you for the update. I'm not clear on what specifically has been
-> > merged or how to verify it.
-> > Could you please clarify which fix was merged,
+> On 12/5/25 5:24 AM, Rafael J. Wysocki wrote:
+> > For example, it has been reported that blk_queue_enter() may deadlock
+> > during a system suspend transition because of the pm_request_resume()
+> > usage in it [1].
 >
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit=
-/?id=3D8a157e0a0aa5
-> "gfs2: Fix use of bio_chain"
->
->
+> System resume is also affected. If pm_request_resume() is called before
+> the device it applies to is resumed by the system resume code then the
+> pm_request_resume() call also hangs.
 
-Thank you for the detailed clarification. Here is a polite and
-professional rephrasing of your message:
+Rather, the work item queued by it will not make progress.
 
----
+OK, I'll add this information to the patch changelog while applying it.
 
-[WARNING]
-Hello,
+> Otherwise this patch looks good to me.
 
-I may not have expressed myself clearly, and you might have
-misunderstood my point.
-
-In the original code, the real end I/O handler (`gfs2_end_log_read`)
-was placed at the end of the chained bio list, while the newer
-`bio_chain_endio` was placed earlier. With `bio_chain(new, prev)`,
-the chain looked like:
-
-`bio1 =E2=86=92 bio2 =E2=86=92 bio3`
-`bio_chain_endio =E2=86=92 bio_chain_endio =E2=86=92 gfs2_end_log_read`
-
-This ensured the actual handler (`gfs2_end_log_read`) was triggered
-at the end of the chain.
-
-However, after the fix changed the order to `bio_chain(prev, new)`,
-the chain now looks like:
-
-`bio1 =E2=86=92 bio2 =E2=86=92 bio3`
-`gfs2_end_log_read =E2=86=92 bio_chain_endio =E2=86=92 bio_chain_endio`
-
-This seems to place `gfs2_end_log_read` at the beginning rather
-than the end, potentially preventing it from being executed as intended.
-
-I hope I misunderstand the gfs2 code logic, and your fix may still be
-correct. However, given how quickly the change was made and ported
-back, I wanted to highlight this concern in case the original behavior
-was intentional.
-
-Thank you for your attention to this matter.
-
-Best regards,
-Shida
-
-
-
-
-> > and if I should now resubmit the cleanup patches?
-> >
-> > Thanks,
-> > Shida
-> >
-> > > Thanks,
-> > > Andreas
-> > >
-> >
->
+Thank you!
