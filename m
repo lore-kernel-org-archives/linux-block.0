@@ -1,48 +1,48 @@
-Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
+Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17ABC29ACF7;
-	Mon,  8 Dec 2025 19:22:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B6CC2E7F3F;
+	Mon,  8 Dec 2025 19:28:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765221769; cv=none; b=USPjc35M2/Bjif1bbKXk4EsgyYjy67487DnWXitYKG7LOnfVowtYpN1ktGT2AD6JviKcmi9KJxxtsnqpaqRdnhLm7lb3dz0/D23xWfonXLCKRHKMjgy6JfgTbjJZ72K7iEcvZNgwDD0pV5wMZ5tmiEMuKr7Jcpr6gy723lD5tdY=
+	t=1765222117; cv=none; b=rD2L3q4XW8YUe4RY5I6pSMJLcONds95AKUnZkRMzc7zBk/0opTctLVM74oyGIGb0HiwJiWXfn903pxm/gvgka0VM4f/CAzLoDY5QkkIVuSJDM55wrDSzbxmS8ttrdwTBDU5xaKcvcv0sWhmoDtgIy4OrtFhq57bKd6RnHUBgcGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765221769; c=relaxed/simple;
-	bh=mNuj5LwPWF/jYu6CvXbhyKwkzLa9BtQBSbG1QwBw+3c=;
+	s=arc-20240116; t=1765222117; c=relaxed/simple;
+	bh=HDG2uAXVi3aBUveh41tkplU2mdOLTj6LlZHJwXiWifk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DNq6Vx2p6sECPfz9rbGofI3xs8zyacQlmSl6Ki+2+CVIOkYfHE7V/1QzwlW3xSWWYn0UE8Yyby8INjLtZQwqghP4YT4o2a/rNus5ZO02XY3nwef27Oy866kgQpEVbj/ZjIKAfOknSOMBwHsBwDZQYXZoa00VJEuyNZehS0K/xt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=MNIo/rCg; arc=none smtp.client-ip=199.89.1.14
+	 In-Reply-To:Content-Type; b=pfyvb8FI5k/D/HJJjp6HbV0MlN9WuQmNRlk74yIpOVK9/MGtRTGwUI4Utz2GEHFhKaU3lZbQOgNug7fyjeQEfYW/40OYUo2tDGGuX0KF626qZHWqHgAlHHLk0+VXfAJncSr9i/WALQCgvVZYi+x+OcAz8t19NUlGx7o138WQqnI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=b9fAYPba; arc=none smtp.client-ip=199.89.1.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="MNIo/rCg"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="b9fAYPba"
 Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4dQBhK3tPRz1XM0pl;
-	Mon,  8 Dec 2025 19:22:41 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4dQBq74rTlzllB6W;
+	Mon,  8 Dec 2025 19:28:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:content-type:content-type:in-reply-to
 	:from:from:content-language:references:subject:subject
 	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1765221758; x=1767813759; bh=PvtBCN8q7OJHTmZPU/1Pvq3W
-	WRAphxJgKeW0vRrevtM=; b=MNIo/rCgdYiwN8mRWKxBEqCy5/qxUG2dLgqnXhq6
-	SP9gsLIQUYXfLm/OSeUGMkLmtmUyD6cXtRKo6U39hH16BzLR+F2nnRWnZjiQyjEG
-	+8peEO7LV5QANPpdCkGNylsIz4WQfaJRxZbatoM15inLdnR041nIuYOnEQvll2pY
-	De5FahEfwAg9XBAWsMVWWXAtVsXFqq23BImDxpJGBRIczxCfXnYoknDSb47R3tRg
-	E1NsVJpcTPVKt+5MZGky6BPCIllhgjEEnX4Jion15JPI5zPhcoFYzet8Ac18mTvU
-	HapCtboazPEDJwyM2RD26+B6R3ZGcQkxiILAKOMqZvmgEw==
+	 s=mr01; t=1765222112; x=1767814113; bh=HDG2uAXVi3aBUveh41tkplU2
+	mdOLTj6LlZHJwXiWifk=; b=b9fAYPbaqu7ggMD7kMyMnXKY7btF9Igt3HnAVlhq
+	l6d8nhs+OaR90pdkfB4/yTy089e3+907XiWDXyiMTQifwBWa5sJihnrBm4Gzz3fz
+	/oTULTg2YY37EGjOZsYgF5O+bxFQq8cM/FJJn9TOkk931ccSyxbyGh8tvZnJ8U4R
+	gdPlkOxWYr4e8NEJqS4yGw45efTeDna8r9JZiOhgtIWdt7s/O2S4KOU9doIb0ptV
+	eQmvi1zb8Bc0dVZO9UYhw/DpnKMAU7+H6Me2R/fY7f+pMVAozpCqTz52gzeToTGM
+	kpRK+te3CvjrLESeUJ2ZsMEdRWkkGVAquNXbzexmdKHi9Q==
 X-Virus-Scanned: by MailRoute
-Received: from 011.lax.mailroute.net ([127.0.0.1])
- by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id E80-xswuVyhH; Mon,  8 Dec 2025 19:22:38 +0000 (UTC)
+Received: from 013.lax.mailroute.net ([127.0.0.1])
+ by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id 5RbHWmiYFzdk; Mon,  8 Dec 2025 19:28:32 +0000 (UTC)
 Received: from [100.119.48.131] (unknown [104.135.180.219])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4dQBhC0SVyz1XM0pk;
-	Mon,  8 Dec 2025 19:22:34 +0000 (UTC)
-Message-ID: <f24709c4-ba5e-4fb8-b20a-883d14185b2f@acm.org>
-Date: Mon, 8 Dec 2025 11:22:33 -0800
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4dQBq05xgrzllB6J;
+	Mon,  8 Dec 2025 19:28:28 +0000 (UTC)
+Message-ID: <3e559a9d-9867-4262-903f-d54e37141d38@acm.org>
+Date: Mon, 8 Dec 2025 11:28:27 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,64 +50,31 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/1] block: Use RCU in blk_mq_[un]quiesce_tagset() instead
- of set->tag_list_lock
-To: Keith Busch <kbusch@kernel.org>
-Cc: Mohamed Khalfella <mkhalfella@purestorage.com>,
+Subject: Re: [PATCH v4 1/1] block: Use RCU in blk_mq_[un]quiesce_tagset()
+ instead of set->tag_list_lock
+To: Mohamed Khalfella <mkhalfella@purestorage.com>,
  Chaitanya Kulkarni <kch@nvidia.com>, Christoph Hellwig <hch@lst.de>,
- Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
- Casey Chen <cachen@purestorage.com>, Yuanyuan Zhong
- <yzhong@purestorage.com>, Hannes Reinecke <hare@suse.de>,
+ Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+ Sagi Grimberg <sagi@grimberg.me>
+Cc: Casey Chen <cachen@purestorage.com>,
+ Yuanyuan Zhong <yzhong@purestorage.com>, Hannes Reinecke <hare@suse.de>,
  Ming Lei <ming.lei@redhat.com>, Waiman Long <llong@redhat.com>,
  Hillf Danton <hdanton@sina.com>, linux-nvme@lists.infradead.org,
  linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20251204181212.1484066-2-mkhalfella@purestorage.com>
- <5450d3fa-3f00-40ae-ac95-1f08886de3b6@acm.org>
- <20251204184243.GZ337106-mkhalfella@purestorage.com>
- <71e9950f-ace7-4570-a604-ceca347eea20@acm.org>
- <20251204191555.GB337106-mkhalfella@purestorage.com>
- <77c5c064-2539-4ad9-8657-8a1db487522f@acm.org>
- <20251204195759.GC337106-mkhalfella@purestorage.com>
- <6994b9a7-ef2b-42f3-9e72-7489a56f8f8e@acm.org> <aTH8opTiwJxH2PMA@kbusch-mbp>
- <201a7e9e-4782-4f71-a73b-9d58a51ee8ec@acm.org> <aTI2L6j50VWjp7aW@kbusch-mbp>
+References: <20251205211738.1872244-1-mkhalfella@purestorage.com>
+ <20251205211738.1872244-2-mkhalfella@purestorage.com>
 Content-Language: en-US
 From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <aTI2L6j50VWjp7aW@kbusch-mbp>
+In-Reply-To: <20251205211738.1872244-2-mkhalfella@purestorage.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 12/4/25 6:32 PM, Keith Busch wrote:
->   static void blk_mq_del_queue_tag_set(struct request_queue *q)
->   {
->   	struct blk_mq_tag_set *set = q->tag_set;
-> +	struct request_queue *shared = NULL;
->   
->   	mutex_lock(&set->tag_list_lock);
->   	list_del(&q->tag_set_list);
-> @@ -4302,15 +4305,25 @@ static void blk_mq_del_queue_tag_set(struct request_queue *q)
->   		/* just transitioned to unshared */
->   		set->flags &= ~BLK_MQ_F_TAG_QUEUE_SHARED;
->   		/* update existing queue */
-> -		blk_mq_update_tag_set_shared(set, false);
-> +		shared = list_first_entry(&set->tag_list, struct request_queue,
-> +					  tag_set_list);
-> +		if (!blk_get_queue(shared))
-> +			shared = NULL;
->   	}
->   	mutex_unlock(&set->tag_list_lock);
->   	INIT_LIST_HEAD(&q->tag_set_list);
-> +
-> +	if (shared) {
-> +		queue_set_hctx_shared(shared);
-> +		blk_put_queue(shared);
-> +	}
->   }
+On 12/5/25 2:17 PM, Mohamed Khalfella wrote:
+> blk_mq_{add,del}_queue_tag_set() functions add and remove queues from
+> tagset, the functions make sure that tagset and queues are marked as
+> shared when two or more queues are attached to the same tagset.
 
-Although harmless, with this approach the queue_set_hctx_shared() calls
-by blk_mq_del_queue_tag_set() and blk_mq_add_queue_tag_set() can be
-reordered. I like Mohamed's approach better because it results in code
-that is easier to review and to reason about.
+The above is hard to understand and probably should be split into two
+sentences. Otherwise this patch looks good to me. Hence:
 
-Thanks,
-
-Bart.
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
