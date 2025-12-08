@@ -1,216 +1,218 @@
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DDB1214813
-	for <linux-block@vger.kernel.org>; Mon,  8 Dec 2025 20:29:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E5621423C
+	for <linux-block@vger.kernel.org>; Mon,  8 Dec 2025 21:10:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765225794; cv=none; b=S3LrC0pKV4guPQQ50EQbRycCAon1lhHhpUtApaoWgdV1a7D26jQ6tGo/W57aBl/+EVSryAwK4au8MA3GAbq0Ixm/RZRZRLPVMg3S81wP7yy6H5HJmr7IoWH3P4QlSvT4TeLUYMVH7FFOVkYO497ifZ+VTmmJJhXLJ/3el+ON/rM=
+	t=1765228234; cv=none; b=QvuMS/XUEKCw4CcZasH4a1guo/7Z98YYOe7w/vT9w8GDSjU3jM9vlwNvlEuYzLE9XQ/pW6H4bWk5rwtmYeabaTBmKBBDDvEHkIJv+lBdvaSR+ftErTtgCDTSU1QUSFPXwQRkqVdTXCwsu8CE9Ag4j6dUgEpvx2bLZMcyMQUeL3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765225794; c=relaxed/simple;
-	bh=W27Dgxi6+K08jq+FbG6mEvmtSoPV1I5/ECX/oBAc+rM=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=VUF8bh8EEI/RQ4cQpdAllZXgwOl5GiCys6OvTlbY3dDAs8CZZRZaRbfQ+8uW0fZS3AzaXDdmjvgEuc1Bg8OxClRBqZLt6e0A+2Brjb6dgPjrARJDUpQQVkkd0gyaKQyE0wqFZH9/O/TiWmIqrVzFJEaHqt7meJ/6z1FvQ3d8Pmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Q8DZdwYJ; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1765228234; c=relaxed/simple;
+	bh=hUBPSpknxd6Fnb8XjPkFOpRoeCovjuBPVKgLmViY/ns=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AhyHz/ugNGAPVCI3qbr9VwGgabAuB+I2eAbaA9Cg0venesDH1wekks/abwtGDr1ALmylY+WtAuqy83jzSZ6mYYMWwb6RsIT4MMRv42JyZJx263rnmWrtYIlx9nSiHwnYnhoh6k3yd/FVNHGRXkIwdZDH61U5Z6XlSLjQr6f0gL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=WhTWoJ74; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Q8DZdwYJ"
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-7e1651ae0d5so3590233b3a.1
-        for <linux-block@vger.kernel.org>; Mon, 08 Dec 2025 12:29:50 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="WhTWoJ74"
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-297dfb8a52dso6390735ad.0
+        for <linux-block@vger.kernel.org>; Mon, 08 Dec 2025 13:10:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1765225790; x=1765830590; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+        d=purestorage.com; s=google2022; t=1765228232; x=1765833032; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=TKx3nA48r5FIPTwFA5MAiW0YP9PNTZEtL1AbQMhVfn8=;
-        b=Q8DZdwYJ+56X+sDU4qMl5IOAarrSWLfCz0lEBU4cXGCQ/x+Q+FUCVKn12AvNWxb5gN
-         JCZkBBuFvoI7mcHMfrdBmONKynipZq9eOboWwMDy85OAcGMtObePKlxQyKUieqoJpsOq
-         t1qymnaC8cT+z9c95RYEP5ThoN3RY9+63bWFkX8ox0HSYip3X0WI6860PJF5kI7ZFuIm
-         qmZyiM89235aXpx46Ub8yV8P4jRoVEnJP2sCku/DjGLnTRDX8wSOhj9GHa9cRDYI8O2q
-         WRYb4B5R3TJ2EcTIsGi+Okkusne11w0ByNIMTmow9QXo1mi1RLaeGS30/fe13tfVz4i7
-         N/Ig==
+        bh=RKEEKiiguUhPkICvRBcr0ZTtMhxwysYUkVureTP5zH4=;
+        b=WhTWoJ74xB4zJjlhlQoBtr1VsPBbdJ/5VGtIBAL2Rk/obJJ4XCYAYxg9G1pW7Bpb2Q
+         EF0fV6+bl9yHfFjACgW1uCq25B2TiLP7XpgYQOikZESFczeXcLj6uMukg6T3jyxAWgRs
+         e9MKm/8Ydb/MIyBwxAOUvQavExKRqPvFpl/EeKIw8qTPJEUapU0MeLsWnkFf3MaUsW8e
+         GBaAX7mCY5ZXhq/NXNe3o2fAvFR3mxuLQV5DLPEsEdz5zM0reUe1w1Kq5/C+oBdWK3p4
+         69EbpMFBoluFPjpiFGLED6dnwsB4Iy7xVSZNsMplSAxlwqo0YnoHLvnM3BApWKGoxmwo
+         vQ1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765225790; x=1765830590;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=TKx3nA48r5FIPTwFA5MAiW0YP9PNTZEtL1AbQMhVfn8=;
-        b=LwJrPx4N7NNnyMekXAcogP8wCLX9LR10m1jqAro2uXXADwq5irobgBxnQ34jZjn1J3
-         7nXwZ3PAggZC013V2UMkgavejuo3pc+DVFfdP1buuVS2JysvLk/rV6w1irEwFhwpJpQN
-         PEAfZuem4ddcSc+VUPn+8b4AqWtkI9GsKEpEeOG5wkRgdfDIIP1cdE3SbbLGCY8UEDzA
-         RBt1ZQEDTqD+Nxoey/ea/2eC0ngnn2Z2IqVRn/cOG1s3vPvDD7uus4J0fLA6/b2NnKq4
-         OE8UWvpp60JML9CVo4nMUDzDvJTRI+8ECugwKFZF7nu0tuNkT7KAVRg5+Tz34TiLzmdA
-         bR/g==
-X-Gm-Message-State: AOJu0YzFdwx9JvPno2VGoZvHkiPsnlw2s4RkeBqvoMaLpaM2SQqWP1UK
-	THwmRGy9EYwmU+FGwH1wlDU9j+beTvxyQkHE6CzUg+nOByoZy1Ect1k8QtEJnDCWK4nVyxz7DZ9
-	Tp1GV
-X-Gm-Gg: ASbGnctxTcabedsJkFtLnxTvfSaKaESCVJ0mTmL1JSlN+k9gVGXD6nt28D+cyqqyb8U
-	t/CZw9w6pmzNbJF/+7SxQ7SwC1sDGOK4hi912+X6eQL/DkTFI/T5cduLKebSv2UpSkacIrHsfwp
-	krgQNotKPWLkSnqMu0BdBX341urkeoBdahTCeVeyBv2eDxvSncJQ3xlVKDqvvBjEdiBmXcrvUVB
-	f7ck6uej4wBY0CWNrI/l9HDoxkwlraMoKX7p9Fjm4OIsQzGN5GGvr4CVXk1hJY0heiJZxj7SHOo
-	dgtADjbmb91FvsSPY14bpRcJ54T/jC1/heridtgXOnyjCzfSW4oIKrTPNgSFfW2rkSJbBBKCpe/
-	ldukXlTrp8ycOlgo9ZvGTPF3fLsQ0bYXbyKL4FWBVdUmwp5qc3VaaPl0DS6L0dBn8RDfSAmkwip
-	TQC7h6CsEYwapEyOCts2LTfPGFLPYP8JffAh0=
-X-Google-Smtp-Source: AGHT+IFx2/0gr34rk5sIhWFl8Z6fbjYX/9qKd4YeFpFQjcleGF6aRxxtIq55iGQuUyev22sm3orhng==
-X-Received: by 2002:a05:6a20:7288:b0:366:14b2:30c with SMTP id adf61e73a8af0-36618021d33mr9072892637.63.1765225789686;
-        Mon, 08 Dec 2025 12:29:49 -0800 (PST)
-Received: from [172.19.130.138] ([164.86.9.138])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-bf686b3e683sm12867375a12.8.2025.12.08.12.29.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Dec 2025 12:29:49 -0800 (PST)
-Message-ID: <34687025-4ddd-4d54-a910-557eb9090566@kernel.dk>
-Date: Mon, 8 Dec 2025 13:29:37 -0700
+        d=1e100.net; s=20230601; t=1765228232; x=1765833032;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=RKEEKiiguUhPkICvRBcr0ZTtMhxwysYUkVureTP5zH4=;
+        b=R68Ma8pzN0DVYNaYJfWvtFhiZl3zjT2ETznax6sSHOFI3Drxxqk93LL+PDx9aT3ruk
+         MQp29CW8NyvrS+7L2hp226rNjUrS0JJ+17p7gh4J0YYoqS7GOaScC4OHRjJvSRFdgzB/
+         95laCRufIX/yuNJl68PQxfZfJ97KIpkJXtT6YfMD3YzzqDOg0jrnmIXIZ7lISWFc8c0Y
+         hNlol0QQnGf4HPe4mmsyVQtxZJPIohdk3iBgAdvhENyPvuFSvOCXpD4DeQ0DrZc3Gzj3
+         kE8kTXxRSw9EbsojHJrC6GCMMQonnrLOW4hA8/PeJiN/K3gjyIV2rX2aKUaY+W/MuTmE
+         CyIA==
+X-Forwarded-Encrypted: i=1; AJvYcCXVKVcXvAS/ShIgeG5K+VazKAftSjbkbueFs2mdR62NA78XsUU7CiytXkqvKVnncFG9V3BNajcP7JXgjQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxrC+j9bhg2iwZ4Ar52DgFVX9+P/0c718UwlI1ORw8cB0F7odY
+	+wkdGOdEyeKdP3uYindAY8N6dCHuILVKrSF6RUnmDdsWzSWpAMUuI1BTTsgx/+UzHKmOW5u70bT
+	Ckd7IclCBYRfT8zY6O0Kd5QQzKgObje9Eis2C/YP/sQ==
+X-Gm-Gg: ASbGnctnF5t4IahtvYYssTuiQpSfN/Fx8127h/acWvPlN/CXeLm8pet0ju8ns9lU3/K
+	ygYBQhtkXXCw/GXtP2RJf1ltuf8JxZM4qw9PLQ5WB6X+9HrTaa4xXq/Pxj8DJi3bogi0j/G4Gxv
+	gP8VgdGuCL8RgXQvWaJuIBKAX8fw5duTI5+HaE20N+f85tLf6J15bWph/Dskz483Rjq/h/LFB8/
+	QvLWCvGvK9nmJGyjNpgoTTlbq4vKCGXgGSD9z7L0WIyfIpfXfCLKVOyWo6639eJJ5/AR7Wz
+X-Google-Smtp-Source: AGHT+IELJXB6Vxn5RJnnZMeL+Gado+IBAHdtaM6Qy2HCdmwbDGr1UqUXyWt3Nl5lSLKzz2Qm7dnUnmUwvjqsA/6fofw=
+X-Received: by 2002:a05:7022:b90:b0:11b:862d:8031 with SMTP id
+ a92af1059eb24-11e031047c8mr4049834c88.0.1765228231561; Mon, 08 Dec 2025
+ 13:10:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Followup block changes for 6.19-rc1
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20251202121917.1412280-1-ming.lei@redhat.com> <20251202121917.1412280-12-ming.lei@redhat.com>
+ <CADUfDZpLrrjmxsmW-JyqLMLR_vFj0gropue9rTSns6ty+OxvCg@mail.gmail.com> <aTWXJRh9wqW4KG4g@fedora>
+In-Reply-To: <aTWXJRh9wqW4KG4g@fedora>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Mon, 8 Dec 2025 13:10:19 -0800
+X-Gm-Features: AQt7F2qYRHniesNDH58Xlvv_TYi3_duoqoTUIEq3_tvfTg-6daU5mqkTBscUkeo
+Message-ID: <CADUfDZrBxohvaZr=uE-s4gz1pAvq-ryy6tV67GDqUu8RUGEOLQ@mail.gmail.com>
+Subject: Re: [PATCH V5 11/21] ublk: document feature UBLK_F_BATCH_IO
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	Uday Shankar <ushankar@purestorage.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Linus,
+On Sun, Dec 7, 2025 at 7:03=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrote=
+:
+>
+> On Sun, Dec 07, 2025 at 12:22:38AM -0800, Caleb Sander Mateos wrote:
+> > On Tue, Dec 2, 2025 at 4:21=E2=80=AFAM Ming Lei <ming.lei@redhat.com> w=
+rote:
+> > >
+> > > Document feature UBLK_F_BATCH_IO.
+> > >
+> > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > > ---
+> > >  Documentation/block/ublk.rst | 64 +++++++++++++++++++++++++++++++++-=
+--
+> > >  1 file changed, 60 insertions(+), 4 deletions(-)
+> > >
+> > > diff --git a/Documentation/block/ublk.rst b/Documentation/block/ublk.=
+rst
+> > > index 8c4030bcabb6..6ad28039663d 100644
+> > > --- a/Documentation/block/ublk.rst
+> > > +++ b/Documentation/block/ublk.rst
+> > > @@ -260,9 +260,12 @@ The following IO commands are communicated via i=
+o_uring passthrough command,
+> > >  and each command is only for forwarding the IO and committing the re=
+sult
+> > >  with specified IO tag in the command data:
+> > >
+> > > -- ``UBLK_IO_FETCH_REQ``
+> > > +Traditional Per-I/O Commands
+> > > +~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > >
+> > > -  Sent from the server IO pthread for fetching future incoming IO re=
+quests
+> > > +- ``UBLK_U_IO_FETCH_REQ``
+> > > +
+> > > +  Sent from the server I/O pthread for fetching future incoming I/O =
+requests
+> > >    destined to ``/dev/ublkb*``. This command is sent only once from t=
+he server
+> > >    IO pthread for ublk driver to setup IO forward environment.
+> > >
+> > > @@ -278,7 +281,7 @@ with specified IO tag in the command data:
+> > >    supported by the driver, daemons must be per-queue instead - i.e. =
+all I/Os
+> > >    associated to a single qid must be handled by the same task.
+> > >
+> > > -- ``UBLK_IO_COMMIT_AND_FETCH_REQ``
+> > > +- ``UBLK_U_IO_COMMIT_AND_FETCH_REQ``
+> > >
+> > >    When an IO request is destined to ``/dev/ublkb*``, the driver stor=
+es
+> > >    the IO's ``ublksrv_io_desc`` to the specified mapped area; then th=
+e
+> > > @@ -293,7 +296,7 @@ with specified IO tag in the command data:
+> > >    requests with the same IO tag. That is, ``UBLK_IO_COMMIT_AND_FETCH=
+_REQ``
+> > >    is reused for both fetching request and committing back IO result.
+> > >
+> > > -- ``UBLK_IO_NEED_GET_DATA``
+> > > +- ``UBLK_U_IO_NEED_GET_DATA``
+> > >
+> > >    With ``UBLK_F_NEED_GET_DATA`` enabled, the WRITE request will be f=
+irstly
+> > >    issued to ublk server without data copy. Then, IO backend of ublk =
+server
+> > > @@ -322,6 +325,59 @@ with specified IO tag in the command data:
+> > >    ``UBLK_IO_COMMIT_AND_FETCH_REQ`` to the server, ublkdrv needs to c=
+opy
+> > >    the server buffer (pages) read to the IO request pages.
+> > >
+> > > +Batch I/O Commands (UBLK_F_BATCH_IO)
+> > > +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > > +
+> > > +The ``UBLK_F_BATCH_IO`` feature provides an alternative high-perform=
+ance
+> > > +I/O handling model that replaces the traditional per-I/O commands wi=
+th
+> > > +per-queue batch commands. This significantly reduces communication o=
+verhead
+> > > +and enables better load balancing across multiple server tasks.
+> > > +
+> > > +Key differences from traditional mode:
+> > > +
+> > > +- **Per-queue vs Per-I/O**: Commands operate on queues rather than i=
+ndividual I/Os
+> > > +- **Batch processing**: Multiple I/Os are handled in single operatio=
+ns
+> > > +- **Multishot commands**: Use io_uring multishot for reduced submiss=
+ion overhead
+> > > +- **Flexible task assignment**: Any task can handle any I/O (no per-=
+I/O daemons)
+> > > +- **Better load balancing**: Tasks can adjust their workload dynamic=
+ally
+> > > +
+> > > +Batch I/O Commands:
+> > > +
+> > > +- ``UBLK_U_IO_PREP_IO_CMDS``
+> > > +
+> > > +  Prepares multiple I/O commands in batch. The server provides a buf=
+fer
+> > > +  containing multiple I/O descriptors that will be processed togethe=
+r.
+> > > +  This reduces the number of individual command submissions required=
+.
+> > > +
+> > > +- ``UBLK_U_IO_COMMIT_IO_CMDS``
+> > > +
+> > > +  Commits results for multiple I/O operations in batch, and prepares=
+ the
+> > > +  I/O descriptors to accept new requests. The server provides a buff=
+er
+> > > +  containing the results of multiple completed I/Os, allowing effici=
+ent
+> > > +  bulk completion of requests.
+> > > +
+> > > +- ``UBLK_U_IO_FETCH_IO_CMDS``
+> > > +
+> > > +  **Multishot command** for fetching I/O commands in batch. This is =
+the key
+> > > +  command that enables high-performance batch processing:
+> > > +
+> > > +  * Uses io_uring multishot capability for reduced submission overhe=
+ad
+> > > +  * Single command can fetch multiple I/O requests over time
+> > > +  * Buffer size determines maximum batch size per operation
+> >
+> > The UBLK_U_IO_FETCH_IO_CMDS command specifies a buffer group, so is
+> > the expectation that there would be a single buffer in the group and
+>
+> It is same with other mulishot request with provided buffer, and the grou=
+p
+> can include 1 or more buffers.
+>
+> > each command would use a different buffer group?
+>
+> Yes, each command should use different buffer group like
+> io_uring_prep_read_multishot(), because tag may be read into the buffer w=
+hen
+> the userspace is parsing/handling previous completed FETCH completion.
 
-Followup set of fixes and updates for block for the 6.19 merge window.
-NVMe had some late minute debates which lead to dropping some patches
-from that tree, which is why the initial PR didn't have NVMe included.
-It's here now. This pull request contains:
+Thanks for explaining.
 
-- NVMe pull request via Keith
-	- Subsystem usage cleanups (Max)
-	- Endpoint device fixes (Shin'ichiro)
-	- Debug statements (Gerd)
-	- FC fabrics cleanups and fixes (Daniel)
-	- Consistent alloc API usages (Israel)
-	- Code comment updates (Chu)
-	- Authentication retry fix (Justin)
-
-- Fix a memory leak in the discard ioctl code, if the task is being
-  interrupted by a signal at just the wrong time.
-
-- Zoned write plugging fixes.
-
-- Add ioctls for for persistent reservations.
-
-- Enable per-cpu bio caching by default.
-
-- Various little fixes and tweaks.
-
-Please pull!
-
-
-The following changes since commit 559e608c46553c107dbba19dae0854af7b219400:
-
-  Merge tag 'ntfs3_for_6.19' of https://github.com/Paragon-Software-Group/linux-ntfs3 (2025-12-03 20:45:43 -0800)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-6.19-20251208
-
-for you to fetch changes up to 0f45353dd48037af61f70df3468d25ca46afe909:
-
-  Merge tag 'nvme-6.19-2025-12-04' of git://git.infradead.org/nvme into block-6.19 (2025-12-04 20:58:19 -0700)
-
-----------------------------------------------------------------
-block-6.19-20251208
-
-----------------------------------------------------------------
-Chaitanya Kulkarni (1):
-      blk-mq: add blk_rq_nr_bvec() helper
-
-Chu Guangqing (1):
-      nvme: fix typo error in nvme target
-
-Cong Zhang (1):
-      blk-mq: Abort suspend when wakeup events are pending
-
-Damien Le Moal (1):
-      block: Clear BLK_ZONE_WPLUG_PLUGGED when aborting plugged BIOs
-
-Daniel Wagner (5):
-      nvme-fc: don't hold rport lock when putting ctrl
-      nvme-fc: check all request and response have been processed
-      nvmet-fcloop: check all request and response have been processed
-      nvmet-fcloop: remove unused lsdir member.
-      nvmet-fc: use pr_* print macros instead of dev_*
-
-Fengnan Chang (2):
-      block: use bio_alloc_bioset for passthru IO by default
-      block: enable per-cpu bio cache by default
-
-Gerd Bayer (2):
-      nvme-pci: print error message on failure in nvme_probe
-      nvme-pci: add debug message on fail to read CSTS
-
-Israel Rukshin (3):
-      nvmet-rdma: use kvcalloc for commands and responses arrays
-      nvmet-tcp: use kvcalloc for commands array
-      nvme-auth: use kvfree() for memory allocated with kvcalloc()
-
-Jens Axboe (1):
-      Merge tag 'nvme-6.19-2025-12-04' of git://git.infradead.org/nvme into block-6.19
-
-Justin Tee (1):
-      nvme-fabrics: add ENOKEY to no retry criteria for authentication failures
-
-Max Gurtovoy (2):
-      nvmet: add sanity checks when freeing subsystem
-      nvmet: remove redundant subsysnqn field from ctrl
-
-Shaurya Rane (1):
-      block: fix memory leak in __blkdev_issue_zero_pages
-
-Shin'ichiro Kawasaki (2):
-      nvmet: pci-epf: move DMA initialization to EPC init callback
-      nvmet: pci-epf: fix DMA channel debug print
-
-Stefan Hajnoczi (4):
-      scsi: sd: reject invalid pr_read_keys() num_keys values
-      nvme: reject invalid pr_read_keys() num_keys values
-      block: add IOC_PR_READ_KEYS ioctl
-      block: add IOC_PR_READ_RESERVATION ioctl
-
-shechenglong (1):
-      block: fix comment for op_is_zone_mgmt() to include RESET_ALL
-
- block/bio.c                     | 26 ++++++------
- block/blk-lib.c                 |  6 +--
- block/blk-map.c                 | 90 +++++++++++++++++------------------------
- block/blk-mq.c                  | 18 ++++++++-
- block/blk-zoned.c               |  4 ++
- block/fops.c                    |  4 --
- block/ioctl.c                   | 84 ++++++++++++++++++++++++++++++++++++++
- drivers/block/loop.c            |  5 +--
- drivers/block/zloop.c           |  5 +--
- drivers/nvme/host/auth.c        |  2 +-
- drivers/nvme/host/fabrics.c     |  2 +-
- drivers/nvme/host/fc.c          |  8 +++-
- drivers/nvme/host/ioctl.c       |  2 +-
- drivers/nvme/host/pci.c         |  2 +
- drivers/nvme/host/pr.c          |  6 ++-
- drivers/nvme/target/admin-cmd.c |  2 +-
- drivers/nvme/target/auth.c      | 18 +++++----
- drivers/nvme/target/core.c      |  5 ++-
- drivers/nvme/target/fc.c        | 48 ++++++++++------------
- drivers/nvme/target/fcloop.c    |  9 +++--
- drivers/nvme/target/nvmet.h     |  1 -
- drivers/nvme/target/passthru.c  |  2 +-
- drivers/nvme/target/pci-epf.c   | 14 ++++---
- drivers/nvme/target/rdma.c      | 12 +++---
- drivers/nvme/target/tcp.c       |  6 +--
- drivers/scsi/sd.c               | 12 +++++-
- include/linux/blk-mq.h          | 18 +++++++++
- include/linux/blk_types.h       |  5 +--
- include/uapi/linux/pr.h         | 14 +++++++
- io_uring/rw.c                   |  1 -
- 30 files changed, 278 insertions(+), 153 deletions(-)
-
--- 
-Jens Axboe
-
+Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
