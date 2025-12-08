@@ -1,218 +1,131 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E5621423C
-	for <linux-block@vger.kernel.org>; Mon,  8 Dec 2025 21:10:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBB402DF719
+	for <linux-block@vger.kernel.org>; Mon,  8 Dec 2025 21:16:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765228234; cv=none; b=QvuMS/XUEKCw4CcZasH4a1guo/7Z98YYOe7w/vT9w8GDSjU3jM9vlwNvlEuYzLE9XQ/pW6H4bWk5rwtmYeabaTBmKBBDDvEHkIJv+lBdvaSR+ftErTtgCDTSU1QUSFPXwQRkqVdTXCwsu8CE9Ag4j6dUgEpvx2bLZMcyMQUeL3Y=
+	t=1765228620; cv=none; b=QWBnMZgjn2XJlbg9POEgAEuP/ZA8crabto49CDij44Qg1FQBYriKIhoOpwTAC4rDlf5VW/cFXQqG7iRb+8mAIuvkbq4WMmRSNc0FhGy0gz+6Zb1q89U3v0xnrAyDwSNCn8VtuUGbQq5ziDjSsrSnMroqsYM1BBvq2QXhIIXvsRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765228234; c=relaxed/simple;
-	bh=hUBPSpknxd6Fnb8XjPkFOpRoeCovjuBPVKgLmViY/ns=;
+	s=arc-20240116; t=1765228620; c=relaxed/simple;
+	bh=5qGC2F3TSPuLPR1QccjvC8Wi8HoL2P4T2S8jzm5W6eg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AhyHz/ugNGAPVCI3qbr9VwGgabAuB+I2eAbaA9Cg0venesDH1wekks/abwtGDr1ALmylY+WtAuqy83jzSZ6mYYMWwb6RsIT4MMRv42JyZJx263rnmWrtYIlx9nSiHwnYnhoh6k3yd/FVNHGRXkIwdZDH61U5Z6XlSLjQr6f0gL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=WhTWoJ74; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	 To:Cc:Content-Type; b=B8TPrwu8W1eisdkqEMD6j8LdHGCqtk/tzt7yTnP6NRrKEuUMwi+f+xMZL0QEkczA4xnAEa1LNZJogsgjR0A24LGo2FUGcp2DJmk+Ke6UXEEdgdhTvjFVKHoZiqTedR9xGQ0GKlHt4egCXft73H3V7/Y9j2/eoil3QGG/xTGl32Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fQrGvnIw; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=bFKGzG50; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="WhTWoJ74"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-297dfb8a52dso6390735ad.0
-        for <linux-block@vger.kernel.org>; Mon, 08 Dec 2025 13:10:32 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fQrGvnIw";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="bFKGzG50"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1765228617;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3cjLyi8J1W1mVcyJajqeGZwTWZZ/xf0eZlzYpjjz4as=;
+	b=fQrGvnIwKxNknra5UAMXMpl5TbKtWArd3DCnkwBLb2siR4Jsh9bL2KPDW5izeAvqqSNcKD
+	d3TUqPvUYuWiTr5NYNcbvbM2ZsSli3k6Bn1TtIUbU///DsybCzZS377vXyII+Wu2wR11J5
+	YMWcl3y2j6vHXYnUzRWbGzWSpHeb/jM=
+Received: from mail-yw1-f197.google.com (mail-yw1-f197.google.com
+ [209.85.128.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-677-KnaKKvjlPCq6BIS6Xom7YA-1; Mon, 08 Dec 2025 16:16:56 -0500
+X-MC-Unique: KnaKKvjlPCq6BIS6Xom7YA-1
+X-Mimecast-MFC-AGG-ID: KnaKKvjlPCq6BIS6Xom7YA_1765228616
+Received: by mail-yw1-f197.google.com with SMTP id 00721157ae682-78a9936470fso63933157b3.0
+        for <linux-block@vger.kernel.org>; Mon, 08 Dec 2025 13:16:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1765228232; x=1765833032; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1765228616; x=1765833416; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=RKEEKiiguUhPkICvRBcr0ZTtMhxwysYUkVureTP5zH4=;
-        b=WhTWoJ74xB4zJjlhlQoBtr1VsPBbdJ/5VGtIBAL2Rk/obJJ4XCYAYxg9G1pW7Bpb2Q
-         EF0fV6+bl9yHfFjACgW1uCq25B2TiLP7XpgYQOikZESFczeXcLj6uMukg6T3jyxAWgRs
-         e9MKm/8Ydb/MIyBwxAOUvQavExKRqPvFpl/EeKIw8qTPJEUapU0MeLsWnkFf3MaUsW8e
-         GBaAX7mCY5ZXhq/NXNe3o2fAvFR3mxuLQV5DLPEsEdz5zM0reUe1w1Kq5/C+oBdWK3p4
-         69EbpMFBoluFPjpiFGLED6dnwsB4Iy7xVSZNsMplSAxlwqo0YnoHLvnM3BApWKGoxmwo
-         vQ1g==
+        bh=3cjLyi8J1W1mVcyJajqeGZwTWZZ/xf0eZlzYpjjz4as=;
+        b=bFKGzG50etizIk2eqfk0P93oWnzxvNyz5+Ctt6eUn6Jn2W8FV1/uookzKgeYOESU17
+         0TgkDNIJxRk2pQsOtjLMIfyNZpLoal4778BqMbaVdSA3rX0SpWItrn6rqxa8VBFm7Qu+
+         ZyF0VWtOwd2xmQGEd6UlbErHD94UiR3OJajp75YTi4F196Umxy60PD3boIW6EF084pwc
+         r2TYLIe8gqul+w5OrrLGZ2pA5Ec/MGdtfXcb10DnmLFTxR1Ma8IuRjXLSgXKGLZqqXTl
+         SewaXhAv49THEyELA7MlTTrIUSMc+sNBUZusIddgD3bNuWkXwgxEPP1zIsGs2DpY6nyT
+         QYuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765228232; x=1765833032;
+        d=1e100.net; s=20230601; t=1765228616; x=1765833416;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=RKEEKiiguUhPkICvRBcr0ZTtMhxwysYUkVureTP5zH4=;
-        b=R68Ma8pzN0DVYNaYJfWvtFhiZl3zjT2ETznax6sSHOFI3Drxxqk93LL+PDx9aT3ruk
-         MQp29CW8NyvrS+7L2hp226rNjUrS0JJ+17p7gh4J0YYoqS7GOaScC4OHRjJvSRFdgzB/
-         95laCRufIX/yuNJl68PQxfZfJ97KIpkJXtT6YfMD3YzzqDOg0jrnmIXIZ7lISWFc8c0Y
-         hNlol0QQnGf4HPe4mmsyVQtxZJPIohdk3iBgAdvhENyPvuFSvOCXpD4DeQ0DrZc3Gzj3
-         kE8kTXxRSw9EbsojHJrC6GCMMQonnrLOW4hA8/PeJiN/K3gjyIV2rX2aKUaY+W/MuTmE
-         CyIA==
-X-Forwarded-Encrypted: i=1; AJvYcCXVKVcXvAS/ShIgeG5K+VazKAftSjbkbueFs2mdR62NA78XsUU7CiytXkqvKVnncFG9V3BNajcP7JXgjQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxrC+j9bhg2iwZ4Ar52DgFVX9+P/0c718UwlI1ORw8cB0F7odY
-	+wkdGOdEyeKdP3uYindAY8N6dCHuILVKrSF6RUnmDdsWzSWpAMUuI1BTTsgx/+UzHKmOW5u70bT
-	Ckd7IclCBYRfT8zY6O0Kd5QQzKgObje9Eis2C/YP/sQ==
-X-Gm-Gg: ASbGnctnF5t4IahtvYYssTuiQpSfN/Fx8127h/acWvPlN/CXeLm8pet0ju8ns9lU3/K
-	ygYBQhtkXXCw/GXtP2RJf1ltuf8JxZM4qw9PLQ5WB6X+9HrTaa4xXq/Pxj8DJi3bogi0j/G4Gxv
-	gP8VgdGuCL8RgXQvWaJuIBKAX8fw5duTI5+HaE20N+f85tLf6J15bWph/Dskz483Rjq/h/LFB8/
-	QvLWCvGvK9nmJGyjNpgoTTlbq4vKCGXgGSD9z7L0WIyfIpfXfCLKVOyWo6639eJJ5/AR7Wz
-X-Google-Smtp-Source: AGHT+IELJXB6Vxn5RJnnZMeL+Gado+IBAHdtaM6Qy2HCdmwbDGr1UqUXyWt3Nl5lSLKzz2Qm7dnUnmUwvjqsA/6fofw=
-X-Received: by 2002:a05:7022:b90:b0:11b:862d:8031 with SMTP id
- a92af1059eb24-11e031047c8mr4049834c88.0.1765228231561; Mon, 08 Dec 2025
- 13:10:31 -0800 (PST)
+        bh=3cjLyi8J1W1mVcyJajqeGZwTWZZ/xf0eZlzYpjjz4as=;
+        b=jo3++bsngQSD+jeMtWEfzvTAvxTBdn+lhiZnFIMeGR41xzpGAYpoWvJxBmHdSjBPyw
+         gf2plSfQ9pFmqErz6rUMy6uCQS+H17cAuCXRINx2o/WacwNOrKrzcWalBxNnISKsJy1j
+         gwLNROVqMdYokUfri9CrPr942oKkeD6TjJ3G1DJdRyN4NZOu5qveWTejIlX6uQ8vODta
+         MOyFH7vkq1b8sQNjvsCqwgb79h/NKj1WtgM/J4UUrT7O2puzB+XH0YgEGgBsa1Mz6OKM
+         mW4injqeIwQnsya2y1qdk8fxKYKw4hIUvgehA9i6IgQ7szUWzoJ0zkmbQVWmttFemjGo
+         mkvA==
+X-Forwarded-Encrypted: i=1; AJvYcCVZtuNqcrV5xKDZE7uaDbKQIlxX4zrBgrsrtU9dKLg8oXz497wbdzk1ODou16biud6afeTxjxQx86uJzg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyqLp24V3FgwXTF4euOxiVPTt8mQd8kzn+lVZidNt0zH0UCoHju
+	J2Zn6AHli1SV6ya1h1G4Bay8yP8LRQw6h6I/Dc0kpJ7GVEPHOZ1ArnJwyObWpho8Jp+1HTv3xsg
+	s22MH6ZZQ1YJkz6sb0U2ffH4pvhJ0wCZSlNwyspfu1rmchxvvtfpmKqCv+SssBneyKDiKm6hhgf
+	jaIJ3ZNPM0EHJY8wfpVkx8hZP+gMEiEiVCQzNMnYY=
+X-Gm-Gg: ASbGncu3bPHerw5Dd8bQBgzlYGk/+02zoE9uuO/9IclqJfqNqMbmhyrta6b60Td4h8g
+	EPF2MiydsDI6534S7W04yINZkSAsDsSrK2F08jBFEXXXw6I96K7L7ONmxYdsM4ysmlQ6kWzexMq
+	5mBxHkm4OmrEDd/lixMJ1l92yLzi4GrTHmN+DZXgD7F7Bb7RYh/59iXLM1xwNVugiN
+X-Received: by 2002:a05:690c:4a02:b0:786:61f3:e4e with SMTP id 00721157ae682-78c33c74655mr90034707b3.54.1765228616031;
+        Mon, 08 Dec 2025 13:16:56 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFiCY42NqIRZgl6uVDR8LkykQzXJsYzMaVLpZgyirQa+mlv/Jyf+1nBV5OG4dbWD1DDVxjeGc24WpTFqReJ20Q=
+X-Received: by 2002:a05:690c:4a02:b0:786:61f3:e4e with SMTP id
+ 00721157ae682-78c33c74655mr90034377b3.54.1765228615599; Mon, 08 Dec 2025
+ 13:16:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251202121917.1412280-1-ming.lei@redhat.com> <20251202121917.1412280-12-ming.lei@redhat.com>
- <CADUfDZpLrrjmxsmW-JyqLMLR_vFj0gropue9rTSns6ty+OxvCg@mail.gmail.com> <aTWXJRh9wqW4KG4g@fedora>
-In-Reply-To: <aTWXJRh9wqW4KG4g@fedora>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Mon, 8 Dec 2025 13:10:19 -0800
-X-Gm-Features: AQt7F2qYRHniesNDH58Xlvv_TYi3_duoqoTUIEq3_tvfTg-6daU5mqkTBscUkeo
-Message-ID: <CADUfDZrBxohvaZr=uE-s4gz1pAvq-ryy6tV67GDqUu8RUGEOLQ@mail.gmail.com>
-Subject: Re: [PATCH V5 11/21] ublk: document feature UBLK_F_BATCH_IO
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Uday Shankar <ushankar@purestorage.com>
+References: <20251208121020.1780402-1-agruenba@redhat.com> <20251208193724.GB4859@twin.jikos.cz>
+In-Reply-To: <20251208193724.GB4859@twin.jikos.cz>
+From: Andreas Gruenbacher <agruenba@redhat.com>
+Date: Mon, 8 Dec 2025 22:16:44 +0100
+X-Gm-Features: AQt7F2pWqhuOxBDn48p5d1W8IkDa9mkk1UO6HtSX6_QdJl4e-fg9m6lrjlZDn5M
+Message-ID: <CAHc6FU6vax1eNB-xrYLuZX5s-RLRhtctG7=3NO+h_GPj5o=W-Q@mail.gmail.com>
+Subject: Re: [RFC 00/12] bio cleanups
+To: dsterba@suse.cz
+Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>, Chris Mason <clm@fb.com>, 
+	David Sterba <dsterba@suse.com>, Satya Tangirala <satyat@google.com>, linux-block@vger.kernel.org, 
+	linux-btrfs@vger.kernel.org, linux-raid@vger.kernel.org, 
+	dm-devel@lists.linux.dev, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Dec 7, 2025 at 7:03=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrote=
+On Mon, Dec 8, 2025 at 8:43=E2=80=AFPM David Sterba <dsterba@suse.cz> wrote=
 :
+> On Mon, Dec 08, 2025 at 12:10:07PM +0000, Andreas Gruenbacher wrote:
+> > With these changes, only a few direct assignments to bio->bi_status
+> > remain, in BTRFS and in MD, and SOME OF THOSE MAY BE UNSAFE.  Could the
+> > maintainers of those subsystems please have a look?
 >
-> On Sun, Dec 07, 2025 at 12:22:38AM -0800, Caleb Sander Mateos wrote:
-> > On Tue, Dec 2, 2025 at 4:21=E2=80=AFAM Ming Lei <ming.lei@redhat.com> w=
-rote:
-> > >
-> > > Document feature UBLK_F_BATCH_IO.
-> > >
-> > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > > ---
-> > >  Documentation/block/ublk.rst | 64 +++++++++++++++++++++++++++++++++-=
---
-> > >  1 file changed, 60 insertions(+), 4 deletions(-)
-> > >
-> > > diff --git a/Documentation/block/ublk.rst b/Documentation/block/ublk.=
-rst
-> > > index 8c4030bcabb6..6ad28039663d 100644
-> > > --- a/Documentation/block/ublk.rst
-> > > +++ b/Documentation/block/ublk.rst
-> > > @@ -260,9 +260,12 @@ The following IO commands are communicated via i=
-o_uring passthrough command,
-> > >  and each command is only for forwarding the IO and committing the re=
-sult
-> > >  with specified IO tag in the command data:
-> > >
-> > > -- ``UBLK_IO_FETCH_REQ``
-> > > +Traditional Per-I/O Commands
-> > > +~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> > >
-> > > -  Sent from the server IO pthread for fetching future incoming IO re=
-quests
-> > > +- ``UBLK_U_IO_FETCH_REQ``
-> > > +
-> > > +  Sent from the server I/O pthread for fetching future incoming I/O =
-requests
-> > >    destined to ``/dev/ublkb*``. This command is sent only once from t=
-he server
-> > >    IO pthread for ublk driver to setup IO forward environment.
-> > >
-> > > @@ -278,7 +281,7 @@ with specified IO tag in the command data:
-> > >    supported by the driver, daemons must be per-queue instead - i.e. =
-all I/Os
-> > >    associated to a single qid must be handled by the same task.
-> > >
-> > > -- ``UBLK_IO_COMMIT_AND_FETCH_REQ``
-> > > +- ``UBLK_U_IO_COMMIT_AND_FETCH_REQ``
-> > >
-> > >    When an IO request is destined to ``/dev/ublkb*``, the driver stor=
-es
-> > >    the IO's ``ublksrv_io_desc`` to the specified mapped area; then th=
-e
-> > > @@ -293,7 +296,7 @@ with specified IO tag in the command data:
-> > >    requests with the same IO tag. That is, ``UBLK_IO_COMMIT_AND_FETCH=
-_REQ``
-> > >    is reused for both fetching request and committing back IO result.
-> > >
-> > > -- ``UBLK_IO_NEED_GET_DATA``
-> > > +- ``UBLK_U_IO_NEED_GET_DATA``
-> > >
-> > >    With ``UBLK_F_NEED_GET_DATA`` enabled, the WRITE request will be f=
-irstly
-> > >    issued to ublk server without data copy. Then, IO backend of ublk =
-server
-> > > @@ -322,6 +325,59 @@ with specified IO tag in the command data:
-> > >    ``UBLK_IO_COMMIT_AND_FETCH_REQ`` to the server, ublkdrv needs to c=
-opy
-> > >    the server buffer (pages) read to the IO request pages.
-> > >
-> > > +Batch I/O Commands (UBLK_F_BATCH_IO)
-> > > +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> > > +
-> > > +The ``UBLK_F_BATCH_IO`` feature provides an alternative high-perform=
-ance
-> > > +I/O handling model that replaces the traditional per-I/O commands wi=
-th
-> > > +per-queue batch commands. This significantly reduces communication o=
-verhead
-> > > +and enables better load balancing across multiple server tasks.
-> > > +
-> > > +Key differences from traditional mode:
-> > > +
-> > > +- **Per-queue vs Per-I/O**: Commands operate on queues rather than i=
-ndividual I/Os
-> > > +- **Batch processing**: Multiple I/Os are handled in single operatio=
-ns
-> > > +- **Multishot commands**: Use io_uring multishot for reduced submiss=
-ion overhead
-> > > +- **Flexible task assignment**: Any task can handle any I/O (no per-=
-I/O daemons)
-> > > +- **Better load balancing**: Tasks can adjust their workload dynamic=
-ally
-> > > +
-> > > +Batch I/O Commands:
-> > > +
-> > > +- ``UBLK_U_IO_PREP_IO_CMDS``
-> > > +
-> > > +  Prepares multiple I/O commands in batch. The server provides a buf=
-fer
-> > > +  containing multiple I/O descriptors that will be processed togethe=
-r.
-> > > +  This reduces the number of individual command submissions required=
-.
-> > > +
-> > > +- ``UBLK_U_IO_COMMIT_IO_CMDS``
-> > > +
-> > > +  Commits results for multiple I/O operations in batch, and prepares=
- the
-> > > +  I/O descriptors to accept new requests. The server provides a buff=
-er
-> > > +  containing the results of multiple completed I/Os, allowing effici=
-ent
-> > > +  bulk completion of requests.
-> > > +
-> > > +- ``UBLK_U_IO_FETCH_IO_CMDS``
-> > > +
-> > > +  **Multishot command** for fetching I/O commands in batch. This is =
-the key
-> > > +  command that enables high-performance batch processing:
-> > > +
-> > > +  * Uses io_uring multishot capability for reduced submission overhe=
-ad
-> > > +  * Single command can fetch multiple I/O requests over time
-> > > +  * Buffer size determines maximum batch size per operation
-> >
-> > The UBLK_U_IO_FETCH_IO_CMDS command specifies a buffer group, so is
-> > the expectation that there would be a single buffer in the group and
->
-> It is same with other mulishot request with provided buffer, and the grou=
-p
-> can include 1 or more buffers.
->
-> > each command would use a different buffer group?
->
-> Yes, each command should use different buffer group like
-> io_uring_prep_read_multishot(), because tag may be read into the buffer w=
-hen
-> the userspace is parsing/handling previous completed FETCH completion.
+> The btrfs bits look good to me, we expect the same semantics, ie. not
+> overwrite existing error with 0. If there are racing writes to the
+> status like in btrfs_bio_end_io() we use cmpxchg() so we don't overwrite
+> it.
 
-Thanks for explaining.
+Really? I'm not talking about the status field in struct btrfs_bio but
+about the bi_status field in struct bio. The first mention of
+bi_status I can find in the btrfs code is right at the beginning of
+btrfs_bio_end_io():
 
-Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
+  bbio->bio.bi_status =3D status;
+
+If status is ever BLK_STS_OK (0) here and bbio->bio is a chained bio,
+things are already not great.
+
+I believe we should eliminate all direct assignments to bi_status and
+use bio_set_status() instead. I'm not familiar enough with the btrfs
+code to make that replacement for you, though.
+
+A cursory look at struct btrfs_bio suggests that those objects cannot
+be chained like plain old bios (bio_chain()). This means that
+cmpxchg() may actually work for catching the first error that occurs.
+For chained regular bios, cmpxchg() won't catch the first error, at
+least not if the length of the chain is greater than two.
+
+Thanks,
+Andreas
+
