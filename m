@@ -1,131 +1,158 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from BL0PR03CU003.outbound.protection.outlook.com (mail-eastusazon11012045.outbound.protection.outlook.com [52.101.53.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBB402DF719
-	for <linux-block@vger.kernel.org>; Mon,  8 Dec 2025 21:16:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765228620; cv=none; b=QWBnMZgjn2XJlbg9POEgAEuP/ZA8crabto49CDij44Qg1FQBYriKIhoOpwTAC4rDlf5VW/cFXQqG7iRb+8mAIuvkbq4WMmRSNc0FhGy0gz+6Zb1q89U3v0xnrAyDwSNCn8VtuUGbQq5ziDjSsrSnMroqsYM1BBvq2QXhIIXvsRQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765228620; c=relaxed/simple;
-	bh=5qGC2F3TSPuLPR1QccjvC8Wi8HoL2P4T2S8jzm5W6eg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=B8TPrwu8W1eisdkqEMD6j8LdHGCqtk/tzt7yTnP6NRrKEuUMwi+f+xMZL0QEkczA4xnAEa1LNZJogsgjR0A24LGo2FUGcp2DJmk+Ke6UXEEdgdhTvjFVKHoZiqTedR9xGQ0GKlHt4egCXft73H3V7/Y9j2/eoil3QGG/xTGl32Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fQrGvnIw; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=bFKGzG50; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91DDB21254B
+	for <linux-block@vger.kernel.org>; Mon,  8 Dec 2025 22:26:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.53.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765232805; cv=fail; b=QzR2tYI6uGcnxkxiyJKWTgJEQWXaUuGxYRcqUq0Ik8uAtTHW/t23aencG0YwWWqjQtG3AoxXpYUw1i6VNjpxWWJkou+tuq4MLZh9s9DNvMt6MyfXjjVh4kEITpDYvwK2OmvjRI3v5hBRy0kocGUSvrRg8zA9FUsIFdVWTcY0+/s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765232805; c=relaxed/simple;
+	bh=zv6Tw8whFycLoW245MbSBf0NDw+wol4fzjsUwL5ehFM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JrnCjLWEsGdBGfX9o0m8SBZL1EFIqbFv+VPZa4l1T2DgsV/AhKng+5a/bXP8setwyynhEzttinbj5qM/RRxz8PgSAg/mtwwYzeUHTBtSvPVxRC91YVY/ka3Z0OIpQnAgEB4l/XbQK1hTAiJaNTNGnOb2oz9w7sYMj2b6/Z3WOWw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Zq1jBhoG; arc=fail smtp.client-ip=52.101.53.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fQrGvnIw";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="bFKGzG50"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765228617;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3cjLyi8J1W1mVcyJajqeGZwTWZZ/xf0eZlzYpjjz4as=;
-	b=fQrGvnIwKxNknra5UAMXMpl5TbKtWArd3DCnkwBLb2siR4Jsh9bL2KPDW5izeAvqqSNcKD
-	d3TUqPvUYuWiTr5NYNcbvbM2ZsSli3k6Bn1TtIUbU///DsybCzZS377vXyII+Wu2wR11J5
-	YMWcl3y2j6vHXYnUzRWbGzWSpHeb/jM=
-Received: from mail-yw1-f197.google.com (mail-yw1-f197.google.com
- [209.85.128.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-677-KnaKKvjlPCq6BIS6Xom7YA-1; Mon, 08 Dec 2025 16:16:56 -0500
-X-MC-Unique: KnaKKvjlPCq6BIS6Xom7YA-1
-X-Mimecast-MFC-AGG-ID: KnaKKvjlPCq6BIS6Xom7YA_1765228616
-Received: by mail-yw1-f197.google.com with SMTP id 00721157ae682-78a9936470fso63933157b3.0
-        for <linux-block@vger.kernel.org>; Mon, 08 Dec 2025 13:16:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1765228616; x=1765833416; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3cjLyi8J1W1mVcyJajqeGZwTWZZ/xf0eZlzYpjjz4as=;
-        b=bFKGzG50etizIk2eqfk0P93oWnzxvNyz5+Ctt6eUn6Jn2W8FV1/uookzKgeYOESU17
-         0TgkDNIJxRk2pQsOtjLMIfyNZpLoal4778BqMbaVdSA3rX0SpWItrn6rqxa8VBFm7Qu+
-         ZyF0VWtOwd2xmQGEd6UlbErHD94UiR3OJajp75YTi4F196Umxy60PD3boIW6EF084pwc
-         r2TYLIe8gqul+w5OrrLGZ2pA5Ec/MGdtfXcb10DnmLFTxR1Ma8IuRjXLSgXKGLZqqXTl
-         SewaXhAv49THEyELA7MlTTrIUSMc+sNBUZusIddgD3bNuWkXwgxEPP1zIsGs2DpY6nyT
-         QYuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765228616; x=1765833416;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=3cjLyi8J1W1mVcyJajqeGZwTWZZ/xf0eZlzYpjjz4as=;
-        b=jo3++bsngQSD+jeMtWEfzvTAvxTBdn+lhiZnFIMeGR41xzpGAYpoWvJxBmHdSjBPyw
-         gf2plSfQ9pFmqErz6rUMy6uCQS+H17cAuCXRINx2o/WacwNOrKrzcWalBxNnISKsJy1j
-         gwLNROVqMdYokUfri9CrPr942oKkeD6TjJ3G1DJdRyN4NZOu5qveWTejIlX6uQ8vODta
-         MOyFH7vkq1b8sQNjvsCqwgb79h/NKj1WtgM/J4UUrT7O2puzB+XH0YgEGgBsa1Mz6OKM
-         mW4injqeIwQnsya2y1qdk8fxKYKw4hIUvgehA9i6IgQ7szUWzoJ0zkmbQVWmttFemjGo
-         mkvA==
-X-Forwarded-Encrypted: i=1; AJvYcCVZtuNqcrV5xKDZE7uaDbKQIlxX4zrBgrsrtU9dKLg8oXz497wbdzk1ODou16biud6afeTxjxQx86uJzg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyqLp24V3FgwXTF4euOxiVPTt8mQd8kzn+lVZidNt0zH0UCoHju
-	J2Zn6AHli1SV6ya1h1G4Bay8yP8LRQw6h6I/Dc0kpJ7GVEPHOZ1ArnJwyObWpho8Jp+1HTv3xsg
-	s22MH6ZZQ1YJkz6sb0U2ffH4pvhJ0wCZSlNwyspfu1rmchxvvtfpmKqCv+SssBneyKDiKm6hhgf
-	jaIJ3ZNPM0EHJY8wfpVkx8hZP+gMEiEiVCQzNMnYY=
-X-Gm-Gg: ASbGncu3bPHerw5Dd8bQBgzlYGk/+02zoE9uuO/9IclqJfqNqMbmhyrta6b60Td4h8g
-	EPF2MiydsDI6534S7W04yINZkSAsDsSrK2F08jBFEXXXw6I96K7L7ONmxYdsM4ysmlQ6kWzexMq
-	5mBxHkm4OmrEDd/lixMJ1l92yLzi4GrTHmN+DZXgD7F7Bb7RYh/59iXLM1xwNVugiN
-X-Received: by 2002:a05:690c:4a02:b0:786:61f3:e4e with SMTP id 00721157ae682-78c33c74655mr90034707b3.54.1765228616031;
-        Mon, 08 Dec 2025 13:16:56 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFiCY42NqIRZgl6uVDR8LkykQzXJsYzMaVLpZgyirQa+mlv/Jyf+1nBV5OG4dbWD1DDVxjeGc24WpTFqReJ20Q=
-X-Received: by 2002:a05:690c:4a02:b0:786:61f3:e4e with SMTP id
- 00721157ae682-78c33c74655mr90034377b3.54.1765228615599; Mon, 08 Dec 2025
- 13:16:55 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Zq1jBhoG"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=R37psQlyw+8wIveIrJFOUzgQQaAqo7X316vSoOHwmRU2i1QgYWbcnV4x8bAnkHONAvgEcsjG3d1jLpsKzk+utgjF4iwCojZOA9ZeAtXV0hK4YJ3xe1mQju97D75CNqu17vxUDsFq+Ja0MypP1kq4Rd23SmbnSaiWm/4bVPq24QmDzffwXFBEu9vYc75u2tWv7mtb8uR+fe3fQfJOQ80PFUP9N7AJiBEZuarcXYK1XBuNr5E5pickgb9OXA14tKdPIB7q1XiSL1Bom7QPqKCTuMjl2zAI0fVBfRipMEG5gRY5lwkcxvIziB5OUtveuZvI8WmAhjmXp8FwAd5JymIYAA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/+hZdhcmDxEVs5qpHIYHICJcM+9NhN+VIw6oOZg1jcU=;
+ b=q3JVlEAHOBhVj36cnBem8KKwaDEonCePAe5vxUG5F1pIlCVtfov0Atp2Yfx/HiRBf0k2RAJ2OVbYjd8wEuZfLgXmNWDYQ1Q8HWYZfUGP+RpFh10Hb4t0Emzi6mEIsmLoWnGPgiug28QHWdblsZqUb/kFR8WZiWmayZq7N18pEuyH8KTU3518b0LxsU/SAuX4xZdkR8JLOWb1Jk1oXWluqJh80IpS4llez5EMhE+am3JRz03v/ui7z/FBqPLSS80bVV6wo+1M+/TPZn9J/3yXFpXhT/nF/oOrm4JMKT/5NkGYNfmwzgxPMxtvWGLnx41vFG/IsfQUWyyahUXOGEIrmQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=grimberg.me smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/+hZdhcmDxEVs5qpHIYHICJcM+9NhN+VIw6oOZg1jcU=;
+ b=Zq1jBhoG3iBi3iI3gsRLgOWkdMk5svLptCX1UK5tkkZI7Giwy5YvrK1h8qjZ8KCQ7SDupOoCwSsXDq/uZm4sSJehvfZpD4SsgY6eb55s4xhHbYtJy6qMp2bXA+v5NOYQXnTzfqBa3K1kajFJCZ5U9uoO94nRAEe3QLaU7pyl+ej8ci06Nqr8wU0hmjoi01rrj90c8vXV+12TjUBtpmYnBo0oZQF1Kuovhn4W8dNl8EIfYwq6ghZbBaQkyjywBFAt3sBMjkCc58rP3e396w8O1ZY7IHmHHCAntYS/VBMUJYIDHaiUzW6au0/z0qszB7sbDifUHYuIbmmYChZ2Q8a17Q==
+Received: from DS7PR03CA0157.namprd03.prod.outlook.com (2603:10b6:5:3b2::12)
+ by SA3PR12MB8023.namprd12.prod.outlook.com (2603:10b6:806:320::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9388.14; Mon, 8 Dec
+ 2025 22:26:38 +0000
+Received: from DS3PEPF0000C37E.namprd04.prod.outlook.com
+ (2603:10b6:5:3b2:cafe::d2) by DS7PR03CA0157.outlook.office365.com
+ (2603:10b6:5:3b2::12) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9388.14 via Frontend Transport; Mon,
+ 8 Dec 2025 22:26:23 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ DS3PEPF0000C37E.mail.protection.outlook.com (10.167.23.8) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9412.4 via Frontend Transport; Mon, 8 Dec 2025 22:26:37 +0000
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 8 Dec
+ 2025 14:26:24 -0800
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail205.nvidia.com
+ (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 8 Dec
+ 2025 14:26:24 -0800
+Received: from r-arch-stor07.mtr.nbulabs.nvidia.com (10.127.8.13) by
+ mail.nvidia.com (10.129.68.8) with Microsoft SMTP Server id 15.2.2562.20 via
+ Frontend Transport; Mon, 8 Dec 2025 14:26:21 -0800
+From: Max Gurtovoy <mgurtovoy@nvidia.com>
+To: <sagi@grimberg.me>, <linux-nvme@lists.infradead.org>, <kbusch@kernel.org>,
+	<hch@lst.de>
+CC: <kch@nvidia.com>, <axboe@kernel.dk>, <linux-block@vger.kernel.org>, "Max
+ Gurtovoy" <mgurtovoy@nvidia.com>
+Subject: [PATCH 1/1] nvme-pci: set virt boundary according to capability
+Date: Tue, 9 Dec 2025 00:26:20 +0200
+Message-ID: <20251208222620.13882-1-mgurtovoy@nvidia.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251208121020.1780402-1-agruenba@redhat.com> <20251208193724.GB4859@twin.jikos.cz>
-In-Reply-To: <20251208193724.GB4859@twin.jikos.cz>
-From: Andreas Gruenbacher <agruenba@redhat.com>
-Date: Mon, 8 Dec 2025 22:16:44 +0100
-X-Gm-Features: AQt7F2pWqhuOxBDn48p5d1W8IkDa9mkk1UO6HtSX6_QdJl4e-fg9m6lrjlZDn5M
-Message-ID: <CAHc6FU6vax1eNB-xrYLuZX5s-RLRhtctG7=3NO+h_GPj5o=W-Q@mail.gmail.com>
-Subject: Re: [RFC 00/12] bio cleanups
-To: dsterba@suse.cz
-Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>, Chris Mason <clm@fb.com>, 
-	David Sterba <dsterba@suse.com>, Satya Tangirala <satyat@google.com>, linux-block@vger.kernel.org, 
-	linux-btrfs@vger.kernel.org, linux-raid@vger.kernel.org, 
-	dm-devel@lists.linux.dev, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS3PEPF0000C37E:EE_|SA3PR12MB8023:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6820bacd-c7e9-487a-1cf7-08de36a8da65
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?13Bj5ErOJsiMQmmAMWiUJOO1HzcHd/1PbnlSaymh1Oik4PDa5N+vmN0RaDz+?=
+ =?us-ascii?Q?EHtlX5wB1qPuPyjXpbOcipVfmekycfMJKm8525AWzKTO7hDfLd/x7Faskqj5?=
+ =?us-ascii?Q?Nolnni4rtuVqGWo4fdh5zAZS+J3uiioHvzz14/FDNfGtigK3oUEQeTRk4N/e?=
+ =?us-ascii?Q?3Y0S0ShXdwjwgQbCMmhRgU1ukuWc6DdSVu4HVOb3VknRt0l7qkzMZiCGwOt1?=
+ =?us-ascii?Q?/Kn0r3jcNDl9od9fDjUadV4E763VTIsjc0xASlkWngUfKG/vCua2Bklu5Wg6?=
+ =?us-ascii?Q?Scq/RE1l2VJWlK1T+OPZRqF/4HClQtMIrgtc1Yz1g4wqWaOdFe3a6oFXKRrA?=
+ =?us-ascii?Q?4gn3RHQsnuq2goIckOWPsIWcFzGRTHnlxrUpsuyNxvqSD2SCzowdwV+Wof1l?=
+ =?us-ascii?Q?vhoB0P3PaqIaxXhUtKUfroyJUSOOOaffFKUenQsDNREYqwV9Y1ahtIEPk8aJ?=
+ =?us-ascii?Q?FYbEHEzaGrguhDdZI7TIR1/idFHEQ9FCKYyIxn+GBn6LdGbUZ6/QRNwO3oMH?=
+ =?us-ascii?Q?5iUYH0EFAHUJ3vlLZ2EZ+YXPcpfR/hTnc6DjXUFNHhHmUXksfPgH7N038BD7?=
+ =?us-ascii?Q?ztCU3kPRxtuvELhv2pOB+mX5ZnOM/qvsisMjkS4O9F27b0E30cEN/CAVkgsN?=
+ =?us-ascii?Q?BADKp/VcILbbZHUAMSODwv/ldw1tTWSFatWdyIq6A6zaTlT+wY2oMgf8carE?=
+ =?us-ascii?Q?Y51KRIqHhZ4lNjsIDaNnB+uDVQfjD64kEwBt9dokgPi9dubBgMa953ypLacf?=
+ =?us-ascii?Q?RslouOC3BuhUXG0XlDndRPvIckV+d17J//FeZ9pirjKS8YBS8bpchunMahLF?=
+ =?us-ascii?Q?HqOBzYQ2B2cOc2ueJrGIwkUMuXYIh47UNkpfOxShgMe/iQU95dbuCePzhFgd?=
+ =?us-ascii?Q?Ybd6uZKdPwUputEdnuqjGMmGmAJnmJZZVp44SFLhfTd1dTXsGLMj8tYiRuHn?=
+ =?us-ascii?Q?GeewlKg6t/Cc93i21FxTPngzZm3zAVLvzx5IC9ul9ZgZbkQGhTkWf5tmXdp8?=
+ =?us-ascii?Q?DZH4WDWdHP95AqDUly03lrDHC4oPdAd4F/bjVfEWt9+ew9+c2qgGA2ox3MlJ?=
+ =?us-ascii?Q?A/NxVshMcgiqTX4H2Ynw0ZjJugxcUQK03zHO90WoSaOt47gsJEB0Pw5GB8VF?=
+ =?us-ascii?Q?E1TKVBa/q922kroNGvfKyC+5WNAFPRNIBjH41nZ9A8fPN2rf+75IwQPyraPc?=
+ =?us-ascii?Q?onebyVrxI+YUZcHb2ch8tGfi9yMIkrZv0PI/p2Qq97QJHKAEHQy5OcFtuTrh?=
+ =?us-ascii?Q?UnxTkQ25/KsCoQYsXVSMLv9xT5dUsNajqmE8TYOE4HhAmjEsAnBwLtk366/a?=
+ =?us-ascii?Q?g4xm2cUpyYw3rJjYvSfgYH3usOeoIn1fkk69XD996mrzsJimXt3iTqw4tP1n?=
+ =?us-ascii?Q?e5QlHpgdSasCW5zWHZ/eReXlj9YYX9GeFcIBPpxsxBQqXsjqfsJRRAf/ljO5?=
+ =?us-ascii?Q?eVIu2flaOOXvWM5VDW6z0+wODrDBxKdF/z4xmzK0SJXBZPbvILoX9JRbutQB?=
+ =?us-ascii?Q?S8E2f3Uix5Y4vKiVxtk1XUyYIkKMHt3KuhpuYzQn/Q/mCK5BIOdgxDP/0Xgm?=
+ =?us-ascii?Q?1rF/Par00PUwEfDY3qM=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Dec 2025 22:26:37.8029
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6820bacd-c7e9-487a-1cf7-08de36a8da65
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS3PEPF0000C37E.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB8023
 
-On Mon, Dec 8, 2025 at 8:43=E2=80=AFPM David Sterba <dsterba@suse.cz> wrote=
-:
-> On Mon, Dec 08, 2025 at 12:10:07PM +0000, Andreas Gruenbacher wrote:
-> > With these changes, only a few direct assignments to bio->bi_status
-> > remain, in BTRFS and in MD, and SOME OF THOSE MAY BE UNSAFE.  Could the
-> > maintainers of those subsystems please have a look?
->
-> The btrfs bits look good to me, we expect the same semantics, ie. not
-> overwrite existing error with 0. If there are racing writes to the
-> status like in btrfs_bio_end_io() we use cmpxchg() so we don't overwrite
-> it.
+Some controllers advertise DWORD alignment for SGLs, so configure the
+virtual boundary correctly for those devices.
 
-Really? I'm not talking about the status field in struct btrfs_bio but
-about the bi_status field in struct bio. The first mention of
-bi_status I can find in the btrfs code is right at the beginning of
-btrfs_bio_end_io():
+Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+---
+ drivers/nvme/host/pci.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-  bbio->bio.bi_status =3D status;
-
-If status is ever BLK_STS_OK (0) here and bbio->bio is a chained bio,
-things are already not great.
-
-I believe we should eliminate all direct assignments to bi_status and
-use bio_set_status() instead. I'm not familiar enough with the btrfs
-code to make that replacement for you, though.
-
-A cursory look at struct btrfs_bio suggests that those objects cannot
-be chained like plain old bios (bio_chain()). This means that
-cmpxchg() may actually work for catching the first error that occurs.
-For chained regular bios, cmpxchg() won't catch the first error, at
-least not if the length of the chain is greater than two.
-
-Thanks,
-Andreas
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index e5ca8301bb8b..eacc89cd25eb 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -3326,7 +3326,9 @@ static unsigned long nvme_pci_get_virt_boundary(struct nvme_ctrl *ctrl,
+ {
+ 	if (!nvme_ctrl_sgl_supported(ctrl) || is_admin)
+ 		return NVME_CTRL_PAGE_SIZE - 1;
+-	return 0;
++	else if (ctrl->sgls & NVME_CTRL_SGLS_BYTE_ALIGNED)
++		return 0;
++	return 3;
+ }
+ 
+ static const struct nvme_ctrl_ops nvme_pci_ctrl_ops = {
+-- 
+2.43.5
 
