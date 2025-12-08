@@ -1,385 +1,144 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DB5F30FF1D
-	for <linux-block@vger.kernel.org>; Mon,  8 Dec 2025 12:11:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87F642EC0B3
+	for <linux-block@vger.kernel.org>; Mon,  8 Dec 2025 12:12:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765195882; cv=none; b=op8Spv5DdK9Pa7vQsCF7RoeBCvuNxLyROziRIGwCvsvC8Tn/QCQ9kDFo5DJmobPvF67pGRwxmhFkEdTb51UJ8UPSIvDik+wPioQ3G1nkVtQmhPeF8YQZtmtBHIPRoFX5XqIfFrntCSnTY36k76i5Fg7EMM8rGgpfZ4hKSpOp3pw=
+	t=1765195928; cv=none; b=VmjetlpLDzj6pmATpU3bZTRAwO/F2W1jUbzN3bMQHc+JdWniK/ya74Nu6o0aXqQ3e/VLmeXv5JZklXhuT6aLDL1zADTRHUGetDDy4+eByEE0DBJ5HrnQ3WNBzqooYsyFwg52Y/x1GKbTpofsE2WYiE07kRo2tOBb41pE0WcXV90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765195882; c=relaxed/simple;
-	bh=AjO5iyr3sycM8pkoxkFHi2j3JezglR+6at8iRF+LPlo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=A84le/4hLMKu5uerqqTd1pN2xeymulMYzvJkoyEUhbaO0uhLRa91SNmVriUEu5imOTWp+YgolOuvyIR4qAiyrD/9+E40gnXOsaBKkTbCqUqgX2PuzhFDbAZGEWNVaM604WLX3IwmE2kHhWJfqTFHiXwARRui4zctNHdDnQJIX9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZBz82/GG; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1765195928; c=relaxed/simple;
+	bh=ZPc9eyxPsVJcas+WmzBa7USBjP/duqnWSDv9k9gDtGs=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=PSfBKJqvbS0VcYBPbw/0ZjqF4Ln7zzPMY0QLVcc4YC7qSB8b/v21cN63sE3ODpGWPpVxqQRhhsH2zARpiGbo+ONeqVEZMZgkfcqkGklXto9HErbRv3WaBjCOyr41iOIY41oj0w5kxBU1PdXU+1mrR6GZZVI9z46OpiCUx2cgjrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=bbiAvoEj; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZBz82/GG"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765195879;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vvXDl6FlzKKYicGNNkhEQN3ksEUv+vCfWRlQsDRp75M=;
-	b=ZBz82/GGCcMkMdedbWKpkNhA32US8reoeIrSzWbvp28eTPr1SMr489lP5z3uJead3F8RGx
-	pvBRkLQPmNZ7JQhvd7sMqGWkC5+9oobPbTWhfhukNY0tosaYFiRDqH/YgTf6xZkd0qoVZQ
-	/PLqygsjxOigNHjYI2pct1qwKGq0mxs=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-615-2pk4_5FGPfaZa_QA5J-5cw-1; Mon,
- 08 Dec 2025 07:11:14 -0500
-X-MC-Unique: 2pk4_5FGPfaZa_QA5J-5cw-1
-X-Mimecast-MFC-AGG-ID: 2pk4_5FGPfaZa_QA5J-5cw_1765195872
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A7DA318002E4;
-	Mon,  8 Dec 2025 12:11:12 +0000 (UTC)
-Received: from pasta.fast.eng.rdu2.dc.redhat.com (unknown [10.44.34.3])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 941921956095;
-	Mon,  8 Dec 2025 12:11:09 +0000 (UTC)
-From: Andreas Gruenbacher <agruenba@redhat.com>
-To: Christoph Hellwig <hch@infradead.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Chris Mason <clm@fb.com>,
-	David Sterba <dsterba@suse.com>
-Cc: Andreas Gruenbacher <agruenba@redhat.com>,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-raid@vger.kernel.org,
-	dm-devel@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [RFC 12/12] bio: add bio_endio_status
-Date: Mon,  8 Dec 2025 12:10:19 +0000
-Message-ID: <20251208121020.1780402-13-agruenba@redhat.com>
-In-Reply-To: <20251208121020.1780402-1-agruenba@redhat.com>
-References: <20251208121020.1780402-1-agruenba@redhat.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bbiAvoEj"
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5B88en3g001548;
+	Mon, 8 Dec 2025 12:11:45 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=pjKqDD
+	xnDeleMY1oyM3fDMAYl44GJFBsP5Du7IzAyrI=; b=bbiAvoEj5H3Yy0/Hf4JBiy
+	M9uEE4n+Dbs6JijNa6eq39Mjn99FYbZwG83aepBRE5TDsd3/jqrTj1zd6ylXuuvi
+	aX1z+JrIW9vG/bV1fpIjSFtRTg82XNbth4NaDgEbXekNDLutxXUuiMu79vNEn+hc
+	+/FHBdWx8FeGqU3I+wQLyetew2in6arqx3NiMB/RyrxxE4alk0SCGLYetQaK6TCG
+	pQQl+mcbXtTusc/xkAJW+U6aYtE7orD1fzQSJfFnJR88obCxDwaLMVRcxiRB07bJ
+	CDl630zr4hGryrgYniopRwISmBAQQSNabM6WrZRfyf9j6N7FExfIBqFNxDgTXKcQ
+	==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4avc7bqk42-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Dec 2025 12:11:45 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5B8B18d2028102;
+	Mon, 8 Dec 2025 12:11:44 GMT
+Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4avy6xnjw9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Dec 2025 12:11:44 +0000
+Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
+	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5B8CBh4526477194
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 8 Dec 2025 12:11:43 GMT
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3D0705805D;
+	Mon,  8 Dec 2025 12:11:43 +0000 (GMT)
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5CB3F5805A;
+	Mon,  8 Dec 2025 12:11:39 +0000 (GMT)
+Received: from [9.111.12.154] (unknown [9.111.12.154])
+	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  8 Dec 2025 12:11:38 +0000 (GMT)
+Message-ID: <4023a0ad-ef60-4307-aca6-514ee790d6c6@linux.ibm.com>
+Date: Mon, 8 Dec 2025 17:41:37 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: What should we do about the nvme atomics mess?
+From: Nilay Shroff <nilay@linux.ibm.com>
+To: John Garry <john.g.garry@oracle.com>, Keith Busch <kbusch@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org
+References: <20250707141834.GA30198@lst.de>
+ <ee663f87-0dbd-4685-a462-27da217dd259@linux.ibm.com>
+ <aG7fArgdSWIjXcp9@kbusch-mbp>
+ <27a01d31-0432-4340-9f45-1595f66f0500@linux.ibm.com>
+ <a454f040-327c-46d1-8d0a-7745eb8a7aaf@oracle.com>
+ <501169ee-37e9-4b15-89ae-8f2b57da270f@linux.ibm.com>
+ <e7873ec2-c447-4eda-9725-80e614c3e210@oracle.com>
+ <eaeaaf10-2e60-4ce1-9a84-42aaff1b7fc5@linux.ibm.com>
+Content-Language: en-US
+In-Reply-To: <eaeaaf10-2e60-4ce1-9a84-42aaff1b7fc5@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: DMh7LYmT1GwxwF_XzWcu9lWjm40KjSN5
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjA2MDAyMCBTYWx0ZWRfX/CDFhho64bTQ
+ vbJ8cCJ/XzQyzynsm22hdI2oGvA1bJdXTXp0ySPLiSZFgLbH7T4ylneWN9mlfMfCmXX82cPjH9c
+ Cxh1ovhBCpR550ju8mwNYrSK2V3I14V1TuR+dCu4yBWpYVYGW9BWOGBT+7VxwEdcnKlN3O17D2O
+ LIp+iNF3r2lyGjxtGyALTBXSLZsXLj/Fg1okYOhhod1j7Ws5aEoXyO6PDsvlSOIVOP9h13cGClf
+ ZAuw8RektRUuk7LclWNXlTaqdprIglVflvGojeteRwItYZFmoByC3N2B2sHQcLK37ccDGBTiA1s
+ VKXW60d1qNRuPlytPV6VB7lVUgg8hbHB+rfDoEue+g6vgVF7gHaXWw9WbM8LAUkRrXh63IH05yW
+ QEZV4PcM8OOzFjeDjB1yTgXAzUdrGw==
+X-Proofpoint-GUID: DMh7LYmT1GwxwF_XzWcu9lWjm40KjSN5
+X-Authority-Analysis: v=2.4 cv=FpwIPmrq c=1 sm=1 tr=0 ts=6936c081 cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
+ a=I5r0CxplrSDLCy34:21 a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=yPCof4ZbAAAA:8
+ a=2LPsYEdpw_cF1ukiLYkA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-12-06_02,2025-12-04_04,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 bulkscore=0 spamscore=0 lowpriorityscore=0 suspectscore=0
+ malwarescore=0 phishscore=0 clxscore=1015 adultscore=0 impostorscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2512060020
 
-Add a bio_endio_status() helper as a shortcut for calling
-bio_set_status() and bio_endio() in sequence. Use the new helper
-throughout the code.
 
-Created with Coccinelle using the following semantic patch:
 
-@@
-expression bio, status;
-@@
-- bio_set_status(bio, status);
-- bio_endio(bio);
-+ bio_endio_status(bio, status);
+On 10/22/25 8:54 PM, Nilay Shroff wrote:
+> 
+> 
+> On 10/22/25 2:20 PM, John Garry wrote:
+>> On 21/10/2025 16:02, Nilay Shroff wrote:
+>>
+>> -
+>>
+>>>> Does the drive which you are using report NAWUPF as zero (as hinted)?
+>>>>
+>>>> If so, have you tried the followinghttps://lore.kernel.org/linux-nvme/20250820150220.1923826-1- john.g.garry@oracle.com/
+>>>>
+>>>> We were considering changing the NVMe driver to not use AWUPF at all...
+>>> Yes, I just tested your patch with the latest upstream kernel on my drive,
+>>> which reports a non-zero AWUPF but a zero NAWUPF.
+>>
+>> Do you think that you could check with the OEM for updated firmware (that reports NAWUPF)?
+> Yes, certainly — we can check with the disk vendor for updated firmware that correctly reports
+> NAWUPF. I’ve already discussed this with my manager, and he’ll arrange a call with the vendor
+> so that I can directly explain the issue and what we want from the kernel perspective.
+> I’ll follow up with you once I’ve spoken to the vendor.
+> 
+Just an update...
 
-Signed-off-by: Andreas Gruenbacher <agruenba@redhat.com>
----
- block/bio-integrity-auto.c    |  3 +--
- block/blk-core.c              |  6 ++----
- block/blk-mq.c                |  6 ++----
- drivers/block/drbd/drbd_req.c |  3 +--
- drivers/block/ps3vram.c       |  3 +--
- drivers/md/dm-cache-target.c  |  3 +--
- drivers/md/dm-integrity.c     | 15 +++++----------
- drivers/md/dm-mpath.c         |  3 +--
- drivers/md/dm-raid1.c         |  3 +--
- drivers/md/dm-thin.c          |  3 +--
- drivers/md/dm.c               |  3 +--
- drivers/md/raid1-10.c         |  3 +--
- drivers/md/raid10.c           |  6 ++----
- include/linux/bio.h           | 12 ++++++++----
- 14 files changed, 28 insertions(+), 44 deletions(-)
+We met with the vendor team and explained the current situation regarding atomic
+writes and the NVMe Linux kernel driver. I’m happy to report that they acknowledged
+the issue and agreed to provide updated firmware that advertises atomic write support
+using NAWUPF instead of AWUPF.
 
-diff --git a/block/bio-integrity-auto.c b/block/bio-integrity-auto.c
-index 736d53a7f699..1185f6e15d86 100644
---- a/block/bio-integrity-auto.c
-+++ b/block/bio-integrity-auto.c
-@@ -190,8 +190,7 @@ bool bio_integrity_prep(struct bio *bio)
- err_free_buf:
- 	kfree(buf);
- err_end_io:
--	bio_set_status(bio, BLK_STS_RESOURCE);
--	bio_endio(bio);
-+	bio_endio_status(bio, BLK_STS_RESOURCE);
- 	return false;
- }
- EXPORT_SYMBOL(bio_integrity_prep);
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 95cbb3ffcf9f..8b36674dc09a 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -640,8 +640,7 @@ static void __submit_bio(struct bio *bio)
- 	
- 		if ((bio->bi_opf & REQ_POLLED) &&
- 		    !(disk->queue->limits.features & BLK_FEAT_POLL)) {
--			bio_set_status(bio, BLK_STS_NOTSUPP);
--			bio_endio(bio);
-+			bio_endio_status(bio, BLK_STS_NOTSUPP);
- 		} else {
- 			disk->fops->submit_bio(bio);
- 		}
-@@ -882,8 +881,7 @@ void submit_bio_noacct(struct bio *bio)
- not_supported:
- 	status = BLK_STS_NOTSUPP;
- end_io:
--	bio_set_status(bio, status);
--	bio_endio(bio);
-+	bio_endio_status(bio, status);
- }
- EXPORT_SYMBOL(submit_bio_noacct);
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 503ca259429f..10933de73205 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3164,8 +3164,7 @@ void blk_mq_submit_bio(struct bio *bio)
- 	}
- 
- 	if ((bio->bi_opf & REQ_POLLED) && !blk_mq_can_poll(q)) {
--		bio_set_status(bio, BLK_STS_NOTSUPP);
--		bio_endio(bio);
-+		bio_endio_status(bio, BLK_STS_NOTSUPP);
- 		goto queue_exit;
- 	}
- 
-@@ -3205,8 +3204,7 @@ void blk_mq_submit_bio(struct bio *bio)
- 
- 	ret = blk_crypto_rq_get_keyslot(rq);
- 	if (ret != BLK_STS_OK) {
--		bio_set_status(bio, ret);
--		bio_endio(bio);
-+		bio_endio_status(bio, ret);
- 		blk_mq_free_request(rq);
- 		return;
- 	}
-diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.c
-index 5bedc972b622..41dbf8bbcd61 100644
---- a/drivers/block/drbd/drbd_req.c
-+++ b/drivers/block/drbd/drbd_req.c
-@@ -1209,8 +1209,7 @@ drbd_request_prepare(struct drbd_device *device, struct bio *bio)
- 		/* only pass the error to the upper layers.
- 		 * if user cannot handle io errors, that's not our business. */
- 		drbd_err(device, "could not kmalloc() req\n");
--		bio_set_status(bio, BLK_STS_RESOURCE);
--		bio_endio(bio);
-+		bio_endio_status(bio, BLK_STS_RESOURCE);
- 		return ERR_PTR(-ENOMEM);
- 	}
- 
-diff --git a/drivers/block/ps3vram.c b/drivers/block/ps3vram.c
-index 06844674c998..8b8bdfa50c97 100644
---- a/drivers/block/ps3vram.c
-+++ b/drivers/block/ps3vram.c
-@@ -573,8 +573,7 @@ static struct bio *ps3vram_do_bio(struct ps3_system_bus_device *dev,
- 	next = bio_list_peek(&priv->list);
- 	spin_unlock_irq(&priv->lock);
- 
--	bio_set_status(bio, error);
--	bio_endio(bio);
-+	bio_endio_status(bio, error);
- 	return next;
- }
- 
-diff --git a/drivers/md/dm-cache-target.c b/drivers/md/dm-cache-target.c
-index d1dbd4ddaadb..da1b1eb29bb8 100644
---- a/drivers/md/dm-cache-target.c
-+++ b/drivers/md/dm-cache-target.c
-@@ -1856,8 +1856,7 @@ static void requeue_deferred_bios(struct cache *cache)
- 	bio_list_merge_init(&bios, &cache->deferred_bios);
- 
- 	while ((bio = bio_list_pop(&bios))) {
--		bio_set_status(bio, BLK_STS_DM_REQUEUE);
--		bio_endio(bio);
-+		bio_endio_status(bio, BLK_STS_DM_REQUEUE);
- 		cond_resched();
- 	}
- }
-diff --git a/drivers/md/dm-integrity.c b/drivers/md/dm-integrity.c
-index 90780a112009..06e5cdfdec7d 100644
---- a/drivers/md/dm-integrity.c
-+++ b/drivers/md/dm-integrity.c
-@@ -2513,8 +2513,7 @@ static int dm_integrity_map_inline(struct dm_integrity_io *dio, bool from_map)
- 	sector_t recalc_sector;
- 
- 	if (unlikely(bio_integrity(bio))) {
--		bio_set_status(bio, BLK_STS_NOTSUPP);
--		bio_endio(bio);
-+		bio_endio_status(bio, BLK_STS_NOTSUPP);
- 		return DM_MAPIO_SUBMITTED;
- 	}
- 
-@@ -2535,8 +2534,7 @@ static int dm_integrity_map_inline(struct dm_integrity_io *dio, bool from_map)
- 			if (dio->payload_len > x_size) {
- 				unsigned sectors = ((x_size - extra_size) / ic->tuple_size) << ic->sb->log2_sectors_per_block;
- 				if (WARN_ON(!sectors || sectors >= bio_sectors(bio))) {
--					bio_set_status(bio, BLK_STS_NOTSUPP);
--					bio_endio(bio);
-+					bio_endio_status(bio, BLK_STS_NOTSUPP);
- 					return DM_MAPIO_SUBMITTED;
- 				}
- 				dm_accept_partial_bio(bio, sectors);
-@@ -2615,8 +2613,7 @@ static int dm_integrity_map_inline(struct dm_integrity_io *dio, bool from_map)
- 	ret = bio_integrity_add_page(bio, virt_to_page(dio->integrity_payload),
- 					dio->payload_len, offset_in_page(dio->integrity_payload));
- 	if (unlikely(ret != dio->payload_len)) {
--		bio_set_status(bio, BLK_STS_RESOURCE);
--		bio_endio(bio);
-+		bio_endio_status(bio, BLK_STS_RESOURCE);
- 		return DM_MAPIO_SUBMITTED;
- 	}
- 
-@@ -2668,8 +2665,7 @@ static void dm_integrity_inline_recheck(struct work_struct *w)
- 		r = bio_integrity_add_page(outgoing_bio, virt_to_page(dio->integrity_payload), ic->tuple_size, 0);
- 		if (unlikely(r != ic->tuple_size)) {
- 			bio_put(outgoing_bio);
--			bio_set_status(bio, BLK_STS_RESOURCE);
--			bio_endio(bio);
-+			bio_endio_status(bio, BLK_STS_RESOURCE);
- 			return;
- 		}
- 
-@@ -2691,8 +2687,7 @@ static void dm_integrity_inline_recheck(struct work_struct *w)
- 			dm_audit_log_bio(DM_MSG_PREFIX, "integrity-checksum",
- 				bio, dio->bio_details.bi_iter.bi_sector, 0);
- 
--			bio_set_status(bio, BLK_STS_PROTECTION);
--			bio_endio(bio);
-+			bio_endio_status(bio, BLK_STS_PROTECTION);
- 			return;
- 		}
- 
-diff --git a/drivers/md/dm-mpath.c b/drivers/md/dm-mpath.c
-index 761e5e79d4a7..1097ffb05b00 100644
---- a/drivers/md/dm-mpath.c
-+++ b/drivers/md/dm-mpath.c
-@@ -722,8 +722,7 @@ static void process_queued_bios(struct work_struct *work)
- 			bio_io_error(bio);
- 			break;
- 		case DM_MAPIO_REQUEUE:
--			bio_set_status(bio, BLK_STS_DM_REQUEUE);
--			bio_endio(bio);
-+			bio_endio_status(bio, BLK_STS_DM_REQUEUE);
- 			break;
- 		case DM_MAPIO_REMAPPED:
- 			submit_bio_noacct(bio);
-diff --git a/drivers/md/dm-raid1.c b/drivers/md/dm-raid1.c
-index c54995847db0..1f53b125b333 100644
---- a/drivers/md/dm-raid1.c
-+++ b/drivers/md/dm-raid1.c
-@@ -627,8 +627,7 @@ static void write_callback(unsigned long error, void *context)
- 	 * degrade the array.
- 	 */
- 	if (bio_op(bio) == REQ_OP_DISCARD) {
--		bio_set_status(bio, BLK_STS_NOTSUPP);
--		bio_endio(bio);
-+		bio_endio_status(bio, BLK_STS_NOTSUPP);
- 		return;
- 	}
- 
-diff --git a/drivers/md/dm-thin.c b/drivers/md/dm-thin.c
-index bd061a6bf016..ae8850a3e728 100644
---- a/drivers/md/dm-thin.c
-+++ b/drivers/md/dm-thin.c
-@@ -2731,8 +2731,7 @@ static int thin_bio_map(struct dm_target *ti, struct bio *bio)
- 	thin_hook_bio(tc, bio);
- 
- 	if (tc->requeue_mode) {
--		bio_set_status(bio, BLK_STS_DM_REQUEUE);
--		bio_endio(bio);
-+		bio_endio_status(bio, BLK_STS_DM_REQUEUE);
- 		return DM_MAPIO_SUBMITTED;
- 	}
- 
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index cbc64377fa96..1743042db9f6 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -983,8 +983,7 @@ static void __dm_io_complete(struct dm_io *io, bool first_stage)
- 		queue_io(md, bio);
- 	} else {
- 		/* done with normal IO or empty flush */
--		bio_set_status(bio, io_error);
--		bio_endio(bio);
-+		bio_endio_status(bio, io_error);
- 	}
- }
- 
-diff --git a/drivers/md/raid1-10.c b/drivers/md/raid1-10.c
-index 504730aba9df..53903bb91408 100644
---- a/drivers/md/raid1-10.c
-+++ b/drivers/md/raid1-10.c
-@@ -104,8 +104,7 @@ static void md_bio_reset_resync_pages(struct bio *bio, struct resync_pages *rp,
- 		int len = min_t(int, size, PAGE_SIZE);
- 
- 		if (WARN_ON(!bio_add_page(bio, page, len, 0))) {
--			bio_set_status(bio, BLK_STS_RESOURCE);
--			bio_endio(bio);
-+			bio_endio_status(bio, BLK_STS_RESOURCE);
- 			return;
- 		}
- 
-diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
-index 7cc27819beb5..7750d6577b83 100644
---- a/drivers/md/raid10.c
-+++ b/drivers/md/raid10.c
-@@ -3681,8 +3681,7 @@ static sector_t raid10_sync_request(struct mddev *mddev, sector_t sector_nr,
- 			struct resync_pages *rp = get_resync_pages(bio);
- 			page = resync_fetch_page(rp, page_idx);
- 			if (WARN_ON(!bio_add_page(bio, page, len, 0))) {
--				bio_set_status(bio, BLK_STS_RESOURCE);
--				bio_endio(bio);
-+				bio_endio_status(bio, BLK_STS_RESOURCE);
- 				goto giveup;
- 			}
- 		}
-@@ -4863,8 +4862,7 @@ static sector_t reshape_request(struct mddev *mddev, sector_t sector_nr,
- 			len = PAGE_SIZE;
- 		for (bio = blist; bio ; bio = bio->bi_next) {
- 			if (WARN_ON(!bio_add_page(bio, page, len, 0))) {
--				bio_set_status(bio, BLK_STS_RESOURCE);
--				bio_endio(bio);
-+				bio_endio_status(bio, BLK_STS_RESOURCE);
- 				return sectors_done;
- 			}
- 		}
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 06fb8ae018c4..8f6ac5fa0a12 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -382,17 +382,21 @@ static inline void bio_set_status(struct bio *bio, blk_status_t status)
- 		WRITE_ONCE(bio->bi_status, status);
- }
- 
--static inline void bio_io_error(struct bio *bio)
-+static inline void bio_endio_status(struct bio *bio, blk_status_t status)
- {
--	bio_set_status(bio, BLK_STS_IOERR);
-+	bio_set_status(bio, status);
- 	bio_endio(bio);
- }
- 
-+static inline void bio_io_error(struct bio *bio)
-+{
-+	bio_endio_status(bio, BLK_STS_IOERR);
-+}
-+
- static inline void bio_wouldblock_error(struct bio *bio)
- {
- 	bio_set_flag(bio, BIO_QUIET);
--	bio_set_status(bio, BLK_STS_AGAIN);
--	bio_endio(bio);
-+	bio_endio_status(bio, BLK_STS_AGAIN);
- }
- 
- blk_status_t errno_to_blk_status(int errno);
--- 
-2.51.0
+We shall first receive a test firmware build with this change. Once our test team
+verifies that it behaves as expected, the vendor will proceed with a formal firmware
+release. I’ll keep you posted once we receive the updated firmware.
 
+Thanks,
+--Nilay
