@@ -1,238 +1,207 @@
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from BL0PR03CU003.outbound.protection.outlook.com (mail-eastusazon11012002.outbound.protection.outlook.com [52.101.53.2])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70CA22BE7AB
-	for <linux-block@vger.kernel.org>; Tue,  9 Dec 2025 17:49:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765302565; cv=none; b=K/gYNolhWaUljl7ewSDdYiP0qyQ6T1sbl0EXV/yeSV2WvnT6X1qwBQJgCUEnYlg5qI/EPrn/aAUTu4lXlXXZnMepJD0ArqG1DwbJmhArMfYdX6XT7M/1Ip1RIPUtyIwOkT53ZF0TF/86te8uLPXwhJUXdTl39raDP//tVvbblO8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765302565; c=relaxed/simple;
-	bh=k9nc/oIuVNKvEzfosgQpz8WyXpPtovU/h1xUr0fGlnI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Tp4oACLvuABnafUEk0P8blhFPa5rMScqQhjMAkmlt8c7T8zab7EgbJOslOU/PkI5QgXqbcDdQhTagzh+KncST0y/DzKvG4s/ghVzJAfIKQnNGs628b+j+rbJvVgbGdTjoGyaCk/CgzRZoxw1F5ihAvKnXCX+YnkBYN8rOiF+m20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=RTch1hCX; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D657946C;
+	Tue,  9 Dec 2025 17:59:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.53.2
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765303161; cv=fail; b=tZkH9elsL8S3xWIbVunM1yc1KdCWSnG14odMHhBmuV9IXDSS3rIIe5Oq9T2kqcGGcRjuX4cYUuMi6ByCreU52WMXugWTqbJZuxwSZPruoL0r8YK+h5C2RjqjqKpKFkaZE5RJc7UVJCcVxMAyceEZna5uK9fJzcQXmF3LKY++nDg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765303161; c=relaxed/simple;
+	bh=8udvs7+97sBSoQenymTF6uT5NcKJ+NTi8oSLOC/Gmb4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=fdEgXWNStLaSIm32O8NL2lz6TgBH6SVddNr73QzHdHxmtHug8OmntwvK1ujr5tQ7mhFoGUpbe1llnxds0PwjsESxEgs7Fl/PVADhCZEuuWYikbUqbqp1xcF3zmzoo9ShBXjRYtEH9FFaGarCgouxNK9+IaUJrDeHMW1yiYrMmw0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=nyB/lU3/; arc=fail smtp.client-ip=52.101.53.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="RTch1hCX"
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-7acd9a03ba9so6379101b3a.1
-        for <linux-block@vger.kernel.org>; Tue, 09 Dec 2025 09:49:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1765302563; x=1765907363; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rz2s4/XACP16CBGrl75sJvoaK4RRP2zE8Z8SxMQdAxE=;
-        b=RTch1hCXlWwUACfKxWdgumW1Z5SHFJrrAcrxm1E17JulWPxVbO9xqynepfSC/udbAS
-         JdiXjwPXzIT6CSv5FuN+8xgxbWeOD2Ex6C7oemftOAzKk1S1IUizIq3I5FhFQqG9rTQm
-         L/5v6KkYNqw1Ki++SN4YNSfwdldAt5d86ycSJlU5h5PLycArczCF+4TjJwldurBc+fNP
-         1SmYNOhDKIihtciIZ0sZTj5s/jey4rkYYgx9YmXz4IuqKzOQ9div42VFfBjqy4TwYAxn
-         AJYqT8ajyCCO/AFGUjKwodWhgbguMIDmChFXONDH/DM7tPeAxGJF7SDGSKhYGyqSBWqh
-         ojnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765302563; x=1765907363;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rz2s4/XACP16CBGrl75sJvoaK4RRP2zE8Z8SxMQdAxE=;
-        b=uKIF2sdLNBCHdXxeIjg2rNeOoHM3TIgMQ+5U329qry/BB7n9K9bR3k8hTtWvBz8JpK
-         Y2zvs7EcI/v+ZZ3Vi0joXe4Y+7lv5OcXBwvFK4rmAcQMdnMHGs78dsdM3P0lwE354Cns
-         /tRXLkDKGr0gc05/T3V1yds3S3IU7ZSCOUpyoV0l/NVbEgbrkwZFZ/ZpEHCtb40k5b10
-         0Y75w+S4MhjIwcCOg868z3Kr3kbXR6luur7v4F5qHmoAAWYTNN6ME30Uuor7c3uGE7A+
-         IK0RUzUX8RVMBOf7FVlKsuEB8m6HnZbeWxgSGeIdSrk5TapmPqPLpuslB8BI/YXl/MfW
-         9Ayw==
-X-Forwarded-Encrypted: i=1; AJvYcCWWw5ZJWUW+xSR01z/97X9w8DHadS97NUcms96/rIrHnwkEtInlAObK074XRjQ+OLaajwmkxiXhzAEZ4g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxsqnNuUY1VsNe/onuDdu6+Ai+f1y1LVE6kzNLktKDv8DcDmfTU
-	sJcaMvSj4uZjoGQ1BbfOZN4WSzl4QKbHpmBS4hVWBsVi7fRy4ho7b9KyIxvu+1UapfA=
-X-Gm-Gg: ASbGncuZijfu2zzHohISyim54I72qHUJoy5JPzMQ3r4FQsw/Tqv6jwTIYyJLsRKG+c/
-	N/I86zFJCMc8PH1Idqd7jh3Uhi9nro2wyXujRVTa+dy2qqu91um1g7tDFSBsrBAahoMOdTIkQFl
-	sxBX2nlsCsrKe8E0mbIYowFztkgePV6vlS9k+nqe8zUfRl2GnaJAwTkPmchm3xsUILpSPuFYIy7
-	VlyrS1iE5TsMW6Ce7ZigqoxF1DGD2dWZOHfgdrprVw7hERPY5cXkEwUQG2M3AhlWYsxTH0aV7Fb
-	zPSnCHosiiZQzqg8scYjdSo6U+G5iK9sUzHgi84vI5To5kQ9nQIH/KjI+om0q35kznDDHSty1Ii
-	Ii30kSuzfdcXQu24dZrqO78X/ZJFTmdl4Pbk3uGMaBSfieJYBNxBACShnm2Xap44cPo5Ovio8A8
-	1sB85Vf9AFrc0d0NLx1UfO+vHYvllJM0ZW/62ExPj5Lg==
-X-Google-Smtp-Source: AGHT+IGis1f6KspkvOM2VBXvQEdi5glaA2doxCZeF0Ob2aKVUNq/AVWKalRTwQc42pJMi4xLulDIzA==
-X-Received: by 2002:a05:7022:f8c:b0:11b:9386:825d with SMTP id a92af1059eb24-11e032c9b59mr10189100c88.42.1765302562406;
-        Tue, 09 Dec 2025 09:49:22 -0800 (PST)
-Received: from medusa.lab.kspace.sh ([208.88.152.253])
-        by smtp.googlemail.com with UTF8SMTPSA id a92af1059eb24-11df7573508sm52718771c88.3.2025.12.09.09.49.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Dec 2025 09:49:22 -0800 (PST)
-Date: Tue, 9 Dec 2025 09:49:20 -0800
-From: Mohamed Khalfella <mkhalfella@purestorage.com>
-To: Hannes Reinecke <hare@suse.de>
-Cc: Chaitanya Kulkarni <kch@nvidia.com>, Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Casey Chen <cachen@purestorage.com>,
-	Yuanyuan Zhong <yzhong@purestorage.com>,
-	Ming Lei <ming.lei@redhat.com>, Waiman Long <llong@redhat.com>,
-	Hillf Danton <hdanton@sina.com>, linux-nvme@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 1/1] block: Use RCU in blk_mq_[un]quiesce_tagset()
- instead of set->tag_list_lock
-Message-ID: <20251209174920.GF337106-mkhalfella@purestorage.com>
-References: <20251205211738.1872244-1-mkhalfella@purestorage.com>
- <20251205211738.1872244-2-mkhalfella@purestorage.com>
- <eb03af5f-6371-4e3b-acfc-9c3d75403d18@suse.de>
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="nyB/lU3/"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=pzB044K9vc60lhsOd25yS6+iUI+LZz9QKkKcGW32xdA1YWZB9vdsvxo65jqecmGQW+cjxlbS8jF8tRAe8/JvREksePUmQwGv0aA4P6Q6s7jePjA/unYzkjHAkID7IsgNZsLXaldaLflYDRix3OFxBnyMg1weoo/LCQE475jziOuZnwn5iW3ow69O+Pq2/YAxMcgU+pdbzjdLhrqV9RIcqZt+1gXcm5uB0OLp/aOu5ejtZhLOCtN6dquVCBLGeWQl9Pqv493p+CbEZCg6T7fsHMXAKJ+av+DOHHYUF5GQKsq8mqpjW5//f1hqgD6EV/GP6KIhfuZ49Jt/ZIHNc1/4PA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8udvs7+97sBSoQenymTF6uT5NcKJ+NTi8oSLOC/Gmb4=;
+ b=PmiTZxJSTQ9+civ7Imaa4rlyazyFaLxeYWLljNgTzgA+c3MHt47r03yCOmqsP0BwSAQ+QXOR2Gc2lyKtm2PiaLOZjiEbvbMnp9oZ1NQq/HXNzAAfWPah9s3PSApfsu562xDPbUXd1RjC9HtuIbX0kRxIrnUUBu7Ri+p0322VjypyFk2cvdunJdFXv8NS0uIoGS9fjwyH7zs7eIqaKKMmdqEw3ILobC4yxviCfQ4OdCJaixE+gapCcdVgWOu9CkAs+NNHwx8PXMkfb8MwUIVeZWxSMiOJ4+qsNDwIT1hLJSKw48B9p8T6ixa5pERc0PGpIGE+xWf0DsBfLH45kv0XKw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8udvs7+97sBSoQenymTF6uT5NcKJ+NTi8oSLOC/Gmb4=;
+ b=nyB/lU3/LttYDR6aDuePJ9uozObFLH38aJD2TgFNHcWbrR2b3UUgisI2UWXTSCbmGOtQ56Le9wzp0tITuSooLa8zLrtFm5ZVuxVfiiI+tmABVL67KB4RexGGnr3LiSz+t0szYUpWVKmtKWjVVWCvBqcqurtAsVnfmXpNKd6Z1NTxQIU96E6qDOfhyz+S0YqMLyfVDjr+qcUh/vJx0KNCzvnVz+SHu6D/O433nT3fKiJCVZi6I92ZmxI9eD6NXZ+ExnDGYvBjZ1gVhRasbUF+S9MfxbyfHlmWS1sLfueG1nuFDRpNPHeA87Xl0vLb1GIWB97XqjX4bnslPvWamAAszw==
+Received: from LV3PR12MB9404.namprd12.prod.outlook.com (2603:10b6:408:219::9)
+ by IA0PR12MB8747.namprd12.prod.outlook.com (2603:10b6:208:48b::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9388.14; Tue, 9 Dec
+ 2025 17:59:13 +0000
+Received: from LV3PR12MB9404.namprd12.prod.outlook.com
+ ([fe80::57ac:82e6:1ec5:f40b]) by LV3PR12MB9404.namprd12.prod.outlook.com
+ ([fe80::57ac:82e6:1ec5:f40b%5]) with mapi id 15.20.9412.005; Tue, 9 Dec 2025
+ 17:59:13 +0000
+From: Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To: Robin Murphy <robin.murphy@arm.com>
+CC: Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>, Will Deacon
+	<will@kernel.org>, Carlos Maiolino <cem@kernel.org>, "iommu@lists.linux.dev"
+	<iommu@lists.linux.dev>, "linux-xfs@vger.kernel.org"
+	<linux-xfs@vger.kernel.org>, "linux-nvme@lists.infradead.org"
+	<linux-nvme@lists.infradead.org>, Sebastian Ott <sebott@redhat.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: WARNING: drivers/iommu/io-pgtable-arm.c:639
+Thread-Topic: WARNING: drivers/iommu/io-pgtable-arm.c:639
+Thread-Index: AQHcaQFVH3CUuaIhmEu/T0GQ8kjfQrUZMfcAgABerYCAAAFnAIAABv+A
+Date: Tue, 9 Dec 2025 17:59:13 +0000
+Message-ID: <35d68746-63e8-48f2-b4e3-045354a5934a@nvidia.com>
+References: <170120f7-dd2c-4d2a-d6fc-ac4c82afefd7@redhat.com>
+ <4386e0f7-9e45-41d2-8236-7133d6d00610@arm.com>
+ <d1d76dcb-5241-4290-ae69-7d20e4461b9b@nvidia.com>
+ <3451a93a-e4d5-4017-b4e3-e58fae3751f8@arm.com>
+In-Reply-To: <3451a93a-e4d5-4017-b4e3-e58fae3751f8@arm.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: LV3PR12MB9404:EE_|IA0PR12MB8747:EE_
+x-ms-office365-filtering-correlation-id: 56af5625-9001-4e96-937f-08de374ca98c
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|7416014|1800799024|376014|10070799003|366016|38070700021;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?dmNhMXl3SUhkbmRoam5OdE96N0xSQW5pNHU4ZDE1ekcvNmJWdytHSi9sTTZt?=
+ =?utf-8?B?RlJZc0dxVG4yR1I1eGh0cmpnZEtDY090YzZ5OHJHRU1mS05tRisxanFkdEJi?=
+ =?utf-8?B?bzQvS0VmaEpmWXRYYmg1azYyK1E5alpJL3UzQ21qelV0MVovYU9VbTJycUQ3?=
+ =?utf-8?B?UjU4dzd6UHV4VlAzd0xyM3dBZ1BXd2JFTXBsRnVXVXlkQWR6MUVIOWNxOGdM?=
+ =?utf-8?B?bEF3TEtuK1kwUWVrcWc3Uy8zY1NNWmR0SlRyNWtGTmc2ODR6R0ZjNnc0ZUFq?=
+ =?utf-8?B?bkdFc0xyS0dQa29najJCYUVwK0oycmgxdjIyL29UaHFVTGlvcjBNSE5qeGVO?=
+ =?utf-8?B?bTZFczZoNFpseVNabGdlSFlRMW83cE5ZVWVZcEJoMVZHMFVTdEtmNW5jZENJ?=
+ =?utf-8?B?enpRREJvaTJrU2tQcC9YdFVBdUlHbzBWQVB2cnBKQStmSW9KS2hrdWV6RWpz?=
+ =?utf-8?B?Ty9YWWt0QjFmL3d1YUZBdWp1RzFyRDRqMzJ3bnUzVXJCUEZwN3BXMlhwYmFZ?=
+ =?utf-8?B?NkJDaSs2SjRuMUJ3RUd3YnhpbitvTXovK29hdlpJOUR2bkpPVnQ4ZzY1cEZS?=
+ =?utf-8?B?UFFFbUZSQy9XMEJ1S05oQWZBQUxTWHVtQ0JLR0RVMWp1TGI4TlB1MXhVMTZW?=
+ =?utf-8?B?Si9xQVE2U014QXY3TzBab0Zva0JqWVE2Mm82T2RpM0VWbXBvNGdiVEJwRFN4?=
+ =?utf-8?B?R0lvN0krQXd5VEJpQVB4Nkd4YWx4SWdWanRnaVJuMGpkUTVDNVc0ZHRZVVRu?=
+ =?utf-8?B?ekpUZG9jNTB1WWhDdGUvRkJ5NjE1bVlpQ0JwTzh5aVordFhldTMrTWd5dzd4?=
+ =?utf-8?B?QWpKaE5lV3RmR25GemltS2M2bU8rWUN0OHdVZjNLZTl5OXBjejMxRVE0eTEy?=
+ =?utf-8?B?Yk42aHdMaFVXdGxUc29JRVBROVJ6S0FTNzhzUktjQkJZV0pWTzN6bzlwajV4?=
+ =?utf-8?B?Y2hRbmxXUjJFSUJyU0h6aE1tUkdZT1FHaWprMUx0anNwYWY3L0czd0Y2TGZj?=
+ =?utf-8?B?NmFtTXhHUHlEbkZHSmFUR0dZeXhRQ29BZ29jYktzeGNWMjhMVVJJY1g4VkxV?=
+ =?utf-8?B?MHVrY25ySjBuVTlUMU8xTmtMMWtCd1krb3Y5N3g2ZEFQSStkOGtOSnd4cm81?=
+ =?utf-8?B?NlRyS0srQW9iK2NwL25QbWR4ZktNNGpXczFKWXBWSTUydXA1Tm04ZnZFMTN0?=
+ =?utf-8?B?dnYyMXh3d1NQM2wwcjNVRnQxVEdZVnRaZjNiNTc4RHZqY21MdWMybEJaZzdC?=
+ =?utf-8?B?N2xVNWp2MmZBK0dtdnZ1TDM3TzRUZzd3d3Uzc2NOVW9IeEo4MjRjWUZTVFQr?=
+ =?utf-8?B?eFYxOXVoZk16b0xIekE3QkpnQnRlZ0x6TGFPZWdhWE1EelJqdlFHSytIS25S?=
+ =?utf-8?B?NFM4dmQvVzdJMHRoc2lWODg3MEFhalRIYzhYVkpLUndIaGxheHZaSEpHaGlM?=
+ =?utf-8?B?bDluVHc0ajZhWHBQSEo2bVRGZ3hKWHFvZFZCU3A3SFJkYTRzWmlFQm4zSitk?=
+ =?utf-8?B?RGt0R0VSUWhkVUNsdGFUQ0ZPdDU0VXBPNmllY1BCZ2w4S2hsSm53T21lNUJD?=
+ =?utf-8?B?bU13ODBUSkNrLzZwaDVubDQ5WTZLNG5CRmFnY2Y5UlliWXVDRitvVjhwU24x?=
+ =?utf-8?B?MGlZQkprcmhjM0lROExDcUdHc3ZZZzZETWlvNjgweTJ1SFdnZVNMbjNZRVZF?=
+ =?utf-8?B?SlR0dkRudU5BYW5tUFlkVitXRG9kOHpiOTNwRWRSOWhtV2tPbDF0N05xR01a?=
+ =?utf-8?B?VC95WlhDaWV5ZWROL3VZSHdlTFR5V2xzQUdWcWtqeGQxVmdHcFE0Y0ZYY0pi?=
+ =?utf-8?B?emtyMjhHelBnQ1ByYmZJWW1Dem1ZSW9nZ3FOWUpUWnFHekFiSGx5RVFBa3hL?=
+ =?utf-8?B?d3R0SlYxc25uMWhJM3VacUZNM3Nyb09Mb0wwZzVoRHYrNm5lc29ZQndRc1Nz?=
+ =?utf-8?B?czVRbEF2VXNzMGFmNUxDMnFYZVpka21lekJ5bXZiMUJpbEtVYXg2clRINWRI?=
+ =?utf-8?B?T2RPY2xETkR4ajlRUnJ3OEk2L1ViMkxLTXRJS3Q0SnVyMGZTakdMZkMxdjg3?=
+ =?utf-8?Q?f2GzYe?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR12MB9404.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(376014)(10070799003)(366016)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?Z1VlSFRJdS8zTGozSU1xOTRqYkloL3htWElLSCtOYVJYWnJlN211QVVYajgx?=
+ =?utf-8?B?bmVhRE94bXIzUzVFOCsyUkxzK3hQR2d3cGhTVitWSTgzUjQyOGxTK2lnVHhv?=
+ =?utf-8?B?UVVjS1ltSEZMQnRHY0ZWZlVJYU5paWlPYkpUZzFlcDRyT3VLbXV4QXU1eWxt?=
+ =?utf-8?B?bUh2T2xwZGI4UlRMNGJ6WFVsV2t1SGlpZzhXYzIxamdaQk1taWNJNVlBS2xZ?=
+ =?utf-8?B?dmpxSi9zT0F5QjBMU05VaGZmRmh0Snlmak5QSk5IdDExUWlwa05iR1prYWpI?=
+ =?utf-8?B?cXhPQ3EySTdkd2lBOUM1aUhraXVzOHZ0dGhPWEJsTklKUk9SMHpyN0tFZitP?=
+ =?utf-8?B?c0hRWmNuQ1NZSVZBUmtWdkhxakNBeUJqaEZFS3ZZWlZOdUdLSGlPWUtFTFpT?=
+ =?utf-8?B?ZGpHdzZqQndTcmlWbUoxWnMyb05SaklFQ1IxRmU3ckZmdllVdEFlSnlMcDl5?=
+ =?utf-8?B?eS93SytkUVZ2ajd1OHcxaEdGOE1wTnZ5OWxKbWo2QXpkQWRaejVoKzRzWmNt?=
+ =?utf-8?B?UmdFNG8vNW5zMDBqaWNuUHVOei9hUjFqZEM1VTBJY1dRRkdQcXpqemR6UnNS?=
+ =?utf-8?B?M2UxcWFFZ092RFgxR3pVcmxNNnVSZXFtbERXVmdHZzZMK3g3NStLellQMkN4?=
+ =?utf-8?B?eDQ2NUlGVGdQOU5sU2Q3aFNEK3pOemVBNS84TStsUy9idERaWUFZRUl3NGdo?=
+ =?utf-8?B?cm1ocWxmRm1FU29mWS9mVFFML1l0Y1BtWitrQ05ONS9uWFRIQVpVanBYQTBH?=
+ =?utf-8?B?MFZZQnBVYW1jamJYQTFsK3d2bWM1ZHZSYTIwOXVoZzRzdlpudnhBTkVuN3o2?=
+ =?utf-8?B?Ymk5UlFxb05ncU4yeUhCbWprRitMYmxHcTN1eTNzbkZsZmlvVitEZk9lY0hH?=
+ =?utf-8?B?OS9oYW9vSEczTy9YeDJ0Wnc4dlg5ZjVBdk1YclluZ1NrSXpEUkdmamJZalVa?=
+ =?utf-8?B?S1REQVAzOVhsY2dLRThWV3Q4Y0JJWEhSSFJDa2Y2OGpWa3BINW1BRHRYVmJT?=
+ =?utf-8?B?bCtQNG5OYlJab2JxZU81TDVzczd6S3lyaU5qV2VmRzMvR1U5K0RHc0tXMWVZ?=
+ =?utf-8?B?MFVucG5mMHRFaWN6MTlUR1g0RFFNcE9SdG81Zm0wQU5BVjFvQlRvaGxJQU42?=
+ =?utf-8?B?UjNwbURYRmRKRmc0Z1JVYzhUU3pmcjFnUk9EQkpkdUs5OUFzS2xCcmVzdmg5?=
+ =?utf-8?B?a0JaNkRDaUpjdjlXbDFKa1dNLzVTWW43alFJQ2dpWFFSaXFlcEFRL0JuWmg3?=
+ =?utf-8?B?QXVLaElYQ2Q2YUZuRlZuL0RXdVNLVGpFakFlK3o5NkJIdHNmWjlGN1ZHaUZ4?=
+ =?utf-8?B?SmZmWmUwRXNEZ01FY0RIYitLRnlGMUhUOVZ0ZWh2ZlY1Zkh5NUJrbHZlMytY?=
+ =?utf-8?B?bTBJTHlVSjNWSmpIWEk1aVBISFgya1BDZ1EveUtKaGtvTUVycmlwSmQ1RWN5?=
+ =?utf-8?B?VDF5RC9jRVNlSm1MZm95SVNoeUFGYWI2Zkd0Z1NkVWtXa2FubEdjYlJKTm9Y?=
+ =?utf-8?B?Wk05eFF0b0VUUmE0Vk9IRVMvK2NKNHd6V1VVdjNpTXYrZU84UUVIN01PRUdK?=
+ =?utf-8?B?ZmxvT3Vub1BJT1lWeDlHOW15RjFxUks3dlVSdTFNZGdKR1BLTDFSYkQvcGov?=
+ =?utf-8?B?a2lWQmNqbklIRnlLZ1RpRHhzMXBWcjFzUnNlTDRySjA3T09ldW1sS0Z4Wi95?=
+ =?utf-8?B?U3dwK3dkR2FnOWI1TzA2MUlXKzJlRW50ZGk3SGU3cGJienk0QVVSMmZSWHRx?=
+ =?utf-8?B?cVNQeFpENTVqekRFeVgwYmF5MWVPUGorVk1RUll6bWlRRUh4SVc0akEvTGRx?=
+ =?utf-8?B?bTVKUS94V0s1eEtwQkRINXA2SEE3dHZIaFFHRHQwZUNMNnNJMG5EdXY0dVhQ?=
+ =?utf-8?B?Vis5UTg3STdDNzk2MmFja2Q2eUhMaGtwalZPQUJ2bGQ3TEIzMnR6OE1FWVNk?=
+ =?utf-8?B?YmdXZnpmSWxhOXdFZmNvZDdyNEgzSFpIaXkxZTc4azNoaUlBdHF2THZNZGw2?=
+ =?utf-8?B?b0FNV0VlU0pwbWJVdlpnbUMyS2VFT2tSNkFuV1pHKzlzb1Z6SzFkNzU3eHU3?=
+ =?utf-8?B?TlJVOVNpUkR2WkZPdlNlTExTU09Jc1dybi9ISEVic3pZMlBvemZvU2RZOGwv?=
+ =?utf-8?B?T2txZ0ZQQ2J6OU9MV05pTWoxeWxpVmJFa1B0MjlmQWpXT05pcDc1MGQ2K2Zt?=
+ =?utf-8?Q?YiLKVwuLqdPSIAlwZWzg7kg+pXhwkQCcjOSYrSvR+PgE?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <F8C6749CB627BF468E94E31FB3F2CCF4@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <eb03af5f-6371-4e3b-acfc-9c3d75403d18@suse.de>
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: LV3PR12MB9404.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 56af5625-9001-4e96-937f-08de374ca98c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Dec 2025 17:59:13.4222
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: HH9dMZqKRs/v8OljLL9aOTkaeQLzf22DXB9+S3WWPXYrE+cv7m1JUkOuq5BRLcR0Z+Qc2ZUTVsLKa7owjjcDEQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8747
 
-On Tue 2025-12-09 08:30:23 +0100, Hannes Reinecke wrote:
-> On 12/5/25 22:17, Mohamed Khalfella wrote:
-> > blk_mq_{add,del}_queue_tag_set() functions add and remove queues from
-> > tagset, the functions make sure that tagset and queues are marked as
-> > shared when two or more queues are attached to the same tagset.
-> > Initially a tagset starts as unshared and when the number of added
-> > queues reaches two, blk_mq_add_queue_tag_set() marks it as shared along
-> > with all the queues attached to it. When the number of attached queues
-> > drops to 1 blk_mq_del_queue_tag_set() need to mark both the tagset and
-> > the remaining queues as unshared.
-> > 
-> > Both functions need to freeze current queues in tagset before setting on
-> > unsetting BLK_MQ_F_TAG_QUEUE_SHARED flag. While doing so, both functions
-> > hold set->tag_list_lock mutex, which makes sense as we do not want
-> > queues to be added or deleted in the process. This used to work fine
-> > until commit 98d81f0df70c ("nvme: use blk_mq_[un]quiesce_tagset")
-> > made the nvme driver quiesce tagset instead of quiscing individual
-> > queues. blk_mq_quiesce_tagset() does the job and quiesce the queues in
-> > set->tag_list while holding set->tag_list_lock also.
-> > 
-> > This results in deadlock between two threads with these stacktraces:
-> > 
-> >    __schedule+0x47c/0xbb0
-> >    ? timerqueue_add+0x66/0xb0
-> >    schedule+0x1c/0xa0
-> >    schedule_preempt_disabled+0xa/0x10
-> >    __mutex_lock.constprop.0+0x271/0x600
-> >    blk_mq_quiesce_tagset+0x25/0xc0
-> >    nvme_dev_disable+0x9c/0x250
-> >    nvme_timeout+0x1fc/0x520
-> >    blk_mq_handle_expired+0x5c/0x90
-> >    bt_iter+0x7e/0x90
-> >    blk_mq_queue_tag_busy_iter+0x27e/0x550
-> >    ? __blk_mq_complete_request_remote+0x10/0x10
-> >    ? __blk_mq_complete_request_remote+0x10/0x10
-> >    ? __call_rcu_common.constprop.0+0x1c0/0x210
-> >    blk_mq_timeout_work+0x12d/0x170
-> >    process_one_work+0x12e/0x2d0
-> >    worker_thread+0x288/0x3a0
-> >    ? rescuer_thread+0x480/0x480
-> >    kthread+0xb8/0xe0
-> >    ? kthread_park+0x80/0x80
-> >    ret_from_fork+0x2d/0x50
-> >    ? kthread_park+0x80/0x80
-> >    ret_from_fork_asm+0x11/0x20
-> > 
-> >    __schedule+0x47c/0xbb0
-> >    ? xas_find+0x161/0x1a0
-> >    schedule+0x1c/0xa0
-> >    blk_mq_freeze_queue_wait+0x3d/0x70
-> >    ? destroy_sched_domains_rcu+0x30/0x30
-> >    blk_mq_update_tag_set_shared+0x44/0x80
-> >    blk_mq_exit_queue+0x141/0x150
-> >    del_gendisk+0x25a/0x2d0
-> >    nvme_ns_remove+0xc9/0x170
-> >    nvme_remove_namespaces+0xc7/0x100
-> >    nvme_remove+0x62/0x150
-> >    pci_device_remove+0x23/0x60
-> >    device_release_driver_internal+0x159/0x200
-> >    unbind_store+0x99/0xa0
-> >    kernfs_fop_write_iter+0x112/0x1e0
-> >    vfs_write+0x2b1/0x3d0
-> >    ksys_write+0x4e/0xb0
-> >    do_syscall_64+0x5b/0x160
-> >    entry_SYSCALL_64_after_hwframe+0x4b/0x53
-> > 
-> > The top stacktrace is showing nvme_timeout() called to handle nvme
-> > command timeout. timeout handler is trying to disable the controller and
-> > as a first step, it needs to blk_mq_quiesce_tagset() to tell blk-mq not
-> > to call queue callback handlers. The thread is stuck waiting for
-> > set->tag_list_lock as it tries to walk the queues in set->tag_list.
-> > 
-> > The lock is held by the second thread in the bottom stack which is
-> > waiting for one of queues to be frozen. The queue usage counter will
-> > drop to zero after nvme_timeout() finishes, and this will not happen
-> > because the thread will wait for this mutex forever.
-> > 
-> > Given that [un]quiescing queue is an operation that does not need to
-> > sleep, update blk_mq_[un]quiesce_tagset() to use RCU instead of taking
-> > set->tag_list_lock, update blk_mq_{add,del}_queue_tag_set() to use RCU
-> > safe list operations. Also, delete INIT_LIST_HEAD(&q->tag_set_list)
-> > in blk_mq_del_queue_tag_set() because we can not re-initialize it while
-> > the list is being traversed under RCU. The deleted queue will not be
-> > added/deleted to/from a tagset and it will be freed in blk_free_queue()
-> > after the end of RCU grace period.
-> > 
-> > Signed-off-by: Mohamed Khalfella <mkhalfella@purestorage.com>
-> > Fixes: 98d81f0df70c ("nvme: use blk_mq_[un]quiesce_tagset")
-> > ---
-> >   block/blk-mq.c | 17 ++++++++---------
-> >   1 file changed, 8 insertions(+), 9 deletions(-)
-> > 
-> > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > index d626d32f6e57..05db3d20783f 100644
-> > --- a/block/blk-mq.c
-> > +++ b/block/blk-mq.c
-> > @@ -335,12 +335,12 @@ void blk_mq_quiesce_tagset(struct blk_mq_tag_set *set)
-> >   {
-> >   	struct request_queue *q;
-> >   
-> > -	mutex_lock(&set->tag_list_lock);
-> > -	list_for_each_entry(q, &set->tag_list, tag_set_list) {
-> > +	rcu_read_lock();
-> > +	list_for_each_entry_rcu(q, &set->tag_list, tag_set_list) {
-> >   		if (!blk_queue_skip_tagset_quiesce(q))
-> >   			blk_mq_quiesce_queue_nowait(q);
-> >   	}
-> > -	mutex_unlock(&set->tag_list_lock);
-> > +	rcu_read_unlock();
-> >   
-> >   	blk_mq_wait_quiesce_done(set);
-> >   }
-> > @@ -350,12 +350,12 @@ void blk_mq_unquiesce_tagset(struct blk_mq_tag_set *set)
-> >   {
-> >   	struct request_queue *q;
-> >   
-> > -	mutex_lock(&set->tag_list_lock);
-> > -	list_for_each_entry(q, &set->tag_list, tag_set_list) {
-> > +	rcu_read_lock();
-> > +	list_for_each_entry_rcu(q, &set->tag_list, tag_set_list) {
-> >   		if (!blk_queue_skip_tagset_quiesce(q))
-> >   			blk_mq_unquiesce_queue(q);
-> >   	}
-> > -	mutex_unlock(&set->tag_list_lock);
-> > +	rcu_read_unlock();
-> >   }
-> >   EXPORT_SYMBOL_GPL(blk_mq_unquiesce_tagset);
-> >   
-> > @@ -4294,7 +4294,7 @@ static void blk_mq_del_queue_tag_set(struct request_queue *q)
-> >   	struct blk_mq_tag_set *set = q->tag_set;
-> >   
-> >   	mutex_lock(&set->tag_list_lock);
-> > -	list_del(&q->tag_set_list);
-> > +	list_del_rcu(&q->tag_set_list);
-> >   	if (list_is_singular(&set->tag_list)) {
-> >   		/* just transitioned to unshared */
-> >   		set->flags &= ~BLK_MQ_F_TAG_QUEUE_SHARED;
-> > @@ -4302,7 +4302,6 @@ static void blk_mq_del_queue_tag_set(struct request_queue *q)
-> >   		blk_mq_update_tag_set_shared(set, false);
-> >   	}
-> >   	mutex_unlock(&set->tag_list_lock);
-> > -	INIT_LIST_HEAD(&q->tag_set_list);
-> >   }
-> >   
-> I'm ever so sceptical whether we can remove the INIT_LIST_HEAD() here.
-> If we can it was pointless to begin with, but I somehow doubt that.
-> Do you have a rationale for that (except from the fact that you
-> are moving to RCU, and hence the 'q' pointer might not be valid then).
-> 
-I think it was pointless to begin with. 'q' is on its way to be freed.
-q->tag_set_list is not going to be used again.
+T24gMTIvOS8yNSAwOTozNCwgUm9iaW4gTXVycGh5IHdyb3RlOg0KPiBPbiAyMDI1LTEyLTA5IDU6
+MjkgcG0sIENoYWl0YW55YSBLdWxrYXJuaSB3cm90ZToNCj4+IE9uIDEyLzkvMjUgMDM6NTAsIFJv
+YmluIE11cnBoeSB3cm90ZToNCj4+PiBPbiAyMDI1LTEyLTA5IDExOjQzIGFtLCBTZWJhc3RpYW4g
+T3R0IHdyb3RlOg0KPj4+PiBIaSwNCj4+Pj4NCj4+Pj4gZ290IHRoZSBmb2xsb3dpbmcgd2Fybmlu
+ZyBhZnRlciBhIGtlcm5lbCB1cGRhdGUgb24gVGh1cnN0ZGF5LCBsZWFkaW5nDQo+Pj4+IHRvIGEN
+Cj4+Pj4gcGFuaWMgYW5kIGZzIGNvcnJ1cHRpb24uIEkgZGlkbid0IGNhcHR1cmUgdGhlIGZpcnN0
+IHdhcm5pbmcgYnV0IEknbQ0KPj4+PiBwcmV0dHkNCj4+Pj4gc3VyZSBpdCB3YXMgdGhlIHNhbWUu
+IEl0J3MgcmVwcm9kdWNpYmxlIGJ1dCBJIGRpZG4ndCBiaXNlY3Qgc2luY2UgaXQNCj4+Pj4gYm9y
+a2VkIG15IGZzLiBUaGUgb25seSBoaW50IEkgY2FuIGdpdmUgaXMgdGhhdCB2Ni4xOCB3b3JrZWQu
+IElzIHRoaXMgYQ0KPj4+PiBrbm93biBpc3N1ZT8gQW55dGhpbmcgSSBzaG91bGQgdHJ5Pw0KPj4+
+DQo+Pj4gbnZtZV91bm1hcF9kYXRhKCkgaXMgYXR0ZW1wdGluZyB0byB1bm1hcCBhbiBJT1ZBIHRo
+YXQgd2FzIG5ldmVyDQo+Pj4gbWFwcGVkLCBvciBoYXMgYWxyZWFkeSBiZWVuIHVubWFwcGVkIGJ5
+IHNvbWVvbmUgZWxzZS4gVGhhdCdzIGEgdXNhZ2UgDQo+Pj4gYnVnLg0KPj4+DQo+Pj4gVGhhbmtz
+LA0KPj4+IFJvYmluLg0KPj4NCj4+IEFua2l0IEEuIGFsc28gcmVwb3J0ZWQgdGhpcy4NCj4+DQo+
+PiBBcGFydCBmcm9tIHVubWFwcGluZywgYnkgYW55IGNoYW5jZSBkbyB3ZSBuZWVkIHRoaXMgPw0K
+Pj4NCj4+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2lvbW11L2lvLXBndGFibGUtYXJtLmMgDQo+PiBi
+L2RyaXZlcnMvaW9tbXUvaW8tcGd0YWJsZS1hcm0uYw0KPj4gaW5kZXggZTY2MjYwMDRiMzIzLi4w
+NWQ2M2ZlOTJlNDMgMTAwNjQ0DQo+PiAtLS0gYS9kcml2ZXJzL2lvbW11L2lvLXBndGFibGUtYXJt
+LmMNCj4+ICsrKyBiL2RyaXZlcnMvaW9tbXUvaW8tcGd0YWJsZS1hcm0uYw0KPj4gQEAgLTYzNyw3
+ICs2MzcsNyBAQCBzdGF0aWMgc2l6ZV90IF9fYXJtX2xwYWVfdW5tYXAoc3RydWN0IA0KPj4gYXJt
+X2xwYWVfaW9fcGd0YWJsZSAqZGF0YSwNCj4+IMKgwqDCoMKgwqDCoCBwdGUgPSBSRUFEX09OQ0Uo
+KnB0ZXApOw0KPj4gwqDCoMKgwqDCoMKgIGlmICghcHRlKSB7DQo+PiDCoMKgwqDCoMKgwqDCoMKg
+wqDCoCBXQVJOX09OKCEoZGF0YS0+aW9wLmNmZy5xdWlya3MgJiBJT19QR1RBQkxFX1FVSVJLX05P
+X1dBUk4pKTsNCj4+IC3CoMKgwqDCoMKgwqDCoCByZXR1cm4gLUVOT0VOVDsNCj4+ICvCoMKgwqDC
+oMKgwqDCoCByZXR1cm4gMDsNCj4+IMKgwqDCoMKgwqDCoCB9DQo+PiDCoMKgIMKgwqDCoMKgwqDC
+oCAvKiBJZiB0aGUgc2l6ZSBtYXRjaGVzIHRoaXMgbGV2ZWwsIHdlJ3JlIGluIHRoZSByaWdodCBw
+bGFjZSAqLw0KPg0KPiBPaCwgaW5kZWVkIC0gSSBhbHNvIGhhcHBlbmVkIHRvIG5vdGljZSB0aGF0
+IHRoZSBvdGhlciB3ZWVrIGFuZCB3YXMgDQo+IGludGVuZGluZyB0byB3cml0ZSB1cCBhIGZpeCwg
+YnV0IGFwcGFyZW50bHkgSSBjb21wbGV0ZWx5IGZvcmdvdCBhYm91dCANCj4gaXQgYWxyZWFkeSA6
+KA0KPg0KPiBJZiB5b3UncmUgaGFwcHkgdG8gd3JpdGUgdGhhdCB1cCBhbmQgc2VuZCBhIHByb3Bl
+ciBwYXRjaCwgcGxlYXNlIGRvIC0gDQo+IG90aGVyd2lzZSBJJ2xsIHRyeSB0byBnZXQgaXQgZG9u
+ZSBiZWZvcmUgSSBmb3JnZXQgYWdhaW4uLi4NCj4NCj4gVGhhbmtzLA0KPiBSb2Jpbi4NCg0Kc291
+bmRzIGdvb2QsIEknbGwgc2VuZCBhIHBhdGNoIGFuZCBjb250aW51ZSBkZWJ1Z2dpbmcgdGhlDQpw
+cm9ibGVtIGZ1cnRoZXIuDQoNCi1jaw0KDQoNCg==
