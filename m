@@ -1,73 +1,75 @@
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3811C329E6E
-	for <linux-block@vger.kernel.org>; Tue,  9 Dec 2025 17:21:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5901632AAD4
+	for <linux-block@vger.kernel.org>; Tue,  9 Dec 2025 17:21:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765300895; cv=none; b=p7P5/TWTB3TKaDK6T6wZ9VCk/488h8DsoKzWuv2qxMDFdBjS6iaAaPa5VPkD7E8bR/Dktj2OGy3W80hzqFDRGmqcY5+1IL+bwgxp54SlaA8LRr03ekYbRyE1WkG1pKd+OyjNl6KcMssllZ/SO52lui1W7NQ1MvZpbHu8rDUDiZE=
+	t=1765300896; cv=none; b=Yynagxj7Ww9HCDysM0V1gkkv4JvKUHrArVFwjzsYkMcEaTDECcCN9HWIbH2VOFpbt9/u+ubc9E6RRnuBzSsFVA4BuGDzzZkkehWRSdFocwjvPGxf+msWdTRz7yfxvP73oOy4Pk4L8YJh0Q3EZLoMRrovaT71JgaO14Fpkmw389Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765300895; c=relaxed/simple;
-	bh=MCW3vFe/rHCVt1VsjfYj58bBs01I9LZR7YOnzkj4474=;
+	s=arc-20240116; t=1765300896; c=relaxed/simple;
+	bh=PxfN6IrhmJsY3FGoedlwbgk9sixTb5+ZEyyS77wtU7E=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=SeSkkWEbHxqwgTQkoqVptBrxiX98Dnmk4pfPBEgy62JNm2lZ7ywmTfY4FklSlJD/D7k/MNDFix5SiLH2AOXahULcD2kaz3RHMUBs14sj9X0TtuYkslLXnn3jQ4xOzDbl+RgoCYx8LC6/vctb3rDJbdT/zo1UFXP72L6eeKGUCAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=bGovVEd1; arc=none smtp.client-ip=209.85.214.175
+	 MIME-Version:Content-Type; b=RVcUdjxFAtCtESs606CS/SKctw2msH8CB/WhiTLLRy/5GrxMrfKCcJLhzxOOVVJA3TYWT5KI/lxjk1KDq6/lAEMYbr+neCp0swt89RjFx4wwBQLD7y03Y0tq5PFVJz007+NS8vf0DfSt3DhtQPXobLa8nZ4TNSxK89TudnVwR7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=1IFq9vuL; arc=none smtp.client-ip=209.85.216.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="bGovVEd1"
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-29812589890so81658295ad.3
-        for <linux-block@vger.kernel.org>; Tue, 09 Dec 2025 09:21:31 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="1IFq9vuL"
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-343f52d15efso5574639a91.3
+        for <linux-block@vger.kernel.org>; Tue, 09 Dec 2025 09:21:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1765300891; x=1765905691; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1765300894; x=1765905694; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UAgPi/FoX2rT03UDFaRERjzlWh6wXMi2wuOp2oMH7JM=;
-        b=bGovVEd16VyGp9JHCCdFYKk+nMHXZ0CRpyMvGpLihmXnzXQRdEdITPhaDREkY9uQb6
-         Wg//4q4ICQ2P2L2r2oJ/C1BsUxnZqpJFhPIcWcshXOCUOgXARYoT2agdleCn0+q+SEdI
-         39+q08YN84uVObSNAqEPMK18l6XppIeSjy4DcEwK3GNhM872kSna/fJUlKXmL3mZr1Cr
-         CUl1MsrLkou3atgkLNVaA4o2xhRrnank0sQ20Ez42hmoqRYL6JXpgH6w8Udr2GwFqVPt
-         NgnGQd3aeYf/5dCCvP7QSuIvgavyT2sVqZPJCEitjDyoA+l1rYXF230iWw3UvlEbm1nH
-         s93g==
+        bh=1rCsW9PlTAYIGULzV3a3bQeMbvWm/rssCDvYfHhy5jY=;
+        b=1IFq9vuLT8BcaYEzHwCFYUamjWdAF4jJuX9BVzkpT7Nr7/M7H5/c2m1TmL7jVfGeJH
+         /u692qOsoEryq3Qdz/lUcHUo/RsbLbNipVqFFOiNK1KhLh2O4Oq81N77eYuxP8gmMffX
+         VoFjh2fJly141fPSewLKszypo+XEwqVHsimtOkWDH2GgcmvN7uL6OGHOwnC0P+J9iYSc
+         CAyD22GOFO4WwLpENl+Oh8i66fwP3LSiUEwAyeWHd+o4RFxTaEtI7+gpqMNgYGIqpUAX
+         haTdh7yOJuhvA+9758XILu2CJm9ZU2zHvR8+36w0vrXcjey8E4bxtrma0OR0CWxaH+xn
+         jtGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765300891; x=1765905691;
+        d=1e100.net; s=20230601; t=1765300894; x=1765905694;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=UAgPi/FoX2rT03UDFaRERjzlWh6wXMi2wuOp2oMH7JM=;
-        b=TduKzo9S4XSzM69Mue+5PoCE3hSxrn3FpzZ72QT31vBjlz+JkUUrxFxFZifDkXHTHw
-         LyA42kDpD9OZ73WfZrEUZSNa9DC/wZCXXXrvlFp+gCL+NNRenxj3QEcc9hAStgStuYeq
-         Nlcf7VKGcOXl5mTbxgmIspZ9J75yuVwAEetvrtrHlvZY9hJ0D0c2b7jbdElfXKRXMW8s
-         KsHs0hhAv9bxc+vbBeDUimGAsxyhOqZNxPCoti4UUKVb3LJ2wPfFs/cYePM73VzZKS3r
-         Q415iCqgKIK6tgXw6felFxHq+L6cTckoiS44pbRsPEl8x0UgdeVLRrq4CuSWCCwuZ0+A
-         ki2w==
-X-Gm-Message-State: AOJu0YzenGkZZJiFeSgJBMDnUTDB2vsyiNN1tBO6Kx6mZzaN3hjX4Lsm
-	1N8VkmARhfnEHIunxPTc2usKmMs4EwZ3td1r5W7CYaaax2TSEbrB/Hibe3cBJMCSR/Y=
-X-Gm-Gg: ASbGncuEv4BNc546qI/+OTpRpSn2wUQk+rt9HwF0UY2fYwY9XUQuYm4PTUmbtvG2gXf
-	AVTJ7Hribzq/4K5fbP7qrrYr1trXf8w//ZNlvGiD238m6BdbwdcedWU3FxYugQkQcjptIFkXlOk
-	tqv8xqC1CvvMyPbiH+dJC1zols1h9pOeK499WWGZfgm/tcQt+lytnoxJQo/UQBQtwkrOGTF3oHv
-	1hW8U74L0mmIxpJEHaGSnP+6G58BhtwllojiUEuOLNAIejMLmXvVjEgEBAP1Ja/EF0Hg2Bv1v+u
-	su4eCFGRpSa3iR18LSgQzzwGiTT+IihvXlrvzL9xJuHhYWYGMEPMnBWxT82Hdp6kAJPg1ry9kdj
-	27jn7LRU06YHvl7TQynpqtXBCufGWuPhmh7YBlbB/ZDEblxTYYi0FOhXhOMiqCkAADFG8ARm2jV
-	pk6cMdQ6XaClx25e3poGPLU+lKDD+nxP4c9BeCTM9+o3K7oA==
-X-Google-Smtp-Source: AGHT+IH2N4S4MYogc3UTuDeyAMXMfTllgWv/8hm33I55C+oA9tgQ6BUCnLFJP9uCdnKOSkJ7g8bvLw==
-X-Received: by 2002:a05:7022:6199:b0:11e:3e9:3e8a with SMTP id a92af1059eb24-11e03e94439mr11045757c88.49.1765300891300;
-        Tue, 09 Dec 2025 09:21:31 -0800 (PST)
+        bh=1rCsW9PlTAYIGULzV3a3bQeMbvWm/rssCDvYfHhy5jY=;
+        b=ADjLEQnPZb2lfQgMa0F7ZKS16CxLNFJQXcPCd9MVkfB8/xFo/8DJQy12j7F5F2Tpxy
+         an47qW796JfpfSWVrDZXxV6Y83/Q/7l20E/wW6lGpAokejMdcf2Q2/nkXw1WxdIJGoRu
+         v1RzWPKn5LMmZqPzXqCBNIMyTTV/eC0BRec1E8nUn0Jwd2I+sfBIPFMXugNGt7P+F8OQ
+         DRS1/PMh2nlu0+0oTgw2pDC1nqTs2iidkneeaUoF+KCoofVcMwmUGH7DKCLrJnNseDXG
+         qbhUyCG5V/ZPd5A0yVZnZKPArv0uXZeZaAACiS1W50RXjsXTVHLFuOyvAF2UbxpDKtdd
+         MpUA==
+X-Gm-Message-State: AOJu0YxMyti+0zPI2x2t8+1JTH0mYkUb/N0LERQ2CQquKVMVtD4sZHzX
+	3cd5MzYodo4NKTes57VfGUfswNNSgnzpPCoOw86bcPTa3iUEaD+E1oSdXErAyu1IM1JzOgDfebv
+	F2DE3d3Xs+Q==
+X-Gm-Gg: ASbGncukPNi5uMlq6K+N1ycvqjWZr99SvmNojaSk/Mrl4g+tDvzOgGovyiWhpLZN6zL
+	1rk2ROc+9hpH/J4/CNWlLBkS7QL+VqtBu/+EjZFmLQAhYC+G4hmOaB+X6IzIp4SG8bJHYbDfLJJ
+	w/ED+GxtVv2YMZJPU9i8BQIPpj3dqulGcniju9z2O6zt+qIGDgCE1e9qo1Zu6YZkOSSfmNRMmU8
+	pEr15yQ7yXDcMbFLcyKNJ1bEVr6ux7pahpd/U84L+WlwOQ0NlFxYwFwvo8D1PkHTysVgyl/dSb0
+	ITKznuwSKHbxak7E3SIyICLhaS3aCgtqEMM6pfsJqQj8+muk2PPYrEfpQjFENzBSzLpALcpTAiM
+	vDx9Wc6uUMpbOvos2MTYFL9A+UpmeZNej7EEhiKv4GRX68ODelkfzPUjLnvvr/SEJnHqwzIvuBL
+	y+10vokttLHVVZkZdwSMsLqqHojSof6KhakeDP2SXZv3ul75bqa/ccs6QG
+X-Google-Smtp-Source: AGHT+IH6eqzKuOWUxreqhPpZimoHVZ2JHD7vpSeAoJZzK5vKnGNGqQwB+Pc2fWZI97x8Z5EiAlsbCQ==
+X-Received: by 2002:a05:7022:fe05:b0:11d:f0d3:c5da with SMTP id a92af1059eb24-11e032bbdc1mr6698483c88.43.1765300893595;
+        Tue, 09 Dec 2025 09:21:33 -0800 (PST)
 Received: from [127.0.0.1] (221x255x142x61.ap221.ftth.ucom.ne.jp. [221.255.142.61])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11f283d4733sm994549c88.17.2025.12.09.09.21.30
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11f283d4733sm994549c88.17.2025.12.09.09.21.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Dec 2025 09:21:30 -0800 (PST)
+        Tue, 09 Dec 2025 09:21:33 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: Ming Lei <ming.lei@redhat.com>, 
- Caleb Sander Mateos <csander@purestorage.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20251201214145.3183381-1-csander@purestorage.com>
-References: <20251201214145.3183381-1-csander@purestorage.com>
-Subject: Re: [PATCH] ublk: allow non-blocking ctrl cmds in
- IO_URING_F_NONBLOCK issue
-Message-Id: <176530089007.83150.7264093177786219301.b4-ty@kernel.dk>
-Date: Tue, 09 Dec 2025 10:21:30 -0700
+To: Johannes.Thumshirn@wdc.com, hch@infradead.org, agruenba@redhat.com, 
+ ming.lei@redhat.com, csander@purestorage.com, colyli@fnnas.com, 
+ Gao Xiang <xiang@kernel.org>, zhangshida <starzhangzsd@gmail.com>
+Cc: linux-block@vger.kernel.org, linux-bcache@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, zhangshida@kylinos.cn
+In-Reply-To: <20251209090157.3755068-1-zhangshida@kylinos.cn>
+References: <20251209090157.3755068-1-zhangshida@kylinos.cn>
+Subject: Re: [PATCH v7 0/2] Fix bio chain related issues
+Message-Id: <176530089153.83150.12817626967905322379.b4-ty@kernel.dk>
+Date: Tue, 09 Dec 2025 10:21:31 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -79,22 +81,22 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3
 
 
-On Mon, 01 Dec 2025 14:41:44 -0700, Caleb Sander Mateos wrote:
-> Handling most of the ublksrv_ctrl_cmd opcodes require locking a mutex,
-> so ublk_ctrl_uring_cmd() bails out with EAGAIN when called with the
-> IO_URING_F_NONBLOCK issue flag. However, several opcodes can be handled
-> without blocking:
-> - UBLK_CMD_GET_QUEUE_AFFINITY
-> - UBLK_CMD_GET_DEV_INFO
-> - UBLK_CMD_GET_DEV_INFO2
-> - UBLK_U_CMD_GET_FEATURES
+On Tue, 09 Dec 2025 17:01:55 +0800, zhangshida wrote:
+> This series addresses incorrect usage of bio_chain_endio().
+> 
+> Note: Patch 2 depends on changes introduced in patch 1. Therefore, patch
+> 1 is still included in this series even though Coly suggested sending it
+> directly to the bcache mailing list:
+> https://lore.kernel.org/all/20251201082611.2703889-1-zhangshida@kylinos.cn/
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] ublk: allow non-blocking ctrl cmds in IO_URING_F_NONBLOCK issue
-      commit: 87213b0d847cd300285b5545598e0548baeb5208
+[1/2] bcache: fix improper use of bi_end_io
+      commit: 53280e398471f0bddbb17b798a63d41264651325
+[2/2] block: prohibit calls to bio_chain_endio
+      commit: cfdeb588ae1dff5d52da37d2797d0203e8605480
 
 Best regards,
 -- 
