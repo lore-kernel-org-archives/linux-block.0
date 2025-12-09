@@ -1,334 +1,143 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F85822256B;
-	Tue,  9 Dec 2025 00:17:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C38F23BF9F
+	for <linux-block@vger.kernel.org>; Tue,  9 Dec 2025 02:06:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765239432; cv=none; b=YXf5ZxXgrUiousg1dMFhkC3ejgig2wgh7JAjU+lslefFPCiFaxAWnvzXTasuxBhia5S9JWgpSeJpz9hlxJ9dBhIsLt9MjEMknUOIDZ+zXVRD74/oCg5iQbSnDAuwJwxnCLPiG7adYSOL+YSOaGWcGXhIpzmzAhr0Lzq6bVkNvj4=
+	t=1765246020; cv=none; b=fs39wF9gWoV2bpMfqKbx8ckKxkNqmdRLxGbEEts88hcWRvBXCwnBNYaS4a+2WK7fLlJZLJOfIJI3mf5fcuafiSLyU7YiVkGeXKk8PvA/DP0/C5wBlOOK1OedzyvhFr3CHcG4kFKcHfnLPxrV1vVZLKZ8ezPqPeijMNYoAiYdYGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765239432; c=relaxed/simple;
-	bh=LWJ5PKBg/xFvkJoc9eCT1/JcOJDhRvKObYShTs+W9Kc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=e5g/Gh38sKYkSePsq48EAf9RjeBktHS7dx4nuets2z7sSQGkqEF9z+ICeQ9FKNdfPg2JVlZNhOytFwMvdsndW+JQc7SPu4GtwbsS5+WM6gB/qVmBIOssOQC2AZPVrD2+WP1I9zWqv4I0HK24hSMn7LDgRVALC4FZ2CvzDznfCIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o+dz7wOJ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1765246020; c=relaxed/simple;
+	bh=YNdOjnU3RjHeumIdjRe9HosnY6ArRfJfsy4E62rIOTo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JIeI1K/MAeypdbRlYivIUQlMjZHD62aNBg9xMM0N5EdY+ZUVdPDCV4DPJQXMupMHFJMNRZA2PQl4TmUhmkDig8MtKGmwNKAuZb71SW9fEStnaNymGjnNjFZYL0xA58NbzsOkhcTKZ18/wKsktGrGrK0XIZrwG+fVlb0HAdG2sXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Cx8mopId; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o+dz7wOJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2789C4CEF1;
-	Tue,  9 Dec 2025 00:17:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765239432;
-	bh=LWJ5PKBg/xFvkJoc9eCT1/JcOJDhRvKObYShTs+W9Kc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=o+dz7wOJ4pUZW9lWTIoiUIPcjCpfCr1F+8nU9PiXeg1m5VRQJNTpErQomKluD9dQm
-	 vKyFysxT9lfzbJ6po2X7P+qFNeCnKtYGPPuyUj5t2v85Lh7z21+OpkHlAeWOfbR7xi
-	 2lnfffzK8qW2dXWKKKshD21I776t5yApyO4RnQp/hf+/eNvtKZmLp0jPMpyGuya19g
-	 PtwI54IIY5bxXPjs6A8OHY4AYtWmGDDoJOq8jAP7Wfviz8mT1fwVkla//CIAtNPrp+
-	 gSaWo68y+RDdemHVNJ4lbNBG7QGkNkoOCOjN7kluXd9bl0snBRT2Ve8+2rWeB7wNDy
-	 +6Z2Mb/eiz3lQ==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: Cong Zhang <cong.zhang@oss.qualcomm.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Sasha Levin <sashal@kernel.org>,
-	mst@redhat.com,
-	virtualization@lists.linux.dev,
-	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18-6.12] virtio_blk: NULL out vqs to avoid double free on failed resume
-Date: Mon,  8 Dec 2025 19:15:10 -0500
-Message-ID: <20251209001610.611575-18-sashal@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251209001610.611575-1-sashal@kernel.org>
-References: <20251209001610.611575-1-sashal@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cx8mopId"
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7b7828bf7bcso5862326b3a.2
+        for <linux-block@vger.kernel.org>; Mon, 08 Dec 2025 18:06:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765246018; x=1765850818; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SmNn1xueZis1+pRgwdAWIO7rUeDG93yacC0yIdzXyEo=;
+        b=Cx8mopIdbfjSh1YuM4rhSBxYt9t6lJDwUZMuxL9dDdiu/iq11rYZnFfRs4ORSFPw2N
+         0gaNHO7uCRFWYP3FH4s43pEsdeVJ1ejHRkuD5lO5owgLSgK7bJ0xHttQxPffDzSYDS76
+         j2GLP4Y1OR+m2L1wW9jIubiJr0NZHU8p5utWLm4E5+8piOwhm07yu4EHodKa9uvBwyEg
+         te5AKFPeyjGtIq5v+vuEM4wxMu0jR/XFiLi+0nB45zmsMAmXDJbujtB02tZNmmD9iIdi
+         4lliLTyJrw2kgv9QMxNetzQxCRBlMhfAhuuoPIAZdFz4nt7RYPNoUC/JEuAEjMaLk5qv
+         0URQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765246018; x=1765850818;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=SmNn1xueZis1+pRgwdAWIO7rUeDG93yacC0yIdzXyEo=;
+        b=IVQabwp8WvryHBpOx0shrfb2bFccHT4DoKL1MJTDWCm9kAE9G25r6k07GhM/LiXFdz
+         eDAeP1jvNkssO9OkbuyaPR9u6Ky59DQRoAf5nuPEQ6PS6e5rnvGHdsmpgwGofi61C001
+         BlrcOQqHWIdlYabo/pyiu6BP+vhxDlBvoJyvD9KV0Lsz9dMam0/ayZpboC3qLfkYKMcJ
+         daVb5gdmqWlE3PtL557iqmY61IQgAkaSsRBqOAXe+G3bgN1tyq4pGfASo28tbwkkk5qq
+         a+X6buFKFl+4qYmv/IeTw92XmlzrwaKwQDHJWMEvvK/0woBPjrS1btUUx7AMoPqthTC8
+         YNeg==
+X-Forwarded-Encrypted: i=1; AJvYcCU1CVb21nSiqUP8mZyfj7pHF7Y8U6wYDx+Q+Yl9HX38Cs+g8WYXoXOBHQAtNu2Eo0ar7FvgMNQx8fcBVA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzYwRTzuuXsNrxYeNd2JpOWhHdDUmM7QIERGsOvEIgJlIcN6B/s
+	t22xc12CdhgWvrP6SoCAWH+if3R7KjlG0+s8ldSKt3KOOn0ji8a/ZG7Zch4svQ3qkkRBK7vTcpy
+	DgWk4YSmQQpK87uMaEa/viO0FUaFKT9Q=
+X-Gm-Gg: ASbGncvLgYVMo3mtL12Yds7KIkUZUco0Y5WkRZbCi6z89zG3Y+VAehqxfMeAVy90fNZ
+	i7VksOTEo25RbDPHJz1jbUEUu98yVW2rsHiMWwYjH6dj5z8SeHbwJexok5Cql+hIclt/oReFBdk
+	PS6EA7O/lftv8eGxIv94G6pTvDii+ELBaJ5hW8Tq14AgBBMAAlfbeU/fC4qZ/7pOaHlHQmNEnZB
+	dURomkPPUTC5jwi6MXvD2Rya16wv8X4QcOPXiOscbRVXO7cu+DDkeSLWYk+Rk7NsU0YfQ==
+X-Google-Smtp-Source: AGHT+IFyeIBizeosCDnsJozmwtXeTZ3Wj2/Z9val8hDQVawDooHONhL0/YodAWhXUxL27JU5DsObS26EWq4vSIiyZdo=
+X-Received: by 2002:a05:6a21:9991:b0:35a:80f2:fa3c with SMTP id
+ adf61e73a8af0-36617e83b82mr9209793637.31.1765246018123; Mon, 08 Dec 2025
+ 18:06:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.18
-Content-Transfer-Encoding: 8bit
+References: <20251208110213.92884-1-pilgrimtao@gmail.com> <33dcc737-1419-4f3e-8952-2f34db47a087@acm.org>
+In-Reply-To: <33dcc737-1419-4f3e-8952-2f34db47a087@acm.org>
+From: Tao pilgrim <pilgrimtao@gmail.com>
+Date: Tue, 9 Dec 2025 10:06:47 +0800
+X-Gm-Features: AQt7F2q6HA9ih7D4cTjshL_pzYYxabnrmjW_6p9Gun9d4NL2ywaSVpZp_OjO0Dw
+Message-ID: <CAAWJmAb0+Xhm7Wy2kqH7E4VGLUqZa_2ohBYP4ttw6zzjD109JA@mail.gmail.com>
+Subject: Re: [PATCH] mq-deadline: the dd->dispatch queue follows a FIFO policy
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Chengkaitao <chengkaitao@kylinos.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Cong Zhang <cong.zhang@oss.qualcomm.com>
+On Tue, Dec 9, 2025 at 12:24=E2=80=AFAM Bart Van Assche <bvanassche@acm.org=
+> wrote:
+>
+> On 12/8/25 4:02 AM, chengkaitao wrote:
+> > From: Chengkaitao <chengkaitao@kylinos.cn>
+> >
+> > In the initial implementation, the 'list_add(&rq->queuelist, ...' state=
+ment
+> > added to the dd_insert_request function was designed to differentiate
+> > priorities among various IO-requests within the same linked list. For
+> > example, 'Commit 945ffb60c11d ("mq-deadline: add blk-mq adaptation of t=
+he
+> > deadline IO scheduler")', introduced this 'list_add' operation to ensur=
+e
+> > that requests with the at_head flag would always be dispatched before
+> > requests without the REQ_TYPE_FS flag.
+> >
+> > Since 'Commit 7687b38ae470 ("bfq/mq-deadline: remove redundant check fo=
+r
+> > passthrough request")', removed blk_rq_is_passthrough, the dd->dispatch
+> > list now contains only requests with the at_head flag. In this context,
+> > all at_head requests should be treated as having equal priority, and a
+> > first-in-first-out (FIFO) policy better aligns with the current situati=
+on.
+> > Therefore, replacing list_add with list_add_tail is more appropriate.
+> >
+> > Signed-off-by: Chengkaitao <chengkaitao@kylinos.cn>
+> > ---
+> >   block/mq-deadline.c | 2 +-
+> >   1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+> > index 3e3719093aec..dcd7f4f1ecd2 100644
+> > --- a/block/mq-deadline.c
+> > +++ b/block/mq-deadline.c
+> > @@ -661,7 +661,7 @@ static void dd_insert_request(struct blk_mq_hw_ctx =
+*hctx, struct request *rq,
+> >       trace_block_rq_insert(rq);
+> >
+> >       if (flags & BLK_MQ_INSERT_AT_HEAD) {
+> > -             list_add(&rq->queuelist, &dd->dispatch);
+> > +             list_add_tail(&rq->queuelist, &dd->dispatch);
+> >               rq->fifo_time =3D jiffies;
+> >       } else {
+> >               deadline_add_rq_rb(per_prio, rq);
+>
+> I think the current behavior (LIFO) is on purpose and also that it only
+> should be changed if there is a strong reason to change it. I don't see
+> a strong reason being mentioned in the patch description.
+>
+Previously, the dd->dispatch queue contained both requests with the
+BLK_MQ_INSERT_AT_HEAD flag and those without it. The implementation
+placed requests with the BLK_MQ_INSERT_AT_HEAD flag at the head of
+the dd->dispatch queue, while requests without this flag were placed
+at the tail. However, now all requests in the dd->dispatch list carry
+the BLK_MQ_INSERT_AT_HEAD flag, and I can't find any justification for
+continuing to use a LIFO (last-in-first-out) policy.
 
-[ Upstream commit 0739c2c6a015604a7c01506bea28200a2cc2e08c ]
+Additionally, the dispatch queue has recently been moved from struct
+dd_per_prio to struct deadline_data, switching back to a single dispatch
+list. This means more requests will queue in the dispatch list, and
+continuing with the LIFO policy makes earlier-arriving requests more
+susceptible to starvation. Could anyone explain the rationale behind
+maintaining this approach?
 
-The vblk->vqs releases during freeze. If resume fails before vblk->vqs
-is allocated, later freeze/remove may attempt to free vqs again.
-Set vblk->vqs to NULL after freeing to avoid double free.
-
-Signed-off-by: Cong Zhang <cong.zhang@oss.qualcomm.com>
-Acked-by: Jason Wang <jasowang@redhat.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
-
-LLM Generated explanations, may be completely bogus:
-
-Good. `kfree(NULL)` is safe - it does nothing. This is a well-known
-C/Linux convention.
-
-Now let me create my final comprehensive analysis:
-
-## COMPLETE ANALYSIS
-
-### 1. COMMIT MESSAGE ANALYSIS
-
-**Subject**: `virtio_blk: NULL out vqs to avoid double free on failed
-resume`
-
-**Key points from commit message:**
-- The `vblk->vqs` is released during freeze
-- If resume fails before `vblk->vqs` is allocated, later freeze/remove
-  may attempt to free vqs again
-- Solution: Set `vblk->vqs` to NULL after freeing to avoid double free
-
-**Acks/Reviews:**
-- Acked-by: Jason Wang <jasowang@redhat.com> (virtio maintainer)
-- Signed-off-by: Jens Axboe <axboe@kernel.dk> (block subsystem
-  maintainer)
-
-**Missing tags:**
-- No `Cc: stable@vger.kernel.org` tag
-- No `Fixes:` tag explicitly pointing to the bug-introducing commit
-
-### 2. CODE CHANGE ANALYSIS
-
-**Changes made:** Two modifications in `drivers/block/virtio_blk.c`:
-
-#### Change 1: In `init_vq()` error path (lines 1029-1032)
-**Before:**
-```c
-if (err)
-    kfree(vblk->vqs);
-return err;
-```
-
-**After:**
-```c
-if (err) {
-    kfree(vblk->vqs);
-    /*
-     - Set to NULL to prevent freeing vqs again during freezing.
-     */
-    vblk->vqs = NULL;
-}
-return err;
-```
-
-#### Change 2: In `virtblk_freeze_priv()` (lines 1599-1600)
-**Before:**
-```c
-vdev->config->del_vqs(vdev);
-kfree(vblk->vqs);
-
-return 0;
-```
-
-**After:**
-```c
-vdev->config->del_vqs(vdev);
-kfree(vblk->vqs);
-/*
- - Set to NULL to prevent freeing vqs again after a failed vqs
- - allocation during resume. Note that kfree() already handles NULL
- - pointers safely.
- */
-vblk->vqs = NULL;
-
-return 0;
-```
-
-### 3. BUG MECHANISM (Root Cause Analysis)
-
-The double-free vulnerability occurs in the following scenario:
-
-**Trigger Sequence:**
-1. **virtblk_freeze_priv()** is called (suspend/PM freeze, or
-   reset_prepare via FLR)
-   - Frees `vblk->vqs` at line 1600
-   - `vblk->vqs` **still points to the freed memory** (dangling pointer)
-
-2. **virtblk_restore_priv()** is called (resume/PM restore, or
-   reset_done)
-   - Calls `init_vq(vblk)` at line 1610
-
-3. **init_vq()** fails (e.g., `kmalloc_array()` fails or
-   `virtio_find_vqs()` fails)
-   - `init_vq()` allocates `vblk->vqs` at line 993
-   - If allocation succeeds but later `virtio_find_vqs()` fails (line
-     1016), the error path at line 1030 calls `kfree(vblk->vqs)`
-   - But if allocation at line 993 fails, `vblk->vqs` is never
-     reassigned and still points to the OLD freed memory from step 1
-   - Error path at line 1030: `kfree(vblk->vqs)` - **FIRST FREE of the
-     OLD pointer**
-
-4. **Second freeze/remove attempt:**
-   - If another freeze cycle or `virtblk_remove()` is called
-   - `kfree(vblk->vqs)` is called again - **SECOND FREE of the same
-     memory = DOUBLE FREE**
-
-**Alternative scenario:**
-- Even in `init_vq()` success path, if `vqs_info` or `vqs` temp
-  allocation fails before line 997-999, and the error `goto out` is hit,
-  the same dangling pointer issue occurs.
-
-### 4. CLASSIFICATION
-
-- **Type**: Bug fix (memory safety - double-free vulnerability)
-- **Security relevance**: Potentially exploitable memory corruption bug
-- **Category**: Does NOT fall into exceptions (device IDs, quirks, DT,
-  build fixes)
-- **Impact area**: virtio-blk block device driver, PM suspend/resume and
-  transport reset recovery
-
-### 5. SCOPE AND RISK ASSESSMENT
-
-**Lines changed**: ~10 lines (including comments)
-**Files touched**: 1 file (`drivers/block/virtio_blk.c`)
-**Complexity**: Very low - simple NULL assignment after kfree
-
-**Subsystem**: virtio-blk - a mature, widely-used block device driver
-for virtual machines
-- Used in QEMU/KVM guests
-- Used in cloud VM instances (AWS, GCP, Azure etc.)
-- Used in container environments
-
-**Risk assessment**: **VERY LOW**
-- The fix is trivial: just setting pointer to NULL after free
-- `kfree(NULL)` is explicitly safe (no-op)
-- No behavioral change in normal operation
-- Only affects error recovery paths
-- Cannot introduce new bugs
-
-### 6. USER IMPACT
-
-**Who is affected:**
-- Users using virtio-blk devices in virtual machines
-- Systems that undergo suspend/resume cycles
-- Systems using PCI Function Level Reset (FLR) on virtio devices
-- Particularly affects systems with constrained memory where allocation
-  might fail
-
-**Severity if bug hits:**
-- Double-free can cause kernel panic/crash
-- Potential memory corruption
-- Potential security vulnerability (though exploitation would be
-  difficult)
-
-**Trigger conditions:**
-- Requires PM suspend/resume OR transport reset (FLR)
-- AND memory allocation failure during resume
-- Relatively rare in practice but can happen under memory pressure
-
-### 7. STABILITY INDICATORS
-
-**Positive indicators:**
-- Acked-by: Jason Wang (virtio maintainer)
-- Signed-off-by: Jens Axboe (block maintainer)
-- The fix is obviously correct and minimal
-- Follows the standard kernel pattern of NULLing after free
-
-**Negative indicators:**
-- No `Cc: stable@vger.kernel.org` tag
-- No `Fixes:` tag
-- No `Tested-by:` tag
-
-### 8. DEPENDENCY CHECK
-
-**Dependencies:**
-- Requires commit `5820a3b089879` ("virtio_blk: Add support for
-  transport error recovery") which introduced `virtblk_freeze_priv()`
-  and `virtblk_restore_priv()` as shared functions
-- This commit (`5820a3b089879`) was merged in v6.14-rc1
-
-**Earlier bug introduction:**
-- The original bug was introduced in `b71ba22e7c6c6` ("virtio-blk: Fix
-  memory leak among suspend/resume procedure") in v5.14-rc1
-- That commit added `kfree(vblk->vqs)` in freeze without NULLing it
-
-**For stable backport:**
-- For kernels v6.14+: should apply cleanly
-- For kernels v5.14 to v6.13: would need different backport (the code
-  structure is different)
-- The `virtblk_freeze_priv` function only exists starting from v6.14
-
-### 9. CONCLUSION
-
-**This commit SHOULD be backported to stable trees** because:
-
-1. **Fixes a real bug**: Double-free is a serious memory safety bug that
-   can cause crashes and potentially be exploited
-
-2. **Obvious correctness**: Setting pointer to NULL after free is the
-   standard kernel idiom and cannot introduce new bugs
-
-3. **Small and contained**: Only ~10 lines changed, very localized to
-   two specific error handling paths
-
-4. **No new features**: Pure bug fix with no behavioral changes in
-   normal operation
-
-5. **Affects important infrastructure**: virtio-blk is used extensively
-   in cloud/virtualization environments
-
-6. **Low risk**: The fix is trivial and follows standard patterns;
-   `kfree(NULL)` is explicitly safe
-
-**Caveats for backporting:**
-- The fix in its current form is ONLY applicable to v6.14+ kernels where
-  `virtblk_freeze_priv()` exists
-- For older stable kernels (v5.14 to v6.13), a different (simpler)
-  backport would be needed that just NULLs `vblk->vqs` in
-  `virtblk_freeze()` directly
-- The maintainers did not explicitly tag this for stable (`Cc:
-  stable@vger.kernel.org`), which might indicate they didn't consider
-  backporting, or the bug wasn't seen as critical
-
-The fix is small, surgical, obviously correct, and addresses a real
-memory safety bug. It meets all stable kernel criteria.
-
-**YES**
-
- drivers/block/virtio_blk.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index f061420dfb10c..746795066d7f5 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -1026,8 +1026,13 @@ static int init_vq(struct virtio_blk *vblk)
- out:
- 	kfree(vqs);
- 	kfree(vqs_info);
--	if (err)
-+	if (err) {
- 		kfree(vblk->vqs);
-+		/*
-+		 * Set to NULL to prevent freeing vqs again during freezing.
-+		 */
-+		vblk->vqs = NULL;
-+	}
- 	return err;
- }
- 
-@@ -1598,6 +1603,12 @@ static int virtblk_freeze_priv(struct virtio_device *vdev)
- 
- 	vdev->config->del_vqs(vdev);
- 	kfree(vblk->vqs);
-+	/*
-+	 * Set to NULL to prevent freeing vqs again after a failed vqs
-+	 * allocation during resume. Note that kfree() already handles NULL
-+	 * pointers safely.
-+	 */
-+	vblk->vqs = NULL;
- 
- 	return 0;
- }
--- 
-2.51.0
-
+--=20
+Yours,
+Kaitao Cheng
