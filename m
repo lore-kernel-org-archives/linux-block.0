@@ -1,114 +1,105 @@
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F96D29C351
-	for <linux-block@vger.kernel.org>; Wed, 10 Dec 2025 05:37:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B112472623
+	for <linux-block@vger.kernel.org>; Wed, 10 Dec 2025 06:49:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765345069; cv=none; b=egau5MN0jMy++zutLniYQONlCuqxzuQtZGOl4RlNdCJa2361sxf8XeZQ5gl0cccQZ0IuL0Nv2P5nG7+Um0fGObk55LqBAdc+XNcWby+7TlBK5FRoSDFOwSdN9vevxMsHyz61VZWBUPM18Mizg4BXsdgOkydRvG2dcHpI/t1pCsU=
+	t=1765349369; cv=none; b=KWwll+u9UoY94bFUG8emgR+PnrzC/rrAX5m62DB6V3qRG993gFUDAaIPLJSQu7TivOsdk2SaqVCp9FoV0j0GaHX2qCN7ZdcF/Sv1CnUf600IR1TBkz53WEACGPEqLv656sWKbaUx+XGFi82/FZ3cRetaEo/Np0i3W+1LfH2jR9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765345069; c=relaxed/simple;
-	bh=CsIPvAXmZAZ+fvM3rL41DaVWNzSMVbUulEqcP7Yq/A8=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=T2ZHG8FZWJFRL3XUYuJXClYzGqngH/uhTjr0cne+urxUhO1WkfOr+qdfjURkANkGA6/MInhaL7F1xb+kaN0X3yXhvpJgpZFzRmvIwWbrgqJGN7CPOQztSOlMD9tj5bXage3vH5srNFa2sXFeX2oICX481T2RNu27ojNnjFle7A4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=UPS2QLib; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1765349369; c=relaxed/simple;
+	bh=ucYn6K4698I4hEq1B6ECF+TDG17sNdhm8GXjpoYK4dA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=marc5w6Eu0AL3XKXjjMlGrR3KzUlq4eJxLTWby5qXp7AJ69KvUwhIjKbwdo4HAAB0n/vWQVwunPiRKT/5EGC75CYxa6dcDQ0RkZ0aLD6iF02Yfhbtxa9LYdDMH9Nyoo3HdFXxvNZ9bNYo7yKF7A4mn+mJo6OwFXAufQA264PPEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=MScUBAgy; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="UPS2QLib"
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-7b9387df58cso9891653b3a.3
-        for <linux-block@vger.kernel.org>; Tue, 09 Dec 2025 21:37:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1765345062; x=1765949862; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Hn3LBvC7zLUxb/SCOQFQjYkYFXRvizJWnamCq6WRwY0=;
-        b=UPS2QLibIbUGX+yvvV1QotUaY1lTUCXG7ZAEaEk37O0V2eBAZ+03oT5evpXZn9bd1i
-         jxbOTxzn/AzP2ybTKdPG9ww5f3/vln0CpPBXhuj691FUk78SPN2dlh17w/atr0aNqOtF
-         MqPdKhpj2DUllrkLqyvToSa4pYRXjUKDve7GpGrNzbq5XhllBNUpiirZYHbuSC3loqt6
-         OXZE3x39hZeqapLdNfTQr/pePQJtVJ+9sCPcxfc7KiH/6BcwMHuiduul1kTBCq3ZYC1L
-         BpEqSRF6cRHQRkfhQG9OMFlZ35VVI1Z9OsJVYSc+V14m4ZBTqB0/8rppcgnDM1NZXBbl
-         qH/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765345062; x=1765949862;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Hn3LBvC7zLUxb/SCOQFQjYkYFXRvizJWnamCq6WRwY0=;
-        b=NJ+F/xDKfFLGcgv1INeOLm6H8e1MMCbNIqzcEAGrFGNhehxsV5yD8LqBp86H8IO0fy
-         /ZwCW4jBdYFX5Wlkz0Tu5EKOeeuRbiL1w19xYyCxlPVPAWsskzY6Vq8WKiJnlgEm7X08
-         Z2U2mBf0U7mslqvQjuwaINWaDN4zwUHNxezN7C2Jq2GVMNm67GBdYjsGq8YnIm17E0Kb
-         TjZPnoAznxr6nXU0/r+B6TA3wAsgnGFeiobwPPlcm9XKCH1MJyFRud9Dl/Q6JY9MW1Jh
-         NE3ISMxIZ+N4lt4BlXRmEEkU/AQ3PBEblBcRpRTU2GJSW1fbwDpT4atg6yO3C29KypC8
-         zLjg==
-X-Gm-Message-State: AOJu0Yymc3Z5TglmaRY8xMZxwVQijIaAKyTT8642bNUIG5ILhubvFDVT
-	fIll1SFLVwMcxxnAPswclyupEAi5EPLgAQW25LEZsG+aAaKKtN6A9vJNvRrVLguUs4mbvXgP2tB
-	mRYK1RgxVMw==
-X-Gm-Gg: ASbGnctsYY8LnrEpxgHNc/BPx5YDXhoCadsVcmK/FPDpw97KwzmluJSYBwMYk2Q/0Oz
-	pzDTKjdEwjN7Rp2WhvBzGivGGP1Z9EVfL/eaHO21okc4ABWUylVlXDnzAXxlQkVM+4VfOXS5ew+
-	K/nJzMVzsQkMZjmh8urmZR/8YojNKdXR1GJbUpA8kRJfUU4C1I0p9I6ltUfCRdfZAlAGQHrd315
-	LautWtj4Uap6h/lEDuYpw6aDv6G5kmEd8M9n9zhzDBVf7aN4BFieETjlDK6H1MQCyu0+xbwugcE
-	Q5BdV4/+2AdG6xdP52gGwUUGW7O5843GCeyDXwlGh4H06P1Krasy1TkYq1n04fHCJxvwg1cRO+m
-	pJBrZNdu5xvWXUlwNAsl7MUsF6lXV/8iHeipZj+bVOn8Nsvkv3N9oieT/aM1yADym2HIunCfzYI
-	0GTo2MXLWHxdg4UZxjbqiF09N4XPNu6qIj+Nh+YA==
-X-Google-Smtp-Source: AGHT+IGevQ2kn0futrNSS9/kQWVUenvdnX1av6YlEKOQZF/7jeBAKoDIw4HvnRZiHoSBGdpvOEVZsQ==
-X-Received: by 2002:a05:6a20:7f87:b0:34f:ce39:1f47 with SMTP id adf61e73a8af0-366e288910dmr1123725637.38.1765345062085;
-        Tue, 09 Dec 2025 21:37:42 -0800 (PST)
-Received: from [127.0.0.1] (fs76eed293.tkyc007.ap.nuro.jp. [118.238.210.147])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-bf6a1caeea7sm16682779a12.24.2025.12.09.21.37.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Dec 2025 21:37:41 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Cc: linux-block@vger.kernel.org, Damien Le Moal <dlemoal@kernel.org>, 
- Naohiro Aota <naohiro.aota@wdc.com>
-In-Reply-To: <20251210021037.10106-1-johannes.thumshirn@wdc.com>
-References: <20251210021037.10106-1-johannes.thumshirn@wdc.com>
-Subject: Re: [PATCH] block: fix cached zone reports on devices with native
- zone append
-Message-Id: <176534506042.363990.16692802689901355633.b4-ty@kernel.dk>
-Date: Tue, 09 Dec 2025 22:37:40 -0700
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="MScUBAgy"
+Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5B9MTI3c3341281
+	for <linux-block@vger.kernel.org>; Tue, 9 Dec 2025 22:49:26 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2025-q2; bh=J2BFEb2JvkesZ5QnKa
+	BD1xADfvvShg++ZS35BOu5DxA=; b=MScUBAgyG0rIdo2jox0oMUFAn+UEp4WMEW
+	WaQD1Ndx29xeG40jf9qTRTAJ0YAq3xR3sEUwRvoi6auPiJ8bvGV6pipZ8xnZLYSc
+	pBUPCGCXcC/W/EJkcfzwd6504+dfcs5alWRby35RX7OPJezEzqYcf40Zil64cOsH
+	O/6maC0bviPLJYgxlEc5BcsA1y8MQ2vfX7lCRs6M955lJLx6yaWmO0xp6XP97hPe
+	C6Lndkhm4ggQMW0T11dz2vHsAXSbAvygumQPiKepi153sm6n9o8kfre3G/1b+EBH
+	yfcVCvnqkPrTBZKDp9yq9B09j6mEnTVWFz8Y4gO3UFfo6VZ5GMzg==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4axrvdch04-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Tue, 09 Dec 2025 22:49:26 -0800 (PST)
+Received: from twshared40939.15.frc2.facebook.com (2620:10d:c085:208::f) by
+ mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.29; Wed, 10 Dec 2025 06:49:24 +0000
+Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
+	id E24824A84EE5; Tue,  9 Dec 2025 22:49:15 -0800 (PST)
+From: Keith Busch <kbusch@meta.com>
+To: <linux-block@vger.kernel.org>, <axboe@kernel.dk>, <hch@lst.de>
+CC: Keith Busch <kbusch@kernel.org>, Sebastian Ott <sebott@redhat.com>
+Subject: [PATCH] blk-mq-dma: always initialize dma state
+Date: Tue, 9 Dec 2025 22:49:15 -0800
+Message-ID: <20251210064915.3196916-1-kbusch@meta.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-GUID: QrlpDyZwFzWQ29KwwEyYIBlSY-LOH54T
+X-Proofpoint-ORIG-GUID: QrlpDyZwFzWQ29KwwEyYIBlSY-LOH54T
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjEwMDA1OCBTYWx0ZWRfX3xiwpLm33Q6P
+ yxivYvcIzhOTuh4bSHLpDtDwXZPltAnoqSSTGlm4pJCdAFmURJpC0bidOXGbIhwHO8nV5RcZNQt
+ IK9xh/BTS7AZwYK5Y6b4dGB2hrME6C49Ju6G7vOep4uCofydxYy8395G1q0P+Z1L0KMV0TK2QH8
+ +td3p1zuqybCPmtp5Daat5Mp7MecfEDZZHDhkPNCYOEc2GTD1PsfHkOFbEmVR9fLfRcS3gozV7m
+ z0nK41IjtTB9e8XSLrxsp3HgniIhsvX894z510BC/4+NnjVD/E1uor+lnVCSPBYkg0okUkkssRO
+ /bxrQtmnI45OGC+KbA3QqVRfVcSkJ7A1H0YyohmwlndDn6S3UkDJtxst7iyVbvGIAZ7rpCAkEp0
+ woPqoLv15uQsK9d4Gh2DGWlu0E4vRw==
+X-Authority-Analysis: v=2.4 cv=NPjYOk6g c=1 sm=1 tr=0 ts=693917f6 cx=c_pps
+ a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
+ a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=20KFwNOVAAAA:8
+ a=AxpzScBtZrD1hND8UIcA:9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-12-09_05,2025-12-09_03,2025-10-01_01
 
+From: Keith Busch <kbusch@kernel.org>
 
-On Wed, 10 Dec 2025 03:10:37 +0100, Johannes Thumshirn wrote:
-> When mounting a btrfs file system on virtio-blk which supports native
-> Zone Append there has been a WARN triggering in btrfs' space management
-> code.
-> 
-> Further looking into btrfs' zoned statistics uncovered the filesystem
-> expecting the zones to be used, but the write pointers being 0:
->  # cat /sys/fs/btrfs/8eabd2e7-3294-4f9e-9b58-7e64135c8bf4/zoned_stats
->  active block-groups: 4
->          reclaimable: 0
->          unused: 0
->          need reclaim: false
->  data relocation block-group: 1342177280
->  active zones:
->          start: 1073741824, wp: 0 used: 0, reserved: 0, unusable: 0
->          start: 1342177280, wp: 0 used: 0, reserved: 0, unusable: 0
->          start: 1610612736, wp: 0 used: 16384, reserved: 0, unusable: 18446744073709535232
->          start: 1879048192, wp: 0 used: 131072, reserved: 0, unusable: 18446744073709420544
-> 
-> [...]
+Ensure the dma state is initialized when we're not using the contiguous
+iova, otherwise the caller may be using a stale state from a previous
+request that could use the coalesed iova allocation.
 
-Applied, thanks!
+Fixes: 2f6b2565d43cdb5 ("block: accumulate memory segment gaps per bio")
+Reported-by: Sebastian Ott <sebott@redhat.com>
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ block/blk-mq-dma.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-[1/1] block: fix cached zone reports on devices with native zone append
-      commit: 2c38ec934ddfe2d35c813edea2674356bea0fabe
-
-Best regards,
--- 
-Jens Axboe
-
-
+diff --git a/block/blk-mq-dma.c b/block/blk-mq-dma.c
+index e9108ccaf4b06..4ca768e0cc7eb 100644
+--- a/block/blk-mq-dma.c
++++ b/block/blk-mq-dma.c
+@@ -196,8 +196,9 @@ static bool blk_dma_map_iter_start(struct request *re=
+q, struct device *dma_dev,
+ 		return false;
+ 	}
+=20
+-	if (blk_can_dma_map_iova(req, dma_dev) &&
+-	    dma_iova_try_alloc(dma_dev, state, vec.paddr, total_len))
++	if (!blk_can_dma_map_iova(req, dma_dev))
++		memset(state, 0, sizeof(*state));
++	else if (dma_iova_try_alloc(dma_dev, state, vec.paddr, total_len))
+ 		return blk_rq_dma_map_iova(req, dma_dev, state, iter, &vec);
+ 	return blk_dma_map_direct(req, dma_dev, iter, &vec);
+ }
+--=20
+2.47.3
 
