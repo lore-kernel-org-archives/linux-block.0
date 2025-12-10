@@ -1,187 +1,117 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C1EE19C54E
-	for <linux-block@vger.kernel.org>; Wed, 10 Dec 2025 00:38:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD032481DD
+	for <linux-block@vger.kernel.org>; Wed, 10 Dec 2025 02:10:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.71.153.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765327111; cv=none; b=Pl2CBSDKai5p3Pml5FLmkpuzJTFKdfaS2rq/S/scVX3dwpq6stHbTBGQwgx3MJxNw1d1af0bf2EG+Lhne0sNIlVY9SnvjcGbyWRsx/G2EBQt+wEhz5z8o2d44DiC0OPxkXqgVyQMJ0LDsHLAkRaOtSUhjQizRe7MF4Ima7+YHLw=
+	t=1765332653; cv=none; b=C1mxz5/Uyjw9J/sv1PTgfmXyWd8voBQEnA5CDyy+spnXl81kXrYpQ9XpzfeI+s63JXYSEmA1dzcRf90Z27mgCBDaZnxTcOtU30IkpZ8cI8iuZtwVqTvadyh5qBr+mKz7k0NEYjdzQYShm1xzYHZ2NqhErU0XpMe6kZ51qUaenps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765327111; c=relaxed/simple;
-	bh=c65hds9zAFnoDayj832FEWgPGyLkvJkfBVHl8GLQypI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GrKWbtkXkr1QdAC28s38bH4lUETznWDQS/WLELGYoFoktvw7srNsFMhjrjLQ6JYgax8tTRXxjHV6GLYFSeA0pF3jS6lUlrfkSJoEM2zWGR8GXRwVrD8grP9sa5tQ2/Yj6MQzeV+tZVcSayeRQf4DwBHScHM4gHiIgMwLbbdioh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=NSDvUYM1; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=rHHBaVK2; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=NSDvUYM1; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=rHHBaVK2; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1765332653; c=relaxed/simple;
+	bh=8zjVElUadOzcDuOR9VRjFiKfaUjiP6pzUh9drRFIcQI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YBv7V/5OWbo1lpypFG1uVQDroZ8OS2UQQBI8q7FeLpRSKWwz6EeeYdN+9AE75mvqNfx7srEGgMieCDF3bLOGp1MC6sisGhY7mc7Ux1IqHEsKhD9Wk03x5azA1cF4mHnMs1jFm1SB0/9WIR3FTxpGEHp0Es7BaHtj060hySyIC8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=jkjweI0w; arc=none smtp.client-ip=216.71.153.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="NSDvUYM1";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="rHHBaVK2";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="NSDvUYM1";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="rHHBaVK2"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 974F7338B4;
-	Wed, 10 Dec 2025 00:38:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1765327108; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sZNiUJuG3TeKZsNDlVrI19mlrKWSweIT9h/omtBTHB8=;
-	b=NSDvUYM1HDtqM6oPFiwMjjuKWt4EqZKJymRYKTh7+EzbnTgM8NgnBjhnDhEjH2fAkho4i5
-	Tt/7gFFhQ50Qp0DqvIcM0fGxIgnBLATl2OJmaTMwtq9K8BsLPKR6Y4f479SGw9c0fn8kBQ
-	YFRJzly+foIx/GASnxveaEDorM0zhZk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1765327108;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sZNiUJuG3TeKZsNDlVrI19mlrKWSweIT9h/omtBTHB8=;
-	b=rHHBaVK2YDKlGAiXwsxjk4Zl6UntY3f/wo8LTvZ6U52z2ltaHfrD/w/u4Xc6paFySFxx55
-	e1GPfKAztuHd1UAg==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1765327108; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sZNiUJuG3TeKZsNDlVrI19mlrKWSweIT9h/omtBTHB8=;
-	b=NSDvUYM1HDtqM6oPFiwMjjuKWt4EqZKJymRYKTh7+EzbnTgM8NgnBjhnDhEjH2fAkho4i5
-	Tt/7gFFhQ50Qp0DqvIcM0fGxIgnBLATl2OJmaTMwtq9K8BsLPKR6Y4f479SGw9c0fn8kBQ
-	YFRJzly+foIx/GASnxveaEDorM0zhZk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1765327108;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sZNiUJuG3TeKZsNDlVrI19mlrKWSweIT9h/omtBTHB8=;
-	b=rHHBaVK2YDKlGAiXwsxjk4Zl6UntY3f/wo8LTvZ6U52z2ltaHfrD/w/u4Xc6paFySFxx55
-	e1GPfKAztuHd1UAg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C59DF3EA63;
-	Wed, 10 Dec 2025 00:38:16 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id +gEjEPjAOGl2dwAAD6G6ig
-	(envelope-from <hare@suse.de>); Wed, 10 Dec 2025 00:38:16 +0000
-Message-ID: <b23da846-ff6e-4b73-9691-beb14ceb0fa5@suse.de>
-Date: Wed, 10 Dec 2025 01:38:09 +0100
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="jkjweI0w"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1765332651; x=1796868651;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=8zjVElUadOzcDuOR9VRjFiKfaUjiP6pzUh9drRFIcQI=;
+  b=jkjweI0wVaVs7ekuies/XvwLDhOA6orxXO8/+jxbA1ZjBc39ucAlV6fA
+   E8eK2LTlsuzrBQVDhYXSZ44fOc8xhNfVNwPVccW/YaCuS96BcdHGNsw5y
+   +ei8JT5pqIB/Bm0P7kUPT+C/akaQbMh0/LayULtfgadmCR5dfddNaSV/r
+   WEJvava7VZSfgtUOuhtxoPtCCEKYDn6Dr0rKy9DTck9c469DVywFEoafi
+   UJ5QJtq2CNYjC8wKOUFWIj1Fr4fd9yCKdnwjCBRcah2TrRbwY/TR/TCbh
+   wc3b2FlE/1DDuxRkE6PTal/3uJidufR4lPLhyeLk+RGWoIot98lBavuFU
+   Q==;
+X-CSE-ConnectionGUID: l/tSCdaqTq2tZsnPREKFDw==
+X-CSE-MsgGUID: 5CpFtm2VSJOxM8+1YNkDpg==
+X-IronPort-AV: E=Sophos;i="6.20,263,1758556800"; 
+   d="scan'208";a="137591770"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 10 Dec 2025 10:10:45 +0800
+IronPort-SDR: 6938d6a5_tuVD3jhsLTUskK01M3VHaIxDanh039jP4UWlifAQZtU2RXv
+ 1jRq1HIG+X1+TGNRKu6Ffm/KF2HvsvUwdVvF2mA==
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 09 Dec 2025 18:10:45 -0800
+WDCIronportException: Internal
+Received: from neo.dhcp.fujisawa.hgst.com (HELO neo.ad.shared) ([10.89.82.133])
+  by uls-op-cesaip01.wdc.com with ESMTP; 09 Dec 2025 18:10:44 -0800
+From: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+To: "axboe@kernel.dk" <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Naohiro Aota <naohiro.aota@wdc.com>,
+	Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH] block: fix cached zone reports on devices with native zone append
+Date: Wed, 10 Dec 2025 03:10:37 +0100
+Message-ID: <20251210021037.10106-1-johannes.thumshirn@wdc.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC v2 1/3] filemap: set max order to be min order if THP is
- disabled
-To: Pankaj Raghav <kernel@pankajraghav.com>,
- Pankaj Raghav <p.raghav@samsung.com>, Suren Baghdasaryan
- <surenb@google.com>, Mike Rapoport <rppt@kernel.org>,
- David Hildenbrand <david@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
- Michal Hocko <mhocko@suse.com>, Lance Yang <lance.yang@linux.dev>,
- Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- Baolin Wang <baolin.wang@linux.alibaba.com>, Dev Jain <dev.jain@arm.com>,
- Barry Song <baohua@kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
- Nico Pache <npache@redhat.com>, Zi Yan <ziy@nvidia.com>,
- Vlastimil Babka <vbabka@suse.cz>, "Liam R . Howlett"
- <Liam.Howlett@oracle.com>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- mcgrof@kernel.org, gost.dev@samsung.com, tytso@mit.edu
-References: <20251206030858.1418814-1-p.raghav@samsung.com>
- <20251206030858.1418814-2-p.raghav@samsung.com>
- <d395cf62-2066-4965-87e6-823a7bbde775@suse.de>
- <3ced3736-81e8-4bc3-b5a3-50ac4af3536c@pankajraghav.com>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <3ced3736-81e8-4bc3-b5a3-50ac4af3536c@pankajraghav.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -4.27
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.27 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.17)[-0.856];
-	MIME_GOOD(-0.10)[text/plain];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email,suse.de:mid]
 
-On 12/9/25 17:33, Pankaj Raghav wrote:
-> On 12/9/25 13:15, Hannes Reinecke wrote:
->> On 12/6/25 04:08, Pankaj Raghav wrote:
->>> Large folios in the page cache depend on the splitting infrastructure from
->>> THP. To remove the dependency between large folios and
->>> CONFIG_TRANSPARENT_HUGEPAGE, set the min order == max order if THP is
->>> disabled. This will make sure the splitting code will not be required
->>> when THP is disabled, therefore, removing the dependency between large
->>> folios and THP.
->>>
->> The description is actually misleading.
->> It's not that you remove the dependency from THP for large folios
->> _in general_ (the CONFIG_THP is retained in this patch).
->> Rather you remove the dependency for large folios _for the block layer_.
->> And that should be make explicit in the description, otherwise the
->> description and the patch doesn't match.
->>
-> 
-> Hmm, that is not what I am doing. This has nothing to do with the block layer directly.
-> I mentioned this in the cover letter but I can reiterate it again.
-> 
-> Large folios depended on THP infrastructure when it was introduced. When we added added LBS support
-> to the block layer, we introduced an indirect dependency on CONFIG_THP. When we disabled config_THP
-> and had a block device logical block size > page size, we ran into a panic.
-> 
-> That was fixed here[1].
-> 
-Yes, and no. That patch limited the maximum blocksize without THP to 4k,
-so effectively disabling LBS.
+When mounting a btrfs file system on virtio-blk which supports native
+Zone Append there has been a WARN triggering in btrfs' space management
+code.
 
-> If this patch is upstreamed, then we can disable THP but still have a LBS drive attached without any
-> issues.
-> 
-But this is what I meant. We do _not_ disable the dependency on THP for
-LBS, we just remove checks for the config option itself in the block 
-layer code. The actual dependency on THP will remain as LBS will only
-be supported if THP is enabled.
+Further looking into btrfs' zoned statistics uncovered the filesystem
+expecting the zones to be used, but the write pointers being 0:
+ # cat /sys/fs/btrfs/8eabd2e7-3294-4f9e-9b58-7e64135c8bf4/zoned_stats
+ active block-groups: 4
+         reclaimable: 0
+         unused: 0
+         need reclaim: false
+ data relocation block-group: 1342177280
+ active zones:
+         start: 1073741824, wp: 0 used: 0, reserved: 0, unusable: 0
+         start: 1342177280, wp: 0 used: 0, reserved: 0, unusable: 0
+         start: 1610612736, wp: 0 used: 16384, reserved: 0, unusable: 18446744073709535232
+         start: 1879048192, wp: 0 used: 131072, reserved: 0, unusable: 18446744073709420544
 
-> Baolin added another CONFIG_THP block in ext4 [2]. With this support, we don't need to sprinkle THP
-> where file backed large folios are used.
-> 
-> Happy to discuss this in LPC (if you are attending)!
-> 
-The very first presentation on the first day in the CXL track. Yes :-)
-Let's discuss there; would love to figure out if we cannot remove the
-actual dependency on THP, too.
+Looking at the blkzone report output for the zone in question
+(1610612736) the write pointer on the device moved, but the filesystem
+did not see a change on the write pointer:
+ # blkzone report -c 1 -o 0x300000 /dev/vda
+   start: 0x000300000, len 0x080000, cap 0x080000, wptr 0x000040 reset:0 non-seq:0, zcond: 2(oi) [type: 2(SEQ_WRITE_REQUIRED)]
 
-Cheers,
+The zone write pointer is 0, because btrfs is using the cached version
+of blkdev_report_zones() and as virtio-blk is supporting native zone
+append, but blkdev_revalidate_zones() does not initialize the zone write
+plugs in this case.
 
-Hannes
+Not skipping the revalidate of sequential zones in
+blkdev_revalidate_zones() callchain fixes this issue.
+
+Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+
+---
+Note I'll also be sending a regression test to blktest for this issue.
+---
+ block/blk-zoned.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index dcc295721c2c..831113667679 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -2096,7 +2096,7 @@ static int blk_revalidate_seq_zone(struct blk_zone *zone, unsigned int idx,
+ 	 * we have a zone write plug for such zone if the device has a zone
+ 	 * write plug hash table.
+ 	 */
+-	if (!queue_emulates_zone_append(disk->queue) || !disk->zone_wplugs_hash)
++	if (!disk->zone_wplugs_hash)
+ 		return 0;
+ 
+ 	wp_offset = disk_zone_wplug_sync_wp_offset(disk, zone);
 -- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+2.52.0
+
