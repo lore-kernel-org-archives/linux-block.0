@@ -1,62 +1,248 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2FDC20013A
-	for <linux-block@vger.kernel.org>; Wed, 10 Dec 2025 08:25:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D148D3064B7
+	for <linux-block@vger.kernel.org>; Wed, 10 Dec 2025 09:10:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765355120; cv=none; b=Vg/8wPoKHm2+/owu3uJVSrVcFnAeGeX7yBNgDzozn95v6y4JSMBywOrzKrocrn4b3VC1KSE9PIfNmrn9SIt1WLelskz+k/tHuEvg3Q6fItofYE163/Vnts6rs1u7ela2Ff08vKQgMbIRC4x2OqzxCpGf8vniQ0cZAdAImj8e5Dk=
+	t=1765357821; cv=none; b=KeJqn04bRJxzR8SyoIK3ZJG4D0QDLvJRMyCZqPk9hbhmSHTZ0pgTlNUHiq6S5UuZw3govJma2ALlje9g1oNAZE9iCn5TxS2Hko4mXTweRqqKGVBdphZUZ/dZtsYS20QmNA3ECnrqDnBPEeF3V+6ifL3ee6EiMDYo0F49h1N5rvk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765355120; c=relaxed/simple;
-	bh=5CXXQpkSVME5iBtO85wZ47sPUfr33FCoTLbhKV/yW6I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jSfYGvsxcevTxq6MK8YlxHF8wpsJJlRNG9bNLw89M94BY7BNt5GlboKT6ef7UY9Mj3EQ56a/rx88JaAE1frwnskSumoONmc0VAxya5AKxMIzO7xCemED1/SIgo5pR9aUR0lQI6yzOV/iAPwEdKPxD5vImVNuF8suqeed5fija6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 1350967373; Wed, 10 Dec 2025 09:25:09 +0100 (CET)
-Date: Wed, 10 Dec 2025 09:25:08 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Keith Busch <kbusch@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@meta.com>,
-	linux-block@vger.kernel.org, axboe@kernel.dk,
-	Sebastian Ott <sebott@redhat.com>,
-	Leon Romanovsky <leon@kernel.org>
-Subject: Re: [PATCH] blk-mq-dma: always initialize dma state
-Message-ID: <20251210082508.GA2638@lst.de>
-References: <20251210064915.3196916-1-kbusch@meta.com> <20251210065407.GA650@lst.de> <aTkcEeRFPHuN8d9f@kbusch-mbp>
+	s=arc-20240116; t=1765357821; c=relaxed/simple;
+	bh=yNXATx+OA6u9jKG1AR+Myq/0+dmZZjrsP0C5Rb2XuPw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TYAJ66+jM775A8w6EQmxFWk5IX/MRT244nsujGolTwZOCl+OzUPc4/y7PUKIJlL8E9AtnLLTooFhx1XQk/Dvhg8DG3HF/+pcdRsaJih5p3hTSblXfHX8QSjlBeNbQt3X6PNhjfOTWtYzbuWShOdQE2jL9Mu7w1fApC2PXwhU78Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KG6x3gwT; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KG6x3gwT"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1765357817;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=YDSbHrXraVoqb/fNOk0FX1GVSehUzloNhyyhqW2J7pk=;
+	b=KG6x3gwTV+6r/T8XKFmbky83G1KdfM4GgNUyNiPVWa6IXd+x333dCHXGRkDfG2ZRmDti9M
+	/SJOBgPbi+69wMg+mC2eqUb5GsG7GtcjVWxdSk9Zgfoijs8FiZANaN5aWF7ItVlCixVY9P
+	CtlhFF1dAeftyBKLVoRv1I6yhlIFtwI=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-649-GVlwU5fBNvWDViKTun1Yrg-1; Wed,
+ 10 Dec 2025 04:10:14 -0500
+X-MC-Unique: GVlwU5fBNvWDViKTun1Yrg-1
+X-Mimecast-MFC-AGG-ID: GVlwU5fBNvWDViKTun1Yrg_1765357813
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BEE131800637;
+	Wed, 10 Dec 2025 09:10:12 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.95])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9978030001A8;
+	Wed, 10 Dec 2025 09:10:10 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Ming Lei <ming.lei@redhat.com>,
+	Nilay Shroff <nilay@linux.ibm.com>,
+	Yu Kuai <yukuai3@huawei.com>,
+	Guangwu Zhang <guazhang@redhat.com>
+Subject: [PATCH] block: fix race between wbt_enable_default and IO submission
+Date: Wed, 10 Dec 2025 17:10:01 +0800
+Message-ID: <20251210091001.236296-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aTkcEeRFPHuN8d9f@kbusch-mbp>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Wed, Dec 10, 2025 at 04:06:57PM +0900, Keith Busch wrote:
-> On Wed, Dec 10, 2025 at 07:54:07AM +0100, Christoph Hellwig wrote:
-> > On Tue, Dec 09, 2025 at 10:49:15PM -0800, Keith Busch wrote:
-> > > -	if (blk_can_dma_map_iova(req, dma_dev) &&
-> > > -	    dma_iova_try_alloc(dma_dev, state, vec.paddr, total_len))
-> > > +	if (!blk_can_dma_map_iova(req, dma_dev))
-> > > +		memset(state, 0, sizeof(*state));
-> > > +	else if (dma_iova_try_alloc(dma_dev, state, vec.paddr, total_len))
-> > >  		return blk_rq_dma_map_iova(req, dma_dev, state, iter, &vec);
-> > 
-> > What about just doing the memset unconditionally?  It's just two
-> > 64-bit fields so no real overhead, and it gives us a clean slate that
-> > avoid introducing other bugs later on.
-> 
-> I didn't do that is because dma_iova_try_alloc() also does that, so it'd
-> be two repeated and unnecessary memset's on the same address. That feels
-> undesirable no matter how small the struct is. I could remove the memset
-> in dma_iova_try_alloc instead and make the caller initialize it. There
-> are only two existing users of the API, so not a big deal to change it.
+When wbt_enable_default() is moved out of queue freezing in elevator_change(),
+it can cause the wbt inflight counter to become negative (-1), leading to hung
+tasks in the writeback path. Tasks get stuck in wbt_wait() because the counter
+is in an inconsistent state.
 
-If we move it out we'll need a separate dma_iova_init helper or similar
-(which I think Leon had in earlier version before I optimized it away).
-Personally I'd prefer to just zero twice, as it's really cheap.
+The issue occurs because wbt_enable_default() could race with IO submission,
+allowing the counter to be decremented before proper initialization. This manifests
+as:
+
+  rq_wait[0]:
+    inflight:             -1
+    has_waiters:        True
+
+And results in hung task warnings like:
+  task:kworker/u24:39 state:D stack:0 pid:14767
+  Call Trace:
+    rq_qos_wait+0xb4/0x150
+    wbt_wait+0xa9/0x100
+    __rq_qos_throttle+0x24/0x40
+    blk_mq_submit_bio+0x672/0x7b0
+    ...
+
+Fix this by:
+
+1. Splitting wbt_enable_default() into:
+   - __wbt_enable_default(): Returns true if wbt_init() should be called
+   - wbt_enable_default(): Wrapper for existing callers (no init)
+   - wbt_init_enable_default(): New function that checks and inits WBT
+
+2. Using wbt_init_enable_default() in blk_register_queue() to ensure
+   proper initialization during queue registration
+
+3. Move wbt_init() out of wbt_enable_default() which is only for enabling
+   disabled wbt from bfq and iocost, and wbt_init() isn't needed. Then the
+   original lock warning can be avoided.
+
+4. Removing the ELEVATOR_FLAG_ENABLE_WBT_ON_EXIT flag and its handling
+   code since it's no longer needed
+
+This ensures WBT is properly initialized before any IO can be submitted,
+preventing the counter from going negative.
+
+Cc: Nilay Shroff <nilay@linux.ibm.com>
+Cc: Yu Kuai <yukuai3@huawei.com>
+Cc: Guangwu Zhang <guazhang@redhat.com>
+Fixes: 78c271344b6f ("block: move wbt_enable_default() out of queue freezing from sched ->exit()")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/bfq-iosched.c |  2 +-
+ block/blk-sysfs.c   |  2 +-
+ block/blk-wbt.c     | 20 ++++++++++++++++----
+ block/blk-wbt.h     |  5 +++++
+ block/elevator.c    |  4 ----
+ block/elevator.h    |  1 -
+ 6 files changed, 23 insertions(+), 11 deletions(-)
+
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 4a8d3d96bfe4..6e54b1d3d8bc 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -7181,7 +7181,7 @@ static void bfq_exit_queue(struct elevator_queue *e)
+ 
+ 	blk_stat_disable_accounting(bfqd->queue);
+ 	blk_queue_flag_clear(QUEUE_FLAG_DISABLE_WBT_DEF, bfqd->queue);
+-	set_bit(ELEVATOR_FLAG_ENABLE_WBT_ON_EXIT, &e->flags);
++	wbt_enable_default(bfqd->queue->disk);
+ 
+ 	kfree(bfqd);
+ }
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 8684c57498cc..e0a70d26972b 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -932,7 +932,7 @@ int blk_register_queue(struct gendisk *disk)
+ 		elevator_set_default(q);
+ 
+ 	blk_queue_flag_set(QUEUE_FLAG_REGISTERED, q);
+-	wbt_enable_default(disk);
++	wbt_init_enable_default(disk);
+ 
+ 	/* Now everything is ready and send out KOBJ_ADD uevent */
+ 	kobject_uevent(&disk->queue_kobj, KOBJ_ADD);
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index eb8037bae0bd..0974875f77bd 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -699,7 +699,7 @@ static void wbt_requeue(struct rq_qos *rqos, struct request *rq)
+ /*
+  * Enable wbt if defaults are configured that way
+  */
+-void wbt_enable_default(struct gendisk *disk)
++static bool __wbt_enable_default(struct gendisk *disk)
+ {
+ 	struct request_queue *q = disk->queue;
+ 	struct rq_qos *rqos;
+@@ -716,19 +716,31 @@ void wbt_enable_default(struct gendisk *disk)
+ 		if (enable && RQWB(rqos)->enable_state == WBT_STATE_OFF_DEFAULT)
+ 			RQWB(rqos)->enable_state = WBT_STATE_ON_DEFAULT;
+ 		mutex_unlock(&disk->rqos_state_mutex);
+-		return;
++		return false;
+ 	}
+ 	mutex_unlock(&disk->rqos_state_mutex);
+ 
+ 	/* Queue not registered? Maybe shutting down... */
+ 	if (!blk_queue_registered(q))
+-		return;
++		return false;
+ 
+ 	if (queue_is_mq(q) && enable)
+-		wbt_init(disk);
++		return true;
++	return false;
++}
++
++void wbt_enable_default(struct gendisk *disk)
++{
++	__wbt_enable_default(disk);
+ }
+ EXPORT_SYMBOL_GPL(wbt_enable_default);
+ 
++void wbt_init_enable_default(struct gendisk *disk)
++{
++	if (__wbt_enable_default(disk))
++		WARN_ON_ONCE(wbt_init(disk));
++}
++
+ u64 wbt_default_latency_nsec(struct request_queue *q)
+ {
+ 	/*
+diff --git a/block/blk-wbt.h b/block/blk-wbt.h
+index e5fc653b9b76..925f22475738 100644
+--- a/block/blk-wbt.h
++++ b/block/blk-wbt.h
+@@ -5,6 +5,7 @@
+ #ifdef CONFIG_BLK_WBT
+ 
+ int wbt_init(struct gendisk *disk);
++void wbt_init_enable_default(struct gendisk *disk);
+ void wbt_disable_default(struct gendisk *disk);
+ void wbt_enable_default(struct gendisk *disk);
+ 
+@@ -16,6 +17,10 @@ u64 wbt_default_latency_nsec(struct request_queue *);
+ 
+ #else
+ 
++static inline void wbt_init_enable_default(struct gendisk *disk)
++{
++}
++
+ static inline void wbt_disable_default(struct gendisk *disk)
+ {
+ }
+diff --git a/block/elevator.c b/block/elevator.c
+index 5b37ef44f52d..a2f8b2251dc6 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -633,14 +633,10 @@ static int elevator_change_done(struct request_queue *q,
+ 			.et = ctx->old->et,
+ 			.data = ctx->old->elevator_data
+ 		};
+-		bool enable_wbt = test_bit(ELEVATOR_FLAG_ENABLE_WBT_ON_EXIT,
+-				&ctx->old->flags);
+ 
+ 		elv_unregister_queue(q, ctx->old);
+ 		blk_mq_free_sched_res(&res, ctx->old->type, q->tag_set);
+ 		kobject_put(&ctx->old->kobj);
+-		if (enable_wbt)
+-			wbt_enable_default(q->disk);
+ 	}
+ 	if (ctx->new) {
+ 		ret = elv_register_queue(q, ctx->new, !ctx->no_uevent);
+diff --git a/block/elevator.h b/block/elevator.h
+index a9d092c5a9e8..3eb32516be0b 100644
+--- a/block/elevator.h
++++ b/block/elevator.h
+@@ -156,7 +156,6 @@ struct elevator_queue
+ 
+ #define ELEVATOR_FLAG_REGISTERED	0
+ #define ELEVATOR_FLAG_DYING		1
+-#define ELEVATOR_FLAG_ENABLE_WBT_ON_EXIT	2
+ 
+ /*
+  * block elevator interface
+-- 
+2.50.1
+
