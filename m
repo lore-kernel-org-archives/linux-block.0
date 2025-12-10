@@ -1,409 +1,176 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012063.outbound.protection.outlook.com [52.101.48.63])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 047E026FA5B;
-	Wed, 10 Dec 2025 15:24:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765380261; cv=none; b=fJMOumpaG6n9+qMhkmVjMY2ntHCLQHYF8x7xll/nEXM1ibIeI0fEem6N4DUA6eMbKmITwhCX9COC+MdF/EOAdbK9+CAFhP+RkYhoxGh1WwiPEW4VuFmeskrcw8vSnELXAMHkfdcW5GqiZoN70a0BhlfhWlSSRMIruJX4QyCPKEo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765380261; c=relaxed/simple;
-	bh=S/jBJL5lZpU5Pg3Ty5UvArbaTWmx/CsOvmfwFLmGkaA=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48D60310768;
+	Wed, 10 Dec 2025 16:37:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.63
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765384681; cv=fail; b=nCOP35y1XomCNo8Z0LDlh+dMv+tTvQgGLFCcS1S1pAG31n8FSej6yMnb04wluhTYoTS2dez5HyVebo77jDnXuG8lcC3/KSqqnzFSPvLMELD7QruLmZdDVOIoK9TU/upLlS+1AIoEN6HNgtAw2j6CBf7Bru5jWO3hvXJv6ZmJ868=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765384681; c=relaxed/simple;
+	bh=LG2WFBliG9duUskAmim1EWgZAJ5rKAZhj419zi27Xz0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=g7oqyXv6yKfOhA7bHu0LF/RlY9bkwwIUzwU+CNUrIKCSeQ1Pr93vbDelfNhslJROoLW1vtIHlM4UQ4jfxuLpC0Kol10mnAxIOhJklGV0P/OsAUUID/jgmdIWjEkq23Rt4xYapHK5nnUZZ7Npubra3zG5hPWgReE6dbwEKk6sFEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=WQ8yF50P; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	 Content-Type:MIME-Version; b=ZMCTlw1brTBDW6LI8/jJqzHcRxNcRsPCVGbXVY7Ctm9fyF2cVWpf+JCYfGGmjaJ8vxfaTbcRFhJA0BL4we5djxQbBEBza7+9XgzpdJDxb2a18Gu91RE5S8B0D3A7pen5cvq00cKDeB2Fk2BouXDiajNLfm5GY4FfnCm8sZbEr/c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=rziNsxnJ; arc=fail smtp.client-ip=52.101.48.63
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WQ8yF50P"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=FQUphoLl+CSl7BzULuCCRXcVoz0pb/MDauqP2iOaV7E=; b=WQ8yF50PVZtz+v2UxDw/R277Yt
-	NroPhVZ3zhpFWJssIqglQijPfTxJK4kG5gstJqVJJwpNZwFya+smrHN3Aepq59BMXDZyFrXntPz+P
-	XB2+kjH797NSdWeeDaY++KbhQNf3SeAqHEGhmxvbofel7OlSZOv8OnXiC0MsdmMrfNPrGu48c1bgV
-	uQrhrE4p4Bp7yAj4nJGq9Wqb2/AWPWGQ0mTYHiB8DX3LuSJG9UD2/g4vfumzN8JcK9mywLnojpdDR
-	4fxE/j93RuVbu/oRHGeC2TYt/5xMdECLQ6TY7azh1BxxThFj8awaYOtGSMvNSuxBkBzVOOcujFpTF
-	yrU4kmFw==;
-Received: from 2a02-8389-2341-5b80-d601-7564-c2e0-491c.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:d601:7564:c2e0:491c] helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vTM39-0000000FZ3h-0KVT;
-	Wed, 10 Dec 2025 15:24:19 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Eric Biggers <ebiggers@kernel.org>
-Cc: linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-fscrypt@vger.kernel.org
-Subject: [PATCH 9/9] blk-crypto: handle the fallback above the block layer
-Date: Wed, 10 Dec 2025 16:23:38 +0100
-Message-ID: <20251210152343.3666103-10-hch@lst.de>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251210152343.3666103-1-hch@lst.de>
-References: <20251210152343.3666103-1-hch@lst.de>
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="rziNsxnJ"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=TH2vrgchjmfkQiZCQF9FBHKvAKBVm0l2Hki5iXIjCTtr51PVpu//IJwrVpE1I8063jFL2pH9LqJgLKQ0ZH5Qg3cUI8r+9Bp8SPIqAROKgJ5PcyUrmqT6cr0wWojcTagwNaf1HugSs1qmSImU5X6qVJ4XjmHgqE4NeSx2b4Ggng5BJ43eMBF81VZ0lss7SlICBv5HlTIQXL180QAxx8ATxaAkpZln/O/SX0NHVKobJnAuerqlJEX11RzDu83tYhl1R13sagEGq7PuTiRNiV3KlShXORjnuZhBoMcvm8nuM4PdMKSiPcA+AGOHodA/GonfxRUSDlqytO/knPeUw5tO0g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=58vVcA/zjtkNyGncrSDKI/ACEENeevsjztGDeGfMruU=;
+ b=TL57XhNnuV8ZSltFeUKebxCceaV1UN+6BackvUIU7nzYGVen8jNA8zfOYMMWFvmnqtF14pn7cwk28fH8A6nb+nTebhhPCZLuw78ZwcCMaqWZ6h9e9UYhNf65HaL0l5m17/ScKisw7oEwKtW+Wm1fIRIhIKsHzQRSF4IR95xoQZlT2hfxkFId46VTt5w1CVB2Efy/WUwZqhI+XVFZTlxEDm9JY7jYXwGZUFxbDusejo2K+R0rrUQvZaMJdLYJwFpXYKfI3y36vfUeVrqJl3DyIH5q2ieL05VX3G//dg0ZRdsqYj28Q3mOEkLbMMZ76zF5wopuSiNwWDQsILcmGJsqJA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=58vVcA/zjtkNyGncrSDKI/ACEENeevsjztGDeGfMruU=;
+ b=rziNsxnJTcgxdkYB5fj6w25kSgTY5lOmV7FjvEjXLYqryNVzB7BxslNUQNUIviQ+j2Osv9a8yimXV4g1/ztqwdIJL9q7r4AD2SAZQkAl49EicMeD4ARUcWXMScicZGvm/AdA9QXuSiWqYzNG1F1EgVUo3XpTODa2J8gO1p94BKG5ZwEsVp6Fno2rdHcK5lp1Hbv4s7l4vr+K0jwUbHak+x18dBgEQGIp9gYtgLcp0x22xaOevB+NSgTpNtgW59xqWbVyoqlJBQlZzyRAzD0wTzR5+IhFrVEoB57Z8nF1R1UP83Ubh/KVI0Iicx0jdRwyIlMF8fGcis2I1nw/JCmLSw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DS7PR12MB9473.namprd12.prod.outlook.com (2603:10b6:8:252::5) by
+ BL1PR12MB5873.namprd12.prod.outlook.com (2603:10b6:208:395::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9412.7; Wed, 10 Dec
+ 2025 16:37:55 +0000
+Received: from DS7PR12MB9473.namprd12.prod.outlook.com
+ ([fe80::5189:ecec:d84a:133a]) by DS7PR12MB9473.namprd12.prod.outlook.com
+ ([fe80::5189:ecec:d84a:133a%5]) with mapi id 15.20.9412.005; Wed, 10 Dec 2025
+ 16:37:55 +0000
+From: Zi Yan <ziy@nvidia.com>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: Pankaj Raghav <p.raghav@samsung.com>,
+ Suren Baghdasaryan <surenb@google.com>, Mike Rapoport <rppt@kernel.org>,
+ David Hildenbrand <david@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>,
+ Michal Hocko <mhocko@suse.com>, Lance Yang <lance.yang@linux.dev>,
+ Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+ Baolin Wang <baolin.wang@linux.alibaba.com>, Dev Jain <dev.jain@arm.com>,
+ Barry Song <baohua@kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
+ Nico Pache <npache@redhat.com>, Vlastimil Babka <vbabka@suse.cz>,
+ "Liam R . Howlett" <Liam.Howlett@oracle.com>, Jens Axboe <axboe@kernel.dk>,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ mcgrof@kernel.org, gost.dev@samsung.com, kernel@pankajraghav.com,
+ tytso@mit.edu
+Subject: Re: [RFC v2 0/3] Decoupling large folios dependency on THP
+Date: Wed, 10 Dec 2025 11:37:51 -0500
+X-Mailer: MailMate (2.0r6290)
+Message-ID: <D498FB7E-1C57-47A6-BAF4-EA1BAAE75526@nvidia.com>
+In-Reply-To: <aTj2pZqwx5xJVavb@casper.infradead.org>
+References: <20251206030858.1418814-1-p.raghav@samsung.com>
+ <64291696-C808-49D0-9F89-6B3B97F58717@nvidia.com>
+ <aTj2pZqwx5xJVavb@casper.infradead.org>
+Content-Type: text/plain
+X-ClientProxiedBy: BL0PR1501CA0012.namprd15.prod.outlook.com
+ (2603:10b6:207:17::25) To DS7PR12MB9473.namprd12.prod.outlook.com
+ (2603:10b6:8:252::5)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR12MB9473:EE_|BL1PR12MB5873:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6a03b19a-5972-4210-9017-08de380a7839
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?ZgkxCnEo8iS97lIgdAi/ad9d3nuwlT6QJ6ghXOC0xJBLAUYzV/4mouvkQvnY?=
+ =?us-ascii?Q?zFN5Km00heorORwKrO13eh9lSlNYUyI74czo2/Y1TE0Jxa3jI9sohiRj7yiC?=
+ =?us-ascii?Q?nGJrUkYmbXxlzTEkBW2NlSuPEMt02v75zI8wAmcpAEDTT57MT1wP/EAyAnpF?=
+ =?us-ascii?Q?cfm3t3qsdG3AdZ32ZY+vt57y0VlEf4Qa3YUwfAz0NnZrqT/HBhxn9XcAMlt5?=
+ =?us-ascii?Q?L1D75jnGHt1/jcVjgvJsbbbfMa1GYwqg3Lag2IzamcBB1kbevpeyldCXISuY?=
+ =?us-ascii?Q?wdEto/oy9bbxVCJaYQ/+BpJtm2d8H2HAbSiTH1lW8sDuylhNp+fRYA6OiizT?=
+ =?us-ascii?Q?sqGDTqsGdVn6bH4ySDafQmZ6VTqMDTmcr2vqw+9TATiEphBJiN/eoyaNCY6/?=
+ =?us-ascii?Q?aSjvzS5TXByw0eCax9UE+3JY1hhJjgbfn2wkcpwkgHauAnpN2W+uynqF+DcJ?=
+ =?us-ascii?Q?cWSfaHP7TKrELuwUClUjUbd5FXcXAulD3S+EVMx+1JeGLc9nyGNpNms2YtE5?=
+ =?us-ascii?Q?ArkJSEyJ6HScDQdjEyfBjLgjcGKL82AvtTYGQkBZU132/ufJGvG767sgDPwl?=
+ =?us-ascii?Q?rdwL0oaen2UXz/IycqnPI6MCBCkrtKrS5FqJNylvaP2qJDMj3hFHCpIUYxHY?=
+ =?us-ascii?Q?Ympsnb8XJIVDnwOCeVd+GU9W2sFG5EVR8A+3YB5OfQpJeS17qjfGnQcFXQIU?=
+ =?us-ascii?Q?7QIx1PEEvQG909BSCam3Oq8lyBInOZ2ntBF92KZu7cFupyfMjo1GQCY4U+5P?=
+ =?us-ascii?Q?oPzRiHPUZGglqr/ruj+WPpqMRctdLLwaKQL/NGnKsNXX9y25JZz3H5iXtqvk?=
+ =?us-ascii?Q?ZYiDeea4WSbsHPtFw5ENmJ4xM4RCWEcIGVCzXjUygisiH/FFSk+0snBLM1nc?=
+ =?us-ascii?Q?HN88G1v9kVllzyxAPW4pN7MyRVPsIA9Qm5GXyN51cofhKINR41EmuhPgiOwD?=
+ =?us-ascii?Q?pogdYoSAdKgasLHNd/zjWT4X/baSshfZxjQ3ryJ7OZX6uE2NPwhMeGuMscu4?=
+ =?us-ascii?Q?K84NgixUkGVT0ZRsQxDkvoEVkHy/65EdAOllRc/UAGpy0CW4WKjvLcWBGuEH?=
+ =?us-ascii?Q?XJ/tO1HmQp6O4XRcHh0nPiw3LJVJYUoBLkhRNHZ4/OkAPKw/RSSJHHus9Sbj?=
+ =?us-ascii?Q?HqqrrhvImt5wUH1kK8Ibl5bYULnYcQj4+o6+SwbZ2vVgSovO3/1BVijQPAro?=
+ =?us-ascii?Q?5Mks8jHjwgJ1jtbi0KG9Rl5cNR7FZN5SLCiwofB97shI9uQls6ejmC1iOvFH?=
+ =?us-ascii?Q?U3FbWT9oUgeHFiWfF3GrT9CXo7CYLb6fpCHWA9eISH5pUGH7Ik2bwvV8L7Kn?=
+ =?us-ascii?Q?IzKO7VahHcDCIFWX+DTp/EpOd2R/S0jQKY6Rkn/J2WznG/bR92DtLzhKk98z?=
+ =?us-ascii?Q?PtJUZSYNgMAb35T4UDsS9no3a1UEddf3WBC/dWrq5gerffC0lXQiswtfuHo/?=
+ =?us-ascii?Q?s508iJ6E39V1kuoJPK5Kccr/7QzJ9++V?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB9473.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?9oT/hz/Qyw6YWeU7QPJVJcoTqP+RijeEdrcK1B9DY1YIUw4X4kSGRDVPY+kx?=
+ =?us-ascii?Q?CyKoiMvEpr3brMdsBabkErrZzswYPXkOi0Cv0stfvKHDhb2Ft+KRrmiOUGwo?=
+ =?us-ascii?Q?TXG7/PnZ6nWVgzZ0C0XsDdJa/josL8q1hU0pRkqI9dDx6CLv2PwDghoss3+V?=
+ =?us-ascii?Q?xq7NvhpAMzO8d/KCB9ssPIxUQ8W65fZAVKoUdGoZu7hROvUExEFGDBwdnHPo?=
+ =?us-ascii?Q?/vGOTTpxVBO7h0A5/GegrQkyKJSollbWhpK162TrYjUhzq9HTdmTar6UA0GG?=
+ =?us-ascii?Q?QueHQU9dzN3tQFjFxhdA1LXQQuu0OWnZ7zbrPSFgzD3TA+r2Lu9TMeGqAEYQ?=
+ =?us-ascii?Q?PLd0CLXS/Ens7DTw805Ppyx+0hj2woqAiUUhqG+MBSp16YfQnsdbiNGCN5fb?=
+ =?us-ascii?Q?KjSpsGVFw+JTEKOqTHPWs9ndJOUM/+YAyT+3tgCbZuhHpTHc1ENeYZyAIXtD?=
+ =?us-ascii?Q?WYTTvB9j0ckKvjMgKqbYaOYbInijUEbj6Ph1F8e6rLqavM0CYBaeIvAuGz5b?=
+ =?us-ascii?Q?vANIX/m/yMxkWsXLITQyKJie+xocoW3Xoh6iGKoPlnrjOupvfWRnLzjKFymF?=
+ =?us-ascii?Q?IpwSoq1t6yRVB/EPW2B2p2A20MrbGMgyNPHhkCbAQ2v8luba3/087O7GUy9P?=
+ =?us-ascii?Q?hDjn0Z/4h3Jxwa/SOKv4OHnm8YR4rgbiGGXcftoSH2HBmY3NuDtEa3OcouZ3?=
+ =?us-ascii?Q?JFj+viJWuaKW/bYaX4TTDZgRj9RQTG3PzHgyv8bTTwzEq3Srfm4RqiE6733z?=
+ =?us-ascii?Q?aUDKtY9TfaxZEzg7+jIeSqEh1+/JrSJvBReRWg/6lzkHD3/FQaH+1zXPAXmB?=
+ =?us-ascii?Q?N/5jssN+i0PV4BY/3iWoDm/lv8xiJmdyPyRoJIQuRJMEAmkBseKyG8EZshDS?=
+ =?us-ascii?Q?1TFxD4DdoX5iZcM2DH6qGmRUGrRCHNyWXnpOj4+Xz6odvJ9xtRJorxfkKjWf?=
+ =?us-ascii?Q?mLLqYQgfXm89z/zittECAFAFBBMTY5Eu58tSec9JK0OhqhKuHJF1xsG7NDED?=
+ =?us-ascii?Q?mJ/czWLpUAbcZl+hlA+35Xgp0e75hoTP7nhxOHb8kl9u7l8YPgF5FRN1srna?=
+ =?us-ascii?Q?klirbZoalmhrH1HjRhJ79EnYezdnmS6pXmdvUxbylfWggN7Jg8GO45n4KuCQ?=
+ =?us-ascii?Q?GxWjnhCgjtr0CequTKNJrf+7RAW20ZKNBAlKfoaovK/5WGnMtaHqDHsAo+DT?=
+ =?us-ascii?Q?Vd1/dfZVh02XXMLJGKbfmr53TEEzJuvfN6ZGPqik+Ykoh4PWM1BKk+rNKKlr?=
+ =?us-ascii?Q?siYB/eciMREsRQQ9rBoQTWmVkv+U42eO4F53STLlefeamWG6GqQD6cdI+OtI?=
+ =?us-ascii?Q?ggKv3qECTOWVxHpyk4NDLVvzzh1I/Ted3mHncpyKk+jcGhJqe640cDxsriZY?=
+ =?us-ascii?Q?UhOkz5pgyXjDiPIN6C1/u60gNHNhIhkd6oi0hlOsMn6egw7+PYseJehP4a1R?=
+ =?us-ascii?Q?zV6MTYO7oP3vHtuI6PYk9AomfINA76To06k8P3YecE7nn8OHzMVuFMcSIAIX?=
+ =?us-ascii?Q?jGo9W9k0wB9wPwGnhzOfG5zxr2kfdgcsyxBALSetQgGXG+1H6YZxvfu8N7N+?=
+ =?us-ascii?Q?dLEZtRbHRs1B7S75MEbw09vrZgdptDvZtupZEnDm?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6a03b19a-5972-4210-9017-08de380a7839
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB9473.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Dec 2025 16:37:55.2046
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: nQnv7Y399rAcNbvZGTgVkPp30Fvg+sdCO6eMJW6KEuPKv123y9SvIFObpv6i51gl
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5873
 
-Add a blk_crypto_submit_bio helper that either submits the bio when
-it is not encrypted or inline encryption is provided, but otherwise
-handles the encryption before going down into the low-level driver.
-This reduces the risk from bio reordering and keeps memory allocation
-as high up in the stack as possible.
+On 9 Dec 2025, at 23:27, Matthew Wilcox wrote:
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- Documentation/block/inline-encryption.rst |  6 ++++++
- block/blk-core.c                          | 10 +++++++---
- block/blk-crypto-internal.h               | 19 +++++++++++--------
- block/blk-crypto.c                        | 23 ++++++-----------------
- fs/buffer.c                               |  3 ++-
- fs/crypto/bio.c                           |  2 +-
- fs/ext4/page-io.c                         |  3 ++-
- fs/ext4/readpage.c                        |  9 +++++----
- fs/f2fs/data.c                            |  4 ++--
- fs/f2fs/file.c                            |  3 ++-
- fs/iomap/direct-io.c                      |  3 ++-
- include/linux/blk-crypto.h                | 22 ++++++++++++++++++++++
- 12 files changed, 68 insertions(+), 39 deletions(-)
+> On Tue, Dec 09, 2025 at 11:03:23AM -0500, Zi Yan wrote:
+>> I wonder if core-mm should move mTHP code out of CONFIG_TRANSPARENT_HUGEPAGE
+>> and mTHP might just work. Hmm, folio split might need to be moved out of
+>> mm/huge_memory.c in that case. khugepaged should work for mTHP without
+>> CONFIG_TRANSPARENT_HUGEPAGE as well. OK, for anon folios, the changes might
+>> be more involved.
+>
+> I think this is the key question to be discussed at LPC.  How much of
 
-diff --git a/Documentation/block/inline-encryption.rst b/Documentation/block/inline-encryption.rst
-index 6380e6ab492b..7e0703a12dfb 100644
---- a/Documentation/block/inline-encryption.rst
-+++ b/Documentation/block/inline-encryption.rst
-@@ -206,6 +206,12 @@ it to a bio, given the blk_crypto_key and the data unit number that will be used
- for en/decryption.  Users don't need to worry about freeing the bio_crypt_ctx
- later, as that happens automatically when the bio is freed or reset.
- 
-+To submit a bio that uses inline encryption, users must call
-+``blk_crypto_submit_bio()`` instead of the usual ``submit_bio()``.  This will
-+submit the bio to the underlying driver if it supports inline crypto, or else
-+call the blk-crypto fallback routines before submitting normal bios to the
-+underlying drivers.
-+
- Finally, when done using inline encryption with a blk_crypto_key on a
- block_device, users must call ``blk_crypto_evict_key()``.  This ensures that
- the key is evicted from all keyslots it may be programmed into and unlinked from
-diff --git a/block/blk-core.c b/block/blk-core.c
-index f87e5f1a101f..a0bf5174e9e9 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -628,9 +628,6 @@ static void __submit_bio(struct bio *bio)
- 	/* If plug is not used, add new plug here to cache nsecs time. */
- 	struct blk_plug plug;
- 
--	if (unlikely(!blk_crypto_bio_prep(bio)))
--		return;
--
- 	blk_start_plug(&plug);
- 
- 	if (!bdev_test_flag(bio->bi_bdev, BD_HAS_SUBMIT_BIO)) {
-@@ -794,6 +791,13 @@ void submit_bio_noacct(struct bio *bio)
- 	if ((bio->bi_opf & REQ_NOWAIT) && !bdev_nowait(bdev))
- 		goto not_supported;
- 
-+	if (bio_has_crypt_ctx(bio)) {
-+		if (WARN_ON_ONCE(!bio_has_data(bio)))
-+			goto end_io;
-+		if (!blk_crypto_supported(bio))
-+			goto not_supported;
-+	}
-+
- 	if (should_fail_bio(bio))
- 		goto end_io;
- 	bio_check_ro(bio);
-diff --git a/block/blk-crypto-internal.h b/block/blk-crypto-internal.h
-index d65023120341..742694213529 100644
---- a/block/blk-crypto-internal.h
-+++ b/block/blk-crypto-internal.h
-@@ -86,6 +86,12 @@ bool __blk_crypto_cfg_supported(struct blk_crypto_profile *profile,
- int blk_crypto_ioctl(struct block_device *bdev, unsigned int cmd,
- 		     void __user *argp);
- 
-+static inline bool blk_crypto_supported(struct bio *bio)
-+{
-+	return blk_crypto_config_supported_natively(bio->bi_bdev,
-+			&bio->bi_crypt_context->bc_key->crypto_cfg);
-+}
-+
- #else /* CONFIG_BLK_INLINE_ENCRYPTION */
- 
- static inline int blk_crypto_sysfs_register(struct gendisk *disk)
-@@ -139,6 +145,11 @@ static inline int blk_crypto_ioctl(struct block_device *bdev, unsigned int cmd,
- 	return -ENOTTY;
- }
- 
-+static inline bool blk_crypto_supported(struct bio *bio)
-+{
-+	return false;
-+}
-+
- #endif /* CONFIG_BLK_INLINE_ENCRYPTION */
- 
- void __bio_crypt_advance(struct bio *bio, unsigned int bytes);
-@@ -165,14 +176,6 @@ static inline void bio_crypt_do_front_merge(struct request *rq,
- #endif
- }
- 
--bool __blk_crypto_bio_prep(struct bio *bio);
--static inline bool blk_crypto_bio_prep(struct bio *bio)
--{
--	if (bio_has_crypt_ctx(bio))
--		return __blk_crypto_bio_prep(bio);
--	return true;
--}
--
- blk_status_t __blk_crypto_rq_get_keyslot(struct request *rq);
- static inline blk_status_t blk_crypto_rq_get_keyslot(struct request *rq)
- {
-diff --git a/block/blk-crypto.c b/block/blk-crypto.c
-index 0b2535d8dbcc..856d3c5b1fa0 100644
---- a/block/blk-crypto.c
-+++ b/block/blk-crypto.c
-@@ -242,25 +242,13 @@ void __blk_crypto_free_request(struct request *rq)
- 	rq->crypt_ctx = NULL;
- }
- 
--/**
-- * __blk_crypto_bio_prep - Prepare bio for inline encryption
-- * @bio: bio to prepare
-- *
-- * If the bio crypt context provided for the bio is supported by the underlying
-- * device's inline encryption hardware, do nothing.
-- *
-- * Otherwise, try to perform en/decryption for this bio by falling back to the
-- * kernel crypto API.  For encryption this means submitting newly allocated
-- * bios for the encrypted payload while keeping back the source bio until they
-- * complete, while for reads the decryption happens in-place by a hooked in
-- * completion handler.
-- *
-- * Caller must ensure bio has bio_crypt_ctx.
-+/*
-+ * Process a bio with a crypto context.  Returns true if the caller should
-+ * submit the passed in bio, false if the bio is consumed.
-  *
-- * Return: true if @bio should be submitted to the driver by the caller, else
-- * false.  Sets bio->bi_status, calls bio_endio and returns false on error.
-+ * See the kerneldoc comment for blk_crypto_submit_bio for further details.
-  */
--bool __blk_crypto_bio_prep(struct bio *bio)
-+bool __blk_crypto_submit_bio(struct bio *bio)
- {
- 	const struct blk_crypto_key *bc_key = bio->bi_crypt_context->bc_key;
- 	struct block_device *bdev = bio->bi_bdev;
-@@ -288,6 +276,7 @@ bool __blk_crypto_bio_prep(struct bio *bio)
- 
- 	return true;
- }
-+EXPORT_SYMBOL_GPL(__blk_crypto_submit_bio);
- 
- int __blk_crypto_rq_bio_prep(struct request *rq, struct bio *bio,
- 			     gfp_t gfp_mask)
-diff --git a/fs/buffer.c b/fs/buffer.c
-index 838c0c571022..da18053f66e8 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -29,6 +29,7 @@
- #include <linux/slab.h>
- #include <linux/capability.h>
- #include <linux/blkdev.h>
-+#include <linux/blk-crypto.h>
- #include <linux/file.h>
- #include <linux/quotaops.h>
- #include <linux/highmem.h>
-@@ -2821,7 +2822,7 @@ static void submit_bh_wbc(blk_opf_t opf, struct buffer_head *bh,
- 		wbc_account_cgroup_owner(wbc, bh->b_folio, bh->b_size);
- 	}
- 
--	submit_bio(bio);
-+	blk_crypto_submit_bio(bio);
- }
- 
- void submit_bh(blk_opf_t opf, struct buffer_head *bh)
-diff --git a/fs/crypto/bio.c b/fs/crypto/bio.c
-index c2b3ca100f8d..6da683ea69dc 100644
---- a/fs/crypto/bio.c
-+++ b/fs/crypto/bio.c
-@@ -105,7 +105,7 @@ static int fscrypt_zeroout_range_inline_crypt(const struct inode *inode,
- 		}
- 
- 		atomic_inc(&done.pending);
--		submit_bio(bio);
-+		blk_crypto_submit_bio(bio);
- 	}
- 
- 	fscrypt_zeroout_range_done(&done);
-diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
-index 39abfeec5f36..a8c95eee91b7 100644
---- a/fs/ext4/page-io.c
-+++ b/fs/ext4/page-io.c
-@@ -7,6 +7,7 @@
-  * Written by Theodore Ts'o, 2010.
-  */
- 
-+#include <linux/blk-crypto.h>
- #include <linux/fs.h>
- #include <linux/time.h>
- #include <linux/highuid.h>
-@@ -401,7 +402,7 @@ void ext4_io_submit(struct ext4_io_submit *io)
- 	if (bio) {
- 		if (io->io_wbc->sync_mode == WB_SYNC_ALL)
- 			io->io_bio->bi_opf |= REQ_SYNC;
--		submit_bio(io->io_bio);
-+		blk_crypto_submit_bio(io->io_bio);
- 	}
- 	io->io_bio = NULL;
- }
-diff --git a/fs/ext4/readpage.c b/fs/ext4/readpage.c
-index e7f2350c725b..49a6d36a8dba 100644
---- a/fs/ext4/readpage.c
-+++ b/fs/ext4/readpage.c
-@@ -36,6 +36,7 @@
- #include <linux/bio.h>
- #include <linux/fs.h>
- #include <linux/buffer_head.h>
-+#include <linux/blk-crypto.h>
- #include <linux/blkdev.h>
- #include <linux/highmem.h>
- #include <linux/prefetch.h>
-@@ -345,7 +346,7 @@ int ext4_mpage_readpages(struct inode *inode,
- 		if (bio && (last_block_in_bio != first_block - 1 ||
- 			    !fscrypt_mergeable_bio(bio, inode, next_block))) {
- 		submit_and_realloc:
--			submit_bio(bio);
-+			blk_crypto_submit_bio(bio);
- 			bio = NULL;
- 		}
- 		if (bio == NULL) {
-@@ -371,14 +372,14 @@ int ext4_mpage_readpages(struct inode *inode,
- 		if (((map.m_flags & EXT4_MAP_BOUNDARY) &&
- 		     (relative_block == map.m_len)) ||
- 		    (first_hole != blocks_per_folio)) {
--			submit_bio(bio);
-+			blk_crypto_submit_bio(bio);
- 			bio = NULL;
- 		} else
- 			last_block_in_bio = first_block + blocks_per_folio - 1;
- 		continue;
- 	confused:
- 		if (bio) {
--			submit_bio(bio);
-+			blk_crypto_submit_bio(bio);
- 			bio = NULL;
- 		}
- 		if (!folio_test_uptodate(folio))
-@@ -389,7 +390,7 @@ int ext4_mpage_readpages(struct inode *inode,
- 		; /* A label shall be followed by a statement until C23 */
- 	}
- 	if (bio)
--		submit_bio(bio);
-+		blk_crypto_submit_bio(bio);
- 	return 0;
- }
- 
-diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
-index c30e69392a62..c3dd8a5c8589 100644
---- a/fs/f2fs/data.c
-+++ b/fs/f2fs/data.c
-@@ -513,7 +513,7 @@ void f2fs_submit_read_bio(struct f2fs_sb_info *sbi, struct bio *bio,
- 	trace_f2fs_submit_read_bio(sbi->sb, type, bio);
- 
- 	iostat_update_submit_ctx(bio, type);
--	submit_bio(bio);
-+	blk_crypto_submit_bio(bio);
- }
- 
- static void f2fs_submit_write_bio(struct f2fs_sb_info *sbi, struct bio *bio,
-@@ -522,7 +522,7 @@ static void f2fs_submit_write_bio(struct f2fs_sb_info *sbi, struct bio *bio,
- 	WARN_ON_ONCE(is_read_io(bio_op(bio)));
- 	trace_f2fs_submit_write_bio(sbi->sb, type, bio);
- 	iostat_update_submit_ctx(bio, type);
--	submit_bio(bio);
-+	blk_crypto_submit_bio(bio);
- }
- 
- static void __submit_merged_bio(struct f2fs_bio_info *io)
-diff --git a/fs/f2fs/file.c b/fs/f2fs/file.c
-index d7047ca6b98d..914790f37915 100644
---- a/fs/f2fs/file.c
-+++ b/fs/f2fs/file.c
-@@ -5,6 +5,7 @@
-  * Copyright (c) 2012 Samsung Electronics Co., Ltd.
-  *             http://www.samsung.com/
-  */
-+#include <linux/blk-crypto.h>
- #include <linux/fs.h>
- #include <linux/f2fs_fs.h>
- #include <linux/stat.h>
-@@ -5046,7 +5047,7 @@ static void f2fs_dio_write_submit_io(const struct iomap_iter *iter,
- 	enum temp_type temp = f2fs_get_segment_temp(sbi, type);
- 
- 	bio->bi_write_hint = f2fs_io_type_to_rw_hint(sbi, DATA, temp);
--	submit_bio(bio);
-+	blk_crypto_submit_bio(bio);
- }
- 
- static const struct iomap_dio_ops f2fs_iomap_dio_write_ops = {
-diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
-index 8e273408453a..4000c8596d9b 100644
---- a/fs/iomap/direct-io.c
-+++ b/fs/iomap/direct-io.c
-@@ -3,6 +3,7 @@
-  * Copyright (C) 2010 Red Hat, Inc.
-  * Copyright (c) 2016-2025 Christoph Hellwig.
-  */
-+#include <linux/blk-crypto.h>
- #include <linux/fscrypt.h>
- #include <linux/pagemap.h>
- #include <linux/iomap.h>
-@@ -74,7 +75,7 @@ static void iomap_dio_submit_bio(const struct iomap_iter *iter,
- 		dio->dops->submit_io(iter, bio, pos);
- 	} else {
- 		WARN_ON_ONCE(iter->iomap.flags & IOMAP_F_ANON_WRITE);
--		submit_bio(bio);
-+		blk_crypto_submit_bio(bio);
- 	}
- }
- 
-diff --git a/include/linux/blk-crypto.h b/include/linux/blk-crypto.h
-index 58b0c5254a67..887169f8feb0 100644
---- a/include/linux/blk-crypto.h
-+++ b/include/linux/blk-crypto.h
-@@ -171,6 +171,28 @@ static inline bool bio_has_crypt_ctx(struct bio *bio)
- 
- #endif /* CONFIG_BLK_INLINE_ENCRYPTION */
- 
-+bool __blk_crypto_submit_bio(struct bio *bio);
-+
-+/**
-+ * blk_crypto_submit_bio - Submit a bio using inline encryption
-+ * @bio: bio to submit
-+ *
-+ * If @bio has not crypto context, or the crypt context attached to @bio is
-+ * supported by the underlying device's inline encryption hardware, just submit
-+ * @bio.
-+ *
-+ * Otherwise, try to perform en/decryption for this bio by falling back to the
-+ * kernel crypto API. For encryption this means submitting newly allocated
-+ * bios for the encrypted payload while keeping back the source bio until they
-+ * complete, while for reads the decryption happens in-place by a hooked in
-+ * completion handler.
-+ */
-+static inline void blk_crypto_submit_bio(struct bio *bio)
-+{
-+	if (!bio_has_crypt_ctx(bio) || __blk_crypto_submit_bio(bio))
-+		submit_bio(bio);
-+}
-+
- int __bio_crypt_clone(struct bio *dst, struct bio *src, gfp_t gfp_mask);
- /**
-  * bio_crypt_clone - clone bio encryption context
--- 
-2.47.3
+I am not going, so would like to get a summary afterwards. :)
 
+> the current THP code should we say "OK, this is large folio support
+> and everybody needs it" and how much is "This is PMD (or mTHP) support;
+> this architecture doesn't have it, we don't need to compile it in".
+
+I agree with most of it, except mTHP part. mTHP should be part of large
+folio, since I see mTHP is anon equivalent to file backed large folio.
+Both are a >0 order folio mapped by PTEs (ignoring to-be-implemented
+multi-PMD mapped large folios for now).
+
+Best Regards,
+Yan, Zi
