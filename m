@@ -1,49 +1,57 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AE4C30F94D;
-	Wed, 10 Dec 2025 04:05:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D65F17A30A;
+	Wed, 10 Dec 2025 04:27:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765339545; cv=none; b=Dl1TO3ujez/4ifnKvryWHaEHampWenIxlMbB0kiannTWoDHP2XR5nNCsAE62vDu2q8yTCdbSDaaDZeCaB/lOCBZ/f5OYSSaTfzGhbPhxcFjT37ytNcg0EpNYlhMz31KkLbWlPNN/eP/fs0utHlekxfb46BINkZ5Zkw7qgD5mT1Q=
+	t=1765340861; cv=none; b=ZyIbUK94CykYJ5LKooI33GTDJJ9dHgMDUfn75A2bmV4+k36AJUTRh0eFZkxGkEW83lMMlK8u/2rALT8bJKvi2i3MkwOeQ3KYzskl8yA/8x5001S/gczHXTNor11QA2OD8QkQGDrj9s31JJXytVAIJwmQ9qGroLkdsvfKlnhyC+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765339545; c=relaxed/simple;
-	bh=DDXeGI3PrVCWYn4HgWXYJxRFC7N8vlabUufE9+1W1hU=;
+	s=arc-20240116; t=1765340861; c=relaxed/simple;
+	bh=WTv0v70vaWxCnm9avv/0y5HO3iK9XjOP1DDjXjwugZY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qIugEN2XMmYhVMXVlrqXBog7grfEdC8zdbrX1CJh6Hv/BuTRmR5vJkQCAlrlu2QxZFHJJz/5+NnPGzBInHbOKwKDxYN3k8xDZbchIBILkiFUnGLXBg4lyHEOqFzOQTPAjtd/a3vdWL2bh1sqzWQHe69g1/+XPmqHEbX/L0ipX5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K3gYJbMV; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=q8YPvegUQ5kd23U8c76MpF5WYGIO3h9+xvTrBLZFKn7wzu+yBlSQSyHBSM6WVZtODTM/nDhwfpRTJt+D6VE9FapFu3XcCpmeq8eDwIL+zd3egExm5nHJFkbK4mXaTl0nlozuUtQxUHT6KUAsH8GTj7vKdXr4px3WtarwH18ojf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=YoEtHsGu; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K3gYJbMV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95D2CC116B1;
-	Wed, 10 Dec 2025 04:05:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765339545;
-	bh=DDXeGI3PrVCWYn4HgWXYJxRFC7N8vlabUufE9+1W1hU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=K3gYJbMVRCC87PmUQ02vWB+jUJdMU6wSQL3EWDlwZ4hdXkL6y1EW8vSd8b3I22MwD
-	 gb/M6kjjt6Z9jA/SkjKVeTwpYzLNdGiAE9BPpVMBReng9K00FrH3PjJIyb2NM/3Lah
-	 pmCklcpqHMPc76RFgxZjYIk6WdFDg6qMOUc0bZih+0piHrJIw5UQ7ItfiGMiROwq+m
-	 tsHBinhfxt3Fz1ONr9RZTxbhlBb5TYB1s9avApO0Cm8OhTGt1VNzZBthCyKd6Rnslu
-	 Oj0Gd8RQBNPjiaZwH+Zu3Eiy59RKsabggSdbwLMy2w9vXNsHe552FCZ64BDnuX98kd
-	 NF+OXmPBOsyIQ==
-Date: Wed, 10 Dec 2025 13:05:41 +0900
-From: Keith Busch <kbusch@kernel.org>
-To: Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc: Sebastian Ott <sebott@redhat.com>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-	Robin Murphy <robin.murphy@arm.com>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-	Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
-	Will Deacon <will@kernel.org>, Carlos Maiolino <cem@kernel.org>
-Subject: Re: WARNING: drivers/iommu/io-pgtable-arm.c:639
-Message-ID: <aTjxleV96jE3PIBh@kbusch-mbp>
-References: <170120f7-dd2c-4d2a-d6fc-ac4c82afefd7@redhat.com>
- <4386e0f7-9e45-41d2-8236-7133d6d00610@arm.com>
- <99e12a04-d23f-f9e7-b02e-770e0012a794@redhat.com>
- <30ae8fc4-94ff-4467-835e-28b4a4dfcd8f@nvidia.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="YoEtHsGu"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=XQZTyVY5EI22OfoG+6/Jw+yO17GgHGjfzONX+f4GGdA=; b=YoEtHsGuQbLbUOQDdHALmnfwAY
+	tNqObB8kUEP4Gy80sUh6a6H3/Nr0AbajRKuSYoR78lcNgmUVQq6R5pU3F43oxeaOzBqymfrpbwlsl
+	cewMwuciIcEhRpC7dPshg6Y32cTaC78zq8lGz4gNi0bnkaca2Iaq1beqJzJinqtKiyBt7shpUUL+t
+	D2u3r6TCbz3yxZH6CnusT0Z9Ocaniazn+dSz0vWuJRlHTH7mSLqVpLOFOc26sI0wx5RWxlBz8ekyx
+	5Eyyjcz8lV7qjG9j0yy4um3BWtHJEIocISpWzduMS6rBVQ8xyNV9Psb7wKqB91GwfGalaY84SbD60
+	vpvfQdFA==;
+Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vTBnJ-0000000CJG5-1xCy;
+	Wed, 10 Dec 2025 04:27:17 +0000
+Date: Wed, 10 Dec 2025 04:27:17 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: Zi Yan <ziy@nvidia.com>
+Cc: Pankaj Raghav <p.raghav@samsung.com>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Mike Rapoport <rppt@kernel.org>,
+	David Hildenbrand <david@redhat.com>,
+	Ryan Roberts <ryan.roberts@arm.com>, Michal Hocko <mhocko@suse.com>,
+	Lance Yang <lance.yang@linux.dev>,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	Dev Jain <dev.jain@arm.com>, Barry Song <baohua@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Nico Pache <npache@redhat.com>, Vlastimil Babka <vbabka@suse.cz>,
+	"Liam R . Howlett" <Liam.Howlett@oracle.com>,
+	Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, mcgrof@kernel.org,
+	gost.dev@samsung.com, kernel@pankajraghav.com, tytso@mit.edu
+Subject: Re: [RFC v2 0/3] Decoupling large folios dependency on THP
+Message-ID: <aTj2pZqwx5xJVavb@casper.infradead.org>
+References: <20251206030858.1418814-1-p.raghav@samsung.com>
+ <64291696-C808-49D0-9F89-6B3B97F58717@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -52,47 +60,17 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <30ae8fc4-94ff-4467-835e-28b4a4dfcd8f@nvidia.com>
+In-Reply-To: <64291696-C808-49D0-9F89-6B3B97F58717@nvidia.com>
 
-On Wed, Dec 10, 2025 at 02:30:50AM +0000, Chaitanya Kulkarni wrote:
-> @@ -126,17 +126,26 @@ static bool blk_rq_dma_map_iova(struct request *req, struct device *dma_dev,
->   		error = dma_iova_link(dma_dev, state, vec->paddr, mapped,
->   				vec->len, dir, attrs);
->   		if (error)
-> -			break;
-> +			goto out_unlink;
->   		mapped += vec->len;
->   	} while (blk_map_iter_next(req, &iter->iter, vec));
->   
->   	error = dma_iova_sync(dma_dev, state, 0, mapped);
-> -	if (error) {
-> -		iter->status = errno_to_blk_status(error);
-> -		return false;
-> -	}
-> +	if (error)
-> +		goto out_unlink;
->   
->   	return true;
-> +
-> +out_unlink:
-> +	/*
-> +	 * Unlink any partial mapping to avoid unmap mismatch later.
-> +	 * If we mapped some bytes but not all, we must clean up now
-> +	 * to prevent attempting to unmap more than was actually mapped.
-> +	 */
-> +	if (mapped)
-> +		dma_iova_unlink(dma_dev, state, 0, mapped, dir, attrs);
-> +	iter->status = errno_to_blk_status(error);
-> +	return false;
->   }
+On Tue, Dec 09, 2025 at 11:03:23AM -0500, Zi Yan wrote:
+> I wonder if core-mm should move mTHP code out of CONFIG_TRANSPARENT_HUGEPAGE
+> and mTHP might just work. Hmm, folio split might need to be moved out of
+> mm/huge_memory.c in that case. khugepaged should work for mTHP without
+> CONFIG_TRANSPARENT_HUGEPAGE as well. OK, for anon folios, the changes might
+> be more involved.
 
-It does look like a bug to continue on when dma_iova_link() fails as the
-caller thinks the entire mapping was successful, but I think you also
-need to call dma_iova_free() to undo the earlier dma_iova_try_alloc(),
-otherwise iova space is leaked.
+I think this is the key question to be discussed at LPC.  How much of
+the current THP code should we say "OK, this is large folio support
+and everybody needs it" and how much is "This is PMD (or mTHP) support;
+this architecture doesn't have it, we don't need to compile it in".
 
-I'm a bit doubtful this error condition was hit though: this sequence
-is largely the same as it was in v6.18 before the regression. The only
-difference since then should just be for handling P2P DMA across a host
-bridge, which I don't think applies to the reported bug since that's a
-pretty unusual thing to do.
