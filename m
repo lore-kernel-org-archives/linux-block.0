@@ -1,48 +1,112 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5C2A6F2F2
-	for <linux-block@vger.kernel.org>; Wed, 10 Dec 2025 15:18:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC0C126738D;
+	Wed, 10 Dec 2025 15:23:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765379931; cv=none; b=Ajo1MO9Jj+dxNxp8Vl6Hu/ToT6fxtnZZwC8X+IFu7ZGZPBiHuWTV93TQyFHS6DSdMM833kaDf41WK4+UuiC+CK0LbQMSWsFboVYS4tH2Yj5n9cEFofoHIwcRodPElgtCwVa/rD4dJURWmzXcCvvXsCkt66wYZdbDm+jApSuZ1Ws=
+	t=1765380230; cv=none; b=paY6cAeSgHaavkSA05dIN0OhQctMydiE9/w6DazXmGoNwablkIzuH78GleE97ndfbp1KfAvC4RRpayOVPkCsuV0Z4vZJJA3FZrYbsqFHG9gFOfAGuD0cOp8+ohalk3OiYHjrTekEmc9ocXl9N6QdkOrggPL/uD0SqmIReeSE81g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765379931; c=relaxed/simple;
-	bh=09owCR2ALd+JoFhA6An9d/x3Qw2D1mj5zzs+3D9FXHk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LwnrGAXYhDG8GJdJiHdwM+EJ/aWGRDOs15+Zlt4uRtXeiz0d5Z1nC3uF7ZCfoOXBkp+kmmMr75FkAl6bGJ6mFYiaVOpph6Rer7NXPkGooEqRWNJ/qGBQHv4K7ioXNlZY3FNK0SITWcy3E+z2jld2aJcTqnqpShGgVPf+oQmsxaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 66F3B227A87; Wed, 10 Dec 2025 16:18:43 +0100 (CET)
-Date: Wed, 10 Dec 2025 16:18:42 +0100
+	s=arc-20240116; t=1765380230; c=relaxed/simple;
+	bh=amcwwXQ5Dc69tTZHE7WTuJUNEDuMfLJwAAGxewrAiS0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Jbzt7016M1z5edW3b2MW1n1vjX7indxZ2Ylh5eEoJSKJK3QqS8lG6Q8+d3Ui+m35H/m9PNczFrAZCIPCNxqDMu5uXhm7E0JIgiVK+lvWZj0qslot+pQzPnxHRkutN+sUgC3IaWh/gsIbRRMa1yJ9q3pWnE8oH0NTqFN7ZLrXBeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=VNlimyqZ; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="VNlimyqZ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=lItwUDV96BZQRw3gIhWS+WYgL9SDWpyUQbRDIJHp+ZM=; b=VNlimyqZJcknRD/QwbHw5fgk6y
+	qpWSALa5ABny23ST1Xd2ITbB5yPFsFG8A82gIvYjk0xiAjoXMOVlnYfBwEAktw1HV6Xd4NkxUzsMc
+	ohVf63Nne9KsVEpwa7xa+QC0cJ5QOLlW/rrBYNUKV7MZrMf++fic8fsT6qOyYUr/AuNXKBGHoxM7U
+	zyBxAk+uoOF28VYicG2mzpgjzYuVbyOgDR6RyOqENdLmcOn4l5x9nQOEe7ihvMHnQ49Q6WlYgsA9m
+	3rEi79JJQ4JCilvej8CjUFnlwqVCSCDJs6Y0aNK1AnrjK1BiO+yEr6+JJ9LeTTtjYo0fV3T7SKuD5
+	2De7MpcA==;
+Received: from 2a02-8389-2341-5b80-d601-7564-c2e0-491c.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:d601:7564:c2e0:491c] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vTM2d-0000000FZ1H-2kJN;
+	Wed, 10 Dec 2025 15:23:48 +0000
 From: Christoph Hellwig <hch@lst.de>
-To: Keith Busch <kbusch@meta.com>
-Cc: linux-block@vger.kernel.org, axboe@kernel.dk, hch@lst.de,
-	Keith Busch <kbusch@kernel.org>, Sebastian Ott <sebott@redhat.com>
-Subject: Re: [PATCHv2] blk-mq-dma: always initialize dma state
-Message-ID: <20251210151842.GA2036@lst.de>
-References: <20251210104346.379106-1-kbusch@meta.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Eric Biggers <ebiggers@kernel.org>
+Cc: linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-fscrypt@vger.kernel.org
+Subject: move blk-crypto-fallback to sit above the block layer v2
+Date: Wed, 10 Dec 2025 16:23:29 +0100
+Message-ID: <20251210152343.3666103-1-hch@lst.de>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251210104346.379106-1-kbusch@meta.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Wed, Dec 10, 2025 at 02:43:46AM -0800, Keith Busch wrote:
-> From: Keith Busch <kbusch@kernel.org>
-> 
-> Ensure the dma state is initialized when we're not using the contiguous
-> iova, otherwise the caller may be using a stale state from a previous
-> request that could use the coalesed iova allocation.
+Hi all,
 
-Looks good:
+in the past we had various discussions that doing the blk-crypto fallback
+below the block layer causes all kinds of problems due to very late
+splitting and communicating up features.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+This series turns that call chain upside down by requiring the caller to
+call into blk-crypto using a new submit_bio wrapper instead so that only
+hardware encryption bios are passed through the block layer as such.
 
+While doings this I also noticed that the existing blk-crypto-fallback
+code does various unprotected memory allocations which this converts to
+mempools, or from loops of mempool allocations to the new safe batch
+mempool allocator.
+
+There might be future avenues for optimization by using high order
+folio allocations that match the file systems preferred folio size,
+but for that'd probably want a batch folio allocator first, in addition
+to deferring it to avoid scope creep.
+
+Changes since v1: 
+ - drop the mempool bulk allocator that was merged upstream
+ - keep call bio_crypt_check_alignment for the hardware crypto case
+ - rework the way bios are submitted earlier and reorder the series
+   a bit to suit this
+ - use struct initializers for struct fscrypt_zero_done in
+   fscrypt_zeroout_range_inline_crypt
+ - use cmpxchg to make the bi_status update in
+   blk_crypto_fallback_encrypt_endio safe
+ - rename the bio_set matching it's new purpose
+ - remove usage of DECLARE_CRYPTO_WAIT()
+ - use consistent GFP flags / scope
+ - optimize data unit alignment checking
+ - update Documentation/block/inline-encryption.rst for the new
+   blk_crypto_submit_bio API
+ - optimize alignment checking and ensure it still happens for
+   hardware encryption
+ - reorder the series a bit
+ - improve various comments
+
+Diffstat:
+ Documentation/block/inline-encryption.rst |    6 
+ block/blk-core.c                          |   10 
+ block/blk-crypto-fallback.c               |  424 ++++++++++++++----------------
+ block/blk-crypto-internal.h               |   30 --
+ block/blk-crypto.c                        |   78 +----
+ block/blk-map.c                           |    2 
+ block/blk-merge.c                         |   19 -
+ fs/btrfs/bio.c                            |    2 
+ fs/buffer.c                               |    3 
+ fs/crypto/bio.c                           |   91 +++---
+ fs/ext4/page-io.c                         |    3 
+ fs/ext4/readpage.c                        |    9 
+ fs/f2fs/data.c                            |    4 
+ fs/f2fs/file.c                            |    3 
+ fs/iomap/direct-io.c                      |    3 
+ fs/iomap/ioend.c                          |    2 
+ fs/xfs/xfs_zone_gc.c                      |    2 
+ include/linux/bio.h                       |    2 
+ include/linux/blk-crypto.h                |   22 +
+ include/linux/blkdev.h                    |    7 
+ 20 files changed, 367 insertions(+), 355 deletions(-)
