@@ -1,69 +1,69 @@
-Received: from mail-oa1-f97.google.com (mail-oa1-f97.google.com [209.85.160.97])
+Received: from mail-pf1-f226.google.com (mail-pf1-f226.google.com [209.85.210.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B3C5285C8C
-	for <linux-block@vger.kernel.org>; Thu, 11 Dec 2025 05:16:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38B8520F08D
+	for <linux-block@vger.kernel.org>; Thu, 11 Dec 2025 05:16:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765430197; cv=none; b=F99wZDKLauMzdb0K5UVbY+MnY5hlKUdBrd2UQ9gYwkj5WJQ2R1tjB+fVAO4kqHpHk0C2DreRUeKrnzfE0f6gpkJnv3GI2xuLJYrcBtoEE2mNJgt/EDovyG4MzfU+x69bw18+8/ZifVbmgUa36UU7NVld+UhicqYhQKzDs6lnhd0=
+	t=1765430197; cv=none; b=fhdYibsbpwsgr/Z9i6ZmHaYi97p+ZTD5ZIZurQndJqYMEjnZ6mPU7yl6zqSLeh12Ra2UURqHPiBT8iZykq43L/DKIqj4Fi7BOJDpDdBT7ty54d1b/nb7w++926N9cygy1dRk2KseZZw6wxokgPUl6FT7lAbslakjXmmOBAcJkiQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1765430197; c=relaxed/simple;
-	bh=3BcnF+JpBAzJisKJ1uTv6+gdgkHDBERFf0MRmBcrFsg=;
+	bh=acykySZqQaZB1IYcjmApohtjhjnF/Dlf+Coyd9uZ2H4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=spAiJJRZoEv0m/KqKL+WmG88GrmjxagLt/L/28YDfzA1XZceSquF5bv3kWxpKSZE7CLvyoKRUSwEjiuaz6joCGXqHuIalI0Q0yrd7o6WjeRBaGjElzY4Y+IDPJ+4yXDaNzSsBjtuQp4iqcZTCOScwcZj9fZ7iCvPUlvl5Ei88Nk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=eaunaJP0; arc=none smtp.client-ip=209.85.160.97
+	 MIME-Version; b=ZcC1/JzUUJ6HuVGhNj0TilICd3erDwZ0UgeNgyXp+WoUWBdv/BK5OY5z9oWHuecEhhqzN76PcmuFYoRe2gfqlHTeYeZ2fkzQhjKBJs77LVn+/xWStWs8tY0HtKAQHaKslt4CdIUowQiT/+7z0TikUUqMABgNdeuOGZeXHGL3MfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=SgciTSnM; arc=none smtp.client-ip=209.85.210.226
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="eaunaJP0"
-Received: by mail-oa1-f97.google.com with SMTP id 586e51a60fabf-3e7f43c8191so7540fac.1
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="SgciTSnM"
+Received: by mail-pf1-f226.google.com with SMTP id d2e1a72fcca58-7bac5b906bcso97014b3a.3
         for <linux-block@vger.kernel.org>; Wed, 10 Dec 2025 21:16:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=purestorage.com; s=google2022; t=1765430193; x=1766034993; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=KfkHHTfuV1VgzCnNWDioK4GO8iHacIvGQ0SM0tegTgc=;
-        b=eaunaJP0AaVysylgpySQADTE5qJoHyY/BvgeogFOj/1OJRedL1MnUPeDCk/o0UPCjS
-         R79WSrUH8qcePzbGHwpn02BOe+dIIen+QA6cgefeYcqAeUA5OT6Ae0nwQ+4j813XSPOZ
-         QmUQvifqCNvIv6IuhbyJs+vXhJ1P7MioAuviJTi8cqhn3JrWSQydg+9RBBowNYFhCG4T
-         oCvnNsE6g5VqpIeRnJoaPB1zlKjwlppgJH02VNrMn1hcSIuKCJg9znRj3mx4YWdG1jZi
-         TZf4HTg/dG9G8er3mJiD1FMO2lJ75hFNiBwAagFWQ4OpdGgJ9g/MMSHV6lvv3r01Uucz
-         v2jA==
+        bh=vnVfufvIYEdI8+hFNgHbkUqJ54wEbcXzUeKinX5SKcw=;
+        b=SgciTSnMLWNdtYoA13frUMQy15TNmrrlUCCSfxc2A99pR9MJKfJq3KAFNOmL0h+xh6
+         nYgxDvhlhpoC5+ZeeGztXpz41ww4zYXigvnXPvVSyiJ9A9smMxoYRcdPleqiC8dn7Hhz
+         19VcudtbzvqDYxeTV56SjSokKMFhRcqswgHDK64AyIDZPIzAZs3NVzL2hueK7W4p9Epr
+         A0M+DlQPdrIfw3kC+PH+zBvTb6HyujtE1GgzS1Zi2k6TJ1q1U0dxCxgSU8DS4R/L4cIP
+         WHt2dihC47Q2mmxCUp6WOlQt/4ONFltxksTKFMc3zOuxNpBbuTpXfIOFv8k6bdVwhLuk
+         nNkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1765430193; x=1766034993;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=KfkHHTfuV1VgzCnNWDioK4GO8iHacIvGQ0SM0tegTgc=;
-        b=RZfvKWLJQq0uRIK1YScGpFmE0sYotuWg/KrmF7+cD44KqecGZy8fpVyjJ1oxYg61Ez
-         gzdPVi8nzBfu2ONcgBrIyoMLNavlPJ/BdYaZlnmCeZMyM07op4oJ24eKjKJM4kEp/neR
-         FIFghW2tTDPnDBhxPlZUGWkBcfONBfH1BBoYuwQS4tlLhElw2eGOni/ghEwp0cYeOf5c
-         YudfRA5oAl9hlEkUNWjIGvmWA8TrfRZH9KGKYokKNJgzC+2Loj72t28PqfEbgBrKjioP
-         btnAmGli2EtpNM1YXVQa828n9nqgZU7D61hHoB+sWfCMzUzpP3XGg/MnaOJQYdaXaaOv
-         ZOFw==
-X-Gm-Message-State: AOJu0YwtUMioiNxkH1MRizGdI3Onhj2KWqkHiOWDrBIZ+yIScUIHFkZZ
-	72EPB4TBlExUOASPd6COWHGx9colBw7fJCB23Iad++Q9AmoobPpTWo3c5UtL89Z2Tx5VGWJGitf
-	omfzBNOg7vdrI7IQDFxsW1YS59unjo/r5P46JiBIg5924dNB3D30m
-X-Gm-Gg: AY/fxX4SSJEVdveX4Y4STOKmhLdL/BECFnq3Lq8hvNHwMLE6AqZcvzElB6YkaAvCmnB
-	ex5p3FqZIxGnfQ3AuKJE5VsaRf49r6AecDH9ekqNWBT0rFJhAiFmUNsIjeK3fwVw32Evvuzu8bi
-	LKUoSJc2Ina3jBrcG6fyvtkZ9uMOwgzjsyd5OZKSqubIJDjpqBCRGxJZhGupTy7uLA27Rh4XPOg
-	UhaD2FknM9qqQeX6M5lo7aGX9uRucMNeNMstgvrB/vUjxeu2g1GW8sTXyJqD9nkmW+0aoC2GANt
-	yb/wxgUtEh9LQH6ykMeuutUp6mOEWbO7XmpZmXC2FuTr+iJMlPBYz3s/JPpj3W+7SDNHYReIhQc
-	u/fl5s8dSmk2nR//Wp4KTrUVM56c=
-X-Google-Smtp-Source: AGHT+IHb3ENL6XXKxhbIoayxGeujs4BLthUNPZTmBQ/rx5/q9AaDNCLok3CtBXuRYAP8aXa/nnfB2DRX5Mgb
-X-Received: by 2002:a05:6870:2484:b0:3e8:9d46:becc with SMTP id 586e51a60fabf-3f5dcdd2a38mr548792fac.3.1765430193474;
+        bh=vnVfufvIYEdI8+hFNgHbkUqJ54wEbcXzUeKinX5SKcw=;
+        b=dNBagx5qqnCVSFlu2Eew31/3qkNNKTpSCdJqNfcWpAui3oB6oTfBxcpjEyXezVZBFw
+         y98kfXkOIVMU2tbpA5wW0i6CwdtF6NJvdeG+KxmqEkrgerzTSUXuHhuHHykSZJr4FqDV
+         iQvLI82VzkPa3JeUqJmjR2LOJgcBZQlH0WHsReBkWh1Chqmd6Aya4YD0UZBWS30xM+sX
+         NZQzfQjwD20Ysr7H4Xdz3aAs3dVkja/p9T8AjVOpAG2UQWkmJxc9+lWleR02eOwmCMbd
+         v3X6roKaLnRSFMzyuDKsB+5DXyTkSXThWXf0G8cUNYBJhmMerKQjF+AByQ1dDUuDg8fc
+         mViA==
+X-Gm-Message-State: AOJu0YzIWqgWFPdzPZCc3QIqHSr2s7pOBgNR020zwKgZTohSNUATeb0+
+	YYBFX0+GgmTZwjOicjDlr/tYTl60cXrv4gbiBLLhoURf1ZJH2RywRJjZKh0VqC0sSQPIWzeVm5+
+	sFUaAxYL6yme6UD8wnkTjZS8T1B86+FSyLMhv+iVaULH7RpxYYS6j
+X-Gm-Gg: ASbGncsppplnI6Bw6xvqu8F5J9nolk4rpnHi86wMjAx1Vz2AvVY1MHTtKO94poyRmmO
+	/DkqhncYZWs8ShwrmKoWIpCttxlUL3I5GPDXPIkoN2bo3eyKmKNAtE1OKeRfITlC0aWM1zPWI5p
+	wGawmgimIyP4YueFbkSImZnaJ3Q2gKqGuXpJR+sJwO+y2tmpB3fiCZBOQU0F8StaZMrfU6Dq/R5
+	SUPIIdxbEUWclgV4lnifhV9bwpSyFJHFS70G1VYGZRXMfdc/X7641sF4CvRLIpUeh/zZZT0dmOs
+	KCwFnHvLMufI0nEHGIolInxlvFjn/SqbfqFA0KevqWRxlyalvwO2b1ZkX+w4fo3FJzrV/KcAwof
+	o5VeVi80/JCuMbR6ErpBPIJULXKs=
+X-Google-Smtp-Source: AGHT+IHQphv4vwSDxzX++wJ7dkwR4fY5PmWaSMm5edn3a8fbf06IH7XN7suyTmn9yIsdflhRFlco/RysUZSQ
+X-Received: by 2002:a05:7022:ea55:10b0:119:e56b:46b7 with SMTP id a92af1059eb24-11f2e7f076fmr445366c88.1.1765430193256;
         Wed, 10 Dec 2025 21:16:33 -0800 (PST)
 Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
-        by smtp-relay.gmail.com with ESMTPS id 586e51a60fabf-3f5d51aa8c5sm240626fac.15.2025.12.10.21.16.33
+        by smtp-relay.gmail.com with ESMTPS id a92af1059eb24-11f2e30259bsm208476c88.8.2025.12.10.21.16.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Wed, 10 Dec 2025 21:16:33 -0800 (PST)
 X-Relaying-Domain: purestorage.com
-Received: from dev-csander.dev.purestorage.com (unknown [IPv6:2620:125:9007:640:ffff::1199])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 7220934079F;
+Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.7.70.37])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id A5DF83401CC;
 	Wed, 10 Dec 2025 22:16:32 -0700 (MST)
 Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id 6F9FEE41888; Wed, 10 Dec 2025 22:16:32 -0700 (MST)
+	id A2B4BE41888; Wed, 10 Dec 2025 22:16:32 -0700 (MST)
 From: Caleb Sander Mateos <csander@purestorage.com>
 To: Ming Lei <ming.lei@redhat.com>,
 	Shuah Khan <shuah@kernel.org>
@@ -71,9 +71,9 @@ Cc: linux-block@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Caleb Sander Mateos <csander@purestorage.com>
-Subject: [PATCH 5/8] selftests: ublk: don't share backing files between ublk servers
-Date: Wed, 10 Dec 2025 22:16:00 -0700
-Message-ID: <20251211051603.1154841-6-csander@purestorage.com>
+Subject: [PATCH 6/8] selftests: ublk: forbid multiple data copy modes
+Date: Wed, 10 Dec 2025 22:16:01 -0700
+Message-ID: <20251211051603.1154841-7-csander@purestorage.com>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20251211051603.1154841-1-csander@purestorage.com>
 References: <20251211051603.1154841-1-csander@purestorage.com>
@@ -85,47 +85,164 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-stress_04 is missing a wait between blocks of tests, meaning multiple
-ublk servers will be running in parallel using the same backing files.
-Add a wait after each section to ensure each backing file is in use by a
-single ublk server at a time.
+The kublk mock ublk server allows multiple data copy mode arguments to
+be passed on the command line (--zero_copy, --get_data, and --auto_zc).
+The ublk device will be created with all the requested feature flags,
+however kublk will only use one of the modes to interact with request
+data (arbitrarily preferring auto_zc over zero_copy over get_data). To
+clarify the intent of the test, don't allow multiple data copy modes to
+be specified. Don't set UBLK_F_USER_COPY for zero_copy, as it's an
+independent feature. Don't require zero_copy for auto_zc_fallback, as
+only auto_zc is needed. Fix the test cases passing multiple data copy
+mode arguments.
 
 Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
 ---
- tools/testing/selftests/ublk/test_stress_04.sh | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ tools/testing/selftests/ublk/kublk.c          | 21 ++++++++++++-------
+ .../testing/selftests/ublk/test_generic_09.sh |  2 +-
+ .../testing/selftests/ublk/test_stress_03.sh  |  4 ++--
+ .../testing/selftests/ublk/test_stress_04.sh  |  2 +-
+ .../testing/selftests/ublk/test_stress_05.sh  | 10 ++++-----
+ 5 files changed, 22 insertions(+), 17 deletions(-)
 
+diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftests/ublk/kublk.c
+index f8fa102a627f..1765c4806523 100644
+--- a/tools/testing/selftests/ublk/kublk.c
++++ b/tools/testing/selftests/ublk/kublk.c
+@@ -1611,11 +1611,11 @@ int main(int argc, char *argv[])
+ 			break;
+ 		case 'd':
+ 			ctx.queue_depth = strtol(optarg, NULL, 10);
+ 			break;
+ 		case 'z':
+-			ctx.flags |= UBLK_F_SUPPORT_ZERO_COPY | UBLK_F_USER_COPY;
++			ctx.flags |= UBLK_F_SUPPORT_ZERO_COPY;
+ 			break;
+ 		case 'r':
+ 			value = strtol(optarg, NULL, 10);
+ 			if (value)
+ 				ctx.flags |= UBLK_F_USER_RECOVERY;
+@@ -1674,17 +1674,22 @@ int main(int argc, char *argv[])
+ 			optind += 1;
+ 			break;
+ 		}
+ 	}
+ 
+-	/* auto_zc_fallback depends on F_AUTO_BUF_REG & F_SUPPORT_ZERO_COPY */
+-	if (ctx.auto_zc_fallback &&
+-	    !((ctx.flags & UBLK_F_AUTO_BUF_REG) &&
+-		    (ctx.flags & UBLK_F_SUPPORT_ZERO_COPY))) {
+-		ublk_err("%s: auto_zc_fallback is set but neither "
+-				"F_AUTO_BUF_REG nor F_SUPPORT_ZERO_COPY is enabled\n",
+-					__func__);
++	/* auto_zc_fallback depends on F_AUTO_BUF_REG */
++	if (ctx.auto_zc_fallback && !(ctx.flags & UBLK_F_AUTO_BUF_REG)) {
++		ublk_err("%s: auto_zc_fallback is set but F_AUTO_BUF_REG is disabled\n",
++			 __func__);
++		return -EINVAL;
++	}
++
++	if (!!(ctx.flags & UBLK_F_SUPPORT_ZERO_COPY) +
++	    !!(ctx.flags & UBLK_F_NEED_GET_DATA) +
++	    !!(ctx.flags & UBLK_F_USER_COPY) +
++	    !!(ctx.flags & UBLK_F_AUTO_BUF_REG) > 1) {
++		fprintf(stderr, "too many data copy modes specified\n");
+ 		return -EINVAL;
+ 	}
+ 
+ 	i = optind;
+ 	while (i < argc && ctx.nr_files < MAX_BACK_FILES) {
+diff --git a/tools/testing/selftests/ublk/test_generic_09.sh b/tools/testing/selftests/ublk/test_generic_09.sh
+index bb6f77ca5522..145e17b3d2b0 100755
+--- a/tools/testing/selftests/ublk/test_generic_09.sh
++++ b/tools/testing/selftests/ublk/test_generic_09.sh
+@@ -14,11 +14,11 @@ if ! _have_program fio; then
+ 	exit "$UBLK_SKIP_CODE"
+ fi
+ 
+ _prep_test "null" "basic IO test"
+ 
+-dev_id=$(_add_ublk_dev -t null -z --auto_zc --auto_zc_fallback)
++dev_id=$(_add_ublk_dev -t null --auto_zc --auto_zc_fallback)
+ _check_add_dev $TID $?
+ 
+ # run fio over the two disks
+ fio --name=job1 --filename=/dev/ublkb"${dev_id}" --ioengine=libaio --rw=readwrite --iodepth=32 --size=256M > /dev/null 2>&1
+ ERR_CODE=$?
+diff --git a/tools/testing/selftests/ublk/test_stress_03.sh b/tools/testing/selftests/ublk/test_stress_03.sh
+index 3ed4c9b2d8c0..8e9f2786ef9c 100755
+--- a/tools/testing/selftests/ublk/test_stress_03.sh
++++ b/tools/testing/selftests/ublk/test_stress_03.sh
+@@ -36,19 +36,19 @@ wait
+ 
+ if _have_feature "AUTO_BUF_REG"; then
+ 	ublk_io_and_remove 8G -t null -q 4 --auto_zc &
+ 	ublk_io_and_remove 256M -t loop -q 4 --auto_zc "${UBLK_BACKFILES[0]}" &
+ 	ublk_io_and_remove 256M -t stripe -q 4 --auto_zc "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
+-	ublk_io_and_remove 8G -t null -q 4 -z --auto_zc --auto_zc_fallback &
++	ublk_io_and_remove 8G -t null -q 4 --auto_zc --auto_zc_fallback &
+ 	wait
+ fi
+ 
+ if _have_feature "PER_IO_DAEMON"; then
+ 	ublk_io_and_remove 8G -t null -q 4 --auto_zc --nthreads 8 --per_io_tasks &
+ 	ublk_io_and_remove 256M -t loop -q 4 --auto_zc --nthreads 8 --per_io_tasks "${UBLK_BACKFILES[0]}" &
+ 	ublk_io_and_remove 256M -t stripe -q 4 --auto_zc --nthreads 8 --per_io_tasks "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
+-	ublk_io_and_remove 8G -t null -q 4 -z --auto_zc --auto_zc_fallback --nthreads 8 --per_io_tasks &
++	ublk_io_and_remove 8G -t null -q 4 --auto_zc --auto_zc_fallback --nthreads 8 --per_io_tasks &
+ 	wait
+ fi
+ 
+ _cleanup_test "stress"
+ _show_result $TID $ERR_CODE
 diff --git a/tools/testing/selftests/ublk/test_stress_04.sh b/tools/testing/selftests/ublk/test_stress_04.sh
-index 965befcee830..c7220723b537 100755
+index c7220723b537..6e165a1f90b4 100755
 --- a/tools/testing/selftests/ublk/test_stress_04.sh
 +++ b/tools/testing/selftests/ublk/test_stress_04.sh
-@@ -29,23 +29,25 @@ _create_backfile 1 128M
- _create_backfile 2 128M
- 
- ublk_io_and_kill_daemon 8G -t null -q 4 -z --no_ublk_fixed_fd &
- ublk_io_and_kill_daemon 256M -t loop -q 4 -z --no_ublk_fixed_fd "${UBLK_BACKFILES[0]}" &
- ublk_io_and_kill_daemon 256M -t stripe -q 4 -z "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
-+wait
+@@ -35,11 +35,11 @@ wait
  
  if _have_feature "AUTO_BUF_REG"; then
  	ublk_io_and_kill_daemon 8G -t null -q 4 --auto_zc &
  	ublk_io_and_kill_daemon 256M -t loop -q 4 --auto_zc "${UBLK_BACKFILES[0]}" &
  	ublk_io_and_kill_daemon 256M -t stripe -q 4 --auto_zc --no_ublk_fixed_fd "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
- 	ublk_io_and_kill_daemon 8G -t null -q 4 -z --auto_zc --auto_zc_fallback &
-+	wait
+-	ublk_io_and_kill_daemon 8G -t null -q 4 -z --auto_zc --auto_zc_fallback &
++	ublk_io_and_kill_daemon 8G -t null -q 4 --auto_zc --auto_zc_fallback &
+ 	wait
  fi
  
  if _have_feature "PER_IO_DAEMON"; then
  	ublk_io_and_kill_daemon 8G -t null -q 4 --auto_zc --nthreads 8 --per_io_tasks &
- 	ublk_io_and_kill_daemon 256M -t loop -q 4 --auto_zc --nthreads 8 --per_io_tasks "${UBLK_BACKFILES[0]}" &
- 	ublk_io_and_kill_daemon 256M -t stripe -q 4 --auto_zc --nthreads 8 --per_io_tasks "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
- 	ublk_io_and_kill_daemon 8G -t null -q 4 --auto_zc --auto_zc_fallback --nthreads 8 --per_io_tasks &
-+	wait
- fi
--wait
+diff --git a/tools/testing/selftests/ublk/test_stress_05.sh b/tools/testing/selftests/ublk/test_stress_05.sh
+index 274295061042..09b94c36f2ba 100755
+--- a/tools/testing/selftests/ublk/test_stress_05.sh
++++ b/tools/testing/selftests/ublk/test_stress_05.sh
+@@ -56,21 +56,21 @@ for reissue in $(seq 0 1); do
+ 	wait
+ done
  
- _cleanup_test "stress"
- _show_result $TID $ERR_CODE
+ if _have_feature "ZERO_COPY"; then
+ 	for reissue in $(seq 0 1); do
+-		ublk_io_and_remove 8G -t null -q 4 -g -z -r 1 -i "$reissue" &
+-		ublk_io_and_remove 256M -t loop -q 4 -g -z -r 1 -i "$reissue" "${UBLK_BACKFILES[1]}" &
++		ublk_io_and_remove 8G -t null -q 4 -z -r 1 -i "$reissue" &
++		ublk_io_and_remove 256M -t loop -q 4 -z -r 1 -i "$reissue" "${UBLK_BACKFILES[1]}" &
+ 		wait
+ 	done
+ fi
+ 
+ if _have_feature "AUTO_BUF_REG"; then
+ 	for reissue in $(seq 0 1); do
+-		ublk_io_and_remove 8G -t null -q 4 -g --auto_zc -r 1 -i "$reissue" &
+-		ublk_io_and_remove 256M -t loop -q 4 -g --auto_zc -r 1 -i "$reissue" "${UBLK_BACKFILES[1]}" &
+-		ublk_io_and_remove 8G -t null -q 4 -g -z --auto_zc --auto_zc_fallback -r 1 -i "$reissue" &
++		ublk_io_and_remove 8G -t null -q 4 --auto_zc -r 1 -i "$reissue" &
++		ublk_io_and_remove 256M -t loop -q 4 --auto_zc -r 1 -i "$reissue" "${UBLK_BACKFILES[1]}" &
++		ublk_io_and_remove 8G -t null -q 4 --auto_zc --auto_zc_fallback -r 1 -i "$reissue" &
+ 		wait
+ 	done
+ fi
+ 
+ if _have_feature "PER_IO_DAEMON"; then
 -- 
 2.45.2
 
