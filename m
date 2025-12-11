@@ -1,205 +1,130 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48EDD248F5A;
-	Thu, 11 Dec 2025 08:29:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 617A0285CA7
+	for <linux-block@vger.kernel.org>; Thu, 11 Dec 2025 08:38:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765441794; cv=none; b=iZPggORVypZBzfrBjj173QrHNcmzdyk3ULSj4TbpflA53xQA2V7IPa/Oy5M8YJi7/nckAO8qMuvl/YcUnvryCHmti9ys5b8wLMm3e3oEBtuB2R1gsQgcqVkHdaA6VHBKkveNHIhvF/e3uLc8UhfXWCLiHTWUrtaw6Xt+X3xv8nE=
+	t=1765442322; cv=none; b=kkWH+ucuBsoklalPIWVTjXWMGCvIOCI62dFcAn1jt9Y6VYzgzj2Zz7yRGy+L4+HSXP3AOlHwl7nKNehIhkKFNEAvVt/4Y3bnGQKaIQkp+RdBSLyTCwTIZrI2u5938mGO2bnPVS7lpMpgEY6ngwG50iDRZyxG23EeCJIynL15OR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765441794; c=relaxed/simple;
-	bh=oZk62VQRQiT5+0VX7ZHg9OxApmN3iEZ3qWothA1myos=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lmIzzGhUWQbEUInMpP7KkC2Qj96st27AgLuMuRft5dqQPs/uOz4BCwXWIEv+7tbZNM9lTpvhYIYRWBguhBbDf64OLqpyb5nJ5Pv1/P5y8EBYGyJY+/pEVABO3Ntd92V2EP5aWlAEaKbGw5A/KJucubhMmMoPSsMcyQ5csOxm3t0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EjGdG+yn; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1765442322; c=relaxed/simple;
+	bh=UtIyJnSbvTvujr7hfQMv9WFTy1RCXEc2g4Kaa8ITtno=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZsDDMjVVNvFXrEpPqEN7nDjzQPUzCN3LX0OCcb9tFWc/694ya9/rOaf82chltB1nZVqCCuyxvlcqiBtTjYeOQP4j7oENTXJ8xmVEWBQ1QJJwKJ44TSKbgS6zT7rrwguhXfZJ3I2hlBAxGxiLuzoAUTw3SYLjg4HVcCzpdOxBmOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EszLwqzk; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EjGdG+yn"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765441792; x=1796977792;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=oZk62VQRQiT5+0VX7ZHg9OxApmN3iEZ3qWothA1myos=;
-  b=EjGdG+ynAlmT4Vh79VsnsZtNiz3ztpVXZ3FScTj9xhx3PcXMjqElXM+j
-   H6ZTa2SLR/eoenE7a1Io4pPK2yo6HFFbeX3BJnyn/fsiMSSVoQtEaQ88l
-   yxKA/A0ySd/9CsRnMLT+G1o+92cq0HvdS2BIkYoxEwjyxWWua17QNXRSc
-   +UN5rMqk6hYTT4QmGQFR1fTgm6pHVkRuAsW/Vg5TwitbYv8BNYWa/WL3Q
-   Dy25InFLn8XCg8vImxVqFm5ZML5e3la8x4i7jGsQE/fvdl8ZOLRAXheBo
-   bfMivxw034VdnOZlBfxK2vjF4mVumKyososWXRNVsLKezIk2pazPiC4H6
-   A==;
-X-CSE-ConnectionGUID: NwArkhlWSDG4bzaTxSJdbw==
-X-CSE-MsgGUID: Xoz+yZJsQUeG32l3v1Vjqw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11638"; a="67305597"
-X-IronPort-AV: E=Sophos;i="6.20,265,1758610800"; 
-   d="scan'208";a="67305597"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2025 00:29:51 -0800
-X-CSE-ConnectionGUID: 3O2abcG3S4u1FyeKWKOjPQ==
-X-CSE-MsgGUID: 0bXA4y8vRLSLU557QTbnnQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,265,1758610800"; 
-   d="scan'208";a="201220538"
-Received: from lkp-server01.sh.intel.com (HELO d335e3c6db51) ([10.239.97.150])
-  by orviesa004.jf.intel.com with ESMTP; 11 Dec 2025 00:29:49 -0800
-Received: from kbuild by d335e3c6db51 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vTc3W-000000004PN-2OZw;
-	Thu, 11 Dec 2025 08:29:46 +0000
-Date: Thu, 11 Dec 2025 16:28:56 +0800
-From: kernel test robot <lkp@intel.com>
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Eric Biggers <ebiggers@kernel.org>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-fscrypt@vger.kernel.org
-Subject: Re: [PATCH 8/9] blk-crypto: optimize data unit alignment checking
-Message-ID: <202512111625.7vv9PN6b-lkp@intel.com>
-References: <20251210152343.3666103-9-hch@lst.de>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EszLwqzk"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1765442318;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=DmeVH7/DhuliDdruhn+MR/dhbCqY+wRKP4UaX7W54cg=;
+	b=EszLwqzkNoTo2LMPuQIaYk32vzCETHc9txe/8zYDDyB7UrZN7919Fr8y/OR6SiyThIuANE
+	9iJPyc+0OfC0EWLmRiaT3580AVhfAcor+VcUXVRchZAR5zj47oNlht162B0dXvrP6K0tLs
+	B3OGfGV1SknGBVMO4/C3JARbN3gB16w=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-47-2rDJ1sC-NtOhsrUaH4keEw-1; Thu,
+ 11 Dec 2025 03:38:32 -0500
+X-MC-Unique: 2rDJ1sC-NtOhsrUaH4keEw-1
+X-Mimecast-MFC-AGG-ID: 2rDJ1sC-NtOhsrUaH4keEw_1765442311
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 10BD019560A5;
+	Thu, 11 Dec 2025 08:38:31 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.129])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0CE2230001A7;
+	Thu, 11 Dec 2025 08:38:29 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Caleb Sander Mateos <csander@purestorage.com>,
+	Uday Shankar <ushankar@purestorage.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH] ublk: fix deadlock when reading partition table
+Date: Thu, 11 Dec 2025 16:38:24 +0800
+Message-ID: <20251211083824.349210-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251210152343.3666103-9-hch@lst.de>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Hi Christoph,
+When one process(such as udev) opens ublk block device (e.g., to read
+the partition table via bdev_open()), a deadlock[1] can occur:
 
-kernel test robot noticed the following build errors:
+1. bdev_open() grabs disk->open_mutex
+2. The process issues read I/O to ublk backend to read partition table
+3. In __ublk_complete_rq(), blk_update_request() or blk_mq_end_request()
+   runs bio->bi_end_io() callbacks
+4. If this triggers fput() on file descriptor of ublk block device, the
+   work may be deferred to current task's task work (see fput() implementation)
+5. This eventually calls blkdev_release() from the same context
+6. blkdev_release() tries to grab disk->open_mutex again
+7. Deadlock: same task waiting for a mutex it already holds
 
-[auto build test ERROR on axboe/for-next]
-[also build test ERROR on jaegeuk-f2fs/dev-test jaegeuk-f2fs/dev linus/master next-20251211]
-[cannot apply to tytso-ext4/dev v6.18]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+The fix is to run blk_update_request() and blk_mq_end_request() with bottom
+halves disabled. This forces blkdev_release() to run in kernel work-queue
+context instead of current task work context, and allows ublk server to make
+forward progress, and avoids the deadlock.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Christoph-Hellwig/fscrypt-keep-multiple-bios-in-flight-in-fscrypt_zeroout_range_inline_crypt/20251211-002354
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git for-next
-patch link:    https://lore.kernel.org/r/20251210152343.3666103-9-hch%40lst.de
-patch subject: [PATCH 8/9] blk-crypto: optimize data unit alignment checking
-config: x86_64-allnoconfig (https://download.01.org/0day-ci/archive/20251211/202512111625.7vv9PN6b-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251211/202512111625.7vv9PN6b-lkp@intel.com/reproduce)
+Fixes: 71f28f3136af ("ublk_drv: add io_uring based userspace block driver")
+Link: https://github.com/ublk-org/ublksrv/issues/170 [1]
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/block/ublk_drv.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202512111625.7vv9PN6b-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> block/blk-merge.c:332:35: error: no member named 'bi_crypt_context' in 'struct bio'
-     332 |                 struct bio_crypt_ctx *bc = bio->bi_crypt_context;
-         |                                            ~~~  ^
-   1 error generated.
-
-
-vim +332 block/blk-merge.c
-
-   310	
-   311	/**
-   312	 * bio_split_io_at - check if and where to split a bio
-   313	 * @bio:  [in] bio to be split
-   314	 * @lim:  [in] queue limits to split based on
-   315	 * @segs: [out] number of segments in the bio with the first half of the sectors
-   316	 * @max_bytes: [in] maximum number of bytes per bio
-   317	 *
-   318	 * Find out if @bio needs to be split to fit the queue limits in @lim and a
-   319	 * maximum size of @max_bytes.  Returns a negative error number if @bio can't be
-   320	 * split, 0 if the bio doesn't have to be split, or a positive sector offset if
-   321	 * @bio needs to be split.
-   322	 */
-   323	int bio_split_io_at(struct bio *bio, const struct queue_limits *lim,
-   324			unsigned *segs, unsigned max_bytes)
-   325	{
-   326		struct bio_vec bv, bvprv, *bvprvp = NULL;
-   327		unsigned nsegs = 0, bytes = 0, gaps = 0;
-   328		struct bvec_iter iter;
-   329		unsigned len_align_mask = lim->dma_alignment;
-   330	
-   331		if (bio_has_crypt_ctx(bio)) {
- > 332			struct bio_crypt_ctx *bc = bio->bi_crypt_context;
-   333	
-   334			len_align_mask |= (bc->bc_key->crypto_cfg.data_unit_size - 1);
-   335		}
-   336	
-   337		bio_for_each_bvec(bv, bio, iter) {
-   338			if (bv.bv_offset & len_align_mask)
-   339				return -EINVAL;
-   340	
-   341			/*
-   342			 * If the queue doesn't support SG gaps and adding this
-   343			 * offset would create a gap, disallow it.
-   344			 */
-   345			if (bvprvp) {
-   346				if (bvec_gap_to_prev(lim, bvprvp, bv.bv_offset))
-   347					goto split;
-   348				gaps |= bvec_seg_gap(bvprvp, &bv);
-   349			}
-   350	
-   351			if (nsegs < lim->max_segments &&
-   352			    bytes + bv.bv_len <= max_bytes &&
-   353			    bv.bv_offset + bv.bv_len <= lim->max_fast_segment_size) {
-   354				nsegs++;
-   355				bytes += bv.bv_len;
-   356			} else {
-   357				if (bvec_split_segs(lim, &bv, &nsegs, &bytes,
-   358						lim->max_segments, max_bytes))
-   359					goto split;
-   360			}
-   361	
-   362			bvprv = bv;
-   363			bvprvp = &bvprv;
-   364		}
-   365	
-   366		*segs = nsegs;
-   367		bio->bi_bvec_gap_bit = ffs(gaps);
-   368		return 0;
-   369	split:
-   370		if (bio->bi_opf & REQ_ATOMIC)
-   371			return -EINVAL;
-   372	
-   373		/*
-   374		 * We can't sanely support splitting for a REQ_NOWAIT bio. End it
-   375		 * with EAGAIN if splitting is required and return an error pointer.
-   376		 */
-   377		if (bio->bi_opf & REQ_NOWAIT)
-   378			return -EAGAIN;
-   379	
-   380		*segs = nsegs;
-   381	
-   382		/*
-   383		 * Individual bvecs might not be logical block aligned. Round down the
-   384		 * split size so that each bio is properly block size aligned, even if
-   385		 * we do not use the full hardware limits.
-   386		 *
-   387		 * It is possible to submit a bio that can't be split into a valid io:
-   388		 * there may either be too many discontiguous vectors for the max
-   389		 * segments limit, or contain virtual boundary gaps without having a
-   390		 * valid block sized split. A zero byte result means one of those
-   391		 * conditions occured.
-   392		 */
-   393		bytes = ALIGN_DOWN(bytes, bio_split_alignment(bio, lim));
-   394		if (!bytes)
-   395			return -EINVAL;
-   396	
-   397		/*
-   398		 * Bio splitting may cause subtle trouble such as hang when doing sync
-   399		 * iopoll in direct IO routine. Given performance gain of iopoll for
-   400		 * big IO can be trival, disable iopoll when split needed.
-   401		 */
-   402		bio_clear_polled(bio);
-   403		bio->bi_bvec_gap_bit = ffs(gaps);
-   404		return bytes >> SECTOR_SHIFT;
-   405	}
-   406	EXPORT_SYMBOL_GPL(bio_split_io_at);
-   407	
-
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 2c715df63f23..f69da449727f 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -1086,6 +1086,7 @@ static inline void __ublk_complete_rq(struct request *req, struct ublk_io *io,
+ {
+ 	unsigned int unmapped_bytes;
+ 	blk_status_t res = BLK_STS_OK;
++	bool requeue;
+ 
+ 	/* failed read IO if nothing is read */
+ 	if (!io->res && req_op(req) == REQ_OP_READ)
+@@ -1117,14 +1118,28 @@ static inline void __ublk_complete_rq(struct request *req, struct ublk_io *io,
+ 	if (unlikely(unmapped_bytes < io->res))
+ 		io->res = unmapped_bytes;
+ 
+-	if (blk_update_request(req, BLK_STS_OK, io->res))
++	/*
++	 * Run bio->bi_end_io() from softirq context for preventing this
++	 * ublk's blkdev_release() from being called on current's task
++	 * work, see fput() implementation.
++	 *
++	 * Otherwise, ublk server may not provide forward progress in
++	 * case of reading partition table from bdev_open() with
++	 * disk->open_mutex grabbed, and causes dead lock.
++	 */
++	local_bh_disable();
++	requeue = blk_update_request(req, BLK_STS_OK, io->res);
++	local_bh_enable();
++	if (requeue)
+ 		blk_mq_requeue_request(req, true);
+ 	else if (likely(!blk_should_fake_timeout(req->q)))
+ 		__blk_mq_end_request(req, BLK_STS_OK);
+ 
+ 	return;
+ exit:
++	local_bh_disable();
+ 	blk_mq_end_request(req, res);
++	local_bh_enable();
+ }
+ 
+ static struct io_uring_cmd *__ublk_prep_compl_io_cmd(struct ublk_io *io,
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.47.1
+
