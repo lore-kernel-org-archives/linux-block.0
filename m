@@ -1,72 +1,72 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13E8B2AD3D
-	for <linux-block@vger.kernel.org>; Thu, 11 Dec 2025 15:32:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6324F2B2DA
+	for <linux-block@vger.kernel.org>; Thu, 11 Dec 2025 15:41:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765467180; cv=none; b=i+gmkvtBGyxuxyELEpX19ggzmZiP7Ydc9yVeousSTd8lyh7AsHm+fuuXFeX2Th1JjeleGD97l/v0ptlp9a4DA2tKzzIdwfszCEkL6ior6CekiSofsrrshtAHc9Snz1vbkdbKtywkDJXgU+NthVZi0GgLRHNsh/w0WwXvonmCBuk=
+	t=1765467676; cv=none; b=LdPkZKo/V8/0+S92Fc99C93MkRVEMenrw+Acutyp+fKSUkLTAGl0EbKwEjNtWQVoniJRrq1qJ559UH2e8pdNXQ/nEBQa9b312X+X7TYecdD+HGugEh+JbKzTtTp10gy8JKGcAZQFHKkKp1lqQ5ey4RrY8cdn5sL5zloQyL01WVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765467180; c=relaxed/simple;
-	bh=7zIcEOw8tcwX9uqM+mV0AXAt7pmeWmegr6LZLHZxccY=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=u4lg6R59FvC/MNPPdNoilS2hu46mejjvFtECEHJKULavFa2/2QLkmrCBgExHIBHUH4vlGzC4rZsck/TTQH9u3OJdrOFpiX/y3fpEf8WYCB076E2tKKRpo71gxJaswNasctAUbUTbuQBnLfB+Y8cGqv7jFG6pix+kosgtpp6+HSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IQKdqyNa; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=TjIOESLU; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1765467676; c=relaxed/simple;
+	bh=SaB39Sm838IRcMkPaQCtYmFLXFa0M/h3ao9ihOdaLD8=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=ZEII1wb3+dhYFJC734b9xDLjQpKjNb6Sj1CeBhUdffLfbTlOKYFoaZXwUx94uEPIZgfvT2L+4cb4bBU1Hpvdld3InEUurcwbLr5+aTVaQQvwWneTiZeApr6O7hOYHzoZwONgGmZGHsICfRf1sfrC1aWibLXDlXiZRaZi4jpHF0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SCVJCrdM; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=HTHV4Q7m; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IQKdqyNa";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="TjIOESLU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SCVJCrdM";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="HTHV4Q7m"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765467177;
+	s=mimecast20190719; t=1765467672;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=IYiY/Eg9zPqFRUEwkZTnA8v8E9X45o8v/KhbLgIvU0c=;
-	b=IQKdqyNaoLuuDj5/NnrQkV0nGBR+eY6oL7pr9PSDRskFBT01ovbGxC66V2ddbQbW0WwEg0
-	+ibaOW0F/x58h3/lY6kpg63NTL9VhjERSl1NeBNuRtRtVyEC4fai/+w43tY+/0rOdTvfxD
-	om6vHJF4PTJFk63gaI0lZg0G72HZpHk=
+	bh=XER0gi0P9Eu2O/l3YIJe5+k6MYwx2x081H2m6084ITg=;
+	b=SCVJCrdMCMXTSsyS1ro8KcBVfbXyZXDmxMsOL9KVW6TBCQhZapMF/h4XDPIRese94i/JDp
+	O3wpbgtbg0dpVTFvDI/JWn/dyaq6qiahqzl9Pm+H7zdx0ayF341Gf2YF9tBedkpRADPKxn
+	fbUL9VpXG9Xacy92iNuxywVuHv/mLRA=
 Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
  [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-116-Zk8KETIvNBak6YMCv3oYTg-1; Thu, 11 Dec 2025 10:32:56 -0500
-X-MC-Unique: Zk8KETIvNBak6YMCv3oYTg-1
-X-Mimecast-MFC-AGG-ID: Zk8KETIvNBak6YMCv3oYTg_1765467175
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-37f8b25aad6so806691fa.2
-        for <linux-block@vger.kernel.org>; Thu, 11 Dec 2025 07:32:56 -0800 (PST)
+ us-mta-610-PljbuHZ4PC2-RtbtEPRohQ-1; Thu, 11 Dec 2025 10:41:10 -0500
+X-MC-Unique: PljbuHZ4PC2-RtbtEPRohQ-1
+X-Mimecast-MFC-AGG-ID: PljbuHZ4PC2-RtbtEPRohQ_1765467669
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-37fa2c5c374so1308901fa.2
+        for <linux-block@vger.kernel.org>; Thu, 11 Dec 2025 07:41:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1765467173; x=1766071973; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1765467666; x=1766072466; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=IYiY/Eg9zPqFRUEwkZTnA8v8E9X45o8v/KhbLgIvU0c=;
-        b=TjIOESLUVSmTfgthF8c9RftbSUkcST9+smm44QX+HKfjKy1KaYvrm3vSEsoHV+1g7N
-         t7tW5I2q9HyGYt+PGr4ztwdf5X9RZGqE1kmFjI/yr239h9FrdfAHr38pVVsBhEkgpfYA
-         tfm07hE+HSqwaYLSjsJ7VtFgVIa8Aynqr8CJlF+ylWdPzV6P673GVeBFStQTbc7Eibe0
-         v5TymWII1LB2QYgzaXurkbgYiMQ8QXUySo5/OTn14rt1G7eDkRWwy08m1O5nVH2uSJiB
-         cZpesnOo6339eSeLRGcqn19cRmef0UnqNSYZBdnT0kwhzy4LitlyZQIURx5gnSaonzhQ
-         +XJQ==
+        bh=XER0gi0P9Eu2O/l3YIJe5+k6MYwx2x081H2m6084ITg=;
+        b=HTHV4Q7mEET5Wa0RvKxHhChax2GnZzW70/SrejDKrTXfBJiLn/z3vZ4x8PJz9LmMtC
+         4KAaROD0EU+GpTbQJqPpo+l+bXB4vtUcxr5S6RsvENDzGoGW600XmxM8rKhlcfNsJJhk
+         LX7W8uwf0rgiy8RS4tGLmlE1/yQuYMigHZCvGoK0SLzYONn5f3t+ZfSvteS/Jd7OIdwT
+         OvQUyvoziZ5YHMPLLwaz2+MfAV5IsUaLujViYKOmgQYHExLqvhSpJBlhlDM2XjjLa3/9
+         c1wMEAhEwCzIziiIzeseXfHCDfdQF8s4CjEGvcdweAGW8P09d16OdE8NiE+miVdcfsyl
+         qJ2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765467173; x=1766071973;
+        d=1e100.net; s=20230601; t=1765467666; x=1766072466;
         h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IYiY/Eg9zPqFRUEwkZTnA8v8E9X45o8v/KhbLgIvU0c=;
-        b=cG9cs51rZN3gPH+sbcQTWUb88XsRIggjmUGXzDVlzfU8PPcvFU7oGYQoM7EmMTgQCe
-         e3RY3Iwigr+Dx6BDnA8g7XY2k/AiNcuo3PVSj8+9veAVYb/6LwCwWgNn4U6fXG+dymm5
-         E1VjGfRBkFqJeAi5CaOZrU0yhTnxd4g3e+tcCFxeTyFcJ9VGafkNPTQxCPDwFSnvx57H
-         3bBvCWdNdKR6bQPHzgZWEOvXMgD2BE02jJ0+w6jKrZxw36aX1TueNWMRNMx+3WnDOB/q
-         yVusxLu/+wWp+qQSntF1oZDSkU4IVrHWd/8L6QyR5GOC063pUjqI8GHsfnkh8QFDxwEG
-         Yvrg==
-X-Gm-Message-State: AOJu0Yxcx6lMp1fWy1dCKsBwuzyaTVzK/pCXlZYHizGUVLpy3B+0kIZd
-	vUO5cyyfkSsjp9fpC7cuGawfrzVKQ5HY/XQus1LULvpfKZZkT2Cw+vwCCM49YnOu70Wjx1qr5nY
-	G2fy4gIOCQZVg9KWyUquHKt2KtTfqkrI9JGuWJg013T9GgVwWqOrJ6+dZRhjsNABrqIeySiRrd/
-	N5MGK5Z127NOP8ofCTIW4rbgQ+daUBSu4DfbJ4xVpXRS81Z1vJ7Fb0
-X-Gm-Gg: AY/fxX6BdqyZJhUqYkTFE/AlUaLDMDzXK08Udx+GfRzhmmfLMVc0SAApnCz2t+RpXQd
-	TNmU287LaaKmLlxcnrIPiuhrqR2FwX0Dp+Z+ROZmBxrgfsEqkmuZlvTOKSaulTtAlSfWgKArc8R
-	mhX74x3ICeeivBZ8XyeS2OjiO0Sb3651dpUI8Js+n5oHAI52T5xgk8AKjWqw9GHP1yBK0=
-X-Received: by 2002:a2e:84cb:0:b0:37a:3794:376 with SMTP id 38308e7fff4ca-37fb2067165mr20240901fa.33.1765467173417;
-        Thu, 11 Dec 2025 07:32:53 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH9Ch+n9xP67LHWDxnICGWNFU0jYxugZlh/fl5qsPbWjvlTJ5GcS+1Tkn99F9aJ/8OzLtgfkpAMtzrhLDNJcK8=
-X-Received: by 2002:a2e:84cb:0:b0:37a:3794:376 with SMTP id
- 38308e7fff4ca-37fb2067165mr20240771fa.33.1765467172870; Thu, 11 Dec 2025
- 07:32:52 -0800 (PST)
+        bh=XER0gi0P9Eu2O/l3YIJe5+k6MYwx2x081H2m6084ITg=;
+        b=LQbH/fWvcEk925/uYN92gEfvSHoUB2MpkhOUK5d1H6BRbyiBLb5pSjn7YbHg9e0S90
+         ryCKNdvNDNZbzHA3+MiFhVbq+cgnjnqta/Rw+wvtSAe9C3NhV1wnHqsoC9wkezEjLfpU
+         HjzbMpsJ+iMDr9Wzp7hxbsFNJEXQJ54IJfP1zuvxoeA5UlJ2RBB7/cEsGFY4h5zUvfdo
+         OYq80hdDq9IDwT6x2QLO2s7+MvPdQCALM3u54Jkny2fpD84hrEg8IAQS97ADgDKePxg1
+         4wpWdL9OZTPiYJ2Qcfa0u9ye0v7TTrhcB2ObqzBNkYiwVcyAZq7kWlHX04yRSp6EQEwN
+         eAxg==
+X-Gm-Message-State: AOJu0YwX0jqr042B6s82Zad+oTRyJCA67IgC71n3oSevnzlfmbKWf5em
+	26NPzK7CdKCMy2tCK5t5q/AxuPoDxlp2sZGSL74AxDV51X92XbcokEVK6ggTPSxF9s+v0gSqXiN
+	45/6vcyvz8bAb7T+CwAolZLm69+SONvvijtre+jWa83zucAgqVmAGQU4nQ1G+DCQovmQ4o8eFES
+	tUX/iOjEMAz4fvYxNs6XoFgis6C2H7hT0pOZpd6YF9V+PKpb0ADWqd
+X-Gm-Gg: AY/fxX6Wd1DlKH7xnI4CCBWOjMrcU/HRv2hikw+Iudjb7k5wPa8BHcner2uCx44En9t
+	vJo9aqNOl4J2j2+DaYxuA5L/D9uQyxqgdUNJyIMY1s2dki7RgezYVUyofqkNQzvF73O2ovOYOvX
+	C0PFvDr0825mUtihFWc6KppoPhv1exvnQJWc0Ul1IIw4FiBugSrwo4HPWF/Jl4rHVr6BE=
+X-Received: by 2002:a05:651c:1508:b0:37a:455e:f2fc with SMTP id 38308e7fff4ca-37fb2152acamr18379521fa.43.1765467666295;
+        Thu, 11 Dec 2025 07:41:06 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHV+wr655qzsjqLP7T1IVlB6YclIVXoe1Iz43J9qZE7N/ayL5NczpGkFZpArOkCiHpM7gRdcQUFwDYgUfFcJOA=
+X-Received: by 2002:a05:651c:1508:b0:37a:455e:f2fc with SMTP id
+ 38308e7fff4ca-37fb2152acamr18379411fa.43.1765467665839; Thu, 11 Dec 2025
+ 07:41:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -74,22 +74,19 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: Yi Zhang <yi.zhang@redhat.com>
-Date: Thu, 11 Dec 2025 23:32:38 +0800
-X-Gm-Features: AQt7F2ryuljKTXFolfEtLQiedO1xP75RAJ-VCzBY7Vc9sHhehuXUrE8NtjuCB_8
-Message-ID: <CAHj4cs94Z0LuhJybxbU2QOqY965A03nbQm2FdVYf0gRcF9LnXg@mail.gmail.com>
-Subject: [bug report] WARNING: block/blk-mq.c:321 at blk_mq_unquiesce_queue+0x93/0xb0
- observed by blktests nvme/fc nvme/058
+Date: Thu, 11 Dec 2025 23:40:52 +0800
+X-Gm-Features: AQt7F2pT_YFn9Ij3s8QGwKq_vywEOzVerk7FehyBknEkeqIpDyo0RNj-5CNMzs8
+Message-ID: <CAHj4cs9wv3SdPo+N01Fw2SHBYDs9tj2M_e1-GdQOkRy=DsBB1w@mail.gmail.com>
+Subject: [bug report] kmemleak observed during blktests nvme/fc
 To: linux-block <linux-block@vger.kernel.org>, 
 	"open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>
-Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>, Jens Axboe <axboe@kernel.dk>, 
-	Daniel Wagner <dwagner@suse.de>
+Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>, Daniel Wagner <dwagner@suse.de>
 Content-Type: text/plain; charset="UTF-8"
 
 Hi
-
-I found this issue with the latest linux-block/for-next. Please help
-check it and let me know if you need any information or tests for it.
-Thank you.
+The following kmemleak was observed during blktests nvme/fc, please
+help check it and let me know if you need any info/test for it,
+thanks.
 
 commit d678712ead7318d5650158aa00113f63ccd4e210
 Merge: 95ed689e9f30 a0750fae73c5
@@ -101,115 +98,222 @@ Date:   Wed Dec 10 13:41:17 2025 -0700
     * block-6.19:
       blk-mq-dma: always initialize dma state
 
-[13367.070880] run blktests nvme/058 at 2025-12-11 09:44:09
-[13368.291045] nvme nvme7: NVME-FC{0}: create association : host wwpn
-0x20001100aa000001  rport wwpn 0x20001100ab000001: NQN
-"nqn.2014-08.org.nvmexpress.discovery"
-[13368.309331] nvmet_fc: {0:0}: Association created
-[13368.314356] nvmet: Created discovery controller 1 for subsystem
-nqn.2014-08.org.nvmexpress.discovery for NQN
-nqn.2014-08.org.nvmexpress:uuid:4c4c4544-0047-5a10-804b-cac04f514a33.
-[13368.333710] nvme nvme7: NVME-FC{0}: controller connect complete
---snip--
-[13377.364142] nvme nvme10: identifiers changed for nsid 3
-[13377.364180] nvme nvme10: identifiers changed for nsid 2
-[13377.366018] nvme nvme10: NVME-FC{3}: resetting controller
-[13377.413250] nvme nvme12: Found shared namespace 1, but multipathing
-not supported.
-[13377.421051] nvme nvme9: Found shared namespace 1, but multipathing
-not supported.
-[13377.429122] nvme nvme9: IDs don't match for shared namespace 2
-[13377.435247] nvme nvme10: Found shared namespace 1, but multipathing
-not supported.
-[13377.438649] ------------[ cut here ]------------
-[13377.442996] nvme nvme12: IDs don't match for shared namespace 2
-[13377.443116] nvme nvme10: Identify namespace failed (880)
-[13377.447459] WARNING: block/blk-mq.c:321 at
-blk_mq_unquiesce_queue+0x93/0xb0, CPU#4: kworker/u65:40/103352
-[13377.447479] Modules linked in: nvme_fcloop nvmet_fc
-[13377.453458] nvme nvme11: IDs don't match for shared namespace 2
-[13377.458724]  nvmet nvme_fc nvme_fabrics nvme nvme_core
-[13377.468369] nvme nvme12: Found shared namespace 3, but multipathing
-not supported.
-[13377.473178]  ext4 crc16 mbcache jbd2 platform_profile dell_wmi
-dell_smbios intel_rapl_msr amd_atl sparse_keymap intel_rapl_common
-rfkill video amd64_edac edac_mce_amd dcdbas kvm_amd vfat fat kvm
-irqbypass mgag200 rapl ipmi_ssif dell_wmi_descriptor i2c_algo_bit
-wmi_bmof pcspkr acpi_cpufreq i2c_piix4 ptdma i2c_smbus k10temp
-acpi_power_meter ipmi_si acpi_ipmi ipmi_devintf ipmi_msghandler sg
-loop fuse xfs sd_mod ahci libahci nvme_keyring tg3 ghash_clmulni_intel
-libata nvme_auth ccp hkdf mpt3sas raid_class scsi_transport_sas
-sp5100_tco wmi sunrpc dm_mirror dm_region_hash dm_log dm_mod nfnetlink
-[last unloaded: nvmet]
-[13377.492397]  nvme9n4: unable to read partition table
-[13377.501340]  nvme12n4: unable to read partition table
-[13377.510005] nvme nvme12: rescanning namespaces.
-[13377.514737]  nvme11n4: unable to read partition table
-[13377.520897] nvme nvme11: rescanning namespaces.
-[13377.546199] CPU: 4 UID: 0 PID: 103352 Comm: kworker/u65:40 Kdump:
-loaded Tainted: G             L      6.18.0+ #1 PREEMPT(voluntary)
-[13377.546213] Tainted: [L]=SOFTLOCKUP
-[13377.546217] Hardware name: Dell Inc. PowerEdge R6515/07PXPY, BIOS
-2.17.0 12/04/2024
-[13377.546224] Workqueue: nvme-reset-wq nvme_fc_reset_ctrl_work [nvme_fc]
-[13377.555677] nvme nvme9: rescanning namespaces.
-[13377.605978] RIP: 0010:blk_mq_unquiesce_queue+0x93/0xb0
-[13377.611131] Code: 01 48 89 de bf 09 00 00 00 e8 39 3c fc ff 48 89
-ee 4c 89 e7 e8 ee 1a 9a 01 48 89 df be 01 00 00 00 5b 5d 41 5c e9 1d
-fa ff ff <0f> 0b 5b 48 89 ee 4c 89 e7 5d 41 5c e9 cc 1a 9a 01 e8 e7 84
-99 ff
-[13377.629885] RSP: 0018:ffffc9000c03fab8 EFLAGS: 00010046
-[13377.635118] RAX: 0000000000000000 RBX: ffff888202a83d50 RCX: 0000000000000001
-[13377.642251] RDX: 0000000000000000 RSI: ffffffff91b66900 RDI: ffff888202a83e70
-[13377.649386] RBP: 0000000000000246 R08: 0000000000000001 R09: fffff52001807f46
-[13377.656525] R10: 0000000000000003 R11: 00000000000003ad R12: ffff888202a83e28
-[13377.663657] R13: ffff888265a71440 R14: ffff888178198048 R15: ffff888265a71418
-[13377.670791] FS:  0000000000000000(0000) GS:ffff888889ec4000(0000)
-knlGS:0000000000000000
-[13377.678884] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[13377.684631] CR2: 00007fffa12a5688 CR3: 0000000245fa0000 CR4: 0000000000350ef0
-[13377.691772] Call Trace:
-[13377.694226]  <TASK>
-[13377.696343]  blk_mq_unquiesce_tagset+0xe1/0x1c0
-[13377.700884]  nvme_fc_delete_association+0x4e9/0x700 [nvme_fc]
-[13377.706658]  ? __pfx_nvme_fc_delete_association+0x10/0x10 [nvme_fc]
-[13377.712936]  ? __pfx_enable_work+0x10/0x10
-[13377.717043]  ? __pfx_autoremove_wake_function+0x10/0x10
-[13377.722288]  nvme_fc_reset_ctrl_work+0x2e/0x110 [nvme_fc]
-[13377.727707]  process_one_work+0xd8b/0x1320
-[13377.731821]  ? __pfx_process_one_work+0x10/0x10
-[13377.736361]  ? srso_return_thunk+0x5/0x5f
-[13377.740387]  ? srso_return_thunk+0x5/0x5f
-[13377.744402]  ? assign_work+0x16c/0x240
-[13377.748157]  ? srso_return_thunk+0x5/0x5f
-[13377.752191]  worker_thread+0x5f3/0xfe0
-[13377.752209]  ? __pfx_worker_thread+0x10/0x10
-[13377.760238]  kthread+0x3b4/0x770
-[13377.763479]  ? __pfx_do_raw_spin_trylock+0x10/0x10
-[13377.768279]  ? srso_return_thunk+0x5/0x5f
-[13377.772328]  ? __pfx_kthread+0x10/0x10
-[13377.776087]  ? lock_acquire+0x10b/0x140
-[13377.781313]  ? calculate_sigpending+0x3d/0x90
-[13377.787059]  ? srso_return_thunk+0x5/0x5f
-[13377.792457]  ? rcu_is_watching+0x15/0xb0
-[13377.797770]  ? srso_return_thunk+0x5/0x5f
-[13377.803170]  ? __pfx_kthread+0x10/0x10
-[13377.808313]  ret_from_fork+0x4ce/0x710
-[13377.813452]  ? __pfx_ret_from_fork+0x10/0x10
-[13377.818503]  ? srso_return_thunk+0x5/0x5f
-[13377.822521]  ? __switch_to+0x528/0xf50
-[13377.826284]  ? __switch_to_asm+0x39/0x70
-[13377.830220]  ? __pfx_kthread+0x10/0x10
-[13377.833982]  ret_from_fork_asm+0x1a/0x30
-[13377.837931]  </TASK>
-[13377.840123] irq event stamp: 0
-[13377.843183] hardirqs last  enabled at (0): [<0000000000000000>] 0x0
-[13377.849457] hardirqs last disabled at (0): [<ffffffff8ecd5acb>]
-copy_process+0x174b/0x5440
-[13377.857725] softirqs last  enabled at (0): [<ffffffff8ecd5b23>]
-copy_process+0x17a3/0x5440
-[13377.865992] softirqs last disabled at (0): [<0000000000000000>] 0x0
-[13377.872259] ---[ end trace 0000000000000000 ]---
+# cat /sys/kernel/debug/kmemleak
+unreferenced object 0xffff88826cab51c0 (size 2488):
+  comm "nvme", pid 84134, jiffies 4304631753
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    60 1a be c1 ff ff ff ff c0 2b 05 73 77 60 00 00  `........+.sw`..
+  backtrace (crc 155ec6c5):
+    kmem_cache_alloc_node_noprof+0x5e4/0x830
+    blk_alloc_queue+0x30/0x700
+    blk_mq_alloc_queue+0x14b/0x230
+    nvme_alloc_admin_tag_set+0x352/0x670 [nvme_core]
+    0xffffffffc11de07f
+    0xffffffffc11dfc28
+    nvmf_create_ctrl+0x2ec/0x620 [nvme_fabrics]
+    nvmf_dev_write+0xd5/0x180 [nvme_fabrics]
+    vfs_write+0x1d0/0xfd0
+    ksys_write+0xf9/0x1d0
+    do_syscall_64+0x95/0x520
+    entry_SYSCALL_64_after_hwframe+0x76/0x7e
+unreferenced object 0xffff8883428ec400 (size 96):
+  comm "nvme", pid 84134, jiffies 4304631753
+  hex dump (first 32 bytes):
+    00 c4 8e 42 83 88 ff ff 00 c4 8e 42 83 88 ff ff  ...B.......B....
+    00 00 00 00 ad 4e ad de ff ff ff ff 00 00 00 00  .....N..........
+  backtrace (crc 1deeea82):
+    __kmalloc_cache_noprof+0x5de/0x820
+    blk_alloc_queue_stats+0x3f/0x100
+    blk_alloc_queue+0xc0/0x700
+    blk_mq_alloc_queue+0x14b/0x230
+    nvme_alloc_admin_tag_set+0x352/0x670 [nvme_core]
+    0xffffffffc11de07f
+    0xffffffffc11dfc28
+    nvmf_create_ctrl+0x2ec/0x620 [nvme_fabrics]
+    nvmf_dev_write+0xd5/0x180 [nvme_fabrics]
+    vfs_write+0x1d0/0xfd0
+    ksys_write+0xf9/0x1d0
+    do_syscall_64+0x95/0x520
+    entry_SYSCALL_64_after_hwframe+0x76/0x7e
+unreferenced object (percpu) 0x60777301a898 (size 8):
+  comm "nvme", pid 84134, jiffies 4304631753
+  hex dump (first 8 bytes on cpu 9):
+    00 00 00 00 00 00 00 00                          ........
+  backtrace (crc 0):
+    pcpu_alloc_noprof+0x5e0/0xf10
+    percpu_ref_init+0x2c/0x330
+    blk_alloc_queue+0x533/0x700
+    blk_mq_alloc_queue+0x14b/0x230
+    nvme_alloc_admin_tag_set+0x352/0x670 [nvme_core]
+    0xffffffffc11de07f
+    0xffffffffc11dfc28
+    nvmf_create_ctrl+0x2ec/0x620 [nvme_fabrics]
+    nvmf_dev_write+0xd5/0x180 [nvme_fabrics]
+    vfs_write+0x1d0/0xfd0
+    ksys_write+0xf9/0x1d0
+    do_syscall_64+0x95/0x520
+    entry_SYSCALL_64_after_hwframe+0x76/0x7e
+unreferenced object 0xffff8881a20fbf80 (size 64):
+  comm "nvme", pid 84134, jiffies 4304631753
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 80 9e db 8f ff ff ff ff  ................
+    00 00 00 00 00 00 00 00 03 00 00 00 00 00 00 00  ................
+  backtrace (crc 8cfdd87d):
+    __kmalloc_cache_noprof+0x5de/0x820
+    percpu_ref_init+0xbf/0x330
+    blk_alloc_queue+0x533/0x700
+    blk_mq_alloc_queue+0x14b/0x230
+    nvme_alloc_admin_tag_set+0x352/0x670 [nvme_core]
+    0xffffffffc11de07f
+    0xffffffffc11dfc28
+    nvmf_create_ctrl+0x2ec/0x620 [nvme_fabrics]
+    nvmf_dev_write+0xd5/0x180 [nvme_fabrics]
+    vfs_write+0x1d0/0xfd0
+    ksys_write+0xf9/0x1d0
+    do_syscall_64+0x95/0x520
+    entry_SYSCALL_64_after_hwframe+0x76/0x7e
+unreferenced object 0xffff8883428ec600 (size 96):
+  comm "nvme", pid 84134, jiffies 4304631753
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 08 c6 8e 42 83 88 ff ff  ...........B....
+    08 c6 8e 42 83 88 ff ff 00 00 00 00 00 00 00 00  ...B............
+  backtrace (crc af4dc711):
+    __kmalloc_cache_noprof+0x5de/0x820
+    blk_mq_init_allocated_queue+0xce/0x1210
+    blk_mq_alloc_queue+0x17f/0x230
+    nvme_alloc_admin_tag_set+0x352/0x670 [nvme_core]
+    0xffffffffc11de07f
+    0xffffffffc11dfc28
+    nvmf_create_ctrl+0x2ec/0x620 [nvme_fabrics]
+    nvmf_dev_write+0xd5/0x180 [nvme_fabrics]
+    vfs_write+0x1d0/0xfd0
+    ksys_write+0xf9/0x1d0
+    do_syscall_64+0x95/0x520
+    entry_SYSCALL_64_after_hwframe+0x76/0x7e
+unreferenced object (percpu) 0x607773052bc0 (size 256):
+  comm "nvme", pid 84134, jiffies 4304631753
+  hex dump (first 32 bytes on cpu 9):
+    00 00 00 00 ad 4e ad de ff ff ff ff 00 00 00 00  .....N..........
+    ff ff ff ff ff ff ff ff 60 3c 17 97 ff ff ff ff  ........`<......
+  backtrace (crc ce57ad5e):
+    pcpu_alloc_noprof+0x5e0/0xf10
+    blk_mq_init_allocated_queue+0xf0/0x1210
+    blk_mq_alloc_queue+0x17f/0x230
+    nvme_alloc_admin_tag_set+0x352/0x670 [nvme_core]
+    0xffffffffc11de07f
+    0xffffffffc11dfc28
+    nvmf_create_ctrl+0x2ec/0x620 [nvme_fabrics]
+    nvmf_dev_write+0xd5/0x180 [nvme_fabrics]
+    vfs_write+0x1d0/0xfd0
+    ksys_write+0xf9/0x1d0
+    do_syscall_64+0x95/0x520
+    entry_SYSCALL_64_after_hwframe+0x76/0x7e
+unreferenced object 0xffff8881459079e0 (size 8):
+  comm "nvme", pid 84134, jiffies 4304631753
+  hex dump (first 8 bytes):
+    00 a0 9e 43 82 88 ff ff                          ...C....
+  backtrace (crc 69c4a0b3):
+    __kmalloc_node_noprof+0x6ab/0x970
+    __blk_mq_realloc_hw_ctxs+0x361/0x5a0
+    blk_mq_init_allocated_queue+0x2e9/0x1210
+    blk_mq_alloc_queue+0x17f/0x230
+    nvme_alloc_admin_tag_set+0x352/0x670 [nvme_core]
+    0xffffffffc11de07f
+    0xffffffffc11dfc28
+    nvmf_create_ctrl+0x2ec/0x620 [nvme_fabrics]
+    nvmf_dev_write+0xd5/0x180 [nvme_fabrics]
+    vfs_write+0x1d0/0xfd0
+    ksys_write+0xf9/0x1d0
+    do_syscall_64+0x95/0x520
+    entry_SYSCALL_64_after_hwframe+0x76/0x7e
+unreferenced object 0xffff8882439ea000 (size 1024):
+  comm "nvme", pid 84134, jiffies 4304631753
+  hex dump (first 32 bytes):
+    00 00 00 00 ad 4e ad de ff ff ff ff 00 00 00 00  .....N..........
+    ff ff ff ff ff ff ff ff e0 3c 17 97 ff ff ff ff  .........<......
+  backtrace (crc 66835ea5):
+    __kmalloc_cache_node_noprof+0x5f9/0x840
+    blk_mq_alloc_hctx+0x52/0x810
+    blk_mq_alloc_and_init_hctx+0x5b9/0x840
+    __blk_mq_realloc_hw_ctxs+0x20a/0x5a0
+    blk_mq_init_allocated_queue+0x2e9/0x1210
+    blk_mq_alloc_queue+0x17f/0x230
+    nvme_alloc_admin_tag_set+0x352/0x670 [nvme_core]
+    0xffffffffc11de07f
+    0xffffffffc11dfc28
+    nvmf_create_ctrl+0x2ec/0x620 [nvme_fabrics]
+    nvmf_dev_write+0xd5/0x180 [nvme_fabrics]
+    vfs_write+0x1d0/0xfd0
+    ksys_write+0xf9/0x1d0
+    do_syscall_64+0x95/0x520
+    entry_SYSCALL_64_after_hwframe+0x76/0x7e
+unreferenced object 0xffff8881459072a0 (size 8):
+  comm "nvme", pid 84134, jiffies 4304631753
+  hex dump (first 8 bytes):
+    ff ff 00 00 00 00 00 00                          ........
+  backtrace (crc b47d4cd6):
+    __kmalloc_node_noprof+0x6ab/0x970
+    alloc_cpumask_var_node+0x56/0xb0
+    blk_mq_alloc_hctx+0x74/0x810
+    blk_mq_alloc_and_init_hctx+0x5b9/0x840
+    __blk_mq_realloc_hw_ctxs+0x20a/0x5a0
+    blk_mq_init_allocated_queue+0x2e9/0x1210
+    blk_mq_alloc_queue+0x17f/0x230
+    nvme_alloc_admin_tag_set+0x352/0x670 [nvme_core]
+    0xffffffffc11de07f
+    0xffffffffc11dfc28
+    nvmf_create_ctrl+0x2ec/0x620 [nvme_fabrics]
+    nvmf_dev_write+0xd5/0x180 [nvme_fabrics]
+    vfs_write+0x1d0/0xfd0
+    ksys_write+0xf9/0x1d0
+    do_syscall_64+0x95/0x520
+    entry_SYSCALL_64_after_hwframe+0x76/0x7e
+unreferenced object 0xffff88814b47b400 (size 128):
+  comm "nvme", pid 84134, jiffies 4304631753
+  hex dump (first 32 bytes):
+    c0 6b f1 fb ff e8 ff ff c0 6b 31 fc ff e8 ff ff  .k.......k1.....
+    c0 6b 71 fc ff e8 ff ff c0 6b b1 fc ff e8 ff ff  .kq......k......
+  backtrace (crc d04b4dbc):
+    __kmalloc_node_noprof+0x6ab/0x970
+    blk_mq_alloc_hctx+0x43a/0x810
+    blk_mq_alloc_and_init_hctx+0x5b9/0x840
+    __blk_mq_realloc_hw_ctxs+0x20a/0x5a0
+    blk_mq_init_allocated_queue+0x2e9/0x1210
+    blk_mq_alloc_queue+0x17f/0x230
+    nvme_alloc_admin_tag_set+0x352/0x670 [nvme_core]
+    0xffffffffc11de07f
+    0xffffffffc11dfc28
+    nvmf_create_ctrl+0x2ec/0x620 [nvme_fabrics]
+    nvmf_dev_write+0xd5/0x180 [nvme_fabrics]
+    vfs_write+0x1d0/0xfd0
+    ksys_write+0xf9/0x1d0
+    do_syscall_64+0x95/0x520
+    entry_SYSCALL_64_after_hwframe+0x76/0x7e
+unreferenced object 0xffff888256326c00 (size 512):
+  comm "nvme", pid 84134, jiffies 4304631753
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace (crc a9e88d35):
+    __kvmalloc_node_noprof+0x814/0xb30
+    sbitmap_init_node+0x184/0x730
+    blk_mq_alloc_hctx+0x4b3/0x810
+    blk_mq_alloc_and_init_hctx+0x5b9/0x840
+    __blk_mq_realloc_hw_ctxs+0x20a/0x5a0
+    blk_mq_init_allocated_queue+0x2e9/0x1210
+    blk_mq_alloc_queue+0x17f/0x230
+    nvme_alloc_admin_tag_set+0x352/0x670 [nvme_core]
+    0xffffffffc11de07f
+    0xffffffffc11dfc28
+    nvmf_create_ctrl+0x2ec/0x620 [nvme_fabrics]
+    nvmf_dev_write+0xd5/0x180 [nvme_fabrics]
+    vfs_write+0x1d0/0xfd0
+    ksys_write+0xf9/0x1d0
+    do_syscall_64+0x95/0x520
+    entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+
 
 -- 
 Best Regards,
