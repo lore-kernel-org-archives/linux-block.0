@@ -1,316 +1,154 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 174A51E1E0B
-	for <linux-block@vger.kernel.org>; Thu, 11 Dec 2025 22:35:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05CEE173
+	for <linux-block@vger.kernel.org>; Thu, 11 Dec 2025 22:46:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765492534; cv=none; b=ZmiqFkkZvQq6/7iJ/vhWuUrZX/crwvIe/9DnGUzvxX43X6ysbRf4gUD/1w43XxiC+cTPMtNS0nuOgx0WumAE2IMrUKKb/av9i4dpJg7A+P9MLut/qwIGfwVDeS2glAkGpy7RDbzgIxhojSsvZUqR+mhVa6OFF9ZHljexW2nLJa4=
+	t=1765493206; cv=none; b=Hmwq+/MidPCWl5Y/pMVLt51LbNJJOFaXOXurwWOEFO7DitjMY5KPoJvb11vfnXTP2V0qGoCdXIlKDhPMQRTEGw8quFDZ3eQvjbtRxdPL0pz681C6GFEZqS7sKlJSnyYl0wrxMAeJX5GY74RgdvwCMMqCnPrjseMR4u2/1beiL5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765492534; c=relaxed/simple;
-	bh=4qCKEtMtZ/d3qLKU3hqSsg/jlOitbG/cy+VURFXxrD8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d7yI6pQ/H7Sjsp3YReVJ39Ew9wFHmRhxw1kHmD1hOx3/ARJl8TwPN1ORSTTiOc9h4+rI6NHHTVh6/C8LYLHhhEOWK8X2rfBmcEm7RgVLvd6/CA49Ee69EPk9eJwCQgtLDxlYT9FqdJMScbM9fMNtXoNkBc4OUIGdpWti3deU2l8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AAqpzy/J; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1765493206; c=relaxed/simple;
+	bh=qSqxTk8vw2RQFrrQ+HTmy7NNvBBKQaqKf3EuVTvhqMk=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=mXQaSZawCuSs6zXRYbxs7VZ2PO8QeGSP5h+OKkFaETDpt+zieAz3mUK8XqRlWgS8PS/t6N91oFn3XJ6CTR7GBWUput8fPSHcKWvfci1ACjFLxiL2hB2QCkw7B4IfbN0VnkgKWBzduDE6iZgQ87t6ULOut15ekO1gM7maLciUMDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=JJY5nJqa; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AAqpzy/J"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765492531;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OMaJDn1GDDLRNnYB3S6cxwEpJWfKeaV9vZ+xd73GtK0=;
-	b=AAqpzy/JU2cmLQH/AreC/PqPWy9sP3wK+RJe5EZ2GG+mH2PGXnqqv3702h4korSwlh7K+S
-	a04myVacka2cqhWj9DsG6lYzSiTp7I3JLM+CCyOz2KaPI3DhB0aw90YYjxJ8HbGYcBK+dX
-	tOBBKpqP4jZiNNK7PHV09Q/THk4memc=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-153-HTDdVv_uN0OS2j2yKk-kYA-1; Thu,
- 11 Dec 2025 17:35:27 -0500
-X-MC-Unique: HTDdVv_uN0OS2j2yKk-kYA-1
-X-Mimecast-MFC-AGG-ID: HTDdVv_uN0OS2j2yKk-kYA_1765492526
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7ADB5195DE49;
-	Thu, 11 Dec 2025 22:35:26 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.129])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1046830001A2;
-	Thu, 11 Dec 2025 22:35:22 +0000 (UTC)
-Date: Fri, 12 Dec 2025 06:35:18 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Shuah Khan <shuah@kernel.org>, linux-block@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 8/8] selftests: ublk: add user copy test cases
-Message-ID: <aTtHJm_qcQIYkXcy@fedora>
-References: <20251211051603.1154841-1-csander@purestorage.com>
- <20251211051603.1154841-9-csander@purestorage.com>
- <aTqMNP3aDpAs044T@fedora>
- <CADUfDZr3WZHwZSMidQKH5p8yMDM6yWwbdyEJcvS6YBHSfFY_RA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="JJY5nJqa"
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-c03e8ac1da3so513576a12.2
+        for <linux-block@vger.kernel.org>; Thu, 11 Dec 2025 14:46:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1765493203; x=1766098003; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4+pP+Ii/tVSE6WIs3V1a2M7kIOlFoqJay+NwL8jb984=;
+        b=JJY5nJqaEuRN9l5tag3Gd3f+Tn4mOr1qmZex5TmKly93hO2ZaWYEQPtnBP81SNdiJi
+         K6e4bFBjbbim2DutrCXcuiQ4J3AuXx63jzW/rrXodafZ+pQNJ5LvIteJcZPG9sM/goSN
+         HFHTJyVruBQBqgsEsyiYV8Ad0ZI1dbe5Xe8tFNwLZsSluEl3kkqGeDkW2NxNY6qDpvQ/
+         LSNuTahq38xYEUpbzt8fz04HtIioeRyuqtebkMwDgLuKYvVpmM4yqYY8uuBUm7sOxxar
+         oDgNAl33AkIulC+s3JejBZ5DlLgDpHSbuQ9A1TAHisLTdGP5l0aJmUP+GdUIwtWshn/J
+         7LKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765493203; x=1766098003;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4+pP+Ii/tVSE6WIs3V1a2M7kIOlFoqJay+NwL8jb984=;
+        b=t3fU2TAgre5AMfV/+YsReorDHDZJ6rEmydD8ixXqDtuHRo/2AVYjBqBz0KN4l7gaLj
+         UIHQBOEoZiGDQ6v1UparbQpEu2UZAAbzIM6RQxix/KSHOIlqlU+7IHdaTBy6COK1EGcY
+         wWMguv0fAA6vQh28Di87Y/P3KnrSp1a9jqxEXuFf13G/YRrud3BqfUN8bKimjZBU5ZzZ
+         8p44sQvXLGoJCX8sjQJZkfLTC6xVzIhdTpj2pJdlsULehNEm6tdjvUIC0EitjgtMbA0E
+         qP7zfMw6PIs8eoTY247b13xeNPtiUsdcUDJ4uQl3Ya5XClXyPbEtbbsSHHpPDBiRf/XD
+         gU7g==
+X-Gm-Message-State: AOJu0YzDmgdx5YqhHpkN6RXNAmIiilkYv/ePyR4xjkUyle/deVs51e+G
+	d8rjY+TyvKgZqnl6lUt9Xy5+TYwUyrB0FPacyQRwjqdUdZInouaJTQ6VpQBSs5rMbbEYdl68fGO
+	+vkMS5+L91Q==
+X-Gm-Gg: AY/fxX7lf9kLZIkR4nZ7F56wdiAX2YTwmqzljep8kiBpOHMLllDWV0IKgFpZELiR52+
+	fOTUlWgkgrZyl7fURLXUO2keXB6dXUARJ2M/l1M6SzGD3qlMvnZ9I/apbKreyD/1KPZhj6MyBxx
+	EBdIzF+ROhXfbbpH3V5fIQflfJBAmkjfEyZ3RUbFyrCX0uRQ9FWbTdKtb9DDawypaXE28W1YYRR
+	u2KvwAKFxg2jJgG4g0FhaYbXRppxk/QKy35HwZ2lvazA5S/G+5cdiIAI+I/eVC44R1O9Zd2WCHK
+	LD3h9eeBvuScvFzr7bMbbJA3vZE8NmBeVqGyJHqLl54BNaPQ1XAIiL3dhpbpQRGibAomLcf8LgT
+	Eg3vRZu4V9CM3T1TrPfAWzyd6TpdQ4T7DqD46cygfNrUpgs4Iw26pOMmQ+2HkG11eYz5j6TGj+I
+	TzrUTG8MVTm+7WPD6bbskTT+nNBC800om1293qrBkI2/Yj+yNFOw==
+X-Google-Smtp-Source: AGHT+IE1pii6EcDxSobAERQ5GYMOL/kzNeLezvGEsxOs9s/+6eVPYgePh9sqc7ba2SKBNcgje9jTaw==
+X-Received: by 2002:a05:7301:1625:b0:2a4:4e38:9a39 with SMTP id 5a478bee46e88-2ac3027e061mr146934eec.34.1765493203152;
+        Thu, 11 Dec 2025 14:46:43 -0800 (PST)
+Received: from [172.20.4.188] (221x255x142x61.ap221.ftth.ucom.ne.jp. [221.255.142.61])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2ac1923a917sm8536462eec.6.2025.12.11.14.46.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 11 Dec 2025 14:46:42 -0800 (PST)
+Message-ID: <3d7381eb-9258-4743-86b3-5f4cfdab06d7@kernel.dk>
+Date: Thu, 11 Dec 2025 15:45:32 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADUfDZr3WZHwZSMidQKH5p8yMDM6yWwbdyEJcvS6YBHSfFY_RA@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
-
-On Thu, Dec 11, 2025 at 10:46:41AM -0800, Caleb Sander Mateos wrote:
-> On Thu, Dec 11, 2025 at 1:17 AM Ming Lei <ming.lei@redhat.com> wrote:
-> >
-> > On Wed, Dec 10, 2025 at 10:16:03PM -0700, Caleb Sander Mateos wrote:
-> > > The ublk selftests cover every data copy mode except user copy. Add
-> > > tests for user copy based on the existing test suite:
-> > > - generic_14 ("basic recover function verification (user copy)") based
-> > >   on generic_04 and generic_05
-> > > - null_03 ("basic IO test with user copy") based on null_01 and null_02
-> > > - loop_06 ("write and verify over user copy") based on loop_01 and
-> > >   loop_03
-> > > - loop_07 ("mkfs & mount & umount with user copy") based on loop_02 and
-> > >   loop_04
-> > > - stripe_05 ("write and verify test on user copy") based on stripe_03
-> > > - stripe_06 ("mkfs & mount & umount on user copy") based on stripe_02
-> > >   and stripe_04
-> > > - Added test cases to stress_05 ("run IO and remove device with recovery
-> > >   enabled") for user copy
-> > > - stress_06 ("run IO and remove device (user copy)") based on stress_01
-> > >   and stress_03
-> > > - stress_07 ("run IO and kill ublk server (user copy)") based on
-> > >   stress_02 and stress_04
-> > >
-> > > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-> > > ---
-> > >  tools/testing/selftests/ublk/Makefile         |  8 ++++
-> > >  .../testing/selftests/ublk/test_generic_14.sh | 40 +++++++++++++++++++
-> > >  tools/testing/selftests/ublk/test_loop_06.sh  | 25 ++++++++++++
-> > >  tools/testing/selftests/ublk/test_loop_07.sh  | 21 ++++++++++
-> > >  tools/testing/selftests/ublk/test_null_03.sh  | 24 +++++++++++
-> > >  .../testing/selftests/ublk/test_stress_05.sh  |  7 ++++
-> > >  .../testing/selftests/ublk/test_stress_06.sh  | 39 ++++++++++++++++++
-> > >  .../testing/selftests/ublk/test_stress_07.sh  | 39 ++++++++++++++++++
-> > >  .../testing/selftests/ublk/test_stripe_05.sh  | 26 ++++++++++++
-> > >  .../testing/selftests/ublk/test_stripe_06.sh  | 21 ++++++++++
-> > >  10 files changed, 250 insertions(+)
-> > >  create mode 100755 tools/testing/selftests/ublk/test_generic_14.sh
-> > >  create mode 100755 tools/testing/selftests/ublk/test_loop_06.sh
-> > >  create mode 100755 tools/testing/selftests/ublk/test_loop_07.sh
-> > >  create mode 100755 tools/testing/selftests/ublk/test_null_03.sh
-> > >  create mode 100755 tools/testing/selftests/ublk/test_stress_06.sh
-> > >  create mode 100755 tools/testing/selftests/ublk/test_stress_07.sh
-> > >  create mode 100755 tools/testing/selftests/ublk/test_stripe_05.sh
-> > >  create mode 100755 tools/testing/selftests/ublk/test_stripe_06.sh
-> > >
-> > > diff --git a/tools/testing/selftests/ublk/Makefile b/tools/testing/selftests/ublk/Makefile
-> > > index 770269efe42a..837977b62417 100644
-> > > --- a/tools/testing/selftests/ublk/Makefile
-> > > +++ b/tools/testing/selftests/ublk/Makefile
-> > > @@ -19,28 +19,36 @@ TEST_PROGS += test_generic_08.sh
-> > >  TEST_PROGS += test_generic_09.sh
-> > >  TEST_PROGS += test_generic_10.sh
-> > >  TEST_PROGS += test_generic_11.sh
-> > >  TEST_PROGS += test_generic_12.sh
-> > >  TEST_PROGS += test_generic_13.sh
-> > > +TEST_PROGS += test_generic_14.sh
-> > >
-> > >  TEST_PROGS += test_null_01.sh
-> > >  TEST_PROGS += test_null_02.sh
-> > > +TEST_PROGS += test_null_03.sh
-> > >  TEST_PROGS += test_loop_01.sh
-> > >  TEST_PROGS += test_loop_02.sh
-> > >  TEST_PROGS += test_loop_03.sh
-> > >  TEST_PROGS += test_loop_04.sh
-> > >  TEST_PROGS += test_loop_05.sh
-> > > +TEST_PROGS += test_loop_06.sh
-> > > +TEST_PROGS += test_loop_07.sh
-> > >  TEST_PROGS += test_stripe_01.sh
-> > >  TEST_PROGS += test_stripe_02.sh
-> > >  TEST_PROGS += test_stripe_03.sh
-> > >  TEST_PROGS += test_stripe_04.sh
-> > > +TEST_PROGS += test_stripe_05.sh
-> > > +TEST_PROGS += test_stripe_06.sh
-> > >
-> > >  TEST_PROGS += test_stress_01.sh
-> > >  TEST_PROGS += test_stress_02.sh
-> > >  TEST_PROGS += test_stress_03.sh
-> > >  TEST_PROGS += test_stress_04.sh
-> > >  TEST_PROGS += test_stress_05.sh
-> > > +TEST_PROGS += test_stress_06.sh
-> > > +TEST_PROGS += test_stress_07.sh
-> > >
-> > >  TEST_GEN_PROGS_EXTENDED = kublk
-> > >
-> > >  include ../lib.mk
-> > >
-> > > diff --git a/tools/testing/selftests/ublk/test_generic_14.sh b/tools/testing/selftests/ublk/test_generic_14.sh
-> > > new file mode 100755
-> > > index 000000000000..cd9b44b97c24
-> > > --- /dev/null
-> > > +++ b/tools/testing/selftests/ublk/test_generic_14.sh
-> > > @@ -0,0 +1,40 @@
-> > > +#!/bin/bash
-> > > +# SPDX-License-Identifier: GPL-2.0
-> > > +
-> > > +. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
-> > > +
-> > > +TID="generic_14"
-> > > +ERR_CODE=0
-> > > +
-> > > +ublk_run_recover_test()
-> > > +{
-> > > +     run_io_and_recover 256M "kill_daemon" "$@"
-> > > +     ERR_CODE=$?
-> > > +     if [ ${ERR_CODE} -ne 0 ]; then
-> > > +             echo "$TID failure: $*"
-> > > +             _show_result $TID $ERR_CODE
-> > > +     fi
-> > > +}
-> > > +
-> > > +if ! _have_program fio; then
-> > > +     exit "$UBLK_SKIP_CODE"
-> > > +fi
-> > > +
-> > > +_prep_test "recover" "basic recover function verification (user copy)"
-> > > +
-> > > +_create_backfile 0 256M
-> > > +_create_backfile 1 128M
-> > > +_create_backfile 2 128M
-> > > +
-> > > +ublk_run_recover_test -t null -q 2 -r 1 -u &
-> > > +ublk_run_recover_test -t loop -q 2 -r 1 -u "${UBLK_BACKFILES[0]}" &
-> > > +ublk_run_recover_test -t stripe -q 2 -r 1 -u "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
-> > > +wait
-> > > +
-> > > +ublk_run_recover_test -t null -q 2 -r 1 -u -i 1 &
-> > > +ublk_run_recover_test -t loop -q 2 -r 1 -u -i 1 "${UBLK_BACKFILES[0]}" &
-> > > +ublk_run_recover_test -t stripe -q 2 -r 1 -u -i 1 "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
-> > > +wait
-> > > +
-> > > +_cleanup_test "recover"
-> > > +_show_result $TID $ERR_CODE
-> > > diff --git a/tools/testing/selftests/ublk/test_loop_06.sh b/tools/testing/selftests/ublk/test_loop_06.sh
-> > > new file mode 100755
-> > > index 000000000000..1d1a8a725502
-> > > --- /dev/null
-> > > +++ b/tools/testing/selftests/ublk/test_loop_06.sh
-> > > @@ -0,0 +1,25 @@
-> > > +#!/bin/bash
-> > > +# SPDX-License-Identifier: GPL-2.0
-> > > +
-> > > +. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
-> > > +
-> > > +TID="loop_06"
-> > > +ERR_CODE=0
-> > > +
-> > > +if ! _have_program fio; then
-> > > +     exit "$UBLK_SKIP_CODE"
-> > > +fi
-> > > +
-> > > +_prep_test "loop" "write and verify over user copy"
-> > > +
-> > > +_create_backfile 0 256M
-> > > +dev_id=$(_add_ublk_dev -t loop -u "${UBLK_BACKFILES[0]}")
-> > > +_check_add_dev $TID $?
-> > > +
-> > > +# run fio over the ublk disk
-> > > +_run_fio_verify_io --filename=/dev/ublkb"${dev_id}" --size=256M
-> > > +ERR_CODE=$?
-> > > +
-> > > +_cleanup_test "loop"
-> > > +
-> > > +_show_result $TID $ERR_CODE
-> > > diff --git a/tools/testing/selftests/ublk/test_loop_07.sh b/tools/testing/selftests/ublk/test_loop_07.sh
-> > > new file mode 100755
-> > > index 000000000000..493f3fb611a5
-> > > --- /dev/null
-> > > +++ b/tools/testing/selftests/ublk/test_loop_07.sh
-> > > @@ -0,0 +1,21 @@
-> > > +#!/bin/bash
-> > > +# SPDX-License-Identifier: GPL-2.0
-> > > +
-> > > +. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
-> > > +
-> > > +TID="loop_07"
-> > > +ERR_CODE=0
-> > > +
-> > > +_prep_test "loop" "mkfs & mount & umount with user copy"
-> > > +
-> > > +_create_backfile 0 256M
-> > > +
-> > > +dev_id=$(_add_ublk_dev -t loop -u "${UBLK_BACKFILES[0]}")
-> > > +_check_add_dev $TID $?
-> > > +
-> > > +_mkfs_mount_test /dev/ublkb"${dev_id}"
-> > > +ERR_CODE=$?
-> > > +
-> > > +_cleanup_test "loop"
-> > > +
-> > > +_show_result $TID $ERR_CODE
-> > > diff --git a/tools/testing/selftests/ublk/test_null_03.sh b/tools/testing/selftests/ublk/test_null_03.sh
-> > > new file mode 100755
-> > > index 000000000000..0051067b4686
-> > > --- /dev/null
-> > > +++ b/tools/testing/selftests/ublk/test_null_03.sh
-> > > @@ -0,0 +1,24 @@
-> > > +#!/bin/bash
-> > > +# SPDX-License-Identifier: GPL-2.0
-> > > +
-> > > +. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
-> > > +
-> > > +TID="null_03"
-> > > +ERR_CODE=0
-> > > +
-> > > +if ! _have_program fio; then
-> > > +     exit "$UBLK_SKIP_CODE"
-> > > +fi
-> > > +
-> > > +_prep_test "null" "basic IO test with user copy"
-> > > +
-> > > +dev_id=$(_add_ublk_dev -t null -u)
-> > > +_check_add_dev $TID $?
-> > > +
-> > > +# run fio over the two disks
-> > > +fio --name=job1 --filename=/dev/ublkb"${dev_id}" --ioengine=libaio --rw=readwrite --iodepth=32 --size=256M > /dev/null 2>&1
-> > > +ERR_CODE=$?
-> > > +
-> > > +_cleanup_test "null"
-> > > +
-> > > +_show_result $TID $ERR_CODE
-> > > diff --git a/tools/testing/selftests/ublk/test_stress_05.sh b/tools/testing/selftests/ublk/test_stress_05.sh
-> > > index 09b94c36f2ba..cb8203957d1d 100755
-> > > --- a/tools/testing/selftests/ublk/test_stress_05.sh
-> > > +++ b/tools/testing/selftests/ublk/test_stress_05.sh
-> > > @@ -78,7 +78,14 @@ if _have_feature "PER_IO_DAEMON"; then
-> > >       ublk_io_and_remove 256M -t loop -q 4 --nthreads 8 --per_io_tasks -r 1 -i "$reissue" "${UBLK_BACKFILES[0]}" &
-> > >       ublk_io_and_remove 8G -t null -q 4 --nthreads 8 --per_io_tasks -r 1 -i "$reissue"  &
-> > >  fi
-> > >  wait
-> > >
-> > > +for reissue in $(seq 0 1); do
-> > > +     ublk_io_and_remove 8G -t null -q 4 -u -r 1 -i "$reissue" &
-> > > +     ublk_io_and_remove 256M -t loop -q 4 -u -r 1 -i "$reissue" "${UBLK_BACKFILES[1]}" &
-> > > +     ublk_io_and_remove 8G -t null -q 4 -u -r 1 -i "$reissue" &
-> > > +     wait
-> > > +done
-> >
-> > I'd suggest to not add new test coverage in old stress tests until default
-> > timeout is overrided, now it is close to default 45 seconds timeout.
-> 
-> Okay, I can just drop the changes in test_stress_05.sh if that sounds
-> good to you?
-
-Yeah, it is fine to drop it in test_stress_05.sh.
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Final block fixes for 6.19-rc1
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
 
-Thanks,
-Ming
+Hi Linus,
+
+A bit of a mixed bag in this pull request, but a few important fixes
+that should go in - hence let's flush these changes out before -rc1.
+This pull request contains:
+
+- Always initialize DMA state, fixing a potentially nasty issue on the
+  block side.
+
+- btrfs zoned write fix with cached zone reports.
+
+- Fix corruption issues in bcache with chained bio's, and further make
+  it clear that the chained IO handler is simply a marker, it's not code
+  meant to be executed.
+
+- Kill old code dealing with synchronous IO polling in the block layer,
+  that has been dead for a long time. Only async polling is supported
+  these days.
+
+- Fix a lockdep issue in tag_set management, moving it to RCU.
+
+- Fix an issue with ublks bio_vec iteration.
+
+- Don't unconditionally enforce blocking issue of ublk control commands,
+  allow some of them with non-blocking issue as they do not block.
+
+Please pull!
+
+
+The following changes since commit 0f45353dd48037af61f70df3468d25ca46afe909:
+
+  Merge tag 'nvme-6.19-2025-12-04' of git://git.infradead.org/nvme into block-6.19 (2025-12-04 20:58:19 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-6.19-20251211
+
+for you to fetch changes up to a0750fae73c55112ea11a4867bee40f11e679405:
+
+  blk-mq-dma: always initialize dma state (2025-12-10 13:41:11 -0700)
+
+----------------------------------------------------------------
+block-6.19-20251211
+
+----------------------------------------------------------------
+Caleb Sander Mateos (2):
+      ublk: allow non-blocking ctrl cmds in IO_URING_F_NONBLOCK issue
+      ublk: don't mutate struct bio_vec in iteration
+
+Fengnan Chang (1):
+      blk-mq: delete task running check in blk_hctx_poll()
+
+Johannes Thumshirn (1):
+      block: fix cached zone reports on devices with native zone append
+
+Keith Busch (1):
+      blk-mq-dma: always initialize dma state
+
+Mohamed Khalfella (1):
+      block: Use RCU in blk_mq_[un]quiesce_tagset() instead of set->tag_list_lock
+
+Shida Zhang (2):
+      bcache: fix improper use of bi_end_io
+      block: prohibit calls to bio_chain_endio
+
+ block/bio.c                 |  6 +++++-
+ block/blk-mq-dma.c          |  1 +
+ block/blk-mq.c              | 29 ++++++++++-------------------
+ block/blk-zoned.c           |  2 +-
+ drivers/block/ublk_drv.c    | 28 +++++++++++++++++++++-------
+ drivers/md/bcache/request.c |  6 +++---
+ 6 files changed, 41 insertions(+), 31 deletions(-)
+
+-- 
+Jens Axboe
 
