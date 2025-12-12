@@ -1,132 +1,115 @@
-Received: from mail-ot1-f97.google.com (mail-ot1-f97.google.com [209.85.210.97])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A17DD2D7DEB
-	for <linux-block@vger.kernel.org>; Fri, 12 Dec 2025 17:17:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85A77238C08
+	for <linux-block@vger.kernel.org>; Fri, 12 Dec 2025 19:37:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765559836; cv=none; b=gG4FqS3M9kuxiapZEVsYOO+HICv0O/JcoTlFNeOTwR2dRoV0LqMYnSd0nCagO/fKjzaHcVXFNo5M5X6Sp7c+BMUEVLAU7L2JKw6XET4U61YtuV+WHj9kksYwNeI+nbFZdlrc/yGclObLysmRoC08oqn4DUyBzl+tu6jOfCuvYGk=
+	t=1765568278; cv=none; b=NZuV3xS8SOvWm+R59liae5ngD/vDzAgjRlEPh3bpaFE/5KQuLD7iEFQv55BM5OgfRRyajJnioGDS2sTXmTlc2aoOF1Uk9vT6aGQ0osGG5Q4HtXMqHWuyBzZw0QHGUXYpEqZKsJ2nCX7iZzhzKO0aYkwovLjIKShkmL6fXFfM7UA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765559836; c=relaxed/simple;
-	bh=YPuVcHbnYS22d6hiURGBWQR+n+8hL0om5JxsTfAyHEE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Dt1gD0s4e9PjJD0fmy3m8elI6sEU6aeX18k3xzsvxjJfQXuv8QXOQ+5OpEAjiazbvsjFBVOnMFGPXezxhTAiGjaG0Clhm96c5D6Nr+RmchyOi+AZmxmJGgf5n++Ie3IuqvzseNozKCxhsJbhxKXBEtlA2vvPqxj2cJbunKALl8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=K6Raha8E; arc=none smtp.client-ip=209.85.210.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1765568278; c=relaxed/simple;
+	bh=VwPoKas3ILAATq/SFSU9txmC5xK1gqUaBfTmIdhRerY=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=iGeYa/vZibFIL9b5Fjyd5RrzXqiKM5Ux/tYpHPs8F1pSgYm06oEUsXfnbm0QY//lIXTPa99c/F1I2REZsD5RqK3IXMgdyUfFL0NPxjXYujycxsg+DY4A+Gsums90g1jMKwIoWlTEjmnmci+8jpUj0S29SohKWPnIcX5WovHAvM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=c5m+1blG; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="K6Raha8E"
-Received: by mail-ot1-f97.google.com with SMTP id 46e09a7af769-7cac7d08c27so95199a34.2
-        for <linux-block@vger.kernel.org>; Fri, 12 Dec 2025 09:17:11 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="c5m+1blG"
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-7b89c1ce9easo1862062b3a.2
+        for <linux-block@vger.kernel.org>; Fri, 12 Dec 2025 11:37:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1765559831; x=1766164631; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1765568276; x=1766173076; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0N5v+Qnf2iY02nSmpCLdO2pcb5orICXH1PEBjkRChjU=;
-        b=K6Raha8E3H6nbXlSquauYF9TLp5zzyc7PVPuiq7LbOalWe89nvNAzW1CEPjveCFftu
-         zsqf2vwKZ+0C7ht5yzv4LhhliV+LVI/K3TxGfSjan0xB+wY/VKlJx9dsz5ixKmg9I2nl
-         xPgXf+0BG9NMJjTHVyW9oU4GQKPVZ+UVmVfhN2t/tRnmrvbwxOjgzTAEscGThLdRcmrz
-         v+ZVTFKLsdCIl6Tv/06qqS990ppNY3EQLT9M9opgAsE7SrFMkwDr8oF4BRjBUNzJrVXT
-         M6Ls/bcGBFYISVAWyL1L34e+m16ZgRM1Oot0vC3IHc3TvWRwZn/FeWIN7TLhJEIxBXmY
-         ry5w==
+        bh=StTVbGf1mPsXgZZ3d28QJjsQQzKmymRGuXpSNQalBC0=;
+        b=c5m+1blG6ge3DTAI7nAHPhHVgc+BMSIozQa31FSf7ThS3uIGzs6iGbu5PHP5lZK4mk
+         /W08Ke2mOJQH4C40BdtfgEliG2aCkSUIchXVjP4aGDgkbo0NGKKk4v/sT/pqKhRGdy5o
+         LuZC4srxaPdLlCTyoaenvnA84F1454vR+yjfwWRRy3YKL10qgQesEYH9Rnv6iqwsVcxc
+         I5OR++zJ5pQK/GATzEEFb7QZSCaV9k210EYF57fpDIjshNzaQd1INI+hKc5YULhSkk8s
+         xRrNg//TV/wQ54QZ3F2hmQGV1pIb1fLNpoxJaPgjkMFuahd/64ye/4BaIkJPat3bdR6V
+         Onbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765559831; x=1766164631;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1765568276; x=1766173076;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=0N5v+Qnf2iY02nSmpCLdO2pcb5orICXH1PEBjkRChjU=;
-        b=aWgw0GfyIoC0sDr47mH8QTYsA0G3e2V2wAcZNayBS9rUzMCNo9HDENpsOQiJqDzp8f
-         4jZXBM5wieYW9A77uyxSG1P4av5drNVlM3Za3fKGLx0zM3RnF0Ls4foSyrJIKkuD3LYi
-         Q68fVgyYOlUNL23OTH5KkHl+X5IfltrPkzeoE5hZz8/d3ysDLyl2o6QZJAdW2lDwge67
-         FoNctv98tVSxosZEZUeMC5ORtQMZG4hs3ncgh/kJKsL7KWZ81TaE1tBhlZ6jAuo9eetm
-         dygnwLT265g3eZcGOmepWlI+t8/MhyxGXxM5+V6VnkwjztDOyoUd5TJh+1thmX6+k/4m
-         OWlQ==
-X-Gm-Message-State: AOJu0YyzD84k+Uj0YzLwkpldxADPsVN/DCUvkaCQ90BgAQ9gEgHKkmK/
-	9yeBJedUYO047Po2LCE6JAK+jwBXsP8LifCZ7rFVUvfUKdd5S8Ac/RM91mvzQDWgOO0cRbkxEP9
-	j5K+dzKr+eGH6KaeEHaNZB6502i5yuro6V1s7
-X-Gm-Gg: AY/fxX7seSuTS42V7+6SvNPJatHsBoUK/wKNXebZxmEKRY1n1q6OGEPmh9eXk7TUSlA
-	XTvQQhDfHeJ6Zg7ATtu0c++gMndhZ3dapH7u2j1VXX1ZmSl0BH47Pts15dZwnLvdsbhPwXweyw8
-	rQUDNbFM6ZUPm3aw+cSNXOuS623a2PgsMRI+3NA2feKGr6p7rCrPoyeQkTaInVZ6cYQ/WNN2TgP
-	v/CzhGe3ijXoFCejdP68TjxIx/RLMre3tZjmfgbnAPSy+/axKVBm/saRCH13WplAYziGnUrou3i
-	W8WjHXx4pn91uCqFS4eMpHiVjiDh6c6X8+Ry3RM9JDDOwDNKQUsqhMBAxc/Mpc93f4dglX6fxn3
-	30tj1LT6+YDFMZhqwK3NALvUt16N0cUQE14BQZcJe/Q==
-X-Google-Smtp-Source: AGHT+IEBD6jX7Ww+IQHxxqsewOUV0b+S5G2Tpohbpjk+hc1S1mfL5EZowmGcc1H0jPBMIqA1EEmegMce+Lv4
-X-Received: by 2002:a05:6870:9a1c:b0:3ec:323e:b5e8 with SMTP id 586e51a60fabf-3f5f8371574mr1362511fac.0.1765559830613;
-        Fri, 12 Dec 2025 09:17:10 -0800 (PST)
-Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.128])
-        by smtp-relay.gmail.com with ESMTPS id 586e51a60fabf-3f5fe30cae5sm289656fac.7.2025.12.12.09.17.10
+        bh=StTVbGf1mPsXgZZ3d28QJjsQQzKmymRGuXpSNQalBC0=;
+        b=I5qy0wf+tFOTGWy101j0zmJsFmNKP4B2jD7XHZxfXwhaHbpjluHbgYfK8LiZyF+3a6
+         vgEEC3qUIM8ruGj+NdOWKHkikM2vBpJrfZN3M/fM32fWt40ymREpS/0JHN4RMbbhs6l8
+         BrRNhAuKWDkWUKwqY2D1WXrvnxFf8XUrDusgTc+I1kwH8rMlzxO+Hf/iN+4aiSi2ARLd
+         PVOqPUFKQxxG4q8JOcZyxiF7TMGNCxYvIlyAxjK9LhyGpg6IXlc0QKSiq1uB+1dDDNKk
+         R8vlCKZD5/gv4kCJcZjQZwq1jmAtTNpmTCswpx32wZYuefJTIwV9p5iwI3Mx6vgCJpUM
+         7IeA==
+X-Gm-Message-State: AOJu0Yw45oW++HZPVYHP9DX252ByDo5qO5zUWRIyyYJ7cGY8jGwIcegu
+	OqOIyBc8L1ZBSvFpmc2mrMdlAKRF7QxCpNTlMDEBGltQoPQ5O+/cWdDQ+FOq/ijLjSI=
+X-Gm-Gg: AY/fxX7wonVdifIPQP3sIhVkrulzctHpgN1Z/PK3tCn0n1IpDxZZPRUxdl8O6s+zNsi
+	bttZ8A081uzKRAvqinR7eHpm2JhNK1MvwoixN72txjgP9vY1YNQINSzAdOc7Hidb0XS81/Q2yDm
+	RVor1PUMsoCEqXQpVJQMga881tyeXnRrdCn1L69MJ8k7VKJF2937yuF5GI6ia9OInBUS2r1QpIZ
+	4JEFmWXYGq9b1/8O+p9Z2tr0GiojhmZabKJRDo3cwE6LRqwkqp3t2MqKQQtkw8b4rIDjndqnrmp
+	6chL+Ut2iGCpMa6AXbwpcEehfXcMMrutZcLBsBtgISjFJzO401o6V3DH0z0KCeo/J+QqCFG3yq7
+	6A8hO95MR/2vVN9BElXKehfsUfgfx4+LIop9VRH650LsXh5g+E2/4vqmMAsjNfsDbKc8x01ghKe
+	lDe1sAGWBZO/KmQumL2ztbzdJFl0LVNqL3BujZP4viuFB4zPuL+/zca9at
+X-Google-Smtp-Source: AGHT+IGRg2Nd8ny+lEY1UTB7dhC5oApF/NmRzRo0kswvAor/xhBJns1Qxh+lICHO2/Y0nRHD/a4u7Q==
+X-Received: by 2002:a05:7022:e1c:b0:11e:354:32cb with SMTP id a92af1059eb24-11f34c39abemr3023356c88.49.1765568275584;
+        Fri, 12 Dec 2025 11:37:55 -0800 (PST)
+Received: from [127.0.0.1] (221x255x142x61.ap221.ftth.ucom.ne.jp. [221.255.142.61])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11f2e2b4867sm20294552c88.6.2025.12.12.11.37.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Dec 2025 09:17:10 -0800 (PST)
-X-Relaying-Domain: purestorage.com
-Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.7.70.37])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id CA552341BBA;
-	Fri, 12 Dec 2025 10:17:09 -0700 (MST)
-Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id C81ABE4232B; Fri, 12 Dec 2025 10:17:09 -0700 (MST)
-From: Caleb Sander Mateos <csander@purestorage.com>
-To: Ming Lei <ming.lei@redhat.com>,
-	Shuah Khan <shuah@kernel.org>
-Cc: linux-block@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Caleb Sander Mateos <csander@purestorage.com>
-Subject: [PATCH v3 6/9] selftests: ublk: don't share backing files between ublk servers
-Date: Fri, 12 Dec 2025 10:17:04 -0700
-Message-ID: <20251212171707.1876250-7-csander@purestorage.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20251212171707.1876250-1-csander@purestorage.com>
-References: <20251212171707.1876250-1-csander@purestorage.com>
+        Fri, 12 Dec 2025 11:37:54 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, io-uring@vger.kernel.org, 
+ Pavel Begunkov <asml.silence@gmail.com>
+Cc: Vishal Verma <vishal1.verma@intel.com>, tushar.gohad@intel.com, 
+ Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, 
+ Sagi Grimberg <sagi@grimberg.me>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+ Christian Brauner <brauner@kernel.org>, 
+ Andrew Morton <akpm@linux-foundation.org>, 
+ Sumit Semwal <sumit.semwal@linaro.org>, 
+ =?utf-8?q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+ linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org, 
+ linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org, 
+ dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org
+In-Reply-To: <cover.1763725387.git.asml.silence@gmail.com>
+References: <cover.1763725387.git.asml.silence@gmail.com>
+Subject: Re: (subset) [RFC v2 00/11] Add dmabuf read/write via io_uring
+Message-Id: <176556827123.851918.9976241171726294701.b4-ty@kernel.dk>
+Date: Fri, 12 Dec 2025 12:37:51 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3
 
-stress_04 is missing a wait between blocks of tests, meaning multiple
-ublk servers will be running in parallel using the same backing files.
-Add a wait after each section to ensure each backing file is in use by a
-single ublk server at a time.
 
-Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
----
- tools/testing/selftests/ublk/test_stress_04.sh | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+On Sun, 23 Nov 2025 22:51:20 +0000, Pavel Begunkov wrote:
+> Picking up the work on supporting dmabuf in the read/write path. There
+> are two main changes. First, it doesn't pass a dma addresss directly by
+> rather wraps it into an opaque structure, which is extended and
+> understood by the target driver.
+> 
+> The second big change is support for dynamic attachments, which added a
+> good part of complexity (see Patch 5). I kept the main machinery in nvme
+> at first, but move_notify can ask to kill the dma mapping asynchronously,
+> and any new IO would need to wait during submission, thus it was moved
+> to blk-mq. That also introduced an extra callback layer b/w driver and
+> blk-mq.
+> 
+> [...]
 
-diff --git a/tools/testing/selftests/ublk/test_stress_04.sh b/tools/testing/selftests/ublk/test_stress_04.sh
-index c0c926ce0539..efa8dc33234b 100755
---- a/tools/testing/selftests/ublk/test_stress_04.sh
-+++ b/tools/testing/selftests/ublk/test_stress_04.sh
-@@ -29,23 +29,25 @@ _create_backfile 1 128M
- _create_backfile 2 128M
- 
- ublk_io_and_kill_daemon 8G -t null -q 4 -z --no_ublk_fixed_fd &
- ublk_io_and_kill_daemon 256M -t loop -q 4 -z --no_ublk_fixed_fd "${UBLK_BACKFILES[0]}" &
- ublk_io_and_kill_daemon 256M -t stripe -q 4 -z "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
-+wait
- 
- if _have_feature "AUTO_BUF_REG"; then
- 	ublk_io_and_kill_daemon 8G -t null -q 4 --auto_zc &
- 	ublk_io_and_kill_daemon 256M -t loop -q 4 --auto_zc "${UBLK_BACKFILES[0]}" &
- 	ublk_io_and_kill_daemon 256M -t stripe -q 4 --auto_zc --no_ublk_fixed_fd "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
- 	ublk_io_and_kill_daemon 8G -t null -q 4 -z --auto_zc --auto_zc_fallback &
-+	wait
- fi
- 
- if _have_feature "PER_IO_DAEMON"; then
- 	ublk_io_and_kill_daemon 8G -t null -q 4 --auto_zc --nthreads 8 --per_io_tasks &
- 	ublk_io_and_kill_daemon 256M -t loop -q 4 --auto_zc --nthreads 8 --per_io_tasks "${UBLK_BACKFILES[0]}" &
- 	ublk_io_and_kill_daemon 256M -t stripe -q 4 --auto_zc --nthreads 8 --per_io_tasks "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
- 	ublk_io_and_kill_daemon 8G -t null -q 4 -z --auto_zc --auto_zc_fallback --nthreads 8 --per_io_tasks &
-+	wait
- fi
--wait
- 
- _cleanup_test "stress"
- _show_result $TID $ERR_CODE
+Applied, thanks!
+
+[03/11] block: move around bio flagging helpers
+        commit: d9f514d3e6ee48c34d70d637479b4c9384832d4f
+
+Best regards,
 -- 
-2.45.2
+Jens Axboe
+
+
 
