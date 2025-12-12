@@ -1,108 +1,137 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2408AD51
-	for <linux-block@vger.kernel.org>; Fri, 12 Dec 2025 15:57:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD5DB26B755
+	for <linux-block@vger.kernel.org>; Fri, 12 Dec 2025 16:50:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765555059; cv=none; b=q541JslsxWEXDza+wA0MPQXyfyt9ComsrZxNhb+mkBddToGlFSfrvuufKmyh/MASxhHq6zT2kzdQVuM9KkjM1vBQkju/H5XkLRtjhW/cvhFZuG8J4kabL50PiF4itmXeSJfY+gT01mZi2jlVIdIqiyPKWheGlBUqMsjUJhRQijE=
+	t=1765558248; cv=none; b=eZU35/I7oydrb8OWNXNTcFru1Q3FtkUafIuaeCBOWtH9VFH9FY/JlLXASmToG00XqnLA9zZ9htHN+yQZO/1cPY7rMElPaDPqlLetjzaM+NFXFEipKjVRraeIk8Tt9g55meQlYlfAP+hfNMNcmC5ARKnAQS7/xC5aDrhyZBNukvk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765555059; c=relaxed/simple;
-	bh=fJ5bSR/gka3dluPpsV2ajv378LBjS3GtrdAMbJdDWr4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NW1JuxmSzNiMoG2XiUKDdnPvKC2mYX3WWg8TWgZjL0pQZ5KZeZ5/yR3iV+dRkEk0JmC1KyXJRfvUFTu6ryFxnKaqs0VlsujElrlpkgilu0dhAMSNfU998+FGmUCCvNoasys7oPswtN+VWDhVdlKFlX1MvCIAsR+Aj6up1jbAXpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=LwRoj850; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1765558248; c=relaxed/simple;
+	bh=gHqFmJu8Q7cEzcmAy0y+0r5LxtGfMwXgn88CsLSJY80=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rrwS63FxdOAvWa20q82YTVfDJPXDPA/GuLmIyCjKE575GVbqrzGaPjYG7W6RBOiSoRJnqoxiW/pD9uoQXCPzy4vPf0OFl50P6WGUA2DtyLUW0xr+3LpzIp2s805dOUSoAvNIECtIPy98J6DQR4X6s2lZhP2w0qPw1v4CObqHPvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Kerfs//+; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="LwRoj850"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5BCFlY1k016479;
-	Fri, 12 Dec 2025 15:57:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=fJ5bSR
-	/gka3dluPpsV2ajv378LBjS3GtrdAMbJdDWr4=; b=LwRoj850UEsnnZqCzq6L6X
-	6Gw7hGxh6B6kLpBDgwikSqmrLRIqSdDAoFbsY3FU8BeTniKWMfVw/3iH9YNMI0Mt
-	nPuLRUZqjLL1nLip5bTSFWqI3MMfBYQtSFK4SP3kHxsdzzQIMo/s9cMf07M8Vtn2
-	nzOpsbQGXBauDJfXqS+m2isrq+vgpxcn6Njh69JlVE+ZR+572GhCOt6UBlCQrqMz
-	B5JFqVhKrK1b8BZgaNI+ovqhes+174mDXsOtS7k1XyRJ740G+MN7EvIfZm7bxKTF
-	uRlcretOz/ZSxF5duNYDNzhsiCBtV9gM6eEBn9mjOccNUCywTQ5j1g6HMtRa5KBg
-	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4avc53wab9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 12 Dec 2025 15:57:25 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5BCE96sC028102;
-	Fri, 12 Dec 2025 15:57:24 GMT
-Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4avy6ycu6q-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 12 Dec 2025 15:57:24 +0000
-Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5BCFvOT98848084
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 12 Dec 2025 15:57:24 GMT
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E84F45805A;
-	Fri, 12 Dec 2025 15:57:23 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B6CC458051;
-	Fri, 12 Dec 2025 15:57:21 +0000 (GMT)
-Received: from [9.111.55.66] (unknown [9.111.55.66])
-	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 12 Dec 2025 15:57:21 +0000 (GMT)
-Message-ID: <2bb0437e-7610-4da9-86a0-a95e425bb79e@linux.ibm.com>
-Date: Fri, 12 Dec 2025 21:27:19 +0530
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Kerfs//+"
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7c32c6eb79dso70765b3a.1
+        for <linux-block@vger.kernel.org>; Fri, 12 Dec 2025 08:50:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1765558245; x=1766163045; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=P6TtTuhlyGm4Yzy8Bwa+JBhXmcS0UPhYZfP/K0YNXHE=;
+        b=Kerfs//+O9YJkJqjUC3VyP8BCGn6vb/FCkHiekSswPd3ywfiJUqLp5hIu8r3rJkJzg
+         VL4Bx7fQuujYAfSex28aDUmiVAAomgutWVx+YaRhSeLvWNyHtWI4pAjaetpIfcq4YDLD
+         MvkJqMTdGcmxDz5z8hThDbPihLk2aAGOr38IfeKikpGYykNsTiaPpD6ZXe4SLTPitOXQ
+         B2NUVbzs+exEHTnTX45W7uQN6wRl7ucpw0JcKeDngKv3LIY3JL4U8r5NC+1uH6vE8r1r
+         F6uNEVZxVjX51VM0RteTO2iSiaoS8YU64dj4u3LwtR/ufWfB2pE9YFm8PVsxSKw6Co/b
+         z+vg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765558245; x=1766163045;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=P6TtTuhlyGm4Yzy8Bwa+JBhXmcS0UPhYZfP/K0YNXHE=;
+        b=vfgGkWWp6WPOr7aR0GqzEWG4t46bIqFLyz1G3K1TNvPDOcwReFMZb/Ty/rCGuJ6Uot
+         ATQeaS1XxIvqWsCk000PRqUMu4mJww0uCHlTRUczIOaW3ywqDEB+QrG4C0guYkziQI1s
+         pOoFQbp2oTJI7SkdWJk9t83ZYVGhHyP7z8WnfTVFU7T2LXXzwDg1Bb/fSum/22oVp8zj
+         gie8OZ/nnJr4CEEwQjVV79rN9PHahAnmWLOKTa23yUCOFUhdy+uuvoDBTI5NYO5t7jGd
+         CUoK3GX3LCm3SvYnSMSxW6/sbpm0mQj+BZI2Pv4oEM16w29TFr1QhQfmQdKEyDyqWnJw
+         32zw==
+X-Forwarded-Encrypted: i=1; AJvYcCXOmLVn7pfbE8oRLI/5QH8kcAr+HoI065huFTe6t+dtQ04ga9pMx9JgYtJ9rQ57RvJLq2bEoj5/VU3ymw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YybXCCBcR42XTb7UIkOsU0oFvl8PZRkwVOx+cndj3mJqGYFGItl
+	OVdZpvw/KXQyLaQfeZh1gGbHvMA+dK/0z4DdJYSXnowkW5VMDhdt0VPPgDh4wAlgjUcHLI/Az2Q
+	bCK5X8ha+xGEVmJP0gJz/6BYCgolE/m5eIR/0+RxUbdizezzBLt8I
+X-Gm-Gg: AY/fxX7BYh6wMYfKD9N8A3cj7vTbW0ZdqrCghxXqtAYK6aCNjmHAjmqBLhCd+4C5b0O
+	dBjhmgmLke/ep8MBRA9EKa8f0O6Kz4+K49/23bpkJww/YE/9ExAYO6+SyV9K17FEK7fTlEe6UyB
+	hPOFV6jZumE4VKXX1ApwZEWojlMLmaQ2hqdiEbN2b9ATAZIHGFjcZ+h6IQnug+l4Pn1qNCkU4CE
+	sgbbO0+57VtVsW4H5CsNVQgyDZvrjzvM0SRMqV+YwaZbvfd9hUpK6YFG8BaXPZlrrhP8Oay
+X-Google-Smtp-Source: AGHT+IEcJsxz5ZEELPu6pxm4vJWkI5dllQ3f0rhBgVRfUNTGD/NqYNvbUp05BHQg6uvLwAj4rrBSA4R+LEUpwwKjShM=
+X-Received: by 2002:a05:7022:989:b0:119:e56b:c3f3 with SMTP id
+ a92af1059eb24-11f34c47c98mr1052360c88.3.1765558244555; Fri, 12 Dec 2025
+ 08:50:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2] block: fix race between wbt_enable_default and IO
- submission
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org
-Cc: Yu Kuai <yukuai@fnnas.com>, Guangwu Zhang <guazhang@redhat.com>
-References: <20251212143500.485521-1-ming.lei@redhat.com>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20251212143500.485521-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjA2MDAyMCBTYWx0ZWRfX1IKX9axjjT1w
- 3dSs1cqMFKPBqAXmZTpimJ/vR3MPseDxHDhU+XkHDhtQzEiRq8jftoCzJVUIOBA+Shn3XafBgwB
- 9oaQPsHSu+JqFEJzYDu620mZPE2NklK/0eCeeB2mtezorYFL0rXeOg3RqN4tNUlHboi7GWtwdxC
- daN5Xt8M9/+hvIuonW3FQ7qmRr2UDNAba0++VTtGItpq2ydWbrUxiAZIR2zgJOWC2nIOzwr/edg
- f2zF1AZqlQ4OsJRTezZHZIr28JfSnmlXpoZWi4DiY8oC2E3gLjgQv2+XKPxJfBisohJU/rpVI2S
- sIslQGglWwLBnig0vapIadmQ2JPt88MH/3X6eH3/oT9VKc+njeczlTR7Xhpb+nU/JYQ/OZvNemQ
- R/2BMS3550iZT/6aKqIgHv96ec9tCA==
-X-Authority-Analysis: v=2.4 cv=S/DUAYsP c=1 sm=1 tr=0 ts=693c3b65 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VnNF1IyMAAAA:8 a=jZooFtwnRqYpt7X2nncA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: I1xnuS6oi-Y0tu4aLyoBgZ1O_XzRMWeU
-X-Proofpoint-GUID: I1xnuS6oi-Y0tu4aLyoBgZ1O_XzRMWeU
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-12-12_04,2025-12-11_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 phishscore=0 clxscore=1015 impostorscore=0 suspectscore=0
- lowpriorityscore=0 adultscore=0 spamscore=0 bulkscore=0 priorityscore=1501
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2512060020
+References: <20251212051658.1618543-1-csander@purestorage.com>
+ <20251212051658.1618543-5-csander@purestorage.com> <aTv06QEJIYyJKCVQ@fedora>
+In-Reply-To: <aTv06QEJIYyJKCVQ@fedora>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Fri, 12 Dec 2025 08:50:32 -0800
+X-Gm-Features: AQt7F2oV7VYFcC0-QUXJvhB3eLP1TVAemCkfOOOvLxD3ZsJNAOgqc72w4YyEZl8
+Message-ID: <CADUfDZq7wno5FEKrJEQ-YNc_VzshNAoefjsrRL4AC6QK4c_DoA@mail.gmail.com>
+Subject: Re: [PATCH v2 4/8] selftests: ublk: use auto_zc for PER_IO_DAEMON
+ tests in stress_04
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Shuah Khan <shuah@kernel.org>, linux-block@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Dec 12, 2025 at 2:56=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
+e:
+>
+> On Thu, Dec 11, 2025 at 10:16:54PM -0700, Caleb Sander Mateos wrote:
+> > stress_04 is described as "run IO and kill ublk server(zero copy)" but
+> > the --per_io_tasks tests cases don't use zero copy. Plus, one of the
+> > test cases is duplicated. Add --auto_zc to these test cases and
+> > --auto_zc_fallback to one of the duplicated ones. This matches the test
+> > cases in stress_03.
+> >
+> > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+> > ---
+> >  tools/testing/selftests/ublk/test_stress_04.sh | 8 ++++----
+> >  1 file changed, 4 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/ublk/test_stress_04.sh b/tools/tes=
+ting/selftests/ublk/test_stress_04.sh
+> > index 3f901db4d09d..965befcee830 100755
+> > --- a/tools/testing/selftests/ublk/test_stress_04.sh
+> > +++ b/tools/testing/selftests/ublk/test_stress_04.sh
+> > @@ -38,14 +38,14 @@ if _have_feature "AUTO_BUF_REG"; then
+> >       ublk_io_and_kill_daemon 256M -t stripe -q 4 --auto_zc --no_ublk_f=
+ixed_fd "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
+> >       ublk_io_and_kill_daemon 8G -t null -q 4 -z --auto_zc --auto_zc_fa=
+llback &
+> >  fi
+> >
+> >  if _have_feature "PER_IO_DAEMON"; then
+> > -     ublk_io_and_kill_daemon 8G -t null -q 4 --nthreads 8 --per_io_tas=
+ks &
+> > -     ublk_io_and_kill_daemon 256M -t loop -q 4 --nthreads 8 --per_io_t=
+asks "${UBLK_BACKFILES[0]}" &
+> > -     ublk_io_and_kill_daemon 256M -t stripe -q 4 --nthreads 8 --per_io=
+_tasks "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
+> > -     ublk_io_and_kill_daemon 8G -t null -q 4 --nthreads 8 --per_io_tas=
+ks &
+> > +     ublk_io_and_kill_daemon 8G -t null -q 4 --auto_zc --nthreads 8 --=
+per_io_tasks &
+> > +     ublk_io_and_kill_daemon 256M -t loop -q 4 --auto_zc --nthreads 8 =
+--per_io_tasks "${UBLK_BACKFILES[0]}" &
+> > +     ublk_io_and_kill_daemon 256M -t stripe -q 4 --auto_zc --nthreads =
+8 --per_io_tasks "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
+> > +     ublk_io_and_kill_daemon 8G -t null -q 4 --auto_zc --auto_zc_fallb=
+ack --nthreads 8 --per_io_tasks &
+>
+> The last line needs `-z`, otherwise the following warning is dumped:
+>
+> ```
+> # selftests: ublk: test_stress_04.sh
+> # main: auto_zc_fallback is set but neither F_AUTO_BUF_REG nor F_SUPPORT_=
+ZERO_COPY is enabled
+> # stress_04 : [FAIL]
+> ```
 
+Yeah, duh! I swear I tested this... Oh, it's because I had revised
+this patch following your initial feedback but replaced it with the
+version from v1 right before sending it. Will fix.
 
-On 12/12/25 8:05 PM, Ming Lei wrote:
-> When wbt_enable_default() is moved out of queue freezing in elevator_change(),
-> it can cause the wbt inflight counter to become negative (-1), leading to hung
-> tasks in the writeback path. Tasks get stuck in wbt_wait() because the counter
-> is in an inconsistent state.
-
-Looks good to me:
-Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
+Thanks,
+Caleb
