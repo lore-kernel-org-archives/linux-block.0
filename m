@@ -1,54 +1,55 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2C4F289811
-	for <linux-block@vger.kernel.org>; Fri, 12 Dec 2025 14:34:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDFE7289811
+	for <linux-block@vger.kernel.org>; Fri, 12 Dec 2025 14:35:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765550080; cv=none; b=YA94MtmKXz5XS6h+lELZ9YJHNMgq0t3XBFrcLfSNQojXw38AO66lVFXL8ryCpcTTy5TDtZoHfIgnr/vd3Wgog+VKvGutLrUtxA7xi1sQHMTb3k4/n7dVaV1SoFIm4mTV4wr5uuULd7lDcMp3wx0MFYVsr/GErCzhIprWo6StV6w=
+	t=1765550115; cv=none; b=nyvl9AE6Ips5/nHV6ZaAeoUzatxOwO8sXJOMsexGaMVoeUOhtQJPOpEDFqFFInMnBWGXhk9XpQyl4Gv94+HBhXbZgBicfk9a3Hd+3aKVcjzQF6yPoGX624XfCfLW6ECryWgLozEs8UdWuGzG7iTImZB5BuIcoqpxmCTSBOIMhPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765550080; c=relaxed/simple;
-	bh=sBRMeldnplFyo/gRjXaCmrntOrlgW0gTtzzmcavaYpY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=riZ37WAWUll75bUs95fxQZSJLjg7vX5tsn4f/Tf213IhjzxxicwHulBfA8KJc5t+D05r0X0EwAiw8Jq3FjViTFA1YGKrf/0eiu1CmH5uvVuDd0j8C+BqwADgfHOphlBKiXHfPFbx2bfAL063Z9mnuqJCO4jTNY2dLCCVazfhsT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PUuL0j7z; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1765550115; c=relaxed/simple;
+	bh=IFxkq9EJvi3x7MBTgFJOD73j45X314+zVnikBY3rPsk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Fekv+VeD+Ul6dGvtzrywKZQq3R1eczw4H19Z4GpX1Dz9nSHuWokXDtROmgpL/c7dr7trdiaGx/dOXSHS3Cx2xgw+d/n5jyXk7QzbdhbzBafPzlk+rr7JrxPj/qPMT7GdfCuTuPOsdWwQEk9zDYtTlEhQRuDK/TBMDdqYDYCCdpc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LVhRv8qI; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PUuL0j7z"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LVhRv8qI"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765550077;
+	s=mimecast20190719; t=1765550112;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=RTtYEOy4bXyp0Np3uXXv7BfIcvy/yxd04dWuBTjTUvY=;
-	b=PUuL0j7z13pTsmw34zJr+Q2A7wZuSVZPMP8RHJW7jAcO60odw6dERuN77vnmoFLNLw/LHI
-	sREi6rgkTg9d/6u9vfdu2hlcAANLupBOmBI9cT+YEPZ2WJGcHFz6qF3Rn1ekJFNQWfBFmz
-	K19GW80lfBDeDi5xL8qPMf9QgDXsvk4=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=yiRdZ7NzjY6LhC6NMlbBCLJmABhpOl86DzaV7OksYFw=;
+	b=LVhRv8qIhiRquM5Og6nOdBqSzjO5qsw2lM8H38H7MAA6SAKHViHREqbZFyzK1VvhMhHKu9
+	OT2QQjg6YwPxnPD3QbFhV0yIsXxhZTobvU+LMN54j2byCY9fj7SlvywLVYMq3afuFISyx3
+	CUrn01yk9d2RBeQrL0ftJtjpJajI6AQ=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-553-_IyhtjKvMc2GfVYVUQDSWg-1; Fri,
- 12 Dec 2025 09:34:34 -0500
-X-MC-Unique: _IyhtjKvMc2GfVYVUQDSWg-1
-X-Mimecast-MFC-AGG-ID: _IyhtjKvMc2GfVYVUQDSWg_1765550073
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-397-Hb04Af92N66B-fQlg8q73Q-1; Fri,
+ 12 Dec 2025 09:35:09 -0500
+X-MC-Unique: Hb04Af92N66B-fQlg8q73Q-1
+X-Mimecast-MFC-AGG-ID: Hb04Af92N66B-fQlg8q73Q_1765550108
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 53C9B1956053;
-	Fri, 12 Dec 2025 14:34:32 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5C2D0180057E;
+	Fri, 12 Dec 2025 14:35:08 +0000 (UTC)
 Received: from localhost (unknown [10.72.116.20])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3864819540DF;
-	Fri, 12 Dec 2025 14:34:30 +0000 (UTC)
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 35ABA180045B;
+	Fri, 12 Dec 2025 14:35:06 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
-Cc: Caleb Sander Mateos <csander@purestorage.com>,
-	Uday Shankar <ushankar@purestorage.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2] ublk: fix deadlock when reading partition table
-Date: Fri, 12 Dec 2025 22:34:15 +0800
-Message-ID: <20251212143415.485359-1-ming.lei@redhat.com>
+Cc: Ming Lei <ming.lei@redhat.com>,
+	Nilay Shroff <nilay@linux.ibm.com>,
+	Yu Kuai <yukuai@fnnas.com>,
+	Guangwu Zhang <guazhang@redhat.com>
+Subject: [PATCH V2] block: fix race between wbt_enable_default and IO submission
+Date: Fri, 12 Dec 2025 22:35:00 +0800
+Message-ID: <20251212143500.485521-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -56,108 +57,200 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-When one process(such as udev) opens ublk block device (e.g., to read
-the partition table via bdev_open()), a deadlock[1] can occur:
+When wbt_enable_default() is moved out of queue freezing in elevator_change(),
+it can cause the wbt inflight counter to become negative (-1), leading to hung
+tasks in the writeback path. Tasks get stuck in wbt_wait() because the counter
+is in an inconsistent state.
 
-1. bdev_open() grabs disk->open_mutex
-2. The process issues read I/O to ublk backend to read partition table
-3. In __ublk_complete_rq(), blk_update_request() or blk_mq_end_request()
-   runs bio->bi_end_io() callbacks
-4. If this triggers fput() on file descriptor of ublk block device, the
-   work may be deferred to current task's task work (see fput() implementation)
-5. This eventually calls blkdev_release() from the same context
-6. blkdev_release() tries to grab disk->open_mutex again
-7. Deadlock: same task waiting for a mutex it already holds
+The issue occurs because wbt_enable_default() could race with IO submission,
+allowing the counter to be decremented before proper initialization. This manifests
+as:
 
-The fix is to run blk_update_request() and blk_mq_end_request() with bottom
-halves disabled. This forces blkdev_release() to run in kernel work-queue
-context instead of current task work context, and allows ublk server to make
-forward progress, and avoids the deadlock.
+  rq_wait[0]:
+    inflight:             -1
+    has_waiters:        True
 
-Fixes: 71f28f3136af ("ublk_drv: add io_uring based userspace block driver")
-Link: https://github.com/ublk-org/ublksrv/issues/170 [1]
+rwb_enabled() checks the state, which can be updated exactly between wbt_wait()
+(rq_qos_throttle()) and wbt_track()(rq_qos_track()), then the inflight counter
+will become negative.
+
+And results in hung task warnings like:
+  task:kworker/u24:39 state:D stack:0 pid:14767
+  Call Trace:
+    rq_qos_wait+0xb4/0x150
+    wbt_wait+0xa9/0x100
+    __rq_qos_throttle+0x24/0x40
+    blk_mq_submit_bio+0x672/0x7b0
+    ...
+
+Fix this by:
+
+1. Splitting wbt_enable_default() into:
+   - __wbt_enable_default(): Returns true if wbt_init() should be called
+   - wbt_enable_default(): Wrapper for existing callers (no init)
+   - wbt_init_enable_default(): New function that checks and inits WBT
+
+2. Using wbt_init_enable_default() in blk_register_queue() to ensure
+   proper initialization during queue registration
+
+3. Move wbt_init() out of wbt_enable_default() which is only for enabling
+   disabled wbt from bfq and iocost, and wbt_init() isn't needed. Then the
+   original lock warning can be avoided.
+
+4. Removing the ELEVATOR_FLAG_ENABLE_WBT_ON_EXIT flag and its handling
+   code since it's no longer needed
+
+This ensures WBT is properly initialized before any IO can be submitted,
+preventing the counter from going negative.
+
+Cc: Nilay Shroff <nilay@linux.ibm.com>
+Cc: Yu Kuai <yukuai@fnnas.com>
+Cc: Guangwu Zhang <guazhang@redhat.com>
+Fixes: 78c271344b6f ("block: move wbt_enable_default() out of queue freezing from sched ->exit()")
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
 V2:
-	- cover another two cases of ending request(Caleb Sander Mateos)
+	- explain the race in commit log(Nilay, YuKuai)
 
- drivers/block/ublk_drv.c | 28 ++++++++++++++++++++++++----
- 1 file changed, 24 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index df9831783a13..38f138f248e6 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -1080,12 +1080,20 @@ static inline struct ublk_uring_cmd_pdu *ublk_get_uring_cmd_pdu(
- 	return io_uring_cmd_to_pdu(ioucmd, struct ublk_uring_cmd_pdu);
- }
+ block/bfq-iosched.c |  2 +-
+ block/blk-sysfs.c   |  2 +-
+ block/blk-wbt.c     | 20 ++++++++++++++++----
+ block/blk-wbt.h     |  5 +++++
+ block/elevator.c    |  4 ----
+ block/elevator.h    |  1 -
+ 6 files changed, 23 insertions(+), 11 deletions(-)
+
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 4a8d3d96bfe4..6e54b1d3d8bc 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -7181,7 +7181,7 @@ static void bfq_exit_queue(struct elevator_queue *e)
  
-+static void ublk_end_request(struct request *req, blk_status_t error)
-+{
-+	local_bh_disable();
-+	blk_mq_end_request(req, error);
-+	local_bh_enable();
+ 	blk_stat_disable_accounting(bfqd->queue);
+ 	blk_queue_flag_clear(QUEUE_FLAG_DISABLE_WBT_DEF, bfqd->queue);
+-	set_bit(ELEVATOR_FLAG_ENABLE_WBT_ON_EXIT, &e->flags);
++	wbt_enable_default(bfqd->queue->disk);
+ 
+ 	kfree(bfqd);
+ }
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 8684c57498cc..e0a70d26972b 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -932,7 +932,7 @@ int blk_register_queue(struct gendisk *disk)
+ 		elevator_set_default(q);
+ 
+ 	blk_queue_flag_set(QUEUE_FLAG_REGISTERED, q);
+-	wbt_enable_default(disk);
++	wbt_init_enable_default(disk);
+ 
+ 	/* Now everything is ready and send out KOBJ_ADD uevent */
+ 	kobject_uevent(&disk->queue_kobj, KOBJ_ADD);
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index eb8037bae0bd..0974875f77bd 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -699,7 +699,7 @@ static void wbt_requeue(struct rq_qos *rqos, struct request *rq)
+ /*
+  * Enable wbt if defaults are configured that way
+  */
+-void wbt_enable_default(struct gendisk *disk)
++static bool __wbt_enable_default(struct gendisk *disk)
+ {
+ 	struct request_queue *q = disk->queue;
+ 	struct rq_qos *rqos;
+@@ -716,19 +716,31 @@ void wbt_enable_default(struct gendisk *disk)
+ 		if (enable && RQWB(rqos)->enable_state == WBT_STATE_OFF_DEFAULT)
+ 			RQWB(rqos)->enable_state = WBT_STATE_ON_DEFAULT;
+ 		mutex_unlock(&disk->rqos_state_mutex);
+-		return;
++		return false;
+ 	}
+ 	mutex_unlock(&disk->rqos_state_mutex);
+ 
+ 	/* Queue not registered? Maybe shutting down... */
+ 	if (!blk_queue_registered(q))
+-		return;
++		return false;
+ 
+ 	if (queue_is_mq(q) && enable)
+-		wbt_init(disk);
++		return true;
++	return false;
 +}
 +
- /* todo: handle partial completion */
- static inline void __ublk_complete_rq(struct request *req, struct ublk_io *io,
- 				      bool need_map)
++void wbt_enable_default(struct gendisk *disk)
++{
++	__wbt_enable_default(disk);
+ }
+ EXPORT_SYMBOL_GPL(wbt_enable_default);
+ 
++void wbt_init_enable_default(struct gendisk *disk)
++{
++	if (__wbt_enable_default(disk))
++		WARN_ON_ONCE(wbt_init(disk));
++}
++
+ u64 wbt_default_latency_nsec(struct request_queue *q)
  {
- 	unsigned int unmapped_bytes;
- 	blk_status_t res = BLK_STS_OK;
-+	bool requeue;
+ 	/*
+diff --git a/block/blk-wbt.h b/block/blk-wbt.h
+index e5fc653b9b76..925f22475738 100644
+--- a/block/blk-wbt.h
++++ b/block/blk-wbt.h
+@@ -5,6 +5,7 @@
+ #ifdef CONFIG_BLK_WBT
  
- 	/* failed read IO if nothing is read */
- 	if (!io->res && req_op(req) == REQ_OP_READ)
-@@ -1117,14 +1125,26 @@ static inline void __ublk_complete_rq(struct request *req, struct ublk_io *io,
- 	if (unlikely(unmapped_bytes < io->res))
- 		io->res = unmapped_bytes;
+ int wbt_init(struct gendisk *disk);
++void wbt_init_enable_default(struct gendisk *disk);
+ void wbt_disable_default(struct gendisk *disk);
+ void wbt_enable_default(struct gendisk *disk);
  
--	if (blk_update_request(req, BLK_STS_OK, io->res))
-+	/*
-+	 * Run bio->bi_end_io() from softirq context for preventing this
-+	 * ublk's blkdev_release() from being called on current's task
-+	 * work, see fput() implementation.
-+	 *
-+	 * Otherwise, ublk server may not provide forward progress in
-+	 * case of reading partition table from bdev_open() with
-+	 * disk->open_mutex grabbed, and causes dead lock.
-+	 */
-+	local_bh_disable();
-+	requeue = blk_update_request(req, BLK_STS_OK, io->res);
-+	local_bh_enable();
-+	if (requeue)
- 		blk_mq_requeue_request(req, true);
- 	else if (likely(!blk_should_fake_timeout(req->q)))
- 		__blk_mq_end_request(req, BLK_STS_OK);
+@@ -16,6 +17,10 @@ u64 wbt_default_latency_nsec(struct request_queue *);
  
- 	return;
- exit:
--	blk_mq_end_request(req, res);
-+	ublk_end_request(req, res);
+ #else
+ 
++static inline void wbt_init_enable_default(struct gendisk *disk)
++{
++}
++
+ static inline void wbt_disable_default(struct gendisk *disk)
+ {
  }
+diff --git a/block/elevator.c b/block/elevator.c
+index 5b37ef44f52d..a2f8b2251dc6 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -633,14 +633,10 @@ static int elevator_change_done(struct request_queue *q,
+ 			.et = ctx->old->et,
+ 			.data = ctx->old->elevator_data
+ 		};
+-		bool enable_wbt = test_bit(ELEVATOR_FLAG_ENABLE_WBT_ON_EXIT,
+-				&ctx->old->flags);
  
- static struct io_uring_cmd *__ublk_prep_compl_io_cmd(struct ublk_io *io,
-@@ -1164,7 +1184,7 @@ static inline void __ublk_abort_rq(struct ublk_queue *ubq,
- 	if (ublk_nosrv_dev_should_queue_io(ubq->dev))
- 		blk_mq_requeue_request(rq, false);
- 	else
--		blk_mq_end_request(rq, BLK_STS_IOERR);
-+		ublk_end_request(rq, BLK_STS_IOERR);
- }
- 
- static void
-@@ -1209,7 +1229,7 @@ __ublk_do_auto_buf_reg(const struct ublk_queue *ubq, struct request *req,
- 			ublk_auto_buf_reg_fallback(ubq, req->tag);
- 			return AUTO_BUF_REG_FALLBACK;
- 		}
--		blk_mq_end_request(req, BLK_STS_IOERR);
-+		ublk_end_request(req, BLK_STS_IOERR);
- 		return AUTO_BUF_REG_FAIL;
+ 		elv_unregister_queue(q, ctx->old);
+ 		blk_mq_free_sched_res(&res, ctx->old->type, q->tag_set);
+ 		kobject_put(&ctx->old->kobj);
+-		if (enable_wbt)
+-			wbt_enable_default(q->disk);
  	}
+ 	if (ctx->new) {
+ 		ret = elv_register_queue(q, ctx->new, !ctx->no_uevent);
+diff --git a/block/elevator.h b/block/elevator.h
+index a9d092c5a9e8..3eb32516be0b 100644
+--- a/block/elevator.h
++++ b/block/elevator.h
+@@ -156,7 +156,6 @@ struct elevator_queue
  
+ #define ELEVATOR_FLAG_REGISTERED	0
+ #define ELEVATOR_FLAG_DYING		1
+-#define ELEVATOR_FLAG_ENABLE_WBT_ON_EXIT	2
+ 
+ /*
+  * block elevator interface
 -- 
 2.47.1
 
