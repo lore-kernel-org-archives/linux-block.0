@@ -1,137 +1,193 @@
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD5DB26B755
-	for <linux-block@vger.kernel.org>; Fri, 12 Dec 2025 16:50:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF4635958
+	for <linux-block@vger.kernel.org>; Fri, 12 Dec 2025 16:57:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765558248; cv=none; b=eZU35/I7oydrb8OWNXNTcFru1Q3FtkUafIuaeCBOWtH9VFH9FY/JlLXASmToG00XqnLA9zZ9htHN+yQZO/1cPY7rMElPaDPqlLetjzaM+NFXFEipKjVRraeIk8Tt9g55meQlYlfAP+hfNMNcmC5ARKnAQS7/xC5aDrhyZBNukvk=
+	t=1765558677; cv=none; b=SsCxZdzOuaxnEb+nVfkkP1HY1ormUcgzH94FYtgoSHU2HgKcqB9qVNB3AZkZ2odJCWxnTuNmNf/UB82K7mSSd84gAcREnk9LYKrZ43vGwE90Kn7UJ3zwmHavEd6T5YMXI9VN80wP4JkY+D4M8HUicnZ0oZwOwHrJ8t+/WKdXbfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765558248; c=relaxed/simple;
-	bh=gHqFmJu8Q7cEzcmAy0y+0r5LxtGfMwXgn88CsLSJY80=;
+	s=arc-20240116; t=1765558677; c=relaxed/simple;
+	bh=rm8eBWO3HQ1GbgWTuwxH95vgQ+0Jxe/bYzWzLHUXaXY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rrwS63FxdOAvWa20q82YTVfDJPXDPA/GuLmIyCjKE575GVbqrzGaPjYG7W6RBOiSoRJnqoxiW/pD9uoQXCPzy4vPf0OFl50P6WGUA2DtyLUW0xr+3LpzIp2s805dOUSoAvNIECtIPy98J6DQR4X6s2lZhP2w0qPw1v4CObqHPvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Kerfs//+; arc=none smtp.client-ip=209.85.210.176
+	 To:Cc:Content-Type; b=oVxDn2sqw1+zlJiHIDnTaQHLidGltj0AMz/5/jFrSc+y27qvA3cyQRPHo0OkMuonY2BwRqTAvls8ADRkvKrCuDpKZp0uv/e+9zQtBQuuEydfvfZHk03BKBNGQwLc8aREYlr60wajW25Z1u55p/6woun9AXTGBfQRX2mlzP1eLNU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Z0Pu1GpZ; arc=none smtp.client-ip=209.85.216.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Kerfs//+"
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7c32c6eb79dso70765b3a.1
-        for <linux-block@vger.kernel.org>; Fri, 12 Dec 2025 08:50:45 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Z0Pu1GpZ"
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-34abca71f9cso187465a91.3
+        for <linux-block@vger.kernel.org>; Fri, 12 Dec 2025 08:57:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1765558245; x=1766163045; darn=vger.kernel.org;
+        d=purestorage.com; s=google2022; t=1765558675; x=1766163475; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=P6TtTuhlyGm4Yzy8Bwa+JBhXmcS0UPhYZfP/K0YNXHE=;
-        b=Kerfs//+O9YJkJqjUC3VyP8BCGn6vb/FCkHiekSswPd3ywfiJUqLp5hIu8r3rJkJzg
-         VL4Bx7fQuujYAfSex28aDUmiVAAomgutWVx+YaRhSeLvWNyHtWI4pAjaetpIfcq4YDLD
-         MvkJqMTdGcmxDz5z8hThDbPihLk2aAGOr38IfeKikpGYykNsTiaPpD6ZXe4SLTPitOXQ
-         B2NUVbzs+exEHTnTX45W7uQN6wRl7ucpw0JcKeDngKv3LIY3JL4U8r5NC+1uH6vE8r1r
-         F6uNEVZxVjX51VM0RteTO2iSiaoS8YU64dj4u3LwtR/ufWfB2pE9YFm8PVsxSKw6Co/b
-         z+vg==
+        bh=9yUoX6IlmaVABsKZSs5vcTjT9zf/kVXn7uDf0h+MBAI=;
+        b=Z0Pu1GpZ4bLT4ht919iJioOJ1Ktt1heA0xxdmo2EbBDuOPVN/zRxrlG7u0RZtTNUGe
+         UStwU97dW9gM0HjRYcuNc7IwIkDfFA/M29msuryzAU4DXeC+lGB5OG0HmvQj4CwsoBp9
+         umI8POhxuZmgrPRdKNQUHvZYnL9yfO28tFDV/4EwcksEmuxy49R0EGCokYhFhJo2lyKG
+         NGDxyOhVvoC5Quztyfa4dG0s1Y3JxEVoMlnLUtmhq5tE4Bhayp4QmIRk1ycgIShC2PEa
+         SmliPrrTvxSrnOeixGvf/abyrLc/jW7yTftqHEyk5qDz4RZjSB1/VXIvyNmu0JLEPXmI
+         A/2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765558245; x=1766163045;
+        d=1e100.net; s=20230601; t=1765558675; x=1766163475;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=P6TtTuhlyGm4Yzy8Bwa+JBhXmcS0UPhYZfP/K0YNXHE=;
-        b=vfgGkWWp6WPOr7aR0GqzEWG4t46bIqFLyz1G3K1TNvPDOcwReFMZb/Ty/rCGuJ6Uot
-         ATQeaS1XxIvqWsCk000PRqUMu4mJww0uCHlTRUczIOaW3ywqDEB+QrG4C0guYkziQI1s
-         pOoFQbp2oTJI7SkdWJk9t83ZYVGhHyP7z8WnfTVFU7T2LXXzwDg1Bb/fSum/22oVp8zj
-         gie8OZ/nnJr4CEEwQjVV79rN9PHahAnmWLOKTa23yUCOFUhdy+uuvoDBTI5NYO5t7jGd
-         CUoK3GX3LCm3SvYnSMSxW6/sbpm0mQj+BZI2Pv4oEM16w29TFr1QhQfmQdKEyDyqWnJw
-         32zw==
-X-Forwarded-Encrypted: i=1; AJvYcCXOmLVn7pfbE8oRLI/5QH8kcAr+HoI065huFTe6t+dtQ04ga9pMx9JgYtJ9rQ57RvJLq2bEoj5/VU3ymw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YybXCCBcR42XTb7UIkOsU0oFvl8PZRkwVOx+cndj3mJqGYFGItl
-	OVdZpvw/KXQyLaQfeZh1gGbHvMA+dK/0z4DdJYSXnowkW5VMDhdt0VPPgDh4wAlgjUcHLI/Az2Q
-	bCK5X8ha+xGEVmJP0gJz/6BYCgolE/m5eIR/0+RxUbdizezzBLt8I
-X-Gm-Gg: AY/fxX7BYh6wMYfKD9N8A3cj7vTbW0ZdqrCghxXqtAYK6aCNjmHAjmqBLhCd+4C5b0O
-	dBjhmgmLke/ep8MBRA9EKa8f0O6Kz4+K49/23bpkJww/YE/9ExAYO6+SyV9K17FEK7fTlEe6UyB
-	hPOFV6jZumE4VKXX1ApwZEWojlMLmaQ2hqdiEbN2b9ATAZIHGFjcZ+h6IQnug+l4Pn1qNCkU4CE
-	sgbbO0+57VtVsW4H5CsNVQgyDZvrjzvM0SRMqV+YwaZbvfd9hUpK6YFG8BaXPZlrrhP8Oay
-X-Google-Smtp-Source: AGHT+IEcJsxz5ZEELPu6pxm4vJWkI5dllQ3f0rhBgVRfUNTGD/NqYNvbUp05BHQg6uvLwAj4rrBSA4R+LEUpwwKjShM=
-X-Received: by 2002:a05:7022:989:b0:119:e56b:c3f3 with SMTP id
- a92af1059eb24-11f34c47c98mr1052360c88.3.1765558244555; Fri, 12 Dec 2025
- 08:50:44 -0800 (PST)
+        bh=9yUoX6IlmaVABsKZSs5vcTjT9zf/kVXn7uDf0h+MBAI=;
+        b=EsmhLlBYfuvMDi5wyPqZDe4ghYNPnXxA5cYTV7LHbKGgWQuP4giwhEdnQkp/z+Pdos
+         Ri4urRonqfRrjbcDM6tftSiK5HVq08LIa9j+3jR3+yaWv3QzINLu9xwP20qNXWFOo4WR
+         u33dTdqqSCn1m/nxZdP2+jTPvymwhD8aepIqf6xZN7swfKb6P+eV2MUgVXY70v4UAwZv
+         hsQu2sjZWW4IIIC4Z+9Eeit3Yc6JW6DZJIxPp1LLLqS2NYKpLBK1OvHUy2/5+p4o0x9j
+         7/QHvpzn5jUw0q+a5eBiNkd1vUn41gkQ2FpA0PgC27xdjikL65sZEJWRAgaPQFq3OHf1
+         YcyA==
+X-Forwarded-Encrypted: i=1; AJvYcCXgzkrcJML3WlS+NUltVtpIohNFjx8YlLgUFC4ikCG2+ijEQgb9Mcs6uTvgRhb5KNjnavFEhfz/I9zbkA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZMpeyyMLan+3fDForjCdec+f4C+BTFAPfMNp7sMlJLAGxJcds
+	eaVROLm0VNS8MGmmRfg9kD8OFYDcjuoB3SgaQUc2Il1xvi7IIvvjLg/RatFqvsBhJp6D5juVjGL
+	H+BmCcv27bPrJqu21WLsFn0C5qxcxx9NqcE38BHKbEg==
+X-Gm-Gg: AY/fxX4cAmYeXkvz02xnhXdv1gLLagikF5OhnGo0+N5/e/7lzw3BuicTr8aQE2t/SYy
+	4uLekia79TFdaTLWdqTvo9DjRC5IipFBP0GG3Kl0LKwOOKW1sXR3ca8Tf4HjdrAmgraVq+maBW3
+	oK8efZebiyNDcauZlvo5JSiTD1Ize3+w1kkHxWj+WsfLUGpUp7myLZ2EtFlVmqSaACcj24sZ+nT
+	yukI/SIACcWrbxyjtbZzHIOuJ/A5n/QlePbBNlc3BVXuahPgS7v13HH8OIMIauGU1+ZwovG
+X-Google-Smtp-Source: AGHT+IFo2oThuXlxpAMmG6maujA/xAWlvr6Av4IWgt3JGX+qtRy7yr9KZrCpmXciYBcF6U3PjgtLThSuGqLGtGppjYE=
+X-Received: by 2002:a05:7022:b98:b0:11e:3e9:3e89 with SMTP id
+ a92af1059eb24-11f34c5d690mr1179144c88.7.1765558675148; Fri, 12 Dec 2025
+ 08:57:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251212051658.1618543-1-csander@purestorage.com>
- <20251212051658.1618543-5-csander@purestorage.com> <aTv06QEJIYyJKCVQ@fedora>
-In-Reply-To: <aTv06QEJIYyJKCVQ@fedora>
+References: <20251212143415.485359-1-ming.lei@redhat.com>
+In-Reply-To: <20251212143415.485359-1-ming.lei@redhat.com>
 From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Fri, 12 Dec 2025 08:50:32 -0800
-X-Gm-Features: AQt7F2oV7VYFcC0-QUXJvhB3eLP1TVAemCkfOOOvLxD3ZsJNAOgqc72w4YyEZl8
-Message-ID: <CADUfDZq7wno5FEKrJEQ-YNc_VzshNAoefjsrRL4AC6QK4c_DoA@mail.gmail.com>
-Subject: Re: [PATCH v2 4/8] selftests: ublk: use auto_zc for PER_IO_DAEMON
- tests in stress_04
+Date: Fri, 12 Dec 2025 08:57:42 -0800
+X-Gm-Features: AQt7F2pp0AEolB2bsyVVMfU-91rnyoxHQVFKWMhiUTtEzX0NLQnhPLswj1CN6-0
+Message-ID: <CADUfDZq5pXN4qAnoM4nrM6Pisfi-B2B4LzQ1OO6jmofxZqEA8g@mail.gmail.com>
+Subject: Re: [PATCH V2] ublk: fix deadlock when reading partition table
 To: Ming Lei <ming.lei@redhat.com>
-Cc: Shuah Khan <shuah@kernel.org>, linux-block@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	Uday Shankar <ushankar@purestorage.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 12, 2025 at 2:56=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
+On Fri, Dec 12, 2025 at 6:34=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
 e:
 >
-> On Thu, Dec 11, 2025 at 10:16:54PM -0700, Caleb Sander Mateos wrote:
-> > stress_04 is described as "run IO and kill ublk server(zero copy)" but
-> > the --per_io_tasks tests cases don't use zero copy. Plus, one of the
-> > test cases is duplicated. Add --auto_zc to these test cases and
-> > --auto_zc_fallback to one of the duplicated ones. This matches the test
-> > cases in stress_03.
-> >
-> > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-> > ---
-> >  tools/testing/selftests/ublk/test_stress_04.sh | 8 ++++----
-> >  1 file changed, 4 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/tools/testing/selftests/ublk/test_stress_04.sh b/tools/tes=
-ting/selftests/ublk/test_stress_04.sh
-> > index 3f901db4d09d..965befcee830 100755
-> > --- a/tools/testing/selftests/ublk/test_stress_04.sh
-> > +++ b/tools/testing/selftests/ublk/test_stress_04.sh
-> > @@ -38,14 +38,14 @@ if _have_feature "AUTO_BUF_REG"; then
-> >       ublk_io_and_kill_daemon 256M -t stripe -q 4 --auto_zc --no_ublk_f=
-ixed_fd "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
-> >       ublk_io_and_kill_daemon 8G -t null -q 4 -z --auto_zc --auto_zc_fa=
-llback &
-> >  fi
-> >
-> >  if _have_feature "PER_IO_DAEMON"; then
-> > -     ublk_io_and_kill_daemon 8G -t null -q 4 --nthreads 8 --per_io_tas=
-ks &
-> > -     ublk_io_and_kill_daemon 256M -t loop -q 4 --nthreads 8 --per_io_t=
-asks "${UBLK_BACKFILES[0]}" &
-> > -     ublk_io_and_kill_daemon 256M -t stripe -q 4 --nthreads 8 --per_io=
-_tasks "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
-> > -     ublk_io_and_kill_daemon 8G -t null -q 4 --nthreads 8 --per_io_tas=
-ks &
-> > +     ublk_io_and_kill_daemon 8G -t null -q 4 --auto_zc --nthreads 8 --=
-per_io_tasks &
-> > +     ublk_io_and_kill_daemon 256M -t loop -q 4 --auto_zc --nthreads 8 =
---per_io_tasks "${UBLK_BACKFILES[0]}" &
-> > +     ublk_io_and_kill_daemon 256M -t stripe -q 4 --auto_zc --nthreads =
-8 --per_io_tasks "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
-> > +     ublk_io_and_kill_daemon 8G -t null -q 4 --auto_zc --auto_zc_fallb=
-ack --nthreads 8 --per_io_tasks &
+> When one process(such as udev) opens ublk block device (e.g., to read
+> the partition table via bdev_open()), a deadlock[1] can occur:
 >
-> The last line needs `-z`, otherwise the following warning is dumped:
+> 1. bdev_open() grabs disk->open_mutex
+> 2. The process issues read I/O to ublk backend to read partition table
+> 3. In __ublk_complete_rq(), blk_update_request() or blk_mq_end_request()
+>    runs bio->bi_end_io() callbacks
+> 4. If this triggers fput() on file descriptor of ublk block device, the
+>    work may be deferred to current task's task work (see fput() implement=
+ation)
+> 5. This eventually calls blkdev_release() from the same context
+> 6. blkdev_release() tries to grab disk->open_mutex again
+> 7. Deadlock: same task waiting for a mutex it already holds
 >
-> ```
-> # selftests: ublk: test_stress_04.sh
-> # main: auto_zc_fallback is set but neither F_AUTO_BUF_REG nor F_SUPPORT_=
-ZERO_COPY is enabled
-> # stress_04 : [FAIL]
-> ```
+> The fix is to run blk_update_request() and blk_mq_end_request() with bott=
+om
+> halves disabled. This forces blkdev_release() to run in kernel work-queue
+> context instead of current task work context, and allows ublk server to m=
+ake
+> forward progress, and avoids the deadlock.
+>
+> Fixes: 71f28f3136af ("ublk_drv: add io_uring based userspace block driver=
+")
+> Link: https://github.com/ublk-org/ublksrv/issues/170 [1]
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 
-Yeah, duh! I swear I tested this... Oh, it's because I had revised
-this patch following your initial feedback but replaced it with the
-version from v1 right before sending it. Will fix.
+Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
 
-Thanks,
-Caleb
+> ---
+> V2:
+>         - cover another two cases of ending request(Caleb Sander Mateos)
+>
+>  drivers/block/ublk_drv.c | 28 ++++++++++++++++++++++++----
+>  1 file changed, 24 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index df9831783a13..38f138f248e6 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -1080,12 +1080,20 @@ static inline struct ublk_uring_cmd_pdu *ublk_get=
+_uring_cmd_pdu(
+>         return io_uring_cmd_to_pdu(ioucmd, struct ublk_uring_cmd_pdu);
+>  }
+>
+> +static void ublk_end_request(struct request *req, blk_status_t error)
+> +{
+> +       local_bh_disable();
+> +       blk_mq_end_request(req, error);
+> +       local_bh_enable();
+> +}
+> +
+>  /* todo: handle partial completion */
+>  static inline void __ublk_complete_rq(struct request *req, struct ublk_i=
+o *io,
+>                                       bool need_map)
+>  {
+>         unsigned int unmapped_bytes;
+>         blk_status_t res =3D BLK_STS_OK;
+> +       bool requeue;
+>
+>         /* failed read IO if nothing is read */
+>         if (!io->res && req_op(req) =3D=3D REQ_OP_READ)
+> @@ -1117,14 +1125,26 @@ static inline void __ublk_complete_rq(struct requ=
+est *req, struct ublk_io *io,
+>         if (unlikely(unmapped_bytes < io->res))
+>                 io->res =3D unmapped_bytes;
+>
+> -       if (blk_update_request(req, BLK_STS_OK, io->res))
+> +       /*
+> +        * Run bio->bi_end_io() from softirq context for preventing this
+> +        * ublk's blkdev_release() from being called on current's task
+> +        * work, see fput() implementation.
+> +        *
+> +        * Otherwise, ublk server may not provide forward progress in
+> +        * case of reading partition table from bdev_open() with
+> +        * disk->open_mutex grabbed, and causes dead lock.
+> +        */
+> +       local_bh_disable();
+> +       requeue =3D blk_update_request(req, BLK_STS_OK, io->res);
+> +       local_bh_enable();
+> +       if (requeue)
+>                 blk_mq_requeue_request(req, true);
+>         else if (likely(!blk_should_fake_timeout(req->q)))
+>                 __blk_mq_end_request(req, BLK_STS_OK);
+>
+>         return;
+>  exit:
+> -       blk_mq_end_request(req, res);
+> +       ublk_end_request(req, res);
+>  }
+>
+>  static struct io_uring_cmd *__ublk_prep_compl_io_cmd(struct ublk_io *io,
+> @@ -1164,7 +1184,7 @@ static inline void __ublk_abort_rq(struct ublk_queu=
+e *ubq,
+>         if (ublk_nosrv_dev_should_queue_io(ubq->dev))
+>                 blk_mq_requeue_request(rq, false);
+>         else
+> -               blk_mq_end_request(rq, BLK_STS_IOERR);
+> +               ublk_end_request(rq, BLK_STS_IOERR);
+>  }
+>
+>  static void
+> @@ -1209,7 +1229,7 @@ __ublk_do_auto_buf_reg(const struct ublk_queue *ubq=
+, struct request *req,
+>                         ublk_auto_buf_reg_fallback(ubq, req->tag);
+>                         return AUTO_BUF_REG_FALLBACK;
+>                 }
+> -               blk_mq_end_request(req, BLK_STS_IOERR);
+> +               ublk_end_request(req, BLK_STS_IOERR);
+>                 return AUTO_BUF_REG_FAIL;
+>         }
+>
+> --
+> 2.47.1
+>
