@@ -1,58 +1,58 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B44814B953
-	for <linux-block@vger.kernel.org>; Fri, 12 Dec 2025 07:47:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 828A71D5147
+	for <linux-block@vger.kernel.org>; Fri, 12 Dec 2025 08:23:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765525645; cv=none; b=Nwhm/yJkqYTRGcUAXprx09iUOlHGlVhfMopibVBIpjjsQhuRsHn2yDj3LljyxaFm9NT0gCdzAy72LWhr0LvZeg/IxEqh7SO5ymL8Uifj6EzWOnXhwsfxuGUl/XPzYmMxmWrRyKmX6KALLzZDfIVUYviqyeSVKklPyWcuUBxmb3Y=
+	t=1765527798; cv=none; b=mwhc+VHllCTlzICXLK8VmW227e3sOJPpFtxlO2Wu+TX4wiFCG/XttMN3IPyRIkbnJIKOlfuutJtnnwLNN7FbyhiF/mRCTLNERIJMobKvSr9as+xiNb/KcsHflpHSsApQKn3jxZ7Fon1bFwYZQKyQHq63ceMOuY8GWreYfokvTMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765525645; c=relaxed/simple;
-	bh=YfNrZr7V9XO1cq+fNCubqmX3H6+Fwf9B3uAc2MLD090=;
+	s=arc-20240116; t=1765527798; c=relaxed/simple;
+	bh=HJCYYPihd5VwkRkfhXPzRF4dmoMlF5CcCSIxsAPbujo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Gcq7nyjxJSiXyDFiv0eyvq4p8R7bB9TIMGovOVSvAi6uOgx+XWez8GSCX3Z76WsBYhfBdnqmfctp3G3RbkJ595aYSyglqduy9BMrLOliCA28/ML/si0Bd+Nyj42vhHjO05SCpb2I6jEXYVLEiv80v9R7M5gRDB2QaHAgBp7IKog=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XmWq54Im; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=UllVn359XB3rGUeZX3RaeVK3q3uFBwXEPtK04AjNzEhHcA3JyOkT6ApQtu9U+rJWr90EXCeSt4wShD3SQxVpiWqwgyeCBqWlnCrxmzlHUFUY5k4aLlbV8Lcfh7eRvrRMI5XI8OTVx6CiVD/JsU0Fv9a2g8HFEhv6Ta9ATzuQdBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Wd9EXhmY; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XmWq54Im"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wd9EXhmY"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765525642;
+	s=mimecast20190719; t=1765527795;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=WeYiDBM/6JuC0zLK/reVdL8cvSC4h0ix0JW7mRr2k0w=;
-	b=XmWq54ImN/dfD0fUY8If/7thnsh6yAAGv2QJIdyHnhJQ4G7Y0UAiXzqK20fadjx2Je93oO
-	bz7TxP9Mm6xvYdv4Lgn7oKrQPyZR31fQF1yQm/tNgQxzpYSO49tZz8tsJw8Gyirc4S3DDV
-	48LYaBAQXxGnW9AK0bi1HmyGa5Z60tc=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+	bh=DWdzARIJkmkueujSHuzYfYoUjvfpiv/3+8T5UkDMLCI=;
+	b=Wd9EXhmYOMTrD5mWEQkLF+Cvhfm1EJiVbAgqZQJaTKfnLT7a9Ja4GvzfRRkS37lRIibJK8
+	ALeaBIs8y8j0CkbBsYFLHyuLC00YrCr6eaGavJ3TT2im8dILQsYIztLFGzEQXIe/QHktQ4
+	TZIpu9CaY41J1JFH0VMX9flYCl25ra4=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-587-QR0ITZm5O-y0G9XwQRow-g-1; Fri,
- 12 Dec 2025 02:47:16 -0500
-X-MC-Unique: QR0ITZm5O-y0G9XwQRow-g-1
-X-Mimecast-MFC-AGG-ID: QR0ITZm5O-y0G9XwQRow-g_1765525635
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-257-uYGbusuSNr-P-POr_M3AYg-1; Fri,
+ 12 Dec 2025 03:23:14 -0500
+X-MC-Unique: uYGbusuSNr-P-POr_M3AYg-1
+X-Mimecast-MFC-AGG-ID: uYGbusuSNr-P-POr_M3AYg_1765527793
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9CDB718011DF;
-	Fri, 12 Dec 2025 07:47:14 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2DEEB18002DE;
+	Fri, 12 Dec 2025 08:23:13 +0000 (UTC)
 Received: from fedora (unknown [10.72.116.129])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4BA721800451;
-	Fri, 12 Dec 2025 07:47:07 +0000 (UTC)
-Date: Fri, 12 Dec 2025 15:47:02 +0800
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A534030001A2;
+	Fri, 12 Dec 2025 08:23:08 +0000 (UTC)
+Date: Fri, 12 Dec 2025 16:22:57 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Yu Kuai <yukuai@fnnas.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Nilay Shroff <nilay@linux.ibm.com>, Yu Kuai <yukuai3@huawei.com>,
-	Guangwu Zhang <guazhang@redhat.com>
-Subject: Re: [PATCH] block: fix race between wbt_enable_default and IO
- submission
-Message-ID: <aTvIdnk3Pl-L-4s_@fedora>
-References: <20251210091001.236296-1-ming.lei@redhat.com>
- <52b5f2a4-e5e1-4917-8620-490fde89cfe7@fnnas.com>
+	Uday Shankar <ushankar@purestorage.com>
+Subject: Re: [PATCH] ublk: fix deadlock when reading partition table
+Message-ID: <aTvQ4UokhqHtKGll@fedora>
+References: <20251211083824.349210-1-ming.lei@redhat.com>
+ <CADUfDZrVk_juib6yw8vrrYP0rrhrt7BxQPn89GeDi5q-XHNHOw@mail.gmail.com>
+ <aTtFMvlgDvxfF5kN@fedora>
+ <CADUfDZqh-jdJzK4E9bz0V12W=d4vGZOJMgC0F-EzXvd8dT_+4Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,119 +62,87 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <52b5f2a4-e5e1-4917-8620-490fde89cfe7@fnnas.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+In-Reply-To: <CADUfDZqh-jdJzK4E9bz0V12W=d4vGZOJMgC0F-EzXvd8dT_+4Q@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Fri, Dec 12, 2025 at 01:56:20PM +0800, Yu Kuai wrote:
-> Hi,
+On Thu, Dec 11, 2025 at 08:56:46PM -0800, Caleb Sander Mateos wrote:
+> On Thu, Dec 11, 2025 at 2:27 PM Ming Lei <ming.lei@redhat.com> wrote:
+> >
+> > On Thu, Dec 11, 2025 at 12:30:35PM -0800, Caleb Sander Mateos wrote:
+> > > On Thu, Dec 11, 2025 at 12:38 AM Ming Lei <ming.lei@redhat.com> wrote:
+> > > >
+> > > > When one process(such as udev) opens ublk block device (e.g., to read
+> > > > the partition table via bdev_open()), a deadlock[1] can occur:
+> > > >
+> > > > 1. bdev_open() grabs disk->open_mutex
+> > > > 2. The process issues read I/O to ublk backend to read partition table
+> > >
+> > > I'm not sure I understand how a process could be issuing read I/O to
+> > > the block device before bdev_open() has returned? Or do you mean that
+> > > bdev_open() is issuing read I/O for the partition table via
+> > > blkdev_get_whole() -> bdev_disk_changed() -> blk_add_partitions() ->
+> > > check_partition()?
+> >
+> > Yes, disk->open_mutex is grabbed and waiting for reading partition table.
+> >
+> > >
+> > > > 3. In __ublk_complete_rq(), blk_update_request() or blk_mq_end_request()
+> > > >    runs bio->bi_end_io() callbacks
+> > > > 4. If this triggers fput() on file descriptor of ublk block device, the
+> > > >    work may be deferred to current task's task work (see fput() implementation)
+> > >
+> > > What is the bi_end_io implementation that results in an fput() call?
+> >
+> > libaio calls fput() via ->ki_complete() via bio->bi_end_io(), io-uring may
+> > call it from io_free_rsrc_node().
+> >
+> > https://github.com/ublk-org/ublksrv/issues/170#issuecomment-3635162644
+> >
+> > >
+> > > > 5. This eventually calls blkdev_release() from the same context
+> > > > 6. blkdev_release() tries to grab disk->open_mutex again
+> > > > 7. Deadlock: same task waiting for a mutex it already holds
+> > > >
+> > > > The fix is to run blk_update_request() and blk_mq_end_request() with bottom
+> > > > halves disabled. This forces blkdev_release() to run in kernel work-queue
+> > > > context instead of current task work context, and allows ublk server to make
+> > > > forward progress, and avoids the deadlock.
+> > >
+> > > The idea here seems reasonable, but I can't say I understand all the
+> > > pieces resulting in the deadlock.
+> >
+> > Please see the following scenarios:
+> >
+> > 1) task A: fio is running IO over /dev/ublkb0 for 5secs
+> >
+> > 2) task B: just when fio is exiting, another task is calling into ioctl(RRPART) on
+> > /dev/ublkb0, waiting for reading partition with disk->open_mutex held.
+> >
+> > 3) in ublk server task, for some reason, fput() drops the `struct
+> > file`'s last reference from task A, so bdev_release() is called from
+> > task_work_run() in ublk server context. However, task B is holding
+> > disk->open_mutex, so bdev_release() hangs forever, because this ublk server
+> > can't handle IO for task B any more.
 > 
-> 在 2025/12/10 17:10, Ming Lei 写道:
-> > When wbt_enable_default() is moved out of queue freezing in elevator_change(),
-> > it can cause the wbt inflight counter to become negative (-1), leading to hung
-> > tasks in the writeback path. Tasks get stuck in wbt_wait() because the counter
-> > is in an inconsistent state.
-> >
-> > The issue occurs because wbt_enable_default() could race with IO submission,
-> > allowing the counter to be decremented before proper initialization. This manifests
-> > as:
-> >
-> >    rq_wait[0]:
-> >      inflight:             -1
-> >      has_waiters:        True
-> >
-> > And results in hung task warnings like:
-> >    task:kworker/u24:39 state:D stack:0 pid:14767
-> >    Call Trace:
-> >      rq_qos_wait+0xb4/0x150
-> >      wbt_wait+0xa9/0x100
-> >      __rq_qos_throttle+0x24/0x40
-> >      blk_mq_submit_bio+0x672/0x7b0
-> >      ...
-> >
-> > Fix this by:
-> >
-> > 1. Splitting wbt_enable_default() into:
-> >     - __wbt_enable_default(): Returns true if wbt_init() should be called
-> >     - wbt_enable_default(): Wrapper for existing callers (no init)
-> >     - wbt_init_enable_default(): New function that checks and inits WBT
-> >
-> > 2. Using wbt_init_enable_default() in blk_register_queue() to ensure
-> >     proper initialization during queue registration
-> >
-> > 3. Move wbt_init() out of wbt_enable_default() which is only for enabling
-> >     disabled wbt from bfq and iocost, and wbt_init() isn't needed. Then the
-> >     original lock warning can be avoided.
-> >
-> > 4. Removing the ELEVATOR_FLAG_ENABLE_WBT_ON_EXIT flag and its handling
-> >     code since it's no longer needed
-> >
-> > This ensures WBT is properly initialized before any IO can be submitted,
-> > preventing the counter from going negative.
-> >
-> > Cc: Nilay Shroff <nilay@linux.ibm.com>
-> > Cc: Yu Kuai <yukuai3@huawei.com>
-> > Cc: Guangwu Zhang <guazhang@redhat.com>
-> > Fixes: 78c271344b6f ("block: move wbt_enable_default() out of queue freezing from sched ->exit()")
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >   block/bfq-iosched.c |  2 +-
-> >   block/blk-sysfs.c   |  2 +-
-> >   block/blk-wbt.c     | 20 ++++++++++++++++----
-> >   block/blk-wbt.h     |  5 +++++
-> >   block/elevator.c    |  4 ----
-> >   block/elevator.h    |  1 -
-> >   6 files changed, 23 insertions(+), 11 deletions(-)
-> >
-> > diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> > index 4a8d3d96bfe4..6e54b1d3d8bc 100644
-> > --- a/block/bfq-iosched.c
-> > +++ b/block/bfq-iosched.c
-> > @@ -7181,7 +7181,7 @@ static void bfq_exit_queue(struct elevator_queue *e)
-> >   
-> >   	blk_stat_disable_accounting(bfqd->queue);
-> >   	blk_queue_flag_clear(QUEUE_FLAG_DISABLE_WBT_DEF, bfqd->queue);
-> > -	set_bit(ELEVATOR_FLAG_ENABLE_WBT_ON_EXIT, &e->flags);
-> > +	wbt_enable_default(bfqd->queue->disk);
-> >   
-> >   	kfree(bfqd);
-> >   }
-> > diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-> > index 8684c57498cc..e0a70d26972b 100644
-> > --- a/block/blk-sysfs.c
-> > +++ b/block/blk-sysfs.c
-> > @@ -932,7 +932,7 @@ int blk_register_queue(struct gendisk *disk)
-> >   		elevator_set_default(q);
-> >   
-> >   	blk_queue_flag_set(QUEUE_FLAG_REGISTERED, q);
-> > -	wbt_enable_default(disk);
-> > +	wbt_init_enable_default(disk);
-> >   
-> >   	/* Now everything is ready and send out KOBJ_ADD uevent */
-> >   	kobject_uevent(&disk->queue_kobj, KOBJ_ADD);
-> > diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-> > index eb8037bae0bd..0974875f77bd 100644
-> > --- a/block/blk-wbt.c
-> > +++ b/block/blk-wbt.c
-> > @@ -699,7 +699,7 @@ static void wbt_requeue(struct rq_qos *rqos, struct request *rq)
-> >   /*
-> >    * Enable wbt if defaults are configured that way
-> >    */
-> > -void wbt_enable_default(struct gendisk *disk)
-> > +static bool __wbt_enable_default(struct gendisk *disk)
-> >   {
-> >   	struct request_queue *q = disk->queue;
-> >   	struct rq_qos *rqos;
-> > @@ -716,19 +716,31 @@ void wbt_enable_default(struct gendisk *disk)
-> >   		if (enable && RQWB(rqos)->enable_state == WBT_STATE_OFF_DEFAULT)
-> >   			RQWB(rqos)->enable_state = WBT_STATE_ON_DEFAULT;
-> 
-> Is this problem due to above state? Changing the state is not under queue frozen.
-> The commit message is not quite clear to me. If so, the changes looks good to me,
-> by setting the state with queue frozen.
+> Ah okay this makes more sense, I thought the fput() was for the
+> completion of the partition table read. But I see now it can be for
+> any other process that happens to have opened the same ublk disk. The
+> "userspace thread and not in interrupt/softirq" logic in
+> __fput_deferred() to decide to close the file in task work seems
+> pretty suspect. The assumption seems to be that blocking a userspace
+> thread is fine since it won't be blocking any kernel threads, but
+> that's clearly wrong for a userspace block device. I wonder if any
+> similar deadlocks are possible with fuse? Pretending the ublk server
 
-Yes, rwb_enabled() checks the state, which can be update exactly between wbt_wait()
-(rq_qos_throttle()) and wbt_track()(rq_qos_track), then the inflight counter will
-become negative.
+It should be one block only issue, cause it is related disk->open_disk.
+
+> thread is in softirq context when completing the seems a bit hacky,
+> but I can see it may be the simplest fix.
+> 
+> Do the blk_mq_end_request() calls in__ublk_do_auto_buf_reg() and
+> __ublk_abort_rq() not also need this protection?
+
+I think all needs this protection, will do it in v2.
 
 
 Thanks,
