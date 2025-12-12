@@ -1,193 +1,477 @@
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF4635958
-	for <linux-block@vger.kernel.org>; Fri, 12 Dec 2025 16:57:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3493026A0A7
+	for <linux-block@vger.kernel.org>; Fri, 12 Dec 2025 17:02:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765558677; cv=none; b=SsCxZdzOuaxnEb+nVfkkP1HY1ormUcgzH94FYtgoSHU2HgKcqB9qVNB3AZkZ2odJCWxnTuNmNf/UB82K7mSSd84gAcREnk9LYKrZ43vGwE90Kn7UJ3zwmHavEd6T5YMXI9VN80wP4JkY+D4M8HUicnZ0oZwOwHrJ8t+/WKdXbfg=
+	t=1765558939; cv=none; b=FWEX+JvsNcSlqsqoV0BeQ9Fkmbzc/Y7GvX59QDdX5/j3GzvnqKdVkZfrJF/XV3ajLpuJm7PWj3Buidv6avSG3pZNcW574KfrfzIWDRs/Wl3iG0eargrxPRUyUQA7SKJbhAj5gaOfxwjzo4YPgx3ccXsTW/JV8CnTI4mTbFygaFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765558677; c=relaxed/simple;
-	bh=rm8eBWO3HQ1GbgWTuwxH95vgQ+0Jxe/bYzWzLHUXaXY=;
+	s=arc-20240116; t=1765558939; c=relaxed/simple;
+	bh=464KWwNBKNfXPoEHxeXTFpwEqv44+W/SD/IdW4t7oPA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oVxDn2sqw1+zlJiHIDnTaQHLidGltj0AMz/5/jFrSc+y27qvA3cyQRPHo0OkMuonY2BwRqTAvls8ADRkvKrCuDpKZp0uv/e+9zQtBQuuEydfvfZHk03BKBNGQwLc8aREYlr60wajW25Z1u55p/6woun9AXTGBfQRX2mlzP1eLNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Z0Pu1GpZ; arc=none smtp.client-ip=209.85.216.44
+	 To:Cc:Content-Type; b=LUzN+/CNz7mjBNiWwv0vzWvxlNAwx7CggacsNhcEocGhBxjUE/NghPqRypo+CZJt8BM1JND5hAEwOr/N20o6eao1iznnu66dyhoDPb1QqZsTpgC1+V/3RcRRgSm6F3hkjzVW2Zp8/piYSxQNaRmj3I3BYjez3JbR9ruKWO2YePk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=RvlH1I4j; arc=none smtp.client-ip=209.85.210.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Z0Pu1GpZ"
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-34abca71f9cso187465a91.3
-        for <linux-block@vger.kernel.org>; Fri, 12 Dec 2025 08:57:55 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="RvlH1I4j"
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-7a9fb70f7a9so56700b3a.1
+        for <linux-block@vger.kernel.org>; Fri, 12 Dec 2025 09:02:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1765558675; x=1766163475; darn=vger.kernel.org;
+        d=purestorage.com; s=google2022; t=1765558935; x=1766163735; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9yUoX6IlmaVABsKZSs5vcTjT9zf/kVXn7uDf0h+MBAI=;
-        b=Z0Pu1GpZ4bLT4ht919iJioOJ1Ktt1heA0xxdmo2EbBDuOPVN/zRxrlG7u0RZtTNUGe
-         UStwU97dW9gM0HjRYcuNc7IwIkDfFA/M29msuryzAU4DXeC+lGB5OG0HmvQj4CwsoBp9
-         umI8POhxuZmgrPRdKNQUHvZYnL9yfO28tFDV/4EwcksEmuxy49R0EGCokYhFhJo2lyKG
-         NGDxyOhVvoC5Quztyfa4dG0s1Y3JxEVoMlnLUtmhq5tE4Bhayp4QmIRk1ycgIShC2PEa
-         SmliPrrTvxSrnOeixGvf/abyrLc/jW7yTftqHEyk5qDz4RZjSB1/VXIvyNmu0JLEPXmI
-         A/2w==
+        bh=ym6jAAZF+CDsp3ilPffvqhNgKf/5Ozjkc/vStK+GCWE=;
+        b=RvlH1I4jjO/CPZcHOFGnLOVg1XG/qNL1/MGvHqoabGCMTZAB2X5IFVSaPnEBcJwl3B
+         txW+d5r7cEpe+CoWTWjVuUJnkzX8i1AfvJQWSPo2vHPPVtHM0aAsEXbjohLL0FeJcgao
+         Q45Ijgju3gX96PGMwr02RzppvTbZ7ur5iDPMr6Pjxa1VdPEE8zuCA4DF4H1ltD0awgzs
+         dwQFaeCP8bZwl3aEOHi+cNUhdi9lMpAXfLWH1XYVRwBWmI+BXhlBOmu+7JZVfvGuhMp7
+         FX5nMIYy9fy+fcgHvHGIg/l20vlDTk6zlxBih1VwAOSHz0hCGPjsNP4zIFgoBuVtoK6w
+         RMFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765558675; x=1766163475;
+        d=1e100.net; s=20230601; t=1765558935; x=1766163735;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=9yUoX6IlmaVABsKZSs5vcTjT9zf/kVXn7uDf0h+MBAI=;
-        b=EsmhLlBYfuvMDi5wyPqZDe4ghYNPnXxA5cYTV7LHbKGgWQuP4giwhEdnQkp/z+Pdos
-         Ri4urRonqfRrjbcDM6tftSiK5HVq08LIa9j+3jR3+yaWv3QzINLu9xwP20qNXWFOo4WR
-         u33dTdqqSCn1m/nxZdP2+jTPvymwhD8aepIqf6xZN7swfKb6P+eV2MUgVXY70v4UAwZv
-         hsQu2sjZWW4IIIC4Z+9Eeit3Yc6JW6DZJIxPp1LLLqS2NYKpLBK1OvHUy2/5+p4o0x9j
-         7/QHvpzn5jUw0q+a5eBiNkd1vUn41gkQ2FpA0PgC27xdjikL65sZEJWRAgaPQFq3OHf1
-         YcyA==
-X-Forwarded-Encrypted: i=1; AJvYcCXgzkrcJML3WlS+NUltVtpIohNFjx8YlLgUFC4ikCG2+ijEQgb9Mcs6uTvgRhb5KNjnavFEhfz/I9zbkA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZMpeyyMLan+3fDForjCdec+f4C+BTFAPfMNp7sMlJLAGxJcds
-	eaVROLm0VNS8MGmmRfg9kD8OFYDcjuoB3SgaQUc2Il1xvi7IIvvjLg/RatFqvsBhJp6D5juVjGL
-	H+BmCcv27bPrJqu21WLsFn0C5qxcxx9NqcE38BHKbEg==
-X-Gm-Gg: AY/fxX4cAmYeXkvz02xnhXdv1gLLagikF5OhnGo0+N5/e/7lzw3BuicTr8aQE2t/SYy
-	4uLekia79TFdaTLWdqTvo9DjRC5IipFBP0GG3Kl0LKwOOKW1sXR3ca8Tf4HjdrAmgraVq+maBW3
-	oK8efZebiyNDcauZlvo5JSiTD1Ize3+w1kkHxWj+WsfLUGpUp7myLZ2EtFlVmqSaACcj24sZ+nT
-	yukI/SIACcWrbxyjtbZzHIOuJ/A5n/QlePbBNlc3BVXuahPgS7v13HH8OIMIauGU1+ZwovG
-X-Google-Smtp-Source: AGHT+IFo2oThuXlxpAMmG6maujA/xAWlvr6Av4IWgt3JGX+qtRy7yr9KZrCpmXciYBcF6U3PjgtLThSuGqLGtGppjYE=
-X-Received: by 2002:a05:7022:b98:b0:11e:3e9:3e89 with SMTP id
- a92af1059eb24-11f34c5d690mr1179144c88.7.1765558675148; Fri, 12 Dec 2025
- 08:57:55 -0800 (PST)
+        bh=ym6jAAZF+CDsp3ilPffvqhNgKf/5Ozjkc/vStK+GCWE=;
+        b=PQFwGM0rEgGGris+McEXBA7NzROnMxgDX4dI0rVUUXkz1XCWA4ftcYsZpng/363PN8
+         b02feyEua45FFyceNPtJktvhSdUJINW+J++v/JDLU//j4CK74aAZkX7l1dIafkscDpoy
+         Cv0mPHqiiWD99IEC++NU0WNpKjKrguqjEm41RDmugvJXhDl/vcccbRONN7DyMPEVkjFm
+         BqENiDt8xVB+VYh5W7Yu8yRuD+WG2JrcZjYWs7gNcR9OymYiToSUH2/GnQjYZ5WxIdvY
+         dZvoMunaWAsVjakRHFztfJT8E0q0Afc3d7jb35SwLhNHOnQzhovGNOxXAXR3g6+paGi+
+         DQsg==
+X-Forwarded-Encrypted: i=1; AJvYcCUJhJjBTN63lhihH6dwAY6cn/V7wwKQ489tysxTginryZ9/SwxjZXPZXZCuO3MiZV29Kj2AFAeB0AWZQg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlD3afiYlMDVahRjMEEe3BdOP3/4ht01u1qnxLGksxYMX6L8eP
+	iNFf2LkJuyj8vK63YyZ71sSzeHtjA+yZS74R/cnFT2Q0SwEyAluQ5GFiTrIt6mbzVcDI0a3Y8yX
+	YJsSxIr/mgJHhnFnDy62X3zQxvjsvyvR7VCqY70wLaA==
+X-Gm-Gg: AY/fxX56b5YnO3XwLcBIk8FTdvS/403POMZEJaHZ+bLJRLYBDhg1BDRUSQipxANJ2I/
+	9I1/WrndQBGhKZi6evGvIaXwPRpGx4Ly4+c8avxBdhrklbslVu4OTulJnNwW5Dcqin7mBijWoKP
+	ACKBkDIhVHptfFCKWlfkL1IkxXtgyKJR0qaQPdL9uuZFVcovwqACe2JKteVsqJ8ryms7B9SKFPv
+	2fPS4lxLppn0a9eCheCcF1qm9i4JBb97hd2jp9iZGWIA/t30UM8kW5nkCOM+yfCxJz78Mpt
+X-Google-Smtp-Source: AGHT+IEXNAQcy8lOTSASaTaFWGmJhQ3gw3rq6GgAdJlPgzPzsLLVyo/P44AaN99wrGW7pUYVIszDLuVADpFmt36Amrs=
+X-Received: by 2002:a05:701b:2615:b0:11e:3e9:3e97 with SMTP id
+ a92af1059eb24-11f34c3d0f0mr820170c88.6.1765558934233; Fri, 12 Dec 2025
+ 09:02:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251212143415.485359-1-ming.lei@redhat.com>
-In-Reply-To: <20251212143415.485359-1-ming.lei@redhat.com>
+References: <20251211051603.1154841-1-csander@purestorage.com>
+ <20251211051603.1154841-7-csander@purestorage.com> <aTqKLSbpQN26XLNq@fedora>
+ <CADUfDZpX3RTu4m5WZ1LrjnFRxg96qpeM0fMtw1-c=7Qn_5gKQQ@mail.gmail.com>
+ <aTtOGmEeYBZLozO8@fedora> <CADUfDZpzZ16vsWhMm6-tYfdj7EBBE_iUaLTmhyiZeR1CxT5d_g@mail.gmail.com>
+ <aTuAGQOurmAfbJc7@fedora> <CADUfDZoyU2R2KGT9573CqpkFQAAn7kksE6mV58oWeK9hg9_fNQ@mail.gmail.com>
+ <aTukkFnbsl5_I0No@fedora> <CADUfDZp3oyFSwLhuAOi24quNFYK2CxLB0dPm5dRiB-AjmHbG=Q@mail.gmail.com>
+ <aTv8vpxAapZCc6yq@fedora>
+In-Reply-To: <aTv8vpxAapZCc6yq@fedora>
 From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Fri, 12 Dec 2025 08:57:42 -0800
-X-Gm-Features: AQt7F2pp0AEolB2bsyVVMfU-91rnyoxHQVFKWMhiUTtEzX0NLQnhPLswj1CN6-0
-Message-ID: <CADUfDZq5pXN4qAnoM4nrM6Pisfi-B2B4LzQ1OO6jmofxZqEA8g@mail.gmail.com>
-Subject: Re: [PATCH V2] ublk: fix deadlock when reading partition table
+Date: Fri, 12 Dec 2025 09:02:02 -0800
+X-Gm-Features: AQt7F2q9YuZR5xEC19OSDODqghw2-7p14e93OGFRxBgg0DBHhlj-wyIl0izhhVI
+Message-ID: <CADUfDZp=J1qnjdcm7oF-7v1majbmr9iCKZnp870HHj7L0t_tFQ@mail.gmail.com>
+Subject: Re: [PATCH 6/8] selftests: ublk: forbid multiple data copy modes
 To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Uday Shankar <ushankar@purestorage.com>
+Cc: Shuah Khan <shuah@kernel.org>, linux-block@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 12, 2025 at 6:34=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
+On Fri, Dec 12, 2025 at 3:30=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
 e:
 >
-> When one process(such as udev) opens ublk block device (e.g., to read
-> the partition table via bdev_open()), a deadlock[1] can occur:
+> On Thu, Dec 11, 2025 at 09:21:37PM -0800, Caleb Sander Mateos wrote:
+> > On Thu, Dec 11, 2025 at 9:14=E2=80=AFPM Ming Lei <ming.lei@redhat.com> =
+wrote:
+> > >
+> > > On Thu, Dec 11, 2025 at 08:59:00PM -0800, Caleb Sander Mateos wrote:
+> > > > On Thu, Dec 11, 2025 at 6:38=E2=80=AFPM Ming Lei <ming.lei@redhat.c=
+om> wrote:
+> > > > >
+> > > > > On Thu, Dec 11, 2025 at 06:06:51PM -0800, Caleb Sander Mateos wro=
+te:
+> > > > > > On Thu, Dec 11, 2025 at 3:05=E2=80=AFPM Ming Lei <ming.lei@redh=
+at.com> wrote:
+> > > > > > >
+> > > > > > > On Thu, Dec 11, 2025 at 10:45:36AM -0800, Caleb Sander Mateos=
+ wrote:
+> > > > > > > > On Thu, Dec 11, 2025 at 1:09=E2=80=AFAM Ming Lei <ming.lei@=
+redhat.com> wrote:
+> > > > > > > > >
+> > > > > > > > > On Wed, Dec 10, 2025 at 10:16:01PM -0700, Caleb Sander Ma=
+teos wrote:
+> > > > > > > > > > The kublk mock ublk server allows multiple data copy mo=
+de arguments to
+> > > > > > > > > > be passed on the command line (--zero_copy, --get_data,=
+ and --auto_zc).
+> > > > > > > > > > The ublk device will be created with all the requested =
+feature flags,
+> > > > > > > > > > however kublk will only use one of the modes to interac=
+t with request
+> > > > > > > > > > data (arbitrarily preferring auto_zc over zero_copy ove=
+r get_data). To
+> > > > > > > > > > clarify the intent of the test, don't allow multiple da=
+ta copy modes to
+> > > > > > > > > > be specified. Don't set UBLK_F_USER_COPY for zero_copy,=
+ as it's an
+> > > > > > > > > > independent feature. Don't require zero_copy for auto_z=
+c_fallback, as
+> > > > > > > > > > only auto_zc is needed. Fix the test cases passing mult=
+iple data copy
+> > > > > > > > > > mode arguments.
+> > > > > > > > > >
+> > > > > > > > > > Signed-off-by: Caleb Sander Mateos <csander@purestorage=
+.com>
+> > > > > > > > > > ---
+> > > > > > > > > >  tools/testing/selftests/ublk/kublk.c          | 21 +++=
++++++++++-------
+> > > > > > > > > >  .../testing/selftests/ublk/test_generic_09.sh |  2 +-
+> > > > > > > > > >  .../testing/selftests/ublk/test_stress_03.sh  |  4 ++-=
+-
+> > > > > > > > > >  .../testing/selftests/ublk/test_stress_04.sh  |  2 +-
+> > > > > > > > > >  .../testing/selftests/ublk/test_stress_05.sh  | 10 +++=
++-----
+> > > > > > > > > >  5 files changed, 22 insertions(+), 17 deletions(-)
+> > > > > > > > > >
+> > > > > > > > > > diff --git a/tools/testing/selftests/ublk/kublk.c b/too=
+ls/testing/selftests/ublk/kublk.c
+> > > > > > > > > > index f8fa102a627f..1765c4806523 100644
+> > > > > > > > > > --- a/tools/testing/selftests/ublk/kublk.c
+> > > > > > > > > > +++ b/tools/testing/selftests/ublk/kublk.c
+> > > > > > > > > > @@ -1611,11 +1611,11 @@ int main(int argc, char *argv[]=
+)
+> > > > > > > > > >                       break;
+> > > > > > > > > >               case 'd':
+> > > > > > > > > >                       ctx.queue_depth =3D strtol(optarg=
+, NULL, 10);
+> > > > > > > > > >                       break;
+> > > > > > > > > >               case 'z':
+> > > > > > > > > > -                     ctx.flags |=3D UBLK_F_SUPPORT_ZER=
+O_COPY | UBLK_F_USER_COPY;
+> > > > > > > > > > +                     ctx.flags |=3D UBLK_F_SUPPORT_ZER=
+O_COPY;
+> > > > > > > > > >                       break;
+> > > > > > > > > >               case 'r':
+> > > > > > > > > >                       value =3D strtol(optarg, NULL, 10=
+);
+> > > > > > > > > >                       if (value)
+> > > > > > > > > >                               ctx.flags |=3D UBLK_F_USE=
+R_RECOVERY;
+> > > > > > > > > > @@ -1674,17 +1674,22 @@ int main(int argc, char *argv[]=
+)
+> > > > > > > > > >                       optind +=3D 1;
+> > > > > > > > > >                       break;
+> > > > > > > > > >               }
+> > > > > > > > > >       }
+> > > > > > > > > >
+> > > > > > > > > > -     /* auto_zc_fallback depends on F_AUTO_BUF_REG & F=
+_SUPPORT_ZERO_COPY */
+> > > > > > > > > > -     if (ctx.auto_zc_fallback &&
+> > > > > > > > > > -         !((ctx.flags & UBLK_F_AUTO_BUF_REG) &&
+> > > > > > > > > > -                 (ctx.flags & UBLK_F_SUPPORT_ZERO_COPY=
+))) {
+> > > > > > > > > > -             ublk_err("%s: auto_zc_fallback is set but=
+ neither "
+> > > > > > > > > > -                             "F_AUTO_BUF_REG nor F_SUP=
+PORT_ZERO_COPY is enabled\n",
+> > > > > > > > > > -                                     __func__);
+> > > > > > > > > > +     /* auto_zc_fallback depends on F_AUTO_BUF_REG */
+> > > > > > > > > > +     if (ctx.auto_zc_fallback && !(ctx.flags & UBLK_F_=
+AUTO_BUF_REG)) {
+> > > > > > > > > > +             ublk_err("%s: auto_zc_fallback is set but=
+ F_AUTO_BUF_REG is disabled\n",
+> > > > > > > > > > +                      __func__);
+> > > > > > > > > > +             return -EINVAL;
+> > > > > > > > > > +     }
+> > > > > > > > > > +
+> > > > > > > > > > +     if (!!(ctx.flags & UBLK_F_SUPPORT_ZERO_COPY) +
+> > > > > > > > > > +         !!(ctx.flags & UBLK_F_NEED_GET_DATA) +
+> > > > > > > > > > +         !!(ctx.flags & UBLK_F_USER_COPY) +
+> > > > > > > > > > +         !!(ctx.flags & UBLK_F_AUTO_BUF_REG) > 1) {
+> > > > > > > > > > +             fprintf(stderr, "too many data copy modes=
+ specified\n");
+> > > > > > > > > >               return -EINVAL;
+> > > > > > > > > >       }
+> > > > > > > > >
+> > > > > > > > > Actually most of them are allowed to co-exist, such as -z=
+/--auto_zc/-u.
+> > > > > > > >
+> > > > > > > > Yes, I know the ublk driver allows multiple copy mode flags=
+ to be set
+> > > > > > > > (though it will clear UBLK_F_NEED_GET_DATA if any of the ot=
+hers are
+> > > > > > > > set). However, kublk will only actually use one of the mode=
+s. For
+> > > > > > > > example, --get_data --zero_copy will use zero copy for the =
+data
+> > > > > > > > transfer, not get data. And --zero_copy --auto_zc will only=
+ use auto
+> > > > > > > > buffer registration. So I think it's confusing to allow mul=
+tiple of
+> > > > > > > > these parameters to be passed to kublk. Or do you think the=
+re is value
+> > > > > > > > in testing ublk device creation with multiple data copy mod=
+e flags
+> > > > > > > > set, but only one of the modes actually used?
+> > > > > > > >
+> > > > > > > > >
+> > > > > > > > > >
+> > > > > > > > > >       i =3D optind;
+> > > > > > > > > >       while (i < argc && ctx.nr_files < MAX_BACK_FILES)=
+ {
+> > > > > > > > > > diff --git a/tools/testing/selftests/ublk/test_generic_=
+09.sh b/tools/testing/selftests/ublk/test_generic_09.sh
+> > > > > > > > > > index bb6f77ca5522..145e17b3d2b0 100755
+> > > > > > > > > > --- a/tools/testing/selftests/ublk/test_generic_09.sh
+> > > > > > > > > > +++ b/tools/testing/selftests/ublk/test_generic_09.sh
+> > > > > > > > > > @@ -14,11 +14,11 @@ if ! _have_program fio; then
+> > > > > > > > > >       exit "$UBLK_SKIP_CODE"
+> > > > > > > > > >  fi
+> > > > > > > > > >
+> > > > > > > > > >  _prep_test "null" "basic IO test"
+> > > > > > > > > >
+> > > > > > > > > > -dev_id=3D$(_add_ublk_dev -t null -z --auto_zc --auto_z=
+c_fallback)
+> > > > > > > > > > +dev_id=3D$(_add_ublk_dev -t null --auto_zc --auto_zc_f=
+allback)
+> > > > > > > > > >  _check_add_dev $TID $?
+> > > > > > > > > >
+> > > > > > > > > >  # run fio over the two disks
+> > > > > > > > > >  fio --name=3Djob1 --filename=3D/dev/ublkb"${dev_id}" -=
+-ioengine=3Dlibaio --rw=3Dreadwrite --iodepth=3D32 --size=3D256M > /dev/nul=
+l 2>&1
+> > > > > > > > > >  ERR_CODE=3D$?
+> > > > > > > > > > diff --git a/tools/testing/selftests/ublk/test_stress_0=
+3.sh b/tools/testing/selftests/ublk/test_stress_03.sh
+> > > > > > > > > > index 3ed4c9b2d8c0..8e9f2786ef9c 100755
+> > > > > > > > > > --- a/tools/testing/selftests/ublk/test_stress_03.sh
+> > > > > > > > > > +++ b/tools/testing/selftests/ublk/test_stress_03.sh
+> > > > > > > > > > @@ -36,19 +36,19 @@ wait
+> > > > > > > > > >
+> > > > > > > > > >  if _have_feature "AUTO_BUF_REG"; then
+> > > > > > > > > >       ublk_io_and_remove 8G -t null -q 4 --auto_zc &
+> > > > > > > > > >       ublk_io_and_remove 256M -t loop -q 4 --auto_zc "$=
+{UBLK_BACKFILES[0]}" &
+> > > > > > > > > >       ublk_io_and_remove 256M -t stripe -q 4 --auto_zc =
+"${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
+> > > > > > > > > > -     ublk_io_and_remove 8G -t null -q 4 -z --auto_zc -=
+-auto_zc_fallback &
+> > > > > > > > > > +     ublk_io_and_remove 8G -t null -q 4 --auto_zc --au=
+to_zc_fallback &
+> > > > > > > > > >       wait
+> > > > > > > > > >  fi
+> > > > > > > > > >
+> > > > > > > > > >  if _have_feature "PER_IO_DAEMON"; then
+> > > > > > > > > >       ublk_io_and_remove 8G -t null -q 4 --auto_zc --nt=
+hreads 8 --per_io_tasks &
+> > > > > > > > > >       ublk_io_and_remove 256M -t loop -q 4 --auto_zc --=
+nthreads 8 --per_io_tasks "${UBLK_BACKFILES[0]}" &
+> > > > > > > > > >       ublk_io_and_remove 256M -t stripe -q 4 --auto_zc =
+--nthreads 8 --per_io_tasks "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
+> > > > > > > > > > -     ublk_io_and_remove 8G -t null -q 4 -z --auto_zc -=
+-auto_zc_fallback --nthreads 8 --per_io_tasks &
+> > > > > > > > > > +     ublk_io_and_remove 8G -t null -q 4 --auto_zc --au=
+to_zc_fallback --nthreads 8 --per_io_tasks &
+> > > > > > > > > >       wait
+> > > > > > > > > >  fi
+> > > > > > > > > >
+> > > > > > > > > >  _cleanup_test "stress"
+> > > > > > > > > >  _show_result $TID $ERR_CODE
+> > > > > > > > > > diff --git a/tools/testing/selftests/ublk/test_stress_0=
+4.sh b/tools/testing/selftests/ublk/test_stress_04.sh
+> > > > > > > > > > index c7220723b537..6e165a1f90b4 100755
+> > > > > > > > > > --- a/tools/testing/selftests/ublk/test_stress_04.sh
+> > > > > > > > > > +++ b/tools/testing/selftests/ublk/test_stress_04.sh
+> > > > > > > > > > @@ -35,11 +35,11 @@ wait
+> > > > > > > > > >
+> > > > > > > > > >  if _have_feature "AUTO_BUF_REG"; then
+> > > > > > > > > >       ublk_io_and_kill_daemon 8G -t null -q 4 --auto_zc=
+ &
+> > > > > > > > > >       ublk_io_and_kill_daemon 256M -t loop -q 4 --auto_=
+zc "${UBLK_BACKFILES[0]}" &
+> > > > > > > > > >       ublk_io_and_kill_daemon 256M -t stripe -q 4 --aut=
+o_zc --no_ublk_fixed_fd "${UBLK_BACKFILES[1]}" "${UBLK_BACKFILES[2]}" &
+> > > > > > > > > > -     ublk_io_and_kill_daemon 8G -t null -q 4 -z --auto=
+_zc --auto_zc_fallback &
+> > > > > > > > > > +     ublk_io_and_kill_daemon 8G -t null -q 4 --auto_zc=
+ --auto_zc_fallback &
+> > > > > > > > > >       wait
+> > > > > > > > > >  fi
+> > > > > > > > > >
+> > > > > > > > > >  if _have_feature "PER_IO_DAEMON"; then
+> > > > > > > > > >       ublk_io_and_kill_daemon 8G -t null -q 4 --auto_zc=
+ --nthreads 8 --per_io_tasks &
+> > > > > > > > > > diff --git a/tools/testing/selftests/ublk/test_stress_0=
+5.sh b/tools/testing/selftests/ublk/test_stress_05.sh
+> > > > > > > > > > index 274295061042..09b94c36f2ba 100755
+> > > > > > > > > > --- a/tools/testing/selftests/ublk/test_stress_05.sh
+> > > > > > > > > > +++ b/tools/testing/selftests/ublk/test_stress_05.sh
+> > > > > > > > > > @@ -56,21 +56,21 @@ for reissue in $(seq 0 1); do
+> > > > > > > > > >       wait
+> > > > > > > > > >  done
+> > > > > > > > > >
+> > > > > > > > > >  if _have_feature "ZERO_COPY"; then
+> > > > > > > > > >       for reissue in $(seq 0 1); do
+> > > > > > > > > > -             ublk_io_and_remove 8G -t null -q 4 -g -z =
+-r 1 -i "$reissue" &
+> > > > > > > > > > -             ublk_io_and_remove 256M -t loop -q 4 -g -=
+z -r 1 -i "$reissue" "${UBLK_BACKFILES[1]}" &
+> > > > > > > > > > +             ublk_io_and_remove 8G -t null -q 4 -z -r =
+1 -i "$reissue" &
+> > > > > > > > > > +             ublk_io_and_remove 256M -t loop -q 4 -z -=
+r 1 -i "$reissue" "${UBLK_BACKFILES[1]}" &
+> > > > > > > > > >               wait
+> > > > > > > > > >       done
+> > > > > > > > > >  fi
+> > > > > > > > > >
+> > > > > > > > > >  if _have_feature "AUTO_BUF_REG"; then
+> > > > > > > > > >       for reissue in $(seq 0 1); do
+> > > > > > > > > > -             ublk_io_and_remove 8G -t null -q 4 -g --a=
+uto_zc -r 1 -i "$reissue" &
+> > > > > > > > > > -             ublk_io_and_remove 256M -t loop -q 4 -g -=
+-auto_zc -r 1 -i "$reissue" "${UBLK_BACKFILES[1]}" &
+> > > > > > > > > > -             ublk_io_and_remove 8G -t null -q 4 -g -z =
+--auto_zc --auto_zc_fallback -r 1 -i "$reissue" &
+> > > > > > > > > > +             ublk_io_and_remove 8G -t null -q 4 --auto=
+_zc -r 1 -i "$reissue" &
+> > > > > > > > > > +             ublk_io_and_remove 256M -t loop -q 4 --au=
+to_zc -r 1 -i "$reissue" "${UBLK_BACKFILES[1]}" &
+> > > > > > > > > > +             ublk_io_and_remove 8G -t null -q 4 --auto=
+_zc --auto_zc_fallback -r 1 -i "$reissue" &
+> > > > > > > > >
+> > > > > > > > > --auto_zc_fallback requires both -z and --auto_zc.
+> > > > > > > >
+> > > > > > > > Ah, right, I forgot that the fallback path relies on normal=
+ zero copy
+> > > > > > > > buffer registration. I guess we are missing coverage of tha=
+t, then,
+> > > > > > > > since the tests still passed with --zero_copy disabled.
+> > > > > > >
+> > > > > > > Looks one regression from commit 0a9beafa7c63 ("ublk: refacto=
+r auto buffer register in ublk_dispatch_req()")
+> > > > > >
+> > > > > > Is there a particular issue you see in that commit? I think the=
+ issue
+> > > > >
+> > > > > Looks I overlooked.
+> > > > >
+> > > > > > is that if UBLK_IO_F_NEED_REG_BUF is set in the ublksrv_io_desc=
+ but zc
+> > > > > > isn't enabled, the null ublk server will just complete the I/O
+> > > > > > immediately. And --auto_zc_fallback isn't supported by any of t=
+he
+> > > > > > other ublk servers.
+> > > > > >
+> > > > > > if (auto_zc && !ublk_io_auto_zc_fallback(iod))
+> > > > > >         queued =3D null_queue_auto_zc_io(t, q, tag);
+> > > > > > else if (zc)
+> > > > > >         queued =3D null_queue_zc_io(t, q, tag);
+> > > > > > else {
+> > > > > >         ublk_complete_io(t, q, tag, iod->nr_sectors << 9);
+> > > > > >         return 0;
+> > > > > > }
+> > > > > >
+> > > > > > So it looks to me to just be an issue with my kublk change.
+> > > > >
+> > > > > But ublk_queue_auto_zc_fallback() is broken, so the auto_zc_fallb=
+ack code
+> > > > > path isn't examined actually.
+> > > >
+> > > > How is it broken?
+> > >
+> > > typeof(q->flags) is u64, but the return type is i32, so it is overflo=
+wed.
+> >
+> > Ah, good catch. Yeah, these ublk_queue flag query functions should
+> > probably return bool. Are you going to send out a patch?
 >
-> 1. bdev_open() grabs disk->open_mutex
-> 2. The process issues read I/O to ublk backend to read partition table
-> 3. In __ublk_complete_rq(), blk_update_request() or blk_mq_end_request()
->    runs bio->bi_end_io() callbacks
-> 4. If this triggers fput() on file descriptor of ublk block device, the
->    work may be deferred to current task's task work (see fput() implement=
-ation)
-> 5. This eventually calls blkdev_release() from the same context
-> 6. blkdev_release() tries to grab disk->open_mutex again
-> 7. Deadlock: same task waiting for a mutex it already holds
+> I guess you may have to send V3 for fixing patch 4, I appreciate you may =
+include the
+> following fix in your V3, otherwise it may conflict with the added ublk_q=
+ueue_use_user_copy().
+
+Sure, will do.
+
+Thanks,
+Caleb
+
 >
-> The fix is to run blk_update_request() and blk_mq_end_request() with bott=
-om
-> halves disabled. This forces blkdev_release() to run in kernel work-queue
-> context instead of current task work context, and allows ublk server to m=
-ake
-> forward progress, and avoids the deadlock.
 >
-> Fixes: 71f28f3136af ("ublk_drv: add io_uring based userspace block driver=
-")
-> Link: https://github.com/ublk-org/ublksrv/issues/170 [1]
+> From 62da81c7a9883dc251cc0daa2a3081226abc5da1 Mon Sep 17 00:00:00 2001
+> From: Ming Lei <ming.lei@redhat.com>
+> Date: Fri, 12 Dec 2025 11:23:56 +0000
+> Subject: [PATCH] selftests: ublk: fix overflow in
+>  ublk_queue_auto_zc_fallback()
+>
+> The functions ublk_queue_use_zc(), ublk_queue_use_auto_zc(), and
+> ublk_queue_auto_zc_fallback() were returning int, but performing
+> bitwise AND on q->flags which is __u64.
+>
+> When a flag bit is set in the upper 32 bits (beyond INT_MAX), the
+> result of the bitwise AND operation could overflow when cast to int,
+> leading to incorrect boolean evaluation.
+>
+> For example, if UBLKS_Q_AUTO_BUF_REG_FALLBACK is 0x8000000000000000:
+>   - (u64)flags & 0x8000000000000000 =3D 0x8000000000000000
+>   - Cast to int: undefined behavior / incorrect value
+>   - Used in if(): may evaluate incorrectly
+>
+> Fix by:
+> 1. Changing return type from int to bool for semantic correctness
+> 2. Using !! to explicitly convert to boolean (0 or 1)
+>
+> This ensures the functions return proper boolean values regardless
+> of which bit position the flags occupy in the 64-bit field.
+>
+> Fixes: c3a6d48f86da ("selftests: ublk: remove ublk queue self-defined fla=
+gs")
 > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-
-Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
-
 > ---
-> V2:
->         - cover another two cases of ending request(Caleb Sander Mateos)
+>  tools/testing/selftests/ublk/kublk.h | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
 >
->  drivers/block/ublk_drv.c | 28 ++++++++++++++++++++++++----
->  1 file changed, 24 insertions(+), 4 deletions(-)
->
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index df9831783a13..38f138f248e6 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -1080,12 +1080,20 @@ static inline struct ublk_uring_cmd_pdu *ublk_get=
-_uring_cmd_pdu(
->         return io_uring_cmd_to_pdu(ioucmd, struct ublk_uring_cmd_pdu);
+> diff --git a/tools/testing/selftests/ublk/kublk.h b/tools/testing/selftes=
+ts/ublk/kublk.h
+> index fda72e19ef09..8a83b90ec603 100644
+> --- a/tools/testing/selftests/ublk/kublk.h
+> +++ b/tools/testing/selftests/ublk/kublk.h
+> @@ -396,19 +396,19 @@ static inline int ublk_completed_tgt_io(struct ublk=
+_thread *t,
+>         return --io->tgt_ios =3D=3D 0;
 >  }
 >
-> +static void ublk_end_request(struct request *req, blk_status_t error)
-> +{
-> +       local_bh_disable();
-> +       blk_mq_end_request(req, error);
-> +       local_bh_enable();
-> +}
-> +
->  /* todo: handle partial completion */
->  static inline void __ublk_complete_rq(struct request *req, struct ublk_i=
-o *io,
->                                       bool need_map)
+> -static inline int ublk_queue_use_zc(const struct ublk_queue *q)
+> +static inline bool ublk_queue_use_zc(const struct ublk_queue *q)
 >  {
->         unsigned int unmapped_bytes;
->         blk_status_t res =3D BLK_STS_OK;
-> +       bool requeue;
->
->         /* failed read IO if nothing is read */
->         if (!io->res && req_op(req) =3D=3D REQ_OP_READ)
-> @@ -1117,14 +1125,26 @@ static inline void __ublk_complete_rq(struct requ=
-est *req, struct ublk_io *io,
->         if (unlikely(unmapped_bytes < io->res))
->                 io->res =3D unmapped_bytes;
->
-> -       if (blk_update_request(req, BLK_STS_OK, io->res))
-> +       /*
-> +        * Run bio->bi_end_io() from softirq context for preventing this
-> +        * ublk's blkdev_release() from being called on current's task
-> +        * work, see fput() implementation.
-> +        *
-> +        * Otherwise, ublk server may not provide forward progress in
-> +        * case of reading partition table from bdev_open() with
-> +        * disk->open_mutex grabbed, and causes dead lock.
-> +        */
-> +       local_bh_disable();
-> +       requeue =3D blk_update_request(req, BLK_STS_OK, io->res);
-> +       local_bh_enable();
-> +       if (requeue)
->                 blk_mq_requeue_request(req, true);
->         else if (likely(!blk_should_fake_timeout(req->q)))
->                 __blk_mq_end_request(req, BLK_STS_OK);
->
->         return;
->  exit:
-> -       blk_mq_end_request(req, res);
-> +       ublk_end_request(req, res);
+> -       return q->flags & UBLK_F_SUPPORT_ZERO_COPY;
+> +       return !!(q->flags & UBLK_F_SUPPORT_ZERO_COPY);
 >  }
 >
->  static struct io_uring_cmd *__ublk_prep_compl_io_cmd(struct ublk_io *io,
-> @@ -1164,7 +1184,7 @@ static inline void __ublk_abort_rq(struct ublk_queu=
-e *ubq,
->         if (ublk_nosrv_dev_should_queue_io(ubq->dev))
->                 blk_mq_requeue_request(rq, false);
->         else
-> -               blk_mq_end_request(rq, BLK_STS_IOERR);
-> +               ublk_end_request(rq, BLK_STS_IOERR);
+> -static inline int ublk_queue_use_auto_zc(const struct ublk_queue *q)
+> +static inline bool ublk_queue_use_auto_zc(const struct ublk_queue *q)
+>  {
+> -       return q->flags & UBLK_F_AUTO_BUF_REG;
+> +       return !!(q->flags & UBLK_F_AUTO_BUF_REG);
 >  }
 >
->  static void
-> @@ -1209,7 +1229,7 @@ __ublk_do_auto_buf_reg(const struct ublk_queue *ubq=
-, struct request *req,
->                         ublk_auto_buf_reg_fallback(ubq, req->tag);
->                         return AUTO_BUF_REG_FALLBACK;
->                 }
-> -               blk_mq_end_request(req, BLK_STS_IOERR);
-> +               ublk_end_request(req, BLK_STS_IOERR);
->                 return AUTO_BUF_REG_FAIL;
->         }
+> -static inline int ublk_queue_auto_zc_fallback(const struct ublk_queue *q=
+)
+> +static inline bool ublk_queue_auto_zc_fallback(const struct ublk_queue *=
+q)
+>  {
+> -       return q->flags & UBLKS_Q_AUTO_BUF_REG_FALLBACK;
+> +       return !!(q->flags & UBLKS_Q_AUTO_BUF_REG_FALLBACK);
+>  }
 >
+>  static inline bool ublk_queue_use_user_copy(const struct ublk_queue *q)
 > --
 > 2.47.1
+>
+>
+>
+>
+> Thanks,
+> Ming
 >
