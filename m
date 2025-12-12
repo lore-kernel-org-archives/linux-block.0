@@ -1,69 +1,67 @@
-Received: from mail-ej1-f97.google.com (mail-ej1-f97.google.com [209.85.218.97])
+Received: from mail-ej1-f99.google.com (mail-ej1-f99.google.com [209.85.218.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 986B323EA93
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99EC0245031
 	for <linux-block@vger.kernel.org>; Fri, 12 Dec 2025 05:17:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.97
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765516627; cv=none; b=izRDTT7yOnEBGCv5vK8ryw6NJAKiyG+08lX0lUURmvLNp1pA4GoJ1oD1MdfhSx8BL32LJx600WC6tiUe65xo2eBAXRQN/+7N7BUbMvoVRsT2TNJ4LdMNUDntnS2/SYh0lb4Vi8zvXIk5XJBS2CqI2xA+3ZXg81cJRfKcBgzzs4c=
+	t=1765516627; cv=none; b=siipEBiYd+D4u3BBBVvFTDjxFJJr0FMEUq6Ud9Usx8JSqyZ0gr2Pw5b1xyAt9r28Bz4LkcCCRyL5gXHKLKSqxPIcC8BU2hGd2otCwIexL1nkpscR7irm/tL6RXkdgqjLmR98yZ9Jchpfvh8wWIMA5XFgqcLIAnaSopjucXC9ZEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1765516627; c=relaxed/simple;
-	bh=Nv/iP0PPlu7PYFQwI+jBPI8ffRylYj1zxIf1qEKb0tE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=U16vTc6npp2Gk1/Cwu3OAmEjoltrhpxxzsMeAddjQRhQyoBkEIYHgxlYZqgdEUpIGDhS+WBA29ekUnhJaXj9Bmm3b4PZtLtkhCzczOZhy9Ea1yUzSii14mZgS8GnxMy/3Cqd5NWaLepM7fAIQLEVJv1AVJx3jTUbVHNro7Zl+P8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=MWCugvxG; arc=none smtp.client-ip=209.85.218.97
+	bh=Kx8N1bylWHtbc8Bcfrw3QypXu8hIDc8UcqEu1LGE9cI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ePe1nfl2mVv9VnDbALeFn0lvhsLIDtH6vFKPEYKXwpyMWp3yMKW9eaqpktaJOvz5YtrUg5c60FEBGeGfxiUcEAi6SQ88uvPZF6kwXTQsWswOZRwtZ1sTGbrFQ5j+sNhVwznPhpn67QqUKanP7FvG4WDHbFY5S59l9N5OQ1akB58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=W0ACdi1p; arc=none smtp.client-ip=209.85.218.99
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="MWCugvxG"
-Received: by mail-ej1-f97.google.com with SMTP id a640c23a62f3a-b7639da2362so14371966b.1
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="W0ACdi1p"
+Received: by mail-ej1-f99.google.com with SMTP id a640c23a62f3a-b735158ef24so12532766b.1
         for <linux-block@vger.kernel.org>; Thu, 11 Dec 2025 21:17:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=purestorage.com; s=google2022; t=1765516624; x=1766121424; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ro8OsZF3uJAug4OtKve3tUbRbgxB29DrKAw1agkxt6A=;
-        b=MWCugvxGJ5bcaQvBBCe1EmAUmVNkByLHzjxtweQxeEFnrCecaqahJ9CiRCBIIkuydN
-         MxQHmXwdCOjCuq+uJxdAAtmiPpFWVKJoVYfz3vNCopWvy/E1rEn3UI2F44zdkRQUey3J
-         nZ9YcqhYf5OGls7PC0umB4f9+5BpUb2+HYSUdUdLoZZvMmM47qkm5bq+1Z+uprJKrJfi
-         1WQHbrNS0cEqie8Sr7+T4xAPt/Roa6MpZdMDM5NlvpNO7fJkMR5LhUmeGkkAHeuTqJ0X
-         jJkAtUum3tKjyG0jD6S8rcBAWZtMMLUjtopMRrYF89udxUR1cHf1bNxNLwvOGy0bFBRm
-         3t8w==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8ai5WkR4oEYh5O0EvOPkNqS4qWJnvXURC4QkhQFv6TA=;
+        b=W0ACdi1pwQRQFoB/Jyibb7GcNiq2H9lXu03g12eBDRH8C6mtU80AEUwtSi4yzgn0xa
+         KlJ31uDLXgOjO1I+wf1JkuLdSiLiYvT4kjzDJ+MgocZXF5vS+UU8p6MXpUO9O0gB2iq6
+         9cWv14cJ20ujfu3eSbDffVl/qUa7XbWtWQWFltTmFbMjC53alc2DMoBFAGrRlTap6NBs
+         RQegHuBNZJVyXnT++eEwSFWyRnTPAS20h+3ogHCkfcbxsemvmGaKy1hGCv5VsGdE6FS1
+         EYsfXy6LCWiBE/BoYq89PlVH/+3uyhTgm9rjmehIt1NX08cbXWKj6rFgPAoybKMFuZCA
+         d+QA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1765516624; x=1766121424;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Ro8OsZF3uJAug4OtKve3tUbRbgxB29DrKAw1agkxt6A=;
-        b=EPeBIe2HQ2YOgSDCidBmpp6VO8t6XM7OL5Reor4RVw185XKCx9+rHwVb3AZbEqlXjT
-         eax1fU4hJZ0NYGNs3Ovuoe4DRcnHataaUXJ26d44d/GYH6dWT0+6MH5TtOMXLZ52QX7f
-         BWABUwBKACUWwUKSZOnbVqnvL/j5hmJ2uW+oO/V5xBP65yc3OE7jSnx4G2Akc+6yC38N
-         nyVxfPLnNO7pcVRrrtb7KBzzhf7sTkJ4IWpEeerICAG5PKMjaSKqJpNbEuZ+Ds6U3/48
-         VxjmAHwJOGF0r478nAC/0y2CqHQIQvoW7k5LUxlPRT7jtge/i/34ACS6QSwsvoGzXbbe
-         Qohw==
-X-Gm-Message-State: AOJu0YxWrEVmSAeOlDVqOMlMQI0gBTpjPYeyond/qwHtGvG/oTzGfHQf
-	9FP+KOzPVgK5EQf9AXgHQn/NQFKX0muRWOeWobP5xp9G/QPWLXbCrFiy2QWs5eYJbnBPDitCRVc
-	ILD/KmP+nSA4mS2/B8sOEp+9E22IaUopsLk6G
-X-Gm-Gg: AY/fxX5Ei8Cn823ut1aOi22lVhMEu3v7UCfgc0ftIU7E3S2Oo+6H2DIoUj57sbxQHrW
-	MAobiWE3rqWhU/E3ILTG2jJvjN/HkfyXQM3hmdxyYWi6Vq067HooiXQJ4GmAkmuzH4SiwTjQB5L
-	CgmjZ6MVnC1hHASouwn/0j7/siUsu9Co7rZXkPp73S32e7oSfVocFj3dGD1WK183raVEyTl8ZA9
-	JI+iGIxIMsZyp9mtm1TSan7H3ayaVFnofgKwlX1KfHf5y2cz1Irg5sUdzxIKQ40voVNM6oO33Ny
-	1EcCJOmGhyA7KjoSgdIKmh7s8m3Lah0YE1HN45aThVVsHDp52tdNjkPu0m5zkO6gPF4JyV0tj+B
-	7MOWlCDr4bHRlqkJMTOWG2HGjci4OeSOEIQxZ6y5cGA==
-X-Google-Smtp-Source: AGHT+IEawf1to/V+/+Qx4OvUJswtkr88PbpqURl0CG0xqAJjTju6BHqC8DK8KJbweq/Q9sRitTwQT4JGUkml
-X-Received: by 2002:a17:907:60d0:b0:b76:c498:d410 with SMTP id a640c23a62f3a-b7d23aa5780mr34437166b.8.1765516623927;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8ai5WkR4oEYh5O0EvOPkNqS4qWJnvXURC4QkhQFv6TA=;
+        b=UiUVg6Sws4DJQH019mQVBEPTdSkXQBQJb/yTHoJHoQDn2OXnsFB7LWoe4mPeSU3Td6
+         Yz2mLKZobYx82r2jS01Bk8l27yT3hfJs6bSY6rd7nrEnvEMBrLFJ0L5x+KVPCb03zUna
+         9MYLre2aDfUAnTLOhWA7aciUUeqd3WJgkVGOpoUWbqHHTsmeLut11AwXEnbjAktwYKeL
+         9W9WTtwMd3udikr8VmYB7RoCilM3WBd74TilB1nfy90HR5spbK1bXcYDtL0G5E5U+pug
+         I2E7QeInBuiR1rkJMZXEbxSXbL6q5r7IMAhKfn1pT0MrBqNAGfup0Is1F6jRdJ3PiAPK
+         WVGQ==
+X-Gm-Message-State: AOJu0YwkOwWOwuSZItZ0in9IbDfh1HuvtDRyaTBqxo2xdmq/7O5NFmFV
+	ZBF7wIhwwb6ELsC0mpX4FcDUKubaMjjecWeVi0n5YcohWRbV65qv8H1i4gejPFpxdp0pK33nvDn
+	tOatxAug93Z0KUZw83CV1zUDVJRpkDv24Wjb+3W1r7s0kbI8ooUUt
+X-Gm-Gg: AY/fxX518lea4XfAs65Yozn6PlIyhNTioHj0BSHSg1aeFh8cXT0APVDd/EAj0ioXAmF
+	sXKqbATWqxvOuQEAqgZSnw4bMfEBEEcFBURosOLK177tSxa2LWn/BQNjZ832xIZigBu/xdmSdz3
+	+aW3EWcPvLyM5iPAP3o92cuAgZskDkLSEJA0tjBr6Qy3GhY58a9hdmAEFg9ZDeDaAg9LzRNcx1J
+	ZzqDxFP/ZAZvFUX0+MTnLQ0bNVyImr2+vKlhUA/TtIHyQyvST1ufUJDv0ENxQXEiSlXBqpf9d7p
+	7Pl23N9YKCS61lSuVPG4WHshVWD1uHgiPe2l1CZQywYHbxegOhlhnwz8fhyhbCs0bvI1sk2ESBk
+	It9KY6VdBcgnWQO0DcDMDyVOgnfg=
+X-Google-Smtp-Source: AGHT+IGJPg4q2IDeX/L7bg7HAM9XpF8sJyvqLzheZcLWMRdmnfuidnrD1FeMw27GjSBDHq5hw179fL9B+2OP
+X-Received: by 2002:a17:907:3f20:b0:b73:51f6:e070 with SMTP id a640c23a62f3a-b7d23aa416emr34917866b.7.1765516623708;
         Thu, 11 Dec 2025 21:17:03 -0800 (PST)
-Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.129])
-        by smtp-relay.gmail.com with ESMTPS id a640c23a62f3a-b7cfa609a26sm86779066b.86.2025.12.11.21.17.03
+Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
+        by smtp-relay.gmail.com with ESMTPS id a640c23a62f3a-b7cfa54ea05sm89263266b.51.2025.12.11.21.17.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 11 Dec 2025 21:17:03 -0800 (PST)
 X-Relaying-Domain: purestorage.com
-Received: from dev-csander.dev.purestorage.com (unknown [IPv6:2620:125:9007:640:ffff::1199])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 9E989340B96;
+Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.7.70.37])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 6B56634079F;
 	Thu, 11 Dec 2025 22:17:02 -0700 (MST)
 Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id 9B464E41A2E; Thu, 11 Dec 2025 22:17:02 -0700 (MST)
+	id 64581E41A2E; Thu, 11 Dec 2025 22:17:02 -0700 (MST)
 From: Caleb Sander Mateos <csander@purestorage.com>
 To: Ming Lei <ming.lei@redhat.com>,
 	Shuah Khan <shuah@kernel.org>
@@ -71,12 +69,10 @@ Cc: linux-block@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Caleb Sander Mateos <csander@purestorage.com>
-Subject: [PATCH v2 1/8] selftests: ublk: correct last_rw map type in seq_io.bt
-Date: Thu, 11 Dec 2025 22:16:51 -0700
-Message-ID: <20251212051658.1618543-2-csander@purestorage.com>
+Subject: [PATCH v2 0/8] selftests: ublk: add user copy test cases
+Date: Thu, 11 Dec 2025 22:16:50 -0700
+Message-ID: <20251212051658.1618543-1-csander@purestorage.com>
 X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20251212051658.1618543-1-csander@purestorage.com>
-References: <20251212051658.1618543-1-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -85,37 +81,54 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The last_rw map is initialized with a value of 0 but later assigned the
-value args.sector + args.nr_sector, which has type sector_t = u64.
-bpftrace complains about the type mismatch between int64 and uint64:
-trace/seq_io.bt:18:3-59: ERROR: Type mismatch for @last_rw: trying to assign value of type 'uint64' when map already contains a value of type 'int64'
-        @last_rw[$dev, str($2)] = (args.sector + args.nr_sector);
+Fix some existing issues in the ublk selftest suite and add coverage
+for user copy, which is currently untested.
 
-Cast the initial value to uint64 so bpftrace will load the program.
+v2:
+- Allow --zero_copy and --auto_zc to coexist for --auto_zc_fallback
+- Don't add test cases to test_stress_05.sh as it's close to the timeout
+- Add Reviewed-By tags
 
-Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
----
- tools/testing/selftests/ublk/trace/seq_io.bt | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Caleb Sander Mateos (8):
+  selftests: ublk: correct last_rw map type in seq_io.bt
+  selftests: ublk: remove unused ios map in seq_io.bt
+  selftests: ublk: fix fio arguments in run_io_and_recover()
+  selftests: ublk: use auto_zc for PER_IO_DAEMON tests in stress_04
+  selftests: ublk: don't share backing files between ublk servers
+  selftests: ublk: forbid multiple data copy modes
+  selftests: ublk: add support for user copy to kublk
+  selftests: ublk: add user copy test cases
 
-diff --git a/tools/testing/selftests/ublk/trace/seq_io.bt b/tools/testing/selftests/ublk/trace/seq_io.bt
-index 272ac54c9d5f..507a3ca05abf 100644
---- a/tools/testing/selftests/ublk/trace/seq_io.bt
-+++ b/tools/testing/selftests/ublk/trace/seq_io.bt
-@@ -2,11 +2,11 @@
- 	$1: 	dev_t
- 	$2: 	RWBS
- 	$3:     strlen($2)
- */
- BEGIN {
--	@last_rw[$1, str($2)] = 0;
-+	@last_rw[$1, str($2)] = (uint64)0;
- }
- tracepoint:block:block_rq_complete
- {
- 	$dev = $1;
- 	if ((int64)args.dev == $1 && !strncmp(args.rwbs, str($2), $3)) {
+ tools/testing/selftests/ublk/Makefile         |  8 +++
+ tools/testing/selftests/ublk/file_backed.c    |  7 +-
+ tools/testing/selftests/ublk/kublk.c          | 64 +++++++++++++++++--
+ tools/testing/selftests/ublk/kublk.h          | 11 ++++
+ tools/testing/selftests/ublk/stripe.c         |  2 +-
+ tools/testing/selftests/ublk/test_common.sh   |  5 +-
+ .../testing/selftests/ublk/test_generic_04.sh |  2 +-
+ .../testing/selftests/ublk/test_generic_05.sh |  2 +-
+ .../testing/selftests/ublk/test_generic_11.sh |  2 +-
+ .../testing/selftests/ublk/test_generic_14.sh | 40 ++++++++++++
+ tools/testing/selftests/ublk/test_loop_06.sh  | 25 ++++++++
+ tools/testing/selftests/ublk/test_loop_07.sh  | 21 ++++++
+ tools/testing/selftests/ublk/test_null_03.sh  | 24 +++++++
+ .../testing/selftests/ublk/test_stress_04.sh  | 12 ++--
+ .../testing/selftests/ublk/test_stress_05.sh  | 10 +--
+ .../testing/selftests/ublk/test_stress_06.sh  | 39 +++++++++++
+ .../testing/selftests/ublk/test_stress_07.sh  | 39 +++++++++++
+ .../testing/selftests/ublk/test_stripe_05.sh  | 26 ++++++++
+ .../testing/selftests/ublk/test_stripe_06.sh  | 21 ++++++
+ tools/testing/selftests/ublk/trace/seq_io.bt  |  3 +-
+ 20 files changed, 336 insertions(+), 27 deletions(-)
+ create mode 100755 tools/testing/selftests/ublk/test_generic_14.sh
+ create mode 100755 tools/testing/selftests/ublk/test_loop_06.sh
+ create mode 100755 tools/testing/selftests/ublk/test_loop_07.sh
+ create mode 100755 tools/testing/selftests/ublk/test_null_03.sh
+ create mode 100755 tools/testing/selftests/ublk/test_stress_06.sh
+ create mode 100755 tools/testing/selftests/ublk/test_stress_07.sh
+ create mode 100755 tools/testing/selftests/ublk/test_stripe_05.sh
+ create mode 100755 tools/testing/selftests/ublk/test_stripe_06.sh
+
 -- 
 2.45.2
 
