@@ -1,115 +1,209 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C83419DF4D
-	for <linux-block@vger.kernel.org>; Fri, 12 Dec 2025 01:35:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 826E62877DC
+	for <linux-block@vger.kernel.org>; Fri, 12 Dec 2025 01:56:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765503319; cv=none; b=auvARYsM9b8RwEdQC4fib+n1J5I87Kcku3BzeWEgnsxykB8hHWrk9xb7qpUErnOYlU/P9dZABWwNzhF6be5zs/1iD2AeVFnfnY5XkFhTOm3nFPZZX8cf0tDClC9vBaIzmXfzwI7EHXImylZjtKCzbhXlAjR4vUdpI9i4zbgUhAc=
+	t=1765504573; cv=none; b=cnOCltvqnF5BMR+yfs4AdzKcqYlPnmS/lc7kRpAtcxCCgiHKufG5iAnZ0E32euWegK4adBTVbHLJ2J9h5CYKgzcQLgJlAcevg6Hh+X/nKZWb/MGzSA6BzAnbucGxO0N/S0fHVYbkE2wmJG0XVPyub70+d2qPabUHcS8IA6ZtiWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765503319; c=relaxed/simple;
-	bh=GKjysckQ91RPf5OUfeXUZ32Qa1ZdrmYSP+2jV8iq6OY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=huIM9vNIYVJff6tM6ARUFGsMKx4CQMYi35aQX4a9t0l13sz2vyYQLFaRuAnEaiL9CPRkflSV0nZFZWbHEhUZGCo/eYKeC9zDt4g4DXf74/0Ab3DhiSs9vNpJuleerocN5KIqv4gEeCph3MGuwXs6pSF1VPNqk9jjOrcdEDvdoRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MqqgfwH+; arc=none smtp.client-ip=209.85.214.177
+	s=arc-20240116; t=1765504573; c=relaxed/simple;
+	bh=YN2oZNmZdtxBobbMK58uZROnBIWaMV+gLny5VUocsy8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=F0rws5JkVgSxr4giQ6zTRib1Uv0relMkDYlUXa4xdiYogGHqxXNsKMg8828yKoXPIuuX7mFzZ5WTda0lfQhpHUc8psCpM8HaeulR/Q/VxV5vHnIJO3iBKdNhhQDTbIQNTB+wltsIRbBgIdiTH3hLSEDPoIlXX7t8HO7L/AkBwDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JNkpr9h8; arc=none smtp.client-ip=209.85.214.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MqqgfwH+"
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-29558061c68so8851835ad.0
-        for <linux-block@vger.kernel.org>; Thu, 11 Dec 2025 17:35:18 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JNkpr9h8"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-29845b06dd2so8562635ad.2
+        for <linux-block@vger.kernel.org>; Thu, 11 Dec 2025 17:56:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765503318; x=1766108118; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=JVqlRPLB5QUg+qJdqqbHPD9JOQ5gxpvvpJ4JkAESAyc=;
-        b=MqqgfwH+FReCJW5fDZsHwg4BwA1ti7ubO6EtLRZ0CtdmkoI7t2LIVZ3hl06Z1z3jBS
-         cTnydTvsou6rrmETHpUUBd3w+ysTb6l7BTcnukOvLGcqQmfcXj94xibuhM+sOrhZzbos
-         S/pnIbrFi8QsAhwxYbGPEVX2cPP8YBHA8v5eVKMqNC8B30uN+cQNlZRNzgy/rllrLN55
-         yhe9cbgfyY35LjrIQxJSO8g+zP9bwmKfkg/zc4w7f1+f1SPI85SlOWtOcQkCAXk9fgWO
-         NUDPXwbkWdDL2f99NPuwwLSjKN0WMLI/6bWbAp5HZLawHR/WCqs0OlSYVm9ONOC4JS1p
-         /KDg==
+        d=gmail.com; s=20230601; t=1765504571; x=1766109371; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZJsiZe/XqcKJjkVqYeKzXPFPwj1/tSmTc15CXhIwXUk=;
+        b=JNkpr9h8tzSgD/ITtuuSPYoPvuKOxTQ+uj9Dd23MtZVSBKijHQkNaEqPUIaerLHbFN
+         jJn/AkTDwdrL2GQkuLZxBpl1I4Funxh83g4z/yd9PKb5P3d82bdxOdElZaan3mi8MYYi
+         Ip7zzxAfHApGTvHpcog4XUR+f3FNfjQ4gO1rZ4mT2YpNpKcugbHUqsIqxQpZ4YhvHK6t
+         0wPJlvUs9Dt8fdrsh5k1fvhH7O1Ws8H2W1Qn5qmUBbSOKgm2ZHkw1atlzL5wbJWvpy+C
+         jQdCPrNbo5wh1+IkjuGRXMl0ZFrOwt+eBWGj9F4kn8ym3WC4brSu1I++jkFefmV2x2UG
+         UzhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765503318; x=1766108118;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JVqlRPLB5QUg+qJdqqbHPD9JOQ5gxpvvpJ4JkAESAyc=;
-        b=hIabhgfiBZ3BhySD//0+pWrZ1MayAZNFTEC0TryDlSVpXodrNKzR8wiAancUWWQTpe
-         SsoerJnZW0wB5D1Fyot/lJ7u69URWEhwm4eShcK+d0VNRRWhjURoCEe4ZsQZwsaKat1u
-         TgT033uVKIXUwxYSvxkFzRLjiNz0QNwcGICZ25vdXw0taQgGHXAQ3V4Jb604Q5tWgV7f
-         cCEyN9pupFECPUAZDWva00BkWYc0caje8EO3UqyD8o/cnZIiMQ2QYVh4ubv5RQaXm70q
-         gKXgrDiwfBktDdyTd2oMSsd1tFtPiT+VCk3lgra27H8YDnHw5cygxZRJRzRRakIiyGNI
-         fuqw==
-X-Gm-Message-State: AOJu0YxbRLj5j5k8N2lSE7uPF/3AF2nHb8bbMNT+pM3q2eRBvfVJFdIQ
-	CRVZm7I0GA4dc9W7NtYqhNrnHSIlAi7m690abgP6qjxQ5lth2Czu10X7
-X-Gm-Gg: AY/fxX7eVB9UWlyWMcZ1FOiE4alRjT8tnwuPbY7GZVWkhyBe7DPsp5TyRkPEC80VWTO
-	Mrh1bwemMpK8TIBjeYCrBVpr4W9/djHylFL3N4O4wGWxFd4wxmdPKA4fSSgByLMhjANk1QVRb30
-	/whRbgVly5CvJJQsr7EHbIOPiO7Oc/He9pj8LCBj0huKi8NDd098Y9RyzL7iiGtucg0zpHfsrQu
-	gdSLXj5NJ41O5VXT8qnPJscvYxrim/yr/n5IWegsCj7lsVdrraOREaO4hrgmlkeM2GfIsqJNCOe
-	clWv7V9t/f5tDoh9H+r4a7JDznJvCuXce/wu2of1s7PwPv3ev1U4a03aHcDfLOv9BwQe1scLS95
-	doPYMOIeflkPrRVGLYEwcXS9MkgldF/t9UPthL/didGGvlSy0P90QsA/mZfsksUqoC0gBP2f9Mz
-	BTNwUIa3o8p/o5VKRT5gphUXnYsJcppLn56YvnL7CJAKcKt+mSUhd2fxt8lJa1DbzjFfo=
-X-Google-Smtp-Source: AGHT+IG5OBwmyhV8Xg09t2GMUwXjTYJLb6+DktyU8tWPFE/56t+QdE1rA06Fv7TsiAJ8YHijViSCGQ==
-X-Received: by 2002:a17:903:380b:b0:29e:76b8:41e5 with SMTP id d9443c01a7336-29f26eb34acmr2087275ad.30.1765503317859;
-        Thu, 11 Dec 2025 17:35:17 -0800 (PST)
-Received: from deepanshu-kernel-hacker.. ([2405:201:682f:389d:8924:b5f2:ed79:957e])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29ee9b376e2sm36857985ad.14.2025.12.11.17.35.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Dec 2025 17:35:17 -0800 (PST)
-From: Deepanshu Kartikey <kartikey406@gmail.com>
-To: axboe@kernel.dk,
-	stefanha@redhat.com,
-	martin.petersen@oracle.com
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Deepanshu Kartikey <kartikey406@gmail.com>,
-	syzbot+660d079d90f8a1baf54d@syzkaller.appspotmail.com
-Subject: [PATCH] block: add allocation size check in blkdev_pr_read_keys()
-Date: Fri, 12 Dec 2025 07:05:10 +0530
-Message-ID: <20251212013510.3576091-1-kartikey406@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1765504571; x=1766109371;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZJsiZe/XqcKJjkVqYeKzXPFPwj1/tSmTc15CXhIwXUk=;
+        b=p+cFhBdds6oVa4Tqme4sUKzYiyp6y07PqYf9uIHzv43ZCw4lCZWOwTxKAyVjG/NTIg
+         y0+GkX8nlMPwfYtiw+1+4nbf355c3rxOsiA+CWk6XBKVYVS3HNbd1LDxv6UV0Sag4Nmb
+         ltP1KKnBXyhAC3HuT77y2eo6u1gg3y1su71FomeKiSEDVbdI4pT5E53/YpVb60+siCRR
+         gsllkReogEcGk+O1oHqjXBiXjUiZkyVgYOHor00gd2x0RHzFpCtNNVix7CGSDVNVM6zC
+         kZK7BWlVThZ+fa/0IctqnDokQthEmZKGtxbKcudzBkzjzrcjclkDHjH4sxpYqZJHykcm
+         IQqw==
+X-Gm-Message-State: AOJu0YxQFh5UnLOzQmXdNuJBRWqVEDI1avmA6FzovgCb3CEkUPl/GGVA
+	L8wqRuK8VDpsgC39KxobLNs9iHU/AWiPJXwe3SbPW25HqBJAuRykSqSiXWnkxW8V
+X-Gm-Gg: AY/fxX7gX8OnjIyuKndUkzyy5gqL7aQNLydgORqhx5gNwqcwbKfNKjsaFQVpACUj4jO
+	Ws7zCX7+XyTK4J8ULp3Slpml0/vLxQwe/HMnokTCxEouKG+X9Ry8rmY957SvQi40AdwM7YuhFtg
+	MB7s8z18VeuNk50LHrh/xzUKcX3mHMoP++yGLmoh01h317qQETMSpKCNBsBBoE+ZTDqk1Ct5dyC
+	yfqSvKqNFRlnVxl1UJqJcqjUsdiUaF3oPfjlReQagWfxJdGry8aG7X92gQZ6Bewb2prWs1nOFV5
+	RTwo7R97U56swJiyXQ5inrqZLqMoBA7EObjd6z7IHxpKYyqfUW38anq7wuD5uYk1scnFnCzB6BO
+	cI7r0fNJX/ViSmJOTzrBzzA+bSMXB5MOs/8g45596PvfqCbNl7yL2vaAlUaDUDqzeKPI9WM6O3M
+	eGdKUI0Zc7Me0B1wP6TfosWBcVo2e8cLjq9VbJvjJ6H8QV59J4ZcCor2fIvg7Nnbm+A0NB7frrH
+	C5MPU5IpOS+pfKEaT1wQGw3Qm56jfxNW7XS/jqAAmU5M0xbLo8=
+X-Google-Smtp-Source: AGHT+IHrNZHNZ799rRWGx+LvO7XaRwwtcVkWXSf4q+3pQ1pJSMCA4DafAXljIyZfD2BV+qpIbTHyew==
+X-Received: by 2002:a17:902:d4c9:b0:29e:ba45:350e with SMTP id d9443c01a7336-29f23cd48c2mr6283765ad.44.1765504570758;
+        Thu, 11 Dec 2025 17:56:10 -0800 (PST)
+Received: from [10.200.8.97] (fs98a57d9c.tkyc007.ap.nuro.jp. [152.165.125.156])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29eea016ac2sm36260535ad.49.2025.12.11.17.56.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 11 Dec 2025 17:56:10 -0800 (PST)
+Message-ID: <eb72c089-a6ba-48df-a215-af35d5dd808b@gmail.com>
+Date: Fri, 12 Dec 2025 01:56:16 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC v2 05/11] block: add infra to handle dmabuf tokens
+To: Christoph Hellwig <hch@infradead.org>
+Cc: linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+ Vishal Verma <vishal1.verma@intel.com>, tushar.gohad@intel.com,
+ Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+ linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org
+References: <cover.1763725387.git.asml.silence@gmail.com>
+ <51cddd97b31d80ec8842a88b9f3c9881419e8a7b.1763725387.git.asml.silence@gmail.com>
+ <aTFo-7ufbyZnEUzd@infradead.org>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <aTFo-7ufbyZnEUzd@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-blkdev_pr_read_keys() takes num_keys from userspace and uses it to
-calculate the allocation size for keys_info via struct_size(). While
-there is a check for SIZE_MAX (integer overflow), there is no upper
-bound validation on the allocation size itself.
+On 12/4/25 10:56, Christoph Hellwig wrote:
+> On Sun, Nov 23, 2025 at 10:51:25PM +0000, Pavel Begunkov wrote:
+...
+>> +	struct request_queue *q = bdev_get_queue(file_bdev(file));
+>> +
+>> +	if (!(file->f_flags & O_DIRECT))
+>> +		return ERR_PTR(-EINVAL);
+> 
+> Shouldn't the O_DIRECT check be in the caller?
 
-A malicious or buggy userspace can pass a large num_keys value that
-doesn't trigger overflow but still results in an excessive allocation
-attempt, causing a warning in the page allocator when the order exceeds
-MAX_PAGE_ORDER.
+If the interface will get implemented e.g. for net at some point, it
+won't be O_DIRECT. If you want some extra safety for fs implementing
+it, I can add sth like below in the common path:
 
-Fix this by checking that keys_info_len does not exceed KMALLOC_MAX_SIZE
-before attempting the allocation.
+if (reg_or_block_file(file))
+	// check O_DIRECT
 
-Fixes: 22a1ffea5f80 ("block: add IOC_PR_READ_KEYS ioctl")
-Reported-by: syzbot+660d079d90f8a1baf54d@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=660d079d90f8a1baf54d
-Signed-off-by: Deepanshu Kartikey <kartikey406@gmail.com>
----
- block/ioctl.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> And a high-level comment explaining the fencing logic would be nice
+> as well.
 
-diff --git a/block/ioctl.c b/block/ioctl.c
-index 61feed686418..3e9e4257569f 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -443,7 +443,7 @@ static int blkdev_pr_read_keys(struct block_device *bdev, blk_mode_t mode,
- 		return -EFAULT;
- 
- 	keys_info_len = struct_size(keys_info, keys, read_keys.num_keys);
--	if (keys_info_len == SIZE_MAX)
-+	if (keys_info_len == SIZE_MAX || keys_info_len > KMALLOC_MAX_SIZE)
- 		return -EINVAL;
- 
- 	keys_info = kzalloc(keys_info_len, GFP_KERNEL);
+I'll add some comments around
+
+...
+>> +static inline
+>> +struct blk_mq_dma_map *blk_mq_get_token_map(struct blk_mq_dma_token *token)
+> 
+> Really odd return value / scope formatting.
+
+static inline struct blk_mq_dma_map
+*blk_mq_get_token_map(...)
+
+Do you prefer this? It's too long to sanely fit it in
+either way. Though I didn't have this problem in v3.
+
+  
+>> +{
+>> +	struct blk_mq_dma_map *map;
+>> +
+>> +	guard(rcu)();
+>> +
+>> +	map = rcu_dereference(token->map);
+>> +	if (unlikely(!map || !percpu_ref_tryget_live_rcu(&map->refs)))
+>> +		return NULL;
+>> +	return map;
+> 
+> Please use good old rcu_read_unlock to make this readable.
+
+Come on, it's pretty readable and less error prone, especially
+for longer functions. Maybe you prefer scoped guards?
+
+scoped_guard(rcu) {
+	map = token->map;
+	if (!map)
+		return;
+}
+
+...
+>> +blk_status_t blk_rq_assign_dma_map(struct request *rq,
+>> +				   struct blk_mq_dma_token *token)
+>> +{
+>> +	struct blk_mq_dma_map *map;
+>> +
+>> +	map = blk_mq_get_token_map(token);
+>> +	if (map)
+>> +		goto complete;
+>> +
+>> +	if (rq->cmd_flags & REQ_NOWAIT)
+>> +		return BLK_STS_AGAIN;
+>> +
+>> +	map = blk_mq_create_dma_map(token);
+>> +	if (IS_ERR(map))
+>> +		return BLK_STS_RESOURCE;
+> 
+> Having a few comments, that say this is creating the map lazily
+> would probably helper the reader.  Also why not keep the !map
+> case in the branch, as the map case should be the fast path and
+> thus usually be straight line in the function?
+> 
+>> +void blk_mq_dma_map_move_notify(struct blk_mq_dma_token *token)
+>> +{
+>> +	blk_mq_dma_map_remove(token);
+>> +}
+> 
+> Is there a good reason for having this blk_mq_dma_map_move_notify
+> wrapper?
+
+I was reused it before and reusing in the next iteration, maybe
+v2 wasn't for some reason.
+
+> 
+>> +	if (bio_flagged(bio, BIO_DMA_TOKEN)) {
+>> +		struct blk_mq_dma_token *token;
+>> +		blk_status_t ret;
+>> +
+>> +		token = dma_token_to_blk_mq(bio->dma_token);
+>> +		ret = blk_rq_assign_dma_map(rq, token);
+>> +		if (ret) {
+>> +			if (ret == BLK_STS_AGAIN) {
+>> +				bio_wouldblock_error(bio);
+>> +			} else {
+>> +				bio->bi_status = BLK_STS_RESOURCE;
+>> +				bio_endio(bio);
+>> +			}
+>> +			goto queue_exit;
+>> +		}
+>> +	}
+> 
+> Any reason to not just keep the dma_token_to_blk_mq?  Also why is this
+> overriding non-BLK_STS_AGAIN errors with BLK_STS_RESOURCE?
+
+Yeah, it should've been errno_to_blk_status()
+
 -- 
-2.43.0
+Pavel Begunkov
 
