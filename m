@@ -1,176 +1,215 @@
-Received: from esa.hc6817-7.iphmx.com (esa.hc6817-7.iphmx.com [216.71.152.95])
+Received: from TYDPR03CU002.outbound.protection.outlook.com (mail-japaneastazolkn19013083.outbound.protection.outlook.com [52.103.43.83])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE70C212B0A;
-	Sat, 13 Dec 2025 07:08:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.152.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 386D013C3F2
+	for <linux-block@vger.kernel.org>; Sat, 13 Dec 2025 13:40:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.43.83
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765609693; cv=fail; b=X3IrZUJpf+i4ViXBpqRSAQKZVgr6lwLSRggD+oh/tZsSlYT6P7M1tQ0QqmFLLQOJbHBzFS2FmE50lrFulGGnz+h90T/pi8J95qyNLLImPpC702RYKDdLCItqTEQkjca46P6ylW2obSnUdzi/I0s6OCkzkpEoHO2r6JEXLM96eGo=
+	t=1765633221; cv=fail; b=hZTy5E86Nx+R3vcFQy9bU61OwJhXeOXRQY5P9CCEBS/8bY/Rcns6w/HIKSTwOEiQnt53KvgxhROWhUeEbf1yfD7NAznktkpogck5Qaxq6a0PQWIi7UDks6aqePZOex9oKu2F9jOEttcYoSvnmCRP3FBcH9BlL6Yzzea1k8THuRc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765609693; c=relaxed/simple;
-	bh=NBfbEkgmVQJuTsPAFYjLK5lI+E/8eBe1Zp0hY6oU+hE=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=MALa6iiAvtH/bQfdVCoHZYCimTw71K4S7lE3b6JtlZ7igqiXQaPM5BQzBIpLdf5Ukxy23f0t0ljuUoozk7mK/fzvemiKDadGBUoqkygjUqkUiNCHI6CpBXRhHuo9fA1gc7aICw5CJg1afPPL3kxmxByn0j8vn7k4tLU2q3td7nc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=sandisk.com; spf=pass smtp.mailfrom=sandisk.com; dkim=pass (2048-bit key) header.d=sandisk.com header.i=@sandisk.com header.b=CFMLbdmf; arc=fail smtp.client-ip=216.71.152.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=sandisk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sandisk.com
+	s=arc-20240116; t=1765633221; c=relaxed/simple;
+	bh=dWW8BZ4ylUklTVyn0eHsdNlTds7tGF5rOyV0nb5nFW0=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=KLovYvcmsffffTLsLOIWrKFBsG/Wos/KL1tX0E8qLp8ctn1Nn5cov0weYVybYtCNjVqrMgaOXn1Ddoa6mkuUzREwMhFXcZMdd9YmKLF+6f9ire1Jf517TPt1SomK7AF8VkiI1Y4Kb1GIzPj+Wq3FXtt/EmDCr8MCVp1utgJweNg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=QB3OQRGB; arc=fail smtp.client-ip=52.103.43.83
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sandisk.com header.i=@sandisk.com header.b="CFMLbdmf"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=sandisk.com; i=@sandisk.com; q=dns/txt;
-  s=dkimnew.sandisk.com; t=1765609690; x=1797145690;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=NBfbEkgmVQJuTsPAFYjLK5lI+E/8eBe1Zp0hY6oU+hE=;
-  b=CFMLbdmfJPFbRPxFXPmkCsmoGAe6bRyex54BgeAZCC6TnhIi5Tbqusta
-   gO7pTHmzqmV8kiWpqIqZbr5G+Our22kstj/6w3qXJApafS/2m4zH/UbXL
-   dGNzqC/3jWTvw69K7lwUKe1Ew/zqJrw76/ABEboyqC8vs2t0/ItFRHXjJ
-   0F4+Xzr9sG/c2ilryv18H6iCbT0t+WBDa+eR1sIJRMD6UzDgfqAaP4y+x
-   TWl1f2zrJ1ANOU/z3JXH0dF30sliHRhacuGGYEvx24pmLBGb/0OY8HCKu
-   0ESsNPT8Gj0CmimXje3Bht0q2UldgxQJ/FTNb2on4VgLvc3F7FE9H7vwa
-   A==;
-X-CSE-ConnectionGUID: Bv4sMyiBQS6bgPeZ29XViw==
-X-CSE-MsgGUID: ke3wJkxeQIyz+4mKdpaSWg==
-Received: from mail-westusazon11022136.outbound.protection.outlook.com (HELO SJ2PR03CU001.outbound.protection.outlook.com) ([52.101.43.136])
-  by ob1.hc6817-7.iphmx.com with ESMTP; 12 Dec 2025 23:08:03 -0800
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="QB3OQRGB"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=uWk0EYIp4yeNoIKfg8tyGQ/G6hZnmsrCqbrZT+2tBvJHAiliTPtLEUblxRYfYH/vxINoLZWDf3dWzOPYceoUOhAWcCpdI2PNWEjyQhxWKzfuYkZNEU3hUQbl+LDXgh+Smm4Y7JrBJSO3rjzIK34LDNl/cc8Ev8xKAb5nAwWL9r0b53IZfcTQb24pFnkDGZWLoZCuLrCM4+1ym8Dj57l9/aKamyM5nKR1MsZotknWidnWPe5exP7Z3Mo5X5r8XM71wMWPRlJm8uUwToFik4RQWqrVmM4KsGlTkcgFxjg6gri3N3pQO09i95rStfD5E50wzDn2GtxGemlkqMbaAwbcZQ==
+ b=VIEPoUY8evMcJ3CV7o5Bhe58C1Hb/nxQwVVE0qRYyq4q4NCNtWwG5tEG9HTABtlvUP+sXTjUv5YjkaAJDP+cMpmJVfsT3PeIwImqYhQNnbkAQCbFXJSt9Of+TRuAjp5tWDZZL0YFigZ6J54KnL72A8AaoZ4Drn2FNTLkJR2hOpM9FDBcH5mfKZHthY4WJufIl9rlt/3qGuREVqVtcYIwa6H7QfkvD5m7jZYmwIbeoI21UVG+Jw/WjGWCovkfnIiF7XWmgAtxvL/m2ZXueDWP4J2jQ89Oa+ghHp06QCt//OTtt7hlrZ+BP+UpkgviPaDDllw3AXyEWHCoFNIqH+qLYA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NBfbEkgmVQJuTsPAFYjLK5lI+E/8eBe1Zp0hY6oU+hE=;
- b=VE+9fS36tRs7qDiugHdIEnrWLGskktx43dR7HsWTy8Uk9aoFbHFLbMFHWf/bqATZwRuDjNp+mulbhX43JidUhPHI1CpcteoWkbg4fsVqJD57wbVrsjD64VZhuKIbjicbHdtSSojvO2ZZqHNpoXKUfGMSiSW22ssJnICkCaVRRw0lmxxDrrrX39xdduMnl9rliPnwMAxXJYTyEvbkZvI9qtkxVe5yg7Onz9ey9yQqykDcpHgZX+ahbU/nuZK2ay741M1SKXR6A3CPt5G+623V9/MGUAU4QUdkR/P7/O2d5rdTfvoye0hz1foHQEvlSGSVSXO/7cBqeH7MAscTH/4etQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=sandisk.com; dmarc=pass action=none header.from=sandisk.com;
- dkim=pass header.d=sandisk.com; arc=none
-Received: from DS1PR16MB6753.namprd16.prod.outlook.com (2603:10b6:8:1ec::5) by
- IA3PR16MB6607.namprd16.prod.outlook.com (2603:10b6:208:522::10) with
+ bh=nYiEUdeRIy8KhNqFZK0RwONYUbZUVj1rHdfWtfSZEqo=;
+ b=oQK/ArGt/UrOSBh6OpTulHnvzUNNi8Q8ug29owsalBJhls2xr93UjsS0GcsIYRKo89UBf60AytWqxoNEpy0iRNHpfrAsfaxAPl+pKihZBoE8YAfWKBJtxwDgLtMLxWKmyEUFOCtjpf2tCMSaFgvU6HOOyVuR/668y2rUJSnKaqH0W1sByTK4nYfsHXs+aiKCcCNFXqZKe9f11IinRV4xPiNhzpO5xwPNy72PwxshczkFANWuzzpmQysrsgoY24jP3WgEuS267NJe0yj2mcM1dHcKk7w3Nm21WO+mh9sAJB7p19Z3MaQAIJS197wk6CyLsIxVgoRP8uJ1FNAjgU5ZEg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nYiEUdeRIy8KhNqFZK0RwONYUbZUVj1rHdfWtfSZEqo=;
+ b=QB3OQRGBZDlcJIVfuxh3eqFITyheqynGRx5FipAhzlKchAevlvGki2b+8py5eADZArE5Knu4X+B3QNEBJcDGPpvtBdF0JNNhlFcMfpVwOrS/Q2L7HwAZO8potRaqcS3tH+ETG8PIDrWXhcLQnXJyUeuSITtSgvuS6m9flf+PQ5K2yMIFsa56VBK+Eff3jBphNmJCsCVF6CyXdNE2o8Fwhz0/sCCsjroei5XdMa9F0Ewfmpx6m8RickOkGGq69Fj6N++OOdr/ZcE836/lQ/8Tun9EToIq/AAZeYhwo50VbEZORkhkQhZJ/z8w51p2zQeX3i0PvHD2LvI+RUj2775Scw==
+Received: from SEZPR02MB5520.apcprd02.prod.outlook.com (2603:1096:101:47::14)
+ by SEZPR02MB6435.apcprd02.prod.outlook.com (2603:1096:101:129::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9412.12; Sat, 13 Dec
- 2025 07:08:01 +0000
-Received: from DS1PR16MB6753.namprd16.prod.outlook.com
- ([fe80::72d7:97b5:4539:a90]) by DS1PR16MB6753.namprd16.prod.outlook.com
- ([fe80::72d7:97b5:4539:a90%5]) with mapi id 15.20.9412.005; Sat, 13 Dec 2025
- 07:08:00 +0000
-From: Avri Altman <Avri.Altman@sandisk.com>
-To: "ziniu.wang_1@nxp.com" <ziniu.wang_1@nxp.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>, "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>
-Subject: RE: [PATCH 2/2] mmc: add quirk to optimize certain Kingston eMMC
- secure erase/trim performance
-Thread-Topic: [PATCH 2/2] mmc: add quirk to optimize certain Kingston eMMC
- secure erase/trim performance
-Thread-Index: AQHca0HTcDoVcKJ3KEaLqoj7rKEi4rUfJi0Q
-Date: Sat, 13 Dec 2025 07:08:00 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9412.13; Sat, 13 Dec
+ 2025 13:40:16 +0000
+Received: from SEZPR02MB5520.apcprd02.prod.outlook.com
+ ([fe80::ebcf:d79b:73ca:4120]) by SEZPR02MB5520.apcprd02.prod.outlook.com
+ ([fe80::ebcf:d79b:73ca:4120%4]) with mapi id 15.20.9412.011; Sat, 13 Dec 2025
+ 13:40:16 +0000
 Message-ID:
- <DS1PR16MB67539E6FE1199DA045DA614CE5AFA@DS1PR16MB6753.namprd16.prod.outlook.com>
-References: <20251212083246.582806-1-ziniu.wang_1@nxp.com>
- <20251212083246.582806-3-ziniu.wang_1@nxp.com>
-In-Reply-To: <20251212083246.582806-3-ziniu.wang_1@nxp.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=sandisk.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS1PR16MB6753:EE_|IA3PR16MB6607:EE_
-x-ms-office365-filtering-correlation-id: 9d0c704c-7126-408c-fb18-08de3a1659ef
-x-ms-exchange-atpmessageproperties: SA
-sndkipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700021;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?iGT2lAhEBQfv1UuyrkL0SVY95if3a2gikRVw5MNTxy+3yUxvyJUECz7hi9GU?=
- =?us-ascii?Q?qpWJi0ShZpeZORFh44IQmXTNZXd/dW4e4qC1h/Y8hFse9ZymJOQpz0ZI4JrQ?=
- =?us-ascii?Q?GuM86sBTLbe2uCfOR7Jt2A2FjdMcjfsMh29jYp4YJ2gDMxBbBcN6TmUKlpJ3?=
- =?us-ascii?Q?sRv11AGF8UchV7vpVpdYsjhR8STzaDGDwRQQaTWFZx0PG1dVtJS0hg7Ssxs8?=
- =?us-ascii?Q?NykZUDEdApOBkyqc3/ho2n8C+G0oQAtKTbBkcPnbukLhsGV+BCpSsQyObhwn?=
- =?us-ascii?Q?WzgvMZGkV97KWIVgu1AsJkYBJVJEEsyHyoR8wZPKK/HPrmdi/HIQNQaWWAnd?=
- =?us-ascii?Q?Nhj8IN23/OqRSya3miH+gn8x48WHecGvb08eRHd7RNSQZu83LH6d6IFFX3Si?=
- =?us-ascii?Q?EhGoIBk3yz2atyw9pACNxHkSmbaZiEW/m+BAxFm4cEzG3ufswSsxyYJVvc/P?=
- =?us-ascii?Q?5p49tKp6xaXTjD6DFVaMErKLaXoRBLN6eIWwpiu+DqBFbecZU2Ti+rfGSiqH?=
- =?us-ascii?Q?zeGBSkWWsCPQ/M1WCcQPt7fM20Z4Shv81Q8pnWgtC07GL80POEeduP4KGnv2?=
- =?us-ascii?Q?8bpXAQi8PeORkFkOR0Ew+C5UyWlz2WzzFtP1A0tHebh8gw0RwnTsNjN1aPuN?=
- =?us-ascii?Q?dNWXamfku7cavHesh+VV9aLx2WXeUtoZ0MUL5Uobvh98ODUwehU/qltNNcAA?=
- =?us-ascii?Q?DrXyiJmeqeR8DK7AU6bEYNN1tFtq3e54ehil9ruj/5B2Z28OAa3cRfjiPg9x?=
- =?us-ascii?Q?8m+RgFZKvX53bXyvtAUSFg3BmVbESq6aY+GjdGczX16hv2LfghYm55LGEkij?=
- =?us-ascii?Q?/i0YIWrzWNHDZ3KwcSNZpdylAJvwjI6jX1P2VWl9KUa6fFs1azXd6fJ4ESI/?=
- =?us-ascii?Q?UM4PTFbzUIM+Pa7kHqlfjuIDP28Wg5AacvFv358NL42SiLWO6g+P5ek6WKAc?=
- =?us-ascii?Q?NOvPwVxvVC/+b+TnqR33OULjvShrNh/Ci4Mms5sMBluti3i++IuQjVagjlE5?=
- =?us-ascii?Q?Zoreow5SUfmAb9kn26zAT6t766CDJxGT67yVNU76W+/BFBvWUXP1KTcbDO6n?=
- =?us-ascii?Q?04G5c4Mc+W6pbNDKtZRVsPgI/98BXuWcH6hbDk0gOv2XSQgNKsyIZS3j+ARP?=
- =?us-ascii?Q?wtiw+orGbn59RTNO2ZqlDJUvX6vsPq0pe2b43JZJaJ1Jk+gAGf1Dy+aXZCyR?=
- =?us-ascii?Q?4kRZiGtHzM9+tg8Id1FdTypxcRGvPuM92xvuce/3a8nOzdnMGlvU3vrIIqvR?=
- =?us-ascii?Q?wwyqkhG96L0CX6Imy3RKXozULuVj1arxcZfU1stRQHt21a1kVG3stZuHwLyL?=
- =?us-ascii?Q?X8TJuF2rNJ5/ru+Qmmi6wEmkjeWSBy0HbtbiQp66rt6r9ZKXTF0InPohboMC?=
- =?us-ascii?Q?b82SCLZU+jPXY5sqsbckaBxZT9+uKodF0S3WMi4IOoH5skRmLrks3dicYFo2?=
- =?us-ascii?Q?GGS13HsQDgFZRGHTAYlYg6+NH2o2QyMUG9DUSP4GDyvSrdc5BOANt69lEB+f?=
- =?us-ascii?Q?ZRaXALzYf8EBsm0gUL3K83i3UE7mDwQw3Egj?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS1PR16MB6753.namprd16.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700021);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?2QXxSG61/yd4OGD3o6kr1iZjZK+8PbMCKiMM4U5Gmej+CnjEEzvtAn2/T+aN?=
- =?us-ascii?Q?12AlOhj9wu31Y7MqTdCP+IN5dTuBG58OyT8OTcIjeZYNbvf2MrT+nOujJfMX?=
- =?us-ascii?Q?Wc9cCiFr0jcIDimfb5e+YCGwzh1dXwh9b7McSvjZ9Y6c+i5pO34J6wnya85i?=
- =?us-ascii?Q?zQXveqsgKMZTiQpP1h4JnYe980Hjv9l/f2r0ejeQ7fHuL/seS5eeMZcTbUFQ?=
- =?us-ascii?Q?+bhlMAHZ3N/0w41wp3rRRCYvMU/NMKB9nYaaqJmJUPRG/OSFynLd8g8CFeSB?=
- =?us-ascii?Q?SQZmiJ48iCI1BGUk+aF6WZ13abi5SQH82pPwsoZw+O4i7U4Lv+ENhEpFJZ8U?=
- =?us-ascii?Q?pezqdelmZX3SZtqdsjjzOJh8H9cq4rbiF3PZZGHaq3RNVlCgxh8yJIY/TIro?=
- =?us-ascii?Q?QZKGUWz0oqKT9AF85hBIFSfX3/pO6W3CnuwAr+fzNhFXSiTaLfKaxNcleZrw?=
- =?us-ascii?Q?e5pH/tzGQv0N+50nFzvzXTRFdNHXWRZTg1ftNv7hQ+rBXZTim0sE2ygKQ2Yx?=
- =?us-ascii?Q?2xIHGpudp6x+weTa1rWJ67iBOmPQRjC6sW6IenY3o+3F4Vz/Gu9sERj37wg8?=
- =?us-ascii?Q?VcIEkdreJHUpAH8XKQaBqxh4OUMz63Gav4wyx6xq2ItdaOJncM9lcEyjUA4Q?=
- =?us-ascii?Q?/sZ2elkjd+hVjNLv5GC11N4qlj5JCRGmK9GbiAm3Q4g3gQVOFG1QnQmbFL0a?=
- =?us-ascii?Q?SVpjinPUbKO377FrQ/gGD5ceG2uQJzvIPATHptQ8mUttsABFm6suffgpYIin?=
- =?us-ascii?Q?EQ/aLRR9hpCrFni7KNlb4OuasWLcAVpayEWue1lGlxdKT435q7iQzSPu6OKZ?=
- =?us-ascii?Q?dAv9F1KhFIbhApAEfksmB2yAzOcyhMXKUMGP5QguO1VlgNMozX+/yH1nZ3Ze?=
- =?us-ascii?Q?782rjrVjZhCo3Tlp2cjRf3yVBPF8Ia52fStwDZd9l8F1kXsMNxfWiMawCUA6?=
- =?us-ascii?Q?2PT3IIyK0Hb7LRcrIpz9nQ4SBRL+/bgLam3Job5LnJTWIMkws22+NqqLDl5F?=
- =?us-ascii?Q?3ShUlgs+Gg8vYP/6BrWufgBP21tiphOiu+qz37RqwILhNMvlIvmXqM6JUaqp?=
- =?us-ascii?Q?XxXigBRQUS0tlFxL2lauOa7u5lpSn8xxWpw253szY8d5NhjYbRhm1lwAgum8?=
- =?us-ascii?Q?dd8vL2ZCyUBlS4I8LX2Bhb/ExgxPqRlDNwCixOaGWb8XKpNtHq3chrUSuCgN?=
- =?us-ascii?Q?JuSbdScCCGTw822Zljbc0cJddOjFjfmuidrNyDCgHxNVfcF1JGBsyOjcVcse?=
- =?us-ascii?Q?Rj/9hKlhDxIGILR6GY+MD0A2Q8/wS7pZVzqFFRNPfIp07NJa/IVtPkqhn3wP?=
- =?us-ascii?Q?3Ez1Ndg7R0eRp6wDfJMv9Pg7LG9UCvTwQ12A7ITxdsVtMnplaFexPikJlIWq?=
- =?us-ascii?Q?OxTO2fL/9mjgD1wNVSN4FSsstDCH/weaKGQM0XhnT2es9EWJLqGdL0firjK+?=
- =?us-ascii?Q?G9MTQD5vsI8yjd4ZdAs/cQBB8SPqDnoVT/ytT0yT2BchDFKPq3HOykBcIlKj?=
- =?us-ascii?Q?bR7Pn2GDJO0vCmMW3K8FWFjLJ9BVJGOC1Vf5CPU40/DyZRQeu/y2C2UwcFDJ?=
- =?us-ascii?Q?S5Lld0zVtc/qSLYlf0XFjMu87IyNz/eTdT/wfRQG?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ <SEZPR02MB5520A617226DCCAA0770B49299AFA@SEZPR02MB5520.apcprd02.prod.outlook.com>
+Date: Sat, 13 Dec 2025 21:40:03 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/1] zloop: protect state check with zloop_ctl_mutex
+ locked in zloop_queue_rq
+To: Damien Le Moal <dlemoal@kernel.org>,
+ Yongpeng Yang <yangyongpeng.storage@outlook.com>,
+ Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org, Yongpeng Yang <yangyongpeng@xiaomi.com>,
+ yangyongpeng.storage@gmail.com
+References: <20251212144617.887997-2-yangyongpeng.storage@gmail.com>
+ <77d57ec3-134f-4667-b260-f8f5ca593339@kernel.dk>
+ <JH0PR02MB86885D86B2A34028A160A0F099AFA@JH0PR02MB8688.apcprd02.prod.outlook.com>
+ <2cc746e6-4a69-4f56-af99-5dc871fce0ad@kernel.org>
+From: Yongpeng Yang <yangyongpeng.storage@outlook.com>
+In-Reply-To: <2cc746e6-4a69-4f56-af99-5dc871fce0ad@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SEWP216CA0110.KORP216.PROD.OUTLOOK.COM
+ (2603:1096:101:2bb::7) To SEZPR02MB5520.apcprd02.prod.outlook.com
+ (2603:1096:101:47::14)
+X-Microsoft-Original-Message-ID:
+ <cdd7339a-6b73-4ef3-87c4-3e3ae581f47d@outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	xh6ChBpdehLQ/ExXMWp8qvNzqsKbnDkEonGI9uxuIlEI5b5lbpCmEFlbsDohR4gc7tSaUuEbyTzsYCOcW5n639z+65PANbeSVXE+5IxP2ICZlOm2YRNW0zyqG9St+c3U7MB3fw9R99cTOMXl6rWSUWP1JoNLewyffrLGLH4V0ISP68HWxKu3Z2ek929SgVFoX+b3HMxgd++P9phTbwC1982y2SyYUp8PgsQdNPO3mIzlmgpNLavpolhkd5ywuDRR+rNXASzSvt8jYJiyr9O879h106MhvigEhbUxGFoXEoqsOlYVicOO0iLp8/6eSq/OxktezaK5cxMaVtrOhH2U3cZrzXwuKCKOt4n+CzyO3upX3YeHtjvJFnrdeAzYCmQBEfg+9nirHsv7rSyCfD5JUl1uHsjwStqoBjpX6rQqtNe1zki+pA3BsRBdhHkPsD8xrKH2R684yvfYgDjBvZNkbaajjT1RouxVgsDTNoU4jsoYaBA05Exbn1Zs3uwWUx/ShTNA9e9S+Nbrhvx9QCtob9bl48o6gKOtvKJAoCI4FU564DfjlDf4GG0tJsgDoPxdBb0/9hB+wq7oPy/alZ7RWc66rLhfju+Nx0Zy9xikJT5QjZ+uhsa71IEqm6gBWfL5dE908ywwoEtsJvZLi8iFpg==
-X-OriginatorOrg: sandisk.com
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SEZPR02MB5520:EE_|SEZPR02MB6435:EE_
+X-MS-Office365-Filtering-Correlation-Id: a438950b-4cd3-42da-0def-08de3a4d2618
+X-Microsoft-Antispam:
+	BCL:0;ARA:14566002|9112599006|15080799012|23021999003|12121999013|461199028|41001999006|19110799012|51005399006|8060799015|5072599009|6090799003|40105399003|440099028|3412199025|3420499032|3430499032|1710799026;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?Wm8ya1gyeEV6TXR6ekNGN0o3Q1dsUWE3VmlZZHZXMlJzRkk1ZkZmQ3FMYVNx?=
+ =?utf-8?B?cXRNZk9qcHNqeE1kVVNVV3VGcVpmTjNhcFFLYW1KSndzYnBmZ0xaNElPY091?=
+ =?utf-8?B?RlNKSkNEMEt5ZmVCT214eVJjUGVCQzg2Nmo3MCtid25UMmNLWmYrbnVVYTQr?=
+ =?utf-8?B?THVPTlFTV3NhOUJFVGU4QjRGK1NCK29IZzEyKzNwdHNMTkNkeDR3ei9RWm50?=
+ =?utf-8?B?THU2UnBETlNvM09uQ2FVcHNsbmVsNE90MzUzQkp2cjBOdy9Pc0lTWDBabEhl?=
+ =?utf-8?B?STVOcldlR3NRUkdCck51T1ZiUmtRY1NwWGlBTW9TNk83YXJYRDJNVUh4UmRz?=
+ =?utf-8?B?SVloM3VLalUzTFZhRThUNTdvbXJwczk0OE1wREhlK25SRUpkNXpJTEVMVk1q?=
+ =?utf-8?B?QmExdmxJYTBTNFRXdk5FdFgycytZeGlRSGRVQU9rSGI5Wmx6Vm0yeE0rbERK?=
+ =?utf-8?B?SkJGNWo4d29GaXZMSnBxY1MvZUlBOUJobXo1dEhpQU9ZRTM3clZqWGJyYk91?=
+ =?utf-8?B?MFdOZW9Jby9wajM0eXV6Rm1qNnh0dUxLek9aTnp6Zmc4c1pMTjRaMkVaNU8y?=
+ =?utf-8?B?OXdDK1I3MzdLcDJuZ3JKMkxXTkV5cTBUQ2FtZjZTQlpheHgzQmNFOVdNcFZV?=
+ =?utf-8?B?YW1jUUM2c0tnWlJ1WWlFcFIyT2pWT1gxWmFNbW1UTFpTbmhyQVN6UE0rc2dK?=
+ =?utf-8?B?bWw2TldmcnVKVTRHQ1pGZi9XdGd1YjhxM3VSNVlXRjVFSHY0OTdmeFhhVzJY?=
+ =?utf-8?B?NlZyR3NBY2VWcU1VUmJCank1ZS8yWDRGTGtLSnJOVnk0em4wOU5va3FQSGdr?=
+ =?utf-8?B?ZjNYQmJ5bzJzbU0vOXQyd1lKMlRhTGVhWHVkbXZadEp1dUdFSEl6RUFkUm1G?=
+ =?utf-8?B?R1lpdXZ2RW5tZjVhWFk4RzQxQlYwdWxaOE9ZVDlKTUNUSzBRbi9iV2VmdG94?=
+ =?utf-8?B?bEFCKzQ3NUl4VUdOalBUN0JXZ2NEWTB6SjhSUkcyRGxHVFNGMjBKRk5kSExj?=
+ =?utf-8?B?TDZIYVkwVWZrTmc5MHlaNERycXhOSEFWY2I2cFk1RVlSWU44dC9lVEllbnky?=
+ =?utf-8?B?K01DeGoxK0lnakh3RUNYN3BsVjhUT2RhN1BzMFlRK3ZBd252WHlLQlVCQjRM?=
+ =?utf-8?B?VFRwRWVCeHdORGZNeWJPUTduRlJVRkNrTGJxQ1RwWFhCY2ZlTWRRM2hqVGRk?=
+ =?utf-8?B?VDBJSXJ0NnVIU0tYVU45RUdxUmJSTndGdnJlbW5XTTVkaXh4ZXRabEIzQ0N3?=
+ =?utf-8?B?K0tXQVh3cEh6eU9mL2RHc1Q3MG9uOHd6eHJCdVMybjZZOWJDM3h1VVJ3T1Bw?=
+ =?utf-8?B?RnljelNUTURVR01rbVd0WFNBVjM2N3dJQnRSbEZFNmxBSU1OdTVrVE5rc0Fw?=
+ =?utf-8?B?d0JvQ3I0eGc4em5sRXEyYTFrSnVvVVg0eFZIeTRMK0ZsN0c5c1VtazE2NEVm?=
+ =?utf-8?B?VTJ1YlVJUWNRTE83dEhSaUVTam9hZW51V0RUaWk0OE04aWYzdEZ5emJNNmhT?=
+ =?utf-8?B?OFViK2x3OHZHSEdSY1VlL2JkNnZJQTBwb0Y3SWRkM0FmOXcrQnBGQmRBMG0x?=
+ =?utf-8?B?VkxqR2VIOFdmNXZGOEx2cWswZ0JiTy9aT1Q2a3o2bmNsMTJ2VkhkWThYQXhj?=
+ =?utf-8?B?K2xjd0ord1E5OHI2MHNibEJkNG1WSTVDVXF1R3cvdVcvVjFVUGx0VDUwaHdK?=
+ =?utf-8?B?UDdIeXpFNUxlR3VhVFZBN01iRG9jclVtQnF5NFFRTm1BYlJqd1JYYjRkT3Rn?=
+ =?utf-8?B?YkIxWlRDTGJGRWpkWnJKdm4yV2YrK0psYWpuYlJ5SjlJbHU0cUJpaWhDQ3Y2?=
+ =?utf-8?B?ejg0QXI2dS9hUXFweFo1QT09?=
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?cWM4QUxINkVYRnpjU2Qvenorckg3TkMvUXQrU3pSUUt3bHJVdzExUEFGV0Na?=
+ =?utf-8?B?RW9Vc055VWRVeEo3Y1R5YmJNb0RJRmRhYVIyVkpqYnlJL3dCekFtNDd0ZWN2?=
+ =?utf-8?B?SUgvZWFxMlVjenRmQUV1WjBWK3lWSm1KN01QdU1aNkpWVElqNVBxbVFvUWVh?=
+ =?utf-8?B?RG0yOEowTk1vMVZ3SXhaT2FldmxDQkxJVVdPTnRLWXFEOEU3L3RJbDg1WkJp?=
+ =?utf-8?B?YmNVWVJ6ZkUvYjEyWFFPRTJCeHBaNWNkRC8yMmpReTdCMHV4OXYvdFNpeVJO?=
+ =?utf-8?B?K091a2dCOHJ6MGNiOGVFemVneGNJczZWZzl1YzJvUWtSYUJabmtJcGVOelFE?=
+ =?utf-8?B?R2huUURnS0FNanBWNnJyeGEwMW1WY1kvbk9nckdTWGI0ZXUrUXhydm04dzJ6?=
+ =?utf-8?B?TGdISTkzZklabktTTGZ4UFlROGp1aHBPbDRxeUQ4RXJCTDFHY2U3bHVRTnho?=
+ =?utf-8?B?c1pyS05FWTZHZmFYdE9ZYzNMdVRkc2dTUzNoSTNCZWtQdHUyU3RUeStkczA5?=
+ =?utf-8?B?dHdtZWs5R1gyc1NRSnpnYlp5dTI0bkhEMEFJOTF6MFREWVRmaEJLREJpaEtY?=
+ =?utf-8?B?TlJvSC9YOVczRjhRNldQME9wZFY5czF1YUljZTNYWkY4UG1ITXRnck1acVVM?=
+ =?utf-8?B?a3dkcFc2b2ZocExNNi9GKzdPcVkvbUJSallOdDRreHJGK0ZnM043aDBwVUh4?=
+ =?utf-8?B?clRkS0ZwNjhTUTJEN0xxdTQwdnZVRmVrYm5VQWtEUFJrN3dFM2Y1S2lrOGwy?=
+ =?utf-8?B?R0lZUUVqRUZ4bWVFUEhYblF2Z2VjRVVyYUVMNDRScWZpQ0NiMlpCUW13RWI5?=
+ =?utf-8?B?VERXNFVvR3granNKUU9DK3hzdWV0V2prUzZxb3N0QXhjdWVMVWRmYk1nVmV4?=
+ =?utf-8?B?QkRiNmdjTWNaYXNqbTY3cG1PUmNzZ0ZkWk1BMk92WkhiZ0JMd0cvaUR0eGx5?=
+ =?utf-8?B?dUMwVFBUbVZUVVFyd001anp5QW9Wem1uWkRqdnhsS0FJSmE1Z2ZkWnBNYjJQ?=
+ =?utf-8?B?VkRDTmMreVk1b2RrVTVHVmNPOUI3c1RZR1ArUS8yci9DNTNZbGdYaUMzNm4v?=
+ =?utf-8?B?MmNWQnZ6Sm9MdW1WaFVYMEplZ2ptN1hoM0xqbGdyU3RqbUdRS2NCbUZMaUN0?=
+ =?utf-8?B?Wk9LSUVPd25jUUVJcmJ1WjRvSHp4RG1Vdnh1NFRCaGRNdFJpWmNqQ0Z6VTBu?=
+ =?utf-8?B?MHZzNC9Ja0xCdWRRNG1GL2c2anpNeFRLcXNWT3VXWTlla3E0Tlp1TWVFendo?=
+ =?utf-8?B?TmV3Q2FqWGNyTXpMYXl5T3lxU2FUOU9iSWdNdzVzTUt6U041VFVYb2lwNERN?=
+ =?utf-8?B?Z3JBNDFFWWZlaTBlTUVseU9aSkxSWVI3SlhIRnBVL3RHaWZQL3JHV0hhaERQ?=
+ =?utf-8?B?QVRRbi9uWGtubDF6MDhySytrdWwyZGgxNGhWc09vYkhEM25DcWdPZzExUEFu?=
+ =?utf-8?B?dVhOQVFvTWo1eFV1NTVnNlJ6cmNwelIxOWZjcWNEQ1JwVWYwcGVuVnZrd2FE?=
+ =?utf-8?B?SjUwU1NYWVgxUi9BaExISzJrT0NSZjVHWjR4SE51MVMyZ3JpUUx4ZGRDVGRs?=
+ =?utf-8?B?dVF4YXVvSjdyUFpGN3hQSE5DeXRMdHkrRWJseERoalJ0VGtyUVNhSGtYaHF0?=
+ =?utf-8?B?aUZHS2hhUkIyYjV0QjNtWFVoUlE0bDhCaFYxNjFqVlV3L1NLTEorbE1lQWtx?=
+ =?utf-8?B?engvTkoyd013VTdoelJEdEJpQnpvVkYvc1IxUE90V1BzLzhPRW00TWhoKzEy?=
+ =?utf-8?B?SmdiaUVBL0tnaE1qLzNaRWVwb1dESkxCbzVNaG5jU3dERFcvNU1ERXYrNStu?=
+ =?utf-8?B?SGMvRC9sSVNWNnlXSzMyZz09?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a438950b-4cd3-42da-0def-08de3a4d2618
+X-MS-Exchange-CrossTenant-AuthSource: SEZPR02MB5520.apcprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS1PR16MB6753.namprd16.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9d0c704c-7126-408c-fb18-08de3a1659ef
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Dec 2025 07:08:00.5608
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Dec 2025 13:40:16.3877
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 7ffe0ff2-35d0-407e-a107-79fc32e84ec4
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: accFkkIllNxHz6Fivtw1ts3nfLs7Sw4PACGDCu9gPoZ5sKto3fup3sUmtVefH0ainUP6z1W1zUg7Ds8jbSZ1aw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA3PR16MB6607
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEZPR02MB6435
 
-> +#define MMC_QUIRK_FIXED_SECURE_ERASE_TRIM_TIME (1<<19) /* Secure
-> erase/trim time is fixed regardless of size */
-Maybe you could rebase your work on:
-https://patchwork.kernel.org/project/linux-mmc/patch/20251128052011.204735-=
-3-avri.altman@sandisk.com/
-Which is expected to be applied in v6.19-rc1.
+On 12/13/25 11:18 AM, Damien Le Moal wrote:
+> On 2025/12/13 11:59, Yongpeng Yang wrote:
+>> On 12/13/25 3:52 AM, Jens Axboe wrote:
+>>> On 12/12/25 7:46 AM, Yongpeng Yang wrote:
+>>>> From: Yongpeng Yang <yangyongpeng@xiaomi.com>
+>>>>
+>>>> zlo->state is not an atomic variable, so checking
+>>>> 'zlo->state == Zlo_deleting' must be done under zloop_ctl_mutex.
+>>>>
+>>>> Signed-off-by: Yongpeng Yang <yangyongpeng@xiaomi.com>
+>>>> ---
+>>>>    drivers/block/zloop.c | 7 +++++--
+>>>>    1 file changed, 5 insertions(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/drivers/block/zloop.c b/drivers/block/zloop.c
+>>>> index 77bd6081b244..0f29e419d8e9 100644
+>>>> --- a/drivers/block/zloop.c
+>>>> +++ b/drivers/block/zloop.c
+>>>> @@ -697,9 +697,12 @@ static blk_status_t zloop_queue_rq(struct blk_mq_hw_ctx *hctx,
+>>>>    	struct zloop_cmd *cmd = blk_mq_rq_to_pdu(rq);
+>>>>    	struct zloop_device *zlo = rq->q->queuedata;
+>>>>    
+>>>> -	if (zlo->state == Zlo_deleting)
+>>>> +	mutex_lock(&zloop_ctl_mutex);
+>>>> +	if (zlo->state == Zlo_deleting) {
+>>>> +		mutex_unlock(&zloop_ctl_mutex);
+>>>>    		return BLK_STS_IOERR;
+>>>> -
+>>>> +	}
+>>>> +	mutex_unlock(&zloop_ctl_mutex);
+>>>
+>>> Probably a better idea to make the state checking atomic, and avoid the
+>>> mutex in the queue_rq path.
+>>>
+>>
+>> It is more reasonable, I'll fix this in v2.
+> 
+> Either what Jens proposed, or move the check to zloop_handle_cmd(), since that
+> is run in work item context, we can block there.
 
-Thanks,
-Avri
+Yes, both approaches are fine. The zloop driver has only 3 states, using
+an atomic variable seems more concise.
+
+> 
+> Of note, is that the loop driver does the same thing in loop_queue_rq(): the
+> device state is checked without the loop device mutex held. So a similar fix
+> there may also be nice to have.
+
+Yes, the loop driver has a similar issue, and I will attempt to fix it
+as well.
+
+Thanks
+Yongpeng,
+
+> 
+>>
+>> Thanks
+>> Yongpeng,
+> 
+> 
+
