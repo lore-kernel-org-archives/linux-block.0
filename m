@@ -1,130 +1,107 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C12927494
-	for <linux-block@vger.kernel.org>; Sun, 14 Dec 2025 06:41:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B40FE2609CC;
+	Sun, 14 Dec 2025 08:05:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765694521; cv=none; b=Zh0UXFQYmPSrO0YXOws5KdEWTS3PuRkfHQ4WLDyAxnlzHziVnc7D4uRPujX4SLaqiym8bjELWoeZSYfDMIqp93Vs13vXL0J7QQ2mYXsMFAtwrKJo+RedOo7RHJ8hVBOvb5H8lOSLUg5KsdqvqagrGKsSFZgXyvj59jci8fwYRWI=
+	t=1765699517; cv=none; b=K3Ad1BPogopym3/to1czJhe8+AzlbH9x1f8oATk9aRsrcOR3jgGSkXkdroDT5H5+7fED2HTf5W5kj+YrEJhK5LfleyPe9+RTWecfmKozlq38/11WjADQrNIN7lX/Zc/kKb82W/+KuV1XQffHMaw+q9+uYsSjM7KgYPI494Jn+lU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765694521; c=relaxed/simple;
-	bh=dQ16CfjkbkfCh4HqYehGqVSamuRbY6apRz6n0Tte68Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oalv/0y1RczeTjVg4xUsHS110++qenrVs2E1jOiw0durl4ndNsv5bXbett04GwHeyA6/tu+K/4SZp6HKW9PMxaNgL4Zw2at6k3nypPJBZsmFiRR1ILVkxeUXqC8FtRN49H2PTGKJ6ELnUNXII31nLcenVi95TJIfIJu6ip0bXws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=NNyF90N5; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1765699517; c=relaxed/simple;
+	bh=ihizdAs5xDOev8/N37y8juDMqohuVvatea37UyTaRi8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=coAzTKlhyGaf9iurBjOf2YcFG1tIDZRAxvVQ5y0PIJRXEcTsHfT/j1znpNZ1lqfMyKBiIS4pKWxCy72vQpMJXZnMiOtc9aGvvGMs7gdQroeMfbqduoGwl8igRJYSnLTRpix5Q2VKvstKFeKyDyem3s+I6aJfM6vI0czfsQ3QyaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kty6VVwz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="NNyF90N5"
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-297e264528aso26806605ad.2
-        for <linux-block@vger.kernel.org>; Sat, 13 Dec 2025 22:41:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1765694516; x=1766299316; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=k1myclC6Fz56BlTmyyPlaEo0TSEJoIxNrl3r4Mi+G78=;
-        b=NNyF90N5yThp5nb0dqA7mlai3od0zb/CKvWvUw4Ouw6WZeL2v3YmgmG6Z9IQ7KAm/R
-         RT/7ATmtagDxZAcMeTNbVgvp83cK1DcTkb0HuT4vlzWay1lqoXt3VvgaVHcnL39huxd6
-         eEC89KD8KiURVVAEzFsarQ9xcHJQmez5GKAR2NaXzzMOVdiTjPA8Sz64CSnROwW1oLOH
-         zagp8nt8EsNQshliV04Zz9TvjcigKWE4RhUQ+uTvWQhoD2tKxnyeo0Vzcmtxt0nCiuKy
-         vWnhtetnq7B/rnhCsCySJrMOEXBJF6hRCNm8OFaq0mcaseV3vx67pcw5WKLfX/5qqgZ2
-         iaTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765694516; x=1766299316;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=k1myclC6Fz56BlTmyyPlaEo0TSEJoIxNrl3r4Mi+G78=;
-        b=UmzyqXy1D8NID97GMfQ6z98cJFYv19gxtlNeiklzHjHvJlSRNyC3UmHEehP1+sIA8d
-         NX328Snum5coeFF7sH0aB0636v3wx9XQFka/XFaTyPyGQw21lKRTAbPYDnbpSoiIML1E
-         CWKahYRv2PtDyxZxN6yK9Jr5qehvts4dJu70S7yFJiUdBgCsbz4CmkepdUwP/viw+a2i
-         2QvmIY6pOy463CrA7C4rMC3M8HKamQaN8SZHs1j7UtYHG0LJapfafsH4SkG/5gF8F3vq
-         vA3I5wVX3UHHOMg3uU6oHsrFyCCokKq9eJHpWx+L6Jell+mHL4VIaL/jpgwxMcnr6xl2
-         +KOQ==
-X-Gm-Message-State: AOJu0Ywy1UfvVL26EeZL1HLu/QwrWPTHSWJB+VZStCMbQku9D2M/5+97
-	fG31dM1n5H2JofN1b3OMmwrm8XAwd9iqqjfjAnIL9ghLaAiheHWXJ71klbr6hnVlHu4=
-X-Gm-Gg: AY/fxX4hcSBatFEftiCoRPvdF/CA6WSo1a0YigoJbHzKOOXvvrjYchQZZtaT7tke2d2
-	ubwqAqSIEdl07fP2MaIO2dJiQJ7s1EupfKOKFe0T0lhmPFqjalPgsPg+//DFNrv9a7HP2BxrEmq
-	i6tSMnTONNzeXDBJFq0RDHs73GoSAZ8QCiHWlhzVAP2fBVKNQWUNg1bhrqhl4AAMd5SUNNgOEMN
-	LDmY3U6e77WsKb0ajFoJ1F22P4oVcB4PqtkboOGKtvuz2Co+yIKRHroOsEHHbEwuf3m3L+stDSu
-	MgH2R4qcnD0txN3GXcoZsWheTPPbIxmXvdb1hkywLIQIJRSvTXG8d4eKlUcA0F5QQz2BBBBlTLi
-	RRjHSECcW+XpXN5qaUYSX2cjZwBHAGWbJYNg4hquPH9PPIeeNIEInIKGTRDj05SXuS4HnR7Onp7
-	8CvoGSup/V56MN4+6Mv/bcG2apt4f5nbcQDj/2+ZkmFfkdz6vPUt37WvYLrQh62g==
-X-Google-Smtp-Source: AGHT+IGk1bEteCTJcmDW+Cc3JwvCbre86yxx4swxVS35VLf29DA19LDx1ExFPzY1C31JPRz2XyfUpg==
-X-Received: by 2002:a17:902:ce11:b0:2a0:c5b8:24b0 with SMTP id d9443c01a7336-2a0c5b82c96mr9968755ad.46.1765694515972;
-        Sat, 13 Dec 2025 22:41:55 -0800 (PST)
-Received: from [192.168.212.20] (x7a12e92d.tkyo.kotei.ppp.nifty.ne.jp. [122.18.233.45])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29f1eff8481sm65222335ad.80.2025.12.13.22.41.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 13 Dec 2025 22:41:55 -0800 (PST)
-Message-ID: <93163617-11bb-4700-aca9-940c0df7429f@kernel.dk>
-Date: Sat, 13 Dec 2025 23:41:52 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kty6VVwz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66711C4CEF1;
+	Sun, 14 Dec 2025 08:05:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765699517;
+	bh=ihizdAs5xDOev8/N37y8juDMqohuVvatea37UyTaRi8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Kty6VVwzTJtdeGkn/OL/sk2f7Vfnpv82H2rJ71SoVx5wLW/jb8lxm2RuFqMqpcEHB
+	 9/ooTAhhdffBRwzl0rkjmLIVGEm8RBGaGHTqlxjBo6IhmNSozd/xIqpYfSV3HiEEuF
+	 r9Ae5LH2yKrVwPDJsSlCF5IKvD6QnlpE6J1sYr19zntuAY/UyUwqETaiphNCCl6Fg0
+	 OIfJqqcMaGaTZTfwoSpZdnCgyFEicpt76KiSaP7TH5N3yFXQRgkZp5SQtveJKUU8O8
+	 qy/urqiNHzU11rrcFzoWeK/Trun7TjKtaJPlRq9DNhHOtzui8DMkvIIYEGKRnYClqr
+	 1Dx2GzcDYarcA==
+Date: Sun, 14 Dec 2025 09:05:09 +0100
+From: Ingo Molnar <mingo@kernel.org>
+To: Juergen Gross <jgross@suse.com>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
+	virtualization@lists.linux.dev, kvm@vger.kernel.org,
+	linux-hwmon@vger.kernel.org, linux-block@vger.kernel.org,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Ajay Kaher <ajay.kaher@broadcom.com>,
+	Alexey Makhalov <alexey.makhalov@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+	xen-devel@lists.xenproject.org, Jean Delvare <jdelvare@suse.com>,
+	Guenter Roeck <linux@roeck-us.net>,
+	Denis Efremov <efremov@linux.com>, Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH 0/5] x86: Cleanups around slow_down_io()
+Message-ID: <aT5vtaefuHwLVsqy@gmail.com>
+References: <20251126162018.5676-1-jgross@suse.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2] ublk: fix deadlock when reading partition table
-To: Ming Lei <ming.lei@redhat.com>
-Cc: linux-block@vger.kernel.org, Caleb Sander Mateos
- <csander@purestorage.com>, Uday Shankar <ushankar@purestorage.com>
-References: <20251212143415.485359-1-ming.lei@redhat.com>
- <8dd3c141-3e92-44f3-91e2-2bf4827b36a4@kernel.dk> <aTzPUzyZ21lVOk1L@fedora>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <aTzPUzyZ21lVOk1L@fedora>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251126162018.5676-1-jgross@suse.com>
 
-On 12/12/25 7:28 PM, Ming Lei wrote:
-> On Fri, Dec 12, 2025 at 12:49:49PM -0700, Jens Axboe wrote:
->> On 12/12/25 7:34 AM, Ming Lei wrote:
->>> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
->>> index df9831783a13..38f138f248e6 100644
->>> --- a/drivers/block/ublk_drv.c
->>> +++ b/drivers/block/ublk_drv.c
->>> @@ -1080,12 +1080,20 @@ static inline struct ublk_uring_cmd_pdu *ublk_get_uring_cmd_pdu(
->>>  	return io_uring_cmd_to_pdu(ioucmd, struct ublk_uring_cmd_pdu);
->>>  }
->>>  
->>> +static void ublk_end_request(struct request *req, blk_status_t error)
->>> +{
->>> +	local_bh_disable();
->>> +	blk_mq_end_request(req, error);
->>> +	local_bh_enable();
->>> +}
->>
->> This is really almost too ugly to live, as a work-around for what just
->> happens to be in __fput_deferred()... Surely we can come up with
->> something better here? Heck even a PF_ flag would be better than this,
->> imho.
-> 
-> task flag will switch to release all files opened by current from wq context,
-> and there may be chance to cause regression, especially this fix needs to
-> backport to stable.
 
-I don't mean in general for the task, just across the completion. It'd
-cause the exact same punts to async puts as the current patch.
+* Juergen Gross <jgross@suse.com> wrote:
 
-> So I'd suggest to take it for safe stable purpose.
+> While looking at paravirt cleanups I stumbled over slow_down_io() and
+> the related REALLY_SLOW_IO define.
+>
+> Especially REALLY_SLOW_IO is a mess, which is proven by 2 completely
+> wrong use cases.
+>
+> Do several cleanups, resulting in a deletion of REALLY_SLOW_IO and the
+> io_delay() paravirt function hook.
+>
+> Patches 2 and 3 are not changing any functionality, but maybe they
+> should? As the potential bug has been present for more than a decade
+> now, I went with just deleting the useless "#define REALLY_SLOW_IO".
+> The alternative would be to do something similar as in patch 5.
+>
+> Juergen Gross (5):
+>   x86/paravirt: Replace io_delay() hook with a bool
+>   hwmon/lm78: Drop REALLY_SLOW_IO setting
+>   hwmon/w83781d: Drop REALLY_SLOW_IO setting
+>   block/floppy: Don't use REALLY_SLOW_IO for delays
+>   x86/io: Remove REALLY_SLOW_IO handling
+>
+>  arch/x86/include/asm/floppy.h         | 27 ++++++++++++++++++++++-----
+>  arch/x86/include/asm/io.h             | 12 +++++-------
+>  arch/x86/include/asm/paravirt.h       | 11 +----------
+>  arch/x86/include/asm/paravirt_types.h |  3 +--
+>  arch/x86/kernel/cpu/vmware.c          |  2 +-
+>  arch/x86/kernel/kvm.c                 |  8 +-------
+>  arch/x86/kernel/paravirt.c            |  3 +--
+>  arch/x86/xen/enlighten_pv.c           |  6 +-----
+>  drivers/block/floppy.c                |  2 --
+>  drivers/hwmon/lm78.c                  |  5 +++--
+>  drivers/hwmon/w83781d.c               |  5 +++--
+>  11 files changed, 39 insertions(+), 45 deletions(-)
 
-I'm really having a hard time with it - and I have to defend it once I
-send it further upstream. And I can tell you who's going to hate it, the
-guy that pulls from me. We might get lucky that he doesn't look at it.
-But the underlying issue here is that the patch is one nasty bandaid,
-not that Linus would yell at it, with good reason imho.
+I think we should get rid of *all* io_delay hacks, they might have been
+relevant in the days of i386 systems, but we don't even support i386
+CPUs anymore. Should it cause any regressions, it's easy to bisect to.
+There's been enough changes around all these facilities that the
+original timings are probably way off already, so we've just been
+cargo-cult porting these to newer kernels essentially.
 
-At the same time, I don't really have other good suggestions. Let me
-ponder it a bit, about to get on a flight anyway and -rc1 has been cut
-at this point regardless.
+Thanks,
 
-Obviously this isn't a ublk induced issue, it's all down to the lock
-grabbing that happens there. Maybe bdev_release() could do a deferred
-put if a trylock of ->open_mutex fails?
-
--- 
-Jens Axboe
+	Ingo
