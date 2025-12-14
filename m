@@ -1,19 +1,19 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EF17299A90
-	for <linux-block@vger.kernel.org>; Sun, 14 Dec 2025 10:14:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9E152040B6
+	for <linux-block@vger.kernel.org>; Sun, 14 Dec 2025 10:14:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765707267; cv=none; b=W4/PlMxVlJnFI7LEsztuZHLipwm16IMcJDClkGjdWQS+cHko29hgqfYSrflJ0agIG8QsaUSJ0IOUAK6GLbOBq8cP2bHk8GKifWWZJLbZTo9SL4AFWpIo0DY7h5S2ZYGwjSUqQemu7Z8nMoHwlpJTxoI4YRV1j7x9jbyFNkhwZ7s=
+	t=1765707271; cv=none; b=UHjFVSuxStD1T6xOOclxwzD5Iot+CM9LPXd3dMj52HGOFqHA/0zTgqe2Z55nBbnFBhVa0wNx161t/JMIIE/FfObmFB+iVex1zXPALeHKMutLbH0xyAU0ZDCGpcc5fnc32Z81pm6uL2q81t9I1rQAB6tbGlw1jR8a+6+7kgu4Ig4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765707267; c=relaxed/simple;
-	bh=7io5gauzaLWGYdMCWcfKV2yUhVgtNcFmCCxTnMgMlF0=;
+	s=arc-20240116; t=1765707271; c=relaxed/simple;
+	bh=KpzvXJbiIsIiP2wwLPEfoCYZGj28qHN7Js/gQX2JgAY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cR60EEd1MAZwHbZKeMTofqnhi9mbeO4j6c/NsEbZ5GrP0+HFpGe09NMQrGXygqCKPKpSIhsBsER4AP6Qt4eSKmpLcrX/HH7YpEGSC9CjKj8tKsmJDOmzmbPf/rRiLxFPsF86JiaSbcvltpmO0pUHNvLILwxYu3KGRkQieAbVBgI=
+	 MIME-Version; b=i1tbMtbFcvJd91XRKGuPMH5G626CFZFvJsrB9bO754qdNO9yf5poUzFEcnp4gnqomIV9vUoZH5zebDyQkl/0dno/6I4S69Z/GcAwNouwPas2mH/04QFfqiP/YGXhuzuz8wlEsbYhTGXpO6mCu9V79zAvaCCm3I9JzzpkITJ/Mr0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D75AC16AAE;
-	Sun, 14 Dec 2025 10:14:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3147C19421;
+	Sun, 14 Dec 2025 10:14:27 +0000 (UTC)
 From: Yu Kuai <yukuai@fnnas.com>
 To: axboe@kernel.dk,
 	linux-block@vger.kernel.org,
@@ -21,9 +21,9 @@ To: axboe@kernel.dk,
 	nilay@linux.ibm.com,
 	ming.lei@redhat.com
 Cc: yukuai@fnnas.com
-Subject: [PATCH v5 05/13] blk-mq-debugfs: make blk_mq_debugfs_register_rqos() static
-Date: Sun, 14 Dec 2025 18:14:00 +0800
-Message-ID: <20251214101409.1723751-6-yukuai@fnnas.com>
+Subject: [PATCH v5 06/13] blk-mq-debugfs: warn about possible deadlock
+Date: Sun, 14 Dec 2025 18:14:01 +0800
+Message-ID: <20251214101409.1723751-7-yukuai@fnnas.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251214101409.1723751-1-yukuai@fnnas.com>
 References: <20251214101409.1723751-1-yukuai@fnnas.com>
@@ -35,59 +35,100 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Because it's only used inside blk-mq-debugfs.c now.
+Creating new debugfs entries can trigger fs reclaim, hence we can't do
+this with queue frozen, meanwhile, other locks that can be held while
+queue is frozen should not be held as well.
 
 Signed-off-by: Yu Kuai <yukuai@fnnas.com>
 ---
- block/blk-mq-debugfs.c | 4 +++-
- block/blk-mq-debugfs.h | 5 -----
- 2 files changed, 3 insertions(+), 6 deletions(-)
+ block/blk-mq-debugfs.c | 30 +++++++++++++++++++++++-------
+ 1 file changed, 23 insertions(+), 7 deletions(-)
 
 diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 128d2aa6a20d..99466595c0a4 100644
+index 99466595c0a4..d54f8c29d2f4 100644
 --- a/block/blk-mq-debugfs.c
 +++ b/block/blk-mq-debugfs.c
-@@ -14,6 +14,8 @@
- #include "blk-mq-sched.h"
- #include "blk-rq-qos.h"
+@@ -610,9 +610,22 @@ static const struct blk_mq_debugfs_attr blk_mq_debugfs_ctx_attrs[] = {
+ 	{},
+ };
  
-+static void blk_mq_debugfs_register_rqos(struct rq_qos *rqos);
+-static void debugfs_create_files(struct dentry *parent, void *data,
++static void debugfs_create_files(struct request_queue *q, struct dentry *parent,
++				 void *data,
+ 				 const struct blk_mq_debugfs_attr *attr)
+ {
++	/*
++	 * Creating new debugfs entries with queue freezed has the risk of
++	 * deadlock.
++	 */
++	WARN_ON_ONCE(q->mq_freeze_depth != 0);
++	/*
++	 * debugfs_mutex should not be nested under other locks that can be
++	 * grabbed while queue is frozen.
++	 */
++	lockdep_assert_not_held(&q->elevator_lock);
++	lockdep_assert_not_held(&q->rq_qos_mutex);
 +
- static int queue_poll_stat_show(void *data, struct seq_file *m)
- {
- 	return 0;
-@@ -758,7 +760,7 @@ void blk_mq_debugfs_unregister_rqos(struct rq_qos *rqos)
- 	rqos->debugfs_dir = NULL;
+ 	if (IS_ERR_OR_NULL(parent))
+ 		return;
+ 
+@@ -640,7 +653,7 @@ void blk_mq_debugfs_register(struct request_queue *q)
+ 	struct blk_mq_hw_ctx *hctx;
+ 	unsigned long i;
+ 
+-	debugfs_create_files(q->debugfs_dir, q, blk_mq_debugfs_queue_attrs);
++	debugfs_create_files(q, q->debugfs_dir, q, blk_mq_debugfs_queue_attrs);
+ 
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		if (!hctx->debugfs_dir)
+@@ -659,7 +672,8 @@ static void blk_mq_debugfs_register_ctx(struct blk_mq_hw_ctx *hctx,
+ 	snprintf(name, sizeof(name), "cpu%u", ctx->cpu);
+ 	ctx_dir = debugfs_create_dir(name, hctx->debugfs_dir);
+ 
+-	debugfs_create_files(ctx_dir, ctx, blk_mq_debugfs_ctx_attrs);
++	debugfs_create_files(hctx->queue, ctx_dir, ctx,
++			     blk_mq_debugfs_ctx_attrs);
  }
  
--void blk_mq_debugfs_register_rqos(struct rq_qos *rqos)
-+static void blk_mq_debugfs_register_rqos(struct rq_qos *rqos)
- {
- 	struct request_queue *q = rqos->disk->queue;
- 	const char *dir_name = rq_qos_id_to_name(rqos->id);
-diff --git a/block/blk-mq-debugfs.h b/block/blk-mq-debugfs.h
-index 54948a266889..d94daa66556b 100644
---- a/block/blk-mq-debugfs.h
-+++ b/block/blk-mq-debugfs.h
-@@ -34,7 +34,6 @@ void blk_mq_debugfs_register_sched_hctx(struct request_queue *q,
- void blk_mq_debugfs_unregister_sched_hctx(struct blk_mq_hw_ctx *hctx);
+ void blk_mq_debugfs_register_hctx(struct request_queue *q,
+@@ -675,7 +689,8 @@ void blk_mq_debugfs_register_hctx(struct request_queue *q,
+ 	snprintf(name, sizeof(name), "hctx%u", hctx->queue_num);
+ 	hctx->debugfs_dir = debugfs_create_dir(name, q->debugfs_dir);
  
- void blk_mq_debugfs_register_rq_qos(struct request_queue *q);
--void blk_mq_debugfs_register_rqos(struct rq_qos *rqos);
- void blk_mq_debugfs_unregister_rqos(struct rq_qos *rqos);
- #else
- static inline void blk_mq_debugfs_register(struct request_queue *q)
-@@ -75,10 +74,6 @@ static inline void blk_mq_debugfs_unregister_sched_hctx(struct blk_mq_hw_ctx *hc
- {
+-	debugfs_create_files(hctx->debugfs_dir, hctx, blk_mq_debugfs_hctx_attrs);
++	debugfs_create_files(q, hctx->debugfs_dir, hctx,
++			     blk_mq_debugfs_hctx_attrs);
+ 
+ 	hctx_for_each_ctx(hctx, ctx, i)
+ 		blk_mq_debugfs_register_ctx(hctx, ctx);
+@@ -726,7 +741,7 @@ void blk_mq_debugfs_register_sched(struct request_queue *q)
+ 
+ 	q->sched_debugfs_dir = debugfs_create_dir("sched", q->debugfs_dir);
+ 
+-	debugfs_create_files(q->sched_debugfs_dir, q, e->queue_debugfs_attrs);
++	debugfs_create_files(q, q->sched_debugfs_dir, q, e->queue_debugfs_attrs);
  }
  
--static inline void blk_mq_debugfs_register_rqos(struct rq_qos *rqos)
--{
--}
--
- static inline void blk_mq_debugfs_register_rq_qos(struct request_queue *q)
- {
+ void blk_mq_debugfs_unregister_sched(struct request_queue *q)
+@@ -775,7 +790,8 @@ static void blk_mq_debugfs_register_rqos(struct rq_qos *rqos)
+ 							 q->debugfs_dir);
+ 
+ 	rqos->debugfs_dir = debugfs_create_dir(dir_name, q->rqos_debugfs_dir);
+-	debugfs_create_files(rqos->debugfs_dir, rqos, rqos->ops->debugfs_attrs);
++	debugfs_create_files(q, rqos->debugfs_dir, rqos,
++			     rqos->ops->debugfs_attrs);
  }
+ 
+ void blk_mq_debugfs_register_sched_hctx(struct request_queue *q,
+@@ -798,7 +814,7 @@ void blk_mq_debugfs_register_sched_hctx(struct request_queue *q,
+ 
+ 	hctx->sched_debugfs_dir = debugfs_create_dir("sched",
+ 						     hctx->debugfs_dir);
+-	debugfs_create_files(hctx->sched_debugfs_dir, hctx,
++	debugfs_create_files(q, hctx->sched_debugfs_dir, hctx,
+ 			     e->hctx_debugfs_attrs);
+ }
+ 
 -- 
 2.51.0
 
