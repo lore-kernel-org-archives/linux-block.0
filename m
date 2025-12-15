@@ -1,61 +1,63 @@
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 386A8313E2C
-	for <linux-block@vger.kernel.org>; Mon, 15 Dec 2025 08:55:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B930328B4C
+	for <linux-block@vger.kernel.org>; Mon, 15 Dec 2025 08:55:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765788951; cv=none; b=dQMSmSpWhdaqrRSTF++bVbfA4igpy7QDqckig+1miADZlWVS8O9sTy3FzFYoL4KFCcQkEkBj8wyOGMIDvUWB3r4z/KCdpgX1NawpUpwE0GuIVqU1wqL0xQ7Q0xSdp3rIrvVZrggtrLbObRL7/+HzC4cvW36GakFypokJCh0zmlw=
+	t=1765788956; cv=none; b=HmM/RGX65wP4Vb0Hckj2BbJGNAhSdRh/e6nzog1Mfuwlx738CgPz+l0uFjjfvBEoode10apKJUHrGLLl7mAmrxPlShm5GD9YQD6NoWja1wpFaRfPzfEiXKfAra6ecHsUnTqtoVnC90lxotqvteV+4Eg1zuaPtM/0ifFJ8Mz4aX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765788951; c=relaxed/simple;
-	bh=4Tie54CDNbTI/pb3KabrJIFdXk+kf8cvTiT0m3fItb0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=t+q3PMzPX5BATf6L4QsTA+tLve3so6Mmds5oFLs8/KR+ZZ5FNg/TpDtD6Lu4Jy8y01D2SZD+lbkxmRsCGWzrWkBa+zQpfuaE3HzriFGZWEAALqgLB4wLpgGGJuYecr/FXgR1Pf+xO6eOsK9tbR0JaFglZL/KUytVCPM0YHM0iDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bUnduup9; arc=none smtp.client-ip=209.85.210.180
+	s=arc-20240116; t=1765788956; c=relaxed/simple;
+	bh=vkIE579D9Pf51E5Sv3rJ8Ww4OOZEx5efXppTB3JrexI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=bCY8BWr+JiC8Fyyt0znuwfKTBa2qlTJqSbASRznEtEC4LOHWRGHEtN+80r+gtMpIIMD3ftMngOl8CvEi+cvrcseNsYpE9/efvXHvbTEyspEnKIwA8QQWLyC6JxHg2ouEQrYbnWpaIN+D0H6stFS7iPDIu0Byk50TQ+pbJt293Co=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GRZ4FSnG; arc=none smtp.client-ip=209.85.210.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bUnduup9"
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-7f1243792f2so2013303b3a.1
-        for <linux-block@vger.kernel.org>; Mon, 15 Dec 2025 00:55:50 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GRZ4FSnG"
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7b9387df58cso4843609b3a.3
+        for <linux-block@vger.kernel.org>; Mon, 15 Dec 2025 00:55:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765788949; x=1766393749; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=TA45cfF16J5xm4R3MV6ZvCgbkvtpLEhAyJMF2NOv6Q4=;
-        b=bUnduup9m4mWUN6BdacNjTI84k0A+Jfy/cxJffF8qVyPccpGs8+JeTznFzyAL8SQKV
-         CjXOO1vxtvMYR1or6lhZpiq6U++YnCuZtWT5uocp7dNy/UhpycFeD5n4x9j+8HbX70Yh
-         kxAmomnjhXRUqSHqbiVtwnZXPExoMdNW6f2yejsk6INSBthN8GjLAgHwLgDsoiAzski4
-         PYrfKMVdSCjT1IhmX2Yywcy+oDepuH7QavpIv4vZJzLWkUbJb3hq1L9+YkHHeFMamMbX
-         b7wBHzw5bpzRHlnZu6eklwMd9K5sqfu4lTOToX7+YDM+MY/pAZy72oURyltUmwbYhz5C
-         2cLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765788949; x=1766393749;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1765788955; x=1766393755; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=TA45cfF16J5xm4R3MV6ZvCgbkvtpLEhAyJMF2NOv6Q4=;
-        b=aFZ8xcpmsZTEbj/D6NE+Pp1j6UxnmVxBxSOjux9VF1mmGKf1+ZgdQ6IjDF5lDlMXYw
-         2u903QFAIQ9xJl1CN9AjNH4erbULbU0tzn3LSPYB+WYorA2YIwugYJloI7sAACcU4wv8
-         08+lRLc6HeiYC6pFmJm8q+u6rDtiQQrXYy+KgCJH7AkyQ1cowJUszimlYOLItZvGuVmK
-         xJSSLqPNdkNFLKI2ytKjSWEucuI1NiXL2AFBFA/AfQvDqnUpKh+Qv08veLP3jaQwE0fV
-         X6IEtokzuy+LPvbJU+SMja3WEz/+FqsnhMg+V6RWVbNzi+u1/3ox2+mBOdaLykZYHxzN
-         vMkQ==
-X-Gm-Message-State: AOJu0YwqhgTQuWVqxbY1HTxxVIJVAG0sv4nnV+rujvIcwkKbCofEHtbE
-	hzT1ROEz9xRaYgaFNGqy6GRCuA2wrW3c1TuV9QpCAw5t20sK8vC/U2Y3UiLjt1SPt+E=
-X-Gm-Gg: AY/fxX56LWKklIfQ/zvRKGRlDKCLZr1h7ksWScgOqC51PhGrMjEtxURZcLKhDXsPHEX
-	+epBOXmFVIyjXMHSb4en6RfTeIsowMq+6lQP5+eI3Zxvj2oBdfaXTtLDyou7Tj65orR1DJdgFAB
-	kaAGD1roDBN0xromU3SbiwrfbzD+c9Uvc1PQRL74RV5XguVP5d3POp94N5Zbq8V04wg4ULrNUxY
-	a+zedB08zbw3pSOqsQsLXemhuo1Es7+E2wO5F74sHTgBpVC5NILXMnjTsvsP/B84H4QQ6AhSsxG
-	u8YMZpXFUNv9rYBDqn6PjXgO52GCUmQ+b2hzSkFnu+BGr4UiqEEtoK+Lo4kkTfpRpwjLuscWysu
-	AmxHaxXMJ9Hz4RUW6zgfOk9wa0UQL9QSY859ic0pIPhKZrKfen5YV4w/NriynmXAyAQ1f52aC1m
-	P+30XnSJIK5fi9wGVXRMh76dtfXzOAgZn+hSeGKyP4UvB83srufp1eHgG1lA==
-X-Google-Smtp-Source: AGHT+IHgo3RXZmHyAanQiobnXtwK3uTeMCXmUhyowjXMyKXVUgAdEjuJP1p4ezWTKsWtrwuXD+ljUg==
-X-Received: by 2002:a05:6a00:339b:b0:7f6:2e6e:5289 with SMTP id d2e1a72fcca58-7f6696a3b80mr8535662b3a.49.1765788949389;
-        Mon, 15 Dec 2025 00:55:49 -0800 (PST)
+        bh=/N5vAhucA7uJnbwMQ9KUYNMH41B1zET6xOOzn4WvilM=;
+        b=GRZ4FSnGzeQgvaVFFuDQHsXHLIYn3M0aSvWLCykK4boEHuna8ORoS9kDkHH+fFa1Mj
+         3IPz2ZcQlERPEO+c8J49549G0/ntHIELpWAfKxS3ejoJmB5ovVodgZZwEIRlqj1e41i/
+         oovTtqMJQRrdbejEQMe8C3A9/tmZvEIN3ddYae7vsLr6piGt0w1tBErnS/Dx9OK4n04h
+         sGJPovbWqNSEgv98CZ/CLRQQSrAppULtydAIedP6E0fSPDO0IqH7cbmM3Juh59S9lYik
+         ld7ww0bUxCQcZBtusz9KpUOLpECVnw+BpyujkKHnqIfJJStlDsMdU0WBn9/uxIFNJLEY
+         FE/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765788955; x=1766393755;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=/N5vAhucA7uJnbwMQ9KUYNMH41B1zET6xOOzn4WvilM=;
+        b=WOUFl+MiLbOD43NNK94NguLvtXczsnCZrOrGQoRuSp7+oE2DOK/HCL9zPQcNYMDWcF
+         Cfgb4ltxoQ8L4phZx1pRIq8/LDSpI0UXOtqBpTMITTlN85ht7M0ISONgQrpCnNOWfQRZ
+         sdA0Vv6pKMTni3HBBkiyZ8cQBKCdLiZ/NABJbCx/zGtlrJcJ9jEflxUEy2sIPp5xVm2o
+         SVENvQupmN9YZoEZj6xJDzpqDWRrK1MG+gLXGT5V299DjI4rOSRYh8tK0omEUeyuFpnl
+         i9E74NO9hi05jhGUu8K8sv1hrwDqSXmH6XdI1hCDOvrG05mD96pGloMDwPLxGN5egEAP
+         BQgw==
+X-Gm-Message-State: AOJu0YyMNrcs5HqsNjZBP+q+Zi0sIipTaDLLTBF/hpUix1tm3GjBWvR5
+	qU5ozN2RznJzZHzmUbYtiaO9OX+3LBnvHdF4XYCUXiTtEhX8OwNNi2uB
+X-Gm-Gg: AY/fxX5ucuqJYKfXUgC3nuQcUFU/uWbbZw0OUq++XKj3LVDXx2DSjaynxKueWOrf2MI
+	VTmPJz0INQ3sykWLXGFuiAusKP7eJI1jYb0HZ2VIanqdDTwdpE/mJCeD7g1vcbg/GosFXLFUoU0
+	1DVksMYZ8gPC1+APU2FCZ1RKzMZjfTB9kQe6Qsa23k7oBUgVb0Yki11P8iz6DZqiVMv7PqbrL8v
+	IqZcHFBOTo5vwFQQ6A8UeOiXorwbvozkGQkH8OMUx2sciGgfHeGRn2VkNGhO9xiw6sMj31J3hkD
+	zh0KltGfrHLhzEuuQK3As51NWTXkRb6/mVAaNT/QUJp2mgLQV/pHJFAeYAzEevdgSTxnbxR+EPY
+	ngfSFWG+TlDLpNaZs4bB4aJZpCcbyS2KShfi5NURRtKWUTWk0XsP8XluNeQI4MdWBPTAg8lfbET
+	3sHnyLug4ik9fY2oa/No8/vVsIhI2fpJ1Rdf6KiGILBcV28vNDj7zyXEl385B6A6Groo7N
+X-Google-Smtp-Source: AGHT+IEt0s9tgTqv2Fxl3YaNfdE9BBsrwJ7AC3l6+9nM2j/CR6onhuRq8BTIequowO4vgl8do7JO3g==
+X-Received: by 2002:a05:6a00:3309:b0:7b9:a3c8:8c3d with SMTP id d2e1a72fcca58-7f667447783mr9820353b3a.5.1765788954645;
+        Mon, 15 Dec 2025 00:55:54 -0800 (PST)
 Received: from xiaomi-ThinkCentre-M760t.mioffice.cn ([43.224.245.241])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7f4c2379e40sm12003114b3a.5.2025.12.15.00.55.47
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7f4c2379e40sm12003114b3a.5.2025.12.15.00.55.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Dec 2025 00:55:49 -0800 (PST)
+        Mon, 15 Dec 2025 00:55:54 -0800 (PST)
 From: Yongpeng Yang <yangyongpeng.storage@gmail.com>
 To: Damien Le Moal <dlemoal@kernel.org>,
 	Christoph Hellwig <hch@lst.de>,
@@ -64,10 +66,12 @@ To: Damien Le Moal <dlemoal@kernel.org>,
 Cc: linux-block@vger.kernel.org,
 	Yongpeng Yang <yangyongpeng@xiaomi.com>,
 	Yongpeng Yang <yangyongpeng.storage@outlook.com>
-Subject: [PATCH v2 1/2] loop: use READ_ONCE() to read lo->lo_state without locking
-Date: Mon, 15 Dec 2025 16:55:18 +0800
-Message-ID: <20251215085518.1474701-2-yangyongpeng.storage@gmail.com>
+Subject: [PATCH v2 2/2] zloop: use READ_ONCE() to read lo->lo_state in queue_rq path
+Date: Mon, 15 Dec 2025 16:55:19 +0800
+Message-ID: <20251215085518.1474701-3-yangyongpeng.storage@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20251215085518.1474701-2-yangyongpeng.storage@gmail.com>
+References: <20251215085518.1474701-2-yangyongpeng.storage@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -78,40 +82,31 @@ Content-Transfer-Encoding: 8bit
 
 From: Yongpeng Yang <yangyongpeng@xiaomi.com>
 
-When lo->lo_mutex is not held, direct access may read stale data. This
-patch uses READ_ONCE() to read lo->lo_state and data_race() to silence
-code checkers.
+In the queue_rq path, zlo->state is accessed without locking, and direct
+access may read stale data. This patch uses READ_ONCE() to read
+zlo->state and data_race() to silence code checkers.
 
 Signed-off-by: Yongpeng Yang <yangyongpeng@xiaomi.com>
 ---
 v2:
-- Use READ_ONCE() instead of converting lo_state to atomic_t type.
+- Use READ_ONCE() instead of converting state to atomic_t type.
 ---
- drivers/block/loop.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/block/zloop.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 272bc608e528..f245715f5a90 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1858,7 +1858,7 @@ static blk_status_t loop_queue_rq(struct blk_mq_hw_ctx *hctx,
+diff --git a/drivers/block/zloop.c b/drivers/block/zloop.c
+index 77bd6081b244..60cb50051e0c 100644
+--- a/drivers/block/zloop.c
++++ b/drivers/block/zloop.c
+@@ -697,7 +697,7 @@ static blk_status_t zloop_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	struct zloop_cmd *cmd = blk_mq_rq_to_pdu(rq);
+ 	struct zloop_device *zlo = rq->q->queuedata;
  
- 	blk_mq_start_request(rq);
- 
--	if (lo->lo_state != Lo_bound)
-+	if (data_race(READ_ONCE(lo->lo_state)) != Lo_bound)
+-	if (zlo->state == Zlo_deleting)
++	if (data_race(READ_ONCE(zlo->state)) == Zlo_deleting)
  		return BLK_STS_IOERR;
  
- 	switch (req_op(rq)) {
-@@ -2198,7 +2198,7 @@ static int loop_control_get_free(int idx)
- 		return ret;
- 	idr_for_each_entry(&loop_index_idr, lo, id) {
- 		/* Hitting a race results in creating a new loop device which is harmless. */
--		if (lo->idr_visible && data_race(lo->lo_state) == Lo_unbound)
-+		if (lo->idr_visible && data_race(READ_ONCE(lo->lo_state)) == Lo_unbound)
- 			goto found;
- 	}
- 	mutex_unlock(&loop_ctl_mutex);
+ 	/*
 -- 
 2.43.0
 
