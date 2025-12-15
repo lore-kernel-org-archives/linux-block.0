@@ -1,194 +1,162 @@
-Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010030.outbound.protection.outlook.com [52.101.84.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3E62317715;
-	Mon, 15 Dec 2025 03:00:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.30
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765767621; cv=fail; b=kdCw4TELoN1g/+DAfjmZ81HwdB8k3vEDnJqtrq+s3eQ3VLs2q/ww9fGFGrgnkgnuAZNyMLKmRROKh8wJMDFI9NelPQ5S+tjVRACx3XvKN1PUOv008kI9ltWNtjKAqO1d3v4I2/OYqMdfb5phbq1iELsLDbu0mct3gYnhUfMxAVI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765767621; c=relaxed/simple;
-	bh=fAd2FjkLX1jKfGv80nOSy/XlqjFv13t0a25dHZJvcms=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=rlzO+BYVzCYQ8wyd+cMNHa50K+HQhpFmTWCNBIDNi6GFr+8kjjVm/v0utkf4qc0bTiSgrLkqeNMV7spNJKE2dslHOwoA6sYEwsOnNVhoXltKr0dZui3RRbdNexI7dX4LjPHoD8SilVBoxnpRPkNs0rnoAVG84VPfiBMw8oISygw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=nVn7ER9i; arc=fail smtp.client-ip=52.101.84.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2753F270ED7
+	for <linux-block@vger.kernel.org>; Mon, 15 Dec 2025 03:44:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765770273; cv=none; b=bxTFjOg5cBRY7aUlcSw/ltPDLHYWmM04LhKbK2YOU5bJYigAY+UZ4Gc4JcoQOe7qkTjTGEu8Sfk5gtN9zjlv8Rt7juM729NQZyzFvkqHb9BPxd4nRrlVEBiLJDVwnbb/D2gz1frGeENSGcIRb6cWouVzA20SS+qgtEKkzCm9Exc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765770273; c=relaxed/simple;
+	bh=yfnOLKJF3bDUZS3NzhyjG4miJQUxfoEJkn0wrbpkfdY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RMppZ/3BXeQ5uJsTLhxE7APPC+wggTGk9fAIEb7CVneK+f1UK0IibZCjnL9HsuMbf2tZ77Yw9wa9pRCsc3nXlvS2g6FPjjPiQ+jM9VWHqVer+yfhbjRtF7PAC6ozFXtuiWhS5ObKGN2XTay8DwtpdrS/BsGv7gAXSCyz2qNqpSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WpSyZySp; arc=none smtp.client-ip=209.85.215.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="nVn7ER9i"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=b/1Kwa/kG6RNSqivp9euHvPLt1FvKdRiC1tGAA0xPWeYo5KLnFK0HnYwAUvWd3B234DAcM6gOu1ejCkwP0PXssv/hRmLKvffZK8ZK+OTZyb0BJIBRtdUHAzUsJ6dldYbkByx5W7YIKF8VXJ5jrhkNXqIuyiwGvbSRvpcWJ1H6qWwqIObLE97bTDpczU9rV9/ApzIo/iZNYTOXNVymXenwHDII1VrNeiKYPBHDd8VhWJYWaEArCWMArJjcTxINbUxDaECi5eybNeu7NKgMw0+yiPFP/yjvuSDD3sVrMqoF3fi25++gnF1sh+nXucUtQb3a/rxZjPOREufz95rQqLJ6A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fAd2FjkLX1jKfGv80nOSy/XlqjFv13t0a25dHZJvcms=;
- b=R3nT9/GrNUi+NcanJn0+PdNwQgFeVULfL0oosJcOsWVHrhR4eZlGdDvbspsXzOZUggXPuwOUPCUFjbzJUdCdMtCwR5wyQR594BdkKSjqhw9kXFoMPIPMOhkebtmUouFn/oqAenV7IyqUz42VDtXyVKI/mFwKC7377ek36lVIxaS+wH6/3zbBpt1OkN8K0wZsjFtjXEEbI8Zz0VfZfFj58i/b2XnMJldObKGhvP9Beg6VGt0HyGz0mVfdiJmYFnMk+gqFNbYPJ//HpB+2wXFxnddMMA/X1FRDBddZ3VmI2Nv8zmVm7UYhJyCdpKhfeTCQtmcfmieUYZYxH8Fq9YSbvQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fAd2FjkLX1jKfGv80nOSy/XlqjFv13t0a25dHZJvcms=;
- b=nVn7ER9i3lD10qZBCUz8HJchrFprDlP+nqvnpfuceyNy6w0yI1hygjL1D9YtR5qOptQTShlAmuUQl9hdXUk5ZXpMmr3cJLbFQdQJkO7hC4SAaQZyqGvIHudKxkAHw1d/7CxukAOJavVNUvLSv3bLkpJy+1SHcOPcFn4yWYoMi2qGjY5Gc+i3oMAedCOLaDbNRb4svBaFf03hx2hs64g2Tr85sRVTHg99CIgwJQt1fDrMD09QHDssmmmKTrGQ+6QpW/QEAgkNEnCStDN5YP3+lrZVIbJGoVg9xe08aAsOndjYrfM2v1tLRy+TzACxJysDvfcv10o+/8kREfoemvPBRA==
-Received: from DU2PR04MB8567.eurprd04.prod.outlook.com (2603:10a6:10:2d6::21)
- by PAWPR04MB11646.eurprd04.prod.outlook.com (2603:10a6:102:512::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9412.13; Mon, 15 Dec
- 2025 03:00:15 +0000
-Received: from DU2PR04MB8567.eurprd04.prod.outlook.com
- ([fe80::32c4:a8a7:1724:b754]) by DU2PR04MB8567.eurprd04.prod.outlook.com
- ([fe80::32c4:a8a7:1724:b754%2]) with mapi id 15.20.9412.011; Mon, 15 Dec 2025
- 03:00:15 +0000
-From: Luke Wang <ziniu.wang_1@nxp.com>
-To: Avri Altman <Avri.Altman@sandisk.com>, "axboe@kernel.dk"
-	<axboe@kernel.dk>, "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>
-CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>
-Subject: RE: [EXT] RE: [PATCH 2/2] mmc: add quirk to optimize certain Kingston
- eMMC secure erase/trim performance
-Thread-Topic: [EXT] RE: [PATCH 2/2] mmc: add quirk to optimize certain
- Kingston eMMC secure erase/trim performance
-Thread-Index: AQHca0HIukzhGMUg7UaHOEMiqVuyy7UfJ+oAgALe8eA=
-Date: Mon, 15 Dec 2025 03:00:15 +0000
-Message-ID:
- <DU2PR04MB85671515360F017E9D7DBFDDEDADA@DU2PR04MB8567.eurprd04.prod.outlook.com>
-References: <20251212083246.582806-1-ziniu.wang_1@nxp.com>
- <20251212083246.582806-3-ziniu.wang_1@nxp.com>
- <DS1PR16MB67539E6FE1199DA045DA614CE5AFA@DS1PR16MB6753.namprd16.prod.outlook.com>
-In-Reply-To:
- <DS1PR16MB67539E6FE1199DA045DA614CE5AFA@DS1PR16MB6753.namprd16.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DU2PR04MB8567:EE_|PAWPR04MB11646:EE_
-x-ms-office365-filtering-correlation-id: c4014a61-889b-49ef-c4f8-08de3b86124a
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|19092799006|376014|1800799024|38070700021;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?ae3xUvJfomB355/9t68GUBXAXTIeB0GBI211yt7gg0yG8TFuV64dzfYxcJ7O?=
- =?us-ascii?Q?S8oGoY9bb4G57Ba4dJiG0h6AVL6gaYqw5CVwkgsRQBiH2pB0nRYAYPlJOeFz?=
- =?us-ascii?Q?8HLOxpUEPtwwuv22b3f99hSx32qP6DaHw3ZNEir/S8vq9q9IcVD1UoFDRves?=
- =?us-ascii?Q?xLRHIZVMzJhaRqgoZBazDQuQdvN7mcQ+8eEhvFkeRnI064tSCRajAUpFIYH4?=
- =?us-ascii?Q?gN1kvpeGcMFkdxczJzl9xfQA3P0H5AugiiqQjpgmZ+VGsqEoXOOziUpV/39D?=
- =?us-ascii?Q?8FQTi3PYZGZQDB99NObGsNfJUtT/Urqm5I5DKXGNy5VSO7KY7LeR1jsMoU2Q?=
- =?us-ascii?Q?7LRfP9chGngifflN2yP+RquN8izE2aCxUCqHFf1Of67+Nh5JyTFtoFx9gxxy?=
- =?us-ascii?Q?hyi09tcvFSI5/dJ1wJl4hrlodHIr/wAmH/PGdliIRCs456+2kYlUsGYlx63h?=
- =?us-ascii?Q?bvw5HR+6VZglPH0HvXMjs6NiG5y++zR9Dshnjk8RCmjsr8+Bsi1wz0SeCEMF?=
- =?us-ascii?Q?8r1Upv2oUfm/EAaBs90gYEajp6moqrqWWYjEW/17ZNosKcLwxWeGjjbPAO6b?=
- =?us-ascii?Q?gpxLxxCEPOxnnR8XayROjxsHpfOByAqIwd2EGiPHdCSpZjvCs0PudIicx93J?=
- =?us-ascii?Q?AINueyhtZtX9oKVM7P9L33r3mFNR6GIgty692pqMqjzBsUjGKmZD4GVhVnz4?=
- =?us-ascii?Q?iytkvITynr76oURKXDQdFoaLEfQC8rGasKpi7b6g6lt2FkrtLZaFd7rZBtN8?=
- =?us-ascii?Q?QRIldO+/FAEE9ZP8tczz5yxql286Zeb6AsANUwhpEFAXco3pkwy3MyNcM8Nw?=
- =?us-ascii?Q?cYRvTt4bOUggHgLINNxCYRBEQVOLwpxt16sMdZc3GZ4UdWxSEOsi51jBmbTk?=
- =?us-ascii?Q?OUzZfoh5eZUbG0JXZ6prG8L3V8p+f6AV8xTkDTZR7R4DZ9b9pyMliwtyqD2j?=
- =?us-ascii?Q?G/wCNXIuYf61sFH0rIVxc6Amp/61q+0K5pimlKgiESjTwZ6aXo8z8Nlu4BwN?=
- =?us-ascii?Q?Y7wt2fC4brndCZOGoxqRfxbtCct9R9ClTBpQpPlximIcr3g+dyKdYe2cPrjj?=
- =?us-ascii?Q?bupkSsO3ukJqSmo13flEiF1wtmKiHxOZSopxx48rYmVQcCRtSlLm5tAOmbvS?=
- =?us-ascii?Q?63icYfLjdWhwwfMmted6RD6/xZjtSE0qspzoBegbN4piYbSoQFbO5iAZ7jhc?=
- =?us-ascii?Q?OyPMogkii2rXiCA2GZ3BQXbXXrrndg/m3mp83B3ozfdyag3/aMDm3u7p02T6?=
- =?us-ascii?Q?ogbhcofC13o0h1jMGqlwmuD0DFQzsU5vZKKnHa9ssjjgNH0canDejKsbXsH7?=
- =?us-ascii?Q?bJSJoK9rPZD5XykrFR7fUouvlEfRARcVW6D8BB+mfC3JnjbX82onYKIaN/DY?=
- =?us-ascii?Q?mtxiLGZcg1cNIVYJdUk81R6T/p0yhtndUh6m92hCFr19Z6Xwlz+oPHhx7rBF?=
- =?us-ascii?Q?FYQT9EDgHfeiWbdQFOWgnE42mKRMESrrey3yqdDRYzljcNwqhyfNZDANFIoL?=
- =?us-ascii?Q?QGsoHrPg+Et/ioXqI+kcRzi/ipIWr1sq92uJ?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU2PR04MB8567.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(19092799006)(376014)(1800799024)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?jBLPIIc0dGVNH9JNhA7uAjIXwNAn67RjTiFfSpiVXiZAS4xVKrxE8NmzFV6l?=
- =?us-ascii?Q?3FXKTK4bi5IkXA/ywjvsJ6W/8PiR71y0FzHhqWEKkFJ1xYj6lPrAmN/IFpgZ?=
- =?us-ascii?Q?NnG1i1FKKXplgD1XpeWh6NZHtbwXkEOSm/pecEi4yZ8RhaWfdu6QjHDMWL3r?=
- =?us-ascii?Q?iWNg8zS2MEJEv5A1rCNU3G00tI3Vge75m6OQGf8rr797xjkLn7+7T+4l3rJO?=
- =?us-ascii?Q?XQ98szmPfOF6eapkEp4X6rHA5b8bU7Ivze5/6CWRgQ+4JheNTh5W6dMX4bzb?=
- =?us-ascii?Q?OK/2UndyPgIf9dnwNve38bU8FoECkqaeNRSSggpRFm0DnzCw3gRFGeV7BShq?=
- =?us-ascii?Q?g44tthQtQflyeeG9SCJ9fL07aiVbABgFoWx/RYXI2AdlN0OIIVxaDVfKbTog?=
- =?us-ascii?Q?f47qaMzPBKzda2YrXyBFn55PJ58pTblMFGX32LXu0LCWFUV4j0+g00ZW16Y5?=
- =?us-ascii?Q?rKnNdsrp81g1Aj9g6IlTunVj8/y0XDM5YMvR969ih48+C3NGdWGnpb7RpkKT?=
- =?us-ascii?Q?7QkUkR3myOn9BO15dwZJ3CgjRi+NAp8yPpIUS3URIQ7OG1D559cBiT/lbqHT?=
- =?us-ascii?Q?QCc3KUQsiWj/k8D+pUN/nafWUIz46JeiZ7VwB2PWus4OXWbDjq33jRTjNPbj?=
- =?us-ascii?Q?NAkQSnMSyliOk3ISqA9OXTYZrM/m/jsXgO7RGKwfqByESdCeTakWE8BUMk1o?=
- =?us-ascii?Q?QX0rJnZ3yRe27jd60vyScW2pVGBR562X+6vCEw8EzGTP+UVCegr5iGhDSaMw?=
- =?us-ascii?Q?b3fPSp9k+1xPQ7PAaK6XHdLs3TwLagLEpGia8kENyikZQlP6oNe0dAKgcnXD?=
- =?us-ascii?Q?k/y+Ta+QwGkFA+NuTSM2Sd7ygDznjZ9N21cBgIpU0mAEetccwqUIDmfiuQtH?=
- =?us-ascii?Q?Ey0QcuKhjbEj4xi4Zx7seME6mWOBhn6+XVIlWllTbYJqpyvFlkQXvGulC3g1?=
- =?us-ascii?Q?3wTJ/BQ63il9tPpkrVB/iQ8DfpHGPMgSqpwPAr+XH3I4izXQhLv8hApie+OM?=
- =?us-ascii?Q?3lfwZOhbGM+Vwa2kPZAskN0NfKVyEzUGJXwVUwXgIgyhbalyDE06fe5Zp39k?=
- =?us-ascii?Q?lMYvmAYhw8pvaDooZ1vZ8UrA74q9kBYCPQ4PUmop52Hm2Rwx8dq1NpHppUnK?=
- =?us-ascii?Q?fpmKtaIPjBY1Ptn2oBQQ7S3IrfL+faxAMD+0YPbCM12t0LSRn8yiWErRX42s?=
- =?us-ascii?Q?bU8hoIQWQJ8XLwtQKCzNimo9YU4JxGCoqgbZHbW0MXePLYlEE4TcLnn74N0f?=
- =?us-ascii?Q?OdRDqwhejXIsyapxP/yATMU/vzmb+A+ICGN/HdD4i49syi2Om/+fdF2LT04+?=
- =?us-ascii?Q?apWV+/gokIq1b1qT1dkMO7HoacstlHzo7R9884891jKZgz2vOiWpkStO4pJm?=
- =?us-ascii?Q?gtb5qrjr1AgvMKh/Ugirf1WO+n5TsGFYEgUDOiPBGyLAKPLByL4eaaYbKcCb?=
- =?us-ascii?Q?D46YlTe+A/fdMHVA/3NykEs27nzKKhUnOQosLO8XDTOCy6U6KYelvAq54ahI?=
- =?us-ascii?Q?ntbh2+d49P9O2iUPUCAFDuLw3ecm0CyDW0fPJvGjymzdF6WyMzYu0jWvEGPP?=
- =?us-ascii?Q?KkpQxuXCT4S20K2XQn96utVdRxa/HemHjwc1pejD?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WpSyZySp"
+Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-bc0d7255434so1907157a12.0
+        for <linux-block@vger.kernel.org>; Sun, 14 Dec 2025 19:44:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765770269; x=1766375069; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=57GeelsZDMHG/yu8fM79YFz+luZM294/w5AcyTPupag=;
+        b=WpSyZySpInGmCviDGX/5QbSUzYoHhHqdfq+FavclnTk7cGuSEL7BT12O50EPA2O1VQ
+         j8MVJ1WWvKnlQS6uxfEgVHCbYWM2OWrtVJgay+Okh3h2nCpG+CIYWlrMrI4/j/alC0Zv
+         PyUmknKYENP33vjtTXqadTAM5nMMIeXdXSrAHC4EnIFNEA7ILkfgKEMcT9mGNMItrgeD
+         aHMqIl1s/w7nWwTvIF5N97UdZGb1QxksJHqRnmKAmCL2HCKug3I90fufKwfuGLSadl4S
+         p5u2i87kzDk9AnD+xeIbMurWFHSuJatdBXYV5uHPdkBK19UlzldybU1MNfj/WRfMV8Ew
+         yhdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765770269; x=1766375069;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=57GeelsZDMHG/yu8fM79YFz+luZM294/w5AcyTPupag=;
+        b=eKJlj4Or1BZKlVzVQ52SSJUm6E7SFGx4l0GE21FRTYVNOtt2wS125Wago0IoCHqDdQ
+         cUmio4f36byTBjpiWTJRRJprLXSUB0nceAR+ltJvMYQmC5VSjwnWZ4KUpuSEss2M/wCv
+         li2yyQfmtDVnDNGxgi0EleMz777zTRA/zLEhpVhq6AdtBh3mjLvN6E5j2sLAQPjtcsyy
+         i6Cw3cvyALa/DwLllZDeu3MRgPpnLtnKSNkhNrAWfu1nCuKcRYbckyrDvFimFVXvETOT
+         C3e7UEKHWTAnRf7s7gm/2w2wkels13eFyGpKsFeGVbR8G1Nf24+RwzNSatDaDMZcVAe7
+         NYpA==
+X-Forwarded-Encrypted: i=1; AJvYcCUcvUvNaA79ZgC5vcq5STseyH6GvS4zO1cwaug/luUtaoB5tixiwnXGsYy1SfzDLBcgf05KhoQ4Z2gECg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7Raqlcq6f1RMq3rQKgdOCR2/lu3E7O3V4u+E0geoSR+hDDz9z
+	m2NXSSPj3UfQq3xXgESwV6Cjp5dqI3TgaWVVtdKjWYNQ4GQpVEYPOctC
+X-Gm-Gg: AY/fxX7UPwWpB5sypXD6k3uKpOAJcMDE4DILouRGtZB3K6IcWscaOwXVbYTtwXEDfEB
+	fhuS645/pBPpP4si+MA+1S7XzSLsmL0WVH/KSYRpjOps3Ud+TkI7TmKJbdtDlfD9WS1qk7S0Smj
+	Qwmo9amLRRdXIJybYNF1p6Bgcqhd6v36KVqdOpcI6W/wZY/H8n+q7zHM3vhmvDFpN1SlamK8IFd
+	8umiFEb49ivrB3G8Ww0PjzL4dxp6a+q0tx13RYA2Vlwk2okYbf0iYhI4R9ua3vbRVqycIGuthEQ
+	CHj5GvZanC5Cj9rrSijQtHlf3Qim2du4NjFCb0U13WTOqRCt+ycc08CCkxCwGQ2VQyKPxvh4DaK
+	1EFrI6fYk5qk6q7hg+oT/mnkLI2cAJBjhS4nA1TahH6i/5LrkCaEJUxOrbDBYc2RkW4kHHFBWY2
+	D0FwURhtQAAUTb70gf65SDWwD6pCYEM6WxWjBvzUiOr0jGuKNwn+mo4y7MUiwhF4Ev
+X-Google-Smtp-Source: AGHT+IHtX257iwl90uElpBrUJZRVMjG2XPgwkYlJRTHebfpWp69rDMIJUAS9W36qS9uR/lfZo5dQsA==
+X-Received: by 2002:a05:701b:2612:b0:11b:9386:a38c with SMTP id a92af1059eb24-11f34c71819mr4989481c88.47.1765770268909;
+        Sun, 14 Dec 2025 19:44:28 -0800 (PST)
+Received: from ?IPV6:2600:8802:b00:9ce0:a625:a605:cb9a:d5e1? ([2600:8802:b00:9ce0:a625:a605:cb9a:d5e1])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11f2e1bb45csm42007893c88.1.2025.12.14.19.44.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 14 Dec 2025 19:44:28 -0800 (PST)
+Message-ID: <262c8ac1-e625-4e4c-8b3c-85f842aba6fe@gmail.com>
+Date: Sun, 14 Dec 2025 19:44:27 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DU2PR04MB8567.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c4014a61-889b-49ef-c4f8-08de3b86124a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Dec 2025 03:00:15.1315
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: VquZ9gj5guDCVQGoY/ho8ScotBu1FDJtCes1wYOflablE8BI63OHs0SD8Jh4XNRZf0GUNMtUYkDkoEIWMzhBRA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAWPR04MB11646
+User-Agent: Mozilla Thunderbird
+Subject: Re: [bug report] kmemleak observed during blktests nvme/fc
+To: Yi Zhang <yi.zhang@redhat.com>
+Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
+ linux-block <linux-block@vger.kernel.org>, Daniel Wagner <dwagner@suse.de>,
+ Chaitanya Kulkarni <kch@nvidia.com>
+References: <CAHj4cs9wv3SdPo+N01Fw2SHBYDs9tj2M_e1-GdQOkRy=DsBB1w@mail.gmail.com>
+Content-Language: en-US
+From: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+In-Reply-To: <CAHj4cs9wv3SdPo+N01Fw2SHBYDs9tj2M_e1-GdQOkRy=DsBB1w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+
+On 12/11/25 07:40, Yi Zhang wrote:
+> Hi
+> The following kmemleak was observed during blktests nvme/fc, please
+> help check it and let me know if you need any info/test for it,
+> thanks.
+>
+> commit d678712ead7318d5650158aa00113f63ccd4e210
+> Merge: 95ed689e9f30 a0750fae73c5
+> Author: Jens Axboe <axboe@kernel.dk>
+> Date:   Wed Dec 10 13:41:17 2025 -0700
+>
+>      Merge branch 'block-6.19' into for-next
+>
+>      * block-6.19:
+>        blk-mq-dma: always initialize dma state
+>
+> # cat /sys/kernel/debug/kmemleak
+> unreferenced object 0xffff88826cab51c0 (size 2488):
+>    comm "nvme", pid 84134, jiffies 4304631753
+>    hex dump (first 32 bytes):
+>      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>      60 1a be c1 ff ff ff ff c0 2b 05 73 77 60 00 00  `........+.sw`..
+>    backtrace (crc 155ec6c5):
+>      kmem_cache_alloc_node_noprof+0x5e4/0x830
+>      blk_alloc_queue+0x30/0x700
+>      blk_mq_alloc_queue+0x14b/0x230
+>      nvme_alloc_admin_tag_set+0x352/0x670 [nvme_core]
+>      0xffffffffc11de07f
+>      0xffffffffc11dfc28
+>      nvmf_create_ctrl+0x2ec/0x620 [nvme_fabrics]
+>      nvmf_dev_write+0xd5/0x180 [nvme_fabrics]
+>      vfs_write+0x1d0/0xfd0
+>      ksys_write+0xf9/0x1d0
+>      do_syscall_64+0x95/0x520
+>      entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
 
+Can you try following ? FYI : - Potential fix, only compile tested.
 
-> -----Original Message-----
-> From: Avri Altman <Avri.Altman@sandisk.com>
-> Sent: Saturday, December 13, 2025 3:08 PM
-> To: Luke Wang <ziniu.wang_1@nxp.com>; axboe@kernel.dk;
-> ulf.hansson@linaro.org
-> Cc: linux-block@vger.kernel.org; linux-mmc@vger.kernel.org; linux-
-> kernel@vger.kernel.org; imx@lists.linux.dev
-> Subject: [EXT] RE: [PATCH 2/2] mmc: add quirk to optimize certain Kingsto=
-n
-> eMMC secure erase/trim performance
->=20
-> Caution: This is an external email. Please take care when clicking links =
-or
-> opening attachments. When in doubt, report the message using the 'Report
-> this email' button
->=20
->=20
-> > +#define MMC_QUIRK_FIXED_SECURE_ERASE_TRIM_TIME (1<<19) /*
-> Secure
-> > erase/trim time is fixed regardless of size */
-> Maybe you could rebase your work on:
-> https://eur01.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fpatch
-> work.kernel.org%2Fproject%2Flinux-
-> mmc%2Fpatch%2F20251128052011.204735-3-
-> avri.altman%40sandisk.com%2F&data=3D05%7C02%7Cziniu.wang_1%40nxp.co
-> m%7C5fceb03d8f644004e23d08de3a165de7%7C686ea1d3bc2b4c6fa92cd99
-> c5c301635%7C0%7C0%7C639012064900475164%7CUnknown%7CTWFpbGZ
-> sb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIs
-> IkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=3DFi%2FpL3MH
-> EmOdwAvZxs%2BTUYI5k9hzrIyqcdq4Q0eYNw4%3D&reserved=3D0
-> Which is expected to be applied in v6.19-rc1.
+ From b3c2e350ae741b18c04abe489dcf9d325537c01c Mon Sep 17 00:00:00 2001
+From: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+Date: Sun, 14 Dec 2025 19:29:24 -0800
+Subject: [PATCH COMPILE TESTED ONLY] nvme-fc: release admin tagset if init fails
 
-Thanks for the suggestion.
-I will rebase this patch series on v6.19-rc1
+nvme_fabrics creates an NVMe/FC controller in following path:
 
-Regards,
-Luke
->=20
-> Thanks,
-> Avri
+     nvmf_dev_write()
+       -> nvmf_create_ctrl()
+         -> nvme_fc_create_ctrl()
+           -> nvme_fc_init_ctrl()
+
+Check ctrl->ctrl.admin_tagset in the fail_ctrl path and call
+nvme_remove_admin_tag_set() to release the resources.
+
+Signed-off-by: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+---
+  drivers/nvme/host/fc.c | 2 ++
+  1 file changed, 2 insertions(+)
+
+diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
+index bc455fa98246..6948de3f438a 100644
+--- a/drivers/nvme/host/fc.c
++++ b/drivers/nvme/host/fc.c
+@@ -3587,6 +3587,8 @@ nvme_fc_init_ctrl(struct device *dev, struct nvmf_ctrl_options *opts,
+  
+  	ctrl->ctrl.opts = NULL;
+  
++	if (ctrl->ctrl.admin_tagset)
++		nvme_remove_admin_tag_set(&ctrl->ctrl);
+  	/* initiate nvme ctrl ref counting teardown */
+  	nvme_uninit_ctrl(&ctrl->ctrl);
+  
+-- 
+2.40.0
+
+-ck
+
+
