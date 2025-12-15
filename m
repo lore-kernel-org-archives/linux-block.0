@@ -1,105 +1,99 @@
 Received: from mail-oi1-f196.google.com (mail-oi1-f196.google.com [209.85.167.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22E543B8D56
-	for <linux-block@vger.kernel.org>; Mon, 15 Dec 2025 16:33:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 575D828643C
+	for <linux-block@vger.kernel.org>; Mon, 15 Dec 2025 16:56:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765816427; cv=none; b=MfHV8FYVaXRT4+5TR3VoFU1VXtdxEVJWllPfT6V/I8kfF6dKcNWQQtNxmyd4bjkCE0BskMKAvIVSZ9DxjrylxlOwzHDR7ah0uKgFhDmWCD8TYbs9ub2C7mB4LVSEtgDORXNTxPrXEFkR0XBMwl14217ygBvRZFgT3lIkmNUoNPQ=
+	t=1765817798; cv=none; b=aH01GqKA45XeuAVYMXSyEWAgHsn2MPkZVQyLgxyS+Kr9zrhemXMi0DOd7qMAIhEcA7TUP70yP5lzOlrs557jFah+FFnnmtDwYNhM6r7J+0iVUQP3nZws0BZ2KRCYf6dOrDU4o7d/PRJezmGMwk/eEi40jU56g89loRuYFV2Xju0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765816427; c=relaxed/simple;
-	bh=qqh34P5uaN59huJB6RXJLp9fVZCpldrzPRcPHhCXrUQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iydlJ1uDic2z5559P3q41fmCpG1UTBMC4F58h2Owvp7HqLeJbakvt/6G3XWcVQOCaIwpdJdrLH5PWZmVEdl5lugibobfQW7/PRztmc25CazKvxuMBzA/hzTJw9aWRIT4d2OHr9qLhc6RpkYe450rqbo4CeUBhI42uJhEwybcRb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=mL+XG0IF; arc=none smtp.client-ip=209.85.167.196
+	s=arc-20240116; t=1765817798; c=relaxed/simple;
+	bh=ulywS1nVNur5F7RNiNozdKiu9bhS+RQCcBW93vOmXT8=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=LoUGTCBj0XTFKH1Hk0tIF0Gd7FSdgygSqQ+g9F2DMncgiEvB0FiePb9JR632blN9GJQh2CSvgorJ7Nib6xyM8flDe00h47iURlKEJ/suspZqhpd2HUV0oFAzl/1IEGK1qqRkuStkeddeTrIzp1PX3ktJSqXRQiwDp2YXeymGacg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=xqJM4FW4; arc=none smtp.client-ip=209.85.167.196
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="mL+XG0IF"
-Received: by mail-oi1-f196.google.com with SMTP id 5614622812f47-450b2715b6cso2160238b6e.0
-        for <linux-block@vger.kernel.org>; Mon, 15 Dec 2025 08:33:45 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="xqJM4FW4"
+Received: by mail-oi1-f196.google.com with SMTP id 5614622812f47-4557f0e5ed2so2152066b6e.1
+        for <linux-block@vger.kernel.org>; Mon, 15 Dec 2025 08:56:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1765816425; x=1766421225; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=aOeEbLkJ4NhNzPDHOpRcyVg6rwLKPErmDWJiIVC5mM4=;
-        b=mL+XG0IFWVrbRZDftOqqjfMXtNSlO9f3apc0k7qpUoItN4t6xripKUjSzauDnIsqFb
-         oOrcVsHuJ7JI2f7R+utR3qLGo7JcZG0zkdAHupjqoWSoW9ZE4cHLu2oyVDFiMTjTbsRF
-         o1/eGrRwbs5UNYTkug7RXBtQbt48RdUfw1HWCkj9Ex99GgdCDU6l9ENuE4jtdY6mjmaF
-         23+HDovK5J3bKKlMujl8cjSl1Br4Nnu7QNO4MQWibtqTaUPxAZztx2TcDBOYCxSkMIfo
-         vKUTDiNR6a4LHiKE8wOvI8/7GDBKKJt8vXmR3kOzJBGhViTy6gGIEkEJ0NS5/fsfEOno
-         q86Q==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1765817794; x=1766422594; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2M3a7+ReJJ3D78a4qK0RZ6Htl361+LOZhI5rTqOV+OE=;
+        b=xqJM4FW4pzKxTZLUG06CDDG67FkP2LY/gTqychYQNoXXhBRxxpQf9b1bgiNe9oaVnh
+         j8OrtZUBKYLKFwCoe13EFpSBxSVJxXIYy67db4DPZ9RD3rNMVRAINT6WtR2Cjpiw59xo
+         duR2Djeyj5TD4Fay6DE1Tu7PIFq2S2LDz9JFUvLLzZzpr6jPIOSrVFg5KM+Dky7fUI8B
+         wqf32+kN6rwYJ5r377pfoKBL0eERTOj+TJs/Snv32Bljm1FCjmaOX5P57ENNk7V1h+bd
+         8KYU2wulS15HAh7nn0sfA5reqXzWYnXD5ePe7pxHdXJiIQnjqkQav7wqsRXEg3TvLcpu
+         y8dA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765816425; x=1766421225;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=aOeEbLkJ4NhNzPDHOpRcyVg6rwLKPErmDWJiIVC5mM4=;
-        b=KYcOtfpk5ZPsK546zXAIuxGvgsH/5KvTMHGwdXNHXEHeiN9KaaCeQkXRLIhsk5RZAc
-         yTGHNLwoNUBC8dy1QGQN6wNqNyweZcOFbgjNkKGGh0Em5sHVbIR/jEq/pMXlVun3ccd+
-         tumPgKLOO6NVOO2WHEGBm1t0HgaPtEBcwUC88YZhZOBzAz6u+aCejbljxe4GchgNpFtL
-         rmG7zCvqLu1K3XflidZmqyGrn+/uHHv9eMyNk+PYssoe914fi5FcvHYwBkryYmRGf6X0
-         WokqVUa/h0U/NihAwANaqwLpAZIsnYM4e+d3nlYToFZfM84WLPWs0rtGFasHp7S92SQs
-         EFsg==
-X-Forwarded-Encrypted: i=1; AJvYcCXS2yOFWINwbkbXIfYjaVp9xRxspPTBnUJCY0Ag74MUUvLumkxRezaamBEgrGyFUmX4qwthBz7tzC9oIQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvN74Q/0vBSmS0FHqCYkO8Aby7YXALdhT4qJtQmEPdmqFoOaaG
-	NLc/XXY1l1o2XWZfow4iruf+IyvaU00r3V2C+fc+T/RUaiUzF9S9vlVmVFEzQmbQ19E=
-X-Gm-Gg: AY/fxX6xqXgVjzaWZRQ1lqPuye5UW8nsP0jEctQ/5t8UW6fzZWlu7cZMnBUO0KrNSoH
-	/RWv+GDYMCAHRp4cnMuqOdCAidv235KioGdOLkT6x5fHWKgRtkqHALcVyAhA9xS5T1FWJXwq+UI
-	QuuNZYfy539o4nrdhFoeOYj2HR0ksLvdmbtjaWZ4PF9kQY9ac2EqKuRWQa9j+gbwGmmnuBIB26a
-	ROhQSRU8FCOluWBr1M80IaiS/HhfZUfYefB6qwFs9UeDqiiO9Fwh5ZMAXXwpVO+kT59LUclmO5G
-	fwZQfLuCzh7DpjSzm9qtbbFwwaYk6/oLhtGTyOgC8wnUFeYr/V81bhAj3uBOc3yWguPl6PR9JCC
-	UhpTMpynBhHaT8TwopTB16gDaNPx2W4Hk8y981BsDDpV7EWWwQ8bA0zeOFW7ToFrTp4t3Inx/Qf
-	NkdC9jS3w=
-X-Google-Smtp-Source: AGHT+IGCrHrQigzG5irmY6fvZHnILsW9Av+YdHaRrG3TJtP7ymKohcpyueiYU6zKEA/9ee1hWHdqcA==
-X-Received: by 2002:a05:6808:bc3:b0:450:730e:d109 with SMTP id 5614622812f47-455ac989e89mr4518931b6e.48.1765816425269;
-        Mon, 15 Dec 2025 08:33:45 -0800 (PST)
-Received: from [192.168.1.102] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-45598cf4858sm6448712b6e.11.2025.12.15.08.33.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 15 Dec 2025 08:33:44 -0800 (PST)
-Message-ID: <2ed0737c-2b2c-4f99-858f-2a4bc4a477ae@kernel.dk>
-Date: Mon, 15 Dec 2025 09:33:43 -0700
+        d=1e100.net; s=20230601; t=1765817794; x=1766422594;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=2M3a7+ReJJ3D78a4qK0RZ6Htl361+LOZhI5rTqOV+OE=;
+        b=qF5TNyQ/THoXxC/tVCfWUUbgZlH21EwwkTQyFEfYbjrWs6fNu5U+9SfXIb4kvs2nXZ
+         WnN0hpiRei4KMUf9WlAPxaoc8wdQXoyZw28czsainiz+aUYh4h1XZsBPlPt9/ruahuiK
+         hgEmOlFnrgS9hKOiU/YgoBkr+GxeZS6NaSB3lmxmBMszWNvnRJaRmGeLFXxStyRb4qYz
+         6jEofvo1a2gdJGodd2A6jGVa9WZSiWFJUq5UmlpCPLuMujORYy0vIxJrGA3i3MTYhxYr
+         68Tgbrv2OYTUW5Qy1N62Yq6rpl7JF6+kbhVAQAYhZCdaZf9t+eORzRvvjzHu8bGFgJj0
+         45UA==
+X-Gm-Message-State: AOJu0Yyk4EyS3P7fzCv69tbUp6K6tZtUwB79DGJyH7vP4dR7I+C0QF62
+	NSb86rX7eEws4cvtljxQ7tobv+jaXEhBuplU6Ff76DZPscJv6fDpjKsI/Rt6CO7W53s=
+X-Gm-Gg: AY/fxX6OMuqkKLLsOWKYapOVdxPQmV8ERLVQe7p8gVMqTI4XmlvECRY18V3STsvk2lM
+	9U7gXTxKfA6dGxMFPoIqjMrpLyDZDU5AGhgHixhKZLVlLNZCqQWDwRXwzNlt/rrgerC8uK3FtE2
+	8zilx6n5+wwia0Jmg9FdQtfBIwEXJhNQg0DrM+B5xhfm+L006tYcE5WKBj24olteh1oIW4FVFH5
+	v2++AG6fUGQHVKPUhbsjBM3refOKlHt3EriBIE1y9MK19rPv6E/O3ktcgQW0APdx/ewE0ZHTBgM
+	Blhi8fhrTKZitLEowRKrZYfqQM6XGXFapT5/XfVhCCh9COmnp3Epl2ToEC8o0E6lWOL0vbkAGXt
+	eOqCGzZAp/hDRb9ZrFzElRe/fs4W7dGTLiI5Ks3zPKOjsh4KfzGgmVQjyvLBsABtn+TNxFl6yoC
+	vKyA==
+X-Google-Smtp-Source: AGHT+IH29+34z8e2aGHfAfFfrbcphokNJodhrKwKQkwo7FiW/yC73PruZYFQUOvBIlcTHfkT1lfHpA==
+X-Received: by 2002:a05:6808:30a9:b0:43b:7b80:5cf2 with SMTP id 5614622812f47-4559a58d733mr8251657b6e.11.1765817794370;
+        Mon, 15 Dec 2025 08:56:34 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-45598cf2becsm6693806b6e.13.2025.12.15.08.56.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Dec 2025 08:56:33 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: Damien Le Moal <dlemoal@kernel.org>, Christoph Hellwig <hch@lst.de>, 
+ Yongpeng Yang <yangyongpeng.storage@gmail.com>
+Cc: linux-block@vger.kernel.org, Yongpeng Yang <yangyongpeng@xiaomi.com>, 
+ Yongpeng Yang <yangyongpeng.storage@outlook.com>
+In-Reply-To: <20251215095816.1495942-2-yangyongpeng.storage@gmail.com>
+References: <20251215095816.1495942-2-yangyongpeng.storage@gmail.com>
+Subject: Re: [RESEND PATCH 1/1] Documentation: admin-guide: blockdev:
+ replace zone_capacity with zone_capacity_mb when creating devices
+Message-Id: <176581779301.11354.768588972196922513.b4-ty@kernel.dk>
+Date: Mon, 15 Dec 2025 09:56:33 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: retiring laptop_mode? was Re: [PATCH] mm: vmscan: always allow
- writeback during memcg reclaim
-To: Christoph Hellwig <hch@infradead.org>,
- Johannes Weiner <hannes@cmpxchg.org>
-Cc: Deepanshu Kartikey <kartikey406@gmail.com>, akpm@linux-foundation.org,
- linux-mm@kvack.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-References: <20251213083639.364539-1-kartikey406@gmail.com>
- <20251215041200.GB905277@cmpxchg.org> <aT-xv1BNYabnZB_n@infradead.org>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <aT-xv1BNYabnZB_n@infradead.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3
 
-On 12/14/25 11:59 PM, Christoph Hellwig wrote:
-> On Sun, Dec 14, 2025 at 11:12:00PM -0500, Johannes Weiner wrote:
->> That reasoning doesn't make sense to me. Reclaim is always in response
->> to an allocation need. The laptop_mode idea applies to cgroup reclaim
->> as much as any other reclaim.
->>
->> Now obviously all of this is pretty dated. Reclaim doesn't do
->> filesystem writes anymore, and I'm not sure there are a whole lot of
->> laptops with rotational drives left, either. Also I doubt anybody is
->> still using zone_reclaim_mode (which is where the may_unmap is from).
+
+On Mon, 15 Dec 2025 17:58:17 +0800, Yongpeng Yang wrote:
+> The "zone_capacity=%umb" option is no longer used. The effective option
+> is now "zone_capacity_mb=%u", so update the documentation accordingly.
 > 
-> Yeah.  I wonder if we should retire laptop_mode.  It was a cute hack
-> back then, but it has it's ugly fingers in way to many places and
-> should be mostly obsolete by how writeback works these days.
+> 
 
-I'd be all for that.
+Applied, thanks!
 
+[1/1] Documentation: admin-guide: blockdev: replace zone_capacity with zone_capacity_mb when creating devices
+      commit: 67d85b062dcb49af9c903a58842a4ed7281f57b8
+
+Best regards,
 -- 
 Jens Axboe
+
+
 
