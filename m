@@ -1,99 +1,98 @@
-Received: from mail-oi1-f196.google.com (mail-oi1-f196.google.com [209.85.167.196])
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 575D828643C
-	for <linux-block@vger.kernel.org>; Mon, 15 Dec 2025 16:56:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 629BC322B62
+	for <linux-block@vger.kernel.org>; Mon, 15 Dec 2025 17:59:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765817798; cv=none; b=aH01GqKA45XeuAVYMXSyEWAgHsn2MPkZVQyLgxyS+Kr9zrhemXMi0DOd7qMAIhEcA7TUP70yP5lzOlrs557jFah+FFnnmtDwYNhM6r7J+0iVUQP3nZws0BZ2KRCYf6dOrDU4o7d/PRJezmGMwk/eEi40jU56g89loRuYFV2Xju0=
+	t=1765821585; cv=none; b=aplkG24tbbFqHd2Fm6nSt9+5KexOLhO16bI5UGxmP/GbMC3AvQSS5o3gS6D+9Tuyev5AEBhcOf4Bzd+e//b/n6Zxy/HgmTdSOnGqChr1npQfhfaG3lUjre9M6ARecMZKVxeMOacVVWblw2fSSBSrODkrTi0uSN7P3rhxuTlx658=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765817798; c=relaxed/simple;
-	bh=ulywS1nVNur5F7RNiNozdKiu9bhS+RQCcBW93vOmXT8=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=LoUGTCBj0XTFKH1Hk0tIF0Gd7FSdgygSqQ+g9F2DMncgiEvB0FiePb9JR632blN9GJQh2CSvgorJ7Nib6xyM8flDe00h47iURlKEJ/suspZqhpd2HUV0oFAzl/1IEGK1qqRkuStkeddeTrIzp1PX3ktJSqXRQiwDp2YXeymGacg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=xqJM4FW4; arc=none smtp.client-ip=209.85.167.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1765821585; c=relaxed/simple;
+	bh=rKVKnsmZY5Zk5WseCbLhC70tZU73oYSI0ZX68nvqOpU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=NjKoE5tXBKpkgH4HMHU0Eo6bUMelDwcqfCqXT6E/g5Pjq/g4eZtDwGdXusHWVzgwR5MIYuAWMjEcuHEbomTsRdGWHsTGVAKCONSfyDgHAMGItXGPREgcXrqQXumoMj+9qcDKp7IwIJS/kRlsoVfWcM8G49GAfLTgaHTbY7LnXeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mWcISiYv; arc=none smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="xqJM4FW4"
-Received: by mail-oi1-f196.google.com with SMTP id 5614622812f47-4557f0e5ed2so2152066b6e.1
-        for <linux-block@vger.kernel.org>; Mon, 15 Dec 2025 08:56:35 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mWcISiYv"
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5943b62c47dso3758742e87.1
+        for <linux-block@vger.kernel.org>; Mon, 15 Dec 2025 09:59:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1765817794; x=1766422594; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1765821580; x=1766426380; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2M3a7+ReJJ3D78a4qK0RZ6Htl361+LOZhI5rTqOV+OE=;
-        b=xqJM4FW4pzKxTZLUG06CDDG67FkP2LY/gTqychYQNoXXhBRxxpQf9b1bgiNe9oaVnh
-         j8OrtZUBKYLKFwCoe13EFpSBxSVJxXIYy67db4DPZ9RD3rNMVRAINT6WtR2Cjpiw59xo
-         duR2Djeyj5TD4Fay6DE1Tu7PIFq2S2LDz9JFUvLLzZzpr6jPIOSrVFg5KM+Dky7fUI8B
-         wqf32+kN6rwYJ5r377pfoKBL0eERTOj+TJs/Snv32Bljm1FCjmaOX5P57ENNk7V1h+bd
-         8KYU2wulS15HAh7nn0sfA5reqXzWYnXD5ePe7pxHdXJiIQnjqkQav7wqsRXEg3TvLcpu
-         y8dA==
+        bh=zIbn2oDFRSGWfD5W22SaWrURpraJkYSQ1nm0bbeV7eo=;
+        b=mWcISiYvQDMyWrcSRycAfbgC2LcfDHeiHNEwlrIHZIiej1AYC1xSGsNIQAQ09hrYkV
+         JX5RKvAXPuBpvT42pleeeJWKLBH2sgmOEqfv/KpJmG2j4MZwEb/VhmN2KUWZSKmpR4y8
+         W9Y9TRYiK/LUJSWBxJeCtVm6+grs9CMML+9OjkE4C8237semIawFtJN/0+n1tfa/B4sH
+         4PXZxM7CBczsbeXD5LrxS/cB7X27CZ/SgFLeQqgNRSooR0u6fqf5viqD1bfmET98d1BJ
+         y+OTGkBGOVpj54S8EoEEBS6SOazJkp5BEh/6fqKDGAxYCvW45iAXLY5VypDKgUjIZ0ta
+         NCVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765817794; x=1766422594;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1765821580; x=1766426380;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=2M3a7+ReJJ3D78a4qK0RZ6Htl361+LOZhI5rTqOV+OE=;
-        b=qF5TNyQ/THoXxC/tVCfWUUbgZlH21EwwkTQyFEfYbjrWs6fNu5U+9SfXIb4kvs2nXZ
-         WnN0hpiRei4KMUf9WlAPxaoc8wdQXoyZw28czsainiz+aUYh4h1XZsBPlPt9/ruahuiK
-         hgEmOlFnrgS9hKOiU/YgoBkr+GxeZS6NaSB3lmxmBMszWNvnRJaRmGeLFXxStyRb4qYz
-         6jEofvo1a2gdJGodd2A6jGVa9WZSiWFJUq5UmlpCPLuMujORYy0vIxJrGA3i3MTYhxYr
-         68Tgbrv2OYTUW5Qy1N62Yq6rpl7JF6+kbhVAQAYhZCdaZf9t+eORzRvvjzHu8bGFgJj0
-         45UA==
-X-Gm-Message-State: AOJu0Yyk4EyS3P7fzCv69tbUp6K6tZtUwB79DGJyH7vP4dR7I+C0QF62
-	NSb86rX7eEws4cvtljxQ7tobv+jaXEhBuplU6Ff76DZPscJv6fDpjKsI/Rt6CO7W53s=
-X-Gm-Gg: AY/fxX6OMuqkKLLsOWKYapOVdxPQmV8ERLVQe7p8gVMqTI4XmlvECRY18V3STsvk2lM
-	9U7gXTxKfA6dGxMFPoIqjMrpLyDZDU5AGhgHixhKZLVlLNZCqQWDwRXwzNlt/rrgerC8uK3FtE2
-	8zilx6n5+wwia0Jmg9FdQtfBIwEXJhNQg0DrM+B5xhfm+L006tYcE5WKBj24olteh1oIW4FVFH5
-	v2++AG6fUGQHVKPUhbsjBM3refOKlHt3EriBIE1y9MK19rPv6E/O3ktcgQW0APdx/ewE0ZHTBgM
-	Blhi8fhrTKZitLEowRKrZYfqQM6XGXFapT5/XfVhCCh9COmnp3Epl2ToEC8o0E6lWOL0vbkAGXt
-	eOqCGzZAp/hDRb9ZrFzElRe/fs4W7dGTLiI5Ks3zPKOjsh4KfzGgmVQjyvLBsABtn+TNxFl6yoC
-	vKyA==
-X-Google-Smtp-Source: AGHT+IH29+34z8e2aGHfAfFfrbcphokNJodhrKwKQkwo7FiW/yC73PruZYFQUOvBIlcTHfkT1lfHpA==
-X-Received: by 2002:a05:6808:30a9:b0:43b:7b80:5cf2 with SMTP id 5614622812f47-4559a58d733mr8251657b6e.11.1765817794370;
-        Mon, 15 Dec 2025 08:56:34 -0800 (PST)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-45598cf2becsm6693806b6e.13.2025.12.15.08.56.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Dec 2025 08:56:33 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: Damien Le Moal <dlemoal@kernel.org>, Christoph Hellwig <hch@lst.de>, 
- Yongpeng Yang <yangyongpeng.storage@gmail.com>
-Cc: linux-block@vger.kernel.org, Yongpeng Yang <yangyongpeng@xiaomi.com>, 
- Yongpeng Yang <yangyongpeng.storage@outlook.com>
-In-Reply-To: <20251215095816.1495942-2-yangyongpeng.storage@gmail.com>
-References: <20251215095816.1495942-2-yangyongpeng.storage@gmail.com>
-Subject: Re: [RESEND PATCH 1/1] Documentation: admin-guide: blockdev:
- replace zone_capacity with zone_capacity_mb when creating devices
-Message-Id: <176581779301.11354.768588972196922513.b4-ty@kernel.dk>
-Date: Mon, 15 Dec 2025 09:56:33 -0700
+        bh=zIbn2oDFRSGWfD5W22SaWrURpraJkYSQ1nm0bbeV7eo=;
+        b=L/fixQ4bTSLRmpmZF2KwfEDJSSiVXOVOVa2q9dZds5IOUVywtQbPOI+eBIs7F4An9t
+         BA9hjcGHLC6rUw+3vjG9mfOFoibUI5XQksBhl8HcuPSw1vgnSsYf2ZRX/PnL6R08bzLY
+         bSXW2kX7eva80D2jv+r2S9TJgkn+cR/c7S3/8OZi1e5sJpPQgaIuWd1EJT3vMpUbXFKC
+         w8hW6LH2xUIJdPvYV0KpkK3FKMmmAt4aThUEenG9yfztPaCVIfnOByXDc4UMDT8Fe95u
+         e6FM8t4jMDmh5Yz8VyDRu4F/v6EQjxxLFzUTWnhsPoa1temCaGLZxVAoSWzX5IoFQMYB
+         sOhw==
+X-Forwarded-Encrypted: i=1; AJvYcCXZXXGOWN6g2Q0JlCZbClTbxPoSwXx/j0agUFQCbqYkS+HR/UDrcoxdBgYqzXBp47gdxpupueA5gNIxLg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxgrfWwN12bpcZaWhPn83fXYiwi5mxLN7FJoJMGdqGGc2XMYesG
+	uSiWlwrcXTh+58c8q3wHGkDP9IquVgrzo4/yNPgmsnPygZwChXcq5XtkVGZMTQ==
+X-Gm-Gg: AY/fxX4zQ8Scvpb24i1UMXHw+7JjrCAtM+VcsWzrSkV/sef0a+XPMRW4udTT8QyNqVd
+	nXXAq1I0kYDV9qPWO4Kub+b3876l5o9tWsXod6I60o5kq8u1928vzTiVjSbaQd+Kqbf1lTC1sUQ
+	lEP4DbzunuSypQpMGoqkwyvOQj39RPPShhO3BFYpoVyPMuQ5575Eejv5/BOwMnDvVu9II4D2vBr
+	JYliYVJO3GJlykarK/eUBO4Xq6gnrEjqbB8BRCZjocfUtrCmortX+2xSxAkQh2/137kSQOdcS+e
+	7HK3vKsaZZM+r915K7CytskU7PvyhSjwdkQOw6LVNUw74tHnGJIUBoFV3THziMH90g8hNC+I/vz
+	Gq8mwTAQ+QJk3a0drDp/s9kMgV+8wKyKTbHfXaSVECheOMeL9IgD9VzDCD2GrU48/+DwhODQl2H
+	tsWk3W63ye
+X-Google-Smtp-Source: AGHT+IFsDUVoZATaLzj9N1/hjfRE03GZ2gIP+Qj4HQeX9tt2ONoJL779FMDFpau9DQULSPR5u/L2Cg==
+X-Received: by 2002:a05:6512:1154:b0:597:d59a:69ca with SMTP id 2adb3069b0e04-598faa4d5b5mr3889154e87.28.1765821580147;
+        Mon, 15 Dec 2025 09:59:40 -0800 (PST)
+Received: from localhost ([194.190.17.114])
+        by smtp.gmail.com with UTF8SMTPSA id 2adb3069b0e04-5990da11dbfsm5648e87.13.2025.12.15.09.59.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 15 Dec 2025 09:59:39 -0800 (PST)
+From: Askar Safin <safinaskar@gmail.com>
+To: rdunlap@infradead.org
+Cc: initramfs@vger.kernel.org,
+	linux-api@vger.kernel.org,
+	linux-arch@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	patches@lists.linux.dev
+Subject: Re: [PATCH v4 1/3] init: remove deprecated "load_ramdisk" and "prompt_ramdisk" command line parameters
+Date: Mon, 15 Dec 2025 20:59:27 +0300
+Message-ID: <20251215175927.300936-1-safinaskar@gmail.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <5c3c4233-3572-4842-850e-0a88ce16eee3@infradead.org>
+References: <5c3c4233-3572-4842-850e-0a88ce16eee3@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
+Content-Transfer-Encoding: 8bit
 
-
-On Mon, 15 Dec 2025 17:58:17 +0800, Yongpeng Yang wrote:
-> The "zone_capacity=%umb" option is no longer used. The effective option
-> is now "zone_capacity_mb=%u", so update the documentation accordingly.
+Randy Dunlap <rdunlap@infradead.org>:
+> Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
 > 
-> 
+> Thanks.
 
-Applied, thanks!
+Thank you!
 
-[1/1] Documentation: admin-guide: blockdev: replace zone_capacity with zone_capacity_mb when creating devices
-      commit: 67d85b062dcb49af9c903a58842a4ed7281f57b8
+P. S. For unknown reasons I don't see your email in my Gmail. Not even in
+spam folder.
 
-Best regards,
+
 -- 
-Jens Axboe
-
-
-
+Askar Safin
