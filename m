@@ -1,70 +1,70 @@
-Received: from mail-pj1-f66.google.com (mail-pj1-f66.google.com [209.85.216.66])
+Received: from mail-pl1-f193.google.com (mail-pl1-f193.google.com [209.85.214.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F32428CF6F
-	for <linux-block@vger.kernel.org>; Mon, 15 Dec 2025 09:52:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 969C0433BC
+	for <linux-block@vger.kernel.org>; Mon, 15 Dec 2025 09:58:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765792336; cv=none; b=EdYLJxSil01LixKYqcCdr7Az+5llfw4+6xw3ixYgLjCfslj7hbdrVmvk8ihBev22cqBdIjA8CBrDg9FbM/GQIDhz58MMJxLCFK7/E5ALlw6vQCm+GsoJWXQL5+qLyaY8f+1LiCqh4Gu9tirDSEksmWFSJWQH/+Wac+wmNWXq8Fs=
+	t=1765792710; cv=none; b=q5ocPEaY9LKU6F0K5/1tDgz6TywgGk178b1Tb1XgNtyD5sXcZzmTG8ig+50Q/6Nfjgo3oH0liRZrA/2Uhwsko9C80fI+nRUQ4V2IB+BidND6j3TzgmtXaTw53h1NguCbwdJStyiLKOIMvIdbd6Thvy7tbqmSo3RdZUEWhjlG30M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765792336; c=relaxed/simple;
-	bh=gI8tNxhia2pIMeY36jPYkFM9x5yJfMfUX4jClXweBEE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hx+wM4HIuOnH2K8U2iz9icYZVv/g8whCLID5AvttBWCgyczj8DgTDV3giTIKR7o6fBcJOiVu1x/4SusRbIdh741o4kFHE1sNONg2pY+1+Bpz+vrh2DS7LBi7PCFbpnwWymR7rLa41CUSRxps7we+7YIVKe5c4MkbOPz6Izw+OS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fCqTzaDX; arc=none smtp.client-ip=209.85.216.66
+	s=arc-20240116; t=1765792710; c=relaxed/simple;
+	bh=erWqIM6ZSx2bz68Z8HE9m/js5xQQD6d+QSvi/upPCTw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EWJt4QxIJRkh1FvKnwDjIYIHL0bwAKlEascH5Niu/AaQU/XXexXqfCgpSdg2np9EzzZhBJt7Ci3mRUCIKKVcaq9DOVHYHTBR0LRGMv/YYaD7MU2Z37laMQMO91msOkfuSO5NY84jFCiljipXo2cIaD6WzaNs8uDs0wE94k4lpgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NbJfr2uO; arc=none smtp.client-ip=209.85.214.193
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fCqTzaDX"
-Received: by mail-pj1-f66.google.com with SMTP id 98e67ed59e1d1-34c718c5481so825863a91.3
-        for <linux-block@vger.kernel.org>; Mon, 15 Dec 2025 01:52:14 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NbJfr2uO"
+Received: by mail-pl1-f193.google.com with SMTP id d9443c01a7336-2a1022dda33so5294785ad.2
+        for <linux-block@vger.kernel.org>; Mon, 15 Dec 2025 01:58:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765792333; x=1766397133; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1765792708; x=1766397508; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=t4ciVJ7aamtPIgOYSgD/1Gz4e5eZe7ufgjmRlA1cyXQ=;
-        b=fCqTzaDXUpf7oxxOK7DhtQl9uwWDp7akm/uWlVBvLpLmr2Ljx6Dg6GZPs9w8I+GjR2
-         awYhHJ3hyzRXbgJ2ivoj05cura00ewgeKR40cRbzXsL6ksFUfUBO+HQTUNuD9RhT2sV8
-         UIfbrj1/R7GRsfCEuXfNhGvAfUEYZ6McD7NBO9SanJfyCBeyQNMRS5zu1K7S7txKjoCG
-         YZHGL6ubLO7JtZFJnPFrL8RnJQRJtD1LlZvg36bRQJG7mzoo7+IPQYYwxXUy1Vipqyu/
-         y558qTcOSSNF7pzG7+deM+/w+0fxw+AHXZ4w8ecduX0Eyc8LLH+zxplE1qQHMghAADr4
-         enCw==
+        bh=erHJWv42eR5+0fURHxPf3eDMpo7jOM4f2flihD2czMU=;
+        b=NbJfr2uO266gdoOjVHD5hTtK7L1BLYcw7QwltPQ24PEyKKC+4eqTQdeRlVLLRMv+/E
+         wNwy6zp8VCIzlRTd8eyfCDRFvIsaLC9K6K9HLK/ngsw9oBzJosjub82WMCR7vg2nFIjH
+         7D7b+ZJn+j/rxJgNS8+D5ZCYsUKUVuCrg0aRacgqfJPk4BBb17CZ6inTpUXgmI9Z1UXg
+         /xIBULUPaJjI+n0p2BC3LE4jwGpQcvYEl+0Sb7xPtT6kBd3FfsHYySsTd9dJ+CIwPnfW
+         gsFuf3rIXzAa0AD3fhGtaqQ6eaGRzMJGcMGvRcgkis5v5jS2pCWRCedDd+znDDD96gBg
+         Uq+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765792333; x=1766397133;
+        d=1e100.net; s=20230601; t=1765792708; x=1766397508;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=t4ciVJ7aamtPIgOYSgD/1Gz4e5eZe7ufgjmRlA1cyXQ=;
-        b=OzT0lDDbt1I6UAF+fw+uzZNrUDjS7UDaCPP6gUv4JVC/yaQxIy2W82s2M8sgJJn4e3
-         Q2nROvaeYhCrJ7J5job3U4i2t6gR4nx8Mk3RGt4Yd/Fq5IqR4AQHdRjef0oFthyN+Ga/
-         8reZqQoqxnwTb1I+35jKWvLbgDnv9TM84twK9OeLLbYm/spfmN0lDODZaC2UzXbQEj9Z
-         bls+t04Lf56E4aXRjoBh7d8v4G7f4DTQ6oOzwBG5q8xK1LuTjLQgq8T0r25ivoUqTcQA
-         0T481zaetURj9NS/d6iXJYeWqX8N1++/MSHUvevE03dSWnsQGplZwyJRirT75YQxi8ZA
-         vpbw==
-X-Gm-Message-State: AOJu0Yxd+cx78feBRFbsxkeUaRsz9ACiTDvnm5e33HnqPhb1QPbJ7hRi
-	mTL8Wi7BevQpYBu+7/uin2nHWOeZRpkhW7p0e+Qb6M96WuwZ8pIb0Rn3
-X-Gm-Gg: AY/fxX4dM1NCL70GawKBH0srk8aZCvRN7kHJms/lYW3EQy+375bUMC0VyXrgBOnY96T
-	WVmrCVCX8BqssE0Ak+RF8AYgCJo7365DbpoUpgRHDeL9UNpZ/qWappGlFGvFmv51wIe2vArpyqn
-	Yz2gloV9L5kkZREg03VCW/q1XzyOY8704508/j/QD+2X3oJc70kKNjhFl8Ok7dGmi4IDiDgMClT
-	BxR/PW065gc1M2kFQgghYHHIaz76S+1Ry/ux3fRCp1XV52epn/U/mWTNtX8QdO7ZLscbeUfQqxL
-	3bMM0GBzCZoCOiMzjoALa97EU0X6ewws+AsQqW4b7fy0UYXn2amkQccYa5A4El5U4mfZ70LsCPN
-	y8CuDZGsHCKTW+iBmgtOiQ5P/6l/404P8n4A9ncoVGdqwZ7AjZJl4E1hHxiSop6diC3BLP1fgp4
-	1hVr79L0MzaL2b1atwzaydZIjXlW3NLRwKF2Vbg43ZNWzxcKC0F/5Pfywvqg==
-X-Google-Smtp-Source: AGHT+IEJbMIduxLFHFK//1a07qGKZ1U2RE6zDiI9pqN+Fv2EYH5Lb8cJ+jvZP9BTh70M+HCJphMEyA==
-X-Received: by 2002:a17:90b:3d4b:b0:340:b06f:7134 with SMTP id 98e67ed59e1d1-34abd768b65mr9472586a91.20.1765792333347;
-        Mon, 15 Dec 2025 01:52:13 -0800 (PST)
+        bh=erHJWv42eR5+0fURHxPf3eDMpo7jOM4f2flihD2czMU=;
+        b=WEIRZAHC6ApTs+9o6mN5cUl5L0+jRG9QVyZr7kpl4SKZ6oG9Y+b5Tf0Q9ZPcfBZGuN
+         mUSnzf0scnUoPeYdhGcVtclK9igcm5hvufmLD2tSVtcdxidpRRwcQf3esI4PNeOIfW3O
+         nemWC5N/AUqsoIfkgo5937/V1Rq8ITHFAC2mfl2Auu3JfsMf536x0ns2Dh7bfZLlNYAT
+         Vtlwy+O42iM3plPNwibzAuqULXfBuCTzsrcSNdeeWWD0b05jN9Gc0BJnfcHyGp1adhst
+         8UcPebUqquzanQsAUY5lXmYpY9ieV0+vryqEir5Q+Nz4wb+FdR43vah/og3Kv4W+ob+d
+         HTSg==
+X-Gm-Message-State: AOJu0YxJlf7HsELS0TRagzcTXx9oR3SAfoDngLzvHl9felzNMcogaO63
+	u79MJa6RbWOhGJ78sgXlPiFyycH8msWjksAJb41/KyS2Z2gPRj1crrX1
+X-Gm-Gg: AY/fxX6BJmcoXrDs3WYw7GT/V7RREsm+Rlo03fHtN2YzyAvBd19FbyMIX17P9NAcpuy
+	GRe3tKOO2iyqixXjS0elOBFbDv+tIjuJHyjh8wVNXxezrsw9ee2p6aTtTsuiBsEt9an1w8Gc9sg
+	vSumq3jj7Ost3/W0c2cUTHQWZq+OsG/PiQ6AKLhzX3ozCe9KAnfilcr1JW/oGxmRscwxADISc3K
+	HyFz/kCc2hz7Y2rB8B8i1xFwVjAaVHQlliOXk1Ztn6/Ov+/3k3PtrcjRmWoW4ioAC3HmiGx/Xvk
+	V4j+7ReRBNaXfySscoLHAJhhbBnxMfxo27c8ozpP07oPnV3cAa2MKHWrNDcSqa0s3bdNIvFkmOc
+	rcU6TUzzU/ApF0t2SZjGgZXLnktLTiNeL/4jnPyaJEopri8sQXH7WSSjb6dXJppP7hA5PxzXFd0
+	i59CpV794B5bsbx4bErMnnS6i+U+m11j87YSFPaYXgswjag9eu5SXDmHnrAVrLcSsNsGC7
+X-Google-Smtp-Source: AGHT+IG3aLFhVm/eM5FvFbK5TpukoOwZcAFQ0Q3ntfULOxDhWZxUUI01oPNZaQ2do74RAUE5M8aTrA==
+X-Received: by 2002:a17:902:f647:b0:2a1:5d5:78a7 with SMTP id d9443c01a7336-2a105d5791fmr14559505ad.24.1765792707709;
+        Mon, 15 Dec 2025 01:58:27 -0800 (PST)
 Received: from xiaomi-ThinkCentre-M760t.mioffice.cn ([43.224.245.241])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34abe3ba5eesm8288688a91.6.2025.12.15.01.52.11
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a0f58d7c27sm24380725ad.24.2025.12.15.01.58.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Dec 2025 01:52:13 -0800 (PST)
+        Mon, 15 Dec 2025 01:58:27 -0800 (PST)
 From: Yongpeng Yang <yangyongpeng.storage@gmail.com>
 To: Damien Le Moal <dlemoal@kernel.org>,
 	Christoph Hellwig <hch@lst.de>
 Cc: linux-block@vger.kernel.org,
 	Yongpeng Yang <yangyongpeng@xiaomi.com>,
 	Yongpeng Yang <yangyongpeng.storage@outlook.com>
-Subject: [PATCH 1/1] Documentation: admin-guide: blockdev: replace zone_capacity with zone_capacity_mb when creating devices
-Date: Mon, 15 Dec 2025 17:51:50 +0800
-Message-ID: <20251215095149.1494265-2-yangyongpeng.storage@gmail.com>
+Subject: [RESEND PATCH 1/1] Documentation: admin-guide: blockdev: replace zone_capacity with zone_capacity_mb when creating devices
+Date: Mon, 15 Dec 2025 17:58:17 +0800
+Message-ID: <20251215095816.1495942-2-yangyongpeng.storage@gmail.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -78,6 +78,8 @@ From: Yongpeng Yang <yangyongpeng@xiaomi.com>
 
 The "zone_capacity=%umb" option is no longer used. The effective option
 is now "zone_capacity_mb=%u", so update the documentation accordingly.
+
+Signed-off-by: Yongpeng Yang <yangyongpeng@xiaomi.com>
 ---
  Documentation/admin-guide/blockdev/zoned_loop.rst | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
