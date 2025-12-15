@@ -1,112 +1,98 @@
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B930328B4C
-	for <linux-block@vger.kernel.org>; Mon, 15 Dec 2025 08:55:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA8BE3168F8
+	for <linux-block@vger.kernel.org>; Mon, 15 Dec 2025 09:03:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765788956; cv=none; b=HmM/RGX65wP4Vb0Hckj2BbJGNAhSdRh/e6nzog1Mfuwlx738CgPz+l0uFjjfvBEoode10apKJUHrGLLl7mAmrxPlShm5GD9YQD6NoWja1wpFaRfPzfEiXKfAra6ecHsUnTqtoVnC90lxotqvteV+4Eg1zuaPtM/0ifFJ8Mz4aX8=
+	t=1765789388; cv=none; b=ZfflOtRRmCKWFwb33M9WWA528yr5tjlK2uGjehS/Zo+5rbIzitE/qx4f308BBIRfRY1fBHJnjAdcLLK+Em+2Q/RrD4x4gZ+3CXr1xzKcTsaFn57ghVQ/JO1LnS+9j6suEzsSiECwo1jZcd5MB2HVA36wdKtKGIDC6rMAgDsjOtw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765788956; c=relaxed/simple;
-	bh=vkIE579D9Pf51E5Sv3rJ8Ww4OOZEx5efXppTB3JrexI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bCY8BWr+JiC8Fyyt0znuwfKTBa2qlTJqSbASRznEtEC4LOHWRGHEtN+80r+gtMpIIMD3ftMngOl8CvEi+cvrcseNsYpE9/efvXHvbTEyspEnKIwA8QQWLyC6JxHg2ouEQrYbnWpaIN+D0H6stFS7iPDIu0Byk50TQ+pbJt293Co=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GRZ4FSnG; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1765789388; c=relaxed/simple;
+	bh=OY4r8eSfKRYFQFtxfzjic5hM/CISIaurnPf04hVrsWE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HqX2W1Lqe4/Am0iN1311F3WSpkQGggCzGtgPiZZzVeOb53CoCcPGJ3ptmMVrH6YziQayoQAyBnY+V0h8E46syieK8STp7BHPqx6uJ9Y9VHNkSRCXIyW2DshPXGA3NybBzqsVuNawyZI3RZdBm48i5PDRUizolHG/f8rVYKi+x8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ADep48NW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GRZ4FSnG"
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7b9387df58cso4843609b3a.3
-        for <linux-block@vger.kernel.org>; Mon, 15 Dec 2025 00:55:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765788955; x=1766393755; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/N5vAhucA7uJnbwMQ9KUYNMH41B1zET6xOOzn4WvilM=;
-        b=GRZ4FSnGzeQgvaVFFuDQHsXHLIYn3M0aSvWLCykK4boEHuna8ORoS9kDkHH+fFa1Mj
-         3IPz2ZcQlERPEO+c8J49549G0/ntHIELpWAfKxS3ejoJmB5ovVodgZZwEIRlqj1e41i/
-         oovTtqMJQRrdbejEQMe8C3A9/tmZvEIN3ddYae7vsLr6piGt0w1tBErnS/Dx9OK4n04h
-         sGJPovbWqNSEgv98CZ/CLRQQSrAppULtydAIedP6E0fSPDO0IqH7cbmM3Juh59S9lYik
-         ld7ww0bUxCQcZBtusz9KpUOLpECVnw+BpyujkKHnqIfJJStlDsMdU0WBn9/uxIFNJLEY
-         FE/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765788955; x=1766393755;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=/N5vAhucA7uJnbwMQ9KUYNMH41B1zET6xOOzn4WvilM=;
-        b=WOUFl+MiLbOD43NNK94NguLvtXczsnCZrOrGQoRuSp7+oE2DOK/HCL9zPQcNYMDWcF
-         Cfgb4ltxoQ8L4phZx1pRIq8/LDSpI0UXOtqBpTMITTlN85ht7M0ISONgQrpCnNOWfQRZ
-         sdA0Vv6pKMTni3HBBkiyZ8cQBKCdLiZ/NABJbCx/zGtlrJcJ9jEflxUEy2sIPp5xVm2o
-         SVENvQupmN9YZoEZj6xJDzpqDWRrK1MG+gLXGT5V299DjI4rOSRYh8tK0omEUeyuFpnl
-         i9E74NO9hi05jhGUu8K8sv1hrwDqSXmH6XdI1hCDOvrG05mD96pGloMDwPLxGN5egEAP
-         BQgw==
-X-Gm-Message-State: AOJu0YyMNrcs5HqsNjZBP+q+Zi0sIipTaDLLTBF/hpUix1tm3GjBWvR5
-	qU5ozN2RznJzZHzmUbYtiaO9OX+3LBnvHdF4XYCUXiTtEhX8OwNNi2uB
-X-Gm-Gg: AY/fxX5ucuqJYKfXUgC3nuQcUFU/uWbbZw0OUq++XKj3LVDXx2DSjaynxKueWOrf2MI
-	VTmPJz0INQ3sykWLXGFuiAusKP7eJI1jYb0HZ2VIanqdDTwdpE/mJCeD7g1vcbg/GosFXLFUoU0
-	1DVksMYZ8gPC1+APU2FCZ1RKzMZjfTB9kQe6Qsa23k7oBUgVb0Yki11P8iz6DZqiVMv7PqbrL8v
-	IqZcHFBOTo5vwFQQ6A8UeOiXorwbvozkGQkH8OMUx2sciGgfHeGRn2VkNGhO9xiw6sMj31J3hkD
-	zh0KltGfrHLhzEuuQK3As51NWTXkRb6/mVAaNT/QUJp2mgLQV/pHJFAeYAzEevdgSTxnbxR+EPY
-	ngfSFWG+TlDLpNaZs4bB4aJZpCcbyS2KShfi5NURRtKWUTWk0XsP8XluNeQI4MdWBPTAg8lfbET
-	3sHnyLug4ik9fY2oa/No8/vVsIhI2fpJ1Rdf6KiGILBcV28vNDj7zyXEl385B6A6Groo7N
-X-Google-Smtp-Source: AGHT+IEt0s9tgTqv2Fxl3YaNfdE9BBsrwJ7AC3l6+9nM2j/CR6onhuRq8BTIequowO4vgl8do7JO3g==
-X-Received: by 2002:a05:6a00:3309:b0:7b9:a3c8:8c3d with SMTP id d2e1a72fcca58-7f667447783mr9820353b3a.5.1765788954645;
-        Mon, 15 Dec 2025 00:55:54 -0800 (PST)
-Received: from xiaomi-ThinkCentre-M760t.mioffice.cn ([43.224.245.241])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7f4c2379e40sm12003114b3a.5.2025.12.15.00.55.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Dec 2025 00:55:54 -0800 (PST)
-From: Yongpeng Yang <yangyongpeng.storage@gmail.com>
-To: Damien Le Moal <dlemoal@kernel.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	Ming Lei <ming.lei@redhat.com>
-Cc: linux-block@vger.kernel.org,
-	Yongpeng Yang <yangyongpeng@xiaomi.com>,
-	Yongpeng Yang <yangyongpeng.storage@outlook.com>
-Subject: [PATCH v2 2/2] zloop: use READ_ONCE() to read lo->lo_state in queue_rq path
-Date: Mon, 15 Dec 2025 16:55:19 +0800
-Message-ID: <20251215085518.1474701-3-yangyongpeng.storage@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20251215085518.1474701-2-yangyongpeng.storage@gmail.com>
-References: <20251215085518.1474701-2-yangyongpeng.storage@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ADep48NW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38448C4CEF5;
+	Mon, 15 Dec 2025 09:03:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765789387;
+	bh=OY4r8eSfKRYFQFtxfzjic5hM/CISIaurnPf04hVrsWE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ADep48NWo+2js0ewk3FHIxQgLTzsCsOjR1npO15AcWqI0bvuL8A1t+6RqkK4GjwR5
+	 0eAS5SZ+1gJDYB067FSk6KMuT4yR4NB+Bcg5cCrTxwS7mZHBRv4k91U3ewnXb+vb89
+	 l1lzfXjI3qGwTlqy54LkfuP4gqiWbN1vrsJR0NTNQZeTgfayJGswm8fl2sUzv4cCHN
+	 YWVyd3c4abGe6PUj8OqcMVnzREdvcAITKGTGx+1lJd7GNTYtVnOaqas7p0CPpZh2ED
+	 NqZC8lHI02xDulSvz2mXL2NVolvlRi8aCgvpwKAax5t49pMHInkcGWeinFaQ5viezU
+	 aZH+r7IJj3kYA==
+Message-ID: <867d692f-a0fe-4e6e-b635-66dead923535@kernel.org>
+Date: Mon, 15 Dec 2025 18:03:04 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/2] loop: use READ_ONCE() to read lo->lo_state without
+ locking
+To: Yongpeng Yang <yangyongpeng.storage@gmail.com>,
+ Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+ Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org, Yongpeng Yang <yangyongpeng@xiaomi.com>,
+ Yongpeng Yang <yangyongpeng.storage@outlook.com>
+References: <20251215085518.1474701-2-yangyongpeng.storage@gmail.com>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <20251215085518.1474701-2-yangyongpeng.storage@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Yongpeng Yang <yangyongpeng@xiaomi.com>
+On 12/15/25 17:55, Yongpeng Yang wrote:
+> From: Yongpeng Yang <yangyongpeng@xiaomi.com>
+> 
+> When lo->lo_mutex is not held, direct access may read stale data. This
+> patch uses READ_ONCE() to read lo->lo_state and data_race() to silence
+> code checkers.
+> 
+> Signed-off-by: Yongpeng Yang <yangyongpeng@xiaomi.com>
+> ---
+> v2:
+> - Use READ_ONCE() instead of converting lo_state to atomic_t type.
+> ---
+>  drivers/block/loop.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index 272bc608e528..f245715f5a90 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -1858,7 +1858,7 @@ static blk_status_t loop_queue_rq(struct blk_mq_hw_ctx *hctx,
+>  
+>  	blk_mq_start_request(rq);
+>  
+> -	if (lo->lo_state != Lo_bound)
+> +	if (data_race(READ_ONCE(lo->lo_state)) != Lo_bound)
 
-In the queue_rq path, zlo->state is accessed without locking, and direct
-access may read stale data. This patch uses READ_ONCE() to read
-zlo->state and data_race() to silence code checkers.
+READ_ONCE() without a corresponding WRITE_ONCE() does not make much sense. You
+need to use WRITE_ONCE() wherever the device state is updated under the mutex lock.
 
-Signed-off-by: Yongpeng Yang <yangyongpeng@xiaomi.com>
----
-v2:
-- Use READ_ONCE() instead of converting state to atomic_t type.
----
- drivers/block/zloop.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+>  		return BLK_STS_IOERR;
+>  
+>  	switch (req_op(rq)) {
+> @@ -2198,7 +2198,7 @@ static int loop_control_get_free(int idx)
+>  		return ret;
+>  	idr_for_each_entry(&loop_index_idr, lo, id) {
+>  		/* Hitting a race results in creating a new loop device which is harmless. */
+> -		if (lo->idr_visible && data_race(lo->lo_state) == Lo_unbound)
+> +		if (lo->idr_visible && data_race(READ_ONCE(lo->lo_state)) == Lo_unbound)
+>  			goto found;
+>  	}
+>  	mutex_unlock(&loop_ctl_mutex);
 
-diff --git a/drivers/block/zloop.c b/drivers/block/zloop.c
-index 77bd6081b244..60cb50051e0c 100644
---- a/drivers/block/zloop.c
-+++ b/drivers/block/zloop.c
-@@ -697,7 +697,7 @@ static blk_status_t zloop_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	struct zloop_cmd *cmd = blk_mq_rq_to_pdu(rq);
- 	struct zloop_device *zlo = rq->q->queuedata;
- 
--	if (zlo->state == Zlo_deleting)
-+	if (data_race(READ_ONCE(zlo->state)) == Zlo_deleting)
- 		return BLK_STS_IOERR;
- 
- 	/*
+
 -- 
-2.43.0
-
+Damien Le Moal
+Western Digital Research
