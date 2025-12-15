@@ -1,559 +1,203 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SEYPR02CU001.outbound.protection.outlook.com (mail-koreacentralazolkn19013079.outbound.protection.outlook.com [52.103.74.79])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E05A320386
-	for <linux-block@vger.kernel.org>; Mon, 15 Dec 2025 09:06:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765789598; cv=none; b=MhPcm+pAjcQjwSeasrdFckZhSMV+M5i7OJQU5O1IVgydFdXEjA9wQbObNSb4S2flmvRdF8vuEcDLByE728AEjyCfknS8YzLq8syOV5+nMkYIynfFY4j/ad4NVdYSH1XG7ye6z328/xiOQ2Ow8VyBp0xwsqDD8GhA94/Dz4XmgrY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765789598; c=relaxed/simple;
-	bh=S+I//71CAh3HG/ntXLeYl26reZdigPregIquYcMsXSQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T82z/kJx7/FlEvDNct+IKdwTU7HVJMtGLyf7wsd5OqFRKsTPJ9F3kVIVbpb4GuZ1OKQ+ulrKwfOCNEXNxnYNtWsBUz8HVm7gvHMJmYH63jn6LTeLpJB89SZOsGPvfMnLunEkmW+kFhZRNMDnrS+2ssCIflWaYBvMBWYAPJDx01Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DbFVAkV+; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC206227B95
+	for <linux-block@vger.kernel.org>; Mon, 15 Dec 2025 09:26:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.74.79
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765790765; cv=fail; b=jLLa/QxNl+NAl68CP2gJGznnBdAG9swGEaiNMmDEQ7Gj6QCT9TkYJS7YGB2QQ+mbxtVrrHjdB7NWkqZCcgpyxlkrlS8ZWhB9WXmWjn4yyEcHyGDq3e7unC7YRvQS6nHs49p7go3KCFGWhWFrPIFBkSCgrz9p6gKnFpwII5tJedY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765790765; c=relaxed/simple;
+	bh=Akmw+M31Fjkg8w2SMkCjYpHXU1YWqUsd0OVv2nI+s8s=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=bAt80oodBXarusnzfxulupPP8PHt3OhE73YaMF7uTl9oindJdVcJbbWenZdGDTDX7B9xFdHBcj3Fc/1wqJ3mT0CLdAWmZTJrzOq2boawqESBkFmU9EtuPm0YPJ6IdLXNAVp9zutcinxDvpjeRqqtNpyzZc1kf29PIqBKIAZOKN8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=YhNlqs4Y; arc=fail smtp.client-ip=52.103.74.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DbFVAkV+"
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2a07f8dd9cdso18211265ad.1
-        for <linux-block@vger.kernel.org>; Mon, 15 Dec 2025 01:06:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765789594; x=1766394394; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8TFzbFLNA/s8ANuMZPs94U2cOEd+GIJ7ZeP4XFmQHWk=;
-        b=DbFVAkV+9bTUaL3zUOZGSc0ehmkKrcH059r2y+rCYu7r+CHzao1iJXSCCC5cedExGk
-         lUC2x3ndImTxfy2TzVNU7aYEMm8XfAAcAwI+/6JLFQ9jLRJvSbjYfnlhjcC5TrYW9VjU
-         R+FFVb8CvOJyUo4cFcBrc9zCq4UNwbfkmt0RK4S/sFIrK8JRRDElD4P2xebPK4ZF+RDQ
-         PN38jaHyahmmFKr8N+L8e7UCZhhKzUzX4GyVaFn1lHh1UyLS/UnZQqaJrNfKgZyKoiHn
-         g2szT0mVHspGhIaaEeT5bxxsrxGNsX8UTGokIauxxAN1NuvFMl13TZFfSZYm5Hjzvf6n
-         9OOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765789594; x=1766394394;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8TFzbFLNA/s8ANuMZPs94U2cOEd+GIJ7ZeP4XFmQHWk=;
-        b=Dy4RPURtFDXpvoWAMFtMk1PF5tKwsWt0EkeOZmH0KtHBg4xq7aIBT0ggpbzbH+PV9r
-         ebk77Rj7O+kd48G+zGxm5DXasARdCE8kGTUiBCw6evoMvY8rjCVTDFgfdLsGOVIKI9lH
-         OC6dRgzkPrqVX4CJQgdEnRusuiZMp38ozgDaNboUzwXRjELUf12XYWi7W250j3l8hzj2
-         8nqvsqiE5PBgJvQP8ddno3eVk2kOsD77gYQ8o9eMfAnc5a6h9+cvBQCvBtHL0ccQKT7J
-         0rD6+utAIa5qMRAhB2gKiuMYt1wfP5IOWz+t2cyYPgfjal7Pd2q/3rfYTXMidS1fjsXu
-         JIPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVtCbpoKQclejpzhTbqfeb3dcgXd0QnzBi0RoqUGWxllF7GTE2ndIH6A+vxV+o02gxREZMMZW7OmAHJqg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwITmZ+g0dPH/ZqTQmYqIKLImjTKibjUHbfI09Mxd6zUUXA+o3c
-	+Y0nrssG6bJAuHfYXfQAl9GQlxe0SOfmRA6OLFQISz8cn0VInqZCtF2VegP3gaDaN7Q=
-X-Gm-Gg: AY/fxX4003xbtRkQuEjhcZUSKvYQ/JIe6tc1IgeX98KJC4TmjCV7qyHeJHsttSm6m61
-	xgwSGm8l4q3iCylY91+cKMPNdyTrjKiNEYwUxlX7werFazeTQletfG0Z5w2quf6kGmcraIZHxUy
-	mbyWjWuGkz4jAG38u+ye7PB+MdIk/qBne8PyM8n61BmKLf4Ffd7bCDYdvf+a/vvl31eaQofBLRo
-	ytfGeNEZ1sgFZ/3VyjmcAgCLB9Xztv/7+Ljf1MYlEn1HoNoIqGd0yNJ7CkhdYXWcau94p7VTpln
-	unnlcy64eyGgGQRf56mAqvY+bc4oUzmvhdofHJyED+7V1mtUcg0Wq7LjhcqEpatl+qkm7s9Bct2
-	YGSvSGE9PZ26u8GrY+nXt/DJPBGZUUqOuCZd8bNPIlMVoE6SyDmlW9Ois/vaGTIkodMvzQcxPwb
-	k4iCSnfQA9WEUYTZe72evYYw==
-X-Google-Smtp-Source: AGHT+IGzyDWmqhEU1Z8oAXr89HQnWirxmApn4cZ+UbhSq+NqKKmus5Ux4BVNBkt46IA1IaRTWuk54w==
-X-Received: by 2002:a17:903:2f10:b0:295:570d:116e with SMTP id d9443c01a7336-29f243447f0mr103959285ad.41.1765789593648;
-        Mon, 15 Dec 2025 01:06:33 -0800 (PST)
-Received: from archie.me ([210.87.74.117])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29ee9d38ae7sm127996155ad.35.2025.12.15.01.06.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Dec 2025 01:06:32 -0800 (PST)
-Received: by archie.me (Postfix, from userid 1000)
-	id 271FE41902F7; Mon, 15 Dec 2025 16:06:28 +0700 (WIB)
-Date: Mon, 15 Dec 2025 16:06:28 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Byungchul Park <byungchul@sk.com>
-Cc: linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
-	torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
-	linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
-	linux-ext4@vger.kernel.org, mingo@redhat.com, peterz@infradead.org,
-	will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
-	joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
-	duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org,
-	tytso@mit.edu, willy@infradead.org, david@fromorbit.com,
-	amir73il@gmail.com, gregkh@linuxfoundation.org, kernel-team@lge.com,
-	linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
-	minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
-	sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
-	penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
-	ngupta@vflare.org, linux-block@vger.kernel.org,
-	josef@toxicpanda.com, linux-fsdevel@vger.kernel.org, jack@suse.cz,
-	jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
-	djwong@kernel.org, dri-devel@lists.freedesktop.org,
-	rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
-	hamohammed.sa@gmail.com, harry.yoo@oracle.com,
-	chris.p.wilson@intel.com, gwan-gyeong.mun@intel.com,
-	max.byungchul.park@gmail.com, boqun.feng@gmail.com,
-	longman@redhat.com, yunseong.kim@ericsson.com, ysk@kzalloc.com,
-	yeoreum.yun@arm.com, netdev@vger.kernel.org,
-	matthew.brost@intel.com, her0gyugyu@gmail.com, corbet@lwn.net,
-	catalin.marinas@arm.com, bp@alien8.de, x86@kernel.org,
-	hpa@zytor.com, luto@kernel.org, sumit.semwal@linaro.org,
-	gustavo@padovan.org, christian.koenig@amd.com,
-	andi.shyti@kernel.org, arnd@arndb.de, lorenzo.stoakes@oracle.com,
-	Liam.Howlett@oracle.com, rppt@kernel.org, surenb@google.com,
-	mcgrof@kernel.org, petr.pavlu@suse.com, da.gomez@kernel.org,
-	samitolvanen@google.com, paulmck@kernel.org, frederic@kernel.org,
-	neeraj.upadhyay@kernel.org, joelagnelf@nvidia.com,
-	josh@joshtriplett.org, urezki@gmail.com,
-	mathieu.desnoyers@efficios.com, jiangshanlai@gmail.com,
-	qiang.zhang@linux.dev, juri.lelli@redhat.com,
-	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-	bsegall@google.com, mgorman@suse.de, vschneid@redhat.com,
-	chuck.lever@oracle.com, neil@brown.name, okorniev@redhat.com,
-	Dai.Ngo@oracle.com, tom@talpey.com, trondmy@kernel.org,
-	anna@kernel.org, kees@kernel.org, bigeasy@linutronix.de,
-	clrkwllms@kernel.org, mark.rutland@arm.com, ada.coupriediaz@arm.com,
-	kristina.martsenko@arm.com, wangkefeng.wang@huawei.com,
-	broonie@kernel.org, kevin.brodsky@arm.com, dwmw@amazon.co.uk,
-	shakeel.butt@linux.dev, ast@kernel.org, ziy@nvidia.com,
-	yuzhao@google.com, baolin.wang@linux.alibaba.com,
-	usamaarif642@gmail.com, joel.granados@kernel.org,
-	richard.weiyang@gmail.com, geert+renesas@glider.be,
-	tim.c.chen@linux.intel.com, linux@treblig.org,
-	alexander.shishkin@linux.intel.com, lillian@star-ark.net,
-	chenhuacai@kernel.org, francesco@valla.it,
-	guoweikang.kernel@gmail.com, link@vivo.com, jpoimboe@kernel.org,
-	masahiroy@kernel.org, brauner@kernel.org,
-	thomas.weissschuh@linutronix.de, oleg@redhat.com, mjguzik@gmail.com,
-	andrii@kernel.org, wangfushuai@baidu.com, linux-doc@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
-	linaro-mm-sig@lists.linaro.org, linux-i2c@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-modules@vger.kernel.org,
-	rcu@vger.kernel.org, linux-nfs@vger.kernel.org,
-	linux-rt-devel@lists.linux.dev, 2407018371@qq.com, dakr@kernel.org,
-	miguel.ojeda.sandonis@gmail.com, neilb@ownmail.net,
-	wsa+renesas@sang-engineering.com, dave.hansen@intel.com,
-	geert@linux-m68k.org, ojeda@kernel.org, alex.gaynor@gmail.com,
-	gary@garyguo.net, bjorn3_gh@protonmail.com, lossin@kernel.org,
-	a.hindborg@kernel.org, aliceryhl@google.com, tmgross@umich.edu,
-	rust-for-linux@vger.kernel.org
-Subject: Re: [PATCH v18 25/42] dept: add documents for dept
-Message-ID: <aT_PlFHyQB6HyZXG@archie.me>
-References: <20251205071855.72743-1-byungchul@sk.com>
- <20251205071855.72743-26-byungchul@sk.com>
- <aTN38kJjBftxnjm9@archie.me>
- <20251215042237.GA49936@system.software.com>
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="YhNlqs4Y"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=AxR0QY0+1HrhYRT+u+ShfWpblNMeuNi/VW1sSxL2RyKSiNZQvN0i4KViRUAar09rTLyHigEn92Ie8ADps/rfwlWajrh9fkb8nITdQycfgn+klmHPzsiVp56eOWV2TJP3zMY4IZVdtY2WfUMQ7mvEiyGtyTMlBzfTWuY90G7AzkTls6RMTdFq2KWcjtq7FkbFtRYNwBC280+cizNTnfiLMp+KN2vjiyLOuRjnIGnI6LEzHpmAYdfkEk0YAedMLjolSp6XTcURohwTJVG9fjrrJiXb73NLVIOzP2HvM4/LRLum+o+9fgvUDn8URYttxeDKncZ6SJPmUGnSt/hlepDD7A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=jkEme+L7K/tuccHb85tr8++7oeGtorSUe1ym5STax0Y=;
+ b=FmafcalCJUA8aVVFDoHOfrh+1hGs4DPu1z0BXYG4ytYBRhopHicsV5MrxQyvNYvJosp+A8vT9GUw/49cgIrZ990YcxdUZoo4R3JPpXaIkDerljMnpeEBaM8nVDUlweBmKSAeA1F+oGQhbvXPkFb3DjbVND6+MCy1GKJ6Z1eJNAy2+FW9M5bEd1Nmk3VbKnlVcDOv4lAdnW+QmVny/r3VP1OwFoKYGfivZZtH4TfbxYfps8QM3zYYJTEdBEmu6XFW1vMM4IGvj+NH3DVcDfWmCEr0oxEWHj/l7u2wLU7BaxpiuUa4uH4iU52nTxOkn++sOGAgy2U59iErgbmV8LmUWQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jkEme+L7K/tuccHb85tr8++7oeGtorSUe1ym5STax0Y=;
+ b=YhNlqs4Y/HMJMbsKVef9BPiUlszA0Ct9MSg3ZJLUuTYO9aBv1ibKCcI3HWXnSrWUrG9/U56YiChaKU4v3wHzBse5rsM9Zi7Wf0vVHYSCY7OvuafxgNvYiqwwqrQF08zIi7ePkFh+bAdfnuWQYgMuVX+l0o/uPRwe8fhZSqHQmOEmLR0+Mk4LcJCMkbdjLPkz8/phdDM7ktVsE8UUVxSf3ZQ40g0Rj3LMYtmS/13tFmG1e+OxQ3tQ39MkqsHfTQezhYqvmzhGtjaFnfK7BqpXovVYPac9HMAmbhS5Stc0FxSFNUEgYPTXAKUzwXJvoRuUTd/y19KhOIKrCj2ujmlEFw==
+Received: from SEZPR02MB5520.apcprd02.prod.outlook.com (2603:1096:101:47::14)
+ by TYZPR02MB6877.apcprd02.prod.outlook.com (2603:1096:405:28::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9412.13; Mon, 15 Dec
+ 2025 09:25:59 +0000
+Received: from SEZPR02MB5520.apcprd02.prod.outlook.com
+ ([fe80::ebcf:d79b:73ca:4120]) by SEZPR02MB5520.apcprd02.prod.outlook.com
+ ([fe80::ebcf:d79b:73ca:4120%4]) with mapi id 15.20.9412.011; Mon, 15 Dec 2025
+ 09:25:58 +0000
+Message-ID:
+ <SEZPR02MB5520CC8A6B2748D4934D16E199ADA@SEZPR02MB5520.apcprd02.prod.outlook.com>
+Date: Mon, 15 Dec 2025 17:25:54 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/2] loop: use READ_ONCE() to read lo->lo_state without
+ locking
+To: Damien Le Moal <dlemoal@kernel.org>,
+ Yongpeng Yang <yangyongpeng.storage@gmail.com>,
+ Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+ Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org, Yongpeng Yang <yangyongpeng@xiaomi.com>,
+ Yongpeng Yang <yangyongpeng.storage@outlook.com>
+References: <20251215085518.1474701-2-yangyongpeng.storage@gmail.com>
+ <867d692f-a0fe-4e6e-b635-66dead923535@kernel.org>
+Content-Language: en-US
+From: Yongpeng Yang <yangyongpeng.storage@outlook.com>
+In-Reply-To: <867d692f-a0fe-4e6e-b635-66dead923535@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SG2PR03CA0098.apcprd03.prod.outlook.com
+ (2603:1096:4:7c::26) To SEZPR02MB5520.apcprd02.prod.outlook.com
+ (2603:1096:101:47::14)
+X-Microsoft-Original-Message-ID:
+ <ab23af76-3de0-49d9-afcd-f382f4185c77@outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="oXMU5jEQKY7U45cC"
-Content-Disposition: inline
-In-Reply-To: <20251215042237.GA49936@system.software.com>
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SEZPR02MB5520:EE_|TYZPR02MB6877:EE_
+X-MS-Office365-Filtering-Correlation-Id: a549da06-66b3-4686-10bd-08de3bbbf47c
+X-Microsoft-Antispam:
+	BCL:0;ARA:14566002|461199028|8060799015|15080799012|19110799012|41001999006|23021999003|51005399006|9112599006|5072599009|6090799003|3430499032|3420499032|40105399003|3412199025|440099028|12091999003|1710799026;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?K0NMcWowR1Z4TERpNStlSGd6ZnhXY2FwU2ozbSsveXI1ak5RTEJORk8yUXRi?=
+ =?utf-8?B?c3V2OUlXUU5XWGt2U0pDYjhBRkFwNHpYWkZRdS9zY1k1R3Jrc1pnSHI1dHpM?=
+ =?utf-8?B?OEltUko4QUZ1UWlyeVVSbmtWdEZtNHJyc0MwTW4relk2VnR6RzBsNC80WkZX?=
+ =?utf-8?B?aGFPRzZoZlE5dk14Slo2VGR0LzFIV0g2RWVDU3lZMkdsa1RHUHBXODIxMHRU?=
+ =?utf-8?B?MXplajduZHpheGJqOFNtdGVCa1NMUWdKY0JURjdLcmlVaFBjTC8rVW9hY1lu?=
+ =?utf-8?B?OWpWakgxOXF0S0ZCQTFLcm80Yms1QUorZlhVZ3I0U1RCb2RDVGwwY21XRVd0?=
+ =?utf-8?B?cHZCYmEzM0l4cmpyY1NaZnRWWGxtRFBOcWMvMVFvbGpGQm5CTk5DbFhta0NT?=
+ =?utf-8?B?QUt5Z1pLSS9FWXR2amIwbmdWbWh6MUxGNE9xLzhPVGFuenF2dEtZMHlPM3ZU?=
+ =?utf-8?B?cm5YSDZOckhlKzZMcDdpUGk5SnoydWhKdGJUOFpSZHVCbTRQUVVraFcyNXIv?=
+ =?utf-8?B?REhsL1hrU3ZuVGduNE5PMDhlS3NNTW50TzBMdjV0UUFMeWV1NGJQSVFJTVBH?=
+ =?utf-8?B?dVplWEhqclR4R0FZbjg5eXo0SEhLaEc1Mm5JZ2hJVWduc3BtMDhVWjl4QWxn?=
+ =?utf-8?B?VStucGJySjNxckJxOGUxSjYrcFVOUE9hTFd3dG9mMzI0WlVBTTQ0VnhqY3NI?=
+ =?utf-8?B?SEtnZGdZZ21XS1RLa0l3M3oxaWVSVGxBV0VsSDJxMVZJMFZRZGNoZDRaSXJo?=
+ =?utf-8?B?b0pPU1JwZ2FUb0RyVEtvaGdNSnlJMEg5ZlRndi9yOUlIaFVrZGpUZy9KSHBq?=
+ =?utf-8?B?SlBxVUloUXZMelFxQWVubzlaYlA4NVFGa05aMHZ3aUkwb04yN1N5RGtoRnhU?=
+ =?utf-8?B?OHh0bk9MU3hoQUNDWmV0dXQ1ME1NdmJvayt1bnJPbDVMUFF6MmxFRHJqWjQ0?=
+ =?utf-8?B?Mm95TGxlTHpLUDNTazlzOWxWY1o5STdxTlc5bWZDWlVUWElkdlJ6ZVhPSEdQ?=
+ =?utf-8?B?MEx6YlZKYjkzdzFUcVZ0OHJLbGt6eURNYWh0OCt5S2VUMUFGa0dzZjhJRzVt?=
+ =?utf-8?B?cVNRdWo5My80SnVlMHkzOXRQQkNPOXF0UTM1V2plNDkvZkxyeU9zaGFQZG1G?=
+ =?utf-8?B?eExvbXRlcEhuL3ZCN0dxQkxBSjFqbWc1eDlVbEF1U0UvazA0Z2R2Vnp5YzVK?=
+ =?utf-8?B?YkJ1NVA5WTdMb1Rka2NEZVJ3MlVKdVZjY3BoZjI3TGFoMHZNKzRBOUlvL25L?=
+ =?utf-8?B?Q0s0TGZubFJZWUdMUkJxbTBUbnVCL0cwZFJveiswWHJCQXJuTHNuOEJGS1FR?=
+ =?utf-8?B?UG41N0FLbXA1dnJ0dW1VMVgxTXY5NCtvRFF3K0VCU29OUHZmWDc3eGp2aWNz?=
+ =?utf-8?B?N0taUldoTmFra3BWUkxyRDNHbnU2cy93TWR2WEhHd2xaTXdHayt3S0JuZ1Q0?=
+ =?utf-8?B?S0NjbWM2cncvK00zNDF4TlNkRHVzV2dtcXNRRkJwaFlmMml3SnNNOGtZbDJD?=
+ =?utf-8?B?QkpFaVNmMGdWdFV1R0JZQzkrOEJZQzh3T29HOXdxRUduSWZXbFJCQzhQdkVQ?=
+ =?utf-8?B?QlBxL2hVbmhWb3J2bzlDV0xHL05RWWw0TUxCZjNmV05SYlJONUo1QlRDeVRz?=
+ =?utf-8?B?Znc4L0ZkeXNiR3U0VlpDTU94dDRxRmNRRVh4SW5VMEJmbE1Yd0tPMU93OEFj?=
+ =?utf-8?B?TVZCeFdSQlphZ3lEOERPcHhhSXVkY2d6T2k5QkxuUi9FK2JYU0t1K1ZFMXFp?=
+ =?utf-8?B?RVZwVmRsT3VDNWhxZmxqR3YwSVZKbEpwbnFuSFAyTERkeklVVExkMW5sMnZi?=
+ =?utf-8?B?STI3V2JaUFRlR0pWVGpSdz09?=
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?T3dDM1ZYZVNLRWZtUFJ5NU1Ra0pQQ3VmQWE4a1ppbVYzcW5oL0xxUWtBeW5F?=
+ =?utf-8?B?azJPMEkzaTVibUd0cVp3Y1hJL3ZoUzJFUHhmaldBQ2MxaWIwdHliNlpQWk1G?=
+ =?utf-8?B?R210bk9DZTVXYWdkcng0VjhrcFBvankvWlAwWWR4VnNsN01zUkRBOWsyZ0Vp?=
+ =?utf-8?B?dm8xUHN3NGhqMjlvenI0WWMzQ1NDY3MvNnRCd2UxNTJDdUg5NWxLa083dVMz?=
+ =?utf-8?B?M0grL01ab2NqRVdydWVwR09WNU11WTZnNTlsRXRNY2ZrdmJSSE1seUI4TnVu?=
+ =?utf-8?B?ZWtMUWhYeDkrdStMcEwrdThmTVFsNW92eEthOHZJN3VBdWJwbTNaSU0xeXFZ?=
+ =?utf-8?B?b3FxTlFpZFVKQytLS3pTQ2NFclVuTytkRTN3aDZ0S2ZYR2g2VXhma3pXMU9V?=
+ =?utf-8?B?ZzFqVWlzZTdtRlgwbjNhRng2MjRZYTRoUXdkRW9OKytGQVdvZHNjTmd0Uk1W?=
+ =?utf-8?B?KzI2VTlHdGUwSkVjK2xKMnBDa285M09YVTV1SEFvRlVYN1dPQkc4VWV1RUx3?=
+ =?utf-8?B?NGZjc0ZtNDhESHdIV1lLSWhHUHRXd0Q5aDNzSUhKb25oVlo5NGVFNWh2VU1m?=
+ =?utf-8?B?VVd3bnpsWGtiQlNGSGpSOXMwc1haTWQ2OHBhRWp4bVZHamFBS1AwaW9icE5M?=
+ =?utf-8?B?dFFac0dyZm5hcVhlc0tWeGRISGs3RkZmSFJNRndTVitzWjVGT2RHOGJpRm5j?=
+ =?utf-8?B?aXZieUhocXFIQk9PdGlZYXhHb29RazFOUXozZlBGT3lXNXRab3dqZlJhTjRq?=
+ =?utf-8?B?cXhCU0ZFc3FZbXIyMHhLR2MzL0tDQmhTeVZSbW4wYXkyM2RpNWk3cnNYQVlR?=
+ =?utf-8?B?clBJZHRPNHBkcEgrMnRLbDlBeFZWVDR2YXFHS2dJUy9zZEhpVU9HM1ZZZzNm?=
+ =?utf-8?B?LzZFYjFNYkJTRjh6SU1LcHRqU2xrcnNKWU1VZ1RMSEZCRnB4TmwyZmVnNUo5?=
+ =?utf-8?B?RUJINzlzUzBjdXFZSENHM1h3K2djdy9xOG12eEFOakg4TGV3MUJxNExSZUtV?=
+ =?utf-8?B?K0w2bkhKQms0Zng0ejZtRGF6Nk1XRFB6S3dKNGI1R0U0UnhpUHhhK2ZKUVVh?=
+ =?utf-8?B?UExremNHZmJEZXIvaXNvblppZ0wzQ2FiWFRFK0V6WVlsbWlsOThLMVhrS3hh?=
+ =?utf-8?B?VnJiaTRjWHRmTnd3dy95RlJjNmVmcUNvRm9hYWJjZkNFMWxLSWFWK1FNZ1Fp?=
+ =?utf-8?B?bzZLNWJheXFyK3ZLeUxHM3V2Q0xPaCtOQklBWnU2dGQ1NmZTV01BeHh0UnJn?=
+ =?utf-8?B?c25OMzJ6U1djTHl3UVRGekhXQ2paVmpPeFB0VHMxOXMyQ1R1a1p4NTErcGo5?=
+ =?utf-8?B?c0Z0M0pTU0tRU1BKVnBRYUY5bll1dy9ldUN5ZmNPRGxLUnM4dHMxbTRJZEZZ?=
+ =?utf-8?B?RXprRzgxWVNmRzJuMTBQWm10VTI0NUg3Y1NvemlJc01ncm82dzIrZTU1VGhZ?=
+ =?utf-8?B?cklCT3E3ejQ4aU9MZ0EwT1ljWWpTOGJrUmVzd0Q0eFNyQ0dPWEdPYm1RODd6?=
+ =?utf-8?B?Y05uYW5Yd1lWMkR1RmUzTmZpVFlVU3RDMFVsamZnSjJvK2RHc28zZFphUENI?=
+ =?utf-8?B?MnBvVEh3aWp6TlBjMFZscE80NmZDNFZlVFQ0SFV5MUFIM2NlSkhObVVVYnht?=
+ =?utf-8?B?dDNoYjJQdFdxeWJKMVhEWnc2eUVybTdpOVBrWkZSTDlvYkdnQ2NiaGdEWDZ2?=
+ =?utf-8?B?UlZnMlppZmtTbnh0TWdUQmIzQ3BHVHJMV1ROdHVhS2tUM1FBekRBVHdRPT0=?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a549da06-66b3-4686-10bd-08de3bbbf47c
+X-MS-Exchange-CrossTenant-AuthSource: SEZPR02MB5520.apcprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Dec 2025 09:25:58.3587
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYZPR02MB6877
 
+On 12/15/25 17:03, Damien Le Moal wrote:
+> On 12/15/25 17:55, Yongpeng Yang wrote:
+>> From: Yongpeng Yang <yangyongpeng@xiaomi.com>
+>>
+>> When lo->lo_mutex is not held, direct access may read stale data. This
+>> patch uses READ_ONCE() to read lo->lo_state and data_race() to silence
+>> code checkers.
+>>
+>> Signed-off-by: Yongpeng Yang <yangyongpeng@xiaomi.com>
+>> ---
+>> v2:
+>> - Use READ_ONCE() instead of converting lo_state to atomic_t type.
+>> ---
+>>  drivers/block/loop.c | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+>> index 272bc608e528..f245715f5a90 100644
+>> --- a/drivers/block/loop.c
+>> +++ b/drivers/block/loop.c
+>> @@ -1858,7 +1858,7 @@ static blk_status_t loop_queue_rq(struct blk_mq_hw_ctx *hctx,
+>>  
+>>  	blk_mq_start_request(rq);
+>>  
+>> -	if (lo->lo_state != Lo_bound)
+>> +	if (data_race(READ_ONCE(lo->lo_state)) != Lo_bound)
+> 
+> READ_ONCE() without a corresponding WRITE_ONCE() does not make much sense. You
+> need to use WRITE_ONCE() wherever the device state is updated under the mutex lock.
+> 
 
---oXMU5jEQKY7U45cC
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+OK, I'll fix this in v3.
 
-On Mon, Dec 15, 2025 at 01:22:37PM +0900, Byungchul Park wrote:
-> On Sat, Dec 06, 2025 at 07:25:22AM +0700, Bagas Sanjaya wrote:
-> > On Fri, Dec 05, 2025 at 04:18:38PM +0900, Byungchul Park wrote:
-> > > Add documents describing the concept and APIs of dept.
-> > >=20
-> > > Signed-off-by: Byungchul Park <byungchul@sk.com>
-> > > ---
-> > >  Documentation/dev-tools/dept.rst     | 778 +++++++++++++++++++++++++=
-++
-> > >  Documentation/dev-tools/dept_api.rst | 125 +++++
-> >=20
-> > You forget to add toctree entries:
->=20
-> I'm sorry for late reply.
->=20
-> Thanks a lot!
->=20
-> > ---- >8 ----
-> > diff --git a/Documentation/dev-tools/index.rst b/Documentation/dev-tool=
-s/index.rst
-> > index 4b8425e348abd1..02c858f5ed1fa2 100644
-> > --- a/Documentation/dev-tools/index.rst
-> > +++ b/Documentation/dev-tools/index.rst
-> > @@ -22,6 +22,8 @@ Documentation/process/debugging/index.rst
-> >     clang-format
-> >     coccinelle
-> >     sparse
-> > +   dept
-> > +   dept_api
-> >     kcov
-> >     gcov
-> >     kasan
-> >=20
-> > > +Lockdep detects a deadlock by checking lock acquisition order.  For
-> > > +example, a graph to track acquisition order built by lockdep might l=
-ook
-> > > +like:
-> > > +
-> > > +.. literal::
-> > > +
-> > > +   A -> B -
-> > > +           \
-> > > +            -> E
-> > > +           /
-> > > +   C -> D -
-> > > +
-> > > +   where 'A -> B' means that acquisition A is prior to acquisition B
-> > > +   with A still held.
-> >=20
-> > Use code-block directive for literal code blocks:
->=20
-> I will.
->=20
-> > ---- >8 ----
-> > diff --git a/Documentation/dev-tools/dept.rst b/Documentation/dev-tools=
-/dept.rst
-> > index 333166464543d7..8394c4ea81bc2a 100644
-> > --- a/Documentation/dev-tools/dept.rst
-> > +++ b/Documentation/dev-tools/dept.rst
-> > @@ -10,7 +10,7 @@ Lockdep detects a deadlock by checking lock acquisiti=
-on order.  For
-> >  example, a graph to track acquisition order built by lockdep might look
-> >  like:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     A -> B -
-> >             \
-> > @@ -25,7 +25,7 @@ Lockdep keeps adding each new acquisition order into =
-the graph at
-> >  runtime.  For example, 'E -> C' will be added when the two locks have
-> >  been acquired in the order, E and then C.  The graph will look like:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >         A -> B -
-> >                 \
-> > @@ -41,7 +41,7 @@ been acquired in the order, E and then C.  The graph =
-will look like:
-> > =20
-> >  This graph contains a subgraph that demonstrates a loop like:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >                  -> E -
-> >                 /      \
-> > @@ -76,7 +76,7 @@ e.g. irq context, normal process context, wq worker c=
-ontext, or so on.
-> > =20
-> >  Can lockdep detect the following deadlock?
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     context X	   context Y	   context Z
-> > =20
-> > @@ -91,7 +91,7 @@ Can lockdep detect the following deadlock?
-> > =20
-> >  No.  What about the following?
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     context X		   context Y
-> > =20
-> > @@ -116,7 +116,7 @@ What leads a deadlock
-> >  A deadlock occurs when one or multi contexts are waiting for events th=
-at
-> >  will never happen.  For example:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     context X	   context Y	   context Z
-> > =20
-> > @@ -148,7 +148,7 @@ In terms of dependency:
-> > =20
-> >  Dependency graph reflecting this example will look like:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >      -> C -> A -> B -
-> >     /                \
-> > @@ -171,7 +171,7 @@ Introduce DEPT
-> >  DEPT(DEPendency Tracker) tracks wait and event instead of lock
-> >  acquisition order so as to recognize the following situation:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     context X	   context Y	   context Z
-> > =20
-> > @@ -186,7 +186,7 @@ acquisition order so as to recognize the following =
-situation:
-> >  and builds up a dependency graph at runtime that is similar to lockdep.
-> >  The graph might look like:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >      -> C -> A -> B -
-> >     /                \
-> > @@ -199,7 +199,7 @@ DEPT keeps adding each new dependency into the grap=
-h at runtime.  For
-> >  example, 'B -> D' will be added when event D occurrence is a
-> >  prerequisite to reaching event B like:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     context W
-> > =20
-> > @@ -211,7 +211,7 @@ prerequisite to reaching event B like:
-> > =20
-> >  After the addition, the graph will look like:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >                       -> D
-> >                      /
-> > @@ -236,7 +236,7 @@ How DEPT works
-> >  Let's take a look how DEPT works with the 1st example in the section
-> >  'Limitation of lockdep'.
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     context X	   context Y	   context Z
-> > =20
-> > @@ -256,7 +256,7 @@ event.
-> > =20
-> >  Adding comments to describe DEPT's view in detail:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     context X	   context Y	   context Z
-> > =20
-> > @@ -293,7 +293,7 @@ Adding comments to describe DEPT's view in detail:
-> > =20
-> >  Let's build up dependency graph with this example.  Firstly, context X:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     context X
-> > =20
-> > @@ -304,7 +304,7 @@ Let's build up dependency graph with this example. =
- Firstly, context X:
-> > =20
-> >  There are no events to create dependency.  Next, context Y:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     context Y
-> > =20
-> > @@ -332,7 +332,7 @@ event A cannot be triggered if wait B cannot be awa=
-kened by event B.
-> >  Therefore, we can say event A depends on event B, say, 'A -> B'.  The
-> >  graph will look like after adding the dependency:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     A -> B
-> > =20
-> > @@ -340,7 +340,7 @@ graph will look like after adding the dependency:
-> > =20
-> >  Lastly, context Z:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     context Z
-> > =20
-> > @@ -362,7 +362,7 @@ triggered if wait A cannot be awakened by event A. =
- Therefore, we can
-> >  say event B depends on event A, say, 'B -> A'.  The graph will look li=
-ke
-> >  after adding the dependency:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >      -> A -> B -
-> >     /           \
-> > @@ -386,7 +386,7 @@ Interpret DEPT report
-> > =20
-> >  The following is the same example in the section 'How DEPT works'.
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     context X	   context Y	   context Z
-> > =20
-> > @@ -425,7 +425,7 @@ We can simplify this by labeling each waiting point=
- with [W], each
-> >  point where its event's context starts with [S] and each event with [E=
-].
-> >  This example will look like after the labeling:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     context X	   context Y	   context Z
-> > =20
-> > @@ -443,7 +443,7 @@ DEPT uses the symbols [W], [S] and [E] in its repor=
-t as described above.
-> >  The following is an example reported by DEPT for a real problem in
-> >  practice.
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     Link: https://lore.kernel.org/lkml/6383cde5-cf4b-facf-6e07-1378a485=
-657d@I-love.SAKURA.ne.jp/#t
-> >     Link: https://lore.kernel.org/lkml/1674268856-31807-1-git-send-emai=
-l-byungchul.park@lge.com/
-> > @@ -646,7 +646,7 @@ practice.
-> > =20
-> >  Let's take a look at the summary that is the most important part.
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     ---------------------------------------------------
-> >     summary
-> > @@ -669,7 +669,7 @@ Let's take a look at the summary that is the most i=
-mportant part.
-> > =20
-> >  The summary shows the following scenario:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     context A	   context B	   context ?(unknown)
-> > =20
-> > @@ -684,7 +684,7 @@ The summary shows the following scenario:
-> > =20
-> >  Adding comments to describe DEPT's view in detail:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     context A	   context B	   context ?(unknown)
-> > =20
-> > @@ -711,7 +711,7 @@ Adding comments to describe DEPT's view in detail:
-> > =20
-> >  Let's build up dependency graph with this report. Firstly, context A:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     context A
-> > =20
-> > @@ -735,7 +735,7 @@ unlock(&ni->ni_lock:0) depends on folio_unlock(&f1)=
-, say,
-> > =20
-> >  The graph will look like after adding the dependency:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     unlock(&ni->ni_lock:0) -> folio_unlock(&f1)
-> > =20
-> > @@ -743,7 +743,7 @@ The graph will look like after adding the dependenc=
-y:
-> > =20
-> >  Secondly, context B:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     context B
-> > =20
-> > @@ -762,7 +762,7 @@ folio_unlock(&f1) depends on unlock(&ni->ni_lock:0)=
-, say,
-> > =20
-> >  The graph will look like after adding the dependency:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >      -> unlock(&ni->ni_lock:0) -> folio_unlock(&f1) -
-> >     /                                                \
-> >=20
-> > > +Limitation of lockdep
-> > > +---------------------
-> > > +
-> > > +Lockdep deals with a deadlock by typical lock e.g. spinlock and mute=
-x,
-> > > +that are supposed to be released within the acquisition context.
-> > > +However, when it comes to a deadlock by folio lock that is not suppo=
-sed
-> > > +to be released within the acquisition context or other general
-> > > +synchronization mechanisms, lockdep doesn't work.
-> > > +
-> > > +NOTE:  In this document, 'context' refers to any type of unique cont=
-ext
-> > > +e.g. irq context, normal process context, wq worker context, or so o=
-n.
-> > > +
-> > > +Can lockdep detect the following deadlock?
-> > > +
-> > > +.. literal::
-> > > +
-> > > +   context X	   context Y	   context Z
-> > > +
-> > > +		   mutex_lock A
-> > > +   folio_lock B
-> > > +		   folio_lock B <- DEADLOCK
-> > > +				   mutex_lock A <- DEADLOCK
-> > > +				   folio_unlock B
-> > > +		   folio_unlock B
-> > > +		   mutex_unlock A
-> > > +				   mutex_unlock A
-> > > +
-> > > +No.  What about the following?
-> > > +
-> > > +.. literal::
-> > > +
-> > > +   context X		   context Y
-> > > +
-> > > +			   mutex_lock A
-> > > +   mutex_lock A <- DEADLOCK
-> > > +			   wait_for_complete B <- DEADLOCK
-> > > +   complete B
-> > > +			   mutex_unlock A
-> > > +   mutex_unlock A
-> > > +
-> > > +No.
-> >=20
-> > One unanswered question from my v17 review [1]: You explain in "How DEP=
-T works"
-> > section how DEPT detects deadlock in the first example (the former with=
- three
-> > contexts). Can you do the same on the second example (the latter with t=
-wo
-> > contexts)?
->=20
-> Did you mean to update the document with it?  I misunderstood what you
-> meant but sure I will update it as [1].
+Thanks
+Yongpeng,
 
-Of course!
+>>  		return BLK_STS_IOERR;
+>>  
+>>  	switch (req_op(rq)) {
+>> @@ -2198,7 +2198,7 @@ static int loop_control_get_free(int idx)
+>>  		return ret;
+>>  	idr_for_each_entry(&loop_index_idr, lo, id) {
+>>  		/* Hitting a race results in creating a new loop device which is harmless. */
+>> -		if (lo->idr_visible && data_race(lo->lo_state) == Lo_unbound)
+>> +		if (lo->idr_visible && data_race(READ_ONCE(lo->lo_state)) == Lo_unbound)
+>>  			goto found;
+>>  	}
+>>  	mutex_unlock(&loop_ctl_mutex);
+> 
+> 
 
---=20
-An old man doll... just what I always wanted! - Clara
-
---oXMU5jEQKY7U45cC
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCaT/PiwAKCRD2uYlJVVFO
-o2U6AQDUdKZUTdPI5wclaV+upvJdG2B4MNuJFQ3Ausve1JhRAgD9FqcmmRDdNgTg
-fQNwIxnV8dOThdPBY4c1vylRfqTVTQg=
-=1ic4
------END PGP SIGNATURE-----
-
---oXMU5jEQKY7U45cC--
