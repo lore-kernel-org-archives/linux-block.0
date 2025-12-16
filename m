@@ -1,204 +1,180 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from xmbghk7.mail.qq.com (xmbghk7.mail.qq.com [43.163.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51E3513AA2F;
-	Tue, 16 Dec 2025 03:16:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAE491EEE6;
+	Tue, 16 Dec 2025 03:23:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.163.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765854973; cv=none; b=c64/1WKfhavdfqi3s8U30lv4GtTP2pwOQS7/DplfbXTyYVMlACiYnZ61mOY751+6P3VjM5u0xli9wOFiMKn6wLWdeEJB1exHh5lqhJ2NNkNjVhfZKB/+11W5dHagN+oIN2xxPR+ZbCu3+bvvnF6HAu2LoWjNTf7wkoyNhDTAN1M=
+	t=1765855412; cv=none; b=fM9FPRvN67OEgD++HeU2rPpQR7M8HTbQIFHj0znaWDjy+B4anB357/hzfKEl4qmWcBwCDTfYiuLQQFDLWaFZim9yQnITE3lGwV3/kQj5GJA7++QeOodQ0qrWKYjrevdLZ/hfXYxWSUFh9AJ8CKxB0QnfTXloriPvvaGvVAy7O3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765854973; c=relaxed/simple;
-	bh=Z7LAXQaV+xdo64VXbtUYTIaKLjpkNKlKQekw/kGSNO8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A81moDzfrn/EdoT7d5z2Uf8s6ScKsYU2fEeKBsCMu1LiutBaB/evfQe55AFIw8M5rHnxcwNYZQAOQeOTzwEmr0JLZdrpz8Itka6fFvmThcygHz80bgXFgOwqJeuKWxmDFhS3NZSBlnPWw9ADsHxZoJRhpM4Ou5M+zy8D3UyaUeE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KGbwrTTv; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1765855412; c=relaxed/simple;
+	bh=PF6nFxIEwkJtkqBvZ196wD7p+090h+6B6+WuSnigkqg=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=t/4YG4j47a+w+7sR8o3ovT/d/TwWZ1Qre6/6t1aDCuams+rZVojQCQi3HKy9FMSyFFI8X81O2Me0tnypAjKJR3r2Mchb9/4InFDFaiU+x8lamOwmc3nptW6KGx74v9ap545MzGndrAj3HeJUXb6yaWYfsqKd3S0eg/EUAVw/YFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=gemG07/Y; arc=none smtp.client-ip=43.163.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KGbwrTTv"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765854971; x=1797390971;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Z7LAXQaV+xdo64VXbtUYTIaKLjpkNKlKQekw/kGSNO8=;
-  b=KGbwrTTvELHvy1ZGDaP3POJ2D5tS8Y/FSlgeHfGeR/VSB5AtzWMRuGhq
-   uBsiPVLUx4cPG+fdRQtuNtLqMMo/RvOLOOQB/bcW88N9uMfDneg9cD0gJ
-   mzs6NfvmJCZOJBSwV7+jOFEBUvtrYTuhIaMP1hSpWpC7x/0/sjmvfXV6j
-   V2gPSNpbMZFLgJ0elJRG1QQYubkmitlykCDKtDNe6T6qFC2ex0QWxid3B
-   ipyhH/6vaTdKq24Kryer2QOBBgCJWjpYs4Kw6G1xx9p6RGJAm8SUYAj7M
-   bSwV/6vGXFrlWUw6YOmAEHHG2RPRun/0Vn+BFUKDNmSNJw/75WRLkkkdr
-   g==;
-X-CSE-ConnectionGUID: BGRhErp8QM+PdGjc9M04/A==
-X-CSE-MsgGUID: 6OT/glS5Rr65tKp1MCSJSg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11643"; a="67838588"
-X-IronPort-AV: E=Sophos;i="6.21,152,1763452800"; 
-   d="scan'208";a="67838588"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2025 19:16:10 -0800
-X-CSE-ConnectionGUID: Cluc8MxxQ5WvjiHGotn3Qw==
-X-CSE-MsgGUID: 9tLsIoDGT9GRN8e8idZFMQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,152,1763452800"; 
-   d="scan'208";a="197643425"
-Received: from igk-lkp-server01.igk.intel.com (HELO 8a0c053bdd2a) ([10.211.93.152])
-  by orviesa009.jf.intel.com with ESMTP; 15 Dec 2025 19:16:09 -0800
-Received: from kbuild by 8a0c053bdd2a with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vVLXi-000000002ue-0vzs;
-	Tue, 16 Dec 2025 03:16:06 +0000
-Date: Tue, 16 Dec 2025 04:16:05 +0100
-From: kernel test robot <lkp@intel.com>
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Eric Biggers <ebiggers@kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-fscrypt@vger.kernel.org
-Subject: Re: [PATCH 8/9] blk-crypto: optimize data unit alignment checking
-Message-ID: <202512160419.nTnYWVyJ-lkp@intel.com>
-References: <20251210152343.3666103-9-hch@lst.de>
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="gemG07/Y"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1765855406; bh=p5yuLsGyp5kCvNGGIQ8SyQX+Gu2MixumdLNQY2QtFxA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=gemG07/YvSM49h/xZirbGXAm9MyutMHK1jYhUiGE7Xm4aQ2oIvPFGWaaVgjAiqsno
+	 XxDU1r+QewwLG8JxttuCjpRlbn36VBnG7zfjOQDgjG+m55q3hsB9R/jTCdovxyz/QO
+	 jXlULSNJYOTLIcugMHCNuiTetzNnL9Dh2Hu/Id1o=
+Received: from lxu-ped-host.. ([111.201.7.117])
+	by newxmesmtplogicsvrsza63-0.qq.com (NewEsmtp) with SMTP
+	id 5D78585E; Tue, 16 Dec 2025 11:23:23 +0800
+X-QQ-mid: xmsmtpt1765855403t6mlkxap7
+Message-ID: <tencent_2AC2ECAACC587B4E6C342D096F909424E90A@qq.com>
+X-QQ-XMAILINFO: NvfE96cLltb5C1bT1tmooJOBdWJs+NzOOjfFwX7X/PixaY8cpvQi+LbvE4Jp1o
+	 X182O/rXSwNbP7FjXdcgTWygdZg8OxkC5TTIQeAFEIVJibQUDQVQgJM7NzVOo4U0fg7McwP7PSK3
+	 ppKf9as1w2NEZqiP7TLwAyWDMf/bNWPkJ421epsftLcSqEQAlsfFMmLlcmc5aEQ5yVWmybBILp+/
+	 /uJZtuqt4fLoeTDMwpzpYg15rwEQxLChVplQNG0zt5OL/Yoe1lt9mD4Xsm8AFRLf6dyckCSHibCV
+	 Rh9vuz0OjQWkCusUulUbrAQp7XNNAgx22JVW+3G3HJ+DtRJvUnV/SyDCtyJPMTaCaEc++p+2cuPj
+	 uGKza85gjR76qYktJkeuYKxFis3nx1xwFbYiLc8GmU8EadNnBNvGRe6uqGZqEnPhjBraKXalLtFF
+	 gh6fLDGRHLv5MuLfI3dObZyjOlVygQA0BHXvTMdBarBks9H2ez8Z111eIpwlUG13nwftY6dnVN90
+	 uoHqwuOUuaZbBD+rQ4yqbZ20u53F08Y+q2Dg4k1NmELPmybROEdIgIibWDPigw2Z56quHlYhhayk
+	 N0JiXMlo9Wec08FvdLXqmWu6QT0zNu/RqDAp8OuPs2kAnt1sMtFVk79wPRNGp3foatOSGuQcAkfj
+	 a6XJvQ65xhJO53d8Xaj/OM1eGevvQLXSRaHlCJJsVORMwAwgpkkEbfJz5wKBykyPRE9ZGQq1nycU
+	 nS73ySRta7tYmNbYIGjyDs2C9+7nJmQc+Ks15E5w52uDSwEPYKtC6LwLvgAFSCLaMvl7QrO5Jywq
+	 k/w6gFspTijrKofcM+rCZW6UY3Nz1tVimk9i0PkrIgHk4IKEGCjR8LF0pXAGT6/oAQNPl2RAF1NZ
+	 e1q+Zg8Mu8xPwoM5z5jVMHhFoFmGsjujVzn11rdOXbRmpLIKEkOwaCUYlvEhbjEKyBW23eShZfAQ
+	 Y/fg8o3PLgeVobVBrAkcG6j5pPiDkeQaifQVBayQ6MUKSKbqfWG2qLCd+FLTt9RgkabB4SDZkp2G
+	 /WNT7P5aFdT0Wpudy3
+X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
+From: Edward Adam Davis <eadavis@qq.com>
+To: syzbot+1d38eedcb25a3b5686a7@syzkaller.appspotmail.com
+Cc: axboe@kernel.dk,
+	jfs-discussion@lists.sourceforge.net,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	shaggy@kernel.org,
+	syzkaller-bugs@googlegroups.com
+Subject: [PATCH] jfs: Extend the done of the window period
+Date: Tue, 16 Dec 2025 11:23:24 +0800
+X-OQ-MSGID: <20251216032323.15192-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <693eb292.a70a0220.33cd7b.00c7.GAE@google.com>
+References: <693eb292.a70a0220.33cd7b.00c7.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251210152343.3666103-9-hch@lst.de>
+Content-Transfer-Encoding: 8bit
 
-Hi Christoph,
+In lbmRead(), the I/O event waited for by wait_event() finishes before
+it goes to sleep, and the lbmIODone() prematurely sets the flag to
+lbmDONE, thus ending the wait. This causes wait_event() to return before
+lbmREAD is cleared (because lbmDONE was set first), the premature return
+of wait_event() leads to the release of lbuf before lbmIODone() returns,
+thus triggering the use-after-free vulnerability reported in [1].
 
-kernel test robot noticed the following build errors:
+Moving the operation of setting the lbmDONE flag to after clearing lbmREAD
+in lbmIODone() avoids the use-after-free vulnerability reported in [1].
 
-[auto build test ERROR on axboe/for-next]
-[also build test ERROR on jaegeuk-f2fs/dev-test jaegeuk-f2fs/dev brauner-vfs/vfs.all next-20251216]
-[cannot apply to tytso-ext4/dev linus/master v6.16-rc1]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+[1]
+BUG: KASAN: slab-use-after-free in rt_spin_lock+0x88/0x3e0 kernel/locking/spinlock_rt.c:56
+Call Trace:
+ blk_update_request+0x57e/0xe60 block/blk-mq.c:1007
+ blk_mq_end_request+0x3e/0x70 block/blk-mq.c:1169
+ blk_complete_reqs block/blk-mq.c:1244 [inline]
+ blk_done_softirq+0x10a/0x160 block/blk-mq.c:1249
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Christoph-Hellwig/fscrypt-keep-multiple-bios-in-flight-in-fscrypt_zeroout_range_inline_crypt/20251211-002354
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git for-next
-patch link:    https://lore.kernel.org/r/20251210152343.3666103-9-hch%40lst.de
-patch subject: [PATCH 8/9] blk-crypto: optimize data unit alignment checking
-config: x86_64-rhel-9.4-ltp (https://download.01.org/0day-ci/archive/20251216/202512160419.nTnYWVyJ-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251216/202512160419.nTnYWVyJ-lkp@intel.com/reproduce)
+Allocated by task 6101:
+ lbmLogInit fs/jfs/jfs_logmgr.c:1821 [inline]
+ lmLogInit+0x3d0/0x19e0 fs/jfs/jfs_logmgr.c:1269
+ open_inline_log fs/jfs/jfs_logmgr.c:1175 [inline]
+ lmLogOpen+0x4e1/0xfa0 fs/jfs/jfs_logmgr.c:1069
+ jfs_mount_rw+0xe9/0x670 fs/jfs/jfs_mount.c:257
+ jfs_fill_super+0x754/0xd80 fs/jfs/super.c:532
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202512160419.nTnYWVyJ-lkp@intel.com/
+Freed by task 6101:
+ kfree+0x1bd/0x900 mm/slub.c:6876
+ lbmLogShutdown fs/jfs/jfs_logmgr.c:1864 [inline]
+ lmLogInit+0x1137/0x19e0 fs/jfs/jfs_logmgr.c:1415
+ open_inline_log fs/jfs/jfs_logmgr.c:1175 [inline]
+ lmLogOpen+0x4e1/0xfa0 fs/jfs/jfs_logmgr.c:1069
+ jfs_mount_rw+0xe9/0x670 fs/jfs/jfs_mount.c:257
+ jfs_fill_super+0x754/0xd80 fs/jfs/super.c:532
 
-All errors (new ones prefixed by >>):
+Reported-by: syzbot+1d38eedcb25a3b5686a7@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=1d38eedcb25a3b5686a7
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+---
+ fs/jfs/jfs_logmgr.c | 18 ++++++------------
+ 1 file changed, 6 insertions(+), 12 deletions(-)
 
-   block/blk-merge.c: In function 'bio_split_io_at':
->> block/blk-merge.c:332:47: error: 'struct bio' has no member named 'bi_crypt_context'
-     332 |                 struct bio_crypt_ctx *bc = bio->bi_crypt_context;
-         |                                               ^~
-
-
-vim +332 block/blk-merge.c
-
-   310	
-   311	/**
-   312	 * bio_split_io_at - check if and where to split a bio
-   313	 * @bio:  [in] bio to be split
-   314	 * @lim:  [in] queue limits to split based on
-   315	 * @segs: [out] number of segments in the bio with the first half of the sectors
-   316	 * @max_bytes: [in] maximum number of bytes per bio
-   317	 *
-   318	 * Find out if @bio needs to be split to fit the queue limits in @lim and a
-   319	 * maximum size of @max_bytes.  Returns a negative error number if @bio can't be
-   320	 * split, 0 if the bio doesn't have to be split, or a positive sector offset if
-   321	 * @bio needs to be split.
-   322	 */
-   323	int bio_split_io_at(struct bio *bio, const struct queue_limits *lim,
-   324			unsigned *segs, unsigned max_bytes)
-   325	{
-   326		struct bio_vec bv, bvprv, *bvprvp = NULL;
-   327		unsigned nsegs = 0, bytes = 0, gaps = 0;
-   328		struct bvec_iter iter;
-   329		unsigned len_align_mask = lim->dma_alignment;
-   330	
-   331		if (bio_has_crypt_ctx(bio)) {
- > 332			struct bio_crypt_ctx *bc = bio->bi_crypt_context;
-   333	
-   334			len_align_mask |= (bc->bc_key->crypto_cfg.data_unit_size - 1);
-   335		}
-   336	
-   337		bio_for_each_bvec(bv, bio, iter) {
-   338			if (bv.bv_offset & len_align_mask)
-   339				return -EINVAL;
-   340	
-   341			/*
-   342			 * If the queue doesn't support SG gaps and adding this
-   343			 * offset would create a gap, disallow it.
-   344			 */
-   345			if (bvprvp) {
-   346				if (bvec_gap_to_prev(lim, bvprvp, bv.bv_offset))
-   347					goto split;
-   348				gaps |= bvec_seg_gap(bvprvp, &bv);
-   349			}
-   350	
-   351			if (nsegs < lim->max_segments &&
-   352			    bytes + bv.bv_len <= max_bytes &&
-   353			    bv.bv_offset + bv.bv_len <= lim->max_fast_segment_size) {
-   354				nsegs++;
-   355				bytes += bv.bv_len;
-   356			} else {
-   357				if (bvec_split_segs(lim, &bv, &nsegs, &bytes,
-   358						lim->max_segments, max_bytes))
-   359					goto split;
-   360			}
-   361	
-   362			bvprv = bv;
-   363			bvprvp = &bvprv;
-   364		}
-   365	
-   366		*segs = nsegs;
-   367		bio->bi_bvec_gap_bit = ffs(gaps);
-   368		return 0;
-   369	split:
-   370		if (bio->bi_opf & REQ_ATOMIC)
-   371			return -EINVAL;
-   372	
-   373		/*
-   374		 * We can't sanely support splitting for a REQ_NOWAIT bio. End it
-   375		 * with EAGAIN if splitting is required and return an error pointer.
-   376		 */
-   377		if (bio->bi_opf & REQ_NOWAIT)
-   378			return -EAGAIN;
-   379	
-   380		*segs = nsegs;
-   381	
-   382		/*
-   383		 * Individual bvecs might not be logical block aligned. Round down the
-   384		 * split size so that each bio is properly block size aligned, even if
-   385		 * we do not use the full hardware limits.
-   386		 *
-   387		 * It is possible to submit a bio that can't be split into a valid io:
-   388		 * there may either be too many discontiguous vectors for the max
-   389		 * segments limit, or contain virtual boundary gaps without having a
-   390		 * valid block sized split. A zero byte result means one of those
-   391		 * conditions occured.
-   392		 */
-   393		bytes = ALIGN_DOWN(bytes, bio_split_alignment(bio, lim));
-   394		if (!bytes)
-   395			return -EINVAL;
-   396	
-   397		/*
-   398		 * Bio splitting may cause subtle trouble such as hang when doing sync
-   399		 * iopoll in direct IO routine. Given performance gain of iopoll for
-   400		 * big IO can be trival, disable iopoll when split needed.
-   401		 */
-   402		bio_clear_polled(bio);
-   403		bio->bi_bvec_gap_bit = ffs(gaps);
-   404		return bytes >> SECTOR_SHIFT;
-   405	}
-   406	EXPORT_SYMBOL_GPL(bio_split_io_at);
-   407	
-
+diff --git a/fs/jfs/jfs_logmgr.c b/fs/jfs/jfs_logmgr.c
+index b343c5ea1159..dda9ffa8eaf5 100644
+--- a/fs/jfs/jfs_logmgr.c
++++ b/fs/jfs/jfs_logmgr.c
+@@ -2180,8 +2180,6 @@ static void lbmIODone(struct bio *bio)
+ 
+ 	LCACHE_LOCK(flags);		/* disable+lock */
+ 
+-	bp->l_flag |= lbmDONE;
+-
+ 	if (bio->bi_status) {
+ 		bp->l_flag |= lbmERROR;
+ 
+@@ -2196,12 +2194,10 @@ static void lbmIODone(struct bio *bio)
+ 	if (bp->l_flag & lbmREAD) {
+ 		bp->l_flag &= ~lbmREAD;
+ 
+-		LCACHE_UNLOCK(flags);	/* unlock+enable */
+-
+ 		/* wakeup I/O initiator */
+ 		LCACHE_WAKEUP(&bp->l_ioevent);
+ 
+-		return;
++		goto out;
+ 	}
+ 
+ 	/*
+@@ -2225,8 +2221,7 @@ static void lbmIODone(struct bio *bio)
+ 
+ 	if (bp->l_flag & lbmDIRECT) {
+ 		LCACHE_WAKEUP(&bp->l_ioevent);
+-		LCACHE_UNLOCK(flags);
+-		return;
++		goto out;
+ 	}
+ 
+ 	tail = log->wqueue;
+@@ -2278,8 +2273,6 @@ static void lbmIODone(struct bio *bio)
+ 	 * leave buffer for i/o initiator to dispose
+ 	 */
+ 	if (bp->l_flag & lbmSYNC) {
+-		LCACHE_UNLOCK(flags);	/* unlock+enable */
+-
+ 		/* wakeup I/O initiator */
+ 		LCACHE_WAKEUP(&bp->l_ioevent);
+ 	}
+@@ -2288,7 +2281,6 @@ static void lbmIODone(struct bio *bio)
+ 	 *	Group Commit pageout:
+ 	 */
+ 	else if (bp->l_flag & lbmGC) {
+-		LCACHE_UNLOCK(flags);
+ 		lmPostGC(bp);
+ 	}
+ 
+@@ -2302,9 +2294,11 @@ static void lbmIODone(struct bio *bio)
+ 		assert(bp->l_flag & lbmRELEASE);
+ 		assert(bp->l_flag & lbmFREE);
+ 		lbmfree(bp);
+-
+-		LCACHE_UNLOCK(flags);	/* unlock+enable */
+ 	}
++
++out:
++	bp->l_flag |= lbmDONE;
++	LCACHE_UNLOCK(flags);
+ }
+ 
+ int jfsIOWait(void *arg)
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.43.0
+
