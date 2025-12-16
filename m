@@ -1,266 +1,131 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5703B33FE15
-	for <linux-block@vger.kernel.org>; Tue, 16 Dec 2025 11:04:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 611DB33D6CC
+	for <linux-block@vger.kernel.org>; Tue, 16 Dec 2025 11:20:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765883051; cv=none; b=Y7QCm/KRZbPrRmgHEg4dnLbMhUca9f8eW4dLnoEKlPg1tZwjJSyatenjmiL2UId3y6dUm7L8Kbj//q8FUwkf0z9fwR9gXKIDTfMdzTaG/PM227GTs5wOGUIxlfT7U1ariNnSA1AoCXVi140nwGgbjm4AjdzJXNqJ0vua7CvQBM8=
+	t=1765884023; cv=none; b=Lx9x6sX+awzXH5O/T6HvSL9mpYBIeAxFnebk2pcKOgT5iziG3GuLAxJit3PTW7H+VyjqnNX7d2Qz3J/fuMLz06DSJ1qE5E19EsWfAvn3XvAv0iHu2G7KE0+stTwOtpgxL++cu0QMErMm8eIk2VG7sqnJoStl0NvSW0LUiI6n8zs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765883051; c=relaxed/simple;
-	bh=NigjvlGfAaur1l5jjpd0dY+SGrsP5whtd61up0JLUCw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dtLuVnTCA26Uxmn/fDWvaEvLs4nWkYAjZ5yDHgEfp13Xb0YIZ1QdzUvGWqL4XxXaHo7Iu8wtAh7+Ajw+6ia1w4kO1+Dpc35QOLpnLFZOqEPufVFpoZxAVLIS0lnj68MUcspQW6AM0g0dcEtdkzQ9PdsO95Q2GvAolcZJf6ugSsc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GeyaeJ04; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1765884023; c=relaxed/simple;
+	bh=Ir34V/AA4/Kn53Xt2wU7m430i1aPoGLugyeX+Sg5NA4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pVIsSMeHKAc4HPjl9SFXsHo4QImpDbkS+8R7WaCVRyjFayIeMIrZX9pW3ZrYAAWn/SrQLp0KPkyGSEzp5ChGfg6Rr4y5CjF/TO8LuYMi5bhb9RGu7bMrvsvVfqXeJJECzZ2JmWnGwSxJiT8ewPGDeo8Cj/pfSZ1QI6MYhZw1tfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y/SUlIF3; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=DdQ/gxxi; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GeyaeJ04"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y/SUlIF3";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="DdQ/gxxi"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765883048;
+	s=mimecast20190719; t=1765884020;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=jleQgJ+tgDSsBxa34lU//k4QBqeaGJJ4X6iKD7iGBx8=;
-	b=GeyaeJ04r5cLarMDZDO5tmdZEc5u9x3MpPXub4F4Jj5ci3sN0ybTse3SyRqnB+XqnNQYgw
-	nCYfoJJFaguJ+nWzK2kd15JZYOZP6qcmdACi2JMZ/NeZudkE3a5r1n+bPANZg1ve1osZ/M
-	GhLKp4lDoW0ijP3eyJdDgTkxtTP4JRY=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-389-_4d8MEjjOeGpm6lXHNjxtg-1; Tue,
- 16 Dec 2025 06:04:04 -0500
-X-MC-Unique: _4d8MEjjOeGpm6lXHNjxtg-1
-X-Mimecast-MFC-AGG-ID: _4d8MEjjOeGpm6lXHNjxtg_1765883043
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7A43619560A1;
-	Tue, 16 Dec 2025 11:04:03 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.190])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 041261800668;
-	Tue, 16 Dec 2025 11:03:58 +0000 (UTC)
-Date: Tue, 16 Dec 2025 19:03:49 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Yu Kuai <yukuai@fnnas.com>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org, tj@kernel.org,
-	nilay@linux.ibm.com
-Subject: Re: [PATCH v5 02/13] blk-wbt: fix possible deadlock to nest
- pcpu_alloc_mutex under q_usage_counter
-Message-ID: <aUE8lSlWa6DnCYMa@fedora>
-References: <20251214101409.1723751-1-yukuai@fnnas.com>
- <20251214101409.1723751-3-yukuai@fnnas.com>
+	bh=TWRZ0JhI9nv9UkoCkjiIAGd+WxbLXiOF8HjIaXhWnLA=;
+	b=Y/SUlIF3xZtgfWnV+nd8PsBUXGzc1qvXwum9v4WxfmIlMV6UZyruB3Jcsx7u5ywHzRQfdl
+	QL7sSlkJyF8GXpTYdTUhNLESg48fX5j9qmbUOAOd7UOHEn4waj4tWICfTonDme9RlYjPQN
+	wEucxWW393E3DnzU4KBzthBrIJ1SPms=
+Received: from mail-yw1-f200.google.com (mail-yw1-f200.google.com
+ [209.85.128.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-94-hMBHyD8hO3eiCF37ewNLBw-1; Tue, 16 Dec 2025 06:20:19 -0500
+X-MC-Unique: hMBHyD8hO3eiCF37ewNLBw-1
+X-Mimecast-MFC-AGG-ID: hMBHyD8hO3eiCF37ewNLBw_1765884018
+Received: by mail-yw1-f200.google.com with SMTP id 00721157ae682-78e668d6eecso36966687b3.3
+        for <linux-block@vger.kernel.org>; Tue, 16 Dec 2025 03:20:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1765884018; x=1766488818; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TWRZ0JhI9nv9UkoCkjiIAGd+WxbLXiOF8HjIaXhWnLA=;
+        b=DdQ/gxxiM4Q4+mxpMmDf0BNn0HUobvKwTPeLKuTLP3nIL2dVN9LPiwN9cttrOvM98R
+         8FuQ/TEdOXvM866VsORzsMktkaFzRgijcmY+6fgUZscV8t/+E7+2D3j9s4K8JXdUI8tB
+         rWc3opUwh659zS+Tmzld3uOYxsSFnoEvFXdurSYoJIhGNM66WRphPfHeee1Vm5xyGi+J
+         lUt3gsO34maU2lsY+khRBqyljf82AsQMgLa4MjGQD9pUoQSlCyAtqTDHRqS6YM3ry++v
+         ELq0i8kb7e69vPyMnWCzwjZa+SqIVuCrR+LV2KOuwIaP2n+dT3RGdv2SzXcQklQMNBTh
+         msMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765884018; x=1766488818;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=TWRZ0JhI9nv9UkoCkjiIAGd+WxbLXiOF8HjIaXhWnLA=;
+        b=AW4Ma6vy6Fx8SoPwxRmZYOqPLCNBpV51qfSJcbNZnTBu5SPjhSnvInGC2315/EjNEs
+         fgY8olG29LivscUW8eQLUTnmKPcDDJxIZERyimViBY86Djhsdm74k9EdjyoklBSeRWkP
+         VnDSnOJ/j3bPCYiapTO1YkMyJI2A/OBIqL4k977wRs9spxk7sIlrQ23/CvJopdaiVtQQ
+         wtd66op7zcuRkjNn4v1+VoaTNUlLJv+wH3JtAvHzZFji6caqkySfYoH6ID5TtULXA7Zn
+         or7QdpXFyFxcYkwL+8p5d4g6jwETdF2lrcg2e67tmzdxY6QaxU8/jvEA3PbcR278XVjA
+         w8CA==
+X-Forwarded-Encrypted: i=1; AJvYcCXosiBkx+8ojdziY3RBa3L8KIiphmsSBeWbzqQRfw0TY+sRuPVJsmFbDqCwVS5rCaH98R+DH0to6lj4AQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw45nsUho8P0EK5L/J2N7fr1w/gpAwr+sMl1MMQHkhEmCHQPNOF
+	/AvS0/QW7aspJ729LK1YalR1fvFtvi/UBMxamq3d6lvmHD/zW647CMoo+3qux5gENfyJ57hL6Dp
+	2wfX2qTD1uIh8QbDn94RqhVCAu83CVglwYMLEBIVMl05dYLnQZTC6xIGpeLjYK49sayi3gH8ATG
+	hm4LDfscnrrGFHk2KsGYYlJ0rRXzTHIuAGG35VgUg=
+X-Gm-Gg: AY/fxX7PQ0oyx5eNxjJNbegBDsv/7G+XsPmRcN1zbvE06hwA5T1F6CSn96tADtpToGg
+	t7+wauy76HY+fUInfQeKf68Dkl4hdyHpW3hQYSwyoMcBHy3nZ74TUSmeyqQTTb0LWm3Zg0Qu+fk
+	Xl82PgXHY1JAxMrA7DLXsoGD30HaIKG3RXZJkzI4g7c6K7P5RjAo8MZ3NnRzZPYNyi
+X-Received: by 2002:a05:690e:118a:b0:641:f5bc:695c with SMTP id 956f58d0204a3-64555661ec4mr12407308d50.72.1765884018377;
+        Tue, 16 Dec 2025 03:20:18 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHE1hRYagai5ZNpwc4wQBEIkmKE4t8Gn5ugUaYPF0w5F6afO5UP4qTUeJlKU6zAyLz8ccdYL4yR/SJoQvAZlXU=
+X-Received: by 2002:a05:690e:118a:b0:641:f5bc:695c with SMTP id
+ 956f58d0204a3-64555661ec4mr12407292d50.72.1765884018076; Tue, 16 Dec 2025
+ 03:20:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251214101409.1723751-3-yukuai@fnnas.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+References: <20251208121020.1780402-1-agruenba@redhat.com> <20251208121020.1780402-7-agruenba@redhat.com>
+ <aUERRp7S1A5YXCm4@infradead.org> <CAHc6FU6QCfqTM9zCREdp3o0UzFX99q2QqXgOiNkN8OtnhWYZVQ@mail.gmail.com>
+ <aUE3_ubz172iThdl@infradead.org>
+In-Reply-To: <aUE3_ubz172iThdl@infradead.org>
+From: Andreas Gruenbacher <agruenba@redhat.com>
+Date: Tue, 16 Dec 2025 12:20:07 +0100
+X-Gm-Features: AQt7F2q5uYepYK7esYO29pN2NRPzWpk3ITk8uPFpAWNLoGj4HZrc4JFHmQEXPKs
+Message-ID: <CAHc6FU4OeAYgvXGE+QZrAJPqERLS3v7q64uSoVtxJjG0AdZvCA@mail.gmail.com>
+Subject: Re: [RFC 06/12] bio: don't check target->bi_status on error
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>, 
+	linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org, 
+	linux-raid@vger.kernel.org, dm-devel@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, Dec 14, 2025 at 06:13:57PM +0800, Yu Kuai wrote:
-> If wbt is disabled by default and user configures wbt by sysfs, queue
-> will be frozen first and then pcpu_alloc_mutex will be held in
-> blk_stat_alloc_callback().
-> 
-> Fix this problem by allocating memory first before queue frozen.
-> 
-> Signed-off-by: Yu Kuai <yukuai@fnnas.com>
-> ---
->  block/blk-wbt.c | 106 ++++++++++++++++++++++++++++--------------------
->  1 file changed, 61 insertions(+), 45 deletions(-)
-> 
-> diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-> index ba807649b29a..696baa681717 100644
-> --- a/block/blk-wbt.c
-> +++ b/block/blk-wbt.c
-> @@ -93,7 +93,7 @@ struct rq_wb {
->  	struct rq_depth rq_depth;
->  };
->  
-> -static int wbt_init(struct gendisk *disk);
-> +static int wbt_init(struct gendisk *disk, struct rq_wb *rwb);
->  
->  static inline struct rq_wb *RQWB(struct rq_qos *rqos)
->  {
-> @@ -698,6 +698,41 @@ static void wbt_requeue(struct rq_qos *rqos, struct request *rq)
->  	}
->  }
->  
-> +static int wbt_data_dir(const struct request *rq)
-> +{
-> +	const enum req_op op = req_op(rq);
-> +
-> +	if (op == REQ_OP_READ)
-> +		return READ;
-> +	else if (op_is_write(op))
-> +		return WRITE;
-> +
-> +	/* don't account */
-> +	return -1;
-> +}
-> +
-> +static struct rq_wb *wbt_alloc(void)
-> +{
-> +	struct rq_wb *rwb = kzalloc(sizeof(*rwb), GFP_KERNEL);
-> +
-> +	if (!rwb)
-> +		return NULL;
-> +
-> +	rwb->cb = blk_stat_alloc_callback(wb_timer_fn, wbt_data_dir, 2, rwb);
-> +	if (!rwb->cb) {
-> +		kfree(rwb);
-> +		return NULL;
-> +	}
-> +
-> +	return rwb;
-> +}
-> +
-> +static void wbt_free(struct rq_wb *rwb)
-> +{
-> +	blk_stat_free_callback(rwb->cb);
-> +	kfree(rwb);
-> +}
-> +
->  /*
->   * Enable wbt if defaults are configured that way
->   */
-> @@ -726,8 +761,15 @@ void wbt_enable_default(struct gendisk *disk)
->  	if (!blk_queue_registered(q))
->  		return;
->  
-> -	if (queue_is_mq(q) && enable)
-> -		wbt_init(disk);
-> +	if (queue_is_mq(q) && enable) {
-> +		struct rq_wb *rwb = wbt_alloc();
-> +
-> +		if (WARN_ON_ONCE(!rwb))
-> +			return;
-> +
-> +		if (WARN_ON_ONCE(wbt_init(disk, rwb)))
-> +			wbt_free(rwb);
-> +	}
->  }
->  EXPORT_SYMBOL_GPL(wbt_enable_default);
->  
-> @@ -743,19 +785,6 @@ static u64 wbt_default_latency_nsec(struct request_queue *q)
->  		return 75000000ULL;
->  }
->  
-> -static int wbt_data_dir(const struct request *rq)
-> -{
-> -	const enum req_op op = req_op(rq);
-> -
-> -	if (op == REQ_OP_READ)
-> -		return READ;
-> -	else if (op_is_write(op))
-> -		return WRITE;
-> -
-> -	/* don't account */
-> -	return -1;
-> -}
-> -
->  static void wbt_queue_depth_changed(struct rq_qos *rqos)
->  {
->  	RQWB(rqos)->rq_depth.queue_depth = blk_queue_depth(rqos->disk->queue);
-> @@ -767,8 +796,7 @@ static void wbt_exit(struct rq_qos *rqos)
->  	struct rq_wb *rwb = RQWB(rqos);
->  
->  	blk_stat_remove_callback(rqos->disk->queue, rwb->cb);
-> -	blk_stat_free_callback(rwb->cb);
-> -	kfree(rwb);
-> +	wbt_free(rwb);
->  }
->  
->  /*
-> @@ -892,22 +920,11 @@ static const struct rq_qos_ops wbt_rqos_ops = {
->  #endif
->  };
->  
-> -static int wbt_init(struct gendisk *disk)
-> +static int wbt_init(struct gendisk *disk, struct rq_wb *rwb)
->  {
->  	struct request_queue *q = disk->queue;
-> -	struct rq_wb *rwb;
-> -	int i;
->  	int ret;
-> -
-> -	rwb = kzalloc(sizeof(*rwb), GFP_KERNEL);
-> -	if (!rwb)
-> -		return -ENOMEM;
-> -
-> -	rwb->cb = blk_stat_alloc_callback(wb_timer_fn, wbt_data_dir, 2, rwb);
-> -	if (!rwb->cb) {
-> -		kfree(rwb);
-> -		return -ENOMEM;
-> -	}
-> +	int i;
->  
->  	for (i = 0; i < WBT_NUM_RWQ; i++)
->  		rq_wait_init(&rwb->rq_wait[i]);
-> @@ -927,38 +944,38 @@ static int wbt_init(struct gendisk *disk)
->  	ret = rq_qos_add(&rwb->rqos, disk, RQ_QOS_WBT, &wbt_rqos_ops);
->  	mutex_unlock(&q->rq_qos_mutex);
->  	if (ret)
-> -		goto err_free;
-> +		return ret;
->  
->  	blk_stat_add_callback(q, rwb->cb);
-> -
->  	return 0;
-> -
-> -err_free:
-> -	blk_stat_free_callback(rwb->cb);
-> -	kfree(rwb);
-> -	return ret;
-> -
->  }
->  
->  int wbt_set_lat(struct gendisk *disk, s64 val)
->  {
->  	struct request_queue *q = disk->queue;
-> +	struct rq_qos *rqos = wbt_rq_qos(q);
-> +	struct rq_wb *rwb = NULL;
->  	unsigned int memflags;
-> -	struct rq_qos *rqos;
->  	int ret = 0;
->  
-> +	if (!rqos) {
-> +		rwb = wbt_alloc();
-> +		if (!rwb)
-> +			return -ENOMEM;
-> +	}
-> +
->  	/*
->  	 * Ensure that the queue is idled, in case the latency update
->  	 * ends up either enabling or disabling wbt completely. We can't
->  	 * have IO inflight if that happens.
->  	 */
->  	memflags = blk_mq_freeze_queue(q);
-> -
-> -	rqos = wbt_rq_qos(q);
->  	if (!rqos) {
-> -		ret = wbt_init(disk);
-> -		if (ret)
-> +		ret = wbt_init(disk, rwb);
-> +		if (ret) {
-> +			wbt_free(rwb);
->  			goto out;
-> +		}
+On Tue, Dec 16, 2025 at 11:44=E2=80=AFAM Christoph Hellwig <hch@infradead.o=
+rg> wrote:
+> On Tue, Dec 16, 2025 at 09:41:49AM +0100, Andreas Gruenbacher wrote:
+> > On Tue, Dec 16, 2025 at 8:59=E2=80=AFAM Christoph Hellwig <hch@infradea=
+d.org> wrote:
+> > > On Mon, Dec 08, 2025 at 12:10:13PM +0000, Andreas Gruenbacher wrote:
+> > > > In a few places, target->bi_status is set to source->bi_status only=
+ if
+> > > > source->bi_status is not 0 and target->bi_status is (still) 0.  Her=
+e,
+> > > > checking the value of target->bi_status before setting it is an
+> > > > unnecessary micro optimization because we are already on an error p=
+ath.
+> > >
+> > > What is source and target here?  I have a hard time trying to follow
+> > > what this is trying to do.
+> >
+> > Not sure, what would you suggest instead?
+>
+> I still don't understand what you're saying here at all, or what this is
+> trying to fix or optimize.
 
-Here it actually depends on patch "block: fix race between wbt_enable_default and IO submission"
-which kills wbt_init() from bfq & iocost code path, otherwise you may have
-to handle -EBUSY from wbt_init().
+When we have this construct in the code and we know that status is not 0:
 
-With the mentioned patch, this fix looks fine:
+  if (!bio->bi_status)
+    bio->bi_status =3D status;
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+we can just do this instead:
 
+  bio>bi_status =3D status;
 
-Thanks,
-Ming
+Andreas
 
