@@ -1,115 +1,135 @@
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4263228A72B
-	for <linux-block@vger.kernel.org>; Tue, 16 Dec 2025 17:22:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A1A63BB40
+	for <linux-block@vger.kernel.org>; Tue, 16 Dec 2025 17:57:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765905762; cv=none; b=BfTbSCHFU4RtBaunF08nGwac3LINxnPrLjZb7VfeovIjNGNGSjKkYnCnLA/WSrf/1zf+51jYDExGmXPAoYPCn4XhCkMezuOnkUTnC2LuE09RW93P2WCFHgytrDcjSpLYODXoLks7/oDgMiyy46fx5S3enTuacqtL+TAzP1SoC40=
+	t=1765907853; cv=none; b=l+DQacjYPc0WF9ekrNYB24J56Y0O5g258wlaNm/63G/1WN2xDaZBFV3QCTbHduFjYDDxr3+Nge32H8wfkUuKm/CpkreQYcd15xiP4/v7Ov9iqd0rPjFK6rQAoSuL2BqcU1C2zt7o1NElNHu0aKETljk7vjpc2ofWfewO/hayij0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765905762; c=relaxed/simple;
-	bh=UFuXGJl87VVFRtOHjho6NIFl+kVD765QpReolS459wU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=b+cWeOxapKxTryTGaH+WhwcGVzuszV4ZtatNJM2Gy2smlg3UggkpXB3LPxNGjoUhpakq1TMGY/jHuLzyBis4pr+x3SjuE+RsDgNonIt2rLyOUJmNlcz8V2u4JgVPvQ3tNDWSVoBLN9ClXeNnE/HPSUb0T+5iaOOcQCz8eCV6hGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WeJXlrfC; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1765907853; c=relaxed/simple;
+	bh=KBEJnz25kuRDr95wtUh1NJVQHDQ4WkqgL/hNEypwNAY=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=dQjGeAf4Mqs8T3h4VbH3TtRPfPbOXwYgNMk5W6O65cPWVKIF8FECJOTbYs+CLEYIWnb86rsCj4ZV417wZ5YWMMTCrOodayJhZCbup/95Et3VM3R1jvMWCQEjF2x7+jMOz56bAUDaTKLeS/BF9IRIF1ed5d4+VCnjDgFAqd3NlP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Fa/6A7PD; arc=none smtp.client-ip=209.85.210.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WeJXlrfC"
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-42b55ba1e62so133501f8f.2
-        for <linux-block@vger.kernel.org>; Tue, 16 Dec 2025 09:22:41 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Fa/6A7PD"
+Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-7c7aee74dceso2019456a34.2
+        for <linux-block@vger.kernel.org>; Tue, 16 Dec 2025 09:57:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765905759; x=1766510559; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=mKyLdQEGhgJbQ0rcfGz63d+VAIFpbamsmpk3rRxDquY=;
-        b=WeJXlrfCU9b2BeOuO6FhxXCKu+1LGv1gwxMq0vkr7PA15yPbD42humEPlmrCoU9ZMJ
-         ktDCCdFISzk/+pOIOP5yDHYN1DFvv+canLb/jxvmhwTNuz5aklg+YP2O8yrjJgLzyaeS
-         tO+dRAaeo+2zwiRNw1rIBXdDtNDEER5MYaNwiVr4D24/ooRkq8iqUFoBnkP2z20MJClj
-         DjHTsviPLm2bXzZ53q5GDhrHRjTg1Lk0AkD2gO7QSKdZ2boxSzlB51Nz2wbk/B9hNnLu
-         br7ZI8+KIt/CE6ZxD7r7vxeFk5F7W0Pv4Zos1hlgB1EfMGidDrMe71+Ug+cMwsJRBB+T
-         Cdpw==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1765907848; x=1766512648; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=WKho9H78QLmw2kchGQF/SQwDA/V5m4vvZx4Dr6moF50=;
+        b=Fa/6A7PDsplZEl0nAI/GG9txf0Eq3Ps9l8JLPpGJVVfQf2eOdWjtlVEEuhueDAJc3x
+         Xncfb3ydBmKqNmFkWGP9UGWZ+j3XKM2395zSh9ViPk/Yk+SEMqiTGvjNwxXdxT1KTL+I
+         o7nG0hPZw6+aaYUw2ddqbD+Fv9fiWfXIkBMthJlvzeqhNJFXdtvBpmRSgcTRnxmV3NB+
+         aLdsmp45c3Yzys+NPLUSflvIZo30qdYembdsKGULFEHvwivbpzuqLorYernGx79XwYAq
+         e80Jla63niGqzyMCB6KG0piisrQE5oK+2G6lJUOB3F2f/DqPIpBrJgDP0gdfudym2h0O
+         iKDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765905759; x=1766510559;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mKyLdQEGhgJbQ0rcfGz63d+VAIFpbamsmpk3rRxDquY=;
-        b=MXHVim6NQF+lXtDWxgrwnS6t0LVh6GVkrnRgTB+8wgkRekIdwzm6wWcnvxP2i9gB7G
-         akMD9JDlc1p+Tlz+0PUrxg7XTSYwOIHPvbypv5GTig84u2wHKHsEFqiliJtFFTjPKKQE
-         x9iJRfJKLo2NVGG/35BeA9BaTfjbfO+yh6Adl9Cmz4IIZiZtjj9qYI4GT29DZErFfyMt
-         KduLKhmk17X4yK/8JMrNNNv/HiolCGgpzvUAO2qiLCXkQd1sWJL8H+QOxYWao+iV4UZZ
-         qKxmJjWLUAQ5MPJwfXToqx6gGy9ndl3j5HetCpXDTfNPK9lG/vKwv8u6QnlbngwhknU0
-         YPPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXUSCJQ6pUZ9OYBEODU3cj/db0txXjlb2C9xNwTVwMDZvAFRyEzhuyFmJr2WtMTtZsKQBQkm6djiK7qPA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwSQPgWxQzyJh+x5EmGKLoeFSYAiUqOABlUNMmXQUfI6Oy3KVsV
-	zy+5fNhUQTgLEg1x8mHmVIQ6gbvp5iJcdVXL3Lq73HsOryK1TnJg/R97
-X-Gm-Gg: AY/fxX6+tw9jOp/izbbp59K4LmYmCTvAJbEEobeG37VcpBCSwHWbhKZ3zpzFoR600Zw
-	X62b+Qafp7YqfhgV5/UIR2wFclcSblr+DhtIUk8WTzmpKM1rXTVA0aSMjuXHqix5D7e6qFKZDsd
-	Kh2DI6V6KdRunDh/tD2bYMuLH/u0+B8itt2rp2dxY41KreAmf6Ws9k09w6FUIDLxIxK+i3m3p0X
-	QU7aKf/UhJI0dl04HPZO9YACP66nXvJr8Y4WdHchpWb88AMTHSLigBezYDVMj9mVVbw/N6MwpsO
-	lWjCUaPtPYvtpTnFdTHjb4ZsdEwmZIF38nFbQRxQv8KkNuZ0H+Q9b0N3kBbzWhNj2JG0/k5l3G9
-	FgRhW/PU0Gq9mMkgunU8JniObpkCnuS+y0ne/itlELk2jYyxm45GUa7xO+ryqxLO46WM+al2RjK
-	tuMyEEnl3iFXXNOZGhhrQjW4r/vj1H8xED4VIbT02zWQUXs1Il6RfLSHrLctcUqfwX3roglxtuL
-	0Rwwy8=
-X-Google-Smtp-Source: AGHT+IHmQS6RGAHTr+Y/wsnGe/COASXW2A2kF5M/0v+c+2mbcCvu35+0lzvO+L74CHYn9f2xAPJB6Q==
-X-Received: by 2002:a05:600c:3146:b0:477:a450:7aa2 with SMTP id 5b1f17b1804b1-47a8f8a8e4cmr107678965e9.1.1765905759518;
-        Tue, 16 Dec 2025 09:22:39 -0800 (PST)
-Received: from thomas-precision3591.paris.inria.fr (wifi-pro-83-215.paris.inria.fr. [128.93.83.215])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-47bdc1ddf2csm231635e9.7.2025.12.16.09.22.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Dec 2025 09:22:39 -0800 (PST)
-From: Thomas Fourier <fourier.thomas@gmail.com>
-To: 
-Cc: Thomas Fourier <fourier.thomas@gmail.com>,
-	"Md. Haris Iqbal" <haris.iqbal@ionos.com>,
-	Jack Wang <jinpu.wang@ionos.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Lutz Pogrell <lutz.pogrell@cloud.ionos.com>,
-	Md Haris Iqbal <haris.iqbal@cloud.ionos.com>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] block: rnbd-clt: Fix leaked ID in init_dev()
-Date: Tue, 16 Dec 2025 18:22:01 +0100
-Message-ID: <20251216172203.48947-2-fourier.thomas@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1765907848; x=1766512648;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WKho9H78QLmw2kchGQF/SQwDA/V5m4vvZx4Dr6moF50=;
+        b=NwX2tI0mzCOKR2adP1h0ZbVpMlatlEMiQgDBs1P0gAzLUbvJz18MotmRcebOgMDUKo
+         zUc0wMgtD4HKK9BaPDTxmkRVfEcTTcUDn138b7vdPGgGzuXfHDe3yfImg2oPyRPKvfez
+         /YXuhFwT7rrvUXC9mqX+fxCy8VdWldfY3smUoPu9gfevSq9BGPtbmIESnGmLQAaayi4V
+         LozDAQkj3WsAgSh/SIjC9zc6A0BcXcftojbq94VQizYm40X7QP6EVy88js5QjbYLIk54
+         C1h1FtF2gHwiQgRvn9pN6PNccUseSYe2FiM3elXGqvDkZFT7IQHOoJEkqvRwe/WzkAvX
+         h2ww==
+X-Gm-Message-State: AOJu0YxUsyubXnvAHIVRyFQbC37Dcn2rUSuSqvZBMdJaI+pbmgmTPtEE
+	gsYwiP0CchlLXOisGxI6GwCvRZA/ePsUnXko34mXJgZrVa3FzaV7MWZJZYYi7cjVZE8=
+X-Gm-Gg: AY/fxX4nFwLADpD14qyv2Kf6E2GbxzHC8OaD0Q1YxPIsArW2Z6OH+cIzgErGBKz2c0a
+	FqHMEzEX+ELuhAyEqVWpZPS42wu/jd//G2qhQiqdL8qwHAqiXkhzp5GZi5yNheN7VG2s89xOUTn
+	+U074D+eeiwK4i+84Qi0/mQJzA8uzASB1AF48DMYyOjYWO99adUh0R8bTKueWmJJx+H+CN5aJLK
+	Hj7cMTUXbR+xInyWHWJDFXdXckSnx65Eq3blTa5FPcy4JVjaom3b5M4faL3GjT+nUWmcHHOA0cA
+	gjWDga7Hq+n4t/piHrRfkhGvk4gsbu8XFOLknDdpE2wurHfRQ6lyp21+ARSwuHmK4nb9MMD3uQt
+	kX1CdS9XTi/ohLKUUzZkMmM+mU9kD5furvPwzrpnnvr/9oBMeBegmCLDwxKyBdt+c7tXYfI/Fzg
+	VQ478UGgK1Ryp8ttA4zw==
+X-Google-Smtp-Source: AGHT+IGxFmvR/WohyAuAXNikVTR3H9alSqIUgBqFvpV0wlN3kp04pnOSB8VcRsktPEX2uUrT3a6TuA==
+X-Received: by 2002:a05:6830:4393:b0:7c7:5f8c:71a3 with SMTP id 46e09a7af769-7cae82ebb9fmr7863500a34.2.1765907847686;
+        Tue, 16 Dec 2025 09:57:27 -0800 (PST)
+Received: from [192.168.1.102] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7cb13e0767fsm970434a34.27.2025.12.16.09.57.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 16 Dec 2025 09:57:26 -0800 (PST)
+Message-ID: <5e2038e1-efcf-4313-8a14-565b970370f2@kernel.dk>
+Date: Tue, 16 Dec 2025 10:57:25 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V2] ublk: fix deadlock when reading partition table
+From: Jens Axboe <axboe@kernel.dk>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org, Caleb Sander Mateos
+ <csander@purestorage.com>, Uday Shankar <ushankar@purestorage.com>
+References: <20251212143415.485359-1-ming.lei@redhat.com>
+ <8dd3c141-3e92-44f3-91e2-2bf4827b36a4@kernel.dk> <aTzPUzyZ21lVOk1L@fedora>
+ <93163617-11bb-4700-aca9-940c0df7429f@kernel.dk> <aUEeu9luJ9ZNvJzA@fedora>
+ <6d40e8a0-14e9-45f4-bbea-360678524767@kernel.dk>
+Content-Language: en-US
+In-Reply-To: <6d40e8a0-14e9-45f4-bbea-360678524767@kernel.dk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-If kstrdup() fails in init_dev(), then the newly allocated ID is lost.
+On 12/16/25 8:03 AM, Jens Axboe wrote:
+>> The issue for ublk is actually triggered by something abnormal: submit AIO
+>> & close(ublk disk) in client application, then fput() is called when the
+>> submitted AIO is done, it will cause deferred fput handler to wq for any block
+>> IO completed from irq handler.
+> 
+> My suggested logic is something ala this in bdev_release():
+> 
+> 	if (current->flags & PF_KTHREAD) {
+> 		mutex_lock(&disk->open_mutex);
+> 	} else {
+> 		if (!mutex_trylock(&disk->open_mutex)) {
+> 			deferred_put(file);
+> 			return;
+> 		}
+> 	}
+> 
+> and that's about it.
 
-Fixes: 64e8a6ece1a5 ("block/rnbd-clt: Dynamically alloc buffer for pathname & blk_symlink_name")
-Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
----
- drivers/block/rnbd/rnbd-clt.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+I took a look at the bug report, and now it makes more sense to me -
+this is an aio only issue, as it does fput() from ->bi_end_io() context.
+That's pretty nasty, as you don't really know what context that might
+be, both in terms of irq/bh state, but also in terms of locks. The
+former fput() does work around.
 
-diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
-index f1409e54010a..d33698eb428d 100644
---- a/drivers/block/rnbd/rnbd-clt.c
-+++ b/drivers/block/rnbd/rnbd-clt.c
-@@ -1434,7 +1434,7 @@ static struct rnbd_clt_dev *init_dev(struct rnbd_clt_session *sess,
- 	dev->pathname = kstrdup(pathname, GFP_KERNEL);
- 	if (!dev->pathname) {
- 		ret = -ENOMEM;
--		goto out_queues;
-+		goto out_ida;
- 	}
- 
- 	dev->clt_device_id	= ret;
-@@ -1453,6 +1453,8 @@ static struct rnbd_clt_dev *init_dev(struct rnbd_clt_session *sess,
- 
- 	return dev;
- 
-+out_ida:
-+	ida_free(&index_ida, ret);
- out_queues:
- 	kfree(dev->hw_queues);
- out_alloc:
+Why isn't the fix something as simple as the below, with your comment
+added on top? I'm not aware of anyone else that would do fput off
+->bi_end_io, so we migt as well treat the source of the issue rather
+than work around it in ublk. THAT makes a lot more sense to me.
+
+diff --git a/fs/aio.c b/fs/aio.c
+index 0a23a8c0717f..d34ae02c61c1 100644
+--- a/fs/aio.c
++++ b/fs/aio.c
+@@ -1104,8 +1104,13 @@ static inline void iocb_destroy(struct aio_kiocb *iocb)
+ {
+ 	if (iocb->ki_eventfd)
+ 		eventfd_ctx_put(iocb->ki_eventfd);
+-	if (iocb->ki_filp)
++	if (iocb->ki_filp) {
++		unsigned long flags;
++
++		local_irq_save(flags);
+ 		fput(iocb->ki_filp);
++		local_irq_restore(flags);
++	}
+ 	percpu_ref_put(&iocb->ki_ctx->reqs);
+ 	kmem_cache_free(kiocb_cachep, iocb);
+ }
+
 -- 
-2.43.0
-
+Jens Axboe
