@@ -1,199 +1,195 @@
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com [209.85.167.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E823366569
-	for <linux-block@vger.kernel.org>; Tue, 16 Dec 2025 12:16:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7563C327BF3
+	for <linux-block@vger.kernel.org>; Tue, 16 Dec 2025 13:27:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765887370; cv=none; b=ZIBKlBLXH7oH+nJwIjf5KNcIHl8pG0ULmij8fNL/HYaloWclT5BKLuekejN0VftRj/YJ/WkzfsSmaSgpYTBQ3ibcIQswpGKo+EeiMdZJffq0BmcRpko+ki9jlIcbjveQ8WOJWNRtJsg+AUji8oML1pUpIoKZe8rVKJCxvWxv3GQ=
+	t=1765891642; cv=none; b=GzeIPkpIiOztw6QDUzF5LLsBBqy8tebqOy1EXVe9qqkVQ75iNq676WicX5zbpI9kp6yApMmBgPMW6VF1x6pcLKSJW050WOt2cnwjhEKfgUyDyur+Mpu4wt7efUW5W7oiS0mscrFK1+EImeaN5blaBmjntDT9wqTrbuYT3APeiAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765887370; c=relaxed/simple;
-	bh=ygM6iPCH2TydP0HkxyKip8E+b6Ls9AqBqncVC7h+DLg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QLJ/Y7dssHBiH7XcoX2gbweZz9DxVCOVUhYGkkr5VHBEdyVpGunNqfPzCB0gzRgRuScpmUBMkRtvTweZojUOCAVAIHHMrSKKo7ldb/MHzH76NOnsdV/velDhaXs4O1fhxQobXwswQnuqazu1K0Cs0lFl5C3y/s6m2LZPVHl65+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=spCzNCAf; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="spCzNCAf"
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-37b99da107cso44282431fa.1
-        for <linux-block@vger.kernel.org>; Tue, 16 Dec 2025 04:16:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1765887366; x=1766492166; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=5bBHT5GO4OwWFNFQ9+2hmY0RqEYQdKcZYHd8MT27q6k=;
-        b=spCzNCAfU6diO0rVR89Z7huXTIT1rPDVEjDuzwPwACYmuoEddq1o5nyZ6Al28HUY02
-         wFa2GEXvd08ONKMrTIucd2DaAuqSw5gRD4W349C8w+hQQindK+0VkQD4AnQNf5etRfMS
-         uaac1IgHT8kHg3ljn1ZsVfxRGiMH1pY7w0dXPuQP0xvYa0mPpeeRm4S511wuYS9Uuki5
-         ng/Lw7TH8XbEW8dr7ZtnyHpuaRtX1N+5N+Yk3gBD2Pgu22MsOJkP+n8eGTdxgKk8cZvn
-         oX5Kq6HV8rY1A4Fsf7MVq/eoGJaf6AOxrK9Lkzwgu2dXmZXLSunxGvFZF1K9MMEJ2LhL
-         9Gww==
+	s=arc-20240116; t=1765891642; c=relaxed/simple;
+	bh=Ktfjgc/L8Ak4Fn42C5MHFy2hQHIgeJeDgnfRsm/0rmI=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=VzS3FiEmQlTxw8E655txbxMZCAp7u+EQZb/5YKOApnBhYo2+/3Gh2VuqHg3Py+ndSHl71chO4G8SZS1ryYkF+rzSsWGsocPtC+Fy9YvC+8HNjxRT/DhClFTVJrPPOKoLYSe3avVRlWOOjsrIRYlJB83xbE0c1eoILel/8N7Apks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-451064d84edso6632428b6e.3
+        for <linux-block@vger.kernel.org>; Tue, 16 Dec 2025 05:27:20 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765887366; x=1766492166;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5bBHT5GO4OwWFNFQ9+2hmY0RqEYQdKcZYHd8MT27q6k=;
-        b=G3C9bL8uLYSvbJRG2JS4KNkN6MFsx+PcGd0z5/E6Nk89ptK/AJcKyUT4hsczIu1Qo7
-         TMuzkHPQhI4gTGkiePEEO2SmaVvZ/nLj/6o6T1olmUb01BU9u2Ufcd5EdsLXPfEiIbkh
-         AA3oTtY8RnU0GSUFN3c9wkPHkjgz2dcrfYte5GoVs5Nwggc9nzTHkVig2TyzdA1qzjxf
-         RYXKC5yqmgG8kulA1Pg2pAt1rfiwhgZsQTzUSMdImXqOubML//NlmidJFDNJfKZGjpzp
-         mn9Yp6L7dsHrCEnU5UMP0sU54isiksVVYx+y8YK6j4QvKH7f4FMBaO8pwNmpnd6/eruj
-         DUEg==
-X-Forwarded-Encrypted: i=1; AJvYcCVt43m49gtwaI8B33uw6yLVLwfAF7jQEwaCI08s8smK25PeCOEoXP8Jg0wRRblN7a5IMhN922Hac7jYrw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyyaA6zsQ6YCw1o29z3jWOti6EHmENKx+IO30F9iKgVZ/i2c4Nx
-	7fI67vXNj00dXFd9We8zpRSD8Xu4hc0rNio+Nf1rwlsj2Gf9rEj/UzEiOw77A4E4k50yHSiQ/C2
-	Ug5YyixpEmg4cbuANmJILOleb8Q6x1GWT8JsMuPUHlYoJDLMUsnyL
-X-Gm-Gg: AY/fxX7Y/guA8I9EzpvQ8pFvLLLwTQBvBEdXURYE0VdYDLYeVP1uITRJWuWD+EQxjK+
-	orjrQAFlQhe6CtQ59NCAsf499I08KKpscMbz8KrORMaVV7CC1PG0NkXP6xJfXtQLF62eGHb3Xcl
-	MCzYIcllhU01aR2UqSFY9JNVLAlADqP+ppZQeRf96pWhqhPu3LqIW48UM/ezNxasHT50TD0xblw
-	Fdylz0vzOkNAiU+zvUQBSN7JGRRKZGa0/s9GZvo/d/pGUZa5BYg9hQ79kpWmPqzc/nOTwV5
-X-Google-Smtp-Source: AGHT+IHSOzKJUAD0VWoqMbAG9/IlbO2ZSE7puMKuCAi60z6RaWldMe2JJwlbhcYrPz8NDWuyAEiNqo14NocbJW/sTAU=
-X-Received: by 2002:a2e:b8c4:0:b0:37f:b5c8:7cc0 with SMTP id
- 38308e7fff4ca-37fd08c7ae4mr55985981fa.33.1765887365959; Tue, 16 Dec 2025
- 04:16:05 -0800 (PST)
+        d=1e100.net; s=20230601; t=1765891639; x=1766496439;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hYjRJJ506ddvMksrKA9PPxHuYdIJ/nrBSLgKkw4pfW8=;
+        b=CVc6gN7XaPn1lVFdITbM5plqW0nqPpBQR76PhVbI+l5BptxhEVAXqHLFS1zOPM76/B
+         gmOPdpH5oi2vM7S2dkOoPS6QOYcVSACwXcdLLfnMfSrU4N0WIdh0Zq5SepAhURTOZE9G
+         o1Ab2jPgVAcjIOa2j+Qov249GILjMZS5BhoLth72tGM/r8wdxmhL8LFdy+FEtRE6VX/l
+         jjfjdpTj3B7TWsY5XSSoqLeeS2AxkTtmVvXw6yD7+ijB7jpxmQkc9Ugoev/h6VrKFQev
+         Z6WAGPCgy85kVjeJ+Vmd886U8BEFALqkSxIjyGFtPapHWVXGMIyAX4w4yMoXl1Ox8LjT
+         5ajw==
+X-Forwarded-Encrypted: i=1; AJvYcCXia0SRkZCKBfIipZrXuLaXpnLF82TdK7c/heh9saI7RD+bC5Ou+BiT+cZdNhfLsdPBVJRgjkV/FkfHIQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YycwGMbOXkmd7WJnwJ8GWoO/i64rsviegVO1ghC70AovvATpaty
+	VH7kh/q6j46rby/sX09tft2dg+Mt6gtgECpt5xFR2rYnqdP1IFSJhW1WRMrQSz6BIv8l496ebeA
+	436wW+WGgF4QcSGf5dROs+kCmWBiRL6JZq0uH2syQP3HJm39eiwgaKhUEvQI=
+X-Google-Smtp-Source: AGHT+IGVYKQeVf2Px4ZQSbykhTj6MuQM6T464vSt503ztlv8bUnmvZ6VNHvqaaoFAgpsTdU5EBMo1FemPHrfipq7VLzs2egYbmG8
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251215102010.608421-1-ziniu.wang_1@nxp.com> <CAPDyKFoLmo=qDru67rj63gQwMjLqVKS+wEQecukuC+3Pz_CjDA@mail.gmail.com>
- <DU2PR04MB8567C09C52C66C59C9CA6607EDAAA@DU2PR04MB8567.eurprd04.prod.outlook.com>
-In-Reply-To: <DU2PR04MB8567C09C52C66C59C9CA6607EDAAA@DU2PR04MB8567.eurprd04.prod.outlook.com>
-From: Ulf Hansson <ulf.hansson@linaro.org>
-Date: Tue, 16 Dec 2025 13:15:28 +0100
-X-Gm-Features: AQt7F2qlgonHE1u8usoQ1ApRhJuG8Mj0nOYZGlZ59wEK9NLeswsioWiDble_0qg
-Message-ID: <CAPDyKFoH+B363wiPi6HoKg1VJXvJVNPoYaRTGXzEDgSTEg9TyA@mail.gmail.com>
-Subject: Re: [EXT] Re: [PATCH v2 0/2] Optimize secure erase performance for
- certain Kingston eMMC devices
-To: Luke Wang <ziniu.wang_1@nxp.com>
-Cc: "axboe@kernel.dk" <axboe@kernel.dk>, 
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
-	"linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "imx@lists.linux.dev" <imx@lists.linux.dev>
+X-Received: by 2002:a05:6808:14c8:b0:441:ca0e:f5ab with SMTP id
+ 5614622812f47-455ac9d900dmr6412826b6e.65.1765891639491; Tue, 16 Dec 2025
+ 05:27:19 -0800 (PST)
+Date: Tue, 16 Dec 2025 05:27:19 -0800
+In-Reply-To: <tencent_2AC2ECAACC587B4E6C342D096F909424E90A@qq.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69415e37.050a0220.1ff09b.001d.GAE@google.com>
+Subject: [syzbot ci] Re: jfs: Extend the done of the window period
+From: syzbot ci <syzbot+ci1f1a4e9c887bc6ea@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, eadavis@qq.com, jfs-discussion@lists.sourceforge.net, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, shaggy@kernel.org, 
+	syzbot@syzkaller.appspotmail.com, syzkaller-bugs@googlegroups.com
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 16 Dec 2025 at 11:02, Luke Wang <ziniu.wang_1@nxp.com> wrote:
->
->
->
-> > -----Original Message-----
-> > From: Ulf Hansson <ulf.hansson@linaro.org>
-> > Sent: Monday, December 15, 2025 11:38 PM
-> > To: Luke Wang <ziniu.wang_1@nxp.com>
-> > Cc: axboe@kernel.dk; linux-block@vger.kernel.org; linux-
-> > mmc@vger.kernel.org; linux-kernel@vger.kernel.org; imx@lists.linux.dev
-> > Subject: [EXT] Re: [PATCH v2 0/2] Optimize secure erase performance for
-> > certain Kingston eMMC devices
-> >
-> > Caution: This is an external email. Please take care when clicking links or
-> > opening attachments. When in doubt, report the message using the 'Report
-> > this email' button
-> >
-> >
-> > On Mon, 15 Dec 2025 at 11:18, <ziniu.wang_1@nxp.com> wrote:
-> > >
-> > > From: Luke Wang <ziniu.wang_1@nxp.com>
-> > >
-> > > This patch series optimize secure erase performance for certain Kingston
-> > > eMMC devices (IY2964 and IB2932) that take a fixed ~2 seconds per secure
-> > > erase operation regardless of size.
-> >
-> > Well, that sounds to me like the eMMC isn't really erasing the blocks.
-> > I wonder how "secure" this is in practice.
->
-> Compared to other eMMC, 2 second secure erase time for 1GB is reasonable.
->
-> Using the default 3.5MB secure erase chunk, the total time spent secure erasing 1GB:
-> Sandisk SDINBDG4-32G-I 0.8s
-> Micron MTFC32GAKAEEF-AIT 4.7s
-> Longsys FEMDNN032G-C9A55 0.6s
->
-> In fact, secure erase does not guarantee that data is physically erased. We previously encountered
-> an issue with long secure trim times on the MTFC32GAKAEEF-AIT eMMC, and got confirmation
-> from Micron:
-> "Secure Erase (0x80000000) is treated as a simple Erase (0x00000000), while Secure
-> Trim (0x80000001 + 0x80008000) and Trim (0x00000001) are treated differently. So, it is
-> possible that Secure Trim really is the heaviest possible erase operation for the FW to execute. "
->
-> And the eMMC 5.1 Spec:
-> "NOTE Secure Erase is included for backwards compatibility. New system level implementations
-> (based on v4.51 devices and beyond) should use Erase combined with Sanitize instead of secure erase."
+syzbot ci has tested the following series
 
-Right, thanks for clarifying this! I do recall the complexity around this now.
+[v1] jfs: Extend the done of the window period
+https://lore.kernel.org/all/tencent_2AC2ECAACC587B4E6C342D096F909424E90A@qq.com
+* [PATCH] jfs: Extend the done of the window period
 
->
-> >
-> > >
-> > > Currently, a 1GB secure erase requires ~300 operations (limited by max
-> > > discard size), taking ~10 minutes. With these changes, the same secure
-> > > erase completes in a single operation, reducing time to just 2 seconds.
-> >
-> > Hmm, is the problem really the size or is it the timeout? Why does 300
-> > operations to erase 1GB take ~10 minutes?
->
-> I think the problem is caused by the fact that this Kingston eMMC secure erase
-> small chunk need ~2 second. In contrast, other eMMC secure erase small chunk
-> only take tens of milliseconds.
+and found the following issue:
+possible deadlock in lbmIODone
 
-Okay! So it looks like using a card quirk, something along what you
-propose in patch2 could make sense. I will have a closer look.
+Full report is available here:
+https://ci.syzbot.org/series/49387e77-608d-493c-9978-8d1e9ab79507
 
->
-> Also, the calculated max discard is too small. For the I.MX8MN USBHC controller,
-> host->max_busy_timeout is 2684ms, and the calculated max discard is always
-> card->pref_erase - 1, which is 3.5MB.
+***
 
-I see, so regular REQ_OP_DISCARDs are suffering from similar problems
-that are taking a very long time to complete?
+possible deadlock in lbmIODone
 
-Are you planning to make a similar card quirk for discards or what do
-you have in mind?
+tree:      torvalds
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/torvalds/linux
+base:      d358e5254674b70f34c847715ca509e46eb81e6f
+arch:      amd64
+compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+config:    https://ci.syzbot.org/builds/802e00bf-1926-4ea9-a853-4f01d10a4a6e/config
+C repro:   https://ci.syzbot.org/findings/784b824b-3582-4c98-a807-ff28792ecaac/c_repro
+syz repro: https://ci.syzbot.org/findings/784b824b-3582-4c98-a807-ff28792ecaac/syz_repro
 
->
-> >
-> > Can you please elaborate what happens on the mmc host driver level for
-> > each operation. What mmc host driver/controller is being used? Does it
-> > support MMC_CAP_WAIT_WHILE_BUSY or do we end up polling for
-> > busy-completion in-between each command?
->
-> This issue is found on IMX8MN-EVK, uSDHC controller. We end up polling for
-> busy-completion in-between each command.
->
-> I print some log during secure erasing:
-> Without this patch
-> [  126.760429] mmc2: starting CMD35 arg 01294000 flags 00000095
-> [  126.766530] mmc2: starting CMD36 arg 01295bff flags 00000095
-> [  126.772246] mmc2: starting CMD38 arg 80000000 flags 00000095
-> [  126.777988] mmc2: mmc_poll_for_busy
-> [  128.616245] mmc2: erase operation completes
-> [  128.628511] mmc2: starting CMD35 arg 01295c00 flags 00000095
-> [  128.634293] mmc2: starting CMD36 arg 012977ff flags 00000095
-> [  128.640089] mmc2: starting CMD38 arg 80000000 flags 00000095
-> [  128.645811] mmc2: mmc_poll_for_busy
-> [  130.456184] mmc2: erase operation completes
-> [  130.468390] mmc2: starting CMD35 arg 01297800 flags 00000095
-> [  130.474160] mmc2: starting CMD36 arg 012993ff flags 00000095
-> [  130.479928] mmc2: starting CMD38 arg 80000000 flags 00000095
-> [  130.485798] mmc2: mmc_poll_for_busy
-> [  132.192309] mmc2: erase operation completes
-> ...
->
-> Apply this patch
-> [  296.480818] mmc2: starting CMD35 arg 01294000 flags 00000095
-> [  296.487219] mmc2: starting CMD36 arg 01493fff flags 00000095
-> [  296.492995] mmc2: starting CMD38 arg 80000000 flags 00000095
-> [  296.498999] mmc2: mmc_poll_for_busy
-> [  298.712865] mmc2: erase operation completes
+======================================================
+WARNING: possible circular locking dependency detected
+syzkaller #0 Not tainted
+------------------------------------------------------
+ksoftirqd/0/15 is trying to acquire lock:
+ffff888112c1f9e8 (&(log)->gclock){..-.}-{3:3}, at: lmPostGC fs/jfs/jfs_logmgr.c:810 [inline]
+ffff888112c1f9e8 (&(log)->gclock){..-.}-{3:3}, at: lbmIODone+0x681/0x17b0 fs/jfs/jfs_logmgr.c:2284
 
-Thanks for sharing the log, much appreciated!
+but task is already holding lock:
+ffffffff8e396158 (jfsLCacheLock){..-.}-{3:3}, at: lbmIODone+0x92/0x17b0 fs/jfs/jfs_logmgr.c:2181
 
-Just to double check, I assume that you have verified that the
-busy-polling works as expected on your HW? The reason for asking is
-that we have seen problems with this several times in the past, on
-other HWs.
+which lock already depends on the new lock.
 
-Kind regards
-Uffe
+
+the existing dependency chain (in reverse order) is:
+
+-> #1 (jfsLCacheLock){..-.}-{3:3}:
+       __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
+       _raw_spin_lock_irqsave+0xa7/0xf0 kernel/locking/spinlock.c:162
+       lbmWrite+0x115/0x490 fs/jfs/jfs_logmgr.c:2022
+       lmGCwrite fs/jfs/jfs_logmgr.c:-1 [inline]
+       lmGroupCommit+0x570/0xb30 fs/jfs/jfs_logmgr.c:687
+       txCommit+0x4940/0x5430 fs/jfs/jfs_txnmgr.c:1305
+       diNewIAG fs/jfs/jfs_imap.c:2592 [inline]
+       diAllocExt fs/jfs/jfs_imap.c:1905 [inline]
+       diAllocAG+0x1770/0x1df0 fs/jfs/jfs_imap.c:1669
+       diAlloc+0x1d5/0x1680 fs/jfs/jfs_imap.c:1590
+       ialloc+0x8c/0x8f0 fs/jfs/jfs_inode.c:56
+       jfs_mkdir+0x193/0xa70 fs/jfs/namei.c:225
+       vfs_mkdir+0x512/0x5b0 fs/namei.c:5130
+       do_mkdirat+0x276/0x4b0 fs/namei.c:5164
+       __do_sys_mkdirat fs/namei.c:5186 [inline]
+       __se_sys_mkdirat fs/namei.c:5184 [inline]
+       __x64_sys_mkdirat+0x87/0xa0 fs/namei.c:5184
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0xfa/0xf80 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #0 (&(log)->gclock){..-.}-{3:3}:
+       check_prev_add kernel/locking/lockdep.c:3165 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3284 [inline]
+       validate_chain kernel/locking/lockdep.c:3908 [inline]
+       __lock_acquire+0x15a6/0x2cf0 kernel/locking/lockdep.c:5237
+       lock_acquire+0x117/0x340 kernel/locking/lockdep.c:5868
+       __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
+       _raw_spin_lock_irqsave+0xa7/0xf0 kernel/locking/spinlock.c:162
+       lmPostGC fs/jfs/jfs_logmgr.c:810 [inline]
+       lbmIODone+0x681/0x17b0 fs/jfs/jfs_logmgr.c:2284
+       blk_update_request+0x57e/0xe60 block/blk-mq.c:1007
+       blk_mq_end_request+0x3e/0x70 block/blk-mq.c:1169
+       blk_complete_reqs block/blk-mq.c:1244 [inline]
+       blk_done_softirq+0x10a/0x160 block/blk-mq.c:1249
+       handle_softirqs+0x27d/0x850 kernel/softirq.c:622
+       run_ksoftirqd+0x9b/0x100 kernel/softirq.c:1063
+       smpboot_thread_fn+0x542/0xa60 kernel/smpboot.c:160
+       kthread+0x711/0x8a0 kernel/kthread.c:463
+       ret_from_fork+0x599/0xb30 arch/x86/kernel/process.c:158
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
+
+other info that might help us debug this:
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(jfsLCacheLock);
+                               lock(&(log)->gclock);
+                               lock(jfsLCacheLock);
+  lock(&(log)->gclock);
+
+ *** DEADLOCK ***
+
+1 lock held by ksoftirqd/0/15:
+ #0: ffffffff8e396158 (jfsLCacheLock){..-.}-{3:3}, at: lbmIODone+0x92/0x17b0 fs/jfs/jfs_logmgr.c:2181
+
+stack backtrace:
+CPU: 0 UID: 0 PID: 15 Comm: ksoftirqd/0 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+ print_circular_bug+0x2e2/0x300 kernel/locking/lockdep.c:2043
+ check_noncircular+0x12e/0x150 kernel/locking/lockdep.c:2175
+ check_prev_add kernel/locking/lockdep.c:3165 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3284 [inline]
+ validate_chain kernel/locking/lockdep.c:3908 [inline]
+ __lock_acquire+0x15a6/0x2cf0 kernel/locking/lockdep.c:5237
+ lock_acquire+0x117/0x340 kernel/locking/lockdep.c:5868
+ __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
+ _raw_spin_lock_irqsave+0xa7/0xf0 kernel/locking/spinlock.c:162
+ lmPostGC fs/jfs/jfs_logmgr.c:810 [inline]
+ lbmIODone+0x681/0x17b0 fs/jfs/jfs_logmgr.c:2284
+ blk_update_request+0x57e/0xe60 block/blk-mq.c:1007
+ blk_mq_end_request+0x3e/0x70 block/blk-mq.c:1169
+ blk_complete_reqs block/blk-mq.c:1244 [inline]
+ blk_done_softirq+0x10a/0x160 block/blk-mq.c:1249
+ handle_softirqs+0x27d/0x850 kernel/softirq.c:622
+ run_ksoftirqd+0x9b/0x100 kernel/softirq.c:1063
+ smpboot_thread_fn+0x542/0xa60 kernel/smpboot.c:160
+ kthread+0x711/0x8a0 kernel/kthread.c:463
+ ret_from_fork+0x599/0xb30 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
+ </TASK>
+
+
+***
+
+If these findings have caused you to resend the series or submit a
+separate fix, please add the following tag to your commit message:
+  Tested-by: syzbot@syzkaller.appspotmail.com
+
+---
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
