@@ -1,125 +1,119 @@
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E95F533AD8D;
-	Tue, 16 Dec 2025 21:51:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B14FB21CA03;
+	Tue, 16 Dec 2025 22:31:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765921904; cv=none; b=PLeqVu8MT0xn4likJR60ZIlJBZDCLQkqsd64AR4a/PqGk3w9AvcSWhKbkhfri7XHMjcUQDfQntWMbgc5wVfPBxKgFttmSL+/JG8Wy5YV7QSPLoK7y+a4EUtx3ep9k3GjCEG7sm2/Vl9ausUG6LguU5UEBTXIIDMtO4E6Atvz0Ds=
+	t=1765924270; cv=none; b=QG2tbkpLjwn9e5qRHyWAVASXIZPr9VAeJHTLG/fRQf1yGyw4surCk1SFutLRxaIi7a0m2CvlC9jTsH/Jc7pvYreRCnTSr35CPgjbmRYNS4kwJmvDIgn5Z4tCghg4sZjsjAoJ3BGWI7IKWMLw5yTOAYiC6lFWVAKSOTqt1CyajGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765921904; c=relaxed/simple;
-	bh=98ggaTZvCYQrJE7EKpjojwh2LUANapTP62HYxPrNHsw=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=t5dN2F4Al9a4K54aFq4VrcvdQTxP2PZVafi0f6/8umBSBtvmTvSyzRGIgePIMSIAvCAVCJdC2oFsSLBs2JUGwLlEOZ3MkR1mhJPgQlUlurwR4GTUxvgPEuOE4ItTkWsXup+bwralx7a/YZe6IjDnLLYVabSHoMMwCw49HYyIuWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=TaSruyIL; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+	s=arc-20240116; t=1765924270; c=relaxed/simple;
+	bh=rrOOt5jDSGAroermPfgjMZ9+gLj/vfpTurs6uUNe0j8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XFP6v1nxtTkZtDXmyaEomEXN9R8a9VKUXdsTe4g8CVoEp8KOMLsRIh3N7Tm3wt0vShlvRSjqAoq7hq4CiFeJaUcCh+R+RJK91BYtDV6S7FQeytQjt+DYWOrq4x/5sIfBlihtPbnBmmV2jt8h28zCL2tUQ6NzMnkgVHVLsWb9Cxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=yBsc/qbw; arc=none smtp.client-ip=199.89.1.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="TaSruyIL"
-Received: from ehlo.thunderbird.net (c-76-133-66-138.hsd1.ca.comcast.net [76.133.66.138])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 5BGLohdD2591914
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Tue, 16 Dec 2025 13:50:43 -0800
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 5BGLohdD2591914
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025112201; t=1765921845;
-	bh=IUFjXMGEioy90PCRU6K4eEZsewA4J72rUYR0KWqV+PM=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=TaSruyIL5BsuQXNl77ikEHcqTR1fDc/rJVG9GGilNzbXMjAWLMi5zLkeAnIAug1+r
-	 Su/ah9a3Wgx0pu3LR0we0eDApaY8L/uZC28BGqjRZAvTkiWEJ87pqbp53NDubEKBmc
-	 G2Nlb4Bu15QyNTu7ZtHdHCV5hKeXr86jkQ674prA51A6dCUfANhW1Hsg5QmpearEVm
-	 kSTg37FHH2iRaLQ9ZpJ76YZa69FMDMyr7gujzLXDUstSm7PXe85dAgbUVevIepDrwN
-	 VkvaQfn0WxKIabhsLzFt4y2wKfCXTwj33MPECOh1RPxcmhVPcWl0HrC+VxhS+9q4G0
-	 a/7lubgc33EpQ==
-Date: Tue, 16 Dec 2025 13:50:42 -0800
-From: "H. Peter Anvin" <hpa@zytor.com>
-To: David Laight <david.laight.linux@gmail.com>
-CC: =?ISO-8859-1?Q?J=FCrgen_Gro=DF?= <jgross@suse.com>,
-        Ingo Molnar <mingo@kernel.org>, linux-kernel@vger.kernel.org,
-        x86@kernel.org, virtualization@lists.linux.dev, kvm@vger.kernel.org,
-        linux-hwmon@vger.kernel.org, linux-block@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ajay Kaher <ajay.kaher@broadcom.com>,
-        Alexey Makhalov <alexey.makhalov@broadcom.com>,
-        Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        xen-devel@lists.xenproject.org, Jean Delvare <jdelvare@suse.com>,
-        Guenter Roeck <linux@roeck-us.net>, Denis Efremov <efremov@linux.com>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH 0/5] x86: Cleanups around slow_down_io()
-User-Agent: K-9 Mail for Android
-In-Reply-To: <20251216195912.0727cc0d@pumpkin>
-References: <20251126162018.5676-1-jgross@suse.com> <aT5vtaefuHwLVsqy@gmail.com> <bff8626d-161e-4470-9cbd-7bbda6852ec3@suse.com> <aUFjRDqbfWMsXvvS@gmail.com> <b969cff5-be11-4fd3-8356-95185ea5de4c@suse.com> <14EF14B1-8889-4037-8E7B-C8446299B1E9@zytor.com> <20251216195912.0727cc0d@pumpkin>
-Message-ID: <69AE77E6-4256-4B0B-970E-194B4C70B7AF@zytor.com>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="yBsc/qbw"
+Received: from localhost (localhost [127.0.0.1])
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4dWBV305ffzmP4v6;
+	Tue, 16 Dec 2025 22:31:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:mime-version:x-mailer:message-id:date
+	:date:subject:subject:from:from:received:received; s=mr01; t=
+	1765924265; x=1768516266; bh=JpvvrnUb4niVYXwpcJrNRd9Hv6ezMChpZX5
+	+Y4oC0jY=; b=yBsc/qbwJVN2FDjUtR1Dh9+m2SzDJqrrE/I97Y5ViBr4vXcvbD2
+	aNZd/eKS8gKZ0zIijhiXhgIHKaIaJs8khkgUWOD3NZNrqCXdAJPCxrfPLgLP0L1T
+	ISQaBAI70MCSJIzExsMs6n129HLYL70GLoJ21vUurOgLU+c5Wv6TYUFO1+pZHxrB
+	o5FyRH8oAzif4/pfaXMLfFP/26RNkKouFN+PZImZkmngpGtEjj7GjJag4etm4Ohx
+	MPXRPUP/2uEHMX04EeS647KcPF9Fa3+41+A+081VQ5hc+ufoZVwVsNQJFLAVPhV4
+	tiIGzkwhD+5zWDBF/g0HKVXAOqzTbK0vNog==
+X-Virus-Scanned: by MailRoute
+Received: from 013.lax.mailroute.net ([127.0.0.1])
+ by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id 4ENXOX7678P6; Tue, 16 Dec 2025 22:31:05 +0000 (UTC)
+Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4dWBTz2qCwzmKtSM;
+	Tue, 16 Dec 2025 22:31:02 +0000 (UTC)
+From: Bart Van Assche <bvanassche@acm.org>
+To: "Martin K . Petersen" <martin.petersen@oracle.com>
+Cc: linux-scsi@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	John Garry <john.g.garry@oracle.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Christoph Hellwig <hch@infradead.org>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH v4 0/6] Increase SCSI IOPS
+Date: Tue, 16 Dec 2025 14:30:44 -0800
+Message-ID: <20251216223052.350366-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.52.0.305.g3fc767764a-goog
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On December 16, 2025 11:59:12 AM PST, David Laight <david=2Elaight=2Elinux@=
-gmail=2Ecom> wrote:
->On Tue, 16 Dec 2025 07:32:09 -0800
->"H=2E Peter Anvin" <hpa@zytor=2Ecom> wrote:
->
->> On December 16, 2025 5:55:54 AM PST, "J=C3=BCrgen Gro=C3=9F" <jgross@su=
-se=2Ecom> wrote:
->> >On 16=2E12=2E25 14:48, Ingo Molnar wrote: =20
->> >>=20
->> >> * J=C3=BCrgen Gro=C3=9F <jgross@suse=2Ecom> wrote:
->> >>  =20
->> >>>> CPUs anymore=2E Should it cause any regressions, it's easy to bise=
-ct to=2E
->> >>>> There's been enough changes around all these facilities that the
->> >>>> original timings are probably way off already, so we've just been
->> >>>> cargo-cult porting these to newer kernels essentially=2E =20
->> >>>=20
->> >>> Fine with me=2E
->> >>>=20
->> >>> Which path to removal of io_delay would you (and others) prefer?
->> >>>=20
->> >>> 1=2E Ripping it out immediately=2E =20
->> >>=20
->> >> I'd just rip it out immediately, and see who complains=2E :-) =20
->> >
->> >I figured this might be a little bit too evil=2E :-)
->> >
->> >I've just sent V2 defaulting to have no delay, so anyone hit by that
->> >can still fix it by applying the "io_delay" boot parameter=2E
->> >
->> >I'll do the ripping out for kernel 6=2E21 (or whatever it will be call=
-ed)=2E
->> >
->> >
->> >Juergen =20
->>=20
->> Ok, I'm going to veto ripping it out from the real-mode init code,
->> because I actually know why it is there :) =2E=2E=2E
->
->Pray tell=2E
->One thing I can think of is the delay allows time for a level-sensitive
->IRQ line to de-assert before an ISR exits=2E
->Or, maybe more obscure, to avoid back to back accesses to some register
->breaking the 'inter-cycle recovery time' for the device=2E
->That was a good way to 'break' the Zilog SCC and the 8259 interrupt
->controller (eg on any reference board with a '286 cpu)=2E
->
->	David
->
->> and that code is pre-UEFI legacy these days anyway=2E
->>=20
->> Other places=2E=2E=2E I don't care :)
->>=20
->
->
+Hi Martin,
 
-A20 gate logic on some motherboards, especially=2E
+This patch series increases scsi_debug IOPS by 5% on my test setup by dis=
+abling
+SCSI budget management if it is not needed. This patch series improves th=
+e
+performance of many SCSI LLDs, including the UFS and ATA drivers. On my U=
+FS 4
+test setup this patch improves IOPS by 1% and reduces the time spent in
+scsi_mq_get_budget() from 0.22% to 0.01%. The improvement for UFS 5 devic=
+es is
+expected to be significantly larger than what I measured on my UFS 4 test=
+ setup.
+
+Please consider this patch series for the next merge window.
+
+Thanks,
+
+Bart.
+
+Changes compared to v3:
+ - Instead of removing the use of cmd->budget_token from the ATA core, in=
+troduce
+   the SCSI host flag .needs_budget_token and set it from the ATA core.
+
+Changes compared to v2:
+ - Fixed a hang during LUN scanning for ATA devices.
+
+Changes compared to v1:
+ - Added three block layer patches to introduce the function
+   blk_mq_tagset_iter().
+ - Applied the optimization not only for host-wide tags but also if there=
+ is
+   only a single hardware queue.
+ - Renamed scsi_device_check_in_flight() into scsi_device_check_allocated=
+().
+ - Added support for set->shared_tags =3D=3D NULL in scsi_device_busy().
+=20
+Bart Van Assche (6):
+  block: Rename busy_tag_iter_fn into blk_mq_rq_iter_fn
+  block: Introduce __blk_mq_tagset_iter()
+  block: Introduce blk_mq_tagset_iter()
+  ata: libata: Set .needs_budget_token
+  scsi: core: Generalize scsi_device_busy()
+  scsi: core: Improve IOPS in case of host-wide tags
+
+ block/blk-mq-tag.c         | 67 ++++++++++++++++++++++++++------------
+ block/blk-mq.h             |  4 +--
+ drivers/ata/libata-scsi.c  |  1 +
+ drivers/scsi/scsi.c        |  6 ++--
+ drivers/scsi/scsi_lib.c    | 38 +++++++++++++++++++++
+ drivers/scsi/scsi_scan.c   | 20 +++++++++++-
+ include/linux/blk-mq.h     |  6 ++--
+ include/scsi/scsi_device.h |  5 +--
+ include/scsi/scsi_host.h   |  3 ++
+ 9 files changed, 116 insertions(+), 34 deletions(-)
+
