@@ -1,104 +1,115 @@
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E51D2C0F9A;
-	Tue, 16 Dec 2025 15:33:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4263228A72B
+	for <linux-block@vger.kernel.org>; Tue, 16 Dec 2025 17:22:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765899225; cv=none; b=BMC/RY4TEMRkiVhy0ob4za9S6AZ5qzj/Q71HsdUWzPXKdAcjGa05O15XMVHuHgpurC8S04HfXrg4nY/24LY7w12LNE3G/bqHtYB/w2MZyejYuagzNyFvdpny2ms0oM7ht4lbSdKlPJwQNHENv/K6K7k6sGwUWqmIarVZEEXkAek=
+	t=1765905762; cv=none; b=BfTbSCHFU4RtBaunF08nGwac3LINxnPrLjZb7VfeovIjNGNGSjKkYnCnLA/WSrf/1zf+51jYDExGmXPAoYPCn4XhCkMezuOnkUTnC2LuE09RW93P2WCFHgytrDcjSpLYODXoLks7/oDgMiyy46fx5S3enTuacqtL+TAzP1SoC40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765899225; c=relaxed/simple;
-	bh=YwoMyqqb7FoPpi5NJyyaera2Ovv71yIWvzL6plb5cBY=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=IEWrNCiTaXNiuUXBMO4xeHJcJToQ/UiLyBc1P/WUPfytbI2WSPkyBC6A/aHkPSb+2ofWDJf31yjbQGzWiJRPDyJ/3Kp0SIRIstDoPdSyCpDvekJFU0EwwDTZVYeaYF2dekZfdbZTqmo4hSYWW+qig2iHgeViEZwsGnw9dQy6Njo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=iPE0VLcT; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+	s=arc-20240116; t=1765905762; c=relaxed/simple;
+	bh=UFuXGJl87VVFRtOHjho6NIFl+kVD765QpReolS459wU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=b+cWeOxapKxTryTGaH+WhwcGVzuszV4ZtatNJM2Gy2smlg3UggkpXB3LPxNGjoUhpakq1TMGY/jHuLzyBis4pr+x3SjuE+RsDgNonIt2rLyOUJmNlcz8V2u4JgVPvQ3tNDWSVoBLN9ClXeNnE/HPSUb0T+5iaOOcQCz8eCV6hGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WeJXlrfC; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="iPE0VLcT"
-Received: from ehlo.thunderbird.net (c-76-133-66-138.hsd1.ca.comcast.net [76.133.66.138])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 5BGFWClL2179001
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Tue, 16 Dec 2025 07:32:13 -0800
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 5BGFWClL2179001
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025112201; t=1765899134;
-	bh=YwoMyqqb7FoPpi5NJyyaera2Ovv71yIWvzL6plb5cBY=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=iPE0VLcTgNWTSt5Tet9JM219GeC7iYNuOcfvkIUd5nEKG/cdvOJwPNBuC1E+DFzIi
-	 SHqu/oogV01S+Vdi/eeDP9MVA/VMd+IORcg8rzelWylaDU7RwlyiRxoXkzNUdlA+49
-	 9a2JqdulmrlQrzXpJXZcHiVRWtWWYGm4vTlgsvktLtFFJNi1LESdKBVzyuTMqbcRTd
-	 bM2x846MlS7boYnZ7dfj6rnowELPFA5PBJghox2dJ8Bq8DfbpSSEai1LJie29QbzBq
-	 ekqe/HtqGC1nCUgMXLOxWd2SgknFZP/ynGzpZ0XgkulTqNVUOmsDcdrJ8/SaabjQy9
-	 7VLOQi94US1rA==
-Date: Tue, 16 Dec 2025 07:32:09 -0800
-From: "H. Peter Anvin" <hpa@zytor.com>
-To: =?ISO-8859-1?Q?J=FCrgen_Gro=DF?= <jgross@suse.com>,
-        Ingo Molnar <mingo@kernel.org>
-CC: linux-kernel@vger.kernel.org, x86@kernel.org,
-        virtualization@lists.linux.dev, kvm@vger.kernel.org,
-        linux-hwmon@vger.kernel.org, linux-block@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ajay Kaher <ajay.kaher@broadcom.com>,
-        Alexey Makhalov <alexey.makhalov@broadcom.com>,
-        Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        xen-devel@lists.xenproject.org, Jean Delvare <jdelvare@suse.com>,
-        Guenter Roeck <linux@roeck-us.net>, Denis Efremov <efremov@linux.com>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH 0/5] x86: Cleanups around slow_down_io()
-User-Agent: K-9 Mail for Android
-In-Reply-To: <b969cff5-be11-4fd3-8356-95185ea5de4c@suse.com>
-References: <20251126162018.5676-1-jgross@suse.com> <aT5vtaefuHwLVsqy@gmail.com> <bff8626d-161e-4470-9cbd-7bbda6852ec3@suse.com> <aUFjRDqbfWMsXvvS@gmail.com> <b969cff5-be11-4fd3-8356-95185ea5de4c@suse.com>
-Message-ID: <14EF14B1-8889-4037-8E7B-C8446299B1E9@zytor.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WeJXlrfC"
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-42b55ba1e62so133501f8f.2
+        for <linux-block@vger.kernel.org>; Tue, 16 Dec 2025 09:22:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765905759; x=1766510559; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=mKyLdQEGhgJbQ0rcfGz63d+VAIFpbamsmpk3rRxDquY=;
+        b=WeJXlrfCU9b2BeOuO6FhxXCKu+1LGv1gwxMq0vkr7PA15yPbD42humEPlmrCoU9ZMJ
+         ktDCCdFISzk/+pOIOP5yDHYN1DFvv+canLb/jxvmhwTNuz5aklg+YP2O8yrjJgLzyaeS
+         tO+dRAaeo+2zwiRNw1rIBXdDtNDEER5MYaNwiVr4D24/ooRkq8iqUFoBnkP2z20MJClj
+         DjHTsviPLm2bXzZ53q5GDhrHRjTg1Lk0AkD2gO7QSKdZ2boxSzlB51Nz2wbk/B9hNnLu
+         br7ZI8+KIt/CE6ZxD7r7vxeFk5F7W0Pv4Zos1hlgB1EfMGidDrMe71+Ug+cMwsJRBB+T
+         Cdpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765905759; x=1766510559;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mKyLdQEGhgJbQ0rcfGz63d+VAIFpbamsmpk3rRxDquY=;
+        b=MXHVim6NQF+lXtDWxgrwnS6t0LVh6GVkrnRgTB+8wgkRekIdwzm6wWcnvxP2i9gB7G
+         akMD9JDlc1p+Tlz+0PUrxg7XTSYwOIHPvbypv5GTig84u2wHKHsEFqiliJtFFTjPKKQE
+         x9iJRfJKLo2NVGG/35BeA9BaTfjbfO+yh6Adl9Cmz4IIZiZtjj9qYI4GT29DZErFfyMt
+         KduLKhmk17X4yK/8JMrNNNv/HiolCGgpzvUAO2qiLCXkQd1sWJL8H+QOxYWao+iV4UZZ
+         qKxmJjWLUAQ5MPJwfXToqx6gGy9ndl3j5HetCpXDTfNPK9lG/vKwv8u6QnlbngwhknU0
+         YPPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXUSCJQ6pUZ9OYBEODU3cj/db0txXjlb2C9xNwTVwMDZvAFRyEzhuyFmJr2WtMTtZsKQBQkm6djiK7qPA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSQPgWxQzyJh+x5EmGKLoeFSYAiUqOABlUNMmXQUfI6Oy3KVsV
+	zy+5fNhUQTgLEg1x8mHmVIQ6gbvp5iJcdVXL3Lq73HsOryK1TnJg/R97
+X-Gm-Gg: AY/fxX6+tw9jOp/izbbp59K4LmYmCTvAJbEEobeG37VcpBCSwHWbhKZ3zpzFoR600Zw
+	X62b+Qafp7YqfhgV5/UIR2wFclcSblr+DhtIUk8WTzmpKM1rXTVA0aSMjuXHqix5D7e6qFKZDsd
+	Kh2DI6V6KdRunDh/tD2bYMuLH/u0+B8itt2rp2dxY41KreAmf6Ws9k09w6FUIDLxIxK+i3m3p0X
+	QU7aKf/UhJI0dl04HPZO9YACP66nXvJr8Y4WdHchpWb88AMTHSLigBezYDVMj9mVVbw/N6MwpsO
+	lWjCUaPtPYvtpTnFdTHjb4ZsdEwmZIF38nFbQRxQv8KkNuZ0H+Q9b0N3kBbzWhNj2JG0/k5l3G9
+	FgRhW/PU0Gq9mMkgunU8JniObpkCnuS+y0ne/itlELk2jYyxm45GUa7xO+ryqxLO46WM+al2RjK
+	tuMyEEnl3iFXXNOZGhhrQjW4r/vj1H8xED4VIbT02zWQUXs1Il6RfLSHrLctcUqfwX3roglxtuL
+	0Rwwy8=
+X-Google-Smtp-Source: AGHT+IHmQS6RGAHTr+Y/wsnGe/COASXW2A2kF5M/0v+c+2mbcCvu35+0lzvO+L74CHYn9f2xAPJB6Q==
+X-Received: by 2002:a05:600c:3146:b0:477:a450:7aa2 with SMTP id 5b1f17b1804b1-47a8f8a8e4cmr107678965e9.1.1765905759518;
+        Tue, 16 Dec 2025 09:22:39 -0800 (PST)
+Received: from thomas-precision3591.paris.inria.fr (wifi-pro-83-215.paris.inria.fr. [128.93.83.215])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-47bdc1ddf2csm231635e9.7.2025.12.16.09.22.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Dec 2025 09:22:39 -0800 (PST)
+From: Thomas Fourier <fourier.thomas@gmail.com>
+To: 
+Cc: Thomas Fourier <fourier.thomas@gmail.com>,
+	"Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+	Jack Wang <jinpu.wang@ionos.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Lutz Pogrell <lutz.pogrell@cloud.ionos.com>,
+	Md Haris Iqbal <haris.iqbal@cloud.ionos.com>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] block: rnbd-clt: Fix leaked ID in init_dev()
+Date: Tue, 16 Dec 2025 18:22:01 +0100
+Message-ID: <20251216172203.48947-2-fourier.thomas@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On December 16, 2025 5:55:54 AM PST, "J=C3=BCrgen Gro=C3=9F" <jgross@suse=
-=2Ecom> wrote:
->On 16=2E12=2E25 14:48, Ingo Molnar wrote:
->>=20
->> * J=C3=BCrgen Gro=C3=9F <jgross@suse=2Ecom> wrote:
->>=20
->>>> CPUs anymore=2E Should it cause any regressions, it's easy to bisect =
-to=2E
->>>> There's been enough changes around all these facilities that the
->>>> original timings are probably way off already, so we've just been
->>>> cargo-cult porting these to newer kernels essentially=2E
->>>=20
->>> Fine with me=2E
->>>=20
->>> Which path to removal of io_delay would you (and others) prefer?
->>>=20
->>> 1=2E Ripping it out immediately=2E
->>=20
->> I'd just rip it out immediately, and see who complains=2E :-)
->
->I figured this might be a little bit too evil=2E :-)
->
->I've just sent V2 defaulting to have no delay, so anyone hit by that
->can still fix it by applying the "io_delay" boot parameter=2E
->
->I'll do the ripping out for kernel 6=2E21 (or whatever it will be called)=
-=2E
->
->
->Juergen
+If kstrdup() fails in init_dev(), then the newly allocated ID is lost.
 
-Ok, I'm going to veto ripping it out from the real-mode init code, because=
- I actually know why it is there :) =2E=2E=2E and that code is pre-UEFI leg=
-acy these days anyway=2E
+Fixes: 64e8a6ece1a5 ("block/rnbd-clt: Dynamically alloc buffer for pathname & blk_symlink_name")
+Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
+---
+ drivers/block/rnbd/rnbd-clt.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Other places=2E=2E=2E I don't care :)
+diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
+index f1409e54010a..d33698eb428d 100644
+--- a/drivers/block/rnbd/rnbd-clt.c
++++ b/drivers/block/rnbd/rnbd-clt.c
+@@ -1434,7 +1434,7 @@ static struct rnbd_clt_dev *init_dev(struct rnbd_clt_session *sess,
+ 	dev->pathname = kstrdup(pathname, GFP_KERNEL);
+ 	if (!dev->pathname) {
+ 		ret = -ENOMEM;
+-		goto out_queues;
++		goto out_ida;
+ 	}
+ 
+ 	dev->clt_device_id	= ret;
+@@ -1453,6 +1453,8 @@ static struct rnbd_clt_dev *init_dev(struct rnbd_clt_session *sess,
+ 
+ 	return dev;
+ 
++out_ida:
++	ida_free(&index_ida, ret);
+ out_queues:
+ 	kfree(dev->hw_queues);
+ out_alloc:
+-- 
+2.43.0
+
