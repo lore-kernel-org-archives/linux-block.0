@@ -1,185 +1,226 @@
-Received: from out162-62-58-216.mail.qq.com (out162-62-58-216.mail.qq.com [162.62.58.216])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5762F3A1E73;
-	Tue, 16 Dec 2025 13:57:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.216
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765893484; cv=none; b=hYn0ImHmbdGRJUTRWA9hypbkUYc/dXeNoeROS4skMcHkvTZm/s9OQInvkOEXBwKGhghEQ3smpf57QySpKVI+C1UN6w39eGlXAmIx9lXUudpYsnfjM2JTj04bxwrb7reBYazzqQypUuCNkACxJkhHEKNevsIP2DsGwggDPF8xMuM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765893484; c=relaxed/simple;
-	bh=v0gRJ/iUcaG+NjAQDBjqxyhU2MisJyjS27UBw8VmtYw=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=BokmAPOCe5MHqCYS1d4/qX46O/9Ahb66WTtijHIEyGAIJouAffBs+8wXW1QeKf9XRfHQ6BFO3i0JsvNf6hoajXVcp1i68SWAAHpPRUOd/li7ly5Y1USMH9r2T0PJz4jGC8U2uG4YAYjEYR/5UIt9uY6M7uZP0R050CcYAdmzSVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=EbsJs+3Z; arc=none smtp.client-ip=162.62.58.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9853624A058
+	for <linux-block@vger.kernel.org>; Tue, 16 Dec 2025 14:44:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.169
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765896249; cv=pass; b=psYBvSLHxtysZ8W01qn4hq50JPBfO7bpdrgtkRqZbVF1ZBUzZRmJs+1k7bM+lc2yC2y3pe8K38JQr+l6aJeAN0McoYU3fZh8DFM2y9R/CKhAst6sdDUX0AvAFPRsf+MXu8tJi65xKpmCqHoTPhEutDOr+NoLajNafeiYVa19ADY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765896249; c=relaxed/simple;
+	bh=x0AdhSYzLct9R1I+qn62qo/eNDqJHMCy3T9bnG16+yk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qagpF6uYf1Z1FmKmQXPYCkyzqB1Si3wuAiiNnB4y+f4ONgufcSu8f8lAJhwOtt5K62qETzjdan2mvcxAngJEKz3sjCehvsXOjaqOkgk7GouIdXASaZcj1Dpyh4+KZ/3y6t/5FgFIQvjTQZJGDTES/pbJVF7tqjFpJxSTMnCQu4c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ofzzBd3L; arc=pass smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="EbsJs+3Z"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1765893474; bh=iXRrlaHLTWoP05X1daQo0hZEfeEwAupxcEuPUUwBHLw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=EbsJs+3ZoFfr9lr7AkVODaWpboi7RYfxBfhwXSclB68vE9+cErzLr7hHDYF0yV48F
-	 1wCTBaKq+jytXtVVTwvkGyORAUdjowXGe0oB8111uzGb2WF521Y+ehtcjsqTdXYhiY
-	 ALSug+ey3HJM9xRXDRLor0TNXQxDuk/i1+9KyKcc=
-Received: from lxu-ped-host.. ([111.201.7.117])
-	by newxmesmtplogicsvrszb51-1.qq.com (NewEsmtp) with SMTP
-	id E73A50AF; Tue, 16 Dec 2025 21:57:51 +0800
-X-QQ-mid: xmsmtpt1765893471twc5zwyl8
-Message-ID: <tencent_48DDBA00BB1033889E551BDE4B721B042508@qq.com>
-X-QQ-XMAILINFO: ODukwAJJE14znYh97sEsMeLf2aaOGGvmrn9g4Q1/VvW+aczWl0WSo7QIcoXLoT
-	 bHLhGYQ+8Q48ULFs4I6hk7o70NErDuuwjaGjEexyufP/9UOBTkE8eIq1E8UozR9e13VaxFNn9HNy
-	 z7qcAoyj281e+QZsiounnur7FIQWYdzsAy+M66ukaZPDMFbuAapYvaAZcqGZPjvvjUkyKaBo8I5J
-	 17atyTCeUUJQ5SDhS9jy4/W4c7oDxbJbvkT4NJD7BY9P3XS2Pz48v5ZahHAbVm2y36C0OdfQG7Cj
-	 CaG4WYllIm/wqJo5TJxwYaKFYEItx513EcVekjFhc1Yj1WAb7w4DNw6RmruL52gtNicNRHmLRORW
-	 FJUaF/kdrBtwBxuHVqL+m7PIRfjOZTGFb7IpRkZV9HR9cVhKeTVd/xxwCl3OJWClNaNBmV3N96Oj
-	 c/7gXmmwEo4V6UyGY01e04Nf7kw2ubROia6+zDIydJPbnlqVmUKyCci9KCp8bAIgUFzIZ6F3uPvj
-	 feSxXTGV3no79A/O7lv4B+IdS64KD5uIA8oh2f2C8IodeSvkFif7w8cby5TqlP1131C8bOX3iD6/
-	 U8gaA6yIQiIjhYdnCxQ5RVBQp0jMCKnFPQ4Nxvb4HsJxG/kjcNGOQsi57QmGLceQ28OIZqnMoiKI
-	 XKiid9VBpZLUcmVNIdmXpjHh5sMKP0o0z079hsaaVg0SPxknXdvXv0mbuaAAMsHZrtrk+a9koRHp
-	 UYYm676ScyqT1fs7utDcWdZd7qnA/4fCMqsDRycoGX+jz0bLZEOQ0T7Kk6Z1VfYsyniLL9IbIuG1
-	 OuJcp9wuW56B3vRjyHrnI1B9BoZwXD6f1wgyE5A/su8aftmdHa8IjUCeBsYwSWsBk2dl3rpejOvN
-	 VZ0mS8hOfma31hAojgiMY5YjLoeFavWtJ1cEs61voDknohZM4M8DKtbYiFEnsrm8E0ctlxfJLe6O
-	 6+kkBO+0QEt1mW5e7aIDurnW0s79oVO09TYUJLxYysUZeh6dfue3wcEkCE5uFnFRxKnw4QGzwql6
-	 hLxvBHiCmOl1TqQtBMs0OpA/F/xC4=
-X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
-From: Edward Adam Davis <eadavis@qq.com>
-To: syzbot+ci1f1a4e9c887bc6ea@syzkaller.appspotmail.com
-Cc: axboe@kernel.dk,
-	eadavis@qq.com,
-	jfs-discussion@lists.sourceforge.net,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	shaggy@kernel.org,
-	syzbot@lists.linux.dev,
-	syzbot@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: [PATCH v2] jfs: Extend the done of the window period
-Date: Tue, 16 Dec 2025 21:57:51 +0800
-X-OQ-MSGID: <20251216135750.31446-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <69415e37.050a0220.1ff09b.001d.GAE@google.com>
-References: <69415e37.050a0220.1ff09b.001d.GAE@google.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ofzzBd3L"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2a0d06cfa93so123205ad.1
+        for <linux-block@vger.kernel.org>; Tue, 16 Dec 2025 06:44:06 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1765896246; cv=none;
+        d=google.com; s=arc-20240605;
+        b=kZwpuwisHIdIqa1BcnxOjbOYO93xA6xL28jzJd5BoHbXjH9KRUfkvcWM1pPvX3HszH
+         0vOTKe/h3By2ZQASJbh5bqIX10z4HnieXS0ochdM/f2klGO0bjHeWxRUUpysGBwFgUhl
+         xmX+77JKv5Op6qsijHPk7B3Wi7WsVZMHxTAePQ4lMsHU6wS8X+LOxxc5JSAldLM7YZIY
+         5N2RY75aTCsNluri4kJasRxRRIoieW7E8BYmBw6SfseWKReRMDx33EeB735qchuTjAnb
+         qnNrcdIFtnmlk+mCw3PhYSXeoSi7/8HqffOm+toABVJH8y0qx0HY4Y5tg6NuV36LPyDz
+         HpNA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=KAmi/53GD4BVHhy6hIhjJyr/xMy23CdsxEuUrYlt9C4=;
+        fh=Gko4a/DaAvNfKhXwrWCI5lTzvbuhZUeIQJO25C/hhGM=;
+        b=dybV1gvtqGos5tLcpLAfD6mTAJpnx7zIrzqamioR6CIRbIe8bQR6I2BDrVe0Ii1vqm
+         HF6gcnuUfg8vm7/xuhT2knBMH2B8QTTteoPFPfc1tgmSzpdq1314Wyuxiu/PQz9fiDVF
+         yejphmcxFsjhxZm8amQKBjJNCu2j/nB7XAdzIDd1MD3UOfAe7SuoFsLqGQ3xKMrvYg9t
+         0eeCmqncsKfryM5qieAx2fzdCFsvtvwEUwD4YDhvjJ52NSnb7qt8t/2Xi+guPSygCqJA
+         H6yNIVT3BghnELOF/TvPgqndxs467JlCLNi81DGgJh5ap77NBBvZivoQ8RcyVwxhEv7D
+         vAFw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1765896246; x=1766501046; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KAmi/53GD4BVHhy6hIhjJyr/xMy23CdsxEuUrYlt9C4=;
+        b=ofzzBd3LTCQpkRVUW1pmtWLSenR302+UTtMbGyrA3WUJBXszElkSfnJM61O9ciQWtq
+         Xm32XUYWhb4+YGEmEfN9+IVVvQ4xcqguSVXzuuPqYiPOxznFl18vggmaILlQiFEfzPEL
+         d0P0/u4vProPXaw8X/omtDeHqnPXJjyLh1AUs+olz9OKQJt7N4Q2ls/trHVWWXjHla4i
+         Jj0UH80clkzaGmL8bQe+dXuRgHA3qgEI8j2Gb88C6NWBghNlyF33CAK1IRF0+226WIB3
+         Y3bSOR0OBFKiPJTcHRUGMvf0bz1ZEpmfdGp4bBq/24/eUDPHLOypQC/kAwq5ttsVTpeC
+         GzFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765896246; x=1766501046;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=KAmi/53GD4BVHhy6hIhjJyr/xMy23CdsxEuUrYlt9C4=;
+        b=khNPZsMqQ1xG84uSzTzWrFNZNnGpMbTePd1Pyk2eZClMiLu2xpvQ5a3ggseerin8EV
+         Wc5IDpkJP1Ww+I+HML1ipf0iT84OO7XuTQ0KonEHIl9YT9JAjcUsuzyDSWvk2uwWHWq7
+         BXViMPJc4KMn1Mvb/ZMB7tVo4xaRhjs51ubw/zyS+2B8aHY0hnrn8mQtDrEEbArl9UYq
+         hl/97IvMe47zYe//ry4NeFr70zcPFtd17Y23PyCy2x+k2UsIZ/NsJU9v7ZSanXNyiSvU
+         zPqKKL8dfqD3Df7YY6retjtl2rHsy70usMMgPcJXon9iGxtVEtAKmzlYWuvsyFPWom5k
+         MTIg==
+X-Forwarded-Encrypted: i=1; AJvYcCXMo15SlGsAWMIO4lNdahnpeyBspi+6NlJRpKcXZWzvexmJpvPFkuM+ATa6ZOtqM7AfbSzejBoLLAKwEg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyPM9P/VhrNjVcLOO6iaEquR8gwN97RMzu2cAhO+/Hg8ouU6cnj
+	4ePQIiigde7+YgCLhWq+6/0d5KkPh/fSB8hoYw8RAskej9cHtjbY53JxTUWa9ql4egryU/dm5Oj
+	Skmj2fIC84e8pHluGk1HoONXKafXyORCf22TZ4m6h
+X-Gm-Gg: AY/fxX6DvJTP5b1z7/wZ5aB0hZA8te3wA6Xxu27n/I0Gy9R55xN5PdcUsE4i3bZw2FJ
+	6TDdN4TlK6RLhNujlFtmRKpJDyakhJRLt/FVsgIVnpUYTY4QG8zWBB9jqZqOW1OeyG7tCAMzqkJ
+	jWcCgmJUnQbYhW74gblk9HcaXiOfuS8l9u1i/yXES55p7USaz83ogMd187MemKrZZlaYDqeBZBj
+	U7DFEE0FPvWCL9vP1EyXzUgXB/uJoRr+Sx+e8swbBCe3Ssb/RByfMPy+PmhskqgO+CTMicc665I
+	4So26bq38s9s2mgQYefqyGnbBu4J4ePhy8Cc9txgmn++LLA6lF18dLU=
+X-Google-Smtp-Source: AGHT+IEiK8lrjUxMAkdhPuZBDUC8WfG1CK6GP/FrJkLfqWEXiBqNJySSdrcdekRlORQEPtUvpXfHdKBF+4spMZWn6is=
+X-Received: by 2002:a17:903:4b2f:b0:297:f0aa:d466 with SMTP id
+ d9443c01a7336-2a13e0e3be4mr1282645ad.8.1765896245495; Tue, 16 Dec 2025
+ 06:44:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20251216062223.647520-1-senozhatsky@chromium.org>
+In-Reply-To: <20251216062223.647520-1-senozhatsky@chromium.org>
+From: Brian Geffon <bgeffon@google.com>
+Date: Tue, 16 Dec 2025 09:43:29 -0500
+X-Gm-Features: AQt7F2q7zRmUgCShM6gfRxNMMZTahWG7X3HrXL8-Yqad8hiy4OHSH28MaqpZh5Q
+Message-ID: <CADyq12yidNfeoRtUONM9VkdXpzZVbKy2+VYSJJpGqZtd7BqD2Q@mail.gmail.com>
+Subject: Re: [PATCH] zram: drop pp_in_progress
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Minchan Kim <minchan@kernel.org>, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, linux-block@vger.kernel.org, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-In lbmRead(), the I/O event waited for by wait_event() finishes before
-it goes to sleep, and the lbmIODone() prematurely sets the flag to
-lbmDONE, thus ending the wait. This causes wait_event() to return before
-lbmREAD is cleared (because lbmDONE was set first), the premature return
-of wait_event() leads to the release of lbuf before lbmIODone() returns,
-thus triggering the use-after-free vulnerability reported in [1].
+On Tue, Dec 16, 2025 at 1:22=E2=80=AFAM Sergey Senozhatsky
+<senozhatsky@chromium.org> wrote:
+>
+> pp_in_progress makes sure that only one post-processing
+> (writeback or recomrpession) is active at any given time.
+> Functionality wise it, basically, shadows zram init_lock,
+> when init_lock is acquired in writer mode.
+>
+> Switch recompress_store() and writeback_store() to take
+> zram init_lock in writer mode, like all store() sysfs
+> handlers should do, so that we can drop pp_in_progress.
+> Recompression and writeback can be somewhat slow, so
+> holding init_lock in writer mode can block zram attrs
+> reads, but in reality the only zram attrs reads that
+> take place are mm_stat reads, and usually it's the same
+> process that reads mm_stat and does recompression or
+> writeback.
+>
+> Suggested-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
 
-Moving the operation of setting the lbmDONE flag to after clearing lbmREAD
-in lbmIODone() avoids the use-after-free vulnerability reported in [1].
+Reviewed-by: Brian Geffon <bgeffon@google.com>
 
-[1]
-BUG: KASAN: slab-use-after-free in rt_spin_lock+0x88/0x3e0 kernel/locking/spinlock_rt.c:56
-Call Trace:
- blk_update_request+0x57e/0xe60 block/blk-mq.c:1007
- blk_mq_end_request+0x3e/0x70 block/blk-mq.c:1169
- blk_complete_reqs block/blk-mq.c:1244 [inline]
- blk_done_softirq+0x10a/0x160 block/blk-mq.c:1249
-
-Allocated by task 6101:
- lbmLogInit fs/jfs/jfs_logmgr.c:1821 [inline]
- lmLogInit+0x3d0/0x19e0 fs/jfs/jfs_logmgr.c:1269
- open_inline_log fs/jfs/jfs_logmgr.c:1175 [inline]
- lmLogOpen+0x4e1/0xfa0 fs/jfs/jfs_logmgr.c:1069
- jfs_mount_rw+0xe9/0x670 fs/jfs/jfs_mount.c:257
- jfs_fill_super+0x754/0xd80 fs/jfs/super.c:532
-
-Freed by task 6101:
- kfree+0x1bd/0x900 mm/slub.c:6876
- lbmLogShutdown fs/jfs/jfs_logmgr.c:1864 [inline]
- lmLogInit+0x1137/0x19e0 fs/jfs/jfs_logmgr.c:1415
- open_inline_log fs/jfs/jfs_logmgr.c:1175 [inline]
- lmLogOpen+0x4e1/0xfa0 fs/jfs/jfs_logmgr.c:1069
- jfs_mount_rw+0xe9/0x670 fs/jfs/jfs_mount.c:257
- jfs_fill_super+0x754/0xd80 fs/jfs/super.c:532
-
-Reported-by: syzbot+1d38eedcb25a3b5686a7@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=1d38eedcb25a3b5686a7
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
----
-v1 -> v2: fix potential deadlock
-
- fs/jfs/jfs_logmgr.c | 18 +++++++-----------
- 1 file changed, 7 insertions(+), 11 deletions(-)
-
-diff --git a/fs/jfs/jfs_logmgr.c b/fs/jfs/jfs_logmgr.c
-index b343c5ea1159..0db4bc9f2d6c 100644
---- a/fs/jfs/jfs_logmgr.c
-+++ b/fs/jfs/jfs_logmgr.c
-@@ -2180,8 +2180,6 @@ static void lbmIODone(struct bio *bio)
- 
- 	LCACHE_LOCK(flags);		/* disable+lock */
- 
--	bp->l_flag |= lbmDONE;
--
- 	if (bio->bi_status) {
- 		bp->l_flag |= lbmERROR;
- 
-@@ -2196,12 +2194,10 @@ static void lbmIODone(struct bio *bio)
- 	if (bp->l_flag & lbmREAD) {
- 		bp->l_flag &= ~lbmREAD;
- 
--		LCACHE_UNLOCK(flags);	/* unlock+enable */
--
- 		/* wakeup I/O initiator */
- 		LCACHE_WAKEUP(&bp->l_ioevent);
- 
--		return;
-+		goto out;
- 	}
- 
- 	/*
-@@ -2225,8 +2221,7 @@ static void lbmIODone(struct bio *bio)
- 
- 	if (bp->l_flag & lbmDIRECT) {
- 		LCACHE_WAKEUP(&bp->l_ioevent);
--		LCACHE_UNLOCK(flags);
--		return;
-+		goto out;
- 	}
- 
- 	tail = log->wqueue;
-@@ -2278,8 +2273,6 @@ static void lbmIODone(struct bio *bio)
- 	 * leave buffer for i/o initiator to dispose
- 	 */
- 	if (bp->l_flag & lbmSYNC) {
--		LCACHE_UNLOCK(flags);	/* unlock+enable */
--
- 		/* wakeup I/O initiator */
- 		LCACHE_WAKEUP(&bp->l_ioevent);
- 	}
-@@ -2290,6 +2283,7 @@ static void lbmIODone(struct bio *bio)
- 	else if (bp->l_flag & lbmGC) {
- 		LCACHE_UNLOCK(flags);
- 		lmPostGC(bp);
-+		LCACHE_LOCK(flags);		/* disable+lock */
- 	}
- 
- 	/*
-@@ -2302,9 +2296,11 @@ static void lbmIODone(struct bio *bio)
- 		assert(bp->l_flag & lbmRELEASE);
- 		assert(bp->l_flag & lbmFREE);
- 		lbmfree(bp);
--
--		LCACHE_UNLOCK(flags);	/* unlock+enable */
- 	}
-+
-+out:
-+	bp->l_flag |= lbmDONE;
-+	LCACHE_UNLOCK(flags);
- }
- 
- int jfsIOWait(void *arg)
--- 
-2.43.0
-
+> ---
+>  drivers/block/zram/zram_drv.c | 28 ++++++----------------------
+>  drivers/block/zram/zram_drv.h |  1 -
+>  2 files changed, 6 insertions(+), 23 deletions(-)
+>
+> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.=
+c
+> index 634848f45e9b..47826d8ed376 100644
+> --- a/drivers/block/zram/zram_drv.c
+> +++ b/drivers/block/zram/zram_drv.c
+> @@ -1264,24 +1264,16 @@ static ssize_t writeback_store(struct device *dev=
+,
+>         ssize_t ret =3D len;
+>         int err, mode =3D 0;
+>
+> -       guard(rwsem_read)(&zram->init_lock);
+> +       guard(rwsem_write)(&zram->init_lock);
+>         if (!init_done(zram))
+>                 return -EINVAL;
+>
+> -       /* Do not permit concurrent post-processing actions. */
+> -       if (atomic_xchg(&zram->pp_in_progress, 1))
+> -               return -EAGAIN;
+> -
+> -       if (!zram->backing_dev) {
+> -               ret =3D -ENODEV;
+> -               goto out;
+> -       }
+> +       if (!zram->backing_dev)
+> +               return -ENODEV;
+>
+>         pp_ctl =3D init_pp_ctl();
+> -       if (!pp_ctl) {
+> -               ret =3D -ENOMEM;
+> -               goto out;
+> -       }
+> +       if (!pp_ctl)
+> +               return -ENOMEM;
+>
+>         wb_ctl =3D init_wb_ctl(zram);
+>         if (!wb_ctl) {
+> @@ -1358,7 +1350,6 @@ static ssize_t writeback_store(struct device *dev,
+>  out:
+>         release_pp_ctl(zram, pp_ctl);
+>         release_wb_ctl(wb_ctl);
+> -       atomic_set(&zram->pp_in_progress, 0);
+>
+>         return ret;
+>  }
+> @@ -2622,14 +2613,10 @@ static ssize_t recompress_store(struct device *de=
+v,
+>         if (threshold >=3D huge_class_size)
+>                 return -EINVAL;
+>
+> -       guard(rwsem_read)(&zram->init_lock);
+> +       guard(rwsem_write)(&zram->init_lock);
+>         if (!init_done(zram))
+>                 return -EINVAL;
+>
+> -       /* Do not permit concurrent post-processing actions. */
+> -       if (atomic_xchg(&zram->pp_in_progress, 1))
+> -               return -EAGAIN;
+> -
+>         if (algo) {
+>                 bool found =3D false;
+>
+> @@ -2700,7 +2687,6 @@ static ssize_t recompress_store(struct device *dev,
+>         if (page)
+>                 __free_page(page);
+>         release_pp_ctl(zram, ctl);
+> -       atomic_set(&zram->pp_in_progress, 0);
+>         return ret;
+>  }
+>  #endif
+> @@ -2891,7 +2877,6 @@ static void zram_reset_device(struct zram *zram)
+>         zram->disksize =3D 0;
+>         zram_destroy_comps(zram);
+>         memset(&zram->stats, 0, sizeof(zram->stats));
+> -       atomic_set(&zram->pp_in_progress, 0);
+>         reset_bdev(zram);
+>
+>         comp_algorithm_set(zram, ZRAM_PRIMARY_COMP, default_compressor);
+> @@ -3127,7 +3112,6 @@ static int zram_add(void)
+>         zram->disk->fops =3D &zram_devops;
+>         zram->disk->private_data =3D zram;
+>         snprintf(zram->disk->disk_name, 16, "zram%d", device_id);
+> -       atomic_set(&zram->pp_in_progress, 0);
+>         zram_comp_params_reset(zram);
+>         comp_algorithm_set(zram, ZRAM_PRIMARY_COMP, default_compressor);
+>
+> diff --git a/drivers/block/zram/zram_drv.h b/drivers/block/zram/zram_drv.=
+h
+> index 48d6861c6647..469a3dab44ad 100644
+> --- a/drivers/block/zram/zram_drv.h
+> +++ b/drivers/block/zram/zram_drv.h
+> @@ -143,6 +143,5 @@ struct zram {
+>  #ifdef CONFIG_ZRAM_MEMORY_TRACKING
+>         struct dentry *debugfs_dir;
+>  #endif
+> -       atomic_t pp_in_progress;
+>  };
+>  #endif
+> --
+> 2.52.0.239.gd5f0c6e74e-goog
+>
