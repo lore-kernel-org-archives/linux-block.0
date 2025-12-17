@@ -1,142 +1,136 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 936162D23B6
-	for <linux-block@vger.kernel.org>; Wed, 17 Dec 2025 09:25:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A718A342524
+	for <linux-block@vger.kernel.org>; Wed, 17 Dec 2025 09:37:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765963543; cv=none; b=UXRCOVXNjliFZecxNAePWpRfWri+YDFTkI65tsyCM+3Bmsk+zr/51uNM/1BsI5yYLKuoMFWMpv33k5BQoyZ7g0t8zjJEJwXX+KKfXVQyxuvqh2TWtAekhjwOl1NP2gq6will+TxNoiSyN+6bxbm/twe0gySwvl18CObNdIhMMa4=
+	t=1765964230; cv=none; b=oNpQh564LDX7lKLJKWp8/gJc+Au91qpUf/v1PmJOU4WIcMF6pyTYHx2aAv1YCqegS9rjxpB1jYadSBbRgTyhR0BPxPK3Jc3mDA8aNY3PTjbwGQmu44jixGtZ4r88hzXACwDeCW9tkaIovc+8HGvYphnuc3oLNqRpnGr63ET2Qxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765963543; c=relaxed/simple;
-	bh=1TlE7wICcKAVwJVoiaOG9Pf5Pz0UeTCykL4mx2B6xMk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E13trrEJ/LpYKk/MNCPfhhJwv1l+Q6Q4rROhln0tjLP+TPwnA1WiniiIUecpxivOkGuiHNtgEE8NFS4eUltl46oIZdjexs2go/GB7KEhuIfmAn3hbATvgieSZDcOzZqifr5Mz1ICulCCwu5qzEzBIccYqdd3z0C5beE7iDgfRO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KG3U+zJ/; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1765964230; c=relaxed/simple;
+	bh=ADLWZB7heMvI8C75+SC62FWj4QS0Sqtg+MDBZq15gwU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bUP2RrD7gGx1NZ3UqTQYZ/Otww+2tYDkbE4/hSccdsjenPmkEDLnbWAt4c15opBQMuiL2LUQyaq1nd3SfLNvcL3PBV72fRHkVbf1oQ/k39/ho4Vbql3wkgDQAKnSSv4i6NUkt+F5JoXpjha79lQhep/CX5T46U+BK/PBCiWWb4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SBJNXi3A; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KG3U+zJ/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765963539;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9+IIVDxiKz/50m0vVWWRYbFCYRcBWOsOhE15R2xWMM4=;
-	b=KG3U+zJ/o2WAtyiSsay7pcpT8EUxEVZL7/+c35fZYd+5GxRe8pYoXPa1qEWKDAiRp4eGbV
-	I5CzJh/0nUTtbg/WYuRcMfaQaF0XU3aT9qb2pswiEd7Z02sEeZA4tfx8jnggQYsaQu0oGH
-	curaEKmpLBh40WeQgi63E7kp9G87u/0=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-444-eBcWCrIfO-Gu8LVgoupy-w-1; Wed,
- 17 Dec 2025 04:25:35 -0500
-X-MC-Unique: eBcWCrIfO-Gu8LVgoupy-w-1
-X-Mimecast-MFC-AGG-ID: eBcWCrIfO-Gu8LVgoupy-w_1765963533
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CC8581956050;
-	Wed, 17 Dec 2025 09:25:33 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.190])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A3E3419560B4;
-	Wed, 17 Dec 2025 09:25:29 +0000 (UTC)
-Date: Wed, 17 Dec 2025 17:25:23 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: huang-jl <huang-jl@deepseek.com>
-Cc: csander@purestorage.com, axboe@kernel.dk, io-uring@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] io_uring: fix nr_segs calculation in io_import_kbuf
-Message-ID: <aUJ3A7Ec7EVAI3FB@fedora>
-References: <CADUfDZo4Kbkodz3w-BRsSOEwTGeEQeb-yppmMNY5-ipG33B2qg@mail.gmail.com>
- <20251217062632.113983-1-huang-jl@deepseek.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SBJNXi3A"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4779c9109ceso5251245e9.1
+        for <linux-block@vger.kernel.org>; Wed, 17 Dec 2025 01:37:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765964226; x=1766569026; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z1GOk404zfyFe5sUCnK+WQVcDYCJq/p7/vBWn+8ExHM=;
+        b=SBJNXi3ASWHbgGJylnJ3AEY9CcismYr44Ta4PWdOrVv4dx9FKjg7/4ouhOp57R49aD
+         d90BZicsaFq/W8qwLLz6U1byxcgytYtYVVrKwdUOl7Ifh9h2IHavoeIEkOYbaSbSsRbz
+         zFOzb9EqpL2oiACatE/8lB5bfPq9egtHHKCxLEXOrNTqihxlK+gtzVSK/4gGVjrDmOA/
+         +l9gEp7L+kH+kUiqk4up6TLLDuqWVMoF0J7ptppNcBe/Si4PYakaBQ52k56BNDR0pEla
+         ZrYqYRjNHqLUdppjvuxhBIDqk6OZXyaepJgV76RGe3et4H8gp7zeFD3Q8GCuT9ynTvn8
+         vMIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765964226; x=1766569026;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Z1GOk404zfyFe5sUCnK+WQVcDYCJq/p7/vBWn+8ExHM=;
+        b=iynvf9YimkjFlLzE/u3rFPkdKOGciEgMftB+phR1apVtuf66FFu76c7r4hp/uThaq4
+         GveFV3SKFBcypiYVJ7uiDk9AlUkbk2R0pwdWiBbPk/JHv0MP6uzqLVyo5g8bFDDzCUD7
+         YrkTnaYym4FUlJDHn91Iaqz/h6OpGpnB2THg8P6Daaa+XIHJXAE9Daedoei0p6MCejlK
+         I7a6pXYV2h6npnhS+vDLKAm09hLu/FVpm10WLEMcHTQ4Sbxszne5GU4Vuz+Nnli37HFx
+         rkaGKEbCroryURr5DJgQyDyKpf6xEJJo5RtqmRUJy61H21ESaED47cH+Vklyl7s61KFq
+         IpHg==
+X-Forwarded-Encrypted: i=1; AJvYcCXmEFR9gt8f9WFKSV5qutBIptnR1mFDaJoOKQ2HggjLj//LYfD7hDP9TbmyeCQsTsMzqX39Hw9+agMq8w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwYR8V2UUB/FMYOwuHuT/ZWmhKHZ18s/Xygg/bA/d1ft2fiqnhi
+	PeVyG8g2Fq2xm8zQzLFNpLxqPOkcrNh07LilaEDG7LviPDZvCMBr56Sp
+X-Gm-Gg: AY/fxX5lu/0VFVOXcN7qWi0LigFNAWND5NvPh9H3nTDiMivE4BlSWjsnZj+omuivrm2
+	Ptkmp8wGL/93NLDbDgIlj9TDJ8k8dxvyiAOgA/7qy2VGcOEPb+LYRuvJANkGQxNfy89yH8AGVJk
+	P4D/FpUTs+Ck1deNwLloeKlMygnN0O5V0WcatDf8t9dvVIj9zW0KeKsa3V0x42hbEhqehUpShAA
+	kYOVdOqySqF0mlyjxz5pWndgA3LB667Nv7kDw8Un+U04eiaGMxQTDO15y3oS20lSjW5rxZWh7h/
+	85ZZNWbgU6Vw9jNVr7stPBiekAi95vdCKPSUzz6tzaHHArLNABR5l8GrMRcQ26nevXyu1RENkl/
+	1r7fhik16t9M+7Dhf+LoZyWwsJZzQQ/hAXmCLA0PfuWztiX61Qu5V2Z5UZHa3p4wXThPTM1uhqk
+	dLwRMjVWtYD6ymmQrA8KMc7JhakgviIwvM044o0VKRXh0oLVQBcnJw3yDtkktDp5wkSbQgQtOPY
+	PTnniA=
+X-Google-Smtp-Source: AGHT+IHgamaBo+e2Pgz14lTDAZNfZl8uQyf8niiu2ktv7qlyAEpoAjbF5VQVzy++0hTE9iQhnltqOg==
+X-Received: by 2002:a05:600c:8b62:b0:471:1387:377e with SMTP id 5b1f17b1804b1-47a8f90f781mr120237745e9.6.1765964225630;
+        Wed, 17 Dec 2025 01:37:05 -0800 (PST)
+Received: from thomas-precision3591.paris.inria.fr (wifi-pro-83-215.paris.inria.fr. [128.93.83.215])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-47bdc1c2076sm29854865e9.3.2025.12.17.01.37.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Dec 2025 01:37:05 -0800 (PST)
+From: Thomas Fourier <fourier.thomas@gmail.com>
+To: 
+Cc: Thomas Fourier <fourier.thomas@gmail.com>,
+	"Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+	Jack Wang <jinpu.wang@ionos.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Md Haris Iqbal <haris.iqbal@cloud.ionos.com>,
+	Lutz Pogrell <lutz.pogrell@cloud.ionos.com>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] block: rnbd-clt: Fix leaked ID in init_dev()
+Date: Wed, 17 Dec 2025 10:36:48 +0100
+Message-ID: <20251217093648.15938-2-fourier.thomas@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251217062632.113983-1-huang-jl@deepseek.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Transfer-Encoding: 8bit
 
-On Wed, Dec 17, 2025 at 02:26:32PM +0800, huang-jl wrote:
-> io_import_kbuf() calculates nr_segs incorrectly when iov_offset is
-> non-zero after iov_iter_advance(). It doesn't account for the partial
-> consumption of the first bvec.
-> 
-> The problem comes when meet the following conditions:
-> 1. Use UBLK_F_AUTO_BUF_REG feature of ublk.
-> 2. The kernel will help to register the buffer, into the io uring.
-> 3. Later, the ublk server try to send IO request using the registered
->    buffer in the io uring, to read/write to fuse-based filesystem, with
-> O_DIRECT.
-> 
-> From a userspace perspective, the ublk server thread is blocked in the
-> kernel, and will see "soft lockup" in the kernel dmesg.
-> 
-> When ublk registers a buffer with mixed-size bvecs like [4K]*6 + [12K]
-> and a request partially consumes a bvec, the next request's nr_segs
-> calculation uses bvec->bv_len instead of (bv_len - iov_offset).
-> 
-> This causes fuse_get_user_pages() to loop forever because nr_segs
-> indicates fewer pages than actually needed.
-> 
-> Specifically, the infinite loop happens at:
-> fuse_get_user_pages()
->   -> iov_iter_extract_pages()
->     -> iov_iter_extract_bvec_pages()
-> Since the nr_segs is miscalculated, the iov_iter_extract_bvec_pages
-> returns when finding that i->nr_segs is zero. Then
-> iov_iter_extract_pages returns zero. However, fuse_get_user_pages does
-> still not get enough data/pages, causing infinite loop.
-> 
-> Example:
->   - Bvecs: [4K, 4K, 4K, 4K, 4K, 4K, 12K, ...]
->   - Request 1: 32K at offset 0, uses 6*4K + 8K of the 12K bvec
->   - Request 2: 32K at offset 32K
->     - iov_offset = 8K (8K already consumed from 12K bvec)
->     - Bug: calculates using 12K, not (12K - 8K) = 4K
->     - Result: nr_segs too small, infinite loop in fuse_get_user_pages.
-> 
-> Fix by accounting for iov_offset when calculating the first segment's
-> available length.
-> 
-> Fixes: b419bed4f0a6 ("io_uring/rsrc: ensure segments counts are correct on kbuf buffers")
-> Signed-off-by: huang-jl <huang-jl@deepseek.com>
-> ---
->  v2: Optimize the logic to handle the iov_offset and add Fixes tag.
-> 
->  > Please add a Fixes tag
->  
->  Thanks for your notice, this is my first time to send patch to linux. I
->  have add the Fixes tag, but not sure if I am doing it correctly.
-> 
->  > Would a simpler fix be just to add a len += iter->iov_offset before the loop?
->  
->  Great suggestion! I have tried it, and also fix the bug correctly.
-> 
->  io_uring/rsrc.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/io_uring/rsrc.c b/io_uring/rsrc.c
-> index a63474b331bf..41c89f5c616d 100644
-> --- a/io_uring/rsrc.c
-> +++ b/io_uring/rsrc.c
-> @@ -1059,6 +1059,7 @@ static int io_import_kbuf(int ddir, struct iov_iter *iter,
->  	if (count < imu->len) {
->  		const struct bio_vec *bvec = iter->bvec;
->  
-> +		len += iter->iov_offset;
->  		while (len > bvec->bv_len) {
->  			len -= bvec->bv_len;
->  			bvec++;
+If kstrdup() fails in init_dev(), then the newly allocated ID is lost.
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Fixes: 64e8a6ece1a5 ("block/rnbd-clt: Dynamically alloc buffer for pathname & blk_symlink_name")
+Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
+---
+v1->v2:
+  - store id in dev directly
 
+ drivers/block/rnbd/rnbd-clt.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
-
-Thanks,
-Ming
+diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
+index f1409e54010a..d1c354636315 100644
+--- a/drivers/block/rnbd/rnbd-clt.c
++++ b/drivers/block/rnbd/rnbd-clt.c
+@@ -1423,9 +1423,11 @@ static struct rnbd_clt_dev *init_dev(struct rnbd_clt_session *sess,
+ 		goto out_alloc;
+ 	}
+ 
+-	ret = ida_alloc_max(&index_ida, (1 << (MINORBITS - RNBD_PART_BITS)) - 1,
+-			    GFP_KERNEL);
+-	if (ret < 0) {
++	dev->clt_device_id = ida_alloc_max(&index_ida,
++					   (1 << (MINORBITS - RNBD_PART_BITS)) - 1,
++					   GFP_KERNEL);
++	if (dev->clt_device_id < 0) {
++		ret = dev->clt_device_id;
+ 		pr_err("Failed to initialize device '%s' from session %s, allocating idr failed, err: %d\n",
+ 		       pathname, sess->sessname, ret);
+ 		goto out_queues;
+@@ -1434,10 +1436,9 @@ static struct rnbd_clt_dev *init_dev(struct rnbd_clt_session *sess,
+ 	dev->pathname = kstrdup(pathname, GFP_KERNEL);
+ 	if (!dev->pathname) {
+ 		ret = -ENOMEM;
+-		goto out_queues;
++		goto out_ida;
+ 	}
+ 
+-	dev->clt_device_id	= ret;
+ 	dev->sess		= sess;
+ 	dev->access_mode	= access_mode;
+ 	dev->nr_poll_queues	= nr_poll_queues;
+@@ -1453,6 +1454,8 @@ static struct rnbd_clt_dev *init_dev(struct rnbd_clt_session *sess,
+ 
+ 	return dev;
+ 
++out_ida:
++	ida_free(&index_ida, dev->clt_device_id);
+ out_queues:
+ 	kfree(dev->hw_queues);
+ out_alloc:
+-- 
+2.43.0
 
