@@ -1,79 +1,81 @@
-Received: from mail-wr1-f66.google.com (mail-wr1-f66.google.com [209.85.221.66])
+Received: from mail-qv1-f67.google.com (mail-qv1-f67.google.com [209.85.219.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AFCE2C1786
-	for <linux-block@vger.kernel.org>; Wed, 17 Dec 2025 19:34:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77CE02EF646
+	for <linux-block@vger.kernel.org>; Wed, 17 Dec 2025 19:59:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766000088; cv=none; b=YXxjGVAryg2xDIshufOtv/XNoT+BnZ2Xj+mVA+ZZS14c8NSsyJf/o00zX2SWQed8ZoWL4bWtJaAEVbLnD1y+2HjH8YAIHPlen+DME7DB4k7FRDXJd2ySUddWc8l5mo551eG5W7vbrOrK9ZnS/P8MnjWloXoi/JVJWDx7ALqHLB4=
+	t=1766001566; cv=none; b=oYEr5XCb/y1tgmMGt4g5A10pxoY+mZ5e3lMuEOGeKKvXvgfVGSeQNAtywJ13ugQdSbz3TBcSN7rnsm9Lxv3mw1gDfHTFjyWcljyDxEN1Y8877F4L6T5raiyY8qcgl+zBf2XoeeWcE5kX3pJdvQi+redU6iTYlmmKEWeRMHQioMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766000088; c=relaxed/simple;
-	bh=pW5XY+qz4bHWcxpu7dF3nTUnwroHaZVnAaaN4lQnnSU=;
+	s=arc-20240116; t=1766001566; c=relaxed/simple;
+	bh=V+ryZgpse65jdzL7I3bov4UY3kdKSBHonGILf/gWTI8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M4fi6CBJYD5GIHMexbvdH7GeudTGeDT6DJe/0rDgzM5sF0zIxCak4gtSxHMbJQCsCGGaz7jyqgPstETYDHCbaFoaIsMU9sGNWxfdLnAKUlzsfb0uII2Z1MRM5VxvdGiuIYdRfOu0zhHt6hRRtWD4la4i70d7mzFB8ztHoxuHrI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=KNuJpRVq; arc=none smtp.client-ip=209.85.221.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=A+/7lDx+Pt3EmXSsuJv1LmJpw6G9KrYlZaZUKb0QRDLxxhmbVm7ak102dUwBtee/Ck9o4jfPRcl5q+NFmTUgl8wqtVjyBgLdEdqD3WoZ+oZ1u77bgNptSvF/KQ+3IXeWi2BqYW0c1xxYu8UpjBvA8FGLZ4xQbE1fl45j3mHHjLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cmpxchg.org; spf=pass smtp.mailfrom=cmpxchg.org; dkim=pass (2048-bit key) header.d=cmpxchg.org header.i=@cmpxchg.org header.b=ul4cBGQs; arc=none smtp.client-ip=209.85.219.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cmpxchg.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cmpxchg.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="KNuJpRVq"
-Received: by mail-wr1-f66.google.com with SMTP id ffacd0b85a97d-42fbc3056afso2940351f8f.2
-        for <linux-block@vger.kernel.org>; Wed, 17 Dec 2025 11:34:45 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=cmpxchg.org header.i=@cmpxchg.org header.b="ul4cBGQs"
+Received: by mail-qv1-f67.google.com with SMTP id 6a1803df08f44-88a367a1dbbso52123356d6.0
+        for <linux-block@vger.kernel.org>; Wed, 17 Dec 2025 11:59:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1766000084; x=1766604884; darn=vger.kernel.org;
+        d=cmpxchg.org; s=google; t=1766001562; x=1766606362; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=h5Dox/IjhxlL5l7CCk2qZ8fasiOHF/NJHXR/kudrHvQ=;
-        b=KNuJpRVqaybGsDZPiPBK5js9Xvey+xSXHdC/UG5/hL77yDj4cJp5iTGjw6MGDW7rYz
-         UA2Jtmbtrq5JycAebSgffVN5tTTr/yYTIoUvdwOGOJskAKnSTIPSZgHIHrZq580WVhD3
-         Q/WTbdudy5zojxgMq0K3BndrchYFrrI1DddHnoM34/ejV78wY694jDQac19aGNQDGmRs
-         0gAl9ciQirgeNTfHIRE4e5WD0b2SRQzehzwQB1tXTTw7YSNnse0rcxsBPCVJHEdIuo2Z
-         RLj/RMt8oZYN6pnPR0ZJQc1sIvm6e+3lkJ+5MdMdl0EikLtpHSLKR58jNXLRPfmIKV+2
-         YxIg==
+        bh=umJwQRcOcv6tN8KQ+xKY+ct7qymfOOSndzlF6qrQs+M=;
+        b=ul4cBGQstaGS7tdthuKYGL3gMPgmPggsCaJsgF8WFAYeqAgtwvJ8ek17C3wJMeP08U
+         FDeZ3wd12ijYej7nQMq6w8RUPt3n9ZPp1RQiIP+FYOmgwFvBnVKAGI2icuKq4ou136T8
+         /kHRJO+U/Ao3MqJojitE0Oe+7l7ISe+f/V8HVtWgd7FoQyLJhmyYAfaIx8efXX/RNFLS
+         XTRlc20MiR6nbXgflMbRSLNDXLC3y7bH4GErvdg5E5Gi/XJI4qDmBvjWfaSH82dpmfXE
+         XpwmNjWIBiYwpwhCS3YVcBEwCc79zOodOrQgzllZTkr+CXmDyNF3t37pKw6XF01BRKaI
+         iKfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766000084; x=1766604884;
+        d=1e100.net; s=20230601; t=1766001562; x=1766606362;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=h5Dox/IjhxlL5l7CCk2qZ8fasiOHF/NJHXR/kudrHvQ=;
-        b=UK61rRrYJHdUTKOd1Wb77YjgPlAqjGw6mCa4N6ThZX06buoiWT/zgSNRYLBM4fpCMR
-         m+g0NIGQLzftISJcoj7uvZ4gHX/DIApjbN2FPtl1sRJxP2dieV4zZAkmfjd5xdGyu3Yc
-         VxciqN9LvI5viODaPTEySJrAVIxIxT44bab8FTAUQwlwtMCDbHxD3epHYr6vzTO0S35F
-         Ode7pJvayyXOsB0hmA51E/J2qeDxi3uJ1lb6kSvynHbBqG+Y0v4d3UErYSQ1899rX8ld
-         xAFy9kxbaKn+lrIJ6XKJG1ets2bRcbfTdnlueBgSiDDPJDlRn5Xt8SOVYrhj6LZxrAHW
-         J71w==
-X-Forwarded-Encrypted: i=1; AJvYcCXB+2AbMREZws4OscJAW97nr9mz2VjYhdZAVKG8yea+KDbeChFG1GBxqqdYkZVrVmG5lIKBh621hL3fXg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzmiG6qSPJpa5fQQfLSiLVdFTrA2OMBAnnTN0nZ/XpBfOoWr5Xg
-	kONHTLc3zbbAPJXy5mATG8AThf1FZUiUnt7Twbaz8GcUGDXtrENGTKznYkXSNoMgXw0=
-X-Gm-Gg: AY/fxX6zfDpVHEilOuMCGSe2ttBX3TTClBGYL1sWGulljk1S7UN/6w5IKeyiZ7Vu3Uo
-	Q1tPshv/pWDR2F0zMuWtCLd1BOf2SmH7LMwbrQKntzHH48EY9gq28/P207+DJu3cvcCHyxUMSAV
-	ciHuv9gHL0Gsrqv8HMjGHhekv/WWCCD5HdvQ3g/2/s34sP/jfq4wo8a6Zmw5U7vgIKYqYLAZaBZ
-	8CAYR5Clbq2p4kK9O59cPuJ185g0XtI7Jzpi44e6ZskKPMsScebO7yjqY+zmn8Mgcw+sAaWsXxm
-	nHKwfKfDtoKthnVGuVHu8oyNk2phkgfkmKdS1TszQPWirTwH2lxaVclhSUOUqpmJuiMnlAK2tbm
-	hhutlIrd6llxfwTNjKRh8TgeI95/aNIFDTkOiHBohxI+9+/kETkpotCvaoJINN01kJBnpeUl/F1
-	Q0cqpD7pJIhTzuqyVnzfeBh42X
-X-Google-Smtp-Source: AGHT+IGjdgNTy6ao/8/rTdokdqhsyqjO1onI/y/VT9z4i621T9Q6cGxvoTUWH6j/q9xfqIewkjNhOA==
-X-Received: by 2002:a05:6000:4287:b0:430:fdfc:7dde with SMTP id ffacd0b85a97d-430fdfc810fmr11095010f8f.36.1766000084277;
-        Wed, 17 Dec 2025 11:34:44 -0800 (PST)
-Received: from localhost (109-81-92-149.rct.o2.cz. [109.81.92.149])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432449346c9sm641020f8f.5.2025.12.17.11.34.43
+        bh=umJwQRcOcv6tN8KQ+xKY+ct7qymfOOSndzlF6qrQs+M=;
+        b=qSbLKk0sIn0Dm2v2vaZG+hFPQJaJyAYsB28YYxdapBUnuaXpmyFe+Gb6C9QCzP+O7H
+         I4L8EfFuvUevLOUNKa9rNt0MXa/j8zuY4deI7/A537ZWkoLuKhvqnzUljGXe3hSXzqBP
+         MlWegL6vm3OVAHP7cGrFBnthUZR+jezRU+X6qMvHx6gSwDFBV8Wuyw0Dv4m0MWwDifOO
+         DFNeXMix0S+uJo9J3fZzul4M+cCs1iDDV3Tp96tey9uh7dhRfQ7UqvQq2w6ITX8nx1NV
+         mQZhv4krtM4bg9vi80S/pAXezfXKxvyiYZpVDBwAD3K2akGtSWzAtlWtiygNSYXFb0HI
+         YFmw==
+X-Forwarded-Encrypted: i=1; AJvYcCUalQv9X8IgJxfCyz2lrXYf4y/4LIis6P8Yi+A2J+XXU3rfX7IFP97Li4Fld4W0+kHaw2pB6jDmcrgs6A==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy93DCiojVQZRFEGEKBjdTh3HB/Gy+ToVbDD7NtinPTsE25KMUY
+	xa7ILqLg72J4JYWzKyZJx6A1olG6fvZlGYSDOOlRydER+s4OwFe+uLmbqlsjxnhvJGTMPXIWcZ3
+	agaXwpF0=
+X-Gm-Gg: AY/fxX7FNeJh+aOuBxpoGPbKqB+QioEbn1k4dJbS1EAwIWR8oP7XP0kGXKz+gWMgK+p
+	yykq0RQnAMmZVhphkjToFjOwpWwuhoJ4yJdsDFyecJ3MSfkgpLisAoI8qIqYdUPf7bAm98u+ZPc
+	gTX1mmj9FUZP0+N6UgcXOmywMH9oWMO1BJ/RhI2YBFaiGue8YmQWC4fZv/ZsvacK+TcmlDWE4dk
+	ccYfElgd1SKy6EHqszfPtAQuehI+1yirPWSTPgKdNIw74OVl6lh/pyPVuAiggWFD96jkcuxvbVS
+	tI/RWqdyPeef99Y2RdkDoLwQc8em8JnjxNKVP+01cakgyaWlFD9EOenGT1SQW5sVCzocIXUPCIR
+	127ibMDEABZvzTtbkmzlRgvP1y+VdjH3skpT6sHjct7p1qs6A/FjTYfFbzr+gM8WzwCb5ix5NWF
+	RWme3iOgdwhfZPLfOgpxFp
+X-Google-Smtp-Source: AGHT+IGkgd14mqGKPn7evzONaa5NlqMwbBZNXipPmIuU2TNCHRjQ90/wuY54LLEAOA2jYshzbetrvA==
+X-Received: by 2002:a05:6214:5b8a:b0:87c:1ec5:8428 with SMTP id 6a1803df08f44-8887e127b6fmr309717816d6.46.1766001562229;
+        Wed, 17 Dec 2025 11:59:22 -0800 (PST)
+Received: from localhost ([2603:7000:c01:2716:929a:4aff:fe16:c778])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-88c61674467sm2152596d6.55.2025.12.17.11.59.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Dec 2025 11:34:43 -0800 (PST)
-Date: Wed, 17 Dec 2025 20:34:42 +0100
-From: Michal Hocko <mhocko@suse.com>
-To: Johannes Weiner <hannes@cmpxchg.org>
+        Wed, 17 Dec 2025 11:59:21 -0800 (PST)
+Date: Wed, 17 Dec 2025 14:59:20 -0500
+From: Johannes Weiner <hannes@cmpxchg.org>
+To: Shakeel Butt <shakeel.butt@linux.dev>
 Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
 	Deepanshu Kartikey <kartikey406@gmail.com>,
 	akpm@linux-foundation.org, linux-mm@kvack.org,
 	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
 Subject: Re: retiring laptop_mode? was Re: [PATCH] mm: vmscan: always allow
  writeback during memcg reclaim
-Message-ID: <aUMF0jVexy08S14T@tiehlicka>
+Message-ID: <aUMLmJ0En24pQBX_@cmpxchg.org>
 References: <20251213083639.364539-1-kartikey406@gmail.com>
  <20251215041200.GB905277@cmpxchg.org>
  <aT-xv1BNYabnZB_n@infradead.org>
  <20251215200838.GC905277@cmpxchg.org>
  <aUENEydFvVvxZK8r@infradead.org>
  <20251216185201.GH905277@cmpxchg.org>
+ <gweo3wdh3agfavhiky5cloweu4m2hvgzk2j2euckbka5x7n47e@ezjmx7eq7ks5>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -82,71 +84,31 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251216185201.GH905277@cmpxchg.org>
+In-Reply-To: <gweo3wdh3agfavhiky5cloweu4m2hvgzk2j2euckbka5x7n47e@ezjmx7eq7ks5>
 
-On Tue 16-12-25 13:52:01, Johannes Weiner wrote:
-> On Mon, Dec 15, 2025 at 11:41:07PM -0800, Christoph Hellwig wrote:
-> > On Mon, Dec 15, 2025 at 03:08:38PM -0500, Johannes Weiner wrote:
-> > > Debated whether to add some sort of deprecation sysctl handler, but at
-> > > least systemd-sysctl just prints a warning and still applies other
-> > > settings from the same config file.
-> > 
-> > In general dropping sysctl will break things.  So I think we'll need
-> > a stub, at which point it might as well warn for a while.
-> 
-> Fair enough, I added that.
-> 
-> Jens, that change seemed small enough that I carried your Ack, but
-> please let me know if you feel otherwise ;)
-> 
-> > > Laptop mode was introduced to save battery, by delaying and
-> > > consolidating writes and maximize the time rotating hard drives
-> > > wouldn't have to spin. Needless to say, this is a scenario of the
-> > > (in)glorious past.
-> > 
-> > Maybe expand on this a bit by mentioning that reclaim now never does
-> > file system writeback, and fs writeback is already very lumpy by
-> > design.  And of cours that hard disk with their high spinup latency
-> > and extra power draw are a thing of the past in laptops or other mobile
-> > devices.
-> 
-> Sounds good. Can you take a look at the new version below?
-> 
-> Andrew, absent any further objections, would you be able to take this
-> through the -mm tree?
-> 
-> Thanks!
-> 
-> >From 087f10b8046864f71ebc3a3f3316b097932cbded Mon Sep 17 00:00:00 2001
-> From: Johannes Weiner <hannes@cmpxchg.org>
-> Date: Mon, 15 Dec 2025 12:57:53 -0500
-> Subject: [PATCH] mm/block/fs: remove laptop_mode
-> 
-> Laptop mode was introduced to save battery, by delaying and
-> consolidating writes and thereby maximize the time rotating hard
-> drives wouldn't have to spin.
-> 
-> Luckily, rotating hard drives, with their high spin-up times and power
-> draw, are a thing of the past for battery-powered devices. Reclaim has
-> also since changed to not write single filesystem pages anymore, and
-> regular filesystem writeback is lumpy by design.
-> 
-> The juice doesn't appear worth the squeeze anymore. The footprint of
-> the feature is small, but nevertheless it's a complicating factor in
-> mm, block, filesystems. Developers don't think about it, and it likely
-> hasn't been tested with new reclaim and writeback changes in years.
-> 
-> Let's sunset it. Keep the sysctl with a deprecation warning around for
-> a few more cycles, but remove all functionality behind it.
-> 
-> Suggested-by: Christoph Hellwig <hch@infradead.org>
-> Message-ID: <aT-xv1BNYabnZB_n@infradead.org>
-> Acked-by: Jens Axboe <axboe@kernel.dk>
-> Signed-off-by: Johannes Weiner <hannes@cmpxchg.org>
+On Tue, Dec 16, 2025 at 03:23:53PM -0800, Shakeel Butt wrote:
+> On Tue, Dec 16, 2025 at 01:52:01PM -0500, Johannes Weiner wrote:
 
-Acked-by: Michal Hocko <mhocko@suse.com>
+> Reviewed-by: Shakeel Butt <shakeel.butt@linux.dev>
 
 Thanks!
--- 
-Michal Hocko
-SUSE Labs
+
+> > --- a/include/uapi/linux/sysctl.h
+> > +++ b/include/uapi/linux/sysctl.h
+> > @@ -183,7 +183,7 @@ enum
+> >  	VM_LOWMEM_RESERVE_RATIO=20,/* reservation ratio for lower memory zones */
+> >  	VM_MIN_FREE_KBYTES=21,	/* Minimum free kilobytes to maintain */
+> >  	VM_MAX_MAP_COUNT=22,	/* int: Maximum number of mmaps/address-space */
+> > -	VM_LAPTOP_MODE=23,	/* vm laptop mode */
+> > +
+> 
+> There are 8 earlier enums here with names like VM_UNUSED* along with
+> the information on what were they. Should we have something similar for
+> this one? Something like:
+> 
+> 	VM_UNUSED10=23, /* was vm laptop mode */
+
+The other enums in that file leave holes, the VM ones have a mix of
+VM_UNUSED and holes. I don't think it matters either way since the
+sysctl syscall has been removed and nothing new should be compiled
+against the definitions in this file, right?
