@@ -1,158 +1,126 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-pj1-f97.google.com (mail-pj1-f97.google.com [209.85.216.97])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 206251E1DE5
-	for <linux-block@vger.kernel.org>; Wed, 17 Dec 2025 05:33:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F2931E32D6
+	for <linux-block@vger.kernel.org>; Wed, 17 Dec 2025 05:35:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.97
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765949635; cv=none; b=sMlCc7BBsLVPn68+x+3jNVypQj6D67S4UJ1Q+neHpSoOOBRf0Mdlk9FdCAHMrDndWscT8PGhzCNRboeozC4Urf2uGZ/jgOi9OXJT/nfFs9+gbqpzHSBwIlkWD4sK2XcW8hcO44apAJwxFpHhueMQnrHNHASQMrsYwZD9Cva7S/s=
+	t=1765949715; cv=none; b=cHNU2InGHjzMgxcvv8EMSqk7lTiDlyTFsUoZ4F4Yt52NpMHARFtsGmKMLr4DV57LtO2cPzWW95di/Co+ENyn80knSRH1M33MccDZ8OFmCuaRB5ovn/ebRl+nk0Y8C7oLRkjodhXCK0fl6YxU990UMywmzwfiWyXuVndyvC7kIa0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765949635; c=relaxed/simple;
-	bh=DST+x9LPybiYdj7182pyF4xlqv6OlY0U+zBHD+N19dE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lGtQBtinrMMwZM04woHRFNVgcrVLllmPmum+1jGwnmTpa94SIz+8bZmdlW/yqH3190V+c4Dgsv9IzAJJZm2Xn8Jpy83Z70xk3sGQm6oSlG0E6szl7PGxeLJ3oyL0NRiU+u5cwhFNom1F95kfROebuPGVJU/Nrlt6WtbDcGVEMUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=XBMpvLmz; arc=none smtp.client-ip=209.85.214.176
+	s=arc-20240116; t=1765949715; c=relaxed/simple;
+	bh=xUW+aJ0AIyUBNjUOSWrr/v9kRnK+74dQ2K/T8dlAGQM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Pp2KKDB7hkJ7QHkl4QzWZmCmxQVcpao/aWkkhHdF35CzvzSD7DD4Q8/PQhXDExhzEFSMoKrt32hLlpTWhDTHX+PglX2Ma4/vXyu8PmEUwQVrJPQV/XyBjQAWOUMHCLexaEl/nCAucS6DUC1PG3QU4oCYDFB58cWPV2Stl5FzZbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=AOhkokyO; arc=none smtp.client-ip=209.85.216.97
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="XBMpvLmz"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-29f08b909aeso12046365ad.2
-        for <linux-block@vger.kernel.org>; Tue, 16 Dec 2025 21:33:51 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="AOhkokyO"
+Received: by mail-pj1-f97.google.com with SMTP id 98e67ed59e1d1-34c6f6566a7so736929a91.3
+        for <linux-block@vger.kernel.org>; Tue, 16 Dec 2025 21:35:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1765949631; x=1766554431; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=purestorage.com; s=google2022; t=1765949712; x=1766554512; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=v7LVKUBAzho21lrKwJ0H+Rmeeg7N0ADHqxWDdZWfz8o=;
-        b=XBMpvLmzc3N2ejBfS/ULEcyr+Brt3APyZXewQY8aYSS2mfB+EvTZ3CmRpThuPxb4pQ
-         aMEl9UlAoDBuEpa3hwItY8N58mlETEVC10nkbfsAgWF6hSf+HxvzV/22Fnb3PDS1MV4X
-         d3FvUhFBUD2N9GA79QtTf000xG44HmfAWCzcQ+SqDcba4AWEVn8zhi3PhIh9ucJqqlZO
-         PgvcR++DVeLLozGc9o+qNfwMTq42jjAByWDPwnuqTWWGfuVKbLWjIZ/7PNBQQPEvafE8
-         Y5RpY/JKyzBLf7mc9bi2++4MSd3w3AWoHdLi2XbJjjR67SGWB/oneKFlXTuorxSi2H+P
-         b79w==
+        bh=1W7GaZySinPtNdu/28BmiINfjaLT2swubxXUIgi/0VI=;
+        b=AOhkokyOhY9siyDVCEeIP+oj1r0bQGZMWzqEPujYTrRJnJ4dW2mtnDCwnirHJIHtyn
+         orVNLqgxOJxiraV60BhgGG8rq6fIuSo3mzP1C5js9b4mxwDZhk42SnnVapxTieKd6sEK
+         6Urp8hE7Yw8gMYgIUd9caOLXhimSFDr6pCseArUgrFfuarWSndCfG0DJlqWc3pQ8YDiO
+         DABMbI2yN4hIjzHC9pUfDULLhEiqr47sSNtWtL5Ly2nkkxq/o45Q+MYI0uLmzQrsaOUd
+         QVbPNjMYLTQpKEhvVsHTw5laGwEjyVvkzJSyCaXyk0JI9Ioxf4xtuoKUP1iozhmVBaEC
+         JC7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765949631; x=1766554431;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1765949712; x=1766554512;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=v7LVKUBAzho21lrKwJ0H+Rmeeg7N0ADHqxWDdZWfz8o=;
-        b=lH6zd1HFmdWtpD1So5S6ElE4s1nGJxJM8gusFFkhtda94KZ65ugLtc/WP+dWJTk88M
-         BNwI1Y6lt6h/p1qyF9o3eTWiIACcbyloobggiFVOJe8ZgtHEIK5DcpG8NwrM7M6h9L8g
-         7xoCntvnOyBfvOeiG9mPp74hBoqN1yxp9oCOHS67HKaHNvhMzJXSaM+A+qTu4EI60zTP
-         TtnmTLvZuQmLoSwtrB7CFDVxOwMDZQg45PQBe0QQO4PMhSP0wAdjEG+gNo1DkR/Tajkm
-         fqihb3/wY6A4yzTKg3H1caipTBbuF3KtBhdacqki4FACK2IdtvHTsXpMJQju75XvFC4p
-         ADgg==
-X-Forwarded-Encrypted: i=1; AJvYcCVe1TEM90cbFVuRGQxc7e+j0A/NYiYsL/yuwmxE8Fqh2Ot5CfkI5kZVovCL5ik6WBI98eR+mGk0EmOJow==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEMONJnk9kBWXnEQDMzoy1FqxkABH+ayi8L5Y9xA/afpZBVZbe
-	OgQDAL1UgO4A+TuoILGybmKwpjEnMxbelq+ps4OrbYZy62YLJJF0JvXKwdZkZcagHkqVq5xkPC7
-	HtSDd81Z5lT+EwxHKipiFnYjJ8VYm/Z7rLBrl6+CA+Q==
-X-Gm-Gg: AY/fxX5xei1uCfkpyNyd+fodzokpAP7tUX2Y7fHTvicNPh+Ft+5o8zDopxvOMKOzWnx
-	m7cI1p8ubrR5zVS0UEBIvqlKSDqgJ/iURCXU2eq3v+kaciH974GyOlKciIB6h7gSQQNDHh60FN9
-	CcE05QhCF8voCKcztugsDo0XTLBRvbKyKRFI02jX41CZ8LaPhXDNlYt6sVtDK2v7Jii6UHU1CpE
-	AWEIKUEJVTzO/SLBT8zcN5AZAuio7sUNT4inRUtLLPCFhCxwYgJdhe/UniTeSqgitxVr2BO
-X-Google-Smtp-Source: AGHT+IEDO2e4oqrAW3KoaZ1ukW3upIm3Qu+OPoDqt5lM/D4B9Ky5jAWYkF2CMxiGU1tI8V1rbcoBu7nC6Xhwn32RySQ=
-X-Received: by 2002:a05:7023:885:b0:11e:3e9:3e88 with SMTP id
- a92af1059eb24-11f34c51e76mr6015410c88.6.1765949631005; Tue, 16 Dec 2025
- 21:33:51 -0800 (PST)
+        bh=1W7GaZySinPtNdu/28BmiINfjaLT2swubxXUIgi/0VI=;
+        b=eU4jwSgicmLHTvlwZSmZajalrCv+2ShI75AL97wVBKbXshBIxI3rbXbNgGSpVghHbJ
+         A5iRZeTUt1CqyitbrY2ev/xBBB58Jhi7qsfJCQp2vxRnxCuF5Zz7uZLmnHqrJ+yMAZS/
+         cqOjN6/t/txrfktOzTXB2ieUrZ7Bse6RQ66qJ9WlJrCr0WJKzi46LCJ66HNp4Z0PKDdq
+         bVd9FDiol68VPzk0GvHTJyhuRQT4PutuoQQrn2xA5y+BhrcBidPCNqBOEtkAuGh5RC5t
+         Cqkp7O2oY5h50x1/7T8LmikNn1Mms40TLPsgry0d5fxkeBLb7t6ifQwAbR28tENX/ZAp
+         /5/A==
+X-Gm-Message-State: AOJu0Yy/qMX8YCBWP+nuQb6zWccCzwAAevKGnYawBfIkX6dpPwmbEkg6
+	8tcZkQWyQkU05Jx9OsipTW3Ym7KRuRBRWedCucf1KuMgPsD0/Vl//XhOKp7AeUcNTjjfS+AOWZE
+	YHKKrkmnMPvBcl92qOTdJJbTQJGXrqh5ex8PStjzUlA6I3hlQG/US
+X-Gm-Gg: AY/fxX5KbUfN0hzE/4LVsEhdaf2WBPdwLo+lLWAU49RVEjkDY0FcPMIfzN9utmOTYHB
+	9qYujExlC5f6dKFGcW+sCxkMzwRlcGHbGoOprd73qNvnnOMt01/1DIuFDqNZ/ZH4u3aC6iHY3Ho
+	dDXrt8GxEzRm5zpcGHF8c3kMFAq+5rgAq6WjcyAycCcFV0ZeRy9L1QDTnn+erx/ddqHgANTwY1D
+	0BHRBwgxfou7x/UV81krF1EirwS5tPPAXIyfvoF4QgvhXKrVmH4fAxNQIuEWtfHBY48QCqOLmVv
+	MJUITF0wiaDQIrtXnR1amoblRHSVFSeFFuCGQF0FLsB/jbr9xMJc/iwmFfM1XyJQBM4jOplZgLL
+	j6UrcyXEYLMJpyYLhtpEZAwag9j8=
+X-Google-Smtp-Source: AGHT+IGmD0xzmGqowX1/sZtnUry9Hv+YVc2UPf0PBiv6bJ1WS1oGm9qgaFTZtLXdzHr346yX/lPuywp6sUBH
+X-Received: by 2002:a17:90b:2749:b0:340:e8e4:1166 with SMTP id 98e67ed59e1d1-34abd898fa3mr11743788a91.5.1765949712251;
+        Tue, 16 Dec 2025 21:35:12 -0800 (PST)
+Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
+        by smtp-relay.gmail.com with ESMTPS id 98e67ed59e1d1-34cfce259ebsm224226a91.0.2025.12.16.21.35.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Dec 2025 21:35:12 -0800 (PST)
+X-Relaying-Domain: purestorage.com
+Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.7.70.37])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 8B8103420C0;
+	Tue, 16 Dec 2025 22:35:11 -0700 (MST)
+Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
+	id 89402E41A08; Tue, 16 Dec 2025 22:35:11 -0700 (MST)
+From: Caleb Sander Mateos <csander@purestorage.com>
+To: Ming Lei <ming.lei@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Shuah Khan <shuah@kernel.org>
+Cc: linux-block@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Stanley Zhang <stazhang@purestorage.com>,
+	Uday Shankar <ushankar@purestorage.com>,
+	Caleb Sander Mateos <csander@purestorage.com>
+Subject: [PATCH 02/20] block: validate interval_exp integrity limit
+Date: Tue, 16 Dec 2025 22:34:36 -0700
+Message-ID: <20251217053455.281509-3-csander@purestorage.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20251217053455.281509-1-csander@purestorage.com>
+References: <20251217053455.281509-1-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251217032617.162914-1-huang-jl@deepseek.com>
-In-Reply-To: <20251217032617.162914-1-huang-jl@deepseek.com>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Tue, 16 Dec 2025 21:33:39 -0800
-X-Gm-Features: AQt7F2oB4kiWmo0uN4dzTlsGChkwPe9sM_53Gw1Zzzrq0lueRxXLRiKCrhOb1Rc
-Message-ID: <CADUfDZo4Kbkodz3w-BRsSOEwTGeEQeb-yppmMNY5-ipG33B2qg@mail.gmail.com>
-Subject: Re: [PATCH 01/01] io_uring: fix nr_segs calculation in io_import_kbuf
-To: huang-jl <huang-jl@deepseek.com>
-Cc: io-uring@vger.kernel.org, axboe@kernel.dk, ming.lei@redhat.com, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Dec 16, 2025 at 8:02=E2=80=AFPM huang-jl <huang-jl@deepseek.com> wr=
-ote:
->
-> io_import_kbuf() calculates nr_segs incorrectly when iov_offset is
-> non-zero after iov_iter_advance(). It doesn't account for the partial
-> consumption of the first bvec.
->
-> The problem comes when meet the following conditions:
-> 1. Use UBLK_F_AUTO_BUF_REG feature of ublk.
-> 2. The kernel will help to register the buffer, into the io uring.
-> 3. Later, the ublk server try to send IO request using the registered
->    buffer in the io uring, to read/write to fuse-based filesystem, with
-> O_DIRECT.
->
-> From a userspace perspective, the ublk server thread is blocked in the
-> kernel, and will see "soft lockup" in the kernel dmesg.
->
-> When ublk registers a buffer with mixed-size bvecs like [4K]*6 + [12K]
-> and a request partially consumes a bvec, the next request's nr_segs
-> calculation uses bvec->bv_len instead of (bv_len - iov_offset).
->
-> This causes fuse_get_user_pages() to loop forever because nr_segs
-> indicates fewer pages than actually needed.
->
-> Specifically, the infinite loop happens at:
-> fuse_get_user_pages()
->   -> iov_iter_extract_pages()
->     -> iov_iter_extract_bvec_pages()
-> Since the nr_segs is miscalculated, the iov_iter_extract_bvec_pages
-> returns when finding that i->nr_segs is zero. Then
-> iov_iter_extract_pages returns zero. However, fuse_get_user_pages does
-> still not get enough data/pages, causing infinite loop.
->
-> Example:
->   - Bvecs: [4K, 4K, 4K, 4K, 4K, 4K, 12K, ...]
->   - Request 1: 32K at offset 0, uses 6*4K + 8K of the 12K bvec
->   - Request 2: 32K at offset 32K
->     - iov_offset =3D 8K (8K already consumed from 12K bvec)
->     - Bug: calculates using 12K, not (12K - 8K) =3D 4K
->     - Result: nr_segs too small, infinite loop in fuse_get_user_pages.
->
-> Fix by accounting for iov_offset when calculating the first segment's
-> available length.
+Various code assumes that the integrity interval is at least 1 sector
+and evenly divides the logical block size. Add these checks to
+blk_validate_integrity_limits(). This guards against block drivers that
+report invalid interval_exp values.
 
-Please add a Fixes tag
+Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+---
+ block/blk-settings.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
->
-> Signed-off-by: huang-jl <huang-jl@deepseek.com>
-> ---
->  io_uring/rsrc.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
->
-> diff --git a/io_uring/rsrc.c b/io_uring/rsrc.c
-> index a63474b33..4eca0c18c 100644
-> --- a/io_uring/rsrc.c
-> +++ b/io_uring/rsrc.c
-> @@ -1058,6 +1058,14 @@ static int io_import_kbuf(int ddir, struct iov_ite=
-r *iter,
->
->         if (count < imu->len) {
->                 const struct bio_vec *bvec =3D iter->bvec;
-> +               size_t first_seg_len =3D bvec->bv_len - iter->iov_offset;
-> +
-> +               if (len <=3D first_seg_len) {
-> +                       iter->nr_segs =3D 1;
-> +                       return 0;
-> +               }
-> +               len -=3D first_seg_len;
-> +               bvec++;
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index d138abc973bb..a9e65dc090da 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -191,12 +191,17 @@ static int blk_validate_integrity_limits(struct queue_limits *lim)
+ 			return -EINVAL;
+ 		}
+ 		break;
+ 	}
+ 
+-	if (!bi->interval_exp)
++	if (!bi->interval_exp) {
+ 		bi->interval_exp = ilog2(lim->logical_block_size);
++	} else if (bi->interval_exp < SECTOR_SHIFT ||
++		   bi->interval_exp > ilog2(lim->logical_block_size)) {
++		pr_warn("invalid interval_exp %u\n", bi->interval_exp);
++		return -EINVAL;
++	}
+ 
+ 	/*
+ 	 * The PI generation / validation helpers do not expect intervals to
+ 	 * straddle multiple bio_vecs.  Enforce alignment so that those are
+ 	 * never generated, and that each buffer is aligned as expected.
+-- 
+2.45.2
 
-Would a simpler fix be just to add a len +=3D iter->iov_offset before the l=
-oop?
-
-Best,
-Caleb
-
->
->                 while (len > bvec->bv_len) {
->                         len -=3D bvec->bv_len;
-> --
-> 2.43.0
->
->
