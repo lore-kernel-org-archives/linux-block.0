@@ -1,30 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5B7C33A9EA;
-	Wed, 17 Dec 2025 09:41:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83F1933893E;
+	Wed, 17 Dec 2025 09:41:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765964496; cv=none; b=Q3i9bsDU8d4GrFy2s1IqSgCNBeSMfTyY8aZPdpreooJMTr9i3UcnMKbV0ZaN9ReoXEG2s6ajgclIYQZdfNX+hykE4/H1UKSMB0RtNpzi5nB2kzIpWzljzLZVWy9squJ7q9MFycxPqEZbaYDWvC3PBVBCYZ7PrNOe/6lb5JcnHVo=
+	t=1765964500; cv=none; b=HNVhroOVURER7M5PCFxnfUBELFcTILgt4zFsoLFih1JX8bEK99jf67aRIXRGUEBTjj0sMdb58Cx8FWQwofVMmUesQXmyqQzx4AAz7dbk1AChMiFztM2GnlwThu5pMSlHQ2P6/6/5ylv5PFTt41ntOLCepoeSFpIrx4ClbBtzOVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765964496; c=relaxed/simple;
-	bh=M+QyWNDQCYDgysdq/2Xe+talz7B50t/KFj/EX0L7Nhc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JI1ZT3JnINqLbFSUAnwjBNARVI/ynMaYzA6ijPasx+tIbp6n/fFwhv0fx2FVey5jsjXfVHYJJ2sivEI8o48+S9yvf5T0VfTYTw/D46lAvQUBpOKe58SLarCxuk+x2hJhffoj8Zdc2/QMK1QgayX39CvteSv9q1odY+6IADT+ExI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N60MN1O3; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1765964500; c=relaxed/simple;
+	bh=bhmUjCgORYgMLhD23jxTIthHkqK7rsSxHpOwfaP7JV0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FrL4zMaucUrN9PGaARRvrlasgjeswI97xnwO6G13ysyYE7wclnTnRJU9ouZTvcI/CxE4geTQsPB5jAIFMt9ppGk1e3yxZsEiQamdpzWOLBr4aN151jE5KrBfmaDE5l179yJEcZ9x/+V/VStjyo6p+Te35dOkghCR7xPw1iG518M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bFDtizeV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N60MN1O3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F098FC19421;
-	Wed, 17 Dec 2025 09:41:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bFDtizeV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44055C4CEFB;
+	Wed, 17 Dec 2025 09:41:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765964495;
-	bh=M+QyWNDQCYDgysdq/2Xe+talz7B50t/KFj/EX0L7Nhc=;
-	h=From:To:Cc:Subject:Date:From;
-	b=N60MN1O3LP9MiL8GqhOOwgZbdaRovZ9/LTt/6jc1gVS4WRJ6n9/jP0Zugme6EpBhY
-	 kFebNSVGojNIxXIgUK0EFzthiKRQg8/rSz6rGqZHZfvs+NctaNa+O7Uw3E3cwZT+ov
-	 eWs5lAdhe4NNghoLl8Az5yB/yFXgxcZJom41OidjHPy2gDRKZvWCq124zG3i4DuWv1
-	 +0PZkGs2FTGYocq2JxNi1U0z/EiIsDAyM8f2YBQq0kidiK+gARcsz0CwYq/M3xc84I
-	 TLUMhKjIOVcbVsISHssayHhmQBktiyKraWs+6n/4eNB5F7sSXt9FJJREavKT4/Zw2T
-	 sq9SAmMQG6cLQ==
+	s=k20201202; t=1765964499;
+	bh=bhmUjCgORYgMLhD23jxTIthHkqK7rsSxHpOwfaP7JV0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=bFDtizeVSbnSht7m+d06svueBoFPM0X0UQfEp/6oNW+CjVu5JBy7pAFEP6SjnSN9X
+	 QmuwxSWlvF1MIskAkqrhBGRxLP5rBwK0U8FglsU/3/dE6+pfca2kahS1WgGfK9IPW6
+	 BSGcjZ3+pLxrs8glq5JF/MisVi4LMa+cqebG8WgoeDGbbvhF3+fu+O8zkIoaiLUtke
+	 zCJ/9Ii/AmLy45XsGbyVL9VbNdh1yVpV/HdkbztsSwtKNNOHIeZpYCkDDA6/tI0IUC
+	 8YeAC3XzIoDTbQwq6CWk7Ow+E3v2mHihE7yrkDhzyTRyGl8Jsmhr9kGzfHE4RP1aE6
+	 /a7hjqy64Gb2w==
 From: Leon Romanovsky <leon@kernel.org>
 To: Jens Axboe <axboe@kernel.dk>,
 	Keith Busch <kbusch@kernel.org>,
@@ -34,10 +35,12 @@ Cc: linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-nvme@lists.infradead.org,
 	Chaitanya Kulkarni <kch@nvidia.com>
-Subject: [PATCH v3 0/2] block: Generalize physical entry definition
-Date: Wed, 17 Dec 2025 11:41:22 +0200
-Message-ID: <20251217-nvme-phys-types-v3-0-f27fd1608f48@nvidia.com>
+Subject: [PATCH v3 1/2] nvme-pci: Use size_t for length fields to handle larger sizes
+Date: Wed, 17 Dec 2025 11:41:23 +0200
+Message-ID: <20251217-nvme-phys-types-v3-1-f27fd1608f48@nvidia.com>
 X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20251217-nvme-phys-types-v3-0-f27fd1608f48@nvidia.com>
+References: <20251217-nvme-phys-types-v3-0-f27fd1608f48@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -45,73 +48,90 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-X-Change-ID: 20251217-nvme-phys-types-5bf34e42b2df
 X-Mailer: b4 0.15-dev-a6db3
 Content-Transfer-Encoding: 8bit
 
-Jens,
+From: Leon Romanovsky <leonro@nvidia.com>
 
-I would like to ask you to put these patches on some shared branch based
-on v6.19-rcX tag, so I will be able to reuse this general type in VFIO
-and DMABUF code.
+This patch changes the length variables from unsigned int to size_t.
+Using size_t ensures that we can handle larger sizes, as size_t is
+always equal to or larger than the previously used u32 type.
 
---------------------------------------------------------------------------------
-Changelog:
-v3:
- * Rebased on top v6.19-rc1
- * Added note that memory size is not changed despite change in the
-   variable type.
-v2: https://lore.kernel.org/linux-nvme/20251117-nvme-phys-types-v2-0-c75a60a2c468@nvidia.com/
- * Added Chaitanya's Reviewed-by tags.
- * Removed explicit casting from size_t to unsigned int.
-v1: https://patch.msgid.link/20251115-nvme-phys-types-v1-0-c0f2e5e9163d@kernel.org
+Originally, u32 was used because blk-mq-dma code evolved from
+scatter-gather implementation, which uses unsigned int to describe length.
+This change will also allow us to reuse the existing struct phys_vec in places
+that don't need scatter-gather.
 
---------------------------------------------------------------------------------
-The block layer code is declared "struct phys_vec" entry which describes
-contiguous chunk of physical memory. That definition is useful for all
-possible users of DMA physical address-based API.
-
-This series changes NVMe code to support larger chunks of memory by changing
-length field from u32 to be size_t, which will be u64 on 64-bits platforms,
-and promotes "struct phys_vec" to general place.
-
-This change doesn't change memory footprint because on 32-bits systems,
-size_t will be u32 as before and on 64bits system previous uint32_t
-variable was padded to be uint64_t anyway.
-
-Thanks
-
+Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
 ---
-Leon Romanovsky (2):
-      nvme-pci: Use size_t for length fields to handle larger sizes
-      types: move phys_vec definition to common header
+ block/blk-mq-dma.c      | 8 ++++++--
+ drivers/nvme/host/pci.c | 4 ++--
+ 2 files changed, 8 insertions(+), 4 deletions(-)
 
- block/blk-mq-dma.c      | 11 +++++------
- drivers/nvme/host/pci.c |  4 ++--
- include/linux/types.h   |  5 +++++
- 3 files changed, 12 insertions(+), 8 deletions(-)
----
-base-commit: 5674abb82e2b74205a6a5cd1ffd79a3ba48a469d
-change-id: 20251030-nvme-phys-types-988893249454
+diff --git a/block/blk-mq-dma.c b/block/blk-mq-dma.c
+index fb018fffffdc..a2bedc8f8666 100644
+--- a/block/blk-mq-dma.c
++++ b/block/blk-mq-dma.c
+@@ -8,7 +8,7 @@
+ 
+ struct phys_vec {
+ 	phys_addr_t	paddr;
+-	u32		len;
++	size_t		len;
+ };
+ 
+ static bool __blk_map_iter_next(struct blk_map_iter *iter)
+@@ -112,8 +112,8 @@ static bool blk_rq_dma_map_iova(struct request *req, struct device *dma_dev,
+ 		struct phys_vec *vec)
+ {
+ 	enum dma_data_direction dir = rq_dma_dir(req);
+-	unsigned int mapped = 0;
+ 	unsigned int attrs = 0;
++	size_t mapped = 0;
+ 	int error;
+ 
+ 	iter->addr = state->addr;
+@@ -297,6 +297,8 @@ int __blk_rq_map_sg(struct request *rq, struct scatterlist *sglist,
+ 	blk_rq_map_iter_init(rq, &iter);
+ 	while (blk_map_iter_next(rq, &iter, &vec)) {
+ 		*last_sg = blk_next_sg(last_sg, sglist);
++
++		WARN_ON_ONCE(overflows_type(vec.len, unsigned int));
+ 		sg_set_page(*last_sg, phys_to_page(vec.paddr), vec.len,
+ 				offset_in_page(vec.paddr));
+ 		nsegs++;
+@@ -417,6 +419,8 @@ int blk_rq_map_integrity_sg(struct request *rq, struct scatterlist *sglist)
+ 
+ 	while (blk_map_iter_next(rq, &iter, &vec)) {
+ 		sg = blk_next_sg(&sg, sglist);
++
++		WARN_ON_ONCE(overflows_type(vec.len, unsigned int));
+ 		sg_set_page(sg, phys_to_page(vec.paddr), vec.len,
+ 				offset_in_page(vec.paddr));
+ 		segments++;
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 0e4caeab739c..3b528369f545 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -290,14 +290,14 @@ struct nvme_iod {
+ 	u8 flags;
+ 	u8 nr_descriptors;
+ 
+-	unsigned int total_len;
++	size_t total_len;
+ 	struct dma_iova_state dma_state;
+ 	void *descriptors[NVME_MAX_NR_DESCRIPTORS];
+ 	struct nvme_dma_vec *dma_vecs;
+ 	unsigned int nr_dma_vecs;
+ 
+ 	dma_addr_t meta_dma;
+-	unsigned int meta_total_len;
++	size_t meta_total_len;
+ 	struct dma_iova_state meta_dma_state;
+ 	struct nvme_sgl_desc *meta_descriptor;
+ };
 
-Best regards,
---
-Leon Romanovsky <leonro@nvidia.com>
-
----
-Leon Romanovsky (2):
-      nvme-pci: Use size_t for length fields to handle larger sizes
-      types: move phys_vec definition to common header
-
- block/blk-mq-dma.c      | 11 +++++------
- drivers/nvme/host/pci.c |  4 ++--
- include/linux/types.h   |  5 +++++
- 3 files changed, 12 insertions(+), 8 deletions(-)
----
-base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
-change-id: 20251217-nvme-phys-types-5bf34e42b2df
-
-Best regards,
---  
-Leon Romanovsky <leonro@nvidia.com>
+-- 
+2.51.1
 
