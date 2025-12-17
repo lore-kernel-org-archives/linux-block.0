@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83F1933893E;
-	Wed, 17 Dec 2025 09:41:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B9DC2BEFFB;
+	Wed, 17 Dec 2025 09:41:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765964500; cv=none; b=HNVhroOVURER7M5PCFxnfUBELFcTILgt4zFsoLFih1JX8bEK99jf67aRIXRGUEBTjj0sMdb58Cx8FWQwofVMmUesQXmyqQzx4AAz7dbk1AChMiFztM2GnlwThu5pMSlHQ2P6/6/5ylv5PFTt41ntOLCepoeSFpIrx4ClbBtzOVY=
+	t=1765964505; cv=none; b=jPPbYPHmegdJ2AgvzWH7bFcFBmsi2lu5B6XUL/i01MjICkmI+5b/BCHbyt/74m0qALauiK1RR7V02M47LOfgEARRh8oN/4Z6Apjda9K3KJN2cnrUBYvQoXt/o1BE2uTIFHlEb7wXegi7U29cYWGzkkZERllbuUmzNT/EcP2k3G8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765964500; c=relaxed/simple;
-	bh=bhmUjCgORYgMLhD23jxTIthHkqK7rsSxHpOwfaP7JV0=;
+	s=arc-20240116; t=1765964505; c=relaxed/simple;
+	bh=b/Jh6xjZVFYW/BZ/jwrPDpIcfQ2LNGIe6zTiBVWKzZA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FrL4zMaucUrN9PGaARRvrlasgjeswI97xnwO6G13ysyYE7wclnTnRJU9ouZTvcI/CxE4geTQsPB5jAIFMt9ppGk1e3yxZsEiQamdpzWOLBr4aN151jE5KrBfmaDE5l179yJEcZ9x/+V/VStjyo6p+Te35dOkghCR7xPw1iG518M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bFDtizeV; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=DAb3sWQ8ysBJNqLOegGDiF690fTqcaHHNi0JwBDldbrbZONmxoqYCk+wP1iPKF1l0+E2Hjtsdx/lInd0MNLHTmiunJzUzkJJuCsZYUZ5coVYizlHGZbntkUEaMpKRD0CwflndCKfM4fbBnWD9Lyvuc8lA2nYYLAu5ClNq+HvsIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MtazOCT9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bFDtizeV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44055C4CEFB;
-	Wed, 17 Dec 2025 09:41:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MtazOCT9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F01BDC4CEF5;
+	Wed, 17 Dec 2025 09:41:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765964499;
-	bh=bhmUjCgORYgMLhD23jxTIthHkqK7rsSxHpOwfaP7JV0=;
+	s=k20201202; t=1765964504;
+	bh=b/Jh6xjZVFYW/BZ/jwrPDpIcfQ2LNGIe6zTiBVWKzZA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bFDtizeVSbnSht7m+d06svueBoFPM0X0UQfEp/6oNW+CjVu5JBy7pAFEP6SjnSN9X
-	 QmuwxSWlvF1MIskAkqrhBGRxLP5rBwK0U8FglsU/3/dE6+pfca2kahS1WgGfK9IPW6
-	 BSGcjZ3+pLxrs8glq5JF/MisVi4LMa+cqebG8WgoeDGbbvhF3+fu+O8zkIoaiLUtke
-	 zCJ/9Ii/AmLy45XsGbyVL9VbNdh1yVpV/HdkbztsSwtKNNOHIeZpYCkDDA6/tI0IUC
-	 8YeAC3XzIoDTbQwq6CWk7Ow+E3v2mHihE7yrkDhzyTRyGl8Jsmhr9kGzfHE4RP1aE6
-	 /a7hjqy64Gb2w==
+	b=MtazOCT9Qnl2xJPI5agV4eVL6iRrG+kqSMaMtyvq0gYmgG8Zo/TfBGJUoi0vCi43Y
+	 9YkvLyujwckc0uJxn5MVbUj/+8rUCRT5NTe+Swi1rRg1ZfdAeyi7RJ4oC/ehSKX6RK
+	 dfXfUq9PfTxwb3AINQ0RYfaiY6+G2lxaI23k+Y4uO42sz5PfTPaTwF9adTr9keCdXb
+	 p6nYRkc6apnSdWBNG9M+J9HmCNPaxpoFeRUlsseOd/jeTWBztvOdA5kJi2z1ZQkgr7
+	 3RxypPG28DnhVwjQLHjaeaJh2qgXWtj2xHjJfIYHDtrs/hR3YIGjYSSjMpvClRcjfo
+	 PPFgP1FS35Nwg==
 From: Leon Romanovsky <leon@kernel.org>
 To: Jens Axboe <axboe@kernel.dk>,
 	Keith Busch <kbusch@kernel.org>,
@@ -35,9 +35,9 @@ Cc: linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-nvme@lists.infradead.org,
 	Chaitanya Kulkarni <kch@nvidia.com>
-Subject: [PATCH v3 1/2] nvme-pci: Use size_t for length fields to handle larger sizes
-Date: Wed, 17 Dec 2025 11:41:23 +0200
-Message-ID: <20251217-nvme-phys-types-v3-1-f27fd1608f48@nvidia.com>
+Subject: [PATCH v3 2/2] types: move phys_vec definition to common header
+Date: Wed, 17 Dec 2025 11:41:24 +0200
+Message-ID: <20251217-nvme-phys-types-v3-2-f27fd1608f48@nvidia.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20251217-nvme-phys-types-v3-0-f27fd1608f48@nvidia.com>
 References: <20251217-nvme-phys-types-v3-0-f27fd1608f48@nvidia.com>
@@ -53,84 +53,57 @@ Content-Transfer-Encoding: 8bit
 
 From: Leon Romanovsky <leonro@nvidia.com>
 
-This patch changes the length variables from unsigned int to size_t.
-Using size_t ensures that we can handle larger sizes, as size_t is
-always equal to or larger than the previously used u32 type.
+Move the struct phys_vec definition from block/blk-mq-dma.c to
+include/linux/types.h to make it available for use across the kernel.
 
-Originally, u32 was used because blk-mq-dma code evolved from
-scatter-gather implementation, which uses unsigned int to describe length.
-This change will also allow us to reuse the existing struct phys_vec in places
-that don't need scatter-gather.
+The phys_vec structure represents a physical address range with a
+length, which is used by the new physical address-based DMA mapping
+API. This structure is already used by the block layer and will be
+needed for DMA phys API users.
+
+Moving this definition to types.h provides a centralized location
+for this common data structure and eliminates code duplication
+across subsystems that need to work with physical address ranges.
 
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
 ---
- block/blk-mq-dma.c      | 8 ++++++--
- drivers/nvme/host/pci.c | 4 ++--
- 2 files changed, 8 insertions(+), 4 deletions(-)
+ block/blk-mq-dma.c    | 5 -----
+ include/linux/types.h | 5 +++++
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/block/blk-mq-dma.c b/block/blk-mq-dma.c
-index fb018fffffdc..a2bedc8f8666 100644
+index a2bedc8f8666..752060d7261c 100644
 --- a/block/blk-mq-dma.c
 +++ b/block/blk-mq-dma.c
-@@ -8,7 +8,7 @@
+@@ -6,11 +6,6 @@
+ #include <linux/blk-mq-dma.h>
+ #include "blk.h"
  
- struct phys_vec {
- 	phys_addr_t	paddr;
--	u32		len;
-+	size_t		len;
- };
- 
+-struct phys_vec {
+-	phys_addr_t	paddr;
+-	size_t		len;
+-};
+-
  static bool __blk_map_iter_next(struct blk_map_iter *iter)
-@@ -112,8 +112,8 @@ static bool blk_rq_dma_map_iova(struct request *req, struct device *dma_dev,
- 		struct phys_vec *vec)
  {
- 	enum dma_data_direction dir = rq_dma_dir(req);
--	unsigned int mapped = 0;
- 	unsigned int attrs = 0;
-+	size_t mapped = 0;
- 	int error;
+ 	if (iter->iter.bi_size)
+diff --git a/include/linux/types.h b/include/linux/types.h
+index d4437e9c452c..d673747eda8a 100644
+--- a/include/linux/types.h
++++ b/include/linux/types.h
+@@ -171,6 +171,11 @@ typedef u64 phys_addr_t;
+ typedef u32 phys_addr_t;
+ #endif
  
- 	iter->addr = state->addr;
-@@ -297,6 +297,8 @@ int __blk_rq_map_sg(struct request *rq, struct scatterlist *sglist,
- 	blk_rq_map_iter_init(rq, &iter);
- 	while (blk_map_iter_next(rq, &iter, &vec)) {
- 		*last_sg = blk_next_sg(last_sg, sglist);
++struct phys_vec {
++	phys_addr_t	paddr;
++	size_t		len;
++};
 +
-+		WARN_ON_ONCE(overflows_type(vec.len, unsigned int));
- 		sg_set_page(*last_sg, phys_to_page(vec.paddr), vec.len,
- 				offset_in_page(vec.paddr));
- 		nsegs++;
-@@ -417,6 +419,8 @@ int blk_rq_map_integrity_sg(struct request *rq, struct scatterlist *sglist)
+ typedef phys_addr_t resource_size_t;
  
- 	while (blk_map_iter_next(rq, &iter, &vec)) {
- 		sg = blk_next_sg(&sg, sglist);
-+
-+		WARN_ON_ONCE(overflows_type(vec.len, unsigned int));
- 		sg_set_page(sg, phys_to_page(vec.paddr), vec.len,
- 				offset_in_page(vec.paddr));
- 		segments++;
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 0e4caeab739c..3b528369f545 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -290,14 +290,14 @@ struct nvme_iod {
- 	u8 flags;
- 	u8 nr_descriptors;
- 
--	unsigned int total_len;
-+	size_t total_len;
- 	struct dma_iova_state dma_state;
- 	void *descriptors[NVME_MAX_NR_DESCRIPTORS];
- 	struct nvme_dma_vec *dma_vecs;
- 	unsigned int nr_dma_vecs;
- 
- 	dma_addr_t meta_dma;
--	unsigned int meta_total_len;
-+	size_t meta_total_len;
- 	struct dma_iova_state meta_dma_state;
- 	struct nvme_sgl_desc *meta_descriptor;
- };
+ /*
 
 -- 
 2.51.1
