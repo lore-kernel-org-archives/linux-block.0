@@ -1,156 +1,108 @@
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7018D15539A
-	for <linux-block@vger.kernel.org>; Wed, 17 Dec 2025 01:47:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A47C17A2FA
+	for <linux-block@vger.kernel.org>; Wed, 17 Dec 2025 03:09:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765936041; cv=none; b=MEVqrjexeUMXgAkfZyGsXk//jURoQqMVhCSPNXPrSpgeK5lhYOMlU6cUqgztiseBq8emUk6A0j0HwagySIrJcRlpzrGIdw4gexlqpf2Du9uzyRsQ5PPBd0Dxn7nEOApopIIcg4liGXdIRArUdnQ0h88G9GvUkZTBoiqY6WWkvHE=
+	t=1765940971; cv=none; b=HcXhMg91SnJS5lqtyY+GNTe0uh+j6Ihn/Opz/hgYDAEcMXy67+3aI/gMnjvOkus3pfcBu5+xfod5dUZTu5ycf1/8C5BVklvUwwOyMgvoL7JnnCRpCDIcE/sylNvvmUfS6Zr+DBbJqCMXmMHgSQWis7JiThh1kELQz3q0jPiPUBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765936041; c=relaxed/simple;
-	bh=6jf/zGubgVOPjbBX+52J37PY6UVXRYaHLLG9ODYssxM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XKDcrGfYbh14dVoDdeA83niVgkALuCscRHjWQlaitTGUfBwDlQ8gBYooujuuNfZESnEabDM1sKMWTQPymI23ZnuTrCnjmTyf6idMflaT8E/+KqddfjLnWrvLp8xL2pSVCAIqZjkcpRFsWv++N1jinwObvKbmZxPjS+l+Vpaip4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VyxkSEZR; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1765940971; c=relaxed/simple;
+	bh=w7hIa6c6KUayC4lX3usTsv64WgM6BMgYRorvpkShH+Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eE2zvqCfWWWfS/gISehwABB+dgQ4g4B6AyFniR6GoLbQWQllQdMQwPeMzH5ommoeOtpviG2BC17sNaKGYUHqODAVLKpAf1aPq6xelWjaRtVk1DPvPJThxJ19qaeJRP36qUjGO3peAMcRpBzS5f73yp/g/OVbQLM0k2cmnwAWliQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R1INiYn7; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VyxkSEZR"
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2a0a33d0585so33751635ad.1
-        for <linux-block@vger.kernel.org>; Tue, 16 Dec 2025 17:47:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765936040; x=1766540840; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=IX62QACWHnPBRf5oS1mJvqi2yLF9xLlELjcpU1yBfU0=;
-        b=VyxkSEZRpLPXhqjk6oNFTLJPLvOCv885VrcPI5KAFWtZOBoZ9aizjnGSiBExz6R6+C
-         cLNaMdAVo3hK8/pn4mS4TppHtMI5USiQ1s98d+kvPy1Qapjgrwz7ww3UtvQarYf/U2Lr
-         MbFv6sDT+hcbhNG65w5XFii9onUp2I/sIN0ObqfkMovUx02sjhyhH6uPnXdIVHSzLDby
-         nGk9MvkLot2o+ueCQ1zx9KESf0rCiq7vFBOPB3P4YLVsWrHmSsZpT4cU6mAWPvxxGoog
-         3Z/WAGYtQaTUFA6/yMkhsRK5UASpKAQQCxmbF06+b7Yw2JY6pFa+QUnY9zXtOG5Vl5P8
-         nhcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765936040; x=1766540840;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IX62QACWHnPBRf5oS1mJvqi2yLF9xLlELjcpU1yBfU0=;
-        b=Wgspy4Rguhdm+4KhNgmkOIDKq3En4HR5obrG1B8MFHnsFpvdA0Xc7XWc9rX188RV2a
-         sCRpfrgCPDLJcGJbmUZ7s2vYpoHixR4CknJoOivj02JDFl+OEXGQWHV5ccB0vGy0Rirl
-         pwDh3g01j9ygK4qY848FUNWG6Qspw/WWul0cV20olZtvSpI6iEbhi/uwCZkIe9ba2NVz
-         G4EKdMkz03eqXkrghM0E/xhe+ck54MhXUzYedOdYMzmisGZv8AdU5fgMEHNopay2fUZ6
-         WAta5JWKOIsmtQK2BM0vcpRn9xieksRJ4B0aTKGq2J3/WKpp9cVZehlg1zbxzFMS98Xs
-         T1tg==
-X-Forwarded-Encrypted: i=1; AJvYcCV9+vtehpYC1iTtcUEssZon80w1blcIJ2k/BLihGzTRR9+E/ihbSaGJ2hOd8RMAsQEd3kaNeMdhOGGa0Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwiFBl3kofkBfcFLVzIkpZCRjkIv3hyUd2lSDfk51SlGjanN58S
-	N3aWhZ6pMAqsqaA6LkaYO2EWneR5myytuJyQEuJJWiqYdR94zG8R4cVl
-X-Gm-Gg: AY/fxX4LSvr+Am0zL5sIdkhkzJ8AOq4Cef/2LnNRVdsN5V1u1TMQ8hSi2WflNODHDUL
-	dBv/AmXHgYboT2nKF4q6s5i78gvmkxh+mp/hNVt0QxG+i4LP7W5E/RdqhgzG3lZBEh3BcZRpFSo
-	M0hqkQIQh57fBsDDAC0nLL21TQc1Flv7rECq9W7rIIIXkmauDnJxMbwdoHrygpbHPsZLenhgxul
-	Ek0t6Ijgj6VqyVs4mscv+NYg2T+zzKdv88ahX043UKFLjvRRDTaSd0+Dsbv6X4TwuM2yhuY111x
-	flHXvylAO86Cdy7nsBbGQWze5LXNYuNmT5mTZcksVZ10NGcrB4fE8K0mPActqQzgAK4mbyHuovv
-	oYokuQjUsQwros0ZP1LuGYSZdrLUs2OKOTiXclwtg0Ysw/ngT6VACb8fjOt1Boje42FX9vKKBaY
-	zzcaRc+pEVQK0gQp7sTMehusJkaSZJntxoKDDKirZuwo6pbHQ7mV5Pnz18H+CQb6XaAY8=
-X-Google-Smtp-Source: AGHT+IEu90ZOwnSFrLaZzTvyYxg2VfIEgcCDuK0V8/kosm5Q28k8NN8vuywHnAi2NKtzsH+ePiT6fA==
-X-Received: by 2002:a17:903:244e:b0:2a0:a09a:c31f with SMTP id d9443c01a7336-2a0a09ac828mr102502835ad.8.1765936039677;
-        Tue, 16 Dec 2025 17:47:19 -0800 (PST)
-Received: from deepanshu-kernel-hacker.. ([2405:201:682f:389d:d818:afcd:6227:33b5])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29eea0594e8sm175629965ad.87.2025.12.16.17.47.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Dec 2025 17:47:19 -0800 (PST)
-From: Deepanshu Kartikey <kartikey406@gmail.com>
-To: axboe@kernel.dk,
-	martin.petersen@oracle.com,
-	stefanha@redhat.com
-Cc: hare@suse.de,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Deepanshu Kartikey <kartikey406@gmail.com>,
-	syzbot+660d079d90f8a1baf54d@syzkaller.appspotmail.com
-Subject: [PATCH v3] block: add allocation size check in blkdev_pr_read_keys()
-Date: Wed, 17 Dec 2025 07:17:12 +0530
-Message-ID: <20251217014712.35771-1-kartikey406@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R1INiYn7"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1765940968;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/iCrAfKX9VhEAPJ3Wo+2SHLz+Hk/pZhINLq268t5w2w=;
+	b=R1INiYn7dOuIP5MN0xLszd3PNvllPFH5JqceR+tlKkU2fAh6B6WW3TcmXStLHI3bt6rqDq
+	y90SFA9oRiunQ9Qpw4KP2yxgnh8e48dC91lBZD7V9dffpHrUiYv1FE57Mrqo0qdO0bhCAc
+	ZXW3Du7n1zBAZ1jhDL7Qbm7Ygz0zN3Y=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-648-1aq8xhuoMCmhNZ59c80j7Q-1; Tue,
+ 16 Dec 2025 22:09:26 -0500
+X-MC-Unique: 1aq8xhuoMCmhNZ59c80j7Q-1
+X-Mimecast-MFC-AGG-ID: 1aq8xhuoMCmhNZ59c80j7Q_1765940965
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A13811956058;
+	Wed, 17 Dec 2025 03:09:25 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.190])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8D7DA180044F;
+	Wed, 17 Dec 2025 03:09:21 +0000 (UTC)
+Date: Wed, 17 Dec 2025 11:09:17 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Caleb Sander Mateos <csander@purestorage.com>,
+	Uday Shankar <ushankar@purestorage.com>
+Subject: Re: [PATCH V2] ublk: fix deadlock when reading partition table
+Message-ID: <aUIe3RXASOEKKc0m@fedora>
+References: <20251212143415.485359-1-ming.lei@redhat.com>
+ <8dd3c141-3e92-44f3-91e2-2bf4827b36a4@kernel.dk>
+ <aTzPUzyZ21lVOk1L@fedora>
+ <93163617-11bb-4700-aca9-940c0df7429f@kernel.dk>
+ <aUEeu9luJ9ZNvJzA@fedora>
+ <6d40e8a0-14e9-45f4-bbea-360678524767@kernel.dk>
+ <5e2038e1-efcf-4313-8a14-565b970370f2@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5e2038e1-efcf-4313-8a14-565b970370f2@kernel.dk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-blkdev_pr_read_keys() takes num_keys from userspace and uses it to
-calculate the allocation size for keys_info via struct_size(). While
-there is a check for SIZE_MAX (integer overflow), there is no upper
-bound validation on the allocation size itself.
+On Tue, Dec 16, 2025 at 10:57:25AM -0700, Jens Axboe wrote:
+> On 12/16/25 8:03 AM, Jens Axboe wrote:
+> >> The issue for ublk is actually triggered by something abnormal: submit AIO
+> >> & close(ublk disk) in client application, then fput() is called when the
+> >> submitted AIO is done, it will cause deferred fput handler to wq for any block
+> >> IO completed from irq handler.
+> > 
+> > My suggested logic is something ala this in bdev_release():
+> > 
+> > 	if (current->flags & PF_KTHREAD) {
+> > 		mutex_lock(&disk->open_mutex);
+> > 	} else {
+> > 		if (!mutex_trylock(&disk->open_mutex)) {
+> > 			deferred_put(file);
+> > 			return;
+> > 		}
+> > 	}
+> > 
+> > and that's about it.
+> 
+> I took a look at the bug report, and now it makes more sense to me -
+> this is an aio only issue, as it does fput() from ->bi_end_io() context.
+> That's pretty nasty, as you don't really know what context that might
+> be, both in terms of irq/bh state, but also in terms of locks. The
+> former fput() does work around.
+> 
+> Why isn't the fix something as simple as the below, with your comment
+> added on top? I'm not aware of anyone else that would do fput off
+> ->bi_end_io, so we migt as well treat the source of the issue rather
+> than work around it in ublk. THAT makes a lot more sense to me.
 
-A malicious or buggy userspace can pass a large num_keys value that
-doesn't trigger overflow but still results in an excessive allocation
-attempt, causing a warning in the page allocator when the order exceeds
-MAX_PAGE_ORDER.
+It doesn't matter if fput is called from ->bi_end_io() directly, it can
+be triggered on io-uring indirectly too, in which fput() is called from
+__io_submit_flush_completions() in case of non-registerd file.
 
-Fix this by introducing PR_KEYS_MAX to limit the number of keys to
-a sane value. This makes the SIZE_MAX check redundant, so remove it.
-Also switch to kvzalloc/kvfree to handle larger allocations gracefully.
 
-Fixes: 22a1ffea5f80 ("block: add IOC_PR_READ_KEYS ioctl")
-Tested-by: syzbot+660d079d90f8a1baf54d@syzkaller.appspotmail.com
-Reported-by: syzbot+660d079d90f8a1baf54d@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=660d079d90f8a1baf54d
-Link: https://lore.kernel.org/all/20251212013510.3576091-1-kartikey406@gmail.com/T/ [v1]
-Signed-off-by: Deepanshu Kartikey <kartikey406@gmail.com>
----
-v3:
-  - Renamed PR_KEYS_MAX_NUM to PR_KEYS_MAX
-  - Moved define to include/uapi/linux/pr.h
-v2:
-  - Added PR_KEYS_MAX_NUM (64K) limit instead of checking KMALLOC_MAX_SIZE
-  - Removed redundant SIZE_MAX check
-  - Switched to kvzalloc/kvfree
----
- block/ioctl.c           | 9 +++++----
- include/uapi/linux/pr.h | 2 ++
- 2 files changed, 7 insertions(+), 4 deletions(-)
-
-diff --git a/block/ioctl.c b/block/ioctl.c
-index 61feed686418..344478348a54 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -442,11 +442,12 @@ static int blkdev_pr_read_keys(struct block_device *bdev, blk_mode_t mode,
- 	if (copy_from_user(&read_keys, arg, sizeof(read_keys)))
- 		return -EFAULT;
- 
--	keys_info_len = struct_size(keys_info, keys, read_keys.num_keys);
--	if (keys_info_len == SIZE_MAX)
-+	if (read_keys.num_keys > PR_KEYS_MAX)
- 		return -EINVAL;
- 
--	keys_info = kzalloc(keys_info_len, GFP_KERNEL);
-+	keys_info_len = struct_size(keys_info, keys, read_keys.num_keys);
-+
-+	keys_info = kvzalloc(keys_info_len, GFP_KERNEL);
- 	if (!keys_info)
- 		return -ENOMEM;
- 
-@@ -473,7 +474,7 @@ static int blkdev_pr_read_keys(struct block_device *bdev, blk_mode_t mode,
- 	if (copy_to_user(arg, &read_keys, sizeof(read_keys)))
- 		ret = -EFAULT;
- out:
--	kfree(keys_info);
-+	kvfree(keys_info);
- 	return ret;
- }
- 
-diff --git a/include/uapi/linux/pr.h b/include/uapi/linux/pr.h
-index 847f3051057a..f0ecb1677317 100644
---- a/include/uapi/linux/pr.h
-+++ b/include/uapi/linux/pr.h
-@@ -79,4 +79,6 @@ struct pr_read_reservation {
- #define IOC_PR_READ_KEYS	_IOWR('p', 206, struct pr_read_keys)
- #define IOC_PR_READ_RESERVATION	_IOR('p', 207, struct pr_read_reservation)
- 
-+#define PR_KEYS_MAX		(1u << 16)
-+
- #endif /* _UAPI_PR_H */
--- 
-2.43.0
+Thanks,
+Ming
 
