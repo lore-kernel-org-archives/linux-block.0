@@ -1,110 +1,125 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B9DC2BEFFB;
-	Wed, 17 Dec 2025 09:41:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D0A2392FFF
+	for <linux-block@vger.kernel.org>; Wed, 17 Dec 2025 14:05:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765964505; cv=none; b=jPPbYPHmegdJ2AgvzWH7bFcFBmsi2lu5B6XUL/i01MjICkmI+5b/BCHbyt/74m0qALauiK1RR7V02M47LOfgEARRh8oN/4Z6Apjda9K3KJN2cnrUBYvQoXt/o1BE2uTIFHlEb7wXegi7U29cYWGzkkZERllbuUmzNT/EcP2k3G8=
+	t=1765980325; cv=none; b=gNgSYKnNxYcKigo+adb3VjXSD3TxTDc+IvdHJ90rrt7PAWyEOwyxsCZPZKFxt0kKtODMmOp5lDi0B8EbdvluTHDJQFYQmHiQSKD8I5IgYbHLjuVMXI3fdIoAEBkaWzhvtibXDNVbrqCS79Afb3HhqT5ccWCH5S23oX44+TMEJiw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765964505; c=relaxed/simple;
-	bh=b/Jh6xjZVFYW/BZ/jwrPDpIcfQ2LNGIe6zTiBVWKzZA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DAb3sWQ8ysBJNqLOegGDiF690fTqcaHHNi0JwBDldbrbZONmxoqYCk+wP1iPKF1l0+E2Hjtsdx/lInd0MNLHTmiunJzUzkJJuCsZYUZ5coVYizlHGZbntkUEaMpKRD0CwflndCKfM4fbBnWD9Lyvuc8lA2nYYLAu5ClNq+HvsIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MtazOCT9; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1765980325; c=relaxed/simple;
+	bh=1LR2Ujfhe6jFIjkL7kGsca95ukR54NpAhGZRKS/DAY4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Du7qdBWDSd7znSr+kXIJepUjxk803d3pCa7Fw0hqk/6lgX7urJJ1+lbHR8oJctzqHlOO0mmE9GEAlWf9pNHX+jj1a98i3wUnge52NqtpVLeVZiW/K/uzOjJLovikyoBDEFvYiY+LF+3V8NlLqd7cQisSI6JN2sarAi5qq4XzNrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iRRElG7w; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MtazOCT9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F01BDC4CEF5;
-	Wed, 17 Dec 2025 09:41:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765964504;
-	bh=b/Jh6xjZVFYW/BZ/jwrPDpIcfQ2LNGIe6zTiBVWKzZA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MtazOCT9Qnl2xJPI5agV4eVL6iRrG+kqSMaMtyvq0gYmgG8Zo/TfBGJUoi0vCi43Y
-	 9YkvLyujwckc0uJxn5MVbUj/+8rUCRT5NTe+Swi1rRg1ZfdAeyi7RJ4oC/ehSKX6RK
-	 dfXfUq9PfTxwb3AINQ0RYfaiY6+G2lxaI23k+Y4uO42sz5PfTPaTwF9adTr9keCdXb
-	 p6nYRkc6apnSdWBNG9M+J9HmCNPaxpoFeRUlsseOd/jeTWBztvOdA5kJi2z1ZQkgr7
-	 3RxypPG28DnhVwjQLHjaeaJh2qgXWtj2xHjJfIYHDtrs/hR3YIGjYSSjMpvClRcjfo
-	 PPFgP1FS35Nwg==
-From: Leon Romanovsky <leon@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <kbusch@kernel.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	Chaitanya Kulkarni <kch@nvidia.com>
-Subject: [PATCH v3 2/2] types: move phys_vec definition to common header
-Date: Wed, 17 Dec 2025 11:41:24 +0200
-Message-ID: <20251217-nvme-phys-types-v3-2-f27fd1608f48@nvidia.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20251217-nvme-phys-types-v3-0-f27fd1608f48@nvidia.com>
-References: <20251217-nvme-phys-types-v3-0-f27fd1608f48@nvidia.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iRRElG7w"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1765980322;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IHWBc1PN61J99zIOiaQbTsRXyNeM+VNsVpnaPMecQ4Y=;
+	b=iRRElG7wJ0hOUxklNDPXG7uHvmeGIU775DIVSjazIe9WbMnkfWUkCWZ4ojxcygWaP/gI2v
+	eoj7fVKA8K8Xa67cGQoW7vYT7kVgH0fPoUaFSSZ4llGuucFZPH/ZUiU4EZAEcfAgwswCZd
+	JGmKlvh8lVNsU54YEj89xssAfmUJ4Jo=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-436--oRjutbQMj2KrwhzoCqjEg-1; Wed,
+ 17 Dec 2025 09:05:16 -0500
+X-MC-Unique: -oRjutbQMj2KrwhzoCqjEg-1
+X-Mimecast-MFC-AGG-ID: -oRjutbQMj2KrwhzoCqjEg_1765980315
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2A9F31800625;
+	Wed, 17 Dec 2025 14:05:15 +0000 (UTC)
+Received: from localhost (unknown [10.2.16.25])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5793F1800576;
+	Wed, 17 Dec 2025 14:05:14 +0000 (UTC)
+Date: Wed, 17 Dec 2025 09:05:13 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Deepanshu Kartikey <kartikey406@gmail.com>
+Cc: axboe@kernel.dk, martin.petersen@oracle.com, hare@suse.de,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	syzbot+660d079d90f8a1baf54d@syzkaller.appspotmail.com
+Subject: Re: [PATCH v3] block: add allocation size check in
+ blkdev_pr_read_keys()
+Message-ID: <20251217140513.GA43988@fedora>
+References: <20251217014712.35771-1-kartikey406@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Mailer: b4 0.15-dev-a6db3
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="LFeN67QYCM/eG8Zh"
+Content-Disposition: inline
+In-Reply-To: <20251217014712.35771-1-kartikey406@gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-From: Leon Romanovsky <leonro@nvidia.com>
 
-Move the struct phys_vec definition from block/blk-mq-dma.c to
-include/linux/types.h to make it available for use across the kernel.
+--LFeN67QYCM/eG8Zh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The phys_vec structure represents a physical address range with a
-length, which is used by the new physical address-based DMA mapping
-API. This structure is already used by the block layer and will be
-needed for DMA phys API users.
+On Wed, Dec 17, 2025 at 07:17:12AM +0530, Deepanshu Kartikey wrote:
+> blkdev_pr_read_keys() takes num_keys from userspace and uses it to
+> calculate the allocation size for keys_info via struct_size(). While
+> there is a check for SIZE_MAX (integer overflow), there is no upper
+> bound validation on the allocation size itself.
+>=20
+> A malicious or buggy userspace can pass a large num_keys value that
+> doesn't trigger overflow but still results in an excessive allocation
+> attempt, causing a warning in the page allocator when the order exceeds
+> MAX_PAGE_ORDER.
+>=20
+> Fix this by introducing PR_KEYS_MAX to limit the number of keys to
+> a sane value. This makes the SIZE_MAX check redundant, so remove it.
+> Also switch to kvzalloc/kvfree to handle larger allocations gracefully.
+>=20
+> Fixes: 22a1ffea5f80 ("block: add IOC_PR_READ_KEYS ioctl")
+> Tested-by: syzbot+660d079d90f8a1baf54d@syzkaller.appspotmail.com
+> Reported-by: syzbot+660d079d90f8a1baf54d@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=3D660d079d90f8a1baf54d
+> Link: https://lore.kernel.org/all/20251212013510.3576091-1-kartikey406@gm=
+ail.com/T/ [v1]
+> Signed-off-by: Deepanshu Kartikey <kartikey406@gmail.com>
+> ---
+> v3:
+>   - Renamed PR_KEYS_MAX_NUM to PR_KEYS_MAX
+>   - Moved define to include/uapi/linux/pr.h
+> v2:
+>   - Added PR_KEYS_MAX_NUM (64K) limit instead of checking KMALLOC_MAX_SIZE
+>   - Removed redundant SIZE_MAX check
+>   - Switched to kvzalloc/kvfree
+> ---
+>  block/ioctl.c           | 9 +++++----
+>  include/uapi/linux/pr.h | 2 ++
+>  2 files changed, 7 insertions(+), 4 deletions(-)
 
-Moving this definition to types.h provides a centralized location
-for this common data structure and eliminates code duplication
-across subsystems that need to work with physical address ranges.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
----
- block/blk-mq-dma.c    | 5 -----
- include/linux/types.h | 5 +++++
- 2 files changed, 5 insertions(+), 5 deletions(-)
+--LFeN67QYCM/eG8Zh
+Content-Type: application/pgp-signature; name=signature.asc
 
-diff --git a/block/blk-mq-dma.c b/block/blk-mq-dma.c
-index a2bedc8f8666..752060d7261c 100644
---- a/block/blk-mq-dma.c
-+++ b/block/blk-mq-dma.c
-@@ -6,11 +6,6 @@
- #include <linux/blk-mq-dma.h>
- #include "blk.h"
- 
--struct phys_vec {
--	phys_addr_t	paddr;
--	size_t		len;
--};
--
- static bool __blk_map_iter_next(struct blk_map_iter *iter)
- {
- 	if (iter->iter.bi_size)
-diff --git a/include/linux/types.h b/include/linux/types.h
-index d4437e9c452c..d673747eda8a 100644
---- a/include/linux/types.h
-+++ b/include/linux/types.h
-@@ -171,6 +171,11 @@ typedef u64 phys_addr_t;
- typedef u32 phys_addr_t;
- #endif
- 
-+struct phys_vec {
-+	phys_addr_t	paddr;
-+	size_t		len;
-+};
-+
- typedef phys_addr_t resource_size_t;
- 
- /*
+-----BEGIN PGP SIGNATURE-----
 
--- 
-2.51.1
+iQEzBAEBCgAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmlCuJkACgkQnKSrs4Gr
+c8iYMAf/d2XXjKSTkke+lSDqsahv3Vcdyi/6yRDNUFRnoia/uGiRmxAHMOUNqNJI
+Tj6LtqFIYjtxc9fBgOK9YbjCnsvHvq51D7x+xOvHQ9PyBdYTsvT4NQF/WxLawLxV
+eOWxJSYINOo/Wr3WPepp++FiixtqkqN5P/LzqrWQXv1eq0Kood2GbHxDEn5Sn7tF
+ODl4mvMGnDnXmCahTjSxGj5b3vOv3iWtnDaDb9+EogarjebwipPAEPImEdANXpIr
+DjZVMezM+aA3q3kYmkdrXMEHhst+NbWJNZpcNP/yIMaMmz8LWBtbSk9HANu/MHG1
+e0QOlXhZpfGW6ziHoApI2L1Y6OjLaQ==
+=Hpzm
+-----END PGP SIGNATURE-----
+
+--LFeN67QYCM/eG8Zh--
 
