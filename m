@@ -1,47 +1,57 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 397B32E8E16;
-	Thu, 18 Dec 2025 09:38:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0314331A68
+	for <linux-block@vger.kernel.org>; Thu, 18 Dec 2025 09:40:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766050738; cv=none; b=I+UH2IYMgd94JMgnIQZpjqWU8UyEL+L3F4QS2pJ9u0J6rzjbA7CGrwRb/bolg/HAQ54s+c//Ld/C41xK2RC5Gfl4TMzECMj/wloKgG6lS+C4Cx7pSUjQl1Y/iVn0480r3svvowHMmH1LnS0iuqa9xrmY2BSJYR9zv6X7VJPnyMI=
+	t=1766050821; cv=none; b=oCnT2JWdwz7Oe6fky+IdBd4n5GyDiAbwWMrUy7at3nNXxv09AdVx7g0GoZPsIaG7USCHmLXzWYBvB2dEfqRJctSRDT8GNYiO7ugT7bDezC/mBnp9OXVXe5PSzf5EOK8hlXSW+ZiIGWfdjjMq0TTIS4Q+ge9V+tGsB9Rm2w3DyQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766050738; c=relaxed/simple;
-	bh=w75zZlJvMZAL3Ahznrh2HPBKCvGY6SwE6HYC4OZ/m/M=;
+	s=arc-20240116; t=1766050821; c=relaxed/simple;
+	bh=ky5Q1T+ezas+6lHUJs5lgO7Nb5r4ocP/kZLPfuMxAbI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GFwRhNGDCBgNkOjGrvdNvcu9aXAx4rhHCZyiOsf6BEgbD7AcvS4Hqy+Z27vrQl/5PQdf3u1mcyMcTrZ5I39Nei9KnQDoC8jCcZaOSxql3/IGULNRUxX9V+MFgMvkTAwGUphDfzCZlGsHqHdiWZWw/MDKsTNYJe5OqYVjO5S1On8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=YzklQRHT; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=Oz3Yp2JpNhsZRuDR55a1M743KCRkARmhbhcNukS805sKx12GR6oJC1EuzF/CgwzLpgHk/97MzImYiv8fodcFDk1JBVw9MfvevuFGRNjXawGenrrYU1UZFSjL7MKVSNqk2YNjhbS5jzKRcAZsYuEyenDYYUxolXA4x5gUnxcFp7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=E5VwaKwI; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="YzklQRHT"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Zx6Nb2DtC321NBtNMWjmqbfzgZP0zfMswFguelvxTr0=; b=YzklQRHTZCE0MKQ/ayaLmxoyEB
-	Qq40ox68eCZQkUiN968bPVIOXZOCOCYzEzYO0tdNZAi9YRnXcpuiv+AMRQBTBaPYATXvc9bGoCoiq
-	vAt9zmHyBPYms9zxNL0+Q8o01smDIiBb0H2rtXQ91/WmMh5nXqZQcOmUwbKMjshXza0Z8WSJmK86g
-	NhlZVupA89g3MCT8UIrIqEr3ReaCUps6dfp2goJAM9bmno/6RPZSmQAIyrQN82Y4xkilYY9EAX1sZ
-	rGZtuuX5r/2hBN4iZ8RTEhC/c12o52xhtGnAd+73Tq2BSnH8G48IUT+ueO1wRlx3VWKPzg/GB5KiG
-	xQjn+/OA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vWATH-00000008ADG-2vx8;
-	Thu, 18 Dec 2025 09:38:55 +0000
-Date: Thu, 18 Dec 2025 01:38:55 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	io-uring@vger.kernel.org,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	huang-jl <huang-jl@deepseek.com>,
-	Nitesh Shetty <nj.shetty@samsung.com>
-Subject: Re: [PATCH 2/3] block: don't initialize bi_vcnt for cloned bio in
- bio_iov_bvec_set()
-Message-ID: <aUPLr_cUd9nmvoI0@infradead.org>
-References: <20251218093146.1218279-1-ming.lei@redhat.com>
- <20251218093146.1218279-3-ming.lei@redhat.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E5VwaKwI"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1766050817;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gdoVLXx4c8oXv89VmjV0/oZ5aqeNJYRBkgDgvRg7VFw=;
+	b=E5VwaKwIhvbg1Vaf6PhYcGdYZZPBxArrpBx43ICmWrFNGx3wpgI467CdN9vHvd/7xjhpuV
+	rQAp5czt01PBggbIejHWM9bJOeTpXOcMtBAUpZ6hWEFguVzDZulUvWGhwXY0M36Hei0j9N
+	OBgO07m659j2TZAXpXXUEntSAWA+YWE=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-422-XjyHrbePM0O-UgWrDE71Gg-1; Thu,
+ 18 Dec 2025 04:40:12 -0500
+X-MC-Unique: XjyHrbePM0O-UgWrDE71Gg-1
+X-Mimecast-MFC-AGG-ID: XjyHrbePM0O-UgWrDE71Gg_1766050811
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 936C318011FB;
+	Thu, 18 Dec 2025 09:40:11 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.190])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A5E6B19560B4;
+	Thu, 18 Dec 2025 09:40:06 +0000 (UTC)
+Date: Thu, 18 Dec 2025 17:40:00 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Carlos Maiolino <cem@kernel.org>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Hans Holmberg <hans.holmberg@wdc.com>, linux-block@vger.kernel.org,
+	linux-xfs@vger.kernel.org
+Subject: Re: [PATCH 1/3] block: add a bio_reuse helper
+Message-ID: <aUPL8Jr39N-SIf_W@fedora>
+References: <20251218063234.1539374-1-hch@lst.de>
+ <20251218063234.1539374-2-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,12 +60,51 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251218093146.1218279-3-ming.lei@redhat.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20251218063234.1539374-2-hch@lst.de>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Thu, Dec 18, 2025 at 05:31:43PM +0800, Ming Lei wrote:
-> For a cloned bio, bi_vcnt should not be initialized since the bio_vec
-> array is shared and owned by the original bio.
+On Thu, Dec 18, 2025 at 07:31:45AM +0100, Christoph Hellwig wrote:
+> Add a helper to allow an existing bio to be resubmitted withtout
+> having to re-add the payload.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/bio.c         | 25 +++++++++++++++++++++++++
+>  include/linux/bio.h |  1 +
+>  2 files changed, 26 insertions(+)
+> 
+> diff --git a/block/bio.c b/block/bio.c
+> index e726c0e280a8..1b68ae877468 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -311,6 +311,31 @@ void bio_reset(struct bio *bio, struct block_device *bdev, blk_opf_t opf)
+>  }
+>  EXPORT_SYMBOL(bio_reset);
+>  
+> +/**
+> + * bio_reuse - reuse a bio with the payload left intact
+> + * @bio bio to reuse
+> + *
+> + * Allow reusing an existing bio for another operation with all set up
+> + * fields including the payload, device and end_io handler left intact.
+> + *
+> + * Typically used for bios first used to read data which is then written
+> + * to another location without modification.
+> + */
+> +void bio_reuse(struct bio *bio)
+> +{
+> +	unsigned short vcnt = bio->bi_vcnt, i;
+> +	bio_end_io_t *end_io = bio->bi_end_io;
+> +	void *private = bio->bi_private;
 
-Maybe, maybe not.  What is the rational for that "should" ?
+The incoming bio can't be a cloned bio, so
+
+	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
+
+should be added.
+
+Otherwise, it looks fine.
+
+Thanks,
+Ming
 
