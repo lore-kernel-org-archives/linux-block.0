@@ -1,32 +1,47 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF51821773D;
-	Thu, 18 Dec 2025 09:35:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B45E3321D1;
+	Thu, 18 Dec 2025 09:37:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766050555; cv=none; b=T5cfTgB7Gksn1QbLWNqoWjpdkv7EQ7ABwzhIapKkPdcaEMCWxK6dkqLvGPhG0kZZ5cNGqGjuBnbt7Ho4NWltFz65dUCxKxs8HKvryWwvLq0ADv5S2RMo6qUuSBTvJ1GFbEDB8Il5bO6V8sYxE934t/1yf4hR21scS8G9kMbj3B8=
+	t=1766050662; cv=none; b=FwkDWE0AkdmD+Gg62vHwKbsHlWeOrLTRs7cBoKbQ3GX61U08ktGJzYHZLQabvHoBxxyktg6ic6SiUY7WRTbpZpbGojxPymX1mHWp7yugdUmut70tU8k6sfRQzfMbBTy7QYG7rBVwQLnesOw498un9RvlNdjwP0PQoa7jy63tumg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766050555; c=relaxed/simple;
-	bh=KsziqKqgTLyBtdcS2PnFtdunbQVwJwzGSiHRWprY5Ds=;
+	s=arc-20240116; t=1766050662; c=relaxed/simple;
+	bh=vWJ4cdmrkvI4ieVrRawR1MELGR9c1Vn5pY4VhVW6VHU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D5/w6yVPbS4oc6HH2XYOjw2satX/tmFB59ztV0bVQKb22NImC7hoqmcP5R6g6GoFbmqMLUXym5u2rn2iSAXfNVRY/0O8FA5It9aQnrv8VGJa5yMyOgtEz5IBt4ugInhHsjD0v2ABnZO/mBMmtaiId5wBcFjcVnMZNgCElvMvCLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id F116F68B05; Thu, 18 Dec 2025 10:35:50 +0100 (CET)
-Date: Thu, 18 Dec 2025 10:35:50 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Hannes Reinecke <hare@suse.de>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Carlos Maiolino <cem@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Hans Holmberg <hans.holmberg@wdc.com>, linux-block@vger.kernel.org,
-	linux-xfs@vger.kernel.org
-Subject: Re: [PATCH 1/3] block: add a bio_reuse helper
-Message-ID: <20251218093550.GA10201@lst.de>
-References: <20251218063234.1539374-1-hch@lst.de> <20251218063234.1539374-2-hch@lst.de> <b5dbf7d2-8e4e-4a96-a04b-a14ed83beb2e@suse.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ekfep9lAUp7b9M4PIG1sXlzbbRkxClUKuNalUGpe6fgvTibSrmOmxekDsWNRacgsnKtFtl4/yI7MsYnoQy2IcFtBlHzAaE2s8B+Q/2Xx3F4TTfCXApCOuyXrYemZCwjMc1e+RXLZbzKkWM2OEWeK5fQd7dclcKtStNu3tNgsPHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=gGj3xOQw; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gGj3xOQw"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=418ItCLm0WIHrajf4kTh9NyZoEJJBs0Wd/JaxwLOaGs=; b=gGj3xOQwkoW028tJruEM5PBuPy
+	kizyDSTtj0E5RixCAa1w4GvWnYbehXkjc0k5pl/dDy0ksicUBzewL7eWzScDhZ1ZY5InAMXbhI+Vz
+	roexj5q1+83MGxoZhw9eaaqISnv8PkVuW+3FM6nrEKeYcDYsetGnjQc7J9mtP7CgyQOG3KJx0FlYO
+	gg4oP6xEbv8ae8sJz1KjrEz955itlWyfguAP48vvArMh+VXRi4cqYx2PMQ+vq9uUupy0citqNaeJL
+	uNI++xOSxC3gN0iOqoWakYGH7jUGJHlFf+7CGoyYgnVzLTmCIN95S+Aw/3oeoY0NwsBpENBn5Y2yH
+	1r2gnCaw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vWAS1-000000089zN-3szg;
+	Thu, 18 Dec 2025 09:37:37 +0000
+Date: Thu, 18 Dec 2025 01:37:37 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	io-uring@vger.kernel.org,
+	Caleb Sander Mateos <csander@purestorage.com>,
+	huang-jl <huang-jl@deepseek.com>,
+	Nitesh Shetty <nj.shetty@samsung.com>
+Subject: Re: [PATCH 1/3] block: fix bio_may_need_split() by using bvec
+ iterator way
+Message-ID: <aUPLYcAx2dh-DvuP@infradead.org>
+References: <20251218093146.1218279-1-ming.lei@redhat.com>
+ <20251218093146.1218279-2-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,13 +50,19 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b5dbf7d2-8e4e-4a96-a04b-a14ed83beb2e@suse.de>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20251218093146.1218279-2-ming.lei@redhat.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Thu, Dec 18, 2025 at 10:20:31AM +0100, Hannes Reinecke wrote:
-> 'reuse' has a different connotation for me; I woudl have expected
-> a 'reused' bio to be used for any purposes.
+On Thu, Dec 18, 2025 at 05:31:42PM +0800, Ming Lei wrote:
+> ->bi_vcnt doesn't make sense for cloned bio, which is perfectly fine
+> passed to bio_may_need_split().
+> 
+> So fix bio_may_need_split() by not taking ->bi_vcnt directly, instead
+> checking with help from bio size and bvec->len.
+> 
+> Meantime retrieving the 1st bvec via __bvec_iter_bvec().
 
-You can reuse it for any purpose.  That's the point - it keeps the
-payload, but you can resubmit it.
+That totally misses the point.  The ->bi_vcnt is a fast and lose
+check to see if we need the fairly expensive iterators to do the
+real check.
 
