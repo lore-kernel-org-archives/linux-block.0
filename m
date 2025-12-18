@@ -1,60 +1,60 @@
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF4EE1D6187
-	for <linux-block@vger.kernel.org>; Thu, 18 Dec 2025 14:20:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01D44334C0A
+	for <linux-block@vger.kernel.org>; Thu, 18 Dec 2025 14:28:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766067622; cv=none; b=YgqBOP6I6oiQuborzOEOlJWHDAgfn5IK1No7UYeN4Ui/UYxBUbCjL7BYvGgLVlDXpq2xqbBCkpyihmjXC/pRiHaKezDPAATttcg2VSN8YQnqq3hYjOKJ8puIggM+WEnYR2B8dhQSbp/bIKqRAKnR5a/wR2r/mUK/Sn7joPkf40M=
+	t=1766068103; cv=none; b=YVw0NsW6TGiQdWbUEHSJ6D8wwo20SPG7JnaN/i7b/gXULQb30armawXDHRjGy9w+1Bs5yA3nn/eTNz8nLs73SgI8WIuBHANiUQq+tQbmRbcVMDCQYnvRM39KYD17GSNLXwlRlalxjLVbU2NOC8s40WgV1OJpVyT8bYrEAJN//Co=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766067622; c=relaxed/simple;
-	bh=fWex/GhEVPOpbWpQK0YVPTyNyd3vQn+E7kUFj022A8M=;
+	s=arc-20240116; t=1766068103; c=relaxed/simple;
+	bh=okCKJH6FTI7y1iwSprDxaVelU1RYUbX1YQD4PZ2wdBY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=kGTo5ndXW1cOFQ92LRNUoyOTncb6yaa0DeNqlOjSaifHyePnUJl7vQ9dMcPNqaO2g/b+vzV/Fq2KLYKbPlM24zcbD5avaApJ5DaKEf/7urCIfBHH9PtRBlkWSEqJ8rlR8PukqtwOL43H7ReA3CgaODciGQ4e6lztGSWNKSLqSII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=oVyZTkIQ; arc=none smtp.client-ip=148.163.156.1
+	 In-Reply-To:Content-Type; b=Zbr0IWZD+uK+g42iFMciufD49PqJas/HsNkVQ/6oyoPHBJbzmCRKFl5gnXqzMAt/dRnuz2j7YJDq/pd2S6Vr52zO90EEnO8RNCUWlbmjgSiHVHHzCPTRqoXqkfWs1JimkidFsqRV1YugsM7hNK409Y0N8YjjpvQqkfJCbh2IO/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HblaoGC5; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="oVyZTkIQ"
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5BIC0L3S029646;
-	Thu, 18 Dec 2025 14:20:10 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HblaoGC5"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5BID1bdn011526;
+	Thu, 18 Dec 2025 14:28:10 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
 	content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=3JyS4/
-	3EZ/NzAuTOozgG3QZD2w+2qs5cW4iA3RIudbY=; b=oVyZTkIQJE2Z/4RRMY1tCX
-	oYrfSPhyZENrFChl27q4suQZmfUKs2kG/IStZFSZLb4EuGsDFgOGF5VM/Cq1LPHp
-	oQA3gG/ijI/0DuBhy+JNUWMptqDiWFqpE/7p3bTHuowHk5JxoUm0WFYORik+EwoY
-	egVrwuZccTHsJVWgsfGRRkDCmRnjWPv6HPskZ6911h2kilEW0+XyzoXysTiZtVeL
-	Tjefjv3uGTA/SEyvPCNQwp1IEaCrY9x1iE5XhiZPsKSAXgzJvHlg/GvBpxz+R19B
-	gUvpVEYFF/rl54r6afQLD3aZrR7ajn2XMPx7xj3A7/6aps+1YMxu1jX6h+T/k9gA
+	:message-id:mime-version:references:subject:to; s=pp1; bh=MPfRKH
+	OzILJ/T8Jd2M2ydF3HphNJwvFLkmZzxcbLKN4=; b=HblaoGC52QRqBc80hLI4PZ
+	gvgvGq3ZzQOmQ5FvzMTowh/byxlkCu5JHHAehr4K0Vm07EEtqNYClPAh7l782SVn
+	GXX8fhnFcJaKj8Gf8jzGRxhJnavYhyGt30K7+/oOLqwKpUn1vbxHEhodiQrw9lCE
+	lxJZGsvH5iAc6dw/8/eHcVVn+xOKZJZtEE3i0aISIsyHwMInK3vyqeCE2x5PIaN5
+	1lsarROXO9ytd4vc3/xeNguf+ul3tT82JJXT9xMxZzoWX5NHVbgeiar8A9syrNSj
+	5DC3lGWa8CC/IFvNovqMG1g5tW/Q3JR/fAjWTgWpll+5+MEmIyOPZZs0/0//YEGg
 	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4b0yvbk0tw-1
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4b0yn8u5r2-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 18 Dec 2025 14:20:09 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5BIBXgHm014344;
-	Thu, 18 Dec 2025 14:20:08 GMT
-Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4b1mpk8fvu-1
+	Thu, 18 Dec 2025 14:28:09 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5BIBAuOO002863;
+	Thu, 18 Dec 2025 14:28:08 GMT
+Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4b1kfngs4r-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 18 Dec 2025 14:20:08 +0000
-Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
-	by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5BIEK8wX8324026
+	Thu, 18 Dec 2025 14:28:08 +0000
+Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
+	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5BIES8X258720578
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 18 Dec 2025 14:20:08 GMT
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 15B5F58052;
-	Thu, 18 Dec 2025 14:20:08 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 55F4B58045;
-	Thu, 18 Dec 2025 14:20:05 +0000 (GMT)
+	Thu, 18 Dec 2025 14:28:08 GMT
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1D7A258052;
+	Thu, 18 Dec 2025 14:28:08 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 99F4C58056;
+	Thu, 18 Dec 2025 14:28:05 +0000 (GMT)
 Received: from [9.111.59.18] (unknown [9.111.59.18])
-	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 18 Dec 2025 14:20:04 +0000 (GMT)
-Message-ID: <f2cf6374-9cc1-426c-89fe-2a99c129ae31@linux.ibm.com>
-Date: Thu, 18 Dec 2025 19:50:03 +0530
+	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 18 Dec 2025 14:28:05 +0000 (GMT)
+Message-ID: <6cbfa0b0-e556-44a6-b18a-619fa0cfaeb8@linux.ibm.com>
+Date: Thu, 18 Dec 2025 19:58:03 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,49 +62,51 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 02/13] blk-wbt: fix possible deadlock to nest
- pcpu_alloc_mutex under q_usage_counter
+Subject: Re: [PATCH v5 03/13] blk-mq-debugfs: factor out a helper to register
+ debugfs for all rq_qos
 To: Yu Kuai <yukuai@fnnas.com>, axboe@kernel.dk, linux-block@vger.kernel.org,
         tj@kernel.org, ming.lei@redhat.com
 References: <20251214101409.1723751-1-yukuai@fnnas.com>
- <20251214101409.1723751-3-yukuai@fnnas.com>
+ <20251214101409.1723751-4-yukuai@fnnas.com>
 Content-Language: en-US
 From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20251214101409.1723751-3-yukuai@fnnas.com>
+In-Reply-To: <20251214101409.1723751-4-yukuai@fnnas.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=V/JwEOni c=1 sm=1 tr=0 ts=69440d99 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=tJLSzyRPAAAA:8 a=VnNF1IyMAAAA:8 a=NL1F5aIbUArUtQSLZB8A:9 a=QEXdDO2ut3YA:10
- a=H0xsmVfZzgdqH4_HIfU3:22
-X-Proofpoint-GUID: 8sC0XLhsqr_Z2YRGVR4ZBop1fgGu2MW6
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjEzMDAyMyBTYWx0ZWRfX1dvt1rYvFJ7g
- GA1gYhGMoZ4+p17oRONlQpaKzaIM+RPRH0b5uX5Nz+Q5vFy93odSelUuPfhT3C4Yr1hJa+UajDq
- yP1k0a5YJ+x38J+PRGdRmsRPe5wqtjTrf8/yb+Oh+zTAdmXbvG59sfBY5bArf2Tr73D4tPTUHGq
- DLWC1kDDvHtz6usjRipephsnHPnj9lHjnjKB/6QaY2EUoa7bdGemHvrDI8bhQQFpYDjkEnIDjG+
- /nIj0d5k9Rn2ySH8tgKEVFwuH41ii3WglylBEKM1/zrI5vR1LGSVdmmXZTivqSjlZP7JzV9rwjG
- uE9jNx1EFDpyIK8KYrPBmWyn3+h7srqPXYK7MUcC/bWUKoZZi8wxPZVNiiBacIZezUXJyx3iS60
- gf9zmJ67+R3t9zWLdwyNmbWZe1z46Q==
-X-Proofpoint-ORIG-GUID: 8sC0XLhsqr_Z2YRGVR4ZBop1fgGu2MW6
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjEzMDAxOCBTYWx0ZWRfX7p6UydAPkCg+
+ iN2JpaFI2cLBjfAkmdnip2KZhN3FdDYyolEci2qUJhhSTqnY691kQcGEFFycyJc0Wj49DBv/yLg
+ JgPuQrl0DgyxkF7OPSdsC72eRGSgP3Wht4V555HQ+IpV2aeHt8LTlkDV1kKsZUnqZgfyczH4bbb
+ kKSp8Kmj/Ry/TDJQiMzltN/j4uP+s2p91BbeNJqf65KNBFZDaNHot0YRIPKpd2mN7ShQMYdMqCR
+ qHBGWA6Py/O0/ZHFcaSOOrHrg66bH7kRLHpjiiIQX2b4cWQI9m2RP6TXRfB5IBzTL8AdihHOutb
+ GsSbXzMN6de0bt9lrAprN/HgLcWvXizOtbAa+oRtUTpB/Xg68AEaJOQksMkKVE5OVgUBJ9kMD/J
+ xll+T+MZPFI6TZN/hId0GeXnhINw3A==
+X-Proofpoint-GUID: uD5z3pNYJOtRrAsd69fFZQ2n26Y0BIFr
+X-Proofpoint-ORIG-GUID: uD5z3pNYJOtRrAsd69fFZQ2n26Y0BIFr
+X-Authority-Analysis: v=2.4 cv=LbYxKzfi c=1 sm=1 tr=0 ts=69440f7a cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+ a=AJc7nIEB-FM70Pyo:21 a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=tJLSzyRPAAAA:8 a=VnNF1IyMAAAA:8
+ a=wyYLQWUfLxWmFtnzBUgA:9 a=QEXdDO2ut3YA:10 a=H0xsmVfZzgdqH4_HIfU3:22
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
  definitions=2025-12-18_02,2025-12-17_02,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 adultscore=0 suspectscore=0 priorityscore=1501 malwarescore=0
- clxscore=1015 bulkscore=0 spamscore=0 lowpriorityscore=0 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2512130023
+ bulkscore=0 spamscore=0 phishscore=0 clxscore=1015 suspectscore=0
+ adultscore=0 malwarescore=0 priorityscore=1501 lowpriorityscore=0
+ impostorscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2510240000
+ definitions=main-2512130018
 
 
 
 On 12/14/25 3:43 PM, Yu Kuai wrote:
-> If wbt is disabled by default and user configures wbt by sysfs, queue
-> will be frozen first and then pcpu_alloc_mutex will be held in
-> blk_stat_alloc_callback().
+> There is already a helper blk_mq_debugfs_register_rqos() to register
+> one rqos, however this helper is called synchronously when the rqos is
+> created with queue frozen.
 > 
-> Fix this problem by allocating memory first before queue frozen.
+> Prepare to fix possible deadlock to create blk-mq debugfs entries while
+> queue is still frozen.
 > 
 > Signed-off-by: Yu Kuai <yukuai@fnnas.com>
 
