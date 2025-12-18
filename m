@@ -1,48 +1,50 @@
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F7162BE7AD
-	for <linux-block@vger.kernel.org>; Thu, 18 Dec 2025 07:21:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACC5E3A1E88;
+	Thu, 18 Dec 2025 08:47:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766042488; cv=none; b=gEJozvsz0/mv0S7ssyE5+0tqfyUOIaAzx3yL0Z0Alyu4Q6x/+L+9KMbj6aiPv/g4GbesKCIO44CyQpunoKWn/HWQUm94ELM+aoDgXJg79MURjcG5CRUj/m9xBqlmEg4aI8xNUc4pHTPCVxokYAXdOpFMUX1zi0VVnCH8g1KaALc=
+	t=1766047679; cv=none; b=IGtdUIuterZj2204OuGarwjNCjX/PIZXg+sdd2ZLUMFkRRbte495qWDqdJNkctng9/xxm/vwgpjpDFzTpdFVQe0SnBp00tetDSZdBZfrk1tqkosPg4doIHjECEmOpoiQISNju4M1q0O16/6ZxrwIuZ7imlCxT5AcpK3iVcKLUps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766042488; c=relaxed/simple;
-	bh=UEHyABRpxQTi4Ga0+FuCEzL5ixPmc4cdUjskcHJfvsg=;
+	s=arc-20240116; t=1766047679; c=relaxed/simple;
+	bh=S9m2zboCLwOViAtMp05VLj0OKcnpua60sdXGdiJmv4o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fBvenAIpIlw7h7u9tPlIxKBgq3mQzLGWvTnX0MKc2KtgDs1pRlw0oG76kdEinFYcjMEzVE6XcRDcMSdNYL3Xlbnc6JOcv32u5daSTVXSQCt1qUN/w3FW/3jNsq/omTFII4rwdfYMWvQuXPipKfyemmxplu0JKKVfQEdIwVIbB/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NYEjKcXO; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 Content-Type:Content-Disposition:In-Reply-To; b=UiR19qLE+pRRMklUD2Ml1ADwArGv2oEtUKd2mnbODWH85nYxILw1AxparW23nTSYz/OXB3/SnkFcP+pqmN5uBSYPKoRJhoLH2qrMfgGZQCnF5wnpUZZj9nXLUfKB8GlRM0hRstjEZgB436EpZAfre/YWqvYj2Zr7f3RcIDXkbgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=HzPXdY1E; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NYEjKcXO"
-Date: Wed, 17 Dec 2025 23:21:04 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1766042469;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QdZo6L5c2+gsxT6SqfejRQC9h/QKy9Y5BdqFa3CYsb4=;
-	b=NYEjKcXO6pX2fx2bGc9uptFb6pO6C7AvivV0STkov7inU2M0mWHwcirHJByV6wiDvx7Q/9
-	geB+YHVMeOYQHkAzN/u+sdw+gGRFHY+EtZktne3zFLOebRl/GVvuJY5T3FvETtId+qsf7S
-	sBpWzybG3rneiH3E2lrowpR3ysywg9o=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Shakeel Butt <shakeel.butt@linux.dev>
-To: Johannes Weiner <hannes@cmpxchg.org>
-Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>, 
-	Deepanshu Kartikey <kartikey406@gmail.com>, akpm@linux-foundation.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: retiring laptop_mode? was Re: [PATCH] mm: vmscan: always allow
- writeback during memcg reclaim
-Message-ID: <vs6nessf2rp4qvh7lpfybntrqzjnvthfykpf4h6rzxwlm77eyr@w74i6i4ojsgz>
-References: <20251213083639.364539-1-kartikey406@gmail.com>
- <20251215041200.GB905277@cmpxchg.org>
- <aT-xv1BNYabnZB_n@infradead.org>
- <20251215200838.GC905277@cmpxchg.org>
- <aUENEydFvVvxZK8r@infradead.org>
- <20251216185201.GH905277@cmpxchg.org>
- <gweo3wdh3agfavhiky5cloweu4m2hvgzk2j2euckbka5x7n47e@ezjmx7eq7ks5>
- <aUMLmJ0En24pQBX_@cmpxchg.org>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="HzPXdY1E"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=rCQQPidAxdKKerSDTyfXQFaHt7qwdYyK9WOnuxBnaW8=; b=HzPXdY1EmDxlbqXcSXLgDelxN1
+	1DpWP+/VdWzLkvwNVphiNXdykRZcyAxngokvBdZdmeMhLpDdb6IDnoBiTYm+ohsAew7/uPJ87tpZS
+	y4M8zcfzjlezbo6JgKCd6J3SgmNCkrECuQT2AZlbC+RCRvVa19ev9xYbmk2hlfXzUyG7vngDQy+AL
+	CFyjyBMTZTFvTIGxSr9hgXUUTQlfPqSoV6unpF92hqGA2PwfietvG7fZ25io5XTIihEF0l7YrNU9z
+	XjydrU1ijVUV16tcaBs9u+mVrNzcJcQ5SLTSv6mOHR0vS6ZA0HOIcRt9olgL1druq+VvMK8iHNiH7
+	HiErgalg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vW9fv-000000085jq-0pIy;
+	Thu, 18 Dec 2025 08:47:55 +0000
+Date: Thu, 18 Dec 2025 00:47:55 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Andreas Gruenbacher <agruenba@redhat.com>
+Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+	Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>,
+	linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	linux-raid@vger.kernel.org, dm-devel@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC 06/12] bio: don't check target->bi_status on error
+Message-ID: <aUO_u7x-4oIfKMei@infradead.org>
+References: <20251208121020.1780402-1-agruenba@redhat.com>
+ <20251208121020.1780402-7-agruenba@redhat.com>
+ <aUERRp7S1A5YXCm4@infradead.org>
+ <CAHc6FU6QCfqTM9zCREdp3o0UzFX99q2QqXgOiNkN8OtnhWYZVQ@mail.gmail.com>
+ <aUE3_ubz172iThdl@infradead.org>
+ <CAHc6FU4OeAYgvXGE+QZrAJPqERLS3v7q64uSoVtxJjG0AdZvCA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -51,35 +53,23 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aUMLmJ0En24pQBX_@cmpxchg.org>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <CAHc6FU4OeAYgvXGE+QZrAJPqERLS3v7q64uSoVtxJjG0AdZvCA@mail.gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Wed, Dec 17, 2025 at 02:59:20PM -0500, Johannes Weiner wrote:
-> On Tue, Dec 16, 2025 at 03:23:53PM -0800, Shakeel Butt wrote:
-> > On Tue, Dec 16, 2025 at 01:52:01PM -0500, Johannes Weiner wrote:
+On Tue, Dec 16, 2025 at 12:20:07PM +0100, Andreas Gruenbacher wrote:
+> > I still don't understand what you're saying here at all, or what this is
+> > trying to fix or optimize.
 > 
-> > Reviewed-by: Shakeel Butt <shakeel.butt@linux.dev>
+> When we have this construct in the code and we know that status is not 0:
 > 
-> Thanks!
+>   if (!bio->bi_status)
+>     bio->bi_status = status;
 > 
-> > > --- a/include/uapi/linux/sysctl.h
-> > > +++ b/include/uapi/linux/sysctl.h
-> > > @@ -183,7 +183,7 @@ enum
-> > >  	VM_LOWMEM_RESERVE_RATIO=20,/* reservation ratio for lower memory zones */
-> > >  	VM_MIN_FREE_KBYTES=21,	/* Minimum free kilobytes to maintain */
-> > >  	VM_MAX_MAP_COUNT=22,	/* int: Maximum number of mmaps/address-space */
-> > > -	VM_LAPTOP_MODE=23,	/* vm laptop mode */
-> > > +
-> > 
-> > There are 8 earlier enums here with names like VM_UNUSED* along with
-> > the information on what were they. Should we have something similar for
-> > this one? Something like:
-> > 
-> > 	VM_UNUSED10=23, /* was vm laptop mode */
+> we can just do this instead:
 > 
-> The other enums in that file leave holes, the VM ones have a mix of
-> VM_UNUSED and holes. I don't think it matters either way since the
-> sysctl syscall has been removed and nothing new should be compiled
-> against the definitions in this file, right?
+>   bio>bi_status = status;
 
-Yes, you are right.
+But this now overrides the previous status instead of preserving the
+first error?
+
+
