@@ -1,32 +1,60 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A779019CD0A;
-	Thu, 18 Dec 2025 09:45:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13DDE329C6C
+	for <linux-block@vger.kernel.org>; Thu, 18 Dec 2025 09:45:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766051133; cv=none; b=GWoiVNLyqLDKghgcRZaFj0gIuZIeFPcKLeCskpzizAYVHO4rP63DpC7vW7B7zu1mqJIxfToTvQuDoo8wqeM9NFrPVdxZa2yxnI96f4WFk6R/I2cKkEtCwBK0Luyi7xTpQ+G0qwdzklNdnH7eVmCY2AjhbBbkEX5HQb55+XPkgcw=
+	t=1766051135; cv=none; b=HJqDiSRs/SP4wHkAipcjLMwaUneljEba1xj86GlEvRiaJV24pzNmGAVBIrdAru3RlR2h8WEaXlA6ROTXf5R8ERCQzbWykXwsCxpfzIJ19+5ru1lJagc+NfD86W2ttkr3yNT6+AmYk0C+JW13r/uv+pdNnvppmHaVp03hu7PdlfI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766051133; c=relaxed/simple;
-	bh=fkcelwqTsF89+HlRta8uDdbmAEpcH5zat2Dex6HfToA=;
+	s=arc-20240116; t=1766051135; c=relaxed/simple;
+	bh=q1rd0BjwtXhRkpK33TpJLSX31WbVof4RvUjf4IaKg7c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Eb5baTPXY0m2K3nPeuitNgUsEmjjzXeYvEBL2IQ+g+Mx4NzUPbBElsXq+Sovmg4BEDRqAwYFVOUg15q16sxEGkGDDtCOjuGM6Kmuazr1Ur+px6DC6wMc7cu/XjBNEY5D+w0wY7Kb0PBA5OlEcMfMnfzzbmhKdoU5lKO5O1myGJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 1C6EA68AFE; Thu, 18 Dec 2025 10:45:27 +0100 (CET)
-Date: Thu, 18 Dec 2025 10:45:26 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Carlos Maiolino <cem@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Hans Holmberg <hans.holmberg@wdc.com>, linux-block@vger.kernel.org,
-	linux-xfs@vger.kernel.org
-Subject: Re: [PATCH 1/3] block: add a bio_reuse helper
-Message-ID: <20251218094526.GA10629@lst.de>
-References: <20251218063234.1539374-1-hch@lst.de> <20251218063234.1539374-2-hch@lst.de> <aUPL8Jr39N-SIf_W@fedora>
+	 Content-Type:Content-Disposition:In-Reply-To; b=uy5NQG1g7VCnPBSJAG0gk4nNvNiQcLRSBiiWQlxcBpU7OZqjH+K3H2nsWniIWAbro+XFqyXvnJwOq9A++r42+4eNTsaLRyQCt1vRDjksvnn1fqZyI90kUuCZXNsU6dzbsSLuh4Y4Tu2y5kDymObx5DEeofInHPXe2ATkL+bdBUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UESuFAy5; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UESuFAy5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1766051133;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WsrscNDNDKwUBouIdwhya0Xgx5ywCJWuXejSiWy6Ftw=;
+	b=UESuFAy5n8wHVApb/HOs80eytzRMw09n8OK8+cayNxm630egA51QeIRiHeL/U4IWvkufzC
+	iOuaYGkY7oS4HKQBVBlMsqWTdPWb/22n131blHLsTIURS6MGREVeUyW35Tun3/DX89PZZ5
+	kB78tvsR4M60Nyj/Ts+qyjNoNoPgccU=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-507-rX9NC6k_NFWuJq_zlZLheg-1; Thu,
+ 18 Dec 2025 04:45:30 -0500
+X-MC-Unique: rX9NC6k_NFWuJq_zlZLheg-1
+X-Mimecast-MFC-AGG-ID: rX9NC6k_NFWuJq_zlZLheg_1766051128
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 23898195FCE3;
+	Thu, 18 Dec 2025 09:45:28 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.190])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DD2D1194C65D;
+	Thu, 18 Dec 2025 09:45:22 +0000 (UTC)
+Date: Thu, 18 Dec 2025 17:45:16 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	io-uring@vger.kernel.org,
+	Caleb Sander Mateos <csander@purestorage.com>,
+	huang-jl <huang-jl@deepseek.com>,
+	Nitesh Shetty <nj.shetty@samsung.com>
+Subject: Re: [PATCH 1/3] block: fix bio_may_need_split() by using bvec
+ iterator way
+Message-ID: <aUPNLNHVz2-Y-Z4C@fedora>
+References: <20251218093146.1218279-1-ming.lei@redhat.com>
+ <20251218093146.1218279-2-ming.lei@redhat.com>
+ <aUPLYcAx2dh-DvuP@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,27 +63,27 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aUPL8Jr39N-SIf_W@fedora>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <aUPLYcAx2dh-DvuP@infradead.org>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Thu, Dec 18, 2025 at 05:40:00PM +0800, Ming Lei wrote:
-> > +/**
-> > + * bio_reuse - reuse a bio with the payload left intact
-> > + * @bio bio to reuse
-> > + *
-> > + * Allow reusing an existing bio for another operation with all set up
-> > + * fields including the payload, device and end_io handler left intact.
-> > + *
-> > + * Typically used for bios first used to read data which is then written
-> > + * to another location without modification.
-> > + */
-> > +void bio_reuse(struct bio *bio)
-> > +{
-> > +	unsigned short vcnt = bio->bi_vcnt, i;
-> > +	bio_end_io_t *end_io = bio->bi_end_io;
-> > +	void *private = bio->bi_private;
+On Thu, Dec 18, 2025 at 01:37:37AM -0800, Christoph Hellwig wrote:
+> On Thu, Dec 18, 2025 at 05:31:42PM +0800, Ming Lei wrote:
+> > ->bi_vcnt doesn't make sense for cloned bio, which is perfectly fine
+> > passed to bio_may_need_split().
+> > 
+> > So fix bio_may_need_split() by not taking ->bi_vcnt directly, instead
+> > checking with help from bio size and bvec->len.
+> > 
+> > Meantime retrieving the 1st bvec via __bvec_iter_bvec().
 > 
-> The incoming bio can't be a cloned bio, so
+> That totally misses the point.  The ->bi_vcnt is a fast and lose
+> check to see if we need the fairly expensive iterators to do the
+> real check.
 
-It better no be, yes.
+It is just __bvec_iter_bvec(), whatever it should be in cache sooner or
+later.
+
+
+Thanks,
+Ming
 
