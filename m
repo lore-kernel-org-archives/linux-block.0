@@ -1,163 +1,109 @@
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 214C133B94A
-	for <linux-block@vger.kernel.org>; Thu, 18 Dec 2025 13:55:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766066107; cv=pass; b=fqcfxhCV1CJ2IjU3cOd9xgDLt6lYgymoPOmmb4BT+Lxtt0vvQLl/vYd9lrkx4z54mW/GSqizXdBpqTO9Ll8Xda3HPP0MhyQDoVSbSmFD+wKnzrCrzMhPGcnz84VS3Ypv5W0PQuxEMrXMXQC89pv561EL4FmIkiYqx2Yf9bIB2Xo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766066107; c=relaxed/simple;
-	bh=eXbCglQsMXFSphJbxAf4iKsmpcpHiz05YKeMX4ISn6Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LdLZ0znA3PEf02HBDczanM4YmAAeb7+M/P3UQs1Hf3DyU25OnHrt1PXMS6Bs80L7fMntL06evEytaa6mYZUdhJ1fV8MOHROpBoM7b91fsu9P6tD4RdM96E0PhDWJHhW8Uv8em13TJ6cRsarXV00TnnvhY+76BQEIBrqicfSk83Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=VLVwCJWy; arc=pass smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 199271D6187
+	for <linux-block@vger.kernel.org>; Thu, 18 Dec 2025 14:18:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1766067536; cv=none; b=HMWkcRfN/SyuutCz+hVr98vlpofyI3hOLVzLw1pFDS1pR6DxAfUhM9gBxZxgm52SoS9mFArmfb6RzrIeJEHv+XYvMyHlxoGp9pvbCKu5SXqmJZaSfBb85IDoQCJE3IYdIKzLTme6dTmy0A8uUOnK93EtBszcdjM+6kG6N4vAgrg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1766067536; c=relaxed/simple;
+	bh=R5F/7i0HtyJpqEKE9f/AzYMDdnNvh+mmL+fSpOwGJRM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=gD3Keq+5rCe1Ulay41KoBmv0onkNDA02qkUUxi/ud1VYFIH0ti3guFx6gfRbp4OfnrTpVbr0rPw7wOoPx1SC24QewAAAFDQmZtfnUMAHyUTrh+PfeSJG2J9Km8YQVZo2D0HA04mmJNIBDNV8+BUnZTRjjcdBoH0ZTpe/GlXiK4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=nCwkxXbM; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="VLVwCJWy"
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-b737d4cde73so7224566b.2
-        for <linux-block@vger.kernel.org>; Thu, 18 Dec 2025 05:55:02 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1766066101; cv=none;
-        d=google.com; s=arc-20240605;
-        b=EJAYOhCiFOfoWXxQRE5+yf7dT1WLRNbmZ3wEJT9yd+Rust4lS3dlz3KgoueVhcgvUw
-         v8miNmVva7nJWJlLuLu9o2kaQD7GLt72/IruONzhTNFxvoYbjO4l9KEwksi7neVWL/TC
-         5AJpymqaUva2RMktqtGWhDA0OjiSvuEzoxjuKm5ZTK4gmrNQRq7gLnQH38AFRZNoJj0p
-         3zqZSi/e2EGr1P+CQXbU0+Flw23qgHzKAdcd7d4BrrPJrE3tSQ3gvMLV57lkLztFdTHW
-         NnHmpIJdDCIn3SPDGhXOLTfWWq5qkPv6c03yunW3/ydScbUo/08kfxHJTRHuVAnqhTBa
-         yPyA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=TuggqT0F+KQhUId8ALwJVG7L0b+tt0jPF/ba4NHvZKc=;
-        fh=MHGaqltLH2KN+suHDBU4wmG+p3+Ql5A4rxL1EGXSKuU=;
-        b=Bn4JntReBKWsNVItAy+queJUmWgZsux2I3fJ6iWuXtq+Zi077dufZu44BF3w51bZvv
-         nt90OoD5r5Bq5AQiN7APbHmXbdMUFeZhMb1qZLod6jDLztbHXi9HsUsbpDRVcKOelb4d
-         2uNhDAagTzQyuFHX2HUa3lpa9For/ATugFFXKuQqDfXTSwhQwwlujeFnmAgJfiNi1SCu
-         1ChuRM1sG99nwbk1PY90w5CcW8LIeU7JDyLW2J+BWtZMV+i/q/4iTbzWYZXICq76TK/n
-         ygjKma3/CmAfu3m4oaApDbc0sjKYvW35YEDj74D12v17m3MxkZ54MV6hVwAAiDAZ5BoE
-         Le9Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google; t=1766066101; x=1766670901; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TuggqT0F+KQhUId8ALwJVG7L0b+tt0jPF/ba4NHvZKc=;
-        b=VLVwCJWy8S/pPetvXClD6SHJd8EHR7ubRBLteQI9eY8DefQS9EfTVS+ZwrB1/3Rr+1
-         5fQy23C7FwoeaEwJHGqH480DmS4YZse6a92y7f8JlttnS1NDsGlCkvuOU9EzTYOhiNxB
-         vb0qCe/0GXqb8xT6EFlVd43ewGf/xvX0aZlmc7M5fys+8vegniyJtnn2CE5hwEw5eM0X
-         5bbrPwXkLkTnQxiIVtFgAYouGQFAPZda733raoqqp6QaA5aNXDb1KAXFcDlWPFYkRxeo
-         isQb6uhq9F6qrjBrvorpzDovLfUoYI9xNNgVzOMoX6kUbcbqRqntgWSWYz16PPMEpTdF
-         t0Dg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766066101; x=1766670901;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=TuggqT0F+KQhUId8ALwJVG7L0b+tt0jPF/ba4NHvZKc=;
-        b=pDlikDmRqbq4KmjB6TLjBdHEQjRjNxYW7Lb0tSf743OhCAxLaHa7+wnG1RqmOAvNF2
-         GMg7WsxI+labotvLvuT9x3B3/aEgcTyf7xQKAs15RWPjUKlQenlpvC6esxsexBYq1Ob4
-         PyrExqrpp55P/inXZx+JJCMtk51qPBBDsoHEWVApcObQGbe8Rgjjv0M35TifkCzroPrt
-         fm7OS6o4ek9hM3bst4eNvkqB5Prp/VL6/mTf3PxkZ5gmfVnVeZny9kI0+dHEBxeTid3R
-         +kvJgrVlauWhAkLYxHTKLxdyCfRrnciiZlaI+ppRoCXqtvz1K40c0MX8wGamDylWFhhT
-         h7kQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWbj0pPAC7vcAqE7I4DezvISYdpOkWJxiGVq6fHdxMu1JkD1MwdlJJKs2CzWNOJE5eLVwiGZoEi3+uvvw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxAPFZiIpQ4SBc1g385/GVx2tv7/K1YagqdiuVFupeilNDXypQP
-	NGlY86ykFQtXzEBkjVgM1brA6Z8UVI3z+W81uj8g2rDN9r5EoZ5M2NRXJ48BGevLQAzOJ7zacg6
-	A0xOcIGvi8nrwJdHM7R9cRxO9+VUCdvIlb9B/wKPADg==
-X-Gm-Gg: AY/fxX4+MfY71qYZ0Fh6Xj4iyHIv/JHPa3tirCcR1KfoO1qtwNeu4LBUsvSSeSkjxfq
-	gfspRXhDe6k6uVftx5qE2OZT7SpNVXVZcfRzf0sUY7l5KQMORdfDslqbugWR/Wk/c2wyZp7vw4X
-	LKfaXysCulvIyncwtRZXR2Ti7lVvLLMnjJlSLEqVfBEt2jDhAzz75Mw/FfFb8fsDAdQDn33a6Gl
-	4uizr9Ux7vDNzXIBm7o2KwWjBlgwflA7hqTLN39G3Ovxs1Di7Ifvq2bYg0oSb1tMaOpfFg=
-X-Google-Smtp-Source: AGHT+IHmrcaEZ/4xgJKyHbaxDw17pSVi915qQ/Af8AcipJ/aKEdizS2ujurbxKh2LNeNbayqAnWeh73SEUp04mm0pLo=
-X-Received: by 2002:a17:907:948d:b0:b76:7e96:8b79 with SMTP id
- a640c23a62f3a-b8024fa5e0amr136869666b.2.1766066100620; Thu, 18 Dec 2025
- 05:55:00 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="nCwkxXbM"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5BIARYU3026434;
+	Thu, 18 Dec 2025 14:18:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=2jJd85
+	Wbq5faTpARkk3gXFpZZkkNwIgIYOS6Gzn7TMs=; b=nCwkxXbMbitqlNBrBF0cS+
+	l+l8joCKSFXBVBtDFb5aoSpF8Qc2aJzgLGKtwUVVT2NToXG7+nDlaHcKDbJKAq72
+	62iG+mbJkuXyQgBCGlEMNeOw4BGqXgmpRZUFXh8yhPItkU9ReXyrUgotz0uxb7O+
+	hdXG7YHKCZARPpYNiZ7fuyb7nqrsxbYwz7ucLdmepLrChhmEyamri4xtA/xjeJNI
+	+5/VgEc1WWkzvLpc/lXg78Rs4qhhQR1EN20P/8lnQgG7QYUQpvT5vZ6CTUbSJoha
+	OfqIDvLDMN+Nat/Sbgn/MElpGy15WZ7heurXG/eLKdElsF1ZWt6z1kfo5XGZonMw
+	==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4b0yn8u4ah-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 18 Dec 2025 14:18:42 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5BIC3nDt005686;
+	Thu, 18 Dec 2025 14:18:41 GMT
+Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4b1tgp7duf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 18 Dec 2025 14:18:41 +0000
+Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
+	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5BIEIekW21758662
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 18 Dec 2025 14:18:41 GMT
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0067C58052;
+	Thu, 18 Dec 2025 14:18:41 +0000 (GMT)
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 01AB358050;
+	Thu, 18 Dec 2025 14:18:38 +0000 (GMT)
+Received: from [9.111.59.18] (unknown [9.111.59.18])
+	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 18 Dec 2025 14:18:37 +0000 (GMT)
+Message-ID: <96af7e1a-8b8b-42b3-9247-b52df56af2ec@linux.ibm.com>
+Date: Thu, 18 Dec 2025 19:48:35 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251217093648.15938-2-fourier.thomas@gmail.com>
-In-Reply-To: <20251217093648.15938-2-fourier.thomas@gmail.com>
-From: Jinpu Wang <jinpu.wang@ionos.com>
-Date: Thu, 18 Dec 2025 14:54:49 +0100
-X-Gm-Features: AQt7F2rUAJe3eACQu6dyqFcKJODAJfKQsBhQaISdIzulKEe-oebCc5LtAkmCTaQ
-Message-ID: <CAMGffE=D5Cj0UmzCGPLwW2WCOKU0NpKPeERfToMdt-trQWwZgw@mail.gmail.com>
-Subject: Re: [PATCH v2] block: rnbd-clt: Fix leaked ID in init_dev()
-To: Thomas Fourier <fourier.thomas@gmail.com>
-Cc: "Md. Haris Iqbal" <haris.iqbal@ionos.com>, Jens Axboe <axboe@kernel.dk>, 
-	Md Haris Iqbal <haris.iqbal@cloud.ionos.com>, Lutz Pogrell <lutz.pogrell@cloud.ionos.com>, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 01/13] blk-wbt: factor out a helper wbt_set_lat()
+To: Yu Kuai <yukuai@fnnas.com>, axboe@kernel.dk, linux-block@vger.kernel.org,
+        tj@kernel.org, ming.lei@redhat.com
+References: <20251214101409.1723751-1-yukuai@fnnas.com>
+ <20251214101409.1723751-2-yukuai@fnnas.com>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <20251214101409.1723751-2-yukuai@fnnas.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjEzMDAxOCBTYWx0ZWRfX2iyHkS9gzqJa
+ PxTsvYFmT3lMJPk6EZRlddJ7gbfFkxgstEOE51R7z0JAYhUejl8ukN1plCBlm4hN9coljDQ6l8Y
+ hVs+Nl5aJlhCC7WKOQIBSK07/0hoqIJOiSRVUJaA6nYFcImydIWuF6l7PUwITEfjhDD7x/BZjDF
+ 9iK7pJyWAVwwtXJ2HP05a8IcwYlXqYKX565rJnrretwuYoh9COO2iAIHdHWvK6pwKmhKy049m+0
+ NFKH35catpCCIjR/f8bYiqZglejstRAoxYkkF6lVMCh4pFAYvy8Beayo2pRsBTPQKNVLBDVqPyG
+ K5ipTpDeKs7WXFUjJhh+YnOOC+oeco9ZP7ckcwmcy8FfHkxUrhXvqZDCFYHwYpreo90jOURMPbT
+ SuOrqbv5aW6eFULt+TLtIt6egfy+AQ==
+X-Proofpoint-GUID: ahvPA6GErM_AFT-uat3j9FzkKQiKX5zK
+X-Proofpoint-ORIG-GUID: ahvPA6GErM_AFT-uat3j9FzkKQiKX5zK
+X-Authority-Analysis: v=2.4 cv=LbYxKzfi c=1 sm=1 tr=0 ts=69440d42 cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=tJLSzyRPAAAA:8 a=VnNF1IyMAAAA:8 a=Xr457Ox3nHxwgcePNx4A:9 a=QEXdDO2ut3YA:10
+ a=A3mqa8q7df4A:10 a=H0xsmVfZzgdqH4_HIfU3:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-12-18_02,2025-12-17_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 spamscore=0 phishscore=0 clxscore=1015 suspectscore=0
+ adultscore=0 malwarescore=0 priorityscore=1501 lowpriorityscore=0
+ impostorscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2510240000
+ definitions=main-2512130018
 
-On Wed, Dec 17, 2025 at 10:37=E2=80=AFAM Thomas Fourier
-<fourier.thomas@gmail.com> wrote:
->
-> If kstrdup() fails in init_dev(), then the newly allocated ID is lost.
->
-> Fixes: 64e8a6ece1a5 ("block/rnbd-clt: Dynamically alloc buffer for pathna=
-me & blk_symlink_name")
-> Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
-Acked-by: Jack Wang <jinpu.wang@ionos.com>
-> ---
-> v1->v2:
->   - store id in dev directly
->
->  drivers/block/rnbd/rnbd-clt.c | 13 ++++++++-----
->  1 file changed, 8 insertions(+), 5 deletions(-)
->
-> diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.=
-c
-> index f1409e54010a..d1c354636315 100644
-> --- a/drivers/block/rnbd/rnbd-clt.c
-> +++ b/drivers/block/rnbd/rnbd-clt.c
-> @@ -1423,9 +1423,11 @@ static struct rnbd_clt_dev *init_dev(struct rnbd_c=
-lt_session *sess,
->                 goto out_alloc;
->         }
->
-> -       ret =3D ida_alloc_max(&index_ida, (1 << (MINORBITS - RNBD_PART_BI=
-TS)) - 1,
-> -                           GFP_KERNEL);
-> -       if (ret < 0) {
-> +       dev->clt_device_id =3D ida_alloc_max(&index_ida,
-> +                                          (1 << (MINORBITS - RNBD_PART_B=
-ITS)) - 1,
-> +                                          GFP_KERNEL);
-> +       if (dev->clt_device_id < 0) {
-> +               ret =3D dev->clt_device_id;
->                 pr_err("Failed to initialize device '%s' from session %s,=
- allocating idr failed, err: %d\n",
->                        pathname, sess->sessname, ret);
->                 goto out_queues;
-> @@ -1434,10 +1436,9 @@ static struct rnbd_clt_dev *init_dev(struct rnbd_c=
-lt_session *sess,
->         dev->pathname =3D kstrdup(pathname, GFP_KERNEL);
->         if (!dev->pathname) {
->                 ret =3D -ENOMEM;
-> -               goto out_queues;
-> +               goto out_ida;
->         }
->
-> -       dev->clt_device_id      =3D ret;
->         dev->sess               =3D sess;
->         dev->access_mode        =3D access_mode;
->         dev->nr_poll_queues     =3D nr_poll_queues;
-> @@ -1453,6 +1454,8 @@ static struct rnbd_clt_dev *init_dev(struct rnbd_cl=
-t_session *sess,
->
->         return dev;
->
-> +out_ida:
-> +       ida_free(&index_ida, dev->clt_device_id);
->  out_queues:
->         kfree(dev->hw_queues);
->  out_alloc:
-> --
-> 2.43.0
->
+
+
+On 12/14/25 3:43 PM, Yu Kuai wrote:
+> To move implementation details inside blk-wbt.c, prepare to fix possible
+> deadlock to call wbt_init() while queue is frozen in the next patch.
+> 
+> Signed-off-by: Yu Kuai <yukuai@fnnas.com>
+
+Looks good to me:
+Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
