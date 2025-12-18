@@ -1,153 +1,186 @@
-Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A867819E82A
-	for <linux-block@vger.kernel.org>; Thu, 18 Dec 2025 03:20:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.48
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766028021; cv=none; b=StExQBvuzK2ZCc7r46Bp3OhsaICxgaQ94aZuMVQE4bDN610opieX+/Drkop03ZYjCsz8/Hs78j37Rtgc10iSnzAepICczILFmBg7LBRVfyG5BimyOKSvRrSTDhBHXYjoaqoEHB1XQvxRR9PJxdxAI5RaXr3fN55rUftJlNjwu9c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766028021; c=relaxed/simple;
-	bh=NKEan06xgUdJ6cXxupFMdrgWgOLhA+xCGG8svbww0MY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=abK85cSQlcWPMoD2DammcJ8jllybgi33YRK+B0ThVoiaxcxZubZ3pkDAVoW1Q2E3ezTO/BecDf4PbJApibt1KOFws9OdJ3VcNHTKWPfig5mlnInwE9tpnqLoum5k8tEPWSjFfXny5Nht6iZ2TLMSQF4UdLyPZxXsGpirrOrdieY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=iAsCFMRh; arc=none smtp.client-ip=209.85.210.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26B102192F9
+	for <linux-block@vger.kernel.org>; Thu, 18 Dec 2025 04:42:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.182
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1766032933; cv=pass; b=gQorNAD3VJhylZm95e0mE6zi8HceANukQ1qHyfooi4VvKBx2xHgu19jRjjqCJPoHWEo6jasYIMTRXZt/hxYCM/sWHL1OlKJYKDCtZf65KjVX51KgIMCqbpCrOTJpfX1UpJ3zK5JcuSzzLl4pUT/zu0shuJvnjUJV2jkxlfavqLo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1766032933; c=relaxed/simple;
+	bh=DUQdLf5edxnyzdl6Na/QaFWiKAg6z6Vl1CdVvMH/63E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PeTYafTA04b2crh5nD0Htwx04RkWap4EPQxKzsobCf0iPnn3fpm6xgW1PnOpsaWzxuidmgFYo8H8KNVKt+SlA1yclnHA2RXCx8mqE/gvpu1Z/tzM/32R3TTcwBBU1/pD4ffUUpnmT2tQ/0Wai1aqx/1IBh7RI/i7Sj28nVYRiik=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=K8QwAbx7; arc=pass smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="iAsCFMRh"
-Received: by mail-ot1-f48.google.com with SMTP id 46e09a7af769-7c7533dbd87so124887a34.2
-        for <linux-block@vger.kernel.org>; Wed, 17 Dec 2025 19:20:17 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="K8QwAbx7"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-29f3018dfc3so533105ad.0
+        for <linux-block@vger.kernel.org>; Wed, 17 Dec 2025 20:42:10 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1766032930; cv=none;
+        d=google.com; s=arc-20240605;
+        b=VKVFBvE4E9/sP8Rpa7RvtJjwZdyolSGrUSELwJUCvSAU3IyVYA+GYkSLAaNq9AGQxD
+         pum5B9WGI7ZihHGjJemtXUeB/kopcgaontvvyXhe0uM6Vkkfh2ve4QGLdattVCeHa+l2
+         Uqma5R+EAmMLhIbBgwU6nWrFXuxHbWPY8MlFCxx7JzVABdzfyfVEaNDOaClA28J5O36y
+         TeiGMBPnEMtbwf13wTlWOzEPw+JTywV94YndyqFfbrBLX24qtsflpvq9BQ+3f8LJIIPd
+         KGAGzTdEeT6aeDt9tv1GMOIMH7ef8ZVoYygV9ap8P7+x4WLgCHC46kBLscXIRyTCCyO6
+         PjFA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=t2ua++xwk7WqtgT5E32GN0mAPrPB18PO58Noh2/9zjs=;
+        fh=/h6GbD16F4nFaDgau21IaA6H6yWeNDC8NZflgyC1Cqs=;
+        b=LMbma5sZbPJSYGSqsAR9qehI70M4D9T7IW7qw6CbflBgzyitbCpnIxGJPTPlq4vW7Y
+         ofu33PeoVmTLbTHynpyBE8NeTTPTirkuLqRRSz6Q3Sn3/uudhH+VcoatgZfyM9BKeoPX
+         VS22WoeBKOnpCqsLvIbr5CpnE+yTwuwpSAGB7TVPap1y4Mb7jkIG9ClHfSd5inAB4Xwf
+         4MWgmhNs3TQpVYPgIfb1khhvg9+DUG+SqNe9B5ca5dZedFmwPpDIAelSkkegDX+tjLli
+         RWPgE3OPwa8pBF6ZMCFACSatI72TSQO8KmxaCGdh4KJDfpGVWrZYV+lt5zmVag47MQsY
+         ma/g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1766028016; x=1766632816; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SbI9vGuOaGNVd02X8DiVeutBVykfn04tLns3ZcNmIJU=;
-        b=iAsCFMRhi3FhAJ1foX9WNBQjQzSq//RRU49RdxptmMbqsku4ZYUAMdI0DKqsif8DVI
-         3RLULA6G7teqcm0BVkH3g+GikuynZXnB8Cr5KV5ZkDPIAKgg10gV1nLSggCm5OBKTE9K
-         QAaAq7K0n+UUcNRFc/1/Y79CW/W6LWIZ9mV83VCReFRrE/1pAewQy5Hoa3ztOTMkF5dW
-         DNxdxAKIQ+hpxcAuKR6oMP6zhvvSNUpieWhwGCkF7hUCEku7IWJj53oRrFftLM1k8c26
-         9gFGk8IJXgYBDXk07LN+6kettl3MqmRE25lvBi1HPku5g61UDeUqvQOfZAdsoffL+aML
-         2wew==
+        d=purestorage.com; s=google2022; t=1766032930; x=1766637730; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=t2ua++xwk7WqtgT5E32GN0mAPrPB18PO58Noh2/9zjs=;
+        b=K8QwAbx7VUfhwpMxWuEx5brHRReLukfr6iSwThq0uog0DTj0pWFdg2BUEFEtWAwECD
+         i9DJb/3AvVUpg5BB4XiGYgJzRtN9c5Ye9Ymh15P/6Gt8KxH843/BKcWlWbuVF+9OjdJG
+         hEZFoOwmHwWZ+XRj14qm4u5UHXxHiE1QYbC+JWaG56c6AEHkM4f2+zW//10T5KRx6uic
+         H4QqtWfRcxs4vukSvYDmhncduBke+kmYEikuClHhYLOcZIfnyNIpaQGKV51SqQM3OrRr
+         drSqY0YZxN6Vp6NbntllmfITIXw8ip30jXtYMYlNslhx3jblKfU5AiUafDu+ax7R17Ds
+         3tJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766028016; x=1766632816;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SbI9vGuOaGNVd02X8DiVeutBVykfn04tLns3ZcNmIJU=;
-        b=AWv82HE1pEln5nln8OB0jAlQ0Qcc137jM6AG47+saW/GaS9SQ2si7HxVztz1szBq3q
-         VgDU7LxkqFp2sug/EW+N9xeZV5n/jFZMlx43FK736cei6FU8o3IkwWq4D5QT59w/tv7a
-         /jVa9SdOnKDxLLxcX+ByuBZMAIbSPs29steWcUlWwgMEaH4FEbEvA7l5gbYLxpoX7F8c
-         2akKPk15RYSZ/rV/iZesgCOcBceCi6Iq2lWbgMIXORAHhTD2asr0HNa3wkNdNBpIRT3m
-         KZiirUn4KnuvfqTPc3oj0A0JgsJY6N12HvgBgL/xWsxjdb6FtWx7EsBMcgMv6do36h9c
-         8rCg==
-X-Forwarded-Encrypted: i=1; AJvYcCWAtf3ilOS9N73o3gVdGvPcmQslyykF47Vf11poySNeNOKFH1VDO+wij6Pf5VKdZVvZGcnqZW83Gjfk4w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOoNAcalZQyFe6vGlwNQ66zJ4iaV7xUXgnJs8hobwBIk4SuX8D
-	SR5BlYB/PZXQl4AzgPZ2G8BEBlu//iagZqP40NZTGUwDUUqHcABmjh8zcDZKTfhrRwA=
-X-Gm-Gg: AY/fxX4xQbRvgfEIEjnVHOJc45vpptNpaQ34EKF39I9fuoM8/503UT7+Nn3xQQ6wkEU
-	whnsx1Y2pwhInv+4B/mqcpgYr2tJWYdMbx88rh3H75Fo1o6DtPIK7+2Km+3MKPqv4IrsHG/c2uD
-	CASQMvZgnFjin/hRP6dTpQqq5wFl0VrsZQ8jIs2G3SRDDOZoUHcGPwTYUGTb6X2XUH6W0erSSC3
-	vrFH1M/mjhBwrIeLjPwDbX6gqLqtKc+aS4WZXMmrue6/NoUAMSVrqXZb7bZIxgl3Lrfr7tAyYYh
-	7zDQHc/ubkwXGGhohexC72JxCfsOm3I+nWjqVvh08eagVJK1L9j8R5x0U4jhCmja8ZVfyJnr61U
-	xCCnUrIajUckMDpW/F2Muvm/jSV8qLEPjgSB39OjvwwxIa2ZsQJypZt0OuZkBZWCKF2jk8nIAWa
-	gXCJn6G9R2
-X-Google-Smtp-Source: AGHT+IFAJin+NRyzqEBUMz8QXuREsN7pguQVRgCpRlCbQ0/YCtgw2Xr6SAf8RYBDkRblLZDKu76I1w==
-X-Received: by 2002:a05:6820:4c84:b0:659:9a49:8ea5 with SMTP id 006d021491bc7-65b4523b5cemr8060181eaf.41.1766028016474;
-        Wed, 17 Dec 2025 19:20:16 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-65cff2150ccsm600548eaf.11.2025.12.17.19.20.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Dec 2025 19:20:15 -0800 (PST)
-Message-ID: <7f5a7801-0403-44e1-8629-3196092f32a9@kernel.dk>
-Date: Wed, 17 Dec 2025 20:20:13 -0700
+        d=1e100.net; s=20230601; t=1766032930; x=1766637730;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=t2ua++xwk7WqtgT5E32GN0mAPrPB18PO58Noh2/9zjs=;
+        b=Q4YJdAKXEkxDivXo9HtBHJu/o6hBZG0Im+nlX1lnJwcfOpAJgNuKjm+z35p747JVBM
+         Sr5xnG3MEemwxPHIMfO9uCmB6QF/Rtn8DZ2sxIWAA+hfph0BpbuMrYCV4VhPdzFWGM4e
+         t9DIK1KspcYKovcKOLHoB/L6qr0VvEZ7A7ArL04ykIeJA/+qzb1gi75ZgKFav6ng9oY0
+         8yF+Joems7N+NiobpqzFeUETM4dl8hqoGGzAGVfAVQjPpvPg/2hjXtkUTfQnhwklntrn
+         wTHj+Fcro6cxSFDPi3/CvHqZJfOwMYOE7dGBB9uoiG3VeIWHEiIF//DOAc5yEYwDvX7X
+         Rw4w==
+X-Forwarded-Encrypted: i=1; AJvYcCVg86yI4eh/QTxZi3PnvQRepvSJ9mEZhT7tnDOWqfeupDekJba5sjPpHhW5QZ5N0cVZKfvVNLorXk5KKA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9aZea7oJ60GZZukzQbxHdgYs8aqxSds7adpsZ2gR3juMzM+ps
+	zCni4WGpLRxdKsetW+vyblhUDP/0NnvW4Qv8K8pSNS2LfonGDIwK0/kBHUhMBdKtgi/djjGr+MT
+	gnt0PpRY891jYkYwlZ8kDP//4uo2MVO+WmxYNBIOa5A==
+X-Gm-Gg: AY/fxX45DYxMHs3aUz2x9Teuaf3qy0dub5yHQ5F5hnQljI2XEzWkfbxuRLSpucbGgjG
+	qrl6YJqRHKi938IZdyPSD6TID1pvnAYX8rHPYK7LMDx5seDAjZDgnBkhKKiputyNcbCu3ez9+J+
+	FFkn7mXnaUusIfaXDmDg1/fcPaFHl22EPYgk4iU1B8sKlz64gQIxxNOf2z5TJu3AaBMwccIhggN
+	2GuTF6LCFOuC0m68jZoPyHXH/x60qducB81lyXwewqpBVt69shcHbbWk7OjKTbxvcpIuz3Q
+X-Google-Smtp-Source: AGHT+IH7PLY+aMKuPLLwBnwJetvrVAgAoTGIvbZNDgtT5W2bAkapV2c1tIFGS8Q3WfwOUbAlI0oOny93OAIxkTzKdrg=
+X-Received: by 2002:a05:7023:90c:b0:11d:faef:21c2 with SMTP id
+ a92af1059eb24-1206281cc05mr535526c88.2.1766032930132; Wed, 17 Dec 2025
+ 20:42:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2] block: fix race between wbt_enable_default and IO
- submission
-To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
-Cc: Nilay Shroff <nilay@linux.ibm.com>, Yu Kuai <yukuai@fnnas.com>,
- Guangwu Zhang <guazhang@redhat.com>
-References: <20251212143500.485521-1-ming.lei@redhat.com>
- <CAFj5m9KVcKzEqpXt0J_28L+bHojeAv4+cu8hTyfdfA_c-q4nWw@mail.gmail.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <CAFj5m9KVcKzEqpXt0J_28L+bHojeAv4+cu8hTyfdfA_c-q4nWw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20251212143500.485521-1-ming.lei@redhat.com> <CAFj5m9KVcKzEqpXt0J_28L+bHojeAv4+cu8hTyfdfA_c-q4nWw@mail.gmail.com>
+ <7f5a7801-0403-44e1-8629-3196092f32a9@kernel.dk>
+In-Reply-To: <7f5a7801-0403-44e1-8629-3196092f32a9@kernel.dk>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Wed, 17 Dec 2025 20:41:58 -0800
+X-Gm-Features: AQt7F2o0wiLvAYjrGIfv5Nem1-WHBMNLrG6ETpfg3r5AWhvb1amPOGgduS0Z6UI
+Message-ID: <CADUfDZq8F2YL-vWcbop4KDrZ1fz5nBP6dbXVB6765kpFgxuy1g@mail.gmail.com>
+Subject: Re: [PATCH V2] block: fix race between wbt_enable_default and IO submission
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org, 
+	Nilay Shroff <nilay@linux.ibm.com>, Yu Kuai <yukuai@fnnas.com>, 
+	Guangwu Zhang <guazhang@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 12/17/25 8:18 PM, Ming Lei wrote:
-> On Fri, Dec 12, 2025 at 10:35?PM Ming Lei <ming.lei@redhat.com> wrote:
->>
->> When wbt_enable_default() is moved out of queue freezing in elevator_change(),
->> it can cause the wbt inflight counter to become negative (-1), leading to hung
->> tasks in the writeback path. Tasks get stuck in wbt_wait() because the counter
->> is in an inconsistent state.
->>
->> The issue occurs because wbt_enable_default() could race with IO submission,
->> allowing the counter to be decremented before proper initialization. This manifests
->> as:
->>
->>   rq_wait[0]:
->>     inflight:             -1
->>     has_waiters:        True
->>
->> rwb_enabled() checks the state, which can be updated exactly between wbt_wait()
->> (rq_qos_throttle()) and wbt_track()(rq_qos_track()), then the inflight counter
->> will become negative.
->>
->> And results in hung task warnings like:
->>   task:kworker/u24:39 state:D stack:0 pid:14767
->>   Call Trace:
->>     rq_qos_wait+0xb4/0x150
->>     wbt_wait+0xa9/0x100
->>     __rq_qos_throttle+0x24/0x40
->>     blk_mq_submit_bio+0x672/0x7b0
->>     ...
->>
->> Fix this by:
->>
->> 1. Splitting wbt_enable_default() into:
->>    - __wbt_enable_default(): Returns true if wbt_init() should be called
->>    - wbt_enable_default(): Wrapper for existing callers (no init)
->>    - wbt_init_enable_default(): New function that checks and inits WBT
->>
->> 2. Using wbt_init_enable_default() in blk_register_queue() to ensure
->>    proper initialization during queue registration
->>
->> 3. Move wbt_init() out of wbt_enable_default() which is only for enabling
->>    disabled wbt from bfq and iocost, and wbt_init() isn't needed. Then the
->>    original lock warning can be avoided.
->>
->> 4. Removing the ELEVATOR_FLAG_ENABLE_WBT_ON_EXIT flag and its handling
->>    code since it's no longer needed
->>
->> This ensures WBT is properly initialized before any IO can be submitted,
->> preventing the counter from going negative.
->>
->> Cc: Nilay Shroff <nilay@linux.ibm.com>
->> Cc: Yu Kuai <yukuai@fnnas.com>
->> Cc: Guangwu Zhang <guazhang@redhat.com>
->> Fixes: 78c271344b6f ("block: move wbt_enable_default() out of queue freezing from sched ->exit()")
->> Signed-off-by: Ming Lei <ming.lei@redhat.com>
->> ---
->> V2:
->>         - explain the race in commit log(Nilay, YuKuai)
-> 
-> Hi Jens,
-> 
-> Can you consider this fix for v6.19 if you are fine? Yu Kuai has one
-> patchset which depends
-> on this fix.
+On Wed, Dec 17, 2025 at 7:20=E2=80=AFPM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> On 12/17/25 8:18 PM, Ming Lei wrote:
+> > On Fri, Dec 12, 2025 at 10:35?PM Ming Lei <ming.lei@redhat.com> wrote:
+> >>
+> >> When wbt_enable_default() is moved out of queue freezing in elevator_c=
+hange(),
+> >> it can cause the wbt inflight counter to become negative (-1), leading=
+ to hung
+> >> tasks in the writeback path. Tasks get stuck in wbt_wait() because the=
+ counter
+> >> is in an inconsistent state.
+> >>
+> >> The issue occurs because wbt_enable_default() could race with IO submi=
+ssion,
+> >> allowing the counter to be decremented before proper initialization. T=
+his manifests
+> >> as:
+> >>
+> >>   rq_wait[0]:
+> >>     inflight:             -1
+> >>     has_waiters:        True
+> >>
+> >> rwb_enabled() checks the state, which can be updated exactly between w=
+bt_wait()
+> >> (rq_qos_throttle()) and wbt_track()(rq_qos_track()), then the inflight=
+ counter
+> >> will become negative.
+> >>
+> >> And results in hung task warnings like:
+> >>   task:kworker/u24:39 state:D stack:0 pid:14767
+> >>   Call Trace:
+> >>     rq_qos_wait+0xb4/0x150
+> >>     wbt_wait+0xa9/0x100
+> >>     __rq_qos_throttle+0x24/0x40
+> >>     blk_mq_submit_bio+0x672/0x7b0
+> >>     ...
+> >>
+> >> Fix this by:
+> >>
+> >> 1. Splitting wbt_enable_default() into:
+> >>    - __wbt_enable_default(): Returns true if wbt_init() should be call=
+ed
+> >>    - wbt_enable_default(): Wrapper for existing callers (no init)
+> >>    - wbt_init_enable_default(): New function that checks and inits WBT
+> >>
+> >> 2. Using wbt_init_enable_default() in blk_register_queue() to ensure
+> >>    proper initialization during queue registration
+> >>
+> >> 3. Move wbt_init() out of wbt_enable_default() which is only for enabl=
+ing
+> >>    disabled wbt from bfq and iocost, and wbt_init() isn't needed. Then=
+ the
+> >>    original lock warning can be avoided.
+> >>
+> >> 4. Removing the ELEVATOR_FLAG_ENABLE_WBT_ON_EXIT flag and its handling
+> >>    code since it's no longer needed
+> >>
+> >> This ensures WBT is properly initialized before any IO can be submitte=
+d,
+> >> preventing the counter from going negative.
+> >>
+> >> Cc: Nilay Shroff <nilay@linux.ibm.com>
+> >> Cc: Yu Kuai <yukuai@fnnas.com>
+> >> Cc: Guangwu Zhang <guazhang@redhat.com>
+> >> Fixes: 78c271344b6f ("block: move wbt_enable_default() out of queue fr=
+eezing from sched ->exit()")
+> >> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> >> ---
+> >> V2:
+> >>         - explain the race in commit log(Nilay, YuKuai)
+> >
+> > Hi Jens,
+> >
+> > Can you consider this fix for v6.19 if you are fine? Yu Kuai has one
+> > patchset which depends
+> > on this fix.
+>
+> It was queued up on the 12/12, now I'm pondering if the "thanks applied"
+> email never got sent out? In any case, it is in block-6.19.
 
-It was queued up on the 12/12, now I'm pondering if the "thanks applied"
-email never got sent out? In any case, it is in block-6.19.
+I also don't see an email about this series being applied, though it
+appears to be queued in block-6.19:
+https://lore.kernel.org/linux-block/20251212171707.1876250-1-csander@purest=
+orage.com/
 
--- 
-Jens Axboe
+Thanks,
+Caleb
