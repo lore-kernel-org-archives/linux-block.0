@@ -1,108 +1,170 @@
-Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEC883BB44
-	for <linux-block@vger.kernel.org>; Thu, 18 Dec 2025 02:41:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DD3D19E82A
+	for <linux-block@vger.kernel.org>; Thu, 18 Dec 2025 03:18:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766025702; cv=none; b=kM+tFFp0u5HfRSfjI2J1m/jyMM3zyoiMFzy+i2j45TpBU5/g+GnLch0qSGF96NvI9J5RS0fPzk0LV8xl6q5Spp8zGt6MSvYYEp60PTy640mY+tbfU8iTFKhueX+o4kerCTQ4J3SWVxudtT1Rd4wSciCJJx+Lj8FrLhjDLxL1AKU=
+	t=1766027904; cv=none; b=sHrxYOQKV3AvMp5QP1mvJLKrJ8sQ/U2NGvJHFmEPOChi41sidBYS5uw9jngsQE7tX5fgNoWe6yiv1O/uVCX4HY50BQgmPjOTdH5wzV39ickGG0Yd9cg/UNc6c35BVPXb4RsY06ryvcuIGDYrhNkovDUjkR5v8X9u2p+LHMimsBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766025702; c=relaxed/simple;
-	bh=fszlObuC7cNaUoTEfJmEqx+EjS6k+AwVEzrkth4Bzwg=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=fbF8yxUF46+xGWbOpQrShr4qAVnrzGub4KMijQ2jUiVSun6eh7tTI9TZkmaq4kRfXfINWii3KiDZFiAaN7qYTdRHHSok3yejhyerSi887528JIIIVb07Nx7PpE60ZTGU6hkyNEGKJ6v0I8Jmp8LCjImYyxn9/twnqPQX5xXLNhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=XE+yq0MQ; arc=none smtp.client-ip=209.85.210.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1766027904; c=relaxed/simple;
+	bh=GMqJG/Hj2OcwRhNGQWos5NnxAJs8HXMcng5Rs+sAAPs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=olcHa4EVw6X6E6S5ba8HQgM9bvUvQF8xozsaaCCd/hkwvhcADLCgHIcZK29cDPgSz3DrE9mo9Um0KyG2Vg5+0ZSoz7pvvd+yXjbXvbdRdLK1fWtgdGMLT8d8rFF9dl/+gB0q9G5hgVGDCM9kUfrfqx3qfsVaSazSSSwMOp62OYA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WjAAushd; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=D8HwLnjJ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="XE+yq0MQ"
-Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-7c6da42fbd4so53365a34.1
-        for <linux-block@vger.kernel.org>; Wed, 17 Dec 2025 18:41:40 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WjAAushd";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="D8HwLnjJ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1766027900;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Yeu5Fr/6tMv/xX9ZelFzXxgOzglbv0wgkFhHHNSk0/E=;
+	b=WjAAushdJtkkNbTHT/JH2CH5rAlJTCWX/GfhTHs9ANLfC/mseWYVxzulsAQo3YdILEfjRO
+	51+HzsL5lgVTeGr5eJ21NDWIIL1WDzHr5DvrzTmz1x4uLqRMPGwm3uQQjqG4ujDORF1Ibw
+	XOgBwi6ubXEMYm4VYlAgRj74mRsJEGI=
+Received: from mail-ua1-f69.google.com (mail-ua1-f69.google.com
+ [209.85.222.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-70-P8WV_GfMPUi6TxxBFfB3Ww-1; Wed, 17 Dec 2025 22:18:18 -0500
+X-MC-Unique: P8WV_GfMPUi6TxxBFfB3Ww-1
+X-Mimecast-MFC-AGG-ID: P8WV_GfMPUi6TxxBFfB3Ww_1766027898
+Received: by mail-ua1-f69.google.com with SMTP id a1e0cc1a2514c-93f5bfb23fbso472492241.0
+        for <linux-block@vger.kernel.org>; Wed, 17 Dec 2025 19:18:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1766025700; x=1766630500; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+        d=redhat.com; s=google; t=1766027898; x=1766632698; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=g9uwrXzDESv1rYaGqjObtlUzrS3biP31gVjvDPSv0Ag=;
-        b=XE+yq0MQjU8c1JD2qGOJDRe/08kyDv1tuRis6oIWvIxk6hcDhwX3L3bf4VbP5wzSyN
-         Fb8Lbwk1JS2IH0QFUzXx4LG89T4KUJedKAfTMqSq0AJvu8F2sQo2/ChZUpgX1W1JIi5o
-         MJVR4IxAOeG6JdJGsZTCJ86+ZocMT/UNWiRgJf1aPXskBkSzBnsdlmhqCFN6lL6jHCXG
-         FtYPy9f4Q2N94A6k1N6jwsuLW2d5onoU77FX6UtG5XdAjXnQiHO4J8a8PBFL4bgrAOe0
-         kgVylHQKAeOr2qvXfsT/wrbNSDEI8Ts4LfiZByFZWO/Z4ragkzBUzhPPDkGRQ5oeQWxP
-         g1wQ==
+        bh=Yeu5Fr/6tMv/xX9ZelFzXxgOzglbv0wgkFhHHNSk0/E=;
+        b=D8HwLnjJ0D3q/GrYuphUxXf2Iliw+x/iGhZBPmkLaG4j2S4kTTJp8TSy2A6nKG0PtL
+         ihWQUbIxUR8NnjJGNrFIqmOqEZxV9LomLh0BV97nm0a+sOe1cihne/485RzI+KYZO8pN
+         /1j3SVzqXV5UxL8BOHdZTUDoSRHYnzagBdFYsyTSxWJqGgC7sfECPFRyAgOzJVaVMnOS
+         4e8p4E8V7348ZBN1UOI4XOQmSzZoMNGemEwSEyIPy7DbnmJHS9Z5TNkzUxZwHMtp+jcA
+         L/LxpJzj15mRuHLQ3m6PzeBtPMbT/ty5W+QuIKlM1E9o/Qi4rG45Q3OmmLYoaPWP5SbV
+         lTvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766025700; x=1766630500;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1766027898; x=1766632698;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=g9uwrXzDESv1rYaGqjObtlUzrS3biP31gVjvDPSv0Ag=;
-        b=v+83n/aGsArec474910MtMF04ij/X/igq0+MPyehNJPQMT5lr0JOEMMjQdjdxj3jKb
-         kwY2jHur10elruQk2C8DQyGtUJVZ8JPIth1pJd5cjzLBSj8QUryx3o5MplNZuts4mXWf
-         fAXFxnMo2q0XvaY2opxbnNYg0q6F0OV42dHfnOh1LL7DA73Mr+Pjh8egfPFLTXNc6/VD
-         ClVR/FysyYtO9YUxO0D6agpE7/ElEhPLRoyCW/Bdip6iOSbYXe6jx34zIegAfym+VLbp
-         GEYcapHeH5OlYdPDzW0MnyCMoPk8HYeayImoab2PgH3barjulw7+x6VSNVnKMx3zv+cu
-         68ng==
-X-Gm-Message-State: AOJu0YxodfSCwyBnV9RquBh9tR/nvBFV3B9gSXPeOBb6uJi4HmU+aWvc
-	/cLI7qGQ89fyngx9Q1Te40u1AnhBHlWtry4/SiqXbfzjR46p5T8CkWGLkTDbiOVqWk4MR2AmmE+
-	QkPAoH1E=
-X-Gm-Gg: AY/fxX4adFL2ZGvJnHg6nYrELr52zNrstUPTkwc+/WDGindIDu1SEzSAKgxmFxUfXIC
-	tIWs9yHLXemg0prEb0VmFY4LhetnUVbvewGfuEh8aH0sIkyF9XK65vBPE3cqB0CfvL0CIVk4OTE
-	Q3yHttr7hPg18L9lNIegzcwZvA0r2+Mvii9dOVpImgx0Llj4NRs1Wow3kO+5gpe5R0tDuV2u65G
-	j6N0TlOc/bfJ5sQGr8uVydn1rS7QO3SvS+DY+43baMlFEZ0Tiu+JajumITuaOU5vixu+NS7XH85
-	tOleGL+252JYGRup6Vs2REzJNDdmF55IBi2HFpwe6V6NoYQgPAOLsQzZmfO9748MKufDxi07sfD
-	O9Hh/hQuPzBdhzt30hLsDq70mA9tmCtRcINtl58BqlbICzF6xW3L0vIEtvMMKMe0NvW+QS1PoOz
-	1C068QJ74S8RQ1uw==
-X-Google-Smtp-Source: AGHT+IF5gU/cj22U4KKR/EBhqNWnoMQfTT25sftjT3yGCYWOEAfpazmknhSlvPXdqtKRqnn5KNA/9g==
-X-Received: by 2002:a05:6830:488a:b0:7cb:1309:5b64 with SMTP id 46e09a7af769-7cb13095d4dmr3292793a34.36.1766025699839;
-        Wed, 17 Dec 2025 18:41:39 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7cc59a7d560sm794948a34.11.2025.12.17.18.41.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Dec 2025 18:41:38 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Cc: Caleb Sander Mateos <csander@purestorage.com>, 
- Uday Shankar <ushankar@purestorage.com>
-In-Reply-To: <20251212143415.485359-1-ming.lei@redhat.com>
-References: <20251212143415.485359-1-ming.lei@redhat.com>
-Subject: Re: [PATCH V2] ublk: fix deadlock when reading partition table
-Message-Id: <176602569801.193494.13054789455823293484.b4-ty@kernel.dk>
-Date: Wed, 17 Dec 2025 19:41:38 -0700
+        bh=Yeu5Fr/6tMv/xX9ZelFzXxgOzglbv0wgkFhHHNSk0/E=;
+        b=vHFwCME+WcpiuNAB6xx8s8VEy2AABLRKJUAYiTraWAI6pqqpqHdRp8bNVWtsEJ/vyH
+         N7LkcvlZGL/FLOiFg4oMfwWR+31tl0Q8An+D1ncc8fzOmw4+IfJyB9ObRhiejQvO959n
+         PPVHKozHExTMNFnN2OM+ADjfMym3opkvm2O1T/MH074XmhN2ar3i3xZTeZNNi4iuvWHZ
+         Pu0oIXxdnIFrrGRU/MpO0rrszrVmy6GzZqVx+PMFVXil/vROyGCdmfkMVo/1kCYgQ1O+
+         PHh1fh+FK42QMyhjOxn6xk6//ra03cyFkTl1A6hm1mwztmR9ZfKd5qYCZfHkxHq1UjCA
+         iF2A==
+X-Forwarded-Encrypted: i=1; AJvYcCUdj/S/mPZJH0Azmvhnb2JIEFcPU1CrqPlZkvITWaHZBrfU8Am/NppbpXwk5jRC3p1QcCkp/f6UiDPU2w==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8c/M9mLoW2Dh4KEi8uMAOznSQiof/OAYZej7BNl5FImA78pNz
+	UkzE+pYEUeb+rnrjZIW1/AeVFWzXN/a9orAdkEWq2tU+dka2CncKXH2THj0EG1Gk0QkApeE+1ce
+	tEAfqSXM044s2WQqEfCuzh6m5ERz7WzzXXrFJen0sS1e2Be+thc3sDnGvtXYHPEyaoEaWf4tU5V
+	SROEuxvk/6oGOiidHv207g3zezCGVadYuIyTHJ1jcpFZpCwB4=
+X-Gm-Gg: AY/fxX7yp1RHpxYiKlj/S4Isjl190habqQ5QATv44JkHzabeoQSyUqPYhe5zuBGWEsF
+	sP5ymR5HFU2CD+b+gwun5WAt203u32u7GPPFSlqz9AjFTvbAHANXQtSDPJhWRb43uzK3A2a+2zT
+	L8BNFLQRRHg0fq+trJ2b2IWtChLaVrFAwl8lFKUm4db3JGKTlwOzCNqebTENP1cnBlb+c=
+X-Received: by 2002:a05:6102:f0c:b0:5db:2828:c133 with SMTP id ada2fe7eead31-5e82768a142mr7643148137.10.1766027897797;
+        Wed, 17 Dec 2025 19:18:17 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEYBjHjOHdwxuf9OHp2WuxdASwHH8L/53RqEzdmSQCUmZbV8hxKrg8rNOX8FFf9cyA1WYWF9FRrVuAltI2hn5E=
+X-Received: by 2002:a05:6102:f0c:b0:5db:2828:c133 with SMTP id
+ ada2fe7eead31-5e82768a142mr7643142137.10.1766027897443; Wed, 17 Dec 2025
+ 19:18:17 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
+References: <20251212143500.485521-1-ming.lei@redhat.com>
+In-Reply-To: <20251212143500.485521-1-ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+Date: Thu, 18 Dec 2025 11:18:06 +0800
+X-Gm-Features: AQt7F2qeFwL24lyRKTzkZEeHpQrTuhCZVn2PlhNtUTkh5X9pyWKY9Zw2P1papP8
+Message-ID: <CAFj5m9KVcKzEqpXt0J_28L+bHojeAv4+cu8hTyfdfA_c-q4nWw@mail.gmail.com>
+Subject: Re: [PATCH V2] block: fix race between wbt_enable_default and IO submission
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Cc: Nilay Shroff <nilay@linux.ibm.com>, Yu Kuai <yukuai@fnnas.com>, 
+	Guangwu Zhang <guazhang@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Dec 12, 2025 at 10:35=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wro=
+te:
+>
+> When wbt_enable_default() is moved out of queue freezing in elevator_chan=
+ge(),
+> it can cause the wbt inflight counter to become negative (-1), leading to=
+ hung
+> tasks in the writeback path. Tasks get stuck in wbt_wait() because the co=
+unter
+> is in an inconsistent state.
+>
+> The issue occurs because wbt_enable_default() could race with IO submissi=
+on,
+> allowing the counter to be decremented before proper initialization. This=
+ manifests
+> as:
+>
+>   rq_wait[0]:
+>     inflight:             -1
+>     has_waiters:        True
+>
+> rwb_enabled() checks the state, which can be updated exactly between wbt_=
+wait()
+> (rq_qos_throttle()) and wbt_track()(rq_qos_track()), then the inflight co=
+unter
+> will become negative.
+>
+> And results in hung task warnings like:
+>   task:kworker/u24:39 state:D stack:0 pid:14767
+>   Call Trace:
+>     rq_qos_wait+0xb4/0x150
+>     wbt_wait+0xa9/0x100
+>     __rq_qos_throttle+0x24/0x40
+>     blk_mq_submit_bio+0x672/0x7b0
+>     ...
+>
+> Fix this by:
+>
+> 1. Splitting wbt_enable_default() into:
+>    - __wbt_enable_default(): Returns true if wbt_init() should be called
+>    - wbt_enable_default(): Wrapper for existing callers (no init)
+>    - wbt_init_enable_default(): New function that checks and inits WBT
+>
+> 2. Using wbt_init_enable_default() in blk_register_queue() to ensure
+>    proper initialization during queue registration
+>
+> 3. Move wbt_init() out of wbt_enable_default() which is only for enabling
+>    disabled wbt from bfq and iocost, and wbt_init() isn't needed. Then th=
+e
+>    original lock warning can be avoided.
+>
+> 4. Removing the ELEVATOR_FLAG_ENABLE_WBT_ON_EXIT flag and its handling
+>    code since it's no longer needed
+>
+> This ensures WBT is properly initialized before any IO can be submitted,
+> preventing the counter from going negative.
+>
+> Cc: Nilay Shroff <nilay@linux.ibm.com>
+> Cc: Yu Kuai <yukuai@fnnas.com>
+> Cc: Guangwu Zhang <guazhang@redhat.com>
+> Fixes: 78c271344b6f ("block: move wbt_enable_default() out of queue freez=
+ing from sched ->exit()")
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+> V2:
+>         - explain the race in commit log(Nilay, YuKuai)
 
-On Fri, 12 Dec 2025 22:34:15 +0800, Ming Lei wrote:
-> When one process(such as udev) opens ublk block device (e.g., to read
-> the partition table via bdev_open()), a deadlock[1] can occur:
-> 
-> 1. bdev_open() grabs disk->open_mutex
-> 2. The process issues read I/O to ublk backend to read partition table
-> 3. In __ublk_complete_rq(), blk_update_request() or blk_mq_end_request()
->    runs bio->bi_end_io() callbacks
-> 4. If this triggers fput() on file descriptor of ublk block device, the
->    work may be deferred to current task's task work (see fput() implementation)
-> 5. This eventually calls blkdev_release() from the same context
-> 6. blkdev_release() tries to grab disk->open_mutex again
-> 7. Deadlock: same task waiting for a mutex it already holds
-> 
-> [...]
+Hi Jens,
 
-Applied, thanks!
+Can you consider this fix for v6.19 if you are fine? Yu Kuai has one
+patchset which depends
+on this fix.
 
-[1/1] ublk: fix deadlock when reading partition table
-      commit: c258f5c4502c9667bccf5d76fa731ab9c96687c1
-
-Best regards,
--- 
-Jens Axboe
-
-
+Thanks,
+Ming
 
