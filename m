@@ -1,62 +1,72 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE4B33587BB
-	for <linux-block@vger.kernel.org>; Thu, 18 Dec 2025 16:09:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4E9A35294C
+	for <linux-block@vger.kernel.org>; Thu, 18 Dec 2025 16:37:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766074155; cv=none; b=I1n1/Wp6ABkshbcoPcg0ACregrpbBCVdFwvEmJGXk01riwFFooRqWeZ/LFUwgY/+/Zl4pEQiifGcF+s7PbHARdbStk/6BFSQk7Q98D10KMnmmu1HM2tyE+yBcQ1cAsLv88FKG7y399SQlyJwkwFMhdiGX+L6zO7aiJZdnNIpWKI=
+	t=1766075848; cv=none; b=BtLypkz9lW29mFUqzlcbVhvUdMw+est8WLh2XqGNYueeZNo9weYSEhy6wGtQ6m2XSMqxx2zDBzPNOaMcjHvKT2qBSV7c2D9hNMfyTgT83PGbOZB7vmzKkF60WXxGttit36LNJNQ0uDmGDcnmb/Tes+6mu3qZyhzYNqHmMeS75v4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766074155; c=relaxed/simple;
-	bh=Tr9+xx0Px/D03EawGODeyaT/8YYgfmAviFlrAXVV9fM=;
+	s=arc-20240116; t=1766075848; c=relaxed/simple;
+	bh=E7v8Jd8q4ZT+w8P4DgFjN83tk23oPHQ/i6x63PK3GgU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C27l3tIL40PYzwgH7P7sgAP2D8JH4BEkCu+X6qBs6jzRHiOLukEK9z8YZrIZSFRF9M051Gn0zu4nnAdmCPQZ5IX+avhYQGsSvXYa7ptgCfqX8NbiTms95B4dNngUGoXtviVS7f6RyVKJtNb528FwbdWFnwb+/MPAoVq/bk9bQw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eIxlsgnC; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=rK4bjWHR38ZpfLwA3iZC0MmpWC/fsDApxERDquH2rynryVO93fAMSfVeBiJve4+XwRW9nZQWO9vCY18vUfCSW3CR3MBhGepWIjacoUFL19p504MHJYdl49K3m2NIsN6hefKEixiAW3lGRBkwlynD8gqSNng0yrYULE7j19YgLqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=NyWhpTAY; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eIxlsgnC"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1766074151;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BHJIFVWe/DYq44cqnbzs7j9+orLzb+mX4JCiPeWS9kc=;
-	b=eIxlsgnC6Ih3G98lZmbCQ317ImYWblTVoQJu7l15G4Sxstm26oMmL9gEwzYQ49ZdUDisHz
-	PzhcWQxbrAAvdXYeGtiCi64v/xwdVXmv1TdoBz7OPVHQGTuMG42/IU2vJpro1gtFW410Zt
-	L+FG80UDeMFpk4hdG91I3MoOkC2Q5rQ=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-694-iQuwRU1bP4GgaXxE2GuQ0A-1; Thu,
- 18 Dec 2025 11:09:05 -0500
-X-MC-Unique: iQuwRU1bP4GgaXxE2GuQ0A-1
-X-Mimecast-MFC-AGG-ID: iQuwRU1bP4GgaXxE2GuQ0A_1766074144
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2E7251955DE1;
-	Thu, 18 Dec 2025 16:09:03 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.190])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E55E830001B9;
-	Thu, 18 Dec 2025 16:08:56 +0000 (UTC)
-Date: Fri, 19 Dec 2025 00:08:51 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Nitesh Shetty <nj.shetty@samsung.com>
-Cc: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, io-uring@vger.kernel.org,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	huang-jl <huang-jl@deepseek.com>
-Subject: Re: [PATCH 1/3] block: fix bio_may_need_split() by using bvec
- iterator way
-Message-ID: <aUQnE0b46XFGrLOd@fedora>
-References: <20251218093146.1218279-1-ming.lei@redhat.com>
- <20251218093146.1218279-2-ming.lei@redhat.com>
- <aUPLYcAx2dh-DvuP@infradead.org>
- <aUPNLNHVz2-Y-Z4C@fedora>
- <CGME20251218151755epcas5p2da7c90c8fdb9ab22ff3338b7169a6f7e@epcas5p2.samsung.com>
- <20251218151522.m4dgyf4nkrfsgkrv@green245.gost>
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="NyWhpTAY"
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-64312565c10so1434490a12.2
+        for <linux-block@vger.kernel.org>; Thu, 18 Dec 2025 08:37:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1766075845; x=1766680645; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Yqc+N7ACejUphaJlZEZfPqDo0ScYeTZ8ibI5l4T2etw=;
+        b=NyWhpTAYORI7nTn3UaI61aWmI7gaMU8pzpNhOmBGgHGCMRzdabbfg+sHGHSRcxKyUK
+         dRsH1kDdo3Ppvr9mRCXY/qeL+74uixxMlLfAhvD6ZaEs2xlgo/0SluAqPKCnfrAnRGoR
+         RVziHFs8IL5cX/68gmf7e6LmxIlRSQf2C/7RVCSVFFVQaZvJeyA5nUXckJIgWR5eullI
+         1xQdjwOssc/If7hWwcxNyUn3MD/KibXwMp81kC+SDxBeGRuyu0ICB7IuV7BG9E/oN0Go
+         pyj6vCA/FaOZ6SskIDOR5EWSxJGTfUCtLGSR3sIW7bfGD8dd6GmdrvlfWG5A9Dj7+vmZ
+         rtyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766075845; x=1766680645;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Yqc+N7ACejUphaJlZEZfPqDo0ScYeTZ8ibI5l4T2etw=;
+        b=aziQc4pfX9bamsquPA6nWWl3WHY+e+wCROynadBUmwHHn2ASkRyXfsHqelyaGa7UH+
+         VsMBNNpVhu8AaxnfmfODYQ+jumzTCs3RfttoHc/epg1WSeb5qcPqQeV4K4ISJIutqxk3
+         xbUUUAYGM8oOVaHCj+brw1MH8L+aOrHfG9XG4avO/ybKpPv3dTwStQEpGzuQm5hrxY8u
+         YvyBIBIhT0kucleFQJZr5tMdLndeqgd5cryhqVYJjdSR+v5HfMYNXOf4X95bVnDaSr9z
+         /C0d1FwjAmPkLFCuX2GG+S4m9C/aO2cKmXPfijk1bk446xp9l7gsotCoQ/Xy4ehm2o+R
+         uV6w==
+X-Forwarded-Encrypted: i=1; AJvYcCVzrYIU5VJQmGVUv0b8I1AMqm5pkEu2LIVkCyH62Z1fkepHgXuS4xV9CLHio136NI8Zi8sTlHpTQvSH2w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRDoYbWpprtIWHUTlrER0KpkB517h3PUWkxS9NV5ORij5iKFq1
+	CQWyIR8Y+fbelAB3H6/uxYd0a1exTq/LgEzfMjTzPfJ/dRZaiNiaYZ9XMoqz44liiYs=
+X-Gm-Gg: AY/fxX5p90fIf1CHn0bSMjgRhxvmfS5Ut+eZbmt3t2/v9x4uWpuqEpgh/tOB2RoFcsd
+	ykeWYRa8pwfXX9IeVUxDqj8bRbZuJMgxSQRlPBly3i3Ql2vlt2pT5zc7rpHVB4LR+dC7+xgWHTa
+	flQLtx4Vb0bVxMXGlKpfkSvtha8ezhyrEHtSMs4N1LDMds/Z2lbTyzSxyV9TQtfoh7o8e/03xRA
+	I9MxF0NlpwvPRNirN+S3spu0HGHelSARy1yVzgXxjMGp4X+QreHCFv8UqYRtVBAYSIcZNwC7kZ5
+	FV9jrg7F3Nnz+W/OXA0+YGEE3XknxDh7maIG4U6zx9BWQUIc24XuwKPqyFUPfo42PPBZ1pKNnPd
+	N0Fm7OAtzd/8g2Y8VZ3mhUf9EzDcMsSmaykhye0ZKgm+vLVgU5pn/yqzip5nVv8yPPYu851iAqZ
+	ddplXFgKheG3FKRubtzg==
+X-Google-Smtp-Source: AGHT+IE8sbMBdxmYf1QUCA7nYTzxwvOawDzPmQWwc6q/kQhBr7eVDkvBVM6zGwZBGDYi05K2pKxZHQ==
+X-Received: by 2002:a05:6402:34d2:b0:649:c56f:5847 with SMTP id 4fb4d7f45d1cf-64b8eb5fd19mr28872a12.10.1766075845006;
+        Thu, 18 Dec 2025 08:37:25 -0800 (PST)
+Received: from purestorage.com ([208.88.159.129])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-64b588b0b3asm3010982a12.35.2025.12.18.08.37.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Dec 2025 08:37:24 -0800 (PST)
+Date: Thu, 18 Dec 2025 09:37:21 -0700
+From: Michael Liang <mliang@purestorage.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] blk-mq: always clear rq->bio in blk_complete_request()
+Message-ID: <20251218163721.qfn2e54stbp2r7s4@purestorage.com>
+References: <20251217171853.2648851-1-mliang@purestorage.com>
+ <aUPAgtbWVql9SkoG@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -65,144 +75,31 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251218151522.m4dgyf4nkrfsgkrv@green245.gost>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+In-Reply-To: <aUPAgtbWVql9SkoG@infradead.org>
 
-On Thu, Dec 18, 2025 at 08:46:47PM +0530, Nitesh Shetty wrote:
-> On 18/12/25 05:45PM, Ming Lei wrote:
-> > On Thu, Dec 18, 2025 at 01:37:37AM -0800, Christoph Hellwig wrote:
-> > > On Thu, Dec 18, 2025 at 05:31:42PM +0800, Ming Lei wrote:
-> > > > ->bi_vcnt doesn't make sense for cloned bio, which is perfectly fine
-> > > > passed to bio_may_need_split().
-> > > >
-> > > > So fix bio_may_need_split() by not taking ->bi_vcnt directly, instead
-> > > > checking with help from bio size and bvec->len.
-> > > >
-> > > > Meantime retrieving the 1st bvec via __bvec_iter_bvec().
-> > > 
-> > > That totally misses the point.  The ->bi_vcnt is a fast and lose
-> > > check to see if we need the fairly expensive iterators to do the
-> > > real check.
+On Thu, Dec 18, 2025 at 12:51:14AM -0800, Christoph Hellwig wrote:
+> On Wed, Dec 17, 2025 at 10:18:53AM -0700, Michael Liang wrote:
+> > Commit ab3e1d3bbab9 ("block: allow end_io based requests in the
+> > completion batch handling") changed blk_complete_request() so that
+> > rq->bio and rq->__data_len are only cleared when ->end_io is NULL.
 > > 
-> > It is just __bvec_iter_bvec(), whatever it should be in cache sooner or
-> > later.
-> > 
-> > 
-> Functionality wise overall patch looks fine to me, but as Christoph
-> stated there is slight performance(IOPS) penalty.
-> Here is my benchmarking numbers[1], I suspect Jens setup might show
-> more regression.
+> > This conditional clearing is incorrect. The block layer guarantees that
+> > all bios attached to the request are fully completed and released before
+> > blk_complete_request() is called. Leaving rq->bio pointing to already
+> > completed bios results in stale pointers that may be reused immediately
+> > by a bioset allocator.
 > 
-> Regards,
-> Nitesh
+> Passthrough commands keep an extra reference on the bio and need the
+> pointer to call blk_rq_unmap_user from the completion handler.
 > 
-> 
-> [1]
-> ===============================
-> a. two optane nvme device setup:
-> ----------
-> base case:
-> ----------
-> sudo taskset -c 0,1 /home/nitesh/src/private/fio/t/io_uring -b512 \
-> -d128 -c32 -s32 -p1 -F1 -B1 -n2 -r4 /dev/nvme0n1 /dev/nvme1n1
-> submitter=0, tid=206586, file=/dev/nvme0n1, nfiles=1, node=-1
-> submitter=1, tid=206587, file=/dev/nvme1n1, nfiles=1, node=-1
-> polled=1, fixedbufs=1, register_files=1, buffered=0, QD=128
-> Engine=io_uring, sq_ring=128, cq_ring=128
-> polled=1, fixedbufs=1, register_files=1, buffered=0, QD=128
-> Engine=io_uring, sq_ring=128, cq_ring=128
-> IOPS=6.45M, BW=3.15GiB/s, IOS/call=32/31
-> IOPS=6.47M, BW=3.16GiB/s, IOS/call=32/32
-> IOPS=6.47M, BW=3.16GiB/s, IOS/call=32/32
-> Exiting on timeout
-> Maximum IOPS=6.47M
-> 
-> ----------------
-> with this patch:
-> ----------------
-> sudo taskset -c 0,1 /home/nitesh/src/private/fio/t/io_uring -b512 \
-> -d128 -c32 -s32 -p1 -F1 -B1 -n2 -r4 /dev/nvme0n1 /dev/nvme1n1
-> submitter=0, tid=6352, file=/dev/nvme0n1, nfiles=1, node=-1
-> polled=1, fixedbufs=1, register_files=1, buffered=0, QD=128
-> Engine=io_uring, sq_ring=128, cq_ring=128
-> submitter=1, tid=6353, file=/dev/nvme1n1, nfiles=1, node=-1
-> IOPS=6.30M, BW=3.08GiB/s, IOS/call=32/31
-> IOPS=6.35M, BW=3.10GiB/s, IOS/call=32/31
-> IOPS=6.37M, BW=3.11GiB/s, IOS/call=32/32
-> Exiting on timeout
-> Maximum IOPS=6.37M
-> 
-> =============================
-> b. two null-blk device setup:
-> ------------------
-> null device setup:
-> ------------------
-> sudo modprobe null_blk queue_mode=2 gb=10 bs=512 nr_devices=2 irqmode=2 \
-> completion_nsec=1000000 hw_queue_depth=256 memory_backed=0 discard=0 \
-> use_per_node_hctx=1
-> 
-> ----------
-> base case:
-> ----------
-> sudo taskset -c 0,1 /home/nitesh/src/private/fio/t/io_uring -b512 \
-> -d128 -c32 -s32 -p1 -F1 -B1 -n2 -r4 /dev/nullb0 /dev/nullb1
-> submitter=0, tid=6743, file=/dev/nullb0, nfiles=1, node=-1
-> submitter=1, tid=6744, file=/dev/nullb1, nfiles=1, node=-1
-> polled=1, fixedbufs=1, register_files=1, buffered=0, QD=128
-> Engine=io_uring, sq_ring=128, cq_ring=128
-> IOPS=7.89M, BW=3.85GiB/s, IOS/call=32/31
-> IOPS=7.96M, BW=3.89GiB/s, IOS/call=32/32
-> IOPS=7.99M, BW=3.90GiB/s, IOS/call=32/32
-> Exiting on timeout
-> Maximum IOPS=7.99M
-> 
-> -------------------
-> with this patchset:
-> -------------------
-> sudo taskset -c 0,1 /home/nitesh/src/private/fio/t/io_uring -b512 \
-> -d128 -c32 -s32 -p1 -F1 -B1 -n2 -r4 /dev/nullb0 /dev/nullb1
-> submitter=0, tid=35633, file=/dev/nullb0, nfiles=1, node=-1
-> submitter=1, tid=35634, file=/dev/nullb1, nfiles=1, node=-1
-> polled=1, fixedbufs=1, register_files=1, buffered=0, QD=128
-> Engine=io_uring, sq_ring=128, cq_ring=128
-> polled=1, fixedbufs=1, register_files=1, buffered=0, QD=128
-> Engine=io_uring, sq_ring=128, cq_ring=128
-> IOPS=7.79M, BW=3.80GiB/s, IOS/call=32/31
-> IOPS=7.86M, BW=3.84GiB/s, IOS/call=32/32
-> IOPS=7.89M, BW=3.85GiB/s, IOS/call=32/32
-> Exiting on timeout
-> Maximum IOPS=7.89M
-
-Thanks for the perf test!
-
-This patch only adds bio->bi_iter memory footprint, which is supposed
-to hit from L1, maybe because `bi_io_vec` is in the 2nd cacheline, can
-you see any difference with the following change?
-
-
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 5dc061d318a4..1c4570b37436 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -240,6 +240,7 @@ struct bio {
-                /* for plugged zoned writes only: */
-                unsigned int            __bi_nr_segments;
-        };
-+       struct bio_vec          *bi_io_vec;     /* the actual vec list */
-        bio_end_io_t            *bi_end_io;
-        void                    *bi_private;
- #ifdef CONFIG_BLK_CGROUP
-@@ -275,8 +276,6 @@ struct bio {
-
-        atomic_t                __bi_cnt;       /* pin count */
-
--       struct bio_vec          *bi_io_vec;     /* the actual vec list */
--
-        struct bio_set          *bi_pool;
- };
-
-
+Are you referring to nvme_uring_cmd_io() and nvme_submit_user_cmd()?
+From what I see req->bio is cached in both cases and from the comment in
+nvmme_uring_cmd_io() it actually expects req->bio is NULL after I/O
+completion. Anyway my point is to me blk_complete_request() is functionally
+similar to blk_update_request(), and in blk_update_request() req->bio is
+updated and if all I/Os are completed it's cleared to NULL. So I think
+it makes sense to keep the logic consistent here. But anyway let me know
+if I miss something here.
 
 Thanks,
-Ming
-
+Michael
