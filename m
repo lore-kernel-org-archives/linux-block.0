@@ -1,64 +1,64 @@
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0609B2FBE1D
-	for <linux-block@vger.kernel.org>; Sat, 20 Dec 2025 11:03:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 066E73009F7
+	for <linux-block@vger.kernel.org>; Sat, 20 Dec 2025 11:03:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766228597; cv=none; b=LJza4XuYxwPPPsNJoUNXsvfJjBWrEv6jOIQf/1uh+vGoLEa/OQcDqEY4EoSxLRkqY+whSihqY7A0OTYpYAYc3COPZk2/oaap4REZHP4M0GWhrPitHqwnCfqBgAttmtfpcmbbY0vJ926Bu3H70EHeJ7jxoAsNp0eDKLT3j6c3B/0=
+	t=1766228604; cv=none; b=WLVAyRRW49yJHw5s/+hUthhfEk4sFXg+sq3Sx53DtJoydghkNdlcWig8cPup+GdBtcH9rSJ35U5iR8Zb+yKUe2Pzsv82raph8o8PIJ2ZTnTDlxuFjLZSsMc6u1/ebRQMO7hWmRDKj8TUUm0Lei1oP+ZWxolnr1ToNxN1z8in0wA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766228597; c=relaxed/simple;
-	bh=o+vEFROiqUoDAPTJIDN1NXPMAkTeLu+cB5g1KoffBU8=;
+	s=arc-20240116; t=1766228604; c=relaxed/simple;
+	bh=qZiaWUijlwHeE8abhYVQrGh0Ck6Xhq/A2Ir5bDcfcM8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NUSpoxqM1CPVkuyEfT3n7SvzeQ+f2CxPxtQdiJpNeFsXDyL4ZKVuLttnq6/wkAic0LT+ZUpm2ewIt283kyotfqIZDjvAFTjr6lyYspWNIKMD3nu1RFQVhUr+9jMLIZyp/+1Cxfk3d/cUEEZn98qT9D58ZyCegrCY2lW/7h5IrVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SqTeyUF5; arc=none smtp.client-ip=209.85.210.178
+	 MIME-Version; b=ksKz8APyTcjh2qPL1TQf+kNeJCDtypYiuajdgohyxfGX9LxiHXcjgKT9Rqt6bFI8r7QEpvR0lFjAOXU7R5MjVpq4gd7rBCRjyY8MPnzAIlounAo5M4r3+eXBE5sSO+uUnIFgSPgCbfJZy/ktfAS2xoJhNUJ/F+/kvJm4hQoUbtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GvL7IudY; arc=none smtp.client-ip=209.85.210.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SqTeyUF5"
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-7b9215e55e6so1716679b3a.2
-        for <linux-block@vger.kernel.org>; Sat, 20 Dec 2025 03:03:15 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GvL7IudY"
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7b89c1ce9easo2944355b3a.2
+        for <linux-block@vger.kernel.org>; Sat, 20 Dec 2025 03:03:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766228595; x=1766833395; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1766228602; x=1766833402; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QmUq8CHI3JkNtGWiGFMZyA0zmDp2QcgRy2thJxu/yXE=;
-        b=SqTeyUF5qSB0bWs/TjWh+IANzwyLtcU5nZKbZVxUQ4kIZfqGv7kp5vMG8qM+rxE0ff
-         y0j/WO3b8WIM34PoCjukuO8+TFJc6HU51pbvTkMlDlUj4asMiiNy5ongYqZ5xDBPvYRe
-         WayxD91Nlo0j2m0VptnpkYIo4ITdeJMBtVXZMstNL5uRIid0soNprtOkLSAUnploWrko
-         6I96mKkmgIuXkzcuU1rinI9xp59gxKVxb+6Dgptt/Zi0M3f1l9TlXnMdVt7iv2VQ/2M2
-         dIO88u5sXC4Nd8jzeGlHAbCSPvb2ERUiNIxd71twmGyci7GbwHAwq01eCDlpksiW9jg5
-         88wA==
+        bh=oS9W7wjkO+D9K7hG07rgBpqwDj1jVarCsyxehEZuYco=;
+        b=GvL7IudYsd4mNxLK9s83kWth3f0hrFRMnhM2YW18kHzvM1Xb71vc9Lvs+wBSeF+Irr
+         pPUV4J/PzyGOmDSO01LJhQBzICQ2YBQjQfCnt2g69miig6RfX9+JKtNtc+44Z/BmpAxt
+         UhoJIpQw3aUwT9FiAo5XguuopElwL697cyFwZyANfNuCW2mCwRsmqrESkveiQ+II1QyQ
+         Z+t5r59/DNVQVsXx/JK1qXrjP8aeJRZqopucPiM7USrKEFGp3kUObFLDIajHeFa/W+/N
+         ztGoy386UXlKzDXwpoAiDgxsZQi3aR8zm3UYfSuFSmQddgOG5Hc7whK7Z/TCaW9f2E6+
+         YDNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766228595; x=1766833395;
+        d=1e100.net; s=20230601; t=1766228602; x=1766833402;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=QmUq8CHI3JkNtGWiGFMZyA0zmDp2QcgRy2thJxu/yXE=;
-        b=FOLbllOXAfsh+uCiUN+cFs1p8zv4I+vvHP9asu27eK24106pE5rgtb6xQCzS0YiBby
-         vSv851oTgaKOhDPLTTX6dKJHPn7LvA52fcyL999EBhpNe162jRlQBbiOqjfwtJf2tKV3
-         I5b8SvY8ZdPyV+zJq3CjVmVquzWcCVttDOFuNp6ojQ2FnCFa+lMJ3RtAZSt3LDeV0AgH
-         iVMOv1NzXDQohHzEiI/SUAPdPSeSnAxX9tbyn8f2Vdw6ndn+y/omxUfkaC9W5/3T6NY7
-         zixU0SvyrIPy0coAvMwFFJonfF96bBd+TRL5YeEqR1evtpBGy8Ma7mqRdBvo91+/oIzh
-         XOrg==
-X-Forwarded-Encrypted: i=1; AJvYcCXoGDMmhLOk0isxzxbuturgJRviZG+Q7OZbhgvwNb29SGeCZHgvYnZopfHZkq8o4F/tRKW3g5aPViijtQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyamNIH/mU4SCvUQLCbxnCgifqy671lmhE+05XjNF9yPJEQtjJK
-	gn0drG4PZOAKytsUi3TqIvDyYgiAQpsopU6Suqm+2/osPr97TeBXaAytSZLNUw==
-X-Gm-Gg: AY/fxX6cJOjgAytxmiaYoCsVZoyEFUG+Gq1Zo3EA3a4NKwlaQB5LJJjSb1EVJ+wcoFo
-	Kv33UDthxns3Fy37bh89uLBm/GAaRyCgnYDXzyz1xjb5KRQE6ysWCGU57lHRfls6cbGiH4LH3zH
-	mkhCqC11Sq2F71kw1PD2Mu0unIL8ZVzr0U0DYehnl4jQccejBrhW6BkskKYsUm6sb2dBZisDMDm
-	+z1MVKxVlGRfCRccAhJQQ29bHjmPudLz0krjUSLCNWan9tC8Gk1NzOHyFK3oiEhT3pQwq4YMYcK
-	IbVPnnYsf3Jauafyb1mhcqbksW+vFFkM3edV80a7TVYnHw7RwNPHUNsKjxtI+qw0Bq8wGL3Nqn1
-	XNsOhS2iLTLy8qBp7DFF+y+D+uue5d9eds04x2+NGcIK0JTkaFIdpKMO9LMiY+oQ1aaDZULGGxL
-	q8LnRYCr0vVaz8JmSh6S8luxOUrdBEoBf8v2eueXgQXUdvgEZ+/fc=
-X-Google-Smtp-Source: AGHT+IGbAZ0JhMv5C7UPQHUgypPKxamy+ux8uZDHLsQ7+9J/dXNnA0eGTxwDCnt+Pb+rIopbPEgwTA==
-X-Received: by 2002:a05:6a00:e11:b0:7b9:4e34:621b with SMTP id d2e1a72fcca58-7ff6421137cmr4854852b3a.12.1766228595290;
-        Sat, 20 Dec 2025 03:03:15 -0800 (PST)
+        bh=oS9W7wjkO+D9K7hG07rgBpqwDj1jVarCsyxehEZuYco=;
+        b=NH1DsXlgt3OJsykh5DofxGflpubANzh53dYaaWJvv5QGnSVFt/z3Jm/an9YuX+vfOx
+         YOKcr9QqO8eXwXIUCPgEa20CYfHrYXDE+CN6tztk0I6NEN2MhXDncGSuZTWkHDA98yCO
+         D9TqOaf1+u3n75qkZdWJz4CkCECAuJ23Hpx/5PxSlauQKUGmTitWMxXZxO/2usJ9MDoq
+         /GTGvkKOzxIecV5mv+vcRzE9u8Z1nf1NgvYePECNozUvXbZKZopzNvdxVQ5X+756kH/b
+         M9J51EjoklFxruv93IBTDTYc/o7E9FU340sA8f9k9olrfp1+aZr4jyKAvXs5ElOFHRUy
+         u8Ww==
+X-Forwarded-Encrypted: i=1; AJvYcCXV2yL5nZchvrkfJMdI6i55Tj+l7ziaH0jbGXvM4E7Sj0MQ4aefbujpuFJz1Z2p1AaWtuzaI/KB7xyzjQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxpangMa4oT9lyviFCBXXa6qVvKIpNm5O48MJCK0LOb6QumpWem
+	aE7MCQZhgph6Y8YKnBuxbubF1vWzBBy2RDR3ge3qEgKWqDL9nsJX+m6a
+X-Gm-Gg: AY/fxX41wgHOmLIxZ/Vgk8VOUYCVu9Jo6OR80Z8wAlnThjFJD2SFX4JY0b1T+t4b6Pw
+	NYvkrBLQ5ftmtYKlegFR6OS19yzOyfTujHthCFV8XvkEumkpVMRpEU7bvNzjZc5D3HicsHrClO1
+	XIa1vKv97uJo1r/WtCvj2VZc4OhH5nh2n4P9uMjiqr+pHlflAS90kaYwmHG3tetnfP45uHDxCUn
+	8pUdKWkKz4EzBjHylJZhf4mVrN6oI7CmoNURKXqIkHhlViTgFANPa/w8Nm4HWOMvLn+OSasB/40
+	CTXiSvF1WVUtfu7Yj1tcy+IdDxTisX3hCtvWgbZ+ZZkyqS/x2bURkNjtQi2pE5BAosHZUVfPMBt
+	j/N0hxFwgmS+4bxpmlYjpB2IjL5DXUfdddpyDj1NikjlTifEfrBR7/ACuItW+YNAqvdJZTHVpQT
+	lug48VGt5izXFvK2wwZ1nI5t8hMESruxpikPlczbotK6Dyqot49V4=
+X-Google-Smtp-Source: AGHT+IF/P/WLJTzCtGkWHYUlpb9xLBtbrMR9kXyxku3L04FO5e2ykvbYbKXn1q2ANA8kjw0xzemWug==
+X-Received: by 2002:a05:6a00:3014:b0:7e1:b7ba:d5a2 with SMTP id d2e1a72fcca58-7ff61b8b53fmr5213055b3a.0.1766228602348;
+        Sat, 20 Dec 2025 03:03:22 -0800 (PST)
 Received: from ionutnechita-arz2022.localdomain ([2a02:2f0e:c406:a500:4e4:f8f7:202b:9c23])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7ff7a84368dsm5015547b3a.2.2025.12.20.03.03.09
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7ff7a84368dsm5015547b3a.2.2025.12.20.03.03.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 20 Dec 2025 03:03:14 -0800 (PST)
+        Sat, 20 Dec 2025 03:03:21 -0800 (PST)
 From: "Ionut Nechita (WindRiver)" <djiony2011@gmail.com>
 X-Google-Original-From: "Ionut Nechita (WindRiver)" <ionut.nechita@windriver.com>
 To: axboe@kernel.dk,
@@ -70,9 +70,9 @@ Cc: gregkh@linuxfoundation.org,
 	linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org,
 	Ionut Nechita <ionut.nechita@windriver.com>
-Subject: [PATCH 1/2] block/blk-mq: fix RT kernel regression with queue_lock in hot path
-Date: Sat, 20 Dec 2025 13:02:40 +0200
-Message-ID: <20251220110241.8435-2-ionut.nechita@windriver.com>
+Subject: [PATCH 2/2] block/blk-mq: convert blk_mq_cpuhp_lock to raw_spinlock for RT
+Date: Sat, 20 Dec 2025 13:02:41 +0200
+Message-ID: <20251220110241.8435-3-ionut.nechita@windriver.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20251220110241.8435-1-ionut.nechita@windriver.com>
 References: <20251220110241.8435-1-ionut.nechita@windriver.com>
@@ -86,74 +86,92 @@ Content-Transfer-Encoding: 8bit
 
 From: Ionut Nechita <ionut.nechita@windriver.com>
 
-Commit 679b1874eba7 ("block: fix ordering between checking
-QUEUE_FLAG_QUIESCED request adding") introduced queue_lock acquisition
-in blk_mq_run_hw_queue() to synchronize QUEUE_FLAG_QUIESCED checks.
+Commit 58bf93580fec ("blk-mq: move cpuhp callback registering out of
+q->sysfs_lock") introduced a global mutex blk_mq_cpuhp_lock to avoid
+lockdep warnings between sysfs_lock and CPU hotplug lock.
 
-On RT kernels (CONFIG_PREEMPT_RT), regular spinlocks are converted to
-rt_mutex (sleeping locks). When multiple MSI-X IRQ threads process I/O
-completions concurrently, they contend on queue_lock in the hot path,
-causing all IRQ threads to enter D (uninterruptible sleep) state. This
-serializes interrupt processing completely.
+On RT kernels (CONFIG_PREEMPT_RT), regular mutexes are converted to
+rt_mutex (sleeping locks). When block layer operations need to acquire
+blk_mq_cpuhp_lock, IRQ threads processing I/O completions may sleep,
+causing additional contention on top of the queue_lock issue from
+commit 679b1874eba7 ("block: fix ordering between checking
+QUEUE_FLAG_QUIESCED request adding").
 
 Test case (MegaRAID 12GSAS with 8 MSI-X vectors on RT kernel):
-- Good (v6.6.52-rt):  640 MB/s sequential read
-- Bad  (v6.6.64-rt):  153 MB/s sequential read (-76% regression)
-- 6-8 out of 8 MSI-X IRQ threads stuck in D-state waiting on queue_lock
+- v6.6.68-rt with queue_lock fix: 640 MB/s (queue_lock fixed)
+- v6.6.69-rt: still exhibits contention due to cpuhp_lock mutex
 
-The original commit message mentioned memory barriers as an alternative
-approach. Use full memory barriers (smp_mb) instead of queue_lock to
-provide the same ordering guarantees without sleeping in RT kernel.
+The functions protected by blk_mq_cpuhp_lock only perform fast,
+non-sleeping operations:
+- hlist_unhashed() checks
+- cpuhp_state_add_instance_nocalls() - just hlist manipulation
+- cpuhp_state_remove_instance_nocalls() - just hlist manipulation
+- INIT_HLIST_NODE() initialization
 
-Memory barriers ensure proper synchronization:
-- CPU0 either sees QUEUE_FLAG_QUIESCED cleared, OR
-- CPU1 sees dispatch list/sw queue bitmap updates
+The _nocalls variants do not invoke state callbacks and only manipulate
+data structures, making them safe to call under raw_spinlock.
 
-This maintains correctness while avoiding lock contention that causes
-RT kernel IRQ threads to sleep in the I/O completion path.
+Convert blk_mq_cpuhp_lock from mutex to raw_spinlock to prevent it from
+becoming a sleeping lock in RT kernel. This eliminates the contention
+bottleneck while maintaining the lockdep fix's original intent.
 
-Fixes: 679b1874eba7 ("block: fix ordering between checking QUEUE_FLAG_QUIESCED request adding")
+Fixes: 58bf93580fec ("blk-mq: move cpuhp callback registering out of q->sysfs_lock")
 Cc: stable@vger.kernel.org
 Signed-off-by: Ionut Nechita <ionut.nechita@windriver.com>
 ---
- block/blk-mq.c | 19 ++++++++-----------
- 1 file changed, 8 insertions(+), 11 deletions(-)
+ block/blk-mq.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 5da948b07058..5fb8da4958d0 100644
+index 5fb8da4958d0..3982e24b1081 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -2292,22 +2292,19 @@ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
+@@ -43,7 +43,7 @@
  
- 	might_sleep_if(!async && hctx->flags & BLK_MQ_F_BLOCKING);
+ static DEFINE_PER_CPU(struct llist_head, blk_cpu_done);
+ static DEFINE_PER_CPU(call_single_data_t, blk_cpu_csd);
+-static DEFINE_MUTEX(blk_mq_cpuhp_lock);
++static DEFINE_RAW_SPINLOCK(blk_mq_cpuhp_lock);
  
-+	/*
-+	 * First lockless check to avoid unnecessary overhead.
-+	 * Memory barrier below synchronizes with blk_mq_unquiesce_queue().
-+	 */
- 	need_run = blk_mq_hw_queue_need_run(hctx);
- 	if (!need_run) {
--		unsigned long flags;
--
--		/*
--		 * Synchronize with blk_mq_unquiesce_queue(), because we check
--		 * if hw queue is quiesced locklessly above, we need the use
--		 * ->queue_lock to make sure we see the up-to-date status to
--		 * not miss rerunning the hw queue.
--		 */
--		spin_lock_irqsave(&hctx->queue->queue_lock, flags);
-+		/* Synchronize with blk_mq_unquiesce_queue() */
-+		smp_mb();
- 		need_run = blk_mq_hw_queue_need_run(hctx);
--		spin_unlock_irqrestore(&hctx->queue->queue_lock, flags);
--
- 		if (!need_run)
- 			return;
-+		/* Ensure dispatch list/sw queue updates visible before execution */
-+		smp_mb();
- 	}
+ static void blk_mq_insert_request(struct request *rq, blk_insert_t flags);
+ static void blk_mq_request_bypass_insert(struct request *rq,
+@@ -3641,9 +3641,9 @@ static void __blk_mq_remove_cpuhp(struct blk_mq_hw_ctx *hctx)
  
- 	if (async || !cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask)) {
+ static void blk_mq_remove_cpuhp(struct blk_mq_hw_ctx *hctx)
+ {
+-	mutex_lock(&blk_mq_cpuhp_lock);
++	raw_spin_lock(&blk_mq_cpuhp_lock);
+ 	__blk_mq_remove_cpuhp(hctx);
+-	mutex_unlock(&blk_mq_cpuhp_lock);
++	raw_spin_unlock(&blk_mq_cpuhp_lock);
+ }
+ 
+ static void __blk_mq_add_cpuhp(struct blk_mq_hw_ctx *hctx)
+@@ -3683,9 +3683,9 @@ static void blk_mq_remove_hw_queues_cpuhp(struct request_queue *q)
+ 	list_splice_init(&q->unused_hctx_list, &hctx_list);
+ 	spin_unlock(&q->unused_hctx_lock);
+ 
+-	mutex_lock(&blk_mq_cpuhp_lock);
++	raw_spin_lock(&blk_mq_cpuhp_lock);
+ 	__blk_mq_remove_cpuhp_list(&hctx_list);
+-	mutex_unlock(&blk_mq_cpuhp_lock);
++	raw_spin_unlock(&blk_mq_cpuhp_lock);
+ 
+ 	spin_lock(&q->unused_hctx_lock);
+ 	list_splice(&hctx_list, &q->unused_hctx_list);
+@@ -3702,10 +3702,10 @@ static void blk_mq_add_hw_queues_cpuhp(struct request_queue *q)
+ 	struct blk_mq_hw_ctx *hctx;
+ 	unsigned long i;
+ 
+-	mutex_lock(&blk_mq_cpuhp_lock);
++	raw_spin_lock(&blk_mq_cpuhp_lock);
+ 	queue_for_each_hw_ctx(q, hctx, i)
+ 		__blk_mq_add_cpuhp(hctx);
+-	mutex_unlock(&blk_mq_cpuhp_lock);
++	raw_spin_unlock(&blk_mq_cpuhp_lock);
+ }
+ 
+ /*
 -- 
 2.52.0
 
