@@ -1,73 +1,102 @@
-Received: from mail-ua1-f54.google.com (mail-ua1-f54.google.com [209.85.222.54])
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EDF31EA7CC
-	for <linux-block@vger.kernel.org>; Sat, 20 Dec 2025 17:32:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BBD118027
+	for <linux-block@vger.kernel.org>; Sat, 20 Dec 2025 17:38:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766251953; cv=none; b=KRKU2YFjcOspwA0OGMIY1B94dEtPxvPkU3L3wdlxb8Nf+cOG1vCY6/Ixj5B5qSnlr6xPsm17Klogrvd8QTPpOd9pbpN8/lvL0v/Eiu9hno6yiFzIDsNzzggayZMLa6dwd+dTZzdWh7L0aXXS+L+fA+K7caUQceWR46g8A8s1+0M=
+	t=1766252325; cv=none; b=ptmIsbvCtKAcNDEfDqnXDdeugRSthvlpwUUdKVXgS+jJWZUmEE1KwJVkgORv1VgSO/Qeukw4PywL8RlzUL9zZDr2wHy+rQQ/68c5QN4L7oTx0Y9ZMbsUwd2OT8YUUgfbi670Nx/4ABUb7XDY2G+BmaUyF/+ZRLuNXtoMqcPDhoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766251953; c=relaxed/simple;
-	bh=nBdYmX8I9PRPdvnvBha5bJMlQMxxN+gbdxxLnaxWK4k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Content-Type; b=Azxi5Ow2uq+leY+MpQDBZvl30/nZGcDTyC5tdJvPyaInzcxmSeIOM4ZrMwGdEGpgPq1HfRQFxZ4JhEdw5r6cD+aaLPK8b9ISuUDVx6b/Fe1as3kJJePeM49woRiqeocYf8SC5DFcjlDNNJnJKp2zEmG7cA+6T2tPRZzVNB6txd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hj/ycP50; arc=none smtp.client-ip=209.85.222.54
+	s=arc-20240116; t=1766252325; c=relaxed/simple;
+	bh=Y/voH7GOaY1vIvvLBz/nsReHQcaB9yvd5oju4+dtb6g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bYcYTkpFrjlmsjIKWamQMkFnzYd0Z3i2J7ilvDpQmb+2qgLJw/g0baj4X86qeMprKkNqTM0ZB0KtIm/GvbgT+W5dC5oW6cbsFc3HRaXLqc4wOLGJ1CR3duxniHLdnE7qCPlPqq2TAZs5nbxV+/gWICQliwnfh0/t6ErujT7KsCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eipv0gmi; arc=none smtp.client-ip=209.85.208.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hj/ycP50"
-Received: by mail-ua1-f54.google.com with SMTP id a1e0cc1a2514c-9412edb5defso598222241.0
-        for <linux-block@vger.kernel.org>; Sat, 20 Dec 2025 09:32:32 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eipv0gmi"
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-37fccf7035aso21916201fa.1
+        for <linux-block@vger.kernel.org>; Sat, 20 Dec 2025 09:38:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766251951; x=1766856751; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nBdYmX8I9PRPdvnvBha5bJMlQMxxN+gbdxxLnaxWK4k=;
-        b=Hj/ycP50iSKmMF6G6n3Rzeuo06Pgn3Wc6hEr6yKMpMdzGWnOEvw8FSpAtYUyUSyMsq
-         23EuNcG9C3apFw1n3i4jAQCcrlmw01K0+CCR5E/0ytP5SN9QNpB7qupyOl6tt3UwPbJt
-         VlJcO0gh9P8QF3ROeWU23MCRJtx/GQT+2qRDGHSnHmJLKRMNAO/Rot0+yuZ3biWDzD9J
-         7hKN30SgwbVjaOByh4/TrsEvBQEpyIGuRdCzPiNcX8oGpwu7sK/iXUNE7mlfBN80zd4/
-         Gwwn2KO8QRWQR5rdjehm9Qi0yCZAGrqIISloIgovhDv9188wJI4/INxjDnA10MWLCPWC
-         9w5w==
+        d=gmail.com; s=20230601; t=1766252321; x=1766857121; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=pWVHQnXJHLnZGKwql2taywHS0CwUooADxiatSjOPg0c=;
+        b=eipv0gmiHguAPhVAm5bSjlU/J7mmVpej8dQO2X62izc2EVlYbGsivihg1anrjbr2n1
+         hMMJv5TChKqqjioP1c2fySgM+9ZTSJIgkIfalnlNefuK2YSo7p5FOSrGRMDsSNVACq9A
+         eL85BRTUyRVyVpYIEr5niD+GBp09XEcYmiTowL2kjQswYQWho+3wLzQ7OjP8WZZr+Fqj
+         IRGkYquAudq+JPEfw4QUeRtCMrnnkhYDYVpuuHnsMIlycDVTJVAdDl5pyV+4eiy49myS
+         R0lPYwKBEOF3tuxDJ9cDmh1c6N2sz777N9xZftkXqQjK40T8w+X9K+Oc68m+eBm1pTSN
+         gxQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766251951; x=1766856751;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=nBdYmX8I9PRPdvnvBha5bJMlQMxxN+gbdxxLnaxWK4k=;
-        b=fcVbNybkjZ5bx718NjMeU3uLltEuxLBnqRV4QsEBR/y3btZyLIVCfOMlRWNuH7pjYn
-         25eL4N8Jjyus36KVs6OTMplmFoqcHio9FYzOIZj2aNUS34S8eFOIoFiwyBr6nxpIZ4lJ
-         cJw7FhxGltprkJXJs252eF6llExSewK4vjjDhJtICaTYu2xGuHL7eHScQqtv7Ci8nXla
-         P50eDnrMkrMxjq+7rejnSV/ZPbmDOfpiTQtCU8ctUGcd2LKNUeYjJq1iTa3uXVgoLKJZ
-         aH7+rJmiRu5tmQUDTWBxGoiVUCrNgj+w5x8enEgCaXSHmYKHa74LGcOMQ/9FeJEgVYbg
-         wSiA==
-X-Gm-Message-State: AOJu0Yx090CbwqtmaGWAwiZLomA5PNXRBzLy/gx7VV5PDz+3TShgaCIZ
-	ya7+zv9O515JJ33HVH6liDj1sKJ4pbdt+hNO+yEMvieca6ViPAgLlO57M6eZN9lzXSLNdW7odWM
-	hdCg35DhfiSinbstfjZKFqb66H0qajwZgcohWmVM=
-X-Gm-Gg: AY/fxX7mkXm3TzSfEtw0QnaJ/Ha7A0UpWsDzsoEVcFlMCO4GOBldROQnJgE8vNuNRo7
-	UAQ9qSV4qPL9wHZal+4292wVB3hz3stBPM8umQJySxSSrp+wfsUFdX9fnUICMLwTxmUmiajXV0M
-	OJG9eCzS/IKD/Jz7GOgPz0sOJ5aS8vpalAs70c4eMkAoSmUqnQP40dvRt2CMO8oeI6PWsaEIQZ5
-	UK68nD6bGgAhgE59ABTKYYtkzxrMXuimW3/vlo76a+edywl7G9IYS+mRlMMqF+y9+isB7pCl02a
-	Kh34x6EDTWo+YfVAxCffiCI27KCKkfLyPkDnEHc=
-X-Google-Smtp-Source: AGHT+IHuJgs7hKhtD/ctzqKH0dugT2Cl4KosgGGegiv6KliJybucs3U1n/6A8Km14jqvLEEhFQaAk7nyQcwhkNi8cG4=
-X-Received: by 2002:a05:6102:5107:b0:5df:ac57:b0ea with SMTP id
- ada2fe7eead31-5eb1a641acfmr1904293137.10.1766251951106; Sat, 20 Dec 2025
- 09:32:31 -0800 (PST)
+        d=1e100.net; s=20230601; t=1766252321; x=1766857121;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pWVHQnXJHLnZGKwql2taywHS0CwUooADxiatSjOPg0c=;
+        b=W8K2ogBexX39Rbv54VJt/OqMMZJzIPbBFbT43XQgno8gPsSc6FubsnQ9stpNafKw+c
+         GKg7lXAOmPaERYv34+H1qnFTUGO9wxElFzJZZXr0+Wz1OYNeBE5lZDE0LslZOrQ0kECz
+         klpJl4HC3Ag71SnYoyeTTHCvGx2+bfqsdxr8nI7DRAPVaEbCNSyFle5lQJSvTgFgvCiz
+         BM/Wb9xzEPQbkbfFxgO6Kys9zPaStWIk+gtRyTvveZjc4XA/4KyJUczbzXiB5ovYha9I
+         IDZfvGyRcBjyL8pkm+PqcFxe0+8gZgys0QvBYZz/elrXC4Ve/nnSucoQkyY7dpVpaOeb
+         wSmg==
+X-Gm-Message-State: AOJu0Yyuqt4nsCq5Ae4NX5LdlFtOlvrGv3BqfcFvQtLFqQdUdyNE03jh
+	72YQARjQuAW/mO5WR8hHW5Z/jYt6QERjH4hwiypFv5Nh2jE7G7rTZidjc0r/8g5/BUE=
+X-Gm-Gg: AY/fxX4o0T4H2F8zyku02kqfCVSaXXO3JcbB5fW/GVEQk/0ULWiU9cxJ8HUKeJyM91p
+	pNLKzl8D8bQF2DN9j0f0daij919L45WszI9S+7Zq3kml6/w1IKG14uqX9Q3cb1LXAc/ok/zQrB6
+	JhnRzYhSAsyn3ms5XTXz5CRMzKOsjfrsgc86/IQYq0jKKXNd/cSks+1mjkQD08Isp6Q1I53eYU+
+	ULGBVQmVlHJOPZX6k4a7gkFV6h3arrNzrp3Wc1UMrkTIoYlqFMrLHniEHcdBNnx8sxe3LOirmyc
+	i6PtTFz7bKwLVAjauHlofG8lzo0tjhgG5hmGDwaF7zxh9Mib6uyW18rw4/NbkWBbLGp/zwfkyZf
+	HAxooZd8IZjWdVzBMB2L87cB5c7bLHo+27RfiBV8vR1eR/Jo+IJq08pcEbnLXXL01LU8qvv8MyM
+	dVCTQkEOdI2IrgCDgwRAo0z5aJBiNCJE1S/9Y8Zqq6SZOW
+X-Google-Smtp-Source: AGHT+IF4oZaM2X0MjOhaWnNrJhiLDqITwDIXbBo4fYLLk5BmYfUmhvV6jmaDiuDNjWd2FalLYanAKw==
+X-Received: by 2002:a05:651c:41c6:b0:37b:9ab6:a071 with SMTP id 38308e7fff4ca-3812162d6a9mr21438191fa.28.1766252321190;
+        Sat, 20 Dec 2025 09:38:41 -0800 (PST)
+Received: from mismas.lan ([176.62.179.109])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-3812269da5esm12685351fa.50.2025.12.20.09.38.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 20 Dec 2025 09:38:40 -0800 (PST)
+From: Vitaliy Filippov <vitalifster@gmail.com>
+To: linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org
+Cc: Vitaliy Filippov <vitalifster@gmail.com>
+Subject: [PATCH] Do not require atomic writes to be power of 2 sized and aligned on length boundary
+Date: Sat, 20 Dec 2025 20:38:33 +0300
+Message-ID: <20251220173833.71176-1-vitalifster@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251220153307.56994-1-vitalifster@gmail.com>
-In-Reply-To: <20251220153307.56994-1-vitalifster@gmail.com>
-From: =?UTF-8?B?0JLQuNGC0LDQu9C40Lkg0KTQuNC70LjQv9C/0L7Qsg==?= <vitalifster@gmail.com>
-Date: Sat, 20 Dec 2025 20:32:19 +0300
-X-Gm-Features: AQt7F2q-vXCY1qViQYCjG6gKqXhA9zNic2YbXSUV0291pnKvG-b5vg8XNTgACLc
-Message-ID: <CAPqjcqr1dXzoa9BqS8UfR-_Pz+M5A1WN-Uo-T3jxZQwu=TODCw@mail.gmail.com>
-Subject: Re: [PATCH] Do not require atomic writes to be aligned on length boundary.
-To: linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Oops, sorry, is_power_of_2 is also an incorrect requirement and should
-also be removed.
+It contradicts NVMe specification where alignment is only required when atomic
+write boundary (NABSPF/NABO) is set and highly limits usage of NVMe atomic writes
+
+Signed-off-by: Vitaliy Filippov <vitalifster@gmail.com>
+---
+ fs/read_write.c | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/fs/read_write.c b/fs/read_write.c
+index 833bae068770..8b901be75a9f 100644
+--- a/fs/read_write.c
++++ b/fs/read_write.c
+@@ -1807,12 +1807,6 @@ int generic_atomic_write_valid(struct kiocb *iocb, struct iov_iter *iter)
+ 	if (!iter_is_ubuf(iter))
+ 		return -EINVAL;
+ 
+-	if (!is_power_of_2(len))
+-		return -EINVAL;
+-
+-	if (!IS_ALIGNED(iocb->ki_pos, len))
+-		return -EINVAL;
+-
+ 	if (!(iocb->ki_flags & IOCB_DIRECT))
+ 		return -EOPNOTSUPP;
+ 
+-- 
+2.51.0
+
