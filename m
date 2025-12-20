@@ -1,120 +1,158 @@
-Received: from exactco.de (exactco.de [176.9.10.151])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A5FE1B81CA
-	for <linux-block@vger.kernel.org>; Sat, 20 Dec 2025 12:58:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.9.10.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6556D2D94A9;
+	Sat, 20 Dec 2025 15:00:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766235521; cv=none; b=eLtjUVO/EVfE4hcv+Kr9ouLNKpHh4JY8NZKFrouBD07qx0DVHbcor0YNX0COKx5AH9RZ8WsIrSZLkJIdFFEi3v4BdhqG1RxNVaUjoGMdXaxf+/0CX2p8XVmgM86LDZDq+A0IvK7a3iHktElFii1B1Ljl1nqokGtlNLKasM72iAM=
+	t=1766242821; cv=none; b=rPQyw+ADIFGiBYRgKKtboSWnKDZRlk1xENHtUzaMh8zlbwLPq9O3ZdzVIUgtmgV9oC+S/DMYH/GRs1i5zd+uSHwqJS/xq2M6Pgy8M/pxhYAczMxdKZPolDtDIH3TLAxWJK36Vx9LSHXXiTE3cwXBmussnQveCnKU1MxOXmALvO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766235521; c=relaxed/simple;
-	bh=ZDmvwxOZ9NTwwoG5I8yKdSIby6h1tQLz60sBzwtFS4I=;
-	h=Date:Message-Id:To:Cc:Subject:From:Mime-Version:Content-Type; b=H3fMPOJDL5aCrueg0goqPzG1ophJtyKNPUqbX4S/bIKbFy0h1CKm7NwipnJf4cMfjva1qodMEMGoiAyhpCkp5+CnPr1BXTF2OToAPpnSwqSxhjdm8INozboahMai69stbpFdARsoTPT1DRrUNIPJfAij5QnWEGZILCRUB987myw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exactco.de; spf=pass smtp.mailfrom=exactco.de; dkim=pass (2048-bit key) header.d=exactco.de header.i=@exactco.de header.b=nuXbbARs; arc=none smtp.client-ip=176.9.10.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exactco.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=exactco.de
+	s=arc-20240116; t=1766242821; c=relaxed/simple;
+	bh=nAnK3wG0RXziPz7E4YON0DH/0jR4RzGtYIeGV6e9eM4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I9toDTl2u+4CTdrJXyIdhCQVTi+Mu010kQlXa7yy2qMWwzYEJFNFBbWQWvSjweq7K4iEVCswkozTPj8iMV8k0eYgXrBLCaco+I9WZRrHykSgHd+M2afzpFig8OYaNiluC1Qs8aV6VoH54LhnziE4CIlO8bFdVtaZCXZXTL18M3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SA8zPB/F; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=exactco.de header.i=@exactco.de header.b="nuXbbARs"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=exactco.de;
-	s=x; h=Content-Transfer-Encoding:Content-Type:Mime-Version:From:Subject:Cc:To
-	:Message-Id:Date:Sender:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:
-	References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:List-Post:
-	List-Owner:List-Archive; bh=bIk7+Oeov4iE49MSABnClqVr3hXCaOM4JLVr8/OtUKg=; b=n
-	uXbbARs7+OzEqb/SX/d7JYixx44tQue1PfiJJQfM0Ibf8xntcNgzRuDlN5DHUgpaSrRTyhJKPBg/p
-	5m2kHFMfvNqpgaT2/SlMApm0miM04utkzLuffw3Cy3BMcZM8asxxVvxZlhI6/eH+DllUeylEARjyZ
-	JlbUepXnnYAKLrzuuXY7BJvawrn72mzLNPVtjbUkRoeVVsdaHQWPdrU6UoQJ1fXUFjLy/YH7qNdOh
-	DSRr/87W++NuMXsbIY0IefwePu8WTtGc9fOQG0Liz34dzGqBzi8wvkUGVx7/gMsH5AMvq2elEhs6O
-	6FSCkXv+vESFGSzw6yvMaK2o0HHEX06qQ==;
-Date: Sat, 20 Dec 2025 13:58:41 +0100 (CET)
-Message-Id: <20251220.135841.1580468505634251616.rene@exactco.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH] partitions: mac: fix exposing free space as partitions
-From: =?iso-8859-1?Q?Ren=E9?= Rebe <rene@exactco.de>
-X-Mailer: Mew version 6.10 on Emacs 30.2
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SA8zPB/F"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1766242820; x=1797778820;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=nAnK3wG0RXziPz7E4YON0DH/0jR4RzGtYIeGV6e9eM4=;
+  b=SA8zPB/F25dXNfUQWSddSWwq9NYRdSspS6vv0u/f4B4V6GwQxFVZaSO4
+   AxQ8brZ6lU8Okj2p//7NBoKr5TT2sOU8g2eQoX0Xecxub9n2d/PoV/vMd
+   vYbPTHJTDDuqwT8IhE2ela1zehRlftJUmyJsGXtFUZTAQc2lW0jrzSJQk
+   uW+GiPIWgAhJuNjY2winYYFdw0El1XnP4ELFFmJUvq1mkmoZCsbkaIAHN
+   xrRjZ46sHG70D6UdgWeaqVhmiQUSjX3u+CNc0oGYD6NTf1+sGviE5CeqC
+   p4OD4WnTQciVt8mlfb/kGI9lXebn80hLl1bgZfQwLA6xOlrRod5kbWN9+
+   w==;
+X-CSE-ConnectionGUID: FIIq50q7Tv6dWGyn1brQCg==
+X-CSE-MsgGUID: iYoF0BeXQKiuxSB0xilDrg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11648"; a="72034868"
+X-IronPort-AV: E=Sophos;i="6.21,164,1763452800"; 
+   d="scan'208";a="72034868"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2025 07:00:19 -0800
+X-CSE-ConnectionGUID: eWNAbC0nRfCspnSKssnnHQ==
+X-CSE-MsgGUID: YNbLtCx4Tp+NnLAk2qHUvQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,164,1763452800"; 
+   d="scan'208";a="198359996"
+Received: from lkp-server01.sh.intel.com (HELO 0d09efa1b85f) ([10.239.97.150])
+  by orviesa010.jf.intel.com with ESMTP; 20 Dec 2025 07:00:12 -0800
+Received: from kbuild by 0d09efa1b85f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vWyRF-000000004hZ-0SYh;
+	Sat, 20 Dec 2025 15:00:09 +0000
+Date: Sat, 20 Dec 2025 22:59:32 +0800
+From: kernel test robot <lkp@intel.com>
+To: Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	cgroups@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+	bpf@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Yu Kuai <yukuai@fnnas.com>, Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Pablo Neira Ayuso <pablo@netfilter.org>
+Subject: Re: [PATCH 2/4] cgroup: Introduce cgroup_level() helper
+Message-ID: <202512202230.1uoB5chV-lkp@intel.com>
+References: <20251217162744.352391-3-mkoutny@suse.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251217162744.352391-3-mkoutny@suse.com>
 
-The mac partitions code creates partitions for unallocated, free
-space, and even the partition map itself. Fix by checking the VALID
-and ALLOCATED bits. Fix checkpatch trailing whitespace error while at
-it.
+Hi Michal,
 
-t2:/# parted /dev/sda print free
-Disk /dev/sda: 34.4GB
-Sector size (logical/physical): 512B/512B
-Partition Table: mac
-Disk Flags:
-Number  Start   End     Size    File system  Name   Flags
- 1      512B    32.8kB  32.3kB               Apple
-        32.8kB  99.6MB  99.6MB  Free Space
- 2      99.6MB  1000MB  901MB                linux
-        1000MB  34.4GB  33.4GB  Free Space
+kernel test robot noticed the following build errors:
 
-before:
-[   67.108282]  sda: [mac] sda1 sda2 sda3 sda4
+[auto build test ERROR on 8f0b4cce4481fb22653697cced8d0d04027cb1e8]
 
-patched:
-[   67.108110]  sda: [mac] sda2
+url:    https://github.com/intel-lab-lkp/linux/commits/Michal-Koutn/cgroup-Eliminate-cgrp_ancestor_storage-in-cgroup_root/20251218-004346
+base:   8f0b4cce4481fb22653697cced8d0d04027cb1e8
+patch link:    https://lore.kernel.org/r/20251217162744.352391-3-mkoutny%40suse.com
+patch subject: [PATCH 2/4] cgroup: Introduce cgroup_level() helper
+config: sparc64-randconfig-r134-20251218 (https://download.01.org/0day-ci/archive/20251220/202512202230.1uoB5chV-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251220/202512202230.1uoB5chV-lkp@intel.com/reproduce)
 
-Signed-off-by: René Rebe <rene@exactco.de>
----
- block/partitions/mac.c | 9 ++++++---
- block/partitions/mac.h | 2 ++
- 2 files changed, 8 insertions(+), 3 deletions(-)
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202512202230.1uoB5chV-lkp@intel.com/
 
-diff --git a/block/partitions/mac.c b/block/partitions/mac.c
-index b02530d98629..fc0ba1c8ec6e 100644
---- a/block/partitions/mac.c
-+++ b/block/partitions/mac.c
-@@ -96,9 +96,12 @@ int mac_partition(struct parsed_partitions *state)
- 		part = (struct mac_partition *) (data + pos%512);
- 		if (be16_to_cpu(part->signature) != MAC_PARTITION_MAGIC)
- 			break;
-+		if ((be32_to_cpu(part->status) & (MAC_STATUS_VALID | MAC_STATUS_ALLOCATED)) !=
-+		    (MAC_STATUS_VALID | MAC_STATUS_ALLOCATED))
-+			continue;
- 		put_partition(state, slot,
--			be32_to_cpu(part->start_block) * (secsize/512),
--			be32_to_cpu(part->block_count) * (secsize/512));
-+				be32_to_cpu(part->start_block) * (secsize/512),
-+				be32_to_cpu(part->block_count) * (secsize/512));
- 
- 		if (!strncasecmp(part->type, "Linux_RAID", 10))
- 			state->parts[slot].flags = ADDPART_FLAG_RAID;
-@@ -112,7 +115,7 @@ int mac_partition(struct parsed_partitions *state)
- 
- 			mac_fix_string(part->processor, 16);
- 			mac_fix_string(part->name, 32);
--			mac_fix_string(part->type, 32);					
-+			mac_fix_string(part->type, 32);
- 		    
- 			if ((be32_to_cpu(part->status) & MAC_STATUS_BOOTABLE)
- 			    && strcasecmp(part->processor, "powerpc") == 0)
-diff --git a/block/partitions/mac.h b/block/partitions/mac.h
-index 0e41c9da7532..10828c5d53d2 100644
---- a/block/partitions/mac.h
-+++ b/block/partitions/mac.h
-@@ -30,6 +30,8 @@ struct mac_partition {
- 	/* there is more stuff after this that we don't need */
- };
- 
-+#define MAC_STATUS_VALID	1	/* partition is valid */
-+#define MAC_STATUS_ALLOCATED	2	/* partition is allocated */
- #define MAC_STATUS_BOOTABLE	8	/* partition is bootable */
- 
- #define MAC_DRIVER_MAGIC	0x4552
--- 
-2.52.0
+All errors (new ones prefixed by >>):
 
+>> block/blk-iocost.c:3006:53: error: expected ';' after expression
+    3006 |         iocg->level = cgroup_level(blkg->blkcg->css.cgroup)
+         |                                                            ^
+         |                                                            ;
+   1 error generated.
+
+
+vim +3006 block/blk-iocost.c
+
+  2981	
+  2982	static void ioc_pd_init(struct blkg_policy_data *pd)
+  2983	{
+  2984		struct ioc_gq *iocg = pd_to_iocg(pd);
+  2985		struct blkcg_gq *blkg = pd_to_blkg(&iocg->pd);
+  2986		struct ioc *ioc = q_to_ioc(blkg->q);
+  2987		struct ioc_now now;
+  2988		struct blkcg_gq *tblkg;
+  2989		unsigned long flags;
+  2990	
+  2991		ioc_now(ioc, &now);
+  2992	
+  2993		iocg->ioc = ioc;
+  2994		atomic64_set(&iocg->vtime, now.vnow);
+  2995		atomic64_set(&iocg->done_vtime, now.vnow);
+  2996		atomic64_set(&iocg->active_period, atomic64_read(&ioc->cur_period));
+  2997		INIT_LIST_HEAD(&iocg->active_list);
+  2998		INIT_LIST_HEAD(&iocg->walk_list);
+  2999		INIT_LIST_HEAD(&iocg->surplus_list);
+  3000		iocg->hweight_active = WEIGHT_ONE;
+  3001		iocg->hweight_inuse = WEIGHT_ONE;
+  3002	
+  3003		init_waitqueue_head(&iocg->waitq);
+  3004		hrtimer_setup(&iocg->waitq_timer, iocg_waitq_timer_fn, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
+  3005	
+> 3006		iocg->level = cgroup_level(blkg->blkcg->css.cgroup)
+  3007	
+  3008		for (tblkg = blkg; tblkg; tblkg = tblkg->parent) {
+  3009			struct ioc_gq *tiocg = blkg_to_iocg(tblkg);
+  3010			iocg->ancestors[tiocg->level] = tiocg;
+  3011		}
+  3012	
+  3013		spin_lock_irqsave(&ioc->lock, flags);
+  3014		weight_updated(iocg, &now);
+  3015		spin_unlock_irqrestore(&ioc->lock, flags);
+  3016	}
+  3017	
 
 -- 
-René Rebe, ExactCODE GmbH, Berlin, Germany
-https://exactco.de • https://t2linux.com • https://patreon.com/renerebe
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
