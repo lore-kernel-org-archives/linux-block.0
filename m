@@ -1,75 +1,76 @@
-Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
+Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 840FD2D6407
-	for <linux-block@vger.kernel.org>; Sat, 20 Dec 2025 20:25:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 682172F12C3
+	for <linux-block@vger.kernel.org>; Sat, 20 Dec 2025 20:25:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766262351; cv=none; b=uJfCYi1uxyJMTgaij1XPi3oMHYN/x1CzKpfwpV012TRBmPbLlJcZchTp4/7KUhg7Te9wbBS4MtNA8NiX+nE/r4TTNQm9MtdFuJNL4429gEKcCeY34jp0edV/uCwp8HSXfugbLf9I9Kg8u0M6xe8uxvAczSHt3TeVCqPUAh+eM48=
+	t=1766262351; cv=none; b=C4ur14fq+q0QjYds918H7C71aX8Nk1hMOIDJ+XUBlfwkpMDNfLq3KPU3nXAZykX8xoG4438T7lTQbDdJa+QO2+snfxoumWltLC+2F04mUXRuCWOw37XUe6FydDYaPbpmrGKkAZncJWBZgHxpWGVGQgCLtnQAW+5nKSrHSN6Cvfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1766262351; c=relaxed/simple;
-	bh=WYiBPoNN15TRawXbXQ89ngXqO29M2xbANzu1FZDc32w=;
+	bh=MYVHHDYPJQlGy377kN/D5GQTkJQCWYfxlfGGoipB9Qo=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=YGC5yIWdt+7QBO4gpl4ZK7ECqx02PMnW1jQrc7lFMlpl1hgBvT5wCJZqNuO4OJs+0n3fhTOzRB/MfEpHrftiyCiU72jUDTsb4CT0BmopjiX42MfpNXzVKAjEcmV+aczamyMAw9cHuliF5qlmRqmfHP5TBs/rW5rAvBBbfumGnvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=bRWJHGeC; arc=none smtp.client-ip=209.85.210.42
+	 MIME-Version:Content-Type; b=RTog+MNWoud8y7G6H6O0XL8YThutv6gz95JD9QJ4C9ziSk5tpG2C8GkVwh6N9luJa2XgHr7AIgqmHoI8sSiOymdnaov0Z3lVxfJ9QAlrzoGOqbcNAh5lyxpuTWVp6syeiighdxVluZ5A9ClzrqurS4EBWQcIZqjq6PAdlhml6iA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=FtvsBmqD; arc=none smtp.client-ip=209.85.210.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="bRWJHGeC"
-Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-7c7bfba3996so1684342a34.0
-        for <linux-block@vger.kernel.org>; Sat, 20 Dec 2025 12:25:48 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="FtvsBmqD"
+Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-7c6cc44ff62so2085386a34.3
+        for <linux-block@vger.kernel.org>; Sat, 20 Dec 2025 12:25:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1766262347; x=1766867147; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1766262348; x=1766867148; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=H/lgamY9SXCimSG62HLgmOca+s6T4w5UYIKxECAKLIo=;
-        b=bRWJHGeC6n7pgXvYnYX83YRwPiY89ncCwAHgUi1qWKOKM7EnsQKVULSNMOjOiUmpcY
-         TLfFRhTRTUP9BjciSaDjgznVaA9zhD+Pzi/T9j5SPE65KOXIijiwTMdETZvb/Q3i7O+k
-         PIXDA1VgiW4/kULiXA/y8ryONImPQQCSi2F2a9TJRQHaiLT5YkbKODlK+RBv6kl4vQpD
-         7njhRVcCR2NYsJeMVUucd/zHQ3lsFzDnJ9qthF2BNBpkJBq0yjgwU9+tel7iYKRqFef8
-         jeF/3WK0QO6QBF8xLr+tVx08VkZgl0ReoBj4cD+iLEt4BPCxRwjIN/TpaZDF/bsqX4uI
-         EkNA==
+        bh=ECS0k4XdVu/LKfu6qgP9Zpz4mmQaxblDFvP7Po9U/iE=;
+        b=FtvsBmqDRdkK/HP39EkHqymXzLOsOnR27hHTXftcSxpm/cTjvu61DKR5H4RG0KYTw1
+         Oo4MJIBIROvXeJ+BtGDkcvjbRV99vVAel7CLT5inJq19Qv6Kpc76uiWArvG+X5GrU3PT
+         nYM52JVsil1HGpmjXruk6W+ig2TSqYZW7ZkJELpLRKx1S+46yK8ILlCfnxeWaqyYj8jg
+         0+ZrfIt9mqGTmJ4eOpB6szGkptp5cLTjoZMIpOypILkeIYXI4bW2BAa/8fjIpoeX3KSB
+         SSvF8FYXgyUFddSxFl/1mNmPk/6wRmofTx/6a3f72PB+j4aJrsHktvnGudVSZXJX7FnC
+         yg6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766262347; x=1766867147;
+        d=1e100.net; s=20230601; t=1766262348; x=1766867148;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=H/lgamY9SXCimSG62HLgmOca+s6T4w5UYIKxECAKLIo=;
-        b=HLyv88Ca+91+4e4R/K//NSELLtQ1nFKpIeh4qOgllva9XUH2ZZxABYTSMg2ATE7kGf
-         iISUHJeDIOlij8fMUD29uPdZNCE8S0iVJ8rV5z+02firApyyOOwni2MwtheDft20bzjP
-         Sx6DeQuAaDq27tmkuWMjAUPAvkZU8rLU7pfAHiEDcaDB8Gp6oP7jA8byAZ7GFUEEwfJy
-         1bczLx1z4epSyfyRxa/BlaByfeuNiSy203/bUUt6wEIdIoO36jNj5l4Cnd2Q3WXinEU/
-         ZUAHsm4kUfzugcHp+lkzVrIK2orBbmZoC7XEQLdz5OOzZZi5ydqA9uzao3UWxCwTTCT7
-         90xg==
-X-Forwarded-Encrypted: i=1; AJvYcCUDCNdUTFy5iqrPLcLterqgN/AJM9DWLTQ/T/KMeH4IfjTKV3ildHbLx4jrZV8s7mZ3jaD910Rpeq9vlg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMzMHZ7z3tzTmNQSJK48gpt0ZyspojeFQ7Qu4zX/b2uMKJrJGp
-	vFiPr8MNvyVPHT1/jjsTdrOLGFK5L5DfVnK0he9DUOSy0uRScjy0zv7EKq8QYrKgspk=
-X-Gm-Gg: AY/fxX5OQZL+ckbL0HInllyxbIb4vh1wKhJkg2NZuduTlmuemAlbe9rSAqIi6vBb6hC
-	PjEN8h1HKhbdEY5WTKWacILl36t6VJYYED3TMz7S9It5dLMTSXNGqMedvmg2DNfu0e3Ba6gu9Ju
-	T2oNzQk9Hkm8hgpUAndqZ0dHxpaWTKdyE9UEdRnQT9oXEmPOK7mstqo9/g33FQ+vtatGCQtZVTT
-	mCx1yYmrZnnt3SPzyG8qoQE/9tofSTLDvQGZXylfj2BQFGlg9FjMsJt5CZeyH0Zku+YMu/WckhU
-	2zcNDNwBhvb3WiRrS632sNDJa6tWwN3tU0y6rntcLW6aPwzmppQJTu1p5ocvwrE3MV1ukTb8qzm
-	LlBpOVS0iwBvVBaprobPZ8qoxZHGQ+nG68+h5Wz+Zc7xJ4D3+oq7u0BJRnf2JUtAcshBrgEaFk8
-	bJmc4=
-X-Google-Smtp-Source: AGHT+IFu2TOReZKWvA4ImfOcDfP76tmGhfg9TIAZOlwn1PwsJysVvxo/+zeCRv31OC5KYhiPkd1OwA==
-X-Received: by 2002:a05:6830:6731:b0:7bb:7a28:51ba with SMTP id 46e09a7af769-7cc66a95465mr3361625a34.26.1766262346970;
-        Sat, 20 Dec 2025 12:25:46 -0800 (PST)
+        bh=ECS0k4XdVu/LKfu6qgP9Zpz4mmQaxblDFvP7Po9U/iE=;
+        b=ktQKXxryutSoqU6cGQAnJMCkQAGiEwhLcU+ur5IhezOxCQN2bEzzSnTf9bUC9Oq47H
+         I+yt2oa3etaAksEyFnJTlhXWbRsujqxUsTVWCmZ6q1GhXEVcXWcvnzuXrQYNya5U0PCR
+         +jDF+HDCxdToO1I2abOEkoXE2Uiwha5mtKNNPdDc9eKIpslpCC+uBs4c4cTQyqEIFENN
+         8JHz4TDi/Go+ncmFyCAesqphPZqT9cUZgkQw3n6bfZ5Oul1YLrxJz96BkTtpEz3Rg0me
+         VA/v9qM2BQZPy4YOolr8nifW9oKWaheCs4DTpXNXJR4DoFR9KBVuPlGi/wsg+nhK4IKb
+         mvRw==
+X-Forwarded-Encrypted: i=1; AJvYcCUsXnp/s1kCIisHRy1FWMjI8Cgxo1I2wUo5UFJ3a828vBFGj0FivSEG98zz/ZTA2sobdaFx9Ir+G+032A==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzpbxACKUSl5vn34YqwlJD1cgZGBNc/ynIr4tp4zIhxHcP48M4N
+	EvW8G93ypDl7ULfG57lR85jdJI3HwY/+TS9w7M1qZV6YafgqncEdFS7TZrEywCm/oC6tX3D+2di
+	RCHeNQGI=
+X-Gm-Gg: AY/fxX6b/f71fiHZlpRSX5z/OUA2+MO3zeB+dJ0iN9bC3uN34Igb36MzN5DcVktJ91b
+	JtojofOkWsMddZXT6aCKdN97dVEKlfVipe77qSEjMG7h6KNP1op1mqmOtghLkCdJUSbMu8hrWF6
+	utJ67kQeSFoQgtrc86KkT+D2qZlfGjBFqCfNrvQa5Q7eMoI+tXFF1hKu2fMAgf1XMKmJcJ2yagx
+	ZjPmaMPszwOasaYGleLuwGgtxDiZVeHjLMkGsmnDixsqUQWUaxubq0zaZm1SkucN206nDzuDTRF
+	zOjxI8TArR/gQzNJ6WbL3aUPz77Gzr/pbWY+KepBvlSg6s3nDFLyvdNasWzuEafdl/rruil804C
+	rgyexSScXl658o+OFq4mn0n/GLc5620WBR3wH4Mno9dGimqO0BEyfNKfl21c9SpxZQPQa84yjwd
+	i6gVs=
+X-Google-Smtp-Source: AGHT+IGHnqUq6qhMw+8+QOCNGqZfJqkiKdZkMU3QPQCb7RcdfwN5RfqQ27Wgup/3i6q2X+NpNWmxjA==
+X-Received: by 2002:a05:6830:4c0e:b0:7c7:827f:872f with SMTP id 46e09a7af769-7cc66a5a9d7mr4103333a34.37.1766262348252;
+        Sat, 20 Dec 2025 12:25:48 -0800 (PST)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7cc6673ccc2sm4240033a34.12.2025.12.20.12.25.45
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7cc6673ccc2sm4240033a34.12.2025.12.20.12.25.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 20 Dec 2025 12:25:45 -0800 (PST)
+        Sat, 20 Dec 2025 12:25:47 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: Ming Lei <ming.lei@redhat.com>, 
- Caleb Sander Mateos <csander@purestorage.com>
-Cc: Uday Shankar <ushankar@purestorage.com>, linux-block@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-In-Reply-To: <20251213001950.2103303-1-csander@purestorage.com>
-References: <20251213001950.2103303-1-csander@purestorage.com>
-Subject: Re: [PATCH] ublk: clean up user copy references on ublk server
- exit
-Message-Id: <176626234523.413702.6264984213970998907.b4-ty@kernel.dk>
-Date: Sat, 20 Dec 2025 13:25:45 -0700
+To: Thomas Fourier <fourier.thomas@gmail.com>, 
+ Dan Carpenter <dan.carpenter@linaro.org>
+Cc: "Md. Haris Iqbal" <haris.iqbal@ionos.com>, 
+ Jack Wang <jinpu.wang@ionos.com>, linux-block@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+In-Reply-To: <aUZiUjcgaOue4j9S@stanley.mountain>
+References: <aUZiUjcgaOue4j9S@stanley.mountain>
+Subject: Re: [PATCH next] block: rnbd-clt: Fix signedness bug in init_dev()
+Message-Id: <176626234708.413702.6669635606958101937.b4-ty@kernel.dk>
+Date: Sat, 20 Dec 2025 13:25:47 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -81,33 +82,17 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3
 
 
-On Fri, 12 Dec 2025 17:19:49 -0700, Caleb Sander Mateos wrote:
-> If a ublk server process releases a ublk char device file, any requests
-> dispatched to the ublk server but not yet completed will retain a ref
-> value of UBLK_REFCOUNT_INIT. Before commit e63d2228ef83 ("ublk: simplify
-> aborting ublk request"), __ublk_fail_req() would decrement the reference
-> count before completing the failed request. However, that commit
-> optimized __ublk_fail_req() to call __ublk_complete_rq() directly
-> without decrementing the request reference count.
-> The leaked reference count incorrectly allows user copy and zero copy
-> operations on the completed ublk request. It also triggers the
-> WARN_ON_ONCE(refcount_read(&io->ref)) warnings in ublk_queue_reinit()
-> and ublk_deinit_queue().
-> Commit c5c5eb24ed61 ("ublk: avoid ublk_io_release() called after ublk
-> char dev is closed") already fixed the issue for ublk devices using
-> UBLK_F_SUPPORT_ZERO_COPY or UBLK_F_AUTO_BUF_REG. However, the reference
-> count leak also affects UBLK_F_USER_COPY, the other reference-counted
-> data copy mode. Fix the condition in ublk_check_and_reset_active_ref()
-> to include all reference-counted data copy modes. This ensures that any
-> ublk requests still owned by the ublk server when it exits have their
-> reference counts reset to 0.
+On Sat, 20 Dec 2025 11:46:10 +0300, Dan Carpenter wrote:
+> The "dev->clt_device_id" variable is set using ida_alloc_max() which
+> returns an int and in particular it returns negative error codes.
+> Change the type from u32 to int to fix the error checking.
 > 
-> [...]
+> 
 
 Applied, thanks!
 
-[1/1] ublk: clean up user copy references on ublk server exit
-      commit: daa24603d9f0808929514ee62ced30052ca7221c
+[1/1] block: rnbd-clt: Fix signedness bug in init_dev()
+      commit: 1ddb815fdfd45613c32e9bd1f7137428f298e541
 
 Best regards,
 -- 
