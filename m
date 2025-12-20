@@ -1,102 +1,117 @@
-Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 682172F12C3
-	for <linux-block@vger.kernel.org>; Sat, 20 Dec 2025 20:25:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E87430F950
+	for <linux-block@vger.kernel.org>; Sat, 20 Dec 2025 20:58:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766262351; cv=none; b=C4ur14fq+q0QjYds918H7C71aX8Nk1hMOIDJ+XUBlfwkpMDNfLq3KPU3nXAZykX8xoG4438T7lTQbDdJa+QO2+snfxoumWltLC+2F04mUXRuCWOw37XUe6FydDYaPbpmrGKkAZncJWBZgHxpWGVGQgCLtnQAW+5nKSrHSN6Cvfo=
+	t=1766264331; cv=none; b=SX6q8aihmvGoFgcZOp6uyPMNlrae64KjUNFf35S5lehSqZrAv8svrHDtddzHMtpMJujRAkMBGfJo/lrZ26kvB1FbKzx0nJyawDic611XG3UfnVfKJYGaRSvSN5xD5Ijp7bkRSUBHmn1TODk+u4QWg3SI1FrTn2o+1VL5QwURANI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766262351; c=relaxed/simple;
-	bh=MYVHHDYPJQlGy377kN/D5GQTkJQCWYfxlfGGoipB9Qo=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=RTog+MNWoud8y7G6H6O0XL8YThutv6gz95JD9QJ4C9ziSk5tpG2C8GkVwh6N9luJa2XgHr7AIgqmHoI8sSiOymdnaov0Z3lVxfJ9QAlrzoGOqbcNAh5lyxpuTWVp6syeiighdxVluZ5A9ClzrqurS4EBWQcIZqjq6PAdlhml6iA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=FtvsBmqD; arc=none smtp.client-ip=209.85.210.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1766264331; c=relaxed/simple;
+	bh=FuxQS6E0Qzft914wYAlyaZ47/nuyIPysXDjhmxdisGE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=jiJRxUnI0lseoQ+Ete5GevqCThIJNQT/Ne2h1SbFt7D7DUe3BZax8gx1lMjZ/OMYFTMgdkOxYpk/Ee9ooPDKOLMdfvr/bkH+TfHKGcf9a6OvK1v3XOgiMT7VF3cd3ZjIMyfYL9gApzmDwltHSTCoVPq/ttdvkqjUsIF/jk8lSio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KQwKBhzS; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="FtvsBmqD"
-Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-7c6cc44ff62so2085386a34.3
-        for <linux-block@vger.kernel.org>; Sat, 20 Dec 2025 12:25:49 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KQwKBhzS"
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7bc248dc16aso2448837b3a.0
+        for <linux-block@vger.kernel.org>; Sat, 20 Dec 2025 12:58:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1766262348; x=1766867148; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1766264330; x=1766869130; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ECS0k4XdVu/LKfu6qgP9Zpz4mmQaxblDFvP7Po9U/iE=;
-        b=FtvsBmqDRdkK/HP39EkHqymXzLOsOnR27hHTXftcSxpm/cTjvu61DKR5H4RG0KYTw1
-         Oo4MJIBIROvXeJ+BtGDkcvjbRV99vVAel7CLT5inJq19Qv6Kpc76uiWArvG+X5GrU3PT
-         nYM52JVsil1HGpmjXruk6W+ig2TSqYZW7ZkJELpLRKx1S+46yK8ILlCfnxeWaqyYj8jg
-         0+ZrfIt9mqGTmJ4eOpB6szGkptp5cLTjoZMIpOypILkeIYXI4bW2BAa/8fjIpoeX3KSB
-         SSvF8FYXgyUFddSxFl/1mNmPk/6wRmofTx/6a3f72PB+j4aJrsHktvnGudVSZXJX7FnC
-         yg6A==
+        bh=Rv3JIVjNgbdyh2io0L3fN/o5T0HuY7Hr8INRNlkFSBM=;
+        b=KQwKBhzS38L7C1XjKOMITCOVb10V5s2hWbV74yWEoGipcsBPaOOYo1nG5y3myvmf+M
+         CvOgc7RHd0ZKlAoIMPAnUjoJ2o1viIHjwko45lGIvH0QOeyorQSQOmgmmUnrbB3Ez21p
+         S/1sYCSnG9tJYd3Wa0efqu7Qz83oH7QFkj/IZeaiMq2qpb60Ee7ARUTo5e3qOrCi37LF
+         ks6DYJzCwj9nFiZYUiTOfJPrDIJUZ+JJGo0rYJJZYFtDdL+iKHso04nKlzMnB13fGHIF
+         jpx/wFfawWC7hHMK8NRTwb/sI74tSRexmSRzVk8plZZSSC0YYUF8Jzdl2Om3oC0i4eZ8
+         Ub7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766262348; x=1766867148;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1766264330; x=1766869130;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=ECS0k4XdVu/LKfu6qgP9Zpz4mmQaxblDFvP7Po9U/iE=;
-        b=ktQKXxryutSoqU6cGQAnJMCkQAGiEwhLcU+ur5IhezOxCQN2bEzzSnTf9bUC9Oq47H
-         I+yt2oa3etaAksEyFnJTlhXWbRsujqxUsTVWCmZ6q1GhXEVcXWcvnzuXrQYNya5U0PCR
-         +jDF+HDCxdToO1I2abOEkoXE2Uiwha5mtKNNPdDc9eKIpslpCC+uBs4c4cTQyqEIFENN
-         8JHz4TDi/Go+ncmFyCAesqphPZqT9cUZgkQw3n6bfZ5Oul1YLrxJz96BkTtpEz3Rg0me
-         VA/v9qM2BQZPy4YOolr8nifW9oKWaheCs4DTpXNXJR4DoFR9KBVuPlGi/wsg+nhK4IKb
-         mvRw==
-X-Forwarded-Encrypted: i=1; AJvYcCUsXnp/s1kCIisHRy1FWMjI8Cgxo1I2wUo5UFJ3a828vBFGj0FivSEG98zz/ZTA2sobdaFx9Ir+G+032A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzpbxACKUSl5vn34YqwlJD1cgZGBNc/ynIr4tp4zIhxHcP48M4N
-	EvW8G93ypDl7ULfG57lR85jdJI3HwY/+TS9w7M1qZV6YafgqncEdFS7TZrEywCm/oC6tX3D+2di
-	RCHeNQGI=
-X-Gm-Gg: AY/fxX6b/f71fiHZlpRSX5z/OUA2+MO3zeB+dJ0iN9bC3uN34Igb36MzN5DcVktJ91b
-	JtojofOkWsMddZXT6aCKdN97dVEKlfVipe77qSEjMG7h6KNP1op1mqmOtghLkCdJUSbMu8hrWF6
-	utJ67kQeSFoQgtrc86KkT+D2qZlfGjBFqCfNrvQa5Q7eMoI+tXFF1hKu2fMAgf1XMKmJcJ2yagx
-	ZjPmaMPszwOasaYGleLuwGgtxDiZVeHjLMkGsmnDixsqUQWUaxubq0zaZm1SkucN206nDzuDTRF
-	zOjxI8TArR/gQzNJ6WbL3aUPz77Gzr/pbWY+KepBvlSg6s3nDFLyvdNasWzuEafdl/rruil804C
-	rgyexSScXl658o+OFq4mn0n/GLc5620WBR3wH4Mno9dGimqO0BEyfNKfl21c9SpxZQPQa84yjwd
-	i6gVs=
-X-Google-Smtp-Source: AGHT+IGHnqUq6qhMw+8+QOCNGqZfJqkiKdZkMU3QPQCb7RcdfwN5RfqQ27Wgup/3i6q2X+NpNWmxjA==
-X-Received: by 2002:a05:6830:4c0e:b0:7c7:827f:872f with SMTP id 46e09a7af769-7cc66a5a9d7mr4103333a34.37.1766262348252;
-        Sat, 20 Dec 2025 12:25:48 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7cc6673ccc2sm4240033a34.12.2025.12.20.12.25.47
+        bh=Rv3JIVjNgbdyh2io0L3fN/o5T0HuY7Hr8INRNlkFSBM=;
+        b=DC7U4rDhjprqZfYQCxTtqbp+bw2tvD/V1aL0vtEjI/Y4jBiY6HynSvoVmxnW5gdzOj
+         LxiSLfJjM46lIXOoIQYjTv96fNMfEt7SshhhtC30jrFqKdotXGw9uMPb9a0j6NQKqZ0C
+         vas25vvJW4kqLl12C30i7U5ob6lzajjCqCEXT2hAuzor/wp6q+FG+YRQUk2L6VKqpRRr
+         h9vM5o7CGEfdjuYGv3Q0Fej6rOXzN2aMksZA8IKOOxOsQ+yYbXfArmq4L2ok0S5XMk38
+         atjMiGYaWBZqxgp/bifc5OLjBzNBVTz0WzGOfhHo91qoYJ55BoS3wgs5CFwVOBeggUMz
+         1p/A==
+X-Forwarded-Encrypted: i=1; AJvYcCUb9KWodDXhURGif65Bwg+rlhT7gKYIowE2MA5AnW0NlYW4jDvzs4DTCoBLrpFzPOZ7vAWDeyN3o6/nUw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzpCZda6aktudQ9My7xxqhASSqRI3iQz33kTh/ErzPoWJAJofZ0
+	PPt67ElimUrJjvm7Foc6otT8qsl5rUuObZE0xgLkM8CaLjHGEzETwKbF
+X-Gm-Gg: AY/fxX7JNILw6nZZ27urv7p5H857Vq95/hzMQG+Nc+gaiKyXZjTUGnGbqABiVpEuIxZ
+	OdLEXLAPFFQGN4IXKDRqOAafh9nLkQswb41XP/5+F8RgOpzGG0LFoZdYa9dLsgSOqPK+pbUa2D/
+	XjvQML0csHM/TfQLVzRH7FsKr/ryk68R6o4W21uPgS3pCj9B3wdH7js5x6XfoncFqE5ZKfgq6u3
+	SkDX8J6xFGroda4W0GFDIwIMVOpZzrZNMf15pASVpsbPLBlYXXVqyxaciFzGzPACQi1XPu3c1Vv
+	R6HOX4v4uDkWjVF3rnHCLxcLAMWC3nCXy9fIwRe6p3rObmqokSawkvoXVOGt4mnwMmNNN+FJT1z
+	5K2jGBi7ODgeleTfpfBDI4Je99ddQH4FdkUqi9vRO3ePgsQZHrzF5dB0+lbSjNKXZwpEthuj8Qb
+	1mnoinapyzZdyFUsNK9CxbZEnE5II614DQhHrSiQiiy6w=
+X-Google-Smtp-Source: AGHT+IHvwuYKMUU22bSDiWhgDhgPtQNkVn7dYPOpwL8nxp+q364FIMqTcJxyMX2lBMhJzgA6rw2kyw==
+X-Received: by 2002:a05:6a20:3946:b0:35d:53dc:cb57 with SMTP id adf61e73a8af0-376a96b9113mr7150196637.49.1766264329534;
+        Sat, 20 Dec 2025 12:58:49 -0800 (PST)
+Received: from ionutnechita-arz2022.local ([2a02:2f0e:c406:a500:11f0:cf32:1f0:98ab])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7ff7a93b441sm5878717b3a.9.2025.12.20.12.58.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 20 Dec 2025 12:25:47 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: Thomas Fourier <fourier.thomas@gmail.com>, 
- Dan Carpenter <dan.carpenter@linaro.org>
-Cc: "Md. Haris Iqbal" <haris.iqbal@ionos.com>, 
- Jack Wang <jinpu.wang@ionos.com>, linux-block@vger.kernel.org, 
- linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-In-Reply-To: <aUZiUjcgaOue4j9S@stanley.mountain>
-References: <aUZiUjcgaOue4j9S@stanley.mountain>
-Subject: Re: [PATCH next] block: rnbd-clt: Fix signedness bug in init_dev()
-Message-Id: <176626234708.413702.6669635606958101937.b4-ty@kernel.dk>
-Date: Sat, 20 Dec 2025 13:25:47 -0700
+        Sat, 20 Dec 2025 12:58:49 -0800 (PST)
+From: "Ionut Nechita (WindRiver)" <djiony2011@gmail.com>
+X-Google-Original-From: "Ionut Nechita (WindRiver)" <ionut.nechita@windriver.com>
+To: ming.lei@redhat.com
+Cc: axboe@kernel.dk,
+	djiony2011@gmail.com,
+	gregkh@linuxfoundation.org,
+	ionut.nechita@windriver.com,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	muchun.song@linux.dev,
+	sashal@kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH 0/2] block/blk-mq: fix RT kernel performance regressions
+Date: Sat, 20 Dec 2025 22:58:22 +0200
+Message-ID: <20251220205822.27539-1-ionut.nechita@windriver.com>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <aUaa7IbGko82Dn8Z@fedora>
+References: <aUaa7IbGko82Dn8Z@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
+Content-Transfer-Encoding: 8bit
 
+From: Ionut Nechita <ionut.nechita@windriver.com>
 
-On Sat, 20 Dec 2025 11:46:10 +0300, Dan Carpenter wrote:
-> The "dev->clt_device_id" variable is set using ida_alloc_max() which
-> returns an int and in particular it returns negative error codes.
-> Change the type from u32 to int to fix the error checking.
-> 
-> 
+Hi Ming,
 
-Applied, thanks!
+Thank you for the feedback!
 
-[1/1] block: rnbd-clt: Fix signedness bug in init_dev()
-      commit: 1ddb815fdfd45613c32e9bd1f7137428f298e541
+You're absolutely right - blk_mq_cpuhp_lock is only acquired in the slow
+path (setup/cleanup operations during queue initialization/teardown), not
+in the fast I/O path.
+
+Looking at my testing results more carefully:
+- The queue_lock patch (PATCH 1/2) alone restores performance to 640 MB/s
+- The cpuhp_lock conversion (PATCH 2/2) doesn't contribute to fixing the
+  I/O regression
+
+The cpuhp_lock is used in:
+- blk_mq_remove_cpuhp() - queue cleanup
+- blk_mq_add_hw_queues_cpuhp() - queue setup
+- blk_mq_remove_hw_queues_cpuhp() - queue cleanup
+
+These are indeed slow path operations with no contention in the I/O hot
+path.
+
+I'll drop the second patch (cpuhp_lock conversion) and send v2 with only
+the queue_lock fix, which addresses the actual bottleneck: removing the
+sleeping lock from blk_mq_run_hw_queue() that was causing IRQ threads to
+serialize and enter D-state during I/O completion.
 
 Best regards,
--- 
-Jens Axboe
-
-
-
+Ionut
