@@ -1,118 +1,105 @@
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B015D22423A
-	for <linux-block@vger.kernel.org>; Sat, 20 Dec 2025 08:20:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1CAC2222C0
+	for <linux-block@vger.kernel.org>; Sat, 20 Dec 2025 08:46:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766218839; cv=none; b=CmWqB6ftw6NkDYttE8I0iRthiEElwahi/aAe7cFBdvB27ygLW9Okl9evFyg2Vb++acwOZ9dy02XowaR0bexFCJR5XT2CwP4wsFrTMb682+GduJ6C+iHCeXWzwRlrBqf/sRF7I1oOlcNQ2gS4rcl8yIzt0JilQwnm3fHMkKmEWds=
+	t=1766220377; cv=none; b=lO+3i+/STsW13Mq3CDDZd2qDz2WHcFkLO7r+AuJHyinA9MFkZJSoavXaT+fl93e3G5QbURGGsayBUifS4HPBUhBpeNfcB6uFnPgZPDnoCka+HzpcIGr1mamybFiyc2bPAR8mIw8Aod1yrZnBWVvZdxGd9/LdfsjcgH3JhTkd4Jc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766218839; c=relaxed/simple;
-	bh=7yIwYBjbhWxFSAswNOF/WryDYMyGg7xBittzBXCnXrI=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
-	 Content-Type:References; b=l2t1Ni9D/hVC/aSX4YBlpYKiSnHn52OM+NN5Ox/vIO4P8Ap5bqP9B6iBsgrhTforv00USPB98FlecKzKVQTdkh8+5LqRZDbQ+BygQC13tyHqJ3lzL837Sjy+QvuKtPYCFuOCZbFrBA74xOjtQQcbX4XZNKRvlLzoPdVKiZ4CqWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=ky/zAW+B; arc=none smtp.client-ip=203.254.224.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1766220377; c=relaxed/simple;
+	bh=GJz0TV3dGwznk2pjw9vchjZ3oHpNifJ97zBYxc0cjic=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=ejTwZUqP/rQagCqSLC/ypg5VjVRBhtYjAnbyJqbjGcqfF5qcTxE+G5Tbu0B11i+pFHcgN2EFEmIv26/oNphppe7yo1U1FMV9XZPdzzmhVTWejM4N4b7S3v5EwEG/W0OIzhjYr20X+pWA7I/P6gouIon1jqJ7mU5JB1gKRYzGbwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=rI2mq1wY; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="ky/zAW+B"
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20251220082034epoutp03db06fa0de9116c85de526ca734c48268~C3qwXcofT2614226142epoutp03G
-	for <linux-block@vger.kernel.org>; Sat, 20 Dec 2025 08:20:34 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20251220082034epoutp03db06fa0de9116c85de526ca734c48268~C3qwXcofT2614226142epoutp03G
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1766218834;
-	bh=9hrPYzKJs4MLeRj565g3Q7+tSWI53XRYe/T6Nz5rFJM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ky/zAW+BeJgA1WvIpqykXPjUR+Yhmj7Q1Hu6SC8sSDMfC75UsiUGWPFIQzwvcsGTw
-	 T0X4G3tyjooIyjIXGNLyC9u86DI5+3lnn7tj1vX9Jtr/1tRw1h6I76nOPusI8+tbzz
-	 9nSQqSmzOuatTze+o5qsLt84j9BGoEFfz6nJsfSI=
-Received: from epsnrtp03.localdomain (unknown [182.195.42.155]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPS id
-	20251220082033epcas5p3a863b4556c582c0d38e5ba53c11ee984~C3qvWbpLA2478424784epcas5p3S;
-	Sat, 20 Dec 2025 08:20:33 +0000 (GMT)
-Received: from epcas5p1.samsung.com (unknown [182.195.38.89]) by
-	epsnrtp03.localdomain (Postfix) with ESMTP id 4dYHQm3wRlz3hhT3; Sat, 20 Dec
-	2025 08:20:32 +0000 (GMT)
-Received: from epsmtip2.samsung.com (unknown [182.195.34.31]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-	20251220082031epcas5p378cacd8fcfdfbcefd899a2e8e4c3cce3~C3qt0VANC2478424784epcas5p3R;
-	Sat, 20 Dec 2025 08:20:31 +0000 (GMT)
-Received: from green245.gost (unknown [107.99.41.245]) by
-	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20251220082030epsmtip24ea2a740c809a5e2dd0a4c1f300c1b8a~C3qsyzWqQ1441314413epsmtip2d;
-	Sat, 20 Dec 2025 08:20:30 +0000 (GMT)
-Date: Sat, 20 Dec 2025 13:49:22 +0530
-From: Nitesh Shetty <nj.shetty@samsung.com>
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	io-uring@vger.kernel.org, Caleb Sander Mateos <csander@purestorage.com>,
-	huang-jl <huang-jl@deepseek.com>
-Subject: Re: [PATCH 1/3] block: fix bio_may_need_split() by using bvec
- iterator way
-Message-ID: <20251220081922.3bbmpvjorqcad5rb@green245.gost>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rI2mq1wY"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-477770019e4so21811065e9.3
+        for <linux-block@vger.kernel.org>; Sat, 20 Dec 2025 00:46:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1766220374; x=1766825174; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=oMd8hFhEdud5JNvQYdjzkL/DFZ3OGk2JIW+0oeUQ8pU=;
+        b=rI2mq1wYV33LL/hVOGnUHEdqMy7FE74tJZZYDESVmV3uFFvgFyfcULvds93LXHmz0G
+         fDPbn1/7LBHefYErleS8drDAR9+NLjt/XLP5/vsmpkyXuH8BVnX6kU6D2ErLgFMgMnmw
+         4LpN5bDE2eUlTWuHvGw1cRRJX8p547rJNvHpsdnnIuDt+8044iaN1BFyr+HBOPGjaoCV
+         iHTJMxSnFU1KPN2reyUN/jA/mujx6GYseQi/B8vKZjQw7Quilb/VCiDXwCX1lhYhkziX
+         qeyX8Reb+FLA9d1T+FnnVLc38HvoCxjCR10xpZre6/DH0vG7717ThmL0FmpFMA/1Wqqt
+         h9Dg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766220374; x=1766825174;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=oMd8hFhEdud5JNvQYdjzkL/DFZ3OGk2JIW+0oeUQ8pU=;
+        b=A1VsIQy2nAt+skdTzfAhlcuLW4FeM4AcoS4WF9fvKbL1PbjkjPQEOG1Z/YWYI+aoZv
+         Z1fKYJm3dtWiZqXYXLLsPCbI/8FzANZC1dyb4xG6EnPkkUVHHTT5/llafVhmDL/K4h93
+         tJTFMg/akLnKyNaHdaB6GsgI5AjMzxoxikCwE1F4sjAmlOK15tK4Zs8bom+uxY6ux4WW
+         2rtNv8I6j4JWiX5RzQfDS/d6knsuuaF6Ovo1NBtzOnmor1kUFMj0krIrIct4REi7dCp1
+         aQP3HSVsFP6VA5eFh/vs+c+Lm7PPtzD5yZHEF5FXf+DrY4lZKd8buSnlBqUw5BRX8g6V
+         JLyw==
+X-Forwarded-Encrypted: i=1; AJvYcCXfma214mQ3MpVYvJeZQqPI2UCpiFT1iKllL2D5hNDdAgmO2i80dJMJsDjocp2E4s2Y03VO0nMPdCOviQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy0J2VZL+hXDt0sT9EhbEdrnV9s8sccfRLtofjvkr/AsYxN2CfM
+	pJlDMb1tBUEPuXBNVGt1ITk6X6uUEjCxJSX2/a4DwgaObRfbdqdi2yLDaNB9OTh9lqY=
+X-Gm-Gg: AY/fxX6m9ziQYPDXRgl0Bme2hYAO1eQJeMoHc5AqRCJEWN/uvpKWK9j1ulg0ZqAcSRC
+	sPfsWmbGoMgCx0fZO+9RFIs3+3/+Uc4IMVbz29n08oM7cFltbYPx+rOgoEbDyu2zNo5/EWE+Zex
+	e9OPNLAq5V5hoBqniliIQ+fjEREiVBJ8TxpMf8XYR0/uCFaohs+LcXTd8r2gfgW1ogQVOWeLCaV
+	J/EBkDzlbrcHdVenHsYhF43DmUDnLIsLRbpc2+7SEVZVIH9CZyGLyD746Xfkwk13irLYgVnLZlm
+	JkzkYnFuT/DiYwbH+ikHrPNFCIoxxCNAyQ5OLP7jV+X3XVXi9KmP2xzjlzNZyhHYUQY07SJNxyy
+	bwVDwqbTmPAgo3QbbbRXdPTsmlhMfZ48PuoagUnzx7i9RiUVcwvp012uYaHs9giFXpNWJnxkzOr
+	4v+0x0J8qejS+eIB5R
+X-Google-Smtp-Source: AGHT+IGRYugwrsODSO161b7aXZ0dgJ/paBxDcbXlBkrr1+MKuen7cVrZowP77Fgt7jWv7lc6dZre1g==
+X-Received: by 2002:a05:600c:1d1d:b0:477:9eb8:97d2 with SMTP id 5b1f17b1804b1-47d1953b8acmr52521985e9.8.1766220373854;
+        Sat, 20 Dec 2025 00:46:13 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d19346e48sm79604965e9.2.2025.12.20.00.46.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 20 Dec 2025 00:46:13 -0800 (PST)
+Date: Sat, 20 Dec 2025 11:46:10 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Thomas Fourier <fourier.thomas@gmail.com>
+Cc: "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+	Jack Wang <jinpu.wang@ionos.com>, Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: [PATCH next] block: rnbd-clt: Fix signedness bug in init_dev()
+Message-ID: <aUZiUjcgaOue4j9S@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20251218093146.1218279-2-ming.lei@redhat.com>
-X-CMS-MailID: 20251220082031epcas5p378cacd8fcfdfbcefd899a2e8e4c3cce3
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-	boundary="----bVwHse4Nykw-L2c5iRRXKf-G.8k0lxUwrpcTFjGaDb9lfltx=_993eb_"
-CMS-TYPE: 105P
-cpgsPolicy: CPGSC10-542,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20251220082031epcas5p378cacd8fcfdfbcefd899a2e8e4c3cce3
-References: <20251218093146.1218279-1-ming.lei@redhat.com>
-	<20251218093146.1218279-2-ming.lei@redhat.com>
-	<CGME20251220082031epcas5p378cacd8fcfdfbcefd899a2e8e4c3cce3@epcas5p3.samsung.com>
-
-------bVwHse4Nykw-L2c5iRRXKf-G.8k0lxUwrpcTFjGaDb9lfltx=_993eb_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
 
-On 18/12/25 05:31PM, Ming Lei wrote:
->->bi_vcnt doesn't make sense for cloned bio, which is perfectly fine
->passed to bio_may_need_split().
->
->So fix bio_may_need_split() by not taking ->bi_vcnt directly, instead
->checking with help from bio size and bvec->len.
->
->Meantime retrieving the 1st bvec via __bvec_iter_bvec().
->
->Fixes: abd45c159df5 ("block: handle fast path of bio splitting inline")
->Signed-off-by: Ming Lei <ming.lei@redhat.com>
->---
-> block/blk.h | 13 ++++++++++---
-> 1 file changed, 10 insertions(+), 3 deletions(-)
->
->diff --git a/block/blk.h b/block/blk.h
->index e4c433f62dfc..a0b9cecba8fa 100644
->--- a/block/blk.h
->+++ b/block/blk.h
->@@ -371,12 +371,19 @@ struct bio *bio_split_zone_append(struct bio *bio,
-> static inline bool bio_may_need_split(struct bio *bio,
-> 		const struct queue_limits *lim)
-> {
->+	const struct bio_vec *bv;
->+
-> 	if (lim->chunk_sectors)
-> 		return true;
->-	if (bio->bi_vcnt != 1)
->+
->+	if ((bio_op(bio) != REQ_OP_READ && bio_op(bio) != REQ_OP_WRITE) ||
->+			!bio->bi_io_vec)
-REQ_OP_READ, REQ_OP_WRITE check is not necessary, since bio_may_need_split
-is always called for READ/WRITE.
+The "dev->clt_device_id" variable is set using ida_alloc_max() which
+returns an int and in particular it returns negative error codes.
+Change the type from u32 to int to fix the error checking.
 
-Thanks,
-Nitesh
+Fixes: c9b5645fd8ca ("block: rnbd-clt: Fix leaked ID in init_dev()")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+---
+ drivers/block/rnbd/rnbd-clt.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-------bVwHse4Nykw-L2c5iRRXKf-G.8k0lxUwrpcTFjGaDb9lfltx=_993eb_
-Content-Type: text/plain; charset="utf-8"
+diff --git a/drivers/block/rnbd/rnbd-clt.h b/drivers/block/rnbd/rnbd-clt.h
+index a48e040abe63..fbc1ed766025 100644
+--- a/drivers/block/rnbd/rnbd-clt.h
++++ b/drivers/block/rnbd/rnbd-clt.h
+@@ -112,7 +112,7 @@ struct rnbd_clt_dev {
+ 	struct rnbd_queue	*hw_queues;
+ 	u32			device_id;
+ 	/* local Idr index - used to track minor number allocations. */
+-	u32			clt_device_id;
++	int			clt_device_id;
+ 	struct mutex		lock;
+ 	enum rnbd_clt_dev_state	dev_state;
+ 	refcount_t		refcount;
+-- 
+2.51.0
 
-
-------bVwHse4Nykw-L2c5iRRXKf-G.8k0lxUwrpcTFjGaDb9lfltx=_993eb_--
