@@ -1,117 +1,164 @@
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E87430F950
-	for <linux-block@vger.kernel.org>; Sat, 20 Dec 2025 20:58:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C50351A3154;
+	Sat, 20 Dec 2025 21:49:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766264331; cv=none; b=SX6q8aihmvGoFgcZOp6uyPMNlrae64KjUNFf35S5lehSqZrAv8svrHDtddzHMtpMJujRAkMBGfJo/lrZ26kvB1FbKzx0nJyawDic611XG3UfnVfKJYGaRSvSN5xD5Ijp7bkRSUBHmn1TODk+u4QWg3SI1FrTn2o+1VL5QwURANI=
+	t=1766267397; cv=none; b=NCjVuofxyNUbgXVYoLFtjyZVhg/F9hquwxjeCoIkNWQ9VMl+zre0KnTNXyPKcNlUexrSDY0jsn/qLIn8sP6zM5mp+hoD0sngA2vIK7w/o16s8xd7bOguRFFfGbgVZj9wmEJ1imr1I40nnMJ7Ji57+vakfwwv1G56vfexfsWKIe8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766264331; c=relaxed/simple;
-	bh=FuxQS6E0Qzft914wYAlyaZ47/nuyIPysXDjhmxdisGE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jiJRxUnI0lseoQ+Ete5GevqCThIJNQT/Ne2h1SbFt7D7DUe3BZax8gx1lMjZ/OMYFTMgdkOxYpk/Ee9ooPDKOLMdfvr/bkH+TfHKGcf9a6OvK1v3XOgiMT7VF3cd3ZjIMyfYL9gApzmDwltHSTCoVPq/ttdvkqjUsIF/jk8lSio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KQwKBhzS; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1766267397; c=relaxed/simple;
+	bh=p5MfNjz+/wJNYDsq5XB9RKtrRlUy9BblRhiK8tcu5I0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KGYOPDY+183zYs7Wqhcnw8p5eSkPUrNoeJ6LqLLNAD57EHe6fDt3wBiVS/uOrDizTnngX2qN/v6Pj8PWYVYUdAdquaQxMfmXVUN8EGj2svtvoC9ajMzH9+R7UIEL+q0jdfb2p//E4cw391dKVFvOsyxPSkPNrWaA/eGpjG+q/0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=j622IMLR; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KQwKBhzS"
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7bc248dc16aso2448837b3a.0
-        for <linux-block@vger.kernel.org>; Sat, 20 Dec 2025 12:58:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766264330; x=1766869130; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Rv3JIVjNgbdyh2io0L3fN/o5T0HuY7Hr8INRNlkFSBM=;
-        b=KQwKBhzS38L7C1XjKOMITCOVb10V5s2hWbV74yWEoGipcsBPaOOYo1nG5y3myvmf+M
-         CvOgc7RHd0ZKlAoIMPAnUjoJ2o1viIHjwko45lGIvH0QOeyorQSQOmgmmUnrbB3Ez21p
-         S/1sYCSnG9tJYd3Wa0efqu7Qz83oH7QFkj/IZeaiMq2qpb60Ee7ARUTo5e3qOrCi37LF
-         ks6DYJzCwj9nFiZYUiTOfJPrDIJUZ+JJGo0rYJJZYFtDdL+iKHso04nKlzMnB13fGHIF
-         jpx/wFfawWC7hHMK8NRTwb/sI74tSRexmSRzVk8plZZSSC0YYUF8Jzdl2Om3oC0i4eZ8
-         Ub7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766264330; x=1766869130;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Rv3JIVjNgbdyh2io0L3fN/o5T0HuY7Hr8INRNlkFSBM=;
-        b=DC7U4rDhjprqZfYQCxTtqbp+bw2tvD/V1aL0vtEjI/Y4jBiY6HynSvoVmxnW5gdzOj
-         LxiSLfJjM46lIXOoIQYjTv96fNMfEt7SshhhtC30jrFqKdotXGw9uMPb9a0j6NQKqZ0C
-         vas25vvJW4kqLl12C30i7U5ob6lzajjCqCEXT2hAuzor/wp6q+FG+YRQUk2L6VKqpRRr
-         h9vM5o7CGEfdjuYGv3Q0Fej6rOXzN2aMksZA8IKOOxOsQ+yYbXfArmq4L2ok0S5XMk38
-         atjMiGYaWBZqxgp/bifc5OLjBzNBVTz0WzGOfhHo91qoYJ55BoS3wgs5CFwVOBeggUMz
-         1p/A==
-X-Forwarded-Encrypted: i=1; AJvYcCUb9KWodDXhURGif65Bwg+rlhT7gKYIowE2MA5AnW0NlYW4jDvzs4DTCoBLrpFzPOZ7vAWDeyN3o6/nUw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzpCZda6aktudQ9My7xxqhASSqRI3iQz33kTh/ErzPoWJAJofZ0
-	PPt67ElimUrJjvm7Foc6otT8qsl5rUuObZE0xgLkM8CaLjHGEzETwKbF
-X-Gm-Gg: AY/fxX7JNILw6nZZ27urv7p5H857Vq95/hzMQG+Nc+gaiKyXZjTUGnGbqABiVpEuIxZ
-	OdLEXLAPFFQGN4IXKDRqOAafh9nLkQswb41XP/5+F8RgOpzGG0LFoZdYa9dLsgSOqPK+pbUa2D/
-	XjvQML0csHM/TfQLVzRH7FsKr/ryk68R6o4W21uPgS3pCj9B3wdH7js5x6XfoncFqE5ZKfgq6u3
-	SkDX8J6xFGroda4W0GFDIwIMVOpZzrZNMf15pASVpsbPLBlYXXVqyxaciFzGzPACQi1XPu3c1Vv
-	R6HOX4v4uDkWjVF3rnHCLxcLAMWC3nCXy9fIwRe6p3rObmqokSawkvoXVOGt4mnwMmNNN+FJT1z
-	5K2jGBi7ODgeleTfpfBDI4Je99ddQH4FdkUqi9vRO3ePgsQZHrzF5dB0+lbSjNKXZwpEthuj8Qb
-	1mnoinapyzZdyFUsNK9CxbZEnE5II614DQhHrSiQiiy6w=
-X-Google-Smtp-Source: AGHT+IHvwuYKMUU22bSDiWhgDhgPtQNkVn7dYPOpwL8nxp+q364FIMqTcJxyMX2lBMhJzgA6rw2kyw==
-X-Received: by 2002:a05:6a20:3946:b0:35d:53dc:cb57 with SMTP id adf61e73a8af0-376a96b9113mr7150196637.49.1766264329534;
-        Sat, 20 Dec 2025 12:58:49 -0800 (PST)
-Received: from ionutnechita-arz2022.local ([2a02:2f0e:c406:a500:11f0:cf32:1f0:98ab])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7ff7a93b441sm5878717b3a.9.2025.12.20.12.58.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 20 Dec 2025 12:58:49 -0800 (PST)
-From: "Ionut Nechita (WindRiver)" <djiony2011@gmail.com>
-X-Google-Original-From: "Ionut Nechita (WindRiver)" <ionut.nechita@windriver.com>
-To: ming.lei@redhat.com
-Cc: axboe@kernel.dk,
-	djiony2011@gmail.com,
-	gregkh@linuxfoundation.org,
-	ionut.nechita@windriver.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	muchun.song@linux.dev,
-	sashal@kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH 0/2] block/blk-mq: fix RT kernel performance regressions
-Date: Sat, 20 Dec 2025 22:58:22 +0200
-Message-ID: <20251220205822.27539-1-ionut.nechita@windriver.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <aUaa7IbGko82Dn8Z@fedora>
-References: <aUaa7IbGko82Dn8Z@fedora>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="j622IMLR"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1766267395; x=1797803395;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=p5MfNjz+/wJNYDsq5XB9RKtrRlUy9BblRhiK8tcu5I0=;
+  b=j622IMLR7KyLeACZ4jH8UvGIInaHSOEd38t0nqKgntu/4pYxBU5iPf/K
+   p/Lw69n1T7zRvicgX5SOGHS5Hby2UagpnZsAwTnkXhYjX67leHqcw4SNd
+   lPPol+dR3gqVLPBEDGwK8qyT1lyF8MG/DhyKDiCUybwH3ZY9H9c9ohQ4w
+   CHDgnzeSfJgSUu+iBVEdf/7X/s0ujfoDJorO/Sc6L58bxXW6Z70u9kc0u
+   yzX4sQf/uRYcKZqBbIJmK9NyNPRt+hs9+w+blBWyzNjXY6j1Hyw/0d2FF
+   S6lye/tdRz2vCur34XUErREEw/Rxc+q3qc+eJ0rsRACxUhuLhdy3slkJ6
+   Q==;
+X-CSE-ConnectionGUID: ILbP2eevTnyz2eZqrHCj/A==
+X-CSE-MsgGUID: iw0IUMj1R9CCBmuhidwiig==
+X-IronPort-AV: E=McAfee;i="6800,10657,11648"; a="71818555"
+X-IronPort-AV: E=Sophos;i="6.21,164,1763452800"; 
+   d="scan'208";a="71818555"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2025 13:49:54 -0800
+X-CSE-ConnectionGUID: HA+sPQP0SAWiXeVfc3FElQ==
+X-CSE-MsgGUID: jt+gQQj+TOmrkp7T1EFbrQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,164,1763452800"; 
+   d="scan'208";a="229832146"
+Received: from lkp-server01.sh.intel.com (HELO 0d09efa1b85f) ([10.239.97.150])
+  by orviesa002.jf.intel.com with ESMTP; 20 Dec 2025 13:49:46 -0800
+Received: from kbuild by 0d09efa1b85f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vX4pb-0000000059d-2H5N;
+	Sat, 20 Dec 2025 21:49:43 +0000
+Date: Sun, 21 Dec 2025 05:49:37 +0800
+From: kernel test robot <lkp@intel.com>
+To: Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	cgroups@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+	bpf@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Yu Kuai <yukuai@fnnas.com>, Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Pablo Neira Ayuso <pablo@netfilter.org>
+Subject: Re: [PATCH 2/4] cgroup: Introduce cgroup_level() helper
+Message-ID: <202512210532.ziNaxDJf-lkp@intel.com>
+References: <20251217162744.352391-3-mkoutny@suse.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251217162744.352391-3-mkoutny@suse.com>
 
-From: Ionut Nechita <ionut.nechita@windriver.com>
+Hi Michal,
 
-Hi Ming,
+kernel test robot noticed the following build errors:
 
-Thank you for the feedback!
+[auto build test ERROR on 8f0b4cce4481fb22653697cced8d0d04027cb1e8]
 
-You're absolutely right - blk_mq_cpuhp_lock is only acquired in the slow
-path (setup/cleanup operations during queue initialization/teardown), not
-in the fast I/O path.
+url:    https://github.com/intel-lab-lkp/linux/commits/Michal-Koutn/cgroup-Eliminate-cgrp_ancestor_storage-in-cgroup_root/20251218-004346
+base:   8f0b4cce4481fb22653697cced8d0d04027cb1e8
+patch link:    https://lore.kernel.org/r/20251217162744.352391-3-mkoutny%40suse.com
+patch subject: [PATCH 2/4] cgroup: Introduce cgroup_level() helper
+config: nios2-allmodconfig (https://download.01.org/0day-ci/archive/20251221/202512210532.ziNaxDJf-lkp@intel.com/config)
+compiler: nios2-linux-gcc (GCC) 11.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251221/202512210532.ziNaxDJf-lkp@intel.com/reproduce)
 
-Looking at my testing results more carefully:
-- The queue_lock patch (PATCH 1/2) alone restores performance to 640 MB/s
-- The cpuhp_lock conversion (PATCH 2/2) doesn't contribute to fixing the
-  I/O regression
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202512210532.ziNaxDJf-lkp@intel.com/
 
-The cpuhp_lock is used in:
-- blk_mq_remove_cpuhp() - queue cleanup
-- blk_mq_add_hw_queues_cpuhp() - queue setup
-- blk_mq_remove_hw_queues_cpuhp() - queue cleanup
+All error/warnings (new ones prefixed by >>):
 
-These are indeed slow path operations with no contention in the I/O hot
-path.
+   block/blk-iocost.c: In function 'ioc_pd_init':
+>> block/blk-iocost.c:3006:60: error: expected ';' before 'for'
+    3006 |         iocg->level = cgroup_level(blkg->blkcg->css.cgroup)
+         |                                                            ^
+         |                                                            ;
+    3007 | 
+    3008 |         for (tblkg = blkg; tblkg; tblkg = tblkg->parent) {
+         |         ~~~                                                 
+>> block/blk-iocost.c:2988:26: warning: unused variable 'tblkg' [-Wunused-variable]
+    2988 |         struct blkcg_gq *tblkg;
+         |                          ^~~~~
 
-I'll drop the second patch (cpuhp_lock conversion) and send v2 with only
-the queue_lock fix, which addresses the actual bottleneck: removing the
-sleeping lock from blk_mq_run_hw_queue() that was causing IRQ threads to
-serialize and enter D-state during I/O completion.
 
-Best regards,
-Ionut
+vim +3006 block/blk-iocost.c
+
+  2981	
+  2982	static void ioc_pd_init(struct blkg_policy_data *pd)
+  2983	{
+  2984		struct ioc_gq *iocg = pd_to_iocg(pd);
+  2985		struct blkcg_gq *blkg = pd_to_blkg(&iocg->pd);
+  2986		struct ioc *ioc = q_to_ioc(blkg->q);
+  2987		struct ioc_now now;
+> 2988		struct blkcg_gq *tblkg;
+  2989		unsigned long flags;
+  2990	
+  2991		ioc_now(ioc, &now);
+  2992	
+  2993		iocg->ioc = ioc;
+  2994		atomic64_set(&iocg->vtime, now.vnow);
+  2995		atomic64_set(&iocg->done_vtime, now.vnow);
+  2996		atomic64_set(&iocg->active_period, atomic64_read(&ioc->cur_period));
+  2997		INIT_LIST_HEAD(&iocg->active_list);
+  2998		INIT_LIST_HEAD(&iocg->walk_list);
+  2999		INIT_LIST_HEAD(&iocg->surplus_list);
+  3000		iocg->hweight_active = WEIGHT_ONE;
+  3001		iocg->hweight_inuse = WEIGHT_ONE;
+  3002	
+  3003		init_waitqueue_head(&iocg->waitq);
+  3004		hrtimer_setup(&iocg->waitq_timer, iocg_waitq_timer_fn, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
+  3005	
+> 3006		iocg->level = cgroup_level(blkg->blkcg->css.cgroup)
+  3007	
+  3008		for (tblkg = blkg; tblkg; tblkg = tblkg->parent) {
+  3009			struct ioc_gq *tiocg = blkg_to_iocg(tblkg);
+  3010			iocg->ancestors[tiocg->level] = tiocg;
+  3011		}
+  3012	
+  3013		spin_lock_irqsave(&ioc->lock, flags);
+  3014		weight_updated(iocg, &now);
+  3015		spin_unlock_irqrestore(&ioc->lock, flags);
+  3016	}
+  3017	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
