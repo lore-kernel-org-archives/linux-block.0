@@ -1,195 +1,73 @@
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com [209.85.210.71])
+Received: from mail-ua1-f54.google.com (mail-ua1-f54.google.com [209.85.222.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C3082D594B
-	for <linux-block@vger.kernel.org>; Sat, 20 Dec 2025 16:00:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EDF31EA7CC
+	for <linux-block@vger.kernel.org>; Sat, 20 Dec 2025 17:32:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766246433; cv=none; b=PlAzz+St7iVrg3wHFpsztNB4yuOxaQPs7Utgho8Ads4xyCjzHiLb/5NsBcG/jUXWuQm0MnKEQka3pKIU+EQevbFmFfmoQZNEvz9Ey3A0DVmggoLZAE3OzdINQSodtnkpC2u5M8cJQlulEHp2uyob8JA8JqDxJlFSayqoBoADtxw=
+	t=1766251953; cv=none; b=KRKU2YFjcOspwA0OGMIY1B94dEtPxvPkU3L3wdlxb8Nf+cOG1vCY6/Ixj5B5qSnlr6xPsm17Klogrvd8QTPpOd9pbpN8/lvL0v/Eiu9hno6yiFzIDsNzzggayZMLa6dwd+dTZzdWh7L0aXXS+L+fA+K7caUQceWR46g8A8s1+0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766246433; c=relaxed/simple;
-	bh=1OL1eqj8HoVIjLIyUb30+BrxQWHr6UQhlRc7+uK2SjA=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=X8/eZtqk/T4G29HviWn7MVHSnWGYEXVXMN7GdNB14MRO7z1lOH1bFuhZdFaBDIvPlwSb5B4Iwpka9ao0gfhzLN81bS/h1RuaDw6ArcXoUKdKwZNQ8ARehJZ05NVimpA+OF8dfQVlC1/eQQFA+nIZrkud5BTVY48J+fGLiM7TB2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-7cad1393ec8so5029441a34.0
-        for <linux-block@vger.kernel.org>; Sat, 20 Dec 2025 08:00:30 -0800 (PST)
+	s=arc-20240116; t=1766251953; c=relaxed/simple;
+	bh=nBdYmX8I9PRPdvnvBha5bJMlQMxxN+gbdxxLnaxWK4k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=Azxi5Ow2uq+leY+MpQDBZvl30/nZGcDTyC5tdJvPyaInzcxmSeIOM4ZrMwGdEGpgPq1HfRQFxZ4JhEdw5r6cD+aaLPK8b9ISuUDVx6b/Fe1as3kJJePeM49woRiqeocYf8SC5DFcjlDNNJnJKp2zEmG7cA+6T2tPRZzVNB6txd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hj/ycP50; arc=none smtp.client-ip=209.85.222.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hj/ycP50"
+Received: by mail-ua1-f54.google.com with SMTP id a1e0cc1a2514c-9412edb5defso598222241.0
+        for <linux-block@vger.kernel.org>; Sat, 20 Dec 2025 09:32:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1766251951; x=1766856751; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nBdYmX8I9PRPdvnvBha5bJMlQMxxN+gbdxxLnaxWK4k=;
+        b=Hj/ycP50iSKmMF6G6n3Rzeuo06Pgn3Wc6hEr6yKMpMdzGWnOEvw8FSpAtYUyUSyMsq
+         23EuNcG9C3apFw1n3i4jAQCcrlmw01K0+CCR5E/0ytP5SN9QNpB7qupyOl6tt3UwPbJt
+         VlJcO0gh9P8QF3ROeWU23MCRJtx/GQT+2qRDGHSnHmJLKRMNAO/Rot0+yuZ3biWDzD9J
+         7hKN30SgwbVjaOByh4/TrsEvBQEpyIGuRdCzPiNcX8oGpwu7sK/iXUNE7mlfBN80zd4/
+         Gwwn2KO8QRWQR5rdjehm9Qi0yCZAGrqIISloIgovhDv9188wJI4/INxjDnA10MWLCPWC
+         9w5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766246430; x=1766851230;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=b7SqT+yNRhkPZ0TwvpPyQ7+AiEKwn1SwkM+MBUYkzeQ=;
-        b=E+sS+rV/ZtrXuWrBPfeqMEXyDXDw4KpMdOR9XdMaW6IXQe+kYZECJsL4Jd1XA/ImlR
-         O1l90DQkYS7i3AvwB30601VCDeaewSsh8W7IwTZEv3ovcCbD7hZ2Tg1gKBC38WJUbDSF
-         bSah1VmgpUq+qMJo3MaXXP/bY4rJbA1zPLTgUki2uA6F9O8/y7Du6cDBXWFaKdXUOpD4
-         fSjrUDeH4D18RYLyY+iO9fEkVi/LjjF0A3/pl37qZ854wHfiMttpUqBgOg6b+TlqJMgN
-         cxyJVACA22ynzd+LAfXQ/3PpzXSpGTV4I7hptVEveY9K7z1BN2zFB7n/FiGF6YwTOGCY
-         O2kg==
-X-Forwarded-Encrypted: i=1; AJvYcCXIpYy3C2UhOWnzG4LyHnnWykpf3QeMGl2wYbSS1QTw8d9WhTNVvwR4tLVKcpxvsdQzqE4jYx4lot1bFg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzsBvJXBiVeNXdtf22Nson1R5eVyFDGJtnNhNd9y1/lrgGgoInh
-	q7YGMEvc0c3c4rQ4UpfRq+EnmBx3t7JVDNwdM/HMfDz2QC/SPY2/vNzWz4duhHXI3MRajzI71hE
-	SIBmOATsiPFTWorHQZQnC186kqA4SfKRNgKXsxu26xpFYP9PjhEpY29892rI=
-X-Google-Smtp-Source: AGHT+IFaLI8u4Bd7SjOx4K0e5dAzsFc4LnHQPEtoFG/dNplb1HXtK6D7L7lg+QRoNvgT7u2AjJ2sIE1Gi9xmr8EP3qinuZo259Nv
+        d=1e100.net; s=20230601; t=1766251951; x=1766856751;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nBdYmX8I9PRPdvnvBha5bJMlQMxxN+gbdxxLnaxWK4k=;
+        b=fcVbNybkjZ5bx718NjMeU3uLltEuxLBnqRV4QsEBR/y3btZyLIVCfOMlRWNuH7pjYn
+         25eL4N8Jjyus36KVs6OTMplmFoqcHio9FYzOIZj2aNUS34S8eFOIoFiwyBr6nxpIZ4lJ
+         cJw7FhxGltprkJXJs252eF6llExSewK4vjjDhJtICaTYu2xGuHL7eHScQqtv7Ci8nXla
+         P50eDnrMkrMxjq+7rejnSV/ZPbmDOfpiTQtCU8ctUGcd2LKNUeYjJq1iTa3uXVgoLKJZ
+         aH7+rJmiRu5tmQUDTWBxGoiVUCrNgj+w5x8enEgCaXSHmYKHa74LGcOMQ/9FeJEgVYbg
+         wSiA==
+X-Gm-Message-State: AOJu0Yx090CbwqtmaGWAwiZLomA5PNXRBzLy/gx7VV5PDz+3TShgaCIZ
+	ya7+zv9O515JJ33HVH6liDj1sKJ4pbdt+hNO+yEMvieca6ViPAgLlO57M6eZN9lzXSLNdW7odWM
+	hdCg35DhfiSinbstfjZKFqb66H0qajwZgcohWmVM=
+X-Gm-Gg: AY/fxX7mkXm3TzSfEtw0QnaJ/Ha7A0UpWsDzsoEVcFlMCO4GOBldROQnJgE8vNuNRo7
+	UAQ9qSV4qPL9wHZal+4292wVB3hz3stBPM8umQJySxSSrp+wfsUFdX9fnUICMLwTxmUmiajXV0M
+	OJG9eCzS/IKD/Jz7GOgPz0sOJ5aS8vpalAs70c4eMkAoSmUqnQP40dvRt2CMO8oeI6PWsaEIQZ5
+	UK68nD6bGgAhgE59ABTKYYtkzxrMXuimW3/vlo76a+edywl7G9IYS+mRlMMqF+y9+isB7pCl02a
+	Kh34x6EDTWo+YfVAxCffiCI27KCKkfLyPkDnEHc=
+X-Google-Smtp-Source: AGHT+IHuJgs7hKhtD/ctzqKH0dugT2Cl4KosgGGegiv6KliJybucs3U1n/6A8Km14jqvLEEhFQaAk7nyQcwhkNi8cG4=
+X-Received: by 2002:a05:6102:5107:b0:5df:ac57:b0ea with SMTP id
+ ada2fe7eead31-5eb1a641acfmr1904293137.10.1766251951106; Sat, 20 Dec 2025
+ 09:32:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:1691:b0:659:9a49:8f6b with SMTP id
- 006d021491bc7-65d0ea9a1e5mr2458037eaf.48.1766246430220; Sat, 20 Dec 2025
- 08:00:30 -0800 (PST)
-Date: Sat, 20 Dec 2025 08:00:30 -0800
-In-Reply-To: <20251220110241.8435-1-ionut.nechita@windriver.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6946c81e.a70a0220.207337.013a.GAE@google.com>
-Subject: [syzbot ci] Re: block/blk-mq: fix RT kernel performance regressions
-From: syzbot ci <syzbot+ci366dec97baf89841@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, djiony2011@gmail.com, gregkh@linuxfoundation.org, 
-	ionut.nechita@windriver.com, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, ming.lei@redhat.com, muchun.song@linux.dev, 
-	sashal@kernel.org, stable@vger.kernel.org
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+References: <20251220153307.56994-1-vitalifster@gmail.com>
+In-Reply-To: <20251220153307.56994-1-vitalifster@gmail.com>
+From: =?UTF-8?B?0JLQuNGC0LDQu9C40Lkg0KTQuNC70LjQv9C/0L7Qsg==?= <vitalifster@gmail.com>
+Date: Sat, 20 Dec 2025 20:32:19 +0300
+X-Gm-Features: AQt7F2q-vXCY1qViQYCjG6gKqXhA9zNic2YbXSUV0291pnKvG-b5vg8XNTgACLc
+Message-ID: <CAPqjcqr1dXzoa9BqS8UfR-_Pz+M5A1WN-Uo-T3jxZQwu=TODCw@mail.gmail.com>
+Subject: Re: [PATCH] Do not require atomic writes to be aligned on length boundary.
+To: linux-block@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-syzbot ci has tested the following series
-
-[v1] block/blk-mq: fix RT kernel performance regressions
-https://lore.kernel.org/all/20251220110241.8435-1-ionut.nechita@windriver.com
-* [PATCH 1/2] block/blk-mq: fix RT kernel regression with queue_lock in hot path
-* [PATCH 2/2] block/blk-mq: convert blk_mq_cpuhp_lock to raw_spinlock for RT
-
-and found the following issues:
-* BUG: sleeping function called from invalid context in __cpuhp_state_add_instance
-* BUG: sleeping function called from invalid context in __cpuhp_state_remove_instance
-
-Full report is available here:
-https://ci.syzbot.org/series/632f4721-6256-44fd-83f5-bf439d5f33f9
-
-***
-
-BUG: sleeping function called from invalid context in __cpuhp_state_add_instance
-
-tree:      torvalds
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/torvalds/linux
-base:      dd9b004b7ff3289fb7bae35130c0a5c0537266af
-arch:      amd64
-compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-config:    https://ci.syzbot.org/builds/9ad1c682-13b1-4626-b61a-a2156384698d/config
-C repro:   https://ci.syzbot.org/findings/f999a055-07f3-4d7a-acfd-8bc0be61e2ec/c_repro
-syz repro: https://ci.syzbot.org/findings/f999a055-07f3-4d7a-acfd-8bc0be61e2ec/syz_repro
-
-BUG: sleeping function called from invalid context at ./include/linux/percpu-rwsem.h:51
-in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 5982, name: syz.0.17
-preempt_count: 1, expected: 0
-RCU nest depth: 0, expected: 0
-INFO: lockdep is turned off.
-Preemption disabled at:
-[<0000000000000000>] 0x0
-CPU: 1 UID: 0 PID: 5982 Comm: syz.0.17 Tainted: G        W           syzkaller #0 PREEMPT(full) 
-Tainted: [W]=WARN
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
- __might_resched+0x495/0x610 kernel/sched/core.c:8827
- percpu_down_read_internal include/linux/percpu-rwsem.h:51 [inline]
- percpu_down_read include/linux/percpu-rwsem.h:77 [inline]
- cpus_read_lock+0x1b/0x160 kernel/cpu.c:491
- __cpuhp_state_add_instance+0x19/0x40 kernel/cpu.c:2454
- cpuhp_state_add_instance_nocalls include/linux/cpuhotplug.h:401 [inline]
- __blk_mq_add_cpuhp block/blk-mq.c:3858 [inline]
- blk_mq_add_hw_queues_cpuhp+0x19a/0x250 block/blk-mq.c:3906
- blk_mq_realloc_hw_ctxs block/blk-mq.c:4611 [inline]
- blk_mq_init_allocated_queue+0x366/0x1350 block/blk-mq.c:4635
- blk_mq_alloc_queue block/blk-mq.c:4416 [inline]
- __blk_mq_alloc_disk+0x1f0/0x340 block/blk-mq.c:4459
- loop_add+0x411/0xad0 drivers/block/loop.c:2050
- loop_control_ioctl+0x128/0x5a0 drivers/block/loop.c:2216
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:597 [inline]
- __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f1dc598f7c9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffff2134d08 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f1dc5be5fa0 RCX: 00007f1dc598f7c9
-RDX: 00000000004080f9 RSI: 0000000000004c80 RDI: 0000000000000003
-RBP: 00007f1dc59f297f R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f1dc5be5fa0 R14: 00007f1dc5be5fa0 R15: 0000000000000003
- </TASK>
-
-
-***
-
-BUG: sleeping function called from invalid context in __cpuhp_state_remove_instance
-
-tree:      torvalds
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/torvalds/linux
-base:      dd9b004b7ff3289fb7bae35130c0a5c0537266af
-arch:      amd64
-compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-config:    https://ci.syzbot.org/builds/9ad1c682-13b1-4626-b61a-a2156384698d/config
-C repro:   https://ci.syzbot.org/findings/f39691bc-570a-4163-9791-31ce10e18fb6/c_repro
-syz repro: https://ci.syzbot.org/findings/f39691bc-570a-4163-9791-31ce10e18fb6/syz_repro
-
-BUG: sleeping function called from invalid context at ./include/linux/percpu-rwsem.h:51
-in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 5975, name: syz.0.17
-preempt_count: 1, expected: 0
-RCU nest depth: 0, expected: 0
-INFO: lockdep is turned off.
-Preemption disabled at:
-[<0000000000000000>] 0x0
-CPU: 0 UID: 0 PID: 5975 Comm: syz.0.17 Tainted: G        W           syzkaller #0 PREEMPT(full) 
-Tainted: [W]=WARN
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
- __might_resched+0x495/0x610 kernel/sched/core.c:8827
- percpu_down_read_internal include/linux/percpu-rwsem.h:51 [inline]
- percpu_down_read include/linux/percpu-rwsem.h:77 [inline]
- cpus_read_lock+0x1b/0x160 kernel/cpu.c:491
- __cpuhp_state_remove_instance+0x77/0x2e0 kernel/cpu.c:2565
- cpuhp_state_remove_instance_nocalls include/linux/cpuhotplug.h:502 [inline]
- __blk_mq_remove_cpuhp+0x140/0x1a0 block/blk-mq.c:3835
- blk_mq_remove_cpuhp block/blk-mq.c:3844 [inline]
- blk_mq_exit_hw_queues block/blk-mq.c:3974 [inline]
- blk_mq_exit_queue+0xe8/0x380 block/blk-mq.c:4670
- __del_gendisk+0x832/0x9e0 block/genhd.c:774
- del_gendisk+0xe8/0x160 block/genhd.c:823
- loop_remove+0x42/0xc0 drivers/block/loop.c:2121
- loop_control_remove drivers/block/loop.c:2180 [inline]
- loop_control_ioctl+0x4ac/0x5a0 drivers/block/loop.c:2218
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:597 [inline]
- __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f911d78f7c9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffd4f0e1fb8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f911d9e5fa0 RCX: 00007f911d78f7c9
-RDX: 0000000000000006 RSI: 0000000000004c81 RDI: 0000000000000003
-RBP: 00007f911d7f297f R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f911d9e5fa0 R14: 00007f911d9e5fa0 R15: 0000000000000003
- </TASK>
-
-
-***
-
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
-
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
+Oops, sorry, is_power_of_2 is also an incorrect requirement and should
+also be removed.
