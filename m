@@ -1,38 +1,60 @@
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D51AF2D4B66
-	for <linux-block@vger.kernel.org>; Sun, 21 Dec 2025 00:00:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 028626F2F2
+	for <linux-block@vger.kernel.org>; Sun, 21 Dec 2025 02:52:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766275217; cv=none; b=Q85wPutYtkHT6s6r0X1R0px8zogm8rTnIjmE5K7AY9fXHU/e85ZlxrfLgaSoB3PImttnPjW6Ija3mqPpuU6gfeQaW7XIBUy49eDG7PbS5juUgTqxubs57hKKrOXmGXVB/lWIqzmeyx2OoBuybVzcudJaocEYJTOJqii6kmRlRKA=
+	t=1766285539; cv=none; b=F2tHPwRU/fzr3JHyXViB0hMbCTtJ6An2FZABTGFaUleAC7QkyzqjV5wPAk6CwKqQKMhz9grsXIT8260/dy69763R2abTDdqbf/4DyjmbiH196KuOmWIoNBuq5MP9FmmhqmJmPRuD9LujquVryUJniAQHb4D3FLjAqKf+gNnlevQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766275217; c=relaxed/simple;
-	bh=CjskQsrtDVQFPX4Kodtenm7h6AILkZ1vHQFGCHsovGo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qNuI8U9oDwc25OPWPQtyn8GKf8T76/ti5NH0/vEDeAWsHOXxAiDHcdgMBtFtRhXzxkocVTFdcT577cC/Mtjk+vRohTOZovjlOkQrMRU49AInNNEHin0jwFHSvAtcm6Sr+hza8TlCztTmqDi9dwfR7wVAMV7RbPB73vKTs80Ar2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CtG4b7hP; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1766285539; c=relaxed/simple;
+	bh=wydG2tqDwgj6QuZW7DY/zuZo5VojiZ1uNvXaK/0N8JE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jVrofGvUTDX1QxK+xLL3uaLdMHeB0wZdUCZ1MLQk2jKFzNqVzlcuPOf8ZLja1YzUgTSxjmdHCyLpGv1WnUJrIF0fj0tDPthduTFxNbj+YAQquYEsx8zBkxYHJSrlXPjjejrxDrpDCeG1npy3JQez9fpaHm9Spjf7N1g6TKkaxF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jNFhagqN; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CtG4b7hP"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1766275199;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jNFhagqN"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1766285536;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=Y0GJfbucheRxs4DPq6cC6aYxCnYudhG1xGjs8gOF/9Y=;
-	b=CtG4b7hPq7I3Tb58ERHgQc4VAZCtnOAdb5sTvohrjhoBdd1b2sfkOOxE1BPGRwKxQIVW3J
-	HlQbDrPAQ+tgkBG1A8Q24uCtxqpY+P9tNJELCmUgDB4vGABZLpLq7bG6vJNt5vtuuau900
-	MrswdaIV9LmzQkDJ+cEgiM7t2qAJM1M=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	bh=gck6PTahdn31ztY8BjIzxEwMrGwEobhk2pDC85pgr+M=;
+	b=jNFhagqN1vrzBnr/dUk/NnMM0IMWP6sLdfAtLHOk7n7wP30FdTPMe+fVX5s2ejzGWef25+
+	bVqIBx0obY8zHP/NndM7JPCCamweRvM6RtNQEZ4wZbSnmLiG7yPYRV8C13lh7LeidrWmCX
+	9qD3GdFtmhmgfwo3USMgSaQz5FvHG2M=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-605-1LXmPRQqPJis4DcQ0aFGKw-1; Sat,
+ 20 Dec 2025 21:52:15 -0500
+X-MC-Unique: 1LXmPRQqPJis4DcQ0aFGKw-1
+X-Mimecast-MFC-AGG-ID: 1LXmPRQqPJis4DcQ0aFGKw_1766285533
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 800E9195605A;
+	Sun, 21 Dec 2025 02:52:12 +0000 (UTC)
+Received: from pasta.fast.eng.rdu2.dc.redhat.com (unknown [10.44.32.8])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8B52D1800367;
+	Sun, 21 Dec 2025 02:52:07 +0000 (UTC)
+From: Andreas Gruenbacher <agruenba@redhat.com>
+To: Christoph Hellwig <hch@infradead.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Chris Mason <clm@fb.com>,
+	David Sterba <dsterba@suse.com>,
+	Satya Tangirala <satyat@google.com>
+Cc: Andreas Gruenbacher <agruenba@redhat.com>,
 	linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-raid@vger.kernel.org,
+	dm-devel@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] brd: replace simple_strtol with kstrtoul in ramdisk_size
-Date: Sun, 21 Dec 2025 00:59:23 +0100
-Message-ID: <20251220235924.126384-1-thorsten.blum@linux.dev>
+Subject: [RFC v2 00/17] bio clenups
+Date: Sun, 21 Dec 2025 03:51:48 +0100
+Message-ID: <20251221025206.87021-1-agruenba@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -40,39 +62,137 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Replace simple_strtol() with the recommended kstrtoul() for parsing the
-'ramdisk_size=' boot parameter. Unlike simple_strtol(), which returns a
-long, kstrtoul() converts the string directly to an unsigned long and
-avoids implicit casting.
+Hello,
 
-Check the return value of kstrtoul() and reject invalid values. This
-adds error handling while preserving behavior for existing values, and
-removes use of the deprecated simple_strtol() helper. The current code
-silently sets 'rd_size = 0' if parsing fails, instead of leaving the
-default value (CONFIG_BLK_DEV_RAM_SIZE) unchanged.
+we are not quite careful enough about setting bio->bi_status in all
+places (see BACKGROUND below).  This patch queue tries to fix this by
+systematically eliminating the direct assignments to bi_status sprinkled
+all throughout the code.  Please comment.
 
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
----
- drivers/block/brd.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+The patches are currently still based on v6.18.
 
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index 9778259b30d4..a5104cf96609 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -247,8 +247,7 @@ MODULE_ALIAS("rd");
- /* Legacy boot options - nonmodular */
- static int __init ramdisk_size(char *str)
- {
--	rd_size = simple_strtol(str, NULL, 0);
--	return 1;
-+	return kstrtoul(str, 0, &rd_size) == 0;
- }
- __setup("ramdisk_size=", ramdisk_size);
- #endif
+GIT tree:
+https://git.kernel.org/pub/scm/linux/kernel/git/gfs2/linux-gfs2.git/log/?h=bio-cleanups
+
+The first version of this patch queue is avaliable here:
+https://lore.kernel.org/linux-block/20251208121020.1780402-1-agruenba@redhat.com/
+
+With these changes, only a few direct assignments to bio->bi_status
+remain, in BTRFS and in MD, and SOME OF THOSE MAY BE UNSAFE.  Could the
+maintainers of those subsystems please have a look?
+
+Once the remaining direct assignments to bi_status are gone, we may want
+to think about "write protecting" bi_status to prevent unintended new
+direct assignments from creeping back in.
+
+
+BACKGROUND
+
+'struct bio' objects start out with their bi_status field initialized to
+BLK_STS_OK (0).  When the bio completes, that field needs to be left
+unchanged in case of success, and set to a BLK_STS_* error code
+otherwise.
+
+This is important when bios are chained (bio_chain()) because then,
+multiple execution contexts will race updating the same bi_status field.
+When an execution context resets bi_status to BLK_STS_OK (0) during bio
+completion, this could hide the error code of the adjacent bio in the
+chain.
+
+When more than a single bio fails in a chain, we know that the resulting
+bi_status will not be BLK_STS_OK, but we don't know which of the status
+error codes will survive.
+
+
+CRYPTO FALLBACK (SATYA TANGIRALA?)
+
+Related to chained bios but unrelated to setting bio->bi_status,
+blk_crypto_fallback_encrypt_bio() in block/blk-crypto-fallback.c swaps
+out bi_private and bi_end_io and reuses the same bio for downcalls, then
+restores those fields in blk_crypto_fallback_decrypt_endio() before
+calling bio_endio() again on the same bio.  This will at the very least
+break with chained bios because it will mess up __bi_remaining.
+
+
+Thanks,
+Andreas
+
+Andreas Gruenbacher (17):
+  xfs: don't clobber bi_status in xfs_zone_alloc_and_submit
+  bio: rename bio_chain arguments
+  bio: use bio_io_error more often
+  bio: add bio_set_status
+  bio: use bio_set_status for BLK_STS_* status codes
+  bio: do not check bio->bi_status before assigning to it
+  block: consecutive blk_status_t error codes
+  block: fix blk_status_to_{errno,str} inconsistency
+  block: turn blk_errors array into a macro
+  block: optimize blk_status <=> errno conversion
+  bio: bio_set_status from non-zero errno
+  bio: do not check bio->bi_status before assigning to it (part 2)
+  xfs: use bio_set_status in xfs_zone_alloc_and_submit
+  bio: switch to bio_set_status in submit_bio_noacct
+  bio: never set bi_status to BLK_STS_OK during completion
+  bio: never set bi_status to BLK_STS_OK during completion (part 2)
+  bio: add bio_endio_status
+
+ block/bio-integrity-auto.c       |   3 +-
+ block/bio.c                      |  25 +++----
+ block/blk-core.c                 | 123 ++++++++++++++++---------------
+ block/blk-crypto-fallback.c      |  22 +++---
+ block/blk-crypto-internal.h      |   2 +-
+ block/blk-crypto.c               |   4 +-
+ block/blk-merge.c                |   6 +-
+ block/blk-mq.c                   |  10 +--
+ block/fops.c                     |   6 +-
+ block/t10-pi.c                   |   2 +-
+ drivers/block/aoe/aoecmd.c       |   8 +-
+ drivers/block/aoe/aoedev.c       |   2 +-
+ drivers/block/drbd/drbd_int.h    |   3 +-
+ drivers/block/drbd/drbd_req.c    |   7 +-
+ drivers/block/ps3vram.c          |   3 +-
+ drivers/block/zram/zram_drv.c    |   4 +-
+ drivers/md/bcache/bcache.h       |   3 +-
+ drivers/md/bcache/request.c      |   8 +-
+ drivers/md/dm-cache-target.c     |   9 ++-
+ drivers/md/dm-ebs-target.c       |   2 +-
+ drivers/md/dm-flakey.c           |   2 +-
+ drivers/md/dm-integrity.c        |  34 ++++-----
+ drivers/md/dm-mpath.c            |   6 +-
+ drivers/md/dm-pcache/dm_pcache.c |   3 +-
+ drivers/md/dm-raid1.c            |   7 +-
+ drivers/md/dm-thin.c             |   7 +-
+ drivers/md/dm-vdo/data-vio.c     |   3 +-
+ drivers/md/dm-verity-target.c    |   2 +-
+ drivers/md/dm-writecache.c       |   7 +-
+ drivers/md/dm-zoned-target.c     |   3 +-
+ drivers/md/dm.c                  |   4 +-
+ drivers/md/md.c                  |   8 +-
+ drivers/md/raid1-10.c            |   3 +-
+ drivers/md/raid1.c               |   2 +-
+ drivers/md/raid10.c              |  20 +++--
+ drivers/md/raid5.c               |   4 +-
+ drivers/nvdimm/btt.c             |   4 +-
+ drivers/nvdimm/pmem.c            |   4 +-
+ fs/btrfs/bio.c                   |   8 +-
+ fs/btrfs/direct-io.c             |   2 +-
+ fs/btrfs/raid56.c                |   6 +-
+ fs/crypto/bio.c                  |   2 +-
+ fs/erofs/fileio.c                |   4 +-
+ fs/erofs/fscache.c               |   8 +-
+ fs/f2fs/data.c                   |   6 +-
+ fs/f2fs/segment.c                |   3 +-
+ fs/iomap/ioend.c                 |   3 +-
+ fs/verity/verify.c               |   2 +-
+ fs/xfs/xfs_aops.c                |   3 +-
+ fs/xfs/xfs_zone_alloc.c          |   4 +-
+ include/linux/bio.h              |  28 ++++++-
+ include/linux/blk_types.h        |   2 +-
+ include/linux/blkdev.h           |  18 ++++-
+ 53 files changed, 236 insertions(+), 238 deletions(-)
+
 -- 
-Thorsten Blum <thorsten.blum@linux.dev>
-GPG: 1D60 735E 8AEF 3BE4 73B6  9D84 7336 78FD 8DFE EAD4
+2.52.0
 
