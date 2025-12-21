@@ -1,107 +1,131 @@
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6326E155322
-	for <linux-block@vger.kernel.org>; Sun, 21 Dec 2025 13:24:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53AA82F99BD
+	for <linux-block@vger.kernel.org>; Sun, 21 Dec 2025 15:40:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766323464; cv=none; b=fl+QY4Ng/X/jxfHkY8bSWK9YiLjHXyZ3ixj1nVpd2PHwgGzuBS+ja/ZnLildZvnJZzBZwnDKwA2R2KAP8PDTKFwizED9oxKnM17yRAGl83YfmtSPHGp2rkLqf3doOGmZpr6cDxDwXmpnEFbGgNOvQYR2Zfo+DBna6z0G868R7FY=
+	t=1766331604; cv=none; b=E5baxzFS+WQC7Zgs/TuJoI2qj26KfrtIUWMvmx7RCXhu3UmXp8yOhDd7518GnJgQQ879Hl8FHqU02YW2O9uIqiquZaRJV3+Ho/rWzNxkRe/sQBCnf0mYqGf/mm2ocK1tsCBmBWLxR04LCQld1WQTChGT6W+BE5n8mljf/GtI6wA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766323464; c=relaxed/simple;
-	bh=EGZh2EvswD4Wb/NBe749kVHHN8RXr0d5bf9D1e7clrU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZiMTMNFemI83JgX/ugl2EOd7lSZrWx4qNJg8G7DjQHrtY7EhYPX/XqEzLe7GETbIHpcS2g6rmoffk6vK+N3vSqgD3alY4C5O0Bh4BWzVBGfFlvPSlRMEEKRCRoCl4ygMZ9bkRbaZtiPEUdCCHesCQk9zIfy3J6aHYWJgsS4QS1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H9J3PjSi; arc=none smtp.client-ip=209.85.167.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1766331604; c=relaxed/simple;
+	bh=mnZjXNK0u+HP/XUiaDYnE60D1RSlqmCcOGyEHMy6J80=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OYE7KsDIo+kEgiME61oaCiV1yHB5CLFH3134r7fUzFB8/v0/l28rHjlAgpN2u1ZXo5wKUl1G5BNdKcuRT47mWPISnFPzMIk+8wOE6nAlDrmOmkWVGRyDvmvTFiYP1b3v0XpIjgS8NqXIUnwcx/D/N/2sfmOx0w1XPRV9+aC9W8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fttG2Je7; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=XM/GWV4t; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H9J3PjSi"
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-598eaafa587so3480489e87.3
-        for <linux-block@vger.kernel.org>; Sun, 21 Dec 2025 05:24:22 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fttG2Je7";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="XM/GWV4t"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1766331601;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+KE66w4YWw6ndgVPN9WJoeENuvGjofTuSeoIQ9xGNDM=;
+	b=fttG2Je7tdPOfLijYFhXFq3PE3AKCw6AQNJoJS1mI71qQq+TxQDEPYBBt6SS1Dp57w5qD7
+	UYCri/YFtUkTv2MRs6daOTYs5v2OUv8HvFYCcr7jN0dEfgATrZwVtAhZ4MNRg0LCX20bjY
+	xUoPIgUQDJrr+9L+UnTYemEK8FkcUxw=
+Received: from mail-yx1-f72.google.com (mail-yx1-f72.google.com
+ [74.125.224.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-321-2HSAi9BBMjC0b1tXHmC1NQ-1; Sun, 21 Dec 2025 10:39:59 -0500
+X-MC-Unique: 2HSAi9BBMjC0b1tXHmC1NQ-1
+X-Mimecast-MFC-AGG-ID: 2HSAi9BBMjC0b1tXHmC1NQ_1766331599
+Received: by mail-yx1-f72.google.com with SMTP id 956f58d0204a3-644716a6f05so4516156d50.2
+        for <linux-block@vger.kernel.org>; Sun, 21 Dec 2025 07:39:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766323460; x=1766928260; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=YoSQ42mrLVsYXEbrMaFWRBaq0h+SRn/ybUjjsp9uLcU=;
-        b=H9J3PjSiu/9SRIlcxoff0YzcufU0Q+ViSlwgSBFThsCqqk+Ss/FgGiZ7UllVQ32X/L
-         8EU4W8Y60mnYcdsKil7pkq0Hswv2fSR0lDs7SmvBcsjrBein/F35Hgdjb7+i8FO5U/VV
-         iA3LCsseEjloU99ePKlz1/hV/Nz1KnOrJjmjs5H7Qnmc8/pPwh3AImGyyLQULeU8XIYX
-         o/9E2aJdWZPOap56TSv0mztNsGSI9HXdGMho54bxkqp5JwcoH696B34Td5DLWv8VAB99
-         GKHkUxITHN0E6A9NYFXwNqujLrVqQ2FloVz0wl3bErQXWsih5xlF74WhBtgtuDxWYqrm
-         yZmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766323460; x=1766928260;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=redhat.com; s=google; t=1766331599; x=1766936399; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YoSQ42mrLVsYXEbrMaFWRBaq0h+SRn/ybUjjsp9uLcU=;
-        b=gXFvZ4tHdIEP4ImDucFX9Rkb0CFYNOLbWX3GHMGzFCfyB4Kz9JXcs5lQMCjnS1USp5
-         s1D86pzx2Br9itGu1hnkKn6jbt48EAO3J0UkU89xVLVPWe8bms7CK9MA9oDAvFbhYOYb
-         QZG9bNlPNHt9v3kUwIXIVfcCSCFHCNflnUb+PQH/7d4eag0HQPJQ9jzGQxtpyear1+Xn
-         C5sM6SDXYHK3H9HW3T9Sr80fby6tRgEIpa8ROcM68vpCMgjpphmVmo+Rilq7xE5JCqH2
-         Q8+ycN3Bm6crnMBMReYvoClIdw9A5pCNXR14a0i8v7XxxStihDtogH5WmEP/gwFiCg4c
-         c15Q==
-X-Gm-Message-State: AOJu0YxyksVTKwe5YQBBBbz1IXhTkz/ug95Dp5Bs3KzH5uYwk32gtVHw
-	TxKsPALOwYtdz52ZY+mq/L0m69Yc6ZVQu2Jd/ZFXslk5Q59AwvdUOgbGW1kHtB+tG9E=
-X-Gm-Gg: AY/fxX6xujwlxs83TNs74v259nDzARc5k8AlEDD+TejAjpNtivEddx3gZdziePsyAjq
-	OpVv7UZBYPiDrha1XaUhskV5Sv5oeA+cDbeYoHR+MPDyt6Q6HGUmI329qS4gnqY+b6EjdtpYM5a
-	m4OJT76IKZxW6wo50dc2nBdFPQwswnZUTxvPWscVXZuZnNJB0gOJ+Gw+wgFXRtKTE/gyg/ae8WL
-	NEOBtcL7KrPb7KiA54nZox2gftlQw8+RvxMw+Te0+Hprum+sWAt92lr/yxQC7SkVVbJcyqgVRrK
-	FFI2tJlE7+S9PYRP6Y/6AB5cKVgmfsHpBBqHJChxgQ9z6nkNJ5T2ABrF3HCBcgqcWIQysT6qmfH
-	34anqf14DbeJ8mtG70D8jp/jKGLo5bpDSSjwgv9mHKFVrwE7uHZB8VzpCD0A/KNcIJDKdqEfuSE
-	l0esIDPxllUMdUj/7g4Vmm7sMBKZZcHo/c7FMw9hbbkquR5WSd9eIQlIw=
-X-Google-Smtp-Source: AGHT+IGrUPswrGfWjOqQP3snzEfw2F7MfyIrcGhl52qtlVj8tDCZHAWezyXnpr2il7RjW0E0QZrKOg==
-X-Received: by 2002:a05:6512:4006:b0:59a:1238:2f52 with SMTP id 2adb3069b0e04-59a17de2c27mr3232118e87.27.1766323459996;
-        Sun, 21 Dec 2025 05:24:19 -0800 (PST)
-Received: from mismas.lan ([176.62.179.109])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-59a185dda8dsm2306800e87.41.2025.12.21.05.24.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Dec 2025 05:24:19 -0800 (PST)
-From: Vitaliy Filippov <vitalifster@gmail.com>
-To: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org
-Cc: Vitaliy Filippov <vitalifster@gmail.com>
-Subject: [PATCH v2] Do not require atomic writes to be power of 2 sized and aligned on length boundary
-Date: Sun, 21 Dec 2025 16:24:02 +0300
-Message-ID: <20251221132402.27293-1-vitalifster@gmail.com>
-X-Mailer: git-send-email 2.51.0
+        bh=+KE66w4YWw6ndgVPN9WJoeENuvGjofTuSeoIQ9xGNDM=;
+        b=XM/GWV4t5bhW/CXc1eTGegsHWhcSygiHGujZphzwTqn5/6LDn4ODMGWBYqzamq5ksp
+         vC3eM6pul+UOVPqUTrkprLC8tf9JkXHTl7Kdn3U1GBr6YzfjaZfniBfGrZWa/k0vHVrF
+         uN54aE+u+CAKKRVzWMPs692lPFF9Q6IMJ/LfE0fUhlo5vMqLo4/WPVwe/7QgKcIBTwE5
+         ocq07T0xOWTLN4Zj90RAMWllVGvDaVmUEKQ5FPnjZ8bL3kEVaVlG5kj/3Bhu+tuooAMr
+         wnKx5Flea13rb/gex/sDWE2cTe1ndirBUbbjZB3V4niqLfmun25MAvNuJyxvlHOTXozO
+         4rcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766331599; x=1766936399;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=+KE66w4YWw6ndgVPN9WJoeENuvGjofTuSeoIQ9xGNDM=;
+        b=lvzpgCX85Beanx33BN37vF9jAKlGwv42QwVTvh2gWzy/PQY7M8deA+pQzYA5Qblv2P
+         5LHTStutckCuCKtJ8+YcEn+jkNJHKKZbQ0vYQXqatUx0Mx4PM8y0y+VZmFj5zVq/GHLC
+         vC+GrDpzhV3MyiCynHf2XsdffVQDkfZIxaPUSlRnBq7+15TJNsDWR1hwUPc36B3aEsCF
+         KXwUgqezNgO8DMPwmcMmIgGtV9zRjnjOlRnb1bDEVEWioe0leezkXwlQasr6C3FlmK89
+         /qu7l6J1dWWAR6cS0+V08NEqdE7F0G1f6dbXAuCR8QCub4aFnLRQ5vq1zhjLE2geRC+m
+         imdA==
+X-Gm-Message-State: AOJu0YyMH5ub/UtlXnj+JMYt+n7IFQARCmwh2LRH/wvYv3iaiu2Hxz2L
+	UYU++EAAnSZ8G158BWmvxZ7IBaJr5pLhP6j+6+JTbh3AJveNGaxKgLGnyOt1lK2qe79ZAyq0Pav
+	wj8sVVYbnTgrsYrYyUt5H/H676aJpwhgI30DoU6BjYw0xi/aHsGAHBWmfeDJLzFbgdWwEclEOrc
+	DQpa4XnAutSF7Bqe3m5caKhk+sgcgrSO/E3XTLNZU=
+X-Gm-Gg: AY/fxX7K6gmUt88sG2WxYWv7GaPG01rOuT5+k1XGPSi4W31p+5048KsQitDgNfSXnG3
+	1aCP3c67rtlC4mgR7kbxgFmITWDE81X95c7CM32qrfYnfyr3wxLjnLpJzwp7MvG1vL4aBNrcKOR
+	NtaJpKiKl/QM+O5W8cQuu75u2P2kcUN9hkTQyNIMEftIOA+/VDSh+xiKEPj99UAM0+3KauHheoY
+	SZ7URW+S2w80ELHjAVsJki0Gd+3SUi/IgDgXBThq0O5WH7OSAyTdA==
+X-Received: by 2002:a05:690e:1284:b0:644:60d9:866c with SMTP id 956f58d0204a3-6466a92dc91mr6656844d50.93.1766331599155;
+        Sun, 21 Dec 2025 07:39:59 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFC7mRAlf3U3160pFy0QO4PEVMCEcrUcemZaiGKUncjGrA9BOh5VcTiZvbH4/xJJSP0FWrca5aMSKuDJG3O3Q8=
+X-Received: by 2002:a05:690e:1284:b0:644:60d9:866c with SMTP id
+ 956f58d0204a3-6466a92dc91mr6656830d50.93.1766331598821; Sun, 21 Dec 2025
+ 07:39:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20251221025233.87087-1-agruenba@redhat.com> <20251221025233.87087-2-agruenba@redhat.com>
+In-Reply-To: <20251221025233.87087-2-agruenba@redhat.com>
+From: Andreas Gruenbacher <agruenba@redhat.com>
+Date: Sun, 21 Dec 2025 16:39:47 +0100
+X-Gm-Features: AQt7F2o4CmeFGTIojqbpS0PVmjVAd-d4HUDEVdSFp54dsbxM3ZckXV6-nNPzQZs
+Message-ID: <CAHc6FU6vAokT9ugX1DA8iQLbeu7=Eixr9bq6z0o77_Nq+PyXvw@mail.gmail.com>
+Subject: Re: [RFC v2 01/17] xfs: don't clobber bi_status in xfs_zone_alloc_and_submit
+To: Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>, Chris Mason <clm@fb.com>, 
+	David Sterba <dsterba@suse.com>
+Cc: linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org, 
+	linux-raid@vger.kernel.org, dm-devel@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-It contradicts NVMe specification where alignment is only required when atomic
-write boundary (NABSPF/NABO) is set and highly limits usage of NVMe atomic writes
+On Sun, Dec 21, 2025 at 3:52=E2=80=AFAM Andreas Gruenbacher <agruenba@redha=
+t.com> wrote:
+> Function xfs_zone_alloc_and_submit() sets bio->bi_status and then it
+> calls bio_io_error(), which overwrites that value again.  Fix that by
+> completing the bio separately after setting bio->bi_status.
 
-Signed-off-by: Vitaliy Filippov <vitalifster@gmail.com>
----
- fs/read_write.c | 8 --------
- 1 file changed, 8 deletions(-)
+By the way, this bug makes me wonder if we shouldn't just get rid of
+bio_io_error() in favour of bio_endio_status(bio, BLK_STS_IOERR). The
+latter would be a lot more obvious.
 
-diff --git a/fs/read_write.c b/fs/read_write.c
-index 833bae068770..5467d710108d 100644
---- a/fs/read_write.c
-+++ b/fs/read_write.c
-@@ -1802,17 +1802,9 @@ int generic_file_rw_checks(struct file *file_in, struct file *file_out)
- 
- int generic_atomic_write_valid(struct kiocb *iocb, struct iov_iter *iter)
- {
--	size_t len = iov_iter_count(iter);
--
- 	if (!iter_is_ubuf(iter))
- 		return -EINVAL;
- 
--	if (!is_power_of_2(len))
--		return -EINVAL;
--
--	if (!IS_ALIGNED(iocb->ki_pos, len))
--		return -EINVAL;
--
- 	if (!(iocb->ki_flags & IOCB_DIRECT))
- 		return -EOPNOTSUPP;
- 
--- 
-2.51.0
+Andreas
+
+> Signed-off-by: Andreas Gruenbacher <agruenba@redhat.com>
+> ---
+>  fs/xfs/xfs_zone_alloc.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/fs/xfs/xfs_zone_alloc.c b/fs/xfs/xfs_zone_alloc.c
+> index ef7a931ebde5..bd6f3ef095cb 100644
+> --- a/fs/xfs/xfs_zone_alloc.c
+> +++ b/fs/xfs/xfs_zone_alloc.c
+> @@ -897,6 +897,9 @@ xfs_zone_alloc_and_submit(
+>
+>  out_split_error:
+>         ioend->io_bio.bi_status =3D errno_to_blk_status(PTR_ERR(split));
+> +       bio_endio(&ioend->io_bio);
+> +       return;
+> +
+>  out_error:
+>         bio_io_error(&ioend->io_bio);
+>  }
+> --
+> 2.52.0
+>
 
