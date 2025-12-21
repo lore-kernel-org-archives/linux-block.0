@@ -1,107 +1,107 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BAA71B808
-	for <linux-block@vger.kernel.org>; Sun, 21 Dec 2025 07:11:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC5B41F30A9
+	for <linux-block@vger.kernel.org>; Sun, 21 Dec 2025 11:18:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766301062; cv=none; b=j3gnxXKJOdaHz99/t7dag2LSmNsuRTXnqwIoSb/jlkyg+XUDQc/nS8fImE/HohMOsmHNaOmv8Xcz2PF5bBzUz3v+7bdWRJiD1oNGzsRLJpso4qQzdfhPDaGPItFylYZ2HpAjDxSNXznwHEaTdJ7CsifV/p+ENzDomJNJSf4iN94=
+	t=1766315883; cv=none; b=lsAEcpIDWnovqNhEXKP7sZsoxxzBtObOW0VaVjWk/DgkZfCqkX91KfnVcIeMlYg0LG46I76zdoGO/newU6+GKQDUyrj0O/oXaGIACQiEUB7Bs84aCBBQMbLOo7MJin1LN6P7evS/2K3uQd14ZxMMmdtAMXjtDDHR7dKYy4DEEvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766301062; c=relaxed/simple;
-	bh=pUcNV5KVp9JG5QHdkt8tf0jL5xiJu4V00/rw6BChgSk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iRbs8wnjbSV5Zfeab0sSMLLhFKHXfuZwH4NU0CSdvbmhIdmvO8DInYiapa0oiyKVUMZqwCPzR4TcHrzQjUX5h2mv/2Id/cIcOSmt4rq9VAeqk/UB806K8A7TzmFB7GlUzj88uMgyJ8K7YOEk1Bs+XwXe6Ibo1BY0BGCSUg1xZBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CIgk4B7f; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1766315883; c=relaxed/simple;
+	bh=EGZh2EvswD4Wb/NBe749kVHHN8RXr0d5bf9D1e7clrU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LeKiYrgxkB1PB+cEaNnXTjx6qkArVRB4K7Xb8cuE4yiUxpzlur0OHGLSM+9m/UvPaGfjDqx7mYPp+Y/WlM00nT8oAV67RDnJUfd6dm/HC0FO1I/yH9I2YDmLz0dV2PXHcXj29e+M4ZnYI3CjguuktTAUaqOF+4IJDuP/mMYkpRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dShUBaym; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CIgk4B7f"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1766301061; x=1797837061;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=pUcNV5KVp9JG5QHdkt8tf0jL5xiJu4V00/rw6BChgSk=;
-  b=CIgk4B7fByqNyZ/IGbrGcWctzWPjivwroENs5EbKUtg8NWJy3EVEZGmY
-   Vf/XveY9jFWQCtUJkpycQOEScdSTJELUsiBSUPW509h0DF67rwL5KXXaa
-   yVeeDPfpK2SRoN2EnlPBjuhYcjwsuW/+BvEtjD8LmFKjvYMVfUjWwlZzv
-   dOTGPsa+O8GkwKwfBEC2/yDOUhFXDms8pkCcPsBSQ+zGKgpia/EW72ROw
-   DWged1/WofoMLltP1cPi3jYSk1oRRyYzzXhDvpEBBA0N8LMZYpth0aqyi
-   Nyx9CGYa7Vl8m+fCEIMJiWx08qHwdykEXeqj69XNcoDofnkkwT2kvX2jd
-   A==;
-X-CSE-ConnectionGUID: BA3DfLrRRkylTuYbRoR/xQ==
-X-CSE-MsgGUID: xnJTFdXuR46MfUWHjMSssA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11648"; a="68242921"
-X-IronPort-AV: E=Sophos;i="6.21,164,1763452800"; 
-   d="scan'208";a="68242921"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2025 23:11:00 -0800
-X-CSE-ConnectionGUID: BwKEE3XIT669p95RFe3K0g==
-X-CSE-MsgGUID: /MGz7wTwRwmYFW/kePXy7Q==
-X-ExtLoop1: 1
-Received: from lkp-server01.sh.intel.com (HELO 0d09efa1b85f) ([10.239.97.150])
-  by fmviesa003.fm.intel.com with ESMTP; 20 Dec 2025 23:10:59 -0800
-Received: from kbuild by 0d09efa1b85f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vXDai-000000005OH-42S1;
-	Sun, 21 Dec 2025 07:10:56 +0000
-Date: Sun, 21 Dec 2025 15:10:03 +0800
-From: kernel test robot <lkp@intel.com>
-To: Vitaliy Filippov <vitalifster@gmail.com>, linux-block@vger.kernel.org,
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dShUBaym"
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5942bac322dso3556983e87.0
+        for <linux-block@vger.kernel.org>; Sun, 21 Dec 2025 03:18:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1766315880; x=1766920680; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YoSQ42mrLVsYXEbrMaFWRBaq0h+SRn/ybUjjsp9uLcU=;
+        b=dShUBaymkcB5o4HMf1RVrBi/KLS+seFGaWivqeo2Tp12WoP9bBGif/H+4eoZVMAWX2
+         +iO2lIGIgtMlcxHkyRhdE1CJVhnZMMcQuK6jxZylOFOOiv6jtHGWbLMCkM0yTWBzL38t
+         RAFoWByJ756/C7cBGVShbki90anvwPry0HQbpdRVx6OGA77YPvOWj6HrJ+tmSFgTg+CO
+         anaCnS160Ybd6Ab72jghoTsMia+pVPlyVAirDN+QLj17F5WQWoU7Y6wADsR1EQzazvkq
+         Rj6fDug9X6Wp4bGJFIaNdfrmOyCOrECih7blYoD0TE4TspAmK4O8YaRz3Sd7bhG1/FLH
+         nx6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766315880; x=1766920680;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YoSQ42mrLVsYXEbrMaFWRBaq0h+SRn/ybUjjsp9uLcU=;
+        b=vxA8wMeaVTCRZtnPjNT5cewgF2hohrSFc6XS9xvSiVNmf+T+0Rt3xilGo4nOdK6ikj
+         LlWdWz+1u/3RT9HWPp3JsfU2xwhG3dEnLqBFanSMFz4p47t1VIY3AdPqG9WddYgNP+Qz
+         n5X9KjffZ5bWcTh8Yc5Jg/bv33LGbYMQRZodCG1tOkldArAqoM6qsKew7VWosAEDO841
+         ue5nqXeA/ouKp0DcPvAbHlelQvbRfdpHK7tutXsWK6da3pGNDd2ewAV2WGYT9L1xKq4N
+         duUREsCINX39tXex5ChyaNpfLvtv/PrZzzpp34SgAFnXde11UNcm0I/0doAZz2WIr6+N
+         41Bg==
+X-Gm-Message-State: AOJu0YwkMII0fNr+WZJ/tvpqxf+t/FbNZMG5q1kYxXoM+7QkticUkNRW
+	ciln/LRUFu46GJzAbhsoCGGbVLo+a4LJRieFq2x9kvt9A1lzjgcPd6LA9m5/CHZZHLU=
+X-Gm-Gg: AY/fxX69t5FF9MdVnaaJrUVXFlCdwYmXuPGlpNKdUdEVNd3TQCnQ9cvYUFq9NazuNuK
+	UgdXaOfSA15q/jboQKeEVilWKV5zOWfE6vfQbsW5/n0RE4DdZBV05G64a3ESzz+FlGCnibzOaLC
+	lF4VydotyFkckeUFt55RKzi66+9Y8eZBJaUFpBNlP9aU/Z1WeTGwu+zfOVdyaoNSVljTMigkj7o
+	9AK3UlUgzhSULBR15RpIa/pXZ8Md6hCm4zGubrzfc7GGIWCgrcCBMk67LwPaFLh76jZSIyEmkNQ
+	zdiWnAMwqifu+WBru2vTWe/CImmhfgwxt8yOxetDqaia1iOhkgFHMaDVi53bbnFuobxtAPE3XRY
+	nQWWXMb1UokjPRrsaR0/ItnMaW7EW0H8e9VxeVIHASrCZ7R9IGVKohcDXM12flSArqDJcUupZV9
+	KA4EBeuibR1bk3B/oj0eKizZ0TvxC8+QDbg2ejdV24YXwC
+X-Google-Smtp-Source: AGHT+IH6d4JJLvxJFsfU8GDWtEpaAdLJtPwCBVEJ7tqIIbHP6cYFV8AmeGI+MWfAbrGcvYKoAAskIg==
+X-Received: by 2002:a05:6512:238c:b0:594:768d:c3ef with SMTP id 2adb3069b0e04-59a17d3c40emr3003521e87.30.1766315879363;
+        Sun, 21 Dec 2025 03:17:59 -0800 (PST)
+Received: from mismas.lan ([176.62.179.109])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-59a18628388sm2283132e87.99.2025.12.21.03.17.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 21 Dec 2025 03:17:59 -0800 (PST)
+From: Vitaliy Filippov <vitalifster@gmail.com>
+To: linux-block@vger.kernel.org,
 	linux-nvme@lists.infradead.org
-Cc: oe-kbuild-all@lists.linux.dev, Vitaliy Filippov <vitalifster@gmail.com>
-Subject: Re: [PATCH] Do not require atomic writes to be power of 2 sized and
- aligned on length boundary
-Message-ID: <202512211405.FsWuMZAC-lkp@intel.com>
-References: <20251220173833.71176-1-vitalifster@gmail.com>
+Cc: Vitaliy Filippov <vitalifster@gmail.com>
+Subject: [PATCH] Do not require atomic writes to be power of 2 sized and aligned on length boundary
+Date: Sun, 21 Dec 2025 14:17:25 +0300
+Message-ID: <20251221111725.19141-1-vitalifster@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251220173833.71176-1-vitalifster@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Vitaliy,
+It contradicts NVMe specification where alignment is only required when atomic
+write boundary (NABSPF/NABO) is set and highly limits usage of NVMe atomic writes
 
-kernel test robot noticed the following build warnings:
+Signed-off-by: Vitaliy Filippov <vitalifster@gmail.com>
+---
+ fs/read_write.c | 8 --------
+ 1 file changed, 8 deletions(-)
 
-[auto build test WARNING on brauner-vfs/vfs.all]
-[also build test WARNING on linus/master v6.19-rc1 next-20251219]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Vitaliy-Filippov/Do-not-require-atomic-writes-to-be-power-of-2-sized-and-aligned-on-length-boundary/20251221-014115
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git vfs.all
-patch link:    https://lore.kernel.org/r/20251220173833.71176-1-vitalifster%40gmail.com
-patch subject: [PATCH] Do not require atomic writes to be power of 2 sized and aligned on length boundary
-config: arc-allnoconfig (https://download.01.org/0day-ci/archive/20251221/202512211405.FsWuMZAC-lkp@intel.com/config)
-compiler: arc-linux-gcc (GCC) 15.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251221/202512211405.FsWuMZAC-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202512211405.FsWuMZAC-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   fs/read_write.c: In function 'generic_atomic_write_valid':
->> fs/read_write.c:1805:16: warning: unused variable 'len' [-Wunused-variable]
-    1805 |         size_t len = iov_iter_count(iter);
-         |                ^~~
-
-
-vim +/len +1805 fs/read_write.c
-
-c34fc6f26ab86d0 Prasad Singamsetty 2024-06-20  1802  
-c3be7ebbbce5201 John Garry         2024-10-19  1803  int generic_atomic_write_valid(struct kiocb *iocb, struct iov_iter *iter)
-c34fc6f26ab86d0 Prasad Singamsetty 2024-06-20  1804  {
-c34fc6f26ab86d0 Prasad Singamsetty 2024-06-20 @1805  	size_t len = iov_iter_count(iter);
-
+diff --git a/fs/read_write.c b/fs/read_write.c
+index 833bae068770..5467d710108d 100644
+--- a/fs/read_write.c
++++ b/fs/read_write.c
+@@ -1802,17 +1802,9 @@ int generic_file_rw_checks(struct file *file_in, struct file *file_out)
+ 
+ int generic_atomic_write_valid(struct kiocb *iocb, struct iov_iter *iter)
+ {
+-	size_t len = iov_iter_count(iter);
+-
+ 	if (!iter_is_ubuf(iter))
+ 		return -EINVAL;
+ 
+-	if (!is_power_of_2(len))
+-		return -EINVAL;
+-
+-	if (!IS_ALIGNED(iocb->ki_pos, len))
+-		return -EINVAL;
+-
+ 	if (!(iocb->ki_flags & IOCB_DIRECT))
+ 		return -EOPNOTSUPP;
+ 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.51.0
+
