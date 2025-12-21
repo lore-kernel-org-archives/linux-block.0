@@ -1,93 +1,88 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B34F623EAB8
-	for <linux-block@vger.kernel.org>; Sun, 21 Dec 2025 16:42:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61A9622157B;
+	Sun, 21 Dec 2025 19:23:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766335334; cv=none; b=j9O2AlJM/WJJYChTLNSYts7cRzKt7zXe7IMMqxuDSOrvDrlj83Y+0nWc1SzeRMD0f5cLmunB0nKwI2E9YXwa9A2LMU0AagwAVnwFa3d6+BGBZyfq8u4N83754NjLuQ/vrbbWyMgSV8P3S9eGWxKF7/b8XEJCAo8nSDI3rGn33j4=
+	t=1766345035; cv=none; b=WLFCq22t/HUcCTzHovOAzYLfZkrVyerN7c/5Q492TTKjmcwp/n3xtzTIVKw6q0ea3Xbe/RFMrGW0UJbj9qwwWYdw6ZpXWVzCg+kEm+vujAHjyzn7RLJEU7A7y7qTXk1BaEOtZ0IWk+q064mlceCseDiyT0wySldXvPztc8e4whM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766335334; c=relaxed/simple;
-	bh=z8qEoSZR75ixLVNP09M5Ehvkn17QwDnpn0rixWHks40=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UPgMXZhfBtmgyHmUtZyml82MWdA31734FVpDkqNX3Nvg5EW3gYDgo5oHglB/V1rBBLUQPtB8X0s/dU1t/TS9fGYH5Q8wYq7HuUGBYfMV7aw6zXQMMfQCIAowPQVNG9g8yMpsKUX9Z9NIqU53Ik0hzVQs5Dv0sZQme1HNwU2igbE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dk5oGq5Q; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1766345035; c=relaxed/simple;
+	bh=yDdIfA2M7bhcnIzaQVZ/MR46IH7vReqFIBom6UsPNOk=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=t0EdAeEIDUBLjWGNfRdId9P2A2Xw8/dHa+pfvPnXCPGcEOyezWZr5aAx67ULMfBSCL7q8ydTStonozaGjEKu1MesVOKh9K3EIOsBNLzntfW3rGOXOAXcmydeR7lAs8rzJbNYVmXzeB73sx/VSKDxvLmWB5rNx/q7u+5g6B5wTSI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=tQgMWruA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dk5oGq5Q"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1766335331;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SdaQ/LJwYRTVPJ3DRN/BJVij5uh10+ieo3HqgJ09/04=;
-	b=dk5oGq5QRPD786Yta5EcvrGrS/AOpUBOtE17o/PVW/X93G2wTNeS7FMFo2Ejr2AbWXPSCl
-	Sx978ZadHg7h5bia4Ji3/Td521znEpUbGRwdTTFqLVG2CudlV8c5Sdg2gSma2n+rpgKi42
-	I/pTBy9XPNd0xIH2SVSlrCKnY2ujjms=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-118-IF7G1hJwOba6wCF5YkU3rw-1; Sun,
- 21 Dec 2025 11:42:06 -0500
-X-MC-Unique: IF7G1hJwOba6wCF5YkU3rw-1
-X-Mimecast-MFC-AGG-ID: IF7G1hJwOba6wCF5YkU3rw_1766335325
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AB5BF19560B2;
-	Sun, 21 Dec 2025 16:42:04 +0000 (UTC)
-Received: from localhost (unknown [10.72.112.2])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B4CAC19560B2;
-	Sun, 21 Dec 2025 16:42:03 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Caleb Sander Mateos <csander@purestorage.com>,
-	Uday Shankar <ushankar@purestorage.com>,
-	Yoav Cohen <yoav@nvidia.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 3/3] selftests/ublk: fix Makefile to rebuild on header changes
-Date: Mon, 22 Dec 2025 00:41:43 +0800
-Message-ID: <20251221164145.1703448-4-ming.lei@redhat.com>
-In-Reply-To: <20251221164145.1703448-1-ming.lei@redhat.com>
-References: <20251221164145.1703448-1-ming.lei@redhat.com>
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="tQgMWruA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB63FC4CEFB;
+	Sun, 21 Dec 2025 19:23:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+	s=korg; t=1766345034;
+	bh=yDdIfA2M7bhcnIzaQVZ/MR46IH7vReqFIBom6UsPNOk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=tQgMWruAu0PX8i7mHrZYIP/VOJTL6M8TGea6hZJQK6NixcH6P3dMo34xEtj3dMMVX
+	 2IIlHOtyxZTAMY8j9WCO8e2bPMfM1HvOinqra/HMQlfv+/MDL0XqV+ygw8hvd5cljh
+	 /UoPNbyTlsNnrzg1N4bEcZiksvFFY0RD4CKMOu9E=
+Date: Sun, 21 Dec 2025 11:23:54 -0800
+From: Andrew Morton <akpm@linux-foundation.org>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, linux-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, Wangyang Guo
+ <wangyang.guo@intel.com>
+Subject: Re: [PATCH] lib/group_cpus: fix cross-NUMA CPU assignment in
+ group_cpus_evenly
+Message-Id: <20251221112354.3a0ee9e1824f2cac9572d170@linux-foundation.org>
+In-Reply-To: <20251020124646.2050459-1-ming.lei@redhat.com>
+References: <20251020124646.2050459-1-ming.lei@redhat.com>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Add header dependencies to kublk build rule so that changes to
-kublk.h, ublk_dep.h, or utils.h trigger a rebuild.
+On Mon, 20 Oct 2025 20:46:46 +0800 Ming Lei <ming.lei@redhat.com> wrote:
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- tools/testing/selftests/ublk/Makefile | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+> When numgrps > nodes, group_cpus_evenly() can incorrectly assign CPUs
+> from different NUMA nodes to the same group due to the wrapping logic.
+> Then poor block IO performance is caused because of remote IO completion.
+> And it can be avoided completely in case of `numgrps > nodes` because
+> each numa node may includes more CPUs than group's.
 
-diff --git a/tools/testing/selftests/ublk/Makefile b/tools/testing/selftests/ublk/Makefile
-index eb0e6cfb00ad..fb7b2273e563 100644
---- a/tools/testing/selftests/ublk/Makefile
-+++ b/tools/testing/selftests/ublk/Makefile
-@@ -53,8 +53,10 @@ TEST_GEN_PROGS_EXTENDED = kublk
- 
- include ../lib.mk
- 
--$(TEST_GEN_PROGS_EXTENDED): kublk.c null.c file_backed.c common.c stripe.c \
--	fault_inject.c
-+LOCAL_HDRS += kublk.h ublk_dep.h utils.h
-+
-+$(TEST_GEN_PROGS_EXTENDED): $(LOCAL_HDRS) \
-+	kublk.c null.c file_backed.c common.c stripe.c fault_inject.c
- 
- check:
- 	shellcheck -x -f gcc *.sh
--- 
-2.47.0
+Please quantify "poor block IO performance", to help people understand
+the userspace-visible effect of this change.
+
+> The issue occurs when curgrp reaches last_grp and wraps to 0. This causes
+> CPUs from later-processed nodes to be added to groups that already contain
+> CPUs from earlier-processed nodes, violating NUMA locality.
+> 
+> Example with 8 NUMA nodes, 16 groups:
+> - Each node gets 2 groups allocated
+> - After processing nodes, curgrp reaches 16
+> - Wrapping to 0 causes CPUs from node N to be added to group 0 which
+>   already has CPUs from node 0
+> 
+> Fix this by adding find_next_node_group() helper that searches for the
+> next group (starting from 0) that already contains CPUs from the same
+> NUMA node. When wrapping is needed, use this helper instead of blindly
+> wrapping to 0, ensuring CPUs are only added to groups within the same
+> NUMA node.
+> 
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  lib/group_cpus.c | 28 +++++++++++++++++++++++++---
+
+The patch overlaps (a lot) with Wangyang Guo's "lib/group_cpus: make
+group CPU cluster aware".  I did a lot of surgery but got stuck on the
+absence of node_to_cpumask, so I guess the patch has bitrotted.
+
+Please update the changelog as above and redo this patch against
+Wangyang's patch (which will be in linux-next very soon).
+
+Also, it would be great if you and Wangyang were to review and test
+each other's changes, thanks.
+
 
