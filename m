@@ -1,47 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B15F62512C8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C59AB253B58
 	for <linux-block@vger.kernel.org>; Sun, 21 Dec 2025 02:53:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766285615; cv=none; b=kuXi0y0mWPbs4Tf7OUtW5SLK/dJOCgziiz5IebaNER5rCGxpiYzGhMQ/6AUEiu/JVoueDsXJ5rIsKuOAEHFqsYU7pn195W+XV/v0d2Akb4jBUbfde2jm2q3CQlHVjrKzFluRhWd+QRkC+VKnZhoUKNadUreA/RsEgHgu7R0MZ2I=
+	t=1766285615; cv=none; b=WMMzyseSgoznIsPfp92IN6jcoVJ5jdnVb5RlzJ2Kp+7gHe3ouHXbiga99VeBz0p0iecXmBXmeyp5WAOUtZA5GQTUsRe1fp2DKWk0jzdGkddmRAH1WPaeYqdtLzSr3ebBEa/FnGAfl8VI3WYPXuQUU3oLTtg0m5GW830UpfjXTCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1766285615; c=relaxed/simple;
-	bh=V7ilqadfBXQOTYr9StUYy6E9eJ9EgwDYxG/6noZg4xI=;
+	bh=4P2dhr1JL9AniZ7kydn/X2v06EQ/REJNhKDabgui29c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=J+b4qU3ulGuMqfu0fCeFjqIZ8J/djYYq78hTn8ndmR5l/aUMFVdVvp75bf8UDvvoBLvLkNbyxzA4DI4pJ15gkIU/gyevIQzIWCOY/iz0h6Mj7niekHsMmkg88Z9z8coWXj7YMFzkKgNeqOvaVK51BpdhhF0lZr+MDuezQfiXzlc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bnXOlqtd; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=HnBuDAbn8gR1tOKGPf7ypGOADjhCMlwar+LZ8SHo7yfoYUE0r+361Vgz6Ex4+zKNHw13ubWTLUBl+GPebOY8SxcPaX14lqL7MQyNFEpqrURCwTDxB4GpRflQsFAHMJbQrjRgxq3VdlUQHGlL4C/90Nhb2Jr+5HvLYtzpChlLjfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=diN/HCtx; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bnXOlqtd"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="diN/HCtx"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
 	s=mimecast20190719; t=1766285612;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=G1uXTIV/q9QWEKYFCtmTYr1p7eCMWcmzNVFUPfueUQ4=;
-	b=bnXOlqtdLHEOcq6p/9gheY5ZTHLK2PCxhdITKRatOCQjSNjCjCwk3AzuJQmok9qLEY5tai
-	Hv87VwHLM3eq64+X5MOEydr2UJFRGQocBTDxvMSgILh53AjSAoj2HfoS1CBQy3rT/zv3a9
-	55OUKcedtMzkP2ht0gizjh/vub2EEbE=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+	bh=Fol6UoUTNivE27QS2qgrcPSW+57SEzmLBc6042LIvfY=;
+	b=diN/HCtxV0hCbq61qQEDs80ie+V/My0IuVENDXJ0Cvsner/e1/i8skvVYM1WPdzPBI5qj8
+	PPENbp65o2a5hqG4ixFerTilkC+cv/AMj7ODPdDy7VuhS6UzjwWfQ4zXkfRtkZGou7V6pI
+	5cJ5J/U4IWloSoxOpJVH7/Fpq/wgbio=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-187-lXnjKGRIMTuWIEywNbTQxw-1; Sat,
- 20 Dec 2025 21:53:27 -0500
-X-MC-Unique: lXnjKGRIMTuWIEywNbTQxw-1
-X-Mimecast-MFC-AGG-ID: lXnjKGRIMTuWIEywNbTQxw_1766285606
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-134-o5WEt6OwNsyRSe35HCz4Kw-1; Sat,
+ 20 Dec 2025 21:53:31 -0500
+X-MC-Unique: o5WEt6OwNsyRSe35HCz4Kw-1
+X-Mimecast-MFC-AGG-ID: o5WEt6OwNsyRSe35HCz4Kw_1766285609
 Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2A2A41956088;
-	Sun, 21 Dec 2025 02:53:26 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 943D619560B2;
+	Sun, 21 Dec 2025 02:53:29 +0000 (UTC)
 Received: from pasta.fast.eng.rdu2.dc.redhat.com (unknown [10.44.32.8])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2F94F180049F;
-	Sun, 21 Dec 2025 02:53:22 +0000 (UTC)
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 94EF8180049F;
+	Sun, 21 Dec 2025 02:53:26 +0000 (UTC)
 From: Andreas Gruenbacher <agruenba@redhat.com>
 To: Christoph Hellwig <hch@infradead.org>,
 	Jens Axboe <axboe@kernel.dk>,
@@ -54,9 +54,9 @@ Cc: Andreas Gruenbacher <agruenba@redhat.com>,
 	linux-raid@vger.kernel.org,
 	dm-devel@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: [RFC v2 13/17] xfs: use bio_set_status in xfs_zone_alloc_and_submit
-Date: Sun, 21 Dec 2025 03:52:28 +0100
-Message-ID: <20251221025233.87087-14-agruenba@redhat.com>
+Subject: [RFC v2 14/17] bio: switch to bio_set_status in submit_bio_noacct
+Date: Sun, 21 Dec 2025 03:52:29 +0100
+Message-ID: <20251221025233.87087-15-agruenba@redhat.com>
 In-Reply-To: <20251221025233.87087-1-agruenba@redhat.com>
 References: <20251221025233.87087-1-agruenba@redhat.com>
 Precedence: bulk
@@ -68,27 +68,40 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-At label out_split_error in xfs_zone_alloc_and_submit(), IS_ERR(split)
-is true, so bio_set_status() compiles down to a simple assignment.
+In submit_bio_noacct(), call bio_endio() and return directly when
+successful.  That way, bio_set_status(bio, status) will only be called
+for actual errors and the compiler can optimize out the 'status !=
+BLK_STS_OK' check inside bio_set_status().
 
 Signed-off-by: Andreas Gruenbacher <agruenba@redhat.com>
 ---
- fs/xfs/xfs_zone_alloc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/blk-core.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/fs/xfs/xfs_zone_alloc.c b/fs/xfs/xfs_zone_alloc.c
-index bd6f3ef095cb..2b069cffac00 100644
---- a/fs/xfs/xfs_zone_alloc.c
-+++ b/fs/xfs/xfs_zone_alloc.c
-@@ -896,7 +896,7 @@ xfs_zone_alloc_and_submit(
- 	return;
- 
- out_split_error:
--	ioend->io_bio.bi_status = errno_to_blk_status(PTR_ERR(split));
-+	bio_set_status(&ioend->io_bio, errno_to_blk_status(PTR_ERR(split)));
- 	bio_endio(&ioend->io_bio);
- 	return;
- 
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 381bdf66045b..acf0a82a90ce 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -821,8 +821,8 @@ void submit_bio_noacct(struct bio *bio)
+ 		if (!bdev_write_cache(bdev)) {
+ 			bio->bi_opf &= ~(REQ_PREFLUSH | REQ_FUA);
+ 			if (!bio_sectors(bio)) {
+-				status = BLK_STS_OK;
+-				goto end_io;
++				bio_endio(bio);
++				return;
+ 			}
+ 		}
+ 	}
+@@ -887,7 +887,7 @@ void submit_bio_noacct(struct bio *bio)
+ not_supported:
+ 	status = BLK_STS_NOTSUPP;
+ end_io:
+-	bio->bi_status = status;
++	bio_set_status(bio, status);
+ 	bio_endio(bio);
+ }
+ EXPORT_SYMBOL(submit_bio_noacct);
 -- 
 2.52.0
 
