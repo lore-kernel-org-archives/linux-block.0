@@ -1,212 +1,187 @@
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74ED3262A6
-	for <linux-block@vger.kernel.org>; Mon, 22 Dec 2025 17:11:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.171
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766423478; cv=pass; b=KpXicWPfpVWwlddAXl2hmUS+ZLZ7Khv5fFV/Qicv6LspR93YIuXL/sWmI5liKWrKMqgmrHT8V+qnmhzpN31jYNAxFP8ly8HL0eKYi0VAiYvsUKqJ+AtAtyrxnyMJaaAhZVU9ReUT1ErOAZM8TAPr2VulP2xN8t6h3LKbutBXkhk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766423478; c=relaxed/simple;
-	bh=JqacWfAt0ZXZ69hE4OkTIVIFQV9cJx9Hva6On2owtTA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=B3SbLiR3IKkDWDmtHHfL/AJTrI36PbgMCqGVipBrEroUXGoWqvlLIfYkEcxi0gas/aR9f0AbuTkP5gE0qlCUKykNTu9yvUlwROFGUUAJkIhmXop5i7t3ASJCgkY/SLfXGjwp3XMme9NIFLcvP0WbQgE7NQH04qpPc+HfzWv0EWg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=gXAhgWJq; arc=pass smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 054F32C11E2
+	for <linux-block@vger.kernel.org>; Mon, 22 Dec 2025 18:11:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1766427065; cv=none; b=GdMMHgBl267CAow1uvhQXsJ8VgSFV/cbbnUznHO2PzigXwg9XUc2/QFk4DW2qxOLgVccn9zFRmxLIRAFcmdJK+BheS0qAbRa6/pQDkie9cp1Eh7Dj2cv1mwVKjvcQLBKAniSEU6kZhb+7US6rE0Z25uhJir+U4elUnHA/dQz09M=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1766427065; c=relaxed/simple;
+	bh=0WUgzmFj2g6mXyUMyOklDH/yf1t3DLZeKp6bYlEtRcw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=K7eIxt0Lh3bkNMsy12skjNVBkS/A4cee6GhhkYAkpNd3fKi6O833PCC8OMcbFjxq3iFvYB2QhBzhT3Ne0fFoLIRR/SdBremZ2T+zI9EXsIJxSjiqP5NGzqE9pCcPXUuB3mNRcXLYGjJzl91sPKyLAOsd/rtXXLqXsrt4HcSwJG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EnP1vPNx; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="gXAhgWJq"
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-7c9011d6039so148019b3a.2
-        for <linux-block@vger.kernel.org>; Mon, 22 Dec 2025 09:11:16 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1766423476; cv=none;
-        d=google.com; s=arc-20240605;
-        b=iifZ53T9IGfgChC41ZWA5IThFxWEf1avszpAAoVIrw7VpCg9/DDI0MDWPIULJXV3BZ
-         bSn48zpBREyY4njGhns1sL1LCxiA2N+owflQU6X+EphzlQrY7UOLVMTKQ2AVHSRVAk3J
-         /8T+SkiHAuHvC/D253c+2c4pdk2NdUK+2kHYEOu4dP3i6OUr2I4uy0lAXB4W1zb1Zvz4
-         aCm5s34n2zKmouJ94JS4izr2SVKiEgQS+uuoIkvA2VLmGvLKs2nJut6T8l/rewVntROh
-         +j5z1ixVEhL0jTSRlv1vRtXlXBDmrKKiBWG7i9gFIKhQqQ7pNwG5oBC+v2cEbcvTodf/
-         g+aQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=WyI3oyBXBFxhrviz8e5X3C6yj6KOriffXerfRYoiv9M=;
-        fh=6r2ABKtPxu5aSAF1q19YJsDSjzrGTdSW8J4n9RdzN08=;
-        b=WpQ0fBK1ea4Oe5BcelT/BiqOd+f282NhnYCE2S80iSIg/qA/UwQLs+zTc3MfD2HIVh
-         waKImNHQ0gwgxok5S94eMOpPbSAY6AfwLqPsMds8kWSNkxGeL76RSnSxWF1mK2Yzd83U
-         yPbSE0NMA+DnEDT5swU/C9MADkr4xq4V1H76t1xD3Dc9bDhukwPEquEcfjptqvprpVf+
-         F96PWhAqrVBIxmpPZ+JUn7rAm6t7NwxH55Dq6Lk55VfNU1/YDv/MvMqxvB8gyVLGFb5q
-         bUtve7DSG5wKAHwShbVMKDsR8NCAHDKCTUR4Ke3HECDzJsoLO6Rb3xf9uNcOSzqbG9Gp
-         X/uA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EnP1vPNx"
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-8035e31d834so1605947b3a.2
+        for <linux-block@vger.kernel.org>; Mon, 22 Dec 2025 10:11:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1766423476; x=1767028276; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WyI3oyBXBFxhrviz8e5X3C6yj6KOriffXerfRYoiv9M=;
-        b=gXAhgWJqu+hgR4ekHjrujxpRlBeI68PVwRESwXvkBuPyt+HOOuqT7a7CtdXOilzXUX
-         KN0MBm/+inJwU6ZfdL1bJ9FcUhncH/S9T8tMQGnBk9jyWKV8prWRcyQH6yrPqI04oTZb
-         dJer1lttS5AsUdCQhMEh5rspzuRxXz65Bay9xhlNYMzzGwtxx6FthDdlgr5+YjNq8FCd
-         sVjQkRL7FXX/CgKlP596NWFA8+mb7PtwxbWrpq33J1a/gWfmkQoHNQ01TtKZF+pcwZeo
-         YBjozgz4pgReegBfyciip4zHA1oB0Nfcrm1bI0m3GiVE2kqpBaYqjVm+ZLHlBTQUoh8F
-         LE1A==
+        d=gmail.com; s=20230601; t=1766427063; x=1767031863; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=iVr+W08/gkAe0aMwVz9OuqZ0vaSf4KgRfnQxdMq0bj4=;
+        b=EnP1vPNxriQ36hm4iCNULdf0acjw0JEO6jyCPeAqV+K220VHMh8rGsUk73zjB713i0
+         zdYdqr+q7inenWb+n1raG7Azl2n9G+taQ1oMGG1+hiyQ3+RHo6wdqfMSlXTCstjReJmf
+         fyzh7jYSvs0dNvyFUlVivreky6tHdB0aUieUmDm2hm4UOHPJfGBvjwMv2UI0dPw5NHY1
+         oRQIxw3Mt43rPKpoG9+RfE9JvSaAPLukSYuthByD++2SWLXwLjwNjmtDTwnfFLZT/qF2
+         F6bM8csrJJr2ZTzbbqaCqorje88SFaiHPcpjiUrL9nmLAWwJ+Jt8w9+rm+wbwn7ung4s
+         3uWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766423476; x=1767028276;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=WyI3oyBXBFxhrviz8e5X3C6yj6KOriffXerfRYoiv9M=;
-        b=nfTUJDAswq1uM923mtM3vVtCpk08mkUKqroY8xydBMUuPpeeoD+Q8wQO1zxjO7KZMy
-         HeGLc3xz1VZuxUV6mJyAiXzdYTzkLs9aMZvoOllux9AoL9rlqpPFZXeK6e8zZdYrNo+O
-         dx9RrOY0fs+Gv7Lqt4unj0dIIfDngKkS8MdLwObWhvHNYpGpQfPLjclLTv8VYRvdYP6r
-         JEFCkTsTsd5/yDIfYYew7L5B4y3s6eyajThu3TXrY7doUL8ERJHRMjxccN975QGDHyon
-         TnABpDwdUoMXJGWfpGIH+/AkbGzyqBmucFwtQNxeiadwEVhgjz8kd1p8stFgf+F9cqoR
-         //BQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXWZgC9Dzp4GG36EqXUKK4rdvrRwLRXps8ytT8d5Ge9HL2RvqZqtIirPusPqaydnZbQXGJpfhXSNlv7cg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyzK9YXXctjTLXG8Hiw/Z+5fJ6w0+RiaKbTbqmdW6qsRUAHcgCw
-	fN5m/RY0GtYRd1xtDX9sbaNxamWJig2lkWXMG+nAaLee4+pXu5tlVDCTeJCBpcsjuVyRmNUUASZ
-	xSEyongLb2+EVPxPiQXjWz++ABwi/aB0T5ixU8G9dIA==
-X-Gm-Gg: AY/fxX5sPNWxppZ9svxvGyncGPFQG2yefwjONenv7EBfnd7JWAZQYUb7y4GMHrxE8p6
-	UAIC1jgdWW/ejFN7bUlBf/spbKjkhmqWAJEHTd4LFCQpBnkqdvXzLpDz/vKQDpOzliZYGGHh6Ro
-	ttf8TBH+AuQZmUwcS22Dua9NTpOPss0SpdZbtE3IBWMnT+d8y7zs6kf9HNZ/nX/xwg61X1JCAgE
-	+QvOacCZ5zUaAwTBDCE9m2YUbVraKwV7OFd8DOakh2bklxQJbNmpCJcPXHbeelCJGnr8CI=
-X-Google-Smtp-Source: AGHT+IEgoFt5onRyuFBvCdWzpye1MCSgMGvEELbkTWdAfyq9Bby3/aulgO/3PI5bxZIcAsJz2e+7U/96+CK/y5Z9WUo=
-X-Received: by 2002:a05:7022:e1b:b0:119:e56a:4ffb with SMTP id
- a92af1059eb24-1217215cb5bmr7000590c88.0.1766423475371; Mon, 22 Dec 2025
- 09:11:15 -0800 (PST)
+        d=1e100.net; s=20230601; t=1766427063; x=1767031863;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iVr+W08/gkAe0aMwVz9OuqZ0vaSf4KgRfnQxdMq0bj4=;
+        b=n7tINYISKa8ItqO495FbryA+60OTts6dV2G3E89mOYEsTWgLag4vUktfgtKxE3AdXx
+         A6SuzjZqnTnMY3rb9u/9VcVpbUBenLL5p+6Q8eryS3pRgvRf9vBTXLPKiQUHd+S9PO4j
+         BgqXuWqgHWULtDgMGnvDbDENargVnqREN/abbfw4Mi3OREr+XYNC9+dzsGhCbZL0Mp7l
+         agc8kB4zi+jYsGDUcL5D/eYPKlmpnRRti7+ENQ1tRRyoGEAgrIu3HjdrmEa3kBjzO189
+         4YW4e2tNkqaFDP20+dql1ZaKxp9a+NBffM5k1BjreMQpk9fHQipbFMIWv+xNQC9fAshg
+         BVhA==
+X-Forwarded-Encrypted: i=1; AJvYcCU+iaMjHhrsb+u4IT8P7kRV5B7dzmATnsGQyakt8ounWfW1x7GUnO+404Wh1PHSksy98Ugn1ZZAagRApA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5ZuU37z9CbsnwZXKZD6c28n6HHr6dnE3Hr9yK8BphQ9xDskS4
+	v8NwPas0F2usL1m8nrBvOsUnoH8skgdIORtiQiJ4i8f+cbKXSh/IALuR
+X-Gm-Gg: AY/fxX6bqCAdUo/ZMoQo1hs9TOP/M4ApJwjF+uvWrc5xugUjOOcdfwERjyZRH1ZIZ5S
+	ZTqrHsUR4w3WfYjuHSyzY5uSXEpeUK2TClkIlYTSLpbe26vjse4LbPBCE8d+djRaBzbjbMCKr59
+	eQFqx/MbA/9jDVBVKFvmbha9iVapLt5PahBbNIo6oO4jh23xNub5JNE6GGFT2CWS4pV/AWf+DNc
+	YdobYZ+JLgd5NhZGwgJfDrt2Ym8TpQH8WBp5NSG4A+g/c9MvUsBVTw4KRPH0jh2TBfIJ/IIQLBz
+	NcVGUT5sOfCMAnyJ7knUevno8WLUlPHS8ajLpaWXLjIFXwNdGFJgGbm2IfpYe6p9+6Jz26FywJx
+	V9O/Xa6Ux43uGtCV6ws5BzIbaDFDl0YFNPSqwURilU8S8cP9B9utJ7t+78qOWKu3fEGCMMIIJzK
+	QdZJnmcPp7lGHRBISuv42rqX1SQg4eZj1Hgf/Masc8uJJ+8Doi
+X-Google-Smtp-Source: AGHT+IFHta1BothcW1/+tFYc400gy/F634D3LW840Kf9vrd1sA0CB3zGQffc3Tc8iWNt7LeYjkExLg==
+X-Received: by 2002:a05:6a00:440f:b0:7f7:3c4f:9407 with SMTP id d2e1a72fcca58-7ff657a4b27mr10430920b3a.26.1766427063194;
+        Mon, 22 Dec 2025 10:11:03 -0800 (PST)
+Received: from deb-101020-bm01.eng.stellus.in ([149.97.161.244])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7ff7a843ee4sm11230244b3a.10.2025.12.22.10.11.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Dec 2025 10:11:02 -0800 (PST)
+Date: Mon, 22 Dec 2025 18:11:01 +0000
+From: Swarna Prabhu <sw.prabhu6@gmail.com>
+To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: Bart Van Assche <bvanassche@acm.org>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"patches@lists.linux.dev" <patches@lists.linux.dev>,
+	"gost.dev@samsung.com" <gost.dev@samsung.com>,
+	"kernel@pankajraghav.com" <kernel@pankajraghav.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>
+Subject: Re: [PATCH v4 1/2] blktests: replace module removal with patient
+ module removal
+Message-ID: <aUmJtfPM7A26swxN@deb-101020-bm01.eng.stellus.in>
+References: <20251126171102.3663957-1-mcgrof@kernel.org>
+ <20251126171102.3663957-2-mcgrof@kernel.org>
+ <a38bbe68-97e8-4476-a406-5c5228167e96@acm.org>
+ <7e056be2-d9c6-41f6-848d-f87e91983968@wdc.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251220095322.1527664-1-ming.lei@redhat.com> <20251220095322.1527664-2-ming.lei@redhat.com>
-In-Reply-To: <20251220095322.1527664-2-ming.lei@redhat.com>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Mon, 22 Dec 2025 12:11:03 -0500
-X-Gm-Features: AQt7F2rdEb1Bo1fkp8d0Z7EFB8KTv6YCIzuB9VKDVyEzrXaw4etsbK_h7EA5mAU
-Message-ID: <CADUfDZprek_M_vkru277HK+h7BuNNv1N+2tFX7zqvGj8chN36g@mail.gmail.com>
-Subject: Re: [PATCH 1/2] ublk: add UBLK_F_NO_AUTO_PART_SCAN feature flag
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Uday Shankar <ushankar@purestorage.com>, Yoav Cohen <yoav@nvidia.com>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7e056be2-d9c6-41f6-848d-f87e91983968@wdc.com>
 
-On Sat, Dec 20, 2025 at 4:53=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
-e:
+On Fri, Dec 19, 2025 at 05:29:06AM +0000, Shinichiro Kawasaki wrote:
+> On 11/27/25 2:45 AM, Bart Van Assche wrote:
+> > On 11/26/25 9:11 AM, Luis Chamberlain wrote:
+> >> Long ago a WAIT option for module removal was added... that was then
+> >> removed as it was deemed not needed as folks couldn't figure out when
+> >> these races happened. The races are actually pretty easy to trigger, it
+> >> was just never properly documented. A simpe blkdev_open() will easily
+> >> bump a module refcnt, and these days many thing scan do that sort of
+> >> thing.
+> > 
+> > It would be appreciated if "thing" could be replaced with a more
+> > specific description of what actually happens.
+> >> The proper solution is to implement then a patient module removal
+> >> on kmod and that has been merged now as modprobe --wait=MSEC option.
+> >> We need a work around to open code a similar solution for users of
+> >> old versions of kmod. An open coded solution for fstests exists
+> >> there for over a year now. This now provides the respective blktests
+> >> implementation.
+> > 
+> > How can it be concluded what the proper solution is without explaining
+> > the root cause first? Please add an explanation of the root cause. I
+> > assume that the root cause is that some references are dropped
+> > asynchronously after module removal has been requested for the first
+> > time?
+> 
+> I agree that the clarification on the above points will improve the commit
+> message. Said that, I do not think lack of the clarifications should delay the
+> application of this series.
+> 
+> Swarna, Luis, if there is any URL to the "flaky bug" that Swaran faced, please
+> share. I can add it as a Link tag to show another reason for this series.
 >
-> Add a new feature flag UBLK_F_NO_AUTO_PART_SCAN to allow users to suppres=
-s
-> automatic partition scanning when starting a ublk device.
 
-Is this approach superseded by your patch series "ublk: scan partition
-in async way", or are you expecting both to coexist?
+I donot have any URL to the bug, but below is the description for it: 
 
->
-> This is useful for network-backed devices where partition scanning
-> can cause issues:
-> - Partition scan triggers synchronous I/O during device startup
-> - If userspace server crashes during scan, recovery is problematic
-> - For remotely-managed devices, partition probing may not be needed
->
-> Users can manually trigger partition scanning later when appropriate
-> using standard tools (e.g., partprobe, blockdev --rereadpt).
->
-> Reported-by: Yoav Cohen <yoav@nvidia.com>
-> Link: https://lore.kernel.org/linux-block/DM4PR12MB63280C5637917C071C2F0D=
-65A9A8A@DM4PR12MB6328.namprd12.prod.outlook.com/
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->
-> - suggest to backport to stable, which is useful for avoiding problematic
->   recovery, also the change is simple enough
+I had seen a sporadic kernel hang  while running block tests (block/003) when testing  
+scsi driver with sector size 16k which is detailed in the  testing description of the 
+cover letter sent for RFC v1 series for scsi fix. 
+(link here- https://lore.kernel.org/all/20251202021522.188419-1-sw.prabhu6@gmail.com/ ).
+The fio task triggerd at test block/003 would race with udevs generated while stressing 
+scsi debug module in test - block/001.
 
-Not sure backporting to stable makes sense. It's a new feature that
-requires the ublk server to opt in, so any existing ublk server being
-used on a stable kernel won't be able to make use of it.
+I havent been able to reproduce the hang in the current setup lately, so i pasted below the 
+snippet of the dmesg i had captured when the hang occured with block/003 test:
 
->
->  drivers/block/ublk_drv.c      | 16 +++++++++++++---
->  include/uapi/linux/ublk_cmd.h |  8 ++++++++
->  2 files changed, 21 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index 78f3e22151b9..ca6ec8ed443f 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -73,7 +73,8 @@
->                 | UBLK_F_AUTO_BUF_REG \
->                 | UBLK_F_QUIESCE \
->                 | UBLK_F_PER_IO_DAEMON \
-> -               | UBLK_F_BUF_REG_OFF_DAEMON)
-> +               | UBLK_F_BUF_REG_OFF_DAEMON \
-> +               | UBLK_F_NO_AUTO_PART_SCAN)
->
->  #define UBLK_F_ALL_RECOVERY_FLAGS (UBLK_F_USER_RECOVERY \
->                 | UBLK_F_USER_RECOVERY_REISSUE \
-> @@ -2930,8 +2931,13 @@ static int ublk_ctrl_start_dev(struct ublk_device =
-*ub,
->
->         ublk_apply_params(ub);
->
-> -       /* don't probe partitions if any daemon task is un-trusted */
-> -       if (ub->unprivileged_daemons)
-> +       /*
-> +        * Don't probe partitions if:
-> +        * - any daemon task is un-trusted, or
-> +        * - user explicitly requested to suppress partition scan
-> +        */
-> +       if (ub->unprivileged_daemons ||
-> +           (ub->dev_info.flags & UBLK_F_NO_AUTO_PART_SCAN))
->                 set_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
->
->         ublk_get_device(ub);
-> @@ -2947,6 +2953,10 @@ static int ublk_ctrl_start_dev(struct ublk_device =
-*ub,
->         if (ret)
->                 goto out_put_cdev;
->
-> +       /* allow user to probe partitions from userspace */
-> +       if (!ub->unprivileged_daemons &&
-> +           (ub->dev_info.flags & UBLK_F_NO_AUTO_PART_SCAN))
-> +               clear_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
->         set_bit(UB_STATE_USED, &ub->state);
->
->  out_put_cdev:
-> diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.=
-h
-> index ec77dabba45b..0827db14a215 100644
-> --- a/include/uapi/linux/ublk_cmd.h
-> +++ b/include/uapi/linux/ublk_cmd.h
-> @@ -311,6 +311,14 @@
->   */
->  #define UBLK_F_BUF_REG_OFF_DAEMON (1ULL << 14)
->
-> +/*
-> + * If this feature is set, the kernel will not automatically scan for pa=
-rtitions
-> + * when the device is started. This is useful for network-backed devices=
- where
-> + * partition scanning can cause deadlocks if the userspace server crashe=
-s during
-> + * the scan. Users can manually trigger partition scanning later when ap=
-propriate.
-> + */
-> +#define UBLK_F_NO_AUTO_PART_SCAN (1ULL << 15)
+55.240584]  __mutex_lock.constprop.0+0x3fc/0xa60
+[10755.241693]  ? _raw_spin_unlock+0x15/0x30
+[10755.242630]  bdev_open+0x2ac/0x3d0
+[10755.243446]  ? __pfx_blkdev_open+0x10/0x10
+[10755.244399]  blkdev_open+0xc6/0x120
+[10755.245217]  do_dentry_open+0x242/0x430
+[10755.246128]  vfs_open+0x2a/0xe0                                                                                                                         
+[10755.246876]  path_openat+0x31e/0x12e0
+[10755.247752]  ? getname_flags.part.0+0x26/0x1c0
+[10755.248777]  do_filp_open+0xbf/0x170
+[10755.249637]  ? _raw_spin_unlock_irqrestore+0x23/0x40
+[10755.250778]  ? __create_object+0x5e/0x90
+[10755.251695]  ? preempt_count_add+0x47/0xa0
+[10755.252645]  ? __virt_addr_valid+0xf5/0x170
+[10755.253636]  ? __check_object_size+0x249/0x2d0
+[10755.254670]  ? alloc_fd+0x11a/0x180
+[10755.255502]  do_sys_openat2+0x70/0xd0
+[10755.256360]  __x64_sys_openat+0x69/0xa0
+[10755.257276]  do_syscall_64+0x50/0xb60
+[10755.258138]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[10755.259294] RIP: 0033:0x7f22ceca49ee
+[10755.260141] RSP: 002b:00007ffc0a8b18e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000101
+[10755.261864] RAX: ffffffffffffffda RBX: 00007f22cc568f00 RCX: 00007f22ceca49ee
+[10755.263489] RDX: 0000000000040002 RSI: 00007f22cb30d2b0 RDI: ffffffffffffff9c
+[10755.265102] RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+[10755.266727] R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000040002
+[10755.268304] R13: 00007f22c3efa000 R14: 0000000000000000 R15: 000055b79b6f020a
+[10755.269724]  </TASK>
+[10755.270209] INFO: task fio:109969 is blocked on a mutex likely owned by task systemd-udevd:404.
+[10755.271920] task:systemd-udevd   state:D stack:0     pid:404   tgid:404   ppid:1      task_flags:0x400100 flags:0x00080003
+[10755.273863] Call Trace:
+[10755.274324]  <TASK>
+[10755.274729]  __schedule+0x54c/0xc10
+[10755.275372]  ? _raw_spin_unlock_irqrestore+0x23/0x40
+[10755.276249]  schedule+0x26/0xd0
+[10755.276782]  schedule_timeout+0x71/0xf0
+[10755.277432]  ? __pfx_process_timeout+0x10/0x10
+[10755.278167]  io_schedule_timeout+0x4d/0x70
+[10755.278845]  __wait_for_common+0x99/0x1b0
+[10755.279517]  ? __pfx_io_schedule_timeout+0x10/0x10
+[10755.280281]  blk_execute_rq+0xeb/0x160
+[10755.280857]  scsi_execute_cmd+0x11e/0x430 [scsi_mod]
+[10755.281653]  ? disk_scan_partitions+0x5d/0xf0
+[10755.282319]  ? __x64_sys_ioctl+0x92/0xe0
+[10755.282914]  sd_spinup_disk+0x102/0x4b0 [sd_mod]
+[10755.283624]  ? _raw_spin_unlock_irqrestore+0x23/0x40
+[10755.284341]  sd_revalidate_disk+0xda/0x2710 [sd_mod]	
 
-This is the same bit you've used for UBLK_F_BATCH_IO in your other
-patch series. Are you planning to change that one?
 
-Best,
-Caleb
+Hope this helps.
 
-> +
->  /* device state */
->  #define UBLK_S_DEV_DEAD        0
->  #define UBLK_S_DEV_LIVE        1
-> --
-> 2.47.0
->
+Thanks
+Swarna
+
+
