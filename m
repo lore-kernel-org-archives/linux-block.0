@@ -1,191 +1,193 @@
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C7BB186E2E
-	for <linux-block@vger.kernel.org>; Mon, 22 Dec 2025 15:03:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AC952F3C34
+	for <linux-block@vger.kernel.org>; Mon, 22 Dec 2025 15:10:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766415808; cv=none; b=J9vZQ039PsBYIMkPB0L7jGLM8eHwPVa6luizErcIpjY+SdO/oTohi1tdLiJn4AFndWFCFps/Xfn/EitBnwcB5iaOCm2R4Svb+uveBHt17gcWVmrGb4S52MRskA68pMZBDs7cOnlM/ry+KQNDAl7GT1GFcq9g7MQqBTBAjCSnD2E=
+	t=1766416206; cv=none; b=am9DPOix2rGtejI3pkJ8GBfNSzatLCZ7v4jIRWp64Jc+UpFOpJUeZUQJxGOeMOrizlfa7O7b6B0/hOneKd1K7nU3EIKrLFsDdibIUGh7xiNkqedFYGXboOUNo/WB4jXbJJ/M6Yt18pvw/srozongV5YrAtlbpZJ/tanvZHNSi60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766415808; c=relaxed/simple;
-	bh=t4rsFnGUzeD1KMwXT4iUUV1jriowknwgJrrHKVJFd1U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uf0Kf65PHVe6cv6Rz16igM0CM2Do0F14eSYfKyNN8OSR8IalK24zBJSbXcuo+RcNc6R7hHpG1HZFl+8SEnLiZ8p48fynAJ1Asu15zYc+ZToSTNG8dTHku0K3I1j0nQ6zgfuwyXEjYBpkBimdbE3oa3lNx5aHSCYNj6jHE7IhXFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WOoHCwzG; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1766416206; c=relaxed/simple;
+	bh=tAKy4bMV3DM0vKtgXMN0pMiR+oQPhcjNnK2H4+iMMMM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SKesMLHa5Z0r36ME5G0WAD10vfSSQ/AGQ8yvKcIL162K3USk2Qj4uAfH6ud1mg4YL5rUuYAzC/e5ZhEbyVietPM77V7/l21DPb3xvjWdXdoP/roN575wLi1zs4To8LCWJcfMqS8xuhoJ0pBUC9Crtffcx2608KdJI+OVuVDP79Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=O8INUE8N; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WOoHCwzG"
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4779aa4f928so39148795e9.1
-        for <linux-block@vger.kernel.org>; Mon, 22 Dec 2025 07:03:26 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="O8INUE8N"
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7e7a1b08e9dso161688b3a.2
+        for <linux-block@vger.kernel.org>; Mon, 22 Dec 2025 07:10:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766415805; x=1767020605; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=/BovpYoyCqPQI6cHyERY9sM0XnG6cSj0PGe1+XI7CW4=;
-        b=WOoHCwzGZ6bdrRKq4+mJbZErvy050GBq3ODQnyT2b98CYCFzmxsGtrerYm83L3vQ1h
-         nb+ImkQODzhldr1p5CdHJYvqO8TzsbOHtQPfReqTsYSNqUmzO+jdBEt0f9ZURDM0Qe2S
-         EaXHqCyM/q9wI+4z6NKWAe/f+AZ4SdZUdaKf18HFxX0zwKB+mqc3E8tLp8kVML9LVgXH
-         qCX7wOop5DS+/BoiX3g4PtamFhrmHC3FYth8ncqjcq23baT9Qud42aZ0A251mbqBg4R6
-         RKVPLfWLqCJDsd6Tign3NwSWwLVRDtPZltGSK0kNR7pWa/aOHVAURoKyJhCa6f2A9qNX
-         fy5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766415805; x=1767020605;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=purestorage.com; s=google2022; t=1766416203; x=1767021003; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/BovpYoyCqPQI6cHyERY9sM0XnG6cSj0PGe1+XI7CW4=;
-        b=u2w+JmwI4/YEq+nhuweUMKVq0iXxoYylGHXUO0UQl/0JVkYrdUXotNfx5zlNvr6ToI
-         0lz/DaOIknHxJmj5MScTaXkc4qE/hgsXbucSiZZMrPoKQoLGQL1dboHVjZOtM/yWh9Fe
-         1OaMdmmo4Y/8/A5Y7nxJebPlvGdlGtBmqIVPmYmtz4lmsD/RFRTRLZa4tg4+Bs4EWH5P
-         lcfj5YaO2pkcaKNz/evFwnnKCvpucB9LA6H1ZWMhuFfxns6iXtLAQvfPAM6W7D1AmYQ7
-         XQjGILuH6JD4X/SKGHOrg4pM6NqgtxNoWJq3VCtooFu98XbX9549FBchbVeW+mg0Rzoz
-         5wTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVdc57s0pXo7o/n0uvAGw++i7RcU4Igl4GDXpYVjovo1yEkxeXpFlQGiV9d8Z9EpsfCys4a1gRCDqHrXQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5lKFbN1SK6prwVNWLqzPHu8dMHTdMU50UNYxIsjNLUfwc+NN2
-	f644Kj9S/pkmq7KglcSHrdgcARC9Tm+mYh6QvmwPX6IRxiMb2reMKm4U
-X-Gm-Gg: AY/fxX6vTttUVUgNJ0DmC8AN1/TBOGuo7HJTg/HQ20TT6Y1kCi5K1+t2Qww3AhVNJV3
-	MdvcBH1yCLiFWriCz5g/OTwqquzhglSfpoRGMJkC35KZs8nhSw5AGtoAjHkkcdsS4cg9qs7BvAT
-	U0y45zdMWAi7JJlZqW5x4eVjfIF2EBzu4GlfSAv+m2LuonhKHgsbCVMCyqYiiUnpgwncaQnKKNY
-	tFiyDdusN27i2t4OKuHndUiVMtqXuoaBFHrVQb4RoqVJZPzY1GMQlX7D8FYCfAG1Eb/ZY3Yqmqs
-	fBgAypw4MSZhw5MfT6wiEYnE4p4LkiIe9Zm6MMNqlkAaiIaS1b/+fMnmoUNPEjrUwlgCkNmGiuI
-	W/fb5QAYp8pwOwRIjeSr7JmDNewJoNBXDuIlvohdzt458uecw7BdGwLGGIsi3E23I4MxHSY+utw
-	/grlGcfs3pm7NhWRw=
-X-Google-Smtp-Source: AGHT+IFJuusyQ+1Mz3/8tYi1eqLylmqECFtDDXhQgv1q9fY01NTCrKY3AspjaGJTpIOiZ62UGg1d9Q==
-X-Received: by 2002:a05:600c:4fce:b0:47a:935f:61a0 with SMTP id 5b1f17b1804b1-47d194c659emr102417425e9.0.1766415804486;
-        Mon, 22 Dec 2025 07:03:24 -0800 (PST)
-Received: from [192.168.1.27] ([176.74.141.242])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4325dbc522esm11740249f8f.11.2025.12.22.07.03.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Dec 2025 07:03:24 -0800 (PST)
-Message-ID: <86300955-72e4-42d5-892d-f49bdf14441e@gmail.com>
-Date: Mon, 22 Dec 2025 16:03:22 +0100
+        bh=WMdFQ93xacGpn515wZlx0nZOWnyfYznFKimZtqIXQqA=;
+        b=O8INUE8N1tnNWC/+QFTNKW0QsT06uRFjXZKHOeXX1QLwpxtJnEwwNWVo1v5IY7jozM
+         dpmefzbTE9uHiqdzqQ/eehTf9CwNx216h99NW2djLNpNdGqPA4AT7eLSTH2LQVehsNUv
+         8BrtScjO2R+oZPhuzdrPr1pdbpVxOtRo/z5rO1bb4JaK9XH+EqI5bL2Nu8m57XHhDgCK
+         WLy0I5iwxNrVAbHI6OAvamxExinShjDNgLamjZUj++2orR6O5U0PgKln03lmzzaUKzUB
+         VJRNqezpOK0cL1/bPG1FYlWBfMNh++yjRTCnZAjaQ8hs50OxVGrsvjjTrH2sKo4Z0I29
+         kx9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766416203; x=1767021003;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=WMdFQ93xacGpn515wZlx0nZOWnyfYznFKimZtqIXQqA=;
+        b=I+bwZXUKRgOpHbwQIsnlPHyDQquv1DTOVfHx4bymGWxRGB3oCM6sHG1WP7K2HF1LEV
+         ITH8BtDZqlED2vrJ+5E5znE75h/UHC3UYuOGc4uOVDStu+1XuCTaUx9jonfncY65Pvj+
+         zl9tcY7lN21GUZWd9PfYRCn78RANy2JC5sdYLDmhh7ZEbCAxrrWET8E5W+V4rUiYGYU1
+         x4YxhZZf/4/V5sPtjYEYKF8z3dZx4P97sIwBPvPBMCPqkzen+cO85f5TywxAeOJPRn/M
+         IQPbdbR7s+tck9Ih1vEjGfxs58h+znlI/Yp9Bo1J8cN2I8sBFG1DIX9HuAdExfO8dQuG
+         FPDw==
+X-Forwarded-Encrypted: i=1; AJvYcCU1lC0NQz6LYuE0ViPw0vnh2gkgzaxbPNClIRVZpYfPDaE+GWSvxlJ/67Cb7Hz2w2Ln5dtY/OhViJ2FIw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/6TdlE+w3M0/BK3TIWsCCkXLYPEnRhf+eATWQr+6gwARZy6nC
+	EeYYbzKU/NmhRrv6hvqGb3vOceC7BB3KdzWw36peIg1Ge2bhADGsWwGuTIX95e5y4BFNyjzss1X
+	tPmWlM8dkFy4cjdaPPqtPEPhWZ6jQLNmQlBqlOAW4Og==
+X-Gm-Gg: AY/fxX7lR7pgt3Z3KDL4+nO9lOBAKO7uqjrnMwbANPr7gA/j1mRVYnyDUHbQKnTSOdZ
+	80BUfFeyIHYHCNgqaa53ZVMiMlQDmQxRFajw2VEo2SQnjiP3DFd7o/R2njTcGZVj2cAbYpkQT8l
+	aVeitDOheHuyOkdp9B2fXIgYiJ+xh8jataKXmZvKDQaUK3Ef34tVrKaWCJeZlUjc5oW40VhYXFI
+	DJGVeD0slJq1+LItJXt5TUYblrRZWHUtJjZD8mcp2H7rz4lRf+G/mpxHqbGREmy7uraqgk=
+X-Google-Smtp-Source: AGHT+IGLJDtjymDAr9V5Vg5EfhSwI1vfO4LprXhvsDLowCFqm0dSh+n8i/q9s2iDn4CdDy6KrAe64MOogTgDbE3+B2k=
+X-Received: by 2002:a05:7022:4287:b0:11e:3e9:3ea5 with SMTP id
+ a92af1059eb24-1217230117bmr6596225c88.7.1766416202455; Mon, 22 Dec 2025
+ 07:10:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 2/2] swsusp: make it possible to hibernate to device
- mapper devices
-To: Askar Safin <safinaskar@gmail.com>, mpatocka@redhat.com
-Cc: Dell.Client.Kernel@dell.com, dm-devel@lists.linux.dev,
- linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-lvm@lists.linux.dev, linux-mm@kvack.org,
- linux-pm@vger.kernel.org, linux-raid@vger.kernel.org,
- lvm-devel@lists.linux.dev, pavel@ucw.cz, rafael@kernel.org
-References: <b32d0701-4399-9c5d-ecc8-071162df97a7@redhat.com>
- <20251217231837.157443-1-safinaskar@gmail.com>
-Content-Language: en-US
-From: Milan Broz <gmazyland@gmail.com>
-Autocrypt: addr=gmazyland@gmail.com; keydata=
- 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
-In-Reply-To: <20251217231837.157443-1-safinaskar@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20251217053455.281509-1-csander@purestorage.com>
+ <20251217053455.281509-5-csander@purestorage.com> <aUlVDtLgPh6NCWsC@fedora>
+In-Reply-To: <aUlVDtLgPh6NCWsC@fedora>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Mon, 22 Dec 2025 10:09:50 -0500
+X-Gm-Features: AQt7F2r98lslmm2BhKy0RLdile86RIpHXz0S5jBJQgkpLCUcmVLkZRGm8cFGzHY
+Message-ID: <CADUfDZp5Or_Q+7HKtdi97n5kBpQ=zpOFAtqfatR3nu+=yGLb_Q@mail.gmail.com>
+Subject: Re: [PATCH 04/20] ublk: add integrity UAPI
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Shuah Khan <shuah@kernel.org>, linux-block@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Stanley Zhang <stazhang@purestorage.com>, Uday Shankar <ushankar@purestorage.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 12/18/25 12:18 AM, Askar Safin wrote:
-> Mikulas Patocka <mpatocka@redhat.com>:
->> Askar Safin requires swap and hibernation on the dm-integrity device mapper
->> target because he needs to protect his data.
-> 
-> Hi, Mikulas, Milan and others.
-> 
-> I'm running swap on dm-integrity for 40 days.
-> 
-> It runs mostly without problems.
-> 
-> But yesterday my screen freezed for 4 minutes. And then continued to work
-> normally.
-> 
-> So, may I ask again a question: is swap on dm-integrity supposed to work
-> at all? (I. e. swap partition on top of dm-integrity partition on top of
-> actual disk partition.) (I'm talking about swap here, not about hibernation.)
+On Mon, Dec 22, 2025 at 9:26=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
+e:
+>
+> On Tue, Dec 16, 2025 at 10:34:38PM -0700, Caleb Sander Mateos wrote:
+> > From: Stanley Zhang <stazhang@purestorage.com>
+> >
+> > Add UAPI definitions for metadata/integrity support in ublk.
+> > UBLK_PARAM_TYPE_INTEGRITY and struct ublk_param_integrity allow a ublk
+> > server to specify the integrity params of a ublk device.
+> > The ublk driver will set UBLK_IO_F_INTEGRITY in the op_flags field of
+> > struct ublksrv_io_desc for requests with integrity data.
+> > The ublk server uses user copy with UBLKSRV_IO_INTEGRITY_FLAG set in th=
+e
+> > offset parameter to access a request's integrity buffer.
+> >
+> > Signed-off-by: Stanley Zhang <stazhang@purestorage.com>
+> > [csander: drop feature flag and redundant pi_tuple_size field,
+> >  add io_desc flag, use block metadata UAPI constants]
+> > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+> > ---
+> >  include/uapi/linux/ublk_cmd.h | 20 +++++++++++++++++++-
+> >  1 file changed, 19 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cm=
+d.h
+> > index ec77dabba45b..5bfb9a0521c3 100644
+> > --- a/include/uapi/linux/ublk_cmd.h
+> > +++ b/include/uapi/linux/ublk_cmd.h
+> > @@ -129,11 +129,15 @@
+> >  #define UBLK_QID_BITS                12
+> >  #define UBLK_QID_BITS_MASK   ((1ULL << UBLK_QID_BITS) - 1)
+> >
+> >  #define UBLK_MAX_NR_QUEUES   (1U << UBLK_QID_BITS)
+> >
+> > -#define UBLKSRV_IO_BUF_TOTAL_BITS    (UBLK_QID_OFF + UBLK_QID_BITS)
+> > +/* Copy to/from request integrity buffer instead of data buffer */
+> > +#define UBLK_INTEGRITY_FLAG_OFF              (UBLK_QID_OFF + UBLK_QID_=
+BITS)
+> > +#define UBLKSRV_IO_INTEGRITY_FLAG    (1ULL << UBLK_INTEGRITY_FLAG_OFF)
+> > +
+>
+> I feel it is more readable to move the definition into the patch which us=
+es
+> them.
 
-Hi,
+Sure, I can do that.
 
-I am not sure if Mikulas is available; maybe it's better to try again
-in January...
+>
+> > +#define UBLKSRV_IO_BUF_TOTAL_BITS    (UBLK_INTEGRITY_FLAG_OFF + 1)
+>
+> It is UAPI, UBLKSRV_IO_BUF_TOTAL_BITS shouldn't be changed, or can you
+> explain this way is safe?
 
-Anyway, my understanding is that all device-mapper targets use mempools,
-which should ensure that they can process even under memory pressure.
+It's not clear to me how userspace is expected to use
+UBLKSRV_IO_BUF_TOTAL_BITS. (Our ublk server, for one, doesn't use it.)
+Can you provide an example? It looks to me like the purpose is to
+communicate the number of bits needed to represent a user copy offset
+value, in which case it makes sense to include the integrity flag now
+that that bit is being used.
 
-AFAIK, swap over a device-mapper target (any target!) with a real block device
-should be ok. The problematic part is stacking over a filesystem (through a loop)
-as Mikulas mentioned.
+>
+> >  #define UBLKSRV_IO_BUF_TOTAL_SIZE    (1ULL << UBLKSRV_IO_BUF_TOTAL_BIT=
+S)
+> >
+> >  /*
+> >   * ublk server can register data buffers for incoming I/O requests wit=
+h a sparse
+> >   * io_uring buffer table. The request buffer can then be used as the d=
+ata buffer
+> > @@ -406,10 +410,12 @@ struct ublksrv_ctrl_dev_info {
+> >   *
+> >   * ublk server has to check this flag if UBLK_AUTO_BUF_REG_FALLBACK is
+> >   * passed in.
+> >   */
+> >  #define              UBLK_IO_F_NEED_REG_BUF          (1U << 17)
+> > +/* Request has an integrity data buffer */
+> > +#define              UBLK_IO_F_INTEGRITY             (1U << 18)
+> >
+> >  /*
+> >   * io cmd is described by this structure, and stored in share memory, =
+indexed
+> >   * by request tag.
+> >   *
+> > @@ -598,10 +604,20 @@ struct ublk_param_segment {
+> >       __u32   max_segment_size;
+> >       __u16   max_segments;
+> >       __u8    pad[2];
+> >  };
+> >
+> > +struct ublk_param_integrity {
+> > +     __u32   flags; /* LBMD_PI_CAP_* from linux/fs.h */
+> > +     __u8    interval_exp;
+> > +     __u8    metadata_size;
+> > +     __u8    pi_offset;
+> > +     __u8    csum_type; /* LBMD_PI_CSUM_* from linux/fs.h */
+> > +     __u8    tag_size;
+> > +     __u8    pad[7];
+> > +};
+> > +
+>
+> Just be curious, `pi_tuple_size` isn't defined, instead it is hard-coded =
+in
+> ublk_integrity_pi_tuple_size().
+>
+> However, both scsi and nvme sets `pi_tuple_size`, so it means that ublk P=
+I
+> supports one `subset` or scsi/nvme `pi_tuple_size` can be removed too?
 
-If I interpret Mikulas' answer correctly, it is the filesystem that could
-allocate memory here, and it deadlocks because of it (as it is swap itself).
-So I believe it can happen with other DM targets too.
-(If I am mistaken, please correct me.)
+blk_validate_integrity_limits() validates that pi_tuple_size matches
+the expected PI size for each csum_type value. So it looks like these
+fields are redundant. Yes, pi_tuple_size could probably be removed
+from the scsi/nvme block drivers too. But maybe there's value in
+having the drivers explicitly specify both values?
 
-I wish it could work, but I do not understand kernel details anymore here.
-It seems we are still in "a little walled gardens" communication issues
-among various kernel subsystems, as one of the former maintainers said :-)
-
-But you asked about a real block device, so it should work.
-I guess it is just another bug you see...
-
-Milan
-> 
-> Mikulas Patocka said here https://lore.kernel.org/all/3f3d871a-6a86-354f-f83d-a871793a4a47@redhat.com/ :
-> 
->> Encrypted swap file is not supposed to work. It uses the loop device that
->> routes the requests to a filesystem and the filesystem needs to allocate
->> memory to process requests.
-> 
->> So, this is what happened to you - the machine runs out of memory, it
->> needs to swap out some pages, dm-crypt encrypts the pages and generates
->> write bios, the write bios are directed to the loop device, the loop
->> device directs them to the filesystem, the filesystem attempts to allocate
->> more memory => deadlock.
-> 
-> Does the same apply to dm-integrity?
-> 
-> I. e. is it possible that write to dm-integrity will lead to allocation?
-> 
-
+Thanks,
+Caleb
