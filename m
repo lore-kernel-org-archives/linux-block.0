@@ -1,63 +1,67 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from wxsgout04.xfusion.com (wxsgout04.xfusion.com [36.139.87.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B69C82505A5
-	for <linux-block@vger.kernel.org>; Sun, 21 Dec 2025 23:17:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9B7233993;
+	Mon, 22 Dec 2025 02:35:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=36.139.87.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766359041; cv=none; b=nqqejwds810rutNmOSzke/KsE4VUTwHU0B3DgQtqBtpvkz3GB5XkNaILiV3CQpID2XUftKIQivrUv0K9rfIkrKOLiglFjAi6A0+1YMZXbTzZzCRMS061CyTVzCPPPTKoZzH+RpMf8kF3sIcKDI1CfDN6YRSI5+g9WGPQtQcVIv0=
+	t=1766370950; cv=none; b=LFSfYcFD57uWBQ3wE8GnMGevO6OjvHp3iLQ3AjUUQz+TtWrjah4J8AEsH0+pr95DC1usWBId781D0yMxBinV81KEyZABM2nn+X7ZmJEvFEG7ccThwMy0evdE7YjfVLStitgciojXZUeKOvN/9EK2N7pc7mAHcbDomwj4flDg2hE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766359041; c=relaxed/simple;
-	bh=iyLpVsiA8ORSOe0sQppKrZn+L7O20ZMfPMTxTtlpZKI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XCccZZK6X2rhHJW1DboEpyR2GDFd7QiNGhEj1TK6Y8jfoz5IDBTd1nqafO54prsmQndFx0oVOICrMYoCJCF9vOjRKmFFHcJpzZon7Op6kfRAaTjYrRgcySFPp9T3GTCHtRnCaOj9VOgIbKMbxA+NGm3zJAUpy1PS/JJ5xnrDwHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F1gvv86k; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F1gvv86k"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8794DC4CEFB;
-	Sun, 21 Dec 2025 23:17:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766359041;
-	bh=iyLpVsiA8ORSOe0sQppKrZn+L7O20ZMfPMTxTtlpZKI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=F1gvv86ktTBvn942fUjwHDB3KbNVedHydJlz6r+8aCGit7JP20j2FnCmEw6DpohFH
-	 iMqrURAKlPP/A+QeD+k4P/UsSVr4onBr9SvYNC9nkkB6x3nssfDQiOo3w1uPhC5dag
-	 2jNnZyMRnXQ6Dq4c7Xl4FAmLSgQwJ9v/Np/OHPWrB26c/xauGiW4uZu+5bXxFd4DYv
-	 JxPsgWq7yXh/jlr88o2FW3Vgsl4fdHHYKYf+oAy1h17XpTYMftUTjz/yIqCHEnCNzF
-	 SI/v6pb929TSk9CeTSZFRVb/nvXJ5b2ZUsUZnc2YwIzilAMp9adVdJ9AxslibaTXOX
-	 RR+fwMQEKEARA==
-Date: Mon, 22 Dec 2025 07:17:15 +0800
-From: Keith Busch <kbusch@kernel.org>
-To: Vitaliy Filippov <vitalifster@gmail.com>
-Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: Re: [PATCH v2] Do not require atomic writes to be power of 2 sized
- and aligned on length boundary
-Message-ID: <aUh_--eKRKYOHzLz@kbusch-mbp>
-References: <20251221132402.27293-1-vitalifster@gmail.com>
+	s=arc-20240116; t=1766370950; c=relaxed/simple;
+	bh=rpRMluFEzh3WKDzl8E+KYRGlISf8k3WDwqtCx4jyGnw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Jikguzp5NVsvWNG8/GsXMYd9rIIl31fR6naNjcLaYBui2dkV0z0ChidlK8T+MY3hoAKuMwIveLTtaWFPw65qURdWvFk1LSrRNal0ndcT2NkPWjFNZjBYQIrrSdj9kTS6h4zW6YesaAGMixucoUv3cA7niDbq9jueeyVsQn6G+Jo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xfusion.com; spf=pass smtp.mailfrom=xfusion.com; arc=none smtp.client-ip=36.139.87.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xfusion.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xfusion.com
+Received: from wuxpheds03048.xfusion.com (unknown [10.32.143.30])
+	by wxsgout04.xfusion.com (SkyGuard) with ESMTPS id 4dZMFZ6SXVzB7ncN;
+	Mon, 22 Dec 2025 10:16:18 +0800 (CST)
+Received: from DESKTOP-Q8I2N5U.xfusion.com (10.82.130.100) by
+ wuxpheds03048.xfusion.com (10.32.143.30) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_RSA_WITH_AES_128_CBC_SHA256) id 15.2.2562.20;
+ Mon, 22 Dec 2025 10:19:45 +0800
+From: shechenglong <shechenglong@xfusion.com>
+To: <tj@kernel.org>, <josef@toxicpanda.com>, <axboe@kernel.dk>,
+	<yukuai@fnnas.com>
+CC: <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <stone.xulei@xfusion.com>,
+	<chenjialong@xfusion.com>, shechenglong <shechenglong@xfusion.com>
+Subject: [PATCH] block: fix aux stat accumulation destination
+Date: Mon, 22 Dec 2025 10:19:36 +0800
+Message-ID: <20251222021937.1280-1-shechenglong@xfusion.com>
+X-Mailer: git-send-email 2.37.1.windows.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251221132402.27293-1-vitalifster@gmail.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: wuxpheds03047.xfusion.com (10.32.141.63) To
+ wuxpheds03048.xfusion.com (10.32.143.30)
 
-On Sun, Dec 21, 2025 at 04:24:02PM +0300, Vitaliy Filippov wrote:
-> It contradicts NVMe specification where alignment is only required when atomic
-> write boundary (NABSPF/NABO) is set and highly limits usage of NVMe atomic writes
+Route bfqg_stats_add_aux() time accumulation into the destination
+stats object instead of the source, aligning with other stat fields.
 
-Commit header is missing the "fs:" prefix, and the commit log should
-wrap at 72 characters.
+Signed-off-by: shechenglong <shechenglong@xfusion.com>
+---
+ block/bfq-cgroup.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On the techincal side, this is a generic function used by multiple
-protocols, so you can't just appeal to NVMe to justify removing the
-checks.
+diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+index 9fb9f3533150..6a75fe1c7a5c 100644
+--- a/block/bfq-cgroup.c
++++ b/block/bfq-cgroup.c
+@@ -380,7 +380,7 @@ static void bfqg_stats_add_aux(struct bfqg_stats *to, struct bfqg_stats *from)
+ 	blkg_rwstat_add_aux(&to->merged, &from->merged);
+ 	blkg_rwstat_add_aux(&to->service_time, &from->service_time);
+ 	blkg_rwstat_add_aux(&to->wait_time, &from->wait_time);
+-	bfq_stat_add_aux(&from->time, &from->time);
++	bfq_stat_add_aux(&to->time, &from->time);
+ 	bfq_stat_add_aux(&to->avg_queue_size_sum, &from->avg_queue_size_sum);
+ 	bfq_stat_add_aux(&to->avg_queue_size_samples,
+ 			  &from->avg_queue_size_samples);
+-- 
+2.43.0
 
-NVMe still has atomic boundaries where straddling it fails to be an
-atomic operation. Instead of removing the checks, you'd have to replace
-it with a more costly operation if you really want to support more
-arbitrary write lengths and offsets. And if you do manage to remove the
-power of two requirement, then the queue limit for nvme's
-atomic_write_hw_unit_max isn't correct anymore.
