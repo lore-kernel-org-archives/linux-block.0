@@ -1,112 +1,197 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA49E2E8B67
-	for <linux-block@vger.kernel.org>; Mon, 22 Dec 2025 15:37:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D52878F4F
+	for <linux-block@vger.kernel.org>; Mon, 22 Dec 2025 16:43:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766417851; cv=none; b=lmnlcuMZGhaxyDlEJzSB1YNbHWdF8Fx6klCBvUy57YUZtONDh9Nwh9eHyRIs+Xfm50gOcGisukmgr3nvbG2L5AI70gtaVACeyLU5Pwz0oqyNpEz8dL+hu+/Fz1acAmtou7RbTaTaYhpjQ3u9Kxa3V/9eBc5ZpkaBxj5HyecdeF0=
+	t=1766421834; cv=none; b=h4sWLvE9pyCpubYba5LPacCR+g00ObL2ok94SGrxR3DbQ+YozYR+RmPjX1Nfbe39e87RvBgxblFsrczx9MrEClj0vGGoFCtUBWP7eeI7pGeIEvzVcIirl8WMWswMVEbYr8iTmczrqEo/AH3MXbjxlFhd/KzOBnlIi0mtJOr7dd4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766417851; c=relaxed/simple;
-	bh=RcUzhWg/Um7DuspxpIDIAp0IJtjt6YbaI9Q9VwJGvwE=;
+	s=arc-20240116; t=1766421834; c=relaxed/simple;
+	bh=H7vVPf3cDoviXLYiV+2Wp9ZatIylrp+30s9joeDBIzY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XRFUI+r6nLYTzonm7bhsmnTM/dM1IJApFxQL6QCS7qGMykJsJCwugfIffSqnfSEQBfPeN7IspV+ejWPVyB5GmIT3BqK8oPjLu2oPoKy1dLpYCv4qAwFtjoAlZguAIAv6eVlyRF5YWNyeegajr1v0O2rHvI1l/0OLo36SBuvM/Is=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=fAOhR5jH; arc=none smtp.client-ip=209.85.214.174
+	 To:Cc:Content-Type; b=VvYk8pedqTFHT9KUCgL4x1LRd9dkz9B/4ZmppvbD6+McBGbWCSw5Vyk4oMJEEBwIAIwJlIx+4GW070L8hQmF7xyTULeNe1DDNOVMS/OTobSCSCIBzQIabWK8Cg9Go/XELaVIG0cxlhmsTU4YfA0pnECWWoiZam4OztX1jxZSyh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=eKVteMBX; arc=none smtp.client-ip=209.85.210.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="fAOhR5jH"
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2a110548f10so13300705ad.1
-        for <linux-block@vger.kernel.org>; Mon, 22 Dec 2025 07:37:29 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="eKVteMBX"
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-7b8c7a4f214so191562b3a.2
+        for <linux-block@vger.kernel.org>; Mon, 22 Dec 2025 08:43:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1766417849; x=1767022649; darn=vger.kernel.org;
+        d=purestorage.com; s=google2022; t=1766421832; x=1767026632; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GT3Diy9pIeV/PN2q7dXNIN/gteU85UXLAruGSjxuY7k=;
-        b=fAOhR5jHEOjYoEhcIrvhhf6mnJZp7JZACt0C1LbMwjLiP0zQ1HCWtgsZYwP8JudWQO
-         xEoFM0tAG/1r0GUWLXVkI/eEAVTCTFXr6eUXBHMXdo9wGQ0OA4Di2/j9G3eIy1nq4GJa
-         NXnjy3vBzL6vBCkxuJqcpsOg7BRo3OGr0kNAdekyZhAMqsRaEFwurxlGWAWXSWpuUp1r
-         M0+rvA+taHJm/nzNgbr+NHdj0KkmaTDFK+wwnT6/vkeRlfpDBZQTDaQMnaRyShMLr8sc
-         er3h1BQPMNzKr/W6q5cdXZTETElIXHO1FFFAo442KVCIT0Vfapmsqeuhq4pwQDFs/hjh
-         +ZyQ==
+        bh=NMPCppz5Jgup4OAetB3jIDQJjA+L2I15Yy6MqELndug=;
+        b=eKVteMBXZW+IDCS/m7I+KMB/Ig8aF1LyOs8LBzsShCSI+PegCgHuXTpeCaiSV4qAiG
+         ORp95NlLWl8cOzXB1B1V/wW5UFiGepHOdx0cSilOncxWO4MvZQ/pga8HUeZ+ntNVzkvT
+         jWYwWTX2R2ExSivFk8GAowuLew0EuO8yatCXQJY096zKiZchJbq2jhn5JoviTFi94Y8L
+         W7ljHhVK1ObrFiNxmSTYW8fSpHm3jRImFBU7xlAP3d3x3Q6fPjpI6ChFx1yMpa68Nt7O
+         mv97bt7UXFX1W98jPBq7zBwFrdz3Wz6E+yxaSzylmeKSo4t7Ek9uj8/U6PAO8kKOD0wa
+         IPpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766417849; x=1767022649;
+        d=1e100.net; s=20230601; t=1766421832; x=1767026632;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=GT3Diy9pIeV/PN2q7dXNIN/gteU85UXLAruGSjxuY7k=;
-        b=IadZ6EnssS8KjaI1Z34v5wg2Fa7XAiXQnibIjrH6AiZ5p4yXFeEqFN38I8KoPwqrDN
-         IOdK7m2mNLldtNHLaic0ntp49DHdEFR7aGXapznQZUoMo2jDrtCLNQsc7ysHtn5MqS20
-         FNLN5z0ZNvc1M27VQL9H98PZ13QvQcp6W/TkZPkakDjecWq9QcqEeDraQFbzyPVGrosH
-         apmivbQlS4TU8GMlIX2vnhR2DQ8FOaU5VP5NADod9jYbeMBXdg08fFgShLRT0RIS2ZTD
-         1O7SUPeltmV7ukzMAkOLwEu2UHBCIBfne/tlugw+5jpR9RaVkIxjBj5vp70N1MGPpzsx
-         lC5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVZmCaNOp+8hTEMs+BAbScGf1Kw3YWU4Qovodo3dDDZTguEF0DqKZ5yUzJTf5ajBS/4+IT3uqwuAX2mew==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzc6R7dut5VuRPW5DGLTrktqwWq6V7RZ2ZcMPOFz/HA4wKAQ1WN
-	m1PhixN+lxrZJT4k+AW/F4ZVitu1bsxAgx4m17oQBReuGGyy3+FNGUZa0/Ylxc3iXa3Ikmzl2OO
-	x71euwzun6iPDrE3DtPKCXl8Kppof3mi41CwAqjIqlQ==
-X-Gm-Gg: AY/fxX6VrMgV0OtieML4741h/4Z5bSrXZS6fx4lAeP1d1OQuWYgLEGzz+25gwc/pN4B
-	q0dguyDvfNhjAJ2eoJPviGQWu7aKb/ZOCwoUY9xmkKva668zP27hRMtuf0pCfvoCVJCUWSFXANf
-	IgTOWIf1f5Bb7BHicg3Ptc/IKrDyZSclSoG8bYzg0RExhSzasqmrbmkcxiu0Y917ZcrDJk6dA6G
-	LTcksXbBeFkVDT7is+cggUgYh4wCK7wysXi4mu+ZtvrHi2NzF0rrRLZpeR9OWkDi8u61e4=
-X-Google-Smtp-Source: AGHT+IG48uyE1b0nQuixVJe4XhHbbPE00lDgvxvW34A3y719k7ccU/Y7YctxFgCLxQBrdafH3y5D7Zxd3tmvFXs4w2o=
-X-Received: by 2002:a05:7022:6199:b0:119:e56b:c3f1 with SMTP id
- a92af1059eb24-121721ad61fmr7865966c88.1.1766417848941; Mon, 22 Dec 2025
- 07:37:28 -0800 (PST)
+        bh=NMPCppz5Jgup4OAetB3jIDQJjA+L2I15Yy6MqELndug=;
+        b=E2BTbkJe+mHTx0t/nA4lGdnGaBbvqhk8W12ZYCYR6Q49dHVg8ZYMz7pIgHIp6bAr4w
+         glAUjNkD3d1SnerMrSiZpItnigMIShv4LtAA9Dbcm/wCBLVfMyVMlCHK60eoKN/7YQ5I
+         +1e1rQA2TFJrfrT1xiGDlWmBlsKNIhOiUQEx1yxc9lMQN8AZxOKWqII33X84oxBIePSk
+         oajFf8+sB677WDGwnuKlziHWr+yQa79CAOhsfgoxVje15/A0rpWg+kU7a7+QzNWGOlsw
+         pp1eGfQt2uDnSds8C+L1EPD2GD9op06kcIhNfYGtkAYHnki1leOVh5HXsGrtMmxAEZcj
+         Edig==
+X-Forwarded-Encrypted: i=1; AJvYcCVY+YdgpROYyNVTLzAiS0hsvJEPQn6hXokIzo2cQmkMwkCGDXdji/5MDJ+YPHymA50I5iwlXw4LLm7RQA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzz3QjglWUpyhcSWuaSUv8YxFkLRt8+uiNUhnZ7gVP6HwxsAp1z
+	VHeppOoWv6hwcHpE/j1FGXqyLTaTdxmSqYf9UKmY0dwBLuytgVbg2YUyz4AbqlWxgH56u+Fi5eW
+	31uBPcGNm+Gf+/VX6su/kSQtLXo0qJr1MfeZVoWTwFw==
+X-Gm-Gg: AY/fxX6HyN5tyN3J0cXcrCSpkH33cGiiplGyqjLS90f1ZJCLFPnh9AUGIIIQS5toJK4
+	+I/7KmSN2akhetPod6PGeZj5z3B4NmL3bkXa8qgFOZQwpqNbWo9ahcKppLYbsSVMG/cVdo7/7wG
+	WxDMl+HbwGKjkTRmwNf9k0W1w/RePb4qPUt0se5DpBEL19Nmi3ZCmaKE8PYKI+yeIgXjWq5XnqJ
+	eCJ2A6jr5MBwLNJvm3EIyg4us2TlMuc/IjQU5Sui7BbpVs/2Vs45a7RZW0uBcsfXWVBCdE=
+X-Google-Smtp-Source: AGHT+IEsxKRwakIja0dzMyWp9W22QIzZiYfpyBw5VoLtUqGlP9YpqA/KD8o/PVYefYDBvqjeR1vV2q+hXZ8pCxwikm4=
+X-Received: by 2002:a05:7022:3897:b0:119:e55a:95a3 with SMTP id
+ a92af1059eb24-1217230569emr6386420c88.5.1766421832132; Mon, 22 Dec 2025
+ 08:43:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251217053455.281509-1-csander@purestorage.com>
- <20251217053455.281509-9-csander@purestorage.com> <aUlbPcjuk_XlE_zq@fedora>
-In-Reply-To: <aUlbPcjuk_XlE_zq@fedora>
+References: <20251221164145.1703448-1-ming.lei@redhat.com> <20251221164145.1703448-2-ming.lei@redhat.com>
+In-Reply-To: <20251221164145.1703448-2-ming.lei@redhat.com>
 From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Mon, 22 Dec 2025 10:37:17 -0500
-X-Gm-Features: AQt7F2oQd6LyEEMBKp5IZ-BamQwRQ8iC19BlCQuds5IXxVlYv-HC1nOaOAZV2eo
-Message-ID: <CADUfDZpW-8e+tkPJZX29w9Rs1vWc5T3t7qZQXWpyygKh42WKbA@mail.gmail.com>
-Subject: Re: [PATCH 08/20] ublk: add ublk_copy_user_bvec() helper
+Date: Mon, 22 Dec 2025 11:43:41 -0500
+X-Gm-Features: AQt7F2qOOfRu-3_mapcm1qeyefwRL3qa22XnF_ZaFcCwVaSpG3wvvjB7qckbYHI
+Message-ID: <CADUfDZrYj3b3dPDRaT25Be=h+QYKQ3X8QJ4VnU_ZVh8jM3AKCQ@mail.gmail.com>
+Subject: Re: [PATCH 1/3] ublk: scan partition in async way
 To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Shuah Khan <shuah@kernel.org>, linux-block@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Stanley Zhang <stazhang@purestorage.com>, Uday Shankar <ushankar@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	Uday Shankar <ushankar@purestorage.com>, Yoav Cohen <yoav@nvidia.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 22, 2025 at 9:53=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
-e:
+On Sun, Dec 21, 2025 at 11:42=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wro=
+te:
 >
-> On Tue, Dec 16, 2025 at 10:34:42PM -0700, Caleb Sander Mateos wrote:
-> > Factor a helper function ublk_copy_user_bvec() out of
-> > ublk_copy_user_pages(). It will be used for copying integrity data too.
-> >
-> > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-> > ---
-> >  drivers/block/ublk_drv.c | 52 +++++++++++++++++++++++-----------------
-> >  1 file changed, 30 insertions(+), 22 deletions(-)
-> >
-> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > index d3652ceba96d..0499add560b5 100644
-> > --- a/drivers/block/ublk_drv.c
-> > +++ b/drivers/block/ublk_drv.c
-> > @@ -987,10 +987,39 @@ static const struct block_device_operations ub_fo=
-ps =3D {
-> >       .open =3D         ublk_open,
-> >       .free_disk =3D    ublk_free_disk,
-> >       .report_zones =3D ublk_report_zones,
-> >  };
-> >
-> > +static bool ublk_copy_user_bvec(struct bio_vec bv, unsigned *offset,
+> Implement async partition scan to avoid IO hang when reading partition
+> tables. Similar to nvme_partition_scan_work(), partition scanning is
+> deferred to a work queue to prevent deadlocks.
 >
-> bv could be better to define as `const struct bio_vec *` for avoiding cop=
-y,
-> otherwise this patch looks fine.
+> When partition scan happens synchronously during add_disk(), IO errors
+> can cause the partition scan to wait while holding ub->mutex, which
+> can deadlock with other operations that need the mutex.
+>
+> Changes:
+> - Add partition_scan_work to ublk_device structure
+> - Implement ublk_partition_scan_work() to perform async scan
+> - Always suppress sync partition scan during add_disk()
+> - Schedule async work after add_disk() for trusted daemons
+> - Add flush_work() in ublk_stop_dev() before grabbing ub->mutex
+>
+> Reported-by: Yoav Cohen <yoav@nvidia.com>
+> Closes: https://lore.kernel.org/linux-block/DM4PR12MB63280C5637917C071C2F=
+0D65A9A8A@DM4PR12MB6328.namprd12.prod.outlook.com/
+> Fixes: 71f28f3136af ("ublk_drv: add io_uring based userspace block driver=
+")
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  drivers/block/ublk_drv.c | 32 +++++++++++++++++++++++++++++---
+>  1 file changed, 29 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 49c208457198..21593826ad2d 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -237,6 +237,7 @@ struct ublk_device {
+>         bool canceling;
+>         pid_t   ublksrv_tgid;
+>         struct delayed_work     exit_work;
+> +       struct work_struct      partition_scan_work;
+>
+>         struct ublk_queue       *queues[];
+>  };
+> @@ -254,6 +255,20 @@ static inline struct request *__ublk_check_and_get_r=
+eq(struct ublk_device *ub,
+>                 u16 q_id, u16 tag, struct ublk_io *io, size_t offset);
+>  static inline unsigned int ublk_req_build_flags(struct request *req);
+>
+> +static void ublk_partition_scan_work(struct work_struct *work)
+> +{
+> +       struct ublk_device *ub =3D
+> +               container_of(work, struct ublk_device, partition_scan_wor=
+k);
+> +
+> +       if (WARN_ON_ONCE(!test_and_clear_bit(GD_SUPPRESS_PART_SCAN,
+> +                                            &ub->ub_disk->state)))
+> +               return;
+> +
+> +       mutex_lock(&ub->ub_disk->open_mutex);
+> +       bdev_disk_changed(ub->ub_disk, false);
+> +       mutex_unlock(&ub->ub_disk->open_mutex);
+> +}
+> +
+>  static inline struct ublksrv_io_desc *
+>  ublk_get_iod(const struct ublk_queue *ubq, unsigned tag)
+>  {
+> @@ -2026,6 +2041,7 @@ static void ublk_stop_dev(struct ublk_device *ub)
+>         mutex_lock(&ub->mutex);
+>         ublk_stop_dev_unlocked(ub);
+>         mutex_unlock(&ub->mutex);
+> +       flush_work(&ub->partition_scan_work);
+>         ublk_cancel_dev(ub);
+>  }
+>
+> @@ -2954,9 +2970,14 @@ static int ublk_ctrl_start_dev(struct ublk_device =
+*ub,
+>
+>         ublk_apply_params(ub);
+>
+> -       /* don't probe partitions if any daemon task is un-trusted */
+> -       if (ub->unprivileged_daemons)
+> -               set_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
+> +       /*
+> +        * Suppress partition scan to avoid potential IO hang.
+> +        * If a path error occurs during partition scan, the IO may wait
 
-I was thinking it probably didn't matter much as the compiler was
-likely to inline the function call. But sure, I can pass it by
-pointer.
+What does a "path error" mean for ublk?
 
-Thanks,
-Caleb
+Other than that,
+Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
+
+> +        * while holding ub->mutex, which can deadlock with other operati=
+ons
+> +        * that need the mutex. Defer partition scan to async work.
+> +        * For unprivileged daemons, keep GD_SUPPRESS_PART_SCAN set perma=
+nently.
+> +        */
+> +       set_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
+>
+>         ublk_get_device(ub);
+>         ub->dev_info.state =3D UBLK_S_DEV_LIVE;
+> @@ -2973,6 +2994,10 @@ static int ublk_ctrl_start_dev(struct ublk_device =
+*ub,
+>
+>         set_bit(UB_STATE_USED, &ub->state);
+>
+> +       /* Schedule async partition scan for trusted daemons */
+> +       if (!ub->unprivileged_daemons)
+> +               schedule_work(&ub->partition_scan_work);
+> +
+>  out_put_cdev:
+>         if (ret) {
+>                 ublk_detach_disk(ub);
+> @@ -3138,6 +3163,7 @@ static int ublk_ctrl_add_dev(const struct ublksrv_c=
+trl_cmd *header)
+>         mutex_init(&ub->mutex);
+>         spin_lock_init(&ub->lock);
+>         mutex_init(&ub->cancel_mutex);
+> +       INIT_WORK(&ub->partition_scan_work, ublk_partition_scan_work);
+>
+>         ret =3D ublk_alloc_dev_number(ub, header->dev_id);
+>         if (ret < 0)
+> --
+> 2.47.0
+>
