@@ -1,122 +1,115 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EDC3342505
-	for <linux-block@vger.kernel.org>; Mon, 22 Dec 2025 13:50:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766411443; cv=none; b=lBbb8mMANS2cR129e2zQRg40iiJGXsRtzDd8P9mtubaQq08QMMqxCF/RUyybTNl5SU+TvLkFI49yU6JwxxtSZE3STFmBsjuk+VmZ6kDni2l8uNE5gvusFCjQcuVEYEZbggdNt3Lnw6ib3jEopiEaTSc397vZA9crSw64JQs13qo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766411443; c=relaxed/simple;
-	bh=2mkfWoBzv/4PUE5EH+qWjzwB6FuUxR5nefaQKiU8XZI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LYcODaWDvWs657lAqf5h+cTTlBUMEFoAypYd2wfy6AuNOnawV9tUzg9dST6ZSXxKbMHhI6w6Hhq7jJenT7CJH+McYifnrqnRxWT2pKtUAlsn8g18VvqYFqKEKE+EuCYdwO6+0U1E3Qh7Mh8/S5d/YAk5LDdtX+FwjgJ+s+3aBxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NneD5XC7; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66F0D2BE048;
+	Mon, 22 Dec 2025 14:20:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1766413234; cv=pass; b=crdVoRxdOnwgIHQrjhFpqxCg+mMFU3DWHPD4/sqYQGUZPF4ZAYQbvMQWFMNghMJzlW1BnHmSt4B0/LjzFVaE3LMnXJtVZbF16VsBeVmCzYztU4mE4LHHvO/tg/4EnOqiiu7hAwKlclZChTdDI0PCkDrJlhL/rTTBkLhjQlXc1o8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1766413234; c=relaxed/simple;
+	bh=/7AkD5MoGLoJ9E0uIl0cXggdSAyflF5Z3k/pqlk9AHk=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=jfsEbo1UE37xU9hTwWN2YoMp/JkbwGxRiFBuXajd8DwFoCCb1lLatPSx0R3wQVbNwmHLtL18nWvLyVdiRDOM6/yRBmmNLgTYBiv2CRKk5+A2gXX2YuLexiNLZjmIzq02l90rPuA87Yo33NsuevztByBiY/MHf+s8ZKK4Lj0ubB0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=daniel.almeida@collabora.com header.b=hHm2zh8i; arc=pass smtp.client-ip=136.143.188.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NneD5XC7"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1766411440;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4uLKaS9M6XCJacGAVbbW+GpokR6maSQb3iL9Idz2WJ0=;
-	b=NneD5XC76rVZ5JitAW6sTRSlFk5+bLri6hwZbNY/uv+8cZVkMpMjFSL1olo8fE04j2p6u6
-	20aoRb6yMk9kpBItE7JzMGWGXuEeRij1E2r2RPWOLMIknMKfCWuCVMlkNPcvyg4YKgBkzh
-	ZGVtQvohuHAPp+UU5uHv2+0adfnUshE=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-284-liCqbJhBNCGzhhjeY3h5XQ-1; Mon,
- 22 Dec 2025 08:50:37 -0500
-X-MC-Unique: liCqbJhBNCGzhhjeY3h5XQ-1
-X-Mimecast-MFC-AGG-ID: liCqbJhBNCGzhhjeY3h5XQ_1766411436
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 91E6A1800637;
-	Mon, 22 Dec 2025 13:50:35 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.92])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 65730180045B;
-	Mon, 22 Dec 2025 13:50:28 +0000 (UTC)
-Date: Mon, 22 Dec 2025 21:50:13 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>, linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Wangyang Guo <wangyang.guo@intel.com>
-Subject: Re: [PATCH] lib/group_cpus: fix cross-NUMA CPU assignment in
- group_cpus_evenly
-Message-ID: <aUlMlf8P5xYOOsWr@fedora>
-References: <20251020124646.2050459-1-ming.lei@redhat.com>
- <20251221112354.3a0ee9e1824f2cac9572d170@linux-foundation.org>
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=daniel.almeida@collabora.com header.b="hHm2zh8i"
+ARC-Seal: i=1; a=rsa-sha256; t=1766413216; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=mKHOwEpsdpTYqSsOlM9PPJY66nGbqiIPGyY3SXyrt4qL5fRzjN4fYVZVBniYRbj9Om5mpkEPQ2OVAJN9o1EhKy1z9bBv6jJeju+GbAUTBj5nGlOHZ30PXthRty/hIyxf0MVqaBuEhDJGhg0xm2hciWwvo/QYbBLN9Dy6tXisimI=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1766413216; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=1Ko8sRL3XFUTsdfrXmGabUt+wzKpzjrULj5gkrSJQns=; 
+	b=mrQh5LnBRPZqvt/yhHrLXkJtkP5RbyrWIDYre8WPDAkGwRVh9c4B/V7ykl4phbVMvdXYZuM4tUqZ3GsAQDHv81+Jh/Xuf9vWfAVJbfWRAjiRyj398yy1LZAn5UzkIV/5qdoRO9sXrgE/WI5YHbdhl1ICO8bjhCYhbqiMTqYjvZY=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=daniel.almeida@collabora.com;
+	dmarc=pass header.from=<daniel.almeida@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1766413216;
+	s=zohomail; d=collabora.com; i=daniel.almeida@collabora.com;
+	h=Content-Type:Mime-Version:Subject:Subject:From:From:In-Reply-To:Date:Date:Cc:Cc:Content-Transfer-Encoding:Message-Id:Message-Id:References:To:To:Reply-To;
+	bh=1Ko8sRL3XFUTsdfrXmGabUt+wzKpzjrULj5gkrSJQns=;
+	b=hHm2zh8icw2bvPkWEWNqu+JT9W72T4LkgWp98iWWmFui/7SLyoDvZwUmvfQE6fgi
+	uUKdVXyS5sp9FEs1THf5B7p8Xp+oAOqsqtaVKkOiVCEYgBZDTHaVqXPEiihbk1g5q/B
+	qNKs5QOL1yXLEdpMZCi2aiIKoHqYtmFsXJZcEDL4=
+Received: by mx.zohomail.com with SMTPS id 176641321412580.97702557807827;
+	Mon, 22 Dec 2025 06:20:14 -0800 (PST)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251221112354.3a0ee9e1824f2cac9572d170@linux-foundation.org>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
-
-On Sun, Dec 21, 2025 at 11:23:54AM -0800, Andrew Morton wrote:
-> On Mon, 20 Oct 2025 20:46:46 +0800 Ming Lei <ming.lei@redhat.com> wrote:
-> 
-> > When numgrps > nodes, group_cpus_evenly() can incorrectly assign CPUs
-> > from different NUMA nodes to the same group due to the wrapping logic.
-> > Then poor block IO performance is caused because of remote IO completion.
-> > And it can be avoided completely in case of `numgrps > nodes` because
-> > each numa node may includes more CPUs than group's.
-> 
-> Please quantify "poor block IO performance", to help people understand
-> the userspace-visible effect of this change.
-
-It is usually a bug, given fast nvme IO perf may drop to 1/2 or 1/3 in case of
-remote completion. queue mapping shouldn't cross CPUs from different numa
-nodes in case of nr_queues >= nr_nodes.
-
-> 
-> > The issue occurs when curgrp reaches last_grp and wraps to 0. This causes
-> > CPUs from later-processed nodes to be added to groups that already contain
-> > CPUs from earlier-processed nodes, violating NUMA locality.
-> > 
-> > Example with 8 NUMA nodes, 16 groups:
-> > - Each node gets 2 groups allocated
-> > - After processing nodes, curgrp reaches 16
-> > - Wrapping to 0 causes CPUs from node N to be added to group 0 which
-> >   already has CPUs from node 0
-> > 
-> > Fix this by adding find_next_node_group() helper that searches for the
-> > next group (starting from 0) that already contains CPUs from the same
-> > NUMA node. When wrapping is needed, use this helper instead of blindly
-> > wrapping to 0, ensuring CPUs are only added to groups within the same
-> > NUMA node.
-> > 
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >  lib/group_cpus.c | 28 +++++++++++++++++++++++++---
-> 
-> The patch overlaps (a lot) with Wangyang Guo's "lib/group_cpus: make
-> group CPU cluster aware".  I did a lot of surgery but got stuck on the
-> absence of node_to_cpumask, so I guess the patch has bitrotted.
-> 
-> Please update the changelog as above and redo this patch against
-> Wangyang's patch (which will be in linux-next very soon).
-
-Please ignore this patch now because I can't reproduce the original issue
-on both v6.18 and v6.19-rc.
-
-> 
-> Also, it would be great if you and Wangyang were to review and test
-> each other's changes, thanks.
-
-OK.
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81\))
+Subject: Re: [PATCH] rnull: replace `kernel::c_str!` with C-Strings
+From: Daniel Almeida <daniel.almeida@collabora.com>
+In-Reply-To: <20251222-cstr-block-v1-1-fdab28bb7367@gmail.com>
+Date: Mon, 22 Dec 2025 11:19:58 -0300
+Cc: Andreas Hindborg <a.hindborg@kernel.org>,
+ Boqun Feng <boqun.feng@gmail.com>,
+ Jens Axboe <axboe@kernel.dk>,
+ Miguel Ojeda <ojeda@kernel.org>,
+ Gary Guo <gary@garyguo.net>,
+ =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>,
+ Benno Lossin <lossin@kernel.org>,
+ Alice Ryhl <aliceryhl@google.com>,
+ Trevor Gross <tmgross@umich.edu>,
+ Danilo Krummrich <dakr@kernel.org>,
+ linux-block@vger.kernel.org,
+ rust-for-linux@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ Tamir Duberstein <tamird@gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <4015C791-D9C1-49D3-893E-79FD1167AD50@collabora.com>
+References: <20251222-cstr-block-v1-1-fdab28bb7367@gmail.com>
+To: Tamir Duberstein <tamird@kernel.org>
+X-Mailer: Apple Mail (2.3826.700.81)
+X-ZohoMailClient: External
 
 
-Thanks,
-Ming
 
+> On 22 Dec 2025, at 09:26, Tamir Duberstein <tamird@kernel.org> wrote:
+>=20
+> From: Tamir Duberstein <tamird@gmail.com>
+>=20
+> C-String literals were added in Rust 1.77. Replace instances of
+> `kernel::c_str!` with C-String literals where possible.
+>=20
+> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+> ---
+> drivers/block/rnull/configfs.rs | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/block/rnull/configfs.rs =
+b/drivers/block/rnull/configfs.rs
+> index 6713a6d92391..2f5a7da03af5 100644
+> --- a/drivers/block/rnull/configfs.rs
+> +++ b/drivers/block/rnull/configfs.rs
+> @@ -25,7 +25,7 @@ pub(crate) fn subsystem() -> impl =
+PinInit<kernel::configfs::Subsystem<Config>, E
+>         ],
+>     };
+>=20
+> -    kernel::configfs::Subsystem::new(c_str!("rnull"), item_type, =
+try_pin_init!(Config {}))
+> +    kernel::configfs::Subsystem::new(c"rnull", item_type, =
+try_pin_init!(Config {}))
+> }
+>=20
+> #[pin_data]
+>=20
+> ---
+> base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
+> change-id: 20251222-cstr-block-0611c0c035e3
+>=20
+> Best regards,
+> -- =20
+> Tamir Duberstein <tamird@gmail.com>
+>=20
+>=20
+
+
+Reviewed-by: Daniel Almeida <daniel.almeida@collabora.com>=
