@@ -1,64 +1,64 @@
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDB5F1A9F8D
-	for <linux-block@vger.kernel.org>; Mon, 22 Dec 2025 20:16:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A3377E105
+	for <linux-block@vger.kernel.org>; Mon, 22 Dec 2025 20:16:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766434578; cv=none; b=RMGulv/8Yhjxx1jNevIN1WYjJ0bRCmaVTs4MVuM99XNXgV8GWC2rUF1XhCWl0I6x7neVY+zy8JAFUjrFaJKk112xb2GIZYGKEN+AuCjKUgvaj+ny5dNocE+gxz22yJlROrAn9niKJZOQmFCoinxNvJOeMvGet8WEs5knY1ZAvko=
+	t=1766434586; cv=none; b=DSa90qYGKHNUJ7RrYFrmn6blWnn7qRvOOkWaxjQeed4Oe2Y/v9/n5Ud7suw7wYDtowz8G8D0oDsVShWiPd9NrE90D+sLt4bZr8APlUodyHpvg4666ay8QaMrfg1iJx1oYIZ1W2ntD27hjnNa1uE+I9DCKeeVvfe5P/Wz54zMris=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766434578; c=relaxed/simple;
-	bh=o+vEFROiqUoDAPTJIDN1NXPMAkTeLu+cB5g1KoffBU8=;
+	s=arc-20240116; t=1766434586; c=relaxed/simple;
+	bh=3x2Lp7T3cj30BgxZkRxFd7fJ+xGEmQsAhJosfnJWiuQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OTuqpguBvMNt6QH6rtvNxW/JX8+VYofX6M28vIHJvMh701HUTfbgjK3s4RBQooJqcyYhEyh3F5XsbE/YtPBvDha9V3MuzDnLVHYJ2JLpgxTHu0rZTLmMvI+e4lJkRnw6vkQaMk4dqkh79CZgyL2K8QvSH9rQWKJ1cvmUh90I13Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NgHTrhDa; arc=none smtp.client-ip=209.85.214.170
+	 MIME-Version; b=tOFF2a+4YrJi4xtmkj96QK3i4kbntYtlH48r7VE//sRPjxJA9fzVTen/GeX/KnNgNRIxL14eAefh9QuDiwvH+0T6+dazdWNnhrcagToWJTLKYah68P4bqStFatmFyqDqWyBDjOMREDDM2/m9Exx/pbB2SnJ8fLF9+LDkHqLV+wY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bJEg+tDL; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NgHTrhDa"
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2a137692691so50335725ad.0
-        for <linux-block@vger.kernel.org>; Mon, 22 Dec 2025 12:16:16 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bJEg+tDL"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2a2ea96930cso48667005ad.2
+        for <linux-block@vger.kernel.org>; Mon, 22 Dec 2025 12:16:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766434576; x=1767039376; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1766434585; x=1767039385; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QmUq8CHI3JkNtGWiGFMZyA0zmDp2QcgRy2thJxu/yXE=;
-        b=NgHTrhDaWxgLy5d2rvpOBnTTvvfF1rnRysmlCB5uWDsfO9ieNB5TNv/BygfS9EW6Xj
-         VjEUO68u5qGnDUmcw2Of2CjPodC+OyiLpGM1bMlXlFde30tuuGjrEV8X2648HElW8Y1Z
-         1Y3KZpuzivSD+yvPY+bzJ18TrC+Khgve50tRNHEebwlyKtX5ORADT+ZKM3Ddhchhri0Q
-         bkr+eZqpIRxoBCon7hs0qbW+HIwxFRnfB3CNI0/7b9mLzYH3jT+ATzvD2UvI+MW8Ka/0
-         7ABxTTdRZgMjRayCCrhgG1pYQeYFiJAaVMkz406yb0hOlNHFnWScJ5C8uDpE8KJ7icYd
-         me6g==
+        bh=BMa3wSdMVGXj95ioxBEETokGr7K3zu5ogl1WC04RcvM=;
+        b=bJEg+tDLBFTO7opn1G4RGReec6Azmzxr8iBknbErFPZXfCNBLPUMluBhvS85bNb71z
+         NWM2SF4qmAETCuEeZrBcFU4Z/C+Vwah7HAhAPTvy7Yqik+YEmUcMtYzK04F5UL+0gy90
+         bDC1f+6bAbbgYYWl6ZtIdjmzWvXfHDEEHkPeohbx10u+yQT9Btw97q+jsOjGFXbKZwO6
+         PNVIJLv/EP0hHPV+u8mC4V7KBfnUsOBk6zX6jyj5q2KQuxbi3d8vJyZpth9Up+HSiak/
+         556Z/F3KWEEfl4XxSi22at7SAOFwiqvCf8NULOmFWL18yBF8Nz+iN3WsPwwU18QWhjmr
+         Go+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766434576; x=1767039376;
+        d=1e100.net; s=20230601; t=1766434585; x=1767039385;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=QmUq8CHI3JkNtGWiGFMZyA0zmDp2QcgRy2thJxu/yXE=;
-        b=fo+fJ22yLlVXu0gwDY3Xck+p/E0Rga2f1FT/43swwUbT9oPZcG6yXqUlgRndsvqExr
-         ekZmMl6O2aBy9im1QNhKCHPLIoonnyR87/IEo5mNhgnyIz/x9bLAy0h14VzInjA32YdB
-         mNTgZQQfQkbOYUqnfyj1/Gn8YfXdCs/0+ionJRt0ugVB54Om9lytsnuA5s+t6warj8hy
-         aqriCaBlkNXjxL+OyAGEwCai5ue/glRc7jAaG5MJgfRbRFFYvWio/eboaXvfJ8RR6phX
-         yyV7E/1IsTBXaaqjM35SS87WzLMJokt5CENhxpHXx6AHo0phYKSDzzSRzKGxhKXYjj2X
-         INUg==
-X-Forwarded-Encrypted: i=1; AJvYcCV8F28j7Mb3dcSmNFbg6Dh7wRT3HfRUUgHvqXpfhBs647vGTH5ImJCT/K14kkGqLreicRJE2QhEAVkpQw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyzB7cw9CFy+zvqcUq9Un5svyR17vUhAtnl7QaJa/tzx9nklOQo
-	CmZbRNQay17Crm+1LOC947C5EPAXlPX0n5HTLkf2Giv7ctO+dGOLunWE
-X-Gm-Gg: AY/fxX6Z2/mtFhOBTwIsY5XNA5PPsR8KS6VuNJ1qjh/uRyIpB/imL43ZUbwz8E4liPz
-	7fTG5Qlvvu1ubeIhXET/41mgJoD+ocOGbmq6tylWs7Fb2/A6zCjR7vP3Sxm7OCR8yd59ZaY8X6d
-	vjCSwHRvqwizQ1Bg1+vEQoicwTdNy2clbIsXlBac5z2mQaWy3wvmFb0eGtib/8Zqeh5Fxu49Rus
-	DdczgfBKuPAl1ur+ZeqvYrgYsQV7NZ/ZiJ+R7SmcdgjQS40vAvwWNmzH61U2wagrbP5SS3P/2PK
-	kKG8Qa+H2TLn7op+yN3SFRE6PRGgMoUJLgl1mKrt6BJoOEpod0J3Os7r081Ek/S10LHi3ua05aG
-	D4ADWf13w5zD0gY9i8o9haWzXWxLmdCIyKjYfTQ5h7AsfleS6WU7xwU+nxy4IMl0GbHrlIom2/a
-	NbaGHaepDGA4Ue/q79pNzGWjxmMudhlEbK7iXDk5XxSFk/
-X-Google-Smtp-Source: AGHT+IGGCPRsUbtdnSyNVH6HcSffxoPpOEnbF7UGpOntHaM5661Ya5XibckfxkPrf4FjkYaBiYk8BQ==
-X-Received: by 2002:a17:903:120b:b0:294:def6:5961 with SMTP id d9443c01a7336-2a2f2840071mr108551835ad.45.1766434575985;
-        Mon, 22 Dec 2025 12:16:15 -0800 (PST)
+        bh=BMa3wSdMVGXj95ioxBEETokGr7K3zu5ogl1WC04RcvM=;
+        b=BEFGCcP4L2mfQ59N15D6VRP1SJjTseu3gCgWh4shgUDUbM7b5zxqEV0ivkoMMkBPVT
+         8Rk4SBZbwMMuj3n1vMqrtsULLAjZJYpr1qUWVXZIxOGyCYQog4LB86FYWIDHwygEvHwh
+         5zynGCzdIjGEnwbC6WE7J5K+Kd8Qe4Uvc1mS0pDfs9uJNJW5kMxzK4SYu0B8dHeeWz3d
+         IuLzn1D2zY0NhVQ7xhOdXN5kLHCokFljX9PgCQqHrjBPSG/P7FSLB0n3fhEEiuqI7Wfe
+         1abjwbO4xvzZbEXQX5j4Se4mMOjwwFP+vNqwIwibgpV3RqWRRGrllDtA16p36XjsBNbb
+         m/vQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWtqI+qZYDtaI4VgL7IyZNRRn0dZ7/1fRJOddOOX1zSrdWXBJryovqzaVFTk9pBnjS+0EYZiKcHY2fIBw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9h9cVtpR9ecjYCJHNp4PrKK/wImppc7iY6l3JpsgM6Uk1PqLv
+	SsnO/c/EP808baMhdqqtBtZBV4ELGi2qr/wS7yl4ibrbvGRmBT3srduK
+X-Gm-Gg: AY/fxX7JgWmQw2c1r/LjXDNVoJMm+RJB9Apjxvn/N2ZZWP3k1NaZbcnzyVM+TtTTser
+	jWnEdJIn+EVep7zsF8oaUh+aXmndFwqWIJTv2xf/QBEFEhCF0JljDvl3dw7NeB2im5gZf6gAlUP
+	3E/VrbBGOjN1mQQpwyhW/m6X8aYMLPCMgzu9mxJv+qJjQyGaDQL+3eOXFVQQNGrr5e3nkoVREfJ
+	YyZ9aHytTgcpUlSJj42XAlgEuvQNEuKQkQ5AmZXGtqOnRXWhvWDPhV6Yq/mLamXeAEGAEM09udI
+	rZM1Ay9jAfLLrCbe73Ew2QYr8zLQsdBQgx9UPALzj8EjpKUZWNSqud7UiiIlP/PWxk69aqtCMrd
+	G4DztTi7K/IMRAm5WAgSLTOejowHAMnNt7NSgX/OfwuTBM+Ws05xFTpYsAagpLvEfU4XNtYfS1Y
+	hV1a94y+Vkcc6P0pBcM+4Nf/eE9TOEtg5nCHv6ylFofFuo
+X-Google-Smtp-Source: AGHT+IEuB211eJrtXYRtnAbPwZHFAJ3Laogx7YmJ49X41eVrFL8nNlqqmkk/chtEKcpdAsKs+c3xJw==
+X-Received: by 2002:a17:903:2a8b:b0:2a0:823f:4da6 with SMTP id d9443c01a7336-2a2f2a34f28mr112442415ad.50.1766434584602;
+        Mon, 22 Dec 2025 12:16:24 -0800 (PST)
 Received: from ionutnechita-arz2022.local ([2a02:2f07:6016:fa00:48f6:1551:3b44:fd83])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a2f330d25esm104358905ad.0.2025.12.22.12.16.09
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a2f330d25esm104358905ad.0.2025.12.22.12.16.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Dec 2025 12:16:15 -0800 (PST)
+        Mon, 22 Dec 2025 12:16:24 -0800 (PST)
 From: "Ionut Nechita (WindRiver)" <djiony2011@gmail.com>
 X-Google-Original-From: "Ionut Nechita (WindRiver)" <ionut.nechita@windriver.com>
 To: ming.lei@redhat.com
@@ -70,9 +70,9 @@ Cc: axboe@kernel.dk,
 	muchun.song@linux.dev,
 	sashal@kernel.org,
 	stable@vger.kernel.org
-Subject: [PATCH v2 1/2] block/blk-mq: fix RT kernel regression with queue_lock in hot path
-Date: Mon, 22 Dec 2025 22:15:40 +0200
-Message-ID: <20251222201541.11961-2-ionut.nechita@windriver.com>
+Subject: [PATCH v2 2/2] block: Fix WARN_ON in blk_mq_run_hw_queue when called from interrupt context
+Date: Mon, 22 Dec 2025 22:15:41 +0200
+Message-ID: <20251222201541.11961-3-ionut.nechita@windriver.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20251222201541.11961-1-ionut.nechita@windriver.com>
 References: <20251222201541.11961-1-ionut.nechita@windriver.com>
@@ -86,74 +86,36 @@ Content-Transfer-Encoding: 8bit
 
 From: Ionut Nechita <ionut.nechita@windriver.com>
 
-Commit 679b1874eba7 ("block: fix ordering between checking
-QUEUE_FLAG_QUIESCED request adding") introduced queue_lock acquisition
-in blk_mq_run_hw_queue() to synchronize QUEUE_FLAG_QUIESCED checks.
+Fix warning "WARN_ON_ONCE(!async && in_interrupt())" that occurs during
+SCSI device scanning when blk_freeze_queue_start() calls blk_mq_run_hw_queues()
+synchronously from interrupt context.
 
-On RT kernels (CONFIG_PREEMPT_RT), regular spinlocks are converted to
-rt_mutex (sleeping locks). When multiple MSI-X IRQ threads process I/O
-completions concurrently, they contend on queue_lock in the hot path,
-causing all IRQ threads to enter D (uninterruptible sleep) state. This
-serializes interrupt processing completely.
+The issue happens during device removal/scanning when:
+1. blk_mq_destroy_queue() -> blk_queue_start_drain()
+2. blk_freeze_queue_start() calls blk_mq_run_hw_queues(q, false)
+3. This triggers the warning in blk_mq_run_hw_queue() when in interrupt context
 
-Test case (MegaRAID 12GSAS with 8 MSI-X vectors on RT kernel):
-- Good (v6.6.52-rt):  640 MB/s sequential read
-- Bad  (v6.6.64-rt):  153 MB/s sequential read (-76% regression)
-- 6-8 out of 8 MSI-X IRQ threads stuck in D-state waiting on queue_lock
+Change the synchronous call to asynchronous to avoid running in interrupt context.
 
-The original commit message mentioned memory barriers as an alternative
-approach. Use full memory barriers (smp_mb) instead of queue_lock to
-provide the same ordering guarantees without sleeping in RT kernel.
-
-Memory barriers ensure proper synchronization:
-- CPU0 either sees QUEUE_FLAG_QUIESCED cleared, OR
-- CPU1 sees dispatch list/sw queue bitmap updates
-
-This maintains correctness while avoiding lock contention that causes
-RT kernel IRQ threads to sleep in the I/O completion path.
-
-Fixes: 679b1874eba7 ("block: fix ordering between checking QUEUE_FLAG_QUIESCED request adding")
-Cc: stable@vger.kernel.org
+Fixes: Warning in blk_mq_run_hw_queue+0x1fa/0x260
 Signed-off-by: Ionut Nechita <ionut.nechita@windriver.com>
 ---
- block/blk-mq.c | 19 ++++++++-----------
- 1 file changed, 8 insertions(+), 11 deletions(-)
+ block/blk-mq.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 5da948b07058..5fb8da4958d0 100644
+index 5fb8da4958d0..ae152f7a6933 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -2292,22 +2292,19 @@ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
- 
- 	might_sleep_if(!async && hctx->flags & BLK_MQ_F_BLOCKING);
- 
-+	/*
-+	 * First lockless check to avoid unnecessary overhead.
-+	 * Memory barrier below synchronizes with blk_mq_unquiesce_queue().
-+	 */
- 	need_run = blk_mq_hw_queue_need_run(hctx);
- 	if (!need_run) {
--		unsigned long flags;
--
--		/*
--		 * Synchronize with blk_mq_unquiesce_queue(), because we check
--		 * if hw queue is quiesced locklessly above, we need the use
--		 * ->queue_lock to make sure we see the up-to-date status to
--		 * not miss rerunning the hw queue.
--		 */
--		spin_lock_irqsave(&hctx->queue->queue_lock, flags);
-+		/* Synchronize with blk_mq_unquiesce_queue() */
-+		smp_mb();
- 		need_run = blk_mq_hw_queue_need_run(hctx);
--		spin_unlock_irqrestore(&hctx->queue->queue_lock, flags);
--
- 		if (!need_run)
- 			return;
-+		/* Ensure dispatch list/sw queue updates visible before execution */
-+		smp_mb();
+@@ -128,7 +128,7 @@ void blk_freeze_queue_start(struct request_queue *q)
+ 		percpu_ref_kill(&q->q_usage_counter);
+ 		mutex_unlock(&q->mq_freeze_lock);
+ 		if (queue_is_mq(q))
+-			blk_mq_run_hw_queues(q, false);
++			blk_mq_run_hw_queues(q, true);
+ 	} else {
+ 		mutex_unlock(&q->mq_freeze_lock);
  	}
- 
- 	if (async || !cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask)) {
 -- 
 2.52.0
 
