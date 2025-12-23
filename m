@@ -1,101 +1,193 @@
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A628434AAFC
-	for <linux-block@vger.kernel.org>; Tue, 23 Dec 2025 01:41:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B31524A04A
+	for <linux-block@vger.kernel.org>; Tue, 23 Dec 2025 01:51:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766454091; cv=none; b=F4TBqHp6eBE5QoLb96IwL3HVHrrCqFH8SsT08etayRfFHBOhh2cLW7Dmrfe+HG4Vx2qKymexAY4hA/K5i2qvYqQ9M0gXHh1JQO2iG9YyjILHbAqdByJSDODRI/TR8mPm75ztwW0JtxX4eKNfteVrNuXbxGAWdS+6fB0LVWxrSxw=
+	t=1766454703; cv=none; b=lya9rrfSh1zigCS4AclmCdSuc+KGJd4ngaBaw53Wuyvcfj08B/NnZLrn8SG7Y3RxOifke/7YZDWK3RuBpuYtLxFo2ZUIbCQcPNodhh8Y4TmfCnYm7UdX2G+BH9ZyLWU9N21881N8epIsYTVEdtiMi18t9dnNfhS7UIbxUBXzW6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766454091; c=relaxed/simple;
-	bh=Dw1tVh0CmnWqKDbnt9xHH3i4dpkMlWgLPtv4rSVZoxQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Wb1+Ru68OjCEY7d198CYqso/1y2KJ5dEqbaigI8DO+78twc6/phQpAlrVRB9uUPOFe4NUsbNxaONFIkzbIHUVlHqlxOUpBTcwGnY9ZgYDICEgs6l3YhDEzuKvZ7lfWPYOr/CCpy6E0HjrJPwxjs4ATU+e4RNb+zYnCXnUPhossI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OfOsId7s; arc=none smtp.client-ip=209.85.167.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1766454703; c=relaxed/simple;
+	bh=Kuo7K4RLDm3D/4aKICIh1JjqGgqzCGr/l78acdLGogs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=O474un0hwh5D6u0zCiotonbvE3idxqjABJQhWPwIxynuznZAV4z7HaGSRvuqXNFwABeLBFY1O8vXT2OTYXU3gfhNt+DR7hcKdXxF2AiYqTGImLR7kNS+uc0ic1BWRdOdaqFqedsuMyM7wEWJIN2Rx3RGR7O+F4PKSF3vlkPlb18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c8BmJj4v; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OfOsId7s"
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-594270ec7f9so5340027e87.3
-        for <linux-block@vger.kernel.org>; Mon, 22 Dec 2025 17:41:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766454088; x=1767058888; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Uzc2azkAT7+UZs63CJT4nkeSpZYqRpvq+hUurVd9/nU=;
-        b=OfOsId7sIcDGQy2pTh1vUpxLeUMu89wMN8s4Lk5g1kjn6irxsnAKWeUrpNqRGyoG36
-         KeetWAt4xPplCAfvWllRU2qX5LiXDYmB4HICp0vluIlAJj36byf5FlO7IURPnAFcLIfz
-         EdOrskXj59Xi4pyqUHPyuUwgjUIFaXZtWIz1k+TrIRp3q+8hANEkpNpTzlkL1uX3AgQ0
-         ZClbOvf3LRxSqsQg1qNBWzRHYzc57vVVkz/mG+VKQYTkkt3PAwUnDwDy8f5K8XKVszoR
-         AeOMq3ZA8JcsAWy+d3QFwQ9mUBT9ymlXsOOpr25TL6BQd5Dr8Z9ZO80mclH1UxWOzlrI
-         yN2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766454088; x=1767058888;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Uzc2azkAT7+UZs63CJT4nkeSpZYqRpvq+hUurVd9/nU=;
-        b=FWwojeXvSnvSvSd3TDpv6lv7hqPb6aZ7NclgO/lgG6sVDlyfLU/oJY+VByRItdsLGt
-         wpOYjlLad43kRBlaFHL3OQ514TUVhX5EglXp4n2ofrjBn1WLcILQW1AFy+fEaZ6v+7dA
-         hCrOVv2Vu3N0iHqSO2PI1OPotqoDet3PRbUY+tcmgveuQkaRDf/P4HEEtnIaCKIP8dvB
-         DnD4aDVecDUxZG6fR9TH3FTDGj/XL8OLNnrpKLVTuhkh5lgvdvVx2sCcb/Am38t4Tt00
-         8nEiLa+irANCOuLnkUJpXmO+GnRXQJvov+fPUXPOtQif1d5aRAnpO+oLWhUvTJRGV/dG
-         r7sQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVY5YczMPuIGUoycE+ZoQWqA/aH8zvQDfToEUwDExUoYuoNeEFCX0QVYZ5+6FsslxTN+6SBinNdb1gkUw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1baVE8g+fSe1ODKFo+hkRYuIaHlx5D2+RyyfH4lwZABcDc5+I
-	JlzyKnOFzWYGIiaJZttg6gIUWnCY2T4Xpn+4Q8vpFW2rI5xv0To2dDHC
-X-Gm-Gg: AY/fxX7GC9TkAx2J8u/LSBVcChu5y07H8HZQXl/zlk4CXxbO5M2Q7EOlzbgG1mi3B/B
-	bSn1Okr+RpWvjwq+rZOfQ3B9L3Ky2S5xhqGvuwZFsm6HEius4YdtOzYfoRpB64z3KVAxDUGbBOD
-	Y1dj7tq0yojPK6eSiLSBLzx8dLe3yh6TcYT7OyJnUdRpWzIvFiOSBPWLkcaffRZsuhVr1GsGTzI
-	K59OP9hMoA6tRbwskVMFbxUYBTAOki285stMs0X/cvzmefnVnsxvddQF+xsiNjM55xSJj4TqeEA
-	r5DuI1MtGi8yIuEvl14XfpIh2ZaWIlU/oDfZeIKTBs6tllhQiL3vvNX5GMHOAK86omp7OD3NPCY
-	mNzzhsVYEXU/xW8262mle4ibR0mYBF9TG92vmhCRcOA0EqsbvuMhcxwiYqAUWElNNSs3TjiF5sV
-	wGt8QJEeqA
-X-Google-Smtp-Source: AGHT+IHWUix04V1tUMjJhj8LmwIJFsrYjMJ2eegt/yizChdKwHOARh8H0MmDtl7KvKnzF0od4dTcxA==
-X-Received: by 2002:a05:6512:234b:b0:59a:123e:69ab with SMTP id 2adb3069b0e04-59a17d08c20mr4858078e87.10.1766454087534;
-        Mon, 22 Dec 2025 17:41:27 -0800 (PST)
-Received: from localhost ([194.190.17.114])
-        by smtp.gmail.com with UTF8SMTPSA id 2adb3069b0e04-59a185d5ea6sm3600776e87.5.2025.12.22.17.41.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Dec 2025 17:41:27 -0800 (PST)
-From: Askar Safin <safinaskar@gmail.com>
-To: gmazyland@gmail.com
-Cc: Dell.Client.Kernel@dell.com,
-	dm-devel@lists.linux.dev,
-	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-lvm@lists.linux.dev,
-	linux-mm@kvack.org,
-	linux-pm@vger.kernel.org,
-	linux-raid@vger.kernel.org,
-	lvm-devel@lists.linux.dev,
-	mpatocka@redhat.com,
-	pavel@ucw.cz,
-	rafael@kernel.org
-Subject: Re: [RFC PATCH 2/2] swsusp: make it possible to hibernate to device mapper devices
-Date: Tue, 23 Dec 2025 04:41:14 +0300
-Message-ID: <20251223014114.2193668-1-safinaskar@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <86300955-72e4-42d5-892d-f49bdf14441e@gmail.com>
-References: <86300955-72e4-42d5-892d-f49bdf14441e@gmail.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c8BmJj4v"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1766454700;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gVyvMHdYiOMJZDAaiQoHIi0uYkIFR3AXDiu2W4PmloY=;
+	b=c8BmJj4vLgbJ9f3yPItpRiINobcjyuA+1jNURe1LzrwUMaeRtMRENwKGCPzzM6B6L74Zle
+	+9puwpYhmw88JV7bys1c9+iYFTbue14RfUAsnbnUpVbg+qbJhQwOhh408nyQbIUrPTbtND
+	7nIohRLJWLL/Pdkn85OTY07Nk0kfqPc=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-145-rK7-h6PVPca3x8lk0ywOPg-1; Mon,
+ 22 Dec 2025 20:51:36 -0500
+X-MC-Unique: rK7-h6PVPca3x8lk0ywOPg-1
+X-Mimecast-MFC-AGG-ID: rK7-h6PVPca3x8lk0ywOPg_1766454695
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 306FE180028B;
+	Tue, 23 Dec 2025 01:51:35 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.97])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8A62B180066E;
+	Tue, 23 Dec 2025 01:51:30 +0000 (UTC)
+Date: Tue, 23 Dec 2025 09:51:25 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Shuah Khan <shuah@kernel.org>,
+	linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Stanley Zhang <stazhang@purestorage.com>,
+	Uday Shankar <ushankar@purestorage.com>
+Subject: Re: [PATCH 04/20] ublk: add integrity UAPI
+Message-ID: <aUn1nac8ZONTAdud@fedora>
+References: <20251217053455.281509-1-csander@purestorage.com>
+ <20251217053455.281509-5-csander@purestorage.com>
+ <aUlVDtLgPh6NCWsC@fedora>
+ <CADUfDZp5Or_Q+7HKtdi97n5kBpQ=zpOFAtqfatR3nu+=yGLb_Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADUfDZp5Or_Q+7HKtdi97n5kBpQ=zpOFAtqfatR3nu+=yGLb_Q@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Milan Broz <gmazyland@gmail.com>:
-> Anyway, my understanding is that all device-mapper targets use mempools,
-> which should ensure that they can process even under memory pressure.
+On Mon, Dec 22, 2025 at 10:09:50AM -0500, Caleb Sander Mateos wrote:
+> On Mon, Dec 22, 2025 at 9:26 AM Ming Lei <ming.lei@redhat.com> wrote:
+> >
+> > On Tue, Dec 16, 2025 at 10:34:38PM -0700, Caleb Sander Mateos wrote:
+> > > From: Stanley Zhang <stazhang@purestorage.com>
+> > >
+> > > Add UAPI definitions for metadata/integrity support in ublk.
+> > > UBLK_PARAM_TYPE_INTEGRITY and struct ublk_param_integrity allow a ublk
+> > > server to specify the integrity params of a ublk device.
+> > > The ublk driver will set UBLK_IO_F_INTEGRITY in the op_flags field of
+> > > struct ublksrv_io_desc for requests with integrity data.
+> > > The ublk server uses user copy with UBLKSRV_IO_INTEGRITY_FLAG set in the
+> > > offset parameter to access a request's integrity buffer.
+> > >
+> > > Signed-off-by: Stanley Zhang <stazhang@purestorage.com>
+> > > [csander: drop feature flag and redundant pi_tuple_size field,
+> > >  add io_desc flag, use block metadata UAPI constants]
+> > > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+> > > ---
+> > >  include/uapi/linux/ublk_cmd.h | 20 +++++++++++++++++++-
+> > >  1 file changed, 19 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
+> > > index ec77dabba45b..5bfb9a0521c3 100644
+> > > --- a/include/uapi/linux/ublk_cmd.h
+> > > +++ b/include/uapi/linux/ublk_cmd.h
+> > > @@ -129,11 +129,15 @@
+> > >  #define UBLK_QID_BITS                12
+> > >  #define UBLK_QID_BITS_MASK   ((1ULL << UBLK_QID_BITS) - 1)
+> > >
+> > >  #define UBLK_MAX_NR_QUEUES   (1U << UBLK_QID_BITS)
+> > >
+> > > -#define UBLKSRV_IO_BUF_TOTAL_BITS    (UBLK_QID_OFF + UBLK_QID_BITS)
+> > > +/* Copy to/from request integrity buffer instead of data buffer */
+> > > +#define UBLK_INTEGRITY_FLAG_OFF              (UBLK_QID_OFF + UBLK_QID_BITS)
+> > > +#define UBLKSRV_IO_INTEGRITY_FLAG    (1ULL << UBLK_INTEGRITY_FLAG_OFF)
+> > > +
+> >
+> > I feel it is more readable to move the definition into the patch which uses
+> > them.
+> 
+> Sure, I can do that.
+> 
+> >
+> > > +#define UBLKSRV_IO_BUF_TOTAL_BITS    (UBLK_INTEGRITY_FLAG_OFF + 1)
+> >
+> > It is UAPI, UBLKSRV_IO_BUF_TOTAL_BITS shouldn't be changed, or can you
+> > explain this way is safe?
+> 
+> It's not clear to me how userspace is expected to use
+> UBLKSRV_IO_BUF_TOTAL_BITS. (Our ublk server, for one, doesn't use it.)
+> Can you provide an example? It looks to me like the purpose is to
+> communicate the number of bits needed to represent a user copy offset
+> value, in which case it makes sense to include the integrity flag now
+> that that bit is being used.
 
-Also, I don't understand how mempools help here.
+Yes, it is used for this purpose.
 
-As well as I understand, allocation from mempool is still real allocation
-if mempool's own reserve is over.
+Now one new bit(bit 53) is added for marking if it is for meta user copy,
+let's keep UBLKSRV_IO_BUF_TOTAL_BITS cover its original meaning, and not
+include the new bit UBLKSRV_IO_INTEGRITY_FLAG, which can be documented.
 
--- 
-Askar Safin
+Then it can avoid some trouble, such as, break some uapi header checker at
+least.
+
+> 
+> >
+> > >  #define UBLKSRV_IO_BUF_TOTAL_SIZE    (1ULL << UBLKSRV_IO_BUF_TOTAL_BITS)
+> > >
+> > >  /*
+> > >   * ublk server can register data buffers for incoming I/O requests with a sparse
+> > >   * io_uring buffer table. The request buffer can then be used as the data buffer
+> > > @@ -406,10 +410,12 @@ struct ublksrv_ctrl_dev_info {
+> > >   *
+> > >   * ublk server has to check this flag if UBLK_AUTO_BUF_REG_FALLBACK is
+> > >   * passed in.
+> > >   */
+> > >  #define              UBLK_IO_F_NEED_REG_BUF          (1U << 17)
+> > > +/* Request has an integrity data buffer */
+> > > +#define              UBLK_IO_F_INTEGRITY             (1U << 18)
+> > >
+> > >  /*
+> > >   * io cmd is described by this structure, and stored in share memory, indexed
+> > >   * by request tag.
+> > >   *
+> > > @@ -598,10 +604,20 @@ struct ublk_param_segment {
+> > >       __u32   max_segment_size;
+> > >       __u16   max_segments;
+> > >       __u8    pad[2];
+> > >  };
+> > >
+> > > +struct ublk_param_integrity {
+> > > +     __u32   flags; /* LBMD_PI_CAP_* from linux/fs.h */
+> > > +     __u8    interval_exp;
+> > > +     __u8    metadata_size;
+> > > +     __u8    pi_offset;
+> > > +     __u8    csum_type; /* LBMD_PI_CSUM_* from linux/fs.h */
+> > > +     __u8    tag_size;
+> > > +     __u8    pad[7];
+> > > +};
+> > > +
+> >
+> > Just be curious, `pi_tuple_size` isn't defined, instead it is hard-coded in
+> > ublk_integrity_pi_tuple_size().
+> >
+> > However, both scsi and nvme sets `pi_tuple_size`, so it means that ublk PI
+> > supports one `subset` or scsi/nvme `pi_tuple_size` can be removed too?
+> 
+> blk_validate_integrity_limits() validates that pi_tuple_size matches
+> the expected PI size for each csum_type value. So it looks like these
+> fields are redundant. Yes, pi_tuple_size could probably be removed
+> from the scsi/nvme block drivers too. But maybe there's value in
+> having the drivers explicitly specify both values?
+
+Ok, got it, then this interface looks fine.
+
+For both scsi and nvme, `pi_tuple_size` is not read from hardware, and
+actually calculated from guard type.
+
+
+Thanks,
+Ming
+
