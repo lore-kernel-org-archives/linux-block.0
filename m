@@ -1,168 +1,181 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f51.google.com (mail-ua1-f51.google.com [209.85.222.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 336873502B9;
-	Tue, 23 Dec 2025 10:05:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31D1329392
+	for <linux-block@vger.kernel.org>; Tue, 23 Dec 2025 11:19:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766484327; cv=none; b=S/vnsC/s3yy3Z2ZX3hK7+Pi9KrlQc7uT2fs/P29V1h71u7IaL+WewiwUjR4h/JgdzqrVPdtD6Vv/DQoiEELxOFizQsmSKjKq7lfs6FKzFsbT3bNM14cvSImlqkyPrFPQBxseICnCdYzFvRQdLTDX0urU0i+cJ802gGJgO++djhY=
+	t=1766488758; cv=none; b=j8BC1c86uCM2dj7KT4H/9yFzqlYyR3fqCdn31jbtkmwEAYcoe80NDvrNgJviXM/dHTgtfLXqSrunZ9v41CzkL5R1OayqUSAR7A2rd9RB1rV9ehuuK35nkvsdJDenKE5YUebatZum9h6uPOfAIR3LwyxQ/m45kCBngR+qgnzyEwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766484327; c=relaxed/simple;
-	bh=ddQ4P35GJ65fx1phlIRY6geJ4UujdLlbIP6/qv+iUsg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VlZfbL6lvs0eOg+vzBYXAiJmWdOTIiI3aKYWYRsLks/I5U9b53+SPARM2HJW7A6Q8YcaLhUwG8tdlPmRM+0OoaSG0qOLgH3HsZ6pFjImFf7dRMdNNPiiVjSoAUKF8vY+pdNShpRHfbC9Hnmf3S5ChpxAuAYZHgBd5Fhq9mAJQZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hbt7u+zP; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1766488758; c=relaxed/simple;
+	bh=j0jCXcOiBNUkZSpElPGCQ9lhDRTu0eKqSVHgceQ6tkM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UaUcb77fXlZb8AwCrSSNlm4H0bxUBzB0A9LnrYQDyDwwmQ7ChbOpopaHqsQ/LcwZgwDkqqclI9B0H9Qtpt5PhL0fxHAgvBHDsrnMNoOO3EA8GE8Uny7b1U1jXj/sFS7UnxJ74StAFX4G3+5QVAfuSqWFAoKHeMS7VnI1J07NpTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=by/CIyNX; arc=none smtp.client-ip=209.85.222.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hbt7u+zP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D534AC16AAE;
-	Tue, 23 Dec 2025 10:05:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766484326;
-	bh=ddQ4P35GJ65fx1phlIRY6geJ4UujdLlbIP6/qv+iUsg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Hbt7u+zPupAG5jcdaNAkQeWzPuyZEzDlio6UJw5q1tiO22mNq8jF/561nJftqLBWI
-	 BBDyNn6EJvUX2nu6SHGjRlWF9WFWMp+tnzOEIMggWMp+vcIUrxVX4SlbASBS78c4lT
-	 wf54uSHev0oqJ/e5LQpJAIIEhYYEz09UXSV6zyjo5oI2J1v1azR/morInAFfgfauyt
-	 938sYYlKlcl45+F/BqxmW29FEUkDUTl2RdKHhYEKqyhvjuppg/FfuW35o53248+Rl0
-	 4ciI2PCC5+X4+iNeKjm0NeSiKsslmfHWW+KNR39gKNfYD6CkYXazC+l1Ae9VljszET
-	 +mOmTXFl/uQsg==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: Caleb Sander Mateos <csander@purestorage.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	Sasha Levin <sashal@kernel.org>,
-	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18] block: validate pi_offset integrity limit
-Date: Tue, 23 Dec 2025 05:05:10 -0500
-Message-ID: <20251223100518.2383364-6-sashal@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251223100518.2383364-1-sashal@kernel.org>
-References: <20251223100518.2383364-1-sashal@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="by/CIyNX"
+Received: by mail-ua1-f51.google.com with SMTP id a1e0cc1a2514c-94240659ceaso1369584241.3
+        for <linux-block@vger.kernel.org>; Tue, 23 Dec 2025 03:19:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1766488755; x=1767093555; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1eXdIVwHKelFkhb9Ztbf3aqTek3oIROcOvmh4s51PYk=;
+        b=by/CIyNXdvNjuCyTU2y16rOPsgIaUXbVl+msuWdpWYbkAGIsU0pATGacLtTTC/izjl
+         RnOjbvUnggLFcpp9X3PcMfE5dqkKsR7V1D2XQyT/a1pv1eADZ5dRB19iwA51GaTW4gx3
+         QiCp6f5RRqA20p7k5meHU90KaGIbLydSOI7gVGhqQ9zloWHxbWdLlYvDmNK3p2RLbPsI
+         OjeasXDTHNhMQbI2GuRqvsPZ3ysPlW5mKTHX2kTix4PY04TsXzqBmMxLjvWAPBNjH0U5
+         IVl30voatKQeY83OeaQs10d9oKZKyb7frvt/79hdHwp/SHTjdbIRr6rsgaTPPz0MatL+
+         zczw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766488755; x=1767093555;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=1eXdIVwHKelFkhb9Ztbf3aqTek3oIROcOvmh4s51PYk=;
+        b=xHp6UaQg0LAgc9MmMm0abG6LoMBAKuoZvs11eiEILjNA4cO2Kok33NDKK9nKskc26Y
+         B2eV2m/FswM5WRgwVCRi/aFy/vq8HAL6R5kL5szsfgdkxiJUTg4H2BMnMYkgCJDPkOzD
+         bUjjjxoi+NEUx033JyXU4JdBW2vwqcRAo4IHEYTQA6rSY0OOrZOMu133RdliQXnLDujO
+         aWOojEY6GByFL0mU/pz+PhtIUlH3EjeJxxVwHJVp2lD6sbeaYve4nvYhtuPdap4jGKqm
+         q0E5E5HQUNd9Qf9kFiXQ9reXuQluG6+VCaVW1XOAdmCxs3OHrVOUNIRmqehg45FsWLGB
+         zw/A==
+X-Forwarded-Encrypted: i=1; AJvYcCUseQsbW8ZH+Ex+/2+3tuUHH9E2uaQJuZDFO2OmoNcWWeHDn/0XpQF5hJyyDfXOHwlEb3Xaxh7Yr5m0UA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAeBUJhLtYkRspb6kEMGVi/sM16wA214RZvndvoDBhfmQz1qPc
+	mb34FZTT3ho96+t10GpeTAUdYq4TCXe/0Wn/e1KRnrzJGexGT1svsGbucnQb7SeaO3VxFWC1XsC
+	04odU5HYxq7DXqKSf1HGrpQczHZOLmjs=
+X-Gm-Gg: AY/fxX6Q0cg0aTk5QX5o6PB79DKVJ/KyygaWShkRlJ/Xgknc9yWsFQ2azIMl+8mI4gf
+	oxtffu1Vi01JA4AVxIYvqFOuHbQCktnsJgksgYs2ibuMHSVlt3v/dYGSvKuODpbsTzH0yvcpzwU
+	igWBv3x4UvWAkUS3vQKvbI4yVlG6VzU97FiIoqUIsbDMIE+obZoS3qEHB7gkUeLCyLkOgvxwVOV
+	HswDdiSNGPi+ZbPd7vDOynxM2h+JEis9ocWUhmxWRHFuIM0ekDIxRsgMSKfc1m7Djs8/Ux+uceF
+	LQPJXyB0MJXrzKoaz38U/6wrp913h/Zub/p/C2qLQXH0xK3C7tHSrQynIwI=
+X-Google-Smtp-Source: AGHT+IGqYfuMT+Zwl+tl6UsRAbxMzMDeJ7TsorbHaeD/KnO8N5c6jy8v1pEwVtaIgrR5qFcARBvMi/oUNg2AZwrR8DM=
+X-Received: by 2002:a05:6102:510d:b0:5de:31b1:2011 with SMTP id
+ ada2fe7eead31-5eb1a663371mr3330211137.17.1766488754627; Tue, 23 Dec 2025
+ 03:19:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.18.2
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20251221132402.27293-1-vitalifster@gmail.com> <aUh_--eKRKYOHzLz@kbusch-mbp>
+ <CAPqjcqqFN-Axot-5Oxc7pXybQW9gt-+G99NnW6cfC==x39WiAg@mail.gmail.com>
+ <CAPqjcqqi8uR=RWEpLEC+JiwOg0fzvWvwEOscj-XYHKLuPcnDBA@mail.gmail.com> <9304d77a-7439-4772-a549-5ebcf8bf371d@oracle.com>
+In-Reply-To: <9304d77a-7439-4772-a549-5ebcf8bf371d@oracle.com>
+From: Vitaliy Filippov <vitalifster@gmail.com>
+Date: Tue, 23 Dec 2025 14:19:02 +0300
+X-Gm-Features: AQt7F2paTDUpwAoVlsdj8zTzltEorO00TKp7nbh-r7QW6ssOVcfvD3jDLALkKPg
+Message-ID: <CAPqjcqrkR7rc+R2+__iH7LwvC=DM_p-a86W9-UdvOrMfzrtB4g@mail.gmail.com>
+Subject: Re: [PATCH v2] Do not require atomic writes to be power of 2 sized
+ and aligned on length boundary
+To: John Garry <john.g.garry@oracle.com>
+Cc: linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-nvme@lists.infradead.org, linux-fsdevel+subscribe@vger.kernel.org, 
+	Keith Busch <kbusch@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Caleb Sander Mateos <csander@purestorage.com>
+What does "just the kernel atomic write rules" mean?
+What's the idea of these restrictions?
+I want to use atomic writes, but without this restriction.
+And generally I don't think this restriction is needed for anyone at all.
+That's why I ask - can it be removed? Can I remove it in my patch?
 
-[ Upstream commit ccb8a3c08adf8121e2afb8e704f007ce99324d79 ]
-
-The PI tuple must be contained within the metadata value, so validate
-that pi_offset + pi_tuple_size <= metadata_size. This guards against
-block drivers that report invalid pi_offset values.
-
-Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
-
-LLM Generated explanations, may be completely bogus:
-
-## Summary
-
-### Problem Being Fixed
-The commit fixes an **incomplete bounds validation bug** in the block
-layer's integrity limit validation code. When the PI (Protection
-Information) tuple can be placed at a non-zero offset within the
-metadata buffer (a feature added in kernel 6.9), the validation check
-only verified that `pi_tuple_size <= metadata_size`, but **completely
-ignored the pi_offset**.
-
-This is mathematically incorrect. If:
-- `metadata_size = 8` bytes
-- `pi_tuple_size = 8` bytes
-- `pi_offset = 4` bytes
-
-The old check (`8 > 8`) passes, but the PI tuple would extend 4 bytes
-beyond the buffer boundary, potentially causing out-of-bounds memory
-access.
-
-### Why It Matters to Stable Users
-- **Data Integrity Risk**: Block layer integrity/PI is used in
-  enterprise storage environments (NVMe, SAS with T10 PI)
-- **Defense Against Buggy Drivers**: The fix prevents the kernel from
-  accepting invalid configurations from misbehaving block drivers
-- **Potential for Memory Corruption**: Without this validation,
-  accessing PI data could read/write beyond buffer bounds
-
-### Stable Kernel Criteria Assessment
-
-| Criterion | Met? | Notes |
-|-----------|------|-------|
-| Obviously correct | ✅ | Mathematical correctness: offset + size must
-fit in buffer |
-| Fixes real bug | ✅ | Incomplete bounds check could allow invalid
-configurations |
-| Small scope | ✅ | 4 lines changed, single file |
-| No new features | ✅ | Only strengthens existing validation |
-| No API changes | ✅ | No user-visible changes |
-
-### Risk vs Benefit
-
-**Risk**: Extremely low
-- The change only makes validation stricter
-- Can only reject configurations that were previously (incorrectly)
-  accepted
-- Any configuration rejected by the new check was already semantically
-  invalid and potentially dangerous
-
-**Benefit**: Moderate to high
-- Prevents kernel from accepting invalid integrity configurations
-- Guards against memory corruption in PI-enabled storage stacks
-- Important for enterprise environments using DIF/PI
-
-### Concerns
-
-**Applicability**: The `pi_offset` field was introduced in kernel 6.9
-(commit 60d21aac52e2). This fix is only applicable to stable kernels
-6.9.y and later.
-
-**Dependencies**: None - this is a standalone validation fix.
-
-### Quality Indicators
-- Reviewed-by: Christoph Hellwig (highly respected kernel developer)
-- Signed-off-by: Jens Axboe (block layer maintainer)
-- Part of a series of validation improvements (similar commit for
-  `interval_exp`)
-- No follow-up fixes needed
-
-The fix is small, surgical, obviously correct, and addresses a real
-validation gap that could lead to memory safety issues. It meets all
-stable kernel criteria.
-
-**YES**
-
- block/blk-settings.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
-
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index d74b13ec8e54..f2c1940fe6f1 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -148,10 +148,9 @@ static int blk_validate_integrity_limits(struct queue_limits *lim)
- 		return -EINVAL;
- 	}
- 
--	if (bi->pi_tuple_size > bi->metadata_size) {
--		pr_warn("pi_tuple_size (%u) exceeds metadata_size (%u)\n",
--			 bi->pi_tuple_size,
--			 bi->metadata_size);
-+	if (bi->pi_offset + bi->pi_tuple_size > bi->metadata_size) {
-+		pr_warn("pi_offset (%u) + pi_tuple_size (%u) exceeds metadata_size (%u)\n",
-+			bi->pi_offset, bi->pi_tuple_size, bi->metadata_size);
- 		return -EINVAL;
- 	}
- 
--- 
-2.51.0
-
+On Tue, Dec 23, 2025 at 12:26=E2=80=AFPM John Garry <john.g.garry@oracle.co=
+m> wrote:
+>
+> On 22/12/2025 13:28, Vitaliy Filippov wrote:
+> > Hi linux-fsdevel,
+> > I recently discovered that Linux incorrectly requires all atomic
+> > writes to have 2^N length and to be aligned on the length boundary.
+> > This requirement contradicts NVMe specification which doesn't require
+> > such alignment and length and thus highly restricts usage of atomic
+> > writes with NVMe disks which support it (Micron and Kioxia).
+>
+> All these alignment and size rules are specific to using RWF_ATOMIC. You
+> don't have to use RWF_ATOMIC if you don't want to - as you prob know,
+> atomic writes are implicit on NVMe.
+>
+> > NVMe specification has its own atomic write restrictions - AWUPF and
+> > NABSPF/NABO, but both are already checked by the nvme subsystem.
+> > The 2^N restriction comes from generic_atomic_write_valid().
+> > I submitted a patch which removes this restriction to linux-block and
+> > linux-nvme. Sorry if these maillists weren't the right place to send
+> > it to, it's my first patch :).
+> > But the function is currently used in 3 places: block/fops.c,
+> > fs/ext4/file.c and fs/xfs/xfs_file.c.
+> > Can you tell me if ext4 and xfs really want atomic writes to be 2^N
+> > sized and length-aligned?
+>
+> As above, this is just the kernel atomic write rules to support using
+> different storage technologies.
+>
+> >  From looking at the code I'd say they don't really require it?
+> > Can you approve my patch if I'm right? Please :-)
+> >
+> > On Mon, Dec 22, 2025 at 12:54=E2=80=AFPM Vitaliy Filippov <vitalifster@=
+gmail.com> wrote:
+> >>
+> >> Hi! Thanks a lot for your reply! This is actually my first patch ever
+> >> so please don't blame me for not following some standards, I'll try to
+> >> resubmit it correctly.
+> >>
+> >> Regarding the rest:
+> >>
+> >> 1) NVMe atomic boundaries seem to already be checked in
+> >> nvme_valid_atomic_write().
+> >>
+> >> 2) What's atomic_write_hw_unit_max? As I understand, Linux also
+> >> already checks it, at least
+> >> /sys/block/nvme**/queue/atomic_write_max_bytes is already limited by
+> >> max_hw_sectors_kb.
+> >>
+> >> 3) Yes, I've of course seen that this function is also used by ext4
+> >> and xfs, but I don't understand the motivation behind the 2^n
+> >> requirement. I suppose file systems may fragment the write according
+> >> to currently allocated extents for example, but I don't see how issues
+> >> coming from this can be fixed by requiring writes to be 2^n.
+> >>
+> >> But I understand that just removing the check may break something if
+> >> somebody relies on them. What do you think about removing the
+> >> requirement only for NVMe or only for block devices then? I see 3 ways
+> >> to do it:
+> >> a) split generic_atomic_write_valid() into two functions - first for
+> >> all types of inodes and second only for file systems.
+> >> b) remove generic_atomic_write_valid() from block device checks at all=
+.
+> >> c) change generic_atomic_write_valid() just like in my original patch
+> >> but copy original checks into other places where it's used (ext4 and
+> >> xfs).
+> >>
+> >> Which way do you think would be the best?
+> >>
+> >> On Mon, Dec 22, 2025 at 2:17=E2=80=AFAM Keith Busch <kbusch@kernel.org=
+> wrote:
+> >>>
+> >>> On Sun, Dec 21, 2025 at 04:24:02PM +0300, Vitaliy Filippov wrote:
+> >>>> It contradicts NVMe specification where alignment is only required w=
+hen atomic
+> >>>> write boundary (NABSPF/NABO) is set and highly limits usage of NVMe =
+atomic writes
+> >>>
+> >>> Commit header is missing the "fs:" prefix, and the commit log should
+> >>> wrap at 72 characters.
+> >>>
+> >>> On the techincal side, this is a generic function used by multiple
+> >>> protocols, so you can't just appeal to NVMe to justify removing the
+> >>> checks.
+> >>>
+> >>> NVMe still has atomic boundaries where straddling it fails to be an
+> >>> atomic operation. Instead of removing the checks, you'd have to repla=
+ce
+> >>> it with a more costly operation if you really want to support more
+> >>> arbitrary write lengths and offsets. And if you do manage to remove t=
+he
+> >>> power of two requirement, then the queue limit for nvme's
+> >>> atomic_write_hw_unit_max isn't correct anymore.
+> >
+>
