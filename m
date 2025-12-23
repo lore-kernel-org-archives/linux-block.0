@@ -1,45 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B51B2C11C2
-	for <linux-block@vger.kernel.org>; Tue, 23 Dec 2025 03:27:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB47E2D63F8
+	for <linux-block@vger.kernel.org>; Tue, 23 Dec 2025 03:28:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766460477; cv=none; b=R8G6PI1YrxTtbAH3Gbq5vbtAHeiz2Kecc7jbIgF3EyD1Hljul1WpjHQTlEvCldpTDM4tUaNppfpzJqmvge3GKW43jURIUTWdFnglOu2Pd1qZwUaNFW1tEWirDF85SKYz0q2cHlsiTXc1IPconUtG4eTkKd/td7JvNNBHwkq7f08=
+	t=1766460483; cv=none; b=uEZD0gb8ovv3GbOwe1hyb9AdusdcewPrGkp9m/NX5JyW3QaGWZrkrHpdAbFWnVGdbbbLP78VT5o4Q/GAICbo/Vu/IGfI8XTiBX151hWoxU+EtmiCvnAhXFHL+6sYq9QxrcxtUQLPUv6OEmLz+Jzm9g1IJyrYNEW84TP/4w1dUpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766460477; c=relaxed/simple;
-	bh=UvIYBswDb7OAJBx+aOfTLluxRNbZ5vfhg84S9W89lqg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Tb1Wmhia7rmwsmv/yKctsy/qOIiKRbGIz64flTX70HpZXW33mrRLdf2aXLDRmcopneeXNAZZpP/cZ9ZMpxiry38Gfp0ha9ouTs9FCQPX6/4G48RM5+ofwnmD7TwFwTZrCKgrz0VT+05IOoz8zEpBBv2wH8wpaX5awD6mXJmZRXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=erhGbqBS; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1766460483; c=relaxed/simple;
+	bh=5WN9U0tgJXYFZ1mcGHGIr+Vg8uWAYXMgd1oIF8CHoyM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=DX8ovlP4QO8LKRxh1YlVX3+WBtz+5ClOpPWdNEBbWNhgbJOvk+RmwGV8y4VFB88osBpEVGlPCKPWmZvYbZ/awTixYqroGV4QsZ900Claac2woecQN9vpdLnm3EYKqffMJMFFEDmvulo/z3vRtOmh4IuN6pwdNvdHRgBKgWAAL8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ek6dDWT3; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="erhGbqBS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ek6dDWT3"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1766460474;
+	s=mimecast20190719; t=1766460480;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=cEtPeuUX9J60EEycGpORZo+SSxAZ7l2BWcakN9qYZ38=;
-	b=erhGbqBSAiYzIluXM0ksngeQ4gZOaQ53R0IJjea2lTsGUAVpe652lJF/4rouhIPFSnJoBg
-	CfzAgCB+5z/4rw7WRVWgM7941kLSmtHaK3RnUoptS5bNQgDEsSUODZyVU9fJYAzcRwuF+2
-	3F01sE5L1IJR5oF0le/Jy7Q4/vTwyjQ=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rUaD4Fbx5QsNG5G8LMgasnGB6AuL24jOfncIFAjOMgk=;
+	b=Ek6dDWT37kIzOIubYjf8xcKB/T9GukIZGCQ7BFnEuwtkeVbysQRsF0AcB/4gYw+jxMnLfi
+	SnD6y0DnqqnHJPPLue2sHMQGVn+52ySg2DFiL7WZnZwE5PJ6y7WKOxXXOXEb+UqUKYwMgD
+	z3ElYXrfYaO1eFWkn7noszhPHzWbVYE=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-669-K_05Rn1pOZeSbm4CXniD8Q-1; Mon,
- 22 Dec 2025 22:27:52 -0500
-X-MC-Unique: K_05Rn1pOZeSbm4CXniD8Q-1
-X-Mimecast-MFC-AGG-ID: K_05Rn1pOZeSbm4CXniD8Q_1766460471
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-191-mnsHWay4M1Sotv6z-Vy50g-1; Mon,
+ 22 Dec 2025 22:27:56 -0500
+X-MC-Unique: mnsHWay4M1Sotv6z-Vy50g-1
+X-Mimecast-MFC-AGG-ID: mnsHWay4M1Sotv6z-Vy50g_1766460475
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8B2CF1800378;
-	Tue, 23 Dec 2025 03:27:51 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A51D81800358;
+	Tue, 23 Dec 2025 03:27:55 +0000 (UTC)
 Received: from localhost (unknown [10.72.116.97])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 98BE530001A2;
-	Tue, 23 Dec 2025 03:27:50 +0000 (UTC)
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A7CA51800665;
+	Tue, 23 Dec 2025 03:27:53 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
@@ -47,9 +49,11 @@ Cc: Caleb Sander Mateos <csander@purestorage.com>,
 	Uday Shankar <ushankar@purestorage.com>,
 	Yoav Cohen <yoav@nvidia.com>,
 	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 0/3] ublk: scan partition in async way
-Date: Tue, 23 Dec 2025 11:27:39 +0800
-Message-ID: <20251223032744.1927434-1-ming.lei@redhat.com>
+Subject: [PATCH V2 1/3] ublk: scan partition in async way
+Date: Tue, 23 Dec 2025 11:27:40 +0800
+Message-ID: <20251223032744.1927434-2-ming.lei@redhat.com>
+In-Reply-To: <20251223032744.1927434-1-ming.lei@redhat.com>
+References: <20251223032744.1927434-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -57,35 +61,113 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Hi Guys,
+Implement async partition scan to avoid IO hang when reading partition
+tables. Similar to nvme_partition_scan_work(), partition scanning is
+deferred to a work queue to prevent deadlocks.
 
-The 1st patch scans partition in async way, so IO hang during partition
-scan can be covered by current error handling code.
+When partition scan happens synchronously during add_disk(), IO errors
+can cause the partition scan to wait while holding ub->mutex, which
+can deadlock with other operations that need the mutex.
 
-The 2nd patch adds one test for verifying if hang from scanning partition
-can be avoided.
+Changes:
+- Add partition_scan_work to ublk_device structure
+- Implement ublk_partition_scan_work() to perform async scan
+- Always suppress sync partition scan during add_disk()
+- Schedule async work after add_disk() for trusted daemons
+- Add flush_work() in ublk_stop_dev() before grabbing ub->mutex
 
-The last patch fixes one selftest/ublk rebuild depending issue.
+Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
+Reported-by: Yoav Cohen <yoav@nvidia.com>
+Closes: https://lore.kernel.org/linux-block/DM4PR12MB63280C5637917C071C2F0D65A9A8A@DM4PR12MB6328.namprd12.prod.outlook.com/
+Fixes: 71f28f3136af ("ublk_drv: add io_uring based userspace block driver")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/block/ublk_drv.c | 35 ++++++++++++++++++++++++++++++++---
+ 1 file changed, 32 insertions(+), 3 deletions(-)
 
-V2:
-	- fix one comment typo in 1/3(Caleb Sander Mateos)
-	- simplify test code: 2/3
-	- fix `LOCAL_HDRS` usage in patch 3/3
-
-Ming Lei (3):
-  ublk: scan partition in async way
-  selftests/ublk: add test for async partition scan
-  selftests/ublk: fix Makefile to rebuild on header changes
-
- drivers/block/ublk_drv.c                      | 35 +++++++++-
- tools/testing/selftests/ublk/Makefile         |  5 +-
- tools/testing/selftests/ublk/test_common.sh   | 16 +++--
- .../testing/selftests/ublk/test_generic_15.sh | 68 +++++++++++++++++++
- 4 files changed, 115 insertions(+), 9 deletions(-)
- create mode 100755 tools/testing/selftests/ublk/test_generic_15.sh
-
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 49c208457198..837fedb02e0d 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -237,6 +237,7 @@ struct ublk_device {
+ 	bool canceling;
+ 	pid_t 	ublksrv_tgid;
+ 	struct delayed_work	exit_work;
++	struct work_struct	partition_scan_work;
+ 
+ 	struct ublk_queue       *queues[];
+ };
+@@ -254,6 +255,20 @@ static inline struct request *__ublk_check_and_get_req(struct ublk_device *ub,
+ 		u16 q_id, u16 tag, struct ublk_io *io, size_t offset);
+ static inline unsigned int ublk_req_build_flags(struct request *req);
+ 
++static void ublk_partition_scan_work(struct work_struct *work)
++{
++	struct ublk_device *ub =
++		container_of(work, struct ublk_device, partition_scan_work);
++
++	if (WARN_ON_ONCE(!test_and_clear_bit(GD_SUPPRESS_PART_SCAN,
++					     &ub->ub_disk->state)))
++		return;
++
++	mutex_lock(&ub->ub_disk->open_mutex);
++	bdev_disk_changed(ub->ub_disk, false);
++	mutex_unlock(&ub->ub_disk->open_mutex);
++}
++
+ static inline struct ublksrv_io_desc *
+ ublk_get_iod(const struct ublk_queue *ubq, unsigned tag)
+ {
+@@ -2026,6 +2041,7 @@ static void ublk_stop_dev(struct ublk_device *ub)
+ 	mutex_lock(&ub->mutex);
+ 	ublk_stop_dev_unlocked(ub);
+ 	mutex_unlock(&ub->mutex);
++	flush_work(&ub->partition_scan_work);
+ 	ublk_cancel_dev(ub);
+ }
+ 
+@@ -2954,9 +2970,17 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
+ 
+ 	ublk_apply_params(ub);
+ 
+-	/* don't probe partitions if any daemon task is un-trusted */
+-	if (ub->unprivileged_daemons)
+-		set_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
++	/*
++	 * Suppress partition scan to avoid potential IO hang.
++	 *
++	 * If ublk server error occurs during partition scan, the IO may
++	 * wait while holding ub->mutex, which can deadlock with other
++	 * operations that need the mutex. Defer partition scan to async
++	 * work.
++	 * For unprivileged daemons, keep GD_SUPPRESS_PART_SCAN set
++	 * permanently.
++	 */
++	set_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
+ 
+ 	ublk_get_device(ub);
+ 	ub->dev_info.state = UBLK_S_DEV_LIVE;
+@@ -2973,6 +2997,10 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
+ 
+ 	set_bit(UB_STATE_USED, &ub->state);
+ 
++	/* Schedule async partition scan for trusted daemons */
++	if (!ub->unprivileged_daemons)
++		schedule_work(&ub->partition_scan_work);
++
+ out_put_cdev:
+ 	if (ret) {
+ 		ublk_detach_disk(ub);
+@@ -3138,6 +3166,7 @@ static int ublk_ctrl_add_dev(const struct ublksrv_ctrl_cmd *header)
+ 	mutex_init(&ub->mutex);
+ 	spin_lock_init(&ub->lock);
+ 	mutex_init(&ub->cancel_mutex);
++	INIT_WORK(&ub->partition_scan_work, ublk_partition_scan_work);
+ 
+ 	ret = ublk_alloc_dev_number(ub, header->dev_id);
+ 	if (ret < 0)
 -- 
 2.47.0
 
