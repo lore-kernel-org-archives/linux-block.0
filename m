@@ -1,209 +1,100 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41E63267B05;
-	Tue, 23 Dec 2025 15:17:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A007F16DEB0
+	for <linux-block@vger.kernel.org>; Tue, 23 Dec 2025 20:03:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766503079; cv=none; b=CIosTCerC0lkl5M7eTBpxjee5ZoY/VrKdM7co9sEhwT7es16+iPA9ztfBt3DEYCTp8ABvykLYFIMhA0W1Vge2Q0DD8AK+3dw60smSDB/khSUTlk67WkWy4zZLll3s6lNcqSjdk72rNP4UYYmVub0yrHoQXTTJnF5Vjc9C7vvVh4=
+	t=1766520229; cv=none; b=hoMMMlYgYEJgBL+7I+JO/p1cjnEwrSMnFzwVkPlYOHZcefM6NCus23aUUyYMQ+Na2EmLw9OpKNb3lEQwum8zwtGz+1lyPht2L8WsXY7wQYTkqqd+EUhwfkUELYPEDwe6g6oWwC3OTYN0zAGEIEPX7y4fLh+SlKJBSBqSA45QCYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766503079; c=relaxed/simple;
-	bh=xHMvPjpKyxjB5+zEUkjOy7aEQZr7/WEBY7QJCb1Hs8U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aYLhlUluZYh0eXhoparq8da2VSzA8CUCx9fZw+azcpyCrbzvZvco5ZWCtbozPauP7z0DWNVRMY6rxkuz1eJrX1OKvq+o/algB45CptW404VHYVh9xnWVWihSVnSNEbJ/sW/vAMAuFngHt56msCjZK662nsfawc+myRhoWNpubqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qWsF7jIJ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1766520229; c=relaxed/simple;
+	bh=EXQmZ+ozp92HfDFtU0evQ90fcQtPfdOWiSV8UAQt5MI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=L5xWOB1LL715Ys0uFsxgpedErB8rzJOt5mmmUe+4rKbaEc4nlxIfzHpcNLLkJEibcsmgbz8F9ehErw4H2gZ2aJPT6OmM7rVy44Q60TNODkTEMqqtBqEhqW01lXIGBerHYq5oBPWvLWWAI4QSowekgdxCVvMNtnG6+kQGpM8hQLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=MLMwxp/o; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qWsF7jIJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C86DC113D0;
-	Tue, 23 Dec 2025 15:17:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766503078;
-	bh=xHMvPjpKyxjB5+zEUkjOy7aEQZr7/WEBY7QJCb1Hs8U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qWsF7jIJOslT8s1S7u/8bjnxl+YQ/1ByeQ1ewt/+rY/9WYG7O1ARU2wUEC0MpvUkt
-	 nJ29+l60fflZZupPoGJY+iB2n0drXAFhG9mh6pnuMBJb+Q3dWKObeiO7STxE+Fl2lq
-	 /KJl7wC7I4QxiKm6M1Zpl1TE/4K8VCzBQpRQArSOLRIrhIRdNuylIsV4o8rCr8jETr
-	 eubw6Onv5VRePw33jttvcPvJiaJCMvHFthEnaBXxiGC8xSNdWgKZcgBD+Fs1McLBoa
-	 6Zqxp/0BvGVhgeE0KZ5Sh8GsmQJZ+tbuC+UMA/z97aVCaWhHitaOxuz7S+m+nR/Dcu
-	 HtgrcvRm/JsRw==
-Date: Tue, 23 Dec 2025 16:17:55 +0100
-From: Frederic Weisbecker <frederic@kernel.org>
-To: Chen Ridong <chenridong@huaweicloud.com>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Gabriele Monaco <gmonaco@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Marco Crivellari <marco.crivellari@suse.com>,
-	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
-	"Rafael J . Wysocki" <rafael@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
-	Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
-	linux-mm@kvack.org, linux-pci@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 17/31] cpuset: Propagate cpuset isolation update to
- workqueue through housekeeping
-Message-ID: <aUqyo58-CDReEm10@localhost.localdomain>
-References: <20251105210348.35256-1-frederic@kernel.org>
- <20251105210348.35256-18-frederic@kernel.org>
- <e0b3f050-ef2e-478e-9e22-5f800b86ee42@huaweicloud.com>
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="MLMwxp/o"
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-7c32c6eb79dso350209b3a.1
+        for <linux-block@vger.kernel.org>; Tue, 23 Dec 2025 12:03:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1766520227; x=1767125027; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EXQmZ+ozp92HfDFtU0evQ90fcQtPfdOWiSV8UAQt5MI=;
+        b=MLMwxp/osmLovVn0YNNEHO3LMWMGDo0dtwQr52ZvP3Jp/TwraAtvUVn1+WNm33dwBD
+         ypvlTtmVLPck4I7Wsm6dAg1l7AudN1AgODexfoVQhAeG5vVoD74pbuQFt0KQvY95rbwR
+         uWIMiCSrBkNJvUXttsnHoYGwzlzCknC462jOTHCCfu7EIYjGeyiOR22Ozs3LDjqfVNeO
+         3pnCGHDElWx1OD8N3VkAs0ehWsh77ausLN/+M/bc22evdgqyalgcIhMIBT7OetVecYTx
+         QOg8vhMi/S1dSyJxpsxruDgks7oWJa5sY0L1WgYVXOc8i1g19jDActBIUgurTd//ScrZ
+         1Sow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766520227; x=1767125027;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=EXQmZ+ozp92HfDFtU0evQ90fcQtPfdOWiSV8UAQt5MI=;
+        b=LtJrcoYLeO8w1VhGkRhIjc/qsmHb1B6rqX0FGN2lPky06MAmODXcQ3N2SJcmfhuhob
+         sdn1USg+jHQde6GpQ8zDRNZ3DQluyg/wxniMjOF6c54JriQ97Xdc23RMs5mkjTPEEpWi
+         POD7VZpFbWeAKZ0o/0eia3gbXcSF+uxL9EmiSkQmje2d63SlqBNeY+yfxJiO97Vfp6jZ
+         2btJv3B2JWopy8xX6fPfDxZMqs/fH3x8/HmiUuZKQn8DSK161SXLZaDb9QyJS8W3DyWy
+         AOHdn40dXNh18sBrJTMK5N62jiSy//L/upDyrocCYh7LDiknAxQGA8vxCMZg4fhbL9/H
+         bZOA==
+X-Forwarded-Encrypted: i=1; AJvYcCW2aJf4sDRhYi6vBtM8/KRCGC4DKjoh7W/aS3hlTE5b+NYWG2VjXcWvDUo++N0zXi2dFppL90ZC5EQ6JQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9ehanV34AkiF89a5/L4N5jIPaMGpiIuVBG55wl40ef/XC4zqP
+	QGeSFDHPjyPYcZItB/+qrs1TrrdwTq+n66wSdHWW4rGuTgXPOmQP56Dc1Ui5x8I8hyBhlbJ89xz
+	nhQntIVj9dlbqHTcumiAWq20dPMKZXY+kMNYS7rHklw==
+X-Gm-Gg: AY/fxX4ieVUENVuqsOno7+ioUEQeB0MB/WM9r9sBnAurcOPmHkskbpBY4RXtZuPxQFF
+	HYzmzJonkECpcbIfYO9R64x+JOQA8OfgWfDsU6krhwqBprxGnDAUEGhpXFJdK6dxZ3+geRh+nct
+	W6R9z/2n0p9b6qSltmnMR+kVELa7+g1H1HoiXy1MTkr++8BQEOlaiA0+tkc1m9L03xbe4A1rnoV
+	ItpHc5vf74bRQn5x/DdRM+2gm45e7EaTbJQTyfdDPEVHJjqkQj5cexz+CprLDGmqXz8K4M=
+X-Google-Smtp-Source: AGHT+IGEI2UFmVAB4gllSBCn35IWH7aIKwKwDq37q/Gg/8+joJI9uLy9sV66UHOMqlihr3VacCQHuLlnSQLFMc7ZjsI=
+X-Received: by 2002:a05:7022:698a:b0:11e:3e9:3ea4 with SMTP id
+ a92af1059eb24-121722ec1bbmr10272339c88.6.1766520226788; Tue, 23 Dec 2025
+ 12:03:46 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <e0b3f050-ef2e-478e-9e22-5f800b86ee42@huaweicloud.com>
+References: <20251220095322.1527664-1-ming.lei@redhat.com> <20251220095322.1527664-2-ming.lei@redhat.com>
+ <CADUfDZprek_M_vkru277HK+h7BuNNv1N+2tFX7zqvGj8chN36g@mail.gmail.com> <aUn_PVBQ7dtcV_-l@fedora>
+In-Reply-To: <aUn_PVBQ7dtcV_-l@fedora>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Tue, 23 Dec 2025 15:03:34 -0500
+X-Gm-Features: AQt7F2r9LaRDNvbGZXYzIITBheOEsP1_Fp83pg5yHWOiPm7yaPAaLXCI_g3bweo
+Message-ID: <CADUfDZogz4ZdVQw5O5stBuheyX-D4CfdZ8XoGqiXBqdp1oQHQA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] ublk: add UBLK_F_NO_AUTO_PART_SCAN feature flag
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	Uday Shankar <ushankar@purestorage.com>, Yoav Cohen <yoav@nvidia.com>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Le Thu, Nov 06, 2025 at 08:55:42AM +0800, Chen Ridong a écrit :
-> 
-> 
-> On 2025/11/6 5:03, Frederic Weisbecker wrote:
-> > Until now, cpuset would propagate isolated partition changes to
-> > workqueues so that unbound workers get properly reaffined.
-> > 
-> > Since housekeeping now centralizes, synchronize and propagates isolation
-> > cpumask changes, perform the work from that subsystem for consolidation
-> > and consistency purposes.
-> > 
-> > For simplification purpose, the target function is adapted to take the
-> > new housekeeping mask instead of the isolated mask.
-> > 
-> > Suggested-by: Tejun Heo <tj@kernel.org>
-> > Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
-> > ---
-> >  include/linux/workqueue.h |  2 +-
-> >  init/Kconfig              |  1 +
-> >  kernel/cgroup/cpuset.c    | 14 ++++++--------
-> >  kernel/sched/isolation.c  |  4 +++-
-> >  kernel/workqueue.c        | 17 ++++++++++-------
-> >  5 files changed, 21 insertions(+), 17 deletions(-)
-> > 
-> > diff --git a/include/linux/workqueue.h b/include/linux/workqueue.h
-> > index dabc351cc127..a4749f56398f 100644
-> > --- a/include/linux/workqueue.h
-> > +++ b/include/linux/workqueue.h
-> > @@ -588,7 +588,7 @@ struct workqueue_attrs *alloc_workqueue_attrs_noprof(void);
-> >  void free_workqueue_attrs(struct workqueue_attrs *attrs);
-> >  int apply_workqueue_attrs(struct workqueue_struct *wq,
-> >  			  const struct workqueue_attrs *attrs);
-> > -extern int workqueue_unbound_exclude_cpumask(cpumask_var_t cpumask);
-> > +extern int workqueue_unbound_housekeeping_update(const struct cpumask *hk);
-> >  
-> >  extern bool queue_work_on(int cpu, struct workqueue_struct *wq,
-> >  			struct work_struct *work);
-> > diff --git a/init/Kconfig b/init/Kconfig
-> > index cab3ad28ca49..a1b3a3b66bfc 100644
-> > --- a/init/Kconfig
-> > +++ b/init/Kconfig
-> > @@ -1247,6 +1247,7 @@ config CPUSETS
-> >  	bool "Cpuset controller"
-> >  	depends on SMP
-> >  	select UNION_FIND
-> > +	select CPU_ISOLATION
-> >  	help
-> >  	  This option will let you create and manage CPUSETs which
-> >  	  allow dynamically partitioning a system into sets of CPUs and
-> > diff --git a/kernel/cgroup/cpuset.c b/kernel/cgroup/cpuset.c
-> > index b04a4242f2fa..ea102e4695a5 100644
-> > --- a/kernel/cgroup/cpuset.c
-> > +++ b/kernel/cgroup/cpuset.c
-> > @@ -1392,7 +1392,7 @@ static bool partition_xcpus_del(int old_prs, struct cpuset *parent,
-> >  	return isolcpus_updated;
-> >  }
-> >  
-> > -static void update_unbound_workqueue_cpumask(bool isolcpus_updated)
-> > +static void update_housekeeping_cpumask(bool isolcpus_updated)
-> >  {
-> >  	int ret;
-> >  
-> > @@ -1401,8 +1401,6 @@ static void update_unbound_workqueue_cpumask(bool isolcpus_updated)
-> >  	if (!isolcpus_updated)
-> >  		return;
-> >  
-> > -	ret = workqueue_unbound_exclude_cpumask(isolated_cpus);
-> > -	WARN_ON_ONCE(ret < 0);
-> >  	ret = housekeeping_update(isolated_cpus, HK_TYPE_DOMAIN);
-> >  	WARN_ON_ONCE(ret < 0);
-> >  }
-> > @@ -1558,7 +1556,7 @@ static int remote_partition_enable(struct cpuset *cs, int new_prs,
-> >  	list_add(&cs->remote_sibling, &remote_children);
-> >  	cpumask_copy(cs->effective_xcpus, tmp->new_cpus);
-> >  	spin_unlock_irq(&callback_lock);
-> > -	update_unbound_workqueue_cpumask(isolcpus_updated);
-> > +	update_housekeeping_cpumask(isolcpus_updated);
-> >  	cpuset_force_rebuild();
-> >  	cs->prs_err = 0;
-> >  
-> > @@ -1599,7 +1597,7 @@ static void remote_partition_disable(struct cpuset *cs, struct tmpmasks *tmp)
-> >  	compute_excpus(cs, cs->effective_xcpus);
-> >  	reset_partition_data(cs);
-> >  	spin_unlock_irq(&callback_lock);
-> > -	update_unbound_workqueue_cpumask(isolcpus_updated);
-> > +	update_housekeeping_cpumask(isolcpus_updated);
-> >  	cpuset_force_rebuild();
-> >  
-> >  	/*
-> > @@ -1668,7 +1666,7 @@ static void remote_cpus_update(struct cpuset *cs, struct cpumask *xcpus,
-> >  	if (xcpus)
-> >  		cpumask_copy(cs->exclusive_cpus, xcpus);
-> >  	spin_unlock_irq(&callback_lock);
-> > -	update_unbound_workqueue_cpumask(isolcpus_updated);
-> > +	update_housekeeping_cpumask(isolcpus_updated);
-> >  	if (adding || deleting)
-> >  		cpuset_force_rebuild();
-> >  
-> > @@ -2027,7 +2025,7 @@ static int update_parent_effective_cpumask(struct cpuset *cs, int cmd,
-> >  		WARN_ON_ONCE(parent->nr_subparts < 0);
-> >  	}
-> >  	spin_unlock_irq(&callback_lock);
-> > -	update_unbound_workqueue_cpumask(isolcpus_updated);
-> > +	update_housekeeping_cpumask(isolcpus_updated);
-> >  
-> >  	if ((old_prs != new_prs) && (cmd == partcmd_update))
-> >  		update_partition_exclusive_flag(cs, new_prs);
-> > @@ -3047,7 +3045,7 @@ static int update_prstate(struct cpuset *cs, int new_prs)
-> >  	else if (isolcpus_updated)
-> >  		isolated_cpus_update(old_prs, new_prs, cs->effective_xcpus);
-> >  	spin_unlock_irq(&callback_lock);
-> > -	update_unbound_workqueue_cpumask(isolcpus_updated);
-> > +	update_housekeeping_cpumask(isolcpus_updated);
-> >  
-> 
-> The patch [1] has been applied to cgroup/for-next, you may have to adapt it.
-> 
-> [1]:
-> https://lore.kernel.org/cgroups/20251105043848.382703-6-longman@redhat.com/T/#u
+On Mon, Dec 22, 2025 at 9:32=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrot=
+e:
+>
+> On Mon, Dec 22, 2025 at 12:11:03PM -0500, Caleb Sander Mateos wrote:
+> > On Sat, Dec 20, 2025 at 4:53=E2=80=AFAM Ming Lei <ming.lei@redhat.com> =
+wrote:
+> > >
+> > > Add a new feature flag UBLK_F_NO_AUTO_PART_SCAN to allow users to sup=
+press
+> > > automatic partition scanning when starting a ublk device.
+> >
+> > Is this approach superseded by your patch series "ublk: scan partition
+> > in async way", or are you expecting both to coexist?
+>
+> This one probably is useful too, but it should belong to v6.20 because
+> "ublk: scan partition in async way" can fix the issue now, and backport
+> to stable isn't needed any more.
 
-Right, I just waited for -rc1 to pop-up before doing that.
-v5 will follow shortly.
+Sure, I think it could be useful for other ublk servers too that know
+the block devices they expose won't be partitioned or want to more
+finely control when/whether the partition scan happens.
 
-Thanks.
-
-> 
-> -- 
-> Best regards,
-> Ridong
-> 
-
--- 
-Frederic Weisbecker
-SUSE Labs
+Best,
+Caleb
