@@ -1,64 +1,64 @@
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 528522D5C91
-	for <linux-block@vger.kernel.org>; Tue, 23 Dec 2025 05:30:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A8412EC0A7
+	for <linux-block@vger.kernel.org>; Tue, 23 Dec 2025 06:34:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766467810; cv=none; b=RkYlMTKEqkYMGiETyKOZ7G0++SmchDNyA/OmclqHeHa4sOtOawyKqArT26e4azZlLzouCLFcNxvRqcj0ENChuMhZdyTvMCEbItj/F3bHlk83aaJBov9ZaOC7Gx/I6ltep8f8ah3EWrFWgZkQu6PnxWeop8Ya9JZbXU4126mE30A=
+	t=1766471647; cv=none; b=dlKLpVRJ0Uq8MP00B4hjeHBuqj5CsGXaM5SgSDUuqklqVLqj3HeJlybAsZcdIp7SsXiFKAyb1nVfwFEA5BL7eK0EL/A7rx9nozDhq13QEJgb2CYWAuLQybjjXEZh6+DWVVrfW+Fd55nEjpLLzm4cbMRGxBONhV/Wxi1LPPxxeCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766467810; c=relaxed/simple;
-	bh=LeHgaTCg3sZgaNtwPEbjvh+7JlJOUXsNXjaOCgEgLN4=;
+	s=arc-20240116; t=1766471647; c=relaxed/simple;
+	bh=zQMCxWwv+vy2hbOmutXkA1vn5ZNuVRvD6yhOueNtNZU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QEkk8vH/vdllGJAWe1p13I4ZbXYnZyoPUxs+MSoKjQjB2Vs86rupaEjltRNqTHbSBKeTuhuVnMZNdJgm6GxC14/8pmbAtsHsX9wdYvT53BNRDXbn25zbsiJp5CnqPChjI4rwxpgAlCQId2XzzULzpsFsIvzVy7BWgg3O6vlsPu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UOxfjcd3; arc=none smtp.client-ip=209.85.167.47
+	 MIME-Version; b=nflj1T4hzDon7qgr7ulnuLU+G+GgxXMJJuQA2mZQamkjQB/kN5Z2lLEugpbo2HZpxli+Bowhw2YJDvc/O2lWsXILkjQae4w7Xmmy/luSyjQ4B1BSSfbMpz0Fq5Z85kjdWdjDH0bn0Bstr5mNSjjN5dyO7TCwIZDXwpPuYpEV4jI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WwAmUTBH; arc=none smtp.client-ip=209.85.208.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UOxfjcd3"
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5942b58ac81so4051390e87.2
-        for <linux-block@vger.kernel.org>; Mon, 22 Dec 2025 21:30:06 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WwAmUTBH"
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-37bac34346dso34521491fa.2
+        for <linux-block@vger.kernel.org>; Mon, 22 Dec 2025 22:34:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766467804; x=1767072604; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1766471644; x=1767076444; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=CjrVs5qAijx5UEiplGDR4bSOktnBgAEK/U0XoVs0/GM=;
-        b=UOxfjcd3KLs0/zOnrEFXM55BIWgg4SWi7QASfMBxTSTBULhPeHWEyu9QQ41IsMHxJv
-         Vp4J37vnn0MbCyyHvtoKWrrB5NPN16zaVrihzDqnjfnlEOIzQDiHn/X+3VkweluQlVpb
-         b33rHk/R0YoujjZ2Dpv0aI1Upgc7yZ4hOw6Cmv/tLdRxRvhKexEtFEhctSH60l90r/Zd
-         xlN0HuUDA8htT+yqvZR6jTx5OHYZZeMVU89zHBe7m9K23LD9P14tIhWQdD0HfBvxOzCG
-         taDipDYZVRZsaI4qpACS606KN+Rw6yCh/03YJoxxr656Fng2iSGKjgipon8b0miprEbc
-         BsDw==
+        bh=048jzD37H8lsx/zZlGI/PEx4g5lnBiNM8RokzD3mdsY=;
+        b=WwAmUTBH+Z8XRKtBCqY+p4vhvOZdSmb+n+f1cbt8viJVJQHBr5U0jo/4s6d7qWWbBf
+         m0+yEyt1/jvRcNLPLCeivO4iEJDrI+k3zJ4jS2PQa2ZNeiL1Tlbub2tME3cf4CpV5t5x
+         y2v7G9wdrigZhwrK4c7Yef+E/fzqp/cS5XJetFqG4hBREaOaTvMWzFG+nlcM12NpLnyV
+         bWftFqc5KSBKZ0BFk6cyJPxHYk5+KPRoe6KeznkQ0/TJBWIgfaUW2op7B7NEb1bQFuep
+         6NgElzoJ6xi+uJ6OfcZAZFe+8coZdOUBZ5vF3OSWtmJtAEFFTI3kGZUoLI04b5pvc8/0
+         nauA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766467804; x=1767072604;
+        d=1e100.net; s=20230601; t=1766471644; x=1767076444;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=CjrVs5qAijx5UEiplGDR4bSOktnBgAEK/U0XoVs0/GM=;
-        b=dFvdvQPWO9CvRTeIk5SQHPnzPOz8gfkKugOKWCegUILtZGrosdND3k7hbqRA+LR9p4
-         RkcCCtk5jzQjHIoi2l2zcYd0N4mCviJtvKgDFfOUh2nWkVnjHep+jc/e0Wtxce1TA2TJ
-         GDVUTuQRbFwtbaCYbggoj3bK59gWVKWHUNDpjnueHKAyrXLVEglAaG9m1x7jOEyrZ9z5
-         Bs67i/UNZDGF6SZkQKL+Iir/FTux9kWaJeI0zWayoMq/67mAHQiSt84KvY+0VI+rnHER
-         +dV3XcXPmsic7RGqc5DHso6W5s8YqYqHpuqpUW96yM6aEPs9tQH5qONFg1752DXwi23M
-         jrIw==
-X-Forwarded-Encrypted: i=1; AJvYcCXGF4kfnq29Myqooa0JcEmeId6TXvapvJrkqadqJ3uCQspSc2H+YF8imyJXriUXUlX5GoxovV06VOURaQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywr/42kDdOb9HF5TkRG+girGOQhAIWUmyAM5INoYPidHVzr7ctN
-	tmvOW1AibAbCAPrszvm6FtuCDBxN1biN7llCKMd+R5G9YVKsEgU7AHw1
-X-Gm-Gg: AY/fxX4pE1SiPTA31MtG6eRgBI7wVzdL2xfZPNQCvxJ1anyoKe7+ll7s7xFb+CMV9Qa
-	egWLxcWz8j3ndYBJeFwkDHQ+nW7GcKEB2I8TACcjDkuAOEEra8Gb55AuU8nQnP+saEdd+VAi12F
-	MY5deg7VdPZEIUI7ZcJjxeHS1i84DzME6cxHAv5dFPMRejeIvc+MmCqDPFS5HZ6U6ZUD7OXeHLK
-	f7VskP8x7sRLrahxVBcRTm7zgft8gmGbakHduCWRTSIOtot2KbTPtnlJnOA5wjm//Eut+SWsbGU
-	6FsOmOZFS7s1rMJXG+17zeZBoih9OPT1lcoQr4FywO/+/MH8jkclATruabeBl+myHFOjNirstQX
-	R14VM341fk9BPWvCnkyu0qTwNOy8kpQKM/nQeeJt2/FrfcyI5FLf9bXaHUSNBv2d7KPKe8gfmQi
-	ILsEIOtPiF
-X-Google-Smtp-Source: AGHT+IFBJ4czf5dy7NoHG6Z5fLR0sF8QwzLoI7Shb3fIF5XKnuFbQtFm8MSKsqZe2birAQ3bGk4BUg==
-X-Received: by 2002:a05:6512:3a85:b0:598:8f90:eff5 with SMTP id 2adb3069b0e04-59a17df6969mr4474213e87.53.1766467803957;
-        Mon, 22 Dec 2025 21:30:03 -0800 (PST)
+        bh=048jzD37H8lsx/zZlGI/PEx4g5lnBiNM8RokzD3mdsY=;
+        b=cK0Bkomraq1XT/m+LNLdzxVPkyIMq4XIdPnMlu5sK/90TnlTg/Qwuz+My8+QQaeplu
+         zYE3KyzKSjKZlsPywf3znDvTs1Z3r2jTX7XyvKuIDhLFZ6QGvCN9+BPg8EBqWhapSq9V
+         WFM4MeZCPXxdqBHRTZ40ywywSQ4Ys1addTy6z5RtYAEUah72lxtFGEAtlp9L9ix+S9va
+         Na+n0DvoOg3Tgm2QGnz8tlSY83Kppmj4lGFj01u7u6mHwVcg62jTjl2k+nrg5NU3zVkk
+         H8x/yzxgHO+YxkibQo/hRjKTkgqlMbkUBZcblKze9dgAr08NULJFDlNPuJLGFlp95/CT
+         TZ8g==
+X-Forwarded-Encrypted: i=1; AJvYcCW3TNRuaQJpgPmdD1KWdEPhaZwkkHA3YwKLfML9R5SPYyFAEMe4VsjeOqRwddIeoV2Q2OYuu5AV8NK2Aw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSkNG+rOvhzmeIjIku8ts8JXZSiEyFq7lnpb3lxVZrZWAUFpLW
+	2XItdLvWIgGoSvBS9Wfv1ms29sDRPlP0+QNP5WrXV3kXEQCN0XZBpcmo
+X-Gm-Gg: AY/fxX4eUJIkcYqHY+25GG/REa6M/ZRTZ12Rt6sV1kgAtHcJjWCWZkRUfIQQS1m6Kzt
+	CjmY4ze6bcIaFoj4Ia2VaIC0LiA/wVVxVRlFoBVzbKa2Ci8U+xVeyLmcnFDkVNReDjN9S/r1dJJ
+	21Yr2pX46tnGIbOt0Ho+v7bLZbagcYi3QHbaccrdgsDdvJCyrdf0SzTS853VD6CCKW/jlLsYLJc
+	p1FMrrtjCA9Bf+9p+KRS1G7H4VZE1154mYBxn9HQjOOOhk+prgKBWhOFcUV5OTAdgT3ccjUUnJQ
+	u6s+9LXVWvthNfQI0+92ZIVHC/2Upc+Fc/mDEwYnVlMcJcY1BCyQwIt472ZAF3XYcRqO0BKjrMf
+	Cyt88pSlruANen+Ejh9CGRKIklum1wFW7e2sga79LOOGVRYnq1Ic6wtkE3E3DFTxwET5Fb/Lg2V
+	Vrojy2IyovOcFfhQQq9z0=
+X-Google-Smtp-Source: AGHT+IFaFE0nlDnowk+Ou3U+M9eX56ZCvZ4aEX/mIAF0sQ5oS0z9Fh1vnyWDY8DQIpJC2t19J66zfQ==
+X-Received: by 2002:a05:651c:1506:b0:378:e055:3150 with SMTP id 38308e7fff4ca-38121566b66mr43783861fa.5.1766471643890;
+        Mon, 22 Dec 2025 22:34:03 -0800 (PST)
 Received: from localhost ([194.190.17.114])
-        by smtp.gmail.com with UTF8SMTPSA id 2adb3069b0e04-59a18618ce8sm3818747e87.54.2025.12.22.21.30.01
+        by smtp.gmail.com with UTF8SMTPSA id 38308e7fff4ca-381224de6eesm33742031fa.6.2025.12.22.22.34.02
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Dec 2025 21:30:02 -0800 (PST)
+        Mon, 22 Dec 2025 22:34:03 -0800 (PST)
 From: Askar Safin <safinaskar@gmail.com>
 To: gmazyland@gmail.com
 Cc: Dell.Client.Kernel@dell.com,
@@ -73,10 +73,11 @@ Cc: Dell.Client.Kernel@dell.com,
 	lvm-devel@lists.linux.dev,
 	mpatocka@redhat.com,
 	pavel@ucw.cz,
-	rafael@kernel.org
+	rafael@kernel.org,
+	safinaskar@gmail.com
 Subject: Re: [RFC PATCH 2/2] swsusp: make it possible to hibernate to device mapper devices
-Date: Tue, 23 Dec 2025 08:29:52 +0300
-Message-ID: <20251223052952.2623971-1-safinaskar@gmail.com>
+Date: Tue, 23 Dec 2025 09:33:55 +0300
+Message-ID: <20251223063355.2740782-1-safinaskar@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <86300955-72e4-42d5-892d-f49bdf14441e@gmail.com>
 References: <86300955-72e4-42d5-892d-f49bdf14441e@gmail.com>
@@ -92,61 +93,17 @@ Milan Broz <gmazyland@gmail.com>:
 > Anyway, my understanding is that all device-mapper targets use mempools,
 > which should ensure that they can process even under memory pressure.
 
-I used journal mode so far, but, as well as I understand, direct mode is
-okay for my use case.
+Okay, I just read some more code and docs.
 
-Okay, I spent some time carefully reading dm-integrity source code.
+dm-integrity fortunately uses bufio for checksums only.
 
-I have read v6.12.48, because this is kernel I use.
+And bufio allocates memory without __GFP_IO (thus allocation should not
+lead to recursion). And bufio claims that "dm-bufio is resistant to allocation failures":
+https://elixir.bootlin.com/linux/v6.19-rc2/source/drivers/md/dm-bufio.c#L1603 .
 
-And I conclude that dm-integrity code never allocate (not even from mempool)...
-...in main code paths (as opposed to initialization code paths)...
-...in direct ('D') mode...
-...if I/O doesn't fail and checksums match.
+This still seems to be fragile.
 
-(As I said in previous letter, mempools are bad, too, as well as I understand.)
-
-I found exactly one place, where we seem to allocate in main code path:
-https://elixir.bootlin.com/linux/v6.12.48/source/drivers/md/dm-integrity.c#L1789
-(i. e. these two kmalloc's).
-
-But I think this okay, because:
-- we pass GFP_NOIO, so, as well as I understand, this should not lead to
-recursion
-- we pass __GFP_NORETRY, so, as well as I understand, we will not block in
-this kmalloc for too much time
-- we gracefully handle possible failure
-
-Other strange place I found is this:
-https://elixir.bootlin.com/linux/v6.12.48/source/drivers/md/dm-integrity.c#L1704 .
-
-But I think this is okay, because:
-- integrity_recheck is only ever called from here:
-https://elixir.bootlin.com/linux/v6.12.48/source/drivers/md/dm-integrity.c#L1857
-- that integrity_recheck call is only ever happens if dm_integrity_rw_tag failed
-- as well as I understand, dm_integrity_rw_tag can only fail if we got actual
-I/O error or checksum mismatch
-
-So, this mempool_alloc call is okay for my use case.
-
-So: in 'D' mode everything should be okay for my use case.
-
-Another note: I used very stupid way to search functions, which allocate:
-if function has "alloc" in its name, then I consider it allocating. :)
-
-And final note: there is an elephant in a room: bufio.
-
-As well as I understand, when pages are swapped in my use case, they first
-will get to dm-integrity bufio cache, and only after that, they will
-actually hit disk.
-
-This, of course, defeats whole purpose of swap.
-
-And possibly can lead to deadlocks.
-
-Is there a way to disable bufio?
-
-Or maybe bufio is used for checksums and metadata only?
+So I will change mode to 'D' and hope for the best. :)
 
 -- 
 Askar Safin
