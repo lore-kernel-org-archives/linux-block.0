@@ -1,48 +1,48 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B31524A04A
-	for <linux-block@vger.kernel.org>; Tue, 23 Dec 2025 01:51:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14115239E65
+	for <linux-block@vger.kernel.org>; Tue, 23 Dec 2025 01:58:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766454703; cv=none; b=lya9rrfSh1zigCS4AclmCdSuc+KGJd4ngaBaw53Wuyvcfj08B/NnZLrn8SG7Y3RxOifke/7YZDWK3RuBpuYtLxFo2ZUIbCQcPNodhh8Y4TmfCnYm7UdX2G+BH9ZyLWU9N21881N8epIsYTVEdtiMi18t9dnNfhS7UIbxUBXzW6Y=
+	t=1766455117; cv=none; b=Mt5pI/IlNu8RSPQ0vhtPAFbECH8PMfdG3J5BbbUK5/y4YiCprYvEnPSwist+wMX9Sydc95GRyF1yR1Wao52Q0oyNhvq/O+skvwgGJ4swpTm5jdFZyBYEluDq2lOwwLYbkmDRJ7pwIML16VufhQp0Pa8WGLDidhevNu5DC/PvfUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766454703; c=relaxed/simple;
-	bh=Kuo7K4RLDm3D/4aKICIh1JjqGgqzCGr/l78acdLGogs=;
+	s=arc-20240116; t=1766455117; c=relaxed/simple;
+	bh=vzHUnLQ+yxGWtXH7nJn1uJLvOBgknSPTdP82hXl2FaU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O474un0hwh5D6u0zCiotonbvE3idxqjABJQhWPwIxynuznZAV4z7HaGSRvuqXNFwABeLBFY1O8vXT2OTYXU3gfhNt+DR7hcKdXxF2AiYqTGImLR7kNS+uc0ic1BWRdOdaqFqedsuMyM7wEWJIN2Rx3RGR7O+F4PKSF3vlkPlb18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c8BmJj4v; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=QAt/ueUjlePDT3q6KX6CLDROvzznEZG2KP0EfxCdtcKv3CpHVSBaG9brUO6rcg2zdabjwp9WpLxeI6P4FepYkAb8I2geuvbIodc4wlNIxypHBBvcs4Vtx9sKPFe2/qLZdmhmMK3fquB7gjxHXZtV3IVFB0X6lcH2L42byvLdy/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=beoVjGMK; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c8BmJj4v"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="beoVjGMK"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1766454700;
+	s=mimecast20190719; t=1766455115;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=gVyvMHdYiOMJZDAaiQoHIi0uYkIFR3AXDiu2W4PmloY=;
-	b=c8BmJj4vLgbJ9f3yPItpRiINobcjyuA+1jNURe1LzrwUMaeRtMRENwKGCPzzM6B6L74Zle
-	+9puwpYhmw88JV7bys1c9+iYFTbue14RfUAsnbnUpVbg+qbJhQwOhh408nyQbIUrPTbtND
-	7nIohRLJWLL/Pdkn85OTY07Nk0kfqPc=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=wbHdy8jdrd9e77NvpwF/dSYZtO3xRPA/0ecEDbzD7kI=;
+	b=beoVjGMK3vOk2bsZ+MoQS2fbjcXX9FZ9ZZtM7xYiprVXHef1LhHh9Yo36prLg9aYuemCco
+	zfpNrMVQbURUK2guTJUI2uGXUbGZuaeYkxSBY7wWjAi0VmVXEAYC18Ob9b50hkR7uH64e6
+	7krbxI24DEzwYzeP6dorz5pN6awKlqE=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-145-rK7-h6PVPca3x8lk0ywOPg-1; Mon,
- 22 Dec 2025 20:51:36 -0500
-X-MC-Unique: rK7-h6PVPca3x8lk0ywOPg-1
-X-Mimecast-MFC-AGG-ID: rK7-h6PVPca3x8lk0ywOPg_1766454695
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-688-Ra5iqk38OaCkOKxpbkkhOg-1; Mon,
+ 22 Dec 2025 20:58:30 -0500
+X-MC-Unique: Ra5iqk38OaCkOKxpbkkhOg-1
+X-Mimecast-MFC-AGG-ID: Ra5iqk38OaCkOKxpbkkhOg_1766455109
 Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 306FE180028B;
-	Tue, 23 Dec 2025 01:51:35 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 58FB91956054;
+	Tue, 23 Dec 2025 01:58:29 +0000 (UTC)
 Received: from fedora (unknown [10.72.116.97])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8A62B180066E;
-	Tue, 23 Dec 2025 01:51:30 +0000 (UTC)
-Date: Tue, 23 Dec 2025 09:51:25 +0800
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8684E180066E;
+	Tue, 23 Dec 2025 01:58:24 +0000 (UTC)
+Date: Tue, 23 Dec 2025 09:58:19 +0800
 From: Ming Lei <ming.lei@redhat.com>
 To: Caleb Sander Mateos <csander@purestorage.com>
 Cc: Jens Axboe <axboe@kernel.dk>, Shuah Khan <shuah@kernel.org>,
@@ -50,12 +50,13 @@ Cc: Jens Axboe <axboe@kernel.dk>, Shuah Khan <shuah@kernel.org>,
 	linux-kernel@vger.kernel.org,
 	Stanley Zhang <stazhang@purestorage.com>,
 	Uday Shankar <ushankar@purestorage.com>
-Subject: Re: [PATCH 04/20] ublk: add integrity UAPI
-Message-ID: <aUn1nac8ZONTAdud@fedora>
+Subject: Re: [PATCH 06/20] ublk: support UBLK_PARAM_TYPE_INTEGRITY in device
+ creation
+Message-ID: <aUn3O2RJtXOpNkyQ@fedora>
 References: <20251217053455.281509-1-csander@purestorage.com>
- <20251217053455.281509-5-csander@purestorage.com>
- <aUlVDtLgPh6NCWsC@fedora>
- <CADUfDZp5Or_Q+7HKtdi97n5kBpQ=zpOFAtqfatR3nu+=yGLb_Q@mail.gmail.com>
+ <20251217053455.281509-7-csander@purestorage.com>
+ <aUlZ7APsr7tIdrWq@fedora>
+ <CADUfDZoW8NBJzRtnVaVF0aXdhW4qhMRijj9bQJqi88uOuswdiw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -65,127 +66,177 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADUfDZp5Or_Q+7HKtdi97n5kBpQ=zpOFAtqfatR3nu+=yGLb_Q@mail.gmail.com>
+In-Reply-To: <CADUfDZoW8NBJzRtnVaVF0aXdhW4qhMRijj9bQJqi88uOuswdiw@mail.gmail.com>
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Mon, Dec 22, 2025 at 10:09:50AM -0500, Caleb Sander Mateos wrote:
-> On Mon, Dec 22, 2025 at 9:26 AM Ming Lei <ming.lei@redhat.com> wrote:
+On Mon, Dec 22, 2025 at 10:35:27AM -0500, Caleb Sander Mateos wrote:
+> On Mon, Dec 22, 2025 at 9:47 AM Ming Lei <ming.lei@redhat.com> wrote:
 > >
-> > On Tue, Dec 16, 2025 at 10:34:38PM -0700, Caleb Sander Mateos wrote:
+> > On Tue, Dec 16, 2025 at 10:34:40PM -0700, Caleb Sander Mateos wrote:
 > > > From: Stanley Zhang <stazhang@purestorage.com>
 > > >
-> > > Add UAPI definitions for metadata/integrity support in ublk.
-> > > UBLK_PARAM_TYPE_INTEGRITY and struct ublk_param_integrity allow a ublk
-> > > server to specify the integrity params of a ublk device.
-> > > The ublk driver will set UBLK_IO_F_INTEGRITY in the op_flags field of
-> > > struct ublksrv_io_desc for requests with integrity data.
-> > > The ublk server uses user copy with UBLKSRV_IO_INTEGRITY_FLAG set in the
-> > > offset parameter to access a request's integrity buffer.
+> > > If the UBLK_PARAM_TYPE_INTEGRITY flag is set, validate the integrity
+> > > parameters and apply them to the blk_integrity limits.
+> > > UBLK_PARAM_TYPE_INTEGRITY requires CONFIG_BLK_DEV_INTEGRITY=y,
+> > > UBLK_F_USER_COPY, and metadata_size > 0. Reuse the block metadata ioctl
+> > > LBMD_PI_CAP_* and LBMD_PI_CSUM_* constants from the linux/fs.h UAPI
+> > > header for the flags and csum_type field values.
+> > > The struct ublk_param_integrity validations are based on the checks in
+> > > blk_validate_integrity_limits(). Any invalid parameters should be
+> > > rejected before being applied to struct blk_integrity.
 > > >
 > > > Signed-off-by: Stanley Zhang <stazhang@purestorage.com>
-> > > [csander: drop feature flag and redundant pi_tuple_size field,
-> > >  add io_desc flag, use block metadata UAPI constants]
+> > > [csander: add param validation]
 > > > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
 > > > ---
-> > >  include/uapi/linux/ublk_cmd.h | 20 +++++++++++++++++++-
-> > >  1 file changed, 19 insertions(+), 1 deletion(-)
+> > >  drivers/block/ublk_drv.c | 92 +++++++++++++++++++++++++++++++++++++++-
+> > >  1 file changed, 91 insertions(+), 1 deletion(-)
 > > >
-> > > diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
-> > > index ec77dabba45b..5bfb9a0521c3 100644
-> > > --- a/include/uapi/linux/ublk_cmd.h
-> > > +++ b/include/uapi/linux/ublk_cmd.h
-> > > @@ -129,11 +129,15 @@
-> > >  #define UBLK_QID_BITS                12
-> > >  #define UBLK_QID_BITS_MASK   ((1ULL << UBLK_QID_BITS) - 1)
+> > > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > > index 4da5d8ff1e1d..2893a9172220 100644
+> > > --- a/drivers/block/ublk_drv.c
+> > > +++ b/drivers/block/ublk_drv.c
+> > > @@ -42,10 +42,12 @@
+> > >  #include <linux/mm.h>
+> > >  #include <asm/page.h>
+> > >  #include <linux/task_work.h>
+> > >  #include <linux/namei.h>
+> > >  #include <linux/kref.h>
+> > > +#include <linux/blk-integrity.h>
+> > > +#include <uapi/linux/fs.h>
+> > >  #include <uapi/linux/ublk_cmd.h>
 > > >
-> > >  #define UBLK_MAX_NR_QUEUES   (1U << UBLK_QID_BITS)
+> > >  #define UBLK_MINORS          (1U << MINORBITS)
 > > >
-> > > -#define UBLKSRV_IO_BUF_TOTAL_BITS    (UBLK_QID_OFF + UBLK_QID_BITS)
-> > > +/* Copy to/from request integrity buffer instead of data buffer */
-> > > +#define UBLK_INTEGRITY_FLAG_OFF              (UBLK_QID_OFF + UBLK_QID_BITS)
-> > > +#define UBLKSRV_IO_INTEGRITY_FLAG    (1ULL << UBLK_INTEGRITY_FLAG_OFF)
+> > >  #define UBLK_INVALID_BUF_IDX         ((u16)-1)
+> > > @@ -81,11 +83,12 @@
+> > >
+> > >  /* All UBLK_PARAM_TYPE_* should be included here */
+> > >  #define UBLK_PARAM_TYPE_ALL                                \
+> > >       (UBLK_PARAM_TYPE_BASIC | UBLK_PARAM_TYPE_DISCARD | \
+> > >        UBLK_PARAM_TYPE_DEVT | UBLK_PARAM_TYPE_ZONED |    \
+> > > -      UBLK_PARAM_TYPE_DMA_ALIGN | UBLK_PARAM_TYPE_SEGMENT)
+> > > +      UBLK_PARAM_TYPE_DMA_ALIGN | UBLK_PARAM_TYPE_SEGMENT | \
+> > > +      UBLK_PARAM_TYPE_INTEGRITY)
+> > >
+> > >  struct ublk_uring_cmd_pdu {
+> > >       /*
+> > >        * Store requests in same batch temporarily for queuing them to
+> > >        * daemon context.
+> > > @@ -613,10 +616,57 @@ static void ublk_dev_param_basic_apply(struct ublk_device *ub)
+> > >               set_disk_ro(ub->ub_disk, true);
+> > >
+> > >       set_capacity(ub->ub_disk, p->dev_sectors);
+> > >  }
+> > >
+> > > +static int ublk_integrity_flags(u32 flags)
+> > > +{
+> > > +     int ret_flags = 0;
 > > > +
-> >
-> > I feel it is more readable to move the definition into the patch which uses
-> > them.
-> 
-> Sure, I can do that.
-> 
-> >
-> > > +#define UBLKSRV_IO_BUF_TOTAL_BITS    (UBLK_INTEGRITY_FLAG_OFF + 1)
-> >
-> > It is UAPI, UBLKSRV_IO_BUF_TOTAL_BITS shouldn't be changed, or can you
-> > explain this way is safe?
-> 
-> It's not clear to me how userspace is expected to use
-> UBLKSRV_IO_BUF_TOTAL_BITS. (Our ublk server, for one, doesn't use it.)
-> Can you provide an example? It looks to me like the purpose is to
-> communicate the number of bits needed to represent a user copy offset
-> value, in which case it makes sense to include the integrity flag now
-> that that bit is being used.
-
-Yes, it is used for this purpose.
-
-Now one new bit(bit 53) is added for marking if it is for meta user copy,
-let's keep UBLKSRV_IO_BUF_TOTAL_BITS cover its original meaning, and not
-include the new bit UBLKSRV_IO_INTEGRITY_FLAG, which can be documented.
-
-Then it can avoid some trouble, such as, break some uapi header checker at
-least.
-
-> 
-> >
-> > >  #define UBLKSRV_IO_BUF_TOTAL_SIZE    (1ULL << UBLKSRV_IO_BUF_TOTAL_BITS)
-> > >
-> > >  /*
-> > >   * ublk server can register data buffers for incoming I/O requests with a sparse
-> > >   * io_uring buffer table. The request buffer can then be used as the data buffer
-> > > @@ -406,10 +410,12 @@ struct ublksrv_ctrl_dev_info {
-> > >   *
-> > >   * ublk server has to check this flag if UBLK_AUTO_BUF_REG_FALLBACK is
-> > >   * passed in.
-> > >   */
-> > >  #define              UBLK_IO_F_NEED_REG_BUF          (1U << 17)
-> > > +/* Request has an integrity data buffer */
-> > > +#define              UBLK_IO_F_INTEGRITY             (1U << 18)
-> > >
-> > >  /*
-> > >   * io cmd is described by this structure, and stored in share memory, indexed
-> > >   * by request tag.
-> > >   *
-> > > @@ -598,10 +604,20 @@ struct ublk_param_segment {
-> > >       __u32   max_segment_size;
-> > >       __u16   max_segments;
-> > >       __u8    pad[2];
-> > >  };
-> > >
-> > > +struct ublk_param_integrity {
-> > > +     __u32   flags; /* LBMD_PI_CAP_* from linux/fs.h */
-> > > +     __u8    interval_exp;
-> > > +     __u8    metadata_size;
-> > > +     __u8    pi_offset;
-> > > +     __u8    csum_type; /* LBMD_PI_CSUM_* from linux/fs.h */
-> > > +     __u8    tag_size;
-> > > +     __u8    pad[7];
-> > > +};
+> > > +     if (flags & LBMD_PI_CAP_INTEGRITY) {
+> > > +             flags &= ~LBMD_PI_CAP_INTEGRITY;
+> > > +             ret_flags |= BLK_INTEGRITY_DEVICE_CAPABLE;
+> > > +     }
+> > > +     if (flags & LBMD_PI_CAP_REFTAG) {
+> > > +             flags &= ~LBMD_PI_CAP_REFTAG;
+> > > +             ret_flags |= BLK_INTEGRITY_REF_TAG;
+> > > +     }
+> > > +     return flags ? -EINVAL : ret_flags;
+> > > +}
 > > > +
+> > > +static int ublk_integrity_pi_tuple_size(u8 csum_type)
+> > > +{
+> > > +     switch (csum_type) {
+> > > +     case LBMD_PI_CSUM_NONE:
+> > > +             return 0;
+> > > +     case LBMD_PI_CSUM_IP:
+> > > +     case LBMD_PI_CSUM_CRC16_T10DIF:
+> > > +             return 8;
+> > > +     case LBMD_PI_CSUM_CRC64_NVME:
+> > > +             return 16;
+> > > +     default:
+> > > +             return -EINVAL;
+> > > +     }
+> > > +}
+> > > +
+> > > +static enum blk_integrity_checksum ublk_integrity_csum_type(u8 csum_type)
+> > > +{
+> > > +     switch (csum_type) {
+> > > +     case LBMD_PI_CSUM_NONE:
+> > > +             return BLK_INTEGRITY_CSUM_NONE;
+> > > +     case LBMD_PI_CSUM_IP:
+> > > +             return BLK_INTEGRITY_CSUM_IP;
+> > > +     case LBMD_PI_CSUM_CRC16_T10DIF:
+> > > +             return BLK_INTEGRITY_CSUM_CRC;
+> > > +     case LBMD_PI_CSUM_CRC64_NVME:
+> > > +             return BLK_INTEGRITY_CSUM_CRC64;
+> > > +     default:
+> > > +             WARN_ON_ONCE(1);
+> > > +             return BLK_INTEGRITY_CSUM_NONE;
+> > > +     }
+> > > +}
+> > > +
+> > >  static int ublk_validate_params(const struct ublk_device *ub)
+> > >  {
+> > >       /* basic param is the only one which must be set */
+> > >       if (ub->params.types & UBLK_PARAM_TYPE_BASIC) {
+> > >               const struct ublk_param_basic *p = &ub->params.basic;
+> > > @@ -675,10 +725,35 @@ static int ublk_validate_params(const struct ublk_device *ub)
+> > >                       return -EINVAL;
+> > >               if (p->max_segment_size < UBLK_MIN_SEGMENT_SIZE)
+> > >                       return -EINVAL;
+> > >       }
+> > >
+> > > +     if (ub->params.types & UBLK_PARAM_TYPE_INTEGRITY) {
+> > > +             const struct ublk_param_integrity *p = &ub->params.integrity;
+> > > +             int pi_tuple_size = ublk_integrity_pi_tuple_size(p->csum_type);
+> > > +             int flags = ublk_integrity_flags(p->flags);
+> > > +
+> > > +             if (!IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY))
+> > > +                     return -EINVAL;
+> > > +             if (!ublk_dev_support_user_copy(ub))
+> > > +                     return -EINVAL;
 > >
-> > Just be curious, `pi_tuple_size` isn't defined, instead it is hard-coded in
-> > ublk_integrity_pi_tuple_size().
-> >
-> > However, both scsi and nvme sets `pi_tuple_size`, so it means that ublk PI
-> > supports one `subset` or scsi/nvme `pi_tuple_size` can be removed too?
+> > UBLK_IO_F_INTEGRITY should be checked here, and ublk_dev_support_user_copy() can be
+> > validated with UBLK_IO_F_INTEGRITY together in ublk_ctrl_add_dev(), so
+> > mis-matched features can be failed earlier.
 > 
-> blk_validate_integrity_limits() validates that pi_tuple_size matches
-> the expected PI size for each csum_type value. So it looks like these
-> fields are redundant. Yes, pi_tuple_size could probably be removed
-> from the scsi/nvme block drivers too. But maybe there's value in
-> having the drivers explicitly specify both values?
+> I'm not sure what you mean. UBLK_IO_F_INTEGRITY is a per-I/O flag set
 
-Ok, got it, then this interface looks fine.
+I misread it as feature flag of `UBLK_F_INTEGRITY`...
 
-For both scsi and nvme, `pi_tuple_size` is not read from hardware, and
-actually calculated from guard type.
+> in struct ublksrv_io_desc's op_flags field. Are you suggesting adding
+> a separate feature flag for integrity? I can do that, but I didn't
+> originally because none of the other UBLK_PARAM_TYPE_* flags have
+> associated features.
+
+oops, you don't define feature flag of UBLK_F_INTEGRITY, then how can
+userspace know UBLK INTEGRITY is supported by driver?
+
+With UBLK_F_INTEGRITY you can run early check in ublk_ctrl_add_dev() for:
+
+- dependency on user copy
+- if kernel enables CONFIG_BLK_DEV_INTEGRITY
+
+> 
+> >
+> > Same for IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY).
+> >
+> > > +             if (flags < 0)
+> > > +                     return flags;
+> > > +             if (pi_tuple_size < 0)
+> > > +                     return pi_tuple_size;
+> > > +             if (!p->metadata_size)
+> > > +                     return -EINVAL;
+> >
+> > blk_validate_integrity_limits() allows zero p->metadata_size with
+> > LBMD_PI_CSUM_NONE, maybe document ublk's support for zero metadata_size & LBMD_PI_CSUM_NONE?
+> 
+> Sure, I can mention that UBLK_PARAM_TYPE_INTEGRITY requires a nonzero
+> metadata size. Would you prefer that metadata_size == 0 be supported?
+> It would be a bit more code, but certainly possible.
+
+It can be started with less feature/functions, and can be extended in future.
 
 
 Thanks,
