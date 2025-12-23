@@ -1,84 +1,91 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 692B122578D
-	for <linux-block@vger.kernel.org>; Tue, 23 Dec 2025 02:32:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B51B2C11C2
+	for <linux-block@vger.kernel.org>; Tue, 23 Dec 2025 03:27:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766457164; cv=none; b=OE8jz6RRJsY0ZBjLmE9e1Rm5arCnUwlfjKw8T/AkVH5IKva3ZltjtjCmjbvuEhog9GKYNJmdCOjccYcpKJVVYaCaUL0vIrEWououRyf1gYihhKSRf3IUwSIb9CJ8hvkOISqBSg4i/j22gDYo5XEZNOzX8d/7YgLQQNdOOJeXQQs=
+	t=1766460477; cv=none; b=R8G6PI1YrxTtbAH3Gbq5vbtAHeiz2Kecc7jbIgF3EyD1Hljul1WpjHQTlEvCldpTDM4tUaNppfpzJqmvge3GKW43jURIUTWdFnglOu2Pd1qZwUaNFW1tEWirDF85SKYz0q2cHlsiTXc1IPconUtG4eTkKd/td7JvNNBHwkq7f08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766457164; c=relaxed/simple;
-	bh=pEl0r6tIMtt4EA48ZnFQISwRXFeyilrX1o5cZ4rg/pE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mDo5KLpYrW6zLk50kumxBI0I0P9vAgYsSEL8i+2Hz0AcUfQagTWuJwmUAkmLkUwSQPpXUvOEvSiKaTAXD2dOXr4KEbDnFQGFX6XIcGvSazfOma2qU7ZwKP1dvfng1hbZ4NADEvJE61KKUde63DX++m/2fMmOSBYVzJsrUsxWs38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Pp6lnJUS; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1766460477; c=relaxed/simple;
+	bh=UvIYBswDb7OAJBx+aOfTLluxRNbZ5vfhg84S9W89lqg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Tb1Wmhia7rmwsmv/yKctsy/qOIiKRbGIz64flTX70HpZXW33mrRLdf2aXLDRmcopneeXNAZZpP/cZ9ZMpxiry38Gfp0ha9ouTs9FCQPX6/4G48RM5+ofwnmD7TwFwTZrCKgrz0VT+05IOoz8zEpBBv2wH8wpaX5awD6mXJmZRXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=erhGbqBS; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pp6lnJUS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="erhGbqBS"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1766457161;
+	s=mimecast20190719; t=1766460474;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oW1QGOLNSp02co7nCAtcdM24JErkYO2/wmSB0f1BR7o=;
-	b=Pp6lnJUSrgX74WMb98ybNnTy5g7PGP5uukruB2G0xHcTP9xe5mHs7w9rFi2tS50WO04nMe
-	rzzII3RDv83y3bPouvKEvEopHxsdQwSNjTjNYADEZuA23MZcbZJnPQr274vtjMhbcaONYa
-	3VJGLOLyIPTrVztF/Ij85zr1Igjovlc=
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=cEtPeuUX9J60EEycGpORZo+SSxAZ7l2BWcakN9qYZ38=;
+	b=erhGbqBSAiYzIluXM0ksngeQ4gZOaQ53R0IJjea2lTsGUAVpe652lJF/4rouhIPFSnJoBg
+	CfzAgCB+5z/4rw7WRVWgM7941kLSmtHaK3RnUoptS5bNQgDEsSUODZyVU9fJYAzcRwuF+2
+	3F01sE5L1IJR5oF0le/Jy7Q4/vTwyjQ=
 Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-664-dn3UrxMxOnSRW7QwxoXHFw-1; Mon,
- 22 Dec 2025 21:32:39 -0500
-X-MC-Unique: dn3UrxMxOnSRW7QwxoXHFw-1
-X-Mimecast-MFC-AGG-ID: dn3UrxMxOnSRW7QwxoXHFw_1766457158
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-669-K_05Rn1pOZeSbm4CXniD8Q-1; Mon,
+ 22 Dec 2025 22:27:52 -0500
+X-MC-Unique: K_05Rn1pOZeSbm4CXniD8Q-1
+X-Mimecast-MFC-AGG-ID: K_05Rn1pOZeSbm4CXniD8Q_1766460471
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A7E171800633;
-	Tue, 23 Dec 2025 02:32:38 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.97])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CD412180045B;
-	Tue, 23 Dec 2025 02:32:34 +0000 (UTC)
-Date: Tue, 23 Dec 2025 10:32:29 +0800
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8B2CF1800378;
+	Tue, 23 Dec 2025 03:27:51 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.97])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 98BE530001A2;
+	Tue, 23 Dec 2025 03:27:50 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Caleb Sander Mateos <csander@purestorage.com>,
 	Uday Shankar <ushankar@purestorage.com>,
-	Yoav Cohen <yoav@nvidia.com>, stable@vger.kernel.org
-Subject: Re: [PATCH 1/2] ublk: add UBLK_F_NO_AUTO_PART_SCAN feature flag
-Message-ID: <aUn_PVBQ7dtcV_-l@fedora>
-References: <20251220095322.1527664-1-ming.lei@redhat.com>
- <20251220095322.1527664-2-ming.lei@redhat.com>
- <CADUfDZprek_M_vkru277HK+h7BuNNv1N+2tFX7zqvGj8chN36g@mail.gmail.com>
+	Yoav Cohen <yoav@nvidia.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 0/3] ublk: scan partition in async way
+Date: Tue, 23 Dec 2025 11:27:39 +0800
+Message-ID: <20251223032744.1927434-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADUfDZprek_M_vkru277HK+h7BuNNv1N+2tFX7zqvGj8chN36g@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Mon, Dec 22, 2025 at 12:11:03PM -0500, Caleb Sander Mateos wrote:
-> On Sat, Dec 20, 2025 at 4:53 AM Ming Lei <ming.lei@redhat.com> wrote:
-> >
-> > Add a new feature flag UBLK_F_NO_AUTO_PART_SCAN to allow users to suppress
-> > automatic partition scanning when starting a ublk device.
-> 
-> Is this approach superseded by your patch series "ublk: scan partition
-> in async way", or are you expecting both to coexist?
+Hi Guys,
 
-This one probably is useful too, but it should belong to v6.20 because
-"ublk: scan partition in async way" can fix the issue now, and backport
-to stable isn't needed any more.
+The 1st patch scans partition in async way, so IO hang during partition
+scan can be covered by current error handling code.
 
+The 2nd patch adds one test for verifying if hang from scanning partition
+can be avoided.
 
-Thanks,
-Ming
+The last patch fixes one selftest/ublk rebuild depending issue.
+
+V2:
+	- fix one comment typo in 1/3(Caleb Sander Mateos)
+	- simplify test code: 2/3
+	- fix `LOCAL_HDRS` usage in patch 3/3
+
+Ming Lei (3):
+  ublk: scan partition in async way
+  selftests/ublk: add test for async partition scan
+  selftests/ublk: fix Makefile to rebuild on header changes
+
+ drivers/block/ublk_drv.c                      | 35 +++++++++-
+ tools/testing/selftests/ublk/Makefile         |  5 +-
+ tools/testing/selftests/ublk/test_common.sh   | 16 +++--
+ .../testing/selftests/ublk/test_generic_15.sh | 68 +++++++++++++++++++
+ 4 files changed, 115 insertions(+), 9 deletions(-)
+ create mode 100755 tools/testing/selftests/ublk/test_generic_15.sh
+
+-- 
+2.47.0
 
