@@ -1,122 +1,98 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07B5D314A9F
-	for <linux-block@vger.kernel.org>; Thu, 25 Dec 2025 10:33:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 439551CEAA3
+	for <linux-block@vger.kernel.org>; Thu, 25 Dec 2025 11:40:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766658805; cv=none; b=SwB8X0+5IHv5fbZ+Vqddy/wpOgeOp0YsWLGW9jd8IUh4I4qi0Y6TsysCLjAK6hMV/Kf1fiu1PebodxnenxwpjRG66dHd5Jf5aHOnEozq9BpNYe3oI2l+QXe0ttuuoSXPCASsm+DZjtvT8IG2XLkY7uaT2gyh2q5DekvG8mpSdUc=
+	t=1766662809; cv=none; b=t/jqlaxyqzjZYjoOlhGHbQXKO4vK9zlbw4QInvymXCfdXj1d/mti5MWW+xF/0BXJ+qLiaTmt+Qjk/5Lgwu62GSOIyCKLcUMyr0ZPFlexatLefmlxjBvVs/2iYIOsaCfD7DDGImkV8HKR+2lt6oGn7dEmFRI3Rlp86AJBUFuUfsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766658805; c=relaxed/simple;
-	bh=aALcnFiv6Fjca+jZT8V6grxwx72IP2VsYuqidEf/+5o=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Q9kRTcCOuTlyENEkQffwwdSVx5dGsG54g/5CnFeSWwKccZVqpDEWZ/EzH1Yjqw+mSKXp7jCCw91SI3y7/fV2Z5vg5Cg+pw4QHrciJu7+Ccb/fhSM+J+VwbFg5xONJsgB2GlvaRE+W9g2R+CJo3G+aJCYZWp3Kb1p8PVXCpZN38g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DE0AC116C6;
-	Thu, 25 Dec 2025 10:33:20 +0000 (UTC)
-From: Yu Kuai <yukuai@fnnas.com>
-To: axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	tj@kernel.org,
-	nilay@linux.ibm.com,
-	ming.lei@redhat.com
-Cc: yukuai@fnnas.com
-Subject: [PATCH v6 11/13] blk-iocost: fix incorrect lock order for rq_qos_mutex and freeze queue
-Date: Thu, 25 Dec 2025 18:32:46 +0800
-Message-ID: <20251225103248.1303397-12-yukuai@fnnas.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251225103248.1303397-1-yukuai@fnnas.com>
-References: <20251225103248.1303397-1-yukuai@fnnas.com>
+	s=arc-20240116; t=1766662809; c=relaxed/simple;
+	bh=cSjw1UYAcOIQX2UupZIRCVtZKmHuWyE1SxemNttGF70=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nxKbvnUY+s5s/5fzrZUAnxSfhKwZ2v6GFYEbT+nceCvkHDDEE9DA09WwvHfu9bIXy9Tp+lTemaNxKq9jm92oy3jV2aqV0MBPPFwRqSlaqPYACvjRnKKX2y6gju7kl0I9BH0JopWrHPest4tyZXIN5YEsPjrJT1+vrp7PW9IcZ+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HL2Dleoy; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HL2Dleoy"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1766662806;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wl9D9dah+mPX5ztqzgvNJU39WjzVpa9UHfF7SLLNbkk=;
+	b=HL2Dleoy1NpWPN2qE0lF4aAii58ysTyFnvhG7e5gEib/1DAOu5T/56OebjPUOKu4+Rq0mF
+	tzx5ZcUny8fsUGhWZx0DySF6JRChF8a1LJJdir3h4l6qLpoLBels9Ejp8u3TY3TbTwlQLM
+	TQvb2WWR4XDXpiA+pVRwUB+XU7w21vc=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-533-gYy8oxAZPXKg1LD7aSlunw-1; Thu,
+ 25 Dec 2025 06:40:02 -0500
+X-MC-Unique: gYy8oxAZPXKg1LD7aSlunw-1
+X-Mimecast-MFC-AGG-ID: gYy8oxAZPXKg1LD7aSlunw_1766662801
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5BBC01956088;
+	Thu, 25 Dec 2025 11:40:01 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.23])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9A66319560A7;
+	Thu, 25 Dec 2025 11:39:57 +0000 (UTC)
+Date: Thu, 25 Dec 2025 19:39:52 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: syzbot <syzbot+71fcf20f7c1e5043d78c@syzkaller.appspotmail.com>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [block?] WARNING in wbt_init_enable_default
+Message-ID: <aU0iiC-4D8qWZMkp@fedora>
+References: <694ce8fd.050a0220.35954c.0035.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <694ce8fd.050a0220.35954c.0035.GAE@google.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Like wbt, rq_qos_add() can be called from two path and the lock order
-are inversely:
+On Wed, Dec 24, 2025 at 11:34:21PM -0800, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    b927546677c8 Merge tag 'dma-mapping-6.19-2025-12-22' of gi..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=11dc8b92580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=a94030c847137a18
+> dashboard link: https://syzkaller.appspot.com/bug?extid=71fcf20f7c1e5043d78c
+> compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10515f1a580000
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/b27369f4b013/disk-b9275466.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/3b2d81c4be86/vmlinux-b9275466.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/89c2ad4f36b6/bzImage-b9275466.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+71fcf20f7c1e5043d78c@syzkaller.appspotmail.com
+> 
+> ------------[ cut here ]------------
+> WARNING: block/blk-wbt.c:741 at wbt_init_enable_default+0x4e/0x60 block/blk-wbt.c:741, CPU#0: syz.1.439/7602
+> Modules linked in:
+> CPU: 0 UID: 0 PID: 7602 Comm: syz.1.439 Not tainted syzkaller #0 PREEMPT(full) 
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+> RIP: 0010:wbt_init_enable_default+0x4e/0x60 block/blk-wbt.c:741
 
-- From ioc_qos_write(), queue is already frozen before rq_qos_add();
-- From ioc_cost_model_write(), rq_qos_add() is called directly;
+Looks like 'echo > /sys/block/loop0/queue/queue_wb_lat' creates wbt first,
+then -EBUSY is triggered.
 
-Fix this problem by converting to use blkg_conf_open_bdev_frozen()
-from ioc_cost_model_write(), then since all rq_qos_add() callers
-already freeze queue, convert to use rq_qos_add_frozen().
+Seems -EBUSY should be filtered for warn here.
 
-Signed-off-by: Yu Kuai <yukuai@fnnas.com>
----
- block/blk-iocost.c | 17 ++++++++---------
- 1 file changed, 8 insertions(+), 9 deletions(-)
-
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index a0416927d33d..929fc1421d7e 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -2925,7 +2925,7 @@ static int blk_iocost_init(struct gendisk *disk)
- 	 * called before policy activation completion, can't assume that the
- 	 * target bio has an iocg associated and need to test for NULL iocg.
- 	 */
--	ret = rq_qos_add(&ioc->rqos, disk, RQ_QOS_COST, &ioc_rqos_ops);
-+	ret = rq_qos_add_frozen(&ioc->rqos, disk, RQ_QOS_COST, &ioc_rqos_ops);
- 	if (ret)
- 		goto err_free_ioc;
- 
-@@ -3408,7 +3408,7 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
- {
- 	struct blkg_conf_ctx ctx;
- 	struct request_queue *q;
--	unsigned int memflags;
-+	unsigned long memflags;
- 	struct ioc *ioc;
- 	u64 u[NR_I_LCOEFS];
- 	bool user;
-@@ -3417,9 +3417,11 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
- 
- 	blkg_conf_init(&ctx, input);
- 
--	ret = blkg_conf_open_bdev(&ctx);
--	if (ret)
-+	memflags = blkg_conf_open_bdev_frozen(&ctx);
-+	if (IS_ERR_VALUE(memflags)) {
-+		ret = memflags;
- 		goto err;
-+	}
- 
- 	body = ctx.body;
- 	q = bdev_get_queue(ctx.bdev);
-@@ -3436,7 +3438,6 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
- 		ioc = q_to_ioc(q);
- 	}
- 
--	memflags = blk_mq_freeze_queue(q);
- 	blk_mq_quiesce_queue(q);
- 
- 	spin_lock_irq(&ioc->lock);
-@@ -3488,20 +3489,18 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
- 	spin_unlock_irq(&ioc->lock);
- 
- 	blk_mq_unquiesce_queue(q);
--	blk_mq_unfreeze_queue(q, memflags);
- 
--	blkg_conf_exit(&ctx);
-+	blkg_conf_exit_frozen(&ctx, memflags);
- 	return nbytes;
- 
- einval:
- 	spin_unlock_irq(&ioc->lock);
- 
- 	blk_mq_unquiesce_queue(q);
--	blk_mq_unfreeze_queue(q, memflags);
- 
- 	ret = -EINVAL;
- err:
--	blkg_conf_exit(&ctx);
-+	blkg_conf_exit_frozen(&ctx, memflags);
- 	return ret;
- }
- 
--- 
-2.51.0
+Thanks,
+Ming
 
