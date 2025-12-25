@@ -1,19 +1,19 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 429D431A552
-	for <linux-block@vger.kernel.org>; Thu, 25 Dec 2025 10:33:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5935531AA96
+	for <linux-block@vger.kernel.org>; Thu, 25 Dec 2025 10:33:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766658796; cv=none; b=qNObd27ApgT9V1fve+p4YLGpnIwdYWqmgBjNl11QgmfLC2P9i6xefKbWOTN9cFK/PXJ0mM1AFhNu51G+xCZNExiFIPtg1K0G7pf9LLqtAFkBL46zPcUBrvlvszHBvEV86/k13ccE/AXMDwR9O9UK4Ev1ctkr91ZKGgc8z9HqqF8=
+	t=1766658799; cv=none; b=QnBCT+FHYm9YZq3It7svQwAhGpKs3Kg3IFBTlKMUlWP+e910H5YmHCNh5LV5nZ/+C5AwwLVAVYF9b8yLbrABFE8+SLERnKUUqVTvQnHkzPhxCa9Ic6UYCloS1zOZabbJHEftZZ/Hi+cTJfIqCM9v1mR8wa2Ow32m1JkMU9aaGGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766658796; c=relaxed/simple;
-	bh=cZAjn3i/1KoYmp6iXvX1OGA7E4xiCxKR1MXi3PWn7sY=;
+	s=arc-20240116; t=1766658799; c=relaxed/simple;
+	bh=/EeUTFOm4bpjSSWOJBud9uN3XCLeYkQuca5MX3rBXJQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gqbWifMLJASHMBENgKLX38ANWUoPjmhw+EQhzOHZj/BhtRAgnbD0Zqor5a7UrkOjP45BzjKzNR2XL7W3bqr7apw2LiDLbQZW9XCZmnkVcKr2HnJUE9V2PpHQAxAkmQqW5c1eJRVi8TZ4CwCAKuvB5YeNmOynqnKVcfNad+SRbmQ=
+	 MIME-Version; b=anByDjg+uyXv6173Ehvm1HxlSfgb0Eyy+X6e/dwWY7sRmO6yeMnGbzVOnxAVwCkh5EaE/I+ZwrNaxd47yKVzx4X9Ug6GlmHQwocvKyMkwhFm5AP59r4jkQnGDXq+rvam8mz25COUZUqG4ZD6Mbcw+ZshWAl0tsvXxK7CYzvNXj8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F335DC4CEF1;
-	Thu, 25 Dec 2025 10:33:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 134FFC16AAE;
+	Thu, 25 Dec 2025 10:33:15 +0000 (UTC)
 From: Yu Kuai <yukuai@fnnas.com>
 To: axboe@kernel.dk,
 	linux-block@vger.kernel.org,
@@ -21,9 +21,9 @@ To: axboe@kernel.dk,
 	nilay@linux.ibm.com,
 	ming.lei@redhat.com
 Cc: yukuai@fnnas.com
-Subject: [PATCH v6 08/13] blk-throttle: fix possible deadlock for fs reclaim under rq_qos_mutex
-Date: Thu, 25 Dec 2025 18:32:43 +0800
-Message-ID: <20251225103248.1303397-9-yukuai@fnnas.com>
+Subject: [PATCH v6 09/13] block/blk-rq-qos: add a new helper rq_qos_add_frozen()
+Date: Thu, 25 Dec 2025 18:32:44 +0800
+Message-ID: <20251225103248.1303397-10-yukuai@fnnas.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251225103248.1303397-1-yukuai@fnnas.com>
 References: <20251225103248.1303397-1-yukuai@fnnas.com>
@@ -35,111 +35,63 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-blk_throtl_init() can be called with rq_qos_mutex held from blkcg
-configuration, and fs reclaim can be triggered because GFP_KERNEL is used
-to allocate memory. This can deadlock because rq_qos_mutex can be held
-with queue frozen.
-
-Fix the problem by using blkg_conf_open_bdev_frozen(), also remove
-useless queue frozen from blk_throtl_init().
+queue should not be frozen under rq_qos_mutex, see example from
+commit 9730763f4756 ("block: correct locking order for protecting blk-wbt
+parameters"), which means current implementation of rq_qos_add() is
+problematic. Add a new helper and prepare to fix this problem in
+following patches.
 
 Signed-off-by: Yu Kuai <yukuai@fnnas.com>
 ---
- block/blk-throttle.c | 27 ++++++++++++++-------------
- 1 file changed, 14 insertions(+), 13 deletions(-)
+ block/blk-rq-qos.c | 21 +++++++++++++++++++++
+ block/blk-rq-qos.h |  2 ++
+ 2 files changed, 23 insertions(+)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 97188a795848..6b9e76c6a24b 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -1310,7 +1310,6 @@ static int blk_throtl_init(struct gendisk *disk)
- {
- 	struct request_queue *q = disk->queue;
- 	struct throtl_data *td;
--	unsigned int memflags;
- 	int ret;
- 
- 	td = kzalloc_node(sizeof(*td), GFP_KERNEL, q->node);
-@@ -1319,8 +1318,6 @@ static int blk_throtl_init(struct gendisk *disk)
- 
- 	INIT_WORK(&td->dispatch_work, blk_throtl_dispatch_work_fn);
- 	throtl_service_queue_init(&td->service_queue);
--
--	memflags = blk_mq_freeze_queue(disk->queue);
- 	blk_mq_quiesce_queue(disk->queue);
- 
- 	q->td = td;
-@@ -1334,8 +1331,6 @@ static int blk_throtl_init(struct gendisk *disk)
- 	}
- 
- 	blk_mq_unquiesce_queue(disk->queue);
--	blk_mq_unfreeze_queue(disk->queue, memflags);
--
- 	return ret;
+diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
+index 85cf74402a09..b8f163827477 100644
+--- a/block/blk-rq-qos.c
++++ b/block/blk-rq-qos.c
+@@ -322,6 +322,27 @@ void rq_qos_exit(struct request_queue *q)
+ 	mutex_unlock(&q->rq_qos_mutex);
  }
  
-@@ -1345,15 +1340,18 @@ static ssize_t tg_set_conf(struct kernfs_open_file *of,
++int rq_qos_add_frozen(struct rq_qos *rqos, struct gendisk *disk,
++		      enum rq_qos_id id, const struct rq_qos_ops *ops)
++{
++	struct request_queue *q = disk->queue;
++
++	WARN_ON_ONCE(q->mq_freeze_depth == 0);
++	lockdep_assert_held(&q->rq_qos_mutex);
++
++	if (rq_qos_id(q, id))
++		return -EBUSY;
++
++	rqos->disk = disk;
++	rqos->id = id;
++	rqos->ops = ops;
++	rqos->next = q->rq_qos;
++	q->rq_qos = rqos;
++	blk_queue_flag_set(QUEUE_FLAG_QOS_ENABLED, q);
++
++	return 0;
++}
++
+ int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
+ 		const struct rq_qos_ops *ops)
  {
- 	struct blkcg *blkcg = css_to_blkcg(of_css(of));
- 	struct blkg_conf_ctx ctx;
-+	unsigned long memflags;
- 	struct throtl_grp *tg;
--	int ret;
-+	int ret = 0;
- 	u64 v;
+diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
+index b538f2c0febc..8d9fb10ae526 100644
+--- a/block/blk-rq-qos.h
++++ b/block/blk-rq-qos.h
+@@ -87,6 +87,8 @@ static inline void rq_wait_init(struct rq_wait *rq_wait)
  
- 	blkg_conf_init(&ctx, buf);
+ int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
+ 		const struct rq_qos_ops *ops);
++int rq_qos_add_frozen(struct rq_qos *rqos, struct gendisk *disk,
++		      enum rq_qos_id id, const struct rq_qos_ops *ops);
+ void rq_qos_del(struct rq_qos *rqos);
  
--	ret = blkg_conf_open_bdev(&ctx);
--	if (ret)
-+	memflags = blkg_conf_open_bdev_frozen(&ctx);
-+	if (IS_ERR_VALUE(memflags)) {
-+		ret = memflags;
- 		goto out_finish;
-+	}
- 
- 	if (!blk_throtl_activated(ctx.bdev->bd_queue)) {
- 		ret = blk_throtl_init(ctx.bdev->bd_disk);
-@@ -1382,7 +1380,7 @@ static ssize_t tg_set_conf(struct kernfs_open_file *of,
- 	tg_conf_updated(tg, false);
- 	ret = 0;
- out_finish:
--	blkg_conf_exit(&ctx);
-+	blkg_conf_exit_frozen(&ctx, memflags);
- 	return ret ?: nbytes;
- }
- 
-@@ -1529,15 +1527,18 @@ static ssize_t tg_set_limit(struct kernfs_open_file *of,
- {
- 	struct blkcg *blkcg = css_to_blkcg(of_css(of));
- 	struct blkg_conf_ctx ctx;
-+	unsigned long memflags;
- 	struct throtl_grp *tg;
-+	int ret = 0;
- 	u64 v[4];
--	int ret;
- 
- 	blkg_conf_init(&ctx, buf);
- 
--	ret = blkg_conf_open_bdev(&ctx);
--	if (ret)
-+	memflags = blkg_conf_open_bdev_frozen(&ctx);
-+	if (IS_ERR_VALUE(memflags)) {
-+		ret = memflags;
- 		goto out_finish;
-+	}
- 
- 	if (!blk_throtl_activated(ctx.bdev->bd_queue)) {
- 		ret = blk_throtl_init(ctx.bdev->bd_disk);
-@@ -1600,7 +1601,7 @@ static ssize_t tg_set_limit(struct kernfs_open_file *of,
- 	tg_conf_updated(tg, false);
- 	ret = 0;
- out_finish:
--	blkg_conf_exit(&ctx);
-+	blkg_conf_exit_frozen(&ctx, memflags);
- 	return ret ?: nbytes;
- }
- 
+ typedef bool (acquire_inflight_cb_t)(struct rq_wait *rqw, void *private_data);
 -- 
 2.51.0
 
