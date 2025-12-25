@@ -1,18 +1,19 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87EAA2F616E
-	for <linux-block@vger.kernel.org>; Thu, 25 Dec 2025 10:32:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A21FC3093D3
+	for <linux-block@vger.kernel.org>; Thu, 25 Dec 2025 10:33:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766658778; cv=none; b=CS9eC/cvyN71sk6IMygSCBf6wP2JQ/eV7tyqRPjEZmD/gfV5tinrNedKUOTlshJ7z97wAlHZIeUyGOvd1KRiI8skpuI25bW34+qv6HjzbJS6tdO+7EwFvtrTGh+9t1pFw7H7lTI7oX7zYSXVaI6FZ8RvBALI0anqiqxA8dUdoKc=
+	t=1766658780; cv=none; b=i3VPHllzK6mwySoB8sQ4kALmkmHQfV1cDgWFoYpum5Y9kmbtoJZWLIpAt0KbC0rXYiWNPqVcNu337XNWOGc1qIuN9lBJLoTQf/+LNE6s3NTSw96kBitfl54x72Q9xddUeyAO7T8SsgJIGd0YjjUKBp4sd/LXHFokQJHLxOoEW84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766658778; c=relaxed/simple;
-	bh=LI2HLGAHJpkpCgYZSY2T1MdXT7OxHlvtdyYlNV56DmI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OKAQgp/ujk24NoeKV9aiIxUhYXKkZGP4qf8CEpsN1Akdfuipbm9ZZuDIsUJgSYj1QtFgG6/v4TElqhuyKuXxLC4rTkUW6nFDNJf5ty3LOqrgeENAm1p/PQ9gSRH26OH/61S+DAe8der9ZFmtOUgZeCpibXSItY3PcT8oNGSXJNU=
+	s=arc-20240116; t=1766658780; c=relaxed/simple;
+	bh=06kuazUcRkDDRipoijGxbugP/qphkxwr6mf3LJXrCtI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=chWrx/qoAqBemdhKY4poeHZTIXk3MqRSNrqrho1vPAhqsVV1zfWodxIoYatORQZ76zu53KA/aKPvfBQV7Ks6D7y8JNjRlfDuXyLMpldSlfdn+qtpggzqSviDmvQmYhvjARpAeQAScVPLO/ofJ9ebN1xyO74MYJcMV+zR1sXyY0w=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D1E7C4CEF1;
-	Thu, 25 Dec 2025 10:32:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95F9DC116C6;
+	Thu, 25 Dec 2025 10:32:58 +0000 (UTC)
 From: Yu Kuai <yukuai@fnnas.com>
 To: axboe@kernel.dk,
 	linux-block@vger.kernel.org,
@@ -20,10 +21,12 @@ To: axboe@kernel.dk,
 	nilay@linux.ibm.com,
 	ming.lei@redhat.com
 Cc: yukuai@fnnas.com
-Subject: [PATCH v6 00/13] blk-mq: fix possible deadlocks
-Date: Thu, 25 Dec 2025 18:32:35 +0800
-Message-ID: <20251225103248.1303397-1-yukuai@fnnas.com>
+Subject: [PATCH v6 01/13] blk-wbt: factor out a helper wbt_set_lat()
+Date: Thu, 25 Dec 2025 18:32:36 +0800
+Message-ID: <20251225103248.1303397-2-yukuai@fnnas.com>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20251225103248.1303397-1-yukuai@fnnas.com>
+References: <20251225103248.1303397-1-yukuai@fnnas.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -32,58 +35,186 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-changes in v6:
- - rebase on the top of block-6.19;
- - add patch 6 to cleanup  blk_mq_debugfs_unregister_rqos();
- - change patch 8, from GFP_NOIO to blkg_conf_open_bdev_frozen();
-changes in v5:
- - free rwb from wbt_init() caller in patch 2;
- - don't recheck rwb in patch 2 to make code cleaner, concurrent callers
-   will fail from rq_qos_add();
- - add patch 7 to fix possible deadlock in blk-throtle;
-changes in v4:
- - add patch 1,2 to fix a new deadlock;
-changes in v3:
- - remove changes for blk-iolatency and blk-iocost in patch 2, since
-   they don't have debugfs entries.
- - add patch 9 to fix lock order for blk-throttle.
-changes in v2:
- - combine two set into one;
+To move implementation details inside blk-wbt.c, prepare to fix possible
+deadlock to call wbt_init() while queue is frozen in the next patch.
 
-Fix deadlocks:
- - patch 1-2, pcpu_alloc_mutex under q_usage_counter in blk-wbt;
- - patch 3-7, debugfs_mutex under q_usage_counter;
- - patch 8, fs_reclaim under rq_qos_mutex in blk-throttle;
- - patch 9-13, q_usage_counter under rq_qos_mutex;
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
+Signed-off-by: Yu Kuai <yukuai@fnnas.com>
+---
+ block/blk-sysfs.c | 39 ++----------------------------------
+ block/blk-wbt.c   | 50 ++++++++++++++++++++++++++++++++++++++++++++---
+ block/blk-wbt.h   |  7 ++-----
+ 3 files changed, 51 insertions(+), 45 deletions(-)
 
-Yu Kuai (13):
-  blk-wbt: factor out a helper wbt_set_lat()
-  blk-wbt: fix possible deadlock to nest pcpu_alloc_mutex under
-    q_usage_counter
-  blk-mq-debugfs: factor out a helper to register debugfs for all rq_qos
-  blk-rq-qos: fix possible debugfs_mutex deadlock
-  blk-mq-debugfs: make blk_mq_debugfs_register_rqos() static
-  blk-mq-debugfs: remove blk_mq_debugfs_unregister_rqos()
-  blk-mq-debugfs: warn about possible deadlock
-  blk-throttle: fix possible deadlock for fs reclaim under rq_qos_mutex
-  block/blk-rq-qos: add a new helper rq_qos_add_frozen()
-  blk-wbt: fix incorrect lock order for rq_qos_mutex and freeze queue
-  blk-iocost: fix incorrect lock order for rq_qos_mutex and freeze queue
-  blk-iolatency: fix incorrect lock order for rq_qos_mutex and freeze
-    queue
-  block/blk-rq-qos: cleanup rq_qos_add()
-
- block/blk-iocost.c     |  15 ++--
- block/blk-iolatency.c  |  11 +--
- block/blk-mq-debugfs.c |  66 +++++++++++-------
- block/blk-mq-debugfs.h |   8 +--
- block/blk-rq-qos.c     |  31 ++-------
- block/blk-sysfs.c      |  39 +----------
- block/blk-throttle.c   |  27 ++++----
- block/blk-wbt.c        | 153 +++++++++++++++++++++++++++++++----------
- block/blk-wbt.h        |   7 +-
- 9 files changed, 194 insertions(+), 163 deletions(-)
-
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index e0a70d26972b..a580688c3ad5 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -636,11 +636,8 @@ static ssize_t queue_wb_lat_show(struct gendisk *disk, char *page)
+ static ssize_t queue_wb_lat_store(struct gendisk *disk, const char *page,
+ 				  size_t count)
+ {
+-	struct request_queue *q = disk->queue;
+-	struct rq_qos *rqos;
+ 	ssize_t ret;
+ 	s64 val;
+-	unsigned int memflags;
+ 
+ 	ret = queue_var_store64(&val, page);
+ 	if (ret < 0)
+@@ -648,40 +645,8 @@ static ssize_t queue_wb_lat_store(struct gendisk *disk, const char *page,
+ 	if (val < -1)
+ 		return -EINVAL;
+ 
+-	/*
+-	 * Ensure that the queue is idled, in case the latency update
+-	 * ends up either enabling or disabling wbt completely. We can't
+-	 * have IO inflight if that happens.
+-	 */
+-	memflags = blk_mq_freeze_queue(q);
+-
+-	rqos = wbt_rq_qos(q);
+-	if (!rqos) {
+-		ret = wbt_init(disk);
+-		if (ret)
+-			goto out;
+-	}
+-
+-	ret = count;
+-	if (val == -1)
+-		val = wbt_default_latency_nsec(q);
+-	else if (val >= 0)
+-		val *= 1000ULL;
+-
+-	if (wbt_get_min_lat(q) == val)
+-		goto out;
+-
+-	blk_mq_quiesce_queue(q);
+-
+-	mutex_lock(&disk->rqos_state_mutex);
+-	wbt_set_min_lat(q, val);
+-	mutex_unlock(&disk->rqos_state_mutex);
+-
+-	blk_mq_unquiesce_queue(q);
+-out:
+-	blk_mq_unfreeze_queue(q, memflags);
+-
+-	return ret;
++	ret = wbt_set_lat(disk, val);
++	return ret ? ret : count;
+ }
+ 
+ QUEUE_RW_ENTRY(queue_wb_lat, "wbt_lat_usec");
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index 0974875f77bd..abc2190689bb 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -93,6 +93,8 @@ struct rq_wb {
+ 	struct rq_depth rq_depth;
+ };
+ 
++static int wbt_init(struct gendisk *disk);
++
+ static inline struct rq_wb *RQWB(struct rq_qos *rqos)
+ {
+ 	return container_of(rqos, struct rq_wb, rqos);
+@@ -506,7 +508,7 @@ u64 wbt_get_min_lat(struct request_queue *q)
+ 	return RQWB(rqos)->min_lat_nsec;
+ }
+ 
+-void wbt_set_min_lat(struct request_queue *q, u64 val)
++static void wbt_set_min_lat(struct request_queue *q, u64 val)
+ {
+ 	struct rq_qos *rqos = wbt_rq_qos(q);
+ 	if (!rqos)
+@@ -741,7 +743,7 @@ void wbt_init_enable_default(struct gendisk *disk)
+ 		WARN_ON_ONCE(wbt_init(disk));
+ }
+ 
+-u64 wbt_default_latency_nsec(struct request_queue *q)
++static u64 wbt_default_latency_nsec(struct request_queue *q)
+ {
+ 	/*
+ 	 * We default to 2msec for non-rotational storage, and 75msec
+@@ -902,7 +904,7 @@ static const struct rq_qos_ops wbt_rqos_ops = {
+ #endif
+ };
+ 
+-int wbt_init(struct gendisk *disk)
++static int wbt_init(struct gendisk *disk)
+ {
+ 	struct request_queue *q = disk->queue;
+ 	struct rq_wb *rwb;
+@@ -949,3 +951,45 @@ int wbt_init(struct gendisk *disk)
+ 	return ret;
+ 
+ }
++
++int wbt_set_lat(struct gendisk *disk, s64 val)
++{
++	struct request_queue *q = disk->queue;
++	unsigned int memflags;
++	struct rq_qos *rqos;
++	int ret = 0;
++
++	/*
++	 * Ensure that the queue is idled, in case the latency update
++	 * ends up either enabling or disabling wbt completely. We can't
++	 * have IO inflight if that happens.
++	 */
++	memflags = blk_mq_freeze_queue(q);
++
++	rqos = wbt_rq_qos(q);
++	if (!rqos) {
++		ret = wbt_init(disk);
++		if (ret)
++			goto out;
++	}
++
++	if (val == -1)
++		val = wbt_default_latency_nsec(q);
++	else if (val >= 0)
++		val *= 1000ULL;
++
++	if (wbt_get_min_lat(q) == val)
++		goto out;
++
++	blk_mq_quiesce_queue(q);
++
++	mutex_lock(&disk->rqos_state_mutex);
++	wbt_set_min_lat(q, val);
++	mutex_unlock(&disk->rqos_state_mutex);
++
++	blk_mq_unquiesce_queue(q);
++out:
++	blk_mq_unfreeze_queue(q, memflags);
++
++	return ret;
++}
+diff --git a/block/blk-wbt.h b/block/blk-wbt.h
+index 925f22475738..6e39da17218b 100644
+--- a/block/blk-wbt.h
++++ b/block/blk-wbt.h
+@@ -4,16 +4,13 @@
+ 
+ #ifdef CONFIG_BLK_WBT
+ 
+-int wbt_init(struct gendisk *disk);
+ void wbt_init_enable_default(struct gendisk *disk);
+ void wbt_disable_default(struct gendisk *disk);
+ void wbt_enable_default(struct gendisk *disk);
+ 
+ u64 wbt_get_min_lat(struct request_queue *q);
+-void wbt_set_min_lat(struct request_queue *q, u64 val);
+-bool wbt_disabled(struct request_queue *);
+-
+-u64 wbt_default_latency_nsec(struct request_queue *);
++bool wbt_disabled(struct request_queue *q);
++int wbt_set_lat(struct gendisk *disk, s64 val);
+ 
+ #else
+ 
 -- 
 2.51.0
 
