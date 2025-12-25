@@ -1,19 +1,19 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5935531AA96
-	for <linux-block@vger.kernel.org>; Thu, 25 Dec 2025 10:33:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F5612D63F8
+	for <linux-block@vger.kernel.org>; Thu, 25 Dec 2025 10:33:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766658799; cv=none; b=QnBCT+FHYm9YZq3It7svQwAhGpKs3Kg3IFBTlKMUlWP+e910H5YmHCNh5LV5nZ/+C5AwwLVAVYF9b8yLbrABFE8+SLERnKUUqVTvQnHkzPhxCa9Ic6UYCloS1zOZabbJHEftZZ/Hi+cTJfIqCM9v1mR8wa2Ow32m1JkMU9aaGGI=
+	t=1766658801; cv=none; b=V+QqZhga47tu0FeB4qpTuPrfmWbdi03Op/+ezFJV01XeieeKgVCkLeDSnR6Szkd8ebqKCedtS7PE8mBi9F0yAt3NaAoiBYkkmO4lDw+ky2/MhSENrrwOkeWvhjTkzf/jbBeyEAeEYGrbVxskkTgGDFq/dm5Y3VDm7tjnXYq6Y90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766658799; c=relaxed/simple;
-	bh=/EeUTFOm4bpjSSWOJBud9uN3XCLeYkQuca5MX3rBXJQ=;
+	s=arc-20240116; t=1766658801; c=relaxed/simple;
+	bh=dcvsFra26tRBCZYW6JVVVp2OPoWwgKEiTrjdLD8DrgY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=anByDjg+uyXv6173Ehvm1HxlSfgb0Eyy+X6e/dwWY7sRmO6yeMnGbzVOnxAVwCkh5EaE/I+ZwrNaxd47yKVzx4X9Ug6GlmHQwocvKyMkwhFm5AP59r4jkQnGDXq+rvam8mz25COUZUqG4ZD6Mbcw+ZshWAl0tsvXxK7CYzvNXj8=
+	 MIME-Version; b=kO9FBZDyQIAMKRBQhuUXNOrrJDwpulszRVzLKEdrtFAL8Z2ReXDd5xe3SZO60NzAOz6N3KL+OM8WaPBkIehun/LUIMV1ut9eGYo1mfhcMvVOpZo680TPPwMCaLyWpKcZIkHAwFXW2a4ILrPALNAOcMM/CeE8mJKSNtSgcNUxK40=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 134FFC16AAE;
-	Thu, 25 Dec 2025 10:33:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AA0FC4CEF1;
+	Thu, 25 Dec 2025 10:33:18 +0000 (UTC)
 From: Yu Kuai <yukuai@fnnas.com>
 To: axboe@kernel.dk,
 	linux-block@vger.kernel.org,
@@ -21,9 +21,9 @@ To: axboe@kernel.dk,
 	nilay@linux.ibm.com,
 	ming.lei@redhat.com
 Cc: yukuai@fnnas.com
-Subject: [PATCH v6 09/13] block/blk-rq-qos: add a new helper rq_qos_add_frozen()
-Date: Thu, 25 Dec 2025 18:32:44 +0800
-Message-ID: <20251225103248.1303397-10-yukuai@fnnas.com>
+Subject: [PATCH v6 10/13] blk-wbt: fix incorrect lock order for rq_qos_mutex and freeze queue
+Date: Thu, 25 Dec 2025 18:32:45 +0800
+Message-ID: <20251225103248.1303397-11-yukuai@fnnas.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251225103248.1303397-1-yukuai@fnnas.com>
 References: <20251225103248.1303397-1-yukuai@fnnas.com>
@@ -35,63 +35,55 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-queue should not be frozen under rq_qos_mutex, see example from
-commit 9730763f4756 ("block: correct locking order for protecting blk-wbt
-parameters"), which means current implementation of rq_qos_add() is
-problematic. Add a new helper and prepare to fix this problem in
-following patches.
+wbt_init() can be called from sysfs attribute and
+wbt_init_enable_default(), however queue_wb_lat_store() can freeze queue
+first, and then wbt_init() will hold rq_qos_mutex.
 
+Fix this problem by converting to use new helper rq_qos_add_frozen() in
+wbt_init(), and freeze queue before calling wbt_init() from
+wbt_init_enable_default().
+
+Fixes: a13bd91be223 ("block/rq_qos: protect rq_qos apis with a new lock")
 Signed-off-by: Yu Kuai <yukuai@fnnas.com>
 ---
- block/blk-rq-qos.c | 21 +++++++++++++++++++++
- block/blk-rq-qos.h |  2 ++
- 2 files changed, 23 insertions(+)
+ block/blk-wbt.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
-index 85cf74402a09..b8f163827477 100644
---- a/block/blk-rq-qos.c
-+++ b/block/blk-rq-qos.c
-@@ -322,6 +322,27 @@ void rq_qos_exit(struct request_queue *q)
- 	mutex_unlock(&q->rq_qos_mutex);
- }
- 
-+int rq_qos_add_frozen(struct rq_qos *rqos, struct gendisk *disk,
-+		      enum rq_qos_id id, const struct rq_qos_ops *ops)
-+{
-+	struct request_queue *q = disk->queue;
-+
-+	WARN_ON_ONCE(q->mq_freeze_depth == 0);
-+	lockdep_assert_held(&q->rq_qos_mutex);
-+
-+	if (rq_qos_id(q, id))
-+		return -EBUSY;
-+
-+	rqos->disk = disk;
-+	rqos->id = id;
-+	rqos->ops = ops;
-+	rqos->next = q->rq_qos;
-+	q->rq_qos = rqos;
-+	blk_queue_flag_set(QUEUE_FLAG_QOS_ENABLED, q);
-+
-+	return 0;
-+}
-+
- int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
- 		const struct rq_qos_ops *ops)
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index de3528236545..ed8231b6b6e9 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -775,6 +775,7 @@ EXPORT_SYMBOL_GPL(wbt_enable_default);
+ void wbt_init_enable_default(struct gendisk *disk)
  {
-diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
-index b538f2c0febc..8d9fb10ae526 100644
---- a/block/blk-rq-qos.h
-+++ b/block/blk-rq-qos.h
-@@ -87,6 +87,8 @@ static inline void rq_wait_init(struct rq_wait *rq_wait)
+ 	struct request_queue *q = disk->queue;
++	unsigned int memflags;
+ 	struct rq_wb *rwb;
  
- int rq_qos_add(struct rq_qos *rqos, struct gendisk *disk, enum rq_qos_id id,
- 		const struct rq_qos_ops *ops);
-+int rq_qos_add_frozen(struct rq_qos *rqos, struct gendisk *disk,
-+		      enum rq_qos_id id, const struct rq_qos_ops *ops);
- void rq_qos_del(struct rq_qos *rqos);
+ 	if (!__wbt_enable_default(disk))
+@@ -784,10 +785,13 @@ void wbt_init_enable_default(struct gendisk *disk)
+ 	if (WARN_ON_ONCE(!rwb))
+ 		return;
  
- typedef bool (acquire_inflight_cb_t)(struct rq_wait *rqw, void *private_data);
++	memflags = blk_mq_freeze_queue(q);
+ 	if (WARN_ON_ONCE(wbt_init(disk, rwb))) {
++		blk_mq_unfreeze_queue(q, memflags);
+ 		wbt_free(rwb);
+ 		return;
+ 	}
++	blk_mq_unfreeze_queue(q, memflags);
+ 
+ 	mutex_lock(&q->debugfs_mutex);
+ 	blk_mq_debugfs_register_rq_qos(q);
+@@ -962,7 +966,7 @@ static int wbt_init(struct gendisk *disk, struct rq_wb *rwb)
+ 	 * Assign rwb and add the stats callback.
+ 	 */
+ 	mutex_lock(&q->rq_qos_mutex);
+-	ret = rq_qos_add(&rwb->rqos, disk, RQ_QOS_WBT, &wbt_rqos_ops);
++	ret = rq_qos_add_frozen(&rwb->rqos, disk, RQ_QOS_WBT, &wbt_rqos_ops);
+ 	mutex_unlock(&q->rq_qos_mutex);
+ 	if (ret)
+ 		return ret;
 -- 
 2.51.0
 
