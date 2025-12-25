@@ -1,97 +1,89 @@
-Received: from sg-1-38.ptr.blmpb.com (sg-1-38.ptr.blmpb.com [118.26.132.38])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F46725D216
-	for <linux-block@vger.kernel.org>; Thu, 25 Dec 2025 09:44:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87EAA2F616E
+	for <linux-block@vger.kernel.org>; Thu, 25 Dec 2025 10:32:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766655889; cv=none; b=OsrJZMdbHTDbJM8OkuABdiXMeKhj8Nfx0kK8PeSPqAHWVXzLoAWUztvgQ5rWs6NbTuFNk0J6glKm24sBIJCznMAb9lNPDDiGxNVf03vxwJ9AJvsbEKpR5YFfaU3ShVkBTyT3SLvL9msUWU/mOb0k8kz9iidtEZygNrcExg0kHGI=
+	t=1766658778; cv=none; b=CS9eC/cvyN71sk6IMygSCBf6wP2JQ/eV7tyqRPjEZmD/gfV5tinrNedKUOTlshJ7z97wAlHZIeUyGOvd1KRiI8skpuI25bW34+qv6HjzbJS6tdO+7EwFvtrTGh+9t1pFw7H7lTI7oX7zYSXVaI6FZ8RvBALI0anqiqxA8dUdoKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766655889; c=relaxed/simple;
-	bh=CE1+eYlv3FtiD3jIDMxQBfmwirtxEXdxnNTVnf0L/50=;
-	h=Mime-Version:References:Date:In-Reply-To:Content-Type:Message-Id:
-	 To:From:Subject; b=jkA6SnUZIug3DzstowOm7rpZdcDCTXJTbfWUsun1nc5C+q4xbeJYSTwmt8Lmo8+IqJMFPZmW4P5wmq8c46rMt/wuAEzD4az2VE7GXx2Ig6q4mUAnDxc4qJVnELjAXl+eD76uwi1fMlfZd7pTmLAWIgaulb9gam5HodtT3mDLTx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=pass smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=oGHOV2xj; arc=none smtp.client-ip=118.26.132.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fnnas.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="oGHOV2xj"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1766655047;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=wsor6s5FUGPt1YmMXehxOSLz+2NyqQ0ERhRS9GPmpS4=;
- b=oGHOV2xjtM8LJWnc6egbiwQrdbrFVYKk0KM70wYWKKBHWbgstni9nh53MXcFDtSS77eJ/s
- osC3WYHRsklQiXbfAf9tXcG01Yv2Gfs46HTRWm2I1ah/xG+i7yo54VSzZPJfmv6FfgZ19U
- sZGK2PHCAI2ccP6SL7/B/mjR4KCCqXaWQVnpHyGtB4s7/ZYBRj6wz/NLDS7g8Otsj0AseC
- EZNXP97niKbgcFRX1ArKPmV63cwPVQhPC2TWhYEq3HTrJYFS3WpLb13UXUNIMmAcY0Yiqn
- DtXK035hVnHFUxFCfGgboWOW1D8d3XfJXgnda9oBc0HnJBuLA/39lagW/NUABw==
-Reply-To: yukuai@fnnas.com
+	s=arc-20240116; t=1766658778; c=relaxed/simple;
+	bh=LI2HLGAHJpkpCgYZSY2T1MdXT7OxHlvtdyYlNV56DmI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OKAQgp/ujk24NoeKV9aiIxUhYXKkZGP4qf8CEpsN1Akdfuipbm9ZZuDIsUJgSYj1QtFgG6/v4TElqhuyKuXxLC4rTkUW6nFDNJf5ty3LOqrgeENAm1p/PQ9gSRH26OH/61S+DAe8der9ZFmtOUgZeCpibXSItY3PcT8oNGSXJNU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D1E7C4CEF1;
+	Thu, 25 Dec 2025 10:32:55 +0000 (UTC)
+From: Yu Kuai <yukuai@fnnas.com>
+To: axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	tj@kernel.org,
+	nilay@linux.ibm.com,
+	ming.lei@redhat.com
+Cc: yukuai@fnnas.com
+Subject: [PATCH v6 00/13] blk-mq: fix possible deadlocks
+Date: Thu, 25 Dec 2025 18:32:35 +0800
+Message-ID: <20251225103248.1303397-1-yukuai@fnnas.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251214101409.1723751-1-yukuai@fnnas.com> <20251214101409.1723751-6-yukuai@fnnas.com> <fcdc91ae-8c41-4978-8271-df10c4931903@linux.ibm.com>
-Date: Thu, 25 Dec 2025 17:30:44 +0800
-Content-Transfer-Encoding: quoted-printable
-Received: from [192.168.1.104] ([39.182.0.136]) by smtp.feishu.cn with ESMTPS; Thu, 25 Dec 2025 17:30:45 +0800
-In-Reply-To: <fcdc91ae-8c41-4978-8271-df10c4931903@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <a03985f4-5ccd-419b-9e04-dcc02dfd6e55@fnnas.com>
-Content-Language: en-US
-X-Lms-Return-Path: <lba+2694d0446+00b231+vger.kernel.org+yukuai@fnnas.com>
-User-Agent: Mozilla Thunderbird
-X-Original-From: Yu Kuai <yukuai@fnnas.com>
-To: "Nilay Shroff" <nilay@linux.ibm.com>, <axboe@kernel.dk>, 
-	<linux-block@vger.kernel.org>, <tj@kernel.org>, <ming.lei@redhat.com>, 
-	<yukuai@fnnas.com>
-From: "Yu Kuai" <yukuai@fnnas.com>
-Subject: Re: [PATCH v5 05/13] blk-mq-debugfs: make blk_mq_debugfs_register_rqos() static
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Hi,
+changes in v6:
+ - rebase on the top of block-6.19;
+ - add patch 6 to cleanup  blk_mq_debugfs_unregister_rqos();
+ - change patch 8, from GFP_NOIO to blkg_conf_open_bdev_frozen();
+changes in v5:
+ - free rwb from wbt_init() caller in patch 2;
+ - don't recheck rwb in patch 2 to make code cleaner, concurrent callers
+   will fail from rq_qos_add();
+ - add patch 7 to fix possible deadlock in blk-throtle;
+changes in v4:
+ - add patch 1,2 to fix a new deadlock;
+changes in v3:
+ - remove changes for blk-iolatency and blk-iocost in patch 2, since
+   they don't have debugfs entries.
+ - add patch 9 to fix lock order for blk-throttle.
+changes in v2:
+ - combine two set into one;
 
-=E5=9C=A8 2025/12/18 22:52, Nilay Shroff =E5=86=99=E9=81=93:
->
-> On 12/14/25 3:44 PM, Yu Kuai wrote:
->> Because it's only used inside blk-mq-debugfs.c now.
->>
->> Signed-off-by: Yu Kuai <yukuai@fnnas.com>
->> ---
->>   block/blk-mq-debugfs.c | 4 +++-
->>   block/blk-mq-debugfs.h | 5 -----
->>   2 files changed, 3 insertions(+), 6 deletions(-)
->>
->> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
->> index 128d2aa6a20d..99466595c0a4 100644
->> --- a/block/blk-mq-debugfs.c
->> +++ b/block/blk-mq-debugfs.c
->> @@ -14,6 +14,8 @@
->>   #include "blk-mq-sched.h"
->>   #include "blk-rq-qos.h"
->>  =20
->> +static void blk_mq_debugfs_register_rqos(struct rq_qos *rqos);
->> +
-> The only caller of blk_mq_debugfs_register_rqos() is blk_mq_debugfs_regis=
-ter_rq_qos()
-> in this file. So if you can move the definition of blk_mq_debugfs_registe=
-r_rq_qos() just
-> after the definition of blk_mq_debugfs_register_rqos() in this file then =
-you may avoid
-> above static declaration. Otherwise this looks good to me. So with that c=
-hange,
+Fix deadlocks:
+ - patch 1-2, pcpu_alloc_mutex under q_usage_counter in blk-wbt;
+ - patch 3-7, debugfs_mutex under q_usage_counter;
+ - patch 8, fs_reclaim under rq_qos_mutex in blk-throttle;
+ - patch 9-13, q_usage_counter under rq_qos_mutex;
 
-Yes, this looks better, I'll do that in patch 3.
+Yu Kuai (13):
+  blk-wbt: factor out a helper wbt_set_lat()
+  blk-wbt: fix possible deadlock to nest pcpu_alloc_mutex under
+    q_usage_counter
+  blk-mq-debugfs: factor out a helper to register debugfs for all rq_qos
+  blk-rq-qos: fix possible debugfs_mutex deadlock
+  blk-mq-debugfs: make blk_mq_debugfs_register_rqos() static
+  blk-mq-debugfs: remove blk_mq_debugfs_unregister_rqos()
+  blk-mq-debugfs: warn about possible deadlock
+  blk-throttle: fix possible deadlock for fs reclaim under rq_qos_mutex
+  block/blk-rq-qos: add a new helper rq_qos_add_frozen()
+  blk-wbt: fix incorrect lock order for rq_qos_mutex and freeze queue
+  blk-iocost: fix incorrect lock order for rq_qos_mutex and freeze queue
+  blk-iolatency: fix incorrect lock order for rq_qos_mutex and freeze
+    queue
+  block/blk-rq-qos: cleanup rq_qos_add()
 
-> you may add:
->
-> Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
->
->
->
->
->
---=20
-Thansk,
-Kuai
+ block/blk-iocost.c     |  15 ++--
+ block/blk-iolatency.c  |  11 +--
+ block/blk-mq-debugfs.c |  66 +++++++++++-------
+ block/blk-mq-debugfs.h |   8 +--
+ block/blk-rq-qos.c     |  31 ++-------
+ block/blk-sysfs.c      |  39 +----------
+ block/blk-throttle.c   |  27 ++++----
+ block/blk-wbt.c        | 153 +++++++++++++++++++++++++++++++----------
+ block/blk-wbt.h        |   7 +-
+ 9 files changed, 194 insertions(+), 163 deletions(-)
+
+-- 
+2.51.0
+
