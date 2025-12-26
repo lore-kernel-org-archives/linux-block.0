@@ -1,87 +1,87 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08521A945
-	for <linux-block@vger.kernel.org>; Fri, 26 Dec 2025 22:11:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 325501DB34C
+	for <linux-block@vger.kernel.org>; Fri, 26 Dec 2025 22:13:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766787096; cv=none; b=P+R0X9hPZAIOkpSY2RLgNJHuxFPP1jcpb2vHbn37wajvjX0fGKd/twDRaXn2Ft1gBSAOZi7umMOnSxBVdWQLY9TUXveGkh6cNUxbjS/k038516NLY2uBjCg1Rcm8jbvO+rP6zOm98FVPv7RP3oF5PM66FN05iWKA9XbfKMy+1v0=
+	t=1766787214; cv=none; b=P2dI/xZmWEPkwIAnJnCocYiAA5lbsgub1k3k+9fOeA8emr4Cg3sTxm7vRYwMVQHJCqKoXzhqiYfCOJivPD441L8//7IogIb6tABcsouo8XMJszeD+bCmX/eeAaNWO69HDoq9eEREB/zEJfFtk7fXjwLMstGoSHmW2Wp+p0fvvOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766787096; c=relaxed/simple;
-	bh=R9tnImEFZzIwnpkj2WDVfVzgbrkCYG/lZwE4VsztwgI=;
+	s=arc-20240116; t=1766787214; c=relaxed/simple;
+	bh=38SETu3HZwoc8bpPyvY57PyJDti9cAF1uQy2Al3c77g=;
 	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Ugq46q3aSdvWB89j4iBr3XoyZWZ0uE25MpICYB/bdzVt44lnhn2Bu327uX4a03kACQE6nOIL+YilQLOag+QPavXUiPlefH1K2guWXBOStS84+vrnxHqHZauUQ6nBswjqA8qu8c1HjRcXy86EaAfPK+5d6fAWrYudtct9AJgrOZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NmuGXbKl; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=EidF7Ydq; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=CK24cPC6JzNvh78MeQSWEmxQu9T3L7H5mM66SUQX4RFwHcVhXlVvMNMbtgkFLjtmAZc6XLpcRxJcbsLQMCEcsCXz11efxdIl7NnksqttQ9/yH9cIG3l/0kHyqDX+9Mbsh09ARvPYkLvc53yXWNEMm77nXvhQR+1Vyp9WL+D8kdE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RLlGyUwt; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=FRhC2VIt; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NmuGXbKl";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="EidF7Ydq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RLlGyUwt";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="FRhC2VIt"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1766787094;
+	s=mimecast20190719; t=1766787212;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=TkFBnQY3LS/CUDnrkcxR3YOk4jUDJ9IE93cEOOeBXqU=;
-	b=NmuGXbKl1ddvCuhKhxYwRYtD+C4NAzkzwuBr/1DcPLAc4jjeTMZppqy2rfz5esB7I1riKM
-	4m6yKfs54E9JSGnMou1Qhod0XJ2kO/y4t4L9UJImTE8DtXprSQDXMRDRykFlcHbuMiia3n
-	QgFVX8jLgXZekhhbVAMjOIsqb9EbEjg=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=MbQAbHkG6iNX6LkB+q4ATv+TKkhtMlH6KHEacyY50T0=;
+	b=RLlGyUwtYevISZY2BzXkC+HU2I13BJVJnZfdig3vmf1eRamCR6Z5+pBqr9wf1y5Gh76d8l
+	uwjAfSZrC3YEokcCIZU7r+bV0UqYuQdTPhGNAe+phYMbNYerhjryR/wEpLw/JAvgPLwK24
+	/1qDKqfSCVpV5gLipzIhB33e1BMKU+Q=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-189-Q-aguA_ZMUSvmUFVsQT0eQ-1; Fri, 26 Dec 2025 17:11:32 -0500
-X-MC-Unique: Q-aguA_ZMUSvmUFVsQT0eQ-1
-X-Mimecast-MFC-AGG-ID: Q-aguA_ZMUSvmUFVsQT0eQ_1766787092
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-4f4ab58098eso177252971cf.1
-        for <linux-block@vger.kernel.org>; Fri, 26 Dec 2025 14:11:32 -0800 (PST)
+ us-mta-533-OMgI1YdaPiyfkDEbmjLgzQ-1; Fri, 26 Dec 2025 17:13:31 -0500
+X-MC-Unique: OMgI1YdaPiyfkDEbmjLgzQ-1
+X-Mimecast-MFC-AGG-ID: OMgI1YdaPiyfkDEbmjLgzQ_1766787210
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-88a2f8e7d8dso202619336d6.1
+        for <linux-block@vger.kernel.org>; Fri, 26 Dec 2025 14:13:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1766787092; x=1767391892; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1766787210; x=1767392010; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:content-language:references
          :cc:to:subject:user-agent:mime-version:date:message-id:from:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=TkFBnQY3LS/CUDnrkcxR3YOk4jUDJ9IE93cEOOeBXqU=;
-        b=EidF7YdqfyHw2+42PNOPVaxHWa35FwPtFgE1WAbC5CTRD9tIR+8icI6UGXyvHiVPUT
-         nD6mR1IcfsqKp/VfccdhNo+iY5YH3QMrnUer4n2pAEBsDrORuGEc271YQjF74sWeDfsb
-         wsaAF+EjM/qf4iECJJf5YKZlH+lhhyJapXrCWE/DiKIHmyw0tw0v16nVIfXK77PJ5bMb
-         l8FnU9wa8EuKRU4QMlaUkCX/ivgPGpKG3LlOr2Rh1Fl2ASVJy5bOwk7jWQrOQZgO+tdH
-         mTae93qCT+F3wgXvhN4A8YD1m+ZThxKo31bEHrsMVbxOwXuwMD19eFAtcQAkqPDmrU/b
-         nN4A==
+        bh=MbQAbHkG6iNX6LkB+q4ATv+TKkhtMlH6KHEacyY50T0=;
+        b=FRhC2VItRuJvOg2H7zCbbHgRrbqiQs7UhLao4Y5EJob/ZLXo7HRhCK0SFMQHx9oylD
+         Et5xRRYE8wpnraa7C4PoZT79EZvfYkJlCpn7o+yGMGqQkQqS/Sd1uAfLsrcQpwp0Rdfj
+         nHaNosZwd/L3bxQawUw66njcan+mTievdwuVyj966FFivyOzGn5UHw7h9avcAdnC2lA1
+         a0qM2HhshEGXRGzm4/V6XEnhiwKBnSALZHK+HfFbAje8h9rFpjUsgqSXf6PG0pdKOMU9
+         1l+EOVPwigSiRKDsy2rYt3bQ6a5v4aqnFDum2zbORqxcV7sqsOqQ7GbTByuAt8LSEPrW
+         kb8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766787092; x=1767391892;
+        d=1e100.net; s=20230601; t=1766787210; x=1767392010;
         h=content-transfer-encoding:in-reply-to:content-language:references
          :cc:to:subject:user-agent:mime-version:date:message-id:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TkFBnQY3LS/CUDnrkcxR3YOk4jUDJ9IE93cEOOeBXqU=;
-        b=PvUL4n4GWtEAtOogvL2xuCUatnp0KLh1k3fKBa/dWvjLPm936/MtWvdteSCE93CcwW
-         B+TBJ2r9ijwBa4+zAW2oaP/7OMNa/vjAkEKVe+n16yFqLSfruugCBV9YCID8EexzhVqi
-         fX2Rc1Jp2z+PS70ed9xJvzcc46UwgrpNLmzP9aj5b5x3gWJXggP0Ut7HCW4sBF/rYam+
-         I/PMgz0/3PBS6WD2tptr/TQ0EYsprT81OFhKcnmT+QwSWgglV6gSP0IVs+vjqkGs/va6
-         PuN8fEr91xNaVkOGK75y23Aq9C9WZ9JkhTK/m/0HUy37oijyRBbGSO53mp8uXE5Hg8HY
-         js8g==
-X-Forwarded-Encrypted: i=1; AJvYcCUIhyRC3LvgVTijmj4o8ddTLjcBd5nvFoRTp/LwyUMJLBLlwqu5HCR13aL+0VBumGOzeIrwVoguuASIWg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwdRZ8IlyDD4g8U0w3xh6kUHF6cG6RejIZ2nPhMsBeP/Nbpf1Ny
-	nXFEn8bd0ZQygeZT4/n6xKt1x0gmUcK+oPDUApB8h/wjPyue9+eq07lR64oN9Hzf3YWMot/me3y
-	kyP6pDTiASBWlvwjURmYc2qbijkEBxn2GYWK7758jXu87o9MCnj5z8120qlsLCheB
-X-Gm-Gg: AY/fxX5CLXzeF6EQPXvvVMUBQ5lh1MbImAgh2E4asFkF9hhr7cipLI+8ZekOwS/aK1J
-	jbIPKgeGfA74+7MsCp6cK3hJuJ08FLQ1YFqYhkcJzJa4DQJ1M0W018VXdq4OcThkAFy3bciCPrE
-	dwpEDZ9OArQZYHfWfkTeKUSwUQL9xZ/+7ngXT67f2wQoudEUwTrvgcfX/nJ/RfjCTO1irsLhV6S
-	yLLo4BEFFOT74TVT7pbqFlsTazTef8BdFH9spctX4t2uV7shpNDTvXg9NQAHTunFx8sHxIW+uDR
-	hHWtU66A3d39dqzVdyBjbnVDV1DWByeJ6M5UJqXmUBUj/7h2/43dEzTNA9eNPRJZl4rqlxAnNo3
-	jgLTYBAdACxzPxKIe6bP33at4smG19Wm7gCZ2e2b3n0sCpuNsZ6TTYy0r
-X-Received: by 2002:a05:622a:4a09:b0:4ee:2510:198a with SMTP id d75a77b69052e-4f4abd75629mr345582071cf.39.1766787091843;
-        Fri, 26 Dec 2025 14:11:31 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGfAC0mMAvBMTtIg0HnYR5V/3qz64S5XCvmCWe5yr1a0y1ZiMQUT11GI7YF+lRu7HFhzwx/CQ==
-X-Received: by 2002:a05:622a:4a09:b0:4ee:2510:198a with SMTP id d75a77b69052e-4f4abd75629mr345581701cf.39.1766787091473;
-        Fri, 26 Dec 2025 14:11:31 -0800 (PST)
+        bh=MbQAbHkG6iNX6LkB+q4ATv+TKkhtMlH6KHEacyY50T0=;
+        b=WQZtDTnBTgeb0RdrrEzYxZ9X4MQ2a0eNpQyOlwdyc69ZivqPBIKqSjDNpMRex+3y+3
+         TI6u0eEEg7nUQwz0W7jpLdIK5ePTZEXh0b/bLa7sK1e2nDldZJNgV3aUrJJPsDfOD8uX
+         6L6EN2FrmB1lxq1zrksnEd7gYoEsioDiJ97dPI6JzEokb0fTf6IfCZKGbah5nX1MGQHS
+         Q+ymE9w7toOHMt6lnTRm0+PeLcF2WaYRl9+l7b3Zym89oia+q6g35dCwZs5idMi1oUpz
+         TsZZzep4K+X7mdJyd3sVKMmC4jidsw5Kt00JQCZMxAPkkrl6MwQwflqaZkZKkf3NstKc
+         z6BQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVgBixLAxt1Qh8FGDPzdrSGAY3Dwer1nSdVyzMNA/rRwOC3tq+r32krB8fN5cE1aHmNFBvVJOwQmzHNlw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6aDfnBjpAwhNoZXdsoMHWHTd8XcgEsr7qIL9QaBvDB+Ru7qiE
+	sLv7lZu7MDmDaSWwTj8gW5u91U62iURXXmzwiL4H75yd2BopJljGnC0WLV+5tzJWq7bCogXDUh/
+	1CTY9AGoVM8WjdPon4QLW60eO0o2+2tT7OVhBor1pKWa2chQx+zs5iQRo+FJn44e3
+X-Gm-Gg: AY/fxX5Uq8AcgxtnpmrexSnItndzVHopVHP1UugzmulDcl+e7kvte79RCF7MWnsveC9
+	P0KqqkZEYNu2LL+1WSndLfMXgWNMRUoIUkVxaF4geqSGHCeIIhgqX0G76Gh0gMmpgL7fZSaGag5
+	Dv8iz3pTAn02JEBP13hE6JDrsBZ7FaPjIEblLEsrnLadAmT7YDC1FNSs/31Ou6z75kv7iAxTqgi
+	dzsJcGDmepSqyBVce3XTa+5L+Uh8+xiPkaoUTqFM6BsmIVRVYb6tBlOXS5SBWDG42aXqMFIktpA
+	IP7d0D1g97sc0hJ/Zvu0BohKYwuvi/Dq/+D9ivoNq2LcWguOul9+yKcWW/f1VKMSCJkrWpwO+6z
+	RsQd6n2PzWf0cfl+8O2uFqjSKgReaysvpM8hyTQ+MuuiXmxjF9OUutMJY
+X-Received: by 2002:a05:6214:c2e:b0:888:8047:e514 with SMTP id 6a1803df08f44-88d81278a7bmr406254546d6.5.1766787210448;
+        Fri, 26 Dec 2025 14:13:30 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEYVLwcCzEd9vRQ5ZAiqiA7WVLjHHO5Pqc++xoxQfNciNGScOhGispLouTYQ6DDT3yyTzTvrQ==
+X-Received: by 2002:a05:6214:c2e:b0:888:8047:e514 with SMTP id 6a1803df08f44-88d81278a7bmr406253916d6.5.1766787209977;
+        Fri, 26 Dec 2025 14:13:29 -0800 (PST)
 Received: from ?IPV6:2601:600:947f:f020:85dc:d2b2:c5ee:e3c4? ([2601:600:947f:f020:85dc:d2b2:c5ee:e3c4])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-88d9623fd37sm176347436d6.3.2025.12.26.14.11.27
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4f4d5b4c975sm115870181cf.1.2025.12.26.14.13.25
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 26 Dec 2025 14:11:30 -0800 (PST)
+        Fri, 26 Dec 2025 14:13:29 -0800 (PST)
 From: Waiman Long <llong@redhat.com>
 X-Google-Original-From: Waiman Long <longman@redhat.com>
-Message-ID: <1e530c72-75d7-4c7e-96e7-329056d6baf5@redhat.com>
-Date: Fri, 26 Dec 2025 17:11:26 -0500
+Message-ID: <48f8bff9-178c-4ab7-a8ef-7edba9b0e7bb@redhat.com>
+Date: Fri, 26 Dec 2025 17:13:25 -0500
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -89,8 +89,8 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 25/33] kthread: Include unbound kthreads in the managed
- affinity list
+Subject: Re: [PATCH 26/33] kthread: Include kthreadd to the managed affinity
+ list
 To: Frederic Weisbecker <frederic@kernel.org>,
  LKML <linux-kernel@vger.kernel.org>
 Cc: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
@@ -116,126 +116,41 @@ Cc: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
  linux-block@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org,
  netdev@vger.kernel.org
 References: <20251224134520.33231-1-frederic@kernel.org>
- <20251224134520.33231-26-frederic@kernel.org>
+ <20251224134520.33231-27-frederic@kernel.org>
 Content-Language: en-US
-In-Reply-To: <20251224134520.33231-26-frederic@kernel.org>
+In-Reply-To: <20251224134520.33231-27-frederic@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 12/24/25 8:45 AM, Frederic Weisbecker wrote:
-> The managed affinity list currently contains only unbound kthreads that
-> have affinity preferences. Unbound kthreads globally affine by default
-> are outside of the list because their affinity is automatically managed
-> by the scheduler (through the fallback housekeeping mask) and by cpuset.
+> The unbound kthreads affinity management performed by cpuset is going to
+> be imported to the kthread core code for consolidation purposes.
 >
-> However in order to preserve the preferred affinity of kthreads, cpuset
-> will delegate the isolated partition update propagation to the
-> housekeeping and kthread code.
->
-> Prepare for that with including all unbound kthreads in the managed
-> affinity list.
+> Treat kthreadd just like any other kthread.
 >
 > Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
 > ---
->   kernel/kthread.c | 70 ++++++++++++++++++++++++++++--------------------
->   1 file changed, 41 insertions(+), 29 deletions(-)
+>   kernel/kthread.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
 >
 > diff --git a/kernel/kthread.c b/kernel/kthread.c
-> index f1e4f1f35cae..51c0908d3d02 100644
+> index 51c0908d3d02..85ccf5bb17c9 100644
 > --- a/kernel/kthread.c
 > +++ b/kernel/kthread.c
-> @@ -365,9 +365,10 @@ static void kthread_fetch_affinity(struct kthread *kthread, struct cpumask *cpum
->   	if (kthread->preferred_affinity) {
->   		pref = kthread->preferred_affinity;
->   	} else {
-> -		if (WARN_ON_ONCE(kthread->node == NUMA_NO_NODE))
-> -			return;
-> -		pref = cpumask_of_node(kthread->node);
-> +		if (kthread->node == NUMA_NO_NODE)
-> +			pref = housekeeping_cpumask(HK_TYPE_KTHREAD);
-> +		else
-> +			pref = cpumask_of_node(kthread->node);
->   	}
+> @@ -818,12 +818,13 @@ int kthreadd(void *unused)
+>   	/* Setup a clean context for our children to inherit. */
+>   	set_task_comm(tsk, comm);
+>   	ignore_signals(tsk);
+> -	set_cpus_allowed_ptr(tsk, housekeeping_cpumask(HK_TYPE_KTHREAD));
+>   	set_mems_allowed(node_states[N_MEMORY]);
 >   
->   	cpumask_and(cpumask, pref, housekeeping_cpumask(HK_TYPE_KTHREAD));
-> @@ -380,32 +381,29 @@ static void kthread_affine_node(void)
->   	struct kthread *kthread = to_kthread(current);
->   	cpumask_var_t affinity;
+>   	current->flags |= PF_NOFREEZE;
+>   	cgroup_init_kthreadd();
 >   
-> -	WARN_ON_ONCE(kthread_is_per_cpu(current));
-> +	if (WARN_ON_ONCE(kthread_is_per_cpu(current)))
-> +		return;
->   
-> -	if (kthread->node == NUMA_NO_NODE) {
-> -		housekeeping_affine(current, HK_TYPE_KTHREAD);
-> -	} else {
-> -		if (!zalloc_cpumask_var(&affinity, GFP_KERNEL)) {
-> -			WARN_ON_ONCE(1);
-> -			return;
-> -		}
-> -
-> -		mutex_lock(&kthread_affinity_lock);
-> -		WARN_ON_ONCE(!list_empty(&kthread->affinity_node));
-> -		list_add_tail(&kthread->affinity_node, &kthread_affinity_list);
-> -		/*
-> -		 * The node cpumask is racy when read from kthread() but:
-> -		 * - a racing CPU going down will either fail on the subsequent
-> -		 *   call to set_cpus_allowed_ptr() or be migrated to housekeepers
-> -		 *   afterwards by the scheduler.
-> -		 * - a racing CPU going up will be handled by kthreads_online_cpu()
-> -		 */
-> -		kthread_fetch_affinity(kthread, affinity);
-> -		set_cpus_allowed_ptr(current, affinity);
-> -		mutex_unlock(&kthread_affinity_lock);
-> -
-> -		free_cpumask_var(affinity);
-> +	if (!zalloc_cpumask_var(&affinity, GFP_KERNEL)) {
-> +		WARN_ON_ONCE(1);
-> +		return;
->   	}
+> +	kthread_affine_node();
 > +
-> +	mutex_lock(&kthread_affinity_lock);
-> +	WARN_ON_ONCE(!list_empty(&kthread->affinity_node));
-> +	list_add_tail(&kthread->affinity_node, &kthread_affinity_list);
-> +	/*
-> +	 * The node cpumask is racy when read from kthread() but:
-> +	 * - a racing CPU going down will either fail on the subsequent
-> +	 *   call to set_cpus_allowed_ptr() or be migrated to housekeepers
-> +	 *   afterwards by the scheduler.
-> +	 * - a racing CPU going up will be handled by kthreads_online_cpu()
-> +	 */
-> +	kthread_fetch_affinity(kthread, affinity);
-> +	set_cpus_allowed_ptr(current, affinity);
-> +	mutex_unlock(&kthread_affinity_lock);
-> +
-> +	free_cpumask_var(affinity);
->   }
->   
->   static int kthread(void *_create)
-> @@ -919,8 +917,22 @@ static int kthreads_online_cpu(unsigned int cpu)
->   			ret = -EINVAL;
->   			continue;
->   		}
-> -		kthread_fetch_affinity(k, affinity);
-> -		set_cpus_allowed_ptr(k->task, affinity);
-> +
-> +		/*
-> +		 * Unbound kthreads without preferred affinity are already affine
-> +		 * to housekeeping, whether those CPUs are online or not. So no need
-> +		 * to handle newly online CPUs for them.
-> +		 *
-> +		 * But kthreads with a preferred affinity or node are different:
-> +		 * if none of their preferred CPUs are online and part of
-> +		 * housekeeping at the same time, they must be affine to housekeeping.
-> +		 * But as soon as one of their preferred CPU becomes online, they must
-> +		 * be affine to them.
-> +		 */
-> +		if (k->preferred_affinity || k->node != NUMA_NO_NODE) {
-> +			kthread_fetch_affinity(k, affinity);
-> +			set_cpus_allowed_ptr(k->task, affinity);
-> +		}
->   	}
->   
->   	free_cpumask_var(affinity);
+>   	for (;;) {
+>   		set_current_state(TASK_INTERRUPTIBLE);
+>   		if (list_empty(&kthread_create_list))
 Reviewed-by: Waiman Long <longman@redhat.com>
 
