@@ -1,118 +1,63 @@
-Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CD695464D
-	for <linux-block@vger.kernel.org>; Fri, 26 Dec 2025 16:12:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C88C824A078
+	for <linux-block@vger.kernel.org>; Fri, 26 Dec 2025 19:53:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766765556; cv=none; b=dkJCZxLPKjeWvCWik4YK8gx4gsBnlyqLR5ylUyxN55FzEIFO+L2gqrJUipWmcqLKBbyydErgn9ZkSYBupC4EhNu3wZxOJa2E9ojS2MRkG5VByUa+rrlZDOn3odC3NLHr25J7hXQVk/nBxbymHSXmRl2kiyz+c3IZ6aCmpcoGtXc=
+	t=1766778802; cv=none; b=iCxCwmAaR+MBcsZGWTVf2bxN/jJO/aFvg+uAWJLZSbh7CcB9FXUVMr98W9x/2U7RCKD1v4Fi4cUXS9MYNukeEeAt8bj2r/Ty/P2tRL+mJxsjQim3LHoS7qr2F1qZuDxBE71svH6C9Z3OIDyaykQEIynjaVuKeYnHRSGwcunf0RU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766765556; c=relaxed/simple;
-	bh=GrF7+TdMSvVYDb+7UIbVZ2eRHLk3l+RXmfkU5nmOm+c=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=ZWcXcnm0+aKAR9dxJKPQeCp8XgFymHiM/KWxMNgeoUXxIDyKb9IU+D3OC13bhcfZy+25sJbLhYE66I9QylS3NmU8s/i0gx1WVP7pZwNpF1wFqnrIzj3C82F/Vpbla2uT7tv/H8dDj4X5evLwHcLb4uQ4I8Qr5lU0K7DUsY6QqoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ikXMBZDE; arc=none smtp.client-ip=209.85.167.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1766778802; c=relaxed/simple;
+	bh=k/+rNP4dWfbDoDRrfhq1+DVNaDj6ar8OLt+6kr7CyE0=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=IhjmuqXdbB41oN4R71txZ6wH9jkoVStdNzAvGU/6mQP8ki8GaR8/fr52og9uvNpo8P3v27aAMxucDGz8zFx8SM+Oj8lPIab3K6Jcc7RDx/nnP2+/vM3hIjq4E6qEt6bUyS+ZpLVERyxF0kxAt9khbWzQRQlIdt4B6/vsD4fwlEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aQlbwDml; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ikXMBZDE"
-Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-459a258561cso1186249b6e.0
-        for <linux-block@vger.kernel.org>; Fri, 26 Dec 2025 08:12:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1766765551; x=1767370351; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=L7E8eTD8ybNtwHejmf3cksDdc3c4tT4lrwbCTkie2ik=;
-        b=ikXMBZDEoFcuHISH6Jc7UCD8OA7xtWpsNTBPPZfwuVsOQlgvIU1d33lwX9JJoeeVOk
-         zFSDYeJF1gu1HBCM7uJ2/wDMgsY7Z00Kt7qPltHV3fGXkJs3znm1FdNyDlKh1eoffJwu
-         J41qMC2Aq5zT7aq21xVl/wQtOuPhLqCWOuEuG0MYDN/6tQSDlDhhndkvRO+y9vVKmjZp
-         Hc6lbENNV+wG3SyZVyiYdruT9gWTh45j944DrBHvTZqflKXqu6/NnPDNuXXMN+sCOPuY
-         4MoGZP4ITz+i0loYxE2B0DFybfrHx+IKHLdluYiApautb4BtRqEdxoN3ddcyxaH9JxZe
-         Dj1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766765551; x=1767370351;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=L7E8eTD8ybNtwHejmf3cksDdc3c4tT4lrwbCTkie2ik=;
-        b=uUBgJpgatAGRarJRLTEq2gX5i+yQEgQ5R/PiujvKGJQJ2r0r0HLT5kFj5t1t/5Tnqc
-         rpUlGgYPgosuZJP3FTE/ovptnpszMuvengSfYkA/QhhJFgW384obmZtvkNnMKYMFpdq2
-         /0G/9yua3Nr/UxyXcReVczIxZBe3fQMqXMoka5SK1DFa4B85KODv6pdz8AqMms4ZUjRn
-         uW6fDN95O2qs/fTPEyVSlCx8euoqR9Vt6baPBWU6vEolcoXr6oYSfVsX5c0RK7lnSaWa
-         6v4gV7A8/yHv21Wt8c8yEgkXTqfpqdSX8dDJvczCt3GJy3KTuD90jin14af418UOxchb
-         QMpQ==
-X-Gm-Message-State: AOJu0YzUvM8pgpKRFgmM8eYkyEexSezUBa8j5LAxzNoPyCeO+sR6wuIG
-	t4YSXpLg/Kc0feXQOLV9idaVC0kaIOsyeidueFzx4Vd+Nd8TPo1rNWkO+2JRCBHNtOVoI991JPx
-	uIDBF
-X-Gm-Gg: AY/fxX5bcVQQbe0xMpBS5uweIp9Xi/CsJUkwdyuw8fqibpDcLAFGOggt9+hYEXsuw3w
-	cBl7Zovhie182rlqXbwhp8LX02U54lxO8e4Tth6EOoSuELGHcLMyiAzvONBlfhosL91RI7qvKJd
-	MrT3BHzwdVkVL80cGnSbvdxKiMnBM4cP666XTwOA9LLaguegb7ogF+6Jmrhq9/zqbXmUr6g7uh4
-	Gh9DzhS4Z3pBtncvTQ1hRiUOISi3ZzxdcGFHhi6qvAvDsdI4OatXayevxfH7VWhd2mRQwIBSRgP
-	Ksk2YaXS2GtyUeVLlfBIjDVE81+ZfrERxKBA07pRUSJ4C7ibdL8xzgD9uJX+lN0+fWDrM3YDqPI
-	57cpyuGw7UzY1NJVu9V8uQ1OT+EPzWsDd4e0CxIXxkCdxeonAlOuh3j2SNqaFtyE/k+mhzj25Jp
-	ue3c1TL29p
-X-Google-Smtp-Source: AGHT+IEOEKFANSVQcZTrd7XONyrEQvo2uCyH4pQlzhHzZQtVAzK7MNNvxvLXLbbNU3rXXYPPrLeekQ==
-X-Received: by 2002:a05:6808:1205:b0:44f:8ccd:c489 with SMTP id 5614622812f47-457b2256e3emr10701927b6e.25.1766765550807;
-        Fri, 26 Dec 2025 08:12:30 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-457b3ba440asm11117489b6e.5.2025.12.26.08.12.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 26 Dec 2025 08:12:29 -0800 (PST)
-Message-ID: <b136d4fd-a686-449c-b2db-71952cf29ac5@kernel.dk>
-Date: Fri, 26 Dec 2025 09:12:28 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aQlbwDml"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 962BCC4CEF7;
+	Fri, 26 Dec 2025 19:53:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1766778802;
+	bh=k/+rNP4dWfbDoDRrfhq1+DVNaDj6ar8OLt+6kr7CyE0=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=aQlbwDml+WmAQczXVx69Xhz7aSP93z0nhK5gxSjdpt0aA75fswTPN0MHJsrXBuyx/
+	 JydE0CgBJTDV8qWwHtRqA/APnOB+BYRm0gnHnLdv11I7b0tPaCQ05W8QnCIb/TPAM3
+	 eD3oQHzCO+y6ejf+bF34QZ8CqUOkb9E06SGJeyA9gRRAHmy9r6ilrAyo/IZ/cMEcB/
+	 OiPioo09bdSXEBrdibND+nDBBaPDiSUqWLoI9HioT96kf7J/7JOMeQoRcj+S965iJ9
+	 M1iCAWvlTy+8qj7OMAKRxV84WHtCE6ibaZmKuFJlLlXuQfj9PPHbvPK62F0Ylqepqt
+	 zI9hzH4Yhla9w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3B77B380A959;
+	Fri, 26 Dec 2025 19:50:08 +0000 (UTC)
+Subject: Re: [GIT PULL] Block fixes for 6.19-rc3
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <b136d4fd-a686-449c-b2db-71952cf29ac5@kernel.dk>
+References: <b136d4fd-a686-449c-b2db-71952cf29ac5@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <b136d4fd-a686-449c-b2db-71952cf29ac5@kernel.dk>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-6.19-20251226
+X-PR-Tracked-Commit-Id: 1ddb815fdfd45613c32e9bd1f7137428f298e541
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 3f0e9c8cefa913dd9bd1d79b9a68896ea130f106
+Message-Id: <176677860672.1987757.13023947523405785281.pr-tracker-bot@kernel.org>
+Date: Fri, 26 Dec 2025 19:50:06 +0000
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 6.19-rc3
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-Hi Linus,
+The pull request you sent on Fri, 26 Dec 2025 09:12:28 -0700:
 
-Two minor fixes for the current kernel release. This pull request
-contains:
+> https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-6.19-20251226
 
-- Fix for a signedness issue introduced in this kernel release for rnbd.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/3f0e9c8cefa913dd9bd1d79b9a68896ea130f106
 
-- Fix up user copy references for ublk when the server exits.
-
-Please pull!
-
-
-The following changes since commit af65faf34f6e9919bdd2912770d25d2a73cbcc7c:
-
-  block: validate interval_exp integrity limit (2025-12-18 09:51:49 -0700)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-6.19-20251226
-
-for you to fetch changes up to 1ddb815fdfd45613c32e9bd1f7137428f298e541:
-
-  block: rnbd-clt: Fix signedness bug in init_dev() (2025-12-20 12:56:48 -0700)
-
-----------------------------------------------------------------
-block-6.19-20251226
-
-----------------------------------------------------------------
-Caleb Sander Mateos (1):
-      ublk: clean up user copy references on ublk server exit
-
-Dan Carpenter (1):
-      block: rnbd-clt: Fix signedness bug in init_dev()
-
- drivers/block/rnbd/rnbd-clt.h | 2 +-
- drivers/block/ublk_drv.c      | 3 +--
- 2 files changed, 2 insertions(+), 3 deletions(-)
+Thank you!
 
 -- 
-Jens Axboe
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
