@@ -1,87 +1,87 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F174A28641F
-	for <linux-block@vger.kernel.org>; Fri, 26 Dec 2025 23:08:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68A563A1E79
+	for <linux-block@vger.kernel.org>; Fri, 26 Dec 2025 23:46:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766790537; cv=none; b=fmwBk1sDedo8guBXEpIuM8sgBdWyAWAanLNfH8jGBWWx5n0WTJOFIwMYoUp7pN1LGUUJ5GURVeTgcIrEq+gHpPNIMjtR0rE7yhLhCTnwetn1l1EaTQ1E5ZIIsxTCnsN6SIc6fXbFTswgsrN+bCmTm6Kx0bZNzp3EB9nn+mebdGI=
+	t=1766792773; cv=none; b=mnZcs5dz0icWqeI9NfCGmgVcMCQGYWluYb6pl54zBtCyL8LOnS4DArRWY7nyaj2A0ISW8Ig0gF/3ttqa7HFNcTcrT2+sODYDb6M4dffo/Ek0/6AUw0CvaXJRl0U7Fe0HWnINkvEohenhicSxuG0EVXqMfZQ9T68QFL3IgYZD1ls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766790537; c=relaxed/simple;
-	bh=oghaDqCtoGuDQNAmtHfUkftbTAQMnzWTPNUYgFydFis=;
+	s=arc-20240116; t=1766792773; c=relaxed/simple;
+	bh=0v3xmUYZaueJUsk7e1yfwE8JR+n/4CdwFxRmBxTEGsA=;
 	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=YkH4pAP3beCU2yTDW1xE4C101HXzg1ZVRNFTQ9XgKhJlxOTEdz4tTjthQDbAMwJ+6TiGpgm2wP0EzaY3+BWHyzSXVpC7XsK1wSfQwsBwfFjJMtDT1sI+2NzM5BSwxy4SEU7beEYwukWmSl6KXgu1dLkGBHv0AwoSfSDf1F+9qVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MPPqP8Lw; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=dGMgwsnv; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=H8ZUAcx+DNGEZ3a+zkCaZ7hoXg/w0sSr1HQnaf9KwvPy4Y+O97bcCzMcDLO7tZsEY9ocRyF7qt10I5zItEYfHLycL/ayPeVwSVQ8T/duvPbnMMVRBceQkJX1LAHpNqJdJnLPYNgbDSFHlUTnGqSjpoIu2KeaKwlObrZtVFuHSsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cKwYdPMq; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ckdywsSY; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MPPqP8Lw";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="dGMgwsnv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cKwYdPMq";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ckdywsSY"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1766790534;
+	s=mimecast20190719; t=1766792770;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=hPVYyOhmWYyUzd26KqEqEx9SiJ2wqcstK13CbukMaus=;
-	b=MPPqP8LwYF8oNEYjd634HOi2+LUO3X2KSXzb+ZAjUXyTRx27Ny/60BNWxfke6n0keCi5hJ
-	KMqiS4FQTJ6E7S/8Ujz3FlZY5i2Me4p3BXIYd5ufP4tr6QpNQzKYR+LCoOJMlh8dXGbZW1
-	/XWtLnO2JGhjj3x1QgMDKA8HGc1HHrU=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=ShTe7n4oL4bSFMstIf8qKgFQ8pgH2Te4INGSKID7CCk=;
+	b=cKwYdPMqZ2MM+yIjTgjpTd1iSU1wPS9Culb5UI23RoeP5XUVQPkxFHgpgSgAOsybtztsNI
+	LcXko/ZhqI5Vgef6/QqhcJ7X3YtojNdxb0dTHtRKrVmN6RTuI54MbG1JGoUXxaUXD9hlV0
+	eKeI4vIwHxmxl5br/d88JMfCBaVK9/g=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-631-sKySFgdmOIaG0McxTns4DA-1; Fri, 26 Dec 2025 18:08:52 -0500
-X-MC-Unique: sKySFgdmOIaG0McxTns4DA-1
-X-Mimecast-MFC-AGG-ID: sKySFgdmOIaG0McxTns4DA_1766790532
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-888825e6423so172576076d6.3
-        for <linux-block@vger.kernel.org>; Fri, 26 Dec 2025 15:08:52 -0800 (PST)
+ us-mta-527-lyDHyTbkNA2NWpt2xjbQjg-1; Fri, 26 Dec 2025 18:46:08 -0500
+X-MC-Unique: lyDHyTbkNA2NWpt2xjbQjg-1
+X-Mimecast-MFC-AGG-ID: lyDHyTbkNA2NWpt2xjbQjg_1766792768
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-8823f4666abso184530836d6.0
+        for <linux-block@vger.kernel.org>; Fri, 26 Dec 2025 15:46:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1766790532; x=1767395332; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1766792768; x=1767397568; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:content-language:references
          :cc:to:subject:user-agent:mime-version:date:message-id:from:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=hPVYyOhmWYyUzd26KqEqEx9SiJ2wqcstK13CbukMaus=;
-        b=dGMgwsnv0ChuiXtLIILgLtrBDzrl/8rCZlKeDtFn6vlyqKI3A3ulUNtS4MJEaWzGJg
-         g253MNP+/r7OZjMZIm0KBgWZH1cfclKY+IUasqv9Uuk7rFAIL36uc/l4Y5ehbzQGX1B5
-         H2iE79XQnxOH+ji2ExBkeq8tYKRabhSoKIpg9HnWYySn3GCv1GxDtBhGdY1Lbh++GizH
-         o0gWSAqGxns5+2l/VtkIm01L4g5jaNxedVoqr1jEby4WlEQDO/A7WTBL7v9Gy5oF4XvO
-         rUfmrTyQxddn2AI0+5Zzs7k42xgj7UoqHOXPIkx2TvSAX91bX3dx7cChlqz53Fz++WLN
-         n/8Q==
+        bh=ShTe7n4oL4bSFMstIf8qKgFQ8pgH2Te4INGSKID7CCk=;
+        b=ckdywsSY//9wN5RWAh9nIX4rLdJriDENrU/gJ3OW5OX6ZnOuvMOOJCrDGPQnZ4cw5O
+         PM4V8PoBO/nbtAawDVcwWwAfac6dFiC6exIAvZYy+ZANOhRD+BfjmvuxqGSZVayOd/oj
+         +VQoZHkas/RDmOOxu9+Tx3wt0QE59lwC6cvFekLl5VHkvKSS7uBd4w3wKn+A1l92hJky
+         yqaQCpSxum4zLvK2jE1fritizNhA+cqfSn1eyIvKo4RTJiBemt3R2IBqKtSrRrrUW+4v
+         u7AxcWlMSXCj0B5UpnOw5unvL54oJz+8rryOFpFRy95Nv/7vml3TaHK4pAVaJBjs7AhU
+         hqHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766790532; x=1767395332;
+        d=1e100.net; s=20230601; t=1766792768; x=1767397568;
         h=content-transfer-encoding:in-reply-to:content-language:references
          :cc:to:subject:user-agent:mime-version:date:message-id:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hPVYyOhmWYyUzd26KqEqEx9SiJ2wqcstK13CbukMaus=;
-        b=LdQtymYFKIr2lcN/i0rm8jcd1/ekjBZ5062m65/U7WhavOQ8PacdduRmi4M8cfvW1Q
-         eaoyUG1M+ufKnRT5W6RW3DGh1rx6suXcGCWee4V9FFttBFdTRGbXTA8uKUjmXCNUjERC
-         99XM7zwtWdiGHeaiGpbOxX3ZDtFCYcFcNThEGWDqlIWIab9B0TgB8RjJqEi4sK/hZcS9
-         MNOMcc44f02jL+V4dT00AEmTeBmjXWZbRg8NG+ThqkFaTA5yk13arqTkhHa3Suf4e8gb
-         spvCkuY0krotRURllhtIX3jyP24kfDjuy2llu4C6w4damZ9waanRti9cCl+wnYP1u/ob
-         Ohgg==
-X-Forwarded-Encrypted: i=1; AJvYcCWTK8c4x4rkTwM6tyq/XUGr8GZiHyN784gZqJ5eCW8RjmtVNBXfPHyCrs68EE54bZTlnPpiWltzj+Ij6Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHt73qIN/m+9zxFM2lBhz1Wbh2+kCbmgY8ngI7OoqWEwugKjBr
-	a2N1BdVkOqmx7k13tIiHhGYVu5JMFtQ5NSToRzigUG/Juu4iJ8WtPgHaowsUp6+lSc2rQqF4cvU
-	3Uxb9DuVQCWyUVFeTSXWhCIdrovjltx+TVTa9ZFqVMdsaqWaVhT87+rM1e81Thgyo
-X-Gm-Gg: AY/fxX4IctXO1x+OigcsyxffkPC9vXB696eiRf9AVVXs1IJWTijQPkMLKh9wuQqc18W
-	iYnpk1qZ9pdfBvf7+cKdqk/tv0lvI5yFBbmNdbWUvNXa1ob6ViUOZ0d1Gwr0v2O2XkenF6kCQ/8
-	x4wmgDq/MkDui8JWD1pot69UdjgyE2WHdB2z4MWjU6s9QxKaGsjjrAm8q7dVR2XL3KzSs/1IxPz
-	1h1P3VhamfP7c5n14DpXWiVZPfINNh1+2d1N1asrSgv4jAfD+NRScv/IgGq+PhO133gUc0PXVpw
-	9UXmWVLwTfbYJIjE6PnHKm8RD5ZpTeXSRF4/CBCW8qroVJYcoyrFfxPZbbFFHy69NZ182wSnzTc
-	rEel2gEe2c/SJQrWfaxU/UqZkDcBYm42KxiaacUar0Iug0CAmpKXNFVxF
-X-Received: by 2002:a05:6214:48b:b0:890:e31:9685 with SMTP id 6a1803df08f44-8900e319a28mr37823626d6.69.1766790532040;
-        Fri, 26 Dec 2025 15:08:52 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEpv55vF+vDJeT6imxDEvVCM6zgRYx4B3T4/k2S1vjNooJ5kJOtFWemCi2nC+rcnjO9pXNW8Q==
-X-Received: by 2002:a05:6214:48b:b0:890:e31:9685 with SMTP id 6a1803df08f44-8900e319a28mr37823076d6.69.1766790531561;
-        Fri, 26 Dec 2025 15:08:51 -0800 (PST)
+        bh=ShTe7n4oL4bSFMstIf8qKgFQ8pgH2Te4INGSKID7CCk=;
+        b=FDh38H/k1RIcu+VfjORS8tB3gZ/WHE7hSiSESI2pps72SYV78C/omGIvvjg02pm+sa
+         ornG5yfimcZSzqszalGiHHYqQoZIH35eXCxCsWOGDnB/amHB3G2ik+H7amhDCGjBRgv4
+         VRw9/csHMISRIl3QE3RJsA1MSHQzLWHx63J4mSYz+EcA1gurWw4k8GmdtXNYd+O5SOKD
+         lCLgqqFcYtkQJ7/KBwf7NM8463uizQRXqPPvqK68aBA6dUcpqktex8IZcyl5gY47wQFh
+         weVC9KuXCHWfQej+VvLwl1o0tznI/wM/HNE8MCVnMROvPumZ6yhw+W/jnnCld2zYwJf6
+         NJ8g==
+X-Forwarded-Encrypted: i=1; AJvYcCVKyILg/5l0t5ZBkHCUxzyFXDxyFPAL4CGfMzQeAqZW6KU8nPVQrbo1MZmhn7VArSHk4agA4MvIetSRUg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzhHpctO7IzC2Sr9AcR22KAYWbSW4PHUpWQwKcecDq4qU8k8V0K
+	30VzmH0gejtxiLNaEymcJpGax5CkJ2FMcjCgKJMoNqR1O7h0nNewBltZwl8dw2xYTEvzpEHYeOc
+	nuwrNwGOQ9E72T9oW4k7XQ7HGzYqveWERjlLBQl8iPP4dq72WZyPmuW1Q/IkcIsaT
+X-Gm-Gg: AY/fxX5/e1Ag2Ck8LrXQCT9ZHm9DgncHipmlbNp+A1fGXrifFHnHbNI8YN2W3kKbKUO
+	sRLcfGoxhUwP6aVrllltf45RikTBTiAO2Ik0mvindSUQrux4ai0CDWkfLzUJoatsftsicWsCyN7
+	NubeGbrG9ZB7uwOSp2xpNvWoIoj1wL3GB1/MffOxiqdk3aB1oFsTkXIlAIkyiPcDMngK4hWagHZ
+	VhxxTp/8roFDpcxQ+xqueFJFcupDVu/NqBOeQPplcZuIfMfB1+BL90hIf6/vvGN5W7UDSYzSc9M
+	m+DwZXtuuYRKuB1DQoYlhfHfHbTbQPIgevgRqjO1aijYx2naxYk80FGF4U6kt2NKNxGr+eOvbRb
+	lqds5qll/nqX54Yc7J4KANyKYInC1rM5GViM+CZfZCUorzYpWdYFFLNOG
+X-Received: by 2002:a0c:d783:0:b0:88a:28b0:9192 with SMTP id 6a1803df08f44-88d8379509fmr260894126d6.33.1766792768274;
+        Fri, 26 Dec 2025 15:46:08 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHI+6C/nsqBk+pm7eqUDmS5eTPjEpCYiybmbNsgHAySbpZ0KGnAPETFvs9s0xhCfd6CKDIFSA==
+X-Received: by 2002:a0c:d783:0:b0:88a:28b0:9192 with SMTP id 6a1803df08f44-88d8379509fmr260893766d6.33.1766792767734;
+        Fri, 26 Dec 2025 15:46:07 -0800 (PST)
 Received: from ?IPV6:2601:600:947f:f020:85dc:d2b2:c5ee:e3c4? ([2601:600:947f:f020:85dc:d2b2:c5ee:e3c4])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-88d99d7dc1esm173664886d6.39.2025.12.26.15.08.44
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-88d997aedafsm176932106d6.31.2025.12.26.15.46.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 26 Dec 2025 15:08:50 -0800 (PST)
+        Fri, 26 Dec 2025 15:46:06 -0800 (PST)
 From: Waiman Long <llong@redhat.com>
 X-Google-Original-From: Waiman Long <longman@redhat.com>
-Message-ID: <2f892ef9-1965-486d-beab-eacf0b6b0386@redhat.com>
-Date: Fri, 26 Dec 2025 18:08:43 -0500
+Message-ID: <19b001a4-0696-4efd-aaa3-902ffa42ff9e@redhat.com>
+Date: Fri, 26 Dec 2025 18:46:02 -0500
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -89,7 +89,7 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 28/33] sched: Switch the fallback task allowed cpumask to
+Subject: Re: [PATCH 29/33] sched/arm64: Move fallback task cpumask to
  HK_TYPE_DOMAIN
 To: Frederic Weisbecker <frederic@kernel.org>,
  LKML <linux-kernel@vger.kernel.org>
@@ -116,37 +116,134 @@ Cc: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
  linux-block@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org,
  netdev@vger.kernel.org
 References: <20251224134520.33231-1-frederic@kernel.org>
- <20251224134520.33231-29-frederic@kernel.org>
+ <20251224134520.33231-30-frederic@kernel.org>
 Content-Language: en-US
-In-Reply-To: <20251224134520.33231-29-frederic@kernel.org>
+In-Reply-To: <20251224134520.33231-30-frederic@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 12/24/25 8:45 AM, Frederic Weisbecker wrote:
-> Tasks that have all their allowed CPUs offline don't want their affinity
-> to fallback on either nohz_full CPUs or on domain isolated CPUs. And
-> since nohz_full implies domain isolation, checking the latter is enough
-> to verify both.
+> When none of the allowed CPUs of a task are online, it gets migrated
+> to the fallback cpumask which is all the non nohz_full CPUs.
 >
-> Therefore exclude domain isolation from fallback task affinity.
+> However just like nohz_full CPUs, domain isolated CPUs don't want to be
+> disturbed by tasks that have lost their CPU affinities.
+>
+> And since nohz_full rely on domain isolation to work correctly, the
+> housekeeping mask of domain isolated CPUs should always be a superset of
+> the housekeeping mask of nohz_full CPUs (there can be CPUs that are
+> domain isolated but not nohz_full, OTOH there shouldn't be nohz_full
+> CPUs that are not domain isolated):
+>
+> 	HK_TYPE_DOMAIN | HK_TYPE_KERNEL_NOISE == HK_TYPE_DOMAIN
+>
+> Therefore use HK_TYPE_DOMAIN as the appropriate fallback target for
+> tasks and since this cpumask can be modified at runtime, make sure
+> that 32 bits support CPUs on ARM64 mismatched systems are not isolated
+> by cpusets.
 >
 > Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
 > ---
->   include/linux/mmu_context.h | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+>   arch/arm64/kernel/cpufeature.c | 18 +++++++++++++++---
+>   include/linux/cpu.h            |  4 ++++
+>   kernel/cgroup/cpuset.c         | 17 ++++++++++++++---
+>   3 files changed, 33 insertions(+), 6 deletions(-)
 >
-> diff --git a/include/linux/mmu_context.h b/include/linux/mmu_context.h
-> index ac01dc4eb2ce..ed3dd0f3fe19 100644
-> --- a/include/linux/mmu_context.h
-> +++ b/include/linux/mmu_context.h
-> @@ -24,7 +24,7 @@ static inline void leave_mm(void) { }
->   #ifndef task_cpu_possible_mask
->   # define task_cpu_possible_mask(p)	cpu_possible_mask
->   # define task_cpu_possible(cpu, p)	true
-> -# define task_cpu_fallback_mask(p)	housekeeping_cpumask(HK_TYPE_TICK)
-> +# define task_cpu_fallback_mask(p)	housekeeping_cpumask(HK_TYPE_DOMAIN)
->   #else
->   # define task_cpu_possible(cpu, p)	cpumask_test_cpu((cpu), task_cpu_possible_mask(p))
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index c840a93b9ef9..70b0e45e299a 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -1656,6 +1656,18 @@ has_cpuid_feature(const struct arm64_cpu_capabilities *entry, int scope)
+>   	return feature_matches(val, entry);
+>   }
+>   
+> +/*
+> + * 32 bits support CPUs can't be isolated because tasks may be
+> + * arbitrarily affine to them, defeating the purpose of isolation.
+> + */
+> +bool arch_isolated_cpus_can_update(struct cpumask *new_cpus)
+> +{
+> +	if (static_branch_unlikely(&arm64_mismatched_32bit_el0))
+> +		return !cpumask_intersects(cpu_32bit_el0_mask, new_cpus);
+> +	else
+> +		return true;
+> +}
+> +
+>   const struct cpumask *system_32bit_el0_cpumask(void)
+>   {
+>   	if (!system_supports_32bit_el0())
+> @@ -1669,7 +1681,7 @@ const struct cpumask *system_32bit_el0_cpumask(void)
+>   
+>   const struct cpumask *task_cpu_fallback_mask(struct task_struct *p)
+>   {
+> -	return __task_cpu_possible_mask(p, housekeeping_cpumask(HK_TYPE_TICK));
+> +	return __task_cpu_possible_mask(p, housekeeping_cpumask(HK_TYPE_DOMAIN));
+>   }
+>   
+>   static int __init parse_32bit_el0_param(char *str)
+> @@ -3987,8 +3999,8 @@ static int enable_mismatched_32bit_el0(unsigned int cpu)
+>   	bool cpu_32bit = false;
+>   
+>   	if (id_aa64pfr0_32bit_el0(info->reg_id_aa64pfr0)) {
+> -		if (!housekeeping_cpu(cpu, HK_TYPE_TICK))
+> -			pr_info("Treating adaptive-ticks CPU %u as 64-bit only\n", cpu);
+> +		if (!housekeeping_cpu(cpu, HK_TYPE_DOMAIN))
+> +			pr_info("Treating domain isolated CPU %u as 64-bit only\n", cpu);
+>   		else
+>   			cpu_32bit = true;
+>   	}
+> diff --git a/include/linux/cpu.h b/include/linux/cpu.h
+> index 487b3bf2e1ea..0b48af25ab5c 100644
+> --- a/include/linux/cpu.h
+> +++ b/include/linux/cpu.h
+> @@ -229,4 +229,8 @@ static inline bool cpu_attack_vector_mitigated(enum cpu_attack_vectors v)
+>   #define smt_mitigations SMT_MITIGATIONS_OFF
 >   #endif
-Acked-by: Waiman Long <longman@redhat.com>
+>   
+> +struct cpumask;
+> +
+> +bool arch_isolated_cpus_can_update(struct cpumask *new_cpus);
+> +
+>   #endif /* _LINUX_CPU_H_ */
+> diff --git a/kernel/cgroup/cpuset.c b/kernel/cgroup/cpuset.c
+> index cd6119c02beb..1cc83a3c25f6 100644
+> --- a/kernel/cgroup/cpuset.c
+> +++ b/kernel/cgroup/cpuset.c
+> @@ -1408,14 +1408,22 @@ static void partition_xcpus_del(int old_prs, struct cpuset *parent,
+>   	cpumask_or(parent->effective_cpus, parent->effective_cpus, xcpus);
+>   }
+>   
+> +bool __weak arch_isolated_cpus_can_update(struct cpumask *new_cpus)
+> +{
+> +	return true;
+> +}
+> +
+>   /*
+> - * isolated_cpus_can_update - check for isolated & nohz_full conflicts
+> + * isolated_cpus_can_update - check for conflicts against housekeeping and
+> + *                            CPUs capabilities.
+>    * @add_cpus: cpu mask for cpus that are going to be isolated
+>    * @del_cpus: cpu mask for cpus that are no longer isolated, can be NULL
+>    * Return: false if there is conflict, true otherwise
+>    *
+> - * If nohz_full is enabled and we have isolated CPUs, their combination must
+> - * still leave housekeeping CPUs.
+> + * Check for conflicts:
+> + * - If nohz_full is enabled and there are isolated CPUs, their combination must
+> + *   still leave housekeeping CPUs.
+> + * - Architecture has CPU capabilities incompatible with being isolated
+>    *
+>    * TBD: Should consider merging this function into
+>    *      prstate_housekeeping_conflict().
+> @@ -1426,6 +1434,9 @@ static bool isolated_cpus_can_update(struct cpumask *add_cpus,
+>   	cpumask_var_t full_hk_cpus;
+>   	int res = true;
+>   
+> +	if (!arch_isolated_cpus_can_update(add_cpus))
+> +		return false;
+> +
+>   	if (!housekeeping_enabled(HK_TYPE_KERNEL_NOISE))
+>   		return true;
+>   
+Reviewed-by: Waiman Long <longman@redhat.com>
 
