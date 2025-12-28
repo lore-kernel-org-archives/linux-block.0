@@ -1,77 +1,72 @@
-Received: from mail-oa1-f65.google.com (mail-oa1-f65.google.com [209.85.160.65])
+Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7819D214A9B
-	for <linux-block@vger.kernel.org>; Sun, 28 Dec 2025 16:07:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1569378F26
+	for <linux-block@vger.kernel.org>; Sun, 28 Dec 2025 16:25:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766938076; cv=none; b=jj+4MEdVoex/WBw8GNROB25LSSS6n3ZdIpv0bHf9zKuxDQ8AA8pRuAS9zzkw1uzHFBDgMAQHX228rJY10BE3avIbGkD3m3ULnErF0i6QSQ2rALfJy0v+VpnlIt/GD+LJwSHSMywO9HoApWATG73/faAbaYc/0Mkfjmfc7MkBniQ=
+	t=1766939154; cv=none; b=Mh0n5AaQpslztYhwQ66H4R2d7K24+QLoZtcPO7uSfH8mdMFIm9I/FNoZBrrERcAavPfzjvIxVOVoL3EufZlKRDY+18wzYolKbdzNtBp8w3Zc4h9bQWPQNf5t4VTOpf+qXCEiCatxDRvZWSL2e0xvT40YHx8ecnRCi+E2gUoT3CM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766938076; c=relaxed/simple;
-	bh=F2tCKSP4YvGQrNXRGmXd+37cmYKNHnUr0Z8WjkgGb9o=;
+	s=arc-20240116; t=1766939154; c=relaxed/simple;
+	bh=MFgIQ8PlYATsRqpNqyNAs70Upnr6lqIlFTSO84rS09k=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=nwNrZfQPKGmTYX188iqBRPF7V6uKxOutbuxaOfy3dG9jddU6KGG8bl2YdzskHOwHx4jpvgCz1agIaJJc7p6QV8ETWS0YB554tf/qsaMaHU3XMZzAWTdEJWmaM0DOL1NKJebaWRofBpnEfoM3SESaUtFdYXDfzvriu8mPQ2fC6dA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=u61F1VoB; arc=none smtp.client-ip=209.85.160.65
+	 MIME-Version:Content-Type; b=mbwaLo0PUyvwuVvN1gZsk5o+8X+JML57NLwYqz3Fh+46/eSXzHJArHaUg/iyFkqoOz+EY8plnToRquFQ3APnn1zUvafH6IOHECAzv5mwOi5ChZ9trzwJyFEGZOKs4hEQUsdWdQjy9vNeDXqL9wWLipA5/ki47dyarvPVAiYHqMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=1RDuziFA; arc=none smtp.client-ip=209.85.160.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="u61F1VoB"
-Received: by mail-oa1-f65.google.com with SMTP id 586e51a60fabf-3f551ad50d1so2967446fac.0
-        for <linux-block@vger.kernel.org>; Sun, 28 Dec 2025 08:07:53 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="1RDuziFA"
+Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-3f13043e2fdso2751956fac.1
+        for <linux-block@vger.kernel.org>; Sun, 28 Dec 2025 08:25:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1766938072; x=1767542872; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1766939150; x=1767543950; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=szKx8AguahzJOPQzAYE7zxY9qDBahnfp9k8YWlf8ulA=;
-        b=u61F1VoBUjM58ptmaZGV2/6X6BHiXdRvZZltRF/BMLMXwk7YO9f0A2xvFB44WApO8R
-         RDNhslRDnmlt/Z2grgUNNVzrjOFMMhn8cO1UEA9+la1wtuxIu69qX0bsVYXk74kUYn1Q
-         4rqsHUECeUXZS5ibcxe1iz8gaXNLuN9HE0CgmWV9oAmOZGURPkdNgdekH/a9+hI1Kdnr
-         L2AvObcQKwmK+xsmN3oo0TxQdfpsYNxWByFpGf36lA8joCtBkAtGW0PCGY8sDXMEcaoE
-         mfW4dvIDwm+I3jYbaUpR9yfu/48AV/wDjzJM1tY79ZBrgU9TFamkciSzNPwIG/brxwo/
-         T/wQ==
+        bh=iD1j5TeOaHU0S0q9fIx8lJvFGn5dIoSWnv6HF+tTfHE=;
+        b=1RDuziFAtyjtoRVwvgsGUnNu0u1TzGbw5YAtfecexbTfWI35dTrySYEDtnyYRUtFmO
+         oRlOoMBuaMh1N966jht+K6g+XDRMSFROU3Fw4045Uvba10PgCUDcsaRMySmNAxEqDG4f
+         XkdoHoyD/7dRsnyHrzLkA7y5iksvdkrS5US3yBD1p2wRWsfGkmc/Gc19WUVaDDgsIPKd
+         k64bulb+Xo6O0RsUZIzZt9BiM2iUaqUCzeG8YZZzNWcRvzIqY7FvQyEn5uOIqE6pWVpJ
+         rMH0QXK5jZ8n2okDaH1AKS82ToaJiwKCSpg9I7YjrSfKo1+fYDLy/ba5BG2qM4RFvySh
+         NFXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766938072; x=1767542872;
+        d=1e100.net; s=20230601; t=1766939150; x=1767543950;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=szKx8AguahzJOPQzAYE7zxY9qDBahnfp9k8YWlf8ulA=;
-        b=owMmx3YdrG0LFLIRicG6dgLGG3ZvkhOP0WtBTYQ/XBQi01lI0VJ3Avb8dg5mpQOPkO
-         pcxDbXcBztqndf2BJ7VnZee9qUxaChD2+q2eY4DFNhYkCg4ebzEyXYRsHyfkYeD+0y9B
-         t102XweA3Qhajyi17mnsmBLm6hYx/iwL5/ExF/x2sasXWsx8hOA84/4TKerOtn/qg6Zp
-         NVRcZc88IMAmDDBjmgMkksnh6HTnLGT+a8NDY65u388f9FhlN4pRaAhbsG2GYLQakzaZ
-         ENkBv9KvCLbtNRvx1fMgx/M6+e2aWbbHDnMGA4AnU6FS40YkYwyeMzjZlydv3N61Fgq9
-         CzYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWUxzSzXgtHwHAPCTlK3a79bOSX2y7poIG0B4Oa131GlqiVNVcXP5LxQxWmCSSlXok++sata/UTVlm8Bw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHN2hj8h6kHy49oXtLpN3kQQbUdteO0JSQQa1AwIGF55oYjGOs
-	ViLD93raIW15+QaoQoiOnkqQDed8qRO8K8+EQYAThwa+8ZZKvd96B21B/RgBemk4qBtT5gsKMPx
-	MMJSl2j0=
-X-Gm-Gg: AY/fxX5ljb2TW/jrYG8YPhRklBcXGaz/C2UrKE11se5m7d+iPocGgC3LLaBH5FZLbjW
-	Oc7LJwMvzIBGhYEGCcYZ33hnmESz2DWkZxpq24cAPlXx8mIVfbOOgWf607FW7+6FomO5A+sczcj
-	JFW/5EG92NlLCNhtdYApoSVI/co9RY1tpPBk6VKCL1A7vpHsmsA/nbrtT025DjiXtg9zAhXN6oP
-	8DzqTq4/7pOFGvqlkMWnPnmWKLYXFcDyEdpGEjljFa9jPCPx6z/OSZMGbf0RUZMHAvp7LeEf6iC
-	FMtAd5pjCzEcEatpDQuosXRV1hMmoeKZkggWfHmceEYi1eAe1O/lWH22r4eQPj7ITbd1hKuFSe8
-	cVRYn8/P1ihDGpnsNhV/8VjpCHEExKMcupUnrlAv6a1SrNgb4A5HHYuYDv47pusEVVgj4Jx0AQl
-	0mfZ4=
-X-Google-Smtp-Source: AGHT+IFnaTAxARAdtF+X96h9yfgX9gbDfyl9BBErpuilZEbI2PIGfbl1nU+8YgIsKD8rjejXZtcsnQ==
-X-Received: by 2002:a05:6820:1691:b0:65c:fa23:2cf9 with SMTP id 006d021491bc7-65d0eb442e1mr11450341eaf.76.1766938072567;
-        Sun, 28 Dec 2025 08:07:52 -0800 (PST)
+        bh=iD1j5TeOaHU0S0q9fIx8lJvFGn5dIoSWnv6HF+tTfHE=;
+        b=BWXuLpjIO2hbDXy3m+qdDLbDr8NbuKtfeiACOt3poRJPwQpvayTHnr8PyN12HoXUca
+         uP7wQD+3A1LuMreTAWA1rA8pyfSdZOPSN9xDW/JYxAeKSR8eFThnHV1lZ3AnKhR/Ldby
+         OtYJdH64TfiyNU1XfOqVuulTI7ZtNt+tMfDIP4BjmFEUyeVfay2Sp0R15bPqnWhzJxLJ
+         ZR2R3RiOcCP/39+YOPP6pzPoBJhWAfGSeIy7cEhEfZPOxD+I5qolL3Boo0T9m9LmWGdc
+         Vbl0aBN3pTgaQTmz+G+a7T601TdqsyZQIBJV5qV54bivCMo2uaGLTTXRVv5oSqQE8koy
+         oEtg==
+X-Gm-Message-State: AOJu0Ywtr0JpfQVqOuTPjKsU9bTi8IjQYUq8cFXmLkBhNn6CWYhTBZst
+	i//aUF2pzSbrUjnZH7I0nfdg+UJZx5rZgLk7+fcsmD8Q20nkfib8+bkKlF0JBIO7OXE=
+X-Gm-Gg: AY/fxX4BuVLUnvQN2ARZ7ZFs+qZ72dVkHceGa9oom6jodRffFcoDxjpVBb4EKscEura
+	Tcw1V7d3voJQDTqg1gwQzCuVbb15F+KRTY/LsTVX0RytvR1PsClMqx1qKKt0eS/nqrU2brm2DQt
+	ZgZl0iI1VyCuff8sDqL+hZ70MFkisRQ1h0/neXR9n+8wpwyODGitZK6X5DPHttzC/uQtNeEVcXr
+	7Fhgg94//gWD4XdrzQFC3E3mF88/tBWZRodA4J1eFbSHW9V0dsWIokdjz6bWECQd1GqqsJK/tJB
+	AUMJ3twD20OgHAFteUrhr8JrPm7NEuGpqzG2+cfeZtot5zqSvPl+F8isKAZ68ZeUtE8amdGPRco
+	3PxefbqzcRNd0atdMjkgnE7a20EqAz+m7LKIkCLx+kRACE/QVbIhpFy+oSdZYRc2Bl04Y+8mgcq
+	ULgeQ=
+X-Google-Smtp-Source: AGHT+IEcncA+NzbiqC6PD6Fi7L90LvUXW/N9cJT9nbZvPgjCbOHybaypavX3jGkWfEPY6EWt8B5ePQ==
+X-Received: by 2002:a05:6870:f714:b0:3e7:eee7:948f with SMTP id 586e51a60fabf-3fda5611093mr13422893fac.9.1766939149983;
+        Sun, 28 Dec 2025 08:25:49 -0800 (PST)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-65d0f6eb26fsm17211956eaf.14.2025.12.28.08.07.50
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-3fdaab65749sm17251902fac.11.2025.12.28.08.25.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 28 Dec 2025 08:07:51 -0800 (PST)
+        Sun, 28 Dec 2025 08:25:48 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: yukuai@fnnas.com, shechenglong <shechenglong@xfusion.com>
-Cc: cgroups@vger.kernel.org, chenjialong@xfusion.com, josef@toxicpanda.com, 
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- stone.xulei@xfusion.com, tj@kernel.org
-In-Reply-To: <20251228130426.1338-1-shechenglong@xfusion.com>
-References: <71df89fb-1766-40d5-8dd5-5d0c6f49519e@fnnas.com>
- <20251228130426.1338-1-shechenglong@xfusion.com>
-Subject: Re: [PATCH v2 0/1] block,bfq: fix aux stat accumulation
- destination
-Message-Id: <176693807087.193010.13084739282285642085.b4-ty@kernel.dk>
-Date: Sun, 28 Dec 2025 09:07:50 -0700
+To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Cc: Caleb Sander Mateos <csander@purestorage.com>, 
+ Uday Shankar <ushankar@purestorage.com>, Yoav Cohen <yoav@nvidia.com>
+In-Reply-To: <20251223032744.1927434-1-ming.lei@redhat.com>
+References: <20251223032744.1927434-1-ming.lei@redhat.com>
+Subject: Re: [PATCH V2 0/3] ublk: scan partition in async way
+Message-Id: <176693914766.195283.16906151653466699321.b4-ty@kernel.dk>
+Date: Sun, 28 Dec 2025 09:25:47 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -83,20 +78,25 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3
 
 
-On Sun, 28 Dec 2025 21:04:25 +0800, shechenglong wrote:
-> > Please change the title and follow existing prefix:
-> > block, bfq: fix aux stat accumulation destination
-> > Otherwise, feel free to add:
-> > Reviewed-by: Yu Kuai <yukuai@fnnas.com>
+On Tue, 23 Dec 2025 11:27:39 +0800, Ming Lei wrote:
+> The 1st patch scans partition in async way, so IO hang during partition
+> scan can be covered by current error handling code.
 > 
-> Thanks to Yu Kuai for the review and helpful feedback.
+> The 2nd patch adds one test for verifying if hang from scanning partition
+> can be avoided.
+> 
+> The last patch fixes one selftest/ublk rebuild depending issue.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] block,bfq: fix aux stat accumulation destination
-      commit: 04bdb1a04d8a2a89df504c1e34250cd3c6e31a1c
+[1/3] ublk: scan partition in async way
+      commit: 7fc4da6a304bdcd3de14fc946dc2c19437a9cc5a
+[2/3] selftests/ublk: add test for async partition scan
+      commit: 60cf863720308ab89ce2fdafea7fcb2cefd9c144
+[3/3] selftests/ublk: fix Makefile to rebuild on header changes
+      commit: a2ce133969175d36d708b7c76536b375d0522e53
 
 Best regards,
 -- 
