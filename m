@@ -1,89 +1,174 @@
-Received: from mail-vs1-f48.google.com (mail-vs1-f48.google.com [209.85.217.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC71B1EFF93
-	for <linux-block@vger.kernel.org>; Tue, 30 Dec 2025 09:01:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A2762857C7
+	for <linux-block@vger.kernel.org>; Tue, 30 Dec 2025 09:17:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767085304; cv=none; b=hKu9l1g3yGyk9kG+bBn0/FZHpINA9IrD1/lzvc0hDzM9xLY+/8umJO/XCZ438CQVinQmfQmLEFGmW5aG4XnQrYEziSpX+4rrOVqkyjDR/X97b/U27OQ7pXpb3qx8c1NMMntSHn00OsDdSEAYqHoyHi4hApn5KaA/3l3iwg7yPo8=
+	t=1767086235; cv=none; b=o69OhzqZwozloV+EEMiW10k3sUroa7XI/Q2SaLISmowbX2I5845vUF+BAhhtb/07EJlboRQvlW/xdZI8NJee2Lsxg0g7wrKYmpSRj/SHwO5WUEwAkSYkI/w1E3yY5RJ/EXWxjmBhFd0/HeFzYOsBQLBqXP1b4P05su69JGySpo0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767085304; c=relaxed/simple;
-	bh=4b086kL5FRkW+7/ru6Zp9bQQk/SLFxpMvQf9iN+95lM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UGMJZ0OOWhiigChcCZnK+xSSVqMwoN+VWKygy/CNnmL1H9wJu7YZFFR06kvPntfXlYgZGRmnfjQZYyb+4037VIhqIveL14+nwXrGH+DYHH6Adcihvjdi99e5O0BcUkK8Wc/yjTPoh2m8sZPmKRFkwPwQjUW/YYJbFcMz/5cNlKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Uv8HTK7q; arc=none smtp.client-ip=209.85.217.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1767086235; c=relaxed/simple;
+	bh=OEFP+R5W0TdmFr38wbq8rdvuZ0rIdRq2p8OrrwrGuOc=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=IbQ66+sUgfrwDnTjqZgTgUQEi7XEnT1kZyCy/MLOpcFoBxLL6dEUZjBNdRpzdrkdYbf7lfCED1eDajKChlKMz4kAQ8VsDVjO1J2HCs6FtFeph5FKT55Vdrk/peXu4JIj1SOd1SUSYn1+BfQOkoHLBXAbGmgbwxlth6OC92ZCstk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=dYIdQQmm; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=J6XHg3xc; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Uv8HTK7q"
-Received: by mail-vs1-f48.google.com with SMTP id ada2fe7eead31-5dfc6be7df3so3558143137.0
-        for <linux-block@vger.kernel.org>; Tue, 30 Dec 2025 01:01:42 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="dYIdQQmm";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="J6XHg3xc"
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5BU16GGY3661918
+	for <linux-block@vger.kernel.org>; Tue, 30 Dec 2025 09:17:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=Y2H9HrTByKwVMEK6NHL3zd
+	BV54N35hz6e6E0f8xL6x8=; b=dYIdQQmmcoLWFb1sLjtzdeDIrykgslgyLkNDZn
+	Hx295L6i/hDvKqpK147JbGJtnmidHpJwkV0whUiL8z51n911JoRvKt0fLNg44h28
+	JC3f+5su+uLVh55vOcKsUSUzKuO6YGu3VrT7W5qU9kXfaXXxRM+ee1rZYcsadzOM
+	JJjdz+EcnjHH4rb4jmMdRyrlPiOM7umNY1KfgMuWBvHJywc8sqAP4OPC8Ivy/321
+	rQY72810RkjGQvNk9YR+juSFlAzodf7QxLGAx1j6J2OuNW03swFi/NX4RanRm2J8
+	vukQWAjW5AdO4zzhdU3LLqPn+/VSttFplB6iC1pG2C8yJYHw==
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com [209.85.214.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4bbc8yv1nu-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Tue, 30 Dec 2025 09:17:13 +0000 (GMT)
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-2a0a4b748a0so228875085ad.1
+        for <linux-block@vger.kernel.org>; Tue, 30 Dec 2025 01:17:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767085302; x=1767690102; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=4b086kL5FRkW+7/ru6Zp9bQQk/SLFxpMvQf9iN+95lM=;
-        b=Uv8HTK7qjktLHc0cgnsvJu2893x2Vp/xh3BrR1bKSPPAg5OD7lUyCAnrm3OWA0NZpb
-         ZjmeDdjD9ir2CC4hGefLDYxh8swzzFC4Qn4H5v9eI8KjUGps3FZfnS3goGEjwkSsl8cA
-         bs6OE07/4xALgmS1S7OWI/GhqazPvMbWv5K2N0NzeOLCEcZBIGbVqkvbv+NOKmaVe48f
-         gF+2BTADqvqU38oqu2fM7zZ1gnfbNTq7Mv8JC30WeCEcdVmadtw3UBXAtUcmZAEvhs6H
-         2/NK3SZ+iVqNCmdYTap2UKvZPkemWukCYepYMmdJzrtm9BJAZhHrjp8G+pGxx6UIB19w
-         UfOg==
+        d=oss.qualcomm.com; s=google; t=1767086232; x=1767691032; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y2H9HrTByKwVMEK6NHL3zdBV54N35hz6e6E0f8xL6x8=;
+        b=J6XHg3xcylCxLUqqH5J8CXZQdI9hwVDOKrClxjuOMt3Fv1C9FmIT2g/e3LTTEYS/+Q
+         mll5+/Q0Z8HG3wm9qYPz2RJu5yq9L7vANqPk/mWYa8Hi3T4H7O+9EDtfQC2cKocjrtZ9
+         79dIJN52rpUyHb7mTDyBAvaQuVIMrjYFZrvhyVgH4BiQSxRRlT+/PjXxacuiCgH4LE0C
+         2ld53Y/IVUv10Ymf4YQ4wg88otQZD84vqqAfu2V2YgOYfjYyPwVqj5p22PKFPsIKqKpb
+         JZsxyKy21a/OElyw4+b+UCOpf+KJc0LEEYC4062wdaSxYNH/fe5mHpDNUpSHhMm692Sg
+         aIrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767085302; x=1767690102;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1767086232; x=1767691032;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4b086kL5FRkW+7/ru6Zp9bQQk/SLFxpMvQf9iN+95lM=;
-        b=OY5ZZAvuLCJYd3QYQL4JgTqm2SvB5seCcgSQhvfjyftPxR4OjGgYHc0Rxiom7gJe2w
-         b8DZBQcHbVy3Ol8EOjwgzmbZ1aqpPYgD1HHKJA2GWE0fj74FwW4u/iSZcYlmnEJEgHwT
-         52gkLZcUE2WNYyy0GfGQW69tbapM2nPxY4YofWIM3rtTQHtZzaunW8SPYMf7Ec7kwaMt
-         vOGQB5gftuNbA8XSiM55UbTYDEHBF+AO4Le41YugQoPSmzUX1R7qaqqmJtYQO9W0ptNn
-         KaqSmv+owROuU8a4vsdn/TCG022uffCoA9aKge1BaXoNLnFUPrKAoZCRn2bdwKDjY/Eo
-         Q2Iw==
-X-Gm-Message-State: AOJu0YwuEN81ocJoFhEghpD9mVZE0AzMa29THfrrJBWXy+2A1yPWFRlD
-	l4KfAeNeQTsPw+pUkAdmfFFO1sjZLZCVLl/X7p9IOp+ZYV1qaoZpb4Qa5AFF/0PaAEeBsibgvUO
-	A60umK8mQOaMZQ5c3aavC9hfGbWyAnt8=
-X-Gm-Gg: AY/fxX7ye1Gr3UJQZYCfuXPBu2/9sAxI7jN92FlmVHfvS3Wa+2YGp5GruDNCl329CaU
-	DVGYSPcamIL6I8CRWNlXdI7FXD1o2m8AG22ZhpPB1RW0b3pP8AH0/9n+oDbuximmlq/NfawgNBv
-	qkHq0gbO/bsGqX7XquM0cyeW5rDsm+Ivj5SPuwaTuaMEh5CvJCt6DL5pASyGfuBwGa2CnaEep7y
-	QcCO2W1LagHAt8Rzg6qfGxKnNAljxmt0Jkf7cQC5LXAMniegXrh9zow0CfE50Tz/5aSTUoH1tBx
-	yDstYyhbyKczEowo+yyMiu8JNL4=
-X-Google-Smtp-Source: AGHT+IG2VVd2ulHKPqepblT/dcXUBuIzAvujT/19dGd3qTOe0K1RCNJYxzEAIxGbD6sVUVs0vdR/LkZE5bbIY8gLskw=
-X-Received: by 2002:a05:6102:2b9b:b0:5e4:b9ff:3fae with SMTP id
- ada2fe7eead31-5eb1a6171f8mr8982040137.3.1767085301799; Tue, 30 Dec 2025
- 01:01:41 -0800 (PST)
+        bh=Y2H9HrTByKwVMEK6NHL3zdBV54N35hz6e6E0f8xL6x8=;
+        b=v/BaybfCxNmNqBOPTIso+uEB10TxfUyomJL8Hn6MOO/2xIcffYMZ6RszRfrLgwS0oF
+         uDg1ILY2wqKqDO4kgYHsANG4ap6wELWsEv6RjAAd8gWU++PFNMK4isY7+H4cG2DjGqyY
+         tiYs8et3AIZVRK+jdL/Baq+pfDcqIHkNEyLLH3vebv0oBAxqsLeNJrtwruV2C0tW66BD
+         ajLNhigssQ+8gIfG70xVEeSIlfHyuhta2IIAjpOn9+vZEL7WyrEjF+xoS+AwrGiB9cuy
+         P1+N/4s+sclXVmzAn9e40HKrjTcL3PGd1klFdkLdnPa+8W58I7UZldW8lZFPnouuV1VJ
+         wHFw==
+X-Forwarded-Encrypted: i=1; AJvYcCWGJpzGwpc+4VKzSFbeyYuBaw99HhD6pn1Tc6SKDbOgLfccIBg7A7DTJJPKUaopAT0FTxpxxbaZmHCGNg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQKAKr6wMQEXf2qsSSv/yWitt3aqnGosUumhEvSlzaukW65TZu
+	oC0Q2paMGtUJELti7P59Cu+fiWSl8CvyYh/RvQeYVDgEdrmlnevBQMI0hEJmWPaxLnQbLTR2G+d
+	U4fanMGI4GXzG3N13/rmbTkLryitE8ql4BspPe2RQcAuoz2lmfgXUK8uGrwHv8uvVng==
+X-Gm-Gg: AY/fxX7Rr/aJX0ZO+mXMzsQrd1bhoVjGnm3gThTNpNDsVNqf+JsLcJMNo6aufVJyq+h
+	HY/PZTHo1d59qpuyOZALw3dsmpVGJARJM/eXRFDZWpFvFHqTtm90D2Z4H5l+uNSmGtPPk1knTPB
+	e3HAYHRvhJJhYcSSlehO9498WFCme50Pxmg0rM9lUsO84cLPU6LzWepjcQBM0Fz+KEz8juMqTse
+	mY762Z0o+mWfEDpzkK2x8vNMge/W6iFSxf8GivYc2MFebD9+sUJFq7i2+Y9/g/NYAiW5cSjOVGH
+	CpV6Yg/YIL5Q5TrjLHaDBpKJ0ZJOK5OQi8mA/BG/WfNydLTde+/zK1V58rgvuf9h7dAO+xnS5Xg
+	dkTaCmlBwh16Rx6K17bT3FNIM7ht1Grq9P2ZQTKrbDzLWunGdvK40XVxfsQX5fTScKTmKEClGvC
+	XfxxMxoOw=
+X-Received: by 2002:a17:902:e74c:b0:298:5fde:5a93 with SMTP id d9443c01a7336-2a2f2a354c9mr339312425ad.32.1767086232424;
+        Tue, 30 Dec 2025 01:17:12 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFu0YURIBL2I5NuLZPSURk18DQXRfkY6JIrOopCNmJ9kAdUTUUIYFgMkA3tVNzOdopoingwyQ==
+X-Received: by 2002:a17:902:e74c:b0:298:5fde:5a93 with SMTP id d9443c01a7336-2a2f2a354c9mr339312115ad.32.1767086231852;
+        Tue, 30 Dec 2025 01:17:11 -0800 (PST)
+Received: from congzhan02.ap.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com. [103.229.16.4])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a2f3c6661esm289208185ad.2.2025.12.30.01.17.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Dec 2025 01:17:11 -0800 (PST)
+From: Cong Zhang <cong.zhang@oss.qualcomm.com>
+Date: Tue, 30 Dec 2025 17:17:05 +0800
+Subject: [PATCH] blk-mq: skip CPU offline notify on unmapped hctx
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251224115312.27036-1-vitalifster@gmail.com> <cc83c3fa-1bee-48b0-bfda-3a807c0b46bd@oracle.com>
-In-Reply-To: <cc83c3fa-1bee-48b0-bfda-3a807c0b46bd@oracle.com>
-From: Vitaliy Filippov <vitalifster@gmail.com>
-Date: Tue, 30 Dec 2025 12:01:30 +0300
-X-Gm-Features: AQt7F2qmQ9Z-5a8F2Rg29NY-tgt0ZGYPV6trfPXjMIRVYLRN4aNMe6W6AAufCfY
-Message-ID: <CAPqjcqqEAb9cUTU3QrmgZ7J-wc_b7Ai_8fi17q5OQAyRZ8RfwQ@mail.gmail.com>
-Subject: Re: [PATCH] fs: remove power of 2 and length boundary atomic write restrictions
-To: John Garry <john.g.garry@oracle.com>
-Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20251230-blk_mq_no_ctx_checking-v1-1-2168131383e6@oss.qualcomm.com>
+X-B4-Tracking: v=1; b=H4sIAJCYU2kC/x3MQQqAIBBA0avErBNUMKqrREjaVIOlpRFBdPek5
+ Vv8/0DCSJigLR6IeFGi4DNEWYBdBj8jozEbJJdKSFkxszq9HdoHbc9b2wWtIz8zrkxVT8rUphk
+ hx3vEie5/3PXv+wHGx2XWaAAAAA==
+X-Change-ID: 20251226-blk_mq_no_ctx_checking-05b68f5b8b9d
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-arm-msm@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Cong Zhang <cong.zhang@oss.qualcomm.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1767086230; l=1670;
+ i=cong.zhang@oss.qualcomm.com; s=20250926; h=from:subject:message-id;
+ bh=OEFP+R5W0TdmFr38wbq8rdvuZ0rIdRq2p8OrrwrGuOc=;
+ b=ttI4m9W/1jpUSabnmV7CDfIDqysMDbcEQyd1gfWm3Pe7Irj/LaC+uu7KBnnn27xVW4TUQdKPc
+ fTB6oMnCLMRCR6ZmX0AoPW63DNW4QRRF7aw80K8IP9Poo4djahtorV5
+X-Developer-Key: i=cong.zhang@oss.qualcomm.com; a=ed25519;
+ pk=8SBh3ey5igz2nlW+UFC6khFvaNPgG7MmbWtAeO2s6n8=
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjMwMDA4MyBTYWx0ZWRfX4qJxbwy+99pz
+ fYitGoEqzjhHkF3JDhEp9LSGYr73Jbll5Sl/T3a43a4ATrHqrMp52jwrSfb48AAIFmVJQwWnnP2
+ t234eq8V7AOExl1tktiTiluwKi7qXdFfRfEwalZnyiq2Y9tsrMNNMEphGGOMw6T57k7w1qBJoB5
+ HTFK5SCd/lxsHaLLyOvJ5TTY15pAVGJoX2ZxRTMVx1whQL/zSUV8iTe6QEWyQK8dot5fOitx/SS
+ Mnv3zdl1cJ4YVgS3/mIEcPYfVtT0fk4OEWjEJUUDuI2JWhHOg40x/13ins8Cn3n7ucJzU/pRvEJ
+ GDPheLrujOOLwBJ1mtaDXcy+bby5rhcNwIaDG047JNEmJvwKFNRfz/YZJuGZymMcIyhJhDIVVyR
+ hHt/ebvgwZLBEnrY8zi0zBZ+7QKJE2aEuYHDMdD/w48H+vcR3kPRgRMs3plm2nhhMxkAAAI5gZ5
+ NiF4oTKOeJ0arQzCtQA==
+X-Authority-Analysis: v=2.4 cv=cP7tc1eN c=1 sm=1 tr=0 ts=69539899 cx=c_pps
+ a=JL+w9abYAAE89/QcEU+0QA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+ a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=EUspDBNiAAAA:8 a=X6FGcEPeVORPTCNb1acA:9
+ a=QEXdDO2ut3YA:10 a=324X-CrmTo6CU4MGRt3R:22
+X-Proofpoint-ORIG-GUID: ro8WXj9kTYa6ZSGLcFVJW7o25l2ryDD7
+X-Proofpoint-GUID: ro8WXj9kTYa6ZSGLcFVJW7o25l2ryDD7
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-12-29_07,2025-12-30_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 priorityscore=1501 malwarescore=0 lowpriorityscore=0
+ impostorscore=0 adultscore=0 bulkscore=0 suspectscore=0 spamscore=0
+ phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2512120000
+ definitions=main-2512300083
 
-I think that even with the 2^N requirement the user still has to look
-for boundaries.
-1) NVMe disks may have NABO != 0 (atomic boundary offset). In this
-case 2^N aligned writes won't work at all.
-2) NABSPF is expressed in blocks in the NVMe spec and it's not
-restricted to 2^N, it can be for example 3 (3*4096 = 12 KB). The spec
-allows it. 2^N breaks this case too.
-And the user also has to look for the maximum atomic write size
-anyway, he can't just assume all writes are atomic out of the box,
-regardless of the 2^N requirement.
-So my idea is that the kernel's task is just to guarantee correctness
-of atomic writes. It anyway can't provide the user with atomic writes
-in all cases.
+If an hctx has no software ctx mapped, blk_mq_map_swqueue() never
+allocates tags and leaves hctx->tags NULL. The CPU hotplug offline
+notifier can still run for that hctx, return early since hctx cannot
+hold any requests.
 
-I see that xfstests also check 2^N and the check obviously failed with
-my patch, should I submit a patch for xfstests first?
+Signed-off-by: Cong Zhang <cong.zhang@oss.qualcomm.com>
+---
+This issue was observed during CPU hotplug. If an hctx is not mapped,
+offlining a CPU can trigger a kernel crash.
+When a block device does not map all hctx, some hctx instances may remain
+unused. These unused hctx can still receive CPU offline notifications and
+enter blk_mq_hctx_notify_offline().
+blk_mq_hctx_notify_offline() calls blk_mq_hctx_has_requests() to check
+whether there are pending requests on the hctx. However, unused hctx do
+not have tags allocated, which leads to a crash.
+Since an unused hctx cannot have any requests, fix this by returning
+early when nr_ctx is zero, skipping blk_mq_hctx_notify_offline().
+---
+ block/blk-mq.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 1978eef95dca3fb332a73aeff7b9613ee770a8a3..eff4f72ce83be80aac9da86aab35079be7d2b5e4 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3721,7 +3721,7 @@ static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_node *node)
+ 			struct blk_mq_hw_ctx, cpuhp_online);
+ 	int ret = 0;
+ 
+-	if (blk_mq_hctx_has_online_cpu(hctx, cpu))
++	if (!hctx->nr_ctx || blk_mq_hctx_has_online_cpu(hctx, cpu))
+ 		return 0;
+ 
+ 	/*
+
+---
+base-commit: cc3aa43b44bdb43dfbac0fcb51c56594a11338a8
+change-id: 20251226-blk_mq_no_ctx_checking-05b68f5b8b9d
+
+Best regards,
+-- 
+Cong Zhang <cong.zhang@oss.qualcomm.com>
+
