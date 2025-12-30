@@ -1,67 +1,60 @@
-Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B16AC2DC762
-	for <linux-block@vger.kernel.org>; Tue, 30 Dec 2025 00:37:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82C2F24169D
+	for <linux-block@vger.kernel.org>; Tue, 30 Dec 2025 05:34:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767055058; cv=none; b=uL3FZaRVcxTkfeHE2C1rLjN34ND1wAskgcxvGNMTPkhAUh7WLgCuTAF8eVMjlDKYBcfwQPjddpbep3TzyHIgfeY81263CSjs/oigW+eub8Xa5pTV29tm4EEsF/fnVglm8Afo+n5BNY9wiuAEFE4XOhRxCwwXp/txYBfudHZGidI=
+	t=1767072860; cv=none; b=C3pjEKyRdDHrKkUttH0dbwpdYin82jN86uDqOy5dKCji61q3lgTEbZYl/cjHQQ4vLnRmspcTN5sYzDSW7o3oCTKiaBk3NtM+QnvrKarh5nB8+4Vp68zyTWnnXlg69ozcPzl99+AjyWaLqyItlpwPFXPIlT1P9HyM4mrmCrp9rCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767055058; c=relaxed/simple;
-	bh=Eu/0MvqtXzKZbDhFka3bibWxt0bbXBOC90Q2iECgF+M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XYMKtLi9cN/Ij6XXwICYVBF11cKVZFtUeeYWnl1meQg6Zp7WEPF9KJN6PFAO499YnorjyJ+IVzMImXNklMrfl0ZzPZm0R81c2dkygTKStOofHwElt2qTKJIFmjSynwxjc5lwxMivjoCrBGNSPSfaYkfU4nzFH4ilWNumyhDSjso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=b75GFGci; arc=none smtp.client-ip=209.85.210.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1767072860; c=relaxed/simple;
+	bh=S0EPWCGeympU3kVk/+wtDHbxqMhJWeohJSe9CkjzEzM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=TD81UAda0qwaEgsmpdILG0d9vXUv/7eHXSAkUPK0ZRb+tkp66OY5WroyysfgBekLOYCRxnvqQpyHbzxB1+CnKY5WRBdHVmMZtauZegetc+8Kwow+C+2rN9L/BARvExigWpVJDpqN3ht426B5uTzErV75fS19vZkwdOt8FYuzKNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=RUTYnYgQ; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="b75GFGci"
-Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-7cc50eb0882so3514587a34.3
-        for <linux-block@vger.kernel.org>; Mon, 29 Dec 2025 16:37:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1767055052; x=1767659852; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=IheJhIQLOL+uGWt6XQ0zIC5UxYwT55m5ifEVRi78ko8=;
-        b=b75GFGciNFmZMA1pAddG/IJyk0M4t8bjXViGqRPJUtlIXNSocJ3qCuRdzql4roVBtZ
-         Qrdqe8iYz7Gqxf7ywr3VQyWONwdpO/lDW9ksNyJh+w7vmT1izd2arvO0pJy3QYropwn/
-         A878rasRxsLtm+n5QK7MVcxyJlV40ig9KrV5JxxKyw8D0H+0TEIhgGsjCLH95Z0hiE7N
-         8RWNwEm1HWyVBonRBhvnnUCwchniJf2BQPG5K6oxn0ODRncyVibOZ2qJcE15PPfMUrMk
-         gB59gvD00SHa7wjiux9LcA7lI81kBy2sSg0xT3VH7QaujB/0Qbq9W14ydND7Y6Xw/Eft
-         sQAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767055052; x=1767659852;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IheJhIQLOL+uGWt6XQ0zIC5UxYwT55m5ifEVRi78ko8=;
-        b=AoAYBXVw0twcm8LacN4p6c3CbxHcIrWRwmc6Zu8JnDl/VxfeZYvXdxr3d4BXxHMRCb
-         6B6GRZ8UMsOGnWbRQCr6qsM7R4NLDYY8FJF5Sm1uLtDdGVa66OieTOus9vHUQQ1ruTJT
-         90PZevTFNbsMt7Znu/TDlZnLx3eBDmmna2JFVxcmwS/UgqqPHBNUFCFHEETxtZPlVN+R
-         UE9RO6AfUmf7kc00ud+zldB5LSkasfT08P9YVZOt5ac2IXVg8TBgm6NP+XR5MPPb4e34
-         nojmzn+Ky8Kou3Ngkn/Pme9guxwdII0Z/Ufo+KArOXKmLHz0lNlGMoUMZvTEb0y5jqi7
-         1uJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXPm8+okk3aTTABFnU2y9efQb/xoU9TIsz7icXo22AVTbDax9RscKsnGC9/gflcEpRjPKOC/SFF3UB5pQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+x8ARY8tkUam8xjeJ4joei6LpXITquhEg5AYvoVnUKI4uRxdx
-	6iemIljeYxEZOGALW9CLlKOsUCWLFJ8YpAcnMDfT5R1sKqMHLkuULoYaWRHOHaxeWq4=
-X-Gm-Gg: AY/fxX4Eqx9AUBx98fL6muPBDJiGNgABM/nhjzcKnArMFnmqHwJuYf6OyZrGoPx0Iz2
-	BN4pw0ctzP8JSjbvE0eYX/SWe3eikuri5Tb0WZ8zoG0N/7lTKR82GmBFjYE+C1U+CAVDaVGjFSw
-	Nq+pG903wD5c4pPBrnzfv4G5U9o/RhWFtWU538xaXarGZZ0hNafE+3eh+w+P0qkTmEHPPGVSA3Z
-	BcMad+sPtPMCYfSiCdtsq4Y7tGJuZNrbuwdlEU8a0rafhQ2TSJVpGYSYg+y/UUcTkFPjMrisEAs
-	avP/qVzkdAAAyE340iT4PwPd8PCLzAc8TQ4OkfdTcV65rXfvfqNVPhnTBYO2h2oDX8MS+dpzSyJ
-	Ibv155heyaOoASnLH42+VIY/kRKVUwLJGJV6cYyjp2TKlXMbhHJjdVzAviE5CSyNeit09TAE3y/
-	yUFQJpRW0w
-X-Google-Smtp-Source: AGHT+IFl9yxlJpaq7sZYozgWoQTaTewr4cBUOiverIAjbR/CmqFwp/DL9X0O2bEGHsivPH5Emtcv9g==
-X-Received: by 2002:a05:6830:2642:b0:7c7:6217:5c60 with SMTP id 46e09a7af769-7cc66a603d6mr14529090a34.25.1767055052471;
-        Mon, 29 Dec 2025 16:37:32 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7cc667d4f62sm21773347a34.19.2025.12.29.16.37.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Dec 2025 16:37:31 -0800 (PST)
-Message-ID: <0f65c4fe-8b10-403d-b5b6-ed33fc4eb69c@kernel.dk>
-Date: Mon, 29 Dec 2025 17:37:29 -0700
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="RUTYnYgQ"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5BTFwCAF018036;
+	Tue, 30 Dec 2025 05:33:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=69lAZQ
+	EeWFf/LvFu2Amia/IFNoNb91CuwJ3WCVDY2Q0=; b=RUTYnYgQP6R26pRefiIWxo
+	TNvwSLV20+X7vrTY3AKlaU78B0SgsdWAJdB8Po0KP3CMY9S4erJiTijNlWEKLK2k
+	u4OvNMrzbz1/2maux59p5H6dQTJDZiI7RWv52vBOXWZO8hEHWAVdPo/evzyvzvrl
+	fihSimJ8UnlqVUTFage1TyQ55XBPEjyjwyhMEBfwrUckzJ03CuH0NDMb2OpGBSFX
+	FmC5s0hxIvD41teonf3Ze5PANdR4y2sOFtJyFts9KPjDO3l5KuscbA0sMWS0vypD
+	Wm20tpoZ248HK1X/3mN3EwehnAbudTG+T7BWwaZ6Mi8WhZgx0ErAP4j7xB2BRN4w
+	==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ba73vs1py-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 30 Dec 2025 05:33:58 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5BU0ZMj5012916;
+	Tue, 30 Dec 2025 05:33:57 GMT
+Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4basssrpu8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 30 Dec 2025 05:33:57 +0000
+Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
+	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5BU5XuJB36569840
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 30 Dec 2025 05:33:56 GMT
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7D66D58054;
+	Tue, 30 Dec 2025 05:33:56 +0000 (GMT)
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id F3FCF5804E;
+	Tue, 30 Dec 2025 05:33:53 +0000 (GMT)
+Received: from [9.111.47.194] (unknown [9.111.47.194])
+	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 30 Dec 2025 05:33:53 +0000 (GMT)
+Message-ID: <5ca7b3a4-e849-4e59-a56c-7e095b0c93b9@linux.ibm.com>
+Date: Tue, 30 Dec 2025 11:03:51 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -69,76 +62,71 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 09/33] block: Protect against concurrent isolated cpuset
- change
-To: Frederic Weisbecker <frederic@kernel.org>,
- LKML <linux-kernel@vger.kernel.org>
-Cc: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Bjorn Helgaas <bhelgaas@google.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Chen Ridong <chenridong@huawei.com>, Danilo Krummrich <dakr@kernel.org>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Gabriele Monaco <gmonaco@redhat.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- Johannes Weiner <hannes@cmpxchg.org>, Lai Jiangshan
- <jiangshanlai@gmail.com>, Marco Crivellari <marco.crivellari@suse.com>,
- Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
- Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
- Phil Auld <pauld@redhat.com>, "Rafael J . Wysocki" <rafael@kernel.org>,
- Roman Gushchin <roman.gushchin@linux.dev>,
- Shakeel Butt <shakeel.butt@linux.dev>, Simon Horman <horms@kernel.org>,
- Tejun Heo <tj@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
- Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
- linux-mm@kvack.org, linux-pci@vger.kernel.org, netdev@vger.kernel.org
-References: <20251224134520.33231-1-frederic@kernel.org>
- <20251224134520.33231-10-frederic@kernel.org>
+Subject: Re: [PATCH v6 06/13] blk-mq-debugfs: remove
+ blk_mq_debugfs_unregister_rqos()
+To: Yu Kuai <yukuai@fnnas.com>, axboe@kernel.dk, linux-block@vger.kernel.org,
+        tj@kernel.org, ming.lei@redhat.com
+References: <20251225103248.1303397-1-yukuai@fnnas.com>
+ <20251225103248.1303397-7-yukuai@fnnas.com>
 Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20251224134520.33231-10-frederic@kernel.org>
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <20251225103248.1303397-7-yukuai@fnnas.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: kzIW9ukpdeP-FBSF6zno6lRgLwo4jLZb
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjMwMDA0NiBTYWx0ZWRfX1wLFUzfQ+emQ
+ kQgLtoyMC0G7ieHo+aaqtIcsFWMHmMaRsKPhxB6RQRj2HNUll1doedh0ODBBEdAl/IKNZldpZS+
+ QH7vm54207uDkl2gBPnZxW/z0Lylumg1ghohUx3FkZoEq2YjltrUqtLd3RLMB1RoDxWd6tsVvM0
+ OHukuMKvCylstvpzqQ8wlo4dGMzDxvKwe2DQgQWKKBwfYNV8aEzaW/a/nGNlmjtYusufR7qg4vX
+ dEh5XiTM4vWHkUIiK52RWBzKLJrbP5JoMMFHcRnTEZN9COCe/v9jBU1Fa4KC5QbfEOPFa71WMzP
+ ZvTcq1pJcJ1iJmsCACaH9go25K0wpuLc5W+V57rUTnRPRPRZVO4yIuKhsgocprG3lD2uAQ5A/Tl
+ pFXC2As5yE1BcGJ5LLBenqDht7bqtW1LrLvsKpBY67D0VszZcLlZUXcgY+cQXUPGuPS/zzxMBP2
+ msqFJfARS+hB4qKuHKQ==
+X-Authority-Analysis: v=2.4 cv=fobRpV4f c=1 sm=1 tr=0 ts=69536446 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=J_wXmi_fcelS5s1Xn4kA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: kzIW9ukpdeP-FBSF6zno6lRgLwo4jLZb
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-12-29_07,2025-12-29_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0 suspectscore=0 phishscore=0 adultscore=0 malwarescore=0
+ spamscore=0 bulkscore=0 impostorscore=0 priorityscore=1501 clxscore=1015
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2512120000 definitions=main-2512300046
 
-On 12/24/25 6:44 AM, Frederic Weisbecker wrote:
-> The block subsystem prevents running the workqueue to isolated CPUs,
-> including those defined by cpuset isolated partitions. Since
-> HK_TYPE_DOMAIN will soon contain both and be subject to runtime
-> modifications, synchronize against housekeeping using the relevant lock.
-> 
-> For full support of cpuset changes, the block subsystem may need to
-> propagate changes to isolated cpumask through the workqueue in the
-> future.
-> 
-> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
-> ---
->  block/blk-mq.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 1978eef95dca..0037af1216f3 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -4257,12 +4257,16 @@ static void blk_mq_map_swqueue(struct request_queue *q)
->  
->  		/*
->  		 * Rule out isolated CPUs from hctx->cpumask to avoid
-> -		 * running block kworker on isolated CPUs
-> +		 * running block kworker on isolated CPUs.
-> +		 * FIXME: cpuset should propagate further changes to isolated CPUs
-> +		 * here.
->  		 */
-> +		rcu_read_lock();
->  		for_each_cpu(cpu, hctx->cpumask) {
->  			if (cpu_is_isolated(cpu))
->  				cpumask_clear_cpu(cpu, hctx->cpumask);
->  		}
-> +		rcu_read_unlock();
 
-Want me to just take this one separately and get it out of your hair?
-Doesn't seem to have any dependencies.
 
--- 
-Jens Axboe
+On 12/25/25 4:02 PM, Yu Kuai wrote:
+> diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
+> index d7ce99ce2e80..85cf74402a09 100644
+> --- a/block/blk-rq-qos.c
+> +++ b/block/blk-rq-qos.c
+> @@ -371,8 +371,4 @@ void rq_qos_del(struct rq_qos *rqos)
+>  	if (!q->rq_qos)
+>  		blk_queue_flag_clear(QUEUE_FLAG_QOS_ENABLED, q);
+>  	blk_mq_unfreeze_queue(q, memflags);
+> -
+> -	mutex_lock(&q->debugfs_mutex);
+> -	blk_mq_debugfs_unregister_rqos(rqos);
+> -	mutex_unlock(&q->debugfs_mutex);
+>  }
+
+This change looks good overall, but I have one comment:
+
+Do we really need to freeze the queue in rq_qos_del() here? Currently,
+rq_qos_del() is only called from blk_iocost_init() and blk_iolatency_init(),
+both of which run while holding ->freeze_lock. Given this, it seems
+unnecessary for rq_qos_del() to freeze and unfreeze the queue again.
+Instead, we could remove the freeze/unfreeze logic from rq_qos_del() and
+add a WARN_ON() or assertion to ensure that the caller has already frozen
+the queue before invoking it.
+Moreover, with the current logic, rq_qos_del() may reverse the locking
+order between ->rq_qos_mutex and ->freeze_lock if the caller has not
+already acquired ->freeze_lock, which could lead to potential lock
+ordering issues.
+
+Thanks,
+--Nilay
