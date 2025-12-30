@@ -1,174 +1,96 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com [209.85.161.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A2762857C7
-	for <linux-block@vger.kernel.org>; Tue, 30 Dec 2025 09:17:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59B7F2D5416
+	for <linux-block@vger.kernel.org>; Tue, 30 Dec 2025 09:52:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767086235; cv=none; b=o69OhzqZwozloV+EEMiW10k3sUroa7XI/Q2SaLISmowbX2I5845vUF+BAhhtb/07EJlboRQvlW/xdZI8NJee2Lsxg0g7wrKYmpSRj/SHwO5WUEwAkSYkI/w1E3yY5RJ/EXWxjmBhFd0/HeFzYOsBQLBqXP1b4P05su69JGySpo0=
+	t=1767088350; cv=none; b=f3hoK7UjzWVuejJPcdu+jqJ8dL8eP7OquerlFY6XRva+Essf+Kv7pUBcA4+eRcFRYxEIYUM+gZ0hsX5+1Je+dW7pivq2wkFCrVFCBwK4b7KS+4yhClIiPVgeooFVPT/f0pHSpeBsGUuxwhZkpZUcjk3nipFO/9y9FdSzzPQ0rko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767086235; c=relaxed/simple;
-	bh=OEFP+R5W0TdmFr38wbq8rdvuZ0rIdRq2p8OrrwrGuOc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=IbQ66+sUgfrwDnTjqZgTgUQEi7XEnT1kZyCy/MLOpcFoBxLL6dEUZjBNdRpzdrkdYbf7lfCED1eDajKChlKMz4kAQ8VsDVjO1J2HCs6FtFeph5FKT55Vdrk/peXu4JIj1SOd1SUSYn1+BfQOkoHLBXAbGmgbwxlth6OC92ZCstk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=dYIdQQmm; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=J6XHg3xc; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="dYIdQQmm";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="J6XHg3xc"
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5BU16GGY3661918
-	for <linux-block@vger.kernel.org>; Tue, 30 Dec 2025 09:17:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=Y2H9HrTByKwVMEK6NHL3zd
-	BV54N35hz6e6E0f8xL6x8=; b=dYIdQQmmcoLWFb1sLjtzdeDIrykgslgyLkNDZn
-	Hx295L6i/hDvKqpK147JbGJtnmidHpJwkV0whUiL8z51n911JoRvKt0fLNg44h28
-	JC3f+5su+uLVh55vOcKsUSUzKuO6YGu3VrT7W5qU9kXfaXXxRM+ee1rZYcsadzOM
-	JJjdz+EcnjHH4rb4jmMdRyrlPiOM7umNY1KfgMuWBvHJywc8sqAP4OPC8Ivy/321
-	rQY72810RkjGQvNk9YR+juSFlAzodf7QxLGAx1j6J2OuNW03swFi/NX4RanRm2J8
-	vukQWAjW5AdO4zzhdU3LLqPn+/VSttFplB6iC1pG2C8yJYHw==
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com [209.85.214.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4bbc8yv1nu-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Tue, 30 Dec 2025 09:17:13 +0000 (GMT)
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-2a0a4b748a0so228875085ad.1
-        for <linux-block@vger.kernel.org>; Tue, 30 Dec 2025 01:17:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1767086232; x=1767691032; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y2H9HrTByKwVMEK6NHL3zdBV54N35hz6e6E0f8xL6x8=;
-        b=J6XHg3xcylCxLUqqH5J8CXZQdI9hwVDOKrClxjuOMt3Fv1C9FmIT2g/e3LTTEYS/+Q
-         mll5+/Q0Z8HG3wm9qYPz2RJu5yq9L7vANqPk/mWYa8Hi3T4H7O+9EDtfQC2cKocjrtZ9
-         79dIJN52rpUyHb7mTDyBAvaQuVIMrjYFZrvhyVgH4BiQSxRRlT+/PjXxacuiCgH4LE0C
-         2ld53Y/IVUv10Ymf4YQ4wg88otQZD84vqqAfu2V2YgOYfjYyPwVqj5p22PKFPsIKqKpb
-         JZsxyKy21a/OElyw4+b+UCOpf+KJc0LEEYC4062wdaSxYNH/fe5mHpDNUpSHhMm692Sg
-         aIrQ==
+	s=arc-20240116; t=1767088350; c=relaxed/simple;
+	bh=RiW1unDnv8u6+802ldD2QN+Gyks7gkE0r1Lyx3H4elk=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=oROv9a4fYDE3AhkjVm5pjcgkdCvVuy61WGmSLrXq5iL/wcAIHnoCgBdDE0t4bU2XlO/Y/vt1xT/li/IQKFJt7LuC1hCo6//x2xjKdsQoujHBLe1CZ3b3olD4zy7yxDErHOwhyfki5iAsPY6ltlHLQKUvQzn4XZq04BYQKJv9Erg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-65b31ec93e7so17613043eaf.3
+        for <linux-block@vger.kernel.org>; Tue, 30 Dec 2025 01:52:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767086232; x=1767691032;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Y2H9HrTByKwVMEK6NHL3zdBV54N35hz6e6E0f8xL6x8=;
-        b=v/BaybfCxNmNqBOPTIso+uEB10TxfUyomJL8Hn6MOO/2xIcffYMZ6RszRfrLgwS0oF
-         uDg1ILY2wqKqDO4kgYHsANG4ap6wELWsEv6RjAAd8gWU++PFNMK4isY7+H4cG2DjGqyY
-         tiYs8et3AIZVRK+jdL/Baq+pfDcqIHkNEyLLH3vebv0oBAxqsLeNJrtwruV2C0tW66BD
-         ajLNhigssQ+8gIfG70xVEeSIlfHyuhta2IIAjpOn9+vZEL7WyrEjF+xoS+AwrGiB9cuy
-         P1+N/4s+sclXVmzAn9e40HKrjTcL3PGd1klFdkLdnPa+8W58I7UZldW8lZFPnouuV1VJ
-         wHFw==
-X-Forwarded-Encrypted: i=1; AJvYcCWGJpzGwpc+4VKzSFbeyYuBaw99HhD6pn1Tc6SKDbOgLfccIBg7A7DTJJPKUaopAT0FTxpxxbaZmHCGNg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQKAKr6wMQEXf2qsSSv/yWitt3aqnGosUumhEvSlzaukW65TZu
-	oC0Q2paMGtUJELti7P59Cu+fiWSl8CvyYh/RvQeYVDgEdrmlnevBQMI0hEJmWPaxLnQbLTR2G+d
-	U4fanMGI4GXzG3N13/rmbTkLryitE8ql4BspPe2RQcAuoz2lmfgXUK8uGrwHv8uvVng==
-X-Gm-Gg: AY/fxX7Rr/aJX0ZO+mXMzsQrd1bhoVjGnm3gThTNpNDsVNqf+JsLcJMNo6aufVJyq+h
-	HY/PZTHo1d59qpuyOZALw3dsmpVGJARJM/eXRFDZWpFvFHqTtm90D2Z4H5l+uNSmGtPPk1knTPB
-	e3HAYHRvhJJhYcSSlehO9498WFCme50Pxmg0rM9lUsO84cLPU6LzWepjcQBM0Fz+KEz8juMqTse
-	mY762Z0o+mWfEDpzkK2x8vNMge/W6iFSxf8GivYc2MFebD9+sUJFq7i2+Y9/g/NYAiW5cSjOVGH
-	CpV6Yg/YIL5Q5TrjLHaDBpKJ0ZJOK5OQi8mA/BG/WfNydLTde+/zK1V58rgvuf9h7dAO+xnS5Xg
-	dkTaCmlBwh16Rx6K17bT3FNIM7ht1Grq9P2ZQTKrbDzLWunGdvK40XVxfsQX5fTScKTmKEClGvC
-	XfxxMxoOw=
-X-Received: by 2002:a17:902:e74c:b0:298:5fde:5a93 with SMTP id d9443c01a7336-2a2f2a354c9mr339312425ad.32.1767086232424;
-        Tue, 30 Dec 2025 01:17:12 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFu0YURIBL2I5NuLZPSURk18DQXRfkY6JIrOopCNmJ9kAdUTUUIYFgMkA3tVNzOdopoingwyQ==
-X-Received: by 2002:a17:902:e74c:b0:298:5fde:5a93 with SMTP id d9443c01a7336-2a2f2a354c9mr339312115ad.32.1767086231852;
-        Tue, 30 Dec 2025 01:17:11 -0800 (PST)
-Received: from congzhan02.ap.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com. [103.229.16.4])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a2f3c6661esm289208185ad.2.2025.12.30.01.17.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Dec 2025 01:17:11 -0800 (PST)
-From: Cong Zhang <cong.zhang@oss.qualcomm.com>
-Date: Tue, 30 Dec 2025 17:17:05 +0800
-Subject: [PATCH] blk-mq: skip CPU offline notify on unmapped hctx
+        d=1e100.net; s=20230601; t=1767088348; x=1767693148;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=TkM8rPYKtwUhzVjSZKbIQ51CP1k4z6NoUeqakqK/fTw=;
+        b=PnKYSvnRF0+NOYMorQ+kC+Bbpu39UCkj7UpmpBo2tCyUiBrRB6hTD82nqm74xNNBzB
+         b4vnoU8j11iG2VMmEpN8BQt5jCHC2GOVpyEVd6ozTdepvP68FC+TfkSXCEHyJrWPgqaW
+         lLtTHRyPIEXHlUUwGOTRnRuz0OEDCjIKbOeQBA8w4ruvcSSWQenLExgqnqyqkJT1x2v7
+         5YJovOmXA6IhClrJeK0hc9raDYmd+InBWQYqowYOUxCcoc+9UjJmTbxvp5TgCVeLN5d+
+         hinAPk8LjzExIMT5JKmi3ev+Z7w8lh71L0O3Co1CId8UuDbZpUHNR3L1pHJh0j/gtnSq
+         +3yA==
+X-Gm-Message-State: AOJu0Yw7ylIOfYfYZlaaPLAQxFoeJpz16mwGUZkoFWElIWXAtzar3U0g
+	/4tes3z3b/fOa70iwlHtQPpF9ppAQlvsOD2DtO/r9FNiWD1UY+134T4vLRgPf85d7DjFK+MOUJl
+	SEV6SXBYruIss14cJ3Kfrynd1vN5b9TbyRfwaThiAFak+TlvpHLx5l/Lop30=
+X-Google-Smtp-Source: AGHT+IG4IMY0eCHDnQenlqNMJPwuMfqrJUf6dWUd05MtV9ZZtBXYk7i67M3H7wFGsuHQ6tixSx+i2DoJAhLHad6BrCJ0SdUdHUUz
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251230-blk_mq_no_ctx_checking-v1-1-2168131383e6@oss.qualcomm.com>
-X-B4-Tracking: v=1; b=H4sIAJCYU2kC/x3MQQqAIBBA0avErBNUMKqrREjaVIOlpRFBdPek5
- Vv8/0DCSJigLR6IeFGi4DNEWYBdBj8jozEbJJdKSFkxszq9HdoHbc9b2wWtIz8zrkxVT8rUphk
- hx3vEie5/3PXv+wHGx2XWaAAAAA==
-X-Change-ID: 20251226-blk_mq_no_ctx_checking-05b68f5b8b9d
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-arm-msm@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Cong Zhang <cong.zhang@oss.qualcomm.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1767086230; l=1670;
- i=cong.zhang@oss.qualcomm.com; s=20250926; h=from:subject:message-id;
- bh=OEFP+R5W0TdmFr38wbq8rdvuZ0rIdRq2p8OrrwrGuOc=;
- b=ttI4m9W/1jpUSabnmV7CDfIDqysMDbcEQyd1gfWm3Pe7Irj/LaC+uu7KBnnn27xVW4TUQdKPc
- fTB6oMnCLMRCR6ZmX0AoPW63DNW4QRRF7aw80K8IP9Poo4djahtorV5
-X-Developer-Key: i=cong.zhang@oss.qualcomm.com; a=ed25519;
- pk=8SBh3ey5igz2nlW+UFC6khFvaNPgG7MmbWtAeO2s6n8=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjMwMDA4MyBTYWx0ZWRfX4qJxbwy+99pz
- fYitGoEqzjhHkF3JDhEp9LSGYr73Jbll5Sl/T3a43a4ATrHqrMp52jwrSfb48AAIFmVJQwWnnP2
- t234eq8V7AOExl1tktiTiluwKi7qXdFfRfEwalZnyiq2Y9tsrMNNMEphGGOMw6T57k7w1qBJoB5
- HTFK5SCd/lxsHaLLyOvJ5TTY15pAVGJoX2ZxRTMVx1whQL/zSUV8iTe6QEWyQK8dot5fOitx/SS
- Mnv3zdl1cJ4YVgS3/mIEcPYfVtT0fk4OEWjEJUUDuI2JWhHOg40x/13ins8Cn3n7ucJzU/pRvEJ
- GDPheLrujOOLwBJ1mtaDXcy+bby5rhcNwIaDG047JNEmJvwKFNRfz/YZJuGZymMcIyhJhDIVVyR
- hHt/ebvgwZLBEnrY8zi0zBZ+7QKJE2aEuYHDMdD/w48H+vcR3kPRgRMs3plm2nhhMxkAAAI5gZ5
- NiF4oTKOeJ0arQzCtQA==
-X-Authority-Analysis: v=2.4 cv=cP7tc1eN c=1 sm=1 tr=0 ts=69539899 cx=c_pps
- a=JL+w9abYAAE89/QcEU+0QA==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
- a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=EUspDBNiAAAA:8 a=X6FGcEPeVORPTCNb1acA:9
- a=QEXdDO2ut3YA:10 a=324X-CrmTo6CU4MGRt3R:22
-X-Proofpoint-ORIG-GUID: ro8WXj9kTYa6ZSGLcFVJW7o25l2ryDD7
-X-Proofpoint-GUID: ro8WXj9kTYa6ZSGLcFVJW7o25l2ryDD7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-12-29_07,2025-12-30_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 priorityscore=1501 malwarescore=0 lowpriorityscore=0
- impostorscore=0 adultscore=0 bulkscore=0 suspectscore=0 spamscore=0
- phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2512120000
- definitions=main-2512300083
+X-Received: by 2002:a05:6820:808:b0:65d:95d:2de2 with SMTP id
+ 006d021491bc7-65d0e99d251mr14805499eaf.25.1767088348429; Tue, 30 Dec 2025
+ 01:52:28 -0800 (PST)
+Date: Tue, 30 Dec 2025 01:52:28 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6953a0dc.050a0220.329c0f.056f.GAE@google.com>
+Subject: [syzbot] Monthly block report (Dec 2025)
+From: syzbot <syzbot+list55d44ccb73da1c14b834@syzkaller.appspotmail.com>
+To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-If an hctx has no software ctx mapped, blk_mq_map_swqueue() never
-allocates tags and leaves hctx->tags NULL. The CPU hotplug offline
-notifier can still run for that hctx, return early since hctx cannot
-hold any requests.
+Hello block maintainers/developers,
 
-Signed-off-by: Cong Zhang <cong.zhang@oss.qualcomm.com>
----
-This issue was observed during CPU hotplug. If an hctx is not mapped,
-offlining a CPU can trigger a kernel crash.
-When a block device does not map all hctx, some hctx instances may remain
-unused. These unused hctx can still receive CPU offline notifications and
-enter blk_mq_hctx_notify_offline().
-blk_mq_hctx_notify_offline() calls blk_mq_hctx_has_requests() to check
-whether there are pending requests on the hctx. However, unused hctx do
-not have tags allocated, which leads to a crash.
-Since an unused hctx cannot have any requests, fix this by returning
-early when nr_ctx is zero, skipping blk_mq_hctx_notify_offline().
----
- block/blk-mq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This is a 31-day syzbot report for the block subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/block
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 1978eef95dca3fb332a73aeff7b9613ee770a8a3..eff4f72ce83be80aac9da86aab35079be7d2b5e4 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3721,7 +3721,7 @@ static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_node *node)
- 			struct blk_mq_hw_ctx, cpuhp_online);
- 	int ret = 0;
- 
--	if (blk_mq_hctx_has_online_cpu(hctx, cpu))
-+	if (!hctx->nr_ctx || blk_mq_hctx_has_online_cpu(hctx, cpu))
- 		return 0;
- 
- 	/*
+During the period, 1 new issues were detected and 1 were fixed.
+In total, 41 issues are still open and 108 have already been fixed.
+
+Some of the still happening issues:
+
+Ref  Crashes Repro Title
+<1>  10004   Yes   INFO: task hung in read_part_sector (2)
+                   https://syzkaller.appspot.com/bug?extid=82de77d3f217960f087d
+<2>  8144    Yes   KMSAN: kernel-infoleak in filemap_read
+                   https://syzkaller.appspot.com/bug?extid=905d785c4923bea2c1db
+<3>  3127    Yes   INFO: task hung in bdev_open
+                   https://syzkaller.appspot.com/bug?extid=5c6179f2c4f1e111df11
+<4>  2746    Yes   INFO: task hung in sync_bdevs (3)
+                   https://syzkaller.appspot.com/bug?extid=97bc0b256218ed6df337
+<5>  2628    Yes   INFO: task hung in bdev_release
+                   https://syzkaller.appspot.com/bug?extid=4da851837827326a7cd4
+<6>  1696    Yes   INFO: task hung in blkdev_fallocate
+                   https://syzkaller.appspot.com/bug?extid=39b75c02b8be0a061bfc
+<7>  667     Yes   possible deadlock in elevator_change
+                   https://syzkaller.appspot.com/bug?extid=ccae337393ac17091c34
+<8>  282     No    INFO: task hung in queue_limits_commit_update_frozen
+                   https://syzkaller.appspot.com/bug?extid=f272bbfbf8498ddadea5
+<9>  124     No    KCSAN: data-race in block_uevent / inc_diskseq (2)
+                   https://syzkaller.appspot.com/bug?extid=c147f9175ec6cc7bd73b
+<10> 101     Yes   WARNING in blk_register_tracepoints
+                   https://syzkaller.appspot.com/bug?extid=c54ded83396afee31eb1
 
 ---
-base-commit: cc3aa43b44bdb43dfbac0fcb51c56594a11338a8
-change-id: 20251226-blk_mq_no_ctx_checking-05b68f5b8b9d
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Best regards,
--- 
-Cong Zhang <cong.zhang@oss.qualcomm.com>
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
