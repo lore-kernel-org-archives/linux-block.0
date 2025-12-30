@@ -1,238 +1,132 @@
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010063.outbound.protection.outlook.com [52.101.85.63])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21E42D531
-	for <linux-block@vger.kernel.org>; Tue, 30 Dec 2025 12:52:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.63
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767099148; cv=fail; b=YcCNLv8Oxy84dine1rIM4yk4Bd0muj5UmT8Pi7Dy/0OIGUUEMAL6hfxnzffZznaAzslpDbWK755pVX7F0sEE7qBjiZXGmSIEWhfhsml+Z1x5jPUi8c2zTM4l2KfPG0oLvF5ad4k0VmJlFaHV+XOk37UQNm8JG5yPcFZpu+2IOWY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767099148; c=relaxed/simple;
-	bh=n2UU1NGEYgxVDPEFRnwY+HR+5XjnDs8UkL1z7kaprhA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MGltgr8/epbcpneSz6+f2mCGiRU6uUDlJqmOcZvkuoXc3VIwRHavbVrR7uOmbjInJEnvr/EyNU9G4CohjhHiuM2g9WOX2wxIYX3M9YQlQteRCZUtnhimuqQGr/hD5QDvxlbFtyDrUoHjRxy9ZTPO/hNkfsSN3l9jb2DDspihtfU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=BHhZU+P2; arc=fail smtp.client-ip=52.101.85.63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 976FC1946DF
+	for <linux-block@vger.kernel.org>; Tue, 30 Dec 2025 13:05:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767099946; cv=none; b=BuGRH+0CP7FTNAHUS1XrJ7nXy5eCuwqCH50MOeEH15ePnta2o3mxlOTsn0i+EjQdiNEsiT3SkVHL0ZIIiujJvbGNotAPTPR/Y7BdEl7Eu7HkttiH5ivPZ7jJotPIC5WouIFceEtJZTdyqpJi4+knQPARSL4o+HYqbITDXcZV41o=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767099946; c=relaxed/simple;
+	bh=zIjWJKRT7Mr6FbULM3V4WMePb5ra2+gSHxHYLOjsjc8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=UiVgQExvxEVJ6k8+nssPQ6c2sOO4kkKsVWidWy6PW6Yoj3GNnAWlfvj8bLSiQ1mIJmdcm2GHiU40YDv4gBj1lgqom0XuzCax4QfOsmKh7kSTLR0XvHC/f/YVfwiKz80KPhSV4LaPJAoJ4MZ3ZJi9H7Ud5lWJiAvDq3+azaQ9K1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=C+xXXE00; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="BHhZU+P2"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Il7LrGhgGmHyn3wifwwtYTESjYfWqiPxVdteJKorUqS0QHJRQeLMQjZS8vPIyeNMeq1HCd30WovPD2CA3SqlHtngFT3dtrfW6WuY5O4CswrsXOY5RjVzTH+NJFSrLS3Ly+pV7z/qbuImLIBKjnKaMRdjgliNdnr0kKKUNme+qsxo+kmXqIbOMjz4nVl238LkUxTEXTeKRjuoZlWg89JA0RMjGV796c2tKX99s+3/NXyW9nqQqV89IgtxW6RCewGkoDjQuDTUqERVuzou1+xn8TCdgmE3dB/rI3+uNZvQeKfBTyZs+Uq/bsbUGIqu+AVGDwWvPrLpdzyEkH9oME6jqA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HEZETbmJUWm6/G0lS/OL8yU1J9NVs9wtsJexCmlUuu8=;
- b=v6iTwoUQKDbgXcCF9BQ6rbeJK/OBkhjw7pwQohSoAHp6SGm6JzJ1LIfqJPU68TSAmLZU2l2A/7NLXEJlGLHDdhB/rvrchNu068on2bqwQgD/oarEl05dQQsaTpNKiF9TWQP2PY2vMsQopJynkv4wmD5uY+NA7ocOVZ9QEtW9XyQ89JtsltxcMBL8vBA0g9vUaG4VmknAIAsTsz4OlSmv8r8dkLNCMWQWenAIylg7I1RSSvo62cpVPQCVI7eQv40zS5grh81vTV1Gh6LqFweyxabXa9Q052g8OOJ6fp/wAQLx5dX9rGMRNAh6VY6rzeoOwEuz5w2E/YH6skCrbEnONg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HEZETbmJUWm6/G0lS/OL8yU1J9NVs9wtsJexCmlUuu8=;
- b=BHhZU+P2EHb1UM9LCNIX5SiQ9DyEPDPkl1zpcihNj+viVtjKlZ11oX8nevYvS/1gkn/GXbXAggjbqUey0c1tIxAIkiLMkTS1jP44yvwlxWN1USyHgGPx9BvKrP8mZmNe3WVShlDOyJHpMjq3MGklmgH9whZf9m5fxy46srynwLchYGsNZJhrETFfUBwVtSkL8aFE6s0dYgS5duL4DR/1G7+mMlmmyDRDHsA7us8jqR/w4Bw60Z6lmEWIxgDpevTVbWGA+DogczZFr1ZgbgsqyeA5XZ+UB+0QMjlwPvDTnumIpLwV4p59HvrhSL6jMh2St/pkC5fsuobgCwF4kU80Lg==
-Received: from MW4P223CA0004.NAMP223.PROD.OUTLOOK.COM (2603:10b6:303:80::9) by
- IA0PR12MB7553.namprd12.prod.outlook.com (2603:10b6:208:43f::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9478.4; Tue, 30 Dec
- 2025 12:52:23 +0000
-Received: from CO1PEPF000042A7.namprd03.prod.outlook.com
- (2603:10b6:303:80:cafe::f1) by MW4P223CA0004.outlook.office365.com
- (2603:10b6:303:80::9) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9456.14 via Frontend Transport; Tue,
- 30 Dec 2025 12:52:22 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CO1PEPF000042A7.mail.protection.outlook.com (10.167.243.36) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9478.4 via Frontend Transport; Tue, 30 Dec 2025 12:52:22 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 30 Dec
- 2025 04:52:10 -0800
-Received: from yoav-mlt.nvidia.com (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 30 Dec
- 2025 04:52:08 -0800
-From: Yoav Cohen <yoav@nvidia.com>
-To: <ming.lei@redhat.com>, <linux-block@vger.kernel.org>
-CC: <jholzman@nvidia.com>, <omril@nvidia.com>, <ofer@nvidia.com>, Yoav Cohen
-	<yoav@nvidia.com>
-Subject: [PATCH 2/2] ublk: add UBLK_CMD_TRY_STOP_DEV command
-Date: Tue, 30 Dec 2025 14:51:40 +0200
-Message-ID: <20251230125140.43760-3-yoav@nvidia.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20251230125140.43760-1-yoav@nvidia.com>
-References: <20251230125140.43760-1-yoav@nvidia.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="C+xXXE00"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5BU5bi0x022411;
+	Tue, 30 Dec 2025 13:05:18 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=Eb6zRl
+	sDHQA0Xj1Kgm86eLd+K9HPmou3oHCDcWmmpKM=; b=C+xXXE00BuTHcGEAQkF3Es
+	gcdEr2ecS37pIZGrW+BBvSyCZOSNZ2daUhOxAZr7RTHgeuHRtX9IOMIprgII6B3U
+	7RgjIK167xO2UirsxAXqOmIBnI7LNXctkgFG5k5x3zjIQyi5BHzO54UUfxU2/Cdh
+	RqRssGNDK5dAKMf/npkipYxScTWWSXt07Vm1YZr1i41WJQVdpK1Q14WZ5TXOTVVK
+	dOt/4DG4+e9HYzHODrQuQHdwkNCCt8KOr6kzw3yFaMlfScHpFZ7KvG7MSkSUOlqF
+	RVq5Hx86OZtqCsgKun+F5nh8+EuptDVd7ROnqFiTfnHk9o3psdTCBX+IsLeeM/8w
+	==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4ba74u3jep-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 30 Dec 2025 13:05:18 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5BUAnOUc012843;
+	Tue, 30 Dec 2025 13:05:17 GMT
+Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4bassst5hn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 30 Dec 2025 13:05:17 +0000
+Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
+	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5BUD5Hbf66650484
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 30 Dec 2025 13:05:17 GMT
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0692C58050;
+	Tue, 30 Dec 2025 13:05:17 +0000 (GMT)
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6E52D58045;
+	Tue, 30 Dec 2025 13:05:14 +0000 (GMT)
+Received: from [9.111.88.112] (unknown [9.111.88.112])
+	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 30 Dec 2025 13:05:14 +0000 (GMT)
+Message-ID: <f7ad88e3-1ed7-40a7-9756-346649a8071d@linux.ibm.com>
+Date: Tue, 30 Dec 2025 18:35:11 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000042A7:EE_|IA0PR12MB7553:EE_
-X-MS-Office365-Filtering-Correlation-Id: 27931ed5-481d-4b01-5f28-08de47a2469e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|376014|36860700013|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?LPEX2/Ti+53qFZUDBCS3hzYGkgv1CLtzm1HvrAJLd0J6cekj2Gf1K5i7ECgJ?=
- =?us-ascii?Q?708xGb6Hvb6eGUBu347JzwNgVvYi02cNPkVZ8NL5mH+JeLKIv+1XxYlAp7g5?=
- =?us-ascii?Q?GepDWxD2uHC04TaDzzc0Khxng/N/YOGnGHDnD3AqrrY5IiNbPCzfgGMlyyLt?=
- =?us-ascii?Q?LuDdgydy1Tpmp7eqKV3oVvXIMmkIzz14HcdXoQNhuTKHUtTsNFGJVBZpV5X7?=
- =?us-ascii?Q?68SKQOaoVd1cmnY7U4+2VgJM8V9EFRZhwTdOCDttP28t5UDGsf6z6Qfos7FX?=
- =?us-ascii?Q?19STK0zBXviTYKMuFQPvZkZjn/4RMwO7nUQNf5VQ92KG1pZZwLZ2VmbNcSaM?=
- =?us-ascii?Q?3bk3tLqhR058YoOwm8B6Dg3Tsd+L1/y5CN1axhTN77UZ/e8HDpGgwznAJdKw?=
- =?us-ascii?Q?zLr08XeKCzqjwoBw5eQq9nMNWHE2LIEE+jmSVBXhUpfWdalQISMJFXPLf8pP?=
- =?us-ascii?Q?yfgfSk2xk0lVRGh9nOrAb/IfbGpeW0DOeNYn2aQk+O51HRO03FYAulIQ/wGb?=
- =?us-ascii?Q?rCgfmrxwM5Atcst/spraZL6UUfFA9d2ou53OJnNVIILiRajDy4gOdMJnkz0d?=
- =?us-ascii?Q?1qkAc2rKJHYOzPOiAyp4GCXSDKsVFR0e9gjsCL5KHhVmKCmnZX0l2DyLUwvu?=
- =?us-ascii?Q?WWgyVWF78SbYFnL7JfcvA0yQT12eh/5Ehyeyfl61J6A2Z6lfx9jvRMFqx6DX?=
- =?us-ascii?Q?HmScTaJwU/E7Xhpo4nEG2XP4UVDtp3I6bF5LXpQPi9eT9TzyyemMBzBU9fE7?=
- =?us-ascii?Q?46DF3hWNEVyuKTqH8AsLxBshkPyLlZ8DpTN389sC3qB5fDpTiDdKovnP5XoG?=
- =?us-ascii?Q?tU0EVyEsaJKxQjmpJlKlcwQrNFxQDkMj8Nj3OQ/heCb0HhEqEUQ2kX5La1UY?=
- =?us-ascii?Q?EmqR0Nsu+DrHqSYRXxapC8KxAtNyBTFIuNhVDVN9Bd/q37VevnJ1yYNOO2t8?=
- =?us-ascii?Q?j7dZXdb4DSeAsum9J3aT0BqtA0oV4WekOxsDIXwTJgiAaWdz/MFEsnhZRish?=
- =?us-ascii?Q?R0F/uK5UvptUoWHJ/uXOd5aXwKtDCuMnMcqs3aIQ9LNHu82WufJaJrgZ7Aw9?=
- =?us-ascii?Q?dJ7rOpVz55+iD4ywLnTR/wU1iw9ebPLnb+Gm23u3PSjDUlJR1FmPKRHxNu2g?=
- =?us-ascii?Q?zrA9tXxkcPoZ8LzJjO/orHrGy3TP7EpW0Qy6oYCe6y1iPZd8pmgZa8pnZJa6?=
- =?us-ascii?Q?GYmi6RIWsd5jvXOd3GKFnpOC+vJANgUSv7gnW3vZvQDrBfZJyOMxUo45r4af?=
- =?us-ascii?Q?SpO4ZHJ3y067QcsA16B19rHgob1lrV+ytne9c2V88imGaOZqsHWJx8O6gJWl?=
- =?us-ascii?Q?I8JnAx6yeeSM6Pmu3XWvCaMYfv1YJZM49KqQGoJwSPTYvtUMymb99dfiVvQH?=
- =?us-ascii?Q?DRW7l2AdB2hcTU+zZ6142p+vSB0qTY6KOPdtnGAp+YyrLE2bUgjW8man8F9Q?=
- =?us-ascii?Q?X+W3KJBoX8AUPckkJZmbUvYxh98ALnqDCBvvp5Wo0+O1XDdpdTtIn9opyYDB?=
- =?us-ascii?Q?cQ1csZ2REE/tkQuzTVEZO55AlL+0WDUDQyAyD0Fy+ZZ8BXQlt+FFYX97BHxv?=
- =?us-ascii?Q?IXlwGo4kMIRX+6aywYA=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700013)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Dec 2025 12:52:22.7386
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 27931ed5-481d-4b01-5f28-08de47a2469e
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000042A7.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7553
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 07/13] blk-mq-debugfs: warn about possible deadlock
+To: Yu Kuai <yukuai@fnnas.com>, axboe@kernel.dk, linux-block@vger.kernel.org,
+        tj@kernel.org, ming.lei@redhat.com
+References: <20251225103248.1303397-1-yukuai@fnnas.com>
+ <20251225103248.1303397-8-yukuai@fnnas.com>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <20251225103248.1303397-8-yukuai@fnnas.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: -1z0UTQ_pjEMlP1hkRX0PEb-WKadnTM9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjMwMDExNSBTYWx0ZWRfX0Alo/aJf/+4Y
+ Fv7GCWTKNHdrZojJzlmsA7KQmdWMJCAxz5Z1UYE8vfgTf8+0E3DIVHdMzHSlkvSfqhhEu7EYSh9
+ NlHauDXBSZeNEfmtIX0Zo/wqAdgflCM/Kkxk541Z50BNs7NRt6JEmHnrLQMgzNI4yTSUWqG+T5W
+ SbPe5ThoPpj0ov4z9DUI8pZzIn5GmvnzkHYjHBJrXhGWFcztorXLOLfbLnGHdpX1KQNWAvlh4JK
+ C8uE+rBGryKAcQNk+4u70PYvO4W+E+1TG6IQHTprQmnC8XKIXw3StTPwzh2Rc7Wy5z9sv6w8KnN
+ 1lVFmm27vmEmUOgHBklWPdUji1oV4/w/cIzRw5LjLnJlkPuPiXbEt8zhtRPQCJsq00jRVKt+MMP
+ 0zORuCjZrxTu1S7UAitvgLYpL5TAvpgA1QDr7YzxwiE1L72Z8DDI4CAk90jvulkw32fInEkIvHR
+ nFlRXPzmwa8ehsi7ZOA==
+X-Authority-Analysis: v=2.4 cv=AN8t5o3d c=1 sm=1 tr=0 ts=6953ce0e cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=hW4mWN5mCCKzNfNKQ1kA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: -1z0UTQ_pjEMlP1hkRX0PEb-WKadnTM9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-12-30_01,2025-12-30_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 impostorscore=0 adultscore=0 suspectscore=0 malwarescore=0
+ bulkscore=0 priorityscore=1501 lowpriorityscore=0 phishscore=0 spamscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2512120000 definitions=main-2512300115
 
-This command is similar to UBLK_CMD_STOP_DEV, but it only stops the
-device if there are no active openers for the ublk block device.
-If the device is busy, the command returns -EBUSY instead of
-disrupting active clients. This allows safe, non-destructive stopping.
 
-Signed-off-by: Yoav Cohen <yoav@nvidia.com>
----
- drivers/block/ublk_drv.c      | 39 +++++++++++++++++++++++++++++++++++
- include/uapi/linux/ublk_cmd.h |  3 ++-
- 2 files changed, 41 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 2d5602ef05cc..7c4c920c35f7 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -54,6 +54,7 @@
- #define UBLK_CMD_DEL_DEV_ASYNC	_IOC_NR(UBLK_U_CMD_DEL_DEV_ASYNC)
- #define UBLK_CMD_UPDATE_SIZE	_IOC_NR(UBLK_U_CMD_UPDATE_SIZE)
- #define UBLK_CMD_QUIESCE_DEV	_IOC_NR(UBLK_U_CMD_QUIESCE_DEV)
-+#define UBLK_CMD_TRY_STOP_DEV	_IOC_NR(UBLK_U_CMD_TRY_STOP_DEV)
- 
- #define UBLK_IO_REGISTER_IO_BUF		_IOC_NR(UBLK_U_IO_REGISTER_IO_BUF)
- #define UBLK_IO_UNREGISTER_IO_BUF	_IOC_NR(UBLK_U_IO_UNREGISTER_IO_BUF)
-@@ -239,6 +240,8 @@ struct ublk_device {
- 	struct delayed_work	exit_work;
- 	struct work_struct	partition_scan_work;
- 
-+	bool			block_open; /* protected by open_mutex */
-+
- 	struct ublk_queue       *queues[];
- };
- 
-@@ -3309,6 +3312,38 @@ static void ublk_ctrl_stop_dev(struct ublk_device *ub)
- 	ublk_stop_dev(ub);
- }
- 
-+static int ublk_ctrl_try_stop_dev(struct ublk_device *ub)
-+{
-+	struct gendisk *disk;
-+	int ret = -EINVAL;
-+
-+	disk = ublk_get_disk(ub);
-+	if (!disk) {
-+		ret = -ENODEV;
-+		goto out;
-+	}
-+
-+	mutex_lock(&disk->open_mutex);
-+	if (disk_openers(disk) > 0) {
-+		ret = -EBUSY;
-+		goto unlock;
-+	}
-+	ub->block_open = true;
-+	/* release open_mutex as del_gendisk() will reacquire it */
-+	mutex_unlock(&disk->open_mutex);
-+
-+	ublk_ctrl_stop_dev(ub);
-+	ret = 0;
-+	goto put_disk;
-+
-+unlock:
-+	mutex_unlock(&disk->open_mutex);
-+put_disk:
-+	ublk_put_disk(disk);
-+out:
-+	return ret;
-+}
-+
- static int ublk_ctrl_get_dev_info(struct ublk_device *ub,
- 		const struct ublksrv_ctrl_cmd *header)
- {
-@@ -3704,6 +3739,7 @@ static int ublk_ctrl_uring_cmd_permission(struct ublk_device *ub,
- 	case UBLK_CMD_END_USER_RECOVERY:
- 	case UBLK_CMD_UPDATE_SIZE:
- 	case UBLK_CMD_QUIESCE_DEV:
-+	case UBLK_CMD_TRY_STOP_DEV:
- 		mask = MAY_READ | MAY_WRITE;
- 		break;
- 	default:
-@@ -3817,6 +3853,9 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
- 	case UBLK_CMD_QUIESCE_DEV:
- 		ret = ublk_ctrl_quiesce_dev(ub, header);
- 		break;
-+	case UBLK_CMD_TRY_STOP_DEV:
-+		ret = ublk_ctrl_try_stop_dev(ub);
-+		break;
- 	default:
- 		ret = -EOPNOTSUPP;
- 		break;
-diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
-index ec77dabba45b..bb191d0afff7 100644
---- a/include/uapi/linux/ublk_cmd.h
-+++ b/include/uapi/linux/ublk_cmd.h
-@@ -55,7 +55,8 @@
- 	_IOWR('u', 0x15, struct ublksrv_ctrl_cmd)
- #define UBLK_U_CMD_QUIESCE_DEV		\
- 	_IOWR('u', 0x16, struct ublksrv_ctrl_cmd)
--
-+#define UBLK_U_CMD_TRY_STOP_DEV		\
-+	_IOWR('u', 0x17, struct ublksrv_ctrl_cmd)
- /*
-  * 64bits are enough now, and it should be easy to extend in case of
-  * running out of feature flags
--- 
-2.39.5 (Apple Git-154)
+On 12/25/25 4:02 PM, Yu Kuai wrote:
+> -static void debugfs_create_files(struct dentry *parent, void *data,
+> +static void debugfs_create_files(struct request_queue *q, struct dentry *parent,
+> +				 void *data,
+>  				 const struct blk_mq_debugfs_attr *attr)
+>  {
+> +	lockdep_assert_held(&q->debugfs_mutex);
+> +	/*
+> +	 * Creating new debugfs entries with queue freezed has the risk of
+> +	 * deadlock.
+> +	 */
+> +	WARN_ON_ONCE(q->mq_freeze_depth != 0);
+> +	/*
+> +	 * debugfs_mutex should not be nested under other locks that can be
+> +	 * grabbed while queue is frozen.
+> +	 */
+> +	lockdep_assert_not_held(&q->elevator_lock);
+> +	lockdep_assert_not_held(&q->rq_qos_mutex);
+> +
+>  	if (IS_ERR_OR_NULL(parent))
+>  		return;
 
+I just saw that we've nr_hw_queue update code path which is
+calling into the above function while registering debugfs 
+entries for the hctx but it doesn't acquire ->debugfs_mutex. 
+So that triggers the lockdep warning. We need to fix nr_hw_queue 
+update path so that it enters into the above function after
+acquiring ->debugfs_mutex. In fact, kernel test robot also
+complains about the same.
+
+Thanks,
+--Nilay
