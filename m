@@ -1,161 +1,105 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69E803A1E94;
-	Tue, 30 Dec 2025 22:38:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95C952BAF4
+	for <linux-block@vger.kernel.org>; Wed, 31 Dec 2025 03:01:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767134293; cv=none; b=DsU9ExFeZpQLf3LgXrU/csOUCvV7sP49pIVvjgjnlEoJLQlyZzgf13qyN6EI6irAo7d8s5jFetZ3WjC/x8rLWUsBI2pSRCRW+8aN8ryyhXkVW2Bc1UGswXiwczB0Z0TBy01E51X5hFhxzLq2b+K/VRUfoAB3xSDjhVIk9kCH6jU=
+	t=1767150079; cv=none; b=I6vRSxzApnc3BGJW1bTAzrDX8C0Y08VEummVCpVTx0aVtIUiNhYH/LI9peBE1MCNnVx99agVyhiA+aPU5d3/JLuZqtaZZkTiMluDKCXtSXRiUY7HOp9hY80atB2tt6P4CBBObKXQ1iT8+cZlo6jw0knS1Iw9JzgyZ3s0yxpEwZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767134293; c=relaxed/simple;
-	bh=Tb3tynnxxnwuANiHqkonp4fihfVrESQp6TRTMLE8/iI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WJrfDkpfeXjLSYcJWvwD1W7xBh1FYhPymnoFwjgrXd8X8AcOmOYUE3djMkwOqAPRyyiO4dFNQfruPEFp8633QtbgUt8QuNflpFjxHaZjWbEoJ9XzwJc0qw9Z51qxo+aQ9bNhjvx2FVFJzqzYl7dJeiStQvF9V1478AcIGk7Ba+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b2cOJ8YL; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1767150079; c=relaxed/simple;
+	bh=C2OHIemlX+5fmONcMPHO5uO582PcWpRSP4x6WdXwqv8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k2qJNXXR7zUhSuD/jaU0kh18Hn1DqS640qgUWohhqx5iykhl6bmAvIF1EMD+4qtInsg2PzFycTotshT88S3gNXLmkHkMmnFjZ/nn8a31r84XCOKDD6PQk7GSTrD258W3m1uzAn2a1U1+5mDcPAY7k1T3zYzR+Xc2h1s/DT17KWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P2/evRSY; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b2cOJ8YL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69369C4CEFB;
-	Tue, 30 Dec 2025 22:38:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767134292;
-	bh=Tb3tynnxxnwuANiHqkonp4fihfVrESQp6TRTMLE8/iI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=b2cOJ8YL9H3+tcxp0RAQnc5CQYnXPXOwJghUPMxwUA9nJ6+jdDVbBaf+CVtGr49mj
-	 NcFoZvSde20KbB6f29qNdHoYvCrrD9KXIKSkLSESSZU3CeFKhgKvmeLsIKz36l3BDv
-	 ZqHDMjOeFqTCfC1E3RRn+MqTIhX3ZzoVKL9GVwFxgm5PZpPnoEShKS6g+GEHhM3T5R
-	 Ak3KCLfwYwDPNgJrx7tv306BftuJfE5/umRJJVfDTi/6tf7wCvTJtzXWSTNibia4VO
-	 e+wO+Ccg/vgWi85o7qxny3KxKBVON1mdMm8lbrc3w/6NSbRmm//YBotNrxpr9frRna
-	 8XuNauqTZD6tg==
-Date: Tue, 30 Dec 2025 23:38:09 +0100
-From: Frederic Weisbecker <frederic@kernel.org>
-To: Zhang Qiao <zhangqiao22@huawei.com>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Chen Ridong <chenridong@huawei.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Gabriele Monaco <gmonaco@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Marco Crivellari <marco.crivellari@suse.com>,
-	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
-	"Rafael J . Wysocki" <rafael@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
-	Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
-	linux-mm@kvack.org, linux-pci@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 01/33] PCI: Prepare to protect against concurrent
- isolated cpuset change
-Message-ID: <aVRUUXa6kJKHHQ_n@pavilion.home>
-References: <20251224134520.33231-1-frederic@kernel.org>
- <20251224134520.33231-2-frederic@kernel.org>
- <e01189e1-d8ef-2791-632c-90d4d897859b@huawei.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P2/evRSY"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767150076;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=kpRq/1M9/wM0DlbC3ziYDPj1R3CzNTH/TXOERyiqeMM=;
+	b=P2/evRSYmccPQHEwLTmDaGTPSJyMNnBm5tEdFNXN8gSb//BVrSLrRePrqeRsZvujtqaDZr
+	aYim2vgXJ3Z8ZyZyA+B/gKnjB7mvb2ZA6zS3bOzNC3xv7W7tbpBGQqrCxnYm8mM05PDaHb
+	i5iws0+UoEf9jJy1cMoPNiN7gnpPjr8=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-595-9FxY58rmPOG5COmnG6RnjQ-1; Tue,
+ 30 Dec 2025 22:01:10 -0500
+X-MC-Unique: 9FxY58rmPOG5COmnG6RnjQ-1
+X-Mimecast-MFC-AGG-ID: 9FxY58rmPOG5COmnG6RnjQ_1767150069
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 65DFE1800365;
+	Wed, 31 Dec 2025 03:01:09 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.52])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4E1E119560A7;
+	Wed, 31 Dec 2025 03:01:07 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: io-uring@vger.kernel.org,
+	Caleb Sander Mateos <csander@purestorage.com>,
+	Nitesh Shetty <nj.shetty@samsung.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 0/3] block: avoid to use bi_vcnt in bio_may_need_split()
+Date: Wed, 31 Dec 2025 11:00:54 +0800
+Message-ID: <20251231030101.3093960-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <e01189e1-d8ef-2791-632c-90d4d897859b@huawei.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Le Mon, Dec 29, 2025 at 11:23:56AM +0800, Zhang Qiao a écrit :
-> Hi, Weisbecker，
-> 
-> 在 2025/12/24 21:44, Frederic Weisbecker 写道:
-> > HK_TYPE_DOMAIN will soon integrate cpuset isolated partitions and
-> > therefore be made modifiable at runtime. Synchronize against the cpumask
-> > update using RCU.
-> > 
-> > The RCU locked section includes both the housekeeping CPU target
-> > election for the PCI probe work and the work enqueue.
-> > 
-> > This way the housekeeping update side will simply need to flush the
-> > pending related works after updating the housekeeping mask in order to
-> > make sure that no PCI work ever executes on an isolated CPU. This part
-> > will be handled in a subsequent patch.
-> > 
-> > Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
-> > ---
-> >  drivers/pci/pci-driver.c | 47 ++++++++++++++++++++++++++++++++--------
-> >  1 file changed, 38 insertions(+), 9 deletions(-)
-> > 
-> > diff --git a/drivers/pci/pci-driver.c b/drivers/pci/pci-driver.c
-> > index 7c2d9d596258..786d6ce40999 100644
-> > --- a/drivers/pci/pci-driver.c
-> > +++ b/drivers/pci/pci-driver.c
-> > @@ -302,9 +302,8 @@ struct drv_dev_and_id {
-> >  	const struct pci_device_id *id;
-> >  };
-> >  
-> > -static long local_pci_probe(void *_ddi)
-> > +static int local_pci_probe(struct drv_dev_and_id *ddi)
-> >  {
-> > -	struct drv_dev_and_id *ddi = _ddi;
-> >  	struct pci_dev *pci_dev = ddi->dev;
-> >  	struct pci_driver *pci_drv = ddi->drv;
-> >  	struct device *dev = &pci_dev->dev;
-> > @@ -338,6 +337,19 @@ static long local_pci_probe(void *_ddi)
-> >  	return 0;
-> >  }
-> >  
-> > +struct pci_probe_arg {
-> > +	struct drv_dev_and_id *ddi;
-> > +	struct work_struct work;
-> > +	int ret;
-> > +};
-> > +
-> > +static void local_pci_probe_callback(struct work_struct *work)
-> > +{
-> > +	struct pci_probe_arg *arg = container_of(work, struct pci_probe_arg, work);
-> > +
-> > +	arg->ret = local_pci_probe(arg->ddi);
-> > +}
-> > +
-> >  static bool pci_physfn_is_probed(struct pci_dev *dev)
-> >  {
-> >  #ifdef CONFIG_PCI_IOV
-> > @@ -362,34 +374,51 @@ static int pci_call_probe(struct pci_driver *drv, struct pci_dev *dev,
-> >  	dev->is_probed = 1;
-> >  
-> >  	cpu_hotplug_disable();
-> > -
-> >  	/*
-> >  	 * Prevent nesting work_on_cpu() for the case where a Virtual Function
-> >  	 * device is probed from work_on_cpu() of the Physical device.
-> >  	 */
-> >  	if (node < 0 || node >= MAX_NUMNODES || !node_online(node) ||
-> >  	    pci_physfn_is_probed(dev)) {
-> > -		cpu = nr_cpu_ids;
-> > +		error = local_pci_probe(&ddi);
-> >  	} else {
-> >  		cpumask_var_t wq_domain_mask;
-> > +		struct pci_probe_arg arg = { .ddi = &ddi };
-> > +
-> > +		INIT_WORK_ONSTACK(&arg.work, local_pci_probe_callback);
-> >  
-> >  		if (!zalloc_cpumask_var(&wq_domain_mask, GFP_KERNEL)) {
-> >  			error = -ENOMEM;
-> 
-> If we return from here, arg.work will not be destroyed.
+This series cleans up bio handling to use bi_iter consistently for both
+cloned and non-cloned bios, removing the reliance on bi_vcnt which is
+only meaningful for non-cloned bios.
 
-Good catch! Thanks.
+Currently, bio_may_need_split() uses bi_vcnt to check if a bio has a
+single segment. While this works, it's inconsistent with how cloned bios
+operate - they use bi_iter for iteration, not bi_vcnt. This inconsistency
+led to io_uring needing to recalculate iov_iter.nr_segs to ensure bi_vcnt
+gets a correct value when copied.
+
+This series unifies the approach:
+
+1. Make bio_may_need_split() use bi_iter instead of bi_vcnt. This handles
+   both cloned and non-cloned bios in a consistent way. Also move bi_io_vec
+   adjacent to bi_iter in struct bio since they're commonly accessed
+   together.
+
+2. Stop copying iov_iter.nr_segs to bi_vcnt in bio_iov_bvec_set(), since
+   cloned bios should rely on bi_iter, not bi_vcnt.
+
+3. Remove the nr_segs recalculation in io_uring, which was only needed
+   to provide an accurate bi_vcnt value.
+
+Nitesh verified no performance regression on NVMe 512-byte fio/t/io_uring
+workloads.
+
+V2:
+	- improve bio layout by putting bi_iter and bi_io_vec together
+	- improve commit log
+
+Ming Lei (3):
+  block: use bvec iterator helper for bio_may_need_split()
+  block: don't initialize bi_vcnt for cloned bio in bio_iov_bvec_set()
+  io_uring: remove nr_segs recalculation in io_import_kbuf()
+
+ block/bio.c               |  5 ++++-
+ block/blk.h               | 12 +++++++++---
+ include/linux/blk_types.h |  4 ++--
+ io_uring/rsrc.c           | 11 -----------
+ 4 files changed, 15 insertions(+), 17 deletions(-)
 
 -- 
-Frederic Weisbecker
-SUSE Labs
+2.47.0
+
