@@ -1,110 +1,99 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sg-1-13.ptr.blmpb.com (sg-1-13.ptr.blmpb.com [118.26.132.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62CC7221282
-	for <linux-block@vger.kernel.org>; Wed, 31 Dec 2025 03:01:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EB9718CBE1
+	for <linux-block@vger.kernel.org>; Wed, 31 Dec 2025 05:39:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767150091; cv=none; b=pmrYwzy37WBzAApd4IpcDQ0TyMGh16Pu+LveKqI4cg53WpMd38ujv6XSNiyYLH8umniDd4RjFlC/StlU1v9gU+ozs8492o2WlUAYoaGMKQOTIy2ZZ0Zor+Rnzn+I3hx7vhoLThGVezx4P0jHMraMRu0kWuHGdznOFuzngrrYMdE=
+	t=1767159556; cv=none; b=KARfI/Hf98goQ/tXEZ2sdUjaFeSP64ZyaJEPbv4GbZRzsp77rfGEZp3M6OGzCScrWDXBPiWsI+AvY1c1EdmY0FKODHJlOcI1h2fGHdSNRwCHCDhXsFDJQBqR8h/uQ5B4tsdqgbRitxMF3LOXoMwT65RcPx7ccWYu3x6dlG09QHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767150091; c=relaxed/simple;
-	bh=Adc/gGOQhKQ7iKHAIQg0d2G/OCsfV4g86heNR+UaMz0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VxqlJfUMPp8XppW715tcDH8DQffV/A5ZFAbzBjFETpFnjshw2TuTWWjWpIUpQtRHpNS3H0z0I63bZP1pvIpGr+Nw6hYTU4icMuYXEec0OKrXIHo8Z6WhS+/5kMHLDJkemWe199vFqYsefCzcmhuabOndxMrIMmiPThUUcX0yMaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=i82JLzSW; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1767159556; c=relaxed/simple;
+	bh=jmO+v1hhAFkA0vt6+I7xseu2QTWBmjqhOi56+S7iUhk=;
+	h=References:From:Date:Mime-Version:Message-Id:Content-Type:To:
+	 Subject:In-Reply-To; b=Gwm/cpSblPkawmnd0dlhPIR1wc1uaASEowID3swSIcb2u9rc9ncJs/78536pVAUKHoKQdgYEjGSRLZB9ON0YpWGjlRvwMqKPEfm9Biga6SjgAKBWLcwEGzPBGsU0Ynxlqb/skgxtF1o9oN6fN4AGj6aQMN83eerCPjztIjaQi4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=pass smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=GplLRw4o; arc=none smtp.client-ip=118.26.132.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fnnas.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i82JLzSW"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767150089;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iSEBKVXerWmpVQLRf+Hq5xLIOFc46hGGm9aUmXEaGuk=;
-	b=i82JLzSWqom+WQ/EYXXDea9JnsagNFT5iSzzURSyUcomg+JYNClNB3rUS8Axg8puV/c08p
-	m6QbNdBnnvj+acP10+diLu8RWcDpzoyBViDMUU2Cvt0h+ENdi01ZyKa7Q0skv2H1GWHYZx
-	Ygh6pKxmDKd92i/0hP8Q4dvT4k78VEQ=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-370-qPkN10iZPmOTu4kKbsCcnQ-1; Tue,
- 30 Dec 2025 22:01:24 -0500
-X-MC-Unique: qPkN10iZPmOTu4kKbsCcnQ-1
-X-Mimecast-MFC-AGG-ID: qPkN10iZPmOTu4kKbsCcnQ_1767150083
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7EB4818002DE;
-	Wed, 31 Dec 2025 03:01:23 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.52])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 51ADE18004D8;
-	Wed, 31 Dec 2025 03:01:21 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: io-uring@vger.kernel.org,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	Nitesh Shetty <nj.shetty@samsung.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 3/3] io_uring: remove nr_segs recalculation in io_import_kbuf()
-Date: Wed, 31 Dec 2025 11:00:57 +0800
-Message-ID: <20251231030101.3093960-4-ming.lei@redhat.com>
-In-Reply-To: <20251231030101.3093960-1-ming.lei@redhat.com>
-References: <20251231030101.3093960-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="GplLRw4o"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1767159540;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=gLycpMcJbDoDv2Vj3qjGXcX/epLzhRogw3PrdsBxqfg=;
+ b=GplLRw4oUAxAfQX7EfVrd5CxpVnT22HI10EP1n2lQ7BctXcfb8f0VTkkdoGT8l7+YIV7Ea
+ O/rmq++CGh6x4HeTy5bcT4QFNliYJJDtYxbWns6NZMODrFjgDs56suvVhTAC/VSrQ1ZHO0
+ arX/te+81ysI8uYRVYMv8n2tlNziRh4wjxS798edoHY/MOO/7vSvq7SaSrUyPmpxChXqME
+ BdPZ7tA+5MZRId03PrHrYLiMCyC2fugZsJ2RnKByyA6MoXgrOXKQU7wR2RF3j8G//AGnty
+ 3A9s5sZ0kOdUWfKMv3WW0rscWOsz6zD6WfflLByB/xh8bJlT2VoaZIbW4g8kBg==
+References: <20251225103248.1303397-1-yukuai@fnnas.com> <20251225103248.1303397-7-yukuai@fnnas.com> <5ca7b3a4-e849-4e59-a56c-7e095b0c93b9@linux.ibm.com>
+Received: from [192.168.1.104] ([39.182.0.136]) by smtp.feishu.cn with ESMTPS; Wed, 31 Dec 2025 13:38:57 +0800
+Content-Language: en-US
+From: "Yu Kuai" <yukuai@fnnas.com>
+Date: Wed, 31 Dec 2025 13:38:54 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Mime-Version: 1.0
+X-Original-From: Yu Kuai <yukuai@fnnas.com>
+User-Agent: Mozilla Thunderbird
+Reply-To: yukuai@fnnas.com
+Message-Id: <68bad073-c1ad-4434-b9ed-6d9aaf4fda02@fnnas.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+To: "Nilay Shroff" <nilay@linux.ibm.com>, <axboe@kernel.dk>, 
+	<linux-block@vger.kernel.org>, <tj@kernel.org>, <ming.lei@redhat.com>, 
+	<yukuai@fnnas.com>
+Subject: Re: [PATCH v6 06/13] blk-mq-debugfs: remove blk_mq_debugfs_unregister_rqos()
+In-Reply-To: <5ca7b3a4-e849-4e59-a56c-7e095b0c93b9@linux.ibm.com>
+X-Lms-Return-Path: <lba+26954b6f2+e2bb59+vger.kernel.org+yukuai@fnnas.com>
 
-io_import_kbuf() recalculates iter->nr_segs to reflect only the bvecs
-needed for the requested byte range. This was added to provide an
-accurate segment count to bio_iov_bvec_set(), which copied nr_segs to
-bio->bi_vcnt for use as a bio split hint.
+Hi,
 
-The previous two patches eliminated this dependency:
- - bio_may_need_split() now uses bi_iter instead of bi_vcnt for split
-   decisions
- - bio_iov_bvec_set() no longer copies nr_segs to bi_vcnt
+=E5=9C=A8 2025/12/30 13:33, Nilay Shroff =E5=86=99=E9=81=93:
+>
+> On 12/25/25 4:02 PM, Yu Kuai wrote:
+>> diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
+>> index d7ce99ce2e80..85cf74402a09 100644
+>> --- a/block/blk-rq-qos.c
+>> +++ b/block/blk-rq-qos.c
+>> @@ -371,8 +371,4 @@ void rq_qos_del(struct rq_qos *rqos)
+>>   	if (!q->rq_qos)
+>>   		blk_queue_flag_clear(QUEUE_FLAG_QOS_ENABLED, q);
+>>   	blk_mq_unfreeze_queue(q, memflags);
+>> -
+>> -	mutex_lock(&q->debugfs_mutex);
+>> -	blk_mq_debugfs_unregister_rqos(rqos);
+>> -	mutex_unlock(&q->debugfs_mutex);
+>>   }
+> This change looks good overall, but I have one comment:
+>
+> Do we really need to freeze the queue in rq_qos_del() here? Currently,
+> rq_qos_del() is only called from blk_iocost_init() and blk_iolatency_init=
+(),
+> both of which run while holding ->freeze_lock. Given this, it seems
+> unnecessary for rq_qos_del() to freeze and unfreeze the queue again.
+> Instead, we could remove the freeze/unfreeze logic from rq_qos_del() and
+> add a WARN_ON() or assertion to ensure that the caller has already frozen
+> the queue before invoking it.
 
-Since nr_segs is no longer used for bio split decisions, the
-recalculation loop is unnecessary. The iov_iter already has the correct
-bi_size to cap iteration, so an oversized nr_segs is harmless.
+Sounds good.
 
-Link: https://lkml.org/lkml/2025/4/16/351
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- io_uring/rsrc.c | 11 -----------
- 1 file changed, 11 deletions(-)
+> Moreover, with the current logic, rq_qos_del() may reverse the locking
+> order between ->rq_qos_mutex and ->freeze_lock if the caller has not
+> already acquired ->freeze_lock, which could lead to potential lock
+> ordering issues.
 
-diff --git a/io_uring/rsrc.c b/io_uring/rsrc.c
-index 41c89f5c616d..ee6283676ba7 100644
---- a/io_uring/rsrc.c
-+++ b/io_uring/rsrc.c
-@@ -1055,17 +1055,6 @@ static int io_import_kbuf(int ddir, struct iov_iter *iter,
- 
- 	iov_iter_bvec(iter, ddir, imu->bvec, imu->nr_bvecs, count);
- 	iov_iter_advance(iter, offset);
--
--	if (count < imu->len) {
--		const struct bio_vec *bvec = iter->bvec;
--
--		len += iter->iov_offset;
--		while (len > bvec->bv_len) {
--			len -= bvec->bv_len;
--			bvec++;
--		}
--		iter->nr_segs = 1 + bvec - iter->bvec;
--	}
- 	return 0;
- }
- 
--- 
-2.47.0
+Meanwhile, I see the same situation in blkcg_policy_register(), where
+blk_mq_freeeze_queue() is called with rq_qos_mutex already held, I'll
+clean that up as well.
 
+>
+> Thanks,
+> --Nilay
+>
+--=20
+Thansk,
+Kuai
