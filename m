@@ -1,48 +1,45 @@
-Received: from mail2-relais-roc.national.inria.fr (mail2-relais-roc.national.inria.fr [192.134.164.83])
+Received: from mail3-relais-sop.national.inria.fr (mail3-relais-sop.national.inria.fr [192.134.164.104])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBDEE2628D;
-	Wed, 31 Dec 2025 17:01:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.134.164.83
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE2BC81732;
+	Wed, 31 Dec 2025 17:22:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.134.164.104
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767200487; cv=none; b=RIyyNXHi3xSmc8dX0KGAsjdbQdax3wnL+vgPF8ikwuMec4c2khOZcm+wc1u6xmC4LhI73p4HiyCRBAUOAB9oqQc03E9MeM3WR7dxC0sIhB9t1xnx2+XpoTOfPbWBlurlNo1YQv+H8ixB3O7SUiKN2dU+IoubOwnVAcsMs8+lFuY=
+	t=1767201739; cv=none; b=fwdmbP0E1kogOTJ2uVK3HmroQnzbEKqMixEHsPsw2rUGsPIfK1f/ma46qyjVFZa9bvgsWmfzi57N1/jx5PAFFHcPOEwQ4beslIC3zig7RhxzGQqdcpxj5CSLFTnrnmcJzmq5eB6qnhrigTxVjTjTq9C63XXVRUU2Tnw9yPPuhcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767200487; c=relaxed/simple;
-	bh=9SdKlaU8EMcOWyN+a8k3zXwXSNceiUwuhX+/C+Y21wM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tFiJ/fZwB+s5dF47r2PicvSPdFqu25AhTQEhYfH86B6mTAU9ezNx1plh+1+gmXU+sccjKFYSOrVm3zTMkWJbW5udhN/bhs5cewfC375JdTRUk1pSAzEc6hkT3ifkHLFuQDOEdVPYAw7JGk0yFI+/YvBChj9NGHmCzx0CTDArNys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr; spf=pass smtp.mailfrom=inria.fr; dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b=Z4Kk3xwt; arc=none smtp.client-ip=192.134.164.83
+	s=arc-20240116; t=1767201739; c=relaxed/simple;
+	bh=VDDny+2QcoOw2Ggk69xl1kHlpWEUwbpfpAnWRcBk8rM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Sy/DMVZo48dwJiYFPxgziviMd8znfpAkFX/88mdu2IGrHOvrudJSrGbsCNWiuMrdD4eNHFJPwk3mWdyFdXLYtBcBBBW9LCRmmVDK6r0x7B7RYnmgcAVhDkL3HJSJ9u94LYtSf7ust+C6O8FB9VuSGTVGoPBviOcLSYDqyE7Wsp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr; spf=pass smtp.mailfrom=inria.fr; dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b=ptJwsOGF; arc=none smtp.client-ip=192.134.164.104
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inria.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="Z4Kk3xwt"
+	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="ptJwsOGF"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=inria.fr; s=dc;
   h=from:to:cc:subject:date:message-id:mime-version:
    content-transfer-encoding;
-  bh=JzaT6YMekIKZjs91ZB40omkWvNzWTEmNqVO/qmivMEk=;
-  b=Z4Kk3xwtIDlZCMSkeASfAfY464FJ9MTFpND+HYoWYLs3C04XgvVjmdvv
-   qiQaRJSo65j/imlbcjF63DrmyeglWAhji8h4X0zvUtLeAkxQOT4YFClHA
-   bSfjdH9zUBRoP19o1qp3xLJMsmGTBydGFuVEML1fNq67xrWbn8IBv0crM
-   Y=;
-X-CSE-ConnectionGUID: akgWHouqSCmAxErCeDPv2w==
-X-CSE-MsgGUID: Lb0WJ4yyTUO10Y9i/NEL1g==
-Authentication-Results: mail2-relais-roc.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=Julia.Lawall@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
+  bh=ITcUj6uBUKyp7sUAB0nbMV5L5gZYuxxVkAnwHIPB+Og=;
+  b=ptJwsOGFkqUcWOQmVodl7wmmfvRpEVZJXW6oCJmifYGQELruhO/3Juo+
+   Qt7vRdZBvpzg0LZEqIjtmFtZ78/0dT7taGb4LURG8khQ4HWnC639qv+nK
+   Gh1U2lr2Rb7Vvh9jU9L0czCl7/HwEuEzX01hO2XBz1DydR/73U91QYgzF
+   4=;
+X-CSE-ConnectionGUID: /BWuHIigT9WndUo8z3sgTA==
+X-CSE-MsgGUID: QGtqnSlqRBeUOjxFLvwD5Q==
+Authentication-Results: mail3-relais-sop.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=Julia.Lawall@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
 X-IronPort-AV: E=Sophos;i="6.21,192,1763420400"; 
-   d="scan'208";a="256477593"
+   d="scan'208";a="134818928"
 Received: from i80.paris.inria.fr (HELO i80.paris.inria.fr.) ([128.93.102.196])
-  by mail2-relais-roc.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Dec 2025 18:01:23 +0100
+  by mail3-relais-sop.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Dec 2025 18:22:14 +0100
 From: Julia Lawall <Julia.Lawall@inria.fr>
-To: Yu Kuai <yukuai3@huawei.com>
-Cc: yunbolyu@smu.edu.sg,
-	kexinsun@smail.nju.edu.cn,
-	ratnadiraw@smu.edu.sg,
-	xutong.ma@inria.fr,
+To: Yu Kuai <yukuai@fnnas.com>
+Cc: kernel-janitors@vger.kernel.org,
 	Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] bfq: update outdated comment
-Date: Wed, 31 Dec 2025 18:01:17 +0100
-Message-Id: <20251231170117.143488-1-Julia.Lawall@inria.fr>
+Subject: [PATCH v2] bfq: update outdated comment
+Date: Wed, 31 Dec 2025 18:22:07 +0100
+Message-Id: <20251231172207.143911-1-Julia.Lawall@inria.fr>
 X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
@@ -59,6 +56,9 @@ bfq_bfqq_may_idle").  Update the comment accordingly.
 Signed-off-by: Julia Lawall <Julia.Lawall@inria.fr>
 
 ---
+
+v2: Update the email address of Yu Kuai
+
  block/bfq-iosched.h |    2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
