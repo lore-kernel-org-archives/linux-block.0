@@ -1,19 +1,19 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B0941A840A
-	for <linux-block@vger.kernel.org>; Wed, 31 Dec 2025 08:52:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA4EE31327A
+	for <linux-block@vger.kernel.org>; Wed, 31 Dec 2025 08:52:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767171123; cv=none; b=HD6Y7NFZz3oI3WoXmxNDgbtIBQOdHqkL4Vn1GgHEL3g12YIXVSHnxomZ6d8WFgB15sdZCb/x2vQhFoveJKsU5EShvbmCplPRhAiQ5bhIERSWrBSYy8rc4DoTKu7/V8JrxT3ZNljO4LAiS5mwkx38IBZCEsuI8tRduHlGZfXSQMk=
+	t=1767171124; cv=none; b=OcetsA+vv2FKMnlWPMtgwUdD3/l7R0WuBA7w8gDq8/qzW/f1FzhkK7w+dpWxUVJRVQNcHnaxd3IJ2fLHoZHq4wwRpZQEkz95wyyrkv/UiRTaY1ST0kzBkafuoP0H/QY8/0RUlWvjtcPnpt09EC1ImXW+CCMJrzunqNIJl5mVYcY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767171123; c=relaxed/simple;
-	bh=aeM7O4lphlkhJ3T9qJ9dEiElr+wJetBu/4Ui8Le+7y4=;
+	s=arc-20240116; t=1767171124; c=relaxed/simple;
+	bh=R4+S3GKh0+LokRRWVBj8W1u5W9NkvWzTRyHf4hPicBs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mAdtFOVGkgHtP9ctn2Mtr/bZDhY1zf280nCFWD5X5I19snjUZNps7p9JTjjW87N3cCh6xCGMVD/MvvnMf6v7idAtkRQljVzSpxunh/VDQoq1IplEC2qKTNiXECwYbaYiML9xiYzQSjAvvIf+TKb8zCdTA5bQeFQJkvXO0a9cGec=
+	 MIME-Version; b=lg3tyXtVPcG/6tOYjK2CAoglQFGRYQibmpVUiIVmwqy/uVpuswR3ge/lmpdnG2UKpa4iyhtd+1fqEY+8gy8mxXyOzIy76RaUAGlFGMu50GtfgdeD6lIQa2oCmwLdDQyi8UXAFEVmJbjphU8FBjD80kTMZZrKDqRVX87IWpTgUvk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86A52C19421;
-	Wed, 31 Dec 2025 08:52:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4208AC113D0;
+	Wed, 31 Dec 2025 08:52:03 +0000 (UTC)
 From: Yu Kuai <yukuai@fnnas.com>
 To: axboe@kernel.dk,
 	linux-block@vger.kernel.org,
@@ -21,9 +21,9 @@ To: axboe@kernel.dk,
 	nilay@linux.ibm.com,
 	ming.lei@redhat.com
 Cc: yukuai@fnnas.com
-Subject: [PATCH v7 15/16] blk-rq-qos: remove queue frozen from rq_qos_del()
-Date: Wed, 31 Dec 2025 16:51:25 +0800
-Message-ID: <20251231085126.205310-16-yukuai@fnnas.com>
+Subject: [PATCH v7 16/16] blk-cgroup: remove queue frozen from blkcg_activate_policy()
+Date: Wed, 31 Dec 2025 16:51:26 +0800
+Message-ID: <20251231085126.205310-17-yukuai@fnnas.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251231085126.205310-1-yukuai@fnnas.com>
 References: <20251231085126.205310-1-yukuai@fnnas.com>
@@ -36,38 +36,54 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
 On the one hand, nest q_usage_counter under rq_qos_mutex is wrong;
-On the other hand, rq_qos_del() is only called from error path of
-iocost/iolatency, where queue is already frozen, hence freeze queue
-here doesn't make sense.
+
+On the other hand, policy activation is now all under queue frozen:
+ - for bfq queue is frozen from elevator_change();
+ - for blk-throttle, iocost, iolatency, queue is frozen from
+ blkg_conf_open_bdev_frozen(&ctx);
 
 Signed-off-by: Yu Kuai <yukuai@fnnas.com>
 ---
- block/blk-rq-qos.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ block/blk-cgroup.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
-index 20d8e53f063e..44d15aa09e27 100644
---- a/block/blk-rq-qos.c
-+++ b/block/blk-rq-qos.c
-@@ -347,11 +347,10 @@ void rq_qos_del(struct rq_qos *rqos)
- {
- 	struct request_queue *q = rqos->disk->queue;
- 	struct rq_qos **cur;
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 3cffb68ba5d8..31ac518b347c 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1580,12 +1580,13 @@ int blkcg_activate_policy(struct gendisk *disk, const struct blkcg_policy *pol)
+ 	struct request_queue *q = disk->queue;
+ 	struct blkg_policy_data *pd_prealloc = NULL;
+ 	struct blkcg_gq *blkg, *pinned_blkg = NULL;
 -	unsigned int memflags;
+ 	int ret;
+ 
+ 	if (blkcg_policy_enabled(q, pol))
+ 		return 0;
  
 +	WARN_ON_ONCE(q->mq_freeze_depth == 0);
- 	lockdep_assert_held(&q->rq_qos_mutex);
++
+ 	/*
+ 	 * Policy is allowed to be registered without pd_alloc_fn/pd_free_fn,
+ 	 * for example, ioprio. Such policy will work on blkcg level, not disk
+@@ -1594,8 +1595,6 @@ int blkcg_activate_policy(struct gendisk *disk, const struct blkcg_policy *pol)
+ 	if (WARN_ON_ONCE(!pol->pd_alloc_fn || !pol->pd_free_fn))
+ 		return -EINVAL;
  
--	memflags = blk_mq_freeze_queue(q);
- 	for (cur = &q->rq_qos; *cur; cur = &(*cur)->next) {
- 		if (*cur == rqos) {
- 			*cur = rqos->next;
-@@ -360,5 +359,4 @@ void rq_qos_del(struct rq_qos *rqos)
- 	}
- 	if (!q->rq_qos)
- 		blk_queue_flag_clear(QUEUE_FLAG_QOS_ENABLED, q);
--	blk_mq_unfreeze_queue(q, memflags);
- }
+-	if (queue_is_mq(q))
+-		memflags = blk_mq_freeze_queue(q);
+ retry:
+ 	spin_lock_irq(&q->queue_lock);
+ 
+@@ -1658,8 +1657,6 @@ int blkcg_activate_policy(struct gendisk *disk, const struct blkcg_policy *pol)
+ 
+ 	spin_unlock_irq(&q->queue_lock);
+ out:
+-	if (queue_is_mq(q))
+-		blk_mq_unfreeze_queue(q, memflags);
+ 	if (pinned_blkg)
+ 		blkg_put(pinned_blkg);
+ 	if (pd_prealloc)
 -- 
 2.51.0
 
