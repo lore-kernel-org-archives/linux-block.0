@@ -1,19 +1,19 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4748314A86
-	for <linux-block@vger.kernel.org>; Wed, 31 Dec 2025 08:51:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61FF12DBF75
+	for <linux-block@vger.kernel.org>; Wed, 31 Dec 2025 08:51:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767171108; cv=none; b=jXyoZshZ2rzFd5dhPB6ZEeIotg8a3tbg2Nd0+IVaPMx8fFvEB10DHkoKv7uJvzWp30BAnLADQLYZAIHfU3uYHKiYe5e8cLG7oaDKs1hxlsovsMygehiHBoYuacnjAttVsaloxRF41MQLG2mLa9zf0R3hDTuDbESap2XCviD1RoU=
+	t=1767171110; cv=none; b=p+IWeFg0qBZp5pJWT2Dn0q3EIQkshVGgVk0C6SjPpHZAQ0U6vq20veFKnf0Z+0Ozii+STjXCivz2RaXIwpYQxS2+rto1Bs06F9FpINFaJwgScjokfZUNHH25UbBC8EcP64oiOaTNalX4VJ++qulvni5gS7XzZKv1UMmLCuQNWQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767171108; c=relaxed/simple;
-	bh=JCJE5EMQNBg7RRmGeixFmETNVyuIdx2OmhpLRHiDxtM=;
+	s=arc-20240116; t=1767171110; c=relaxed/simple;
+	bh=R2vb+E7fPBAG0NMpFae/19GtnwCnokFTXcHe76C2x0Y=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GCJeMM1gXk+ewFbEHSibtBgr8Y21SUagiNDz3p3gS/RT0QgLivm/6JhoisX5AfEtzHmYGrzxAljQm2po95Xxj0Xn5i1Y5SIXGLP3Ldlr3WZDKot5tBxBARWEHuCX9stHT+KjxOAom+mYtx6+1SlwpQwSc3KzU/EwHThsaHFgC5A=
+	 MIME-Version; b=cO+ZdaXmvHcHMsxV+TQFYKwz7mIzZxhY7CvMgWfLHFtKrzlLCyXBOX6NMG+BuIMlOv38Ah+SPCCVu8ow7fWmoySowl2h33XzftrUHsigCKQ+rgSERyC67mAxorBrrvGtmki5q1GxzhLeIsMoK4s899S3fvXKMvUjr8/dWR9IjFM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 033D7C113D0;
-	Wed, 31 Dec 2025 08:51:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2C75C116D0;
+	Wed, 31 Dec 2025 08:51:47 +0000 (UTC)
 From: Yu Kuai <yukuai@fnnas.com>
 To: axboe@kernel.dk,
 	linux-block@vger.kernel.org,
@@ -21,9 +21,9 @@ To: axboe@kernel.dk,
 	nilay@linux.ibm.com,
 	ming.lei@redhat.com
 Cc: yukuai@fnnas.com
-Subject: [PATCH v7 06/16] blk-mq-debugfs: remove blk_mq_debugfs_unregister_rqos()
-Date: Wed, 31 Dec 2025 16:51:16 +0800
-Message-ID: <20251231085126.205310-7-yukuai@fnnas.com>
+Subject: [PATCH v7 07/16] blk-mq-debugfs: add missing debugfs_mutex in blk_mq_debugfs_register_hctxs()
+Date: Wed, 31 Dec 2025 16:51:17 +0800
+Message-ID: <20251231085126.205310-8-yukuai@fnnas.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251231085126.205310-1-yukuai@fnnas.com>
 References: <20251231085126.205310-1-yukuai@fnnas.com>
@@ -35,72 +35,30 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Because this helper is only used by iocost and iolatency, while they
-don't have debugfs entries.
+In blk_mq_update_nr_hw_queues(), debugfs_mutex is not held while
+creating debugfs entries for hctxs. Hence add debugfs_mutex there,
+it's safe because queue is not frozen.
 
 Signed-off-by: Yu Kuai <yukuai@fnnas.com>
 ---
- block/blk-mq-debugfs.c | 10 ----------
- block/blk-mq-debugfs.h |  4 ----
- block/blk-rq-qos.c     |  4 ----
- 3 files changed, 18 deletions(-)
+ block/blk-mq-debugfs.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 11f00a868541..22c182b40bc3 100644
+index 22c182b40bc3..5c7cadf51a88 100644
 --- a/block/blk-mq-debugfs.c
 +++ b/block/blk-mq-debugfs.c
-@@ -734,16 +734,6 @@ static const char *rq_qos_id_to_name(enum rq_qos_id id)
- 	return "unknown";
+@@ -679,8 +679,10 @@ void blk_mq_debugfs_register_hctxs(struct request_queue *q)
+ 	struct blk_mq_hw_ctx *hctx;
+ 	unsigned long i;
+ 
++	mutex_lock(&q->debugfs_mutex);
+ 	queue_for_each_hw_ctx(q, hctx, i)
+ 		blk_mq_debugfs_register_hctx(q, hctx);
++	mutex_unlock(&q->debugfs_mutex);
  }
  
--void blk_mq_debugfs_unregister_rqos(struct rq_qos *rqos)
--{
--	lockdep_assert_held(&rqos->disk->queue->debugfs_mutex);
--
--	if (!rqos->disk->queue->debugfs_dir)
--		return;
--	debugfs_remove_recursive(rqos->debugfs_dir);
--	rqos->debugfs_dir = NULL;
--}
--
- static void blk_mq_debugfs_register_rqos(struct rq_qos *rqos)
- {
- 	struct request_queue *q = rqos->disk->queue;
-diff --git a/block/blk-mq-debugfs.h b/block/blk-mq-debugfs.h
-index d94daa66556b..49bb1aaa83dc 100644
---- a/block/blk-mq-debugfs.h
-+++ b/block/blk-mq-debugfs.h
-@@ -34,7 +34,6 @@ void blk_mq_debugfs_register_sched_hctx(struct request_queue *q,
- void blk_mq_debugfs_unregister_sched_hctx(struct blk_mq_hw_ctx *hctx);
- 
- void blk_mq_debugfs_register_rq_qos(struct request_queue *q);
--void blk_mq_debugfs_unregister_rqos(struct rq_qos *rqos);
- #else
- static inline void blk_mq_debugfs_register(struct request_queue *q)
- {
-@@ -78,9 +77,6 @@ static inline void blk_mq_debugfs_register_rq_qos(struct request_queue *q)
- {
- }
- 
--static inline void blk_mq_debugfs_unregister_rqos(struct rq_qos *rqos)
--{
--}
- #endif
- 
- #if defined(CONFIG_BLK_DEV_ZONED) && defined(CONFIG_BLK_DEBUG_FS)
-diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
-index d7ce99ce2e80..85cf74402a09 100644
---- a/block/blk-rq-qos.c
-+++ b/block/blk-rq-qos.c
-@@ -371,8 +371,4 @@ void rq_qos_del(struct rq_qos *rqos)
- 	if (!q->rq_qos)
- 		blk_queue_flag_clear(QUEUE_FLAG_QOS_ENABLED, q);
- 	blk_mq_unfreeze_queue(q, memflags);
--
--	mutex_lock(&q->debugfs_mutex);
--	blk_mq_debugfs_unregister_rqos(rqos);
--	mutex_unlock(&q->debugfs_mutex);
- }
+ void blk_mq_debugfs_unregister_hctxs(struct request_queue *q)
 -- 
 2.51.0
 
