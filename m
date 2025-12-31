@@ -1,19 +1,19 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD8F4314B82
-	for <linux-block@vger.kernel.org>; Wed, 31 Dec 2025 08:51:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F20512DBF75
+	for <linux-block@vger.kernel.org>; Wed, 31 Dec 2025 08:51:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767171110; cv=none; b=u8wyg8TRriuu8CP/U80tfcPxGdBzQJdYU460QovE+nM60ChsIO92k5nDUp4TNW56VJh4YFU+J5O1N1t6gpBB6RwkQUq5ZVAU83Ev4GIUbUMheX4J6Lql8Xu35aJ1VawNLEB6WRLfahCMPToyF2HonSaJy5NnW96LMvhQZkGAkLk=
+	t=1767171113; cv=none; b=aNr2vwpUgppr9uW1YZ2ybRVEy7LE8KaHAubi6KsJRXrzUtd4BVp2rqmkSRQ4FCiwCsdJ5ASymY14Rfy4LzMieK46dFrlNnbTeuyxaFWpGUt3bGlLq/v/e1v/6GLCpKkabxhSX3FSA62rJMf5bFodCH7IsEeCDwfn9TqVSdwlRHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767171110; c=relaxed/simple;
-	bh=3FX0vRJMp2XpiFB9iZ7kxLv/9ansve6AoL3cSKa7Qns=;
+	s=arc-20240116; t=1767171113; c=relaxed/simple;
+	bh=cZAjn3i/1KoYmp6iXvX1OGA7E4xiCxKR1MXi3PWn7sY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=f1nX8V8qiMYSlXftK7zz2PZ6jdJ4yntaBT85ULAkx+0sw1uo0InIsTQgc+Ijsrfvp1jBT8EjnpaYl89Zuwf4fbKRHEJKTcpSe5EqydP4uqUrsNPFj7Rrkp/FswbiCBrdsWv4Gwd0fKpLIb7mY0sGLbu6kLrAi16Q3lCiCOlDqV4=
+	 MIME-Version; b=gbsMtWnwFTLY2QSjP7ocw9Te8iX8KGfyqx91BPBMs9p19R+5Y32oMDR9+Q8E7yoBMm8SXuyinB8UK3qaj0UjWXvA3brfv4R3WlhQT0God00VjU+jEScLnjUia+iBJGJVqjz4a9zkaWVO8lMIEaRENAmXlVWfRJBTKkB0/3X+/I4=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DF04C113D0;
-	Wed, 31 Dec 2025 08:51:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29132C116D0;
+	Wed, 31 Dec 2025 08:51:50 +0000 (UTC)
 From: Yu Kuai <yukuai@fnnas.com>
 To: axboe@kernel.dk,
 	linux-block@vger.kernel.org,
@@ -21,9 +21,9 @@ To: axboe@kernel.dk,
 	nilay@linux.ibm.com,
 	ming.lei@redhat.com
 Cc: yukuai@fnnas.com
-Subject: [PATCH v7 08/16] blk-mq-debugfs: warn about possible deadlock
-Date: Wed, 31 Dec 2025 16:51:18 +0800
-Message-ID: <20251231085126.205310-9-yukuai@fnnas.com>
+Subject: [PATCH v7 09/16] blk-throttle: fix possible deadlock for fs reclaim under rq_qos_mutex
+Date: Wed, 31 Dec 2025 16:51:19 +0800
+Message-ID: <20251231085126.205310-10-yukuai@fnnas.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251231085126.205310-1-yukuai@fnnas.com>
 References: <20251231085126.205310-1-yukuai@fnnas.com>
@@ -35,99 +35,109 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Creating new debugfs entries can trigger fs reclaim, hence we can't do
-this with queue frozen, meanwhile, other locks that can be held while
-queue is frozen should not be held as well.
+blk_throtl_init() can be called with rq_qos_mutex held from blkcg
+configuration, and fs reclaim can be triggered because GFP_KERNEL is used
+to allocate memory. This can deadlock because rq_qos_mutex can be held
+with queue frozen.
+
+Fix the problem by using blkg_conf_open_bdev_frozen(), also remove
+useless queue frozen from blk_throtl_init().
 
 Signed-off-by: Yu Kuai <yukuai@fnnas.com>
 ---
- block/blk-mq-debugfs.c | 31 ++++++++++++++++++++++++-------
- 1 file changed, 24 insertions(+), 7 deletions(-)
+ block/blk-throttle.c | 27 ++++++++++++++-------------
+ 1 file changed, 14 insertions(+), 13 deletions(-)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 5c7cadf51a88..faeaa1fc86a7 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -608,9 +608,23 @@ static const struct blk_mq_debugfs_attr blk_mq_debugfs_ctx_attrs[] = {
- 	{},
- };
- 
--static void debugfs_create_files(struct dentry *parent, void *data,
-+static void debugfs_create_files(struct request_queue *q, struct dentry *parent,
-+				 void *data,
- 				 const struct blk_mq_debugfs_attr *attr)
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 97188a795848..6b9e76c6a24b 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -1310,7 +1310,6 @@ static int blk_throtl_init(struct gendisk *disk)
  {
-+	lockdep_assert_held(&q->debugfs_mutex);
-+	/*
-+	 * Creating new debugfs entries with queue freezed has the risk of
-+	 * deadlock.
-+	 */
-+	WARN_ON_ONCE(q->mq_freeze_depth != 0);
-+	/*
-+	 * debugfs_mutex should not be nested under other locks that can be
-+	 * grabbed while queue is frozen.
-+	 */
-+	lockdep_assert_not_held(&q->elevator_lock);
-+	lockdep_assert_not_held(&q->rq_qos_mutex);
-+
- 	if (IS_ERR_OR_NULL(parent))
- 		return;
+ 	struct request_queue *q = disk->queue;
+ 	struct throtl_data *td;
+-	unsigned int memflags;
+ 	int ret;
  
-@@ -624,7 +638,7 @@ void blk_mq_debugfs_register(struct request_queue *q)
- 	struct blk_mq_hw_ctx *hctx;
- 	unsigned long i;
+ 	td = kzalloc_node(sizeof(*td), GFP_KERNEL, q->node);
+@@ -1319,8 +1318,6 @@ static int blk_throtl_init(struct gendisk *disk)
  
--	debugfs_create_files(q->debugfs_dir, q, blk_mq_debugfs_queue_attrs);
-+	debugfs_create_files(q, q->debugfs_dir, q, blk_mq_debugfs_queue_attrs);
+ 	INIT_WORK(&td->dispatch_work, blk_throtl_dispatch_work_fn);
+ 	throtl_service_queue_init(&td->service_queue);
+-
+-	memflags = blk_mq_freeze_queue(disk->queue);
+ 	blk_mq_quiesce_queue(disk->queue);
  
- 	queue_for_each_hw_ctx(q, hctx, i) {
- 		if (!hctx->debugfs_dir)
-@@ -643,7 +657,8 @@ static void blk_mq_debugfs_register_ctx(struct blk_mq_hw_ctx *hctx,
- 	snprintf(name, sizeof(name), "cpu%u", ctx->cpu);
- 	ctx_dir = debugfs_create_dir(name, hctx->debugfs_dir);
+ 	q->td = td;
+@@ -1334,8 +1331,6 @@ static int blk_throtl_init(struct gendisk *disk)
+ 	}
  
--	debugfs_create_files(ctx_dir, ctx, blk_mq_debugfs_ctx_attrs);
-+	debugfs_create_files(hctx->queue, ctx_dir, ctx,
-+			     blk_mq_debugfs_ctx_attrs);
+ 	blk_mq_unquiesce_queue(disk->queue);
+-	blk_mq_unfreeze_queue(disk->queue, memflags);
+-
+ 	return ret;
  }
  
- void blk_mq_debugfs_register_hctx(struct request_queue *q,
-@@ -659,7 +674,8 @@ void blk_mq_debugfs_register_hctx(struct request_queue *q,
- 	snprintf(name, sizeof(name), "hctx%u", hctx->queue_num);
- 	hctx->debugfs_dir = debugfs_create_dir(name, q->debugfs_dir);
+@@ -1345,15 +1340,18 @@ static ssize_t tg_set_conf(struct kernfs_open_file *of,
+ {
+ 	struct blkcg *blkcg = css_to_blkcg(of_css(of));
+ 	struct blkg_conf_ctx ctx;
++	unsigned long memflags;
+ 	struct throtl_grp *tg;
+-	int ret;
++	int ret = 0;
+ 	u64 v;
  
--	debugfs_create_files(hctx->debugfs_dir, hctx, blk_mq_debugfs_hctx_attrs);
-+	debugfs_create_files(q, hctx->debugfs_dir, hctx,
-+			     blk_mq_debugfs_hctx_attrs);
+ 	blkg_conf_init(&ctx, buf);
  
- 	hctx_for_each_ctx(hctx, ctx, i)
- 		blk_mq_debugfs_register_ctx(hctx, ctx);
-@@ -712,7 +728,7 @@ void blk_mq_debugfs_register_sched(struct request_queue *q)
+-	ret = blkg_conf_open_bdev(&ctx);
+-	if (ret)
++	memflags = blkg_conf_open_bdev_frozen(&ctx);
++	if (IS_ERR_VALUE(memflags)) {
++		ret = memflags;
+ 		goto out_finish;
++	}
  
- 	q->sched_debugfs_dir = debugfs_create_dir("sched", q->debugfs_dir);
- 
--	debugfs_create_files(q->sched_debugfs_dir, q, e->queue_debugfs_attrs);
-+	debugfs_create_files(q, q->sched_debugfs_dir, q, e->queue_debugfs_attrs);
+ 	if (!blk_throtl_activated(ctx.bdev->bd_queue)) {
+ 		ret = blk_throtl_init(ctx.bdev->bd_disk);
+@@ -1382,7 +1380,7 @@ static ssize_t tg_set_conf(struct kernfs_open_file *of,
+ 	tg_conf_updated(tg, false);
+ 	ret = 0;
+ out_finish:
+-	blkg_conf_exit(&ctx);
++	blkg_conf_exit_frozen(&ctx, memflags);
+ 	return ret ?: nbytes;
  }
  
- void blk_mq_debugfs_unregister_sched(struct request_queue *q)
-@@ -751,7 +767,8 @@ static void blk_mq_debugfs_register_rqos(struct rq_qos *rqos)
- 							 q->debugfs_dir);
+@@ -1529,15 +1527,18 @@ static ssize_t tg_set_limit(struct kernfs_open_file *of,
+ {
+ 	struct blkcg *blkcg = css_to_blkcg(of_css(of));
+ 	struct blkg_conf_ctx ctx;
++	unsigned long memflags;
+ 	struct throtl_grp *tg;
++	int ret = 0;
+ 	u64 v[4];
+-	int ret;
  
- 	rqos->debugfs_dir = debugfs_create_dir(dir_name, q->rqos_debugfs_dir);
--	debugfs_create_files(rqos->debugfs_dir, rqos, rqos->ops->debugfs_attrs);
-+	debugfs_create_files(q, rqos->debugfs_dir, rqos,
-+			     rqos->ops->debugfs_attrs);
- }
+ 	blkg_conf_init(&ctx, buf);
  
- void blk_mq_debugfs_register_rq_qos(struct request_queue *q)
-@@ -788,7 +805,7 @@ void blk_mq_debugfs_register_sched_hctx(struct request_queue *q,
+-	ret = blkg_conf_open_bdev(&ctx);
+-	if (ret)
++	memflags = blkg_conf_open_bdev_frozen(&ctx);
++	if (IS_ERR_VALUE(memflags)) {
++		ret = memflags;
+ 		goto out_finish;
++	}
  
- 	hctx->sched_debugfs_dir = debugfs_create_dir("sched",
- 						     hctx->debugfs_dir);
--	debugfs_create_files(hctx->sched_debugfs_dir, hctx,
-+	debugfs_create_files(q, hctx->sched_debugfs_dir, hctx,
- 			     e->hctx_debugfs_attrs);
+ 	if (!blk_throtl_activated(ctx.bdev->bd_queue)) {
+ 		ret = blk_throtl_init(ctx.bdev->bd_disk);
+@@ -1600,7 +1601,7 @@ static ssize_t tg_set_limit(struct kernfs_open_file *of,
+ 	tg_conf_updated(tg, false);
+ 	ret = 0;
+ out_finish:
+-	blkg_conf_exit(&ctx);
++	blkg_conf_exit_frozen(&ctx, memflags);
+ 	return ret ?: nbytes;
  }
  
 -- 
