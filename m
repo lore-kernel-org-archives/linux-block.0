@@ -1,100 +1,192 @@
-Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D894D22259F
-	for <linux-block@vger.kernel.org>; Thu,  1 Jan 2026 15:58:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84863205E02;
+	Thu,  1 Jan 2026 22:14:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767283085; cv=none; b=uwIQ8J+W1/t4bFQZ6Wh2aMkbkvd/OBVHwSOI0qmIIHVwau5kiB2CPznK1scMTcLkiXIdOdT1V2j5ot4oAHuUgoqhK4bYrzwcv3pogHOP0L7wF8/klJVedJRB3tCxr1XhPSwFAuy+nH8173yxB5TXckQB5glDXi0hLON/Tr3aIh8=
+	t=1767305652; cv=none; b=BJVsDaIM3uPcQA6C4pvKdwIH/ao4P0osa+yk3EIpbVXE4APixIsbfkK2p1pAa0KbCq2NBtfGUSzq7hnccHAfcNaA7c2K69PxJ5+XdN07hV2Dp5UNAAg/tQ9TaI+QB/fl+ZmfresBlElHpU604+WS+fDDTOTECGXuu28UZvllgDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767283085; c=relaxed/simple;
-	bh=Th3fJ1MQIwKOtdSeQbGdqWL9zs8Sbkw2DIL9tRp36As=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=CMFokx5jYgnZg2klEtJiSbM3rhPAqzIY3abLD+Tiuy2EqcxpQlbA/5QhJ+6adS2CVRNFvqMDbYOrK2JB3WZA7kmhU2Xc/2QcJ7CiIQTehq9lA+4K6RSUWGfq4L2IDjFqL7QUWwflbc4SoL8HE/pwDAOxLE4k12r+smVROOZRQCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=BTglT2sy; arc=none smtp.client-ip=209.85.210.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1767305652; c=relaxed/simple;
+	bh=TkV0C834LNJT27mx2/Ayl0IxXi3IFIB0xDgB+kxqTGk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nOXKWrMCCWZsJNK5g54uUftTVh1UEQBJzObcYXccvFaKqCGuuKw98zLy5mh55ueLq4huiUO51V9dSW7rBLWAvLOFQd59votL2vvrtOZ1juY1bRohV7o+XC0WIlaVIAatrNxaKwnfm+gbF7MIptS9oB6c96uFjKBOSay9OXWt2is=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r+AnEX/U; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="BTglT2sy"
-Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-7c6d3676455so5188338a34.2
-        for <linux-block@vger.kernel.org>; Thu, 01 Jan 2026 07:58:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1767283082; x=1767887882; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xWxZMPDfz6VibqcQ4C4tU4AllLssToyo/WIL80GfDDo=;
-        b=BTglT2syHlu6wQD6rA0vMgMj98sd6jvZNpgSQZAUydl7KlTA5FCS2yp6T+ViX5qkEv
-         a45g3bMfYeZLalCoOgAxlOtvstfjNJ3Y4wFOJIB9LIJpCQXytTtAAWQwigkWOT72t6bt
-         f+Aqy4R40O+POiuiU9St0MbGaDwlbkBtm7hfPIGsAmo50F0x1ZFYo4VgCvYbdZpFoYAD
-         tYhkV1EKc9arbam+vEFDlcCMFa5kJuMENHz/UlME450Ar74IRVR7veI3JbbPm5jZ1/fs
-         DjaXqsBTMZVzbbmlyRK1/d8qydALTZMZ7Yu+mXSaALZfaSQb86hQRd+NEdK80sml93cg
-         nfrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767283082; x=1767887882;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=xWxZMPDfz6VibqcQ4C4tU4AllLssToyo/WIL80GfDDo=;
-        b=jiTMVuEIF4tMMZSrhiyFsUrb7Il9ojSLh17mumXUY86HGLikYcKeodOjcZLfzSvSaG
-         dX2iIziZjjrK6wXFdkZBfHyJreMsbpdLSVtMx/Vt8eEDe4qB+fhuAGyzS49hzQClVGE5
-         ElDayfy5aiHpH7Hi0CDSIaCO9JBunQ1KZqv6gEK7tRMwAfBPQJEy7gziD4YHUvbX+BxS
-         O1AD2IgcR872HYkzZcEv3evvsZaVGKFMzvsll5qay7Vqw3Ngy72kNZCmn5O1rtloakrU
-         a8BWFZynaowbKQZg/fooPz5BG3KrLJ6uQ13cwi0MCSHP6y8ceTbPa7wEOdHDf+DlFxA8
-         SD+A==
-X-Forwarded-Encrypted: i=1; AJvYcCU55oCpEEh2ks4HAtMaUhQiKbbChxjQbODQ8sahWbCQMMlMd7A0nE10QFdf9Z3L3lotuXHC2MRE87bqxg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+mlsE82JkqOYvPapKdYmf9n0rQnRh94xqn/lHs80M8T9gFSK1
-	ZfSkOSk6+WDIVk+Wdia3uUT7D1LmQvnqNOBiCVdwr2t2N5PcAW2yNfYxGjbqppL0oES7KfBBKs0
-	YRic0
-X-Gm-Gg: AY/fxX77hrK4M328M/uvFbquYeA73x863V5/93u3ydiwvfL+FnGkF2bAkx88B4HKzq1
-	25in3Uy0jqpf00Y1qV/WFHcMJVuemhsO6KEu4S2e+HwO0mm9y2xmirKHAZXsgkuK2NyGZL0lzV+
-	jBcmX2b/Rwic0JWMuOyDfqpHhGiEq60Av1rXJYu7mo1np7509Hm2I6gedLi7yOLrN/Erpdwfdv9
-	PzvWPzE4zBB/wMxF0O2q5Nk2wlyvssarEWqamLTq1ldVxxGisHQq9VoioBoFL7lDv6DgAA1Yebe
-	SpBpoJlPsiouYdUECvkSCbe6pwmkM83ygVgmjiM/BGpTw5/+X6VN1+gxUo41z6tBIXnXwBFyxjv
-	90GU5GUONIW8kdRBaUzDe6Dkbiy99xfh3/xDGz9eCD7tegr6kczlf7Vg3I9+BzE+szDfapJYZ9B
-	B79KQ=
-X-Google-Smtp-Source: AGHT+IGHCkf/1xNPXPk0nyG8mmvveOUau82FYECqKBzaPoATKt456TDZITRLK3PauRkPrRFIrTXqiA==
-X-Received: by 2002:a05:6830:254c:b0:7c7:55e3:9117 with SMTP id 46e09a7af769-7cc6690c751mr20713295a34.22.1767283081859;
-        Thu, 01 Jan 2026 07:58:01 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7cc6673bdabsm26303693a34.10.2026.01.01.07.58.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Jan 2026 07:58:01 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: Yu Kuai <yukuai@fnnas.com>, Julia Lawall <Julia.Lawall@inria.fr>
-Cc: kernel-janitors@vger.kernel.org, linux-block@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-In-Reply-To: <20251231172207.143911-1-Julia.Lawall@inria.fr>
-References: <20251231172207.143911-1-Julia.Lawall@inria.fr>
-Subject: Re: [PATCH v2] bfq: update outdated comment
-Message-Id: <176728308066.509736.9424691237994816881.b4-ty@kernel.dk>
-Date: Thu, 01 Jan 2026 08:58:00 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r+AnEX/U"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D868C4CEF7;
+	Thu,  1 Jan 2026 22:14:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767305652;
+	bh=TkV0C834LNJT27mx2/Ayl0IxXi3IFIB0xDgB+kxqTGk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=r+AnEX/Uh7pY3+P9PtZZEL/YIDn27sHbkqPtMSwNLRKHHMTms8Iih3doTf696xwnu
+	 gEPlpuSiMxK4SXJxo4eSA8HJefbZZhMKsT1EF4NF5ytyce+tbp8wA33QjukE70v5oL
+	 UeUMrHshVDmYFFB+rH5otwwzlN8jOnScbiMonmLog0e7JWiUXs7DCJJjEnsGDShFp7
+	 T9eAqXR4tqZeHDiuR8a6MJx6IsPtATcbvcdT4Q6qbs9dBvxv5nSVFssetF1MBcynmq
+	 OcDhyEwkROwIlr8GTTga8WovIiNHj94MbaZ+Yc4fvu65j6YAwxQYvgJLR/xHfZNysi
+	 Tu6x4WAFW1OMA==
+From: Frederic Weisbecker <frederic@kernel.org>
+To: LKML <linux-kernel@vger.kernel.org>
+Cc: Frederic Weisbecker <frederic@kernel.org>,
+	Tejun Heo <tj@kernel.org>,
+	Phil Auld <pauld@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Michal Koutny <mkoutny@suse.com>,
+	netdev@vger.kernel.org,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	linux-block@vger.kernel.org,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Eric Dumazet <edumazet@google.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	Chen Ridong <chenridong@huawei.com>,
+	cgroups@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Simon Horman <horms@kernel.org>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	linux-mm@kvack.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	Gabriele Monaco <gmonaco@redhat.com>,
+	Waiman Long <longman@redhat.com>,
+	Muchun Song <muchun.song@linux.dev>,
+	Will Deacon <will@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Chen Ridong <chenridong@huaweicloud.com>
+Subject: [PATCH 00/33 v6] cpuset/isolation: Honour kthreads preferred affinity
+Date: Thu,  1 Jan 2026 23:13:25 +0100
+Message-ID: <20260101221359.22298-1-frederic@kernel.org>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
+Content-Transfer-Encoding: 8bit
+
+Hi,
+
+The kthread code was enhanced lately to provide an infrastructure which
+manages the preferred affinity of unbound kthreads (node or custom
+cpumask) against housekeeping constraints and CPU hotplug events.
+
+One crucial missing piece is cpuset: when an isolated partition is
+created, deleted, or its CPUs updated, all the unbound kthreads in the
+top cpuset are affine to _all_ the non-isolated CPUs, possibly breaking
+their preferred affinity along the way
+
+Solve this with performing the kthreads affinity update from cpuset to
+the kthreads consolidated relevant code instead so that preferred
+affinities are honoured.
+
+The dispatch of the new cpumasks to workqueues and kthreads is performed
+by housekeeping, as per the nice Tejun's suggestion.
+
+As a welcome side effect, HK_TYPE_DOMAIN then integrates both the set
+from isolcpus= and cpuset isolated partitions. Housekeeping cpumasks are
+now modifyable with specific synchronization. A big step toward making
+nohz_full= also mutable through cpuset in the future.
+
+Changes since v5:
+
+* Add more tags
+
+* Fix leaked destroy_work_on_stack() (Zhang Qiao, Waiman Long)
+
+* Comment schedule_drain_work() synchronization requirement (Tejun)
+
+* s/Revert of/Inverse of (Waiman Long)
+
+* Remove housekeeping_update() needless (for now) parameter (Chen Ridong)
+
+* Don't propagate housekeeping_update() failures beyond allocations (Waiman Long)
+
+* Whitespace cleanup (Waiman Long)
 
 
-On Wed, 31 Dec 2025 18:22:07 +0100, Julia Lawall wrote:
-> The function bfq_bfqq_may_idle() was renamed as bfq_better_to_idle()
-> in commit 277a4a9b56cd ("block, bfq: give a better name to
-> bfq_bfqq_may_idle").  Update the comment accordingly.
-> 
-> 
+git://git.kernel.org/pub/scm/linux/kernel/git/frederic/linux-dynticks.git
+	kthread/core-v6
 
-Applied, thanks!
+HEAD: 811e87ca8a0a1e54eb5f23e71896cb97436cccdc
 
-[1/1] bfq: update outdated comment
-      (no commit info)
+Happy new year,
+	Frederic
+---
 
-Best regards,
--- 
-Jens Axboe
+Frederic Weisbecker (33):
+      PCI: Prepare to protect against concurrent isolated cpuset change
+      cpu: Revert "cpu/hotplug: Prevent self deadlock on CPU hot-unplug"
+      memcg: Prepare to protect against concurrent isolated cpuset change
+      mm: vmstat: Prepare to protect against concurrent isolated cpuset change
+      sched/isolation: Save boot defined domain flags
+      cpuset: Convert boot_hk_cpus to use HK_TYPE_DOMAIN_BOOT
+      driver core: cpu: Convert /sys/devices/system/cpu/isolated to use HK_TYPE_DOMAIN_BOOT
+      net: Keep ignoring isolated cpuset change
+      block: Protect against concurrent isolated cpuset change
+      timers/migration: Prevent from lockdep false positive warning
+      cpu: Provide lockdep check for CPU hotplug lock write-held
+      cpuset: Provide lockdep check for cpuset lock held
+      sched/isolation: Convert housekeeping cpumasks to rcu pointers
+      cpuset: Update HK_TYPE_DOMAIN cpumask from cpuset
+      sched/isolation: Flush memcg workqueues on cpuset isolated partition change
+      sched/isolation: Flush vmstat workqueues on cpuset isolated partition change
+      PCI: Flush PCI probe workqueue on cpuset isolated partition change
+      cpuset: Propagate cpuset isolation update to workqueue through housekeeping
+      cpuset: Propagate cpuset isolation update to timers through housekeeping
+      timers/migration: Remove superfluous cpuset isolation test
+      cpuset: Remove cpuset_cpu_is_isolated()
+      sched/isolation: Remove HK_TYPE_TICK test from cpu_is_isolated()
+      PCI: Remove superfluous HK_TYPE_WQ check
+      kthread: Refine naming of affinity related fields
+      kthread: Include unbound kthreads in the managed affinity list
+      kthread: Include kthreadd to the managed affinity list
+      kthread: Rely on HK_TYPE_DOMAIN for preferred affinity management
+      sched: Switch the fallback task allowed cpumask to HK_TYPE_DOMAIN
+      sched/arm64: Move fallback task cpumask to HK_TYPE_DOMAIN
+      kthread: Honour kthreads preferred affinity after cpuset changes
+      kthread: Comment on the purpose and placement of kthread_affine_node() call
+      kthread: Document kthread_affine_preferred()
+      doc: Add housekeeping documentation
 
-
-
+ Documentation/core-api/housekeeping.rst | 111 ++++++++++++++++++++++
+ Documentation/core-api/index.rst        |   1 +
+ arch/arm64/kernel/cpufeature.c          |  18 +++-
+ block/blk-mq.c                          |   6 +-
+ drivers/base/cpu.c                      |   2 +-
+ drivers/pci/pci-driver.c                |  71 ++++++++++----
+ include/linux/cpu.h                     |   4 +
+ include/linux/cpuhplock.h               |   1 +
+ include/linux/cpuset.h                  |   8 +-
+ include/linux/kthread.h                 |   1 +
+ include/linux/memcontrol.h              |   4 +
+ include/linux/mmu_context.h             |   2 +-
+ include/linux/pci.h                     |   3 +
+ include/linux/percpu-rwsem.h            |   1 +
+ include/linux/sched/isolation.h         |  16 +++-
+ include/linux/vmstat.h                  |   2 +
+ include/linux/workqueue.h               |   2 +-
+ init/Kconfig                            |   1 +
+ kernel/cgroup/cpuset.c                  |  68 +++++++-------
+ kernel/cpu.c                            |  42 ++++-----
+ kernel/kthread.c                        | 160 +++++++++++++++++++++-----------
+ kernel/sched/isolation.c                | 141 +++++++++++++++++++++++-----
+ kernel/sched/sched.h                    |   4 +
+ kernel/time/timer_migration.c           |  25 +++--
+ kernel/workqueue.c                      |  17 ++--
+ mm/memcontrol.c                         |  31 ++++++-
+ mm/vmstat.c                             |  15 ++-
+ net/core/net-sysfs.c                    |   2 +-
+ 28 files changed, 557 insertions(+), 202 deletions(-)
