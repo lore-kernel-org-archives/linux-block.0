@@ -1,76 +1,45 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from imap5.colo.codethink.co.uk (imap5.colo.codethink.co.uk [78.40.148.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 760CF31280A;
-	Thu,  1 Jan 2026 22:18:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DECFB20C488;
+	Fri,  2 Jan 2026 14:49:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.40.148.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767305925; cv=none; b=QxuyXYOy/gla1m4YyMAUAIk4tsbVHJGqDZNEiwZIGEtI3nq2qrj1f93GaUkxPTehgjF9bL+hbylisEp54pecNwU76MAidljkpWcrTNJHTVL1Hk9NjmlQ9/QC40K1z6e4Gqi8k8b1jljEMHX9WXxNTxwVERhXdz3JhFC8oEw6kSc=
+	t=1767365380; cv=none; b=LsGap3QoM94GJVC9sp1/fRxj/Cbndu4QcPQSCzQR2+4Gec86OK85+zsjd5dHI0jBDkbnOSVrMZeAoVo/NAB/uvlK0zRYAd+5hZ9Rwst4p50zKohRFUiJLc6ulBYWl5NPrLeFW8j/+bgT2rkqEFiDWXvtYn8BaxzT2eCS/B4y4Kg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767305925; c=relaxed/simple;
-	bh=soOg+pSguRYShDvlBT6z+CExBTh9mpEwKqBDpU+MvVA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jdIwy3WUeopMsD5LEbW70gXRqmh6xo1keBGanz3De/bwQg0RdWuaTYFLPwCdWuvq5cMFix8Au4pcFK9Vh/2+y2vvpPD5VkWMtDZQoN5NhVo+Ba/emGWF+qJB7p+T5MDS1U6lKF4MRcuoHdICmXqbHYtS9s4ubg1WYr76BlrtEs4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ch0+O6T9; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1767365380; c=relaxed/simple;
+	bh=qZZVe7dI5RoV7ypfn2BCqByQl/Rrfb6IN8o30oe5hfQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KN5YZ0vKOhfeKsLgOjSe8ZtfIWDiVgWozk+zlrYNvg8p/3dx3bqm7LDmWVfbH7DXdnE7Iw7OCnFZeb5Sg0wqnXflUQdKcTz2wqrTWvjKsvbqNkdiZ2imxVg84dqpuSeIMwxBocWUfzL9xGIGo7yRb1FTOZd3R8obI2jtQ40P1V8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=codethink.co.uk; spf=pass smtp.mailfrom=codethink.com; dkim=pass (2048-bit key) header.d=codethink.co.uk header.i=@codethink.co.uk header.b=seVnVSHi; arc=none smtp.client-ip=78.40.148.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=codethink.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codethink.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ch0+O6T9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5258EC4CEF7;
-	Thu,  1 Jan 2026 22:18:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767305925;
-	bh=soOg+pSguRYShDvlBT6z+CExBTh9mpEwKqBDpU+MvVA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ch0+O6T98cz7FFkRIvS/lrnNxuwEZVtNVKFC3b2uDV4OOAyrOCUNOhusqCS6JNycr
-	 JUpM4y18xsCFl5PanmWQQ56Xf4q84aK9WKNz43EhMZ1cwGEt+l7YTfU8aIyG79LZFm
-	 umUER4Ke8sqCA4evjdGE7hKCxtUMzlRqiHgbST3rqhEnSWxUWB0Ay/pY7a418yRReV
-	 VyWeUpgJ1b01hgn0Knsfb6k0nIunjAL6AWFL2SPFbQ9xuquSJrz5ncySl9dYIZ6+Q+
-	 kw65NtkT6BzpNxo/bs+0zFugLdB4vJmfSkrCoHMfujB2EbbJKcG3Fx7qcV66bUr8Dx
-	 F9u1AJrAhWhAQ==
-From: Frederic Weisbecker <frederic@kernel.org>
-To: LKML <linux-kernel@vger.kernel.org>
-Cc: Frederic Weisbecker <frederic@kernel.org>,
-	=?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Chen Ridong <chenridong@huawei.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Gabriele Monaco <gmonaco@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Marco Crivellari <marco.crivellari@suse.com>,
-	Michal Hocko <mhocko@suse.com>,
-	Muchun Song <muchun.song@linux.dev>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Phil Auld <pauld@redhat.com>,
-	"Rafael J . Wysocki" <rafael@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Simon Horman <horms@kernel.org>,
-	Tejun Heo <tj@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Waiman Long <longman@redhat.com>,
-	Will Deacon <will@kernel.org>,
-	cgroups@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-pci@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH 33/33] doc: Add housekeeping documentation
-Date: Thu,  1 Jan 2026 23:13:58 +0100
-Message-ID: <20260101221359.22298-34-frederic@kernel.org>
-X-Mailer: git-send-email 2.51.1
-In-Reply-To: <20260101221359.22298-1-frederic@kernel.org>
-References: <20260101221359.22298-1-frederic@kernel.org>
+	dkim=pass (2048-bit key) header.d=codethink.co.uk header.i=@codethink.co.uk header.b="seVnVSHi"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=codethink.co.uk; s=imap5-20230908; h=Sender:Content-Transfer-Encoding:
+	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:In-Reply-To:
+	References; bh=IN4ZPEM2XJumj6U3hK6l0T7+VyujQJ17XVJbwsFxc0s=; b=seVnVSHiKS2K32
+	sZ0LGNS7eqki1O2IyxS11970Xo/zJ5tJCmye3Ojz0knjjTwknwKkoftgdCdvb0+z6StErHBxNN6M2
+	rl4Q+iXWrO4jIrSqYZhTLo/XRDGFVqkTgdVUyk9agUgjjCxegy/ClsP/WiKApja2eqE2UAO2DElHn
+	wNDcs3as0nZkIcZNydKgrMVMa29euo7eeA2skv+hOLmKh507NZ3/Yj4JUCfy9wMgj+LG0cQEQZRHM
+	8gsQXCKTfeaUlJelOoZJIz3966mOEqzAYpjY6TI231LJcK6MDMJIM3kMUanVjj6KKZcl/vwcxznoP
+	EGm4f8bxWR8PziA9IziQ==;
+Received: from [167.98.27.226] (helo=rainbowdash)
+	by imap5.colo.codethink.co.uk with esmtpsa  (Exim 4.94.2 #2 (Debian))
+	id 1vbgT8-0006BT-B5; Fri, 02 Jan 2026 14:49:34 +0000
+Received: from ben by rainbowdash with local (Exim 4.99.1)
+	(envelope-from <ben@rainbowdash>)
+	id 1vbgT8-00000002kko-0UCa;
+	Fri, 02 Jan 2026 14:49:34 +0000
+From: Ben Dooks <ben.dooks@codethink.co.uk>
+To: linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Ben Dooks <ben.dooks@codethink.co.uk>
+Subject: [PATCH] block: fix type for printf argument
+Date: Fri,  2 Jan 2026 14:49:21 +0000
+Message-Id: <20260102144921.656362-1-ben.dooks@codethink.co.uk>
+X-Mailer: git-send-email 2.37.2.352.g3c44437643
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -78,144 +47,32 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Sender: srv_ts003@codethink.com
 
-Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
-Acked-by: Waiman Long <longman@redhat.com>
+When making the block-%d id, the type should be %u. Fixes:
+
+block/bio.c:92:62: warning: incorrect type in argument 4 (different types)
+block/bio.c:92:62:    expected int
+block/bio.c:92:62:    got unsigned int size
+
+Signed-off-by: Ben Dooks <ben.dooks@codethink.co.uk>
 ---
- Documentation/core-api/housekeeping.rst | 111 ++++++++++++++++++++++++
- Documentation/core-api/index.rst        |   1 +
- 2 files changed, 112 insertions(+)
- create mode 100644 Documentation/core-api/housekeeping.rst
+ block/bio.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Documentation/core-api/housekeeping.rst b/Documentation/core-api/housekeeping.rst
-new file mode 100644
-index 000000000000..e5417302774c
---- /dev/null
-+++ b/Documentation/core-api/housekeeping.rst
-@@ -0,0 +1,111 @@
-+======================================
-+Housekeeping
-+======================================
-+
-+
-+CPU Isolation moves away kernel work that may otherwise run on any CPU.
-+The purpose of its related features is to reduce the OS jitter that some
-+extreme workloads can't stand, such as in some DPDK usecases.
-+
-+The kernel work moved away by CPU isolation is commonly described as
-+"housekeeping" because it includes ground work that performs cleanups,
-+statistics maintainance and actions relying on them, memory release,
-+various deferrals etc...
-+
-+Sometimes housekeeping is just some unbound work (unbound workqueues,
-+unbound timers, ...) that gets easily assigned to non-isolated CPUs.
-+But sometimes housekeeping is tied to a specific CPU and requires
-+elaborated tricks to be offloaded to non-isolated CPUs (RCU_NOCB, remote
-+scheduler tick, etc...).
-+
-+Thus, a housekeeping CPU can be considered as the reverse of an isolated
-+CPU. It is simply a CPU that can execute housekeeping work. There must
-+always be at least one online housekeeping CPU at any time. The CPUs that
-+are not	isolated are automatically assigned as housekeeping.
-+
-+Housekeeping is currently divided in four features described
-+by the ``enum hk_type type``:
-+
-+1.	HK_TYPE_DOMAIN matches the work moved away by scheduler domain
-+	isolation performed through ``isolcpus=domain`` boot parameter or
-+	isolated cpuset partitions in cgroup v2. This includes scheduler
-+	load balancing, unbound workqueues and timers.
-+
-+2.	HK_TYPE_KERNEL_NOISE matches the work moved away by tick isolation
-+	performed through ``nohz_full=`` or ``isolcpus=nohz`` boot
-+	parameters. This includes remote scheduler tick, vmstat and lockup
-+	watchdog.
-+
-+3.	HK_TYPE_MANAGED_IRQ matches the IRQ handlers moved away by managed
-+	IRQ isolation performed through ``isolcpus=managed_irq``.
-+
-+4.	HK_TYPE_DOMAIN_BOOT matches the work moved away by scheduler domain
-+	isolation performed through ``isolcpus=domain`` only. It is similar
-+	to HK_TYPE_DOMAIN except it ignores the isolation performed by
-+	cpusets.
-+
-+
-+Housekeeping cpumasks
-+=================================
-+
-+Housekeeping cpumasks include the CPUs that can execute the work moved
-+away by the matching isolation feature. These cpumasks are returned by
-+the following function::
-+
-+	const struct cpumask *housekeeping_cpumask(enum hk_type type)
-+
-+By default, if neither ``nohz_full=``, nor ``isolcpus``, nor cpuset's
-+isolated partitions are used, which covers most usecases, this function
-+returns the cpu_possible_mask.
-+
-+Otherwise the function returns the cpumask complement of the isolation
-+feature. For example:
-+
-+With isolcpus=domain,7 the following will return a mask with all possible
-+CPUs except 7::
-+
-+	housekeeping_cpumask(HK_TYPE_DOMAIN)
-+
-+Similarly with nohz_full=5,6 the following will return a mask with all
-+possible CPUs except 5,6::
-+
-+	housekeeping_cpumask(HK_TYPE_KERNEL_NOISE)
-+
-+
-+Synchronization against cpusets
-+=================================
-+
-+Cpuset can modify the HK_TYPE_DOMAIN housekeeping cpumask while creating,
-+modifying or deleting an isolated partition.
-+
-+The users of HK_TYPE_DOMAIN cpumask must then make sure to synchronize
-+properly against cpuset in order to make sure that:
-+
-+1.	The cpumask snapshot stays coherent.
-+
-+2.	No housekeeping work is queued on a newly made isolated CPU.
-+
-+3.	Pending housekeeping work that was queued to a non isolated
-+	CPU which just turned isolated through cpuset must be flushed
-+	before the related created/modified isolated partition is made
-+	available to userspace.
-+
-+This synchronization is maintained by an RCU based scheme. The cpuset update
-+side waits for an RCU grace period after updating the HK_TYPE_DOMAIN
-+cpumask and before flushing pending works. On the read side, care must be
-+taken to gather the housekeeping target election and the work enqueue within
-+the same RCU read side critical section.
-+
-+A typical layout example would look like this on the update side
-+(``housekeeping_update()``)::
-+
-+	rcu_assign_pointer(housekeeping_cpumasks[type], trial);
-+	synchronize_rcu();
-+	flush_workqueue(example_workqueue);
-+
-+And then on the read side::
-+
-+	rcu_read_lock();
-+	cpu = housekeeping_any_cpu(HK_TYPE_DOMAIN);
-+	queue_work_on(cpu, example_workqueue, work);
-+	rcu_read_unlock();
-diff --git a/Documentation/core-api/index.rst b/Documentation/core-api/index.rst
-index 5eb0fbbbc323..79fe7735692e 100644
---- a/Documentation/core-api/index.rst
-+++ b/Documentation/core-api/index.rst
-@@ -25,6 +25,7 @@ it.
-    symbol-namespaces
-    asm-annotations
-    real-time/index
-+   housekeeping.rst
+diff --git a/block/bio.c b/block/bio.c
+index b3a79285c278..198b966d71b8 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -89,7 +89,7 @@ static struct bio_slab *create_bio_slab(unsigned int size)
+ 	if (!bslab)
+ 		return NULL;
  
- Data structures and low-level utilities
- =======================================
+-	snprintf(bslab->name, sizeof(bslab->name), "bio-%d", size);
++	snprintf(bslab->name, sizeof(bslab->name), "bio-%u", size);
+ 	bslab->slab = kmem_cache_create(bslab->name, size,
+ 			ARCH_KMALLOC_MINALIGN,
+ 			SLAB_HWCACHE_ALIGN | SLAB_TYPESAFE_BY_RCU, NULL);
 -- 
-2.51.1
+2.37.2.352.g3c44437643
 
