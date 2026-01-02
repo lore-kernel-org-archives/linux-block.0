@@ -1,78 +1,168 @@
-Received: from imap5.colo.codethink.co.uk (imap5.colo.codethink.co.uk [78.40.148.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com [209.85.160.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DECFB20C488;
-	Fri,  2 Jan 2026 14:49:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.40.148.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E811F21D3C5
+	for <linux-block@vger.kernel.org>; Fri,  2 Jan 2026 16:13:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767365380; cv=none; b=LsGap3QoM94GJVC9sp1/fRxj/Cbndu4QcPQSCzQR2+4Gec86OK85+zsjd5dHI0jBDkbnOSVrMZeAoVo/NAB/uvlK0zRYAd+5hZ9Rwst4p50zKohRFUiJLc6ulBYWl5NPrLeFW8j/+bgT2rkqEFiDWXvtYn8BaxzT2eCS/B4y4Kg=
+	t=1767370411; cv=none; b=GTr0DQC96wrgg9wlGojM4yAO+m96ZdouesmMq3+wbERk79mNpXUGquuuAQNDUQ32iHWW/DAmOz47SStPkVr4mkebgXCg3da213R1WwM4ZnTCR9NgIXpEV6pdtn9UItsb9vdIbu3iwnu249imHpcof4vTlGWskf6vI/LwARYUWo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767365380; c=relaxed/simple;
-	bh=qZZVe7dI5RoV7ypfn2BCqByQl/Rrfb6IN8o30oe5hfQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KN5YZ0vKOhfeKsLgOjSe8ZtfIWDiVgWozk+zlrYNvg8p/3dx3bqm7LDmWVfbH7DXdnE7Iw7OCnFZeb5Sg0wqnXflUQdKcTz2wqrTWvjKsvbqNkdiZ2imxVg84dqpuSeIMwxBocWUfzL9xGIGo7yRb1FTOZd3R8obI2jtQ40P1V8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=codethink.co.uk; spf=pass smtp.mailfrom=codethink.com; dkim=pass (2048-bit key) header.d=codethink.co.uk header.i=@codethink.co.uk header.b=seVnVSHi; arc=none smtp.client-ip=78.40.148.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=codethink.co.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codethink.com
+	s=arc-20240116; t=1767370411; c=relaxed/simple;
+	bh=/0j4jTV5e7W5aKdrlQjLfPLFnioIKMNWkikqICSTG4w=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=eATzgSTyvoU/zZRhnw4GOSyi7+5Qtf6LQrhBqmaATuYhgrkaL9qryqGGBD5Gx5deKDPryKDeXhfisE/ECeawRL7MepJdjqi+MM2u1SRGXehXJjVatGgw0Z3rP+I3gy1cgCc3kJY/Oe7R6TEtdMz6TS7kW38evm1D1dn8HMMeum8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=o9TBSKQN; arc=none smtp.client-ip=209.85.160.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codethink.co.uk header.i=@codethink.co.uk header.b="seVnVSHi"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=codethink.co.uk; s=imap5-20230908; h=Sender:Content-Transfer-Encoding:
-	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:In-Reply-To:
-	References; bh=IN4ZPEM2XJumj6U3hK6l0T7+VyujQJ17XVJbwsFxc0s=; b=seVnVSHiKS2K32
-	sZ0LGNS7eqki1O2IyxS11970Xo/zJ5tJCmye3Ojz0knjjTwknwKkoftgdCdvb0+z6StErHBxNN6M2
-	rl4Q+iXWrO4jIrSqYZhTLo/XRDGFVqkTgdVUyk9agUgjjCxegy/ClsP/WiKApja2eqE2UAO2DElHn
-	wNDcs3as0nZkIcZNydKgrMVMa29euo7eeA2skv+hOLmKh507NZ3/Yj4JUCfy9wMgj+LG0cQEQZRHM
-	8gsQXCKTfeaUlJelOoZJIz3966mOEqzAYpjY6TI231LJcK6MDMJIM3kMUanVjj6KKZcl/vwcxznoP
-	EGm4f8bxWR8PziA9IziQ==;
-Received: from [167.98.27.226] (helo=rainbowdash)
-	by imap5.colo.codethink.co.uk with esmtpsa  (Exim 4.94.2 #2 (Debian))
-	id 1vbgT8-0006BT-B5; Fri, 02 Jan 2026 14:49:34 +0000
-Received: from ben by rainbowdash with local (Exim 4.99.1)
-	(envelope-from <ben@rainbowdash>)
-	id 1vbgT8-00000002kko-0UCa;
-	Fri, 02 Jan 2026 14:49:34 +0000
-From: Ben Dooks <ben.dooks@codethink.co.uk>
-To: linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Ben Dooks <ben.dooks@codethink.co.uk>
-Subject: [PATCH] block: fix type for printf argument
-Date: Fri,  2 Jan 2026 14:49:21 +0000
-Message-Id: <20260102144921.656362-1-ben.dooks@codethink.co.uk>
-X-Mailer: git-send-email 2.37.2.352.g3c44437643
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="o9TBSKQN"
+Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-3eae4e590a4so6267988fac.1
+        for <linux-block@vger.kernel.org>; Fri, 02 Jan 2026 08:13:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1767370408; x=1767975208; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=929ng381HsJQb353irA69SEMuHXFfWEQE0+aHjHLPrg=;
+        b=o9TBSKQNFBAst2dfMHw3+Vq+J2AMRqQjJKn1ilGawbk20WBHlH/JIn4CXSVJvAPI6+
+         qj6Irq8gL6rDT0I0EbvGCTWYQYLZcOA3s4Edlr/MzMZfEEZ/oUqlHTxIMQMDTTm6K1vl
+         t0Uc78nv31VJpm5Da4x/GA/uDVWnGXnvOfgF9e9JfcNy4H5UFtVvO7sC6GBx1TmNa09c
+         EE++upxkf6hvh2iS5OEasoFrqYwjBFCsyrorG7c+nqzxBX3D42SdtQaqD8IZtLKSxSaS
+         RcVjufCV5Iv2uHD86eJD/ofoj7VzNEVW3+0M9CWMZvGWmO9cQwoL1+XFafjmz11DQ1pr
+         w96A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767370408; x=1767975208;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=929ng381HsJQb353irA69SEMuHXFfWEQE0+aHjHLPrg=;
+        b=G9awQDGZmGrYfVS+qdxCiYTerBU+R7P85M439wVutuRfkNKWYGvfImQ7N98E0uuosP
+         gXVIHjWcd0j0dxfatWTHWXMR91vz9iELgymafvJOjUE70ycqtdfAKkHxJwv/nkXvgV7m
+         nOshLiaDZqyB/eHfoWHE7U9+0gLQaAS65fsMSveIhz/bYk1+D0qLYn0EFbiSW3iu487Y
+         IMoq0R6Q92lq7j1HQsfTaM9kbddRB6BT8o1oRAJFQY6ZOVK+I3FV3z8mfwzBzmhEf1RF
+         foYfZd7IdmWdvAXGJm9mvENroLZkccqnkCqt88G8PDDcJH6+C2s+Ju905HqeDfboihLw
+         S1Mw==
+X-Gm-Message-State: AOJu0YzQ+VVR2n85WS6zjDoKbyHac+WCk/eXV/ZNul8feHRvz+RFCagQ
+	Y4O3yYLwEQTgqfG0PvG//DnIIaZMykiTLx/luYMFZ1SEa5ab7HworQ7uvPEb5jd17Mnd0i52bgR
+	3B0/o
+X-Gm-Gg: AY/fxX6iY+9PTvlEZjx7sGnq/sYxfKyhT27DvA9FN8d08w1PWsfW2zig2qlrUrZutT2
+	GsSli8V4z4VEJHvFzGGffsM7FgexzbuXEmgsgO19pAtEP6j8kA2nYqoNZGLEkWm7elN6Mv2LVga
+	/WIZNpQIDakrqAKi1U5mYZDKDkuqYYzj4f4uIRPDgYPbFCIBaaGhmIFTXBOG0STu3OeLWg4Guvv
+	/+w2+WmkqVHTbwfSk6p0IIZVhGLu2xSiYEBmju8sjWigZZHi6ewIROBJRJ3AwzGunRmSs8D6bOE
+	h54WRLILpWxUMpdW1c+oRqobD2qQLz4L7MuN8JLA2mCPkzJLxzZNOpGCUzu+Z6M5ZGCzq1suOjG
+	AwZrthUfMWmJfqbbv0NH57sqK67DF4yA3tzWRS17p9mk3gUewNXMT8jfSpfmglL8/7GUKPpbwKM
+	kJMuLuDjGK
+X-Google-Smtp-Source: AGHT+IHCYFXj3DSF0FtaPZxMzzjBZJGZfcF1SijscmboehwySshnkLUkiBacCZK5CeuqJKhvtYkhkQ==
+X-Received: by 2002:a05:6870:e9aa:b0:3ec:554d:c233 with SMTP id 586e51a60fabf-3fda581afddmr21621248fac.28.1767370407650;
+        Fri, 02 Jan 2026 08:13:27 -0800 (PST)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-3fdaa8d4521sm25604990fac.4.2026.01.02.08.13.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 02 Jan 2026 08:13:26 -0800 (PST)
+Message-ID: <8176248f-c50a-4e2f-8eb0-a16f1bb3122b@kernel.dk>
+Date: Fri, 2 Jan 2026 09:13:26 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: srv_ts003@codethink.com
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 6.19-rc4
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-When making the block-%d id, the type should be %u. Fixes:
+Hi Linus,
 
-block/bio.c:92:62: warning: incorrect type in argument 4 (different types)
-block/bio.c:92:62:    expected int
-block/bio.c:92:62:    got unsigned int size
+Here are a set of fixes for block that should go into the 6.19 kernel
+release. This pull request contains:
 
-Signed-off-by: Ben Dooks <ben.dooks@codethink.co.uk>
----
- block/bio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+- Scan partition tables asynchronously for ublk, similarly to how nvme
+  does it. This avoids potential deadlocks, which is why nvme does it
+  that way too. Includes a set of selftests as well.
 
-diff --git a/block/bio.c b/block/bio.c
-index b3a79285c278..198b966d71b8 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -89,7 +89,7 @@ static struct bio_slab *create_bio_slab(unsigned int size)
- 	if (!bslab)
- 		return NULL;
- 
--	snprintf(bslab->name, sizeof(bslab->name), "bio-%d", size);
-+	snprintf(bslab->name, sizeof(bslab->name), "bio-%u", size);
- 	bslab->slab = kmem_cache_create(bslab->name, size,
- 			ARCH_KMALLOC_MINALIGN,
- 			SLAB_HWCACHE_ALIGN | SLAB_TYPESAFE_BY_RCU, NULL);
+- MD pull request via Yu
+	- Fix null-pointer dereference in raid5 sysfs group_thread_cnt
+	  store (Tuo Li)
+	- Fix possible mempool corruption during raid1 raid_disks update
+	  via sysfs (FengWei Shih)
+	- Fix logical_block_size configuration being overwritten during
+	  super_1_validate() (Li Nan)
+	- Fix forward incompatibility with configurable logical block
+	  size: arrays assembled on new kernels could not be assembled
+	  on kernels <=6.18 due to non-zero reserved pad rejection
+	  (Li Nan)
+	- Fix static checker warning about iterator not incremented
+	  (Li Nan)
+
+- Skip CPU offlining notifications on unmapped hardware queues.
+
+- bfq-iosched block stats fix
+
+- Fix outdated comment in bfq-iosched
+
+Please pull!
+
+
+The following changes since commit 1ddb815fdfd45613c32e9bd1f7137428f298e541:
+
+  block: rnbd-clt: Fix signedness bug in init_dev() (2025-12-20 12:56:48 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-6.19-20260102
+
+for you to fetch changes up to 69153e8b97ebe2afc0dd101767a9805130305500:
+
+  block, bfq: update outdated comment (2026-01-01 08:57:37 -0700)
+
+----------------------------------------------------------------
+block-6.19-20260102
+
+----------------------------------------------------------------
+Cong Zhang (1):
+      blk-mq: skip CPU offline notify on unmapped hctx
+
+FengWei Shih (1):
+      md: suspend array while updating raid_disks via sysfs
+
+Jens Axboe (1):
+      Merge tag 'md-6.19-20251231' of gitolite.kernel.org:pub/scm/linux/kernel/git/mdraid/linux into block-6.19
+
+Julia Lawall (1):
+      block, bfq: update outdated comment
+
+Li Nan (3):
+      md: Fix static checker warning in analyze_sbs
+      md: Fix logical_block_size configuration being overwritten
+      md: Fix forward incompatibility from configurable logical block size
+
+Ming Lei (3):
+      ublk: scan partition in async way
+      selftests/ublk: add test for async partition scan
+      selftests/ublk: fix Makefile to rebuild on header changes
+
+Tuo Li (1):
+      md/raid5: fix possible null-pointer dereferences in raid5_store_group_thread_cnt()
+
+shechenglong (1):
+      block,bfq: fix aux stat accumulation destination
+
+ block/bfq-cgroup.c                              |  2 +-
+ block/bfq-iosched.h                             |  2 +-
+ block/blk-mq.c                                  |  2 +-
+ drivers/block/ublk_drv.c                        | 35 +++++++++++--
+ drivers/md/md.c                                 | 61 ++++++++++++++++++----
+ drivers/md/raid5.c                              | 10 ++--
+ tools/testing/selftests/ublk/Makefile           |  5 +-
+ tools/testing/selftests/ublk/test_common.sh     | 16 ++++--
+ tools/testing/selftests/ublk/test_generic_15.sh | 68 +++++++++++++++++++++++++
+ 9 files changed, 174 insertions(+), 27 deletions(-)
+ create mode 100755 tools/testing/selftests/ublk/test_generic_15.sh
+
 -- 
-2.37.2.352.g3c44437643
+Jens Axboe
 
