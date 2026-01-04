@@ -1,60 +1,60 @@
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4FA312FF69
-	for <linux-block@vger.kernel.org>; Sun,  4 Jan 2026 16:41:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0821C283FD6
+	for <linux-block@vger.kernel.org>; Sun,  4 Jan 2026 16:41:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767544876; cv=none; b=aqRi6Cw0JlSKquVrt6gPqX34DblVJZEiZrnVcqEftE5qvam8eNRg0YeOMjdzKHt4D8ABaukyrYexKV1XQLVywnn1/wCNlqcfaS0FX81zrkC6YVdb8hfG/J9Ie7Au8xjNNuqHYsKK+X3iyPV0z2eocQQy0f+mZWeXf4Oe2770ulI=
+	t=1767544912; cv=none; b=Ii2QTcfkA5zxIrRL+PrlEXr5WM1a9QKiOz/GZQ5XX93YH0Q0RsTJSfx8ZYBXRDtsyDjrGJx/GCJa+XNh7icKb3qnSAgmST3rRs5I+3Y2fGO3n6b0de3c/iyTnu6popekVObh4peXaBsA+53553aiTiUMF4pJIzl7urAE3Ll4N8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767544876; c=relaxed/simple;
-	bh=k9VCfL0//R1wZAYDKdKhad2mNZRg1VfJz2+0xSqKFOU=;
+	s=arc-20240116; t=1767544912; c=relaxed/simple;
+	bh=/9WrmsF5asiwCzC4/TbMcgcF8h45ZhSX12AiOvVcQew=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=h1PSBPVdbTc+5xPg5yFPvG1NgoWdX2GQpT972jy5fdn0Z9L6/l/AKLOIEFHaaaMB8zIa8XIC8u5lDyuRpouS7wL8bHeDoOeM3MdTsCSYUmbjcVpFXFMjL4iAZdIU0r2xfIvLQPLQl3+Lk2fbG6vNuMR7ML5ZWvSr/x07+fD4PBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=igYaLMDq; arc=none smtp.client-ip=148.163.158.5
+	 In-Reply-To:Content-Type; b=uBVRoDEdz/wv3EV+Q2NzN3QlHpMS7KD5QsnYMPZqOdqfRiw/v2KWZ/vt3+rZ/CZiuk7ZAtsa0mOw57PiXCwXKy0Rkd08ZE6w/pnc/G09C5n4tQfwhY9SeUMnmq9Py0rlcLG3Ces/UCH4N9gjvqHo1lwTe75FETa8VtnTLfyoF3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=KEC9Yqsf; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="igYaLMDq"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="KEC9Yqsf"
 Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 6048uaZO018987;
-	Sun, 4 Jan 2026 16:41:03 GMT
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 604EgeoU028927;
+	Sun, 4 Jan 2026 16:41:39 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
 	content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=diJGgT
-	X1/Xy28cEZuO84Pgnvf7GFf/i6f+teB6W/pgE=; b=igYaLMDqVnNR1oGh/LW8SC
-	92xwe/fO8g4AYDbo+qXOXaMwOo290FILTDnaKmiG0WA2nOVhVxTyVCw4MMLS30C9
-	Gmc38V2p9Hg7XvcNFRFSInzucjYvn2BOfXr69miSWnsUT3A3bZE3ePsmS36W0cHG
-	oWUeiW6mKHHy4h4PlNAJQOxogIlJ1e100b76749Ytk3x0//YvbidACFgkc+wjYlg
-	EVDiX1PSpV1vNXV6t5CFiYtunFlByjq0z7AzVGqBEoYiNH5h96GKnhQC5uI+7yZ3
-	OxL8LhqKeOIYdWH8F9cMoeIaIIPjP86ou6nCDtAgnUQAj6HXW7tQhrsBySN6VNQw
+	:message-id:mime-version:references:subject:to; s=pp1; bh=ePnrmV
+	GZFl/KXzQSV8Jm/E91RZ9jMb3ePIixMkBFJac=; b=KEC9YqsfSMmONGFcRT2woW
+	cB3gxbd9jXAUKJG2HouVXDiR38c7MZfchWw4lfE+4SaCfI/dsl4zuel2hKKUKKsd
+	YfmwMJTHps7munDJgZahGsid6fIofC/ZoKyFYwj62dvQlAhRAyHSHBhcBTLfKRz4
+	mxogSfcJBbU4ZoK2YwrFoGgZCCfHCzlgrg7HtNazt6F17aKlf+Bnlquqalgj9lLC
+	CeWIc4bs9mpi1RPm6wA63sRy++ZXWSmdLbwpFYS+8Uhkj+/QX9oz96PrQDoQPhik
+	1yvMXI+z6tvdnREv+A3SyvVXNx9hjuYPYh7bqx9Awk5j9O6kvljt2qERjAPfc1jQ
 	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4beshektfv-1
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4beshektgh-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 04 Jan 2026 16:41:02 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 604DWtOR029602;
-	Sun, 4 Jan 2026 16:41:02 GMT
-Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4bfdtxj69d-1
+	Sun, 04 Jan 2026 16:41:38 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 604FgVO7012590;
+	Sun, 4 Jan 2026 16:41:37 GMT
+Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4bffnj1vhj-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 04 Jan 2026 16:41:02 +0000
+	Sun, 04 Jan 2026 16:41:37 +0000
 Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 604Gf1Rs26477278
+	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 604GfbGi33096436
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 4 Jan 2026 16:41:01 GMT
+	Sun, 4 Jan 2026 16:41:37 GMT
 Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4714758053;
-	Sun,  4 Jan 2026 16:41:01 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 3D1C458053;
+	Sun,  4 Jan 2026 16:41:37 +0000 (GMT)
 Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B3FCC58043;
-	Sun,  4 Jan 2026 16:40:58 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id C5DEC58043;
+	Sun,  4 Jan 2026 16:41:34 +0000 (GMT)
 Received: from [9.87.141.48] (unknown [9.87.141.48])
 	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Sun,  4 Jan 2026 16:40:58 +0000 (GMT)
-Message-ID: <7b1fbf2b-e8ef-4248-bb1a-e56e8e8b2a74@linux.ibm.com>
-Date: Sun, 4 Jan 2026 22:10:56 +0530
+	Sun,  4 Jan 2026 16:41:34 +0000 (GMT)
+Message-ID: <093daf4f-3ebe-4487-b922-1de0578cf054@linux.ibm.com>
+Date: Sun, 4 Jan 2026 22:11:32 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,32 +62,32 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 15/16] blk-rq-qos: remove queue frozen from
- rq_qos_del()
+Subject: Re: [PATCH v7 16/16] blk-cgroup: remove queue frozen from
+ blkcg_activate_policy()
 To: Yu Kuai <yukuai@fnnas.com>, axboe@kernel.dk, linux-block@vger.kernel.org,
         tj@kernel.org, ming.lei@redhat.com
 References: <20251231085126.205310-1-yukuai@fnnas.com>
- <20251231085126.205310-16-yukuai@fnnas.com>
+ <20251231085126.205310-17-yukuai@fnnas.com>
 Content-Language: en-US
 From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20251231085126.205310-16-yukuai@fnnas.com>
+In-Reply-To: <20251231085126.205310-17-yukuai@fnnas.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA0MDE1MSBTYWx0ZWRfX80bswxxqp/Ak
- Mc1NDnppJgsbSG+I2391y5bwxzW9KaB30lic4LrEJCqWo0h6WuoyDpyhyc73Ud5kbnsbaw+wwha
- HIzYTkZb8XvREadSIFsCDpnrHvzCFfwY0gv3XhSZx4GJeXRymdFnX7nPTGFuin4XzkA6Nul2cpg
- bh64Ln+zEV2CcSw6SphJ2LzwlG60j4/ocAxA3xtNCYgPtlNSuK30qx8Fxjupyh3tnEZeDbo4pmA
- 4trMeKu+qUl4SfXDaz0xbjbhGn7Jdk+RoXFZh6Kyjh9/UP9M5eOTr8NgN7rZXExJ405jwUbupxt
- Hap5rib7ZGoZoauzFhw+Vb03to5v+ZZJP/FT3cxtfRtZgH/rS6kRnd7Ym9WtHsCwOYNqGhNBLwf
- T28w5xTC2Mw5kWt1GHjpvZH4XYvUGgLxAKA3m6rOn+sxi9xtu+4g+55VsGQCG275wGvGz6vsEOo
- SsXDdbb7Em7ZMLZOq4A==
-X-Proofpoint-GUID: F1jNJvkwDnF3AO5sEqRX9j7UTK0uZ0K_
-X-Proofpoint-ORIG-GUID: F1jNJvkwDnF3AO5sEqRX9j7UTK0uZ0K_
-X-Authority-Analysis: v=2.4 cv=AOkvhdoa c=1 sm=1 tr=0 ts=695a981e cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA0MDE1MSBTYWx0ZWRfX+WpsrpAV0Xfp
+ ud3IGE/BqUYsdcwk+fD9JfH73bzO5UWA+zCOS7wTOC1FCXSaKRtAxwsScVOqtt1q3MjA3FmQmh5
+ w0RyHd8mzkwDwIIm9DoxXhB7O6SluYdijZM23Vf9CgLM1hEMvyrOtLRINuJqz0tDPmb9c5kv/qa
+ OvbwbhJQRDUzUNUYCho4onppW9t6y6V28UhnfsY/7psRhrJww6tiUukUsy06axDoo5TvBHsb/m9
+ BciDbnc6dR66KN3FOAgJHo9qK2+9u1uWLfnHulyn3p1R+f5/E8ZRGKYVk2nkLHp5A8WeSJ6si31
+ MYzcMQd+UpByPyHejWfTk7WTlQI1W8hktY/pP8h74lz/01pdH+PMopbNyGk5I0Bo8DhIwWN7DbA
+ 4VCDAxNGI0pNlx0Neo04bjXOfQ9+gcnYwxhFtiuny+zFAW7Cdkag1yhFUijor6jaM8FnE7H1Rgp
+ zSJup1+H8WCuhNaJK5g==
+X-Proofpoint-GUID: yGHNN-mE-2i16MvzbjPhQBEVhBEu1vwC
+X-Proofpoint-ORIG-GUID: yGHNN-mE-2i16MvzbjPhQBEVhBEu1vwC
+X-Authority-Analysis: v=2.4 cv=AOkvhdoa c=1 sm=1 tr=0 ts=695a9842 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
  a=IkcTkHD0fZMA:10 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=tJLSzyRPAAAA:8 a=VnNF1IyMAAAA:8 a=ttQx5oi95VPzTDNic7MA:9 a=QEXdDO2ut3YA:10
+ a=tJLSzyRPAAAA:8 a=VnNF1IyMAAAA:8 a=dCVqPiDxyPADKUYh4gYA:9 a=QEXdDO2ut3YA:10
  a=H0xsmVfZzgdqH4_HIfU3:22
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
@@ -102,9 +102,11 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
 
 On 12/31/25 2:21 PM, Yu Kuai wrote:
 > On the one hand, nest q_usage_counter under rq_qos_mutex is wrong;
-> On the other hand, rq_qos_del() is only called from error path of
-> iocost/iolatency, where queue is already frozen, hence freeze queue
-> here doesn't make sense.
+> 
+> On the other hand, policy activation is now all under queue frozen:
+>  - for bfq queue is frozen from elevator_change();
+>  - for blk-throttle, iocost, iolatency, queue is frozen from
+>  blkg_conf_open_bdev_frozen(&ctx);
 > 
 > Signed-off-by: Yu Kuai <yukuai@fnnas.com>
 
