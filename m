@@ -1,152 +1,105 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C649D30C639
-	for <linux-block@vger.kernel.org>; Sat,  3 Jan 2026 14:14:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 873FD1F471F
+	for <linux-block@vger.kernel.org>; Sun,  4 Jan 2026 01:43:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767449694; cv=none; b=JwP3LBQdm4XUK5bFoKs6Bw9BA3ROsuG7bFFHyfDTy03SXlLAtJQSV9KUwkX8PZYqYELokVCqjl+QIicYQ7gF8A79e7FBWQmIc5gTTRnbBqrrv+x0sRpP/2fSotb2AXLSgmmn9InwPaopq9Q4caAyoIkp0zhQaeGE+mXpV2tpAn8=
+	t=1767491001; cv=none; b=HeaTtltN2J5mh1eCTmtOr5XYMBv1DHWsQ+kRUBhEwpyILNKQkt4Aj9xTwH72tJc5V8MPly+fSdNgZ6gVn3Cds1SDjxKs+m1vVugVmMO/6gGy4Pl5ZPRv+YFs5oYRK3Mevte8u1XuoH+kLNXIO4VjIUfHM86HkKdzZCNhZJr9btg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767449694; c=relaxed/simple;
-	bh=5TPvSvo3LXqU3rGbqWnYD5rCziwBBug8JDx8BzGtH9E=;
+	s=arc-20240116; t=1767491001; c=relaxed/simple;
+	bh=l5EbRgM9bVZ8pV8NkSF2wo5G6NkqvfiuJxGmKxmW7rY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Np0qgg/Mx7FGJhbL4VkkVkzJTDdllBvPNNZ+xo5GRMblS+FI3TLDMM7ygwWy2PaCvnt2LKQys/bUqpBqD5y/FgweMVsHTaChc2s+/gKarvRBtCgE5/avsW7vXr9qgIGiu0AjNXjBCeVtjAK5C0YiJmD1YUXujxHNrQjng6hfzSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q6vyGI/3; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZNJtZjZL7zDxkI4kWk78SnMqglOJfuYdNfN2Um7clrH6chRf703c2ft+A4k8pkQ7ezOpu3wCh6+vuXJziudbd7AIqKG+9qu6aShjldszFA//EHHl5rgSEmkZpKM/3fbtOtMDoVwKnHsGwJJs4LvBT0qYrz9FyisE2FIsVGGiIR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U9bEmwvH; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q6vyGI/3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U9bEmwvH"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767449691;
+	s=mimecast20190719; t=1767490998;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=MjENUdGrgDrShWJm6ofVyEv4RgoSnGWRB8yy1V/0ggQ=;
-	b=Q6vyGI/3/VRx4yYGUjVbjCyhKIQosQGGe1GTdDknMb7e22G5kti5G/E/OZPCCJYEoq4eg0
-	Sxxu5orNeBPeIi6wEtuZohRBn6cZ2uejRqExVI35hcajfWp5LLjFMIBRpq+tsYx3D0hozK
-	PruzmHzZxFGm0KJOux3IX76+9QVKYBI=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	bh=JOHCJ6ws2PdEVpdMzUbfxY52ykfjA/AadGdfIrG4o2w=;
+	b=U9bEmwvHPK8Lk13UVDsT7YluTsNWUi8kEqL4pw1ZjIQJbC+fL4XaG6LrXLkAUyRt7w+Irg
+	T7u2Wts0tHBoenJMe7xCVHHH99cS/pUJno1ZVDflB8fyCw98iBdK1QtkSQmKPm/D1v9oXP
+	dSsxDjWQhmq6KlM4RPo6qVbMq9hyi8A=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-665-kg0e9oyyPzOpYAvuBTviRQ-1; Sat,
- 03 Jan 2026 09:14:48 -0500
-X-MC-Unique: kg0e9oyyPzOpYAvuBTviRQ-1
-X-Mimecast-MFC-AGG-ID: kg0e9oyyPzOpYAvuBTviRQ_1767449687
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-621-8xYrOUkAPh6aSHp3iCO0tw-1; Sat,
+ 03 Jan 2026 20:43:15 -0500
+X-MC-Unique: 8xYrOUkAPh6aSHp3iCO0tw-1
+X-Mimecast-MFC-AGG-ID: 8xYrOUkAPh6aSHp3iCO0tw_1767490993
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A7D5019560A5;
-	Sat,  3 Jan 2026 14:14:46 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.49])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1101F30001A2;
-	Sat,  3 Jan 2026 14:14:40 +0000 (UTC)
-Date: Sat, 3 Jan 2026 22:14:35 +0800
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 62C001956080;
+	Sun,  4 Jan 2026 01:43:12 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.132])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 36773180044F;
+	Sun,  4 Jan 2026 01:43:00 +0000 (UTC)
+Date: Sun, 4 Jan 2026 09:42:55 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Shuah Khan <shuah@kernel.org>,
-	linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Stanley Zhang <stazhang@purestorage.com>,
-	Uday Shankar <ushankar@purestorage.com>
-Subject: Re: [PATCH v2 04/19] ublk: set request integrity params in
- ublksrv_io_desc
-Message-ID: <aVkkSxNNUBMz9E61@fedora>
-References: <20260103004529.1582405-1-csander@purestorage.com>
- <20260103004529.1582405-5-csander@purestorage.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+	Vishal Verma <vishal1.verma@intel.com>, tushar.gohad@intel.com,
+	Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org
+Subject: Re: [RFC v2 01/11] file: add callback for pre-mapping dmabuf
+Message-ID: <aVnFnzRYWC_Y5zHg@fedora>
+References: <cover.1763725387.git.asml.silence@gmail.com>
+ <74d689540fa200fe37f1a930165357a92fe9e68c.1763725387.git.asml.silence@gmail.com>
+ <7b2017f4-02a3-482a-a173-bb16b895c0cb@amd.com>
+ <20251204110709.GA22971@lst.de>
+ <0571ca61-7b17-4167-83eb-4269bd0459fe@amd.com>
+ <20251204131025.GA26860@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20260103004529.1582405-5-csander@purestorage.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20251204131025.GA26860@lst.de>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Fri, Jan 02, 2026 at 05:45:14PM -0700, Caleb Sander Mateos wrote:
-> Indicate to the ublk server when an incoming request has integrity data
-> by setting UBLK_IO_F_INTEGRITY in the ublksrv_io_desc's op_flags field.
-> If the ublk device doesn't support integrity, the request will never
-> provide integrity data. If the ublk device supports integrity, the
-> request may omit the integrity buffer only if metadata_size matches the
-> PI tuple size determined by csum_type. In this case, the ublk server
-> should internally generate/verify the protection information from the
-> data and sector offset.
-> Set the UBLK_IO_F_CHECK_{GUARD,REFTAG,APPTAG} flags based on the
-> request's BIP_CHECK_{GUARD,REFTAG,APPTAG} flags, indicating whether to
-> verify the guard, reference, and app tags in the protection information.
-> The expected reference tag (32 or 48 bits) and app tag (16 bits) are
-> indicated in ublksrv_io_desc's new struct ublksrv_io_integrity integrity
-> field. This field is unioned with the addr field to avoid changing the
-
-It might be fine to set per-rq app_tag, but bios in one request might have
-different app_tag in case of io merge actually.
-
-Also block layer builds ref_tag for each internal, please see
-t10_pi_generate() and ext_pi_crc64_generate().
-
-So looks this way is wrong.
-
-More importantly reusing iod->addr for other purpose not related with IO
-buffer is very unfriendly for adding new features, and one lesson is for ZONED support
-by reusing ublksrv_io_cmd->addr for zoned's append lba.
-
-For example, there is chance to support dma-buf based zero copy for ublk, and
-please see the io-uring dma-buf support[1], and iod->addr might carry IO buffer info
-in dma-buf format in future.
-
-[1] https://lore.kernel.org/io-uring/cover.1763725387.git.asml.silence@gmail.com/#t
-
-
-> size of struct ublksrv_io_desc. UBLK_F_INTEGRITY requires
-> UBLK_F_USER_COPY and the addr field isn't used for UBLK_F_USER_COPY, so
-> the two fields aren't needed simultaneously.
+On Thu, Dec 04, 2025 at 02:10:25PM +0100, Christoph Hellwig wrote:
+> On Thu, Dec 04, 2025 at 12:09:46PM +0100, Christian König wrote:
+> > > I find the naming pretty confusing a well.  But what this does is to
+> > > tell the file system/driver that it should expect a future
+> > > read_iter/write_iter operation that takes data from / puts data into
+> > > the dmabuf passed to this operation.
+> > 
+> > That explanation makes much more sense.
+> > 
+> > The remaining question is why does the underlying file system / driver
+> > needs to know that it will get addresses from a DMA-buf?
 > 
-> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-> ---
->  drivers/block/ublk_drv.c      | 43 +++++++++++++++++++++++++++++++----
->  include/uapi/linux/ublk_cmd.h | 27 ++++++++++++++++++++--
->  2 files changed, 64 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index 2f9316febf83..51469e0627ff 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -316,10 +316,36 @@ static inline bool ublk_dev_is_zoned(const struct ublk_device *ub)
->  static inline bool ublk_queue_is_zoned(const struct ublk_queue *ubq)
->  {
->  	return ubq->flags & UBLK_F_ZONED;
->  }
->  
-> +static void ublk_setup_iod_buf(const struct ublk_queue *ubq,
-> +			       const struct request *req,
-> +			       struct ublksrv_io_desc *iod)
-> +{
-> +#ifdef CONFIG_BLK_DEV_INTEGRITY
-> +	if (ubq->flags & UBLK_F_INTEGRITY) {
-> +		struct bio_integrity_payload *bip;
-> +		sector_t ref_tag_seed;
-> +
-> +		if (!blk_integrity_rq(req))
-> +			return;
-> +
-> +		bip = bio_integrity(req->bio);
-> +		ref_tag_seed = bip_get_seed(bip);
+> This eventually ends up calling dma_buf_dynamic_attach and provides
+> a way to find the dma_buf_attachment later in the I/O path.
 
-As mentioned, t10_pi_generate() and ext_pi_crc64_generate() builds
-per-internal ref tag.
+Maybe it can be named as ->dma_buf_attach()?  For wiring dma-buf and the
+importer side(nvme).
 
-
-> +		iod->integrity.ref_tag_lo = ref_tag_seed;
-> +		iod->integrity.ref_tag_hi = ref_tag_seed >> 32;
-> +		iod->integrity.app_tag = bip->app_tag;
-
-In case of io merge, each bio may have different ->app_tag.
-
-Given you have to copy meta data via user copy, I suggest to follow the PI
-standard and make it per-internal.
+But I am wondering why not make it as one subsystem interface, such as nvme
+ioctl, then the whole implementation can be simplified a lot. It is reasonable
+because subsystem is exactly the side for consuming/importing the dma-buf.
+ 
 
 Thanks, 
 Ming
