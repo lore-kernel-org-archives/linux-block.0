@@ -1,114 +1,128 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0821C283FD6
-	for <linux-block@vger.kernel.org>; Sun,  4 Jan 2026 16:41:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 685C4254B18
+	for <linux-block@vger.kernel.org>; Sun,  4 Jan 2026 16:54:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767544912; cv=none; b=Ii2QTcfkA5zxIrRL+PrlEXr5WM1a9QKiOz/GZQ5XX93YH0Q0RsTJSfx8ZYBXRDtsyDjrGJx/GCJa+XNh7icKb3qnSAgmST3rRs5I+3Y2fGO3n6b0de3c/iyTnu6popekVObh4peXaBsA+53553aiTiUMF4pJIzl7urAE3Ll4N8Q=
+	t=1767545659; cv=none; b=pkkLwdW0K65WF0fE8jFyfSYV4MIaDT52U5knINhMPOkjp+vmLhYyVHOJ4d4WotEhs54RMKnIA7p4wPRLApZUFOmnc2GPAmJO3ZMQqRcYuUC6WdZQDGB4olstgb3mcBc5OCtkdW8dJ8e+8/HnLf4kBZHNkYNh06DnpMjo8U/39zk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767544912; c=relaxed/simple;
-	bh=/9WrmsF5asiwCzC4/TbMcgcF8h45ZhSX12AiOvVcQew=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=uBVRoDEdz/wv3EV+Q2NzN3QlHpMS7KD5QsnYMPZqOdqfRiw/v2KWZ/vt3+rZ/CZiuk7ZAtsa0mOw57PiXCwXKy0Rkd08ZE6w/pnc/G09C5n4tQfwhY9SeUMnmq9Py0rlcLG3Ces/UCH4N9gjvqHo1lwTe75FETa8VtnTLfyoF3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=KEC9Yqsf; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1767545659; c=relaxed/simple;
+	bh=x28E5yt7ezS4k8PM6aROdVSVIU8TQ8nffABefAV1VCI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MHc9B13uaOJeZHX24jPlzC/7pe0E7Pl7WSrAr/GNJ9a4iAA/uV3xaB/2X4wNevCpVYLBlUlh3IxUgQTLW19fYXhsBuODIYgOQZFSLxV4VO4y4RtnnUNfKWkpI/wtK1i8QkYHsM01v8mna+6cvHvp9apAaJpM/X2qZQiU6z4OBeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dlekuV3z; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="KEC9Yqsf"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 604EgeoU028927;
-	Sun, 4 Jan 2026 16:41:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=ePnrmV
-	GZFl/KXzQSV8Jm/E91RZ9jMb3ePIixMkBFJac=; b=KEC9YqsfSMmONGFcRT2woW
-	cB3gxbd9jXAUKJG2HouVXDiR38c7MZfchWw4lfE+4SaCfI/dsl4zuel2hKKUKKsd
-	YfmwMJTHps7munDJgZahGsid6fIofC/ZoKyFYwj62dvQlAhRAyHSHBhcBTLfKRz4
-	mxogSfcJBbU4ZoK2YwrFoGgZCCfHCzlgrg7HtNazt6F17aKlf+Bnlquqalgj9lLC
-	CeWIc4bs9mpi1RPm6wA63sRy++ZXWSmdLbwpFYS+8Uhkj+/QX9oz96PrQDoQPhik
-	1yvMXI+z6tvdnREv+A3SyvVXNx9hjuYPYh7bqx9Awk5j9O6kvljt2qERjAPfc1jQ
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4beshektgh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 04 Jan 2026 16:41:38 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 604FgVO7012590;
-	Sun, 4 Jan 2026 16:41:37 GMT
-Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4bffnj1vhj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 04 Jan 2026 16:41:37 +0000
-Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 604GfbGi33096436
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 4 Jan 2026 16:41:37 GMT
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3D1C458053;
-	Sun,  4 Jan 2026 16:41:37 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C5DEC58043;
-	Sun,  4 Jan 2026 16:41:34 +0000 (GMT)
-Received: from [9.87.141.48] (unknown [9.87.141.48])
-	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Sun,  4 Jan 2026 16:41:34 +0000 (GMT)
-Message-ID: <093daf4f-3ebe-4487-b922-1de0578cf054@linux.ibm.com>
-Date: Sun, 4 Jan 2026 22:11:32 +0530
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dlekuV3z"
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7b9c17dd591so10995215b3a.3
+        for <linux-block@vger.kernel.org>; Sun, 04 Jan 2026 08:54:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767545658; x=1768150458; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=h4wzx0QjNYHmMcnbzoklLRWyBOWFDjQWK58mjz76Amc=;
+        b=dlekuV3z0WiaxientqEC59ntftxXguXew/oeY424JzR0a3ASjmd+0yxvqRHVgx/b9J
+         UMt3FjCalX8hjyEAP8pMBwn8mWIZ3utFFNa5LwG/R3Ww1gi90jePct2fooD8GlOnjxmp
+         BQVoCADx0GSLMpu/qd6hpJ87VZn7DD65OZhbMt5qSgttgeaOvMGretYRlEQb0TJ+9mQQ
+         FLMnjssYuEoPNYMr9BTb9/DyJwZs11QFyFCOoIH1ShMJA5TsKwIFsEpBDhC+McUqZU+s
+         wQvHH4zFiXnJNixVT62oG0qW7CjmGrk+RCZRmDZX6Pxi5DNumhbJE/gd7d/E185GQWMU
+         r95Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767545658; x=1768150458;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=h4wzx0QjNYHmMcnbzoklLRWyBOWFDjQWK58mjz76Amc=;
+        b=a9/rp67EjpCqc4wcP0bA1UEW+Xg2emIXwiAPsDSggrvSun/xx4ZHBIkLlSsWl/zZRR
+         xVZXrV7il5Eln6zkqDw8ppFZFcc7dbi3kFJQ3GfYMafb8yzLSLKxboB85R37GxgpFOQS
+         NCKHwHk5fsf6RHokqXdfhIaSRYmtjl1luvJmjZ1mVjJgJ2f/ZWX/xDWTBsIb58LUQ6+d
+         HyaH3OcSGcwja8f/YcEVzUs9Fe8F3ZNyJE+sc8MYpC0j+3CfoxEY8/jVwBf9IZwZjDcm
+         /brbIBfnrXzs7jDZJg6aS8OaAQUKLypeRC30UyHEg8xZT7r67XY/VPQWgx/yzxHcnuCJ
+         8r8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX8IlhO2is/Czfceb6v7BGnh2cW4OYWI0sjOyZbDxl35b0L/82TwnqW7wz6UByaxRc2WATqE3TeBJeDAQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzd7rTxo+DK8GfrYDIgdAeqGOzWLIzTDvhOVvMA7hkrGdr+2NKh
+	+S9WqgE46PzW4E3kRDGgP2HqeUQW8CyPQHMwSORYQSelh+k7001ac3QnHFJ6HuGc
+X-Gm-Gg: AY/fxX5xfFvUBjxMNV6WvHkj6pD6Tv4oz9jTN9mFehvcB+SUJx00mTClxLRzl2Ne3kW
+	M886mnJxWyrLnsZg0pnOfupSb4oTqG/q2vdnnjK8Rz03bs3krY1kH9Tke3ZMHtJsG1aGc7SWiZq
+	+npp1OdHGf8jX1aX3eeg7wXZt1GtBi1YBx49mQXYubtfmG7ias/z7eahuIKdInKtAKODLwTjsPA
+	0n3NLo+35HQKbYC9/4mAdsNNNAIII8Y1kPu84EDPJsEKn/TSViiY5IECMAODQbBbZtehRx+JboW
+	r6mRvfy8zqLYpnMGfrVVP+JvcN51LQGwaaJfITFguv400sWyqXijU7trhFpo2x5BJcT+qFrVFw+
+	P0hypXrul2eIH3jAhWK/pQl4lTaLXRPF+vc3hqD19W9O0cRSYODmcnZxndLH3QNJ8MxjohfE=
+X-Google-Smtp-Source: AGHT+IFqAajYDM9xpB7V+TTg7NNHeCTt4UbeUM+Gej/hB2IL8cFrRKaGYgKk/bBQT3fRJOAZV5tbUQ==
+X-Received: by 2002:a05:6a00:8186:b0:801:ee55:a2ef with SMTP id d2e1a72fcca58-801ee55a3c0mr28211971b3a.8.1767545657617;
+        Sun, 04 Jan 2026 08:54:17 -0800 (PST)
+Received: from oslab.. ([2402:f000:4:1006:809:0:a77:18ea])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7ff7a843a18sm45972843b3a.14.2026.01.04.08.54.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 04 Jan 2026 08:54:17 -0800 (PST)
+From: Tuo Li <islituo@gmail.com>
+To: philipp.reisner@linbit.com,
+	lars.ellenberg@linbit.com,
+	christoph.boehmwalder@linbit.com,
+	axboe@kernel.dk
+Cc: drbd-dev@lists.linbit.com,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Tuo Li <islituo@gmail.com>
+Subject: [PATCH] drbd: fix a null-pointer dereference when the request event in drbd_request_endio() is READ_COMPLETED_WITH_ERROR
+Date: Mon,  5 Jan 2026 00:53:55 +0800
+Message-ID: <20260104165355.151864-1-islituo@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 16/16] blk-cgroup: remove queue frozen from
- blkcg_activate_policy()
-To: Yu Kuai <yukuai@fnnas.com>, axboe@kernel.dk, linux-block@vger.kernel.org,
-        tj@kernel.org, ming.lei@redhat.com
-References: <20251231085126.205310-1-yukuai@fnnas.com>
- <20251231085126.205310-17-yukuai@fnnas.com>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <20251231085126.205310-17-yukuai@fnnas.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA0MDE1MSBTYWx0ZWRfX+WpsrpAV0Xfp
- ud3IGE/BqUYsdcwk+fD9JfH73bzO5UWA+zCOS7wTOC1FCXSaKRtAxwsScVOqtt1q3MjA3FmQmh5
- w0RyHd8mzkwDwIIm9DoxXhB7O6SluYdijZM23Vf9CgLM1hEMvyrOtLRINuJqz0tDPmb9c5kv/qa
- OvbwbhJQRDUzUNUYCho4onppW9t6y6V28UhnfsY/7psRhrJww6tiUukUsy06axDoo5TvBHsb/m9
- BciDbnc6dR66KN3FOAgJHo9qK2+9u1uWLfnHulyn3p1R+f5/E8ZRGKYVk2nkLHp5A8WeSJ6si31
- MYzcMQd+UpByPyHejWfTk7WTlQI1W8hktY/pP8h74lz/01pdH+PMopbNyGk5I0Bo8DhIwWN7DbA
- 4VCDAxNGI0pNlx0Neo04bjXOfQ9+gcnYwxhFtiuny+zFAW7Cdkag1yhFUijor6jaM8FnE7H1Rgp
- zSJup1+H8WCuhNaJK5g==
-X-Proofpoint-GUID: yGHNN-mE-2i16MvzbjPhQBEVhBEu1vwC
-X-Proofpoint-ORIG-GUID: yGHNN-mE-2i16MvzbjPhQBEVhBEu1vwC
-X-Authority-Analysis: v=2.4 cv=AOkvhdoa c=1 sm=1 tr=0 ts=695a9842 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=IkcTkHD0fZMA:10 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=tJLSzyRPAAAA:8 a=VnNF1IyMAAAA:8 a=dCVqPiDxyPADKUYh4gYA:9 a=QEXdDO2ut3YA:10
- a=H0xsmVfZzgdqH4_HIfU3:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2026-01-04_05,2025-12-31_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0 spamscore=0 adultscore=0 malwarescore=0 impostorscore=0
- clxscore=1015 suspectscore=0 bulkscore=0 phishscore=0 priorityscore=1501
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2512120000 definitions=main-2601040151
+Content-Transfer-Encoding: 8bit
 
+In drbd_request_endio(), the request event what can be set to
+READ_COMPLETED_WITH_ERROR. In this case, __req_mod() is invoked with a NULL
+peer_device:
 
+  __req_mod(req, what, NULL, &m);
 
-On 12/31/25 2:21 PM, Yu Kuai wrote:
-> On the one hand, nest q_usage_counter under rq_qos_mutex is wrong;
-> 
-> On the other hand, policy activation is now all under queue frozen:
->  - for bfq queue is frozen from elevator_change();
->  - for blk-throttle, iocost, iolatency, queue is frozen from
->  blkg_conf_open_bdev_frozen(&ctx);
-> 
-> Signed-off-by: Yu Kuai <yukuai@fnnas.com>
+When handling READ_COMPLETED_WITH_ERROR, __req_mod() unconditionally calls
+drbd_set_out_of_sync():
 
-Looks good to me:
-Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
+  case READ_COMPLETED_WITH_ERROR:
+    drbd_set_out_of_sync(peer_device, req->i.sector, req->i.size);
+
+The drbd_set_out_of_sync() macro expands to __drbd_change_sync():
+
+  #define drbd_set_out_of_sync(peer_device, sector, size) \
+	__drbd_change_sync(peer_device, sector, size, SET_OUT_OF_SYNC)
+
+However, __drbd_change_sync() assumes a valid peer_device and immediately
+dereferences it:
+
+  struct drbd_device *device = peer_device->device;
+
+If peer_device is NULL, this results in a NULL-pointer dereference.
+
+Fix this by adding a NULL check in __req_mod() before calling
+drbd_set_out_of_sync().
+
+Signed-off-by: Tuo Li <islituo@gmail.com>
+---
+ drivers/block/drbd/drbd_req.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.c
+index d15826f6ee81..aa3da2733f14 100644
+--- a/drivers/block/drbd/drbd_req.c
++++ b/drivers/block/drbd/drbd_req.c
+@@ -621,7 +621,8 @@ int __req_mod(struct drbd_request *req, enum drbd_req_event what,
+ 		break;
+ 
+ 	case READ_COMPLETED_WITH_ERROR:
+-		drbd_set_out_of_sync(peer_device, req->i.sector, req->i.size);
++		if (peer_device)
++			drbd_set_out_of_sync(peer_device, req->i.sector, req->i.size);
+ 		drbd_report_io_error(device, req);
+ 		__drbd_chk_io_error(device, DRBD_READ_ERROR);
+ 		fallthrough;
+-- 
+2.43.0
+
