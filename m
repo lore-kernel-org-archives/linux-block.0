@@ -1,59 +1,59 @@
-Received: from mail-vs1-f53.google.com (mail-vs1-f53.google.com [209.85.217.53])
+Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com [209.85.217.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 121833161BF
-	for <linux-block@vger.kernel.org>; Mon,  5 Jan 2026 18:59:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44311340DB1
+	for <linux-block@vger.kernel.org>; Mon,  5 Jan 2026 19:29:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767639552; cv=none; b=dsdmIjA/Nwkr7WqqNKRvSkQBAKO+qSkPhnrg2VsGNdXhm88iPJNCjekVq65G7k+NtECOC+cQXAsj8uqEEWCxQGDbzB20VVEecE+NRny5v4ZBr0Z54PbM7HnaVsS80eQeJoRJ3couDjINcn084ZHoDU0a62WKpU2lqxO7W8Rvq8g=
+	t=1767641361; cv=none; b=P2I45HiTgyFEP22sDzMJ6rdFEt+FyBWLORg/PQln/n8y0hBDNl44agqYFk3SASm38FLwvQTRn5ougrnRWib7t7BU5gX20EgjdTu2tQg7SSSfxp36D3jVXe26D2NaPDgtJBbf335AEa4DSDBNa8ijAgtnVwbZgEgZS6d/CsJH+E8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767639552; c=relaxed/simple;
-	bh=yn1Jc4ICLWk8ULaLrztIgS2WchuirD6GB9gytQ0+C+k=;
+	s=arc-20240116; t=1767641361; c=relaxed/simple;
+	bh=4q7zjiMztx4TqbiphqF7KyHD7GkrdILcLu6qGCKShJE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=I2rHSNdC0PpgrdGXbwkkCMoD4p0yeN2wAruv/GkMgirKJw89WZGdedeKeXHFi+nGKDQkjYP65A31CtvdqU/G6CMtWTQASbY7F+mo4bkPa7+5I7xOc316bYETHU46rhG4Xa2HJecVUzKlNv5OT8D22E9yFm/QHZdMJwm6gEJ6+Zw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HOmBMWj6; arc=none smtp.client-ip=209.85.217.53
+	 To:Cc:Content-Type; b=P+H08KVa8jZc7+evr94QdfA5vCcGD85JCiKTaSWYSpScvPol8hYaezzUecbUZwI6sDua7xb14A1NDNSghStPftrEs30B0uxHk2UrVrODcAJegTkpTFwe0sz75UqO3/edQaRFrn/k4ucVpqnQw2GQfSHjI6BrNzvcbKaa4bi7bNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dRVXTl//; arc=none smtp.client-ip=209.85.217.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HOmBMWj6"
-Received: by mail-vs1-f53.google.com with SMTP id ada2fe7eead31-5de0c1fa660so76245137.1
-        for <linux-block@vger.kernel.org>; Mon, 05 Jan 2026 10:59:10 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dRVXTl//"
+Received: by mail-vs1-f52.google.com with SMTP id ada2fe7eead31-5dd6fbe5091so100944137.1
+        for <linux-block@vger.kernel.org>; Mon, 05 Jan 2026 11:29:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767639550; x=1768244350; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1767641359; x=1768246159; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yn1Jc4ICLWk8ULaLrztIgS2WchuirD6GB9gytQ0+C+k=;
-        b=HOmBMWj6rTW5E42iN8lyJI2T/fy8wYpRZNif5Cju6iGV+MuwzGdTIvINxPBnFjanWI
-         3i/LEwF0uUFVyLSynw8XrpD8YbW9Y1efXJe+nbso4SkDvW6Og/E28bbCwLmRKCBPxzYq
-         7Z5x+JBf/VC93IsodLE4D/uFM4RzfyS4RXdaSKjPvJUY6kmfyCV3H4iMaGpFcCzK91Jd
-         hQC+b9JffTVVd52eAvrOJA78eHdbn3Dz3PsDrBZXoAzCB3wbRvMGT+OgYxRll2fGPOyn
-         usfiWN9vR4htkZ2ruYLwCeiEZ0mpM1SCOZnNVmKW1/29090xg4wcKzwYZCmhlje8hNY4
-         GcBw==
+        bh=4q7zjiMztx4TqbiphqF7KyHD7GkrdILcLu6qGCKShJE=;
+        b=dRVXTl//brTP3Rjv9baowmv9nDvghrUtjmtp2/jNJa4sFBzL0UaB9OvuWfIeVKbhjh
+         /mWBD+NS/escAIEHmU78jNJz3tgwpF4vff4yK04ojdEwayp0xrDh/jYI0Oid9YP13e6U
+         4rHp9uTSTvS7cP3gDj3G7VbvhIBOSczuQUU8D6Sbu/dfaHFCcgC7bJdCiH36sBk60A2n
+         XNn/XUYQY9XcVfu8Q9deo0gVXMtIj+OUpNRdZZwVWLGr4xGoIdTVXkVKDyUcRksntvgM
+         k6yQfO4IgorSbaSvk82TF+EkxwcJlz5stHrhXEcD4qpWXneKFCHnHbXLNkW7opk08F9C
+         /lsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767639550; x=1768244350;
+        d=1e100.net; s=20230601; t=1767641359; x=1768246159;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=yn1Jc4ICLWk8ULaLrztIgS2WchuirD6GB9gytQ0+C+k=;
-        b=egH6wZVlwX+6AZEDUg5hkmUCuEfO1/XBln/J7utGFLEBsayVBLc0RDxj8yHVgM3pDI
-         La9L5utM2eZAzruMEQsdG00uFqJFCIImn50tY6D86wmWPDCTOtAaEta4uBaj7m0U8Mxe
-         1O59e1vtyabjtoAXTzC6pqeFRZP+QbKna9iPX6XdiXCMSIzwA3j/pgM99XvfPJY7sXiu
-         AbNpa+kUg3eA3/jtRUfOdSh5nFDuALmZ4KmgbR7l+qAhCiQ3jh/k36SKVhPZCYred4kk
-         1VQxjOBbJD0jn4lc3YZ8XZuxtBEottd4K3+E3DWlTjb4lfjydL0xELXc7yeKCfjZpFL5
-         VzHw==
-X-Gm-Message-State: AOJu0Yw6FKP+3aggl0fjVAM+qSz+v8g53C0nX6IBAr5DSzBmAeVpDVrK
-	+9EIVjdx0eQG8DXsoXVNTKwM/6x2U7qfEU+yGbnVSkqmmog2YrjFhvAOELsRiIYq51fA/GVGiO3
-	Rvuwf1azxt1V3HwETE60Qyine272Ltf8=
-X-Gm-Gg: AY/fxX5wFLVZ+EyqrKlEGco/kjR4Job9Bqh12mmJvo+iAPJ9UJXYVJdOI8+23EQIiKd
-	5zoc/iLGQITj8IT/5wfflbUU7/Nn8DuFpyITS8Rq/k8aK7DdyhVOQa5ubgHKgS/It2InhsKe9eA
-	Lf34azKJL3NUONYX7oGVw7c2RP+/dnkzH9yxR7clRoh0rg4JOK+rz37uStVWxlMd+tt81a+sZMT
-	Kaf3IjgOY4XHV/RKME+pQwRhwd9JpRHgMHyOQbHMaLWm2NjIUD2zHS8XO8Wh9XFissL9XOl6s2n
-	aclQwT6cjzITVYJBuLqB0VOAhiX9
-X-Google-Smtp-Source: AGHT+IEK6t29nnbM4KSi3RE2dRptIPsBlJI7+TEZUWDWfQLw/G0JUg7s/X6SseZ/NRhydZf5A+iBWFM2iESPtCJyrnk=
-X-Received: by 2002:a05:6102:2ac2:b0:5db:cba0:941 with SMTP id
- ada2fe7eead31-5ec744f41e0mr168063137.38.1767639550024; Mon, 05 Jan 2026
- 10:59:10 -0800 (PST)
+        bh=4q7zjiMztx4TqbiphqF7KyHD7GkrdILcLu6qGCKShJE=;
+        b=i6gonrkHMqhb9CCkKMRxDSsLE96JoHUbPXc4t1qXXJM7Z/fbOMd2C2+AJXEIANp3Hh
+         2zbuStBjTvOcPt4k9w57H8x3DJGGN/Y/W+eAy3FOOBXLhFSZgtvgKzFXursY/xpdNXci
+         8E9mq7ohkPqQ1R6CwrfLIGuXbISSrDsQjmFKDlkzDE1lhDhcE7WEWmjLmG0qJxnCbfPo
+         CvQ45vejfnFC9eH3az+HccU/ZhU1cVecPOMJg2fTmwbMoJ6vfnZS3HOANXoOXSfN4qfU
+         Tb2mp/ZQFUiDAALu69O3h9aGKVXSm7i7gIvRlbox/5KSLlkKLp6BrxSHJjPqPtVcpd26
+         0wFg==
+X-Gm-Message-State: AOJu0YxaSOki5Ck6+opXwr3SPEIwhEipOiyzLC5MkOm1iVy/mPaqm0XE
+	H/8BUIRtpf1nNhNP/nYt9LFIu0sTeEmk++uVLKdj2zyIbs/HSohn9aWqcm6tM4n6CUX4Dl48+j+
+	OfG69lqEMrRM1eD66lKH5HIIjqqi36ZtKJDqrHOw=
+X-Gm-Gg: AY/fxX4DhA5MraoQGhmG5sKaitqdF1cUM4i+u0woII/1yP+gYxOaBdBRZFlryLESegW
+	6mj73V9dSCjP/qSGnnBZ0kgbZvG0fPP9Qic9HmOQmCZXQYxNC4L1ASuc3uA5GkVhmQtyKBTxHb9
+	b5tBoBLy0YOFx4DxA6hFC/pdPHPVWpOteCYvkskVIll6zMHibKtBv26GruWLXhMLmXUviEhK+EC
+	+s+PaUsSOiGCMSwt4XADEAKarQ1Wemk/6C7pvT6gItnoOlwVsGo+W9kb7TtA6icpV5vvT+c+y23
+	FgMHHoQxhSaersP9ELYGK+jLHBzX
+X-Google-Smtp-Source: AGHT+IEe8UKkk2h7BpzVcEwHWC/sWqwc2MZY4Kvn4Z+IHlV1a0a+CwpvSiV8XUjBASIJ7qPF9b/FYFNA6BO9PO85Rmk=
+X-Received: by 2002:a05:6102:3f55:b0:522:86ea:42c with SMTP id
+ ada2fe7eead31-5ec74330421mr177233137.11.1767641359029; Mon, 05 Jan 2026
+ 11:29:19 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -64,9 +64,9 @@ References: <20251224115312.27036-1-vitalifster@gmail.com> <cc83c3fa-1bee-48b0-b
  <CAPqjcqqEAb9cUTU3QrmgZ7J-wc_b7Ai_8fi17q5OQAyRZ8RfwQ@mail.gmail.com> <492a0427-2b84-47aa-b70c-a4355a7566f2@oracle.com>
 In-Reply-To: <492a0427-2b84-47aa-b70c-a4355a7566f2@oracle.com>
 From: Vitaliy Filippov <vitalifster@gmail.com>
-Date: Mon, 5 Jan 2026 21:58:58 +0300
-X-Gm-Features: AQt7F2rq5lSdRuDrKKO_WX7qlrOIHIyAA4sAGBL3za53jFIAgFNIDCZCA8inI4w
-Message-ID: <CAPqjcqpPQMhTOd3hHTsZxKuLwZB-QJdHqOyac2vyZ+AeDYWC6g@mail.gmail.com>
+Date: Mon, 5 Jan 2026 22:29:07 +0300
+X-Gm-Features: AQt7F2pMgKTlnuto4S9HkLyjodLaVsqWExGHp9yO0nB4jzx8fHD3I6QJ8e7Kamk
+Message-ID: <CAPqjcqrqQ7PjPywFgdA-2eXf5LRAP2fAqcFGknnDYrMyqw3W8A@mail.gmail.com>
 Subject: Re: [PATCH] fs: remove power of 2 and length boundary atomic write restrictions
 To: John Garry <john.g.garry@oracle.com>
 Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
@@ -74,26 +74,36 @@ Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
->What good is that to a user?
+>As I said before, just don't use RWF_ATOMIC if you don't want to deal with=
+ these restrictions.
 
-It will allow him to use the feature which he currently can't use.
+But how to get the torn write protection then? What if the kernel
+decides to fragment my 'once atomic' write?
 
-I don't understand your point about "arbitrary" failures.
+I'll add some details:
 
-Imagine that a user just sends a 256 KB write with RWF_ATOMIC while
-the device has NAWUPF=3D128 KB.
+The real NVMe disks with atomic write support which I know are:
+1) Micron 7450 / 7500 and probably later
+2) Kioxia CD6-R / CD7-R / CD8-R and similar
 
-He gets EINVAL even though the write is 2^N and length-aligned. Is it
-any different from an 'arbitrary failure' which you describe?
+Both use AWUPF=3D256 KB and NABO=3D0. That means any write up to 256 KB
+size is atomic regardless of the offset.
 
-Now imagine that he sends a write but it spans multiple extents in the
-FS. And he gets EINVAL once again.
+Actually it results in atomic_write_max_bytes being 128 KB when IOMMU
+is turned on because max_hw_sectors_kb becomes 128 KB because it's
+limited by iommu_dma_opt_mapping_size() and it's hard-coded to return
+128 KB =3D PAGE_SIZE << (IOVA_RANGE_CACHE_MAX_SIZE - 1) =3D 4096 << 5. But
+that's not the main point.
 
-Is it any different from what I propose?
+My use case is: I use raw NVMe devices in my project and I want to use
+atomic writes to avoid journaling. But for me it means that I want to
+do atomic writes at arbitrary 4 KB aligned offsets. And I want to use
+atomic writes **safely**. That's why I want to use RWF_ATOMIC - it
+allows the kernel to guarantee that it doesn't fragment the write.
 
-Obviously in all of these cases the app has to make sure that it
-satisfies all atomic write requirements before actually using them. I
-think it's absolutely fine.
+With the current restrictions, as a user, I can't do that - I get
+EINVAL for some of my writes when I enable RWF_ATOMIC. So I'm asking:
+what's the reason behind these restrictions? Could they be removed?
 
 On Fri, Jan 2, 2026 at 8:41=E2=80=AFPM John Garry <john.g.garry@oracle.com>=
  wrote:
