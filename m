@@ -1,222 +1,133 @@
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-vs1-f53.google.com (mail-vs1-f53.google.com [209.85.217.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9366F28B40E
-	for <linux-block@vger.kernel.org>; Mon,  5 Jan 2026 16:45:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 121833161BF
+	for <linux-block@vger.kernel.org>; Mon,  5 Jan 2026 18:59:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767631502; cv=none; b=Mi6GgZ6bHSdY/c7QhNccPYp25z3ooW3tUnWphkhLtQMBSFO9on05s07SqeQzqyAr3FLTrIC58ZHTwT06+Rg2iH7mMP3f4sUUa10PRv7dZ81ximkoNSezJAnoYtaq+uWzdMjZInGzEaqDHsFdTrZ2yNJ3eSKQskMfcOyC2J+565M=
+	t=1767639552; cv=none; b=dsdmIjA/Nwkr7WqqNKRvSkQBAKO+qSkPhnrg2VsGNdXhm88iPJNCjekVq65G7k+NtECOC+cQXAsj8uqEEWCxQGDbzB20VVEecE+NRny5v4ZBr0Z54PbM7HnaVsS80eQeJoRJ3couDjINcn084ZHoDU0a62WKpU2lqxO7W8Rvq8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767631502; c=relaxed/simple;
-	bh=q3oBIJBCKsgETtCPP1VXg2X9fdRdjcqRRDj8EfShKmg=;
+	s=arc-20240116; t=1767639552; c=relaxed/simple;
+	bh=yn1Jc4ICLWk8ULaLrztIgS2WchuirD6GB9gytQ0+C+k=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cMtHNB3kpiyg6V2qmVtbvqIiMX8XiBQbRKcfj0dUcLB9XVCWGbP7vQyzmegg1XWZZ1n3sSCXmVQ3zmgdKAUVTnHiE5+aYV7m2PE6QbEetaELrmNQCWSqZFMh8QHucCmWYNNWzyhJfSste/qLgojdaMd6ksN08QMPbnq6QFPDQyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=dgiBx5Bl; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	 To:Cc:Content-Type; b=I2rHSNdC0PpgrdGXbwkkCMoD4p0yeN2wAruv/GkMgirKJw89WZGdedeKeXHFi+nGKDQkjYP65A31CtvdqU/G6CMtWTQASbY7F+mo4bkPa7+5I7xOc316bYETHU46rhG4Xa2HJecVUzKlNv5OT8D22E9yFm/QHZdMJwm6gEJ6+Zw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HOmBMWj6; arc=none smtp.client-ip=209.85.217.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="dgiBx5Bl"
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-802e9abb429so21221b3a.1
-        for <linux-block@vger.kernel.org>; Mon, 05 Jan 2026 08:45:00 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HOmBMWj6"
+Received: by mail-vs1-f53.google.com with SMTP id ada2fe7eead31-5de0c1fa660so76245137.1
+        for <linux-block@vger.kernel.org>; Mon, 05 Jan 2026 10:59:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1767631500; x=1768236300; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1767639550; x=1768244350; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=L6BL2qPpVVqiVwXY3IB51McHsnbFfXZf1WvJyfM78Xk=;
-        b=dgiBx5BlzLP/Ac9sW4gKVy6SEc1PSKMUt8WxGEEmLugL3iSMye3W/7CSXkyYzqn0YC
-         p3yszztnQy/B5FjrWkH121uWLhZJ4nE9SceH5Fh9WWaFS4TxYErtvLdCFTU5Oyj7pKi8
-         yvOJnYug0j0S3RD8axAMeu7Ayw7TP+onu9hJCu+cyPAJnzc+GgM/oNDl5gG8nVop9UOy
-         /4rQvsSZkmYGQIvXDzpYliVP/s88blwyxdQ4cv1CJPLuildY5bSa5AJLWiJJ6vJMkPJQ
-         aL87zu4SRfRAa9y/jw6fR2hbTqdom1XIyMo1zapI0cEddGYQo+u3bLguPcxYJ+xnoAgE
-         uxYg==
+        bh=yn1Jc4ICLWk8ULaLrztIgS2WchuirD6GB9gytQ0+C+k=;
+        b=HOmBMWj6rTW5E42iN8lyJI2T/fy8wYpRZNif5Cju6iGV+MuwzGdTIvINxPBnFjanWI
+         3i/LEwF0uUFVyLSynw8XrpD8YbW9Y1efXJe+nbso4SkDvW6Og/E28bbCwLmRKCBPxzYq
+         7Z5x+JBf/VC93IsodLE4D/uFM4RzfyS4RXdaSKjPvJUY6kmfyCV3H4iMaGpFcCzK91Jd
+         hQC+b9JffTVVd52eAvrOJA78eHdbn3Dz3PsDrBZXoAzCB3wbRvMGT+OgYxRll2fGPOyn
+         usfiWN9vR4htkZ2ruYLwCeiEZ0mpM1SCOZnNVmKW1/29090xg4wcKzwYZCmhlje8hNY4
+         GcBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767631500; x=1768236300;
+        d=1e100.net; s=20230601; t=1767639550; x=1768244350;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=L6BL2qPpVVqiVwXY3IB51McHsnbFfXZf1WvJyfM78Xk=;
-        b=mgJ1hQKTlL+rRk8nl2YQWuuP5h67852owfqrVeweryvNrOyQiqHX7SHxq6/ssc/YED
-         nPEXSHCSZEIDyaFhi2O37OMRlVOWUd8+KlZN2/3yujDrjpt/pLpLkQTeha4rKe1FcUOQ
-         MfEvr3xh+fGyRhfXETv5mrT75szmekoP8wmyr2VbAjvFh2nsBA5cxMAGDkbRkvthq76p
-         uGXPCLSApeLK8KoYX52Bwp+Ej/VmJX0KURBzWfg3s5l6L1QkqRggTllwDu4CqoSWvxgy
-         aJ7vHstizBnTZrmeA+KV7vOHcvX8JMpuvnZ0q1Og2de0FQR9mTmWi3bz+Phr8pu2gRZO
-         lKTA==
-X-Forwarded-Encrypted: i=1; AJvYcCV1+ubKsXV4IFAIOXBdyfbCe1NHpC047VtN1ortiECSlKBLF2FNGG5k+CC8WB46ZjzaZnURK6uKFZbVrg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyp81eCdstDkl2O4SUF4niv0HwJ9K87CReJfsxkR/00MKfQzqhU
-	itMhHblZDtfl0gK5z0Uql2keP1QRz/AOTxKvf//y+DmwPj9fLD9gVsAxcFKxVPEuw+4KV7mlxMr
-	s/ugkZ84B9oCFO+ORt7LGPBeXfsa3Rcmf7Y+zNvDfMQ==
-X-Gm-Gg: AY/fxX4Ee8aqSERq1uOZyIqUTNRs+XTklUoRwpycJyZZgwYw0gHrE6EGEhEKHXwBfUh
-	RI95PVyZKHfBWBNvh3DWrspbCMgAvKpyIoj+g67PldxL3c6Ts+PLx7syD8/+YzS+C1miu/KEIK6
-	Jla85fC0pLWhQJQtWmU0P3W56ZxZAg+5e1lNsu/MnEjjeRVSmpmjDtp27ycyYrjWoUkOBz+UuwD
-	B+emyrG2qJPkJ5+cxpz//bKF0SzmOSKExmRRWleN5HkdZBBdr3OQZwwBFFU2iMziVmjiqux
-X-Google-Smtp-Source: AGHT+IF8k9ZANyOFgf4uVHZiLOyEIYQd/42XmN4OjyQ1CnRUZ4eFH6gAsgBHijDU+QbTdIeIftviRS4WQOARay1ZyAA=
-X-Received: by 2002:a05:7022:4298:b0:11e:3e9:3e9b with SMTP id
- a92af1059eb24-121723088c9mr25211029c88.6.1767631499550; Mon, 05 Jan 2026
- 08:44:59 -0800 (PST)
+        bh=yn1Jc4ICLWk8ULaLrztIgS2WchuirD6GB9gytQ0+C+k=;
+        b=egH6wZVlwX+6AZEDUg5hkmUCuEfO1/XBln/J7utGFLEBsayVBLc0RDxj8yHVgM3pDI
+         La9L5utM2eZAzruMEQsdG00uFqJFCIImn50tY6D86wmWPDCTOtAaEta4uBaj7m0U8Mxe
+         1O59e1vtyabjtoAXTzC6pqeFRZP+QbKna9iPX6XdiXCMSIzwA3j/pgM99XvfPJY7sXiu
+         AbNpa+kUg3eA3/jtRUfOdSh5nFDuALmZ4KmgbR7l+qAhCiQ3jh/k36SKVhPZCYred4kk
+         1VQxjOBbJD0jn4lc3YZ8XZuxtBEottd4K3+E3DWlTjb4lfjydL0xELXc7yeKCfjZpFL5
+         VzHw==
+X-Gm-Message-State: AOJu0Yw6FKP+3aggl0fjVAM+qSz+v8g53C0nX6IBAr5DSzBmAeVpDVrK
+	+9EIVjdx0eQG8DXsoXVNTKwM/6x2U7qfEU+yGbnVSkqmmog2YrjFhvAOELsRiIYq51fA/GVGiO3
+	Rvuwf1azxt1V3HwETE60Qyine272Ltf8=
+X-Gm-Gg: AY/fxX5wFLVZ+EyqrKlEGco/kjR4Job9Bqh12mmJvo+iAPJ9UJXYVJdOI8+23EQIiKd
+	5zoc/iLGQITj8IT/5wfflbUU7/Nn8DuFpyITS8Rq/k8aK7DdyhVOQa5ubgHKgS/It2InhsKe9eA
+	Lf34azKJL3NUONYX7oGVw7c2RP+/dnkzH9yxR7clRoh0rg4JOK+rz37uStVWxlMd+tt81a+sZMT
+	Kaf3IjgOY4XHV/RKME+pQwRhwd9JpRHgMHyOQbHMaLWm2NjIUD2zHS8XO8Wh9XFissL9XOl6s2n
+	aclQwT6cjzITVYJBuLqB0VOAhiX9
+X-Google-Smtp-Source: AGHT+IEK6t29nnbM4KSi3RE2dRptIPsBlJI7+TEZUWDWfQLw/G0JUg7s/X6SseZ/NRhydZf5A+iBWFM2iESPtCJyrnk=
+X-Received: by 2002:a05:6102:2ac2:b0:5db:cba0:941 with SMTP id
+ ada2fe7eead31-5ec744f41e0mr168063137.38.1767639550024; Mon, 05 Jan 2026
+ 10:59:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260103004529.1582405-1-csander@purestorage.com>
- <20260103004529.1582405-5-csander@purestorage.com> <aVkkSxNNUBMz9E61@fedora>
-In-Reply-To: <aVkkSxNNUBMz9E61@fedora>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Mon, 5 Jan 2026 08:44:48 -0800
-X-Gm-Features: AQt7F2oLATeVcsBIU8okZcBk_MFEK1W5141SRB_Yq7_1i_fxRUD7vLCBZiqM1qY
-Message-ID: <CADUfDZqF2rWRQVptMjM7JedkkHfM-K+V65=odLcdrc3OM9jsJg@mail.gmail.com>
-Subject: Re: [PATCH v2 04/19] ublk: set request integrity params in ublksrv_io_desc
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Shuah Khan <shuah@kernel.org>, linux-block@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Stanley Zhang <stazhang@purestorage.com>, Uday Shankar <ushankar@purestorage.com>
+References: <20251224115312.27036-1-vitalifster@gmail.com> <cc83c3fa-1bee-48b0-bfda-3a807c0b46bd@oracle.com>
+ <CAPqjcqqEAb9cUTU3QrmgZ7J-wc_b7Ai_8fi17q5OQAyRZ8RfwQ@mail.gmail.com> <492a0427-2b84-47aa-b70c-a4355a7566f2@oracle.com>
+In-Reply-To: <492a0427-2b84-47aa-b70c-a4355a7566f2@oracle.com>
+From: Vitaliy Filippov <vitalifster@gmail.com>
+Date: Mon, 5 Jan 2026 21:58:58 +0300
+X-Gm-Features: AQt7F2rq5lSdRuDrKKO_WX7qlrOIHIyAA4sAGBL3za53jFIAgFNIDCZCA8inI4w
+Message-ID: <CAPqjcqpPQMhTOd3hHTsZxKuLwZB-QJdHqOyac2vyZ+AeDYWC6g@mail.gmail.com>
+Subject: Re: [PATCH] fs: remove power of 2 and length boundary atomic write restrictions
+To: John Garry <john.g.garry@oracle.com>
+Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, 
+	linux-fsdevel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jan 3, 2026 at 6:14=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrote=
-:
+>What good is that to a user?
+
+It will allow him to use the feature which he currently can't use.
+
+I don't understand your point about "arbitrary" failures.
+
+Imagine that a user just sends a 256 KB write with RWF_ATOMIC while
+the device has NAWUPF=3D128 KB.
+
+He gets EINVAL even though the write is 2^N and length-aligned. Is it
+any different from an 'arbitrary failure' which you describe?
+
+Now imagine that he sends a write but it spans multiple extents in the
+FS. And he gets EINVAL once again.
+
+Is it any different from what I propose?
+
+Obviously in all of these cases the app has to make sure that it
+satisfies all atomic write requirements before actually using them. I
+think it's absolutely fine.
+
+On Fri, Jan 2, 2026 at 8:41=E2=80=AFPM John Garry <john.g.garry@oracle.com>=
+ wrote:
 >
-> On Fri, Jan 02, 2026 at 05:45:14PM -0700, Caleb Sander Mateos wrote:
-> > Indicate to the ublk server when an incoming request has integrity data
-> > by setting UBLK_IO_F_INTEGRITY in the ublksrv_io_desc's op_flags field.
-> > If the ublk device doesn't support integrity, the request will never
-> > provide integrity data. If the ublk device supports integrity, the
-> > request may omit the integrity buffer only if metadata_size matches the
-> > PI tuple size determined by csum_type. In this case, the ublk server
-> > should internally generate/verify the protection information from the
-> > data and sector offset.
-> > Set the UBLK_IO_F_CHECK_{GUARD,REFTAG,APPTAG} flags based on the
-> > request's BIP_CHECK_{GUARD,REFTAG,APPTAG} flags, indicating whether to
-> > verify the guard, reference, and app tags in the protection information=
-.
-> > The expected reference tag (32 or 48 bits) and app tag (16 bits) are
-> > indicated in ublksrv_io_desc's new struct ublksrv_io_integrity integrit=
-y
-> > field. This field is unioned with the addr field to avoid changing the
+> On 30/12/2025 09:01, Vitaliy Filippov wrote:
+> > I think that even with the 2^N requirement the user still has to look
+> > for boundaries.
+> > 1) NVMe disks may have NABO !=3D 0 (atomic boundary offset). In this
+> > case 2^N aligned writes won't work at all.
 >
-> It might be fine to set per-rq app_tag, but bios in one request might hav=
-e
-> different app_tag in case of io merge actually.
-
-I based this logic largely on the code under if (ns->head->ms) in
-nvme_setup_rw(). That also assumes a single app_tag for the request.
-Sounds like an existing bug if bios with different app_tags can be
-merged together?
-
+> We don't support NABO !=3D 0
 >
-> Also block layer builds ref_tag for each internal, please see
-
-What do you mean by "internal"? "interval"?
-
-> t10_pi_generate() and ext_pi_crc64_generate().
-
-Yes, the reftag increases by 1 for each integrity interval. That's why
-it suffices for an NVMe command reading multiple blocks to specify
-only the expected reftag for the first block; the reftags for
-subsequent blocks are incremented accordingly.
-
-Actually, I think we probably don't need to communicate the reftag
-seed to the ublk server. NVMe doesn't use the reftag seed (which can
-be overridden by struct uio_meta's seed field). Instead,
-nvme_set_ref_tag() always uses the offset into the block device
-divided by the integrity interval size, as required by all the
-existing csum_type formats the kernel supports. So a ublk server could
-just use the start_sector field of struct ublksrv_io_desc to compute
-the expected reftags. And using start_sector as the reftag also means
-merging requests would preserve their expected reftags.
-
+> > 2) NABSPF is expressed in blocks in the NVMe spec and it's not
+> > restricted to 2^N, it can be for example 3 (3*4096 =3D 12 KB). The spec
+> > allows it. 2^N breaks this case too.
 >
-> So looks this way is wrong.
+> We could support NABSPF which is not a power-of-2, but we don't today.
 >
-> More importantly reusing iod->addr for other purpose not related with IO
-> buffer is very unfriendly for adding new features, and one lesson is for =
-ZONED support
-> by reusing ublksrv_io_cmd->addr for zoned's append lba.
-
-That's a fair point.
-
+> If you can find some real HW which has NABSPF which is not a power-of-2,
+> then it can be considered.
 >
-> For example, there is chance to support dma-buf based zero copy for ublk,=
- and
-> please see the io-uring dma-buf support[1], and iod->addr might carry IO =
-buffer info
-> in dma-buf format in future.
+> > And the user also has to look for the maximum atomic write size
+> > anyway, he can't just assume all writes are atomic out of the box,
+> > regardless of the 2^N requirement.
+> > So my idea is that the kernel's task is just to guarantee correctness
+> > of atomic writes. It anyway can't provide the user with atomic writes
+> > in all cases.
 >
-> [1] https://lore.kernel.org/io-uring/cover.1763725387.git.asml.silence@gm=
-ail.com/#t
+> What good is that to a user?
 >
+> Consider the user wants to atomic write a range of a file which is
+> backed by disk blocks which straddle a boundary - in this case, the
+> write would fail. What is the user supposed to do then? That API could
+> have arbitrary failures, which effectively makes it a useless API.
 >
-> > size of struct ublksrv_io_desc. UBLK_F_INTEGRITY requires
-> > UBLK_F_USER_COPY and the addr field isn't used for UBLK_F_USER_COPY, so
-> > the two fields aren't needed simultaneously.
-> >
-> > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-> > ---
-> >  drivers/block/ublk_drv.c      | 43 +++++++++++++++++++++++++++++++----
-> >  include/uapi/linux/ublk_cmd.h | 27 ++++++++++++++++++++--
-> >  2 files changed, 64 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > index 2f9316febf83..51469e0627ff 100644
-> > --- a/drivers/block/ublk_drv.c
-> > +++ b/drivers/block/ublk_drv.c
-> > @@ -316,10 +316,36 @@ static inline bool ublk_dev_is_zoned(const struct=
- ublk_device *ub)
-> >  static inline bool ublk_queue_is_zoned(const struct ublk_queue *ubq)
-> >  {
-> >       return ubq->flags & UBLK_F_ZONED;
-> >  }
-> >
-> > +static void ublk_setup_iod_buf(const struct ublk_queue *ubq,
-> > +                            const struct request *req,
-> > +                            struct ublksrv_io_desc *iod)
-> > +{
-> > +#ifdef CONFIG_BLK_DEV_INTEGRITY
-> > +     if (ubq->flags & UBLK_F_INTEGRITY) {
-> > +             struct bio_integrity_payload *bip;
-> > +             sector_t ref_tag_seed;
-> > +
-> > +             if (!blk_integrity_rq(req))
-> > +                     return;
-> > +
-> > +             bip =3D bio_integrity(req->bio);
-> > +             ref_tag_seed =3D bip_get_seed(bip);
->
-> As mentioned, t10_pi_generate() and ext_pi_crc64_generate() builds
-> per-internal ref tag.
-
-As mentioned, the reftags for subsequent intervals can be computed by
-simply incrementing the seed. If the seed is assumed to always be
-start_sector >> (interval_exp - SECTOR_SHIFT), then it may not be
-necessary to communicate ref_tag_seed at all.
-
->
->
-> > +             iod->integrity.ref_tag_lo =3D ref_tag_seed;
-> > +             iod->integrity.ref_tag_hi =3D ref_tag_seed >> 32;
-> > +             iod->integrity.app_tag =3D bip->app_tag;
->
-> In case of io merge, each bio may have different ->app_tag.
-
-It seems like it would make more sense to prevent merging bios with
-different app_tags. In the common case where a request contains a
-single bio, which has a single app_tag, it would be much more
-efficient to communicate only the 1 app_tag instead of having to pass
-a separate app_tag for every logical block/integrity interval.
-
->
-> Given you have to copy meta data via user copy, I suggest to follow the P=
-I
-> standard and make it per-internal.
-
-How are you suggesting the ublk server access bip->app_tag and
-bip_get_seed(bip) (if overriding the reftag seed is supported)? Would
-the ublk server need to make another user copy syscall?
-
-Or would you prefer I drop the BIP_CHECK_* flag support from this
-patch set for now?
-
-Thanks,
-Caleb
+> As I said before, just don't use RWF_ATOMIC if you don't want to deal
+> with these restrictions.
