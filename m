@@ -1,180 +1,222 @@
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12B4E33EAEC
-	for <linux-block@vger.kernel.org>; Mon,  5 Jan 2026 15:41:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9366F28B40E
+	for <linux-block@vger.kernel.org>; Mon,  5 Jan 2026 16:45:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767627680; cv=none; b=dD/jh94bGgluMnApzUJCip4ZE0nounXIGs3du2gxTTC9Cn9wwKCQN8J1uvtGk3F9cMquF5QCi9/pZ78zdLfdifOZFhorJCfSnshpJdSaDjwJKl3O5VJXyS06AS2AhJ53ntzNqU6XwaSqq+xDrm1ADGaB6zQq9e3zzg29DnkGwgE=
+	t=1767631502; cv=none; b=Mi6GgZ6bHSdY/c7QhNccPYp25z3ooW3tUnWphkhLtQMBSFO9on05s07SqeQzqyAr3FLTrIC58ZHTwT06+Rg2iH7mMP3f4sUUa10PRv7dZ81ximkoNSezJAnoYtaq+uWzdMjZInGzEaqDHsFdTrZ2yNJ3eSKQskMfcOyC2J+565M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767627680; c=relaxed/simple;
-	bh=7XOckaOqG/PMRqT76fU8qmeyL4hEz8+C+ksukJDZjK4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=on51xBw8Qs94EtA+muMWc4S1YVA9JfTiIM84E39re0I4U7HNrtD7LiJ4exvczKYx63xr59IyFLO42Dt6Tepws2eBBkqq5dQ+zvivqkoSdFzd9H8EHnasD+N/bkufh7U1AJjwBaYWeJw6wIIeV1N230DgysHSEv1FcepGvgW+Klg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ANTOsH7t; arc=none smtp.client-ip=209.85.219.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1767631502; c=relaxed/simple;
+	bh=q3oBIJBCKsgETtCPP1VXg2X9fdRdjcqRRDj8EfShKmg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cMtHNB3kpiyg6V2qmVtbvqIiMX8XiBQbRKcfj0dUcLB9XVCWGbP7vQyzmegg1XWZZ1n3sSCXmVQ3zmgdKAUVTnHiE5+aYV7m2PE6QbEetaELrmNQCWSqZFMh8QHucCmWYNNWzyhJfSste/qLgojdaMd6ksN08QMPbnq6QFPDQyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=dgiBx5Bl; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ANTOsH7t"
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-88a347c424aso2366d6.0
-        for <linux-block@vger.kernel.org>; Mon, 05 Jan 2026 07:41:18 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="dgiBx5Bl"
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-802e9abb429so21221b3a.1
+        for <linux-block@vger.kernel.org>; Mon, 05 Jan 2026 08:45:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767627678; x=1768232478; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
+        d=purestorage.com; s=google2022; t=1767631500; x=1768236300; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=r6BA1g1a3pdykyjLkvUREMTVpM7/WCPoUOv36P4M2nY=;
-        b=ANTOsH7tPDcPS8CmZzOHNm0S+V/mWI0bFCqEFpOAekO1YJgBqpiHZRaKgcbvfWofGS
-         hkM8D+8SEd6n4+gGjSAsdsohNibziUL5avRF2LPZbvycxOZzY88dlebGTDgG5NJH4pvF
-         KbbVPq3zkMqpLzgtJikFPIuttRZCac4SxO5QeTWzOo0UM8z3jhcgvaa3X/pNVaz1vfVe
-         xJI28IlTfCVcObZZTJYscPtRojUpRuUhe2X5x6XpEUBNpLc+jSX9QB3fA7pMWfkRDOBL
-         B9eaErOp+Z+JCIwR3VJVMkTYEWmNvKxg0m93Kv5ej+Wff+QC2UEJC81jHLGQ0NHq2xSQ
-         hycQ==
+        bh=L6BL2qPpVVqiVwXY3IB51McHsnbFfXZf1WvJyfM78Xk=;
+        b=dgiBx5BlzLP/Ac9sW4gKVy6SEc1PSKMUt8WxGEEmLugL3iSMye3W/7CSXkyYzqn0YC
+         p3yszztnQy/B5FjrWkH121uWLhZJ4nE9SceH5Fh9WWaFS4TxYErtvLdCFTU5Oyj7pKi8
+         yvOJnYug0j0S3RD8axAMeu7Ayw7TP+onu9hJCu+cyPAJnzc+GgM/oNDl5gG8nVop9UOy
+         /4rQvsSZkmYGQIvXDzpYliVP/s88blwyxdQ4cv1CJPLuildY5bSa5AJLWiJJ6vJMkPJQ
+         aL87zu4SRfRAa9y/jw6fR2hbTqdom1XIyMo1zapI0cEddGYQo+u3bLguPcxYJ+xnoAgE
+         uxYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767627678; x=1768232478;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1767631500; x=1768236300;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=r6BA1g1a3pdykyjLkvUREMTVpM7/WCPoUOv36P4M2nY=;
-        b=q7ap598gatJzozuh1fKjMtVq4v9gheqydLP364rkk92n3Zg0CokYbqBzDv2rZ7vccs
-         Os3yylKlxbNtOq1+w7FJHPsubPS9c/MuMyqJQNGYjMpVYUhpvxkuA5QvtKnKEJpd9lYF
-         bl9eGvWtWhExdbOS8UJDf8VY4M26QZqmnzzx6wvS1M2YsyAzAV8pbvDLFXJCESz2+NHq
-         CZsXvwBXv8UqQpOAoWRKaXU+g69b1nea370MbkYnpd7UHns8fQZ75aUOl2qzCqYvArVS
-         b4wAc+DtvBNMS1o513YFJtJDVGOYipxtaZY4cspAh6yI9f8u1Qt8T8bJvLC6SDbI3Tyj
-         tN2w==
-X-Forwarded-Encrypted: i=1; AJvYcCWVMFRYL4Pi08KwBYthHc+hvvhiu6H95ZYyq3+wYQNwSfKY+yEJyO8cT8PDD3XGCtqZWG0ZrcLTQm5h7g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzdmsmmzNVE5hxUnzezxUcPDJ/9g2XDdzWTf+2rB5JDF+ENcX0y
-	4gqM70zYV12iaT2IEKoirurMZAgyX6zjRpcdzkOmrCRpz9nXhZ6laTrE
-X-Gm-Gg: AY/fxX6zxyH122+Ospxgxj2lYo9UpA5iUKIZcptlEVD2PVvuxTrJuIBYCWb8Pyzmtz7
-	F62h/1TGq2iy1XDWpeQ3IdPiCuXKw2BmqYVKE54mcdsrAREHmxc37Tz2ke56rQc/Z9FjForUoau
-	My/YAiE8RQL+fpCmJogeUYXEftZlZwiGJxrUW8zwiroA1SxYC9vqUNSraXfH+jHA+rTwVRi5SS/
-	N/QExNYb71aNLXu/swMNJZ+Nf+gwB6RzFc7XGkXV2q4LcyDdwAfVOKo2qMC1YqjUa5xjEtw7bos
-	5y2WKRWmB44cyzbfWa8hahsY/z5lw0kE+dVuAebbXfAuyc6PPY01Zaqv7pVCMbyO/2unyAGtNsl
-	oAeIEoMixfkdFcoOTvjjAsYHFYVfEx1xc+V2mfYBvLRgsocYXKOFiiHyga0OBYAYtIReOZavA1K
-	LOGroKqFpD/SXEe0ljnJwY+KUO4N32b2iIfP13edI6VJGxWRh2qowCV2zdZdeA4mpR53vALfmrB
-	Bgn/LQefFrr1Lo=
-X-Google-Smtp-Source: AGHT+IFcWhopwSaKjTCty9xmTi8J6nU5610w9dE8RcpeTOSxGCXk1EYPkRdikqmONExTL9dAEe+Esw==
-X-Received: by 2002:a05:6214:1249:b0:890:4f86:495e with SMTP id 6a1803df08f44-8904f8649bamr161313626d6.39.1767627677769;
-        Mon, 05 Jan 2026 07:41:17 -0800 (PST)
-Received: from fauth-a1-smtp.messagingengine.com (fauth-a1-smtp.messagingengine.com. [103.168.172.200])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-890753ef0f8sm1464776d6.14.2026.01.05.07.41.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jan 2026 07:41:17 -0800 (PST)
-Received: from phl-compute-11.internal (phl-compute-11.internal [10.202.2.51])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 8F0F5F40068;
-	Mon,  5 Jan 2026 10:41:11 -0500 (EST)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-11.internal (MEProxy); Mon, 05 Jan 2026 10:41:11 -0500
-X-ME-Sender: <xms:l9tbaQl8adq_q8oemVdp9py9aCB5rEYMUXGPUHOfxSENDh0M6SOSiw>
-    <xme:l9tbaVrCyG7LEDf5sozj9kkhyLQ0sPqK87jUAC_qJfbekq6ICe_xe5QMuMoTjEKUA
-    tB0zjAhiqSBWufmhb_KP365bDbxKmKQ-BUeRDG7AXs90zPIyqpX-w>
-X-ME-Received: <xmr:l9tbaTuvJMNXCwyVLLEQxwAkDuZHya194bV4WrOdHwOVBYRN60UCxK-j>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeljeeilecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpeeuohhquhhnucfh
-    vghnghcuoegsohhquhhnrdhfvghnghesghhmrghilhdrtghomheqnecuggftrfgrthhtvg
-    hrnhephedugfduffffteeutddvheeuveelvdfhleelieevtdeguefhgeeuveeiudffiedv
-    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsghoqh
-    hunhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqieelvdeghedtieegqddu
-    jeejkeehheehvddqsghoqhhunhdrfhgvnhhgpeepghhmrghilhdrtghomhesfhhigihmvg
-    drnhgrmhgvpdhnsggprhgtphhtthhopeehkedpmhhouggvpehsmhhtphhouhhtpdhrtghp
-    thhtoheprghlihgtvghrhihhlhesghhoohhglhgvrdgtohhmpdhrtghpthhtoheprhhush
-    htqdhfohhrqdhlihhnuhigsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohep
-    lhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
-    epghgrrhihsehgrghrhihguhhordhnvghtpdhrtghpthhtohepphgvthgvrhiisehinhhf
-    rhgruggvrggurdhorhhgpdhrtghpthhtohepvghllhgvseifvggrthhhvghrvgguqdhsth
-    gvvghlrdguvghvpdhrtghpthhtoheprgdrhhhinhgusghorhhgsehkvghrnhgvlhdrohhr
-    ghdprhgtphhtthhopehlihhnuhigqdgslhhotghksehvghgvrhdrkhgvrhhnvghlrdhorh
-    hgpdhrtghpthhtohepfhhujhhithgrrdhtohhmohhnohhrihesghhmrghilhdrtghomh
-X-ME-Proxy: <xmx:l9tbabmkDu5goAML_Vw6wQks5sr1-oqWVGEVyl7SpncPG41qLq8PqQ>
-    <xmx:l9tbaZEvXpCwph3gfl5iq-kHa4fsrJ-e6g21CjltgBbR441YOY405w>
-    <xmx:l9tbaa8pxEfCJ2_idKerH3733Rocx35rGJlDBn4X7HlKs2MkaFUX5A>
-    <xmx:l9tbaW7nR-qjUaIEByc4-kPNbC8tpKXp-OM_EvS1h_evQ7bx_68mJA>
-    <xmx:l9tbaS4UkZJm3L0Tu3phQb3ItLU_OD6WXZGJ8xIIxpleNVBlr6HjnmTP>
-Feedback-ID: iad51458e:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 5 Jan 2026 10:41:10 -0500 (EST)
-Date: Mon, 5 Jan 2026 23:41:08 +0800
-From: Boqun Feng <boqun.feng@gmail.com>
-To: Alice Ryhl <aliceryhl@google.com>
-Cc: rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Gary Guo <gary@garyguo.net>, Peter Zijlstra <peterz@infradead.org>,
-	Elle Rhumsaa <elle@weathered-steel.dev>,
-	Andreas Hindborg <a.hindborg@kernel.org>,	linux-block@vger.kernel.org,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, linux-clk@vger.kernel.org,
-	Benno Lossin <lossin@kernel.org>,	Danilo Krummrich <dakr@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,	Paul Moore <paul@paul-moore.com>,
- Serge Hallyn <sergeh@kernel.org>,	linux-security-module@vger.kernel.org,
-	Josh Poimboeuf <jpoimboe@kernel.org>,	Jason Baron <jbaron@akamai.com>,
-	Steven Rostedt <rostedt@goodmis.org>,	Ard Biesheuvel <ardb@kernel.org>,
-	Andrew Ballance <andrewjballance@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	maple-tree@lists.infradead.org, linux-mm@kvack.org,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	Uladzislau Rezki <urezki@gmail.com>,
-	Vitaly Wool <vitaly.wool@konsulko.se>,	Rob Herring <robh@kernel.org>,
- devicetree@vger.kernel.org,
-	Daniel Almeida <daniel.almeida@collabora.com>,
-	Michal Wilczynski <m.wilczynski@samsung.com>,	linux-pwm@vger.kernel.org,
- "Paul E. McKenney" <paulmck@kernel.org>,	rcu@vger.kernel.org,
- Will Deacon <will@kernel.org>,	Fiona Behrens <me@kloenk.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Vlastimil Babka <vbabka@suse.cz>, Christoph Lameter <cl@gentwo.org>,
-	David Rientjes <rientjes@google.com>,	Ingo Molnar <mingo@redhat.com>,
- Waiman Long <longman@redhat.com>,
-	Mitchell Levy <levymitchell0@gmail.com>,
-	Frederic Weisbecker <frederic@kernel.org>,	Lyude Paul <lyude@redhat.com>,
-	Anna-Maria Behnsen <anna-maria@linutronix.de>,
-	John Stultz <jstultz@google.com>, linux-usb@vger.kernel.org,
-	Tejun Heo <tj@kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Tamir Duberstein <tamird@gmail.com>, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH v2 00/27] Allow inlining C helpers into Rust when using
- LTO
-Message-ID: <aVvblLp8sjFB7JvB@tardis-2.local>
-References: <20260105-define-rust-helper-v2-0-51da5f454a67@google.com>
+        bh=L6BL2qPpVVqiVwXY3IB51McHsnbFfXZf1WvJyfM78Xk=;
+        b=mgJ1hQKTlL+rRk8nl2YQWuuP5h67852owfqrVeweryvNrOyQiqHX7SHxq6/ssc/YED
+         nPEXSHCSZEIDyaFhi2O37OMRlVOWUd8+KlZN2/3yujDrjpt/pLpLkQTeha4rKe1FcUOQ
+         MfEvr3xh+fGyRhfXETv5mrT75szmekoP8wmyr2VbAjvFh2nsBA5cxMAGDkbRkvthq76p
+         uGXPCLSApeLK8KoYX52Bwp+Ej/VmJX0KURBzWfg3s5l6L1QkqRggTllwDu4CqoSWvxgy
+         aJ7vHstizBnTZrmeA+KV7vOHcvX8JMpuvnZ0q1Og2de0FQR9mTmWi3bz+Phr8pu2gRZO
+         lKTA==
+X-Forwarded-Encrypted: i=1; AJvYcCV1+ubKsXV4IFAIOXBdyfbCe1NHpC047VtN1ortiECSlKBLF2FNGG5k+CC8WB46ZjzaZnURK6uKFZbVrg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyp81eCdstDkl2O4SUF4niv0HwJ9K87CReJfsxkR/00MKfQzqhU
+	itMhHblZDtfl0gK5z0Uql2keP1QRz/AOTxKvf//y+DmwPj9fLD9gVsAxcFKxVPEuw+4KV7mlxMr
+	s/ugkZ84B9oCFO+ORt7LGPBeXfsa3Rcmf7Y+zNvDfMQ==
+X-Gm-Gg: AY/fxX4Ee8aqSERq1uOZyIqUTNRs+XTklUoRwpycJyZZgwYw0gHrE6EGEhEKHXwBfUh
+	RI95PVyZKHfBWBNvh3DWrspbCMgAvKpyIoj+g67PldxL3c6Ts+PLx7syD8/+YzS+C1miu/KEIK6
+	Jla85fC0pLWhQJQtWmU0P3W56ZxZAg+5e1lNsu/MnEjjeRVSmpmjDtp27ycyYrjWoUkOBz+UuwD
+	B+emyrG2qJPkJ5+cxpz//bKF0SzmOSKExmRRWleN5HkdZBBdr3OQZwwBFFU2iMziVmjiqux
+X-Google-Smtp-Source: AGHT+IF8k9ZANyOFgf4uVHZiLOyEIYQd/42XmN4OjyQ1CnRUZ4eFH6gAsgBHijDU+QbTdIeIftviRS4WQOARay1ZyAA=
+X-Received: by 2002:a05:7022:4298:b0:11e:3e9:3e9b with SMTP id
+ a92af1059eb24-121723088c9mr25211029c88.6.1767631499550; Mon, 05 Jan 2026
+ 08:44:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260105-define-rust-helper-v2-0-51da5f454a67@google.com>
+References: <20260103004529.1582405-1-csander@purestorage.com>
+ <20260103004529.1582405-5-csander@purestorage.com> <aVkkSxNNUBMz9E61@fedora>
+In-Reply-To: <aVkkSxNNUBMz9E61@fedora>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Mon, 5 Jan 2026 08:44:48 -0800
+X-Gm-Features: AQt7F2oLATeVcsBIU8okZcBk_MFEK1W5141SRB_Yq7_1i_fxRUD7vLCBZiqM1qY
+Message-ID: <CADUfDZqF2rWRQVptMjM7JedkkHfM-K+V65=odLcdrc3OM9jsJg@mail.gmail.com>
+Subject: Re: [PATCH v2 04/19] ublk: set request integrity params in ublksrv_io_desc
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Shuah Khan <shuah@kernel.org>, linux-block@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Stanley Zhang <stazhang@purestorage.com>, Uday Shankar <ushankar@purestorage.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 05, 2026 at 12:42:13PM +0000, Alice Ryhl wrote:
-> This patch series adds __rust_helper to every single rust helper. The
-> patches do not depend on each other, so maintainers please go ahead and
-> pick up any patches relevant to your subsystem! Or provide your Acked-by
-> so that Miguel can pick them up.
-> 
+On Sat, Jan 3, 2026 at 6:14=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrote=
+:
+>
+> On Fri, Jan 02, 2026 at 05:45:14PM -0700, Caleb Sander Mateos wrote:
+> > Indicate to the ublk server when an incoming request has integrity data
+> > by setting UBLK_IO_F_INTEGRITY in the ublksrv_io_desc's op_flags field.
+> > If the ublk device doesn't support integrity, the request will never
+> > provide integrity data. If the ublk device supports integrity, the
+> > request may omit the integrity buffer only if metadata_size matches the
+> > PI tuple size determined by csum_type. In this case, the ublk server
+> > should internally generate/verify the protection information from the
+> > data and sector offset.
+> > Set the UBLK_IO_F_CHECK_{GUARD,REFTAG,APPTAG} flags based on the
+> > request's BIP_CHECK_{GUARD,REFTAG,APPTAG} flags, indicating whether to
+> > verify the guard, reference, and app tags in the protection information=
+.
+> > The expected reference tag (32 or 48 bits) and app tag (16 bits) are
+> > indicated in ublksrv_io_desc's new struct ublksrv_io_integrity integrit=
+y
+> > field. This field is unioned with the addr field to avoid changing the
+>
+> It might be fine to set per-rq app_tag, but bios in one request might hav=
+e
+> different app_tag in case of io merge actually.
 
-I queued the following into rust-sync:
+I based this logic largely on the code under if (ns->head->ms) in
+nvme_setup_rw(). That also assumes a single app_tag for the request.
+Sounds like an existing bug if bios with different app_tags can be
+merged together?
 
-       rust: barrier: add __rust_helper to helpers
-       rust: blk: add __rust_helper to helpers
-       rust: completion: add __rust_helper to helpers
-       rust: cpu: add __rust_helper to helpers
-       rust: processor: add __rust_helper to helpers
-       rust: rcu: add __rust_helper to helpers
-       rust: refcount: add __rust_helper to helpers
-       rust: sync: add __rust_helper to helpers
-       rust: task: add __rust_helper to helpers
-       rust: time: add __rust_helper to helpers
-       rust: wait: add __rust_helper to helpers
+>
+> Also block layer builds ref_tag for each internal, please see
 
-Thanks!
+What do you mean by "internal"? "interval"?
 
-Regards,
-Boqun
+> t10_pi_generate() and ext_pi_crc64_generate().
 
-> These changes were generated by adding __rust_helper and running
-> ClangFormat. Unrelated formatting changes were removed manually.
-> 
-[...]
+Yes, the reftag increases by 1 for each integrity interval. That's why
+it suffices for an NVMe command reading multiple blocks to specify
+only the expected reftag for the first block; the reftags for
+subsequent blocks are incremented accordingly.
+
+Actually, I think we probably don't need to communicate the reftag
+seed to the ublk server. NVMe doesn't use the reftag seed (which can
+be overridden by struct uio_meta's seed field). Instead,
+nvme_set_ref_tag() always uses the offset into the block device
+divided by the integrity interval size, as required by all the
+existing csum_type formats the kernel supports. So a ublk server could
+just use the start_sector field of struct ublksrv_io_desc to compute
+the expected reftags. And using start_sector as the reftag also means
+merging requests would preserve their expected reftags.
+
+>
+> So looks this way is wrong.
+>
+> More importantly reusing iod->addr for other purpose not related with IO
+> buffer is very unfriendly for adding new features, and one lesson is for =
+ZONED support
+> by reusing ublksrv_io_cmd->addr for zoned's append lba.
+
+That's a fair point.
+
+>
+> For example, there is chance to support dma-buf based zero copy for ublk,=
+ and
+> please see the io-uring dma-buf support[1], and iod->addr might carry IO =
+buffer info
+> in dma-buf format in future.
+>
+> [1] https://lore.kernel.org/io-uring/cover.1763725387.git.asml.silence@gm=
+ail.com/#t
+>
+>
+> > size of struct ublksrv_io_desc. UBLK_F_INTEGRITY requires
+> > UBLK_F_USER_COPY and the addr field isn't used for UBLK_F_USER_COPY, so
+> > the two fields aren't needed simultaneously.
+> >
+> > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+> > ---
+> >  drivers/block/ublk_drv.c      | 43 +++++++++++++++++++++++++++++++----
+> >  include/uapi/linux/ublk_cmd.h | 27 ++++++++++++++++++++--
+> >  2 files changed, 64 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > index 2f9316febf83..51469e0627ff 100644
+> > --- a/drivers/block/ublk_drv.c
+> > +++ b/drivers/block/ublk_drv.c
+> > @@ -316,10 +316,36 @@ static inline bool ublk_dev_is_zoned(const struct=
+ ublk_device *ub)
+> >  static inline bool ublk_queue_is_zoned(const struct ublk_queue *ubq)
+> >  {
+> >       return ubq->flags & UBLK_F_ZONED;
+> >  }
+> >
+> > +static void ublk_setup_iod_buf(const struct ublk_queue *ubq,
+> > +                            const struct request *req,
+> > +                            struct ublksrv_io_desc *iod)
+> > +{
+> > +#ifdef CONFIG_BLK_DEV_INTEGRITY
+> > +     if (ubq->flags & UBLK_F_INTEGRITY) {
+> > +             struct bio_integrity_payload *bip;
+> > +             sector_t ref_tag_seed;
+> > +
+> > +             if (!blk_integrity_rq(req))
+> > +                     return;
+> > +
+> > +             bip =3D bio_integrity(req->bio);
+> > +             ref_tag_seed =3D bip_get_seed(bip);
+>
+> As mentioned, t10_pi_generate() and ext_pi_crc64_generate() builds
+> per-internal ref tag.
+
+As mentioned, the reftags for subsequent intervals can be computed by
+simply incrementing the seed. If the seed is assumed to always be
+start_sector >> (interval_exp - SECTOR_SHIFT), then it may not be
+necessary to communicate ref_tag_seed at all.
+
+>
+>
+> > +             iod->integrity.ref_tag_lo =3D ref_tag_seed;
+> > +             iod->integrity.ref_tag_hi =3D ref_tag_seed >> 32;
+> > +             iod->integrity.app_tag =3D bip->app_tag;
+>
+> In case of io merge, each bio may have different ->app_tag.
+
+It seems like it would make more sense to prevent merging bios with
+different app_tags. In the common case where a request contains a
+single bio, which has a single app_tag, it would be much more
+efficient to communicate only the 1 app_tag instead of having to pass
+a separate app_tag for every logical block/integrity interval.
+
+>
+> Given you have to copy meta data via user copy, I suggest to follow the P=
+I
+> standard and make it per-internal.
+
+How are you suggesting the ublk server access bip->app_tag and
+bip_get_seed(bip) (if overriding the reftag seed is supported)? Would
+the ublk server need to make another user copy syscall?
+
+Or would you prefer I drop the BIP_CHECK_* flag support from this
+patch set for now?
+
+Thanks,
+Caleb
