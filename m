@@ -1,242 +1,242 @@
-Received: from mail-pl1-f226.google.com (mail-pl1-f226.google.com [209.85.214.226])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01DFB2236FD
-	for <linux-block@vger.kernel.org>; Tue,  6 Jan 2026 00:58:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1911C2192F9
+	for <linux-block@vger.kernel.org>; Tue,  6 Jan 2026 01:55:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767661100; cv=none; b=U9dGgJ1PzTfi+xrATqi4ES4r7f2+B7GKd/PRuy9OeHC5++PGl8Dwt9PS+xtQrGKvZhy+mK4o8Er6Xbc4UwVuudbQHynTH0zWDI75Uji4E55TxQFV5Oe7NB/qStH3IYhe6NRZbHQO9UWqfv7gumWwjT0AyuELVkXdoONcf1GpP1s=
+	t=1767664537; cv=none; b=uzUCjAyjO/5KAU5QcoiE6n84e3NlvIpww8dUa58aW7VvqWQRbm3nUEfUe6pujbJRSCmtYNCbPNn2S0aZ6RXM3WdxMIfoHibZ6/QNDTDv0aKbFyBHbdTco1q+CHT+Rzm3g2b/PsEVYpNiChgyB7/8lxjYJ+ek7Ph6MQdAZgRjPDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767661100; c=relaxed/simple;
-	bh=Z1UdenNqomW1Gdmx86hqjdPqAqBfGOKQ/CBxjOYJH6g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PoU+BaLSEYRv2ocavvy3sjJnL3UlRhu3GkRWV5MpZ5EkCJIUT7iJZGEiNtj3+Ehm4Zs3yriS7GZOTi5N426rSpWXNjBNLDHKlurDSxzsjTSpO6RMt9q3rF2VgLoCe94BNR66nFK699RHBu+XtQNwo/9bEj543lrSD/RO9uOrq6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Nvu4zP1A; arc=none smtp.client-ip=209.85.214.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1767664537; c=relaxed/simple;
+	bh=FVzhdFndiyaeZn/ZXbRag3NTxTYTueURwbLXArlNCls=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LLIK69lkU7yIDv/Gs2hG7KvWCWyBCC4fC6DvdhJs968F/w9cfMyI/5uSxbKUcdXAhE4h/k8iKAVfT1OwuBELhB52vHeJHh0J4DHyCMX19XFiR216DZSKrJd0E4slB5IpksQAjQf4IJ12ISqVDK9vNz9cVhv8eX4I2kKVIIktlvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=X8Bi3kf8; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Nvu4zP1A"
-Received: by mail-pl1-f226.google.com with SMTP id d9443c01a7336-2a08cb5e30eso1067955ad.1
-        for <linux-block@vger.kernel.org>; Mon, 05 Jan 2026 16:58:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1767661092; x=1768265892; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iWgbGYobkvaFSQnhmymI3uWpc8/0KXyANTacEmbRQf4=;
-        b=Nvu4zP1AUR1u2OTOlSMg1Gt/rqgn6E7TwHYkzScRZgn95dYdn5uIBZiZJYMROpju/0
-         sHiWsiLHEE21xxGhXelaOufc79a1wWGWL/E/P4kl6sF/2zdQtRlwMQADZbcSsaxTBCiw
-         5K4NvPnajm7HIcoSDGrHqR81S3F5LixvAFPa2xWAxIE61Khvw05UIHQp5sT3ohv97AB1
-         qyefiE4TTxxsd4PMiZP4QOPUvfbMY+i556dIrsY9VvX45oETOWYjDYOu/JMlxCoezKbB
-         DS8ZfqdYHZ0CpcUP3U4ACIDgKT/2DRMMooQqibn2xzDyxMBnyqYPn56JSv0b33vDz4Cv
-         RBKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767661092; x=1768265892;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=iWgbGYobkvaFSQnhmymI3uWpc8/0KXyANTacEmbRQf4=;
-        b=CmLXnBiUA9Q17NU0DbDz1ps7xvf98ULpwZUwikvwr9rzWbwSi1jxw+bpOaNSLcqdLZ
-         YVDTeGnUvVn67m5MqupHO0hK3vwMJRvuw7jJFEZlircQo/MjMC7UFQLvVExAdHnjrUIy
-         r+2qzg7EhEgsBlHJODCFKH4VWxpopuZXyYUftMMDqSttn22iTf7BjOd37QYA5fS2LaJu
-         E2AcBNVUWTZP3lSeAKAfhIzvWzbO4rvIBQzRPLTD7FqSOPtcIm3k1MgIA5MYJYqbCvbo
-         y8JmzihgHBZmlFf3A4nmy3bwSu8RiIrLJRUsP2G2YREDxh98Oh1zQt4rCMU4mQ1gjyhf
-         QgKA==
-X-Gm-Message-State: AOJu0YwyIW7dTrHWGyrYScU3kCdOSyx/ehMMpLoofqVaQTuLAKhvDyRG
-	VtpdpujRH/k8SamzbXFP5rceKMvkrQfGL+ZpAdPXxThS34QOWYKoyf7lpCRYNYWf0IcEAkngWmQ
-	OczFVNoH523pjiwh+7pajLNqjBH8mDXBvXuoz
-X-Gm-Gg: AY/fxX7S2uHWRllMR97QzJOk7td9TEbNmZpuIr+j8d6jXcjFhlUhxAkzTA/+ZeRcGAp
-	n13gUYsHo0iRGCrNUCga9gRscCE5HRNAVTn4ofeRzL1xI8sDNazxwyPWWR+0IABPpcjbtdWJ76s
-	23BXowXDFWnctM13D7tH++NZn4WINNBkAmw2h5RUBJte5hcdAHxPi48YYrGpLNQSazmRN9IiZde
-	wLhZupybmDDm/4WCgtxSIE8heV9KUHEb+AGi+0x5z/rnkAN9KXddGKCVWbuAHSyOPk//byyYZ71
-	qDKGefJs9FLW1O1afp0SUAoHptLeY2jcdaRlsXhnoftirRVAO7sUQRn87l4WrR41xyM147D9hPf
-	DQ24G/k5vXdUjWb8izfsnNy1pJFDY1E2fDbqC0eHx0w==
-X-Google-Smtp-Source: AGHT+IGOfp+6bH84vad2EBQ2+Dwb3Z0fUV6/3dMYfGye5S2Vf4an6Zy5q/XCGn88/corDJ9YMoIic3ed4Enw
-X-Received: by 2002:a17:90b:2884:b0:340:be2e:9884 with SMTP id 98e67ed59e1d1-34f5f284472mr709682a91.1.1767661092230;
-        Mon, 05 Jan 2026 16:58:12 -0800 (PST)
-Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.128])
-        by smtp-relay.gmail.com with ESMTPS id 98e67ed59e1d1-34f5faf11e2sm107244a91.4.2026.01.05.16.58.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jan 2026 16:58:12 -0800 (PST)
-X-Relaying-Domain: purestorage.com
-Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.49.34.222])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id AB19434173B;
-	Mon,  5 Jan 2026 17:58:11 -0700 (MST)
-Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id 9D880E44554; Mon,  5 Jan 2026 17:58:11 -0700 (MST)
-From: Caleb Sander Mateos <csander@purestorage.com>
-To: Ming Lei <ming.lei@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Shuah Khan <shuah@kernel.org>
-Cc: linux-block@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X8Bi3kf8"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767664535;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TqrbmwV2NsnPlt4zdPSfdnjZwfQNS3UmdSxT1ApGuxc=;
+	b=X8Bi3kf8Jkg48/uW0Yx7jxEL5NAenGn+iZNwQoTqPxV81dMtybK7CFp7u2RcYZyHfBDh1A
+	EmNerbzF08+K/4jxx4RYLMwTkMrur3Sw3zqgd0RuX5lmjRUfFbxJkFGV7P6cvxeLImu9pJ
+	6UW9CrZY3Z80QpY11nOhI0h/QoHuVtQ=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-28-klqC1BbjP4STxwpU7DalrA-1; Mon,
+ 05 Jan 2026 20:55:33 -0500
+X-MC-Unique: klqC1BbjP4STxwpU7DalrA-1
+X-Mimecast-MFC-AGG-ID: klqC1BbjP4STxwpU7DalrA_1767664532
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D76871956050;
+	Tue,  6 Jan 2026 01:55:31 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.57])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EDDE3195398A;
+	Tue,  6 Jan 2026 01:55:26 +0000 (UTC)
+Date: Tue, 6 Jan 2026 09:55:22 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Shuah Khan <shuah@kernel.org>,
+	linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Stanley Zhang <stazhang@purestorage.com>,
-	Uday Shankar <ushankar@purestorage.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Caleb Sander Mateos <csander@purestorage.com>
-Subject: [PATCH v3 19/19] selftests: ublk: add end-to-end integrity test
-Date: Mon,  5 Jan 2026 17:57:51 -0700
-Message-ID: <20260106005752.3784925-20-csander@purestorage.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20260106005752.3784925-1-csander@purestorage.com>
-References: <20260106005752.3784925-1-csander@purestorage.com>
+	Uday Shankar <ushankar@purestorage.com>
+Subject: Re: [PATCH v2 04/19] ublk: set request integrity params in
+ ublksrv_io_desc
+Message-ID: <aVxrih4F_V58QM3S@fedora>
+References: <20260103004529.1582405-1-csander@purestorage.com>
+ <20260103004529.1582405-5-csander@purestorage.com>
+ <aVkkSxNNUBMz9E61@fedora>
+ <CADUfDZqF2rWRQVptMjM7JedkkHfM-K+V65=odLcdrc3OM9jsJg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADUfDZqF2rWRQVptMjM7JedkkHfM-K+V65=odLcdrc3OM9jsJg@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Add test case loop_08 to verify the ublk integrity data flow. It uses
-the kublk loop target to create a ublk device with integrity on top of
-backing data and integrity files. It then writes to the whole device
-with fio configured to generate integrity data. Then it reads back the
-whole device with fio configured to verify the integrity data.
-It also verifies that injected guard, reftag, and apptag corruptions are
-correctly detected.
+On Mon, Jan 05, 2026 at 08:44:48AM -0800, Caleb Sander Mateos wrote:
+> On Sat, Jan 3, 2026 at 6:14 AM Ming Lei <ming.lei@redhat.com> wrote:
+> >
+> > On Fri, Jan 02, 2026 at 05:45:14PM -0700, Caleb Sander Mateos wrote:
+> > > Indicate to the ublk server when an incoming request has integrity data
+> > > by setting UBLK_IO_F_INTEGRITY in the ublksrv_io_desc's op_flags field.
+> > > If the ublk device doesn't support integrity, the request will never
+> > > provide integrity data. If the ublk device supports integrity, the
+> > > request may omit the integrity buffer only if metadata_size matches the
+> > > PI tuple size determined by csum_type. In this case, the ublk server
+> > > should internally generate/verify the protection information from the
+> > > data and sector offset.
+> > > Set the UBLK_IO_F_CHECK_{GUARD,REFTAG,APPTAG} flags based on the
+> > > request's BIP_CHECK_{GUARD,REFTAG,APPTAG} flags, indicating whether to
+> > > verify the guard, reference, and app tags in the protection information.
+> > > The expected reference tag (32 or 48 bits) and app tag (16 bits) are
+> > > indicated in ublksrv_io_desc's new struct ublksrv_io_integrity integrity
+> > > field. This field is unioned with the addr field to avoid changing the
+> >
+> > It might be fine to set per-rq app_tag, but bios in one request might have
+> > different app_tag in case of io merge actually.
+> 
+> I based this logic largely on the code under if (ns->head->ms) in
+> nvme_setup_rw(). That also assumes a single app_tag for the request.
+> Sounds like an existing bug if bios with different app_tags can be
+> merged together?
 
-Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
----
- tools/testing/selftests/ublk/Makefile        |   1 +
- tools/testing/selftests/ublk/test_loop_08.sh | 111 +++++++++++++++++++
- 2 files changed, 112 insertions(+)
- create mode 100755 tools/testing/selftests/ublk/test_loop_08.sh
+Looks it is true.
 
-diff --git a/tools/testing/selftests/ublk/Makefile b/tools/testing/selftests/ublk/Makefile
-index bfd68ae64142..ab745443fd58 100644
---- a/tools/testing/selftests/ublk/Makefile
-+++ b/tools/testing/selftests/ublk/Makefile
-@@ -33,10 +33,11 @@ TEST_PROGS += test_loop_02.sh
- TEST_PROGS += test_loop_03.sh
- TEST_PROGS += test_loop_04.sh
- TEST_PROGS += test_loop_05.sh
- TEST_PROGS += test_loop_06.sh
- TEST_PROGS += test_loop_07.sh
-+TEST_PROGS += test_loop_08.sh
- TEST_PROGS += test_stripe_01.sh
- TEST_PROGS += test_stripe_02.sh
- TEST_PROGS += test_stripe_03.sh
- TEST_PROGS += test_stripe_04.sh
- TEST_PROGS += test_stripe_05.sh
-diff --git a/tools/testing/selftests/ublk/test_loop_08.sh b/tools/testing/selftests/ublk/test_loop_08.sh
-new file mode 100755
-index 000000000000..ca289cfb2ad4
---- /dev/null
-+++ b/tools/testing/selftests/ublk/test_loop_08.sh
-@@ -0,0 +1,111 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
-+
-+if ! _have_program fio; then
-+	exit $UBLK_SKIP_CODE
-+fi
-+
-+fio_version=$(fio --version)
-+if [[ "$fio_version" =~ fio-[0-9]+\.[0-9]+$ ]]; then
-+	echo "Requires development fio version with https://github.com/axboe/fio/pull/1992"
-+	exit $UBLK_SKIP_CODE
-+fi
-+
-+TID=loop_08
-+
-+_prep_test "loop" "end-to-end integrity"
-+
-+_create_backfile 0 256M
-+_create_backfile 1 32M # 256M * (64 integrity bytes / 512 data bytes)
-+integrity_params="--integrity_capable --integrity_reftag
-+                  --metadata_size 64 --pi_offset 56 --csum_type t10dif"
-+dev_id=$(_add_ublk_dev -t loop -u $integrity_params "${UBLK_BACKFILES[@]}")
-+_check_add_dev $TID $?
-+
-+# 1M * (64 integrity bytes / 512 data bytes) = 128K
-+fio_args="--ioengine io_uring --direct 1 --bsrange 512-1M --iodepth 32
-+          --md_per_io_size 128K --pi_act 0 --pi_chk GUARD,REFTAG,APPTAG
-+          --filename /dev/ublkb$dev_id"
-+fio --name fill --rw randwrite $fio_args > /dev/null
-+err=$?
-+if [ $err != 0 ]; then
-+	echo "fio fill failed"
-+	_show_result $TID $err
-+fi
-+
-+fio --name verify --rw randread $fio_args > /dev/null
-+err=$?
-+if [ $err != 0 ]; then
-+	echo "fio verify failed"
-+	_show_result $TID $err
-+fi
-+
-+fio_err=$(mktemp fio_err_XXXXX)
-+
-+# Overwrite 4-byte reftag at offset 56 + 4 = 60
-+dd_reftag_args="bs=1 seek=60 count=4 oflag=dsync conv=notrunc status=none"
-+dd if=/dev/urandom "of=${UBLK_BACKFILES[1]}" $dd_reftag_args
-+err=$?
-+if [ $err != 0 ]; then
-+	echo "dd corrupted_reftag failed"
-+	rm -f "$fio_err"
-+	_show_result $TID $err
-+fi
-+if fio --name corrupted_reftag --rw randread $fio_args > /dev/null 2> "$fio_err"; then
-+	echo "fio corrupted_reftag unexpectedly succeeded"
-+	rm -f "$fio_err"
-+	_show_result $TID 255
-+fi
-+expected_err="REFTAG compare error: LBA: 0 Expected=0, Actual="
-+if ! grep -q "$expected_err" "$fio_err"; then
-+	echo "fio corrupted_reftag message not found: $expected_err"
-+	rm -f "$fio_err"
-+	_show_result $TID 255
-+fi
-+# Reset to 0
-+dd if=/dev/zero "of=${UBLK_BACKFILES[1]}" $dd_reftag_args
-+err=$?
-+if [ $err != 0 ]; then
-+	echo "dd restore corrupted_reftag failed"
-+	rm -f "$fio_err"
-+	_show_result $TID $err
-+fi
-+
-+dd_data_args="bs=512 count=1 oflag=direct,dsync conv=notrunc status=none"
-+dd if=/dev/zero "of=${UBLK_BACKFILES[0]}" $dd_data_args
-+err=$?
-+if [ $err != 0 ]; then
-+	echo "dd corrupted_data failed"
-+	rm -f "$fio_err"
-+	_show_result $TID $err
-+fi
-+if fio --name corrupted_data --rw randread $fio_args > /dev/null 2> "$fio_err"; then
-+	echo "fio corrupted_data unexpectedly succeeded"
-+	rm -f "$fio_err"
-+	_show_result $TID 255
-+fi
-+expected_err="Guard compare error: LBA: 0 Expected=0, Actual="
-+if ! grep -q "$expected_err" "$fio_err"; then
-+	echo "fio corrupted_data message not found: $expected_err"
-+	rm -f "$fio_err"
-+	_show_result $TID 255
-+fi
-+
-+if fio --name bad_apptag --rw randread $fio_args --apptag 0x4321 > /dev/null 2> "$fio_err"; then
-+	echo "fio bad_apptag unexpectedly succeeded"
-+	rm -f "$fio_err"
-+	_show_result $TID 255
-+fi
-+expected_err="APPTAG compare error: LBA: [0-9]* Expected=4321, Actual=1234"
-+if ! grep -q "$expected_err" "$fio_err"; then
-+	echo "fio bad_apptag message not found: $expected_err"
-+	rm -f "$fio_err"
-+	_show_result $TID 255
-+fi
-+
-+rm -f "$fio_err"
-+
-+_cleanup_test
-+_show_result $TID 0
--- 
-2.45.2
+> 
+> >
+> > Also block layer builds ref_tag for each internal, please see
+> 
+> What do you mean by "internal"? "interval"?
+> 
+> > t10_pi_generate() and ext_pi_crc64_generate().
+> 
+> Yes, the reftag increases by 1 for each integrity interval. That's why
+> it suffices for an NVMe command reading multiple blocks to specify
+> only the expected reftag for the first block; the reftags for
+> subsequent blocks are incremented accordingly.
+> 
+> Actually, I think we probably don't need to communicate the reftag
+> seed to the ublk server. NVMe doesn't use the reftag seed (which can
+> be overridden by struct uio_meta's seed field). Instead,
+> nvme_set_ref_tag() always uses the offset into the block device
+> divided by the integrity interval size, as required by all the
+> existing csum_type formats the kernel supports. So a ublk server could
+> just use the start_sector field of struct ublksrv_io_desc to compute
+> the expected reftags. And using start_sector as the reftag also means
+> merging requests would preserve their expected reftags.
+
+IMO, this way looks fine from user viewpoint, especially aligning with NVMe. 
+
+> 
+> >
+> > So looks this way is wrong.
+> >
+> > More importantly reusing iod->addr for other purpose not related with IO
+> > buffer is very unfriendly for adding new features, and one lesson is for ZONED support
+> > by reusing ublksrv_io_cmd->addr for zoned's append lba.
+> 
+> That's a fair point.
+
+One candidate is add per-IO mmaped meta area, which can be flexible to
+cover more use cases. 
+
+> 
+> >
+> > For example, there is chance to support dma-buf based zero copy for ublk, and
+> > please see the io-uring dma-buf support[1], and iod->addr might carry IO buffer info
+> > in dma-buf format in future.
+> >
+> > [1] https://lore.kernel.org/io-uring/cover.1763725387.git.asml.silence@gmail.com/#t
+
+BTW, PI data size is often small, and it belongs to kernel, there could be
+chance to define PI data as pre-mapped DMA-BUF, then almost all drivers can
+benefit from avoiding the runtime dma mapping for meta. But that may be one
+bigger thing.
+
+> >
+> >
+> > > size of struct ublksrv_io_desc. UBLK_F_INTEGRITY requires
+> > > UBLK_F_USER_COPY and the addr field isn't used for UBLK_F_USER_COPY, so
+> > > the two fields aren't needed simultaneously.
+> > >
+> > > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+> > > ---
+> > >  drivers/block/ublk_drv.c      | 43 +++++++++++++++++++++++++++++++----
+> > >  include/uapi/linux/ublk_cmd.h | 27 ++++++++++++++++++++--
+> > >  2 files changed, 64 insertions(+), 6 deletions(-)
+> > >
+> > > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > > index 2f9316febf83..51469e0627ff 100644
+> > > --- a/drivers/block/ublk_drv.c
+> > > +++ b/drivers/block/ublk_drv.c
+> > > @@ -316,10 +316,36 @@ static inline bool ublk_dev_is_zoned(const struct ublk_device *ub)
+> > >  static inline bool ublk_queue_is_zoned(const struct ublk_queue *ubq)
+> > >  {
+> > >       return ubq->flags & UBLK_F_ZONED;
+> > >  }
+> > >
+> > > +static void ublk_setup_iod_buf(const struct ublk_queue *ubq,
+> > > +                            const struct request *req,
+> > > +                            struct ublksrv_io_desc *iod)
+> > > +{
+> > > +#ifdef CONFIG_BLK_DEV_INTEGRITY
+> > > +     if (ubq->flags & UBLK_F_INTEGRITY) {
+> > > +             struct bio_integrity_payload *bip;
+> > > +             sector_t ref_tag_seed;
+> > > +
+> > > +             if (!blk_integrity_rq(req))
+> > > +                     return;
+> > > +
+> > > +             bip = bio_integrity(req->bio);
+> > > +             ref_tag_seed = bip_get_seed(bip);
+> >
+> > As mentioned, t10_pi_generate() and ext_pi_crc64_generate() builds
+> > per-internal ref tag.
+> 
+> As mentioned, the reftags for subsequent intervals can be computed by
+> simply incrementing the seed. If the seed is assumed to always be
+> start_sector >> (interval_exp - SECTOR_SHIFT), then it may not be
+> necessary to communicate ref_tag_seed at all.
+
+Fair enough, but this should be documented in UAPI interface.
+
+> 
+> >
+> >
+> > > +             iod->integrity.ref_tag_lo = ref_tag_seed;
+> > > +             iod->integrity.ref_tag_hi = ref_tag_seed >> 32;
+> > > +             iod->integrity.app_tag = bip->app_tag;
+> >
+> > In case of io merge, each bio may have different ->app_tag.
+> 
+> It seems like it would make more sense to prevent merging bios with
+> different app_tags. In the common case where a request contains a
+> single bio, which has a single app_tag, it would be much more
+> efficient to communicate only the 1 app_tag instead of having to pass
+> a separate app_tag for every logical block/integrity interval.
+
+OK.
+
+> 
+> >
+> > Given you have to copy meta data via user copy, I suggest to follow the PI
+> > standard and make it per-internal.
+> 
+> How are you suggesting the ublk server access bip->app_tag and
+> bip_get_seed(bip) (if overriding the reftag seed is supported)? Would
+> the ublk server need to make another user copy syscall?
+> 
+> Or would you prefer I drop the BIP_CHECK_* flag support from this
+> patch set for now?
+
+I can understand the motivation, and extra syscall should be avoided for
+communicating reftag & apptag only, given you have explained both can be
+per-request instead of per-interval.
+
+But iod->addr should be avoided for this purpose, otherwise, new feature
+can conflict with this usage easily.
+
+But per-io mmapped area can solve this issue, the meta size can be one parameter
+of `ublksrv_ctrl_dev_info` with feature flag of UBLK_F_MMAPED_IO_META, what
+do you think of this way?
+
+
+Thanks,
+Ming
 
