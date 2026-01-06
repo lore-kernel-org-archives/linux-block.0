@@ -1,428 +1,282 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3665F218E91
-	for <linux-block@vger.kernel.org>; Tue,  6 Jan 2026 16:36:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B8AF33ADB9;
+	Tue,  6 Jan 2026 16:43:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767717375; cv=none; b=RIbU12iZlMmzJx1QC8OZV7c0vKgZetb7g79D7BXfousXjHgwJ1jvi7g4UyjVZi6R6PeJ2QS7S9aD+e6zhGth9LGDvDvPEJxn+M7MYrUY0I/+75G7JualJKgnD56DZrHHHvS6D34wQF8S1ouAVZ8uC9etn+GMCYlohCUwPZcq6B8=
+	t=1767717821; cv=none; b=a9Im5WuRnhWF6Wju8RWd/7GuvcCalJnS7bRG72edy/8zrG97qkSKBSyaGCAPiAex5dhXBvlWudqNy8wHPNlwg5jS9c5bBJhgKkfsIX7c3MBYS7FGjGze7MTVA+BdovTdD9lYESJInpP//+7CYBVQANsezAkpXdsnViwjqxaLCHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767717375; c=relaxed/simple;
-	bh=fbfnFXxPvdmihDUx6O1pUH15NA4z2Jq0GBIYnKOXeQE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QkTEe567zm5iy7HgJKZivbV2h7BRHDlXEztRXVSTv/itc/+iMoBhLBVSVL5DCsO8JHKnf3GYENqlCBdV6rvWP318PJYXAH22srlDp2hE5UvQ4J340tc1GAezDpfbfoSMScNodfvxRGK/z3GpEIY717Wc6A/azxoRrHcuwXcKoSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ijrpFfJS; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1767717821; c=relaxed/simple;
+	bh=JFUJGb6a2tiXXuw/l9L5ZI/JHw7GzkLasqeAZ17OdR4=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=bexOoB+B1jxNDnkn2HueoCbolCCtvcBynk+HxQ4hZGo7kiQv/MtuWH2VsmEc97jSo38vm8sxzhX1g0ysuREa7PEbRfemMY4593Auod5Lm+iZm4vW37dU/03vrW1wUeifSKNOxBu5aox/RPDGdaFhq7doq9+vNJAHcXvl7UpQspI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=rZcsN54B; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ijrpFfJS"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-47755de027eso7105015e9.0
-        for <linux-block@vger.kernel.org>; Tue, 06 Jan 2026 08:36:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767717371; x=1768322171; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=m05O6szv3ztLcdGBKw/XhCvY0Xp40lTIJVCQNLoUnGg=;
-        b=ijrpFfJStMF/ymo8vgDtRJGkfeCZu5T06KEMsOMkaYYb+hGnR2LA2YNX7Pg4oizrKr
-         GJI069gwnCeAx61RzcuIGzNuVTP4wUoO/NUyJBFxP1iPTn29cc47QoHAdSxzu/d2WnUS
-         NDQanoCnGmwWhn+MDpaLHG8doa3zsHsuN4zOX98UAnuN30jbTksEh91MMgq2S3ZvsNvE
-         X0x9Y4jGttKqZbLjmecAPDOOJ5p/Hgf/jsG4x3WfSYicERi1U4xofm+yBCfurBsGay5l
-         +rrKSckAy3BwelO0CwMJTbvh8RrqCm1mQEORfNg5SZluhu1eq1sashZYqr5rCniaalCY
-         X1bg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767717371; x=1768322171;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=m05O6szv3ztLcdGBKw/XhCvY0Xp40lTIJVCQNLoUnGg=;
-        b=wy7wQZsVKSHNvI+d9Pn++StUeUmW2wUAzs+WzVh6bjcnkW6HKMfIxkGNCohLL1qBsx
-         UrtCTNDUemY8GqpgFbxPPTq5UngmxGvBVYdpB5gpSMwffCX6E34Sg34ThRbxGIHmfquB
-         ttiNAQ+w4ZkqKXb3LlvaJ9Vm/otoMOLhmE98uVV8WLNYCDYTQ02b0dwSwjeH2B6CA9kr
-         2PRGX6rsPVJRBf98eby/c4hPeKtUTRAdQitSqTnuA6qDOJpsrUgJk4o1MPx05+ZHe/0e
-         wjkk6gz9p0SeuSGRCt6UX4YcGl8wWh2W/zs62si8SjLtAyrHMsK+NuB9hzGn5QKoPUR8
-         uFAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUl95hBcj8nJAiEGCaUqVEb4elPW6QMqDQQ1axJdBBYwdYtZnIL2REDeDnTzOsAIXTL9XhS2UN8R0Bzug==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzEE1GpU0EjPClr4AFHsguygg8vR2ywqzXPpH+r4+zZPSX+M69D
-	jVZDaRDxuIvduynZMkHVpZ0J1M2Cjun5SDBr0k/bUMB0e7hgkNFRU6Cj
-X-Gm-Gg: AY/fxX40m4/hFiwK9bqDAdkS7k2Zl2tS3AH/TH7A5XmeTCunyrZE5aAvMfJ1vtpOrwF
-	QUFFZnXubQmBA0i5jVxSNcJAZbawMCap6XVxUtn/H9ynQ38L/KbI/MTcr3v7uP64HGhExlfMDjQ
-	KUoAqnLegQRvsFyJDnI6fShRJblASKls1JJRHIzCSPuPL89HnuElgxKWjx9m75/8yYa8wmSNg6k
-	eATBfpE4ENnfRZbg52NBVsQhWqViTERtFx3UCLtAxCxVcp3c2zmghPvO1txsx2iq/XCZtSTq3Jt
-	aIqbdtzTWS08ZFqprpiqEzoMVwWlE4YOyb0172ZBICaHCBp4sg0T/j83ZwPCSTDRErScf+E2BCF
-	5ffyZnF7qzJoBH6/27w+sD0eUKMIUWtMs2VfVQYIoo3OgZlNJC8cfjJu/IV9C19B/ney415DUYd
-	ynbWgdD9cc4ORKUAj8uMZX8VtWpk5zKuuZRvI2VIgj1UVq
-X-Google-Smtp-Source: AGHT+IFot2qjzVeWiBFgwlHh/92zvu6BeESvfCHb1Xh4NEVOw93szDJC3J99SMXWiI6L0J67PnZwFA==
-X-Received: by 2002:a05:600c:8216:b0:476:4efc:8ed4 with SMTP id 5b1f17b1804b1-47d7f073134mr38820325e9.11.1767717370637;
-        Tue, 06 Jan 2026 08:36:10 -0800 (PST)
-Received: from ionutnechita-arz2022.local ([2a02:2f0e:ca09:7000:33fc:5cce:3767:6b22])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d7f68f686sm50967685e9.3.2026.01.06.08.36.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Jan 2026 08:36:09 -0800 (PST)
-From: "Ionut Nechita (WindRiver)" <djiony2011@gmail.com>
-X-Google-Original-From: "Ionut Nechita (WindRiver)" <ionut.nechita@windriver.com>
-To: ming.lei@redhat.com
-Cc: axboe@kernel.dk,
-	gregkh@linuxfoundation.org,
-	ionut.nechita@windriver.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	muchun.song@linux.dev,
-	sashal@kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] block: Fix WARN_ON in blk_mq_run_hw_queue when called from interrupt context
-Date: Tue,  6 Jan 2026 18:35:13 +0200
-Message-ID: <20260106163515.145571-2-ionut.nechita@windriver.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <aV0kdKSvufPFflQ8@fedora>
-References: <aV0kdKSvufPFflQ8@fedora>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="rZcsN54B"
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 606G04n5017255;
+	Tue, 6 Jan 2026 16:43:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=Hvjq7R
+	AJM+qrNyt4O58uFTb81BE3vAUuat6DzFjDnoE=; b=rZcsN54BDc9sRcTiVN8lA0
+	TcCgtXubk4tLidxvs2QNbOiJSXc9S3pJmH/laaCM42jEl8y6OnDgXUCtTH8eg+Am
+	TYfU09JrC7s7raH8kzFR20V5nQ6GS+lU8SbkIsICOmmPLSplxEUlmckG9aovBYKW
+	YYhvwu8vkizlwOzFuz9kgTDbHzOsjkf6pNPAsGRDrJvBEDB0o59Aht35B+bwnL2j
+	crSDZ1+rz7cbYpW4CM8ID70PPktYQS/3YjQpZHReeXBB4CqXMWBoQoGaTIpItEIu
+	0KGOU/UB886lknWIa3xK5/W/LpF5JNThz5HP4QS7pZxMkjE1ViB7W5i3xkVUjvfg
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4betu64uyc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 06 Jan 2026 16:43:34 +0000 (GMT)
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 606GaFS7032159;
+	Tue, 6 Jan 2026 16:43:34 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4betu64uy7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 06 Jan 2026 16:43:34 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 606DvBnc012604;
+	Tue, 6 Jan 2026 16:43:33 GMT
+Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4bffnjc8g6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 06 Jan 2026 16:43:33 +0000
+Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
+	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 606GhEvP31785662
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 6 Jan 2026 16:43:15 GMT
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2841458056;
+	Tue,  6 Jan 2026 16:43:32 +0000 (GMT)
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CE05158052;
+	Tue,  6 Jan 2026 16:43:29 +0000 (GMT)
+Received: from [9.111.89.66] (unknown [9.111.89.66])
+	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  6 Jan 2026 16:43:29 +0000 (GMT)
+Message-ID: <ba9e9b96-5782-46a2-ba1f-c2b679b7ea3d@linux.ibm.com>
+Date: Tue, 6 Jan 2026 22:13:27 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: kernel build failure when CONFIG_DEBUG_INFO_BTF and CONFIG_KCSAN
+ are enabled
+From: Nilay Shroff <nilay@linux.ibm.com>
+To: Alan Maguire <alan.maguire@oracle.com>, Jiri Olsa <olsajiri@gmail.com>
+Cc: bpf@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <42a1b4b0-83d0-4dda-b1df-15a1b7c7638d@linux.ibm.com>
+ <aSgz3h0Ywa6i3gKT@krava> <214308ce-763c-47a8-8719-70564b3ef49c@oracle.com>
+ <65e3ff98-4490-413e-a075-c1df8e7b2bd1@linux.ibm.com>
+ <a9643691-f456-4414-a13f-a50abf1ac8b4@oracle.com>
+ <6e326cbf-2f19-4619-aa27-3e8b72835b03@linux.ibm.com>
+Content-Language: en-US
+In-Reply-To: <6e326cbf-2f19-4619-aa27-3e8b72835b03@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=QbNrf8bv c=1 sm=1 tr=0 ts=695d3bb6 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=IkcTkHD0fZMA:10 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8 a=yPCof4ZbAAAA:8 a=iowt1JT-1UugtLDoFqgA:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: oaiXtfYn4eFo8SbU6b8ohRwXaELvxluS
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTA2MDE0MSBTYWx0ZWRfX5LQSQQa3wT7C
+ MakpDf/BPQ2YEIQCMI6oj8aDewNZr7NICDFVPEe2Pzl9r1KG82VG41jBXdUag1uo0WVFe/GJfLB
+ 2SaYior7J7umNlQrrdUG5R8nNSgDDTzUJEzJPpysr6CDdcO2EwbLW/mHbC1ofxlm+5U8m36Wa6g
+ J7fhi+KqNuaVkbzZb9zfU9ntgIwJDkZXdBcZYA1WXVwv5NKV0RfbihDTmsmwEfIBdQazyvOpsLy
+ hNiYKwDODDlxG7bXF7l/F39zi1w6ei3ztgXTnLklNq9LGI8bVQCZ1FaeZhsfQtOt+z1xmgUg6fk
+ v0c5sJY/5sMX2GjXHJ7Q7E9Cq75yLXEJhAMwsqPtd4Wv9m4nU4qS+CzGJIkPjN0jrHbHIfjiYjO
+ 2a6bYECxO2ekZEIUdcC2gHTz9OcdpXoNJJ6Tyxvv1zJsK0fRDG4+h6AKjecpjAFnQIqJUJ1EW1X
+ HTK5Fuz8r7oPZddtnpw==
+X-Proofpoint-GUID: xu4xudJNxNuO1ByHqorCGFN43gitJpGV
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-06_01,2026-01-06_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 clxscore=1015 bulkscore=0 suspectscore=0 priorityscore=1501
+ adultscore=0 lowpriorityscore=0 impostorscore=0 phishscore=0 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2512120000 definitions=main-2601060141
 
-From: Ionut Nechita <ionut.nechita@windriver.com>
+Hi Alan,
 
-Hi Ming,
+Gentle ping on this patch...
 
-Thank you for the thorough review. You've identified critical issues with my analysis.
+Did you get a chance to formally send this path upstream?
+On the latest upstream kernel, I could still reproduce this 
+error.
 
-> There is so big change between 6.6.0-1-rt and 6.19, because Real-Time
-> "PREEMPT_RT" Support Merged For Linux 6.12
+Thanks,
+--Nilay
 
-You're absolutely right. I tested on Debian's 6.6.71-rt which uses the out-of-tree
-RT patches. I will retest on Friday with both 6.12 (first kernel with merged RT
-support) and linux-next to confirm whether this issue still exists in current upstream.
+On 11/28/25 3:14 PM, Nilay Shroff wrote:
+> 
+> 
+> On 11/28/25 1:23 PM, Alan Maguire wrote:
+>> On 28/11/2025 06:27, Nilay Shroff wrote:
+>>>
+>>> Hi Alan,
+>>>
+>>> On 11/27/25 9:06 PM, Alan Maguire wrote:
+>>>> On 27/11/2025 11:19, Jiri Olsa wrote:
+>>>>> On Wed, Nov 26, 2025 at 03:59:28PM +0530, Nilay Shroff wrote:
+>>>>>> Hi,
+>>>>>>
+>>>>>> I am encountering the following build failures when compiling the kernel source checked out
+>>>>>> from the for-6.19/block branch [1]:
+>>>>>>
+>>>>>>   KSYMS   .tmp_vmlinux2.kallsyms.S
+>>>>>>   AS      .tmp_vmlinux2.kallsyms.o
+>>>>>>   LD      vmlinux.unstripped
+>>>>>>   BTFIDS  vmlinux.unstripped
+>>>>>> WARN: multiple IDs found for 'task_struct': 110, 3046 - using 110
+>>>>>> WARN: multiple IDs found for 'module': 170, 3055 - using 170
+>>>>>> WARN: multiple IDs found for 'file': 697, 3130 - using 697
+>>>>>> WARN: multiple IDs found for 'vm_area_struct': 714, 3140 - using 714
+>>>>>> WARN: multiple IDs found for 'seq_file': 1060, 3167 - using 1060
+>>>>>> WARN: multiple IDs found for 'cgroup': 2355, 3304 - using 2355
+>>>>>> WARN: multiple IDs found for 'inode': 553, 3339 - using 553
+>>>>>> WARN: multiple IDs found for 'path': 586, 3369 - using 586
+>>>>>> WARN: multiple IDs found for 'bpf_prog': 2565, 3640 - using 2565
+>>>>>> WARN: multiple IDs found for 'bpf_map': 2657, 3837 - using 2657
+>>>>>> WARN: multiple IDs found for 'bpf_link': 2849, 3965 - using 2849
+>>>>>> [...]
+>>>>>> make[2]: *** [scripts/Makefile.vmlinux:72: vmlinux.unstripped] Error 255
+>>>>>> make[2]: *** Deleting file 'vmlinux.unstripped'
+>>>>>> make[1]: *** [/home/src/linux/Makefile:1242: vmlinux] Error 2
+>>>>>> make: *** [Makefile:248: __sub-make] Error 2
+>>>>>>
+>>>>>>
+>>>>>> The build failure appears after commit 42adb2d4ef24 (“fs: Add the __data_racy annotation
+>>>>>> to backing_dev_info.ra_pages”) and commit 935a20d1bebf (“block: Remove queue freezing
+>>>>>> from several sysfs store callbacks”). However, the root cause does not seem to be specific
+>>>>>
+>>>>> yep, looks like __data_racy macro that adds 'volatile' to struct member is causing
+>>>>> the mismatch during deduplication
+>>>>>
+>>>>> when you enable KCSAN some objects may opt out from it (via KCSAN_SANITIZE := n or
+>>>>> such) and they will be compiled without __SANITIZE_THREAD__ macro defined which means
+>>>>> __data_racy will be empty .. and we will get 2 versions of 'struct backing_dev_info'
+>>>>> which cascades up to the task_struct and others
+>>>>>
+>>>>> not sure what's the best solution in here.. could we ignore volatile for
+>>>>> the field in the struct during deduplication? 
+>>>>>
+>>>>
+>>>> Yeah, it seems like a slightly looser form of equivalence matching might be needed.
+>>>> The following libbpf change ignores modifiers in type equivalence comparison and 
+>>>> resolves the issue for me. It might be too big a hammer though, what do folks think?
+>>>>
+>>>> From 160fb6610d75d3cdc38a9729cc17875a302a7189 Mon Sep 17 00:00:00 2001
+>>>> From: Alan Maguire <alan.maguire@oracle.com>
+>>>> Date: Thu, 27 Nov 2025 15:22:04 +0000
+>>>> Subject: [RFC bpf-next] libbpf: BTF dedup should ignore modifiers in type
+>>>>  equivalence checks
+>>>>
+>>>> We see identical type problems in [1] as a result of an occasionally
+>>>> applied volatile modifier to kernel data structures. Such things can
+>>>> result from different header include patterns, explicit Makefile
+>>>> rules etc.  As a result consider types with modifiers (const, volatile,
+>>>> restrict, type tag) as equivalent for dedup equivalence testing purposes.
+>>>>
+>>>> [1] https://lore.kernel.org/bpf/42a1b4b0-83d0-4dda-b1df-15a1b7c7638d@linux.ibm.com/
+>>>>
+>>>> Reported-by: Nilay Shroff <nilay@linux.ibm.com>
+>>>> Signed-off-by: Alan Maguire <alan.maguire@oracle.com>
+>>>> ---
+>>>>  tools/lib/bpf/btf.c | 27 +++++++++++++++++++++------
+>>>>  1 file changed, 21 insertions(+), 6 deletions(-)
+>>>>
+>>>> diff --git a/tools/lib/bpf/btf.c b/tools/lib/bpf/btf.c
+>>>> index e5003885bda8..384194a6cdae 100644
+>>>> --- a/tools/lib/bpf/btf.c
+>>>> +++ b/tools/lib/bpf/btf.c
+>>>> @@ -4678,12 +4678,10 @@ static int btf_dedup_is_equiv(struct btf_dedup *d, __u32 cand_id,
+>>>>  	cand_kind = btf_kind(cand_type);
+>>>>  	canon_kind = btf_kind(canon_type);
+>>>>  
+>>>> -	if (cand_type->name_off != canon_type->name_off)
+>>>> -		return 0;
+>>>> -
+>>>>  	/* FWD <--> STRUCT/UNION equivalence check, if enabled */
+>>>> -	if ((cand_kind == BTF_KIND_FWD || canon_kind == BTF_KIND_FWD)
+>>>> -	    && cand_kind != canon_kind) {
+>>>> +	if ((cand_kind == BTF_KIND_FWD || canon_kind == BTF_KIND_FWD) &&
+>>>> +	    cand_type->name_off == canon_type->name_off &&
+>>>> +	    cand_kind != canon_kind) {
+>>>>  		__u16 real_kind;
+>>>>  		__u16 fwd_kind;
+>>>>  
+>>>> @@ -4700,7 +4698,24 @@ static int btf_dedup_is_equiv(struct btf_dedup *d, __u32 cand_id,
+>>>>  		return fwd_kind == real_kind;
+>>>>  	}
+>>>>  
+>>>> -	if (cand_kind != canon_kind)
+>>>> +	/*
+>>>> +	 * Types are considered equivalent if modifiers (const, volatile,
+>>>> +	 * restrict, type tag) are present for one but not the other.
+>>>> +	 */
+>>>> +	if (cand_kind != canon_kind) {
+>>>> +		__u32 next_cand_id = cand_id;
+>>>> +		__u32 next_canon_id = canon_id;
+>>>> +
+>>>> +		if (btf_is_mod(cand_type))
+>>>> +			next_cand_id = cand_type->type;
+>>>> +		if (btf_is_mod(canon_type))
+>>>> +			next_canon_id = canon_type->type;
+>>>> +		if (cand_id == next_cand_id && canon_id == next_canon_id)
+>>>> +			return 0;
+>>>> +		return btf_dedup_is_equiv(d, next_cand_id, next_canon_id);
+>>>> +	}
+>>>> +
+>>>> +	if (cand_type->name_off != canon_type->name_off)
+>>>>  		return 0;
+>>>>  
+>>>>  	switch (cand_kind) {
+>>>
+>>> Thanks for your patch! I just applied it on my tree and rebuild the 
+>>> tree. However I am still seeing the same compilation warnings. I am
+>>> using the latest for-6.19/block branch[1].
+>>>
+>>> [1] https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git/log/?h=for-6.19/block 
+>>>
+>>
+>> hi Nilay,
+>>
+>> The tricky part with testing this is ensure that pahole is using the updated libbpf 
+>> rather than just the kernel itself. Did you  "make install" the modified libbpf and 
+>> ensure that pahole was using it by building pahole with the cmake option 
+>> -DLIBBPF_EMBEDDED=OFF ? That's the easiest way to ensure the change makes it into pahole; 
+>> you can check shared library usage using  "ldd /usr/local/bin/pahole". The other option 
+>> is to apply the change to the embedded libbpf in the lib/bpf directory in pahole.
+>>
+>> I tested the for-6.19/block branch with your config before and after making the
+>> above change and applying it to pahole and things woorked. If that's doable from your
+>> side that would be great. Thanks!
+>>
+> Thanks Alan! And obviously I didn't updated pahole using patched libbpf. Now I have 
+> just updated pahole which uses the your patched libbpf. With this change, I confirmed
+> that your patch fixes this compilation warnings for me. 
+> 
+> # which pahole
+> /usr/local/bin/pahole
+> 
+> # ldd /usr/local/bin/pahole | grep libbpf
+> 	libbpf.so.1 => /usr/local/lib64/libbpf.so.1 (0x00007fffa2fc0000)
+> 
+> With this test, please feel free to add,
+> 
+> Acked-by: Nilay Shroff<nilay@linux.ibm.com>
+> 
 
-> Why is the above warning related with your patch?
-
-After reviewing the complete dmesg log, I now see there are TWO separate errors
-from the same process (PID 2041):
-
-**Error #1** - Root cause (the one you highlighted):
-```
-BUG: scheduling while atomic: kworker/u385:1/2041/0x00000002
-  mutex_lock
-  → __cpuhp_state_add_instance
-  → blk_mq_realloc_hw_ctxs
-  → blk_mq_init_queue
-  → scsi_alloc_sdev          ← Queue ALLOCATION
-```
-
-**Error #2** - Symptom (the one my patch addresses):
-```
-WARNING at blk_mq_run_hw_queue+0x1fa
-  blk_mq_run_hw_queue
-  → blk_mq_run_hw_queues
-  → blk_queue_start_drain
-  → blk_mq_destroy_queue
-  → __scsi_remove_device
-  → scsi_alloc_sdev          ← Queue DESTRUCTION (cleanup)
-```
-
-The sequence is:
-1. Queue allocation in scsi_alloc_sdev() hits Error #1 (mutex in atomic context)
-2. Allocation fails, enters cleanup path
-3. Cleanup calls blk_mq_destroy_queue() while STILL in atomic context
-4. blk_queue_start_drain() → blk_mq_run_hw_queues(q, false)
-5. WARN_ON(!async && in_interrupt()) triggers → Error #2
-
-> Or please share how preempt is disabled in the above blk_mq_run_hw_queues
-> code path.
-
-The atomic context (preempt_count = 0x00000002) is inherited from Error #1.
-The code is already in atomic state when it enters the cleanup path.
-
-> If you think the same issue exists on recent kernel, show the stack trace.
-
-I don't have current data from upstream kernels. I will test on Friday and provide:
-1. Results from 6.12-rt (first kernel with merged RT support)
-2. Results from linux-next
-3. Complete stack traces if the issue reproduces
-
-If the issue still exists on current upstream, I need to address Error #1 (the
-root cause) rather than Error #2 (the symptom). My current patch only suppresses
-the warning during cleanup but doesn't fix the underlying atomic context problem.
-
-I will report back with test results on Friday.
-
- - 
-
-BUG: scheduling while atomic: kworker/u385:1/2041/0x00000002
-Modules linked in:
-CPU: 190 PID: 2041 Comm: kworker/u385:1 Not tainted 6.6.0-1-rt-amd64 #1  Debian 6.6.71-1
-Hardware name: Dell Inc. PowerEdge R7615/09K9WP, BIOS 1.11.2 12/19/2024
-Workqueue: events_unbound async_run_entry_fn
-Call Trace:
- <TASK>
- dump_stack_lvl+0x37/0x50
- __schedule_bug+0x52/0x60
- __schedule+0x87d/0xb10
- rt_mutex_schedule+0x21/0x40
- rt_mutex_slowlock_block.constprop.0+0x33/0x170
- __rt_mutex_slowlock_locked.constprop.0+0xc4/0x1e0
- mutex_lock+0x44/0x60
- __cpuhp_state_add_instance_cpuslocked+0x41/0x110
- __cpuhp_state_add_instance+0x48/0xd0
- blk_mq_realloc_hw_ctxs+0x405/0x420
- blk_mq_init_allocated_queue+0x10a/0x480
-intel_rapl_common: Found RAPL domain package
- ? srso_alias_return_thunk+0x5/0xfbef5
-intel_rapl_common: Found RAPL domain core
- ? percpu_ref_init+0x6e/0x130
- blk_mq_init_queue+0x3c/0x70
- scsi_alloc_sdev+0x225/0x360
- scsi_probe_and_add_lun+0x8ac/0xc00
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? dev_set_name+0x57/0x80
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? attribute_container_add_device+0x4d/0x130
- __scsi_scan_target+0xf0/0x520
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? sched_clock_cpu+0x64/0x190
- scsi_scan_channel+0x57/0x90
- scsi_scan_host_selected+0xd4/0x110
- do_scan_async+0x1c/0x190
- async_run_entry_fn+0x2f/0x130
- process_one_work+0x175/0x370
- worker_thread+0x280/0x390
- ? __pfx_worker_thread+0x10/0x10
- kthread+0xdd/0x110
- ? __pfx_kthread+0x10/0x10
- ret_from_fork+0x31/0x50
- ? __pfx_kthread+0x10/0x10
- ret_from_fork_asm+0x1b/0x30
- </TASK>
-gnss: GNSS driver registered with major 241
-------------[ cut here ]------------
-WARNING: CPU: 190 PID: 2041 at block/blk-mq.c:2291 blk_mq_run_hw_queue+0x1fa/0x260
-Modules linked in:
-CPU: 190 PID: 2041 Comm: kworker/u385:1 Tainted: G        W          6.6.0-1-rt-amd64 #1  Debian 6.6.71-1
-Hardware name: Dell Inc. PowerEdge R7615/09K9WP, BIOS 1.11.2 12/19/2024
-Workqueue: events_unbound async_run_entry_fn
-RIP: 0010:blk_mq_run_hw_queue+0x1fa/0x260
-Code: ff 75 68 44 89 f6 e8 e5 45 c0 ff e9 ac fe ff ff e8 2b 70 c0 ff 48 89 ef e8 b3 a0 00 00 5b 5d 41 5c 41 5d 41 5e e9 26 9e c0 ff <0f> 0b e9 43 fe ff ff e8 0a 70 c0 ff 48 8b 85 d0 00 00 00 48 8b 80
-RSP: 0018:ff630f098528fb98 EFLAGS: 00010206
-RAX: 0000000000ff0000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: 0000000000ff0000 RSI: 0000000000000000 RDI: ff3edc0247159400
-RBP: ff3edc0247159400 R08: ff3edc0247159400 R09: ff630f098528fb60
-R10: 0000000000000000 R11: 0000000045069ed3 R12: 0000000000000000
-R13: ff3edc024715a828 R14: 0000000000000000 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ff3edc10fd380000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 000000073961a001 CR4: 0000000000771ee0
-PKRU: 55555554
-Call Trace:
- <TASK>
- ? __warn+0x89/0x140
- ? blk_mq_run_hw_queue+0x1fa/0x260
- ? report_bug+0x198/0x1b0
- ? handle_bug+0x53/0x90
- ? exc_invalid_op+0x18/0x70
- ? asm_exc_invalid_op+0x1a/0x20
- ? blk_mq_run_hw_queue+0x1fa/0x260
- blk_mq_run_hw_queues+0x6c/0x130
- blk_queue_start_drain+0x12/0x40
- blk_mq_destroy_queue+0x37/0x70
- __scsi_remove_device+0x6a/0x180
- scsi_alloc_sdev+0x357/0x360
- scsi_probe_and_add_lun+0x8ac/0xc00
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? dev_set_name+0x57/0x80
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? attribute_container_add_device+0x4d/0x130
- __scsi_scan_target+0xf0/0x520
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? sched_clock_cpu+0x64/0x190
- scsi_scan_channel+0x57/0x90
- scsi_scan_host_selected+0xd4/0x110
- do_scan_async+0x1c/0x190
- async_run_entry_fn+0x2f/0x130
- process_one_work+0x175/0x370
- worker_thread+0x280/0x390
- ? __pfx_worker_thread+0x10/0x10
- kthread+0xdd/0x110
- ? __pfx_kthread+0x10/0x10
- ret_from_fork+0x31/0x50
- ? __pfx_kthread+0x10/0x10
- ret_from_fork_asm+0x1b/0x30
- </TASK>
----[ end trace 0000000000000000 ]---
-------------[ cut here ]------------
-WARNING: CPU: 190 PID: 2041 at kernel/time/timer.c:1570 __timer_delete_sync+0x152/0x170
-Modules linked in:
-CPU: 190 PID: 2041 Comm: kworker/u385:1 Tainted: G        W          6.6.0-1-rt-amd64 #1  Debian 6.6.71-1
-Hardware name: Dell Inc. PowerEdge R7615/09K9WP, BIOS 1.11.2 12/19/2024
-Workqueue: events_unbound async_run_entry_fn
-RIP: 0010:__timer_delete_sync+0x152/0x170
-Code: 8b 04 24 4c 89 c7 e8 ad 11 b9 00 f0 ff 4d 30 4c 8b 04 24 4c 89 c7 e8 8d 03 b9 00 be 00 02 00 00 4c 89 ff e8 e0 83 f3 ff eb 93 <0f> 0b e9 e8 fe ff ff 49 8d 2c 16 eb a8 e8 5c 49 b8 00 66 66 2e 0f
-RSP: 0018:ff630f098528fba8 EFLAGS: 00010246
-RAX: 000000007fffffff RBX: ff3edc02829426d0 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: ff3edc02829426d0
-RBP: ff3edc02829425b0 R08: ff3edc0282942938 R09: ff630f098528fba0
-R10: 0000000000000000 R11: 0000000045069ed3 R12: 0000000000000000
-R13: ff3edc024715a828 R14: 0000000000000000 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ff3edc10fd380000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 000000073961a001 CR4: 0000000000771ee0
-PKRU: 55555554
-Call Trace:
- <TASK>
- ? __warn+0x89/0x140
- ? __timer_delete_sync+0x152/0x170
- ? report_bug+0x198/0x1b0
- ? handle_bug+0x53/0x90
- ? exc_invalid_op+0x18/0x70
- ? asm_exc_invalid_op+0x1a/0x20
- ? __timer_delete_sync+0x152/0x170
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? percpu_ref_is_zero+0x3b/0x50
- ? srso_alias_return_thunk+0x5/0xfbef5
- blk_sync_queue+0x19/0x30
- blk_mq_destroy_queue+0x47/0x70
- __scsi_remove_device+0x6a/0x180
- scsi_alloc_sdev+0x357/0x360
- scsi_probe_and_add_lun+0x8ac/0xc00
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? dev_set_name+0x57/0x80
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? attribute_container_add_device+0x4d/0x130
- __scsi_scan_target+0xf0/0x520
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? sched_clock_cpu+0x64/0x190
- scsi_scan_channel+0x57/0x90
- scsi_scan_host_selected+0xd4/0x110
- do_scan_async+0x1c/0x190
- async_run_entry_fn+0x2f/0x130
- process_one_work+0x175/0x370
- worker_thread+0x280/0x390
- ? __pfx_worker_thread+0x10/0x10
- kthread+0xdd/0x110
- ? __pfx_kthread+0x10/0x10
- ret_from_fork+0x31/0x50
- ? __pfx_kthread+0x10/0x10
- ret_from_fork_asm+0x1b/0x30
- </TASK>
----[ end trace 0000000000000000 ]---
-drop_monitor: Initializing network drop monitor service
-------------[ cut here ]------------
-WARNING: CPU: 190 PID: 2041 at kernel/time/timer.c:1570 __timer_delete_sync+0x152/0x170
-Modules linked in:
-CPU: 190 PID: 2041 Comm: kworker/u385:1 Tainted: G        W          6.6.0-1-rt-amd64 #1  Debian 6.6.71-1
-Hardware name: Dell Inc. PowerEdge R7615/09K9WP, BIOS 1.11.2 12/19/2024
-Workqueue: events_unbound async_run_entry_fn
-RIP: 0010:__timer_delete_sync+0x152/0x170
-Code: 8b 04 24 4c 89 c7 e8 ad 11 b9 00 f0 ff 4d 30 4c 8b 04 24 4c 89 c7 e8 8d 03 b9 00 be 00 02 00 00 4c 89 ff e8 e0 83 f3 ff eb 93 <0f> 0b e9 e8 fe ff ff 49 8d 2c 16 eb a8 e8 5c 49 b8 00 66 66 2e 0f
-RSP: 0018:ff630f098528fba8 EFLAGS: 00010246
-RAX: 000000007fffffff RBX: ff3edc0282943790 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: ff3edc0282943790
-RBP: ff3edc0282943670 R08: ff3edc02829439f8 R09: ff630f098528fba0
-R10: 0000000000000000 R11: 00000000b3b80e06 R12: 0000000000000000
-R13: ff3edc02828dc428 R14: 0000000000000000 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ff3edc10fd380000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 000000073961a001 CR4: 0000000000771ee0
-PKRU: 55555554
-Call Trace:
- <TASK>
- ? __warn+0x89/0x140
- ? __timer_delete_sync+0x152/0x170
- ? report_bug+0x198/0x1b0
- ? handle_bug+0x53/0x90
- ? exc_invalid_op+0x18/0x70
- ? asm_exc_invalid_op+0x1a/0x20
- ? __timer_delete_sync+0x152/0x170
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? percpu_ref_is_zero+0x3b/0x50
- ? srso_alias_return_thunk+0x5/0xfbef5
- blk_sync_queue+0x19/0x30
- blk_mq_destroy_queue+0x47/0x70
- __scsi_remove_device+0x6a/0x180
- scsi_alloc_sdev+0x357/0x360
- scsi_probe_and_add_lun+0x8ac/0xc00
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? dev_set_name+0x57/0x80
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? attribute_container_add_device+0x4d/0x130
- __scsi_scan_target+0xf0/0x520
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? sched_clock_cpu+0x64/0x190
- scsi_scan_channel+0x57/0x90
- scsi_scan_host_selected+0xd4/0x110
- do_scan_async+0x1c/0x190
- async_run_entry_fn+0x2f/0x130
- process_one_work+0x175/0x370
- worker_thread+0x280/0x390
- ? __pfx_worker_thread+0x10/0x10
- kthread+0xdd/0x110
- ? __pfx_kthread+0x10/0x10
- ret_from_fork+0x31/0x50
- ? __pfx_kthread+0x10/0x10
- ret_from_fork_asm+0x1b/0x30
- </TASK>
----[ end trace 0000000000000000 ]---
-------------[ cut here ]------------
-WARNING: CPU: 190 PID: 2041 at kernel/time/timer.c:1570 __timer_delete_sync+0x152/0x170
-Modules linked in:
-CPU: 190 PID: 2041 Comm: kworker/u385:1 Tainted: G        W          6.6.0-1-rt-amd64 #1  Debian 6.6.71-1
-Hardware name: Dell Inc. PowerEdge R7615/09K9WP, BIOS 1.11.2 12/19/2024
-Workqueue: events_unbound async_run_entry_fn
-RIP: 0010:__timer_delete_sync+0x152/0x170
-Code: 8b 04 24 4c 89 c7 e8 ad 11 b9 00 f0 ff 4d 30 4c 8b 04 24 4c 89 c7 e8 8d 03 b9 00 be 00 02 00 00 4c 89 ff e8 e0 83 f3 ff eb 93 <0f> 0b e9 e8 fe ff ff 49 8d 2c 16 eb a8 e8 5c 49 b8 00 66 66 2e 0f
-RSP: 0018:ff630f098528fba8 EFLAGS: 00010246
-RAX: 000000007fffffff RBX: ff3edc0282944420 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: ff3edc0282944420
-RBP: ff3edc0282944300 R08: ff3edc0282944688 R09: ff630f098528fba0
-R10: 0000000000000000 R11: 0000000043ba156d R12: 0000000000000000
-R13: ff3edc02829ec028 R14: 0000000000000000 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ff3edc10fd380000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 000000073961a001 CR4: 0000000000771ee0
-PKRU: 55555554
-Call Trace:
- <TASK>
- ? __warn+0x89/0x140
- ? __timer_delete_sync+0x152/0x170
- ? report_bug+0x198/0x1b0
- ? handle_bug+0x53/0x90
- ? exc_invalid_op+0x18/0x70
- ? asm_exc_invalid_op+0x1a/0x20
- ? __timer_delete_sync+0x152/0x170
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? percpu_ref_is_zero+0x3b/0x50
- ? srso_alias_return_thunk+0x5/0xfbef5
- blk_sync_queue+0x19/0x30
- blk_mq_destroy_queue+0x47/0x70
- __scsi_remove_device+0x6a/0x180
- scsi_alloc_sdev+0x357/0x360
- scsi_probe_and_add_lun+0x8ac/0xc00
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? dev_set_name+0x57/0x80
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? attribute_container_add_device+0x4d/0x130
- __scsi_scan_target+0xf0/0x520
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? sched_clock_cpu+0x64/0x190
- scsi_scan_channel+0x57/0x90
- scsi_scan_host_selected+0xd4/0x110
- do_scan_async+0x1c/0x190
- async_run_entry_fn+0x2f/0x130
- process_one_work+0x175/0x370
- worker_thread+0x280/0x390
- ? __pfx_worker_thread+0x10/0x10
- kthread+0xdd/0x110
- ? __pfx_kthread+0x10/0x10
- ret_from_fork+0x31/0x50
- ? __pfx_kthread+0x10/0x10
- ret_from_fork_asm+0x1b/0x30
- </TASK>
----[ end trace 0000000000000000 ]---
-Initializing XFRM netlink socket
-
-
-Thank you for the careful review,
-Ionut
