@@ -1,281 +1,113 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A21B932E758
-	for <linux-block@vger.kernel.org>; Tue,  6 Jan 2026 12:08:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71A063A1E88
+	for <linux-block@vger.kernel.org>; Tue,  6 Jan 2026 12:28:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767701301; cv=none; b=fVEiQXSlxv2JTOxKtP0ovpAeCpfX3ZupSSfgmkpM1HKP29+iJiMRUblNTRhLNOtil6DGd/wkU40R/rPN1Qrf8BJtt2rhbT5oWTD8yC6wCYNFZ1Dt4m2dKminLP9FKXED43k9lfGq+4iAGsb2CWTn8YYmrvmHV+5ikLkPiVJlNg4=
+	t=1767702516; cv=none; b=OLPGhONuWE5qTYLgQvSaA/T9GOCu0djcAJlDe4cpkRrfQCbq7ifCFT/3wzw3H+tKY38GL8jk9Vc7R/A94D1zYaPqqIGmYrhPvnH0/zjkRSutnlfK/CxcHs62Rqw6tynZbajQR+auu4SH/xAEgqMqQzpTdwVCwj6yejvH/KzzyRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767701301; c=relaxed/simple;
-	bh=+W/OG9hSv3ZdaiIFx2ZpwlIdZsOkYGpeJXZF1X1V3+o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CdoOe5fVB/3U+pzBVXQ2Gnb3gHUtzfgO3OovAWzGi2ZgWMqGmoaG9BrGWSAj2DxDKCWf7hR6CDUCTlKf4sLYITK/5pbxLpd7kX8alO7c7Wfsl/ITjWk1b07rtr/cWCLsLApHnshJOvPaimxY23vc2hX7FyNWuocR3sLS4t86QFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=fe9Z2NWA; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=YkbW0vVG; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=wFCpSPli; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=LIFBKhQF; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1767702516; c=relaxed/simple;
+	bh=q8XxwV0f3T8GUgvVPjIeIv1ZqGRZn/3KRNHQFBqYHaU=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=NV8LVnOAgzjTSgmZBPW9nPdohsu0lyqiGkM4C5K7IJh9W/b1AQL7st718SPRD7hV9qnu3/b09mtZWG4dE1b4kKrE+23sgY8JpSKMFpxz4RehTbK3GFrKTBH2tekNNOpkOk7VyxWpJeNoHSwvAoH/yGsBr6v8+N1/MxdhzIC74UQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=DDn3aYCd; arc=none smtp.client-ip=209.85.210.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="fe9Z2NWA";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="YkbW0vVG";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="wFCpSPli";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="LIFBKhQF"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id D1CD85BCC3;
-	Tue,  6 Jan 2026 12:08:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1767701297; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+U6IdZ4NJ2OtMuGntNzqapcSRZ/FVDdE3xGkF515WKQ=;
-	b=fe9Z2NWAadywFeBjd2IpCMk8RCagykfjdjc/AfNW1+7rdwU7nYxsZC7djSDiouqAmX672g
-	RJ9RkV29Q3bxKEPOnrYIyFCbI7GDYwtW4GWMkyFQBrRUiROVHYvhch0bXqTshY8+0QONJw
-	Iq8R6rquXRenIBiRzJMXYOQEnQcTxyA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1767701297;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+U6IdZ4NJ2OtMuGntNzqapcSRZ/FVDdE3xGkF515WKQ=;
-	b=YkbW0vVG+zf3ayLD0ZMJQbiR0mAYPuWDz9gPSJuMTm5s/whViZvjF2jc6E27isCCP4UcbJ
-	ABL6+vtAVpLQvaBQ==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1767701296; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+U6IdZ4NJ2OtMuGntNzqapcSRZ/FVDdE3xGkF515WKQ=;
-	b=wFCpSPliOOlIkaq84Y+iFsTSmAsOEBPObh539cyGNkpus+0rW+4bSKcxfPqao7/NmGtVcf
-	O85heE6H1mjbVB9n2YSvVOOVl+R9vdSxB1op+u/idivMJm1uTHlXoADPvpnuFFGuya0vfP
-	3SWRFykmrPTcEz0oeNADAor9S/6zp0M=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1767701296;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+U6IdZ4NJ2OtMuGntNzqapcSRZ/FVDdE3xGkF515WKQ=;
-	b=LIFBKhQF43KFjbcYQVoLbyW0VbRI2fcLhNdGzbXjX05C+K4TgXqCWwGEnq03FygvXEN/YS
-	XoBtbSW4hSPMkPBw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C56313EA63;
-	Tue,  6 Jan 2026 12:08:16 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 7tcpMDD7XGlwdQAAD6G6ig
-	(envelope-from <jack@suse.cz>); Tue, 06 Jan 2026 12:08:16 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 852A9A08E3; Tue,  6 Jan 2026 13:08:16 +0100 (CET)
-Date: Tue, 6 Jan 2026 13:08:16 +0100
-From: Jan Kara <jack@suse.cz>
-To: Raphael Pinsonneault-Thibeault <rpthibeault@gmail.com>
-Cc: axboe@kernel.dk, jack@suse.cz, 
-	syzbot+3ee481e21fd75e14c397@syzkaller.appspotmail.com, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kernel-mentees@lists.linux.dev, Yongpeng Yang <yangyongpeng@xiaomi.com>
-Subject: Re: [PATCH v2] loop: don't change loop device under exclusive opener
- in loop_set_status
-Message-ID: <f45muigy6nwxtbfbxidbqyru73qtntuqfby6lgnt32c6eyyov6@eg2mbf6pncq6>
-References: <2crvwmytxw5splvtauxdq6o3dt4rnnzuy22vcub45rjk354alr@6m66k3ucoics>
- <20251217190040.490204-2-rpthibeault@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="DDn3aYCd"
+Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-7c6cc366884so545685a34.1
+        for <linux-block@vger.kernel.org>; Tue, 06 Jan 2026 04:28:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1767702510; x=1768307310; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EGy+CLSLHRsLD91PudYdXZwmMIMcdqnAL5MOO2Ykibk=;
+        b=DDn3aYCddio/krTLyQqnnaw5PK7BP4MyC8UOgBbyF8SOlxbr75lGXfyCp4+vZOqpkI
+         cIaTuIp6Y3CdWEgKWdgTZW5JERnzzOKYw/J/tFQJmt7jgUJ1tRLZ+I9vDq2j04aFzyRr
+         NL2w7goQD16X2nA2IhppPYg/bBlRLxxM9NNhNElRXc8QtDkuJpFv9smmIam7i4dXivfp
+         5mULb9Ggtj+cHXaW0zWNvGasN3S4AT89fUtGRZmDAI6ti3w+7Io2RK1gAF4+4WkX/lbt
+         UQoju9BjKe3yLJHpsvSQtbcJ6pIzX9TDeeJJvCLPt7w9hn11RNACqufZfjTm0SD3y/b+
+         G06w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767702510; x=1768307310;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=EGy+CLSLHRsLD91PudYdXZwmMIMcdqnAL5MOO2Ykibk=;
+        b=RnaHulGLaE9LHnH0G0cpIxK8t/Crz5AgsRpy5hwzvvEYC3YiRSOQw5utkv/5e9jaxu
+         9tqruqLbjML2KzlduvM11evkK8ZVvW0OW/fSfaAG04u3ZWULMva6O8tIvrp4uuuNlRTY
+         USFIHTgHU1UZBILMM+i/LB0pVZXl/LmsTDHHG2OWNYwHPu9+H4QLRKqopZ414Q3+CTqO
+         iR8wHC+TTJAC/SowiTBahPMjsr7CGgWRk8hQscyIvP0fKRtlmpfgM4qYvoVEBU0Fiz61
+         oxrBBqZGdWdlFqxwTlFcUwWFSgaBNAxcLcSTzktEVr23lh3/ZG3wsmTBhitTKLNvChKX
+         DBAQ==
+X-Gm-Message-State: AOJu0YyMWP8BwYPx5d4NaCyOexP4/ZmflWOjSCss3Vb6DxbTX5LkNjbK
+	8nivh/lKXOVN5j7IZgXogiVDrxtu15OHG8C8nWnyfQfAmta28XfPUlceEJBrYG5eIUXF256W9Ai
+	S+41x
+X-Gm-Gg: AY/fxX7P8noQdCjXgaYuS/cyAaW7x8HBmKOoe0k6QIrIdKxJuLWoFShDCYUNsH7ICyw
+	SIwLG1iB7ut9IJhgrdHO9CcnTjM3m8A7uYTmBlnxGYjUDwsbwilgNpQ117+clchx4rZtNhnsQ5W
+	Gy+jVuLr1yqSvybps4YOxcjyux/XN2T/Q1VySPJk+FnyZFrbbFOLXidAU+e/bGJnvoWnQj9hlt6
+	idaPsoUGmZ2ch41ZgbITY0ymjpPQsJpr+J0OmaJe8/XsQxnUx09H8l8LGSjoOVE7MLqqINPOcw4
+	wCFCQICo2a/cho502DlEx606B+oe4cPTi4+yGW4PTa+2dqJtSnUeJfgzlHos/PBu+cF7QqBqZCQ
+	lRQqPB8kDHufWTUWAPh3sm53gsl+OeqksVncgPV/RvCqjyhRA+LTtrHrZ2XVrBGOq3jOz9jjFMD
+	pFIFk=
+X-Google-Smtp-Source: AGHT+IFjHc3VCPXwnF1tkgq5di57EUUZj12OGQwCoMhxXkEBE2fMXPEw7F+wdt/L6ThoAPqCSQt9mA==
+X-Received: by 2002:a9d:70c1:0:b0:7ca:e8bf:8c4b with SMTP id 46e09a7af769-7ce4665187bmr1131336a34.9.1767702510044;
+        Tue, 06 Jan 2026 04:28:30 -0800 (PST)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-3ffa507235fsm1228167fac.13.2026.01.06.04.28.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Jan 2026 04:28:29 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Md Haris Iqbal <haris.iqbal@ionos.com>
+Cc: hch@lst.de, sagi@grimberg.me, bvanassche@acm.org, jinpu.wang@ionos.com, 
+ grzegorz.prajsner@ionos.com
+In-Reply-To: <20251205124733.26358-1-haris.iqbal@ionos.com>
+References: <20251205124733.26358-1-haris.iqbal@ionos.com>
+Subject: Re: [PATCH 0/6] Misc patches for RNBD
+Message-Id: <176770250832.675549.15679393984824160874.b4-ty@kernel.dk>
+Date: Tue, 06 Jan 2026 05:28:28 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251217190040.490204-2-rpthibeault@gmail.com>
-X-Spamd-Result: default: False [-2.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_COUNT_THREE(0.00)[3];
-	FREEMAIL_TO(0.00)[gmail.com];
-	ARC_NA(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[3ee481e21fd75e14c397];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,imap1.dmz-prg2.suse.org:helo,appspotmail.com:email,suse.cz:email,syzkaller.appspot.com:url]
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Spam-Score: -2.30
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3
 
-On Wed 17-12-25 14:00:40, Raphael Pinsonneault-Thibeault wrote:
-> loop_set_status() is allowed to change the loop device while there
-> are other openers of the device, even exclusive ones.
-> 
-> In this case, it causes a KASAN: slab-out-of-bounds Read in
-> ext4_search_dir(), since when looking for an entry in an inlined
-> directory, e_value_offs is changed underneath the filesystem by
-> loop_set_status().
-> 
-> Fix the problem by forbidding loop_set_status() from modifying the loop
-> device while there are exclusive openers of the device. This is similar
-> to the fix in loop_configure() by commit 33ec3e53e7b1 ("loop: Don't
-> change loop device under exclusive opener") alongside commit ecbe6bc0003b
-> ("block: use bd_prepare_to_claim directly in the loop driver").
-> 
-> Reported-by: syzbot+3ee481e21fd75e14c397@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=3ee481e21fd75e14c397
-> Tested-by: syzbot+3ee481e21fd75e14c397@syzkaller.appspotmail.com
-> Tested-by: Yongpeng Yang <yangyongpeng@xiaomi.com>
-> Signed-off-by: Raphael Pinsonneault-Thibeault <rpthibeault@gmail.com>
-> Reviewed-by: Jan Kara <jack@suse.cz>
 
-Jens, ping?
+On Fri, 05 Dec 2025 13:47:27 +0100, Md Haris Iqbal wrote:
+> Please consider to include following changes for next merge window.
+> 
+> Florian-Ewald Mueller (1):
+>   rnbd-srv: Fix server side setting of bi_size for special IOs
+> 
+> Jack Wang (1):
+>   rnbd-srv: fix the trace format for flags
+> 
+> [...]
 
-								Honza
+Applied, thanks!
 
-> ---
-> v2:
-> - added Tested-by and Reviewed-by tags for v1
-> 
->  drivers/block/loop.c | 41 ++++++++++++++++++++++++++++++-----------
->  1 file changed, 30 insertions(+), 11 deletions(-)
-> 
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index 053a086d547e..756ee682e767 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -1222,13 +1222,24 @@ static int loop_clr_fd(struct loop_device *lo)
->  }
->  
->  static int
-> -loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
-> +loop_set_status(struct loop_device *lo, blk_mode_t mode,
-> +		struct block_device *bdev, const struct loop_info64 *info)
->  {
->  	int err;
->  	bool partscan = false;
->  	bool size_changed = false;
->  	unsigned int memflags;
->  
-> +	/*
-> +	 * If we don't hold exclusive handle for the device, upgrade to it
-> +	 * here to avoid changing device under exclusive owner.
-> +	 */
-> +	if (!(mode & BLK_OPEN_EXCL)) {
-> +		err = bd_prepare_to_claim(bdev, loop_set_status, NULL);
-> +		if (err)
-> +			goto out_reread_partitions;
-> +	}
-> +
->  	err = mutex_lock_killable(&lo->lo_mutex);
->  	if (err)
->  		return err;
-> @@ -1270,6 +1281,9 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
->  	}
->  out_unlock:
->  	mutex_unlock(&lo->lo_mutex);
-> +	if (!(mode & BLK_OPEN_EXCL))
-> +		bd_abort_claiming(bdev, loop_set_status);
-> +out_reread_partitions:
->  	if (partscan)
->  		loop_reread_partitions(lo);
->  
-> @@ -1349,7 +1363,9 @@ loop_info64_to_old(const struct loop_info64 *info64, struct loop_info *info)
->  }
->  
->  static int
-> -loop_set_status_old(struct loop_device *lo, const struct loop_info __user *arg)
-> +loop_set_status_old(struct loop_device *lo, blk_mode_t mode,
-> +		    struct block_device *bdev,
-> +		    const struct loop_info __user *arg)
->  {
->  	struct loop_info info;
->  	struct loop_info64 info64;
-> @@ -1357,17 +1373,19 @@ loop_set_status_old(struct loop_device *lo, const struct loop_info __user *arg)
->  	if (copy_from_user(&info, arg, sizeof (struct loop_info)))
->  		return -EFAULT;
->  	loop_info64_from_old(&info, &info64);
-> -	return loop_set_status(lo, &info64);
-> +	return loop_set_status(lo, mode, bdev, &info64);
->  }
->  
->  static int
-> -loop_set_status64(struct loop_device *lo, const struct loop_info64 __user *arg)
-> +loop_set_status64(struct loop_device *lo, blk_mode_t mode,
-> +		  struct block_device *bdev,
-> +		  const struct loop_info64 __user *arg)
->  {
->  	struct loop_info64 info64;
->  
->  	if (copy_from_user(&info64, arg, sizeof (struct loop_info64)))
->  		return -EFAULT;
-> -	return loop_set_status(lo, &info64);
-> +	return loop_set_status(lo, mode, bdev, &info64);
->  }
->  
->  static int
-> @@ -1546,14 +1564,14 @@ static int lo_ioctl(struct block_device *bdev, blk_mode_t mode,
->  	case LOOP_SET_STATUS:
->  		err = -EPERM;
->  		if ((mode & BLK_OPEN_WRITE) || capable(CAP_SYS_ADMIN))
-> -			err = loop_set_status_old(lo, argp);
-> +			err = loop_set_status_old(lo, mode, bdev, argp);
->  		break;
->  	case LOOP_GET_STATUS:
->  		return loop_get_status_old(lo, argp);
->  	case LOOP_SET_STATUS64:
->  		err = -EPERM;
->  		if ((mode & BLK_OPEN_WRITE) || capable(CAP_SYS_ADMIN))
-> -			err = loop_set_status64(lo, argp);
-> +			err = loop_set_status64(lo, mode, bdev, argp);
->  		break;
->  	case LOOP_GET_STATUS64:
->  		return loop_get_status64(lo, argp);
-> @@ -1647,8 +1665,9 @@ loop_info64_to_compat(const struct loop_info64 *info64,
->  }
->  
->  static int
-> -loop_set_status_compat(struct loop_device *lo,
-> -		       const struct compat_loop_info __user *arg)
-> +loop_set_status_compat(struct loop_device *lo, blk_mode_t mode,
-> +		    struct block_device *bdev,
-> +		    const struct compat_loop_info __user *arg)
->  {
->  	struct loop_info64 info64;
->  	int ret;
-> @@ -1656,7 +1675,7 @@ loop_set_status_compat(struct loop_device *lo,
->  	ret = loop_info64_from_compat(arg, &info64);
->  	if (ret < 0)
->  		return ret;
-> -	return loop_set_status(lo, &info64);
-> +	return loop_set_status(lo, mode, bdev, &info64);
->  }
->  
->  static int
-> @@ -1682,7 +1701,7 @@ static int lo_compat_ioctl(struct block_device *bdev, blk_mode_t mode,
->  
->  	switch(cmd) {
->  	case LOOP_SET_STATUS:
-> -		err = loop_set_status_compat(lo,
-> +		err = loop_set_status_compat(lo, mode, bdev,
->  			     (const struct compat_loop_info __user *)arg);
->  		break;
->  	case LOOP_GET_STATUS:
-> -- 
-> 2.43.0
-> 
+[1/6] block/rnbd-proto: Handle PREFLUSH flag properly for IOs
+      commit: 483cbec3422399aca449265205be3aa83df281f6
+[2/6] block: rnbd: add .release to rnbd_dev_ktype
+      commit: 581cf833cac4461d90ef5da4c5ef4475f440e489
+[3/6] block/rnbd-proto: Check and retain the NOUNMAP flag for requests
+      commit: ef63e9ef76c801ac3081811fc6226ffb4c02453a
+[4/6] rnbd-srv: fix the trace format for flags
+      commit: e1384543e85b11b494051d11728d6d88a93161bc
+[5/6] rnbd-srv: Fix server side setting of bi_size for special IOs
+      commit: 4ac9690d4b9456ca1d5276d86547fa2e7cd47684
+[6/6] rnbd-srv: Zero the rsp buffer before using it
+      commit: 69d26698e4fd44935510553809007151b2fe4db5
+
+Best regards,
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Jens Axboe
+
+
+
