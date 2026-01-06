@@ -1,315 +1,170 @@
-Received: from mail-dl1-f54.google.com (mail-dl1-f54.google.com [74.125.82.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010055.outbound.protection.outlook.com [52.101.193.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1F0C3587A2
-	for <linux-block@vger.kernel.org>; Tue,  6 Jan 2026 18:20:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767723630; cv=none; b=WRBPxBO/y/90cjGyPuvpO7G7g/yOtrFZ1U0fK4mtjcR20Vi20Gfl45fz6CSye8rUxgSQxzw9zKJFeOMG/rpKoSV+ExpQcEXfey5CPZFXG2nw0zdrIwLU2hN+WjL5LfVsZRPGxsbGei1F4qSYwalTVtxhCsMBHGAMmVnUVl51BcY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767723630; c=relaxed/simple;
-	bh=ebIajIsNCEAaLXdlDyN9HP/t+M4wECN11cF+l0otgw0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=r6x8PEgk9hNraEr5toC1cwGN4MCtG1tDyP9Qeg+Zc8rZjv6naG7MigsAvO5DQ1gdaUZT7BFVbmQUtWGvwfiyVlbsznKga402/9NXTLl4QOnliBAAc4y60a/sXXMFa94EzeZUTdmGX4grQQx5vwLb4EVSkpGYxSFL5CEfTgYmlmk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=JwJWBgoP; arc=none smtp.client-ip=74.125.82.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DB232C21F1
+	for <linux-block@vger.kernel.org>; Tue,  6 Jan 2026 18:59:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.55
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767725951; cv=fail; b=r3ArOnk1cumf9lrzYS84ZbxBXm0OrAPCtulcF4aVxjmT5QKEBjkHlkFLjU0kB9hnqkjyiB92NSYkxD6rA7azEGUI5UDNiaRsafMkbHExzlVesYSux/3AOuGmsYbFbsNN59A9EMPp2kyPHCF/A6qMUiEb7wb5mmHbIlGD1+Tx7XM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767725951; c=relaxed/simple;
+	bh=oqvrpd1O2OYQ37VlnWE5miTKrQjE2+sorPLZLRsl6tU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=h+Ksu8e6fWalPnkiSt8nUv4B48OG+YlJWqFvLlWNog1Oq5PxcSySISwstY9HzORsMmHuXRqotFic1XWSCTbIZCOQi6SUC6GwheyEqEvY7BKZJJdgsiR3ceyVUYy1KsH5g48UE9Nvtgx1vdkDC6La8lb95UJLjotVHsqdBLT9V5Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=lyaQ7svi; arc=fail smtp.client-ip=52.101.193.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="JwJWBgoP"
-Received: by mail-dl1-f54.google.com with SMTP id a92af1059eb24-11f0d900dc4so37894c88.1
-        for <linux-block@vger.kernel.org>; Tue, 06 Jan 2026 10:20:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1767723626; x=1768328426; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NFBIpZGvOZlFODU4+hZrVYsOqSpPgzir/I9+wtVk4UE=;
-        b=JwJWBgoPJNShPuh8xPrcrI5mtKo+gjabwRlGfpQFoYqAm4DKaL57wH1UuE1kj/Kpof
-         oKa6EfMDne2ADArVTScBqh7w+YGZUiT1GQwliazisc6JxBCGThAO/urUl9GGHNnjHEmj
-         w/3y7UbJHYzM84mGULTMUqIph4EwhDSae7tKbNUY5oQTK8/Bua6WLs0maxo5yHJueKbW
-         WvRHWTfzI+5u2IxqN7vSCgIq3MrqYReBi35BAqSanMncwW3oDsPpURxdGySt9jbrGIJL
-         I89kNS6ftL+sXZ4xnQanX8JNXMfKJTQjMXnZylbcRef2gfhJBkBCyMHnNIqfOYm4tpG2
-         N5iw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767723626; x=1768328426;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=NFBIpZGvOZlFODU4+hZrVYsOqSpPgzir/I9+wtVk4UE=;
-        b=tEPi07TtylEEa4nIkEq/SzoQbxEzPZEZMVG7YAL2jMnYgSk9tNpYxYPjW743d2NdbV
-         h9KIGLyMdtpWW4ms2LYfFGrf3SmFNKesPqbAUAyyEE6oa2oO7Od1tnemm0CPnYm/L1r4
-         gY5XbdEBPq9f7dGU+fs5Sx7GT4mpSxNMk22amNEnXGd7M/t6qc4Yl3R+do/VvoC1VKvM
-         MvqNnmbRGHF92ijazcYFDUQW7M8DrXz5st1O2wAPRtQ2YctMlhaqDPTNJxE0Xa73Dr06
-         Sqa1TM1a4wZDys8pW2slVIr+m6mWqP8QBEI/iTyZt9y0HdVGKg1NWhkJPTvlKv1pu2iW
-         WK7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUxYf/eBKo8w0eBLOZrAwVWv10qxmtyfguZzzdmLCzStkv2q0KiBh0e1dU815VK7sdf7bVZ1mmqOrKFRg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwkP4dOLnQ3udXEfR0WzVNb6dselcXEap6muVcj7DVFlgSgTsNu
-	gjMla/rlne7wPBVsHJ2zfLxspy5uD3cLQEuNcxL9b+8nT4Eh7KpFCQQsgytmJiB+w8va4LSYo8Y
-	WqQnaqWAc/BH+rFOb++hvrkxXlwGtUwZzi9SIdnEuKQ==
-X-Gm-Gg: AY/fxX5jwEcTHYXqWg9BfLCC61lghEZdfuH797BECMMGTXT5rJ8V94kcNB1H3dyaVh/
-	DNBV4r5kZ8jmNCNpWSI2yvYztGFmzfzkpNn/9zjuhwV4EFDzzmsmomxo28nhoJO3ECe1OGxNmJg
-	CaR8YzC7N7F45efvLsz7/+SWo5/E1WncNjXWsAU7uPUvg1OlTQ/Qh4ZYyqveveygRcKlgrcnKPD
-	yhVZDy5+lJ2zcG9T/oVdReBhuVYMtDHQsLMF7c4MxPmnyBLMbvNO1GePAgkCW9jPY0vXD0w
-X-Google-Smtp-Source: AGHT+IE0KofUxg5lEGxsAVpLbHlGM/FyF8D5GQ2NJ0KDsjXkAS47DwF8YiGFgIpCLiZ1o5h8yYe6PL5D5DQT2f54HFw=
-X-Received: by 2002:a05:7022:42a7:b0:11e:3e9:3e89 with SMTP id
- a92af1059eb24-121f18ea258mr1840934c88.7.1767723625636; Tue, 06 Jan 2026
- 10:20:25 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="lyaQ7svi"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Zudx9zJOSXNPxWJi2R0gjHrNF2a9M+zOW8MPty0GX8q5l3dXz7VQejc40nVzYnpFWHO7gkynmm9wzlWkFh7JbrMPC2nFJPu/eBtJ70x88LtXCBeWUKh+CH0CUe3feQXheUCYgS3RmTN9MO6bb7Wxl5+G4c0j32q45C+sfc9tDTwf/vXoDT1bJA3rfHiEDpE+kZuBrssWpMGiMzn7XC2eUHED/ebpMHUTEfuQD1tkEs81tpy7KZHDzAXlxujMmXfQ40aPwKlgb8oDgDDeUM/V0udVg9IUY+4RjbXmj1/gWfpGXNx7LrNQTq/92HrkWdWlGo9ltjtykoqBIicqhSDv7A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NPkxFhj9Buh1yE9xH11RUNEROZGYe2drCjNeNk/FZ3o=;
+ b=p0Zoa5DtYjsD3DDIpp9Ozth8ScyuQgM78iS39Cpqy0SMl5jAKAEBq4TDAi/PF0NuZ0unMdYfS/xaqly7reuqg/B6vOUiaZXtAjGkzOAooFUui0bSUUWxHCa/8bwoTCI//oDjzy9OplieKHePDihQ7v6JmwJXf14CtcdECAA66lB963HirJXIpr+vKxYixmqY9CJ35hRyX4ycKfUKmvhEssi7qVFqM+tQxRLWpc2vR8IIwxcOY92sFG+VD+HE/Vnhi/5U+PqmOhKk6V93U3u7NUDqRvecV9RKd0bygegL0QokmL8mUWT9miGmwganuaBPSdWlrJjBpUVFUXY86Jf4eQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NPkxFhj9Buh1yE9xH11RUNEROZGYe2drCjNeNk/FZ3o=;
+ b=lyaQ7sviGn0umHhS6T1fLabUkqdu2up12iFxiwkHlyE8IxPb6XbNzrXWr0LU2lQDIEJLOAprMkMMAJAqEJkAO8+NG4IwRtdnb9ArLf/H23O2fQzi4oWBaywpMKnfmYukiudl9nLPZE9ia4pGe57NC3Z7fhN7vLuyLN5jpnOYeruubA1cqIRFjEmpf9jrY736ZsD0CXJkEzOg5M28Mb3C4dITBat3n4XEem0RF2quPc7V04XCEOsMDEw0OZKtJa2BCJwBfZPapur/So0aSdXu4I5JVbyvvxF+AecZZB881I8cwX29Rtcfwiv53xDEozU+52d8+RosgimqhoesiUUpOA==
+Received: from CH2PR18CA0001.namprd18.prod.outlook.com (2603:10b6:610:4f::11)
+ by CH3PR12MB9122.namprd12.prod.outlook.com (2603:10b6:610:196::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.2; Tue, 6 Jan
+ 2026 18:59:03 +0000
+Received: from CH2PEPF0000009B.namprd02.prod.outlook.com
+ (2603:10b6:610:4f:cafe::f6) by CH2PR18CA0001.outlook.office365.com
+ (2603:10b6:610:4f::11) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9478.4 via Frontend Transport; Tue, 6
+ Jan 2026 18:58:21 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CH2PEPF0000009B.mail.protection.outlook.com (10.167.244.23) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9499.1 via Frontend Transport; Tue, 6 Jan 2026 18:59:03 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 6 Jan
+ 2026 10:58:46 -0800
+Received: from yoav-mlt.nvidia.com (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 6 Jan
+ 2026 10:58:43 -0800
+From: Yoav Cohen <yoav@nvidia.com>
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	<linux-block@vger.kernel.org>, <csander@purestorage.com>
+CC: <jholzman@nvidia.com>, <omril@nvidia.com>, Yoav Cohen <yoav@example.com>,
+	Yoav Cohen <yoav@nvidia.com>
+Subject: [PATCH v3 0/2] ublk: introduce UBLK_CMD_TRY_STOP_DEV
+Date: Tue, 6 Jan 2026 20:58:29 +0200
+Message-ID: <20260106185831.18711-1-yoav@nvidia.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260106005752.3784925-1-csander@purestorage.com>
- <20260106005752.3784925-10-csander@purestorage.com> <aV0PauBTiqWVQ-26@fedora>
-In-Reply-To: <aV0PauBTiqWVQ-26@fedora>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Tue, 6 Jan 2026 10:20:14 -0800
-X-Gm-Features: AQt7F2qi_5E9WBZPnpvafZe-4ti-j5mNJvNs0Ekwu2OQuM3Hx9s-YvfFNiycSRM
-Message-ID: <CADUfDZryjLxVBFpk1c_NUp_GEWuWA=8UB6Vyx15tFUjQHGa_DQ@mail.gmail.com>
-Subject: Re: [PATCH v3 09/19] ublk: implement integrity user copy
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Shuah Khan <shuah@kernel.org>, linux-block@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Stanley Zhang <stazhang@purestorage.com>, Uday Shankar <ushankar@purestorage.com>, 
-	"Martin K . Petersen" <martin.petersen@oracle.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH2PEPF0000009B:EE_|CH3PR12MB9122:EE_
+X-MS-Office365-Filtering-Correlation-Id: 05f3210f-5836-45c7-fc49-08de4d55a911
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|376014|1800799024|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?QkExY0k4MkJkUGlWNzdIUm1jbGRWY09nalg0dVZqVE5JcWc0bU0zTG5hb0w5?=
+ =?utf-8?B?OThEUjIyaG8xRVQySkdiY3F0VkVwZnQ3YlVWQmtEdUJpbDl4YUtaOWhja1Fz?=
+ =?utf-8?B?U3FEQ3RTa1d5Vmdsc29Bb0FneWRaNmFKMnRIMDFFcjZjUzl3bExPZ0RSNWVF?=
+ =?utf-8?B?Q2xjNCsrOVNHbmlmS1Y0ajNqekp6Q2Y4bkpKUXRZQXdIMldPTHlWckFzdHhh?=
+ =?utf-8?B?d1M5dEVuRlZ5SjN2cVB6SC9NVkVrYm85U2F2Szc3ckpsb2RRRU0yZndWVjRT?=
+ =?utf-8?B?NU1vYjQyTzFiUktFUlRzZElJcW9pcDVYc29OcklETHN2UElxdFd6Tk92OUJM?=
+ =?utf-8?B?YkxrRk9XV1lwaXM1SXhZekJVdURCVkExRFFvQSs5NFNDVmNCcGh0aVdWM20w?=
+ =?utf-8?B?NHN4L1RlL2FucFJLMy9iTERIV0dxbFQzU0xLU2xkV1FnSlNiN3F6WFBaQjZ0?=
+ =?utf-8?B?ejZqcmxNRmpZRnhueUo1c0ZWWEZBZUNOVWx5bnoyckRBcnVRbnhnWWJMTGw2?=
+ =?utf-8?B?L2k5TUJJS1I2R2c0WWFLaml6M2pLYzVQUVJPeGVBOWttL1dhbHdLdllRUEh3?=
+ =?utf-8?B?a1lEN0swWFpvUnp6QUlRdEgwVUxybThPbnl0T1Z1b2hRQ1dqYURSZXlkbUxD?=
+ =?utf-8?B?RmRSRzF0eUViSldSSURpUDJTQmdxdC92MUFlWDlKeUFEZ0FVbmtxVHQwMVlJ?=
+ =?utf-8?B?Y3V4K29LQUFOeTVtMTd4cXYvbGcrbzl6Z01DSkNlOXNLeXk0SFBBcEtBaFNy?=
+ =?utf-8?B?MlR4Z01BdlJXRmZjNUUzRlcxbXJwWGYrSVJ6TnpJalhIczdkY3dWZ1BUU3V5?=
+ =?utf-8?B?MHBkTmVmOHJJVjY5dnd3NDhYQjFpMVZaY3FCcUtDOGtVMGIxUWFWYUNNczlo?=
+ =?utf-8?B?ZGptaTRsdU10VGRWcUsrdlQ2T1hNdGFzTzcyWklFYXBzWGgrZVA1S2J0UzVV?=
+ =?utf-8?B?dHZ4NzhXckUzOWtGdi9JVXhYQVJUSW9LR3oyN2NueGtwd3BFNFpuNkJObUtX?=
+ =?utf-8?B?RDMwaWZHRDg0WHlFZzg3VlRSU1Q5SGhUc0R1NmlmN1NuQi85ajY0Q3lNUnVt?=
+ =?utf-8?B?MXh4aWpNYW5ucHJLWUx5QXpBN0pZc3pGZnlUUHhJZDdmblE1TGM3KzBUUURy?=
+ =?utf-8?B?a2RuK05yVDNuTXdEM0FsYTVPR2JnTHFteFVpSWZQWXl2dEZ6ZTV3dnZCUGQ3?=
+ =?utf-8?B?V1ovcjVaRjdrZUk1elV1blorZjN0azRIbzVYZ3Q3NlpWWjlsREsxazI3c3Ji?=
+ =?utf-8?B?aGpBK2tUWm1QY3NxVGd1Y204azRqZ1FuMVVJZFhIN2hJS1A0Z2kzRTBFNitO?=
+ =?utf-8?B?a0srdWxCajVYR3haMnpZc29MVTdwckU0cHNMenF2SVZQdEsvZlJYdUdiaXVx?=
+ =?utf-8?B?VGM0VVVIenJVVG1ZeFNERW9jYzZvclhid0pMeHZNZmkwSldVbjdyNDZFM0Vo?=
+ =?utf-8?B?S09rRFo1K1ZEaE5Qbk9IM3pDNEUweEtGMGpwYXhRVFNZZFJxUjh4QUZRcVM0?=
+ =?utf-8?B?eVN5SkQxZVorL2FUUW9nS3BQakxMdHAxMlBpZk85R1NzSmdZb0xVMkx3c1FV?=
+ =?utf-8?B?c0p0TUJvc1V0RzZuMFNzemtsYWpVbVdieW1jNFN3OE8wMlBQQ2laaStxWndo?=
+ =?utf-8?B?TEJPVDFXclhwOU82R1N6Y0J6STZxRDFhVXBXdnZUb0I5czlpV3hFZFhyWEhK?=
+ =?utf-8?B?VXdsTkJJRmw2NGtwaWdTa2dlczhmenh2THJJOW8xcjlvSDBuSTc5RVBJaDBQ?=
+ =?utf-8?B?Qml1bzN4UndLZXBkSGhLVmZpR09ZdnllNU11ZERTRGxqYXN0TDYyN0dqRG5L?=
+ =?utf-8?B?TTNzN04wQ3pwSW1BaWJWVnJEdE92NFBVdlROTlZ6amN2ek0yTFViNitzSFJ6?=
+ =?utf-8?B?aUhQUGpLSGZFektWVVIxNnNwcG13S3hMZGVuR2poc04waC94dnQ0azMwM3VH?=
+ =?utf-8?B?Ui9Gckx1Z0h3QjFJeFlPZVU0M0FTMUtpNUVBWlp6RTVVZ2NrNjc3V3kxdXhC?=
+ =?utf-8?B?UEVzVkpDckIzaVppeSs2VXFsUDE0ZUdTcFR1ZGhNQkZrOFJqZG1nZlNmbngx?=
+ =?utf-8?B?UndoT1RiNHJOeThZMjB3Zm9mN3lXK0MwcU1hOFhBaUJyZXI3UnVUTXMwUUNW?=
+ =?utf-8?Q?1BG8=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(376014)(1800799024)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jan 2026 18:59:03.5665
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 05f3210f-5836-45c7-fc49-08de4d55a911
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH2PEPF0000009B.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9122
 
-On Tue, Jan 6, 2026 at 5:34=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrote=
-:
->
-> On Mon, Jan 05, 2026 at 05:57:41PM -0700, Caleb Sander Mateos wrote:
-> > From: Stanley Zhang <stazhang@purestorage.com>
-> >
-> > Add a function ublk_copy_user_integrity() to copy integrity information
-> > between a request and a user iov_iter. This mirrors the existing
-> > ublk_copy_user_pages() but operates on request integrity data instead o=
-f
-> > regular data. Check UBLKSRV_IO_INTEGRITY_FLAG in iocb->ki_pos in
-> > ublk_user_copy() to choose between copying data or integrity data.
-> >
-> > Signed-off-by: Stanley Zhang <stazhang@purestorage.com>
-> > [csander: change offset units from data bytes to integrity data bytes,
-> >  test UBLKSRV_IO_INTEGRITY_FLAG after subtracting UBLKSRV_IO_BUF_OFFSET=
-,
-> >  fix CONFIG_BLK_DEV_INTEGRITY=3Dn build,
-> >  rebase on ublk user copy refactor]
-> > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-> > ---
-> >  drivers/block/ublk_drv.c      | 52 +++++++++++++++++++++++++++++++++--
-> >  include/uapi/linux/ublk_cmd.h |  4 +++
-> >  2 files changed, 53 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > index e44ab9981ef4..9694a4c1caa7 100644
-> > --- a/drivers/block/ublk_drv.c
-> > +++ b/drivers/block/ublk_drv.c
-> > @@ -621,10 +621,15 @@ static inline unsigned ublk_pos_to_tag(loff_t pos=
-)
-> >  {
-> >       return ((pos - UBLKSRV_IO_BUF_OFFSET) >> UBLK_TAG_OFF) &
-> >               UBLK_TAG_BITS_MASK;
-> >  }
-> >
-> > +static inline bool ublk_pos_is_integrity(loff_t pos)
-> > +{
-> > +     return !!((pos - UBLKSRV_IO_BUF_OFFSET) & UBLKSRV_IO_INTEGRITY_FL=
-AG);
-> > +}
-> > +
->
-> It could be more readable to check UBLKSRV_IO_INTEGRITY_FLAG only.
+Hello,
 
-That's assuming that UBLK_TAG_BITS =3D 16 has more bits than are
-strictly required by UBLK_MAX_QUEUE_DEPTH =3D 4096? Otherwise, adding
-UBLKSRV_IO_BUF_OFFSET =3D 1 << 31 to tag << UBLK_TAG_OFF could overflow
-into the QID bits, which could then overflow into
-UBLKSRV_IO_INTEGRITY_FLAG. That seems like a very fragile assumption.
-And if you want to rely on this assumption, why bother subtracting
-UBLKSRV_IO_BUF_OFFSET in ublk_pos_to_hwq() either? The compiler should
-easily be able to deduplicate the iocb->ki_pos - UBLKSRV_IO_BUF_OFFSET
-computations, so I can't imagine it matters for performance.
+This patch series introduces a new command for ublk device management.
 
->
-> >  static void ublk_dev_param_basic_apply(struct ublk_device *ub)
-> >  {
-> >       const struct ublk_param_basic *p =3D &ub->params.basic;
-> >
-> >       if (p->attrs & UBLK_ATTR_READ_ONLY)
-> > @@ -1047,10 +1052,37 @@ static size_t ublk_copy_user_pages(const struct=
- request *req,
-> >                       break;
-> >       }
-> >       return done;
-> >  }
-> >
-> > +#ifdef CONFIG_BLK_DEV_INTEGRITY
-> > +static size_t ublk_copy_user_integrity(const struct request *req,
-> > +             unsigned offset, struct iov_iter *uiter, int dir)
-> > +{
-> > +     size_t done =3D 0;
-> > +     struct bio *bio =3D req->bio;
-> > +     struct bvec_iter iter;
-> > +     struct bio_vec iv;
-> > +
-> > +     if (!blk_integrity_rq(req))
-> > +             return 0;
-> > +
-> > +     bio_for_each_integrity_vec(iv, bio, iter) {
-> > +             if (!ublk_copy_user_bvec(&iv, &offset, uiter, dir, &done)=
-)
-> > +                     break;
-> > +     }
-> > +
-> > +     return done;
-> > +}
-> > +#else /* #ifdef CONFIG_BLK_DEV_INTEGRITY */
-> > +static size_t ublk_copy_user_integrity(const struct request *req,
-> > +             unsigned offset, struct iov_iter *uiter, int dir)
-> > +{
-> > +     return 0;
-> > +}
-> > +#endif /* #ifdef CONFIG_BLK_DEV_INTEGRITY */
-> > +
-> >  static inline bool ublk_need_map_req(const struct request *req)
-> >  {
-> >       return ublk_rq_has_data(req) && req_op(req) =3D=3D REQ_OP_WRITE;
-> >  }
-> >
-> > @@ -2654,10 +2686,12 @@ ublk_user_copy(struct kiocb *iocb, struct iov_i=
-ter *iter, int dir)
-> >  {
-> >       struct ublk_device *ub =3D iocb->ki_filp->private_data;
-> >       struct ublk_queue *ubq;
-> >       struct request *req;
-> >       struct ublk_io *io;
-> > +     unsigned data_len;
-> > +     bool is_integrity;
-> >       size_t buf_off;
-> >       u16 tag, q_id;
-> >       ssize_t ret;
-> >
-> >       if (!user_backed_iter(iter))
-> > @@ -2667,10 +2701,11 @@ ublk_user_copy(struct kiocb *iocb, struct iov_i=
-ter *iter, int dir)
-> >               return -EACCES;
-> >
-> >       tag =3D ublk_pos_to_tag(iocb->ki_pos);
-> >       q_id =3D ublk_pos_to_hwq(iocb->ki_pos);
-> >       buf_off =3D ublk_pos_to_buf_off(iocb->ki_pos);
-> > +     is_integrity =3D ublk_pos_is_integrity(iocb->ki_pos);
->
-> UBLKSRV_IO_INTEGRITY_FLAG can be set for device without UBLK_F_INTEGRITY,
-> so UBLK_F_INTEGRITY need to be checked in case of `is_integrity`.
+The first patch changes `ublk_ctrl_stop_dev()` to return void, since it
+always returned 0. This simplifies the API.
 
-If UBLK_F_INTEGRITY isn't set, then UBLK_PARAM_TYPE_INTEGRITY isn't
-allowed, so the ublk device won't support integrity data. Therefore,
-blk_integrity_rq() will return false and ublk_copy_user_integrity()
-will just return 0. Do you think it's important to return some error
-code value instead? I would rather avoid the additional checks in the
-hot path.
+The second patch introduces `UBLK_CMD_TRY_STOP_DEV`, which stops the
+device only if there are no active openers. Unlike the existing stop
+command (`UBLK_CMD_STOP_DEV`), this command avoids disrupting active
+users by returning -EBUSY if the device is busy.
 
->
-> >
-> >       if (q_id >=3D ub->dev_info.nr_hw_queues)
-> >               return -EINVAL;
-> >
-> >       ubq =3D ublk_get_queue(ub, q_id);
-> > @@ -2683,21 +2718,31 @@ ublk_user_copy(struct kiocb *iocb, struct iov_i=
-ter *iter, int dir)
-> >       io =3D &ubq->ios[tag];
-> >       req =3D __ublk_check_and_get_req(ub, q_id, tag, io);
-> >       if (!req)
-> >               return -EINVAL;
-> >
-> > -     if (buf_off > blk_rq_bytes(req)) {
-> > +     if (is_integrity) {
-> > +             struct blk_integrity *bi =3D &req->q->limits.integrity;
-> > +
-> > +             data_len =3D bio_integrity_bytes(bi, blk_rq_sectors(req))=
-;
-> > +     } else {
-> > +             data_len =3D blk_rq_bytes(req);
-> > +     }
-> > +     if (buf_off > data_len) {
-> >               ret =3D -EINVAL;
-> >               goto out;
-> >       }
-> >
-> >       if (!ublk_check_ubuf_dir(req, dir)) {
-> >               ret =3D -EACCES;
-> >               goto out;
-> >       }
-> >
-> > -     ret =3D ublk_copy_user_pages(req, buf_off, iter, dir);
-> > +     if (is_integrity)
-> > +             ret =3D ublk_copy_user_integrity(req, buf_off, iter, dir)=
-;
-> > +     else
-> > +             ret =3D ublk_copy_user_pages(req, buf_off, iter, dir);
-> >
-> >  out:
-> >       ublk_put_req_ref(io, req);
-> >       return ret;
-> >  }
-> > @@ -3931,11 +3976,12 @@ static struct miscdevice ublk_misc =3D {
-> >  static int __init ublk_init(void)
-> >  {
-> >       int ret;
-> >
-> >       BUILD_BUG_ON((u64)UBLKSRV_IO_BUF_OFFSET +
-> > -                     UBLKSRV_IO_BUF_TOTAL_SIZE < UBLKSRV_IO_BUF_OFFSET=
-);
-> > +                     UBLKSRV_IO_BUF_TOTAL_SIZE +
-> > +                     UBLKSRV_IO_INTEGRITY_FLAG < UBLKSRV_IO_BUF_OFFSET=
-);
->
-> Maybe it can be simplified as:
->
-> BUILD_BUG_ON(UBLK_INTEGRITY_FLAG_OFF >=3D 63);  /* Must fit in loff_t */
+These patches only introduce the new command and API simplification
+without altering existing behavior for active users
 
-Okay, I think that works. Even if the addition of
-UBLKSRV_IO_BUF_OFFSET causes an overflow to the next bit, it should
-still fit within a 64-bit integer.
+Changes since v1:
+ - Address Ming Lei’s comments in patch 2:
+   - Add a feature flag and some minor comments.
+ - Patch 1 unchanged, keeps Reviewed-by
 
-Thanks,
-Caleb
+Yoav Cohen (2):
+  ublk: make ublk_ctrl_stop_dev return void
+  ublk: add UBLK_CMD_TRY_STOP_DEV command
 
->
-> >       BUILD_BUG_ON(sizeof(struct ublk_auto_buf_reg) !=3D 8);
-> >
-> >       init_waitqueue_head(&ublk_idr_wq);
-> >
-> >       ret =3D misc_register(&ublk_misc);
-> > diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cm=
-d.h
-> > index c1103ad5925b..3af7e3684834 100644
-> > --- a/include/uapi/linux/ublk_cmd.h
-> > +++ b/include/uapi/linux/ublk_cmd.h
-> > @@ -132,10 +132,14 @@
-> >  #define UBLK_MAX_NR_QUEUES   (1U << UBLK_QID_BITS)
-> >
-> >  #define UBLKSRV_IO_BUF_TOTAL_BITS    (UBLK_QID_OFF + UBLK_QID_BITS)
-> >  #define UBLKSRV_IO_BUF_TOTAL_SIZE    (1ULL << UBLKSRV_IO_BUF_TOTAL_BIT=
-S)
-> >
-> > +/* Copy to/from request integrity buffer instead of data buffer */
-> > +#define UBLK_INTEGRITY_FLAG_OFF UBLKSRV_IO_BUF_TOTAL_BITS
-> > +#define UBLKSRV_IO_INTEGRITY_FLAG (1ULL << UBLK_INTEGRITY_FLAG_OFF)
-> > +
-> >  /*
-> >   * ublk server can register data buffers for incoming I/O requests wit=
-h a sparse
-> >   * io_uring buffer table. The request buffer can then be used as the d=
-ata buffer
-> >   * for io_uring operations via the fixed buffer index.
-> >   * Note that the ublk server can never directly access the request dat=
-a memory.
-> > --
-> > 2.45.2
-> >
->
-> Thanks,
-> Ming
->
+ drivers/block/ublk_drv.c      | 48 ++++++++++++++++++++++++++++++++---
+ include/uapi/linux/ublk_cmd.h |  9 ++++++-
+ 2 files changed, 52 insertions(+), 5 deletions(-)
+
+-- 
+2.39.5 (Apple Git-154)
+
