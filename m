@@ -1,276 +1,272 @@
-Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011005.outbound.protection.outlook.com [52.101.62.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f43.google.com (mail-dl1-f43.google.com [74.125.82.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23C40330315
-	for <linux-block@vger.kernel.org>; Tue,  6 Jan 2026 19:40:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.5
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767728443; cv=fail; b=hC9wUVSrVSjBK+kY3IMM0dOtPJuO0OmjCHRXlqxqT95IANzmBxXJrIvz+H4Ze+NJy6PkotzcNXYE3J1eMOESc9tnwnW3l4Ucjyr7BDB4DT23wpcRiuHw0TJ9CPxoDAmp2yB/4dRPzVD5kS7yAwa/MJ8EoCBxnw/smRNJtSwOhRQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767728443; c=relaxed/simple;
-	bh=09NNkm4RvIFy+LdDUB0iRGzBFUaZ1VV+6qn4zYUwqL8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=KJH2QFb9i/fH38LKX5iXmjpMr5jQiPd56noFxeZalug4YnY7uNeCJPcHqmnO6n3nDNu/Bv6tB44dhr19y4m3GCLAwyu5DfWAn9TerhNLksvATFsLOKJrrGNY+4zzl8QAa/0/cBKTylTX46lDUU5hrSk9hk/wWEqj8DSA22Zcv9Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=X6VzW9WD; arc=fail smtp.client-ip=52.101.62.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28170342C9A
+	for <linux-block@vger.kernel.org>; Tue,  6 Jan 2026 19:48:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767728937; cv=none; b=diM6YJwJzn8Kqbw+apMMjxF1bsAuHoBG2Uy+zBt/5RjG2Xws/MTbRSoOprpknivLGI3RwsOcdea3SixLb1b6y+fCky18y59dlD6Dd8LjT1vg+53NS5/KaBSX0Hk2Szv493ZvdXSZ9p78FhGIGSF0Hank4rTww6IHYbIMdFNrKDQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767728937; c=relaxed/simple;
+	bh=2Yjt8U1jmBIMKEj6M4Q2oLpf2I8t6Zgc0Yqo5olcCh0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jje1lrqCvHne6zEjNkxNxilM6FZBs+4vT+XV4JxVN6BUht3AdTrWFhhp+S0+BG5YX8UQVpXF8eUx07Udk61AcdGp98HSWFuIyb/PZKS1K95413co8kRP8bxT3Wbj/ykCqmkiBzPEawgDE7MH943M1lPVBrDnFgoXaTDcTQal27s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Q9pd6qQ2; arc=none smtp.client-ip=74.125.82.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="X6VzW9WD"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=rPGgUzo/kNxCw5bzncuR3l1rYkYAdTgGnrdTr/fbunisVRkI5KBWXDACEDN20gX+QT1tMxjEm50xoMwdGQvbockGjUAFJPH1a3cMR3eoj+4bxkZ+OGfbSA+x71PfIOX+mUm/Ho53LmiU9UyYDMa9narkOvennSvUwhFiSJd7af/Y1k2ldImcSkf+xaJFJoc9kX8IS1VfQlDbRr8FMURLI2AOp74gt6PK7vwi0Dxw/5zsrz4g26D4nCh7l6B3ZpWS/cB2ghvGwpgn6vehBCq051T84unhj1gzKquJWXqan9XPXrYv8dlF5rvBMFZn1/sJZoMKdkAzTVqJGUmEJwTawQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=09NNkm4RvIFy+LdDUB0iRGzBFUaZ1VV+6qn4zYUwqL8=;
- b=N29pOPkTXrC59Fa5xATr5d4HTOekp9BmHR9gNzGmQvm0KtBuqE40qSoE6icErILAvZJ4fYLegboDHVbe3vkFoped6UkIsLYGZgXGB1CJm3lK/t94kcGFLoBE1yKkt+h2IAguA4TLKpvwCX6v1vn1ZOMHdj+efMJFiwxa80V6ltUn0JbcD+O0Ylr3ji4dgIqrwwBFV9oFcaNmGX2mWyXHS9hNPQZreMInmgpoRcK1ONKhw2hqI1UauENp7JudNfZWafNvJlZMME2WLmx+nXm2igtmmR2NrQR03J8o+jvkf0aACqGRHQoeX1B4aDiXFvZIl2FbY9OaVWHc83TXU3jc3A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=09NNkm4RvIFy+LdDUB0iRGzBFUaZ1VV+6qn4zYUwqL8=;
- b=X6VzW9WDNxAvg5Mxf4fJq2qRoNBhEzILH0pqpLNh9v3HASOe3V/gc2ICpXvbaHZNjuTTQKoP5ZfqlRnmm29UvgHAApAuDqRx7zHKzthoC33fLf4cUpxQqjnhorEvsHx7Gsjjl3YlIsbd/x+aEe8vZalSxcQF8OxVCqz2oKvLt/NWWj4G2wwYLKpJk2msKaEpDc9Ji1+hK78RHi/1PG8wp/CEC1LeQKAc1BcqBQzplLmS9Yv+eQiCB4F9jbfAWttV5ZqjA8aBhveCUw7TeTPeYvQOK0gvXWd9Jk7hhAdZWo+H8ud/JKxa1oi6dTtt2NOOqoFtQrIKJpiaqm7S1TCJ8A==
-Received: from DM4PR12MB6328.namprd12.prod.outlook.com (2603:10b6:8:a0::16) by
- BY5PR12MB4113.namprd12.prod.outlook.com (2603:10b6:a03:207::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9456.14; Tue, 6 Jan
- 2026 19:40:38 +0000
-Received: from DM4PR12MB6328.namprd12.prod.outlook.com
- ([fe80::35dd:a6f9:6b74:3caa]) by DM4PR12MB6328.namprd12.prod.outlook.com
- ([fe80::35dd:a6f9:6b74:3caa%5]) with mapi id 15.20.9478.004; Tue, 6 Jan 2026
- 19:40:38 +0000
-From: Yoav Cohen <yoav@nvidia.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-CC: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Jared Holzman
-	<jholzman@nvidia.com>, Omri Levi <omril@nvidia.com>, Yoav Cohen
-	<yoav@example.com>
-Subject: Re: [PATCH v3 2/2] ublk: add UBLK_CMD_TRY_STOP_DEV command
-Thread-Topic: [PATCH v3 2/2] ublk: add UBLK_CMD_TRY_STOP_DEV command
-Thread-Index: AQHcfz6YC1iIuStC+k+bUjQ/rSCvarVFhmuAgAADwYA=
-Date: Tue, 6 Jan 2026 19:40:38 +0000
-Message-ID: <c45de2c7-7d88-4b52-a3e9-a9f5863864d7@nvidia.com>
-References: <20260106185831.18711-1-yoav@nvidia.com>
- <20260106185831.18711-3-yoav@nvidia.com>
- <CADUfDZr9bdzsHMQj1u3_iSLHF8Nka7OxB6H3eEs8dO5zWLOxQA@mail.gmail.com>
-In-Reply-To:
- <CADUfDZr9bdzsHMQj1u3_iSLHF8Nka7OxB6H3eEs8dO5zWLOxQA@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM4PR12MB6328:EE_|BY5PR12MB4113:EE_
-x-ms-office365-filtering-correlation-id: e1c626f4-a454-4562-58e8-08de4d5b7836
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700021;
-x-microsoft-antispam-message-info:
- =?utf-8?B?ZlUyQU96U1VUWmJVdHZKU0pZeGV3QnkwdmNLMHg1ZVNZaDlpLzhUVHA4d2Vj?=
- =?utf-8?B?enBEZEtnOGNPN2ZLeWViRHF1L0hGcU1IbTlwK0Y5ZVJvSHdVdStzZDZiOU1y?=
- =?utf-8?B?MDkwRTNHQTA2R2p2cVJ5N2ZWYUx0N0p4UEk0VXI1UFZtcG83YmNyNTNpMjhS?=
- =?utf-8?B?R2xHbS9YNzZpWXJMSHFJSnNBazhKWURsclJONk5nUjh1TTl6TDBUQWNjSVVr?=
- =?utf-8?B?ekdONGVHSHFQZHNLNlZtb1FYcW9ZNlN1SlpyVVF5azBGNmN5ZFN5azU4Szk1?=
- =?utf-8?B?Wm5RMkc4Rkd2ZURMdGJwcThJMXRPdnpuVWlNeGl5cGprZmlzWUJDM0JibkxM?=
- =?utf-8?B?cU1Zd1UzU3hqY21NMVRsc2hLL1ZJS0VlazlITis1cWJyQjl2TmtDM0tPVHV0?=
- =?utf-8?B?MEZlOFYwUHpweEkrclVhV2c1ZStqVE5pR1RvZ284alA4Q3ZxR0ZqallwRjFI?=
- =?utf-8?B?aDkwTkhrVXZqMW0rck9NOEp0eDRtT0llajhrR3BTY2ltc1d5OGJ5NGN2aWV5?=
- =?utf-8?B?T1hyeDZ2UEJIUjVQYjNLYUVJS3gyUWpReUtxK2V1dXJNQ3FaVGthUkE1Q2Fx?=
- =?utf-8?B?Z1lyZDlUM2gycjdrS2dBSFpjYXVkZEg4YWR3Y2hwenM2dEZGT25KWGtQbGNs?=
- =?utf-8?B?ZC9ZTEpKZlB6VkM4dXNQUVhPRk9CMmdURkNsVmszcS9NV2t5MjlXTEpnOTZO?=
- =?utf-8?B?Nkh2T0I3QVF0SnRrZE5ZUTN0dTlqcVJoMENWR1duM05DQWNyNTlFYk5QbGNP?=
- =?utf-8?B?TFVRNllObDhwbFh2dzZ4SEc5bk5XL054aXRRTWVCYmY2RkRLSnpsL2dqNmNx?=
- =?utf-8?B?VC9tOFl6N0VLeWlGc0dzUGpiNU5jYk5XRDVYVEFnVHFoR0RXWHZqVkMyQmxz?=
- =?utf-8?B?N3lIMXBENHd5T2NaeVZrL3c5OWh0VVJNb2ptdzVRRWVIMmU5dHd0OUIxOXBJ?=
- =?utf-8?B?ZmNzVEh0OUdlRzhxZkhwUldMWFFCTDdqR0kwVVN0UjhlL2Z6ZUwvOXMya2pl?=
- =?utf-8?B?OWlQeDcxR2lqZ2F0cEVpZElIZmx6N3lXZnpDUHJxYlFsTW5Hc2huNmRqR0NB?=
- =?utf-8?B?cUNlV3FOdCtBelJaWEtnSDdtamhKMTM2aXFQSnlPdU5SQWkyS1BSWmk0N0E0?=
- =?utf-8?B?VWYzbVlvTXhMWlBvcU9Qb3ViT3d5OVBVMlhtNGhmRVNHRWNYdE1vd3VIY3Mx?=
- =?utf-8?B?cW9EZ0lvV1pOY0tFRXdYOVRUTE1sd0FmaDZSd2VXQXRKZUdFZnpkYlRORzhw?=
- =?utf-8?B?QjhLME1ZZU5HVE5KY1ZVVUMvdXNjdmFYcGNkbEprR1hBSXNubFZ0MTU3QnJs?=
- =?utf-8?B?b3RVQ0FWMlVIVWtNMnJUZDRhRzdyRmo4ZDh1cEVDRmJydk4zbkJHQ3ozWDY1?=
- =?utf-8?B?NzZlajR2MjlEM2QzcEE1Sk9vVURocW9rUUx6OWF4ZjIvOTN3a0x6djFpbWdn?=
- =?utf-8?B?aDY2SHJOSEE5U2g3SjFwYmVMMWRwR3dxd0Q0cFY5SjhwWGVLdzE3ME96S2NK?=
- =?utf-8?B?dXg3Sy9pUmdOOFlJcmZzN1puTlZXcXdCY1dQd0Y4NXVVNE5naldCSzJIckZh?=
- =?utf-8?B?eUFBbzV0NUx0cDNlSUc3MU8wRWRGaXlSNVdUMEpteUpwaSt0aElLU2txMXgw?=
- =?utf-8?B?eTB5dktoemYwNkZTQVNxL3VoY2RLbDFoUmhFKzlVZUpUM1RkMTY3OGIwUXg0?=
- =?utf-8?B?U2ZGWFZlYmo1elluQjNTQWE2cHh4N1Bnd3A1aVZCS3lKb2tTdkFaQm9XMk1Z?=
- =?utf-8?B?b1YxeDZJUWtLM3kxK21Md0RJQ0pNaFRoSjVuZG5EVjdvZ0Q0enZxeFBzMFdQ?=
- =?utf-8?B?eThuUktDN2d0OFlHT0EzVnVGTVBDS2R3N2R3SEhyaFpuTFVvbUpIYmRiV2lw?=
- =?utf-8?B?RzA0TFc2NnJneEZYR25peVBUdkpTQys5M3QzU0g4ZlpMOE9kVVp3c3F2UUVy?=
- =?utf-8?B?TVF2c0ZoankzTUJkRTdSQ2l3ZUV0cjhkSVZPOGJuOWQzZ1IvOHlIVzg5d0pp?=
- =?utf-8?B?MzYvM2l3RU9idmNucjVRQm9BcTZvaGRLZGRMWHUrV29RV0QzcHJoQXlRUTIx?=
- =?utf-8?Q?rE77yW?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB6328.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?eEVGa0VwOEtaWkRwSU5zUFh5OC9nTVk0SW1JSzJNTGs3UmQvM1F2U05TVUE2?=
- =?utf-8?B?RWo5a0RETFRYT3Q5bFJybWpZMXFUTm9sRU91ZjZDd1FkSmJ3OVplMGs4NGMz?=
- =?utf-8?B?TXhLS0E4aS85RUs1RStDSVRmQ3JXR1ExeE5UYko2MkVCd3lOV3Fsd25kTTFJ?=
- =?utf-8?B?RUNPV1Z3Yys0ZnIwNk5JWTRGZWtzN1ZwQ2hRQ3o1VVlZMk5pK3VkcmkvVEIr?=
- =?utf-8?B?Y2NISzNJN1k0Tksyd3N1V2FCWDc5Q1VHUTJvMk5WN1J3VnlNWFdvYjRUNi85?=
- =?utf-8?B?S0t1d044akhrWERIcW9Hd2l1b0JFOVNRcVRmQWhUbXJXQ3cwZ0JIVFozdHNa?=
- =?utf-8?B?ekVvci9ia1NKNjl0bG12MG5ML25iM2hKbUtBWEhDUjI2ajdMbDVBSlZnNERK?=
- =?utf-8?B?Mk9KQ2hTcEl3c1c2RnVBN1ZXMFZaVW4xMkJ3bzE5YkNMbXJEdmlRR2JYZ3ZG?=
- =?utf-8?B?TnZEQXYxdENkK2xxdHNueFpxR2FyMXdRZ2hFMllJOUZwbllYM0pUdk53TE1l?=
- =?utf-8?B?TkVSV3lyU1BWYmNKNUFvQVhyMHI2bVZTaEQwdFdGZkpsVTl0a0ZMTUdtUktP?=
- =?utf-8?B?UE9tSmZUR0NKTjQ2UnkzSW5CWEYxYnJrSzVsTzB6REczVDJEaDRWbEpYQnFy?=
- =?utf-8?B?ZmlCWmdTZ3I1SHhPcUJjOFdNSjlsSEhyMTJ2algyeGlxem1lVDgxbnV2b0Iy?=
- =?utf-8?B?YUJ3YnU2OFYxbTRnT2tpakVOd1dHRGo0amozVkV0OGZjbnF0eU5OQjA0UFJi?=
- =?utf-8?B?NW5BTGhzUkV4TUc3SGdyb29NUjVuRHJ0NXdISXJtV3FRcHRWOHBiazBNU0Zj?=
- =?utf-8?B?WFhVUGMrZTVOUEsxL3JzQVRUOUNYV3NVT3NqMEFIL0xkMkdaL05SRm1yKzlN?=
- =?utf-8?B?UTd6U0IycXgzTEx6T0h0a3dvVDdEZHlIc2dQZk91YmhvZVhIcHJoa0R2UTV4?=
- =?utf-8?B?eDdtMDJFbHdUL0Y4a2NDVUlmZTRjdERUZk9DN2FDRUtxeERZOWdVNW5rU21U?=
- =?utf-8?B?US9WTGpZR2VtM3l4SDNWdTUxKzgzVlZRVzJpYkg4VVhpM0dKaUIrLzdiS1ZB?=
- =?utf-8?B?c0hnSmpkZVV5ZUlXTXJDdmdjazlPY3lzR2RodjhkRUJXUkt6T3pqRVJ6bzRp?=
- =?utf-8?B?K2JOU3NTWis1MVZ2UUhhOTB4WFFnTnVVQTFIQkZ2YUhpMXJxYjNxQ2FXYUZB?=
- =?utf-8?B?ZFp4cUhkaEZtNUdERXY4WUJHek5ROVE3UHhyQm5Cd0FoUnhQc1NEUkNzZDFE?=
- =?utf-8?B?bm1CYm5LSVlLcEJ3WEZJRFhFUDVQcVB5ZUk1TFgyeEhmTkVaTWFEcUF1VXhz?=
- =?utf-8?B?ckNwbVdYRHhpTyttcXMvVktQZ3pYN3pNT3dQMkxPVmtGWXBCc3JHUzFZK1Rv?=
- =?utf-8?B?YWlTN3N4cU5SSVBJWTFTQVloSnhKWGZaS1gzYkp6aEdEQlRUV29yRFJpa25R?=
- =?utf-8?B?YUZIRFNaLzJTK2FOU0dxZWVDZmFmcWNpNkVNLzkxTjlRMlJaTXJBTHVQTmE3?=
- =?utf-8?B?TklDdk50cHV0SlpMWGt2cGxzWllKc05MSjBRZ1gycjFKeFhHT1ZIYmlXRGFO?=
- =?utf-8?B?MVVzVHd4VHZEeVNWRFZaYm9TUnRHZklNT2lnVW9nLzF5d0IvbnRGU1lJN2t4?=
- =?utf-8?B?bDJIL2hycCthWkxsOGU5K0w4Q3lmTDFPaDhwb2prVEpwa3hQRjJ3TjVQeXYv?=
- =?utf-8?B?Z1JiV3FPVFlBbTlBSXZvRnVkQ002czl2TExKdzBKK3h4Z2Jhc21kRit0SWtw?=
- =?utf-8?B?NWMzVTRFNGEwaGhVcXZ4bjQ1dVdpZlNSWk5uWUxWTkdxaEtIUVdLYi9YaEQ1?=
- =?utf-8?B?N3ZkNmx5MXNIMmtQZHVZbnlpdHZOcmxGQnBVcU1XdjU0b0tMZndlZmo4SFla?=
- =?utf-8?B?RUU3ZVdzejg0a3JNclNFKzdMditkSUlxQ3ZNZXgyamFxa0lBVlpTNTZKanEv?=
- =?utf-8?B?WGR3MG9vV1ZWZjN2eEpoakV3WW5KZTRQSlpwdUFsTDd5UEpxUlpJbld1Nm9I?=
- =?utf-8?B?OVRZcGthNmNNNVdnbUNkSjBSMzlpczZFZk1lcmNhQUw4bkh3b1FZYVJIODh2?=
- =?utf-8?B?Zjk2Y0Z4eWc0c2V0K3VoZ0xjaUhvOC9VbzB1SVE5eVdiUk5EWFAzRXBybEMy?=
- =?utf-8?B?bGl6YXg5c0NSaG5vYUJ1VVJiRnRmOFNNdWRyV0JpY0E1Q0xHdHlGTGE4M3hH?=
- =?utf-8?B?M2tJQUs0WDNJYlRJRHFkUWNVc0RUTmpoVUxicEFWRE5xQ05mUVVpMWVaT09M?=
- =?utf-8?B?QnFqbFZIak5JUDJHS2pnckVnY1J1TTJIZWVmNDg5OE1WdGEvTXY3TXlJKzVH?=
- =?utf-8?B?bW1selhlMS93K0xsd3ArT1dsNndUSFNKS0cxTFpON3cwS0hsZkdIdz09?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <A53C295A8D69844D89D7A56DECEB0D5F@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Q9pd6qQ2"
+Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-11bba84006dso71702c88.2
+        for <linux-block@vger.kernel.org>; Tue, 06 Jan 2026 11:48:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1767728934; x=1768333734; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OZpVi5TIDx1hg/lePodnjApaWASmkc/Ad/LDk3KapkU=;
+        b=Q9pd6qQ2wW4+y2CET+uLSd6CiMqdVOyhFLg02mMAQnoDt9il0Qggel9pFweP6NUKSr
+         paObhu50s6A9sInAIlrAZhGgjCGozNQlNQ+DA93WK/9xvSgP2ciVWHCx3xps/M7yHWzj
+         BkusGhmcRQqSPqfGFPdKpUkK9zA6Bfd7KTaNgHov458JFEM6vikjs/hyGk9Q76yF96E2
+         aYoKYa/GSWCHOJkSMQBQDk1EV1/kXAwXXiqiUjvq8Rt5Izu/zD7cxGL57s2C2PE7oE5C
+         bixCLAeldg1j3NfMaZAc/CY97JVQ08lcNQat08MkhrwQdZdd2KbLd8VS1CaK86OamB9d
+         R8bQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767728934; x=1768333734;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=OZpVi5TIDx1hg/lePodnjApaWASmkc/Ad/LDk3KapkU=;
+        b=jeArBsY+MYgyG3LbPY2Ecg7plscat9mqoIuzdTAanGqAwnZkLYWuxYyhHpnj7zq9Rm
+         6fHIuUQ1VbLguTXbSuWTWpDBGDEaiMgfPVUyYwJ/PKFjs/VBPMnK3qcTlnsqcZGosPti
+         tyVo6JJ0TSCOBxDx8wUBuKWzBrASHjPu9l0S5214ya4f70EENexc4vpaE5H/PiOkhJ2W
+         yVU1Gvui9YrlDf17z8Q0JkCxa9lFqR6H5JlaGPgkR8deWIU/eCASLvsr5nUJHH+I4mTN
+         cQNvizItoa6P8+oH9lydWwdMX4YHKlsrQC10XMMYPEreVrPAYqaJeytOcaB45+jvVGTb
+         mmPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW7/ldvn6vGm9/+04NeSuo5UZ1Yx3YAKfWYWbIK2AC5izV3k/3FMVpRqwlk3zgvcWQ5vmXdVPO6HXgMrg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzV2qhfTH9Ydp+88UdWgvO9JdREVeamHyYBgDYazYH354Fn+p2x
+	Vg0zpAfWEKftGoIbKDrccoAHBIAmXL79MSu8pMwHFvId7Gb4XKBw4c8Dq4HfZaF06cedkkPVYQ8
+	KEsNgjCpRw9V0dsep7Rf1ZGdtUXuMvGRp3Oe0xcu+1A==
+X-Gm-Gg: AY/fxX5LZcuWt1HWU3cEAnnu9DNX01MHH9iBQZzpvNyhT6cl58NkqDVhatwI5NkmvoS
+	bK5t4lxs2dUWFGDw3J7NKpkyvCiG/WuvxUO+fIYoSq4meH7uAGF1l7t/m6yOsKyJK6M+TDBAzGP
+	YNG0jZIYEOuZYTnUqCAdItbUfLDwC84ExmYSiS8gZvqL4P3JhJVQ4N8N4Denx0pV3/gpbs25aA6
+	XdHjHvy4VVKzdWNLCfIvxzapTRpqwAm0TfsCFrNPNa7EXycKb3nvNlW3ZsftrrGwt1m7VEy
+X-Google-Smtp-Source: AGHT+IE2PNbz1ewsurDKE9n2C67mLPnmFPmpIU8QTmXZdsoPUDFL49W7Jr9krGqLCTYPnvdwb8fSWgNu8haL1fqp4JA=
+X-Received: by 2002:a05:7022:6293:b0:11b:1c6d:98ed with SMTP id
+ a92af1059eb24-121f8abea5cmr54920c88.2.1767728934088; Tue, 06 Jan 2026
+ 11:48:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB6328.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e1c626f4-a454-4562-58e8-08de4d5b7836
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Jan 2026 19:40:38.7264
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ru9CbzGlAJYx1zyuSxwpHSdHcJx7kYT+yy1/euHGYYXSte5ZjR80vQBMhsz4JvCx
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4113
+References: <20260106185831.18711-1-yoav@nvidia.com> <20260106185831.18711-3-yoav@nvidia.com>
+ <CADUfDZr9bdzsHMQj1u3_iSLHF8Nka7OxB6H3eEs8dO5zWLOxQA@mail.gmail.com> <c45de2c7-7d88-4b52-a3e9-a9f5863864d7@nvidia.com>
+In-Reply-To: <c45de2c7-7d88-4b52-a3e9-a9f5863864d7@nvidia.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Tue, 6 Jan 2026 11:48:42 -0800
+X-Gm-Features: AQt7F2qbV02jq8AcVb2x8Tp-52HdovtoN9Uz-zSPCzFoHW7tqNw7BDr8o9TbECs
+Message-ID: <CADUfDZpfOt6A8T+sPDLuOtJhuDyd11CBL9J+tnoz44s1FgNvfg@mail.gmail.com>
+Subject: Re: [PATCH v3 2/2] ublk: add UBLK_CMD_TRY_STOP_DEV command
+To: Yoav Cohen <yoav@nvidia.com>
+Cc: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Jared Holzman <jholzman@nvidia.com>, 
+	Omri Levi <omril@nvidia.com>, Yoav Cohen <yoav@example.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-T24gMDYvMDEvMjAyNiAyMToyNywgQ2FsZWIgU2FuZGVyIE1hdGVvcyB3cm90ZToNCj4gRXh0ZXJu
-YWwgZW1haWw6IFVzZSBjYXV0aW9uIG9wZW5pbmcgbGlua3Mgb3IgYXR0YWNobWVudHMNCj4gDQo+
-IA0KPiBPbiBUdWUsIEphbiA2LCAyMDI2IGF0IDEwOjU54oCvQU0gWW9hdiBDb2hlbiA8eW9hdkBu
-dmlkaWEuY29tPiB3cm90ZToNCj4+DQo+PiBUaGlzIGNvbW1hbmQgaXMgc2ltaWxhciB0byBVQkxL
-X0NNRF9TVE9QX0RFViwgYnV0IGl0IG9ubHkgc3RvcHMgdGhlDQo+PiBkZXZpY2UgaWYgdGhlcmUg
-YXJlIG5vIGFjdGl2ZSBvcGVuZXJzIGZvciB0aGUgdWJsayBibG9jayBkZXZpY2UuDQo+PiBJZiB0
-aGUgZGV2aWNlIGlzIGJ1c3ksIHRoZSBjb21tYW5kIHJldHVybnMgLUVCVVNZIGluc3RlYWQgb2YN
-Cj4+IGRpc3J1cHRpbmcgYWN0aXZlIGNsaWVudHMuIFRoaXMgYWxsb3dzIHNhZmUsIG5vbi1kZXN0
-cnVjdGl2ZSBzdG9wcGluZy4NCj4+DQo+PiBBZHZlcnRpc2UgVUJMS19DTURfVFJZX1NUT1BfREVW
-IHN1cHBvcnQgdmlhIFVCTEtfRl9TQUZFX1NUT1BfREVWIGZlYXR1cmUgZmxhZy4NCj4+DQo+PiBT
-aWduZWQtb2ZmLWJ5OiBZb2F2IENvaGVuIDx5b2F2QG52aWRpYS5jb20+DQo+PiAtLS0NCj4+ICAg
-ZHJpdmVycy9ibG9jay91YmxrX2Rydi5jICAgICAgfCA0MiArKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrLQ0KPj4gICBpbmNsdWRlL3VhcGkvbGludXgvdWJsa19jbWQuaCB8ICA5ICsr
-KysrKystDQo+PiAgIDIgZmlsZXMgY2hhbmdlZCwgNDkgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlv
-bnMoLSkNCj4+DQo+PiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9ibG9jay91YmxrX2Rydi5jIGIvZHJp
-dmVycy9ibG9jay91YmxrX2Rydi5jDQo+PiBpbmRleCAyZDU2MDJlZjA1Y2MuLjkyOTFlYWI0YzMx
-ZiAxMDA2NDQNCj4+IC0tLSBhL2RyaXZlcnMvYmxvY2svdWJsa19kcnYuYw0KPj4gKysrIGIvZHJp
-dmVycy9ibG9jay91YmxrX2Rydi5jDQo+PiBAQCAtNTQsNiArNTQsNyBAQA0KPj4gICAjZGVmaW5l
-IFVCTEtfQ01EX0RFTF9ERVZfQVNZTkMgX0lPQ19OUihVQkxLX1VfQ01EX0RFTF9ERVZfQVNZTkMp
-DQo+PiAgICNkZWZpbmUgVUJMS19DTURfVVBEQVRFX1NJWkUgICBfSU9DX05SKFVCTEtfVV9DTURf
-VVBEQVRFX1NJWkUpDQo+PiAgICNkZWZpbmUgVUJMS19DTURfUVVJRVNDRV9ERVYgICBfSU9DX05S
-KFVCTEtfVV9DTURfUVVJRVNDRV9ERVYpDQo+PiArI2RlZmluZSBVQkxLX0NNRF9UUllfU1RPUF9E
-RVYgIF9JT0NfTlIoVUJMS19VX0NNRF9UUllfU1RPUF9ERVYpDQo+Pg0KPj4gICAjZGVmaW5lIFVC
-TEtfSU9fUkVHSVNURVJfSU9fQlVGICAgICAgICAgICAgICAgIF9JT0NfTlIoVUJMS19VX0lPX1JF
-R0lTVEVSX0lPX0JVRikNCj4+ICAgI2RlZmluZSBVQkxLX0lPX1VOUkVHSVNURVJfSU9fQlVGICAg
-ICAgX0lPQ19OUihVQkxLX1VfSU9fVU5SRUdJU1RFUl9JT19CVUYpDQo+PiBAQCAtNzMsNyArNzQs
-OCBAQA0KPj4gICAgICAgICAgICAgICAgICB8IFVCTEtfRl9BVVRPX0JVRl9SRUcgXA0KPj4gICAg
-ICAgICAgICAgICAgICB8IFVCTEtfRl9RVUlFU0NFIFwNCj4+ICAgICAgICAgICAgICAgICAgfCBV
-QkxLX0ZfUEVSX0lPX0RBRU1PTiBcDQo+PiAtICAgICAgICAgICAgICAgfCBVQkxLX0ZfQlVGX1JF
-R19PRkZfREFFTU9OKQ0KPj4gKyAgICAgICAgICAgICAgIHwgVUJMS19GX0JVRl9SRUdfT0ZGX0RB
-RU1PTiBcDQo+PiArICAgICAgICAgICAgICAgfCBVQkxLX0ZfU0FGRV9TVE9QX0RFVikNCj4gDQo+
-IFNob3VsZCBhbHNvIGJlIGFkZGVkIHRvIHRoZSBsaXN0IG9mIGF1dG9tYXRpYyBmZWF0dXJlIGZs
-YWdzIGluDQo+IHVibGtfY3RybF9hZGRfZGV2KCkgKFVCTEtfRl9DTURfSU9DVExfRU5DT0RFLCAu
-Li4sDQo+IFVCTEtfRl9CVUZfUkVHX09GRl9EQUVNT04pLg0KPiANCj4+DQo+PiAgICNkZWZpbmUg
-VUJMS19GX0FMTF9SRUNPVkVSWV9GTEFHUyAoVUJMS19GX1VTRVJfUkVDT1ZFUlkgXA0KPj4gICAg
-ICAgICAgICAgICAgICB8IFVCTEtfRl9VU0VSX1JFQ09WRVJZX1JFSVNTVUUgXA0KPj4gQEAgLTIz
-OSw2ICsyNDEsOCBAQCBzdHJ1Y3QgdWJsa19kZXZpY2Ugew0KPj4gICAgICAgICAgc3RydWN0IGRl
-bGF5ZWRfd29yayAgICAgZXhpdF93b3JrOw0KPj4gICAgICAgICAgc3RydWN0IHdvcmtfc3RydWN0
-ICAgICAgcGFydGl0aW9uX3NjYW5fd29yazsNCj4+DQo+PiArICAgICAgIGJvb2wgICAgICAgICAg
-ICAgICAgICAgIGJsb2NrX29wZW47IC8qIHByb3RlY3RlZCBieSBvcGVuX211dGV4ICovDQo+PiAr
-DQo+PiAgICAgICAgICBzdHJ1Y3QgdWJsa19xdWV1ZSAgICAgICAqcXVldWVzW107DQo+PiAgIH07
-DQo+Pg0KPj4gQEAgLTkxOSw2ICs5MjMsOSBAQCBzdGF0aWMgaW50IHVibGtfb3BlbihzdHJ1Y3Qg
-Z2VuZGlzayAqZGlzaywgYmxrX21vZGVfdCBtb2RlKQ0KPj4gICAgICAgICAgICAgICAgICAgICAg
-ICAgIHJldHVybiAtRVBFUk07DQo+PiAgICAgICAgICB9DQo+Pg0KPj4gKyAgICAgICBpZiAodWIt
-PmJsb2NrX29wZW4pDQo+PiArICAgICAgICAgICAgICAgcmV0dXJuIC1FQlVTWTsNCj4+ICsNCj4+
-ICAgICAgICAgIHJldHVybiAwOw0KPj4gICB9DQo+Pg0KPj4gQEAgLTMzMDksNiArMzMxNiwzNSBA
-QCBzdGF0aWMgdm9pZCB1YmxrX2N0cmxfc3RvcF9kZXYoc3RydWN0IHVibGtfZGV2aWNlICp1YikN
-Cj4+ICAgICAgICAgIHVibGtfc3RvcF9kZXYodWIpOw0KPj4gICB9DQo+Pg0KPj4gK3N0YXRpYyBp
-bnQgdWJsa19jdHJsX3RyeV9zdG9wX2RldihzdHJ1Y3QgdWJsa19kZXZpY2UgKnViKQ0KPj4gK3sN
-Cj4+ICsgICAgICAgc3RydWN0IGdlbmRpc2sgKmRpc2s7DQo+PiArICAgICAgIGludCByZXQgPSAw
-Ow0KPj4gKw0KPj4gKyAgICAgICBkaXNrID0gdWJsa19nZXRfZGlzayh1Yik7DQo+PiArICAgICAg
-IGlmICghZGlzaykgew0KPj4gKyAgICAgICAgICAgICAgIHJldHVybiAtRU5PREVWOw0KPj4gKyAg
-ICAgICB9DQo+PiArDQo+PiArICAgICAgIG11dGV4X2xvY2soJmRpc2stPm9wZW5fbXV0ZXgpOw0K
-Pj4gKyAgICAgICBpZiAoZGlza19vcGVuZXJzKGRpc2spID4gMCkgew0KPj4gKyAgICAgICAgICAg
-ICAgIHJldCA9IC1FQlVTWTsNCj4+ICsgICAgICAgICAgICAgICBnb3RvIHVubG9jazsNCj4+ICsg
-ICAgICAgfQ0KPj4gKyAgICAgICB1Yi0+YmxvY2tfb3BlbiA9IHRydWU7DQo+PiArICAgICAgIC8q
-IHJlbGVhc2Ugb3Blbl9tdXRleCBhcyBkZWxfZ2VuZGlzaygpIHdpbGwgcmVhY3F1aXJlIGl0ICov
-DQo+PiArICAgICAgIG11dGV4X3VubG9jaygmZGlzay0+b3Blbl9tdXRleCk7DQo+PiArDQo+PiAr
-ICAgICAgIHVibGtfY3RybF9zdG9wX2Rldih1Yik7DQo+PiArICAgICAgIGdvdG8gb3V0Ow0KPj4g
-Kw0KPj4gK3VubG9jazoNCj4+ICsgICAgICAgbXV0ZXhfdW5sb2NrKCZkaXNrLT5vcGVuX211dGV4
-KTsNCj4+ICtvdXQ6DQo+PiArICAgICAgIHVibGtfcHV0X2Rpc2soZGlzayk7DQo+PiArICAgICAg
-IHJldHVybiByZXQ7DQo+PiArfQ0KPj4gKw0KPj4gICBzdGF0aWMgaW50IHVibGtfY3RybF9nZXRf
-ZGV2X2luZm8oc3RydWN0IHVibGtfZGV2aWNlICp1YiwNCj4+ICAgICAgICAgICAgICAgICAgY29u
-c3Qgc3RydWN0IHVibGtzcnZfY3RybF9jbWQgKmhlYWRlcikNCj4+ICAgew0KPj4gQEAgLTM3MDQs
-NiArMzc0MCw3IEBAIHN0YXRpYyBpbnQgdWJsa19jdHJsX3VyaW5nX2NtZF9wZXJtaXNzaW9uKHN0
-cnVjdCB1YmxrX2RldmljZSAqdWIsDQo+PiAgICAgICAgICBjYXNlIFVCTEtfQ01EX0VORF9VU0VS
-X1JFQ09WRVJZOg0KPj4gICAgICAgICAgY2FzZSBVQkxLX0NNRF9VUERBVEVfU0laRToNCj4+ICAg
-ICAgICAgIGNhc2UgVUJMS19DTURfUVVJRVNDRV9ERVY6DQo+PiArICAgICAgIGNhc2UgVUJMS19D
-TURfVFJZX1NUT1BfREVWOg0KPj4gICAgICAgICAgICAgICAgICBtYXNrID0gTUFZX1JFQUQgfCBN
-QVlfV1JJVEU7DQo+PiAgICAgICAgICAgICAgICAgIGJyZWFrOw0KPj4gICAgICAgICAgZGVmYXVs
-dDoNCj4+IEBAIC0zODE3LDYgKzM4NTQsOSBAQCBzdGF0aWMgaW50IHVibGtfY3RybF91cmluZ19j
-bWQoc3RydWN0IGlvX3VyaW5nX2NtZCAqY21kLA0KPj4gICAgICAgICAgY2FzZSBVQkxLX0NNRF9R
-VUlFU0NFX0RFVjoNCj4+ICAgICAgICAgICAgICAgICAgcmV0ID0gdWJsa19jdHJsX3F1aWVzY2Vf
-ZGV2KHViLCBoZWFkZXIpOw0KPj4gICAgICAgICAgICAgICAgICBicmVhazsNCj4+ICsgICAgICAg
-Y2FzZSBVQkxLX0NNRF9UUllfU1RPUF9ERVY6DQo+PiArICAgICAgICAgICAgICAgcmV0ID0gdWJs
-a19jdHJsX3RyeV9zdG9wX2Rldih1Yik7DQo+PiArICAgICAgICAgICAgICAgYnJlYWs7DQo+PiAg
-ICAgICAgICBkZWZhdWx0Og0KPj4gICAgICAgICAgICAgICAgICByZXQgPSAtRU9QTk9UU1VQUDsN
-Cj4+ICAgICAgICAgICAgICAgICAgYnJlYWs7DQo+PiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS91YXBp
-L2xpbnV4L3VibGtfY21kLmggYi9pbmNsdWRlL3VhcGkvbGludXgvdWJsa19jbWQuaA0KPj4gaW5k
-ZXggZWM3N2RhYmJhNDViLi4yYjQ4YzE3MjU0MmQgMTAwNjQ0DQo+PiAtLS0gYS9pbmNsdWRlL3Vh
-cGkvbGludXgvdWJsa19jbWQuaA0KPj4gKysrIGIvaW5jbHVkZS91YXBpL2xpbnV4L3VibGtfY21k
-LmgNCj4+IEBAIC01NSw3ICs1NSw4IEBADQo+PiAgICAgICAgICBfSU9XUigndScsIDB4MTUsIHN0
-cnVjdCB1Ymxrc3J2X2N0cmxfY21kKQ0KPj4gICAjZGVmaW5lIFVCTEtfVV9DTURfUVVJRVNDRV9E
-RVYgICAgICAgICBcDQo+PiAgICAgICAgICBfSU9XUigndScsIDB4MTYsIHN0cnVjdCB1Ymxrc3J2
-X2N0cmxfY21kKQ0KPj4gLQ0KPj4gKyNkZWZpbmUgVUJMS19VX0NNRF9UUllfU1RPUF9ERVYgICAg
-ICAgICAgICAgICAgXA0KPj4gKyAgICAgICBfSU9XUigndScsIDB4MTcsIHN0cnVjdCB1Ymxrc3J2
-X2N0cmxfY21kKQ0KPj4gICAvKg0KPj4gICAgKiA2NGJpdHMgYXJlIGVub3VnaCBub3csIGFuZCBp
-dCBzaG91bGQgYmUgZWFzeSB0byBleHRlbmQgaW4gY2FzZSBvZg0KPj4gICAgKiBydW5uaW5nIG91
-dCBvZiBmZWF0dXJlIGZsYWdzDQo+PiBAQCAtMjQxLDYgKzI0MiwxMiBAQA0KPj4gICAgKi8NCj4+
-ICAgI2RlZmluZSBVQkxLX0ZfVVBEQVRFX1NJWkUgICAgICAgICAgICAgICgxVUxMIDw8IDEwKQ0K
-Pj4NCj4+ICsvKg0KPj4gKyAqIFRoZSBkZXZpY2Ugc3VwcG9ydHMgdGhlIFVCTEtfQ01EX1RSWV9T
-VE9QX0RFViBjb21tYW5kLCB3aGljaA0KPj4gKyAqIGFsbG93cyBzdG9wcGluZyB0aGUgZGV2aWNl
-IG9ubHkgaWYgdGhlcmUgYXJlIG5vIG9wZW5lcnMuDQo+PiArICovDQo+PiArI2RlZmluZSBVQkxL
-X0ZfU0FGRV9TVE9QX0RFViAgICgxVUxMIDw8IDExKQ0KPiANCj4gVGhpcyBmZWF0dXJlIGZsYWcg
-aXMgYWxyZWFkeSB1c2VkIGZvciBVQkxLX0ZfQVVUT19CVUZfUkVHLiBQbGVhc2UgdXNlDQo+IGJp
-dCAxNyBvciBoaWdoZXIsIGFzIGJpdHMgdXAgdG8gMTQgYXJlIGFscmVhZHkgYXNzaWduZWQgYW5k
-IGJpdHMgMTUNCj4gYW5kIDE2IGFyZSBhbGxvY2F0ZWQgYnkgaW4tZmxpZ2h0IHBhdGNoIHNldHMu
-DQo+IA0KPiBUaGUgZmVhdHVyZSBmbGFnIHNob3VsZCBhbHNvIGJlIGFkZGVkIHRvIHRoZSBsaXN0
-IG9mIGtub3duIHVibGsNCj4gZmVhdHVyZSBmbGFncyBpbiBjbWRfZGV2X2dldF9mZWF0dXJlcygp
-IGluDQo+IHRvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL3VibGsva3VibGsuYy4NCj4gDQo+IEJlc3Qs
-DQo+IENhbGViDQo+IA0KPj4gKw0KPj4gICAvKg0KPj4gICAgKiByZXF1ZXN0IGJ1ZmZlciBpcyBy
-ZWdpc3RlcmVkIGF1dG9tYXRpY2FsbHkgdG8gdXJpbmdfY21kJ3MgaW9fdXJpbmcNCj4+ICAgICog
-Y29udGV4dCBiZWZvcmUgZGVsaXZlcmluZyB0aGlzIGlvIGNvbW1hbmQgdG8gdWJsayBzZXJ2ZXIs
-IG1lYW50aW1lDQo+PiAtLQ0KPj4gMi4zOS41IChBcHBsZSBHaXQtMTU0KQ0KPj4NClRoYW5rIHlv
-dSBmb3IgdGhlIGNvbW1lbnRzLCBvbiB3aGljaCBicmFuY2ggc2hvdWxkIEkgcmViYXNlZCBteSBj
-aGFuZ2VzIG9uPw0KDQpUaGFuayB5b3UsDQpZb2F2DQo=
+On Tue, Jan 6, 2026 at 11:40=E2=80=AFAM Yoav Cohen <yoav@nvidia.com> wrote:
+>
+> On 06/01/2026 21:27, Caleb Sander Mateos wrote:
+> > External email: Use caution opening links or attachments
+> >
+> >
+> > On Tue, Jan 6, 2026 at 10:59=E2=80=AFAM Yoav Cohen <yoav@nvidia.com> wr=
+ote:
+> >>
+> >> This command is similar to UBLK_CMD_STOP_DEV, but it only stops the
+> >> device if there are no active openers for the ublk block device.
+> >> If the device is busy, the command returns -EBUSY instead of
+> >> disrupting active clients. This allows safe, non-destructive stopping.
+> >>
+> >> Advertise UBLK_CMD_TRY_STOP_DEV support via UBLK_F_SAFE_STOP_DEV featu=
+re flag.
+> >>
+> >> Signed-off-by: Yoav Cohen <yoav@nvidia.com>
+> >> ---
+> >>   drivers/block/ublk_drv.c      | 42 +++++++++++++++++++++++++++++++++=
++-
+> >>   include/uapi/linux/ublk_cmd.h |  9 +++++++-
+> >>   2 files changed, 49 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> >> index 2d5602ef05cc..9291eab4c31f 100644
+> >> --- a/drivers/block/ublk_drv.c
+> >> +++ b/drivers/block/ublk_drv.c
+> >> @@ -54,6 +54,7 @@
+> >>   #define UBLK_CMD_DEL_DEV_ASYNC _IOC_NR(UBLK_U_CMD_DEL_DEV_ASYNC)
+> >>   #define UBLK_CMD_UPDATE_SIZE   _IOC_NR(UBLK_U_CMD_UPDATE_SIZE)
+> >>   #define UBLK_CMD_QUIESCE_DEV   _IOC_NR(UBLK_U_CMD_QUIESCE_DEV)
+> >> +#define UBLK_CMD_TRY_STOP_DEV  _IOC_NR(UBLK_U_CMD_TRY_STOP_DEV)
+> >>
+> >>   #define UBLK_IO_REGISTER_IO_BUF                _IOC_NR(UBLK_U_IO_REG=
+ISTER_IO_BUF)
+> >>   #define UBLK_IO_UNREGISTER_IO_BUF      _IOC_NR(UBLK_U_IO_UNREGISTER_=
+IO_BUF)
+> >> @@ -73,7 +74,8 @@
+> >>                  | UBLK_F_AUTO_BUF_REG \
+> >>                  | UBLK_F_QUIESCE \
+> >>                  | UBLK_F_PER_IO_DAEMON \
+> >> -               | UBLK_F_BUF_REG_OFF_DAEMON)
+> >> +               | UBLK_F_BUF_REG_OFF_DAEMON \
+> >> +               | UBLK_F_SAFE_STOP_DEV)
+> >
+> > Should also be added to the list of automatic feature flags in
+> > ublk_ctrl_add_dev() (UBLK_F_CMD_IOCTL_ENCODE, ...,
+> > UBLK_F_BUF_REG_OFF_DAEMON).
+> >
+> >>
+> >>   #define UBLK_F_ALL_RECOVERY_FLAGS (UBLK_F_USER_RECOVERY \
+> >>                  | UBLK_F_USER_RECOVERY_REISSUE \
+> >> @@ -239,6 +241,8 @@ struct ublk_device {
+> >>          struct delayed_work     exit_work;
+> >>          struct work_struct      partition_scan_work;
+> >>
+> >> +       bool                    block_open; /* protected by open_mutex=
+ */
+> >> +
+> >>          struct ublk_queue       *queues[];
+> >>   };
+> >>
+> >> @@ -919,6 +923,9 @@ static int ublk_open(struct gendisk *disk, blk_mod=
+e_t mode)
+> >>                          return -EPERM;
+> >>          }
+> >>
+> >> +       if (ub->block_open)
+> >> +               return -EBUSY;
+> >> +
+> >>          return 0;
+> >>   }
+> >>
+> >> @@ -3309,6 +3316,35 @@ static void ublk_ctrl_stop_dev(struct ublk_devi=
+ce *ub)
+> >>          ublk_stop_dev(ub);
+> >>   }
+> >>
+> >> +static int ublk_ctrl_try_stop_dev(struct ublk_device *ub)
+> >> +{
+> >> +       struct gendisk *disk;
+> >> +       int ret =3D 0;
+> >> +
+> >> +       disk =3D ublk_get_disk(ub);
+> >> +       if (!disk) {
+> >> +               return -ENODEV;
+> >> +       }
+> >> +
+> >> +       mutex_lock(&disk->open_mutex);
+> >> +       if (disk_openers(disk) > 0) {
+> >> +               ret =3D -EBUSY;
+> >> +               goto unlock;
+> >> +       }
+> >> +       ub->block_open =3D true;
+> >> +       /* release open_mutex as del_gendisk() will reacquire it */
+> >> +       mutex_unlock(&disk->open_mutex);
+> >> +
+> >> +       ublk_ctrl_stop_dev(ub);
+> >> +       goto out;
+> >> +
+> >> +unlock:
+> >> +       mutex_unlock(&disk->open_mutex);
+> >> +out:
+> >> +       ublk_put_disk(disk);
+> >> +       return ret;
+> >> +}
+> >> +
+> >>   static int ublk_ctrl_get_dev_info(struct ublk_device *ub,
+> >>                  const struct ublksrv_ctrl_cmd *header)
+> >>   {
+> >> @@ -3704,6 +3740,7 @@ static int ublk_ctrl_uring_cmd_permission(struct=
+ ublk_device *ub,
+> >>          case UBLK_CMD_END_USER_RECOVERY:
+> >>          case UBLK_CMD_UPDATE_SIZE:
+> >>          case UBLK_CMD_QUIESCE_DEV:
+> >> +       case UBLK_CMD_TRY_STOP_DEV:
+> >>                  mask =3D MAY_READ | MAY_WRITE;
+> >>                  break;
+> >>          default:
+> >> @@ -3817,6 +3854,9 @@ static int ublk_ctrl_uring_cmd(struct io_uring_c=
+md *cmd,
+> >>          case UBLK_CMD_QUIESCE_DEV:
+> >>                  ret =3D ublk_ctrl_quiesce_dev(ub, header);
+> >>                  break;
+> >> +       case UBLK_CMD_TRY_STOP_DEV:
+> >> +               ret =3D ublk_ctrl_try_stop_dev(ub);
+> >> +               break;
+> >>          default:
+> >>                  ret =3D -EOPNOTSUPP;
+> >>                  break;
+> >> diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_c=
+md.h
+> >> index ec77dabba45b..2b48c172542d 100644
+> >> --- a/include/uapi/linux/ublk_cmd.h
+> >> +++ b/include/uapi/linux/ublk_cmd.h
+> >> @@ -55,7 +55,8 @@
+> >>          _IOWR('u', 0x15, struct ublksrv_ctrl_cmd)
+> >>   #define UBLK_U_CMD_QUIESCE_DEV         \
+> >>          _IOWR('u', 0x16, struct ublksrv_ctrl_cmd)
+> >> -
+> >> +#define UBLK_U_CMD_TRY_STOP_DEV                \
+> >> +       _IOWR('u', 0x17, struct ublksrv_ctrl_cmd)
+> >>   /*
+> >>    * 64bits are enough now, and it should be easy to extend in case of
+> >>    * running out of feature flags
+> >> @@ -241,6 +242,12 @@
+> >>    */
+> >>   #define UBLK_F_UPDATE_SIZE              (1ULL << 10)
+> >>
+> >> +/*
+> >> + * The device supports the UBLK_CMD_TRY_STOP_DEV command, which
+> >> + * allows stopping the device only if there are no openers.
+> >> + */
+> >> +#define UBLK_F_SAFE_STOP_DEV   (1ULL << 11)
+> >
+> > This feature flag is already used for UBLK_F_AUTO_BUF_REG. Please use
+> > bit 17 or higher, as bits up to 14 are already assigned and bits 15
+> > and 16 are allocated by in-flight patch sets.
+> >
+> > The feature flag should also be added to the list of known ublk
+> > feature flags in cmd_dev_get_features() in
+> > tools/testing/selftests/ublk/kublk.c.
+> >
+> > Best,
+> > Caleb
+> >
+> >> +
+> >>   /*
+> >>    * request buffer is registered automatically to uring_cmd's io_urin=
+g
+> >>    * context before delivering this io command to ublk server, meantim=
+e
+> >> --
+> >> 2.39.5 (Apple Git-154)
+> >>
+> Thank you for the comments, on which branch should I rebased my changes o=
+n?
+
+I would use block-6.19. It looks like it has 1 additional ublk commit
+on top of for-7.0/block. Feature flag bits 15 and 16 are used by the
+following patch series, but they can be rebased on yours once it
+lands:
+UBLK_F_BATCH_IO:
+https://lore.kernel.org/linux-block/20251202121917.1412280-11-ming.lei@redh=
+at.com/T/#u
+UBLK_F_NO_AUTO_PART_SCAN:
+https://lore.kernel.org/linux-block/20251220095322.1527664-2-ming.lei@redha=
+t.com/T/#u
+UBLK_F_INTEGRITY:
+https://lore.kernel.org/linux-block/20260106005752.3784925-4-csander@purest=
+orage.com/T/#u
+
+Best,
+Caleb
