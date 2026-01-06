@@ -1,272 +1,130 @@
-Received: from mail-dl1-f43.google.com (mail-dl1-f43.google.com [74.125.82.43])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28170342C9A
-	for <linux-block@vger.kernel.org>; Tue,  6 Jan 2026 19:48:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C35AD352944
+	for <linux-block@vger.kernel.org>; Tue,  6 Jan 2026 19:51:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767728937; cv=none; b=diM6YJwJzn8Kqbw+apMMjxF1bsAuHoBG2Uy+zBt/5RjG2Xws/MTbRSoOprpknivLGI3RwsOcdea3SixLb1b6y+fCky18y59dlD6Dd8LjT1vg+53NS5/KaBSX0Hk2Szv493ZvdXSZ9p78FhGIGSF0Hank4rTww6IHYbIMdFNrKDQ=
+	t=1767729079; cv=none; b=E3igzDX2Aj3tV5cK1go3EvAIiW9iEc7oIUJjgzJ52xTDS6jkgpPfdzRYXM5AtLGLMO1b8PV96ItrAdsPnyYto90Uipexl7Gv/8YqNrMw5q6AsagqYaq41UfKrzAMKsQGye8csDb2a07fmQqp9pDbH62QoaobT3usb8WYlt+Hrrs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767728937; c=relaxed/simple;
-	bh=2Yjt8U1jmBIMKEj6M4Q2oLpf2I8t6Zgc0Yqo5olcCh0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jje1lrqCvHne6zEjNkxNxilM6FZBs+4vT+XV4JxVN6BUht3AdTrWFhhp+S0+BG5YX8UQVpXF8eUx07Udk61AcdGp98HSWFuIyb/PZKS1K95413co8kRP8bxT3Wbj/ykCqmkiBzPEawgDE7MH943M1lPVBrDnFgoXaTDcTQal27s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Q9pd6qQ2; arc=none smtp.client-ip=74.125.82.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1767729079; c=relaxed/simple;
+	bh=lHxyhw/2ECuTZwsuxRhqHF7q0GnOP8IQA1gLR0EAaao=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pmpeE2l91d3Tq5AtQSpjAyLVgg23FoGWadTJMHAXfRHH4CcRp4FMfavr9re2cDRg2s20WXuMjlIDgmjUatXrrl5yHFySgvvF4mBkgNO0Y6B9Du8iyvymvGyeTjqOAUX8DGyXHBef7rx87NJn7oavIgKc+iuEM1+23Of/HyuNCNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GEK7fZu2; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Q9pd6qQ2"
-Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-11bba84006dso71702c88.2
-        for <linux-block@vger.kernel.org>; Tue, 06 Jan 2026 11:48:54 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GEK7fZu2"
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-43260a5a096so876032f8f.0
+        for <linux-block@vger.kernel.org>; Tue, 06 Jan 2026 11:51:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1767728934; x=1768333734; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OZpVi5TIDx1hg/lePodnjApaWASmkc/Ad/LDk3KapkU=;
-        b=Q9pd6qQ2wW4+y2CET+uLSd6CiMqdVOyhFLg02mMAQnoDt9il0Qggel9pFweP6NUKSr
-         paObhu50s6A9sInAIlrAZhGgjCGozNQlNQ+DA93WK/9xvSgP2ciVWHCx3xps/M7yHWzj
-         BkusGhmcRQqSPqfGFPdKpUkK9zA6Bfd7KTaNgHov458JFEM6vikjs/hyGk9Q76yF96E2
-         aYoKYa/GSWCHOJkSMQBQDk1EV1/kXAwXXiqiUjvq8Rt5Izu/zD7cxGL57s2C2PE7oE5C
-         bixCLAeldg1j3NfMaZAc/CY97JVQ08lcNQat08MkhrwQdZdd2KbLd8VS1CaK86OamB9d
-         R8bQ==
+        d=gmail.com; s=20230601; t=1767729076; x=1768333876; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ovZgk8PxCrhilP9ak1FB2YkidalwKuZZczfXtCx59dw=;
+        b=GEK7fZu22juEKoMqHTh/UIQCo4vg9eUE/aRaG+aroaUaGX1Hv5Cti0Y8ZBvTn83WIQ
+         Ls+PanyNnhvdqk4FkLhAPaSlTOMwHvQz0BAyeT46JdzUNDy6AbV6rTyI/gF9J9ltRxQ5
+         qQKtY3ADsKUoiiqQuAc6iLAaXHHQj3APDu8qfY6CGTwfxULvFgzUt0Yx6iWD2Tv+wqgC
+         0iUtJpjmjpcH+67hgqPw65J/VOliFYZs/vyoD43mZ6bjoPWMORsVyYRgj5Nn+oeG3FUP
+         GSN1QGMlv/7TY0n7L1xX9WelJRxvHniTArdGNPMX0jolb1OSs70TS64tYQr0nq7zMfY1
+         ugBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767728934; x=1768333734;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=OZpVi5TIDx1hg/lePodnjApaWASmkc/Ad/LDk3KapkU=;
-        b=jeArBsY+MYgyG3LbPY2Ecg7plscat9mqoIuzdTAanGqAwnZkLYWuxYyhHpnj7zq9Rm
-         6fHIuUQ1VbLguTXbSuWTWpDBGDEaiMgfPVUyYwJ/PKFjs/VBPMnK3qcTlnsqcZGosPti
-         tyVo6JJ0TSCOBxDx8wUBuKWzBrASHjPu9l0S5214ya4f70EENexc4vpaE5H/PiOkhJ2W
-         yVU1Gvui9YrlDf17z8Q0JkCxa9lFqR6H5JlaGPgkR8deWIU/eCASLvsr5nUJHH+I4mTN
-         cQNvizItoa6P8+oH9lydWwdMX4YHKlsrQC10XMMYPEreVrPAYqaJeytOcaB45+jvVGTb
-         mmPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW7/ldvn6vGm9/+04NeSuo5UZ1Yx3YAKfWYWbIK2AC5izV3k/3FMVpRqwlk3zgvcWQ5vmXdVPO6HXgMrg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzV2qhfTH9Ydp+88UdWgvO9JdREVeamHyYBgDYazYH354Fn+p2x
-	Vg0zpAfWEKftGoIbKDrccoAHBIAmXL79MSu8pMwHFvId7Gb4XKBw4c8Dq4HfZaF06cedkkPVYQ8
-	KEsNgjCpRw9V0dsep7Rf1ZGdtUXuMvGRp3Oe0xcu+1A==
-X-Gm-Gg: AY/fxX5LZcuWt1HWU3cEAnnu9DNX01MHH9iBQZzpvNyhT6cl58NkqDVhatwI5NkmvoS
-	bK5t4lxs2dUWFGDw3J7NKpkyvCiG/WuvxUO+fIYoSq4meH7uAGF1l7t/m6yOsKyJK6M+TDBAzGP
-	YNG0jZIYEOuZYTnUqCAdItbUfLDwC84ExmYSiS8gZvqL4P3JhJVQ4N8N4Denx0pV3/gpbs25aA6
-	XdHjHvy4VVKzdWNLCfIvxzapTRpqwAm0TfsCFrNPNa7EXycKb3nvNlW3ZsftrrGwt1m7VEy
-X-Google-Smtp-Source: AGHT+IE2PNbz1ewsurDKE9n2C67mLPnmFPmpIU8QTmXZdsoPUDFL49W7Jr9krGqLCTYPnvdwb8fSWgNu8haL1fqp4JA=
-X-Received: by 2002:a05:7022:6293:b0:11b:1c6d:98ed with SMTP id
- a92af1059eb24-121f8abea5cmr54920c88.2.1767728934088; Tue, 06 Jan 2026
- 11:48:54 -0800 (PST)
+        d=1e100.net; s=20230601; t=1767729076; x=1768333876;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ovZgk8PxCrhilP9ak1FB2YkidalwKuZZczfXtCx59dw=;
+        b=XfpQsnGBbFfKkwAWMGrUjuue1KrKjc3FduKaFPb+esPTIFLMNFTQ0U0jNkp1DYhhHK
+         pPexxMz8LjaLGy/lbTKc/YuPOc2c17jckTFC2l/zKibnutyp9VHOr0TK3X4FSHs0Jovf
+         qSJULUZV0OC9CbJLQ2xp3IQxzOJHkcANByXPhpbt4P7IWfOgc1uPg/IFgvZ28AAE5OFk
+         kiB6rS/Mgn1UyJyGiB/ObpHZNXZfTGuygb7LZh2RLFdy89RQ3esX6/t33rizgLiTluqq
+         7g+8ZfOlAZCx1ra+kf7bkUxgGgP8U/12yrRGFFzfZp4V8mz5zWx/pT2MMAL1IUS9koi7
+         3l9g==
+X-Forwarded-Encrypted: i=1; AJvYcCWzE7m1RDaMXn2+7Ygo+5LQLGgAE+7UKLNScoq2LwzErzRm6aRVIs5WJt29Kxal3zA4TLuetddeMeSg6Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzOcKEH1CIB73ZRYTxjdKJFTb6vQr3o7YaBEk8fuV1VIUH0u10P
+	8V9CeDGMtgOd8vKdt6NCk1Q1KhqSvJmyEN1KODbep+HgWVvv3Y0dyc0BVWv5mA==
+X-Gm-Gg: AY/fxX78l+itW92UO9sjg8abvaE5cDJnnhXL//kFkq5mk0D3HYnLUS5IAkBLBV5jr0u
+	QcIo/tSZO0JlKwNXsgeT2kmfQ1WP6h7q/eCRAtZlXOlkqSfW/cjNgLLtWujzVxO0BWiY3xuXWMS
+	dlgKq8hFIOV2ncDBFT80qmSCMr0zOPaTX/v/rncRoodmkxApOuySIqmhSbsds8XTKD5psJH+CBN
+	EeK8LDhl5pHjMt+LLGAo2lIhO0DdEZtdxjXvWYiUH9olaOlqs3vnJ7NknG2A90hwiwr/RbW/I/2
+	eG0YN6F0yTU+i/C9h+6YcfB9w9WFrEJ9FvQR0m4y+VCVEfyCx4lDubFX43l8VCHLuHTe49qS1cP
+	zIVRNfrCnFXw8CCOuoZzDFz3QXX96LsDHWVLZiOz5C3851TWD/tRJbWbHvlOZwMaHriydKEQ5Uw
+	QOKF1hqLSXmElT6j/fQ5xNuEGzkJTFPGI65MXmApkVpSM1hMdW3qAt1fLh9/ZPeVJeu4NPFXYBF
+	MUZ4mytJoJeJ8KxfMpVdDC78kz3ymFJltRXoE8Hwmx7IQccBXsL40FX+Q8TELTS
+X-Google-Smtp-Source: AGHT+IFFym+HTWb6WhRU4bKfzHds67XbzvjVQ0ncM7+fS6yOVWLogcdaslK7a3BF15xU4e7GXQY5lg==
+X-Received: by 2002:a5d:5f51:0:b0:430:fdb8:8510 with SMTP id ffacd0b85a97d-432c3790ca4mr333772f8f.24.1767729076041;
+        Tue, 06 Jan 2026 11:51:16 -0800 (PST)
+Received: from ?IPV6:2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c? ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd0e19bfsm6241105f8f.18.2026.01.06.11.51.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 06 Jan 2026 11:51:15 -0800 (PST)
+Message-ID: <a96e327d-3fef-4d08-87e9-c65866223967@gmail.com>
+Date: Tue, 6 Jan 2026 19:51:12 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260106185831.18711-1-yoav@nvidia.com> <20260106185831.18711-3-yoav@nvidia.com>
- <CADUfDZr9bdzsHMQj1u3_iSLHF8Nka7OxB6H3eEs8dO5zWLOxQA@mail.gmail.com> <c45de2c7-7d88-4b52-a3e9-a9f5863864d7@nvidia.com>
-In-Reply-To: <c45de2c7-7d88-4b52-a3e9-a9f5863864d7@nvidia.com>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Tue, 6 Jan 2026 11:48:42 -0800
-X-Gm-Features: AQt7F2qbV02jq8AcVb2x8Tp-52HdovtoN9Uz-zSPCzFoHW7tqNw7BDr8o9TbECs
-Message-ID: <CADUfDZpfOt6A8T+sPDLuOtJhuDyd11CBL9J+tnoz44s1FgNvfg@mail.gmail.com>
-Subject: Re: [PATCH v3 2/2] ublk: add UBLK_CMD_TRY_STOP_DEV command
-To: Yoav Cohen <yoav@nvidia.com>
-Cc: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Jared Holzman <jholzman@nvidia.com>, 
-	Omri Levi <omril@nvidia.com>, Yoav Cohen <yoav@example.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC v2 01/11] file: add callback for pre-mapping dmabuf
+To: Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>
+Cc: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+ Vishal Verma <vishal1.verma@intel.com>, tushar.gohad@intel.com,
+ Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ Sagi Grimberg <sagi@grimberg.me>, Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Sumit Semwal <sumit.semwal@linaro.org>, linux-kernel@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linaro-mm-sig@lists.linaro.org
+References: <cover.1763725387.git.asml.silence@gmail.com>
+ <74d689540fa200fe37f1a930165357a92fe9e68c.1763725387.git.asml.silence@gmail.com>
+ <7b2017f4-02a3-482a-a173-bb16b895c0cb@amd.com>
+ <20251204110709.GA22971@lst.de>
+ <0571ca61-7b17-4167-83eb-4269bd0459fe@amd.com>
+ <20251204131025.GA26860@lst.de> <aVnFnzRYWC_Y5zHg@fedora>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <aVnFnzRYWC_Y5zHg@fedora>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 6, 2026 at 11:40=E2=80=AFAM Yoav Cohen <yoav@nvidia.com> wrote:
->
-> On 06/01/2026 21:27, Caleb Sander Mateos wrote:
-> > External email: Use caution opening links or attachments
-> >
-> >
-> > On Tue, Jan 6, 2026 at 10:59=E2=80=AFAM Yoav Cohen <yoav@nvidia.com> wr=
-ote:
-> >>
-> >> This command is similar to UBLK_CMD_STOP_DEV, but it only stops the
-> >> device if there are no active openers for the ublk block device.
-> >> If the device is busy, the command returns -EBUSY instead of
-> >> disrupting active clients. This allows safe, non-destructive stopping.
-> >>
-> >> Advertise UBLK_CMD_TRY_STOP_DEV support via UBLK_F_SAFE_STOP_DEV featu=
-re flag.
-> >>
-> >> Signed-off-by: Yoav Cohen <yoav@nvidia.com>
-> >> ---
-> >>   drivers/block/ublk_drv.c      | 42 +++++++++++++++++++++++++++++++++=
-+-
-> >>   include/uapi/linux/ublk_cmd.h |  9 +++++++-
-> >>   2 files changed, 49 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> >> index 2d5602ef05cc..9291eab4c31f 100644
-> >> --- a/drivers/block/ublk_drv.c
-> >> +++ b/drivers/block/ublk_drv.c
-> >> @@ -54,6 +54,7 @@
-> >>   #define UBLK_CMD_DEL_DEV_ASYNC _IOC_NR(UBLK_U_CMD_DEL_DEV_ASYNC)
-> >>   #define UBLK_CMD_UPDATE_SIZE   _IOC_NR(UBLK_U_CMD_UPDATE_SIZE)
-> >>   #define UBLK_CMD_QUIESCE_DEV   _IOC_NR(UBLK_U_CMD_QUIESCE_DEV)
-> >> +#define UBLK_CMD_TRY_STOP_DEV  _IOC_NR(UBLK_U_CMD_TRY_STOP_DEV)
-> >>
-> >>   #define UBLK_IO_REGISTER_IO_BUF                _IOC_NR(UBLK_U_IO_REG=
-ISTER_IO_BUF)
-> >>   #define UBLK_IO_UNREGISTER_IO_BUF      _IOC_NR(UBLK_U_IO_UNREGISTER_=
-IO_BUF)
-> >> @@ -73,7 +74,8 @@
-> >>                  | UBLK_F_AUTO_BUF_REG \
-> >>                  | UBLK_F_QUIESCE \
-> >>                  | UBLK_F_PER_IO_DAEMON \
-> >> -               | UBLK_F_BUF_REG_OFF_DAEMON)
-> >> +               | UBLK_F_BUF_REG_OFF_DAEMON \
-> >> +               | UBLK_F_SAFE_STOP_DEV)
-> >
-> > Should also be added to the list of automatic feature flags in
-> > ublk_ctrl_add_dev() (UBLK_F_CMD_IOCTL_ENCODE, ...,
-> > UBLK_F_BUF_REG_OFF_DAEMON).
-> >
-> >>
-> >>   #define UBLK_F_ALL_RECOVERY_FLAGS (UBLK_F_USER_RECOVERY \
-> >>                  | UBLK_F_USER_RECOVERY_REISSUE \
-> >> @@ -239,6 +241,8 @@ struct ublk_device {
-> >>          struct delayed_work     exit_work;
-> >>          struct work_struct      partition_scan_work;
-> >>
-> >> +       bool                    block_open; /* protected by open_mutex=
- */
-> >> +
-> >>          struct ublk_queue       *queues[];
-> >>   };
-> >>
-> >> @@ -919,6 +923,9 @@ static int ublk_open(struct gendisk *disk, blk_mod=
-e_t mode)
-> >>                          return -EPERM;
-> >>          }
-> >>
-> >> +       if (ub->block_open)
-> >> +               return -EBUSY;
-> >> +
-> >>          return 0;
-> >>   }
-> >>
-> >> @@ -3309,6 +3316,35 @@ static void ublk_ctrl_stop_dev(struct ublk_devi=
-ce *ub)
-> >>          ublk_stop_dev(ub);
-> >>   }
-> >>
-> >> +static int ublk_ctrl_try_stop_dev(struct ublk_device *ub)
-> >> +{
-> >> +       struct gendisk *disk;
-> >> +       int ret =3D 0;
-> >> +
-> >> +       disk =3D ublk_get_disk(ub);
-> >> +       if (!disk) {
-> >> +               return -ENODEV;
-> >> +       }
-> >> +
-> >> +       mutex_lock(&disk->open_mutex);
-> >> +       if (disk_openers(disk) > 0) {
-> >> +               ret =3D -EBUSY;
-> >> +               goto unlock;
-> >> +       }
-> >> +       ub->block_open =3D true;
-> >> +       /* release open_mutex as del_gendisk() will reacquire it */
-> >> +       mutex_unlock(&disk->open_mutex);
-> >> +
-> >> +       ublk_ctrl_stop_dev(ub);
-> >> +       goto out;
-> >> +
-> >> +unlock:
-> >> +       mutex_unlock(&disk->open_mutex);
-> >> +out:
-> >> +       ublk_put_disk(disk);
-> >> +       return ret;
-> >> +}
-> >> +
-> >>   static int ublk_ctrl_get_dev_info(struct ublk_device *ub,
-> >>                  const struct ublksrv_ctrl_cmd *header)
-> >>   {
-> >> @@ -3704,6 +3740,7 @@ static int ublk_ctrl_uring_cmd_permission(struct=
- ublk_device *ub,
-> >>          case UBLK_CMD_END_USER_RECOVERY:
-> >>          case UBLK_CMD_UPDATE_SIZE:
-> >>          case UBLK_CMD_QUIESCE_DEV:
-> >> +       case UBLK_CMD_TRY_STOP_DEV:
-> >>                  mask =3D MAY_READ | MAY_WRITE;
-> >>                  break;
-> >>          default:
-> >> @@ -3817,6 +3854,9 @@ static int ublk_ctrl_uring_cmd(struct io_uring_c=
-md *cmd,
-> >>          case UBLK_CMD_QUIESCE_DEV:
-> >>                  ret =3D ublk_ctrl_quiesce_dev(ub, header);
-> >>                  break;
-> >> +       case UBLK_CMD_TRY_STOP_DEV:
-> >> +               ret =3D ublk_ctrl_try_stop_dev(ub);
-> >> +               break;
-> >>          default:
-> >>                  ret =3D -EOPNOTSUPP;
-> >>                  break;
-> >> diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_c=
-md.h
-> >> index ec77dabba45b..2b48c172542d 100644
-> >> --- a/include/uapi/linux/ublk_cmd.h
-> >> +++ b/include/uapi/linux/ublk_cmd.h
-> >> @@ -55,7 +55,8 @@
-> >>          _IOWR('u', 0x15, struct ublksrv_ctrl_cmd)
-> >>   #define UBLK_U_CMD_QUIESCE_DEV         \
-> >>          _IOWR('u', 0x16, struct ublksrv_ctrl_cmd)
-> >> -
-> >> +#define UBLK_U_CMD_TRY_STOP_DEV                \
-> >> +       _IOWR('u', 0x17, struct ublksrv_ctrl_cmd)
-> >>   /*
-> >>    * 64bits are enough now, and it should be easy to extend in case of
-> >>    * running out of feature flags
-> >> @@ -241,6 +242,12 @@
-> >>    */
-> >>   #define UBLK_F_UPDATE_SIZE              (1ULL << 10)
-> >>
-> >> +/*
-> >> + * The device supports the UBLK_CMD_TRY_STOP_DEV command, which
-> >> + * allows stopping the device only if there are no openers.
-> >> + */
-> >> +#define UBLK_F_SAFE_STOP_DEV   (1ULL << 11)
-> >
-> > This feature flag is already used for UBLK_F_AUTO_BUF_REG. Please use
-> > bit 17 or higher, as bits up to 14 are already assigned and bits 15
-> > and 16 are allocated by in-flight patch sets.
-> >
-> > The feature flag should also be added to the list of known ublk
-> > feature flags in cmd_dev_get_features() in
-> > tools/testing/selftests/ublk/kublk.c.
-> >
-> > Best,
-> > Caleb
-> >
-> >> +
-> >>   /*
-> >>    * request buffer is registered automatically to uring_cmd's io_urin=
-g
-> >>    * context before delivering this io command to ublk server, meantim=
-e
-> >> --
-> >> 2.39.5 (Apple Git-154)
-> >>
-> Thank you for the comments, on which branch should I rebased my changes o=
-n?
+On 1/4/26 01:42, Ming Lei wrote:
+> On Thu, Dec 04, 2025 at 02:10:25PM +0100, Christoph Hellwig wrote:
+>> On Thu, Dec 04, 2025 at 12:09:46PM +0100, Christian König wrote:
+>>>> I find the naming pretty confusing a well.  But what this does is to
+>>>> tell the file system/driver that it should expect a future
+>>>> read_iter/write_iter operation that takes data from / puts data into
+>>>> the dmabuf passed to this operation.
+>>>
+>>> That explanation makes much more sense.
+>>>
+>>> The remaining question is why does the underlying file system / driver
+>>> needs to know that it will get addresses from a DMA-buf?
+>>
+>> This eventually ends up calling dma_buf_dynamic_attach and provides
+>> a way to find the dma_buf_attachment later in the I/O path.
+> 
+> Maybe it can be named as ->dma_buf_attach()?  For wiring dma-buf and the
+> importer side(nvme).
+> 
+> But I am wondering why not make it as one subsystem interface, such as nvme
+> ioctl, then the whole implementation can be simplified a lot. It is reasonable
+> because subsystem is exactly the side for consuming/importing the dma-buf.
 
-I would use block-6.19. It looks like it has 1 additional ublk commit
-on top of for-7.0/block. Feature flag bits 15 and 16 are used by the
-following patch series, but they can be rebased on yours once it
-lands:
-UBLK_F_BATCH_IO:
-https://lore.kernel.org/linux-block/20251202121917.1412280-11-ming.lei@redh=
-at.com/T/#u
-UBLK_F_NO_AUTO_PART_SCAN:
-https://lore.kernel.org/linux-block/20251220095322.1527664-2-ming.lei@redha=
-t.com/T/#u
-UBLK_F_INTEGRITY:
-https://lore.kernel.org/linux-block/20260106005752.3784925-4-csander@purest=
-orage.com/T/#u
+It's not an nvme specific interface, and so a file op was much more
+convenient. And ioctls for registering it into io_uring would also be
+problematic. I simplified some of the layering for the next version,
+but most of the complexity comes from handling in blk-mq-dma-token.h,
+it'd be same even if made nvme specific. In fact, I had it all first
+in nvme but then had to move to block/ because of sleeping.
 
-Best,
-Caleb
+-- 
+Pavel Begunkov
+
