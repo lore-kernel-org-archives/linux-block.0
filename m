@@ -1,138 +1,281 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E8FC332ED3
-	for <linux-block@vger.kernel.org>; Tue,  6 Jan 2026 11:37:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A21B932E758
+	for <linux-block@vger.kernel.org>; Tue,  6 Jan 2026 12:08:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767699455; cv=none; b=MEOg9+bmBEG0qGdDbOqUk/UuLTtHlAeNOgh19Px9ntSjuGJLTl7B/q1a6QsQ8Ifr3G63YXJzYweU7e7CRc3OJBZRHpyWB32k1WkWOFfuiwJEvPRV+u1IM13R0H+XIkz5/lXVtAZJrU3I1W1lBOzdu7I5AdKjmQl56XvximjNIsI=
+	t=1767701301; cv=none; b=fVEiQXSlxv2JTOxKtP0ovpAeCpfX3ZupSSfgmkpM1HKP29+iJiMRUblNTRhLNOtil6DGd/wkU40R/rPN1Qrf8BJtt2rhbT5oWTD8yC6wCYNFZ1Dt4m2dKminLP9FKXED43k9lfGq+4iAGsb2CWTn8YYmrvmHV+5ikLkPiVJlNg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767699455; c=relaxed/simple;
-	bh=v4YuHG1rupxsoSiOid32tx2tUkEKlM5xOQlZqfA5aZY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EF281Ezo3SEDfKwKeFCgCozWZf6UT96CbO/Q4ol6Ni8EYQGTZfBCTGLa0uChVK+NGai0X5DffFhTJVL5KqsCl6a5yTZj++TLVxvdpYBlm5RhogtshHS1fGxvoy7Bw3Y3u+4cnu0JGDulxYTtLYXYFLPZ0s9EyqvsZTrgeeep5vE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aH8clGh0; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1767701301; c=relaxed/simple;
+	bh=+W/OG9hSv3ZdaiIFx2ZpwlIdZsOkYGpeJXZF1X1V3+o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CdoOe5fVB/3U+pzBVXQ2Gnb3gHUtzfgO3OovAWzGi2ZgWMqGmoaG9BrGWSAj2DxDKCWf7hR6CDUCTlKf4sLYITK/5pbxLpd7kX8alO7c7Wfsl/ITjWk1b07rtr/cWCLsLApHnshJOvPaimxY23vc2hX7FyNWuocR3sLS4t86QFo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=fe9Z2NWA; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=YkbW0vVG; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=wFCpSPli; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=LIFBKhQF; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aH8clGh0"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-477ba2c1ca2so9128995e9.2
-        for <linux-block@vger.kernel.org>; Tue, 06 Jan 2026 03:37:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767699451; x=1768304251; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=q6uW+A2P9pkdDCkg7XZPcaKU2E1i1mrVtntLiN6dJWY=;
-        b=aH8clGh0aGB7eBc1MCM7+h6zNBiz4ABTMAJg9hhbrbFi4nOyCRr7Oat7A+tYBQBb+A
-         u32LlHWneALAikJjmB2Yl0OvLjjBRNx1JiJXj1lRKFo/ZubXBcXx3S5xB6od0wQrBWsV
-         RC32c19kxeBU1uzmp9KTRZLmW6n8E0I5sz3zNu7Qad/rhe2ZD2Zi7e1a16e0RXDtsfQB
-         0G2t4RHKUxprxxuIzszkCpEWnI8yptSiK+LfO9Gl9OIi09NBDiEh2MiJkgBs1nuMIl4n
-         oxJwyoFgvjuu4YrCbvup8BUVo9BN7cJUFXBg6TK0NcZ1c+OofZ9I+mz3pAiyUtIQMVj2
-         03TQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767699451; x=1768304251;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=q6uW+A2P9pkdDCkg7XZPcaKU2E1i1mrVtntLiN6dJWY=;
-        b=I8f9ROY76qoTjc2lz6nxO+KnzJGuEni1EjorusgzzkfYZkzLbKPURVpXxrymxuvJ9i
-         oD9iNQ7Nqa/BBkVGp8/IvoE2P2Gret9cIa9LFzkHN/AEvUdqHohK/AOk3/Uv5WkdtcWK
-         B13xDBNjn6yWJaiyqDWv7uJProK2Ank64lyPJq8Pd5wCQXjAWur31yPLJSnGk5Z0xyp5
-         csGr3JY4EeygPTlcDc9qV6qhnzZfAuCkHyOdJEcPXhJoHKQZH4qOcfwtTyFp/sjWUr+v
-         iOXiJWHSV6eDg+q6fYLXujvfCXUCVvU6EHN2ZSy4gF12tNEh3P3KKQOj2YaSxhnsqZ4F
-         fM3w==
-X-Forwarded-Encrypted: i=1; AJvYcCXXsRYZPQvRJUuRqUAFn/J4pF3AK3MudWQhl+geSyEAangC1RlLoaWwsAmhGEP0deo4v3aITVWNGHvCKg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzwvp+goNuhspCbJPXqEzzd+aJYv5sbCLLMGNlcoxUTLMNoOS4I
-	ladTbt31kYcMjLZeLLo42fmcqfwCjLJ7DHOXgJqt797//9raMOnevI+e
-X-Gm-Gg: AY/fxX7aZzCKy+kOJZPHChCuKgnrqli7aLLvoHhxLHF1pqg1bRJ7K31EbopHKvDwWNx
-	LDq448Q8zFsU+y/vXLGw50LpOfDekoJ3P3VPPgNbMNSTb+axVsYEwzUAWvbZCRlCzrhxFw2yzoj
-	VMsbe30LWlT1H3NnQFYXvcdijZqhSm0ya9QshQ1aIVn2oAY3+TEK2QbAE3ul90zcQu/trGCsb6d
-	cNBMAV0FYyxUNQ2KxtVcHvcaGpwCvqqi7V5DPsRHtPl/jPBx71vaBvnvjSMjC1YggASnuljrmLR
-	/jV4rFRuNtPVHcj83kDxIggsGZ7h3ZkZn6U28md/Fivs9HKXA8f8HKaJS9sG7z0jx3ny4lugyCV
-	E8x39WeMauM1QPPZaREX1qjmmo4ID/V09XzFggm8fcPBpfhcvBWdCzY8OjE1BLonx+JSJo8nFVH
-	4cpCWSUEerTA/GO+HCW23PRBmwxqqrd0dg4h7HJLmf8yI0
-X-Google-Smtp-Source: AGHT+IFZ91WQ+XxVidfhxQyJyWI8jqmAirmsj1rp2dJE8QgUjcxhZbOX7ZjT1XaFm0hj6+FAliB85A==
-X-Received: by 2002:a05:600c:4e86:b0:477:98f7:2aec with SMTP id 5b1f17b1804b1-47d7f066195mr30148295e9.3.1767699451299;
-        Tue, 06 Jan 2026 03:37:31 -0800 (PST)
-Received: from ionutnechita-arz2022.local ([2a02:2f0e:ca09:7000:33fc:5cce:3767:6b22])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d7f410c6csm40282735e9.1.2026.01.06.03.37.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Jan 2026 03:37:30 -0800 (PST)
-From: djiony2011@gmail.com
-X-Google-Original-From: ionut.nechita@windriver.com
-To: muchun.song@linux.dev
-Cc: axboe@kernel.dk,
-	gregkh@linuxfoundation.org,
-	ionut.nechita@windriver.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ming.lei@redhat.com,
-	sashal@kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] block/blk-mq: fix RT kernel regression with queue_lock in hot path
-Date: Tue,  6 Jan 2026 13:36:27 +0200
-Message-ID: <20260106113626.7319-2-ionut.nechita@windriver.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <73000e7f-14a7-40be-a137-060e5c2c49dc@linux.dev>
-References: <73000e7f-14a7-40be-a137-060e5c2c49dc@linux.dev>
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="fe9Z2NWA";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="YkbW0vVG";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="wFCpSPli";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="LIFBKhQF"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id D1CD85BCC3;
+	Tue,  6 Jan 2026 12:08:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1767701297; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+U6IdZ4NJ2OtMuGntNzqapcSRZ/FVDdE3xGkF515WKQ=;
+	b=fe9Z2NWAadywFeBjd2IpCMk8RCagykfjdjc/AfNW1+7rdwU7nYxsZC7djSDiouqAmX672g
+	RJ9RkV29Q3bxKEPOnrYIyFCbI7GDYwtW4GWMkyFQBrRUiROVHYvhch0bXqTshY8+0QONJw
+	Iq8R6rquXRenIBiRzJMXYOQEnQcTxyA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1767701297;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+U6IdZ4NJ2OtMuGntNzqapcSRZ/FVDdE3xGkF515WKQ=;
+	b=YkbW0vVG+zf3ayLD0ZMJQbiR0mAYPuWDz9gPSJuMTm5s/whViZvjF2jc6E27isCCP4UcbJ
+	ABL6+vtAVpLQvaBQ==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1767701296; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+U6IdZ4NJ2OtMuGntNzqapcSRZ/FVDdE3xGkF515WKQ=;
+	b=wFCpSPliOOlIkaq84Y+iFsTSmAsOEBPObh539cyGNkpus+0rW+4bSKcxfPqao7/NmGtVcf
+	O85heE6H1mjbVB9n2YSvVOOVl+R9vdSxB1op+u/idivMJm1uTHlXoADPvpnuFFGuya0vfP
+	3SWRFykmrPTcEz0oeNADAor9S/6zp0M=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1767701296;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+U6IdZ4NJ2OtMuGntNzqapcSRZ/FVDdE3xGkF515WKQ=;
+	b=LIFBKhQF43KFjbcYQVoLbyW0VbRI2fcLhNdGzbXjX05C+K4TgXqCWwGEnq03FygvXEN/YS
+	XoBtbSW4hSPMkPBw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C56313EA63;
+	Tue,  6 Jan 2026 12:08:16 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 7tcpMDD7XGlwdQAAD6G6ig
+	(envelope-from <jack@suse.cz>); Tue, 06 Jan 2026 12:08:16 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 852A9A08E3; Tue,  6 Jan 2026 13:08:16 +0100 (CET)
+Date: Tue, 6 Jan 2026 13:08:16 +0100
+From: Jan Kara <jack@suse.cz>
+To: Raphael Pinsonneault-Thibeault <rpthibeault@gmail.com>
+Cc: axboe@kernel.dk, jack@suse.cz, 
+	syzbot+3ee481e21fd75e14c397@syzkaller.appspotmail.com, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kernel-mentees@lists.linux.dev, Yongpeng Yang <yangyongpeng@xiaomi.com>
+Subject: Re: [PATCH v2] loop: don't change loop device under exclusive opener
+ in loop_set_status
+Message-ID: <f45muigy6nwxtbfbxidbqyru73qtntuqfby6lgnt32c6eyyov6@eg2mbf6pncq6>
+References: <2crvwmytxw5splvtauxdq6o3dt4rnnzuy22vcub45rjk354alr@6m66k3ucoics>
+ <20251217190040.490204-2-rpthibeault@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251217190040.490204-2-rpthibeault@gmail.com>
+X-Spamd-Result: default: False [-2.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_TO(0.00)[gmail.com];
+	ARC_NA(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[3ee481e21fd75e14c397];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,imap1.dmz-prg2.suse.org:helo,appspotmail.com:email,suse.cz:email,syzkaller.appspot.com:url]
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spam-Score: -2.30
 
-From: Ionut Nechita <ionut.nechita@windriver.com>
+On Wed 17-12-25 14:00:40, Raphael Pinsonneault-Thibeault wrote:
+> loop_set_status() is allowed to change the loop device while there
+> are other openers of the device, even exclusive ones.
+> 
+> In this case, it causes a KASAN: slab-out-of-bounds Read in
+> ext4_search_dir(), since when looking for an entry in an inlined
+> directory, e_value_offs is changed underneath the filesystem by
+> loop_set_status().
+> 
+> Fix the problem by forbidding loop_set_status() from modifying the loop
+> device while there are exclusive openers of the device. This is similar
+> to the fix in loop_configure() by commit 33ec3e53e7b1 ("loop: Don't
+> change loop device under exclusive opener") alongside commit ecbe6bc0003b
+> ("block: use bd_prepare_to_claim directly in the loop driver").
+> 
+> Reported-by: syzbot+3ee481e21fd75e14c397@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=3ee481e21fd75e14c397
+> Tested-by: syzbot+3ee481e21fd75e14c397@syzkaller.appspotmail.com
+> Tested-by: Yongpeng Yang <yangyongpeng@xiaomi.com>
+> Signed-off-by: Raphael Pinsonneault-Thibeault <rpthibeault@gmail.com>
+> Reviewed-by: Jan Kara <jack@suse.cz>
 
-Hi Muchun,
+Jens, ping?
 
-Thank you for the detailed review. Your questions about the memory barriers are
-absolutely correct and highlight fundamental issues with my approach.
+								Honza
 
-> Memory barriers must be used in pairs. So how to synchronize?
-
-> Why we need another barrier? What order does this barrier guarantee?
-
-You're right to ask these questions. After careful consideration and discussion
-with Ming Lei, I've concluded that the memory barrier approach in this patch is
-flawed and insufficient.
-
-The fundamental problem is:
-1. Memory barriers need proper pairing on both read and write sides
-2. The write-side barriers would need to be inserted at MULTIPLE call sites
-   throughout the block layer - everywhere work is added before calling
-   blk_mq_run_hw_queue()
-3. This is exactly why the original commit 679b1874eba7 chose the lock-based
-   approach, noting that "memory barrier is not easy to be maintained"
-
-My patch attempted to add barriers only in blk_mq_run_hw_queue(), but didn't
-address the pairing barriers needed at all the call sites that add work to
-dispatch lists/sw queues. This makes the synchronization incomplete.
-
-## New approach: dedicated raw_spinlock
-
-I'm abandoning the memory barrier approach and preparing a new patch that uses
-a dedicated raw_spinlock_t (quiesce_sync_lock) instead of the general-purpose
-queue_lock.
-
-The key differences from the current problematic code:
-- Current: Uses queue_lock (spinlock_t) which becomes rt_mutex in RT kernel
-- New: Uses quiesce_sync_lock (raw_spinlock_t) which stays a real spinlock
-
-Why raw_spinlock is safe:
-- Critical section is provably short (only flag and counter checks)
-- No sleeping operations under the lock
-- Specific to quiesce synchronization, not general queue operations
-
-This approach:
-- Maintains the correct synchronization from 679b1874eba7
-- Avoids sleeping in RT kernel's IRQ thread context
-- Simpler and more maintainable than memory barrier pairing across many call sites
-
-I'll send the new patch shortly. Thank you for catching these issues before
-they made it into the kernel.
-
-Best regards,
-Ionut
+> ---
+> v2:
+> - added Tested-by and Reviewed-by tags for v1
+> 
+>  drivers/block/loop.c | 41 ++++++++++++++++++++++++++++++-----------
+>  1 file changed, 30 insertions(+), 11 deletions(-)
+> 
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index 053a086d547e..756ee682e767 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -1222,13 +1222,24 @@ static int loop_clr_fd(struct loop_device *lo)
+>  }
+>  
+>  static int
+> -loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+> +loop_set_status(struct loop_device *lo, blk_mode_t mode,
+> +		struct block_device *bdev, const struct loop_info64 *info)
+>  {
+>  	int err;
+>  	bool partscan = false;
+>  	bool size_changed = false;
+>  	unsigned int memflags;
+>  
+> +	/*
+> +	 * If we don't hold exclusive handle for the device, upgrade to it
+> +	 * here to avoid changing device under exclusive owner.
+> +	 */
+> +	if (!(mode & BLK_OPEN_EXCL)) {
+> +		err = bd_prepare_to_claim(bdev, loop_set_status, NULL);
+> +		if (err)
+> +			goto out_reread_partitions;
+> +	}
+> +
+>  	err = mutex_lock_killable(&lo->lo_mutex);
+>  	if (err)
+>  		return err;
+> @@ -1270,6 +1281,9 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+>  	}
+>  out_unlock:
+>  	mutex_unlock(&lo->lo_mutex);
+> +	if (!(mode & BLK_OPEN_EXCL))
+> +		bd_abort_claiming(bdev, loop_set_status);
+> +out_reread_partitions:
+>  	if (partscan)
+>  		loop_reread_partitions(lo);
+>  
+> @@ -1349,7 +1363,9 @@ loop_info64_to_old(const struct loop_info64 *info64, struct loop_info *info)
+>  }
+>  
+>  static int
+> -loop_set_status_old(struct loop_device *lo, const struct loop_info __user *arg)
+> +loop_set_status_old(struct loop_device *lo, blk_mode_t mode,
+> +		    struct block_device *bdev,
+> +		    const struct loop_info __user *arg)
+>  {
+>  	struct loop_info info;
+>  	struct loop_info64 info64;
+> @@ -1357,17 +1373,19 @@ loop_set_status_old(struct loop_device *lo, const struct loop_info __user *arg)
+>  	if (copy_from_user(&info, arg, sizeof (struct loop_info)))
+>  		return -EFAULT;
+>  	loop_info64_from_old(&info, &info64);
+> -	return loop_set_status(lo, &info64);
+> +	return loop_set_status(lo, mode, bdev, &info64);
+>  }
+>  
+>  static int
+> -loop_set_status64(struct loop_device *lo, const struct loop_info64 __user *arg)
+> +loop_set_status64(struct loop_device *lo, blk_mode_t mode,
+> +		  struct block_device *bdev,
+> +		  const struct loop_info64 __user *arg)
+>  {
+>  	struct loop_info64 info64;
+>  
+>  	if (copy_from_user(&info64, arg, sizeof (struct loop_info64)))
+>  		return -EFAULT;
+> -	return loop_set_status(lo, &info64);
+> +	return loop_set_status(lo, mode, bdev, &info64);
+>  }
+>  
+>  static int
+> @@ -1546,14 +1564,14 @@ static int lo_ioctl(struct block_device *bdev, blk_mode_t mode,
+>  	case LOOP_SET_STATUS:
+>  		err = -EPERM;
+>  		if ((mode & BLK_OPEN_WRITE) || capable(CAP_SYS_ADMIN))
+> -			err = loop_set_status_old(lo, argp);
+> +			err = loop_set_status_old(lo, mode, bdev, argp);
+>  		break;
+>  	case LOOP_GET_STATUS:
+>  		return loop_get_status_old(lo, argp);
+>  	case LOOP_SET_STATUS64:
+>  		err = -EPERM;
+>  		if ((mode & BLK_OPEN_WRITE) || capable(CAP_SYS_ADMIN))
+> -			err = loop_set_status64(lo, argp);
+> +			err = loop_set_status64(lo, mode, bdev, argp);
+>  		break;
+>  	case LOOP_GET_STATUS64:
+>  		return loop_get_status64(lo, argp);
+> @@ -1647,8 +1665,9 @@ loop_info64_to_compat(const struct loop_info64 *info64,
+>  }
+>  
+>  static int
+> -loop_set_status_compat(struct loop_device *lo,
+> -		       const struct compat_loop_info __user *arg)
+> +loop_set_status_compat(struct loop_device *lo, blk_mode_t mode,
+> +		    struct block_device *bdev,
+> +		    const struct compat_loop_info __user *arg)
+>  {
+>  	struct loop_info64 info64;
+>  	int ret;
+> @@ -1656,7 +1675,7 @@ loop_set_status_compat(struct loop_device *lo,
+>  	ret = loop_info64_from_compat(arg, &info64);
+>  	if (ret < 0)
+>  		return ret;
+> -	return loop_set_status(lo, &info64);
+> +	return loop_set_status(lo, mode, bdev, &info64);
+>  }
+>  
+>  static int
+> @@ -1682,7 +1701,7 @@ static int lo_compat_ioctl(struct block_device *bdev, blk_mode_t mode,
+>  
+>  	switch(cmd) {
+>  	case LOOP_SET_STATUS:
+> -		err = loop_set_status_compat(lo,
+> +		err = loop_set_status_compat(lo, mode, bdev,
+>  			     (const struct compat_loop_info __user *)arg);
+>  		break;
+>  	case LOOP_GET_STATUS:
+> -- 
+> 2.43.0
+> 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
