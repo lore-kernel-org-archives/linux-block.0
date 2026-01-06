@@ -1,216 +1,239 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f45.google.com (mail-dl1-f45.google.com [74.125.82.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94D7A1A9F9F
-	for <linux-block@vger.kernel.org>; Tue,  6 Jan 2026 16:59:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767718775; cv=none; b=Dgh6KstPBeoKiZCIv4Vc5021Sz+xpedFBt5tPN4HOGvW8XmA4xhaBwk5Ht14jTglrfTX1DEXXSVwBIu5RjRi9Z0jg8jeDZ7WU9K9yjuGubJIOfCF2w7R0JrGaOO5EtGXvCo3I8Yb8aa8KGGx+qilykIV0JboFU1de1KCR2kwY9k=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767718775; c=relaxed/simple;
-	bh=cmNKtg+J8LhTwVzg2ci/rk3+VO/unz9oDnPTminxzP0=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=XvAWHGtgiXgHHa81UnYErfUvCxBW45qOcoajK8iT1fH5HKmJWyIpFpzdqbEblB//wvnNux3tVdtBfwdrvCf1xUcVldjNMsfMiyssRdQpLvZKzHT4lnR5yMowfhy0mF517k7xF2aukh/1NvUHiphVdVfMGhADWvW3TizVIZfkRd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DhX/9PLP; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 218E93469F2
+	for <linux-block@vger.kernel.org>; Tue,  6 Jan 2026 17:15:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767719759; cv=pass; b=kANoe2mI6+BtEd7z2IlFVVY+eUjyKsCWn49CU8yzrZPO6g9WmZDfGJeivG/kGBmLTizM6q4g4f8gFLOj9deKGm94LmPgOPKD3DhG5T/GuCbfB1M2NA9onY439GrrQ0BgJ/T720fXOKFFc8f1sHFlbyhz8RkTYoAvlzg00vY0280=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767719759; c=relaxed/simple;
+	bh=BcUKT/WaKF3cc5RT8cSr1Hmp5p8kpbrtWjAK1Grl5Fg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=roDf1H5p0c4dzmYuMgsJyhEcL4/q3mhp78QoxKIr+7bgDW6GDpXfdZfSSKoV1xNunLcQueBESvDcn45RMdvLM0yetOYnaxcJY8NkhNkhfLmDCk6NbvVr5PG0fvXCyD5AA8g9AtM3CaDAmiwrFuXdBjfzC9tNRaLkyOIeuuD3nmA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=XO9wN6w3; arc=pass smtp.client-ip=74.125.82.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DhX/9PLP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767718772;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZXIPja358bYJTShsT3/eIi172a+gL/gWyu8mS8R++3E=;
-	b=DhX/9PLPXyBvqpqEhTtKMkemwtIpqJQ5vZ2anJiHJd3yBUj6s4x3scyxFFPJnjzVoVZJoA
-	x1zhu/l0xE01dMgV6I6GWjxWz7AXVhV1BmhV71E6IqoSouNiWmPgohPKyhrBM7PdOFvoLw
-	sPaFb95VD1lByKSoG7CoMM7VzPhWtww=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-688-H7_ducD1MVuQwnNRvvOrKg-1; Tue,
- 06 Jan 2026 11:59:28 -0500
-X-MC-Unique: H7_ducD1MVuQwnNRvvOrKg-1
-X-Mimecast-MFC-AGG-ID: H7_ducD1MVuQwnNRvvOrKg_1767718766
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7B7701800654;
-	Tue,  6 Jan 2026 16:59:26 +0000 (UTC)
-Received: from [10.44.33.27] (unknown [10.44.33.27])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1A5C530001B9;
-	Tue,  6 Jan 2026 16:59:22 +0000 (UTC)
-Date: Tue, 6 Jan 2026 17:59:16 +0100 (CET)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Uladzislau Rezki <urezki@gmail.com>
-cc: Fengnan Chang <fengnanchang@gmail.com>, Yu Kuai <yukuai3@huawei.com>, 
-    Fengnan Chang <changfengnan@bytedance.com>, Jens Axboe <axboe@kernel.dk>, 
-    "Paul E. McKenney" <paulmck@kernel.org>, 
-    Frederic Weisbecker <frederic@kernel.org>, 
-    Neeraj Upadhyay <neeraj.upadhyay@kernel.org>, 
-    Joel Fernandes <joelagnelf@nvidia.com>, 
-    Josh Triplett <josh@joshtriplett.org>, Boqun Feng <boqun.feng@gmail.com>, 
-    rcu@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH] blk-mq: avoid stall during boot due to
- synchronize_rcu_expedited
-In-Reply-To: <aV04Vp3nmCg41YZD@pc636>
-Message-ID: <2720e388-9341-34af-21c5-0e5e1a822960@redhat.com>
-References: <8e5d6c26-4854-74f8-9f44-fdb1b74cf3c4@redhat.com> <aV04Vp3nmCg41YZD@pc636>
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="XO9wN6w3"
+Received: by mail-dl1-f45.google.com with SMTP id a92af1059eb24-11f1cb6cefeso37135c88.0
+        for <linux-block@vger.kernel.org>; Tue, 06 Jan 2026 09:15:56 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1767719756; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Lgqc5gRRmNM+S3tZdQ2mVYkI2KwmoeJ6C8nOD/bQi8ZG/GRynup17kmQgP7qQ9dD6h
+         3dEZkcGeWnWPjUK1qLCyeZJRkb+Q+yyOkVPKHT05/JydP/XqVe5NvzQBX40J0mJrZGR+
+         WSFjMBRPj8S5KTBf8jaW9uHBaR/foG1Ev2HCAUnj8aZ6qCRy1k1POtKmNwc8wiso3M0r
+         +eflA3+GjiwWk5LAw2HBiCBUGRZ10ivfwsaXkAnCqo5qxzU/2JGCMC023ANYLIgeJj9i
+         UzOycRULLjo94o8ZIDtvqaAujQE5XQrzWM2vNm/VmSVZetFsUMTIicN2BAG4GFPy2mXF
+         +iug==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=h0S9X35x1dPYmVywIfwy49RDgI1meLSZA2LdM4U3+6o=;
+        fh=TvVbB9aHBmf30eSOU7pttDUjF9Rtrf3xvQZw5Zr4wHs=;
+        b=anMqfdx3V5pTbAa0ce3Lvuj6hDgM+ypKzNdA8ZsZx6OOLytBUdloGVynp0hu5vokhx
+         WVHJcw2cYdFaaACsGSpQcj4xRLWeYYIEqHHE0qC+m/I9qP6z2ssvjQlUby9uuegNA7NB
+         ywOYlWa8TeUEh1RSu61MTWnR0GX+D3wm3XV1qxbqt4n2916fyz/ax+Au9tweoatRH1zh
+         Ch7qUw5TQUd4avofrLh8Kg5S/bYDT5lDtaNUoMvaPlcPLLNNWp2hgXwJpCB3Rs0W4K+5
+         wbyBfLdlOTuAY8csdU7dRVjdtifiIRzVZGWhhhv74k/rm3aJhZPDOtq0nX7hyYI7Cwm7
+         uS4g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1767719756; x=1768324556; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=h0S9X35x1dPYmVywIfwy49RDgI1meLSZA2LdM4U3+6o=;
+        b=XO9wN6w3Opl7nMwLomPxLAU98QSEE6/7I4oGQQFjM3wtnqQSdRDxJalKkX2vq3OsWg
+         il5XdccSJfDz+Bv9lZGLKHbLnwj8mSjjhsc2zkLmIlXuevG/AQnRKeQh6oHHc0qrVBW+
+         jbkcx+Y6QPmgOM1XRyHJUcpvOM4bXFMGuD3PzfkGba0SR6NsanQfg7hQoggDguDpJX5E
+         fZabPw5l81W4yK05v1oooaBtbl9uKJKCnuzAyIxyLwoBmu2to7KoRXPJ8TZhzJZ/gN6B
+         N3eFZgSF6O5q0n8nPdKLdOA6295ZYXhU7U5edlXeY5Byov89mRUg+WPKcgHAD+n3IzfZ
+         zuCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767719756; x=1768324556;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=h0S9X35x1dPYmVywIfwy49RDgI1meLSZA2LdM4U3+6o=;
+        b=AKdVMhvYTqDyTYkzA6KRKtbbnh39uLAM3wqavoqanmXmZPRKhewgj2EnetHUrlgxKz
+         dWngNbc4L7R0VMe5Vg7AolyandTFNZk0F4WO3Kq2xhg7osD+RS1ilhxQ6EUJ/eaREo77
+         8khO3nqMpkZJ3kX3wVJrjvDjzGpCV/DpW9qcZ87PRsbhyYWIts3ViDiJpEUVASaiqsJ8
+         B33bqtIg80qZQtnQ5W9HzSeqCn9cp+CrZ0oqI8UgvyQoUNEdKPk7AvNmyfKKIhcer6oz
+         agmeot7PRK66S6RKMtkP8Ey2HBes5//c99LpeIALyfmC+ekXKwYBOMeq3ymFZgVuUqbK
+         F5dQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVaFaZLfro8G23acdOzyyzrsAUQbHAfLZ2BXfjoLh9cViPMxhAzRm3pdGdfxtsAOfYz+yZvJwvL2Cp+gQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5yKFXVFWY+bOVGmj6XVBplWfMloIueay1y4ErY9QgG/f/R//Q
+	ElmNP2zgndmOa8IsNsv4ZYJ38ODDEBLZ3xzLbFNEiQ/UOAEe3GL7DaVDcEl8oA5/TLf3qEhWdvW
+	kn+L+Ic/DGvGFfzRp2z7X5QietB8kbL4bREZ0sM+3+bpkgKdn/eCBDd4=
+X-Gm-Gg: AY/fxX6uvzcFfzSjetsWeKpe9R7bEvJ9oUGzT/p3XZ1gMnwEqWFwtwci9w3or7+z68G
+	oRZn4/EpQu5MCSWzT1LsnvQPUPgaYdBIk44peMZmMWEvBd0+6XPVdDNCfo1yNFmk80CTkj215fr
+	0j8m9T1I39if+XR3QqoN5xdO4e9+9PkpXLpe5suZ3+POLBTvyoj5oauQojMM6ea9ZbZDQ2wy+xh
+	JxoN4bBzktG+iTTrpdY0Ui2lp0Y6IBXNzddCliNQVPeG29gAMUAbEiaPJZFub5Cusrpg4kwnsiO
+	yKAQ5Mw=
+X-Google-Smtp-Source: AGHT+IHsx2prbXYg3j18SfdVTQFJ60Rbk1R0GsSR/Ko74ivczv03vINWOjHdxoRdXuVpHJS26gsubAcJWKCBQS4KIZA=
+X-Received: by 2002:a05:7022:6195:b0:119:e56a:4fff with SMTP id
+ a92af1059eb24-121f18e1ff2mr1694930c88.4.1767719756030; Tue, 06 Jan 2026
+ 09:15:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+References: <20260106005752.3784925-1-csander@purestorage.com>
+ <20260106005752.3784925-20-csander@purestorage.com> <aV0Xx2vWmL5Iuls4@fedora>
+In-Reply-To: <aV0Xx2vWmL5Iuls4@fedora>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Tue, 6 Jan 2026 09:15:44 -0800
+X-Gm-Features: AQt7F2oH1KSrEU_qjpFRn21_6eSA-1DRw6ns58qu5_CQ83y4Pw0aC2-PF1SPR9A
+Message-ID: <CADUfDZofEg0Q=veyihy=M-XCxoga6fkueJmLdJ4CVd6KU=GdBg@mail.gmail.com>
+Subject: Re: [PATCH v3 19/19] selftests: ublk: add end-to-end integrity test
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Shuah Khan <shuah@kernel.org>, linux-block@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Stanley Zhang <stazhang@purestorage.com>, Uday Shankar <ushankar@purestorage.com>, 
+	"Martin K . Petersen" <martin.petersen@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-
-On Tue, 6 Jan 2026, Uladzislau Rezki wrote:
-
-> On Tue, Jan 06, 2026 at 04:56:07PM +0100, Mikulas Patocka wrote:
-> > On the kernel 6.19-rc, I am experiencing 15-second boot stall in a
-> > virtual machine when probing a virtio-scsi disk:
-> > [    1.011641] SCSI subsystem initialized
-> > [    1.013972] virtio_scsi virtio6: 16/0/0 default/read/poll queues
-> > [    1.015983] scsi host0: Virtio SCSI HBA
-> > [    1.019578] ACPI: \_SB_.GSIA: Enabled at IRQ 16
-> > [    1.020225] ahci 0000:00:1f.2: AHCI vers 0001.0000, 32 command slots, 1.5 Gbps, SATA mode
-> > [    1.020228] ahci 0000:00:1f.2: 6/6 ports implemented (port mask 0x3f)
-> > [    1.020230] ahci 0000:00:1f.2: flags: 64bit ncq only
-> > [    1.024688] scsi host1: ahci
-> > [    1.025432] scsi host2: ahci
-> > [    1.025966] scsi host3: ahci
-> > [    1.026511] scsi host4: ahci
-> > [    1.028371] scsi host5: ahci
-> > [    1.028918] scsi host6: ahci
-> > [    1.029266] ata1: SATA max UDMA/133 abar m4096@0xfea23000 port 0xfea23100 irq 16 lpm-pol 1
-> > [    1.029305] ata2: SATA max UDMA/133 abar m4096@0xfea23000 port 0xfea23180 irq 16 lpm-pol 1
-> > [    1.029316] ata3: SATA max UDMA/133 abar m4096@0xfea23000 port 0xfea23200 irq 16 lpm-pol 1
-> > [    1.029327] ata4: SATA max UDMA/133 abar m4096@0xfea23000 port 0xfea23280 irq 16 lpm-pol 1
-> > [    1.029341] ata5: SATA max UDMA/133 abar m4096@0xfea23000 port 0xfea23300 irq 16 lpm-pol 1
-> > [    1.029356] ata6: SATA max UDMA/133 abar m4096@0xfea23000 port 0xfea23380 irq 16 lpm-pol 1
-> > [    1.118111] scsi 0:0:0:0: Direct-Access     QEMU     QEMU HARDDISK 2.5+ PQ: 0 ANSI: 5
-> > [    1.348916] ata1: SATA link down (SStatus 0 SControl 300)
-> > [    1.350713] ata2: SATA link down (SStatus 0 SControl 300)
-> > [    1.351025] ata6: SATA link down (SStatus 0 SControl 300)
-> > [    1.351160] ata5: SATA link down (SStatus 0 SControl 300)
-> > [    1.351326] ata3: SATA link down (SStatus 0 SControl 300)
-> > [    1.351536] ata4: SATA link down (SStatus 0 SControl 300)
-> > [    1.449153] input: ImExPS/2 Generic Explorer Mouse as /devices/platform/i8042/serio1/input/input2
-> > [   16.483477] sd 0:0:0:0: Power-on or device reset occurred
-> > [   16.483691] sd 0:0:0:0: [sda] 2097152 512-byte logical blocks: (1.07 GB/1.00 GiB)
-> > [   16.483762] sd 0:0:0:0: [sda] Write Protect is off
-> > [   16.483877] sd 0:0:0:0: [sda] Write cache: enabled, read cache: enabled, doesn't support DPO or FUA
-> > [   16.569225] sd 0:0:0:0: [sda] Attached SCSI disk
-> > 
-> > I bisected it and it is caused by the commit 89e1fb7ceffd which
-> > introduces calls to synchronize_rcu_expedited.
-> > 
-> > This commit replaces synchronize_rcu_expedited and kfree with a call to 
-> > kfree_rcu_mightsleep, avoiding the 15-second delay.
-> > 
-> > Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
-> > Fixes: 89e1fb7ceffd ("blk-mq: fix potential uaf for 'queue_hw_ctx'")
-> > 
-> > ---
-> >  block/blk-mq.c |    3 +--
-> >  1 file changed, 1 insertion(+), 2 deletions(-)
-> > 
-> > Index: linux-2.6/block/blk-mq.c
-> > ===================================================================
-> > --- linux-2.6.orig/block/blk-mq.c	2026-01-06 16:45:11.000000000 +0100
-> > +++ linux-2.6/block/blk-mq.c	2026-01-06 16:48:00.000000000 +0100
-> > @@ -4553,8 +4553,7 @@ static void __blk_mq_realloc_hw_ctxs(str
-> >  		 * Make sure reading the old queue_hw_ctx from other
-> >  		 * context concurrently won't trigger uaf.
-> >  		 */
-> > -		synchronize_rcu_expedited();
-> > -		kfree(hctxs);
-> > +		kfree_rcu_mightsleep(hctxs);
+On Tue, Jan 6, 2026 at 6:10=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrote=
+:
+>
+> On Mon, Jan 05, 2026 at 05:57:51PM -0700, Caleb Sander Mateos wrote:
+> > Add test case loop_08 to verify the ublk integrity data flow. It uses
+> > the kublk loop target to create a ublk device with integrity on top of
+> > backing data and integrity files. It then writes to the whole device
+> > with fio configured to generate integrity data. Then it reads back the
+> > whole device with fio configured to verify the integrity data.
+> > It also verifies that injected guard, reftag, and apptag corruptions ar=
+e
+> > correctly detected.
 > >
-> I agree, doing freeing that way is not optimal. But kfree_rcu_mightsleep()
-> also might not work. It has a fallback, if we can not place an object into
-> "page" due to memory allocation failure, it inlines freeing:
-> 
-> <snip>
-> synchronize_rcu();
-> free().
-> <snip>
-> 
-> Please note, synchronize_rcu() can easily be converted into expedited
-> version. See rcu_gp_is_expedited().
-> 
-> --
-> Uladzislau Rezki
+> > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+> > ---
+> >  tools/testing/selftests/ublk/Makefile        |   1 +
+> >  tools/testing/selftests/ublk/test_loop_08.sh | 111 +++++++++++++++++++
+> >  2 files changed, 112 insertions(+)
+> >  create mode 100755 tools/testing/selftests/ublk/test_loop_08.sh
+> >
+> > diff --git a/tools/testing/selftests/ublk/Makefile b/tools/testing/self=
+tests/ublk/Makefile
+> > index bfd68ae64142..ab745443fd58 100644
+> > --- a/tools/testing/selftests/ublk/Makefile
+> > +++ b/tools/testing/selftests/ublk/Makefile
+> > @@ -33,10 +33,11 @@ TEST_PROGS +=3D test_loop_02.sh
+> >  TEST_PROGS +=3D test_loop_03.sh
+> >  TEST_PROGS +=3D test_loop_04.sh
+> >  TEST_PROGS +=3D test_loop_05.sh
+> >  TEST_PROGS +=3D test_loop_06.sh
+> >  TEST_PROGS +=3D test_loop_07.sh
+> > +TEST_PROGS +=3D test_loop_08.sh
+> >  TEST_PROGS +=3D test_stripe_01.sh
+> >  TEST_PROGS +=3D test_stripe_02.sh
+> >  TEST_PROGS +=3D test_stripe_03.sh
+> >  TEST_PROGS +=3D test_stripe_04.sh
+> >  TEST_PROGS +=3D test_stripe_05.sh
+> > diff --git a/tools/testing/selftests/ublk/test_loop_08.sh b/tools/testi=
+ng/selftests/ublk/test_loop_08.sh
+> > new file mode 100755
+> > index 000000000000..ca289cfb2ad4
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/ublk/test_loop_08.sh
+> > @@ -0,0 +1,111 @@
+> > +#!/bin/bash
+> > +# SPDX-License-Identifier: GPL-2.0
+> > +
+> > +. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
+> > +
+> > +if ! _have_program fio; then
+> > +     exit $UBLK_SKIP_CODE
+> > +fi
+> > +
+> > +fio_version=3D$(fio --version)
+> > +if [[ "$fio_version" =3D~ fio-[0-9]+\.[0-9]+$ ]]; then
+> > +     echo "Requires development fio version with https://github.com/ax=
+boe/fio/pull/1992"
+> > +     exit $UBLK_SKIP_CODE
+> > +fi
+> > +
+> > +TID=3Dloop_08
+> > +
+> > +_prep_test "loop" "end-to-end integrity"
+> > +
+> > +_create_backfile 0 256M
+> > +_create_backfile 1 32M # 256M * (64 integrity bytes / 512 data bytes)
+> > +integrity_params=3D"--integrity_capable --integrity_reftag
+> > +                  --metadata_size 64 --pi_offset 56 --csum_type t10dif=
+"
+> > +dev_id=3D$(_add_ublk_dev -t loop -u $integrity_params "${UBLK_BACKFILE=
+S[@]}")
+>
+> I tried above setting:
+>
+> ./kublk add -t loop --integrity_capable --integrity_reftag --metadata_siz=
+e 64 --pi_offset 56 --csum_type t10dif --foreground -u /dev/sdb /dev/sdc
+> dev id 1: nr_hw_queues 2 queue_depth 128 block size 512 dev_capacity 8388=
+608
+>         max rq size 1048576 daemon pid 38295 flags 0x160c2 state LIVE
+>         queue 0: affinity(0 )
+>         queue 1: affinity(8 )
+>
+> However, IO error is always triggered:
+>
+> [ 9202.316382] ublkb1: ref tag error at location 0 (rcvd 128)
+> [ 9202.317171] Buffer I/O error on dev ublkb1, logical block 0, async pag=
+e read
 
-Would this patch be better? It does GFP_KERNEL allocation which dones't 
-fail in practice.
+Hmm, what are the initial contents of /dev/sdc? It looks like they are
+nonzero, as the reftag being read for logical block 0 is 128 rather
+than the expected 0 (the reftag would be read from bytes 60 to 63 of
+/dev/sdc). In general, though, the partition scan may be expected to
+fail the bio-integrity-auto checks if the integrity data hasn't been
+initialized. I don't think this is an issue, since the partition scan
+is looking for a partition table but there's no guarantee that one
+exists.
+You can disable the kernel integrity checks if you want by writing 0
+to /sys/block/ublkb1/integrity/read_verify. However, I'm not sure it's
+possible to do this soon enough to take effect before the partition
+scan.
+We could also use the UBLK_F_NO_AUTO_PART_SCAN feature, once it lands,
+to suppress the partition scan and these error messages.
 
-> Inlining is a corner case but it can happen. The best way is to add
-> rcu_head to the blk_mq_hw_ctx structure and use kfree_rcu(). It never
-> blocks.
+Best,
+Caleb
 
-We are not protecting the blk_mq_hw_ctx structure with RCU, we are 
-protecting the q->queue_hw_ctx array. So, rcu_head cannot be added to an 
-array. We could cast the array to rcu_head (and make sure that the initial 
-allocation is at least sizeof(struct rcu_head)), but that is hacky.
-
-Mikulas
-
----
- block/blk-mq.c |   23 +++++++++++++++++++++--
- 1 file changed, 21 insertions(+), 2 deletions(-)
-
-Index: linux-2.6/block/blk-mq.c
-===================================================================
---- linux-2.6.orig/block/blk-mq.c	2026-01-06 15:55:41.000000000 +0100
-+++ linux-2.6/block/blk-mq.c	2026-01-06 16:22:40.000000000 +0100
-@@ -4531,6 +4531,18 @@ static struct blk_mq_hw_ctx *blk_mq_allo
- 	return NULL;
- }
- 
-+struct rcu_free_hctxs {
-+	struct rcu_head head;
-+	struct blk_mq_hw_ctx **hctxs;
-+};
-+
-+static void rcu_free_hctxs(struct rcu_head *head)
-+{
-+	struct rcu_free_hctxs *r = container_of(head, struct rcu_free_hctxs, head);
-+	kfree(r->hctxs);
-+	kfree(r);
-+}
-+
- static void __blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
- 				     struct request_queue *q)
- {
-@@ -4539,6 +4551,7 @@ static void __blk_mq_realloc_hw_ctxs(str
- 
- 	if (q->nr_hw_queues < set->nr_hw_queues) {
- 		struct blk_mq_hw_ctx **new_hctxs;
-+		struct rcu_free_hctxs *r;
- 
- 		new_hctxs = kcalloc_node(set->nr_hw_queues,
- 				       sizeof(*new_hctxs), GFP_KERNEL,
-@@ -4553,8 +4566,14 @@ static void __blk_mq_realloc_hw_ctxs(str
- 		 * Make sure reading the old queue_hw_ctx from other
- 		 * context concurrently won't trigger uaf.
- 		 */
--		synchronize_rcu_expedited();
--		kfree(hctxs);
-+		r = kmalloc(sizeof(struct rcu_free_hctxs), GFP_KERNEL);
-+		if (!r) {
-+			synchronize_rcu_expedited();
-+			kfree(hctxs);
-+		} else {
-+			r->hctxs = hctxs;
-+			call_rcu(&r->head, rcu_free_hctxs);
-+		}
- 		hctxs = new_hctxs;
- 	}
- 
-> 
-
+> [ 9202.319478] ublkb1: ref tag error at location 0 (rcvd 128)
+> [ 9202.319983] Buffer I/O error on dev ublkb1, logical block 0, async pag=
+e read
+> [ 9202.326332] ublkb1: ref tag error at location 0 (rcvd 128)
+> [ 9202.326974] Buffer I/O error on dev ublkb1, logical block 0, async pag=
+e read
+> [ 9202.327570] ldm_validate_partition_table(): Disk read failed.
+> [ 9202.336539] ublkb1: ref tag error at location 0 (rcvd 128)
+> [ 9202.337228] Buffer I/O error on dev ublkb1, logical block 0, async pag=
+e read
+> [ 9202.339247] ublkb1: ref tag error at location 0 (rcvd 128)
+> [ 9202.339779] Buffer I/O error on dev ublkb1, logical block 0, async pag=
+e read
+> [ 9202.344306] ublkb1: ref tag error at location 0 (rcvd 128)
+> [ 9202.344948] Buffer I/O error on dev ublkb1, logical block 0, async pag=
+e read
+> [ 9202.347067] ublkb1: ref tag error at location 0 (rcvd 128)
+> [ 9202.347558] Buffer I/O error on dev ublkb1, logical block 0, async pag=
+e read
+> [ 9202.348100] Dev ublkb1: unable to read RDB block 0
+> [ 9202.350159] ublkb1: ref tag error at location 0 (rcvd 128)
+> [ 9202.350642] Buffer I/O error on dev ublkb1, logical block 0, async pag=
+e read
+> [ 9202.354977] ublkb1: ref tag error at location 0 (rcvd 128)
+> [ 9202.355539] Buffer I/O error on dev ublkb1, logical block 0, async pag=
+e read
+> [ 9202.356280]  ublkb1: unable to read partition table
+>
+>
+>
+> Thanks,
+> Ming
+>
