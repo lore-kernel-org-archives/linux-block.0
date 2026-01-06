@@ -1,81 +1,80 @@
-Received: from mail-dl1-f45.google.com (mail-dl1-f45.google.com [74.125.82.45])
+Received: from mail-dl1-f47.google.com (mail-dl1-f47.google.com [74.125.82.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 218E93469F2
-	for <linux-block@vger.kernel.org>; Tue,  6 Jan 2026 17:15:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D22E9349B1E
+	for <linux-block@vger.kernel.org>; Tue,  6 Jan 2026 17:18:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.47
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767719759; cv=pass; b=kANoe2mI6+BtEd7z2IlFVVY+eUjyKsCWn49CU8yzrZPO6g9WmZDfGJeivG/kGBmLTizM6q4g4f8gFLOj9deKGm94LmPgOPKD3DhG5T/GuCbfB1M2NA9onY439GrrQ0BgJ/T720fXOKFFc8f1sHFlbyhz8RkTYoAvlzg00vY0280=
+	t=1767719926; cv=pass; b=BURBUSOpA2D8trd6l07Hu1JN9azxiDYvFI1qcjAWgZb43Kxn7n+JjIkh4buKChiAf/jI7XGyTlXODIoyQFmkDXp/1hm+9JivFFcfureu+984wzXDcRtsy1gKIaULuZ/gRIo9vZQapM7fFJ/7VXTfbemjBsvsumVLuJc6KIOkDm8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767719759; c=relaxed/simple;
-	bh=BcUKT/WaKF3cc5RT8cSr1Hmp5p8kpbrtWjAK1Grl5Fg=;
+	s=arc-20240116; t=1767719926; c=relaxed/simple;
+	bh=4kIuX6Agq3HD0TLnVcZN913LVX+FCf68NrUDWYKrLZ0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=roDf1H5p0c4dzmYuMgsJyhEcL4/q3mhp78QoxKIr+7bgDW6GDpXfdZfSSKoV1xNunLcQueBESvDcn45RMdvLM0yetOYnaxcJY8NkhNkhfLmDCk6NbvVr5PG0fvXCyD5AA8g9AtM3CaDAmiwrFuXdBjfzC9tNRaLkyOIeuuD3nmA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=XO9wN6w3; arc=pass smtp.client-ip=74.125.82.45
+	 To:Cc:Content-Type; b=OkYjg9PeOH6uj9h9eDmebmy/eDPaSBJsiYzcZavOHQ6+/LgRHp3eMZ5d/1EnnNMi2hAelMT2SasFDYRukCOtrud6xh6RfQyZU/ohPtH6tPRgNZSYs+qRZa55QYnMgkfQMwrdeUg5ixuZsxoTkbIMwxOTlF2olNmRJM2UFoov+R4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=L0JCrEf0; arc=pass smtp.client-ip=74.125.82.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="XO9wN6w3"
-Received: by mail-dl1-f45.google.com with SMTP id a92af1059eb24-11f1cb6cefeso37135c88.0
-        for <linux-block@vger.kernel.org>; Tue, 06 Jan 2026 09:15:56 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1767719756; cv=none;
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="L0JCrEf0"
+Received: by mail-dl1-f47.google.com with SMTP id a92af1059eb24-11b7bd9e6e5so37739c88.2
+        for <linux-block@vger.kernel.org>; Tue, 06 Jan 2026 09:18:44 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1767719924; cv=none;
         d=google.com; s=arc-20240605;
-        b=Lgqc5gRRmNM+S3tZdQ2mVYkI2KwmoeJ6C8nOD/bQi8ZG/GRynup17kmQgP7qQ9dD6h
-         3dEZkcGeWnWPjUK1qLCyeZJRkb+Q+yyOkVPKHT05/JydP/XqVe5NvzQBX40J0mJrZGR+
-         WSFjMBRPj8S5KTBf8jaW9uHBaR/foG1Ev2HCAUnj8aZ6qCRy1k1POtKmNwc8wiso3M0r
-         +eflA3+GjiwWk5LAw2HBiCBUGRZ10ivfwsaXkAnCqo5qxzU/2JGCMC023ANYLIgeJj9i
-         UzOycRULLjo94o8ZIDtvqaAujQE5XQrzWM2vNm/VmSVZetFsUMTIicN2BAG4GFPy2mXF
-         +iug==
+        b=MSpDuVvZtMVz0/jqwLeouoenc+TuJFHP+LPg2lyMuVUKjeJki6kxDQRLxWtrVD6dqb
+         1kYIfSykTurUtElJchl7J5noNtfpWrWFSR8OoWHlRAedNQZgzavQRYrEEi1BWRBOQjM4
+         /iRr4F1tIF+o4dD+ijdwR2hXpC+9aYRm1YNeVuOs1eRBgttbo4glJejllT4HMnJUBUqG
+         Qid0VCJSTGPsdwxgJFIib2bifiYMZc7hB1kueEbSAEaTTwd+eCAQDhAeypKj/kPKYEb7
+         KOm+U8EuJkvv1I1FsEcs3SOcGb/m4paxdpf7RCX2qBr5UHSGNwh89VWy/Z1D1g4Uq98s
+         986Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=h0S9X35x1dPYmVywIfwy49RDgI1meLSZA2LdM4U3+6o=;
-        fh=TvVbB9aHBmf30eSOU7pttDUjF9Rtrf3xvQZw5Zr4wHs=;
-        b=anMqfdx3V5pTbAa0ce3Lvuj6hDgM+ypKzNdA8ZsZx6OOLytBUdloGVynp0hu5vokhx
-         WVHJcw2cYdFaaACsGSpQcj4xRLWeYYIEqHHE0qC+m/I9qP6z2ssvjQlUby9uuegNA7NB
-         ywOYlWa8TeUEh1RSu61MTWnR0GX+D3wm3XV1qxbqt4n2916fyz/ax+Au9tweoatRH1zh
-         Ch7qUw5TQUd4avofrLh8Kg5S/bYDT5lDtaNUoMvaPlcPLLNNWp2hgXwJpCB3Rs0W4K+5
-         wbyBfLdlOTuAY8csdU7dRVjdtifiIRzVZGWhhhv74k/rm3aJhZPDOtq0nX7hyYI7Cwm7
-         uS4g==;
+        bh=el9IdsVpvDRJVEdnxklkmPvqwg7S8+dzbfu1CSsjkVc=;
+        fh=0DodeHMGiEObJydjsIbfb9MgyjVOUFBOkftjTCaprVo=;
+        b=aTBfOYaGwk/pdwzUJw+RaRccwrtdjB3fwyETdoBqoGiO667NePjBqZqV9MlNG8xQjT
+         8E4/CZhAB/3en5jMEvG8APEIeQSe9AvfLLZgr9GCbA7Pn7CO2Hao6cDC4+XHZotSy63B
+         tahpOrWlMEQ8uZ8Lcmln/HVAz8uHz4M41ABUecCoe3MWTxtTn0VRjxvamOWEsooxcgcd
+         oSrIW90jIOu/J73GrDjJHFbR21Y/ljk7UwZ+TL+esLc++i68pFMyOPq22nyRnbAXlDF2
+         rfY1NQqp4DFOsRpzAIxFSB15RBFoy6R+yp5QVBz42Q4rWy1FiI6XHond+wPgHmopQMr+
+         NS8w==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1767719756; x=1768324556; darn=vger.kernel.org;
+        d=purestorage.com; s=google2022; t=1767719924; x=1768324724; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=h0S9X35x1dPYmVywIfwy49RDgI1meLSZA2LdM4U3+6o=;
-        b=XO9wN6w3Opl7nMwLomPxLAU98QSEE6/7I4oGQQFjM3wtnqQSdRDxJalKkX2vq3OsWg
-         il5XdccSJfDz+Bv9lZGLKHbLnwj8mSjjhsc2zkLmIlXuevG/AQnRKeQh6oHHc0qrVBW+
-         jbkcx+Y6QPmgOM1XRyHJUcpvOM4bXFMGuD3PzfkGba0SR6NsanQfg7hQoggDguDpJX5E
-         fZabPw5l81W4yK05v1oooaBtbl9uKJKCnuzAyIxyLwoBmu2to7KoRXPJ8TZhzJZ/gN6B
-         N3eFZgSF6O5q0n8nPdKLdOA6295ZYXhU7U5edlXeY5Byov89mRUg+WPKcgHAD+n3IzfZ
-         zuCw==
+        bh=el9IdsVpvDRJVEdnxklkmPvqwg7S8+dzbfu1CSsjkVc=;
+        b=L0JCrEf0CxGjZlVPdGLiAhubcYDAobdQSZrOsNjJpiygYspAp/4Ht6kGoF1CvSSp3W
+         DSGBWeiFw1jvHjjgq0N329CbU1pzbW24n/uKPKsE4XRtpNBdy1kbfspf64RPQOJgyWdl
+         lwl4zzH//6aRLc5CRsD04toFAIpd3u5WRWVQB1Mt4680h6y1TSiwHgz6lh22zgaBrv1c
+         lT7Fp4PynyaldSrmnUTkVTkk5h8hKH0EJEPDkFnQxozoA82RuKaKm6MTgRPKCy062Sld
+         dv31/jY9T3dPFrH13drZVvny1K+4jq3cNRQP8VuRnU9j0+n1tuOH6w4QYUws/9ha/7kE
+         aDQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767719756; x=1768324556;
+        d=1e100.net; s=20230601; t=1767719924; x=1768324724;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=h0S9X35x1dPYmVywIfwy49RDgI1meLSZA2LdM4U3+6o=;
-        b=AKdVMhvYTqDyTYkzA6KRKtbbnh39uLAM3wqavoqanmXmZPRKhewgj2EnetHUrlgxKz
-         dWngNbc4L7R0VMe5Vg7AolyandTFNZk0F4WO3Kq2xhg7osD+RS1ilhxQ6EUJ/eaREo77
-         8khO3nqMpkZJ3kX3wVJrjvDjzGpCV/DpW9qcZ87PRsbhyYWIts3ViDiJpEUVASaiqsJ8
-         B33bqtIg80qZQtnQ5W9HzSeqCn9cp+CrZ0oqI8UgvyQoUNEdKPk7AvNmyfKKIhcer6oz
-         agmeot7PRK66S6RKMtkP8Ey2HBes5//c99LpeIALyfmC+ekXKwYBOMeq3ymFZgVuUqbK
-         F5dQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVaFaZLfro8G23acdOzyyzrsAUQbHAfLZ2BXfjoLh9cViPMxhAzRm3pdGdfxtsAOfYz+yZvJwvL2Cp+gQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5yKFXVFWY+bOVGmj6XVBplWfMloIueay1y4ErY9QgG/f/R//Q
-	ElmNP2zgndmOa8IsNsv4ZYJ38ODDEBLZ3xzLbFNEiQ/UOAEe3GL7DaVDcEl8oA5/TLf3qEhWdvW
-	kn+L+Ic/DGvGFfzRp2z7X5QietB8kbL4bREZ0sM+3+bpkgKdn/eCBDd4=
-X-Gm-Gg: AY/fxX6uvzcFfzSjetsWeKpe9R7bEvJ9oUGzT/p3XZ1gMnwEqWFwtwci9w3or7+z68G
-	oRZn4/EpQu5MCSWzT1LsnvQPUPgaYdBIk44peMZmMWEvBd0+6XPVdDNCfo1yNFmk80CTkj215fr
-	0j8m9T1I39if+XR3QqoN5xdO4e9+9PkpXLpe5suZ3+POLBTvyoj5oauQojMM6ea9ZbZDQ2wy+xh
-	JxoN4bBzktG+iTTrpdY0Ui2lp0Y6IBXNzddCliNQVPeG29gAMUAbEiaPJZFub5Cusrpg4kwnsiO
-	yKAQ5Mw=
-X-Google-Smtp-Source: AGHT+IHsx2prbXYg3j18SfdVTQFJ60Rbk1R0GsSR/Ko74ivczv03vINWOjHdxoRdXuVpHJS26gsubAcJWKCBQS4KIZA=
-X-Received: by 2002:a05:7022:6195:b0:119:e56a:4fff with SMTP id
- a92af1059eb24-121f18e1ff2mr1694930c88.4.1767719756030; Tue, 06 Jan 2026
- 09:15:56 -0800 (PST)
+        bh=el9IdsVpvDRJVEdnxklkmPvqwg7S8+dzbfu1CSsjkVc=;
+        b=EPE4Trrl0bFV3Fn4CNleEYsTPfpaFaGL/nKxmNFgVDLbpDw/Qx736aV2A/3OBfPG7c
+         M91a+3p4CFZxf89m9q0Fe3ZvhkbMYisshxMbX60UzMPLQMWogl4TjVtZk7VyKYsiNi7t
+         GjpBQ+HZktZOWb0Xqrg6i4Pxx07bsSsb29RAX8ruKllIOkqArGCBhO4UMYlTe5QFu1Ni
+         zHC4mCfKtMp3HY1izT1tD3Sw3qWj1nmPUvkyJNvtWOQrRy1bGfgsVaNGydG4LEcCuckR
+         bjzB3qFZlOxXVsHZO+1Vx3QHewDielwcAwkJdaoSY1Oc6KOSor3rs+m3xxLX6Us2EKHf
+         gFtg==
+X-Forwarded-Encrypted: i=1; AJvYcCXM2sl80o4LTqxpi7M3CVuT2Rftf4V4jZ4w50Z5xV5L8yILWVT1vZhtgfXDQqyclnFYdHQDhSejhoxDfw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyad8M9CDacVwYWtunoEEF11M1kEOhYaFmkh2ClbX/T0eTX0/j3
+	itRjB0WlGX9jpvALzCYFIRjTKUkUod8YgujYODbM8HsIVYyxku2ZpxePHxBApjNh6W/OHBn5S0T
+	ueJqIBrQ+xVtKOjAEI2Yc/tY6IqIrbQwXj1sC1PSUGw==
+X-Gm-Gg: AY/fxX6V9737eJDoHEWfw41SpDvm5etOJkSKB7xQTWQYJRM/pEXXAdjEJDjQKWgJrnk
+	dsjQKnAaRtqDKuBzyK9+avwF5z2mXXKQPzjeL5UgooAXVI0KgesF7JRm91Pel5m7LTl1OnR5dMX
+	0a6M0j9Iu9Xm/atcCR2DVcaVUz9G0eyt4SIMAhhzmjtUvLSLJXhDB0mlT70nSOcOhaEb0ZJ4GfF
+	/mnLxgr9qPtik2wJzyeXMd7Z5GwM6+M7T9Et3UmvvBSzrNEeWg+56aKNoRBbAJlf/TK8M3l
+X-Google-Smtp-Source: AGHT+IHJa/wLLHrmuywVzlRGyH5Yo3APVWKq7aE4CE/jD/1YOw2SXtvug2pAPBCT3XgeLuTQ6DbQhrJVVoiNv+zqfew=
+X-Received: by 2002:a05:7022:e0b:b0:11d:faef:21c2 with SMTP id
+ a92af1059eb24-121f188dca6mr1576758c88.2.1767719923753; Tue, 06 Jan 2026
+ 09:18:43 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -83,13 +82,14 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20260106005752.3784925-1-csander@purestorage.com>
- <20260106005752.3784925-20-csander@purestorage.com> <aV0Xx2vWmL5Iuls4@fedora>
-In-Reply-To: <aV0Xx2vWmL5Iuls4@fedora>
+ <20260106005752.3784925-14-csander@purestorage.com> <aV0THiUJ0S1l8FNC@fedora>
+In-Reply-To: <aV0THiUJ0S1l8FNC@fedora>
 From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Tue, 6 Jan 2026 09:15:44 -0800
-X-Gm-Features: AQt7F2oH1KSrEU_qjpFRn21_6eSA-1DRw6ns58qu5_CQ83y4Pw0aC2-PF1SPR9A
-Message-ID: <CADUfDZofEg0Q=veyihy=M-XCxoga6fkueJmLdJ4CVd6KU=GdBg@mail.gmail.com>
-Subject: Re: [PATCH v3 19/19] selftests: ublk: add end-to-end integrity test
+Date: Tue, 6 Jan 2026 09:18:32 -0800
+X-Gm-Features: AQt7F2p-9Q1Gb8POklMIHL1sT1S_3cYjSMMZ_GUmQXTheHiXANNW7Tkv76aEaqo
+Message-ID: <CADUfDZpw7rfshnC649QG+N+vVvck4VNXDLwCQW=6TYFCiB7a_Q@mail.gmail.com>
+Subject: Re: [PATCH v3 13/19] selftests: ublk: add utility to get block device
+ metadata size
 To: Ming Lei <ming.lei@redhat.com>
 Cc: Jens Axboe <axboe@kernel.dk>, Shuah Khan <shuah@kernel.org>, linux-block@vger.kernel.org, 
 	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -98,142 +98,53 @@ Cc: Jens Axboe <axboe@kernel.dk>, Shuah Khan <shuah@kernel.org>, linux-block@vge
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 6, 2026 at 6:10=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrote=
+On Tue, Jan 6, 2026 at 5:50=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrote=
 :
 >
-> On Mon, Jan 05, 2026 at 05:57:51PM -0700, Caleb Sander Mateos wrote:
-> > Add test case loop_08 to verify the ublk integrity data flow. It uses
-> > the kublk loop target to create a ublk device with integrity on top of
-> > backing data and integrity files. It then writes to the whole device
-> > with fio configured to generate integrity data. Then it reads back the
-> > whole device with fio configured to verify the integrity data.
-> > It also verifies that injected guard, reftag, and apptag corruptions ar=
-e
-> > correctly detected.
+> On Mon, Jan 05, 2026 at 05:57:45PM -0700, Caleb Sander Mateos wrote:
+> > Some block device integrity parameters are available in sysfs, but
+> > others are only accessible using the FS_IOC_GETLBMD_CAP ioctl. Add a
+> > metadata_size utility program to print out the logical block metadata
+> > size, PI offset, and PI size within the metadata. Example output:
+> > $ metadata_size /dev/ublkb0
+> > metadata_size: 64
+> > pi_offset: 56
+> > pi_tuple_size: 8
 > >
 > > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
 > > ---
-> >  tools/testing/selftests/ublk/Makefile        |   1 +
-> >  tools/testing/selftests/ublk/test_loop_08.sh | 111 +++++++++++++++++++
-> >  2 files changed, 112 insertions(+)
-> >  create mode 100755 tools/testing/selftests/ublk/test_loop_08.sh
+> >  tools/testing/selftests/ublk/Makefile        |  4 +--
+> >  tools/testing/selftests/ublk/metadata_size.c | 36 ++++++++++++++++++++
+> >  2 files changed, 38 insertions(+), 2 deletions(-)
+> >  create mode 100644 tools/testing/selftests/ublk/metadata_size.c
 > >
 > > diff --git a/tools/testing/selftests/ublk/Makefile b/tools/testing/self=
 tests/ublk/Makefile
-> > index bfd68ae64142..ab745443fd58 100644
+> > index 06ba6fde098d..41f776bb86a6 100644
 > > --- a/tools/testing/selftests/ublk/Makefile
 > > +++ b/tools/testing/selftests/ublk/Makefile
-> > @@ -33,10 +33,11 @@ TEST_PROGS +=3D test_loop_02.sh
-> >  TEST_PROGS +=3D test_loop_03.sh
-> >  TEST_PROGS +=3D test_loop_04.sh
-> >  TEST_PROGS +=3D test_loop_05.sh
-> >  TEST_PROGS +=3D test_loop_06.sh
-> >  TEST_PROGS +=3D test_loop_07.sh
-> > +TEST_PROGS +=3D test_loop_08.sh
-> >  TEST_PROGS +=3D test_stripe_01.sh
-> >  TEST_PROGS +=3D test_stripe_02.sh
-> >  TEST_PROGS +=3D test_stripe_03.sh
-> >  TEST_PROGS +=3D test_stripe_04.sh
-> >  TEST_PROGS +=3D test_stripe_05.sh
-> > diff --git a/tools/testing/selftests/ublk/test_loop_08.sh b/tools/testi=
-ng/selftests/ublk/test_loop_08.sh
-> > new file mode 100755
-> > index 000000000000..ca289cfb2ad4
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/ublk/test_loop_08.sh
-> > @@ -0,0 +1,111 @@
-> > +#!/bin/bash
-> > +# SPDX-License-Identifier: GPL-2.0
-> > +
-> > +. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
-> > +
-> > +if ! _have_program fio; then
-> > +     exit $UBLK_SKIP_CODE
-> > +fi
-> > +
-> > +fio_version=3D$(fio --version)
-> > +if [[ "$fio_version" =3D~ fio-[0-9]+\.[0-9]+$ ]]; then
-> > +     echo "Requires development fio version with https://github.com/ax=
-boe/fio/pull/1992"
-> > +     exit $UBLK_SKIP_CODE
-> > +fi
-> > +
-> > +TID=3Dloop_08
-> > +
-> > +_prep_test "loop" "end-to-end integrity"
-> > +
-> > +_create_backfile 0 256M
-> > +_create_backfile 1 32M # 256M * (64 integrity bytes / 512 data bytes)
-> > +integrity_params=3D"--integrity_capable --integrity_reftag
-> > +                  --metadata_size 64 --pi_offset 56 --csum_type t10dif=
-"
-> > +dev_id=3D$(_add_ublk_dev -t loop -u $integrity_params "${UBLK_BACKFILE=
-S[@]}")
+> > @@ -47,14 +47,14 @@ TEST_PROGS +=3D test_stress_03.sh
+> >  TEST_PROGS +=3D test_stress_04.sh
+> >  TEST_PROGS +=3D test_stress_05.sh
+> >  TEST_PROGS +=3D test_stress_06.sh
+> >  TEST_PROGS +=3D test_stress_07.sh
+> >
+> > -TEST_GEN_PROGS_EXTENDED =3D kublk
+> > +TEST_GEN_PROGS_EXTENDED =3D kublk metadata_size
+> >
+> >  LOCAL_HDRS +=3D $(wildcard *.h)
+> >  include ../lib.mk
+> >
+> > -$(TEST_GEN_PROGS_EXTENDED): $(wildcard *.c)
+> > +$(OUTPUT)/kublk: common.c fault_inject.c file_backed.c kublk.c null.c =
+stripe.c
 >
-> I tried above setting:
+> I feel wildcard is pretty handy, can we avoid to kill it? Such as:
 >
-> ./kublk add -t loop --integrity_capable --integrity_reftag --metadata_siz=
-e 64 --pi_offset 56 --csum_type t10dif --foreground -u /dev/sdb /dev/sdc
-> dev id 1: nr_hw_queues 2 queue_depth 128 block size 512 dev_capacity 8388=
-608
->         max rq size 1048576 daemon pid 38295 flags 0x160c2 state LIVE
->         queue 0: affinity(0 )
->         queue 1: affinity(8 )
->
-> However, IO error is always triggered:
->
-> [ 9202.316382] ublkb1: ref tag error at location 0 (rcvd 128)
-> [ 9202.317171] Buffer I/O error on dev ublkb1, logical block 0, async pag=
-e read
+> STANDALONE_UTILS :=3D metadata_size.c
+> KUBLK_SRCS :=3D $(filter-out $(STANDALONE_UTILS),$(wildcard *.c))
 
-Hmm, what are the initial contents of /dev/sdc? It looks like they are
-nonzero, as the reftag being read for logical block 0 is 128 rather
-than the expected 0 (the reftag would be read from bytes 60 to 63 of
-/dev/sdc). In general, though, the partition scan may be expected to
-fail the bio-integrity-auto checks if the integrity data hasn't been
-initialized. I don't think this is an issue, since the partition scan
-is looking for a partition table but there's no guarantee that one
-exists.
-You can disable the kernel integrity checks if you want by writing 0
-to /sys/block/ublkb1/integrity/read_verify. However, I'm not sure it's
-possible to do this soon enough to take effect before the partition
-scan.
-We could also use the UBLK_F_NO_AUTO_PART_SCAN feature, once it lands,
-to suppress the partition scan and these error messages.
+Sure, I wasn't aware of filter-out. I'm fine with that.
 
-Best,
+Thanks,
 Caleb
-
-> [ 9202.319478] ublkb1: ref tag error at location 0 (rcvd 128)
-> [ 9202.319983] Buffer I/O error on dev ublkb1, logical block 0, async pag=
-e read
-> [ 9202.326332] ublkb1: ref tag error at location 0 (rcvd 128)
-> [ 9202.326974] Buffer I/O error on dev ublkb1, logical block 0, async pag=
-e read
-> [ 9202.327570] ldm_validate_partition_table(): Disk read failed.
-> [ 9202.336539] ublkb1: ref tag error at location 0 (rcvd 128)
-> [ 9202.337228] Buffer I/O error on dev ublkb1, logical block 0, async pag=
-e read
-> [ 9202.339247] ublkb1: ref tag error at location 0 (rcvd 128)
-> [ 9202.339779] Buffer I/O error on dev ublkb1, logical block 0, async pag=
-e read
-> [ 9202.344306] ublkb1: ref tag error at location 0 (rcvd 128)
-> [ 9202.344948] Buffer I/O error on dev ublkb1, logical block 0, async pag=
-e read
-> [ 9202.347067] ublkb1: ref tag error at location 0 (rcvd 128)
-> [ 9202.347558] Buffer I/O error on dev ublkb1, logical block 0, async pag=
-e read
-> [ 9202.348100] Dev ublkb1: unable to read RDB block 0
-> [ 9202.350159] ublkb1: ref tag error at location 0 (rcvd 128)
-> [ 9202.350642] Buffer I/O error on dev ublkb1, logical block 0, async pag=
-e read
-> [ 9202.354977] ublkb1: ref tag error at location 0 (rcvd 128)
-> [ 9202.355539] Buffer I/O error on dev ublkb1, logical block 0, async pag=
-e read
-> [ 9202.356280]  ublkb1: unable to read partition table
->
->
->
-> Thanks,
-> Ming
->
