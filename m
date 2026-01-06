@@ -1,37 +1,37 @@
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 859CC20468E
-	for <linux-block@vger.kernel.org>; Tue,  6 Jan 2026 02:43:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9E7E3093CE
+	for <linux-block@vger.kernel.org>; Tue,  6 Jan 2026 07:05:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767667401; cv=none; b=kin2a3l3IhvzB3CvdeQRnTw/Cjocgcby0QskJbbga1sub1Kp4g5BMJmsOOp8aP2/PHpuNzpDodynS38S2fafG+C36ET0G3/jeg5XFsh7RE7lS6LzcsbdRWF0AawUyzx7L2PbdIUCIhLgw0tQy9YCl3eWlQ2nO6t2UKLu5uP0UqY=
+	t=1767683128; cv=none; b=s9ANV3n1gRUA3ePgNV1GMC1pMvvMgMxRq6etYG+w8KI3qCGufXYM1mmjjFywXgifAnbg3OXjDIj2xgodvUxP8vdVxvSnKuuwMK/uhSYC9zbLqKdkAgZcSOUWiRxL0UavoaBqO2KF52vQYZaN9m4E6HIEYE1F4P+BpsYaIoE+2Tk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767667401; c=relaxed/simple;
-	bh=WngXNw5TLT9ESIezQBibG29lop1zmpfZuZPivaAG8mQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cGMBjM88mFyv49isnMen3odqsroIDOCVoKpL+gwLxyFbYK+Chty8P57tDb8sN/+PbF2GiIGzvlCAvS/TLchnjGjLDMAausacrfQ01Fb/qn781HrpCyrdl4BuAQmEozg+FT/61uG7LAMDqQAmCnn++fHhqFd58l1Zx0W3C5mwlqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=K2EYBjWL; arc=none smtp.client-ip=220.197.31.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1767683128; c=relaxed/simple;
+	bh=/jy8PWjGAF9cEhVahjUz8KqHL9lmBNs98pIAwzSS4vE=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=d2Pk3PTKlrGuUeIacILUndyj8Ykk0PV3FpE4Xk38gjRWV+1GlyUYp0JI5lyr4PuAQaNyX2WLVdRZpNbj9HNVvcVqlf7xeuh0Up97HnWLi/dERg+cnYlcC55p8XlstOrvvFTckDKkPKsvWCC0eHdRcYEsYqJPJ1R3+6Q2V4UAylI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z5N5tqQk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="K2EYBjWL"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=9z
-	0wbNwD0eUQevy49eIwK9wlGS/cBOv+mCc/PwjdXBw=; b=K2EYBjWLUiOjZxk+ii
-	HxCTD1T5DJ65I+orPQCaO+NSUTeJzlIHbqusaYgakrIwOxgkii6ibUSulA/4RoeM
-	53qZXhLk8rSVLJMxdFJ1Br5YxF7wei9BYKxJven5+r9LImU1rlW1laov6fYZo+OT
-	+VjjQ3oJxwIjZ4boVQw9rY1hU=
-Received: from localhost.localdomain (unknown [])
-	by gzsmtp3 (Coremail) with SMTP id PigvCgDnuOC0dlxpESiPKQ--.87S2;
-	Tue, 06 Jan 2026 10:43:03 +0800 (CST)
-From: Yang Xiuwei <yangxiuwei2025@163.com>
-To: axboe@kernel.dk
-Cc: linux-block@vger.kernel.org,
-	Yang Xiuwei <yangxiuwei@kylinos.cn>
-Subject: [PATCH] block: remove redundant kill_bdev() call in set_blocksize()
-Date: Tue,  6 Jan 2026 10:42:57 +0800
-Message-Id: <20260106024257.144974-1-yangxiuwei2025@163.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z5N5tqQk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86329C116C6;
+	Tue,  6 Jan 2026 07:05:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767683127;
+	bh=/jy8PWjGAF9cEhVahjUz8KqHL9lmBNs98pIAwzSS4vE=;
+	h=From:To:Subject:Date:From;
+	b=Z5N5tqQkI0b+P6KCX6hKwpBfbcF0akzKVBIMO1lqE7MidJQaDOYjEmnflOdFJICI0
+	 jvz+mxZ0SLJCjB59c+LfZqPPwmJxeCWGTtFkRJhLEbZG84u0vE46CjBRsBQzcVzVMQ
+	 JhZ9AjHQJLjysDpPP7MqFOTAJYL3XCHH+uDHlgItRm4uZc8VD1I6uKveRyWoLaaaWT
+	 LfMER2Jsc9Z8mvWozHnrQOjbNUy6xl1brhHeVyT5rf2SEUclOIeIIMK3tGWFerFkit
+	 MjTuUQDS7NmgTw0Pcbhml46CUToh5C8UV2d6bYVmwEu9PoABprdUrz2WZvxm6xYa+L
+	 U/5bx29mMklww==
+From: Damien Le Moal <dlemoal@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Subject: [PATCH 0/2] Improve some comments
+Date: Tue,  6 Jan 2026 16:00:55 +0900
+Message-ID: <20260106070057.1364551-1-dlemoal@kernel.org>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -39,33 +39,25 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PigvCgDnuOC0dlxpESiPKQ--.87S2
-X-Coremail-Antispam: 1Uf129KBjvdXoW7Jw1fKrWUur4DWryxGw4kWFg_yoWxKrc_WF
-	W09F48AF43Zrs8Cr43CF13Z3sYyw4q9r1S9rZ3ArWxX3W3tF4kZ3y8Ww1jyrn8GFZ7Was0
-	kw4UWrs8Xr1rKjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7xRR9Yw5UUUUU==
-X-CM-SenderInfo: p1dqw55lxzvxisqskqqrwthudrp/xtbC6hc8zGlcdrdcWgAA3-
 
-From: Yang Xiuwei <yangxiuwei@kylinos.cn>
+Jens,
 
-The second kill_bdev() call in set_blocksize() is redundant as the first
-call already clears all buffers and pagecache, and locks prevent new
-pagecache creation between the calls.
+Here are a couple of patches to improve helper function comments.
+No functional changes.
 
-Signed-off-by: Yang Xiuwei <yangxiuwei@kylinos.cn>
+This also gets rid of the "XXX" strings in the comments, which makes
+temporary coding easier as XXX is often used to marke places that need
+some more attention when developing.
 
-diff --git a/block/bdev.c b/block/bdev.c
-index b8fbb9576110..ed022f8c48c7 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -208,7 +208,6 @@ int set_blocksize(struct file *file, int size)
- 
- 		inode->i_blkbits = blksize_bits(size);
- 		mapping_set_folio_min_order(inode->i_mapping, get_order(size));
--		kill_bdev(bdev);
- 		filemap_invalidate_unlock(inode->i_mapping);
- 		inode_unlock(inode);
- 	}
+Damien Le Moal (2):
+  block: fix blk_zone_cond_str() comment
+  block: improve blk_op_str() comment
+
+ block/blk-core.c       | 10 +++++-----
+ block/blk-zoned.c      | 10 +++++-----
+ include/linux/blkdev.h |  4 ++--
+ 3 files changed, 12 insertions(+), 12 deletions(-)
+
 -- 
-2.25.1
+2.52.0
 
