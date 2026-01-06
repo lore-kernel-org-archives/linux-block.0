@@ -1,164 +1,193 @@
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D5CB32D439
-	for <linux-block@vger.kernel.org>; Tue,  6 Jan 2026 14:48:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD97428D8E8
+	for <linux-block@vger.kernel.org>; Tue,  6 Jan 2026 15:05:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767710941; cv=none; b=aNCGWXgqWQ2C4lWCoqHAG/68d7gvTZPQZ6vEqFIDMBZdz4vP99l3FJ/lKmw8SmRMKLDob5jDtPcJx62E3Ujp7FrA0gxfLzFoPuRwWYV+bjyBG0MIkWz4MSetMXRfCMyTNpawItak5Ov4ScJ1xIS/6p+eNByBTb1glH8KXaz8UlA=
+	t=1767711959; cv=none; b=BrBCYiu5LF+mRMtf34xjYr3GP+G0XMO7kgkm1UloXtKcLR6O9IN1C1S+i1/HQP1UklrPiOX2HVRuWCNW6TbJ/asjKnS/MrNTmKI6YY0vjedSAI+nJDVoooVAGv83IVG9iECdq8KETMrrlZJB7j7KfTZ4qsWoS3+TmwBeL5wJHBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767710941; c=relaxed/simple;
-	bh=6YOiDJGD/xN647oeFLRihMwreWGKsEw4MO9xcq+Juho=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lG+nxOEz8rUtd9bzzBC1h/4M8MMfBO2AKss5Hfl9F3+YUY9fK3FtypuwcGrAeXM7UJIV5z3EQ/4G5v96qQ8t42xZMlhmMLxkP94ol4C+y+FTvKLoxg9DB5zeSqjvRI52eVB/apbxH5MdvDBA1Xg6RuY7tJN1xI65w2+rm54AMkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FWL7fmRr; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1767711959; c=relaxed/simple;
+	bh=AuF0ZNWNX8tx+EqQ6ge6AqRotPQTjft/0huFQJnmnwc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TCA4ZWu28q4coqQj8fQYngnDWjYmG10gkXzAG728bIQq6hChH5KwQSuIcGNYpNiViyU4BYOx71NDFJynESZ65d0CeiguxVh6BHrua/TkoYudBm3zMGt1VgXfCom5RWsdMNZ/RryMZr1gu7gUwODmyaidVLJT8yvkq0PYrRUldyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MyaU07wl; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FWL7fmRr"
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4775ae77516so11474805e9.1
-        for <linux-block@vger.kernel.org>; Tue, 06 Jan 2026 06:48:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767710938; x=1768315738; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gxkFIY8qM1qxfl1HL58V0glbGXXY0jztZigsQiwZ12I=;
-        b=FWL7fmRrwjfKdAIe5oYslIrym+s5QmaLtQljTsUvqDW6DstBKJo7NxqsGtwEDoyZLY
-         le32rSrvbLBRQY0YITEeawJ7UleFQk4qVmft0egOTsrYuzS6zdyy/Ujwe9GU0UWoZ9Sy
-         2p2R/nid6IQIDSXM9md4pNepC4RDU1vYmCv3qS4CUJztiLnlm7kXHB7R3XAvswB5cKB5
-         KnCIg0II64VHrKezapXxSktOVmmdt6MmQTfVU9CKFlLaHTi9r20VbIvUrBwGV5cJ08Jg
-         yLJzvsulBo5wsH83yILR/fZmRSeDySBGLOWn7w4JrnyPZl2mYNe40tuGrZXPIcAblhUK
-         tJlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767710938; x=1768315738;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=gxkFIY8qM1qxfl1HL58V0glbGXXY0jztZigsQiwZ12I=;
-        b=N/ZQ9yQMPWvcT9j3cUPz6kW9KBD2Nto7GHpIWoRLwPdoE4B82HuXokXhutW0u1kFqA
-         2qL4cIRiwGBkGFd+deFMZLaUMTGuzsf/fLkf2sZwN/6baiMkoHEBS+cJyzVnChqMGq0n
-         Hxqvf8WjNFBmw87fVu/aGF2LScsp6ov4z36EtiHLu5IwAmFfQ6vOmkZeZn0/NGiaatiM
-         r+PObqcv9Uh5n9s0r8VX2kHSZAM12ZXjvCvXwiODGcbPj3ROm5YtrFlkC1/fqIGPsWgN
-         hU1SIFQs7St0CU0RvlinJ3JwHpJpmrpQtAsr2GNOtilt2IDYUgx7yKBxQCNWqr0KhKxh
-         D2vQ==
-X-Forwarded-Encrypted: i=1; AJvYcCURhd3MNJmGRBrwdaGY4Wlrwml8SAyOlfPbJOVmlujS91tyrIXH4kL9fcErJzSTKW+tcmgohz5nc3iDtg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzau5VmAnT79Sx9ofVZxd1H2U+UTePy+SL0u0MxtJxoBxv0beAe
-	uimJ/lKEfiUG/1wEbE7RiwPwQeF6TUOf5x5mV1E2AMtLbY4TlVBN2MPz
-X-Gm-Gg: AY/fxX4N54uRbZGNjqn8u5q5hdslAJ5WhAiZ4jOp4yGBk9iEmsq72sxcSXgoP06AdnX
-	SWsfxf24c2rbEp5OWzV+wv3mTMFixI0f7/7jDP/zQLyAfgH8lj5DCNNebbkNZCGtofXLgUukfra
-	T95WzIaqiMOzuWzMcrwXNrVDYGnESDYUJvNCp0a8Qde6j2jlkx4gcW/8EQJjLrj0wDtT7CMl+Ud
-	irXN/5o39aR46xEa8aGxTvZD5qIKR14GL4VMq+nZNQOz8MGQaOlg/1ReJpWNM1vROnq0rGMmnKU
-	enJ2IMhMcV+4cMVpPHKIe9Af29+pMeCghJhvMMHcvBDY9FZPY3WRwZ+5+318qs/QVuNsXx9EfZ/
-	u6x4skCu0cNWEKDllvJhnM9S23GGCgRffM9/XVdQpRS2xe3aDmBua6p8eRXaO74mdSpB8ZoWe4P
-	24S+roJc8rqQqrcEcIlf+U7liIBM4eIH8errpMP5tD1K0k
-X-Google-Smtp-Source: AGHT+IEj73RVY8eYlp2o73JgkLW4iMwOBRsV69LLVN84xy5evsMlhdmdNOmgoJ0bEI5q3eY0MF7NJw==
-X-Received: by 2002:a05:600c:8b05:b0:471:14f5:126f with SMTP id 5b1f17b1804b1-47d7f0a806bmr32999185e9.33.1767710937649;
-        Tue, 06 Jan 2026 06:48:57 -0800 (PST)
-Received: from ionutnechita-arz2022.local ([2a02:2f0e:ca09:7000:33fc:5cce:3767:6b22])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d7fb3a912sm19743095e9.4.2026.01.06.06.48.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Jan 2026 06:48:56 -0800 (PST)
-From: Ionut Nechita <djiony2011@gmail.com>
-X-Google-Original-From: Ionut Nechita <ionut.nechita@windriver.com>
-To: bvanassche@acm.org
-Cc: axboe@kernel.dk,
-	gregkh@linuxfoundation.org,
-	ionut.nechita@windriver.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ming.lei@redhat.com,
-	muchun.song@linux.dev,
-	sashal@kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] block: Fix WARN_ON in blk_mq_run_hw_queue when called from interrupt context
-Date: Tue,  6 Jan 2026 16:40:21 +0200
-Message-ID: <20260106144023.381884-2-ionut.nechita@windriver.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <6eb6abcf-26aa-473d-843e-428ae0f38203@acm.org>
-References: <6eb6abcf-26aa-473d-843e-428ae0f38203@acm.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MyaU07wl"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767711949;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bndakk8tV+THlPhBiVbOCDHYYU6NOemGYWdM8KPqmKE=;
+	b=MyaU07wl+bShJpD0TF6/53cIudCLNYA2pqWLIJTEildm+XYMP/ehGfgrf+5+ytWkj36v5c
+	8PTlKeH2Ql8FLiJyqKe4JvI9rWkob9BRSnu5OQ+bGC28uLfTodVRee883HF31n/mAegxX+
+	Wem6qr5tB/70q33q5iTIXdY0aiZSqho=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-274-c5fQlrvFMJqIfzUET8KE7A-1; Tue,
+ 06 Jan 2026 10:05:19 -0500
+X-MC-Unique: c5fQlrvFMJqIfzUET8KE7A-1
+X-Mimecast-MFC-AGG-ID: c5fQlrvFMJqIfzUET8KE7A_1767711901
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 93ADC197732A;
+	Tue,  6 Jan 2026 15:04:31 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.130])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A601819560A7;
+	Tue,  6 Jan 2026 15:04:25 +0000 (UTC)
+Date: Tue, 6 Jan 2026 23:04:20 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: djiony2011@gmail.com
+Cc: axboe@kernel.dk, gregkh@linuxfoundation.org,
+	ionut.nechita@windriver.com, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, muchun.song@linux.dev,
+	sashal@kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] block: Fix WARN_ON in blk_mq_run_hw_queue when
+ called from interrupt context
+Message-ID: <aV0kdKSvufPFflQ8@fedora>
+References: <aUnu1HdMqQbksLeY@fedora>
+ <20260106111411.6435-1-ionut.nechita@windriver.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260106111411.6435-1-ionut.nechita@windriver.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Hi Bart,
+On Tue, Jan 06, 2026 at 01:14:11PM +0200, djiony2011@gmail.com wrote:
+> From: Ionut Nechita <ionut.nechita@windriver.com>
+> 
+> Hi Ming,
+> 
+> Thank you for the review. You're absolutely right to ask for clarification - I need to
+> correct my commit message as it's misleading about the actual call path.
+> 
+> > Can you show the whole stack trace in the warning? The in-code doesn't
+> > indicate that freeze queue can be called from scsi's interrupt context.
+> 
+> Here's the complete stack trace from the WARNING at blk_mq_run_hw_queue:
+> 
+> [Mon Dec 22 10:18:18 2025] WARNING: CPU: 190 PID: 2041 at block/blk-mq.c:2291 blk_mq_run_hw_queue+0x1fa/0x260
+> [Mon Dec 22 10:18:18 2025] Modules linked in:
+> [Mon Dec 22 10:18:18 2025] CPU: 190 PID: 2041 Comm: kworker/u385:1 Tainted: G        W          6.6.0-1-rt-amd64 #1  Debian 6.6.71-1
 
-Thank you for the thorough and insightful review. You've identified several critical issues with my submission that I need to address.
+There is so big change between 6.6.0-1-rt and 6.19, because Real-Time "PREEMPT_RT" Support Merged For Linux 6.12
 
-> 6.6.71 is pretty far away from Jens' for-next branch. Please use Jens'
-> for-next branch for testing kernel patches intended for the upstream kernel.
+https://www.phoronix.com/news/Linux-6.12-Does-Real-Time
 
-You're absolutely right. I was testing on the stable Debian kernel (6.6.71-rt) which was where the issue was originally reported. I will now fetch and test on Jens' for-next branch and ensure the issue reproduces there before resubmitting.
 
-> Where in the above call stack is the code that disables interrupts?
+> [Mon Dec 22 10:18:18 2025] Hardware name: Dell Inc. PowerEdge R7615/09K9WP, BIOS 1.11.2 12/19/2024
+> [Mon Dec 22 10:18:18 2025] Workqueue: events_unbound async_run_entry_fn
+> [Mon Dec 22 10:18:18 2025] RIP: 0010:blk_mq_run_hw_queue+0x1fa/0x260
+> [Mon Dec 22 10:18:18 2025] Code: ff 75 68 44 89 f6 e8 e5 45 c0 ff e9 ac fe ff ff e8 2b 70 c0 ff 48 89 ef e8 b3 a0 00 00 5b 5d 41 5c 41 5d 41 5e e9 26 9e c0 ff <0f> 0b e9 43 fe ff ff e8 0a 70 c0 ff 48 8b 85 d0 00 00 00 48 8b 80
+> [Mon Dec 22 10:18:18 2025] RSP: 0018:ff630f098528fb98 EFLAGS: 00010206
+> [Mon Dec 22 10:18:18 2025] RAX: 0000000000ff0000 RBX: 0000000000000000 RCX: 0000000000000000
+> [Mon Dec 22 10:18:18 2025] RDX: 0000000000ff0000 RSI: 0000000000000000 RDI: ff3edc0247159400
+> [Mon Dec 22 10:18:18 2025] RBP: ff3edc0247159400 R08: ff3edc0247159400 R09: ff630f098528fb60
+> [Mon Dec 22 10:18:18 2025] R10: 0000000000000000 R11: 0000000045069ed3 R12: 0000000000000000
+> [Mon Dec 22 10:18:18 2025] R13: ff3edc024715a828 R14: 0000000000000000 R15: 0000000000000000
+> [Mon Dec 22 10:18:18 2025] FS:  0000000000000000(0000) GS:ff3edc10fd380000(0000) knlGS:0000000000000000
+> [Mon Dec 22 10:18:18 2025] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [Mon Dec 22 10:18:18 2025] CR2: 0000000000000000 CR3: 000000073961a001 CR4: 0000000000771ee0
+> [Mon Dec 22 10:18:18 2025] PKRU: 55555554
+> [Mon Dec 22 10:18:18 2025] Call Trace:
+> [Mon Dec 22 10:18:18 2025]  <TASK>
+> [Mon Dec 22 10:18:18 2025]  ? __warn+0x89/0x140
+> [Mon Dec 22 10:18:18 2025]  ? blk_mq_run_hw_queue+0x1fa/0x260
+> [Mon Dec 22 10:18:18 2025]  ? report_bug+0x198/0x1b0
+> [Mon Dec 22 10:18:18 2025]  ? handle_bug+0x53/0x90
+> [Mon Dec 22 10:18:18 2025]  ? exc_invalid_op+0x18/0x70
+> [Mon Dec 22 10:18:18 2025]  ? asm_exc_invalid_op+0x1a/0x20
+> [Mon Dec 22 10:18:18 2025]  ? blk_mq_run_hw_queue+0x1fa/0x260
+> [Mon Dec 22 10:18:18 2025]  blk_mq_run_hw_queues+0x6c/0x130
+> [Mon Dec 22 10:18:18 2025]  blk_queue_start_drain+0x12/0x40
+> [Mon Dec 22 10:18:18 2025]  blk_mq_destroy_queue+0x37/0x70
+> [Mon Dec 22 10:18:18 2025]  __scsi_remove_device+0x6a/0x180
+> [Mon Dec 22 10:18:18 2025]  scsi_alloc_sdev+0x357/0x360
+> [Mon Dec 22 10:18:18 2025]  scsi_probe_and_add_lun+0x8ac/0xc00
+> [Mon Dec 22 10:18:18 2025]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [Mon Dec 22 10:18:18 2025]  ? dev_set_name+0x57/0x80
+> [Mon Dec 22 10:18:18 2025]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [Mon Dec 22 10:18:18 2025]  ? attribute_container_add_device+0x4d/0x130
+> [Mon Dec 22 10:18:18 2025]  __scsi_scan_target+0xf0/0x520
+> [Mon Dec 22 10:18:18 2025]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [Mon Dec 22 10:18:18 2025]  ? sched_clock_cpu+0x64/0x190
+> [Mon Dec 22 10:18:18 2025]  scsi_scan_channel+0x57/0x90
+> [Mon Dec 22 10:18:18 2025]  scsi_scan_host_selected+0xd4/0x110
+> [Mon Dec 22 10:18:18 2025]  do_scan_async+0x1c/0x190
+> [Mon Dec 22 10:18:18 2025]  async_run_entry_fn+0x2f/0x130
+> [Mon Dec 22 10:18:18 2025]  process_one_work+0x175/0x370
+> [Mon Dec 22 10:18:18 2025]  worker_thread+0x280/0x390
+> [Mon Dec 22 10:18:18 2025]  ? __pfx_worker_thread+0x10/0x10
+> [Mon Dec 22 10:18:18 2025]  kthread+0xdd/0x110
+> [Mon Dec 22 10:18:18 2025]  ? __pfx_kthread+0x10/0x10
+> [Mon Dec 22 10:18:18 2025]  ret_from_fork+0x31/0x50
+> [Mon Dec 22 10:18:18 2025]  ? __pfx_kthread+0x10/0x10
+> [Mon Dec 22 10:18:18 2025]  ret_from_fork_asm+0x1b/0x30
+> [Mon Dec 22 10:18:18 2025]  </TASK>
+> [Mon Dec 22 10:18:18 2025] ---[ end trace 0000000000000000 ]---
+> 
+> ## Important clarifications:
+> 
+> 1. **Not freeze queue, but drain during destroy**: My commit message was incorrect.
+>    The call path is:
+>    blk_mq_destroy_queue() -> blk_queue_start_drain() -> blk_mq_run_hw_queues(q, false)
+> 
+>    This is NOT during blk_freeze_queue_start(), but during queue destruction when a
+>    SCSI device probe fails and cleanup is triggered.
+> 
+> 2. **Not true interrupt context**: You're correct that this isn't from an interrupt
+>    handler. The workqueue context is process context, not interrupt context.
+> 
+> 3. **The actual problem on PREEMPT_RT**: There's a preceding "scheduling while atomic"
+>    error that provides the real context:
+> 
+> [Mon Dec 22 10:18:18 2025] BUG: scheduling while atomic: kworker/u385:1/2041/0x00000002
+> [Mon Dec 22 10:18:18 2025] Call Trace:
+> [Mon Dec 22 10:18:18 2025]  dump_stack_lvl+0x37/0x50
+> [Mon Dec 22 10:18:18 2025]  __schedule_bug+0x52/0x60
+> [Mon Dec 22 10:18:18 2025]  __schedule+0x87d/0xb10
+> [Mon Dec 22 10:18:18 2025]  rt_mutex_schedule+0x21/0x40
+> [Mon Dec 22 10:18:18 2025]  rt_mutex_slowlock_block.constprop.0+0x33/0x170
+> [Mon Dec 22 10:18:18 2025]  __rt_mutex_slowlock_locked.constprop.0+0xc4/0x1e0
+> [Mon Dec 22 10:18:18 2025]  mutex_lock+0x44/0x60
+> [Mon Dec 22 10:18:18 2025]  __cpuhp_state_add_instance_cpuslocked+0x41/0x110
+> [Mon Dec 22 10:18:18 2025]  __cpuhp_state_add_instance+0x48/0xd0
+> [Mon Dec 22 10:18:18 2025]  blk_mq_realloc_hw_ctxs+0x405/0x420
 
-This was poorly worded on my part, and I apologize for the confusion. The issue is NOT "interrupt context" in the hardirq sense.
+Why is the above warning related with your patch?
 
-What's actually happening:
-- **Context:** kworker thread (async SCSI device scan)
-- **State:** Running with preemption disabled (atomic context, not hardirq)
-- **Path:** Queue destruction during device probe error cleanup
-- **Trigger:** On PREEMPT_RT, in_interrupt() returns true when preemption is disabled, even in process context
+> [Mon Dec 22 10:18:18 2025]  blk_mq_init_allocated_queue+0x10a/0x480
+> 
+> The context is atomic because on PREEMPT_RT, some spinlock earlier in the call chain has
+> been converted to an rt_mutex, and the code is holding that lock. When blk_mq_run_hw_queues()
+> is called with async=false, it triggers kblockd_mod_delayed_work_on(), which calls
+> in_interrupt(), and this returns true because preempt_count() is non-zero due to the
+> rt_mutex being held.
+> 
+> ## What this means:
+> 
+> The issue is specific to PREEMPT_RT where:
+> - Spinlocks become sleeping mutexes (rt_mutex)
+> - Holding an rt_mutex sets preempt_count, making in_interrupt() return true
+> - blk_mq_run_hw_queues() with async=false hits WARN_ON_ONCE(!async && in_interrupt())
 
-The WARN_ON in blk_mq_run_hw_queue() at line 2291 is:
-  WARN_ON_ONCE(!async && in_interrupt());
+If you think the same issue exists on recent kernel, show the stack trace.
 
-On PREEMPT_RT, this check fires because:
-1. blk_freeze_queue_start() calls blk_mq_run_hw_queues(q, false) ← async=false
-2. This eventually calls blk_mq_run_hw_queue() with async=false
-3. in_interrupt() returns true (because preempt_count indicates atomic state)
-4. WARN_ON triggers
+Or please share how preempt is disabled in the above blk_mq_run_hw_queues code
+path.
 
-So it's not "interrupt context" - it's atomic context (preemption disabled) being detected by in_interrupt() on RT kernel.
 
-> How is the above call stack related to the reported problem? The above
-> call stack is about request queue allocation while the reported problem
-> happens during request queue destruction.
+Thanks,
+Ming
 
-You're absolutely correct, and I apologize for the confusion. I mistakenly included two different call stacks in my commit message:
-
-1. **"scheduling while atomic" during blk_mq_realloc_hw_ctxs** - This was from queue allocation and is a DIFFERENT issue. It should NOT have been included.
-
-2. **WARN_ON during blk_queue_start_drain** - This is the ACTUAL issue that my patch addresses (queue destruction path).
-
-I will revise the commit message to remove the unrelated allocation stack trace and focus solely on the queue destruction path.
-
-> I apologize for the confusion in my commit message. Should I:
-> 1. Revise the commit message to accurately describe the blk_queue_start_drain() path?
-> 2. Add details about the PREEMPT_RT context causing the atomic state?
->
-> The answer to both questions is yes.
-
-Understood. I will prepare v3->v5 with the following corrections:
-
-1. **Test on Jens' for-next branch** - Fetch, reproduce, and validate the fix on the upstream development tree
-
-2. **Accurate context description** - Replace "IRQ thread context" with "kworker context with preemption disabled (atomic context on RT)"
-
-3. **Single, clear call stack** - Remove the confusing allocation stack trace, focus only on the destruction path:
-   ```
-   scsi_alloc_sdev (error path)
-   → __scsi_remove_device
-   → blk_mq_destroy_queue
-   → blk_queue_start_drain
-   → blk_freeze_queue_start
-   → blk_mq_run_hw_queues(q, false)  ← Problem: async=false
-   ```
-
-4. **Explain PREEMPT_RT specifics** - Clearly describe why in_interrupt() returns true in atomic context on RT kernel, and how changing to async=true avoids the problem
-
-5. **Accurate problem statement** - This is about avoiding synchronous queue runs in atomic context on RT, not about MSI-X IRQ thread contention (that was a misunderstanding on my part)
-
-I'll respond again once I've validated on for-next and have a corrected v3->v5 ready.
-
-Thank you again for the detailed feedback.
-
-Best regards,
-Ionut
---
-2.52.0
