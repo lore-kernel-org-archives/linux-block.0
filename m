@@ -1,185 +1,135 @@
-Received: from mail-oa1-f44.google.com (mail-oa1-f44.google.com [209.85.160.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E29782DF128
-	for <linux-block@vger.kernel.org>; Tue,  6 Jan 2026 14:27:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84FA829CE9
+	for <linux-block@vger.kernel.org>; Tue,  6 Jan 2026 14:28:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767709633; cv=none; b=qClMQ2lQS1ZF40HzgxEPkwpuEAtR9RnMhMmTClo8WDw/Jy/eXQ18N3aXcfdlJX4HAI8pie3DFvLmomtM4veL9G5hByREpNBXH9G2FrT+9rvbGgx3/r1hoxrBN+jd7dDup6aj41T0+3G/KOEHkWN4hYzcmrhq6yMQYtu+YFOFrkM=
+	t=1767709712; cv=none; b=CeZMrbmysjYdgxYZTa+2AHFGc064nM3CPT21JFgOXo0cz0auFQ1Qmk1KaEwz9KoI39RuLhnMHYQ8G2iMjCxQfBaa3hYU7sGwhQgsRohu3Ki7azsiIpycNJ0CbPRH7HrGoq0MxiEQNn5ukOwWQMKzzUKCxuiiO0i5X2ztHrxlCeI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767709633; c=relaxed/simple;
-	bh=vV0mvS4Jnm2xZ3ntnOC7IJN7wlIZlMsfOIIsKVUA/to=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=nGleF9HHzOWskGxkW37fdk1wtxaqxQNBjejL29ulHjXFnGiYSR5uQ9ZFlxKpVQGMDvbMOOK2PEXFI+mgyOnxodHU2s94HXr7PBdaqg8vMnw6ak4cLRH7Y44Trb+4qa8PaUT1nYJ8sIUObqahlHXYTMy4Rd9qin7fLm0Hx7X9/WM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.160.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-3fa11ba9ed5so690929fac.0
-        for <linux-block@vger.kernel.org>; Tue, 06 Jan 2026 06:27:11 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767709631; x=1768314431;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+3qd01S9PP2+OLCSEIsQdXiiXsFMzjeQSYIxX2JGNCE=;
-        b=VOjemtdm9OGDwlWIf+E6FBH/+tChDBaBmHD3X6BBV0tI94XrfB45jJlPZPG73kloOT
-         HBCrcK1RlZAfIfiUjcxpPU+0ri/7OS4bPeIequR840mUNAxehbvteDGTkoB6bcMQ0BhF
-         fIVpupWOMhtLOT2WYy18yOjzhKeZ325CpDL46i7cXFuoZMxYTDK0UJFmldhB/iF57ftz
-         ntYno2g9z5PkhqM3dSLDWCkbJ6fuRtk4QIRVYfVNj0KIahxHdJyGvxQrOD0mJn/0AXmj
-         Blez/x10ryXPlEhe7OBI3BXk9VS1TOwWFx2O9PhxeIHMyc2gzQMks/IElilY/1D0o9nq
-         D3Tg==
-X-Gm-Message-State: AOJu0YzEHk+R8qG+elNMp06s4bqtY7micfXeKSnwxYnMB1wBY8gKNRfR
-	mIZ/hT6mMOK3b2rv1tzGBq/ZNqmQ2lFQEriAHIWM0KLznE6wjoVfhgjM
-X-Gm-Gg: AY/fxX4Qy7a4JvfFJWsFxObXzysA+FDwE6BMDwI722J/4ifWoV43SVJIMu2S8Wd2wQO
-	fpqlD9SSC0InIunu8YAeYY8e95o96NuNc/davMyyDuxK4ew/tq3W3aqTO2ihGmZH/kyu3OXS2t3
-	qyAgi9UFIL9kmrbO33pZ0ykoBfhcCBqNaGzN85ym4GeRpY2X1wPKOWfZkPyLaMg9zXQ8bFctz0I
-	huQbFEpCpoS2kn2eOWWVc0W6vhveI4YkV362bhw+F8paRINcbHy15fBPshPH701hk9BBM23n93h
-	vH2qJA3TpIuQCV/c2AEl4ymQqXjZ7OlHRXZfKcil1N7eMSQ35ucWf+KEa9TpjAaQ2uHZn2omyet
-	a3Z39lX9SYNIjIXPgqFGX58gQhRtWHpCJRVXmt+vGCynEb0oYrW6g2kYPRyhDZ/QRy///+krO+s
-	RAxZSH5sMjRPrPLC7syYJaHSWM
-X-Google-Smtp-Source: AGHT+IED2Gwv/rYRU8OuPikMe18KRTzt/416cCB+x5CYYikPcYVGf68I6GEJ88NpybGUFPEiq8Dqew==
-X-Received: by 2002:a05:6870:f14f:b0:3ec:3b3e:4f38 with SMTP id 586e51a60fabf-3ffa0c6b5cemr1746241fac.36.1767709630794;
-        Tue, 06 Jan 2026 06:27:10 -0800 (PST)
-Received: from localhost ([2a03:2880:10ff:52::])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-3ffa4deae43sm1394643fac.1.2026.01.06.06.27.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Jan 2026 06:27:10 -0800 (PST)
-From: Breno Leitao <leitao@debian.org>
-Date: Tue, 06 Jan 2026 06:26:57 -0800
-Subject: [PATCH] blk-rq-qos: Remove unlikely() hints from QoS checks
+	s=arc-20240116; t=1767709712; c=relaxed/simple;
+	bh=1+94GJ8+LkHE3asxoSQmLwOLrII0o196LUuF2uk5+S0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QKZxrKWKAyw88ikkzQoBcxoCjZeNAYlQwrc4c+/NIMugWxjLG9HbyncCXwAxq6fwtvO7f07rdAmAs7whgTfuw/at95UOjSgeXu9Ai1gHx0V6u3sZEaV9K8SANNqq0N3fERKzUt3/CnSecOzdxVZlX8yY1UjPQbbWqcM07uMuxjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VcGlKW5x; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VcGlKW5x"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767709709;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ERjLT0cuVeu4ym3+lt85LlaMv7KqBqF0oVent2a7UsQ=;
+	b=VcGlKW5xvc1/rH5VO82ORlGgEaHs2A2rpJJB9m3CZqd+x79dudPpPBXSv/yC5A50BaXuDO
+	FjoaKbTtGy7MbT07R4IqJzudxMVEBQzOYjtxcvbzFbxRywc+YpLBKwc5KrH9Rv3eZiNRKN
+	4u9CTrxjNXDHcbUz/rJcy7SEX0LrYEk=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-56-MYrhGzHNPNO4xg49mkcvkw-1; Tue,
+ 06 Jan 2026 09:28:28 -0500
+X-MC-Unique: MYrhGzHNPNO4xg49mkcvkw-1
+X-Mimecast-MFC-AGG-ID: MYrhGzHNPNO4xg49mkcvkw_1767709707
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1BB0A18002C9;
+	Tue,  6 Jan 2026 14:28:27 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.130])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 837211956053;
+	Tue,  6 Jan 2026 14:28:23 +0000 (UTC)
+Date: Tue, 6 Jan 2026 22:28:18 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Yoav Cohen <yoav@nvidia.com>
+Cc: linux-block@vger.kernel.org, csander@purestorage.com,
+	jholzman@nvidia.com, omril@nvidia.com
+Subject: Re: [PATCH v2 2/2] ublk: add UBLK_CMD_TRY_STOP_DEV command
+Message-ID: <aV0cAkNxHRqxHMHg@fedora>
+References: <20260104084839.30065-1-yoav@nvidia.com>
+ <20260104084839.30065-3-yoav@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260106-blk_unlikely-v1-1-90fb556a6776@debian.org>
-X-B4-Tracking: v=1; b=H4sIALAbXWkC/yXMQQqDMBAF0KsMf20gEUkhV5FSTDq2U0NaEhVFv
- HtRl2/zNhTOwgWONmSepcg3wZGpCOHdpRcrecIRal1bbbRVPg6PKUUZOK7KcteE/ma90Q0qwi9
- zL8vZtffLZfIfDuNxYN//YPdCanAAAAA=
-X-Change-ID: 20260106-blk_unlikely-6ea4cf76b104
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- tj@kernel.org, josef@toxicpanda.com, kernel-team@meta.com, 
- Breno Leitao <leitao@debian.org>
-X-Mailer: b4 0.15-dev-47773
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3757; i=leitao@debian.org;
- h=from:subject:message-id; bh=vV0mvS4Jnm2xZ3ntnOC7IJN7wlIZlMsfOIIsKVUA/to=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpXRu9Fd50a83G9ZgMg3oXgeowUcIVdLtQ5P3j6
- S7if+yCV42JAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaV0bvQAKCRA1o5Of/Hh3
- bdzHEACnvGlRYnTRfUQaQ60ZDw2d/qcHz7HXgSyPHC04T9R93ajP3iDb1b8TH+sr8gTgl5iKLrR
- RYAYSkdBIKHIFGapj9U57zkR7c3Cc/n1Y4hVukG9ZwStFSWYXSDCpdr6NGOzOw4tHVYjDHGwiHA
- VsmzU8bJSIJnQtX5ynBRikqhW2+90hGzesTST9tXgv/sDC/yyFdYWvgvPouQLq++TIfL0p9nvn9
- gVZioVm1DJQn+17ba9Ga5qmpTzpmcEwQ8b5IiCfN8lVkm7nbCsx8cfASlhxODTlRPxfRTrILOpL
- +N0KrnS4dE4yvMZd7uzfUVAMsOfFcYgjeed+Gc/rmM1zcIz9zo7dvhIB7X+zIQ/1zDUrqm3TXMa
- GphO91GEk/ZU93mRYY7uCQsB672NZVDtMLCsT9qlo+t24i9a0+Nbryjc14FL4Xc4cyPB/AgEhvc
- HyOCEk5U/zNrIIxXFRGtrFpgIxlWAMeMzZvY5tS6VbZc9F8ssc0OhSshgMbRScpbtSvv73OvgXM
- 6HeoWG3pjXV/PYTB2jGwIYq5Jzo6iYWHpSR2XW+EHO1/O/w0trqcBjYNXt0h5pB1ec19WD9y3M9
- 6RAewEepqt4MbierniH4rXvLbx+29vOVu770Lbwod8QO/DZXh1VIkev1OOULI/D6c7TQPEBfpSF
- MU2Oo3+pAecEAUQ==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260104084839.30065-3-yoav@nvidia.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-The unlikely() annotations on QUEUE_FLAG_QOS_ENABLED checks are
-counterproductive. Writeback throttling (WBT) might be enabled by
-default, mainly because CONFIG_BLK_WBT_MQ defaults to 'y'.
+On Sun, Jan 04, 2026 at 10:48:39AM +0200, Yoav Cohen wrote:
+> This command is similar to UBLK_CMD_STOP_DEV, but it only stops the
+> device if there are no active openers for the ublk block device.
+> If the device is busy, the command returns -EBUSY instead of
+> disrupting active clients. This allows safe, non-destructive stopping.
+> 
+> Signed-off-by: Yoav Cohen <yoav@nvidia.com>
+> ---
+>  drivers/block/ublk_drv.c      | 42 +++++++++++++++++++++++++++++++++++
+>  include/uapi/linux/ublk_cmd.h |  3 ++-
+>  2 files changed, 44 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 2d5602ef05cc..55a5ab11c1cd 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -54,6 +54,7 @@
+>  #define UBLK_CMD_DEL_DEV_ASYNC	_IOC_NR(UBLK_U_CMD_DEL_DEV_ASYNC)
+>  #define UBLK_CMD_UPDATE_SIZE	_IOC_NR(UBLK_U_CMD_UPDATE_SIZE)
+>  #define UBLK_CMD_QUIESCE_DEV	_IOC_NR(UBLK_U_CMD_QUIESCE_DEV)
+> +#define UBLK_CMD_TRY_STOP_DEV	_IOC_NR(UBLK_U_CMD_TRY_STOP_DEV)
 
-Branch profiling on Meta servers, which have WBT enabled, confirms 100%
-misprediction rates on these checks.
+This need a feature flag, such as UBLK_F_SAFE_STOP, which is set in
+ublk_ctrl_add_dev(), meantime document that UBLK_CMD_TRY_STOP_DEV is
+supported with this feature.
 
-Remove the unlikely() annotations to let the CPU's branch predictor
-learn the actual behavior, potentially improving I/O path performance.
+>  
+>  #define UBLK_IO_REGISTER_IO_BUF		_IOC_NR(UBLK_U_IO_REGISTER_IO_BUF)
+>  #define UBLK_IO_UNREGISTER_IO_BUF	_IOC_NR(UBLK_U_IO_UNREGISTER_IO_BUF)
+> @@ -239,6 +240,8 @@ struct ublk_device {
+>  	struct delayed_work	exit_work;
+>  	struct work_struct	partition_scan_work;
+>  
+> +	bool			block_open; /* protected by open_mutex */
+> +
+>  	struct ublk_queue       *queues[];
+>  };
+>  
+> @@ -919,6 +922,9 @@ static int ublk_open(struct gendisk *disk, blk_mode_t mode)
+>  			return -EPERM;
+>  	}
+>  
+> +	if (ub->block_open)
+> +		return -EBUSY;
+> +
+>  	return 0;
+>  }
+>  
+> @@ -3309,6 +3315,38 @@ static void ublk_ctrl_stop_dev(struct ublk_device *ub)
+>  	ublk_stop_dev(ub);
+>  }
+>  
+> +static int ublk_ctrl_try_stop_dev(struct ublk_device *ub)
+> +{
+> +	struct gendisk *disk;
+> +	int ret = -EINVAL;
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- block/blk-rq-qos.h | 25 +++++++++----------------
- 1 file changed, 9 insertions(+), 16 deletions(-)
+-EINVAL is never used, it may save the line of `ret = 0` if it is
+initialized as 0.
 
-diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
-index b538f2c0febc..a747a504fe42 100644
---- a/block/blk-rq-qos.h
-+++ b/block/blk-rq-qos.h
-@@ -112,29 +112,26 @@ void __rq_qos_queue_depth_changed(struct rq_qos *rqos);
- 
- static inline void rq_qos_cleanup(struct request_queue *q, struct bio *bio)
- {
--	if (unlikely(test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags)) &&
--			q->rq_qos)
-+	if (test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags) && q->rq_qos)
- 		__rq_qos_cleanup(q->rq_qos, bio);
- }
- 
- static inline void rq_qos_done(struct request_queue *q, struct request *rq)
- {
--	if (unlikely(test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags)) &&
--			q->rq_qos && !blk_rq_is_passthrough(rq))
-+	if (test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags) &&
-+	    q->rq_qos && !blk_rq_is_passthrough(rq))
- 		__rq_qos_done(q->rq_qos, rq);
- }
- 
- static inline void rq_qos_issue(struct request_queue *q, struct request *rq)
- {
--	if (unlikely(test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags)) &&
--			q->rq_qos)
-+	if (test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags) && q->rq_qos)
- 		__rq_qos_issue(q->rq_qos, rq);
- }
- 
- static inline void rq_qos_requeue(struct request_queue *q, struct request *rq)
- {
--	if (unlikely(test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags)) &&
--			q->rq_qos)
-+	if (test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags) && q->rq_qos)
- 		__rq_qos_requeue(q->rq_qos, rq);
- }
- 
-@@ -162,8 +159,7 @@ static inline void rq_qos_done_bio(struct bio *bio)
- 
- static inline void rq_qos_throttle(struct request_queue *q, struct bio *bio)
- {
--	if (unlikely(test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags)) &&
--			q->rq_qos) {
-+	if (test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags) && q->rq_qos) {
- 		bio_set_flag(bio, BIO_QOS_THROTTLED);
- 		__rq_qos_throttle(q->rq_qos, bio);
- 	}
-@@ -172,16 +168,14 @@ static inline void rq_qos_throttle(struct request_queue *q, struct bio *bio)
- static inline void rq_qos_track(struct request_queue *q, struct request *rq,
- 				struct bio *bio)
- {
--	if (unlikely(test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags)) &&
--			q->rq_qos)
-+	if (test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags) && q->rq_qos)
- 		__rq_qos_track(q->rq_qos, rq, bio);
- }
- 
- static inline void rq_qos_merge(struct request_queue *q, struct request *rq,
- 				struct bio *bio)
- {
--	if (unlikely(test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags)) &&
--			q->rq_qos) {
-+	if (test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags) && q->rq_qos) {
- 		bio_set_flag(bio, BIO_QOS_MERGED);
- 		__rq_qos_merge(q->rq_qos, rq, bio);
- 	}
-@@ -189,8 +183,7 @@ static inline void rq_qos_merge(struct request_queue *q, struct request *rq,
- 
- static inline void rq_qos_queue_depth_changed(struct request_queue *q)
- {
--	if (unlikely(test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags)) &&
--			q->rq_qos)
-+	if (test_bit(QUEUE_FLAG_QOS_ENABLED, &q->queue_flags) && q->rq_qos)
- 		__rq_qos_queue_depth_changed(q->rq_qos);
- }
- 
+> +
+> +	disk = ublk_get_disk(ub);
+> +	if (!disk) {
+> +		ret = -ENODEV;
+> +		goto out;
 
----
-base-commit: c92f16e43c48f367af2f63956eb8385cb05816f3
-change-id: 20260106-blk_unlikely-6ea4cf76b104
+		return -ENODEV;
 
-Best regards,
---  
-Breno Leitao <leitao@debian.org>
+
+Thanks, 
+Ming
 
