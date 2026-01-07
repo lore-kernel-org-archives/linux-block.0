@@ -1,102 +1,108 @@
-Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
+Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EBD423B63E
-	for <linux-block@vger.kernel.org>; Wed,  7 Jan 2026 02:10:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EBB525EFBB
+	for <linux-block@vger.kernel.org>; Wed,  7 Jan 2026 02:13:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767751853; cv=none; b=nSPiKCPkor9lbNIwX2RK1H1E/W62V6e332xZPdnZehDzux7yLZmka2fpaXia621Cphwdp2QGpWa4kiMrXhz6bZcHr7k8tmJmDg08M93l2ArGhHvO2dcGE/vQZS2Yw3Gb32D4KUF9bedNTuQPG75yec+Webv9z6tBAxfY6Li0JT8=
+	t=1767752026; cv=none; b=nJvkps3INtnEX/5kT4zKJHme2QdMH3YUiLyGd92b0QOg30bJHClNdKi0tDCY7XeA2nBHhm7MvNbYnmf70/WCx4Iplx+xHn+vSuNP7RN8OZtXMIaV9qa+8IJRc+hHAe8c+fLXq4RushomzruGhvTwtW1nLu/29xQB7hdmy1iA1m8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767751853; c=relaxed/simple;
-	bh=Y6aoXvhkuzefcMF+xpGyKWRJm8HL9kXnxHq8SAp9htw=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=pSkTWqQJmXjpCDZvdi7vM1YqSOv/FJb/l1PWa9XiIDVAvLimMV73zVyUCFmFN14PRfyTKuHKNu4AQW2+Q+OEt18Pw/IP9FJ8bDu8LwRoaRPC19/N7PUO82ZCMRUbyw6AM3JIoGZ058BRJUrM7xwD088hDl8zRATEQi9Spr2N8H4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=uGJI6l7+; arc=none smtp.client-ip=209.85.210.54
+	s=arc-20240116; t=1767752026; c=relaxed/simple;
+	bh=ko5ju/j5NSockVrPDdBGG7MHmEDZS4hS4BKQnuN+2+I=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=ZfoRNyKIepvd4Hbwwng6BF8v3jOkUYGmSYNSI1ZOMw8LggQ67egpwcLRgab1vfU9E3Mniyn8fWTG2uRU1iskqS31x+pqF7xPDjFbjXsi1zmxHBsBJJG+6Ufceco6apMIRkp2MBRCUyVHlMnRF5tFbiXmcfN2PuYheMfbHcgtHj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=jiyBDCeq; arc=none smtp.client-ip=209.85.160.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="uGJI6l7+"
-Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-7c75b829eb6so1027523a34.1
-        for <linux-block@vger.kernel.org>; Tue, 06 Jan 2026 18:10:50 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="jiyBDCeq"
+Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-3f13043e2fdso661972fac.1
+        for <linux-block@vger.kernel.org>; Tue, 06 Jan 2026 18:13:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1767751849; x=1768356649; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zBY9MOF7X02eCGV6DsJdXa4mypeE3yc/SmqnqMel/o8=;
-        b=uGJI6l7+gUiPEbldkT0vyt5AWu4IwtYOjzhduFT4oMUHWo3B7YR6xy13c+AsVt0DKk
-         fypVu0y/QsLnJFqZdwsuCIxIlIXA9wktW1MySh5KEWNfl9GHrN6Kt6myQkMJDzgYk2z+
-         lHEFudXKS8PGAtBU43OvP0IkeojQTX43/DKxBBFsR4S87elQfXxIPzxoNFriUqiXeOEB
-         IUmRp4AVXRtLYdsHykLX99CK41M4Y64hGdyaCOUPHpstDBZekbnWUmal34prvWUQ3Lza
-         1RPCly7OofpeQdu7dG8h3PJLud2l3RRG9beSF3Y6B07/W9lAzC/tdlDy40X+Skd3Y3us
-         3GhQ==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1767752024; x=1768356824; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=cmFoPTysutl7lpdqNp7zT7B4cAvUQjN/lrEalOzdDr0=;
+        b=jiyBDCeqhaN9n2up9RBylu9i2vGERKWpCyotZrjqe1LBSp3UlZLOQ4y4X6+GL3sauN
+         6AcBYGUOvxds4xMRil0UFNR1IwjpuWXsR539S/UkWN58Pr4K0XZAhb7VLeaVXnmVfAYG
+         MOeSUOIZ2sYqJfUTzaDeqnilPQ+DBuMSnaWxzbprdvSEuxLtrfacegMbA/HT9YzMBfuH
+         LMNzXo7LpCGbqcUUIUfQ8bpOArsbBiiG05wMnIEnz2xSUTexpWhSxqkcrzmpW6CmtLPR
+         IQz4CIAjcYSIsEuvCfKWh0ZKnkZybcxuNCTUbn/MWja8fEBhp64Ufftq4cQxnFQk/0Y9
+         GyRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767751849; x=1768356649;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=zBY9MOF7X02eCGV6DsJdXa4mypeE3yc/SmqnqMel/o8=;
-        b=EzzcwRfo1iFUPsIfYoka9ZY33Fk8Fosv+8DSPT6U2kCOFfMs+dz3Sgchk1bEs2kGtP
-         YktYju09uxralhjc/W1UaaBxhSveAEoh1rNCg5kZPvJ0H91+es8UYU/Ll0jkmWeJZowJ
-         0sat/RkHm7w4Oq15Az4Zi8yT6smBfyDqJQwW8zC8Yp8AnyQ8t88jAp7I2iDfAu68nVee
-         VWMTPG65BJWRGjVxMc2p213Ca6XQnyT+rB2BkC1HMgz7rhGKRufraobVf7MujzPPo2pe
-         0KLnHRHxDje+tUr/WRTY1ICKPh/fmMTVUnzTqPjQV1VRAN6KrcTDNf9MC3AOIuMGC6xn
-         6AcA==
-X-Gm-Message-State: AOJu0YwXqDxT9v63P7FlZcBizFaOaSAKUSFU3Mwv60vq/ioOoUMZEtfG
-	mQOInixVSKwRhnNS6rhN2wCVWZRdbY3LNQTw4CKWiYNrKUZlFLYpyweRv//s88iGxeYsdX5VXaL
-	da5Mx
-X-Gm-Gg: AY/fxX6hLH0ASwKp2nAwURWeziEG4N6D/m2jaWuASrdsWCqiBkbgb3VT8VffFCtVGua
-	YmED1n5kK9Cwk2OqctmR8JFbwjdRMS+Z02nndBrbkkoUG0zDgMLPG2wrxBX7J79mbiME+/hO5P6
-	Rtnt7V+BIXGU23eH6BHv8BSqfvjHZeav6/l9oiBexTHmwHfz3a1Q4U9RR4VNtw5bED/6wgtn1Ql
-	8SvjcnClLNTK3dQf3GGv2f6S/91u4NvMughIr/8AZOoBVqBv1wRSzxHe8CudprpsJJTeQploYwd
-	2JEYGmCgeFCoG/SWXNC2IaDr9Ms40q5gobsOM0SModOdCVU2o2fF5mzYjc1w53CgeZfA+diWLAl
-	69r0LBUt9N8v9K0osUGE96It2tAiMwcPlNdQ14+39Wn5KGz6y3uy++i9sGTxjhXfkdwIH7KkfTo
-	dTlbQ=
-X-Google-Smtp-Source: AGHT+IH3gvX9TnXoXnHti1TWOwB44yPm4rVX7GJbCS04VaUh9KGb8dHR+lT4lcVjzAr72S76fur4Lw==
-X-Received: by 2002:a05:6830:230e:b0:7ca:ee2d:fd8d with SMTP id 46e09a7af769-7ce508d7fb0mr685570a34.9.1767751848795;
-        Tue, 06 Jan 2026 18:10:48 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7ce478af8besm2460657a34.14.2026.01.06.18.10.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Jan 2026 18:10:48 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: Breno Leitao <leitao@debian.org>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- tj@kernel.org, josef@toxicpanda.com, kernel-team@meta.com
-In-Reply-To: <20260106-blk_unlikely-v1-1-90fb556a6776@debian.org>
-References: <20260106-blk_unlikely-v1-1-90fb556a6776@debian.org>
-Subject: Re: [PATCH] blk-rq-qos: Remove unlikely() hints from QoS checks
-Message-Id: <176775184768.14145.3891847681300037489.b4-ty@kernel.dk>
-Date: Tue, 06 Jan 2026 19:10:47 -0700
+        d=1e100.net; s=20230601; t=1767752024; x=1768356824;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cmFoPTysutl7lpdqNp7zT7B4cAvUQjN/lrEalOzdDr0=;
+        b=pyCsqCjussbO4FoIMo86S/XPwsh5mzIQh+LvINgWqb6tTG9Lk9gVqsMpZVhB6sWOEM
+         7nWedhmWrkqwhYHLMKLo1HL5vSN21WgbkOsXS3lkF+63WYoBv7dm4H4FuoHEfDNSGzFB
+         /SVyjIu/F1T8tLzfqXIQWbG+ZGAAYVtmbuje8F1nYpP6Y7BYrtGgLTlfQt9nrTT75U1X
+         30+1gquN1Y0UF3nxK5RLs7EIW91A8AZBt0XT2s9GlDDE7GHhSd7M/MCCW6gnKSn8czpT
+         7FdG1dS3KmRg2dXI6bdQe/H1KP+jqCA8g7NyjZofl78nUxXZXb8vvG481QN4H7GnyhOh
+         7oHg==
+X-Gm-Message-State: AOJu0YxGjiCD4ekqE0Nf/r0ehD+qdflg/cDpyHTIGm59o/XWhjvmFUJR
+	LcJ7I6fdtXTKAj59srqH+//cAXIndKQ1GKYi2qMRiehnsFhRfIynGSqH77MKkrt2em0Wv+wByxB
+	V5hMw
+X-Gm-Gg: AY/fxX4AYidKOJvDje6i7TEjV5a1ocyZsFBABGTGk1I+mtVY0lVKLBVIaFXvlFm+MGQ
+	G3l22btR31NLn1yRMflU0mbTxlKUBjnaIurgwYFZnRBc83LAvKb60UcOIHbXLP7udXrF7Q6bSxM
+	vpb+3kbN33ymutL5x4qYuwpKzAFSxPIoE57va4vTz/zItjk5AlurAWxSBMMxWeq174k9l0sDUPs
+	rs2BN5gijxPQQ3qqxzGYGnPIydx6ZpmuzN48PBCEk7XyhZzNpDt2MCv44rtE8Qat3MKZyuDoNEP
+	vrLuYiDnjw+1zQVx8mZ4GOa2sJn0t5J7H+TU4vKu22ImfDve4aOOVAYpe960yKllS5RuXcViOvE
+	XgbQOjhXRIptsBOQ6vgsnKiBt4X80Bg1z4YwBdXg8Cgg9ELesg0CIqRl/16SGqNlLuVbcu8Wri6
+	y8YhxRdd+e
+X-Google-Smtp-Source: AGHT+IEppoxbhawLA/RHqdOT5mS+agQwDkfuGX33BEL6nW7U9EwrGzbn/dp5d0/9QmUXu76YicDHeg==
+X-Received: by 2002:a05:6820:16a8:b0:65b:ccd9:c9b with SMTP id 006d021491bc7-65f55089d14mr424682eaf.62.1767752023811;
+        Tue, 06 Jan 2026 18:13:43 -0800 (PST)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-3ffa4de40bfsm2280001fac.5.2026.01.06.18.13.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 06 Jan 2026 18:13:43 -0800 (PST)
+Message-ID: <8f839d6a-02a2-47f2-97af-f77cb10c5790@kernel.dk>
+Date: Tue, 6 Jan 2026 19:13:41 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 0/2] block: Generalize physical entry definition
+From: Jens Axboe <axboe@kernel.dk>
+To: Leon Romanovsky <leon@kernel.org>, Keith Busch <kbusch@kernel.org>,
+ Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-nvme@lists.infradead.org, Chaitanya Kulkarni <kch@nvidia.com>
+References: <20251217-nvme-phys-types-v3-0-f27fd1608f48@nvidia.com>
+ <20260104151517.GA563680@unreal>
+ <258e49de-7af3-4a35-852a-8f26fcb7ddbd@kernel.dk>
+Content-Language: en-US
+In-Reply-To: <258e49de-7af3-4a35-852a-8f26fcb7ddbd@kernel.dk>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
 
-
-On Tue, 06 Jan 2026 06:26:57 -0800, Breno Leitao wrote:
-> The unlikely() annotations on QUEUE_FLAG_QOS_ENABLED checks are
-> counterproductive. Writeback throttling (WBT) might be enabled by
-> default, mainly because CONFIG_BLK_WBT_MQ defaults to 'y'.
+On 1/6/26 5:46 AM, Jens Axboe wrote:
+> On 1/4/26 8:15 AM, Leon Romanovsky wrote:
+>> On Wed, Dec 17, 2025 at 11:41:22AM +0200, Leon Romanovsky wrote:
+>>> Jens,
+>>>
+>>> I would like to ask you to put these patches on some shared branch based
+>>> on v6.19-rcX tag, so I will be able to reuse this general type in VFIO
+>>> and DMABUF code.
+>>
+>> Jens,
+>>
+>> Can we please progress with this simple series?
 > 
-> Branch profiling on Meta servers, which have WBT enabled, confirms 100%
-> misprediction rates on these checks.
-> 
-> [...]
+> If Keith/Christoph are happy with it?
 
-Applied, thanks!
+It's here:
 
-[1/1] blk-rq-qos: Remove unlikely() hints from QoS checks
-      commit: 7d121d701d58a92f26decb10da1d04a88b74519d
+for-7.0/blk-pvec
 
-Best regards,
+now.
+
 -- 
 Jens Axboe
-
-
 
