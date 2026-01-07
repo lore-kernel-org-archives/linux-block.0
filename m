@@ -1,368 +1,533 @@
-Received: from mail-dl1-f52.google.com (mail-dl1-f52.google.com [74.125.82.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from r3-19.sinamail.sina.com.cn (r3-19.sinamail.sina.com.cn [202.108.3.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E8CF23ABB0
-	for <linux-block@vger.kernel.org>; Wed,  7 Jan 2026 02:20:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88C9D219EB
+	for <linux-block@vger.kernel.org>; Wed,  7 Jan 2026 03:52:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.108.3.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767752417; cv=none; b=I0NeIVdKPXxFN5rhlBM+3afznfDNP1X4RhnqIhu8BuwvYPsgIOIGNQPFp+37gSToSUA7zVHR9kc33Hx4gxZsI0wEVpkXpjNbOP+6A8x2Wk1txio2hV8Y3NF/V2h1TnM/2kKarISQwZPcjb0uoJOrCIy8L+DA81jAjGOF+6j/148=
+	t=1767757959; cv=none; b=gC9vV2KQj6gVH09fG5m3Set2SK76ZB0gB6fRom5ESg1NqGKtQPAia5qAWcSV965NOeE03VrfB9OFZMs/vDvOPqvl6NSl+NOTyQSAGKJQFwwCzoCLaZLqvG8lMZC2HIvbcmmJdlwCYDd5+CtjZutam+trU2o02hILUrcClMtZkP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767752417; c=relaxed/simple;
-	bh=AvddBUkPBSH0wJa5YIhAZhCUPkBMQMiLHhQKdPJqWPM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=M9pBaiFeOIQplmz1e+jcu47wJFbz2/EP5WQzMBwzyQED7aTRt27uZ1ehw0OxqFUza57FP7ZrZQYwjkSY4/ES4C8Lepihwx4sdXsATPpHSN7JeL0He6wRgIoc9580yt/OlzyoD1d82ziCdjJBNevPxiZCZBShRlDIpP9A+hduMZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=dIFwD0tP; arc=none smtp.client-ip=74.125.82.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1767757959; c=relaxed/simple;
+	bh=ohQXq6q8UqTIorksO1KhNsWcTyGCYV8BEKPpWRTnPP0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nRQL7VlcsGaJ6+DUOTeXetsLlKE8JfHM+8wgwuuzQmr891BSlSJs3KbBtL6v1uTXgxMe41+6hQiTOQCB3nWk+j9G6dO50fJ++iQ7edC6vDp33barSIzKSlJKytmueUpcI8dxqfFWH+PPog6QQWGd/e1w4sH3sBaylvZVwqt0SXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=NNLXPNSf; arc=none smtp.client-ip=202.108.3.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="dIFwD0tP"
-Received: by mail-dl1-f52.google.com with SMTP id a92af1059eb24-11dd21d402cso54488c88.2
-        for <linux-block@vger.kernel.org>; Tue, 06 Jan 2026 18:20:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1767752414; x=1768357214; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nH/6zmQeVoutdpdBWxorB62PgSFMjPmFsHzqI05ISfE=;
-        b=dIFwD0tPTRvw0LRGHNRIrnUWbIibGWwGU+aDnkHopNyvuCQXnvabRaLIercGHrB45s
-         aDLWrgTWch43I6fgChaPEKS8TH9w+5mqn0YDL8ClkeQIRz9xLl8e2+dks90uEMvNxPu6
-         KdbxnVeOgeCgWEdl10OhMiopbFaHspJmz4i5y5NYef56VTt8G9NnZ0umJGjvKo7Yn+15
-         pCOc89uqRPTBsjkAMJsiVv8gmn/P875whRujX1hbDx7jYte/ictKHcfxUp6zhdsN0eH1
-         gsGUAcPdXDpeRutB65B80IyO0/xt8VmVku50JgjfYVKHDurASG1db92BB/lmrKDDjPLE
-         rWLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767752414; x=1768357214;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=nH/6zmQeVoutdpdBWxorB62PgSFMjPmFsHzqI05ISfE=;
-        b=gh/aaKj/qKScnCJ/Ts2MD0pZcLHlfKkzIG9swaHSDaNB1M9YhF7DZmkdopCmJWZ8vS
-         xZGgOEY/qaYIVWOKoc9Y+sRKjm68DrhWBtE8UW4UPQUsGC0ry0m7sbNuw5Le/ipxmtw/
-         img8BfiEDjDM0IySoCsLkB69Bgt0b8C+sCeDX8hV3HIvSdjMskw/ASo/p0uO3QbfTXQN
-         kW6jNonIle36JocVC8FemMisy5dM2Sku7nwwGKN+Q6JkfQ5SqgaxJE6v5hiHFythA4Ww
-         F7RT2fa8SLxQzn35UnIYKQ7O0kMgVtbaaw984GidGGtc0CmgCaeydV5CCjsPMyPxrV/w
-         hWXg==
-X-Forwarded-Encrypted: i=1; AJvYcCWNijtWzZdfwdEF3ob0tOwPTmu0nuIbSVGOP4YN9RovyBk6r4d0PVWSbIznOnC07TMZbZ1vwFcs+9+WDA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxjPlo/T4ZjNGZfyUXyn0KDFCe3Gpecbw3ErXNB6MfMeDiAibNM
-	iBK6SPgW8vGEzAsm1Xhj/X2rtWoL1YhYntcQPCmVSyWECdaHRIi2gbYxmDT+hZTdCPljsz/Vwrs
-	9EJeHoZ4OphYrc9fpQdt86kqewRxXMG08hSEHzclMeQ==
-X-Gm-Gg: AY/fxX7tRBgNR2I3+JfM3askhaymsUEU7P3VhyqMeJiKYJk9+BRv/FOYOUM5OLJ+2yv
-	wc5YbTkK9YgVXlwb/5gy7Thk/xCDtkeIm04kOVP9UdrPS5XhmwS4lrf/sKPxthCBNQqNcflDV3i
-	8ep8hcc5BRWZ905tjjtGd+ui3oyighrGfxo1sKpbk6tw+XUl90QOADGCdaxo1akWTcqyuoN8Nxi
-	diFbmQs0p/Y/jigLSjWkk129vThtKJ4ekaSUSrRMZis2fmw6Huabt7uJ7yc7jTm1cx3zdaR
-X-Google-Smtp-Source: AGHT+IHC8t2aAq/Ljug6rAjg7bb6O7srippWKn6q4BpZL9+Yj1Xf627/ee+f2KrLxWJraZVZtjcFRMx9b1Rde/vyuxo=
-X-Received: by 2002:a05:7022:6723:b0:11a:2020:ac85 with SMTP id
- a92af1059eb24-121f8b7d702mr473887c88.4.1767752414196; Tue, 06 Jan 2026
- 18:20:14 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="NNLXPNSf"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1767757953;
+	bh=EAfTRhIMR6MA/RGKf2sN9GCYjQmKTTSJUJWy2g0oOg0=;
+	h=Message-ID:Date:Subject:From;
+	b=NNLXPNSfHQ5QvAkvwKTZoGFgki0ZgQ1KHk3he5YUtihZKa+FygGtVlhCkzhEhXj9K
+	 JQHSgEjMPDdvsLiYTMVf5A9R6sm2fKY3PM5yjFdzfFk2mkF0zezQFz9st1Tcp0wZzH
+	 rrBQHG2wg5D30ysxbvBiO3iA9Yj42xNVLcjjNl0U=
+X-SMAIL-HELO: [10.189.149.126]
+Received: from unknown (HELO [10.189.149.126])([114.247.175.249])
+	by sina.com (10.54.253.32) with ESMTP
+	id 695DD7EC00001C09; Wed, 7 Jan 2026 11:50:06 +0800 (CST)
+X-Sender: zhangdongdong925@sina.com
+X-Auth-ID: zhangdongdong925@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=zhangdongdong925@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=zhangdongdong925@sina.com
+X-SMAIL-MID: 6079074456895
+X-SMAIL-UIID: B76B5308995B42AD8E20F2E5FD0EC548-20260107-115006-1
+Message-ID: <40e38fa7-725b-407a-917a-59c5a76dedcb@sina.com>
+Date: Wed, 7 Jan 2026 11:50:04 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260106005752.3784925-1-csander@purestorage.com>
- <20260106005752.3784925-4-csander@purestorage.com> <aV0Jd76i9Iru8Ge9@fedora>
- <CADUfDZpwRQv0yghG7S4ugNGc4X_b5bC=Za=+M-D36J5T46w64g@mail.gmail.com> <aV2lhCLzISL0J-vH@fedora>
-In-Reply-To: <aV2lhCLzISL0J-vH@fedora>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Tue, 6 Jan 2026 18:20:02 -0800
-X-Gm-Features: AQt7F2qWffftyT8OFORSaC1s-VMlzDnF8S4pvHy-j5UaHH9mqqU-p1cc60dk88I
-Message-ID: <CADUfDZp-g+Juy0TkksWCMTy6Q8kjPQFhzs2X2MpcZvWz3N1rLw@mail.gmail.com>
-Subject: Re: [PATCH v3 03/19] ublk: support UBLK_PARAM_TYPE_INTEGRITY in
- device creation
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Shuah Khan <shuah@kernel.org>, linux-block@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Stanley Zhang <stazhang@purestorage.com>, Uday Shankar <ushankar@purestorage.com>, 
-	"Martin K . Petersen" <martin.petersen@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv2 1/7] zram: introduce compressed data writeback
+To: Sergey Senozhatsky <senozhatsky@chromium.org>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Richard Chang <richardycc@google.com>, Minchan Kim <minchan@kernel.org>
+Cc: Brian Geffon <bgeffon@google.com>, David Stevens <stevensd@google.com>,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ linux-block@vger.kernel.org, Minchan Kim <minchan@google.com>
+References: <20251201094754.4149975-1-senozhatsky@chromium.org>
+ <20251201094754.4149975-2-senozhatsky@chromium.org>
+Content-Language: en-US
+From: zhangdongdong <zhangdongdong925@sina.com>
+In-Reply-To: <20251201094754.4149975-2-senozhatsky@chromium.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 6, 2026 at 4:15=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrote=
-:
->
-> On Tue, Jan 06, 2026 at 08:32:08AM -0800, Caleb Sander Mateos wrote:
-> > On Tue, Jan 6, 2026 at 5:09=E2=80=AFAM Ming Lei <ming.lei@redhat.com> w=
-rote:
-> > >
-> > > On Mon, Jan 05, 2026 at 05:57:35PM -0700, Caleb Sander Mateos wrote:
-> > > > From: Stanley Zhang <stazhang@purestorage.com>
-> > > >
-> > > > Add a feature flag UBLK_F_INTEGRITY for a ublk server to request
-> > > > integrity/metadata support when creating a ublk device. The ublk se=
-rver
-> > > > can also check for the feature flag on the created device or the re=
-sult
-> > > > of UBLK_U_CMD_GET_FEATURES to tell if the ublk driver supports it.
-> > > > UBLK_F_INTEGRITY requires UBLK_F_USER_COPY, as user copy is the onl=
-y
-> > > > data copy mode initially supported for integrity data.
-> > > > Add UBLK_PARAM_TYPE_INTEGRITY and struct ublk_param_integrity to st=
-ruct
-> > > > ublk_params to specify the integrity params of a ublk device.
-> > > > UBLK_PARAM_TYPE_INTEGRITY requires UBLK_F_INTEGRITY and a nonzero
-> > > > metadata_size. The LBMD_PI_CAP_* and LBMD_PI_CSUM_* values from the
-> > > > linux/fs.h UAPI header are used for the flags and csum_type fields.
-> > > > If the UBLK_PARAM_TYPE_INTEGRITY flag is set, validate the integrit=
-y
-> > > > parameters and apply them to the blk_integrity limits.
-> > > > The struct ublk_param_integrity validations are based on the checks=
- in
-> > > > blk_validate_integrity_limits(). Any invalid parameters should be
-> > > > rejected before being applied to struct blk_integrity.
-> > > >
-> > > > Signed-off-by: Stanley Zhang <stazhang@purestorage.com>
-> > > > [csander: drop redundant pi_tuple_size field, use block metadata UA=
-PI
-> > > >  constants, add param validation]
-> > > > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-> > > > ---
-> > > >  drivers/block/ublk_drv.c      | 94 +++++++++++++++++++++++++++++++=
-+++-
-> > > >  include/uapi/linux/ublk_cmd.h | 18 +++++++
-> > > >  2 files changed, 111 insertions(+), 1 deletion(-)
-> > > >
-> > > > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > > > index 8e3da9b2b93a..066c6ae062a0 100644
-> > > > --- a/drivers/block/ublk_drv.c
-> > > > +++ b/drivers/block/ublk_drv.c
-> > > > @@ -42,10 +42,12 @@
-> > > >  #include <linux/mm.h>
-> > > >  #include <asm/page.h>
-> > > >  #include <linux/task_work.h>
-> > > >  #include <linux/namei.h>
-> > > >  #include <linux/kref.h>
-> > > > +#include <linux/blk-integrity.h>
-> > > > +#include <uapi/linux/fs.h>
-> > > >  #include <uapi/linux/ublk_cmd.h>
-> > > >
-> > > >  #define UBLK_MINORS          (1U << MINORBITS)
-> > > >
-> > > >  #define UBLK_INVALID_BUF_IDX         ((u16)-1)
-> > > > @@ -81,11 +83,12 @@
-> > > >
-> > > >  /* All UBLK_PARAM_TYPE_* should be included here */
-> > > >  #define UBLK_PARAM_TYPE_ALL                                \
-> > > >       (UBLK_PARAM_TYPE_BASIC | UBLK_PARAM_TYPE_DISCARD | \
-> > > >        UBLK_PARAM_TYPE_DEVT | UBLK_PARAM_TYPE_ZONED |    \
-> > > > -      UBLK_PARAM_TYPE_DMA_ALIGN | UBLK_PARAM_TYPE_SEGMENT)
-> > > > +      UBLK_PARAM_TYPE_DMA_ALIGN | UBLK_PARAM_TYPE_SEGMENT | \
-> > > > +      UBLK_PARAM_TYPE_INTEGRITY)
-> > > >
-> > > >  struct ublk_uring_cmd_pdu {
-> > > >       /*
-> > > >        * Store requests in same batch temporarily for queuing them =
-to
-> > > >        * daemon context.
-> > > > @@ -628,10 +631,57 @@ static void ublk_dev_param_basic_apply(struct=
- ublk_device *ub)
-> > > >               set_disk_ro(ub->ub_disk, true);
-> > > >
-> > > >       set_capacity(ub->ub_disk, p->dev_sectors);
-> > > >  }
-> > > >
-> > > > +static int ublk_integrity_flags(u32 flags)
-> > > > +{
-> > > > +     int ret_flags =3D 0;
-> > > > +
-> > > > +     if (flags & LBMD_PI_CAP_INTEGRITY) {
-> > > > +             flags &=3D ~LBMD_PI_CAP_INTEGRITY;
-> > > > +             ret_flags |=3D BLK_INTEGRITY_DEVICE_CAPABLE;
-> > > > +     }
-> > > > +     if (flags & LBMD_PI_CAP_REFTAG) {
-> > > > +             flags &=3D ~LBMD_PI_CAP_REFTAG;
-> > > > +             ret_flags |=3D BLK_INTEGRITY_REF_TAG;
-> > > > +     }
-> > > > +     return flags ? -EINVAL : ret_flags;
-> > > > +}
-> > > > +
-> > > > +static int ublk_integrity_pi_tuple_size(u8 csum_type)
-> > > > +{
-> > > > +     switch (csum_type) {
-> > > > +     case LBMD_PI_CSUM_NONE:
-> > > > +             return 0;
-> > > > +     case LBMD_PI_CSUM_IP:
-> > > > +     case LBMD_PI_CSUM_CRC16_T10DIF:
-> > > > +             return 8;
-> > > > +     case LBMD_PI_CSUM_CRC64_NVME:
-> > > > +             return 16;
-> > > > +     default:
-> > > > +             return -EINVAL;
-> > > > +     }
-> > > > +}
-> > > > +
-> > > > +static enum blk_integrity_checksum ublk_integrity_csum_type(u8 csu=
-m_type)
-> > > > +{
-> > > > +     switch (csum_type) {
-> > > > +     case LBMD_PI_CSUM_NONE:
-> > > > +             return BLK_INTEGRITY_CSUM_NONE;
-> > > > +     case LBMD_PI_CSUM_IP:
-> > > > +             return BLK_INTEGRITY_CSUM_IP;
-> > > > +     case LBMD_PI_CSUM_CRC16_T10DIF:
-> > > > +             return BLK_INTEGRITY_CSUM_CRC;
-> > > > +     case LBMD_PI_CSUM_CRC64_NVME:
-> > > > +             return BLK_INTEGRITY_CSUM_CRC64;
-> > > > +     default:
-> > > > +             WARN_ON_ONCE(1);
-> > > > +             return BLK_INTEGRITY_CSUM_NONE;
-> > > > +     }
-> > > > +}
-> > > > +
-> > > >  static int ublk_validate_params(const struct ublk_device *ub)
-> > > >  {
-> > > >       /* basic param is the only one which must be set */
-> > > >       if (ub->params.types & UBLK_PARAM_TYPE_BASIC) {
-> > > >               const struct ublk_param_basic *p =3D &ub->params.basi=
-c;
-> > > > @@ -690,10 +740,33 @@ static int ublk_validate_params(const struct =
-ublk_device *ub)
-> > > >                       return -EINVAL;
-> > > >               if (p->max_segment_size < UBLK_MIN_SEGMENT_SIZE)
-> > > >                       return -EINVAL;
-> > > >       }
-> > > >
-> > > > +     if (ub->params.types & UBLK_PARAM_TYPE_INTEGRITY) {
-> > > > +             const struct ublk_param_integrity *p =3D &ub->params.=
-integrity;
-> > > > +             int pi_tuple_size =3D ublk_integrity_pi_tuple_size(p-=
->csum_type);
-> > > > +             int flags =3D ublk_integrity_flags(p->flags);
-> > > > +
-> > > > +             if (!(ub->dev_info.flags & UBLK_F_INTEGRITY))
-> > > > +                     return -EINVAL;
-> > > > +             if (flags < 0)
-> > > > +                     return flags;
-> > > > +             if (pi_tuple_size < 0)
-> > > > +                     return pi_tuple_size;
-> > > > +             if (!p->metadata_size)
-> > > > +                     return -EINVAL;
-> > > > +             if (p->csum_type =3D=3D LBMD_PI_CSUM_NONE &&
-> > > > +                 p->flags & LBMD_PI_CAP_REFTAG)
-> > > > +                     return -EINVAL;
-> > > > +             if (p->pi_offset + pi_tuple_size > p->metadata_size)
-> > > > +                     return -EINVAL;
-> > > > +             if (p->interval_exp < SECTOR_SHIFT ||
-> > > > +                 p->interval_exp > ub->params.basic.logical_bs_shi=
-ft)
-> > > > +                     return -EINVAL;
-> > > > +     }
-> > > > +
-> > > >       return 0;
-> > > >  }
-> > > >
-> > > >  static void ublk_apply_params(struct ublk_device *ub)
-> > > >  {
-> > > > @@ -2941,10 +3014,25 @@ static int ublk_ctrl_start_dev(struct ublk_=
-device *ub,
-> > > >               lim.seg_boundary_mask =3D ub->params.seg.seg_boundary=
-_mask;
-> > > >               lim.max_segment_size =3D ub->params.seg.max_segment_s=
-ize;
-> > > >               lim.max_segments =3D ub->params.seg.max_segments;
-> > > >       }
-> > > >
-> > > > +     if (ub->params.types & UBLK_PARAM_TYPE_INTEGRITY) {
-> > > > +             const struct ublk_param_integrity *p =3D &ub->params.=
-integrity;
-> > > > +             int pi_tuple_size =3D ublk_integrity_pi_tuple_size(p-=
->csum_type);
-> > > > +
-> > > > +             lim.integrity =3D (struct blk_integrity) {
-> > > > +                     .flags =3D ublk_integrity_flags(p->flags),
-> > > > +                     .csum_type =3D ublk_integrity_csum_type(p->cs=
-um_type),
-> > > > +                     .metadata_size =3D p->metadata_size,
-> > > > +                     .pi_offset =3D p->pi_offset,
-> > > > +                     .interval_exp =3D p->interval_exp,
-> > > > +                     .tag_size =3D p->tag_size,
-> > > > +                     .pi_tuple_size =3D pi_tuple_size,
-> > > > +             };
-> > > > +     }
-> > > > +
-> > > >       if (wait_for_completion_interruptible(&ub->completion) !=3D 0=
-)
-> > > >               return -EINTR;
-> > > >
-> > > >       if (ub->ublksrv_tgid !=3D ublksrv_pid)
-> > > >               return -EINVAL;
-> > > > @@ -3131,10 +3219,14 @@ static int ublk_ctrl_add_dev(const struct u=
-blksrv_ctrl_cmd *header)
-> > > >               if (info.flags & (UBLK_F_USER_COPY | UBLK_F_SUPPORT_Z=
-ERO_COPY |
-> > > >                                       UBLK_F_AUTO_BUF_REG))
-> > > >                       return -EINVAL;
-> > > >       }
-> > > >
-> > > > +     /* User copy is required to access integrity buffer */
-> > > > +     if (info.flags & UBLK_F_INTEGRITY && !(info.flags & UBLK_F_US=
-ER_COPY))
-> > > > +             return -EINVAL;
-> > > > +
-> > > >       /* the created device is always owned by current user */
-> > > >       ublk_store_owner_uid_gid(&info.owner_uid, &info.owner_gid);
-> > > >
-> > > >       if (header->dev_id !=3D info.dev_id) {
-> > > >               pr_warn("%s: dev id not match %u %u\n",
-> > > > diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ubl=
-k_cmd.h
-> > > > index ec77dabba45b..a54c47832fa2 100644
-> > > > --- a/include/uapi/linux/ublk_cmd.h
-> > > > +++ b/include/uapi/linux/ublk_cmd.h
-> > > > @@ -309,10 +309,16 @@
-> > > >   * the I/O's daemon task. The q_id and tag of the registered buffe=
-r are required
-> > > >   * in UBLK_U_IO_UNREGISTER_IO_BUF's ublksrv_io_cmd.
-> > > >   */
-> > > >  #define UBLK_F_BUF_REG_OFF_DAEMON (1ULL << 14)
-> > > >
-> > > > +/*
-> > > > + * ublk device supports requests with integrity/metadata buffer.
-> > > > + * Requires UBLK_F_USER_COPY.
-> > > > + */
-> > > > +#define UBLK_F_INTEGRITY (1ULL << 16)
-> > > > +
-> > > >  /* device state */
-> > > >  #define UBLK_S_DEV_DEAD      0
-> > > >  #define UBLK_S_DEV_LIVE      1
-> > > >  #define UBLK_S_DEV_QUIESCED  2
-> > > >  #define UBLK_S_DEV_FAIL_IO   3
-> > > > @@ -598,10 +604,20 @@ struct ublk_param_segment {
-> > > >       __u32   max_segment_size;
-> > > >       __u16   max_segments;
-> > > >       __u8    pad[2];
-> > > >  };
-> > > >
-> > > > +struct ublk_param_integrity {
-> > > > +     __u32   flags; /* LBMD_PI_CAP_* from linux/fs.h */
-> > > > +     __u8    interval_exp;
-> > > > +     __u8    metadata_size; /* UBLK_PARAM_TYPE_INTEGRITY requires =
-nonzero */
-> > > > +     __u8    pi_offset;
-> > > > +     __u8    csum_type; /* LBMD_PI_CSUM_* from linux/fs.h */
-> > > > +     __u8    tag_size;
-> > > > +     __u8    pad[7];
-> > > > +};
-> > >
-> > > Looks max_integrity_segments is missed, otherwise this patch is fine =
-for me.
-> >
-> > My thinking was that there isn't any reason why a ublk server would
-> > need to limit the number of integrity segments. The request integrity
-> > segments aren't directly exposed to the ublk server through user copy.
-> > And since zero copy isn't supported for integrity data, there's no
-> > concern about needing to align the ublk integrity limits with the
-> > backing device limits. What do you think?
->
-> Yeah, it isn't needed in current implementation, but things may change in
-> future.
->
-> How about adding it(__u16) to `ublk_param_integrity`? And document it is =
-ignored for
-> user-copy based implementation. It is usually part of HW/SW interface wrt=
-. PI.
+On 12/1/25 17:47, Sergey Senozhatsky wrote:
+> From: Richard Chang <richardycc@google.com>
+> 
+> zram stores all written back slots raw, which implies that
+> during writeback zram first has to decompress slots (except
+> for ZRAM_HUGE slots, which are raw already).  The problem
+> with this approach is that not every written back page gets
+> read back (either via read() or via page-fault), which means
+> that zram basically wastes CPU cycles and battery decompressing
+> such slots.  This changes with introduction of decompression
+> on demand, in other words decompression on read()/page-fault.
+> 
+> One caveat of decompression on demand is that async read
+> is completed in IRQ context, while zram decompression is
+> sleepable.  To workaround this, read-back decompression
+> is offloaded to a preemptible context - system high-prio
+> work-queue.
+> 
+> At this point compressed writeback is still disabled,
+> a follow up patch will introduce a new device attribute
+> which will make it possible to toggle compressed writeback
+> per-device.
+> 
+> [senozhatsky: rewrote original implementation]
+> Signed-off-by: Richard Chang <richardycc@google.com>
+> Co-developed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+> Suggested-by: Minchan Kim <minchan@google.com>
+> Suggested-by: Brian Geffon <bgeffon@google.com>
+> ---
+>   drivers/block/zram/zram_drv.c | 279 +++++++++++++++++++++++++++-------
+>   drivers/block/zram/zram_drv.h |   1 +
+>   2 files changed, 227 insertions(+), 53 deletions(-)
+> 
+> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+> index 5759823d6314..6263d300312e 100644
+> --- a/drivers/block/zram/zram_drv.c
+> +++ b/drivers/block/zram/zram_drv.c
+> @@ -57,9 +57,6 @@ static size_t huge_class_size;
+>   static const struct block_device_operations zram_devops;
+>   
+>   static void zram_free_page(struct zram *zram, size_t index);
+> -static int zram_read_from_zspool(struct zram *zram, struct page *page,
+> -				 u32 index);
+> -
+>   #define slot_dep_map(zram, index) (&(zram)->table[(index)].dep_map)
+>   
+>   static void zram_slot_lock_init(struct zram *zram, u32 index)
+> @@ -502,6 +499,10 @@ static ssize_t idle_store(struct device *dev,
+>   #ifdef CONFIG_ZRAM_WRITEBACK
+>   #define INVALID_BDEV_BLOCK		(~0UL)
+>   
+> +static int read_from_zspool_raw(struct zram *zram, struct page *page,
+> +				u32 index);
+> +static int read_from_zspool(struct zram *zram, struct page *page, u32 index);
+> +
+>   struct zram_wb_ctl {
+>   	/* idle list is accessed only by the writeback task, no concurency */
+>   	struct list_head idle_reqs;
+> @@ -522,6 +523,22 @@ struct zram_wb_req {
+>   	struct list_head entry;
+>   };
+>   
+> +struct zram_rb_req {
+> +	struct work_struct work;
+> +	struct zram *zram;
+> +	struct page *page;
+> +	/* The read bio for backing device */
+> +	struct bio *bio;
+> +	unsigned long blk_idx;
+> +	union {
+> +		/* The original bio to complete (async read) */
+> +		struct bio *parent;
+> +		/* error status (sync read) */
+> +		int error;
+> +	};
+> +	u32 index;
+> +};
+> +
+>   static ssize_t writeback_limit_enable_store(struct device *dev,
+>   					    struct device_attribute *attr,
+>   					    const char *buf, size_t len)
+> @@ -780,18 +797,6 @@ static void zram_release_bdev_block(struct zram *zram, unsigned long blk_idx)
+>   	atomic64_dec(&zram->stats.bd_count);
+>   }
+>   
+> -static void read_from_bdev_async(struct zram *zram, struct page *page,
+> -			unsigned long entry, struct bio *parent)
+> -{
+> -	struct bio *bio;
+> -
+> -	bio = bio_alloc(zram->bdev, 1, parent->bi_opf, GFP_NOIO);
+> -	bio->bi_iter.bi_sector = entry * (PAGE_SIZE >> 9);
+> -	__bio_add_page(bio, page, PAGE_SIZE, 0);
+> -	bio_chain(bio, parent);
+> -	submit_bio(bio);
+> -}
+> -
+>   static void release_wb_req(struct zram_wb_req *req)
+>   {
+>   	__free_page(req->page);
+> @@ -886,8 +891,9 @@ static void zram_account_writeback_submit(struct zram *zram)
+>   
+>   static int zram_writeback_complete(struct zram *zram, struct zram_wb_req *req)
+>   {
+> -	u32 index = req->pps->index;
+> -	int err;
+> +	u32 size, index = req->pps->index;
+> +	int err, prio;
+> +	bool huge;
+>   
+>   	err = blk_status_to_errno(req->bio.bi_status);
+>   	if (err) {
+> @@ -914,9 +920,27 @@ static int zram_writeback_complete(struct zram *zram, struct zram_wb_req *req)
+>   		goto out;
+>   	}
+>   
+> +	if (zram->wb_compressed) {
+> +		/*
+> +		 * ZRAM_WB slots get freed, we need to preserve data required
+> +		 * for read decompression.
+> +		 */
+> +		size = zram_get_obj_size(zram, index);
+> +		prio = zram_get_priority(zram, index);
+> +		huge = zram_test_flag(zram, index, ZRAM_HUGE);
+> +	}
+> +
+>   	zram_free_page(zram, index);
+>   	zram_set_flag(zram, index, ZRAM_WB);
+>   	zram_set_handle(zram, index, req->blk_idx);
+> +
+> +	if (zram->wb_compressed) {
+> +		if (huge)
+> +			zram_set_flag(zram, index, ZRAM_HUGE);
+> +		zram_set_obj_size(zram, index, size);
+> +		zram_set_priority(zram, index, prio);
+> +	}
+> +
+>   	atomic64_inc(&zram->stats.pages_stored);
+>   
+>   out:
+> @@ -1050,7 +1074,11 @@ static int zram_writeback_slots(struct zram *zram,
+>   		 */
+>   		if (!zram_test_flag(zram, index, ZRAM_PP_SLOT))
+>   			goto next;
+> -		if (zram_read_from_zspool(zram, req->page, index))
+> +		if (zram->wb_compressed)
+> +			err = read_from_zspool_raw(zram, req->page, index);
+> +		else
+> +			err = read_from_zspool(zram, req->page, index);
+> +		if (err)
+>   			goto next;
+>   		zram_slot_unlock(zram, index);
+>   
+> @@ -1313,24 +1341,140 @@ static ssize_t writeback_store(struct device *dev,
+>   	return ret;
+>   }
+>   
+> -struct zram_work {
+> -	struct work_struct work;
+> -	struct zram *zram;
+> -	unsigned long entry;
+> -	struct page *page;
+> -	int error;
+> -};
+> +static int decompress_bdev_page(struct zram *zram, struct page *page, u32 index)
+> +{
+> +	struct zcomp_strm *zstrm;
+> +	unsigned int size;
+> +	int ret, prio;
+> +	void *src;
+> +
+> +	zram_slot_lock(zram, index);
+> +	/* Since slot was unlocked we need to make sure it's still ZRAM_WB */
+> +	if (!zram_test_flag(zram, index, ZRAM_WB)) {
+> +		zram_slot_unlock(zram, index);
+> +		/* We read some stale data, zero it out */
+> +		memset_page(page, 0, 0, PAGE_SIZE);
+> +		return -EIO;
+> +	}
+> +
+> +	if (zram_test_flag(zram, index, ZRAM_HUGE)) {
+> +		zram_slot_unlock(zram, index);
+> +		return 0;
+> +	}
+> +
+> +	size = zram_get_obj_size(zram, index);
+> +	prio = zram_get_priority(zram, index);
+>   
+> -static void zram_sync_read(struct work_struct *work)
+> +	zstrm = zcomp_stream_get(zram->comps[prio]);
+> +	src = kmap_local_page(page);
+> +	ret = zcomp_decompress(zram->comps[prio], zstrm, src, size,
+> +			       zstrm->local_copy);
+> +	if (!ret)
+> +		copy_page(src, zstrm->local_copy);
+> +	kunmap_local(src);
+> +	zcomp_stream_put(zstrm);
+> +	zram_slot_unlock(zram, index);
+> +
+> +	return ret;
+> +}
+> +
+> +static void zram_deferred_decompress(struct work_struct *w)
+>   {
+> -	struct zram_work *zw = container_of(work, struct zram_work, work);
+> +	struct zram_rb_req *req = container_of(w, struct zram_rb_req, work);
+> +	struct page *page = bio_first_page_all(req->bio);
+> +	struct zram *zram = req->zram;
+> +	u32 index = req->index;
+> +	int ret;
+> +
+> +	ret = decompress_bdev_page(zram, page, index);
+> +	if (ret)
+> +		req->parent->bi_status = BLK_STS_IOERR;
+> +
+> +	/* Decrement parent's ->remaining */
+> +	bio_endio(req->parent);
+> +	bio_put(req->bio);
+> +	kfree(req);
+> +}
+> +
+> +static void zram_async_read_endio(struct bio *bio)
+> +{
+> +	struct zram_rb_req *req = bio->bi_private;
+> +	struct zram *zram = req->zram;
+> +
+> +	if (bio->bi_status) {
+> +		req->parent->bi_status = bio->bi_status;
+> +		bio_endio(req->parent);
+> +		bio_put(bio);
+> +		kfree(req);
+> +		return;
+> +	}
+> +
+> +	/*
+> +	 * NOTE: zram_async_read_endio() is not exactly right place for this.
+> +	 * Ideally, we need to do it after ZRAM_WB check, but this requires
+> +	 * us to use wq path even on systems that don't enable compressed
+> +	 * writeback, because we cannot take slot-lock in the current context.
+> +	 *
+> +	 * Keep the existing behavior for now.
+> +	 */
+> +	if (zram->wb_compressed == false) {
+> +		/* No decompression needed, complete the parent IO */
+> +		bio_endio(req->parent);
+> +		bio_put(bio);
+> +		kfree(req);
+> +		return;
+> +	}
+> +
+> +	/*
+> +	 * zram decompression is sleepable, so we need to deffer it to
+> +	 * a preemptible context.
+> +	 */
+> +	INIT_WORK(&req->work, zram_deferred_decompress);
+> +	queue_work(system_highpri_wq, &req->work);
+> +}
+> +
+> +static void read_from_bdev_async(struct zram *zram, struct page *page,
+> +				 u32 index, unsigned long blk_idx,
+> +				 struct bio *parent)
+> +{
+> +	struct zram_rb_req *req;
+> +	struct bio *bio;
+> +
+> +	req = kmalloc(sizeof(*req), GFP_NOIO);
+> +	if (!req)
+> +		return;
+> +
+> +	bio = bio_alloc(zram->bdev, 1, parent->bi_opf, GFP_NOIO);
+> +	if (!bio) {
+> +		kfree(req);
+> +		return;
+> +	}
+> +
+> +	req->zram = zram;
+> +	req->index = index;
+> +	req->blk_idx = blk_idx;
+> +	req->bio = bio;
+> +	req->parent = parent;
+> +
+> +	bio->bi_iter.bi_sector = blk_idx * (PAGE_SIZE >> 9);
+> +	bio->bi_private = req;
+> +	bio->bi_end_io = zram_async_read_endio;
+> +
+> +	__bio_add_page(bio, page, PAGE_SIZE, 0);
+> +	bio_inc_remaining(parent);
+> +	submit_bio(bio);
+> +}
+> +
+> +static void zram_sync_read(struct work_struct *w)
+> +{
+> +	struct zram_rb_req *req = container_of(w, struct zram_rb_req, work);
+>   	struct bio_vec bv;
+>   	struct bio bio;
+>   
+> -	bio_init(&bio, zw->zram->bdev, &bv, 1, REQ_OP_READ);
+> -	bio.bi_iter.bi_sector = zw->entry * (PAGE_SIZE >> 9);
+> -	__bio_add_page(&bio, zw->page, PAGE_SIZE, 0);
+> -	zw->error = submit_bio_wait(&bio);
+> +	bio_init(&bio, req->zram->bdev, &bv, 1, REQ_OP_READ);
+> +	bio.bi_iter.bi_sector = req->blk_idx * (PAGE_SIZE >> 9);
+> +	__bio_add_page(&bio, req->page, PAGE_SIZE, 0);
+> +	req->error = submit_bio_wait(&bio);
+>   }
+>   
+>   /*
+> @@ -1338,39 +1482,42 @@ static void zram_sync_read(struct work_struct *work)
+>    * chained IO with parent IO in same context, it's a deadlock. To avoid that,
+>    * use a worker thread context.
+>    */
+> -static int read_from_bdev_sync(struct zram *zram, struct page *page,
+> -				unsigned long entry)
+> +static int read_from_bdev_sync(struct zram *zram, struct page *page, u32 index,
+> +			       unsigned long blk_idx)
+>   {
+> -	struct zram_work work;
+> +	struct zram_rb_req req;
+>   
+> -	work.page = page;
+> -	work.zram = zram;
+> -	work.entry = entry;
+> +	req.page = page;
+> +	req.zram = zram;
+> +	req.blk_idx = blk_idx;
+>   
+> -	INIT_WORK_ONSTACK(&work.work, zram_sync_read);
+> -	queue_work(system_dfl_wq, &work.work);
+> -	flush_work(&work.work);
+> -	destroy_work_on_stack(&work.work);
+> +	INIT_WORK_ONSTACK(&req.work, zram_sync_read);
+> +	queue_work(system_dfl_wq, &req.work);
+> +	flush_work(&req.work);
+> +	destroy_work_on_stack(&req.work);
 
-Okay, may as well just plumb it through to the queue_limits then.
+Hi Sergey,
 
-Best,
-Caleb
+Thanks for the work on decompression-on-demand.
+
+One concern I’d like to raise is the use of a workqueue for readback
+decompression. In our measurements, deferring decompression to a worker
+introduces non-trivial scheduling overhead, and under memory pressure
+the added latency can be noticeable (tens of milliseconds in some cases).
+
+This makes the swap-in read path more sensitive to scheduler behavior.
+It may be worth considering whether the decompression can be placed in a
+context that avoids this extra scheduling hop, for example by moving the
+decompression closer to the swap layer.
+
+Thanks,
+dongdong
+
+>   
+> -	return work.error;
+> +	if (req.error || zram->wb_compressed == false)
+> +		return req.error;
+> +
+> +	return decompress_bdev_page(zram, page, index);
+>   }
+>   
+> -static int read_from_bdev(struct zram *zram, struct page *page,
+> -			unsigned long entry, struct bio *parent)
+> +static int read_from_bdev(struct zram *zram, struct page *page, u32 index,
+> +			  unsigned long blk_idx, struct bio *parent)
+>   {
+>   	atomic64_inc(&zram->stats.bd_reads);
+>   	if (!parent) {
+>   		if (WARN_ON_ONCE(!IS_ENABLED(ZRAM_PARTIAL_IO)))
+>   			return -EIO;
+> -		return read_from_bdev_sync(zram, page, entry);
+> +		return read_from_bdev_sync(zram, page, index, blk_idx);
+>   	}
+> -	read_from_bdev_async(zram, page, entry, parent);
+> +	read_from_bdev_async(zram, page, index, blk_idx, parent);
+>   	return 0;
+>   }
+>   #else
+>   static inline void reset_bdev(struct zram *zram) {};
+> -static int read_from_bdev(struct zram *zram, struct page *page,
+> -			unsigned long entry, struct bio *parent)
+> +static int read_from_bdev(struct zram *zram, struct page *page, u32 index,
+> +			  unsigned long blk_idx, struct bio *parent)
+>   {
+>   	return -EIO;
+>   }
+> @@ -1977,12 +2124,37 @@ static int read_compressed_page(struct zram *zram, struct page *page, u32 index)
+>   	return ret;
+>   }
+>   
+> +#if defined CONFIG_ZRAM_WRITEBACK
+> +static int read_from_zspool_raw(struct zram *zram, struct page *page, u32 index)
+> +{
+> +	struct zcomp_strm *zstrm;
+> +	unsigned long handle;
+> +	unsigned int size;
+> +	void *src;
+> +
+> +	handle = zram_get_handle(zram, index);
+> +	size = zram_get_obj_size(zram, index);
+> +
+> +	/*
+> +	 * We need to get stream just for ->local_copy buffer, in
+> +	 * case if object spans two physical pages. No decompression
+> +	 * takes place here, as we read raw compressed data.
+> +	 */
+> +	zstrm = zcomp_stream_get(zram->comps[ZRAM_PRIMARY_COMP]);
+> +	src = zs_obj_read_begin(zram->mem_pool, handle, zstrm->local_copy);
+> +	memcpy_to_page(page, 0, src, size);
+> +	zs_obj_read_end(zram->mem_pool, handle, src);
+> +	zcomp_stream_put(zstrm);
+> +
+> +	return 0;
+> +}
+> +#endif
+> +
+>   /*
+>    * Reads (decompresses if needed) a page from zspool (zsmalloc).
+>    * Corresponding ZRAM slot should be locked.
+>    */
+> -static int zram_read_from_zspool(struct zram *zram, struct page *page,
+> -				 u32 index)
+> +static int read_from_zspool(struct zram *zram, struct page *page, u32 index)
+>   {
+>   	if (zram_test_flag(zram, index, ZRAM_SAME) ||
+>   	    !zram_get_handle(zram, index))
+> @@ -2002,7 +2174,7 @@ static int zram_read_page(struct zram *zram, struct page *page, u32 index,
+>   	zram_slot_lock(zram, index);
+>   	if (!zram_test_flag(zram, index, ZRAM_WB)) {
+>   		/* Slot should be locked through out the function call */
+> -		ret = zram_read_from_zspool(zram, page, index);
+> +		ret = read_from_zspool(zram, page, index);
+>   		zram_slot_unlock(zram, index);
+>   	} else {
+>   		unsigned long blk_idx = zram_get_handle(zram, index);
+> @@ -2012,7 +2184,7 @@ static int zram_read_page(struct zram *zram, struct page *page, u32 index,
+>   		 * device.
+>   		 */
+>   		zram_slot_unlock(zram, index);
+> -		ret = read_from_bdev(zram, page, blk_idx, parent);
+> +		ret = read_from_bdev(zram, page, index, blk_idx, parent);
+>   	}
+>   
+>   	/* Should NEVER happen. Return bio error if it does. */
+> @@ -2273,7 +2445,7 @@ static int recompress_slot(struct zram *zram, u32 index, struct page *page,
+>   	if (comp_len_old < threshold)
+>   		return 0;
+>   
+> -	ret = zram_read_from_zspool(zram, page, index);
+> +	ret = read_from_zspool(zram, page, index);
+>   	if (ret)
+>   		return ret;
+>   
+> @@ -2960,6 +3132,7 @@ static int zram_add(void)
+>   	init_rwsem(&zram->init_lock);
+>   #ifdef CONFIG_ZRAM_WRITEBACK
+>   	zram->wb_batch_size = 32;
+> +	zram->wb_compressed = false;
+>   #endif
+>   
+>   	/* gendisk structure */
+> diff --git a/drivers/block/zram/zram_drv.h b/drivers/block/zram/zram_drv.h
+> index c6d94501376c..72fdf66c78ab 100644
+> --- a/drivers/block/zram/zram_drv.h
+> +++ b/drivers/block/zram/zram_drv.h
+> @@ -128,6 +128,7 @@ struct zram {
+>   #ifdef CONFIG_ZRAM_WRITEBACK
+>   	struct file *backing_dev;
+>   	bool wb_limit_enable;
+> +	bool wb_compressed;
+>   	u32 wb_batch_size;
+>   	u64 bd_wb_limit;
+>   	struct block_device *bdev;
+
