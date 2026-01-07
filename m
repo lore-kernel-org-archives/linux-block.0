@@ -1,117 +1,79 @@
-Received: from mail3-163.sinamail.sina.com.cn (mail3-163.sinamail.sina.com.cn [202.108.3.163])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E81E628726A
-	for <linux-block@vger.kernel.org>; Wed,  7 Jan 2026 07:28:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.108.3.163
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5925259C84;
+	Wed,  7 Jan 2026 07:54:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767770930; cv=none; b=K5rUj5guBFAn2bJWFouKmESRB8D3W8ak2af0HhgqrEhuPkTbRKaZCsY1VhgZ75QqB5yR9eBuBLFbcH0BTlV5naLBKldtZvAP9Ayib4UpwfUs42QsAniCPobopyP8tchC+LojFQj+2LuTEp3fuqYq7+HpCnpZ/jLAD3JGH6NRk5s=
+	t=1767772496; cv=none; b=mFlgKm8mdWXUFxBB2wJ0XmD33a5RCKmyNf6037QaKkBE/k3dEvZi9qNYfsfxEAvXnpjor3kzWpc9gLK7JosDkPK4GSwLPgbaPNUCEZJ3NeBJvOXsCys8CNn0kcoJlvkqD6gmA6fAeN7ks9/MXx/rEvbpeduwqi8Kzb7GZiVbG9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767770930; c=relaxed/simple;
-	bh=vYxamPaAEK+1M2FbxLivh0yseffre3SvElcP9FnA6Ak=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bUIqVVAeO8sHfKbHWjGtaQnaqKZwH1paNA/3/NjEYVKxqcvwwrV9vSM3nF7dEERNMW82eeJeuXd80PVcSE5qNXE59b0QoL5ORqNL3tipwp8yz/HqMvUsebzSZCY1rJ+7yBcueKrm2lTb/0E9FK1LAndxiQL6KkHJIUZclN9fWf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=JmAFXzuq; arc=none smtp.client-ip=202.108.3.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+	s=arc-20240116; t=1767772496; c=relaxed/simple;
+	bh=WU9BYosDgytSGFm7ugxaTC6PwVTLaeQgkXlafkxHXxs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ENtYxrFDuxv2m4hrtZxoqfMZOz6xCyfJw0IedcJ/jcpiN7Pj2MoLELkBgk7jON+N0cy9nO5q7oqa5fG/2mOSQVRYXnaZjDDpwC5Sp42KYL/Qr63qhdbJ3bi/d6/lgfMQ6q6DuOYwR0vrLB7riooBB85i22e3p8nRFdIO9gqyh2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BWX7k91r; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="JmAFXzuq"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1767770925;
-	bh=MCDQKkv00dee+7Hq9Qla+ViyMcC4NAiMlT8zc8Ml/os=;
-	h=Message-ID:Date:Subject:From;
-	b=JmAFXzuq4eJB0AYX565KBK3/oFJ7rKj7s9bMOuS2QdqJGyH0RX8t61Ln4FhXZNAI6
-	 WejMDigUlkF0QHGZ9ubBig17bDZPLHILrazyeEmfaYJXCvMoGgnY9gdGQ488UrAwrm
-	 U8/1AEfeTmCUshnCuAIu8c8ruloRYP/zNln28uGE=
-X-SMAIL-HELO: [10.189.149.126]
-Received: from unknown (HELO [10.189.149.126])([114.247.175.249])
-	by sina.com (10.54.253.34) with ESMTP
-	id 695E0B0300000142; Wed, 7 Jan 2026 15:28:04 +0800 (CST)
-X-Sender: zhangdongdong925@sina.com
-X-Auth-ID: zhangdongdong925@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=zhangdongdong925@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=zhangdongdong925@sina.com
-X-SMAIL-MID: 8978036291840
-X-SMAIL-UIID: 5D5FCF9AA3104E0E9780317D09358A48-20260107-152804-1
-Message-ID: <2663a3d3-2d52-4269-970a-892d71c966bb@sina.com>
-Date: Wed, 7 Jan 2026 15:28:03 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BWX7k91r"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08BD9C4CEF7;
+	Wed,  7 Jan 2026 07:54:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767772496;
+	bh=WU9BYosDgytSGFm7ugxaTC6PwVTLaeQgkXlafkxHXxs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BWX7k91r5EsQAB87qtbAZypQwDX0sEi6XAeCSrLfQFPos//pxQh2SX8BEmcWe8hG4
+	 AMDkoj5SgHzz4WQ5DtKjpdQZjXUe1khZPvMeoPDuE6svQJS82YUtCt7qT2rLFgn4xp
+	 WVCzmjeBK7x7Q0pLQ/7F1FXTBIQENMTH5Fzk+B/XpHUwo73KKuZzCh52rvaLLzAF2G
+	 Dd9JhwlZ7fzsWz9Gk9MoeCp+tZo8QzZAVwEAokSQm7wxHy6MItUNBEuS1BZZ7aGdIF
+	 fx56kc45HmhxfJZVfW3qJsCDWb6C8ACDDFlo4sto1ocbdWhGo5EtBdvcX3awoDLORn
+	 fueO8cx/tbCdg==
+Date: Wed, 7 Jan 2026 09:54:53 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+	Chaitanya Kulkarni <kch@nvidia.com>
+Subject: Re: [PATCH v3 0/2] block: Generalize physical entry definition
+Message-ID: <20260107075453.GB11783@unreal>
+References: <20251217-nvme-phys-types-v3-0-f27fd1608f48@nvidia.com>
+ <20260104151517.GA563680@unreal>
+ <258e49de-7af3-4a35-852a-8f26fcb7ddbd@kernel.dk>
+ <8f839d6a-02a2-47f2-97af-f77cb10c5790@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 1/7] zram: introduce compressed data writeback
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
- Richard Chang <richardycc@google.com>, Minchan Kim <minchan@kernel.org>,
- Brian Geffon <bgeffon@google.com>, David Stevens <stevensd@google.com>,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- linux-block@vger.kernel.org, Minchan Kim <minchan@google.com>
-References: <20251201094754.4149975-1-senozhatsky@chromium.org>
- <20251201094754.4149975-2-senozhatsky@chromium.org>
- <40e38fa7-725b-407a-917a-59c5a76dedcb@sina.com>
- <7bnmkuodymm33yclp6e5oir2sqnqmpwlsb5qlxqyawszb5bvlu@l63wu3ckqihc>
-Content-Language: en-US
-From: zhangdongdong <zhangdongdong925@sina.com>
-In-Reply-To: <7bnmkuodymm33yclp6e5oir2sqnqmpwlsb5qlxqyawszb5bvlu@l63wu3ckqihc>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8f839d6a-02a2-47f2-97af-f77cb10c5790@kernel.dk>
 
-On 1/7/26 12:28, Sergey Senozhatsky wrote:
-> On (26/01/07 11:50), zhangdongdong wrote:
->> Hi Sergey,
->>
->> Thanks for the work on decompression-on-demand.
->>
->> One concern I’d like to raise is the use of a workqueue for readback
->> decompression. In our measurements, deferring decompression to a worker
->> introduces non-trivial scheduling overhead, and under memory pressure
->> the added latency can be noticeable (tens of milliseconds in some cases).
+On Tue, Jan 06, 2026 at 07:13:41PM -0700, Jens Axboe wrote:
+> On 1/6/26 5:46 AM, Jens Axboe wrote:
+> > On 1/4/26 8:15 AM, Leon Romanovsky wrote:
+> >> On Wed, Dec 17, 2025 at 11:41:22AM +0200, Leon Romanovsky wrote:
+> >>> Jens,
+> >>>
+> >>> I would like to ask you to put these patches on some shared branch based
+> >>> on v6.19-rcX tag, so I will be able to reuse this general type in VFIO
+> >>> and DMABUF code.
+> >>
+> >> Jens,
+> >>
+> >> Can we please progress with this simple series?
+> > 
+> > If Keith/Christoph are happy with it?
 > 
-> The problem is those bio completions happen in atomic context, and zram
-> requires both compression and decompression to be non-atomic.  And we
-> can't do sync read on the zram side, because those bio-s are chained.
-> So the current plan is to look how system hi-prio per-cpu workqueue
-> will handle this.
+> It's here:
 > 
-> Did you try high priority workqueue?
+> for-7.0/blk-pvec
+
+Thanks a lot.
+
 > 
-Hi,Sergey
-
-Yes, we have tried high priority workqueues. In fact, our current
-implementation already uses a dedicated workqueue created with
-WQ_HIGHPRI and marked as UNBOUND, which handles the read/decompression
-path for swap-in.
-
-Below is a simplified snippet of the queue we are currently using:
-
-zgroup_read_wq = alloc_workqueue("zgroup_read",
-				 WQ_HIGHPRI | WQ_UNBOUND, 0);
-
-static int zgroup_submit_zio_async(struct zgroup_io *zio,
-				   struct zram_group *zgroup)
-{
-	struct zgroup_req req = {
-		.zio = zio,
-	};
-
-	if (!zgroup_io_step_chg(zio, ZIO_STARTED, ZIO_INFLIGHT)) {
-		wait_for_completion(&zio->wait);
-		if (zio->status)
-			zgroup_put_io(zio);
-		return zio->status;
-	}
-
-	INIT_WORK_ONSTACK(&req.work, zgroup_submit_zio_work);
-	queue_work(zgroup_read_wq, &req.work);
-	flush_work(&req.work);
-	destroy_work_on_stack(&req.work);
-
-	return req.status ?: zgroup_decrypt_pages(zio);
-}
-
-Thanks,
-dongdong
+> now.
+> 
+> -- 
+> Jens Axboe
+> 
