@@ -1,456 +1,287 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azon11011035.outbound.protection.outlook.com [40.107.208.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47249309F13
-	for <linux-block@vger.kernel.org>; Wed,  7 Jan 2026 13:20:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767792061; cv=none; b=tsdmZY3qKKgr4eoYEd/oBq/NiFsao3lWTNY9j03UgLeGzQbZsGeYrLNG7CKi9WqL5g2yLCqjDC/Nf8Z3FbsQWczJpW7gkmyOR3c+g90mas6mmWV58hc+2GLtmi3hMuQ5OmpTBdBDO9crTeE/mEyltBog1Z48xQPRxoykVPooEf0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767792061; c=relaxed/simple;
-	bh=I9u6uhJEkCVlDWPAWwq50eRCabGLHHyLrj1g3ffrc2Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mWMxJOVQdzBtOFZwz8INK5EVS02pnEIW5IXgmRtvciUfFD9MlSJ8bsodl5Li2FxYy7qi7K2DzaQL3pHO7ykVvXq6pHb5X3WGFLbCmA7cZkis4dcg14i5gCW5C1Kc1Mm49XYqlcrT9tKVdmc/TfDjw9/I3Toy6YMh/4qztA/NhdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SloeC6tv; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3763A33C1A9
+	for <linux-block@vger.kernel.org>; Wed,  7 Jan 2026 13:34:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.208.35
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767792894; cv=fail; b=q3GZWcfgfyfb31F02TVlG8kdID2JITyiIuHSrIJxkJm0Um/2vRkg/pr6XIK6zUUS8YUWkbvPczoMJmQqUQ1fOoCDm0+XxEApbCnqSWOTm0WePFdsjIOvsDuHnEjU5mjIRiR1sedPvQuw9wURzJHXINTibvCTRDQRQH5m8ZQXsGU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767792894; c=relaxed/simple;
+	bh=fdd+WjEgX0PQnb9AQlSn0O0DkLm1c/QWphJbgzGNpIE=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=qySr6SQq7jsr75aitt3mTOozc2bz3F19YpEzkvASROMxQToR2ua4E5B7t43eaZH0CYFY37ox1aFbRt3vixaTNkgeTt6pHv/3DvdZpDv98TRRBo6smNm15ABjC0Hh8QZhMUv3XvvoZDU9caYOVgM4v/dAS2al9dn7eHja9QmLNcQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=rJFVz43X; arc=fail smtp.client-ip=40.107.208.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SloeC6tv"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767792058;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MpSNqim9KVt1jqi29b9wk9JrPddrzLYTR+V1mj2DHN4=;
-	b=SloeC6tvTKHeA4vm8BrtVpThxmOGAg5LeN4qplCThFGByZ4p7J4cKoj+i5yOq5Sq5Su/1e
-	8nkDfGkpeen2EvZPnbpYQI6o0iSP7bEVAu8clMBCYv/7gEYr9UmFf+JdzR3AKUM3UQ/O7f
-	1PresQ2A78e4qKDN51K15PHGU78xvSw=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-41-hJb1n06pPO-3PkC613dN-Q-1; Wed,
- 07 Jan 2026 08:20:53 -0500
-X-MC-Unique: hJb1n06pPO-3PkC613dN-Q-1
-X-Mimecast-MFC-AGG-ID: hJb1n06pPO-3PkC613dN-Q_1767792051
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BF2A81954237;
-	Wed,  7 Jan 2026 13:20:51 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.199])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7E4B919560A7;
-	Wed,  7 Jan 2026 13:20:47 +0000 (UTC)
-Date: Wed, 7 Jan 2026 21:20:41 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Yoav Cohen <yoav@nvidia.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	csander@purestorage.com, jholzman@nvidia.com, omril@nvidia.com
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="rJFVz43X"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=F9UfYfJSNAUGbZN28lFnGGgHFefL2bkoFqb8nqJNtJiy0XHGTiSdtvtmXlVTxPi6jXEBod7PDnJ+E1+vcqsJnaz07fDDWeYDr+5KEste2i7R5+tpZqtN+e9ftk9+Hy/idLfwHZ1SKn3h2xtRPTLfqOPg2IwValLG38wWBYG7Ih0moTF2KMmbMt0YLqramW/R+zF3c89tgla6FEE+KkVyTkrcdb/+6/Exav6T+5uAmb7g80l9P3pwB01t8L9RRAS+sqgZJ1CjG447tJLjM0ZiTU0QOYE31BGB6UB10HujmwRVEyEPpyL4fFHdg8vCNV0RQhwr3/sXcwXHq/XB92uigg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fdd+WjEgX0PQnb9AQlSn0O0DkLm1c/QWphJbgzGNpIE=;
+ b=mxlB83JjQw0qf5KxG/obXvReH03/DELMhg4uwBqVSJH+C0g7SxyVPetGOi5K5K5WhWBzwvbzYh/4s0BqXluN2e4eX3ixm0DyguQjQ4ooHnuSCmwZvMjy9R7PuGWVJHPgOemlSi2OwzCTSVAFWAfqnHMk0pg8SvdJq/jKEUCul6dT0rbO3c8CHiWLt2TQ04z5TznCkXAx9aHbFzc/1aPH0ENq0Zs95/QCfArd5K5/6CD0sjuJa5WUeL6dmHiRNYFFRlzrq2ZVbrdIncwAD/eyBZAPPlyJoQVJVD8nOUhHWYMs5W92/6fPWoP0K8KDEXb+kPkAyGIldU8ehZOPfyIGew==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fdd+WjEgX0PQnb9AQlSn0O0DkLm1c/QWphJbgzGNpIE=;
+ b=rJFVz43XNemvIas+OVSzRSohTff4Y22WNJnDAKKsEH3g2a+5BZbCpomxfpnWYVu80adxBjg4N3+i4sHPGHCWcGs5Ewi/BK1gF7uAYdDPIbws2fqo+nUlC3p8+HG6Z7oK2pviI3Xoe6r7grvdbPDBwsL/BtsHqazsJRPZ92bkadh/vc+oO2aTislLXFVGrc1P+vf0X1+U4qal+0mf+B5IFco6c/1AF1p8LladoUoBQSLaHzoH9VAhgLcrvlppdoYhD2RjVF4Ui//iUMJMA0+PSfAARDsyMIYfKOwMFSwayQiQNQkbwB+ro963/ZBL6ZHBN3iLzbv1Re1Bwp+z5kBxfw==
+Received: from DM4PR12MB6328.namprd12.prod.outlook.com (2603:10b6:8:a0::16) by
+ DS0PR12MB7677.namprd12.prod.outlook.com (2603:10b6:8:136::13) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9499.2; Wed, 7 Jan 2026 13:34:49 +0000
+Received: from DM4PR12MB6328.namprd12.prod.outlook.com
+ ([fe80::35dd:a6f9:6b74:3caa]) by DM4PR12MB6328.namprd12.prod.outlook.com
+ ([fe80::35dd:a6f9:6b74:3caa%5]) with mapi id 15.20.9499.002; Wed, 7 Jan 2026
+ 13:34:49 +0000
+From: Yoav Cohen <yoav@nvidia.com>
+To: Ming Lei <ming.lei@redhat.com>
+CC: Jens Axboe <axboe@kernel.dk>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "csander@purestorage.com"
+	<csander@purestorage.com>, Jared Holzman <jholzman@nvidia.com>, Omri Levi
+	<omril@nvidia.com>
 Subject: Re: [PATCH v4 2/2] ublk: add UBLK_CMD_TRY_STOP_DEV command
-Message-ID: <aV5djH9ueztZm49y@fedora>
+Thread-Topic: [PATCH v4 2/2] ublk: add UBLK_CMD_TRY_STOP_DEV command
+Thread-Index: AQHcf0vWxjzS10H3JkqOapULI6psc7VGsj+AgAAD8gA=
+Date: Wed, 7 Jan 2026 13:34:49 +0000
+Message-ID: <d88b1705-e4e1-455e-89d4-1cc92fbd6921@nvidia.com>
 References: <20260106203333.30589-1-yoav@nvidia.com>
- <20260106203333.30589-3-yoav@nvidia.com>
+ <20260106203333.30589-3-yoav@nvidia.com> <aV5djH9ueztZm49y@fedora>
+In-Reply-To: <aV5djH9ueztZm49y@fedora>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM4PR12MB6328:EE_|DS0PR12MB7677:EE_
+x-ms-office365-filtering-correlation-id: 1b1eefa7-f5d3-40b7-c913-08de4df187b9
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700021;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?UlpMWm0vWmx6R3hTS050OHM1c0xvaUpIYzZvZWpYbGFIbEc3ZHBoMTk3a0FO?=
+ =?utf-8?B?SWhsUzRzWjBLTDdHZFo0RlJ3d2FPWUxyUk5qYzd3L3RYRDFSRDV2ck9hSzdu?=
+ =?utf-8?B?QXU2dmEvNTJMN3BxNC9idnFNR1M2cmRHZ29MbzVNU1lXTjdTWUhjV0l4OHNK?=
+ =?utf-8?B?NjNmdUZVRk95VHZ2a3ZjcGVpeGVCSXg0WnRzWHU1SmxpUnIySGJ3dlR2M3p2?=
+ =?utf-8?B?WkVqYTVvVFhtdnFlS3dNYUpERDE2TFUraEdWMElLVVoxVzJmZ0s3OUZLbVdy?=
+ =?utf-8?B?UXl3NVVBaFRFdFJKcGRGNSs5WXJtVnR1V2NmdllaRHFUTk84RWFRYmN4QnRO?=
+ =?utf-8?B?eldlVnlTLzRjZGE4SzU1TEtyak9lU0ZFa2ZJbVlFSWRxdGtXUHlBL2hzT2k2?=
+ =?utf-8?B?dkVDenFWTVFTRHVXT0Ryc2ZabTF6Y1dMVEpzYjVGd2FQNEFaWTA0S3puTFIz?=
+ =?utf-8?B?cGRhKzkrekZpQ1VuUmp4VEhxWUgwWXN6bDFEWTAwTXUvNjNGa0FYTEVacE85?=
+ =?utf-8?B?OFlXV1JQUTdjODZMR3lkeFQ4aEh6MS9WMzArSXBpdC9Oc0p3bGVQd3d4NXlr?=
+ =?utf-8?B?ZlNpL01wVERsT2k4UkpWOFZVRjFybCt2Q1ZLZkh4UnY3ZmZmbHVUYkhObmVP?=
+ =?utf-8?B?NGVETzNsMjZMd1p6VHNKcnNVTGgyNzlxU043UnZ1alVNZnBra3BlS1RabS9v?=
+ =?utf-8?B?TWVsRHJqMHVOWUlIWTZQUm5FVmx3UUl2YU9FZmF0ajBJOTh0cDVBT1dMYUNX?=
+ =?utf-8?B?T2R1dzhzR1lrT2kwYVZqbU0vczQ1SjFzUENLenY4MDkwMzVwd3F0WjArZXFF?=
+ =?utf-8?B?ZVBwVy9RSTVkVUpQWDBlVnpHVFoybVVHU1dsOGN6bTBBenMxeVZrYmtYWG1F?=
+ =?utf-8?B?VFIrSXM0QTJ3WWo0SkxsVTVFRFZMeG0rbjBmbUFZR3pnajgxSS9FZHNqWmxr?=
+ =?utf-8?B?T2R5Rlg5d2FJN0hIbDZkR1ZyM1g1QnRpQXNTcThpYmFmOWh1VXYrZGl4NWt0?=
+ =?utf-8?B?MVZvZm1CY3lENHBYMHhCVjdIVWF0OURTbWg1Mi8xbkZ0bDVEdmIwY25YR0xi?=
+ =?utf-8?B?b01iWUZHYkNHUXFwL0hEZlhCdExsNWVEZjJxaTJlQWdYQ3o4OENhU3EwQktP?=
+ =?utf-8?B?SDZQdDVKekhVa0dtVU1vbkxRY0dJU3pzNGlKUUp2ek56d2N2TjZuQUNidVRy?=
+ =?utf-8?B?ZVRvZUJuRnQ5c2s4aWhJLzJjeW5SSGMxaWtUdndGbjd5aU0vM1lNWHg3aGEz?=
+ =?utf-8?B?bHNIS0E3MXYvVEZiYnZINXgwdzVQd1hWV3FweTdUUEUwcFJEdDc3QzBDZ3F0?=
+ =?utf-8?B?MmNRVm9CNTBEN09Fc0djbFFwazR5R0VrSDlCeVBidndVV0lnalZ6UnZwaWEr?=
+ =?utf-8?B?U3VCdExiNEErem9waHk5eGpuUWVseHhSSUZHM0xiL1BGeitYbDZDYkdFL0Zi?=
+ =?utf-8?B?UU5yaE0yekFJWjdwMjJaNUllRkNsUHp4R3ZRTW4xK0gza0h2SEtIT0RhWk9y?=
+ =?utf-8?B?Q0krRUtTb2F6L1ZGd1h5b0FxQ0pYZzBJOVRaUThOdkJOZmJEdTFEalJ5K0ta?=
+ =?utf-8?B?NHhnSmxEekh2RHNnOEI0UFFsWDUxWVhBWllQdmRoZ3hvVE82dWtNZmNidGRz?=
+ =?utf-8?B?alc1ZWRnZWVPYlYvLy94RUNMMGU5eU9seUtGTElFYXBuZjloa0dGZXBncDdw?=
+ =?utf-8?B?MzByZTJhUmp6a0JjL0FPT0gyRGp1ZkZ6Uk9QVDRhWHF4L1Mrd2s1RURRMWdT?=
+ =?utf-8?B?N1NFb3k0VUp0ejY1SXIrbm1veGlYNjNwQjI1MWdhbmN2QlVKZjRVTWRyREZ6?=
+ =?utf-8?B?c1Y0TGpNenBIbXpZT2xVci83U0ttWVJidkZiV0VNQzBCZWxlTkJJMXVMWFNn?=
+ =?utf-8?B?MmRpYUYrRUEwcjZ6M0NqU2NOQlJ6Y1VGOEw3V1RkOGlMcDhKUGxjMW1pZDZ3?=
+ =?utf-8?B?UHJ1aFh2OGU1ZkRpVWZ6ZFg4RlF3c084REFhL1c3WWs2dEFtU2ZnK2w4T3Ft?=
+ =?utf-8?B?MWdYazhxOUxqTG1yVWxkRU4rQ2U2a3JqN0lBRnd1UnpGKzdJZlQwa2s1VHUv?=
+ =?utf-8?Q?NBErOZ?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB6328.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?cTFNOWpQRndldmp1ZjZBWUg0VjBuVXl6K0xIaldkWmMzVkhKcjg4MEJmRTBm?=
+ =?utf-8?B?eGxrKzFpak56N1NEcVRjZnFaaE4reGg4TUs4MGx2czhYR2hockJqaDgwWWc1?=
+ =?utf-8?B?RWFOSnNBaVdUanhnY21GZTZIOXRETklSbmtvdTY1Wm45bCtMUjRyMUplZUE1?=
+ =?utf-8?B?TmNzd1h4TzhWS1VtSDNBc1pEWko4UEh4b0hSWG9DUVpJQUxXNzVWYUhVNWFJ?=
+ =?utf-8?B?K3ppYnVhL2J2dTBpcjZaUlFudDNiZEFPQ3ExQnhQSHIyV2F4RFVwS0ZyZDU1?=
+ =?utf-8?B?ZW81RUFRNUVOb0dHNlE5a3N2bUtpZVJ4RDJWU2NXQ1YzUG9DTFNMMHR3Vlpu?=
+ =?utf-8?B?MXlHTEx4M0VlSVQ1V2E1NHdOaExOMHFQQ3ExRmJyMW9VTktXbnk1SFMxbmpC?=
+ =?utf-8?B?Y3BBbEpQa3BiZ2REUlRnSXRid0NhV2hzSGVOb1oybTR2OVRsNkpGUFJUN2xH?=
+ =?utf-8?B?ODF3QUtxVS9pSytFeVRLbHpneEZ3ZVFLU0tMS3U3TGl5M2QxYmhTdGZhMndX?=
+ =?utf-8?B?N0ZEWUNUWHBnRFZQdUE0bzFYdWYwUWFUMC95ck5xN01NSzdRUGxZLzZpWWo2?=
+ =?utf-8?B?SXdXc2tRclNJd25hL1VybWRvVTBvTmlmcERKM1VHckIzT0lIRk5JbjRJUTZU?=
+ =?utf-8?B?Q3lieGN1SGNuc0dGYzFhU0o1bnd6bmQwcEM2Y0dJV0tjUXg1MjBxTk9kRzFD?=
+ =?utf-8?B?c0Ntb2RHZzd0bXB5bWcrT1Zqd3drMkhyMW5nOW5NV0QwRHA1U2p4SzNZaE1o?=
+ =?utf-8?B?RTdySlQrd1lqZFppRTRxZ1BzQzNFMjc4aVlNU21JalRycGNWaHhDbzl2enVX?=
+ =?utf-8?B?VEUzcDRaY0VONXp0bTJUVUhpMTdNdFhtNlRCZG5nc1JyQThudk9ibG40bEZK?=
+ =?utf-8?B?Nkx3UXZsbHdvWWl5ams5NlhvcTBCUVRQMWVVOXJpbnlORGx6aGlrYnREdjZ1?=
+ =?utf-8?B?aW9HOUk2cXhKNzRxdHBDY0pFbEdNazZ1NFZlMzJXNi85T0lqWkVxNFVTM3dQ?=
+ =?utf-8?B?bHd6bmxXRk1VVG14Uys5NzlYNUd4aStXY05SV3RZRmRUVkZIalZ3TWhNb1Aw?=
+ =?utf-8?B?SzdoSENPRXIvS1g0ZjI5aW80eVhJYVY0ekhjeUlFbHdjeWdVRGpUOFVtRks4?=
+ =?utf-8?B?Mks2WDJJRVNMakIzUnRjbXRNbGtMNEllcEdOWUVtNWpMNFZCS1RLRkVjTit6?=
+ =?utf-8?B?UDY2TEQ3MHk1RDkxUHQ5cFltYTJBb2FGcHp2RDcvWWFoQzZjZXFSdGNmUktE?=
+ =?utf-8?B?MGhNOUR4UWFxMHlTOUNuelJ5bjNXY0x5dThwL3BLYTIwcUx0b2pOeFRTWlFy?=
+ =?utf-8?B?anlQbWJWRmZkMWlXdENDUmtUUkt3MklCamlPZEVPZkJ2K1htNnl0WnB5V1FL?=
+ =?utf-8?B?blg4MXNkZ1ZIRUNjenF6bDkwUXZWWEJ6MFdxYWRrTGRVZWI4Ny9OOEk1aTEx?=
+ =?utf-8?B?cHI2c2RnU0JlcU12M0tveFZMQjhXekZ1VGFZUURXQlJ2TkZXcXphOXc1WlJD?=
+ =?utf-8?B?SnFqaUtXSUdNYkc2S0NVT0x4cWxSTW45TzMxdDZvY2VWblhyUHltTk1sRktt?=
+ =?utf-8?B?T216NTRaR3NuSzUyblhDY0J0K3ZQUzlFM21OSFdFb2FmbmphdEVBSFdFNCtz?=
+ =?utf-8?B?VHBXeVQ5SloxeWZycmVmOE00Tm9yL0Z0UzZma1daVGtMMTBXdmVBczNjeDhB?=
+ =?utf-8?B?OTZVRCtnZmlNcVBvVFBJQVAxb3ZneWhyOHRqWXNGdnlzcjNLMlZTMUV0Uys1?=
+ =?utf-8?B?cjBLTHBaU0lLdzBhZTlPUEx6V09UV084RnFkN2g5QnJoaE8wVW1HVHBLbWVN?=
+ =?utf-8?B?NWY3TnBFWXZudTR6Si94K2hlU2ZNZjFRcGNaS3UxOEk0Mks5WGVpOE1PTFQv?=
+ =?utf-8?B?d25LM2l5a2NVbHA1ZEd5UEN3bkhDWUp4UnNnNExBb2ZOKzVxUDRYYklBTlVK?=
+ =?utf-8?B?RlpGR1djeGo0ZEhGNm80cVpGcXd1dGFUNWwrYXVqNms4UHFDbWFSekZHbCtY?=
+ =?utf-8?B?Zmx1VlNWMzZ1L1pyTE1pR2FwQ1dpTFVsaWJzNjlPNjh0VWwxbGJOTy9lUWpT?=
+ =?utf-8?B?SG9xNmdlYmdBd1MwUEtzNkZxWFNpSnFRbE9tU0U4ZE84MTIvdHgycmVlTS9t?=
+ =?utf-8?B?czlwb2pBcHh1N3JGWTZvczh1SFlFS1JvQ0VmM0FpZ3RwbnE1NHBsM2pVY1p5?=
+ =?utf-8?B?M1VLeFFxM2xIaHVHeEdoTnlabjh6YVRleVYyMnUwd01WRmxhMHRzL1NKbCtp?=
+ =?utf-8?B?K0hXaXRYVGJLWnRXcm5ROXFMWmpWa0puTUc0VlRXalJna1lrSHlvQWF4c3g1?=
+ =?utf-8?Q?0rL3/GeLYRJn28PrKr?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <AF111D802656D647981C9191AADB0103@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="Oqghg8yZypsy5Xnj"
-Content-Disposition: inline
-In-Reply-To: <20260106203333.30589-3-yoav@nvidia.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB6328.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1b1eefa7-f5d3-40b7-c913-08de4df187b9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Jan 2026 13:34:49.2218
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: JrkkWcQ4mEMVBq7D6Jvc6SnLJi0OQ1gBrsdwAg00avQtLDKAqQ6ZmeZ/2RvpbRHS
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7677
 
-
---Oqghg8yZypsy5Xnj
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Tue, Jan 06, 2026 at 10:33:33PM +0200, Yoav Cohen wrote:
-> This command is similar to UBLK_CMD_STOP_DEV, but it only stops the
-> device if there are no active openers for the ublk block device.
-> If the device is busy, the command returns -EBUSY instead of
-> disrupting active clients. This allows safe, non-destructive stopping.
-> 
-> Advertise UBLK_CMD_TRY_STOP_DEV support via UBLK_F_SAFE_STOP_DEV
-> feature flag.
-> 
-> Signed-off-by: Yoav Cohen <yoav@nvidia.com>
-> ---
->  drivers/block/ublk_drv.c             | 44 ++++++++++++++++++++++++++--
->  include/uapi/linux/ublk_cmd.h        |  9 +++++-
->  tools/testing/selftests/ublk/kublk.c |  1 +
->  3 files changed, 51 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index 2d5602ef05cc..fc8b87902f8f 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -54,6 +54,7 @@
->  #define UBLK_CMD_DEL_DEV_ASYNC	_IOC_NR(UBLK_U_CMD_DEL_DEV_ASYNC)
->  #define UBLK_CMD_UPDATE_SIZE	_IOC_NR(UBLK_U_CMD_UPDATE_SIZE)
->  #define UBLK_CMD_QUIESCE_DEV	_IOC_NR(UBLK_U_CMD_QUIESCE_DEV)
-> +#define UBLK_CMD_TRY_STOP_DEV	_IOC_NR(UBLK_U_CMD_TRY_STOP_DEV)
->  
->  #define UBLK_IO_REGISTER_IO_BUF		_IOC_NR(UBLK_U_IO_REGISTER_IO_BUF)
->  #define UBLK_IO_UNREGISTER_IO_BUF	_IOC_NR(UBLK_U_IO_UNREGISTER_IO_BUF)
-> @@ -73,7 +74,8 @@
->  		| UBLK_F_AUTO_BUF_REG \
->  		| UBLK_F_QUIESCE \
->  		| UBLK_F_PER_IO_DAEMON \
-> -		| UBLK_F_BUF_REG_OFF_DAEMON)
-> +		| UBLK_F_BUF_REG_OFF_DAEMON \
-> +		| UBLK_F_SAFE_STOP_DEV)
->  
->  #define UBLK_F_ALL_RECOVERY_FLAGS (UBLK_F_USER_RECOVERY \
->  		| UBLK_F_USER_RECOVERY_REISSUE \
-> @@ -239,6 +241,8 @@ struct ublk_device {
->  	struct delayed_work	exit_work;
->  	struct work_struct	partition_scan_work;
->  
-> +	bool			block_open; /* protected by open_mutex */
-> +
->  	struct ublk_queue       *queues[];
->  };
->  
-> @@ -919,6 +923,9 @@ static int ublk_open(struct gendisk *disk, blk_mode_t mode)
->  			return -EPERM;
->  	}
->  
-> +	if (ub->block_open)
-> +		return -EBUSY;
-> +
->  	return 0;
->  }
->  
-> @@ -3188,7 +3195,8 @@ static int ublk_ctrl_add_dev(const struct ublksrv_ctrl_cmd *header)
->  	ub->dev_info.flags |= UBLK_F_CMD_IOCTL_ENCODE |
->  		UBLK_F_URING_CMD_COMP_IN_TASK |
->  		UBLK_F_PER_IO_DAEMON |
-> -		UBLK_F_BUF_REG_OFF_DAEMON;
-> +		UBLK_F_BUF_REG_OFF_DAEMON |
-> +		UBLK_F_SAFE_STOP_DEV;
->  
->  	/* GET_DATA isn't needed any more with USER_COPY or ZERO COPY */
->  	if (ub->dev_info.flags & (UBLK_F_USER_COPY | UBLK_F_SUPPORT_ZERO_COPY |
-> @@ -3309,6 +3317,34 @@ static void ublk_ctrl_stop_dev(struct ublk_device *ub)
->  	ublk_stop_dev(ub);
->  }
->  
-> +static int ublk_ctrl_try_stop_dev(struct ublk_device *ub)
-> +{
-> +	struct gendisk *disk;
-> +	int ret = 0;
-> +
-> +	disk = ublk_get_disk(ub);
-> +	if (!disk)
-> +		return -ENODEV;
-> +
-> +	mutex_lock(&disk->open_mutex);
-> +	if (disk_openers(disk) > 0) {
-> +		ret = -EBUSY;
-> +		goto unlock;
-> +	}
-> +	ub->block_open = true;
-> +	/* release open_mutex as del_gendisk() will reacquire it */
-> +	mutex_unlock(&disk->open_mutex);
-> +
-> +	ublk_ctrl_stop_dev(ub);
-> +	goto out;
-> +
-> +unlock:
-> +	mutex_unlock(&disk->open_mutex);
-> +out:
-> +	ublk_put_disk(disk);
-> +	return ret;
-> +}
-> +
->  static int ublk_ctrl_get_dev_info(struct ublk_device *ub,
->  		const struct ublksrv_ctrl_cmd *header)
->  {
-> @@ -3704,6 +3740,7 @@ static int ublk_ctrl_uring_cmd_permission(struct ublk_device *ub,
->  	case UBLK_CMD_END_USER_RECOVERY:
->  	case UBLK_CMD_UPDATE_SIZE:
->  	case UBLK_CMD_QUIESCE_DEV:
-> +	case UBLK_CMD_TRY_STOP_DEV:
->  		mask = MAY_READ | MAY_WRITE;
->  		break;
->  	default:
-> @@ -3817,6 +3854,9 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
->  	case UBLK_CMD_QUIESCE_DEV:
->  		ret = ublk_ctrl_quiesce_dev(ub, header);
->  		break;
-> +	case UBLK_CMD_TRY_STOP_DEV:
-> +		ret = ublk_ctrl_try_stop_dev(ub);
-> +		break;
->  	default:
->  		ret = -EOPNOTSUPP;
->  		break;
-> diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
-> index ec77dabba45b..9daa8ab372f0 100644
-> --- a/include/uapi/linux/ublk_cmd.h
-> +++ b/include/uapi/linux/ublk_cmd.h
-> @@ -55,7 +55,8 @@
->  	_IOWR('u', 0x15, struct ublksrv_ctrl_cmd)
->  #define UBLK_U_CMD_QUIESCE_DEV		\
->  	_IOWR('u', 0x16, struct ublksrv_ctrl_cmd)
-> -
-> +#define UBLK_U_CMD_TRY_STOP_DEV		\
-> +	_IOWR('u', 0x17, struct ublksrv_ctrl_cmd)
->  /*
->   * 64bits are enough now, and it should be easy to extend in case of
->   * running out of feature flags
-> @@ -311,6 +312,12 @@
->   */
->  #define UBLK_F_BUF_REG_OFF_DAEMON (1ULL << 14)
->  
-> +/*
-> + * The device supports the UBLK_CMD_TRY_STOP_DEV command, which
-> + * allows stopping the device only if there are no openers.
-> + */
-> +#define UBLK_F_SAFE_STOP_DEV	(1ULL << 17)
-> +
->  /* device state */
->  #define UBLK_S_DEV_DEAD	0
->  #define UBLK_S_DEV_LIVE	1
-> diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftests/ublk/kublk.c
-> index 185ba553686a..6739e28c4059 100644
-> --- a/tools/testing/selftests/ublk/kublk.c
-> +++ b/tools/testing/selftests/ublk/kublk.c
-> @@ -1454,6 +1454,7 @@ static int cmd_dev_get_features(void)
->  		FEAT_NAME(UBLK_F_QUIESCE),
->  		FEAT_NAME(UBLK_F_PER_IO_DAEMON),
->  		FEAT_NAME(UBLK_F_BUF_REG_OFF_DAEMON),
-> +		FEAT_NAME(UBLK_F_SAFE_STOP_DEV),
-
-We usually split driver and test code into different patches, and the patch
-looks fine:
-
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-
-But we usually separate test code from driver change, also new feature needs
-selftest code for verifying, can you move `+FEAT_NAME(UBLK_F_SAFE_STOP_DEV)` into
-the attached selftest patch and post all 3 in v5?
-
-
-
-Thanks,
-Ming
-
---Oqghg8yZypsy5Xnj
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment;
-	filename="0001-selftests-ublk-add-stop-command-with-safe-option.patch"
-
-From 3574f73d3098dc56f63b7c2b1097c0f090c4ad3c Mon Sep 17 00:00:00 2001
-From: Ming Lei <ming.lei@redhat.com>
-Date: Wed, 7 Jan 2026 13:01:39 +0000
-Subject: [PATCH] selftests: ublk: add stop command with --safe option
-
-Add 'stop' subcommand to kublk utility that uses the new
-UBLK_CMD_TRY_STOP_DEV command when --safe option is specified.
-This allows stopping a device only if it has no active openers,
-returning -EBUSY otherwise.
-
-Also add test_generic_16.sh to test the new functionality.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- tools/testing/selftests/ublk/Makefile         |  1 +
- tools/testing/selftests/ublk/kublk.c          | 52 +++++++++++++++++
- tools/testing/selftests/ublk/kublk.h          |  1 +
- .../testing/selftests/ublk/test_generic_16.sh | 57 +++++++++++++++++++
- 4 files changed, 111 insertions(+)
- create mode 100755 tools/testing/selftests/ublk/test_generic_16.sh
-
-diff --git a/tools/testing/selftests/ublk/Makefile b/tools/testing/selftests/ublk/Makefile
-index 06ba6fde098d..e9614f77b809 100644
---- a/tools/testing/selftests/ublk/Makefile
-+++ b/tools/testing/selftests/ublk/Makefile
-@@ -23,6 +23,7 @@ TEST_PROGS += test_generic_12.sh
- TEST_PROGS += test_generic_13.sh
- TEST_PROGS += test_generic_14.sh
- TEST_PROGS += test_generic_15.sh
-+TEST_PROGS += test_generic_16.sh
- 
- TEST_PROGS += test_null_01.sh
- TEST_PROGS += test_null_02.sh
-diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftests/ublk/kublk.c
-index 6739e28c4059..1a563705caa0 100644
---- a/tools/testing/selftests/ublk/kublk.c
-+++ b/tools/testing/selftests/ublk/kublk.c
-@@ -107,6 +107,15 @@ static int ublk_ctrl_stop_dev(struct ublk_dev *dev)
- 	return __ublk_ctrl_cmd(dev, &data);
- }
- 
-+static int ublk_ctrl_try_stop_dev(struct ublk_dev *dev)
-+{
-+	struct ublk_ctrl_cmd_data data = {
-+		.cmd_op	= UBLK_U_CMD_TRY_STOP_DEV,
-+	};
-+
-+	return __ublk_ctrl_cmd(dev, &data);
-+}
-+
- static int ublk_ctrl_start_dev(struct ublk_dev *dev,
- 		int daemon_pid)
- {
-@@ -1392,6 +1401,42 @@ static int cmd_dev_del(struct dev_ctx *ctx)
- 	return 0;
- }
- 
-+static int cmd_dev_stop(struct dev_ctx *ctx)
-+{
-+	int number = ctx->dev_id;
-+	struct ublk_dev *dev;
-+	int ret;
-+
-+	if (number < 0) {
-+		ublk_err("%s: device id is required\n", __func__);
-+		return -EINVAL;
-+	}
-+
-+	dev = ublk_ctrl_init();
-+	dev->dev_info.dev_id = number;
-+
-+	ret = ublk_ctrl_get_info(dev);
-+	if (ret < 0)
-+		goto fail;
-+
-+	if (ctx->safe_stop) {
-+		ret = ublk_ctrl_try_stop_dev(dev);
-+		if (ret < 0)
-+			ublk_err("%s: try_stop dev %d failed ret %d\n",
-+					__func__, number, ret);
-+	} else {
-+		ret = ublk_ctrl_stop_dev(dev);
-+		if (ret < 0)
-+			ublk_err("%s: stop dev %d failed ret %d\n",
-+					__func__, number, ret);
-+	}
-+
-+fail:
-+	ublk_ctrl_deinit(dev);
-+
-+	return ret;
-+}
-+
- static int __cmd_dev_list(struct dev_ctx *ctx)
- {
- 	struct ublk_dev *dev = ublk_ctrl_init();
-@@ -1582,6 +1627,8 @@ static int cmd_dev_help(char *exe)
- 
- 	printf("%s del [-n dev_id] -a \n", exe);
- 	printf("\t -a delete all devices -n delete specified device\n\n");
-+	printf("%s stop -n dev_id [--safe]\n", exe);
-+	printf("\t --safe only stop if device has no active openers\n\n");
- 	printf("%s list [-n dev_id] -a \n", exe);
- 	printf("\t -a list all devices, -n list specified device, default -a \n\n");
- 	printf("%s features\n", exe);
-@@ -1613,6 +1660,7 @@ int main(int argc, char *argv[])
- 		{ "nthreads",		1,	NULL,  0 },
- 		{ "per_io_tasks",	0,	NULL,  0 },
- 		{ "no_ublk_fixed_fd",	0,	NULL,  0 },
-+		{ "safe",		0,	NULL,  0 },
- 		{ 0, 0, 0, 0 }
- 	};
- 	const struct ublk_tgt_ops *ops = NULL;
-@@ -1697,6 +1745,8 @@ int main(int argc, char *argv[])
- 				ctx.per_io_tasks = 1;
- 			if (!strcmp(longopts[option_idx].name, "no_ublk_fixed_fd"))
- 				ctx.no_ublk_fixed_fd = 1;
-+			if (!strcmp(longopts[option_idx].name, "safe"))
-+				ctx.safe_stop = 1;
- 			break;
- 		case '?':
- 			/*
-@@ -1764,6 +1814,8 @@ int main(int argc, char *argv[])
- 		}
- 	} else if (!strcmp(cmd, "del"))
- 		ret = cmd_dev_del(&ctx);
-+	else if (!strcmp(cmd, "stop"))
-+		ret = cmd_dev_stop(&ctx);
- 	else if (!strcmp(cmd, "list")) {
- 		ctx.all = 1;
- 		ret = cmd_dev_list(&ctx);
-diff --git a/tools/testing/selftests/ublk/kublk.h b/tools/testing/selftests/ublk/kublk.h
-index 8a83b90ec603..4b6b4992f78e 100644
---- a/tools/testing/selftests/ublk/kublk.h
-+++ b/tools/testing/selftests/ublk/kublk.h
-@@ -78,6 +78,7 @@ struct dev_ctx {
- 	unsigned int	auto_zc_fallback:1;
- 	unsigned int	per_io_tasks:1;
- 	unsigned int	no_ublk_fixed_fd:1;
-+	unsigned int	safe_stop:1;
- 
- 	int _evtfd;
- 	int _shmid;
-diff --git a/tools/testing/selftests/ublk/test_generic_16.sh b/tools/testing/selftests/ublk/test_generic_16.sh
-new file mode 100755
-index 000000000000..e08af7b685c9
---- /dev/null
-+++ b/tools/testing/selftests/ublk/test_generic_16.sh
-@@ -0,0 +1,57 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
-+
-+TID="generic_16"
-+ERR_CODE=0
-+
-+_prep_test "null" "stop --safe command"
-+
-+# Check if SAFE_STOP_DEV feature is supported
-+if ! _have_feature "SAFE_STOP_DEV"; then
-+	_cleanup_test "null"
-+	exit "$UBLK_SKIP_CODE"
-+fi
-+
-+# Test 1: stop --safe on idle device should succeed
-+dev_id=$(_add_ublk_dev -t null -q 2 -d 32)
-+_check_add_dev $TID $?
-+
-+# Device is idle (no openers), stop --safe should succeed
-+if ! ${UBLK_PROG} stop -n "${dev_id}" --safe; then
-+	echo "stop --safe on idle device failed unexpectedly!"
-+	ERR_CODE=255
-+fi
-+
-+# Clean up device
-+${UBLK_PROG} del -n "${dev_id}" > /dev/null 2>&1
-+udevadm settle
-+
-+# Test 2: stop --safe on device with active opener should fail
-+dev_id=$(_add_ublk_dev -t null -q 2 -d 32)
-+_check_add_dev $TID $?
-+
-+# Open device in background (dd reads indefinitely)
-+dd if=/dev/ublkb${dev_id} of=/dev/null bs=4k iflag=direct > /dev/null 2>&1 &
-+dd_pid=$!
-+
-+# Give dd time to start
-+sleep 0.2
-+
-+# Device has active opener, stop --safe should fail with -EBUSY
-+if ${UBLK_PROG} stop -n "${dev_id}" --safe 2>/dev/null; then
-+	echo "stop --safe on busy device succeeded unexpectedly!"
-+	ERR_CODE=255
-+fi
-+
-+# Kill dd and clean up
-+kill $dd_pid 2>/dev/null
-+wait $dd_pid 2>/dev/null
-+
-+# Now device should be idle, regular delete should work
-+${UBLK_PROG} del -n "${dev_id}"
-+udevadm settle
-+
-+_cleanup_test "null"
-+_show_result $TID $ERR_CODE
--- 
-2.47.1
-
-
---Oqghg8yZypsy5Xnj--
-
+T24gMDcvMDEvMjAyNiAxNToyMCwgTWluZyBMZWkgd3JvdGU6DQo+IEV4dGVybmFsIGVtYWlsOiBV
+c2UgY2F1dGlvbiBvcGVuaW5nIGxpbmtzIG9yIGF0dGFjaG1lbnRzDQo+IA0KPiANCj4gT24gVHVl
+LCBKYW4gMDYsIDIwMjYgYXQgMTA6MzM6MzNQTSArMDIwMCwgWW9hdiBDb2hlbiB3cm90ZToNCj4+
+IFRoaXMgY29tbWFuZCBpcyBzaW1pbGFyIHRvIFVCTEtfQ01EX1NUT1BfREVWLCBidXQgaXQgb25s
+eSBzdG9wcyB0aGUNCj4+IGRldmljZSBpZiB0aGVyZSBhcmUgbm8gYWN0aXZlIG9wZW5lcnMgZm9y
+IHRoZSB1YmxrIGJsb2NrIGRldmljZS4NCj4+IElmIHRoZSBkZXZpY2UgaXMgYnVzeSwgdGhlIGNv
+bW1hbmQgcmV0dXJucyAtRUJVU1kgaW5zdGVhZCBvZg0KPj4gZGlzcnVwdGluZyBhY3RpdmUgY2xp
+ZW50cy4gVGhpcyBhbGxvd3Mgc2FmZSwgbm9uLWRlc3RydWN0aXZlIHN0b3BwaW5nLg0KPj4NCj4+
+IEFkdmVydGlzZSBVQkxLX0NNRF9UUllfU1RPUF9ERVYgc3VwcG9ydCB2aWEgVUJMS19GX1NBRkVf
+U1RPUF9ERVYNCj4+IGZlYXR1cmUgZmxhZy4NCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBZb2F2IENv
+aGVuIDx5b2F2QG52aWRpYS5jb20+DQo+PiAtLS0NCj4+ICAgZHJpdmVycy9ibG9jay91YmxrX2Ry
+di5jICAgICAgICAgICAgIHwgNDQgKysrKysrKysrKysrKysrKysrKysrKysrKystLQ0KPj4gICBp
+bmNsdWRlL3VhcGkvbGludXgvdWJsa19jbWQuaCAgICAgICAgfCAgOSArKysrKy0NCj4+ICAgdG9v
+bHMvdGVzdGluZy9zZWxmdGVzdHMvdWJsay9rdWJsay5jIHwgIDEgKw0KPj4gICAzIGZpbGVzIGNo
+YW5nZWQsIDUxIGluc2VydGlvbnMoKyksIDMgZGVsZXRpb25zKC0pDQo+Pg0KPj4gZGlmZiAtLWdp
+dCBhL2RyaXZlcnMvYmxvY2svdWJsa19kcnYuYyBiL2RyaXZlcnMvYmxvY2svdWJsa19kcnYuYw0K
+Pj4gaW5kZXggMmQ1NjAyZWYwNWNjLi5mYzhiODc5MDJmOGYgMTAwNjQ0DQo+PiAtLS0gYS9kcml2
+ZXJzL2Jsb2NrL3VibGtfZHJ2LmMNCj4+ICsrKyBiL2RyaXZlcnMvYmxvY2svdWJsa19kcnYuYw0K
+Pj4gQEAgLTU0LDYgKzU0LDcgQEANCj4+ICAgI2RlZmluZSBVQkxLX0NNRF9ERUxfREVWX0FTWU5D
+ICAgICAgIF9JT0NfTlIoVUJMS19VX0NNRF9ERUxfREVWX0FTWU5DKQ0KPj4gICAjZGVmaW5lIFVC
+TEtfQ01EX1VQREFURV9TSVpFIF9JT0NfTlIoVUJMS19VX0NNRF9VUERBVEVfU0laRSkNCj4+ICAg
+I2RlZmluZSBVQkxLX0NNRF9RVUlFU0NFX0RFViBfSU9DX05SKFVCTEtfVV9DTURfUVVJRVNDRV9E
+RVYpDQo+PiArI2RlZmluZSBVQkxLX0NNRF9UUllfU1RPUF9ERVYgICAgICAgIF9JT0NfTlIoVUJM
+S19VX0NNRF9UUllfU1RPUF9ERVYpDQo+Pg0KPj4gICAjZGVmaW5lIFVCTEtfSU9fUkVHSVNURVJf
+SU9fQlVGICAgICAgICAgICAgICBfSU9DX05SKFVCTEtfVV9JT19SRUdJU1RFUl9JT19CVUYpDQo+
+PiAgICNkZWZpbmUgVUJMS19JT19VTlJFR0lTVEVSX0lPX0JVRiAgICBfSU9DX05SKFVCTEtfVV9J
+T19VTlJFR0lTVEVSX0lPX0JVRikNCj4+IEBAIC03Myw3ICs3NCw4IEBADQo+PiAgICAgICAgICAg
+ICAgICB8IFVCTEtfRl9BVVRPX0JVRl9SRUcgXA0KPj4gICAgICAgICAgICAgICAgfCBVQkxLX0Zf
+UVVJRVNDRSBcDQo+PiAgICAgICAgICAgICAgICB8IFVCTEtfRl9QRVJfSU9fREFFTU9OIFwNCj4+
+IC0gICAgICAgICAgICAgfCBVQkxLX0ZfQlVGX1JFR19PRkZfREFFTU9OKQ0KPj4gKyAgICAgICAg
+ICAgICB8IFVCTEtfRl9CVUZfUkVHX09GRl9EQUVNT04gXA0KPj4gKyAgICAgICAgICAgICB8IFVC
+TEtfRl9TQUZFX1NUT1BfREVWKQ0KPj4NCj4+ICAgI2RlZmluZSBVQkxLX0ZfQUxMX1JFQ09WRVJZ
+X0ZMQUdTIChVQkxLX0ZfVVNFUl9SRUNPVkVSWSBcDQo+PiAgICAgICAgICAgICAgICB8IFVCTEtf
+Rl9VU0VSX1JFQ09WRVJZX1JFSVNTVUUgXA0KPj4gQEAgLTIzOSw2ICsyNDEsOCBAQCBzdHJ1Y3Qg
+dWJsa19kZXZpY2Ugew0KPj4gICAgICAgIHN0cnVjdCBkZWxheWVkX3dvcmsgICAgIGV4aXRfd29y
+azsNCj4+ICAgICAgICBzdHJ1Y3Qgd29ya19zdHJ1Y3QgICAgICBwYXJ0aXRpb25fc2Nhbl93b3Jr
+Ow0KPj4NCj4+ICsgICAgIGJvb2wgICAgICAgICAgICAgICAgICAgIGJsb2NrX29wZW47IC8qIHBy
+b3RlY3RlZCBieSBvcGVuX211dGV4ICovDQo+PiArDQo+PiAgICAgICAgc3RydWN0IHVibGtfcXVl
+dWUgICAgICAgKnF1ZXVlc1tdOw0KPj4gICB9Ow0KPj4NCj4+IEBAIC05MTksNiArOTIzLDkgQEAg
+c3RhdGljIGludCB1YmxrX29wZW4oc3RydWN0IGdlbmRpc2sgKmRpc2ssIGJsa19tb2RlX3QgbW9k
+ZSkNCj4+ICAgICAgICAgICAgICAgICAgICAgICAgcmV0dXJuIC1FUEVSTTsNCj4+ICAgICAgICB9
+DQo+Pg0KPj4gKyAgICAgaWYgKHViLT5ibG9ja19vcGVuKQ0KPj4gKyAgICAgICAgICAgICByZXR1
+cm4gLUVCVVNZOw0KPj4gKw0KPj4gICAgICAgIHJldHVybiAwOw0KPj4gICB9DQo+Pg0KPj4gQEAg
+LTMxODgsNyArMzE5NSw4IEBAIHN0YXRpYyBpbnQgdWJsa19jdHJsX2FkZF9kZXYoY29uc3Qgc3Ry
+dWN0IHVibGtzcnZfY3RybF9jbWQgKmhlYWRlcikNCj4+ICAgICAgICB1Yi0+ZGV2X2luZm8uZmxh
+Z3MgfD0gVUJMS19GX0NNRF9JT0NUTF9FTkNPREUgfA0KPj4gICAgICAgICAgICAgICAgVUJMS19G
+X1VSSU5HX0NNRF9DT01QX0lOX1RBU0sgfA0KPj4gICAgICAgICAgICAgICAgVUJMS19GX1BFUl9J
+T19EQUVNT04gfA0KPj4gLSAgICAgICAgICAgICBVQkxLX0ZfQlVGX1JFR19PRkZfREFFTU9OOw0K
+Pj4gKyAgICAgICAgICAgICBVQkxLX0ZfQlVGX1JFR19PRkZfREFFTU9OIHwNCj4+ICsgICAgICAg
+ICAgICAgVUJMS19GX1NBRkVfU1RPUF9ERVY7DQo+Pg0KPj4gICAgICAgIC8qIEdFVF9EQVRBIGlz
+bid0IG5lZWRlZCBhbnkgbW9yZSB3aXRoIFVTRVJfQ09QWSBvciBaRVJPIENPUFkgKi8NCj4+ICAg
+ICAgICBpZiAodWItPmRldl9pbmZvLmZsYWdzICYgKFVCTEtfRl9VU0VSX0NPUFkgfCBVQkxLX0Zf
+U1VQUE9SVF9aRVJPX0NPUFkgfA0KPj4gQEAgLTMzMDksNiArMzMxNywzNCBAQCBzdGF0aWMgdm9p
+ZCB1YmxrX2N0cmxfc3RvcF9kZXYoc3RydWN0IHVibGtfZGV2aWNlICp1YikNCj4+ICAgICAgICB1
+YmxrX3N0b3BfZGV2KHViKTsNCj4+ICAgfQ0KPj4NCj4+ICtzdGF0aWMgaW50IHVibGtfY3RybF90
+cnlfc3RvcF9kZXYoc3RydWN0IHVibGtfZGV2aWNlICp1YikNCj4+ICt7DQo+PiArICAgICBzdHJ1
+Y3QgZ2VuZGlzayAqZGlzazsNCj4+ICsgICAgIGludCByZXQgPSAwOw0KPj4gKw0KPj4gKyAgICAg
+ZGlzayA9IHVibGtfZ2V0X2Rpc2sodWIpOw0KPj4gKyAgICAgaWYgKCFkaXNrKQ0KPj4gKyAgICAg
+ICAgICAgICByZXR1cm4gLUVOT0RFVjsNCj4+ICsNCj4+ICsgICAgIG11dGV4X2xvY2soJmRpc2st
+Pm9wZW5fbXV0ZXgpOw0KPj4gKyAgICAgaWYgKGRpc2tfb3BlbmVycyhkaXNrKSA+IDApIHsNCj4+
+ICsgICAgICAgICAgICAgcmV0ID0gLUVCVVNZOw0KPj4gKyAgICAgICAgICAgICBnb3RvIHVubG9j
+azsNCj4+ICsgICAgIH0NCj4+ICsgICAgIHViLT5ibG9ja19vcGVuID0gdHJ1ZTsNCj4+ICsgICAg
+IC8qIHJlbGVhc2Ugb3Blbl9tdXRleCBhcyBkZWxfZ2VuZGlzaygpIHdpbGwgcmVhY3F1aXJlIGl0
+ICovDQo+PiArICAgICBtdXRleF91bmxvY2soJmRpc2stPm9wZW5fbXV0ZXgpOw0KPj4gKw0KPj4g
+KyAgICAgdWJsa19jdHJsX3N0b3BfZGV2KHViKTsNCj4+ICsgICAgIGdvdG8gb3V0Ow0KPj4gKw0K
+Pj4gK3VubG9jazoNCj4+ICsgICAgIG11dGV4X3VubG9jaygmZGlzay0+b3Blbl9tdXRleCk7DQo+
+PiArb3V0Og0KPj4gKyAgICAgdWJsa19wdXRfZGlzayhkaXNrKTsNCj4+ICsgICAgIHJldHVybiBy
+ZXQ7DQo+PiArfQ0KPj4gKw0KPj4gICBzdGF0aWMgaW50IHVibGtfY3RybF9nZXRfZGV2X2luZm8o
+c3RydWN0IHVibGtfZGV2aWNlICp1YiwNCj4+ICAgICAgICAgICAgICAgIGNvbnN0IHN0cnVjdCB1
+Ymxrc3J2X2N0cmxfY21kICpoZWFkZXIpDQo+PiAgIHsNCj4+IEBAIC0zNzA0LDYgKzM3NDAsNyBA
+QCBzdGF0aWMgaW50IHVibGtfY3RybF91cmluZ19jbWRfcGVybWlzc2lvbihzdHJ1Y3QgdWJsa19k
+ZXZpY2UgKnViLA0KPj4gICAgICAgIGNhc2UgVUJMS19DTURfRU5EX1VTRVJfUkVDT1ZFUlk6DQo+
+PiAgICAgICAgY2FzZSBVQkxLX0NNRF9VUERBVEVfU0laRToNCj4+ICAgICAgICBjYXNlIFVCTEtf
+Q01EX1FVSUVTQ0VfREVWOg0KPj4gKyAgICAgY2FzZSBVQkxLX0NNRF9UUllfU1RPUF9ERVY6DQo+
+PiAgICAgICAgICAgICAgICBtYXNrID0gTUFZX1JFQUQgfCBNQVlfV1JJVEU7DQo+PiAgICAgICAg
+ICAgICAgICBicmVhazsNCj4+ICAgICAgICBkZWZhdWx0Og0KPj4gQEAgLTM4MTcsNiArMzg1NCw5
+IEBAIHN0YXRpYyBpbnQgdWJsa19jdHJsX3VyaW5nX2NtZChzdHJ1Y3QgaW9fdXJpbmdfY21kICpj
+bWQsDQo+PiAgICAgICAgY2FzZSBVQkxLX0NNRF9RVUlFU0NFX0RFVjoNCj4+ICAgICAgICAgICAg
+ICAgIHJldCA9IHVibGtfY3RybF9xdWllc2NlX2Rldih1YiwgaGVhZGVyKTsNCj4+ICAgICAgICAg
+ICAgICAgIGJyZWFrOw0KPj4gKyAgICAgY2FzZSBVQkxLX0NNRF9UUllfU1RPUF9ERVY6DQo+PiAr
+ICAgICAgICAgICAgIHJldCA9IHVibGtfY3RybF90cnlfc3RvcF9kZXYodWIpOw0KPj4gKyAgICAg
+ICAgICAgICBicmVhazsNCj4+ICAgICAgICBkZWZhdWx0Og0KPj4gICAgICAgICAgICAgICAgcmV0
+ID0gLUVPUE5PVFNVUFA7DQo+PiAgICAgICAgICAgICAgICBicmVhazsNCj4+IGRpZmYgLS1naXQg
+YS9pbmNsdWRlL3VhcGkvbGludXgvdWJsa19jbWQuaCBiL2luY2x1ZGUvdWFwaS9saW51eC91Ymxr
+X2NtZC5oDQo+PiBpbmRleCBlYzc3ZGFiYmE0NWIuLjlkYWE4YWIzNzJmMCAxMDA2NDQNCj4+IC0t
+LSBhL2luY2x1ZGUvdWFwaS9saW51eC91YmxrX2NtZC5oDQo+PiArKysgYi9pbmNsdWRlL3VhcGkv
+bGludXgvdWJsa19jbWQuaA0KPj4gQEAgLTU1LDcgKzU1LDggQEANCj4+ICAgICAgICBfSU9XUign
+dScsIDB4MTUsIHN0cnVjdCB1Ymxrc3J2X2N0cmxfY21kKQ0KPj4gICAjZGVmaW5lIFVCTEtfVV9D
+TURfUVVJRVNDRV9ERVYgICAgICAgICAgICAgICBcDQo+PiAgICAgICAgX0lPV1IoJ3UnLCAweDE2
+LCBzdHJ1Y3QgdWJsa3Nydl9jdHJsX2NtZCkNCj4+IC0NCj4+ICsjZGVmaW5lIFVCTEtfVV9DTURf
+VFJZX1NUT1BfREVWICAgICAgICAgICAgICBcDQo+PiArICAgICBfSU9XUigndScsIDB4MTcsIHN0
+cnVjdCB1Ymxrc3J2X2N0cmxfY21kKQ0KPj4gICAvKg0KPj4gICAgKiA2NGJpdHMgYXJlIGVub3Vn
+aCBub3csIGFuZCBpdCBzaG91bGQgYmUgZWFzeSB0byBleHRlbmQgaW4gY2FzZSBvZg0KPj4gICAg
+KiBydW5uaW5nIG91dCBvZiBmZWF0dXJlIGZsYWdzDQo+PiBAQCAtMzExLDYgKzMxMiwxMiBAQA0K
+Pj4gICAgKi8NCj4+ICAgI2RlZmluZSBVQkxLX0ZfQlVGX1JFR19PRkZfREFFTU9OICgxVUxMIDw8
+IDE0KQ0KPj4NCj4+ICsvKg0KPj4gKyAqIFRoZSBkZXZpY2Ugc3VwcG9ydHMgdGhlIFVCTEtfQ01E
+X1RSWV9TVE9QX0RFViBjb21tYW5kLCB3aGljaA0KPj4gKyAqIGFsbG93cyBzdG9wcGluZyB0aGUg
+ZGV2aWNlIG9ubHkgaWYgdGhlcmUgYXJlIG5vIG9wZW5lcnMuDQo+PiArICovDQo+PiArI2RlZmlu
+ZSBVQkxLX0ZfU0FGRV9TVE9QX0RFViAoMVVMTCA8PCAxNykNCj4+ICsNCj4+ICAgLyogZGV2aWNl
+IHN0YXRlICovDQo+PiAgICNkZWZpbmUgVUJMS19TX0RFVl9ERUFEICAgICAgMA0KPj4gICAjZGVm
+aW5lIFVCTEtfU19ERVZfTElWRSAgICAgIDENCj4+IGRpZmYgLS1naXQgYS90b29scy90ZXN0aW5n
+L3NlbGZ0ZXN0cy91YmxrL2t1YmxrLmMgYi90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy91YmxrL2t1
+YmxrLmMNCj4+IGluZGV4IDE4NWJhNTUzNjg2YS4uNjczOWUyOGM0MDU5IDEwMDY0NA0KPj4gLS0t
+IGEvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMvdWJsay9rdWJsay5jDQo+PiArKysgYi90b29scy90
+ZXN0aW5nL3NlbGZ0ZXN0cy91YmxrL2t1YmxrLmMNCj4+IEBAIC0xNDU0LDYgKzE0NTQsNyBAQCBz
+dGF0aWMgaW50IGNtZF9kZXZfZ2V0X2ZlYXR1cmVzKHZvaWQpDQo+PiAgICAgICAgICAgICAgICBG
+RUFUX05BTUUoVUJMS19GX1FVSUVTQ0UpLA0KPj4gICAgICAgICAgICAgICAgRkVBVF9OQU1FKFVC
+TEtfRl9QRVJfSU9fREFFTU9OKSwNCj4+ICAgICAgICAgICAgICAgIEZFQVRfTkFNRShVQkxLX0Zf
+QlVGX1JFR19PRkZfREFFTU9OKSwNCj4+ICsgICAgICAgICAgICAgRkVBVF9OQU1FKFVCTEtfRl9T
+QUZFX1NUT1BfREVWKSwNCj4gDQo+IFdlIHVzdWFsbHkgc3BsaXQgZHJpdmVyIGFuZCB0ZXN0IGNv
+ZGUgaW50byBkaWZmZXJlbnQgcGF0Y2hlcywgYW5kIHRoZSBwYXRjaA0KPiBsb29rcyBmaW5lOg0K
+PiANCj4gUmV2aWV3ZWQtYnk6IE1pbmcgTGVpIDxtaW5nLmxlaUByZWRoYXQuY29tPg0KPiANCj4g
+QnV0IHdlIHVzdWFsbHkgc2VwYXJhdGUgdGVzdCBjb2RlIGZyb20gZHJpdmVyIGNoYW5nZSwgYWxz
+byBuZXcgZmVhdHVyZSBuZWVkcw0KPiBzZWxmdGVzdCBjb2RlIGZvciB2ZXJpZnlpbmcsIGNhbiB5
+b3UgbW92ZSBgK0ZFQVRfTkFNRShVQkxLX0ZfU0FGRV9TVE9QX0RFVilgIGludG8NCj4gdGhlIGF0
+dGFjaGVkIHNlbGZ0ZXN0IHBhdGNoIGFuZCBwb3N0IGFsbCAzIGluIHY1Pw0KPiANCj4gDQo+IA0K
+PiBUaGFua3MsDQo+IE1pbmcNCg0KSGksDQoNClRoYW5rIHlvdSBNaW5nLCBqdXN0IHRvIGJlIHN1
+cmU6DQpJJ2xsIHNwbGl0IHRoZSBrdWJsayBjaGFuZ2UgdG8gYSAzcmQgcGF0Y2ggLSB0aGF0J3Mg
+b2suDQpCdXQgZG8geW91IGFsc28gd2FudCBtZSB0byB3cml0ZSBhIHNlbGZ0ZXN0IGZvciB0aGlz
+IGZlYXR1cmUgYXMgcGFydCBvZiANCnRoZSAzcmQgcGF0Y2g/DQoNClRoYW5rIHlvdQ0K
