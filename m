@@ -1,84 +1,66 @@
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D616A283FDD
-	for <linux-block@vger.kernel.org>; Wed,  7 Jan 2026 11:01:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F2C7238166;
+	Wed,  7 Jan 2026 11:57:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767783705; cv=none; b=PZ9IE6W/YA0OyJdfJPCfh6Ak0R1lru3IgJtNy2k/qrcxDhUq99gVeTnx6uLd/j71zNd+mpotOsP++Uxj0i1rKcI7y63JTgvbsh6p56t6/6Zt8cJ7CX0LfwoV2+S85lu7PkmjTdRtuvLetOH4+cBPG0/xwLyxoGGSKH7z493j0J4=
+	t=1767787023; cv=none; b=eImndedoxtpdBeEKAbFojQdvPfOo1JJr0qWpY2Ulp4xJOJovB6gnSSJZIeDa45deCIxmtQQLyOFMdScfuCCxsAj6xVSv32bhhU4cIXlqw8Jnbv0cGDglmWrNw+5wvIGeafJEMX1FOQrtpuz6pMR7oyKWh+Ajk9rznKCnXgOv21s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767783705; c=relaxed/simple;
-	bh=1etL+6scw9quQ+KtPtj0BPbuo+bh7iGR/cBtgvirTqs=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qIkfuLjNUbjKlnZkTedUCwlQ1Ebr6UPYDcmno/pGdpG+PuWfDeiOzXk2jOyBvANLTQiWp4AS7V0/zTAiGYutkJcq1D9PGS38woDnwKMmgghG3veQHBd2I7GQM46jp3xTOurW1UPB8psX3f7INieF39ZD1hmZKFvEwpXEg5eY+tA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bM+aGmFJ; arc=none smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1767787023; c=relaxed/simple;
+	bh=mNpHcF+MwpeYkX9EkT3dgyo2t+tch8FndQ1ofJbAPRQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Lib/rEo2TrXGAw+PwoEEnmtV50OFHN2E6F4GrqAT+AFvXbCPDYi94svYY6vv8LQbQ5WLrW2OlLuKOsxW1JsMBKQSDjELNCqMO2KZ2DW1fn/romiRl0LMmSmjxI0RMQtPMDLdLxwMzcboqKBzUsdnDvAxuvRSx7hgpxBlLAoFMGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LeOVqk9+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bM+aGmFJ"
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-59b7073f61dso668864e87.2
-        for <linux-block@vger.kernel.org>; Wed, 07 Jan 2026 03:01:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767783702; x=1768388502; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=2vH7sVip8YBoc0jyqFGrFID1VITFPoEJ6FVSoKHW8RA=;
-        b=bM+aGmFJ+hksrjYPcfR6YOmbfEcTZ77SdhNaGJvRBQxsSD6jbgLv7Hx18aROVI6Mp0
-         aqNwR5y39h9VFGFHtnD71GxA/kpRNWZRACjb4UFnMft+MLCzHxr5Pn3HW+6KqQz10jxn
-         3lKHBhRNfzn3em22MmFynMMD9UsuMlDQ0oc+GrT8Nmg803jCZdKPEcu7PxZO8HWsKQ7v
-         ZSSTrnIor+bC63eGDv2hF22soSKGSL+86xbuRssBYJPUHzBsLT7WFIbh//yt4KjUNuj+
-         5dBzoAd14nG8DseSzANCfD/suJy/4VSfhDpcaB7vC6L1uelcr1W9pWbgIj+9KaJWaN0Z
-         s9gw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767783702; x=1768388502;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2vH7sVip8YBoc0jyqFGrFID1VITFPoEJ6FVSoKHW8RA=;
-        b=ctPH0ba1xvHrmZGLw9s2wQL/2vVzukYOaXKLVxIIUasco35rqCTZHXY/EltDd/Z34o
-         GI7q1CiqsC7EeCD85j1bKPE0+O2QrqYg1KF2ZPzlTocQGnJv1d/rb6jL+O5DSlst3g8i
-         4s2bcc6t+pi0nCwde689+SoD3DhmNpjQU5eWRdqeLaPa7rnqCtxKEZP3/ge0qeiAjA4+
-         O5JVDv3KkNgmJY90Ec+HIQW5IEO8kcc4CDw3DDYcwIJuFCkMKGsx+rS4kFs+vu68PLVS
-         cQ2rUNn0eX06pNTNvFyrVhQRDRzsaPEB7RVkKoV0rxBoKwmrRen+OfthqGAwe00jVbPQ
-         hFVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUAtSeHRen57jBhBsS8nAZD9plPBrP3CCOcIeM+MunOeWqI0IbJ3g83WIWTWoTHhCmwxQUPNYuiTBbG8w==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxq1OWbtBtSJOPoqyZqEPCfE0mX1LnceJd3PqS/kd0O6StnSS/8
-	/qCIl7X8ucvbXzBavudJceb5/11uAdd1U21Cfgq8ezBZ5T3BWslGuKDK
-X-Gm-Gg: AY/fxX4GY856tkiBjZawAQAXobcBy0SZy1u8UbowYVUHm8bN4Be/6IAhyt/nGhifGrH
-	RnDPa3cjZs/eDaS+uuBElKzrlzvuoq/u6dHFCdaI/ufmUbalw64PAsBpH3MsxIRpqqTdk948fAE
-	nR6pvosXunHulYb76syt+l99ZJUeZD/BRqyEK+tiEsfcBw2TUC4WvNvwM2Tnqa8w8CI7rCBWIqf
-	FdYxivt1HqfGIejdNNGPNcrl3rtvm9lbLn3YAA5FxGVx0omkp/EOnv6BCyzDv4bnMjbD+m5tUbc
-	hyX598t0O+zzBaenDLds3G8iG1HeiJPORCBmk8WHjf/FeHBQa3L1Ps11f/g1aXescwVmMToLgL9
-	j5iggmXAZqZokrqPSUWdgSkDBYF11NQpx4OfbgYa8M/bM08tQgdcz
-X-Google-Smtp-Source: AGHT+IGaA2Nx4sS8tB+fh0DIuVKmhBM0sprOcJlqgy094I7FKRtoJJoSZ+dObTTEY2owLZYluuBBgA==
-X-Received: by 2002:a05:6512:32ca:b0:592:ee1f:227a with SMTP id 2adb3069b0e04-59b6f04d3fbmr753449e87.43.1767783701201;
-        Wed, 07 Jan 2026 03:01:41 -0800 (PST)
-Received: from milan ([2001:9b1:d5a0:a500::24b])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-59b739a7349sm84043e87.8.2026.01.07.03.01.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Jan 2026 03:01:40 -0800 (PST)
-From: Uladzislau Rezki <urezki@gmail.com>
-X-Google-Original-From: Uladzislau Rezki <urezki@milan>
-Date: Wed, 7 Jan 2026 12:01:38 +0100
-To: Mikulas Patocka <mpatocka@redhat.com>
-Cc: Uladzislau Rezki <urezki@gmail.com>,
-	Fengnan Chang <fengnanchang@gmail.com>,
-	Yu Kuai <yukuai3@huawei.com>,
-	Fengnan Chang <changfengnan@bytedance.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
-	Joel Fernandes <joelagnelf@nvidia.com>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Boqun Feng <boqun.feng@gmail.com>, rcu@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: Re: [PATCH] blk-mq: avoid stall during boot due to
- synchronize_rcu_expedited
-Message-ID: <aV49En4-qub5af-C@milan>
-References: <8e5d6c26-4854-74f8-9f44-fdb1b74cf3c4@redhat.com>
- <aV04Vp3nmCg41YZD@pc636>
- <2720e388-9341-34af-21c5-0e5e1a822960@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LeOVqk9+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7530C2BC86;
+	Wed,  7 Jan 2026 11:56:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767787023;
+	bh=mNpHcF+MwpeYkX9EkT3dgyo2t+tch8FndQ1ofJbAPRQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LeOVqk9+TU5kCP+FDRa6whXFCQVaVEbDllyqM6h//SAX5uiVAXQ8VG7Am0rvJsC1H
+	 GqoHmEPSiac74Rt53FFrHdVYKM4/rFVqh30AdgVeV6vLWbAjvELEI1HTUOnJqZhRcl
+	 WUKTPSBfeNtl/h9hRKM1nu0OKjKz29OOH9dTct1GoghBZrfukj/3dyGolifM9h+2bh
+	 wbVLW2c8CGbXntqacDOCLSp8UU61M7HCX59PbmrBJjXYcCtF5Cx56s4+CUuypQTiMs
+	 aUdEwgtI6C7dlhy4lPby3E841CBfyCwkeyWL2UmPv7fe8h0pBCK+OfBWitaUqoPHxs
+	 uX/nyikfJSLNw==
+Date: Wed, 7 Jan 2026 11:56:53 +0000
+From: Simon Horman <horms@kernel.org>
+To: Frederic Weisbecker <frederic@kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Chen Ridong <chenridong@huawei.com>,
+	Danilo Krummrich <dakr@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Gabriele Monaco <gmonaco@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>, Tejun Heo <tj@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
+	Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+	linux-mm@kvack.org, linux-pci@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 13/33] sched/isolation: Convert housekeeping cpumasks to
+ rcu pointers
+Message-ID: <20260107115653.GA196631@kernel.org>
+References: <20260101221359.22298-1-frederic@kernel.org>
+ <20260101221359.22298-14-frederic@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -87,162 +69,62 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2720e388-9341-34af-21c5-0e5e1a822960@redhat.com>
+In-Reply-To: <20260101221359.22298-14-frederic@kernel.org>
 
-On Tue, Jan 06, 2026 at 05:59:16PM +0100, Mikulas Patocka wrote:
+On Thu, Jan 01, 2026 at 11:13:38PM +0100, Frederic Weisbecker wrote:
+> HK_TYPE_DOMAIN's cpumask will soon be made modifiable by cpuset.
+> A synchronization mechanism is then needed to synchronize the updates
+> with the housekeeping cpumask readers.
 > 
+> Turn the housekeeping cpumasks into RCU pointers. Once a housekeeping
+> cpumask will be modified, the update side will wait for an RCU grace
+> period and propagate the change to interested subsystem when deemed
+> necessary.
 > 
-> On Tue, 6 Jan 2026, Uladzislau Rezki wrote:
-> 
-> > On Tue, Jan 06, 2026 at 04:56:07PM +0100, Mikulas Patocka wrote:
-> > > On the kernel 6.19-rc, I am experiencing 15-second boot stall in a
-> > > virtual machine when probing a virtio-scsi disk:
-> > > [    1.011641] SCSI subsystem initialized
-> > > [    1.013972] virtio_scsi virtio6: 16/0/0 default/read/poll queues
-> > > [    1.015983] scsi host0: Virtio SCSI HBA
-> > > [    1.019578] ACPI: \_SB_.GSIA: Enabled at IRQ 16
-> > > [    1.020225] ahci 0000:00:1f.2: AHCI vers 0001.0000, 32 command slots, 1.5 Gbps, SATA mode
-> > > [    1.020228] ahci 0000:00:1f.2: 6/6 ports implemented (port mask 0x3f)
-> > > [    1.020230] ahci 0000:00:1f.2: flags: 64bit ncq only
-> > > [    1.024688] scsi host1: ahci
-> > > [    1.025432] scsi host2: ahci
-> > > [    1.025966] scsi host3: ahci
-> > > [    1.026511] scsi host4: ahci
-> > > [    1.028371] scsi host5: ahci
-> > > [    1.028918] scsi host6: ahci
-> > > [    1.029266] ata1: SATA max UDMA/133 abar m4096@0xfea23000 port 0xfea23100 irq 16 lpm-pol 1
-> > > [    1.029305] ata2: SATA max UDMA/133 abar m4096@0xfea23000 port 0xfea23180 irq 16 lpm-pol 1
-> > > [    1.029316] ata3: SATA max UDMA/133 abar m4096@0xfea23000 port 0xfea23200 irq 16 lpm-pol 1
-> > > [    1.029327] ata4: SATA max UDMA/133 abar m4096@0xfea23000 port 0xfea23280 irq 16 lpm-pol 1
-> > > [    1.029341] ata5: SATA max UDMA/133 abar m4096@0xfea23000 port 0xfea23300 irq 16 lpm-pol 1
-> > > [    1.029356] ata6: SATA max UDMA/133 abar m4096@0xfea23000 port 0xfea23380 irq 16 lpm-pol 1
-> > > [    1.118111] scsi 0:0:0:0: Direct-Access     QEMU     QEMU HARDDISK 2.5+ PQ: 0 ANSI: 5
-> > > [    1.348916] ata1: SATA link down (SStatus 0 SControl 300)
-> > > [    1.350713] ata2: SATA link down (SStatus 0 SControl 300)
-> > > [    1.351025] ata6: SATA link down (SStatus 0 SControl 300)
-> > > [    1.351160] ata5: SATA link down (SStatus 0 SControl 300)
-> > > [    1.351326] ata3: SATA link down (SStatus 0 SControl 300)
-> > > [    1.351536] ata4: SATA link down (SStatus 0 SControl 300)
-> > > [    1.449153] input: ImExPS/2 Generic Explorer Mouse as /devices/platform/i8042/serio1/input/input2
-> > > [   16.483477] sd 0:0:0:0: Power-on or device reset occurred
-> > > [   16.483691] sd 0:0:0:0: [sda] 2097152 512-byte logical blocks: (1.07 GB/1.00 GiB)
-> > > [   16.483762] sd 0:0:0:0: [sda] Write Protect is off
-> > > [   16.483877] sd 0:0:0:0: [sda] Write cache: enabled, read cache: enabled, doesn't support DPO or FUA
-> > > [   16.569225] sd 0:0:0:0: [sda] Attached SCSI disk
-> > > 
-> > > I bisected it and it is caused by the commit 89e1fb7ceffd which
-> > > introduces calls to synchronize_rcu_expedited.
-> > > 
-> > > This commit replaces synchronize_rcu_expedited and kfree with a call to 
-> > > kfree_rcu_mightsleep, avoiding the 15-second delay.
-> > > 
-> > > Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
-> > > Fixes: 89e1fb7ceffd ("blk-mq: fix potential uaf for 'queue_hw_ctx'")
-> > > 
-> > > ---
-> > >  block/blk-mq.c |    3 +--
-> > >  1 file changed, 1 insertion(+), 2 deletions(-)
-> > > 
-> > > Index: linux-2.6/block/blk-mq.c
-> > > ===================================================================
-> > > --- linux-2.6.orig/block/blk-mq.c	2026-01-06 16:45:11.000000000 +0100
-> > > +++ linux-2.6/block/blk-mq.c	2026-01-06 16:48:00.000000000 +0100
-> > > @@ -4553,8 +4553,7 @@ static void __blk_mq_realloc_hw_ctxs(str
-> > >  		 * Make sure reading the old queue_hw_ctx from other
-> > >  		 * context concurrently won't trigger uaf.
-> > >  		 */
-> > > -		synchronize_rcu_expedited();
-> > > -		kfree(hctxs);
-> > > +		kfree_rcu_mightsleep(hctxs);
-> > >
-> > I agree, doing freeing that way is not optimal. But kfree_rcu_mightsleep()
-> > also might not work. It has a fallback, if we can not place an object into
-> > "page" due to memory allocation failure, it inlines freeing:
-> > 
-> > <snip>
-> > synchronize_rcu();
-> > free().
-> > <snip>
-> > 
-> > Please note, synchronize_rcu() can easily be converted into expedited
-> > version. See rcu_gp_is_expedited().
-> > 
-> > --
-> > Uladzislau Rezki
-> 
-> Would this patch be better? It does GFP_KERNEL allocation which dones't 
-> fail in practice.
-> 
-> > Inlining is a corner case but it can happen. The best way is to add
-> > rcu_head to the blk_mq_hw_ctx structure and use kfree_rcu(). It never
-> > blocks.
-> 
-> We are not protecting the blk_mq_hw_ctx structure with RCU, we are 
-> protecting the q->queue_hw_ctx array. So, rcu_head cannot be added to an 
-> array. We could cast the array to rcu_head (and make sure that the initial 
-> allocation is at least sizeof(struct rcu_head)), but that is hacky.
-> 
-> Mikulas
-> 
+> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
 > ---
->  block/blk-mq.c |   23 +++++++++++++++++++++--
->  1 file changed, 21 insertions(+), 2 deletions(-)
+>  kernel/sched/isolation.c | 58 +++++++++++++++++++++++++---------------
+>  kernel/sched/sched.h     |  1 +
+>  2 files changed, 37 insertions(+), 22 deletions(-)
 > 
-> Index: linux-2.6/block/blk-mq.c
-> ===================================================================
-> --- linux-2.6.orig/block/blk-mq.c	2026-01-06 15:55:41.000000000 +0100
-> +++ linux-2.6/block/blk-mq.c	2026-01-06 16:22:40.000000000 +0100
-> @@ -4531,6 +4531,18 @@ static struct blk_mq_hw_ctx *blk_mq_allo
->  	return NULL;
+> diff --git a/kernel/sched/isolation.c b/kernel/sched/isolation.c
+> index 11a623fa6320..83be49ec2b06 100644
+> --- a/kernel/sched/isolation.c
+> +++ b/kernel/sched/isolation.c
+> @@ -21,7 +21,7 @@ DEFINE_STATIC_KEY_FALSE(housekeeping_overridden);
+>  EXPORT_SYMBOL_GPL(housekeeping_overridden);
+>  
+>  struct housekeeping {
+> -	cpumask_var_t cpumasks[HK_TYPE_MAX];
+> +	struct cpumask __rcu *cpumasks[HK_TYPE_MAX];
+>  	unsigned long flags;
+>  };
+>  
+> @@ -33,17 +33,28 @@ bool housekeeping_enabled(enum hk_type type)
 >  }
+>  EXPORT_SYMBOL_GPL(housekeeping_enabled);
 >  
-> +struct rcu_free_hctxs {
-> +	struct rcu_head head;
-> +	struct blk_mq_hw_ctx **hctxs;
-> +};
-> +
-> +static void rcu_free_hctxs(struct rcu_head *head)
+> +const struct cpumask *housekeeping_cpumask(enum hk_type type)
 > +{
-> +	struct rcu_free_hctxs *r = container_of(head, struct rcu_free_hctxs, head);
-> +	kfree(r->hctxs);
-> +	kfree(r);
-> +}
-> +
->  static void __blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
->  				     struct request_queue *q)
->  {
-> @@ -4539,6 +4551,7 @@ static void __blk_mq_realloc_hw_ctxs(str
->  
->  	if (q->nr_hw_queues < set->nr_hw_queues) {
->  		struct blk_mq_hw_ctx **new_hctxs;
-> +		struct rcu_free_hctxs *r;
->  
->  		new_hctxs = kcalloc_node(set->nr_hw_queues,
->  				       sizeof(*new_hctxs), GFP_KERNEL,
-> @@ -4553,8 +4566,14 @@ static void __blk_mq_realloc_hw_ctxs(str
->  		 * Make sure reading the old queue_hw_ctx from other
->  		 * context concurrently won't trigger uaf.
->  		 */
-> -		synchronize_rcu_expedited();
-> -		kfree(hctxs);
-> +		r = kmalloc(sizeof(struct rcu_free_hctxs), GFP_KERNEL);
-> +		if (!r) {
-> +			synchronize_rcu_expedited();
-> +			kfree(hctxs);
-> +		} else {
-> +			r->hctxs = hctxs;
-> +			call_rcu(&r->head, rcu_free_hctxs);
+> +	if (static_branch_unlikely(&housekeeping_overridden)) {
+> +		if (housekeeping.flags & BIT(type)) {
+> +			return rcu_dereference_check(housekeeping.cpumasks[type], 1);
 > +		}
->  		hctxs = new_hctxs;
->  	}
->  
-> > 
-> 
-I see. That will work but this looks like a temporary fix. It would be
-great to understand why synchronize_rcu_expedited() is blocked for so long.
-16 seconds is a way too long.
+> +	}
+> +	return cpu_possible_mask;
+> +}
+> +EXPORT_SYMBOL_GPL(housekeeping_cpumask);
+> +
 
-Is that easy to reproduce?
+Hi Frederic,
 
---
-Uladzislau Rezki
+I think this patch should also update the access to housekeeping.cpumasks
+in housekeeping_setup(), on line 200, to use housekeeping_cpumask().
+
+As is, sparse flags __rcu a annotation miss match there.
+
+  kernel/sched/isolation.c:200:80: warning: incorrect type in argument 3 (different address spaces)
+  kernel/sched/isolation.c:200:80:    expected struct cpumask const *srcp3
+  kernel/sched/isolation.c:200:80:    got struct cpumask [noderef] __rcu *
+
+...
