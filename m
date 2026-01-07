@@ -1,102 +1,99 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91B9742A9D
-	for <linux-block@vger.kernel.org>; Wed,  7 Jan 2026 04:11:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25A8E6A33B
+	for <linux-block@vger.kernel.org>; Wed,  7 Jan 2026 04:28:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767759082; cv=none; b=T7O9tZnCu0NRewvYPHyffLGQjUqqWfj69ETca98UDb8yUqg8c01iotkWmgiurKe6Fn8QiAbsDiUZm7M6gwpf4/xjFabrnhhjnNFaINsi48hUVIJ8U9m/qWLFD0ZKYqyHoWmHzkmVY37QIckBrKT/WFAnCptKkEscTJc3SSS4QrU=
+	t=1767760100; cv=none; b=j9Xiw8YvDQw/SVunoRNpiyU4GOOB7/6sMphB8tM0qbFdD+/gYCdvzUwTZmiqWBfX+F7p/9e/QT43KXex3tEq884T9GV9gO7J3wGPDoat9uUI+KFKMooL6KPCs6l0C3ujAEeK1r/JZXKK2EP2xhiWAULl+r0l1WlNarVHZu81HmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767759082; c=relaxed/simple;
-	bh=HqcGPuE5HInpGjr9ZdqPOWL8+0D6iiKhxDT8E0/yTRw=;
+	s=arc-20240116; t=1767760100; c=relaxed/simple;
+	bh=f2jhy0sSOQ92qHcYgk5u8vpOp8prFdML9fHvs0aUyDw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=blDETktBj2GRsNUF3Lxis/MZf/bfTlgR0Jn/XUJRx7gthMW2+8W2yqmquz3eXG/Tsz+f9IXUVE5p6sZ2nb2yOqTy5K6ZYEa1RK69EC2CZuqmxcyR2fBli2ZdSO7NhtgI0pyycuwFOrmuv5U/VdCucNrRJ32CqpFuU0UICNkwOXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F85AgaWL; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=GFYj0EDvb8T0QYCTZ70d+zvArwz17h/0CcmJjq6wku5BhurfOQIW5rrq4g/csJ7HlfgiOiLKYjr5uAt5A2YKZJZdPoQgGdHb/yEHUMDFYhAtOch0QIx1Pk/4CYendZLBaJ4VDQtTGTHPdNhhThBnb+wNPlepl86FaBrYQtYyWKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=YXQ6gvuY; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F85AgaWL"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767759079;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Jin/vEZZymCL/DVlcrCtAux5SXI8ULCxtzzAdOtrPIM=;
-	b=F85AgaWLF1maHGj/KXWVAPggEa44dKqcb+6j4Fol5ax9gNSRhY50rBRN30OvzIPyIt5Cbu
-	HGyv6f8wCUsT6q8sfX5Sp2I6doQ1yokXwG2/tNIR+/5a6oocuFra3vAxlowaZjlKdIVmcC
-	Rv4Lm6vlDhhQru/OJz1AvpHtWk/0jzs=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-440-LaAqKakxOKmbs_u_avyUkA-1; Tue,
- 06 Jan 2026 23:11:16 -0500
-X-MC-Unique: LaAqKakxOKmbs_u_avyUkA-1
-X-Mimecast-MFC-AGG-ID: LaAqKakxOKmbs_u_avyUkA_1767759075
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D6F5B195608A;
-	Wed,  7 Jan 2026 04:11:14 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.130])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 57B64180009E;
-	Wed,  7 Jan 2026 04:11:10 +0000 (UTC)
-Date: Wed, 7 Jan 2026 12:11:06 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Cc: io-uring@vger.kernel.org, Caleb Sander Mateos <csander@purestorage.com>,
-	Nitesh Shetty <nj.shetty@samsung.com>
-Subject: Re: [PATCH V2 0/3] block: avoid to use bi_vcnt in
- bio_may_need_split()
-Message-ID: <aV3c2jrL-ykptXhf@fedora>
-References: <20251231030101.3093960-1-ming.lei@redhat.com>
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="YXQ6gvuY"
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-bcfd82f55ebso146062a12.1
+        for <linux-block@vger.kernel.org>; Tue, 06 Jan 2026 20:28:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1767760098; x=1768364898; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=lHnkuioL4uAKz+quBgfo5p0xKOWMA07CTVehzvC4g0g=;
+        b=YXQ6gvuYl27wkQ3XJ9UscMkJ0c3nFbDNwErLYCl2OT0h9plsg9ilBlcA+cWEUfRjBa
+         0V7RYMmZy42dpXECgqBe494yCwnUw/8Fp0kHj0ieAaam0y03dZajROwR7VGP6PNwAPNl
+         xbuZY+TirTMP7AyCJbkflGC9zmXv49GsSiOTE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767760098; x=1768364898;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lHnkuioL4uAKz+quBgfo5p0xKOWMA07CTVehzvC4g0g=;
+        b=u+/zNkoGU3lIpKD6ul8SkOVVj5APu1qwIM6QZzaI2cAQAc8x9eHnWKTYm6He6Wx1TT
+         FO151V41ckhC7oSaolsSACwAzRX5FRUi6ycOxkEv0483LiA/N5BPaFwJkrDcahah23lE
+         x3ublvkd4sDMbB6ulM0swDcUsHdL0vwzRnCsK7OHogbP7uJJSZN+9duuWnMaCFKGySBp
+         UwAD8lMwfH3VVl8WFjfVQZG/1WlDu5QhT/j49mj7LZ8pd2j5zvV9K+japcJsE/rBqtXi
+         FUlE7N1cJV4IljlQZGo8KKfCx1fAPVwwVS3W15Cl2DOHYyUTzLK0zisVaqc0COJURWsZ
+         GVTg==
+X-Forwarded-Encrypted: i=1; AJvYcCUUf91sDbGagCT6mpT8F9usHj2ek8cd+V0hOvrTfofOjGKnvlA5NOoOTadtYbFilB31OBIhb7qkamwnvQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzIoou4fU2oKI5EwoQEC4h2xbf1IBjHEZGL/izaiAq6dqvgqFUj
+	QjSstr4FnPK7rF+dKY19KuPt/UNor1PjS0wf4aQ+MnkQ6jbkxs1/dyy3mfOBCpsVAw==
+X-Gm-Gg: AY/fxX43hkfvIWjP3TFhqqKaxS649E/xA9hWVeZWE7LhHTaBGvqyWUZviMBHBy4h35k
+	rRtft5sp1plIxg/z1MGA8eTMas2/Suuh29/WZ1/wrRTH9+sXR4LGCUyha2jbsAqFixAkXbBxDMm
+	vYxfvpZDbVnoyUduefEoSZqWFJKXH7wVSeAnxQduM5KUDmE03uyLWoQ/W/KQsbdWFYxtIx7GEq2
+	rkAkkIEVCac7hhzKz9yv1U59AQd9pW8rOFR49DgYxjufXjQmxjEbVNTpAgyxEE2z5rQsM2GmdnW
+	6H1xo/mzaG1cRtdBhPWNap2cS26ug7luptM+uGJOpbMs+LNzAYvTMLOEF7W//kHS44xB/Yo4zZD
+	ELOeeVy2i+SQKi15CDUAQAVRXpnM1VB9PtrFdQTkHW9/oEWYk/lgardrdg16W9sbrVCF8FZQ3rk
+	N9n1jKhmtzPGxth6EnFXzPpLSRQPgAG61gnJEpaPRq/hkfe0iUW0Y=
+X-Google-Smtp-Source: AGHT+IGeUQkxH4Y6IawwUJQJllB/6lg+8Ctvx8R3Cj+8E1aOahzcqPjitaieJ2XpuHPozrGfu9gLJw==
+X-Received: by 2002:a17:90b:49:b0:340:8d99:49d4 with SMTP id 98e67ed59e1d1-34f5f831cabmr3930755a91.1.1767760098369;
+        Tue, 06 Jan 2026 20:28:18 -0800 (PST)
+Received: from google.com ([2a00:79e0:2031:6:9f6a:2617:8891:93ff])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34f5f7b1d81sm3584165a91.1.2026.01.06.20.28.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Jan 2026 20:28:16 -0800 (PST)
+Date: Wed, 7 Jan 2026 13:28:11 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: zhangdongdong <zhangdongdong925@sina.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, Richard Chang <richardycc@google.com>, 
+	Minchan Kim <minchan@kernel.org>, Brian Geffon <bgeffon@google.com>, 
+	David Stevens <stevensd@google.com>, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-block@vger.kernel.org, Minchan Kim <minchan@google.com>
+Subject: Re: [PATCHv2 1/7] zram: introduce compressed data writeback
+Message-ID: <7bnmkuodymm33yclp6e5oir2sqnqmpwlsb5qlxqyawszb5bvlu@l63wu3ckqihc>
+References: <20251201094754.4149975-1-senozhatsky@chromium.org>
+ <20251201094754.4149975-2-senozhatsky@chromium.org>
+ <40e38fa7-725b-407a-917a-59c5a76dedcb@sina.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20251231030101.3093960-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <40e38fa7-725b-407a-917a-59c5a76dedcb@sina.com>
 
-On Wed, Dec 31, 2025 at 11:00:54AM +0800, Ming Lei wrote:
-> This series cleans up bio handling to use bi_iter consistently for both
-> cloned and non-cloned bios, removing the reliance on bi_vcnt which is
-> only meaningful for non-cloned bios.
+On (26/01/07 11:50), zhangdongdong wrote:
+> Hi Sergey,
 > 
-> Currently, bio_may_need_split() uses bi_vcnt to check if a bio has a
-> single segment. While this works, it's inconsistent with how cloned bios
-> operate - they use bi_iter for iteration, not bi_vcnt. This inconsistency
-> led to io_uring needing to recalculate iov_iter.nr_segs to ensure bi_vcnt
-> gets a correct value when copied.
+> Thanks for the work on decompression-on-demand.
 > 
-> This series unifies the approach:
-> 
-> 1. Make bio_may_need_split() use bi_iter instead of bi_vcnt. This handles
->    both cloned and non-cloned bios in a consistent way. Also move bi_io_vec
->    adjacent to bi_iter in struct bio since they're commonly accessed
->    together.
-> 
-> 2. Stop copying iov_iter.nr_segs to bi_vcnt in bio_iov_bvec_set(), since
->    cloned bios should rely on bi_iter, not bi_vcnt.
-> 
-> 3. Remove the nr_segs recalculation in io_uring, which was only needed
->    to provide an accurate bi_vcnt value.
-> 
-> Nitesh verified no performance regression on NVMe 512-byte fio/t/io_uring
-> workloads.
-> 
-> V2:
-> 	- improve bio layout by putting bi_iter and bi_io_vec together
-> 	- improve commit log
+> One concern I’d like to raise is the use of a workqueue for readback
+> decompression. In our measurements, deferring decompression to a worker
+> introduces non-trivial scheduling overhead, and under memory pressure
+> the added latency can be noticeable (tens of milliseconds in some cases).
 
-Hello Guys,
+The problem is those bio completions happen in atomic context, and zram
+requires both compression and decompression to be non-atomic.  And we
+can't do sync read on the zram side, because those bio-s are chained.
+So the current plan is to look how system hi-prio per-cpu workqueue
+will handle this.
 
-Ping...
-
-
-Thanks,
-Ming
-
+Did you try high priority workqueue?
