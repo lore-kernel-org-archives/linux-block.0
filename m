@@ -1,66 +1,56 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F2C7238166;
-	Wed,  7 Jan 2026 11:57:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4AED309DCB
+	for <linux-block@vger.kernel.org>; Wed,  7 Jan 2026 12:05:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767787023; cv=none; b=eImndedoxtpdBeEKAbFojQdvPfOo1JJr0qWpY2Ulp4xJOJovB6gnSSJZIeDa45deCIxmtQQLyOFMdScfuCCxsAj6xVSv32bhhU4cIXlqw8Jnbv0cGDglmWrNw+5wvIGeafJEMX1FOQrtpuz6pMR7oyKWh+Ajk9rznKCnXgOv21s=
+	t=1767787504; cv=none; b=Slomq1K8dG8rmwkczsajo7eNxHqR8+Tnmz+jPXImQlux0i4wstqJSozb1e//8no4sXo084K0hdh/ALrJFsAxb3PkB0lm281Fp3aoQtrOu//uxlEigs3N36ri0jTqsD9dsfaOw4pAFlmhYmGvBoMl5xfVHedrszvwO3dd5iThb/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767787023; c=relaxed/simple;
-	bh=mNpHcF+MwpeYkX9EkT3dgyo2t+tch8FndQ1ofJbAPRQ=;
+	s=arc-20240116; t=1767787504; c=relaxed/simple;
+	bh=cPgjr0c3tnXSioGQ2Pv3K/ip8s3yZgvsmdFIOWNrCAU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Lib/rEo2TrXGAw+PwoEEnmtV50OFHN2E6F4GrqAT+AFvXbCPDYi94svYY6vv8LQbQ5WLrW2OlLuKOsxW1JsMBKQSDjELNCqMO2KZ2DW1fn/romiRl0LMmSmjxI0RMQtPMDLdLxwMzcboqKBzUsdnDvAxuvRSx7hgpxBlLAoFMGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LeOVqk9+; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=tb019HBl6o24Fp/Xuk1YFR6vhrBd/Eh9XHqWFR9lB6d+cRc6Jq3fBAr3i6lun/n19b8KJ2AMlK1zXYXrBLYn7nxihaoEIL9WUUU1YLmqz9W5cYnsMHXTZMtMQ75Ns6EenenPV3dTHTmELAofCJovXoNujuYMzrnMXYCDT8RGvcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G90Qed1p; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LeOVqk9+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7530C2BC86;
-	Wed,  7 Jan 2026 11:56:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767787023;
-	bh=mNpHcF+MwpeYkX9EkT3dgyo2t+tch8FndQ1ofJbAPRQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LeOVqk9+TU5kCP+FDRa6whXFCQVaVEbDllyqM6h//SAX5uiVAXQ8VG7Am0rvJsC1H
-	 GqoHmEPSiac74Rt53FFrHdVYKM4/rFVqh30AdgVeV6vLWbAjvELEI1HTUOnJqZhRcl
-	 WUKTPSBfeNtl/h9hRKM1nu0OKjKz29OOH9dTct1GoghBZrfukj/3dyGolifM9h+2bh
-	 wbVLW2c8CGbXntqacDOCLSp8UU61M7HCX59PbmrBJjXYcCtF5Cx56s4+CUuypQTiMs
-	 aUdEwgtI6C7dlhy4lPby3E841CBfyCwkeyWL2UmPv7fe8h0pBCK+OfBWitaUqoPHxs
-	 uX/nyikfJSLNw==
-Date: Wed, 7 Jan 2026 11:56:53 +0000
-From: Simon Horman <horms@kernel.org>
-To: Frederic Weisbecker <frederic@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Chen Ridong <chenridong@huawei.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Gabriele Monaco <gmonaco@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Marco Crivellari <marco.crivellari@suse.com>,
-	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
-	"Rafael J . Wysocki" <rafael@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>, Tejun Heo <tj@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
-	Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
-	linux-mm@kvack.org, linux-pci@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 13/33] sched/isolation: Convert housekeeping cpumasks to
- rcu pointers
-Message-ID: <20260107115653.GA196631@kernel.org>
-References: <20260101221359.22298-1-frederic@kernel.org>
- <20260101221359.22298-14-frederic@kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G90Qed1p"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767787498;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YCh8v5X4plTO2AJyzJWnSf2omIF5Jqns6VnxxjVYSrw=;
+	b=G90Qed1p9p3zYc/9NmtsQyXtbXJ7y/KHexii1Wi7GL5pQw5hDRsbhj8saoJ1orv6MrWWhB
+	2MgYNsC4IW/ZAS5Uu3W6Y25/tZGI7c6xIuMXLz9UnnFukjC1GXyoC3pWksPdwE9dsL3gvP
+	SRSg7OkNOIR+1e3fHqkdcl1vuJfRLDA=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-489-vJJHoaRAN4yC5UqFT8v2ew-1; Wed,
+ 07 Jan 2026 07:04:55 -0500
+X-MC-Unique: vJJHoaRAN4yC5UqFT8v2ew-1
+X-Mimecast-MFC-AGG-ID: vJJHoaRAN4yC5UqFT8v2ew_1767787494
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0E8B5180047F;
+	Wed,  7 Jan 2026 12:04:54 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.199])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3EB5C1800109;
+	Wed,  7 Jan 2026 12:04:48 +0000 (UTC)
+Date: Wed, 7 Jan 2026 20:04:43 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Yu Kuai <yukuai@fnnas.com>
+Cc: axboe@kernel.dk, linux-block@vger.kernel.org, tj@kernel.org,
+	nilay@linux.ibm.com
+Subject: Re: [PATCH v7 09/16] blk-throttle: fix possible deadlock for fs
+ reclaim under rq_qos_mutex
+Message-ID: <aV5L25KZkM4dvzLD@fedora>
+References: <20251231085126.205310-1-yukuai@fnnas.com>
+ <20251231085126.205310-10-yukuai@fnnas.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -69,62 +59,28 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260101221359.22298-14-frederic@kernel.org>
+In-Reply-To: <20251231085126.205310-10-yukuai@fnnas.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Thu, Jan 01, 2026 at 11:13:38PM +0100, Frederic Weisbecker wrote:
-> HK_TYPE_DOMAIN's cpumask will soon be made modifiable by cpuset.
-> A synchronization mechanism is then needed to synchronize the updates
-> with the housekeeping cpumask readers.
+On Wed, Dec 31, 2025 at 04:51:19PM +0800, Yu Kuai wrote:
+> blk_throtl_init() can be called with rq_qos_mutex held from blkcg
+> configuration, and fs reclaim can be triggered because GFP_KERNEL is used
+> to allocate memory. This can deadlock because rq_qos_mutex can be held
+> with queue frozen.
 > 
-> Turn the housekeeping cpumasks into RCU pointers. Once a housekeeping
-> cpumask will be modified, the update side will wait for an RCU grace
-> period and propagate the change to interested subsystem when deemed
-> necessary.
+> Fix the problem by using blkg_conf_open_bdev_frozen(), also remove
+> useless queue frozen from blk_throtl_init().
 > 
-> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+> Signed-off-by: Yu Kuai <yukuai@fnnas.com>
 > ---
->  kernel/sched/isolation.c | 58 +++++++++++++++++++++++++---------------
->  kernel/sched/sched.h     |  1 +
->  2 files changed, 37 insertions(+), 22 deletions(-)
-> 
-> diff --git a/kernel/sched/isolation.c b/kernel/sched/isolation.c
-> index 11a623fa6320..83be49ec2b06 100644
-> --- a/kernel/sched/isolation.c
-> +++ b/kernel/sched/isolation.c
-> @@ -21,7 +21,7 @@ DEFINE_STATIC_KEY_FALSE(housekeeping_overridden);
->  EXPORT_SYMBOL_GPL(housekeeping_overridden);
->  
->  struct housekeeping {
-> -	cpumask_var_t cpumasks[HK_TYPE_MAX];
-> +	struct cpumask __rcu *cpumasks[HK_TYPE_MAX];
->  	unsigned long flags;
->  };
->  
-> @@ -33,17 +33,28 @@ bool housekeeping_enabled(enum hk_type type)
->  }
->  EXPORT_SYMBOL_GPL(housekeeping_enabled);
->  
-> +const struct cpumask *housekeeping_cpumask(enum hk_type type)
-> +{
-> +	if (static_branch_unlikely(&housekeeping_overridden)) {
-> +		if (housekeeping.flags & BIT(type)) {
-> +			return rcu_dereference_check(housekeeping.cpumasks[type], 1);
-> +		}
-> +	}
-> +	return cpu_possible_mask;
-> +}
-> +EXPORT_SYMBOL_GPL(housekeeping_cpumask);
-> +
 
-Hi Frederic,
+I think this patch goes toward wrong direction by enlarging queue freeze
+scope, and blkg_conf_prep() may run into percpu allocation, then new
+lockdep warning could be triggered.
 
-I think this patch should also update the access to housekeeping.cpumasks
-in housekeeping_setup(), on line 200, to use housekeeping_cpumask().
+IMO, we should try to reduce blkg_conf_open_bdev_frozen() uses, instead of
+adding more.
 
-As is, sparse flags __rcu a annotation miss match there.
+Thanks,
+Ming
 
-  kernel/sched/isolation.c:200:80: warning: incorrect type in argument 3 (different address spaces)
-  kernel/sched/isolation.c:200:80:    expected struct cpumask const *srcp3
-  kernel/sched/isolation.c:200:80:    got struct cpumask [noderef] __rcu *
-
-...
