@@ -1,99 +1,135 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8FCF1EB9E1;
-	Wed,  7 Jan 2026 19:05:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C903B33507E
+	for <linux-block@vger.kernel.org>; Wed,  7 Jan 2026 19:26:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767812736; cv=none; b=oRKZozxZSSjwdTs+XF5CkwfYYHV0+IJmC5Yr9FleceiiYhmjFOnlWyJt1A6+9rGPhtpodPcTKZIK8MtsWCzBqqA1CnCDJ9zTOPVVFMm2zH2I+BfD5eGrkUb021Ywr57A4/xuiDhO163hZwgnEknaWLZ7ieTKiFJtl3Tp6CcrJds=
+	t=1767813995; cv=none; b=gP5RV6GdTnw1QogDuO1aRx2bSQcq66Vp1wBL6I8FgkNJYNzQWTrx1N3C+pEMnvIORQslUC8ED4whhtR9p7Na3pyh6l33j7wi2Dkfj5SqkEd1OqqmjltrkoEj2WeAjLqvD9IltgDK3XxluYnZ2SD+AOOPfLxxBvOVlUslPSnv22A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767812736; c=relaxed/simple;
-	bh=cXrxAzv98+rTuAo6AZR2IpL01l/GgbnBK6hzUkgo918=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=JgW3CwVayZkeEv8ASfTK2hgrZg9l9Ds+Vy1KmLG2IHtz2ENkZi7Na8ie8hFo8KwC0Kng3X7ijrci6B6lOfPlXSi/54Bbiap9dxphnsAok6SYZ+YcP39BtNQBwuJPOI69yaOFewP/u9UyqEX7R5fBszfNvOyARhrGQ0HgAZvnWaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A4RHJTdV; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1767813995; c=relaxed/simple;
+	bh=MTYMrV+Yymv4Cd/avn0CLByEMclgUVINm5O/bdwOWB8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rMPlearbD6Llm240DLfpigJ2znUaMdUpga8ZuZu2CmLYuDAwkxb1ukQPt2fCr3uFyGggqODoa7wi3/oJgQunFcC9onlPUEgAf4+W2vrSM145ZIUf6GOf4bmGnhwApk4b0RI1RE3PSM+zDC2eC2+L1bj+Hl29XjXCc8tFubAraM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ksCe5Bo/; arc=none smtp.client-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A4RHJTdV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F10CC4CEF1;
-	Wed,  7 Jan 2026 19:05:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767812735;
-	bh=cXrxAzv98+rTuAo6AZR2IpL01l/GgbnBK6hzUkgo918=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=A4RHJTdVg2eo8w4IuucYp7SsRoCH3YT//hVw93Zkkrf5yuY7VdVHzXn5p17rzjL12
-	 qFhnYO1sBxAF8pzvUHMpneAhxajxGMSSn/P5eWKV8DgEr+V8cC0I0it/mxBoIwnpzA
-	 ZTG5e65Y87dMZvAKJQ5K5dt9Ppt1bkZCnEZg46y9U/FleUdZZwCi/IwOgRoSRZueGl
-	 wWU3xb2cH5R7JKWBRu+isqhIrXzOJQiW5H8Z0OLzuYO0YHMw3moiytq6UZetkvnrs/
-	 q+BCtxWtQqAd1Xg6v3hFI08liH2/hzx+9bPTHbu7bb9UT4hw/68aVlXtLjWeg5+mZk
-	 TljZ3k+3lL8bg==
-Date: Wed, 7 Jan 2026 13:05:34 -0600
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Frederic Weisbecker <frederic@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Chen Ridong <chenridong@huawei.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Gabriele Monaco <gmonaco@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Marco Crivellari <marco.crivellari@suse.com>,
-	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
-	"Rafael J . Wysocki" <rafael@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
-	Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
-	linux-mm@kvack.org, linux-pci@vger.kernel.org,
-	netdev@vger.kernel.org, Jinhui Guo <guojinhui.liam@bytedance.com>
-Subject: Re: [PATCH 01/33] PCI: Prepare to protect against concurrent
- isolated cpuset change
-Message-ID: <20260107190534.GA441483@bhelgaas>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ksCe5Bo/"
+Message-ID: <e26b8ff0-c176-4d94-a25a-4e29992611c1@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1767813980;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WcB8G3y5iz+8intAQ2MzrTuvbBYtEhwRblwqeC5cVu4=;
+	b=ksCe5Bo/EPvK+Yybn2Q4RtDdQIIfm2yAJStNI/8d7/7WVqQsANcOBJj465bf6HWSAzwhLs
+	Ty4edCKZq2IY9d/jXLadET9lMp3SLgo6JPTJ5EHVC7LP/fu65QsgKSjByKGo5N8Wg51DKP
+	oMU66hLaVaQ2xlxQfVuoWnI746hW/ig=
+Date: Wed, 7 Jan 2026 11:26:16 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260101221359.22298-2-frederic@kernel.org>
+Subject: Re: kernel build failure when CONFIG_DEBUG_INFO_BTF and CONFIG_KCSAN
+ are enabled
+Content-Language: en-GB
+To: Nilay Shroff <nilay@linux.ibm.com>, Alan Adamson
+ <alan.adamson@oracle.com>, bpf@vger.kernel.org
+Cc: Bart Van Assche <bvanassche@acm.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <42a1b4b0-83d0-4dda-b1df-15a1b7c7638d@linux.ibm.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yonghong Song <yonghong.song@linux.dev>
+In-Reply-To: <42a1b4b0-83d0-4dda-b1df-15a1b7c7638d@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-[+cc Jinhui]
 
-On Thu, Jan 01, 2026 at 11:13:26PM +0100, Frederic Weisbecker wrote:
-> HK_TYPE_DOMAIN will soon integrate cpuset isolated partitions and
-> therefore be made modifiable at runtime. Synchronize against the cpumask
-> update using RCU.
-> 
-> The RCU locked section includes both the housekeeping CPU target
-> election for the PCI probe work and the work enqueue.
-> 
-> This way the housekeeping update side will simply need to flush the
-> pending related works after updating the housekeeping mask in order to
-> make sure that no PCI work ever executes on an isolated CPU. This part
-> will be handled in a subsequent patch.
-> 
-> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
 
-Just FYI, Jinhui posted a series that touches this same code and might
-need some coordination:
+On 11/26/25 2:29 AM, Nilay Shroff wrote:
+> Hi,
+>
+> I am encountering the following build failures when compiling the kernel source checked out
+> from the for-6.19/block branch [1]:
+>
+>    KSYMS   .tmp_vmlinux2.kallsyms.S
+>    AS      .tmp_vmlinux2.kallsyms.o
+>    LD      vmlinux.unstripped
+>    BTFIDS  vmlinux.unstripped
+> WARN: multiple IDs found for 'task_struct': 110, 3046 - using 110
+> WARN: multiple IDs found for 'module': 170, 3055 - using 170
+> WARN: multiple IDs found for 'file': 697, 3130 - using 697
+> WARN: multiple IDs found for 'vm_area_struct': 714, 3140 - using 714
+> WARN: multiple IDs found for 'seq_file': 1060, 3167 - using 1060
+> WARN: multiple IDs found for 'cgroup': 2355, 3304 - using 2355
+> WARN: multiple IDs found for 'inode': 553, 3339 - using 553
+> WARN: multiple IDs found for 'path': 586, 3369 - using 586
+> WARN: multiple IDs found for 'bpf_prog': 2565, 3640 - using 2565
+> WARN: multiple IDs found for 'bpf_map': 2657, 3837 - using 2657
+> WARN: multiple IDs found for 'bpf_link': 2849, 3965 - using 2849
+> [...]
+> make[2]: *** [scripts/Makefile.vmlinux:72: vmlinux.unstripped] Error 255
+> make[2]: *** Deleting file 'vmlinux.unstripped'
+> make[1]: *** [/home/src/linux/Makefile:1242: vmlinux] Error 2
+> make: *** [Makefile:248: __sub-make] Error 2
+>
+>
+> The build failure appears after commit 42adb2d4ef24 (“fs: Add the __data_racy annotation
+> to backing_dev_info.ra_pages”) and commit 935a20d1bebf (“block: Remove queue freezing
+> from several sysfs store callbacks”). However, the root cause does not seem to be specific
+> to these commits or to the block layer changes themselves. Instead, the issue is triggered
+> by the introduction of the __data_racy annotation on several fields in struct request_queue
+> and struct backing_dev_info.
+>
+> It seems likely that some compilation units are built with KCSAN disabled, in which case
+> the preprocessor expands __data_racy to nothing. Other units have KCSAN enabled, where
+> __data_racy expands to the volatile qualifier. This results in two different versions
+> of both struct request_queue and struct backing_dev_info: one where fields such as
+> rq_timeout or ra_pages are declared volatile, and another where they are not.
+>
+> During BTF generation, the resolver encounters these conflicting type definitions.
+> Although the reported error does not explicitly reference struct request_queue or
+> struct backing_dev_info, it likely surfaces through types such as task_struct or
+> others that embed these structures deep within their type hierarchies.
+>
+> For reference, gcc and pahole versions are shown below. Also, attached kernel .config:
+>
+> # gcc --version
+> gcc (GCC) 11.4.1 20231218 (Red Hat 11.4.1-3)
+> Copyright (C) 2021 Free Software Foundation, Inc.
+> This is free software; see the source for copying conditions.  There is NO
+> warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+>
+> # pahole --version
+> v1.27
+>
+> [1] https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git/log/?h=for-6.19/block
 
-  https://lore.kernel.org/r/20260107175548.1792-1-guojinhui.liam@bytedance.com
+I tried with clang with CONFIG_DEBUG_INFO_BTF and CONFIG_KCSAN enabled.
+I am using the latest bpf-next.
+   $ make LLVM=1 -j
+   ...
+   KSYMS   .tmp_vmlinux0.kallsyms.S
+   AS      .tmp_vmlinux0.kallsyms.o
+   LD      .tmp_vmlinux1
+   BTF     .tmp_vmlinux1
+      <==== hang here
 
-IIUC, Jinhui's series adds some more NUMA smarts in the driver core
-sync probing path and removes corresponding NUMA code from the PCI
-core probe path.
+^Cmake[2]: *** [/home/yhs/work/bpf-next/scripts/Makefile.vmlinux:72: vmlinux.unstripped] Interrupt
+make[1]: *** [/home/yhs/work/bpf-next/Makefile:1277: vmlinux] Interrupt
+make: *** [/home/yhs/work/bpf-next/Makefile:248: __sub-make] Interrupt
 
-Bjorn
+I am using latest clang22 and latest pahole master (v1.31).
+
+I will debug further from clang side.
+
+
+>
+> Thanks,
+> --Nilay
+
