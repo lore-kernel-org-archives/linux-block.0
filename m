@@ -1,47 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8568F441034
-	for <linux-block@vger.kernel.org>; Thu,  8 Jan 2026 12:14:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93F374AC79F
+	for <linux-block@vger.kernel.org>; Thu,  8 Jan 2026 12:20:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767874491; cv=none; b=FFYiWQyvQL2Ab4zoQCrFt3c8Ec3mg8R6I1G0eSHW9Z81NfCYwZ7LCysEUTdlW4qN92l/njWvi/93O3xS3q4JlTFOWIZHK/dCbheeLIK+VnVSrnlow1aklDEYzC4oER99CqQavq4qk0a2AJxmMld3p34dBqVvHXljYQ6zAZl0u3w=
+	t=1767874818; cv=none; b=J+WMkwP/kjjY/Btrcxgw9ndXrwCyjRbuDKgAMMk6HaO/Q1DZmt+p19PxAVxfOIYW8mO8+uoM2oFFXT4z4pMsIKciVFuA1jia/GM0tAxx/g6bLen0zIyLZs8CHGQMLMPZ8uBYIFhfN4s882OlyGweaZw+L8WaTnr7O6eXErENcuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767874491; c=relaxed/simple;
-	bh=8OjR00LI97LjKvDNXw3KG6qSBV2UsnBXXlfmyFmZlxY=;
+	s=arc-20240116; t=1767874818; c=relaxed/simple;
+	bh=NNpGr0TUosqGSN2a0EGi84k3Eo0OmIJDd6rO5DGlzxA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uwkGeAXeYapnizmXpqBFDSL7E6uqCKmp9iuroyU+0OJtJAhhs1Y+WHaMW+Y6JJ6Wo7J0h9BQKxkPTIvq2ZJTj/vadtv5d2roSxhsGlju34+YMpcyvhQYkxkgETeXFAg0E1RY2bzECSe0iU1TlVwRYbArN1i0xltzZVFEKTjsgN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SBjSHFCQ; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=gUiSIgCeM4Ujb/FA4YqKGkUbv494DLx5cGipWsyL3NzaswW9XTbHng9At7PqtAVqfSKZTlhTw9l2wMWdTAzoEZYep9rSuMZrAcKDOMkCzcVuLkVl5iiZugpU74Q/FJK9Ei38ABt54g2bgOfoy0KIEZUzJ3uDjxnJg5zTB7TW5FY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D5w8XX5y; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SBjSHFCQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D5w8XX5y"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767874484;
+	s=mimecast20190719; t=1767874814;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=t2qCFNA4/Erewu1t8D7IW9h5dHqTnH3aALQyYtKnmOM=;
-	b=SBjSHFCQPkyVXx8GKdcy2/TocmINm1WJP6XZt/P5UhAjfTf/NyVHpoYEGSkZyky5yoLmyV
-	a5ZI0mm/qsPd3C4HNTJlHE0DB1oTdYmwLZpajamu1pxzAuUYaJaNBAZkHhJ7dLMFWq7zxn
-	6xEhw5JMQVlBnUudeAvK59AcQTygdQ4=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+	bh=O3gEBAPNPXaPH1lX1DR0amMzqk/RyPoLCSLo0EIYFeo=;
+	b=D5w8XX5yj28poGLF3tYM0EmHQsdIejG1avhkBRdv5WzzZUOVIvc9qWslkqVd2GSSDvJYZj
+	VqFDYOpkRL+39qs1msSfODyLP0DSCIBidMVao6zwDbwaDcYXQO9rchgofaMVuLIR8v+GMa
+	Xj+Bu/kYg8gcL1DGns/YhqDf/TRVgw0=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-561-AblKnrJkOPa--NQ8ZeZf2w-1; Thu,
- 08 Jan 2026 07:14:38 -0500
-X-MC-Unique: AblKnrJkOPa--NQ8ZeZf2w-1
-X-Mimecast-MFC-AGG-ID: AblKnrJkOPa--NQ8ZeZf2w_1767874477
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-457-J4mfcCOBPt-WaBJOwseDYQ-1; Thu,
+ 08 Jan 2026 07:20:13 -0500
+X-MC-Unique: J4mfcCOBPt-WaBJOwseDYQ-1
+X-Mimecast-MFC-AGG-ID: J4mfcCOBPt-WaBJOwseDYQ_1767874811
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C8BE0195608D;
-	Thu,  8 Jan 2026 12:14:36 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 60BE21956059;
+	Thu,  8 Jan 2026 12:20:11 +0000 (UTC)
 Received: from fedora (unknown [10.72.116.180])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1643F19560A2;
-	Thu,  8 Jan 2026 12:14:29 +0000 (UTC)
-Date: Thu, 8 Jan 2026 20:14:23 +0800
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CE57430002D1;
+	Thu,  8 Jan 2026 12:20:03 +0000 (UTC)
+Date: Thu, 8 Jan 2026 20:19:58 +0800
 From: Ming Lei <ming.lei@redhat.com>
 To: Caleb Sander Mateos <csander@purestorage.com>
 Cc: Jens Axboe <axboe@kernel.dk>, Shuah Khan <shuah@kernel.org>,
@@ -50,11 +50,10 @@ Cc: Jens Axboe <axboe@kernel.dk>, Shuah Khan <shuah@kernel.org>,
 	Stanley Zhang <stazhang@purestorage.com>,
 	Uday Shankar <ushankar@purestorage.com>,
 	"Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: Re: [PATCH v4 03/19] ublk: support UBLK_PARAM_TYPE_INTEGRITY in
- device creation
-Message-ID: <aV-fnxYoyCdphIU5@fedora>
+Subject: Re: [PATCH v4 09/19] ublk: implement integrity user copy
+Message-ID: <aV-g7obwQw4HFcn8@fedora>
 References: <20260108091948.1099139-1-csander@purestorage.com>
- <20260108091948.1099139-4-csander@purestorage.com>
+ <20260108091948.1099139-10-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -63,32 +62,21 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260108091948.1099139-4-csander@purestorage.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+In-Reply-To: <20260108091948.1099139-10-csander@purestorage.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Thu, Jan 08, 2026 at 02:19:31AM -0700, Caleb Sander Mateos wrote:
+On Thu, Jan 08, 2026 at 02:19:37AM -0700, Caleb Sander Mateos wrote:
 > From: Stanley Zhang <stazhang@purestorage.com>
 > 
-> Add a feature flag UBLK_F_INTEGRITY for a ublk server to request
-> integrity/metadata support when creating a ublk device. The ublk server
-> can also check for the feature flag on the created device or the result
-> of UBLK_U_CMD_GET_FEATURES to tell if the ublk driver supports it.
-> UBLK_F_INTEGRITY requires UBLK_F_USER_COPY, as user copy is the only
-> data copy mode initially supported for integrity data.
-> Add UBLK_PARAM_TYPE_INTEGRITY and struct ublk_param_integrity to struct
-> ublk_params to specify the integrity params of a ublk device.
-> UBLK_PARAM_TYPE_INTEGRITY requires UBLK_F_INTEGRITY and a nonzero
-> metadata_size. The LBMD_PI_CAP_* and LBMD_PI_CSUM_* values from the
-> linux/fs.h UAPI header are used for the flags and csum_type fields.
-> If the UBLK_PARAM_TYPE_INTEGRITY flag is set, validate the integrity
-> parameters and apply them to the blk_integrity limits.
-> The struct ublk_param_integrity validations are based on the checks in
-> blk_validate_integrity_limits(). Any invalid parameters should be
-> rejected before being applied to struct blk_integrity.
+> Add a function ublk_copy_user_integrity() to copy integrity information
+> between a request and a user iov_iter. This mirrors the existing
+> ublk_copy_user_pages() but operates on request integrity data instead of
+> regular data. Check UBLKSRV_IO_INTEGRITY_FLAG in iocb->ki_pos in
+> ublk_user_copy() to choose between copying data or integrity data.
 > 
 > Signed-off-by: Stanley Zhang <stazhang@purestorage.com>
-> [csander: drop redundant pi_tuple_size field, use block metadata UAPI
->  constants, add param validation]
+> [csander: change offset units from data bytes to integrity data bytes,
+>  fix CONFIG_BLK_DEV_INTEGRITY=n build, rebase on user copy refactor]
 > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
 
 Reviewed-by: Ming Lei <ming.lei@redhat.com>
