@@ -1,46 +1,29 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7809638B645;
-	Thu,  8 Jan 2026 13:52:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B555E4C870D;
+	Thu,  8 Jan 2026 13:58:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767880337; cv=none; b=DY5T6d7q4yvkVnSfkI8PLveWhleKUm8W9wT3lhRlaOMTZCDmsuRmxnotW63BC6DCVRQIW0xCfx3t8HvhHMJngLnqYdM+eCy3aEFuybR37a2uGy5n+Jb+XTgHyYgM/4Hr7kpvvciUrcOcELHcIc0wpOBMjEOaV/hg/RbeE+EtzBI=
+	t=1767880707; cv=none; b=Zpfpj0jaHvlNNWwI8nvojiKpFN6sB2rwrToWwBuyYyhxf+Bf7Yc9comZGWbi1VofAHXUy/ORF1h1dJeB5whwOPolmrz78P/AhD5y/eXsiOmTVK8DOaeQeZqVFSsWLFYucr41DSwSpX9tJpvkgu8M4KMBcPkEf9RosSVtEhRJEYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767880337; c=relaxed/simple;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
+	s=arc-20240116; t=1767880707; c=relaxed/simple;
+	bh=mVDVp/XpkfFMLxjpzuhZbM9IvMM4Xol+e6l3g7M/PTw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mzuZuftHp25DNS55sSAofvfJL+LkM9NQvCOm7dpZ/bJs2PPYy8mfq/d0d4BgJb329oHY1O3/HNjrRnXSr32N2OJ3n1eie1shGedYTTLTdXhQyIBYJrMX0+TgU6Oi5pYRGvtrSj1s/Ekm7f5BpZWaxgGGLByB0C1cjx0ckQHJok0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Di4j+R9k; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Di4j+R9k"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=Di4j+R9kLqA3lWNhGbECjRl2Ya
-	bkBwXDK0fuqmHJtkr9n1SppYje7O1U/jbEoiceQ8gLEhvTdC2jz5oXEWzaIdWLYFT4zWRYJ2J8MxG
-	24cAu8ywmVEUSkosNHWqEO5cC4+WmbDF31SUP9ThzWF4L7nJ3LAiiVJSZCHE4RZiOB45JiIhh5NnA
-	r+88IG3izle6/WJ7fj58AdHeP3a0piaGt+lsOXX1UPad+ERnv+zz2VdTrz/zO/ZFm2CTXH6g8/qfS
-	J30SsCmHGo0bLqiTO/F84fqu0+/niVQsbmIbdS6a9/bPCsUjFo8oG5BAJLJ3CXswTim08rYAv5wQP
-	Lc/pcqAQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vdqQv-0000000HEdd-0r8g;
-	Thu, 08 Jan 2026 13:52:13 +0000
-Date: Thu, 8 Jan 2026 05:52:13 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Zheng Qixing <zhengqixing@huaweicloud.com>
-Cc: tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk, yukuai@fnnas.com,
-	cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-	yangerkun@huawei.com, houtao1@huawei.com, zhengqixing@huawei.com
-Subject: Re: [PATCH 3/3] blk-cgroup: skip dying blkg in
- blkcg_activate_policy()
-Message-ID: <aV-2jeMsLFdFRsp5@infradead.org>
-References: <20260108014416.3656493-1-zhengqixing@huaweicloud.com>
- <20260108014416.3656493-4-zhengqixing@huaweicloud.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=cQ7ePCFbMMxwN0u26uq0GKhL9cc0tPPx/jseNLZukOsFnbgMB0vdIvjTfe4KM5ryJTJ+zrCzNl0S3UcrpGxyzc0tUzeK1qbSkgZ8gMvwK9h2EupuyWyNcxdfJ316gFVkanCk6oX8V6XNASOTXWzm1Za6/o6lihyOBVCV79YuAaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 0C63B6732A; Thu,  8 Jan 2026 14:58:22 +0100 (CET)
+Date: Thu, 8 Jan 2026 14:58:21 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] block: initialize auto integrity buffer opaque
+Message-ID: <20260108135821.GA8886@lst.de>
+References: <20260108090401.1091352-1-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -49,10 +32,19 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260108014416.3656493-4-zhengqixing@huaweicloud.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20260108090401.1091352-1-csander@purestorage.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-Looks good:
+The subject sounds a little weird.  From looking at the commit
+message and the code change I'd expect it to be something like:
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+block: zero auto integrity buffer when not fully occupied by PI tuple
+
+does that make sense?
+
+> Switch the gfp_t variable to bool zero_buffer since it's only used to
+> compute the zero_buffer argument to bio_integrity_alloc_buf().
+
+Yeah, that also makes total sense now.  But maybe split it into a
+separate cleanup patch to not detract from the bug fix?
 
