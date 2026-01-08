@@ -1,105 +1,121 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from r3-21.sinamail.sina.com.cn (r3-21.sinamail.sina.com.cn [202.108.3.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 353E624E4C4
-	for <linux-block@vger.kernel.org>; Thu,  8 Jan 2026 02:19:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D42A213254
+	for <linux-block@vger.kernel.org>; Thu,  8 Jan 2026 02:57:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.108.3.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767838786; cv=none; b=kflAd7nqlIrW7Q0LTDEHmCoTDphB8wBkQsvZHyjM9freO/O7LaXoo1AOWIHgFXHwt4l+mpJkdkKpbQUvePAseZU2pRQ5C5gePZWdkjlm1JfDezsXxMn7blVQtkcx5Saf0eMwfKzyW40yFXkTvhtui9SEbUKBkb8lFm24oiOf9bc=
+	t=1767841055; cv=none; b=KAmGhY6jPIzLBVySJ+dxTNmZ52U6r8tNcTxA1S56BGhIEYXn2gTKgObAR4iovMLa6PJiqWWptFrACox989nTEJ71xJoEsjFSkTwK88L1eLR8o8zKIZez0884nNgHVe69I6xRKanBQsHOnJnhrnWJhshui0+/JNW5DCBNKj2B4pM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767838786; c=relaxed/simple;
-	bh=izpliozQQ6AAmjcpKXMDWqRUBVV+mLb3CvrOtT/maOE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TJQ75tRG7wV+JO3ELh6fpNvq+9EDcgY+AQ2F/F37BavaAtLi4im544A4mlEleQEDBm917Xa78YBm+SMJbvuABQUTlwTx1T8kkYZJw2fi/KtYBbq7KfKR3zB/wOuvy22kbBqOXqV0ibO05Vq/m7J1AyRU4ujV/gVl5v/oNCU0Skg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GjMdeRnn; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1767841055; c=relaxed/simple;
+	bh=lELN0MFdKmh5KijQX4cGYcWLtEjiEiDKh5RTMWd8XFg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WFbQMwBXAfaj9Ok5bS6UM5rt+LXcTdSeBixPXKhuYfe1OtZLWDEmvZ+IedLP6qEVwJEVtQAG4gHTcZIKTclePuqcVOPIBbWTG+7wbEduZNfXQUAxInO9D9fVAoJnQ33aScfyxWaQM8WAKXEaQw/cDFtehsNihQrbEv2fGJHtVG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=uOALkVvC; arc=none smtp.client-ip=202.108.3.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GjMdeRnn"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767838784;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=e58AvOofkAZMERAjCRNSCzg+OQ2/rgznWXJZC9l5yys=;
-	b=GjMdeRnnRyRPQlmwXruumHLfkUVW9G+M1UcPNIyhpZEShaoJ0e1uvdoa8SHmH65tCQfF2d
-	mQhPK9iAYcT/3R0yY67Dl2h450j63YCmERQE1kErs0jFQU6azeYgmmrmGJCz85bZge1Uff
-	Zx1TeDxbiebEzBnmm3rbzuiOJEMWTLE=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-696-C5u5R4y1Mv68vhPM4j7ZUg-1; Wed,
- 07 Jan 2026 21:19:39 -0500
-X-MC-Unique: C5u5R4y1Mv68vhPM4j7ZUg-1
-X-Mimecast-MFC-AGG-ID: C5u5R4y1Mv68vhPM4j7ZUg_1767838776
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C016D18005A7;
-	Thu,  8 Jan 2026 02:19:34 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.164])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4FDBC19560A2;
-	Thu,  8 Jan 2026 02:19:23 +0000 (UTC)
-Date: Thu, 8 Jan 2026 10:19:18 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	linux-block@vger.kernel.org, io-uring@vger.kernel.org,
-	Vishal Verma <vishal1.verma@intel.com>, tushar.gohad@intel.com,
-	Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org
-Subject: Re: [RFC v2 01/11] file: add callback for pre-mapping dmabuf
-Message-ID: <aV8UJvkt7VGzHjxS@fedora>
-References: <cover.1763725387.git.asml.silence@gmail.com>
- <74d689540fa200fe37f1a930165357a92fe9e68c.1763725387.git.asml.silence@gmail.com>
- <7b2017f4-02a3-482a-a173-bb16b895c0cb@amd.com>
- <20251204110709.GA22971@lst.de>
- <0571ca61-7b17-4167-83eb-4269bd0459fe@amd.com>
- <20251204131025.GA26860@lst.de>
- <aVnFnzRYWC_Y5zHg@fedora>
- <754b4cc9-20ab-4d87-85bf-eb56be058856@amd.com>
- <20260107160151.GA21887@lst.de>
+	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="uOALkVvC"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1767841051;
+	bh=LNxegYof74IPP9KhgYLykJdLB7hHFuhQpm3nUOS29DA=;
+	h=Message-ID:Date:Subject:From;
+	b=uOALkVvCmAUXamqwfp8656Ry2tz8PMA7kfY+DYdRQwP+WNMrRJwIYsbMcUlzXQyZl
+	 wvRQCeqsxn0kV5AbVpUBlxxIfTO5I7BsIX8mADFZAz+Zj52rEZ7g3zgYLU6ats+/4g
+	 FOK8Eh2cu0SNnsmXGrHhPbej3MGRqKFnPY/0+FwQ=
+X-SMAIL-HELO: [10.189.149.126]
+Received: from unknown (HELO [10.189.149.126])([114.247.175.249])
+	by sina.com (10.54.253.33) with ESMTP
+	id 695F1D0F00006204; Thu, 8 Jan 2026 10:57:21 +0800 (CST)
+X-Sender: zhangdongdong925@sina.com
+X-Auth-ID: zhangdongdong925@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=zhangdongdong925@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=zhangdongdong925@sina.com
+X-SMAIL-MID: 8957726685282
+X-SMAIL-UIID: 56B5BAE87F644BB09AAD52D6CCF48F14-20260108-105721-1
+Message-ID: <a527b179-263f-40ad-9d7c-bfa86731bfde@sina.com>
+Date: Thu, 8 Jan 2026 10:57:19 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv2 1/7] zram: introduce compressed data writeback
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+ Richard Chang <richardycc@google.com>, Minchan Kim <minchan@kernel.org>,
+ Brian Geffon <bgeffon@google.com>, David Stevens <stevensd@google.com>,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ linux-block@vger.kernel.org, Minchan Kim <minchan@google.com>
+References: <20251201094754.4149975-1-senozhatsky@chromium.org>
+ <20251201094754.4149975-2-senozhatsky@chromium.org>
+ <40e38fa7-725b-407a-917a-59c5a76dedcb@sina.com>
+ <7bnmkuodymm33yclp6e5oir2sqnqmpwlsb5qlxqyawszb5bvlu@l63wu3ckqihc>
+ <2663a3d3-2d52-4269-970a-892d71c966bb@sina.com>
+ <z22c2qgw2al73yij2ml2hlle2p24twgpmz4jemfqhjoiekc65f@pvap7olsolfp>
+Content-Language: en-US
+From: zhangdongdong <zhangdongdong925@sina.com>
+In-Reply-To: <z22c2qgw2al73yij2ml2hlle2p24twgpmz4jemfqhjoiekc65f@pvap7olsolfp>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260107160151.GA21887@lst.de>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Wed, Jan 07, 2026 at 05:01:51PM +0100, Christoph Hellwig wrote:
-> On Wed, Jan 07, 2026 at 04:56:05PM +0100, Christian König wrote:
-> > > But I am wondering why not make it as one subsystem interface, such as nvme
-> > > ioctl, then the whole implementation can be simplified a lot. It is reasonable
-> > > because subsystem is exactly the side for consuming/importing the dma-buf.
-> > 
-> > Yeah that it might be better if it's more nvme specific came to me as well.
+On 1/7/26 18:14, Sergey Senozhatsky wrote:
+> On (26/01/07 15:28), zhangdongdong wrote:
+>> Hi,Sergey
+>>
+>> Yes, we have tried high priority workqueues. In fact, our current
+>> implementation already uses a dedicated workqueue created with
+>> WQ_HIGHPRI and marked as UNBOUND, which handles the read/decompression
+>> path for swap-in.
+>>
+>> Below is a simplified snippet of the queue we are currently using:
+>>
+>> zgroup_read_wq = alloc_workqueue("zgroup_read",
+>> 				 WQ_HIGHPRI | WQ_UNBOUND, 0);
+>>
+>> static int zgroup_submit_zio_async(struct zgroup_io *zio,
+>> 				   struct zram_group *zgroup)
+>> {
+>> 	struct zgroup_req req = {
+>> 		.zio = zio,
+>> 	};
+>>
 > 
-> The feature is in no way nvme specific.  nvme is just the initial
-> underlying driver.  It makes total sense to support this for any high
-> performance block device, and to pass it through file systems.
+> zgroup... That certainly looks like a lot of downstream code ;)
+> 
+> Do you use any strategies for writeback?  Compressed writeback
+> is supposed to be used for apps for which latency is not critical
+> or sensitive, because of on-demand decompression costs.
+> 
 
-But why does FS care the dma buffer attachment? Since high performance host controller
-is exactly the dma buffer attachment point.
+Hi Sergey,
 
-If the callback is added in `struct file_operations` for wiring dma buffer
-and the importer(host contrller), you will see it is hard to let it cross device
-mapper/raid or other stackable block devices.
+Sorry for the delayed reply â€” I had some urgent matters come up and only
+got back to this now ;)
 
-Thanks, 
-Ming
+Yes, we do use writeback strategies on our side. The current 
+implementation focuses on batched writeback of compressed data from
+zram, managed on a per-app / per-memcg basis. We track and control how
+much data from each app is written back to the backing storage, with the
+same assumption you mentioned: compressed writeback is primarily
+intended for workloads where latency is not critical.
+
+Accurate prefetching on swap-in is still an open problem for us. As you
+pointed out, both the I/O itself and on-demand decompression introduce
+additional latency on the readback path, and minimizing their impact
+remains challenging.
+
+Regarding the workqueue choice: initially we used system_dfl_wq for the
+read/decompression path. Later, based on observed scheduling latency
+under memory pressure, we switched to a dedicated workqueue created with
+WQ_HIGHPRI | WQ_UNBOUND. This change helped reduce scheduling
+interference, but it also reinforced our concern that deferring
+decompression to a worker still adds an extra scheduling hop on the
+swap-in path.
+
+Best regards,
+dongdong
 
