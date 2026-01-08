@@ -1,31 +1,41 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DC737083C;
-	Thu,  8 Jan 2026 09:31:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA1139E6E3;
+	Thu,  8 Jan 2026 10:17:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767864681; cv=none; b=QRdHlm4ufLjYHtOniwoRNR+KKGkKi7XLHQhDdAEo+lGrzKct1Q829ThXSdZpQzAxnd0jHL15uHnF8ATFUkGHrwedl09kgK6Rj1QtYSGY3J3emapvwlh5LX2tTAWMPwSqn6X95BOwUvcQ5SD6ZVoK33mseKn04Iw5jrR9R3RnE/Q=
+	t=1767867439; cv=none; b=EjFYsVWgmLzeH6KmJN9Htjr3vwnSCRkMa3KW0OCanSNIWWRGn6PfrEsZy1OiohfWqjwRJSW5Om8xzNxQFyj+GFSZz7mibuswPxilW0doCM6NjUYmn+VGZrRMrWT3Ycef0v9J6TUh4Tcjh62msZHnxMEFyIHnBpsTkvHrHvShxRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767864681; c=relaxed/simple;
-	bh=jgrwJ32MrtKLFCwfKG6SoX/ziA1fnF3cqXAWEWhwFVI=;
+	s=arc-20240116; t=1767867439; c=relaxed/simple;
+	bh=ODGdH7RlSR+dio8YcadH4b5hAYSaRoEE5ObchUQmYbM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V09NN3Ehn3JPDHVGAxEnlnYULMINBTUqT7/ydl6xr/lcd/zN6WW3Ixp5TU2TzWXYe8y+03XpVUcVORvW4n+eyPeub2Drg8oTTy5RYdztVWblbHNgTM8RQhkp00WmCTyncqb3BxOSMHhx9n6gDI12AETVQ2x7XFXqvKe1BnNkLl0=
+	 Content-Type:Content-Disposition:In-Reply-To; b=ry+Vcbfw2VmEjeU6qx0baHYoHbB0bsqLuK82kJQvZgDpIprwZUjuhl3zwcLlpZfVwPW6jWrUBwDJhLP7oEtC7yCRPreJjHQDCNFDuiceK72FEF7muE0XAncTIZGZoWLj/DexOU0GcJJIs2/OsKcQUSA4/p79DXhTSv7XVx+et2U=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id C2BD0227A87; Thu,  8 Jan 2026 10:31:02 +0100 (CET)
-Date: Thu, 8 Jan 2026 10:31:01 +0100
+	id E3BE3227A87; Thu,  8 Jan 2026 11:17:03 +0100 (CET)
+Date: Thu, 8 Jan 2026 11:17:03 +0100
 From: Christoph Hellwig <hch@lst.de>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-fscrypt@vger.kernel.org
-Subject: Re: [PATCH 7/9] blk-crypto: use mempool_alloc_bulk for encrypted
- bio page allocation
-Message-ID: <20260108093101.GA20489@lst.de>
-References: <20260106073651.1607371-1-hch@lst.de> <20260106073651.1607371-8-hch@lst.de> <20260108002250.GA2614@sol>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+	Vishal Verma <vishal1.verma@intel.com>, tushar.gohad@intel.com,
+	Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org
+Subject: Re: [RFC v2 01/11] file: add callback for pre-mapping dmabuf
+Message-ID: <20260108101703.GA24709@lst.de>
+References: <cover.1763725387.git.asml.silence@gmail.com> <74d689540fa200fe37f1a930165357a92fe9e68c.1763725387.git.asml.silence@gmail.com> <7b2017f4-02a3-482a-a173-bb16b895c0cb@amd.com> <20251204110709.GA22971@lst.de> <0571ca61-7b17-4167-83eb-4269bd0459fe@amd.com> <20251204131025.GA26860@lst.de> <aVnFnzRYWC_Y5zHg@fedora> <754b4cc9-20ab-4d87-85bf-eb56be058856@amd.com> <20260107160151.GA21887@lst.de> <aV8UJvkt7VGzHjxS@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -34,24 +44,26 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260108002250.GA2614@sol>
+In-Reply-To: <aV8UJvkt7VGzHjxS@fedora>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Wed, Jan 07, 2026 at 04:22:50PM -0800, Eric Biggers wrote:
-> On Tue, Jan 06, 2026 at 08:36:30AM +0100, Christoph Hellwig wrote:
-> > +out_free_enc_bio:
-> > +	/*
-> > +	 * Add the remaining pages to the bio so that the normal completion path
-> > +	 * in blk_crypto_fallback_encrypt_endio frees them.  The exact data
-> > +	 * layout does not matter for that, so don't bother iterating the source
-> > +	 * bio.
-> > +	 */
-> > +	for (; enc_idx < nr_enc_pages; enc_idx++)
-> > +		__bio_add_page(enc_bio, enc_pages[enc_idx++], PAGE_SIZE, 0);
-> > +	bio_io_error(enc_bio);
+On Thu, Jan 08, 2026 at 10:19:18AM +0800, Ming Lei wrote:
+> > The feature is in no way nvme specific.  nvme is just the initial
+> > underlying driver.  It makes total sense to support this for any high
+> > performance block device, and to pass it through file systems.
 > 
-> There's a double increment above.
+> But why does FS care the dma buffer attachment? Since high performance
+> host controller is exactly the dma buffer attachment point.
 
-Indeed.  Which also means the failure testing wasn't all that
-great..
+I can't parse what you're trying to say here.
+
+> If the callback is added in `struct file_operations` for wiring dma buffer
+> and the importer(host contrller), you will see it is hard to let it cross device
+> mapper/raid or other stackable block devices.
+
+Why?
+
+But even when not stacking, the registration still needs to go
+through the file system even for a single device, never mind multiple
+controlled by the file system.
 
