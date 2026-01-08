@@ -1,234 +1,176 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D49062367CE
-	for <linux-block@vger.kernel.org>; Thu,  8 Jan 2026 02:11:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5803A231836;
+	Thu,  8 Jan 2026 02:13:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767838296; cv=none; b=hPF9n12+LOToyv1ZBi7K7L9MUcPIzWV6/pSkBPks+ACbeCoSt4sJs+lNwJP2Eian3UitPrvt48YqxO04Q7FoEd2is0oh1XCby/flb7Iv9S4DzgtCXCGytj+owMGpx/vwCWje1jl3hmsUyQ1ICFZ6nP8ozq9pqLclFVQ0KG1LlD4=
+	t=1767838393; cv=none; b=JHtlV3DFx9XXSo2ViToMXyGaV5TJssn1l7930LnCDanJU87PcIdjeYGI6RYd/Pz9Ksjt5SZYO/TgRlwh4JkBWaZssdSUtwLH0U8g6hlK20+fgx7nV9atqclOx/AnGi9BOyO6Jwu5PRvS5Kpi3ZApKcZHeoGOpdSCMjjfi+mcNTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767838296; c=relaxed/simple;
-	bh=049aThQQ0R4hiDA0tJLpuzFVU7KU0eDMVCiKqIRr0Ng=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YgpwnquL/XuzOFR0cU5QjcLi+ejwj//vG+yW3OqoqTNEPqYsMzOINx+SrswL9V2SePpgQQugPOuKaDjJzTG7sdXAnJlkK/qS62766FrBCxtjAN235hkpMY1Mt48wvYIOCk/H9gewX0pulPgMnX/WDBbFs19gsK5sP3oGszuByHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CidDQkOR; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CidDQkOR"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767838293;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rwTDfrrhXfxF0SpZgYiLTozrSeWG4M61kJgcHxQn5os=;
-	b=CidDQkOR/yxsRkan7mBudVvwIRXSqrh2FMH7ENnljtCoRFGqQAuC8Q9iHmqpwLa9tLEwSO
-	I5WoGBMZohBFcoFPu7jG7RKUjWWl3845CjIiKRuC1OS0nGhX5XRs1TBZf9ws49s47kBAoR
-	4TMhOOmMMRiRL7w72er0jked+RFz2Uo=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-121-3yITyVF1Ogm3ZGARGrb3yw-1; Wed,
- 07 Jan 2026 21:11:30 -0500
-X-MC-Unique: 3yITyVF1Ogm3ZGARGrb3yw-1
-X-Mimecast-MFC-AGG-ID: 3yITyVF1Ogm3ZGARGrb3yw_1767838289
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CFCB019560B2;
-	Thu,  8 Jan 2026 02:11:28 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.164])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 633C91956053;
-	Thu,  8 Jan 2026 02:11:23 +0000 (UTC)
-Date: Thu, 8 Jan 2026 10:11:18 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Shuah Khan <shuah@kernel.org>,
-	linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	s=arc-20240116; t=1767838393; c=relaxed/simple;
+	bh=FeQoNSTG96rIErqETAsHeALjzwHrUjE0owt40ekNH5o=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=hjjjKPsbucWBFf1xnYd/cWkgDC/e0d2PUnwfw/cXXAZAlDcxdJ4RueX30Y45ApGDgV8K0faf5AYi8Fh4J6jddaQWLY88GVYiPhvj9rV/mEIFFb1Qee43GSAt8a5EFfijfmx9j8pK2Q2+MDmOLaa35DlduuYbTt4mK2LriLP4FjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.170])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4dmnwq36mkzYQtx4;
+	Thu,  8 Jan 2026 09:52:59 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 4A73C4056C;
+	Thu,  8 Jan 2026 09:53:02 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.50.87.129])
+	by APP4 (Coremail) with SMTP id gCh0CgAXd_f8DV9pVBQTDA--.41552S5;
+	Thu, 08 Jan 2026 09:53:02 +0800 (CST)
+From: Zheng Qixing <zhengqixing@huaweicloud.com>
+To: tj@kernel.org,
+	josef@toxicpanda.com,
+	axboe@kernel.dk,
+	yukuai@fnnas.com
+Cc: cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Stanley Zhang <stazhang@purestorage.com>,
-	Uday Shankar <ushankar@purestorage.com>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: Re: [PATCH v3 09/19] ublk: implement integrity user copy
-Message-ID: <aV8SRkTYU0NN2V6t@fedora>
-References: <20260106005752.3784925-1-csander@purestorage.com>
- <20260106005752.3784925-10-csander@purestorage.com>
- <aV0PauBTiqWVQ-26@fedora>
- <CADUfDZryjLxVBFpk1c_NUp_GEWuWA=8UB6Vyx15tFUjQHGa_DQ@mail.gmail.com>
- <aV2onjve8cFAkJrV@fedora>
- <CADUfDZqxU+egMQh3ejZo4n3jHo7EwaTS7LXm2+G+RV3wpOzT9A@mail.gmail.com>
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com,
+	houtao1@huawei.com,
+	zhengqixing@huawei.com
+Subject: [PATCH 1/3] blk-cgroup: factor policy pd teardown loop into helper
+Date: Thu,  8 Jan 2026 09:44:14 +0800
+Message-Id: <20260108014416.3656493-2-zhengqixing@huaweicloud.com>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20260108014416.3656493-1-zhengqixing@huaweicloud.com>
+References: <20260108014416.3656493-1-zhengqixing@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADUfDZqxU+egMQh3ejZo4n3jHo7EwaTS7LXm2+G+RV3wpOzT9A@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+X-CM-TRANSID:gCh0CgAXd_f8DV9pVBQTDA--.41552S5
+X-Coremail-Antispam: 1UD129KBjvJXoWxGr45Gw4rur4xWrW8WF4rZrb_yoW5AFyxpF
+	43Kr9xA3s2vr4Du3WDWw1UurZIga1rKw4UJ3yxCa9akw42qrnxX3Wqv3ykZFWfAFZrWF45
+	uFWrt3yakr4UCFUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUPIb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUGw
+	A2048vs2IY020Ec7CjxVAFwI0_Gr0_Xr1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
+	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
+	W8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMc
+	Ij6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv67AKxVW8Jr0_Cr1UMcvjeVCFs4IE7xkE
+	bVWUJVW8JwACjcxG0xvY0x0EwIxGrwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7
+	AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02
+	F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GF
+	ylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r
+	1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07j8
+	l19UUUUU=
+X-CM-SenderInfo: x2kh0wptl0x03j6k3tpzhluzxrxghudrp/
 
-On Wed, Jan 07, 2026 at 05:50:04PM -0800, Caleb Sander Mateos wrote:
-> On Tue, Jan 6, 2026 at 4:28 PM Ming Lei <ming.lei@redhat.com> wrote:
-> >
-> > On Tue, Jan 06, 2026 at 10:20:14AM -0800, Caleb Sander Mateos wrote:
-> > > On Tue, Jan 6, 2026 at 5:34 AM Ming Lei <ming.lei@redhat.com> wrote:
-> > > >
-> > > > On Mon, Jan 05, 2026 at 05:57:41PM -0700, Caleb Sander Mateos wrote:
-> > > > > From: Stanley Zhang <stazhang@purestorage.com>
-> > > > >
-> > > > > Add a function ublk_copy_user_integrity() to copy integrity information
-> > > > > between a request and a user iov_iter. This mirrors the existing
-> > > > > ublk_copy_user_pages() but operates on request integrity data instead of
-> > > > > regular data. Check UBLKSRV_IO_INTEGRITY_FLAG in iocb->ki_pos in
-> > > > > ublk_user_copy() to choose between copying data or integrity data.
-> > > > >
-> > > > > Signed-off-by: Stanley Zhang <stazhang@purestorage.com>
-> > > > > [csander: change offset units from data bytes to integrity data bytes,
-> > > > >  test UBLKSRV_IO_INTEGRITY_FLAG after subtracting UBLKSRV_IO_BUF_OFFSET,
-> > > > >  fix CONFIG_BLK_DEV_INTEGRITY=n build,
-> > > > >  rebase on ublk user copy refactor]
-> > > > > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-> > > > > ---
-> > > > >  drivers/block/ublk_drv.c      | 52 +++++++++++++++++++++++++++++++++--
-> > > > >  include/uapi/linux/ublk_cmd.h |  4 +++
-> > > > >  2 files changed, 53 insertions(+), 3 deletions(-)
-> > > > >
-> > > > > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > > > > index e44ab9981ef4..9694a4c1caa7 100644
-> > > > > --- a/drivers/block/ublk_drv.c
-> > > > > +++ b/drivers/block/ublk_drv.c
-> > > > > @@ -621,10 +621,15 @@ static inline unsigned ublk_pos_to_tag(loff_t pos)
-> > > > >  {
-> > > > >       return ((pos - UBLKSRV_IO_BUF_OFFSET) >> UBLK_TAG_OFF) &
-> > > > >               UBLK_TAG_BITS_MASK;
-> > > > >  }
-> > > > >
-> > > > > +static inline bool ublk_pos_is_integrity(loff_t pos)
-> > > > > +{
-> > > > > +     return !!((pos - UBLKSRV_IO_BUF_OFFSET) & UBLKSRV_IO_INTEGRITY_FLAG);
-> > > > > +}
-> > > > > +
-> > > >
-> > > > It could be more readable to check UBLKSRV_IO_INTEGRITY_FLAG only.
-> > >
-> > > That's assuming that UBLK_TAG_BITS = 16 has more bits than are
-> > > strictly required by UBLK_MAX_QUEUE_DEPTH = 4096? Otherwise, adding
-> > > UBLKSRV_IO_BUF_OFFSET = 1 << 31 to tag << UBLK_TAG_OFF could overflow
-> > > into the QID bits, which could then overflow into
-> > > UBLKSRV_IO_INTEGRITY_FLAG. That seems like a very fragile assumption.
-> > > And if you want to rely on this assumption, why bother subtracting
-> > > UBLKSRV_IO_BUF_OFFSET in ublk_pos_to_hwq() either? The compiler should
-> > > easily be able to deduplicate the iocb->ki_pos - UBLKSRV_IO_BUF_OFFSET
-> > > computations, so I can't imagine it matters for performance.
-> >
-> > UBLKSRV_IO_INTEGRITY_FLAG should be defined as one flag starting from top
-> > bit(bit 62), then you will see it is just fine to check it directly.
-> >
-> > But it isn't a big deal to subtract UBLKSRV_IO_BUF_OFFSET or not here, I
-> > will leave it to you.
-> >
-> > >
-> > > >
-> > > > >  static void ublk_dev_param_basic_apply(struct ublk_device *ub)
-> > > > >  {
-> > > > >       const struct ublk_param_basic *p = &ub->params.basic;
-> > > > >
-> > > > >       if (p->attrs & UBLK_ATTR_READ_ONLY)
-> > > > > @@ -1047,10 +1052,37 @@ static size_t ublk_copy_user_pages(const struct request *req,
-> > > > >                       break;
-> > > > >       }
-> > > > >       return done;
-> > > > >  }
-> > > > >
-> > > > > +#ifdef CONFIG_BLK_DEV_INTEGRITY
-> > > > > +static size_t ublk_copy_user_integrity(const struct request *req,
-> > > > > +             unsigned offset, struct iov_iter *uiter, int dir)
-> > > > > +{
-> > > > > +     size_t done = 0;
-> > > > > +     struct bio *bio = req->bio;
-> > > > > +     struct bvec_iter iter;
-> > > > > +     struct bio_vec iv;
-> > > > > +
-> > > > > +     if (!blk_integrity_rq(req))
-> > > > > +             return 0;
-> > > > > +
-> > > > > +     bio_for_each_integrity_vec(iv, bio, iter) {
-> > > > > +             if (!ublk_copy_user_bvec(&iv, &offset, uiter, dir, &done))
-> > > > > +                     break;
-> > > > > +     }
-> > > > > +
-> > > > > +     return done;
-> > > > > +}
-> > > > > +#else /* #ifdef CONFIG_BLK_DEV_INTEGRITY */
-> > > > > +static size_t ublk_copy_user_integrity(const struct request *req,
-> > > > > +             unsigned offset, struct iov_iter *uiter, int dir)
-> > > > > +{
-> > > > > +     return 0;
-> > > > > +}
-> > > > > +#endif /* #ifdef CONFIG_BLK_DEV_INTEGRITY */
-> > > > > +
-> > > > >  static inline bool ublk_need_map_req(const struct request *req)
-> > > > >  {
-> > > > >       return ublk_rq_has_data(req) && req_op(req) == REQ_OP_WRITE;
-> > > > >  }
-> > > > >
-> > > > > @@ -2654,10 +2686,12 @@ ublk_user_copy(struct kiocb *iocb, struct iov_iter *iter, int dir)
-> > > > >  {
-> > > > >       struct ublk_device *ub = iocb->ki_filp->private_data;
-> > > > >       struct ublk_queue *ubq;
-> > > > >       struct request *req;
-> > > > >       struct ublk_io *io;
-> > > > > +     unsigned data_len;
-> > > > > +     bool is_integrity;
-> > > > >       size_t buf_off;
-> > > > >       u16 tag, q_id;
-> > > > >       ssize_t ret;
-> > > > >
-> > > > >       if (!user_backed_iter(iter))
-> > > > > @@ -2667,10 +2701,11 @@ ublk_user_copy(struct kiocb *iocb, struct iov_iter *iter, int dir)
-> > > > >               return -EACCES;
-> > > > >
-> > > > >       tag = ublk_pos_to_tag(iocb->ki_pos);
-> > > > >       q_id = ublk_pos_to_hwq(iocb->ki_pos);
-> > > > >       buf_off = ublk_pos_to_buf_off(iocb->ki_pos);
-> > > > > +     is_integrity = ublk_pos_is_integrity(iocb->ki_pos);
-> > > >
-> > > > UBLKSRV_IO_INTEGRITY_FLAG can be set for device without UBLK_F_INTEGRITY,
-> > > > so UBLK_F_INTEGRITY need to be checked in case of `is_integrity`.
-> > >
-> > > If UBLK_F_INTEGRITY isn't set, then UBLK_PARAM_TYPE_INTEGRITY isn't
-> > > allowed, so the ublk device won't support integrity data. Therefore,
-> > > blk_integrity_rq() will return false and ublk_copy_user_integrity()
-> > > will just return 0. Do you think it's important to return some error
-> > > code value instead? I would rather avoid the additional checks in the
-> > > hot path.
-> >
-> > The check could be zero cost, but better to fail the wrong usage than
-> > returning 0 silently, which may often imply big issue.
-> 
-> Not sure what you mean by "the check could be zero cost". It's 2
-> branches to check for UBLK_F_INTEGRITY in the ublk_device flags and to
-> check is_integrity. Even if the branches are predictable (and the
-> is_integrity one might not be), there's still some cost for computing
-> the conditions and taking up space in the branch history table.
+From: Zheng Qixing <zhengqixing@huawei.com>
 
-ub->dev_info.nr_hw_queues is fetched for validating `q_id`, so
-ub->dev_info.flags is always hit from the same cache line.
+Move the teardown sequence which offlines and frees per-policy
+blkg_policy_data (pd) into a helper for readability.
 
-> A ublk server should already be checking that the return value from
-> the user copy syscall matches the passed in length. Otherwise, the
-> request's data was shorter than expected or a fault occurred while
-> accessing the userspace buffer. But if you feel strongly, I'll add an
-> explicit -EINVAL return code.
+No functional change intended.
 
-It is absolutely userspace fault or bug, I think it is better to fast fail.
-Otherwise, it has to be documented clearly.
+Signed-off-by: Zheng Qixing <zhengqixing@huawei.com>
+---
+ block/blk-cgroup.c | 58 +++++++++++++++++++++-------------------------
+ 1 file changed, 27 insertions(+), 31 deletions(-)
 
-
-Thanks,
-Ming
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 3cffb68ba5d8..5e1a724a799a 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1559,6 +1559,31 @@ struct cgroup_subsys io_cgrp_subsys = {
+ };
+ EXPORT_SYMBOL_GPL(io_cgrp_subsys);
+ 
++/*
++ * Tear down per-blkg policy data for @pol on @q.
++ */
++static void blkcg_policy_teardown_pds(struct request_queue *q,
++				      const struct blkcg_policy *pol)
++{
++	struct blkcg_gq *blkg;
++
++	list_for_each_entry(blkg, &q->blkg_list, q_node) {
++		struct blkcg *blkcg = blkg->blkcg;
++		struct blkg_policy_data *pd;
++
++		spin_lock(&blkcg->lock);
++		pd = blkg->pd[pol->plid];
++		if (pd) {
++			if (pd->online && pol->pd_offline_fn)
++				pol->pd_offline_fn(pd);
++			pd->online = false;
++			pol->pd_free_fn(pd);
++			blkg->pd[pol->plid] = NULL;
++		}
++		spin_unlock(&blkcg->lock);
++	}
++}
++
+ /**
+  * blkcg_activate_policy - activate a blkcg policy on a gendisk
+  * @disk: gendisk of interest
+@@ -1669,21 +1694,7 @@ int blkcg_activate_policy(struct gendisk *disk, const struct blkcg_policy *pol)
+ enomem:
+ 	/* alloc failed, take down everything */
+ 	spin_lock_irq(&q->queue_lock);
+-	list_for_each_entry(blkg, &q->blkg_list, q_node) {
+-		struct blkcg *blkcg = blkg->blkcg;
+-		struct blkg_policy_data *pd;
+-
+-		spin_lock(&blkcg->lock);
+-		pd = blkg->pd[pol->plid];
+-		if (pd) {
+-			if (pd->online && pol->pd_offline_fn)
+-				pol->pd_offline_fn(pd);
+-			pd->online = false;
+-			pol->pd_free_fn(pd);
+-			blkg->pd[pol->plid] = NULL;
+-		}
+-		spin_unlock(&blkcg->lock);
+-	}
++	blkcg_policy_teardown_pds(q, pol);
+ 	spin_unlock_irq(&q->queue_lock);
+ 	ret = -ENOMEM;
+ 	goto out;
+@@ -1702,7 +1713,6 @@ void blkcg_deactivate_policy(struct gendisk *disk,
+ 			     const struct blkcg_policy *pol)
+ {
+ 	struct request_queue *q = disk->queue;
+-	struct blkcg_gq *blkg;
+ 	unsigned int memflags;
+ 
+ 	if (!blkcg_policy_enabled(q, pol))
+@@ -1713,22 +1723,8 @@ void blkcg_deactivate_policy(struct gendisk *disk,
+ 
+ 	mutex_lock(&q->blkcg_mutex);
+ 	spin_lock_irq(&q->queue_lock);
+-
+ 	__clear_bit(pol->plid, q->blkcg_pols);
+-
+-	list_for_each_entry(blkg, &q->blkg_list, q_node) {
+-		struct blkcg *blkcg = blkg->blkcg;
+-
+-		spin_lock(&blkcg->lock);
+-		if (blkg->pd[pol->plid]) {
+-			if (blkg->pd[pol->plid]->online && pol->pd_offline_fn)
+-				pol->pd_offline_fn(blkg->pd[pol->plid]);
+-			pol->pd_free_fn(blkg->pd[pol->plid]);
+-			blkg->pd[pol->plid] = NULL;
+-		}
+-		spin_unlock(&blkcg->lock);
+-	}
+-
++	blkcg_policy_teardown_pds(q, pol);
+ 	spin_unlock_irq(&q->queue_lock);
+ 	mutex_unlock(&q->blkcg_mutex);
+ 
+-- 
+2.39.2
 
