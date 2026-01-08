@@ -1,287 +1,176 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013063.outbound.protection.outlook.com [40.107.201.63])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AD2D157A5A
-	for <linux-block@vger.kernel.org>; Thu,  8 Jan 2026 02:04:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767837842; cv=none; b=aF3HEmpXEp7a0Y2V2cufizOK6E6mTrNFDTfl+twZLGT0nVcMxDpVDerIrMY3u3BNencHaH922ZtZh4a6MOdeymTewVHCUiyQe67RCOt4zNp3bHxD5PZfSlK6tOB4TNZwNjbOuUSA6jgpcrMZCARz52wPV1bvMIq/4j4nhzRYj1M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767837842; c=relaxed/simple;
-	bh=nFSgQw5repL4bg4rX6ve1p1bL53wEP4/lHpWX7vhe0k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TgLyPxQbFN2t1NMFtU5jhnblVzCYkgXdFc3rkYbcJkxUFK9qLfwjLMekyzk3T/5dRskAv4meBfuN0XMLGg+BPm6Q1mvexuqwR2sxvm0LVJwikuELhDTeSvHLJaTIq7/Zs0KufI0L2Zy9KeNE5u8TbHm9KX/WkI/PlWUTBPomJP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VFztK2K4; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E7C121CC79
+	for <linux-block@vger.kernel.org>; Thu,  8 Jan 2026 02:08:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.63
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767838100; cv=fail; b=cTuKwfIP8IBWMOZS8Fh1VCA3g2H9eAb7QaQBPERcAXYJV6Gy2qpn1lv3qbqa/GowPi5HOf9OG34CX9AirEMnr9ZjHIlV4sKWAx7wak7PYLXBKIlzNeVhLBfn4TUk+vfvdgyFMVOGegSNvwu59mIXsqf3E/sTS0yNs+iKdOzUYfk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767838100; c=relaxed/simple;
+	bh=C9cj6qH1OXja4HwPtFDtbx7RQKhvSJLO5VQdPm+Gup4=;
+	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=cW9rXHTq9HTtWOJFuPFvTk1u1nU5BA0R62AODX3QuHeFZ8r6Z48iAu6t+GZvscuADJysJmhKFhNRWP85Nhq/lmodClIpGF/mebkhtJJK3Vrat3ogCbWl46ZYjNFBRerzInreMlN0RmejaPw+G2JLJ/+kxYZDYu2gdlTNUhlBDcw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=VNcq9DV1; arc=fail smtp.client-ip=40.107.201.63
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VFztK2K4"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767837839;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iH8J0y5h4urC8PC3Rp+2w8joeJDe9xVDjIuHtLfMXHA=;
-	b=VFztK2K42q9PXcqaUN/I/TV3wnuHa8lczrp+vA3LE672986wW8IjUrYJeCiBIwk39WnFLt
-	WEPqmcT6/1LD2Fjrv+t+i04Jbf/rqtcI81LRccJ1Ssr7eaV+sBltbPAqpNHWqndTPac6au
-	ogyVNaiw7n0KP1cgMpfaZzDCocseyes=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-493-_2M56nkKNUiELhPdq9W6eA-1; Wed,
- 07 Jan 2026 21:03:54 -0500
-X-MC-Unique: _2M56nkKNUiELhPdq9W6eA-1
-X-Mimecast-MFC-AGG-ID: _2M56nkKNUiELhPdq9W6eA_1767837832
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5EE9318005B2;
-	Thu,  8 Jan 2026 02:03:52 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.164])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4054219560A2;
-	Thu,  8 Jan 2026 02:03:46 +0000 (UTC)
-Date: Thu, 8 Jan 2026 10:03:42 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Shuah Khan <shuah@kernel.org>,
-	linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Stanley Zhang <stazhang@purestorage.com>,
-	Uday Shankar <ushankar@purestorage.com>
-Subject: Re: [PATCH v2 04/19] ublk: set request integrity params in
- ublksrv_io_desc
-Message-ID: <aV8QfvaNO5P6vOs6@fedora>
-References: <20260103004529.1582405-1-csander@purestorage.com>
- <20260103004529.1582405-5-csander@purestorage.com>
- <aVkkSxNNUBMz9E61@fedora>
- <CADUfDZqF2rWRQVptMjM7JedkkHfM-K+V65=odLcdrc3OM9jsJg@mail.gmail.com>
- <aVxrih4F_V58QM3S@fedora>
- <CADUfDZpyYfUGC0zD76E--xVMOwBsf_NoLwax2n+0fVBOAjAODA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="VNcq9DV1"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=YfrSwGAcA5J75uhFmjM0VupEA6H0CJIDfLJs63vA/isMQHkhQI7c5SJ3r7CZAkr87NVpO7oJY+F3bbvrSw06omBAqIzDOh+kPLJEW1xuR4WspvDlQ2cIm46C+MY0DNu+QkAuIJZI7wC7mFiTOznH4WkAiUvMRQWdzXg+tEWmag3vmiw9SL26BKy2ZvA64vgYB3P5qiVuDmz03YzprL/Ywm+KQK/NNG3V/1DRRfSdzOpTvCVdKEO3xXd85CM3DlbyRHkuV8MwyzK5n/W/GtLmWUUsJBq+uRaHytZ7JJD9qkYTY3t5n9dhN/yCS0X4/nZbJzY1rW7ZOrUMuVU54QbYyA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=C9cj6qH1OXja4HwPtFDtbx7RQKhvSJLO5VQdPm+Gup4=;
+ b=NSENzwZK/ecmNVWZ4kst0iZwunNtgsIKphXWr3xm79HrWiq5qFnm6Hgh9EnSC0Xcd2C7M8bfN4KpzxPlDk46VUlHC5NzSZ1t8ets1mTB4HUMqAp5lj1qMjVDvVRmblZUjnhZpn74++bJGJCbS4MHpvTVnRPQp9lK1S/4Nn8T/YZHRLCcj6yPvX/sgZiRu43LwCm4gyqk4r5gZWMhaUb+pZW4IzRLdwoEYq4qZ7MmIMXTXlv9HQmk+ReupmaLQ2O93pbBNLKau9XbVbrF84VX6CNaV6+/52CcDncDH0PeUERhA/ZP+jPrvSTCN1ibMINydqZhol0ISLCm2RA+49hzfw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=C9cj6qH1OXja4HwPtFDtbx7RQKhvSJLO5VQdPm+Gup4=;
+ b=VNcq9DV1NQieR1P781kMCn8p1GSUhHDVWFn4z54q8njj/BdKX7ySlX6C16zr6dm1ijbORsXMBFqo0YOcVCkYygZ3Mp8jtcrJejXCkNuMJ+F2J09TlMZer0OuAH7fCX8MW13X0GtO1AqDD1xTyyce4oeQs+L3RDw4MAqIC3d0RWUCRMnY0bQs8I4q10Od6NHiiTB80w2/V7I7oKHsw2Q9MNgdFVmF7Dz+AH0BqnYKf5c2CPpiy4NnaTIM8ikBqEke3EztoNAZA25hmWYyyyxSzMbOVn4k3gfnrkOYWRsoYuvfydLw19nX3JeOiHWn0EVve95RVvd/21Yj8LzPr+o15A==
+Received: from LV3PR12MB9404.namprd12.prod.outlook.com (2603:10b6:408:219::9)
+ by DM4PR12MB5889.namprd12.prod.outlook.com (2603:10b6:8:65::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.2; Thu, 8 Jan
+ 2026 02:08:10 +0000
+Received: from LV3PR12MB9404.namprd12.prod.outlook.com
+ ([fe80::57ac:82e6:1ec5:f40b]) by LV3PR12MB9404.namprd12.prod.outlook.com
+ ([fe80::57ac:82e6:1ec5:f40b%5]) with mapi id 15.20.9499.002; Thu, 8 Jan 2026
+ 02:08:10 +0000
+From: Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To: Damien Le Moal <dlemoal@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH 1/2] block: fix blk_zone_cond_str() comment
+Thread-Topic: [PATCH 1/2] block: fix blk_zone_cond_str() comment
+Thread-Index: AQHcftrkwTAPqvaZvEyd1SBpKukxYLVHiY+A
+Date: Thu, 8 Jan 2026 02:08:10 +0000
+Message-ID: <16593f93-2642-4a74-9920-706c43722d2b@nvidia.com>
+References: <20260106070057.1364551-1-dlemoal@kernel.org>
+ <20260106070057.1364551-2-dlemoal@kernel.org>
+In-Reply-To: <20260106070057.1364551-2-dlemoal@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: LV3PR12MB9404:EE_|DM4PR12MB5889:EE_
+x-ms-office365-filtering-correlation-id: 30d6c7fc-4050-41ff-fe91-08de4e5ac586
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|376014|366016|10070799003|38070700021;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?MnZpUXprVFhvNVhHR0hYeEFZdTJKTTNMMlBiUmRhdVRHUmZWUUZ2N1luZENM?=
+ =?utf-8?B?b0tkOHJQNGRqQ2EweVY1TDk2OVQxYVk3VFpDc2tsMWZsYzZ3Z2x5ejZhVll2?=
+ =?utf-8?B?R0pneWE4T2IwZ3J0clR6TnQ0bGJ0ZlpjSm1lek9KMHJmTkp1dGpPOHp0T1Yr?=
+ =?utf-8?B?NnBaWXFqb01ZVUh1bXBmU3JscnJiUGF5OGdqTGdHQWkxeHdsejRoaVg1ZW1G?=
+ =?utf-8?B?SU01azN2OFU4LzVZYUN0RDV5em00cGx5RmVKNmdZaHNZV0hOMEhGVlJZUjVk?=
+ =?utf-8?B?R0xTWU1xdnBVTE1oTFJNdEkzS3pJeXRmRGh1b1MrcStIUHZaTnQwVGdjbElX?=
+ =?utf-8?B?QVBhOEdqUlE5Wnd6VGNjRy9rUmdBdG9xVnNsT0gweHJreEMySWZ2dU51OHB2?=
+ =?utf-8?B?b2FXNzd2dXFiL0pJQnJ4YXI0K1FrSEJNbWFSTzAvRit3bGc4V3RNSDZUelV4?=
+ =?utf-8?B?a3pXL0kyK1FSa1QxbTAzMUVkeXFyOG5rZEl2cjVDSnZTRGZoK1VvSjc4T2Ja?=
+ =?utf-8?B?UElSdS9RbjFKSXdRYThSMVNKa1B2cEhjNGREZFlza2F1SDdIQWp6azVNWVV0?=
+ =?utf-8?B?MENyVTVnVXVYeFM1U1kyUFc5dStpcFJnUGwxbzlFV2VEVVJQeHNYcU1nbkMv?=
+ =?utf-8?B?MnNEZlJYNENacEhYbDBjQUlPZUVlR1QxeVFTVXcwZXNUL0wxbmwybXViM1ow?=
+ =?utf-8?B?R0E3ZXd0UGxJQkJ3M1lqWFdRSEdBVGhNei96ekwwbU5BcEpIak5uK2cveU9P?=
+ =?utf-8?B?Q0kvOWlpVnArTHUva1ZSRkNVWnc4U0ZnUC91Tmw1ZDhPR3lSa1JjeWZyelNL?=
+ =?utf-8?B?S29tZFZqeGdaVmVQZmw2SXlqLzJwWnAxNnRmb3ZwYThtM1dBU3NYYjMzb3hW?=
+ =?utf-8?B?MHFFd1VkWGNGblo5MUJmMldpYXYyQjVyTXI1dXhCSzRQTGNGMGd4WlBwZlky?=
+ =?utf-8?B?am5SMzd5UmpHb1AzNW5FVGRKUWFGd2FlVUp3N1ZvSk5hWW5yOFFzYVNsY2Rk?=
+ =?utf-8?B?cFlmdjZIWWloblpRQVRnZ2d2dGswYk5sQ0hERW02UWMvbmVKaXdyaGFzVElh?=
+ =?utf-8?B?WTROMVQvVHA5TGNicDVXNERtQm5MdzR4QkZPQkdSKzg1QVZtbWQra0RjMFo2?=
+ =?utf-8?B?U05vUDRRQWxHeWdWOGRLQ283KzhNUElzdnZncWNOUHNYY1dvcGRLN3NSWldr?=
+ =?utf-8?B?NXdCR2hKTHVoVE1nUUczSENJNFp5bkFqbFRJZU5ENG5tU3c3aWs0SnhZeE5s?=
+ =?utf-8?B?anpxUi9oeVVPQ01GSnRtaXR6V28wMW14ZVRzUkxPYVYzbHBxa0pMMEFJdElq?=
+ =?utf-8?B?VmJxWitRRTdLSkI3VG1BK2ZZemdNWVpkbDMyRFVsRW8rc2tSSkNEVDZZVGt4?=
+ =?utf-8?B?WTVqK3lNZlhoajlvd0wzWUhNdlZyYzZrMkZwM0cydWdxVDl1WkIzSUZ5NFFa?=
+ =?utf-8?B?OVFoTm15cDhna1ZuWU54UE5sdmFRRVFKTlZzNGNvT3VVUEVmbTl2Q253T2dV?=
+ =?utf-8?B?LytvZjBNNUYyeHMzeEJmRGUyL1g5ZEg3ajF0SmRvazZIT2RSMTI2VXExTFpR?=
+ =?utf-8?B?WDBrNlFXZER6d3ZWa0pEMXEzV0poY0VoOWZIQnZna1llaWVhSVVJbHlJRkhw?=
+ =?utf-8?B?MW56aEwwRW1MZWtmUkFkelRQR1pPblc5TWNkTU5teGVYenZYRDMyNDM5cW1q?=
+ =?utf-8?B?NXFEcU1HMmg5UnVkZ2FzL0VHckpEMHdSbU1SbUNwTzIyUXJ5ZXJoWFdGVlJh?=
+ =?utf-8?B?cTlDWElmTC9NNitONHNPQ0FhcW9pWm5qWG1BaWRPRXlzZXZ2VlpGVkN0QkRN?=
+ =?utf-8?B?VFUxU1RnaHhzeEdxaWxYT2pCS3lXekVYeFp4aWo4czFuVnkxbVlUVzZrYVBz?=
+ =?utf-8?B?UjVaVFJsQS9sQ3d6QmloRXppdUpqNmg4cldBMVREcHgzVkJZMHhpMC9VbGZX?=
+ =?utf-8?B?QWpIeC9LRnBDK1RyaGVhN0VpOEZtc2lmNkV5U3RrVzJtOGk4OGxpQ2U1ano4?=
+ =?utf-8?B?aDJRNStVU3RvM3gyck10bmtPRUxYcElzakRSNXplRGRNQWx3L1p6T2cvaXRX?=
+ =?utf-8?Q?/Gy9eI?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR12MB9404.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(10070799003)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 2
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?dlMwVlpzYU9tRWJLOFNuL201V2lFRTY3SmJBa2VrTjB5elplZklTZCtsYTBM?=
+ =?utf-8?B?V055ZUZRWGxuQVhsdkhuTE9tbVhKNjQwRUVhRFRQZCtXa3lNNXBmaU1iN0tv?=
+ =?utf-8?B?SStCMS9WUkZoWE5IVjhUVFl2WURJK3RNbHNVMmxZbDVaUkhvaHBzTmdkcmpj?=
+ =?utf-8?B?bWZSb1UyQ3JsQTVhMjhRRjlIdWtuNFhRam41Z1NnckdRbG9tWmV6YWVKS2k0?=
+ =?utf-8?B?T1d5eHBNMXgreFcrQ21qRkNGZDhiRFk1ckw1UjJlMks0RFVEc3BxT1VUWVhL?=
+ =?utf-8?B?MlhKend0dGM5OTc5aDVhWDA2QUtsc3ZxR2NmS0RGcTJLTGVKeThMNURpS0ZZ?=
+ =?utf-8?B?dHYwejNwSWNRb2M5cE9JSmRnak5lbFVTaThwbitDWUZYbW5pV2hYbWZreFN6?=
+ =?utf-8?B?TG42NXFxMFVlaU5MMTFLUWxIbFVXWjlubFpjZUtBUmpWTGxXVnVpZmluaER4?=
+ =?utf-8?B?aStVaE1tWnRwWmRQWnJJcGJiRkdZeGhMdWdjdFlpMHUzOXFybW1KOHAyUkx3?=
+ =?utf-8?B?RkNBZWpkNk42dyt5TDlBZmh3azJPUm5aTHBSZFFKS3ZjUjVIRCs2cDJleTVX?=
+ =?utf-8?B?TlhzWlczWHRpS0QydDliekVLbVNNL1R3Y2IwV2VZZU9RdkpTdzJmTG9NZkRO?=
+ =?utf-8?B?OTdtRXpCbmpLb0NNS3BIci9oRXlkcldxZEU4VjhjdS8wdDV5Vi9LakpNUU5h?=
+ =?utf-8?B?a3o2VW1GbWZVUXhqek0wNlNVYXdpbGNaOWRBenRETkVhZDBnMnI1MzR3VStE?=
+ =?utf-8?B?Z0xwVFJoOC9aSHg2N1VHaWwvVnpkY3BOZ0JsOG41OVIyNDluNkhUVVJGckdx?=
+ =?utf-8?B?RENNaWtyVHJSZFdIc1k2VTBDQ2p4bXVEUkJvbmhUZTVVSmRMV3AzVDIxQi9m?=
+ =?utf-8?B?dHViVFQ3K0VXR01zZ3NyazEzRU5PYzlBNDB0RTFNUDEvaUw5OHM3OGxOYWE3?=
+ =?utf-8?B?dVdtZ3R6dGg5VEMwM0tTbVVHcGVHK0tFbVhZWll6ek9LcTZ3Mi91NzRaTzlq?=
+ =?utf-8?B?Q3VwL3RRSG9PTmdaa0o3SFM3aXJzYlZKS20wTjBXQ2RpbGtDU0ZZcUFNR3Jo?=
+ =?utf-8?B?blo3UXoyU1pYNkFvdFpPYWhqWERqajFVc0RWWUFtZXR0VFRKNG8vY0hHUU9W?=
+ =?utf-8?B?eEhLWDRGaGJvd0dYTXZwRHErMjFyT3ZqZWhGc0FSZmNzVFNxblJMQkhBVmE5?=
+ =?utf-8?B?UXdZdEIxbzJkRW4vZWhQZy92bklUQjQwTml0QmpaWm1tZUdFS1p2b1V5OTBO?=
+ =?utf-8?B?QzVURGQwTkYyU2pndUkrZjliejdwQlY3bjdvOTlRaEZ0MjVOa0tZVmJpNjVG?=
+ =?utf-8?B?UDNCdXZLUFhibTlvajNHbnNmRFU0b1Y2ZHZiTFBUNVFSL0dicWUvSnRod1c2?=
+ =?utf-8?B?SUo4dEliZDZqNDBZeW9YTHU4WG5IcWtCTk1lUmkvdmJMK1gwbExLOVBQR3Ay?=
+ =?utf-8?B?U1ZjTWtBeTNrZlVVQi9UVUN2dmE1TzlZRVpkNERhTjA4dGxEc3c3ZkN6dURW?=
+ =?utf-8?B?T2N2dW9TZ1pCRXVqR28rMnNHVEgycXFCSXRoc0pmSHFEaTZZdjVsdWtzRWxE?=
+ =?utf-8?B?Z0EwRHlkRWFhcUl1K1VVQXVTSlhoaGFJV3diRElFN1dUMEVjWGRvNTlUaDhs?=
+ =?utf-8?B?Q2xQREtsSlVzdCthcnBVdkx4YVEraU1LV3dDSVVrdDZ5bzYyT0RWTlVwai94?=
+ =?utf-8?B?WkxncEpUMWMyUDl2SWRKbDZBVlhqTElaVG9wNHBTc2Jic3dXSGcvQlp3OVBV?=
+ =?utf-8?B?Ri9sNlBjTk5vUlFVR0NuZ2hhY0RUL2x6Z2hrRFZRdHlvVE1ZaVVqY0V2Q2dV?=
+ =?utf-8?B?QnV2SFB6SzhueloxYVVySllLN0tzWHp2cVZJbHB3YUliWnoya0R1WDBNK3V5?=
+ =?utf-8?B?cVZHendiZU9LbnFjOUFGckxFTWRkcWViMFJ5eHFTaktDaUFHSUJHOS9PTUNK?=
+ =?utf-8?B?bzQyckM4eTNJS3JSV3Z4akczQzE4NnBuYkxWcGYrUGlCaytPb29ZT2N1K2cx?=
+ =?utf-8?B?Z1ZUdmtYR1dvcHE2WjdubUZLMFNHUTFuUTlmQWcxaXE1anNCcjlVNTBiVXhw?=
+ =?utf-8?B?U3FiaWcvNTBuVzVndWhoTnQ3ZVBTcExJWEZNY3QyajlWQnBkKzNFNkcyWmN0?=
+ =?utf-8?B?QzRMSXBnZzU5MHFrYmg3TkhxQVMrZDdUalJwUG1LTnhPdmF1VzZpalJGRkMr?=
+ =?utf-8?B?OHprYmRZYnFySXJEV3ZvUmRwYTl6UWtqR3R3M2U5RlROUm9oQmY4bm83RlR3?=
+ =?utf-8?B?aHhOL3hETEdUUVg2OCtJZmx5a3B5M01kMVpYZnAvRzl4N1VjMVVGRlU3OXZo?=
+ =?utf-8?B?ZnMwMEduUW5kZmZvSGFsb0RCOXZpbVNZWnFVYVNYbkRQeHJxUXlLMHBpOWxs?=
+ =?utf-8?Q?//jlTIFRayxLIjUQMgVcp+vlf3tCRdosHhvJtCL9Kb87Q?=
+x-ms-exchange-antispam-messagedata-1: gKsIkNjBvCNwwA==
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <878A82197CB25044947DF34A6977EBE0@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADUfDZpyYfUGC0zD76E--xVMOwBsf_NoLwax2n+0fVBOAjAODA@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: LV3PR12MB9404.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 30d6c7fc-4050-41ff-fe91-08de4e5ac586
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Jan 2026 02:08:10.0784
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: UBua7f8yqvrKMiT39WjmDGvPZb6Yh5YE1d1Jd/NbXEN4+CywtP6iLq6FtNw71U8nMrQZEfEuBu96IO9ndTK5bA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5889
 
-On Wed, Jan 07, 2026 at 09:45:08AM -0800, Caleb Sander Mateos wrote:
-> On Mon, Jan 5, 2026 at 5:55 PM Ming Lei <ming.lei@redhat.com> wrote:
-> >
-> > On Mon, Jan 05, 2026 at 08:44:48AM -0800, Caleb Sander Mateos wrote:
-> > > On Sat, Jan 3, 2026 at 6:14 AM Ming Lei <ming.lei@redhat.com> wrote:
-> > > >
-> > > > On Fri, Jan 02, 2026 at 05:45:14PM -0700, Caleb Sander Mateos wrote:
-> > > > > Indicate to the ublk server when an incoming request has integrity data
-> > > > > by setting UBLK_IO_F_INTEGRITY in the ublksrv_io_desc's op_flags field.
-> > > > > If the ublk device doesn't support integrity, the request will never
-> > > > > provide integrity data. If the ublk device supports integrity, the
-> > > > > request may omit the integrity buffer only if metadata_size matches the
-> > > > > PI tuple size determined by csum_type. In this case, the ublk server
-> > > > > should internally generate/verify the protection information from the
-> > > > > data and sector offset.
-> > > > > Set the UBLK_IO_F_CHECK_{GUARD,REFTAG,APPTAG} flags based on the
-> > > > > request's BIP_CHECK_{GUARD,REFTAG,APPTAG} flags, indicating whether to
-> > > > > verify the guard, reference, and app tags in the protection information.
-> > > > > The expected reference tag (32 or 48 bits) and app tag (16 bits) are
-> > > > > indicated in ublksrv_io_desc's new struct ublksrv_io_integrity integrity
-> > > > > field. This field is unioned with the addr field to avoid changing the
-> > > >
-> > > > It might be fine to set per-rq app_tag, but bios in one request might have
-> > > > different app_tag in case of io merge actually.
-> > >
-> > > I based this logic largely on the code under if (ns->head->ms) in
-> > > nvme_setup_rw(). That also assumes a single app_tag for the request.
-> > > Sounds like an existing bug if bios with different app_tags can be
-> > > merged together?
-> >
-> > Looks it is true.
-> >
-> > >
-> > > >
-> > > > Also block layer builds ref_tag for each internal, please see
-> > >
-> > > What do you mean by "internal"? "interval"?
-> > >
-> > > > t10_pi_generate() and ext_pi_crc64_generate().
-> > >
-> > > Yes, the reftag increases by 1 for each integrity interval. That's why
-> > > it suffices for an NVMe command reading multiple blocks to specify
-> > > only the expected reftag for the first block; the reftags for
-> > > subsequent blocks are incremented accordingly.
-> > >
-> > > Actually, I think we probably don't need to communicate the reftag
-> > > seed to the ublk server. NVMe doesn't use the reftag seed (which can
-> > > be overridden by struct uio_meta's seed field). Instead,
-> > > nvme_set_ref_tag() always uses the offset into the block device
-> > > divided by the integrity interval size, as required by all the
-> > > existing csum_type formats the kernel supports. So a ublk server could
-> > > just use the start_sector field of struct ublksrv_io_desc to compute
-> > > the expected reftags. And using start_sector as the reftag also means
-> > > merging requests would preserve their expected reftags.
-> >
-> > IMO, this way looks fine from user viewpoint, especially aligning with NVMe.
-> >
-> > >
-> > > >
-> > > > So looks this way is wrong.
-> > > >
-> > > > More importantly reusing iod->addr for other purpose not related with IO
-> > > > buffer is very unfriendly for adding new features, and one lesson is for ZONED support
-> > > > by reusing ublksrv_io_cmd->addr for zoned's append lba.
-> > >
-> > > That's a fair point.
-> >
-> > One candidate is add per-IO mmaped meta area, which can be flexible to
-> > cover more use cases.
-> >
-> > >
-> > > >
-> > > > For example, there is chance to support dma-buf based zero copy for ublk, and
-> > > > please see the io-uring dma-buf support[1], and iod->addr might carry IO buffer info
-> > > > in dma-buf format in future.
-> > > >
-> > > > [1] https://lore.kernel.org/io-uring/cover.1763725387.git.asml.silence@gmail.com/#t
-> >
-> > BTW, PI data size is often small, and it belongs to kernel, there could be
-> 
-> The integrity data buffer isn't necessarily kernel memory. With
-> IORING_RW_ATTR_FLAG_PI, userspace can use a buffer from its address
-> space for the integrity data.
-
-You are right, that is something I missed, but it is from io_uring
-interface.
-
-> 
-> > chance to define PI data as pre-mapped DMA-BUF, then almost all drivers can
-> > benefit from avoiding the runtime dma mapping for meta. But that may be one
-> > bigger thing.
-> 
-> Yes, I think it would be a significant amount of work to use
-> pre-mapped buffers for integrity data. I'd like to avoid that in this
-> patch set and focus on just the ublk integrity data support.
-
-Agree.
-
-> 
-> >
-> > > >
-> > > >
-> > > > > size of struct ublksrv_io_desc. UBLK_F_INTEGRITY requires
-> > > > > UBLK_F_USER_COPY and the addr field isn't used for UBLK_F_USER_COPY, so
-> > > > > the two fields aren't needed simultaneously.
-> > > > >
-> > > > > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-> > > > > ---
-> > > > >  drivers/block/ublk_drv.c      | 43 +++++++++++++++++++++++++++++++----
-> > > > >  include/uapi/linux/ublk_cmd.h | 27 ++++++++++++++++++++--
-> > > > >  2 files changed, 64 insertions(+), 6 deletions(-)
-> > > > >
-> > > > > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > > > > index 2f9316febf83..51469e0627ff 100644
-> > > > > --- a/drivers/block/ublk_drv.c
-> > > > > +++ b/drivers/block/ublk_drv.c
-> > > > > @@ -316,10 +316,36 @@ static inline bool ublk_dev_is_zoned(const struct ublk_device *ub)
-> > > > >  static inline bool ublk_queue_is_zoned(const struct ublk_queue *ubq)
-> > > > >  {
-> > > > >       return ubq->flags & UBLK_F_ZONED;
-> > > > >  }
-> > > > >
-> > > > > +static void ublk_setup_iod_buf(const struct ublk_queue *ubq,
-> > > > > +                            const struct request *req,
-> > > > > +                            struct ublksrv_io_desc *iod)
-> > > > > +{
-> > > > > +#ifdef CONFIG_BLK_DEV_INTEGRITY
-> > > > > +     if (ubq->flags & UBLK_F_INTEGRITY) {
-> > > > > +             struct bio_integrity_payload *bip;
-> > > > > +             sector_t ref_tag_seed;
-> > > > > +
-> > > > > +             if (!blk_integrity_rq(req))
-> > > > > +                     return;
-> > > > > +
-> > > > > +             bip = bio_integrity(req->bio);
-> > > > > +             ref_tag_seed = bip_get_seed(bip);
-> > > >
-> > > > As mentioned, t10_pi_generate() and ext_pi_crc64_generate() builds
-> > > > per-internal ref tag.
-> > >
-> > > As mentioned, the reftags for subsequent intervals can be computed by
-> > > simply incrementing the seed. If the seed is assumed to always be
-> > > start_sector >> (interval_exp - SECTOR_SHIFT), then it may not be
-> > > necessary to communicate ref_tag_seed at all.
-> >
-> > Fair enough, but this should be documented in UAPI interface.
-> >
-> > >
-> > > >
-> > > >
-> > > > > +             iod->integrity.ref_tag_lo = ref_tag_seed;
-> > > > > +             iod->integrity.ref_tag_hi = ref_tag_seed >> 32;
-> > > > > +             iod->integrity.app_tag = bip->app_tag;
-> > > >
-> > > > In case of io merge, each bio may have different ->app_tag.
-> > >
-> > > It seems like it would make more sense to prevent merging bios with
-> > > different app_tags. In the common case where a request contains a
-> > > single bio, which has a single app_tag, it would be much more
-> > > efficient to communicate only the 1 app_tag instead of having to pass
-> > > a separate app_tag for every logical block/integrity interval.
-> >
-> > OK.
-> >
-> > >
-> > > >
-> > > > Given you have to copy meta data via user copy, I suggest to follow the PI
-> > > > standard and make it per-internal.
-> > >
-> > > How are you suggesting the ublk server access bip->app_tag and
-> > > bip_get_seed(bip) (if overriding the reftag seed is supported)? Would
-> > > the ublk server need to make another user copy syscall?
-> > >
-> > > Or would you prefer I drop the BIP_CHECK_* flag support from this
-> > > patch set for now?
-> >
-> > I can understand the motivation, and extra syscall should be avoided for
-> > communicating reftag & apptag only, given you have explained both can be
-> > per-request instead of per-interval.
-> >
-> > But iod->addr should be avoided for this purpose, otherwise, new feature
-> > can conflict with this usage easily.
-> >
-> > But per-io mmapped area can solve this issue, the meta size can be one parameter
-> > of `ublksrv_ctrl_dev_info` with feature flag of UBLK_F_MMAPED_IO_META, what
-> > do you think of this way?
-> 
-> Are you thinking this userspace-mapped region would consist of one u16
-> app_tag per ublk I/O descriptor? It seems a bit complex to introduce
-> an additional userspace-mapped region just to communicate the app_tag.
-> What do you think about making the size of the I/O descriptor
-> information dependent on the feature flags? Basically extend
-> ublksrv_io_desc with an app_tag field if UBLK_F_INTEGRITY is set. This
-> mechanism could be extended to communicate other per-request
-> information in the future.
-
-Right, that is basically what I suggested:
-
-- add new feature flag UBLK_F_IO_DESC_EXT or UBLK_F_IO_META, meantime add
-  .io_desc_ext_size or .io_meta_size field in `ublksrv_ctrl_dev_info`
-
-- in case of this feature enabled, per-IO mmaped data size is increased to
-  
-  	sizeof(ublksrv_io_desc) + 
-		.io_desc_ext_size or .io_meta_size(should be 8 bytes aligned)
-
-This way should be easy to implement, and it is flexible for many extentions
-in future, such as, you can set proper size for avoiding extra PI user copy
-for small IO.
-
-
-Thanks,
-Ming
-
+T24gMS81LzI2IDIzOjAwLCBEYW1pZW4gTGUgTW9hbCB3cm90ZToNCj4gRml4IHRoZSBjb21tZW50
+IGZvciBibGtfem9uZV9jb25kX3N0cigpIGJ5IHJlcGxhY2luZyB0aGUgbWVhbmluZ2xlc3MNCj4g
+QkxLX1pPTkVfWk9ORV9YWFggY29tbWVudCB3aXRoIHRoZSBjb3JyZWN0IEJMS19aT05FX0NPTkRf
+bmFtZSwgdGh1cyBhbHNvDQo+IHJlcGxhY2luZyB0aGUgWFhYIHdpdGggd2hhdCB0aGF0IGFjdHVh
+bGx5IG1lYW5zLg0KPg0KPiBTaWduZWQtb2ZmLWJ5OiBEYW1pZW4gTGUgTW9hbDxkbGVtb2FsQGtl
+cm5lbC5vcmc+DQoNCkxvb2tzIGdvb2QuDQoNClJldmlld2VkLWJ5OiBDaGFpdGFueWEgS3Vsa2Fy
+bmkgPGtjaEBudmlkaWEuY29tPg0KDQotY2sNCg0KDQo=
