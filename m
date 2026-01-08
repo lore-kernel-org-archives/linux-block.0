@@ -1,177 +1,99 @@
-Received: from mail3-167.sinamail.sina.com.cn (mail3-167.sinamail.sina.com.cn [202.108.3.167])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB6744B9E7A
-	for <linux-block@vger.kernel.org>; Thu,  8 Jan 2026 10:36:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.108.3.167
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8568F441034
+	for <linux-block@vger.kernel.org>; Thu,  8 Jan 2026 12:14:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767868589; cv=none; b=uepIUZntRcyg2gepRKYSsQxwmMB1wGMhuGQClEcXFsEEZHZChs6tDuCwUWGtjyThBWRXTCy2xO6+eMCMtF1V8nvrWS/fxv42JRDof9Q6hFhUq91rRsHjJPWGRA23Ra4CRCOsEJdEv1EW8xPPcqCa6/o0S1ZT41PgnSGtuqjdjCQ=
+	t=1767874491; cv=none; b=FFYiWQyvQL2Ab4zoQCrFt3c8Ec3mg8R6I1G0eSHW9Z81NfCYwZ7LCysEUTdlW4qN92l/njWvi/93O3xS3q4JlTFOWIZHK/dCbheeLIK+VnVSrnlow1aklDEYzC4oER99CqQavq4qk0a2AJxmMld3p34dBqVvHXljYQ6zAZl0u3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767868589; c=relaxed/simple;
-	bh=op7055KsVRf0QKrHS7uftM549Xva9fIs9XkoBybVfd0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BfLcw9YjcKoLJojcrtdnOaw8ZpVsNlWACS8iy7Vn776+9ac+bTLqyAHCP/HlKxqNy0uSTlaHz1srrXicgscnwV93ZreXagHsyDDXsRcCsln29P4lyODYk+0Fv0xexm01M+g0lVQtdQDDNLucazibJLXmYRGQolslg1eH/vGMF+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=Ka1Q6PuG; arc=none smtp.client-ip=202.108.3.167
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+	s=arc-20240116; t=1767874491; c=relaxed/simple;
+	bh=8OjR00LI97LjKvDNXw3KG6qSBV2UsnBXXlfmyFmZlxY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uwkGeAXeYapnizmXpqBFDSL7E6uqCKmp9iuroyU+0OJtJAhhs1Y+WHaMW+Y6JJ6Wo7J0h9BQKxkPTIvq2ZJTj/vadtv5d2roSxhsGlju34+YMpcyvhQYkxkgETeXFAg0E1RY2bzECSe0iU1TlVwRYbArN1i0xltzZVFEKTjsgN0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SBjSHFCQ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="Ka1Q6PuG"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1767868579;
-	bh=dvlc7vqh4bhdCSEuA5TpLBp3Xu6DhQ+wjbFss0nogZw=;
-	h=Message-ID:Date:Subject:From;
-	b=Ka1Q6PuGS52o8s8OrIcYL0AnvGp3A23BV+r/oB3PYdIasb6SEbdoaWdKkkU2QltYA
-	 2a+wQCd0hYNvsUWm/FbG+OHo1ILIT1yVG66z9h5V3+71TYEXGglNjjFwve4hyRZrOJ
-	 QIHd4R1uTF4aL4m0sFTCOnNpYrQrH46jNzSTrNsg=
-X-SMAIL-HELO: [10.189.149.126]
-Received: from unknown (HELO [10.189.149.126])([114.247.175.249])
-	by sina.com (10.54.253.33) with ESMTP
-	id 695F8895000018B3; Thu, 8 Jan 2026 18:36:07 +0800 (CST)
-X-Sender: zhangdongdong925@sina.com
-X-Auth-ID: zhangdongdong925@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=zhangdongdong925@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=zhangdongdong925@sina.com
-X-SMAIL-MID: 117396685200
-X-SMAIL-UIID: 0A83DA6CFAD5406983CF226D49853D50-20260108-183607-1
-Message-ID: <731f6e5b-f678-49ef-ad8e-fe6ff85d5422@sina.com>
-Date: Thu, 8 Jan 2026 18:36:04 +0800
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SBjSHFCQ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767874484;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=t2qCFNA4/Erewu1t8D7IW9h5dHqTnH3aALQyYtKnmOM=;
+	b=SBjSHFCQPkyVXx8GKdcy2/TocmINm1WJP6XZt/P5UhAjfTf/NyVHpoYEGSkZyky5yoLmyV
+	a5ZI0mm/qsPd3C4HNTJlHE0DB1oTdYmwLZpajamu1pxzAuUYaJaNBAZkHhJ7dLMFWq7zxn
+	6xEhw5JMQVlBnUudeAvK59AcQTygdQ4=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-561-AblKnrJkOPa--NQ8ZeZf2w-1; Thu,
+ 08 Jan 2026 07:14:38 -0500
+X-MC-Unique: AblKnrJkOPa--NQ8ZeZf2w-1
+X-Mimecast-MFC-AGG-ID: AblKnrJkOPa--NQ8ZeZf2w_1767874477
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C8BE0195608D;
+	Thu,  8 Jan 2026 12:14:36 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.180])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1643F19560A2;
+	Thu,  8 Jan 2026 12:14:29 +0000 (UTC)
+Date: Thu, 8 Jan 2026 20:14:23 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Shuah Khan <shuah@kernel.org>,
+	linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Stanley Zhang <stazhang@purestorage.com>,
+	Uday Shankar <ushankar@purestorage.com>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>
+Subject: Re: [PATCH v4 03/19] ublk: support UBLK_PARAM_TYPE_INTEGRITY in
+ device creation
+Message-ID: <aV-fnxYoyCdphIU5@fedora>
+References: <20260108091948.1099139-1-csander@purestorage.com>
+ <20260108091948.1099139-4-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 1/7] zram: introduce compressed data writeback
-To: Sergey Senozhatsky <senozhatsky@chromium.org>,
- Jens Axboe <axboe@kernel.dk>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
- Richard Chang <richardycc@google.com>, Minchan Kim <minchan@kernel.org>,
- Brian Geffon <bgeffon@google.com>, David Stevens <stevensd@google.com>,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- linux-block@vger.kernel.org, Minchan Kim <minchan@google.com>,
- xiongping1@xiaomi.com, huangjianan@xiaomi.com, wanghui33@xiaomi.com
-References: <20251201094754.4149975-1-senozhatsky@chromium.org>
- <20251201094754.4149975-2-senozhatsky@chromium.org>
- <40e38fa7-725b-407a-917a-59c5a76dedcb@sina.com>
- <7bnmkuodymm33yclp6e5oir2sqnqmpwlsb5qlxqyawszb5bvlu@l63wu3ckqihc>
- <2663a3d3-2d52-4269-970a-892d71c966bb@sina.com>
- <z22c2qgw2al73yij2ml2hlle2p24twgpmz4jemfqhjoiekc65f@pvap7olsolfp>
- <a527b179-263f-40ad-9d7c-bfa86731bfde@sina.com>
- <luzn25fgin43cnbmvmxwps7isqeq2pt5kfn26jqzly6hbnedlp@ojpw52ldzmuw>
-Content-Language: en-US
-From: zhangdongdong <zhangdongdong925@sina.com>
-In-Reply-To: <luzn25fgin43cnbmvmxwps7isqeq2pt5kfn26jqzly6hbnedlp@ojpw52ldzmuw>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260108091948.1099139-4-csander@purestorage.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+
+On Thu, Jan 08, 2026 at 02:19:31AM -0700, Caleb Sander Mateos wrote:
+> From: Stanley Zhang <stazhang@purestorage.com>
+> 
+> Add a feature flag UBLK_F_INTEGRITY for a ublk server to request
+> integrity/metadata support when creating a ublk device. The ublk server
+> can also check for the feature flag on the created device or the result
+> of UBLK_U_CMD_GET_FEATURES to tell if the ublk driver supports it.
+> UBLK_F_INTEGRITY requires UBLK_F_USER_COPY, as user copy is the only
+> data copy mode initially supported for integrity data.
+> Add UBLK_PARAM_TYPE_INTEGRITY and struct ublk_param_integrity to struct
+> ublk_params to specify the integrity params of a ublk device.
+> UBLK_PARAM_TYPE_INTEGRITY requires UBLK_F_INTEGRITY and a nonzero
+> metadata_size. The LBMD_PI_CAP_* and LBMD_PI_CSUM_* values from the
+> linux/fs.h UAPI header are used for the flags and csum_type fields.
+> If the UBLK_PARAM_TYPE_INTEGRITY flag is set, validate the integrity
+> parameters and apply them to the blk_integrity limits.
+> The struct ublk_param_integrity validations are based on the checks in
+> blk_validate_integrity_limits(). Any invalid parameters should be
+> rejected before being applied to struct blk_integrity.
+> 
+> Signed-off-by: Stanley Zhang <stazhang@purestorage.com>
+> [csander: drop redundant pi_tuple_size field, use block metadata UAPI
+>  constants, add param validation]
+> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
 
-On 1/8/26 11:39, Sergey Senozhatsky wrote:
-> Hi,
-> 
-> On (26/01/08 10:57), zhangdongdong wrote:
->>> Do you use any strategies for writeback?  Compressed writeback
->>> is supposed to be used for apps for which latency is not critical
->>> or sensitive, because of on-demand decompression costs.
->>>
->>
->> Hi Sergey,
->>
->> Sorry for the delayed reply — I had some urgent matters come up and only
->> got back to this now ;)
-> 
-> No worries, you reply in a perfectly reasonable time frame.
-> 
->> Yes, we do use writeback strategies on our side. The current implementation
->> focuses on batched writeback of compressed data from
->> zram, managed on a per-app / per-memcg basis. We track and control how
->> much data from each app is written back to the backing storage, with the
->> same assumption you mentioned: compressed writeback is primarily
->> intended for workloads where latency is not critical.
->>
->> Accurate prefetching on swap-in is still an open problem for us. As you
->> pointed out, both the I/O itself and on-demand decompression introduce
->> additional latency on the readback path, and minimizing their impact
->> remains challenging.
->>
->> Regarding the workqueue choice: initially we used system_dfl_wq for the
->> read/decompression path. Later, based on observed scheduling latency
->> under memory pressure, we switched to a dedicated workqueue created with
->> WQ_HIGHPRI | WQ_UNBOUND. This change helped reduce scheduling
->> interference, but it also reinforced our concern that deferring
->> decompression to a worker still adds an extra scheduling hop on the
->> swap-in path.
-> 
-> How bad (and often) is your memory pressure situation?  I just wonder
-> if your case is an outlier, so to speak.
-> 
-> 
-> Just thinking aloud:
-> 
-> I really don't see a path back to atomic zram read/write.  Those
-> were very painful and problematic, I do not consider a possibility
-> of re-introducing them, especially if the reason is an optional
-> feature (which comp-wb is).  If we want to improve latency, we need
-> to find a way to do it without going back to atomic read/write,
-> assuming that latency becomes unbearable.  But at the same time under
-> memory pressure everything becomes janky at some point, so I don't
-> know if comp-wb latency is the biggest problem in that case.
-> 
-> Dunno, *maybe* we can explore a possibility of grabbing both entry-lock
-> and per-CPU compression stream before we queue async bio, so that in
-> the bio completion we already *sort of* have everything we need.
-> However, that comes with a bunch of issues:
-> 
-> - the number of per-CPU compression streams is limited, naturally,
->    to the number of CPUs.  So if we have a bunch of comp-wb reads we
->    can block all other activities: normal zram reads/writes, which
->    compete for the same per-CPU compressions streams.
-> 
-> - this still puts atomicity requirements on the compressors.  I haven't
->    looked into, for instance, zstd *de*-compression code, but I know for
->    sure that zstd compression code allocates memory internally when
->    configured to use pre-trained CD-dictionaries, effectively making zstd
->    use GFP_ATOMIC allocations internally, if called from atomic context.
->    Do we have anything like that in decompression - I don't know.  But in
->    general we cannot be sure that all compressors work in atomic context
->    in the same way as they do in non-atomic context.
-> 
-> I don't know if solving it on zram side alone is possible.  Maybe we
-> can get some help from the block layer: some sort of two-stage bio
-> submission.  First stage: submit chained bio-s, second stage: iterate
-> over all submitted and completed bio-s and decompress the data.  Again,
-> just thinking out loud.
-> 
-
-Hi Sergey,
-
-My thinking is largely aligned with yours. I agree that relying on zram
-alone is unlikely to fully solve this problem, especially without going
-back to atomic read/write.
-
-Our current mitigation approach is to introduce a hook at the swap layer
-and move decompression there. By doing so, decompression happens in a
-fully sleepable context, which avoids the atomic-context constraints
-you outlined. This helps us sidestep the core issue rather than trying
-to force decompression back into zram completion paths.
-
-For reference, this is the change we are experimenting with:
-https://android-review.googlesource.com/c/kernel/common/+/3724447
-
-I also noticed that Richard proposed a similar optimization hook recently:
-https://android-review.googlesource.com/c/kernel/common/+/3730147
-
-Regarding your question about memory pressure: our current test case
-runs on an 8 GB device, with around 50 apps being launched sequentially.
-This creates fairly heavy memory pressure. In earlier tests using an
-async kworker-based approach, we observed an average latency of about
-1.3 ms,but with tail latencies occasionally reaching 30–100 ms.
-
-If I recall correctly, this issue first became noticeable after a block
-layer change was merged; I can try to dig that up and share more details
-later.
-
-Best regards,
-dongdong
+Thanks,
+Ming
 
