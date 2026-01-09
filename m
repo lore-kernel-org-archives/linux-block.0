@@ -1,76 +1,118 @@
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B16EA28C5B1
-	for <linux-block@vger.kernel.org>; Thu,  8 Jan 2026 22:39:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98C7623ABBD
+	for <linux-block@vger.kernel.org>; Fri,  9 Jan 2026 02:11:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767912001; cv=none; b=LYTnDQH5KcxQ7Ildn67ZpVACPBj0HDvN7Osh77bIAM7BnZvOcAMLdjX0peP+ajTPAgnDCfS6+o1Q/yzi4vS9oOvBxDP+4JOXitheFf8hfuq6KRgJIj+GddMk5/DPaYptMtnWxd0VMaPMYX7qME6QTD9EZZiVPYfEsb47wMGzHjQ=
+	t=1767924687; cv=none; b=vBPU2pmgunmAxwnkSxrWXSisbiX4LoZH7Bmp37GL+JY8Tt18VbWjs0IsNT+HhocUgUMcHEZ9wRa/bZGERJBHZpg+NcUPo3yydeCszNZEoeT1nZpVVfySYuXmLChvoreyaK4dALI/dRjq/OB6p/C7hBgWNEWL5qwtzTcchCFeq6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767912001; c=relaxed/simple;
-	bh=gm1y3HjSbfjetP2qj6SkQ/PvAerOiP935sq/jHQIUpg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=V7cZDkabDj2ENkPjHOZwKVh1O1rL3UrXWaJa8Hh2GHeAJQFUwWn8CQIlxA9oPkxhw0UsM1GyNG+iwoqYDRUujOda/Gr1ljP8gRMPkzNe5Rlb1JnxDgkQL2IchxHgRFUqSq8Bn21GIMYLj8g6/f8HygJ8DfHuFm4vddQWyMcpmWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QbgZy9aq; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1767924687; c=relaxed/simple;
+	bh=4xHCKtZXDRo7uO8OxrPGMlVhxh8phR1fHCKcxDBXTjc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aFGVWjon0Ovlyl9qQiJUCOsmenqb8PrwZpRPp81MAHlSsdwrPxbarU+vnAEDEzW6mcA7ie0nhX0k7XmoldcsCBPPcsmff2jlZ3pVl6PSyM893DI7DeUDgJz0lO9iQSrUE6xpAogvEEB9m+4sLCVwpkeFkCrEYPbsWARzQpWvDyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LVTKDf/H; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QbgZy9aq"
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-64b921d9e67so6177507a12.3
-        for <linux-block@vger.kernel.org>; Thu, 08 Jan 2026 14:39:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1767911998; x=1768516798; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=gm1y3HjSbfjetP2qj6SkQ/PvAerOiP935sq/jHQIUpg=;
-        b=QbgZy9aqk2vWTF3AOoOaQPqCoxYmFHqIMeKqpp0LyGpZzijVwmyPhs/o+evjzVCH7w
-         wKuZCHr+r2RCbO6QbDHqKVNdBJINLcOWqyd8ZlHWDSDWuhzUX1xzJ9+RHrBEDRJN6Ss3
-         UzlrtGVmmTpU9t+QegvtAnOuN3FkhXpu2VM6EADugxTgXPDsLcDg149nSjautFtBCl44
-         0EISw+Kn9tMf9ARygEjCw8PBBB+tugSz5Yt3exeEA32qaP2D5w+4imIv8jDZYrT3slsb
-         SaRRsMc7We6RSq87eGTHuFBiKcPtGd4oLjX0HljsDxZlGSBwJgvzQhRZpnXsIXj0kU8q
-         TQxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767911998; x=1768516798;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gm1y3HjSbfjetP2qj6SkQ/PvAerOiP935sq/jHQIUpg=;
-        b=U5a70UrXCEZlBDlKGuE0nEjP6tmuMKSfVqhvsEXVULlL62DWr6NdFYCxO5JvB1GBT6
-         Q2QdO7OGquAGEKXY8jnSlJIRo7P8lYJyjA2l2IYrNJkn4TQaS2qo7DHlDmgDQkUbUtcV
-         DgNuz36mEszqeK1KXx19V64R51dF5oj/9roaEbYnH017KvMsJwIaaYCZZMnHwlGWSYse
-         BJ7c0Rng45L2pseRm3YbolHaLWU2StJDydozaKugEIVqXxGIb5ZevlQVs6jIiDj1Gnh8
-         von7Lby7PrfmYtT8jKZvzjlac4oKpcOHzIwgVD6hNvtJq6HAxxINF32S+cFqCt2MHc4z
-         /b+g==
-X-Forwarded-Encrypted: i=1; AJvYcCVy1D2gg+0CHDQbWTc8lXnVdNvPhfW333KF6CRA/X0bLQIeG3DI0lNQ0cxO5OQ+YRJI8wVZXCcI2eGuwQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5uOoNajEmRxQqgaBXiJfFTNGf1HscoiH6aL7uuyvdU+vxKT8W
-	0cOdnEkNzN/Hshx6PVhYbAOOPm5s+3QE+F2x+73bdNzn1sSx50wv9SewcHnUz3m32XyCfLUPoZy
-	H/jti/cfZiDx0vatww18sZNm2DrwPTg==
-X-Gm-Gg: AY/fxX7nGLc/adeh9DkBO45jB/dgi7s5mO3CxSBiATAKvCc6Nl34qqm/OeUq/dGT66j
-	MpVZXHG9ZK5hMv+473rbF5TazYggA47ZA+lhmpjAT6I9cAUTWdylG3kg03ZDrsni3fTmd9Sjib9
-	CFgxvHq/eckQvLZFC6nefVWxt7xy30zpVGwiKcCziwd8Zj8+IR1vDqtkDjeQfkUBXW0U7VaNphf
-	61gl56PhDWXRw6ma8wBEo+ncbivkN8zcm+JEZUEO4mImOZ4Y1XkoP/7SpmYAhBIZZ5Dd7IzmoJm
-	rHJondMFDx+BLODqGgYEon+oU5kG6TIV8Ea+5fGL3Q==
-X-Google-Smtp-Source: AGHT+IGOvCDDBmwDmcHZS3ZLtEWMgsbk8YHksldlgh5+t7hmn+dGTou0rilUkLBS0AawN5vMkCkMfsAwQHKnMCFbePA=
-X-Received: by 2002:a05:6402:50cc:b0:640:c460:8a90 with SMTP id
- 4fb4d7f45d1cf-65097dea447mr6973619a12.12.1767911997940; Thu, 08 Jan 2026
- 14:39:57 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LVTKDf/H"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767924684;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=09fZuRtKBthvUPFZRfmDU+5G5cxlC+xjTolnVnh0EhI=;
+	b=LVTKDf/HaWrjfx7phLferX+Qj5m+dBz8cAdm0QxQPevy/Mm7baMmdRDnscLs3DgfGVL5zb
+	JJxcSVol8o/3HnWZtr/typ5zFdtRNJFNjF1HckAvuMiggMbx8jyEcJ6PTdhFIpnswh1t3H
+	dWHkFm8WvgsHEvNlCmP+xDCm/puwZhk=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-264-A_n-5HUKMWaEy_K0o4HrYg-1; Thu,
+ 08 Jan 2026 21:11:20 -0500
+X-MC-Unique: A_n-5HUKMWaEy_K0o4HrYg-1
+X-Mimecast-MFC-AGG-ID: A_n-5HUKMWaEy_K0o4HrYg_1767924676
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5CBA9195608F;
+	Fri,  9 Jan 2026 02:11:14 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.172])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E4C1230002D5;
+	Fri,  9 Jan 2026 02:11:02 +0000 (UTC)
+Date: Fri, 9 Jan 2026 10:10:57 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+	Vishal Verma <vishal1.verma@intel.com>, tushar.gohad@intel.com,
+	Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org
+Subject: Re: [RFC v2 01/11] file: add callback for pre-mapping dmabuf
+Message-ID: <aWBjsa2RZ_uaO9Ns@fedora>
+References: <74d689540fa200fe37f1a930165357a92fe9e68c.1763725387.git.asml.silence@gmail.com>
+ <7b2017f4-02a3-482a-a173-bb16b895c0cb@amd.com>
+ <20251204110709.GA22971@lst.de>
+ <0571ca61-7b17-4167-83eb-4269bd0459fe@amd.com>
+ <20251204131025.GA26860@lst.de>
+ <aVnFnzRYWC_Y5zHg@fedora>
+ <754b4cc9-20ab-4d87-85bf-eb56be058856@amd.com>
+ <20260107160151.GA21887@lst.de>
+ <aV8UJvkt7VGzHjxS@fedora>
+ <20260108101703.GA24709@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260108172212.1402119-1-csander@purestorage.com> <20260108172212.1402119-4-csander@purestorage.com>
-In-Reply-To: <20260108172212.1402119-4-csander@purestorage.com>
-From: Anuj gupta <anuj1072538@gmail.com>
-Date: Fri, 9 Jan 2026 04:09:20 +0530
-X-Gm-Features: AQt7F2qutSapigW2d78mKK-K9ISNU5Mnv98Q4c-zxR6IX4o9wG-xZuIAbv3p3V8
-Message-ID: <CACzX3Asj5B4LYZZ6=8aW-z-ymOg_c7UjpfotS+h=zuCiJPA1LA@mail.gmail.com>
-Subject: Re: [PATCH v2 3/3] block: use pi_tuple_size in bi_offload_capable()
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Anuj Gupta <anuj20.g@samsung.com>, 
-	Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260108101703.GA24709@lst.de>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Reviewed-by: Anuj Gupta <anuj20.g@samsung.com>
+On Thu, Jan 08, 2026 at 11:17:03AM +0100, Christoph Hellwig wrote:
+> On Thu, Jan 08, 2026 at 10:19:18AM +0800, Ming Lei wrote:
+> > > The feature is in no way nvme specific.  nvme is just the initial
+> > > underlying driver.  It makes total sense to support this for any high
+> > > performance block device, and to pass it through file systems.
+> > 
+> > But why does FS care the dma buffer attachment? Since high performance
+> > host controller is exactly the dma buffer attachment point.
+> 
+> I can't parse what you're trying to say here.
+
+dma buffer attachment is simply none of FS's business.
+
+> 
+> > If the callback is added in `struct file_operations` for wiring dma buffer
+> > and the importer(host contrller), you will see it is hard to let it cross device
+> > mapper/raid or other stackable block devices.
+> 
+> Why?
+> 
+> But even when not stacking, the registration still needs to go
+> through the file system even for a single device, never mind multiple
+> controlled by the file system.
+
+dma_buf can have multiple importers, so why does it have to go through FS for
+single device only?
+
+If the registered buffer is attached to single device before going
+through FS, it can not support stacking block device, and it can't or not
+easily to use for multiple block device, no matter if they are behind same
+host controller or multiple.
+
+
+Thanks,
+Ming
+
