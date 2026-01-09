@@ -1,119 +1,125 @@
-Received: from mail-dl1-f46.google.com (mail-dl1-f46.google.com [74.125.82.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46437363C66
-	for <linux-block@vger.kernel.org>; Fri,  9 Jan 2026 16:30:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7574D271456;
+	Fri,  9 Jan 2026 16:30:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767976208; cv=none; b=u5Jsan7TKKmCPOu70wQb0x4vzqblOlxyxLR7n/eDaFr2I+5/cNBmEvNxkPbRwaflcjUyxtL4M+TNzozIF5lX3zIPanx73XSVWM6h4815WBC9uJd+C1Ef7//6EIOXkakYo9X9VKJj9Dl5SnSGBVCA6wSEsqXS7cstxiguiET4m+o=
+	t=1767976224; cv=none; b=ASPBPcG7JrScNWT9o1J2k03UKHViDHTTK1gmUEsoxsxeeHjmMs840sSGze21T9xu5DGCSzqGFq893jjDIs8uOc2AIAfiRM0MO1gHnu4rozGc810+pxuWZ75JFuV+vSKYGzVJeuAhve5FLJKhICqQ2TSZAVHzVjwhZyV1LrRxj/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767976208; c=relaxed/simple;
-	bh=vgkUjsN8ExHKHTx9/7nY4I/nt63eZszotViQ9gfru3A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tXYwhbjXkEIX123IfJyw417/1Lrdt4AaSrkfmk0NsuUTu4aoeZh9f05+bLWEAd+Hp4gG6JSm9ZDzEeuEG3RL/uNWjyd4xzqtOaSTjBscPbWnbI+t4by67Bo2fwWyyDKiakI0JqwshSQVZQzeXF3DABJzbCJDgwMLGZwMg7dGGZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=SVB/xHP1; arc=none smtp.client-ip=74.125.82.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1767976224; c=relaxed/simple;
+	bh=M/yqtirED+VcZXJl8nGUr340RjD4PMfUeZjAFFhLUXc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Lb+FQc1ZdzlzooC5MR3+6olFVRnyoN2Xdb2RjAox0pHcYqCdCHXJ0TxFK0RHPPFsdWGvMaX3s+T6rdbFKfgLbIW4VEmkN5OCiILx8pNQ1OrnuV8NgmAhU9vnMPp0CJZ+8yFys/5+XJFK0NDno8IOEBDFCQkDcinMH35I8IIfbJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X/U7JDPc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="SVB/xHP1"
-Received: by mail-dl1-f46.google.com with SMTP id a92af1059eb24-11f42e9733fso189260c88.0
-        for <linux-block@vger.kernel.org>; Fri, 09 Jan 2026 08:30:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1767976206; x=1768581006; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wVBFdMZSv4hBYIJD/c7yM+WiKJpV4k9ufsep5DEEPrk=;
-        b=SVB/xHP1ukRq+6FzH50AYOWELC4diVbIX7wYMrx3j/t1HsdQ9Vi0le+4uvKr3PfMK4
-         oLXuflPzlnDqoJmQCeRGBdABPE/GflGl47BnINskPelWhEpXv5wOtA4X1osdM/TmXlEo
-         kfN3yUjvatbmAX0EGo49eTU9W/B4kBO2tmw5Z9ojZJh7+9/ur8Bog1Fq6gTGy6m2f6Gg
-         lkbZFr5jTWMBCPFEoT/bZjcQSY2nVoCZQKZHtCLhXinzevYm7X3PPBW+SScneuGx/DGN
-         We7KbUIuQ3lOcagmacgCGNKBH15U33ZLzxD9cRUdBicFBk8+5pgaMtk6MSGiHBqroU9F
-         Kj8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767976206; x=1768581006;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=wVBFdMZSv4hBYIJD/c7yM+WiKJpV4k9ufsep5DEEPrk=;
-        b=UIWbjg2/CrWSTtM7rhTp32BRO9BTOe5IIMDo4+shZ7hD/z5DC7XV9s240j3los9d4l
-         pGy3kjKOuqa1fGG5yLOepwinbqByvbWgcbqrjRcrq+wLypIRjpnJJXGV8K/Wf63kXbzP
-         BHz9xfE2ZdQU40KZGh37SoJ5/9HD8dQgGGX1mrqlJ20YiRmamuCKaRVBjtxmUoBiBCqq
-         7ZyeDdXcV71MKJ+v3DYebJZg8/wp+J1ou7e6/FJVBV+wRpEgjSDY5BDFH3p3cTXzYg4b
-         0NHvPnMRp4CFwuXRCdad3lklsAvl05eO/tWxXtd6crQnjhBNnIAFYu2+npGIejG21tmv
-         VKzQ==
-X-Gm-Message-State: AOJu0YxwqyMKM51T7nS1oqnyv+NZC1FZe2dhoaXrUx1eWRF23RqTs+Rb
-	J04doKTgMgm1Yrm4+2OaXtcK3fbnJupUmFLMysrjOURsZT/29ga+igiLzDqqXJHu8S6erNeJ/wM
-	g2xGNL2FJ3W9lVeABvIciqI5QEvwKTmTDwG88c36bAQ==
-X-Gm-Gg: AY/fxX4Jyb+32M/w8gd/Q+9QdlSqBLt1L/YA0yUPgjjK8hfnZckuj3mZunQNFFPg4a1
-	6eLy41QeEjmgjkGWoY9rD+t3woqglOqtTkzsQH2Lwl2H0YBH3P+e12B2CBWQh6JVwUrn5F/8+/0
-	+XwoYr4Ae2lwrkqtGRd7MMSM3hgwh54J6MMlkUj23DlvKA1uatPpiXuCzQvN5tFsmzOQ4A9WgLv
-	6i0VA0te771cl9nnVSuuMTVeU3lBNzS8q84Xgycd28LOtzyTfJpVCSt/KFS2H1D5KlEReWy
-X-Google-Smtp-Source: AGHT+IFhp4yt2AQ1ZP1QdiJqmZMwnXirdCCvBrrqz+9ao7l4CoEYukmyuVM+PcZqaieMafkTE41rb+J/punHUo7hR0I=
-X-Received: by 2002:a05:7022:238b:b0:11e:3e9:3e88 with SMTP id
- a92af1059eb24-121f8b923f9mr5084248c88.6.1767976205771; Fri, 09 Jan 2026
- 08:30:05 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X/U7JDPc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A752C4CEF1;
+	Fri,  9 Jan 2026 16:30:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767976224;
+	bh=M/yqtirED+VcZXJl8nGUr340RjD4PMfUeZjAFFhLUXc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=X/U7JDPcI3gDeG/lO+XatA9a1MUfcw6mC9hHjEnoCsCUSyKcNCZXE8Wq431i8u/AU
+	 PWfo6VRPb48tAZMiYcrxq7Xm17DH08MNEMvJB5PL2VKvr4PeVJ3+G3A3KwByaHvjM/
+	 mpRAHzTuIN+z2EW+k5CSQXijCW7mg8Vx/89X2erDBel0741s1MRKmX/kUqog7gOsUN
+	 LZaCqzTwn1QuoNflw+PkgELKDVkb4vrbYzSEWZPGEnHFpT7r0IukVt8za2KRPqtSsA
+	 b0/4zvgGT1oLPrOIlqDZ83toKm47I7Son8LVxpr4uMd24Lw8FiCa1sbJtrnDnTL8La
+	 nXlwa1AHy0ffA==
+Date: Fri, 9 Jan 2026 17:30:19 +0100
+From: Carlos Maiolino <cem@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Damien Le Moal <dlemoal@kernel.org>, 
+	Hans Holmberg <hans.holmberg@wdc.com>, linux-block@vger.kernel.org, linux-xfs@vger.kernel.org
+Subject: Re: [PATCH 1/3] block: add a bio_reuse helper
+Message-ID: <aWEst_dAEWFO3JYd@nidhogg.toxiclabs.cc>
+References: <20260106075914.1614368-1-hch@lst.de>
+ <20260106075914.1614368-2-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260108172212.1402119-1-csander@purestorage.com> <176796707483.352942.3630670392140403614.b4-ty@kernel.dk>
-In-Reply-To: <176796707483.352942.3630670392140403614.b4-ty@kernel.dk>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Fri, 9 Jan 2026 08:29:53 -0800
-X-Gm-Features: AQt7F2q9WSHtQNGsZy_6XPje6YYdBvRDgZ-kNB4PteJPUfnXLMLT-u1F2wwS0LM
-Message-ID: <CADUfDZoacSnJz5FOZQov50k4_nP0sxqxDHYOvDqp1_7KKD8z1A@mail.gmail.com>
-Subject: Re: [PATCH v2 0/3] block: zero non-PI portion of auto integrity buffer
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Anuj Gupta <anuj20.g@samsung.com>, Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260106075914.1614368-2-hch@lst.de>
 
-On Fri, Jan 9, 2026 at 5:57=E2=80=AFAM Jens Axboe <axboe@kernel.dk> wrote:
->
->
-> On Thu, 08 Jan 2026 10:22:09 -0700, Caleb Sander Mateos wrote:
-> > For block devices capable of storing "opaque" metadata in addition to
-> > protection information, ensure the opaque bytes are initialized by the
-> > block layer's auto integrity generation. Otherwise, the contents of
-> > kernel memory can be leaked via the storage device.
-> > Two follow-on patches simplify the bio_integrity_prep() code a bit.
-> >
-> > v2:
-> > - Clarify commit message (Christoph)
-> > - Split gfp_t cleanup into separate patch (Christoph)
-> > - Add patch simplifying bi_offload_capable()
-> > - Add Reviewed-by tag
-> >
-> > [...]
->
-> Applied, thanks!
->
-> [1/3] block: zero non-PI portion of auto integrity buffer
->       commit: eaa33937d509197cd53bfbcd14247d46492297a3
+On Tue, Jan 06, 2026 at 08:58:52AM +0100, Christoph Hellwig wrote:
+> Add a helper to allow an existing bio to be resubmitted withtout
+> having to re-add the payload.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Hans Holmberg <hans.holmberg@wdc.com>
+> Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+> ---
+>  block/bio.c         | 29 +++++++++++++++++++++++++++++
+>  include/linux/bio.h |  1 +
+>  2 files changed, 30 insertions(+)
+> 
+> diff --git a/block/bio.c b/block/bio.c
+> index e726c0e280a8..ed99368c662f 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
 
-Hi Jens,
-I see the patches were applied to for-7.0/block. But I would argue the
-first patch makes sense for 6.19, as being able to leak the contents
-of kernel heap memory is pretty concerning. Block devices that support
-metadata_size > pi_tuple_size aren't super widespread, but they do
-exist (looking at a Samsung NVMe device that supports 64-byte metadata
-right now).
+Jens, would you be ok if I pull it through XFS tree, giving it's tightly
+connected to xfs?
 
-Thanks,
-Caleb
+I have it in our for-next for now so that it can be tested, but I plan
+to update it once you pull the patch. If you're ok with this going
+through xfs tree, I'll just leave it as-is.
 
-> [2/3] block: replace gfp_t with bool in bio_integrity_prep()
->       commit: fd902c117e49eabbbbe70b1bde8978763c6d3fc0
-> [3/3] block: use pi_tuple_size in bi_offload_capable()
->       commit: 0357a764b5f8f2f503c1bb1f100d74feb67a599a
->
-> Best regards,
-> --
-> Jens Axboe
->
->
->
+Carlos
+
+> @@ -311,6 +311,35 @@ void bio_reset(struct bio *bio, struct block_device *bdev, blk_opf_t opf)
+>  }
+>  EXPORT_SYMBOL(bio_reset);
+>  
+> +/**
+> + * bio_reuse - reuse a bio with the payload left intact
+> + * @bio bio to reuse
+> + *
+> + * Allow reusing an existing bio for another operation with all set up
+> + * fields including the payload, device and end_io handler left intact.
+> + *
+> + * Typically used for bios first used to read data which is then written
+> + * to another location without modification.  This must be used by the
+> + * I/O submitter on an bio that is not in flight.  Can't be used for
+> + * cloned bios.
+> + */
+> +void bio_reuse(struct bio *bio)
+> +{
+> +	unsigned short vcnt = bio->bi_vcnt, i;
+> +	bio_end_io_t *end_io = bio->bi_end_io;
+> +	void *private = bio->bi_private;
+> +
+> +	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
+> +
+> +	bio_reset(bio, bio->bi_bdev, bio->bi_opf);
+> +	for (i = 0; i < vcnt; i++)
+> +		bio->bi_iter.bi_size += bio->bi_io_vec[i].bv_len;
+> +	bio->bi_vcnt = vcnt;
+> +	bio->bi_private = private;
+> +	bio->bi_end_io = end_io;
+> +}
+> +EXPORT_SYMBOL_GPL(bio_reuse);
+> +
+>  static struct bio *__bio_chain_endio(struct bio *bio)
+>  {
+>  	struct bio *parent = bio->bi_private;
+> diff --git a/include/linux/bio.h b/include/linux/bio.h
+> index ad2d57908c1c..c0190f8badde 100644
+> --- a/include/linux/bio.h
+> +++ b/include/linux/bio.h
+> @@ -414,6 +414,7 @@ static inline void bio_init_inline(struct bio *bio, struct block_device *bdev,
+>  }
+>  extern void bio_uninit(struct bio *);
+>  void bio_reset(struct bio *bio, struct block_device *bdev, blk_opf_t opf);
+> +void bio_reuse(struct bio *bio);
+>  void bio_chain(struct bio *, struct bio *);
+>  
+>  int __must_check bio_add_page(struct bio *bio, struct page *page, unsigned len,
+> -- 
+> 2.47.3
+> 
+> 
