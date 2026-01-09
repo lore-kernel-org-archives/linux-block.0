@@ -1,19 +1,19 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D0182E7BB6
-	for <linux-block@vger.kernel.org>; Fri,  9 Jan 2026 06:52:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34D7F28689A
+	for <linux-block@vger.kernel.org>; Fri,  9 Jan 2026 06:52:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767941568; cv=none; b=K0/32T7/vgV4Yi0lQeVikh3dyTqq+zPk1UoDKTDcDNnWLCGp+7fZqrrdHTaya/Ok/9yndILK0Cx7qq2sWj2bj6klF6bw7qi4ijdeYu47s2XANmjPnOMH5uuTimCif0nB+flkvtOWIBu/fpqWs7yEijCuqTCez+MwTgfST0UIANo=
+	t=1767941570; cv=none; b=o30rykHNMh5pInH3kbL70TzLbKdBKCECwDwaQHsRze2NR43e+dDxk1ZBPCS5uyqKf9gc55PnzZWVGdIYiohlsOaNN5oyxzBn+4SuD1Ao9UdDG0dQrMJYqU/S3j3LOUcGqaGWiyzwEt7RuDs+CQJpbhbb6A5pvwkruJx94n4WMPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767941568; c=relaxed/simple;
-	bh=06kuazUcRkDDRipoijGxbugP/qphkxwr6mf3LJXrCtI=;
+	s=arc-20240116; t=1767941570; c=relaxed/simple;
+	bh=fYGWRb50usFc3M2pW8I769OEfev1XIq0uVIQ7v6doB4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=geU36tByTCeoA2JAhKHRlOsbmenXTeicmvkt5fRVuepQUkX58UE2581I3H2IUNWuP8pzeoKpFqxlCcxbmQ/GoPyTgY87r08ge8jLWGg2SdziOeViXbWjqmmm+xZ0QyM8FZKHO1sd1oafUF9R+NW8qjCquY/RiPP9b9goKh4un2k=
+	 MIME-Version; b=OOEKx9F8i1j/S1RWWI6GXLsriHh8WukCjw1vOHqIWZLKQRKIDNtpEaKcgj0gjBLIsxMACZXadoe32850Wnz+m5z4Br3mytjszvHI07u+eY2QWlkCkU5DmGF+Z02il884Z3mVh3kZ/O4OT27YlMb5Cd+Wv/fd10BeCgpBUEnHnNQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23F8BC4CEF1;
-	Fri,  9 Jan 2026 06:52:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A368C4CEF1;
+	Fri,  9 Jan 2026 06:52:48 +0000 (UTC)
 From: Yu Kuai <yukuai@fnnas.com>
 To: axboe@kernel.dk,
 	linux-block@vger.kernel.org,
@@ -21,9 +21,9 @@ To: axboe@kernel.dk,
 	nilay@linux.ibm.com,
 	ming.lei@redhat.com
 Cc: yukuai@fnnas.com
-Subject: [PATCH v8 1/8] blk-wbt: factor out a helper wbt_set_lat()
-Date: Fri,  9 Jan 2026 14:52:23 +0800
-Message-ID: <20260109065230.653281-2-yukuai@fnnas.com>
+Subject: [PATCH v8 2/8] blk-wbt: fix possible deadlock to nest pcpu_alloc_mutex under q_usage_counter
+Date: Fri,  9 Jan 2026 14:52:24 +0800
+Message-ID: <20260109065230.653281-3-yukuai@fnnas.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260109065230.653281-1-yukuai@fnnas.com>
 References: <20260109065230.653281-1-yukuai@fnnas.com>
@@ -35,186 +35,208 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-To move implementation details inside blk-wbt.c, prepare to fix possible
-deadlock to call wbt_init() while queue is frozen in the next patch.
+If wbt is disabled by default and user configures wbt by sysfs, queue
+will be frozen first and then pcpu_alloc_mutex will be held in
+blk_stat_alloc_callback().
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
+Fix this problem by allocating memory first before queue frozen.
+
 Signed-off-by: Yu Kuai <yukuai@fnnas.com>
+Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-sysfs.c | 39 ++----------------------------------
- block/blk-wbt.c   | 50 ++++++++++++++++++++++++++++++++++++++++++++---
- block/blk-wbt.h   |  7 ++-----
- 3 files changed, 51 insertions(+), 45 deletions(-)
+ block/blk-wbt.c | 108 ++++++++++++++++++++++++++++--------------------
+ 1 file changed, 63 insertions(+), 45 deletions(-)
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index e0a70d26972b..a580688c3ad5 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -636,11 +636,8 @@ static ssize_t queue_wb_lat_show(struct gendisk *disk, char *page)
- static ssize_t queue_wb_lat_store(struct gendisk *disk, const char *page,
- 				  size_t count)
- {
--	struct request_queue *q = disk->queue;
--	struct rq_qos *rqos;
- 	ssize_t ret;
- 	s64 val;
--	unsigned int memflags;
- 
- 	ret = queue_var_store64(&val, page);
- 	if (ret < 0)
-@@ -648,40 +645,8 @@ static ssize_t queue_wb_lat_store(struct gendisk *disk, const char *page,
- 	if (val < -1)
- 		return -EINVAL;
- 
--	/*
--	 * Ensure that the queue is idled, in case the latency update
--	 * ends up either enabling or disabling wbt completely. We can't
--	 * have IO inflight if that happens.
--	 */
--	memflags = blk_mq_freeze_queue(q);
--
--	rqos = wbt_rq_qos(q);
--	if (!rqos) {
--		ret = wbt_init(disk);
--		if (ret)
--			goto out;
--	}
--
--	ret = count;
--	if (val == -1)
--		val = wbt_default_latency_nsec(q);
--	else if (val >= 0)
--		val *= 1000ULL;
--
--	if (wbt_get_min_lat(q) == val)
--		goto out;
--
--	blk_mq_quiesce_queue(q);
--
--	mutex_lock(&disk->rqos_state_mutex);
--	wbt_set_min_lat(q, val);
--	mutex_unlock(&disk->rqos_state_mutex);
--
--	blk_mq_unquiesce_queue(q);
--out:
--	blk_mq_unfreeze_queue(q, memflags);
--
--	return ret;
-+	ret = wbt_set_lat(disk, val);
-+	return ret ? ret : count;
- }
- 
- QUEUE_RW_ENTRY(queue_wb_lat, "wbt_lat_usec");
 diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index 0974875f77bd..abc2190689bb 100644
+index abc2190689bb..9bef71ec645d 100644
 --- a/block/blk-wbt.c
 +++ b/block/blk-wbt.c
-@@ -93,6 +93,8 @@ struct rq_wb {
+@@ -93,7 +93,7 @@ struct rq_wb {
  	struct rq_depth rq_depth;
  };
  
-+static int wbt_init(struct gendisk *disk);
-+
+-static int wbt_init(struct gendisk *disk);
++static int wbt_init(struct gendisk *disk, struct rq_wb *rwb);
+ 
  static inline struct rq_wb *RQWB(struct rq_qos *rqos)
  {
- 	return container_of(rqos, struct rq_wb, rqos);
-@@ -506,7 +508,7 @@ u64 wbt_get_min_lat(struct request_queue *q)
- 	return RQWB(rqos)->min_lat_nsec;
+@@ -698,6 +698,41 @@ static void wbt_requeue(struct rq_qos *rqos, struct request *rq)
+ 	}
  }
  
--void wbt_set_min_lat(struct request_queue *q, u64 val)
-+static void wbt_set_min_lat(struct request_queue *q, u64 val)
++static int wbt_data_dir(const struct request *rq)
++{
++	const enum req_op op = req_op(rq);
++
++	if (op == REQ_OP_READ)
++		return READ;
++	else if (op_is_write(op))
++		return WRITE;
++
++	/* don't account */
++	return -1;
++}
++
++static struct rq_wb *wbt_alloc(void)
++{
++	struct rq_wb *rwb = kzalloc(sizeof(*rwb), GFP_KERNEL);
++
++	if (!rwb)
++		return NULL;
++
++	rwb->cb = blk_stat_alloc_callback(wb_timer_fn, wbt_data_dir, 2, rwb);
++	if (!rwb->cb) {
++		kfree(rwb);
++		return NULL;
++	}
++
++	return rwb;
++}
++
++static void wbt_free(struct rq_wb *rwb)
++{
++	blk_stat_free_callback(rwb->cb);
++	kfree(rwb);
++}
++
+ /*
+  * Enable wbt if defaults are configured that way
+  */
+@@ -739,8 +774,17 @@ EXPORT_SYMBOL_GPL(wbt_enable_default);
+ 
+ void wbt_init_enable_default(struct gendisk *disk)
  {
- 	struct rq_qos *rqos = wbt_rq_qos(q);
- 	if (!rqos)
-@@ -741,7 +743,7 @@ void wbt_init_enable_default(struct gendisk *disk)
- 		WARN_ON_ONCE(wbt_init(disk));
+-	if (__wbt_enable_default(disk))
+-		WARN_ON_ONCE(wbt_init(disk));
++	struct rq_wb *rwb;
++
++	if (!__wbt_enable_default(disk))
++		return;
++
++	rwb = wbt_alloc();
++	if (WARN_ON_ONCE(!rwb))
++		return;
++
++	if (WARN_ON_ONCE(wbt_init(disk, rwb)))
++		wbt_free(rwb);
  }
  
--u64 wbt_default_latency_nsec(struct request_queue *q)
-+static u64 wbt_default_latency_nsec(struct request_queue *q)
+ static u64 wbt_default_latency_nsec(struct request_queue *q)
+@@ -755,19 +799,6 @@ static u64 wbt_default_latency_nsec(struct request_queue *q)
+ 		return 75000000ULL;
+ }
+ 
+-static int wbt_data_dir(const struct request *rq)
+-{
+-	const enum req_op op = req_op(rq);
+-
+-	if (op == REQ_OP_READ)
+-		return READ;
+-	else if (op_is_write(op))
+-		return WRITE;
+-
+-	/* don't account */
+-	return -1;
+-}
+-
+ static void wbt_queue_depth_changed(struct rq_qos *rqos)
  {
- 	/*
- 	 * We default to 2msec for non-rotational storage, and 75msec
-@@ -902,7 +904,7 @@ static const struct rq_qos_ops wbt_rqos_ops = {
+ 	RQWB(rqos)->rq_depth.queue_depth = blk_queue_depth(rqos->disk->queue);
+@@ -779,8 +810,7 @@ static void wbt_exit(struct rq_qos *rqos)
+ 	struct rq_wb *rwb = RQWB(rqos);
+ 
+ 	blk_stat_remove_callback(rqos->disk->queue, rwb->cb);
+-	blk_stat_free_callback(rwb->cb);
+-	kfree(rwb);
++	wbt_free(rwb);
+ }
+ 
+ /*
+@@ -904,22 +934,11 @@ static const struct rq_qos_ops wbt_rqos_ops = {
  #endif
  };
  
--int wbt_init(struct gendisk *disk)
-+static int wbt_init(struct gendisk *disk)
+-static int wbt_init(struct gendisk *disk)
++static int wbt_init(struct gendisk *disk, struct rq_wb *rwb)
  {
  	struct request_queue *q = disk->queue;
- 	struct rq_wb *rwb;
-@@ -949,3 +951,45 @@ int wbt_init(struct gendisk *disk)
- 	return ret;
+-	struct rq_wb *rwb;
+-	int i;
+ 	int ret;
+-
+-	rwb = kzalloc(sizeof(*rwb), GFP_KERNEL);
+-	if (!rwb)
+-		return -ENOMEM;
+-
+-	rwb->cb = blk_stat_alloc_callback(wb_timer_fn, wbt_data_dir, 2, rwb);
+-	if (!rwb->cb) {
+-		kfree(rwb);
+-		return -ENOMEM;
+-	}
++	int i;
  
+ 	for (i = 0; i < WBT_NUM_RWQ; i++)
+ 		rq_wait_init(&rwb->rq_wait[i]);
+@@ -939,38 +958,38 @@ static int wbt_init(struct gendisk *disk)
+ 	ret = rq_qos_add(&rwb->rqos, disk, RQ_QOS_WBT, &wbt_rqos_ops);
+ 	mutex_unlock(&q->rq_qos_mutex);
+ 	if (ret)
+-		goto err_free;
++		return ret;
+ 
+ 	blk_stat_add_callback(q, rwb->cb);
+-
+ 	return 0;
+-
+-err_free:
+-	blk_stat_free_callback(rwb->cb);
+-	kfree(rwb);
+-	return ret;
+-
  }
-+
-+int wbt_set_lat(struct gendisk *disk, s64 val)
-+{
-+	struct request_queue *q = disk->queue;
-+	unsigned int memflags;
-+	struct rq_qos *rqos;
-+	int ret = 0;
-+
-+	/*
-+	 * Ensure that the queue is idled, in case the latency update
-+	 * ends up either enabling or disabling wbt completely. We can't
-+	 * have IO inflight if that happens.
-+	 */
-+	memflags = blk_mq_freeze_queue(q);
-+
-+	rqos = wbt_rq_qos(q);
+ 
+ int wbt_set_lat(struct gendisk *disk, s64 val)
+ {
+ 	struct request_queue *q = disk->queue;
++	struct rq_qos *rqos = wbt_rq_qos(q);
++	struct rq_wb *rwb = NULL;
+ 	unsigned int memflags;
+-	struct rq_qos *rqos;
+ 	int ret = 0;
+ 
 +	if (!rqos) {
-+		ret = wbt_init(disk);
-+		if (ret)
-+			goto out;
++		rwb = wbt_alloc();
++		if (!rwb)
++			return -ENOMEM;
 +	}
 +
-+	if (val == -1)
-+		val = wbt_default_latency_nsec(q);
-+	else if (val >= 0)
-+		val *= 1000ULL;
-+
-+	if (wbt_get_min_lat(q) == val)
-+		goto out;
-+
-+	blk_mq_quiesce_queue(q);
-+
-+	mutex_lock(&disk->rqos_state_mutex);
-+	wbt_set_min_lat(q, val);
-+	mutex_unlock(&disk->rqos_state_mutex);
-+
-+	blk_mq_unquiesce_queue(q);
-+out:
-+	blk_mq_unfreeze_queue(q, memflags);
-+
-+	return ret;
-+}
-diff --git a/block/blk-wbt.h b/block/blk-wbt.h
-index 925f22475738..6e39da17218b 100644
---- a/block/blk-wbt.h
-+++ b/block/blk-wbt.h
-@@ -4,16 +4,13 @@
- 
- #ifdef CONFIG_BLK_WBT
- 
--int wbt_init(struct gendisk *disk);
- void wbt_init_enable_default(struct gendisk *disk);
- void wbt_disable_default(struct gendisk *disk);
- void wbt_enable_default(struct gendisk *disk);
- 
- u64 wbt_get_min_lat(struct request_queue *q);
--void wbt_set_min_lat(struct request_queue *q, u64 val);
--bool wbt_disabled(struct request_queue *);
+ 	/*
+ 	 * Ensure that the queue is idled, in case the latency update
+ 	 * ends up either enabling or disabling wbt completely. We can't
+ 	 * have IO inflight if that happens.
+ 	 */
+ 	memflags = blk_mq_freeze_queue(q);
 -
--u64 wbt_default_latency_nsec(struct request_queue *);
-+bool wbt_disabled(struct request_queue *q);
-+int wbt_set_lat(struct gendisk *disk, s64 val);
+-	rqos = wbt_rq_qos(q);
+ 	if (!rqos) {
+-		ret = wbt_init(disk);
+-		if (ret)
++		ret = wbt_init(disk, rwb);
++		if (ret) {
++			wbt_free(rwb);
+ 			goto out;
++		}
+ 	}
  
- #else
- 
+ 	if (val == -1)
+@@ -990,6 +1009,5 @@ int wbt_set_lat(struct gendisk *disk, s64 val)
+ 	blk_mq_unquiesce_queue(q);
+ out:
+ 	blk_mq_unfreeze_queue(q, memflags);
+-
+ 	return ret;
+ }
 -- 
 2.51.0
 
