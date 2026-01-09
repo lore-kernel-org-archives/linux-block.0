@@ -1,414 +1,172 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32BBA273803;
-	Fri,  9 Jan 2026 06:08:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0A34287517;
+	Fri,  9 Jan 2026 06:22:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767938932; cv=none; b=BijIQH5OrpKqVmoReLJXlwbK1HcnJl+P6yZuvOar/+2l2iImeB1oigzd0WFfYwayuBRH/jZYPxzczO7aVnMZT7N5kZOWMwI/xfan/NpWE3DVTHlt5M3EEHhG2LLWQmUY9S3yw26of8y866TQID9x5YwpAiTys1ztXGAgkhVYwxY=
+	t=1767939748; cv=none; b=USYC9cnwv5CVQvplU5rcZh4Pmj0SZVOCG6zr6uMqg6EF/uXwD22N0vyhQuurME6ZGf/QlZHRv2VjvlhIJHNXRS3D3NKX2iTfdUdZBpNCeDH1uKLTvfHPg0bCFJrBVQrtilwnLQJWqAV1R+wLP3jaGh12PpYHYNb2My1nLvzbKCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767938932; c=relaxed/simple;
-	bh=q+q0kAJkDcHxmiay2Q7KyhxsBWs1GxeZPAYbLxz8KPE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Bf7ubJvRyWlBvWQhWfyDyqllyoeLQkq2fAj4MQ/9LKNpUEuvR/imnmmRhryHBmuvi0IT9yZ5ZDg1sr3Hy7eJ69XPTwcjFPYyA4IwHASrVDlv7cbuwFrLGpKwGmVHPGLbTud4Pxj0TRMa/UxlReJYLHOXkwwhXy/TH/5XTDuQyoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=abPpl6UU; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="abPpl6UU"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=TKeVIOVvzGw1Nv5RkMVu5btUi6jsl1j0Qo4fryX+tQM=; b=abPpl6UUlVPWSmS4e6rdbQ1CCz
-	+7xJY4HNgqvM/zOMVIb3VLgdMlKjdYPJb5VJT7t1KWrun8sIut51ch7rF/zUdt3furq6oklSjxo6E
-	0caSMU+bwX3v4xeYbds9WHa8ZatmsjS5Kwa5qFjHMy5bgXKeCSr/mzPtukn+SSe/wbzgT0/82voKJ
-	nEmlghzCZVbMO+QaDgp80YfoCt+X5pu+/534zidIBZMpHWcG2K6h/J5SQjL5lPVL3HSJAwTmhZhBx
-	YocEFygzs3yvV5+F5tLINqdtI0AWWdQArJ+zTyix2QXQzzYnBscyZyqDj/91v5UOVlRSRZF+iCd1X
-	Nly1xkEw==;
-Received: from 2a02-8389-2341-5b80-d601-7564-c2e0-491c.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:d601:7564:c2e0:491c] helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1ve5g2-00000001WXu-1ZyQ;
-	Fri, 09 Jan 2026 06:08:50 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Eric Biggers <ebiggers@kernel.org>
-Cc: linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-fscrypt@vger.kernel.org
-Subject: [PATCH 9/9] blk-crypto: handle the fallback above the block layer
-Date: Fri,  9 Jan 2026 07:07:49 +0100
-Message-ID: <20260109060813.2226714-10-hch@lst.de>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260109060813.2226714-1-hch@lst.de>
-References: <20260109060813.2226714-1-hch@lst.de>
+	s=arc-20240116; t=1767939748; c=relaxed/simple;
+	bh=w0330BGIWmi7mp7CkC76lDurCaat5GIPaj+F36EaUqI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rDkIhheeKfp7A7gSQIVPsTA/QLNVMF/Zrj/tyr9NnGdRZeFvnAYTP8+abD/NRmm8oeJL685iJtq4ruIgSrCdfT92AIlM6Ueaq3vzfvVjPloPE7u8F4X1VrAPa2bZ6f14wlyxFbigxzJNq3rRJA9UdtXDBJ857qyJhoxrXAIr02A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.198])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4dnWs01nBWzYQts3;
+	Fri,  9 Jan 2026 14:22:12 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 18B8B40579;
+	Fri,  9 Jan 2026 14:22:17 +0800 (CST)
+Received: from [10.174.178.72] (unknown [10.174.178.72])
+	by APP4 (Coremail) with SMTP id gCh0CgD3WPmXnmBpHNShDA--.7943S3;
+	Fri, 09 Jan 2026 14:22:16 +0800 (CST)
+Message-ID: <5fdbd368-6d00-4453-8f03-23d17c8c1338@huaweicloud.com>
+Date: Fri, 9 Jan 2026 14:22:12 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/3] blk-cgroup: fix uaf in blkcg_activate_policy() racing
+ with blkg_free_workfn()
+To: yukuai@fnnas.com
+Cc: hch@infradead.org, cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yi.zhang@huawei.com, yangerkun@huawei.com,
+ houtao1@huawei.com, tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
+ zhengqixing@huawei.com
+References: <20260108014416.3656493-1-zhengqixing@huaweicloud.com>
+ <20260108014416.3656493-3-zhengqixing@huaweicloud.com>
+ <72dc0ed6-1ba9-46b8-a43f-d11c32e2f341@fnnas.com>
+From: Zheng Qixing <zhengqixing@huaweicloud.com>
+In-Reply-To: <72dc0ed6-1ba9-46b8-a43f-d11c32e2f341@fnnas.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-CM-TRANSID:gCh0CgD3WPmXnmBpHNShDA--.7943S3
+X-Coremail-Antispam: 1UD129KBjvJXoW3Ar45Ww1kAFyUAr1rtFWDArb_yoW7Zr47pr
+	1DA3yxCr48Za48ArWa9r15Kw1qqFs7CF47tr97Aa1j9rWDG3y8tFn0vryvqwnrGrW8uF12
+	vF1jvryrKFy7Zw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AF
+	wI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
+	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
+	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
+	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUF1
+	v3UUUUU
+X-CM-SenderInfo: x2kh0wptl0x03j6k3tpzhluzxrxghudrp/
 
-Add a blk_crypto_submit_bio helper that either submits the bio when
-it is not encrypted or inline encryption is provided, but otherwise
-handles the encryption before going down into the low-level driver.
-This reduces the risk from bio reordering and keeps memory allocation
-as high up in the stack as possible.
 
-Note that if the submitter knows that inline enctryption is known to
-be supported by the underyling driver, it can still use plain
-submit_bio.
+在 2026/1/9 0:11, Yu Kuai 写道:
+> This looks correct, however, I think it's better also to protect q->blkg_list iteration from
+> blkcg_activate_policy() and blkg_destroys_all() as well. This way all the q->blkg_list access
+> will be protected by blkcg_mutex, and it'll be easier to convert protecting blkg from queue_lock
+> to blkcg_mutex.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Eric Biggers <ebiggers@kernel.org>
----
- Documentation/block/inline-encryption.rst |  6 ++++++
- block/blk-core.c                          | 10 +++++++---
- block/blk-crypto-internal.h               | 19 +++++++++++--------
- block/blk-crypto.c                        | 23 ++++++-----------------
- fs/buffer.c                               |  3 ++-
- fs/crypto/bio.c                           |  2 +-
- fs/ext4/page-io.c                         |  3 ++-
- fs/ext4/readpage.c                        |  9 +++++----
- fs/f2fs/data.c                            |  4 ++--
- fs/f2fs/file.c                            |  3 ++-
- fs/iomap/direct-io.c                      |  3 ++-
- include/linux/blk-crypto.h                | 22 ++++++++++++++++++++++
- 12 files changed, 68 insertions(+), 39 deletions(-)
+I tried adding blkcg_mutex protection in blkcg_activate_policy() and 
+blkg_destroy_all() as suggested.
 
-diff --git a/Documentation/block/inline-encryption.rst b/Documentation/block/inline-encryption.rst
-index 6380e6ab492b..7e0703a12dfb 100644
---- a/Documentation/block/inline-encryption.rst
-+++ b/Documentation/block/inline-encryption.rst
-@@ -206,6 +206,12 @@ it to a bio, given the blk_crypto_key and the data unit number that will be used
- for en/decryption.  Users don't need to worry about freeing the bio_crypt_ctx
- later, as that happens automatically when the bio is freed or reset.
- 
-+To submit a bio that uses inline encryption, users must call
-+``blk_crypto_submit_bio()`` instead of the usual ``submit_bio()``.  This will
-+submit the bio to the underlying driver if it supports inline crypto, or else
-+call the blk-crypto fallback routines before submitting normal bios to the
-+underlying drivers.
-+
- Finally, when done using inline encryption with a blk_crypto_key on a
- block_device, users must call ``blk_crypto_evict_key()``.  This ensures that
- the key is evicted from all keyslots it may be programmed into and unlinked from
-diff --git a/block/blk-core.c b/block/blk-core.c
-index f87e5f1a101f..a0bf5174e9e9 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -628,9 +628,6 @@ static void __submit_bio(struct bio *bio)
- 	/* If plug is not used, add new plug here to cache nsecs time. */
- 	struct blk_plug plug;
- 
--	if (unlikely(!blk_crypto_bio_prep(bio)))
--		return;
--
- 	blk_start_plug(&plug);
- 
- 	if (!bdev_test_flag(bio->bi_bdev, BD_HAS_SUBMIT_BIO)) {
-@@ -794,6 +791,13 @@ void submit_bio_noacct(struct bio *bio)
- 	if ((bio->bi_opf & REQ_NOWAIT) && !bdev_nowait(bdev))
- 		goto not_supported;
- 
-+	if (bio_has_crypt_ctx(bio)) {
-+		if (WARN_ON_ONCE(!bio_has_data(bio)))
-+			goto end_io;
-+		if (!blk_crypto_supported(bio))
-+			goto not_supported;
-+	}
-+
- 	if (should_fail_bio(bio))
- 		goto end_io;
- 	bio_check_ro(bio);
-diff --git a/block/blk-crypto-internal.h b/block/blk-crypto-internal.h
-index d65023120341..742694213529 100644
---- a/block/blk-crypto-internal.h
-+++ b/block/blk-crypto-internal.h
-@@ -86,6 +86,12 @@ bool __blk_crypto_cfg_supported(struct blk_crypto_profile *profile,
- int blk_crypto_ioctl(struct block_device *bdev, unsigned int cmd,
- 		     void __user *argp);
- 
-+static inline bool blk_crypto_supported(struct bio *bio)
-+{
-+	return blk_crypto_config_supported_natively(bio->bi_bdev,
-+			&bio->bi_crypt_context->bc_key->crypto_cfg);
-+}
-+
- #else /* CONFIG_BLK_INLINE_ENCRYPTION */
- 
- static inline int blk_crypto_sysfs_register(struct gendisk *disk)
-@@ -139,6 +145,11 @@ static inline int blk_crypto_ioctl(struct block_device *bdev, unsigned int cmd,
- 	return -ENOTTY;
- }
- 
-+static inline bool blk_crypto_supported(struct bio *bio)
-+{
-+	return false;
-+}
-+
- #endif /* CONFIG_BLK_INLINE_ENCRYPTION */
- 
- void __bio_crypt_advance(struct bio *bio, unsigned int bytes);
-@@ -165,14 +176,6 @@ static inline void bio_crypt_do_front_merge(struct request *rq,
- #endif
- }
- 
--bool __blk_crypto_bio_prep(struct bio *bio);
--static inline bool blk_crypto_bio_prep(struct bio *bio)
--{
--	if (bio_has_crypt_ctx(bio))
--		return __blk_crypto_bio_prep(bio);
--	return true;
--}
--
- blk_status_t __blk_crypto_rq_get_keyslot(struct request *rq);
- static inline blk_status_t blk_crypto_rq_get_keyslot(struct request *rq)
- {
-diff --git a/block/blk-crypto.c b/block/blk-crypto.c
-index 0b2535d8dbcc..856d3c5b1fa0 100644
---- a/block/blk-crypto.c
-+++ b/block/blk-crypto.c
-@@ -242,25 +242,13 @@ void __blk_crypto_free_request(struct request *rq)
- 	rq->crypt_ctx = NULL;
- }
- 
--/**
-- * __blk_crypto_bio_prep - Prepare bio for inline encryption
-- * @bio: bio to prepare
-- *
-- * If the bio crypt context provided for the bio is supported by the underlying
-- * device's inline encryption hardware, do nothing.
-- *
-- * Otherwise, try to perform en/decryption for this bio by falling back to the
-- * kernel crypto API.  For encryption this means submitting newly allocated
-- * bios for the encrypted payload while keeping back the source bio until they
-- * complete, while for reads the decryption happens in-place by a hooked in
-- * completion handler.
-- *
-- * Caller must ensure bio has bio_crypt_ctx.
-+/*
-+ * Process a bio with a crypto context.  Returns true if the caller should
-+ * submit the passed in bio, false if the bio is consumed.
-  *
-- * Return: true if @bio should be submitted to the driver by the caller, else
-- * false.  Sets bio->bi_status, calls bio_endio and returns false on error.
-+ * See the kerneldoc comment for blk_crypto_submit_bio for further details.
-  */
--bool __blk_crypto_bio_prep(struct bio *bio)
-+bool __blk_crypto_submit_bio(struct bio *bio)
- {
- 	const struct blk_crypto_key *bc_key = bio->bi_crypt_context->bc_key;
- 	struct block_device *bdev = bio->bi_bdev;
-@@ -288,6 +276,7 @@ bool __blk_crypto_bio_prep(struct bio *bio)
- 
- 	return true;
- }
-+EXPORT_SYMBOL_GPL(__blk_crypto_submit_bio);
- 
- int __blk_crypto_rq_bio_prep(struct request *rq, struct bio *bio,
- 			     gfp_t gfp_mask)
-diff --git a/fs/buffer.c b/fs/buffer.c
-index 838c0c571022..da18053f66e8 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -29,6 +29,7 @@
- #include <linux/slab.h>
- #include <linux/capability.h>
- #include <linux/blkdev.h>
-+#include <linux/blk-crypto.h>
- #include <linux/file.h>
- #include <linux/quotaops.h>
- #include <linux/highmem.h>
-@@ -2821,7 +2822,7 @@ static void submit_bh_wbc(blk_opf_t opf, struct buffer_head *bh,
- 		wbc_account_cgroup_owner(wbc, bh->b_folio, bh->b_size);
- 	}
- 
--	submit_bio(bio);
-+	blk_crypto_submit_bio(bio);
- }
- 
- void submit_bh(blk_opf_t opf, struct buffer_head *bh)
-diff --git a/fs/crypto/bio.c b/fs/crypto/bio.c
-index c2b3ca100f8d..6da683ea69dc 100644
---- a/fs/crypto/bio.c
-+++ b/fs/crypto/bio.c
-@@ -105,7 +105,7 @@ static int fscrypt_zeroout_range_inline_crypt(const struct inode *inode,
- 		}
- 
- 		atomic_inc(&done.pending);
--		submit_bio(bio);
-+		blk_crypto_submit_bio(bio);
- 	}
- 
- 	fscrypt_zeroout_range_done(&done);
-diff --git a/fs/ext4/page-io.c b/fs/ext4/page-io.c
-index 39abfeec5f36..a8c95eee91b7 100644
---- a/fs/ext4/page-io.c
-+++ b/fs/ext4/page-io.c
-@@ -7,6 +7,7 @@
-  * Written by Theodore Ts'o, 2010.
-  */
- 
-+#include <linux/blk-crypto.h>
- #include <linux/fs.h>
- #include <linux/time.h>
- #include <linux/highuid.h>
-@@ -401,7 +402,7 @@ void ext4_io_submit(struct ext4_io_submit *io)
- 	if (bio) {
- 		if (io->io_wbc->sync_mode == WB_SYNC_ALL)
- 			io->io_bio->bi_opf |= REQ_SYNC;
--		submit_bio(io->io_bio);
-+		blk_crypto_submit_bio(io->io_bio);
- 	}
- 	io->io_bio = NULL;
- }
-diff --git a/fs/ext4/readpage.c b/fs/ext4/readpage.c
-index e7f2350c725b..49a6d36a8dba 100644
---- a/fs/ext4/readpage.c
-+++ b/fs/ext4/readpage.c
-@@ -36,6 +36,7 @@
- #include <linux/bio.h>
- #include <linux/fs.h>
- #include <linux/buffer_head.h>
-+#include <linux/blk-crypto.h>
- #include <linux/blkdev.h>
- #include <linux/highmem.h>
- #include <linux/prefetch.h>
-@@ -345,7 +346,7 @@ int ext4_mpage_readpages(struct inode *inode,
- 		if (bio && (last_block_in_bio != first_block - 1 ||
- 			    !fscrypt_mergeable_bio(bio, inode, next_block))) {
- 		submit_and_realloc:
--			submit_bio(bio);
-+			blk_crypto_submit_bio(bio);
- 			bio = NULL;
- 		}
- 		if (bio == NULL) {
-@@ -371,14 +372,14 @@ int ext4_mpage_readpages(struct inode *inode,
- 		if (((map.m_flags & EXT4_MAP_BOUNDARY) &&
- 		     (relative_block == map.m_len)) ||
- 		    (first_hole != blocks_per_folio)) {
--			submit_bio(bio);
-+			blk_crypto_submit_bio(bio);
- 			bio = NULL;
- 		} else
- 			last_block_in_bio = first_block + blocks_per_folio - 1;
- 		continue;
- 	confused:
- 		if (bio) {
--			submit_bio(bio);
-+			blk_crypto_submit_bio(bio);
- 			bio = NULL;
- 		}
- 		if (!folio_test_uptodate(folio))
-@@ -389,7 +390,7 @@ int ext4_mpage_readpages(struct inode *inode,
- 		; /* A label shall be followed by a statement until C23 */
- 	}
- 	if (bio)
--		submit_bio(bio);
-+		blk_crypto_submit_bio(bio);
- 	return 0;
- }
- 
-diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
-index c30e69392a62..c3dd8a5c8589 100644
---- a/fs/f2fs/data.c
-+++ b/fs/f2fs/data.c
-@@ -513,7 +513,7 @@ void f2fs_submit_read_bio(struct f2fs_sb_info *sbi, struct bio *bio,
- 	trace_f2fs_submit_read_bio(sbi->sb, type, bio);
- 
- 	iostat_update_submit_ctx(bio, type);
--	submit_bio(bio);
-+	blk_crypto_submit_bio(bio);
- }
- 
- static void f2fs_submit_write_bio(struct f2fs_sb_info *sbi, struct bio *bio,
-@@ -522,7 +522,7 @@ static void f2fs_submit_write_bio(struct f2fs_sb_info *sbi, struct bio *bio,
- 	WARN_ON_ONCE(is_read_io(bio_op(bio)));
- 	trace_f2fs_submit_write_bio(sbi->sb, type, bio);
- 	iostat_update_submit_ctx(bio, type);
--	submit_bio(bio);
-+	blk_crypto_submit_bio(bio);
- }
- 
- static void __submit_merged_bio(struct f2fs_bio_info *io)
-diff --git a/fs/f2fs/file.c b/fs/f2fs/file.c
-index d7047ca6b98d..914790f37915 100644
---- a/fs/f2fs/file.c
-+++ b/fs/f2fs/file.c
-@@ -5,6 +5,7 @@
-  * Copyright (c) 2012 Samsung Electronics Co., Ltd.
-  *             http://www.samsung.com/
-  */
-+#include <linux/blk-crypto.h>
- #include <linux/fs.h>
- #include <linux/f2fs_fs.h>
- #include <linux/stat.h>
-@@ -5046,7 +5047,7 @@ static void f2fs_dio_write_submit_io(const struct iomap_iter *iter,
- 	enum temp_type temp = f2fs_get_segment_temp(sbi, type);
- 
- 	bio->bi_write_hint = f2fs_io_type_to_rw_hint(sbi, DATA, temp);
--	submit_bio(bio);
-+	blk_crypto_submit_bio(bio);
- }
- 
- static const struct iomap_dio_ops f2fs_iomap_dio_write_ops = {
-diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
-index 8e273408453a..4000c8596d9b 100644
---- a/fs/iomap/direct-io.c
-+++ b/fs/iomap/direct-io.c
-@@ -3,6 +3,7 @@
-  * Copyright (C) 2010 Red Hat, Inc.
-  * Copyright (c) 2016-2025 Christoph Hellwig.
-  */
-+#include <linux/blk-crypto.h>
- #include <linux/fscrypt.h>
- #include <linux/pagemap.h>
- #include <linux/iomap.h>
-@@ -74,7 +75,7 @@ static void iomap_dio_submit_bio(const struct iomap_iter *iter,
- 		dio->dops->submit_io(iter, bio, pos);
- 	} else {
- 		WARN_ON_ONCE(iter->iomap.flags & IOMAP_F_ANON_WRITE);
--		submit_bio(bio);
-+		blk_crypto_submit_bio(bio);
- 	}
- }
- 
-diff --git a/include/linux/blk-crypto.h b/include/linux/blk-crypto.h
-index eb80df19be68..f7c3cb4a342f 100644
---- a/include/linux/blk-crypto.h
-+++ b/include/linux/blk-crypto.h
-@@ -181,6 +181,28 @@ static inline struct bio_crypt_ctx *bio_crypt_ctx(struct bio *bio)
- 
- #endif /* CONFIG_BLK_INLINE_ENCRYPTION */
- 
-+bool __blk_crypto_submit_bio(struct bio *bio);
-+
-+/**
-+ * blk_crypto_submit_bio - Submit a bio that may have a crypto context
-+ * @bio: bio to submit
-+ *
-+ * If @bio has no crypto context, or the crypt context attached to @bio is
-+ * supported by the underlying device's inline encryption hardware, just submit
-+ * @bio.
-+ *
-+ * Otherwise, try to perform en/decryption for this bio by falling back to the
-+ * kernel crypto API. For encryption this means submitting newly allocated
-+ * bios for the encrypted payload while keeping back the source bio until they
-+ * complete, while for reads the decryption happens in-place by a hooked in
-+ * completion handler.
-+ */
-+static inline void blk_crypto_submit_bio(struct bio *bio)
-+{
-+	if (!bio_has_crypt_ctx(bio) || __blk_crypto_submit_bio(bio))
-+		submit_bio(bio);
-+}
-+
- int __bio_crypt_clone(struct bio *dst, struct bio *src, gfp_t gfp_mask);
- /**
-  * bio_crypt_clone - clone bio encryption context
--- 
-2.47.3
+Unfortunately, the UAF still occurs even with proper mutex protection.
+
+The mutex successfully protects the list structure during traversal 
+won't be added/removed from
+
+q->blkg_list while we hold the lock. However, this doesn't prevent the 
+same blkg from being released
+
+twice.
+
+[  108.677948][    C0] 
+==================================================================
+[  108.678541][    C0] BUG: KASAN: slab-use-after-free in 
+rcu_cblist_dequeue+0xb1/0xe0
+[  108.679117][    C0] Read of size 8 at addr ffff888108ee9e48 by task 
+swapper/0/0
+[  108.679654][    C0]
+[  108.679827][    C0] CPU: 0 PID: 0 Comm: swapper/0 Not tainted 
+6.6.0-ga7706cf69006-dirty #43
+[  108.680437][    C0] Hardware name: QEMU Standard PC (i440FX + PIIX, 
+1996), BIOS 1.16.1-2.fc37 04/01/2014
+[  108.681125][    C0] Call Trace:
+[  108.681369][    C0]  <IRQ>
+[  108.684870][    C0]  rcu_cblist_dequeue+0xb1/0xe0
+[  108.685239][    C0]  rcu_do_batch+0x24c/0xd80
+[  108.686892][    C0]  rcu_core+0x4d1/0x7d0
+[  108.687205][    C0]  handle_softirqs+0x1ca/0x720
+[  108.687561][    C0]  irq_exit_rcu+0x141/0x1a0
+[  108.687896][    C0]  sysvec_apic_timer_interrupt+0x6e/0x90
+[  108.689218][    C0] RIP: 0010:pv_native_safe_halt+0xb/0x10
+[  108.689642][    C0] Code: 0b 66 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 
+00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 eb 07 0f 00 2d 97 d9 
+3d 00 fb f4 <e9> 50 ce 02 00 90 90 90 90 90 90 90 90 90 90 90 90 90 9b
+[  108.691075][    C0] RSP: 0018:ffffffff9cc07e00 EFLAGS: 00000206
+[  108.691537][    C0] RAX: 0000000000000006 RBX: 0000000000000000 RCX: 
+ffffffff9b280422
+[  108.692129][    C0] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 
+ffffffff97b74d45
+[  108.692714][    C0] RBP: 0000000000000000 R08: 0000000000000001 R09: 
+ffffed10e3602165
+[  108.693305][    C0] R10: ffff88871b010b2b R11: 0000000000000000 R12: 
+1ffffffff3980fc5
+[  108.693892][    C0] R13: ffffffff9cc88ec0 R14: dffffc0000000000 R15: 
+0000000000014810
+[  108.695293][    C0]  default_idle+0x5/0x10
+[  108.695594][    C0]  default_idle_call+0x97/0x1d0
+[  108.695942][    C0]  cpuidle_idle_call+0x1e5/0x270
+[  108.697162][    C0]  do_idle+0xef/0x150
+[  108.697454][    C0]  cpu_startup_entry+0x51/0x60
+[  108.698108][    C0]  rest_init+0x1cc/0x320
+[  108.698410][    C0]  arch_call_rest_init+0xf/0x30
+[  108.698761][    C0]  start_kernel+0x392/0x400
+[  108.699085][    C0]  x86_64_start_reservations+0x14/0x30
+[  108.699474][    C0]  x86_64_start_kernel+0x9b/0xa0
+[  108.699822][    C0]  secondary_startup_64_no_verify+0x194/0x19b
+[  108.700255][    C0]  </TASK>
+[  108.700477][    C0]
+[  108.700644][    C0] Allocated by task 1045:
+[  108.700948][    C0]  kasan_save_stack+0x1c/0x40
+[  108.701293][    C0]  kasan_set_track+0x21/0x30
+[  108.701617][    C0]  __kasan_kmalloc+0x8b/0x90
+[  108.701946][    C0]  blkg_alloc+0xbc/0x940
+[  108.702251][    C0]  blkg_create+0xcf6/0x13d0
+[  108.702576][    C0]  blkg_lookup_create+0x47b/0x810
+[  108.702935][    C0]  bio_associate_blkg_from_css+0x1a0/0x8c0
+[  108.703354][    C0]  bio_associate_blkg+0xa2/0x190
+[  108.703704][    C0]  bio_init+0x272/0x8d0
+[  108.704000][    C0]  bio_alloc_bioset+0x454/0x770
+[  108.704350][    C0]  ext4_bio_write_folio+0x68e/0x10d0
+[  108.704729][    C0]  mpage_submit_folio+0x14a/0x2b0
+[  108.705090][    C0]  mpage_process_page_bufs+0x1b1/0x390
+[  108.705492][    C0]  mpage_prepare_extent_to_map+0xa91/0x1060
+[  108.705915][    C0]  ext4_do_writepages+0x9af/0x1d60
+[  108.706288][    C0]  ext4_writepages+0x281/0x5a0
+[  108.706634][    C0]  do_writepages+0x165/0x5f0
+[  108.707057][    C0]  filemap_fdatawrite_wbc+0x111/0x170
+[  108.707450][    C0]  __filemap_fdatawrite_range+0x9d/0xd0
+[  108.707851][    C0]  file_write_and_wait_range+0x97/0x110
+[  108.708251][    C0]  ext4_sync_file+0x1fb/0xb60
+[  108.708592][    C0]  __x64_sys_fsync+0x55/0x90
+[  108.708932][    C0]  do_syscall_64+0x6b/0x120
+[  108.709262][    C0]  entry_SYSCALL_64_after_hwframe+0x78/0xe2
+[  108.709690][    C0]
+[  108.709867][    C0] Freed by task 338:
+[  108.710150][    C0]  kasan_save_stack+0x1c/0x40
+[  108.710496][    C0]  kasan_set_track+0x21/0x30
+[  108.710835][    C0]  kasan_save_free_info+0x27/0x40
+[  108.711203][    C0]  __kasan_slab_free+0x106/0x180
+[  108.711564][    C0]  __kmem_cache_free+0x1dd/0x470
+[  108.711923][    C0]  process_one_work+0x774/0x13a0
+[  108.712288][    C0]  worker_thread+0x6eb/0x12c0
+[  108.712631][    C0]  kthread+0x29f/0x360
+[  108.712928][    C0]  ret_from_fork+0x30/0x70
+[  108.713251][    C0]  ret_from_fork_asm+0x1b/0x30
 
