@@ -1,203 +1,123 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73A3F35FF70
-	for <linux-block@vger.kernel.org>; Fri,  9 Jan 2026 14:40:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C249E3612EA
+	for <linux-block@vger.kernel.org>; Fri,  9 Jan 2026 14:44:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767969658; cv=none; b=C1rdmZtx6yGS92kaPVD4jMDsBfF1ztWhizQrKenv23IvYnbkD+EIpjTifZ0ortlQoPBWpQ3CfericknHby3OasE1+MSWYd9+57AMbW36QFJchRV4yKzuFUrt96qcoBa8Vw1hZxl+rGiBJlcKdv4jo0ycS2+ln4W6vD4twofirU0=
+	t=1767969880; cv=none; b=DeVWViXbu4s4UWTfJ0WcUMXG4foO45yk2xgc021t4GIrVGc6nw3lY8bJOZMrAbEx968c2xWNBIjACCS/TKa1xeviNdpNWwSFVemWQv2Q7ooS03QeQCKakbRCvuFjQr6kbTkY16XC+9hmlH6v9ZTabZToLWvVWa68avNH8ksQA4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767969658; c=relaxed/simple;
-	bh=5jlOfYj+ObCR52PVgF13Z89GSOj3yoygabUG550Aazg=;
+	s=arc-20240116; t=1767969880; c=relaxed/simple;
+	bh=/1+Y4xy4fXPDI+ucFHeswujk5sqRoZi9rm5QWGYirNM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M6ahNh/3XXI8QQSVz5V2lBa7j3RZ2c9anAMyHKqfdeqVFbJwf2AsdTyq6hM5I0I+/2CM9tzllL6JDOAaUE4bTP7OQF0y0DoqaM4wurrbV0FyoSm+RzDBKZ1GT+mVcydWwsEMC2TFaz0jUESi9u+zJpJVdwfWXFVet1IXSEUkAek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UG9RBn/2; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=AF+jhr9rC0CK/s0otAtIo8uzHS3vuzcSBohDHSNp/+pbj2GnFfR2Wan1sJWYuReHJYcBZrRI6WCbueOu0VjsnCqM45n9UF7ZbiYzrV5GpH3Pm+j1QmO0eG7qCzj5mLkXeKJ6q62SRcklmwV0Fnl5Nls4+JPGNp6LLteb1lsLwhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=byYqCuHc; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UG9RBn/2"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1767969655;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4WZOrllwhvLAdn1gTsOABlv26CL05TG42u6HT7EiAos=;
-	b=UG9RBn/2/Wp3dXwoFtEFUNen381Be0oq7LHElmbx7vsmQGpt2cm+6zM+kKco5kCZymVtSh
-	cqp68/Eb1peGGOLTJokzKCyx1HAgGSyoUJk4Z1x5Bv9yP6TwbE61QDImOaBnCFnVvYvIrt
-	CS5/SSO+y3GT/GsrlirmLJbNgOU3vpQ=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-611-e6P9twM5NRK4iZ5JdkpsHA-1; Fri,
- 09 Jan 2026 09:40:51 -0500
-X-MC-Unique: e6P9twM5NRK4iZ5JdkpsHA-1
-X-Mimecast-MFC-AGG-ID: e6P9twM5NRK4iZ5JdkpsHA_1767969647
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B38721956053;
-	Fri,  9 Jan 2026 14:40:47 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.172])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6A7AD30002D1;
-	Fri,  9 Jan 2026 14:40:40 +0000 (UTC)
-Date: Fri, 9 Jan 2026 22:40:29 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Venkat Rao Bagalkote <venkat88@linux.ibm.com>
-Cc: Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
-	linux-scsi@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	James.Bottomley@hansenpartnership.com, leonro@nvidia.com,
-	kch@nvidia.com, LKML <linux-kernel@vger.kernel.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>, riteshh@linux.ibm.com,
-	ojaswin@linux.ibm.com
-Subject: Re: [next-20260108]kernel BUG at drivers/scsi/scsi_lib.c:1173!
-Message-ID: <aWETXSLwAYOVdB9J@fedora>
-References: <9687cf2b-1f32-44e1-b58d-2492dc6e7185@linux.ibm.com>
- <aWCYl3I7GtsGXIG3@infradead.org>
- <aWClEA6KuLP6E1cP@fedora>
- <7382f235-3e42-4b77-b18d-c38661816301@linux.ibm.com>
- <aWDspG-J1a3iyIqG@fedora>
- <b7624213-65e5-41d4-81ba-e95f885018dd@linux.ibm.com>
- <aWD7j3NR_m6EyZv1@fedora>
- <ab7635d7-70e7-4906-bdcf-90006d7edf85@linux.ibm.com>
- <aWELGGBf1Sl3RK6k@fedora>
- <4c85df85-58f7-4e44-8201-2f0562f93439@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="byYqCuHc"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-47774d3536dso28385775e9.0
+        for <linux-block@vger.kernel.org>; Fri, 09 Jan 2026 06:44:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1767969877; x=1768574677; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/1+Y4xy4fXPDI+ucFHeswujk5sqRoZi9rm5QWGYirNM=;
+        b=byYqCuHc2gGCdX631PDgnpi+b/A1HSPGUy6zLWlxomwuu8vi1koDw4ecHqwnrYv2Vk
+         PDoSsSjg/Y/1o3itkhfH/fiMspLBm98rPJ5CdpDxfNI5dMkJm83qQhWXrbpS4pyMYMNk
+         fhb/REApmd1h7f6YJduY/poyGiICcJSaGZsKRV0JGgElW4Y7Yz9N1qX2uhpSRLsu/szm
+         8IUdORu19hdSyL7/dxjxnXOSl7i7Md98FsS2km7RFVY8/tyT3pqJJp/LDbJh3HUL7NlV
+         znj4g/oPh9HB+ocZ3Dx+K2QekL5k37OFQK5BJld6vif+HeKZdjwxKCwkGgYbvd4EaXYT
+         XGvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767969877; x=1768574677;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/1+Y4xy4fXPDI+ucFHeswujk5sqRoZi9rm5QWGYirNM=;
+        b=S3m1QAmrhdRlmyGBW2n4pNen+abTqnv8QDDQQbcYQxxjV7MSQ2Gv3AtxI/210pRorK
+         0msX0LoiYpVLuLeR6154xKUMx+Rt97pdwCn5TocNWO9r+sfx2U/oCZgmQLFMIKo5tey+
+         xqhXwX671DDCn/mgWy9TAQXhhm6dXmMW+ecoawt8FGMSsOoZUFBBM8d0INSI/cv6caoK
+         lYj5veC9B9ybmYAQK2NdONazVuYXjCwiLnRWzIp4S0Ggwd4AGkjakOyRWvvLrXf2LLI9
+         pw+d8VkfUtyyvdkDW/bDFJbjIsGSAk9i2aWzJAaHdKd20Obnom5WtzXP3+ynWBf0TGqd
+         8BnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXD9umZz4FWIt+c+Z6tn0txLfHRc0WlGpXWRsOc3kOi2OWCT/5V6H3bjuO/7VPKhjvcug9EbGaosMA1Sw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxwYraW+u6K7Rj5rBLD1UUrzO3rKTERiU8Uw6C+d144ME3SNj1K
+	sScqTLRNnzJnXooDkcMjLGNYQO0rCBZjzir73J+Wv8g6axrCEloiikC+wgcldRoPNyyQ/sT1Stc
+	KY8iG
+X-Gm-Gg: AY/fxX4lZyMWfL0oGYkKEyn7P/gRrOlNIITvCsWlTxTAqFl1I4y/QAnNgEFypMsqCUI
+	cICW8iH1MchCMqw5GQImi0ovg3X+5vzujCcwuK5qfbMg8UR+21ms15491wLfT7ZkxMarD+yCMaf
+	DGGZBbWUVkW4yJ2E3hWrHGpofxHwogeWO5HQm78sFU2u+1QABJF0AIJPfZ4WkD5EwEr4l3l/h91
+	DRmeJUZlimyivmb5zKLn41gJsSX2jXcYQdvwOWcqDFywu+ud2u1cnO+elTF8a1raYnGVfqady28
+	Hw4KD8qdOY4vTYE7KEA8ggSsvCIrvrRquSBIMpXQ8ztMPn7MtJi9Lh/ieYCkuk43F+A2SJ6jLXD
+	YHE/TP4oJ9G0PtzjOfv/OORh8S11AVwf4wXmYQkK6VbWyWdZrpkZ3Mc0gKB1/MvuBf+WLXfpZcQ
+	GVQtgvRFlQFw+5lPfrN9OhSSONmc9hmC0=
+X-Google-Smtp-Source: AGHT+IH8FOAwnYy4OZuYKVuTUkzsl5zvNMupDK3PWM4j2did/Ahw9oYwLrTudoKw4NQ1y1JmyWkZcA==
+X-Received: by 2002:a05:600c:3541:b0:477:9fa0:7495 with SMTP id 5b1f17b1804b1-47d848787e3mr128657395e9.14.1767969877156;
+        Fri, 09 Jan 2026 06:44:37 -0800 (PST)
+Received: from blackdock.suse.cz (nat2.prg.suse.com. [195.250.132.146])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5ee243sm22648070f8f.31.2026.01.09.06.44.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Jan 2026 06:44:36 -0800 (PST)
+Date: Fri, 9 Jan 2026 15:44:35 +0100
+From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
+To: Zheng Qixing <zhengqixing@huaweicloud.com>
+Cc: tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk, yukuai@fnnas.com, 
+	cgroups@vger.kernel.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	yi.zhang@huawei.com, yangerkun@huawei.com, houtao1@huawei.com, zhengqixing@huawei.com
+Subject: Re: [PATCH 1/3] blk-cgroup: factor policy pd teardown loop into
+ helper
+Message-ID: <heoizkdewdbvczav4xa4fylnkbswb7sjybt5naw7jlafbzmvin@tctcbn5oxqmb>
+References: <20260108014416.3656493-1-zhengqixing@huaweicloud.com>
+ <20260108014416.3656493-2-zhengqixing@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ywuwths76adpwenh"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <4c85df85-58f7-4e44-8201-2f0562f93439@linux.ibm.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+In-Reply-To: <20260108014416.3656493-2-zhengqixing@huaweicloud.com>
 
-On Fri, Jan 09, 2026 at 07:53:00PM +0530, Venkat Rao Bagalkote wrote:
-> 
-> On 09/01/26 7:35 pm, Ming Lei wrote:
-> > On Fri, Jan 09, 2026 at 07:26:01PM +0530, Venkat Rao Bagalkote wrote:
-> > > On 09/01/26 6:28 pm, Ming Lei wrote:
-> > > > On Fri, Jan 09, 2026 at 05:51:15PM +0530, Venkat Rao Bagalkote wrote:
-> > > > > On 09/01/26 5:25 pm, Ming Lei wrote:
-> > > > > > On Fri, Jan 09, 2026 at 05:14:36PM +0530, Venkat Rao Bagalkote wrote:
-> > > > > > > On 09/01/26 12:19 pm, Ming Lei wrote:
-> > > > > > > > On Thu, Jan 08, 2026 at 09:56:39PM -0800, Christoph Hellwig wrote:
-> > > > > > > > > I've seen the same when running xfstests on xfs, and bisected it to:
-> > > > > > > > > 
-> > > > > > > > > commit ee623c892aa59003fca173de0041abc2ccc2c72d
-> > > > > > > > > Author: Ming Lei <ming.lei@redhat.com>
-> > > > > > > > > Date:   Wed Dec 31 11:00:55 2025 +0800
-> > > > > > > > > 
-> > > > > > > > >         block: use bvec iterator helper for bio_may_need_split()
-> > > > > > > > > 
-> > > > > > > > Hi Christoph and Venkat Rao Bagalkote,
-> > > > > > > > 
-> > > > > > > > Unfortunately I can't duplicate the issue in my environment, can you test
-> > > > > > > > the following patch?
-> > > > > > > > 
-> > > > > > > > diff --git a/block/blk.h b/block/blk.h
-> > > > > > > > index 98f4dfd4ec75..980eef1f5690 100644
-> > > > > > > > --- a/block/blk.h
-> > > > > > > > +++ b/block/blk.h
-> > > > > > > > @@ -380,7 +380,7 @@ static inline bool bio_may_need_split(struct bio *bio,
-> > > > > > > >                     return true;
-> > > > > > > >             bv = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
-> > > > > > > > -       if (bio->bi_iter.bi_size > bv->bv_len)
-> > > > > > > > +       if (bio->bi_iter.bi_size > bv->bv_len - bio->bi_iter.bi_bvec_done)
-> > > > > > > >                     return true;
-> > > > > > > >             return bv->bv_len + bv->bv_offset > lim->max_fast_segment_size;
-> > > > > > > >      }
-> > > > > > > Hello Ming,
-> > > > > > > 
-> > > > > > > 
-> > > > > > > This is not helping. I am hitting this issue, during kernel build itself.
-> > > > > > Can you confirm if it can fix the blktests ext4/056 first?
-> > > > > > 
-> > > > > > If kernel building is running over new patched kernel, please provide the
-> > > > > > dmesg log. And if it is reproduciable, can you confirm if it can be fixed
-> > > > > > by reverting ee623c892aa59003 (block: use bvec iterator helper for bio_may_need_split())?
-> > > > > Unfortunately, even with revert, build fails.
-> > > > > 
-> > > > > 
-> > > > > 
-> > > > > commit c64b2ee9cddcb31546c8622ef018d344544a9388 (HEAD)
-> > > > > Author: Super User <root@ltc-zzci-1.ltc.tadn.ibm.com>
-> > > > > Date:   Fri Jan 9 06:51:19 2026 -0600
-> > > > > 
-> > > > >       Revert "block: use bvec iterator helper for bio_may_need_split()"
-> > > > > 
-> > > > >       This reverts commit ee623c892aa59003fca173de0041abc2ccc2c72d.
-> > > > OK, then your issue isn't related with the above change.
-> > > > 
-> > > > Can you reproduce & collect dmesg log with the bad sg/rq/bio/bvec info by
-> > > > applying the attached debug patch?
-> > > > 
-> > > > Also if possible, please collect your scsi queue's limit info before
-> > > > reproducing the issue:
-> > > > 
-> > > > 	(cd /sys/block/$SD/queue && find . -type f -exec grep -aH . {} \;)
-> > > Hello Ming,
-> > > 
-> > > After applying the patch shared via attachment also, I see build failure.
-> > > 
-> > > I have attached the kernel config file.
-> > > 
-> > > 
-> > > git diff
-> > > diff --git a/block/blk-mq-dma.c b/block/blk-mq-dma.c
-> > > index 752060d7261c..33c1b6a0a738 100644
-> > > --- a/block/blk-mq-dma.c
-> > > +++ b/block/blk-mq-dma.c
-> > > @@ -4,8 +4,75 @@
-> > >    */
-> > >   #include <linux/blk-integrity.h>
-> > >   #include <linux/blk-mq-dma.h>
-> > > +#include <linux/scatterlist.h>
-> > >   #include "blk.h"
-> > Hi Venkat,
-> > 
-> > Thanks for your test.
-> > 
-> > But you didn't apply the whole debug patch in the following link:
-> > 
-> > https://lore.kernel.org/linux-block/aWD7j3NR_m6EyZv1@fedora/
-> > 
-> > otherwise something like "=== __blk_rq_map_sg DEBUG DUMP ===" will be
-> > dumped in dmesg log.
-> > 
-> > > make -j 48 -s && make modules_install && make install
-> > > [ 5625.770436] ------------[ cut here ]------------
-> > > [ 5625.770476] WARNING: block/blk-mq-dma.c:309 at
-> > If the whole debug patch is applied correctly, the above line number should
-> > have become 378 instead of original 309.
-> > 
-> > Please re-apply the debug patch & reproduce again.
-> > 
-> 
-> Hello Ming,
-> 
-> 
-> Apologies for back and forth. But I did apply the whole patch. Below is the
-> git diff from my machine. Let me know, if I am missing anything.
 
-OK, the patch is correct.
+--ywuwths76adpwenh
+Content-Type: text/plain; protected-headers=v1; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH 1/3] blk-cgroup: factor policy pd teardown loop into
+ helper
+MIME-Version: 1.0
 
-But you need to boot with one good kernel(such as, distribution shipped kernel) first
-for building new test kernel against -next tree with this patch.
+Hi Qixing.
 
-After this new test kernel is built & installed & reboot, you can start your
-kernel build workload, then the issue will be triggered, and the log is
-collected.
+On Thu, Jan 08, 2026 at 09:44:14AM +0800, Zheng Qixing <zhengqixing@huaweic=
+loud.com> wrote:
+> From: Zheng Qixing <zhengqixing@huawei.com>
+>=20
+> Move the teardown sequence which offlines and frees per-policy
+> blkg_policy_data (pd) into a helper for readability.
+>=20
+> No functional change intended.
 
-When the issue is triggered, `WARNING: block/blk-mq-dma.c:378 ` should be
-shown in dmesg log, which signals you are running the test kernel with the
-debug patch for collecting log.
-
-Please let me know if anything is clear.
+This rework isn't so big, so I'd leave it upon your discretion but
+consider please moving this patch towards the end of the series.
+(Generally, eases backports of such fixes.)
 
 Thanks,
-Ming
+Michal
 
+--ywuwths76adpwenh
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iJEEABYKADkWIQRCE24Fn/AcRjnLivR+PQLnlNv4CAUCaWEUShsUgAAAAAAEAA5t
+YW51MiwyLjUrMS4xMSwyLDIACgkQfj0C55Tb+AiA0wEApu7S3lwu4BFXk2atN0ZG
+Rj9eEkFVhXMjypkS3w+UiE8A/2euYms6kN4Br0fW1U7H1n/OS2G9qKo1fkYEd7DB
+2BQD
+=Dv65
+-----END PGP SIGNATURE-----
+
+--ywuwths76adpwenh--
