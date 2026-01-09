@@ -1,284 +1,257 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9C53359FA9;
-	Fri,  9 Jan 2026 12:24:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 541A735A94E
+	for <linux-block@vger.kernel.org>; Fri,  9 Jan 2026 12:59:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767961463; cv=none; b=FpJPmphQ/vcOBCfLsbsbtualXGUXtR0hcsk3bhipWEuOHZY0wGTPevy/F18bLBduyoU+JfmTFy3UrkHsHTIxWtYUaqofnocTFRSFqYaXwppKQN56LFmihGqD+ZO2PIfxuJ3qA1nW7EyY+fMLmsdTpp1RZ4SZpE8vZb62ubgrKeU=
+	t=1767963566; cv=none; b=Ysqr8b5llYHAp2OUhhAme4+Namy09QWnSDg8bTJAB4ldK+fAUQxR7bFojnX3Q7qOTOuVB2uvjVaAa6r9X6Lig6HwH2uBer6Ha41YFrLRtSqCsTv80vWmNPFsjA3BhnaVJSVCRF5mZC+mfEMleTLOtYnfRjrGGaGj3vU7knrsBwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767961463; c=relaxed/simple;
-	bh=9CelIXlUwF0eBdZnmpYz4I7obd+q+TVOc4T+qw3wxfk=;
+	s=arc-20240116; t=1767963566; c=relaxed/simple;
+	bh=SywYImdD9t0SPL/FKsAXilQZf0r/LfY4dx2S63mfwZE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uRicKGjUcYcLq/2nnuuEf/P/bgEudzWNOzeScnHMK9mmbVAjIacDqpTd8hoZ2r0tKv7g3E0bt0AC1a7E6bItmXAIdPqmGUEFJrg8Vi335syFlpSdpbEmDgWrkU+enPIh1oJ4pAWihvdTo3ENd13AP2xR+BpzaUSmwzxr8tadIvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iKWnYr3d; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=nPvcIpTwBCVtrOOShVduFN9Q49KwJ4cTktSTh3PQlfGg2ke+KyyQ65FA6UecHWoylQtdjWg5Jse1j6IXf6ymizb7EnmpZaNlpE+G1ke2gHvmo3X+PvQFwTGJs8iUBRK2s5YQpKl26sO7wPJbqOT5TPJuuNw8qX4qXCOfKlvckxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JPlHfgUi; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iKWnYr3d"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDFBAC4CEF1;
-	Fri,  9 Jan 2026 12:24:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767961463;
-	bh=9CelIXlUwF0eBdZnmpYz4I7obd+q+TVOc4T+qw3wxfk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iKWnYr3dUG6kJOOSvASovWCgx5lJTBcownYg8ZBbON8kHDuUUPaDUWnIgpyCNlA+M
-	 ObXNzsKmrlro6RTtS8QBQFyKwKq6khAeM/qP3eqrnB9OOoPgcc59EQRvV/sD0tshJ1
-	 Rw8Uaif43Z+zjkzY80d+QiGtro9Xkwlyb7UdGBJSK/cEhgq2y58NU6F16EpfIKX2kD
-	 WHJXCuxur+4oREDVU23cCiL3tGpoVaBo76fpQE7yr3ysxeaSs8oHO4DBb9xR8LNJY1
-	 1+bQIEGwy6bqg1I+mYxoH/tIf+IilY/TmXhKnE99p6EP84dSbacxM9whF1Ft0XEDQu
-	 ++upyY6j0xUig==
-Date: Fri, 9 Jan 2026 13:24:19 +0100
-From: Carlos Maiolino <cem@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Damien Le Moal <dlemoal@kernel.org>, 
-	Hans Holmberg <hans.holmberg@wdc.com>, linux-block@vger.kernel.org, linux-xfs@vger.kernel.org
-Subject: Re: [PATCH 3/3] xfs: rework zone GC buffer management
-Message-ID: <aWDzaJB7PXyW09Nb@nidhogg.toxiclabs.cc>
-References: <20260106075914.1614368-1-hch@lst.de>
- <20260106075914.1614368-4-hch@lst.de>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JPlHfgUi"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767963564;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oXMA7qdNTbFAou+tiTx3NbdbqV4+2pXn9UDbRG9h2tE=;
+	b=JPlHfgUiS7MZDHiKHcMikSlBmoiyt5dewfcFzpgeomyOJXKAUbMn4+qTyNWVbn3VWkhkUt
+	oV075SIEGFLZQMZhs3afAr5h0eN19lk+7uslsVzRXymmgyjVoptW7b3ZC01qP2cVU4Bll9
+	lIMs6TrNMazIGi1DLt3AdxkFkTp5alo=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-343-ihnfsEvMODqXRqbL6EFWyQ-1; Fri,
+ 09 Jan 2026 07:59:19 -0500
+X-MC-Unique: ihnfsEvMODqXRqbL6EFWyQ-1
+X-Mimecast-MFC-AGG-ID: ihnfsEvMODqXRqbL6EFWyQ_1767963557
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 47C8B195609E;
+	Fri,  9 Jan 2026 12:59:16 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.172])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BFE4D1956048;
+	Fri,  9 Jan 2026 12:59:06 +0000 (UTC)
+Date: Fri, 9 Jan 2026 20:58:55 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Venkat Rao Bagalkote <venkat88@linux.ibm.com>
+Cc: Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
+	linux-scsi@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	James.Bottomley@hansenpartnership.com, leonro@nvidia.com,
+	kch@nvidia.com, LKML <linux-kernel@vger.kernel.org>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>, riteshh@linux.ibm.com,
+	ojaswin@linux.ibm.com
+Subject: Re: [next-20260108]kernel BUG at drivers/scsi/scsi_lib.c:1173!
+Message-ID: <aWD7j3NR_m6EyZv1@fedora>
+References: <9687cf2b-1f32-44e1-b58d-2492dc6e7185@linux.ibm.com>
+ <aWCYl3I7GtsGXIG3@infradead.org>
+ <aWClEA6KuLP6E1cP@fedora>
+ <7382f235-3e42-4b77-b18d-c38661816301@linux.ibm.com>
+ <aWDspG-J1a3iyIqG@fedora>
+ <b7624213-65e5-41d4-81ba-e95f885018dd@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/mixed; boundary="d72Y9DGiNE0UCluM"
 Content-Disposition: inline
-In-Reply-To: <20260106075914.1614368-4-hch@lst.de>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <b7624213-65e5-41d4-81ba-e95f885018dd@linux.ibm.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Tue, Jan 06, 2026 at 08:58:54AM +0100, Christoph Hellwig wrote:
-> The double buffering where just one scratch area is used at a time does
-> not efficiently use the available memory.  It was originally implemented
-> when GC I/O could happen out of order, but that was removed before
-> upstream submission to avoid fragmentation.  Now that all GC I/Os are
-> processed in order, just use a number of buffers as a simple ring buffer.
-> 
-> For a synthetic benchmark that fills 256MiB HDD zones and punches out
-> holes to free half the space this leads to a decrease of GC time by
-> a little more than 25%.
-> 
-> Thanks to Hans Holmberg <hans.holmberg@wdc.com> for testing and
-> benchmarking.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Hans Holmberg <hans.holmberg@wdc.com>
-> Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
 
-Reviewed-by: Carlos Maiolino <cmaiolino@redhat.com>
+--d72Y9DGiNE0UCluM
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-> ---
->  fs/xfs/xfs_zone_gc.c | 106 ++++++++++++++++++++++++-------------------
->  1 file changed, 59 insertions(+), 47 deletions(-)
+On Fri, Jan 09, 2026 at 05:51:15PM +0530, Venkat Rao Bagalkote wrote:
 > 
-> diff --git a/fs/xfs/xfs_zone_gc.c b/fs/xfs/xfs_zone_gc.c
-> index 40408b1132e0..960cf79d484e 100644
-> --- a/fs/xfs/xfs_zone_gc.c
-> +++ b/fs/xfs/xfs_zone_gc.c
-> @@ -50,23 +50,11 @@
->   */
->  
->  /*
-> - * Size of each GC scratch pad.  This is also the upper bound for each
-> - * GC I/O, which helps to keep latency down.
-> + * Size of each GC scratch allocation, and the number of buffers.
->   */
-> -#define XFS_GC_CHUNK_SIZE	SZ_1M
-> -
-> -/*
-> - * Scratchpad data to read GCed data into.
-> - *
-> - * The offset member tracks where the next allocation starts, and freed tracks
-> - * the amount of space that is not used anymore.
-> - */
-> -#define XFS_ZONE_GC_NR_SCRATCH	2
-> -struct xfs_zone_scratch {
-> -	struct folio			*folio;
-> -	unsigned int			offset;
-> -	unsigned int			freed;
-> -};
-> +#define XFS_GC_BUF_SIZE		SZ_1M
-> +#define XFS_GC_NR_BUFS		2
-> +static_assert(XFS_GC_NR_BUFS < BIO_MAX_VECS);
->  
->  /*
->   * Chunk that is read and written for each GC operation.
-> @@ -141,10 +129,14 @@ struct xfs_zone_gc_data {
->  	struct bio_set			bio_set;
->  
->  	/*
-> -	 * Scratchpad used, and index to indicated which one is used.
-> +	 * Scratchpad to buffer GC data, organized as a ring buffer over
-> +	 * discontiguous folios.  scratch_head is where the buffer is filled,
-> +	 * and scratch_tail tracks the buffer space freed.
->  	 */
-> -	struct xfs_zone_scratch		scratch[XFS_ZONE_GC_NR_SCRATCH];
-> -	unsigned int			scratch_idx;
-> +	struct folio			*scratch_folios[XFS_GC_NR_BUFS];
-> +	unsigned int			scratch_size;
-> +	unsigned int			scratch_head;
-> +	unsigned int			scratch_tail;
->  
->  	/*
->  	 * List of bios currently being read, written and reset.
-> @@ -210,20 +202,16 @@ xfs_zone_gc_data_alloc(
->  	if (!data->iter.recs)
->  		goto out_free_data;
->  
-> -	/*
-> -	 * We actually only need a single bio_vec.  It would be nice to have
-> -	 * a flag that only allocates the inline bvecs and not the separate
-> -	 * bvec pool.
-> -	 */
->  	if (bioset_init(&data->bio_set, 16, offsetof(struct xfs_gc_bio, bio),
->  			BIOSET_NEED_BVECS))
->  		goto out_free_recs;
-> -	for (i = 0; i < XFS_ZONE_GC_NR_SCRATCH; i++) {
-> -		data->scratch[i].folio =
-> -			folio_alloc(GFP_KERNEL, get_order(XFS_GC_CHUNK_SIZE));
-> -		if (!data->scratch[i].folio)
-> +	for (i = 0; i < XFS_GC_NR_BUFS; i++) {
-> +		data->scratch_folios[i] =
-> +			folio_alloc(GFP_KERNEL, get_order(XFS_GC_BUF_SIZE));
-> +		if (!data->scratch_folios[i])
->  			goto out_free_scratch;
->  	}
-> +	data->scratch_size = XFS_GC_BUF_SIZE * XFS_GC_NR_BUFS;
->  	INIT_LIST_HEAD(&data->reading);
->  	INIT_LIST_HEAD(&data->writing);
->  	INIT_LIST_HEAD(&data->resetting);
-> @@ -232,7 +220,7 @@ xfs_zone_gc_data_alloc(
->  
->  out_free_scratch:
->  	while (--i >= 0)
-> -		folio_put(data->scratch[i].folio);
-> +		folio_put(data->scratch_folios[i]);
->  	bioset_exit(&data->bio_set);
->  out_free_recs:
->  	kfree(data->iter.recs);
-> @@ -247,8 +235,8 @@ xfs_zone_gc_data_free(
->  {
->  	int			i;
->  
-> -	for (i = 0; i < XFS_ZONE_GC_NR_SCRATCH; i++)
-> -		folio_put(data->scratch[i].folio);
-> +	for (i = 0; i < XFS_GC_NR_BUFS; i++)
-> +		folio_put(data->scratch_folios[i]);
->  	bioset_exit(&data->bio_set);
->  	kfree(data->iter.recs);
->  	kfree(data);
-> @@ -590,7 +578,12 @@ static unsigned int
->  xfs_zone_gc_scratch_available(
->  	struct xfs_zone_gc_data	*data)
->  {
-> -	return XFS_GC_CHUNK_SIZE - data->scratch[data->scratch_idx].offset;
-> +	if (!data->scratch_tail)
-> +		return data->scratch_size - data->scratch_head;
-> +
-> +	if (!data->scratch_head)
-> +		return data->scratch_tail;
-> +	return (data->scratch_size - data->scratch_head) + data->scratch_tail;
->  }
->  
->  static bool
-> @@ -664,6 +657,28 @@ xfs_zone_gc_alloc_blocks(
->  	return oz;
->  }
->  
-> +static void
-> +xfs_zone_gc_add_data(
-> +	struct xfs_gc_bio	*chunk)
-> +{
-> +	struct xfs_zone_gc_data	*data = chunk->data;
-> +	unsigned int		len = chunk->len;
-> +	unsigned int		off = data->scratch_head;
-> +
-> +	do {
-> +		unsigned int	this_off = off % XFS_GC_BUF_SIZE;
-> +		unsigned int	this_len = min(len, XFS_GC_BUF_SIZE - this_off);
-> +
-> +		bio_add_folio_nofail(&chunk->bio,
-> +				data->scratch_folios[off / XFS_GC_BUF_SIZE],
-> +				this_len, this_off);
-> +		len -= this_len;
-> +		off += this_len;
-> +		if (off == data->scratch_size)
-> +			off = 0;
-> +	} while (len);
-> +}
-> +
->  static bool
->  xfs_zone_gc_start_chunk(
->  	struct xfs_zone_gc_data	*data)
-> @@ -677,6 +692,7 @@ xfs_zone_gc_start_chunk(
->  	struct xfs_inode	*ip;
->  	struct bio		*bio;
->  	xfs_daddr_t		daddr;
-> +	unsigned int		len;
->  	bool			is_seq;
->  
->  	if (xfs_is_shutdown(mp))
-> @@ -691,17 +707,19 @@ xfs_zone_gc_start_chunk(
->  		return false;
->  	}
->  
-> -	bio = bio_alloc_bioset(bdev, 1, REQ_OP_READ, GFP_NOFS, &data->bio_set);
-> +	len = XFS_FSB_TO_B(mp, irec.rm_blockcount);
-> +	bio = bio_alloc_bioset(bdev,
-> +			min(howmany(len, XFS_GC_BUF_SIZE) + 1, XFS_GC_NR_BUFS),
-> +			REQ_OP_READ, GFP_NOFS, &data->bio_set);
->  
->  	chunk = container_of(bio, struct xfs_gc_bio, bio);
->  	chunk->ip = ip;
->  	chunk->offset = XFS_FSB_TO_B(mp, irec.rm_offset);
-> -	chunk->len = XFS_FSB_TO_B(mp, irec.rm_blockcount);
-> +	chunk->len = len;
->  	chunk->old_startblock =
->  		xfs_rgbno_to_rtb(iter->victim_rtg, irec.rm_startblock);
->  	chunk->new_daddr = daddr;
->  	chunk->is_seq = is_seq;
-> -	chunk->scratch = &data->scratch[data->scratch_idx];
->  	chunk->data = data;
->  	chunk->oz = oz;
->  	chunk->victim_rtg = iter->victim_rtg;
-> @@ -710,13 +728,9 @@ xfs_zone_gc_start_chunk(
->  
->  	bio->bi_iter.bi_sector = xfs_rtb_to_daddr(mp, chunk->old_startblock);
->  	bio->bi_end_io = xfs_zone_gc_end_io;
-> -	bio_add_folio_nofail(bio, chunk->scratch->folio, chunk->len,
-> -			chunk->scratch->offset);
-> -	chunk->scratch->offset += chunk->len;
-> -	if (chunk->scratch->offset == XFS_GC_CHUNK_SIZE) {
-> -		data->scratch_idx =
-> -			(data->scratch_idx + 1) % XFS_ZONE_GC_NR_SCRATCH;
-> -	}
-> +	xfs_zone_gc_add_data(chunk);
-> +	data->scratch_head = (data->scratch_head + len) % data->scratch_size;
-> +
->  	WRITE_ONCE(chunk->state, XFS_GC_BIO_NEW);
->  	list_add_tail(&chunk->entry, &data->reading);
->  	xfs_zone_gc_iter_advance(iter, irec.rm_blockcount);
-> @@ -834,6 +848,7 @@ xfs_zone_gc_finish_chunk(
->  	struct xfs_gc_bio	*chunk)
->  {
->  	uint			iolock = XFS_IOLOCK_EXCL | XFS_MMAPLOCK_EXCL;
-> +	struct xfs_zone_gc_data	*data = chunk->data;
->  	struct xfs_inode	*ip = chunk->ip;
->  	struct xfs_mount	*mp = ip->i_mount;
->  	int			error;
-> @@ -845,11 +860,8 @@ xfs_zone_gc_finish_chunk(
->  		return;
->  	}
->  
-> -	chunk->scratch->freed += chunk->len;
-> -	if (chunk->scratch->freed == chunk->scratch->offset) {
-> -		chunk->scratch->offset = 0;
-> -		chunk->scratch->freed = 0;
-> -	}
-> +	data->scratch_tail =
-> +		(data->scratch_tail + chunk->len) % data->scratch_size;
->  
->  	/*
->  	 * Cycle through the iolock and wait for direct I/O and layouts to
-> -- 
-> 2.47.3
+> On 09/01/26 5:25 pm, Ming Lei wrote:
+> > On Fri, Jan 09, 2026 at 05:14:36PM +0530, Venkat Rao Bagalkote wrote:
+> > > On 09/01/26 12:19 pm, Ming Lei wrote:
+> > > > On Thu, Jan 08, 2026 at 09:56:39PM -0800, Christoph Hellwig wrote:
+> > > > > I've seen the same when running xfstests on xfs, and bisected it to:
+> > > > > 
+> > > > > commit ee623c892aa59003fca173de0041abc2ccc2c72d
+> > > > > Author: Ming Lei <ming.lei@redhat.com>
+> > > > > Date:   Wed Dec 31 11:00:55 2025 +0800
+> > > > > 
+> > > > >       block: use bvec iterator helper for bio_may_need_split()
+> > > > > 
+> > > > Hi Christoph and Venkat Rao Bagalkote,
+> > > > 
+> > > > Unfortunately I can't duplicate the issue in my environment, can you test
+> > > > the following patch?
+> > > > 
+> > > > diff --git a/block/blk.h b/block/blk.h
+> > > > index 98f4dfd4ec75..980eef1f5690 100644
+> > > > --- a/block/blk.h
+> > > > +++ b/block/blk.h
+> > > > @@ -380,7 +380,7 @@ static inline bool bio_may_need_split(struct bio *bio,
+> > > >                   return true;
+> > > >           bv = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
+> > > > -       if (bio->bi_iter.bi_size > bv->bv_len)
+> > > > +       if (bio->bi_iter.bi_size > bv->bv_len - bio->bi_iter.bi_bvec_done)
+> > > >                   return true;
+> > > >           return bv->bv_len + bv->bv_offset > lim->max_fast_segment_size;
+> > > >    }
+> > > Hello Ming,
+> > > 
+> > > 
+> > > This is not helping. I am hitting this issue, during kernel build itself.
+> > Can you confirm if it can fix the blktests ext4/056 first?
+> > 
+> > If kernel building is running over new patched kernel, please provide the
+> > dmesg log. And if it is reproduciable, can you confirm if it can be fixed
+> > by reverting ee623c892aa59003 (block: use bvec iterator helper for bio_may_need_split())?
 > 
 > 
+> Unfortunately, even with revert, build fails.
+> 
+> 
+> 
+> commit c64b2ee9cddcb31546c8622ef018d344544a9388 (HEAD)
+> Author: Super User <root@ltc-zzci-1.ltc.tadn.ibm.com>
+> Date:   Fri Jan 9 06:51:19 2026 -0600
+> 
+>     Revert "block: use bvec iterator helper for bio_may_need_split()"
+> 
+>     This reverts commit ee623c892aa59003fca173de0041abc2ccc2c72d.
+
+OK, then your issue isn't related with the above change.
+
+Can you reproduce & collect dmesg log with the bad sg/rq/bio/bvec info by
+applying the attached debug patch?
+
+Also if possible, please collect your scsi queue's limit info before
+reproducing the issue:
+
+	(cd /sys/block/$SD/queue && find . -type f -exec grep -aH . {} \;)
+
+
+
+Thanks, 
+Ming
+
+--d72Y9DGiNE0UCluM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename="rq-dbg.patch"
+
+diff --git a/block/blk-mq-dma.c b/block/blk-mq-dma.c
+index 752060d7261c..33c1b6a0a738 100644
+--- a/block/blk-mq-dma.c
++++ b/block/blk-mq-dma.c
+@@ -4,8 +4,75 @@
+  */
+ #include <linux/blk-integrity.h>
+ #include <linux/blk-mq-dma.h>
++#include <linux/scatterlist.h>
+ #include "blk.h"
+ 
++static void dump_rq_mapping_debug(struct request *rq, struct scatterlist *sglist,
++				  int nsegs)
++{
++	struct scatterlist *sg;
++	struct bio *bio;
++	struct bvec_iter iter;
++	struct bio_vec bv;
++	int i;
++
++	pr_err("=== __blk_rq_map_sg DEBUG DUMP ===\n");
++	pr_err("DISK: %s\n", rq->q->disk ? rq->q->disk->disk_name : "(null)");
++
++	/* Dump nsegs vs expected */
++	pr_err("nsegs=%d nr_phys_segments=%u\n",
++	       nsegs, blk_rq_nr_phys_segments(rq));
++
++	/* Dump request info */
++	pr_err("REQUEST: __data_len=%u __sector=%llu cmd_flags=0x%x "
++	       "rq_flags=0x%x nr_phys_segments=%u phys_gap_bit=%u\n",
++	       rq->__data_len, (unsigned long long)rq->__sector,
++	       rq->cmd_flags, (__force unsigned int)rq->rq_flags,
++	       rq->nr_phys_segments, rq->phys_gap_bit);
++
++	/* Dump each SG element */
++	pr_err("--- SG LIST (%d entries) ---\n", nsegs);
++	for_each_sg(sglist, sg, nsegs, i) {
++		pr_err("  sg[%d]: pfn=0x%lx offset=%u len=%u dma_addr=0x%llx\n",
++		       i, page_to_pfn(sg_page(sg)), sg->offset, sg->length,
++		       (unsigned long long)sg_dma_address(sg));
++	}
++
++	/* Dump each bio */
++	pr_err("--- BIO LIST ---\n");
++	for (bio = rq->bio; bio; bio = bio->bi_next) {
++		pr_err("  BIO %p: bi_iter={sector=%llu size=%u idx=%u bvec_done=%u} "
++		       "bi_flags=0x%x bi_opf=0x%x bi_vcnt=%u bi_bvec_gap_bit=%u\n",
++		       bio,
++		       (unsigned long long)bio->bi_iter.bi_sector,
++		       bio->bi_iter.bi_size, bio->bi_iter.bi_idx,
++		       bio->bi_iter.bi_bvec_done,
++		       bio->bi_flags, bio->bi_opf, bio->bi_vcnt,
++		       bio->bi_bvec_gap_bit);
++
++		/* Dump each bvec in this bio */
++		pr_err("    --- BVECS (bi_vcnt=%u) ---\n", bio->bi_vcnt);
++		for (i = 0; i < bio->bi_vcnt; i++) {
++			struct bio_vec *bvp = &bio->bi_io_vec[i];
++
++			pr_err("      bvec[%d]: pfn=0x%lx len=%u offset=%u\n",
++			       i, page_to_pfn(bvp->bv_page), bvp->bv_len,
++			       bvp->bv_offset);
++		}
++
++		/* Also dump effective bvecs via iterator */
++		pr_err("    --- EFFECTIVE BVECS (via iter) ---\n");
++		i = 0;
++		bio_for_each_bvec(bv, bio, iter) {
++			pr_err("      eff_bvec[%d]: pfn=0x%lx len=%u offset=%u\n",
++			       i++, page_to_pfn(bv.bv_page), bv.bv_len,
++			       bv.bv_offset);
++		}
++	}
++
++	pr_err("=== END DEBUG DUMP ===\n");
++}
++
+ static bool __blk_map_iter_next(struct blk_map_iter *iter)
+ {
+ 	if (iter->iter.bi_size)
+@@ -306,6 +373,8 @@ int __blk_rq_map_sg(struct request *rq, struct scatterlist *sglist,
+ 	 * Something must have been wrong if the figured number of
+ 	 * segment is bigger than number of req's physical segments
+ 	 */
++	if (nsegs > blk_rq_nr_phys_segments(rq))
++		dump_rq_mapping_debug(rq, sglist, nsegs);
+ 	WARN_ON(nsegs > blk_rq_nr_phys_segments(rq));
+ 
+ 	return nsegs;
+diff --git a/block/blk.h b/block/blk.h
+index 98f4dfd4ec75..980eef1f5690 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -380,7 +380,7 @@ static inline bool bio_may_need_split(struct bio *bio,
+ 		return true;
+ 
+ 	bv = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
+-	if (bio->bi_iter.bi_size > bv->bv_len)
++	if (bio->bi_iter.bi_size > bv->bv_len - bio->bi_iter.bi_bvec_done)
+ 		return true;
+ 	return bv->bv_len + bv->bv_offset > lim->max_fast_segment_size;
+ }
+
+--d72Y9DGiNE0UCluM--
+
