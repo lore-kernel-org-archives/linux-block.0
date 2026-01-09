@@ -1,88 +1,152 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFD092EAD10;
-	Fri,  9 Jan 2026 12:14:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A1F333B6C6
+	for <linux-block@vger.kernel.org>; Fri,  9 Jan 2026 12:15:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767960843; cv=none; b=GMmhFOSnoVhgRvWSvKLfoxqWn0rMp0jQoAeZ+sFfHOIB/BXd1ICApgQ+2kUoJOahuVZYp8km47H7RkVuA+UKpR86xdgo00N5xpciB0MSmjP80ml4QZLgHEXUm2dIoRO0Pmxk8IMVMIpr/cQbT7MRVpi/GVhwOgifUDDFXW4GFXY=
+	t=1767960907; cv=none; b=F+5VebT1rxjD4ovRYucduyP8T2U6RiYPiWM5e8ODqv5lUUX6fbhAFdnyZ0ANn4tBPJk1e9qzN9qp0416EfNFshFKG46P50Acv3ZRvKQsD51ktKcga4CGXM58QfziAKxUv8gw2LK4rqmwcjB7KizMq27cIkq/jFuFcpoYt7Kfds0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767960843; c=relaxed/simple;
-	bh=6d5VyKD4I8RNZvyndJtGD0eNCqAjEYUY43WW1qa72Ys=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XYvDccMdkPrk25wlzl+VI6tb1uhLrnpbCgDMgw9XK+juO+GeB6v4toKxpIFApmzje/DWwT0psRrRqF31p1rYL8rdAgn5V9UYFBAUfg/LMJXAnX16NnPiZ1TbseZo5Pdo7ykxgGOIuXPP8SZskyVD/D1eQXH8bhXJXEzyO2Fr1XQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UG35Azhd; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1767960907; c=relaxed/simple;
+	bh=tOc2o7PUk5GR2CNezVaJl4bPt6ezg5feijXSK30D/MI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rNbP4sm6Ag5e9+rAzgGIEH7sjYjksdHtNRRHwSe1nBKZE//CxBAAiJbvxASz93PcoNbUR5F0NzONEbFLT2PtZtLjMnblQwY1ETMQrTWuZWBMQj+inWsz6HEmXD+HbwQom8AgzEOkdXrqRwDMKiXhdgjqikmkcqWYHfnc8GJs/es=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T3AQFLuR; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UG35Azhd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43ECDC19421;
-	Fri,  9 Jan 2026 12:14:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767960843;
-	bh=6d5VyKD4I8RNZvyndJtGD0eNCqAjEYUY43WW1qa72Ys=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UG35Azhd6ZbjAvc8ZGovh4GotHDZFj4XhPgA10ra8CakzxJ8jcu5QKJhxHfZz+62Z
-	 A8CQigylurur3y7RtJVaiAQBwy3gEimnJRM+7qQn+3uGA7SE9Lswk00n5feUGpYeKV
-	 Vd0C9gvXnSIjos6ViLkmiFXjIIjO0ZURiBBDccWjGM4LOWcYaYx83/CcWXNBrlNN7L
-	 YWQaxahVh1ZMG6rDtBi7zx9OKwpZGbLP0VBsxbKZITSod734ZIxgslv2g6xBqq7nyJ
-	 0quNaXRjsjitb9EnZ9Nt5oDgJs+v32DF6P3PJmMCeXLCuHd3sOa4Cbg8Hqfpee7mB7
-	 Mu7Q/NiHnIwYA==
-Date: Fri, 9 Jan 2026 13:13:59 +0100
-From: Carlos Maiolino <cem@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Damien Le Moal <dlemoal@kernel.org>, 
-	Hans Holmberg <hans.holmberg@wdc.com>, linux-block@vger.kernel.org, linux-xfs@vger.kernel.org
-Subject: Re: [PATCH 2/3] xfs: use bio_reuse in the zone GC code
-Message-ID: <aWDw-J4kP7UvJW9Y@nidhogg.toxiclabs.cc>
-References: <20260106075914.1614368-1-hch@lst.de>
- <20260106075914.1614368-3-hch@lst.de>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T3AQFLuR"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767960905;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=FNcv9OWFq212ck4UihQV9snMzPwMwWBrwOy7VswARx0=;
+	b=T3AQFLuR63Eo8Xe2lELgsArWzCR8gq6/qHPscmOlcVDMahx/Ht07VeM2chLebIaeKl2w3q
+	LJNIe5Cr0HSB4Fra4T3125yuGftuYocEA6EA+IgbsRM3grOvuIe3lTJB6RY7OGRNRixiHr
+	+oK5BabCdg0/xXMNxIfarAYhaA4RmwA=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-267-Wh2C3K-xNQCUWdZ97oZugA-1; Fri,
+ 09 Jan 2026 07:15:02 -0500
+X-MC-Unique: Wh2C3K-xNQCUWdZ97oZugA-1
+X-Mimecast-MFC-AGG-ID: Wh2C3K-xNQCUWdZ97oZugA_1767960901
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0FC551956048;
+	Fri,  9 Jan 2026 12:15:01 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.172])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id F269518004D8;
+	Fri,  9 Jan 2026 12:14:59 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Caleb Sander Mateos <csander@purestorage.com>,
+	Uday Shankar <ushankar@purestorage.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Ruikai Peng <ruikai@pwno.io>
+Subject: [PATCH] ublk: fix use-after-free in ublk_partition_scan_work
+Date: Fri,  9 Jan 2026 20:14:54 +0800
+Message-ID: <20260109121454.278336-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260106075914.1614368-3-hch@lst.de>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Tue, Jan 06, 2026 at 08:58:53AM +0100, Christoph Hellwig wrote:
-> Replace our somewhat fragile code to reuse the bio, which caused a
-> regression in the past with the block layer bio_reuse helper.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Hans Holmberg <hans.holmberg@wdc.com>
-> Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
-> ---
->  fs/xfs/xfs_zone_gc.c | 7 +------
->  1 file changed, 1 insertion(+), 6 deletions(-)
-> 
-> diff --git a/fs/xfs/xfs_zone_gc.c b/fs/xfs/xfs_zone_gc.c
-> index 3c52cc1497d4..40408b1132e0 100644
-> --- a/fs/xfs/xfs_zone_gc.c
-> +++ b/fs/xfs/xfs_zone_gc.c
-> @@ -811,8 +811,6 @@ xfs_zone_gc_write_chunk(
->  {
->  	struct xfs_zone_gc_data	*data = chunk->data;
->  	struct xfs_mount	*mp = chunk->ip->i_mount;
-> -	phys_addr_t		bvec_paddr =
-> -		bvec_phys(bio_first_bvec_all(&chunk->bio));
->  	struct xfs_gc_bio	*split_chunk;
->  
->  	if (chunk->bio.bi_status)
-> @@ -825,10 +823,7 @@ xfs_zone_gc_write_chunk(
->  	WRITE_ONCE(chunk->state, XFS_GC_BIO_NEW);
->  	list_move_tail(&chunk->entry, &data->writing);
->  
-> -	bio_reset(&chunk->bio, mp->m_rtdev_targp->bt_bdev, REQ_OP_WRITE);
-> -	bio_add_folio_nofail(&chunk->bio, chunk->scratch->folio, chunk->len,
-> -			offset_in_folio(chunk->scratch->folio, bvec_paddr));
-> -
-> +	bio_reuse(&chunk->bio);
->  	while ((split_chunk = xfs_zone_gc_split_write(data, chunk)))
->  		xfs_zone_gc_submit_write(data, split_chunk);
->  	xfs_zone_gc_submit_write(data, chunk);
-> -- 
-> 2.47.3
-> 
+A race condition exists between the async partition scan work and device
+teardown that can lead to a use-after-free of ub->ub_disk:
 
-Reviewed-by: Carlos Maiolino <cmaiolino@redhat.com>
+1. ublk_ctrl_start_dev() schedules partition_scan_work after add_disk()
+2. ublk_stop_dev() calls ublk_stop_dev_unlocked() which does:
+   - del_gendisk(ub->ub_disk)
+   - ublk_detach_disk() sets ub->ub_disk = NULL
+   - put_disk() which may free the disk
+3. The worker ublk_partition_scan_work() then dereferences ub->ub_disk
+   leading to UAF
+
+Fix this by using ublk_get_disk()/ublk_put_disk() in the worker to hold
+a reference to the disk during the partition scan. The spinlock in
+ublk_get_disk() synchronizes with ublk_detach_disk() ensuring the worker
+either gets a valid reference or sees NULL and exits early.
+
+Also change flush_work() to cancel_work_sync() to avoid running the
+partition scan work unnecessarily when the disk is already detached.
+
+Fixes: 7fc4da6a304b ("ublk: scan partition in async way")
+Reported-by: Ruikai Peng <ruikai@pwno.io>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/block/ublk_drv.c | 37 ++++++++++++++++++++++---------------
+ 1 file changed, 22 insertions(+), 15 deletions(-)
+
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 837fedb02e0d..f6e5a0766721 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -255,20 +255,6 @@ static inline struct request *__ublk_check_and_get_req(struct ublk_device *ub,
+ 		u16 q_id, u16 tag, struct ublk_io *io, size_t offset);
+ static inline unsigned int ublk_req_build_flags(struct request *req);
+ 
+-static void ublk_partition_scan_work(struct work_struct *work)
+-{
+-	struct ublk_device *ub =
+-		container_of(work, struct ublk_device, partition_scan_work);
+-
+-	if (WARN_ON_ONCE(!test_and_clear_bit(GD_SUPPRESS_PART_SCAN,
+-					     &ub->ub_disk->state)))
+-		return;
+-
+-	mutex_lock(&ub->ub_disk->open_mutex);
+-	bdev_disk_changed(ub->ub_disk, false);
+-	mutex_unlock(&ub->ub_disk->open_mutex);
+-}
+-
+ static inline struct ublksrv_io_desc *
+ ublk_get_iod(const struct ublk_queue *ubq, unsigned tag)
+ {
+@@ -1597,6 +1583,27 @@ static void ublk_put_disk(struct gendisk *disk)
+ 		put_device(disk_to_dev(disk));
+ }
+ 
++static void ublk_partition_scan_work(struct work_struct *work)
++{
++	struct ublk_device *ub =
++		container_of(work, struct ublk_device, partition_scan_work);
++	/* Hold disk reference to prevent UAF during concurrent teardown */
++	struct gendisk *disk = ublk_get_disk(ub);
++
++	if (!disk)
++		return;
++
++	if (WARN_ON_ONCE(!test_and_clear_bit(GD_SUPPRESS_PART_SCAN,
++					     &disk->state)))
++		goto out;
++
++	mutex_lock(&disk->open_mutex);
++	bdev_disk_changed(disk, false);
++	mutex_unlock(&disk->open_mutex);
++out:
++	ublk_put_disk(disk);
++}
++
+ /*
+  * Use this function to ensure that ->canceling is consistently set for
+  * the device and all queues. Do not set these flags directly.
+@@ -2041,7 +2048,7 @@ static void ublk_stop_dev(struct ublk_device *ub)
+ 	mutex_lock(&ub->mutex);
+ 	ublk_stop_dev_unlocked(ub);
+ 	mutex_unlock(&ub->mutex);
+-	flush_work(&ub->partition_scan_work);
++	cancel_work_sync(&ub->partition_scan_work);
+ 	ublk_cancel_dev(ub);
+ }
+ 
+-- 
+2.47.1
+
