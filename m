@@ -1,44 +1,57 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 076F212D21B
-	for <linux-block@vger.kernel.org>; Fri,  9 Jan 2026 15:09:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4CEF500951
+	for <linux-block@vger.kernel.org>; Fri,  9 Jan 2026 15:31:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767971386; cv=none; b=rnnmDI14s6DsQmj4qtCAXSREDMwhj43g/2b7cM8nQdZhlEPBTKi9aAil+rGLRuKOeaTJbouXsbSj8fL3sWV5gkDXl6O6iYVaGMZiRs9+ZnOZebJ/BqhjQDoP4oZ+yQCUGJuWgE9fZeYi7a0+sdeI+LMEym61wwhQLCB6F8MMEes=
+	t=1767972688; cv=none; b=rZkPLVj04YBf0Ev7fIH+uVok6FN+1HnZWw2reSmVVN8TDYYzfcb7BDFCzPu+4eHiYbGQ1ttweYFkLJTfQ5H6nkXoVLV2fI6aEW19JFdFIVuwyTKhkBjhDFD2/Tm0kXQC+dmJxMLHP+93DVn67TldlFgfF/JyZFMl2MgGY76m90k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767971386; c=relaxed/simple;
-	bh=fT4jWSTb2I6oIxE3Xfk8Y16Qci+9O0FAG/fPqWpq2bc=;
+	s=arc-20240116; t=1767972688; c=relaxed/simple;
+	bh=bvhJVIQWtwfjUfz/RmFvnSSQyRV043RTXmbYHx7VeHE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l950XcRUojlyijIHL1sFMcT7EK6pHGKu6FuUKDbHw+9wlWhfEf2Zi+v5fVTI9Q8nhpkddHb7QPSTLToLXZwCC+9atFVv1K888n/drTz77XgisHccRvimy7gPn80znHZJw76HjN7gRkg1QLUX957ngmZe1YhCXwdPXjC6Ao3K/pc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=J/rDsNTZ; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=riCgLcqMd/e0tbPtOukYWuLwxaVGhlIOuekfMfOaVBefo4uOfjvtKSmU04cjK478aYvwA2FNLevKHqTbWsSDaYnBAo3XICN49x6/AMjfAF8YkCw7gK3P1PLa3RxY2rnLauZXaUr5wY6gWbuF+zTKXtzUIccj633PYnKNDsC1bf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bgh7kNdm; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="J/rDsNTZ"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=fT4jWSTb2I6oIxE3Xfk8Y16Qci+9O0FAG/fPqWpq2bc=; b=J/rDsNTZj3I00ZE9PUiem++qFW
-	yosCdIddicVolu/QLtm6zEEwCUqzYYneXYZK7tz0tnHb6ZGbCGYQkRI4/24zR4hYzy1yNHEubGfyP
-	ks/bC6ANycvSRhpVMduTMa8BLawIxzpIcTRdJgDnZZ4iwKLWjAsGH3Vo+G5oCmodBKHLV6HiIC7Wn
-	8K+cA5i3lYrJscmtxWX9+DSQ3PzGHoXtjCys3C50fCU8nlaCrARkrbuhUHMj0oK6oHIFlRUTp5742
-	vOwhJxDkJLH38KBBN4jlwzTykd0axrSl1YQNXuMiZ69C344T8MOYOfpzmYA8Ig9NmR3eXm9+mRc2T
-	5W33wJKw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1veE7U-00000002SWL-0x8u;
-	Fri, 09 Jan 2026 15:09:44 +0000
-Date: Fri, 9 Jan 2026 07:09:44 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Ming Lei <ming.lei@redhat.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bgh7kNdm"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767972686;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ViBkhJq5sQu37jN/l696lTJGeFUJOwEfwM+VWEO3FD0=;
+	b=bgh7kNdmMwX/Lcq6pqqhHfpfjIYNPJrRkemEd/uPl+/9Vd0O9uV9Kx0IukyHlrfydE02u4
+	Ep2eZJfkcG2FUZjNmeOVEqTH+wmakb7VlK0mDVDciW4H3Rbf0wrsFBvcCElknlOGo5DPQ2
+	8zsZzISMYMjzHINa2PmWqKkp2a1wOOA=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-625-On0ZK2r3NLOvhbvuMZC0Dw-1; Fri,
+ 09 Jan 2026 10:31:25 -0500
+X-MC-Unique: On0ZK2r3NLOvhbvuMZC0Dw-1
+X-Mimecast-MFC-AGG-ID: On0ZK2r3NLOvhbvuMZC0Dw_1767972684
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 417F818002C7;
+	Fri,  9 Jan 2026 15:31:24 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.172])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 66F7B1800285;
+	Fri,  9 Jan 2026 15:31:19 +0000 (UTC)
+Date: Fri, 9 Jan 2026 23:31:15 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christoph Hellwig <hch@infradead.org>
 Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
 	Caleb Sander Mateos <csander@purestorage.com>,
 	Uday Shankar <ushankar@purestorage.com>,
 	Ruikai Peng <ruikai@pwno.io>
 Subject: Re: [PATCH] ublk: fix use-after-free in ublk_partition_scan_work
-Message-ID: <aWEaOFuhRPvtnkRO@infradead.org>
+Message-ID: <aWEfQ148Qu0axKfp@fedora>
 References: <20260109121454.278336-1-ming.lei@redhat.com>
+ <aWEaOFuhRPvtnkRO@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -47,8 +60,19 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260109121454.278336-1-ming.lei@redhat.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <aWEaOFuhRPvtnkRO@infradead.org>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Why does ublk have it's own partition scan code anyway?
+On Fri, Jan 09, 2026 at 07:09:44AM -0800, Christoph Hellwig wrote:
+> Why does ublk have it's own partition scan code anyway?
+
+It is for improving error handling and avoiding deadlock.
+
+ub->mutex is held when calling add_disk(), when IO error or timeout is
+triggered, error handling code path requires ub->mutex.
+
+So it takes nvme mpath's approach to scan partition from wq context.
+
+Thanks, 
+Ming
 
