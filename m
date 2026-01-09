@@ -1,80 +1,101 @@
-Received: from sg-1-34.ptr.blmpb.com (sg-1-34.ptr.blmpb.com [118.26.132.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA6F32E6CC4
-	for <linux-block@vger.kernel.org>; Fri,  9 Jan 2026 06:45:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B2682E88B0
+	for <linux-block@vger.kernel.org>; Fri,  9 Jan 2026 06:50:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767941150; cv=none; b=nJ+lFl6YcgAXjBTHmo7zkCalvOUZ2RF/5/RVekX+/ABm42eikm1TEgvV3m4ykqpqFCGAgPJAcX4VwkkIoweN9UdCDd5X/1jIXG5n6Yu4DRSczjrh9b6bXFZ8VwTnxJ/kmVTlF7q+lJ47NFJGj5PAo9VJkTYrUu29Zk+yeW9L184=
+	t=1767941414; cv=none; b=kxOJ1jeorysCXHVtwf7PRLuxIMx1eJ3nLdwiuIFel9zOBqFmuM8BGtss93ev/EEwt5u4xaEbA0coQnGmY/t1dKZzTZwq8mNgqSRUlaCx3UixFzISfaHINgGV/gzXDsqO4nDa2qASlvbc+nCZCKK08519B4NfrpX1hK+epPtuhnc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767941150; c=relaxed/simple;
-	bh=7yD81IKz2KSAMr2J5SfeADQ2pPoLJgprowgK1sfNxqw=;
-	h=References:Cc:To:Subject:Message-Id:Content-Type:From:Date:
-	 Mime-Version:In-Reply-To; b=akxxfy+WUvA0p7R5dWI/2dAadMXlcT0+OIMuOC1YXEO++iSgQeY4et54Wle6a6Mo97m4BHHMAVHhXm+Xtw03T7C6rSZRh8a/Vl2sBkGxI7LBJSIVBvCxgWADouaqQsnvKKW98rXzsZP/wdXdc7JmmhgT6uKKyGWx4U/N5Df3Dx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=none smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=aLSP4NjB; arc=none smtp.client-ip=118.26.132.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=fnnas.com
+	s=arc-20240116; t=1767941414; c=relaxed/simple;
+	bh=Wddd71YfgqBV61Mz3piu6HtOhpkWUJ3GcXZFH/9NaQU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kt7G/XEcu2+wZwZL3Jk9kgjXeOt508TKZqSMHGQiXbTkn4nEDYoyK3csVOQzU+NDHIpOY9ET4adDRtX44MQUUj8njcBLi+wNjZ7Xd3YtygFHTyDjA8wVl0yNGRl6CZA3l6joazazTzz8YR+kl2DNaOUtgWf8xVlvpnzPmfNNUT0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cdPZAyAN; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="aLSP4NjB"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1767941024;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=7yD81IKz2KSAMr2J5SfeADQ2pPoLJgprowgK1sfNxqw=;
- b=aLSP4NjBx4JzeOad4c+e+hep2ugo4u1Ye6dGeSZ1vK85XJQi1Ff1yAfGampmJ8XgrZjfXS
- kCPeXrfgtnDXZZoK3BFynemTkmCoKxg8dQ/W1wZOsTshU2xVDEOeODEZNh3SxfQG6v7Zl+
- IfnIuvDpx4M+XxRkBWJCzyl3lLQ03BAqfM2VWm/Skm87Le3Ch0nDKWZgbAFa7IKwqPqMUR
- 2IbgXw1aPj0F8/CvUkKgQpiYUK/jE2qmHlmdGql9xr6ugvirhfXGX7RDTZrQUtM3tj5OF5
- 0jOHsb+J4Pgf7CqsL0H2X98DQsQXmSu7bMbQPNNRWc0VhHU3Ig1pQ24njHoxww==
-References: <20260108014416.3656493-1-zhengqixing@huaweicloud.com> <20260108014416.3656493-3-zhengqixing@huaweicloud.com> <72dc0ed6-1ba9-46b8-a43f-d11c32e2f341@fnnas.com> <5fdbd368-6d00-4453-8f03-23d17c8c1338@huaweicloud.com>
-User-Agent: Mozilla Thunderbird
-Content-Transfer-Encoding: quoted-printable
-Cc: <hch@infradead.org>, <cgroups@vger.kernel.org>, 
-	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>, 
-	<yi.zhang@huawei.com>, <yangerkun@huawei.com>, <houtao1@huawei.com>, 
-	<tj@kernel.org>, <josef@toxicpanda.com>, <axboe@kernel.dk>, 
-	<zhengqixing@huawei.com>, <yukuai@fnnas.com>
-Received: from [192.168.1.104] ([39.182.0.185]) by smtp.feishu.cn with ESMTPS; Fri, 09 Jan 2026 14:43:41 +0800
-Content-Language: en-US
-To: "Zheng Qixing" <zhengqixing@huaweicloud.com>
-Subject: Re: [PATCH 2/3] blk-cgroup: fix uaf in blkcg_activate_policy() racing with blkg_free_workfn()
-Message-Id: <22046287-0a36-45ac-bc17-b41636076552@fnnas.com>
-X-Lms-Return-Path: <lba+26960a39e+0193d7+vger.kernel.org+yukuai@fnnas.com>
-Content-Type: text/plain; charset=UTF-8
-X-Original-From: Yu Kuai <yukuai@fnnas.com>
-Reply-To: yukuai@fnnas.com
-From: "Yu Kuai" <yukuai@fnnas.com>
-Date: Fri, 9 Jan 2026 14:43:39 +0800
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cdPZAyAN"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1767941411;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GeB3Xq3xOpZZ0Hi1G5g7hUDKY44hDnBC9KWf8hZkWmk=;
+	b=cdPZAyAN1KbU0obn8lGJl/0d6iribUOqzOG0FP31H3yKdUvc00NMhdNzeUeCMMyaUULiZV
+	gXH2XJRkpT+SRqJSoHjEGRSnjbxEO114f3SV829i5XeO91kFAwEmdF6cFE64ei1DZ/fD2t
+	6ZdjEubFClfEmP/CW3tT5CXael1QgI8=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-342-rQU7WIl1NNCxGMqTTvr7mA-1; Fri,
+ 09 Jan 2026 01:50:08 -0500
+X-MC-Unique: rQU7WIl1NNCxGMqTTvr7mA-1
+X-Mimecast-MFC-AGG-ID: rQU7WIl1NNCxGMqTTvr7mA_1767941406
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BC7CF195608F;
+	Fri,  9 Jan 2026 06:50:05 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.172])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9CE2930002D1;
+	Fri,  9 Jan 2026 06:49:57 +0000 (UTC)
+Date: Fri, 9 Jan 2026 14:49:52 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Venkat Rao Bagalkote <venkat88@linux.ibm.com>,
+	linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>, James.Bottomley@hansenpartnership.com,
+	leonro@nvidia.com, kch@nvidia.com,
+	LKML <linux-kernel@vger.kernel.org>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>, riteshh@linux.ibm.com,
+	ojaswin@linux.ibm.com
+Subject: Re: [next-20260108]kernel BUG at drivers/scsi/scsi_lib.c:1173!
+Message-ID: <aWClEA6KuLP6E1cP@fedora>
+References: <9687cf2b-1f32-44e1-b58d-2492dc6e7185@linux.ibm.com>
+ <aWCYl3I7GtsGXIG3@infradead.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-In-Reply-To: <5fdbd368-6d00-4453-8f03-23d17c8c1338@huaweicloud.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aWCYl3I7GtsGXIG3@infradead.org>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Hi,
+On Thu, Jan 08, 2026 at 09:56:39PM -0800, Christoph Hellwig wrote:
+> I've seen the same when running xfstests on xfs, and bisected it to:
+> 
+> commit ee623c892aa59003fca173de0041abc2ccc2c72d
+> Author: Ming Lei <ming.lei@redhat.com>
+> Date:   Wed Dec 31 11:00:55 2025 +0800
+> 
+>     block: use bvec iterator helper for bio_may_need_split()
+> 
 
-=E5=9C=A8 2026/1/9 14:22, Zheng Qixing =E5=86=99=E9=81=93:
-> I tried adding blkcg_mutex protection in blkcg_activate_policy() and=20
-> blkg_destroy_all() as suggested.
->
-> Unfortunately, the UAF still occurs even with proper mutex protection.
->
-> The mutex successfully protects the list structure during traversal=20
-> won't be added/removed from
->
-> q->blkg_list while we hold the lock. However, this doesn't prevent the=20
-> same blkg from being released
->
-> twice.
+Hi Christoph and Venkat Rao Bagalkote,
 
-I don't understand, what I suggested should actually include your changes i=
-n this patch. Can you
-show your changes and make sure blkcg_policy_teardown_pds() inside blkcg_ac=
-tivate_policy() is
-also protected.
+Unfortunately I can't duplicate the issue in my environment, can you test
+the following patch?
 
---=20
-Thansk,
-Kuai
+diff --git a/block/blk.h b/block/blk.h
+index 98f4dfd4ec75..980eef1f5690 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -380,7 +380,7 @@ static inline bool bio_may_need_split(struct bio *bio,
+                return true;
+ 
+        bv = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
+-       if (bio->bi_iter.bi_size > bv->bv_len)
++       if (bio->bi_iter.bi_size > bv->bv_len - bio->bi_iter.bi_bvec_done)
+                return true;
+        return bv->bv_len + bv->bv_offset > lim->max_fast_segment_size;
+ }
+
+
+Thanks,
+Ming
+
