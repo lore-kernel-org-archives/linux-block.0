@@ -1,78 +1,63 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF55D13D8B1;
-	Sat, 10 Jan 2026 00:50:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 771D3221FCD
+	for <linux-block@vger.kernel.org>; Sat, 10 Jan 2026 02:18:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768006211; cv=none; b=lVkipxwC4A+774kI6PskYqXrOBTIYc67iqW6g70fW0d6GisIpizALFh3Xe3AQiEzBpLlnZCI31YtXEh0k7DzS1WB5V7cmVpmA5IARtqRM2F/bdiRjkQUVhGYlcdLpPrJdqJOqC1MtCa09Qapk+uwYHe5Wf1A4TLbfZYOrpofIS4=
+	t=1768011519; cv=none; b=VkLF7ErhjRc0VdvxOZZ/nBCIewJB0rvw2yC3GmupYNqtEk45EAydQ0H+H6Qmmw4SyGeCBnhfwdSpzbyrLJHW3MI3yFJb2q+lIx5uXnUdAMcqfROmC7hE3qj9sib8xwmnf2KH2Ryd98ntzt2e70bIC9WLd6PiyY06PA+CTgN7GaA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768006211; c=relaxed/simple;
-	bh=hLSd+dpHYdWrhoz5btWTKrnm8lBv2niFb9un0TBXSvY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JdfQdkPobIkkHHxGqe25Y3cNyMIzUZTUf/FFL4Q81Uf+AHlPkejO4bXBMGE9bgQ7fdbEtciimECzM4K5cVoMZ7z1xI71ckvVOrVvIJrts6aDpXmuKANLNhec3efxg44I/egvzjLuqlaoLEQh42srg5sB+fXaOPmyOg2bwz55LqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XCSgDR+y; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768011519; c=relaxed/simple;
+	bh=t+RyrOIUOP51gmIIUrXO2JWUoUNyBDr8t5EpMiZLe/Y=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=jtLjtbympJtbPpPLmkFZz9nqxtElAwqOERBEKFIdI8wS+UNroOc+U+APrDQ9QGG2xTLNUhITQmqLx7FqywalCZmQrvy+/6dyvD+7Exa2XR+z3ax3Gzxr4REtTLhlB5wbQc6kjlRjt9HtiDanEbjwd49fsdDfpRGIZ8oiPzh8KXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BLyXWyol; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XCSgDR+y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77A67C4CEF1;
-	Sat, 10 Jan 2026 00:50:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BLyXWyol"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D427C4CEF1;
+	Sat, 10 Jan 2026 02:18:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768006210;
-	bh=hLSd+dpHYdWrhoz5btWTKrnm8lBv2niFb9un0TBXSvY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XCSgDR+yU69AnFGByLtnjMMYAeoSoAWY2kFbj2eYg2xl6ZcSDbOTlowH4UfSB0DLe
-	 cxAoUZ3OsIOL6jA3LxFkqXCmED3pQ29WoTvLQYaCeQrs5PFLnVtuEh6fA/LcYe1aaO
-	 CdM7FM9aH4NkG4y3yhHXUVrV6srx5YsV5eOmENmKKDjropjIvbv8pqc3KrkfaUPJDL
-	 mNW5HawTnhY3b8oPg14pmizSPjLKyMqTRncPNO5WhFoT/3VJmxw3FoY51jXxfliweX
-	 lnxDcMdycQPDFyKtYIYUE6ExO/E6lQEYkCz4eE7f9T2AIEsLoVgZo9LRTJEI67XtXi
-	 9RAKRTs3Np1mQ==
-Date: Fri, 9 Jan 2026 16:50:09 -0800
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Carlos Maiolino <cem@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Hans Holmberg <hans.holmberg@wdc.com>, linux-block@vger.kernel.org,
-	linux-xfs@vger.kernel.org
-Subject: Re: [PATCH 1/3] block: add a bio_reuse helper
-Message-ID: <20260110005009.GU15551@frogsfrogsfrogs>
-References: <20260106075914.1614368-1-hch@lst.de>
- <20260106075914.1614368-2-hch@lst.de>
- <20260109161906.GN15551@frogsfrogsfrogs>
- <20260109162506.GA16090@lst.de>
+	s=k20201202; t=1768011519;
+	bh=t+RyrOIUOP51gmIIUrXO2JWUoUNyBDr8t5EpMiZLe/Y=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=BLyXWyol6gmC4Snszt60t099ukIMNEp6B9qpIVJfAbWQujl0089lYudl9ZSNxq1Bs
+	 21o5KxY8v42EsTKjoZ6JDI698HbNwCWqvPidECMr+XIgbnrxjrrvvx9w7fjxXHpEoK
+	 XCIaspZCCIk58Alh9hW7GPjX21fTKCTdEQMLT4J0EECUtA3A9ShP1u29+kal6pMB4r
+	 t5UNIUzXBU0ECuk3Y+osJ/SV69yTeapOjS7/8HyNXNzsE5JZDfm6iaoChTRvnCcrLA
+	 PCmM8UPlXoFOzdEeLRgRCRRM0mzCnYe49dB9uM/nNZ0HQB1od3Ni2oU8FT21By3dyN
+	 1lbOGtOe8tBrA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3B6F23AA9F46;
+	Sat, 10 Jan 2026 02:15:16 +0000 (UTC)
+Subject: Re: [GIT PULL] Block fixes for 6.19-rc5
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <a4c67857-e36a-46f2-9912-bf2128392c52@kernel.dk>
+References: <a4c67857-e36a-46f2-9912-bf2128392c52@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <a4c67857-e36a-46f2-9912-bf2128392c52@kernel.dk>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-6.19-20260109
+X-PR-Tracked-Commit-Id: f0d385f6689f37a2828c686fb279121df006b4cb
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: cb2076b0910f3b19036ec7d50530113fcb9736c8
+Message-Id: <176801131472.452892.1546815836227473762.pr-tracker-bot@kernel.org>
+Date: Sat, 10 Jan 2026 02:15:14 +0000
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260109162506.GA16090@lst.de>
 
-On Fri, Jan 09, 2026 at 05:25:06PM +0100, Christoph Hellwig wrote:
-> On Fri, Jan 09, 2026 at 08:19:06AM -0800, Darrick J. Wong wrote:
-> > General question about bio_reset -- it calls bio_uninit, which strips
-> > off the integrity and crypt metadata.  I /think/ that will all get
-> > re-added if necessary during the subsequent bio submission, right?
-> 
-> Yes.
-> 
-> > For your zonegc case, I wonder if it's actually a good idea to keep that
-> > metadata attached as long as the bdev doesn't change across reuse?
-> 
-> We need to generate different metadata for a different block location.
-> Reusing the allocation might be useful, but it would really complicate
-> this API, especially as the currently most common way to use integrity
-> metadata is through the block layer auto PI, which allocates it below
-> submit_bio and frees it before calling back into the submitter on I/O
-> completion.
-> 
-> But it might be worth writing up another sentence on this in the comment.
+The pull request you sent on Fri, 9 Jan 2026 11:47:15 -0700:
 
-Yes, please. :)
+> https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-6.19-20260109
 
-With that brief mention that PI/crypt data get regenerated, I think I
-understand what this (fairly brief refactoring) does, so
-Reviewed-by: "Darrick J. Wong" <djwong@kernel.org>
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/cb2076b0910f3b19036ec7d50530113fcb9736c8
 
---D
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
