@@ -1,126 +1,144 @@
-Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
+Received: from mail-dl1-f47.google.com (mail-dl1-f47.google.com [74.125.82.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30363277C86
-	for <linux-block@vger.kernel.org>; Sat, 10 Jan 2026 17:28:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.48
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768066087; cv=none; b=RP2lEpvFv5glwntJ5ugZQcgxJhx/KPE0NK5usz2doB3swgub0jOPeGwlhYtN2zomicOCNWJLywHh1k48AY8p0XVuhnAVGZsOnrvfXjkEqWqLYUfr7TVcWGcaCAd+gsl2M8T5/VUOH/GTYsOk+RL5PgimuE802NVPzIUu9OtI0h4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768066087; c=relaxed/simple;
-	bh=Bm21lO7kzxFVEUxOrX69gehbqX1DwoPdd62omyuA5aE=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=bhz43CPEkFMo8rByl1rZWX90zT+B/MlpT/HrZ2LHItUX/23DfP31MLmtRJlw+Zkriae1CP77ltYs4QSefROQr/dpRS024UkEP0Qccv3qc/OSkzuaCt9qNGYHb0FT/xcolPsVtBd6f2IRltdti4wfPaMHvR2cnnne94w5H1b6tNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=GAiFdiVy; arc=none smtp.client-ip=209.85.210.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D4128852E
+	for <linux-block@vger.kernel.org>; Sat, 10 Jan 2026 20:05:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768075526; cv=pass; b=PUfUN9VuBi4FsLm+7KQ/BiSGe05u0/L/c+a7o554bkRavi45C9CUW03lOqxtYsfrNVoeYCB7XuTLdk5UEFmD+7RDLg2nzUV/IdJOpQQjEJnYJrbDVwuQnXe4owFYvkxBiIPrb1JoqHEzjpQ0dIwmTj8H7JTSyoYEYU8RB1H9bkg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768075526; c=relaxed/simple;
+	bh=xNLFUGTyVvCzdM0Lg23E1hHoOhAz2/4srJMuQIdQsRQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=keHT3k0RVNfX2IsRSR5jyfZ/ZZU+JJaYlb/VcJSCC3cew4USSY4pE+kMrgH6yRc1vC06w629/b9LGmDddFKM/pDx0ZDmjSMAEEaBuD4sEp1HTJrsl5n5OZ20+86g0ThoJxr5reXrVecIpfk0hiq6YBSN+OyZKXFvrT+jkQbBucA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=X1/q3x6h; arc=pass smtp.client-ip=74.125.82.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="GAiFdiVy"
-Received: by mail-ot1-f48.google.com with SMTP id 46e09a7af769-7ce614de827so1632941a34.1
-        for <linux-block@vger.kernel.org>; Sat, 10 Jan 2026 09:28:05 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="X1/q3x6h"
+Received: by mail-dl1-f47.google.com with SMTP id a92af1059eb24-11f450147cfso409289c88.1
+        for <linux-block@vger.kernel.org>; Sat, 10 Jan 2026 12:05:24 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1768075524; cv=none;
+        d=google.com; s=arc-20240605;
+        b=CF3+y38btjJHjd8FGgVCmUq9VxQObmCwrwo5o+MeId/+/OC6S/vc3amQ6dJv/4JGD/
+         4ajCA57PdVV+gQE+MkhbH3zOTbMPsQlyJHK8/Y9eDQCNudBlk3ksMU6d5ACtRePEoz72
+         z9sVJaZ8ih2XZQIhdwg3xZ4DiLzDy4deffv8fKtXwGokaGJ9PhTaGnmXbNxO71ycSi+V
+         ST9yyzknqyOjnqbWqpaVMeq8KHU3NdwkItWy+z9qrr5z6SktxUsW+MKWiMZHRpJaeZHp
+         ZtWrMirS62lL9b9MIyt8aYc6lReBOXeSWYkkQlJvH6OWcFJzlVKVi8+/JfSLKLFcYWOY
+         VDyw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=LgOtTn8tJ3rZiKBvX6QVD1MIHtcv/J5gUjDbVV8Z8pI=;
+        fh=JPbg8m0EnrK5C8BkeFAgOqRafMKUl/xgpreWnMmuPnA=;
+        b=RZaombQvew3xqbo9E7kz2PAOHiuGlm2gvgsJk4WnhYtQsi2PKqILaIyahcWGgesxOW
+         zndDvGKCNCzrjAIqgNaGPZILyPXkE/DiOBQKwsQab3KRIt+pDV+PKSuTit3/9yuExIgf
+         3KcQafE4VaJtRD//swM0/918gK0z+QwOroVcHEB8811u9A9KcbYFU+AHQgzoqzEs2/ej
+         ESdo3j2S8pjDgWwf2NmW+HJfuRQQulwJ6sR7eI0wWK6i6uSXiHDkqL3EuMyTcJfbYEsE
+         xrO8vbI9GOiszMyjAlsOmvCKJFP95x3HELxVWoy6h2gkpArDvxFzEixmrVrtNyoquaiA
+         S5ow==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1768066084; x=1768670884; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=TXruW4vZ8ixZMvSdqPOKj/W54NefVRcJvx7qIpkFANo=;
-        b=GAiFdiVyEDIso+JLWVtYNZjhTOjLxOrVOhRc927cG6v9x8kqA7L8ecLCmOyIxRViKg
-         +CSGKWh0JFG5m/o01+27xcWYfi30NptbM8h6NTphWM8QkfE93GeWw88RWedXDReIvvvV
-         /H4KYwWnySclUEzrGn7Ls7VigzrlZAgsirBdvvsPtJlxz1MQ0do9lFoMy1dXpG7Ga1Bb
-         bgwvS18gSc2tx86aT7Ciqq+PRydKHlBOklOaavn+01Ohz2vU0ONLTksKjapx8+/G6/zS
-         N81uI0BlwynGizerk3k5PoA8M0nVlRsczHzQLY7gnb9XKcDk/7AkPLV8QQsFWnjzVv10
-         Ekpg==
+        d=purestorage.com; s=google2022; t=1768075524; x=1768680324; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LgOtTn8tJ3rZiKBvX6QVD1MIHtcv/J5gUjDbVV8Z8pI=;
+        b=X1/q3x6hy9hzMDAxcVC9jgTkSJXKNcy3qsxWv+XhBOhRcF23BSv71rBghI8P18ghH+
+         rGNbah9WthW4W0zdBhB2+zBpdGHd6tqctf7OXxW8BwNG4Cy8mUnlN7rx+mJcDjkUKdQy
+         CQM+yT5hi+YMlOVSkOFY3ktSBpGBPpd3CdAdPNOxNKR5mr2Jm0iERIl47u3T9I23Yjd9
+         OhXGePSiVpNXXHd4QPdr3WyzEEVsgszqYLNmgc0IE2u4ES25euu87ChWB2DD48tw4UyI
+         bShf4pLM0mQm9uYooPEY2Re/OzcoOY/2Hzv1hApQxvx1kPVyJXlb5bYkYu6h6BEXUdH4
+         dfzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768066084; x=1768670884;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TXruW4vZ8ixZMvSdqPOKj/W54NefVRcJvx7qIpkFANo=;
-        b=jv4z01sP5j//L8TCt6WVnV5UDiBodav7evY9ONBoEC0pF8vZXqbCGuzKyUD1bmgaOc
-         IOLnBmpKJY4P/V+HfMGfeSIJcR9CaLh2OjwG2YNq5/44qQUknoezdW6srJakyToEAm9G
-         PKF5FdlGJkqjjqzIvV/hCnyut2HEba4k0bkdCCyjh/l0CG+/s391kH4CDn64+zbAYlQf
-         JIdv/wb3veiMCPWZqhX4zVtQg1RcBR4v6IVkMgh8EG18OKSzhKFIeYIcyCATz6XGjhng
-         2z0hTxYV3MHRfP5Z9oRp8dECwRI87KbcdbA8jmPuUoU5X0Rq2DMvi01DGUbn116ipazZ
-         905Q==
-X-Gm-Message-State: AOJu0YwZeHgcsA06GcTPOtruonCXCDfePjXG0UsfZkmXCeYqtOXY/z7t
-	aHmeEEP5e70BlIJVTJNuyAGayKbMFlnm7PVbeEur6pPG0tcvvDOh3Xw1yOS1fzY+XSQ=
-X-Gm-Gg: AY/fxX4fap2i+Jns79a+ZFP/j045tVqZIjG0gNE42x7hi3fSYhwaeQytO0F95LV+AKD
-	rZLQSap1P2m8nWOmLfOtiCyPvQUdOKWB5Jty9c/Mj7MyMatvZ4+IApPMRzkD/j9NlCNuU3xVOF7
-	sGXT2rxKWS/mHfV86a41FwLs6+/Sr75qNUr6GQFDdRMXzCWIH3BJpdn1YsxDatMEs9s7PQYVrU8
-	v6TJzgxCss2dtjvZSwHXO+g4f7BHygIrRdmqKqvIIde+6C93HKqY0P5/ZTC7E5tfAwCxqH4zgrP
-	4DrieILhCx7L1OK1y1czUSuSIIET/65GUoWGE/dqDb1vl9eBY1hFhotaiBjeAe8MwoqQn/UY1aS
-	a0ZPAVmvV1ihH/n3+qZ6h9xoBjQT/8iJfxp0z9cx/H9sFirURBaobvA0SfMn1xIU7fU6Hxq4Khk
-	mZXEUSiv9q
-X-Google-Smtp-Source: AGHT+IE3j4WuOvoW2sMO5AGZsgxxfm6j57157cp0sDKxph5B/9oRM7JR3Y0F3EFt1bIIVczxw4F4Ew==
-X-Received: by 2002:a05:6830:3141:b0:7c6:ca62:e258 with SMTP id 46e09a7af769-7ce50a01f56mr7412873a34.21.1768066084124;
-        Sat, 10 Jan 2026 09:28:04 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7ce47801d63sm9443098a34.6.2026.01.10.09.28.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 10 Jan 2026 09:28:03 -0800 (PST)
-Message-ID: <cdbd634d-4f15-48c8-9c2f-812130605465@kernel.dk>
-Date: Sat, 10 Jan 2026 10:28:02 -0700
+        d=1e100.net; s=20230601; t=1768075524; x=1768680324;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=LgOtTn8tJ3rZiKBvX6QVD1MIHtcv/J5gUjDbVV8Z8pI=;
+        b=kywVrEzX5wpUliS3/sdRlxQQtX4W+ixny+p4J7mBpyn2xnKAdfwzap4B/g9xi2/t8w
+         UDjBG1pLisIE1TW3wswNkWOZOho6fiI3BFfskwVaaYP+Fgtf6BelUR92UOMEwMeepzTR
+         SvU/wLu5IB9erL3UpLPHMuoZb06aBbjfgFJE5pdIFWiR30uL4Qa5gZXyuoRZd2aIyoo0
+         bi2E8obRZQEQIsIK2oV+RpdbEIcx/NtSN1rsNpVCozISmhpFKXUG3lm6tvhuyt8NAJLw
+         63we6RN0w1mdEKZsEf2a1m5Nc70AWXZBK7PyCWX4W+3t6EjZ7cshaXa/6dnx5c3WhBcW
+         NE6Q==
+X-Gm-Message-State: AOJu0YziudxlOvBFEQq4U2AggHb64ZVmaN6/RRDzbBqQAV8eNJyEZESf
+	tbFFk/xugrAhaDbATdcLXr/nyFpqYOvTdak9TIQ5HoO3xQyowY/cRICQHJoMEKrSnHWGuixF6of
+	ECDIpxQ+6M8BZ4HKyWa/wpwlrMpozeAjDz+ufSAz3iw==
+X-Gm-Gg: AY/fxX6Tl8jLhMu73+SyPTIR95ztiZPg7bNLt53HHuOTOJtKpci49wwjWmurb4HIv2k
+	TlWkE7CHpemQfb7hR39fzt3qGwfm0g2uHDapEGxmlQzjWWaRJU5OJ+OxGKmxBpaDhcVUdApZFUk
+	bHJkb1rWREJeqDAgps8+SPHdSI7PksMfW+OP1RLqQmfWwd1bnKY6jxlnLtMSkZTj3J18ObdTH5a
+	606HaPABAc2qQ7B2i4D7JItE41HdcpRzumw1AvFG8uzRga91O9ceB61RHwHI820wOFyk0T/
+X-Google-Smtp-Source: AGHT+IH809LkpcrXd59rFV/WoVkKW55EoZ1xZdmo39Ao0aQ147EUvuSJKHBsYMOYGzZrMhhpL2xWuHgy5IQD0M+isVk=
+X-Received: by 2002:a05:7022:622:b0:11a:5cb2:24a0 with SMTP id
+ a92af1059eb24-121f8ab7afdmr7923042c88.1.1768075523694; Sat, 10 Jan 2026
+ 12:05:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/3] block: zero non-PI portion of auto integrity
- buffer
-From: Jens Axboe <axboe@kernel.dk>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- Anuj Gupta <anuj20.g@samsung.com>, Christoph Hellwig <hch@lst.de>
 References: <20260108172212.1402119-1-csander@purestorage.com>
- <176796707483.352942.3630670392140403614.b4-ty@kernel.dk>
- <CADUfDZoacSnJz5FOZQov50k4_nP0sxqxDHYOvDqp1_7KKD8z1A@mail.gmail.com>
+ <176796707483.352942.3630670392140403614.b4-ty@kernel.dk> <CADUfDZoacSnJz5FOZQov50k4_nP0sxqxDHYOvDqp1_7KKD8z1A@mail.gmail.com>
  <cf37342e-c2dc-48c9-a63b-e62fe8e791e4@kernel.dk>
-Content-Language: en-US
 In-Reply-To: <cf37342e-c2dc-48c9-a63b-e62fe8e791e4@kernel.dk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Sat, 10 Jan 2026 12:05:12 -0800
+X-Gm-Features: AZwV_QhhcGwSr6PGLZhrCHk9FCk9XsGW2-9uTLK0DbuTKuqxYz315UE5EtjC3kc
+Message-ID: <CADUfDZqbqWjGhY3FuSOgBk5pgTR7By6LgXPBH+A=7g9wLp5qmg@mail.gmail.com>
+Subject: Re: [PATCH v2 0/3] block: zero non-PI portion of auto integrity buffer
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Anuj Gupta <anuj20.g@samsung.com>, Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 1/10/26 10:21 AM, Jens Axboe wrote:
+On Sat, Jan 10, 2026 at 9:21=E2=80=AFAM Jens Axboe <axboe@kernel.dk> wrote:
+>
 > On 1/9/26 9:29 AM, Caleb Sander Mateos wrote:
->> On Fri, Jan 9, 2026 at 5:57?AM Jens Axboe <axboe@kernel.dk> wrote:
->>>
->>>
->>> On Thu, 08 Jan 2026 10:22:09 -0700, Caleb Sander Mateos wrote:
->>>> For block devices capable of storing "opaque" metadata in addition to
->>>> protection information, ensure the opaque bytes are initialized by the
->>>> block layer's auto integrity generation. Otherwise, the contents of
->>>> kernel memory can be leaked via the storage device.
->>>> Two follow-on patches simplify the bio_integrity_prep() code a bit.
->>>>
->>>> v2:
->>>> - Clarify commit message (Christoph)
->>>> - Split gfp_t cleanup into separate patch (Christoph)
->>>> - Add patch simplifying bi_offload_capable()
->>>> - Add Reviewed-by tag
->>>>
->>>> [...]
->>>
->>> Applied, thanks!
->>>
->>> [1/3] block: zero non-PI portion of auto integrity buffer
->>>       commit: eaa33937d509197cd53bfbcd14247d46492297a3
->>
->> Hi Jens,
->> I see the patches were applied to for-7.0/block. But I would argue the
->> first patch makes sense for 6.19, as being able to leak the contents
->> of kernel heap memory is pretty concerning. Block devices that support
->> metadata_size > pi_tuple_size aren't super widespread, but they do
->> exist (looking at a Samsung NVMe device that supports 64-byte metadata
->> right now).
-> 
+> > On Fri, Jan 9, 2026 at 5:57=E2=80=AFAM Jens Axboe <axboe@kernel.dk> wro=
+te:
+> >>
+> >>
+> >> On Thu, 08 Jan 2026 10:22:09 -0700, Caleb Sander Mateos wrote:
+> >>> For block devices capable of storing "opaque" metadata in addition to
+> >>> protection information, ensure the opaque bytes are initialized by th=
+e
+> >>> block layer's auto integrity generation. Otherwise, the contents of
+> >>> kernel memory can be leaked via the storage device.
+> >>> Two follow-on patches simplify the bio_integrity_prep() code a bit.
+> >>>
+> >>> v2:
+> >>> - Clarify commit message (Christoph)
+> >>> - Split gfp_t cleanup into separate patch (Christoph)
+> >>> - Add patch simplifying bi_offload_capable()
+> >>> - Add Reviewed-by tag
+> >>>
+> >>> [...]
+> >>
+> >> Applied, thanks!
+> >>
+> >> [1/3] block: zero non-PI portion of auto integrity buffer
+> >>       commit: eaa33937d509197cd53bfbcd14247d46492297a3
+> >
+> > Hi Jens,
+> > I see the patches were applied to for-7.0/block. But I would argue the
+> > first patch makes sense for 6.19, as being able to leak the contents
+> > of kernel heap memory is pretty concerning. Block devices that support
+> > metadata_size > pi_tuple_size aren't super widespread, but they do
+> > exist (looking at a Samsung NVMe device that supports 64-byte metadata
+> > right now).
+>
 > Good point, let me see if I can reshuffle it a bit. In the future, would
 > be nice with these split, particularly if they don't have any real
 > dependencies. I'll shift 1/3 to block-6.19.
 
-Done - 1/3 is now in block-6.19. I dropped 2/3 as it's mostly useless
-and will now through a conflict in for-7.0/block. 3/3 still in there.
+Thanks, I'll try to label my patch series more clearly in the future.
+Christoph had suggested splitting apart the fix patch 1 from the
+cleanup patch 2, but I see how that makes it a pain to apply the
+series. I'll resend patch 2 once for-7.0/block picks up patch 1 from
+block-6.19.
 
--- 
-Jens Axboe
+--Caleb
