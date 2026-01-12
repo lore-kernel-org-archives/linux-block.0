@@ -1,87 +1,87 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77F2D21FF49
-	for <linux-block@vger.kernel.org>; Mon, 12 Jan 2026 01:43:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92F01182B7
+	for <linux-block@vger.kernel.org>; Mon, 12 Jan 2026 02:45:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768182215; cv=none; b=VhsMbd1uLQ3WF0EdLbVeRfvPFlyndBMGaInQV/ux0vL5J/Nn37M+UKM5B5Br4oHu8PTYiA1fR7ZfQFIXnKnAg3V8fvU4RGRNuJcLBYcZAydMUgQ0RSOk2IVNUlKJ19Hl/x/OYBVvFr11gwn30wigqdvT+U5PmHGTHdQhDu4Ii9Y=
+	t=1768185958; cv=none; b=A0zRRJGn86An7ZXRh7g2pBc3nwhhsP7ByEe0nWQWH2L2iibf3SqqO66EHYN3A0DQh44CAMa9CJPBVwzm5+uhaXNV334KdNSjsaK+Sk1rPYgMiJug5rz+3+N63q5UOsuZaLaDwN3jN6S2bhp9C9Bhh2Lo2UgHCffFLpXnDcpFkDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768182215; c=relaxed/simple;
-	bh=hS5M2IBt+XDf18Gy4ts4vK0v+84GrMVmqYQzF/J1aLY=;
+	s=arc-20240116; t=1768185958; c=relaxed/simple;
+	bh=t3fqYup1Q4i1hX+rY6sipxB1IioFo7OZLWHTUppIxwE=;
 	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=oxEz/D+xKsy6o9FIgnmOJKAogvT0dDywclCAb7gah48CiQl/JXjojxJ3nVFimu3exGwGl/s5rjEDo9zoFekZTknQXm2u572Tgi0kSumbg/n1CRfM/lriypr5X37BBvom6JSGWGWbCb/WCtZsmMn2zYdeQ7IXxU07FULhldtwtKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h20AJA39; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=fM9c3APa; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=E1+neaHMQ1X6SG4EZ1kdhuNdm8bq9Oq0cAmFqj7aZyES+tY0pn/zWl/4ppwx60B9cr64NsshyesO+GzTP85HTlqwid1CLr4H1+M5znb0n7cl/K6RmhyVzLTWlRovJ40T/eQAZ60hnkOcO6KykPNT3rtqOQK8bI8zYg/Mzgm96v0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RIHtvEL6; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=OQaguD4O; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h20AJA39";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="fM9c3APa"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RIHtvEL6";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="OQaguD4O"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768182213;
+	s=mimecast20190719; t=1768185954;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5g0eqFZw+saooIdmg9NsoPWVUWAMnQL8vdrqEmKZ9zg=;
-	b=h20AJA39iueWpUfsWHIyMbWOwGr8njJH8B4VH6UaX9OhjXt+tovB3b7LQHHY5qVQKl6Eei
-	xDpOBfFhSoOh9al/I60XBM719p4XDmEPiDT0H+lkx2j3j7ldZmy1lijmYRRAgUHxUZSg36
-	uwZz3emhbIMqwGSSDShzUQS6iDs908A=
-Received: from mail-vk1-f198.google.com (mail-vk1-f198.google.com
- [209.85.221.198]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=xcS5shRmDCmvz+IoTKqWTzUo+o6AAuc9PAErT+qJLAs=;
+	b=RIHtvEL6WNI17SXaRSRMorIVqYMrxh0ySwzskBkEaln1u8krV+tG1S/A7Lr5TCnZ/xmPyZ
+	KtKNrpQmrQ45jIQpgu6HJ7A1kYnPaFHjPmwVj/b5VXojhbjSh2ImKwg3YSG+yXekkmAAns
+	oUF53XL9SgyNuCR2Z2VN4mMm5KjFmL8=
+Received: from mail-vk1-f200.google.com (mail-vk1-f200.google.com
+ [209.85.221.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-196-sBtgy-D5PEmiAFGD19cyMQ-1; Sun, 11 Jan 2026 20:43:31 -0500
-X-MC-Unique: sBtgy-D5PEmiAFGD19cyMQ-1
-X-Mimecast-MFC-AGG-ID: sBtgy-D5PEmiAFGD19cyMQ_1768182211
-Received: by mail-vk1-f198.google.com with SMTP id 71dfb90a1353d-563662e2266so6993436e0c.0
-        for <linux-block@vger.kernel.org>; Sun, 11 Jan 2026 17:43:31 -0800 (PST)
+ us-mta-393-_Fga1RB5PnKY_NR5_j_5sg-1; Sun, 11 Jan 2026 21:45:53 -0500
+X-MC-Unique: _Fga1RB5PnKY_NR5_j_5sg-1
+X-Mimecast-MFC-AGG-ID: _Fga1RB5PnKY_NR5_j_5sg_1768185953
+Received: by mail-vk1-f200.google.com with SMTP id 71dfb90a1353d-5634f73edc2so3721965e0c.2
+        for <linux-block@vger.kernel.org>; Sun, 11 Jan 2026 18:45:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768182211; x=1768787011; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1768185953; x=1768790753; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:content-language:references
          :cc:to:subject:user-agent:mime-version:date:message-id:from:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=5g0eqFZw+saooIdmg9NsoPWVUWAMnQL8vdrqEmKZ9zg=;
-        b=fM9c3APaS9aJm3sKodkftW12rE+dqCrcvZJlQSwfYYp7KL3/Y/xN4jk/jSEVwDnpaz
-         7bBln+Xh0dI9j3tuBh9QKGmDbyt0E7wP9SE2I9OJUvkdbdErxkUlN16ucy4/k9W7bPGN
-         AZFMFIN6EPk7/I19Ka2sf+rhZC5iD8DvAjrppEKF6Oks8qFP3kypCAFrnqFct6/rdaJt
-         fjQaHZ+oOsSQhcEt+ZTjCmHL678zidC4VAnb6VlC5JjLQMWznEsiMlboBmzxowUWNCEg
-         DJlLBUab+MHi4Svpsy2LvKLAh5qnh4YxIziY4jgK787VXKkpe1LeRiL2JGkhyZv1iPAG
-         Znzw==
+        bh=xcS5shRmDCmvz+IoTKqWTzUo+o6AAuc9PAErT+qJLAs=;
+        b=OQaguD4OW/a0PRcKXewnQoJz2HveUAELXWyoGoFSB4eakOiaN7tvkhvroIJENmrFeJ
+         PuXhQwOuoS0ZPVBot7jNgIujYR/bmcdJMtq1VBx7U0wi1aj+iIuW4r/6YuomR+XN0y9v
+         sSRuVS20/+rxYnHwdp+oQyGga1ktao5cj7wHS/C0jbSqfrBDZZVwi5JksbrL92hPebwY
+         fLaRsznU4Ph/uhnaDGP5GyNfrYYkj71sNtZ7TZOgK0l/7FzeYA6/q8LhcJGUMV4nZinF
+         gcNf58MM8flPh5y8Kkcdqu/uhs8VpBTqx5/327LJT+G9ApAPx2w6zzFUoq4SKNY3v0qk
+         QpfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768182211; x=1768787011;
+        d=1e100.net; s=20230601; t=1768185953; x=1768790753;
         h=content-transfer-encoding:in-reply-to:content-language:references
          :cc:to:subject:user-agent:mime-version:date:message-id:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5g0eqFZw+saooIdmg9NsoPWVUWAMnQL8vdrqEmKZ9zg=;
-        b=ITRF9PX9qOUR4nm49ahYaGbschUBh+5Sw+i+R/wmJFdawqVkkyH093zH+D7gsIi+3R
-         2+nf/KxdwvhpqfCwCy4IL9tsD08DTZoz04QQTQvVEqOzS1Jz6Zu/Kt7WPAfQPGpObzxa
-         naH29kO3sY/PpHE2FzfmVqA5Oh0LxyDoawEuisiOQGufu34EaFA6RmuHSlPBGAYcnwO5
-         SUcC3lvcYSsof+piQaUajcdR0ldZKPNfe5osSeFhkf8ANh//07RPY4uLqCcYFZ/4tn9t
-         ytOUMm84IU1LSX3t4AyPS8lWO1zosSJt6+9gaJEUkBFqT3G6DLY9Y3384O//z5lQh8EP
-         4o6A==
-X-Forwarded-Encrypted: i=1; AJvYcCU2jGHI1Zj8HkccPKjYmwi8nLqupnMmeQxOxBLjxr/O2DFaojrA+XN5oJoCjSPzTmli1fZdyJCeDnn5ZQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWcE6cxiMewMMe6Nd8n6qIdNuShHaXFyhP7YUNVZTU0lprBT8a
-	4kTCUE860G9szVPiSgUanxlWsXxz0N6+/HviG37kQ0mGKFgMSTBPeTtLtkhVCT6veaKbhcr1y0W
-	VjRXHnUs38l9HA0n0aRhjdETwQ+0eQUNtx/JkxjfOJo5FZTh3IUuoO1PoPR0ufr4f
-X-Gm-Gg: AY/fxX6iR4+wrdD9j1sInpmUZ7uChkADbbuBPfGi1iZFDk01k6H6bCDPaanO+xwi/3R
-	VyG02/hz25Bry17COkLLJmuYFr+Njv55c9RYP6Ut2lOLwcVPojFd+jIni/8IigcjHl3KqAKjjtM
-	qpNdXnH6KJnOQ8iJtTIJMp8yDt2NTpamktAKF+CUeFs6b5qY2dcZpOfHUZwjtvQ4tHG+4faDRkG
-	WMY0PhLA3m1HyzUXCTpWtWw6d4dIGH35hUcCAbLi8nuTAub5oBOPmpPyBJdGCv+uikirLjvTDPZ
-	chSYnHVwWz8+JXmXu9z7WeDgIuFiQLisxI+Nd+ayUABH+5R6acMH2NzIPR7z76gftDBwKmpnM2F
-	b3emHANRxNNlt7tAEc1nf9GoC8DVBdzUUrLb/MW+rBtbB3HkTKI4C+JXw
-X-Received: by 2002:a05:6122:3383:b0:55e:82c3:e1fb with SMTP id 71dfb90a1353d-563466b1471mr6360613e0c.10.1768182211333;
-        Sun, 11 Jan 2026 17:43:31 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHV+QUILwqeHqopifLZI0TMkyTSwUxskEqEsydIK3wu+6ViPTcpBZklzMvbaEYb1jKTIvUBCg==
-X-Received: by 2002:a05:6122:3383:b0:55e:82c3:e1fb with SMTP id 71dfb90a1353d-563466b1471mr6360599e0c.10.1768182210967;
-        Sun, 11 Jan 2026 17:43:30 -0800 (PST)
+        bh=xcS5shRmDCmvz+IoTKqWTzUo+o6AAuc9PAErT+qJLAs=;
+        b=m9aI4LljjuvubSv/wjW43g94TefPRi03oHxPffSoENGesqasnJm2rhCtH4FNE1/LvG
+         Uh4DQLQ/nxyOP2SH2qzbTjef1J8uNhD8yOJZVv38QWzhC1AnuVjAxkscGN/++M97aWAX
+         4KMRRtLr2aZJmopVQChnIhQXQjFn5vmQGgkpwrtv0dzUiSaBylGEzuKuC0OFalEhejyi
+         Wa5vxfsSShiXwQMWPYrPLnrHS1RZ2zFOhu048kw1lllnzn9NYYka3JSrDb1Ifr7qSvsc
+         3EtEvPCX8IecoSjhrPQNaT1XhdzdZ9dmmKg/cqKKUYGFVl6ifVPJwtjXxQQQIE1Y4ivN
+         Nu5g==
+X-Forwarded-Encrypted: i=1; AJvYcCUKCI77VPFuU1vy5Sb7I2zq4QTPbD07G33hU9NCSWaVhl7X7qAZ/q/vWGOok6gNJHSuWJQq+Kxf43p98Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwpZNjRGw9Qs5aJfeN7by58emuSWQcl2DJb0g5VIfIA7WVuO8AW
+	AeWzJTA50Ki14kYU0SG3ck5yKnow7k2E0bPbbQninalZ9naTuoj/LmGuxfj+AKg+BEWFQaDftlm
+	GRln4Bc/ZEYGieMg7H3wVEBSX7o97BJZFUq4dKCIZ4CZG1hTKsCmyFvhzEDlQmu1o
+X-Gm-Gg: AY/fxX65dEmh/LZ3KrqkCwYire4Y0bKie1MlypEOkq2jlAYq4H1H8b/YjORXwV5gRLU
+	1C2KSXC7dI3Ug5sIc7/eerYJe47V58hNrozRxIkphmo/F1aVcUj8hQb9aA68IVn1zqW9ihtLK2y
+	F4v/yZQwdwv2/W04QHABa0VHA3lh4QBVRgYEx+5pHZfa392apC0k8e9V+nvKKjY/aSjA3q/MJsB
+	ipVJ6XuqQ3FvIjinFd1NJAk5LbkMg1yiLnJl76AJc7CFaoKWjDwAKZHUre5Zaqgsqkw4BAOVX1q
+	aP1iiK3dsj7mK0s6QjGz0FYwpBi+yk5oDFtmp1X60jA29eUefJuSHe8I0T4a0rv9rWj612fOICo
+	Z6gNvgOk5DHuSW4SIHr+wqy2rkeNDDPBUKuJrYS8uIPO9SzNEpppkQSC8
+X-Received: by 2002:a05:6122:1d4d:b0:55b:1a1b:3273 with SMTP id 71dfb90a1353d-56347d4a0bemr5054198e0c.6.1768185952708;
+        Sun, 11 Jan 2026 18:45:52 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEwOFp6cPvfkUcSbRWdkrghqM2mUWR9n3I0P3Nk8PJy6T841SLsur+1hpT47PiYyZ5sXMn8AA==
+X-Received: by 2002:a05:6122:1d4d:b0:55b:1a1b:3273 with SMTP id 71dfb90a1353d-56347d4a0bemr5054194e0c.6.1768185952291;
+        Sun, 11 Jan 2026 18:45:52 -0800 (PST)
 Received: from ?IPV6:2601:188:c102:b180:1f8b:71d0:77b1:1f6e? ([2601:188:c102:b180:1f8b:71d0:77b1:1f6e])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56375cd7cd6sm4961512e0c.10.2026.01.11.17.43.17
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-563667cf148sm8166160e0c.2.2026.01.11.18.45.39
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 11 Jan 2026 17:43:30 -0800 (PST)
+        Sun, 11 Jan 2026 18:45:51 -0800 (PST)
 From: Waiman Long <llong@redhat.com>
 X-Google-Original-From: Waiman Long <longman@redhat.com>
-Message-ID: <e97d96fc-cbdf-4c03-aa1a-b0cde5419681@redhat.com>
-Date: Sun, 11 Jan 2026 20:43:16 -0500
+Message-ID: <18ee9089-8a08-44ed-8761-7c9db765cd4e@redhat.com>
+Date: Sun, 11 Jan 2026 21:45:36 -0500
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -89,11 +89,11 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 12/33] cpuset: Provide lockdep check for cpuset lock held
-To: Frederic Weisbecker <frederic@kernel.org>,
- LKML <linux-kernel@vger.kernel.org>
-Cc: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
- Andrew Morton <akpm@linux-foundation.org>,
+Subject: Re: [PATCH 13/33] sched/isolation: Convert housekeeping cpumasks to
+ rcu pointers
+To: Simon Horman <horms@kernel.org>, Frederic Weisbecker <frederic@kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?=
+ <mkoutny@suse.com>, Andrew Morton <akpm@linux-foundation.org>,
  Bjorn Helgaas <bhelgaas@google.com>,
  Catalin Marinas <catalin.marinas@arm.com>,
  Chen Ridong <chenridong@huawei.com>, Danilo Krummrich <dakr@kernel.org>,
@@ -108,69 +108,96 @@ Cc: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
  Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
  Phil Auld <pauld@redhat.com>, "Rafael J . Wysocki" <rafael@kernel.org>,
  Roman Gushchin <roman.gushchin@linux.dev>,
- Shakeel Butt <shakeel.butt@linux.dev>, Simon Horman <horms@kernel.org>,
- Tejun Heo <tj@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Vlastimil Babka <vbabka@suse.cz>, Will Deacon <will@kernel.org>,
- cgroups@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-block@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org,
- netdev@vger.kernel.org
+ Shakeel Butt <shakeel.butt@linux.dev>, Tejun Heo <tj@kernel.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Vlastimil Babka <vbabka@suse.cz>,
+ Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+ linux-mm@kvack.org, linux-pci@vger.kernel.org, netdev@vger.kernel.org
 References: <20260101221359.22298-1-frederic@kernel.org>
- <20260101221359.22298-13-frederic@kernel.org>
+ <20260101221359.22298-14-frederic@kernel.org>
+ <20260107115653.GA196631@kernel.org>
 Content-Language: en-US
-In-Reply-To: <20260101221359.22298-13-frederic@kernel.org>
+In-Reply-To: <20260107115653.GA196631@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 1/1/26 5:13 PM, Frederic Weisbecker wrote:
-> cpuset modifies partitions, including isolated, while holding the cpuset
-> mutex.
+On 1/7/26 6:56 AM, Simon Horman wrote:
+> On Thu, Jan 01, 2026 at 11:13:38PM +0100, Frederic Weisbecker wrote:
+>> HK_TYPE_DOMAIN's cpumask will soon be made modifiable by cpuset.
+>> A synchronization mechanism is then needed to synchronize the updates
+>> with the housekeeping cpumask readers.
+>>
+>> Turn the housekeeping cpumasks into RCU pointers. Once a housekeeping
+>> cpumask will be modified, the update side will wait for an RCU grace
+>> period and propagate the change to interested subsystem when deemed
+>> necessary.
+>>
+>> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+>> ---
+>>   kernel/sched/isolation.c | 58 +++++++++++++++++++++++++---------------
+>>   kernel/sched/sched.h     |  1 +
+>>   2 files changed, 37 insertions(+), 22 deletions(-)
+>>
+>> diff --git a/kernel/sched/isolation.c b/kernel/sched/isolation.c
+>> index 11a623fa6320..83be49ec2b06 100644
+>> --- a/kernel/sched/isolation.c
+>> +++ b/kernel/sched/isolation.c
+>> @@ -21,7 +21,7 @@ DEFINE_STATIC_KEY_FALSE(housekeeping_overridden);
+>>   EXPORT_SYMBOL_GPL(housekeeping_overridden);
+>>   
+>>   struct housekeeping {
+>> -	cpumask_var_t cpumasks[HK_TYPE_MAX];
+>> +	struct cpumask __rcu *cpumasks[HK_TYPE_MAX];
+>>   	unsigned long flags;
+>>   };
+>>   
+>> @@ -33,17 +33,28 @@ bool housekeeping_enabled(enum hk_type type)
+>>   }
+>>   EXPORT_SYMBOL_GPL(housekeeping_enabled);
+>>   
+>> +const struct cpumask *housekeeping_cpumask(enum hk_type type)
+>> +{
+>> +	if (static_branch_unlikely(&housekeeping_overridden)) {
+>> +		if (housekeeping.flags & BIT(type)) {
+>> +			return rcu_dereference_check(housekeeping.cpumasks[type], 1);
+>> +		}
+>> +	}
+>> +	return cpu_possible_mask;
+>> +}
+>> +EXPORT_SYMBOL_GPL(housekeeping_cpumask);
+>> +
+> Hi Frederic,
 >
-> This means that holding the cpuset mutex is safe to synchronize against
-> housekeeping cpumask changes.
+> I think this patch should also update the access to housekeeping.cpumasks
+> in housekeeping_setup(), on line 200, to use housekeeping_cpumask().
 >
-> Provide a lockdep check to validate that.
+> As is, sparse flags __rcu a annotation miss match there.
 >
-> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
-> ---
->   include/linux/cpuset.h | 2 ++
->   kernel/cgroup/cpuset.c | 7 +++++++
->   2 files changed, 9 insertions(+)
+>    kernel/sched/isolation.c:200:80: warning: incorrect type in argument 3 (different address spaces)
+>    kernel/sched/isolation.c:200:80:    expected struct cpumask const *srcp3
+>    kernel/sched/isolation.c:200:80:    got struct cpumask [noderef] __rcu *
 >
-> diff --git a/include/linux/cpuset.h b/include/linux/cpuset.h
-> index a98d3330385c..1c49ffd2ca9b 100644
-> --- a/include/linux/cpuset.h
-> +++ b/include/linux/cpuset.h
-> @@ -18,6 +18,8 @@
->   #include <linux/mmu_context.h>
->   #include <linux/jump_label.h>
->   
-> +extern bool lockdep_is_cpuset_held(void);
-> +
->   #ifdef CONFIG_CPUSETS
->   
->   /*
-> diff --git a/kernel/cgroup/cpuset.c b/kernel/cgroup/cpuset.c
-> index 3afa72f8d579..5e2e3514c22e 100644
-> --- a/kernel/cgroup/cpuset.c
-> +++ b/kernel/cgroup/cpuset.c
-> @@ -283,6 +283,13 @@ void cpuset_full_unlock(void)
->   	cpus_read_unlock();
->   }
->   
-> +#ifdef CONFIG_LOCKDEP
-> +bool lockdep_is_cpuset_held(void)
-> +{
-> +	return lockdep_is_held(&cpuset_mutex);
-> +}
-> +#endif
-> +
->   static DEFINE_SPINLOCK(callback_lock);
->   
->   void cpuset_callback_lock_irq(void)
+> ...
+>
+The direct housekeeping.cpumasks[type] reference is in the newly merged 
+check after Federic's initial patch series.
 
-The cgroup/for-next tree already have a similar 
-lockdep_assert_cpuset_lock_held() defined. So you can drop this patch if 
-this series won't land in the next merge window.
+                 iter_flags = housekeeping.flags & (HK_FLAG_KERNEL_NOISE 
+| HK_FLAG_DOMAIN);
+                 type = find_first_bit(&iter_flags, HK_TYPE_MAX);
+                 /*
+                  * Pass the check if none of these flags were 
+previously set or
+                  * are not in the current selection.
+                  */
+                 iter_flags = flags & (HK_FLAG_KERNEL_NOISE | 
+HK_FLAG_DOMAIN);
+                 first_cpu = (type == HK_TYPE_MAX || !iter_flags) ? 0 :
+cpumask_first_and_and(cpu_present_mask,
+                                     housekeeping_staging, 
+housekeeping.cpumasks[type]);
+
+Maybe that is why it is missed.
 
 Cheers,
 Longman
