@@ -1,66 +1,67 @@
-Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
+Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DFF63612F2
-	for <linux-block@vger.kernel.org>; Mon, 12 Jan 2026 15:36:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A8B0296BBC
+	for <linux-block@vger.kernel.org>; Mon, 12 Jan 2026 16:22:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768232188; cv=none; b=b1DJphxIxX7/jO0PFzFHYh5yHKujzcvnSKpTKMh9IUk1+7rqj2/B4BVLqNrK+Lt4+8hwwNk9qHEjmv30aTzanLH6xxHQDTqg2CzI6pue//In9A+BjgwCaVRDuSM51lPlJfij8JPY0Nv9XP8sr73jK0IwsqWhnxomMRj9Jx31E/s=
+	t=1768234932; cv=none; b=uk8KdNq5hfxhArogyZuNGRI0teD2k60GrLckTqzwQvrRFmWhePEJw5MuVEwRBS7CO6JBoXHdKjAppYzPx/5S+K4yRRO99ToNAggubmU9vjqXr9e2vrn7kkU3VvJlpIFdffKo4mIFFyub4+s65MzGs1Kb/21/yXaZ0OzwZbc9Hnc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768232188; c=relaxed/simple;
-	bh=ra0u739DCYCl3c40BI5aiE1MJ4c5O/zZ/bPxL6K1lpc=;
+	s=arc-20240116; t=1768234932; c=relaxed/simple;
+	bh=XRbTptgeLfFnGVjoH04s96CXwkSL9pA7ZPa2F/LCxg0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jRTWUasMqI+dSmi3zh9EfVOICLF/ugXZPnOVv/vTyHX4pUgBl810q/SLWwCz9zsjxG3X1aCpAokJEIxV+P6dT1Fki1arcA3zIt0KoZz4A+f+kwJhhBB8jtL/tTHDJSb3pWTFOhqz8xrTFP25N34wNRun79U2SI8tVT3mspZzSnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=xb2czxL3; arc=none smtp.client-ip=209.85.160.49
+	 In-Reply-To:Content-Type; b=eYjEvM70gVrpnLc+ozK1of57Ia3wR9SGEyLK/AH3gbArdHHI/sPaqHmDZZGtl2zilKIZilWIQrxgPkqI/NMU37uBCIFjU2DrMNwfk41iLo5auX9yvIk/uLvnLA185BthfkMRonDWQU6/eL7x/EcbwuXYpw89nJvk2vc5E5n6IiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=umXtWpNF; arc=none smtp.client-ip=209.85.210.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="xb2czxL3"
-Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-3e8819eda8bso2227563fac.3
-        for <linux-block@vger.kernel.org>; Mon, 12 Jan 2026 07:36:24 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="umXtWpNF"
+Received: by mail-ot1-f48.google.com with SMTP id 46e09a7af769-7c75a5cb752so4963423a34.2
+        for <linux-block@vger.kernel.org>; Mon, 12 Jan 2026 08:22:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1768232183; x=1768836983; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1768234928; x=1768839728; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=06lsboNoB9F2+Ai0kYr9ObKsqCdi05wDUU2fe9TFvf8=;
-        b=xb2czxL3CrQq7TAaEDPDmD5KBJusI7/JpZcFP/dv6EMMUqxvK7xC5g3T4qA+jNYVHf
-         Q5/Km2fg6vpM9bvEl2fnTkm+IfOGNvWUFsC1ljqdNYCLKCvYOGEcj+qf5Tnlf/8aJMdX
-         4U9ovOfAebU48JSansySPAvXnm3PMYRX73VIi0DTS7ZEpw90ekf7MCpmr8vxlP+bFpEF
-         ahI6rN/UVKYHDBs1Otn2EqryIJmZDf9OejUXgbWDBxKCu2X5zrXBs2XJYoYs2RlDHom5
-         iOKWPIfOMMVFfgaD2f5ji9sk4LM8fCb33hZYQCAaok5hgQl01JuTsWSAI/lpWk73DRms
-         IwoA==
+        bh=AVVFSuRsjCwlvtdi0lzW9JD0Eq2NEbemzwA+xmgStKo=;
+        b=umXtWpNFyiocBWXkk5T3c7suw97P3l9pXtNEfOT41oGK2uH4j7BwIO/Z/Le74TscXs
+         JxOMCmBJmZ+7Ul3I4xoucNXNSiL19wXqmR8vvY0QCDjhfbap/VpdOa1WRRJvZKCbiW8/
+         Iq+sQHonDodsgbzPtr4W7Vrtnch0t+ctBnNaQtn8GrjpljPsLci3WZCgYrl/qRT1ffMw
+         mZxQewVO3cpn8WC7yjWEx/O4mQCsBEq5opKJc1wPNF2Hhdn7p4lAI2Hj4CeZFGBPwWBm
+         OHv2xuBlU5JZXVPv0XPcmTcQSUEmir6lu0Ul+02qTUsoez/l0XmTWHfc2XGMYJ8m9vZb
+         iEKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768232183; x=1768836983;
+        d=1e100.net; s=20230601; t=1768234928; x=1768839728;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=06lsboNoB9F2+Ai0kYr9ObKsqCdi05wDUU2fe9TFvf8=;
-        b=X0iTA99uSYyw48ebWSExlAB2aTPXQnca+jISP6Usv+i3TKHLbgtPPnWbO09w1xN6TU
-         288sgkso88h5y0jAo/wsj9/kMeUyJ0JAz5blNL8CjzsXGZ3Xhhys0MoH3r6jhSlNU+ww
-         DIlo0N3Dv1sJmk8Dkossnfn853/dAhXR/pQRFzoo91wxSQJ9+F1nm7A8I4/46Ga7xjhA
-         nmZDjLQUr47CT3cKTwjdNLMLvZch8IDyf+fAtDBMQ1zH6HEdu0urkwv0qUFNaklPBJ07
-         trTqZigkb0JSrr/GwCEvqs2cPpfFcOU3yDmdmphgbhz3vK5QWFOWjED1Jd1GGHSqk7um
-         Jvvg==
-X-Gm-Message-State: AOJu0YzOBesJW9LTbNyukYbJgt3lH+dRIXVUEBvxIRTTzL9KjX0S0TTd
-	IgDrDofE6kOA8oLsRZ1EWGU2txyPrDC0s8IKbQkBKwVM+vVKC4YMmWjeZCRMp8nxZRs=
-X-Gm-Gg: AY/fxX5klMvOvtcoS6HokR+/h43/psFtg4kpJCPoiSJRR0iE2T+tbOckLvGo7qr3XP1
-	wO1yZXwX5YVv0YK6GFS9JAN5xoaW1M6ZtWjfDdDZzECRrNsKNlZcvqONOGQDXeoxzy6NovA29Sq
-	GiL+H6Yq6lH0XW0L2/B2Sg7SgmUh8Yrz9GFJv88Ca1krS3g8d0RDtOFPSvpzJiqppKP3CIC25iQ
-	1iCqpwtw8pzBRDlV1b4E/Y4i3v38wPj+zA0cfDMt44FcNTAJHvnbePxudaxbkhW0+d20ThZ8rk5
-	p94e+bfs0pzSxIaobqIRsTvOkDrossFVHytMfCsNzxJj/mDuwapcbCCF+GtMCZP352BKprVcBNh
-	6waZGXQMR2IpqEwZ1GFXG7daCi5r8RkkRvIK1iu+9wSBc3ytfFBKABsVdPpjWVNawWVttHAsW/t
-	NWV0BlNHRH
-X-Google-Smtp-Source: AGHT+IG5ZpxgZ7/rV/aD2rNG4KGnPr3neXhKNkt61+Q9bgZ0iJjyjPMJv6tnJi+G9E149EfEKQ6JDQ==
-X-Received: by 2002:a05:6871:2b22:b0:3f5:4172:1d with SMTP id 586e51a60fabf-3ffc0bb26e4mr8217122fac.58.1768232182992;
-        Mon, 12 Jan 2026 07:36:22 -0800 (PST)
+        bh=AVVFSuRsjCwlvtdi0lzW9JD0Eq2NEbemzwA+xmgStKo=;
+        b=ktI0cKZeruf8IlirDlpTCGXFw5j9UrXDvGiVUpsv0/eVpZGThf18lfwl8mwhyxMrwo
+         f29dJG/0H/sgG1DDoxYQu9sOYFEgZjQQBmzSAe6dq/+XTiMp0HTqUjh+O5RycHZw7Oqh
+         Oysx9PNcdEdR+gCm4ev06kIBzWoO1gNReO61yUl6gnOe7i3J6ofa0B5YcBn57T+IVNUk
+         q/6lkNlvN6BhSxiM2qDeuSP6agjtMIoszpt/YHRagAPpBHa+ffqtgF86WdZrnh3q8Omr
+         rhtkcWHFrh/1zjCrTPA2fZOkC8mQwYb3/647LLqw6h1TvuWUEoFtgVW8j0NkGOoklZHi
+         seiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVOz4TOfQx/iNvtWxF+ZxlQdfksPAUyZdDJgRvEJE1/lIX22xR4fGkVIDdljqdz+uo/Z9lH6+aTYC5UBg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTnbCr6+fPcP57EUPU2M4wIA+uriYWZI1KUqH0VOU+T7vDGn5F
+	oTVJ9Uyqwluo6APycFmmcehHCV3+GLpJhbDhot68iMudca62UndDH/7eMKt0e6j+n7A=
+X-Gm-Gg: AY/fxX5RnndE0HBCZNNnXup/vBb6esdjEow+waf12opazHh29nXwT31YRxm3iM44wJv
+	L3p1ji2ceGv7DiSYFVdjrnENmi7BUXcM9GcdHSdD5CbcnHsEtitnb9Zg++mOqQuupNx597IZg1X
+	B1qS14BbHNNiOpG5gz8PM/O79LntiN16NfGJVleuxKaaEv+tWIcrMNM+3uR5wkNlwEd4iakY8v9
+	zWXXKpK8KjdJiZgoOECpHAiHUd7sHWxmVOnQ+uVEsv/G+vT/I/AhaeYwovw5lKx6vNvpVHxGUFl
+	QB6Z5jWMAK0I6WMf8jVCGkMJwC3IMJJ/yqSDpfEez/utLFRQtFh5gkWEpxIe9oRDRBAgzKbqgBL
+	Lx0HxDSKSSCR2Btwkxqy9zHMJnGrdcBAD7/npRaZOojFS+f+uLExsLE/IsRipulpRQOOj66G2qJ
+	HH7+lBu8Bt
+X-Google-Smtp-Source: AGHT+IFFsc7r/7+E50VF4hpRtDV9+pB77kbt9rvAFuWuRdpCwk4Sm7YH51B9GMYr3a6b85MuDDWX/w==
+X-Received: by 2002:a05:6830:2709:b0:7c7:67be:8ea with SMTP id 46e09a7af769-7ce509e793bmr13194543a34.18.1768234928395;
+        Mon, 12 Jan 2026 08:22:08 -0800 (PST)
 Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-3ffa5072427sm12061510fac.12.2026.01.12.07.36.22
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7ce4781c43asm13237437a34.7.2026.01.12.08.22.07
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Jan 2026 07:36:22 -0800 (PST)
-Message-ID: <72e8bf7d-f4fd-42ec-890e-f4ff5aa3d314@kernel.dk>
-Date: Mon, 12 Jan 2026 08:36:21 -0700
+        Mon, 12 Jan 2026 08:22:07 -0800 (PST)
+Message-ID: <b784bf25-78aa-42cf-bf3b-0687d9138139@kernel.dk>
+Date: Mon, 12 Jan 2026 09:22:06 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -68,45 +69,36 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [Samsung] bsg-lib.c patch for double-free error fix.
-To: jonghwi.rha@samsung.com
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "hch@lst.de" <hch@lst.de>, =?UTF-8?B?6rmA7KCV7YOc?=
- <jt1217.kim@samsung.com>, =?UTF-8?B?7KCV7Zic7Jew?= <hyeon.chung@samsung.com>
-References: <CGME20260112094010epcms2p518c5eb5408f90ceb7ef5739a0fbf7f65@epcms2p5>
- <1591680112.4972876.1768210810254@v8mail-kr2-6.v8mail-kr2.knoxportal-kr-prod-blue.svc.cluster.local>
+Subject: Re: [PATCH v6 0/3] ublk: introduce UBLK_CMD_TRY_STOP_DEV
+To: Yoav Cohen <yoav@nvidia.com>, Ming Lei <ming.lei@redhat.com>,
+ linux-block@vger.kernel.org, csander@purestorage.com, alex@zazolabs.com
+Cc: jholzman@nvidia.com, omril@nvidia.com, Yoav Cohen <yoav@example.com>
+References: <20260112133648.51722-1-yoav@nvidia.com>
 Content-Language: en-US
 From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <1591680112.4972876.1768210810254@v8mail-kr2-6.v8mail-kr2.knoxportal-kr-prod-blue.svc.cluster.local>
+In-Reply-To: <20260112133648.51722-1-yoav@nvidia.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Please don't send patches as attachments, and particularly with html
-emails as they will just get dropped from the list. And it makes it
-impossible to reply to as well, as you then need to save and read the
-patch separately and import it into an email...
+Please rebase this on the current for-7.0/block tree. It doesn't
+apply at all, and hunks like:
 
-> Change-Id: Iadb96f8736f8d9d9aae7b4a831c2a286ff59c520
-
-What is this?
-
-diff --git a/block/bsg-lib.c b/block/bsg-lib.c
-index 9ceb5d0832f5..635b3b988f92 100644
---- a/block/bsg-lib.c
-+++ b/block/bsg-lib.c
-@@ -215,7 +215,7 @@ static int bsg_map_buffer(struct bsg_buffer *buf, struct request *req)
+@@ -311,6 +312,12 @@
+  */
+ #define UBLK_F_BUF_REG_OFF_DAEMON (1ULL << 14)
  
- 	BUG_ON(!req->nr_phys_segments);
- 
--	buf->sg_list = kmalloc(sz, GFP_KERNEL);
-+	buf->sg_list = kzalloc(sz, GFP_KERNEL);
- 	if (!buf->sg_list)
- 		return -ENOMEM;
- 	sg_init_table(buf->sg_list, req->nr_phys_segments);
++/*
++ * The device supports the UBLK_CMD_TRY_STOP_DEV command, which
++ * allows stopping the device only if there are no openers.
++ */
++#define UBLK_F_SAFE_STOP_DEV	(1ULL << 17)
++
+ /* device state */
+ #define UBLK_S_DEV_DEAD	0
+ #define UBLK_S_DEV_LIVE	1
 
-How does this make a difference, when sg_init_table() explicitly sets it
-all to 0?
+is a clear sign that your way off base at this point. Why else would
+STOP_DEV be 1 << 17, with the previous one at 1 << 14?
 
 -- 
 Jens Axboe
