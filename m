@@ -1,465 +1,255 @@
-Received: from sg-1-12.ptr.blmpb.com (sg-1-12.ptr.blmpb.com [118.26.132.12])
+Received: from mail-qt1-f228.google.com (mail-qt1-f228.google.com [209.85.160.228])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0B86946C
-	for <linux-block@vger.kernel.org>; Mon, 12 Jan 2026 09:16:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E768C356A2B
+	for <linux-block@vger.kernel.org>; Mon, 12 Jan 2026 11:42:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.228
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768209408; cv=none; b=nem0EYKl+o3uTYvrzrN8h0dPvVXG1Kl98iIeMmdwZyY9NJgg4BXphdoZZS3w4NWNDvmm9rm9YeNCwnjSj5JH3IQx81ArWJlLd6A+02QXJaQuVZHT+42fhSGVrkF0C2R4w+gPzG3Fn1Py+HRoCAZAE77Z5I4Se1ZDG9jV5O4l7Ew=
+	t=1768218173; cv=none; b=YtVMttSqjPY+Qf32RNm/Ascrv0stJIR1LS7HhvMxkrSnVMDUqAWPJK/CZioiSTGNF6yL0CQtLUD3OYduHx8chKbtAZFUAzZ3Db9fLAtKBG5aZCrd2weGT97rG26MKtkDFyClfiT0zOt2YEwI6VwHp96Am2Gzk9Uh+HH0M8mQjm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768209408; c=relaxed/simple;
-	bh=p+uER8WuyRRVzNg+EdwdAt76d59KYQ0wTK9immabVpo=;
-	h=From:Subject:To:Mime-Version:References:Date:In-Reply-To:
-	 Content-Type:Message-Id; b=T4W3V6QOPwYPeDM1vrd7lR0c8vVDu37rhq8LL4ThetzD6VjQN6ugiRCNwgm2LzaWLSl2+Q9hXGKRP45Z8g0uEeOnZOAQtd3f69EpzyQ6VmL2ON6fLIyHYg8COe9Oo64I9p5JjNXSz6IVKh4FdxmzUUIYXEFOMbuQeMEjI5Be9pg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=pass smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=yC81uHX+; arc=none smtp.client-ip=118.26.132.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fnnas.com
+	s=arc-20240116; t=1768218173; c=relaxed/simple;
+	bh=c95WO/l5Yh3ODJc5THKGAjEQryf6UWGtacSfjwHl9EA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eC/Z5f+Qoma6nEs6hbQ64ACYxi7oeXokKMd7iOSw+QN2Oi5Yn7Old5JKUkZonRA+WWl60C98tur+xWz97ACxhuXoFdYZrjzbHJKM0PBjcjYXuJ4WSXqHy44l3HXynoyIFBstlOl+4LAqIgAbWb05/HbFbdXcAZkMh/07QJdihjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=hr7s7myz; arc=none smtp.client-ip=209.85.160.228
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="yC81uHX+"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1768209392;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=p+uER8WuyRRVzNg+EdwdAt76d59KYQ0wTK9immabVpo=;
- b=yC81uHX+1wihZv9Dfh9Ct54D6ZWnjAW1CliJk9Q+ER6yhkLTUNA9vmM5oZmOYp3k1xnD68
- XTpefslfr6TQFTR8Dt/1DAsTn99NrQW6IFHJT4TlEjQnA4sK45Q+sVwCCcgdUHWsLKFH+o
- JqTMcPqC+13D2UbvdmUQgtNuK1GWH5ZHwy6jNDwa/y0vlQfN84XyD6HNYWq7tpq35sdoto
- IUPYiKmAaQKWmB3/dzTrgcxORlz77MN8FpQLI2Kbn2G0Ak9gDNSpr9gcDmawAMkCtIF3rO
- ea6i1lElgTWbodyC5m/GoChvN/qm5GxkD2SSSnrfuXOqFAks25/ZfoydRSPVAA==
-From: "Yu Kuai" <yukuai@fnnas.com>
-Subject: Re: [PATCH v8 2/8] blk-wbt: fix possible deadlock to nest pcpu_alloc_mutex under q_usage_counter
-Received: from [192.168.1.104] ([39.182.0.185]) by smtp.feishu.cn with ESMTPS; Mon, 12 Jan 2026 17:16:30 +0800
-X-Lms-Return-Path: <lba+26964bbef+9eb808+vger.kernel.org+yukuai@fnnas.com>
-X-Original-From: Yu Kuai <yukuai@fnnas.com>
-To: "Hannes Reinecke" <hare@suse.de>, <axboe@kernel.dk>, 
-	<linux-block@vger.kernel.org>, <tj@kernel.org>, <nilay@linux.ibm.com>, 
-	<ming.lei@redhat.com>, <yukuai@fnnas.com>
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="hr7s7myz"
+Received: by mail-qt1-f228.google.com with SMTP id d75a77b69052e-4ee24fc1c46so3806541cf.0
+        for <linux-block@vger.kernel.org>; Mon, 12 Jan 2026 03:42:51 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768218171; x=1768822971;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fzFvHeJhDdP4ilFE2+bLWYgTIbgx2yUf1NNqPTKhjnU=;
+        b=notURvSurmC0L7hdJmIN8z+nEY1b1UETVtSmEA/XLvLSlM0UPV8cfzygVjfqUW+Dut
+         gJODrKIS+E2xxkgJqQveCBoF8t5axQUjFErZBVv4+OFvuaJ+DSZSRw9Gmk0Qyxml20HZ
+         VrsQvrnv4zXtDYJDwVT1cjEXeATXDJUmevtq+st7CSIKxNiQaOrl0RdC3YixF2Uv7MVC
+         9hEJOr0HK2gpTirtZHVVQWOZpRophUAl6DwDeCDIic+WgtPCkU8zIQKBq2FNUDRjPKgd
+         o/V8CpqpEiYJTkq7u3kY8J2aRdQRVqfbRI2mAMiU+7lifvXE9DPLMOFg51FbIj6HXgyA
+         HnwA==
+X-Forwarded-Encrypted: i=1; AJvYcCV1Y76khVtMHxwQD+B5we82aUH12epR7LTzhZ01V3BskWj61GTCaRL7A69tA18kIkW4P6U7dHJBBszEvQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZr83VJuhGEXoX0/xbFCeR6HF2ie/aYmbLZ5MmXg/f7Wnha/Gn
+	erkb5bx4pbMLfNDhf/UckbAVSOgAWYeDJiPqXkqlXig846P9PPB28cIU+WfrFOhFt2tl/BeLyY1
+	Z2L62OPVa+ntZPVydnMj2HWOAltPmdfWTrD8pORTKpyl0gCr9yoyT2TS2Ysm/iHBftDgQny1WNt
+	4J1ZEkIczGD491EmIz1t890RjkOd5+8vJyUvEVtlkC/Uad/pKpT2CtIrCd5KK2ZgW/P9Y/TP13T
+	MG/9bzXzY+8bUccyVG5GWj/0tRlVIitpB1fww==
+X-Gm-Gg: AY/fxX741CL8wEg8os1YE2/gAym3YzmoiA3GLTJOoxIFvFtsBsheOiTUOwc1x/zhi1X
+	AOrVgnT67JHGyFxdSUQX6c2ZGmu+Z2SspjPAQ9SbDKK2plvIlV5BFyy96meB23sqWE+olyQcwu2
+	BEXDHxsc3VpUdI+GtlqQVZcS1+8NVPersmrEIAYwtD1B1fE4HZ+vB+KFEBF+91jU0m9rveVoq6V
+	qMlfHLwdrwEuNrlIOa68u3Nkq1E5VqL/IAnBvrKUctJpU9eduINsYSXFavD2J6esDc0tHqCWFAj
+	CVqLkFm4Kh1bK+9Axe2ak67vUglI+npuvPihNHyWDAhTy2OgqIX8XsnZKy8qcszw6WyRoEzd8zI
+	8+P7klAocABFD0tye5keWOyo2bq9lhZmiZEZj9zjPCEV/S4tuRlziuEF+cyrRifR24vA7i4CeSW
+	yu2SLcTwiinrvhMMbJjw22qnQ40p7CFukIC8zly5nHFFkPrWYx/TLF42G0sd8=
+X-Google-Smtp-Source: AGHT+IGnqsPG1PhWGiaH85BJmsPiteZfa6dm23hIxNa5A/rw/nkEfXi0O9VQlYbmXpzO8GV9ZVjTsc2SKTXI
+X-Received: by 2002:a05:622a:211:b0:4ee:2638:ea2 with SMTP id d75a77b69052e-4ffb4a73847mr186929081cf.9.1768218170638;
+        Mon, 12 Jan 2026 03:42:50 -0800 (PST)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-2.dlp.protect.broadcom.com. [144.49.247.2])
+        by smtp-relay.gmail.com with ESMTPS id 6a1803df08f44-8907715cec3sm22585156d6.30.2026.01.12.03.42.50
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 12 Jan 2026 03:42:50 -0800 (PST)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-29f25dbe495so17179625ad.0
+        for <linux-block@vger.kernel.org>; Mon, 12 Jan 2026 03:42:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1768218169; x=1768822969; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=fzFvHeJhDdP4ilFE2+bLWYgTIbgx2yUf1NNqPTKhjnU=;
+        b=hr7s7myzXDppYeBDqEA5fUIGcoPByswxXfPxIojG06oZOGZ2UbehVKRzSLtnZiOxTh
+         mNCQ82cn3Mi3UV+OXLwXEp2FEvaW23kPz2daPd7Z/A45s10k/chs9WzoX5xwpNhwOmk1
+         jS4IC+P4pIuLBS3orwsEbQbRRsobQTC5q6z00=
+X-Forwarded-Encrypted: i=1; AJvYcCUFsos7e0rYTtNE8WUfCCNisy3ZfTj1n6OarCJSjsMyU6YcGTZo60MC1EPjzyLOoJHfaJgyOwHKUIfp5Q==@vger.kernel.org
+X-Received: by 2002:a17:902:ea01:b0:2a0:9424:7dc7 with SMTP id d9443c01a7336-2a3ee4917d2mr129653785ad.4.1768218169337;
+        Mon, 12 Jan 2026 03:42:49 -0800 (PST)
+X-Received: by 2002:a17:902:ea01:b0:2a0:9424:7dc7 with SMTP id d9443c01a7336-2a3ee4917d2mr129653635ad.4.1768218168930;
+        Mon, 12 Jan 2026 03:42:48 -0800 (PST)
+Received: from keerthanak-ph5-dev.. ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a3e3c48c0asm175905495ad.31.2026.01.12.03.42.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Jan 2026 03:42:47 -0800 (PST)
+From: Keerthana K <keerthana.kalyanasundaram@broadcom.com>
+To: stable@vger.kernel.org,
+	gregkh@linuxfoundation.org
+Cc: tj@kernel.org,
+	axboe@kernel.dk,
+	cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ajay.kaher@broadcom.com,
+	alexey.makhalov@broadcom.com,
+	vamsi-krishna.brahmajosyula@broadcom.com,
+	yin.ding@broadcom.com,
+	tapas.kundu@broadcom.com,
+	Laibin Qiu <qiulaibin@huawei.com>,
+	Ming Lei <ming.lei@redhat.com>,
+	Sasha Levin <sashal@kernel.org>,
+	Keerthana K <keerthana.kalyanasundaram@broadcom.com>,
+	Shivani Agarwal <shivani.agarwal@broadcom.com>
+Subject: [PATCH v5.10-v5.15] blk-throttle: Set BIO_THROTTLED when bio has been throttled
+Date: Mon, 12 Jan 2026 11:39:36 +0000
+Message-ID: <20260112113936.3291786-1-keerthana.kalyanasundaram@broadcom.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260109065230.653281-1-yukuai@fnnas.com> <20260109065230.653281-3-yukuai@fnnas.com> <b6110ffc-f999-49a1-8a7e-ce51af51e211@suse.de>
-Date: Mon, 12 Jan 2026 17:16:29 +0800
-In-Reply-To: <b6110ffc-f999-49a1-8a7e-ce51af51e211@suse.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <25dc9258-30af-4132-bd38-ba055ed61005@fnnas.com>
-Content-Language: en-US
-User-Agent: Mozilla Thunderbird
-Reply-To: yukuai@fnnas.com
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-Hi=EF=BC=8C
+From: Laibin Qiu <qiulaibin@huawei.com>
 
-=E5=9C=A8 2026/1/12 15:38, Hannes Reinecke =E5=86=99=E9=81=93:
-> On 1/9/26 07:52, Yu Kuai wrote:
->> If wbt is disabled by default and user configures wbt by sysfs, queue
->> will be frozen first and then pcpu_alloc_mutex will be held in
->> blk_stat_alloc_callback().
->>
->> Fix this problem by allocating memory first before queue frozen.
->>
->> Signed-off-by: Yu Kuai <yukuai@fnnas.com>
->> Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
->> Reviewed-by: Ming Lei <ming.lei@redhat.com>
->> ---
->> =C2=A0 block/blk-wbt.c | 108 ++++++++++++++++++++++++++++---------------=
------
->> =C2=A0 1 file changed, 63 insertions(+), 45 deletions(-)
->>
->> diff --git a/block/blk-wbt.c b/block/blk-wbt.c
->> index abc2190689bb..9bef71ec645d 100644
->> --- a/block/blk-wbt.c
->> +++ b/block/blk-wbt.c
->> @@ -93,7 +93,7 @@ struct rq_wb {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct rq_depth rq_depth;
->> =C2=A0 };
->> =C2=A0 -static int wbt_init(struct gendisk *disk);
->> +static int wbt_init(struct gendisk *disk, struct rq_wb *rwb);
->> =C2=A0 =C2=A0 static inline struct rq_wb *RQWB(struct rq_qos *rqos)
->> =C2=A0 {
->> @@ -698,6 +698,41 @@ static void wbt_requeue(struct rq_qos *rqos,=20
->> struct request *rq)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0 }
->> =C2=A0 +static int wbt_data_dir(const struct request *rq)
->> +{
->> +=C2=A0=C2=A0=C2=A0 const enum req_op op =3D req_op(rq);
->> +
->> +=C2=A0=C2=A0=C2=A0 if (op =3D=3D REQ_OP_READ)
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return READ;
->> +=C2=A0=C2=A0=C2=A0 else if (op_is_write(op))
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return WRITE;
->> +
->> +=C2=A0=C2=A0=C2=A0 /* don't account */
->> +=C2=A0=C2=A0=C2=A0 return -1;
->> +}
->> +
->> +static struct rq_wb *wbt_alloc(void)
->> +{
->> +=C2=A0=C2=A0=C2=A0 struct rq_wb *rwb =3D kzalloc(sizeof(*rwb), GFP_KERN=
-EL);
->> +> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
->> index e0a70d26972b..a580688c3ad5 100644
->> --- a/block/blk-sysfs.c
->> +++ b/block/blk-sysfs.c
->> @@ -636,11 +636,8 @@ static ssize_t queue_wb_lat_show(struct gendisk=20
->> *disk, char *page)
->> =C2=A0 static ssize_t queue_wb_lat_store(struct gendisk *disk, const cha=
-r=20
->> *page,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 size_t count)
->> =C2=A0 {
->> -=C2=A0=C2=A0=C2=A0 struct request_queue *q =3D disk->queue;
->> -=C2=A0=C2=A0=C2=A0 struct rq_qos *rqos;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ssize_t ret;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s64 val;
->> -=C2=A0=C2=A0=C2=A0 unsigned int memflags;
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D queue_var_store64(&val, pa=
-ge);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret < 0)
->> @@ -648,40 +645,8 @@ static ssize_t queue_wb_lat_store(struct gendisk=20
->> *disk, const char *page,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (val < -1)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -EINVAL;
->> =C2=A0 -=C2=A0=C2=A0=C2=A0 /*
->> -=C2=A0=C2=A0=C2=A0=C2=A0 * Ensure that the queue is idled, in case the =
-latency update
->> -=C2=A0=C2=A0=C2=A0=C2=A0 * ends up either enabling or disabling wbt com=
-pletely. We can't
->> -=C2=A0=C2=A0=C2=A0=C2=A0 * have IO inflight if that happens.
->> -=C2=A0=C2=A0=C2=A0=C2=A0 */
->> -=C2=A0=C2=A0=C2=A0 memflags =3D blk_mq_freeze_queue(q);
->> -
->> -=C2=A0=C2=A0=C2=A0 rqos =3D wbt_rq_qos(q);
->> -=C2=A0=C2=A0=C2=A0 if (!rqos) {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D wbt_init(disk);
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret)
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto=
- out;
->> -=C2=A0=C2=A0=C2=A0 }
->> -
->> -=C2=A0=C2=A0=C2=A0 ret =3D count;
->> -=C2=A0=C2=A0=C2=A0 if (val =3D=3D -1)
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 val =3D wbt_default_latency_=
-nsec(q);
->> -=C2=A0=C2=A0=C2=A0 else if (val >=3D 0)
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 val *=3D 1000ULL;
->> -
->> -=C2=A0=C2=A0=C2=A0 if (wbt_get_min_lat(q) =3D=3D val)
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto out;
->> -
->> -=C2=A0=C2=A0=C2=A0 blk_mq_quiesce_queue(q);
->> -
->> -=C2=A0=C2=A0=C2=A0 mutex_lock(&disk->rqos_state_mutex);
->> -=C2=A0=C2=A0=C2=A0 wbt_set_min_lat(q, val);
->> -=C2=A0=C2=A0=C2=A0 mutex_unlock(&disk->rqos_state_mutex);
->> -
->> -=C2=A0=C2=A0=C2=A0 blk_mq_unquiesce_queue(q);
->> -out:
->> -=C2=A0=C2=A0=C2=A0 blk_mq_unfreeze_queue(q, memflags);
->> -
->> -=C2=A0=C2=A0=C2=A0 return ret;
->> +=C2=A0=C2=A0=C2=A0 ret =3D wbt_set_lat(disk, val);
->> +=C2=A0=C2=A0=C2=A0 return ret ? ret : count;
->> =C2=A0 }
->> =C2=A0 =C2=A0 QUEUE_RW_ENTRY(queue_wb_lat, "wbt_lat_usec");
->> diff --git a/block/blk-wbt.c b/block/blk-wbt.c
->> index 0974875f77bd..abc2190689bb 100644
->> --- a/block/blk-wbt.c
->> +++ b/block/blk-wbt.c
->> @@ -93,6 +93,8 @@ struct rq_wb {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct rq_depth rq_depth;
->> =C2=A0 };
->> =C2=A0 +static int wbt_init(struct gendisk *disk);
->> +
->> =C2=A0 static inline struct rq_wb *RQWB(struct rq_qos *rqos)
->> =C2=A0 {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return container_of(rqos, struct rq_wb, r=
-qos);
->> @@ -506,7 +508,7 @@ u64 wbt_get_min_lat(struct request_queue *q)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return RQWB(rqos)->min_lat_nsec;
->> =C2=A0 }
->> =C2=A0 -void wbt_set_min_lat(struct request_queue *q, u64 val)
->> +static void wbt_set_min_lat(struct request_queue *q, u64 val)
->> =C2=A0 {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct rq_qos *rqos =3D wbt_rq_qos(q);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!rqos)
->> @@ -741,7 +743,7 @@ void wbt_init_enable_default(struct gendisk *disk)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 WARN_ON_ONCE(wbt_=
-init(disk));
->> =C2=A0 }
->> =C2=A0 -u64 wbt_default_latency_nsec(struct request_queue *q)
->> +static u64 wbt_default_latency_nsec(struct request_queue *q)
->> =C2=A0 {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * We default to 2msec for non-rotat=
-ional storage, and 75msec
->> @@ -902,7 +904,7 @@ static const struct rq_qos_ops wbt_rqos_ops =3D {
->> =C2=A0 #endif
->> =C2=A0 };
->> =C2=A0 -int wbt_init(struct gendisk *disk)
->> +static int wbt_init(struct gendisk *disk)
->> =C2=A0 {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct request_queue *q =3D disk->queue;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct rq_wb *rwb;
->> @@ -949,3 +951,45 @@ int wbt_init(struct gendisk *disk)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return ret;
->> =C2=A0 =C2=A0 }
->> +
->> +int wbt_set_lat(struct gendisk *disk, s64 val)
->> +{
->> +=C2=A0=C2=A0=C2=A0 struct request_queue *q =3D disk->queue;
->> +=C2=A0=C2=A0=C2=A0 unsigned int memflags;
->> +=C2=A0=C2=A0=C2=A0 struct rq_qos *rqos;
->> +=C2=A0=C2=A0=C2=A0 int ret =3D 0;
->> +
->> +=C2=A0=C2=A0=C2=A0 /*
->> +=C2=A0=C2=A0=C2=A0=C2=A0 * Ensure that the queue is idled, in case the =
-latency update
->> +=C2=A0=C2=A0=C2=A0=C2=A0 * ends up either enabling or disabling wbt com=
-pletely. We can't
->> +=C2=A0=C2=A0=C2=A0=C2=A0 * have IO inflight if that happens.
->> +=C2=A0=C2=A0=C2=A0=C2=A0 */
->> +=C2=A0=C2=A0=C2=A0 memflags =3D blk_mq_freeze_queue(q);
->> +
->> +=C2=A0=C2=A0=C2=A0 rqos =3D wbt_rq_qos(q);
->> +=C2=A0=C2=A0=C2=A0 if (!rqos) {
->
-> Isn't 'if (!wbt_rq_qos(q))' sufficient here?
-> 'rqos' is never used, and might even trigger an 'unused variable'
-> compiler warning ...
+[ Upstream commit 5a011f889b4832aa80c2a872a5aade5c48d2756f ]
 
-Yes
+1.In current process, all bio will set the BIO_THROTTLED flag
+after __blk_throtl_bio().
 
->
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D wbt_init(disk);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret)
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto=
- out;
->> +=C2=A0=C2=A0=C2=A0 }
->> +
->> +=C2=A0=C2=A0=C2=A0 if (val =3D=3D -1)
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 val =3D wbt_default_latency_=
-nsec(q);
->> +=C2=A0=C2=A0=C2=A0 else if (val >=3D 0)
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 val *=3D 1000ULL;
->> +
->> +=C2=A0=C2=A0=C2=A0 if (wbt_get_min_lat(q) =3D=3D val)
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto out;
->> +
->> +=C2=A0=C2=A0=C2=A0 blk_mq_quiesce_queue(q);
->> +
->> +=C2=A0=C2=A0=C2=A0 mutex_lock(&disk->rqos_state_mutex);
->> +=C2=A0=C2=A0=C2=A0 wbt_set_min_lat(q, val);
->> +=C2=A0=C2=A0=C2=A0 mutex_unlock(&disk->rqos_state_mutex);
->> +
->> +=C2=A0=C2=A0=C2=A0 blk_mq_unquiesce_queue(q);
->> +out:
->> +=C2=A0=C2=A0=C2=A0 blk_mq_unfreeze_queue(q, memflags);
->> +
->> +=C2=A0=C2=A0=C2=A0 return ret;
->> +}
->> diff --git a/block/blk-wbt.h b/block/blk-wbt.h
->> index 925f22475738..6e39da17218b 100644
->> --- a/block/blk-wbt.h
->> +++ b/block/blk-wbt.h
->> @@ -4,16 +4,13 @@
->> =C2=A0 =C2=A0 #ifdef CONFIG_BLK_WBT
->> =C2=A0 -int wbt_init(struct gendisk *disk);
->> =C2=A0 void wbt_init_enable_default(struct gendisk *disk);
->> =C2=A0 void wbt_disable_default(struct gendisk *disk);
->> =C2=A0 void wbt_enable_default(struct gendisk *disk);
->> =C2=A0 =C2=A0 u64 wbt_get_min_lat(struct request_queue *q);
->> -void wbt_set_min_lat(struct request_queue *q, u64 val);
->> -bool wbt_disabled(struct request_queue *);
->> -
->> -u64 wbt_default_latency_nsec(struct request_queue *);
->> +bool wbt_disabled(struct request_queue *q);
->> +int wbt_set_lat(struct gendisk *disk, s64 val);
->> =C2=A0 =C2=A0 #else
->> =C2=A0 +=C2=A0=C2=A0=C2=A0 if (!rwb)
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
->> +
->> +=C2=A0=C2=A0=C2=A0 rwb->cb =3D blk_stat_alloc_callback(wb_timer_fn, wbt=
-_data_dir, 2,=20
->> rwb);
->> +=C2=A0=C2=A0=C2=A0 if (!rwb->cb) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 kfree(rwb);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
->> +=C2=A0=C2=A0=C2=A0 }
->> +
->> +=C2=A0=C2=A0=C2=A0 return rwb;
->> +}
->> +
->> +static void wbt_free(struct rq_wb *rwb)
->> +{
->> +=C2=A0=C2=A0=C2=A0 blk_stat_free_callback(rwb->cb);
->> +=C2=A0=C2=A0=C2=A0 kfree(rwb);
->> +}
->> +
->> =C2=A0 /*
->> =C2=A0=C2=A0 * Enable wbt if defaults are configured that way
->> =C2=A0=C2=A0 */
->> @@ -739,8 +774,17 @@ EXPORT_SYMBOL_GPL(wbt_enable_default);
->> =C2=A0 =C2=A0 void wbt_init_enable_default(struct gendisk *disk)
->> =C2=A0 {
->> -=C2=A0=C2=A0=C2=A0 if (__wbt_enable_default(disk))
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 WARN_ON_ONCE(wbt_init(disk))=
-;
->> +=C2=A0=C2=A0=C2=A0 struct rq_wb *rwb;
->> +
->> +=C2=A0=C2=A0=C2=A0 if (!__wbt_enable_default(disk))
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
->> +
->> +=C2=A0=C2=A0=C2=A0 rwb =3D wbt_alloc();
->> +=C2=A0=C2=A0=C2=A0 if (WARN_ON_ONCE(!rwb))
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
->> +
->> +=C2=A0=C2=A0=C2=A0 if (WARN_ON_ONCE(wbt_init(disk, rwb)))
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 wbt_free(rwb);
->> =C2=A0 }
->> =C2=A0 =C2=A0 static u64 wbt_default_latency_nsec(struct request_queue *=
-q)
->> @@ -755,19 +799,6 @@ static u64 wbt_default_latency_nsec(struct=20
->> request_queue *q)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 75000000UL=
-L;
->> =C2=A0 }
->> =C2=A0 -static int wbt_data_dir(const struct request *rq)
->> -{
->> -=C2=A0=C2=A0=C2=A0 const enum req_op op =3D req_op(rq);
->> -
->> -=C2=A0=C2=A0=C2=A0 if (op =3D=3D REQ_OP_READ)
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return READ;
->> -=C2=A0=C2=A0=C2=A0 else if (op_is_write(op))
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return WRITE;
->> -
->> -=C2=A0=C2=A0=C2=A0 /* don't account */
->> -=C2=A0=C2=A0=C2=A0 return -1;
->> -}
->> -
->> =C2=A0 static void wbt_queue_depth_changed(struct rq_qos *rqos)
->> =C2=A0 {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 RQWB(rqos)->rq_depth.queue_depth =3D=20
->> blk_queue_depth(rqos->disk->queue);
->> @@ -779,8 +810,7 @@ static void wbt_exit(struct rq_qos *rqos)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct rq_wb *rwb =3D RQWB(rqos);
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 blk_stat_remove_callback(rqos->dis=
-k->queue, rwb->cb);
->> -=C2=A0=C2=A0=C2=A0 blk_stat_free_callback(rwb->cb);
->> -=C2=A0=C2=A0=C2=A0 kfree(rwb);
->> +=C2=A0=C2=A0=C2=A0 wbt_free(rwb);
->> =C2=A0 }
->> =C2=A0 =C2=A0 /*
->> @@ -904,22 +934,11 @@ static const struct rq_qos_ops wbt_rqos_ops =3D {
->> =C2=A0 #endif
->> =C2=A0 };
->> =C2=A0 -static int wbt_init(struct gendisk *disk)
->> +static int wbt_init(struct gendisk *disk, struct rq_wb *rwb)
->> =C2=A0 {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct request_queue *q =3D disk->queue;
->> -=C2=A0=C2=A0=C2=A0 struct rq_wb *rwb;
->> -=C2=A0=C2=A0=C2=A0 int i;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int ret;
->> -
->> -=C2=A0=C2=A0=C2=A0 rwb =3D kzalloc(sizeof(*rwb), GFP_KERNEL);
->> -=C2=A0=C2=A0=C2=A0 if (!rwb)
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -ENOMEM;
->> -
->> -=C2=A0=C2=A0=C2=A0 rwb->cb =3D blk_stat_alloc_callback(wb_timer_fn, wbt=
-_data_dir, 2,=20
->> rwb);
->> -=C2=A0=C2=A0=C2=A0 if (!rwb->cb) {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 kfree(rwb);
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -ENOMEM;
->> -=C2=A0=C2=A0=C2=A0 }
->> +=C2=A0=C2=A0=C2=A0 int i;
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < WBT_NUM_RWQ; i++=
-)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 rq_wait_init(&rwb=
-->rq_wait[i]);
->> @@ -939,38 +958,38 @@ static int wbt_init(struct gendisk *disk)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D rq_qos_add(&rwb->rqos, disk, RQ_Q=
-OS_WBT, &wbt_rqos_ops);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mutex_unlock(&q->rq_qos_mutex);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret)
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto err_free;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return ret;
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 blk_stat_add_callback(q, rwb->cb);
->> -
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
->> -
->> -err_free:
->> -=C2=A0=C2=A0=C2=A0 blk_stat_free_callback(rwb->cb);
->> -=C2=A0=C2=A0=C2=A0 kfree(rwb);
->> -=C2=A0=C2=A0=C2=A0 return ret;
->> -
->> =C2=A0 }
->> =C2=A0 =C2=A0 int wbt_set_lat(struct gendisk *disk, s64 val)
->> =C2=A0 {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct request_queue *q =3D disk->queue;
->> +=C2=A0=C2=A0=C2=A0 struct rq_qos *rqos =3D wbt_rq_qos(q);
->> +=C2=A0=C2=A0=C2=A0 struct rq_wb *rwb =3D NULL;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 unsigned int memflags;
->> -=C2=A0=C2=A0=C2=A0 struct rq_qos *rqos;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int ret =3D 0;
->> =C2=A0 +=C2=A0=C2=A0=C2=A0 if (!rqos) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 rwb =3D wbt_alloc();
->
-> Similar here...
->
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!rwb)
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 retu=
-rn -ENOMEM;
->> +=C2=A0=C2=A0=C2=A0 }
->> +
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * Ensure that the queue is idled, i=
-n case the latency update
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * ends up either enabling or disabl=
-ing wbt completely. We can't
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * have IO inflight if that happens.
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 memflags =3D blk_mq_freeze_queue(q);
->> -
->> -=C2=A0=C2=A0=C2=A0 rqos =3D wbt_rq_qos(q);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!rqos) {
->
-> Huh? Am I reading this correctly that we have
-> two calls for 'if (!rqos)' after this change?
-> That looks odd ...
+2.If bio needs to be throttled, it will start the timer and
+stop submit bio directly. Bio will submit in
+blk_throtl_dispatch_work_fn() when the timer expires.But in
+the current process, if bio is throttled. The BIO_THROTTLED
+will be set to bio after timer start. If the bio has been
+completed, it may cause use-after-free blow.
 
-Because if wbt is initialized, it will never be freed until disk removal.
-The first check is used to allocate memory before queue frozen. The second
-check is used to initialize wbt.
+BUG: KASAN: use-after-free in blk_throtl_bio+0x12f0/0x2c70
+Read of size 2 at addr ffff88801b8902d4 by task fio/26380
 
->
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D wbt_init(disk);
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret)
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D wbt_init(disk, rwb);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 wbt_=
-free(rwb);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 goto out;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (val =3D=3D -1)
->> @@ -990,6 +1009,5 @@ int wbt_set_lat(struct gendisk *disk, s64 val)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 blk_mq_unquiesce_queue(q);
->> =C2=A0 out:
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 blk_mq_unfreeze_queue(q, memflags);
->> -
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return ret;
->> =C2=A0 }
->
-> Cheers,
->
-> Hannes
+ dump_stack+0x9b/0xce
+ print_address_description.constprop.6+0x3e/0x60
+ kasan_report.cold.9+0x22/0x3a
+ blk_throtl_bio+0x12f0/0x2c70
+ submit_bio_checks+0x701/0x1550
+ submit_bio_noacct+0x83/0xc80
+ submit_bio+0xa7/0x330
+ mpage_readahead+0x380/0x500
+ read_pages+0x1c1/0xbf0
+ page_cache_ra_unbounded+0x471/0x6f0
+ do_page_cache_ra+0xda/0x110
+ ondemand_readahead+0x442/0xae0
+ page_cache_async_ra+0x210/0x300
+ generic_file_buffered_read+0x4d9/0x2130
+ generic_file_read_iter+0x315/0x490
+ blkdev_read_iter+0x113/0x1b0
+ aio_read+0x2ad/0x450
+ io_submit_one+0xc8e/0x1d60
+ __se_sys_io_submit+0x125/0x350
+ do_syscall_64+0x2d/0x40
+ entry_SYSCALL_64_after_hwframe+0x44/0xa9
 
---=20
-Thansk,
-Kuai
+Allocated by task 26380:
+ kasan_save_stack+0x19/0x40
+ __kasan_kmalloc.constprop.2+0xc1/0xd0
+ kmem_cache_alloc+0x146/0x440
+ mempool_alloc+0x125/0x2f0
+ bio_alloc_bioset+0x353/0x590
+ mpage_alloc+0x3b/0x240
+ do_mpage_readpage+0xddf/0x1ef0
+ mpage_readahead+0x264/0x500
+ read_pages+0x1c1/0xbf0
+ page_cache_ra_unbounded+0x471/0x6f0
+ do_page_cache_ra+0xda/0x110
+ ondemand_readahead+0x442/0xae0
+ page_cache_async_ra+0x210/0x300
+ generic_file_buffered_read+0x4d9/0x2130
+ generic_file_read_iter+0x315/0x490
+ blkdev_read_iter+0x113/0x1b0
+ aio_read+0x2ad/0x450
+ io_submit_one+0xc8e/0x1d60
+ __se_sys_io_submit+0x125/0x350
+ do_syscall_64+0x2d/0x40
+ entry_SYSCALL_64_after_hwframe+0x44/0xa9
+
+Freed by task 0:
+ kasan_save_stack+0x19/0x40
+ kasan_set_track+0x1c/0x30
+ kasan_set_free_info+0x1b/0x30
+ __kasan_slab_free+0x111/0x160
+ kmem_cache_free+0x94/0x460
+ mempool_free+0xd6/0x320
+ bio_free+0xe0/0x130
+ bio_put+0xab/0xe0
+ bio_endio+0x3a6/0x5d0
+ blk_update_request+0x590/0x1370
+ scsi_end_request+0x7d/0x400
+ scsi_io_completion+0x1aa/0xe50
+ scsi_softirq_done+0x11b/0x240
+ blk_mq_complete_request+0xd4/0x120
+ scsi_mq_done+0xf0/0x200
+ virtscsi_vq_done+0xbc/0x150
+ vring_interrupt+0x179/0x390
+ __handle_irq_event_percpu+0xf7/0x490
+ handle_irq_event_percpu+0x7b/0x160
+ handle_irq_event+0xcc/0x170
+ handle_edge_irq+0x215/0xb20
+ common_interrupt+0x60/0x120
+ asm_common_interrupt+0x1e/0x40
+
+Fix this by move BIO_THROTTLED set into the queue_lock.
+
+Signed-off-by: Laibin Qiu <qiulaibin@huawei.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Link: https://lore.kernel.org/r/20220301123919.2381579-1-qiulaibin@huawei.com
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+[ Keerthana: Remove 'out' and handle return with reference to commit 81c7a63 ]
+Signed-off-by: Keerthana K <keerthana.kalyanasundaram@broadcom.com>
+Signed-off-by: Shivani Agarwal <shivani.agarwal@broadcom.com>
+---
+ block/blk-throttle.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
+
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 4bf514a7b..4d3436cd6 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -2216,8 +2216,10 @@ bool blk_throtl_bio(struct bio *bio)
+ 	rcu_read_lock();
+ 
+ 	/* see throtl_charge_bio() */
+-	if (bio_flagged(bio, BIO_THROTTLED))
+-		goto out;
++	if (bio_flagged(bio, BIO_THROTTLED)) {
++		rcu_read_unlock();
++		return false;
++	}
+ 
+ 	if (!cgroup_subsys_on_dfl(io_cgrp_subsys)) {
+ 		blkg_rwstat_add(&tg->stat_bytes, bio->bi_opf,
+@@ -2225,8 +2227,10 @@ bool blk_throtl_bio(struct bio *bio)
+ 		blkg_rwstat_add(&tg->stat_ios, bio->bi_opf, 1);
+ 	}
+ 
+-	if (!tg->has_rules[rw])
+-		goto out;
++	if (!tg->has_rules[rw]) {
++		rcu_read_unlock();
++		return false;
++	}
+ 
+ 	spin_lock_irq(&q->queue_lock);
+ 
+@@ -2310,14 +2314,14 @@ bool blk_throtl_bio(struct bio *bio)
+ 	}
+ 
+ out_unlock:
+-	spin_unlock_irq(&q->queue_lock);
+-out:
+ 	bio_set_flag(bio, BIO_THROTTLED);
+ 
+ #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
+ 	if (throttled || !td->track_bio_latency)
+ 		bio->bi_issue.value |= BIO_ISSUE_THROTL_SKIP_LATENCY;
+ #endif
++	spin_unlock_irq(&q->queue_lock);
++
+ 	rcu_read_unlock();
+ 	return throttled;
+ }
+-- 
+2.40.4
+
