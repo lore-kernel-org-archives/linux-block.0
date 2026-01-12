@@ -1,152 +1,206 @@
-Received: from mail-dl1-f53.google.com (mail-dl1-f53.google.com [74.125.82.53])
+Received: from mail-dl1-f52.google.com (mail-dl1-f52.google.com [74.125.82.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AD5330C35E
-	for <linux-block@vger.kernel.org>; Mon, 12 Jan 2026 17:07:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E696337E301
+	for <linux-block@vger.kernel.org>; Mon, 12 Jan 2026 17:36:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.52
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768237669; cv=pass; b=cwa7hco962Z9iAxwk6greAhVui0mHAvqRUZZ7e84YvfGus0HSsSrN6YmP+zObxemUQDkAGDwYIPzpcJjTaWcWh6dCNQV8AVXBX+D0NrI4tgpVeggEIE+RTeQkbQ+Kky4kRrCA54fVnw6mZSWA8cApOQ6oAX1Z1vWPYnlbFvef0c=
+	t=1768239413; cv=pass; b=PGWO//ZRjmAtFQzb1WCmEOoRiChWZSY5viBN7sajnCe9VHbboG4qpZLSPGsUkSeLNLSBwo3xq1M+bWgNxFg/4n7KK+BN23xbSlF92aU+Rh0nYpBq+HBZLDHvC+C0onTZnkov+/0nyNW0SkOmuFhOcPBRQHEgjtLipQFO3ioHCJ8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768237669; c=relaxed/simple;
-	bh=aWsTt/KJRgkPFGxk6Mnc5BHmuYHnkqX2MOBx28jMWF0=;
+	s=arc-20240116; t=1768239413; c=relaxed/simple;
+	bh=D/E4fDx6+Mx8V77x7SnXPETvK/m4Eg4JzhHx9KR8/qc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Fg3C9RWXIprpNSP601CRofuU2FJ0fCQ2BTZjTya7EA0hsxJGvA9Vzh6z57HpwIoZuzyXXin7q+sj5PwxjkTlqf0v0DNa61wyM5LEOPx5jnx2CmFNoqfh/uyChn56GCGt3wk1MrKjn63ughLM1gDT/LOX7MlH7lIbI7OvimwCBQk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=XPz27NWS; arc=pass smtp.client-ip=74.125.82.53
+	 To:Cc:Content-Type; b=T+kWlAwkKl8qVtO0vLQ7iK2K9cOdu3EP9O5U4mS5EI0sHvvDhwDm9Gf8yF6EgxQEU2ouPM7pKJx5/cvWpgphYUSNVQCSkDhjMFLhHPFzBH3IabdkEXNY0NkCYK5tD2JIDKdAFJpzJxHgu6e+7mSRWml4QXbZS3E6jxacJKpYRAY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=bbeNHv0Z; arc=pass smtp.client-ip=74.125.82.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="XPz27NWS"
-Received: by mail-dl1-f53.google.com with SMTP id a92af1059eb24-11f42e9733fso315663c88.0
-        for <linux-block@vger.kernel.org>; Mon, 12 Jan 2026 09:07:48 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1768237667; cv=none;
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="bbeNHv0Z"
+Received: by mail-dl1-f52.google.com with SMTP id a92af1059eb24-11ddccf4afdso457448c88.3
+        for <linux-block@vger.kernel.org>; Mon, 12 Jan 2026 09:36:51 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1768239411; cv=none;
         d=google.com; s=arc-20240605;
-        b=ez8XhZH0jSIOk21d4Z6IRFZnn4Uk1AOuhK156mxsp/jyHJP+lHo19yGNGtLbSMoVwV
-         eJbnQET7al71lXdVBx+ktCm4J/7WtC0UJqWt9qYLRKxVep0uo3GlXhKkml+w4i4nbhT0
-         uVX0vSQDK0vgfCvxIjNOlOuBLRicDf5po7DUqnq6Blwtfg9M0wgOJ7Ca+kFemAXdiSGE
-         uJ4cmYGBDAZznUqhtOoexbp1j+4H8kYyKEvootP1Vz5FEW0yocGctNsYaHCpnYXXKufi
-         5E74dpWIR+6ozYYGIBDHrBqjY7LdNVT7iL1fRB5KWZ8WUv8pIYUbyvfhVF8pob0kKJJZ
-         a0RA==
+        b=dO7sXl9mFVliLR+slS3bD+QOhQjXHfAhzRB/lzaZmPM8rYjWCHi7YeJcopfX3+HCPN
+         p00xBFE6SCpHwDkI2SLO20dlpnaN/WHtnIdyS15KcL9vLErrF3v4ASQODPiFcus7YXxz
+         WSd0djPfdWXI9tLAIN+qxEu8qh4AO9AECgWCDU6iiXk2pHXF0opKjfyoi2nQUdrh97dl
+         jtqJfHVkdmThaRx7hLU2i8hsyixX186spAxwIuqAlU7ZArFSU0h3v0geEgwFhIqa4mPW
+         BlAij2RlaKP6/IkRFLWhv3WAcWYw0n7+2/xH3GX/wO57Sy6aS38//Lpzn2r6W/uDnW//
+         OjjQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=ihUHGZwLbRTOi4jtAjauZbYgq5g9pI20xsnYtMLrEy8=;
-        fh=PLrMKlVNNvTLCHOCdhHwY6Qb/Oq0XzB1otdBd/ifnmY=;
-        b=EcWOkj1JcfVCLZa/SSGdQtFj8Ui+XqDP17ASikRES3hYQBFqpB1+TevB7Z8303zHlw
-         zWmFUGByDwqOBECMdh3RAHK3I/fIGEmVUT44GTOl+ypHy/Lsh88iiojrNcYaZejtKF1/
-         o8cRW/h11cXG0sh15cwaxwq7xwvrsQqlr3l05hgvLQQ+CTcVWQh61eq5S90+CKzvbXBo
-         zhEzfBSrbm9eRHyD2sLVYX6mC7EuEFKvxnoKDoZmfFiHtJBAyurr8yBzwtaE+HEi8HYZ
-         bTJBt0oqiFgHdZT+VqgH5mUjxdwPDMlnSVqN7pNZjHK7J8ys76Tg57fZCcp6vx/awDgA
-         hiDw==;
+        bh=7BBCGyjbOvAM/AYNfhRrDUNiTPHGMtFTyGRQUIGm25g=;
+        fh=piWN7Hl5YsmsFO30S7xi3XZogGHT5FQ79FNLjGlZoC4=;
+        b=imviQR0i+JAZfQnXtPVy/Mb9JOHL7+x2b8hKUjaaiTIG8He3olvHJ4BSjHRquK4hxb
+         9t/Cktl89OB1jW0Ysd5hjyJGcyXP50RF6c50GKGuU7aKYPGPvkpZVE23hXipA5FrELqb
+         xq+/rRuLIfxUiA59Q92X7BcP6zckWo+sWeqbIfZY4Q4JQId1SFxFdSalAuPibY5YXV4g
+         sLZ3QCv6i1ItPGeLS6gBsssYJZ34EFkK5uvCVdWVUSuyzSiTxRZdQD2e2nlYdQRW8QQ8
+         rgxZezXB6IOQg8ZsEWMPcIxjR9YFYGHembjy3FB5qVKznfwEK+DZHQeBv1P7t3GCRUOn
+         S8ew==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1768237667; x=1768842467; darn=vger.kernel.org;
+        d=purestorage.com; s=google2022; t=1768239411; x=1768844211; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ihUHGZwLbRTOi4jtAjauZbYgq5g9pI20xsnYtMLrEy8=;
-        b=XPz27NWSQf/8QPyVHrqpR9TEcCLeJW0EkFLdv5XFPeeh6TOt5RMoBsfwMU84y7C1/Y
-         NIdge3pVGgehCmOzONGj16bbtLt6iBoOma/FEZcLYSh+EC1vyyCYvFJzReAwQDaJWUsz
-         mUUGWzt9b1idD69wznit34bNkAgsuugVSPykSVE3aiysdrksS5EAT7AuO3lC68EY0jPr
-         24K9N9T+RUUSok/RV/m9w8RPgx7Vo58PHV5t/zST5m2UTFyRJtXneV7pr0VoTNq7zIm/
-         wSVWQIDkv3vLhTOLft7Pcrei/bzfi0uX7UABeNG9fmJlBtSvZ7Mjpr7Kh3S8Zxr05Ndn
-         82LQ==
+        bh=7BBCGyjbOvAM/AYNfhRrDUNiTPHGMtFTyGRQUIGm25g=;
+        b=bbeNHv0ZhbmV1gKb3JB3c2QRR2oS7aaywHQnYhLRv0eqZZJ4pw2jE/zW81sBf5/l1x
+         8htio/TkvWqaq/e+nI3BeivTtTbfTJNcDjjjnWBvLVpul2Q/rqwbXFbCb101tF7o8oPd
+         QBnQ6Vle9rSd3MULibryeucc5RgzgZ0naTItxPKlhA6nVANiR8AfaTmeh2lUg2/I+bX2
+         f/u0nf54kD7aG/xJOE/MZ9v1YLpQeMiu1OrKm1rSRCnguMun6fisSDZDdCR+PdgKg1Ql
+         ELwUPQ4NsmOMYIVEjbvt4GZOH64rmdF9N5c56LJUjKhl1o4PlYSfUWgev7sQrNNLW178
+         1qow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768237667; x=1768842467;
+        d=1e100.net; s=20230601; t=1768239411; x=1768844211;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=ihUHGZwLbRTOi4jtAjauZbYgq5g9pI20xsnYtMLrEy8=;
-        b=dXcgvMAwQsOtQHqdVskoD5Aaxh9Xb30s/dgcdYwQ94aS2Cwpsi3/5Yd6LQ+8AdOZ3m
-         8klEc/6Rz0+Qlop020ACBBkSAYnx4TAHB2sg4Y6p8kjMcUeQ5RqH3vrLmBLzZiuuGif/
-         3gheO1rgSITHvQ4qxUHPrqUzbZ+o9JxM/k0dNvS+0FwUoEzs/Uq3NxX4/1Og33edkK/v
-         TBwxhzWWSZBcspBYf9Th9gFU8CKRPj6bpyZe7hMzQa6BM5D5h2PsoN3lgNr9ceafPaip
-         PrmuNe6Dzb+3zcC8IbsagRwE/VtLr4uxY6JrcvRRjVe3GICWKx0x9cdrtLDCe1zZlEsW
-         g0Fw==
-X-Forwarded-Encrypted: i=1; AJvYcCUerjihb8sW/76n8OibRGic0hNnOF39VgetPu+yxV25K6DKIqn7HEv+JGfpqgI3rHxkdlF3jELc+DhXTg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwF9oWCYZTYmP5ZNtRor8T38M4nMiO23wU6qmd4innGDo1ZpFon
-	NhSJFiy/UJUpmWWJIb8gVUJphtmYH95hGqTK3Mdqk/zv6UjD1DJUL0nKqmzgIU5te3pSC3dKDi9
-	Lt5UJfh83saGhRreQLVUQgaXGTEleLtE8SAHN5bQHsQ==
-X-Gm-Gg: AY/fxX5MIhfEl9ZBOi2Tb1y/UDX4t+8X8uXDCyHpD6Aw1X5ZKrDj+QSyUkfrtFGXEon
-	XcWNvZh0am67m+4YMT+7AW9dhxFPkpAF98jikDIL85dgQ2cfw+z5DTTf5FaxTle/qqm9AW6XEmZ
-	AupeDMbxoGu8TpYbCeQmEZoTV1NfoUhJV2LdnnDD5cEFQnbAWXd9OvgS5FUqrEyZNnIZOhG13hl
-	NvYqB4Rncgvi7D1fuvN+CI1Wl2/NWj2WYpW/o8zPsaptINJmiUVFv8LaLKhXEVI5rvtnaZp
-X-Google-Smtp-Source: AGHT+IHiAWcX/1/Q3cPl5CWQIlsYV0ExSyWckL+NfZIiIRmEQSG5lmRsPlkGyRWIFkHHQIkK5xpNImCX9ASqSi2zjk4=
-X-Received: by 2002:a05:7022:619c:b0:119:e55a:95a3 with SMTP id
- a92af1059eb24-121f8b92076mr9793049c88.5.1768237666857; Mon, 12 Jan 2026
- 09:07:46 -0800 (PST)
+        bh=7BBCGyjbOvAM/AYNfhRrDUNiTPHGMtFTyGRQUIGm25g=;
+        b=PXFTY6vJvjcfaLGrLjoJ9yikB26V8eGXPdXbDSeURpmxoYeIgCoXUjT4pz2cs16RjA
+         epbVHs5a6+MQeesFzEjUPlDSsZc/a+74zQRYtrzeRUPCIVkhciMyuNa1I/3rxtmqqvrm
+         ZYVlazLH45XD+hDc8BbrH0vCAmNZXD2ihSZvlpGitdMC+lmQX2UXfiT7Q5ZRU2KHOZos
+         5uCs6Q+IMCVQCaLJdqScvKczNnElybcAqO0hjSYWKfq7BPdnn1kbhtJRN9kwDGg4e/ba
+         4rBsRw3/qa35z6F1u3Y59ZwlWHSoSR6F0dJHkOCtTwjLy6bd0F+fkLItyLQuQ313YWgU
+         iTAA==
+X-Forwarded-Encrypted: i=1; AJvYcCUUqi8SESc7RSov5dHdVMATlXHu9SMInPFtu1kRC/TFmtL/YFQL3MBJBLf9HRgBBDkhVaEZO0qpc3WqVA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzUrnVrkhKC2FyZGox8GBZEpMpbQR6og2oHXPBmYtdlfTsaPH9A
+	Ra2FwWfNb/grKkRYUki+GDjbxBAJLg7D8YzdQRWjESWUT2F4cDs0tyKjrFrL5dKh82iQZd5L9dk
+	rLqG4AodisD4Fqah/+R0Ei6Sjjdw0C1sxUWuhA55koer4ApmSiND+5GE=
+X-Gm-Gg: AY/fxX6r1lS8NGPGyIw5uNwloHnjC+8cTy+DUgjlTsP+laNqW4ZSIute9FAHxQp6Dmq
+	lIKUBHuJclTfWYqTc6vQX6MeBgR/o9A0KcF0xVOZBMdo792HSnzwqcvah9CN5arPvd9pYn3FqW9
+	qMRJV7WewH6zipuKADLe60AgIIZAYzoFKhMyQgsFJrghlo9XdefUdQlGiGYCsG1E7XMWCNaWtzm
+	M0TBObHE3nT0l4w8xfBU5kJ0Qe762k19fh+IPOcPHWtaa7c36ufR9xsPhcABUzmgzTjnb1z
+X-Google-Smtp-Source: AGHT+IGrfBjUgdm272SLeQExeyKWl77uUP8gY5NPGJ7w1eiizdFVP71dmWPUcvbmpDGKdrayDYmibBCyalCyqLEdeSk=
+X-Received: by 2002:a05:7022:799:b0:119:e56b:46b7 with SMTP id
+ a92af1059eb24-121f8abf499mr10833439c88.1.1768239410496; Mon, 12 Jan 2026
+ 09:36:50 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260112133648.51722-1-yoav@nvidia.com> <b784bf25-78aa-42cf-bf3b-0687d9138139@kernel.dk>
- <CADUfDZrzAdjf3PT0M7Gh0jQshKKRdAmb8Ce39dNUfj378vvDTQ@mail.gmail.com> <5447c8c4-da12-4497-8d74-4942101ba412@kernel.dk>
-In-Reply-To: <5447c8c4-da12-4497-8d74-4942101ba412@kernel.dk>
+References: <20260112041209.79445-1-ming.lei@redhat.com> <20260112041209.79445-3-ming.lei@redhat.com>
+In-Reply-To: <20260112041209.79445-3-ming.lei@redhat.com>
 From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Mon, 12 Jan 2026 09:07:34 -0800
-X-Gm-Features: AZwV_QjAr2bE-mfzS3QZ6YxW1ZTvIXcC9wnYT1Pe-PXGJBhDbDuX7PNyAxb04IQ
-Message-ID: <CADUfDZr-NP5q04K+ypZLXGrdG6MRNbO=xkjbdkj027vhwPOL3Q@mail.gmail.com>
-Subject: Re: [PATCH v6 0/3] ublk: introduce UBLK_CMD_TRY_STOP_DEV
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Yoav Cohen <yoav@nvidia.com>, Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org, 
-	alex@zazolabs.com, jholzman@nvidia.com, omril@nvidia.com, 
-	Yoav Cohen <yoav@example.com>
+Date: Mon, 12 Jan 2026 09:36:39 -0800
+X-Gm-Features: AZwV_Qg6MmDIvNKl9JTSXsKhoO89DKh_1sMu5h1tCmuPDiZvyEhGa2BypiQl8nc
+Message-ID: <CADUfDZpnX1yU-+7xDcEtSqTMuaR2q5zgzgMs0Bh3x8+c=1g+_w@mail.gmail.com>
+Subject: Re: [PATCH 2/2] selftests/ublk: fix garbage output and cleanup on failure
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
+	Uday Shankar <ushankar@purestorage.com>, Seamus Connor <sconnor@purestorage.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 12, 2026 at 8:33=E2=80=AFAM Jens Axboe <axboe@kernel.dk> wrote:
+On Sun, Jan 11, 2026 at 8:12=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wrot=
+e:
 >
-> On 1/12/26 9:28 AM, Caleb Sander Mateos wrote:
-> > On Mon, Jan 12, 2026 at 8:22?AM Jens Axboe <axboe@kernel.dk> wrote:
-> >>
-> >> Please rebase this on the current for-7.0/block tree. It doesn't
-> >> apply at all, and hunks like:
-> >>
-> >> @@ -311,6 +312,12 @@
-> >>   */
-> >>  #define UBLK_F_BUF_REG_OFF_DAEMON (1ULL << 14)
-> >>
-> >> +/*
-> >> + * The device supports the UBLK_CMD_TRY_STOP_DEV command, which
-> >> + * allows stopping the device only if there are no openers.
-> >> + */
-> >> +#define UBLK_F_SAFE_STOP_DEV   (1ULL << 17)
-> >> +
-> >>  /* device state */
-> >>  #define UBLK_S_DEV_DEAD        0
-> >>  #define UBLK_S_DEV_LIVE        1
-> >>
-> >> is a clear sign that your way off base at this point. Why else would
-> >> STOP_DEV be 1 << 17, with the previous one at 1 << 14?
-> >
-> > This is due to being developed in parallel with other ublk patch sets
-> > which are using feature flags 15 (UBLK_F_BATCH_IO) and 16
-> > (UBLK_F_INTEGRITY). UBLK_F_BATCH_IO is still in development and
-> > UBLK_F_INTEGRITY was just applied. So I don't think it's fair to blame
-> > Yoav for not having rebased on commits that didn't exist yet when this
-> > version of the patch series was sent out :) Should be a trivial
-> > rebase, though, since the value of 17 was already chosen to avoid
-> > conflicting with the other patch sets.
+> Fix several issues in kublk:
 >
-> At the time v6 was posted, it did not apply to the current branches. So
+> 1. Initialize _evtfd to -1 in struct dev_ctx to prevent garbage output
+>    in foreground mode. Without this, _evtfd is zero-initialized to 0
+>    (stdin), and when ublk_send_dev_event() is called on failure, it
+>    writes binary data to stdin which appears as garbage on the terminal.
 
-I just tried it, and v6 applies just fine at commit 5df832ba5f9d
-("Merge branch 'block-6.19' into for-7.0/block") prior to the "ublk:
-add support for integrity data" patch set. And v6 was sent at 13:36
-UTC, while the integrity patch set was applied at 16:22 UTC. So It
-looks like v6 in fact did apply to for-7.0/block when posted.
+Nice, I always wondered why that happened!
 
-> regardless of how it was developed, that's not a very useful approach as
-> it means I have to hand apply it. Which isn't too difficult for patches
-> 1-2. But now we have the integrity bits in, which means the selftest
-> bits take more work. At that point I just threw my hands up.
 >
-> Hence please repost against the current tree.
+> 2. Move fail label in ublk_start_daemon() to ensure pthread_join() is
+>    called before queue deinit on the error path. This ensures proper
+>    thread cleanup when startup fails.
+>
+> 3. Add async parameter to ublk_ctrl_del_dev() and use async deletion
+>    when the daemon fails to start. This prevents potential hangs when
+>    deleting a device that failed during startup.
+>
+> Also fix a debug message format string that was missing __func__ and
+> had wrong escape character.
 
-Yes, completely agree it makes sense to resend the patch set rebased
-on top of for-7.0/block with the integrity changes.
+These all look good, but maybe they would make sense as separate commits?
+
+>
+> Fixes: 6aecda00b7d1 ("selftests: ublk: add kernel selftests for ublk")
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  tools/testing/selftests/ublk/kublk.c | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
+>
+> diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftes=
+ts/ublk/kublk.c
+> index 185ba553686a..0c62a967f2cb 100644
+> --- a/tools/testing/selftests/ublk/kublk.c
+> +++ b/tools/testing/selftests/ublk/kublk.c
+> @@ -153,11 +153,10 @@ static int ublk_ctrl_add_dev(struct ublk_dev *dev)
+>         return __ublk_ctrl_cmd(dev, &data);
+>  }
+>
+> -static int ublk_ctrl_del_dev(struct ublk_dev *dev)
+> +static int ublk_ctrl_del_dev(struct ublk_dev *dev, bool async)
+>  {
+>         struct ublk_ctrl_cmd_data data =3D {
+> -               .cmd_op =3D UBLK_U_CMD_DEL_DEV,
+> -               .flags =3D 0,
+> +               .cmd_op =3D async ? UBLK_U_CMD_DEL_DEV_ASYNC: UBLK_U_CMD_=
+DEL_DEV,
+>         };
+>
+>         return __ublk_ctrl_cmd(dev, &data);
+> @@ -1063,11 +1062,11 @@ static int ublk_start_daemon(const struct dev_ctx=
+ *ctx, struct ublk_dev *dev)
+>         else
+>                 ublk_send_dev_event(ctx, dev, dev->dev_info.dev_id);
+>
+> + fail:
+>         /* wait until we are terminated */
+>         for (i =3D 0; i < dev->nthreads; i++)
+>                 pthread_join(tinfo[i].thread, &thread_ret);
+
+Is it valid to call pthread_join() on a zeroed pthread_t value? If
+ublk_queue_init() fails, there is a goto fail before any of the
+tinfo[i].thread have been assigned. And there's no checking of the
+return value from pthread_create(), so if pthread_create() fails,
+tinfo[i].thread may not be assigned either.
 
 Best,
 Caleb
+
+>         free(tinfo);
+> - fail:
+>         for (i =3D 0; i < dinfo->nr_hw_queues; i++)
+>                 ublk_queue_deinit(&dev->q[i]);
+>         ublk_dev_unprep(dev);
+> @@ -1272,9 +1271,9 @@ static int __cmd_dev_add(const struct dev_ctx *ctx)
+>         }
+>
+>         ret =3D ublk_start_daemon(ctx, dev);
+> -       ublk_dbg(UBLK_DBG_DEV, "%s: daemon exit %d\b", ret);
+> +       ublk_dbg(UBLK_DBG_DEV, "%s: daemon exit %d\n", __func__, ret);
+>         if (ret < 0)
+> -               ublk_ctrl_del_dev(dev);
+> +               ublk_ctrl_del_dev(dev, true);
+>
+>  fail:
+>         if (ret < 0)
+> @@ -1371,7 +1370,7 @@ static int __cmd_dev_del(struct dev_ctx *ctx)
+>         if (ret < 0)
+>                 ublk_err("%s: stop daemon id %d dev %d, ret %d\n",
+>                                 __func__, dev->dev_info.ublksrv_pid, numb=
+er, ret);
+> -       ublk_ctrl_del_dev(dev);
+> +       ublk_ctrl_del_dev(dev, false);
+>  fail:
+>         ublk_ctrl_deinit(dev);
+>
+> @@ -1622,6 +1621,7 @@ int main(int argc, char *argv[])
+>                 .nr_hw_queues   =3D       2,
+>                 .dev_id         =3D       -1,
+>                 .tgt_type       =3D       "unknown",
+> +               ._evtfd         =3D       -1,
+>         };
+>         int ret =3D -EINVAL, i;
+>         int tgt_argc =3D 1;
+> --
+> 2.47.0
+>
