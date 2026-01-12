@@ -1,152 +1,130 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E105F242D72
-	for <linux-block@vger.kernel.org>; Mon, 12 Jan 2026 04:12:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E8CE22AE65
+	for <linux-block@vger.kernel.org>; Mon, 12 Jan 2026 05:40:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768191156; cv=none; b=hoj1EISXeo++skzwgnUXzYimGmXbLg6oUsveHfUtZUueU5coF7o92D+RIuIDdRu1K51xMYPPm8rU6RmBXlflhtz1VHs4D5gc/PypDxoCUISiOP+sC9pqaGIVFs4HSE9Xs2fElCSGbycvfhNPaQkzgs0nClbX6zFZeDLYVNXtG9g=
+	t=1768196436; cv=none; b=diN1jvVoOjBTSnJjE4lKE/oNnaFm4HFVNGhskbSVUN4PN1L9rh+HtD3E78Brn632/DfSysBwo5YIlOTfPs32wO/vP1fAV9eLE3JakjKi7KWk1cAMQVFHmEp1kETEVhVyE+Bs6/ZYe+usA5UuBjLws4nWUDEGzGbJtb8u0o0hMjU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768191156; c=relaxed/simple;
-	bh=BZK865e0Wkbi/GuXMzWfSSB5aGiZ+uoZQ1VuPYow+dQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pBMcleFGkUAmuyc8UkWWJOKMZC+cwHPppS55rVMid1+jPaXhHaticYNcJ41Wpnx+d3bnCHoJQaPEARfeBPJYAgHXfqYwIugN5pA8ZwL1CsEESciabm+M0MMUBbFqdIsN1dHTRj8BBd1W1j19GAybIDGcEqqCQPrYwAj+jHRCVhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hGzvXP6t; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1768196436; c=relaxed/simple;
+	bh=PHw/+BMzpdwZVAyAXhbv02n447R+EAZTmHifaichADU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l81WZSzMh9k7PzD84hON7aZ7dtA8Kv9MPBGFuJ2hR2Cwe+D3XA+AHRDadZjGETtBx9QRH1FfGpU7qmKtS58kwXSXw79hJYqrB1mWkH34HjIUPYqumz3Ohh1UjCQqQQQbUwVwsuCPZ6XO2INiZFK+WoS6Fz5J+ePjjqXEhsKLXv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Jamh9ApZ; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hGzvXP6t"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jamh9ApZ"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768191154;
+	s=mimecast20190719; t=1768196434;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+DvDbB+Gumxq7+FOhjC5zpfrBkZIH/4Awr1Pdpie75Q=;
-	b=hGzvXP6thE0ynLZAzM6vVAQrmcnO/OqZ6OfFhLsxPl6RUSb6gjKcsyaumggFNXbCybbsg6
-	Ha0uUCyWQIGeKDvPoRyslD/IE1NqBte3fRTr/MDJTzs3w84x0VfgBrTffIjs30ky6coI3d
-	LwtVo8kTW3WFiGcfi/zLoavb3FC9NeI=
+	bh=ch0WtTqfAzSn33u9u9LW5lpCUVUydnD/jEupG2LR628=;
+	b=Jamh9ApZN/E5HTvP1bfl4OqLcIfnFVVEbgrThZTvYyU3Ij/1gfq5OxaXY2hT6Qs+LIfYf2
+	5fx5Tj5kbKofbYgXB7dZuP0H9H535DYlse2rrDEY3AKdk5t/JSlNRDHwks98LoYqlX8kgM
+	sMZLKAxyYzMOqIshZxl1IUF4ZIPRrKA=
 Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-684-m6PIPvFFPV21l48CybNQSg-1; Sun,
- 11 Jan 2026 23:12:31 -0500
-X-MC-Unique: m6PIPvFFPV21l48CybNQSg-1
-X-Mimecast-MFC-AGG-ID: m6PIPvFFPV21l48CybNQSg_1768191149
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-83-OD1ykJJEMQi8oKFGjzBW-Q-1; Mon,
+ 12 Jan 2026 00:40:30 -0500
+X-MC-Unique: OD1ykJJEMQi8oKFGjzBW-Q-1
+X-Mimecast-MFC-AGG-ID: OD1ykJJEMQi8oKFGjzBW-Q_1768196429
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5395C18005A7;
-	Mon, 12 Jan 2026 04:12:29 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.42])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2832230001A2;
-	Mon, 12 Jan 2026 04:12:27 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5DB8218005A7;
+	Mon, 12 Jan 2026 05:40:29 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.42])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9D2121800665;
+	Mon, 12 Jan 2026 05:40:25 +0000 (UTC)
+Date: Mon, 12 Jan 2026 13:40:20 +0800
 From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Caleb Sander Mateos <csander@purestorage.com>,
-	Uday Shankar <ushankar@purestorage.com>,
-	Seamus Connor <sconnor@purestorage.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 2/2] selftests/ublk: fix garbage output and cleanup on failure
-Date: Mon, 12 Jan 2026 12:12:06 +0800
-Message-ID: <20260112041209.79445-3-ming.lei@redhat.com>
-In-Reply-To: <20260112041209.79445-1-ming.lei@redhat.com>
-References: <20260112041209.79445-1-ming.lei@redhat.com>
+To: Seamus Connor <sconnor@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Caleb Sander <csander@purestorage.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] ublk: fix ublksrv pid handling for pid namespaces
+Message-ID: <aWSJRAEbC3SUuRk-@fedora>
+References: <CAB5MrP5YbxdUe0378VfKBMb_n9=6G-C=TPixYoMaV48trgtWBg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+In-Reply-To: <CAB5MrP5YbxdUe0378VfKBMb_n9=6G-C=TPixYoMaV48trgtWBg@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Fix several issues in kublk:
+On Sat, Jan 10, 2026 at 04:00:15PM -0800, Seamus Connor wrote:
+> When ublksrv runs inside a pid namespace, START/END_RECOVERY compared
+> the stored init-ns tgid against the userspace pid (getpid vnr), so the
+> check failed and control ops could not proceed. Compare against the
+> caller’s init-ns tgid and store that value, then translate it back to
+> the caller’s pid namespace when reporting GET_DEV_INFO so ublk list
+> shows a sensible pid.
+> 
+> Testing: start/recover in a pid namespace; `ublk list` shows
+> reasonable pid values in init, child, and sibling namespaces.
+> 
+> Fixes: d37a224fc119 ("ublk: validate ublk server pid")
+> Signed-off-by: Seamus Connor <sconnor@purestorage.com>
+> Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
+> ---
+>  drivers/block/ublk_drv.c | 36 ++++++++++++++++++++++++++----------
+>  1 file changed, 26 insertions(+), 10 deletions(-)
+> 
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 79847e0b9e88..9ef6432fef7c 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -2858,7 +2858,6 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
+>   const struct ublksrv_ctrl_cmd *header)
+>  {
+>   const struct ublk_param_basic *p = &ub->params.basic;
+> - int ublksrv_pid = (int)header->data[0];
+>   struct queue_limits lim = {
+>   .logical_block_size = 1 << p->logical_bs_shift,
+>   .physical_block_size = 1 << p->physical_bs_shift,
+> @@ -2874,8 +2873,6 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
+>   struct gendisk *disk;
+>   int ret = -EINVAL;
+> 
+> - if (ublksrv_pid <= 0)
+> - return -EINVAL;
+>   if (!(ub->params.types & UBLK_PARAM_TYPE_BASIC))
+>   return -EINVAL;
+> 
+> @@ -2922,7 +2919,7 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
+>   if (wait_for_completion_interruptible(&ub->completion) != 0)
+>   return -EINTR;
+> 
+> - if (ub->ublksrv_tgid != ublksrv_pid)
+> + if (ub->ublksrv_tgid != current->tgid)
 
-1. Initialize _evtfd to -1 in struct dev_ctx to prevent garbage output
-   in foreground mode. Without this, _evtfd is zero-initialized to 0
-   (stdin), and when ublk_send_dev_event() is called on failure, it
-   writes binary data to stdin which appears as garbage on the terminal.
+This way requires that START_DEV command can only be submitted from ublk server
+daemon context, which may break implementation sending `START_DEV` command
+from remote process context.
 
-2. Move fail label in ublk_start_daemon() to ensure pthread_join() is
-   called before queue deinit on the error path. This ensures proper
-   thread cleanup when startup fails.
+Can we fix it in the following way?
 
-3. Add async parameter to ublk_ctrl_del_dev() and use async deletion
-   when the daemon fails to start. This prevents potential hangs when
-   deleting a device that failed during startup.
++       struct pid *pid = find_vpid(ublksrv_pid);
++
++       if (!pid || pid_nr(pid) != ub->ublksrv_tgid)
++               return -EINVAL;
 
-Also fix a debug message format string that was missing __func__ and
-had wrong escape character.
+Also your patch has patch style issue, please check it before posting out
+by `./scripts/checkpatch.pl`. Or you may have to use `git send-email` to
+send patch file.
 
-Fixes: 6aecda00b7d1 ("selftests: ublk: add kernel selftests for ublk")
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- tools/testing/selftests/ublk/kublk.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftests/ublk/kublk.c
-index 185ba553686a..0c62a967f2cb 100644
---- a/tools/testing/selftests/ublk/kublk.c
-+++ b/tools/testing/selftests/ublk/kublk.c
-@@ -153,11 +153,10 @@ static int ublk_ctrl_add_dev(struct ublk_dev *dev)
- 	return __ublk_ctrl_cmd(dev, &data);
- }
- 
--static int ublk_ctrl_del_dev(struct ublk_dev *dev)
-+static int ublk_ctrl_del_dev(struct ublk_dev *dev, bool async)
- {
- 	struct ublk_ctrl_cmd_data data = {
--		.cmd_op = UBLK_U_CMD_DEL_DEV,
--		.flags = 0,
-+		.cmd_op = async ? UBLK_U_CMD_DEL_DEV_ASYNC: UBLK_U_CMD_DEL_DEV,
- 	};
- 
- 	return __ublk_ctrl_cmd(dev, &data);
-@@ -1063,11 +1062,11 @@ static int ublk_start_daemon(const struct dev_ctx *ctx, struct ublk_dev *dev)
- 	else
- 		ublk_send_dev_event(ctx, dev, dev->dev_info.dev_id);
- 
-+ fail:
- 	/* wait until we are terminated */
- 	for (i = 0; i < dev->nthreads; i++)
- 		pthread_join(tinfo[i].thread, &thread_ret);
- 	free(tinfo);
-- fail:
- 	for (i = 0; i < dinfo->nr_hw_queues; i++)
- 		ublk_queue_deinit(&dev->q[i]);
- 	ublk_dev_unprep(dev);
-@@ -1272,9 +1271,9 @@ static int __cmd_dev_add(const struct dev_ctx *ctx)
- 	}
- 
- 	ret = ublk_start_daemon(ctx, dev);
--	ublk_dbg(UBLK_DBG_DEV, "%s: daemon exit %d\b", ret);
-+	ublk_dbg(UBLK_DBG_DEV, "%s: daemon exit %d\n", __func__, ret);
- 	if (ret < 0)
--		ublk_ctrl_del_dev(dev);
-+		ublk_ctrl_del_dev(dev, true);
- 
- fail:
- 	if (ret < 0)
-@@ -1371,7 +1370,7 @@ static int __cmd_dev_del(struct dev_ctx *ctx)
- 	if (ret < 0)
- 		ublk_err("%s: stop daemon id %d dev %d, ret %d\n",
- 				__func__, dev->dev_info.ublksrv_pid, number, ret);
--	ublk_ctrl_del_dev(dev);
-+	ublk_ctrl_del_dev(dev, false);
- fail:
- 	ublk_ctrl_deinit(dev);
- 
-@@ -1622,6 +1621,7 @@ int main(int argc, char *argv[])
- 		.nr_hw_queues	=	2,
- 		.dev_id		=	-1,
- 		.tgt_type	=	"unknown",
-+		._evtfd		=	-1,
- 	};
- 	int ret = -EINVAL, i;
- 	int tgt_argc = 1;
--- 
-2.47.0
+Thanks,
+Ming
 
