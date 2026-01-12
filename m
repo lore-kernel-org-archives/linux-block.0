@@ -1,130 +1,140 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E8CE22AE65
-	for <linux-block@vger.kernel.org>; Mon, 12 Jan 2026 05:40:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AA8032E154
+	for <linux-block@vger.kernel.org>; Mon, 12 Jan 2026 07:32:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768196436; cv=none; b=diN1jvVoOjBTSnJjE4lKE/oNnaFm4HFVNGhskbSVUN4PN1L9rh+HtD3E78Brn632/DfSysBwo5YIlOTfPs32wO/vP1fAV9eLE3JakjKi7KWk1cAMQVFHmEp1kETEVhVyE+Bs6/ZYe+usA5UuBjLws4nWUDEGzGbJtb8u0o0hMjU=
+	t=1768203137; cv=none; b=XGuBpWL4klVvinmWF/+yNXWZALW/z/pao9B4TrXSRIfZ97I/ro6Dr+SCMta6GA8vLQ9wpFJRfnwVdFLJSj+bFs7k2xr+2UZ+SfWaWMvtK4HWDzbwerMqyx2nB2ws3bL0PuzQRQ07OGNGHYWIOilODm4hcrvp+xrHD7SnSOoG+ks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768196436; c=relaxed/simple;
-	bh=PHw/+BMzpdwZVAyAXhbv02n447R+EAZTmHifaichADU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l81WZSzMh9k7PzD84hON7aZ7dtA8Kv9MPBGFuJ2hR2Cwe+D3XA+AHRDadZjGETtBx9QRH1FfGpU7qmKtS58kwXSXw79hJYqrB1mWkH34HjIUPYqumz3Ohh1UjCQqQQQbUwVwsuCPZ6XO2INiZFK+WoS6Fz5J+ePjjqXEhsKLXv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Jamh9ApZ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1768203137; c=relaxed/simple;
+	bh=UI0PqBIQP5hsmWJgMOgtZLdENRGsnMZwf85Oo+xWLjY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=SggnE0RE2Nr1/O9S3qQ4nkUbAv1xAG3afSpiLUPLJrnORWP9YT/w/qejxuZJ9NKoJQf/9+txXxFL2DOjzIONO+0Kea62mTBMS2ElELiAG7KiiItpVQbo5MAQyFGkMFhmBuC8vFAXFIEaoaZCFaIpK4j0WSUwqu3raNHNtGpB5AE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=wrIo4n7k; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=LpNN0rAw; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=wrIo4n7k; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=LpNN0rAw; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jamh9ApZ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768196434;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="wrIo4n7k";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="LpNN0rAw";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="wrIo4n7k";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="LpNN0rAw"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id AF7895BD31;
+	Mon, 12 Jan 2026 07:32:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1768203131; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ch0WtTqfAzSn33u9u9LW5lpCUVUydnD/jEupG2LR628=;
-	b=Jamh9ApZN/E5HTvP1bfl4OqLcIfnFVVEbgrThZTvYyU3Ij/1gfq5OxaXY2hT6Qs+LIfYf2
-	5fx5Tj5kbKofbYgXB7dZuP0H9H535DYlse2rrDEY3AKdk5t/JSlNRDHwks98LoYqlX8kgM
-	sMZLKAxyYzMOqIshZxl1IUF4ZIPRrKA=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-83-OD1ykJJEMQi8oKFGjzBW-Q-1; Mon,
- 12 Jan 2026 00:40:30 -0500
-X-MC-Unique: OD1ykJJEMQi8oKFGjzBW-Q-1
-X-Mimecast-MFC-AGG-ID: OD1ykJJEMQi8oKFGjzBW-Q_1768196429
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	bh=mbXJGsTtcJWXyUVSuPnOdvV+LhUE4cMC2wmDVmBQPv4=;
+	b=wrIo4n7kVNg3EOk9hXiJ6eZVbqE6jUl/tEYgYxk7qU+r3hGUfTOSVpsajwTXFxlSBaT5vG
+	z2fOr6fjeb8rPrt7kHsPBSqJD2tvSB/+GMUb9ytzTSxhBLNU8ph+js1CNHGzAUSDptJX6X
+	S+qqV5o8TkoPuuqiFE6rBaCLqhoW+7s=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1768203131;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mbXJGsTtcJWXyUVSuPnOdvV+LhUE4cMC2wmDVmBQPv4=;
+	b=LpNN0rAwLhtpEo5Ensh56yssaoP3lKovBGhjMtiZsqQFiz1FUl56AKsEU66qwDVB3nNe24
+	VVyTiYo6DDSEURAA==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1768203131; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mbXJGsTtcJWXyUVSuPnOdvV+LhUE4cMC2wmDVmBQPv4=;
+	b=wrIo4n7kVNg3EOk9hXiJ6eZVbqE6jUl/tEYgYxk7qU+r3hGUfTOSVpsajwTXFxlSBaT5vG
+	z2fOr6fjeb8rPrt7kHsPBSqJD2tvSB/+GMUb9ytzTSxhBLNU8ph+js1CNHGzAUSDptJX6X
+	S+qqV5o8TkoPuuqiFE6rBaCLqhoW+7s=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1768203131;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mbXJGsTtcJWXyUVSuPnOdvV+LhUE4cMC2wmDVmBQPv4=;
+	b=LpNN0rAwLhtpEo5Ensh56yssaoP3lKovBGhjMtiZsqQFiz1FUl56AKsEU66qwDVB3nNe24
+	VVyTiYo6DDSEURAA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5DB8218005A7;
-	Mon, 12 Jan 2026 05:40:29 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.42])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9D2121800665;
-	Mon, 12 Jan 2026 05:40:25 +0000 (UTC)
-Date: Mon, 12 Jan 2026 13:40:20 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Seamus Connor <sconnor@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Caleb Sander <csander@purestorage.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] ublk: fix ublksrv pid handling for pid namespaces
-Message-ID: <aWSJRAEbC3SUuRk-@fedora>
-References: <CAB5MrP5YbxdUe0378VfKBMb_n9=6G-C=TPixYoMaV48trgtWBg@mail.gmail.com>
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 651AA3EA63;
+	Mon, 12 Jan 2026 07:32:11 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 2SbhFXujZGniSAAAD6G6ig
+	(envelope-from <hare@suse.de>); Mon, 12 Jan 2026 07:32:11 +0000
+Message-ID: <6070ede6-9d8d-40ae-b42b-9c82ae002a4f@suse.de>
+Date: Mon, 12 Jan 2026 08:32:10 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 1/8] blk-wbt: factor out a helper wbt_set_lat()
+To: Yu Kuai <yukuai@fnnas.com>, axboe@kernel.dk, linux-block@vger.kernel.org,
+ tj@kernel.org, nilay@linux.ibm.com, ming.lei@redhat.com
+References: <20260109065230.653281-1-yukuai@fnnas.com>
+ <20260109065230.653281-2-yukuai@fnnas.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20260109065230.653281-2-yukuai@fnnas.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAB5MrP5YbxdUe0378VfKBMb_n9=6G-C=TPixYoMaV48trgtWBg@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-Spam-Score: -4.30
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Level: 
+X-Spam-Flag: NO
 
-On Sat, Jan 10, 2026 at 04:00:15PM -0800, Seamus Connor wrote:
-> When ublksrv runs inside a pid namespace, START/END_RECOVERY compared
-> the stored init-ns tgid against the userspace pid (getpid vnr), so the
-> check failed and control ops could not proceed. Compare against the
-> caller’s init-ns tgid and store that value, then translate it back to
-> the caller’s pid namespace when reporting GET_DEV_INFO so ublk list
-> shows a sensible pid.
+On 1/9/26 07:52, Yu Kuai wrote:
+> To move implementation details inside blk-wbt.c, prepare to fix possible
+> deadlock to call wbt_init() while queue is frozen in the next patch.
 > 
-> Testing: start/recover in a pid namespace; `ublk list` shows
-> reasonable pid values in init, child, and sibling namespaces.
-> 
-> Fixes: d37a224fc119 ("ublk: validate ublk server pid")
-> Signed-off-by: Seamus Connor <sconnor@purestorage.com>
-> Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
+> Reviewed-by: Ming Lei <ming.lei@redhat.com>
+> Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
+> Signed-off-by: Yu Kuai <yukuai@fnnas.com>
 > ---
->  drivers/block/ublk_drv.c | 36 ++++++++++++++++++++++++++----------
->  1 file changed, 26 insertions(+), 10 deletions(-)
+>   block/blk-sysfs.c | 39 ++----------------------------------
+>   block/blk-wbt.c   | 50 ++++++++++++++++++++++++++++++++++++++++++++---
+>   block/blk-wbt.h   |  7 ++-----
+>   3 files changed, 51 insertions(+), 45 deletions(-)
 > 
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index 79847e0b9e88..9ef6432fef7c 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -2858,7 +2858,6 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
->   const struct ublksrv_ctrl_cmd *header)
->  {
->   const struct ublk_param_basic *p = &ub->params.basic;
-> - int ublksrv_pid = (int)header->data[0];
->   struct queue_limits lim = {
->   .logical_block_size = 1 << p->logical_bs_shift,
->   .physical_block_size = 1 << p->physical_bs_shift,
-> @@ -2874,8 +2873,6 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
->   struct gendisk *disk;
->   int ret = -EINVAL;
-> 
-> - if (ublksrv_pid <= 0)
-> - return -EINVAL;
->   if (!(ub->params.types & UBLK_PARAM_TYPE_BASIC))
->   return -EINVAL;
-> 
-> @@ -2922,7 +2919,7 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
->   if (wait_for_completion_interruptible(&ub->completion) != 0)
->   return -EINTR;
-> 
-> - if (ub->ublksrv_tgid != ublksrv_pid)
-> + if (ub->ublksrv_tgid != current->tgid)
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-This way requires that START_DEV command can only be submitted from ublk server
-daemon context, which may break implementation sending `START_DEV` command
-from remote process context.
+Cheers,
 
-Can we fix it in the following way?
-
-+       struct pid *pid = find_vpid(ublksrv_pid);
-+
-+       if (!pid || pid_nr(pid) != ub->ublksrv_tgid)
-+               return -EINVAL;
-
-Also your patch has patch style issue, please check it before posting out
-by `./scripts/checkpatch.pl`. Or you may have to use `git send-email` to
-send patch file.
-
-
-Thanks,
-Ming
-
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
