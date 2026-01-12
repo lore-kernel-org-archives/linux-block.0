@@ -1,48 +1,87 @@
-Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1AEA29BDAB;
-	Mon, 12 Jan 2026 17:44:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C5E430E82B
+	for <linux-block@vger.kernel.org>; Mon, 12 Jan 2026 17:54:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768239901; cv=none; b=kDPwjbvXgFfLFEc5B3fDqTaN923omhPFttZ7iAMQjT/QXc83cB+moSRxGBYMQPC+il/+fXE3s4lhBraNXdMkXb2NNH5x56tUe8KxMOK3y29YXs48C2Kjl5sYSdZHgpnvauhODSXVDfN64lTJycFcI1kzxepUiiKLKHZ5ZZbNmt4=
+	t=1768240448; cv=none; b=IQQli8FoOLJp4LIJNrRuXQRT0rTYrr/yvOxEL4VMVvEEtlLryKO0k/cjKBf042x3yl9eTdpKty3ZoUF4kuWQ8jCnen8b89dhRDDwZ8pY2SwI3pi044oSjPUcpeAAQ+Z1jAvBV1Sg+SuL4ssxFTVqUDQpbNe4slUVFVX1LAMvFf8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768239901; c=relaxed/simple;
-	bh=Nw3Mdnjdd+FAXGE3L5NnfSAg8wWbXO9m6KgkYTWnhkc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=en2+w36ONUYOVBGqS3LZ6PLl4g3sVfoC7Ulsz2iyFOGQwYtiQu5N1F1cGa9v0BEisHB2oz9xGTVgkjVpdSK2Rt3xtfd0I9Wu7tZPnI2gHmhLD3yLQQGjHphACtkXaYMsJtwsIogC3cpptLzJlKuXdBVwIdvHOVBJM2UVV53PfgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=Ei0BsuXx; arc=none smtp.client-ip=199.89.1.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1768240448; c=relaxed/simple;
+	bh=69fqmCRd2Tf1nBFL5gD9s9xWKdbIFwrikt2C7UGqOuQ=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=W09jr6keGeBcLlVQPC0iiI6up1Toazczn77N54kpaeXD/U/903/Glmt8bdLi+RC9p3Iyi2utPuwR42GgyZqXRUgYQHpE3EStjoCz/lsrbSb+fbY5XM894ZOp7WItgZE63RHPUG7UUX3eN8CoWUsAnmhrrwDuFvCke+Ury9ZbVts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OJufZ8Ks; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZMS+qKWM; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="Ei0BsuXx"
-Received: from localhost (localhost [127.0.0.1])
-	by 011.lax.mailroute.net (Postfix) with ESMTP id 4dqfsK4ZSpz1XZXnK;
-	Mon, 12 Jan 2026 17:44:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1768239891; x=1770831892; bh=VigNWxwHrVjj5pnwp6TCnMPE
-	cgTU7qwBHER/lf6RvEA=; b=Ei0BsuXxrUedzIRBmWURjtjVu4X9z7rC4WLGvX8Y
-	TFXBI1lJNxgPfLBnXJkGcWhkim0aMx9htVAyb3U5EEBk1CbXJmQ3C9QotWln33iN
-	FWDPbw8TqIzkCe6MnyPZGorrQPQDOk0cRXpZ18oBOPpQWE0BHzqUDYYlqgx/5G24
-	ThOCoCas3JvMKDSWfBm0p1RC410MvIytEwY16wBBKOhiWbiOLvrZfRNXd0s4h5/c
-	gzuchD4vScEYaXI/iIxSX7QE6/VMSJcSR+5YBN65wdGyrywZ3e6ovbPqhP2vHvua
-	1oG6cZfS/aKrlkrwD4/kCdMIUhYCIl5xe21YmIu7TMkd3A==
-X-Virus-Scanned: by MailRoute
-Received: from 011.lax.mailroute.net ([127.0.0.1])
- by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id ey46c5ZYvPXZ; Mon, 12 Jan 2026 17:44:51 +0000 (UTC)
-Received: from [100.119.48.131] (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4dqfsF6lh3z1XZZ07;
-	Mon, 12 Jan 2026 17:44:49 +0000 (UTC)
-Message-ID: <93b11693-3734-48ff-8039-29fc46a17cc6@acm.org>
-Date: Mon, 12 Jan 2026 09:44:48 -0800
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OJufZ8Ks";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZMS+qKWM"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768240446;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9TjQuHk6AbSuF3wU6pHO95OUHC0x3l8Lsr+qaj6DcQU=;
+	b=OJufZ8KstiLFvfrro91PWjbQ94BmxSuBhRU9m8vB8uo3kW5WLzNCcgqF9BNIPaLZg2biYc
+	9d1fW56upcWZJlvA2/1sGAfM7wO2XMBwreW2TugcSM8I+lZwWcC2R43Q2P38nrVclYl45c
+	hnGlxlnIUES/vRZ1ZmpGr8qVzfeBwmA=
+Received: from mail-vk1-f197.google.com (mail-vk1-f197.google.com
+ [209.85.221.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-562-JROwjIrtN_aGtziVPQQSCQ-1; Mon, 12 Jan 2026 12:54:05 -0500
+X-MC-Unique: JROwjIrtN_aGtziVPQQSCQ-1
+X-Mimecast-MFC-AGG-ID: JROwjIrtN_aGtziVPQQSCQ_1768240445
+Received: by mail-vk1-f197.google.com with SMTP id 71dfb90a1353d-5636892d498so7973323e0c.3
+        for <linux-block@vger.kernel.org>; Mon, 12 Jan 2026 09:54:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1768240444; x=1768845244; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=9TjQuHk6AbSuF3wU6pHO95OUHC0x3l8Lsr+qaj6DcQU=;
+        b=ZMS+qKWMbzAgtiOZ95b5b8ACdWzxM4x9sBM6AmZ6omRt50avcKiYgnQFchcpczNi0Z
+         5wbcfi+GqGL/W+H44x189kjMmOu7+H/AKjM3mNtITG67PLv+TFc01DsJqq9a7X9SM2MO
+         CN29O8bEx0OT+bQ4FLWb7gwWLUy2HQvqIf4cZZm+wfPJe5q8mEUU9T0iKe55/50Uj940
+         a/9u5REydn/+V679XfJfgbVn1/e4uh3vOCEtUkSs/wcKdHEBMU4XdFN6iBFcddrF5bV2
+         zYt3Gc2e31k9oYfQHjWTkgFWX6atHOwgpiDIPcVTI6H8i7s1pGIryuHitaOy0fi0WK30
+         bHpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768240444; x=1768845244;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9TjQuHk6AbSuF3wU6pHO95OUHC0x3l8Lsr+qaj6DcQU=;
+        b=lED491bMWlpCIC+YaHqrH6cB7SBb1JvGCB1r1uGq4TUOtSOwgHk73E2yeeP7Uxyqvq
+         pqhQ1Rx1LFy59Dw1GSZEuT3s1yzXf7WZFLIIqQqWqsCoIfd5JuQLI1ks3p5/blyXXBow
+         G7VKOYBkhU29+CZuwxeNQdR/SakcZ72rxdP85eVAvfdGx34lFZh7UcDtGZABwrvAJ5im
+         eNd9TFUTkFJztc+Ij06/u+ILhjt0BK4HCRTjs4Wfw4f8KYc9Xbtqdwk+6q8Q/BE0mwyN
+         +6P+CNTFQvm6G2zcS1Kd1P/eehgWA5Xp/MW6VtMyXaNdhRk3INOxiFi9pXewsr090568
+         cT0g==
+X-Forwarded-Encrypted: i=1; AJvYcCUBHRk7LSClSDBIyxjfyHCOQ+HKh8lqzgmz+AN/ze+J5eGBNsr2SZqleMSYbR2WQA+HtPUEyimVdljKAQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxQZUmg+Xx18vR+8ytnJ9cRroT5sh86Cud2Avg+4HXB3VkNfh/H
+	x0ldzeeF2JJpQNw3OW0pQol+4RgYGWT7YD4juqD6HMuhMzFI0LpvQXFejB+1zjvEBHuHUNbCgAZ
+	ZjxK1bYgh6DgGOMIxst0P4sYMyD4Xy7GVFJJudfGeF/J4afT8C4YQ0hek/PSwAbw1bV/y/eeT
+X-Gm-Gg: AY/fxX5aPS27hJgYRFqyneflBhWdR31KSI9rQZGy05FrBsz7SJsMtdvjQ2BwVdX+6RI
+	c0DYZQkqVk8xFlkCiQvu/ZnriUh8f95rQmx2y6T+e27hQcFvxJy4KubPeZUdsYuz3Q1xwTEmYc6
+	K7Fb1XndWs59JE5+GKR74wEUBkwnfenmZrUo5vBsRyhf8SZrK1Ec/t5VoPnK+tLpC2QEnuvfETG
+	+BKHo2ipUZnGR7XGk7kK9fVwKl47QHhyUWOsrvpNUyk1NPFq/YMwMUHSrXPtTPQ0k7fBFJMTeYA
+	QDonzIbNSAWq9XmqbQZtw/w0MYDKAKl92k+nR6JGXut/Gye9NDsZpmfv//INcls/2ZFOtSXm3jB
+	Nyf72G06bFFF7s9XVNGXZXwNVbPAyRRoAEX4GLGNWZdG7fINYXEDPpxe5
+X-Received: by 2002:a05:6122:4f88:b0:563:8335:9ab7 with SMTP id 71dfb90a1353d-5638335b3d9mr1837512e0c.19.1768240444527;
+        Mon, 12 Jan 2026 09:54:04 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHxwLoMJ4ylgMx4yokJUFTrQvglGoUK2cQ8cuwE9wOBcOJlyALmmG0hMGzOjgHwYtiz9Ob2mA==
+X-Received: by 2002:a05:6122:4f88:b0:563:8335:9ab7 with SMTP id 71dfb90a1353d-5638335b3d9mr1837491e0c.19.1768240444039;
+        Mon, 12 Jan 2026 09:54:04 -0800 (PST)
+Received: from ?IPV6:2601:188:c102:b180:1f8b:71d0:77b1:1f6e? ([2601:188:c102:b180:1f8b:71d0:77b1:1f6e])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5634ca16da7sm15469803e0c.17.2026.01.12.09.53.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 12 Jan 2026 09:54:03 -0800 (PST)
+From: Waiman Long <llong@redhat.com>
+X-Google-Original-From: Waiman Long <longman@redhat.com>
+Message-ID: <f8ca375e-9051-4c7c-880d-e56e07206788@redhat.com>
+Date: Mon, 12 Jan 2026 12:53:49 -0500
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,51 +89,91 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 1/3] bsg: add bsg_uring_cmd uapi structure
-To: Yang Xiuwei <yangxiuwei@kylinos.cn>, linux-scsi@vger.kernel.org,
- linux-block@vger.kernel.org, io-uring@vger.kernel.org
-Cc: fujita.tomonori@lab.ntt.co.jp, axboe@kernel.dk,
- James.Bottomley@HansenPartnership.com, martin.petersen@oracle.com
-References: <20260112084606.570887-1-yangxiuwei@kylinos.cn>
- <20260112084606.570887-2-yangxiuwei@kylinos.cn>
+Subject: Re: [PATCH 12/33] cpuset: Provide lockdep check for cpuset lock held
+To: Frederic Weisbecker <frederic@kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>
+Cc: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Bjorn Helgaas <bhelgaas@google.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Chen Ridong <chenridong@huawei.com>, Danilo Krummrich <dakr@kernel.org>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Gabriele Monaco <gmonaco@redhat.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+ Lai Jiangshan <jiangshanlai@gmail.com>,
+ Marco Crivellari <marco.crivellari@suse.com>, Michal Hocko
+ <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+ Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
+ Phil Auld <pauld@redhat.com>, "Rafael J . Wysocki" <rafael@kernel.org>,
+ Roman Gushchin <roman.gushchin@linux.dev>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Simon Horman <horms@kernel.org>,
+ Tejun Heo <tj@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Vlastimil Babka <vbabka@suse.cz>, Will Deacon <will@kernel.org>,
+ cgroups@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-block@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20260101221359.22298-1-frederic@kernel.org>
+ <20260101221359.22298-13-frederic@kernel.org>
+ <e97d96fc-cbdf-4c03-aa1a-b0cde5419681@redhat.com>
 Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20260112084606.570887-2-yangxiuwei@kylinos.cn>
+In-Reply-To: <e97d96fc-cbdf-4c03-aa1a-b0cde5419681@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 1/12/26 1:46 AM, Yang Xiuwei wrote:
-> +struct bsg_uring_cmd {
-> +	__u64 cdb_addr;
-> +	__u8  cdb_len;
-> +	__u8  protocol;		/* [i] protocol type (BSG_PROTOCOL_*) */
-> +	__u8  subprotocol;	/* [i] subprotocol type (BSG_SUB_PROTOCOL_*) */
-> +	__u8  reserved1;
-> +	__u32 din_iovec_count;	/* [i] 0 -> flat din transfer else
-> +				 * din_xferp points to array of iovec
-> +				 */
-> +	__u32 din_xfer_len;	/* [i] bytes to be transferred from device */
-> +	__u64 din_xferp;	/* [i] data in buffer address or iovec array
-> +				 * address
-> +				 */
-> +	__u32 dout_iovec_count;	/* [i] 0 -> flat dout transfer else
-> +				 * dout_xferp points to array of iovec
-> +				 */
-> +	__u32 dout_xfer_len;	/* [i] bytes to be transferred to device */
-> +	__u64 dout_xferp;	/* [i] data out buffer address or iovec array address */
-> +	__u32 sense_len;
-> +	__u64 sense_addr;
-> +	__u32 timeout_ms;
-> +	__u32 flags;		/* [i] bit mask (BSG_FLAG_*) - reserved for future use */
-> +	__u8  reserved[16];	/* reserved for future extension */
+On 1/11/26 8:43 PM, Waiman Long wrote:
+> On 1/1/26 5:13 PM, Frederic Weisbecker wrote:
+>> cpuset modifies partitions, including isolated, while holding the cpuset
+>> mutex.
+>>
+>> This means that holding the cpuset mutex is safe to synchronize against
+>> housekeeping cpumask changes.
+>>
+>> Provide a lockdep check to validate that.
+>>
+>> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+>> ---
+>>   include/linux/cpuset.h | 2 ++
+>>   kernel/cgroup/cpuset.c | 7 +++++++
+>>   2 files changed, 9 insertions(+)
+>>
+>> diff --git a/include/linux/cpuset.h b/include/linux/cpuset.h
+>> index a98d3330385c..1c49ffd2ca9b 100644
+>> --- a/include/linux/cpuset.h
+>> +++ b/include/linux/cpuset.h
+>> @@ -18,6 +18,8 @@
+>>   #include <linux/mmu_context.h>
+>>   #include <linux/jump_label.h>
+>>   +extern bool lockdep_is_cpuset_held(void);
+>> +
+>>   #ifdef CONFIG_CPUSETS
+>>     /*
+>> diff --git a/kernel/cgroup/cpuset.c b/kernel/cgroup/cpuset.c
+>> index 3afa72f8d579..5e2e3514c22e 100644
+>> --- a/kernel/cgroup/cpuset.c
+>> +++ b/kernel/cgroup/cpuset.c
+>> @@ -283,6 +283,13 @@ void cpuset_full_unlock(void)
+>>       cpus_read_unlock();
+>>   }
+>>   +#ifdef CONFIG_LOCKDEP
+>> +bool lockdep_is_cpuset_held(void)
+>> +{
+>> +    return lockdep_is_held(&cpuset_mutex);
+>> +}
+>> +#endif
+>> +
+>>   static DEFINE_SPINLOCK(callback_lock);
+>>     void cpuset_callback_lock_irq(void)
+>
+> The cgroup/for-next tree already have a similar 
+> lockdep_assert_cpuset_lock_held() defined. So you can drop this patch 
+> if this series won't land in the next merge window. 
 
-BSG supports much more than only SCSI. The above seems to support SCSI
-commands only.
+Sorry, the other new lockdep API isn't exactly the same as what you 
+propose here. So it is not a replacement for your use case. Sorry for 
+the noise.
 
-> +} __packed;
+Cheers,
+Longman
 
-Applying __packed to a data structure in its entirety is wrong because
-it causes compilers to generate suboptimal code on architectures that do
-not support unaligned 16-/32-/64-bit accesses.
-
-Bart.
