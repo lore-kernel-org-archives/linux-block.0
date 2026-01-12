@@ -1,28 +1,28 @@
-Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010039.outbound.protection.outlook.com [52.101.201.39])
+Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012002.outbound.protection.outlook.com [40.107.200.2])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77CAD2DBF78
-	for <linux-block@vger.kernel.org>; Mon, 12 Jan 2026 13:37:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A45A3590A3
+	for <linux-block@vger.kernel.org>; Mon, 12 Jan 2026 13:37:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.2
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768225059; cv=fail; b=IfEQY2xRbddma8Pq77Wa8U4+vSoN5EJTci1xeIEi+EGps9rKnFnZeu2771M7rLifM1L4fM2ivl7JE/CuSQa3jZOV6zR78iekMSeI5x7QBvCOxxgXuszUYiViYweXifxOJ3TyOXPzTW94lcwuF2Asmu89/ybC7AZRht5GTAI12So=
+	t=1768225064; cv=fail; b=bLBA1pc/eILT6M5qqbNOBbZ/wVl05F/07vk3KbhhpAHDpFFteBhMlDVZyRXg1woBsi55Tu+rjyiJAbDFdJHgoqU9JXLrCmLavAZCVBW1ecenC8D/1Aj5+adX6AnX1Jl75Zrgiw82lD0Hfz6JCcPvLfu7E41aVVp/mU0hQdWLSLM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768225059; c=relaxed/simple;
-	bh=jW1mq5yAczPGy8n90K4RgVMpL4gMDi+PZoHyAHx70Fw=;
+	s=arc-20240116; t=1768225064; c=relaxed/simple;
+	bh=oHKOACg2At8o1UY+V+6TqjccrjIX6qm6lNrZtj8JKNA=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PInmdRzvw83aeQk0UhwIiV86L9rIJkSjyr5TYo/QzsiOTaCvz/2IIfcKf+ZTCCC9b/lZBUXYpc7k7h7M2vuaj5ifrYWxAhyYKJSDYAmiGMze6mtI49j86wJSCa42iNxTgBXPWuGUAvvAHOBJoeDCkyDlsoTd2m+Px6Alkykl78U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=GLH0DOWd; arc=fail smtp.client-ip=52.101.201.39
+	 MIME-Version:Content-Type; b=EV3yZqP6V04H81cpwnCzt4HrtUHb/wSsi4EPd+k+Xe130j+6doMOP3tG6iVF51kn81qXR6YnTRXKqThPdcuJJJHBJdWh5DrYeu1KfZZWuDoUAsFJtvkLk3bXDodwXOfPQZ9TlGWUCNvma63whSrdKMQPkWF5CuKa4ksJAWGSamQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=sf3TSWfY; arc=fail smtp.client-ip=40.107.200.2
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="GLH0DOWd"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="sf3TSWfY"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dbcFnmScw5fqJblKXp3g9k3oz+oL+E3zlyCWIbM6ebSINQSs43TFlt3LQlVmY1/GE4eVb4DOAe2ZXprTJs844vsOxoFTqNR4x89hZFoEix9gIfz7kazk6rDd9hYqqQbSc4UPdItMJLQt0fkVFr4zEYBoz7u3i7xm0EqLoroVTv+2choeHreynr6x1TwSAycl10LAYXnjPXcHK2NGRP9V8osaPU3WRSIBZOXq1f2kM3IStZlQGyUl8dTggG24o5QyPUw4/l69UD8AF3WEDkn5M6gcbAGtsapwVv6FvIXYS5vk7rfjoqRZRrwoHse26M9ZpWdh9Tmwl18FOwlX4SS3HA==
+ b=WHP63aB+kLnlhyCf9FxprpFxMMvx1vu4puWSKV/1c9IS1ICqB2CmqY+W72q5W1yp5swcKqe9TdTAvIFZZ0jsrN92vYVyxDiIWWC7W/6LJk3Ex/DVaZLcdKE8ebf8yFy+s2v1x7itueFDkJjNN5QFBR+IZ50J4vpKGjHXaoSDvvPPqYmK5qPc9GfBtyZDoZVBL14SAInfYT71mqFBjhY5hPDJ4wd5fGvZYVaWlF1F90O9jRxw7u/SCAIxWKCHd1XjmSQ4ty0cIsR1QNXexsZmAcx882nKQXmBpxWe4i52Q5NXZQ3Rp/vKhgEilmrssrVAyW3DQVl05dzHg7E3cNNXug==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AdvsjsVUXzHgJiYCpt90f+ZXSkoubHSzh7aTZKLoAXA=;
- b=mqxuzjFuJo7NuxNcmcV7TWovE+kL/02EQENpkImrIKXwV4Iyl9ZTsFH3aGQHG6T3Y/YE0ae8RwoHuFJO68K+zLVekLwdatNDrEIlqZU7373jMElS5DWCF6B43/GwCsBqC4DHMEf/AqVBEzdg5vsCkZIqANXxM/YHSpg2S03c83z8ZdMdRPIGRutWQ/OaU1S+QMqjdcwK5d+XvfzjHaG5bZV3aI/FonuYXKST+rVwIIBN15T0BqRGH4jotb/80jR6/iaiIWMVeKA5jvE8Kg/CN9oBEQrleXOWlHADTazdXgeabF4AD+E4BoQ/06/Xm/H7f7bJx3myaK4kPqFWJmsa2w==
+ bh=OG84x3F4FtW0xaQ7MeBqZPDUCPuIm3si7SjGtnP7YtQ=;
+ b=qlL6L5GYC+MzevgjudsNfBO6rhpmYw6m8K1CkOjIz0bXL4HWNJKmwNfeiMD+c+tpzgw62ZbOO4DKwu52i//k/aL1vUsl5cetGbzLI7LzfBTA436NweRx7EP9bqnCRBacWo5SYy4S7EMjeI1KpxMwkqG5cnG90m3QVQolHASrTQIaq6kZdcqFZy53sHvxB9RMwkJy6W0WR0VR1hABW/VN27gSHC5MxdAnQfoq/5ryi11epZfebFf1mY/E/99L4dwNaTy8tSvNWSPdgIsqNp6Ua9n+Uskyd/ArKF5C4uFaQURIduhC+PHTjXeymOM9HyWFHR05BI8kV+IDAAD421G3ew==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -30,17 +30,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AdvsjsVUXzHgJiYCpt90f+ZXSkoubHSzh7aTZKLoAXA=;
- b=GLH0DOWdVc5+vIelXoJ2q6USbDTGzdizUZjauBINggbGVXH5Rp3tuX6uq/q5rHqPq+iAYAVVTmNsEd+xZku1P1MZSJP+ftD19bxJLH8vFxHDDV9EY8hBkfrlix6A8UxAKmD+eV8tZ3Wzv8PPv84HsyIyatNj24Ikw83X3T5eH6uBw1UlbtoWhXenen4M/8WYMmWSkEg1CxQE5Q6EmQYjezIdf0CYU57rf/DWEolpzCvFk3cnWNonWI+eNSgBQaLnON/AnnPbaOkgRHD07n63lqxYl+C2RO1NhdOyo2kCG4ZM7K4ij84TR7tNcXifPjHoqsb5kgQFTkjLmB1URzL7OQ==
-Received: from DM6PR13CA0005.namprd13.prod.outlook.com (2603:10b6:5:bc::18) by
- BY5PR12MB4179.namprd12.prod.outlook.com (2603:10b6:a03:211::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9499.7; Mon, 12 Jan 2026 13:37:33 +0000
-Received: from DS2PEPF00003445.namprd04.prod.outlook.com
- (2603:10b6:5:bc:cafe::12) by DM6PR13CA0005.outlook.office365.com
- (2603:10b6:5:bc::18) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9520.4 via Frontend Transport; Mon,
- 12 Jan 2026 13:37:33 +0000
+ bh=OG84x3F4FtW0xaQ7MeBqZPDUCPuIm3si7SjGtnP7YtQ=;
+ b=sf3TSWfYCsthWjL7q/CfD2ILkwKtLy5h8q1l4OYYBF6uq9KCGFDM0IlVHZtBA25wz+EGcCnLawlnOQiU47jIgQt3fdCL8cTJeL0csXswQ7mML9vAIs1PXQlkj7VYwAOjnzVXQr8lVvOOraJL2TQU5g1QFT416jBoTQz4+5xgZ4pb0bGMx7SQXTF1J2PxfdTjdjN1Dbk4EuYGeYseCgf/IPRESpOMftoXhww8ujuPsSCZLN2w3wnj4H8HiMQhdaeOSAEkDkfUYfnBIJsN6UygzWnvsvCNrRpvPFtvkTxvb21VoOBYBsO2eJhEwfgN4Ya2vuUgPeJjeFJV/KYZiQmBEg==
+Received: from CH0PR04CA0052.namprd04.prod.outlook.com (2603:10b6:610:77::27)
+ by SA1PR12MB8118.namprd12.prod.outlook.com (2603:10b6:806:333::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.7; Mon, 12 Jan
+ 2026 13:37:38 +0000
+Received: from DS2PEPF00003443.namprd04.prod.outlook.com
+ (2603:10b6:610:77:cafe::d6) by CH0PR04CA0052.outlook.office365.com
+ (2603:10b6:610:77::27) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9499.7 via Frontend Transport; Mon,
+ 12 Jan 2026 13:37:36 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -48,25 +49,24 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.161 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.161) by
- DS2PEPF00003445.mail.protection.outlook.com (10.167.17.72) with Microsoft
+ DS2PEPF00003443.mail.protection.outlook.com (10.167.17.70) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9520.1 via Frontend Transport; Mon, 12 Jan 2026 13:37:31 +0000
+ 15.20.9520.1 via Frontend Transport; Mon, 12 Jan 2026 13:37:37 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 12 Jan
- 2026 05:37:14 -0800
+ 2026 05:37:19 -0800
 Received: from yoav-mlt.nvidia.com (10.126.231.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 12 Jan
- 2026 05:37:11 -0800
+ 2026 05:37:16 -0800
 From: Yoav Cohen <yoav@nvidia.com>
 To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
 	<linux-block@vger.kernel.org>, <csander@purestorage.com>, <alex@zazolabs.com>
-CC: <jholzman@nvidia.com>, <omril@nvidia.com>, Yoav Cohen <yoav@example.com>,
-	Yoav Cohen <yoav@nvidia.com>
-Subject: [PATCH v6 2/3] ublk: add UBLK_CMD_TRY_STOP_DEV command
-Date: Mon, 12 Jan 2026 15:36:46 +0200
-Message-ID: <20260112133648.51722-3-yoav@nvidia.com>
+CC: <jholzman@nvidia.com>, <omril@nvidia.com>, Yoav Cohen <yoav@example.com>
+Subject: [PATCH v6 3/3] selftests: ublk: add stop command with --safe option
+Date: Mon, 12 Jan 2026 15:36:47 +0200
+Message-ID: <20260112133648.51722-4-yoav@nvidia.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 In-Reply-To: <20260112133648.51722-1-yoav@nvidia.com>
 References: <20260112133648.51722-1-yoav@nvidia.com>
@@ -82,204 +82,265 @@ X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS2PEPF00003445:EE_|BY5PR12MB4179:EE_
-X-MS-Office365-Filtering-Correlation-Id: f4baa314-6d66-4399-cabd-08de51dfbcd9
+X-MS-TrafficTypeDiagnostic: DS2PEPF00003443:EE_|SA1PR12MB8118:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1e7a7f0f-7df9-4fde-d95b-08de51dfc03f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|376014|82310400026|1800799024|7053199007;
+	BCL:0;ARA:13230040|376014|36860700013|82310400026|1800799024|7142099003|7053199007;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?H7CuIMQUiqsoBEX95QktlYQjq9LbnZe3swREtMcm37/Mc8GAY1IGNI140flD?=
- =?us-ascii?Q?0tKdUcfLv884Fw5NC5CGr4/9If/9gS4gKirk+GFKuldruDlGrBzglEoY43m8?=
- =?us-ascii?Q?MPS+SNlzPlbe5YK3jNThKGST2cT4CSzdR/mBKnuHdaeAG041vcK37eR2zTJk?=
- =?us-ascii?Q?oSZn2VJkMeBxiwDGTzaygenLe80wTo22ao2SVzRhgvMHuD090q+pbZFS/Mcf?=
- =?us-ascii?Q?jtT95ca4vYVofk7Bqgc65r/gukIhzdQCybMixN1S/+4Gy7H59G2oW7uHJNjO?=
- =?us-ascii?Q?M33hqkR+TWpiUO0MZ1IjfY7e0sMw8r7mSB2LE9AG6Z/4Hb/22c1N10qQcent?=
- =?us-ascii?Q?rQI5YLYmZxj8+4Ah2atJRFCp3So12IYfJUzqcBfHfh1L87LF1F3uCxJMtk+J?=
- =?us-ascii?Q?wcKaAobcteBHf6AOPsUE/Bp6iZ7jKn3g2Q1hxGwvobDvIuSPoIZ5A98+nv9R?=
- =?us-ascii?Q?YFBMKN7jhe7Nj55wn8RVbj3bNvG/wHFZlY8G7W3G37NojamIjYsJk9Kf2BKs?=
- =?us-ascii?Q?Q3XEJcb5YxOUEB3upYazpYv6BCJnSlXTxJfkGFcBYsfZrp/qNGlW10LzT8AO?=
- =?us-ascii?Q?9IVMePvvV+tgeusEauFhkhUzgolpgzGHZNa5jdebzBhkxa5DQ18sowGrCHMO?=
- =?us-ascii?Q?dKRqm7Hy+DbHw7TsUwtGXTJaepxU83tVPm7nBEwXgEsvnnTPmB+3igRQmy7e?=
- =?us-ascii?Q?x7oV+0YeZUMr53Sg0AWbIwX5t41AdboAAOIUKty8djdORLtJp3t26mvqI6+H?=
- =?us-ascii?Q?ciVQz+u4ayU/RWmUfOCvEoYiaOcKdmgfCvoIFx8wnfNoWYfwL4N8UeewHOpE?=
- =?us-ascii?Q?mmuy8VnE89mQ3fUBTgNC7VpZExYihr0qIMWqJ0697d5ZaDWC0c+OLZwJq+rB?=
- =?us-ascii?Q?G4QKRy/r1vbnFSwma2AHLZdHg9kHmh3IOrkYnZvM3nFBY9TS1QjKbyMrwkGp?=
- =?us-ascii?Q?Zfig9DoIeJnzUYmcckwPFcCw3xL1x98jTVppkOObFhWYQZlEhRSpmfisNaGm?=
- =?us-ascii?Q?dolfxGAk1tNCYUGRRalucOwqMn1N4hOLlA9Y1J8xBW3o35wbLjNeLF9pHOPF?=
- =?us-ascii?Q?BdixBtDf5ZRIkDIlc+XIAGNPPbOo2eeeFWdjWDotyR1VZZ1Zz8EMNa96F7Gi?=
- =?us-ascii?Q?1L4FSi1ApdLuoP0v/pNz72DhKlnqTl/MCIKv0c1ddWLJeSDApvM+7Mbq/Knd?=
- =?us-ascii?Q?suaQI4WfOEFTUZ6ACD4g0wYWcftmkqaHXXs5IWgdHpsue7GlUS2mO5+Dh1Lq?=
- =?us-ascii?Q?2SvsJg0Ooe+peqg0h8T4IX67CqTJ7JqfuF3IEOEFfPtwNpMGTpBfMmvk82oE?=
- =?us-ascii?Q?BU57eOVUMKwvbA5NNY/rltJ6kJXhQacwnha7LuXm5j4ZNKzaUh8sfBNvGzfP?=
- =?us-ascii?Q?SHasezfl/XKz09SpiOztCQG/r3VNfvJfWYq0BJ4CTcQ6CC/9hXsMvp5HhHjh?=
- =?us-ascii?Q?Gyq1YnFp4L0smdbKgAiXvPIbX0hMxg6FB5dyO81qbSxE1zJj7xT6Jc7j/lhn?=
- =?us-ascii?Q?5q6QY1s1IMPYvuWO+I310ZY1za2zvnZWjGt/WQgFQJkxMtcbY4vtloKua9hq?=
- =?us-ascii?Q?+d8Ua4yr8Zofk4yax6Q=3D?=
+	=?us-ascii?Q?t771rNcGnYlLEDHERF9b1emytZ0VEXp6+40S9jusIJmTOp4rkoP/YujWnJGl?=
+ =?us-ascii?Q?1Of0uhowIb95OyZKGtn1QT5tvWWCsSscIrce/WN5YQXCY13XQ6rl5GE4Whcs?=
+ =?us-ascii?Q?KkFP10wIsO9FjWUYsorVJ4ZiKBX4NRFCTrFGQ4IZH+XHKdxbqXUdPW8ReX95?=
+ =?us-ascii?Q?W7slvF4cG+PxzzScqPeW8RnKo+PO5FBu/CSaH/K9se7+ujMean5sdxCbQazJ?=
+ =?us-ascii?Q?sWw5PKCBVF+qYI+9TZcdxbstSKJsXvaisYR7OElnCdz1SSqOt7/yJ1Jm+ex9?=
+ =?us-ascii?Q?iXRQeG1vRALKMQDmRQL7ow+ZC9YSqjRrg1YcIZamtD81/jgqzO+Noi8fZV4S?=
+ =?us-ascii?Q?oL8b9KRWqVfQm4/cNdpN/+kT5tV+UhSw982D03IZ62iya/XNtFpkTfL4Evhl?=
+ =?us-ascii?Q?PdqooX3U/+9KC/hMBAu25VngNWMqC08anT/Kq55qGFyt6pYSlCSEgmFb5WYW?=
+ =?us-ascii?Q?uUXLmgoWcjdggrQ7x9ZRzSsmcjS+bwBrqDIVlHfKh1UMPe/bPBkudLm8qECJ?=
+ =?us-ascii?Q?kU1X7IgDYy3xRGRbF2T+hGVWsuWs3IraLIuVLbryVxBpR3tniykchEQq443k?=
+ =?us-ascii?Q?tCK/rx/0eXVehyIENPhwNUQYiQJQaYqWpPlDVOpD794iPSDAwwrXW0b3Pt3b?=
+ =?us-ascii?Q?JbixskvsmUpw3uhCel1YwNHfAvhoDtNzv1zexqb7eastICtNW3slfDRCVnaE?=
+ =?us-ascii?Q?QquWi9ViMXdzXi51d8FrAb5UYmRNBDvLXmgZbWqmrYBZKsIJ4wykbn/pokAS?=
+ =?us-ascii?Q?gNF2ycW/epJuccK9VWBlhThZHHCSeHp7UD1Je+ZK7MvPFRYxHX5m5WJNlnfa?=
+ =?us-ascii?Q?mSM3akIL6MMUjto7A46M6oTLSCOHsKakPj3JcIfTQ3mRQCjWBM1yjAe6jPCC?=
+ =?us-ascii?Q?QYF6v18KILUWYt+sqXwahOABF87a7HTsWrU6mYvsRqRZvmLW3bbUthX1+UQi?=
+ =?us-ascii?Q?qlgOeuhOAzjl0CMWhR4oUSZFJAwSefmzCS6ZWBb6/yAVlRuBS5y8fBsD9DjE?=
+ =?us-ascii?Q?zwdBA4zpPJi1FUVJRL+Ufmqrnu+5Ui7xGIeABWnqa4eFS51wkAeZSXhONCoY?=
+ =?us-ascii?Q?/eyHY9LntiQ2XOjLQOZrVyK8EPJOqHL2QWGmWCiydi0LamAhYzsEyPtaTwk3?=
+ =?us-ascii?Q?h8Xu/BtXvs3X/7PeMJT8sZrzwLlKSAvykGaFBHF8NbXTNs6c9AO5MO3pOxuV?=
+ =?us-ascii?Q?W/sXGuFELh6g8a2rX+fWNz+UjbZkGgPooyZ9MGlZA9Zp9HXK/vSTxWgAtk00?=
+ =?us-ascii?Q?tDOPSNT/OSX2eDubsRb44GSMwcH7GdsIQ+y80w6AxVh5BZ2yiFZuC23UsmX2?=
+ =?us-ascii?Q?5/j9oaG8Hqwa+5y1rJR+h2YYDL/DrbS2vrtkx3lMFN2j/FZOFlWesx4+MKby?=
+ =?us-ascii?Q?MSd35bK0iX2vosPHQTc9Igg7ZtMzU0hhVKE1WDHKDFyzzIbNBLvEpFjjAEiT?=
+ =?us-ascii?Q?7UgyEFOUrILYfzeMKe9aBZQsDPTBGgXN2eKVnAsBdlGpLe+sNUuuQlAv3zOj?=
+ =?us-ascii?Q?5qCEbgqMtnGtu8h9XDEgeQ/0lSwDPDK4Xw5McCAzOO3sj4PEV7Z0LRjmhVno?=
+ =?us-ascii?Q?Q2xylgtNuQ2VgA6OU+U=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(376014)(82310400026)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(36860700013)(82310400026)(1800799024)(7142099003)(7053199007);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jan 2026 13:37:31.9650
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jan 2026 13:37:37.6707
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f4baa314-6d66-4399-cabd-08de51dfbcd9
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1e7a7f0f-7df9-4fde-d95b-08de51dfc03f
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DS2PEPF00003445.namprd04.prod.outlook.com
+	DS2PEPF00003443.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4179
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8118
 
-Add a best-effort stop command, UBLK_CMD_TRY_STOP_DEV, which only stops a
-ublk device when it has no active openers.
+From: Ming Lei <ming.lei@redhat.com>
 
-Unlike UBLK_CMD_STOP_DEV, this command does not disrupt existing users.
-New opens are blocked only after disk_openers has reached zero; if the
-device is busy, the command returns -EBUSY and leaves it running.
+Add 'stop' subcommand to kublk utility that uses the new
+UBLK_CMD_TRY_STOP_DEV command when --safe option is specified.
+This allows stopping a device only if it has no active openers,
+returning -EBUSY otherwise.
 
-The ub->block_open flag is used only to close a race with an in-progress
-open and does not otherwise change open behavior.
+Also add test_generic_16.sh to test the new functionality.
 
-Advertise support via the UBLK_F_SAFE_STOP_DEV feature flag.
-
-Signed-off-by: Yoav Cohen <yoav@nvidia.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/ublk_drv.c      | 44 +++++++++++++++++++++++++++++++++--
- include/uapi/linux/ublk_cmd.h |  9 ++++++-
- 2 files changed, 50 insertions(+), 3 deletions(-)
+ tools/testing/selftests/ublk/Makefile         |  1 +
+ tools/testing/selftests/ublk/kublk.c          | 53 +++++++++++++++++
+ tools/testing/selftests/ublk/kublk.h          |  1 +
+ .../testing/selftests/ublk/test_generic_16.sh | 57 +++++++++++++++++++
+ 4 files changed, 112 insertions(+)
+ create mode 100755 tools/testing/selftests/ublk/test_generic_16.sh
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 2d5602ef05cc..f91e70aa402e 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -54,6 +54,7 @@
- #define UBLK_CMD_DEL_DEV_ASYNC	_IOC_NR(UBLK_U_CMD_DEL_DEV_ASYNC)
- #define UBLK_CMD_UPDATE_SIZE	_IOC_NR(UBLK_U_CMD_UPDATE_SIZE)
- #define UBLK_CMD_QUIESCE_DEV	_IOC_NR(UBLK_U_CMD_QUIESCE_DEV)
-+#define UBLK_CMD_TRY_STOP_DEV	_IOC_NR(UBLK_U_CMD_TRY_STOP_DEV)
+diff --git a/tools/testing/selftests/ublk/Makefile b/tools/testing/selftests/ublk/Makefile
+index 06ba6fde098d..e9614f77b809 100644
+--- a/tools/testing/selftests/ublk/Makefile
++++ b/tools/testing/selftests/ublk/Makefile
+@@ -23,6 +23,7 @@ TEST_PROGS += test_generic_12.sh
+ TEST_PROGS += test_generic_13.sh
+ TEST_PROGS += test_generic_14.sh
+ TEST_PROGS += test_generic_15.sh
++TEST_PROGS += test_generic_16.sh
  
- #define UBLK_IO_REGISTER_IO_BUF		_IOC_NR(UBLK_U_IO_REGISTER_IO_BUF)
- #define UBLK_IO_UNREGISTER_IO_BUF	_IOC_NR(UBLK_U_IO_UNREGISTER_IO_BUF)
-@@ -73,7 +74,8 @@
- 		| UBLK_F_AUTO_BUF_REG \
- 		| UBLK_F_QUIESCE \
- 		| UBLK_F_PER_IO_DAEMON \
--		| UBLK_F_BUF_REG_OFF_DAEMON)
-+		| UBLK_F_BUF_REG_OFF_DAEMON \
-+		| UBLK_F_SAFE_STOP_DEV)
+ TEST_PROGS += test_null_01.sh
+ TEST_PROGS += test_null_02.sh
+diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftests/ublk/kublk.c
+index 185ba553686a..c217745b0523 100644
+--- a/tools/testing/selftests/ublk/kublk.c
++++ b/tools/testing/selftests/ublk/kublk.c
+@@ -107,6 +107,15 @@ static int ublk_ctrl_stop_dev(struct ublk_dev *dev)
+ 	return __ublk_ctrl_cmd(dev, &data);
+ }
  
- #define UBLK_F_ALL_RECOVERY_FLAGS (UBLK_F_USER_RECOVERY \
- 		| UBLK_F_USER_RECOVERY_REISSUE \
-@@ -239,6 +241,8 @@ struct ublk_device {
- 	struct delayed_work	exit_work;
- 	struct work_struct	partition_scan_work;
- 
-+	bool			block_open; /* protected by open_mutex */
++static int ublk_ctrl_try_stop_dev(struct ublk_dev *dev)
++{
++	struct ublk_ctrl_cmd_data data = {
++		.cmd_op	= UBLK_U_CMD_TRY_STOP_DEV,
++	};
 +
- 	struct ublk_queue       *queues[];
- };
- 
-@@ -919,6 +923,9 @@ static int ublk_open(struct gendisk *disk, blk_mode_t mode)
- 			return -EPERM;
- 	}
- 
-+	if (ub->block_open)
-+		return -ENXIO;
++	return __ublk_ctrl_cmd(dev, &data);
++}
 +
+ static int ublk_ctrl_start_dev(struct ublk_dev *dev,
+ 		int daemon_pid)
+ {
+@@ -1392,6 +1401,42 @@ static int cmd_dev_del(struct dev_ctx *ctx)
  	return 0;
  }
  
-@@ -3188,7 +3195,8 @@ static int ublk_ctrl_add_dev(const struct ublksrv_ctrl_cmd *header)
- 	ub->dev_info.flags |= UBLK_F_CMD_IOCTL_ENCODE |
- 		UBLK_F_URING_CMD_COMP_IN_TASK |
- 		UBLK_F_PER_IO_DAEMON |
--		UBLK_F_BUF_REG_OFF_DAEMON;
-+		UBLK_F_BUF_REG_OFF_DAEMON |
-+		UBLK_F_SAFE_STOP_DEV;
- 
- 	/* GET_DATA isn't needed any more with USER_COPY or ZERO COPY */
- 	if (ub->dev_info.flags & (UBLK_F_USER_COPY | UBLK_F_SUPPORT_ZERO_COPY |
-@@ -3309,6 +3317,34 @@ static void ublk_ctrl_stop_dev(struct ublk_device *ub)
- 	ublk_stop_dev(ub);
- }
- 
-+static int ublk_ctrl_try_stop_dev(struct ublk_device *ub)
++static int cmd_dev_stop(struct dev_ctx *ctx)
 +{
-+	struct gendisk *disk;
-+	int ret = 0;
++	int number = ctx->dev_id;
++	struct ublk_dev *dev;
++	int ret;
 +
-+	disk = ublk_get_disk(ub);
-+	if (!disk)
-+		return -ENODEV;
-+
-+	mutex_lock(&disk->open_mutex);
-+	if (disk_openers(disk) > 0) {
-+		ret = -EBUSY;
-+		goto unlock;
++	if (number < 0) {
++		ublk_err("%s: device id is required\n", __func__);
++		return -EINVAL;
 +	}
-+	ub->block_open = true;
-+	/* release open_mutex as del_gendisk() will reacquire it */
-+	mutex_unlock(&disk->open_mutex);
 +
-+	ublk_ctrl_stop_dev(ub);
-+	goto out;
++	dev = ublk_ctrl_init();
++	dev->dev_info.dev_id = number;
 +
-+unlock:
-+	mutex_unlock(&disk->open_mutex);
-+out:
-+	ublk_put_disk(disk);
++	ret = ublk_ctrl_get_info(dev);
++	if (ret < 0)
++		goto fail;
++
++	if (ctx->safe_stop) {
++		ret = ublk_ctrl_try_stop_dev(dev);
++		if (ret < 0)
++			ublk_err("%s: try_stop dev %d failed ret %d\n",
++					__func__, number, ret);
++	} else {
++		ret = ublk_ctrl_stop_dev(dev);
++		if (ret < 0)
++			ublk_err("%s: stop dev %d failed ret %d\n",
++					__func__, number, ret);
++	}
++
++fail:
++	ublk_ctrl_deinit(dev);
++
 +	return ret;
 +}
 +
- static int ublk_ctrl_get_dev_info(struct ublk_device *ub,
- 		const struct ublksrv_ctrl_cmd *header)
+ static int __cmd_dev_list(struct dev_ctx *ctx)
  {
-@@ -3704,6 +3740,7 @@ static int ublk_ctrl_uring_cmd_permission(struct ublk_device *ub,
- 	case UBLK_CMD_END_USER_RECOVERY:
- 	case UBLK_CMD_UPDATE_SIZE:
- 	case UBLK_CMD_QUIESCE_DEV:
-+	case UBLK_CMD_TRY_STOP_DEV:
- 		mask = MAY_READ | MAY_WRITE;
- 		break;
- 	default:
-@@ -3817,6 +3854,9 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
- 	case UBLK_CMD_QUIESCE_DEV:
- 		ret = ublk_ctrl_quiesce_dev(ub, header);
- 		break;
-+	case UBLK_CMD_TRY_STOP_DEV:
-+		ret = ublk_ctrl_try_stop_dev(ub);
-+		break;
- 	default:
- 		ret = -EOPNOTSUPP;
- 		break;
-diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
-index ec77dabba45b..9daa8ab372f0 100644
---- a/include/uapi/linux/ublk_cmd.h
-+++ b/include/uapi/linux/ublk_cmd.h
-@@ -55,7 +55,8 @@
- 	_IOWR('u', 0x15, struct ublksrv_ctrl_cmd)
- #define UBLK_U_CMD_QUIESCE_DEV		\
- 	_IOWR('u', 0x16, struct ublksrv_ctrl_cmd)
--
-+#define UBLK_U_CMD_TRY_STOP_DEV		\
-+	_IOWR('u', 0x17, struct ublksrv_ctrl_cmd)
- /*
-  * 64bits are enough now, and it should be easy to extend in case of
-  * running out of feature flags
-@@ -311,6 +312,12 @@
-  */
- #define UBLK_F_BUF_REG_OFF_DAEMON (1ULL << 14)
+ 	struct ublk_dev *dev = ublk_ctrl_init();
+@@ -1454,6 +1499,7 @@ static int cmd_dev_get_features(void)
+ 		FEAT_NAME(UBLK_F_QUIESCE),
+ 		FEAT_NAME(UBLK_F_PER_IO_DAEMON),
+ 		FEAT_NAME(UBLK_F_BUF_REG_OFF_DAEMON),
++		FEAT_NAME(UBLK_F_SAFE_STOP_DEV)
+ 	};
+ 	struct ublk_dev *dev;
+ 	__u64 features = 0;
+@@ -1581,6 +1627,8 @@ static int cmd_dev_help(char *exe)
  
-+/*
-+ * The device supports the UBLK_CMD_TRY_STOP_DEV command, which
-+ * allows stopping the device only if there are no openers.
-+ */
-+#define UBLK_F_SAFE_STOP_DEV	(1ULL << 17)
+ 	printf("%s del [-n dev_id] -a \n", exe);
+ 	printf("\t -a delete all devices -n delete specified device\n\n");
++	printf("%s stop -n dev_id [--safe]\n", exe);
++	printf("\t --safe only stop if device has no active openers\n\n");
+ 	printf("%s list [-n dev_id] -a \n", exe);
+ 	printf("\t -a list all devices, -n list specified device, default -a \n\n");
+ 	printf("%s features\n", exe);
+@@ -1612,6 +1660,7 @@ int main(int argc, char *argv[])
+ 		{ "nthreads",		1,	NULL,  0 },
+ 		{ "per_io_tasks",	0,	NULL,  0 },
+ 		{ "no_ublk_fixed_fd",	0,	NULL,  0 },
++		{ "safe",		0,	NULL,  0 },
+ 		{ 0, 0, 0, 0 }
+ 	};
+ 	const struct ublk_tgt_ops *ops = NULL;
+@@ -1696,6 +1745,8 @@ int main(int argc, char *argv[])
+ 				ctx.per_io_tasks = 1;
+ 			if (!strcmp(longopts[option_idx].name, "no_ublk_fixed_fd"))
+ 				ctx.no_ublk_fixed_fd = 1;
++			if (!strcmp(longopts[option_idx].name, "safe"))
++				ctx.safe_stop = 1;
+ 			break;
+ 		case '?':
+ 			/*
+@@ -1763,6 +1814,8 @@ int main(int argc, char *argv[])
+ 		}
+ 	} else if (!strcmp(cmd, "del"))
+ 		ret = cmd_dev_del(&ctx);
++	else if (!strcmp(cmd, "stop"))
++		ret = cmd_dev_stop(&ctx);
+ 	else if (!strcmp(cmd, "list")) {
+ 		ctx.all = 1;
+ 		ret = cmd_dev_list(&ctx);
+diff --git a/tools/testing/selftests/ublk/kublk.h b/tools/testing/selftests/ublk/kublk.h
+index 8a83b90ec603..4b6b4992f78e 100644
+--- a/tools/testing/selftests/ublk/kublk.h
++++ b/tools/testing/selftests/ublk/kublk.h
+@@ -78,6 +78,7 @@ struct dev_ctx {
+ 	unsigned int	auto_zc_fallback:1;
+ 	unsigned int	per_io_tasks:1;
+ 	unsigned int	no_ublk_fixed_fd:1;
++	unsigned int	safe_stop:1;
+ 
+ 	int _evtfd;
+ 	int _shmid;
+diff --git a/tools/testing/selftests/ublk/test_generic_16.sh b/tools/testing/selftests/ublk/test_generic_16.sh
+new file mode 100755
+index 000000000000..e08af7b685c9
+--- /dev/null
++++ b/tools/testing/selftests/ublk/test_generic_16.sh
+@@ -0,0 +1,57 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
 +
- /* device state */
- #define UBLK_S_DEV_DEAD	0
- #define UBLK_S_DEV_LIVE	1
++. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
++
++TID="generic_16"
++ERR_CODE=0
++
++_prep_test "null" "stop --safe command"
++
++# Check if SAFE_STOP_DEV feature is supported
++if ! _have_feature "SAFE_STOP_DEV"; then
++	_cleanup_test "null"
++	exit "$UBLK_SKIP_CODE"
++fi
++
++# Test 1: stop --safe on idle device should succeed
++dev_id=$(_add_ublk_dev -t null -q 2 -d 32)
++_check_add_dev $TID $?
++
++# Device is idle (no openers), stop --safe should succeed
++if ! ${UBLK_PROG} stop -n "${dev_id}" --safe; then
++	echo "stop --safe on idle device failed unexpectedly!"
++	ERR_CODE=255
++fi
++
++# Clean up device
++${UBLK_PROG} del -n "${dev_id}" > /dev/null 2>&1
++udevadm settle
++
++# Test 2: stop --safe on device with active opener should fail
++dev_id=$(_add_ublk_dev -t null -q 2 -d 32)
++_check_add_dev $TID $?
++
++# Open device in background (dd reads indefinitely)
++dd if=/dev/ublkb${dev_id} of=/dev/null bs=4k iflag=direct > /dev/null 2>&1 &
++dd_pid=$!
++
++# Give dd time to start
++sleep 0.2
++
++# Device has active opener, stop --safe should fail with -EBUSY
++if ${UBLK_PROG} stop -n "${dev_id}" --safe 2>/dev/null; then
++	echo "stop --safe on busy device succeeded unexpectedly!"
++	ERR_CODE=255
++fi
++
++# Kill dd and clean up
++kill $dd_pid 2>/dev/null
++wait $dd_pid 2>/dev/null
++
++# Now device should be idle, regular delete should work
++${UBLK_PROG} del -n "${dev_id}"
++udevadm settle
++
++_cleanup_test "null"
++_show_result $TID $ERR_CODE
 -- 
 2.39.5 (Apple Git-154)
 
