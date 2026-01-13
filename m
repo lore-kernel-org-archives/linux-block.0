@@ -1,288 +1,56 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25F03369235;
-	Tue, 13 Jan 2026 07:19:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEE641BC08F;
+	Tue, 13 Jan 2026 07:24:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768288772; cv=none; b=tAsfQ5uJ3xpi9cJiYf/3V/bswytUVIsfjVz1LqFkU3M8NP2HxIy5TtqZtOzR29liqXE59L7XmOFSl2Z8GqkyJbYJH8HmqjywjDdMpNKmrX1cYIxP0N+0oUNMC//JR6rhUAwIxfNeEf7CnvtAsI1t0cqje33VfsN40HUmTgMzx7k=
+	t=1768289055; cv=none; b=upgi1ajenc8utxgtZQKxepAxwqp6CV2L5XSOho7wvEQO0U9Qt9DaH5ndc/eye8E9FoyCmtK9CchtqeKB8DO/UuFtszf4kc6e8J5lwWtgD29vn9Bta7qnuMmanMWueJ5E/TB7OWYVNHp/R+Yeytd6riP9Wg2yjIOKO0rTk8AGQ9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768288772; c=relaxed/simple;
-	bh=4mVRpY88Lj9/FT1or2G0lqhkDAAp4pgzkfYXWsGepMI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LUT7+NzAQ3xN1u+ZjK7dBbnvcOELLOOG1sGi7rJ09dhGfoioxfhokVSEokycdKJ7MGL1DPVVhhTbFz8csloF+3rAGuX61SW6i9ag2i56V8Qfp8zolz0hW9tUNeYCTLuKfvFCfwm1qsnKxD5WcFxNlHVy5Asd/ZGYKfyYPLIH5Xg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=3bHkWhFB; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="3bHkWhFB"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=64cTiCnmO7C8yaGsdUiGI1y3RyvfmSSKUQw47GI9fcg=; b=3bHkWhFBHda/CEEHzpAGP5ujZy
-	TxAlbsWmhhlAbPgdeil0QZlUe7PAtOeScRTvCsn8vtwW73i7KKkmBOr3Et0m1hfrvJ2/AjQ+m85qG
-	UJJZX/677IHjgQI7xC1u3zoLh2Y0Wb7OG1zRr8msQ4e9ENCTmAe70tAmBLO7w015NR127wlfgUIjv
-	v35gOjeWp5Xdjn4iDToCLfA6j+0cM/xEtRkIByxUUbubvO9n+k04HF14eOx4EOn6JfcAo2MlNQtBf
-	sZJogfOrB7dvNA9XCFyO85x4EWlK7OBN8HYltHnLmB1E/0rya72epcAbAh8w68IFDjx88H+Zvn7tp
-	ZELHealg==;
-Received: from 2a02-8389-2341-5b80-d601-7564-c2e0-491c.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:d601:7564:c2e0:491c] helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vfYgc-00000006dZc-2JlR;
-	Tue, 13 Jan 2026 07:19:30 +0000
+	s=arc-20240116; t=1768289055; c=relaxed/simple;
+	bh=qJlSVSZIA/vsqZj27L0xVgR++YJ1Ii2BRw2zRW2TCw4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CIP3DXvOFBR+b3t982QeLSFhbRFLPVZtidu+sNUaSIL1ZRctQcahKMPibtv1wY/8zVn07hZGj6y56GkI4R3qjCuhdBmjk+vwOkxbLcJyxqpRJ0dp2ozPQHpz9pyH6QAB2uygIFCcMuICXSyxBBEacBTi+jTkyvPzV4/B2g6HKls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 7B3B267373; Tue, 13 Jan 2026 08:24:09 +0100 (CET)
+Date: Tue, 13 Jan 2026 08:24:08 +0100
 From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>,
-	Carlos Maiolino <cem@kernel.org>
-Cc: Damien Le Moal <dlemoal@kernel.org>,
-	Hans Holmberg <hans.holmberg@wdc.com>,
-	linux-block@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	Carlos Maiolino <cmaiolino@redhat.com>
-Subject: [PATCH 3/3] xfs: rework zone GC buffer management
-Date: Tue, 13 Jan 2026 08:19:03 +0100
-Message-ID: <20260113071912.3158268-4-hch@lst.de>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260113071912.3158268-1-hch@lst.de>
-References: <20260113071912.3158268-1-hch@lst.de>
+To: Nitesh Shetty <nj.shetty@samsung.com>
+Cc: Damien Le Moal <dlemoal@kernel.org>, Keith Busch <kbusch@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>, nitheshshetty@gmail.com,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-nvme@lists.infradead.org
+Subject: Re: [PATCH 2/2] nvme: blk_rq_dma_map_iter_next is no longer using
+ iova state
+Message-ID: <20260113072408.GA26776@lst.de>
+References: <20260112135736.1982406-1-nj.shetty@samsung.com> <CGME20260112140208epcas5p4c3ef0209b01be379c836f705a10efa7d@epcas5p4.samsung.com> <20260112135736.1982406-2-nj.shetty@samsung.com> <5b07dbce-2644-4079-a768-9167cbe3e25a@kernel.org> <20260112142822.tk34ei4evgypw3qv@green245.gost>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20260112142822.tk34ei4evgypw3qv@green245.gost>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-The double buffering where just one scratch area is used at a time does
-not efficiently use the available memory.  It was originally implemented
-when GC I/O could happen out of order, but that was removed before
-upstream submission to avoid fragmentation.  Now that all GC I/Os are
-processed in order, just use a number of buffers as a simple ring buffer.
+On Mon, Jan 12, 2026 at 07:58:22PM +0530, Nitesh Shetty wrote:
+>> Hu... Why is this not squashed with the previous patch ? If only patch 1 is
+>> applied, this will not compile, right ?
+>>
+> I couldn’t decide whether to use the layering convention or a unified patch,
+> so I chose one patch per layer.
+> Agreed, independently this doesn't compile, merging make sense.
+> I will resend.
 
-For a synthetic benchmark that fills 256MiB HDD zones and punches out
-holes to free half the space this leads to a decrease of GC time by
-a little more than 25%.
+Rule number one is: don't break compilation after each step.
+Everything else is secondary.
 
-Thanks to Hans Holmberg <hans.holmberg@wdc.com> for testing and
-benchmarking.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Hans Holmberg <hans.holmberg@wdc.com>
-Reviewed-by: Carlos Maiolino <cmaiolino@redhat.com>
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
----
- fs/xfs/xfs_zone_gc.c | 106 ++++++++++++++++++++++++-------------------
- 1 file changed, 59 insertions(+), 47 deletions(-)
-
-diff --git a/fs/xfs/xfs_zone_gc.c b/fs/xfs/xfs_zone_gc.c
-index 40408b1132e0..960cf79d484e 100644
---- a/fs/xfs/xfs_zone_gc.c
-+++ b/fs/xfs/xfs_zone_gc.c
-@@ -50,23 +50,11 @@
-  */
- 
- /*
-- * Size of each GC scratch pad.  This is also the upper bound for each
-- * GC I/O, which helps to keep latency down.
-+ * Size of each GC scratch allocation, and the number of buffers.
-  */
--#define XFS_GC_CHUNK_SIZE	SZ_1M
--
--/*
-- * Scratchpad data to read GCed data into.
-- *
-- * The offset member tracks where the next allocation starts, and freed tracks
-- * the amount of space that is not used anymore.
-- */
--#define XFS_ZONE_GC_NR_SCRATCH	2
--struct xfs_zone_scratch {
--	struct folio			*folio;
--	unsigned int			offset;
--	unsigned int			freed;
--};
-+#define XFS_GC_BUF_SIZE		SZ_1M
-+#define XFS_GC_NR_BUFS		2
-+static_assert(XFS_GC_NR_BUFS < BIO_MAX_VECS);
- 
- /*
-  * Chunk that is read and written for each GC operation.
-@@ -141,10 +129,14 @@ struct xfs_zone_gc_data {
- 	struct bio_set			bio_set;
- 
- 	/*
--	 * Scratchpad used, and index to indicated which one is used.
-+	 * Scratchpad to buffer GC data, organized as a ring buffer over
-+	 * discontiguous folios.  scratch_head is where the buffer is filled,
-+	 * and scratch_tail tracks the buffer space freed.
- 	 */
--	struct xfs_zone_scratch		scratch[XFS_ZONE_GC_NR_SCRATCH];
--	unsigned int			scratch_idx;
-+	struct folio			*scratch_folios[XFS_GC_NR_BUFS];
-+	unsigned int			scratch_size;
-+	unsigned int			scratch_head;
-+	unsigned int			scratch_tail;
- 
- 	/*
- 	 * List of bios currently being read, written and reset.
-@@ -210,20 +202,16 @@ xfs_zone_gc_data_alloc(
- 	if (!data->iter.recs)
- 		goto out_free_data;
- 
--	/*
--	 * We actually only need a single bio_vec.  It would be nice to have
--	 * a flag that only allocates the inline bvecs and not the separate
--	 * bvec pool.
--	 */
- 	if (bioset_init(&data->bio_set, 16, offsetof(struct xfs_gc_bio, bio),
- 			BIOSET_NEED_BVECS))
- 		goto out_free_recs;
--	for (i = 0; i < XFS_ZONE_GC_NR_SCRATCH; i++) {
--		data->scratch[i].folio =
--			folio_alloc(GFP_KERNEL, get_order(XFS_GC_CHUNK_SIZE));
--		if (!data->scratch[i].folio)
-+	for (i = 0; i < XFS_GC_NR_BUFS; i++) {
-+		data->scratch_folios[i] =
-+			folio_alloc(GFP_KERNEL, get_order(XFS_GC_BUF_SIZE));
-+		if (!data->scratch_folios[i])
- 			goto out_free_scratch;
- 	}
-+	data->scratch_size = XFS_GC_BUF_SIZE * XFS_GC_NR_BUFS;
- 	INIT_LIST_HEAD(&data->reading);
- 	INIT_LIST_HEAD(&data->writing);
- 	INIT_LIST_HEAD(&data->resetting);
-@@ -232,7 +220,7 @@ xfs_zone_gc_data_alloc(
- 
- out_free_scratch:
- 	while (--i >= 0)
--		folio_put(data->scratch[i].folio);
-+		folio_put(data->scratch_folios[i]);
- 	bioset_exit(&data->bio_set);
- out_free_recs:
- 	kfree(data->iter.recs);
-@@ -247,8 +235,8 @@ xfs_zone_gc_data_free(
- {
- 	int			i;
- 
--	for (i = 0; i < XFS_ZONE_GC_NR_SCRATCH; i++)
--		folio_put(data->scratch[i].folio);
-+	for (i = 0; i < XFS_GC_NR_BUFS; i++)
-+		folio_put(data->scratch_folios[i]);
- 	bioset_exit(&data->bio_set);
- 	kfree(data->iter.recs);
- 	kfree(data);
-@@ -590,7 +578,12 @@ static unsigned int
- xfs_zone_gc_scratch_available(
- 	struct xfs_zone_gc_data	*data)
- {
--	return XFS_GC_CHUNK_SIZE - data->scratch[data->scratch_idx].offset;
-+	if (!data->scratch_tail)
-+		return data->scratch_size - data->scratch_head;
-+
-+	if (!data->scratch_head)
-+		return data->scratch_tail;
-+	return (data->scratch_size - data->scratch_head) + data->scratch_tail;
- }
- 
- static bool
-@@ -664,6 +657,28 @@ xfs_zone_gc_alloc_blocks(
- 	return oz;
- }
- 
-+static void
-+xfs_zone_gc_add_data(
-+	struct xfs_gc_bio	*chunk)
-+{
-+	struct xfs_zone_gc_data	*data = chunk->data;
-+	unsigned int		len = chunk->len;
-+	unsigned int		off = data->scratch_head;
-+
-+	do {
-+		unsigned int	this_off = off % XFS_GC_BUF_SIZE;
-+		unsigned int	this_len = min(len, XFS_GC_BUF_SIZE - this_off);
-+
-+		bio_add_folio_nofail(&chunk->bio,
-+				data->scratch_folios[off / XFS_GC_BUF_SIZE],
-+				this_len, this_off);
-+		len -= this_len;
-+		off += this_len;
-+		if (off == data->scratch_size)
-+			off = 0;
-+	} while (len);
-+}
-+
- static bool
- xfs_zone_gc_start_chunk(
- 	struct xfs_zone_gc_data	*data)
-@@ -677,6 +692,7 @@ xfs_zone_gc_start_chunk(
- 	struct xfs_inode	*ip;
- 	struct bio		*bio;
- 	xfs_daddr_t		daddr;
-+	unsigned int		len;
- 	bool			is_seq;
- 
- 	if (xfs_is_shutdown(mp))
-@@ -691,17 +707,19 @@ xfs_zone_gc_start_chunk(
- 		return false;
- 	}
- 
--	bio = bio_alloc_bioset(bdev, 1, REQ_OP_READ, GFP_NOFS, &data->bio_set);
-+	len = XFS_FSB_TO_B(mp, irec.rm_blockcount);
-+	bio = bio_alloc_bioset(bdev,
-+			min(howmany(len, XFS_GC_BUF_SIZE) + 1, XFS_GC_NR_BUFS),
-+			REQ_OP_READ, GFP_NOFS, &data->bio_set);
- 
- 	chunk = container_of(bio, struct xfs_gc_bio, bio);
- 	chunk->ip = ip;
- 	chunk->offset = XFS_FSB_TO_B(mp, irec.rm_offset);
--	chunk->len = XFS_FSB_TO_B(mp, irec.rm_blockcount);
-+	chunk->len = len;
- 	chunk->old_startblock =
- 		xfs_rgbno_to_rtb(iter->victim_rtg, irec.rm_startblock);
- 	chunk->new_daddr = daddr;
- 	chunk->is_seq = is_seq;
--	chunk->scratch = &data->scratch[data->scratch_idx];
- 	chunk->data = data;
- 	chunk->oz = oz;
- 	chunk->victim_rtg = iter->victim_rtg;
-@@ -710,13 +728,9 @@ xfs_zone_gc_start_chunk(
- 
- 	bio->bi_iter.bi_sector = xfs_rtb_to_daddr(mp, chunk->old_startblock);
- 	bio->bi_end_io = xfs_zone_gc_end_io;
--	bio_add_folio_nofail(bio, chunk->scratch->folio, chunk->len,
--			chunk->scratch->offset);
--	chunk->scratch->offset += chunk->len;
--	if (chunk->scratch->offset == XFS_GC_CHUNK_SIZE) {
--		data->scratch_idx =
--			(data->scratch_idx + 1) % XFS_ZONE_GC_NR_SCRATCH;
--	}
-+	xfs_zone_gc_add_data(chunk);
-+	data->scratch_head = (data->scratch_head + len) % data->scratch_size;
-+
- 	WRITE_ONCE(chunk->state, XFS_GC_BIO_NEW);
- 	list_add_tail(&chunk->entry, &data->reading);
- 	xfs_zone_gc_iter_advance(iter, irec.rm_blockcount);
-@@ -834,6 +848,7 @@ xfs_zone_gc_finish_chunk(
- 	struct xfs_gc_bio	*chunk)
- {
- 	uint			iolock = XFS_IOLOCK_EXCL | XFS_MMAPLOCK_EXCL;
-+	struct xfs_zone_gc_data	*data = chunk->data;
- 	struct xfs_inode	*ip = chunk->ip;
- 	struct xfs_mount	*mp = ip->i_mount;
- 	int			error;
-@@ -845,11 +860,8 @@ xfs_zone_gc_finish_chunk(
- 		return;
- 	}
- 
--	chunk->scratch->freed += chunk->len;
--	if (chunk->scratch->freed == chunk->scratch->offset) {
--		chunk->scratch->offset = 0;
--		chunk->scratch->freed = 0;
--	}
-+	data->scratch_tail =
-+		(data->scratch_tail + chunk->len) % data->scratch_size;
- 
- 	/*
- 	 * Cycle through the iolock and wait for direct I/O and layouts to
--- 
-2.47.3
+Also I'm only seeing patch 2 anyway, and not patch 1.
 
