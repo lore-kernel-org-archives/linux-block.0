@@ -1,47 +1,42 @@
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D89C17BED0
-	for <linux-block@vger.kernel.org>; Tue, 13 Jan 2026 16:34:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FFCC342CB1;
+	Tue, 13 Jan 2026 18:26:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768322076; cv=none; b=gH/kfg6FGY2prc1CqSq5EwnpTh/sfl5BjdMyYNLw8a61A6eROoGeh7k/z7stdSkYsO1cqAquotpgV/q2rH3EQg5DrE/tM2Id31K9RGfc+gdb63uwP1093Eg1lQamHPEZGr1FfyCUKMnbq2vZG2vsSe//18UNQ/nVkw5wi8xMZVM=
+	t=1768328798; cv=none; b=XB6fE0hMcUCrIe051rEVZkaLNJivtuiQeYMaYIHBq9z5AgBl+PQXWeMGlTkQjth9O6V8pHMBQr55O42smlOC1x8aY+WSXwhrAMBKN8ZXlfVSAUBM110agnCC2e3YjVhCCFV+BX5vdJHhZVwi5UNUwWoqOKyRJ8hFSa1SbPSaQFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768322076; c=relaxed/simple;
-	bh=SR1ll+za/ItqGEEW7Gr9NxUxSz3pK8k678ErpIfAKi8=;
+	s=arc-20240116; t=1768328798; c=relaxed/simple;
+	bh=jh7/eYIHMILsLEFfo4BthZi8zyqYrl3uhdHXbRUAmFk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=clEY6dvofB7c2Yk/fF/eWAMlCkvzEBi6ulP70Q90NMAZVeqqxxRIfgHw3gl/vNO+Vez4cSMX0ZqOJWxYf4jlEI/715lWPYe9Ok4DvVnvxLRthnVA0RPSA+54utkuDKuBV8nNifibRQUi9PbGhjSLZ92RslCT/wiE6BvqTvHaRQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=G4mJ4ZxF; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 Content-Type:Content-Disposition:In-Reply-To; b=GLi/6fAM7CspknX/4ymlb9wSHclxL5kqcvfbUpeGYXwtD4dtldJHugRm6R2LViOx0sD4v1LcpVToWI2gA0jh3tZqXnIO0Z578q41L+EDgSWPyH8vJSIyNwQ2KH3IgbZYo9HuH17VEbaVZtwG/piTUL6O8lINa7tuqZ+abfk3xrU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q6GrqHA/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="G4mJ4ZxF"
-Date: Tue, 13 Jan 2026 11:34:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1768322062;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gOAMAdCQyAqdI6Qeoapp+TyKnQv5z0cYHCbTYrmHX1E=;
-	b=G4mJ4ZxF2WfHTgs7+Cw9ZE6igHAKRjKOw7tHkQB4EquAjZAL4abzT6zs6WZcpPsa1sQzzR
-	Kjb1GIORFJAafQIQvP3FRVKf18clYOkqS5JD749hzQ2ZwHOlXxIPIAIh5TLRYfOXFdDE9+
-	h/DA87VwV/LcIAs5iiBcyHRd64oUXZc=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kent Overstreet <kent.overstreet@linux.dev>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Coly Li <colyli@fnnas.com>, axboe@kernel.dk, 
-	linux-block@vger.kernel.org, linux-bcache@vger.kernel.org, 
-	Shida Zhang <zhangshida@kylinos.cn>
-Subject: Re: [PATCH] Revert "bcache: fix improper use of bi_end_io"
-Message-ID: <aWZyWJiOi9hZgtqo@moria.home.lan>
-References: <20260113060940.46489-1-colyli@fnnas.com>
- <aWX9WmRrlaCRuOqy@infradead.org>
- <aWYCe-MJKFaS__vi@moria.home.lan>
- <aWYDnKOdpT6gwL5b@infradead.org>
- <aWYDySBBmQ01JQOk@moria.home.lan>
- <aWYJRsxQcLfEXJlu@infradead.org>
- <aWZwBZaVVBC0otPd@studio.local>
- <aWZyHz_eZWN-yQiD@infradead.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q6GrqHA/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 738B5C116C6;
+	Tue, 13 Jan 2026 18:26:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768328797;
+	bh=jh7/eYIHMILsLEFfo4BthZi8zyqYrl3uhdHXbRUAmFk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=q6GrqHA/OZD057vy4y74WtcRaDgTQi3SIuatkLJSpIHyflAegUY6dFYIwZ5ai3eTh
+	 jIdeRNbMHYj5Rf8MERPbP6inJiiQ4XKXlLgvdSAdpElCehCb9t5OJnhRgjDmuanuQP
+	 6UBAb8aDTtf1qztmjbMS3KV8yDs7E59ceiiWnx0Bo8y5X6/ojKxoQiJVGvOg/L+X/U
+	 FZTBlQaYn5RcNm2HgzUHNbc9Va1JcIPJDZIcAuRBLwVRxSs3ObeeJg0Pu2/bcDBJjA
+	 CxdU6s+lNtDE1jkYzmjAymDOCYRWFZGVKihKab3XcSwSfTFOm19i9quV5nDxFP5Zq/
+	 Hpghpz1dWm78Q==
+Date: Tue, 13 Jan 2026 11:26:35 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Carlos Maiolino <cem@kernel.org>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Hans Holmberg <hans.holmberg@wdc.com>, linux-block@vger.kernel.org,
+	linux-xfs@vger.kernel.org, Carlos Maiolino <cmaiolino@redhat.com>
+Subject: Re: [PATCH 2/3] xfs: use bio_reuse in the zone GC code
+Message-ID: <aWaOW-mjk7uuEcyW@kbusch-mbp>
+References: <20260113071912.3158268-1-hch@lst.de>
+ <20260113071912.3158268-3-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,31 +45,20 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aWZyHz_eZWN-yQiD@infradead.org>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20260113071912.3158268-3-hch@lst.de>
 
-On Tue, Jan 13, 2026 at 08:26:07AM -0800, Christoph Hellwig wrote:
-> On Wed, Jan 14, 2026 at 12:18:45AM +0800, Coly Li wrote:
-> > Hi Christoph,
-> > 
-> > This cloned bio method looks good. Could you please post a formal patch?
-> > Then I may replace the revert commit with your patch.
-> 
-> As usual with bcache I don't really know how to test it to confidently
-> submit it.  Is there an official test suite I can run now.
+On Tue, Jan 13, 2026 at 08:19:02AM +0100, Christoph Hellwig wrote:
+> @@ -825,10 +823,7 @@ xfs_zone_gc_write_chunk(
+>  	WRITE_ONCE(chunk->state, XFS_GC_BIO_NEW);
+>  	list_move_tail(&chunk->entry, &data->writing);
+>  
+> -	bio_reset(&chunk->bio, mp->m_rtdev_targp->bt_bdev, REQ_OP_WRITE);
+> -	bio_add_folio_nofail(&chunk->bio, chunk->scratch->folio, chunk->len,
+> -			offset_in_folio(chunk->scratch->folio, bvec_paddr));
+> -
+> +	bio_reuse(&chunk->bio);
 
-Coly and I were just on a call discussing updating my old test suite. I
-haven't used the bcache tests in > 10 years so they do need to be
-updated, but the harness and related tooling is well supported both for
-local development and has full CI.
-
-https://evilpiepirate.org/git/ktest.git/tree/README.md
-https://evilpiepirate.org/git/ktest.git/tree/tests/bcache/
-
-There's fio verify testing in various modes, reboot tests - there was
-fault injection when I was using it but the fault injection code never
-got merged into mainline.
-
-I wish I could do the updating myself, but I'm neck deep in my own code,
-but as I was just telling Coly I'm always available on IRC to answer
-questions - irc.oftc.net #bcache.
+bio_reuse() uses the previous bio->bi_opf value, so don't you need to
+explicitly override it to REQ_OP_WRITE here? Or maybe bio_reuse() should
+take the desired op as a parameter so it doesn't get doubly initialized
+by the caller.
