@@ -1,122 +1,141 @@
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE99E2F12AB
-	for <linux-block@vger.kernel.org>; Tue, 13 Jan 2026 04:54:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D74A26A0A7
+	for <linux-block@vger.kernel.org>; Tue, 13 Jan 2026 05:27:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768280051; cv=none; b=H6Dj1O/cImfd+DKFM2bBcnSJHB2axEB84s5YBiILWY4u6QkabYEOxl4EI96vjhGTIXgmyXjyet4cLomQmADV/bNPvMAXms6Zn3nKiQzirMF/UwQQf1g+4EfFc6AU1S3IIQc8TmYWA4JCHRc4jg3TtDNkpzjWs1YNuGjBiqEHVNM=
+	t=1768282074; cv=none; b=rDtLCAQwKb7igki8XVOWXsscvVgJy8c4CxbfZnLa25RTQGVrJTt2mElHI0BuGG0Zb0MfTqrX85eNJn4amrHP+w5koLzi8Sri89ZXfkXsrSk13CaTPQQP/NT/eDbr+KMQvd7UBHejGis6YX1n1N0/vvDIhJ0EqqHigY2f0hrzhLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768280051; c=relaxed/simple;
-	bh=4XH7SG21b7snAnQOojHTDt4mSjqwvVfkoZV1gEFjqno=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Gh/fqMjMOR+flCNtZPp6Lfu+2EW7WGThq8AL+M/R8DS/Mnv2r03R0wgjBwCmAW23kUwWIgp8y00r4MO3I5owmWWds0wambOag+LH5pg077qRCaZAs+AJK/Dh+2pI0eAu2cIDwZOlrXnzNVNTDkmSwidbQVQHgIVN+dTActDgevo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=Qfdc9vZ1; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1768282074; c=relaxed/simple;
+	bh=2qAxwhrppVrOj8g7sJXJ9v7a9gGDPfMJeyVarSXAyt0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=K+vIJaRv/EL9dSgQpUouQ4+/zaUcEjGu5V/7jz/UQZrdcBEb9zv3nZsPdOEw9x8ZjOVN7gTt4497E1fzJjUJxhpfKESeuBI3kaXkJkeq+3JqqSvrMLBBqQNnjQt9Ebb9j3QCMp6sdc1TjOM9POTc4345obJZ8p2KonmFjZsQU+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ZI0sISLn; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Qfdc9vZ1"
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-81dab89f286so1873112b3a.2
-        for <linux-block@vger.kernel.org>; Mon, 12 Jan 2026 20:54:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1768280049; x=1768884849; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UKtScXEwrHQrA89l3N54sxGcQUtq2SKFpHUrz7nEa60=;
-        b=Qfdc9vZ1aZAinVhftv+UDUN2dJ0RabuR3WGx9PixKXzkGKjeoVtUN+TyZ6vtxyWfdL
-         2wcQweuvFP11Ji2dkLhW12NcCYyWX3cthXmWtmR2lGYOiXkWGWCk3h15ZOw3F3it/c5q
-         snh20MhcJivq34Q9iiiCN5eWo6+WgSNtTm/YY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768280049; x=1768884849;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UKtScXEwrHQrA89l3N54sxGcQUtq2SKFpHUrz7nEa60=;
-        b=FOnmiLjAUcnw+6sHO/hCfHNgfNZSJlXaqNE40C8+SlvQpdIEL8eW7Cm/tJWIRxQ/qQ
-         qV4Zc4DtBDR5kH1L3AcpUdDQsM+c5PwBfe/7hF2esBxNaJRrGKyewxRzoaa3QpoTt7Yh
-         +5pCLQsc9/HjHJr6+Uu4+4xGVlK2F3Z+ot3bacI3czQMfnnVMq8TJQTE9WaBzTlujHB2
-         nwf43mivCIlFKCvKvoYJhC4IUweg/fDOHwvegZUDr0GUI+m0hpFM3kbMEYEVmi+MuqMs
-         pw4l6VZqVEM+0VDMv2O3bvJJ5CWSbAMYfI2GdsFrVys3d/jRgUkRfRivnCSqm1LzMtNN
-         2CNw==
-X-Forwarded-Encrypted: i=1; AJvYcCV0nWYIcRVUUAhKzPj+rEWdvLtvhciw/EZORNEKD9b40NxnnO7YLCDX5vCerY5ITi7iIPZEK4l6VhsZvQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzy5awDbfhTJ4X5EvV8X2TA8xchOB2gQu9iI5UXHsINKs3f5P3o
-	Ix60SoUKMJ+prN5Swf6F0MA+1r70++/2B1Ndid8M9dYn0EFlMFVmilBP9r4lf0JN5g==
-X-Gm-Gg: AY/fxX7dmPXLSyhtv3v8IeWwTCnJM/2xqsAhXiOidbJ0qRaXKKRILc+vacsjbDgU2BL
-	GPDzEqOkVxPP3uK6E7MAp/ZMxpzdmp+WynbQ9AZAWkdQkG++oTziuZ48tOzSOaWk6unJuJCklz7
-	+kkAeIB1yDFAyBbNTwBLdxlUFVQ4zklmYtO3XvUPGLjlx+GiHJR+w7ynfw5E2oJBi5TuIZTnyye
-	be36JOoNeBh8cgw/0WigRCFtI3U4UqVMRdGXJ835nUU29muashjSDKe5tbwtk+YifA6GL+gNtMM
-	j0L4bMGuWheof9NZa4OrYAuBjvUkyh3k/kY8zCvJjpeFs+lpQ9+46owoNRSXLol/gAo9R394mOx
-	Cdwiof5Gv21qT9CrzSxACPYbtpxu7r9LfiSy0SdL9oLCpF7Eo0f/8mjckaLmhM9Re/mmzuV8p7o
-	yAykAG86ye4g3/BYM/1PmMgY/6T81PjEjN6earkTaKMH6IVPQD7Bt/uZ5ZpHAgnw==
-X-Google-Smtp-Source: AGHT+IF8giJZ1cwqEfJp/6iUzbp0/TRCRwNaNcmX9U5Tj5XcALJKWgAQYkT9Emt45eu48BVTknyMpA==
-X-Received: by 2002:a05:6a20:728a:b0:366:14b2:30a with SMTP id adf61e73a8af0-3898f9cd5d0mr19601101637.61.1768280049256;
-        Mon, 12 Jan 2026 20:54:09 -0800 (PST)
-Received: from google.com ([2a00:79e0:2031:6:3c61:f146:e418:e233])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c59b0bf72afsm6489637a12.28.2026.01.12.20.54.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jan 2026 20:54:08 -0800 (PST)
-Date: Tue, 13 Jan 2026 13:54:02 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: zhangdongdong <zhangdongdong925@sina.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Jens Axboe <axboe@kernel.dk>, Andrew Morton <akpm@linux-foundation.org>, 
-	Richard Chang <richardycc@google.com>, Minchan Kim <minchan@kernel.org>, 
-	Brian Geffon <bgeffon@google.com>, David Stevens <stevensd@google.com>, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, linux-block@vger.kernel.org, 
-	Minchan Kim <minchan@google.com>, xiongping1@xiaomi.com, huangjianan@xiaomi.com, 
-	wanghui33@xiaomi.com
-Subject: Re: [PATCHv2 1/7] zram: introduce compressed data writeback
-Message-ID: <aswaagdlczqq3sh2okdew2o5jtzmev5ghdz4ksvzmqkfsshbfw@aoxdptshkqvu>
-References: <20251201094754.4149975-1-senozhatsky@chromium.org>
- <20251201094754.4149975-2-senozhatsky@chromium.org>
- <40e38fa7-725b-407a-917a-59c5a76dedcb@sina.com>
- <7bnmkuodymm33yclp6e5oir2sqnqmpwlsb5qlxqyawszb5bvlu@l63wu3ckqihc>
- <2663a3d3-2d52-4269-970a-892d71c966bb@sina.com>
- <z22c2qgw2al73yij2ml2hlle2p24twgpmz4jemfqhjoiekc65f@pvap7olsolfp>
- <a527b179-263f-40ad-9d7c-bfa86731bfde@sina.com>
- <luzn25fgin43cnbmvmxwps7isqeq2pt5kfn26jqzly6hbnedlp@ojpw52ldzmuw>
- <731f6e5b-f678-49ef-ad8e-fe6ff85d5422@sina.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ZI0sISLn"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 60CM21vI004230;
+	Tue, 13 Jan 2026 05:27:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=r0Eo5p
+	G/bSXdFrHmAA7TroR04e0m/duMa/n7fHJc77w=; b=ZI0sISLncGewgzlfg7CA4d
+	JYpWWD/ygOytUx4S2VVXJBZFZWN+ouE5ynPyXcmFfwfY/CgwlnoLuFqwfzLC+nAz
+	QW6qRYdc1M3gBMMF7cSybqnCU9XCb5UQ/X0O073Q/mfNQoIDJd+Oe3eFtblvCsm4
+	Od9kpsgz/pvjOu823bV7tNqwKnAmKGGRyXrD/fjHusr9rT6PH7SMSGJtew70q9n0
+	7+i3iEmF5qd2fC6IjXDL+dT2egTjaPPwM+C8NY/LbBbiKcwYlZttxdEIjTDvRApo
+	5f6DjzQ+PD20eK33oVtCl7rbB7A/SrWrEymESYBiX4xkMdQ1NeyWwKeHeEIeBKPA
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4bke92tuje-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 13 Jan 2026 05:27:51 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 60D2YR3V025546;
+	Tue, 13 Jan 2026 05:27:50 GMT
+Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4bm23n2ags-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 13 Jan 2026 05:27:50 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 60D5RUka29295260
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 13 Jan 2026 05:27:30 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E23B558059;
+	Tue, 13 Jan 2026 05:27:47 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BC6D858057;
+	Tue, 13 Jan 2026 05:27:46 +0000 (GMT)
+Received: from [9.109.198.193] (unknown [9.109.198.193])
+	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 13 Jan 2026 05:27:46 +0000 (GMT)
+Message-ID: <b0577774-4ca4-462e-98e6-5e2540f5c428@linux.ibm.com>
+Date: Tue, 13 Jan 2026 10:57:45 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <731f6e5b-f678-49ef-ad8e-fe6ff85d5422@sina.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] null_blk: fix kmemleak by releasing references to fault
+ configfs items
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Cc: gjoyce@ibm.com
+References: <20260112174003.1724320-1-nilay@linux.ibm.com>
+ <b8a5b940-3be3-4f4d-bf3d-36fdf6896e5a@kernel.dk>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <b8a5b940-3be3-4f4d-bf3d-36fdf6896e5a@kernel.dk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: vKBL-mD2TaDOrgah6EEb-KHxhi3zfp_J
+X-Authority-Analysis: v=2.4 cv=dYyNHHXe c=1 sm=1 tr=0 ts=6965d7d7 cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+ a=IkcTkHD0fZMA:10 a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=4z9ZDRyrDThlQRHdhsMA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTEzMDA0MSBTYWx0ZWRfXzLwD/i3pZeYC
+ NK0goMj/DOLnfk8rdBtNJ3SbXYzXt56/baj59LBp3BVn8rkrYKUAU8Uv7jJqJuaGdhwrZHiSp5o
+ 70zt1oZnrZnbfclc8c+dwHrFhYjk6poLSvKGIbTGRbvkMWQS5QAvMYuzWWzG+vCSv++mWxPKUk1
+ vv2QOHHutXjw8ueZWwIKV/jpac+7c5iDFhgQB9Wvq/y3Hr5WSRm3LR8aGUl2yWjHbMmonBvbS8G
+ ii3T+u59Map0xZMSweCuf4qDqXKOWkRWJWPdAhgZ4IQDm62OKxjP5Z0J/g/E7mvmUzEfouzdkly
+ Mcu17VGXxOJOd0D/BmOh0zI8fEQxvtQfpppWflPE5XVXjSN+CPG8GILYe3Q1QooqtIIqwCvCx90
+ 1JlspjyjuyOy5a/fqg37Kd5QFfU55/jnv07Nwv0CZ9l3yOFG4hcpvkTA4c5F57OruBSH8EPjXp+
+ G5aDrWcE1Eza36ExMpA==
+X-Proofpoint-GUID: vKBL-mD2TaDOrgah6EEb-KHxhi3zfp_J
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-12_07,2026-01-09_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 impostorscore=0 adultscore=0 priorityscore=1501 suspectscore=0
+ bulkscore=0 phishscore=0 clxscore=1015 lowpriorityscore=0 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2512120000 definitions=main-2601130041
 
-Hi,
 
-On (26/01/08 18:36), zhangdongdong wrote:
-[..]
-> > I don't know if solving it on zram side alone is possible.  Maybe we
-> > can get some help from the block layer: some sort of two-stage bio
-> > submission.  First stage: submit chained bio-s, second stage: iterate
-> > over all submitted and completed bio-s and decompress the data.  Again,
-> > just thinking out loud.
-> > 
+
+On 1/13/26 1:51 AM, Jens Axboe wrote:
+> On 1/12/26 10:39 AM, Nilay Shroff wrote:
+>> When CONFIG_BLK_DEV_NULL_BLK_FAULT_INJECTION is enabled, the null-blk
+>> driver sets up fault injection support by creating the timeout_inject,
+>> requeue_inject, and init_hctx_fault_inject configfs items as children
+>> of the top-level nullb configfs group.
+>>
+>> However, when the nullb device is removed, the references taken to
+>> these fault-config configfs items are not released. As a result,
+>> kmemleak reports a memory leak, for example:
+>>
+>> unreferenced object 0xc00000021ff25c40 (size 32):
+>>   comm "mkdir", pid 10665, jiffies 4322121578
+>>   hex dump (first 32 bytes):
+>>     69 6e 69 74 5f 68 63 74 78 5f 66 61 75 6c 74 5f  init_hctx_fault_
+>>     69 6e 6a 65 63 74 00 88 00 00 00 00 00 00 00 00  inject..........
+>>   backtrace (crc 1a018c86):
+>>     __kmalloc_node_track_caller_noprof+0x494/0xbd8
+>>     kvasprintf+0x74/0xf4
+>>     config_item_set_name+0xf0/0x104
+>>     config_group_init_type_name+0x48/0xfc
+>>     fault_config_init+0x48/0xf0
+>>     0xc0080000180559e4
+>>     configfs_mkdir+0x304/0x814
+>>     vfs_mkdir+0x49c/0x604
+>>     do_mkdirat+0x314/0x3d0
+>>     sys_mkdir+0xa0/0xd8
+>>     system_call_exception+0x1b0/0x4f0
+>>     system_call_vectored_common+0x15c/0x2ec
+>>
+>> Fix this by explicitly releasing the references to the fault-config
+>> configfs items when dropping the reference to the top-level nullb
+>> configfs group.
 > 
-> Hi Sergey,
+> Seems like this should have a fixes and stable tag, too?
 > 
-> My thinking is largely aligned with yours. I agree that relying on zram
-> alone is unlikely to fully solve this problem, especially without going
-> back to atomic read/write.
-> 
-> Our current mitigation approach is to introduce a hook at the swap layer
-> and move decompression there. By doing so, decompression happens in a
-> fully sleepable context, which avoids the atomic-context constraints
-> you outlined. This helps us sidestep the core issue rather than trying
-> to force decompression back into zram completion paths.
+Yeah, I will send out v2 with these changes.
 
-This approach is limited to swap use-cases only, while zram
-is a generic block device: one can mkfs on it and use it as
-a normal block device.  So, this is not a complete solution.
-
-[..]
-
-> If I recall correctly, this issue first became noticeable after a block
-> layer change was merged; I can try to dig that up and share more details
-> later.
-
-Interesting.
+Thanks,
+--Nilay
