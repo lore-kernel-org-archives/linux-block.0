@@ -1,51 +1,114 @@
-Received: from m16.mail.126.com (m16.mail.126.com [117.135.210.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BCCE2D7D41;
-	Tue, 13 Jan 2026 02:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A1D32853F7
+	for <linux-block@vger.kernel.org>; Tue, 13 Jan 2026 02:01:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768269632; cv=none; b=uStaxxtUNEwj4zs2Jne7cQhHI9wG0mm1HG/75PWNPwGVPOI1Gk2840BHPAv74LFuOtsCHV+eDviK8lWZ5ztpb7lOSrLgTo9C3LkoTC/E2e9/owc7ePR3I3pxjHGr5LZzTl7MBWhdZGzzi+AQubwrOi2hOxP1pckA0f/hHOIrboM=
+	t=1768269714; cv=none; b=epDmCgNmr7u0+3z2g4LWhZS2bDRpo0UqUqBVmowjf5Nn36HrfILtIbtIYR6SY2HI2aEPrtqU/WV9rGPXdGCIH2KmFUMHZEoHsAMliIXHnaTXCWx+Jp4HcsCJ1bjzZ5a/SfINzaWxHzklOrU6brLSUYuFS7NNOw98LCQafIiDal0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768269632; c=relaxed/simple;
-	bh=cpMMSXmxxAK/oz2nR0lbi8N/BFlxzjt8GL5z0xcp/9A=;
-	h=Date:From:To:Subject:Content-Type:MIME-Version:Message-ID; b=nAJK6QAl7qC2JZIOS1BZrJkRt2oragDdpfYBxv3w6bAcUZNVJns+e3OWnTxOjUpFKNm0LtfPNO1kjYVO3mAp0HmSvs7DqH5aEYpRbsUpjpIZpC8qN1J3PiqLJ2byMx+TnjrgKFEzopRjZM+s34eGsSeIuWoNHM5C9Ftv1Ympg8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com; spf=pass smtp.mailfrom=126.com; dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b=fbQYBnUj; arc=none smtp.client-ip=117.135.210.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
+	s=arc-20240116; t=1768269714; c=relaxed/simple;
+	bh=wQiw39IjT8czb/0Aglc82cbfsDbbONQWhopUhKaQOFk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gcjTzA1qOZ9BA5XZTNqI8WFvqfIBJ18+WRL9ShzdY33uUDasaYJBZbyVbjoE2zskADCVdeTIxUvciu1BGmwPHWwScsS6fUfy1eOND9C6SBomrCytMGzEts5SlLyXYKtcavRw6KSvXMU7gxcRQC1NXqhckZsEs7ll289NsTSAd2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NhUKoXbm; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="fbQYBnUj"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
-	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
-	Message-ID; bh=cpMMSXmxxAK/oz2nR0lbi8N/BFlxzjt8GL5z0xcp/9A=; b=f
-	bQYBnUj2Twy3AHfRba6wPyvWh1IVSEZVHlnZGVIaPV1SjkfJyK6C/P2/2e7cDf+y
-	pTj4N3HuNrYyNbsBsj3dZ0m38dARQqxWsJxf2PjksjujZzLUpm5esStCIis6oFEb
-	rIy0ppNTZcGLRkhBbcOr/hKwWgak9/kd1P0VzCojOs=
-Received: from cp3alai$126.com ( [49.7.65.243] ) by
- ajax-webmail-wmsvr-41-107 (Coremail) ; Tue, 13 Jan 2026 10:00:11 +0800
- (CST)
-Date: Tue, 13 Jan 2026 10:00:11 +0800 (CST)
-From: alai <cp3alai@126.com>
-To: netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org, linux-mm@kvack.org
-Subject: =?GBK?B?wLTX1GFsYWm1xNPKvP4=?=
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.4-cmXT build
- 20251222(83accb85) Copyright (c) 2002-2026 www.mailtech.cn 126com
-X-NTES-SC: AL_Qu2dCv6dtk4q5yCdZOkfmUkUjus3WMKyuv4u34RQPpF8jDrjwg4aTHFNLVTZ2dCFLSqMiTaGVSZo9+Z/T4RIYKUOLK5IUAtaKRTxyH8BokwUqg==
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=GBK
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NhUKoXbm"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768269711;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7eJDEZm34En/rNpoE91ME/pYGQ09hSljQKYKT81zW1c=;
+	b=NhUKoXbmGAOywafGTMSgGxYkLZG9ZaeuMkyphY9pRI2+pzt/xxGthdV9TNzKnnizppiSRm
+	+E/bbIHRmnpBCuXSSLPOWoxj4z9gM5okOk3p/11/1CLoTKjG7B32Zu12CaSRDcGUHlzxw4
+	cYIawi1up+7yaiYx2VGON9NH/M6Y7kM=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-1-50xiQRGVNOK12-yzxNvLDw-1; Mon,
+ 12 Jan 2026 21:01:50 -0500
+X-MC-Unique: 50xiQRGVNOK12-yzxNvLDw-1
+X-Mimecast-MFC-AGG-ID: 50xiQRGVNOK12-yzxNvLDw_1768269709
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 090C419560B7;
+	Tue, 13 Jan 2026 02:01:49 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.42])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 017DD19560BA;
+	Tue, 13 Jan 2026 02:01:45 +0000 (UTC)
+Date: Tue, 13 Jan 2026 10:01:41 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Seamus Connor <sconnor@purestorage.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Caleb Sander Mateos <csander@purestorage.com>
+Subject: Re: [PATCH v2] ublk: fix ublksrv pid handling for pid namespaces
+Message-ID: <aWWnhX7h3m9w2wc6@fedora>
+References: <CAB5MrP5YbxdUe0378VfKBMb_n9=6G-C=TPixYoMaV48trgtWBg@mail.gmail.com>
+ <20260112225614.1817055-1-sconnor@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <697cd2e2.171a.19bb5150035.Coremail.cp3alai@126.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:aykvCgDXnxArp2VpysNDAA--.50487W
-X-CM-SenderInfo: lfsttzldl6ij2wof0z/xtbBrQunZGllpyuk1wAA3W
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260112225614.1817055-1-sconnor@purestorage.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-CgpzdWJzY3JpYmU=
+On Mon, Jan 12, 2026 at 02:56:14PM -0800, Seamus Connor wrote:
+> When ublksrv runs inside a pid namespace, START/END_RECOVERY compared
+> the stored init-ns tgid against the userspace pid (getpid vnr), so the
+> check failed and control ops could not proceed. Compare against the
+> caller’s init-ns tgid and store that value, then translate it back to
+> the caller’s pid namespace when reporting GET_DEV_INFO so ublk list
+> shows a sensible pid.
+> 
+> Testing: start/recover in a pid namespace; `ublk list` shows
+> reasonable pid values in init, child, and sibling namespaces.
+> 
+> Fixes: d37a224fc119 ("ublk: validate ublk server pid")
+> Signed-off-by: Seamus Connor <sconnor@purestorage.com>
+> Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
+> ---
+> Changes since v1:
+>  - Updated start_dev and end_recovery to respect the user-supplied pid
+> 
+>  drivers/block/ublk_drv.c | 30 +++++++++++++++++++++++++++++-
+>  1 file changed, 29 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 79847e0b9e88..4a4673e64668 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -2922,6 +2922,10 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
+>  	if (wait_for_completion_interruptible(&ub->completion) != 0)
+>  		return -EINTR;
+>  
+> +	rcu_read_lock();
+> +	ublksrv_pid = pid_nr(find_vpid(ublksrv_pid));
+> +	rcu_read_unlock();
+> +
+
+`ublksrv_pid` is from userspace, so it may be invalid, then you may have to
+check result of find_vpid().
+
+>  	if (ub->ublksrv_tgid != ublksrv_pid)
+>  		return -EINVAL;
+
+Please add one helper of ublk_validate_ublksrv_pid() by moving all above
+change into the helper, then two code paths can use the single helper.
+
+
+Otherwise, this patch looks fine.
+
+Thanks, 
+Ming
+
