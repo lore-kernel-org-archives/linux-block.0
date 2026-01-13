@@ -1,114 +1,445 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A1D32853F7
-	for <linux-block@vger.kernel.org>; Tue, 13 Jan 2026 02:01:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 680B818BC3D;
+	Tue, 13 Jan 2026 02:33:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768269714; cv=none; b=epDmCgNmr7u0+3z2g4LWhZS2bDRpo0UqUqBVmowjf5Nn36HrfILtIbtIYR6SY2HI2aEPrtqU/WV9rGPXdGCIH2KmFUMHZEoHsAMliIXHnaTXCWx+Jp4HcsCJ1bjzZ5a/SfINzaWxHzklOrU6brLSUYuFS7NNOw98LCQafIiDal0=
+	t=1768271587; cv=none; b=aCRW3SW/miZlJ60LWduKecm2Aln3t+Hyoliwf8WsLAh78CPjABpQRJ11DG8XhebYe+BCk0lLDUPrJCSu6q8sR8h5RFx+nKyNUZ+nfMVlMyswtiKCkEavSoOOM0IhMfYZiKa/5q+U0uSshpGb7SoACLmQdaAdIBJmttSjM6Efhd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768269714; c=relaxed/simple;
-	bh=wQiw39IjT8czb/0Aglc82cbfsDbbONQWhopUhKaQOFk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gcjTzA1qOZ9BA5XZTNqI8WFvqfIBJ18+WRL9ShzdY33uUDasaYJBZbyVbjoE2zskADCVdeTIxUvciu1BGmwPHWwScsS6fUfy1eOND9C6SBomrCytMGzEts5SlLyXYKtcavRw6KSvXMU7gxcRQC1NXqhckZsEs7ll289NsTSAd2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NhUKoXbm; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1768271587; c=relaxed/simple;
+	bh=AOuDSE6/eWcFlRb6r186vh6Tjpsg1kdsTdkYdZKJIMo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fSS0mEFdkkVO21eWZtMA4lmCl3rOvwYP6WVKWWybAgG5SkDVS8FDBzJoHpUuXgOM3s1L0ZqF9f1oxEsal/El2EM64e+aRYCoqg/7YmZ/xeS9cV3DfgMFfihUhVcPNQaVK6ej6/j0gBvhj/MqQYLerwOp3yE2Ca6QEqzU8/wARx8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BARovaB8; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NhUKoXbm"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768269711;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7eJDEZm34En/rNpoE91ME/pYGQ09hSljQKYKT81zW1c=;
-	b=NhUKoXbmGAOywafGTMSgGxYkLZG9ZaeuMkyphY9pRI2+pzt/xxGthdV9TNzKnnizppiSRm
-	+E/bbIHRmnpBCuXSSLPOWoxj4z9gM5okOk3p/11/1CLoTKjG7B32Zu12CaSRDcGUHlzxw4
-	cYIawi1up+7yaiYx2VGON9NH/M6Y7kM=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-1-50xiQRGVNOK12-yzxNvLDw-1; Mon,
- 12 Jan 2026 21:01:50 -0500
-X-MC-Unique: 50xiQRGVNOK12-yzxNvLDw-1
-X-Mimecast-MFC-AGG-ID: 50xiQRGVNOK12-yzxNvLDw_1768269709
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 090C419560B7;
-	Tue, 13 Jan 2026 02:01:49 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.42])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 017DD19560BA;
-	Tue, 13 Jan 2026 02:01:45 +0000 (UTC)
-Date: Tue, 13 Jan 2026 10:01:41 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Seamus Connor <sconnor@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Caleb Sander Mateos <csander@purestorage.com>
-Subject: Re: [PATCH v2] ublk: fix ublksrv pid handling for pid namespaces
-Message-ID: <aWWnhX7h3m9w2wc6@fedora>
-References: <CAB5MrP5YbxdUe0378VfKBMb_n9=6G-C=TPixYoMaV48trgtWBg@mail.gmail.com>
- <20260112225614.1817055-1-sconnor@purestorage.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BARovaB8"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1768271585; x=1799807585;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=AOuDSE6/eWcFlRb6r186vh6Tjpsg1kdsTdkYdZKJIMo=;
+  b=BARovaB81Jo0qN1APxp6COoe3OO1ylEPFaHAoLwGUOzsO2Y+KjEPaiPC
+   GUtCVMVDO8jqyf3k6gIhN3Tm+QLz7PnfVCRmabxYEMnEGTfKf/nJIlCSj
+   4967UdLJQtjQtmQZAvk0QwF+8FjF8CT/dAfEiG6ScTqx7JmJcEqZ8K2UF
+   CDslCE//WZJqWGWJEOylQ2Jam1vVrkQOsxtHLUEiIeYn1o5U874LA9ntX
+   UNFw2SLVp23bSx3RZiHfVikqJjfqZHpAdizxeYe27qGeKdRcQfHAqochn
+   KLLYEWmyWvi0gOnFtDPYlDf7qulFoyS75/zlRIDex7LZn9NE8wZfA/pvW
+   Q==;
+X-CSE-ConnectionGUID: 6XYWL33SRDa1FOvRYw4bQQ==
+X-CSE-MsgGUID: Cb+J04l3R3yLbCQMx06XHQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11669"; a="80916894"
+X-IronPort-AV: E=Sophos;i="6.21,222,1763452800"; 
+   d="scan'208";a="80916894"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2026 18:33:02 -0800
+X-CSE-ConnectionGUID: DjF4Dm12SIGaeRUUVZU1VA==
+X-CSE-MsgGUID: cH5xLomVR4ueF4JafFWPJA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,222,1763452800"; 
+   d="scan'208";a="203462074"
+Received: from linux-pnp-server-11.sh.intel.com ([10.239.176.178])
+  by orviesa010.jf.intel.com with ESMTP; 12 Jan 2026 18:32:59 -0800
+From: Wangyang Guo <wangyang.guo@intel.com>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Radu Rendec <rrendec@redhat.com>,
+	Ming Lei <ming.lei@redhat.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>,
+	Keith Busch <kbusch@kernel.org>,
+	Jens Axboe <axboe@fb.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	linux-kernel@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	virtualization@lists.linux-foundation.org,
+	linux-block@vger.kernel.org,
+	Wangyang Guo <wangyang.guo@intel.com>,
+	Tianyou Li <tianyou.li@intel.com>,
+	Tim Chen <tim.c.chen@linux.intel.com>,
+	Dan Liang <dan.liang@intel.com>
+Subject: [PATCH v2] lib/group_cpus: make group CPU cluster aware
+Date: Tue, 13 Jan 2026 10:29:58 +0800
+Message-ID: <20260113022958.3379650-1-wangyang.guo@intel.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260112225614.1817055-1-sconnor@purestorage.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Mon, Jan 12, 2026 at 02:56:14PM -0800, Seamus Connor wrote:
-> When ublksrv runs inside a pid namespace, START/END_RECOVERY compared
-> the stored init-ns tgid against the userspace pid (getpid vnr), so the
-> check failed and control ops could not proceed. Compare against the
-> caller’s init-ns tgid and store that value, then translate it back to
-> the caller’s pid namespace when reporting GET_DEV_INFO so ublk list
-> shows a sensible pid.
-> 
-> Testing: start/recover in a pid namespace; `ublk list` shows
-> reasonable pid values in init, child, and sibling namespaces.
-> 
-> Fixes: d37a224fc119 ("ublk: validate ublk server pid")
-> Signed-off-by: Seamus Connor <sconnor@purestorage.com>
-> Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
-> ---
-> Changes since v1:
->  - Updated start_dev and end_recovery to respect the user-supplied pid
-> 
->  drivers/block/ublk_drv.c | 30 +++++++++++++++++++++++++++++-
->  1 file changed, 29 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index 79847e0b9e88..4a4673e64668 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -2922,6 +2922,10 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
->  	if (wait_for_completion_interruptible(&ub->completion) != 0)
->  		return -EINTR;
->  
-> +	rcu_read_lock();
-> +	ublksrv_pid = pid_nr(find_vpid(ublksrv_pid));
-> +	rcu_read_unlock();
-> +
+As CPU core counts increase, the number of NVMe IRQs may be smaller than
+the total number of CPUs. This forces multiple CPUs to share the same
+IRQ. If the IRQ affinity and the CPU’s cluster do not align, a
+performance penalty can be observed on some platforms.
 
-`ublksrv_pid` is from userspace, so it may be invalid, then you may have to
-check result of find_vpid().
+This patch improves IRQ affinity by grouping CPUs by cluster within each
+NUMA domain, ensuring better locality between CPUs and their assigned
+NVMe IRQs.
 
->  	if (ub->ublksrv_tgid != ublksrv_pid)
->  		return -EINVAL;
+Details:
 
-Please add one helper of ublk_validate_ublksrv_pid() by moving all above
-change into the helper, then two code paths can use the single helper.
+Intel Xeon E platform packs 4 CPU cores as 1 module (cluster) and share
+the L2 cache. Let's say, if there are 40 CPUs in 1 NUMA domain and 11
+IRQs to dispatch. The existing algorithm will map first 7 IRQs each with
+4 CPUs and remained 4 IRQs each with 3 CPUs. The last 4 IRQs may
+have cross cluster issue. For example, the 9th IRQ which pinned to
+CPU32, then for CPU31, it will have cross L2 memory access.
 
+CPU |28 29 30 31|32 33 34 35|36 ...
+     -------- -------- --------
+IRQ      8        9       10
 
-Otherwise, this patch looks fine.
+If this patch applied, then first 2 IRQs each mapped with 2 CPUs and
+rest 9 IRQs each mapped with 4 CPUs, which avoids the cross cluster
+memory access.
 
-Thanks, 
-Ming
+CPU |00 01 02 03|04 05 06 07|08 09 10 11| ...
+     ----- ----- ----------- -----------
+IRQ  1      2        3           4
+
+As a result, 15%+ performance difference is observed in FIO
+libaio/randread/bs=8k.
+
+Changes since V1:
+- Add more performance details in commit messages.
+- Fix endless loop when topology_cluster_cpumask return invalid mask.
+
+History:
+  v1: https://lore.kernel.org/all/20251024023038.872616-1-wangyang.guo@intel.com/
+  v1 [RESEND]: https://lore.kernel.org/all/20251111020608.1501543-1-wangyang.guo@intel.com/
+
+Reviewed-by: Tianyou Li <tianyou.li@intel.com>
+Reviewed-by: Tim Chen <tim.c.chen@linux.intel.com>
+Tested-by: Dan Liang <dan.liang@intel.com>
+Signed-off-by: Wangyang Guo <wangyang.guo@intel.com>
+---
+ lib/group_cpus.c | 271 +++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 206 insertions(+), 65 deletions(-)
+
+diff --git a/lib/group_cpus.c b/lib/group_cpus.c
+index 6d08ac05f371..a93df70919df 100644
+--- a/lib/group_cpus.c
++++ b/lib/group_cpus.c
+@@ -114,48 +114,15 @@ static int ncpus_cmp_func(const void *l, const void *r)
+ 	return ln->ncpus - rn->ncpus;
+ }
+ 
+-/*
+- * Allocate group number for each node, so that for each node:
+- *
+- * 1) the allocated number is >= 1
+- *
+- * 2) the allocated number is <= active CPU number of this node
+- *
+- * The actual allocated total groups may be less than @numgrps when
+- * active total CPU number is less than @numgrps.
+- *
+- * Active CPUs means the CPUs in '@cpu_mask AND @node_to_cpumask[]'
+- * for each node.
+- */
+-static void alloc_nodes_groups(unsigned int numgrps,
+-			       cpumask_var_t *node_to_cpumask,
+-			       const struct cpumask *cpu_mask,
+-			       const nodemask_t nodemsk,
+-			       struct cpumask *nmsk,
+-			       struct node_groups *node_groups)
++static void alloc_groups_to_nodes(unsigned int numgrps,
++				  unsigned int numcpus,
++				  struct node_groups *node_groups,
++				  unsigned int num_nodes)
+ {
+-	unsigned n, remaining_ncpus = 0;
+-
+-	for (n = 0; n < nr_node_ids; n++) {
+-		node_groups[n].id = n;
+-		node_groups[n].ncpus = UINT_MAX;
+-	}
+-
+-	for_each_node_mask(n, nodemsk) {
+-		unsigned ncpus;
+-
+-		cpumask_and(nmsk, cpu_mask, node_to_cpumask[n]);
+-		ncpus = cpumask_weight(nmsk);
+-
+-		if (!ncpus)
+-			continue;
+-		remaining_ncpus += ncpus;
+-		node_groups[n].ncpus = ncpus;
+-	}
++	unsigned int n, remaining_ncpus = numcpus;
++	unsigned int  ngroups, ncpus;
+ 
+-	numgrps = min_t(unsigned, remaining_ncpus, numgrps);
+-
+-	sort(node_groups, nr_node_ids, sizeof(node_groups[0]),
++	sort(node_groups, num_nodes, sizeof(node_groups[0]),
+ 	     ncpus_cmp_func, NULL);
+ 
+ 	/*
+@@ -226,9 +193,8 @@ static void alloc_nodes_groups(unsigned int numgrps,
+ 	 * finally for each node X: grps(X) <= ncpu(X).
+ 	 *
+ 	 */
+-	for (n = 0; n < nr_node_ids; n++) {
+-		unsigned ngroups, ncpus;
+ 
++	for (n = 0; n < num_nodes; n++) {
+ 		if (node_groups[n].ncpus == UINT_MAX)
+ 			continue;
+ 
+@@ -246,12 +212,201 @@ static void alloc_nodes_groups(unsigned int numgrps,
+ 	}
+ }
+ 
++/*
++ * Allocate group number for each node, so that for each node:
++ *
++ * 1) the allocated number is >= 1
++ *
++ * 2) the allocated number is <= active CPU number of this node
++ *
++ * The actual allocated total groups may be less than @numgrps when
++ * active total CPU number is less than @numgrps.
++ *
++ * Active CPUs means the CPUs in '@cpu_mask AND @node_to_cpumask[]'
++ * for each node.
++ */
++static void alloc_nodes_groups(unsigned int numgrps,
++			       cpumask_var_t *node_to_cpumask,
++			       const struct cpumask *cpu_mask,
++			       const nodemask_t nodemsk,
++			       struct cpumask *nmsk,
++			       struct node_groups *node_groups)
++{
++	unsigned int n, numcpus = 0;
++
++	for (n = 0; n < nr_node_ids; n++) {
++		node_groups[n].id = n;
++		node_groups[n].ncpus = UINT_MAX;
++	}
++
++	for_each_node_mask(n, nodemsk) {
++		unsigned int ncpus;
++
++		cpumask_and(nmsk, cpu_mask, node_to_cpumask[n]);
++		ncpus = cpumask_weight(nmsk);
++
++		if (!ncpus)
++			continue;
++		numcpus += ncpus;
++		node_groups[n].ncpus = ncpus;
++	}
++
++	numgrps = min_t(unsigned int, numcpus, numgrps);
++	alloc_groups_to_nodes(numgrps, numcpus, node_groups, nr_node_ids);
++}
++
++static void assign_cpus_to_groups(unsigned int ncpus,
++				  struct cpumask *nmsk,
++				  struct node_groups *nv,
++				  struct cpumask *masks,
++				  unsigned int *curgrp,
++				  unsigned int last_grp)
++{
++	unsigned int v, cpus_per_grp, extra_grps;
++	/* Account for rounding errors */
++	extra_grps = ncpus - nv->ngroups * (ncpus / nv->ngroups);
++
++	/* Spread allocated groups on CPUs of the current node */
++	for (v = 0; v < nv->ngroups; v++, *curgrp += 1) {
++		cpus_per_grp = ncpus / nv->ngroups;
++
++		/* Account for extra groups to compensate rounding errors */
++		if (extra_grps) {
++			cpus_per_grp++;
++			--extra_grps;
++		}
++
++		/*
++		 * wrapping has to be considered given 'startgrp'
++		 * may start anywhere
++		 */
++		if (*curgrp >= last_grp)
++			*curgrp = 0;
++		grp_spread_init_one(&masks[*curgrp], nmsk, cpus_per_grp);
++	}
++}
++
++static int alloc_cluster_groups(unsigned int ncpus,
++				unsigned int ngroups,
++				struct cpumask *node_cpumask,
++				cpumask_var_t msk,
++				const struct cpumask ***clusters_ptr,
++				struct node_groups **cluster_groups_ptr)
++{
++	unsigned int ncluster = 0;
++	unsigned int cpu, nc, n;
++	const struct cpumask *cluster_mask;
++	const struct cpumask **clusters;
++	struct node_groups *cluster_groups;
++
++	cpumask_copy(msk, node_cpumask);
++
++	/* Probe how many clusters in this node. */
++	while (1) {
++		cpu = cpumask_first(msk);
++		if (cpu >= nr_cpu_ids)
++			break;
++
++		cluster_mask = topology_cluster_cpumask(cpu);
++		if (!cpumask_weight(cluster_mask))
++			goto no_cluster;
++		/* Clean out CPUs on the same cluster. */
++		cpumask_andnot(msk, msk, cluster_mask);
++		ncluster++;
++	}
++
++	/* If ngroups < ncluster, cross cluster is inevitable, skip. */
++	if (ncluster == 0 || ncluster > ngroups)
++		goto no_cluster;
++
++	/* Allocate memory based on cluster number. */
++	clusters = kcalloc(ncluster, sizeof(struct cpumask *), GFP_KERNEL);
++	if (!clusters)
++		goto no_cluster;
++	cluster_groups = kcalloc(ncluster, sizeof(struct node_groups), GFP_KERNEL);
++	if (!cluster_groups)
++		goto fail_cluster_groups;
++
++	/* Filling cluster info for later process. */
++	cpumask_copy(msk, node_cpumask);
++	for (n = 0; n < ncluster; n++) {
++		cpu = cpumask_first(msk);
++		cluster_mask = topology_cluster_cpumask(cpu);
++		nc = cpumask_weight_and(cluster_mask, node_cpumask);
++		clusters[n] = cluster_mask;
++		cluster_groups[n].id = n;
++		cluster_groups[n].ncpus = nc;
++		cpumask_andnot(msk, msk, cluster_mask);
++	}
++
++	alloc_groups_to_nodes(ngroups, ncpus, cluster_groups, ncluster);
++
++	*clusters_ptr = clusters;
++	*cluster_groups_ptr = cluster_groups;
++	return ncluster;
++
++ fail_cluster_groups:
++	kfree(clusters);
++ no_cluster:
++	return 0;
++}
++
++/*
++ * Try group CPUs evenly for cluster locality within a NUMA node.
++ *
++ * Return: true if success, false otherwise.
++ */
++static bool __try_group_cluster_cpus(unsigned int ncpus,
++				     unsigned int ngroups,
++				     struct cpumask *node_cpumask,
++				     struct cpumask *masks,
++				     unsigned int *curgrp,
++				     unsigned int last_grp)
++{
++	struct node_groups *cluster_groups;
++	const struct cpumask **clusters;
++	unsigned int ncluster;
++	bool ret = false;
++	cpumask_var_t nmsk;
++	unsigned int i, nc;
++
++	if (!zalloc_cpumask_var(&nmsk, GFP_KERNEL))
++		goto fail_nmsk_alloc;
++
++	ncluster = alloc_cluster_groups(ncpus, ngroups, node_cpumask, nmsk,
++					&clusters, &cluster_groups);
++
++	if (ncluster == 0)
++		goto fail_no_clusters;
++
++	for (i = 0; i < ncluster; i++) {
++		struct node_groups *nv = &cluster_groups[i];
++
++		/* Get the cpus on this cluster. */
++		cpumask_and(nmsk, node_cpumask, clusters[nv->id]);
++		nc = cpumask_weight(nmsk);
++		if (!nc)
++			continue;
++		WARN_ON_ONCE(nv->ngroups > nc);
++
++		assign_cpus_to_groups(nc, nmsk, nv, masks, curgrp, last_grp);
++	}
++
++	ret = true;
++	kfree(cluster_groups);
++	kfree(clusters);
++ fail_no_clusters:
++	free_cpumask_var(nmsk);
++ fail_nmsk_alloc:
++	return ret;
++}
++
+ static int __group_cpus_evenly(unsigned int startgrp, unsigned int numgrps,
+ 			       cpumask_var_t *node_to_cpumask,
+ 			       const struct cpumask *cpu_mask,
+ 			       struct cpumask *nmsk, struct cpumask *masks)
+ {
+-	unsigned int i, n, nodes, cpus_per_grp, extra_grps, done = 0;
++	unsigned int i, n, nodes, done = 0;
+ 	unsigned int last_grp = numgrps;
+ 	unsigned int curgrp = startgrp;
+ 	nodemask_t nodemsk = NODE_MASK_NONE;
+@@ -287,7 +442,7 @@ static int __group_cpus_evenly(unsigned int startgrp, unsigned int numgrps,
+ 	alloc_nodes_groups(numgrps, node_to_cpumask, cpu_mask,
+ 			   nodemsk, nmsk, node_groups);
+ 	for (i = 0; i < nr_node_ids; i++) {
+-		unsigned int ncpus, v;
++		unsigned int ncpus;
+ 		struct node_groups *nv = &node_groups[i];
+ 
+ 		if (nv->ngroups == UINT_MAX)
+@@ -301,28 +456,14 @@ static int __group_cpus_evenly(unsigned int startgrp, unsigned int numgrps,
+ 
+ 		WARN_ON_ONCE(nv->ngroups > ncpus);
+ 
+-		/* Account for rounding errors */
+-		extra_grps = ncpus - nv->ngroups * (ncpus / nv->ngroups);
+-
+-		/* Spread allocated groups on CPUs of the current node */
+-		for (v = 0; v < nv->ngroups; v++, curgrp++) {
+-			cpus_per_grp = ncpus / nv->ngroups;
+-
+-			/* Account for extra groups to compensate rounding errors */
+-			if (extra_grps) {
+-				cpus_per_grp++;
+-				--extra_grps;
+-			}
+-
+-			/*
+-			 * wrapping has to be considered given 'startgrp'
+-			 * may start anywhere
+-			 */
+-			if (curgrp >= last_grp)
+-				curgrp = 0;
+-			grp_spread_init_one(&masks[curgrp], nmsk,
+-						cpus_per_grp);
++		if (__try_group_cluster_cpus(ncpus, nv->ngroups, nmsk,
++					     masks, &curgrp, last_grp)) {
++			done += nv->ngroups;
++			continue;
+ 		}
++
++		assign_cpus_to_groups(ncpus, nmsk, nv, masks, &curgrp,
++				      last_grp);
+ 		done += nv->ngroups;
+ 	}
+ 	kfree(node_groups);
+-- 
+2.47.3
 
