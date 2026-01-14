@@ -1,75 +1,94 @@
-Received: from va-2-39.ptr.blmpb.com (va-2-39.ptr.blmpb.com [209.127.231.39])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D66322FF160
-	for <linux-block@vger.kernel.org>; Wed, 14 Jan 2026 17:24:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D0EA221F0C
+	for <linux-block@vger.kernel.org>; Wed, 14 Jan 2026 18:38:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768411445; cv=none; b=T2wn3SXiH/qN/xZgkZLCqdp1qbjs9pjRT4YC+K5UELhItgKsbfVUzn/D18+xo7ACLbT3kKhE5dPUva/5HFuxEeVHQ0DuoqVn5Uh0IEpmTe7hN6oTEBIztN8tEo5phmZE1LoWbj6ua/46e4OtI4cydR+YgoKMUVAWyl6aJBQ3B10=
+	t=1768415934; cv=none; b=Qgq0S4X3+mcMPOlp5VppIM/TmIvuCjsStIliWIJyLsLtg14j9SAwTNS6VFsNJP6dnjYBhyrexhiG9wVpTyGvnmVIEn5dIH4oDpWM2YM1CZGxum8u8VaxVZNFlg109kOW13VMDvTQXxgJ0QFe8QYeLKzQOQ6SHeCdALDEGRVy5g0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768411445; c=relaxed/simple;
-	bh=hxmiHVCcKE3/Yocna+eDPqZ+73wncyP6BILnrvmtXV0=;
-	h=From:Mime-Version:Date:References:To:Subject:Message-Id:
-	 Content-Type:In-Reply-To; b=YTR5+6rbwZiGc42rnFndN6lZxAIfi/sKTKPUpsb9QIST4nmMea7A33/Bq4v/OXpyA6k59rGSrKzGiJC9SCUr8qkUeT6Lly/ROmn7t9AjYPrbPH7l9F7B3Tk0r0TVphzcibgD8mAx+PZMtUPkUhVYBweZRT03cMcS2ZSHop1wZnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=none smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=MCgnMKpD; arc=none smtp.client-ip=209.127.231.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=fnnas.com
+	s=arc-20240116; t=1768415934; c=relaxed/simple;
+	bh=x7DbmQJQV7QHt+t2udRvHDk681dZQUYX/n92c2XtDxI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=RMefBF4XO3XPlo5Zi0GLEzvVVsY91bMRI9wnv7P9TpSVWsRWN32OpiWRKlCwXBpAbGim5zQLHs96FLPUGVS9dbj61zJYfnHrlVMbU3EnSr8usV5aOFys0tkA9mvnCqiRXwWA05XY3KWAzNgtxWec7txnjEaaO+3fbKb6Ram98kk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ttXrT5Ex; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="MCgnMKpD"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1768411394;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=/CnDTCJeP7SqyefY7N1x7ZhXQVr6kPeznOAU4W+bA78=;
- b=MCgnMKpDNJhzEOlzF9Hte7PweY+U69GgFfUudZPmJ8MjVWeCw2L8hlWVUpqonzaos73Vf5
- px48qA7QfdESlJR3GNI96YEhRwAkupo0EQXhmIBiBU2zc8ZIL7+PKmt18mlFAcyqO0gm4f
- 2FvmELjqrAOD9ivl9c4WwzOFD55Ywe/wEfWPifV1fKIZjVaMkhHYOV+3+pqF7k2d29nMwS
- SKU3IJjLBL1yjbAR3LIAXoQmRunwnzgqUrskVcy2xPPvDx4xUfS6gt5ngQofnusyLvNUoz
- yw2SJeEyhFOWm2I9hUWs1xif7kIBquxWB2YULjk8O6J6/0sns4m7v7sPcUoahQ==
-From: "Yu Kuai" <yukuai@fnnas.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ttXrT5Ex"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8969AC4CEF7;
+	Wed, 14 Jan 2026 18:38:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768415933;
+	bh=x7DbmQJQV7QHt+t2udRvHDk681dZQUYX/n92c2XtDxI=;
+	h=Date:From:To:Cc:Subject:From;
+	b=ttXrT5Ex7QuBQ/8y9k7pghMUriZwp2xrculrfP6ZeLxZ4w5PowgpVTAX3S1hWtk2t
+	 nyYR26UfxR1zsEanoCKc6XWVK33uRBx6r0xFvYB8x+YSo8YINCBHRLUG4f+E/zXqeM
+	 GIZg1QvmaE2gWdsEgX/7PqWJ5KsWbxfKicfUZHN1dwfYOglWYZHd94CUj0XYK5vmgE
+	 9CJ2fEljVz54lOYblbHWrYSzij+iE6FVJCtApVnypjz+YlhsBVWRRqEocM0OHXEn5l
+	 zBOAhItyIECl0DpsCu3wDEacZhq6DZHlWhOredTuJ+UHboU+Ra9RRbTp063z3iRLrN
+	 RVe4HvqLGQuZw==
+Date: Wed, 14 Jan 2026 11:38:51 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: axboe@kernel.dk
+Cc: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, hch@lst.de,
+	sagi@grimberg.me
+Subject: [GIT PULL] nvme fixes for Linux 6.19
+Message-ID: <aWfiu2Twr5_lT9zq@kbusch-mbp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Received: from [192.168.1.104] ([39.182.0.185]) by smtp.feishu.cn with ESMTPS; Thu, 15 Jan 2026 01:23:12 +0800
-X-Original-From: Yu Kuai <yukuai@fnnas.com>
-User-Agent: Mozilla Thunderbird
-Reply-To: yukuai@fnnas.com
-Date: Thu, 15 Jan 2026 01:23:10 +0800
-References: <20260109065230.653281-1-yukuai@fnnas.com> <20260109065230.653281-3-yukuai@fnnas.com> <b6110ffc-f999-49a1-8a7e-ce51af51e211@suse.de> <25dc9258-30af-4132-bd38-ba055ed61005@fnnas.com>
-To: "Hannes Reinecke" <hare@suse.de>, <axboe@kernel.dk>, 
-	<linux-block@vger.kernel.org>, <tj@kernel.org>, <nilay@linux.ibm.com>, 
-	<ming.lei@redhat.com>, <yukuai@fnnas.com>
-Subject: Re: [PATCH v8 2/8] blk-wbt: fix possible deadlock to nest pcpu_alloc_mutex under q_usage_counter
-Message-Id: <03ab5e68-1977-4938-ac03-e36f53a87149@fnnas.com>
-X-Lms-Return-Path: <lba+26967d101+6f358b+vger.kernel.org+yukuai@fnnas.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <25dc9258-30af-4132-bd38-ba055ed61005@fnnas.com>
-Content-Language: en-US
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Hi,
+The following changes since commit 9869d3a6fed381f3b98404e26e1afc75d680cbf9:
 
-=E5=9C=A8 2026/1/12 17:16, Yu Kuai =E5=86=99=E9=81=93:
->>  =C2=A0 =C2=A0 int wbt_set_lat(struct gendisk *disk, s64 val)
->>  =C2=A0 {
->>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct request_queue *q =3D disk->queue;
->> +=C2=A0=C2=A0=C2=A0 struct rq_qos *rqos =3D wbt_rq_qos(q);
->> +=C2=A0=C2=A0=C2=A0 struct rq_wb *rwb =3D NULL;
->>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 unsigned int memflags;
->> -=C2=A0=C2=A0=C2=A0 struct rq_qos *rqos;
->>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int ret =3D 0;
->>  =C2=A0 +=C2=A0=C2=A0=C2=A0 if (!rqos) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 rwb =3D wbt_alloc();
-> Similar here...
+  block: fix race between wbt_enable_default and IO submission (2025-12-12 12:51:11 -0700)
 
-Just checked, looks like something is wrong while you were reviewing this
-patch, the same context wbt_set_lat() shows twice in your reply.
+are available in the Git repository at:
 
-For now, I won't send a new version, otherwise please let me know.
+  git://git.infradead.org/nvme.git tags/nvme-6.19-2026-01-14
 
---=20
-Thansk,
-Kuai
+for you to fetch changes up to 0edb475ac0a7d153318a24d4dca175a270a5cc4f:
+
+  nvme: fix PCIe subsystem reset controller state transition (2026-01-14 07:21:31 -0800)
+
+----------------------------------------------------------------
+nvme fixes for Linux 6.19
+
+ - Device quirk to disable faulty temperature (Ilikara)
+ - TCP target null pointer fix from bad host protocol usage (Shivam)
+ - Add compatible apple controller (Janne)
+ - FC tagset leak fix (Chaitanya)
+ - TCP socket deadlock fix (Hannes)
+ - Target name buffer overrun fix (Shin'ichiro)
+
+----------------------------------------------------------------
+Chaitanya Kulkarni (1):
+      nvme-fc: release admin tagset if init fails
+
+Hannes Reinecke (1):
+      nvmet-tcp: fixup hang in nvmet_tcp_listen_data_ready()
+
+Ilikara Zheng (1):
+      nvme-pci: disable secondary temp for Wodposit WPBSNM8
+
+Janne Grunau (1):
+      nvme-apple: add "apple,t8103-nvme-ans2" as compatible
+
+Nilay Shroff (1):
+      nvme: fix PCIe subsystem reset controller state transition
+
+Shin'ichiro Kawasaki (1):
+      nvmet: do not copy beyond sybsysnqn string length
+
+Shivam Kumar (1):
+      nvme-tcp: fix NULL pointer dereferences in nvmet_tcp_build_pdu_iovec
+
+ drivers/nvme/host/apple.c      |  1 +
+ drivers/nvme/host/fc.c         |  2 ++
+ drivers/nvme/host/pci.c        |  7 ++++++-
+ drivers/nvme/target/passthru.c |  2 +-
+ drivers/nvme/target/tcp.c      | 21 ++++++++++++++++-----
+ 5 files changed, 26 insertions(+), 7 deletions(-)
