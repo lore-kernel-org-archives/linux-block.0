@@ -1,93 +1,48 @@
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A55E135FF67
-	for <linux-block@vger.kernel.org>; Wed, 14 Jan 2026 07:27:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DB6334E760;
+	Wed, 14 Jan 2026 07:42:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768375653; cv=none; b=gma/NA7mbV31MS/HXoN91nSNsPwM8c+8D3a80YRpCYBlPpGsINTWJdHuEaYl6NpQodqXHtAxKY98q4UBiNuGnLLPneT4g7GJ4ARgqL/bCTXTx88QgQL9MM4X4TxaXuDH0CVYWJmPa11ZAd14q12IYDPD6HoPQsOctkA6xhby/Vg=
+	t=1768376528; cv=none; b=JLLdmU+3sF0b6zOvZJWK4bG/i0Bq0GuZlqAZRxDqiTj51graqHWXrTvC5KI8vjg4lyYccJY273AdC3EVxBubYIIG6ruXKDtAdXPtxzAToWXDvceGDKnc+BdiYWePJ7Jpu6XDK25ehspIRNMorH7B5akvNFCx3lHa2Bvab0X8H2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768375653; c=relaxed/simple;
-	bh=DQUeirNpPP89aLFHeqsLAGeTASvH8cy8TfogQVOev1c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RDoP2csCKBHaHSqe3SXblbry+NuqFjDF/sewtXCrntfVBuJhckZ9HHWp3JQPaMKlDGSF0y4jbOqeqNN/HwYz2GHsuDY1dql42ocqBT4TGbqQ031lORkkhpLX4o98iOkcoPt6PmmlMyrbiVgq/cIS9D9J2b3gkoQLMACHHrhFOBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jsy3RiMK; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1768376528; c=relaxed/simple;
+	bh=GJ1oKmnDP37Jb9BXKyvzbmVhZbftS+PHr8QRwOZFqOg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oGOTTInld2CoCvlENcLQUsf0Cf0w0COhtxa3D9m45d4ZLBqjmULej7M17iYsZoMHIz9GWBclaKQp3WsUWFHsnVNKkYJZuCr3g8iYEnTkf+G76vLimUamnYaryz66Rj5q1ZWBwKs8qG5sBDqXlJ6zGuyhI/jLVf/vaKy6R75cvYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=WFFnBPut; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jsy3RiMK"
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-431048c4068so315076f8f.1
-        for <linux-block@vger.kernel.org>; Tue, 13 Jan 2026 23:27:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768375643; x=1768980443; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Iatfbkb039XtZtG7yO5eMvoMHygvxkVJOdhG6yXVCuE=;
-        b=Jsy3RiMKatD5gGcBzlt8vZgyZbSjtRMF8NHUerUpH4iSTn7cmUTXXg40ZxLiDVI4S+
-         lMU6+0a3Vml9Oh4ebjleWnz1bjJDztZ9k3iAHceao/RIIQyE4Ou6Ago20/rDN2s6xZIV
-         2Y0ZC61ca89sSy/eNeTN6tZqpAw4QSkuZX2X3u0JXIndZIppyAP0uZfg4T86VCjy1Mdz
-         1GdJif+MPFpHCjjdnTsWlw9oWTmDkgiDNW25tQ5iwWjdEcBTtD9BuycYum9dGuJ1QRVX
-         spcA1/CUW1fgVL2W14ffZsgyTWT07+WrJ+qsiNDoScL7QtD8/yR1kDToKCNvB1KFN9wh
-         6/QA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768375643; x=1768980443;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Iatfbkb039XtZtG7yO5eMvoMHygvxkVJOdhG6yXVCuE=;
-        b=pSJTyWEHinEmYpeNLGQPIHQohHYp9wiZeoiOYpbTqGQjQgaXMJK+nfsWQEiajk22p9
-         rQkVXgBFxKNt/v2bFTDCoF0cwFmeQQrDO2FO2+bYGKXTrA3pwv5QGASkKbuql0+Nt4tP
-         kPWdvF5q2zzKA7jgfmmhgh/tXzSUg95QEXAOuxLOFpufjXG8dKz67Nn0uUzyddGW3Q8P
-         idy+xPFTvjNvpvGuPj8zZSg75uQVhaU8Oc6HSfZXOdinBEZwTdup/Vg7ix7ZMErQaItd
-         FP4FfuA0rquSVVGU99ey0oO29Z0VbnnByxONlxv1O0VInU3LtHFmSJF3W1ZUgI0hKfru
-         k+EA==
-X-Forwarded-Encrypted: i=1; AJvYcCWs6LT0RAvmpT6aUIhc0teUraGfnF1mMdRoOJnHnbQlL3DE52uKxI/BDW+3JPnOUo+jCuTxYYhIueKzYw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzqu/Khd7qKzwe5gz24IogAeCwmcb1YA17ZuQMppgCeaJlZ1sKr
-	hCGuiawu0hT1/hCPjPuthYtE6tU5ShbLTEZsAmUIxThWo4rMx/gIvRgE
-X-Gm-Gg: AY/fxX4ojVYdoya5HoMtE8/Mm7E6wTHKAkNUNNaCvCyTFai6eUL0CrNbRjwd5eTL7K1
-	Wj1Ie3p3UGnhhydUHVw7ESjbcWRYANdxc0pQQ05YJHw/H7Ik0iK+yJiaAFapzLMDl5o2fvL8hNs
-	y3RwzgtRUB7+acMcCZO+oPrWRP6bhVRo6sIthDpkZLrfTnzFTDxGjOkTHGF40DRlEvs2nAfclUJ
-	V0U3hKrBMjb0YwBnvGuyGGS6xaEMAw3tvdo0s+CzbhQ6rnSN0dgeJggH/oj1UlbeKMr/rmKWngW
-	1NfSHcaHW1VyRFLvmTNhuivJ1BypYf4c7DmM5YRWbcxKtkkxAbPa+mBqdu0ex2zjpr29pld6pTG
-	KAm/6gNEzjkiGOelwmhKXJak/QFx9GwL10AldEc2rQ6qpusWflDfObOWjzC/CGoSXQ01O8G+0hL
-	CYcNsEFJY=
-X-Received: by 2002:a05:6000:402c:b0:431:66a:cbda with SMTP id ffacd0b85a97d-43423d4709emr6998700f8f.0.1768375642965;
-        Tue, 13 Jan 2026 23:27:22 -0800 (PST)
-Received: from localhost ([212.73.77.104])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-432bd0dacd1sm47532193f8f.4.2026.01.13.23.27.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 Jan 2026 23:27:22 -0800 (PST)
-From: Askar Safin <safinaskar@gmail.com>
-To: mpatocka@redhat.com
-Cc: Dell.Client.Kernel@dell.com,
-	agk@redhat.com,
-	brauner@kernel.org,
-	dm-devel@lists.linux.dev,
-	ebiggers@kernel.org,
-	kix@kix.es,
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WFFnBPut"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=szw3/B/ne+BABndo/Nl4eMPVvDooE6ItKnVO892TolQ=; b=WFFnBPutI/FhEKhnqaoVq7VNao
+	K/+dOD0ZT3FzQsiBozAnZcBdr4DY/elIzCZy3FTp+JUQArMVAMwRD/BeUg3IYZ+zHluyPfkj5t27v
+	VIYjLQmqrS+P77pCynze7oOytXfuLhfOssWFGaq1Sq7vs4On/SqMxsljCpQkuE2D1nCAbIkzDn8Gp
+	ywOwXXSL4QI/WH9xOzgCijCG3mY/hMFKDUNbGnkA5QQJS4RO5QxUV1ubgm1b1SgpXZyEutRTm+AsE
+	/J8wCDoAaOrcgIyC93/pipJ/f3MtiI/yltWcEptvpyWM6piQKwyFOTuNVrjfOkTAVigZD6nxOrHj/
+	c4/8Ez/Q==;
+Received: from 85-127-106-146.dsl.dynamic.surfer.at ([85.127.106.146] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vfvVm-00000008DlJ-33DA;
+	Wed, 14 Jan 2026 07:41:51 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>,
+	Christian Brauner <brauner@kernel.org>
+Cc: "Darrick J. Wong" <djwong@kernel.org>,
+	Carlos Maiolino <cem@kernel.org>,
+	Qu Wenruo <wqu@suse.com>,
+	Al Viro <viro@zeniv.linux.org.uk>,
 	linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-lvm@lists.linux.dev,
-	linux-mm@kvack.org,
-	linux-pm@vger.kernel.org,
-	linux-raid@vger.kernel.org,
-	lvm-devel@lists.linux.dev,
-	milan@mazyland.cz,
-	msnitzer@redhat.com,
-	mzxreary@0pointer.de,
-	nphamcs@gmail.com,
-	pavel@ucw.cz,
-	rafael@kernel.org,
-	ryncsn@gmail.com,
-	torvalds@linux-foundation.org
-Subject: Re: [RFC PATCH 2/2] swsusp: make it possible to hibernate to device mapper devices
-Date: Wed, 14 Jan 2026 10:27:05 +0300
-Message-ID: <20260114072705.2798057-1-safinaskar@gmail.com>
+	linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org
+Subject: bounce buffer direct I/O when stable pages are required
+Date: Wed, 14 Jan 2026 08:40:58 +0100
+Message-ID: <20260114074145.3396036-1-hch@lst.de>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <b32d0701-4399-9c5d-ecc8-071162df97a7@redhat.com>
-References: <b32d0701-4399-9c5d-ecc8-071162df97a7@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -95,87 +50,71 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-Mikulas Patocka <mpatocka@redhat.com>:
-> Askar Safin requires swap and hibernation on the dm-integrity device mapper
-> target because he needs to protect his data.
+Hi all,
 
-Now I see that your approach is valid. (But some small changes are needed.)
+this series tries to address the problem that under I/O pages can be
+modified during direct I/O, even when the device or file system require
+stable pages during I/O to calculate checksums, parity or data
+operations.  It does so by adding block layer helpers to bounce buffer
+an iov_iter into a bio, then wires that up in iomap and ultimately
+XFS.
 
-[[ TL;DR: you approach is good. I kindly ask you to continue with this patch.
-Needed changes are in section "Needed changes". ]]
+The reason that the file system even needs to know about it, is because
+reads need a user context to copy the data back, and the infrastructure
+to defer ioends to a workqueue currently sits in XFS.  I'm going to look
+into moving that into ioend and enabling it for other file systems.
+Additionally btrfs already has it's own infrastructure for this, and
+actually an urgent need to bounce buffer, so this should be useful there
+and could be wire up easily.  In fact the idea comes from patches by
+Qu that did this in btrfs.
 
-Let me explain why I initially rejected your patch and why now I think it is good.
+This patch fixes all but one xfstests failures on T10 PI capable devices
+(generic/095 seems to have issues with a mix of mmap and splice still,
+I'm looking into that separate), and make qemu VMs running Windows,
+or Linux with swap enabled fine on an XFS file on a device using PI.
 
+Performance numbers on my (not exactly state of the art) NVMe PI test
+setup:
 
-= Why I rejected =
+  Sequential reads using io_uring, QD=16.
+  Bandwidth and CPU usage (usr/sys):
 
-In your patch "notify_swap_device" call located before "pm_restrict_gfp_mask".
+  | size |        zero copy         |          bounce          |
+  +------+--------------------------+--------------------------+
+  |   4k | 1316MiB/s (12.65/55.40%) | 1081MiB/s (11.76/49.78%) |
+  |  64K | 3370MiB/s ( 5.46/18.20%) | 3365MiB/s ( 4.47/15.68%) |
+  |   1M | 3401MiB/s ( 0.76/23.05%) | 3400MiB/s ( 0.80/09.06%) |
+  +------+--------------------------+--------------------------+
 
-But "pm_restrict_gfp_mask" is call, which forbids further swapping. I. e.
-we still can swap till "pm_restrict_gfp_mask" call!
+  Sequential writes using io_uring, QD=16.
+  Bandwidth and CPU usage (usr/sys):
 
-Thus "notify_swap_device" should be moved after "pm_restrict_gfp_mask" call.
+  | size |        zero copy         |          bounce          |
+  +------+--------------------------+--------------------------+
+  |   4k |  882MiB/s (11.83/33.88%) |  750MiB/s (10.53/34.08%) |
+  |  64K | 2009MiB/s ( 7.33/15.80%) | 2007MiB/s ( 7.47/24.71%) |
+  |   1M | 1992MiB/s ( 7.26/ 9.13%) | 1992MiB/s ( 9.21/19.11%) |
+  +------+--------------------------+--------------------------+
 
-But then I thought about more complex storage hierarchies. For example,
-swap on top of some dm device on top of loop device on top of some filesystem
-on top of some another dm device, etc.
+Note that the 64k read numbers look really odd to me for the baseline
+zero copy case, but are reproducible over many repeated runs.
 
-If we have such hierarchy, then hibernating dm devices should be intertwined
-with freezing of filesystems, which happens in "filesystems_freeze" call.
+The bounce read numbers should further improve when moving the PI
+validation to the file system and removing the double context switch,
+which I have patches for that will sent as soon as we are done with
+this series.
 
-But "filesystems_freeze" call located before "pm_restrict_gfp_mask" call, so
-here we got contradiction.
-
-In other words, we should satisfy this 3 things at the same time:
-
-- Hibernating of dm devices should happen inside "filesystems_freeze" call
-intermixed with freezing of filesystems
-- Hibernating of dm devices should happen after "pm_restrict_gfp_mask" call
-- "pm_restrict_gfp_mask" is located after "filesystems_freeze" call in current
-kernel
-
-These 3 points obviously contradict to each other.
-
-So in this point I gave up.
-
-The only remaining solution (as I thought at that time) was to move
-"filesystems_freeze" after "pm_restrict_gfp_mask" call (or to move
-"pm_restrict_gfp_mask" before "filesystems_freeze").
-
-But:
-- Freezing of filesystem might require memory. It is bad idea to call
-"filesystems_freeze" after we forbid to swap
-- This would be pretty big change to the kernel. I'm not sure that my
-small use case justifies such change
-
-So in this point I totally gave up.
-
-
-= Why now I think your patch is good =
-
-But then I found this your email:
-https://lore.kernel.org/all/3f3d871a-6a86-354f-f83d-a871793a4a47@redhat.com/ .
-
-And now I see that complex hierarchies, such as described above, are not
-supported anyway!
-
-This fully ruins my argument above.
-
-And this means that your patch in fact works!
-
-
-= Needed changes =
-
-Please, move "notify_swap_device" after "pm_restrict_gfp_mask".
-
-Also: you introduced new operation to target_type: hibernate.
-I'm not sure we need this operation, we already have presuspend
-and postsuspend. In my personal hacky patch I simply added
-"dm_bufio_client_reset" to the end of "dm_integrity_postsuspend",
-and it worked. But I'm not sure about this point, i. e. if
-you think that we need "hibernate", then go with it.
-
-
--- 
-Askar Safin
+Diffstat:
+ block/bio.c           |  323 ++++++++++++++++++++++++++++++--------------------
+ block/blk.h           |   11 -
+ fs/iomap/direct-io.c  |  189 +++++++++++++++--------------
+ fs/iomap/ioend.c      |    8 +
+ fs/xfs/xfs_aops.c     |    8 -
+ fs/xfs/xfs_file.c     |   41 +++++-
+ include/linux/bio.h   |   26 ++++
+ include/linux/iomap.h |    9 +
+ include/linux/uio.h   |    3 
+ lib/iov_iter.c        |   98 +++++++++++++++
+ 10 files changed, 490 insertions(+), 226 deletions(-)
