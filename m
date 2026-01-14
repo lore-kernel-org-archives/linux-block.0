@@ -1,69 +1,133 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACD5D258CCC
-	for <linux-block@vger.kernel.org>; Wed, 14 Jan 2026 12:44:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FB011D0DEE;
+	Wed, 14 Jan 2026 12:45:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768394644; cv=none; b=S9wUzpdAPn4PRlbbRCnJi6tOs/+WY+/sqpWqoVvWANUr9DeYV4vXqB7jz8m1ZxmAHAyIqU4q9O+H9eUGdb6aBpV4eGwMpu2qxzmxGtjoPcFy8UweDGz4BNBYXhOaamCi5g3jORSQ3wq76zwTksJz63W2f8Pn9p556nukJjUR0OU=
+	t=1768394749; cv=none; b=bHiLrECTwBzOx2Xaf2OOagTcScTsy6Xp87j3vL2YbPW0iP1HePhjcOnIbuCqtdLq99d12vsGyD4nzAAlhPtjKObf53vJiHzlJRett6hL0gc6DTdAQzzyvHdtuuwK3yxGGeF6eSc8rOVpVg9y/BsGIs9a9mbpCr0n1d9ySHJGDpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768394644; c=relaxed/simple;
-	bh=rTXiqjGwQe9StbY8q2PGEsSVnb5XD/eiq91f8fTTRKI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Yk/0bAqtrPN2HWMkZzYR8VeOSLpg9APcPopWIRUWZniTwjZuIuz62ZEs/uF1VAlBUyumJ5EpTl0MWIKx7ReN3HfTKNZ3KQfBw8s8egepYFvv83Ii3P0ky0MThOzuM3oxKgCxXRRBMo4jpYCCd+9QVuqmWkrEpioBokGkX2zLO7E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=desi+bbh; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1768394749; c=relaxed/simple;
+	bh=Vqo9DURxpzPQ+KJ4W44yz2L9R/yyGNIsJHVgPJnIi9A=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=R14PjSZ7GOyYW7s3Y6PwApHQuQMHwWJKavQnzD/huo+XqpmZQHo5TLZSV4Lb3ZgzJevJnT78WUfT3UpdmRDKr7pB35qLAQlofxMfDU/kSaiBK2kvx5LKUEM3n6qIrxgBy6z6AjNmHnsGc8SQPESGQdPbQ2O/9K9/9iyTV/2cGuM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=lB7tLl+l; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="desi+bbh"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=KOu8e0fvmwRWQ233dbgArPcX6Udc57jyEPBr1+MBcUQ=; b=desi+bbhygwxq8XMZtuOwgx6vv
-	nYcTfKhc5GY8sWVCT7bL9gn9BmKv6gFjyvaBW0dSZXEzQr5SqPeeD7WIhuhg/wG5wlvWTbBcEdosg
-	O2wALqxIeGRsoLO4b+L7Sy5xozWvsd3D4my5YD211ZUT6gZ0UJnUtBCoP/IN0gcdei7zu6YMw2z4F
-	rGYJkccSMkepN8IgjOZ4JRQIgKnt3+WHdDZynYmEVvY0cwVCkjWDKSri7kZ1bw9IYshMaM4SzxLvT
-	qDFuzTFqiJlzkqQ2Zxw77eZHapbOdRCa4gkPvj3EYXKVHQZDYx0CQVMABFwlq3skMQQ4wQayhanlf
-	mmSG6ayw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vg0E9-00000009DkZ-327u;
-	Wed, 14 Jan 2026 12:43:57 +0000
-Date: Wed, 14 Jan 2026 04:43:57 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: alex+zkern@zazolabs.com
-Cc: Yi Zhang <yi.zhang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	fengnanchang@gmail.com, linux-block <linux-block@vger.kernel.org>,
-	Ming Lei <ming.lei@redhat.com>,
-	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: Re: [bug report][bisected] kernel BUG at lib/list_debug.c:32!
- triggered by blktests nvme/049
-Message-ID: <aWePjbx5p269pXzn@infradead.org>
-References: <CAHj4cs_SLPj9v9w5MgfzHKy+983enPx3ZQY2kMuMJ1202DBefw@mail.gmail.com>
- <0e1446e1-f2a7-41f4-8b3c-bce225f49aa6@kernel.dk>
- <CAHj4cs-uHD_cm_5MHAS2Nyd1Dt6=sqNPrD4yWZrbykM+WvyxbQ@mail.gmail.com>
- <CAHj4cs_d81+Tbe+kh=9sz-ort4MZnC1F5gzPLGt2jrDJxA2P_g@mail.gmail.com>
- <4817253e-2cec-4cf8-95c4-6292e758fb8f@zazolabs.com>
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="lB7tLl+l"
+Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60EBY4Hr1562086;
+	Wed, 14 Jan 2026 04:45:38 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
+	 bh=/mbzjjpPpsVzlkiMoi7YIoiToKWvmhWtEUDnWSeDPQ8=; b=lB7tLl+l2I1S
+	ofzL/aelsqyH+NKrxmfXvEXhmAMb1fRqdpRbFVOFzsxxylyDNsaLjc1KO1vJSZtg
+	D85wfPdQK/z2Ugank7CIE5aRW70AdZEUYIMwxTHKbvPKpD6IQMzbwXEBi9n/EkQm
+	ysyjc3lkZvv18QOqjLfBWYUtaxm+zPQ4TZQX1OmvM6BVl+EpVRKx5t4XR/IgkNPH
+	8H/G3mPOuN+aTzDcoM155XSR4sDw+Q+eem8y+Kzn9ItBAXCydUdxfd5UrEmtuChc
+	0/t363IdtEcK6MnOwcRy7jlg8OPQULvaTWN+DFKikpxoEhHYcFx2p58mGcfvJXAi
+	eDp7wj3bqw==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4bpact8f94-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Wed, 14 Jan 2026 04:45:38 -0800 (PST)
+Received: from devbig003.atn7.facebook.com (2620:10d:c0a8:1b::8e35) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.29; Wed, 14 Jan 2026 12:45:36 +0000
+From: Chris Mason <clm@meta.com>
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+CC: Chris Mason <clm@meta.com>, Andrew Morton <akpm@linux-foundation.org>,
+        Minchan Kim <minchan@kernel.org>, Brian Geffon <bgeffon@google.com>,
+        "David
+ Stevens" <stevensd@google.com>, <linux-kernel@vger.kernel.org>,
+        <linux-mm@kvack.org>, <linux-block@vger.kernel.org>
+Subject: Re: [PATCH 1/3] zram: use u32 for entry ac_time tracking
+Date: Wed, 14 Jan 2026 04:45:07 -0800
+Message-ID: <20260114124522.1326519-1-clm@meta.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <d7c0b48450c70eeb5fd8acd6ecd23593f30dbf1f.1765775954.git.senozhatsky@chromium.org>
+References:
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4817253e-2cec-4cf8-95c4-6292e758fb8f@zazolabs.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: oZjgV2DufGzTBOccm1TJGbVQnIOX0PPd
+X-Authority-Analysis: v=2.4 cv=d5f4CBjE c=1 sm=1 tr=0 ts=69678ff2 cx=c_pps
+ a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
+ a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=cm27Pg_UAAAA:8
+ a=XjV5nGeaLPyDJ1P11u0A:9
+X-Proofpoint-GUID: oZjgV2DufGzTBOccm1TJGbVQnIOX0PPd
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTE0MDEwNiBTYWx0ZWRfX4Bbro2YFOdmr
+ WvZ7hQLyaHbsDQwXHz4cWEw+UB2D9Kph4AH+X9S5H2IdPfk3msQo8bgK51MR2xCWCERBunaFKeR
+ IbUpS/ZV5To+zgtKg8PqhICjPK2FES/4aki85aVyqUhLKBQQJdbXvOpn/S+BoZT1ptFDpyUPrTV
+ CR9r3ZR/zCqClq4GslGkAy7XMKZTjukeOLkjANqcCJMoRkOyJmNnVB5kLNt+2iIrcRwXNzh0zdP
+ Mc1fQ6XBUO6ohFRj+19+IojcjtrIcihQ87t6smv6GUO22vL0Kuvjuscei5gOI7AImsKBU8EvEBT
+ yKfxbSWURDRD1FkRCXqyjCU0oLkfLGt313mNq6zzg12WA2Yzihv+gtfX+rua8pWED5Z27VkpCgd
+ AUXGEr8Zi6PiiCWW698Fftwrt0yuYfuWqLAY2SYFVKznDaLftH7RSSO6GbUA3EYe5mI2iO0Efmf
+ HdgMUJvwnNyREGhzVVw==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-14_04,2026-01-09_02,2025-10-01_01
 
-On Wed, Jan 14, 2026 at 11:40:41AM +0200, Alexander Atanasov wrote:
-> Double linked lists require init, single lists do not (including
-> io_wq_work_list). iopoll_node is never list_init-ed. So init before adding.
+On Mon, 15 Dec 2025 14:47:11 +0900 Sergey Senozhatsky <senozhatsky@chromium.org> wrote:
+
+> We can reduce sizeof(zram_table_entry) on 64-bit systems
+> by converting flags and ac_time to u32.  Entry flags fit
+> into u32, and for ac_time u32 gives us over a century of
+> entry lifespan (approx 136 years) which is plenty (zram
+> uses system boot time (seconds)).
 > 
-> Can you check if this fixes it for you? If yes, i will submit it as a proper
-> patch - no way to test it at the moment.
+> In struct zram_table_entry we use bytes aliasing, because
+> bit-wait API (for slot lock) requires a whole unsigned
+> long word.
 
-The heads (anchors) of lists need initializations.  The entries added
-to the list do not.  I know this is a bit confusing because they use
-the same time, but besides not compiling due to the double-&, the patch
-would not do anything even the version that would compile.
+Hi everyone,
+
+I ran mm-new through the AI patch review prompts, and this one was flagged:
+
+> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+> --- a/drivers/block/zram/zram_drv.c
+> +++ b/drivers/block/zram/zram_drv.c
+
+[ ... ]
+
+> @@ -222,7 +221,7 @@ static void zram_accessed(struct zram *zram, u32 index)
+>  	zram_clear_flag(zram, index, ZRAM_IDLE);
+>  	zram_clear_flag(zram, index, ZRAM_PP_SLOT);
+>  #ifdef CONFIG_ZRAM_TRACK_ENTRY_ACTIME
+> -	zram->table[index].ac_time = ktime_get_boottime();
+> +	zram->table[index].attr.ac_time = (u32)ktime_get_boottime_seconds();
+>  #endif
+>  }
+
+This stores seconds in ac_time.
+
+[ ... ]
+
+> @@ -1588,7 +1588,7 @@ static ssize_t read_block_state(struct file *file, char __user *buf,
+>  		if (!zram_allocated(zram, index))
+>  			goto next;
+>
+> -		ts = ktime_to_timespec64(zram->table[index].ac_time);
+> +		ts = ktime_to_timespec64(zram->table[index].attr.ac_time);
+>  		copied = snprintf(kbuf + written, count,
+>  			"%12zd %12lld.%06lu %c%c%c%c%c%c\n",
+>  			index, (s64)ts.tv_sec,
+>  			ts.tv_nsec / NSEC_PER_USEC,
+
+ktime_to_timespec64() is defined as ns_to_timespec64(), which expects
+nanoseconds.  Since ac_time now stores seconds, will this produce
+incorrect output?
+
+For example, if ac_time is 3600 (representing 1 hour of uptime),
+ns_to_timespec64(3600) would compute ts.tv_sec = 3600 / 1000000000 = 0
+and ts.tv_nsec = 3600, resulting in "0.000003" instead of "3600.000000".
+
 
