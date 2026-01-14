@@ -1,215 +1,105 @@
-Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 052112E8B74
-	for <linux-block@vger.kernel.org>; Wed, 14 Jan 2026 15:26:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7A9B39E6EF
+	for <linux-block@vger.kernel.org>; Wed, 14 Jan 2026 15:41:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768404404; cv=none; b=jRzAhZISma0pdKc29ZRdI8iFfH0hechu1REdO0z6WjEMLtvGxojTa8qhid95i3zTxu6c/PGNsay7dgHnpON4QUSfNOlO4UQBI/L4WzXsH5mnvAgm56uT9izKn2SVhML0vFAvymJRswXo6cGAVfUCssvde1DSjhP+KUWZL7Nz02Y=
+	t=1768405285; cv=none; b=KPKMpq3HirNiu/EAdWj/2m2FsdwNdERqYQs8cCgdhBjin7RTS4Q4CP1WX7JlaAkpq7FVch1pp1e9agkNHj2uF0RCXH/K+2tk0EwNAKW6qQr9A5tkBQKn40TZy3FmlH5/7fF/JHN1Bqy61600bk/rYx9WgELoOnoWSvCYXVcxhaA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768404404; c=relaxed/simple;
-	bh=0/F4TDV0UiAUy0rUQ3S2guINcAU7UzUN13WXmSHQ1Mc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QY9nEF7oIAYNC3Bnm+meGqoEK+ufhj0JRhqHWDSvks5SvHkOOsFF6v0eHHQwQKhPM6rxre4idzH9FsNibWqY5OzKDcfAbOhTwGhYaeT2IzyRYuIJ/kVGAn5TkQTLDrUSEXtXva8x5jGGEeVHcVa4OuonKiMwdj1J+GEy5wVuoGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=XdZMwUGg; arc=none smtp.client-ip=209.85.160.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1768405285; c=relaxed/simple;
+	bh=uoYeTVO/oNx7JVivr+YReXOWFEc0wL2JJKTh1X9OQXI=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sEIKkVJMtplK7iKPNcNShwhhK1fUtYG9TB7o9cx2cG/M3oG37lUgozpu7czMGPH4fHt8IniftN6l4oa2a+LXUh6xltQF208ts++hrtD9MrgIlQazcN59zpYOkjBBbSUrU0qEy90a18eeZvTDhCliffBerB8sBhM6U1x8zM/hqK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=Msk8AYLl; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="XdZMwUGg"
-Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-3f5aaa0c8d7so6719439fac.3
-        for <linux-block@vger.kernel.org>; Wed, 14 Jan 2026 07:26:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1768404401; x=1769009201; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bDmgdyOlCADWml/YDAc9mPJyIF2TgZY1TTtFY3TujVQ=;
-        b=XdZMwUGgyUkr60+LRPoXm4TCq2dYjHw57lvwanPlNkY0dFlmQbbFKidJZYKfp4CblQ
-         mntex81FclRj1SBxVhjeFvsWiVnTte+wmmp3eiDvhHso6t/5y7BWrX8f98b8ygbwPc0X
-         NMN4kymtrR5jsauOIpJyVwnjJOMadzGYa36Xikbnvxgy+kQY5XF+ADnkW2QJ9EJgIQSP
-         zU1uQeOTt6Cseu5yZjJMRDPPLqNd3WRrBYID9+vP6FKPtz2EQ1bxOBkxzTi5ODnaOl8k
-         j4CkaMa9wmqZeDp60xJDM3Rg/Ux1CFUEPBxVBIZku6xmaW4+eLOA5Bc3y1dBAnVsCrwr
-         twXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768404401; x=1769009201;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bDmgdyOlCADWml/YDAc9mPJyIF2TgZY1TTtFY3TujVQ=;
-        b=DsFqgKGl+qWBygR+J1nta7c8uTKYCHjPReBsf3S1NMkhZrexwcuOOb26mqbtrdG/ZR
-         dLxDGSpVjsTmg2MY4u0/41plKbOS9OcrahYZDk4e4ZmGDfyvnKtns4+wx1KLxopIL4BJ
-         Ocq+0EHB+/sO+Miv83I4xlqrjC8s7hbk5EcvWSwvmAdEXER+bi3DcdsJina8x5zgNquZ
-         Ay/PFiHA6bKsKudm5xT4tT0rdb+NLun4gVkQyMFmHAwbI1O7Ivws7ZDNbxWSBsMFUiMT
-         ucz8vArB0I+TXxGwPWYu+xrG50glDSP6R5MOcGRIdaH7BvKZRe8s+WtK5Ci8X5Rx4QeS
-         dq2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWhO71mS5r64TROr5GwZStxQzHx6oBajitBFT2yWfauIr6CLQcpZkMzc5CxQF6HCrZ8NHlCj6O0ItNJPA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWGzanW4iJjvtVJmQlGQHeeBnnRQ1q+BWg+bt2HD2wy68yGLTV
-	L9mUuZziWBm1DBim7yEM3U+XIqegi9YOK4KVnevOqDUNBPQV9XIWviREN1Z81FC1n9Y=
-X-Gm-Gg: AY/fxX5u7jPTnOqX/XY+qGWMdwWzH60eerahLZvwuNTOzIJtP1Pc2N4SDwF1DxHW3DA
-	WiU2VgZ5zA2eqRgJm49QdWxIY7tDEwX3/BSp/6N7TH4+AHv5fYwsQhdtgWzG/67uwOITwluqUDy
-	ojSnQbkDhfu7w0Qcz++2wBnawoG0d9+bNXJiA7QvLMDuE7ifREkBkRqbsKhqivObmVW7gCzBib4
-	6+6temkpsYm/vMfZSHyQlI/CsrncpLidfF/MoLsUINizSCsYYORCisVePqMcXZeyB4XgSYDSQIX
-	jBkjEG9AbhXi5v2kI/cOf7uRpFHLcI1swx5undVScgfF2FEzpPrv2l3EBCGM5Bvre1icqW5bBgy
-	10MzFa1jMCUVwzMqWu05XzrN6JXkBX9UoVypN9Oh346tg+vUJeeetv7xa3b6e7du8Y64GjagdIc
-	gme1BeH20=
-X-Received: by 2002:a05:6870:3751:b0:3ec:565a:13a4 with SMTP id 586e51a60fabf-404070fb615mr1921030fac.34.1768404400649;
-        Wed, 14 Jan 2026 07:26:40 -0800 (PST)
-Received: from [192.168.1.102] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-3ffa5072427sm16245382fac.12.2026.01.14.07.26.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 14 Jan 2026 07:26:40 -0800 (PST)
-Message-ID: <836abb95-31ca-40c1-8f9e-c1748a251c1b@kernel.dk>
-Date: Wed, 14 Jan 2026 08:26:39 -0700
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="Msk8AYLl"
+Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60EETKbY4028387
+	for <linux-block@vger.kernel.org>; Wed, 14 Jan 2026 07:41:22 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
+	 bh=t++cTXL1wgV9wEspodYuYmUnkMprtJ4AbLORX5XRU70=; b=Msk8AYLlS9ks
+	3s4Hj6Q2bZAhVsqVPYaQhFD1L+M6DzSLyB7+dmhrgjD7pdDbwQler9jfSSeY919w
+	XtsvdEIsJITlgTb1DLDWbb37VeSF9ZvuPd6J2WxGUTB76QZyUALkqFsCrH7RRhbm
+	qvZ5++Q5/2o5EHoXscpm0ZtE9wBFr4+xm5ZZM3xzJlveIMkU4Jf5KPhqHnxhalyL
+	XEZU9KuDUq40y5Tje2rofJoT4w8s/GZT3wgzhyBEfRYD5vvP3zSZwJuFVcNUqHpa
+	1OyXBPZdvOO2VxxiUtP0xA1RtJEcNJAlGwDvg/rNAlfo79lYR8NeAVVaTaINDvPz
+	b2iV1RooGQ==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4bp6pwug6r-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-block@vger.kernel.org>; Wed, 14 Jan 2026 07:41:21 -0800 (PST)
+Received: from twshared18080.32.frc3.facebook.com (2620:10d:c085:208::f) by
+ mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.29; Wed, 14 Jan 2026 15:41:21 +0000
+Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
+	id 02BB563A8FF9; Wed, 14 Jan 2026 07:41:13 -0800 (PST)
+From: Keith Busch <kbusch@meta.com>
+To: <dm-devel@lists.linux.dev>, <linux-block@vger.kernel.org>,
+        <snitzer@kernel.org>, <hch@lst.de>, <axboe@kernel.dk>,
+        <ebiggers@kernel.org>
+CC: Keith Busch <kbusch@kernel.org>
+Subject: [PATCHv2 1/3] block: remove stacking default dma_alignment
+Date: Wed, 14 Jan 2026 07:41:11 -0800
+Message-ID: <20260114154113.3207790-2-kbusch@meta.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260114154113.3207790-1-kbusch@meta.com>
+References: <20260114154113.3207790-1-kbusch@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [bug report][bisected] kernel BUG at lib/list_debug.c:32!
- triggered by blktests nvme/049
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Yi Zhang <yi.zhang@redhat.com>, fengnanchang@gmail.com,
- linux-block <linux-block@vger.kernel.org>,
- Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-References: <CAHj4cs_SLPj9v9w5MgfzHKy+983enPx3ZQY2kMuMJ1202DBefw@mail.gmail.com>
- <0e1446e1-f2a7-41f4-8b3c-bce225f49aa6@kernel.dk>
- <CAHj4cs-uHD_cm_5MHAS2Nyd1Dt6=sqNPrD4yWZrbykM+WvyxbQ@mail.gmail.com>
- <CAHj4cs_d81+Tbe+kh=9sz-ort4MZnC1F5gzPLGt2jrDJxA2P_g@mail.gmail.com>
- <aWekEgznso6zkgdI@fedora> <78ff994b-26e8-4b35-a83f-15bb61865e87@kernel.dk>
- <9ae067ba-d0b6-49ac-9e96-01d23348261f@kernel.dk> <aWe0SjcDRQZM2t2G@fedora>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <aWe0SjcDRQZM2t2G@fedora>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Authority-Analysis: v=2.4 cv=GYIaXAXL c=1 sm=1 tr=0 ts=6967b921 cx=c_pps
+ a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
+ a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8
+ a=wfdUoG3Gv6Dt7mlkbiwA:9
+X-Proofpoint-GUID: gQpOJNvym_Jrb4wTuOL4EW-noVhDY9Y1
+X-Proofpoint-ORIG-GUID: gQpOJNvym_Jrb4wTuOL4EW-noVhDY9Y1
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTE0MDEzMSBTYWx0ZWRfXz3ATdcjbsgfX
+ hhDN0r7hAKMsJmYbUjV183soWDue67ag2xv7M1cw4931uTjuX1AEJncAg74lMqCr/Y73qTsMw2W
+ oO3wO5hs8R0q5vRQWMGsLPkTrfE0/myuRLO70DAZPOfzGAYs5aZ5EzF/pJG0WqAookrSXj+A+Jk
+ NdsDIPa0dGqbTQ9BOP/xifTD5IN6i7OsRJXBbTnOUtzQcQmbogHSDU06eOYcDE/1YCt0U9KfFUp
+ g7RDTfkdgR5ctanIVcCh1ttHfySCrtqHZU0AYd/gaO+lVMuASn5LIG+dO1VDoxrk+dx0H12CcTV
+ 2SVOykCS23PUt0uvabFkBguVUurrcFZdHNkjDLbuS133DN+bFT7wHYwNqq8b37VwDF/F+HPrufA
+ tsYsoFas6Eix8uxzMd3Me8uNY0HaAb3JV8p4vj7Qyn8CdIRxINm47dB1ohnc+DNGPnd2n9Go85Q
+ 2FdJvmblVI7pIpDHeOg==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2026-01-14_04,2026-01-14_01,2025-10-01_01
 
-On 1/14/26 8:20 AM, Ming Lei wrote:
-> On Wed, Jan 14, 2026 at 07:58:54AM -0700, Jens Axboe wrote:
->> On 1/14/26 7:43 AM, Jens Axboe wrote:
->>> On 1/14/26 7:11 AM, Ming Lei wrote:
->>>> On Wed, Jan 14, 2026 at 01:58:03PM +0800, Yi Zhang wrote:
->>>>> On Thu, Jan 8, 2026 at 2:39?PM Yi Zhang <yi.zhang@redhat.com> wrote:
->>>>>>
->>>>>> On Thu, Jan 8, 2026 at 12:48?AM Jens Axboe <axboe@kernel.dk> wrote:
->>>>>>>
->>>>>>> On 1/7/26 9:39 AM, Yi Zhang wrote:
->>>>>>>> Hi
->>>>>>>> The following issue[2] was triggered by blktests nvme/059 and it's
->>>>>>>
->>>>>>> nvme/049 presumably?
->>>>>>>
->>>>>> Yes.
->>>>>>
->>>>>>>> 100% reproduced with commit[1]. Please help check it and let me know
->>>>>>>> if you need any info/test for it.
->>>>>>>> Seems it's one regression, I will try to test with the latest
->>>>>>>> linux-block/for-next and also bisect it tomorrow.
->>>>>>>
->>>>>>> Doesn't reproduce for me on the current tree, but nothing since:
->>>>>>>
->>>>>>>> commit 5ee81d4ae52ec4e9206efb4c1b06e269407aba11
->>>>>>>> Merge: 29cefd61e0c6 fcf463b92a08
->>>>>>>> Author: Jens Axboe <axboe@kernel.dk>
->>>>>>>> Date:   Tue Jan 6 05:48:07 2026 -0700
->>>>>>>>
->>>>>>>>     Merge branch 'for-7.0/blk-pvec' into for-next
->>>>>>>
->>>>>>> should have impacted that. So please do bisect.
->>>>>>
->>>>>> Hi Jens
->>>>>> The issue seems was introduced from below commit.
->>>>>> and the issue cannot be reproduced after reverting this commit.
->>>>>
->>>>> The issue still can be reproduced on the latest linux-block/for-next
->>>>
->>>> Hi Yi,
->>>>
->>>> Can you try the following patch?
->>>>
->>>>
->>>> diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
->>>> index a9c097dacad6..7b0e62b8322b 100644
->>>> --- a/drivers/nvme/host/ioctl.c
->>>> +++ b/drivers/nvme/host/ioctl.c
->>>> @@ -425,14 +425,23 @@ static enum rq_end_io_ret nvme_uring_cmd_end_io(struct request *req,
->>>>  	pdu->result = le64_to_cpu(nvme_req(req)->result.u64);
->>>>  
->>>>  	/*
->>>> -	 * IOPOLL could potentially complete this request directly, but
->>>> -	 * if multiple rings are polling on the same queue, then it's possible
->>>> -	 * for one ring to find completions for another ring. Punting the
->>>> -	 * completion via task_work will always direct it to the right
->>>> -	 * location, rather than potentially complete requests for ringA
->>>> -	 * under iopoll invocations from ringB.
->>>> +	 * For IOPOLL, complete the request inline. The request's io_kiocb
->>>> +	 * uses a union for io_task_work and iopoll_node, so scheduling
->>>> +	 * task_work would corrupt the iopoll_list while the request is
->>>> +	 * still on it. io_uring_cmd_done() handles IOPOLL by setting
->>>> +	 * iopoll_completed rather than scheduling task_work.
->>>> +	 *
->>>> +	 * For non-IOPOLL, complete via task_work to ensure we run in the
->>>> +	 * submitter's context and handling multiple rings is safe.
->>>>  	 */
->>>> -	io_uring_cmd_do_in_task_lazy(ioucmd, nvme_uring_task_cb);
->>>> +	if (blk_rq_is_poll(req)) {
->>>> +		if (pdu->bio)
->>>> +			blk_rq_unmap_user(pdu->bio);
->>>> +		io_uring_cmd_done32(ioucmd, pdu->status, pdu->result, 0);
->>>> +	} else {
->>>> +		io_uring_cmd_do_in_task_lazy(ioucmd, nvme_uring_task_cb);
->>>> +	}
->>>> +
->>>>  	return RQ_END_IO_FREE;
->>>>  }
->>>>  
->>>
->>> Ah yes that should fix it, the task_work addition will conflict with
->>> the list addition. Don't think it's safe though, which is why I made
->>> them all use task_work previously. Let me fix it in the IOPOLL patch
->>> instead.
->>
->> This should be better:
->>
->> diff --git a/include/linux/io_uring_types.h b/include/linux/io_uring_types.h
->> index dd084a55bed8..1fa8d829cbac 100644
->> --- a/include/linux/io_uring_types.h
->> +++ b/include/linux/io_uring_types.h
->> @@ -719,13 +719,10 @@ struct io_kiocb {
->>  	atomic_t			refs;
->>  	bool				cancel_seq_set;
->>  
->> -	/*
->> -	 * IOPOLL doesn't use task_work, so use the ->iopoll_node list
->> -	 * entry to manage pending iopoll requests.
->> -	 */
->>  	union {
->>  		struct io_task_work	io_task_work;
->> -		struct list_head	iopoll_node;
->> +		/* For IOPOLL setup queues, with hybrid polling */
->> +		u64                     iopoll_start;
->>  	};
->>  
->>  	union {
->> @@ -734,8 +731,8 @@ struct io_kiocb {
->>  		 * poll
->>  		 */
->>  		struct hlist_node	hash_node;
->> -		/* For IOPOLL setup queues, with hybrid polling */
->> -		u64                     iopoll_start;
->> +		/* IOPOLL completion handling */
->> +		struct list_head	iopoll_node;
->>  		/* for private io_kiocb freeing */
->>  		struct rcu_head		rcu_head;
->>  	};
-> 
-> This way looks better, just `req->iopoll_start` needs to read to local
-> variable first in io_uring_hybrid_poll().
+From: Keith Busch <kbusch@kernel.org>
 
-True, let me send out a v2.
+The dma_alignment becomes 511 anyway if the caller doesn't explicitly
+set it. But setting this default prevents the stacked device from
+requesting a lower value even if it can handle lower alignments.
 
--- 
-Jens Axboe
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ block/blk-settings.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index b38e94c85402a..2a7cb46973440 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -41,7 +41,6 @@ void blk_set_stacking_limits(struct queue_limits *lim)
+ 	lim->physical_block_size =3D SECTOR_SIZE;
+ 	lim->io_min =3D SECTOR_SIZE;
+ 	lim->discard_granularity =3D SECTOR_SIZE;
+-	lim->dma_alignment =3D SECTOR_SIZE - 1;
+ 	lim->seg_boundary_mask =3D BLK_SEG_BOUNDARY_MASK;
+=20
+ 	/* Inherit limits from component devices */
+--=20
+2.47.3
 
