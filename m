@@ -1,146 +1,149 @@
-Received: from mail-dl1-f50.google.com (mail-dl1-f50.google.com [74.125.82.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11F8218B0F
-	for <linux-block@vger.kernel.org>; Wed, 14 Jan 2026 04:17:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768364258; cv=pass; b=qsRvi7k4wuIjsko9p1cwoUvZx4c3I5nqNCxurzGF7uGOjC44OXRZYJi07o2obTIE6WK0ad6M9rPaRNuX1dfx6bieXhkX3SniMB8ttmX8ZMLvmV6WASfXd8DcPTvFs1KhyeLpAyPwNk0OxZfhi8U/rteGxzBsGhtoMVC0/AzM6ZA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768364258; c=relaxed/simple;
-	bh=H32VidvqQFtCxxNHQog9PbRI04+h9abDbVnH952IaNE=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 299BC33F361
+	for <linux-block@vger.kernel.org>; Wed, 14 Jan 2026 05:58:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768370310; cv=none; b=qzF4MC/W0f7jFYFKO1KQ0n7erSH2yX7y20PCYR9Ex1/TQIM/n5BW3cld8CVEsxz8fVAyYW7ir4KKFxt3wl01F/M+Hwkmcxd+j+OnYR8fBuPmZwNO1llPKaC/n9nSeNeYQl6kOziT9TuGiy+BRVTQbKBqcEyC5EOFEkvv/ZuhWRk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768370310; c=relaxed/simple;
+	bh=EQTTq3C3PpEZeZ9P6KqubrAmcSy2Zb9VRqOdtwwSBkM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UtnLC9QiriZbSRKTJR9Ay3wyHPOkc5B2WAQe2RFW2oaHtf65AbtlYoCOpg1odG/a+Fm2ziFMzctFJlWxpfiJ7MKq+evhOQYKbndsvg3DvuLtploHFuw737I9zGygRe4GkXP94HldmY9Z2CJUap/hd4JTfGfO40ouuSwurUj92ZM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=eX7N574E; arc=pass smtp.client-ip=74.125.82.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	 To:Cc:Content-Type; b=pnZSVJa3No1lWfKR2kuS/gs8XhDbr/KLamh1OjwWqYerqzB5dUQzhC8DCruhLcdUUytsZ3oPGrWIIN/9G5rAD5wOyjGPzQe2i5W/7JDI3ys8BWmKh+cwnSz5NubuQg1ehr8N8yN7yrC9HXuXL5t/hNv5ZHuthyHJL3V373bv5UM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GzxmZTPY; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=I/XeOQP1; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="eX7N574E"
-Received: by mail-dl1-f50.google.com with SMTP id a92af1059eb24-121a15dacd1so661698c88.1
-        for <linux-block@vger.kernel.org>; Tue, 13 Jan 2026 20:17:36 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1768364256; cv=none;
-        d=google.com; s=arc-20240605;
-        b=fAxlifSOuabIqLEoaK4fHFUzdQ1kAaHI6vh/yDrwv6RgLiLcWMEPzHvYJC4Sfcs47V
-         kzuC6GMPy8Otn2L4uoJc2rJ5q2BluNCQsv5F4E+3LL3GnqYGO0tPCF2fzPBFsbS1N3w+
-         ycRtm/xDLqp2n2Z7n18931cLpn/rNfIo/5ADYmnrTGZF/6GvZAD9KuLDyDvyrnkF9+bW
-         ee2swZc6K7ennKTNcYpQ0PIoj6SfB37KyWMfg/ja8h/btdkBsL6FhV7oJxSxR+vIKjI9
-         /3UFGqjJAoJhgkOxkd1xozjYqazxJpZd/W7dXcPFfgr1Tiq2+H6u0BDPJXJiDT3ap53M
-         GsDg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=qE+6m/MnTNf3xQNICaY7+Dgd1y8AwvNooJie/PSgVGA=;
-        fh=oR7/SYdmI4bW0YFRypuUdmuyOiCSwXEyZDx1dvC3ZHw=;
-        b=AoxHkXVdLqnMtOCKha3B94+r8P9F0mwjMyj058PAA8yMjP45r0x3htzTjJ7YHWY+kq
-         NnZ0jjebfMa/KBr8o98DWIDWHzfoICaOMRdBDK4+PFSq2VbE2SDbc4PzrGXdAhuDn3fK
-         9Sc6zY826tFbdQMnoNyeyfxAqql8gykbeZpu6RA+Ckn+biIm7TtKKC/Hmtlszq8tplpI
-         Q6JrajpEY0xrrcds0P6M/hKxOq9xpr1Y3EduXGkHQinafRD6ZakexplEL/yWLM1BQEu0
-         pm9zLX8Xxmo5nYVGzLrCcOw77qodruX4q+PyFUWKJwGcEEYpatlUzJ7n5WMaNAJKOZ8d
-         ZHYw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GzxmZTPY";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="I/XeOQP1"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768370299;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=etTeQSsRKnzSeWJ4DkOitPwqySAd6KzRagi4OvsHXbQ=;
+	b=GzxmZTPYYKm3bPZ3tULaH2x6FQbz150TRzRdstMnc2u+ADY2llWnEWdAjtEMDSrOiHzvNT
+	C/9Ig9qW+01h6GfoqqdyVDN7lvwzYWHlzu9lMYKqlXR1vR6CcoqCAd8EwwLLer4EHMr6+I
+	er7RZi2eIjp96MOHMxazKnG9NWGzzGM=
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
+ [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-416-lIrhBVTtMYGWOaZDftmc5w-1; Wed, 14 Jan 2026 00:58:18 -0500
+X-MC-Unique: lIrhBVTtMYGWOaZDftmc5w-1
+X-Mimecast-MFC-AGG-ID: lIrhBVTtMYGWOaZDftmc5w_1768370297
+Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-59b6f3890e4so6521408e87.3
+        for <linux-block@vger.kernel.org>; Tue, 13 Jan 2026 21:58:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1768364256; x=1768969056; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1768370296; x=1768975096; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qE+6m/MnTNf3xQNICaY7+Dgd1y8AwvNooJie/PSgVGA=;
-        b=eX7N574E7L5r3ZEU95b+IKl8eEiOWOoBF/3xhR7YfZ8Zt2+rFcgLWyTdBAKyULX2um
-         22Uybd97qf9mbcwWhxP812pvwiX7wiV5SaeuK/cFrirr+SaNHtxyKmDSV2qg2sSFrQmk
-         CmSmWfKeo6NMoqpaRX/BEPNLGmvnBiHzgp+E120Dt4lb0FzMKLJrjU/iAjjoZiLNTuha
-         HFJORfaEc90oOIcALhCv/BWF3rVEZu49oYt3XY/xfXlAdaed2LmzqabhksSBrFypI4FD
-         e6sKAA4PqnLkwKOl16ko9RiIIS4E+twcGG94VR75uicBH0DzssWx7bJjODFXClSmHzOZ
-         Q7yg==
+        bh=etTeQSsRKnzSeWJ4DkOitPwqySAd6KzRagi4OvsHXbQ=;
+        b=I/XeOQP1pdzM88Tx9+xZcfsf4B9EMRDPdV9qRaUi2nIMLEJSI48hDtW90OPbHUdMCN
+         z/2501W94BKVPbvNz1RAtDisxONkPKozEzMegA4M9EOXUVt5t4v9ED41vTu/R4jWRAqf
+         XaPy68INbPwkhMlskglgz0CCk/tb7uKNiAJyNG7/jhHPnCR6wGSdGFFSgCaTEzMUNHO2
+         oATk4RrPUih4sbVNrhjfy67fdIXDxYjrqKmqJWcKH8rozn9mE2E2io2aLIqPaJQkTXTa
+         QHiPiWAufZWw6L4L71qtdNwyaEdgMdmZzeQOxJ2wnw4DRAF/2QMu+xT1WDi6eCUWEwzK
+         zJUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768364256; x=1768969056;
+        d=1e100.net; s=20230601; t=1768370296; x=1768975096;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=qE+6m/MnTNf3xQNICaY7+Dgd1y8AwvNooJie/PSgVGA=;
-        b=XK8GbOHgQTXOxjDukx9QJZjfWAf8AWzEvoUAi/ycysLWSnm4zrRgdz5VaGhLCmd9OO
-         h8jQSUFjDMDa7SZqM4Qrx49vJceDFjmNqDY2ro9vvddAkak2gNPUnvfQRhMbdv7nRzHT
-         qmQ9ogsRlDuo5IBtuAUFu93UV6A2h55y/YN+ARmEczHn3P7xkpcau06DsVTo9tji8WTr
-         SpQ95WrzuPSbi5fS6dNHnfTuChNU6Ue9yqKuWFXfVJ697QZ4ubQsc3P8DRpfn10snF9p
-         mF92Tjw1KBgseKZnXnUTe0fjS+64+yDDbN93HnT08q9DP22XxGmTdBj2RvU3uRXUKVDz
-         sWeA==
-X-Forwarded-Encrypted: i=1; AJvYcCU2hJ7v8DlBGwJ+x5SHfDDoW+ycoRR4n5pMmZg53aggJcW/7sFC35bJqmKfCoLNfCu739rAbtvmOy6bUw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywwb8Dyi4snglrSZeYEYdGeNWSOALiD4qJvE5h44yS6msrR32L3
-	Utbk9t13J6hqC3eautu2TbisQ6NJQM23hs14FSoxpnBmAuY/lS8cPYA1f7miaQFCmOiey+UEOvt
-	qNCedAmX1Udn5+tZXfgvkM3W8YytO8AYCU+bBabizGg==
-X-Gm-Gg: AY/fxX4j9GpZm1wZWHykikUNiOJPkOGpsUdpsGD5tCkSLSYXUsC8tTtqfJIOJzOvgbO
-	IVxd2SpA3O1pRP1W6aYPCFBjgLXxZXfZBmWUeZ/2D3Nu6ey6zzvW09R2S07xWidRrBeLXYfDamq
-	NPDajHpmZxA0Q+ZOhgp+aWvtgkllL+yzCHZ4n26RdGZjk/+foXSEvy+Vg7LQn2gPIrCnDORMsZQ
-	YMqDubU0AjTKPsint7xRjdcMm2u8H6Z7cIjtwLiZIP7wYRqx9LMSXNX+BXVIoBMGvNXZdTju3yb
-	0mIEe4A=
-X-Received: by 2002:a05:701b:2504:b0:11b:1c6d:98ed with SMTP id
- a92af1059eb24-12336a34017mr709026c88.2.1768364255987; Tue, 13 Jan 2026
- 20:17:35 -0800 (PST)
+        bh=etTeQSsRKnzSeWJ4DkOitPwqySAd6KzRagi4OvsHXbQ=;
+        b=RhRZDqXjxZRWvDdtlELw+PEJeBscpzJsVHHPmzqe3ZkknEPLuwopkRQIQRbUnEL8I2
+         1FiVY96XrqmTH+AznQasNkbF0q8y/Zg3lCZl6urhaBDEbQuAH1lc6qgGxZBagjc6VgSv
+         ZYSIRtUxPlQyofe6lKo2PTCFV9p7Oc1A/4I/8DBpRemaFMyDyjpjoeU2OHFh04yHK5w+
+         wV1xyrD5dM5WL9WLytQFAMtShgSD3glL4EXG4oEnnDaFBsecrg32FjQqYfyr7P1YDfTu
+         IfXWUp/9E2gblEAPyHukgLuGfc/TRN9rhO35s/qgFjLCQVeUq1eRSJolzDomaeDnFbD6
+         JegQ==
+X-Gm-Message-State: AOJu0YxhUmzAlEDVnFPLHDo74aNfGX0EbNnYFrK1MdavSTYsFGONhyVZ
+	hH/NhQJBERxFPM27TvVNvnkhOuURVczX/wP5vTo+samGUnHSEDn2TZANdJst60BkK6WkjGmOpZ+
+	MZPxxYnqGbqALMHOD2vTraARFuQBTPhAHuyYjCVKcLxio8f5mz2jo9zhg3S9VxprZ+S9a4JuViN
+	NdvxlYRldNdqHkCzBjPrx6gQAdSsUIJXhH0oqiZ7FPK5eU7UCW8fKo
+X-Gm-Gg: AY/fxX69xOBr+xAKdP3/R6ZPBJ8Ffz6honrwpX6WL9aGgZWLGcnJWwwy+cew6yXqV/n
+	qbSZuDeY/ouEk98FYCcXGFywLdCTGGLmgh0CS3dGEk+fSvSeU96fftNsI0UOPNbqiTUXrU99ZCk
+	LgZtwnxOWj4MNiYBMyQm/SlSK4miumn/E1rB67jL7dlLCkvMF9Nps+ymumg2qrkcLyUQM=
+X-Received: by 2002:a05:6512:61b1:b0:59b:9a9d:dc94 with SMTP id 2adb3069b0e04-59ba0f6517cmr417929e87.13.1768370296521;
+        Tue, 13 Jan 2026 21:58:16 -0800 (PST)
+X-Received: by 2002:a05:6512:61b1:b0:59b:9a9d:dc94 with SMTP id
+ 2adb3069b0e04-59ba0f6517cmr417921e87.13.1768370296045; Tue, 13 Jan 2026
+ 21:58:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260113085805.233214-1-ming.lei@redhat.com> <20260113085805.233214-4-ming.lei@redhat.com>
-In-Reply-To: <20260113085805.233214-4-ming.lei@redhat.com>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Tue, 13 Jan 2026 20:17:24 -0800
-X-Gm-Features: AZwV_QhapZFaWkVoOBE44PaMvbpNGQdnkAmk2xPJEpphlti4n0MbvyTCGODWWO0
-Message-ID: <CADUfDZrpYYM6SuYocO502cv-KtgbkhUmwkp75F4T6Z=oi=F=sg@mail.gmail.com>
-Subject: Re: [PATCH 3/3] selftests/ublk: fix garbage output in foreground mode
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Uday Shankar <ushankar@purestorage.com>, Seamus Connor <sconnor@purestorage.com>
+References: <CAHj4cs_SLPj9v9w5MgfzHKy+983enPx3ZQY2kMuMJ1202DBefw@mail.gmail.com>
+ <0e1446e1-f2a7-41f4-8b3c-bce225f49aa6@kernel.dk> <CAHj4cs-uHD_cm_5MHAS2Nyd1Dt6=sqNPrD4yWZrbykM+WvyxbQ@mail.gmail.com>
+In-Reply-To: <CAHj4cs-uHD_cm_5MHAS2Nyd1Dt6=sqNPrD4yWZrbykM+WvyxbQ@mail.gmail.com>
+From: Yi Zhang <yi.zhang@redhat.com>
+Date: Wed, 14 Jan 2026 13:58:03 +0800
+X-Gm-Features: AZwV_QjPoMkPEHaT9pV2ou9ANFJz4fdy1W_ExdZWa8tT7f7iRN8zml_kR8bvEYQ
+Message-ID: <CAHj4cs_d81+Tbe+kh=9sz-ort4MZnC1F5gzPLGt2jrDJxA2P_g@mail.gmail.com>
+Subject: Re: [bug report][bisected] kernel BUG at lib/list_debug.c:32!
+ triggered by blktests nvme/049
+To: Jens Axboe <axboe@kernel.dk>, fengnanchang@gmail.com
+Cc: linux-block <linux-block@vger.kernel.org>, Ming Lei <ming.lei@redhat.com>, 
+	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 13, 2026 at 12:58=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wro=
-te:
+On Thu, Jan 8, 2026 at 2:39=E2=80=AFPM Yi Zhang <yi.zhang@redhat.com> wrote=
+:
 >
-> Initialize _evtfd to -1 in struct dev_ctx to prevent garbage output
-> when running kublk in foreground mode. Without this, _evtfd is
-> zero-initialized to 0 (stdin), and ublk_send_dev_event() writes
-> binary data to stdin which appears as garbage on the terminal.
+> On Thu, Jan 8, 2026 at 12:48=E2=80=AFAM Jens Axboe <axboe@kernel.dk> wrot=
+e:
+> >
+> > On 1/7/26 9:39 AM, Yi Zhang wrote:
+> > > Hi
+> > > The following issue[2] was triggered by blktests nvme/059 and it's
+> >
+> > nvme/049 presumably?
+> >
+> Yes.
 >
-> Also fix debug message format string.
+> > > 100% reproduced with commit[1]. Please help check it and let me know
+> > > if you need any info/test for it.
+> > > Seems it's one regression, I will try to test with the latest
+> > > linux-block/for-next and also bisect it tomorrow.
+> >
+> > Doesn't reproduce for me on the current tree, but nothing since:
+> >
+> > > commit 5ee81d4ae52ec4e9206efb4c1b06e269407aba11
+> > > Merge: 29cefd61e0c6 fcf463b92a08
+> > > Author: Jens Axboe <axboe@kernel.dk>
+> > > Date:   Tue Jan 6 05:48:07 2026 -0700
+> > >
+> > >     Merge branch 'for-7.0/blk-pvec' into for-next
+> >
+> > should have impacted that. So please do bisect.
 >
-> Fixes: 6aecda00b7d1 ("selftests: ublk: add kernel selftests for ublk")
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  tools/testing/selftests/ublk/kublk.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/tools/testing/selftests/ublk/kublk.c b/tools/testing/selftes=
-ts/ublk/kublk.c
-> index 65f59e7b6972..f197ad9cc262 100644
-> --- a/tools/testing/selftests/ublk/kublk.c
-> +++ b/tools/testing/selftests/ublk/kublk.c
-> @@ -1274,7 +1274,7 @@ static int __cmd_dev_add(const struct dev_ctx *ctx)
->         }
->
->         ret =3D ublk_start_daemon(ctx, dev);
-> -       ublk_dbg(UBLK_DBG_DEV, "%s: daemon exit %d\b", ret);
-> +       ublk_dbg(UBLK_DBG_DEV, "%s: daemon exit %d\n", __func__, ret);
+> Hi Jens
+> The issue seems was introduced from below commit.
+> and the issue cannot be reproduced after reverting this commit.
 
-Could add __attribute__((format(printf, 2, 3))) to ublk_dbg() so the
-compiler can warn about this in the future. Similar for ublk_err() and
-ublk_log().
+The issue still can be reproduced on the latest linux-block/for-next
 
-But this fix looks good.
-
-Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
-
->         if (ret < 0)
->                 ublk_ctrl_del_dev(dev);
 >
-> @@ -1620,6 +1620,7 @@ int main(int argc, char *argv[])
->         int option_idx, opt;
->         const char *cmd =3D argv[1];
->         struct dev_ctx ctx =3D {
-> +               ._evtfd         =3D       -1,
->                 .queue_depth    =3D       128,
->                 .nr_hw_queues   =3D       2,
->                 .dev_id         =3D       -1,
+> 3c7d76d6128a io_uring: IOPOLL polling improvements
+>
+> >
+> > --
+> > Jens Axboe
+> >
+>
+>
 > --
-> 2.47.0
->
+> Best Regards,
+>   Yi Zhang
+
+
+
+--=20
+Best Regards,
+  Yi Zhang
+
