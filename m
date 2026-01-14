@@ -1,99 +1,95 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7EA33B6E4
-	for <linux-block@vger.kernel.org>; Wed, 14 Jan 2026 21:08:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 307DA35502A;
+	Wed, 14 Jan 2026 22:36:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768424903; cv=none; b=Gc40gcJlfJAlasU4o8KRELFZaFmzJLbZP6jYrCu5+ALB5R4k8COaQch8BAIo1Cv4Rv8TT7v2lBHCt59KGZrzNIhFcHhzgJwsx++NLapKtruXPAV32EfOwFppDewrL/iLAJr4vS7p6i8hLHlUg8cQj/4EQoTnOJczn+4Rc6nrCW8=
+	t=1768430160; cv=none; b=OnmVyg0c0byOGh0WupfPEXctnSsL6LwQZPK2QXTtrfR0U1kba2PDfcbZ/qpVVcNOWYIz0QX+wCRpjTQJXRkLKHw0/5OxlvS6Eq5Q8akIBW6/IZpdI7R/d8XtRW/50hWyqr7cnAELEXFVwSDajOSyOEfUlxsJ2J0sHpmHz5TAp14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768424903; c=relaxed/simple;
-	bh=asf4Z4UQLO9Q9fM2GnaXgjjK4qyXjMeedZ0PrIjmcJs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GtSeqCGATzgUbnblhc7mfhSO9vewbV/Pzqe5fVyNV9y0zA70fozWeMGWFFlXf9ee7Q3IRLCWfqqbn+KumwuiBs81Rl6kZq5pUpFoeZhzHQmswldyoZAvkXtqXFzEAbv3dthbflAqPYeKPRf6Kv9tV0mcnRWxppKB3V9prYZD4j0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=E2uimELN; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1768430160; c=relaxed/simple;
+	bh=b5/3DQjQA9EXl8io9tA//lDMRsaMGLjSrpkfvbD0DYY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=atpBUvo2ADARdhRNUuDmwrcRRtwPz1FJp6A1JUh6Pfnlf0WQ2mB5YBxixvNOIBkM0O+e9ccQ1C1Tbwn0nps0ciG0dI1tBTlmYSBO9g+lu/hrRzgGfpD5PTJCtlC4QI9pjpgJbtkcNknpCq8C7D7NtKYw/wgzxQuH775cttx2bv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AeTB3veu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E2uimELN"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768424900;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7CJdwOL2h6r4qb6j8TUiN1uNHRq/XzHoO2Xuh/9uhA4=;
-	b=E2uimELNAqPN1LoAav5Metp2CE4vq601WffAJdAUKP1GaVu67I9z9DVmuSC6ajoLym5TYt
-	ZzYsqBFCvcbMwZyuPjKBNSiNLDzKXKD7PB5rtbXoJNr54aEBlXq/6WM3eIYoWl2pvDu/dN
-	FSIHaH94a7TLUX+ocBTYQ+3kgTxoA58=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-118-h3U9l59EMlq9eLZCp5iUIg-1; Wed,
- 14 Jan 2026 16:08:17 -0500
-X-MC-Unique: h3U9l59EMlq9eLZCp5iUIg-1
-X-Mimecast-MFC-AGG-ID: h3U9l59EMlq9eLZCp5iUIg_1768424896
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AA58019560B2;
-	Wed, 14 Jan 2026 21:08:16 +0000 (UTC)
-Received: from host.redhat.com (unknown [10.22.66.14])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 12D4930002D8;
-	Wed, 14 Jan 2026 21:08:15 +0000 (UTC)
-From: John Pittman <jpittman@redhat.com>
-To: shinichiro.kawasaki@wdc.com
-Cc: linux-block@vger.kernel.org,
-	John Pittman <jpittman@redhat.com>
-Subject: [PATCH blktests 1/2] common/rc: support multiple arguments for _require_test_dev_sysfs()
-Date: Wed, 14 Jan 2026 16:08:08 -0500
-Message-ID: <20260114210809.2195262-2-jpittman@redhat.com>
-In-Reply-To: <20260114210809.2195262-1-jpittman@redhat.com>
-References: <20260114210809.2195262-1-jpittman@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AeTB3veu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A35CEC4CEF7;
+	Wed, 14 Jan 2026 22:35:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768430158;
+	bh=b5/3DQjQA9EXl8io9tA//lDMRsaMGLjSrpkfvbD0DYY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AeTB3veulDOxVFJA7q/2kxNU/YOfNDPHu6RWoNwbDb+p52Lqp2vufat85saIIZbG4
+	 a70VwG02F+CwP/YQo+ALxKJXoIlIZICbdotxgLb3Hq3M2w9oCAxB7JJy4wEBJ3fyUE
+	 gqINc4CIzOOj/K7fTPLWP9NL4IAcqebt1QnbpGcwmZ19mrTaw5+Q8e9/TCqDDuRVF4
+	 r1yiAWVnJLrWxqgufgOn5ligfu34K6+YwW3R3NGCtEFh1sD2swvknfS8ErF2jbknIr
+	 +nTcRcYGw+5vHLr3linYgLbDJyzc1aUHNcTuiXOr+w2+gZ00CKCHZlojcKG+e0BuHL
+	 Wtf0oHrXpl6Hw==
+Date: Wed, 14 Jan 2026 14:35:58 -0800
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Christian Brauner <brauner@kernel.org>,
+	Carlos Maiolino <cem@kernel.org>, Qu Wenruo <wqu@suse.com>,
+	Al Viro <viro@zeniv.linux.org.uk>, linux-block@vger.kernel.org,
+	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 06/14] iomap: fix submission side handling of completion
+ side errors
+Message-ID: <20260114223558.GK15551@frogsfrogsfrogs>
+References: <20260114074145.3396036-1-hch@lst.de>
+ <20260114074145.3396036-7-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260114074145.3396036-7-hch@lst.de>
 
-In some cases we may need to check multiple sysfs values for tests.
-If this happens, create the ability to pass in multiple arguments to
-_require_test_dev_sysfs() instead of having to call the function
-multiple times.
+On Wed, Jan 14, 2026 at 08:41:04AM +0100, Christoph Hellwig wrote:
+> The "if (dio->error)" in iomap_dio_bio_iter exists to stop submitting
+> more bios when a completion already return an error.  Commit cfe057f7db1f
+> ("iomap_dio_actor(): fix iov_iter bugs") made it revert the iov by
+> "copied", which is very wrong given that we've already consumed that
+> range and submitted a bio for it.
 
-Signed-off-by: John Pittman <jpittman@redhat.com>
----
- common/rc | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+Is it possible for the error to be ENOTBLK and the caller wants to fall
+back to buffered IO?  I /think/ the answer is "no" because only the
+->iomap_begin methods (and therefore iomap_iter()) should be doing that,
+and we mask the ENOTBLK and pretend it's a short write.  Right?
 
-diff --git a/common/rc b/common/rc
-index b76a856..e4b5196 100644
---- a/common/rc
-+++ b/common/rc
-@@ -326,11 +326,14 @@ _test_dev_is_rotational() {
- }
- 
- _require_test_dev_sysfs() {
--	if [[ ! -e "${TEST_DEV_SYSFS}/$1" ]]; then
--		SKIP_REASONS+=("${TEST_DEV} does not have sysfs attribute $1")
--		return 1
--	fi
--	return 0
-+	local ret=0
-+	for attr in "$@"; do
-+		if [[ ! -e "${TEST_DEV_SYSFS}/$attr" ]]; then
-+			SKIP_REASONS+=("${TEST_DEV} does not have sysfs attribute $attr")
-+			ret=1
-+		fi
-+	done
-+	return $ret
- }
- 
- _require_test_dev_is_rotational() {
--- 
-2.51.1
+--D
 
+> Fixes: cfe057f7db1f ("iomap_dio_actor(): fix iov_iter bugs")
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  fs/iomap/direct-io.c | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
+> 
+> diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
+> index 8e273408453a..6ec4940e019c 100644
+> --- a/fs/iomap/direct-io.c
+> +++ b/fs/iomap/direct-io.c
+> @@ -442,9 +442,13 @@ static int iomap_dio_bio_iter(struct iomap_iter *iter, struct iomap_dio *dio)
+>  	nr_pages = bio_iov_vecs_to_alloc(dio->submit.iter, BIO_MAX_VECS);
+>  	do {
+>  		size_t n;
+> -		if (dio->error) {
+> -			iov_iter_revert(dio->submit.iter, copied);
+> -			copied = ret = 0;
+> +
+> +		/*
+> +		 * If completions already occurred and reported errors, give up now and
+> +		 * don't bother submitting more bios.
+> +		 */
+> +		if (unlikely(data_race(dio->error))) {
+> +			ret = 0;
+>  			goto out;
+>  		}
+>  
+> -- 
+> 2.47.3
+> 
+> 
