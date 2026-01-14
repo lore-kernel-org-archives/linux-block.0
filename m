@@ -1,108 +1,109 @@
-Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F64B342509
-	for <linux-block@vger.kernel.org>; Wed, 14 Jan 2026 19:28:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9700923184F
+	for <linux-block@vger.kernel.org>; Wed, 14 Jan 2026 19:36:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768418903; cv=none; b=B2N6Br+Tdxc+6Qo1wWxAu9p7zZVr6v3u8r6zzTI/K2AotrzpWFo6Gz9swqoXcAcNdCWG8M4xD5o/socrz68umOLVh3Opi7nDkQ2f7aaygUG9/WNdFSJLBZicyJzsWEO9W5zQc4Dwu+M5fVkP9LYtCnDyWOnjBkzCGVIAmhGq7Gc=
+	t=1768419375; cv=none; b=ies6JLuR9LMOtrfWfZ+Jk3V5R15gaTQAmGaEHZ4U2BgRo/dyD8ODBNDS54rnDci5DGjb3WgbUeRgVzdRvdBuenEIf1Z+XOepkqfifEgouekzp8B5PEkC+CHY9rDDQwa46Anu+jSBuRLZxavsH1EAPlpAs8RL7fdKfEbBrPFjKfw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768418903; c=relaxed/simple;
-	bh=cUH5bM5HFzfTWJm5cSou4PcyQsw2Y0xdVVI4/JbnNDg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eQpv+8salNQIk4hd+tdlusoMn+pnezPEkBA7OVUTPp6r/t5Wq2Iz4xrWDcIEuZPWw5BGhx6y4GboAs+4gzVfghWqhR2BtFcmejqvYA4SJn+pjNwiU1E/XB7H5AsV7QR8pbixwVZWQs/mzDxG6v3TZcurWmGlmAL2eGkEBwD4Qrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=2kZWXDtG; arc=none smtp.client-ip=199.89.1.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1768419375; c=relaxed/simple;
+	bh=+uSO4y7Gg1H8HilK/2dWsamVw4u4INQzYQZSrKKx3Fg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=STiGlEoSlPBUPGZd1Tr16CZ10++yhRaMd/Ous9xVtieae27QeKNTz9h+x79ML8aVxLL3nZH52TQiBcbHsi6EdIqPahsAof8s47u314w7HqWQNoR8JrKtu8PxpMTtYq/7KQsp9Bo4IjLsqrpVE0OYaf6tJnPGEUvhfwtlZWVIjRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=kd/qh9Nh; arc=none smtp.client-ip=209.85.167.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="2kZWXDtG"
-Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4drx3p06JZzllB7X;
-	Wed, 14 Jan 2026 19:28:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:mime-version:references:in-reply-to
-	:x-mailer:message-id:date:date:subject:subject:from:from
-	:received:received; s=mr01; t=1768418900; x=1771010901; bh=2f10t
-	uGrtn5UdpS24AjOqi8BIthVBlCIHtZIjYdR/GE=; b=2kZWXDtGsLRMT6fph2F/1
-	mdYHrt7jrzTyeNGomQoYx7TBTbBkLSrPiSq+F/w8O+CbheaFEytOzx9hYEcoln40
-	SqVB1enQ7EvLJ/mZ23bSMklNHbwRBmcRooYtkITxdMF98ceVP3zHma11hws0/qdB
-	o4Ul03qTI7iDvRekiGTSJusUIGZEaofPkVT2UJ7AolHFSNxF0d3JNgHyjs1QpByd
-	skY9z1PZpwedLhXZjcddV97/slXzAMsVWOtB9Nf5sXVgzIlpjD4O1Vr/53FiFSKO
-	U7nXietLGKcskaymX0zovQHuJzoYmydKBu+LcTr+qW/cPIR+w5Xvcf1o/Eg5NQB/
-	g==
-X-Virus-Scanned: by MailRoute
-Received: from 013.lax.mailroute.net ([127.0.0.1])
- by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 12Vi8SbwvgAN; Wed, 14 Jan 2026 19:28:20 +0000 (UTC)
-Received: from bvanassche.mtv.corp.google.com (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4drx3k0WPZzlhpcd;
-	Wed, 14 Jan 2026 19:28:17 +0000 (UTC)
-From: Bart Van Assche <bvanassche@acm.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Hannes Reinecke <hare@suse.de>
-Subject: [PATCH 2/2] block: Fix an error path in disk_update_zone_resources()
-Date: Wed, 14 Jan 2026 11:28:02 -0800
-Message-ID: <20260114192803.4171847-3-bvanassche@acm.org>
-X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-In-Reply-To: <20260114192803.4171847-1-bvanassche@acm.org>
-References: <20260114192803.4171847-1-bvanassche@acm.org>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="kd/qh9Nh"
+Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-45c798c92edso92923b6e.1
+        for <linux-block@vger.kernel.org>; Wed, 14 Jan 2026 11:36:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1768419371; x=1769024171; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0teKoFJhNTQo64s382zvN9Vkvtlc93XKoD9YKexQVJw=;
+        b=kd/qh9NhUhAbzj5Bd84ABNE9lxIMnYKJhxA3MnpaEvjLMVDM06/bgh9PcA8jo+Nak8
+         FX/XgQuhNiMIVy2R7Sip1L2wN5+5NZV6ShaZcif9sk1MtmiDMXxF2fb9rlXgNhkgLwuz
+         LPhwINeGdx7UQXupbUOTAgacNtzCnU2Ff8Yxo3gYMmLdtkBfVNoMFbyOpnmW2KE6etBN
+         AQ7W+ZkPYKRz8MF3O1oeX5Aq6S/Df5yL409pSIDf3dKjUzJN1r8QBs52rbjWOColRjKv
+         sszsRyUM3HorPl801WK/BpUMfp1cXFC+804JDrnstYWJsB4cux/7U10zzF/kRBUnJYAl
+         2jsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768419371; x=1769024171;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0teKoFJhNTQo64s382zvN9Vkvtlc93XKoD9YKexQVJw=;
+        b=rJ6xzlkKHqS5dXfH4/rWO3ieksVh2Nd83Xnx8EJ/NPwixpuoot714w8WMKcT4S0PxB
+         P7rseYww6v1v/OV5VE22OJxVhxdOF/EMyIrXoSn6IdoNW9uR2vH0iwOrzcMcspjzU9/S
+         pGOpUcff+xYNkb0TGmPiwalKedlvwrzzZlbmjAzYoa2C8ZLE3hraQElnKCfNqXA/Paam
+         l9WzWZi4gulxBoHabNmkrElIWvynJ6HxaWtxvrag0+G0FzJFkyoRz3gHCFfFSn/g98cR
+         CJe5KXKGailN3SK7cFK6Y8xxEW8C2PYmYRnmy23pIb9womyWamiK71wJ0AVCuRMshqY5
+         sdlw==
+X-Forwarded-Encrypted: i=1; AJvYcCWbYE1yBbeUWq9I46VXr8YBg4uAccl9fYeP0jxNY7o+tfyKMUVp9lAMLS1htVskUyffd4D5qFCMu5AKeA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzlvuZr/pGlN4hokYD2TTaLc7ThrNXh8vZrofIRQFHWX0Bs0Pko
+	pCQ6rtfUVHzgURH1Gv8Bq2PixkvkZ4MpQhpLRLAzeBApxBWFlfz/wYEU/2DzGLQkspo=
+X-Gm-Gg: AY/fxX4QUh5NzyFar5tpWw2imquUTLgH6r3gaCY/AthdhpIQNQ71DRbjd6J2jUceQPW
+	jx/G3BUbs5WB45vLtodzHakysrikw5rKfINrI6T2nVZ/Xve0RsPvi5q0v76rO11Kk4hb6NvMx2F
+	Ckr9+M+6tXuUQTiu2elFr/dVCSJFd624reGvWILZih5Or0t7UE8w3dJsdLAKf5+c1LvF8hVE3rF
+	ZW9pZs8vABWPSjeYHO8VeB/MdR9sQiSJ0YBiHQ68VdSM1nhQBOe/f6jhDi+SA0IrNf3PiDNPcWr
+	wxhHvtHIsTpNWY2xrG0snEspJla0cPKhNWRK0BZW4phBGPtmaX2InJDO06kEe1da2R18KFBMFCM
+	nze32moQg4sw65vYKwspCCCYuqdV9X8qIYHCfj4cU38dvhygS9e0EPmNGim5XUdEyP59q+PeKIa
+	vU+Lg8frs=
+X-Received: by 2002:a05:6808:318d:b0:450:c877:fd98 with SMTP id 5614622812f47-45c714936f6mr2557042b6e.21.1768419371526;
+        Wed, 14 Jan 2026 11:36:11 -0800 (PST)
+Received: from [192.168.1.102] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-45a5dfb6256sm11842467b6e.0.2026.01.14.11.36.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 14 Jan 2026 11:36:11 -0800 (PST)
+Message-ID: <602e772f-b3e9-4bba-8cea-8ab94bb64b65@kernel.dk>
+Date: Wed, 14 Jan 2026 12:36:10 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [GIT PULL] nvme fixes for Linux 6.19
+To: Keith Busch <kbusch@kernel.org>
+Cc: linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, hch@lst.de,
+ sagi@grimberg.me
+References: <aWfiu2Twr5_lT9zq@kbusch-mbp>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <aWfiu2Twr5_lT9zq@kbusch-mbp>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Any queue_limits_start_update() call must be followed either by a
-queue_limits_commit_update() call or by a queue_limits_cancel_update()
-call. Make sure that the error path near the start of
-disk_update_zone_resources() follows this requirement. Remove the
-"goto unfreeze" statement from that error path to make the code easier
-to verify.
+On 1/14/26 11:38 AM, Keith Busch wrote:
+> The following changes since commit 9869d3a6fed381f3b98404e26e1afc75d680cbf9:
+> 
+>   block: fix race between wbt_enable_default and IO submission (2025-12-12 12:51:11 -0700)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.infradead.org/nvme.git tags/nvme-6.19-2026-01-14
+> 
+> for you to fetch changes up to 0edb475ac0a7d153318a24d4dca175a270a5cc4f:
+> 
+>   nvme: fix PCIe subsystem reset controller state transition (2026-01-14 07:21:31 -0800)
+> 
+> ----------------------------------------------------------------
+> nvme fixes for Linux 6.19
+> 
+>  - Device quirk to disable faulty temperature (Ilikara)
+>  - TCP target null pointer fix from bad host protocol usage (Shivam)
+>  - Add compatible apple controller (Janne)
+>  - FC tagset leak fix (Chaitanya)
+>  - TCP socket deadlock fix (Hannes)
+>  - Target name buffer overrun fix (Shin'ichiro)
 
-This was detected by annotating the queue_limits_*() calls with Clang
-thread-safety attributes and by building the kernel with thread-safety
-checking enabled. Without this patch and with thread-safety checking
-enabled, the following error is reported:
+Pulled, thanks.
 
-block/blk-zoned.c:2020:1: error: mutex 'disk->queue->limits_lock' is not =
-held on every path through here [-Werror,-Wthread-safety-analysis]
- 2020 | }
-      | ^
-block/blk-zoned.c:1959:8: note: mutex acquired here
- 1959 |         lim =3D queue_limits_start_update(q);
-      |               ^
+-- 
+Jens Axboe
 
-Cc: Damien Le Moal <dlemoal@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Fixes: bba4322e3f30 ("block: freeze queue when updating zone resources")
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- block/blk-zoned.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 1c54678fae6b..8000c94690ee 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -1957,6 +1957,7 @@ static int disk_update_zone_resources(struct gendis=
-k *disk,
-=20
- 	disk->nr_zones =3D args->nr_zones;
- 	if (args->nr_conv_zones >=3D disk->nr_zones) {
-+		queue_limits_cancel_update(q);
- 		pr_warn("%s: Invalid number of conventional zones %u / %u\n",
- 			disk->disk_name, args->nr_conv_zones, disk->nr_zones);
- 		ret =3D -ENODEV;
