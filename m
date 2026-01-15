@@ -1,33 +1,29 @@
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 095E62236FA;
-	Thu, 15 Jan 2026 06:24:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75450381C4
+	for <linux-block@vger.kernel.org>; Thu, 15 Jan 2026 06:26:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768458276; cv=none; b=Sqwh4VuaaEJl+pVKNSdswSOJ/tdl0epVIgwbqlUODLRi8Js3XGlqXH2m+s7CcDh87x3/vxYBoWE7vEA6HTVy1jMIFvZRULZHJnIEdMyFLlIMa0cQs5w1WRueOhSzzMMVccICyGUsMBYie04Qb9+J11NpQvbtzjoLw9VwmTaue7k=
+	t=1768458377; cv=none; b=JkNkb2Lk4d9AI8t2i6Kh9r9G3CesFNy6ZCcc6L0KbbV9ICb9trXuGzItAHXEkw76jjpPW1zFXMQYRwC7YfHb0HdHMj48TxNbG2gdIu8ClG2mvY6Oe/RCaWEKHs3yE71W50i6utsxWDdU2zkEEXp6tWSNG0W6kkLsLiNM0xscz40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768458276; c=relaxed/simple;
-	bh=KIhm1XufAznvrR2UwjEjuF5zYuMHtrqnlyhSV4IcgKw=;
+	s=arc-20240116; t=1768458377; c=relaxed/simple;
+	bh=686tOCsbPJkCySgghQw6eP1wDKYNjzOCVd08P5J0xX8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iCK7iaBjaH9xrkAZp+Cx3nA8xU06OY2Q7uFGD7FTaQhNL/J5toV3CEpm5mf92G4jBInKjmCUqxt51iKH/TUToHZRzBIg7A0s5wpAlYuKm9q7IXsTRP6+smKceOPfZBAiqODKSKZ3on6eAp4cKAVxnwjvfkPTjniVLrx3ITOUDDo=
+	 Content-Type:Content-Disposition:In-Reply-To; b=Rral0CSzzzPJdsvyRfaYwPLWwtzTveU9ohqq1f5dhI3ZigVXQgAjVxNpX+p1C+XDHStfPuJlMxZSQcwe3VyDJEKYzZho6XfUrGo3SQzPZ4uSPcKjeUGjRN2bVKtKY1VRGTF14RyEeXLI8r8YUC/rYqYIpsHwLovusCP/gbc9gCQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
 Received: by verein.lst.de (Postfix, from userid 2407)
-	id 4E62E227AA8; Thu, 15 Jan 2026 07:24:31 +0100 (CET)
-Date: Thu, 15 Jan 2026 07:24:30 +0100
+	id 48395227AA8; Thu, 15 Jan 2026 07:26:13 +0100 (CET)
+Date: Thu, 15 Jan 2026 07:26:13 +0100
 From: Christoph Hellwig <hch@lst.de>
-To: "Darrick J. Wong" <djwong@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-	Christian Brauner <brauner@kernel.org>,
-	Carlos Maiolino <cem@kernel.org>, Qu Wenruo <wqu@suse.com>,
-	Al Viro <viro@zeniv.linux.org.uk>, linux-block@vger.kernel.org,
-	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 14/14] xfs: use bounce buffering direct I/O when the
- device requires stable pages
-Message-ID: <20260115062430.GI9205@lst.de>
-References: <20260114074145.3396036-1-hch@lst.de> <20260114074145.3396036-15-hch@lst.de> <20260114230728.GS15551@frogsfrogsfrogs>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Damien Le Moal <dlemoal@kernel.org>
+Subject: Re: [PATCH 1/2] block: Annotate the queue limits functions
+Message-ID: <20260115062613.GA9542@lst.de>
+References: <20260114192803.4171847-1-bvanassche@acm.org> <20260114192803.4171847-2-bvanassche@acm.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -36,40 +32,9 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260114230728.GS15551@frogsfrogsfrogs>
+In-Reply-To: <20260114192803.4171847-2-bvanassche@acm.org>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Wed, Jan 14, 2026 at 03:07:28PM -0800, Darrick J. Wong wrote:
-> Now that I've gotten to the final patch, one thing strikes me as a
-> little strange -- we pass the iocb to iomap_dio_rw, which means that in
-> theory iomap could set IOMAP_DIO_BOUNCE for us, instead of XFS having to
-> do that on its own.
-> 
-> I think the only barrier to that is the little bit with
-> xfs_dio_read_bounce_submit_io where we have to kick the direct read
-> completion to a place where we can copy the bounce buffer contents to
-> the pages that the caller gave us in the iov_iter, right?
-
-Yes.
-
-> Directio already has a mechanism for doing completions from
-> s_dio_done_wq, so can't we reuse that?  Or is the gamble here that
-> things like btrfs might want to do something further with the bounce
-> buffer (like verifying checksums before copying to the caller's pages)
-> so we might as well make the fs responsible for setting IOMAP_DIO_BOUNCE
-> and taking control of the bio completion?
-
-A few things:
-
-  - s_dio_done_wq is used for completing the entire iomap_dio
-  - by default the iomap direct I/O code uses plain bios, that don't
-    have a work struct that can be queued up on a workqueue, so we'll
-    need to grow that structure
-  - queuing a work_struct for each I/O completion can lead to nasty
-    scheduling storms
-
-All that is handled nicely by the XFS ioend based code, which uses
-a per-inode work and merging of contiguous ioends.  As mentioned in
-the cover letter this should probably move to common code, and then
-used by all file systems.  But one thing at a time.
+This is missing a commit log.  And not really telling what kind
+of annotation you're adding.
 
