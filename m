@@ -1,106 +1,118 @@
-Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
+Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DB2C308F28
-	for <linux-block@vger.kernel.org>; Thu, 15 Jan 2026 14:20:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7856F212549
+	for <linux-block@vger.kernel.org>; Thu, 15 Jan 2026 14:22:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768486848; cv=none; b=m0CYcr+sdhL/pnyDLsaOAPYTz9jO7gd7/+UVfs0GxHqXD8tHYDwjZFKB4CLw48Q0jyVkqdCIg/tYN7FXe06Wif+UJOHiUetdTOg4LE281kwVrEHbeqnqKvbKbzyOPrtypFXX2X6/ceWs7vMjjjgOffUMlO5iy8ZCbTP5AEZbZog=
+	t=1768486966; cv=none; b=tww7KN/GjM1EABtnHEQglGTHRmE3rFCCPPb8GrSeDaOtSQ10G4W3DqZoF36JUUdosVx0vbC2Y47vy2twx28zU7OY5BiU8ziUX9ATq9T+WU59jn8eTsnr+8IGbsXhEsQXkR9UQqJni/PXUgICEGOkEc+6DmyqoL4IVFJdab1DQVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768486848; c=relaxed/simple;
-	bh=7Axx6qLU+OR1zr6kdqLPt3T8v1gnRULkQ6J94nLPYkI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=thj1+XygbBJnm9iiON0/BW+Nc6n2VqVtkuuNRPr108m7CIx80pjeuVp6A/NLK3MBEtUe/zzexVboX890VEcpYO18/9ckoXpo40Rs9fpnnkw0EbjNbmDzNTBoGzG2MGYgsOqfvFwUREWx9YXtkxzM5K3FzaBiCE0e3G9c4qg28nI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=dYpntBcA; arc=none smtp.client-ip=209.85.160.41
+	s=arc-20240116; t=1768486966; c=relaxed/simple;
+	bh=N5SP9u8NyaqlqJGbhed37h/EVcEsQ2lF0KmoDZKLJlI=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=VgfD07uAezMWsQRJx93DenIuZdEHziqhP6Pb3gIOvv+DQmPEEDFI4MVkw/jBcabmv/7yt7oxY1c+Chz5u4n2FiuzAbigunCubS2D1dtkE0/cq78Ncp31ocSuvMZeHRFSiRd+LESfA08XYyLUX13A6zPXWUwskSdanIQCQm4m3uM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=nz0AK2AQ; arc=none smtp.client-ip=209.85.160.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="dYpntBcA"
-Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-40427db1300so548874fac.0
-        for <linux-block@vger.kernel.org>; Thu, 15 Jan 2026 06:20:47 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="nz0AK2AQ"
+Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-40421de595fso655129fac.3
+        for <linux-block@vger.kernel.org>; Thu, 15 Jan 2026 06:22:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1768486846; x=1769091646; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=cf8B8jT40BQgRqVi+k4MJAXnmeH8H8nOEYwkHoCMjF8=;
-        b=dYpntBcATYQldoOPdvi72OfbAChORfGUGxLNSa4RxX1Umal+21xT2+Vm11QEUAC3rp
-         bY9wXs5pIuFg7EF0cLYMpmTjNdNmYhMouMxq/N9Tc2jWmQmOZZA93eVOdVp1lsSRniAN
-         /CZ1+ONDehGJdtG2SFh48buKyh/DolcOsMkVUNShV5rOT5HndLeMLc6koOfTg0TwYT7V
-         heYoEZLxDfN6P8iHd9kKVOonlEaMsLQ/2mUqT2HMBOwaNNF76/PuuetmpNuKzffiCgld
-         S1Z4m821zuCuz/HvwyP0OixpHe+gUPGsPblfMe8w2GWYvXIFsjEh4tFt2Qr3xob6MG4y
-         I/RQ==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1768486963; x=1769091763; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=X/2mnT/PHyltzTTPTkq7MpDkkTKP8GbDY8kCAW/ksT8=;
+        b=nz0AK2AQ+lw9qjYIMcSojooPwTZIIl98Cnn5eLAlnuJi9MQ/AW/5eYBOdK08xbhiKB
+         pppL2oE3UA/nKRKKSPyd6klhxGyl9px/HZfDnJrU3cAgK2CaIiYsC62zI8AI9YwDjdPV
+         XjsnMZzBO+UXpqezPLpk5cIwXNBaen+v+JzNxHTvnmFltHQknkMQAPCKuUuDFVXKicsi
+         gj6JgGtqRHWIGiaog/FMOdFEJuNJzNUVuTbl0t90NznhqHG6hc7K48BEDy4zOsORK+p3
+         0CkrYvZnol9T1EGvg4A30FkpwJZl3DxbXYlxvgwh8MBnGqHFyfhevaw3Fdmckvez+wHO
+         69rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768486846; x=1769091646;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cf8B8jT40BQgRqVi+k4MJAXnmeH8H8nOEYwkHoCMjF8=;
-        b=rNtxuH195knKje584E8y3u9J42gQExNkbZ56FfF8zRPM/qeRv9fM8Ks9vaY1M6wMyS
-         pMk/10HlptmsWrp+NHEh3UK5cRfbOtBhQYeIaXGtA3Gvuix7z+yhMtLhJQmhmQGwxTa7
-         hETza+n+dFvaNg76oj2ZxeQw+9NpPrtj3ZTSqn0MahSJQyiPMEhA5FuwuMht6th0o1Dy
-         PQmEkQNHoC55SI0oOK32GjN/8lMdfDvyHpqaX/ISCnaFDA+ypXk/Yqs48aC+buALuI7X
-         dDE1t0AuKPhd+rT7FHO62si8TVu7gsbwXO0WaU9VqubkCtmnG2CMb15O19TcTLlp02n6
-         C5Zg==
-X-Forwarded-Encrypted: i=1; AJvYcCXZN7zs7XWmdqSZDxtvSBeTj7peBqjmmHsQkmkKZjrAPFcH0wPIP5p0AoTo7utuhedglwbRho8xBQli5w==@vger.kernel.org
-X-Gm-Message-State: AOJu0YymSrrEIgNSm+Q+RFvi9lwIS7s0BbmE1xYLpWh6LaRYA90N7P8B
-	aZU3UHrxylIcnK/w1pyDkHAel8egghcumGVihM2AIiTl7wnq7fWS9O0s+yuMbAKi5hs=
-X-Gm-Gg: AY/fxX4bo9GDvp53usDFXHGg51yzfwXfhoxD3twjeCE2jKe9lr0lzyjFi9aLXcISFOo
-	7KiaVXSNuAjH7qr40mhphn8ZKx4xrLQB2f9OUwsmN6D+gd4NUZD0omKsRQpxoclzyTWhv3kn/Mr
-	aAtn6QjqWnpLMQJu54E3/pjczCFrp6/CHTP2EKLg6Ju+FyOCfjmDfrtbFNgbCO4aAAxDzGZyW0l
-	iZzshELbyWR0M08fcWJtRJ5XdzOXHBiTeTAIPCJQ6prsoEMkseCz+C90y5n5B/lx/lS2m5k3aDQ
-	/Npc44BCScL9MyWjB8CWIJOCjbMpORDlus/l4ytCOORDmAgiIRvq1OlrRyuS4f0lrCXng4Vx333
-	8jjbsgyiH6V3AZ5AhgvOmgNLTwos6MI6V5K4RqsA7/xTPW+E9c4DDzL+sw6kgMxXo1Kjn238VMU
-	YKe9RFlN8=
-X-Received: by 2002:a05:6871:7a4:b0:3fd:a31d:104e with SMTP id 586e51a60fabf-4040ba2a031mr4079312fac.11.1768486845740;
-        Thu, 15 Jan 2026 06:20:45 -0800 (PST)
-Received: from [192.168.1.102] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-3ffa50721a6sm19193920fac.10.2026.01.15.06.20.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 Jan 2026 06:20:44 -0800 (PST)
-Message-ID: <e7fd9926-4e67-4396-ba84-c9749a9c7d1c@kernel.dk>
-Date: Thu, 15 Jan 2026 07:20:43 -0700
+        d=1e100.net; s=20230601; t=1768486963; x=1769091763;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=X/2mnT/PHyltzTTPTkq7MpDkkTKP8GbDY8kCAW/ksT8=;
+        b=KxbWQvJxZIQAGYVj9eH3N6ylB1RTFZEHF93jlgM7m/YU4gXJcqFynR5BQikd9sDGVU
+         lJ0XKboUeU1PnwHkpTt/P7HqyBpg1zmETHKNtHib6hS7rI+rWdmyGg9KsXsEt0Addehp
+         80lf+nY0kuINCNEIzFdZOXGsFvGb6fHjryRGSWhPe8pxWfOYMKcSwb4Vfck4iNsnOqoM
+         fgS/inP94r0QKGAInO31xTA8aAeIArLKt6TcAqTxvNe5T0fJ+oqNFphLQfXjdybIjqXL
+         7VhFS5/XFrDrxpNICLirBUsHg6DsWNBNr8PqpTWGraDhFos1OpkQcxU0VbD+IJdwI71j
+         jGQA==
+X-Gm-Message-State: AOJu0Yzn6WbcaD5xwGFVjfsEjJ9t9UwVcvJ6aB+HaQTEfz0yhAWj88Cf
+	Qv3PKqZ6DzaG5JIupZRJCAjW3aQBO3W32PC4qiQlN9FCYoVcjSPy5FwbE/sQKrR+3Asz+M20FBO
+	VAb8/
+X-Gm-Gg: AY/fxX5iB0MNKjWefqyMJUpyGkVxqbGfqdQKhEpvkslQZ9hVj8eszNZ09TfkirMop0D
+	3QDx3c5O7+RNpqNkzC3efpbtg5AWT7KAdK5ypbSmZktP7R9R4Olg2npYeksWDbuYli8ZqdP99DB
+	7ZcErOHr4+b+LEcdLknE7LuWfOI+b1D8fspqw6likAgwVrAm6OOGWisWjH/BAeSrfOl/msvhYS7
+	omFjsB7zRgd4ZPgkXpWYfJ1MS678x8NDBEGFAfmEzvIR6Hpuf1MOOifk5Z3ye1ijMP9e81p4LEq
+	XQ9Hn98nUXAAWBxYCcw/1tSOajOQLmmpFp0nd0W1Vv4aqYnPQRZ969GiFibuzRFculQx4K+X3X+
+	XlZVsiM1eKOm3TwXS8XCwgUiIEpT8354/ot35fSMJksEV+Bwj/+nTXqyyTQhyHtWywmpwuvLTcQ
+	TnH7A1yVEEG6/y
+X-Received: by 2002:a05:6808:2028:b0:455:bebf:af3c with SMTP id 5614622812f47-45c71590f09mr3773981b6e.48.1768486963397;
+        Thu, 15 Jan 2026 06:22:43 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-45c98a4d3d3sm120202b6e.20.2026.01.15.06.22.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Jan 2026 06:22:42 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: haris.iqbal@ionos.com, jinpu.wang@ionos.com, yanjun.zhu@linux.dev, 
+ grzegorz.prajsner@ionos.com, Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+Cc: linux-block@vger.kernel.org
+In-Reply-To: <20260112231928.68185-1-ckulkarnilinux@gmail.com>
+References: <20260112231928.68185-1-ckulkarnilinux@gmail.com>
+Subject: Re: [PATCH] rnbd-clt: fix refcount underflow in device unmap path
+Message-Id: <176848696172.896295.7096462379350367119.b4-ty@kernel.dk>
+Date: Thu, 15 Jan 2026 07:22:41 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] rnbd-clt: fix refcount underflow in device unmap path
-To: Chaitanya Kulkarni <chaitanyak@nvidia.com>,
- Jinpu Wang <jinpu.wang@ionos.com>,
- Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
-Cc: "haris.iqbal@ionos.com" <haris.iqbal@ionos.com>,
- "yanjun.zhu@linux.dev" <yanjun.zhu@linux.dev>,
- "grzegorz.prajsner@ionos.com" <grzegorz.prajsner@ionos.com>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <20260112231928.68185-1-ckulkarnilinux@gmail.com>
- <CAMGffEmPCB4j-SfufLAdnBo=x-5HsM-vkzhu7o1ocHwnc0=jVg@mail.gmail.com>
- <bc5b7643-8f6e-4801-8d73-06e869318cd6@nvidia.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <bc5b7643-8f6e-4801-8d73-06e869318cd6@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3
 
-On 1/14/26 6:58 PM, Chaitanya Kulkarni wrote:
-> On 1/14/26 00:40, Jinpu Wang wrote:
->>> This follows the kernel pattern where sysfs removal (kobject_del) is
->>> separate from object destruction (kobject_put).
->>>
->>> Fixes: 581cf833cac4 ("block: rnbd: add .release to rnbd_dev_ktype")
->>> Signed-off-by: Chaitanya Kulkarni<ckulkarnilinux@gmail.com>
->> lgtm, thx for the fix.
->> Acked-by: Jack Wang<jinpu.wang@ionos.com>
+
+On Mon, 12 Jan 2026 15:19:28 -0800, Chaitanya Kulkarni wrote:
+> During device unmapping (triggered by module unload or explicit unmap),
+> a refcount underflow occurs causing a use-after-free warning:
 > 
-> If this is correct we will needs reviewed-by tag to apply this patch.
+>   [14747.574913] ------------[ cut here ]------------
+>   [14747.574916] refcount_t: underflow; use-after-free.
+>   [14747.574917] WARNING: lib/refcount.c:28 at refcount_warn_saturate+0x55/0x90, CPU#9: kworker/9:1/378
+>   [14747.574924] Modules linked in: rnbd_client(-) rtrs_client rnbd_server rtrs_server rtrs_core ...
+>   [14747.574998] CPU: 9 UID: 0 PID: 378 Comm: kworker/9:1 Tainted: G           O     N  6.19.0-rc3lblk-fnext+ #42 PREEMPT(voluntary)
+>   [14747.575005] Workqueue: rnbd_clt_wq unmap_device_work [rnbd_client]
+>   [14747.575010] RIP: 0010:refcount_warn_saturate+0x55/0x90
+>   [14747.575037]  Call Trace:
+>   [14747.575038]   <TASK>
+>   [14747.575038]   rnbd_clt_unmap_device+0x170/0x1d0 [rnbd_client]
+>   [14747.575044]   process_one_work+0x211/0x600
+>   [14747.575052]   worker_thread+0x184/0x330
+>   [14747.575055]   ? __pfx_worker_thread+0x10/0x10
+>   [14747.575058]   kthread+0x10d/0x250
+>   [14747.575062]   ? __pfx_kthread+0x10/0x10
+>   [14747.575066]   ret_from_fork+0x319/0x390
+>   [14747.575069]   ? __pfx_kthread+0x10/0x10
+>   [14747.575072]   ret_from_fork_asm+0x1a/0x30
+>   [14747.575083]   </TASK>
+>   [14747.575096] ---[ end trace 0000000000000000 ]---
+> 
+> [...]
 
-Eh no, that is not correct. What I care about is that it has been
-seen and acknowledged. Whether it's a acked-by or reviewed-by
-doesn't matter one single bit.
+Applied, thanks!
 
+[1/1] rnbd-clt: fix refcount underflow in device unmap path
+      commit: ec19ed2b3e2af8ec5380400cdee9cb6560144506
+
+Best regards,
 -- 
 Jens Axboe
+
+
 
