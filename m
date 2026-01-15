@@ -1,76 +1,54 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4527522A4EB
-	for <linux-block@vger.kernel.org>; Thu, 15 Jan 2026 08:49:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCEF53358C0
+	for <linux-block@vger.kernel.org>; Thu, 15 Jan 2026 09:00:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768466952; cv=none; b=dJmxGHoMcpkFB9fDta3peyW5vO5JY1ex9CicLTAXtMyxxuEZWxE7mhSzfARojKoWpP75pSWJxYx+gUsuT02ndDOewi1wzYUe9e/kR0Tbpe449m9drVjaoLxXNr3Z4RS1BT+0uVkt61L0JQgsXbX86avizOTSWVjD1cbpk5iHDGA=
+	t=1768467610; cv=none; b=BpVTTgAfPKPPrLFRYUDkWYVD4C42VfhmcPhCBbE7b1TNpGIq+3xbu/1oP6apWyNhzFvrmDoy2AJMsMy6IoZE9n0ciXCA4Fr8vCZTIlVeAlWzxhaGdiAtep9I1LeEXugWmjmtsazxViDYNr67eYiWEGmVV1wjKSELRCsotwsnTcI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768466952; c=relaxed/simple;
-	bh=DjVOIUifmh6NM2I/E7/zNycX5vsGEUeskp5h0rgKAd4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IVupzqmxB0gI/0Y5SCiLxXfn/6uzBZS1IildYC/Bqok99bipGHTaZf5tgnxkMJKHSUbHyeSlcYhNBL4tfeAgCDnSt4DUadQZawTpRb0ZbNtQW1kLTh9vdlDnnwldUZgYSFyVj6shcPAtkf+NHYtS8Go1FJVT5/DFyHQWbbrnAjo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=RlxkA8Zf; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=RlxkA8Zf; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1768467610; c=relaxed/simple;
+	bh=Zdt/qisqFDX109KN9gzVhNrGYcWOFfwh4UgesJCoelc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fC92oE+JQIXeaKtBC6kl18jxqWb+3TyibFRenrq3oTYen6Osf10cEzSHYEV5biwsck6psf5JFUqx9fo6cwfHQQhKkNoCAZlqb0HOExke/1+pdKRSCUo3kKBnef0oHax0cpIb9tKv3MKt7y2edfikuKWbxfjkeXSfP7XIaIOsirg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BOeEfKJe; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="RlxkA8Zf";
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="RlxkA8Zf"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BOeEfKJe"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768467608;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=h/ZZKlHZurqbfW1B7W/nlx38PVNHuIvXpjWS+Iexpd0=;
+	b=BOeEfKJeWVuzoht2UJVmooIFDQvrfheBKRDQFM1b/yETjt0py3rIoq7sA3I4YAb8/A9Lbw
+	puDcwPXrxXZrf/+W9FC4JUrigY6Xy8pbrhrQZhYKfBessECgzLBQVl5dnKywvf2tR9/Mx3
+	abXcEVP8EtlERJ0P9FruiAFXticH5FE=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-677-Gfgta2fEMFivZQFd505cQA-1; Thu,
+ 15 Jan 2026 04:00:01 -0500
+X-MC-Unique: Gfgta2fEMFivZQFd505cQA-1
+X-Mimecast-MFC-AGG-ID: Gfgta2fEMFivZQFd505cQA_1768467600
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 8C43D5BCF9;
-	Thu, 15 Jan 2026 08:49:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1768466947; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=19SEqM5XbA0cekSTgHS01uLyO8gPh/sGxoARr2qzA7w=;
-	b=RlxkA8ZflTmZU2IPwwg/yzPOh09EwcBlp7bGJCvuq+PKaKl7rEtyP5KaDDHEi7C4xyCI4F
-	JPyF8ojkwj6JmIqygemuHyrqPQe1oH1OUfeecJlBRnToXmUBOHvLxHlibF2J43LUArjImB
-	YT+aMOjYY9qxGaINL9sVajZiJ8hYHEg=
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1768466947; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=19SEqM5XbA0cekSTgHS01uLyO8gPh/sGxoARr2qzA7w=;
-	b=RlxkA8ZflTmZU2IPwwg/yzPOh09EwcBlp7bGJCvuq+PKaKl7rEtyP5KaDDHEi7C4xyCI4F
-	JPyF8ojkwj6JmIqygemuHyrqPQe1oH1OUfeecJlBRnToXmUBOHvLxHlibF2J43LUArjImB
-	YT+aMOjYY9qxGaINL9sVajZiJ8hYHEg=
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A8FE93EA63;
-	Thu, 15 Jan 2026 08:49:06 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id VrG2JQKqaGnmIAAAD6G6ig
-	(envelope-from <jgross@suse.com>); Thu, 15 Jan 2026 08:49:06 +0000
-From: Juergen Gross <jgross@suse.com>
-To: linux-kernel@vger.kernel.org,
-	x86@kernel.org,
-	linux-block@vger.kernel.org
-Cc: Juergen Gross <jgross@suse.com>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Denis Efremov <efremov@linux.com>,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH v3 2/5] block/floppy: Don't use REALLY_SLOW_IO for delays
-Date: Thu, 15 Jan 2026 09:48:46 +0100
-Message-ID: <20260115084849.31502-3-jgross@suse.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260115084849.31502-1-jgross@suse.com>
-References: <20260115084849.31502-1-jgross@suse.com>
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9DFF2180045C;
+	Thu, 15 Jan 2026 08:59:59 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.198])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 275B818004D8;
+	Thu, 15 Jan 2026 08:59:57 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	io-uring@vger.kernel.org
+Cc: linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH] nvme: optimize passthrough IOPOLL completion for local ring context
+Date: Thu, 15 Jan 2026 16:59:52 +0800
+Message-ID: <20260115085952.494077-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -78,109 +56,143 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Score: -2.80
-X-Spamd-Result: default: False [-2.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-0.999];
-	MIME_GOOD(-0.10)[text/plain];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.com:mid,suse.com:email];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	DKIM_SIGNED(0.00)[suse.com:s=susede1];
-	R_RATELIMIT(0.00)[to_ip_from(RLfdszjqhz8kzzb9uwpzdm8png)];
-	RCVD_TLS_ALL(0.00)[]
-X-Spam-Level: 
-X-Spam-Flag: NO
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Instead of defining REALLY_SLOW_IO before including io.h, add the
-required additional calls of native_io_delay() to the related functions
-in arch/x86/include/asm/floppy.h.
+When multiple io_uring rings poll on the same NVMe queue, one ring can
+find completions belonging to another ring. The current code always
+uses task_work to handle this, but this adds overhead for the common
+single-ring case.
 
-This will remove the last place where REALLY_SLOW_IO is being defined.
+This patch passes the polling io_ring_ctx through the iopoll callback
+chain via io_comp_batch and stores it in the request. In the NVMe
+end_io handler, we compare the polling context with the request's
+owning context. If they match (local), we complete inline. If they
+differ (remote) or it's a non-IOPOLL path, we use task_work as before.
 
-Signed-off-by: Juergen Gross <jgross@suse.com>
+Changes:
+- Add poll_ctx field to struct io_comp_batch
+- Add poll_ctx to struct request's hash/ipi_list union
+- Set iob.poll_ctx in io_do_iopoll() before calling iopoll callbacks
+- Store poll_ctx in request in nvme_ns_chr_uring_cmd_iopoll()
+- Check local vs remote context in nvme_uring_cmd_end_io()
+
+~10% IOPS improvement is observed in the following benchmark:
+
+fio/t/io_uring -b512 -d128 -c32 -s32 -p1 -F1 -B[0|1] -O0 -P1 -u1 -n1 /dev/ng0n1
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- arch/x86/include/asm/floppy.h | 27 ++++++++++++++++++++++-----
- drivers/block/floppy.c        |  2 --
- 2 files changed, 22 insertions(+), 7 deletions(-)
+ drivers/nvme/host/ioctl.c | 36 ++++++++++++++++++++++++++++--------
+ include/linux/blk-mq.h    |  4 +++-
+ include/linux/blkdev.h    |  1 +
+ io_uring/rw.c             |  7 +++++++
+ 4 files changed, 39 insertions(+), 9 deletions(-)
 
-diff --git a/arch/x86/include/asm/floppy.h b/arch/x86/include/asm/floppy.h
-index e7a244051c62..8d1e86687b98 100644
---- a/arch/x86/include/asm/floppy.h
-+++ b/arch/x86/include/asm/floppy.h
-@@ -29,9 +29,6 @@
- #define CSW fd_routine[can_use_virtual_dma & 1]
+diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
+index a9c097dacad6..0b85378f7fbb 100644
+--- a/drivers/nvme/host/ioctl.c
++++ b/drivers/nvme/host/ioctl.c
+@@ -425,14 +425,28 @@ static enum rq_end_io_ret nvme_uring_cmd_end_io(struct request *req,
+ 	pdu->result = le64_to_cpu(nvme_req(req)->result.u64);
  
+ 	/*
+-	 * IOPOLL could potentially complete this request directly, but
+-	 * if multiple rings are polling on the same queue, then it's possible
+-	 * for one ring to find completions for another ring. Punting the
+-	 * completion via task_work will always direct it to the right
+-	 * location, rather than potentially complete requests for ringA
+-	 * under iopoll invocations from ringB.
++	 * For IOPOLL, check if this completion is happening in the context
++	 * of the same io_ring that owns the request (local context). If so,
++	 * we can complete inline without task_work overhead. Otherwise, we
++	 * must punt to task_work to ensure completion happens in the correct
++	 * ring's context.
+ 	 */
+-	io_uring_cmd_do_in_task_lazy(ioucmd, nvme_uring_task_cb);
++	if (blk_rq_is_poll(req) && req->poll_ctx == io_uring_cmd_ctx_handle(ioucmd)) {
++		/*
++		 * Local context: the polling ring owns this request.
++		 * Complete inline for optimal performance.
++		 */
++		if (pdu->bio)
++			blk_rq_unmap_user(pdu->bio);
++		io_uring_cmd_done32(ioucmd, pdu->status, pdu->result, 0);
++	} else {
++		/*
++		 * Remote or non-IOPOLL context: either a different ring found
++		 * this completion, or this is IRQ/softirq completion. Use
++		 * task_work to direct completion to the correct location.
++		 */
++		io_uring_cmd_do_in_task_lazy(ioucmd, nvme_uring_task_cb);
++	}
+ 	return RQ_END_IO_FREE;
+ }
  
--#define fd_inb(base, reg)		inb_p((base) + (reg))
--#define fd_outb(value, base, reg)	outb_p(value, (base) + (reg))
--
- #define fd_request_dma()	CSW._request_dma(FLOPPY_DMA, "floppy")
- #define fd_free_dma()		CSW._free_dma(FLOPPY_DMA)
- #define fd_enable_irq()		enable_irq(FLOPPY_IRQ)
-@@ -49,6 +46,26 @@ static char *virtual_dma_addr;
- static int virtual_dma_mode;
- static int doing_pdma;
+@@ -677,8 +691,14 @@ int nvme_ns_chr_uring_cmd_iopoll(struct io_uring_cmd *ioucmd,
+ 	struct nvme_uring_cmd_pdu *pdu = nvme_uring_cmd_pdu(ioucmd);
+ 	struct request *req = pdu->req;
  
-+static inline u8 fd_inb(u16 base, u16 reg)
-+{
-+	u8 ret = inb_p(base + reg);
-+
-+	native_io_delay();
-+	native_io_delay();
-+	native_io_delay();
-+
-+	return ret;
-+}
-+
-+static inline void fd_outb(u8 value, u16 base, u16 reg)
-+{
-+	outb_p(value, base + reg);
-+
-+	native_io_delay();
-+	native_io_delay();
-+	native_io_delay();
-+}
-+
- static irqreturn_t floppy_hardint(int irq, void *dev_id)
- {
- 	unsigned char st;
-@@ -79,9 +96,9 @@ static irqreturn_t floppy_hardint(int irq, void *dev_id)
- 			if (st != (STATUS_DMA | STATUS_READY))
- 				break;
- 			if (virtual_dma_mode)
--				outb_p(*lptr, virtual_dma_port + FD_DATA);
-+				fd_outb(*lptr, virtual_dma_port, FD_DATA);
- 			else
--				*lptr = inb_p(virtual_dma_port + FD_DATA);
-+				*lptr = fd_inb(virtual_dma_port, FD_DATA);
- 		}
- 		virtual_dma_count = lcount;
- 		virtual_dma_addr = lptr;
-diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-index c28786e0fe1c..4422bc57a4f2 100644
---- a/drivers/block/floppy.c
-+++ b/drivers/block/floppy.c
-@@ -145,8 +145,6 @@
-  * Better audit of register_blkdev.
-  */
+-	if (req && blk_rq_is_poll(req))
++	if (req && blk_rq_is_poll(req)) {
++		/*
++		 * Store the polling context in the request so end_io can
++		 * detect if it's completing in the local ring's context.
++		 */
++		req->poll_ctx = iob ? iob->poll_ctx : NULL;
+ 		return blk_rq_poll(req, iob, poll_flags);
++	}
+ 	return 0;
+ }
+ #ifdef CONFIG_NVME_MULTIPATH
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index cae9e857aea4..1975f5dd29f8 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -175,11 +175,13 @@ struct request {
+ 	 * request reaches the dispatch list. The ipi_list is only used
+ 	 * to queue the request for softirq completion, which is long
+ 	 * after the request has been unhashed (and even removed from
+-	 * the dispatch list).
++	 * the dispatch list). poll_ctx is used during iopoll to track
++	 * the io_ring_ctx that initiated the poll operation.
+ 	 */
+ 	union {
+ 		struct hlist_node hash;	/* merge hash */
+ 		struct llist_node ipi_list;
++		void *poll_ctx;		/* iopoll context */
+ 	};
  
--#define REALLY_SLOW_IO
--
- #define DEBUGT 2
+ 	/*
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 72e34acd439c..4ed708912127 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1820,6 +1820,7 @@ void bdev_fput(struct file *bdev_file);
  
- #define DPRINT(format, args...) \
+ struct io_comp_batch {
+ 	struct rq_list req_list;
++	void *poll_ctx;
+ 	bool need_ts;
+ 	void (*complete)(struct io_comp_batch *);
+ };
+diff --git a/io_uring/rw.c b/io_uring/rw.c
+index c33c533a267e..27a49ce3de46 100644
+--- a/io_uring/rw.c
++++ b/io_uring/rw.c
+@@ -1321,6 +1321,13 @@ int io_do_iopoll(struct io_ring_ctx *ctx, bool force_nonspin)
+ 	struct io_kiocb *req, *tmp;
+ 	int nr_events = 0;
+ 
++	/*
++	 * Store the polling ctx so drivers can detect if they're completing
++	 * a request from the same ring that's polling (local) vs a different
++	 * ring (remote). This enables optimizations for local completions.
++	 */
++	iob.poll_ctx = ctx;
++
+ 	/*
+ 	 * Only spin for completions if we don't have multiple devices hanging
+ 	 * off our complete list.
 -- 
-2.51.0
+2.47.1
 
