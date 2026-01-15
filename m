@@ -1,261 +1,127 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65BB734DCF2
-	for <linux-block@vger.kernel.org>; Thu, 15 Jan 2026 09:25:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB153358D0D
+	for <linux-block@vger.kernel.org>; Thu, 15 Jan 2026 09:39:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768469117; cv=none; b=thn4Kl6iKI3BTYMin6QeAL5lQO91GYbUTrvW3VrNBPX1bffptX4df6aDzrSPlWMQZkJKxd8EwdG0HHACLWcOiOLq/+0aS/MPme1kYcZgcs2Z3wKLqowSxWRfeb/qz9r1mF1Ev+kBHRr9rvZS5I0+r8u3i9Ctprgj68KPYmDSoBk=
+	t=1768469954; cv=none; b=UrdaeZmt+YevRdHabBFppwO8bk3eJLSXVRLXBCclhK2Ks0CZes7pye01fur0AEhoJH8v+DzZrUcMh2K1sQD5gvfxgS/ig5UCF8C6ed+aClUyn8n4IRsNIURXQHr0ezN7jait6NvzM7Fp/bDHsYC+nOva4Q9bYvjzR1L8G0Oi3P4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768469117; c=relaxed/simple;
-	bh=zfGjpg4zpVIbODkbpBbVLKcC9rUSmBMpD3GAAU51X/s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sF5RhS27tj0gZBW9wCVaniElXNLB3h5Lo/hGKubW+ibM937gVAeUgmur3yyp4vSMho9aG/PugL8s/W0hmejfOR1teNemROh4tK8jjPH208GEoyK4a+Jc2E69eqdlyNcNxdQMFwgeAMXlxjz8gynJQtMjRbZhzu9tAZazZgeMoIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MnxCewiK; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=RaiQIc/n; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1768469954; c=relaxed/simple;
+	bh=IpKdm4vm1xXiTCAlkhSwSqOJm8VYAroIug3XCsnyJgo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CLrZwW28K0R+RmQ0xh8UPCq9AQuGp3zs3fa5sy6REC3/n5mmB4JMdM8bFkF219CvGYtn+mMqIDd4A89+crLvPdfzfKzS7ErWSyoOvGtnETxhiT1o1YCbEvXeDJdqqU6Y7HHPx9DKuGAcF+EfzXHUHnwnliJ/tshWzULzAkQjK7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=dbsaX3Tv; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MnxCewiK";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="RaiQIc/n"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768469115;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AFVx2OPknI0/5/crmPB60StwMjoaJBP8nc1bG0QCX/A=;
-	b=MnxCewiK+rQAW3tSUjVYtXcBndLSFk7FNlBbw/iZ8OBDldXyTUYPbIXDwm2H931VVDscJ6
-	rXY82Q05HuR6uO/6FakXWlcFbPaWYd005WnJbUIIDOzPPMJFFtp3Oux0ekNIWizLKBzpA0
-	9G+BVsK9rc6pxgmIFULbdj2Ih26XQBU=
-Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
- [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-644-ZEJM6ugwNluuimx9WbhmcQ-1; Thu, 15 Jan 2026 04:25:13 -0500
-X-MC-Unique: ZEJM6ugwNluuimx9WbhmcQ-1
-X-Mimecast-MFC-AGG-ID: ZEJM6ugwNluuimx9WbhmcQ_1768469112
-Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-38305c7a140so3600041fa.2
-        for <linux-block@vger.kernel.org>; Thu, 15 Jan 2026 01:25:13 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="dbsaX3Tv"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-47fedb7c68dso3461315e9.2
+        for <linux-block@vger.kernel.org>; Thu, 15 Jan 2026 01:39:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768469112; x=1769073912; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AFVx2OPknI0/5/crmPB60StwMjoaJBP8nc1bG0QCX/A=;
-        b=RaiQIc/nCemccU4jUKFS1cdK7InLFjIvz3rAufk5lN2fJaEpc+gv0xUZgvg2NOccXh
-         eQSrQPhFY2KRxzkuv+99GAxnnJlQyAZrjeX57HRiHxz+04jsEGuSO3OggscXEK+rJZjB
-         CpfESmQ2JFNy7mIYi5ciD6slSrTUZfmkcQ7yrvJUtCq9nCjqcCQqLvWIDyFl/a8AHnNB
-         RNFcg+AaWbUGt8iNY1+Omx2z4K4g379Fx5h5DEeNWWe8ibJ1Frd6MjKHO++fw6WlAiqK
-         79y3IUoavLNtUS2t4VQeWV0TC8FBwDMvfTXav7FMN5KmXz09CLt73bUmZkaXDBzURAqh
-         G87A==
+        d=suse.com; s=google; t=1768469951; x=1769074751; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=IpKdm4vm1xXiTCAlkhSwSqOJm8VYAroIug3XCsnyJgo=;
+        b=dbsaX3TvS3zLj/8HBTXY1PQPRgAwkuIm1De8IuyGdZDraFiJdbh0nox8oK3YZQUH7J
+         ZhyNaxvbkxM+Jdk4/Difgtj5y48E3UXY1It57q8LT+Ms1WQxxLbKzevXduR2BiTbE0lf
+         jgwsX/WE4lRxoDe1VjRolIIKL7rRE5EcotMw35qYTSElvTEO7HitpfBJHsJNYqmhVJnD
+         1RVtunosc6TKz83erKNmHj9tuzB8p4UkLkDiuwxexIHuqJTLW8Y79jslTNXatAE4XD9f
+         i2Yp2lszMWhF7Hcpi0Rik3u4twVnBzGUplW5Q+rEkrM3cFaFEHGCWozmKoS0ZOEIuNlo
+         7N0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768469112; x=1769073912;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=AFVx2OPknI0/5/crmPB60StwMjoaJBP8nc1bG0QCX/A=;
-        b=l7ro8Yw+aR6WPaVeQiLq3pZp2AtvDxLodDf/htV5orTmMXDXvzhJbN54GdeB/1jBin
-         mVnqjn8zmXdLStR+E+fexuJ1FlE+wc+BcsZRW45oAPU6JMAC6Zh+sXcGHaXtga8KSmoz
-         SnUDmjO6EFh2OA3Uv/s9A/YBMuacX9AvlB+viC9MjXrTNxAzLKJILvr/FKEe/Z0n4Msk
-         mZ2EYiPwNVWNd8JZW1U764cp6I89NisaHTW/YxzlhZ6D68/E/vYgUNuz++JhmCnnkzym
-         JzvHQ570FjXo/JoTg9ZMvr/AEQ4pZqV3cfI3+9gJGZfw/a+WbjJ45pSg5QORyHpZ8TRo
-         PX7g==
-X-Forwarded-Encrypted: i=1; AJvYcCX1Y6fkJyyGYkkFGzb2fhTXLlPs6+cHWADA7aEwblD56Tde2chC9Z3mSPcNB6reHskszMRLK2fhT5BzoQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5ZSdElVVX04SvR5nIR4uNGMJqWpHWpB4EiZQwSMnqe6o/wSma
-	AvRj5RaTYgbn+QcQlq/QmnhxbQ67KX6aIXTObQIk8YmXOtTHk7f1ttK5bCFZe5fezP0tBr5FV7J
-	egNpAmsOvJhPkNFSZ2QPINO9bmXWVs7RjRwfZMLwfz3sDXBJAKQp2276Rl2bSUcnsPeVp5RgsjB
-	c59R5UWp3FsSZMPCqR1f2roRk23xYTQMjkczCjoZI=
-X-Gm-Gg: AY/fxX6b+zvO1RgA8fO3R3DHeY59yjIJfDMlPYpCe0z9Ci0FOq8PXr7B6OxUQac7Qkb
-	r5NMaj2mnGW22b/iYH8iuOBeDyAdKA/tWH0ZwTx4hh6FWI6pt2AOanHdg/8MihSUdTXgamXHqv7
-	Ouue6nIgM0YuYo2jlLa+Y3gYJ8zNjJGN3+wSHtxc43ox7rvgvPA4osmvYOHoZsosCbdxQ=
-X-Received: by 2002:a05:651c:1541:b0:383:5a4f:2605 with SMTP id 38308e7fff4ca-38360831ad3mr18477941fa.44.1768469111874;
-        Thu, 15 Jan 2026 01:25:11 -0800 (PST)
-X-Received: by 2002:a05:651c:1541:b0:383:5a4f:2605 with SMTP id
- 38308e7fff4ca-38360831ad3mr18477851fa.44.1768469111410; Thu, 15 Jan 2026
- 01:25:11 -0800 (PST)
+        d=1e100.net; s=20230601; t=1768469951; x=1769074751;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IpKdm4vm1xXiTCAlkhSwSqOJm8VYAroIug3XCsnyJgo=;
+        b=FfgKxIqmiG0+diwrBmOKXzNlMeJ7oh+K8coLxidBN3sOw/L9L9rlUYNIu5LYPUtNbN
+         rno+crlEg3tCjm0/3R3wn5JVghX/djwJHGzq+CgeLO+VHux3+EyJHstZnB76LE1WxTTv
+         VJKuwbcLk6VdjrvIERxu7fReVh6oyMOKw7mx1mTlaRSgDxnQD49pIAIJjg4puw7C2XD2
+         g5mXfhF1pcWKzkAH0cRJ8YUI9NjCLiE4svzHjJNiRoJjf0mVo2/asbBp8lmTmi06K564
+         Radi9Zkb2yuXj9KZViIsnw/1f9jJWStK3ROgHBedwKamdqgNiMF3BSQpH/YpWJL0xl7O
+         olCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU1QRzP9evYrtRZUbfA7puf6uTUcipimCJKHFJcEeHie0eVOsLPIoEOC7IJdCLRXHbFnHgweAs/6zBsDA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwN/S5tLAUBVsuRgPssJCbduImzicHIAwkZokXmaTK88loE33oO
+	BUI6l+E/MaA+Bkjvd4OdBdeh4oEuFxiJbNSf+mARHfHPtYafIXq9sKsHvn8+uoU3V+E=
+X-Gm-Gg: AY/fxX4FO7+qR3JcsgM0AjLmjo64PWcRrbouEgOqSMboJVaFDgjGSEec+GMoUUZZmch
+	8loTcppj6ZX8dvBrqs+qHjosEEUkQIyx72WLNmA3gPEx5ab815HNzPtQ9/L5RmRk1qK858pEU5L
+	gWVltOWsMC1oWcd9soVsvn9oE1SZtRWxwVi06eObafhDma3MDL/3nHpxo7AVwS3Ejcuf4RW96E0
+	T6QDZwpsWhusPNFCQHyWQbWAcoMjEEuRl7iaLiUcnjrKEwxanNMRpcTkpMyH8BMZMtB1xOnpV9T
+	OunAf3sSKTeveHsT2bR5UlHw5YR26glxAP99M1P1D/3EUMg+qZKXyxLluWPdJu9ltxFX/QUHcpu
+	Q3RRLXIGqB5TMTISxq1C7SivdR14S3GZNDZeQIgYEKToR7WQpDmlsrkW1HO2/1XFv6HxHg6FZLI
+	HP9zzlObtC+Y80AzzbOSOSOPeD+pYdftQ=
+X-Received: by 2002:a05:600c:4750:b0:480:1c75:407c with SMTP id 5b1f17b1804b1-4801c754220mr4477325e9.2.1768469951289;
+        Thu, 15 Jan 2026 01:39:11 -0800 (PST)
+Received: from blackdock.suse.cz (nat2.prg.suse.com. [195.250.132.146])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47f428ac749sm37266595e9.5.2026.01.15.01.39.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Jan 2026 01:39:10 -0800 (PST)
+Date: Thu, 15 Jan 2026 10:39:09 +0100
+From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
+To: Zheng Qixing <zhengqixing@huaweicloud.com>
+Cc: Yu Kuai <yukuai@fnnas.com>, tj@kernel.org, josef@toxicpanda.com, 
+	axboe@kernel.dk, hch@infradead.org, cgroups@vger.kernel.org, 
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, yi.zhang@huawei.com, 
+	yangerkun@huawei.com, houtao1@huawei.com, zhengqixing@huawei.com
+Subject: Re: [PATCH v2 1/3] blk-cgroup: fix race between policy activation
+ and blkg destruction
+Message-ID: <xjwdgvoc6fw65yvtuyz7ku6dtjqzpf2ipty7ei5qcrfo7brxee@slit46ljmaoz>
+References: <20260113061035.1902522-1-zhengqixing@huaweicloud.com>
+ <20260113061035.1902522-2-zhengqixing@huaweicloud.com>
+ <le5sjny634ffj6piswnkhkh33eq5cbclgysedyjl2bcuijiutf@f3j6ozw7zuuc>
+ <edf84e44-d7e3-4a34-ad49-90ab5a4f545e@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAHj4cs9wv3SdPo+N01Fw2SHBYDs9tj2M_e1-GdQOkRy=DsBB1w@mail.gmail.com>
- <262c8ac1-e625-4e4c-8b3c-85f842aba6fe@gmail.com> <7d718bc8-64b6-4e8f-bad7-7e1615c577ca@nvidia.com>
- <CAHj4cs9gBTHLB_7JrFpZnJ-imc7jmqnhZpqkemaRVQYLn9j_rQ@mail.gmail.com>
-In-Reply-To: <CAHj4cs9gBTHLB_7JrFpZnJ-imc7jmqnhZpqkemaRVQYLn9j_rQ@mail.gmail.com>
-From: Yi Zhang <yi.zhang@redhat.com>
-Date: Thu, 15 Jan 2026 17:24:58 +0800
-X-Gm-Features: AZwV_QgMuBM7WRV2hAZveEm3FY527xhIAOt1HlaitQTZAE4l_GoB7b6WdnawdWg
-Message-ID: <CAHj4cs-84wsWQKeBS2wkd-_Y4Xe7wcTPqzutisNbXtpcAdh8yw@mail.gmail.com>
-Subject: Re: [bug report] kmemleak observed during blktests nvme/fc
-To: Chaitanya Kulkarni <chaitanyak@nvidia.com>, justintee8345@gmail.com
-Cc: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>, 
-	Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>, 
-	"open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>, linux-block <linux-block@vger.kernel.org>, 
-	Daniel Wagner <dwagner@suse.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-Hi Justin and Chaitanya
-
-It turns out that the kmemleak was caused by nvme-loop. It was
-observed during the stress nvme loop/tcp/fc[1] test, but the kmemleak
-log was reported during the nvme/fc test. That's why I didn't
-reproduce it with the stress nvme/fc test before.
-
-[1]
-nvme_trtype=3Dloop ./check nvme/
-nvme_trtype=3Dtcp ./check nvme/
-nvme_trtype=3Dfc ./check nvme/
-
-unreferenced object 0xffff8881295fd000 (size 1024):
-  comm "nvme", pid 101335, jiffies 4299282670
-  hex dump (first 32 bytes):
-    00 00 00 00 ad 4e ad de ff ff ff ff 00 00 00 00  .....N..........
-    ff ff ff ff ff ff ff ff e0 3c 57 af ff ff ff ff  .........<W.....
-  backtrace (crc 414bcfcd):
-    __kmalloc_cache_node_noprof+0x5f9/0x840
-    blk_mq_alloc_hctx+0x52/0x810
-    blk_mq_alloc_and_init_hctx+0x5b9/0x840
-    __blk_mq_realloc_hw_ctxs+0x20a/0x610
-    blk_mq_init_allocated_queue+0x2e9/0x1210
-    blk_mq_alloc_queue+0x17f/0x230
-    nvme_alloc_admin_tag_set+0x352/0x670 [nvme_core]
-    nvme_loop_configure_admin_queue+0xdf/0x2d0 [nvme_loop]
-    nvme_loop_create_ctrl+0x428/0xb13 [nvme_loop]
-    nvmf_create_ctrl+0x2ec/0x620 [nvme_fabrics]
-    nvmf_dev_write+0xd5/0x180 [nvme_fabrics]
-    vfs_write+0x1d0/0xfd0
-    ksys_write+0xf9/0x1d0
-    do_syscall_64+0x95/0x520
-    entry_SYSCALL_64_after_hwframe+0x76/0x7e
-unreferenced object 0xffff8881c24db660 (size 8):
-  comm "nvme", pid 101335, jiffies 4299282670
-  hex dump (first 8 bytes):
-    ff ff 00 00 00 00 00 00                          ........
-  backtrace (crc b47d4cd6):
-    __kmalloc_node_noprof+0x6ab/0x970
-    alloc_cpumask_var_node+0x56/0xb0
-    blk_mq_alloc_hctx+0x74/0x810
-    blk_mq_alloc_and_init_hctx+0x5b9/0x840
-    __blk_mq_realloc_hw_ctxs+0x20a/0x610
-    blk_mq_init_allocated_queue+0x2e9/0x1210
-    blk_mq_alloc_queue+0x17f/0x230
-    nvme_alloc_admin_tag_set+0x352/0x670 [nvme_core]
-    nvme_loop_configure_admin_queue+0xdf/0x2d0 [nvme_loop]
-    nvme_loop_create_ctrl+0x428/0xb13 [nvme_loop]
-    nvmf_create_ctrl+0x2ec/0x620 [nvme_fabrics]
-    nvmf_dev_write+0xd5/0x180 [nvme_fabrics]
-    vfs_write+0x1d0/0xfd0
-    ksys_write+0xf9/0x1d0
-    do_syscall_64+0x95/0x520
-    entry_SYSCALL_64_after_hwframe+0x76/0x7e
-unreferenced object 0xffff8882752cd300 (size 128):
-  comm "nvme", pid 101335, jiffies 4299282670
-  hex dump (first 32 bytes):
-    00 bf f0 fb ff e8 ff ff 00 bf 30 fc ff e8 ff ff  ..........0.....
-    00 bf 70 fc ff e8 ff ff 00 bf b0 fc ff e8 ff ff  ..p.............
-  backtrace (crc caffc16d):
-    __kmalloc_node_noprof+0x6ab/0x970
-    blk_mq_alloc_hctx+0x43a/0x810
-    blk_mq_alloc_and_init_hctx+0x5b9/0x840
-    __blk_mq_realloc_hw_ctxs+0x20a/0x610
-    blk_mq_init_allocated_queue+0x2e9/0x1210
-    blk_mq_alloc_queue+0x17f/0x230
-    nvme_alloc_admin_tag_set+0x352/0x670 [nvme_core]
-    nvme_loop_configure_admin_queue+0xdf/0x2d0 [nvme_loop]
-    nvme_loop_create_ctrl+0x428/0xb13 [nvme_loop]
-    nvmf_create_ctrl+0x2ec/0x620 [nvme_fabrics]
-    nvmf_dev_write+0xd5/0x180 [nvme_fabrics]
-    vfs_write+0x1d0/0xfd0
-    ksys_write+0xf9/0x1d0
-    do_syscall_64+0x95/0x520
-    entry_SYSCALL_64_after_hwframe+0x76/0x7e
-unreferenced object 0xffff88827d5d7800 (size 512):
-  comm "nvme", pid 101335, jiffies 4299282670
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace (crc 93cf34af):
-    __kvmalloc_node_noprof+0x814/0xb30
-    sbitmap_init_node+0x184/0x730
-    blk_mq_alloc_hctx+0x4b3/0x810
-    blk_mq_alloc_and_init_hctx+0x5b9/0x840
-    __blk_mq_realloc_hw_ctxs+0x20a/0x610
-    blk_mq_init_allocated_queue+0x2e9/0x1210
-    blk_mq_alloc_queue+0x17f/0x230
-    nvme_alloc_admin_tag_set+0x352/0x670 [nvme_core]
-    nvme_loop_configure_admin_queue+0xdf/0x2d0 [nvme_loop]
-    nvme_loop_create_ctrl+0x428/0xb13 [nvme_loop]
-    nvmf_create_ctrl+0x2ec/0x620 [nvme_fabrics]
-    nvmf_dev_write+0xd5/0x180 [nvme_fabrics]
-    vfs_write+0x1d0/0xfd0
-    ksys_write+0xf9/0x1d0
-    do_syscall_64+0x95/0x520
-    entry_SYSCALL_64_after_hwframe+0x76/0x7e
-On Sat, Dec 27, 2025 at 8:10=E2=80=AFPM Yi Zhang <yi.zhang@redhat.com> wrot=
-e:
->
-> > > Can you try following ? FYI : - Potential fix, only compile tested.
-> > >
-> > > From b3c2e350ae741b18c04abe489dcf9d325537c01c Mon Sep 17 00:00:00 200=
-1
-> > > From: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
-> > > Date: Sun, 14 Dec 2025 19:29:24 -0800
-> > > Subject: [PATCH COMPILE TESTED ONLY] nvme-fc: release admin tagset if
-> > > init fails
-> > >
-> > > nvme_fabrics creates an NVMe/FC controller in following path:
-> > >
-> > >     nvmf_dev_write()
-> > >       -> nvmf_create_ctrl()
-> > >         -> nvme_fc_create_ctrl()
-> > >           -> nvme_fc_init_ctrl()
-> > >
-> > > Check ctrl->ctrl.admin_tagset in the fail_ctrl path and call
-> > > nvme_remove_admin_tag_set() to release the resources.
-> > >
-> > > Signed-off-by: Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
-> > > ---
-> > >  drivers/nvme/host/fc.c | 2 ++
-> > >  1 file changed, 2 insertions(+)
-> > >
-> > > diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
-> > > index bc455fa98246..6948de3f438a 100644
-> > > --- a/drivers/nvme/host/fc.c
-> > > +++ b/drivers/nvme/host/fc.c
-> > > @@ -3587,6 +3587,8 @@ nvme_fc_init_ctrl(struct device *dev, struct
-> > > nvmf_ctrl_options *opts,
-> > >
-> > >      ctrl->ctrl.opts =3D NULL;
-> > >
-> > > +    if (ctrl->ctrl.admin_tagset)
-> > > +        nvme_remove_admin_tag_set(&ctrl->ctrl);
-> > >      /* initiate nvme ctrl ref counting teardown */
-> > >      nvme_uninit_ctrl(&ctrl->ctrl);
-> > >
-> > did you get a chance to try this ?
->
-> Hi Chaitanya
->
-> Sorry for the late response, I tried to reproduce this issue recently
-> but with no luck to reproduce it again.
-> And during the stress blktests nvme/fc test, I reproduced several panic i=
-ssue.
-> I will report it later after I get more info.
->
->
-> >
-> > -ck
-> >
->
->
-> --
-> Best Regards,
->   Yi Zhang
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="l27swnkbzqhelwte"
+Content-Disposition: inline
+In-Reply-To: <edf84e44-d7e3-4a34-ad49-90ab5a4f545e@huaweicloud.com>
 
 
+--l27swnkbzqhelwte
+Content-Type: text/plain; protected-headers=v1; charset=us-ascii
+Content-Disposition: inline
+Subject: Re: [PATCH v2 1/3] blk-cgroup: fix race between policy activation
+ and blkg destruction
+MIME-Version: 1.0
 
---
-Best Regards,
-  Yi Zhang
+On Thu, Jan 15, 2026 at 11:27:47AM +0800, Zheng Qixing <zhengqixing@huaweicloud.com> wrote:
+> Yes, this issue was discovered by injecting memory allocation failure at
+> ->pd_alloc_fn(..., GFP_KERNEL) in blkcg_activate_policy().
 
+Fair enough.
+
+> Commit f1c006f1c685 ("blk-cgroup: synchronize pd_free_fn() from
+> blkg_free_workfn() and blkcg_deactivate_policy()") delays
+> list_del_init(&blkg->q_node) until after pd_free_fn() in blkg_free_workfn().
+
+IIUC, the point was to delay it from blkg_destroy until blkg_free_workfn
+but then inside blkg_free_workfn it may have gone too far where it calls
+pd_free_fn's before actual list removal.
+
+(I'm Cc'ing the correct Kuai's address now.)
+IOW, I'm wondering whether mere swap of these two actions (pd_free_fn
+and list removal) wouldn't be a sufficient fix for the discovered issue
+(instead of expanding lock coverage).
+
+Thanks,
+Michal
+
+--l27swnkbzqhelwte
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iJEEABYKADkWIQRCE24Fn/AcRjnLivR+PQLnlNv4CAUCaWi1uxsUgAAAAAAEAA5t
+YW51MiwyLjUrMS4xMSwyLDIACgkQfj0C55Tb+AjBoQD+P0vwCMjZtjVGS9olloNJ
+W00FAlkbpKQbdfBF2UpOw6gA/3cd7/jS+Q2klkyaKhjtBWnmlIXM9qQIMhNR6dfO
+P9EA
+=EJwI
+-----END PGP SIGNATURE-----
+
+--l27swnkbzqhelwte--
