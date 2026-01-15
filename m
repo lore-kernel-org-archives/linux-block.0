@@ -1,29 +1,30 @@
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCE971C5D77;
-	Thu, 15 Jan 2026 01:25:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3100122A1D5;
+	Thu, 15 Jan 2026 01:25:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768440319; cv=none; b=ghqdu/6i3CenIfwXeN2SEdFW818NUsdSwvZhQU4OZM9Vu34lJPVCqrTw5IL/c+KtYyAG+3nHtzpalJ1sNionjjGvwn080H4nUzw0+ZxgVTATZ7M/6kVanSTJe6kyUnmLV8kEyhgQgEB8iqnJa88XoJdtNO+mLXTczCzAFQpDHWA=
+	t=1768440342; cv=none; b=flBTDPuWBjexgkW1BCyUJvGbzJoLAUJGKgggcl2spFUj/MiL8GIYbiNQBRveiZTieTGXOgLRv9iV2cNGMe1oMixlW1xi2tbWU+rMmSKnx+Hc3NAQafNAtC2WxWQ0iTq5xt/2HFoh6JvY9nVGKrt1LPQEaM/85QHdUygx6pPLNEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768440319; c=relaxed/simple;
-	bh=sPfse5Cc5z9C+okX6nNmVsZ6uUCzWV2DIzBj3kmjSW0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=q1uqforQfIawqiK5ghx8Nvukq2eGwQFwOZMctVIqBOgV+fWJ5hXEZQHyWmpMSHwOFtNesr81Op27YEp3wI8zMWpf4QkhqxbvfPvLHRc+GRAkFbI1OxmFS5IeArdSm+dtm9bXz4MF+78k488wwMymY0J8LqiAyhD5eKWPYVM2BzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=f6+0/olL; arc=none smtp.client-ip=220.197.31.5
+	s=arc-20240116; t=1768440342; c=relaxed/simple;
+	bh=wbQb3CWmge51BOfTCPtb1lZhfFw2tuZcZ68aEpFTtpI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=TEGNDlIT4FZZSMltEFZytDBltdFg4dBGeY570UAeA9pxG53wuwUS6I+UfPmRCF+w990zevbTwyFBPMsKQ3IPMg65Al7Gklqnw2ccgi5CJ1xOyfGAgQGlBlFBJve15d+ldzLwQSJVBqEM3P+5v8NS6oTwv64xQc+LyNCWHgQjXus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=b4DVBNjl; arc=none smtp.client-ip=220.197.31.3
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="f6+0/olL"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="b4DVBNjl"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=Kx
-	pEQ33grYiIYyFVG6/rA3+zwrNTxIpguT9J6DE6a4o=; b=f6+0/olLiTCWyzsHrn
-	QIel86VQi3rYG5ceXPbL9KsGTtTJwB/ry4Pbj0U59oMUGk1Z1FNvUlFIcPEMBCPo
-	ikoX4JAIBnQxhXV1NO2lw2CUJTK2iRQwDZIX2yd2TnzeQU0gES5J2DI9y+sDEiKQ
-	5UZ8eK3a3mwOJfqfL28IxS4OQ=
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=xJ
+	P+lwfqKpPR76hZePl+UKdzGq7g6uGlNER0Vnei9Sk=; b=b4DVBNjlYUfZ1M7NhJ
+	5IRykggcd1rT3nFyqgR+VKVoq8XiI8xhN6zxvNbGIlmHLSoHFia3AhPfryIDm857
+	1AC3X16iy6w7cFn6duzi9pCJD0D3BPEGyE3EGRGAtKBDdNUq4sdYrosd067K8Hd9
+	5RzPoY4iLWqYtz0kO73boT0GE=
 Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g1-4 (Coremail) with SMTP id _____wAnDqzXQWhp5NZdGA--.64S2;
-	Thu, 15 Jan 2026 09:24:41 +0800 (CST)
+	by gzga-smtp-mtada-g1-4 (Coremail) with SMTP id _____wAnDqzXQWhp5NZdGA--.64S4;
+	Thu, 15 Jan 2026 09:24:44 +0800 (CST)
 From: Yang Xiuwei <yangxiuwei@kylinos.cn>
 To: linux-scsi@vger.kernel.org,
 	linux-block@vger.kernel.org,
@@ -34,10 +35,12 @@ Cc: fujita.tomonori@lab.ntt.co.jp,
 	martin.petersen@oracle.com,
 	bvanassche@acm.org,
 	Yang Xiuwei <yangxiuwei@kylinos.cn>
-Subject: [RFC PATCH v2 0/3] bsg: add io_uring command support for SCSI passthrough
-Date: Thu, 15 Jan 2026 09:24:34 +0800
-Message-Id: <cover.1768439194.git.yangxiuwei@kylinos.cn>
+Subject: [RFC PATCH v2 2/3] bsg: add uring_cmd support to BSG generic layer
+Date: Thu, 15 Jan 2026 09:24:36 +0800
+Message-Id: <7b27926e3ce532df32988e9b5b5fce247d20eb89.1768439194.git.yangxiuwei@kylinos.cn>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <cover.1768439194.git.yangxiuwei@kylinos.cn>
+References: <cover.1768439194.git.yangxiuwei@kylinos.cn>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -45,95 +48,121 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wAnDqzXQWhp5NZdGA--.64S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxWFyrJr48AF17ZryDJr4kXrb_yoW5ZF47pF
-	WSgr93GayUJr1xuFn3XrZrZFWFqa95G347G343K34vyr909F9FyF1UKF1Fq397Gry2q34j
-	qw4jqrs8Ca1kAa7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07j1v38UUUUU=
+X-CM-TRANSID:_____wAnDqzXQWhp5NZdGA--.64S4
+X-Coremail-Antispam: 1Uf129KBjvJXoWxJF47Zw45Kw43GF4xWF48JFb_yoW5uFyrpF
+	WDZa15AFWFgr1xuas8Jan8Ar9Igw4kK347JFW2934Yyr9FyF9Yq34v9r18tFW8JrZFkayq
+	q3Za9rZ8Cr1jqw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jj5l8UUUUU=
 Sender: yangxiuwei2025@163.com
-X-CM-SenderInfo: p1dqw55lxzvxisqskqqrwthudrp/xtbCwRn6i2loQdk0kQAA3V
+X-CM-SenderInfo: p1dqw55lxzvxisqskqqrwthudrp/xtbCwRz7jGloQdw0xgAA3E
 
-This RFC series adds io_uring command support to the BSG (Block layer
-SCSI Generic) driver, enabling asynchronous SCSI passthrough operations
-via io_uring.
+Add io_uring command handler to the generic BSG layer. This handler
+validates that SQE128 and CQE32 flags are set (required for the command
+structure and status information), then delegates to the SCSI-specific
+handler.
 
-Motivation:
------------
-The current BSG interface uses ioctl() for SCSI passthrough, which is
-synchronous and has limitations for high-performance applications. By
-integrating with io_uring, we can provide:
+Signed-off-by: Yang Xiuwei <yangxiuwei@kylinos.cn>
+---
+ block/bsg.c             | 28 ++++++++++++++++++++++++++++
+ drivers/scsi/scsi_bsg.c |  7 +++++++
+ include/linux/bsg.h     |  4 ++++
+ 3 files changed, 39 insertions(+)
 
-1. Asynchronous I/O support for better scalability
-2. Zero-copy I/O via io_uring fixed buffers
-3. Better integration with modern async I/O frameworks
-4. Reduced system call overhead
-
-Design:
--------
-The implementation follows the io_uring uring_cmd pattern used by other
-drivers (e.g., nvme). Key design decisions:
-
-1. UAPI Structure: A new bsg_uring_cmd structure is defined that fits
-   within the 80-byte cmd field of a 128-byte SQE, with 24 bytes reserved
-   for future extensions. The structure uses protocol-agnostic field names
-   to support multiple protocols beyond SCSI.
-
-2. Status Information: SCSI status (device_status, host_status,
-   driver_status, sense_len, resid_len) is returned in the CQE res2 field
-   using a compact 64-bit encoding.
-
-3. Zero-copy Support: The implementation supports both traditional
-   user buffers and io_uring fixed buffers for zero-copy I/O.
-
-4. Async Completion: Command completion is handled via task work to
-   safely access user space and copy sense data.
-
-5. Non-blocking I/O: Support for IO_URING_F_NONBLOCK flag to enable
-   non-blocking command submission.
-
-Limitations:
------------
-- Currently only SCSI commands are supported (BSG_PROTOCOL_SCSI)
-- Scatter/gather I/O (iovec arrays) is not currently supported, but
-  the data structure includes fields for future implementation.
-- Bidirectional transfers are not supported (consistent with existing
-  BSG behavior).
-
-Testing:
---------
-A user-space test program has been developed to validate the
-implementation, including:
-- Basic SCSI commands (INQUIRY, READ CAPACITY (10), READ (10),
-  WRITE (10))
-- Zero-copy mode using fixed buffers
-- Error handling (invalid flags, unsupported features)
-
-The test program is available separately and can be provided upon request.
-
-Changes since v1:
------------------
-- Renamed SCSI-specific fields (cdb_addr/cdb_len) to protocol-agnostic
-  names (request/request_len) to support multiple protocols beyond SCSI
-- Removed __packed attribute and optimized field alignment to avoid
-  suboptimal code generation on architectures that don't support unaligned
-  accesses
-- Simplified data transfer structure: unified din_xferp/dout_xferp into a
-  single xfer_addr field with xfer_dir to indicate direction (0=read, 1=write),
-  consistent with existing BSG behavior where bidirectional transfers are not
-  supported
-- Updated implementation to use new protocol-agnostic field names
-
-Yang Xiuwei (3):
-  bsg: add bsg_uring_cmd uapi structure
-  bsg: add uring_cmd support to BSG generic layer
-  bsg: implement SCSI BSG uring_cmd handler
-
- block/bsg.c              |  28 +++++
- drivers/scsi/scsi_bsg.c  | 222 +++++++++++++++++++++++++++++++++++++++
- include/linux/bsg.h      |   4 +
- include/uapi/linux/bsg.h |  19 ++++
- 4 files changed, 273 insertions(+)
-
+diff --git a/block/bsg.c b/block/bsg.c
+index 72157a59b788..cdccf86b8673 100644
+--- a/block/bsg.c
++++ b/block/bsg.c
+@@ -12,6 +12,7 @@
+ #include <linux/idr.h>
+ #include <linux/bsg.h>
+ #include <linux/slab.h>
++#include <linux/io_uring/cmd.h>
+ 
+ #include <scsi/scsi.h>
+ #include <scsi/scsi_ioctl.h>
+@@ -158,11 +159,38 @@ static long bsg_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
+ 	}
+ }
+ 
++static int bsg_uring_cmd_checks(unsigned int issue_flags)
++{
++	/* BSG passthrough requires big SQE/CQE support */
++	if ((issue_flags & (IO_URING_F_SQE128|IO_URING_F_CQE32)) !=
++	    (IO_URING_F_SQE128|IO_URING_F_CQE32))
++		return -EOPNOTSUPP;
++	return 0;
++}
++
++static int bsg_uring_cmd(struct io_uring_cmd *ioucmd, unsigned int issue_flags)
++{
++	struct bsg_device *bd = to_bsg_device(file_inode(ioucmd->file));
++	struct request_queue *q = bd->queue;
++	bool open_for_write = ioucmd->file->f_mode & FMODE_WRITE;
++	int ret;
++
++	if (!q)
++		return -EINVAL;
++
++	ret = bsg_uring_cmd_checks(issue_flags);
++	if (ret)
++		return ret;
++
++	return scsi_bsg_uring_cmd(q, ioucmd, issue_flags, open_for_write);
++}
++
+ static const struct file_operations bsg_fops = {
+ 	.open		=	bsg_open,
+ 	.release	=	bsg_release,
+ 	.unlocked_ioctl	=	bsg_ioctl,
+ 	.compat_ioctl	=	compat_ptr_ioctl,
++	.uring_cmd	=	bsg_uring_cmd,
+ 	.owner		=	THIS_MODULE,
+ 	.llseek		=	default_llseek,
+ };
+diff --git a/drivers/scsi/scsi_bsg.c b/drivers/scsi/scsi_bsg.c
+index a9a9ec086a7e..4399a25990fc 100644
+--- a/drivers/scsi/scsi_bsg.c
++++ b/drivers/scsi/scsi_bsg.c
+@@ -1,5 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0
+ #include <linux/bsg.h>
++#include <linux/io_uring/cmd.h>
+ #include <scsi/scsi.h>
+ #include <scsi/scsi_ioctl.h>
+ #include <scsi/scsi_cmnd.h>
+@@ -9,6 +10,12 @@
+ 
+ #define uptr64(val) ((void __user *)(uintptr_t)(val))
+ 
++int scsi_bsg_uring_cmd(struct request_queue *q, struct io_uring_cmd *ioucmd,
++		       unsigned int issue_flags, bool open_for_write)
++{
++	return -EOPNOTSUPP;
++}
++
+ static int scsi_bsg_sg_io_fn(struct request_queue *q, struct sg_io_v4 *hdr,
+ 		bool open_for_write, unsigned int timeout)
+ {
+diff --git a/include/linux/bsg.h b/include/linux/bsg.h
+index ee2df73edf83..68ec50b5e97c 100644
+--- a/include/linux/bsg.h
++++ b/include/linux/bsg.h
+@@ -7,6 +7,7 @@
+ struct bsg_device;
+ struct device;
+ struct request_queue;
++struct io_uring_cmd;
+ 
+ typedef int (bsg_sg_io_fn)(struct request_queue *, struct sg_io_v4 *hdr,
+ 		bool open_for_write, unsigned int timeout);
+@@ -16,4 +17,7 @@ struct bsg_device *bsg_register_queue(struct request_queue *q,
+ 		bsg_sg_io_fn *sg_io_fn);
+ void bsg_unregister_queue(struct bsg_device *bcd);
+ 
++int scsi_bsg_uring_cmd(struct request_queue *q, struct io_uring_cmd *ioucmd,
++		       unsigned int issue_flags, bool open_for_write);
++
+ #endif /* _LINUX_BSG_H */
 -- 
 2.25.1
 
