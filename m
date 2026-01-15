@@ -1,18 +1,19 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE3932C11CA
-	for <linux-block@vger.kernel.org>; Thu, 15 Jan 2026 16:38:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBCE0346E71
+	for <linux-block@vger.kernel.org>; Thu, 15 Jan 2026 16:38:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768495109; cv=none; b=T2ySq5rbf00yAMk4BL13or7pGfbi+K2/t2wOGF3+7QakUpJg2ISjt9Tr2iuNwWCJBpZbLN0val3w2Vo8h96LUcuxP8FuuhdcGQwOP87+KMIVUw4XdbCJwqyCkjf46rU+uAz2MTe6AffHumd11F09tbj7ezW5NZkmdpq4RkXmgK8=
+	t=1768495112; cv=none; b=ll2/ZDfPQusZnkufiFur/RXLVriQqco5jINoch3ueotDzAzBqbVmfg+67xmyg2eHXJ3e8X/kTAx/I31riGVCXeAnFNc9XFGTmCNomeiwfUwtgWZ3ybYVEcC+fqmcngVObbBD9O/qEcRstI8p/YDRweffIgoHcpdbd1KpRlk96Xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768495109; c=relaxed/simple;
-	bh=vNHNLLUNIFtaQjwUWjOUcKAm7mWdL8GvLgxJAOV6gjw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mYMIUZfw2TWKwqtYZz7382DpxqyRFbTTAyRF+40bkL1l8FRrmnnSt3C5t2YhE2mnscVz7GksvyFtzZurTWzm0FiBqZO6FmW3xCIjLsUbCkS5/5dVLGxJeMn4YiiTV/FG3aZB4WhjgreGlv5lfALMyB/Ak+0z72sOdK9LwOhxUws=
+	s=arc-20240116; t=1768495112; c=relaxed/simple;
+	bh=rhAh8Qt6BcEMTM98R8MnFkUNtJyn1YPkVEfNxMDnwP4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=uoUSvV4lpC9hyMNV/ye1/GBO5Evc/TOTz/yhS6vVrMesI9v6q5natWCTXc80rjOUrXLXywGihGo4AyY6sZLz2F0rrcE22DLa5rAQrmyyddLRcfHehdsOc76GJk575iASU1jrfYa5l8de3VRTKZdg4BgtiWDq1IXUNpia1fWDSYc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58956C116D0;
-	Thu, 15 Jan 2026 16:38:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1089C116D0;
+	Thu, 15 Jan 2026 16:38:29 +0000 (UTC)
 From: Yu Kuai <yukuai@fnnas.com>
 To: axboe@kernel.dk,
 	linux-block@vger.kernel.org,
@@ -23,10 +24,12 @@ Cc: yukuai@fnnas.com,
 	zhengqixing@huawei.com,
 	mkoutny@suse.com,
 	hch@infradead.org
-Subject: [PATCH 0/6] blk-cgroup: fix races in blkcg_activate_policy()
-Date: Fri, 16 Jan 2026 00:38:12 +0800
-Message-ID: <20260115163818.162968-1-yukuai@fnnas.com>
+Subject: [PATCH 1/6] blk-cgroup: protect q->blkg_list iteration in blkg_destroy_all() with blkcg_mutex
+Date: Fri, 16 Jan 2026 00:38:13 +0800
+Message-ID: <20260115163818.162968-2-yukuai@fnnas.com>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260115163818.162968-1-yukuai@fnnas.com>
+References: <20260115163818.162968-1-yukuai@fnnas.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -35,39 +38,46 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series fixes race conditions between blkcg_activate_policy() and
-blkg destruction, and optimizes the policy activation path.
+blkg_destroy_all() iterates q->blkg_list without holding blkcg_mutex,
+which can race with blkg_free_workfn() that removes blkgs from the list
+while holding blkcg_mutex.
 
-Patches 1-2 add missing blkcg_mutex protection for q->blkg_list iteration.
+Add blkcg_mutex protection around the q->blkg_list iteration to prevent
+potential list corruption or use-after-free issues.
 
-Patches 3-5 from Zheng Qixing fix use-after-free and memory leak issues
-caused by races between policy activation and blkg destruction.
+Signed-off-by: Yu Kuai <yukuai@fnnas.com>
+---
+ block/blk-cgroup.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Patch 6 restructures blkcg_activate_policy() to allocate pds before
-freezing the queue. This is a prep patch to fix deadlocks related to
-percpu allocation with queue frozen, since some policies like iocost
-and iolatency do percpu allocation in pd_alloc_fn(). Future work is to
-remove all queue freezing before blkcg_activate_policy() to fix the
-deadlocks thoroughly.
-
-Yu Kuai (3):
-  blk-cgroup: protect q->blkg_list iteration in blkg_destroy_all() with
-    blkcg_mutex
-  bfq: protect q->blkg_list iteration in bfq_end_wr_async() with
-    blkcg_mutex
-  blk-cgroup: allocate pds before freezing queue in
-    blkcg_activate_policy()
-
-Zheng Qixing (3):
-  blk-cgroup: fix race between policy activation and blkg destruction
-  blk-cgroup: skip dying blkg in blkcg_activate_policy()
-  blk-cgroup: factor policy pd teardown loop into helper
-
- block/bfq-cgroup.c  |   3 +-
- block/bfq-iosched.c |   2 +
- block/blk-cgroup.c  | 148 +++++++++++++++++++-------------------------
- 3 files changed, 66 insertions(+), 87 deletions(-)
-
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 3cffb68ba5d8..0bc7b19399b6 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -574,6 +574,7 @@ static void blkg_destroy_all(struct gendisk *disk)
+ 	int i;
+ 
+ restart:
++	mutex_lock(&q->blkcg_mutex);
+ 	spin_lock_irq(&q->queue_lock);
+ 	list_for_each_entry(blkg, &q->blkg_list, q_node) {
+ 		struct blkcg *blkcg = blkg->blkcg;
+@@ -592,6 +593,7 @@ static void blkg_destroy_all(struct gendisk *disk)
+ 		if (!(--count)) {
+ 			count = BLKG_DESTROY_BATCH_SIZE;
+ 			spin_unlock_irq(&q->queue_lock);
++			mutex_unlock(&q->blkcg_mutex);
+ 			cond_resched();
+ 			goto restart;
+ 		}
+@@ -611,6 +613,7 @@ static void blkg_destroy_all(struct gendisk *disk)
+ 
+ 	q->root_blkg = NULL;
+ 	spin_unlock_irq(&q->queue_lock);
++	mutex_unlock(&q->blkcg_mutex);
+ }
+ 
+ static void blkg_iostat_set(struct blkg_iostat *dst, struct blkg_iostat *src)
 -- 
 2.51.0
 
