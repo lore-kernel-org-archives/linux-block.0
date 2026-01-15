@@ -1,54 +1,57 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCEF53358C0
-	for <linux-block@vger.kernel.org>; Thu, 15 Jan 2026 09:00:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E57E30BBBF
+	for <linux-block@vger.kernel.org>; Thu, 15 Jan 2026 09:11:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.141.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768467610; cv=none; b=BpVTTgAfPKPPrLFRYUDkWYVD4C42VfhmcPhCBbE7b1TNpGIq+3xbu/1oP6apWyNhzFvrmDoy2AJMsMy6IoZE9n0ciXCA4Fr8vCZTIlVeAlWzxhaGdiAtep9I1LeEXugWmjmtsazxViDYNr67eYiWEGmVV1wjKSELRCsotwsnTcI=
+	t=1768468265; cv=none; b=g85jBl6I5ZjqxzpYN5qjTGUhfnlay7eIIwvRzD6jbP3FQFOVxigCPs27a9v468qCOsapSapXgeHUhKQAIUFHzHbN4p2p6wA1rwBNoytE2v8hvJ28cZs5EUx6eTFKMpxUYt+xVWH+7LtJIs7O01NvscZvmBnb1syAN27muiVNgnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768467610; c=relaxed/simple;
-	bh=Zdt/qisqFDX109KN9gzVhNrGYcWOFfwh4UgesJCoelc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fC92oE+JQIXeaKtBC6kl18jxqWb+3TyibFRenrq3oTYen6Osf10cEzSHYEV5biwsck6psf5JFUqx9fo6cwfHQQhKkNoCAZlqb0HOExke/1+pdKRSCUo3kKBnef0oHax0cpIb9tKv3MKt7y2edfikuKWbxfjkeXSfP7XIaIOsirg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BOeEfKJe; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1768468265; c=relaxed/simple;
+	bh=mgqMlLFrrjCirlG8KN3wiXu9EpNS4EH0OsbI72ARyHY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ElUP8Dvmep/ColpHvM7QRRZUyA1vO75t/V5FyASdWZGCgy2MoNrwoZc6LAwgfD2nwAJAGrfGEMYwuFRpxsT5dbXgz7qQY44RTkxHcaI74dgOPpFpldBuwOYX69vFiaX7RUKAv0Ir215K5MRVhZ0m/OS7kWL4zy0NjVLkJqdpSIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=KZo/mkTS; arc=none smtp.client-ip=68.232.141.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BOeEfKJe"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768467608;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=h/ZZKlHZurqbfW1B7W/nlx38PVNHuIvXpjWS+Iexpd0=;
-	b=BOeEfKJeWVuzoht2UJVmooIFDQvrfheBKRDQFM1b/yETjt0py3rIoq7sA3I4YAb8/A9Lbw
-	puDcwPXrxXZrf/+W9FC4JUrigY6Xy8pbrhrQZhYKfBessECgzLBQVl5dnKywvf2tR9/Mx3
-	abXcEVP8EtlERJ0P9FruiAFXticH5FE=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-677-Gfgta2fEMFivZQFd505cQA-1; Thu,
- 15 Jan 2026 04:00:01 -0500
-X-MC-Unique: Gfgta2fEMFivZQFd505cQA-1
-X-Mimecast-MFC-AGG-ID: Gfgta2fEMFivZQFd505cQA_1768467600
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9DFF2180045C;
-	Thu, 15 Jan 2026 08:59:59 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.198])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 275B818004D8;
-	Thu, 15 Jan 2026 08:59:57 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	io-uring@vger.kernel.org
-Cc: linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH] nvme: optimize passthrough IOPOLL completion for local ring context
-Date: Thu, 15 Jan 2026 16:59:52 +0800
-Message-ID: <20260115085952.494077-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="KZo/mkTS"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1768468264; x=1800004264;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=mgqMlLFrrjCirlG8KN3wiXu9EpNS4EH0OsbI72ARyHY=;
+  b=KZo/mkTS/PsxfLhPqChVTmK9Eud36902m4Ho1HZt0xbTEw3qZJoNXKwS
+   TMuuL7xzriDBFN77Sl0TzSmFcnQt8WDV8iFC22mftLxmNKllrZvYXjSxL
+   FDUrHsP02moXdIadkjpcqEQk/s+dT9RWGcDXM7qO8SUOUYJ/9n2IM55up
+   MGHgW3u72TkHRQpivzsa9UZ/V8CtgiDgmGL6ijUPB8xGbH+kiSCNvPPjH
+   dkCh/U4akuw+cWLQWdfm4VnWR0BHfRdyI96fxk2NBiZ+LIdOrKMZ3VFNr
+   nOhQtqLmKuJFZpYYxeFnhy+Y2eueJ61El7G2bBmCrADhgXDelzoreCGJz
+   Q==;
+X-CSE-ConnectionGUID: lRz2Vok9Q96ORSJs/p6/KA==
+X-CSE-MsgGUID: z1IswAY7Tuq0wSpckcUwbg==
+X-IronPort-AV: E=Sophos;i="6.21,226,1763395200"; 
+   d="scan'208";a="138836168"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep03.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 15 Jan 2026 17:11:03 +0800
+IronPort-SDR: 6968af27_IDscoq4oF7stI8PKdSCvOdZQWlZ6FvNRoKrjMNvYJnNXzo4
+ w7jQr0r0cC+e3YTrvh679/BrRqL4B25V0xDa0pQ==
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep03.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 15 Jan 2026 01:11:04 -0800
+WDCIronportException: Internal
+Received: from 5cg217417w.ad.shared (HELO shinmob.wdc.com) ([10.224.109.142])
+  by uls-op-cesaip02.wdc.com with ESMTP; 15 Jan 2026 01:11:03 -0800
+From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: linux-block@vger.kernel.org
+Cc: mcgrof@kernel.org,
+	sw.prabhu6@gmail.com,
+	bvanassche@acm.org,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests v7 0/3] replace module removal with patient module removal
+Date: Thu, 15 Jan 2026 18:10:58 +0900
+Message-ID: <20260115091101.70464-1-shinichiro.kawasaki@wdc.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -56,143 +59,52 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-When multiple io_uring rings poll on the same NVMe queue, one ring can
-find completions belonging to another ring. The current code always
-uses task_work to handle this, but this adds overhead for the common
-single-ring case.
+This patch series was originally authored by Luis Chamberlain [0][1]. I
+reworked and post it as this series.
 
-This patch passes the polling io_ring_ctx through the iopoll callback
-chain via io_comp_batch and stores it in the request. In the NVMe
-end_io handler, we compare the polling context with the request's
-owning context. If they match (local), we complete inline. If they
-differ (remote) or it's a non-IOPOLL path, we use task_work as before.
+[0] https://lore.kernel.org/all/20221220235324.1445248-2-mcgrof@kernel.org/T/#u
+[1] https://lore.kernel.org/linux-block/20251126171102.3663957-1-mcgrof@kernel.org/
 
-Changes:
-- Add poll_ctx field to struct io_comp_batch
-- Add poll_ctx to struct request's hash/ipi_list union
-- Set iob.poll_ctx in io_do_iopoll() before calling iopoll callbacks
-- Store poll_ctx in request in nvme_ns_chr_uring_cmd_iopoll()
-- Check local vs remote context in nvme_uring_cmd_end_io()
+Original cover letter:
 
-~10% IOPS improvement is observed in the following benchmark:
+We now have the modprobe --wait upstream so use that if available.
 
-fio/t/io_uring -b512 -d128 -c32 -s32 -p1 -F1 -B[0|1] -O0 -P1 -u1 -n1 /dev/ng0n1
+The patient module remover addresses race conditions where module removal
+can fail due to userspace temporarily bumping the refcount (e.g., via
+blkdev_open() calls). If your version of kmod supports modprobe --wait,
+we use that. Otherwise we implement our own patient module remover.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/nvme/host/ioctl.c | 36 ++++++++++++++++++++++++++++--------
- include/linux/blk-mq.h    |  4 +++-
- include/linux/blkdev.h    |  1 +
- io_uring/rw.c             |  7 +++++++
- 4 files changed, 39 insertions(+), 9 deletions(-)
+* Changes from v6
+- 1st patch: dropped the hank to replace two _unload_module() calls in srp/rc
+- 2nd patch: modified to keep _unload_module() as it is
 
-diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
-index a9c097dacad6..0b85378f7fbb 100644
---- a/drivers/nvme/host/ioctl.c
-+++ b/drivers/nvme/host/ioctl.c
-@@ -425,14 +425,28 @@ static enum rq_end_io_ret nvme_uring_cmd_end_io(struct request *req,
- 	pdu->result = le64_to_cpu(nvme_req(req)->result.u64);
- 
- 	/*
--	 * IOPOLL could potentially complete this request directly, but
--	 * if multiple rings are polling on the same queue, then it's possible
--	 * for one ring to find completions for another ring. Punting the
--	 * completion via task_work will always direct it to the right
--	 * location, rather than potentially complete requests for ringA
--	 * under iopoll invocations from ringB.
-+	 * For IOPOLL, check if this completion is happening in the context
-+	 * of the same io_ring that owns the request (local context). If so,
-+	 * we can complete inline without task_work overhead. Otherwise, we
-+	 * must punt to task_work to ensure completion happens in the correct
-+	 * ring's context.
- 	 */
--	io_uring_cmd_do_in_task_lazy(ioucmd, nvme_uring_task_cb);
-+	if (blk_rq_is_poll(req) && req->poll_ctx == io_uring_cmd_ctx_handle(ioucmd)) {
-+		/*
-+		 * Local context: the polling ring owns this request.
-+		 * Complete inline for optimal performance.
-+		 */
-+		if (pdu->bio)
-+			blk_rq_unmap_user(pdu->bio);
-+		io_uring_cmd_done32(ioucmd, pdu->status, pdu->result, 0);
-+	} else {
-+		/*
-+		 * Remote or non-IOPOLL context: either a different ring found
-+		 * this completion, or this is IRQ/softirq completion. Use
-+		 * task_work to direct completion to the correct location.
-+		 */
-+		io_uring_cmd_do_in_task_lazy(ioucmd, nvme_uring_task_cb);
-+	}
- 	return RQ_END_IO_FREE;
- }
- 
-@@ -677,8 +691,14 @@ int nvme_ns_chr_uring_cmd_iopoll(struct io_uring_cmd *ioucmd,
- 	struct nvme_uring_cmd_pdu *pdu = nvme_uring_cmd_pdu(ioucmd);
- 	struct request *req = pdu->req;
- 
--	if (req && blk_rq_is_poll(req))
-+	if (req && blk_rq_is_poll(req)) {
-+		/*
-+		 * Store the polling context in the request so end_io can
-+		 * detect if it's completing in the local ring's context.
-+		 */
-+		req->poll_ctx = iob ? iob->poll_ctx : NULL;
- 		return blk_rq_poll(req, iob, poll_flags);
-+	}
- 	return 0;
- }
- #ifdef CONFIG_NVME_MULTIPATH
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index cae9e857aea4..1975f5dd29f8 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -175,11 +175,13 @@ struct request {
- 	 * request reaches the dispatch list. The ipi_list is only used
- 	 * to queue the request for softirq completion, which is long
- 	 * after the request has been unhashed (and even removed from
--	 * the dispatch list).
-+	 * the dispatch list). poll_ctx is used during iopoll to track
-+	 * the io_ring_ctx that initiated the poll operation.
- 	 */
- 	union {
- 		struct hlist_node hash;	/* merge hash */
- 		struct llist_node ipi_list;
-+		void *poll_ctx;		/* iopoll context */
- 	};
- 
- 	/*
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 72e34acd439c..4ed708912127 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1820,6 +1820,7 @@ void bdev_fput(struct file *bdev_file);
- 
- struct io_comp_batch {
- 	struct rq_list req_list;
-+	void *poll_ctx;
- 	bool need_ts;
- 	void (*complete)(struct io_comp_batch *);
- };
-diff --git a/io_uring/rw.c b/io_uring/rw.c
-index c33c533a267e..27a49ce3de46 100644
---- a/io_uring/rw.c
-+++ b/io_uring/rw.c
-@@ -1321,6 +1321,13 @@ int io_do_iopoll(struct io_ring_ctx *ctx, bool force_nonspin)
- 	struct io_kiocb *req, *tmp;
- 	int nr_events = 0;
- 
-+	/*
-+	 * Store the polling ctx so drivers can detect if they're completing
-+	 * a request from the same ring that's polling (local) vs a different
-+	 * ring (remote). This enables optimizations for local completions.
-+	 */
-+	iob.poll_ctx = ctx;
-+
- 	/*
- 	 * Only spin for completions if we don't have multiple devices hanging
- 	 * off our complete list.
+* Changes from v5
+- Dropped the 2nd patch
+- 1st patch: replaced _unload_module() calls in srp/rc
+
+* Changes from v4
+- 1st patch: moved the new functions from "common/rc" to "check"
+- 1st patch: reflected comments by Bart
+- 2nd patch: moved the srp/rc hunk from the 1st patch
+- Added the 3rd and the 4th patches
+
+Luis Chamberlain (1):
+  check,common,srp/rc: replace module removal with patient module
+    removal
+
+Shin'ichiro Kawasaki (2):
+  check: reimplement _unload_modules() with _patient_rmmod()
+  check: check reference count for modprobe --remove --wait success case
+
+ check                      | 128 ++++++++++++++++++++++++++++++++++++-
+ common/multipath-over-rdma |  10 +--
+ common/null_blk            |   5 +-
+ common/nvme                |   8 +--
+ common/scsi_debug          |  12 +---
+ tests/srp/rc               |   4 +-
+ 6 files changed, 140 insertions(+), 27 deletions(-)
+
 -- 
-2.47.1
+2.52.0
 
