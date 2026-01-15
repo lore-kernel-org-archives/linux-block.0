@@ -1,198 +1,94 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 299353B9619
-	for <linux-block@vger.kernel.org>; Thu, 15 Jan 2026 16:38:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D320C25228D
+	for <linux-block@vger.kernel.org>; Thu, 15 Jan 2026 16:53:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768495137; cv=none; b=lEZ8/dL0x6jyFRaLgya2OiPQHWpLvUnvoKoYgGXWTzFi272e8W7z/XLVnLfF1sVkG8YVzQA70fbloGxDH+EIClpC1v6jE5Kr8qOS2L83RSWEC3HfMHlyVyVbbzG/yopaXHUPixN9FEiWo1W5UXq9zQ0O77y+3JfRNHGRQlbcmZk=
+	t=1768496018; cv=none; b=uwZ88kZowOxdYRC3XKq+hx0dP9lD86Lvba1jp6sglrIZmlL3NQ/9GRbnkStOgioGSXWQq7hQgX4+bbOQTQjVFBMmDDrvp6PD3u5v7TFBJJLJdcgkocMG0GHpp9BVsLl/epaU+QuQRKjSJf2/prJhDjWou7O0/xysvKi8FumEE8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768495137; c=relaxed/simple;
-	bh=Cnpho0AVBHmQTj4A5OQUYiDhYrEyr9z1KgKgeAKHq44=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gMjC8Vfr1tIULbFtS4JLItnpAoykqx1Ml5W1rlAtTQhatcJYKBozb7ZC1PAOAyTfnjyQcLHrgK4uqIfYXck4jbbI7uyxEios9uFM/lj7fr/af8PK+2NXeme4MAeq1cZHRuIzwQIPKkp4oGmsYPodZ+K6cDnkD7MLeLl6g4YzSQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30046C16AAE;
-	Thu, 15 Jan 2026 16:38:52 +0000 (UTC)
-From: Yu Kuai <yukuai@fnnas.com>
-To: axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	tj@kernel.org,
-	nilay@linux.ibm.com,
-	ming.lei@redhat.com
-Cc: yukuai@fnnas.com,
-	zhengqixing@huawei.com,
-	mkoutny@suse.com,
-	hch@infradead.org
-Subject: [PATCH 6/6] blk-cgroup: allocate pds before freezing queue in blkcg_activate_policy()
-Date: Fri, 16 Jan 2026 00:38:18 +0800
-Message-ID: <20260115163818.162968-7-yukuai@fnnas.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260115163818.162968-1-yukuai@fnnas.com>
-References: <20260115163818.162968-1-yukuai@fnnas.com>
+	s=arc-20240116; t=1768496018; c=relaxed/simple;
+	bh=2JxGyKIPgE87YLxXlMWHMfYRMdr2GStF6rnuzsKEayQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rd0eeV4haAzVrI7vmXdtS27lzWHSXbNoqO2IITh7yz8o/RmrG881QtFzsI92b2uxC5WPRve7e5LGAFk+P4PeWnDs47CTCBBKIc/C1r36bBLcdnYlabQ9KfFRW/2ppnl3oG4lXoxCFqTiiazi4U+Ib/5iFPW30SsFIvr6AweKYWo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=N7Pvwfjm; arc=none smtp.client-ip=199.89.1.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="N7Pvwfjm"
+Received: from localhost (localhost [127.0.0.1])
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4dsTZm260Yz1XLwWq;
+	Thu, 15 Jan 2026 16:53:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1768496014; x=1771088015; bh=2JxGyKIPgE87YLxXlMWHMfYR
+	Mdr2GStF6rnuzsKEayQ=; b=N7Pvwfjm/vv5JuxbUiNOZIa3bDTztthxKQ1psF3Z
+	LBl0w2gmgRlH1zs+QGMQcarIm7ium7jehU1nuU8ZlLiAqet5SBtAnQdDbSs+sakQ
+	Mfg3qHEjmCXY5znwQ8g4xdtrr8WcIk4XzPxjSnT3w+btysBKtaT6x9+3FCWdI31q
+	EJUwxehBNV5mjgxKjoRRWN/BvKmeaUFkIBg9pXn9vykcglSrnwbQ7/qzHb3ymTA0
+	3bkqX7qA2i0lVwS7WpCURMol849GX19JbREEiX1AE1RnKZ+n+AA6f3VTrY68VER3
+	5yGIm9fAPPi2CSW2uivZ/sW1xRksr/cCo8iCAOT7c9otzA==
+X-Virus-Scanned: by MailRoute
+Received: from 011.lax.mailroute.net ([127.0.0.1])
+ by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id nKTb412N5kfX; Thu, 15 Jan 2026 16:53:34 +0000 (UTC)
+Received: from [100.119.48.131] (unknown [104.135.180.219])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4dsTZj62pKz1XLyhS;
+	Thu, 15 Jan 2026 16:53:33 +0000 (UTC)
+Message-ID: <33fe1cf9-a779-427b-bf74-1eee4434517c@acm.org>
+Date: Thu, 15 Jan 2026 08:53:32 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] block: Annotate the queue limits functions
+To: John Garry <john.g.garry@oracle.com>, Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ Damien Le Moal <dlemoal@kernel.org>
+References: <20260114192803.4171847-1-bvanassche@acm.org>
+ <20260114192803.4171847-2-bvanassche@acm.org> <20260115062613.GA9542@lst.de>
+ <1eeca326-9403-4483-8b03-36621e79db81@oracle.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <1eeca326-9403-4483-8b03-36621e79db81@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
-Some policies like iocost and iolatency perform percpu allocation in
-pd_alloc_fn(). Percpu allocation with queue frozen can cause deadlock
-because percpu memory reclaim may issue IO.
+On 1/15/26 1:11 AM, John Garry wrote:
+> On 15/01/2026 06:26, Christoph Hellwig wrote:
+>> This is missing a commit log.=C2=A0 And not really telling what kind
+>> of annotation you're adding.
+>
+> And we removed these previously - see c3042a5403ef2.
+>=20
+> Does sparse now handle mutexes?
 
-Now that q->blkg_list is protected by blkcg_mutex, restructure
-blkcg_activate_policy() to allocate all pds before freezing the queue:
-1. Allocate all pds with GFP_KERNEL before freezing the queue
-2. Freeze the queue
-3. Initialize and online all pds
+sparse is dead. The most recent commit is from February 2024 (almost two
+years ago). Additionally, the sparse maintainer doesn't reply anymore to
+emails or bug reports about sparse.
 
-Note: Future work is to remove all queue freezing before
-blkcg_activate_policy() to fix the deadlocks thoroughly.
+These annotations aren't for sparse - these are for clang. This patch=20
+series has been queued by Peter Zijlstra on the tip master branch and is
+expected to be sent to Linus during the next merge window: "[PATCH v5
+00/36] Compiler-Based Context- and Locking-Analysis"
+(https://lore.kernel.org/lkml/20251219154418.3592607-1-elver@google.com/)=
+.
 
-Signed-off-by: Yu Kuai <yukuai@fnnas.com>
----
- block/blk-cgroup.c | 90 ++++++++++++++++------------------------------
- 1 file changed, 31 insertions(+), 59 deletions(-)
+There are some subtle differences between the sparse and clang lock
+context attributes. Sparse only cares about lock context attributes on
+the function implementation. Clang respects lock context annotations
+whether these annotations occur on the function declaration or the
+function definition. The former is preferred since this ensures that the
+annotations are visible not only while compiling the function
+implementation but also when compiling all callers of a function.
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 573f2d93a261..88dbb5bdd6f7 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1606,8 +1606,7 @@ static void blkcg_policy_teardown_pds(struct request_queue *q,
- int blkcg_activate_policy(struct gendisk *disk, const struct blkcg_policy *pol)
- {
- 	struct request_queue *q = disk->queue;
--	struct blkg_policy_data *pd_prealloc = NULL;
--	struct blkcg_gq *blkg, *pinned_blkg = NULL;
-+	struct blkcg_gq *blkg;
- 	unsigned int memflags;
- 	int ret;
- 
-@@ -1622,90 +1621,63 @@ int blkcg_activate_policy(struct gendisk *disk, const struct blkcg_policy *pol)
- 	if (WARN_ON_ONCE(!pol->pd_alloc_fn || !pol->pd_free_fn))
- 		return -EINVAL;
- 
--	if (queue_is_mq(q))
--		memflags = blk_mq_freeze_queue(q);
--
-+	/*
-+	 * Allocate all pds before freezing queue. Some policies like iocost
-+	 * and iolatency do percpu allocation in pd_alloc_fn(), which can
-+	 * deadlock with queue frozen because percpu memory reclaim may issue
-+	 * IO. blkcg_mutex protects q->blkg_list iteration.
-+	 */
- 	mutex_lock(&q->blkcg_mutex);
--retry:
--	spin_lock_irq(&q->queue_lock);
--
--	/* blkg_list is pushed at the head, reverse walk to initialize parents first */
- 	list_for_each_entry_reverse(blkg, &q->blkg_list, q_node) {
- 		struct blkg_policy_data *pd;
- 
--		if (blkg->pd[pol->plid])
-+		/* Skip dying blkg */
-+		if (hlist_unhashed(&blkg->blkcg_node))
- 			continue;
- 
--		/* If prealloc matches, use it; otherwise try GFP_NOWAIT */
--		if (blkg == pinned_blkg) {
--			pd = pd_prealloc;
--			pd_prealloc = NULL;
--		} else {
--			pd = pol->pd_alloc_fn(disk, blkg->blkcg,
--					      GFP_NOWAIT);
--		}
--
-+		pd = pol->pd_alloc_fn(disk, blkg->blkcg, GFP_KERNEL);
- 		if (!pd) {
--			/*
--			 * GFP_NOWAIT failed.  Free the existing one and
--			 * prealloc for @blkg w/ GFP_KERNEL.
--			 */
--			if (hlist_unhashed(&blkg->blkcg_node))
--				continue;
--			if (pinned_blkg)
--				blkg_put(pinned_blkg);
--			blkg_get(blkg);
--			pinned_blkg = blkg;
--
--			spin_unlock_irq(&q->queue_lock);
--
--			if (pd_prealloc)
--				pol->pd_free_fn(pd_prealloc);
--			pd_prealloc = pol->pd_alloc_fn(disk, blkg->blkcg,
--						       GFP_KERNEL);
--			if (pd_prealloc)
--				goto retry;
--			else
--				goto enomem;
-+			ret = -ENOMEM;
-+			goto err_teardown;
- 		}
- 
--		spin_lock(&blkg->blkcg->lock);
--
- 		pd->blkg = blkg;
- 		pd->plid = pol->plid;
-+		pd->online = false;
- 		blkg->pd[pol->plid] = pd;
-+	}
- 
-+	/* Now freeze queue and initialize/online all pds */
-+	if (queue_is_mq(q))
-+		memflags = blk_mq_freeze_queue(q);
-+
-+	spin_lock_irq(&q->queue_lock);
-+	list_for_each_entry_reverse(blkg, &q->blkg_list, q_node) {
-+		struct blkg_policy_data *pd = blkg->pd[pol->plid];
-+
-+		/* Skip dying blkg */
-+		if (hlist_unhashed(&blkg->blkcg_node))
-+			continue;
-+
-+		spin_lock(&blkg->blkcg->lock);
- 		if (pol->pd_init_fn)
- 			pol->pd_init_fn(pd);
--
- 		if (pol->pd_online_fn)
- 			pol->pd_online_fn(pd);
- 		pd->online = true;
--
- 		spin_unlock(&blkg->blkcg->lock);
- 	}
- 
- 	__set_bit(pol->plid, q->blkcg_pols);
--	ret = 0;
--
- 	spin_unlock_irq(&q->queue_lock);
--out:
--	mutex_unlock(&q->blkcg_mutex);
-+
- 	if (queue_is_mq(q))
- 		blk_mq_unfreeze_queue(q, memflags);
--	if (pinned_blkg)
--		blkg_put(pinned_blkg);
--	if (pd_prealloc)
--		pol->pd_free_fn(pd_prealloc);
--	return ret;
-+	mutex_unlock(&q->blkcg_mutex);
-+	return 0;
- 
--enomem:
--	/* alloc failed, take down everything */
--	spin_lock_irq(&q->queue_lock);
-+err_teardown:
- 	blkcg_policy_teardown_pds(q, pol);
--	spin_unlock_irq(&q->queue_lock);
--	ret = -ENOMEM;
--	goto out;
-+	mutex_unlock(&q->blkcg_mutex);
-+	return ret;
- }
- EXPORT_SYMBOL_GPL(blkcg_activate_policy);
- 
--- 
-2.51.0
-
+Bart.
