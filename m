@@ -1,127 +1,106 @@
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB153358D0D
-	for <linux-block@vger.kernel.org>; Thu, 15 Jan 2026 09:39:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DB2C308F28
+	for <linux-block@vger.kernel.org>; Thu, 15 Jan 2026 14:20:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768469954; cv=none; b=UrdaeZmt+YevRdHabBFppwO8bk3eJLSXVRLXBCclhK2Ks0CZes7pye01fur0AEhoJH8v+DzZrUcMh2K1sQD5gvfxgS/ig5UCF8C6ed+aClUyn8n4IRsNIURXQHr0ezN7jait6NvzM7Fp/bDHsYC+nOva4Q9bYvjzR1L8G0Oi3P4=
+	t=1768486848; cv=none; b=m0CYcr+sdhL/pnyDLsaOAPYTz9jO7gd7/+UVfs0GxHqXD8tHYDwjZFKB4CLw48Q0jyVkqdCIg/tYN7FXe06Wif+UJOHiUetdTOg4LE281kwVrEHbeqnqKvbKbzyOPrtypFXX2X6/ceWs7vMjjjgOffUMlO5iy8ZCbTP5AEZbZog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768469954; c=relaxed/simple;
-	bh=IpKdm4vm1xXiTCAlkhSwSqOJm8VYAroIug3XCsnyJgo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CLrZwW28K0R+RmQ0xh8UPCq9AQuGp3zs3fa5sy6REC3/n5mmB4JMdM8bFkF219CvGYtn+mMqIDd4A89+crLvPdfzfKzS7ErWSyoOvGtnETxhiT1o1YCbEvXeDJdqqU6Y7HHPx9DKuGAcF+EfzXHUHnwnliJ/tshWzULzAkQjK7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=dbsaX3Tv; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1768486848; c=relaxed/simple;
+	bh=7Axx6qLU+OR1zr6kdqLPt3T8v1gnRULkQ6J94nLPYkI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=thj1+XygbBJnm9iiON0/BW+Nc6n2VqVtkuuNRPr108m7CIx80pjeuVp6A/NLK3MBEtUe/zzexVboX890VEcpYO18/9ckoXpo40Rs9fpnnkw0EbjNbmDzNTBoGzG2MGYgsOqfvFwUREWx9YXtkxzM5K3FzaBiCE0e3G9c4qg28nI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=dYpntBcA; arc=none smtp.client-ip=209.85.160.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="dbsaX3Tv"
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-47fedb7c68dso3461315e9.2
-        for <linux-block@vger.kernel.org>; Thu, 15 Jan 2026 01:39:12 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="dYpntBcA"
+Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-40427db1300so548874fac.0
+        for <linux-block@vger.kernel.org>; Thu, 15 Jan 2026 06:20:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1768469951; x=1769074751; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IpKdm4vm1xXiTCAlkhSwSqOJm8VYAroIug3XCsnyJgo=;
-        b=dbsaX3TvS3zLj/8HBTXY1PQPRgAwkuIm1De8IuyGdZDraFiJdbh0nox8oK3YZQUH7J
-         ZhyNaxvbkxM+Jdk4/Difgtj5y48E3UXY1It57q8LT+Ms1WQxxLbKzevXduR2BiTbE0lf
-         jgwsX/WE4lRxoDe1VjRolIIKL7rRE5EcotMw35qYTSElvTEO7HitpfBJHsJNYqmhVJnD
-         1RVtunosc6TKz83erKNmHj9tuzB8p4UkLkDiuwxexIHuqJTLW8Y79jslTNXatAE4XD9f
-         i2Yp2lszMWhF7Hcpi0Rik3u4twVnBzGUplW5Q+rEkrM3cFaFEHGCWozmKoS0ZOEIuNlo
-         7N0g==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1768486846; x=1769091646; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cf8B8jT40BQgRqVi+k4MJAXnmeH8H8nOEYwkHoCMjF8=;
+        b=dYpntBcATYQldoOPdvi72OfbAChORfGUGxLNSa4RxX1Umal+21xT2+Vm11QEUAC3rp
+         bY9wXs5pIuFg7EF0cLYMpmTjNdNmYhMouMxq/N9Tc2jWmQmOZZA93eVOdVp1lsSRniAN
+         /CZ1+ONDehGJdtG2SFh48buKyh/DolcOsMkVUNShV5rOT5HndLeMLc6koOfTg0TwYT7V
+         heYoEZLxDfN6P8iHd9kKVOonlEaMsLQ/2mUqT2HMBOwaNNF76/PuuetmpNuKzffiCgld
+         S1Z4m821zuCuz/HvwyP0OixpHe+gUPGsPblfMe8w2GWYvXIFsjEh4tFt2Qr3xob6MG4y
+         I/RQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768469951; x=1769074751;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IpKdm4vm1xXiTCAlkhSwSqOJm8VYAroIug3XCsnyJgo=;
-        b=FfgKxIqmiG0+diwrBmOKXzNlMeJ7oh+K8coLxidBN3sOw/L9L9rlUYNIu5LYPUtNbN
-         rno+crlEg3tCjm0/3R3wn5JVghX/djwJHGzq+CgeLO+VHux3+EyJHstZnB76LE1WxTTv
-         VJKuwbcLk6VdjrvIERxu7fReVh6oyMOKw7mx1mTlaRSgDxnQD49pIAIJjg4puw7C2XD2
-         g5mXfhF1pcWKzkAH0cRJ8YUI9NjCLiE4svzHjJNiRoJjf0mVo2/asbBp8lmTmi06K564
-         Radi9Zkb2yuXj9KZViIsnw/1f9jJWStK3ROgHBedwKamdqgNiMF3BSQpH/YpWJL0xl7O
-         olCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU1QRzP9evYrtRZUbfA7puf6uTUcipimCJKHFJcEeHie0eVOsLPIoEOC7IJdCLRXHbFnHgweAs/6zBsDA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwN/S5tLAUBVsuRgPssJCbduImzicHIAwkZokXmaTK88loE33oO
-	BUI6l+E/MaA+Bkjvd4OdBdeh4oEuFxiJbNSf+mARHfHPtYafIXq9sKsHvn8+uoU3V+E=
-X-Gm-Gg: AY/fxX4FO7+qR3JcsgM0AjLmjo64PWcRrbouEgOqSMboJVaFDgjGSEec+GMoUUZZmch
-	8loTcppj6ZX8dvBrqs+qHjosEEUkQIyx72WLNmA3gPEx5ab815HNzPtQ9/L5RmRk1qK858pEU5L
-	gWVltOWsMC1oWcd9soVsvn9oE1SZtRWxwVi06eObafhDma3MDL/3nHpxo7AVwS3Ejcuf4RW96E0
-	T6QDZwpsWhusPNFCQHyWQbWAcoMjEEuRl7iaLiUcnjrKEwxanNMRpcTkpMyH8BMZMtB1xOnpV9T
-	OunAf3sSKTeveHsT2bR5UlHw5YR26glxAP99M1P1D/3EUMg+qZKXyxLluWPdJu9ltxFX/QUHcpu
-	Q3RRLXIGqB5TMTISxq1C7SivdR14S3GZNDZeQIgYEKToR7WQpDmlsrkW1HO2/1XFv6HxHg6FZLI
-	HP9zzlObtC+Y80AzzbOSOSOPeD+pYdftQ=
-X-Received: by 2002:a05:600c:4750:b0:480:1c75:407c with SMTP id 5b1f17b1804b1-4801c754220mr4477325e9.2.1768469951289;
-        Thu, 15 Jan 2026 01:39:11 -0800 (PST)
-Received: from blackdock.suse.cz (nat2.prg.suse.com. [195.250.132.146])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47f428ac749sm37266595e9.5.2026.01.15.01.39.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Jan 2026 01:39:10 -0800 (PST)
-Date: Thu, 15 Jan 2026 10:39:09 +0100
-From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
-To: Zheng Qixing <zhengqixing@huaweicloud.com>
-Cc: Yu Kuai <yukuai@fnnas.com>, tj@kernel.org, josef@toxicpanda.com, 
-	axboe@kernel.dk, hch@infradead.org, cgroups@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, yi.zhang@huawei.com, 
-	yangerkun@huawei.com, houtao1@huawei.com, zhengqixing@huawei.com
-Subject: Re: [PATCH v2 1/3] blk-cgroup: fix race between policy activation
- and blkg destruction
-Message-ID: <xjwdgvoc6fw65yvtuyz7ku6dtjqzpf2ipty7ei5qcrfo7brxee@slit46ljmaoz>
-References: <20260113061035.1902522-1-zhengqixing@huaweicloud.com>
- <20260113061035.1902522-2-zhengqixing@huaweicloud.com>
- <le5sjny634ffj6piswnkhkh33eq5cbclgysedyjl2bcuijiutf@f3j6ozw7zuuc>
- <edf84e44-d7e3-4a34-ad49-90ab5a4f545e@huaweicloud.com>
+        d=1e100.net; s=20230601; t=1768486846; x=1769091646;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cf8B8jT40BQgRqVi+k4MJAXnmeH8H8nOEYwkHoCMjF8=;
+        b=rNtxuH195knKje584E8y3u9J42gQExNkbZ56FfF8zRPM/qeRv9fM8Ks9vaY1M6wMyS
+         pMk/10HlptmsWrp+NHEh3UK5cRfbOtBhQYeIaXGtA3Gvuix7z+yhMtLhJQmhmQGwxTa7
+         hETza+n+dFvaNg76oj2ZxeQw+9NpPrtj3ZTSqn0MahSJQyiPMEhA5FuwuMht6th0o1Dy
+         PQmEkQNHoC55SI0oOK32GjN/8lMdfDvyHpqaX/ISCnaFDA+ypXk/Yqs48aC+buALuI7X
+         dDE1t0AuKPhd+rT7FHO62si8TVu7gsbwXO0WaU9VqubkCtmnG2CMb15O19TcTLlp02n6
+         C5Zg==
+X-Forwarded-Encrypted: i=1; AJvYcCXZN7zs7XWmdqSZDxtvSBeTj7peBqjmmHsQkmkKZjrAPFcH0wPIP5p0AoTo7utuhedglwbRho8xBQli5w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YymSrrEIgNSm+Q+RFvi9lwIS7s0BbmE1xYLpWh6LaRYA90N7P8B
+	aZU3UHrxylIcnK/w1pyDkHAel8egghcumGVihM2AIiTl7wnq7fWS9O0s+yuMbAKi5hs=
+X-Gm-Gg: AY/fxX4bo9GDvp53usDFXHGg51yzfwXfhoxD3twjeCE2jKe9lr0lzyjFi9aLXcISFOo
+	7KiaVXSNuAjH7qr40mhphn8ZKx4xrLQB2f9OUwsmN6D+gd4NUZD0omKsRQpxoclzyTWhv3kn/Mr
+	aAtn6QjqWnpLMQJu54E3/pjczCFrp6/CHTP2EKLg6Ju+FyOCfjmDfrtbFNgbCO4aAAxDzGZyW0l
+	iZzshELbyWR0M08fcWJtRJ5XdzOXHBiTeTAIPCJQ6prsoEMkseCz+C90y5n5B/lx/lS2m5k3aDQ
+	/Npc44BCScL9MyWjB8CWIJOCjbMpORDlus/l4ytCOORDmAgiIRvq1OlrRyuS4f0lrCXng4Vx333
+	8jjbsgyiH6V3AZ5AhgvOmgNLTwos6MI6V5K4RqsA7/xTPW+E9c4DDzL+sw6kgMxXo1Kjn238VMU
+	YKe9RFlN8=
+X-Received: by 2002:a05:6871:7a4:b0:3fd:a31d:104e with SMTP id 586e51a60fabf-4040ba2a031mr4079312fac.11.1768486845740;
+        Thu, 15 Jan 2026 06:20:45 -0800 (PST)
+Received: from [192.168.1.102] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-3ffa50721a6sm19193920fac.10.2026.01.15.06.20.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 15 Jan 2026 06:20:44 -0800 (PST)
+Message-ID: <e7fd9926-4e67-4396-ba84-c9749a9c7d1c@kernel.dk>
+Date: Thu, 15 Jan 2026 07:20:43 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="l27swnkbzqhelwte"
-Content-Disposition: inline
-In-Reply-To: <edf84e44-d7e3-4a34-ad49-90ab5a4f545e@huaweicloud.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] rnbd-clt: fix refcount underflow in device unmap path
+To: Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+ Jinpu Wang <jinpu.wang@ionos.com>,
+ Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
+Cc: "haris.iqbal@ionos.com" <haris.iqbal@ionos.com>,
+ "yanjun.zhu@linux.dev" <yanjun.zhu@linux.dev>,
+ "grzegorz.prajsner@ionos.com" <grzegorz.prajsner@ionos.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <20260112231928.68185-1-ckulkarnilinux@gmail.com>
+ <CAMGffEmPCB4j-SfufLAdnBo=x-5HsM-vkzhu7o1ocHwnc0=jVg@mail.gmail.com>
+ <bc5b7643-8f6e-4801-8d73-06e869318cd6@nvidia.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <bc5b7643-8f6e-4801-8d73-06e869318cd6@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 1/14/26 6:58 PM, Chaitanya Kulkarni wrote:
+> On 1/14/26 00:40, Jinpu Wang wrote:
+>>> This follows the kernel pattern where sysfs removal (kobject_del) is
+>>> separate from object destruction (kobject_put).
+>>>
+>>> Fixes: 581cf833cac4 ("block: rnbd: add .release to rnbd_dev_ktype")
+>>> Signed-off-by: Chaitanya Kulkarni<ckulkarnilinux@gmail.com>
+>> lgtm, thx for the fix.
+>> Acked-by: Jack Wang<jinpu.wang@ionos.com>
+> 
+> If this is correct we will needs reviewed-by tag to apply this patch.
 
---l27swnkbzqhelwte
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
-Subject: Re: [PATCH v2 1/3] blk-cgroup: fix race between policy activation
- and blkg destruction
-MIME-Version: 1.0
+Eh no, that is not correct. What I care about is that it has been
+seen and acknowledged. Whether it's a acked-by or reviewed-by
+doesn't matter one single bit.
 
-On Thu, Jan 15, 2026 at 11:27:47AM +0800, Zheng Qixing <zhengqixing@huaweicloud.com> wrote:
-> Yes, this issue was discovered by injecting memory allocation failure at
-> ->pd_alloc_fn(..., GFP_KERNEL) in blkcg_activate_policy().
+-- 
+Jens Axboe
 
-Fair enough.
-
-> Commit f1c006f1c685 ("blk-cgroup: synchronize pd_free_fn() from
-> blkg_free_workfn() and blkcg_deactivate_policy()") delays
-> list_del_init(&blkg->q_node) until after pd_free_fn() in blkg_free_workfn().
-
-IIUC, the point was to delay it from blkg_destroy until blkg_free_workfn
-but then inside blkg_free_workfn it may have gone too far where it calls
-pd_free_fn's before actual list removal.
-
-(I'm Cc'ing the correct Kuai's address now.)
-IOW, I'm wondering whether mere swap of these two actions (pd_free_fn
-and list removal) wouldn't be a sufficient fix for the discovered issue
-(instead of expanding lock coverage).
-
-Thanks,
-Michal
-
---l27swnkbzqhelwte
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iJEEABYKADkWIQRCE24Fn/AcRjnLivR+PQLnlNv4CAUCaWi1uxsUgAAAAAAEAA5t
-YW51MiwyLjUrMS4xMSwyLDIACgkQfj0C55Tb+AjBoQD+P0vwCMjZtjVGS9olloNJ
-W00FAlkbpKQbdfBF2UpOw6gA/3cd7/jS+Q2klkyaKhjtBWnmlIXM9qQIMhNR6dfO
-P9EA
-=EJwI
------END PGP SIGNATURE-----
-
---l27swnkbzqhelwte--
