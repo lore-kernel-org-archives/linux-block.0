@@ -1,94 +1,68 @@
-Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D90E828CF77;
-	Thu, 15 Jan 2026 05:44:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 517541EBA19;
+	Thu, 15 Jan 2026 06:13:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768455866; cv=none; b=epHudpc2EqMuCjZ3P5Q5fZ26dQxLUuQLO/Id51DFjerWbqVIp/XbNNCRfBs9s5I8HCFdxHb1RdyMt2PKVLK+xae2BQl8zYC88zde4MCNUMI5OHcW3jBxQwdx6bEuf3wzKKZEvYfd8ZNcZBavOhiltdYuuJQOjB88k93Kz/K1CFQ=
+	t=1768457583; cv=none; b=fuCZ8VEe/A8nRNo3cvUgutlRdCwV+zzv6DV1up7jaRgZH/jNMVbqRiOp4UTruYdQrp/nyfMLHOMJvlTiVwiDa9M/dmdk8xQHHs+BwmjqUCvSOEJ47ZjgjhT4iTECyQRgIi4RGuqhyBVYr0x9QlZJ5S/A77moi5SRS8KyM42mFIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768455866; c=relaxed/simple;
-	bh=+2Xr+QVU5EHdw9RUdnIE0Pp3V7kJaLV/sC2sfAeTaMM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=sMutQffi2SxdYypg/HYWLrdR+qYbBamICo9NstWIftUG3bSSO3pfeP1Ih0eciGNo1BuFUcOH80lN7uuQAfmTvejfFn8YyftEapuQ0kX9yvKYm5nQE6/ljLLgwwqF1XneB4tlXC0/FFRlq55Gsso4lS0YDRpGbZFBwsOLJwBMPKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=JazgTWl2; arc=none smtp.client-ip=113.46.200.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="JazgTWl2"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=yfSxkx0+G5w6qup/JbuydzWZnFxw4o74pcA7oS4Kb+0=;
-	b=JazgTWl2ShyJeC7wTNhP6PpCUQxNn5pA8/oLOyVF0s/78U3pZbeL/frjZDDNjOIJ0KZHbEy3i
-	Y+Qj45Bm/LR+Id3GgdCvqYMuKp/MRwPhHvR/m+4/btUEU6dK3sq0pDkE8GT5nFzqc4OxsjitA6z
-	ztp96kWxa6oy1LTjtL/gZFs=
-Received: from mail.maildlp.com (unknown [172.19.162.197])
-	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4dsBfz0LXHz12LD3;
-	Thu, 15 Jan 2026 13:41:15 +0800 (CST)
-Received: from kwepemh100003.china.huawei.com (unknown [7.202.181.85])
-	by mail.maildlp.com (Postfix) with ESMTPS id C006040363;
-	Thu, 15 Jan 2026 13:44:14 +0800 (CST)
-Received: from [10.174.178.72] (10.174.178.72) by
- kwepemh100003.china.huawei.com (7.202.181.85) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Thu, 15 Jan 2026 13:44:13 +0800
-Message-ID: <3ec605aa-dd61-46eb-bcb6-282b482b90ea@huawei.com>
-Date: Thu, 15 Jan 2026 13:44:10 +0800
+	s=arc-20240116; t=1768457583; c=relaxed/simple;
+	bh=HeSqlO9ckGm3cAmaq7OQysya1zOqlZMFjCs8SfpbVRY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gD+VHhL3knr/NaHyTjiQJJG70w7XWj7/0OOMwmpNCK+UbprxUUjt4Bvq5sU82PtUTxcsfnkwJkBF5IXaeeo5PEIw6L83JB9j+8tn7QlaEqJ9Uuzr/GpkWzXhmTot1nJCjvpFZs22HMq7LG6bvIZBJHLVgEUcwOItBAFfvfMtKug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id CE01E227AA8; Thu, 15 Jan 2026 07:12:52 +0100 (CET)
+Date: Thu, 15 Jan 2026 07:12:52 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: "Darrick J. Wong" <djwong@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+	Carlos Maiolino <cem@kernel.org>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Hans Holmberg <hans.holmberg@wdc.com>,
+	Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+	linux-xfs@vger.kernel.org, Carlos Maiolino <cmaiolino@redhat.com>
+Subject: Re: [PATCH 3/3] xfs: rework zone GC buffer management
+Message-ID: <20260115061252.GB9205@lst.de>
+References: <20260114130651.3439765-1-hch@lst.de> <20260114130651.3439765-4-hch@lst.de> <20260114195947.GI15551@frogsfrogsfrogs>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/3] blk-cgroup: fix race between policy activation and
- blkg destruction
-To: <yukuai@fnnas.com>
-CC: <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <mkoutny@suse.com>, <yi.zhang@huawei.com>,
-	<yangerkun@huawei.com>, <houtao1@huawei.com>, <tj@kernel.org>,
-	<josef@toxicpanda.com>, <axboe@kernel.dk>, <hch@infradead.org>, Zheng Qixing
-	<zhengqixing@huawei.com>
-References: <20260113061035.1902522-1-zhengqixing@huaweicloud.com>
- <20260113061035.1902522-2-zhengqixing@huaweicloud.com>
- <b004989f-900f-447f-a931-93c91082ca63@fnnas.com>
-From: Zheng Qixing <zhengqixing@huawei.com>
-In-Reply-To: <b004989f-900f-447f-a931-93c91082ca63@fnnas.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- kwepemh100003.china.huawei.com (7.202.181.85)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260114195947.GI15551@frogsfrogsfrogs>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
->> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
->> index 3cffb68ba5d8..600f8c5843ea 100644
->> --- a/block/blk-cgroup.c
->> +++ b/block/blk-cgroup.c
->> @@ -1596,6 +1596,8 @@ int blkcg_activate_policy(struct gendisk *disk, const struct blkcg_policy *pol)
->>    
->>    	if (queue_is_mq(q))
->>    		memflags = blk_mq_freeze_queue(q);
->> +
->> +	mutex_lock(&q->blkcg_mutex);
->>    retry:
->>    	spin_lock_irq(&q->queue_lock);
->>    
->> @@ -1658,6 +1660,7 @@ int blkcg_activate_policy(struct gendisk *disk, const struct blkcg_policy *pol)
->>    
->>    	spin_unlock_irq(&q->queue_lock);
->>    out:
->> +	mutex_unlock(&q->blkcg_mutex);
->>    	if (queue_is_mq(q))
->>    		blk_mq_unfreeze_queue(q, memflags);
->>    	if (pinned_blkg)
-> Can you also protect blkg_destroy_all() will blkcg_mutex as well? Then all access for q->blkg_list will
-> be protected.
-Why does blkg_destroy_all() also need blkcg_mutex?
+On Wed, Jan 14, 2026 at 11:59:47AM -0800, Darrick J. Wong wrote:
+> > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> > Reviewed-by: Hans Holmberg <hans.holmberg@wdc.com>
+> > Reviewed-by: Carlos Maiolino <cmaiolino@redhat.com>
+> > Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+> 
+> Huh.  I guess I never touched this patch at all???
 
-After finishing ->pd_offline_fn() for blkgs and scheduling 
-blkg_free_workfn() in blkg_destroy(),
-blkg_destroy_all() clears the corresponding policy bit in q->blkcg_pols 
-to avoid duplicate policy
-teardown in blkcg_deactivate_policy().
+Not yet :)
 
+> Ok so it looks like we're switching out garbage collecting with two
+> independent (but not) scratchpads for what amounts to a ring buffer
+> consisting of a bunch of discontig folios.
+
+Yeah.
+
+> Now when gc wants to move some data, we compute the number of folios we
+> need, and bump scratch_head by that amount.  Then we attach those folios
+> to a read bio and submit it.  When that finishes, we call bio_reuse with
+> REQ_OP_WRITE and submit that.  When the write finishes we do the "remap
+> if mapping hasn't changed" dance to update the metadata, and advance the
+> tail by however many folios we've stopped using.
+> 
+> If I got that right, then
+
+You did, thanks!
 
