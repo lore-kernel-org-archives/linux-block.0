@@ -1,88 +1,96 @@
-Received: from sg-1-17.ptr.blmpb.com (sg-1-17.ptr.blmpb.com [118.26.132.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 894C327816C
-	for <linux-block@vger.kernel.org>; Fri, 16 Jan 2026 07:32:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 528862BEC2B
+	for <linux-block@vger.kernel.org>; Fri, 16 Jan 2026 07:46:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768548740; cv=none; b=kvSQbTIXAMQJINglaJOdA2yvBaqsTOlUdTq4/Gr6LfFzkP8g1v6kQiUfOKc6189r0oxLQrpVC4ilf5ONgw5Hrx5mr5Cf+7Nn9R++H+S1reAEA7iUfceNyjN0pyoWpAAGWih9koBDhAp8jwYTDG3YVij4dCh3NS0PYTxAxBj8aDY=
+	t=1768549616; cv=none; b=kNgQmlKsxTEXP+Xl35l8O98LpnJNhEgnW4R1pppUSZ7XeioVTwWQnpFCfFRLIUkvaMZUrqUVyT7VAOTXnvP9zGpG+yQ1cMQ8o1zcAw/BR9x/5Ggh/3/g6PmD5ZwiHEaIhVvn/3f7eS/Gv4KP+5Lx+yaigaSF/FbiLt5T3udIlaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768548740; c=relaxed/simple;
-	bh=HrZxHqGlspVWStqt/o8ilWNhVPUBqQKhYTIA+Im+TIM=;
-	h=Message-Id:To:In-Reply-To:From:Subject:Date:Mime-Version:
-	 Content-Type:References; b=AxP0ObmKle/M5Fr2QB/Afx7jC/wUzp3DGH6BiqdAs+KJW8jyjZhFirCwcUdabaFxzWON3ppUNVqtOr3LnsFhdQjTas0moJXqD7p4S/wSYLf6trHhHM6kDnU+iItThgw217rWx+OyW795t6j8Hdgsz13F2/VaT8OYiJudYit5+o4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=none smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=2XF8PS09; arc=none smtp.client-ip=118.26.132.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=fnnas.com
+	s=arc-20240116; t=1768549616; c=relaxed/simple;
+	bh=LjeHfjmsD9t+ZZBERvrSAQj1waljXxwnYgBLBs19gcg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dGmpuJVg6eITsP29jSoV2dmPjhoFRn7nUpsLNBbb43AGiAWHr7SFctPXIkha/tVaRQC8GmeTcNbcqYcnhzx7acB6pk8PSxp8ZpVRI1StC5v15ooDlRzkvOnoV7V42g5ctHAuSdpl0jHZ2V0JE3bhRJaYqUC/i9i7ndaY5SWYBM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KqVoO/SE; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="2XF8PS09"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1768548724;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=OaWVvZpftbp+J+XN/0wkh2dpu90pXSBFpTSkKrTXlx4=;
- b=2XF8PS09Ht2CPoloqUuGug8G+ARYNa87I8EXWgLMx8lBnV1CPEHn1fKhWcSyZg2k/arkLx
- RRwxi4YTX/zyk2bys7sefqMTdXmaFYLqqrjE2bCNPSqQenel1cltfMIn5uowIeRgEzazz8
- RUQ6q644IFhjQzuUWiC8b99hJ6k/bhVIku1L3AUCoYPj0rbPiYnkElqG7+nfTDNJjwXoTU
- FcGkcIbAR8tcY/FqYArPEcd/YQkiT9KZqtGPcAtpT4t3+p8dxx25aROTCBqHQmYGLQsz5y
- E6XMRypUwraPut1+j7BdYfJgGo5jKYdDijQGd1y9yNB94tmdHs4AZy24zNNC9A==
-Message-Id: <1cf65d49-995a-462a-b355-cd28c093592c@fnnas.com>
-X-Original-From: Yu Kuai <yukuai@fnnas.com>
-Content-Transfer-Encoding: quoted-printable
-X-Lms-Return-Path: <lba+26969e972+cace28+vger.kernel.org+yukuai@fnnas.com>
-To: "Chaohai Chen" <wdhh6@aliyun.com>, <axboe@kernel.dk>, 
-	<linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>, 
-	<yukuai@fnnas.com>
-User-Agent: Mozilla Thunderbird
-In-Reply-To: <20260116061927.1004411-1-wdhh6@aliyun.com>
-Content-Language: en-US
-From: "Yu Kuai" <yukuai@fnnas.com>
-Subject: Re: [PATCH] blk-mq-sched: Remove redundant code in blk_mq_sched_mark_restart_hctx().
-Date: Fri, 16 Jan 2026 15:32:00 +0800
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KqVoO/SE"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768549614;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Uw5SQo76I/dUoQRmEd0OyonqVhtHtUJXX1WXGNe3MCg=;
+	b=KqVoO/SE8SMlixHmJ/0LCbiiFp51jRlwt+JcDMOY5ZSl70b7E1hNg8EL0jcofUQULECVpB
+	PhHQE+fnXJH9VIwiJ8s39/W2XX/djUeBZbAZSYV7qzFuKhEwnn7Y3FDcKQPhYh0ySIwBEn
+	3eYFkM4HjDZ+6Xx5n9vvF8OXyBh6KmQ=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-442-MBclx_u-PRKJq80N7d865w-1; Fri,
+ 16 Jan 2026 02:46:50 -0500
+X-MC-Unique: MBclx_u-PRKJq80N7d865w-1
+X-Mimecast-MFC-AGG-ID: MBclx_u-PRKJq80N7d865w_1768549609
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0D3601800359;
+	Fri, 16 Jan 2026 07:46:49 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.198])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 74E031955F22;
+	Fri, 16 Jan 2026 07:46:47 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	io-uring@vger.kernel.org,
+	Keith Busch <kbusch@kernel.org>
+Cc: linux-block@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 0/2] nvme: optimize passthrough IOPOLL completion for local ring context
+Date: Fri, 16 Jan 2026 15:46:36 +0800
+Message-ID: <20260116074641.665422-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Received: from [192.168.1.104] ([39.182.0.185]) by smtp.feishu.cn with ESMTPS; Fri, 16 Jan 2026 15:32:01 +0800
-References: <20260116061927.1004411-1-wdhh6@aliyun.com>
-Reply-To: yukuai@fnnas.com
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Hi,
+Hello,
 
-=E5=9C=A8 2026/1/16 14:19, Chaohai Chen =E5=86=99=E9=81=93:
-> The current purpose of the blk_mq_sched_mark_restart_hctx() function
-> is to set the BLK_MQ_S_SCHED_RESTART flag in hctx->state. Just remove
-> the redundant judgement.
+The 1st patch passes `struct io_comp_batch *` to rq_end_io_fn callback.
 
-I don't think this is just redundant. This function is called from IO hot p=
-ath,
-and test_bit() should have less performance overhead than set_bit() if the
-state is already set.
+The 2nd patch completes IOPOLL uring_cmd inline in case of local ring
+context, and improves IOPS by ~10%.
 
->
-> Signed-off-by: Chaohai Chen <wdhh6@aliyun.com>
-> ---
->   block/blk-mq-sched.c | 3 ---
->   1 file changed, 3 deletions(-)
->
-> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-> index e26898128a7e..2f6c353cb6d0 100644
-> --- a/block/blk-mq-sched.c
-> +++ b/block/blk-mq-sched.c
-> @@ -21,9 +21,6 @@
->    */
->   void blk_mq_sched_mark_restart_hctx(struct blk_mq_hw_ctx *hctx)
->   {
-> -	if (test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state))
-> -		return;
-> -
->   	set_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
->   }
->   EXPORT_SYMBOL_GPL(blk_mq_sched_mark_restart_hctx);
 
---=20
-Thansk,
-Kuai
+V2:
+	- pass `struct io_comp_batch *` to ->end_io() directly via
+	  blk_mq_end_request_batch().
+
+Ming Lei (2):
+  block: pass io_comp_batch to rq_end_io_fn callback
+  nvme/io_uring: optimize IOPOLL completions for local ring context
+
+ block/blk-flush.c                  |  6 ++++--
+ block/blk-mq.c                     |  9 +++++----
+ drivers/md/dm-rq.c                 |  3 ++-
+ drivers/nvme/host/core.c           |  3 ++-
+ drivers/nvme/host/ioctl.c          | 23 +++++++++++++++--------
+ drivers/nvme/host/pci.c            | 11 +++++++----
+ drivers/nvme/target/passthru.c     |  3 ++-
+ drivers/scsi/scsi_error.c          |  3 ++-
+ drivers/scsi/sg.c                  |  6 ++++--
+ drivers/scsi/st.c                  |  3 ++-
+ drivers/target/target_core_pscsi.c |  6 ++++--
+ include/linux/blk-mq.h             |  4 +++-
+ include/linux/blkdev.h             |  1 +
+ io_uring/rw.c                      |  6 ++++++
+ 14 files changed, 59 insertions(+), 28 deletions(-)
+
+-- 
+2.47.0
+
