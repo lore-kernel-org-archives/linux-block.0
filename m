@@ -1,223 +1,160 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail.itpri.com (mx1.itpri.com [185.125.111.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E22A23195E8
-	for <linux-block@vger.kernel.org>; Fri, 16 Jan 2026 11:14:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C081A37C0F9
+	for <linux-block@vger.kernel.org>; Fri, 16 Jan 2026 11:54:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.111.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768562069; cv=none; b=RZD2kwk4WiXXAcRRwfQRxRRVrlr7wDYlvTpczhHf8Xd4UtqZcqWv1ADT6tP9jx6zg0py2VWnPXTRd1EBCNT6kDnhTa3DVa+6eKPyddxzqwVHCDEQtvSeUBy50XibvMjYKUexUpHKOkwr+Sn6dtLeEyUk/kXB9jkRVbdqdFqa5Gc=
+	t=1768564463; cv=none; b=g0OjjSXqrL8kPZ3rtFDn7EDycfN9yJfPKsLlRkx3O0W7qcc5PV6bdbhD/rIZJz4oYxSdyoCbMNchr5BCokrWkQqXxcSaHsd806AWMqa4gErAzVYMZYcZuv3wZlsXMVG3VlhJiHVOd2QwNN85mFyWDBbeU+4Hq6NC0pEbP/7BSas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768562069; c=relaxed/simple;
-	bh=1VmR8Kkpaw5Jnmcy3b+kUQsvs1wTo9T/0AMBqtyOAcI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZjKJu/lZaru889y9aMk2+q+r9/ZuU/N+SRkYL4azMhBkIruAgE1+YUA+FN9roNREoOhMqzHCXOh7fg3oY1pEs9evDB0eFc8FsHdPfGQE6dEYW++vo7DAaEFK3JuNUW49/KkRnz3t/5HWj9grAID6p7i1yqmsjsyQ5IVEo6ohZrU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Nxn5rYId; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=PPvIBo6X; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1768564463; c=relaxed/simple;
+	bh=0YkcKoSpd1bCexoMcb8rOcqMtAwJhUmwsBUyaRAjeN4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Y5ZRvJxJuZCxBKQqLRlSQnSqEaGCLc6OMQmHe7BcewrkVEu/37lDaVblGZ5qM6SEo5aGy5wTMI9aTI23pakG6MY5F6ooMgEAwSmrh2q6BOeFUJOggol+eWs86vrucVXX/FSfXv6jc/OJmU69q/v4Pj5UyDGLB9WZGybRWlvmmTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zazolabs.com; spf=pass smtp.mailfrom=zazolabs.com; dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b=f1oxnlJV; arc=none smtp.client-ip=185.125.111.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zazolabs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zazolabs.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nxn5rYId";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="PPvIBo6X"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768562066;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=b/swVgDB3UZWLJtgAMRxwsG0G/0q1Yp9koeHNSg/Ack=;
-	b=Nxn5rYId4UjHuE2kFb5lAo3G7N6Ctt5aFU/r/EL2deRj4WSXs8TnlAG2p/XSskMlvzkygW
-	4+O0ZoXd9NfsZaNqjD4ZUNubhxK4AHxj5/jW2Oc1V0lGBtUnwWDlK4MsSODUkEZ1JqeMhT
-	qgi7IpqOQ95NzyrX8LfRnLgA4TyHQ9s=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-479-l2X_NxDVObGKfDosYhPchw-1; Fri, 16 Jan 2026 06:14:25 -0500
-X-MC-Unique: l2X_NxDVObGKfDosYhPchw-1
-X-Mimecast-MFC-AGG-ID: l2X_NxDVObGKfDosYhPchw_1768562064
-Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-59b78adfc09so1670750e87.0
-        for <linux-block@vger.kernel.org>; Fri, 16 Jan 2026 03:14:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1768562064; x=1769166864; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=b/swVgDB3UZWLJtgAMRxwsG0G/0q1Yp9koeHNSg/Ack=;
-        b=PPvIBo6X5A4ptsosXc2msDu6TITF3JEQx0DlJvYgxeW6gbVr7nfLjCTi/0sNWvXVT1
-         DshGYvxzkz/CyuYUQCkLeUOrbZNfHufKIl+nej5fkORQg2HPsWn/1ueF2TGLTUKFYohr
-         dI18W7aNUBdQQbgSvUIeC7xbH3nOhK3N9eF9HFAVUSI8uvHkv4sGzE9yr54MoI0fnnaL
-         7jIhRDh2wesLD9fEwVBnulTg1YtHWb+4A1H0L8OAsCwrn4OXsqY2Z+Jcem+Ymza0gH1t
-         xMSs7JK4jn8grWT2AAlK8v4YolkBLn45pUhbI2PchZhyLWlhh5Y9zaCPgVGdKqzjcAVz
-         BcEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768562064; x=1769166864;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=b/swVgDB3UZWLJtgAMRxwsG0G/0q1Yp9koeHNSg/Ack=;
-        b=DBXoGjrp3skavUCNdAcaD+xoSktBMCSH328mVB7CZPQtpAi4PjY/lok1A2PqZg675b
-         gorSHFLEVb65Ca0Ksk2fnyNBk3+z6bOqv4mtRlgJ7nCCWq0vnKDEkkyvYJ/WMbYjQSBv
-         LG7JXq+aXD9ChIdO62mSXFQmSiXoETlyjsAfBevQpF/4ChLGr4aqc9tmukDkX93AQamP
-         Z/OEfqb13SmUgWlqDOdSR918ysTlXbQ+0ESjOa1OblLskGdiI0uDOboYlGMwqhEKVfYQ
-         7gYDACL9YBDhD+tJb3S8cI30bEPUoR/xkrJM1MPG9t2fsUibOCr+tgv8CPagyUKVL4K2
-         1wqg==
-X-Gm-Message-State: AOJu0YytGRhKyQ/99F/G7aOZYPi5GtOMT96C7VowXgyR7gJmjXMwO2M9
-	Upk7JjLzQSXaHy5qkRttAhRVnQ136rye9TP0rp4dtqBcPI76v1S72AJzS8qE/JwtX1Cls1MJmyr
-	RA69vqYmDv+10TjpwFQvmgbUUy7eqtrbA8m2COFPlviXav+9SAHNjK3EBjrTPB9fZLldU2L7Iuf
-	BZud/C/wg7LsROHm/GBbf3GZh+J1PSOJ0YcJghxuk=
-X-Gm-Gg: AY/fxX6+dQfzO7Or0wnmApAP4dLPDRTm2+de4VSCDo3vd7V3noEJHWXCNy+7Ur6MU22
-	tuwP5zWrPFQFIlzK0/IRbUgguClbQLYaONDH6uWiHnvrrLvQi8w2C5BfZ8yYCMifUp5pPI4yQj5
-	hlnlMLoXOe9KURPgGxNl/gSP6ZHNZKmO98PRI4Cz4cXo2P12pYpJAkD5oO/IOjH3ncJ2E=
-X-Received: by 2002:a05:6512:3f20:b0:59b:2670:aa5 with SMTP id 2adb3069b0e04-59baffd29famr637731e87.37.1768562063756;
-        Fri, 16 Jan 2026 03:14:23 -0800 (PST)
-X-Received: by 2002:a05:6512:3f20:b0:59b:2670:aa5 with SMTP id
- 2adb3069b0e04-59baffd29famr637722e87.37.1768562063314; Fri, 16 Jan 2026
- 03:14:23 -0800 (PST)
+	dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b="f1oxnlJV"
+X-Virus-Scanned: Yes
+Message-ID: <8c523b07-f868-41c9-88f1-753c77ef85fb@zazolabs.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=zazolabs.com; s=mail;
+	t=1768564457; bh=0YkcKoSpd1bCexoMcb8rOcqMtAwJhUmwsBUyaRAjeN4=;
+	h=Subject:To:Cc:References:From:Reply-To:In-Reply-To;
+	b=f1oxnlJVpi0O1RIbUOkEETpoWTioHZoiQ2FyId5U3ins5IS1wuDb33H+l0ENWG46H
+	 3Ml5RKdLcruYw8wvoKLO+zWwS0L9h+cjDp5MhbQxkLKMCMJZ2vjjIiTt45l266pLgS
+	 WkwFH9f/QbMfPbxYDt7hbqCti9Tmpa+sbi4vdZ9L/rixJIwqg6X9q2YxNT6KE//aIo
+	 NQGF3S8jjENqE/dDpLkJX8AGB6mgG00fChjRESfl3MwMcAklftn0v4OkTFgMS4kA46
+	 Gvu49UqgEkDbVLzINuw5NAxNTV49Xoj94+sQmPu+eqjVOjQutp7SpnOnTT3j5GqrRI
+	 EiIybpMkY/zoLbSRpdBIYKa8L5xAoT1pTjyIKR9EstpPql1AUtQtueRLPJ4AnwDBUm
+	 9UeXE3qluwO09IF2RocLX28ok9X6ZPGn2hRNKBX5W64AZbawb+d7qCmBEsnP9Qx3hQ
+	 NSbjTPSpC1gpc0zMXOG0ooVXJfqQ5lsO/sQrXpyXla06jC1Kswuzi9tPjBlw06BhhB
+	 1F7DJxzmfAJOqFtLNRxciT402HuxNbDoGyF6xHx6GBE40D6+FVo3sJMRxFabL/9JwQ
+	 J7XzV5Mo1VzdisuD0ANixY1Z/Q9+ePj+tkoqVcc8EosuxVP8HSB3mze80H7tHqy66W
+	 LuCiEvaCHW2UduvJFgr1ebe4=
+Date: Fri, 16 Jan 2026 13:54:15 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260113095134.1818646-1-nilay@linux.ibm.com>
-In-Reply-To: <20260113095134.1818646-1-nilay@linux.ibm.com>
-From: Yi Zhang <yi.zhang@redhat.com>
-Date: Fri, 16 Jan 2026 19:14:11 +0800
-X-Gm-Features: AZwV_QhkcJmbytiAKG0vxewEFZePe5Hk4bZotZyThrul9hScAhO7VqpNyvaDrGY
-Message-ID: <CAHj4cs9dDcQdExzwyENa5wcfPHChy4Q8Xv-vtpNuAPX7Ue9AAQ@mail.gmail.com>
-Subject: Re: [PATCH blktests] check: add kmemleak support to blktests
-To: Nilay Shroff <nilay@linux.ibm.com>
-Cc: linux-block@vger.kernel.org, shinichiro.kawasaki@wdc.com, gjoyce@ibm.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [bug report][bisected] kernel BUG at lib/list_debug.c:32!
+ triggered by blktests nvme/049
+Content-Language: en-GB
+To: Ming Lei <ming.lei@redhat.com>, Yi Zhang <yi.zhang@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, fengnanchang@gmail.com,
+ linux-block <linux-block@vger.kernel.org>,
+ Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+References: <CAHj4cs_SLPj9v9w5MgfzHKy+983enPx3ZQY2kMuMJ1202DBefw@mail.gmail.com>
+ <0e1446e1-f2a7-41f4-8b3c-bce225f49aa6@kernel.dk>
+ <CAHj4cs-uHD_cm_5MHAS2Nyd1Dt6=sqNPrD4yWZrbykM+WvyxbQ@mail.gmail.com>
+ <CAHj4cs_d81+Tbe+kh=9sz-ort4MZnC1F5gzPLGt2jrDJxA2P_g@mail.gmail.com>
+ <aWekEgznso6zkgdI@fedora>
+From: Alexander Atanasov <alex@zazolabs.com>
+Reply-To: alex+zkern@zazolabs.com
+In-Reply-To: <aWekEgznso6zkgdI@fedora>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 13, 2026 at 5:52=E2=80=AFPM Nilay Shroff <nilay@linux.ibm.com> =
-wrote:
->
-> Running blktests can also help uncover kernel memory leaks when the
-> kernel is built with CONFIG_DEBUG_KMEMLEAK. However, until now the
-> blktests framework had no way to automatically detect or report such
-> leaks. Users typically had to manually setup kmemleak and trigger
-> scans after running tests[1][2].
->
-> This change integrates kmemleak support directly into the blktests
-> framework. Before running each test, the framework checks for the
-> presence of /sys/kernel/debug/kmemleak to determine whether kmemleak
-> is enabled for the running kernel. If available, before running a test,
-> any existing kmemleak reports are cleared to avoid false positives
-> from previous tests. After the test completes, the framework explicitly
-> triggers a kmemleak scan. If memory leaks are detected, they are written
-> to a per-test file at, "results/.../.../<test>.kmemleak" and the
-> corresponding test is marked as FAIL. Users can then inspect the
-> <test>.kmemleak file to analyze the reported leaks.
->
-> With this enhancement, blktests can automatically detect kernel memory
-> leaks (if kerel is configured with CONFIG_DEBUG_KMEMLEAK support)  on
-> a per-test basis, removing the need for manual kmemleak setup and scans.
-> This should make it easier and faster to identify memory leaks
-> introduced by individual tests.
->
-> [1] https://lore.kernel.org/all/CAHj4cs8oJFvz=3DdaCvjHM5dYCNQH4UXwSySPPU4=
-v-WHce_kZXZA@mail.gmail.com/
-> [2] https://lore.kernel.org/all/CAHj4cs9wv3SdPo+N01Fw2SHBYDs9tj2M_e1-GdQO=
-kRy=3DDsBB1w@mail.gmail.com/
->
+Hello Ming,
 
-Thanks for the patch, that's really helpful to catch the kmemleak issue.
-
-Reviewed-by: Yi Zhang <yi.zhang@redhat.com>
-
-
-> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
-> ---
->  check | 47 +++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 47 insertions(+)
->
-> diff --git a/check b/check
-> index 6d77d8e..3a6e837 100755
-> --- a/check
-> +++ b/check
-> @@ -183,6 +183,36 @@ _check_dmesg() {
->         fi
->  }
->
-> +_setup_kmemleak() {
-> +       local f=3D"/sys/kernel/debug/kmemleak"
+On 14.01.26 16:11, Ming Lei wrote:
+> On Wed, Jan 14, 2026 at 01:58:03PM +0800, Yi Zhang wrote:
+>> On Thu, Jan 8, 2026 at 2:39 PM Yi Zhang <yi.zhang@redhat.com> wrote:
+>>>
+>>> On Thu, Jan 8, 2026 at 12:48 AM Jens Axboe <axboe@kernel.dk> wrote:
+>>>>
+>>>> On 1/7/26 9:39 AM, Yi Zhang wrote:
+>>>>> Hi
+>>>>> The following issue[2] was triggered by blktests nvme/059 and it's
+>>>>
+>>>> nvme/049 presumably?
+>>>>
+>>> Yes.
+>>>
+>>>>> 100% reproduced with commit[1]. Please help check it and let me know
+>>>>> if you need any info/test for it.
+>>>>> Seems it's one regression, I will try to test with the latest
+>>>>> linux-block/for-next and also bisect it tomorrow.
+>>>>
+>>>> Doesn't reproduce for me on the current tree, but nothing since:
+>>>>
+>>>>> commit 5ee81d4ae52ec4e9206efb4c1b06e269407aba11
+>>>>> Merge: 29cefd61e0c6 fcf463b92a08
+>>>>> Author: Jens Axboe <axboe@kernel.dk>
+>>>>> Date:   Tue Jan 6 05:48:07 2026 -0700
+>>>>>
+>>>>>      Merge branch 'for-7.0/blk-pvec' into for-next
+>>>>
+>>>> should have impacted that. So please do bisect.
+>>>
+>>> Hi Jens
+>>> The issue seems was introduced from below commit.
+>>> and the issue cannot be reproduced after reverting this commit.
+>>
+>> The issue still can be reproduced on the latest linux-block/for-next
+> 
+> Hi Yi,
+> 
+> Can you try the following patch?
+> 
+> 
+> diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
+> index a9c097dacad6..7b0e62b8322b 100644
+> --- a/drivers/nvme/host/ioctl.c
+> +++ b/drivers/nvme/host/ioctl.c
+> @@ -425,14 +425,23 @@ static enum rq_end_io_ret nvme_uring_cmd_end_io(struct request *req,
+>   	pdu->result = le64_to_cpu(nvme_req(req)->result.u64);
+>   
+>   	/*
+> -	 * IOPOLL could potentially complete this request directly, but
+> -	 * if multiple rings are polling on the same queue, then it's possible
+> -	 * for one ring to find completions for another ring. Punting the
+> -	 * completion via task_work will always direct it to the right
+> -	 * location, rather than potentially complete requests for ringA
+> -	 * under iopoll invocations from ringB.
+> +	 * For IOPOLL, complete the request inline. The request's io_kiocb
+> +	 * uses a union for io_task_work and iopoll_node, so scheduling
+> +	 * task_work would corrupt the iopoll_list while the request is
+> +	 * still on it. io_uring_cmd_done() handles IOPOLL by setting
+> +	 * iopoll_completed rather than scheduling task_work.
+> +	 *
+> +	 * For non-IOPOLL, complete via task_work to ensure we run in the
+> +	 * submitter's context and handling multiple rings is safe.
+>   	 */
+> -	io_uring_cmd_do_in_task_lazy(ioucmd, nvme_uring_task_cb);
+> +	if (blk_rq_is_poll(req)) {
+> +		if (pdu->bio)
+> +			blk_rq_unmap_user(pdu->bio);
+> +		io_uring_cmd_done32(ioucmd, pdu->status, pdu->result, 0);
+> +	} else {
+> +		io_uring_cmd_do_in_task_lazy(ioucmd, nvme_uring_task_cb);
+> +	}
 > +
-> +       if [[ ! -e $f || ! -r $f ]]; then
-> +               return 0
-> +       fi
-> +
-> +       echo clear > "$f"
-> +}
-> +
-> +_check_kmemleak() {
-> +       local kmemleak
-> +       local f=3D"/sys/kernel/debug/kmemleak"
-> +
-> +       if [[ ! -e $f || ! -r $f ]]; then
-> +               return 0
-> +       fi
-> +
-> +       echo scan > "$f"
-> +       sleep 1
-> +       kmemleak=3D$(cat "$f")
-> +
-> +       if [[ -z $kmemleak ]]; then
-> +               return 0
-> +       fi
-> +
-> +       printf '%s\n' "$kmemleak" > "${seqres}.kmemleak"
-> +       return 1
-> +}
-> +
->  _read_last_test_run() {
->         local seqres=3D"${RESULTS_DIR}/${TEST_NAME}"
->
-> @@ -377,6 +407,8 @@ _call_test() {
->         if [[ -v SKIP_REASONS ]]; then
->                 TEST_RUN["status"]=3D"not run"
->         else
-> +               _setup_kmemleak
-> +
->                 if [[ -w /dev/kmsg ]]; then
->                         local dmesg_marker=3D"run blktests $TEST_NAME at =
-${TEST_RUN["date"]}"
->                         echo "$dmesg_marker" >> /dev/kmsg
-> @@ -414,6 +446,9 @@ _call_test() {
->                 elif ! _check_dmesg "$dmesg_marker"; then
->                         TEST_RUN["status"]=3Dfail
->                         TEST_RUN["reason"]=3Ddmesg
-> +               elif ! _check_kmemleak; then
-> +                       TEST_RUN["status"]=3Dfail
-> +                       TEST_RUN["reason"]=3Dkmemleak
->                 else
->                         TEST_RUN["status"]=3Dpass
->                 fi
-> @@ -451,6 +486,18 @@ _call_test() {
->                                 print \"    \" \$0
->                         }" "${seqres}.dmesg"
->                         ;;
-> +               kmemleak)
-> +                       echo "    kmemleak detected:"
-> +                        awk "
-> +                        {
-> +                                if (NR > 10) {
-> +                                        print \"    ...\"
-> +                                        print \"    (See '${seqres}.kmem=
-leak' for the entire message)\"
-> +                                        exit
-> +                                }
-> +                                print \"    \" \$0
-> +                        }" "${seqres}.kmemleak"
-> +                        ;;
->                 esac
->                 return 1
->         else
-> --
-> 2.52.0
->
+>   	return RQ_END_IO_FREE;
+>   }
 
 
---
-Best Regards,
-  Yi Zhang
+While this is a good optimisation and it will fix the list issue for a 
+single user - it may crash with multiple users of the context. I am 
+still learning this code, so excuse my ignorance here and there.
+
+The bisected patch 3c7d76d6128a changed io_wq_work_list which looks like 
+safe to be used  without locks (it is a derivate of llist) , list_head 
+require proper locking to be safe.
+
+ctx can be used to poll multiple files, iopoll_list is a list for that 
+reason.
+sqpoll is calling io_iopoll_req_issued without lock -> it does 
+list_add_tail
+if that races with other list addition or deletion it will corrupt the list.
+
+is there any mechanism to prevent that? or i am missing something?
+
+
+
+-- 
+have fun,
+alex
 
