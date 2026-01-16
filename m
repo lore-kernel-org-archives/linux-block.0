@@ -1,30 +1,66 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B6FF1EB5E3
-	for <linux-block@vger.kernel.org>; Fri, 16 Jan 2026 02:42:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4384323EA83
+	for <linux-block@vger.kernel.org>; Fri, 16 Jan 2026 03:40:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768531372; cv=none; b=bropaHQd0jaPLd4ZX4O3ergUakZOmEgHElhnCDAA6pCacVcdkn8mMof9dlSTq3TA/QOcAX12P02fEsSlkGYoKw+FjcFmXUJPop8N1td4apkp/cu5A7ycikMzaDNFK7QUu9aPzlLqewUCBA+qoBYq+hQyvOLbgIAlS4+t/INgAic=
+	t=1768534861; cv=none; b=vDIDw+UUfCcme9Ion2t8q9DWHsA/kTS7nqfCr1q67qucednm/pB8Aju2YxZo8MBll1OGepAuDtZrqBM7FYvC1D1Hi8H5Qo/4Uu8S0pBcxzcoGD1pjq99/1qh/XgJUrv+54kXyAnCUS1l2cXdimJm66PADjddDZqdn5wZ+gGdYDg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768531372; c=relaxed/simple;
-	bh=rLsYooGVNze0v/4LsySEpsJCMM+QEqV+kZ+KESbHc8E=;
+	s=arc-20240116; t=1768534861; c=relaxed/simple;
+	bh=/i6Dyk8wuqbXmMN1e3S7R2VA5VM8S9Z03l2XYBazvVU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=m41r2BJKBu4bQHHPgZ9i00vVymTefgaIRg+yJeruXAlQIPvnBQQIYeApuGSHU14u1QdkeFhkm36PmHn4c3/5xYh9w3bn27LRVLbuufRhaaEe+5lTlYbc2SBIlNQG4SostRzDVCZSKRbbS59Wjawkw744VrevSLCyVb7w9cp7184=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.177])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4dskdV06ctzKHLy1
-	for <linux-block@vger.kernel.org>; Fri, 16 Jan 2026 10:41:50 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 7F4894058A
-	for <linux-block@vger.kernel.org>; Fri, 16 Jan 2026 10:42:44 +0800 (CST)
-Received: from [10.174.178.72] (unknown [10.174.178.72])
-	by APP4 (Coremail) with SMTP id gCh0CgAXePiepWlp3zbbDw--.18371S3;
-	Fri, 16 Jan 2026 10:42:40 +0800 (CST)
-Message-ID: <f259092e-0ee3-4bcd-ab49-25cbb46edf66@huaweicloud.com>
-Date: Fri, 16 Jan 2026 10:42:36 +0800
+	 In-Reply-To:Content-Type; b=jOtOn+DuU6Mdk9OdSiq7YlJBBCUokj0C/8mmSb8gfFDbkAKvcIZT4H9A7ytlOSDJfO6eknymCbfjK7JkeWw+DsjAfxj3cKCaG5CFiGj7eXBPzmJIOQ52w39/M0BDOsaCxGmzH1Oyj1RHLj6fOUnd6uZG3PfzuhGXTHFBuBwEcEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=neSbjmUB; arc=none smtp.client-ip=209.85.210.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="neSbjmUB"
+Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-7cfd0f2ef93so713616a34.1
+        for <linux-block@vger.kernel.org>; Thu, 15 Jan 2026 19:40:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1768534858; x=1769139658; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/PfayK5hlZPTQ7Jul/Cnommd5sGdCaiVUqVPiu1G3d4=;
+        b=neSbjmUBRieCi1qkvJA2FvxN7WNcPIP+jeAdJnVfHGp3T2b96S+NTJbBLLFbg1SBGP
+         BAbkjOfHSgWwyqYvvXmOJbAukLwYxgUqGNcjwGLcadfLzjELYRIyPPtv68aebdyoKbIg
+         jO8cwBkNkJMvfjugd4d77PcqoJO1KW1sRDP+WmpN1LxNbro7b4XBTKT1boMVXQh1IThw
+         tnC/T0rvbfdiHHvlY6JS7xqvNlOMx9IL2Ow5LoWmwA0xv5QP+ECZrv11bkfKv/U7aUr/
+         yC+i6zVUEG3bOuMu/NFkE1r9OB7hFRvcJ0EL6PDudcViS4tvVi51nXcnt8Y9av/3LmqN
+         HINA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768534858; x=1769139658;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/PfayK5hlZPTQ7Jul/Cnommd5sGdCaiVUqVPiu1G3d4=;
+        b=MFWUu44fxs4RO0gIzd3WweZlGGXWYtwsSaSGbLWS3hiJWlpBjxycY5iSAwRCj0AdJZ
+         HY5GEmf56lSYhY8tFrU8ENx4jOOVfLuBY3W/stVLfW5oOkLtgD8r0tMH5REv/R25DBdo
+         hdBTr12EZJlRpROCkwaUyAxH+mj52Uj/n8y4q9rZnSLO13O6HtSzVJpokQqKGIxTqRni
+         M4kb71eKyG226YTXxFMERfIH4+/XrS9g+zRalyAOSyuOo4UpLvP05HD9v3hoBzuKD3RF
+         HSOxjPvPbUJ0YBOVy11IvzUfs7yKgRmZWbgLy615SqIltS78wYRGdlgw4YKCk5QBdLW5
+         NZ/w==
+X-Forwarded-Encrypted: i=1; AJvYcCVPxVwd3GIHnpL20q152SCvxi75MNLPIRaVYK7aA3RSnG4AviBh6yV6hbZawPr/wnPeZ67xq9wUBaqSgg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxUzc+bP7cbvGQaqDnr4Zco2k219pqQmP11UlAyUmyQ8qOy0QDc
+	pKi6GoI8Jx2YzQgMAkYnQd6Jh3ID+KgJEAn6avzgMkfxskg34YcT4VQZla77s1NTW28=
+X-Gm-Gg: AY/fxX43/d5+3BR3dA+4xq0YPZ3y4C+XxZfH/F25VTc+rTvUsLbFuMkGwVvow/etI9T
+	bDu4QOsgyASmdtcQCRpmsh0gdZT/6mxgwJllx985nahathDvSAuN0caT+rq/Huk0/a7hXDu3KOo
+	7L7UaU8w/xDWmBbCLwH7JnmJ2l7r/WJD50TT5ADNjLgq/pFmcKQb8wMMED1v0kvVTYFJ2EDGa7K
+	NcgkB0owu43xu5Rn+SYcdpFLlOAHRWAtM9oLOF8He7M+cQO4VvbMeXBP97voWJs4bt4CxL5sfKr
+	bdeppINFstecysur9VBzuxVF5Mp+6exGfCKvgEwsuWjC+nPH8UzasW35I9z2flJSXpT37UFwSzy
+	HRhKRO75J4p3LUBWQvZqvgHqYVSSgtOZqQe2jd00E0ftB/bH+/hiiZHWixWr7YCTBdS4NyNZ3qC
+	qi6kXq/8ri
+X-Received: by 2002:a05:6830:2a91:b0:7c7:63b6:89d3 with SMTP id 46e09a7af769-7cfdee2b72cmr912948a34.19.1768534858009;
+        Thu, 15 Jan 2026 19:40:58 -0800 (PST)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7cfdf28f71dsm1029345a34.16.2026.01.15.19.40.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 15 Jan 2026 19:40:57 -0800 (PST)
+Message-ID: <6d0e6461-de4f-468f-bb81-0c650700ba0d@kernel.dk>
+Date: Thu, 15 Jan 2026 20:40:56 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -32,92 +68,19 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/6] blk-cgroup: skip dying blkg in
- blkcg_activate_policy()
-To: Yu Kuai <yukuai@fnnas.com>
-Cc: mkoutny@suse.com, hch@infradead.org, axboe@kernel.dk,
- linux-block@vger.kernel.org, tj@kernel.org, nilay@linux.ibm.com,
- ming.lei@redhat.com, Zheng Qixing <zhengqixing@huawei.com>
-References: <20260115163818.162968-1-yukuai@fnnas.com>
- <20260115163818.162968-5-yukuai@fnnas.com>
-From: Zheng Qixing <zhengqixing@huaweicloud.com>
-In-Reply-To: <20260115163818.162968-5-yukuai@fnnas.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgAXePiepWlp3zbbDw--.18371S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7Cr43AF45CF43Kr4xZFyxKrg_yoW8CFy3pr
-	ZxG3Z0kr9rKFyIka129a47X340vF4ftr1UG3yak3yY9rZxA3WSyFnrurn8JFWxAFs3AFWr
-	Z3ZIqFyUKw48K3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUylb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAK
-	I48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7
-	xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xII
-	jxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw2
-	0EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x02
-	67AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUF1v3UUUUU
-X-CM-SenderInfo: x2kh0wptl0x03j6k3tpzhluzxrxghudrp/
+Subject: Re: [PATCH] block: remove the boring judgment in
+ blk_rq_map_bio_alloc()
+To: Chaohai Chen <wdhh6@aliyun.com>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+References: <20260116021524.776322-1-wdhh6@aliyun.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20260116021524.776322-1-wdhh6@aliyun.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+https://lore.kernel.org/all/2d73aaa4-9718-4285-ab3f-85e1fa3b40fa@kernel.dk/
 
-在 2026/1/16 0:38, Yu Kuai 写道:
-> From: Zheng Qixing <zhengqixing@huawei.com>
->
-> When switching IO schedulers on a block device, blkcg_activate_policy()
-> can race with concurrent blkcg deletion, leading to a use-after-free in
-> rcu_accelerate_cbs.
->
-> T1:                               T2:
->                                    blkg_destroy
->                                    kill(&blkg->refcnt) // blkg->refcnt=1->0
->                                    blkg_release // call_rcu(__blkg_release)
->                                    ...
->                                    blkg_free_workfn
->                                    ->pd_free_fn(pd)
-> elv_iosched_store
-> elevator_switch
-> ...
-> iterate blkg list
-> blkg_get(blkg) // blkg->refcnt=0->1
->                                    list_del_init(&blkg->q_node)
-> blkg_put(pinned_blkg) // blkg->refcnt=1->0
-> blkg_release // call_rcu again
-> rcu_accelerate_cbs // uaf
->
-> Fix this by checking hlist_unhashed(&blkg->blkcg_node) before getting
-> a reference to the blkg. This is the same check used in blkg_destroy()
-> to detect if a blkg has already been destroyed. If the blkg is already
-> unhashed, skip processing it since it's being destroyed.
->
-> Link: https://lore.kernel.org/all/20260108014416.3656493-4-zhengqixing@huaweicloud.com/
-> Fixes: f1c006f1c685 ("blk-cgroup: synchronize pd_free_fn() from blkg_free_workfn() and blkcg_deactivate_policy()")
-> Signed-off-by: Zheng Qixing <zhengqixing@huawei.com>
-> Signed-off-by: Yu Kuai <yukuai@fnnas.com>
-> ---
->   block/blk-cgroup.c | 2 ++
->   1 file changed, 2 insertions(+)
->
-> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-> index a6ac6ba9430d..8d9273f61dd5 100644
-> --- a/block/blk-cgroup.c
-> +++ b/block/blk-cgroup.c
-> @@ -1625,6 +1625,8 @@ int blkcg_activate_policy(struct gendisk *disk, const struct blkcg_policy *pol)
->   			 * GFP_NOWAIT failed.  Free the existing one and
->   			 * prealloc for @blkg w/ GFP_KERNEL.
->   			 */
-> +			if (hlist_unhashed(&blkg->blkcg_node))
-> +				continue;
->   			if (pinned_blkg)
->   				blkg_put(pinned_blkg);
->   			blkg_get(blkg);
-
-Looks good.
-
-
-Thanks,
-
-Qixing
+-- 
+Jens Axboe
 
