@@ -1,195 +1,157 @@
-Received: from mail-qk1-f193.google.com (mail-qk1-f193.google.com [209.85.222.193])
+Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C105C3218B3
-	for <linux-block@vger.kernel.org>; Sat, 17 Jan 2026 02:51:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABB2728030E
+	for <linux-block@vger.kernel.org>; Sat, 17 Jan 2026 03:53:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768618302; cv=none; b=dO+QqJj/Sxf/2QwkLQ6QS1SmK3IjsAkDcISEdUcm4N3JILwbvU0kIGGJneD7F9vDyO0A8anNq5ac827qeG88YFWKQtpnJ0Kr88mrWVEeaQRik04e0FiP910mrDjEyqD8mbSDUtoH8jHE+S29b0OBJw7V33JD7Eq2PeCzS9W1YTs=
+	t=1768621987; cv=none; b=BOIyYmP8GG4EGKYZk8eLdfKSECaWOdKFXvP414DJXFyp6Ok0Na9lSnujF/i6ngFx/+XVtRTUPckJz7HsSMK0aoxkgiCQyQEfD2r2We1ZqvbxmMM1tKAn00WbMRlt+KN+vh741nR1pdZq7RgdL5/zQ+iiPkz9Qfc+jkhpaTkeVZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768618302; c=relaxed/simple;
-	bh=JR2lB6SpwQyYKrn3A+sb/GAiufPu5j/SZUDtKHTacRg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=TynL13/87A6hgrpaaCvLy9d0pT8mrnt4o/reAFFN57l4ks3muGc7SJC7FOB1VSjbGJ0WlibSWCdQGBWosoA6q42GC8OCpkCwpwmVtFgYLy+40VLoRn7nNPFdjxvg0Ht+XYdMNeM1Zf1pHaCnozh55KBrlmZciwZdmRX4zHPs5hk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Iei1Y9D1; arc=none smtp.client-ip=209.85.222.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1768621987; c=relaxed/simple;
+	bh=H0DAI8HuDKxJXhamfV2OweGIMjoVGIGacA+haK+JPCw=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=cERiRo+rk30NH9wLMBuZNr4t5Mc8bCb88ZIvD1Ny3gXfY4Ow/CB6H0rO0Efc2tNv5rfubU+LSktEMDR1KPrmG96qBO3ojT2PqPujvATakxV7NbucjH9/EYRyxzekMk04vp4t7kiFzdyJeL/F+U/P2+pg5vbnIGvNCZHRCHfrL7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=YCTkWOmd; arc=none smtp.client-ip=209.85.210.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Iei1Y9D1"
-Received: by mail-qk1-f193.google.com with SMTP id af79cd13be357-8c07bc2ad13so188099085a.2
-        for <linux-block@vger.kernel.org>; Fri, 16 Jan 2026 18:51:40 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="YCTkWOmd"
+Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-7cfcb5b1e2fso1759603a34.3
+        for <linux-block@vger.kernel.org>; Fri, 16 Jan 2026 19:53:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768618299; x=1769223099; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=g52RCNxKP5yWPLz6Ydp2XilgQT0ikaZD3cfRfzbViX4=;
-        b=Iei1Y9D1hiBbSXQkhJ7pRvzkEU10RXKvJeHPQOp9PPInZ8tvYcE1TdRNaEHwuk6oN8
-         t21rWkSnnNL6I4utjSmlyRM3IisRWFxXHu6yy0OO6rPMLquEgR0Ptv0bK4i6T+gYWdVx
-         LE6d59KAKMpg6P7kXwdzFdoqbMDfWnAGHDIWazEjLatBLkpug4QYmEgVb4Cih1F/XKD5
-         j1TMyQp7i6SO/GUqA+2mCtWpJG2rB+eVOqX1v5cehsD/cbjerRJ0qyZrmgV7VKvdSUAE
-         7Z4nTLQsn5PkFz47fnymQ7qmXZGWyDC8dGSboAN+i1UpENeP5CXTrydvs4KopOR/RKif
-         BPrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768618299; x=1769223099;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1768621984; x=1769226784; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=g52RCNxKP5yWPLz6Ydp2XilgQT0ikaZD3cfRfzbViX4=;
-        b=mFMvpMrJW+kin3qOKdAOYd4k5SSLOiYm6DFY/ZBeUcvRL8iO1FkPA+Mo2v3qsUqmxf
-         huSa1aRUp5Y3JZ4iQPodIMV5in7j4iNtX5+OTu9LHEBPhNszy9oh6XUCRBZEqBJD3mU1
-         /nuOjIdYvsvYk2vSelpHff4E6ICp1d0rhIFOZvt2VEEpfPMDoF59sWwuqSGe3E4UgLRs
-         rJQv/X1uH2wPFHVu57H+Ag7GD09chrMBsqYLgoK7jMD/Js5M4ZTblxxbHnMaXUT7VInU
-         92KZzpJ4aRFnB9HWf+AKx18t4GvDChK9fNe9N4FApqF/Fxs36E1w/WiPs95fBeqnsXOb
-         9m4w==
-X-Gm-Message-State: AOJu0YzRDkh7GW98edg3NmXBzYb2ac6TJofoX9do4ZXPgJAK09zZUgoV
-	ph2CBw0mRiluwV1gjgP8/pvemLnyp47aGE539wvQvgjPX2NuHyxc9mkN12JhiBHtc08=
-X-Gm-Gg: AY/fxX6PprPTIUJR7ctVW2VVQvLRWjLMQg4czxZ1DLor5FM6QYOL0/H4vQYP+RPqJMJ
-	Ioq9HmbNwCKwsy+f1r8d51uzkgrbCPd3xqgvttPaCBUstu6zQ0ZBLdvF5TlUZyQDhxUQejqLk8T
-	3/P4uC//BZbVwcQG/jBjIi7c1i3wN85+4oqg+DuT0NvKALpFMgUGySfpG+8ujS3U2hpj4zYlpuv
-	z8c3sjpXcsvoFFiQH6HAwIS7zsp04eVVfSQxYsnwFMxUsF7GRPWqIv5JfPVQ89mers09zCzKsVX
-	6Ujfbvk07BuS4/COtbD2lEcLXpPKnd8rMwWURUZmsbVITd2cAjop5AzMqY8OWURsL6/elE5Ja7H
-	jB6/BBixjYYagP0EqW9uErtwLbLg/DJffVGTIfwaHinQI5bXS+NO4SwE/+H+dN3f47lY5eEUQyl
-	TM9ao446q6mKDx5Sqw06wg
-X-Received: by 2002:a05:620a:254a:b0:8c3:6f44:46c0 with SMTP id af79cd13be357-8c6a66edbd8mr718053085a.16.1768618299277;
-        Fri, 16 Jan 2026 18:51:39 -0800 (PST)
-Received: from biancapradeep.lan ([2605:a601:a619:8500::8])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8942e603a8bsm37163326d6.17.2026.01.16.18.51.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Jan 2026 18:51:38 -0800 (PST)
-From: Hithashree Bojanala <bojanalahithashri@gmail.com>
-To: linux-block@vger.kernel.org
-Cc: bojanala hithashri <bojanalahithashri@gmail.com>,
-	linux-scsi@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: =?UTF-8?q?=5BREGRESSION=5D=20fio=204k=20randread=3A=20=7E1=E2=80=933=2E5=25=20IOPS=20regression=20on=20linux-next=20=286=2E19=2E0-rc1-next-20251219=29=20vs=20RHEL9=205=2E14=20on=20PERC=20H740P?=
-Date: Fri, 16 Jan 2026 21:44:07 -0500
-Message-ID: <20260117024413.484508-2-bojanalahithashri@gmail.com>
-X-Mailer: git-send-email 2.47.0
+        bh=k2pkI3a52PPBfsI8Bbv3eUa0XcIvzWNTb6mPIU9j5eI=;
+        b=YCTkWOmdloaXX6NiPFKx27zadf8WFscUHMksiI+Ma6pnl19ZxOBhEVfSQXC+PL7PLc
+         oW3o9t9VN437m5oNGE8wSknyX4QC1jGcBCmmTE5ugcmzMCBOW5qaii6QAWaHNj4mygl4
+         n5soXcHZnxN3c5Tg+PnukCrRiMUjrUKVvuCJWtBb69Y1iTXLT136wEA++UqzGiA/TyB7
+         ALPKjYCoQohTPabQRHWztv3gHNIYfQbUDuXgsuN4M1Iw/i1wC5iO7lHIUvgVXfWNxaVr
+         qLtSTeyywosJfwrAmiRljdCSSg8D0FumpWyTelXi3wsV9LUO2EwjH5F7KB07wXOXzQeY
+         ubXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768621984; x=1769226784;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=k2pkI3a52PPBfsI8Bbv3eUa0XcIvzWNTb6mPIU9j5eI=;
+        b=igth+5KtM8pL0ILS9g5bEryBeKgxP7e10D1IF6+yYyOKC7tNtzyKTczTbjfhcPIxWV
+         vlqUICZquVPDLYFD3KEb8oPYXlqkIj2kdaiczHrUMBsogrLeB+59nKslpQVUKOSW3X86
+         Nm5z5q5GuMefm9KFPoGEZlqe0IqBHEcICOfYjUEyND1+fwuHFmOLKKskdnn4KGQlwjne
+         33i7ltwpVGwE2MowQLHRZfZmXPFg8BR0KOJK7ERclE/Azy5heVRqtmvJQ03RCCFsqAQ6
+         znOsEDcE0xiIv4Qn0dNsYyysTItvlEwP9C5gNS93rNeqIT4bPPHc7JFBefp4ksA7gxam
+         nztw==
+X-Gm-Message-State: AOJu0YwGIaB1LfKX2wQYqcTjLmjmjRvF5O4t003nXMxqVFp9Qdgtmjnd
+	vIgyqDFlkAOOLiscewHD9/igF3WOnjA6rvkfMU9AB2pA7tqapaiTu+M9XqFQPbGeAtQ=
+X-Gm-Gg: AY/fxX4E5rwlJfii2NtDzybCpQBZjMcWTrLWiJ+jSQ7HueKxO1cFMToQDKNzYScCX5a
+	Y0XUr90d61GxTW/LMQ5KWFrF23zQ9q1hv/16PjAUos3PpnpWsLK56E5+cqc1DMTbCZivtNLhy73
+	hdAkl1lBb83LCXRqXa24ac5mEm/F1IBDDoUsi/yrOBU7ZCP0YUGLIPAPibCT11MeVECa9QHLKye
+	Il0IHlz/r6wWFgme+6eU79Ss1Gs+igBDKXJahxZK5NbCpX9eFP2wPsu5GGwDWaUp8olxUdk2i4i
+	SALZ9/QPk8MRU+7OXNYb05ssQdcEC2ogS9cf1rjNLUM2vOiBlCWvYwvhSz5GqvyjguiexRDsqwF
+	WL/9tdlzfhZ4qP6dB7PRgOz81U3V9o7Yf01Z2HGjpDj38m7v9CqPlZPkeAhkAAAWZHTlWWy7Q3A
+	b5v//IRTZVBdNEDpzsGnnqHYp/E4ebUKimn56cYJwaxMT4nRDbx5rU6EosLzaTaOE70fn/dw==
+X-Received: by 2002:a05:6830:2a94:b0:7cf:ddee:686f with SMTP id 46e09a7af769-7cfe0123adbmr1837381a34.22.1768621984442;
+        Fri, 16 Jan 2026 19:53:04 -0800 (PST)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7cfdf2b59e2sm2927703a34.30.2026.01.16.19.53.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 16 Jan 2026 19:53:03 -0800 (PST)
+Message-ID: <4e5e1aba-adc4-4414-bc86-35d3c8d9f653@kernel.dk>
+Date: Fri, 16 Jan 2026 20:53:03 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 6.19-rc6
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-From: bojanala hithashri <bojanalahithashri@gmail.com> 
+Hi Linus,
+
+Fix for the block area that should go into this kernel release. This
+pull request contains:
+
+- NVMe pull request via Keith
+	- Device quirk to disable faulty temperature (Ilikara)
+	- TCP target null pointer fix from bad host protocol usage
+	  (Shivam)
+	- Add apple,t8103-nvme-ans2 as a compatible apple controller
+	  (Janne)
+	- FC tagset leak fix (Chaitanya)
+	- TCP socket deadlock fix (Hannes)
+	- Target name buffer overrun fix (Shin'ichiro)
+
+- Fix for an underflow for rnbd during device unmap
+
+- Zero the non-PI part of the auto integrity buffer
+
+- Fix for a configfs memory leak in the null block driver
+
+Please pull!
 
 
-Hello,
+The following changes since commit f0d385f6689f37a2828c686fb279121df006b4cb:
 
-I am reporting a small but consistent block I/O performance regression
-observed when running 4k random reads across queue depths on a hardware
-RAID device.
+  ublk: fix use-after-free in ublk_partition_scan_work (2026-01-09 06:55:30 -0700)
 
-The regression appears when comparing a RHEL9 downstream kernel against
-a linux-next snapshot.
+are available in the Git repository at:
 
-System / Hardware
------------------
-CPU:   
-      Model: Intel Xeon Gold 6130 @ 2.10GHz
-      Architecture: x86_64
-      Sockets: 2
-      Cores per socket: 16
-      Threads per core: 2
-      NUMA nodes: 2
-Memory: 
-      Total: 187 GB
-      NUMA nodes: 2
-      Node 0: ~94 GB
-      Node 1: ~97 GB
-      Swap: 4 GB (unused during test)
+  https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-6.19-20260116
 
-Storage controller:
-  Dell PERC H740P (hardware RAID)
+for you to fetch changes up to ec19ed2b3e2af8ec5380400cdee9cb6560144506:
 
-Block device:
-  /dev/sdh
+  rnbd-clt: fix refcount underflow in device unmap path (2026-01-15 07:22:09 -0700)
 
-lsblk output:
-  NAME MODEL           SIZE ROTA TRAN SCHED
-  sdh  PERC H740P Adp  1.6T    1      mq-deadline
+----------------------------------------------------------------
+block-6.19-20260116
 
-Active scheduler:
-  /sys/block/sdh/queue/scheduler
-    none [mq-deadline] kyber bfq
+----------------------------------------------------------------
+Caleb Sander Mateos (1):
+      block: zero non-PI portion of auto integrity buffer
 
-Kernels Tested
---------------
-Baseline (downstream):
-  5.14.0-427.13.1.el9_4.x86_64
+Chaitanya Kulkarni (2):
+      nvme-fc: release admin tagset if init fails
+      rnbd-clt: fix refcount underflow in device unmap path
 
-Test (upstream integration tree):
-  6.19.0-rc1-next-20251219
+Hannes Reinecke (1):
+      nvmet-tcp: fixup hang in nvmet_tcp_listen_data_ready()
 
-Workload / Reproducer
----------------------
-fio version: 3.35
-Raw block device, direct I/O, libaio, single job, long runtime (300s)
+Ilikara Zheng (1):
+      nvme-pci: disable secondary temp for Wodposit WPBSNM8
 
-Command used:
+Janne Grunau (1):
+      nvme-apple: add "apple,t8103-nvme-ans2" as compatible
 
-for depth in 1 2 4 8 16 32 64 128 256 512 1024 2048; do
-  fio --rw=randread \
-      --bs=4096 \
-      --name=randread-$depth \
-      --filename=/dev/sdh \
-      --ioengine=libaio \
-      --numjobs=1 --thread \
-      --norandommap \
-      --runtime=300 \
-      --direct=1 \
-      --iodepth=$depth \
-      --scramble_buffers=1 \
-      --offset=0 \
-      --size=100g
-done
+Jens Axboe (1):
+      Merge tag 'nvme-6.19-2026-01-14' of git://git.infradead.org/nvme into block-6.19
 
-Observed Behavior
------------------
-Across all queue depths tested, the linux-next kernel shows:
+Nilay Shroff (2):
+      null_blk: fix kmemleak by releasing references to fault configfs items
+      nvme: fix PCIe subsystem reset controller state transition
 
-- ~1–3.5% lower IOPS
-- Corresponding bandwidth reduction
-- ~1–3.6% higher average completion latency
-- Slightly worse p99 / p99.9 latency
+Shin'ichiro Kawasaki (1):
+      nvmet: do not copy beyond sybsysnqn string length
 
-The throughput saturation point remains unchanged
-(around iodepth ≈ 128), suggesting the regression is
-related to service/dispatch efficiency rather than a
-change in device limits.
+Shivam Kumar (1):
+      nvme-tcp: fix NULL pointer dereferences in nvmet_tcp_build_pdu_iovec
 
-Example Data Points
--------------------
-- iodepth=32:
-    old: 554 IOPS → new: 535 IOPS  (~-3.4%)
-    avg clat: 57.7 ms → 59.8 ms
+ block/bio-integrity-auto.c     |  2 +-
+ drivers/block/null_blk/main.c  | 12 +++++++++++-
+ drivers/block/rnbd/rnbd-clt.c  |  1 -
+ drivers/nvme/host/apple.c      |  1 +
+ drivers/nvme/host/fc.c         |  2 ++
+ drivers/nvme/host/pci.c        |  7 ++++++-
+ drivers/nvme/target/passthru.c |  2 +-
+ drivers/nvme/target/tcp.c      | 21 ++++++++++++++++-----
+ 8 files changed, 38 insertions(+), 10 deletions(-)
 
-- iodepth=64:
-    old: 608 IOPS → new: 588 IOPS  (~-3.3%)
-    avg clat: 105 ms → 109 ms
+-- 
+Jens Axboe
 
-- iodepth=128:
-    old: 648 IOPS → new: 640 IOPS (~-1.2%)
-
-This behavior is consistent across multiple runs.
-
-Notes
------
-I understand this comparison spans a downstream RHEL kernel
-and a linux-next snapshot. I wanted to report this early
-because the regression is consistent and may relate to recent
-blk-mq or mq-deadline changes affecting rotational / hardware
-RAID devices.
-
-I am happy to:
-- Re-test on a specific mainline release (e.g. v6.18 or v6.19-rc)
-- Compare schedulers (mq-deadline vs none / bfq)
-- Provide additional instrumentation (iostat, perf, bpf)
-- Assist with bisection if a suspect window is identified
-
-Please let me know how you would like me to proceed.
-
-Thanks,
-Hithashree
