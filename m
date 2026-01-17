@@ -1,221 +1,195 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f193.google.com (mail-qk1-f193.google.com [209.85.222.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE585335541
-	for <linux-block@vger.kernel.org>; Fri, 16 Jan 2026 14:58:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C105C3218B3
+	for <linux-block@vger.kernel.org>; Sat, 17 Jan 2026 02:51:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768575529; cv=none; b=JlLOFoYppzkAe4W1ICrVG2daSGYIYMGrYRllj9aRyHUTn7WBMd4BD+wIEpZoZnT6NJDv+dpLy2rZ3k6MLO72GjMH378M5qTOig0FhjoUf760zYFHtWVN1fAAoZEAuM0AEDxNj5JHoiJOhlX6KTaL4RVGo4HZYxI7zt84hySjQI8=
+	t=1768618302; cv=none; b=dO+QqJj/Sxf/2QwkLQ6QS1SmK3IjsAkDcISEdUcm4N3JILwbvU0kIGGJneD7F9vDyO0A8anNq5ac827qeG88YFWKQtpnJ0Kr88mrWVEeaQRik04e0FiP910mrDjEyqD8mbSDUtoH8jHE+S29b0OBJw7V33JD7Eq2PeCzS9W1YTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768575529; c=relaxed/simple;
-	bh=AcvcVVpDDWP4PfN5fEYmRivRnsJFEUEXABE9uCVzM3Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lsTWxwvdBsuxe5I5P8lsG2XS3LjJJIr6JL+bfLsAVcXATzuE+zsDU5rNotSG+v67oy/A1eWB6kDCSetffeQPrJ6K7TXU7u/7UXiNYhWA4CRwnaMB7tIWk/YnB+zMRYMdZXyTwmWNldAftdh1L0AQCmr2sNf64nZW4M5ow8Vazm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TWgeOnGs; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1768618302; c=relaxed/simple;
+	bh=JR2lB6SpwQyYKrn3A+sb/GAiufPu5j/SZUDtKHTacRg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=TynL13/87A6hgrpaaCvLy9d0pT8mrnt4o/reAFFN57l4ks3muGc7SJC7FOB1VSjbGJ0WlibSWCdQGBWosoA6q42GC8OCpkCwpwmVtFgYLy+40VLoRn7nNPFdjxvg0Ht+XYdMNeM1Zf1pHaCnozh55KBrlmZciwZdmRX4zHPs5hk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Iei1Y9D1; arc=none smtp.client-ip=209.85.222.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TWgeOnGs"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768575526;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=k/gK3TrN4qKHGqA2JoFf79R78d75j8SrGkFRWrBK0lc=;
-	b=TWgeOnGsQx817/zg2pGYbxUGZK0KE3qIJ1pNAJKSeriLDqgvfzJyVq5r9FoZoXwz1xXOqn
-	atTV+N5G7g1IQiuJXn4ZT09jpb2k/GGLKV+I87Uf86/QWCp0t7gVduzq/PIkpVrmGBTJAk
-	++RdevKIR1G+canvgt4inGIMsY5wCaQ=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-252-Z4YNv09QOTib3tpcKO7IgQ-1; Fri,
- 16 Jan 2026 09:58:45 -0500
-X-MC-Unique: Z4YNv09QOTib3tpcKO7IgQ-1
-X-Mimecast-MFC-AGG-ID: Z4YNv09QOTib3tpcKO7IgQ_1768575524
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9F8641956094;
-	Fri, 16 Jan 2026 14:58:44 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.198])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5ABAF30002D6;
-	Fri, 16 Jan 2026 14:58:41 +0000 (UTC)
-Date: Fri, 16 Jan 2026 22:58:36 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: huang-jl <huang-jl@deepseek.com>
-Cc: linux-block@vger.kernel.org
-Subject: Re: [BUG] ublk: ublk server hangs in D state during STOP_DEV
-Message-ID: <aWpSHIBn_1W_Xo9h@fedora>
-References: <20260116141532.45377-1-huang-jl@deepseek.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Iei1Y9D1"
+Received: by mail-qk1-f193.google.com with SMTP id af79cd13be357-8c07bc2ad13so188099085a.2
+        for <linux-block@vger.kernel.org>; Fri, 16 Jan 2026 18:51:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1768618299; x=1769223099; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=g52RCNxKP5yWPLz6Ydp2XilgQT0ikaZD3cfRfzbViX4=;
+        b=Iei1Y9D1hiBbSXQkhJ7pRvzkEU10RXKvJeHPQOp9PPInZ8tvYcE1TdRNaEHwuk6oN8
+         t21rWkSnnNL6I4utjSmlyRM3IisRWFxXHu6yy0OO6rPMLquEgR0Ptv0bK4i6T+gYWdVx
+         LE6d59KAKMpg6P7kXwdzFdoqbMDfWnAGHDIWazEjLatBLkpug4QYmEgVb4Cih1F/XKD5
+         j1TMyQp7i6SO/GUqA+2mCtWpJG2rB+eVOqX1v5cehsD/cbjerRJ0qyZrmgV7VKvdSUAE
+         7Z4nTLQsn5PkFz47fnymQ7qmXZGWyDC8dGSboAN+i1UpENeP5CXTrydvs4KopOR/RKif
+         BPrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768618299; x=1769223099;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=g52RCNxKP5yWPLz6Ydp2XilgQT0ikaZD3cfRfzbViX4=;
+        b=mFMvpMrJW+kin3qOKdAOYd4k5SSLOiYm6DFY/ZBeUcvRL8iO1FkPA+Mo2v3qsUqmxf
+         huSa1aRUp5Y3JZ4iQPodIMV5in7j4iNtX5+OTu9LHEBPhNszy9oh6XUCRBZEqBJD3mU1
+         /nuOjIdYvsvYk2vSelpHff4E6ICp1d0rhIFOZvt2VEEpfPMDoF59sWwuqSGe3E4UgLRs
+         rJQv/X1uH2wPFHVu57H+Ag7GD09chrMBsqYLgoK7jMD/Js5M4ZTblxxbHnMaXUT7VInU
+         92KZzpJ4aRFnB9HWf+AKx18t4GvDChK9fNe9N4FApqF/Fxs36E1w/WiPs95fBeqnsXOb
+         9m4w==
+X-Gm-Message-State: AOJu0YzRDkh7GW98edg3NmXBzYb2ac6TJofoX9do4ZXPgJAK09zZUgoV
+	ph2CBw0mRiluwV1gjgP8/pvemLnyp47aGE539wvQvgjPX2NuHyxc9mkN12JhiBHtc08=
+X-Gm-Gg: AY/fxX6PprPTIUJR7ctVW2VVQvLRWjLMQg4czxZ1DLor5FM6QYOL0/H4vQYP+RPqJMJ
+	Ioq9HmbNwCKwsy+f1r8d51uzkgrbCPd3xqgvttPaCBUstu6zQ0ZBLdvF5TlUZyQDhxUQejqLk8T
+	3/P4uC//BZbVwcQG/jBjIi7c1i3wN85+4oqg+DuT0NvKALpFMgUGySfpG+8ujS3U2hpj4zYlpuv
+	z8c3sjpXcsvoFFiQH6HAwIS7zsp04eVVfSQxYsnwFMxUsF7GRPWqIv5JfPVQ89mers09zCzKsVX
+	6Ujfbvk07BuS4/COtbD2lEcLXpPKnd8rMwWURUZmsbVITd2cAjop5AzMqY8OWURsL6/elE5Ja7H
+	jB6/BBixjYYagP0EqW9uErtwLbLg/DJffVGTIfwaHinQI5bXS+NO4SwE/+H+dN3f47lY5eEUQyl
+	TM9ao446q6mKDx5Sqw06wg
+X-Received: by 2002:a05:620a:254a:b0:8c3:6f44:46c0 with SMTP id af79cd13be357-8c6a66edbd8mr718053085a.16.1768618299277;
+        Fri, 16 Jan 2026 18:51:39 -0800 (PST)
+Received: from biancapradeep.lan ([2605:a601:a619:8500::8])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8942e603a8bsm37163326d6.17.2026.01.16.18.51.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Jan 2026 18:51:38 -0800 (PST)
+From: Hithashree Bojanala <bojanalahithashri@gmail.com>
+To: linux-block@vger.kernel.org
+Cc: bojanala hithashri <bojanalahithashri@gmail.com>,
+	linux-scsi@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: =?UTF-8?q?=5BREGRESSION=5D=20fio=204k=20randread=3A=20=7E1=E2=80=933=2E5=25=20IOPS=20regression=20on=20linux-next=20=286=2E19=2E0-rc1-next-20251219=29=20vs=20RHEL9=205=2E14=20on=20PERC=20H740P?=
+Date: Fri, 16 Jan 2026 21:44:07 -0500
+Message-ID: <20260117024413.484508-2-bojanalahithashri@gmail.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260116141532.45377-1-huang-jl@deepseek.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Fri, Jan 16, 2026 at 10:15:32PM +0800, huang-jl wrote:
-> Hello,
-> 
-> I am reporting a bug in the ublk driver observed during production usage.
-> Under specific conditions during device removal, the ublk server process
-> enters an uninterruptible sleep (D state) and becomes unkillable,
-> subsequently blocking further device deletions on the system.
-> 
-> [1. Description]
-> We run a customized ublk server with the following configuration:
-> 
-> - ublksrv_ctrl_dev_info.flags = 0 (UBLK_F_USER_RECOVERY is not enabled).
-> - Environment: Frequent creation/deletion of ublk devices (400–500 active
->   devices, one device at most 5-hour lifespan).
-> - Upon receiving SIGINT, our ublk server will sends UBLK_U_CMD_STOP_DEV to the
->   driver.
-> - A monitor process will send SIGINT to the ublk server when deleting. If it
->   finds the ublk server does not stopped within 10 seconds, the monitor will
->   send SIGKILL.
-> 
-> 
-> On one production node, a ublk server process (PID 348910) failed to exit and
-> entered D state. Simultaneously, related kworkers also entered D state:
-> 
-> $ ps -eo pid,stat,lstart,comm | grep -E "^ *[0-9]+ D"
->  77625 D    Wed Jan 14 15:23:57 2026 kworker/303:0+events
-> 348910 Dl   Wed Jan 14 23:00:20 2026 uvm_ublk
-> 355239 D    Wed Jan 14 23:04:18 2026 kworker/u775:1+flush-259:11
-> 
-> The device number of the ublk device is exact 259:11.
-> 
-> After this hang occurs, we can still create new ublk devices, but we cannot
-> delete them. While UBLK_U_CMD_STOP_DEV can be sent, UBLK_U_CMD_DEL_DEV never
-> receives a response from io_uring, and the issuing process hangs in S state.
-> 
-> I give the process's stack in the following:
-> 
-> 
-> # The ublk server
-> $ cat /proc/348910/stack 
-> [<0>] io_wq_put_and_exit+0xa6/0x210
-> [<0>] io_uring_clean_tctx+0x8c/0xd0
-> [<0>] io_uring_cancel_generic+0x19b/0x370
-> [<0>] __io_uring_cancel+0x1b/0x30
-> [<0>] do_exit+0x17a/0x530
-> [<0>] do_group_exit+0x35/0x90
-> [<0>] get_signal+0x96e/0x9b0
-> [<0>] arch_do_signal_or_restart+0x39/0x120
-> [<0>] syscall_exit_to_user_mode+0x15f/0x1e0
-> [<0>] do_syscall_64+0x8c/0x180
-> [<0>] entry_SYSCALL_64_after_hwframe+0x78/0x80
+From: bojanala hithashri <bojanalahithashri@gmail.com> 
 
-The above trace means that io-wq workers are stuck on blocked I/O.
 
-However, all builtin uring_cmd won't be run from io-wq, so it is very
-likely that your target IO handling is stuck somewhere, then some ublk io
-commands can't be completed.
+Hello,
 
-If your system supports drgn and it is still ready to collect log, it
-should be pretty easy to figure out the reason by writing one drgn script
-to dump ublk queue/ublk io of driver.
- 
-> [2. Kernel version]
-> 
-> Linux  6.8.0-87-generic #88-Ubuntu SMP PREEMPT_DYNAMIC Sat Oct 11 09:28:41 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux
-> 
-> I am running Ubuntu 24:
-> 
-> Distributor ID: Ubuntu
-> Description:    Ubuntu-Server 24.04.2 2025.05.26 (Cubic 2025-05-27 05:35)
-> Release:        24.04
-> Codename:       noble
-> 
-> [3. Steps to reproduce]
-> Sorry, as this happens only in one process among one of our production servers,
-> I do not find an easy way to reproduce the error.
-> 
-> [4. Dmesg/Logs]
-> I can only find the logs like following. Apart from the kworker, there are
-> similar logs for the ublk server iou-wrk.
-> 
-> Jan 15 00:53:02 kernel: INFO: task kworker/303:0:77625 blocked for more than 122 seconds.
-> Jan 15 00:53:02 kernel:       Tainted: G           OE      6.8.0-87-generic #88-Ubuntu
-> Jan 15 00:53:02 kernel: "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-> Jan 15 00:53:02 kernel: task:kworker/303:0   state:D stack:0     pid:77625 tgid:77625 ppid:2      flags:0x00004000
-> Jan 15 00:53:02 kernel: Workqueue: events delayed_fput
-> Jan 15 00:53:02 kernel: Call Trace:
-> Jan 15 00:53:02 kernel:  <TASK>
-> Jan 15 00:53:02 kernel:  __schedule+0x27c/0x6b0
-> Jan 15 00:53:02 kernel:  schedule+0x33/0x110
-> Jan 15 00:53:02 kernel:  io_schedule+0x46/0x80
-> Jan 15 00:53:02 kernel:  folio_wait_bit_common+0x136/0x330
-> Jan 15 00:53:02 kernel:  ? __pfx_wake_page_function+0x10/0x10
-> Jan 15 00:53:02 kernel:  __folio_lock+0x17/0x30
-> Jan 15 00:53:02 kernel:  write_cache_pages+0x1cd/0x430
-> Jan 15 00:53:02 kernel:  ? __pfx_blkdev_get_block+0x10/0x10
-> Jan 15 00:53:02 kernel:  ? __pfx_block_write_full_folio+0x10/0x10
-> Jan 15 00:53:02 kernel:  blkdev_writepages+0x6f/0xb0
-> Jan 15 00:53:02 kernel:  do_writepages+0xcd/0x1f0
-> Jan 15 00:53:02 kernel:  ? srso_alias_return_thunk+0x5/0xfbef5
-> Jan 15 00:53:02 kernel:  filemap_fdatawrite_wbc+0x75/0xb0
-> Jan 15 00:53:02 kernel:  __filemap_fdatawrite_range+0x58/0x80
-> Jan 15 00:53:02 kernel:  filemap_write_and_wait_range+0x59/0xc0
-> Jan 15 00:53:02 kernel:  bdev_release+0x18e/0x240
-> Jan 15 00:53:02 kernel:  blkdev_release+0x15/0x30
-> Jan 15 00:53:02 kernel:  __fput+0xa0/0x2e0
-> Jan 15 00:53:02 kernel:  delayed_fput+0x23/0x40
-> Jan 15 00:53:02 kernel:  process_one_work+0x181/0x3a0
-> Jan 15 00:53:02 kernel:  worker_thread+0x306/0x440
-> Jan 15 00:53:02 kernel:  ? srso_alias_return_thunk+0x5/0xfbef5
-> Jan 15 00:53:02 kernel:  ? _raw_spin_lock_irqsave+0xe/0x20
-> Jan 15 00:53:02 kernel:  ? __pfx_worker_thread+0x10/0x10
-> Jan 15 00:53:02 kernel:  kthread+0xef/0x120
-> Jan 15 00:53:02 kernel:  ? __pfx_kthread+0x10/0x10
-> Jan 15 00:53:02 kernel:  ret_from_fork+0x44/0x70
-> Jan 15 00:53:02 kernel:  ? __pfx_kthread+0x10/0x10
-> Jan 15 00:53:02 kernel:  ret_from_fork_asm+0x1b/0x30
-> Jan 15 00:53:02 kernel:  </TASK>
-> 
-> [5. Technical Hypothesis]
-> I suspect a deadlock occurs during the following sequence (assuming ublk id
-> is 123):
-> 
-> 1. User program writes to /dev/ublkb123 via cached I/O, leaving dirty pages
->    in the page cache.
-> 2. The ublk server receives SIGINT and issues UBLK_U_CMD_STOP_DEV.
-> 3. The kernel path STOP_DEV -> del_gendisk() -> bdev_mark_dead() attempts to
->    flush dirty pages.
-> 4. This flush generates new I/O requests directed back to the ublk server.
-> 5. The ublk server receives SIGKILL at this moment, its threads stop and can
->    no longer handle the I/O requests generated by the flush in step 3.
-> 6. The server remains stuck in del_gendisk(), waiting for I/O completion that
->    will never happen.
-> 
-> [6. My Question]
-> 1. Would enable UBLK_F_USER_RECOVERY solve this bug? I find UBLK_F_USER_RECOVERY
->    allows  ublk_unquiesce_dev() to be called during ublk_stop_dev.
-> 2. Should userspace strictly forbid to send SIGKILL to ublk server?
+I am reporting a small but consistent block I/O performance regression
+observed when running 4k random reads across queue depths on a hardware
+RAID device.
 
-It is fine to send KILL to ublk server, and actually it is used widely in ublk
-kernel selftest.
+The regression appears when comparing a RHEL9 downstream kernel against
+a linux-next snapshot.
 
-> 3. I try to search the related bug fix or patches, but does not find.
->    Are there known fixes in later kernels (6.10+) that address this specific
->    interaction between del_gendisk and server termination?
+System / Hardware
+-----------------
+CPU:   
+      Model: Intel Xeon Gold 6130 @ 2.10GHz
+      Architecture: x86_64
+      Sockets: 2
+      Cores per socket: 16
+      Threads per core: 2
+      NUMA nodes: 2
+Memory: 
+      Total: 187 GB
+      NUMA nodes: 2
+      Node 0: ~94 GB
+      Node 1: ~97 GB
+      Swap: 4 GB (unused during test)
 
-I'd understand why ublk server is stuck in io_wq_put_and_exit() first, so
-far it is very likely caused by your ublk target logic...
+Storage controller:
+  Dell PERC H740P (hardware RAID)
 
-If the cancel code path can move on, the ublk uring_cmd cancel function will fail
-the inflight uring_cmd first, and finally the ublk char device is released
-after ublk server is exit really, then all pending ublk block requests are aborted,
-and everything can move on.
- 
+Block device:
+  /dev/sdh
+
+lsblk output:
+  NAME MODEL           SIZE ROTA TRAN SCHED
+  sdh  PERC H740P Adp  1.6T    1      mq-deadline
+
+Active scheduler:
+  /sys/block/sdh/queue/scheduler
+    none [mq-deadline] kyber bfq
+
+Kernels Tested
+--------------
+Baseline (downstream):
+  5.14.0-427.13.1.el9_4.x86_64
+
+Test (upstream integration tree):
+  6.19.0-rc1-next-20251219
+
+Workload / Reproducer
+---------------------
+fio version: 3.35
+Raw block device, direct I/O, libaio, single job, long runtime (300s)
+
+Command used:
+
+for depth in 1 2 4 8 16 32 64 128 256 512 1024 2048; do
+  fio --rw=randread \
+      --bs=4096 \
+      --name=randread-$depth \
+      --filename=/dev/sdh \
+      --ioengine=libaio \
+      --numjobs=1 --thread \
+      --norandommap \
+      --runtime=300 \
+      --direct=1 \
+      --iodepth=$depth \
+      --scramble_buffers=1 \
+      --offset=0 \
+      --size=100g
+done
+
+Observed Behavior
+-----------------
+Across all queue depths tested, the linux-next kernel shows:
+
+- ~1–3.5% lower IOPS
+- Corresponding bandwidth reduction
+- ~1–3.6% higher average completion latency
+- Slightly worse p99 / p99.9 latency
+
+The throughput saturation point remains unchanged
+(around iodepth ≈ 128), suggesting the regression is
+related to service/dispatch efficiency rather than a
+change in device limits.
+
+Example Data Points
+-------------------
+- iodepth=32:
+    old: 554 IOPS → new: 535 IOPS  (~-3.4%)
+    avg clat: 57.7 ms → 59.8 ms
+
+- iodepth=64:
+    old: 608 IOPS → new: 588 IOPS  (~-3.3%)
+    avg clat: 105 ms → 109 ms
+
+- iodepth=128:
+    old: 648 IOPS → new: 640 IOPS (~-1.2%)
+
+This behavior is consistent across multiple runs.
+
+Notes
+-----
+I understand this comparison spans a downstream RHEL kernel
+and a linux-next snapshot. I wanted to report this early
+because the regression is consistent and may relate to recent
+blk-mq or mq-deadline changes affecting rotational / hardware
+RAID devices.
+
+I am happy to:
+- Re-test on a specific mainline release (e.g. v6.18 or v6.19-rc)
+- Compare schedulers (mq-deadline vs none / bfq)
+- Provide additional instrumentation (iostat, perf, bpf)
+- Assist with bisection if a suspect window is identified
+
+Please let me know how you would like me to proceed.
 
 Thanks,
-Ming
-
+Hithashree
