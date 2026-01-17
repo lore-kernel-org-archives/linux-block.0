@@ -1,108 +1,54 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail-m82199.xmail.ntesmail.com (mail-m82199.xmail.ntesmail.com [156.224.82.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CDD22040B6
-	for <linux-block@vger.kernel.org>; Sat, 17 Jan 2026 11:17:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AC30197A7D
+	for <linux-block@vger.kernel.org>; Sat, 17 Jan 2026 23:53:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.224.82.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768648625; cv=none; b=KIk6LYliX7ceMRAV1GZPETl11nAgRbUrUxA956OqmeLlvIQPnbdWhiGJJIfgVikbwINKXyylQAZ0kHSD7JZ+SboaXoAIs8c1JkEv4EHScM7Dd1Y4siQzqTl77Zg4hW/PBlfYsBjaxJ3Kuq+5vemDRqTpvNLUuxhfOIOgGNyi3Cg=
+	t=1768693999; cv=none; b=S4SBal/cUxQ3BorpB8p6pM4epcdoXX/M6FwYmbbCs4Uzj/BQ6/lJtjh/28omIQn+QSrQ1de57ApJ9OVVSg4OzGmG+DzdfzB3BCiQ7UdpgNxuPTB99UiEuoHLp6jR6yWmTtQwiqwg2tIrIODNsS1IKbyVO6B07VAJ/hybylpmMiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768648625; c=relaxed/simple;
-	bh=JqAYO3YS1sIBl2Yf0AhYA5osVLZjSa9XwywoEptfwvs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XlS4eJUyryPzOjSKLDAp5/SOoOJ49ncHEyew3erkgi7jHM/vs/DbLkNCEJFu7xxtJmqmNkhPuOEX9BnW+L8nb0aQ9GFM7sk6keOvRsA27bn/C+xDwoHFVNbeYTgrZQAAooRZIOPn/GeBaEOXwqcwNCI3ybo7ijnrzAEk4kK6Wr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RqdvZ458; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1768693999; c=relaxed/simple;
+	bh=e+Vqax/BuQkaT9Z3A50Be90HXCv2Tsa8HACcXaqlGd8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=q7HG6vJHqmn52RzsCfcXMHJN3gy29yAzUHtzn4A6yMTa9yVvwBBhxO6ql7YG/ZLV+0O0egvIYOExQ4i1QuCrDF+RIeFG/rNOovsmek3WUSgJZzjLclPWs1Nom3xEjCFqdiaQdCd5mOIkifQ4B0gFt5FXmKiOBppA60LkvlFRpSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deepseek.com; spf=pass smtp.mailfrom=deepseek.com; dkim=pass (1024-bit key) header.d=deepseek.com header.i=@deepseek.com header.b=CQGamB1R; arc=none smtp.client-ip=156.224.82.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=deepseek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=deepseek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RqdvZ458"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768648623;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6/KiGtA5gxoeaNwzoYsGO+4lk+MYFWP1WZBtCPpeyFA=;
-	b=RqdvZ4588ptoz5TL6WiFb9kQOxI8WzJY2X4XoV2IgP22orKySHaV9KlKAilMqZRlTB8aak
-	E+b/aoN+k61yzb9b8iqEesgV3AjnbohBYoXHswYLNcMG2jvZR3FwOfX0QHmjeyhsy1PNV5
-	vV0VLCmCxgPevCdEQ33HnRLZoHHPEfs=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-177-Y84OqkjGOMqchU1aI7o78Q-1; Sat,
- 17 Jan 2026 06:16:59 -0500
-X-MC-Unique: Y84OqkjGOMqchU1aI7o78Q-1
-X-Mimecast-MFC-AGG-ID: Y84OqkjGOMqchU1aI7o78Q_1768648618
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 510B01956080;
-	Sat, 17 Jan 2026 11:16:58 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.198])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E99CC19560A7;
-	Sat, 17 Jan 2026 11:16:54 +0000 (UTC)
-Date: Sat, 17 Jan 2026 19:16:48 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: huang-jl <huang-jl@deepseek.com>
-Cc: linux-block@vger.kernel.org
+	dkim=pass (1024-bit key) header.d=deepseek.com header.i=@deepseek.com header.b="CQGamB1R"
+Received: from localhost.localdomain (unknown [IPV6:2402:f000:5:c001:5d8e:8961:95e5:4104])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 310158bf6;
+	Sun, 18 Jan 2026 01:03:19 +0800 (GMT+08:00)
+From: huang-jl <huang-jl@deepseek.com>
+To: ming.lei@redhat.com
+Cc: huang-jl@deepseek.com,
+	linux-block@vger.kernel.org
 Subject: Re: [BUG] ublk: ublk server hangs in D state during STOP_DEV
-Message-ID: <aWtvoHe3Yt8xbmdb@fedora>
-References: <aWpSHIBn_1W_Xo9h@fedora>
- <20260116171613.46312-1-huang-jl@deepseek.com>
- <aWs91n3yzPX9mZaV@fedora>
+Date: Sun, 18 Jan 2026 01:03:19 +0800
+Message-Id: <20260117170319.51050-1-huang-jl@deepseek.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <aWtvoHe3Yt8xbmdb@fedora>
+References: <aWtvoHe3Yt8xbmdb@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aWs91n3yzPX9mZaV@fedora>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Transfer-Encoding: 8bit
+X-HM-Tid: 0a9bcce94a8d09d9kunm107a9fd8769302
+X-HM-MType: 1
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVkaShlKVkoYSR9LSkNCTUgYGlYVFAkWGhdVEwETFh
+	oSFyQUDg9ZV1kYEgtZQVlJT0tJQR1LS0tBTkEYS0tKQU4fQx5BQ0JNSkFCTh5OQU9KS09ZV1kWGg
+	8SFR0UWUFZT0tIVUlJTUtNTkpVSktLVUpCS0tZBg++
+DKIM-Signature: a=rsa-sha256;
+	b=CQGamB1R9W4KpfgmqjVC1ldw0b49rLP8vT0KiE2P0vnWzWYQNOaD8rITO74d1oZEO2wWwhCuT/FrQ73+GCNJo0mOKROq1u56A+CN73hAESjeoRLWpksqn2yNjuKjUDWoYpKrSBwdrbietDliguhKBScEeiQKMOePPXCt4UKKop0=; c=relaxed/relaxed; s=default; d=deepseek.com; v=1;
+	bh=saft5v32MGJEFwZXUGq387ACC2HNVobO04cpzfMTIRY=;
+	h=date:mime-version:subject:message-id:from;
 
-On Sat, Jan 17, 2026 at 03:44:22PM +0800, Ming Lei wrote:
-> On Sat, Jan 17, 2026 at 01:16:13AM +0800, huang-jl wrote:
-> > > I'd understand why ublk server is stuck in io_wq_put_and_exit() first, so
-> > > far it is very likely caused by your ublk target logic...
-> > 
-> > I think the io-wq worker is stuck executing STOP_DEV uring cmd,
-> > and not our target I/O logic causes the issue. Let me explain:
-> > 
-> > Looking at the iou-wrk thread (348911) stack trace, this iou-wrk is a thread
-> > in my D-state ublk server, its stack is as follows:
-> > 
-> > $ cat /proc/348910/task/348911/stack 
-> > [<0>] folio_wait_bit_common+0x136/0x330
-> > [<0>] __folio_lock+0x17/0x30
-> > [<0>] write_cache_pages+0x1cd/0x430
-> > [<0>] blkdev_writepages+0x6f/0xb0
-> > [<0>] do_writepages+0xcd/0x1f0
-> > [<0>] filemap_fdatawrite_wbc+0x75/0xb0
-> > [<0>] __filemap_fdatawrite_range+0x58/0x80
-> > [<0>] filemap_write_and_wait_range+0x59/0xc0
-> > [<0>] bdev_mark_dead+0x85/0xd0
-> > [<0>] blk_report_disk_dead+0x87/0xf0
-> > [<0>] del_gendisk+0x37f/0x3b0
-> > [<0>] ublk_stop_dev+0x89/0x100 [ublk_drv]
-> > [<0>] ublk_ctrl_uring_cmd+0x51a/0x750 [ublk_drv]
-> > [<0>] io_uring_cmd+0x9f/0x140
-> > [<0>] io_issue_sqe+0x193/0x410
-> > [<0>] io_wq_submit_work+0xe2/0x380
-> > [<0>] io_worker_handle_work+0xdf/0x340
-> > [<0>] io_wq_worker+0xf9/0x350
-> > [<0>] ret_from_fork+0x44/0x70
-> > [<0>] ret_from_fork_asm+0x1b/0x30
-> > 
-> > This shows:
-> > 
-> > - The STOP_DEV command is being executed by an io-wq worker thread
-> > - ublk_stop_dev() called del_gendisk()
-> > - del_gendisk() is trying to flush dirty pages via bdev_mark_dead()
-> > - The writeback is stuck waiting for a folio lock
-> 
 > > - Upon receiving SIGINT, our ublk server will sends UBLK_U_CMD_STOP_DEV to the
-> >  driver.
+> > driver.
 > 
 > Can you share how your server sends STOP_DEV when receiving SIGINT?
 > 
@@ -112,23 +58,66 @@ On Sat, Jan 17, 2026 at 03:44:22PM +0800, Ming Lei wrote:
 > 
 > prepare UBLK_IO_FETCH_REQ uring_cmds;
 > while (1) {
-> 	io_uring_enter(submission & wait event);
+> io_uring_enter(submission & wait event);
 > }
 > 
 > If you send STOP_DEV command inside the above loop, you will get the
 > deadlock, because inflight and new IOs can't be handled any more.
 
-If that is the case, you may remove the sending of STOP_DEV simply in your
-implementation, and let ublk server exit. Then delete the ublk device before
-ublk server is exiting to kernel, or let your monitor process remove the
-ublk device, which becomes DEAD state after ublk server exits.
+My ublk server has two threads:
 
-Otherwise, you may have to investigate why ublk server can't handle IO
-command after sending STOP_DEV command.
+- The main thread: opens /dev/ublk-control and create an io uring. It handles
+  all control uring cmd (e.g., ADD_DEV, START_DEV, STOP_DEV).
 
-STOP_DEV and DEL_DEV command may need to be documented for ublk server to
-avoid deadlock.
+- A worker thread: also creates an io uring. It will send UBLK_U_IO_FETCH_REQ
+  and UBLK_U_IO_COMMIT_AND_FETCH_REQ uring cmd, and handle IO request.
+
+Main thread will first ADD and START device, then listens for SIGINT signal.
+Upon receiving SIGINT, main thread issues a STOP_DEV cmd.
+The worker thread continues running independently and is not directly affected
+by this signal.
+
+(Implementation detail: I am using Rust and the Tokio async runtime. The SIGINT
+is handled within the userspace rather than directly inside the signal handler.)
+
+> If that is the case, you may remove the sending of STOP_DEV simply in your
+> implementation, and let ublk server exit. Then delete the ublk device before
+> ublk server is exiting to kernel, or let your monitor process remove the
+> ublk device, which becomes DEAD state after ublk server exits.
+> 
+> Otherwise, you may have to investigate why ublk server can't handle IO
+> command after sending STOP_DEV command.
+
+Based on my previous post [1], **the ublk server gets SIGKILL after sending
+STOP_DEV command**, so it cannot handle IO request.
+
+In detail:
+
+1. Flush Kernel Thread: A kworker/flush thread attempts to write dirty pages
+to the ublk device. It acquires a folio lock but then enters a sleep state
+in wbt_wait() due to Writeback Throttling (WBT).
+
+2. STOP_DEV Command: The ublk server issues a STOP_DEV command. This uring cmd
+is processed by an uring kernel thread.
+
+3. Resource Conflict: When handle STOP_DEV, the uring kernel thread also tries
+to flush dirty pages. It needs to acquire the same folio lock held by the flush
+kworker to submit the I/O.
+
+4. Termination Signal: At this point, the ublk server receives a SIGKILL.
+
+Conclusion:
+This creates a circular dependency: the flush kworker cannot be woken from WBT
+because the ublk server is no longer processing I/O requests.
+Simultaneously, the ublk server cannot exit because it is waiting for the
+STOP_DEV command to complete. However, the uring kernel thread remains stuck
+waiting for the folio lock held by the flush kworker.
+
+Should we avoid having the ublk server issue STOP_DEV command by it self? As it
+is highly prone to deadlocks if a SIGKILL occurs during the shutdown sequence.
 
 Thanks,
-Ming
+huang-jl
+
+[1]: https://lore.kernel.org/linux-block/aWtvoHe3Yt8xbmdb@fedora/T/#mdd14011f6830a7e93a7df9b8df1ea93db91ebc77
 
