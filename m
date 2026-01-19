@@ -1,195 +1,103 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F2302FFFA4;
-	Mon, 19 Jan 2026 17:45:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3D0432FA30
+	for <linux-block@vger.kernel.org>; Mon, 19 Jan 2026 18:04:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768844738; cv=none; b=paF1/pjpEKrRTxHWaJBW1e3aSkeMQ5h35Xthx0Rtw+Z6VWA+2GMEJZmTuMLzv444LUeF3xGc7IKUx9sp6aZXJ44uJHRZF9P2WSRsAm3eYYHhCdJET0P6CNzXalzJCxJV+yt272TdZ7cpxQxcDr881us1BWc1c8SH0X5zY4c9GXE=
+	t=1768845860; cv=none; b=E0XtzhKqkvm38GVwPne0/iAceP12kMPL+3QIeRI97Or7yRJGaDOurGqeptWd2atqqtNiHoxzPuhlT2qHnmb0KQutoGFj0gIHtd4EqF9rX3cR80XAkQukmWjNjQPVWvUTMaLX6jvWPktnib+52ilOZc5Janww4xFSuntm8dcOd/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768844738; c=relaxed/simple;
-	bh=GPpH+lrbGOkUO+HU9Chxi5Q9b/lVJMf37L9lUr7ORSQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZAt7XMeyn6XaRzwLVKJoySz9CMWaaF+M0sYjmyeivm6CfZEfQ/ujXe2Pa2pwdcaLbcehCm6iNDjjwjZHdibs2GyPOsrwPiIgwRs+Xabk+k+37MmCxPC+63lstYn5pgjUqY1c+Vn1/M8z47I1VEFRc11trDZd4uT0jF1mR65tX3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C5XRitry; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768845860; c=relaxed/simple;
+	bh=YZ/etbGKsvDJxBmVxSvaiidiFCzoS7a7uBNHPljZECU=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=p9p9kcN/xXzQlcV9/Jn1WK/GRurr3SsCLq0x8qcUY1FsULJN7hn0X5VNiybgodrdLEhB/YHGvnwnnIwaCB6NHnU6juPDNBLiSzPA02yIPhssU9c32Qr6BWgLMNTuAe8W+kQPq34FEPBMIxYsW35lMAPt4WAqe9YxxKzLfPtAPuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=OnLiU09w; arc=none smtp.client-ip=209.85.210.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C5XRitry"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 264B7C116C6;
-	Mon, 19 Jan 2026 17:45:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768844738;
-	bh=GPpH+lrbGOkUO+HU9Chxi5Q9b/lVJMf37L9lUr7ORSQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=C5XRitryyvB369UvpUUl4ZByVUzZnV/Os70U8sb5qN7qyvUay3fkYqXuMerG1KiaK
-	 uiCUCQPF45PW7tt+hEkQzAKhgO2IXjJlJGMPNTIhEbYTIEDRde7TbzUW7Odwa6CiU0
-	 RYgOM/1POMEt5PwTYJmmkKJ2iPsOrShfOjrk4tKwSREc4rPj5kvQv+/m8qkx1xYOoq
-	 GfbiOA5x4FLcNJ3KgUtHdwWYiCpSHNMLSQdDRWPLKD2/Pf4n9wXkJhSCG/7GMnVUS8
-	 xboHbYe45dKIdeVZUtIKXcTbU53+OBiVlxyAlKjzZbwJ+7XYrwiro3TzMUuc86s/u6
-	 7JcdUFJL9s1kg==
-Date: Mon, 19 Jan 2026 09:45:37 -0800
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Christian Brauner <brauner@kernel.org>,
-	Carlos Maiolino <cem@kernel.org>, Qu Wenruo <wqu@suse.com>,
-	Al Viro <viro@zeniv.linux.org.uk>, linux-block@vger.kernel.org,
-	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 14/14] xfs: use bounce buffering direct I/O when the
- device requires stable pages
-Message-ID: <20260119174537.GD15551@frogsfrogsfrogs>
-References: <20260119074425.4005867-1-hch@lst.de>
- <20260119074425.4005867-15-hch@lst.de>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="OnLiU09w"
+Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-7cfd5d34817so3025295a34.1
+        for <linux-block@vger.kernel.org>; Mon, 19 Jan 2026 10:04:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1768845858; x=1769450658; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vmjU0ak1lsaum7nFKQEIrOwHth+XfV015kG/Ob4QYXY=;
+        b=OnLiU09wld5WQRpjSlS219gNjtnCOrZSCvhGfWFB7+9ATHG4Q2Fz54O6KPKKInIgdQ
+         AafHd6hc5nzZDQIwH665h4TGy5E65JYIxi+Lf7KdqH9M6ikrNJeL+pIPHOm+SfBVuai8
+         hLdh8/0uYUF7K+plcWGqWcEgoCIPM6MxAELy6o3hHvYhgjL8yrv/nBXeFDoxe98xNP8i
+         PN8uDvxSdI8kLdGMvFToGIxmshh8SiStjZxFNIJcJmFiVEHNrB8AFldiIugoFbU68cQM
+         MBmOVqADeK9sB2yV+SllU59mYs2JxCY3MBqfXmsBBN99r72GVBBbP9x9WFE+A49Gfpcr
+         G0BA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768845858; x=1769450658;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=vmjU0ak1lsaum7nFKQEIrOwHth+XfV015kG/Ob4QYXY=;
+        b=G3wrpMVa2VvjOYBLZFSgZFkTJo0Z0k8vVbxxbuyXBjNZEhZZz9eyqfD2gz/LIcfpMQ
+         k2I88y73DFhuvy1nPvd7IiugVWU20s4z/5xu1cQwCOU5iyWAF0brZIwHgEsCWsdd0hY+
+         PVpcHxva5/WSTpEbNTbC1jxqBqfnFMR2PusL2gjbQgOzytHVxqLkKTbttx2N/Ewh6hHS
+         yzOg7M5m02HCm3MqjsR5CSCy9xn3gS/9/CuEFemGgBo9ZxUfvtOtmJLtcNFSet3femVe
+         LH1TuUnL4tmlmpbopb65y8G5Vhr57qyUyQZhmOJgcPtsC/1CR5HkLmaIIn0TVMgRvkx8
+         p/dA==
+X-Gm-Message-State: AOJu0Yy8AJ4WmbZBGtsk6yvzaoOeDza3Y5RfzuUpCAR6ezl2PxXaatr3
+	E/t8TQtxKqNswwHwErMKthxujZGUEK5az5RA5fwcC8+FUZ1tqvTBcVOMrWoTQf+Hwd8aDCL8S5t
+	o20ls
+X-Gm-Gg: AY/fxX6Z/gpJZ7hZ8cRESpGJFinJE9UGIUc4R+K4SZBqreiLQQitpWzcYq4HyoQdDDu
+	42V0HvP3lfmh6FDxV/3GEliXoWMBWzLYFkLZycUWeEMJQhFWLLgO+Q80jAPyMHhYyhAhacV/vaB
+	LwflRDJF94cQDQfqI6pOkhWmwUzkKuc1imdaU55MG7lYkFEE1lUHiPxpcs8uj/HQK/q552un4rj
+	f9yhZU9+nNJ6ACDIQ+jmENo9SSoMCU6CDmh/fCh1kI3bOHncuiKsh1vVurzcVYedipLCIhDu5m5
+	3QXKK15a4iXnOyAb/wuWBnW86Jgcq+etqYp/un0ANZnQODUSX5HZkkqTZKL6kvfvpkf3Bl/xkCx
+	Ab6SHj5Btc8ZdlVjVkogMDdCj58nP4i02Kh/y6s9sLK6KJKtlja3dABRH0zQ8loFaIMplcvpjHQ
+	CfWZROBAHFH3gJ6TeP4+5h6jSjecRq97QaxYayvGNKCDGl+YAEKSyttc1QiaALXtSy
+X-Received: by 2002:a05:6830:25c6:b0:7c7:5d72:566c with SMTP id 46e09a7af769-7cfe0137951mr5338260a34.24.1768845857758;
+        Mon, 19 Jan 2026 10:04:17 -0800 (PST)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7cfdf2b57e2sm7059274a34.27.2026.01.19.10.04.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Jan 2026 10:04:17 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>, 
+ Damien Le Moal <dlemoal@kernel.org>
+In-Reply-To: <20260114192803.4171847-1-bvanassche@acm.org>
+References: <20260114192803.4171847-1-bvanassche@acm.org>
+Subject: Re: (subset) [PATCH 0/2] Fix an error path in
+ disk_update_zone_resources()
+Message-Id: <176884585683.1591133.6692823875201359295.b4-ty@kernel.dk>
+Date: Mon, 19 Jan 2026 11:04:16 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260119074425.4005867-15-hch@lst.de>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3
 
-On Mon, Jan 19, 2026 at 08:44:21AM +0100, Christoph Hellwig wrote:
-> Fix direct I/O on devices that require stable pages by asking iomap
-> to bounce buffer.  To support this, ioends are used for direct reads
-> in this case to provide a user context for copying data back from the
-> bounce buffer.
-> 
-> This fixes qemu when used on devices using T10 protection information
-> and probably other cases like iSCSI using data digests.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Ahaha, I forgot in the last round that s_dio_done_wq is not at all the
-place for doing bio completions.
-Reviewed-by: "Darrick J. Wong" <djwong@kernel.org>
+On Wed, 14 Jan 2026 11:28:00 -0800, Bart Van Assche wrote:
+> This patch series includes a fix for an error path in
+> disk_update_zone_resources() and also the patch with which this bug was
+> discovered. Compile-tested only.
+> 
+> Please consider this patch series for inclusion in the upstream kernel.
+> 
+> Thanks,
+> 
+> [...]
 
---D
+Applied, thanks!
 
-> ---
->  fs/xfs/xfs_aops.c |  8 ++++++--
->  fs/xfs/xfs_file.c | 41 ++++++++++++++++++++++++++++++++++++++---
->  2 files changed, 44 insertions(+), 5 deletions(-)
-> 
-> diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-> index 56a544638491..c3c1e149fff4 100644
-> --- a/fs/xfs/xfs_aops.c
-> +++ b/fs/xfs/xfs_aops.c
-> @@ -103,7 +103,7 @@ xfs_ioend_put_open_zones(
->   * IO write completion.
->   */
->  STATIC void
-> -xfs_end_ioend(
-> +xfs_end_ioend_write(
->  	struct iomap_ioend	*ioend)
->  {
->  	struct xfs_inode	*ip = XFS_I(ioend->io_inode);
-> @@ -202,7 +202,11 @@ xfs_end_io(
->  			io_list))) {
->  		list_del_init(&ioend->io_list);
->  		iomap_ioend_try_merge(ioend, &tmp);
-> -		xfs_end_ioend(ioend);
-> +		if (bio_op(&ioend->io_bio) == REQ_OP_READ)
-> +			iomap_finish_ioends(ioend,
-> +				blk_status_to_errno(ioend->io_bio.bi_status));
-> +		else
-> +			xfs_end_ioend_write(ioend);
->  		cond_resched();
->  	}
->  }
-> diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
-> index 7874cf745af3..f6cc63dcf961 100644
-> --- a/fs/xfs/xfs_file.c
-> +++ b/fs/xfs/xfs_file.c
-> @@ -224,12 +224,34 @@ xfs_ilock_iocb_for_write(
->  	return 0;
->  }
->  
-> +/*
-> + * Bounce buffering dio reads need a user context to copy back the data.
-> + * Use an ioend to provide that.
-> + */
-> +static void
-> +xfs_dio_read_bounce_submit_io(
-> +	const struct iomap_iter	*iter,
-> +	struct bio		*bio,
-> +	loff_t			file_offset)
-> +{
-> +	iomap_init_ioend(iter->inode, bio, file_offset, IOMAP_IOEND_DIRECT);
-> +	bio->bi_end_io = xfs_end_bio;
-> +	submit_bio(bio);
-> +}
-> +
-> +static const struct iomap_dio_ops xfs_dio_read_bounce_ops = {
-> +	.submit_io	= xfs_dio_read_bounce_submit_io,
-> +	.bio_set	= &iomap_ioend_bioset,
-> +};
-> +
->  STATIC ssize_t
->  xfs_file_dio_read(
->  	struct kiocb		*iocb,
->  	struct iov_iter		*to)
->  {
->  	struct xfs_inode	*ip = XFS_I(file_inode(iocb->ki_filp));
-> +	unsigned int		dio_flags = 0;
-> +	const struct iomap_dio_ops *dio_ops = NULL;
->  	ssize_t			ret;
->  
->  	trace_xfs_file_direct_read(iocb, to);
-> @@ -242,7 +264,12 @@ xfs_file_dio_read(
->  	ret = xfs_ilock_iocb(iocb, XFS_IOLOCK_SHARED);
->  	if (ret)
->  		return ret;
-> -	ret = iomap_dio_rw(iocb, to, &xfs_read_iomap_ops, NULL, 0, NULL, 0);
-> +	if (mapping_stable_writes(iocb->ki_filp->f_mapping)) {
-> +		dio_ops = &xfs_dio_read_bounce_ops;
-> +		dio_flags |= IOMAP_DIO_BOUNCE;
-> +	}
-> +	ret = iomap_dio_rw(iocb, to, &xfs_read_iomap_ops, dio_ops, dio_flags,
-> +			NULL, 0);
->  	xfs_iunlock(ip, XFS_IOLOCK_SHARED);
->  
->  	return ret;
-> @@ -703,6 +730,8 @@ xfs_file_dio_write_aligned(
->  		xfs_ilock_demote(ip, XFS_IOLOCK_EXCL);
->  		iolock = XFS_IOLOCK_SHARED;
->  	}
-> +	if (mapping_stable_writes(iocb->ki_filp->f_mapping))
-> +		dio_flags |= IOMAP_DIO_BOUNCE;
->  	trace_xfs_file_direct_write(iocb, from);
->  	ret = iomap_dio_rw(iocb, from, ops, dops, dio_flags, ac, 0);
->  out_unlock:
-> @@ -750,6 +779,7 @@ xfs_file_dio_write_atomic(
->  {
->  	unsigned int		iolock = XFS_IOLOCK_SHARED;
->  	ssize_t			ret, ocount = iov_iter_count(from);
-> +	unsigned int		dio_flags = 0;
->  	const struct iomap_ops	*dops;
->  
->  	/*
-> @@ -777,8 +807,10 @@ xfs_file_dio_write_atomic(
->  	}
->  
->  	trace_xfs_file_direct_write(iocb, from);
-> -	ret = iomap_dio_rw(iocb, from, dops, &xfs_dio_write_ops,
-> -			0, NULL, 0);
-> +	if (mapping_stable_writes(iocb->ki_filp->f_mapping))
-> +		dio_flags |= IOMAP_DIO_BOUNCE;
-> +	ret = iomap_dio_rw(iocb, from, dops, &xfs_dio_write_ops, dio_flags,
-> +			NULL, 0);
->  
->  	/*
->  	 * The retry mechanism is based on the ->iomap_begin method returning
-> @@ -867,6 +899,9 @@ xfs_file_dio_write_unaligned(
->  	if (flags & IOMAP_DIO_FORCE_WAIT)
->  		inode_dio_wait(VFS_I(ip));
->  
-> +	if (mapping_stable_writes(iocb->ki_filp->f_mapping))
-> +		flags |= IOMAP_DIO_BOUNCE;
-> +
->  	trace_xfs_file_direct_write(iocb, from);
->  	ret = iomap_dio_rw(iocb, from, &xfs_direct_write_iomap_ops,
->  			   &xfs_dio_write_ops, flags, NULL, 0);
-> -- 
-> 2.47.3
-> 
-> 
+[2/2] block: Fix an error path in disk_update_zone_resources()
+      commit: 07a1bc5c14c9ef6401b21c1873c6c087075ff292
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
