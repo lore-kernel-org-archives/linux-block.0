@@ -1,49 +1,66 @@
-Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f195.google.com (mail-oi1-f195.google.com [209.85.167.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D75633ADA9
-	for <linux-block@vger.kernel.org>; Mon, 19 Jan 2026 15:07:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B957387569
+	for <linux-block@vger.kernel.org>; Mon, 19 Jan 2026 15:19:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768835248; cv=none; b=BvSyJAsSKS2x8iXPGWe6BPKBCyXpZhXxy4TdEzdOx/bgtHtb4Aev9Q4beodfUdWYtH5g4h9y6W0FEXO/af88XIDgY7OlxHUlb8wdd+hPdxcSDcrNNdH7pew+bEGklI98i82Cl8BCrRzqhi9uN01hNzxbq3mq+MFVIM/nMM1J0Xk=
+	t=1768835957; cv=none; b=aYqvjo/qSox222vV2R/zKukUERgVszCMpnVTQKahKU6H8zJexZfdGy5NI8KprdhmeQeIYrQQas3tKPwiN7Y/RhgaLk0p3Dj0A6nrQQkpBVNscZwyW9SzEAewJA5nrqVOv3ytPNmutj4X1ESe01EUsxthGokJHswS5rPR09/Xqcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768835248; c=relaxed/simple;
-	bh=JM7VN05whJCE8jBj3BeZK69T5QEE8FUa4uiPivIbJPM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=GzfGDfHBNeJsAtqT1sNcto8pWU9yPNzxdCtRt2ZJfeje8hwtVcgoTTYjWW8rxrRRcM/tWW8hVr5CW5rU+qD6/A8/smKyLNEBGg30avX5M0Iy3MoLP/p9p8LB7Jdbg0xAvpI0Sb2eNJUpQTAtLppWJCjJITRePaZhGULLn4jum7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=u7JplAdL; arc=none smtp.client-ip=203.254.224.24
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1768835957; c=relaxed/simple;
+	bh=9lYKl1A4wmL3dbwXIN3aCVha0yGrj9gb1A0dg+knqeM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mIXYO1eNCCLHgIYdkmxf0ZW/jJTs7lzzWytLfKPWQtYsOJYi5XCdSeTScoZkF0765dtBsqjxNT0DraCqqiZ+X9zKyBFapI6RdH3u6QyO7AoZvf47vhsZNBRp7mTQtCD95AYndKyOgMqim+3XusNbNmLMC4pHWJVegDJ42W5NHCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=FkxvkdHD; arc=none smtp.client-ip=209.85.167.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="u7JplAdL"
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20260119150719epoutp01ca68967782dd1cdca8cc258b9400d441~MKkc-fPkT2803228032epoutp013
-	for <linux-block@vger.kernel.org>; Mon, 19 Jan 2026 15:07:19 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20260119150719epoutp01ca68967782dd1cdca8cc258b9400d441~MKkc-fPkT2803228032epoutp013
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1768835239;
-	bh=0jeav41QIUHWhSoDptzFRbTAmSL8MmZG7TIS0IJTjF0=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=u7JplAdLbGepLlzFeBjNI128rr8r8mm94rGOFXcVnVMLWp0KVtUDgDGhi+4BotDTx
-	 LsfTcE2UEHfyPs0iKocsbVEw9Wu+nFEiLonm5CloRYdfyJTssSc1+g+WYOc22Nwyhk
-	 Gjf7Dv4+5G8OO2bhPKzG19eEoKdmPFHVQYyUmuw4=
-Received: from epsnrtp03.localdomain (unknown [182.195.42.155]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTPS id
-	20260119150718epcas5p1f2155df96dd92bf19d47d1e967a301df~MKkcM6_bH2049720497epcas5p1K;
-	Mon, 19 Jan 2026 15:07:18 +0000 (GMT)
-Received: from epcas5p1.samsung.com (unknown [182.195.38.90]) by
-	epsnrtp03.localdomain (Postfix) with ESMTP id 4dvv2F2Wh8z3hhT3; Mon, 19 Jan
-	2026 15:07:17 +0000 (GMT)
-Received: from epsmtip2.samsung.com (unknown [182.195.34.31]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-	20260119150716epcas5p3b1139cbdabe33c2e7d65832c32516fa1~MKka7CoCN2047920479epcas5p3-;
-	Mon, 19 Jan 2026 15:07:16 +0000 (GMT)
-Received: from [107.122.11.51] (unknown [107.122.11.51]) by
-	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20260119150714epsmtip231525018180c6659701036326a13e695~MKkY17Sj80973609736epsmtip2L;
-	Mon, 19 Jan 2026 15:07:14 +0000 (GMT)
-Message-ID: <ebb64c7a-e379-4c83-a7ce-89f9e9419257@samsung.com>
-Date: Mon, 19 Jan 2026 20:37:13 +0530
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="FkxvkdHD"
+Received: by mail-oi1-f195.google.com with SMTP id 5614622812f47-45c93313721so2538007b6e.2
+        for <linux-block@vger.kernel.org>; Mon, 19 Jan 2026 07:19:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1768835954; x=1769440754; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Wte8eMJNDbcrKLuDulK17hs1mTpYcPcujxWR+qNMyWA=;
+        b=FkxvkdHDP/rhGjIwObbKn0hv90Gjs/INsDHhF5CR7iSQiuxwsbie59ZNLkxms60l/o
+         1hdqe+Zz/j2iXLlFTTcyRdsQEFFZ8U4ksFPxOnRR59ifM0YJJog5Hp68l8X9lR/4Ou5z
+         2AjwLNdsuexnVnhFrRuXuyNYY5Q+IzN7zp5DEQZhX9Svm9AGCWnxGGv9kMd4GSFyOK8u
+         qRABKY+0Ldf+E3ZRs1G/Rilkg2MsjmkGvlx7grm5+RPQ4WaeOCywceFX/5aHk53pngoX
+         BPyNx+lucm5xD/W+vobUkQ49NQNOJbhXQIgrXbin1fONk+2vGraqa3AMJETL1iI0PIMy
+         gRlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768835954; x=1769440754;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Wte8eMJNDbcrKLuDulK17hs1mTpYcPcujxWR+qNMyWA=;
+        b=kr5/f/KVCN+5WbNeMpfOtHQ/RKkuUxRhK0E8BLJA4a3TSzfG1x6Xovs2962USN+M0c
+         Le3jpw0lwgtY9SZR0uQrM3TY37UB031pFXOyNjYq3hbxEC5MCrh2sG+ZLZL7CXsJyblQ
+         fPVIL8HHD5Fv8HRC47bS+hq9MNKJjWfcjdq0tZpLkgNVnIvma2bHiOf53QsCjPOqfLTM
+         aaX/9akG7Psx9fybZQ9vOlWp+mnuR+BZdzPgZal9gXGdW4izHlvBS8x1d8lNWhRJXsF0
+         8GB95Kz9nOp8tjFdrUaqOS06c/p3KByTlEerGCdjWXI2fw33oQ62pbFenJr8jwWiRQYi
+         r5ig==
+X-Gm-Message-State: AOJu0YyqUg4UZt5t2uQ3UZLNpKOTx/yRCy5Yk+Ho69u//yG5fMsaJ1TW
+	R7GLBU0s9SHEn7c4fCwmjRlQreMouR6JoV6iqTrtmVYCVb45kRzRWox0Ef/XEhoSPuc=
+X-Gm-Gg: AY/fxX6hiEvUrm18p7/xQkx2SjTgn4hBIAkH1NQHaspNPXFwj+mei0JPglJ+6hFn8BH
+	nqqiyn3ohEoYOTpX6UAczSe69L0iCgm1wbsorjQ2qgAP0eC7BXgFFqzf4EtlT+aBk8hkmHQSHWb
+	aExzVuP3DxDl/rCWci9jTqI/AYPrWgCQj8CjdXIQ1pdQ6mmmsiskEBiyjk585VZJcH6upb6O4gx
+	BjZ2HQuxY5qSsSNlaWI40Sxg2MbBchn1fngG5AffQKxn88X0v8n2aIHUCQoXj/1a+8A4clSapOF
+	QZj/U2FojR+s89k40fTL2jiikrssb8T3wBlkDS8+uoMiWFd52rvcSSv0cBYvarnxUcL8znzGeYS
+	Cx3m10ukRkEQOF7eF/nOsJxHKPM/YHR8SeM2DC978QHdH2vj3M4tGioj89/HUaNKjhQmJyyVRKn
+	3VXqLF+EZBNTEBeoz/vDzCBGIj7Soeql9mkAV/EGZvG1nf62Dj15t6kQfGegIsKHnss40Hzw5hw
+	hxga7J0
+X-Received: by 2002:a05:6808:650a:b0:45c:8d9d:8db4 with SMTP id 5614622812f47-45c9c0c3149mr5241188b6e.55.1768835954379;
+        Mon, 19 Jan 2026 07:19:14 -0800 (PST)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4044bd5c64asm7047741fac.16.2026.01.19.07.19.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 19 Jan 2026 07:19:13 -0800 (PST)
+Message-ID: <9859f637-d8f9-48e0-98ba-42cc6255c73b@kernel.dk>
+Date: Mon, 19 Jan 2026 08:19:13 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -53,32 +70,31 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH V2 0/2] nvme: optimize passthrough IOPOLL completion for
  local ring context
-To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	io-uring@vger.kernel.org, Keith Busch <kbusch@kernel.org>
+To: Ming Lei <ming.lei@redhat.com>, io-uring@vger.kernel.org,
+ Keith Busch <kbusch@kernel.org>
 Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+References: <20260116074641.665422-1-ming.lei@redhat.com>
 Content-Language: en-US
-From: Kanchan Joshi <joshi.k@samsung.com>
+From: Jens Axboe <axboe@kernel.dk>
 In-Reply-To: <20260116074641.665422-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-CMS-MailID: 20260119150716epcas5p3b1139cbdabe33c2e7d65832c32516fa1
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-cpgsPolicy: CPGSC10-542,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20260116074819epcas5p37afab1cd05fdf9e0555a14b5fe89c2dd
-References: <CGME20260116074819epcas5p37afab1cd05fdf9e0555a14b5fe89c2dd@epcas5p3.samsung.com>
-	<20260116074641.665422-1-ming.lei@redhat.com>
 
-On 1/16/2026 1:16 PM, Ming Lei wrote:
+On 1/16/26 12:46 AM, Ming Lei wrote:
 > Hello,
 > 
 > The 1st patch passes `struct io_comp_batch *` to rq_end_io_fn callback.
 > 
 > The 2nd patch completes IOPOLL uring_cmd inline in case of local ring
 > context, and improves IOPS by ~10%.
+> 
+> 
+> V2:
+> 	- pass `struct io_comp_batch *` to ->end_io() directly via
+> 	  blk_mq_end_request_batch().
 
-For me this was ~5%, but I suppose this is sensitive to the 
-setup/config. Changes looked good to me, so
+This is a much better approach indeed. Looks good to me.
 
-Reviewed-by: Kanchan Joshi <joshi.k@samsung.com>
+-- 
+Jens Axboe
+
