@@ -1,62 +1,125 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CB77221275;
-	Mon, 19 Jan 2026 02:34:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E12F833710F;
+	Mon, 19 Jan 2026 07:44:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768790079; cv=none; b=urHokC6mkW46SD9DVkE9pveMTxbvn7WP3gpOEVKU+x2NdhHJwqA8mZuZ1EVIeTn+iC1zxNMQNHzhUeJjcAKsYZ5+aG7J6KrXdXSAik+5flC9+rNAdNar1drhFjWygQXJD2IoJ+GX+KU3woymLTC9ekHWQxYWijWgMQzghIMbbgM=
+	t=1768808673; cv=none; b=U9qlgoxhdBG09Wip4Y0kQP7iHVw3PtjqblAj7oDoTRFLDmuW/2Ce8CQI9EYEjYvIj9GWQHx0oS37cibqEJneIk/APuyQ2vpGuHmrbyy3JHfdCSlHDXsUIcyYVI2+m7Y9Rt3GY7sB1cEAAvPdIIoyL1hG3z59aYeRk2trk/AbRkU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768790079; c=relaxed/simple;
-	bh=YVy/1y+q+QVasfuOK09hlzjhuU7NPNg3Wonyo/pdW/s=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=s2LAhpFJnpDPeGirYip1uZVK2pPpVMezYmuNV/r3nCTHz0icOpUKMv4uCjoB1d70iGovWcNIGzc6DXxq9lZCizBpn2rDPfriLaAYPNkeZmIkYCgjyrXyRLZNM9fscKiINONse0GUNp6lBVf5Gkl8IQLCkL+7Jq6x2m7u+p5IVJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=ZKGhiebf; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768808673; c=relaxed/simple;
+	bh=l97McbaRZO3TQfukZUYzMAM6afrZCrKJrOB5BVWfk9M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ExVSfACiKJWCaS5TXnvAWeHjXr1k2yJRvJHrcH2qUHzomXI57x360vut04udQErPY60nZpTYLrdEjODqHIC9VT/h8ccM42Oja38DMng1MZGQFj7MGKpIf+hHwc46lRkOdOfWIak3H9eHgaAvN/YF3/QOzuCVpPTRBVLfBo2LFnk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=oBuhYEY5; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="ZKGhiebf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68ED4C116D0;
-	Mon, 19 Jan 2026 02:34:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-	s=korg; t=1768790078;
-	bh=YVy/1y+q+QVasfuOK09hlzjhuU7NPNg3Wonyo/pdW/s=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ZKGhiebfTjbjAZzdeRmF2R9ic4BcynR0XIZ3LeGjkdjM5rECcyFPeIdQZFRD/WQZ1
-	 WF5lIJx1xVmKmmB5lEseKryywNtXQ3ZtBhMt9sAzh9f8sqEUrDpa4PwdYAT6XNpRi8
-	 2gzvF6+uuF9z1WX77IvNBChBpauX6F0NIam0igDc=
-Date: Sun, 18 Jan 2026 18:34:37 -0800
-From: Andrew Morton <akpm@linux-foundation.org>
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Richard Chang <richardycc@google.com>, Minchan Kim <minchan@kernel.org>,
- Brian Geffon <bgeffon@google.com>, David Stevens <stevensd@google.com>,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- linux-block@vger.kernel.org
-Subject: Re: [PATCHv2 0/7] zram: introduce compressed data writeback
-Message-Id: <20260118183437.6b11e6c43c7701759b73d22c@linux-foundation.org>
-In-Reply-To: <20251201094754.4149975-1-senozhatsky@chromium.org>
-References: <20251201094754.4149975-1-senozhatsky@chromium.org>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="oBuhYEY5"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=0jMumst/DKmc/sQa4zpacgepgiHuibSYZ04TsJOr/m0=; b=oBuhYEY5K6CRaVdSIpWd2LVorD
+	x7sLE2IecpZJ5K3Z1NeYP6rnQdQCPtd15oTVau4PRWC5yNFMhY9CGlC0txEY9Yb+WSL/c7tpycpze
+	dRpegUdk7qwfN51thGgIPw8FnCU1bSikKEegJZ0Hp9PiiZLpVqHi1KiemSarLrrbm+meTxKl00w/G
+	BgpdfHTy15CwfPrtVvJvMqmUF03NDKRwABqN6UXJOk9EUtKhouk0yfmkk3PeoGeAnXLd8teAXfIfp
+	AQouDLV9JKX/eLHZSXtUjADpAE9Q72nFc84DQQ6hipLA9GPRQPRJ0IBefCtPdTM2kv4mZ4sIL/miY
+	NAyOKtQA==;
+Received: from 2a02-8389-2341-5b80-d601-7564-c2e0-491c.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:d601:7564:c2e0:491c] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vhjw6-00000001W8k-1Phr;
+	Mon, 19 Jan 2026 07:44:30 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>,
+	Christian Brauner <brauner@kernel.org>
+Cc: "Darrick J. Wong" <djwong@kernel.org>,
+	Carlos Maiolino <cem@kernel.org>,
+	Qu Wenruo <wqu@suse.com>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	linux-block@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org
+Subject: bounce buffer direct I/O when stable pages are required v2
+Date: Mon, 19 Jan 2026 08:44:07 +0100
+Message-ID: <20260119074425.4005867-1-hch@lst.de>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Mon,  1 Dec 2025 18:47:47 +0900 Sergey Senozhatsky <senozhatsky@chromium.org> wrote:
+Hi all,
 
-> As writeback becomes more common there is another shortcoming
-> that needs to be addressed - compressed data writeback.  Currently
-> zram does uncompressed data writeback which is not optimal due to
-> potential CPU and battery wastage.  This series changes suboptimal
-> uncompressed writeback to a more optimal compressed data writeback.
+this series tries to address the problem that under I/O pages can be
+modified during direct I/O, even when the device or file system require
+stable pages during I/O to calculate checksums, parity or data
+operations.  It does so by adding block layer helpers to bounce buffer
+an iov_iter into a bio, then wires that up in iomap and ultimately
+XFS.
 
-I'll move this series and the "zram: use u32 for entry ac_time
-tracking" series into mm-stable soon, but the review coverage is thin.
+The reason that the file system even needs to know about it, is because
+reads need a user context to copy the data back, and the infrastructure
+to defer ioends to a workqueue currently sits in XFS.  I'm going to look
+into moving that into ioend and enabling it for other file systems.
+Additionally btrfs already has it's own infrastructure for this, and
+actually an urgent need to bounce buffer, so this should be useful there
+and could be wire up easily.  In fact the idea comes from patches by
+Qu that did this in btrfs.
 
-It would be good to get some more reviewer input on these zram/zsmalloc
-changes.  We haven't heard from Minchan for a couple of months.  Is
-there someone else who can step up and help out?
+This patch fixes all but one xfstests failures on T10 PI capable devices
+(generic/095 seems to have issues with a mix of mmap and splice still,
+I'm looking into that separate), and make qemu VMs running Windows,
+or Linux with swap enabled fine on an XFS file on a device using PI.
 
-Thanks.
+Performance numbers on my (not exactly state of the art) NVMe PI test
+setup:
+
+  Sequential reads using io_uring, QD=16.
+  Bandwidth and CPU usage (usr/sys):
+
+  | size |        zero copy         |          bounce          |
+  +------+--------------------------+--------------------------+
+  |   4k | 1316MiB/s (12.65/55.40%) | 1081MiB/s (11.76/49.78%) |
+  |  64K | 3370MiB/s ( 5.46/18.20%) | 3365MiB/s ( 4.47/15.68%) |
+  |   1M | 3401MiB/s ( 0.76/23.05%) | 3400MiB/s ( 0.80/09.06%) |
+  +------+--------------------------+--------------------------+
+
+  Sequential writes using io_uring, QD=16.
+  Bandwidth and CPU usage (usr/sys):
+
+  | size |        zero copy         |          bounce          |
+  +------+--------------------------+--------------------------+
+  |   4k |  882MiB/s (11.83/33.88%) |  750MiB/s (10.53/34.08%) |
+  |  64K | 2009MiB/s ( 7.33/15.80%) | 2007MiB/s ( 7.47/24.71%) |
+  |   1M | 1992MiB/s ( 7.26/ 9.13%) | 1992MiB/s ( 9.21/19.11%) |
+  +------+--------------------------+--------------------------+
+
+Note that the 64k read numbers look really odd to me for the baseline
+zero copy case, but are reproducible over many repeated runs.
+
+The bounce read numbers should further improve when moving the PI
+validation to the file system and removing the double context switch,
+which I have patches for that will sent out soon.
+
+Changes since v1:
+ - spelling fixes
+ - add more details to some commit messages
+ - add a new code comment about freeing the bio early in the I/O
+   completion handler
+
+Diffstat:
+ block/bio.c           |  323 ++++++++++++++++++++++++++++++--------------------
+ block/blk.h           |   11 -
+ fs/iomap/direct-io.c  |  191 ++++++++++++++++-------------
+ fs/iomap/ioend.c      |    8 +
+ fs/xfs/xfs_aops.c     |    8 -
+ fs/xfs/xfs_file.c     |   41 +++++-
+ include/linux/bio.h   |   26 ++++
+ include/linux/iomap.h |    9 +
+ include/linux/uio.h   |    3 
+ lib/iov_iter.c        |   98 +++++++++++++++
+ 10 files changed, 492 insertions(+), 226 deletions(-)
