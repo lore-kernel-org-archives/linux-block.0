@@ -1,92 +1,43 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6874B1A285
-	for <linux-block@vger.kernel.org>; Mon, 19 Jan 2026 15:57:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 846F932C937;
+	Mon, 19 Jan 2026 17:40:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768838230; cv=none; b=l2AncKXzzDQIHRhQ5Bz83ZtAenga7fW0MNNylBZ/dKjgB4IOieZ7SnrRHIgTUyFse1qyEWEE0WFicQjQ1+GwRQ10QYStu+NHkIbE2cVAMmUXKY7qroB/O7nhV1zWDnYcl+ssOyinnrAVe+8ezbnEp+S6x4yJaiLL0fFZxqzY9Kw=
+	t=1768844459; cv=none; b=ET0yCPCdzfJ0HH/Spmja3N+jtGn+Jo4N8kcxLz9KZJHJ9SsB+eco2gowvnbaiBHeGisBnJiXRmOcjK1A8MdDSN2GPaw4P5di2OiwgXtTu6+/8ANzhvU0kir2NRzWegCANIk52tu6XlFiavZT57JGpMdNRsxkHjFAHJkFXkaknxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768838230; c=relaxed/simple;
-	bh=pTFzu+uZg+boSjY878R+c8nRpLFoaEecQZ6bGsiGzo0=;
+	s=arc-20240116; t=1768844459; c=relaxed/simple;
+	bh=BS+NKcICrRrnj0S+OS2EH3so28h66QIWlb5Nmti/+88=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cZsgTZUxL0sjhstqz/CTDrWseBJbyZsmk/FMfxQtG2PJwVg7cLVNPcIsRnEENp3Tmo/M0f7Ye4ucPvFWj1mN+AZ1CYBLiN1tnGdsUP80SKXdzAizK+y1lI4VMdjEg3MYUQGlLJ22cGq8sckV7qYmmitrx5KFhU34tlmdwOacDqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=kglkAOim; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=vUyPNmpc; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=n9NFkx2m; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=b03o/fQl; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	 Content-Type:Content-Disposition:In-Reply-To; b=FVxfjhz9KKEwxhI/bsMCh1fNBVXiu9vrqWqb2brmdJvQ3D/TY/bZXb0dEpu2ndhOvwjNTqY1CSLGfjGnD0dS1ob5bwtwUhMNU1Rbf8dXHX2r6e2FSfvhjozhnK49Xmxmsi5+Y3j4FokVQZdG3KRLMNmUOCiwWqBha17Jv3i9RLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WJ9MEf6E; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="kglkAOim";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="vUyPNmpc";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="n9NFkx2m";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="b03o/fQl"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 8D58433725;
-	Mon, 19 Jan 2026 15:57:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1768838227; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=msWUNQIl0T+SKY0aMGXculM4ILtkCPb+eK1aBarneAI=;
-	b=kglkAOimmtKNnofM/dhoQI65iduwcM+aWiALRYwA8+UzGonr8hxZQ8t+YglpaJ3HC5A3td
-	xlewsJHGemupMyfAXy7iHYTRuRHOJzry3H6C/OEGum4g84v2GFbIEoJWeO0CFWVCbA210j
-	EGXTS+RuI/jnclwLusYXyDHt774siww=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1768838227;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=msWUNQIl0T+SKY0aMGXculM4ILtkCPb+eK1aBarneAI=;
-	b=vUyPNmpcDovKpxxW5vQDnVe4NJU+GPorxcG8yYw3z1VXHFY3AQMzV9ADBwIwD8mu6hm3vI
-	jqNcTpruHuFyo8BQ==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1768838226; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=msWUNQIl0T+SKY0aMGXculM4ILtkCPb+eK1aBarneAI=;
-	b=n9NFkx2meYt4cWL54v55GLDvDGgvnmD3T4u5/uf89r1otVsZfgr8iFDWEeOj8VOvUgTbBK
-	e/8ssgnq+eHoRt/yIk+hb1l7XVvzoDSdjuuj+2/OQOyvGXmEKMSvkWh4Z4/dT4yOlD+EwL
-	e5PxvoXVV+cgre+6aP1Wxyum03NruGs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1768838226;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=msWUNQIl0T+SKY0aMGXculM4ILtkCPb+eK1aBarneAI=;
-	b=b03o/fQl3MZXi2PQ98MkX6f5zGKgdh5msWXo1sMJ8mBed+IWQWAogUHXHG8begl8Rhxz2R
-	EqelcYK9rbOqfjCw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 7DFD43EA63;
-	Mon, 19 Jan 2026 15:57:06 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id UabKHVJUbmk9WAAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Mon, 19 Jan 2026 15:57:06 +0000
-Date: Mon, 19 Jan 2026 16:57:05 +0100
-From: Daniel Wagner <dwagner@suse.de>
-To: Kent Overstreet <kent.overstreet@linux.dev>
-Cc: Christoph Hellwig <hch@infradead.org>, Coly Li <colyli@fnnas.com>, 
-	axboe@kernel.dk, linux-block@vger.kernel.org, linux-bcache@vger.kernel.org, 
-	Shida Zhang <zhangshida@kylinos.cn>
-Subject: Re: [PATCH] Revert "bcache: fix improper use of bi_end_io"
-Message-ID: <4712ff66-ecce-4a50-82f7-8f27930e79a2@flourine.local>
-References: <aWYCe-MJKFaS__vi@moria.home.lan>
- <aWYDnKOdpT6gwL5b@infradead.org>
- <aWYDySBBmQ01JQOk@moria.home.lan>
- <aWYJRsxQcLfEXJlu@infradead.org>
- <aWZwBZaVVBC0otPd@studio.local>
- <aWZyHz_eZWN-yQiD@infradead.org>
- <aWZyWJiOi9hZgtqo@moria.home.lan>
- <f7af1e25-fbe9-4d37-b902-5b3a9ed4c8f4@flourine.local>
- <aW4D0UPTBXEap1Jg@moria.home.lan>
- <4224c9a1-e53c-4592-933c-dc6b1003ce00@flourine.local>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WJ9MEf6E"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E37EC116C6;
+	Mon, 19 Jan 2026 17:40:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768844459;
+	bh=BS+NKcICrRrnj0S+OS2EH3so28h66QIWlb5Nmti/+88=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WJ9MEf6EC7SdoQr3VcPmfkO0Z6hRk1nusvyU3v2cz215vVaeS9Bpqli5ccYJKTfeB
+	 XDoZcAYcuJHGTC3sv4CV2d2AHtTIVAOuO70WXVq7LyXhnsd4/1QL0hDisnq2OLAEed
+	 emE573K87qRiSuoEEmlM0k2PzqqkRXvE1WYzXhK7mfdM1QBPNbgOuCHL8ivWc4hHe1
+	 1Z49+AN09VGKNSNxUlx1sfHj+Vvp75Dvzvbbp4wLAQEuLI7eWDdpZ1DSCob0YkBZCp
+	 qXnMXNZ3EL50xfSrij85HStN7mmtiMkqjdbq6crHL3+cPDyGlUBmfVg+DDOTUAl2Xe
+	 mJq38OFTCQHgw==
+Date: Mon, 19 Jan 2026 09:40:58 -0800
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Christian Brauner <brauner@kernel.org>,
+	Carlos Maiolino <cem@kernel.org>, Qu Wenruo <wqu@suse.com>,
+	Al Viro <viro@zeniv.linux.org.uk>, linux-block@vger.kernel.org,
+	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 06/14] iomap: fix submission side handling of completion
+ side errors
+Message-ID: <20260119174058.GA15551@frogsfrogsfrogs>
+References: <20260119074425.4005867-1-hch@lst.de>
+ <20260119074425.4005867-7-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -95,45 +46,49 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4224c9a1-e53c-4592-933c-dc6b1003ce00@flourine.local>
-X-Spam-Score: -4.30
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[flourine.local:mid,imap1.dmz-prg2.suse.org:helo]
-X-Spam-Level: 
-X-Spam-Flag: NO
+In-Reply-To: <20260119074425.4005867-7-hch@lst.de>
 
-On Mon, Jan 19, 2026 at 11:34:15AM +0100, Daniel Wagner wrote:
-> That's why I said some of tests could be added directly to blktests,
+On Mon, Jan 19, 2026 at 08:44:13AM +0100, Christoph Hellwig wrote:
+> The "if (dio->error)" in iomap_dio_bio_iter exists to stop submitting
+> more bios when a completion already return an error.  Commit cfe057f7db1f
+> ("iomap_dio_actor(): fix iov_iter bugs") made it revert the iov by
+> "copied", which is very wrong given that we've already consumed that
+> range and submitted a bio for it.
+> 
+> Fixes: cfe057f7db1f ("iomap_dio_actor(): fix iov_iter bugs")
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-FWIW, I've started to work on an initial test case for bcache in
-blktests. I shamelessly stole some helper/setup stuff from ktest to get
-things rolling. But I think I am going to replace this as it doesn't
-really match the blktests style for helpers and in the end it's not that
-much we need to get it working anyway:
+Thanks for answering my question last time around,
+Reviewed-by: "Darrick J. Wong" <djwong@kernel.org>
 
-   https://github.com/igaw/blktests/pull/new/bcache
+--D
 
-In case anyone wants to play with, you need to define
-TEST_CASE_DEV_ARRAY:
-
-# cat /root/config
-TEST_CASE_DEV_ARRAY[bcache/*]="/dev/nvme0n1 /dev/nvme1n1 /dev/vda /dev/vdb"
-
-# ./check -c /root/config bcache
+> ---
+>  fs/iomap/direct-io.c | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
+> 
+> diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
+> index 4000c8596d9b..867c0ac6df8f 100644
+> --- a/fs/iomap/direct-io.c
+> +++ b/fs/iomap/direct-io.c
+> @@ -443,9 +443,13 @@ static int iomap_dio_bio_iter(struct iomap_iter *iter, struct iomap_dio *dio)
+>  	nr_pages = bio_iov_vecs_to_alloc(dio->submit.iter, BIO_MAX_VECS);
+>  	do {
+>  		size_t n;
+> -		if (dio->error) {
+> -			iov_iter_revert(dio->submit.iter, copied);
+> -			copied = ret = 0;
+> +
+> +		/*
+> +		 * If completions already occurred and reported errors, give up now and
+> +		 * don't bother submitting more bios.
+> +		 */
+> +		if (unlikely(data_race(dio->error))) {
+> +			ret = 0;
+>  			goto out;
+>  		}
+>  
+> -- 
+> 2.47.3
+> 
+> 
