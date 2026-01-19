@@ -1,71 +1,84 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72AAC37C0FB;
-	Mon, 19 Jan 2026 14:26:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D75633ADA9
+	for <linux-block@vger.kernel.org>; Mon, 19 Jan 2026 15:07:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768832804; cv=none; b=gG139AjZQZdCdKnCjbUWumvLEcIrPg5npY5QIMHV/r+XXGz7vnvaS11ohpA5LucxxjZ4XkIeVQmjppyHdireeFwj5n3eBnsNNPtZylRoQy+HemS5M8g9ktFSEhghuZOr/23uo5hCn608FmMZyjM0wlzgyGVVDRhVVFyoIccVcqo=
+	t=1768835248; cv=none; b=BvSyJAsSKS2x8iXPGWe6BPKBCyXpZhXxy4TdEzdOx/bgtHtb4Aev9Q4beodfUdWYtH5g4h9y6W0FEXO/af88XIDgY7OlxHUlb8wdd+hPdxcSDcrNNdH7pew+bEGklI98i82Cl8BCrRzqhi9uN01hNzxbq3mq+MFVIM/nMM1J0Xk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768832804; c=relaxed/simple;
-	bh=zYgPbUIvOI/eIYcLAUkaAfmyJoWuvHhnUe5EkIKG3qQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IxOmlO0wc6ZCaVRezLgNN6hrmdfzNQymluKLAb31qk0oTA2W894oYMgToRfvgFeibcAvM40xR4NtVl9Q4FKBuXyTIOzosL+kbY3/t0JCw2VNFxqQukLcNBHLP7hwU0tee6RKtKd4hAiw/LbaKfmvvG8lgx6fpXnhszpNKQaOjZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DmFJt6Mw; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768835248; c=relaxed/simple;
+	bh=JM7VN05whJCE8jBj3BeZK69T5QEE8FUa4uiPivIbJPM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=GzfGDfHBNeJsAtqT1sNcto8pWU9yPNzxdCtRt2ZJfeje8hwtVcgoTTYjWW8rxrRRcM/tWW8hVr5CW5rU+qD6/A8/smKyLNEBGg30avX5M0Iy3MoLP/p9p8LB7Jdbg0xAvpI0Sb2eNJUpQTAtLppWJCjJITRePaZhGULLn4jum7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=u7JplAdL; arc=none smtp.client-ip=203.254.224.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DmFJt6Mw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4941C19424;
-	Mon, 19 Jan 2026 14:26:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768832804;
-	bh=zYgPbUIvOI/eIYcLAUkaAfmyJoWuvHhnUe5EkIKG3qQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DmFJt6Mw/5KVucLHrqBHkKImBW4D9anZGrDzR7DQ0z+TfTHQjB/JLG3sij3qK0FDT
-	 N9dTP1ieNYwddPogZcPsYykDCnziU7O/cKnIVud/yiOubFUoQVnYPmQJtItcrcPVZ2
-	 P/NPA9bzvx5f1C5FnYmICbzEMk48qXwuD/JnZBKCqAtaL4Dc6+EE8G12Ghjif00rxL
-	 jXxZBvWZ2LCJCPHmFOqiXxiUTtzP8JNcqMbjfILHZAVkRntiN9fvfNRetSN78bClse
-	 HGsElR3adIdLZlThgAqzTg9R+F7H6RkuzWzJAZjLXe5ooCaCtj3cGfsNTp0zmSikOx
-	 95itlDDyxK4LQ==
-Date: Mon, 19 Jan 2026 15:26:39 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-block@vger.kernel.org, linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	linux-nvme@lists.infradead.org, bpf@vger.kernel.org
-Cc: lsf-pc@lists.linux-foundation.org, linux-kernel@vger.kernel.org, 
-	lwn@lwn.net
-Subject: Re: LSF/MM/BPF: 2026: Call for Proposals
-Message-ID: <20260119-bagger-desaster-e11c27458c49@brauner>
-References: <20260110-lsfmm-2026-cfp-ae970765d60e@brauner>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="u7JplAdL"
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20260119150719epoutp01ca68967782dd1cdca8cc258b9400d441~MKkc-fPkT2803228032epoutp013
+	for <linux-block@vger.kernel.org>; Mon, 19 Jan 2026 15:07:19 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20260119150719epoutp01ca68967782dd1cdca8cc258b9400d441~MKkc-fPkT2803228032epoutp013
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1768835239;
+	bh=0jeav41QIUHWhSoDptzFRbTAmSL8MmZG7TIS0IJTjF0=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=u7JplAdLbGepLlzFeBjNI128rr8r8mm94rGOFXcVnVMLWp0KVtUDgDGhi+4BotDTx
+	 LsfTcE2UEHfyPs0iKocsbVEw9Wu+nFEiLonm5CloRYdfyJTssSc1+g+WYOc22Nwyhk
+	 Gjf7Dv4+5G8OO2bhPKzG19eEoKdmPFHVQYyUmuw4=
+Received: from epsnrtp03.localdomain (unknown [182.195.42.155]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTPS id
+	20260119150718epcas5p1f2155df96dd92bf19d47d1e967a301df~MKkcM6_bH2049720497epcas5p1K;
+	Mon, 19 Jan 2026 15:07:18 +0000 (GMT)
+Received: from epcas5p1.samsung.com (unknown [182.195.38.90]) by
+	epsnrtp03.localdomain (Postfix) with ESMTP id 4dvv2F2Wh8z3hhT3; Mon, 19 Jan
+	2026 15:07:17 +0000 (GMT)
+Received: from epsmtip2.samsung.com (unknown [182.195.34.31]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+	20260119150716epcas5p3b1139cbdabe33c2e7d65832c32516fa1~MKka7CoCN2047920479epcas5p3-;
+	Mon, 19 Jan 2026 15:07:16 +0000 (GMT)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20260119150714epsmtip231525018180c6659701036326a13e695~MKkY17Sj80973609736epsmtip2L;
+	Mon, 19 Jan 2026 15:07:14 +0000 (GMT)
+Message-ID: <ebb64c7a-e379-4c83-a7ce-89f9e9419257@samsung.com>
+Date: Mon, 19 Jan 2026 20:37:13 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260110-lsfmm-2026-cfp-ae970765d60e@brauner>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V2 0/2] nvme: optimize passthrough IOPOLL completion for
+ local ring context
+To: Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	io-uring@vger.kernel.org, Keith Busch <kbusch@kernel.org>
+Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Content-Language: en-US
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <20260116074641.665422-1-ming.lei@redhat.com>
+Content-Transfer-Encoding: 7bit
+X-CMS-MailID: 20260119150716epcas5p3b1139cbdabe33c2e7d65832c32516fa1
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+cpgsPolicy: CPGSC10-542,Y
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20260116074819epcas5p37afab1cd05fdf9e0555a14b5fe89c2dd
+References: <CGME20260116074819epcas5p37afab1cd05fdf9e0555a14b5fe89c2dd@epcas5p3.samsung.com>
+	<20260116074641.665422-1-ming.lei@redhat.com>
 
-> (1) Fill out the following Google form to request attendance and
->     suggest any topics for discussion:
+On 1/16/2026 1:16 PM, Ming Lei wrote:
+> Hello,
 > 
->           https://forms.gle/hUgiEksr8CA1migCA
+> The 1st patch passes `struct io_comp_batch *` to rq_end_io_fn callback.
 > 
->     If advance notice is required for visa applications, please point
->     that out in your proposal or request to attend, and submit the topic
->     as soon as possible.
+> The 2nd patch completes IOPOLL uring_cmd inline in case of local ring
+> context, and improves IOPS by ~10%.
 
-Hey everyone,
+For me this was ~5%, but I suppose this is sensitive to the 
+setup/config. Changes looked good to me, so
 
-This is a reminder to put in your invitation request for LSF/MM/BPF 2026!
-
-The sooner you do this the easier it is for us to plan and the less time
-we have to spend hunting down missing attendees just weeks prior to the
-event. Unless you're really hankering for the special-snowflake
-experience please do your part and get in your invitation request.
-
-Please also don't forget to pester^wask^wremind your respective
-organizations to consider sponsoring LSF/MM/BPF 2026.
-
-Thanks!
-Christian
+Reviewed-by: Kanchan Joshi <joshi.k@samsung.com>
