@@ -1,113 +1,213 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A717A1531E8;
-	Tue, 20 Jan 2026 15:15:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768922124; cv=none; b=V3U0MhiT5NKSuT7OLQICbIXOtNe5C/oKaTyCsIqTPx3LwMa/OpvLuTO7GMLazPAUhN+OtjlE1B2XwLosM0SH5qRVXcJ3OXi8jhzud9EZ2H7tir26p7QXuLbfWsm6pF/c7orGsmXctScJtN7kUbX6vWLItDfzUs1cfNyyeGuYTuw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768922124; c=relaxed/simple;
-	bh=cB6+u0cGFM+BuA6s4Sw76CjAr/+izfs5ypcZfWumP+8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EzEy85kqJ/2Z+LMoThi5rMTg30Nv+y4s5oJbfL6KtV1t6+EM9nk+x7tOnQemBr2j1V/QCxZoozQV6tdQ+dx/ojGdxFbb0bcPAVFqCnNoYpPPtS6uVaBCHUjcDguU83O7RU/XIImmqztEh8xsCBsXySbCmjruTmCoWjT5gi21C40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dTm6pm0U; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C00C31771B
+	for <linux-block@vger.kernel.org>; Tue, 20 Jan 2026 16:17:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.129.124
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768925836; cv=pass; b=c/m1TZqq3hzz9JsaFo5WRf3BLW2D8S5Q5+FUfRFHWkRo7usfldLYFA2IRkZPVDxmeEd03A7Om1vwzoo8A2Rnlf/N7i0ASGZQN4HqjM+quBq06oyNTcep9CzoqXwIq8dFEy5Dd7UjS6RoGJnA+fup9tgvagG5wQHbPGI2VbgL4/Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768925836; c=relaxed/simple;
+	bh=tCNVx6q0fwH6pjyWn+uRG02ZeHI/TyFmS/lDJY46FWw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=EtkbsKhSbgpLX3jUnrkDFai1r34G5ZtSsDYVc7Qe/3cTmWXXIBBsW961KXlgp/SSLBetlc9idCmpoZ3I+SzCV5KJzQxbOwMUBkEzOEHud92PYXOXafrhtV94UYDEueGklpIjrjjdTcpYhHBGzbGVmL1Lfqk7+0BcA9IlvDz8Di8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bfv7DPgK; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=X6YqEqBB; arc=pass smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dTm6pm0U"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B042EC16AAE;
-	Tue, 20 Jan 2026 15:15:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768922124;
-	bh=cB6+u0cGFM+BuA6s4Sw76CjAr/+izfs5ypcZfWumP+8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dTm6pm0UbqrACPX84K25WsKI0mLcsga30LnGZ0xAs1QeHOq8GuYQb0tsVAj/1PyOk
-	 AN1JtPlGK2Lo1SN6drBYr1dVy9fdgzrRQCr2v1Zr5WaI0DgPDkYpbpHSPBc0lzPVxT
-	 mDodJS2/jqZjTXVaKaFD5qjNt2270SzYmLSpr9NA2qekfz0PdVSlZLmHpnEvNYJ+eY
-	 A07k9S1Ry7xxwMicubb01dCJM4tNlasnq386AOzVL87vqKI0T34pSKz9QNypV2LDxE
-	 2HWPcTW6E/V+Ce+TphpVMpakDh1WcI3tzKUwZtHRXG5Gb8k9H87NfGW6D+dQQz/FfZ
-	 kpuAsAsDnxf/g==
-Date: Tue, 20 Jan 2026 15:15:14 +0000
-From: Will Deacon <will@kernel.org>
-To: Frederic Weisbecker <frederic@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Chen Ridong <chenridong@huawei.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Gabriele Monaco <gmonaco@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Marco Crivellari <marco.crivellari@suse.com>,
-	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
-	"Rafael J . Wysocki" <rafael@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
-	cgroups@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-mm@kvack.org,
-	linux-pci@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 29/33] sched/arm64: Move fallback task cpumask to
- HK_TYPE_DOMAIN
-Message-ID: <aW-cAlJCtI5Qtify@willie-the-truck>
-References: <20260101221359.22298-1-frederic@kernel.org>
- <20260101221359.22298-30-frederic@kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bfv7DPgK";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="X6YqEqBB"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768925834;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xjmz6BJQ3UN8YVqtcYDSDmAuA9+2oF0GvLcz/cx2Xig=;
+	b=bfv7DPgK9h/TeQVSyJckVIsQjj6Cf3VZ07IXWvNx6uSflUckfV6zqIld3bH9yDiJ6PGUDx
+	CzYLAXiQibC52QH+Koaf8gMcwhO8Ih5JtPvPjXvH9XsBEM6u4Y/pNxSD2EpfWm1KVxEpl0
+	NqDttVB9D+2nypb2IuyIp1WcF7kMNyA=
+Received: from mail-yx1-f71.google.com (mail-yx1-f71.google.com
+ [74.125.224.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-5-HOCsT8m7O8qaxJpYDy1arw-1; Tue, 20 Jan 2026 11:17:12 -0500
+X-MC-Unique: HOCsT8m7O8qaxJpYDy1arw-1
+X-Mimecast-MFC-AGG-ID: HOCsT8m7O8qaxJpYDy1arw_1768925832
+Received: by mail-yx1-f71.google.com with SMTP id 956f58d0204a3-64941169ecaso498765d50.1
+        for <linux-block@vger.kernel.org>; Tue, 20 Jan 2026 08:17:12 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1768925832; cv=none;
+        d=google.com; s=arc-20240605;
+        b=JpLXORM5dxKDYtY8oN37gDrRzFeCuO91A1Ju3b9CPM9cFaonJmSdxqSbYfkXbMnIFd
+         i2V4uYnfqT7ylZXoSDcF+IPT1ITKubT9wAt6DuNuHvlMkxsg+kYoakgudpRuOXNevKP6
+         kI1ebT+DQZioxnBNr7cK7Hetu9nDm75TMrFVCYYNmCGVm8VXSGvw3KPKzKXvzt9/yKLG
+         aYumcilqxNrXaCfH/Z1db5Ev5yKVx3catrObz2un2gyenujqx2+leip7pyyeA0ipmI1b
+         4f2uDaVHu9d+JkdTW1ymMe5WEVSWKlBLhquCoEwqyhZztbkxORe1Y2LcRODTmOG0sOUZ
+         qgbw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=xjmz6BJQ3UN8YVqtcYDSDmAuA9+2oF0GvLcz/cx2Xig=;
+        fh=4CedISFanfkPvOoq3t00iWStznc8OpF0cpIA0cPsBZw=;
+        b=F4hRDtw0OVNkOKKL/u1ARURsiX0xcEHwMgcAQwQw3e8pJANoCONkvHwViFP24hU7jy
+         ge0M/wmNYtf48Af/BgeZG+xHyyicsMdvEjxA+6cUq3R3j26HN0kl4PgfJOyByXoAIkmX
+         sUyQXA+dY8Hv4ZS5Mzfm2bYPqQkMfBm1NfNSkO/rZsyoEwmmgrxbV+2E99vG8CB7f4gd
+         +N9D4NoRAD7+Jp8KkP8b4hn8m2PuSpiBC5NRvLqFuMnkja0b5ybu2rSwPMaAdT60+2D1
+         L9UG7Gn3G2Y0iNVqxKfPtQ2Ab+MxjL6M36tKF+1lXaU1G1WhMEnlePoEybP6pKUwgEAd
+         lOsA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1768925832; x=1769530632; darn=vger.kernel.org;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xjmz6BJQ3UN8YVqtcYDSDmAuA9+2oF0GvLcz/cx2Xig=;
+        b=X6YqEqBBUt+fWxoeDLipwWXIygdqmGQVPFtwwuFRyhS4HPzwBYmD5om30AvVVpaLEE
+         Mln4UYDCOL/G+GSDGloS+9spxc292gZ/iwsLogHV4Iz1YHc6K/MGgdivgmcDQk4YWW4L
+         5PGd48SExJlPA5ix5RqSrqfPknc40Lxhn+YTtmvfTtR6rgbP+sV6eTqZP/Idu5HuACzW
+         BMBTtpbniPrQPdZYt3Nn0ohTJgSdm6dPPPX2gWY+BQp8owuN7/0BP+oMQEH52uzx6Las
+         rl3FjGRKXklQIupwguFpo14LoslFs9agDrORhnTgj8b7XS27XH2hjT7s1jdaSBZvqlBH
+         9kZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768925832; x=1769530632;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=xjmz6BJQ3UN8YVqtcYDSDmAuA9+2oF0GvLcz/cx2Xig=;
+        b=Uu4NQhsvQ/aNG1ipfiO8feTVz1y7K9JBVoSYuFzNR3g+ECqb6dl9Vu5FFFnX5yh8sQ
+         ZzXP9Ylc2NJSiCWs57kCro0qZKqJZQXAXfgPou6HhoQQdkzjos9U8ykYs4JXgdxiorgz
+         4hpgrVcy/gzjao/Ga7Op5HiUs+pMlrNKCHwRMWOzcvPHydgWXnzX6jl/W9a/37xnpmBk
+         oJZRTtxelcN830gE8Ax7sFVQeK9krJa8mT0abedPNqBEWCQDgmNXVYwn/GKr2l6Qfexw
+         AGwOG1xSVJ+jqw42uA4Znk4V/5zZMB+PnZ0a+tm4AkrWM5A81FyUMUxvbiMlZXP0dYZ7
+         tDdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVITksPRGxtSNYN4GzbPe17IjzgHqXxtqzzYMRMJE6dDx8Q0mohwekSgTxFqxwR3z5ECuTzFhI3PNHGVg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxkh+rO/Co4X/Q4OLaPKr3cRnRUcYqnvMovEltCT5cf75+7esVV
+	wAcijaaCXTTIFXVHQs34xRUAGQ+Mt/Y7bRuxsIkBXWXpKZoEDvOqms5nrUfp6sA1BSAd/zEH5wc
+	zQeGZ4cqVsLY71vqNTUJhe0u1ntBahOqRsj6YklBnSbQv9ecvycVBX9GrG0wuWYiDOVrMr5bLsZ
+	FdhgWcxJAfhI6kzU2CUgmlYUO3gZAX7Z7tLEVEHOHXtAGmy7Q=
+X-Gm-Gg: AZuq6aIOJanxgJD/zdBLlTdFtWzzAwH3snMMjPDA9qvpBaa9xDqoilmZEEAr/sWFMVB
+	pCQ6rP/uFf+umE+d6Tvjk1I8nxV9OGx46G97ox4WH1Sy5z6LYpATDRf2nt39rwjaComt25/zhgH
+	7xhY8QxiLeJCAU1/+0Utk9iDhaBn/KtnVdiEtUZEl8/4FZly8AGVrXP9rnaWvYTcVLNqlILW/t6
+	gzJwY7I9tCJSwVYinZfbq5U1nt1uOiPP/JYLvwRyA==
+X-Received: by 2002:a05:690e:b42:b0:640:e5e1:190e with SMTP id 956f58d0204a3-6493c848e5cmr1600209d50.57.1768925831677;
+        Tue, 20 Jan 2026 08:17:11 -0800 (PST)
+X-Received: by 2002:a05:690e:b42:b0:640:e5e1:190e with SMTP id
+ 956f58d0204a3-6493c848e5cmr1600203d50.57.1768925831291; Tue, 20 Jan 2026
+ 08:17:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260101221359.22298-30-frederic@kernel.org>
+References: <20260114210809.2195262-1-jpittman@redhat.com> <20260114210809.2195262-3-jpittman@redhat.com>
+ <aWo2phhtvibIfQ1D@shinmob>
+In-Reply-To: <aWo2phhtvibIfQ1D@shinmob>
+From: John Pittman <jpittman@redhat.com>
+Date: Tue, 20 Jan 2026 11:16:35 -0500
+X-Gm-Features: AZwV_QiGVyojD-1izZ3-hpi4JThkBwcYDNbp7bhF29TRDbbwyZJV0en7PwH1OqY
+Message-ID: <CA+RJvhxhrRMnSqwdOtme7om0=qzdAtkYNectDU7HC4f6w_7KOA@mail.gmail.com>
+Subject: Re: [PATCH blktests 2/2] block/042: check sysfs values prior to running
+To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>, linux-block <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Frederic,
+Hi Shinichiro!  Thanks so much for the review.  I'm correcting the
+attr and the unneeded argument preparing the V2, but I'm confused
+about the below request:
 
-On Thu, Jan 01, 2026 at 11:13:54PM +0100, Frederic Weisbecker wrote:
-> When none of the allowed CPUs of a task are online, it gets migrated
-> to the fallback cpumask which is all the non nohz_full CPUs.
-> 
-> However just like nohz_full CPUs, domain isolated CPUs don't want to be
-> disturbed by tasks that have lost their CPU affinities.
-> 
-> And since nohz_full rely on domain isolation to work correctly, the
-> housekeeping mask of domain isolated CPUs should always be a superset of
-> the housekeeping mask of nohz_full CPUs (there can be CPUs that are
-> domain isolated but not nohz_full, OTOH there shouldn't be nohz_full
-> CPUs that are not domain isolated):
-> 
-> 	HK_TYPE_DOMAIN | HK_TYPE_KERNEL_NOISE == HK_TYPE_DOMAIN
-> 
-> Therefore use HK_TYPE_DOMAIN as the appropriate fallback target for
-> tasks and since this cpumask can be modified at runtime, make sure
-> that 32 bits support CPUs on ARM64 mismatched systems are not isolated
-> by cpusets.
-> 
-> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
-> Reviewed-by: Waiman Long <longman@redhat.com>
-> ---
->  arch/arm64/kernel/cpufeature.c | 18 +++++++++++++++---
->  include/linux/cpu.h            |  4 ++++
->  kernel/cgroup/cpuset.c         | 17 ++++++++++++++---
->  3 files changed, 33 insertions(+), 6 deletions(-)
+>> Nit: spaces are used for indent. I suggest to replace them with a space.
 
-tbh, I'd also be fine just saying that isolation isn't reliable on these
-systems and then you don't need to add the extra arch hook.
+Using vim to show the tabs (using commands ":set list" then "set
+listchars=3Dtab:>-,trail:~"), I see in block/042 that I am indeed using
+tabs:
 
-Whatever you prefer, but please can you update the text in
-Documentation/arch/arm64/asymmetric-32bit.rst to cover the interaction
-between the asymmetric stuff and cpu isolation?
+device_requires() {
+        _require_test_dev_sysfs "queue/max_segments" "queue/dma_alignment" =
+\
+>------->-------"queue/virt_boundary_mask" "queue/logical_block_size" \
+>------->-------"queue/max_sectors_kb"
+}
 
-Cheers,
+And lower down in block/042, I see that in a past patch you used a
+single tab then spaces:
 
-Will
+>-------if ! src/dio-offsets "${TEST_DEV}" "$sys_max_segments" \
+>-------     "$sys_max_sectors_kb" "$sys_dma_alignment" \
+>-------     "$sys_virt_boundary_mask" "$sys_logical_block_size"; then
+>------->-------echo "src/dio-offsets failed"
+>-------fi
+
+However, when I check other test files, it seems like people have been
+using only tabs for indent rather than spaces.  For example in
+block/010:
+
+run_fio_job() {
+>-------_fio_perf --size=3D8g --bs=3D4k --direct=3D1 --ioengine=3Dlibaio --=
+iodepth=3D32 \
+>------->---------group_reporting=3D1 --rw=3Drandread --norandommap --name=
+=3Dnullb0 \
+>------->---------filename=3D/dev/nullb0 --name=3Dnullb1 --filename=3D/dev/=
+nullb1 \
+>------->---------name=3Dnullb2 --filename=3D/dev/nullb2 --name=3Dnullb3 \
+>------->---------filename=3D/dev/nullb3 --name=3Dnullb4 --filename=3D/dev/=
+nullb4 \
+SNIP....
+
+So, I'm unsure what to do.  Do you want me to use one tab then spaces
+as you did lower in block/042?  Or stick with only tabs as others seem
+to have been doing?  Or only spaces?  Sorry for the confusion and
+thanks for any help!
+
+John
+
+
+On Fri, Jan 16, 2026 at 8:03=E2=80=AFAM Shinichiro Kawasaki
+<shinichiro.kawasaki@wdc.com> wrote:
+>
+> On Jan 14, 2026 / 16:08, John Pittman wrote:
+> > In testing some older kernels recently, block/042 has failed due
+> > to dma_alignment and virt_boundary_mask not being present.
+> >
+> >    Running block/042
+> >    +cat: '.../queue/dma_alignment': No such file or directory
+> >    +cat: '.../queue/virt_boundary_mask': No such file or directory
+> >    +dio-offsets: test_dma_aligned: failed to write buf: Invalid argumen=
+t
+> >
+> > To ensure we skip if this is the case, check all sysfs values prior
+> > to run.
+> >
+> > Signed-off-by: John Pittman <jpittman@redhat.com>
+>
+> John, thank you for this series.
+>
+> > ---
+> >  tests/block/042 | 4 +++-
+> >  1 file changed, 3 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/tests/block/042 b/tests/block/042
+> > index 28ac4a2..bbf13fd 100644
+> > --- a/tests/block/042
+> > +++ b/tests/block/042
+> > @@ -11,7 +11,9 @@ DESCRIPTION=3D"Test unusual direct-io offsets"
+> >  QUICK=3D1
+> >
+> >  device_requires() {
+> > -        _require_test_dev_sysfs
+> > +        _require_test_dev_sysfs "" "queue/max_segments" "queue/dma_ali=
+gnment" \
+>
+> Do we need the first argument "" ?  It looks useless.
+> Nit: spaces are used for indent. I suggest to replace them with a space.
+>
+> > +             "queue/virt_boundary_mask" "queue/logical_block_size" \
+> > +             "queue/max_sectors_kb"
+> >  }
+> >
+> >  test_device() {
+> > --
+> > 2.51.1
+> >
+>
+
