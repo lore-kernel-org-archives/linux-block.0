@@ -1,106 +1,74 @@
-Received: from mail-ot1-f68.google.com (mail-ot1-f68.google.com [209.85.210.68])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 011.lax.mailroute.net (011.lax.mailroute.net [199.89.1.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2D6041322C
-	for <linux-block@vger.kernel.org>; Tue, 20 Jan 2026 17:24:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEDDC34F250
+	for <linux-block@vger.kernel.org>; Tue, 20 Jan 2026 17:33:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768929896; cv=none; b=aagyDJjZ1sR4q7keMuUOogjej4K/7Dw0yTv5epYDwYO41HfjLhHJORJcuvlVlYVV7SGLRBt1vJc9BAKVOviKmfWkTtPFwdojSSuTzQ6JhPj7yY6vnHh+SIHnqiYrIebWSGxNFiYktcaA6kz4GYiK3P5ObAwLJIpw+6kXmnUrbKc=
+	t=1768930423; cv=none; b=YJYP4yMCHIulqXUaZME5eZX+weYbrbDNPF8BsK2F6VL6j33iNTnyWbo6EGbKbs6uLWr2T1jntWoV+8YoEBVCKaNj2+BNluS/1tD2i5+ZhTRvd6xVdWWbp6hqNpnuAB87OtDaK4FC52XCJtqTBmMb0QPTOPBPyo7KHZYrAOgaSA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768929896; c=relaxed/simple;
-	bh=CujrEw+cKm2GKzRdfUbANKRittHXfLKMnJNavHCF4g0=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=n7DDUT17ZtuBdm6/2X8YyFk8rcnQyuNzZPXU+6yYY2fKmQoc/KTgFBQkqjhLiJVSWRGZkrDjS0fqm6ZDQgvgmjRrOP2HHKpUe7K2GAZxKg+Tz4c+AEUFZKUZHPa/pwYgVmFHH730Tis92i4tsOnmyKIABVw1YHyQfex88ETOjKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=nr09jmJB; arc=none smtp.client-ip=209.85.210.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1768930423; c=relaxed/simple;
+	bh=tFagLQqAn7jYHLggxD6ukov+XHeQpRISyFhpdf47eNo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FL4zXeJP4+rLJeP03qR6bx/T1FwD9HbsUxta4rQezAdnaA1HFvzfub17JaqhiVmjsanrqz0PBxcs/u/Xjx7wacVOkWYXdJuFdj941fbzXcDpfFJ+0vM47p/EtsPgL8ADsSXnuzMf3qsGj8BR4KaSKqDYPenybCEGHin/ERLSgFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=fDGaqV3f; arc=none smtp.client-ip=199.89.1.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="nr09jmJB"
-Received: by mail-ot1-f68.google.com with SMTP id 46e09a7af769-7cfd04f1be8so2099194a34.2
-        for <linux-block@vger.kernel.org>; Tue, 20 Jan 2026 09:24:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1768929894; x=1769534694; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sa8+4KO1m/ufVgLZFpuPOgrMf4fnNhj8yXe10/VofOY=;
-        b=nr09jmJBWfgxEC6vLKKvxIjyC4/HGPlMDfjimJO3foJMauqNpDNzMUaMKLYRR3YSsD
-         EGIy9OrXBSNiOxJXIoXqNhZ6UqPdpxmakPAIrJB1VF7Su+RkWaLjsirpfa5PsYLv1eFB
-         sJ+0qTcKWnJYrbCe4WN3s5BKXke55IGrHJprjCEQIIU52VbCnvnMqardffvSFAA+vf4m
-         X788vT+TuV2N/g17b1jz5jfU0IiEVcfGWklJg6EgofU4kwDnf78gaWNAkS/CpMA0s2fG
-         n+EQne9L9k9yYyZVJW3U+oZjnSd38no6x8HdSMQCud2SIQGBRFmzGrSwPZXZpnhhLBQq
-         LUqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768929894; x=1769534694;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=sa8+4KO1m/ufVgLZFpuPOgrMf4fnNhj8yXe10/VofOY=;
-        b=C4jED7UIakhlDgnuTyr8LSM/vCv5QCT2Dh9yq8KdYPxVG1Y0DlLq48rePNQKfEu1/g
-         xLZudPoXNdlaGC3R52btbO8BBJWa8VgXFwtOh1YZYkjaWjH7pMw6SCtKlW9yZNm8h3/z
-         VdoQQ5jbdA9d1Xjnf3ptrf2rfq7M8h+FyUlWsNQiBJfNk2PnVfmDynYW36KH8qFNmmjB
-         CsOSq+FdBSHeEXD5FWo7OjR5uO8HZRK3bKHYASPCvy4CU7RhZ6OJHHgQIsfYbtdorKsi
-         S7BQ9+8s7zOMsaVnlaSm1RgISvFhxY9H04x1Ehd1yV6a2BcdO34uVY6jZRkkuCgOhBrU
-         Hc8w==
-X-Gm-Message-State: AOJu0Yx8LfVNJWnRPQzAfnw12S/0TxEFjwIYJ/0NHITTYVE6tY3riMp9
-	DV3q0PXEuQLwkql1ev+5PiVzImE7LPPdvvqGOjMjWyctsYLyY47Xnk2VPA1sRgN2rC4=
-X-Gm-Gg: AY/fxX7EDSyJoC07JBmGzkksCr4SvrqNU3XTs4E2dp6ApabHJO7D6JnJyCcpx5Wz7I1
-	gQithDJP3QkqaL5s0BPekftOV3VCXzURdik3ZeQkmcgdHlXW1P1c0mmsixcBgCKbLvwDWgLWM/I
-	iiBp7xG8jrM6ouYB/bEM1uHKcCgiDGY4tDO9Yl0ryIn5OJKXxfMU2l2Ep50pberGyoXP0xW783o
-	hcsI57yJJ2hBs2sAlnR3wjwYrfQNBq5zZMNzFq6LBj1bONb8kUGiXJoqPsdnHWA7vWbUlxs0UI4
-	cWoRJ2rZOm/s8BR79dmnDl8oPzzV7RF+abfZ+6HcIkiK/k1Z95dQgR1Tag9ljZLJfXBabQ57p7S
-	XvVpVSVWaISnQKzYtCy8/1UbzT0BbAJczklfjBT7G9iquSJX1wG1jgz9rlBrUixh43m62aqgLo+
-	RXSpbnHFXLI4xdrNiheKTyGsOmbRoV1+RS3Ha7c9Hho6SgIW0rqz9psnKPDN5TPE0=
-X-Received: by 2002:a05:6830:7006:b0:7cf:d822:37fb with SMTP id 46e09a7af769-7cfe029c704mr8422971a34.34.1768929893712;
-        Tue, 20 Jan 2026 09:24:53 -0800 (PST)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7cfdf0e9209sm8932389a34.8.2026.01.20.09.24.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jan 2026 09:24:52 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: io-uring@vger.kernel.org, Keith Busch <kbusch@kernel.org>, 
- Ming Lei <ming.lei@redhat.com>
-Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-In-Reply-To: <20260116074641.665422-1-ming.lei@redhat.com>
-References: <20260116074641.665422-1-ming.lei@redhat.com>
-Subject: Re: [PATCH V2 0/2] nvme: optimize passthrough IOPOLL completion
- for local ring context
-Message-Id: <176892989230.1994823.2473484633888931536.b4-ty@kernel.dk>
-Date: Tue, 20 Jan 2026 10:24:52 -0700
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="fDGaqV3f"
+Received: from localhost (localhost [127.0.0.1])
+	by 011.lax.mailroute.net (Postfix) with ESMTP id 4dwZDb5m5Xz1XLyhN;
+	Tue, 20 Jan 2026 17:33:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1768930414; x=1771522415; bh=tFagLQqAn7jYHLggxD6ukov+
+	XHeQpRISyFhpdf47eNo=; b=fDGaqV3f51qXc08EZMT4BnFBh1ABuYa8vO1LfDUa
+	pbMH4wPnzs+AxXMDUCa16LkXmmPoN6AXqUgjm1hlsjcH7qNxeb5M48g6SQVAEPk/
+	ORqFMm+AiYUcG5V2T3w0I3s1pg3pccLE0ZPkniHIVHS8eOdc0woFBqhi88PAU8CO
+	VltoOBrOqRePe4CZo2Kc4jwbffggQHTZg5CpSAx8KSyv77R8jRfkAFFacFWZ3cBB
+	TnIfL2tBVBekODtx6VhbX5MkmbePgdGuClLgQpGIXJyEEvdbZFUJBDMNyhczFW3O
+	68fF5OAyvZXGaT0OGq3Jhll6kq4EqnvEpQHI+PPa2HwNUg==
+X-Virus-Scanned: by MailRoute
+Received: from 011.lax.mailroute.net ([127.0.0.1])
+ by localhost (011.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id PQBnCEWnSR38; Tue, 20 Jan 2026 17:33:34 +0000 (UTC)
+Received: from [100.119.48.131] (unknown [104.135.180.219])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 011.lax.mailroute.net (Postfix) with ESMTPSA id 4dwZDY3p1fz1XM5jn;
+	Tue, 20 Jan 2026 17:33:33 +0000 (UTC)
+Message-ID: <56e64af8-6a9e-4221-8a63-f6626c47e92b@acm.org>
+Date: Tue, 20 Jan 2026 09:33:32 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH blktests v7 0/3] replace module removal with patient
+ module removal
+To: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+ linux-block@vger.kernel.org
+Cc: mcgrof@kernel.org, sw.prabhu6@gmail.com,
+ Chaitanya Kulkarni <kch@nvidia.com>
+References: <20260115091101.70464-1-shinichiro.kawasaki@wdc.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20260115091101.70464-1-shinichiro.kawasaki@wdc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
 
+On 1/15/26 1:10 AM, Shin'ichiro Kawasaki wrote:
+> The patient module remover addresses race conditions where module removal
+> can fail due to userspace temporarily bumping the refcount (e.g., via
+> blkdev_open() calls). If your version of kmod supports modprobe --wait,
+> we use that. Otherwise we implement our own patient module remover.
+For the series:
 
-On Fri, 16 Jan 2026 15:46:36 +0800, Ming Lei wrote:
-> The 1st patch passes `struct io_comp_batch *` to rq_end_io_fn callback.
-> 
-> The 2nd patch completes IOPOLL uring_cmd inline in case of local ring
-> context, and improves IOPS by ~10%.
-> 
-> 
-> V2:
-> 	- pass `struct io_comp_batch *` to ->end_io() directly via
-> 	  blk_mq_end_request_batch().
-> 
-> [...]
-
-Applied, thanks!
-
-[1/2] block: pass io_comp_batch to rq_end_io_fn callback
-      commit: 5e2fde1a9433efc484a5feec36f748aa3ea58c85
-[2/2] nvme/io_uring: optimize IOPOLL completions for local ring context
-      commit: f7bc22ca0d55bdcb59e3a4a028fb811d23e53959
-
-Best regards,
--- 
-Jens Axboe
-
-
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 
