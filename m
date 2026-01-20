@@ -1,96 +1,113 @@
-Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C43642EECF
-	for <linux-block@vger.kernel.org>; Tue, 20 Jan 2026 13:42:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A717A1531E8;
+	Tue, 20 Jan 2026 15:15:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768916552; cv=none; b=uqcKTp4gIS/l3n/eUyo5631Vv6SW3JXcp57hWE/tVKDP74kw8wBcRfel0bBSXp/adkwcHCsN5VXg/7b5z2ubIOUaQwKpZEIkQ1RUz1CcFVD4CRkxQrEPL5ebk186sCp0gbYkKiG9W3+pE4+t5iGRbNJ0Lth91gW5ua1kIm0283I=
+	t=1768922124; cv=none; b=V3U0MhiT5NKSuT7OLQICbIXOtNe5C/oKaTyCsIqTPx3LwMa/OpvLuTO7GMLazPAUhN+OtjlE1B2XwLosM0SH5qRVXcJ3OXi8jhzud9EZ2H7tir26p7QXuLbfWsm6pF/c7orGsmXctScJtN7kUbX6vWLItDfzUs1cfNyyeGuYTuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768916552; c=relaxed/simple;
-	bh=Bvq1OiLJX+XuOddzADa3EtQmWj3/0bcBAuQyXDw38VM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FE3qz15JVQrgyRI3hhbMZWu2KqGfEnhpdmbgt3rgX79patneOnrSfPZjL90MbXu6Vi+YB4ILfMgc5wwGS8Ba88euaE7KHQDyd5VWMqmiDmQB5RikMBYTcIxgTrN3+gueHzVg3gODyWuDs+KNQ8i9Ma0NorYJm5PHhmMkHVSWNbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=48vWhJBo; arc=none smtp.client-ip=199.89.1.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1768922124; c=relaxed/simple;
+	bh=cB6+u0cGFM+BuA6s4Sw76CjAr/+izfs5ypcZfWumP+8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EzEy85kqJ/2Z+LMoThi5rMTg30Nv+y4s5oJbfL6KtV1t6+EM9nk+x7tOnQemBr2j1V/QCxZoozQV6tdQ+dx/ojGdxFbb0bcPAVFqCnNoYpPPtS6uVaBCHUjcDguU83O7RU/XIImmqztEh8xsCBsXySbCmjruTmCoWjT5gi21C40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dTm6pm0U; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="48vWhJBo"
-Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4dwT5x4KLLzlh1Wl;
-	Tue, 20 Jan 2026 13:42:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1768916548; x=1771508549; bh=rj0/q+F0OOTTSQFT1eQb2qCk
-	APNM4Sz31Z6SI7Safbo=; b=48vWhJBoRw/JJGx3OqwyNPgK3Mxv0zS8jHLGCKv+
-	y9CfKKpbpllkvwJ0hVabYpeFs21bcnBe2ACI+ryl4etvFFWmiYWfujnR+1gEoLzD
-	pXlZM61dDCT94iz60At3zamXfzpuovi42H1Oo+rCAk/FPGNDDDTRGt7vbbHiuBWz
-	7gwGG/OkoZ9ggZ1jxS8DVSdN2NRgh0niUVNsqpMM95XbGogoenCAPUL+Tqs/BScr
-	40RK2sgSj4FEyzOJCVa7J+fiEMFSb3/JEenE8EuniL36Ia3H96Rmw3J0a4+4n1d+
-	KCh3YWyRkrlKFoWZ5C0epORqT2BwI24bO5syH1HrNQVLGQ==
-X-Virus-Scanned: by MailRoute
-Received: from 013.lax.mailroute.net ([127.0.0.1])
- by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id ib6r9kwi6Ldb; Tue, 20 Jan 2026 13:42:28 +0000 (UTC)
-Received: from [192.168.50.14] (c-73-231-117-72.hsd1.ca.comcast.net [73.231.117.72])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4dwT5t74cgzlhH07;
-	Tue, 20 Jan 2026 13:42:26 +0000 (UTC)
-Message-ID: <06e8517a-1b30-4aef-9ec7-80b56a430fd6@acm.org>
-Date: Tue, 20 Jan 2026 05:42:25 -0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dTm6pm0U"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B042EC16AAE;
+	Tue, 20 Jan 2026 15:15:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768922124;
+	bh=cB6+u0cGFM+BuA6s4Sw76CjAr/+izfs5ypcZfWumP+8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dTm6pm0UbqrACPX84K25WsKI0mLcsga30LnGZ0xAs1QeHOq8GuYQb0tsVAj/1PyOk
+	 AN1JtPlGK2Lo1SN6drBYr1dVy9fdgzrRQCr2v1Zr5WaI0DgPDkYpbpHSPBc0lzPVxT
+	 mDodJS2/jqZjTXVaKaFD5qjNt2270SzYmLSpr9NA2qekfz0PdVSlZLmHpnEvNYJ+eY
+	 A07k9S1Ry7xxwMicubb01dCJM4tNlasnq386AOzVL87vqKI0T34pSKz9QNypV2LDxE
+	 2HWPcTW6E/V+Ce+TphpVMpakDh1WcI3tzKUwZtHRXG5Gb8k9H87NfGW6D+dQQz/FfZ
+	 kpuAsAsDnxf/g==
+Date: Tue, 20 Jan 2026 15:15:14 +0000
+From: Will Deacon <will@kernel.org>
+To: Frederic Weisbecker <frederic@kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Chen Ridong <chenridong@huawei.com>,
+	Danilo Krummrich <dakr@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Gabriele Monaco <gmonaco@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
+	cgroups@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-block@vger.kernel.org, linux-mm@kvack.org,
+	linux-pci@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 29/33] sched/arm64: Move fallback task cpumask to
+ HK_TYPE_DOMAIN
+Message-ID: <aW-cAlJCtI5Qtify@willie-the-truck>
+References: <20260101221359.22298-1-frederic@kernel.org>
+ <20260101221359.22298-30-frederic@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] block: Annotate the queue limits functions
-To: Christoph Hellwig <hch@lst.de>
-Cc: John Garry <john.g.garry@oracle.com>, Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org, Damien Le Moal <dlemoal@kernel.org>
-References: <20260114192803.4171847-1-bvanassche@acm.org>
- <20260114192803.4171847-2-bvanassche@acm.org> <20260115062613.GA9542@lst.de>
- <1eeca326-9403-4483-8b03-36621e79db81@oracle.com>
- <33fe1cf9-a779-427b-bf74-1eee4434517c@acm.org> <20260119084143.GA5509@lst.de>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20260119084143.GA5509@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260101221359.22298-30-frederic@kernel.org>
 
-On 1/19/26 12:41 AM, Christoph Hellwig wrote:
-> On Thu, Jan 15, 2026 at 08:53:32AM -0800, Bart Van Assche wrote:
->> On 1/15/26 1:11 AM, John Garry wrote:
->>> On 15/01/2026 06:26, Christoph Hellwig wrote:
->>>> This is missing a commit log.=C2=A0 And not really telling what kind
->>>> of annotation you're adding.
->>>
->>> And we removed these previously - see c3042a5403ef2.
->>>
->>> Does sparse now handle mutexes?
->>
->> sparse is dead.
->=20
-> It's not.  And even if it was we still need it.
-Is there perhaps a new official sparse git repository? What I wrote
-applies to the following repository:
-https://github.com/lucvoo/sparse.git. After some searching, I found a
-repository with more recent changes:
-git://git.kernel.org/pub/scm/devel/sparse/sparse.git
+Hi Frederic,
 
-There are 7 commits in the latter repository that are not in Luc Voo's
-repository. Not much, but better than nothing.
+On Thu, Jan 01, 2026 at 11:13:54PM +0100, Frederic Weisbecker wrote:
+> When none of the allowed CPUs of a task are online, it gets migrated
+> to the fallback cpumask which is all the non nohz_full CPUs.
+> 
+> However just like nohz_full CPUs, domain isolated CPUs don't want to be
+> disturbed by tasks that have lost their CPU affinities.
+> 
+> And since nohz_full rely on domain isolation to work correctly, the
+> housekeeping mask of domain isolated CPUs should always be a superset of
+> the housekeeping mask of nohz_full CPUs (there can be CPUs that are
+> domain isolated but not nohz_full, OTOH there shouldn't be nohz_full
+> CPUs that are not domain isolated):
+> 
+> 	HK_TYPE_DOMAIN | HK_TYPE_KERNEL_NOISE == HK_TYPE_DOMAIN
+> 
+> Therefore use HK_TYPE_DOMAIN as the appropriate fallback target for
+> tasks and since this cpumask can be modified at runtime, make sure
+> that 32 bits support CPUs on ARM64 mismatched systems are not isolated
+> by cpusets.
+> 
+> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+> Reviewed-by: Waiman Long <longman@redhat.com>
+> ---
+>  arch/arm64/kernel/cpufeature.c | 18 +++++++++++++++---
+>  include/linux/cpu.h            |  4 ++++
+>  kernel/cgroup/cpuset.c         | 17 ++++++++++++++---
+>  3 files changed, 33 insertions(+), 6 deletions(-)
 
-And I found this email from September 2025: "Re: Sparse maintainership"
-(https://lore.kernel.org/all/CACePvbU=3DfAf6nNih5r-epJwU8qpiJ4TmkU6yQg8O1=
-hrJKznDRA@mail.gmail.com/)
+tbh, I'd also be fine just saying that isolation isn't reliable on these
+systems and then you don't need to add the extra arch hook.
 
-Thanks,
+Whatever you prefer, but please can you update the text in
+Documentation/arch/arm64/asymmetric-32bit.rst to cover the interaction
+between the asymmetric stuff and cpu isolation?
 
-Bart.
+Cheers,
+
+Will
