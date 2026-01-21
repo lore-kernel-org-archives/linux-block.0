@@ -1,88 +1,85 @@
-Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
+Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FBA63126B2
-	for <linux-block@vger.kernel.org>; Wed, 21 Jan 2026 14:45:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AAE44C6F1D
+	for <linux-block@vger.kernel.org>; Wed, 21 Jan 2026 14:48:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769006738; cv=none; b=G1f3fYFTctNkyK2onoDqj1ECYUnbtvNXxQAfVkZ7bcjpkSVY4z1LUpU1ecoc1fSWoebTrJjTmrDsntr+qzJky7hTbz9huBzQHbgHtm2NatY57XcPtBPjMUaOmLj9Q/0DwVKmkn12YTnfohsdSgVn7iCqNLmYWIdBcVxFmWuQIIc=
+	t=1769006884; cv=none; b=TzlyF/GTG7DK/4wOctfPWActEXVeMRhqvLIz828n6bCVrsdFKrM+kCPEp6xTHEnJ9u76afg/l0/WvLxPmQTaF0lnB/nH7feGzEwBhFB0DkYlGrnSCpYRiBPXHX7cROfBI9S67l4cn+W790Qqa9mqy56qhfwzrzbwFs/p7bBj3wI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769006738; c=relaxed/simple;
-	bh=du6gKJXrQs6RJhJZOe6uv2xtSqobAVtxvVa6PU3+Weg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KkxR7PPV1sbt/ozwZ6uUll4DErrn+3LF4ihwwIveMTZTHNPgOugTSekFn7HvVbUyK0vLvI1dqlCcpmADU3WShmdL3znSJqgQQPvDKxpv8fXpj7wW2IYeHvR2/9PQyJaRTdwg/njrbetVRXw4+KbOkSZT3hHZppR85oCylM8bml8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Uu3SUHxZ; arc=none smtp.client-ip=209.85.167.176
+	s=arc-20240116; t=1769006884; c=relaxed/simple;
+	bh=mZE8Hk7PfGvF8HALLlgjtJ7b6zqMNmnUFjMAdt+vOZ8=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=Oifxs+e/dZ+lbRJBNuIQdrkrzggZwgEpd+ufEdZTlLzBE2Exu92EmIB4sqrsVYt8XB/KdxepNlaC0fnBTucPxrYWCGE7atUSlNNDcVy5wGn+8W12jAbKYmCgcrR08Q/xM5hr5MUhgUKl5dxGNLQRWCSNq03BZY2Q0FvBD1Z+0UI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=r+PTncNg; arc=none smtp.client-ip=209.85.167.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Uu3SUHxZ"
-Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-45c958d480aso3160502b6e.1
-        for <linux-block@vger.kernel.org>; Wed, 21 Jan 2026 06:45:34 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="r+PTncNg"
+Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-45c8984fac8so2018165b6e.3
+        for <linux-block@vger.kernel.org>; Wed, 21 Jan 2026 06:48:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1769006733; x=1769611533; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Nfv55OSEk4T+D6o+9c3xawnnfmZ6Qods0Pwv8rYz6bE=;
-        b=Uu3SUHxZhoVGcTGTvqkHgi2n+QsuSvfGWTDNtid01VV+SYd7gP4AqNBhpZK534xWcI
-         oTG4Ornn410WIPYAA22RLQRjUtuXv3mKxjepCTTDfUGc5PPc1NDif4cQmxFiFD19iIeS
-         Fgkv+JIWXZBPyoLquyuehBGhxY0Pnl2V/gX4+5zSKxlu4aP/jHg+QGjGICvIixTHFKP6
-         zyjM+8QNoNa3ZM3Se8WYvlkWbeG8gq1xTSYfyJ17+h0Osagg4edc6IS1f8YikIbE8VlO
-         +n244PUwAlr1Vl0EBYGjQbTjGsU8WBVjG6v0u0bvKz7vht0VCIWpDGyK1xDMH4JvmPJs
-         z7fg==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1769006882; x=1769611682; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iTUuP97slCqRp8vpSo1t9EhLn96fGsRPJRFZTMxF6oc=;
+        b=r+PTncNg2hwexJwPK71QQY6++1tmMbUeZzwoMN2XippzMul6ZsItCXDjf7rXlLIe3q
+         tQTQcK314XvUgWmsK1NyeLoBbDIGJWQH/0I5TIYMhRxluLt3YqEyBMCBy0gDwECqfR1M
+         aImytNuMfuVZKDR1MxfMJ4P/19pCUGh4peSWeOjg9TUxnQlT3stkOa+nKshzhooiayHr
+         jZWkXbpzneHaQrODDIBJHNVtqiBUWR3BRZKvWl4hhY+f8gRfYoTjAfw70UuFCE7Ps496
+         wLX3hobm7btcv5rvyHsIrz8I1NeBaIViiCel/eGqc4iB9MfZ58NXMQuLaUsJrUwxcbH2
+         7Suw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769006733; x=1769611533;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Nfv55OSEk4T+D6o+9c3xawnnfmZ6Qods0Pwv8rYz6bE=;
-        b=piKPT4qPKykDbBTYIORGVRIW5q+7Y5iBVtWu2ycb3t6Dw4D8F9YbShtJ6E4NdbKp15
-         vhIUTaXoUrX+vatMIbYA8h1aTgiFdtzLbBEvkczwL68V10BWfnkMIGhmsy/qp7xksTmu
-         /Ck0nWhTqiqev6gajZkbXe/oMYxV9/lz/o6fl9xR2SlNw7LuloUoHT7WrXzTbVBLhH09
-         erY6K5AmtlBCKutSJaVk6MMFKq4w8y3Yq/ICgB7nZu8LLXtMW8fdG3YyuZgSdATs1uCo
-         Jkqj6RbG7Cq5waO8u4w72MJYjMzbWDdgt6aEH9QpoOylBNp9MKcHcPlxHnFUhe6XK8LR
-         CgUw==
-X-Forwarded-Encrypted: i=1; AJvYcCX47Ybzw2QXSaaIdNfOWIvxuX2jAbmoLuSCwEf6R8+u+ii5Fo4mPpBmSMmicSKy8LX7wp+Jf613AJmelg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YztxLEj0GE1z+1llpI4UWOqWf2J/D18o2v3/WdSiUgy/fiwUs6C
-	s2xMqPPDd8w3h6EvbuNUuEIGSwfKRQ3zeR7s4b88K+I7YaTlGzlYa+RfwwcktpwvCowQDaKxhgI
-	6vjmFVrk=
-X-Gm-Gg: AZuq6aJfgpTSWXsDmkmC1EuimbbTqckk3+nYX8oAZJIiHO53kYjODBxgusWIG0KHgFf
-	j32fvKUuCvlOZjk3xGpcSuzhdznZ8/9mD9UPyX0qTTuYRK+PArusDoDCTm327tmHaY/MyzSXNQj
-	KpH2a60aa7KY7WMba/g5SE/tuYXMYsQl8elNnn6TfQDYJoWmTKqz6ozzn7ObiSQP6sCeV92sP9N
-	dfUYnFtA6DDjYI/uSp1s2LzmZ3tPhIkfbK0br1K5/obaDO09GP6VgN5oLWJhk26gW4l3DZQznzd
-	mvbwgHdY5BJs47PYK2SWEYgPeGbUdPUVdsKqB7aA8WOH7fEJdSF1xk0ShAVVoHtERkOog+yMB+e
-	J10biBTpBXxPBfPzawqBukQrI1w+NTIqRuQlem6yZmk8h2RNsAJj6MYc6OA06PIhTsuJB909RW+
-	cZwDZu6auw5lKFpK4fQ1LrSm6yLhkQH/nZRfQqHfvlCGXn0VFLOt6P6noy+O2Fl0TP3d64WJAxx
-	YWz46o=
-X-Received: by 2002:a05:6808:3088:b0:45c:9a6e:1ea1 with SMTP id 5614622812f47-45e8aaad5b4mr2707763b6e.66.1769006733341;
-        Wed, 21 Jan 2026 06:45:33 -0800 (PST)
-Received: from [192.168.1.102] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-45c9e08dbbbsm8824394b6e.21.2026.01.21.06.45.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 21 Jan 2026 06:45:32 -0800 (PST)
-Message-ID: <0faaa7ff-597d-4b25-b03a-a01cf8b2a013@kernel.dk>
-Date: Wed, 21 Jan 2026 07:45:31 -0700
+        d=1e100.net; s=20230601; t=1769006882; x=1769611682;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=iTUuP97slCqRp8vpSo1t9EhLn96fGsRPJRFZTMxF6oc=;
+        b=ZV+9sL6GSRixrWUYo8Zbf7GhwsdFsgh/C3szTsA3AJqhK8FcKK0rqkqCHmZZtbZWRh
+         kE7Nha3yAKO0LcIC/42wxSKtVHR2+s27W+zqyntoQUputwVQiJzFUkDPWOa6vPix//yi
+         gQhCnuJFXP+CQ2nlbJyP0p53gk2ONlQQMGWG10XMC0tvH+G/iHNwxgMziBnuPngxPIiO
+         ly2VCg5tYWIfNUNunVjmlYfpwkfIWos50iFiiNPo30ESnWoHXjmPMRwoEZU/yL8Df8L6
+         z2iPyzs5xMP3GvpuD62uTLZf8Fy8J1hZOGlr5YbYAMl/g8RKSDBzouDvbtmp7CrDyFqf
+         YnvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVdJA0maXwj4bDJoK0iAQyJ0xVC0gEFqQ9BfvGuwYjQQCJGJT9n62CoR9bZVu4XZ4fN0/nWzRDOckTS5A==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyxIMxJngwqKnw9KZ6rshOt/EKqkB9ETqBmE1g13y8pcaHGI/2m
+	BJHjHmNv+fs82Raok2M2tMK9qecbBy03kDEoAeOuqLl61uQ/r/6u8XmcP8J3ONeQcCs=
+X-Gm-Gg: AZuq6aKM+BgaK42g02sbEvOZ7wbVylr6r/O8W2haYSv3RHfCrAYWbXf+e+2bYQ560d+
+	5bwxvqDL1pCk/UY9SzatEJIIxGtGF7IDAo4rnIXpHUkg0O3Q3TLZfsY+KyaE8j6lPJx0L4k7FZF
+	w+GuM3fRvamMrXHi0m34oFGv57P6P8vDX4PUzr8C2Z4BHgjzKLcoBzEZPh4icqyGvHmp8wpG0fT
+	r/lFvC3Yt4GHns0ry5OaYtyPT2ret+VE0zzBNr0ccfKdz5FgjkJFA0lnit3qOsn1NOQHoKzJS8E
+	xrGoUWskiPDDsenJ9CIS+e2beCDIuzFRE6sPQvYf/dPT9njMGMJcoUhdO69nZZnnmpNR4k3pOFn
+	67bpRfwvU3ZoCdVyBJ86tZa+aMllxLI4mp0Ukw5P5kNk8WdTV6zdpsba4z/P0ypsIJRMJlemW2D
+	qApRxD02cqwV9b36/5SpY4XWGCghyaLYS/VkQv+sqjqqJPX0yz6nkNf8E4AOoic+g=
+X-Received: by 2002:a05:6808:1207:b0:45c:8c9a:44eb with SMTP id 5614622812f47-45c9c14fd52mr6878378b6e.36.1769006881780;
+        Wed, 21 Jan 2026 06:48:01 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-45c9e03e82esm8760513b6e.15.2026.01.21.06.48.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Jan 2026 06:48:00 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org, 
+ Seamus Connor <sconnor@purestorage.com>
+Cc: Caleb Sander Mateos <csander@purestorage.com>
+In-Reply-To: <20260115025952.2321238-1-sconnor@purestorage.com>
+References: <CAB5MrP5YbxdUe0378VfKBMb_n9=6G-C=TPixYoMaV48trgtWBg@mail.gmail.com>
+ <20260115025952.2321238-1-sconnor@purestorage.com>
+Subject: Re: [PATCH v4] ublk: fix ublksrv pid handling for pid namespaces
+Message-Id: <176900688050.9724.9395276335790217400.b4-ty@kernel.dk>
+Date: Wed, 21 Jan 2026 07:48:00 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4] ublk: fix ublksrv pid handling for pid namespaces
-To: Seamus Connor <sconnor@purestorage.com>, Ming Lei <ming.lei@redhat.com>,
- linux-block@vger.kernel.org
-Cc: Caleb Sander Mateos <csander@purestorage.com>
-References: <CAB5MrP5YbxdUe0378VfKBMb_n9=6G-C=TPixYoMaV48trgtWBg@mail.gmail.com>
- <20260115025952.2321238-1-sconnor@purestorage.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20260115025952.2321238-1-sconnor@purestorage.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-Mailer: b4 0.14.3
 
-On 1/14/26 7:59 PM, Seamus Connor wrote:
+
+On Wed, 14 Jan 2026 18:59:52 -0800, Seamus Connor wrote:
 > When ublksrv runs inside a pid namespace, START/END_RECOVERY compared
 > the stored init-ns tgid against the userspace pid (getpid vnr), so the
 > check failed and control ops could not proceed. Compare against the
@@ -90,15 +87,16 @@ On 1/14/26 7:59 PM, Seamus Connor wrote:
 > the caller’s pid namespace when reporting GET_DEV_INFO so ublk list
 > shows a sensible pid.
 > 
-> Testing: start/recover in a pid namespace; `ublk list` shows
-> reasonable pid values in init, child, and sibling namespaces.
-> 
-> Fixes: d37a224fc119 ("ublk: validate ublk server pid")
+> [...]
 
-Where is this sha from? Looks like this should be:
+Applied, thanks!
 
-Fixes: c2c8089f325e ("ublk: validate ublk server pid")                          
+[1/1] ublk: fix ublksrv pid handling for pid namespaces
+      commit: 47bdf1d29caec7207b7f112230055db36602dfc0
 
+Best regards,
 -- 
 Jens Axboe
+
+
 
