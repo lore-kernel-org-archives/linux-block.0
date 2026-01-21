@@ -1,71 +1,135 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2549D199385;
-	Wed, 21 Jan 2026 12:21:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D20F48B389
+	for <linux-block@vger.kernel.org>; Wed, 21 Jan 2026 12:36:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768998118; cv=none; b=Rk+VVrhkfwr0PEU1lIqmZC92sMqCORPdbjBB/ogUPkM9JMOdMAK43J+pBTLuM5M/UYPYJBLAZGanzPtXMLNDOVfk7iCNx/AWlcaVJOqi+VG0B55VFUUXcF430oFHIVayjp3VDYJZV/Uj8FBqLusSVqKS49IKTAx8bCaSTfTu2yI=
+	t=1768998996; cv=none; b=PrabgBCqwEsxgE4HuyeTad0mP08PhWHKujwPpjB9syxKZAy3Ud6J51qkqjwNwBNv2zHLz7N73P1mPZHUTwfDqX6PanBa+diHhvYUrOwnhggYah7fptTIcOICpuOKeV7Qvn2TdEI4CzTydjkOJYG1tAkUruja5RuSvCgJqkush9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768998118; c=relaxed/simple;
-	bh=uAoexXlStnKJ6Ucj7FIagodxFTAoMSySrT/B9piab1U=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=mtzbqxUhCGfbKbQGtl6Td3ThPYTCnciYnzqp2mgewQsPaMqZXntR2kq13waNxXRleNfg4Ky66Y0po2TQV2QuKrOOwUvh+VGYmIbr8AEGOS5NDOPfMgPKKU8LQ673/GkW92LliY/8QMDDxc4Oe8FobA8V8aryn6Sx5wqId75LjW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZK1D4ksh; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768998996; c=relaxed/simple;
+	bh=BHt3Yg56RB1BYd7f8HjwyhlFnNJaRmTd+f51TDTXjDY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iO7Grhh2akCHDAksGRbjXitNSU5qUa9qmuMH0xcWaeiyi0XBzIu2eJMGnXP0xBsZWNOmwxjWSMleZT0aHw5dzmDS4aEM0dqSqFnfPNf8lMo22Toy/hBbCWTCJBuH6Bh0cx5bUqlsSPPLZBmsC3+JJNyFvMAArPcecy9xBWdIi74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=b438SPpK; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Au2Wtalc; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=b438SPpK; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Au2Wtalc; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZK1D4ksh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D8B1C116D0;
-	Wed, 21 Jan 2026 12:21:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768998117;
-	bh=uAoexXlStnKJ6Ucj7FIagodxFTAoMSySrT/B9piab1U=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=ZK1D4kshikxSph7pV6IC/3hh7jvWlXldnwo7fpmYCgO/o+iOamiapY5Con8dtaEEx
-	 Wc/4/eBfkA6UY4v++D1w+07vAc0ZSmbrWMQ4Szuftp/YKVZa/IBKPZoB384DBTlWA8
-	 p251o8C1Ty+DebyjoItpt7cSV7PYTrXHTBlyAnCi3EVsVFhgm7pTasfT0a6gQ38Zf7
-	 2fUkjvJ0uYVwJGbeZkUETh6nrc7wqHZb7uN+tLyka0/oDG6X0ibmGpvFkOOn9OUSYC
-	 sqj8DDKY4eSWrr4ut1Xd0bPe10fjLEBqLdWegLEG4POH/PIaDeqk+dldDe9pr8IU/O
-	 TUlbc6SzLqMvQ==
-From: Carlos Maiolino <cem@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
-Cc: Damien Le Moal <dlemoal@kernel.org>, 
- Hans Holmberg <hans.holmberg@wdc.com>, Keith Busch <kbusch@kernel.org>, 
- linux-block@vger.kernel.org, linux-xfs@vger.kernel.org
-In-Reply-To: <20260114130651.3439765-1-hch@lst.de>
-References: <20260114130651.3439765-1-hch@lst.de>
-Subject: Re: improve zoned XFS GC buffer management v4
-Message-Id: <176899811589.852468.8217537567492644435.b4-ty@kernel.org>
-Date: Wed, 21 Jan 2026 13:21:55 +0100
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="b438SPpK";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Au2Wtalc";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="b438SPpK";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Au2Wtalc"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 0E0FB5BCFE;
+	Wed, 21 Jan 2026 12:36:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1768998992; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BHt3Yg56RB1BYd7f8HjwyhlFnNJaRmTd+f51TDTXjDY=;
+	b=b438SPpKggth3qZQQ9104HcV/w72js38KcdBaseJlxHYlXH40p80O5FTxKsZREc9qK3wnr
+	SmfPeQj9L3/9ARfaB6dIbsHuiI1nLg51f5LpOzwQALJeSuu1aP+ywfSpCchARP7eTM2P7t
+	CcxFTQsj7706JMthCE3WYS7BhuGwat8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1768998992;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BHt3Yg56RB1BYd7f8HjwyhlFnNJaRmTd+f51TDTXjDY=;
+	b=Au2Wtalcpso3foWFHc8FXSz+RdxH+Zt+CUNFzQDpNoSc/e1je5DjB3iC81sEbNHgIv6MtH
+	hP4mEOkv/2RDMZDA==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=b438SPpK;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=Au2Wtalc
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1768998992; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BHt3Yg56RB1BYd7f8HjwyhlFnNJaRmTd+f51TDTXjDY=;
+	b=b438SPpKggth3qZQQ9104HcV/w72js38KcdBaseJlxHYlXH40p80O5FTxKsZREc9qK3wnr
+	SmfPeQj9L3/9ARfaB6dIbsHuiI1nLg51f5LpOzwQALJeSuu1aP+ywfSpCchARP7eTM2P7t
+	CcxFTQsj7706JMthCE3WYS7BhuGwat8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1768998992;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BHt3Yg56RB1BYd7f8HjwyhlFnNJaRmTd+f51TDTXjDY=;
+	b=Au2Wtalcpso3foWFHc8FXSz+RdxH+Zt+CUNFzQDpNoSc/e1je5DjB3iC81sEbNHgIv6MtH
+	hP4mEOkv/2RDMZDA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id F1CED3EA63;
+	Wed, 21 Jan 2026 12:36:31 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id uLgKOk/IcGkveAAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Wed, 21 Jan 2026 12:36:31 +0000
+Date: Wed, 21 Jan 2026 13:36:31 +0100
+From: Daniel Wagner <dwagner@suse.de>
+To: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+Cc: "hch@infradead.org" <hch@infradead.org>, 
+	Stephen Zhang <starzhangzsd@gmail.com>, Kent Overstreet <kent.overstreet@linux.dev>, 
+	Coly Li <colyli@fnnas.com>, Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>, 
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>
+Subject: Re: [PATCH blktests] bcache: add bcache/001
+Message-ID: <740e43f6-549b-4c9b-b1e0-0eebd0c2323b@flourine.local>
+References: <20260120-bcache-v1-1-59bf0b2d4140@suse.de>
+ <bc45323c-d261-4ff4-8174-28fbb0676237@wdc.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bc45323c-d261-4ff4-8174-28fbb0676237@wdc.com>
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	URIBL_BLOCKED(0.00)[suse.de:dkim,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	ARC_NA(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[infradead.org,gmail.com,linux.dev,fnnas.com,wdc.com,vger.kernel.org];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	RCVD_COUNT_TWO(0.00)[2];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received,2a07:de40:b281:104:10:150:64:97:from];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DWL_DNSWL_BLOCKED(0.00)[suse.de:dkim];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MISSING_XM_UA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:dkim,flourine.local:mid]
+X-Spam-Flag: NO
+X-Spam-Score: -4.51
+X-Rspamd-Queue-Id: 0E0FB5BCFE
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spam-Level: 
 
-On Wed, 14 Jan 2026 14:06:40 +0100, Christoph Hellwig wrote:
-> the zoned XFS GC code currently uses a weird bank switching strategy to
-> manage the scratch buffer.  The reason for that was that I/O could be
-> proceed out of order in the early days, but that actually changed before
-> the code was upstreamed to avoid fragmentation.  This replaced the logic
-> with a simple ring buffer, which makes the buffer space utilization much
-> more efficient.
-> 
-> [...]
+On Wed, Jan 21, 2026 at 08:19:08AM +0000, Johannes Thumshirn wrote:
+> It's either my MUA or there's some mix of space and tabs here.
 
-Applied to for-next, thanks!
-
-[1/3] block: add a bio_reuse helper
-      commit: 7ca44303f9f6160a2f87ae3d5d2326d9127cd61c
-[2/3] xfs: use bio_reuse in the zone GC code
-      commit: 0506d32f7c52e41f6e8db7c337e0ce6374c6ffbb
-[3/3] xfs: rework zone GC buffer management
-      commit: 102f444b57b35e41b04a5c8192fcdacb467c9161
-
-Best regards,
--- 
-Carlos Maiolino <cem@kernel.org>
-
+I had a mix of tabs and spaces and didn't realize it before sending it
+out. I've converted it all to spaces. I'll sent an new version, so it's
+actually readable. Sorry!
