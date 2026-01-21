@@ -1,85 +1,44 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A02A330305
-	for <linux-block@vger.kernel.org>; Wed, 21 Jan 2026 12:48:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A6F23D411D;
+	Wed, 21 Jan 2026 13:43:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768999711; cv=none; b=tGCtEkIyaLoeHfunj5SP4mhCc3/AE490ypFhdTpYbnWI5C5gh0ktvsvXMC8PFblL8X0197tVU5AUQreh5dp5KscjpboHLXcfpWdlTYm/C57IKoCUuzaQtKXXkB584I9/RnJx3wgxQYs7JfjXIbD4/94JVTHHsQF1RRkWEff4I6s=
+	t=1769002991; cv=none; b=ZCXW0RaxUxUfZwsuksbO8h26wuduTqX6+/6nKtYuVXo4NYd+AQ2ldSQfn6X6mzGILcMzWV38iDfRlm0MxumDwRV8/RYIbZMymzYieN3dzHD3mA6Bcds/wfF1PxG5t8KXabivn/KliHeOpc6zM71DUsuajw+1EYQTHOATAYbzQDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768999711; c=relaxed/simple;
-	bh=MQUwqdHyd/BOxoWEu9xk4LKrRqcZUSaOJ8tsfHYDvDU=;
+	s=arc-20240116; t=1769002991; c=relaxed/simple;
+	bh=BPUSs+DRWFaZUaaeSKV+bFcPdPErDhU0WKpIbS8DUQ0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t5eYIpI54aBWc0vXh+tMDfqb/FWEJsEAZdF4mJ5UnINNdEywQp/forTIMnlVpn3sNArZ3o4idNDPjaLoIsqbmwIq0OSSB02rIwCjhW7/D89QewFgMF0m86boDHyfq/c3OEqhxu1IYFszz/DJMOYILQSw18+F/NvzZCFwo2tsV9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=g6v6oxje; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=wuP4Ta1S; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=g6v6oxje; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=wuP4Ta1S; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	 Content-Type:Content-Disposition:In-Reply-To; b=FtoPUTnWS3RvsgtE0cX7TCdPigZ2JMEnWVctjF+SpppVfTzlOdZlV0opW3mXZVErcDyhP3YlRD+Dnssi6mvdc4QIuU6rtvGLapNakjeZEVY/6FgMncqm00Xv1AmQ/XDcL7zP5UOMPH42hzPr8TAECJOFVHzYvfIJtjn1UHI4vrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=TB9H8ELB; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="g6v6oxje";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="wuP4Ta1S";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="g6v6oxje";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="wuP4Ta1S"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 1D56A5BD01;
-	Wed, 21 Jan 2026 12:48:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1768999708; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=faEXmTyOTXLohN/DbSvHrX9xwFhdeS+KvDdK6U4EqeI=;
-	b=g6v6oxjelf/AkRvp2Qnn6bhMtGAnTK5B7e9p46adA9i/S+Ju/1lL2pEaTwOUoeaYuRBjXT
-	XPcSBCe9w9+Nfvjmi+MXij/NCqs5OdLOmgC2kM/RizKzCRkv0yJlG3D3O3pSOv4hH4RgKq
-	J4Xb/rQd/0oh4S0us32P0rPfJ5kHaj4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1768999708;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=faEXmTyOTXLohN/DbSvHrX9xwFhdeS+KvDdK6U4EqeI=;
-	b=wuP4Ta1SZHOKpmXuKoXdJVvbw4LgZvXXqy5cpopA1hPshTTsvkgMRVCa19cmMoFdSJqkmk
-	fyvSWIaDT+J/WPDg==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=g6v6oxje;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=wuP4Ta1S
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1768999708; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=faEXmTyOTXLohN/DbSvHrX9xwFhdeS+KvDdK6U4EqeI=;
-	b=g6v6oxjelf/AkRvp2Qnn6bhMtGAnTK5B7e9p46adA9i/S+Ju/1lL2pEaTwOUoeaYuRBjXT
-	XPcSBCe9w9+Nfvjmi+MXij/NCqs5OdLOmgC2kM/RizKzCRkv0yJlG3D3O3pSOv4hH4RgKq
-	J4Xb/rQd/0oh4S0us32P0rPfJ5kHaj4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1768999708;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=faEXmTyOTXLohN/DbSvHrX9xwFhdeS+KvDdK6U4EqeI=;
-	b=wuP4Ta1SZHOKpmXuKoXdJVvbw4LgZvXXqy5cpopA1hPshTTsvkgMRVCa19cmMoFdSJqkmk
-	fyvSWIaDT+J/WPDg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 0CEEA3EA63;
-	Wed, 21 Jan 2026 12:48:28 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id n9EtAhzLcGlRBQAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Wed, 21 Jan 2026 12:48:28 +0000
-Date: Wed, 21 Jan 2026 13:48:27 +0100
-From: Daniel Wagner <dwagner@suse.de>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Stephen Zhang <starzhangzsd@gmail.com>, 
-	Kent Overstreet <kent.overstreet@linux.dev>, Coly Li <colyli@fnnas.com>, 
-	Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>, linux-block@vger.kernel.org, linux-bcache@vger.kernel.org
-Subject: Re: [PATCH blktests] bcache: add bcache/001
-Message-ID: <512c18ed-feed-416d-9de6-c9183da98efc@flourine.local>
-References: <20260120-bcache-v1-1-59bf0b2d4140@suse.de>
- <aXCGseCNoaX8rQ83@infradead.org>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="TB9H8ELB"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=BPUSs+DRWFaZUaaeSKV+bFcPdPErDhU0WKpIbS8DUQ0=; b=TB9H8ELBvyJ5o6fkmXBGE4HzcU
+	9kZIHgbsSNMa8UTK1gr6PLdBQ9DQ+98G4MdYJXDwlKI0PDa6k0DF62m2e+9bxQypK70NS9dRgdjs6
+	KCXrEmoY3uismyDUFAoTuWFzrMDI0CcIZOIrtnbmF2qrUo9RF6CcjMs8ATBLLdqTWaiHTiMjyMtgO
+	JcxDOomHm7tIVdPaGybioLZHIcpzAd+6cueMVtff2W6tdFhMZDvf8HismZ+B6EnBY59n5StiREDMX
+	eNy2Bzzuz3aqmAfhagGKItK8pqGb+aHz7q+K5L2970v8upiGS/HR81671xwwIG3QyJV4duuxa0Z85
+	F1SeW3rA==;
+Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1viYU8-0000000GPup-13XG;
+	Wed, 21 Jan 2026 13:43:00 +0000
+Date: Wed, 21 Jan 2026 13:43:00 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: Jan Kara <jack@suse.cz>
+Cc: Andrew Morton <akpm@linux-foundation.org>, bernd@bsbernd.com,
+	Joanne Koong <joannelkoong@gmail.com>,
+	Miklos Szeredi <miklos@szeredi.hu>, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH v2] flex_proportions: Make fprop_new_period() hardirq safe
+Message-ID: <aXDX5IXuvghtyZZU@casper.infradead.org>
+References: <20260121112729.24463-2-jack@suse.cz>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -88,82 +47,23 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aXCGseCNoaX8rQ83@infradead.org>
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	URIBL_BLOCKED(0.00)[flourine.local:mid,suse.de:dkim,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	TO_DN_SOME(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,linux.dev,fnnas.com,wdc.com,vger.kernel.org];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	RCVD_COUNT_TWO(0.00)[2];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received,2a07:de40:b281:104:10:150:64:97:from];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	DWL_DNSWL_BLOCKED(0.00)[suse.de:dkim];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:dkim,flourine.local:mid]
-X-Spam-Flag: NO
-X-Spam-Score: -4.51
-X-Rspamd-Queue-Id: 1D56A5BD01
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spam-Level: 
+In-Reply-To: <20260121112729.24463-2-jack@suse.cz>
 
-On Tue, Jan 20, 2026 at 11:56:33PM -0800, Christoph Hellwig wrote:
-> On Tue, Jan 20, 2026 at 02:28:18PM +0100, Daniel Wagner wrote:
-> > So far we are missing tests for bcache. Besides a relative simple
-> > setup/teardown tests add also the corresponding infrastructure. More
-> > tests are to be expected to depend on this.
-> > 
-> > _create_bcache/_remove_bcache are tracking the resources and if anything
-> > is missing it will complain.
-> 
-> Not really an expert on bcache, and not that much in blktests either,
-> but having some testing for bcache readabily available is fantastic!
+On Wed, Jan 21, 2026 at 12:27:30PM +0100, Jan Kara wrote:
+> Bernd has reported a lockdep splat from flexible proportions code that
+> is essentially complaining about the following race:
+[...]
+> Note that a deadlock like this is only possible if the bdi has
+> configured maximum fraction of writeout throughput which is very rare
+> in general but frequent for example for FUSE bdis. To fix this problem
+> we have to make sure write section of the sequence counter is irqsafe.
 
-I think so too. Anyway, I'll hope, I figure out to make it more
-stable/consistent. 
- 
-> > Note: to run this tests blktests TEST_CASE_DEV_ARRAY needs to be set:
-> > 
-> >   # cat config
-> >   TEST_CASE_DEV_ARRAY[bcache/*]="/dev/nvme0n1 /dev/vdb /dev/vdc"
-> 
-> Can you add a blurb to Documentation/running-tests.md about this?
-> 
-> I also wonder if we could have a generic TEST_CASE_DEV_ARRAY that
-> would just work for all tests needing multiple devices?
+Ah, that's why we haven't seen it reported before.
 
-Sure, I'll update the documentation.
+> CC: stable@vger.kernel.org
+> Fixes: a91befde3503 ("lib/flex_proportions.c: remove local_irq_ops in fprop_new_period()")
+> Reported-by: Bernd Schubert <bernd@bsbernd.com>
+> Link: https://lore.kernel.org/all/9b845a47-9aee-43dd-99bc-1a82bea00442@bsbernd.com/
+> Signed-off-by: Jan Kara <jack@suse.cz>
 
-On this note, It took me a while to understand that using
-TEST_DEVS="/dev/nvme0n1 /dev/vdb /dev/vdc" is not populating the
-TEST_DEV_ARRAY array.
-
-Commit 653ace845911 ("check, new: introduce test_device_array()")
-explains why:
-
-    As to the test target devices defined in TEST_DEVS variable, blktests
-    assumes that each test case with test_device() function is run for each
-    single device defined in TEST_DEVS. On the other hand, it is suggested
-    to support a test case for not a single device but multiple devices.
-
-Maybe we could add a default config with all options listed and
-documented but commented out.
+Reviewed-by: Matthew Wilcox (Oracle) <willy@infradead.org>
