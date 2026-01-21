@@ -1,162 +1,104 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A654548A2D5
-	for <linux-block@vger.kernel.org>; Wed, 21 Jan 2026 14:36:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FBA63126B2
+	for <linux-block@vger.kernel.org>; Wed, 21 Jan 2026 14:45:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769006205; cv=none; b=dhuKSkXjpDntoCS9Ml3dtoc6MSIxJO0urbldST2nSWyAWaWW2v9hvxjKP6HTJMWThbtYzXYQwWmAOQcyLsUZgR30XYrjhLBVnQ9jyoXRjcW0Hn56GqpUAZxzwv2pyrXLOSCRvSZv1x/D3lE1qU6bY7NgZ4vsCPmLnQgNTOjXQ5w=
+	t=1769006738; cv=none; b=G1f3fYFTctNkyK2onoDqj1ECYUnbtvNXxQAfVkZ7bcjpkSVY4z1LUpU1ecoc1fSWoebTrJjTmrDsntr+qzJky7hTbz9huBzQHbgHtm2NatY57XcPtBPjMUaOmLj9Q/0DwVKmkn12YTnfohsdSgVn7iCqNLmYWIdBcVxFmWuQIIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769006205; c=relaxed/simple;
-	bh=NLQWcszwwPVj7IFmO9rVoI3ra+NeqadPxyhReSokYvA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To; b=PIC6PDpTEMgeu93L4KRSYNsm3byc0a19NeNSZgEdN4hn7ln50xE8zSVfD/L3o+8PCmYVTXeChlUyW6v2HyoYD2+deg2sEBQju4vv3lbv9sH36xWFIr+lzIrg0dHsVWlxsyL+4h5Y2xSZ+XxF3MxA8CRiS6QDTacS+KUdWsSKX8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=dP+S1rh6; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=2idHcTA+; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=P5FzQAhB; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=CiLjokEa; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1769006738; c=relaxed/simple;
+	bh=du6gKJXrQs6RJhJZOe6uv2xtSqobAVtxvVa6PU3+Weg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KkxR7PPV1sbt/ozwZ6uUll4DErrn+3LF4ihwwIveMTZTHNPgOugTSekFn7HvVbUyK0vLvI1dqlCcpmADU3WShmdL3znSJqgQQPvDKxpv8fXpj7wW2IYeHvR2/9PQyJaRTdwg/njrbetVRXw4+KbOkSZT3hHZppR85oCylM8bml8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Uu3SUHxZ; arc=none smtp.client-ip=209.85.167.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="dP+S1rh6";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="2idHcTA+";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="P5FzQAhB";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="CiLjokEa"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id E58075BD15;
-	Wed, 21 Jan 2026 14:36:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1769006202; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aZE7ky8QMQgbf4ZqVwA9QPknpSJehBT8c2sDK/t2HKk=;
-	b=dP+S1rh6tjS5NflaCb1BIt/X1sI6dXIohs3PqeujDOEfk6A0TLxy1bfAwEnjUZ/EkOKOFN
-	2qHC5MgqunzzGVAYiTx5s0sM4KV9bcDxqxPjF7uYCf+PFKe7YwRHIEnZ+CV7lVsPy9mOju
-	41SycrMMaqv07AIQxgaL7zkEngEgdGo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1769006202;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aZE7ky8QMQgbf4ZqVwA9QPknpSJehBT8c2sDK/t2HKk=;
-	b=2idHcTA+Zyot37XvpF4knkBNkZi52+Pb2ISdOaV9UjP21TMCrjwyIa3O/6P6WjxLUpNaP7
-	5h4DjATY34NtYxCQ==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1769006201; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aZE7ky8QMQgbf4ZqVwA9QPknpSJehBT8c2sDK/t2HKk=;
-	b=P5FzQAhBeVNNQ/zf0O9/2MBv+2L13I5mTRK07zexHDSeCS37+AMna/MgMyPOO/qO1RytIB
-	OVAXA5spUHnsI8p9jSeqio+lhXGS+ekYLeIc/DtbhTe8CXuBYSZ00ZSVMzJWe8Zie9ddkX
-	B69x2v2RD+Vb6XAgdVPVBK5k3UEMnFU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1769006201;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aZE7ky8QMQgbf4ZqVwA9QPknpSJehBT8c2sDK/t2HKk=;
-	b=CiLjokEa5YE2IkULKfcnEJczeaf55rgKK/iZjgGe6i9cRtT8IY/3K7tgSRLtkexrYmxr83
-	pqY3w3zwZ8L2YtDg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D65FA3EA63;
-	Wed, 21 Jan 2026 14:36:41 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 8BxeM3nkcGnxcgAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Wed, 21 Jan 2026 14:36:41 +0000
-From: Daniel Wagner <dwagner@suse.de>
-Date: Wed, 21 Jan 2026 15:36:23 +0100
-Subject: [PATCH blktests v2 2/2] doc: document how to configure bcache
- tests
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Uu3SUHxZ"
+Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-45c958d480aso3160502b6e.1
+        for <linux-block@vger.kernel.org>; Wed, 21 Jan 2026 06:45:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1769006733; x=1769611533; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Nfv55OSEk4T+D6o+9c3xawnnfmZ6Qods0Pwv8rYz6bE=;
+        b=Uu3SUHxZhoVGcTGTvqkHgi2n+QsuSvfGWTDNtid01VV+SYd7gP4AqNBhpZK534xWcI
+         oTG4Ornn410WIPYAA22RLQRjUtuXv3mKxjepCTTDfUGc5PPc1NDif4cQmxFiFD19iIeS
+         Fgkv+JIWXZBPyoLquyuehBGhxY0Pnl2V/gX4+5zSKxlu4aP/jHg+QGjGICvIixTHFKP6
+         zyjM+8QNoNa3ZM3Se8WYvlkWbeG8gq1xTSYfyJ17+h0Osagg4edc6IS1f8YikIbE8VlO
+         +n244PUwAlr1Vl0EBYGjQbTjGsU8WBVjG6v0u0bvKz7vht0VCIWpDGyK1xDMH4JvmPJs
+         z7fg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769006733; x=1769611533;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Nfv55OSEk4T+D6o+9c3xawnnfmZ6Qods0Pwv8rYz6bE=;
+        b=piKPT4qPKykDbBTYIORGVRIW5q+7Y5iBVtWu2ycb3t6Dw4D8F9YbShtJ6E4NdbKp15
+         vhIUTaXoUrX+vatMIbYA8h1aTgiFdtzLbBEvkczwL68V10BWfnkMIGhmsy/qp7xksTmu
+         /Ck0nWhTqiqev6gajZkbXe/oMYxV9/lz/o6fl9xR2SlNw7LuloUoHT7WrXzTbVBLhH09
+         erY6K5AmtlBCKutSJaVk6MMFKq4w8y3Yq/ICgB7nZu8LLXtMW8fdG3YyuZgSdATs1uCo
+         Jkqj6RbG7Cq5waO8u4w72MJYjMzbWDdgt6aEH9QpoOylBNp9MKcHcPlxHnFUhe6XK8LR
+         CgUw==
+X-Forwarded-Encrypted: i=1; AJvYcCX47Ybzw2QXSaaIdNfOWIvxuX2jAbmoLuSCwEf6R8+u+ii5Fo4mPpBmSMmicSKy8LX7wp+Jf613AJmelg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YztxLEj0GE1z+1llpI4UWOqWf2J/D18o2v3/WdSiUgy/fiwUs6C
+	s2xMqPPDd8w3h6EvbuNUuEIGSwfKRQ3zeR7s4b88K+I7YaTlGzlYa+RfwwcktpwvCowQDaKxhgI
+	6vjmFVrk=
+X-Gm-Gg: AZuq6aJfgpTSWXsDmkmC1EuimbbTqckk3+nYX8oAZJIiHO53kYjODBxgusWIG0KHgFf
+	j32fvKUuCvlOZjk3xGpcSuzhdznZ8/9mD9UPyX0qTTuYRK+PArusDoDCTm327tmHaY/MyzSXNQj
+	KpH2a60aa7KY7WMba/g5SE/tuYXMYsQl8elNnn6TfQDYJoWmTKqz6ozzn7ObiSQP6sCeV92sP9N
+	dfUYnFtA6DDjYI/uSp1s2LzmZ3tPhIkfbK0br1K5/obaDO09GP6VgN5oLWJhk26gW4l3DZQznzd
+	mvbwgHdY5BJs47PYK2SWEYgPeGbUdPUVdsKqB7aA8WOH7fEJdSF1xk0ShAVVoHtERkOog+yMB+e
+	J10biBTpBXxPBfPzawqBukQrI1w+NTIqRuQlem6yZmk8h2RNsAJj6MYc6OA06PIhTsuJB909RW+
+	cZwDZu6auw5lKFpK4fQ1LrSm6yLhkQH/nZRfQqHfvlCGXn0VFLOt6P6noy+O2Fl0TP3d64WJAxx
+	YWz46o=
+X-Received: by 2002:a05:6808:3088:b0:45c:9a6e:1ea1 with SMTP id 5614622812f47-45e8aaad5b4mr2707763b6e.66.1769006733341;
+        Wed, 21 Jan 2026 06:45:33 -0800 (PST)
+Received: from [192.168.1.102] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-45c9e08dbbbsm8824394b6e.21.2026.01.21.06.45.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 21 Jan 2026 06:45:32 -0800 (PST)
+Message-ID: <0faaa7ff-597d-4b25-b03a-a01cf8b2a013@kernel.dk>
+Date: Wed, 21 Jan 2026 07:45:31 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260121-bcache-v2-2-b26af185e63a@suse.de>
-References: <20260121-bcache-v2-0-b26af185e63a@suse.de>
-In-Reply-To: <20260121-bcache-v2-0-b26af185e63a@suse.de>
-To: Christoph Hellwig <hch@infradead.org>, 
- Stephen Zhang <starzhangzsd@gmail.com>, 
- Kent Overstreet <kent.overstreet@linux.dev>, Coly Li <colyli@fnnas.com>, 
- Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>, 
- Johannes Thumshirn <Johannes.Thumshirn@wdc.com>, 
- linux-block@vger.kernel.org, linux-bcache@vger.kernel.org, 
- Daniel Wagner <dwagner@suse.de>
-X-Mailer: b4 0.14.3
-X-Spam-Score: -4.30
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_TO(0.00)[infradead.org,gmail.com,linux.dev,fnnas.com,wdc.com,vger.kernel.org,suse.de];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:mid,suse.de:email]
-X-Spam-Level: 
-X-Spam-Flag: NO
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4] ublk: fix ublksrv pid handling for pid namespaces
+To: Seamus Connor <sconnor@purestorage.com>, Ming Lei <ming.lei@redhat.com>,
+ linux-block@vger.kernel.org
+Cc: Caleb Sander Mateos <csander@purestorage.com>
+References: <CAB5MrP5YbxdUe0378VfKBMb_n9=6G-C=TPixYoMaV48trgtWBg@mail.gmail.com>
+ <20260115025952.2321238-1-sconnor@purestorage.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20260115025952.2321238-1-sconnor@purestorage.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Add a bcache entry in running-tests which explains how to configure
-blktests for the bcache tests.
+On 1/14/26 7:59 PM, Seamus Connor wrote:
+> When ublksrv runs inside a pid namespace, START/END_RECOVERY compared
+> the stored init-ns tgid against the userspace pid (getpid vnr), so the
+> check failed and control ops could not proceed. Compare against the
+> caller’s init-ns tgid and store that value, then translate it back to
+> the caller’s pid namespace when reporting GET_DEV_INFO so ublk list
+> shows a sensible pid.
+> 
+> Testing: start/recover in a pid namespace; `ublk list` shows
+> reasonable pid values in init, child, and sibling namespaces.
+> 
+> Fixes: d37a224fc119 ("ublk: validate ublk server pid")
 
-Signed-off-by: Daniel Wagner <dwagner@suse.de>
----
- Documentation/running-tests.md | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+Where is this sha from? Looks like this should be:
 
-diff --git a/Documentation/running-tests.md b/Documentation/running-tests.md
-index f9da042bb3a0..c4abc6767cd0 100644
---- a/Documentation/running-tests.md
-+++ b/Documentation/running-tests.md
-@@ -189,6 +189,22 @@ THROTL_BLKDEV_TYPES="sdebug" ./check throtl/
- THROTL_BLKDEV_TYPES="nullb sdebug" ./check throtl/
- ```
- 
-+### bcache test configuration
-+
-+The bcache tests require multiple devices to run simultaneously. By default,
-+blktests executes each test case iteratively for every individual device listed
-+in TEST_DEVS. This standard behavior makes it impossible to pass a group of
-+devices into a single test via TEST_DEVS.
-+
-+To solve this, the TEST_CASE_DEV_ARRAY was introduced. This allows for custom
-+device configurations on a per-test basis. For bcache tests, a minimum of three
-+devices is required. Configuration Example
-+
-+Add the following to your configuration to define the devices used for all
-+bcache tests:
-+
-+TEST_CASE_DEV_ARRAY[bcache/*]="/dev/nvme0n1 /dev/vdb /dev/vdc"
-+
- ### Normal user
- 
- To run test cases which require normal user privilege, prepare a user and
+Fixes: c2c8089f325e ("ublk: validate ublk server pid")                          
 
 -- 
-2.52.0
+Jens Axboe
 
