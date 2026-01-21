@@ -1,69 +1,215 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A6F23D411D;
-	Wed, 21 Jan 2026 13:43:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A62B83B9608
+	for <linux-block@vger.kernel.org>; Wed, 21 Jan 2026 14:36:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769002991; cv=none; b=ZCXW0RaxUxUfZwsuksbO8h26wuduTqX6+/6nKtYuVXo4NYd+AQ2ldSQfn6X6mzGILcMzWV38iDfRlm0MxumDwRV8/RYIbZMymzYieN3dzHD3mA6Bcds/wfF1PxG5t8KXabivn/KliHeOpc6zM71DUsuajw+1EYQTHOATAYbzQDQ=
+	t=1769006198; cv=none; b=XozHUQ01kZe9GFyoQAZHmdrNqZuxj9+gF+vR8EG2frJpB5EhqjxJI9ro92oBlkmrqHKJdKhz6fvJGSyWfbK+Ph6/j7g+OEV8tfiL/gBf63+Y/Qg/XwUddqjrILkyGwpF8vogctmDB+R4CnSi9Q72FFVTFUxiOM7qMbv0zpitjDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769002991; c=relaxed/simple;
-	bh=BPUSs+DRWFaZUaaeSKV+bFcPdPErDhU0WKpIbS8DUQ0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FtoPUTnWS3RvsgtE0cX7TCdPigZ2JMEnWVctjF+SpppVfTzlOdZlV0opW3mXZVErcDyhP3YlRD+Dnssi6mvdc4QIuU6rtvGLapNakjeZEVY/6FgMncqm00Xv1AmQ/XDcL7zP5UOMPH42hzPr8TAECJOFVHzYvfIJtjn1UHI4vrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=TB9H8ELB; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1769006198; c=relaxed/simple;
+	bh=T2xwOQeUfClNmAPH1kWpwGvyOhczPdS1888A9zHSx5s=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To; b=F989V75oYchhVrwNxeup+nuuiQfj+Z2yMSYPM2TgQw9ZigryRj4BTVSJD4xyDOcztULZqnlFnbxHmD2cFMoE+Fy9oXjkj03UOM/IqailllARDR5JlN9jMssVJjuXxr4xYcRnMi9M7oCS/Sm1kPLTiVG/J07Yqn53qGPpKtRUW/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=q+YrjhY9; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Va3D61gu; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=q+YrjhY9; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Va3D61gu; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="TB9H8ELB"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=BPUSs+DRWFaZUaaeSKV+bFcPdPErDhU0WKpIbS8DUQ0=; b=TB9H8ELBvyJ5o6fkmXBGE4HzcU
-	9kZIHgbsSNMa8UTK1gr6PLdBQ9DQ+98G4MdYJXDwlKI0PDa6k0DF62m2e+9bxQypK70NS9dRgdjs6
-	KCXrEmoY3uismyDUFAoTuWFzrMDI0CcIZOIrtnbmF2qrUo9RF6CcjMs8ATBLLdqTWaiHTiMjyMtgO
-	JcxDOomHm7tIVdPaGybioLZHIcpzAd+6cueMVtff2W6tdFhMZDvf8HismZ+B6EnBY59n5StiREDMX
-	eNy2Bzzuz3aqmAfhagGKItK8pqGb+aHz7q+K5L2970v8upiGS/HR81671xwwIG3QyJV4duuxa0Z85
-	F1SeW3rA==;
-Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1viYU8-0000000GPup-13XG;
-	Wed, 21 Jan 2026 13:43:00 +0000
-Date: Wed, 21 Jan 2026 13:43:00 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Jan Kara <jack@suse.cz>
-Cc: Andrew Morton <akpm@linux-foundation.org>, bernd@bsbernd.com,
-	Joanne Koong <joannelkoong@gmail.com>,
-	Miklos Szeredi <miklos@szeredi.hu>, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v2] flex_proportions: Make fprop_new_period() hardirq safe
-Message-ID: <aXDX5IXuvghtyZZU@casper.infradead.org>
-References: <20260121112729.24463-2-jack@suse.cz>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="q+YrjhY9";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Va3D61gu";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="q+YrjhY9";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Va3D61gu"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 900FB5BD14;
+	Wed, 21 Jan 2026 14:36:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1769006193; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=DRp9TRJcSbq4fFrCMqLeHybFyWqKHLAmfQmIBccHNgo=;
+	b=q+YrjhY9jVpHTzATYggAqvUaRIFx3H5/BDyv3Ty1WaKRzNBaD9QkvHoD08IZXJKC877boU
+	c6513N3tuJ5ZpjV5MMGiyPjWMFed9ga5Kt1pMaqQ/752LWhnALyjCmo/6z1Aiea+54/NDP
+	tpcaR/2839INPmzJ8aMgVjF9pnmVv+8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1769006193;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=DRp9TRJcSbq4fFrCMqLeHybFyWqKHLAmfQmIBccHNgo=;
+	b=Va3D61gu3IzNomTUWo9dC4S2Bkqh/ygPQ87oscIfn4VueGo6LEgh38Wy0JA/3NkzvnxsGB
+	sUVHSkR0/cRpWoAA==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=q+YrjhY9;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=Va3D61gu
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1769006193; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=DRp9TRJcSbq4fFrCMqLeHybFyWqKHLAmfQmIBccHNgo=;
+	b=q+YrjhY9jVpHTzATYggAqvUaRIFx3H5/BDyv3Ty1WaKRzNBaD9QkvHoD08IZXJKC877boU
+	c6513N3tuJ5ZpjV5MMGiyPjWMFed9ga5Kt1pMaqQ/752LWhnALyjCmo/6z1Aiea+54/NDP
+	tpcaR/2839INPmzJ8aMgVjF9pnmVv+8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1769006193;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=DRp9TRJcSbq4fFrCMqLeHybFyWqKHLAmfQmIBccHNgo=;
+	b=Va3D61gu3IzNomTUWo9dC4S2Bkqh/ygPQ87oscIfn4VueGo6LEgh38Wy0JA/3NkzvnxsGB
+	sUVHSkR0/cRpWoAA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id DE51D3EA63;
+	Wed, 21 Jan 2026 14:36:32 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id YSlPNXDkcGl9cgAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Wed, 21 Jan 2026 14:36:32 +0000
+From: Daniel Wagner <dwagner@suse.de>
+Subject: [PATCH blktests v2 0/2] bcache: add bcache/001
+Date: Wed, 21 Jan 2026 15:36:21 +0100
+Message-Id: <20260121-bcache-v2-0-b26af185e63a@suse.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260121112729.24463-2-jack@suse.cz>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/2XMQQ7CIBCF4as0sxYDlNbqyns0XRQYZDatYZTUN
+ Nxd7Nbl//Ly7cCYCBluzQ4JMzGtSw19asDFeXmgIF8btNS9VFoK62YXUbQdukvbD24IBur5mTD
+ QdkDjVDsSv9b0OdysfusfkZVQorvaIK32Rhl55zfj2SNMpZQvr42IEpoAAAA=
+X-Change-ID: 20260120-bcache-35ec7368c8f4
+To: Christoph Hellwig <hch@infradead.org>, 
+ Stephen Zhang <starzhangzsd@gmail.com>, 
+ Kent Overstreet <kent.overstreet@linux.dev>, Coly Li <colyli@fnnas.com>, 
+ Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>, 
+ Johannes Thumshirn <Johannes.Thumshirn@wdc.com>, 
+ linux-block@vger.kernel.org, linux-bcache@vger.kernel.org, 
+ Daniel Wagner <dwagner@suse.de>
+X-Mailer: b4 0.14.3
+X-Spam-Score: -4.51
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	ARC_NA(0.00)[];
+	FREEMAIL_TO(0.00)[infradead.org,gmail.com,linux.dev,fnnas.com,wdc.com,vger.kernel.org,suse.de];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Spam-Level: 
+X-Rspamd-Action: no action
+X-Rspamd-Queue-Id: 900FB5BD14
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Flag: NO
 
-On Wed, Jan 21, 2026 at 12:27:30PM +0100, Jan Kara wrote:
-> Bernd has reported a lockdep splat from flexible proportions code that
-> is essentially complaining about the following race:
+I've got it working. The problem is that udevd sometimes doesn't register the
+devices in a timely fashion. The workaround is to explicitly register the
+devices within the tests. This races with udevd, thus some logic is in there to
+filter out 'already registered warnings'. Eventually someone should look at
+this...
+
+Also made the wiping of the disks a bit more robust by stealing the ideas from
+Stephen's test case[1]. Thanks!
+
+As requested I also added an entry in running-tests.md. There is already a
+section on TEST_CASE_DEV_ARRAY so it's a bit redudant but given it took me a
+while to figure this out, I think it's worth to have it around.
+
+Now, the test runs very stable in my VM. No issues in hundres of of runs:
+
+bcache/001 => nvme0n1 vdb vdc (test bcache setup and teardown) [passed]
+    runtime  4.659s  ...  3.555s
+
+The runtime is not really constant, one of the symptions with all the
+workarounds in place to get it working (retry loops, white loops etc).
+
+[ 5327.588585][T100690] run blktests bcache/001 at 2026-01-21 14:33:45
+[ 5327.742119][T100766] bcache: run_cache_set() invalidating existing data
+[ 5327.747790][T100766] bcache: register_cache() registered cache device nvme0n1
+[ 5327.782118][T100690] bcache: register_bcache() error : device already registered
+[ 5327.790339][T100690] bcache: register_bdev() registered backing device vdb
+[ 5327.798633][T100690] bcache: bch_cached_dev_attach() Caching vdb as bcache0 on set 33fc88e8-3251-433e-be43-620f625c
+[ 5329.598292][T100396] bcache: bcache_device_free() bcache0 stopped
+[ 5329.898146][T94893] bcache: cache_set_free() Cache set 33fc88e8-3251-433e-be43-620f6253e0fc unregistered
+[ 5330.315859][T100803] bcache: run_cache_set() invalidating existing data
+[ 5330.324537][T100803] bcache: register_cache() registered cache device nvme0n1
+[ 5330.330337][T100809] bcache: register_bdev() registered backing device vdc
+[ 5330.339168][T100809] bcache: bch_cached_dev_attach() Caching vdc as bcache0 on set 986fa332-8e02-4a1e-942c-b6f3458e
+[ 5330.345113][T100813] bcache: register_bdev() registered backing device vdb
+[ 5330.362462][T100813] bcache: bch_cached_dev_attach() Caching vdb as bcache1 on set 986fa332-8e02-4a1e-942c-b6f3458e
+[ 5330.466850][T100690] bcache: register_bcache() error : device already registered
+[ 5330.469039][T100690] bcache: register_bcache() error : device already registered
+[ 5330.470933][T100690] bcache: register_bcache() error : device already registered
+[ 5330.472971][T100690] bcache: register_bcache() error : device already registered
+[ 5330.474847][T100690] bcache: register_bcache() error : device already registered
+[ 5330.522678][T11701] bcache: bcache_device_free() bcache1 stopped
+[ 5330.571838][T11701] bcache: bcache_device_free() bcache0 stopped
+[ 5330.805725][T80064] bcache: cache_set_free() Cache set 986fa332-8e02-4a1e-942c-b6f3458470fe unregistered
+
+The next step is to figure out how to hand back the devices to calling test, so
+the test doesn't have to hardcode the test device. From Stephen's test:
+
 [...]
-> Note that a deadlock like this is only possible if the bdi has
-> configured maximum fraction of writeout throughput which is very rare
-> in general but frequent for example for FUSE bdis. To fix this problem
-> we have to make sure write section of the sequence counter is irqsafe.
+    # 2. Detach
+    log "Detaching backing device..."
+    BDEV_NAME=$(basename $BCACHE_DEV)
+    echo 1 | sudo tee /sys/block/$BDEV_NAME/bcache/detach > /dev/null
+[...]
 
-Ah, that's why we haven't seen it reported before.
+I am sure there is some bash-way to do this, which makes me blind. But hey, if
+it works, I wont complain.
 
-> CC: stable@vger.kernel.org
-> Fixes: a91befde3503 ("lib/flex_proportions.c: remove local_irq_ops in fprop_new_period()")
-> Reported-by: Bernd Schubert <bernd@bsbernd.com>
-> Link: https://lore.kernel.org/all/9b845a47-9aee-43dd-99bc-1a82bea00442@bsbernd.com/
-> Signed-off-by: Jan Kara <jack@suse.cz>
+[1] https://lore.kernel.org/linux-bcache/CANubcdX7eNbH_bo4-f94DUbdiEbt04Vxy1MPyhm+CZyXB01FuQ@mail.gmail.com/
+ 
 
-Reviewed-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+Signed-off-by: Daniel Wagner <dwagner@suse.de>
+---
+Changes in v2:
+- fixed whitespace damage
+- added documentation on how to configure for bcache tests
+- do registering explicitly
+- made disk wiping more robust
+- Link to v1: https://patch.msgid.link/20260120-bcache-v1-1-59bf0b2d4140@suse.de
+
+---
+Daniel Wagner (2):
+      bcache: add bcache/001
+      doc: document how to configure bcache tests
+
+ Documentation/running-tests.md |  16 +++
+ tests/bcache/001               |  32 +++++
+ tests/bcache/001.out           |   1 +
+ tests/bcache/rc                | 259 +++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 308 insertions(+)
+---
+base-commit: e387a7e0169cc012eb6a7140a0561d2901c92a76
+change-id: 20260120-bcache-35ec7368c8f4
+
+Best regards,
+-- 
+Daniel Wagner <dwagner@suse.de>
+
