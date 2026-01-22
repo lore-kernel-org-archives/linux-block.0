@@ -1,204 +1,294 @@
-Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C3ED46AED4;
-	Thu, 22 Jan 2026 11:14:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.154.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769080494; cv=fail; b=dVGyC5AXEj1+jsEg6uNK7WUKTFqL5Z6K8F1/CVTeH1m9gp4bM6Z2sM5ZrFq21YzWj44/5PS8vE16ROW6oQ/xBlsj0Zj/ri3vEzrkXZK+Ih69bRyqtNrMMS/j23XRUylRbHqo5976a9SruHrX2Y6cjt9KqVnkJDOJ5s/FPDIBKN4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769080494; c=relaxed/simple;
-	bh=f+z6ql9M5JhawzkmfcJJBxApS2D5ls0dv54BOWw8ja8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=gGQuUrgm8aOrcsU9AxKJFCPArCcmgGA1tKPNkKOiD8qpjrXQhhKabgHH7PttbpcEwXPsgOzPpi6ng3ANOFMc1dGmA0Tc23JQjUgGBitb9ux3TnChgoSAZ11ExE4czmWygdgPFWxV4NsSVJxhgKZ2E1sz+NaMUcH/Gu07QjB69a8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=Yq+lDV3f; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=jWCRiu2k; arc=fail smtp.client-ip=216.71.154.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Yq+lDV3f";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="jWCRiu2k"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1769080490; x=1800616490;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=f+z6ql9M5JhawzkmfcJJBxApS2D5ls0dv54BOWw8ja8=;
-  b=Yq+lDV3fBI5dKWQZ4hUyZoCMaMgNn5iyd4HjBS86FicZ4gEPA07sboS+
-   nYMKe7/goW/darLiuWtbRfmYWMaApfp2Z5xzYhNm7RkiExDUnmgxREh2e
-   qEVPb9DBM3mJr7AInbLsTjJvFAM7NIr8eIl/SMcS8L9vOoMzlBffbohNM
-   SBOwMaKB7l88Bxui79Qkc8CqR1HMMEiHzoHIWoeKwNWWvLqdXz64ceJlq
-   yogIRzaBh7a9FyGJYxvRFMP/IiZoAOt6EfMZRCpeTrCzet2UDo3sCz76C
-   3pu46jeW3q0UmgXjPbyhr6kq0bRZUoPmyPsVzDV3T5xyHDm2Dvd7QnJMk
-   g==;
-X-CSE-ConnectionGUID: Z/bOZHx4TgOyo0IKQPSDTA==
-X-CSE-MsgGUID: ITLlKGA+Q/C7rmtz3dYTnw==
-X-IronPort-AV: E=Sophos;i="6.21,246,1763395200"; 
-   d="scan'208";a="135873727"
-Received: from mail-westus2azon11010069.outbound.protection.outlook.com (HELO CO1PR03CU002.outbound.protection.outlook.com) ([52.101.46.69])
-  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 22 Jan 2026 19:14:48 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xkp0d8WtgpS8CQ+oynO4AXyhJdKtuHYbDXYh+5Ufht5BHH4niw2psCTufzdXweH0fYMYQpLRd8z+lI3V5sg/oELG0N4+f2UFBMbOKWs2Uq85+GddplZmbbNtDYDq8BkpuAKwwTaHTLZFdXsqfhrVYen7ddL5zaXhaBPmfWAV3a1wYMzb+8aDVZnGxbaTq2cJiZtWXMsQsW7MwsLjSCxd/IhAmRi/pKCCBZcJ++pb1hEUtHDMFEQavd2C6pmmy37dKo+lZF6CPQmF9Bvvc2AE0/99BW8enDHUv/wl06QpJgczDFIECFYYHkdgUsllbuLR/RNcNyG+x6lfS92ifpDJpA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=f+z6ql9M5JhawzkmfcJJBxApS2D5ls0dv54BOWw8ja8=;
- b=MzviApdKzql6FIFdYOg+dZj5jH74eCYUJG4fKDjAvLakF86tM+z2Fh7vIRJAG3LrDTZryTUj8l7oiMr8W+HW8GN6NtJBmNp5+jHkrIKjmPZxSiTiIKhESZZchtf+prPHser59BLAcpJZEDjnS8A1TgDaKOkAfofs+vRnlogSUQf4v8fngDpia+HFmtwCl/M5Gc2HS54eKGqYF9kZfZdFJKtAVDrYQVmtQFv27i6ty10zvz8WneaJT9JAjQFrU5tzNJ8XyZVuam3V8R8YGIvi6h2tLl8ZA2110zOCbRYmIn8e8GSaXahty+h8tJUkZv2EwltYA6pj/DbLnUpJ6EJ5CA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=f+z6ql9M5JhawzkmfcJJBxApS2D5ls0dv54BOWw8ja8=;
- b=jWCRiu2kEu4MaUue+pAIzRkryLLLVoBz44v7bUyfxSTYJfzA0GhtfKChZde53BoI9dohWMuoRzxe1bPsPWL3ToFHngVSPhPweX77R7sHfW8LWiIonuGdeeBQcuhMA7RSC+r1ej3gw8b60QOehlbL/CWI5AlXW2e6NBwPzBHQAX0=
-Received: from LV8PR04MB8984.namprd04.prod.outlook.com (2603:10b6:408:18b::13)
- by CH2PR04MB6490.namprd04.prod.outlook.com (2603:10b6:610:69::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.3; Thu, 22 Jan
- 2026 11:14:48 +0000
-Received: from LV8PR04MB8984.namprd04.prod.outlook.com
- ([fe80::9ba6:7273:90bc:53a8]) by LV8PR04MB8984.namprd04.prod.outlook.com
- ([fe80::9ba6:7273:90bc:53a8%5]) with mapi id 15.20.9564.001; Thu, 22 Jan 2026
- 11:14:47 +0000
-From: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To: hch <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Christian Brauner
-	<brauner@kernel.org>
-CC: "Darrick J. Wong" <djwong@kernel.org>, Carlos Maiolino <cem@kernel.org>,
-	WenRuo Qu <wqu@suse.com>, Al Viro <viro@zeniv.linux.org.uk>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
-Subject: Re: [PATCH 04/14] block: remove bio_release_page
-Thread-Topic: [PATCH 04/14] block: remove bio_release_page
-Thread-Index: AQHciReGVCQNhTYEQ0aewl8mGlH8cbVeDnIA
-Date: Thu, 22 Jan 2026 11:14:47 +0000
-Message-ID: <27ddf78f-f9dd-4d0f-80cf-b9065088fe01@wdc.com>
-References: <20260119074425.4005867-1-hch@lst.de>
- <20260119074425.4005867-5-hch@lst.de>
-In-Reply-To: <20260119074425.4005867-5-hch@lst.de>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Mozilla Thunderbird
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: LV8PR04MB8984:EE_|CH2PR04MB6490:EE_
-x-ms-office365-filtering-correlation-id: c9467a80-859c-4d2e-bae4-08de59a77406
-x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|7416014|10070799003|19092799006|1800799024|366016|38070700021;
-x-microsoft-antispam-message-info:
- =?utf-8?B?bGNjMFErSjBwYno3eTNUOHA0Ri9ac3lRais0enBEY29VVG9vOVdqeW85aVYw?=
- =?utf-8?B?V21NS0o3dDhldVZ0eWtkQklnZy9taW9yeG8zOE1uNGR4anhYTVlCL3JiNGZD?=
- =?utf-8?B?cmtnekdjcFJuaXhYeFprdEdBRTVTQlJUTFpOYThJdVcrSFNXV2lSb1VHT2tV?=
- =?utf-8?B?dkpZdHlKQmQ0ek9wMzI5THliM1JtZHY3V1N1TlJhSnpGQ00yajFnR2V5V1ZQ?=
- =?utf-8?B?VUdoQUs3ZTBZanpNL2RuMmJzWGVibGlGWVFqY0FpWjJtZWtueHRyUFczaUFW?=
- =?utf-8?B?NVhoYUVYRmhrR1hDT05jdjdzRmQzVWdreFY1N0d5WFN4cjV5SzlLR0N3MkRR?=
- =?utf-8?B?ai9wY3V5R0N1eUNQSmcrMnRLU3lqaEJCOUZMbUJNRFpXSk1JMnIyZUtZSjZE?=
- =?utf-8?B?enJoWmVCVDVvZWpLU29xam5oUVh0MjdMSmNPQ2trQ0crOERYR3dhaE9sMG1V?=
- =?utf-8?B?Z2FDRkcraS9SM0JsQlZ2cGtoblVuRnY4bUdYZWZoRlpoMUM1L055NkhOQzZL?=
- =?utf-8?B?eENrY1dWYlR1TFBwVTJCQVNSYk9GUUFJMkpBTkVodjdZYU5zc1VjY0crdTBN?=
- =?utf-8?B?bHBqVjkwcUUycjdGV3RMZ3dXcmJSMjI3d0Z5dll4UzVYWUl0V2xnd2Z5QTNQ?=
- =?utf-8?B?dVJUWkg4NGRkQWxEc2NSQ2dxMnp5MXRzTklwbzFvS1BVRm9Cbzl1SEMzRmlE?=
- =?utf-8?B?eG9uQ1Z5c01mRFpoYUlIWm1mWnloQ1dTVjVtVmt4NUxNTjY2d2dCT2xkZTVr?=
- =?utf-8?B?Y1dKVi9wR0xYSGRQMEZOZzh6SjRUWU1tb1p1NjcyZWdUTmIyZmprK2dSQlRG?=
- =?utf-8?B?Y1JVSWhTOFVDMjlsSm0wZ3hMcnJxLzdlVUxMQXp6QVBpTVhKKzJ6SWlWTmdX?=
- =?utf-8?B?L1hZYW9ydm1xSWV3RVF0bDlJR05DYkFKMEpramV3bUlFK3luUUh2c1pBSVNR?=
- =?utf-8?B?NmhQQkFLeXppRG9MZk9tN3UyNmExZ1d1dlI4T1Z4RFM1WFUrRzRXV3pCRjRV?=
- =?utf-8?B?c20ranZoTlFjTDJKM3l5Z0k5LzNsRjg3ZXhBODUvaW1DWnhmTk8zcUtvNkNi?=
- =?utf-8?B?VExyM1J6RGFidk5GNGIyVjZ1cGhvazZrWThLV2NFbGxqMkJrTFF2M0VoRlJC?=
- =?utf-8?B?anZVMzVuaTlhS0lMQkx1dXdiOUhETFVWeHZCMk5CdnY2YmRnYWpTb2JPWEpH?=
- =?utf-8?B?b1N3TjFudWRlZmZPOGt6QTFsbFAvRk1nVlNPbWx1S2JMdUlWdFd4MkRlSmNZ?=
- =?utf-8?B?dkVvMm5MWElhMElTb2dRVnF3L2szK0drZ0k3NDB6SVN2VDVldUZEdmdvb085?=
- =?utf-8?B?TzBCTGVtei9ybXFpMVI3WXBVRW5FdEhVaFdCdXRCUWIyN21TMFFOYnB0Yk8v?=
- =?utf-8?B?dHk0SWEwSnhucCtQQ3o3R3ZmOTd5d0F0cWptNlNpMW5VMklic1NVUFVUL3Bl?=
- =?utf-8?B?SzVzVnhvc0VvdndRUTRnK2ZUWGs4WHdLWFpSNThZdCtjTjNmSVpiR3lBRDF1?=
- =?utf-8?B?TjI1MHBURHdHT2N2L1I3bmZ0S2xYamEyUTJ4UGZTdGgrZnRhOFRyVyt2R3cw?=
- =?utf-8?B?Vk5Xb2pkb045OGpvOVB5R2gyVEdYOHVWZ0VvNWlaTTJVc0JwV2MwMXZVQUYy?=
- =?utf-8?B?WnMyYTZGV0dBeTNacmR3TnowVGpPUi9lenZvRXpvWS9TNFkzNU9QOVQvWW9w?=
- =?utf-8?B?dGVMNm0rQ2tyNW9QUkUxOXpjQUs5S1hXNmtYYlZGaWMrTExNZmNPWEJXU3Jm?=
- =?utf-8?B?ZGJpbWN1cGVFcUYyVFdhNi9vTlNhWE02eXpPQWQwRFNralN2T3hsYXNObnBo?=
- =?utf-8?B?amZyYXNmdHlPdXQzb3h1VGhicjQzS1N0RXRzTHhVbGs0Ri9pR1ZhSGh0TDJI?=
- =?utf-8?B?THF4VXJGc1U4a0ppb0dCTlB3a3cwdkF3ajhYYzZtZU50T3FDbkpvVGpaSHpq?=
- =?utf-8?B?cjJLUnZLZ2pJQlAyUDdJVUsrNlJqbGdmRHlsTjNlSXNOOGwvWG1VS2hVOTA3?=
- =?utf-8?B?d0ZDSi9PTTlsMSt0NXE0YlZ5MmppYVdoV3pFajdsU0gxVFRVMXFNWkJjUGI2?=
- =?utf-8?B?ZEVzeWZrQmhSVXJJcGxpL3gxQUp5a1BUQnF0cjNVemx3a1dtcmFJd0hvU0lj?=
- =?utf-8?B?K0hJRHAvM29zUEZBVVpuR1NTTURGd1lVZWdmaVlPVmNnMXNzaFBWbXdKcDNi?=
- =?utf-8?Q?u2oNSrwFbhcXA76YD21v2Qw=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV8PR04MB8984.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(10070799003)(19092799006)(1800799024)(366016)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 2
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?eHVPOTNrNkwxNFlmM2lxcTRjVDdaMEM3bCtrb0t3QlRTWUVJZFVRWG1wNlJG?=
- =?utf-8?B?eUI4RGZ1VVZvekVxL2xZNTZzS1dOdG9KMFZwWXlSSnNqZmZlekc5SVFVZTgy?=
- =?utf-8?B?ZU9Wd0NTSDlGdkkwUkZTeERIakZGdmN1S1J5SzQ4NG81U3ljM1J6b05hVEc4?=
- =?utf-8?B?MFc1T2tyaXZ1b2hVTE0xb0xQNTlYTGZPUzlTVVlWaHNpUUFValcrZFM2N2RD?=
- =?utf-8?B?SUhvT2hZNlYxZnNwZmlPWEJKRDVpUmtsR2xmVnNTZHRlOWRpeitXQkFTOG1Y?=
- =?utf-8?B?Wi8wb04wUXVJUUFHc3o2OXNWL0VOSUtjclFHUjdKYUM4TXhBbkVsY0d5T2Q4?=
- =?utf-8?B?UkZabVdDazIzR2pLc2RiOTBBWFQvdzdnV3NmQ1JIU1NUaCtIQjZhTEZ2TnY2?=
- =?utf-8?B?K2VBSVBkL3doNUhYM1pDREIydEFlM1dFMTdrQi8zRldWRWtWOFM0VTRFMXQ1?=
- =?utf-8?B?Q2Y0VVhWYXJva1pNWTdScWplY3BuNXR5M1hhT3Z6dEUwTm1hL3FCa3RQampU?=
- =?utf-8?B?VW5hRjZLRjZIeUV2YVJSbWZrNHI2YlNWMVNEQjlrK3AwWWxRTlNvVTlnWlNV?=
- =?utf-8?B?aGRwaHNRNmJMalJQU1N2d3d5bFEzdzJiL0lNS1BXOFg1WFlIaWNYdUIzQkJ3?=
- =?utf-8?B?a09GT25jMUplV1RJUXF4WVdmelhZVTMxbnNiNTBYT2k2OElzWGYySGJVRFFI?=
- =?utf-8?B?VkJvL0xrellTZE53amNQZVk1dWZNNldacEQ4Vjg3elAydnRZR0RYMWtqRFd4?=
- =?utf-8?B?bzdrTExTNStZMjB6bmFJM1psd2o4aEhQS2hBL0ZQMHBsUFFTTHI3ME9zWlBy?=
- =?utf-8?B?QUk3Q2wwcDBmV3JFS1lSNjJqZkFmNXZiWSs5ZzhFV0R0QkJpZEhleDJSQnRI?=
- =?utf-8?B?a3FiWWtGMEdmNmUvemdtMXdvQ1FTY20rR1Q3YUR1MHEyY1kxTjUvdDZHYkNL?=
- =?utf-8?B?RVdZQlpYWmtzVitGMUVCQjRtdjRQVE1HNzNVSkFDVDBoWVRuall0cFF1NjF4?=
- =?utf-8?B?OW9pc01tZHBwRnpreVdFMUwrMTBNbXpwdDNnSEJGWVQvbnZzOS9WWUY2Nitz?=
- =?utf-8?B?OS9weUprS2VDNHh0T1BIb3lDL042YnRmTSt4QXcxSWhId1F1QmFOL3FWdEN4?=
- =?utf-8?B?ZG95WlZpeFRwUkdNd2NVdmtzdUZSakU2eWNMTjIrWjJnMUNYWi84SDRZakVK?=
- =?utf-8?B?c0NvazF6bURPa1BHSk5hZmZFYUYrOTBhREtNZlJ3dUNzM1M1Uy9PQmdaR2t4?=
- =?utf-8?B?Wnk2aEdZallhdWZ5NVNGL3pDQ3lBa3BGNG9NSWd1aklhMFFIdG9DdmxidVlO?=
- =?utf-8?B?allDSjA2bnpycWNJbHUxaU9ibFpIZ2xPdlhtVjJYV2NlcmptVHpqYXpiOUJv?=
- =?utf-8?B?eTh2blZuc0xFbkJyOUhpOHVvQVdob3pJWGIwd2FkazZyVFFjVUhEL1RPcGpp?=
- =?utf-8?B?Ykh1L2lMKzhvRklINWxOK21rUzNtSjNXb3BRUTcwMElKU1diRG9lWW56ZHFu?=
- =?utf-8?B?Y1owNmxlb05JWjY0SExPOHI3N2NTU282c2dZTzBSWDF3WHpQaW1DVmt2WkVC?=
- =?utf-8?B?V0dXQmwxZksvaEM5NitpWTRMVlZLWEJGR0pDSVFmQXZlQ09hRlRYNzlHNlNG?=
- =?utf-8?B?N3dwaFVJZmxiY1dYMnlYVDJvM1dNYk5Ha3pRK29LN1h2ZDJwNEovdW9tMHhx?=
- =?utf-8?B?MGFiYkNNdzFKaGNLY0tZa2txT2dPMXhuVm1tL0JrMWExejJ1OWNiemtYRmht?=
- =?utf-8?B?N3lLZ243Z3N1K21KdzBSaFoyc1UwRE1XdlpPZUZsb2FlSHpPUU9tekpIbWIw?=
- =?utf-8?B?Yi9RU3RwYUhRUUdxM0ZpbGNNRzdVeW9SdGRPdDA0T1NTM3pheFI5Zm5oaEVC?=
- =?utf-8?B?RWpyMExWdWJ1Mm85Tkw4Y2hMb2x4NzFNY2NVaUlTK2ZEU3gzdmtpakxubmRw?=
- =?utf-8?B?ejVyOVNiaTRKTWpTaTdDV0FJSjhNaXBkaXozQmZDSmMreFFsdVJBbkRZQ04z?=
- =?utf-8?B?Y2RCa3crVDIrMHE4OUl3Y3RoRG1WWmp2L2hXRjcwejFMMXBuUDJRdmlKVzEr?=
- =?utf-8?B?UCtEcnBPMjJlTWFzS0c0M0pDQXdFc3h5d2tCYmovVE1sVkFVbDUvaW00Zlpx?=
- =?utf-8?B?cjdDZSswY09lK0M0V3pWc1A3WTc4Sm1UUWNOTnFBUm96NnIwRmE2V2NPS00x?=
- =?utf-8?B?MnVUU1Z3dVc4L05qUmt3NURLSjNWMXVLTm9mNFJDbXNib2xWbEI5R3ZqRUdY?=
- =?utf-8?B?T092SXhhWjdHdXNVL2o1L0R4ajR5VVdidHhhOEROVVJHamttWE1SY1RlOG5O?=
- =?utf-8?B?U3h6WlRFZDVSTU80YjhuYWNpS1R2VVdUY1pHRzduTWQrT2wxTEZIU0JJYzlD?=
- =?utf-8?Q?hxertgHn8WPZdulK7Lf+KBB9BJYsSXF/GBhGop8V+WGri?=
-x-ms-exchange-antispam-messagedata-1: FA+jZmyiIN9113KKdvNDxjaERlG8VrCHgSM=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <19A88B640E662E41B42FA6CF387BB57D@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6695930FC0E;
+	Thu, 22 Jan 2026 11:24:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769081061; cv=none; b=biYxdGqrIb08OQ5adJN8b3tvRUMlsjQy2eC+CNnVlAOgMcpY6qY9sAW/4aKjpY6Sc9pTBcg92kyxFN4pcGELUAvPz7rMNMdKfLT1cn72s3UvbiDHhLEYB7KiaEBhdCHV7rmSaju0ZOjcHyIxLJVuOeb5/vpYuCX1MJ2idM9rgM8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769081061; c=relaxed/simple;
+	bh=1yHxMH842dxN7NIcoRgcu0xZfsoLuZ8qWSHUy7FRR2A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SEBsM7g94aGqV4vA8qGqgMC+6NeIjs2bLw7ZhGTkrBXEC/x4cexIi8hj1oPj4vI49s337l1z5M3K9PCYhk4ANKseaF/Im2fYkS28r+kSkV9U0lXY3VgJhIJnMA8gccjMejkcHsCcpYgkKBEE6x7e4lN++IzWZlJS+UiO65xpaaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.198])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4dxdxS1tFHzKHMZX;
+	Thu, 22 Jan 2026 19:24:12 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 68F6040575;
+	Thu, 22 Jan 2026 19:24:15 +0800 (CST)
+Received: from [10.67.111.176] (unknown [10.67.111.176])
+	by APP4 (Coremail) with SMTP id gCh0CgBH9fXaCHJpzfXUEg--.64027S2;
+	Thu, 22 Jan 2026 19:24:12 +0800 (CST)
+Message-ID: <fa4764db-430b-403c-a085-b71e3777ac5e@huaweicloud.com>
+Date: Thu, 22 Jan 2026 19:24:10 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	RLmXZ3Zpreog6AfuNpEgp6JfNwLaMjwIup/QlRdLDJOCb8jpMTbuPV0UJ/ivJ47osfMNkSrgAEUo8vfSEuvFS+zLiEA1VP/RQrnKLiCSksY4ni0AmOXImD9+azyzI0FPfFJoyicTmWKtU4Sn3xmxtiEQHDIjF2NF5FeqdPBNDkpjZTVDBXVRfbbqyCj+Q4AtoKNu5Yltk528r2s+3BBDjUvNNSRpyQgPv/mPlYQ1RAXV9Vc7Pvm5a2uIqbLwvCrmNt48mMvZJkmUJA00EZiUAl/JgmHQVAa55Wka7GZ99nWueAxF25L0t3ubm05Bc9j6tDmlrmIzBxtAGxK2ms15KvB3ABgjD2Pdosav/2lEmMTViZJTqOl0kCajkouTYXrT0aEwsn0s9k1JdTHAqbIyp59rx1cIY4fa5oyD7EktBI4zb/zKXiuu395Gzj31ZKJCaWRQdINXAw2DnNaEpkhMbRjntZw57emYEwWSpRbQ7wdK26rHCoHt1rXbVedrR2IhzfLhsqGfMhXrmQAmQXMtRh3Z5UNgjhvs+AGKsxX6qvCO8TOFenM5jPTsHzCBd0sUPtc3664+s/+PpaRXXmnCywmryKHghjpy0Ze0JA+rws9CG6ieNKfBCDbzGjhU4kvF
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: LV8PR04MB8984.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c9467a80-859c-4d2e-bae4-08de59a77406
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jan 2026 11:14:47.3749
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: UPuEkuCnaOLYS9NMXzXoqNCSyf4/fDzfAQuT4lJsKGCeWiCQJheef+k8a/SQaw7wSzkOJVlsDO56YC9u+Nj5fV7BBZ//PKDNA7G/2wiCle0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR04MB6490
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 14/33] cpuset: Update HK_TYPE_DOMAIN cpumask from cpuset
+To: Frederic Weisbecker <frederic@kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>
+Cc: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Bjorn Helgaas <bhelgaas@google.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Chen Ridong <chenridong@huawei.com>, Danilo Krummrich <dakr@kernel.org>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Gabriele Monaco <gmonaco@redhat.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+ Lai Jiangshan <jiangshanlai@gmail.com>,
+ Marco Crivellari <marco.crivellari@suse.com>, Michal Hocko
+ <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+ Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
+ Phil Auld <pauld@redhat.com>, "Rafael J . Wysocki" <rafael@kernel.org>,
+ Roman Gushchin <roman.gushchin@linux.dev>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Simon Horman <horms@kernel.org>,
+ Tejun Heo <tj@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
+ Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+ linux-mm@kvack.org, linux-pci@vger.kernel.org, netdev@vger.kernel.org
+References: <20260101221359.22298-1-frederic@kernel.org>
+ <20260101221359.22298-15-frederic@kernel.org>
+Content-Language: en-US
+From: Chen Ridong <chenridong@huaweicloud.com>
+In-Reply-To: <20260101221359.22298-15-frederic@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:gCh0CgBH9fXaCHJpzfXUEg--.64027S2
+X-Coremail-Antispam: 1UD129KBjvJXoW3WrWxAw4kJF4DJr1kCF1Dtrb_yoWxtFWfpF
+	WDWrWfGF4DJr13G3s8Zw1DArWrWwn3Cw18K3sxKw4rAFy2ga4vv3409FnxXrykZr97Cr17
+	ZF1Y9w4S93WjyrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvYb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
+	14v26rWY6Fy7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
+	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWrXVW8
+	Jr1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7
+	CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v2
+	6r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07
+	j6a0PUUUUU=
+X-CM-SenderInfo: hfkh02xlgr0w46kxt4xhlfz01xgou0bp/
 
-TG9va3MgZ29vZCwNCg0KUmV2aWV3ZWQtYnk6IEpvaGFubmVzIFRodW1zaGlybiA8am9oYW5uZXMu
-dGh1bXNoaXJuQHdkYy5jb20+DQoNCg==
+
+
+On 2026/1/2 6:13, Frederic Weisbecker wrote:
+> Until now, HK_TYPE_DOMAIN used to only include boot defined isolated
+> CPUs passed through isolcpus= boot option. Users interested in also
+> knowing the runtime defined isolated CPUs through cpuset must use
+> different APIs: cpuset_cpu_is_isolated(), cpu_is_isolated(), etc...
+> 
+> There are many drawbacks to that approach:
+> 
+> 1) Most interested subsystems want to know about all isolated CPUs, not
+>   just those defined on boot time.
+> 
+> 2) cpuset_cpu_is_isolated() / cpu_is_isolated() are not synchronized with
+>   concurrent cpuset changes.
+> 
+> 3) Further cpuset modifications are not propagated to subsystems
+> 
+> Solve 1) and 2) and centralize all isolated CPUs within the
+> HK_TYPE_DOMAIN housekeeping cpumask.
+> 
+> Subsystems can rely on RCU to synchronize against concurrent changes.
+> 
+> The propagation mentioned in 3) will be handled in further patches.
+> 
+> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+> Reviewed-by: Waiman Long <longman@redhat.com>
+> Reviewed-by: Chen Ridong <chenridong@huawei.com>
+> ---
+>  include/linux/sched/isolation.h |  7 ++++
+>  kernel/cgroup/cpuset.c          |  3 ++
+>  kernel/sched/isolation.c        | 73 ++++++++++++++++++++++++++++++---
+>  kernel/sched/sched.h            |  1 +
+>  4 files changed, 78 insertions(+), 6 deletions(-)
+> 
+> diff --git a/include/linux/sched/isolation.h b/include/linux/sched/isolation.h
+> index c7cf6934489c..d8d9baf44516 100644
+> --- a/include/linux/sched/isolation.h
+> +++ b/include/linux/sched/isolation.h
+> @@ -9,6 +9,11 @@
+>  enum hk_type {
+>  	/* Inverse of boot-time isolcpus= argument */
+>  	HK_TYPE_DOMAIN_BOOT,
+> +	/*
+> +	 * Same as HK_TYPE_DOMAIN_BOOT but also includes the
+> +	 * inverse of cpuset isolated partitions. As such it
+> +	 * is always a subset of HK_TYPE_DOMAIN_BOOT.
+> +	 */
+>  	HK_TYPE_DOMAIN,
+>  	/* Inverse of boot-time isolcpus=managed_irq argument */
+>  	HK_TYPE_MANAGED_IRQ,
+> @@ -35,6 +40,7 @@ extern const struct cpumask *housekeeping_cpumask(enum hk_type type);
+>  extern bool housekeeping_enabled(enum hk_type type);
+>  extern void housekeeping_affine(struct task_struct *t, enum hk_type type);
+>  extern bool housekeeping_test_cpu(int cpu, enum hk_type type);
+> +extern int housekeeping_update(struct cpumask *isol_mask);
+>  extern void __init housekeeping_init(void);
+>  
+>  #else
+> @@ -62,6 +68,7 @@ static inline bool housekeeping_test_cpu(int cpu, enum hk_type type)
+>  	return true;
+>  }
+>  
+> +static inline int housekeeping_update(struct cpumask *isol_mask) { return 0; }
+>  static inline void housekeeping_init(void) { }
+>  #endif /* CONFIG_CPU_ISOLATION */
+>  
+> diff --git a/kernel/cgroup/cpuset.c b/kernel/cgroup/cpuset.c
+> index 5e2e3514c22e..1c0475e384dc 100644
+> --- a/kernel/cgroup/cpuset.c
+> +++ b/kernel/cgroup/cpuset.c
+> @@ -1490,6 +1490,9 @@ static void update_isolation_cpumasks(void)
+>  	ret = tmigr_isolated_exclude_cpumask(isolated_cpus);
+>  	WARN_ON_ONCE(ret < 0);
+>  
+> +	ret = housekeeping_update(isolated_cpus);
+> +	WARN_ON_ONCE(ret < 0);
+> +
+>  	isolated_cpus_updating = false;
+>  }
+>  
+> diff --git a/kernel/sched/isolation.c b/kernel/sched/isolation.c
+> index 83be49ec2b06..c61b7ef3e98e 100644
+> --- a/kernel/sched/isolation.c
+> +++ b/kernel/sched/isolation.c
+> @@ -29,18 +29,48 @@ static struct housekeeping housekeeping;
+>  
+>  bool housekeeping_enabled(enum hk_type type)
+>  {
+> -	return !!(housekeeping.flags & BIT(type));
+> +	return !!(READ_ONCE(housekeeping.flags) & BIT(type));
+>  }
+>  EXPORT_SYMBOL_GPL(housekeeping_enabled);
+>  
+> +static bool housekeeping_dereference_check(enum hk_type type)
+> +{
+> +	if (IS_ENABLED(CONFIG_LOCKDEP) && type == HK_TYPE_DOMAIN) {
+> +		/* Cpuset isn't even writable yet? */
+> +		if (system_state <= SYSTEM_SCHEDULING)
+> +			return true;
+> +
+> +		/* CPU hotplug write locked, so cpuset partition can't be overwritten */
+> +		if (IS_ENABLED(CONFIG_HOTPLUG_CPU) && lockdep_is_cpus_write_held())
+> +			return true;
+> +
+> +		/* Cpuset lock held, partitions not writable */
+> +		if (IS_ENABLED(CONFIG_CPUSETS) && lockdep_is_cpuset_held())
+> +			return true;
+> +
+> +		return false;
+> +	}
+> +
+> +	return true;
+> +}
+> +
+> +static inline struct cpumask *housekeeping_cpumask_dereference(enum hk_type type)
+> +{
+> +	return rcu_dereference_all_check(housekeeping.cpumasks[type],
+> +					 housekeeping_dereference_check(type));
+> +}
+> +
+>  const struct cpumask *housekeeping_cpumask(enum hk_type type)
+>  {
+> +	const struct cpumask *mask = NULL;
+> +
+>  	if (static_branch_unlikely(&housekeeping_overridden)) {
+> -		if (housekeeping.flags & BIT(type)) {
+> -			return rcu_dereference_check(housekeeping.cpumasks[type], 1);
+> -		}
+> +		if (READ_ONCE(housekeeping.flags) & BIT(type))
+> +			mask = housekeeping_cpumask_dereference(type);
+>  	}
+> -	return cpu_possible_mask;
+> +	if (!mask)
+> +		mask = cpu_possible_mask;
+> +	return mask;
+>  }
+>  EXPORT_SYMBOL_GPL(housekeeping_cpumask);
+>  
+> @@ -80,12 +110,43 @@ EXPORT_SYMBOL_GPL(housekeeping_affine);
+>  
+>  bool housekeeping_test_cpu(int cpu, enum hk_type type)
+>  {
+> -	if (static_branch_unlikely(&housekeeping_overridden) && housekeeping.flags & BIT(type))
+> +	if (static_branch_unlikely(&housekeeping_overridden) &&
+> +	    READ_ONCE(housekeeping.flags) & BIT(type))
+>  		return cpumask_test_cpu(cpu, housekeeping_cpumask(type));
+>  	return true;
+>  }
+>  EXPORT_SYMBOL_GPL(housekeeping_test_cpu);
+>  
+> +int housekeeping_update(struct cpumask *isol_mask)
+> +{
+> +	struct cpumask *trial, *old = NULL;
+> +
+> +	trial = kmalloc(cpumask_size(), GFP_KERNEL);
+> +	if (!trial)
+> +		return -ENOMEM;
+> +
+> +	cpumask_andnot(trial, housekeeping_cpumask(HK_TYPE_DOMAIN_BOOT), isol_mask);
+> +	if (!cpumask_intersects(trial, cpu_online_mask)) {
+> +		kfree(trial);
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (!housekeeping.flags)
+> +		static_branch_enable(&housekeeping_overridden);
+> +
+
+The cpu_read_lock is held outside, we should use static_branch_enable_cpuslocked
+here, since static_branch_enable acquires cpu_read_lock.
+
+I have sent out a patch to fix this issue.
+
+https://lore.kernel.org/cgroups/20260122080902.2312721-1-chenridong@huaweicloud.com/T/#u
+
+> +	if (housekeeping.flags & HK_FLAG_DOMAIN)
+> +		old = housekeeping_cpumask_dereference(HK_TYPE_DOMAIN);
+> +	else
+> +		WRITE_ONCE(housekeeping.flags, housekeeping.flags | HK_FLAG_DOMAIN);
+> +	rcu_assign_pointer(housekeeping.cpumasks[HK_TYPE_DOMAIN], trial);
+> +
+> +	synchronize_rcu();
+> +
+> +	kfree(old);
+> +
+> +	return 0;
+> +}
+> +
+>  void __init housekeeping_init(void)
+>  {
+>  	enum hk_type type;
+> diff --git a/kernel/sched/sched.h b/kernel/sched/sched.h
+> index 475bdab3b8db..653e898a996a 100644
+> --- a/kernel/sched/sched.h
+> +++ b/kernel/sched/sched.h
+> @@ -30,6 +30,7 @@
+>  #include <linux/context_tracking.h>
+>  #include <linux/cpufreq.h>
+>  #include <linux/cpumask_api.h>
+> +#include <linux/cpuset.h>
+>  #include <linux/ctype.h>
+>  #include <linux/file.h>
+>  #include <linux/fs_api.h>
+
+-- 
+Best regards,
+Ridong
+
