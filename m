@@ -1,71 +1,59 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2854934F265
-	for <linux-block@vger.kernel.org>; Thu, 22 Jan 2026 05:52:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D0F328136C;
+	Thu, 22 Jan 2026 05:59:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769061163; cv=none; b=GdgnEPQQJexKzObxEcrVfuMaj63vJMt5L8oC5n3zD1YI9SFyvk7ffrKpQ2upUcySJBiXvhUS05OQ+xizDRULZz2U2GAVSbGz8R2IpdaQ6uPX39cj9uXjE9Lsq4QvG3Eelkk1VTULcLwLWvFCScyxq8lqkMFPoJp2UmIFfucp83Q=
+	t=1769061602; cv=none; b=ec9usn5+MQQZJRF80MpJQCxufRH+LVTWH+caQA9u0T661zyzviGvIujcBs0SVvDXo2yd3TgN5G6Lwh0GoDsltfp+qwxCA+kDg3bE6b8j8WSUe9T6xoCN1T9vCXmQVKX1JkXtkZBgHSC1303ghZ8AIVRu/CDExYps0zuRLU+C35U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769061163; c=relaxed/simple;
-	bh=42URolF5j1UxfDtHhDYr0S0Ki6I2tWH7NhZqS4hCuJc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nVzD7ogMNaPC4rkhM9dwqt5GjduA7EAkqxAWsCTOLpx0LDUBYNPvy9q9kvrGGVyDhMdXKnV/05+7F/dsmyxhQwi+RrDLSc7S1RHcE+wqyR7S+/CfjNyzdea6L4kRhYTxXR2IfDF+0UHPg43yQVuQwQcCPUERThSNOuVqlUNxkSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y5+pN1XO; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y5+pN1XO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABEE0C116C6;
-	Thu, 22 Jan 2026 05:52:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769061162;
-	bh=42URolF5j1UxfDtHhDYr0S0Ki6I2tWH7NhZqS4hCuJc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Y5+pN1XODin/jZFw1uB6rSN8B/0GvhmU3Agseb/M3ORkByYX4jFBsd2obLvZbJ8Qw
-	 j7gwqRkBcWJDKlQlZ1GxsoUHiX3LFvDsg+WVw5s9ZNMZ6JiookEEzgTuuN424ApMFs
-	 shMZchlEvt32zCYMA2rkTRg4Yj6EcfS2vJMXRAtKTJ/Dg0yKs1T2e0Q/cWaRxaNIpk
-	 n6DaPPMVwAFb27sglEAjPPPDYW+32i3r9OG2XCh4r2djBIQMh2oaww0jvUpsCovCqb
-	 KvOgX4Er6HypxOX9dnnqu4cx5IdrDQ3skSaTafKEIFHV/jf2zCfwVlIwJimTDyixqP
-	 sqCaATLmeMuig==
-Message-ID: <dd97dbe8-5f8a-4d05-adb0-00c0189132bc@kernel.org>
-Date: Thu, 22 Jan 2026 16:52:39 +1100
+	s=arc-20240116; t=1769061602; c=relaxed/simple;
+	bh=AUM4cTsAHo2KpfyeYkwusVbFC2K/h4rgaNm312fW9tc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eRyRDIp3iTZ5F+LqBGfGL/NKVM0r6o1lOFzfnIN28Avf0o9Qsvd6z3Dfn63+XxwBA7xeqwhNJfRzSrYuqhi/ogiZjWRu2Xdi3y+SMdJZmMdO6mEQ3gqdVZzY8K3Uji/cM+AhKGkro5uDIkNEaXy4mdgWv9WOuzc27XP2SoE1USA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id E5719227AA8; Thu, 22 Jan 2026 06:59:56 +0100 (CET)
+Date: Thu, 22 Jan 2026 06:59:56 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Joanne Koong <joannelkoong@gmail.com>
+Cc: "Darrick J. Wong" <djwong@kernel.org>, Christoph Hellwig <hch@lst.de>,
+	Jens Axboe <axboe@kernel.dk>,
+	Christian Brauner <brauner@kernel.org>,
+	Carlos Maiolino <cem@kernel.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Anuj Gupta <anuj20.g@samsung.com>,
+	Kanchan Joshi <joshi.k@samsung.com>, linux-block@vger.kernel.org,
+	nvdimm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+	linux-xfs@vger.kernel.org
+Subject: Re: [PATCH 10/15] iomap: only call into ->submit_read when there
+ is a read_ctx
+Message-ID: <20260122055956.GA24006@lst.de>
+References: <20260121064339.206019-1-hch@lst.de> <20260121064339.206019-11-hch@lst.de> <20260122004451.GN5945@frogsfrogsfrogs> <CAJnrk1YAbcODi8pkG9XawciDpaHqdbZE+ucji73D_F=Jv1kQXg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH for-6.19] block: make the new blkzoned UAPI constants
- discoverable
-To: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, aalbersh@redhat.com
-References: <20260121073203.234429-1-hch@lst.de>
-Content-Language: en-US
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20260121073203.234429-1-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJnrk1YAbcODi8pkG9XawciDpaHqdbZE+ucji73D_F=Jv1kQXg@mail.gmail.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On 2026/01/21 18:31, Christoph Hellwig wrote:
-> The Linux 6.19 merge window added the new BLKREPORTZONESV2 ioctl, and
-> with it the new BLK_ZONE_REP_CACHED and BLK_ZONE_COND_ACTIVE constants.
+On Wed, Jan 21, 2026 at 06:44:12PM -0800, Joanne Koong wrote:
+> On Wed, Jan 21, 2026 at 4:44 PM Darrick J. Wong <djwong@kernel.org> wrote:
+> >
+> > On Wed, Jan 21, 2026 at 07:43:18AM +0100, Christoph Hellwig wrote:
+> > > Move the NULL check into the callers to simplify the callees.  Not sure
+> > > how fuse worked before, given that it was missing the NULL check.
 > 
-> The two constants are defined as part of enums, which makes it very
-> painful for userspace to discover if they are present in the installed
-> system headers.
-> 
-> Use the #define to the same name trick to make them trivially
-> discoverable using CPP directives.
-> 
-> Fixes: 0bf0e2e46668 ("block: track zone conditions")
-> Fixes: b30ffcdc0c15 ("block: introduce BLKREPORTZONESV2 ioctl")
-> Reported-by: Andrey Albershteyn <aalbersh@redhat.com>
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> In fuse, ctx->read_ctx is always valid. It gets initialized to point
+> to a local struct before it calls into
+> iomap_read_folio()/iomap_readahead()
 
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+Ok, thanks.
 
-
--- 
-Damien Le Moal
-Western Digital Research
