@@ -1,144 +1,175 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AA003D3D11;
-	Thu, 22 Jan 2026 11:36:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3D57337BA0
+	for <linux-block@vger.kernel.org>; Thu, 22 Jan 2026 11:47:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769081792; cv=none; b=tIOd3/N+QwjkrVBgbD080JJZxPXmpcZecXE+zK5YwmX/LCgLzvsFvrDyGxcPNQgSFONxv44Du1e4wXw2DrAR2fW+Vsa8l+mevbCmBATFPxlyagwy/LcFych6Yrr28Xp2CjVQxUQFGmCk7wX4RKNs/HOx2F6ghHy9ZQ2mY7D7mdc=
+	t=1769082426; cv=none; b=HI3IlKFFoSiEe4PipBM4KBJfwYOz3MOhFOSMQIqJk75m0UFSn1pCe3au3i3eMrTG9T6apsvsTXChUVpcQWyCOvT1qEprJ6JGUx94hQalPIkuNCXmTw72eGMWk618fA5Wkxx0GGmST3Nz2ECHM0kQPtUHZYngvC4+HxsmFWfDou4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769081792; c=relaxed/simple;
-	bh=ENaX1Ni1MjEYqWK5DUAycRHraRvMcIc+oNSelx9/l2Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VD1BNqB4pCqKFZoesgG6bjN3hlgpWukjuN9DzSv/nE8qiH3pODBBxjyHgC/dm71fDU2frsfnEGkWuaAxxpV+qIDw2XDQX+XSNrfIRy8B4RraCEjD6PS9qSrHjtETICbBGicyXC+gEvDj/ygasCtrd1DhtCwnG3dYK2ttQ/HqKJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZDryn4r3; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1769082426; c=relaxed/simple;
+	bh=L23kP1MKIlxxrA/vTdHehDXUOocxzJrIy3gu+khhV+g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rofJ5Y7/ZW3AbkHlIwgRfkQEIKohMcZl/Ol2wJO5N5H9Vyv7A46XL+QLLOrC+ZxoBBhDRwSLB+0ZQh8atfOkyy91eBx0qgoIpYvwo88tFDXBoaFbSVx/qBUJf3SYH25CYZvPY8eMUzaocAorTTaaee68QIzZ0hZ1fyLtD3wNpJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nljiXZaw; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZDryn4r3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A76CC116C6;
-	Thu, 22 Jan 2026 11:36:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769081791;
-	bh=ENaX1Ni1MjEYqWK5DUAycRHraRvMcIc+oNSelx9/l2Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZDryn4r3pVEndSSCPyKyGmEaA5BTct8VAHmY8jYwQGX6bZIuzGBK2tyiehlMSViCM
-	 Ei7gUubm2NpO0vLH1gLLEG7shYisa/qu58z1kPKCeHT7psSLc0dFIUNS20igfaqR8y
-	 H0JYR5Y3GLo2UHCzTKrQTDQA5CIsBsQX04/nfiZiuS1HDLzqsOcDFUUSDSixFNi2cA
-	 bcka/tqaxHdr2hWnQ1CWDAu9Vo3BBVN03Rl8iRMbmoAtVSYCecBSZ7PNzldFeiHaHe
-	 bmQniStX0qxItibPa8e+b/txibvQDRMzP6YVhz2gBqk8YlXoX44FzT/wg3EmzCppge
-	 Qf8lkGFsAGPRA==
-Date: Thu, 22 Jan 2026 11:36:21 +0000
-From: Will Deacon <will@kernel.org>
-To: Frederic Weisbecker <frederic@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Chen Ridong <chenridong@huawei.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Gabriele Monaco <gmonaco@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Marco Crivellari <marco.crivellari@suse.com>,
-	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
-	"Rafael J . Wysocki" <rafael@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
-	cgroups@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-block@vger.kernel.org, linux-mm@kvack.org,
-	linux-pci@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 29/33] sched/arm64: Move fallback task cpumask to
- HK_TYPE_DOMAIN
-Message-ID: <aXILtazyRtpb3Yjy@willie-the-truck>
-References: <20260101221359.22298-1-frederic@kernel.org>
- <20260101221359.22298-30-frederic@kernel.org>
- <aW-cAlJCtI5Qtify@willie-the-truck>
- <aXEHf5nbZMI8LT4b@localhost.localdomain>
- <aXH0TZU7UNowTmwc@willie-the-truck>
- <aXIKDduX5qUXvOUX@localhost.localdomain>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nljiXZaw"
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-4359228b7c6so576386f8f.2
+        for <linux-block@vger.kernel.org>; Thu, 22 Jan 2026 03:47:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1769082423; x=1769687223; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/c04FssyRzWAvFZbUZZ5iSwy4KaO1b4NaDQ9GK8JLME=;
+        b=nljiXZawh5QxydA4lbo89SOm6Z5RduUhSqUBtra9we1Svfex2VEIf860MZoiYSNwow
+         Q7dTem3yaRi1Pm57q/7He6mqWTLV55hH67oAbdm8VybY0K95d/umdKxgRfgJjj/ReFQd
+         peOUFEAhJji17Q4l5c9oqDNwEjfRdHuPZ7GJ1rTO6/qCPaCDnmpnF5aQM0HtHerG4Ljv
+         ccfpfM37hGbhRqBlN+54iBu05VAD1kreB0csgIgVM+xW3c6rOhHZScVQzYMjU6silAOx
+         xWBcUQOsAmsQtVBgbhykOCRtAhr2ioAbGwk207natgOb0+EZLQlj4GIQ94Pjf+6/MvxK
+         ccCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769082423; x=1769687223;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/c04FssyRzWAvFZbUZZ5iSwy4KaO1b4NaDQ9GK8JLME=;
+        b=FLgfMsn2w0/VjQMoENrNKIp7Gzb8g6uDcSScCoU6jQxxeJo/dX8cX1kOPeRfE418bl
+         MXQIqKWduuWNCe9qCqzCAY6zh9DcB7idYMwDi92LvIfMRvq+kVklP+YsJ+10HuxVVszc
+         XVj84mZ6kJQnTJ3xf0oOgGzR+UIL5dAJ0/CJoayKw/z8yf84e++5wu2jsKj/Yj3/1XVa
+         Ang+wjObcuDjTE6iD4fKlgjaySIMEaw1lggZIaq/M4WS4OWsHVcR8/JZwPAR5y43HgZW
+         SjXgoxqQjGmlIqLocVurnNSVSfq7DlwBIMTt/DA7sBNxhWXVy2iSJ6rqafZhvbwkkGAp
+         cBWg==
+X-Gm-Message-State: AOJu0YxhWbjC9I5hzl6p0zfQ8bR/mYgSREeN3VrYi7ueHpmLj1FN2Xq9
+	q7y3TZ0J6qvVxFwrCMq7JwPYnFK8qbdtMbPYcdDtGV4AoDXRE1FQEzM+
+X-Gm-Gg: AZuq6aKnRLx09IYZp/sCdbRY2qffuBjkrzpkYZfkZCS+T6PB7Q5jO0jh7C3bjHxxzsa
+	4VGLmwPMgh6fZKtkrbl6LCQJFptEhkgEZDQ1g8DuZnU0BYMsKmEurq5ybkEutO78bBJxHotDMY4
+	5SdMWkeMnAZtCAj5kkoc9f75tObZKXHZ+v4tL12hOwghLX1U5KoXPh5f5yfe+ghVoaILMyJpe6q
+	83qJpSqJhOp1UiZb/hSdG3OhaqVz/VM14OEawfVTjd0/iXAayuetUIm/QwJ0EG5Xl+i5TaeZioQ
+	Ds3xIjZ6fc2Xr+SIxROzglIlP7EgF+anGKyTwzHIuz2FR/VZnaptds0icHhHgByZ98wdQ8kNJTy
+	voukLWLUBWPuolwZz5aRvsCzkTlT/Hq4celVTb3DgJUnDRAtgbvnYAGIH4wS6/0AKCxciro009K
+	4IMwXfPsDbwL0j9JCxA82xc51Dfj1yLfRT1jfdLfQMkRDWx9CJ2cHZJvQxT/SDEg6z0vHyxupud
+	B7wsKo7+6S9ghgcaJ8fdnXPls/N46Mrz0G6pd8hle1c+a4=
+X-Received: by 2002:a05:6000:144b:b0:435:95ce:836e with SMTP id ffacd0b85a97d-43595ce838amr11818024f8f.55.1769082423045;
+        Thu, 22 Jan 2026 03:47:03 -0800 (PST)
+Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:46c4])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4358f138e26sm19447555f8f.17.2026.01.22.03.47.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Jan 2026 03:47:02 -0800 (PST)
+Message-ID: <d3389449-f344-48ae-ab13-697e01d1cc46@gmail.com>
+Date: Thu, 22 Jan 2026 11:46:59 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC v2 05/11] block: add infra to handle dmabuf tokens
+To: Nitesh Shetty <nj.shetty@samsung.com>
+Cc: linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+ Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linaro-mm-sig@lists.linaro.org
+References: <cover.1763725387.git.asml.silence@gmail.com>
+ <51cddd97b31d80ec8842a88b9f3c9881419e8a7b.1763725387.git.asml.silence@gmail.com>
+ <CGME20260121074135epcas5p2eeb621d6acc9b4b73e6d45f5a40c078d@epcas5p2.samsung.com>
+ <20260121073724.dja6wyqyf5apkdcx@green245.gost>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20260121073724.dja6wyqyf5apkdcx@green245.gost>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <aXIKDduX5qUXvOUX@localhost.localdomain>
 
-On Thu, Jan 22, 2026 at 12:29:17PM +0100, Frederic Weisbecker wrote:
-> Le Thu, Jan 22, 2026 at 09:56:29AM +0000, Will Deacon a �crit :
-> > On Wed, Jan 21, 2026 at 06:06:07PM +0100, Frederic Weisbecker wrote:
-> > > Le Tue, Jan 20, 2026 at 03:15:14PM +0000, Will Deacon a �crit :
-> > > > Hi Frederic,
-> > > > 
-> > > > On Thu, Jan 01, 2026 at 11:13:54PM +0100, Frederic Weisbecker wrote:
-> > > > > When none of the allowed CPUs of a task are online, it gets migrated
-> > > > > to the fallback cpumask which is all the non nohz_full CPUs.
-> > > > > 
-> > > > > However just like nohz_full CPUs, domain isolated CPUs don't want to be
-> > > > > disturbed by tasks that have lost their CPU affinities.
-> > > > > 
-> > > > > And since nohz_full rely on domain isolation to work correctly, the
-> > > > > housekeeping mask of domain isolated CPUs should always be a superset of
-> > > > > the housekeeping mask of nohz_full CPUs (there can be CPUs that are
-> > > > > domain isolated but not nohz_full, OTOH there shouldn't be nohz_full
-> > > > > CPUs that are not domain isolated):
-> > > > > 
-> > > > > 	HK_TYPE_DOMAIN | HK_TYPE_KERNEL_NOISE == HK_TYPE_DOMAIN
-> > > > > 
-> > > > > Therefore use HK_TYPE_DOMAIN as the appropriate fallback target for
-> > > > > tasks and since this cpumask can be modified at runtime, make sure
-> > > > > that 32 bits support CPUs on ARM64 mismatched systems are not isolated
-> > > > > by cpusets.
-> > > > > 
-> > > > > Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
-> > > > > Reviewed-by: Waiman Long <longman@redhat.com>
-> > > > > ---
-> > > > >  arch/arm64/kernel/cpufeature.c | 18 +++++++++++++++---
-> > > > >  include/linux/cpu.h            |  4 ++++
-> > > > >  kernel/cgroup/cpuset.c         | 17 ++++++++++++++---
-> > > > >  3 files changed, 33 insertions(+), 6 deletions(-)
-> > > > 
-> > > > tbh, I'd also be fine just saying that isolation isn't reliable on these
-> > > > systems and then you don't need to add the extra arch hook.
-> > > 
-> > > Hmm, I think I heard about nohz_full usage on arm64 but I'm not sure.
-> > > And I usually expect isolcpus or cpuset isolated partitions to be even
-> > > more broadly used, it's lighter isolation with less constraints.
-> > > 
-> > > Anyway you're probably right that we could remove isolation support here
-> > > but I don't want to break any existing user.
-> > 
-> > fwiw, I think it's only some Android markets using the mismatched 32-bit
-> > support and we're definitely not using nohz_full there.
+On 1/21/26 07:37, Nitesh Shetty wrote:
+> On 23/11/25 10:51PM, Pavel Begunkov wrote:
+>> Add blk-mq infrastructure to handle dmabuf tokens. There are two main
+>> objects. The first is struct blk_mq_dma_token, which is an extension of
+>> struct dma_token and passed in an iterator. The second is struct
+>> blk_mq_dma_map, which keeps the actual mapping and unlike the token, can
+>> be ejected (e.g. by move_notify) and recreated.
+>>
+>> The token keeps an rcu protected pointer to the mapping, so when it
+>> resolves a token into a mapping to pass it to a request, it'll do an rcu
+>> protected lookup and get a percpu reference to the mapping.
+>>
+>> If there is no current mapping attached to a token, it'll need to be
+>> created by calling the driver (e.g. nvme) via a new callback. It
+>> requires waiting, thefore can't be done for nowait requests and couldn't
+>> happen deeper in the stack, e.g. during nvme request submission.
+>>
+>> The structure split is needed because move_notify can request to
+>> invalidate the dma mapping at any moment, and we need a way to
+>> concurrently remove it and wait for the inflight requests using the
+>> previous mapping to complete.
+>>
+>> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+>> ---
+>> block/Makefile                   |   1 +
+>> block/bdev.c                     |  14 ++
+>> block/blk-mq-dma-token.c         | 236 +++++++++++++++++++++++++++++++
+>> block/blk-mq.c                   |  20 +++
+>> block/fops.c                     |   1 +
+>> include/linux/blk-mq-dma-token.h |  60 ++++++++
+>> include/linux/blk-mq.h           |  21 +++
+>> include/linux/blkdev.h           |   3 +
+>> 8 files changed, 356 insertions(+)
+>> create mode 100644 block/blk-mq-dma-token.c
+>> create mode 100644 include/linux/blk-mq-dma-token.h
+>>
+>> diff --git a/block/Makefile b/block/Makefile
+>> index c65f4da93702..0190e5aa9f00 100644
+...
+>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>> index f2650c97a75e..1ff3a7e3191b 100644
+>> --- a/block/blk-mq.c
+>> +++ b/block/blk-mq.c
+>> @@ -29,6 +29,7 @@
+>> #include <linux/blk-crypto.h>
+>> #include <linux/part_stat.h>
+>> #include <linux/sched/isolation.h>
+>> +#include <linux/blk-mq-dma-token.h>
+>>
+>> #include <trace/events/block.h>
+>>
+>> @@ -439,6 +440,7 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+>>     rq->nr_integrity_segments = 0;
+>>     rq->end_io = NULL;
+>>     rq->end_io_data = NULL;
+>> +    rq->dma_map = NULL;
+>>
+>>     blk_crypto_rq_set_defaults(rq);
+>>     INIT_LIST_HEAD(&rq->queuelist);
+>> @@ -794,6 +796,7 @@ static void __blk_mq_free_request(struct request *rq)
+>>     blk_pm_mark_last_busy(rq);
+>>     rq->mq_hctx = NULL;
+>>
+>> +    blk_rq_drop_dma_map(rq);
+> blk_rq_drop_dma_map(rq), needs to be added in blk_mq_end_request_batch
+> as well[1], otherwise I am seeing we leave with increased reference
+> count in dma-buf exporter side.
 > 
-> Now that removal becomes appealing. And what about isolcpus= / isolated cpuset
-> which only consist in scheduler domain isolation? Probably not used by android
-> either.
+> Thanks,
+> Nitesh
 > 
-> Ok but is there a way to detect on early boot that the system has mismatched
-> 32 bits support? Because I need to fail nohz_full= and isolcpus= boot parameters
-> early on top of this information without waiting for secondary CPUs boot.
+> [1]
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1214,6 +1214,7 @@ void blk_mq_end_request_batch(struct io_comp_batch *iob)
+> 
+>                   blk_crypto_free_request(rq);
+>                   blk_pm_mark_last_busy(rq);
+> +               blk_rq_drop_dma_map(rq);
 
-Honestly, I'm not sure I'd bother trying to be smart here. Even if the
-system has enabled support for mismatched 32-bit CPUs, things should
-still work properly with nohz_full/isolcpus if all the tasks are 64-bit,
-right?
+Ah yes, thanks Nitesh
 
-In which case, I'd just document whatever weird behaviour you get if
-somebody throws 32-bit tasks into the mix. Adding hooks to the generic
-code for this use-case just seems like a waste, as they're not going to
-be used in practice and it increases the maintenance burden.
+-- 
+Pavel Begunkov
 
-Will
