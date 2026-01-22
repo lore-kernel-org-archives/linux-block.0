@@ -1,78 +1,82 @@
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09535355044
-	for <linux-block@vger.kernel.org>; Thu, 22 Jan 2026 09:57:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B5433ACEED
+	for <linux-block@vger.kernel.org>; Thu, 22 Jan 2026 09:57:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769075841; cv=none; b=S729AbVoS6pv+BRYizLJ7u4s3WDtDzi6vGoSVxKHfUEOP7bDczxP18CocCa31eTjQvEx4cRv490/7zNWttTfx8WBre0kTxImlrIz46VyBL5bkRCBBMskjlU/Rj5RhARXV8BXDAZ+NQcTR3WA03ekJ2XPwvnoYoQc4ztbbLS2X6Y=
+	t=1769075851; cv=none; b=IrfhoPhEVixGW9km3KeUUpEl7slsunRFwgzEYJZG16BB3MfNOeMptOa9lYW7DsXNsh/m+G8kXCL9X5ndV6YE2i/9PXdAwQEPIo9aAoTL/Jii/Hywe/LGRct3hrXCiXpxwDFlLqSG1dhqwk6EBZ0sdul/49k/QdyBqC62sYdKCl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769075841; c=relaxed/simple;
-	bh=NwKM766jve6cwdRMlWgSLgJPeEpUyWaH5Qzxv/0YWnM=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To; b=oQEROhie7B1w9jfVhdVJjwK9RCH3nfNZx46l/pRQZZ1Po/waL76wjh02zcM5mGhqmGbPIICJVCxR5rzNmJKPfrt5MC1rHz8MBZiod9++x/2TGQpo7e1sPXRokvTShkU1I4RMuKsCn+5Sfm7ME5dPzRVCVKMT2ZjpF7YpgWJECJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=f3E6zAk8; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=u4q6iUI7; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=z5wVksZp; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=/Kg2c+Ai; arc=none smtp.client-ip=195.135.223.131
+	s=arc-20240116; t=1769075851; c=relaxed/simple;
+	bh=WR24rVlPKskuQG4aQ/syKb5Fca0gz1lw+HvLLHHcH+Q=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To; b=CjXOJyfy5u2KFLYEK3ScMeTj04GKPuvDFBAO9ywONuJ9GbI9WaiB7LCMBOGTEqNhELfCUxCGog5SnfK+ZBBXcDxO0JT2HJ32f8VASmXfQlDzz9ww7ASzf49t9PsCmkJXraarb/5zN3fW9L+x+14MhxClGjSv4AZ95oMOVf7TrsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=eTiGNdSB; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=WLvGKAWR; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=eTiGNdSB; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=WLvGKAWR; arc=none smtp.client-ip=195.135.223.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="f3E6zAk8";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="u4q6iUI7";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="z5wVksZp";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="/Kg2c+Ai"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="eTiGNdSB";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="WLvGKAWR";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="eTiGNdSB";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="WLvGKAWR"
 Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id ECB9F5BCE6;
-	Thu, 22 Jan 2026 09:57:17 +0000 (UTC)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 3F0D55BCCB;
+	Thu, 22 Jan 2026 09:57:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1769075838; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	t=1769075847; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
 	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=IgzyTsBFZLO0ugTNs8K7WRXuwUlDB1zpFclRdktsbN0=;
-	b=f3E6zAk81ekaKSw0cRmYiQBU9AqHwcabxd8IPpR4FYRFQ927oN+R3N/1TBstVdRN0GfOfa
-	p3XPQaw9OJ0cB7u62QfzY8+fKrzQVVgElNQHBHbIyPRRMddrRv2ux35sAPeB+YD8Wep9aE
-	3taxy2GD7Y/tlf+NkpZWOH2KGfOwTEI=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MjEOYNPNl/uRPBXRzOyBtLVc1i1/cXqtUW300ha+FqY=;
+	b=eTiGNdSBUXwD8MA3h0B7L5ZdoInDi/FpmE9noyOUrEqFypN1njyuqn5m2nhmDH4WTwd803
+	HhvuztfK4quUO44DW4x8mDgoY4Mv3KoBkHWjsPVvhL+vT1SHA8ztS0umsZRl8krg4D85pd
+	GQ7rBorpxjDB01lZnLppYdyBMzjv1OY=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1769075838;
+	s=susede2_ed25519; t=1769075847;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
 	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=IgzyTsBFZLO0ugTNs8K7WRXuwUlDB1zpFclRdktsbN0=;
-	b=u4q6iUI72kUcDvJSSrCRlYefIhWM02OIAW2fi/UFJko0UcbsVEID69/ME2SZeaoDsx8pzT
-	8UkMyrB4n7z80GCw==
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MjEOYNPNl/uRPBXRzOyBtLVc1i1/cXqtUW300ha+FqY=;
+	b=WLvGKAWRQM1dN5IvWadnJQiW0dhrq00/HfGhtkEgMPWBqV2mSQGQc6HKAilaB53pZlUq00
+	z7w5K0hfV68M+ABA==
 Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=z5wVksZp;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="/Kg2c+Ai"
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=eTiGNdSB;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=WLvGKAWR
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1769075837; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	t=1769075847; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
 	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=IgzyTsBFZLO0ugTNs8K7WRXuwUlDB1zpFclRdktsbN0=;
-	b=z5wVksZp079El++j2wkgL+CyDcLeYg9VfH3gH52M+yyeDwDVLPNMVz+xVp6cY43BNhBbX5
-	dr+9G6mA4EohYCZbKHkQbyHnrPe+bgKjhqORLx2fJDx84nGm0mkR9yKKPgyXvsb2fgwTJG
-	dcDfU1E0zThkFr0smENF4hVbZmrc9sY=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MjEOYNPNl/uRPBXRzOyBtLVc1i1/cXqtUW300ha+FqY=;
+	b=eTiGNdSBUXwD8MA3h0B7L5ZdoInDi/FpmE9noyOUrEqFypN1njyuqn5m2nhmDH4WTwd803
+	HhvuztfK4quUO44DW4x8mDgoY4Mv3KoBkHWjsPVvhL+vT1SHA8ztS0umsZRl8krg4D85pd
+	GQ7rBorpxjDB01lZnLppYdyBMzjv1OY=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1769075837;
+	s=susede2_ed25519; t=1769075847;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
 	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=IgzyTsBFZLO0ugTNs8K7WRXuwUlDB1zpFclRdktsbN0=;
-	b=/Kg2c+AiI+xKuBkqNJuZzeHSlES1zmwLgJYBRfQbeXPniMcgCR4gJ0yhzeU0HhNriBYLuk
-	wkATL99g3OQLq2Ag==
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MjEOYNPNl/uRPBXRzOyBtLVc1i1/cXqtUW300ha+FqY=;
+	b=WLvGKAWRQM1dN5IvWadnJQiW0dhrq00/HfGhtkEgMPWBqV2mSQGQc6HKAilaB53pZlUq00
+	z7w5K0hfV68M+ABA==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D254A13978;
-	Thu, 22 Jan 2026 09:57:17 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 246BA13978;
+	Thu, 22 Jan 2026 09:57:27 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id N/RmMn30cWnLGAAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Thu, 22 Jan 2026 09:57:17 +0000
+	id VTftB4f0cWnZGAAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Thu, 22 Jan 2026 09:57:27 +0000
 From: Daniel Wagner <dwagner@suse.de>
-Subject: [PATCH blktests v3 0/3] bcache: add initial test cases
-Date: Thu, 22 Jan 2026 10:57:11 +0100
-Message-Id: <20260122-bcache-v3-0-2c02d15a4503@suse.de>
+Date: Thu, 22 Jan 2026 10:57:13 +0100
+Subject: [PATCH blktests v3 2/3] bcache: add bcache/002
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -81,11 +85,9 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/2WMQQ7CIBBFr9LMWgwztFi78h7GBdDBsmkNKNE0v
- bu0CzVx+X7+ezMkjoETdNUMkXNIYRoLqF0FbjDjlUXoCwNJ0hJJCuuMG1ioht1B6da1voZyvkX
- 24bmFzpfCQ0j3Kb62bsZ1/UtkFCiao/XSUl9jLU/pkXjfM6yBTL8SfiQSJUDaeGwb1sp8pWVZ3
- kv3ODXPAAAA
-X-Change-ID: 20260120-bcache-35ec7368c8f4
+Message-Id: <20260122-bcache-v3-2-2c02d15a4503@suse.de>
+References: <20260122-bcache-v3-0-2c02d15a4503@suse.de>
+In-Reply-To: <20260122-bcache-v3-0-2c02d15a4503@suse.de>
 To: Christoph Hellwig <hch@infradead.org>, 
  Stephen Zhang <starzhangzsd@gmail.com>, 
  Kent Overstreet <kent.overstreet@linux.dev>, Coly Li <colyli@fnnas.com>, 
@@ -94,6 +96,7 @@ To: Christoph Hellwig <hch@infradead.org>,
  linux-block@vger.kernel.org, linux-bcache@vger.kernel.org, 
  Daniel Wagner <dwagner@suse.de>
 X-Mailer: b4 0.14.3
+X-Spam-Score: -4.51
 X-Spamd-Result: default: False [-4.51 / 50.00];
 	BAYES_HAM(-3.00)[100.00%];
 	NEURAL_HAM_LONG(-1.00)[-1.000];
@@ -116,77 +119,103 @@ X-Spamd-Result: default: False [-4.51 / 50.00];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_COUNT_TWO(0.00)[2];
 	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:mid,suse.de:dkim,suse.de:email];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:dkim,suse.de:mid,suse.de:email];
 	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	DKIM_TRACE(0.00)[suse.de:+]
-X-Spam-Flag: NO
-X-Spam-Score: -4.51
-X-Rspamd-Queue-Id: ECB9F5BCE6
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
 X-Spam-Level: 
+X-Rspamd-Action: no action
+X-Rspamd-Queue-Id: 3F0D55BCCB
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Flag: NO
 
-I've added the test case from Stephen [1] which showed all the limitation in v2.
-The cleanup code should be more robust now. The new test case reports
-
-bcache/001 => nvme0n1 vdb vdc (test bcache setup and teardown) [passed]
-    runtime  1.373s  ...  1.334s
-bcache/002 => nvme0n1 vdb vdc (test bcache for bio leaks in clone) [failed]
-    runtime  7.360s  ...  7.336s
-    --- tests/bcache/002.out    2026-01-22 09:49:22.379130632 +0000
-    +++ /tmp/blktests/nvme0n1_vdb_vdc/bcache/002.out.bad        2026-01-22 09:49:39.343331470 +0000
-    @@ -1,2 +1,3 @@
-     Running bcache/002
-     Device state: no cache
-    +ERROR: Accounting leak detected!
-
-So it seems to do something. Though I think it could look at sysfs values
-directly isntead using iostat. Though that's for another time.
-
-I wont work on this in the next two weeks as I am on vacation. So no hurry to
-review :)
-
-Cheers,
-Daniel
+Add test case from Stephen Zhang [1].
 
 [1] https://lore.kernel.org/linux-bcache/CANubcdX7eNbH_bo4-f94DUbdiEbt04Vxy1MPyhm+CZyXB01FuQ@mail.gmail.com/
- 
 
 Signed-off-by: Daniel Wagner <dwagner@suse.de>
 ---
-Changes in v3:
-- add bcache/002
-- return created bcache devices to tests case
-- made cleanup more robust (handling detached cache)
-- track all resources correctly
-- operatoe only in final cleanup on known devices
-- Link to v2: https://patch.msgid.link/20260121-bcache-v2-0-b26af185e63a@suse.de
+ tests/bcache/002     | 63 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/bcache/002.out |  2 ++
+ 2 files changed, 65 insertions(+)
 
-Changes in v2:
-- fixed whitespace damage
-- added documentation on how to configure for bcache tests
-- do registering explicitly
-- made disk wiping more robust
-- Link to v1: https://patch.msgid.link/20260120-bcache-v1-1-59bf0b2d4140@suse.de
+diff --git a/tests/bcache/002 b/tests/bcache/002
+new file mode 100644
+index 000000000000..04892667ad1b
+--- /dev/null
++++ b/tests/bcache/002
+@@ -0,0 +1,63 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++# Copyright (C) 2026 Daniel Wagner, SUSE Labs
++#
++# Test based on Stephen Zhang <starzhangzsd@gmail.com> test case
++# https://lore.kernel.org/linux-bcache/CANubcdX7eNbH_bo4-f94DUbdiEbt04Vxy1MPyhm+CZyXB01FuQ@mail.gmail.com/#t
++#
++# Test bcache for bio leaks in clone
++
++. tests/bcache/rc
++
++DESCRIPTION="test bcache for bio leaks in clone"
++
++requires() {
++	_bcache_requires
++	_have_fio
++	_have_program iostat
++}
++
++test_device_array() {
++	echo "Running ${TEST_NAME}"
++
++	if [[ ${#TEST_DEV_ARRAY[@]} -lt 2 ]]; then
++		SKIP_REASONS+=("requires at least 2 devices")
++		return 1
++	fi
++
++	_setup_bcache "${TEST_DEV_ARRAY[@]}"
++
++	local bcache_nodes bcache_dev bdev_name fio_pid
++
++	mapfile -t bcache_nodes < <(_create_bcache \
++				--cache "${TEST_DEV_ARRAY[0]##*/}" \
++				--bdev "${TEST_DEV_ARRAY[1]##*/}" \
++				--writeback)
++
++	bcache_dev="${bcache_nodes[0]}"
++	bdev_name="$(basename "${bcache_dev}")"
++	echo 1 > /sys/block/"${bdev_name}"/bcache/detach
++
++	state="$(cat /sys/block/"${bdev_name}"/bcache/state)"
++	echo "Device state: ${state}"
++
++	_run_fio_rand_io --filename="${bcache_dev}" --time_base \
++			--runtime=30 >> "$FULL" 2>&1 &
++	fio_pid=$!
++
++	sleep 5
++
++	local stats_line util
++	stats_line=$(iostat -x 1 2 "${bdev_name}" | grep -w "${bdev_name}" | tail -n 1)
++	util="$(echo "${stats_line}" | awk '{print $NF}')"
++
++	if (( $(echo "${util} > 1.0" | bc -l) )); then
++		echo "ERROR: Accounting leak detected!"
++	fi
++
++	{ pkill -f "fio.*${bcache_dev}"; wait "${fio_pid}"; } &> /dev/null
++
++	_remove_bcache --bcache "${bcache_nodes[@]}" \
++			--cache "${TEST_DEV_ARRAY[0]##*/}" \
++			--bdev "${TEST_DEV_ARRAY[1]##*/}"
++}
+diff --git a/tests/bcache/002.out b/tests/bcache/002.out
+new file mode 100644
+index 000000000000..529c1a90b135
+--- /dev/null
++++ b/tests/bcache/002.out
+@@ -0,0 +1,2 @@
++Running bcache/002
++Device state: no cache
 
----
-Daniel Wagner (3):
-      bcache: add bcache/001
-      bcache: add bcache/002
-      doc: document how to configure bcache tests
-
- Documentation/running-tests.md |  16 ++
- tests/bcache/001               |  48 ++++++
- tests/bcache/001.out           |   3 +
- tests/bcache/002               |  63 +++++++
- tests/bcache/002.out           |   2 +
- tests/bcache/rc                | 368 +++++++++++++++++++++++++++++++++++++++++
- 6 files changed, 500 insertions(+)
----
-base-commit: e387a7e0169cc012eb6a7140a0561d2901c92a76
-change-id: 20260120-bcache-35ec7368c8f4
-
-Best regards,
 -- 
-Daniel Wagner <dwagner@suse.de>
+2.52.0
 
