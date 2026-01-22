@@ -1,206 +1,236 @@
-Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 968FB244670;
-	Thu, 22 Jan 2026 13:05:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.143.124
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769087129; cv=fail; b=JHugpJBBoNG/TiB5jv3TUHRzvxhSrox/Ow1zVjg18y57PayP8PdcQHZfT5+VTOZzCPPrtc+m27oYQiV+SQCE9c36WxaFdEyZH9/7ekxnncT7ofVkq/BqYidLd2iExD1Z1i6iUau9EjMHP0hf5nrT2CVnyAqLmso+k5yxcsnCWz8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769087129; c=relaxed/simple;
-	bh=mcVjTQ/dWEd3wDQpBxSZruq4zD6Tft0F3gJQ5/FmXZA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=WQyvm7vQwWnZY2qauIVGjsGu918KEIeTUI/mq1zzotIAh5HqPj010Ek0V/VKEEYFIwwWknXcF7tsCimvq1VZjWCK/C8zH7P+1RibsE/DeOCanxmQ11LQaoTIb/kkS4ukiAeXuda7w4IpQQ3xONMAF4btxgHtDFPqfoAXLzwODdY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=qfzpvb8S; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=WMog3psc; arc=fail smtp.client-ip=68.232.143.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D46F926D4EF;
+	Thu, 22 Jan 2026 14:25:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769091954; cv=none; b=XNNechYRG55Ggd7uaFvco5uVDlHXpv/wxZ40FR4x7pWLriIHajwc5bAxGiE/xX2OIaJB2zEH3QovXgG0mQP9e56JRRSzbtVkoYTW0QFnmHgD1CcuYlTiq78eXvvLxjPBEV4MR+KTlR8ufATe8AIpCe3cT2Sq9j9gJejmCy+qYhU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769091954; c=relaxed/simple;
+	bh=Yl2qHTWE9Fz/7zZDgzhuQhCUpz24c+UW8s5oFbDoqv4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D/w9kR0YH2ueJ7Rylrql9TFAWEIAmNiXXu7/ODCFx+/v6igMliu+V/I4kSCxSiicgRU2NH4uLu94JD9gF+ek+WnQ/7YEjvb+XIwX2bc16x1ijd6N5abNgcwqpjiVllTBSaqAj1C8cPpOvW8bk6hHP9kpXJ2EnjZUFaAwo2M/ar4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dgksenNL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="qfzpvb8S";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="WMog3psc"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1769087126; x=1800623126;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=mcVjTQ/dWEd3wDQpBxSZruq4zD6Tft0F3gJQ5/FmXZA=;
-  b=qfzpvb8SoT8xPsG4rgai4i105jK2KLVW9UoD90sKPEnwvFN/8u06293f
-   Yb38tfyJ154tgX/0IR12r5w6ST7FLcIqjEgrt3kZtwzD/Np8OOuh0dvl3
-   UleSGYDpCV76HfjK4XHTK3TbRMy+36yP0cvtCDwC72aIuoFZvlobpCM1z
-   nN3R/PK0G/8DfvqC5KWvxy6f3w6WX5GSdD5yupvAT04BmQocLzxUB7Ub0
-   Z0oyKMVleH1t+BCNQCVQjvfLsgOCI2Kvpg+CYZzXQpovc6dlc1oC+5yKL
-   xWcgvnsGqNQNhDx70EOMHq6t56QnFDNR4pgQHCB29Cq3bvtQp670r9n5z
-   w==;
-X-CSE-ConnectionGUID: BIyEWw0kQ4CPyNQEJ4vCPA==
-X-CSE-MsgGUID: yCe+d4UpR8O/NVuS/JYBXg==
-X-IronPort-AV: E=Sophos;i="6.21,246,1763395200"; 
-   d="scan'208,223";a="140451858"
-Received: from mail-eastusazon11011003.outbound.protection.outlook.com (HELO BL2PR02CU003.outbound.protection.outlook.com) ([52.101.52.3])
-  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 22 Jan 2026 21:05:24 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=hqsxeC0jeDx8GdbDeu7UGZ46FNSZOlZXOktxIszKznJCl4biAJ3+7ghQUJJ2/9JY89NZGMpt7asbKqdqxdLpMRZThxUBgUNPQ4FTbJmFIYao6mvZTM7JhhR0y/hF7sAdGxBmzHnxm09PDlS7OsbD0XZz0K7LmPt6CuHLtoPyPQz3BTsmuTRDCW5kg12ZqVOhjOxRZE8C3EqmMhMmcKV1kBNBhBW1AZtmSCRiyHr4RDxD7q9o+hzngv0URM3cMr5+xPSDZlumvpGHcYTRVV98lO9ZDgBb+ZkhPgYEVH0nyU6hLnxRGMvNgXnIXfcCcjYAt0+c0La6Qx1sPO8PZnKysg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mcVjTQ/dWEd3wDQpBxSZruq4zD6Tft0F3gJQ5/FmXZA=;
- b=Ya0TEMne1ocMhxQFWEAAQNQnLx6XMDTnZYhvU2356+hV4/bAfbuSWxVi1RNaf4u4xebw1HRyqIycgOjECBgQvzYXrpeQW4ix+bQlLveA0l/gguqU2A6zqHgga8rfjY4PgiuK+jwbezOKlcy5EGlM1nnWtFXqOCleO2HzQMIX3br6CvOJzBm0PCf8ixbQ6D2CwAETE/oTUOu1CiSwv1Zjp1ZFSdeMdsiIjG+pAySSFIzJJAE45rVH0bhBjJ+ON6R9N2c5G9iCRfLbSIlbTKqBawSleBOmII+n/bzONsPr2oLSP6hucM14ridtkb5D43zk6coGhzt/Wf/XTPTaImkZBw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mcVjTQ/dWEd3wDQpBxSZruq4zD6Tft0F3gJQ5/FmXZA=;
- b=WMog3psca4Ap269djG7js/Mu8Wou6oegmaphjrePzs5YJJ+0P2N/++5aYZfa3bRi+Z5+6B8nisbePcXtvSQBGPxtUwKT0AvI+WnBYmcux+F2tSvtdsNYulbm3Wa9oI6xtg0O5RamzyacEg2CaUecBb9xQa/MmKJcuJ2g7HSg4Wc=
-Received: from LV8PR04MB8984.namprd04.prod.outlook.com (2603:10b6:408:18b::13)
- by MN2PR04MB6832.namprd04.prod.outlook.com (2603:10b6:208:19e::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.2; Thu, 22 Jan
- 2026 13:05:24 +0000
-Received: from LV8PR04MB8984.namprd04.prod.outlook.com
- ([fe80::9ba6:7273:90bc:53a8]) by LV8PR04MB8984.namprd04.prod.outlook.com
- ([fe80::9ba6:7273:90bc:53a8%5]) with mapi id 15.20.9564.001; Thu, 22 Jan 2026
- 13:05:23 +0000
-From: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To: hch <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Christian Brauner
-	<brauner@kernel.org>
-CC: "Darrick J. Wong" <djwong@kernel.org>, Carlos Maiolino <cem@kernel.org>,
-	WenRuo Qu <wqu@suse.com>, Al Viro <viro@zeniv.linux.org.uk>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
-Subject: Re: [PATCH 05/14] block: add helpers to bounce buffer an iov_iter
- into bios
-Thread-Topic: [PATCH 05/14] block: add helpers to bounce buffer an iov_iter
- into bios
-Thread-Index: AQHciRgwrUjwCsM0skyaUYv20x9P/7VeLViA
-Date: Thu, 22 Jan 2026 13:05:23 +0000
-Message-ID: <848832ec-99c7-491a-b9d0-974874bc7ff6@wdc.com>
-References: <20260119074425.4005867-1-hch@lst.de>
- <20260119074425.4005867-6-hch@lst.de>
-In-Reply-To: <20260119074425.4005867-6-hch@lst.de>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Mozilla Thunderbird
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: LV8PR04MB8984:EE_|MN2PR04MB6832:EE_
-x-ms-office365-filtering-correlation-id: 00eff7a8-696d-4ae9-0466-08de59b6e7b5
-x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|7416014|10070799003|19092799006|1800799024|366016|38070700021;
-x-microsoft-antispam-message-info:
- =?utf-8?B?UGpxSFd2YXhTTnhkaWhBRVpxK2QzM3VQbmpvdTFFVSsyTnBNK1FaQlcxUU4z?=
- =?utf-8?B?ekwwUXhlYzJmSkx4clEzNmw0YWxtMEVLSEplOGk0WnRnNE5DQ2REK1RZanJ5?=
- =?utf-8?B?SHZRbFcxMC9nM3EwSnJCR3JtMDBKdDRpNVppVTVXcEZFK1Y0bnlYazVKTkk2?=
- =?utf-8?B?QjNVaDRzeS9zWnlFTjFGTUE2b0NWZzdtdWl2ODVXZ3g1VWV4WFl4L05UZG8z?=
- =?utf-8?B?MjVuZ3lLdmUrSlF4NUN3RnF3UXZKUGFkVTNsOWpmTE0yT1FCRzFseWcweHRt?=
- =?utf-8?B?U1VPLzFZbldxZVhRRlBmcFFpTlNicjR2eFJBaThWUmdRSXI4M2NzY2gvUDJx?=
- =?utf-8?B?MmIvRHg2V25XR2tjQzlBMk5veVhwSG80dHNCQTJwN1dMdVE1UWJXMTBNeVN0?=
- =?utf-8?B?YVl0YTM5UldZUTNWRi9MUm9SN3NreHR1Vmt2OWRXaGxSaGxUaCtoaUpjcERx?=
- =?utf-8?B?MlpTdEhRRG9oUnJzdUZybGQvODJualoxbXdFM0JFdmc5VFpIVk9pdndwbE1F?=
- =?utf-8?B?eklWVDBLeU1WN1BERWVpdzVXSHF6Wm83ZXpCY1JKQnpFTG5KYmpXQURaSW5P?=
- =?utf-8?B?cDFnS2FKVHJsZ0RDVVF5UVlpVzVkRVRDVmpSMXZHaFRaWGw5VTcwZlZSQUFm?=
- =?utf-8?B?VkJFVzRib3lQRGJlR01EcGNFWW8xbUNvdmVRVVRqNUhhZEVJeVdFcnRic3Av?=
- =?utf-8?B?dzZocldZdXo5TE9ZY1BYbzFibUR0dlVsRVVpV2NNUHJkVGRYWEV6RG45WDJO?=
- =?utf-8?B?VEJONTN4WW9OczcvMC9NUjh5T0RJaUg4TXk1MFF1RGRUbERwaHRudTI5ZjE0?=
- =?utf-8?B?OGRIcEliMThWc3JFOGNGc0JsZUtJYVNwTHJBM3l1ZW9SR2hqVFZwcmE0cnZh?=
- =?utf-8?B?U2JsVXVvOWdQQnNETmpuWGVFN0owcUs5eXBoc1pNUmJLZmdocjBxNWhDNERC?=
- =?utf-8?B?bk0xbExyME16THJadjVuS0crWEdtWTZXSHFLTVBTcnVjd0c2cE0yOTZZbmRi?=
- =?utf-8?B?U1IrR28yWCtNWjVyT2Q4YzZnWTFYTWlsZXJYS3RsUXRnZXIzcUNJRldIZEhz?=
- =?utf-8?B?T3RoVXBCWTFCSCtUbDRVN2hSN2xiV1lBNGtONHNreS81OUtPWHJSSURienVO?=
- =?utf-8?B?b2VqOWlYVThKSjNtcW1qU1p6M05kYzRQcWFlU20yenl5Yk14K09TUHBBaHZw?=
- =?utf-8?B?cU5VQ1hKUG1qTG9PZFlGdm5razUvdjFlYUdiWUE0ejlNSkFocTVkMXdlYk9I?=
- =?utf-8?B?ZU1hT2xNcVQvb2Y3Q3FVUTVKelhLR0NTUDFYMjZQakZRR1dkTklsNDY1ZnND?=
- =?utf-8?B?UUY3TE1ML2hQaUlJOWYxSXlhaHg4TkVvM21kdG0wL1hHYitnbWRNdlhGR2xN?=
- =?utf-8?B?Ny8xSmxId0Q4Ynp6Y1R6WW90ZnZIRjd3WUZaUHVlTm0xM2VjZUVMY25UYm5C?=
- =?utf-8?B?TDV5UlBpRU51QmhFRjFSakg2RUlHRmxmYU5tQVV2emdLemNwTlA4OU1MZS92?=
- =?utf-8?B?NTJPMGordmY5NWJPcE5ITk1KODVqajhYVDFlZngyKytwRnk0TUN4amJwaDJY?=
- =?utf-8?B?Vkd4ZnQzUCtkb0w2SzlnUUpwcStHMUVQVGJFWVZlcjBRcG9aTFZtdGMwdHY0?=
- =?utf-8?B?N3dOR0E3Umd1MjUxOGlrZDFzc2FYY3pPcEZYZEpqWTNJbzR6NmZVelJqWkNF?=
- =?utf-8?B?cWlXWUEwTUV5WUxtOWtnQ01uSTZMdkVGTGw4SDZwbkNzM2R4WUFkTm1qZnh2?=
- =?utf-8?B?NTRyQ3ArbmN3M0s2YW5QKzVaM0ZFdlpibE0vN3k5SGxQYk1UbHU2UENLSjEr?=
- =?utf-8?B?dzEwOXFSWTBHa25qZUM2by80Z2p0WkVJSW1wY3hNWW0wbGtnY1dVZnNoOFJz?=
- =?utf-8?B?SGMvZURMQUNKVDlnN1dNVG1sZGJoNzRwT0VndFNwR3FoekZ1RTU1cENrMnBQ?=
- =?utf-8?B?aWluSlByMEo4YXUwZ2NrblkzVkNRZjF1SzVuRmQ1Rnk2WGxxZkRGYjNpdjZp?=
- =?utf-8?B?Y0VSOVdvWG9NNEo2MSthaDlwblAxelJ2WVExZXhEODQzSHNtaldzMUg2c09s?=
- =?utf-8?B?aWpHSG1FSXFwT0NBMmlEdmVnWVQyRi8vL2djL1JxcDgrM1pFbW5KQTJqN1Vz?=
- =?utf-8?B?dHhadU1TTE1md2VsbUZZUll0SGhyUzAwdWxralNWYmJzdnNURDFpdVRzaUZH?=
- =?utf-8?Q?USbKl5IhK7ZG/WJ+C46jKjk=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV8PR04MB8984.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(10070799003)(19092799006)(1800799024)(366016)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 2
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?VDFCZCs2SFdTUWRKdnNoZCtZbDJSSFlVeG5GQU9oSW1Pc2Erbkk4cjBGSm9M?=
- =?utf-8?B?S2sreTIwK3Vhc0h0MnNZTTN3T0t1UlhCMTFhT0Y5QlUzSVhLNWVJTXJaQzlr?=
- =?utf-8?B?b2ltYUljV290TmZZS0V5OWNjV1JvRjRvMEh3QlJwOWdhM2VodkMybDk1MU9I?=
- =?utf-8?B?ZHlGN3J4UDRhVElndS91TEhseHFDOGp0RXhzMlhycmd3Si9XMktQR3gxNGxq?=
- =?utf-8?B?UEMwYTk1WWJRcnR1SWFYM1I3VmxzbzhmTmw0N0tzRjViYVJKQWh5RUhUZTcx?=
- =?utf-8?B?dEhmbjNVc21LL2JhenpuYzlkUFNUUXMzbDN1THRmSGJ3cHJpV2xXMTVZOERs?=
- =?utf-8?B?YzhwYVlRa0JDb2t2WGx5cUxaQXJQUjAvRTN0MHUrUmhaNzloaGl3d21LeE5I?=
- =?utf-8?B?dHN4RUQyZkJLL2FESzNFeGg5N3lCMTNURW5aejI4c1NOcFN6WnJyc0RjS0w2?=
- =?utf-8?B?eFpaV0h0bm1DY1hDTFRqNVJZd0k2ZnVJSjlzZkVnNG5ucXhQcEl4ZEg0WUVT?=
- =?utf-8?B?VlIyN3dQaWZ0NkUxSnZQMnR5K21QeXVYNFl0ZXQ0SlNmMzhmYWFMQmFoeTRK?=
- =?utf-8?B?TUFwbUZTTzVpN2F0RVhJUFY5NFZFSjdsYUNWTStEWTJQbk81MlBGWG1BZ2VE?=
- =?utf-8?B?bUZyclFhR1BZRWJWdlg3TmFzWXVUd3FuMnppNFBYZVVLZExUQTlFV2NGeU9h?=
- =?utf-8?B?VFlCMENCZHFIQVN6cVpVcFBmOXBJTmM4cnZDNzFISnlOVFNtZXNoV3paMGdP?=
- =?utf-8?B?bExPajRHdFRQTnQwa2ZlR1g0V09CM0g2bmFlVWRJRmxITU92YzVMdlBEY2tI?=
- =?utf-8?B?aVdCRTRRQXBVV2NaNml0QmFlbkxpUGRCMDJHWk5zUjhrOEFtZFZXdldkOVVE?=
- =?utf-8?B?QVlOR2YxMkFPQkhHb2tyU20wZ2RaVkNvMnhpT2dMY3kyV2VPdXo1ZlJNVENo?=
- =?utf-8?B?aHk5dUxyRFZYSDdIZUJWenBlVm05OTdOU1Q2WnRIUEEwc1RQUFdreGdTSzA3?=
- =?utf-8?B?c0psZHQyYy9XQ0wweGpyUVFnTW96VXlaZEN6bXZvUUg1ZFVseUJ1bmQ5V3RG?=
- =?utf-8?B?TXFJTjBQMzZqVEdoWlJmTUZlZlFzRVhUMENUVkcwbWV1TDJtOGdmVmpndlYz?=
- =?utf-8?B?VWxJWDhNWjFEb3ZDSnI4Z0NubnhuUzRGdlMyd3lLN0c4N2tPZDBlSlBZUzFO?=
- =?utf-8?B?dWkvWE82UDRIam90a2srdGY1Q0h3c0xkREg3ZnR1UGRHTTA3T3M2RERwRk5m?=
- =?utf-8?B?c2ZEMHRPOVhrdk84eFBMamxnNVZVSlJqampjWGRuZFpZWnA1Qks1VmVxVVNB?=
- =?utf-8?B?MVFjT1AwR3B3dWEyM3JYU1p3Wi9FTER6cktLLzBIb0xaNitxRFVaalFZcVBH?=
- =?utf-8?B?ZElUZWZNc1p3dnJCK1JlR2NaUHhLakdweERIa3RSVUlqUTkrem5VWngzdmN0?=
- =?utf-8?B?WnVxRWJEalJHd0M3bFp4T29JakFjdEJjZXhiL3M1NHI5ZGpDWmNhTkRtbmlk?=
- =?utf-8?B?bVFwSGRtSGNOdXJlZTg3TzN2REFJNkU0ZlFUeno1UjFVTE1uSk1BdW1nSGor?=
- =?utf-8?B?VHp0OTBKVCt0d21HUjBTaTlYQndhc1Z0c05DYXRuc0V4RG9IYXQwN2RUc1pQ?=
- =?utf-8?B?a3lSaGM1MlRBdUdzY1VPNkVxSVYrMXhROWdPbjY2NnNMdlBWVzRkUjIxZE4x?=
- =?utf-8?B?cGpVMWJOVDdKMElyMzNDTkt5RXd0TXNkNzBXWmZaWlRnT0lBQkdSN3VqQzZP?=
- =?utf-8?B?U1hsKzB6SUw5U1kvWnhoNlZpMDlNalQ0T3c3WEU1VGx3WFZuRHFxYTZsTnR3?=
- =?utf-8?B?RUtRZXcwR3djaU1HZ1RnK1FtZXU5TXpLUXJ2YUgxbk9GSkhHSUVnUys3QzNp?=
- =?utf-8?B?S3JSZ0YvOG9hanZHQVdBWnpwSStjRk80VmdIQURwQ1dFK1VBaGJPWEFsdE9B?=
- =?utf-8?B?ZlpVeHFZcmI5c25kaU9PQnpLVjRPbzgvbjZtd1hOeWxOOElWcnloOEc1d0Z1?=
- =?utf-8?B?N3h3K2xiS2dZVzRQMUsvdkRsTGhRaXBGcFlBVmdZY3ppZ0FGZ09hUFNwRzUx?=
- =?utf-8?B?c1ozUkNIN041MWhCYzFLdTk5ai8zU09jVDROKzZONDkrK1FUVkE3d3p1aUtW?=
- =?utf-8?B?RW9OWHVlelhKWGZ0Y1pEcDBZelF6SnNZejR6aUV4d3VOMjY5cjZNTWdIUXhx?=
- =?utf-8?B?Ujc5b3EzbFIwOXY3NUxkZjlkclhkRGsxZjRBdG1kcVBWYWo0L0FaY2VDN1Ry?=
- =?utf-8?B?OE9WYnBBNHpZTmFRVDJ1ekEyZTRCRExZQzVNc2NkdmlUL2JMaGxEMDE3ZDAz?=
- =?utf-8?B?Z2Rpd2wwTGJucXo0QldlOWYrL01PcEJnWCtqZmFFQjl3QVFoYUQwNCtrdDNR?=
- =?utf-8?Q?nGXaT18AYoRzHwSWjA4r56SSH1B2OcRt+jntPel4Ph42Q?=
-x-ms-exchange-antispam-messagedata-1: 36Agf4OFsKMuNshVOGty6K1lY2qrLLzqDvk=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E3D7FD89D8BF3B418500D3DD1E25D751@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dgksenNL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3070C116C6;
+	Thu, 22 Jan 2026 14:25:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769091953;
+	bh=Yl2qHTWE9Fz/7zZDgzhuQhCUpz24c+UW8s5oFbDoqv4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dgksenNLm8vVcFnylVsW42Tv+ZdtC5W29o1qOctfuLKEDknRSTgAq8uzfYssEItmI
+	 1/wOROGwmmKK4A6J0Uf0YffnAOAuPW+Z6RN9LrRJxi0cMAMDPJW+sHCCBqhwnraKRy
+	 kJJ07EzgsYxVOO45tD2+zF7iBGbuIZkGKgSP05MJZvD+tcbKYbrvLKNW11VeHgFWi+
+	 VU9GuE9ZZl3qbAvIeLSbzdH7Yue/O7ulWuBcayymCEG/yFqi3DTV/nqppK2pyvu/Jm
+	 wh4/199cda1IpN1SL0mJt6msWh7JYksIQOb9a5HPcwS51wHfuEWcY3g1/EH2SLxa1V
+	 CSmkUrJoC7XpQ==
+Date: Thu, 22 Jan 2026 15:25:50 +0100
+From: Frederic Weisbecker <frederic@kernel.org>
+To: Will Deacon <will@kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Chen Ridong <chenridong@huawei.com>,
+	Danilo Krummrich <dakr@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Gabriele Monaco <gmonaco@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
+	cgroups@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-block@vger.kernel.org, linux-mm@kvack.org,
+	linux-pci@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 29/33] sched/arm64: Move fallback task cpumask to
+ HK_TYPE_DOMAIN
+Message-ID: <aXIzbmitdoJIMFCP@localhost.localdomain>
+References: <20260101221359.22298-1-frederic@kernel.org>
+ <20260101221359.22298-30-frederic@kernel.org>
+ <aW-cAlJCtI5Qtify@willie-the-truck>
+ <aXEHf5nbZMI8LT4b@localhost.localdomain>
+ <aXH0TZU7UNowTmwc@willie-the-truck>
+ <aXIKDduX5qUXvOUX@localhost.localdomain>
+ <aXILtazyRtpb3Yjy@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	nl75msM1qh7AmQe8WsvvPEaQ4WUgvHIwz5Jc3CMD4SpD13HPqLWr946JRebbx/8Q9PfUxSDuUHD988iUrL5/SIySteJ0PrmG9nKis+XzTBZ3HgPvTu+sCkXvb1ii9NjN8K/quRBT2Bg9AACeYT1bEAWk83Ob0ozCbH2cipJWwOjsaWjPQ3nkkbckqLBq5bkttzC1Xh9JJqbICCW9wVUIlc7mfTB0rUa2Nu8AbfGc/5Jm1+TIwMRQqkeKbjHGv/xHi+En/JfFvsv7+qLBNqAj/6CJJuReaPxKPMxxIe2sA1K0Sr222YkkshlRaz7Ckq7XrbQjbV3/GdzcuaOmPK9mV4i6fN15n/g0aCMiQb7uPMXmtsVG2MgR8JBUzNS0seLpoHWIj+6oeeUR8J9kbMBYQmMvHHIOJXKzln+q1Urh2QYRc1Oqo0VezfZEM7Zjz9M/8ssFLueXhmw+oyXjbFKn+U3FAWKMQLaVJZym5ArJHojY40hye13iI1S/D+r1XTCwY9/NJhBgmlo8vJaaprNFP9jNNTd7agRKt7ywP+mvMDXmFsAoZUuxAGCp5AnBcuBQ0M4IZ+/Qdd/7ehrxG+TSDNo8rYteqaRK4izZroTIZGlg4jRycuRtR6JgykVCm57R
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: LV8PR04MB8984.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 00eff7a8-696d-4ae9-0466-08de59b6e7b5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jan 2026 13:05:23.9322
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: QahOU9WLO0dPPy1PmuVCwIBLNjR+YBRg2GE/FC7g3eD9we2ygOPOPoOtIwe5KlQljBt18AKdIGsAbAwkL67WbVND9cO5Q5yY3Ecwu1UX6Js=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB6832
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aXILtazyRtpb3Yjy@willie-the-truck>
 
-IEZyb20gd2hhdCBJIGNhbiBzZWUgdGhpcyBsb29rcyBnb29kLA0KDQpSZXZpZXdlZC1ieTogSm9o
-YW5uZXMgVGh1bXNoaXJuIDxqb2hhbm5lcy50aHVtc2hpcm5Ad2RjLmNvbT4NCg0K
+Le Thu, Jan 22, 2026 at 11:36:21AM +0000, Will Deacon a écrit :
+> On Thu, Jan 22, 2026 at 12:29:17PM +0100, Frederic Weisbecker wrote:
+> > Le Thu, Jan 22, 2026 at 09:56:29AM +0000, Will Deacon a écrit :
+> > > On Wed, Jan 21, 2026 at 06:06:07PM +0100, Frederic Weisbecker wrote:
+> > > > Le Tue, Jan 20, 2026 at 03:15:14PM +0000, Will Deacon a écrit :
+> > > > > Hi Frederic,
+> > > > > 
+> > > > > On Thu, Jan 01, 2026 at 11:13:54PM +0100, Frederic Weisbecker wrote:
+> > > > > > When none of the allowed CPUs of a task are online, it gets migrated
+> > > > > > to the fallback cpumask which is all the non nohz_full CPUs.
+> > > > > > 
+> > > > > > However just like nohz_full CPUs, domain isolated CPUs don't want to be
+> > > > > > disturbed by tasks that have lost their CPU affinities.
+> > > > > > 
+> > > > > > And since nohz_full rely on domain isolation to work correctly, the
+> > > > > > housekeeping mask of domain isolated CPUs should always be a superset of
+> > > > > > the housekeeping mask of nohz_full CPUs (there can be CPUs that are
+> > > > > > domain isolated but not nohz_full, OTOH there shouldn't be nohz_full
+> > > > > > CPUs that are not domain isolated):
+> > > > > > 
+> > > > > > 	HK_TYPE_DOMAIN | HK_TYPE_KERNEL_NOISE == HK_TYPE_DOMAIN
+> > > > > > 
+> > > > > > Therefore use HK_TYPE_DOMAIN as the appropriate fallback target for
+> > > > > > tasks and since this cpumask can be modified at runtime, make sure
+> > > > > > that 32 bits support CPUs on ARM64 mismatched systems are not isolated
+> > > > > > by cpusets.
+> > > > > > 
+> > > > > > Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+> > > > > > Reviewed-by: Waiman Long <longman@redhat.com>
+> > > > > > ---
+> > > > > >  arch/arm64/kernel/cpufeature.c | 18 +++++++++++++++---
+> > > > > >  include/linux/cpu.h            |  4 ++++
+> > > > > >  kernel/cgroup/cpuset.c         | 17 ++++++++++++++---
+> > > > > >  3 files changed, 33 insertions(+), 6 deletions(-)
+> > > > > 
+> > > > > tbh, I'd also be fine just saying that isolation isn't reliable on these
+> > > > > systems and then you don't need to add the extra arch hook.
+> > > > 
+> > > > Hmm, I think I heard about nohz_full usage on arm64 but I'm not sure.
+> > > > And I usually expect isolcpus or cpuset isolated partitions to be even
+> > > > more broadly used, it's lighter isolation with less constraints.
+> > > > 
+> > > > Anyway you're probably right that we could remove isolation support here
+> > > > but I don't want to break any existing user.
+> > > 
+> > > fwiw, I think it's only some Android markets using the mismatched 32-bit
+> > > support and we're definitely not using nohz_full there.
+> > 
+> > Now that removal becomes appealing. And what about isolcpus= / isolated cpuset
+> > which only consist in scheduler domain isolation? Probably not used by android
+> > either.
+> > 
+> > Ok but is there a way to detect on early boot that the system has mismatched
+> > 32 bits support? Because I need to fail nohz_full= and isolcpus= boot parameters
+> > early on top of this information without waiting for secondary CPUs boot.
+> 
+> Honestly, I'm not sure I'd bother trying to be smart here. Even if the
+> system has enabled support for mismatched 32-bit CPUs, things should
+> still work properly with nohz_full/isolcpus if all the tasks are 64-bit,
+> right?
+> 
+> In which case, I'd just document whatever weird behaviour you get if
+> somebody throws 32-bit tasks into the mix. Adding hooks to the generic
+> code for this use-case just seems like a waste, as they're not going to
+> be used in practice and it increases the maintenance burden.
+
+Ok, how does this updated version look now?
+
+---
+From: Frederic Weisbecker <frederic@kernel.org>
+Date: Thu, 24 Jul 2025 23:38:48 +0200
+Subject: [PATCH] sched/arm64: Move fallback task cpumask to HK_TYPE_DOMAIN
+
+When none of the allowed CPUs of a task are online, it gets migrated
+to the fallback cpumask which is all the non nohz_full CPUs.
+
+However just like nohz_full CPUs, domain isolated CPUs don't want to be
+disturbed by tasks that have lost their CPU affinities.
+
+And since nohz_full rely on domain isolation to work correctly, the
+housekeeping mask of domain isolated CPUs should always be a subset of
+the housekeeping mask of nohz_full CPUs (there can be CPUs that are
+domain isolated but not nohz_full, OTOH there shouldn't be nohz_full
+CPUs that are not domain isolated):
+
+	HK_TYPE_DOMAIN & HK_TYPE_KERNEL_NOISE == HK_TYPE_DOMAIN
+
+Therefore use HK_TYPE_DOMAIN as the appropriate fallback target for
+tasks. Note that cpuset isolated partitions are not supported on those
+systems and may result in undefined behaviour.
+
+Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Marco Crivellari <marco.crivellari@suse.com>
+Cc: Michal Hocko <mhocko@suse.com>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Waiman Long <longman@redhat.com>
+Cc: Will Deacon <will@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org
+---
+ Documentation/arch/arm64/asymmetric-32bit.rst | 12 ++++++++----
+ arch/arm64/kernel/cpufeature.c                |  6 +++---
+ 2 files changed, 11 insertions(+), 7 deletions(-)
+
+diff --git a/Documentation/arch/arm64/asymmetric-32bit.rst b/Documentation/arch/arm64/asymmetric-32bit.rst
+index 57b8d7476f71..fc0c350c5e00 100644
+--- a/Documentation/arch/arm64/asymmetric-32bit.rst
++++ b/Documentation/arch/arm64/asymmetric-32bit.rst
+@@ -154,10 +154,14 @@ mode will return to host userspace with an ``exit_reason`` of
+ ``KVM_EXIT_FAIL_ENTRY`` and will remain non-runnable until successfully
+ re-initialised by a subsequent ``KVM_ARM_VCPU_INIT`` operation.
+ 
+-NOHZ FULL
+----------
++SCHEDULER DOMAIN ISOLATION
++--------------------------
+ 
+-To avoid perturbing an adaptive-ticks CPU (specified using
+-``nohz_full=``) when a 32-bit task is forcefully migrated, these CPUs
++To avoid perturbing a boot-defined domain isolated CPU (specified using
++``isolcpus=[domain]``) when a 32-bit task is forcefully migrated, these CPUs
+ are treated as 64-bit-only when support for asymmetric 32-bit systems
+ is enabled.
++
++However as opposed to boot-defined domain isolation, runtime-defined domain
++isolation using cpuset isolated partition is not advised on asymmetric
++32-bit systems and will result in undefined behaviour.
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index c840a93b9ef9..f0e66cb27d17 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -1669,7 +1669,7 @@ const struct cpumask *system_32bit_el0_cpumask(void)
+ 
+ const struct cpumask *task_cpu_fallback_mask(struct task_struct *p)
+ {
+-	return __task_cpu_possible_mask(p, housekeeping_cpumask(HK_TYPE_TICK));
++	return __task_cpu_possible_mask(p, housekeeping_cpumask(HK_TYPE_DOMAIN));
+ }
+ 
+ static int __init parse_32bit_el0_param(char *str)
+@@ -3987,8 +3987,8 @@ static int enable_mismatched_32bit_el0(unsigned int cpu)
+ 	bool cpu_32bit = false;
+ 
+ 	if (id_aa64pfr0_32bit_el0(info->reg_id_aa64pfr0)) {
+-		if (!housekeeping_cpu(cpu, HK_TYPE_TICK))
+-			pr_info("Treating adaptive-ticks CPU %u as 64-bit only\n", cpu);
++		if (!housekeeping_cpu(cpu, HK_TYPE_DOMAIN))
++			pr_info("Treating domain isolated CPU %u as 64-bit only\n", cpu);
+ 		else
+ 			cpu_32bit = true;
+ 	}
+-- 
+2.51.1
+
