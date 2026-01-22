@@ -1,104 +1,71 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 258F829DB61
-	for <linux-block@vger.kernel.org>; Thu, 22 Jan 2026 04:29:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2854934F265
+	for <linux-block@vger.kernel.org>; Thu, 22 Jan 2026 05:52:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769056151; cv=none; b=HG4PubK80I1UJxgfq9LDjzJnLslvd1qjKnnwrhW1UZffp++NV170S4lFQ2N2FcaqPjPGi5m/1iIo4RLKVV6ZBueau/0ypFWtwX5qsR9SteaFw6iDfaKDAweyaRtCgubhEzqU4t/BczS1WLi7qXIodZbf9IEbJ9OQSxmcX3DuFAA=
+	t=1769061163; cv=none; b=GdgnEPQQJexKzObxEcrVfuMaj63vJMt5L8oC5n3zD1YI9SFyvk7ffrKpQ2upUcySJBiXvhUS05OQ+xizDRULZz2U2GAVSbGz8R2IpdaQ6uPX39cj9uXjE9Lsq4QvG3Eelkk1VTULcLwLWvFCScyxq8lqkMFPoJp2UmIFfucp83Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769056151; c=relaxed/simple;
-	bh=rKof281dAQBCJlv0GxvoXy77F+fxoW4ZvTEFaibLCRs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=t4RKLiAIjNzLjk5joLje8PLDzLMKXS7A3FivC265t47uL7O80cKYEEjAl4oFYsi3h8P99vKzEXla09YxBHTOXydRuw4bN+H/JjGJ3LB9faszxf0guO43VUZzMJQizH+gmuZpb1fTE/tQTeYoqLS23ekbxqnXrFiFoJHcX2npEb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d9E6TFRE; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1769061163; c=relaxed/simple;
+	bh=42URolF5j1UxfDtHhDYr0S0Ki6I2tWH7NhZqS4hCuJc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nVzD7ogMNaPC4rkhM9dwqt5GjduA7EAkqxAWsCTOLpx0LDUBYNPvy9q9kvrGGVyDhMdXKnV/05+7F/dsmyxhQwi+RrDLSc7S1RHcE+wqyR7S+/CfjNyzdea6L4kRhYTxXR2IfDF+0UHPg43yQVuQwQcCPUERThSNOuVqlUNxkSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y5+pN1XO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d9E6TFRE"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769056148;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=djbUhpWziubZy0hG2pzCp8X0QPKkAgogfUKI+ywjDtg=;
-	b=d9E6TFREnAITaL+I3ZQ/d7XEVEULPkM6bMHl3hUxH5ahBB0krxOysixysnEI5bzNMPtZoM
-	QOpttunmjxQdKxHaeequ1y7LENgSnR+0YCF2br1WJrrEhvy9vxftavhUw2R9y1R4ZlmC0F
-	fVrZpD4ZTqwqYwupIUwyWi6YvlwaVIY=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-256-qMwXB48QMAa24md6RH_ZHg-1; Wed,
- 21 Jan 2026 23:29:06 -0500
-X-MC-Unique: qMwXB48QMAa24md6RH_ZHg-1
-X-Mimecast-MFC-AGG-ID: qMwXB48QMAa24md6RH_ZHg_1769056145
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D40061956080;
-	Thu, 22 Jan 2026 04:29:04 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.62])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 81A603000218;
-	Thu, 22 Jan 2026 04:29:03 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Ming Lei <ming.lei@redhat.com>,
-	Diangang Li <lidiangang@bytedance.com>,
-	Fengnan Chang <changfengnan@bytedance.com>,
-	Yi Zhang <yi.zhang@redhat.com>
-Subject: [PATCH] blk-mq: use BLK_POLL_ONESHOT for synchronous poll completion
-Date: Thu, 22 Jan 2026 12:28:58 +0800
-Message-ID: <20260122042858.1877497-1-ming.lei@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y5+pN1XO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABEE0C116C6;
+	Thu, 22 Jan 2026 05:52:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769061162;
+	bh=42URolF5j1UxfDtHhDYr0S0Ki6I2tWH7NhZqS4hCuJc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Y5+pN1XODin/jZFw1uB6rSN8B/0GvhmU3Agseb/M3ORkByYX4jFBsd2obLvZbJ8Qw
+	 j7gwqRkBcWJDKlQlZ1GxsoUHiX3LFvDsg+WVw5s9ZNMZ6JiookEEzgTuuN424ApMFs
+	 shMZchlEvt32zCYMA2rkTRg4Yj6EcfS2vJMXRAtKTJ/Dg0yKs1T2e0Q/cWaRxaNIpk
+	 n6DaPPMVwAFb27sglEAjPPPDYW+32i3r9OG2XCh4r2djBIQMh2oaww0jvUpsCovCqb
+	 KvOgX4Er6HypxOX9dnnqu4cx5IdrDQ3skSaTafKEIFHV/jf2zCfwVlIwJimTDyixqP
+	 sqCaATLmeMuig==
+Message-ID: <dd97dbe8-5f8a-4d05-adb0-00c0189132bc@kernel.org>
+Date: Thu, 22 Jan 2026 16:52:39 +1100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH for-6.19] block: make the new blkzoned UAPI constants
+ discoverable
+To: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
+Cc: linux-block@vger.kernel.org, aalbersh@redhat.com
+References: <20260121073203.234429-1-hch@lst.de>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <20260121073203.234429-1-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-blk_execute_rq() with polling is used in kernel code paths such as
-NVMe controller connect. The aggressive spinning in blk_hctx_poll()
-can prevent the completion task from getting a chance to run, causing
-a lockup.
+On 2026/01/21 18:31, Christoph Hellwig wrote:
+> The Linux 6.19 merge window added the new BLKREPORTZONESV2 ioctl, and
+> with it the new BLK_ZONE_REP_CACHED and BLK_ZONE_COND_ACTIVE constants.
+> 
+> The two constants are defined as part of enums, which makes it very
+> painful for userspace to discover if they are present in the installed
+> system headers.
+> 
+> Use the #define to the same name trick to make them trivially
+> discoverable using CPP directives.
+> 
+> Fixes: 0bf0e2e46668 ("block: track zone conditions")
+> Fixes: b30ffcdc0c15 ("block: introduce BLKREPORTZONESV2 ioctl")
+> Reported-by: Andrey Albershteyn <aalbersh@redhat.com>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-The spinning with cpu_relax() doesn't yield CPU, so need_resched()
-only becomes true on timer tick. This causes unnecessary spinning
-while the completion task is already waiting to run.
+Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
 
-Before commit f22ecf9c14c1, the loop would exit early because
-task_is_running() was always true. After that commit removed the
-check, the loop now spins until need_resched().
 
-Fix this by using BLK_POLL_ONESHOT in blk_rq_poll_completion(). This
-causes blk_hctx_poll() to poll once and return immediately, letting
-the outer loop's cond_resched() yield CPU so the completion task can
-run.
-
-Fixes: f22ecf9c14c1 ("blk-mq: delete task running check in blk_hctx_poll()")
-Cc: Diangang Li <lidiangang@bytedance.com>
-Cc: Fengnan Chang <changfengnan@bytedance.com>
-Reported-by: Yi Zhang <yi.zhang@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a29d8ac9d3e3..968699277c3d 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1480,7 +1480,7 @@ EXPORT_SYMBOL_GPL(blk_rq_is_poll);
- static void blk_rq_poll_completion(struct request *rq, struct completion *wait)
- {
- 	do {
--		blk_hctx_poll(rq->q, rq->mq_hctx, NULL, 0);
-+		blk_hctx_poll(rq->q, rq->mq_hctx, NULL, BLK_POLL_ONESHOT);
- 		cond_resched();
- 	} while (!completion_done(wait));
- }
 -- 
-2.47.1
-
+Damien Le Moal
+Western Digital Research
