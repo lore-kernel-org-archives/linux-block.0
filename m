@@ -1,210 +1,148 @@
-Received: from mail-dl1-f44.google.com (mail-dl1-f44.google.com [74.125.82.44])
+Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com [209.85.167.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 404CC25487C
-	for <linux-block@vger.kernel.org>; Fri, 23 Jan 2026 03:04:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769137483; cv=pass; b=uhkifkTMkB+igBvYi7g2gsN6VnSlQ7piEA6iyrUoeuYGOSNwpJDmj+9XhfC1tbR+Qu5ixvscigwjh7JyX9mJ7wMiaoznHPwspz/PpQEgO1Ktab7oRGPaf2ZxzKwHbd3u2H36SL8+VtGz5BYWgeHcYrwff0eMcKFcH/0KBL4L318=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769137483; c=relaxed/simple;
-	bh=Cpgb40uV1NYUGZaLYm5XKQrq8FCIo0aYhFqtXSp+YxM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dLqKmehQLWBmQGYoO+flO0tr6syeNsoXINDkTwTgZLqQRyYCArFMmC3/HgqvvvcBs0a2jJVAqj94Or/H013JtTPmUv2kSeNmLQMob+Vo0cJwSlWKugqaSqufsEpPHbeYsTqeU9mBL3deHjO1jhDxxrutj5KhUJWAn5am2W1FSSk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=OJiRKK40; arc=pass smtp.client-ip=74.125.82.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D427131AA8F
+	for <linux-block@vger.kernel.org>; Fri, 23 Jan 2026 03:06:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.180
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769137591; cv=none; b=lYJ2XOBdhup5ZE63o+Rw7M8+fGWVb1i8Vv67APaoLIS5HRoIds1B6rqoPUGiZCaXWQvoVJTXuHAWKps3BdIdJCc52ILZs2o9satSazyYOvRdSLZDTuCyPdE/Fi87q3zp1+Yjitfx5THRWtnmv68w2+6xjnG3siJDBD1RqkbZA2k=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769137591; c=relaxed/simple;
+	bh=6qifJRRb2/d7t32KiXBPn4WOt2cCIjEs83EixMwiHHU=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=s7FUiyDxoYkWV5M/RY0msJNk8Rlg4V2b8RsMLOARfHMlN0LGDKuYVKWLxKPm/GRluWZr2Dfvzjb6iUJgWqbs4G+f/V7efz6+FApFmKB7yfabxUqaMBjweAnqqqtQk6lw9CZ1F1aipEucK+ierEYpL8/Px0lQBHkCI4wNKvKrOF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=aRAsC94h; arc=none smtp.client-ip=209.85.167.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="OJiRKK40"
-Received: by mail-dl1-f44.google.com with SMTP id a92af1059eb24-1232c98f98cso129465c88.3
-        for <linux-block@vger.kernel.org>; Thu, 22 Jan 2026 19:04:18 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769137453; cv=none;
-        d=google.com; s=arc-20240605;
-        b=MD+mguDOIE+vSiBNs9ZiJHQf2/MJ4FBRu5xhd3h9t2mTDxPDkgMcBwrl4r05Qgtqlf
-         9q2hnc/hQFPKW8k9fjm2I4gNMZND4+gJimb7MpRzKJmk95tEiucmYUBHrTa1gNm0OExp
-         x2XrTtbK/MYBZEcLU6TE8lMaSdjh31NneEyj4UHRcw215yruAvZhis/wU/zLfQBtA33C
-         UergaTS0C4+Rjc+UkSBOKdGKq/xzPZ+JEPvteWYRi386AzjeD8P6oN9ryOkXozJIy2G9
-         joAsgBHyxZtZcS0h/Jfeind9HJOuclXOKpf9yGsj6l4QmEkJkpsh6B4txuGDxCVNbQMW
-         wZfA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=cBRSDXB6JMN9S/RlVBs3/WNTXTn6Eip0qhz4zK0c2Ds=;
-        fh=dgmJBPyO/P6mcodWSf34g+ujrPmfMmYCDxfiN4gLzSo=;
-        b=CF+EEnl+PIIv1DpycQgjoLS3WxIhKTcESyYXAcXAXZS5z/iTG8+ApV8e53Gbtc552N
-         HRaHUzhZZyWuzH1/cHf73i42aIV2sB54Qv32PUhJVzy2MTAerXzra7EAUy78DWheM1Wr
-         yEZBll6o2QSL7aDob6kT8ZCekiBLdcC18hmi/TIkRM2utcAwHORAgEq8sxublHocRpYd
-         JGBuG3/8gOwkbO8fYst1dX36OaHOxj3vCQq/NVqA97akM+zT0+bpLQQGQiPa4DxNontF
-         QEVWvO1gwiGMy/PFJtedu3jBUiC21HnCbE16xvuiIml44yaNuJR4VgWnZAo075TugKdC
-         dHfA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="aRAsC94h"
+Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-45c838069e5so1236034b6e.0
+        for <linux-block@vger.kernel.org>; Thu, 22 Jan 2026 19:06:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1769137453; x=1769742253; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1769137584; x=1769742384; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=cBRSDXB6JMN9S/RlVBs3/WNTXTn6Eip0qhz4zK0c2Ds=;
-        b=OJiRKK40DK35n9HER9PkiUWFLfDBoRQEJyMAcp9wPDswXrhzR3XANejXpyi3qhXOE/
-         lwu9sMxwqnTgbFlDDhvws2EhZWuTWNsE0NfE959Q41QogZi4s5iTsTaxZe0qIfMWrFWD
-         5u0KHBj1XiE5mMt9t3OOppqsoYl3VwsPgCNVa35tXpiRWVYS+2OqZ+eeLXmeHA4uMhmk
-         ptpLa805YJ8/BgsxO/pXYn1Ibx0obvoy3ZKwfjRpuKbF6sGd3NcosTUErisiFvbMe0Aj
-         sgkgM8BnnjX7xaJvdG0N7esBFCiAIVHTsq7OASQRc0fFyrnlUsVqt4Htq2BZ7aw5mfq9
-         LVoA==
+        bh=tww0drQ4QXMVlHXCFAlAp3A+f2eCHoSVEKQGqj347QQ=;
+        b=aRAsC94hECQBzFk6Tdgz86FsW5CnGA4+UxPisCokou7X4TZYSp1CH2EMzvf7PvF0tH
+         Wmgit9Im+pHw9Qz5jFj4M8OvTxWeNA+UXCTUKSjk86N2Ru3teMRxSxoReSQK7s2FV42C
+         dPBRNXOc1liXQfTPXOcWEwyH/t/Ji6gZpBPeKl4kuD44VW3ft/QVi8oA4NUvtTT8cq6k
+         5xls9rSbpJCQ6eull2eC8UrL5HOgfHp6P5NVy3JVWdTQMCDq7bgmQGRpHhLuoxZWWj7v
+         AdLG48FcQq8neLZk6MhLBlqYQGfqoCUP2VvFAM2PyhirRXYFlZ+AQsaG5JnRfNnli2CI
+         k1mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769137453; x=1769742253;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1769137584; x=1769742384;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=cBRSDXB6JMN9S/RlVBs3/WNTXTn6Eip0qhz4zK0c2Ds=;
-        b=pGF7VfVve3e3rjyf/1IgXWgcU7MPt4EgNE6W7HCafinInU4o0v19rV5Sw0ncep2xJb
-         l44IhkKNYWA6FqS7N9qVFugypVZw5GTJxhrTHZ3IVW8/UfWGiPUeMFRH38yNUqTYgLNZ
-         jfwd5pgPr/XX/M3doL45ZI+wUOzQMMkES9hoUgAB/EHcB6sr1uKwmUqvfO25TCzeIff2
-         d58LpjIF8cAtV0xWeGMBIUjvUEGaD1xEBKdiFlibmduJT2fTQU9uh5/92RhxuQiOH3Bj
-         xHfJPwfiwgxyFf++Rh8ThwWElPvVDXP1rmfSeECXUcFXQIrel+pTK2lXKLlBZLIcv1lz
-         NaJA==
-X-Forwarded-Encrypted: i=1; AJvYcCVFdhqb9GziLCYgMrc7CBq/urQ91ybpX1BWkCV/hkY2yzw98yIerihx+CIaPdn8Y6Oy2IOCWt9G5B4A2g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyaEWwy/qCK+y4fK20ogANsgp99O62LQaK3ySaGS1C9uuLsKa1e
-	645CERJhHkxRSe2K9UVS8oCpKRhdMtEvmv0os0H0GvB/AD7IavOMh/JEKzIHNhoougCFTGwiOU9
-	CAxMM5CXcMo80Qe0k/c7FswFUT0ad8f8B91sNRbKGAA==
-X-Gm-Gg: AZuq6aLitfwSXywknx8jXM5EAw5r3yhlR5JH+hgFY+xvbH7BT/58rqtFLEPxNH4HCb+
-	bw4azjq84TnGPyraD0g7d+Z/pQbrkNw42+TTS4k/19h83GjYWt5CbOXa/s38BKi5HPuxC8FOKlm
-	Qh8GRJrksAtlW8+B9y92Vv95Yq0K8Nlq22u2oQRJQ6YxTv5RUvoM7YqbzRgkNMhHU1dyMYpZ7Kw
-	PeFMPuLvIl4Z6RbyNqQDOHNAHNLnNp3wCvq//LY+edhV0tH2rjoYocvIof+6HY08+n94cj42BZ5
-	kCDgqH0=
-X-Received: by 2002:a05:7022:e08:b0:123:308f:667b with SMTP id
- a92af1059eb24-1247dbb12bdmr443508c88.2.1769137452891; Thu, 22 Jan 2026
- 19:04:12 -0800 (PST)
+        bh=tww0drQ4QXMVlHXCFAlAp3A+f2eCHoSVEKQGqj347QQ=;
+        b=mks83FxPD6YyeMqU7Kkf0PssxVKB5f09C2pVAjTD29vE+AukWt9LxQ1ZZ8YiR0IZlO
+         Bs30SsveeV6X0pieLRHqtGneWRV952hbfNcUCmmZVxioU70eayw9nQ7DoGzk91ubYE8n
+         0G2UWz5Dgn9v2yiig7XLOezmdktUtajyZb7pgJhFyiUIHAklT+AhMR/TzzjMoDJmDRJa
+         fkBnAOKyYG3bpWFkKDAbSYbZCp7Bix5amjqnKkm3i7y4gBIbXXurh8gwYcLhz1CE7oAt
+         tzaBlAkO046MdnP8Z97nORHUc4O1ZyBHJVEbuNh0a2VBzp6shtsDnyqgSS5je4WghUUy
+         ZEGg==
+X-Gm-Message-State: AOJu0YzWh0reL/YAf9rWJYurjSD4hpJu+HshrXby5dgIW9z+dE24IvoN
+	KJY2Gplsv4+ZYdpgPErrwm89DMx3MYlz846jNDcm7TWQ/1Pa4ufk8q9rLMcSBz7PAuLX520mHn6
+	EtbuqVjM=
+X-Gm-Gg: AZuq6aLwHzJSXxkTzLS3wa/Z2g4eN5qaMFKp1jt7Etku5+0LP/eD+NphyMfBotvjS38
+	xTTkvZ7OTxMfO7LAU5PV0fuMAXW4UtNFxfTCt+1caeeiJl/Iw39p0BgC5gKIejifJ+f+QFbjGrr
+	oTjkZp9mo9UiN1j9Ax/dpp6/3b0ttKYIJ3LbIeSHIU/bFnDsfJ/njP40TDdP5FFmO/9Ym+f4ktQ
+	kYZDCwryBlnmEsy4pqb07FHNGgNcxcjioR/p0QMIyP+W10ZuelYi2sfKqAD4qAlRV8ZzzPZ+AMS
+	ZGmUIfhb8q3YTjb/vxPTx0hOq4WUTkz9rhFjQAhXmmYdm/YcAl7fXXXtImkf81cP4Pkw2BbVYB/
+	NOuDkVnwaAGxWHPclpqkt9T+HgQy5WkszbMMx8TK6KHQ332IOnwWWViEp94/gJFEM3ipN+iFYGc
+	GH1Tm9lCRcB0xkMYpVdUHNLOPxhYWhrrZ3COVVHIxujVzV+DiGXvuBidByB0P1iiQpp7JjhNCd6
+	wY=
+X-Received: by 2002:a05:6808:1927:b0:44f:775b:729f with SMTP id 5614622812f47-45eb1afe347mr910799b6e.28.1769137578902;
+        Thu, 22 Jan 2026 19:06:18 -0800 (PST)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-45eb423262bsm562506b6e.11.2026.01.22.19.06.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Jan 2026 19:06:17 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Cc: Caleb Sander Mateos <csander@purestorage.com>, 
+ Uday Shankar <ushankar@purestorage.com>
+In-Reply-To: <20260116141859.719929-1-ming.lei@redhat.com>
+References: <20260116141859.719929-1-ming.lei@redhat.com>
+Subject: Re: [PATCH V6 00/24] ublk: add UBLK_F_BATCH_IO
+Message-Id: <176913757733.565634.9277936164116017084.b4-ty@kernel.dk>
+Date: Thu, 22 Jan 2026 20:06:17 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260116141859.719929-1-ming.lei@redhat.com> <20260116141859.719929-10-ming.lei@redhat.com>
-In-Reply-To: <20260116141859.719929-10-ming.lei@redhat.com>
-From: Caleb Sander Mateos <csander@purestorage.com>
-Date: Thu, 22 Jan 2026 19:04:01 -0800
-X-Gm-Features: AZwV_Qg4kTv8WAIcovM9chxaCTMyKwsNggpME3leC6I9Jmr-qsPviCRs5TvtBdc
-Message-ID: <CADUfDZrZ36pyELN8KGKiFHC_M-sB=2ek0a7TAv9RbvZ1xhuu-w@mail.gmail.com>
-Subject: Re: [PATCH V6 09/24] ublk: refactor ublk_queue_rq() and add ublk_batch_queue_rq()
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Uday Shankar <ushankar@purestorage.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3
 
-On Fri, Jan 16, 2026 at 6:19=E2=80=AFAM Ming Lei <ming.lei@redhat.com> wrot=
-e:
->
-> Extract common request preparation and cancellation logic into
-> __ublk_queue_rq_common() helper function. Add dedicated
-> ublk_batch_queue_rq() for batch mode operations to eliminate runtime chec=
-k
-> in ublk_queue_rq().
->
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 
-Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
+On Fri, 16 Jan 2026 22:18:33 +0800, Ming Lei wrote:
+> This patchset adds UBLK_F_BATCH_IO feature for communicating between kernel and ublk
+> server in batching way:
+> 
+> - Per-queue vs Per-I/O: Commands operate on queues rather than individual I/Os
+> 
+> - Batch processing: Multiple I/Os are handled in single operation
+> 
+> [...]
 
-> ---
->  drivers/block/ublk_drv.c | 56 +++++++++++++++++++++++++++++++++-------
->  1 file changed, 46 insertions(+), 10 deletions(-)
->
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index aa1852bd6b77..5e960ff54714 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -1975,16 +1975,22 @@ static blk_status_t ublk_prep_req(struct ublk_que=
-ue *ubq, struct request *rq,
->         return BLK_STS_OK;
->  }
->
-> -static blk_status_t ublk_queue_rq(struct blk_mq_hw_ctx *hctx,
-> -               const struct blk_mq_queue_data *bd)
-> +/*
-> + * Common helper for queue_rq that handles request preparation and
-> + * cancellation checks. Returns status and sets should_queue to indicate
-> + * whether the caller should proceed with queuing the request.
-> + */
-> +static inline blk_status_t __ublk_queue_rq_common(struct ublk_queue *ubq=
-,
-> +                                                  struct request *rq,
-> +                                                  bool *should_queue)
->  {
-> -       struct ublk_queue *ubq =3D hctx->driver_data;
-> -       struct request *rq =3D bd->rq;
->         blk_status_t res;
->
->         res =3D ublk_prep_req(ubq, rq, false);
-> -       if (res !=3D BLK_STS_OK)
-> +       if (res !=3D BLK_STS_OK) {
-> +               *should_queue =3D false;
->                 return res;
-> +       }
->
->         /*
->          * ->canceling has to be handled after ->force_abort and ->fail_i=
-o
-> @@ -1992,14 +1998,44 @@ static blk_status_t ublk_queue_rq(struct blk_mq_h=
-w_ctx *hctx,
->          * of recovery, and cause hang when deleting disk
->          */
->         if (unlikely(ubq->canceling)) {
-> +               *should_queue =3D false;
->                 __ublk_abort_rq(ubq, rq);
->                 return BLK_STS_OK;
->         }
->
-> -       if (ublk_support_batch_io(ubq))
-> -               ublk_batch_queue_cmd(ubq, rq, bd->last);
-> -       else
-> -               ublk_queue_cmd(ubq, rq);
-> +       *should_queue =3D true;
-> +       return BLK_STS_OK;
-> +}
-> +
-> +static blk_status_t ublk_queue_rq(struct blk_mq_hw_ctx *hctx,
-> +               const struct blk_mq_queue_data *bd)
-> +{
-> +       struct ublk_queue *ubq =3D hctx->driver_data;
-> +       struct request *rq =3D bd->rq;
-> +       bool should_queue;
-> +       blk_status_t res;
-> +
-> +       res =3D __ublk_queue_rq_common(ubq, rq, &should_queue);
-> +       if (!should_queue)
-> +               return res;
-> +
-> +       ublk_queue_cmd(ubq, rq);
-> +       return BLK_STS_OK;
-> +}
-> +
-> +static blk_status_t ublk_batch_queue_rq(struct blk_mq_hw_ctx *hctx,
-> +               const struct blk_mq_queue_data *bd)
-> +{
-> +       struct ublk_queue *ubq =3D hctx->driver_data;
-> +       struct request *rq =3D bd->rq;
-> +       bool should_queue;
-> +       blk_status_t res;
-> +
-> +       res =3D __ublk_queue_rq_common(ubq, rq, &should_queue);
-> +       if (!should_queue)
-> +               return res;
-> +
-> +       ublk_batch_queue_cmd(ubq, rq, bd->last);
->         return BLK_STS_OK;
->  }
->
-> @@ -2122,7 +2158,7 @@ static const struct blk_mq_ops ublk_mq_ops =3D {
->
->  static const struct blk_mq_ops ublk_batch_mq_ops =3D {
->         .commit_rqs     =3D ublk_commit_rqs,
-> -       .queue_rq       =3D ublk_queue_rq,
-> +       .queue_rq       =3D ublk_batch_queue_rq,
->         .queue_rqs      =3D ublk_batch_queue_rqs,
->         .init_hctx      =3D ublk_init_hctx,
->         .timeout        =3D ublk_timeout,
-> --
-> 2.47.0
->
+Applied, thanks!
+
+[01/24] ublk: define ublk_ch_batch_io_fops for the coming feature F_BATCH_IO
+        commit: fb027d569422efcf1b367441f782fb425a4b5569
+[02/24] ublk: prepare for not tracking task context for command batch
+        commit: 7ba62f5969defbab7df47c0016ffd4dedf30950a
+[03/24] ublk: add new batch command UBLK_U_IO_PREP_IO_CMDS & UBLK_U_IO_COMMIT_IO_CMDS
+        commit: e86f89ab24f5ec595879a01eebb5df84f5ed6d2b
+[04/24] ublk: handle UBLK_U_IO_PREP_IO_CMDS
+        commit: b256795b3606e9a67c725dde8eaae91dd9d21de4
+[05/24] ublk: handle UBLK_U_IO_COMMIT_IO_CMDS
+        commit: 1e500e106d5a82280db59dba06f0108085beba65
+[06/24] ublk: add io events fifo structure
+        commit: f1f99ddf607a4b54dc19d92fb07f2a30c131ee56
+[07/24] ublk: add batch I/O dispatch infrastructure
+        commit: 7a1bb41947cee3aa50fa9b276e9aeb6caa87b543
+[08/24] ublk: add UBLK_U_IO_FETCH_IO_CMDS for batch I/O processing
+        commit: a4d88375539920b7401ead59d2f944ac23c668ea
+[09/24] ublk: refactor ublk_queue_rq() and add ublk_batch_queue_rq()
+        commit: 3ac4796b888a2574cb982c89076ed717f122289d
+[10/24] ublk: abort requests filled in event kfifo
+        commit: 29d0a927f9efd5f87ac8a2d291d2782384d1bee2
+[11/24] ublk: add new feature UBLK_F_BATCH_IO
+        commit: e2723e6ce6025026b6d79d9a00048386a69e00c3
+[12/24] ublk: document feature UBLK_F_BATCH_IO
+        commit: 4d8fd7c5592acc2cc89b1759fb01171478c9ee5f
+[13/24] ublk: implement batch request completion via blk_mq_end_request_batch()
+        commit: 7aa78d4a3c9c30d15c0107fb652b22376aaacce6
+[14/24] ublk: fix batch I/O recovery -ENODEV error
+        commit: 3f3850785594e323c5adc6b19ef5907419d3159f
+[15/24] selftests: ublk: fix user_data truncation for tgt_data >= 256
+        commit: caf84294ff98bb7455722285f30f46c193ffccdd
+[16/24] selftests: ublk: replace assert() with ublk_assert()
+        commit: 584709ad5ce359f8b5773eb6af40070412652c51
+[17/24] selftests: ublk: add ublk_io_buf_idx() for returning io buffer index
+        commit: f1d621b5a04ea41ee90f177db084d00db57e6839
+[18/24] selftests: ublk: add batch buffer management infrastructure
+        commit: dccbfa9d416424fbcbc83a46e84c604bad1db9d0
+[19/24] selftests: ublk: handle UBLK_U_IO_PREP_IO_CMDS
+        commit: d468930a019df71951a80fde20f6348136a2175d
+[20/24] selftests: ublk: handle UBLK_U_IO_COMMIT_IO_CMDS
+        commit: dee7024ffecba291891503e425373d9f2a1d01b6
+[21/24] selftests: ublk: handle UBLK_U_IO_FETCH_IO_CMDS
+        commit: cb5a6b308700c65c29baccbb6b9b07f306633ad5
+[22/24] selftests: ublk: increase timeout to 150 seconds
+        commit: 4968fb7cc60676040258c8867f22931c8735126f
+[23/24] selftests: ublk: add --batch/-b for enabling F_BATCH_IO
+        commit: 20aeab0b08a175d9ceb4ad327f55ba5c29a79888
+[24/24] selftests: ublk: support arbitrary threads/queues combination
+        commit: e8cd481cc665d5db8e918e84740db22bc213059e
+
+Best regards,
+-- 
+Jens Axboe
+
+
+
