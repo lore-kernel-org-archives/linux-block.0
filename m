@@ -1,69 +1,72 @@
-Received: from relay.hostedemail.com (smtprelay0012.hostedemail.com [216.40.44.12])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27A7C18FC80;
-	Fri, 23 Jan 2026 20:32:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 379382E8B9F;
+	Fri, 23 Jan 2026 20:37:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769200344; cv=none; b=avXNu7fcKYWLnchSU6+e6Ntf3qZzyuw79BsbvxH599IBZedGHyOTDcdKR5aQElEmFu9e0bmCwYJjyz9rs5BGayzSHC1koUnzZNBuGmKIyNhGo5N3HqXLAg7FPZlgS7CglarERHEtCawMSEPirsCIt/NrMpX3v8rL/5EuFJRMLYc=
+	t=1769200641; cv=none; b=YJ7wzdfElkzGgpa8wms7rv8qHVhyZPRUbyNROP4PkKnaxRHaoWpMma3Sy9vxLanGFOR4gvFzAxOUNjIQo604p8lNwMFRV7WNEZg+DK/h2/zHwWaHocddCTE2g1sVyRKYx287ytVeH1InUuoLv4slEGkh8+DDTTE0jw+YdujUUR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769200344; c=relaxed/simple;
-	bh=4lkwQ7iW/kaqXjEt5Q+cIRty/QB0fh4q7chQXrl3Ia8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=putC2z407FJZ7CU0ZdvQ7DP3e+hrjarthJNPxCS4UgVWayuu5+e0DOSS3m4W4PGKEKa5gi3SP8CwAi4NhH1L+GhBj0APynquylriyxn4KHagEQPggtUvSFBVqPSuLb852uPGBQg2UY+qvP1hENFTr0PQSyKZrAWO6BBWoafwuNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
-Received: from omf10.hostedemail.com (a10.router.float.18 [10.200.18.1])
-	by unirelay09.hostedemail.com (Postfix) with ESMTP id B39748C152;
-	Fri, 23 Jan 2026 20:32:20 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf10.hostedemail.com (Postfix) with ESMTPA id CA9772F;
-	Fri, 23 Jan 2026 20:32:18 +0000 (UTC)
-Date: Fri, 23 Jan 2026 15:32:47 -0500
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Yaxiong Tian <tianyaxiong@kylinos.cn>
-Cc: axboe@kernel.dk, mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/3] tracing: Export eval_map_wq for asynchronous use by
- other modules
-Message-ID: <20260123153247.004688f6@gandalf.local.home>
-In-Reply-To: <20260122032415.395548-1-tianyaxiong@kylinos.cn>
-References: <20260122032051.386331-1-tianyaxiong@kylinos.cn>
-	<20260122032415.395548-1-tianyaxiong@kylinos.cn>
-X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1769200641; c=relaxed/simple;
+	bh=J3uIrIsI3rDKrre8O5bOnE8gVqwa7R70GzDdw+6sFgc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gWA0PHf2ubTGvmiMe2YsfboMZY7uU4p7uDaHTqLpe8LOeGdc/eIYr1P0dlVltY13oQymD/6krdQ5On11iaxXJcpL9Ju1dN/SsUbalKjiaGcYWOQ+6Rsq7oKgl3Wcfdg6iWlGQLjm26sA936O4UqQ10spkaEpqUm1DTM4DVCw5vw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=rMzzr48Z; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="rMzzr48Z"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=jIvepI9acMMMk9EyKKutMt3xnmNKtmyd0L+HCslVMZQ=; b=rMzzr48ZEZwxWMtRrKDYd5siJh
+	aH5MXe97U3+/lggnM1s+cCvnK5QyDgtQqX/Ou9/z0+/TICygzTWr316AA58osp/yT8PJnYjsni60L
+	HKyMZEwSibLYWoIbObsv1RVKbPMn9eGPjhxH7lXyrtcCq9H7cHIaS9WteSwHg+XjouAhHvn9JQZS8
+	yCQLEhyl7ZGPx3NS8rQWO7WrSxTAM7+vbpu+v8sKpOwUmzk0X/GX8ofdd4hXTVGqStFeJ11wXrcY2
+	mqTA9SJF3XAKqI4Gn757O/GLxH8ZaSzJaG/Yqs85MAyL2mgXCKSgXiLIAdqqga5ylsEpiLGQn4Osc
+	EXBZEEqQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vjNu6-00000002Fay-1Ftx;
+	Fri, 23 Jan 2026 20:37:14 +0000
+Date: Fri, 23 Jan 2026 20:37:14 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: Viacheslav Dubeyko <Slava.Dubeyko@ibm.com>
+Cc: "qian01.li@samsung.com" <qian01.li@samsung.com>,
+	"a.manzanares@samsung.com" <a.manzanares@samsung.com>,
+	"lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>,
+	"javier.gonz@samsung.com" <javier.gonz@samsung.com>,
+	Patrick Donnelly <pdonnell@ibm.com>,
+	"ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"slava@dubeyko.com" <slava@dubeyko.com>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	Pavan Rallabhandi <Pavan.Rallabhandi@ibm.com>
+Subject: Re: [Lsf-pc] [LSF/MM/BPF TOPIC] Data placement policy for FDP SSD in
+ Ceph and other distributed file systems
+Message-ID: <aXPb-tehcuOvSC9V@casper.infradead.org>
+References: <b4bbba0993d4c1abd6566d8d508bbb47aacd7671.camel@ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: CA9772F
-X-Stat-Signature: mjcaisees6qtjyzu3y9c4fbm6a5e8wwu
-X-Rspamd-Server: rspamout08
-X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
-X-Session-ID: U2FsdGVkX18TE4v3b6cYeHshQ8nMe0mwBUNOCTR19KU=
-X-HE-Tag: 1769200338-690880
-X-HE-Meta: U2FsdGVkX187iAiokqEjL54ekCswSFMs6Gpc1fUa6J8U+CEiE5/oWgMCqO3Xqp1OdJj9qe4ZMV/WHSCSDWvGy6+qNx/T5aBOWg2cGVf9I1+asvYtcZNqYau4+4+VM/P0i9EoW16YTxuKrXnpK0tOOh1qT6S/HtfI1LYkT1T3HU7UIk21qJ88K0ZVtIbgqrEaQlW8sKIiB2ftNOyqYCOnDsYePhTtOazSJqXPEINd674J/lez9vH9B+smekoGKVwMm3ZIdRO5pJB0duDzjp0WU/4wEyt9wGg8gBYywkWaxG9A7+rxuwq/ZKMkJxmIck9c
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b4bbba0993d4c1abd6566d8d508bbb47aacd7671.camel@ibm.com>
 
-On Thu, 22 Jan 2026 11:24:15 +0800
-Yaxiong Tian <tianyaxiong@kylinos.cn> wrote:
-
-> The eval_map_work_func() function, though queued in eval_map_wq,
-> holds the trace_event_sem read-write lock for a long time during
-> kernel boot. This causes blocking issues for other functions.
+On Fri, Jan 23, 2026 at 08:13:49PM +0000, Viacheslav Dubeyko via Lsf-pc wrote:
+> I think we need to elaborate much better approach for FDP SSDs in the case of
+> distributed file systems. I believe that it needs to execute accurate
+> benchmarking of above mentioned use-cases with analysis of peculiarities of
+> distributed file systems case. Finally, we will be able to analyze these results
+> and to elaborate a vision of proper solution for distributed file system case
+> (like Ceph, for example).
 > 
-> Making eval_map_wq extern allows other modules to schedule their
-> work asynchronously on this queue,  preventing it from blocking
-> the main boot thread.
+> So, I suggest to meet at LSF/MM/BPF and to discuss the benchmarking results and
+> potential vision of the solution.
 
-If you are going to make this wq generic for other parts of the tracing
-code, then let's rename it. As "eval_map" is specific to the enum mappings
-being updated (which I hope someday I can get that update working at build
-time. And when I do, the name will be totally meaningless).
-
-Let's rename it to "trace_init_wq" instead.
-
--- Steve
+Is this proposal for an I/O track discussion, an FS track discussion or
+both?  (I see nothing in this proposal that would suggest that MM or BPF
+people should be involved).
