@@ -1,45 +1,47 @@
 Received: from mail.itpri.com (mx1.itpri.com [185.125.111.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D23E27261D;
-	Fri, 23 Jan 2026 11:22:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D62B30CDBC;
+	Fri, 23 Jan 2026 11:29:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.111.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769167363; cv=none; b=WtCIkAc+yDqSjbp71zCjCgXMv+IiqYZ2lXgtP42firEcLDoUAoXz1H8GuzX5UtFZnOzVEtGMV+rW7RK/vNuKt2oio/5xy/2OndcLHGiEx07CZ+rewAXSp3qao3IVG2srlzBJ+8vmgvsFgTvsjU6nYacmAUlenIUYy4nYSFbKjV4=
+	t=1769167773; cv=none; b=fI8bk+tajl6pfG0XE/NYPbC5D52PPgUX4Ij6j4g7S2JiMu+ylwp+CaFAYgsk+bO09JyVvCPuqgq2FPg2CGFZuxiPJSsLDD8fbAJTqQ0xuuLEiR1H2VX+0r8qKH/ov4hBiwk8s2bbZOJhlPujHK/goA5XDaXfh0xIDM6tR1Pa6mU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769167363; c=relaxed/simple;
-	bh=UnGIWg0ZcvGDP7TKRHVWTrGtvWsOix2/9eOwXH07BbY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MKa0pLzaZCcPvr/EHGBxFuegR1SA+ChOvYIv3IFClMN0S1t/5rf5+/N5LDMrIYby1VSOZZKTJr3rxqp8t7L9CVDtgbEp5Q3usvMw7L/pHINkfVfRN+l1vun9OH+WRlzUfIWGZjlI4oQ3dWa775yefA+pKklR/2Jsof1Mphmt/wo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zazolabs.com; spf=pass smtp.mailfrom=zazolabs.com; dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b=G5p9tSql; arc=none smtp.client-ip=185.125.111.158
+	s=arc-20240116; t=1769167773; c=relaxed/simple;
+	bh=dzJBpSf1nhpH3ORKnwydt5RqNbxmWVNk2rbSEtCJ0VM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JxjYFuCxhf/tCLP/yVDNQCAN4/HMUT3klgk7VRlHPkVkaKa0wyIwdYvnKIhWBZrjkCooowhIjM/Gp3WtiRFtGDAVaKDw1rlZHTfKqOsvOJgWc/5BMx8u4Ds0fTVOrxuKf01qo5OxTxDDIrz8yHqP/xegg9lzcw0LBIAg0eYYZ/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zazolabs.com; spf=pass smtp.mailfrom=zazolabs.com; dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b=c7XcLdQB; arc=none smtp.client-ip=185.125.111.158
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zazolabs.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zazolabs.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b="G5p9tSql"
+	dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b="c7XcLdQB"
 X-Virus-Scanned: Yes
 From: Alexander Atanasov <alex@zazolabs.com>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=zazolabs.com; s=mail;
-	t=1769167357; bh=UnGIWg0ZcvGDP7TKRHVWTrGtvWsOix2/9eOwXH07BbY=;
+	t=1769167768; bh=dzJBpSf1nhpH3ORKnwydt5RqNbxmWVNk2rbSEtCJ0VM=;
 	h=From:To:Cc:Subject;
-	b=G5p9tSqlQF0rbiyQWXtiWpcDQyVeeJm4SHtw8YLXX6OopN9zAZLYTvzI7e992kOjA
-	 8VD1fmw1qPfYnnnSjY4ZJlAivD0SpEdnYhsRhSHes0zSWcCQEKrxAXdTEtiyHEyivE
-	 mDyn57X2F8EdXmB2EIyMJbttNbG3G7b/RMITUTtQp5Fx0VAdE/t2+986ux9IgHSo11
-	 Sp4IKmEjXup6KdtIcc+4VF/M/vSrrCZhuFDSJcRNm3MyKMJlnOr0gjhbObUPh6QuYV
-	 K/YhpwYUxixZ2nViTCZR1Pv5xXPBdHtdYjOlEYmWaEZ9OpQ586kQ6wobi63qVCosXs
-	 yvHLwEi0wEQREfwtNp+CFBV8nBDxbQKqs10c8lIa1IoEE9BG5LxgxRTrOuvQEkS7b8
-	 VZEmSIuQxqwF5vBu2xKX81mEXNADmPUlN1IQ3Fbx4vYKC7D49LJ5FYoHeYZ2IsoHRL
-	 mqr0Kf87zYjGdNirj0Thf+CaVqmIYs/NVkBX0zxjMy9ik9jEv4ZkKGy9vpKajvTtFM
-	 HsT/Qh/SERFrdtRL0ye8iEhXYeN3UcLi1Qmwnv2jy+vJWYSKjc+ouB6hhuhPKc1EOx
-	 OLxX3ohw08nPa8uj8KAQDw63CNBnfSJxOKTz/YoLgPlbD/Jr2MM7ZjHBqBSPJXrdPL
-	 oTHYNXzfSUancJYPWxrefEQI=
+	b=c7XcLdQBuYOLWYE503QcgUCOtYstzn7tg3PgEqpUvmEsVZJ7oFG+149F1ySzwgbjK
+	 5OcQBVeiG2CDxW0UG0jCQB7R8uKUD8RF2YK1yQogG4xaGMucjgyC3AKB4hShXAoVAy
+	 ssigotD9Cqp+tJ1e2pgVt2LB/9kkutJ1OP6Iv3F35SZn5rIKc8Iue5co7dz6LwSuss
+	 GMan4ruIlV3DELTDSh+ks7T2tmW/W48q9oY5sOE96xop3NfElN+QcWpK7KOdRB5Hd1
+	 JCUiv1iUGHzTgnFjTb+zcb1smGQ5xS3lkH43PnDy+hUDHT16EzfiaE3zoGJbzwpyKM
+	 F+doyEffWQ6eWO8xNgDG/TwRgCKaxukOoZhI/KQR7Fhom1kf3X9McZLhq1fhZrT341
+	 OrhGR8tReQa5O4DhMsM1eF39HhqCFbhFTrztIf1hvJAd9TFk6nw2axEqpW5km3hSxl
+	 1hq5HNHffZfGX3PuWmvBA79P/rgB3PpDz74XlVbOqNkNWFx1UdOeHVcoxpEXbUQEHp
+	 f0+6cSmsR0dshLdqgup+tE2sP2QlOz4HV6ZiV+5UMtsP8DNlq1qJ96Jh1iv4Fqposa
+	 YOROGfIbw/K3zD2IYTZgobX7lPM+1AuEQMa6dJWZCTcktU544RN46vOyH7tMExNiBr
+	 eahRMMhOF/lBELm4Yclr9bw0=
 To: Ming Lei <ming.lei@redhat.com>,
-	Shuah Khan <shuah@kernel.org>
+	Shuah Khan <shuah@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Caleb Sander Mateos <csander@purestorage.com>
 Cc: Alexander Atanasov <alex@zazolabs.com>,
 	linux-block@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] selftests: ublk: use tmpdir for scratch files and improve relative paths use
-Date: Fri, 23 Jan 2026 11:20:36 +0000
-Message-ID: <20260123112039.1370223-1-alex@zazolabs.com>
+Subject: [PATCH] selftests: ublk: add missing gitignore for metadata_size binary
+Date: Fri, 23 Jan 2026 11:29:12 +0000
+Message-ID: <20260123112913.1371323-1-alex@zazolabs.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -48,133 +50,25 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Create a temp dir for temporary files and use it instead of
-placing them inside source tree.
-Reference files in subdirectories relative to script's source dir
-for bpftrace uses.
-While there fix a typo.
+A new utility metadata_size was added in commit:
+261b67f4e347 ("selftests: ublk: add utility to get block device metadata size")
+but it was not added to .gitignore. Fix that by adding it there.
 
+Fixes: 261b67f4e347 ("selftests: ublk: add utility to get block device metadata size")
 Signed-off-by: Alexander Atanasov <alex@zazolabs.com>
 ---
- tools/testing/selftests/ublk/test_common.sh     | 8 +++++---
- tools/testing/selftests/ublk/test_generic_01.sh | 5 +++--
- tools/testing/selftests/ublk/test_generic_02.sh | 5 +++--
- tools/testing/selftests/ublk/test_generic_12.sh | 5 +++--
- 4 files changed, 14 insertions(+), 9 deletions(-)
+ tools/testing/selftests/ublk/.gitignore | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/tools/testing/selftests/ublk/test_common.sh b/tools/testing/selftests/ublk/test_common.sh
-index 7ff6ce79d62c..ab1ea5cc904a 100755
---- a/tools/testing/selftests/ublk/test_common.sh
-+++ b/tools/testing/selftests/ublk/test_common.sh
-@@ -43,7 +43,7 @@ _create_backfile() {
- 	old_file="${UBLK_BACKFILES[$index]}"
- 	[ -f "$old_file" ] && rm -f "$old_file"
- 
--	new_file=$(mktemp ublk_file_"${new_size}"_XXXXX)
-+	new_file=$(mktemp $TMPDIR/ublk_file_"${new_size}"_XXXXX)
- 	truncate -s "${new_size}" "${new_file}"
- 	UBLK_BACKFILES["$index"]="$new_file"
- }
-@@ -55,6 +55,7 @@ _remove_files() {
- 		[ -f "$file" ] && rm -f "$file"
- 	done
- 	[ -f "$UBLK_TMP" ] && rm -f "$UBLK_TMP"
-+	rm -rf "$TMPDIR"
- }
- 
- _create_tmp_dir() {
-@@ -119,7 +120,7 @@ _prep_test() {
- 	local type=$1
- 	shift 1
- 	modprobe ublk_drv > /dev/null 2>&1
--	UBLK_TMP=$(mktemp ublk_test_XXXXX)
-+	UBLK_TMP=$(mktemp $TMPDIR/ublk_test_XXXXX)
- 	[ "$UBLK_TEST_QUIET" -eq 0 ] && echo "ublk $type: $*"
- }
- 
-@@ -367,7 +368,7 @@ run_io_and_recover()
- 
- 	state=$(_recover_ublk_dev -n "$dev_id" "$@")
- 	if [ "$state" != "LIVE" ]; then
--		echo "faile to recover to LIVE($state)"
-+		echo "failed to recover to LIVE($state)"
- 		return 255
- 	fi
- 
-@@ -401,3 +402,4 @@ UBLK_BACKFILES=()
- export UBLK_PROG
- export UBLK_TEST_QUIET
- export UBLK_TEST_SHOW_RESULT
-+export TMPDIR=$(mktemp -d ${TMPDIR:-/tmp}/ublktest-dir.XXXXXX)
-diff --git a/tools/testing/selftests/ublk/test_generic_01.sh b/tools/testing/selftests/ublk/test_generic_01.sh
-index 21a31cd5491a..5b06beee91ca 100755
---- a/tools/testing/selftests/ublk/test_generic_01.sh
-+++ b/tools/testing/selftests/ublk/test_generic_01.sh
-@@ -1,7 +1,8 @@
- #!/bin/bash
- # SPDX-License-Identifier: GPL-2.0
- 
--. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
-+TDIR=$(cd "$(dirname "$0")" && pwd)
-+. $TDIR/test_common.sh
- 
- TID="generic_01"
- ERR_CODE=0
-@@ -20,7 +21,7 @@ dev_id=$(_add_ublk_dev -t null)
- _check_add_dev $TID $?
- 
- dev_t=$(_get_disk_dev_t "$dev_id")
--bpftrace trace/seq_io.bt "$dev_t" "W" 1 > "$UBLK_TMP" 2>&1 &
-+bpftrace $TDIR/trace/seq_io.bt "$dev_t" "W" 1 > "$UBLK_TMP" 2>&1 &
- btrace_pid=$!
- sleep 2
- 
-diff --git a/tools/testing/selftests/ublk/test_generic_02.sh b/tools/testing/selftests/ublk/test_generic_02.sh
-index 12920768b1a0..1c0e3ab8afc7 100755
---- a/tools/testing/selftests/ublk/test_generic_02.sh
-+++ b/tools/testing/selftests/ublk/test_generic_02.sh
-@@ -1,7 +1,8 @@
- #!/bin/bash
- # SPDX-License-Identifier: GPL-2.0
- 
--. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
-+TDIR=$(cd "$(dirname "$0")" && pwd)
-+. $TDIR/test_common.sh
- 
- TID="generic_02"
- ERR_CODE=0
-@@ -20,7 +21,7 @@ dev_id=$(_add_ublk_dev -t null -q 2)
- _check_add_dev $TID $?
- 
- dev_t=$(_get_disk_dev_t "$dev_id")
--bpftrace trace/seq_io.bt "$dev_t" "W" 1 > "$UBLK_TMP" 2>&1 &
-+bpftrace $TDIR/trace/seq_io.bt "$dev_t" "W" 1 > "$UBLK_TMP" 2>&1 &
- btrace_pid=$!
- sleep 2
- 
-diff --git a/tools/testing/selftests/ublk/test_generic_12.sh b/tools/testing/selftests/ublk/test_generic_12.sh
-index b4046201b4d9..d4240ec94827 100755
---- a/tools/testing/selftests/ublk/test_generic_12.sh
-+++ b/tools/testing/selftests/ublk/test_generic_12.sh
-@@ -1,7 +1,8 @@
- #!/bin/bash
- # SPDX-License-Identifier: GPL-2.0
- 
--. "$(cd "$(dirname "$0")" && pwd)"/test_common.sh
-+TDIR=$(cd "$(dirname "$0")" && pwd)
-+. $TDIR/test_common.sh
- 
- TID="generic_12"
- ERR_CODE=0
-@@ -21,7 +22,7 @@ dev_id=$(_add_ublk_dev -t null -q 4 -d 16 --nthreads $NTHREADS --per_io_tasks)
- _check_add_dev $TID $?
- 
- dev_t=$(_get_disk_dev_t "$dev_id")
--bpftrace trace/count_ios_per_tid.bt "$dev_t" > "$UBLK_TMP" 2>&1 &
-+bpftrace $TDIR/trace/count_ios_per_tid.bt "$dev_t" > "$UBLK_TMP" 2>&1 &
- btrace_pid=$!
- sleep 2
- 
+diff --git a/tools/testing/selftests/ublk/.gitignore b/tools/testing/selftests/ublk/.gitignore
+index 8b2871ea7751..95052c32fa09 100644
+--- a/tools/testing/selftests/ublk/.gitignore
++++ b/tools/testing/selftests/ublk/.gitignore
+@@ -1,3 +1,4 @@
+ kublk
+ /tools
+ *-verify.state
++metadata_size
 -- 
 2.43.0
 
