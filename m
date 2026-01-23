@@ -1,64 +1,65 @@
-Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
+Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35A7628751F
-	for <linux-block@vger.kernel.org>; Fri, 23 Jan 2026 03:32:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33F3532AAB7
+	for <linux-block@vger.kernel.org>; Fri, 23 Jan 2026 03:33:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769139166; cv=none; b=Wg0lrG0erXOkQE/XF6ra2LOMmP7eh58/2M0WL5qijTLmUv4/zqypyerEn19PYug7xhIf7tXKLPhPbZN5ZtfvujuZrHJMDNzMQsDQ3+SGZ/t1Zpb5IN6I7t/n2n3LwMgvgglxeafBVYh2zwmRHV57AkENJLsYsvho0c7uRjC2w3c=
+	t=1769139232; cv=none; b=nQeEqlOxPcihu3h6nenmeMdO/Kq56yUklMAwsVTobt3in9KV2gAySnD16W7bpJzXehLkJ4+iAjXMuHtpNyY1b6n0iBtp7/zjv0CACUko0TFhY/sG7gVqOjTt0mnDkuQMfEedgiCh2blkWDa232PHTTEIv6+JXKDwatXJQCZ2IjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769139166; c=relaxed/simple;
-	bh=tuRVSF3SKRKBDSthLQ1PyR8NPfxw8My0GMqonFgsOTE=;
+	s=arc-20240116; t=1769139232; c=relaxed/simple;
+	bh=nQdfCDYJvcfIsPj6+hijnJsydGoPIuhyEkPoqerOMf0=;
 	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=QMcZGnrPLuwZ3HNguK7Fg+wcdVcbm3KLE0jMLNq2MG7QllbRTlPLi3rZuJC/6PNFTE1txrS3igJrkBC1kNL/vSttV0O7W5xyQkbue36b14jK/xf6i3wG2r+f7GhyVKa5AOgTfTkj5JAFyZMz9Ax3U/45im3wglq9Ub77jT4l+94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=rzePrDvA; arc=none smtp.client-ip=209.85.210.54
+	 In-Reply-To:Content-Type; b=TjX0lqCDWkwGd/m1af8dchR5WFzSb1LqE91GZ7sucf3U9yChK460MUBDZdA+fefc0EiG+pYPPBUU/8Etxx45FbuQrBbzSV98S2U9z84nffWCSwioVvXPcXNxiztMYVrZp8FERvAA8j76eNMz5yElioq1GrHFQJMSOMNFrqV3CVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=H4+RQ+H4; arc=none smtp.client-ip=209.85.210.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="rzePrDvA"
-Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-7cfca52ac2dso1261376a34.0
-        for <linux-block@vger.kernel.org>; Thu, 22 Jan 2026 19:32:29 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="H4+RQ+H4"
+Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-7cfd10887d5so663979a34.1
+        for <linux-block@vger.kernel.org>; Thu, 22 Jan 2026 19:33:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1769139146; x=1769743946; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1769139220; x=1769744020; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:content-language:references
          :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=hxzS+YjAYZ/Z4fbIAWQo/yLtdb+CpF3mDoXOB1ku/v0=;
-        b=rzePrDvAham03TLFsB6lWECN7B/1h++aI1CCIrpAd4/UdjNgJ0TJqnnp/KLV2FdHOD
-         dGWX9IivrjR0aUituPYQIy78iBxFdEuumoJdyWOcwcsgRaEia+33uZbdBqPRtVCnEpd7
-         QKoA6sqG/r/icdhqyEglYk4/HKn+ha2qIESxEkNPve7fdhJuiGSr4l3ModVJ/d7rO22L
-         +blPlFsBsZf1UpNa1jsiM8xi8kuxEMkFUgXgUVX7vgQiPAef1J07GFfayN2mfFVpGVNY
-         So5lc4331kSdN8Q3fiaEAr1Y3dEIgGLQi+U3LQ+7fhFIdjABimKa0HfSxj7KJuCXp+mS
-         C6KQ==
+        bh=FRCKO43zBGo/syu1JZDnlgocs+7/bLyPqadUsvvtKZs=;
+        b=H4+RQ+H4V/jFpzERy6rodc927rgHUG0umdnOniiP5+5P7L6VKL/t6tDGgLqkNZAR53
+         njbggxOf+2prf4BUZD7Uk3Xj+X4AcoJ7TGGKOWXsIPG4Hb4PbyI3L55066eMdahzbT6r
+         FaSyrdEh/vfPUT0TFs3j1ywq7INIY1yKVSGec8opT1d4Kvqk8YALT0toI8/uxY9tKGds
+         WKcpgCHCFKIc1GCHANsPUcaTp3PDF4K7162OfzWgBNxbUphUqmeR2ZVx2pSdEmPP88Hn
+         v4sdS/HzdpCzjOr5LyiPgFRUxUi7DOsMEyOBJK9rZNS1QGOSnUnLhE7KTstdX3hqz+T9
+         lMQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769139146; x=1769743946;
+        d=1e100.net; s=20230601; t=1769139220; x=1769744020;
         h=content-transfer-encoding:in-reply-to:content-language:references
          :cc:to:subject:from:user-agent:mime-version:date:message-id:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hxzS+YjAYZ/Z4fbIAWQo/yLtdb+CpF3mDoXOB1ku/v0=;
-        b=niZaCDIjsfi7YlsOiwwM5bTXQFRGAi97VliWTJwLBptYNhslU5HQOox2MqLbsrbOYv
-         TA/7jRUw8cjhpubSAkojGY0fMiG4T3MN7oifmbX5RMzc2iaVaLvXzXZTXMIX9Gorl0hJ
-         1ljZKfx9SD7bAitP6hN9gtndrTVRRMz6lVkl7mqvr14GS8RJWMKNh73yGMueOsWBGvof
-         WrpsP/tj4jwQR39sn0ADpxaQYjGzZYVWWTmbCWakV4h/L1rBuFx8+fWV0SFVKYUGQiPN
-         feUVrrYnWguURy0fSaI4Fg1yfxO5I2x+s/Dy2funnWqPp8nG27hnubF5BqJEXEubCMHQ
-         nPEw==
-X-Gm-Message-State: AOJu0Yy9rXQ7qDC8yWxdf+NcT6Q/9Gyg8olzBO5YDScFcex+0iqG7khJ
-	GENC+JOkFxvg3n1cfrVtr3UihLkMMurUl8zWyGFPBW9l+8MyaUpfi+RwOhZY9b9vVHA=
-X-Gm-Gg: AZuq6aJdQMYMA6kpFiDyrNUx3h4i1Na84Q72F46Of6jWN796Ncs0VO/+Whi8TJmQM1O
-	uxPIO7t551qS2Kre8NlFouLURaNHlOdgB+8v+fBJD1t/SICxc4DEaGeC5mZz4xF6ZozNEXqZajx
-	YLd/BlYXRo5zmoDrUnHMyxiKX2YFtmuuCDpseuncBWgIaVKBsus+kwSdZSE3s6IPXpeu5g+x7Dv
-	6pLwCjt75ZufH0eiBHgETKm1bkOC9j5N1j9rVuq5zI+sLZKDESOicWSrav45NL2zBP0LBDx8cqa
-	UJQzhCEuQGBpWit4rRRsK9EXrIXKU+ryZKMT5CMLCJbSPFftrdzodvk9yIgQjt4856S/hCGxUCM
-	+s0BYzRFl76OzUOFy138SeA/ZVmFwfmA1jrkAUqHuBZk1igMFp6Zg9xzuBycoxknNMHNL7HS+c0
-	dn5/0/r2pE80G41k1JiTQGWyfsnOyy4LXHaGd9rD12h0QeNMajC/f48BmhSx0U7ibA0vAnUg==
-X-Received: by 2002:a05:6830:2aac:b0:7cf:d213:7ecf with SMTP id 46e09a7af769-7d15a633c68mr944024a34.32.1769139146302;
-        Thu, 22 Jan 2026 19:32:26 -0800 (PST)
+        bh=FRCKO43zBGo/syu1JZDnlgocs+7/bLyPqadUsvvtKZs=;
+        b=IXygIGelUw/bshl+VB/etz1xCqsCy432YzzLNgeVoZLBJMQXYM/ffGo3myaqKNW6rR
+         CX1H/cmlzHzPKlWzbuIK8g9Yc6cqg6RD6PU6sEytJEHRpYAnX+g7eQpEJFAhYcbHAQKb
+         QbA10qO+4kJGHNqcFjCuNjq0BkdLLLqTst2hCc+6eJ7bKTUcVOtDNILZgmaLZBDBmQVb
+         +Bw4WzoaQwQmX7uCr1m8/P2wCxy5xsTBJdBg7cnVkvKm/Q95KECQtAhIfY0WpPY1eYNi
+         dHOj8puvNWYIYjvhdZZJ+LLaOI8XX52bx28sVcoPgnc6cb3T9IO+Q55en3a4Wye6UV/S
+         Dpww==
+X-Gm-Message-State: AOJu0YyefCvxaQxw9WLayykPzajAsmzVMTqDWir/vDBGu4P4IEy2t6Br
+	ePeQdQUTTiHGBsYJaAa/pzPqny2Xr6XQVbgW5nCeHzpAkT7/o54Usy8obI21kKjGS2NkftYLayZ
+	9HwZW7Kc=
+X-Gm-Gg: AZuq6aL01QbdzeWPFpGY2ma5hX2Q8OyCU+lCfS14AKS5wV54pCVvTI3yuNQWZDCn0gv
+	JRBHvW7AsoDrBjSHq+gaGMGQw9e5hH1ZzII9sN4P2WXxf1CquaS6xTz4pq6g4LM6QfmZs0mAiKQ
+	RVrKqOxa64NLsim86o6ozX9MQzisrDemysWyLC5Jd6HeDJvAOemUJv255ZsCRS5yk2a7sJf/AFn
+	ZSaslCXk7rhHeXWig9KvvIAI+vaaVSemuOn5XKsu7c5Wm75/8I/yIbvwGQn4MEV+CDXkeHgSY7t
+	O8Ztc7mY4tgSR8LetMVl0x4calQYywNwMnJplsUW2i+tQv04iS+NEpRR2nhnZYiQHmkafgi3vHp
+	mGSKfIvriE2N050ty079uCpmzXyEOhsKRrSH/K9NaE7fD8G8wEByGOCqcxI70RklKgNi3oU8EBk
+	mHRKBi/nZu3P1eFroi/sBrNtELX39WYvckI0eXK1L1wUTuDWR5qrMmM6zZkre6W8aWOxzEQw==
+X-Received: by 2002:a05:6830:2a92:b0:7cf:d744:4e2 with SMTP id 46e09a7af769-7d15a64d160mr903565a34.35.1769139220208;
+        Thu, 22 Jan 2026 19:33:40 -0800 (PST)
 Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d15b346e1fsm937858a34.4.2026.01.22.19.32.25
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d15b3d3d00sm961775a34.24.2026.01.22.19.33.39
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Jan 2026 19:32:25 -0800 (PST)
-Message-ID: <a56a1182-72da-47ff-98fc-d1d33afcd557@kernel.dk>
-Date: Thu, 22 Jan 2026 20:32:25 -0700
+        Thu, 22 Jan 2026 19:33:39 -0800 (PST)
+Message-ID: <716ab266-d2fe-45ff-8ec5-10c4d9a1ebcc@kernel.dk>
+Date: Thu, 22 Jan 2026 20:33:39 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -67,109 +68,110 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 From: Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH V6 07/24] ublk: add batch I/O dispatch infrastructure
+Subject: Re: [PATCH V6 14/24] ublk: fix batch I/O recovery -ENODEV error
 To: Ming Lei <ming.lei@redhat.com>
 Cc: linux-block@vger.kernel.org, Caleb Sander Mateos
  <csander@purestorage.com>, Uday Shankar <ushankar@purestorage.com>,
  Ming Lei <ming.lei@redhat.com>
 References: <20260116141859.719929-1-ming.lei@redhat.com>
- <20260116141859.719929-8-ming.lei@redhat.com>
+ <20260116141859.719929-15-ming.lei@redhat.com>
 Content-Language: en-US
-In-Reply-To: <20260116141859.719929-8-ming.lei@redhat.com>
+In-Reply-To: <20260116141859.719929-15-ming.lei@redhat.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 Claude says:
 
+ublk: fix batch I/O recovery -ENODEV error
+
+This commit changes the recovery flow to track per-queue readiness and
+clear ubq->canceling when individual queues become ready, rather than
+waiting for all queues. This fixes UBLK_U_IO_FETCH_IO_CMDS failing with
+-ENODEV during batch I/O recovery.
+
 > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index e5db5a552357..e7bd7e7b1731 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
+> index e6e746cd369e..346596c1e319 100644
 
 [ ... ]
 
-> +static bool __ublk_batch_prep_dispatch(struct ublk_queue *ubq,
-> +				       const struct ublk_batch_io_data *data,
-> +				       unsigned short tag)
-> +{
-> +	struct ublk_device *ub = data->ub;
-> +	struct ublk_io *io = &ubq->ios[tag];
-> +	struct request *req = blk_mq_tag_to_rq(ub->tag_set.tags[ubq->q_id], tag);
-> +	enum auto_buf_reg_res res = AUTO_BUF_REG_FALLBACK;
-> +	struct io_uring_cmd *cmd = data->cmd;
-> +
-> +	if (!ublk_start_io(ubq, req, io))
-> +		return false;
-> +
-> +	if (ublk_support_auto_buf_reg(ubq) && ublk_rq_has_data(req)) {
-> +		res = __ublk_do_auto_buf_reg(ubq, req, io, cmd,
-> +				data->issue_flags);
-> +
-> +		if (res == AUTO_BUF_REG_FAIL)
-> +			return false;
-> +	}
-> +
-> +	ublk_io_lock(io);
-> +	ublk_prep_auto_buf_reg_io(ubq, req, io, cmd, res);
-> +	ublk_io_unlock(io);
-> +
-> +	return true;
-> +}
+> @@ -2791,37 +2797,52 @@ static void ublk_stop_dev(struct ublk_device *ub)
+>  	ublk_cancel_dev(ub);
+>  }
+>
+> -/* reset ublk io_uring queue & io flags */
+> -static void ublk_reset_io_flags(struct ublk_device *ub)
+> +/* reset per-queue io flags */
+> +static void ublk_queue_reset_io_flags(struct ublk_queue *ubq)
+>  {
+> -	int i, j;
+> +	int j;
+>
+> -	for (i = 0; i < ub->dev_info.nr_hw_queues; i++) {
+> -		struct ublk_queue *ubq = ublk_get_queue(ub, i);
+> -
+> -		/* UBLK_IO_FLAG_CANCELED can be cleared now */
+> -		spin_lock(&ubq->cancel_lock);
+> -		for (j = 0; j < ubq->q_depth; j++)
+> -			ubq->ios[j].flags &= ~UBLK_IO_FLAG_CANCELED;
+> -		spin_unlock(&ubq->cancel_lock);
+> -		ubq->fail_io = false;
+> -	}
+> -	mutex_lock(&ub->cancel_mutex);
+> -	ublk_set_canceling(ub, false);
+> -	mutex_unlock(&ub->cancel_mutex);
+> +	/* UBLK_IO_FLAG_CANCELED can be cleared now */
+> +	spin_lock(&ubq->cancel_lock);
+> +	for (j = 0; j < ubq->q_depth; j++)
+> +		ubq->ios[j].flags &= ~UBLK_IO_FLAG_CANCELED;
+> +	spin_unlock(&ubq->cancel_lock);
+> +	ubq->fail_io = false;
+> +	ubq->canceling = false;
+                         ^^^^
+
+The comment on ublk_set_canceling() says "Do not set these flags directly"
+and requires cancel_mutex to be held. Is it intentional to set
+ubq->canceling directly here without the mutex? The old code used
+ublk_set_canceling() with proper locking.
 
 [ ... ]
 
-> +#define MAX_NR_TAG 128
-> +static int __ublk_batch_dispatch(struct ublk_queue *ubq,
-> +				 const struct ublk_batch_io_data *data,
-> +				 struct ublk_batch_fetch_cmd *fcmd)
-> +{
-
-[ ... ]
-
-> +	sel.val = ublk_batch_copy_io_tags(fcmd, sel.addr, tag_buf, len * tag_sz);
-> +	ret = ublk_batch_fetch_post_cqe(fcmd, &sel, data->issue_flags);
-> +	if (unlikely(ret < 0)) {
-> +		int i, res;
+> @@ -3411,7 +3432,14 @@ static int ublk_batch_unprep_io(struct ublk_queue *ubq,
+>  {
+>  	struct ublk_io *io = &ubq->ios[elem->tag];
+>
+> -	data->ub->nr_io_ready--;
+> +	/*
+> +	 * If queue was ready before this decrement, it won't be anymore,
+> +	 * so we need to decrement the queue ready count too.
+> +	 */
+> +	if (ublk_queue_ready(ubq))
+> +		data->ub->nr_queue_ready--;
+> +	ubq->nr_io_ready--;
 > +
-> +		/*
-> +		 * Undo prep state for all IOs since userspace never received them.
-> +		 * This restores IOs to pre-prepared state so they can be cleanly
-> +		 * re-prepared when tags are pulled from FIFO again.
-> +		 */
-> +		for (i = 0; i < len; i++) {
-> +			struct ublk_io *io = &ubq->ios[tag_buf[i]];
-> +			int index = -1;
-> +
-> +			ublk_io_lock(io);
-> +			if (io->flags & UBLK_IO_FLAG_AUTO_BUF_REG)
-> +				index = io->buf.auto_reg.index;
-> +			io->flags &= ~(UBLK_IO_FLAG_OWNED_BY_SRV | UBLK_IO_FLAG_AUTO_BUF_REG);
-> +			io->flags |= UBLK_IO_FLAG_ACTIVE;
-> +			ublk_io_unlock(io);
-> +
-> +			if (index != -1)
-> +				io_buffer_unregister_bvec(data->cmd, index,
-> +						data->issue_flags);
-> +		}
+>  	ublk_io_lock(io);
+>  	io->flags = 0;
+>  	ublk_io_unlock(io);
 
-Should io->task_registered_buffers also be cleared here?
+When ublk_batch_unprep_io() is used for rollback after a batch prep
+failure, the counters are correctly decremented, but if the queue
+became ready during prep (triggering ublk_queue_reset_io_flags() which
+set ubq->canceling = false), the canceling flag is not restored.
 
-When __ublk_batch_prep_dispatch() succeeds with AUTO_BUF_REG_OK, the call to
-ublk_prep_auto_buf_reg_io() sets io->task_registered_buffers = 1.  In this
-error recovery path, the buffer is unregistered and UBLK_IO_FLAG_AUTO_BUF_REG
-is cleared, but task_registered_buffers is not reset to 0.
+Consider this scenario during recovery:
+1. Batch prep command with tags 0,1,2,3 (valid) and tag 5 (invalid)
+2. Tags 0-3 prep succeeds, queue becomes ready, canceling set to false
+3. Tag 5 validation fails (tag >= q_depth)
+4. Rollback via ublk_batch_revert_prep_cmd() calls ublk_batch_unprep_io()
 
-If the tag is later re-dispatched and __ublk_do_auto_buf_reg() returns
-AUTO_BUF_REG_FALLBACK (e.g., due to -ENOMEM), task_registered_buffers will
-remain at 1 even though no buffer is actually registered.
+After rollback: nr_io_ready=0, nr_queue_ready=0, but canceling=false.
 
-This could affect ublk_sub_req_ref() which calculates:
+With canceling incorrectly false, new requests in __ublk_queue_rq_common()
+would not be aborted and could reach ublk_queue_cmd() which accesses
+ubq->ios[tag].cmd - but the IO slots were cleared by rollback.
 
-    sub_refs = UBLK_REFCOUNT_INIT - io->task_registered_buffers
-
-If task_registered_buffers is incorrectly 1 when it should be 0, the
-refcount subtraction would leave an extra reference, potentially causing
-the IO to never complete.
+Should ublk_batch_unprep_io() restore ubq->canceling = true when the
+queue transitions from ready to not-ready?
 
 -- 
 Jens Axboe
+
