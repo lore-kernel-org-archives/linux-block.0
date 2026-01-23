@@ -1,45 +1,54 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8D7D2F25F5;
-	Fri, 23 Jan 2026 00:11:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCE9738A712
+	for <linux-block@vger.kernel.org>; Fri, 23 Jan 2026 02:25:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769127113; cv=none; b=LD6drRrXcMPO9a1XKLnHKaDg70NaqD50KQFUXbQg0+I0manjznRPJe8Mpu2F5XDCGwyk4fq5lwU026vCMUill009wvM3Ho3fcNWhily+kQvcKP/kDPt8fXT8ymqMnRRnhZFiYxzB7uVXeROSJhR6DzDER0GgehtdR1kL4W8u12s=
+	t=1769135125; cv=none; b=WnsGBgMD82JVN3ZuQ6KlvcWNgfOMyyu/RE7QTwZPH5AQuAh/5tf8Qw4UAyyl7RMZRgxrCU20PFDFHvEDgt3oVqnKcwWC8XYbfSr/0/ZkOXsAI8n/HJoiaGqIvgFe2d9JmygBLp/siT8MPq5cabNpUzDv924mAMXW0t4LjBOfqAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769127113; c=relaxed/simple;
-	bh=W0l8rkdl/NphprkLF/MG7YFKFxORfE9biiB9GZtSY2Q=;
+	s=arc-20240116; t=1769135125; c=relaxed/simple;
+	bh=LgxGsmdSuD1aeMYqYDZfDD9wY9ETSzWWmo5bM9Vzrwo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YeYcslNjFA/FfFHrbAWqulX+7VTyxdQwerE1HfTAw5CkeXjQv3b/lSgcX3n4B/aO7r7lRQC/JkQUQkwpSEYsxTE4rmXeFBBpvI8fDi7tQKt8R1BlvmoEOj+0+z0K6OLNDkB1zJzVMv43Mk935yo+u3HPcoBWX09eP8B8w8bTswM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dIiFnBTo; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=WeVU/Z0yh6sQcaoSWij0RCzgSnaHgCVqeOMhmHjfhX3zjQaUapLcO6Neel9He5t7bPMJFAUPH+XtaBVD6P9LHdq5F4BmPsFlCu0s5pPFVeiOY9QXqKlYAbxnGyodqRs8QsZc01PvPXKw0Y1TJK3AEwg85ZiGFk567I90fI50pEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dpqNV/Mu; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dIiFnBTo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 576F7C116C6;
-	Fri, 23 Jan 2026 00:11:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769127111;
-	bh=W0l8rkdl/NphprkLF/MG7YFKFxORfE9biiB9GZtSY2Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dIiFnBToxYE01ZXyMMjqfJy+5cYgiK8Xq2CVVUeoOPMSjn602pBJ75WRufgeQmmWq
-	 VO/A5qmTBPV5fHj0tS75TgiQBxdI3/vNJmx3X89C40BfxVcGvzhNLQ6K6905qRkZqd
-	 Zcb2u4YR/ZJDdWFFoMcJvmkh+JdxJifCGYFQTAk/Xp1x8YbP/vBpn/ARZG1jIWK31H
-	 YT4U1y3QM3cgXqxzbO2E5BNOG9yTb3vbVl3hKSBg25FiYvHi/0VR9NXHxQBT8BPim1
-	 dtc3GWbAAy0vf+4QFj3hv1DhE14gPq/IhQbIamSsjpsMvKPDClJWsye4MDUmyh8avV
-	 wE7a+nylyQJjQ==
-Date: Thu, 22 Jan 2026 16:11:50 -0800
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Christian Brauner <brauner@kernel.org>,
-	Carlos Maiolino <cem@kernel.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Anuj Gupta <anuj20.g@samsung.com>,
-	Kanchan Joshi <joshi.k@samsung.com>, linux-block@vger.kernel.org,
-	nvdimm@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-xfs@vger.kernel.org
-Subject: Re: [PATCH 06/15] block: add fs_bio_integrity helpers
-Message-ID: <20260123001150.GK5945@frogsfrogsfrogs>
-References: <20260121064339.206019-1-hch@lst.de>
- <20260121064339.206019-7-hch@lst.de>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dpqNV/Mu"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1769135102;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+E61B803whC+FXll4LYXkMBXmVjcgAWIkEGKZoZC838=;
+	b=dpqNV/MuxU3/TlkQ8P5uuPzo2nv3Zs/1EZsGYBnV2G2WssfBJt7ZIufLrBsjHbOK1ZS8Jl
+	MfV+KDgRwn0hERL/Dw/O4CHyBMoRAx+8Mc2zEDdYRlbV2MjBzIuYPYbXGtwNOjE+MFkjAy
+	ti4nAaumB5m5WmDU+aLCgV5fGUTTcok=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-688-o22PJCWTPLKkhWld3m1bJQ-1; Thu,
+ 22 Jan 2026 21:24:58 -0500
+X-MC-Unique: o22PJCWTPLKkhWld3m1bJQ-1
+X-Mimecast-MFC-AGG-ID: o22PJCWTPLKkhWld3m1bJQ_1769135097
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6C2BB1800451;
+	Fri, 23 Jan 2026 02:24:57 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.62])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4608D1800993;
+	Fri, 23 Jan 2026 02:24:53 +0000 (UTC)
+Date: Fri, 23 Jan 2026 10:24:48 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Cc: Caleb Sander Mateos <csander@purestorage.com>,
+	Uday Shankar <ushankar@purestorage.com>
+Subject: Re: [PATCH V6 00/24] ublk: add UBLK_F_BATCH_IO
+Message-ID: <aXLb8PwEsyszFuiz@fedora>
+References: <20260116141859.719929-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -48,146 +57,87 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260121064339.206019-7-hch@lst.de>
+In-Reply-To: <20260116141859.719929-1-ming.lei@redhat.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Wed, Jan 21, 2026 at 07:43:14AM +0100, Christoph Hellwig wrote:
-> Add a set of helpers for file system initiated integrity information.
-> These include mempool backed allocations and verifying based on a passed
-> in sector and size which is often available from file system completion
-> routines.
+On Fri, Jan 16, 2026 at 10:18:33PM +0800, Ming Lei wrote:
+> Hello,
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  block/Makefile                |  2 +-
->  block/bio-integrity-fs.c      | 81 +++++++++++++++++++++++++++++++++++
->  include/linux/bio-integrity.h |  6 +++
->  3 files changed, 88 insertions(+), 1 deletion(-)
->  create mode 100644 block/bio-integrity-fs.c
+> This patchset adds UBLK_F_BATCH_IO feature for communicating between kernel and ublk
+> server in batching way:
 > 
-> diff --git a/block/Makefile b/block/Makefile
-> index c65f4da93702..7dce2e44276c 100644
-> --- a/block/Makefile
-> +++ b/block/Makefile
-> @@ -26,7 +26,7 @@ bfq-y				:= bfq-iosched.o bfq-wf2q.o bfq-cgroup.o
->  obj-$(CONFIG_IOSCHED_BFQ)	+= bfq.o
->  
->  obj-$(CONFIG_BLK_DEV_INTEGRITY) += bio-integrity.o blk-integrity.o t10-pi.o \
-> -				   bio-integrity-auto.o
-> +				   bio-integrity-auto.o bio-integrity-fs.o
->  obj-$(CONFIG_BLK_DEV_ZONED)	+= blk-zoned.o
->  obj-$(CONFIG_BLK_WBT)		+= blk-wbt.o
->  obj-$(CONFIG_BLK_DEBUG_FS)	+= blk-mq-debugfs.o
-> diff --git a/block/bio-integrity-fs.c b/block/bio-integrity-fs.c
-> new file mode 100644
-> index 000000000000..c8b3c753965d
-> --- /dev/null
-> +++ b/block/bio-integrity-fs.c
-> @@ -0,0 +1,81 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (c) 2025 Christoph Hellwig.
-> + */
-> +#include <linux/blk-integrity.h>
-> +#include <linux/bio-integrity.h>
-> +#include "blk.h"
-> +
-> +struct fs_bio_integrity_buf {
-> +	struct bio_integrity_payload	bip;
-> +	struct bio_vec			bvec;
-> +};
-> +
-> +static struct kmem_cache *fs_bio_integrity_cache;
-> +static mempool_t fs_bio_integrity_pool;
-> +
-> +void fs_bio_integrity_alloc(struct bio *bio)
-> +{
-> +	struct fs_bio_integrity_buf *iib;
-> +	unsigned int action;
-> +
-> +	action = bio_integrity_action(bio);
-> +	if (!action)
-> +		return;
-> +
-> +	iib = mempool_alloc(&fs_bio_integrity_pool, GFP_NOIO);
-> +	bio_integrity_init(bio, &iib->bip, &iib->bvec, 1);
-> +
-> +	bio_integrity_alloc_buf(bio, action & BI_ACT_ZERO);
-> +	if (action & BI_ACT_CHECK)
-> +		bio_integrity_setup_default(bio);
-> +}
-> +
-> +void fs_bio_integrity_free(struct bio *bio)
-> +{
-> +	struct bio_integrity_payload *bip = bio_integrity(bio);
-> +
-> +	bio_integrity_free_buf(bip);
-> +	mempool_free(container_of(bip, struct fs_bio_integrity_buf, bip),
-> +			&fs_bio_integrity_pool);
-> +
-> +	bio->bi_integrity = NULL;
-> +	bio->bi_opf &= ~REQ_INTEGRITY;
-> +}
-> +
-> +void fs_bio_integrity_generate(struct bio *bio)
-> +{
-> +	fs_bio_integrity_alloc(bio);
-> +	bio_integrity_generate(bio);
-> +}
-> +EXPORT_SYMBOL_GPL(fs_bio_integrity_generate);
-> +
-> +int fs_bio_integrity_verify(struct bio *bio, sector_t sector, unsigned int size)
-> +{
-> +	struct blk_integrity *bi = blk_get_integrity(bio->bi_bdev->bd_disk);
-> +	struct bio_integrity_payload *bip = bio_integrity(bio);
-> +
-> +	/*
-> +	 * Reinitialize bip->bit_iter.
-
-s/bit_iter/bip_iter/ ?
-
-With that fixed, this looks fine to me;
-Reviewed-by: "Darrick J. Wong" <djwong@kernel.org>
-
---D
-
-> +	 *
-> +	 * This is for use in the submitter after the driver is done with the
-> +	 * bio. Requires the submitter to remember the sector and the size.
-> +	 */
-> +
-> +	memset(&bip->bip_iter, 0, sizeof(bip->bip_iter));
-> +	bip->bip_iter.bi_sector = sector;
-> +	bip->bip_iter.bi_size = bio_integrity_bytes(bi, size >> SECTOR_SHIFT);
-> +	return blk_status_to_errno(bio_integrity_verify(bio, &bip->bip_iter));
-> +}
-> +
-> +static int __init fs_bio_integrity_init(void)
-> +{
-> +	fs_bio_integrity_cache = kmem_cache_create("fs_bio_integrity",
-> +			sizeof(struct fs_bio_integrity_buf), 0,
-> +			SLAB_HWCACHE_ALIGN | SLAB_PANIC, NULL);
-> +	if (mempool_init_slab_pool(&fs_bio_integrity_pool, BIO_POOL_SIZE,
-> +			fs_bio_integrity_cache))
-> +		panic("fs_bio_integrity: can't create pool\n");
-> +	return 0;
-> +}
-> +fs_initcall(fs_bio_integrity_init);
-> diff --git a/include/linux/bio-integrity.h b/include/linux/bio-integrity.h
-> index 232b86b9bbcb..503dc9bc655d 100644
-> --- a/include/linux/bio-integrity.h
-> +++ b/include/linux/bio-integrity.h
-> @@ -145,4 +145,10 @@ void bio_integrity_alloc_buf(struct bio *bio, bool zero_buffer);
->  void bio_integrity_free_buf(struct bio_integrity_payload *bip);
->  void bio_integrity_setup_default(struct bio *bio);
->  
-> +void fs_bio_integrity_alloc(struct bio *bio);
-> +void fs_bio_integrity_free(struct bio *bio);
-> +void fs_bio_integrity_generate(struct bio *bio);
-> +int fs_bio_integrity_verify(struct bio *bio, sector_t sector,
-> +		unsigned int size);
-> +
->  #endif /* _LINUX_BIO_INTEGRITY_H */
-> -- 
-> 2.47.3
+> - Per-queue vs Per-I/O: Commands operate on queues rather than individual I/Os
+> 
+> - Batch processing: Multiple I/Os are handled in single operation
+> 
+> - Multishot commands: Use io_uring multishot for reducing submission overhead
+> 
+> - Flexible task assignment: Any task can handle any I/O (no per-I/O daemons)
+> 
+> - Better load balancing: Tasks can adjust their workload dynamically
+> 
+> - help for future optimizations:
+> 	- blk-mq batch tags free
+>   	- support io-poll
+> 	- per-task batch for avoiding per-io lock
+> 	- fetch command priority
+> 
+> - simplify command cancel process with per-queue lock
+> 
+> selftest are provided.
 > 
 > 
+> Performance test result(IOPS) on V3:
+> 
+> - page copy
+> 
+> tools/testing/selftests/ublk//kublk add -t null -q 16 [-b]
+> 
+> - zero copy(--auto_zc)
+> tools/testing/selftests/ublk//kublk add -t null -q 16 --auto_zc [-b]
+> 
+> - IO test
+> taskset -c 0-31 fio/t/io_uring -p0 -n $JOBS -r 30 /dev/ublkb0
+> 
+> 1) 16 jobs IO
+> - page copy:  			37.77M vs. 42.40M(BATCH_IO), +12%
+> - zero copy(--auto_zc): 42.83M vs. 44.43M(BATCH_IO), +3.7%
+> 
+> 
+> 2) single job IO
+> - page copy:  			2.54M vs. 2.6M(BATCH_IO),   +2.3%
+> - zero copy(--auto_zc): 3.13M vs. 3.35M(BATCH_IO),  +7%
+> 
+> 
+> Links: https://lore.kernel.org/linux-block/20251202121917.1412280-1-ming.lei@redhat.com/
+> Links: https://lore.kernel.org/linux-block/20251121015851.3672073-1-ming.lei@redhat.com/
+> Links: https://lore.kernel.org/linux-block/20251112093808.2134129-1-ming.lei@redhat.com/
+> Links: https://lore.kernel.org/linux-block/20251023153234.2548062-1-ming.lei@redhat.com/
+> Links: https://lore.kernel.org/linux-block/20250901100242.3231000-1-ming.lei@redhat.com/
+> 
+> 
+> This patchset is based on for-7.0/block with the following two patches:
+> 
+> 	[PATCH v4] ublk: fix ublksrv pid handling for pid namespaces ( https://lore.kernel.org/linux-block/20260115025952.2321238-1-sconnor@purestorage.com/ )
+> 
+> 	[PATCH 0/3] selftests/ublk: three bug fixes ( https://lore.kernel.org/linux-block/20260113085805.233214-1-ming.lei@redhat.com/ ) 
+> 
+> 
+> V6:
+> 	- rebase on for-7.0/block
+> 	- fix ublk_handle_non_batch_cmd() (Caleb Sander Mateos)
+> 	- add `ublk: refactor ublk_queue_rq() and add ublk_batch_queue_rq()` (Caleb Sander Mateos)
+> 	- add `ublk: fix batch I/O recovery -ENODEV error`
+> 	- increase selftest timeout for running more things in some generic tests
+> 	- fix kublk utility wrt. ->cmd_inflight accounting for BATCH_IO
+> 	- pass all selftest after applying the io_uring cancel fix
+
+Hi Jens,
+
+Any chance to queue it for-7.0/block? And it is applied cleanly.
+
+
+
+Thanks,
+Ming
+
