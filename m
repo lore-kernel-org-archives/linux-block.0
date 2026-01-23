@@ -1,73 +1,83 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0CFA33AD97;
-	Fri, 23 Jan 2026 09:08:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6500A26F2A8
+	for <linux-block@vger.kernel.org>; Fri, 23 Jan 2026 09:16:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769159298; cv=none; b=rskcDi6/dCImCKcoLOFnzR9KviIvU0ss1iLAUmwk+S7Jq18RuzOtzFYAy/G8tCkHlvj+L4/icLJBGCUTuR6xEAWDDzx9wJA4U7XSHc76WW6ZSqdj1oJ2tSeipZMEg96/8VUPpVckzfwGAlvbLijR8xk5iJPbt6EWh4vt4l862lk=
+	t=1769159761; cv=none; b=nqnUv3Ipz7stRc6Dc3NKX5tzEYQI94TLKcBssNOuudvsQrdk33TYVeumE0/WOtnQe1ULuUWRraA8vCqqpmoK1niTPj2nH1ZvWmR+EEFRXUYAsQ3PJ200lrSDPtNtGNjX3hBOLEbV3JsdpNJNItytmVV8+d3DaZ9KQzxq3V17jxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769159298; c=relaxed/simple;
-	bh=FqrXViJXlFx7Tkw12hFERAHqJqqesi3p/6FAehWVfCY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=b1CXHGmvCmDpC3DqqVhCBh7Yxqh0f4giXVnsE/D5pEnb/LryOYP5cnypawzZgDogB/cfhhV9yb75Erz0qlWXNIqajwFiykuVUj27Uyx6+z5JUXPd0PzaW6+cEM8aaWrzUBrO/de95g6LR5h3RsvwmwQLr86Cc3FFh2NYho3ka6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rvi/QL/w; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1769159761; c=relaxed/simple;
+	bh=0dQzOHY2Zb2sfNU10r2tfBsq6xcFcWeqDGUAzGfAgmE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HIzrACEGFZX1fH2eyHry9VTCPD3W5ZqgMlGjBdqiPyvP87OB0iKwESBQxHuXMcWmWqwI3Hr5f1NvLCyuoKKKb4nxCirrnCZ72sCwJLozLXOFcAuXUyez1p+xc4BdEp3jWkMS8tf8D2OKFOzGFn4iFEp4/clYDy+ALJ7FnGWRbi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZbzzanK0; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rvi/QL/w"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4141C19422;
-	Fri, 23 Jan 2026 09:08:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769159296;
-	bh=FqrXViJXlFx7Tkw12hFERAHqJqqesi3p/6FAehWVfCY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=rvi/QL/wbqe25HO7PgbDbXUsAjqnjI7eYrcEfwwJuCAnFVb3rPjcDOin6q2357t5O
-	 rUr+9/wT4RCk8kq5LSaRw3IZ0KAZKYewv/wZvofpIDpzjDrgYQnBDtl3fCSZU0pGiJ
-	 LGjVUy6oLkMLFYKyvJUnVlqlbqOT0TdrZ0sSHE00Wd4VhCKyNjcUijmx1JiWgAtMmC
-	 NARBb5j+ykQev90VqkVCFQ3PWQoLER8qhJQkqCZG4ru30YGi6Mqc65jvCzyWjWHRtj
-	 9zRP66VanAUk5fFlN/77+b2cWJjqPeOs8/x+IteiWg9viwS7aUyzG/e5YvjVTOkt2O
-	 IOeSjhEp/HrUA==
-Message-ID: <ca8744b3-e091-4910-bd0c-9779898c0840@kernel.org>
-Date: Fri, 23 Jan 2026 20:08:12 +1100
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZbzzanK0"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1769159759;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=UjzOHKl+CXyiXEc6bgMjg6XndycT+DPLqlZ7hI4MfXQ=;
+	b=ZbzzanK0Fn+5koJW5L5QVRBiTntGiCN2QtyilOBBryY+SoUvQyhdhz1MkETVvxX+SL8YWE
+	Yw6m6etv2cV8rqiDk9BTVi/1vidZbkR4aAgIqak2eWMIZrB2K2Ag30OAdWbbU12Fh08rls
+	Ocg83r1pGpl67Fs3FWUd14elShU0WfQ=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-527-LiGQ9xK1NEqQ6QMY_8ofPA-1; Fri,
+ 23 Jan 2026 04:15:54 -0500
+X-MC-Unique: LiGQ9xK1NEqQ6QMY_8ofPA-1
+X-Mimecast-MFC-AGG-ID: LiGQ9xK1NEqQ6QMY_8ofPA_1769159752
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6E5A218002CC;
+	Fri, 23 Jan 2026 09:15:52 +0000 (UTC)
+Received: from localhost (unknown [10.72.116.62])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5F9291956095;
+	Fri, 23 Jan 2026 09:15:50 +0000 (UTC)
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Cc: Caleb Sander Mateos <csander@purestorage.com>,
+	Uday Shankar <ushankar@purestorage.com>,
+	Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 0/3] ublk: BATCH_IO fixes
+Date: Fri, 23 Jan 2026 17:15:41 +0800
+Message-ID: <20260123091547.2164984-1-ming.lei@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 14/14] xfs: use bounce buffering direct I/O when the
- device requires stable pages
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
- Christian Brauner <brauner@kernel.org>
-Cc: "Darrick J. Wong" <djwong@kernel.org>, Carlos Maiolino <cem@kernel.org>,
- Qu Wenruo <wqu@suse.com>, Al Viro <viro@zeniv.linux.org.uk>,
- linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
- linux-fsdevel@vger.kernel.org
-References: <20260119074425.4005867-1-hch@lst.de>
- <20260119074425.4005867-15-hch@lst.de>
-Content-Language: en-US
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20260119074425.4005867-15-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On 2026/01/19 18:44, Christoph Hellwig wrote:
-> Fix direct I/O on devices that require stable pages by asking iomap
-> to bounce buffer.  To support this, ioends are used for direct reads
-> in this case to provide a user context for copying data back from the
-> bounce buffer.
-> 
-> This fixes qemu when used on devices using T10 protection information
-> and probably other cases like iSCSI using data digests.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+Hi Jens,
 
-Looks OK to me.
+The 1st two patches fix two issues found by Claude.
 
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+The 3rd patch fixes test name in test_stress_08.sh and test_stress_09.sh.
 
+Thanks,
+Ming
+
+
+Ming Lei (3):
+  ublk: move ublk_mark_io_ready() out of __ublk_fetch()
+  ublk: fix canceling flag handling in batch I/O recovery
+  selftests: ublk: fix test name
+
+ drivers/block/ublk_drv.c                       | 17 +++++++++++++----
+ tools/testing/selftests/ublk/test_stress_08.sh |  2 +-
+ tools/testing/selftests/ublk/test_stress_09.sh |  2 +-
+ 3 files changed, 15 insertions(+), 6 deletions(-)
 
 -- 
-Damien Le Moal
-Western Digital Research
+2.47.0
+
