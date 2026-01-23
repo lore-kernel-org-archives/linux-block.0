@@ -1,83 +1,147 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3903D336EE8
-	for <linux-block@vger.kernel.org>; Fri, 23 Jan 2026 11:37:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C42DD2F6920
+	for <linux-block@vger.kernel.org>; Fri, 23 Jan 2026 11:53:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769168252; cv=none; b=WcYBl7XVTp2/23hVEGKOe2xuWbb5TFQM/lLNMhVEhaWQVZHGsQDz6tmyeT1yGLBokNTMyCKoPP72hWRd3QFQj/vYfZuKCo6yhDXPo1PEtQB1ud3lI6i9eC7PqSmN7XEsNZf9CfaX7OB5DBEA7TpApuCfXkmEwb+NebpAzLTjlCg=
+	t=1769169224; cv=none; b=l59M0KdeBSwJeA/nnS0MRnhGJKSC4HnAvfnwTyRfZmiH2aaGRTbyiFxm4P/1aTzvGlO7COJdJmSHFgYuBRCKQmMWJqlCIzDaM2PJzOwW5OtymkSwWcXUWLYIJarZP5jn8Mei9FSGzB9PLccW1hdW0TvyzpqKLU84Fx3fgW3wDp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769168252; c=relaxed/simple;
-	bh=e259cDOR2x8y2PNY1VZBUyduw1cVUirqqxjpTqnIsNA=;
-	h=In-Reply-To:References:To:Cc:Subject:MIME-Version:Content-Type:
-	 From:Date:Message-ID; b=JiLjOkPr5KWE/J+EhBi21beqFKM7kotOW097Dug5MA1rmVGNF/JvBR4aPFH1Hq9MnfCZuqI9KdDLo6prZZcwL+2ywxHjn1o6TvCiFrIhJT8Vmdp+go0J4s09mOKvoorjR+9DEqJ8RTmPeucpvDlULwvbXcvwGgk756Fu6DZj8H0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AkyVd1NO; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1769169224; c=relaxed/simple;
+	bh=5l3A3XhX9Nn3ssGUAGDL2RxHcuLY1Q77Bh/eLpmu4EQ=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=sXjndrJdTHfhzMyJ8ShsE4Ywz4RzBeTW0bqF+rC3XZqEilzkLdcMXnTx2r0LzwCDYSnWr79i6XEoPLlioF727eihK6Sznc1ob5SzHFL9Lq9yd6soUZFbgdA0z++ClY4BU0uJENBHMuDj59/q7FnLmGHfILoRXBlYWRQaPo/PsKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Vrt0DS8m; arc=none smtp.client-ip=209.85.210.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AkyVd1NO"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769168247;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xs0Vg5nji+dUGsW7zgyizne5BIyRwd0ccrRHXi+VavY=;
-	b=AkyVd1NOJMhkIYgiy3NFvv0LdBDETRExl4bJueTt98VYtRZOcRpRr0Ia2F1L4KHZyxfRug
-	CLE+r+iLWLfJwggx4sQUaR2QlY/EynAxoi94UbXw7d7w4O4SgHKqOEnoM7an9LlAL4vZW3
-	hdKLUt8HPhZ+gLQb9KoYvBSW2UQJLbs=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-303-cxzqkuf4OhGk9R5ZCIISSw-1; Fri,
- 23 Jan 2026 06:37:23 -0500
-X-MC-Unique: cxzqkuf4OhGk9R5ZCIISSw-1
-X-Mimecast-MFC-AGG-ID: cxzqkuf4OhGk9R5ZCIISSw_1769168241
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4D8AD1800342;
-	Fri, 23 Jan 2026 11:37:21 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.2])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id EDB1918001D5;
-	Fri, 23 Jan 2026 11:37:18 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-In-Reply-To: <20260119074425.4005867-4-hch@lst.de>
-References: <20260119074425.4005867-4-hch@lst.de> <20260119074425.4005867-1-hch@lst.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: dhowells@redhat.com, Jens Axboe <axboe@kernel.dk>,
-    Christian Brauner <brauner@kernel.org>,
-    "Darrick J. Wong" <djwong@kernel.org>,
-    Carlos Maiolino <cem@kernel.org>, Qu Wenruo <wqu@suse.com>,
-    Al Viro <viro@zeniv.linux.org.uk>, linux-block@vger.kernel.org,
-    linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 03/14] iov_iter: extract a iov_iter_extract_bvecs helper from bio code
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Vrt0DS8m"
+Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-7cfcebf1725so1534213a34.1
+        for <linux-block@vger.kernel.org>; Fri, 23 Jan 2026 03:53:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1769169219; x=1769774019; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=q1bfelIcGj9bPg/ihS4pbXaq7rSK0ZKcJSkeEsJlxbE=;
+        b=Vrt0DS8mLviaSNfWYB/qeyWJCBGqZzKdn4tu24Qqa6eeM/l0WgAzKCAMxEr2YO6CjS
+         hMQ+cgwuxK08BoSf0AULEkHlYm58s4juD0KQKkVxOc5vuSyhYFFTe9od25LLD2Vt6xBW
+         vYC5vmUfkVLDB2A/wzR8fI1R6WRCloPA+APjlLHbppq6feyihRWs4+IlTcvH9HC6ipOC
+         qekKXhYmmZzeqkzjABNqlTRePVxwIpwDznM/YK99YMSGISOmtrmb7gbW+BZl9WSeAalb
+         KnZ6rCnAZuNTZUfYdB7H5uJv/8LLArDotzt/dggvCQOvywogR/4GImbedMotdc30Xjoi
+         BXEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769169219; x=1769774019;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=q1bfelIcGj9bPg/ihS4pbXaq7rSK0ZKcJSkeEsJlxbE=;
+        b=XLug5eOmLF+rXugN8xfABqzDjggyCCI8OanRMfymo9JbPNKI+5kI0+EIqkluT39491
+         PG+PKqgGKcFy4WQzGmb6turL6F/MK0N1C9rs3k9AsUpUZ/4/LhO1Ch5Abnf9+9ZsJZZB
+         JqGPXmDD/SPCK2If+bfgnzcMS626OzJqzABY9dU4gWqQ93aQTfaVmptYKVAzYbpFiSKQ
+         G1Y1iL8UYvqkc8f49n19UStbbzaiOkLRG7GNfndRxzbUF1VelzJlEtT/+Sdsvi1QSmQv
+         DVaNdGVLNQe9LMMx+gd8se/KgOnIABLryB6YZDBBL9BKJ7TPFV+HWWH0eBx64JVvvmPb
+         KsFA==
+X-Gm-Message-State: AOJu0Yx6ZdtCeK9M64PxHqcJk3sYUtI44pPnpWfr1vo4g7as6YmoYqJQ
+	gbD1xPKLQQaIInSXI1zNGL8GjBZFA0qRQNcJNTK8GeXzUMhnhK6WGjR+s7fomk+bNSI6BHFPtnf
+	MByvF7hQ=
+X-Gm-Gg: AZuq6aKdzRU2LeeKkFetRYCWsmrIuhBdTdtpNYV/uRo+UYEWfOl3ouB5hECa9iPhKhs
+	Eivh8a5HAOkm8e2ETa1rgxmXIWC7eLm9ex+LRvmeXhXohBA1yykI4ltnRNYEclWw3FhgvcYO14p
+	ZCew1grzNTJVNITTweqGG15LZIC8G77XpaU/2zXDRy9OK6abCBjS1E/bJX/a+vnjMazo53cXcqu
+	bLs/Vjxb2IYhXIBCbICAf9R7amm2Ctf+lSYgJ+9Dv10PFQ92+HQ3uuueTb5XOsGsxvunM2gSZTe
+	xv8u2TCycwPbfNZJA70xetstaD5HAKTYHrI9Nqt1eGzCwM04oz4/SAzz0VPrb9rnXVNh0m4aw1R
+	zwyn7pqAM2oUTE2RyVFQeUKNozJV9VH1k2BazcEU3peSfqIuKRUjlbYJVA87KLSMTqQxhKZxioU
+	M3iD2Re3bpNXoIXnEqaQh+llF7hZJFAf61k23Nh9KGTBzNqLLDY6qlWHqf1siB5GEkNzgakw==
+X-Received: by 2002:a05:6830:81d4:b0:7d1:4d5a:29fb with SMTP id 46e09a7af769-7d15a64cf35mr1655312a34.38.1769169218706;
+        Fri, 23 Jan 2026 03:53:38 -0800 (PST)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d15b346e03sm1665238a34.1.2026.01.23.03.53.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 23 Jan 2026 03:53:38 -0800 (PST)
+Message-ID: <361664fa-25d6-48e9-9e7d-6cf7437cc9ce@kernel.dk>
+Date: Fri, 23 Jan 2026 04:53:37 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1754439.1769168181.1@warthog.procyon.org.uk>
-From: David Howells <dhowells@redhat.com>
-Date: Fri, 23 Jan 2026 11:37:17 +0000
-Message-ID: <1754475.1769168237@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 6.19-rc7
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Christoph Hellwig <hch@lst.de> wrote:
+Hi Linus,
 
-> +static unsigned int get_contig_folio_len(struct page **pages,
-> +		unsigned int *num_pages, size_t left, size_t offset)
-> +{
-> +	struct folio *folio = page_folio(pages[0]);
+Set of fixes for block that should go into this kernel releae. This pull
+request contains:
 
-You can't do this.  You cannot assume that pages[0] is of folio type.
-vmsplice() is unfortunately a thing and the page could be a network read
-buffer.
+- Set of selftest fixes for ublk
 
-David
+- Fix for a pid mismatch in ublk, comparing PIDs in different
+  namespaces if run inside a namespace.
+
+- Fix for a regression added in this release with polling, where the
+  nvme tcp connect code would spin forever.
+
+- Zoned device error path fix.
+
+- Tweak the blkzoned uapi additions from this kernel release, making
+  them more easily discoverable.
+
+- Fix for a regression in bcache with bio endio handling added in this
+  release.
+
+Pleae pull!
+
+
+The following changes since commit ec19ed2b3e2af8ec5380400cdee9cb6560144506:
+
+  rnbd-clt: fix refcount underflow in device unmap path (2026-01-15 07:22:09 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-6.19-20260122
+
+for you to fetch changes up to 3ef825dfd4e487d6f92b23ee2df2455814583ef4:
+
+  bcache: use bio cloning for detached device requests (2026-01-22 07:24:50 -0700)
+
+----------------------------------------------------------------
+block-6.19-20260122
+
+----------------------------------------------------------------
+Bart Van Assche (1):
+      block: Fix an error path in disk_update_zone_resources()
+
+Christoph Hellwig (1):
+      block: make the new blkzoned UAPI constants discoverable
+
+Ming Lei (4):
+      selftests/ublk: fix IO thread idle check
+      selftests/ublk: fix error handling for starting device
+      selftests/ublk: fix garbage output in foreground mode
+      blk-mq: use BLK_POLL_ONESHOT for synchronous poll completion
+
+Seamus Connor (1):
+      ublk: fix ublksrv pid handling for pid namespaces
+
+Shida Zhang (1):
+      bcache: use bio cloning for detached device requests
+
+ block/blk-mq.c                       |  2 +-
+ block/blk-zoned.c                    |  1 +
+ drivers/block/ublk_drv.c             | 39 +++++++++++++++---
+ drivers/md/bcache/bcache.h           |  9 ++++
+ drivers/md/bcache/request.c          | 79 ++++++++++++++++--------------------
+ drivers/md/bcache/super.c            | 12 +++++-
+ include/uapi/linux/blkzoned.h        |  6 ++-
+ tools/testing/selftests/ublk/kublk.c | 11 +++--
+ 8 files changed, 101 insertions(+), 58 deletions(-)
+
+-- 
+Jens Axboe
 
