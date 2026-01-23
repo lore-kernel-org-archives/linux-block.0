@@ -1,101 +1,76 @@
-Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0281C2E7F11
-	for <linux-block@vger.kernel.org>; Fri, 23 Jan 2026 12:25:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B07C030DD1A
+	for <linux-block@vger.kernel.org>; Fri, 23 Jan 2026 13:33:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769171114; cv=none; b=fbyPHRVpc4WoaPxBhRImcOCq/1d4GllYG87a3Z4Ae61H2DVeFcjDtpJJvw/wBreOoHKXI2Dgo803yibedp9MEoEvtA06C4q5CwT4vgCeBa0OIUqgHSihi/Yu8yEbJitMkWxgfkIRZLN3dwpFP345VnMxKWRDIMy/J7woQmiS3vI=
+	t=1769175213; cv=none; b=qLg3zg3RPCroOwk00xMKDOI9QJhOicTb2FCRjIekNtuNpSJFwr47BstANfvmXzDuRwyHoCUuHVcYIVbk1HA+BtLeemK3zTaA64MSBkvKkLCDfMKv7IMw/4J6X6mg1t3aE/1SwfPFslUWker6Uy3hbaf4yQh4J6LKJQZzS4eq0OI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769171114; c=relaxed/simple;
-	bh=MaHOma0efUDlj0h9t53FX6P5BmsxWu98DpeJ6qmkNLA=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
-	 Content-Type:References; b=nbSN6YaYjHF3X5vV6xKPZR1rF2s/ZbrFoNJ8FR8Gg1VdIuUIWJ5QWQhN+7QqQJ4YBQsBkHClffFD07gYT4ETMnrmEzsyfFDStM6+oZ7OK1+nQvxe3UCuwQrXnG04fA60E1+Zm+b5FAjtMR0vAiTOBB82v/dKtDErLdKi75+sb+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=EaCiZh5A; arc=none smtp.client-ip=203.254.224.24
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1769175213; c=relaxed/simple;
+	bh=Fgy1tFmfF35ftBDNMgSCd40rnxMyiRynTGtXv1c/WXE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SSIo+djViOf0PbOUlt9ntT6kfyrsnx9VCNPyeYo2LjdxCO0GxWmsarGzPNYXYTioMiUGmyq6C7petN2tkKkVSbp9JdMAevWlFI3s+9EzzTWBwMW6X8xhTxq0OnFUl7Wz+TMDcJ3HpdmF0jfLPZWW5DWYYS3fLrmKK3PwoDyFkWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H1VftjVj; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="EaCiZh5A"
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20260123122510epoutp0151b2f94800290319ac057cb1418bde86~NW8BUF2NX2962329623epoutp01O
-	for <linux-block@vger.kernel.org>; Fri, 23 Jan 2026 12:25:10 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20260123122510epoutp0151b2f94800290319ac057cb1418bde86~NW8BUF2NX2962329623epoutp01O
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1769171110;
-	bh=SeX3v0qWWpxp41MS12UgsBRF91mTWn1NcAmLb+gsNgw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EaCiZh5A+hxpONWmD4ls9BDrI92FWylHWbyuvtfJueTwfJIigoBFaiy5CqByjhkcl
-	 q6xaT90OlmFKZN+jPAfxtNBKuD0/1gfBueE+51PNQANMRfJEth2qxZidduimPa5NGV
-	 Mn7krHPOouUTNsDrMfaJPO+nB5U4nba9oHd/lzr0=
-Received: from epsnrtp04.localdomain (unknown [182.195.42.156]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTPS id
-	20260123122509epcas5p4eccec6ebc055a3bbdfdc949ba346d3f9~NW8AktzEx3114531145epcas5p4_;
-	Fri, 23 Jan 2026 12:25:09 +0000 (GMT)
-Received: from epcas5p1.samsung.com (unknown [182.195.38.93]) by
-	epsnrtp04.localdomain (Postfix) with ESMTP id 4dyHFJ3RCgz6B9m7; Fri, 23 Jan
-	2026 12:25:08 +0000 (GMT)
-Received: from epsmtip2.samsung.com (unknown [182.195.34.31]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-	20260123122508epcas5p391c1fb8720a8f1323860431b93da9a53~NW7-TYNTI3097430974epcas5p3t;
-	Fri, 23 Jan 2026 12:25:08 +0000 (GMT)
-Received: from green245.gost (unknown [107.99.41.245]) by
-	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20260123122506epsmtip2c18e842c141830db4d4e99801abb9607~NW798qyeb2585125851epsmtip2K;
-	Fri, 23 Jan 2026 12:25:06 +0000 (GMT)
-Date: Fri, 23 Jan 2026 17:50:47 +0530
-From: Anuj Gupta <anuj20.g@samsung.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>, Christian Brauner <brauner@kernel.org>,
-	"Darrick J. Wong" <djwong@kernel.org>, Carlos Maiolino <cem@kernel.org>, Qu
-	Wenruo <wqu@suse.com>, Al Viro <viro@zeniv.linux.org.uk>,
-	linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 05/14] block: add helpers to bounce buffer an iov_iter
- into bios
-Message-ID: <20260123122047.by424afpy5swmhqw@green245.gost>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H1VftjVj"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1769175211;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lLhcYYedh3hfzldrcwUUr9xBpyL/rwKLSqNMQ5untPs=;
+	b=H1VftjVjSMoBo7pKY9vp2ZMgK9U1EqNpfTHK8C1syDlTkgB1UMZrbMbHclhHA/8zsqeWYc
+	2D0m9HTXnLRXZY+ewUs0G+O+SzpDW8Fhr0EeHzaFnLv5Avd8GoJWt/jbmElkeCi339EC1N
+	ijR84SFuzsIY50SsIZHXvW8ULc/b+mQ=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-628-RLxqBvJhPreQLwumG7M_sg-1; Fri,
+ 23 Jan 2026 08:33:27 -0500
+X-MC-Unique: RLxqBvJhPreQLwumG7M_sg-1
+X-Mimecast-MFC-AGG-ID: RLxqBvJhPreQLwumG7M_sg_1769175206
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 650FC1944B1C;
+	Fri, 23 Jan 2026 13:33:26 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.62])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 055881800665;
+	Fri, 23 Jan 2026 13:33:19 +0000 (UTC)
+Date: Fri, 23 Jan 2026 21:33:12 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Alexander Atanasov <alex@zazolabs.com>
+Cc: Shuah Khan <shuah@kernel.org>, linux-block@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] selftests: ublk: use tmpdir for scratch files and
+ improve relative paths use
+Message-ID: <aXN4mFuoXhtJDKyF@fedora>
+References: <20260123112039.1370223-1-alex@zazolabs.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20260119074425.4005867-6-hch@lst.de>
-X-CMS-MailID: 20260123122508epcas5p391c1fb8720a8f1323860431b93da9a53
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-	boundary="----uUAw3F.Lk_UAUO08rJsbYBgyLSlm5c8z3L48n3TH2NgWyj3Z=_11efce_"
-CMS-TYPE: 105P
-cpgsPolicy: CPGSC10-542,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20260123122508epcas5p391c1fb8720a8f1323860431b93da9a53
-References: <20260119074425.4005867-1-hch@lst.de>
-	<20260119074425.4005867-6-hch@lst.de>
-	<CGME20260123122508epcas5p391c1fb8720a8f1323860431b93da9a53@epcas5p3.samsung.com>
-
-------uUAw3F.Lk_UAUO08rJsbYBgyLSlm5c8z3L48n3TH2NgWyj3Z=_11efce_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20260123112039.1370223-1-alex@zazolabs.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On 19/01/26 08:44AM, Christoph Hellwig wrote:
->Add helpers to implement bounce buffering of data into a bio to implement
->direct I/O for cases where direct user access is not possible because
->stable in-flight data is required.  These are intended to be used as
->easily as bio_iov_iter_get_pages for the zero-copy path.
->
->The write side is trivial and just copies data into the bounce buffer.
->The read side is a lot more complex because it needs to perform the copy
->from the completion context, and without preserving the iov_iter through
->the call chain.  It steals a trick from the integrity data user interface
->and uses the first vector in the bio for the bounce buffer data that is
->fed to the block I/O stack, and uses the others to record the user
->buffer fragments.
->
->Signed-off-by: Christoph Hellwig <hch@lst.de>
+On Fri, Jan 23, 2026 at 11:20:36AM +0000, Alexander Atanasov wrote:
+> Create a temp dir for temporary files and use it instead of
+> placing them inside source tree.
 
-Reviewed-by: Anuj Gupta <anuj20.g@samsung.com
+Many temporary files are backing files of file storage target, so far
+the code requires O_DIRECT, or the size could be a bit big.
 
-------uUAw3F.Lk_UAUO08rJsbYBgyLSlm5c8z3L48n3TH2NgWyj3Z=_11efce_
-Content-Type: text/plain; charset="utf-8"
+In case of ramfs/tmpfs of temp dir, it may cause problem for tests.
 
 
-------uUAw3F.Lk_UAUO08rJsbYBgyLSlm5c8z3L48n3TH2NgWyj3Z=_11efce_--
+Thanks, 
+Ming
+
