@@ -1,205 +1,131 @@
-Received: from mail.itpri.com (mx1.itpri.com [185.125.111.158])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f41.google.com (mail-dl1-f41.google.com [74.125.82.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0B1733E368;
-	Fri, 23 Jan 2026 15:00:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.111.158
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769180451; cv=none; b=G75i7q+7Hwv9UymgIy9sEyvZjUctWlaBa+NrszlgfV7aU+WCXObS06sDIic0NURjVcfnlRA9xRTdN91g8tEEDR1xQ0ivmJCK9w8R9T5tsya10xnshjRgj5RZaWlN4HSGvgNmhmhQFS9VHx8wFvHYQtOjOYt25IKymQbEBry8Ek4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769180451; c=relaxed/simple;
-	bh=jG2l8hIYUIs13LzRPlg0EEs5BVPaSsVc3bpkrBgkr5w=;
-	h=Content-Type:MIME-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=qbfcUYImk3tzD6owYOD0zLdKvQc0y6OA/ScAjKNsy0OARKVqLJih/AcJHFG5muSERZDK7ZwLaxo+S+Uxj/LqU1Fxyr6tc+0i6psVtyE49w/YfjYBFwwqoWADDIfXgUwbgf2bNce3t+xU6Y9JTwX3DQfdakW4CVlyBzFq/SOjWgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zazolabs.com; spf=pass smtp.mailfrom=zazolabs.com; dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b=YPnxpL8T; arc=none smtp.client-ip=185.125.111.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zazolabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zazolabs.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C58E3EBF21
+	for <linux-block@vger.kernel.org>; Fri, 23 Jan 2026 16:21:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769185296; cv=pass; b=T4MQK9ucA0P6ek6ttPE2xtix5FWv86//P9wXkHo+W3OGyntSR5dQ057/IDxQSUQ129UdyKGJoN4QA+sUfs4A2ylFKPFvtk3l+Y5UsCxVx2e8m0zV1Lw6O2LY1PmxCAEpC1uULALMF26XPKDe/aFeIR8EjkO+ajPE8zf1zbIGmNQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769185296; c=relaxed/simple;
+	bh=cJdkYRcxnUEL397UI1OS3MXqry0cR6kyDUerA84EGyc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=U1hsHnpOmwxlij3hUGQeE30kXNRh5lEDn7HpaX2ZzBY8YhzRd7Ai1+CCL2F2it8IivDlmylSyWNmJR8tTGSUuNacLnSbFcKG9C4HmVTib7Qy8mvY7zg885gqleLQ85mULfAoXvWbG6lT1Tg5wowz5+HDLwZTdAoy0yiQr4p0GxI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=ZBH1DMes; arc=pass smtp.client-ip=74.125.82.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b="YPnxpL8T"
-X-Virus-Scanned: Yes
-Content-Type: text/plain;
-	charset=utf-8
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=zazolabs.com; s=mail;
-	t=1769180445; bh=jG2l8hIYUIs13LzRPlg0EEs5BVPaSsVc3bpkrBgkr5w=;
-	h=Subject:From:In-Reply-To:Cc:References:To;
-	b=YPnxpL8T+ZRZwGpoDr+hO8cpS4ElhZSIHWCGzvCocOki+vlw03raTjLEZhc2FMfRq
-	 OqKvx1Cbtfk5mBq5iK9egUVlKsekGL7vLoPKmh4YCBA4frAC5OVnfPEHG7ArjhPdex
-	 8NmqRdyeUduYrGA6FXgVtT6G4STwOg/Li8mkorwW6wGtzHtVGNg1k5VoPy9/jt3Jpn
-	 AHbjlCtToeretFB0kKqD2kqM9p1GUYkR0eP4vqTPIC3N459ks3BpAGzLa2vfj8g08J
-	 QC0g1DZYmpoElbfsRCRbGE4N2gCOTDeXqX40II4OTGAg3ujFU/25vfqeixpzdJIQsz
-	 vwtvK6aSBzMdGx0LuA+JNy/dAsEAl5f1xAVvvURTYyEE2e5hAv28s4kFx2s0hJhacv
-	 /Dh/COyx5AODm4iaAhnVk9myXT/ljv2eaZuguVKiKvSicIMtdg2uYvnLMOlKIMObxA
-	 ZEY2QHWWg+sD9TFzQszu4r/BGh69WBPLIwhhq0TR6UVDUbX5NToVBCxWUxQ8MvyoQK
-	 hI0OIMYTbUwkIuG3Oh1kwa45HNsYJnqPZrRUJqJzfxkkvGoz/V+1aeYGmQ/6NAkH0t
-	 Zyygorqif+N5eVCboodwvfLjDT4946AI0TtUak61ByP2LFEAds91QsvpZ50dX/tckN
-	 smbH6O47NYv+Ez3QBvMU58tI=
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="ZBH1DMes"
+Received: by mail-dl1-f41.google.com with SMTP id a92af1059eb24-1233bc11279so168180c88.1
+        for <linux-block@vger.kernel.org>; Fri, 23 Jan 2026 08:21:35 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769185295; cv=none;
+        d=google.com; s=arc-20240605;
+        b=H+7BNZxv+jdsYbFUgWmfBb12RbBIKmIdNG642CphYxyypGTQ9995PBbaTYzOScgFCq
+         q7OSpiRxE/mSD99ad1MkcmiuJTiplzg4Z7haitfZgObU7svSTMo1JG6lMA3Zcvsx01+U
+         Yr2ihi6DKC4QEp22/goZEm87sHgdN6uIaMOMeReDZpqSlEUEcheFyCNJLr6A/OhjUm+t
+         0HQGeXEpmezXf5345Q+vUwD2poE3fsqF+jcvyAwFrceYSaO7ML9uFD6Q88LWQdEGUfY6
+         HgsZmT+MMxbcmEFGh6U1uOT2KshL3Md2bD/WhPdbtSgYlvyjqEZOmWXxIbfJoT4nWWUG
+         iYgQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=DxNTeWBn5w9lqozNLdO3vzm/ZdxHMZsH4CX0i7ouB0I=;
+        fh=M/5BqOLrk/HHu94mg2Wygjoiz7d0rZU31WlBGTlhBWg=;
+        b=BCAhtV6x5nvkdl3VSR490DFb18scQszQVptTM2eVbsGUtivbKXQwn4T3JtxaTjU4k9
+         Nti5FWUhUTViot5XM49DgQlcU5Z+BDx4wtpoPjssXj8eXgbcTkJ8O0R4Cow1mhwFqcmS
+         OUk5vZPwHUkXCQUFZUqQt/2kbGlAad3j4rhX5BtghUbumVghCdjsq5FBOtHFKmWzNyLv
+         z4O3kz3T7K6MYPwwYkYAxRoW5Lv6lfCkTjEw7wV118IGRal1E0MvLXqzl1w3MS3V7LuD
+         LbkQW3f215IHtPApjvLIHI3IX2QjO5MnY8NtVfkABKkp8Fj7IEXjqslMU3Ne9UMVE4La
+         bkJQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1769185295; x=1769790095; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DxNTeWBn5w9lqozNLdO3vzm/ZdxHMZsH4CX0i7ouB0I=;
+        b=ZBH1DMesoeN3x9rLf4Vg5hJ2zsEgC/W6Thlf/asg2KkZ3sqnnx9lmwJs78y2WCRo/h
+         OAb8NDy1eXpc7oUciDIQD3gS4cFFeO+Y5uwNI/O01tye/BhIxlbe/HIKZnTILNfWUdlJ
+         XoELepb9HozzEOjTXyhAOP9lmzRLKH7+kjIPiJWdf00rzb0HYXDtZpf9WBT5ytop/mrY
+         yxtzScFv2Py0X7/lcDlf9pKvDg8WErXBwSQc/3yQhzNuoelHABdx/byfw8gh010wQh8g
+         9RkJBpq9SvmayaD78lMz5svsG3PIU/IbNTkNqOryxZ7Lo4FzFQoIu4x7oulTlb4RLjEI
+         OF7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769185295; x=1769790095;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=DxNTeWBn5w9lqozNLdO3vzm/ZdxHMZsH4CX0i7ouB0I=;
+        b=v2Wmo4JgMC6wBLI3BijeivVKyi4IAqb9N3nS1k7HaiVynI8SWdkUE+IJcl7DAuXj9W
+         8Cu2fHYdZz5Ezkwzsx4Pxrchw2ewpuOOOYHDU1YgKT1TeYW1CZeCyvJb2rx9LatDLpUU
+         4IwacZCUZ3aAdJbn/bhAxbxtUMJLjZX4AcqnMU2kn2Gyii/ufJHcFTKjKrVZ2gFHDtR8
+         Ukvg7816Q7UcBbcPHdwqWq+pPflxbi2ue+47bgpiC/qPC5qCotZKgM7txkQ6We9+g7h7
+         w4uruYEsKY7ST8GfQOcjN+PWtyIcgeEDcHQxrjVAdD2RgwEB+RQOHVxmhfiwHiS+z3Fx
+         g0Dg==
+X-Forwarded-Encrypted: i=1; AJvYcCVRr40HZ0uF4NBxmBats7R8FVWwGseBvL1Pn/ZZ95lhmACmk1wVxg0fxgnd4bQ+eP2sgvncTScv2n4QEA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywx2n2ab4b3GG/IXlBaUAI/vVIswX1MjtsOPP1lhbsgjk/xIt7T
+	RfEfT5HhAWO0dpBACKgOJmJKc8+0zRXx+BZiVbDjo1j28YoXClGbVO364DTdwy7Pn/3Y4lkN+1I
+	Dyz/x58VPmxlSqbtrlxX3qVpUiGtL5rxaG9J/tf8GFQ==
+X-Gm-Gg: AZuq6aLm66vwmkQgJyTyzZSBdfYLhbb5CrMC6HaM/e0jkNNu2jCIZ7LH1D0rTQa94Aa
+	Oad+7q8bwsgt9CcNs7PpxQFRvV7EGlHevIr0yWUjRetfc5D6aAXibIeQWdupOC/1Hg87RGiKd5G
+	qAHtOXyWfsAoUnHVhX/YrZ4lip7K2/Hsi2EoGXQiA6VF3YQ7hQc216ODomfD3GKs6VWYhvFDFl+
+	epnbaPztsVLjzgBkqnja5iy1kWCbNSJudnjfk2fz/ivy4rBs2wjvmiWdKo2C9E/dt7AdHlJ
+X-Received: by 2002:a05:7022:258b:b0:119:e56b:46ba with SMTP id
+ a92af1059eb24-1247dbf83afmr822047c88.4.1769185294328; Fri, 23 Jan 2026
+ 08:21:34 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] selftests: ublk: use tmpdir for scratch files and improve
- relative paths use
-From: Alexander Atanasov <alex@zazolabs.com>
-In-Reply-To: <aXOGrXo3AbXPHA-K@fedora>
-Date: Fri, 23 Jan 2026 17:00:33 +0200
-Cc: Shuah Khan <shuah@kernel.org>,
- linux-block@vger.kernel.org,
- linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
+References: <20260123112913.1371323-1-alex@zazolabs.com>
+In-Reply-To: <20260123112913.1371323-1-alex@zazolabs.com>
+From: Caleb Sander Mateos <csander@purestorage.com>
+Date: Fri, 23 Jan 2026 08:21:22 -0800
+X-Gm-Features: AZwV_Qh3_0A3z74JwuZQxyRjNGjleQd1M4K5VH1qZpvE0taKw_h1Ly7vckZSHC8
+Message-ID: <CADUfDZrtJO8AhRh1WbMo8_xPvwE6NBOD9K8bUr6_B+=mhiSd4g@mail.gmail.com>
+Subject: Re: [PATCH] selftests: ublk: add missing gitignore for metadata_size binary
+To: Alexander Atanasov <alex@zazolabs.com>
+Cc: Ming Lei <ming.lei@redhat.com>, Shuah Khan <shuah@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+	linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <03C8F5B9-B2E1-4C78-A043-B4F9422508B7@zazolabs.com>
-References: <20260123112039.1370223-1-alex@zazolabs.com>
- <aXN4mFuoXhtJDKyF@fedora> <147635F1-943E-46D5-8EF1-D1C965F85EC1@zazolabs.com>
- <aXOGrXo3AbXPHA-K@fedora>
-To: Ming Lei <ming.lei@redhat.com>
 
+On Fri, Jan 23, 2026 at 3:29=E2=80=AFAM Alexander Atanasov <alex@zazolabs.c=
+om> wrote:
+>
+> A new utility metadata_size was added in commit:
+> 261b67f4e347 ("selftests: ublk: add utility to get block device metadata =
+size")
+> but it was not added to .gitignore. Fix that by adding it there.
+>
+> Fixes: 261b67f4e347 ("selftests: ublk: add utility to get block device me=
+tadata size")
+> Signed-off-by: Alexander Atanasov <alex@zazolabs.com>
+> ---
+>  tools/testing/selftests/ublk/.gitignore | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/tools/testing/selftests/ublk/.gitignore b/tools/testing/self=
+tests/ublk/.gitignore
+> index 8b2871ea7751..95052c32fa09 100644
+> --- a/tools/testing/selftests/ublk/.gitignore
+> +++ b/tools/testing/selftests/ublk/.gitignore
+> @@ -1,3 +1,4 @@
+>  kublk
+>  /tools
+>  *-verify.state
+> +metadata_size
 
+Maybe move it next to kublk (the other executable), which would also
+keep these sorted alphabetically?
 
-> On 23 Jan 2026, at 16:33, Ming Lei <ming.lei@redhat.com> wrote:
->=20
-> On Fri, Jan 23, 2026 at 03:59:31PM +0200, Alexander Atanasov wrote:
->> On 23 Jan 2026, at 15:33, Ming Lei <ming.lei@redhat.com> wrote:
->>>=20
->>> On Fri, Jan 23, 2026 at 11:20:36AM +0000, Alexander Atanasov wrote:
->>>> Create a temp dir for temporary files and use it instead of
->>>> placing them inside source tree.
->>>=20
->>> Many temporary files are backing files of file storage target, so =
-far
->>> the code requires O_DIRECT, or the size could be a bit big.
->>>=20
->>> In case of ramfs/tmpfs of temp dir, it may cause problem for tests.
->>>=20
->>=20
->> I am aware of O_DIRECT problem but you can export different TMPDIR =
-that has working O_DIRECT.
->=20
-> Can you share how to export TMPDIR capable of O_DIRECT?
+Other than that,
+Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
 
-
-+export TMPDIR=3D$(mktemp -d ${TMPDIR:-/tmp}/ublktest-dir.XXXXXX)
-
-I made the tests to run in own TMPDIR. Which is under already set TMPDIR =
-or
-if TMPDIR is not set it is defaults to  /tmp.
-
-export TMPDIR=3D/path/to/odirect/capable
-Before running and tests will run in:
-/path/to/odirect/capable/ublktest-dir.XXXXXX
-
-
->=20
->>=20
->> I use sshfs mount of the build to run the tests and that is a problem =
-sshfs/fuse does not
->> do O_DIRECT too.
->>=20
->> I think test_generic_06.sh is the only one that fails due to =
-this(thou I still have to investigate).
->>=20
->> If O_DIRECT is required by the tests it may be possible to go thru a =
-RAM disk which does support it,
->> so it works eveerywhere
->>=20
->> Other option is to preserve working in source tree as it is now, and =
-just add a variable to specify working directory -
->> UBLK_TMPDIR or something.
->>=20
->>=20
->> I get a lot of out of order io - between 0 and 10 on average on my =
-test setup:
->> tools/testing/selftests/ublk/test_generic_01.sh=20
->> Attached 3 probes
->> io_out_of_order: exp 564688 actual 564648
->> io_out_of_order: exp 564648 actual 565584
->> io_out_of_order: exp 565584 actual 564688
->> io_out_of_order: exp 565592 actual 564688
->> io_out_of_order: exp 566328 actual 565592
->> io_out_of_order: exp 882256 actual 882248
->> io_out_of_order: exp 883032 actual 882912
->> io_out_of_order: exp 882912 actual 883040
->> io_out_of_order: exp 883040 actual 883032
->>=20
->>=20
->> generic_01 : [FAIL]
->>=20
->> All rq-s are there just reordered , AFAIK blk-mq does not guarantee =
-that requests will be completed in order, what=E2=80=99s the idea to =
-catch this and
->=20
-> If there is just 0 ~ 10, it could be fine. But if all are reorderd,
-> something must be wrong. One improvement could be check if there is =
-too
-> many reorder...
->=20
-> Actually what I am trying to test is to make sure same order is =
-observed
-> from both ublk driver dispatch code path and ublk target io handling =
-code
-> path, because io_uring task work schedule uses llist, which may =
-introduce io
-> reorder.
-
-There are for sure other places where a reordering can be introduced, so =
-the code should be ready and expecting=20
-It. (For my case see bellow) Is preserving the order required for some =
-reason for ublk?
-
->=20
-> However, that involves ublk kprobe/kfunc trace, which may not be =
-stable,
-> so I simply check the end-to-end IO order. Sometimes blk-mq IO =
-queue/dispatch
-> may re-order IO.
->=20
-> I guess the following change may avoid the re-order, but batch IO case =
-may
-> not be covered:
->=20
-> diff --git a/tools/testing/selftests/ublk/test_generic_01.sh =
-b/tools/testing/selftests/ublk/test_generic_01.sh
-> index 21a31cd5491a..5805da4c84c5 100755
-> --- a/tools/testing/selftests/ublk/test_generic_01.sh
-> +++ b/tools/testing/selftests/ublk/test_generic_01.sh
-> @@ -29,14 +29,8 @@ if ! kill -0 "$btrace_pid" > /dev/null 2>&1; then
->        exit "$UBLK_SKIP_CODE"
-> fi
->=20
-> -# run fio over this ublk disk
-> -fio --name=3Dwrite_seq \
-> -    --filename=3D/dev/ublkb"${dev_id}" \
-> -    --ioengine=3Dlibaio --iodepth=3D16 \
-> -    --rw=3Dwrite \
-> -    --size=3D512M \
-> -    --direct=3D1 \
-> -    --bs=3D4k > /dev/null 2>&1
-> +taskset -c 0 dd if=3D/dev/zero of=3D/dev/ublkb"${dev_id}" bs=3D1M =
-count=3D256 oflag=3Ddirect > /dev/null 2>&1
-> +
->=20
->=20
->> consider it an error? (Latest tree with batch io and batch io fixes =
-on top of if that matters)
->=20
-> Never observe generic_01 failure in my test VM and hardware.
->=20
-> My kernel config is based on Fedora, maybe scheduler config option =
-makes the difference.
-
-Fedora 43 default config with some debugging options enabled, but no =
-changes in schedulers.
-Test VM storage is on a networked NAS over iSCSI - both boxes VM host =
-and NAS have two NICs,
-I get the errors when I load the network. So I believe the requests =
-really complete out of=20
-order due to the network in my case. All tests that have the bpftrace =
-check fail on occasion.
-
-
-Regards,
-Alexander Atanasov
-
-
-
+> --
+> 2.43.0
+>
