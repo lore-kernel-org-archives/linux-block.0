@@ -1,184 +1,113 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6A9241C71
-	for <linux-block@vger.kernel.org>; Sat, 24 Jan 2026 04:27:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA7E51494C3;
+	Sat, 24 Jan 2026 06:42:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769228852; cv=none; b=HjHVUTFHlNHtv/sOymiGvxMP0u3x4S2eo08MOzChy7od//QfU4VynzqsaJGd7tdHbTM0qUVSsrt1ZEnS0YLWkAwMZTRrc1OUG/8+GHDzSPKZHNXvrOD+LlPiCnyKq0HsKm/hQlM4QTOhFXG7qeYvyswGFu9hWquW3sIdJzY+itA=
+	t=1769236945; cv=none; b=Ts8dFFpQyedw7aicu3mVJAy0bETc41MlHb4JeLVKyaOVUC5ivA61OE0tdV7fjyVfk0k6sQ5n/epIRBcRy0GqGNRXcPd+0KKgCdQ4jaCJzR6Tew/Wxneav9VgD3j8vMtxpC+7a6CxynnY25M85aAORC2opJK9B9FPgVIHih4OvnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769228852; c=relaxed/simple;
-	bh=HOJju+4AtcwM088MbqTfHnOa2O8cKksPoOR3ztigb/8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=a19c1n3nonCzgLVANk+M8KcOrGcK8lqf6/8dESNdiXs57CZ0CR25ONHNB49qxiC2LgPaxsvy7purLIM1Y1928FdqKe1nTRrR0Wr79RIYmgshHhEKueNvd4ZaDkvkog6DnFwlMw9sL36JmevhPxmRYpxVyWUvaYZjZ/D1wGzaaXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ObHViSHC; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ObHViSHC"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769228849;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=5FcEPL2VGjfgAMi4PgE3MtQe1wcdrQmITZ2S/uSo6Xc=;
-	b=ObHViSHC7vX+l+oR2GOLJjULvZdc6dwSx7FiZiCTKv9oWe9mlirryOdoyzHIkyNdft2AM/
-	pkjmG4VyVOj7ZMtFsFISDwHM+iULaWBN87sCzjB6TV4Uo9tWb/O1LrHsRpGSmdCh1sHEbR
-	k7HOHOv8ogOQTOMZhZ7G8lY8kjtx+UA=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-651-sTK9WDVhPGq-IfLuJMTGPQ-1; Fri,
- 23 Jan 2026 23:27:25 -0500
-X-MC-Unique: sTK9WDVhPGq-IfLuJMTGPQ-1
-X-Mimecast-MFC-AGG-ID: sTK9WDVhPGq-IfLuJMTGPQ_1769228844
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6A480195608D;
-	Sat, 24 Jan 2026 04:27:24 +0000 (UTC)
-Received: from localhost (unknown [10.72.116.30])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 50A7C1958DC4;
-	Sat, 24 Jan 2026 04:27:22 +0000 (UTC)
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org
-Cc: Caleb Sander Mateos <csander@purestorage.com>,
-	Uday Shankar <ushankar@purestorage.com>,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2] ublk: document IO reference counting design
-Date: Sat, 24 Jan 2026 12:27:16 +0800
-Message-ID: <20260124042716.2314690-1-ming.lei@redhat.com>
+	s=arc-20240116; t=1769236945; c=relaxed/simple;
+	bh=kewW54hEEUzq1bMX2iROgbHAUNDHiRiZz4+yw/JHNss=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lUaJaP+YTSvCzF4fDTJOfPIXn5Onk4Sit/PXeG7dzhDfucXQlkCZc8KwD8VeSqT4a4QLtIlzUGwDNQ2SxRNCgfCWpmZTznQqZ5+sYod0IMPf3SSicoHXwOsqrePyyKRZR+j4cyTH47Ct01nx4f/fkUCnqqzGK76YS7EABNHg5Eo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.198])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4dylb13P1tzKHMR3;
+	Sat, 24 Jan 2026 14:42:05 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 698FB40539;
+	Sat, 24 Jan 2026 14:42:11 +0800 (CST)
+Received: from [10.174.178.129] (unknown [10.174.178.129])
+	by APP4 (Coremail) with SMTP id gCh0CgAXxfXBaXRpiJCuEw--.25082S3;
+	Sat, 24 Jan 2026 14:42:11 +0800 (CST)
+Message-ID: <ee6b631b-79d4-09f7-da38-dfe1dea11d4b@huaweicloud.com>
+Date: Sat, 24 Jan 2026 14:42:09 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH 1/2] md/raid5: fix IO hang with degraded array with
+ llbitmap
+To: Yu Kuai <yukuai@fnnas.com>, axboe@kernel.dk, linux-block@vger.kernel.org,
+ linux-raid@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, xni@redhat.com
+References: <20260123182623.3718551-1-yukuai@fnnas.com>
+ <20260123182623.3718551-2-yukuai@fnnas.com>
+From: Li Nan <linan666@huaweicloud.com>
+In-Reply-To: <20260123182623.3718551-2-yukuai@fnnas.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-CM-TRANSID:gCh0CgAXxfXBaXRpiJCuEw--.25082S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7tw48WF1DtF17Ww45XrWUArb_yoW8Ww4Upa
+	nay3Zxuw1jgFyjgFnxAFyUuF1Fgw48XrWxAFWxJ34fuFyDXr1fKr4fKa45tF13JayFvasx
+	X3WDJ34UAFn5GrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU90b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l
+	5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67
+	AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07Al
+	zVAYIcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
+	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
+	VFxhVjvjDU0xZFpf9x07UMnQUUUUUU=
+X-CM-SenderInfo: polqt0awwwqx5xdzvxpfor3voofrz/
 
-Add comprehensive documentation for ublk's split reference counting
-model (io->ref + io->task_registered_buffers) above ublk_init_req_ref()
-given this model isn't very straightforward.
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
-V2:
-	- clarify `both ref and task_registered_buffers are 0 before dispatch`
-	  (Caleb Sander Mateos)
-	- ublk_sub_req_ref() is the point for collapsing task_registered_buffers
-	  into the atomic ref, optimization can only be used before this point
-	  (Caleb Sander Mateos)
-	- Both ref and task_registered_buffers becomes zero in ublk_check_and_reset_active_ref
-	  (Caleb Sander Mateos)
-	- add `zero copy with ublk server killed example`
-	- document io->lock is for protecting task_registered_buffers in case of batch
-	  io
 
- drivers/block/ublk_drv.c | 89 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 89 insertions(+)
+在 2026/1/24 2:26, Yu Kuai 写道:
+> When llbitmap bit state is still unwritten, any new write should force
+> rcw, as bitmap_ops->blocks_synced() is checked in handle_stripe_dirting().
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 7981decd1cee..8a5a6ba29a1d 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -985,6 +985,95 @@ static inline bool ublk_dev_need_req_ref(const struct ublk_device *ub)
- 	       ublk_dev_support_auto_buf_reg(ub);
- }
- 
-+/*
-+ * ublk IO Reference Counting Design
-+ * ==================================
-+ *
-+ * For user-copy and zero-copy modes, ublk uses a split reference model with
-+ * two counters that together track IO lifetime:
-+ *
-+ *   - io->ref: refcount for off-task buffer registrations and user-copy ops
-+ *   - io->task_registered_buffers: count of buffers registered on the IO task
-+ *
-+ * Key Invariant:
-+ * --------------
-+ * When IO is dispatched to the ublk server (UBLK_IO_FLAG_OWNED_BY_SRV set),
-+ * the sum (io->ref + io->task_registered_buffers) must equal UBLK_REFCOUNT_INIT
-+ * when no active references exist. After IO completion, both counters become
-+ * zero. For I/Os not currently dispatched to the ublk server, both ref and
-+ * task_registered_buffers are 0.
-+ *
-+ * This invariant is checked by ublk_check_and_reset_active_ref() during daemon
-+ * exit to determine if all references have been released.
-+ *
-+ * Why Split Counters:
-+ * -------------------
-+ * Buffers registered on the IO daemon task can use the lightweight
-+ * task_registered_buffers counter (simple increment/decrement) instead of
-+ * atomic refcount operations. The ublk_io_release() callback checks if
-+ * current == io->task to decide which counter to update.
-+ *
-+ * This optimization only applies before IO completion. At completion,
-+ * ublk_sub_req_ref() collapses task_registered_buffers into the atomic ref.
-+ * After that, all subsequent buffer unregistrations must use the atomic ref
-+ * since they may be releasing the last reference.
-+ *
-+ * Reference Lifecycle:
-+ * --------------------
-+ * 1. ublk_init_req_ref(): Sets io->ref = UBLK_REFCOUNT_INIT at IO dispatch
-+ *
-+ * 2. During IO processing:
-+ *    - On-task buffer reg: task_registered_buffers++ (no ref change)
-+ *    - Off-task buffer reg: ref++ via ublk_get_req_ref()
-+ *    - Buffer unregister callback (ublk_io_release):
-+ *      * If on-task: task_registered_buffers--
-+ *      * If off-task: ref-- via ublk_put_req_ref()
-+ *
-+ * 3. ublk_sub_req_ref() at IO completion:
-+ *    - Computes: sub_refs = UBLK_REFCOUNT_INIT - task_registered_buffers
-+ *    - Subtracts sub_refs from ref and zeroes task_registered_buffers
-+ *    - This effectively collapses task_registered_buffers into the atomic ref,
-+ *      accounting for the initial UBLK_REFCOUNT_INIT minus any on-task
-+ *      buffers that were already counted
-+ *
-+ * Example (zero-copy, register on-task, unregister off-task):
-+ *   - Dispatch: ref = UBLK_REFCOUNT_INIT, task_registered_buffers = 0
-+ *   - Register buffer on-task: task_registered_buffers = 1
-+ *   - Unregister off-task: ref-- (UBLK_REFCOUNT_INIT - 1), task_registered_buffers stays 1
-+ *   - Completion via ublk_sub_req_ref():
-+ *     sub_refs = UBLK_REFCOUNT_INIT - 1,
-+ *     ref = (UBLK_REFCOUNT_INIT - 1) - (UBLK_REFCOUNT_INIT - 1) = 0
-+ *
-+ * Example (auto buffer registration):
-+ *   Auto buffer registration sets task_registered_buffers = 1 at dispatch.
-+ *
-+ *   - Dispatch: ref = UBLK_REFCOUNT_INIT, task_registered_buffers = 1
-+ *   - Buffer unregister: task_registered_buffers-- (becomes 0)
-+ *   - Completion via ublk_sub_req_ref():
-+ *     sub_refs = UBLK_REFCOUNT_INIT - 0, ref becomes 0
-+ *
-+ * Example (zero-copy, ublk server killed):
-+ *   When daemon is killed, io_uring cleanup unregisters buffers off-task.
-+ *   ublk_check_and_reset_active_ref() waits for the invariant to hold.
-+ *
-+ *   - Dispatch: ref = UBLK_REFCOUNT_INIT, task_registered_buffers = 0
-+ *   - Register buffer on-task: task_registered_buffers = 1
-+ *   - Daemon killed, io_uring cleanup unregisters buffer (off-task):
-+ *     ref-- (UBLK_REFCOUNT_INIT - 1), task_registered_buffers stays 1
-+ *   - Daemon exit check: sum = (UBLK_REFCOUNT_INIT - 1) + 1 = UBLK_REFCOUNT_INIT
-+ *   - Sum equals UBLK_REFCOUNT_INIT, then both two counters are zeroed by
-+ *     ublk_check_and_reset_active_ref(), so ublk_abort_queue() can proceed
-+ *     and abort pending requests
-+ *
-+ * Batch IO Special Case:
-+ * ----------------------
-+ * In batch IO mode, io->task is NULL. This means ublk_io_release() always
-+ * takes the off-task path (ublk_put_req_ref), decrementing io->ref. The
-+ * task_registered_buffers counter still tracks registered buffers for the
-+ * invariant check, even though the callback doesn't decrement it.
-+ *
-+ * Note: updating task_registered_buffers is protected by io->lock.
-+ */
- static inline void ublk_init_req_ref(const struct ublk_queue *ubq,
- 		struct ublk_io *io)
- {
+s/handle_stripe_dirting/handle_stripe_dirtying/
+
+Besides this, LGTM
+
+Reviewed-by: Li Nan <linan122@huawei.com>
+
+> However, later the same check is missing in need_this_block(), causing
+> stripe to deadloop during handling because handle_stripe() will decide
+> to go to handle_stripe_fill(), meanwhile need_this_block() always return
+> 0 and nothing is handled.
+> 
+> Fixes: 5ab829f1971d ("md/md-llbitmap: introduce new lockless bitmap")
+> Signed-off-by: Yu Kuai <yukuai@fnnas.com>
+> ---
+>   drivers/md/raid5.c | 7 ++++++-
+>   1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
+> index 8dc98f545969..93e672b3432b 100644
+> --- a/drivers/md/raid5.c
+> +++ b/drivers/md/raid5.c
+> @@ -3751,9 +3751,14 @@ static int need_this_block(struct stripe_head *sh, struct stripe_head_state *s,
+>   	struct r5dev *dev = &sh->dev[disk_idx];
+>   	struct r5dev *fdev[2] = { &sh->dev[s->failed_num[0]],
+>   				  &sh->dev[s->failed_num[1]] };
+> +	struct mddev *mddev = sh->raid_conf->mddev;
+> +	bool force_rcw = false;
+>   	int i;
+> -	bool force_rcw = (sh->raid_conf->rmw_level == PARITY_DISABLE_RMW);
+>   
+> +	if (sh->raid_conf->rmw_level == PARITY_DISABLE_RMW ||
+> +	    (mddev->bitmap_ops && mddev->bitmap_ops->blocks_synced &&
+> +	     !mddev->bitmap_ops->blocks_synced(mddev, sh->sector)))
+> +		force_rcw = true;
+>   
+>   	if (test_bit(R5_LOCKED, &dev->flags) ||
+>   	    test_bit(R5_UPTODATE, &dev->flags))
+
 -- 
-2.47.1
+Thanks,
+Nan
 
