@@ -1,228 +1,92 @@
-Received: from mail-oa1-f78.google.com (mail-oa1-f78.google.com [209.85.160.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DFD42D6E71
-	for <linux-block@vger.kernel.org>; Fri, 23 Jan 2026 23:14:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B43487263B
+	for <linux-block@vger.kernel.org>; Sat, 24 Jan 2026 01:05:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769210079; cv=none; b=AvrnMS3G/MhTL3899Pd90X8Jb0SvCXsouI+ooa3zcCqTKbY6kUUtR/dIlouLvTOS1DUCfiN4ujv2Dlyjo7zrEq9qHeHoVqBdY4O4Ma5uXs5ZTBkgEttPfoCdjvlAnPY/gfUiOyAfPhp+LgNZqIuTToec4yLqwvv5yJqRfSnXWys=
+	t=1769216727; cv=none; b=jYLpghsvcJxUqbPM+NTa4egPmobszq7RlIzbNXO0U6tMz9RsVvFSC6ZTa2N/O5kHKTsPj60AxjM3W+Y8y8cPFyljMDNn0gilGvWd8qSExyqdViqt8cFCuOto/uN/Q2Mt5nPsZFEwWnTVd4bHZnY9cHOtQqmhx700wjrNmVGoZoo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769210079; c=relaxed/simple;
-	bh=/AjWj6cBvWMbhNyM4II1vF5NC7KkV7ooexnawpnnLsU=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=XSyLHrXfN3lXv5GJ2CpqSsJxhOqllKgtAMHGkEbq2sPOhMIFIGH3Cff4LXf8e7Hxzj3xH7MH7U1j+gbpbXHVmOYRbQyxgDr4K8oFWm9EwYp2j3MhEDsdkLn8ayGdqKThUU6i8+KADOdabqQv9K7t+2k++IZq3NKZ+nwZAnFJNuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oa1-f78.google.com with SMTP id 586e51a60fabf-404563556e9so4442134fac.3
-        for <linux-block@vger.kernel.org>; Fri, 23 Jan 2026 15:14:37 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769210077; x=1769814877;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rBf+zrfIaRMtapePZ/HJ6W/A8bO2xe7hejTEEyEvELE=;
-        b=TB9YkxXosuhl8hNynPZy7w7fRwLJwHxNPCJIpp1Tod4UvaplM3lgTX6+xV0L5sWUoZ
-         ZSEaOBr78yr6og+p9vlgrWQslkaGjkRQYwwtzjeiwtwtyNE2l/cHOVgGNQUL9LA9kyW6
-         8C25AgUHBxjdgkazssTROGIRjKs7+XYN6mghqnxBYBzudjtsew0wXzYOtnz3FZE/qZ2y
-         CveNd51LXhPXyVpUJbwxn3DHR03JlPU1F7PDK7DA2kN3zCFfEWcbqwgUYuCIHZPh/t5n
-         bLSxffRfl20+QUhqw++dm75DPhew3cclKEO1vU+X3Uf2Ye0kFA1BIYMge6+30j8J1O3q
-         mbJg==
-X-Forwarded-Encrypted: i=1; AJvYcCX/dmwY52GB82ZmUpT/FmVkhl9CU+SerEzOf9FAyBI+mghDWLaJgvFKOjkr3P4jjWJ41eozSuakVhX4+A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTlDDXr7mbLSuoZCus9QgHoOPdvJoK3L84MbuHVoT0/Harsmn1
-	UpT5a4qYT2VoK46/1NSy12nwGvcNrZiwU5rSS/rz2hl0V2NOn9k1BuNOp6YR8IFuXkWHFF8C3AF
-	e/m27CIzGj3w3lUYEoRh78ZaH9Maj9PmT0DpOc9ZQ6VgwhBfYypY9X1Tm3Go=
+	s=arc-20240116; t=1769216727; c=relaxed/simple;
+	bh=FBpBzxHpRotxgyhVKzM4cRSWd1Zr1PykX1UhxtqsxDo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BXfPxtY1NR5QfAu28s9qzbeSem0Wggdm8ooZDWPj/gcpcn+iTa3nSHB6XPh0i1C+OP68CQUnlFDj67cqFvcRUIAo/dDhCcYJ/cvHs+3h0zZR9X3xKAkewDp+6V+S80ebbI7q/QPGo3LoGhX8S4FIqcp4rNpRj51QCwsQEpNea8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IbII4y3y; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IbII4y3y"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1769216724;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eBTkPYq+fbgMdkRaPKujxvUupz8ohw1JAJ/cEkXDT7Q=;
+	b=IbII4y3yApR7BColoOQmX/eujrCV6BjPIN6QJypUBVIE5IZkojuctESJqAsjv14Delceww
+	RFtCRUGE7J8dWJZDdr2jh36TRcqUTTVTPbUTdJVEA1wWHG4ZnGJrp2oJIDUH3YhOFy0+39
+	KrtfZPjsSRUrtue6Rpl+NRtRTZiPQ4A=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-144-swGyZUX5OZC0d7_4auN4FQ-1; Fri,
+ 23 Jan 2026 20:03:58 -0500
+X-MC-Unique: swGyZUX5OZC0d7_4auN4FQ-1
+X-Mimecast-MFC-AGG-ID: swGyZUX5OZC0d7_4auN4FQ_1769216637
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EDD011956089;
+	Sat, 24 Jan 2026 01:03:56 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.62])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BEA6918004D8;
+	Sat, 24 Jan 2026 01:03:52 +0000 (UTC)
+Date: Sat, 24 Jan 2026 09:03:48 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	Caleb Sander Mateos <csander@purestorage.com>,
+	Uday Shankar <ushankar@purestorage.com>
+Subject: Re: [PATCH 0/2] ublk: auto buffer helpers rename & document io
+ reference
+Message-ID: <aXQadDz91PAYliwI@fedora>
+References: <20260123135205.2202474-1-ming.lei@redhat.com>
+ <176919561293.731063.8947763808975933270.b4-ty@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:460b:b0:65c:f019:ccca with SMTP id
- 006d021491bc7-662caaf74f4mr1924715eaf.21.1769210076889; Fri, 23 Jan 2026
- 15:14:36 -0800 (PST)
-Date: Fri, 23 Jan 2026 15:14:36 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <697400dc.a70a0220.35de72.000a.GAE@google.com>
-Subject: [syzbot] [block?] possible deadlock in blkdev_read_iter
-From: syzbot <syzbot+4e70c8e0a2017b432f7a@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <176919561293.731063.8947763808975933270.b4-ty@kernel.dk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Hello,
+On Fri, Jan 23, 2026 at 12:13:32PM -0700, Jens Axboe wrote:
+> 
+> On Fri, 23 Jan 2026 21:51:57 +0800, Ming Lei wrote:
+> > The 1st patch improves auto buffer helpers naming, and improve
+> > documentation.
+> > 
+> > The 2nd patch documents ublk io reference counting design, given it isn't
+> > very straightforward.
+> > 
+> > Thanks,
+> > 
+> > [...]
+> 
+> Applied, thanks!
+> 
+> [1/2] ublk: rename auto buffer registration helpers
+>       commit: f50af896932f5edb1ff7b407753ecfa285c30b7a
+> [2/2] ublk: document IO reference counting design
+>       commit: 420bcbf67b4575d6455a4fa0de06695d98d340b1
 
-syzbot found the following issue on:
+Hi Jens,
 
-HEAD commit:    24d479d26b25 Linux 6.19-rc6
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=100033fa580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=1859476832863c41
-dashboard link: https://syzkaller.appspot.com/bug?extid=4e70c8e0a2017b432f7a
-compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11451b9a580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1045e852580000
+I'd address Caleb's comment on the 2nd patch, so can you drop it?
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-24d479d2.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/d0f3c47f6869/vmlinux-24d479d2.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/800231513703/bzImage-24d479d2.xz
+Thanks,
+Ming
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+4e70c8e0a2017b432f7a@syzkaller.appspotmail.com
-
-WARNING: possible circular locking dependency detected
-syzkaller #0 Not tainted
-------------------------------------------------------
-syz.0.17/6091 is trying to acquire lock:
-ffff8881061287a8 (
-&sb->s_type->i_mutex_key#8){++++}-{4:4}, at: inode_lock_shared include/linux/fs.h:1042 [inline]
-&sb->s_type->i_mutex_key#8){++++}-{4:4}, at: blkdev_read_iter+0x19e/0x500 block/fops.c:855
-
-but task is already holding lock:
-ffff888012aa0448 (vm_lock){++++}-{0:0}, at: lock_next_vma+0x10e/0xed0 mm/mmap_lock.c:334
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #2 (vm_lock){++++}-{0:0}:
-       __vma_enter_locked+0x260/0x770 mm/mmap_lock.c:72
-       __vma_start_write+0x21/0x160 mm/mmap_lock.c:104
-       vma_start_write include/linux/mmap_lock.h:213 [inline]
-       mprotect_fixup+0x4e3/0xb80 mm/mprotect.c:768
-       setup_arg_pages+0x4a2/0xbb0 fs/exec.c:670
-       load_elf_binary+0xb5b/0x4fe0 fs/binfmt_elf.c:1028
-       search_binary_handler fs/exec.c:1669 [inline]
-       exec_binprm fs/exec.c:1701 [inline]
-       bprm_execve fs/exec.c:1753 [inline]
-       bprm_execve+0x8c2/0x1620 fs/exec.c:1729
-       kernel_execve+0x2ef/0x3b0 fs/exec.c:1919
-       try_to_run_init_process init/main.c:1506 [inline]
-       kernel_init+0x14a/0x2b0 init/main.c:1634
-       ret_from_fork+0x983/0xb10 arch/x86/kernel/process.c:158
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
-
--> #1 (&mm->mmap_lock){++++}-{4:4}:
-       __might_fault mm/memory.c:7174 [inline]
-       __might_fault+0x113/0x190 mm/memory.c:7168
-       _copy_to_iter+0x1c2/0x1710 lib/iov_iter.c:196
-       copy_page_to_iter lib/iov_iter.c:374 [inline]
-       copy_page_to_iter+0x12a/0x1e0 lib/iov_iter.c:361
-       copy_folio_to_iter include/linux/uio.h:204 [inline]
-       filemap_read+0x6b1/0xe40 mm/filemap.c:2851
-       blkdev_read_iter+0x1ac/0x500 block/fops.c:856
-       new_sync_read fs/read_write.c:491 [inline]
-       vfs_read+0x8bf/0xcf0 fs/read_write.c:572
-       ksys_read+0x12a/0x250 fs/read_write.c:715
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0xcd/0xf80 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #0 (&sb->s_type->i_mutex_key#8){++++}-{4:4}:
-       check_prev_add kernel/locking/lockdep.c:3165 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3284 [inline]
-       validate_chain kernel/locking/lockdep.c:3908 [inline]
-       __lock_acquire+0x1669/0x2890 kernel/locking/lockdep.c:5237
-       lock_acquire kernel/locking/lockdep.c:5868 [inline]
-       lock_acquire+0x179/0x330 kernel/locking/lockdep.c:5825
-       down_read+0x9b/0x460 kernel/locking/rwsem.c:1537
-       inode_lock_shared include/linux/fs.h:1042 [inline]
-       blkdev_read_iter+0x19e/0x500 block/fops.c:855
-       __kernel_read+0x3f3/0xbf0 fs/read_write.c:530
-       freader_fetch+0x1d7/0x9d0 lib/buildid.c:100
-       __build_id_parse.isra.0+0xdd/0x6c0 lib/buildid.c:297
-       do_procmap_query+0xb0e/0x1080 fs/proc/task_mmu.c:733
-       procfs_procmap_ioctl+0x9d/0xe0 fs/proc/task_mmu.c:813
-       vfs_ioctl fs/ioctl.c:51 [inline]
-       __do_sys_ioctl fs/ioctl.c:597 [inline]
-       __se_sys_ioctl fs/ioctl.c:583 [inline]
-       __x64_sys_ioctl+0x18e/0x210 fs/ioctl.c:583
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0xcd/0xf80 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-other info that might help us debug this:
-
-Chain exists of:
-  &sb->s_type->i_mutex_key#8 --> &mm->mmap_lock --> vm_lock
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  rlock(vm_lock);
-                               lock(&mm->mmap_lock);
-                               lock(vm_lock);
-  rlock(&sb->s_type->i_mutex_key#8);
-
- *** DEADLOCK ***
-
-1 lock held by syz.0.17/6091:
- #0: ffff888012aa0448 (vm_lock){++++}-{0:0}, at: lock_next_vma+0x10e/0xed0 mm/mmap_lock.c:334
-
-stack backtrace:
-CPU: 2 UID: 0 PID: 6091 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
- print_circular_bug+0x275/0x340 kernel/locking/lockdep.c:2043
- check_noncircular+0x146/0x160 kernel/locking/lockdep.c:2175
- check_prev_add kernel/locking/lockdep.c:3165 [inline]
- check_prevs_add kernel/locking/lockdep.c:3284 [inline]
- validate_chain kernel/locking/lockdep.c:3908 [inline]
- __lock_acquire+0x1669/0x2890 kernel/locking/lockdep.c:5237
- lock_acquire kernel/locking/lockdep.c:5868 [inline]
- lock_acquire+0x179/0x330 kernel/locking/lockdep.c:5825
- down_read+0x9b/0x460 kernel/locking/rwsem.c:1537
- inode_lock_shared include/linux/fs.h:1042 [inline]
- blkdev_read_iter+0x19e/0x500 block/fops.c:855
- __kernel_read+0x3f3/0xbf0 fs/read_write.c:530
- freader_fetch+0x1d7/0x9d0 lib/buildid.c:100
- __build_id_parse.isra.0+0xdd/0x6c0 lib/buildid.c:297
- do_procmap_query+0xb0e/0x1080 fs/proc/task_mmu.c:733
- procfs_procmap_ioctl+0x9d/0xe0 fs/proc/task_mmu.c:813
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:597 [inline]
- __se_sys_ioctl fs/ioctl.c:583 [inline]
- __x64_sys_ioctl+0x18e/0x210 fs/ioctl.c:583
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xcd/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7ff1a238f7c9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffebbe538b8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007ff1a25e5fa0 RCX: 00007ff1a238f7c9
-RDX: 0000200000000180 RSI: 00000000c0686611 RDI: 0000000000000004
-RBP: 00007ff1a2413f91 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007ff1a25e5fa0 R14: 00007ff1a25e5fa0 R15: 0000000000000003
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
