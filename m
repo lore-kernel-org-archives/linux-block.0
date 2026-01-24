@@ -1,212 +1,241 @@
-Received: from r3-11.sinamail.sina.com.cn (r3-11.sinamail.sina.com.cn [202.108.3.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f77.google.com (mail-oo1-f77.google.com [209.85.161.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99FCD3EBF0C
-	for <linux-block@vger.kernel.org>; Sat, 24 Jan 2026 11:37:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.108.3.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EEA2E55C
+	for <linux-block@vger.kernel.org>; Sat, 24 Jan 2026 13:10:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769254653; cv=none; b=JkDUYhbrME7klE52iBwF47sQwYPdhY2QcRzbimGI+qoRq3k3AV9XfJl5XYavCrT4buOhgStOSDfq/RQ/hz3Dhh06ipMkYXnRlXli0yrsJVr4YzR1XdqcTh+dz+qkW2dCJ7dG7iMf/XT1NDdhtmMQdE0JFaQvxkuFpbS0Ev7gYX4=
+	t=1769260234; cv=none; b=VtrgcAgzO9KH1dGCDl5tnBTREEMB0P54U4Z5ntzLFtQ7aRvQMLkyk5sCBeWSfF2Xg7suEAKRKBK+Dk+c5RKki6jsl9zPBETvFqnBMfjYMQUlSz112CcW0Ga2IC4yQC8l/zZb7/WCzidvy49+8UBCeR4/TQP+SuNjrud24GiKfHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769254653; c=relaxed/simple;
-	bh=UFaEYa7MpiUAxEkzN2PJE9LInV/P1aYmKFExDlQQelQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=M0j4eQ8mKQ24Gizx8cSuS1coQm16zcpvfqkt5x1+OD8rh6tuzJcbPMXX1DEMHczk9sxVBvqr/iH+5yf2RIThjYnDJsypanoZyd8jZMWA43p18wQ3LB1osC3QBRo5svrv59IMl0SzIa9dNpN6fuvfJYgCpFKmZuDPnmiUWjbwwpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=iJG7v2JF; arc=none smtp.client-ip=202.108.3.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="iJG7v2JF"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1769254648;
-	bh=qkOEQgaEwy9leZy1ujQ4H2JefbzU2lHbydy/pVzpG10=;
-	h=From:Subject:Date:Message-ID;
-	b=iJG7v2JFvLL+vHKpFpnCr9FeJnUoChzxbD5kBVK6B7Euu2wAHtDFs+SUlFTHBzEM8
-	 xGWsuGXzybAeDL4zo+mMICT/BjNCeKzcVwK95hZvl5cywbstpqJ1I2s+nGTQ+nrmEU
-	 Zubr88iwl0vtDjPwVv+faSSh8+54e1/LBTauY0Dk=
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([114.249.58.160])
-	by sina.com (10.54.253.34) with ESMTP
-	id 6974ADAE00002209; Sat, 24 Jan 2026 19:32:01 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 1296846291920
-X-SMAIL-UIID: 99F37E143FD540628EBE341A8B8EE97B-20260124-193201-1
-From: Hillf Danton <hdanton@sina.com>
-To: syzbot <syzbot+4e70c8e0a2017b432f7a@syzkaller.appspotmail.com>
-Cc: axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
-	Suren Baghdasaryan <surenb@google.com>,
-	linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [block?] possible deadlock in blkdev_read_iter
-Date: Sat, 24 Jan 2026 19:31:47 +0800
-Message-ID: <20260124113148.2398-1-hdanton@sina.com>
-In-Reply-To: <697400dc.a70a0220.35de72.000a.GAE@google.com>
-References: 
+	s=arc-20240116; t=1769260234; c=relaxed/simple;
+	bh=7RTkZ474UUJD+ra2YETzVu0cNSTzU1/InW4Sh1qhHmA=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=PLba3ihBvKulFfBPVtg1oVIMdFA4/VYdlyj0luTTdcCAkf9elGJgzlHZesNhYfP79iBpC0zLfEDBkrTLrwRU59mrLd0d7aGdljVsBwTVUHfFuVlfBYbMcanVfOm3kFToleu9w4zzOe281TUFlRLUqHSuJAfU2e3weVehPo8IhA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f77.google.com with SMTP id 006d021491bc7-662c9283415so7402982eaf.1
+        for <linux-block@vger.kernel.org>; Sat, 24 Jan 2026 05:10:32 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769260231; x=1769865031;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XNSu4w3Lz6YTuBjgjK93YawmOK5beBEdSh0ZnfnLRS0=;
+        b=QmhvrinR2tMEeX7OjJSebORCxEmaSBp2+HT7ttN5Vwk9zh9qoMiksFsLxnp1vOcDQZ
+         dM3Y3suDsRQCj88Faai0OJNG0memldZsIhr+8kQOf83iD+Kxq22ND3sglDHhtFt3cBt0
+         l2PgMeyI/OQDSRK6Lv9q/ZCcaN0NDsKkZoEDooDHQ6qZvX0DDaX6E3QH6LMBD9kizOLx
+         6lM8H2/T5Yfp9EyK1VSWuUT0nz9v12uGodIC8GBXfcY70KYVqwT4CWYszfbfGmyTAyxO
+         cejvBD5RNZL1nOUfMLUY9P0LnqbsIWHKPE/Zl0Jl+LPEsxA6qy5D2X1ZK1nxz4l3c3cx
+         6RQA==
+X-Forwarded-Encrypted: i=1; AJvYcCXnSTyAIOfRnFoqPyEmMlFVGU0XN2/gm30LN9KTRw/Hdu9NTXdMhPp1kkXPbh9s4PUn/Jnlza5HCkJx+A==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6FxBIv7J0NF9gN7ryrCbHXfek5DgCVZjcRuIsCzMIKbsDBfpy
+	ZZ6xdjCgw0B3fmv37Lx9jgJFzFgLKFe1F/I5WC6X0tR9qa7GAxUDvs6m/Kiw0IcQB5oeu0TY2+5
+	CPdwvkySDR3x+lsVwgcRBr5yExYwXrn7HLmbgxoWm937kIB6QAdzYuwMcdC4=
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6820:22a6:b0:65d:22b:415a with SMTP id
+ 006d021491bc7-662cab7e8e8mr3128180eaf.66.1769260231458; Sat, 24 Jan 2026
+ 05:10:31 -0800 (PST)
+Date: Sat, 24 Jan 2026 05:10:31 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6974c4c7.a00a0220.33ccc7.000a.GAE@google.com>
+Subject: [syzbot] [block?] INFO: task hung in read_cache_folio (5)
+From: syzbot <syzbot+90f65e574fb85432db68@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Add Lorenzo and Suren
+Hello,
 
-> Date: Fri, 23 Jan 2026 15:14:36 -0800
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    24d479d26b25 Linux 6.19-rc6
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=100033fa580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=1859476832863c41
-> dashboard link: https://syzkaller.appspot.com/bug?extid=4e70c8e0a2017b432f7a
-> compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11451b9a580000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1045e852580000
-> 
-> Downloadable assets:
-> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-24d479d2.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/d0f3c47f6869/vmlinux-24d479d2.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/800231513703/bzImage-24d479d2.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+4e70c8e0a2017b432f7a@syzkaller.appspotmail.com
-> 
-> WARNING: possible circular locking dependency detected
-> syzkaller #0 Not tainted
-> ------------------------------------------------------
-> syz.0.17/6091 is trying to acquire lock:
-> ffff8881061287a8 (
-> &sb->s_type->i_mutex_key#8){++++}-{4:4}, at: inode_lock_shared include/linux/fs.h:1042 [inline]
-> &sb->s_type->i_mutex_key#8){++++}-{4:4}, at: blkdev_read_iter+0x19e/0x500 block/fops.c:855
-> 
-> but task is already holding lock:
-> ffff888012aa0448 (vm_lock){++++}-{0:0}, at: lock_next_vma+0x10e/0xed0 mm/mmap_lock.c:334
-> 
-> which lock already depends on the new lock.
-> 
-> 
-> the existing dependency chain (in reverse order) is:
-> 
-> -> #2 (vm_lock){++++}-{0:0}:
->        __vma_enter_locked+0x260/0x770 mm/mmap_lock.c:72
->        __vma_start_write+0x21/0x160 mm/mmap_lock.c:104
->        vma_start_write include/linux/mmap_lock.h:213 [inline]
->        mprotect_fixup+0x4e3/0xb80 mm/mprotect.c:768
->        setup_arg_pages+0x4a2/0xbb0 fs/exec.c:670
->        load_elf_binary+0xb5b/0x4fe0 fs/binfmt_elf.c:1028
->        search_binary_handler fs/exec.c:1669 [inline]
->        exec_binprm fs/exec.c:1701 [inline]
->        bprm_execve fs/exec.c:1753 [inline]
->        bprm_execve+0x8c2/0x1620 fs/exec.c:1729
->        kernel_execve+0x2ef/0x3b0 fs/exec.c:1919
->        try_to_run_init_process init/main.c:1506 [inline]
->        kernel_init+0x14a/0x2b0 init/main.c:1634
->        ret_from_fork+0x983/0xb10 arch/x86/kernel/process.c:158
->        ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
-> 
-> -> #1 (&mm->mmap_lock){++++}-{4:4}:
->        __might_fault mm/memory.c:7174 [inline]
->        __might_fault+0x113/0x190 mm/memory.c:7168
->        _copy_to_iter+0x1c2/0x1710 lib/iov_iter.c:196
->        copy_page_to_iter lib/iov_iter.c:374 [inline]
->        copy_page_to_iter+0x12a/0x1e0 lib/iov_iter.c:361
->        copy_folio_to_iter include/linux/uio.h:204 [inline]
->        filemap_read+0x6b1/0xe40 mm/filemap.c:2851
->        blkdev_read_iter+0x1ac/0x500 block/fops.c:856
->        new_sync_read fs/read_write.c:491 [inline]
->        vfs_read+0x8bf/0xcf0 fs/read_write.c:572
->        ksys_read+0x12a/0x250 fs/read_write.c:715
->        do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->        do_syscall_64+0xcd/0xf80 arch/x86/entry/syscall_64.c:94
->        entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> -> #0 (&sb->s_type->i_mutex_key#8){++++}-{4:4}:
->        check_prev_add kernel/locking/lockdep.c:3165 [inline]
->        check_prevs_add kernel/locking/lockdep.c:3284 [inline]
->        validate_chain kernel/locking/lockdep.c:3908 [inline]
->        __lock_acquire+0x1669/0x2890 kernel/locking/lockdep.c:5237
->        lock_acquire kernel/locking/lockdep.c:5868 [inline]
->        lock_acquire+0x179/0x330 kernel/locking/lockdep.c:5825
->        down_read+0x9b/0x460 kernel/locking/rwsem.c:1537
->        inode_lock_shared include/linux/fs.h:1042 [inline]
->        blkdev_read_iter+0x19e/0x500 block/fops.c:855
->        __kernel_read+0x3f3/0xbf0 fs/read_write.c:530
->        freader_fetch+0x1d7/0x9d0 lib/buildid.c:100
->        __build_id_parse.isra.0+0xdd/0x6c0 lib/buildid.c:297
->        do_procmap_query+0xb0e/0x1080 fs/proc/task_mmu.c:733
->        procfs_procmap_ioctl+0x9d/0xe0 fs/proc/task_mmu.c:813
->        vfs_ioctl fs/ioctl.c:51 [inline]
->        __do_sys_ioctl fs/ioctl.c:597 [inline]
->        __se_sys_ioctl fs/ioctl.c:583 [inline]
->        __x64_sys_ioctl+0x18e/0x210 fs/ioctl.c:583
->        do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->        do_syscall_64+0xcd/0xf80 arch/x86/entry/syscall_64.c:94
->        entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> other info that might help us debug this:
-> 
-> Chain exists of:
->   &sb->s_type->i_mutex_key#8 --> &mm->mmap_lock --> vm_lock
-> 
->  Possible unsafe locking scenario:
-> 
->        CPU0                    CPU1
->        ----                    ----
->   rlock(vm_lock);
->                                lock(&mm->mmap_lock);
->                                lock(vm_lock);
->   rlock(&sb->s_type->i_mutex_key#8);
-> 
->  *** DEADLOCK ***
-> 
-> 1 lock held by syz.0.17/6091:
->  #0: ffff888012aa0448 (vm_lock){++++}-{0:0}, at: lock_next_vma+0x10e/0xed0 mm/mmap_lock.c:334
-> 
-> stack backtrace:
-> CPU: 2 UID: 0 PID: 6091 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-> Call Trace:
->  <TASK>
->  __dump_stack lib/dump_stack.c:94 [inline]
->  dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
->  print_circular_bug+0x275/0x340 kernel/locking/lockdep.c:2043
->  check_noncircular+0x146/0x160 kernel/locking/lockdep.c:2175
->  check_prev_add kernel/locking/lockdep.c:3165 [inline]
->  check_prevs_add kernel/locking/lockdep.c:3284 [inline]
->  validate_chain kernel/locking/lockdep.c:3908 [inline]
->  __lock_acquire+0x1669/0x2890 kernel/locking/lockdep.c:5237
->  lock_acquire kernel/locking/lockdep.c:5868 [inline]
->  lock_acquire+0x179/0x330 kernel/locking/lockdep.c:5825
->  down_read+0x9b/0x460 kernel/locking/rwsem.c:1537
->  inode_lock_shared include/linux/fs.h:1042 [inline]
->  blkdev_read_iter+0x19e/0x500 block/fops.c:855
->  __kernel_read+0x3f3/0xbf0 fs/read_write.c:530
->  freader_fetch+0x1d7/0x9d0 lib/buildid.c:100
->  __build_id_parse.isra.0+0xdd/0x6c0 lib/buildid.c:297
->  do_procmap_query+0xb0e/0x1080 fs/proc/task_mmu.c:733
->  procfs_procmap_ioctl+0x9d/0xe0 fs/proc/task_mmu.c:813
->  vfs_ioctl fs/ioctl.c:51 [inline]
->  __do_sys_ioctl fs/ioctl.c:597 [inline]
->  __se_sys_ioctl fs/ioctl.c:583 [inline]
->  __x64_sys_ioctl+0x18e/0x210 fs/ioctl.c:583
->  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->  do_syscall_64+0xcd/0xf80 arch/x86/entry/syscall_64.c:94
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7ff1a238f7c9
-> Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007ffebbe538b8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-> RAX: ffffffffffffffda RBX: 00007ff1a25e5fa0 RCX: 00007ff1a238f7c9
-> RDX: 0000200000000180 RSI: 00000000c0686611 RDI: 0000000000000004
-> RBP: 00007ff1a2413f91 R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-> R13: 00007ff1a25e5fa0 R14: 00007ff1a25e5fa0 R15: 0000000000000003
->  </TASK>
+syzbot found the following issue on:
+
+HEAD commit:    24d479d26b25 Linux 6.19-rc6
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1248cd22580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=9ec857cfb59de463
+dashboard link: https://syzkaller.appspot.com/bug?extid=90f65e574fb85432db68
+compiler:       aarch64-linux-gnu-gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: arm
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/fa3fbcfdac58/non_bootable_disk-24d479d2.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/f4a697aeae5b/vmlinux-24d479d2.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/df285e089d77/zImage-24d479d2.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+90f65e574fb85432db68@syzkaller.appspotmail.com
+
+INFO: task udevd:6058 blocked for more than 430 seconds.
+      Not tainted syzkaller #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:udevd           state:D stack:0     pid:6058  tgid:6058  ppid:3136   task_flags:0x400140 flags:0x00000019
+Call trace:
+ __switch_to+0x208/0x4f0 arch/arm64/kernel/process.c:742 (T)
+ context_switch kernel/sched/core.c:5260 [inline]
+ __schedule+0xcfc/0x2fec kernel/sched/core.c:6867
+ __schedule_loop kernel/sched/core.c:6949 [inline]
+ schedule+0xd0/0x344 kernel/sched/core.c:6964
+ io_schedule+0xac/0x114 kernel/sched/core.c:7791
+ folio_wait_bit_common+0x2a4/0x630 mm/filemap.c:1323
+ folio_put_wait_locked mm/filemap.c:1487 [inline]
+ do_read_cache_folio+0x240/0x3f4 mm/filemap.c:4078
+ read_cache_folio+0x44/0x6c mm/filemap.c:4128
+ read_mapping_folio include/linux/pagemap.h:1017 [inline]
+ read_part_sector+0xac/0x5f4 block/partitions/core.c:722
+ msdos_partition+0xe4/0x1f3c block/partitions/msdos.c:592
+ check_partition block/partitions/core.c:141 [inline]
+ blk_add_partitions block/partitions/core.c:589 [inline]
+ bdev_disk_changed+0x504/0xf08 block/partitions/core.c:693
+ blkdev_get_whole+0x144/0x1e4 block/bdev.c:765
+ bdev_open+0x1dc/0xa84 block/bdev.c:974
+ blkdev_open+0x270/0x3dc block/fops.c:698
+ do_dentry_open+0x3f4/0x10e4 fs/open.c:962
+ vfs_open+0x5c/0x2fc fs/open.c:1094
+ do_open fs/namei.c:4637 [inline]
+ path_openat+0x17f0/0x28cc fs/namei.c:4796
+ do_filp_open+0x184/0x360 fs/namei.c:4823
+ do_sys_openat2+0xe0/0x188 fs/open.c:1430
+ do_sys_open fs/open.c:1436 [inline]
+ __do_sys_openat fs/open.c:1452 [inline]
+ __se_sys_openat fs/open.c:1447 [inline]
+ __arm64_sys_openat+0x12c/0x1bc fs/open.c:1447
+ __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+ invoke_syscall+0x6c/0x258 arch/arm64/kernel/syscall.c:49
+ el0_svc_common.constprop.0+0xac/0x230 arch/arm64/kernel/syscall.c:132
+ do_el0_svc+0x40/0x58 arch/arm64/kernel/syscall.c:151
+ el0_svc+0x54/0x2b0 arch/arm64/kernel/entry-common.c:724
+ el0t_64_sync_handler+0xa0/0xe4 arch/arm64/kernel/entry-common.c:743
+ el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:596
+
+Showing all locks held in the system:
+1 lock held by khungtaskd/32:
+ #0: ffff800087552ae0 (rcu_read_lock){....}-{1:3}, at: debug_show_all_locks+0x18/0x1c4 kernel/locking/lockdep.c:6769
+4 locks held by kworker/1:2/912:
+ #0: ffff00000dc29948 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work+0x6f8/0x18d4 kernel/workqueue.c:3232
+ #1: ffff80008ec17c90 ((work_completion)(&helper->damage_work)){+.+.}-{0:0}, at: psi_task_switch+0x60/0x804 kernel/sched/psi.c:933
+ #2: ffff00000fb4e160 (&helper->damage_lock){....}-{3:3}, at: drm_fb_helper_fb_dirty drivers/gpu/drm/drm_fb_helper.c:340 [inline]
+ #2: ffff00000fb4e160 (&helper->damage_lock){....}-{3:3}, at: drm_fb_helper_damage_work+0x188/0x5d8 drivers/gpu/drm/drm_fb_helper.c:372
+ #3: ffff00001489a128 (&dev->master_mutex){+.+.}-{4:4}, at: drm_master_internal_acquire+0x24/0x6c drivers/gpu/drm/drm_auth.c:435
+1 lock held by syslogd/3121:
+2 locks held by getty/3259:
+ #0: ffff00001373d0a0 (&tty->ldisc_sem){++++}-{0:0}, at: ldsem_down_read+0x3c/0x4c drivers/tty/tty_ldsem.c:340
+ #1: ffff80008d8eb2f0 (&ldata->atomic_read_lock){+.+.}-{4:4}, at: n_tty_read+0x3e8/0xdd0 drivers/tty/n_tty.c:2211
+1 lock held by syz-executor/3321:
+2 locks held by kworker/u8:10/4327:
+ #0: ffff00000dc31148 ((wq_completion)events_unbound#2){+.+.}-{0:0}, at: process_one_work+0x6f8/0x18d4 kernel/workqueue.c:3232
+ #1: ffff80008f437c90 ((work_completion)(&sub_info->work)){+.+.}-{0:0}, at: process_one_work+0x71c/0x18d4 kernel/workqueue.c:3232
+2 locks held by kworker/u8:11/4332:
+ #0: ffff00000dc31148 ((wq_completion)events_unbound#2){+.+.}-{0:0}, at: process_one_work+0x6f8/0x18d4 kernel/workqueue.c:3232
+ #1: ffff80008f417c90 ((work_completion)(&sub_info->work)){+.+.}-{0:0}, at: process_one_work+0x71c/0x18d4 kernel/workqueue.c:3232
+1 lock held by udevd/6058:
+ #0: ffff000015305358 (&disk->open_mutex){+.+.}-{4:4}, at: bdev_open+0x2c4/0xa84 block/bdev.c:962
+2 locks held by kworker/u8:1/6356:
+ #0: ffff00000dc31148 ((wq_completion)events_unbound#2){+.+.}-{0:0}, at: process_one_work+0x6f8/0x18d4 kernel/workqueue.c:3232
+ #1: ffff8000a1f27c90 ((work_completion)(&sub_info->work)){+.+.}-{0:0}, at: process_one_work+0x71c/0x18d4 kernel/workqueue.c:3232
+1 lock held by syz.0.1250/7258:
+ #0: ffff000015305358 (&disk->open_mutex){+.+.}-{4:4}, at: bdev_open+0x84/0xa84 block/bdev.c:962
+3 locks held by modprobe/7800:
+2 locks held by modprobe/7802:
+2 locks held by kworker/u8:11/7804:
+
+=============================================
+
+INFO: task udevd:6058 blocked for more than 451 seconds.
+      Not tainted syzkaller #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:udevd           state:D stack:0     pid:6058  tgid:6058  ppid:3136   task_flags:0x400140 flags:0x00000019
+Call trace:
+ __switch_to+0x208/0x4f0 arch/arm64/kernel/process.c:742 (T)
+ context_switch kernel/sched/core.c:5260 [inline]
+ __schedule+0xcfc/0x2fec kernel/sched/core.c:6867
+ __schedule_loop kernel/sched/core.c:6949 [inline]
+ schedule+0xd0/0x344 kernel/sched/core.c:6964
+ io_schedule+0xac/0x114 kernel/sched/core.c:7791
+ folio_wait_bit_common+0x2a4/0x630 mm/filemap.c:1323
+ folio_put_wait_locked mm/filemap.c:1487 [inline]
+ do_read_cache_folio+0x240/0x3f4 mm/filemap.c:4078
+ read_cache_folio+0x44/0x6c mm/filemap.c:4128
+ read_mapping_folio include/linux/pagemap.h:1017 [inline]
+ read_part_sector+0xac/0x5f4 block/partitions/core.c:722
+ msdos_partition+0xe4/0x1f3c block/partitions/msdos.c:592
+ check_partition block/partitions/core.c:141 [inline]
+ blk_add_partitions block/partitions/core.c:589 [inline]
+ bdev_disk_changed+0x504/0xf08 block/partitions/core.c:693
+ blkdev_get_whole+0x144/0x1e4 block/bdev.c:765
+ bdev_open+0x1dc/0xa84 block/bdev.c:974
+ blkdev_open+0x270/0x3dc block/fops.c:698
+ do_dentry_open+0x3f4/0x10e4 fs/open.c:962
+ vfs_open+0x5c/0x2fc fs/open.c:1094
+ do_open fs/namei.c:4637 [inline]
+ path_openat+0x17f0/0x28cc fs/namei.c:4796
+ do_filp_open+0x184/0x360 fs/namei.c:4823
+ do_sys_openat2+0xe0/0x188 fs/open.c:1430
+ do_sys_open fs/open.c:1436 [inline]
+ __do_sys_openat fs/open.c:1452 [inline]
+ __se_sys_openat fs/open.c:1447 [inline]
+ __arm64_sys_openat+0x12c/0x1bc fs/open.c:1447
+ __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+ invoke_syscall+0x6c/0x258 arch/arm64/kernel/syscall.c:49
+ el0_svc_common.constprop.0+0xac/0x230 arch/arm64/kernel/syscall.c:132
+ do_el0_svc+0x40/0x58 arch/arm64/kernel/syscall.c:151
+ el0_svc+0x54/0x2b0 arch/arm64/kernel/entry-common.c:724
+ el0t_64_sync_handler+0xa0/0xe4 arch/arm64/kernel/entry-common.c:743
+ el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:596
+
+Showing all locks held in the system:
+1 lock held by rcu_preempt/15:
+1 lock held by khungtaskd/32:
+ #0: ffff800087552ae0 (rcu_read_lock){....}-{1:3}, at: debug_show_all_locks+0x18/0x1c4 kernel/locking/lockdep.c:6769
+1 lock held by syslogd/3121:
+2 locks held by dhcpcd/3165:
+ #0: ffff800088b7e8a8 (vlan_ioctl_mutex){+.+.}-{4:4}, at: sock_ioctl+0x418/0x5d4 net/socket.c:1337
+ #1: ffff800088ba83c8 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x1c/0x28 net/core/rtnetlink.c:80
+2 locks held by getty/3259:
+ #0: ffff00001373d0a0 (&tty->ldisc_sem){++++}-{0:0}, at: ldsem_down_read+0x3c/0x4c drivers/tty/tty_ldsem.c:340
+ #1: ffff80008d8eb2f0 (&ldata->atomic_read_lock){+.+.}-{4:4}, at: n_tty_read+0x3e8/0xdd0 drivers/tty/n_tty.c:2211
+5 locks held by kworker/u8:11/4332:
+ #0: ffff00000e16b948 ((wq_completion)netns){+.+.}-{0:0}, at: process_one_work+0x6f8/0x18d4 kernel/workqueue.c:3232
+ #1: ffff80008f417c90 (net_cleanup_work){+.+.}-{0:0}, at: process_one_work+0x71c/0x18d4 kernel/workqueue.c:3232
+ #2: ffff800088b93230 (pernet_ops_rwsem){++++}-{4:4}, at: cleanup_net+0xdc/0x75c net/core/net_namespace.c:670
+ #3: ffff800088ba83c8 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x1c/0x28 net/core/rtnetlink.c:80
+ #4: ffff80008755b5f8 (rcu_state.exp_mutex){+.+.}-{4:4}, at: exp_funnel_lock+0x250/0x364 kernel/rcu/tree_exp.h:311
+3 locks held by kworker/u8:0/5452:
+1 lock held by udevd/6058:
+ #0: ffff000015305358 (&disk->open_mutex){+.+.}-{4:4}, at: bdev_open+0x2c4/0xa84 block/bdev.c:962
+1 lock held by syz.0.1250/7258:
+ #0: ffff000015305358 (&disk->open_mutex){+.+.}-{4:4}, at: bdev_open+0x84/0xa84 block/bdev.c:962
+3 locks held by kworker/u8:6/7811:
+ #0: ffff00000dc31948 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_one_work+0x6f8/0x18d4 kernel/workqueue.c:3232
+ #1: ffff80008e307c90 ((linkwatch_work).work){+.+.}-{0:0}, at: process_one_work+0x71c/0x18d4 kernel/workqueue.c:3232
+ #2: ffff800088ba83c8 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock+0x1c/0x28 net/core/rtnetlink.c:80
+
+=============================================
+
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
