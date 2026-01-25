@@ -1,60 +1,76 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7045A313524
-	for <linux-block@vger.kernel.org>; Sun, 25 Jan 2026 22:49:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 176C92F3622;
+	Sun, 25 Jan 2026 22:49:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769381353; cv=none; b=q7BcjNxQWo+kOOHeVgpwhKkDxYZMTLqc4w24jZrV3TjNnqrXp9JBq9sAOXyhL/qPNn13aiPYmw7w7tlwcc1lCkSmcHJWn95XcuF8pXn/17cFN4Ix28OfGR4gbys3sIsPE9y32C4V8ON4StZKvgJ8rxLGP23z3ZPXAxseDIB3+lU=
+	t=1769381356; cv=none; b=OMBx8omxEIfVH3q6wUzs65Bc3vnV2HETm0biXqpqFxSp//KSML9EiLOYMW5EQ+ZIdVFOqZMlfEQHZJhTLFuzMhyJo6wkRpHT+f49LH2rYZg2B+BwDBLR5yUKBCWfYh6QYdAWSOdzm6Ki/zzwnQEgA0RZSn9aDXVmr8GXUixxowQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769381353; c=relaxed/simple;
-	bh=RJO/MvwbYDEQp0k95rEjr9lDrEPQqukhw1O/1fvjT4M=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PcHtvN4ueHgKVRHGtQtIJO/FIUuVqiYMBwxwFrrjMI9Vn/q2etdJkMpQthMJoaeM1hQ05zMFWSh1moOiQRI88VYNNmuFyObjL9nptnr53klkdZTnEDOEcFssoh1TldYzX/oGTxCf+DEzBHFgf4GtisJKKrC8IdhBJs4ZIaEIdcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=L4Ixu66j; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=L4Ixu66j; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1769381356; c=relaxed/simple;
+	bh=FQiUYX134QuRdMK2UHqgCPVDFLi7Mj4zGAJtAEtu0Bs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=VLID/FnuEhWbexYSvAKYtEpUayh9fwrjZuk1IHBcig0iPNvOOIJ0/QIq3PdPcICQTvTQRQZPEa9OrXlLRQ7zyq2539p84TXpZ9iQRLbFNo6Ni3M0YuIStXESvQ5MJH0sbKGSrN6WIMULI6ZNWHNPNXFIMUD7m13R+mQ3BZCTdZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UgViSQhG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="L4Ixu66j";
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="L4Ixu66j"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 8972D5BCCC;
-	Sun, 25 Jan 2026 22:49:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1769381348; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=yh5iTP+2dJxVBlOnph6ReIH+YRVU5WTjTFDh56g+p0E=;
-	b=L4Ixu66j4Vp5GTLyMgv7WPl+a/k0gY2NEjpNgawS86kB/urSx6FvEnVTrixDvxU6Thn//m
-	K05lazWqki4ABp8JSKqB6s1jiHOchDJD8g6+mvz+xDzSz6yxVDH0vIDfuZLeytzIdgIF/e
-	xHvNhtlhsRVknIWDqgJTocfVjycxZOU=
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1769381348; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=yh5iTP+2dJxVBlOnph6ReIH+YRVU5WTjTFDh56g+p0E=;
-	b=L4Ixu66j4Vp5GTLyMgv7WPl+a/k0gY2NEjpNgawS86kB/urSx6FvEnVTrixDvxU6Thn//m
-	K05lazWqki4ABp8JSKqB6s1jiHOchDJD8g6+mvz+xDzSz6yxVDH0vIDfuZLeytzIdgIF/e
-	xHvNhtlhsRVknIWDqgJTocfVjycxZOU=
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 342F8139E9;
-	Sun, 25 Jan 2026 22:49:06 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id ZNohNeKddmnSTAAAD6G6ig
-	(envelope-from <wqu@suse.com>); Sun, 25 Jan 2026 22:49:06 +0000
-From: Qu Wenruo <wqu@suse.com>
-To: linux-btrfs@vger.kernel.org
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 0/9] btrfs: used compressed_bio structure for writes
-Date: Mon, 26 Jan 2026 09:18:39 +1030
-Message-ID: <cover.1769381237.git.wqu@suse.com>
-X-Mailer: git-send-email 2.52.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UgViSQhG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1ECDC2BC87;
+	Sun, 25 Jan 2026 22:49:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769381355;
+	bh=FQiUYX134QuRdMK2UHqgCPVDFLi7Mj4zGAJtAEtu0Bs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=UgViSQhGT3Wuke/Yit+vSr4vsPQsGUB9TksMilPkbw8ucPH88dnfcU8EQRgMLb06e
+	 lN2gyJnxemaInoGQz3B75xDql7Evl1TQQ4zZmMsXAnbD1Urr7NwOnt6wOnaYCOQeeQ
+	 sgfXCryqqyMrpzQwx8K3coFYao2XKspATR/APoqQUbITIoNDoEi47ehdm2MK1mENnZ
+	 ywxEht8+8pss3W8QMkb/rQLYybf1dBhLQUt9LxeRxUkMJZvTICvHfAVqI24kffYkw6
+	 adk3FM+FdCMT9PgkO4j8TJQKImvmwOStO+j50JTiTr4NKwPRgOc7x/stxI36amWxYC
+	 ikhAsOpNxxM2A==
+From: Frederic Weisbecker <frederic@kernel.org>
+To: LKML <linux-kernel@vger.kernel.org>
+Cc: Frederic Weisbecker <frederic@kernel.org>,
+	=?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Chen Ridong <chenridong@huawei.com>,
+	Danilo Krummrich <dakr@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Gabriele Monaco <gmonaco@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Muchun Song <muchun.song@linux.dev>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Phil Auld <pauld@redhat.com>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Simon Horman <horms@kernel.org>,
+	Tejun Heo <tj@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Waiman Long <longman@redhat.com>,
+	Will Deacon <will@kernel.org>,
+	cgroups@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-pci@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH 25/33] kthread: Include unbound kthreads in the managed affinity list
+Date: Sun, 25 Jan 2026 23:45:32 +0100
+Message-ID: <20260125224541.50226-26-frederic@kernel.org>
+X-Mailer: git-send-email 2.51.1
+In-Reply-To: <20260125224541.50226-1-frederic@kernel.org>
+References: <20260125224541.50226-1-frederic@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -62,145 +78,122 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Score: -2.80
-X-Spamd-Result: default: False [-2.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCPT_COUNT_TWO(0.00)[2];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DKIM_SIGNED(0.00)[suse.com:s=susede1];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCVD_TLS_ALL(0.00)[]
-X-Spam-Level: 
-X-Spam-Flag: NO
 
-Cc: linux-block@vger.kernel.org
+The managed affinity list currently contains only unbound kthreads that
+have affinity preferences. Unbound kthreads globally affine by default
+are outside of the list because their affinity is automatically managed
+by the scheduler (through the fallback housekeeping mask) and by cpuset.
 
-Cc bio people first, there are some uncertain/tricky usage of the bio
-structure:
+However in order to preserve the preferred affinity of kthreads, cpuset
+will delegate the isolated partition update propagation to the
+housekeeping and kthread code.
 
-- Is it a good idea to queue unaligned range into a bio?
+Prepare for that with including all unbound kthreads in the managed
+affinity list.
 
-  Bio means Block IO, but bio_add_*() never requires alignment (to 512
-  bytes), so not sure if this is expected or not.
-  Only the bi_sector is sector related.
+Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+Reviewed-by: Waiman Long <longman@redhat.com>
+---
+ kernel/kthread.c | 70 ++++++++++++++++++++++++++++--------------------
+ 1 file changed, 41 insertions(+), 29 deletions(-)
 
-  Thus this patch is queuing a lot of unaligned range into a bio,
-  especially for LZO cases.
-  (ZLIB and ZSTD are properly filling all folios except the last one)
-
-  But the end result should still be fine, most ranges (except the last
-  block) will be properly merged and fill a full folio.
-  Most unaligned parts will only be temporary before merge.
-
-  Btrfs internally has extra alignment checks thus an unaligned 
-  bio will never be submitted.
-
-- Will there be a public helper to "round up" a bio
-
-  Since we have unaligned bios, we will need to round them up before
-  submission.
-  For now I'm using internal helpers to do that, but a public helper
-  will be appreciated.
-
-The remaining part are all btrfs specific.
-
-I was never a huge fan of the current btrfs_compress_folios() interface:
-
-- Complex and duplicated parameter list
-
-  * A folio array to hold all folios
-    Which means extra error handling.
-
-  * A @nr_folios pointer
-    That pointer is both input and output, representing the number of max
-    folios, but also the number of compressed folios.
-
-    The number of input folios is not really necessary, it's always no
-    larger than DIV_ROUND_UP(len, PAGE_SIZE) in the first place.
-
-  * A @total_in pointer
-    Again an pointer as both input and output, representing the filemap
-    range length, and how many bytes are compressed in this run.
-
-    However if we failed to compress the full range, all supported
-    algorithms will return an error, thus fallback to uncompressed path.
-
-    Thus there is no need to use it as an output pointer.
-
-  * A @total_compressed point
-    Again an pointer as both input and output, representing the max
-    number of compressed size, and the final compressed size.
-
-    However we do not need it as an input at all, we always error out
-    if the compressed size is larger than the original size.
-
-- Extra error cleanup handling
-
-  We need to cleanup the compressed_folios[] array during error
-  handling.
-
-Replace the old btrfs_compress_folios() interface with
-btrfs_compress_bio(), which has the following benefits:
-
-- Simplified parameter list
-
-  * inode
-  * start
-  * len
-  * compress_type
-  * compress_level 
-  * write_flags
-
-    No parameter is sharing input and output members, and all are very
-    straightforward (except the last write_flags, which is just an extra
-    bio flag).
-
-- Directly return a compressed_bio structure
-
-  With minor modifications, that pointer can be passed to
-  btrfs_submit_bio().
-
-  The caller still needs to do proper round up and fill the proper
-  disk_bytenr/num_bytes before submission.
-
-  And for error handling, simply call cleanup_compressed_bio() then
-  everything is cleaned up properly (at least I hope so).
-
-- No more extra folios array passing and error handling
-
-
-Qu Wenruo (9):
-  btrfs: introduce lzo_compress_bio() helper
-  btrfs: introduce zstd_compress_bio() helper
-  btrfs: introduce zlib_compress_bio() helper
-  btrfs: introduce btrfs_compress_bio() helper
-  btrfs: switch to btrfs_compress_bio() interface for compressed writes
-  btrfs: remove the old btrfs_compress_folios() infrastructures
-  btrfs: get rid of compressed_folios[] usage for compressed read
-  btrfs: get rid of compressed_folios[] usage for encoded writes
-  btrfs: get rid of compressed_bio::compressed_folios[]
-
- fs/btrfs/compression.c | 205 +++++++++++++++++--------------------
- fs/btrfs/compression.h |  40 ++++----
- fs/btrfs/inode.c       | 217 ++++++++++++++++++++-------------------
- fs/btrfs/lzo.c         | 223 +++++++++++++++++++++++++++--------------
- fs/btrfs/zlib.c        |  64 ++++++------
- fs/btrfs/zstd.c        |  69 ++++++-------
- 6 files changed, 434 insertions(+), 384 deletions(-)
-
+diff --git a/kernel/kthread.c b/kernel/kthread.c
+index f1e4f1f35cae..51c0908d3d02 100644
+--- a/kernel/kthread.c
++++ b/kernel/kthread.c
+@@ -365,9 +365,10 @@ static void kthread_fetch_affinity(struct kthread *kthread, struct cpumask *cpum
+ 	if (kthread->preferred_affinity) {
+ 		pref = kthread->preferred_affinity;
+ 	} else {
+-		if (WARN_ON_ONCE(kthread->node == NUMA_NO_NODE))
+-			return;
+-		pref = cpumask_of_node(kthread->node);
++		if (kthread->node == NUMA_NO_NODE)
++			pref = housekeeping_cpumask(HK_TYPE_KTHREAD);
++		else
++			pref = cpumask_of_node(kthread->node);
+ 	}
+ 
+ 	cpumask_and(cpumask, pref, housekeeping_cpumask(HK_TYPE_KTHREAD));
+@@ -380,32 +381,29 @@ static void kthread_affine_node(void)
+ 	struct kthread *kthread = to_kthread(current);
+ 	cpumask_var_t affinity;
+ 
+-	WARN_ON_ONCE(kthread_is_per_cpu(current));
++	if (WARN_ON_ONCE(kthread_is_per_cpu(current)))
++		return;
+ 
+-	if (kthread->node == NUMA_NO_NODE) {
+-		housekeeping_affine(current, HK_TYPE_KTHREAD);
+-	} else {
+-		if (!zalloc_cpumask_var(&affinity, GFP_KERNEL)) {
+-			WARN_ON_ONCE(1);
+-			return;
+-		}
+-
+-		mutex_lock(&kthread_affinity_lock);
+-		WARN_ON_ONCE(!list_empty(&kthread->affinity_node));
+-		list_add_tail(&kthread->affinity_node, &kthread_affinity_list);
+-		/*
+-		 * The node cpumask is racy when read from kthread() but:
+-		 * - a racing CPU going down will either fail on the subsequent
+-		 *   call to set_cpus_allowed_ptr() or be migrated to housekeepers
+-		 *   afterwards by the scheduler.
+-		 * - a racing CPU going up will be handled by kthreads_online_cpu()
+-		 */
+-		kthread_fetch_affinity(kthread, affinity);
+-		set_cpus_allowed_ptr(current, affinity);
+-		mutex_unlock(&kthread_affinity_lock);
+-
+-		free_cpumask_var(affinity);
++	if (!zalloc_cpumask_var(&affinity, GFP_KERNEL)) {
++		WARN_ON_ONCE(1);
++		return;
+ 	}
++
++	mutex_lock(&kthread_affinity_lock);
++	WARN_ON_ONCE(!list_empty(&kthread->affinity_node));
++	list_add_tail(&kthread->affinity_node, &kthread_affinity_list);
++	/*
++	 * The node cpumask is racy when read from kthread() but:
++	 * - a racing CPU going down will either fail on the subsequent
++	 *   call to set_cpus_allowed_ptr() or be migrated to housekeepers
++	 *   afterwards by the scheduler.
++	 * - a racing CPU going up will be handled by kthreads_online_cpu()
++	 */
++	kthread_fetch_affinity(kthread, affinity);
++	set_cpus_allowed_ptr(current, affinity);
++	mutex_unlock(&kthread_affinity_lock);
++
++	free_cpumask_var(affinity);
+ }
+ 
+ static int kthread(void *_create)
+@@ -919,8 +917,22 @@ static int kthreads_online_cpu(unsigned int cpu)
+ 			ret = -EINVAL;
+ 			continue;
+ 		}
+-		kthread_fetch_affinity(k, affinity);
+-		set_cpus_allowed_ptr(k->task, affinity);
++
++		/*
++		 * Unbound kthreads without preferred affinity are already affine
++		 * to housekeeping, whether those CPUs are online or not. So no need
++		 * to handle newly online CPUs for them.
++		 *
++		 * But kthreads with a preferred affinity or node are different:
++		 * if none of their preferred CPUs are online and part of
++		 * housekeeping at the same time, they must be affine to housekeeping.
++		 * But as soon as one of their preferred CPU becomes online, they must
++		 * be affine to them.
++		 */
++		if (k->preferred_affinity || k->node != NUMA_NO_NODE) {
++			kthread_fetch_affinity(k, affinity);
++			set_cpus_allowed_ptr(k->task, affinity);
++		}
+ 	}
+ 
+ 	free_cpumask_var(affinity);
 -- 
-2.52.0
+2.51.1
 
