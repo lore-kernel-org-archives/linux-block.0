@@ -1,208 +1,91 @@
-Received: from mail.itpri.com (mx1.itpri.com [185.125.111.158])
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A33E1E0E14;
-	Sun, 25 Jan 2026 18:35:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.111.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9012C23645D
+	for <linux-block@vger.kernel.org>; Sun, 25 Jan 2026 19:46:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769366141; cv=none; b=n0eD9l3xypbATOkRV/0fTOm11ImKsWxYDpZCmPiireK5xbo06Owo8TpIQjkNlSXgRE+gR3eQ4u613tU294jAiPAxyLcjNrjdiuEECtPZQpBA1odL2UEE2EWP5QUx7eME0Z1mBHxakW2004SFf9uneiA82zIm+L2tgC1s3SyBL54=
+	t=1769370394; cv=none; b=NacuAPJ77Dat+G7OyVvAKvIKmK+CIwJZ92w2KzrXMk1rKhcxGLEAbRnZRrNX2qaULjs3F6LuRoTzKt0pnEJyxynrVMeDNnp69KMeHIaE6a4lTLzqHKR/mQJU8SwXryDeqyetme4/nN4Yrupi9p7PUBizZAq/ivo3IEras5JyrBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769366141; c=relaxed/simple;
-	bh=/+JWKCl/rMmMylcDCp60yI7tIO/uuQl3FBnTc6hQyng=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Uf7xAxyAPbFfMMc+K5C9kYkGQkUHwm1GmTnm2H9pL6Mzsi9haQ3dqedX+/HN8P94edtOWdJWV/J05NB/KNv9JfeVsOTApBlUW1gDRAbJdSYR4DXmYg3ka6WQatMLGjCs6RiXRJy9XNJyCBaUGB61pAHZ/n/wKBEWmJzEqeHe18E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zazolabs.com; spf=pass smtp.mailfrom=zazolabs.com; dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b=pbcR0W9o; arc=none smtp.client-ip=185.125.111.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zazolabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zazolabs.com
+	s=arc-20240116; t=1769370394; c=relaxed/simple;
+	bh=pnpfW+3fa7GgKGziyGk3v46fN4NDxNkxD05HOURtW1I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=byKeDyH5RTz3JhbbHXAOq8RsrS7IiTkyAnHDMzKEhfkp902/k5uCgKpWgvpYygHXzI0gaROe/Yxrlf36ySJYn3+mFj3gib/+r+mdUQZ6VE4B82HyBItlkjAvIRl66Z41bbrNvkGhLVdbE7CPm8QBb3EiTuxn95Gl6GQ2ymyK3VE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=j2S+hU8Q; arc=none smtp.client-ip=203.254.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b="pbcR0W9o"
-X-Virus-Scanned: Yes
-Message-ID: <c517e1ca-0e2b-4143-b0f6-07a3d0c3abcf@zazolabs.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=zazolabs.com; s=mail;
-	t=1769366136; bh=/+JWKCl/rMmMylcDCp60yI7tIO/uuQl3FBnTc6hQyng=;
-	h=Reply-To:Subject:To:Cc:References:From:In-Reply-To;
-	b=pbcR0W9oOnzO9d8lZZDDfDRngN+hxGPh9cgG7kEnWsJoUvVINyEt1xBheaKJBKCNh
-	 /yMfAKsODMUgq17C05SsX6Gp5GWua1jzD3YQREHA7KlX2BGlEYjBCXO42YnM0UZikG
-	 r26Hwa7wyGldIGYqyDZYy647Il5Ty72ghzCJ86NlbZfPnqNXcFkeJOC4F2e9zpLnZx
-	 9Rua9Lx4hNNMaebBTiSHsh2Uhn0bl1PYDOZ5QB9YYK9in5E1Cx4kSMVAPsbeW/F0hm
-	 hRrtI/JWjDMh4r7Q9WNiYn5BURpt3LiENwD1Eq+YpzxTYcaJl5clFfbNlCX1VCtS3D
-	 QQEFikF2MxGyUNvFiVY/0J3ZnhR+DZjkuy0Ih4DqNkVDevqaoaNIgtGtdU87InWeO5
-	 xNIUbZdBjIp/tskKnUBWnqhf30m51P+wEk+Li9XROJbd6EEespVjwddc659cSyiF86
-	 XYDPCygiVJBA81NDj63GSThN6muF+6XIE6fVjqj/7aaRm6/yaBGd5bH5ZXHcItJqty
-	 Cmqp9c9HA22tcqAJS8Wejeg4KL7WRXBNIZqhr6NAmlOwU0luO2EtN8/UnBlaV9CXHS
-	 pwi6OUWwMPMNz+4LJpXvnBeeAixH5uYlivZKMbS6RtIkPEIbZg7dOM2E0fJ2qhAOQB
-	 ignyJKZ1762fhyjnYnm4+7mo=
-Date: Sun, 25 Jan 2026 20:35:20 +0200
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="j2S+hU8Q"
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20260125194624epoutp0444b7639fd4224977cd110052df7ae0ff~OEP1_UAsa0259502595epoutp04O
+	for <linux-block@vger.kernel.org>; Sun, 25 Jan 2026 19:46:24 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20260125194624epoutp0444b7639fd4224977cd110052df7ae0ff~OEP1_UAsa0259502595epoutp04O
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1769370384;
+	bh=01TZlvzYtBsjbZhLHZ4rreHMj5t508L0uHzvLErt79E=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=j2S+hU8Q9aMda7RiAShlaT0F3weoz3hQBBtjrHTxqT2U52GrKIbfIiVKzJ9rjNdFK
+	 myD6VSCIsAutEWqOoFTeV4nOYDx7/75fA30YIBJBJ7Ft3BN7bJOcjgzcloqv+BmwKK
+	 GIPmUJJ2t7yielrk92nlp+dSloeTkgNqn+pjfs8I=
+Received: from epsnrtp03.localdomain (unknown [182.195.42.155]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPS id
+	20260125194623epcas5p2a76fe24f719fb026c9131beda0b5d7f7~OEP1XVGHq0871508715epcas5p20;
+	Sun, 25 Jan 2026 19:46:23 +0000 (GMT)
+Received: from epcas5p3.samsung.com (unknown [182.195.38.92]) by
+	epsnrtp03.localdomain (Postfix) with ESMTP id 4dzhxW1T0Tz3hhT3; Sun, 25 Jan
+	2026 19:46:23 +0000 (GMT)
+Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+	20260125194622epcas5p2a833c6825df4933f14d0cdf4deba1296~OEPz-Ifgh0871508715epcas5p2z;
+	Sun, 25 Jan 2026 19:46:22 +0000 (GMT)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20260125194619epsmtip1b8917c6c089783eb7d6bdeb2b45b1180~OEPxb2Ly80686606866epsmtip1c;
+	Sun, 25 Jan 2026 19:46:19 +0000 (GMT)
+Message-ID: <513ddb72-b891-48a7-a2e0-4b8a983580bf@samsung.com>
+Date: Mon, 26 Jan 2026 01:16:17 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Reply-To: alex+zkern@zazolabs.com
-Subject: Re: [PATCH] selftests: ublk: io-reorder triggered in
- test_generic_01.sh
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Shuah Khan <shuah@kernel.org>, linux-block@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260123112039.1370223-1-alex@zazolabs.com>
- <aXN4mFuoXhtJDKyF@fedora> <147635F1-943E-46D5-8EF1-D1C965F85EC1@zazolabs.com>
- <aXOGrXo3AbXPHA-K@fedora> <03C8F5B9-B2E1-4C78-A043-B4F9422508B7@zazolabs.com>
- <aXY2qdYtfVTSc7jB@fedora>
-Content-Language: en-GB
-From: Alexander Atanasov <alex@zazolabs.com>
-In-Reply-To: <aXY2qdYtfVTSc7jB@fedora>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 01/15] block: factor out a bio_integrity_action helper
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Christian
+	Brauner <brauner@kernel.org>
+Cc: "Darrick J. Wong" <djwong@kernel.org>, Carlos Maiolino <cem@kernel.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>, Anuj Gupta
+	<anuj20.g@samsung.com>, linux-block@vger.kernel.org, nvdimm@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org
+Content-Language: en-US
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <20260121064339.206019-2-hch@lst.de>
 Content-Transfer-Encoding: 7bit
+X-CMS-MailID: 20260125194622epcas5p2a833c6825df4933f14d0cdf4deba1296
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+cpgsPolicy: CPGSC10-542,Y
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20260121064649epcas5p1ce059a9a4bd5a10b231bd5fa87df87f7
+References: <20260121064339.206019-1-hch@lst.de>
+	<CGME20260121064649epcas5p1ce059a9a4bd5a10b231bd5fa87df87f7@epcas5p1.samsung.com>
+	<20260121064339.206019-2-hch@lst.de>
 
-On 25.01.26 17:28, Ming Lei wrote:
-> On Fri, Jan 23, 2026 at 05:00:33PM +0200, Alexander Atanasov wrote:
->>
->>
-
-[snip]
-
-> Can you test the following patch and see if re-order still can happen?
-> 
-> 
-> diff --git a/tools/testing/selftests/ublk/test_generic_01.sh b/tools/testing/selftests/ublk/test_generic_01.sh
-> index 26cf3c7ceeb5..26d5e52ece29 100755
-> --- a/tools/testing/selftests/ublk/test_generic_01.sh
-> +++ b/tools/testing/selftests/ublk/test_generic_01.sh
-> @@ -13,7 +13,7 @@ if ! _have_program fio; then
->   	exit "$UBLK_SKIP_CODE"
->   fi
->   
-> -_prep_test "null" "sequential io order"
-> +_prep_test "null" "ublk dispatch won't reorder IO"
->   
->   dev_id=$(_add_ublk_dev -t null)
->   _check_add_dev $TID $?
-> @@ -39,9 +39,13 @@ fio --name=write_seq \
->   ERR_CODE=$?
->   kill "$btrace_pid"
->   wait
-> -if grep -q "io_out_of_order" "$UBLK_TMP"; then
-> -	cat "$UBLK_TMP"
+On 1/21/2026 12:13 PM, Christoph Hellwig wrote:
+> +	case REQ_OP_WRITE:
+> +		/*
+> +		 * Flush masquerading as write?
+> +		 */
+> +		if (!bio_sectors(bio))
+> +			return 0;
 > +
-> +# Check for out-of-order completions detected by bpftrace
-> +if grep -q "^out_of_order:" "$UBLK_TMP"; then
-> +	echo "I/O reordering detected:"
-> +	grep "^out_of_order:" "$UBLK_TMP"
->   	ERR_CODE=255
->   fi
-> +
->   _cleanup_test "null"
->   _show_result $TID $ERR_CODE
-> diff --git a/tools/testing/selftests/ublk/trace/seq_io.bt b/tools/testing/selftests/ublk/trace/seq_io.bt
-> index b2f60a92b118..60ac40e66606 100644
-> --- a/tools/testing/selftests/ublk/trace/seq_io.bt
-> +++ b/tools/testing/selftests/ublk/trace/seq_io.bt
-> @@ -2,23 +2,45 @@
->   	$1: 	dev_t
->   	$2: 	RWBS
->   	$3:     strlen($2)
-> +
-> +	Track request order between block_io_start and block_rq_complete.
-> +	For each request, record its start sequence number and verify
-> +	completions happen in the same order.
->   */
-> +
->   BEGIN {
-> -	@last_rw[$1, str($2)] = (uint64)0;
-> +	@start_seq = (uint64)0;
-> +	@complete_seq = (uint64)0;
-> +	@out_of_order = (uint64)0;
-> +}
-> +
-> +tracepoint:block:block_io_start
-> +{
-> +	if ((int64)args.dev == $1 && !strncmp(args.rwbs, str($2), $3)) {
-> +		@start_order[args.sector] = @start_seq;
-> +		@start_seq = @start_seq + 1;
-> +	}
->   }
-> +
->   tracepoint:block:block_rq_complete
->   {
-> -	$dev = $1;
->   	if ((int64)args.dev == $1 && !strncmp(args.rwbs, str($2), $3)) {
-> -		$last = @last_rw[$dev, str($2)];
-> -		if ((uint64)args.sector != $last) {
-> -			printf("io_out_of_order: exp %llu actual %llu\n",
-> -				args.sector, $last);
-> +		$expected_order = @start_order[args.sector];
-> +		if ($expected_order != @complete_seq) {
-> +			printf("out_of_order: sector %llu started at seq %llu but completed at seq %llu\n",
-> +				args.sector, $expected_order, @complete_seq);
-> +			@out_of_order = @out_of_order + 1;
->   		}
-> -		@last_rw[$dev, str($2)] = (args.sector + args.nr_sector);
-> +		delete(@start_order[args.sector]);
-> +		@complete_seq = @complete_seq + 1;
->   	}
->   }
->   
->   END {
-> -	clear(@last_rw);
-> +	printf("total_start: %llu total_complete: %llu out_of_order: %llu\n",
-> +		@start_seq, @complete_seq, @out_of_order);
-> +	clear(@start_order);
-> +	clear(@start_seq);
-> +	clear(@complete_seq);
-> +	clear(@out_of_order);
->   }
+
+Earlier this check was happening for REQ_OP_READ too but not sure 
+whether that was superfluous or actually filtering out zero-sector 
+reads. For everything else,
+
+Reviewed-by: Kanchan Joshi <joshi.k@samsung.com>
 
 
-First run after reboot always fails:
-
-./test_generic_01.sh
-ublk selftest: generic_01 starting at 2026-01-25T19:08:47+02:00
-I/O reordering detected:
-out_of_order: sector 112040 started at seq 88 but completed at seq 0
-out_of_order: sector 112048 started at seq 89 but completed at seq 1
-out_of_order: sector 112056 started at seq 90 but completed at seq 2
-out_of_order: sector 112064 started at seq 91 but completed at seq 3
-out_of_order: sector 112072 started at seq 92 but completed at seq 4
-out_of_order: sector 112080 started at seq 93 but completed at seq 5
-out_of_order: sector 112088 started at seq 94 but completed at seq 6
-out_of_order: sector 112096 started at seq 95 but completed at seq 7
-out_of_order: sector 112104 started at seq 96 but completed at seq 8
-out_of_order: sector 112112 started at seq 97 but completed at seq 9
-out_of_order: sector 112120 started at seq 98 but completed at seq 10
-out_of_order: sector 112128 started at seq 99 but completed at seq 11
-
-[snip]
-
-out_of_order: sector 1048528 started at seq 117149 but completed at seq 
-117061
-out_of_order: sector 1048536 started at seq 117150 but completed at seq 
-117062
-out_of_order: sector 1048544 started at seq 117151 but completed at seq 
-117063
-out_of_order: sector 1048552 started at seq 117152 but completed at seq 
-117064
-out_of_order: sector 1048560 started at seq 117153 but completed at seq 
-117065
-out_of_order: sector 1048568 started at seq 117154 but completed at seq 
-117066
-ublk selftest: generic_01 done at 2026-01-25T19:08:54+02:00
-generic_01 : [FAIL]
-
-consecutive runs are okay
-
-./test_generic_01.sh
-ublk selftest: generic_01 starting at 2026-01-25T20:21:31+02:00
-ublk selftest: generic_01 done at 2026-01-25T20:21:38+02:00
-generic_01 : [PASS]
-
-I went thru the reboot cycle several times - it  repeats.
-
-Tried with and without setting the affinity - and i observed no difference.
-
-I will do some more testing but it was easier to reproduce before that 
-patch.
-
--- 
-have fun,
-alex
