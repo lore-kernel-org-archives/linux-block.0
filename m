@@ -1,82 +1,170 @@
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1C971EB5FD
-	for <linux-block@vger.kernel.org>; Sun, 25 Jan 2026 20:14:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28612823DD;
+	Sun, 25 Jan 2026 22:45:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769372094; cv=none; b=XBQw5yHcb7OigNyWdwySJZZsAi39Vx5oVR/+6L7+uQaYhHLXvBEJd+Ff6v/PdXyPWjTJ5Mx0HQkvzPpLRf6gvnUIwJRrTOgI5YdVkPox8t5GiskRwTcdyWoXfCVsyxmjrZWq3fqqCFRJ24dKEGrTKI1GMKMdhXEd3TXg/JmcX8o=
+	t=1769381153; cv=none; b=p2SDTJeLrCFaxIU31zAaSqV96t1TcZqXroiZkTGLaQv9UZoL5kY7W2pU+akPHFkRcnY6pJkK3hAtLfmS4wi73WMPeb8xNFbot9cQ12nexYv10P8C8FSIoBVg/oVa9Ij/jJNvAw0JefxjRQ1UtR8ZncMAZTJPB9ebLDfdslcQWNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769372094; c=relaxed/simple;
-	bh=OuBEfKb4DxWC/8jq3lLUOnyZkjh2+ze7Hx0jfDBe4Dk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=ZBwWsJUBOiUk38LucXREpioiMAcwBd84ufODjzGr0IlR2durBIHRGgbG92THHEnXmCeNkihMXZ/Vszha/sVMMjHgtN1JA9Sa3iwMLgv75djSU/28TpnxkGRkrNB7zyWoi8kFmMvTEmBcFzEmS1JDxED1ew+gCfonXEB7MZAee2U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=uqG9kP19; arc=none smtp.client-ip=203.254.224.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1769381153; c=relaxed/simple;
+	bh=S9vFWXhyg0MkV+tLx10WmLW7gf6qdVccxzNBP8JiVGU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MB8M7o8wab1N68PSXQddCxqO0LnueRDwE18qO62CgmMuYYanvvpVXs9HC59AEcpte8myxg+PxdK3aeK4h9o/NgK+qpSHztzZHi7EmgzG68uXQvR0W7aEu8WiZYU4cFeRKZWmecmblC6I5pcKK1KIVCS9eJPD2N5+Fa/teoQcQyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bqJjGl8d; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="uqG9kP19"
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20260125201449epoutp045b370a5a1206d88840f4a03382f8ce94~OEop4j92j1617816178epoutp044
-	for <linux-block@vger.kernel.org>; Sun, 25 Jan 2026 20:14:49 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20260125201449epoutp045b370a5a1206d88840f4a03382f8ce94~OEop4j92j1617816178epoutp044
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1769372089;
-	bh=OuBEfKb4DxWC/8jq3lLUOnyZkjh2+ze7Hx0jfDBe4Dk=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=uqG9kP19rtZSs14wvuV61aVi0lbK5ujOjhydtohKaqfMYd60QZB2LrW9JozgGTaP/
-	 g1skEaa2+sJ1a1ZWauHUZSi0Faf5D3yLWdyAITvSwmmGdAi3ITjFQa3NEYeSTCPTEM
-	 +1n8qdGUM4e9hxZ418SaGFlE65wYt2ZhB9PajEvg=
-Received: from epsnrtp04.localdomain (unknown [182.195.42.156]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPS id
-	20260125201448epcas5p364329e0bf8ea6d1baaaed0addfe5fb83~OEoo97vDo1870518705epcas5p3-;
-	Sun, 25 Jan 2026 20:14:48 +0000 (GMT)
-Received: from epcas5p2.samsung.com (unknown [182.195.38.88]) by
-	epsnrtp04.localdomain (Postfix) with ESMTP id 4dzjZH4BJ5z6B9m5; Sun, 25 Jan
-	2026 20:14:47 +0000 (GMT)
-Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-	20260125201446epcas5p12e8f4a24a151776c67079759b2667611~OEonL3qVE0032500325epcas5p1n;
-	Sun, 25 Jan 2026 20:14:46 +0000 (GMT)
-Received: from [107.122.11.51] (unknown [107.122.11.51]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20260125201443epsmtip1c399112a41f8d93a5d789d339a01036b~OEokegkJ51855218552epsmtip1V;
-	Sun, 25 Jan 2026 20:14:43 +0000 (GMT)
-Message-ID: <88813626-a33c-464f-a782-41b815800fa9@samsung.com>
-Date: Mon, 26 Jan 2026 01:44:40 +0530
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bqJjGl8d"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1E9CC4CEF1;
+	Sun, 25 Jan 2026 22:45:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769381152;
+	bh=S9vFWXhyg0MkV+tLx10WmLW7gf6qdVccxzNBP8JiVGU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=bqJjGl8d8RkkxkNvm/b5FIs/lRTASegJ/2eEoGWhYNy0srWYwoejNbrqxkPu2klYU
+	 YVq84UWjZ3KVHkLb3wiIOu7FCgNo9VHkTwG0W5/o3u0kyD0fL7JbFhVEcrQng2LmLu
+	 GVLMOXatTuZeWFep6DqNIoVnejZ4E/K2VMt5H8ZAnwsZqEtHinrP8j40M6aXuquMs/
+	 N9lYLDQOFUPXs0x7iEoCWmgFUKARoa0cHptC3IKwrxOrHarVuA9cjNpuHWpvl5jM3u
+	 NSMHi06NAeCcQIlPkr7hsC+VTZfuiOtGbaerDSPBNtMwoBS2MYvO7k1/vIxRHuoYi2
+	 Y3KSPEiKGXnXA==
+From: Frederic Weisbecker <frederic@kernel.org>
+To: LKML <linux-kernel@vger.kernel.org>
+Cc: Frederic Weisbecker <frederic@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Michal Hocko <mhocko@suse.com>,
+	cgroups@vger.kernel.org,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Will Deacon <will@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Michal Koutny <mkoutny@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Gabriele Monaco <gmonaco@redhat.com>,
+	linux-pci@vger.kernel.org,
+	linux-mm@kvack.org,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Chen Ridong <chenridong@huawei.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Muchun Song <muchun.song@linux.dev>,
+	Tejun Heo <tj@kernel.org>,
+	Waiman Long <longman@redhat.com>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	linux-arm-kernel@lists.infradead.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Phil Auld <pauld@redhat.com>,
+	linux-block@vger.kernel.org,
+	Peter Zijlstra <peterz@infradead.org>,
+	netdev@vger.kernel.org
+Subject: [PATCH 00/33 v7] cpuset/isolation: Honour kthreads preferred affinity
+Date: Sun, 25 Jan 2026 23:45:07 +0100
+Message-ID: <20260125224541.50226-1-frederic@kernel.org>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 02/15] block: factor out a bio_integrity_setup_default
- helper
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Christian
-	Brauner <brauner@kernel.org>
-Cc: "Darrick J. Wong" <djwong@kernel.org>, Carlos Maiolino <cem@kernel.org>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>, Anuj Gupta
-	<anuj20.g@samsung.com>, linux-block@vger.kernel.org, nvdimm@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org
-Content-Language: en-US
-From: Kanchan Joshi <joshi.k@samsung.com>
-In-Reply-To: <20260121064339.206019-3-hch@lst.de>
-Content-Transfer-Encoding: 7bit
-X-CMS-MailID: 20260125201446epcas5p12e8f4a24a151776c67079759b2667611
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-cpgsPolicy: CPGSC10-542,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20260121064706epcas5p3966a36ee7579ee56b6f13eec5ff5067d
-References: <20260121064339.206019-1-hch@lst.de>
-	<CGME20260121064706epcas5p3966a36ee7579ee56b6f13eec5ff5067d@epcas5p3.samsung.com>
-	<20260121064339.206019-3-hch@lst.de>
+Content-Transfer-Encoding: 8bit
 
-On 1/21/2026 12:13 PM, Christoph Hellwig wrote:
-> Note that this includes a small behavior change, as we ow only sets the
+Hi,
 
-with commit wording fixed,
+Here is just a few changes sinces v6:
 
-Reviewed-by: Kanchan Joshi <joshi.k@samsung.com>
+- More tags
+
+- Fix raw access to __rcu pointer (Simon Horman, Waiman)
+
+- Fix cpu_hotplug_lock deadlock and use correct static branch API
+  (Chen Ridong)
+
+- Fix a few changelogs that got the set rules between HK_TYPE_DOMAIN
+  HL_TYPE_KERNEL_NOISE wrong.
+
+- Simplify arm64 mismatched 32 bits support (Will Deacon)
+
+If all goes well, my plan is to make the pull request myself for the
+upcoming merge window.
+
+git://git.kernel.org/pub/scm/linux/kernel/git/frederic/linux-dynticks.git
+	kthread/core-v7
+
+HEAD: dcbe41f43e2cb32fbdbaf73b7745739e018b35dc
+
+Thanks,
+	Frederic
+---
+
+Frederic Weisbecker (33):
+      PCI: Prepare to protect against concurrent isolated cpuset change
+      cpu: Revert "cpu/hotplug: Prevent self deadlock on CPU hot-unplug"
+      memcg: Prepare to protect against concurrent isolated cpuset change
+      mm: vmstat: Prepare to protect against concurrent isolated cpuset change
+      sched/isolation: Save boot defined domain flags
+      cpuset: Convert boot_hk_cpus to use HK_TYPE_DOMAIN_BOOT
+      driver core: cpu: Convert /sys/devices/system/cpu/isolated to use HK_TYPE_DOMAIN_BOOT
+      net: Keep ignoring isolated cpuset change
+      block: Protect against concurrent isolated cpuset change
+      timers/migration: Prevent from lockdep false positive warning
+      cpu: Provide lockdep check for CPU hotplug lock write-held
+      cpuset: Provide lockdep check for cpuset lock held
+      sched/isolation: Convert housekeeping cpumasks to rcu pointers
+      cpuset: Update HK_TYPE_DOMAIN cpumask from cpuset
+      sched/isolation: Flush memcg workqueues on cpuset isolated partition change
+      sched/isolation: Flush vmstat workqueues on cpuset isolated partition change
+      PCI: Flush PCI probe workqueue on cpuset isolated partition change
+      cpuset: Propagate cpuset isolation update to workqueue through housekeeping
+      cpuset: Propagate cpuset isolation update to timers through housekeeping
+      timers/migration: Remove superfluous cpuset isolation test
+      cpuset: Remove cpuset_cpu_is_isolated()
+      sched/isolation: Remove HK_TYPE_TICK test from cpu_is_isolated()
+      PCI: Remove superfluous HK_TYPE_WQ check
+      kthread: Refine naming of affinity related fields
+      kthread: Include unbound kthreads in the managed affinity list
+      kthread: Include kthreadd to the managed affinity list
+      kthread: Rely on HK_TYPE_DOMAIN for preferred affinity management
+      sched: Switch the fallback task allowed cpumask to HK_TYPE_DOMAIN
+      sched/arm64: Move fallback task cpumask to HK_TYPE_DOMAIN
+      kthread: Honour kthreads preferred affinity after cpuset changes
+      kthread: Comment on the purpose and placement of kthread_affine_node() call
+      kthread: Document kthread_affine_preferred()
+      doc: Add housekeeping documentation
+
+ Documentation/arch/arm64/asymmetric-32bit.rst |  12 +-
+ Documentation/core-api/housekeeping.rst       | 111 ++++++++++++++++++
+ Documentation/core-api/index.rst              |   1 +
+ arch/arm64/kernel/cpufeature.c                |   6 +-
+ block/blk-mq.c                                |   6 +-
+ drivers/base/cpu.c                            |   2 +-
+ drivers/pci/pci-driver.c                      |  71 +++++++++---
+ include/linux/cpuhplock.h                     |   1 +
+ include/linux/cpuset.h                        |   8 +-
+ include/linux/kthread.h                       |   1 +
+ include/linux/memcontrol.h                    |   4 +
+ include/linux/mmu_context.h                   |   2 +-
+ include/linux/pci.h                           |   3 +
+ include/linux/percpu-rwsem.h                  |   1 +
+ include/linux/sched/isolation.h               |  16 ++-
+ include/linux/vmstat.h                        |   2 +
+ include/linux/workqueue.h                     |   2 +-
+ init/Kconfig                                  |   1 +
+ kernel/cgroup/cpuset.c                        |  53 +++------
+ kernel/cpu.c                                  |  42 +++----
+ kernel/kthread.c                              | 160 +++++++++++++++++---------
+ kernel/sched/isolation.c                      | 145 ++++++++++++++++++-----
+ kernel/sched/sched.h                          |   4 +
+ kernel/time/timer_migration.c                 |  25 ++--
+ kernel/workqueue.c                            |  17 +--
+ mm/memcontrol.c                               |  31 ++++-
+ mm/vmstat.c                                   |  15 ++-
+ net/core/net-sysfs.c                          |   2 +-
+ 28 files changed, 538 insertions(+), 206 deletions(-)
