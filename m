@@ -1,103 +1,208 @@
-Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.itpri.com (mx1.itpri.com [185.125.111.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51ADD23958A
-	for <linux-block@vger.kernel.org>; Sun, 25 Jan 2026 17:12:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A33E1E0E14;
+	Sun, 25 Jan 2026 18:35:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.111.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769361132; cv=none; b=fdKT+dde2A8k2sZ2buBJNRpw4vK7pUXL8wrikdDIcBNSOPW5Ilocb0TwfrjGX3gtPt3z1bY5guWiqHJaLL8AFrs2C4SvUiBpj4yKnESOJeTF6DWYmBZ4Y/qG/MA6c4rIV0v8fUiwWfsKWKzzHSqJaR1+4zEVK7rYZzqwSDbbAa8=
+	t=1769366141; cv=none; b=n0eD9l3xypbATOkRV/0fTOm11ImKsWxYDpZCmPiireK5xbo06Owo8TpIQjkNlSXgRE+gR3eQ4u613tU294jAiPAxyLcjNrjdiuEECtPZQpBA1odL2UEE2EWP5QUx7eME0Z1mBHxakW2004SFf9uneiA82zIm+L2tgC1s3SyBL54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769361132; c=relaxed/simple;
-	bh=/QEo7Wqu3iUNMjgPZIJZJSjNsND2rsdpxLPDFpvSVRw=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=cn5P5Fh6ZXx44D6ykkxsawIlsljykUYg4o2Rsmt1j5qtcoURy8lX/bdovrfwk4c0H1Dw9HuWRS6DMK99Eh96MxrlvvTm9ufwoCh8ybWOMzpIJy2YCdsrDWAjzY723bTUAEAtAuj5Q6dtc8sCRfv7zA1+UvYgltzgOuycOR65AGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=zG6h2k3P; arc=none smtp.client-ip=209.85.167.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1769366141; c=relaxed/simple;
+	bh=/+JWKCl/rMmMylcDCp60yI7tIO/uuQl3FBnTc6hQyng=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Uf7xAxyAPbFfMMc+K5C9kYkGQkUHwm1GmTnm2H9pL6Mzsi9haQ3dqedX+/HN8P94edtOWdJWV/J05NB/KNv9JfeVsOTApBlUW1gDRAbJdSYR4DXmYg3ka6WQatMLGjCs6RiXRJy9XNJyCBaUGB61pAHZ/n/wKBEWmJzEqeHe18E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zazolabs.com; spf=pass smtp.mailfrom=zazolabs.com; dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b=pbcR0W9o; arc=none smtp.client-ip=185.125.111.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zazolabs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zazolabs.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="zG6h2k3P"
-Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-45c7a71ba20so1007024b6e.2
-        for <linux-block@vger.kernel.org>; Sun, 25 Jan 2026 09:12:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1769361130; x=1769965930; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HTG/UusmHhSRHax119uDW0R9FQMeUnyKXFiplnDVLQM=;
-        b=zG6h2k3PO+hGnwhfxa2hw73QiE1wpIv6Um8AM3v4Taor85tnUAEVsn9ZLuUulwvflE
-         1qOcmebdfsKb8MI2P9qZFBhK+hCiiY3YjdDa9+evPjWwLDYAeUjRRizNKh8B9+RRJjCR
-         41SIJzK56YFbUDqJO4SDznjvJ97E5VW6X9wba5z09CDDo3XaGdq/wLs4TdHm4OF6zjOt
-         rWghRbNl0c40W7If2uvBUbkMFrlxBhiQrHl2e/wqgTA8NHcXf/aoy+Wevb3KiVw4oqtB
-         KXOCyzbquMB1yVi5sSKS64HZ6tUojm+SVof/1Z7Qkoe08VIsqfnuGc/8Jzv6A333+TEu
-         zehA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769361130; x=1769965930;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=HTG/UusmHhSRHax119uDW0R9FQMeUnyKXFiplnDVLQM=;
-        b=q9aNAwfdKqheoTr2FaNjWa2et4CK86DNM8uZCanTeSKytABMDtBIZTDfCcCwJK54Vz
-         BxhicsG7Abbf2OlYcFEFxw+9B4dPmV7/Nl0SWY6UvtlxTO5Vr3dV03J71b3cvp+jHzWz
-         9nqLH6b44kiYscgoXCZKcozBoB9fRGOQ7uZRZV8WYbZkHTtN2EUvY8qIFVbZm+PE1Si5
-         dbwugpTIUWcpV3WfjnhxRmsERn5og0Lk/hfiPIZEjxaIbborjiaWQtqY49DVvv9um4+d
-         s4f5WAjZP2l21tyByDRpey6DS7sW9/WXQr5fpIZrfni+4VmoG3l5pHRKvZcXMufCy3Bi
-         VYVQ==
-X-Gm-Message-State: AOJu0YxllefyRxD8w4olUYKaVD+oNH4qK+CSsA47WUDe8Ms1ev6kt/Ze
-	HMXCPLmQ9vi08WMTgc2OI9rNppbsNuvRM3s5mHdZtnhYenYCxP9MWSOnZxhzkVUYTv0=
-X-Gm-Gg: AZuq6aIiwHP4DifeFXY2f15MGF3UcK0A9i/QE46IJbHzpAAP0uU4cA02ePuGUY5jugA
-	QPix8ULOowIhk54ALopoQxAVjXO9JxTizCkST7AmgxbeklOUvIZ9zAd+FSAXC1DsgTrjwWN4sRh
-	8ktMJzznnBCCs8i7beB9lvubINIuIkB71m3OtMnNCmyta0kBL4/JBwpaFVmrj7eGpH4tDMt9MKE
-	EpmVMPc1GMDO56ycgBlnJf9ICqNXcdJkINNz+q4f7O22VZQ3HHwE9mqwBnFLS+Id5OswW0YSr+Z
-	ohT6tYtvI17wM/GsTQI+twrQQ6ZGNVZroFxK8j5oNf7KWwlu1TzdbLd9KkSiu3O+JCnPhaFUtXg
-	a+NVBa9GqS/ktaXFw48o7sugY034AqYGorziam3m9l6oR576403Q7zhzTiGH2YXt0DljT/i/1nm
-	D5ICBG8cu7HW8ACPRUU5v6V3C5Y/NbbchE9G3TpDIMGqCK1EzZNy6sBWPa3lUTGD8c
-X-Received: by 2002:a05:6820:4a8e:b0:65d:163:3e5 with SMTP id 006d021491bc7-662e04616a9mr616403eaf.47.1769361130058;
-        Sun, 25 Jan 2026 09:12:10 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-408afc0a17bsm5629457fac.19.2026.01.25.09.12.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 Jan 2026 09:12:09 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: Ming Lei <ming.lei@redhat.com>, Shuah Khan <shuah@kernel.org>, 
- Caleb Sander Mateos <csander@purestorage.com>, 
- Alexander Atanasov <alex@zazolabs.com>
-Cc: linux-block@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-In-Reply-To: <20260125085747.1631424-1-alex@zazolabs.com>
-References: <20260125085747.1631424-1-alex@zazolabs.com>
-Subject: Re: [PATCH v2] selftests: ublk: add missing gitignore for
- metadata_size binary
-Message-Id: <176936112869.8973.14050161093900489800.b4-ty@kernel.dk>
-Date: Sun, 25 Jan 2026 10:12:08 -0700
+	dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b="pbcR0W9o"
+X-Virus-Scanned: Yes
+Message-ID: <c517e1ca-0e2b-4143-b0f6-07a3d0c3abcf@zazolabs.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=zazolabs.com; s=mail;
+	t=1769366136; bh=/+JWKCl/rMmMylcDCp60yI7tIO/uuQl3FBnTc6hQyng=;
+	h=Reply-To:Subject:To:Cc:References:From:In-Reply-To;
+	b=pbcR0W9oOnzO9d8lZZDDfDRngN+hxGPh9cgG7kEnWsJoUvVINyEt1xBheaKJBKCNh
+	 /yMfAKsODMUgq17C05SsX6Gp5GWua1jzD3YQREHA7KlX2BGlEYjBCXO42YnM0UZikG
+	 r26Hwa7wyGldIGYqyDZYy647Il5Ty72ghzCJ86NlbZfPnqNXcFkeJOC4F2e9zpLnZx
+	 9Rua9Lx4hNNMaebBTiSHsh2Uhn0bl1PYDOZ5QB9YYK9in5E1Cx4kSMVAPsbeW/F0hm
+	 hRrtI/JWjDMh4r7Q9WNiYn5BURpt3LiENwD1Eq+YpzxTYcaJl5clFfbNlCX1VCtS3D
+	 QQEFikF2MxGyUNvFiVY/0J3ZnhR+DZjkuy0Ih4DqNkVDevqaoaNIgtGtdU87InWeO5
+	 xNIUbZdBjIp/tskKnUBWnqhf30m51P+wEk+Li9XROJbd6EEespVjwddc659cSyiF86
+	 XYDPCygiVJBA81NDj63GSThN6muF+6XIE6fVjqj/7aaRm6/yaBGd5bH5ZXHcItJqty
+	 Cmqp9c9HA22tcqAJS8Wejeg4KL7WRXBNIZqhr6NAmlOwU0luO2EtN8/UnBlaV9CXHS
+	 pwi6OUWwMPMNz+4LJpXvnBeeAixH5uYlivZKMbS6RtIkPEIbZg7dOM2E0fJ2qhAOQB
+	 ignyJKZ1762fhyjnYnm4+7mo=
+Date: Sun, 25 Jan 2026 20:35:20 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Reply-To: alex+zkern@zazolabs.com
+Subject: Re: [PATCH] selftests: ublk: io-reorder triggered in
+ test_generic_01.sh
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Shuah Khan <shuah@kernel.org>, linux-block@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260123112039.1370223-1-alex@zazolabs.com>
+ <aXN4mFuoXhtJDKyF@fedora> <147635F1-943E-46D5-8EF1-D1C965F85EC1@zazolabs.com>
+ <aXOGrXo3AbXPHA-K@fedora> <03C8F5B9-B2E1-4C78-A043-B4F9422508B7@zazolabs.com>
+ <aXY2qdYtfVTSc7jB@fedora>
+Content-Language: en-GB
+From: Alexander Atanasov <alex@zazolabs.com>
+In-Reply-To: <aXY2qdYtfVTSc7jB@fedora>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
 
+On 25.01.26 17:28, Ming Lei wrote:
+> On Fri, Jan 23, 2026 at 05:00:33PM +0200, Alexander Atanasov wrote:
+>>
+>>
 
-On Sun, 25 Jan 2026 08:57:46 +0000, Alexander Atanasov wrote:
-> A new utility metadata_size was added in
-> commit 261b67f4e347 ("selftests: ublk: add utility to get block device metadata size")
-> but it was not added to .gitignore. Fix that by adding it there.
+[snip]
+
+> Can you test the following patch and see if re-order still can happen?
 > 
-> While at it sort all entries alphabetically and add a SPDX license header.
 > 
-> 
-> [...]
+> diff --git a/tools/testing/selftests/ublk/test_generic_01.sh b/tools/testing/selftests/ublk/test_generic_01.sh
+> index 26cf3c7ceeb5..26d5e52ece29 100755
+> --- a/tools/testing/selftests/ublk/test_generic_01.sh
+> +++ b/tools/testing/selftests/ublk/test_generic_01.sh
+> @@ -13,7 +13,7 @@ if ! _have_program fio; then
+>   	exit "$UBLK_SKIP_CODE"
+>   fi
+>   
+> -_prep_test "null" "sequential io order"
+> +_prep_test "null" "ublk dispatch won't reorder IO"
+>   
+>   dev_id=$(_add_ublk_dev -t null)
+>   _check_add_dev $TID $?
+> @@ -39,9 +39,13 @@ fio --name=write_seq \
+>   ERR_CODE=$?
+>   kill "$btrace_pid"
+>   wait
+> -if grep -q "io_out_of_order" "$UBLK_TMP"; then
+> -	cat "$UBLK_TMP"
+> +
+> +# Check for out-of-order completions detected by bpftrace
+> +if grep -q "^out_of_order:" "$UBLK_TMP"; then
+> +	echo "I/O reordering detected:"
+> +	grep "^out_of_order:" "$UBLK_TMP"
+>   	ERR_CODE=255
+>   fi
+> +
+>   _cleanup_test "null"
+>   _show_result $TID $ERR_CODE
+> diff --git a/tools/testing/selftests/ublk/trace/seq_io.bt b/tools/testing/selftests/ublk/trace/seq_io.bt
+> index b2f60a92b118..60ac40e66606 100644
+> --- a/tools/testing/selftests/ublk/trace/seq_io.bt
+> +++ b/tools/testing/selftests/ublk/trace/seq_io.bt
+> @@ -2,23 +2,45 @@
+>   	$1: 	dev_t
+>   	$2: 	RWBS
+>   	$3:     strlen($2)
+> +
+> +	Track request order between block_io_start and block_rq_complete.
+> +	For each request, record its start sequence number and verify
+> +	completions happen in the same order.
+>   */
+> +
+>   BEGIN {
+> -	@last_rw[$1, str($2)] = (uint64)0;
+> +	@start_seq = (uint64)0;
+> +	@complete_seq = (uint64)0;
+> +	@out_of_order = (uint64)0;
+> +}
+> +
+> +tracepoint:block:block_io_start
+> +{
+> +	if ((int64)args.dev == $1 && !strncmp(args.rwbs, str($2), $3)) {
+> +		@start_order[args.sector] = @start_seq;
+> +		@start_seq = @start_seq + 1;
+> +	}
+>   }
+> +
+>   tracepoint:block:block_rq_complete
+>   {
+> -	$dev = $1;
+>   	if ((int64)args.dev == $1 && !strncmp(args.rwbs, str($2), $3)) {
+> -		$last = @last_rw[$dev, str($2)];
+> -		if ((uint64)args.sector != $last) {
+> -			printf("io_out_of_order: exp %llu actual %llu\n",
+> -				args.sector, $last);
+> +		$expected_order = @start_order[args.sector];
+> +		if ($expected_order != @complete_seq) {
+> +			printf("out_of_order: sector %llu started at seq %llu but completed at seq %llu\n",
+> +				args.sector, $expected_order, @complete_seq);
+> +			@out_of_order = @out_of_order + 1;
+>   		}
+> -		@last_rw[$dev, str($2)] = (args.sector + args.nr_sector);
+> +		delete(@start_order[args.sector]);
+> +		@complete_seq = @complete_seq + 1;
+>   	}
+>   }
+>   
+>   END {
+> -	clear(@last_rw);
+> +	printf("total_start: %llu total_complete: %llu out_of_order: %llu\n",
+> +		@start_seq, @complete_seq, @out_of_order);
+> +	clear(@start_order);
+> +	clear(@start_seq);
+> +	clear(@complete_seq);
+> +	clear(@out_of_order);
+>   }
 
-Applied, thanks!
 
-[1/1] selftests: ublk: add missing gitignore for metadata_size binary
-      commit: 8e5bcc3a955a2cc4460b391f55d3b49905eb248e
+First run after reboot always fails:
 
-Best regards,
+./test_generic_01.sh
+ublk selftest: generic_01 starting at 2026-01-25T19:08:47+02:00
+I/O reordering detected:
+out_of_order: sector 112040 started at seq 88 but completed at seq 0
+out_of_order: sector 112048 started at seq 89 but completed at seq 1
+out_of_order: sector 112056 started at seq 90 but completed at seq 2
+out_of_order: sector 112064 started at seq 91 but completed at seq 3
+out_of_order: sector 112072 started at seq 92 but completed at seq 4
+out_of_order: sector 112080 started at seq 93 but completed at seq 5
+out_of_order: sector 112088 started at seq 94 but completed at seq 6
+out_of_order: sector 112096 started at seq 95 but completed at seq 7
+out_of_order: sector 112104 started at seq 96 but completed at seq 8
+out_of_order: sector 112112 started at seq 97 but completed at seq 9
+out_of_order: sector 112120 started at seq 98 but completed at seq 10
+out_of_order: sector 112128 started at seq 99 but completed at seq 11
+
+[snip]
+
+out_of_order: sector 1048528 started at seq 117149 but completed at seq 
+117061
+out_of_order: sector 1048536 started at seq 117150 but completed at seq 
+117062
+out_of_order: sector 1048544 started at seq 117151 but completed at seq 
+117063
+out_of_order: sector 1048552 started at seq 117152 but completed at seq 
+117064
+out_of_order: sector 1048560 started at seq 117153 but completed at seq 
+117065
+out_of_order: sector 1048568 started at seq 117154 but completed at seq 
+117066
+ublk selftest: generic_01 done at 2026-01-25T19:08:54+02:00
+generic_01 : [FAIL]
+
+consecutive runs are okay
+
+./test_generic_01.sh
+ublk selftest: generic_01 starting at 2026-01-25T20:21:31+02:00
+ublk selftest: generic_01 done at 2026-01-25T20:21:38+02:00
+generic_01 : [PASS]
+
+I went thru the reboot cycle several times - it  repeats.
+
+Tried with and without setting the affinity - and i observed no difference.
+
+I will do some more testing but it was easier to reproduce before that 
+patch.
+
 -- 
-Jens Axboe
-
-
-
+have fun,
+alex
