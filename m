@@ -1,148 +1,139 @@
-Received: from mail-dy1-f173.google.com (mail-dy1-f173.google.com [74.125.82.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 396F0221F24
-	for <linux-block@vger.kernel.org>; Mon, 26 Jan 2026 05:08:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.173
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769404101; cv=pass; b=sw1/ixC/WjK8kUYdElSBPQrJ7z2yEniQW67xO4R6eTPrPE8+xFoj6qjtok58qXz3L91AIpxdSlHO0n5efyyBKh7xHpgrmDbmUbVuNXPkVkpmcpaLX5V9i9arZud6hichMcuBp6O73n46YDhutEUqfP2/vz6GMHrotQfVe2b2tMQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769404101; c=relaxed/simple;
-	bh=ZBsVD6kxKzurT7H7DtCLfcoGufza6/gI7cdcVlj4q0M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FCMcHDxUuHya2oRNvS3gWURscMwGHN7+Zq7lHo8RNBwZotIKGSxq0LkC3zbEZblwZW90vkhQd3pUd1lQzUA9OCh1cQp1dRJUI1qydovtOIaxiskmwbrAiNGP3ZxYWq11mYbWClx6aaVIjYSI6lHMf2RYWqwlMnBf2yAhZW7pqAw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k9kfJBC+; arc=pass smtp.client-ip=74.125.82.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D278D29CE9;
+	Mon, 26 Jan 2026 05:54:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769406858; cv=none; b=RX5hYl/LlQGrmdA/vl+2xKyRVps4bRd+P1Moq1U1L1v88v9xj+wFGp4JT30P2U4FdNx6vMmvpqI4YtXO+uWvK1qIXmvdOPH5TyT+yT30a1OixlMu5H+LmmdDA6nRki5n/2bnV8e1SjV1sN4++Io4UNURYmZUxOzfUwEdXKTZktk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769406858; c=relaxed/simple;
+	bh=VyS1Vh/UcpixWSeTr8u8aTIsT1VL+92os2S3KJQ7OjU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=W+ldLH7ZS6OEfatoX0LaMduUlNbVCfwfHLkGxvcyg0iP2l8vypir3cd0jQ2t3jxH+NkXmYpQbfZmBV5kiBG48evrIGbMy0t7dJ7yg+2aE8kBZJhmFBoR9VxVR9caQqCJKm7EZ2WnSK6ngfxKP+2+5zRY8QC6D2Oo8Mfog+wfHZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=A1JvkzoV; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k9kfJBC+"
-Received: by mail-dy1-f173.google.com with SMTP id 5a478bee46e88-2b71e7dab12so333105eec.1
-        for <linux-block@vger.kernel.org>; Sun, 25 Jan 2026 21:08:19 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769404098; cv=none;
-        d=google.com; s=arc-20240605;
-        b=FKNKOR3qZMjPjopHcF0AoGC5rowCmWP18FhmNojspsPHxdGE3SV7Iy00+q90P9q0C7
-         cA64e6bKqy126/dTnADNF8fXHSMNN3qDqOUcGdYQYDwY+ps6HqjNZQGoGbS6jFmFCQ/1
-         G184usK+LcCN4yDkKfkBjzcK8atb7KvjL9n8h0J7G3/wZU951AhaiOlvNQKgjHTZXkWq
-         xbHd+MX0g6rR1dFEmOjq7gjIEAoziXK6HRbXh64vFmOnxkmh1AAndKtZZ6XmV2tC2+4a
-         CDPrHc33LuNWLtTlp31iGbMM8orNTPClOpqi6JzNCW/cJtjbt18VD4UmkPho+w8Kw4FV
-         czCw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=bsbA3S4vvXnWg6PVwhDAv4/t5NunrqZ0yk7Z9wsyNZU=;
-        fh=TT8pIbyIfIwnKwRXugABUX+6krP6QFoRU8EAQho9ZLI=;
-        b=JnGdjENclAxRLCoeJXRVZxax1CS/QXSGuC4zlfbVqNvJTO7/JOOvFtAkas0fxR7sPh
-         GBy+Rs0tKea/m/jtMikhgWRwJI/PLhfTLrsOZp29+TqkHGF4hko4ZR6NbwVM9lIbC8U0
-         Rdq1a4PUASnj18Bb4nqh7ueyq2KJ3qcVr2nBmdBN19nGDPjehf96W+czaZ4aFi9q+fNc
-         hLcgjQPda+I4zuNA0CfvX6CUfKshq8GOS9rwhLEDBXHzdWjY5yGi3dYvdCte30HGQBI/
-         EEl58YZZ0GQSkfvfhc3Zszo1FTbTAAkUmPrmhlP/zqUpbMu28AyE552Tlu2VT4r72QxR
-         f4+w==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769404098; x=1770008898; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bsbA3S4vvXnWg6PVwhDAv4/t5NunrqZ0yk7Z9wsyNZU=;
-        b=k9kfJBC+ldCHGEir2hpwOAhElO6egoRCIxzj0IKfTEqmro2/yY4nV/+ZWVpPnASaL2
-         +mKMYxEvPEWQ3mA0MifDdWsjJxAV9WDFd60bga1tQmEuwjCMbcYXGnmdKnOy0gkl2ch2
-         Mwj8Ks7ue/Tv0fi0t1I2FGHTzLLGzLT7EpWkOR1/bqd5u34W9Lgxxo6NypTHOKYsnB2Z
-         KCh6L7ducVKh/8PXfUb+iHCyyPnIdAB5ON83DnVEVnBfpqvtvEurIJrSHBLvIkSub/iU
-         dCIDy2cliqsDj+61/J2ss/bUZVs3zCGOy2Q26lc2sW5MOSWlOjMrzV8iWQUqiUi0YrGB
-         4lrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769404098; x=1770008898;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=bsbA3S4vvXnWg6PVwhDAv4/t5NunrqZ0yk7Z9wsyNZU=;
-        b=Cg2tb/RiPqMzd6txGwnb4KNlKG9jZ3CLOKR4ovyo1bXxPVhValq9sL60gyMs1x0Xxc
-         uQMzOYiiruZTAcjEOWwWJxdQ/RqWRPEMh6fWZQJ97ZoNzA4W6iN1ls58B5W28mEzVHQu
-         wZiy0YVVBP1osP7yUOJFEq6UNKHQ/8F2VM3FlX9zDnL+46lnfKAoW+q/EOHMRLwBmaiM
-         elbZ+PmeWT7kyx5LSv21qW7788DbyJQ9bOcpJpd7/7eNkYYBMazJDbvyyMcY5XGe9TFb
-         dBh4Svc97dqXh9graPro8bkXWiUEmgpvUwmneWgDdYq30h/7GqGPN9PcJ0jiEW98owi3
-         edYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVGKVh7l3tQk1XO/wBZ2P8aCBRt2syAJ3bMHWsmXJ60Vy1mwswfpc/CPLGdvyKHxBptVwVowAeW72qDXg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxav+zYglIZDhYNFaVDl6YPUCkWAdFmGHp98l9ITvNHsjy/hnrg
-	/+8EqkDuVpvkcLP9917Ep2z8wTOxer29bGHxakBG/Tn63kyTPgo3K7nuvZmTkDZsZpm7Ii24v9Z
-	KVVNX4kKD26FE5z+BNpW3cx4Z7i0ragw=
-X-Gm-Gg: AZuq6aJbSnRGuNFruhsBxAgELYqMWPps1/lVv9N077sRI7HDF3E4L3SKkW13EC/xCOE
-	k7W/cCmhFDkmupdMgw+5G7g9ATW/7L8EBGecud9VnTkHXQLZgiYe41QXApzik202oLOWfK9jlQn
-	igwE+GVlhbmEEvDac+9dG6Py4ssHncjkrVSTUw5ovpNuAOSQQxxOjbdz3CKQvUGzqSLUDVfiS/H
-	9AQmuyPZiuCnBvzPh0TeE0LDgYfIYf05vgvdpISqqoJYFDYWDuoN9VNGcPEtXxa5pZ9v1I76Vd6
-	ZlHF7dgVlSJ+fxx81Fa8MumUaLGYBeAowecdwECDDgZ6EBoCqQ0sa1JddHDYT510B3ks3kBB4Cq
-	zUMVxjWzXhxrQ
-X-Received: by 2002:a05:7301:3d10:b0:2ae:5b8c:324a with SMTP id
- 5a478bee46e88-2b7644f41dbmr855051eec.4.1769404098278; Sun, 25 Jan 2026
- 21:08:18 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="A1JvkzoV"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=p04uGP/MTX7AmZ6atyztOPX6j2smbwyWbkVxRfOzqiQ=; b=A1JvkzoV80drvsknn3Khw+noXT
+	rsrPhH0Sr/SUwCOOu+mhU8JlMtnfxBfxKZyeq5rpKCgN/auSG/xJ1ez/G0Yx3Q995VcNYQoU9A7W3
+	poiLbJWn9n16uAhupsfCbNjZ4CkxV7MfhVzZ2uHMm05vqPBJ5LZ7BtYRHnItvIEDhHfEmTqct6R2d
+	z/YkQVOemAGzYk/iWHmKYwds8wuHj/H65Ki4zqo/5SoD4TE4P7GAFeam0SYUKbfSZcvW7ZF9RFjFV
+	l/XX0lpNRefuQ44IEq+m7NRpJ4DtJhcdQEcDjTX2OZgI1rZdWMg0V9ZLrOz2Ec5BtVwd/JeKDq9vd
+	1yxPTJMw==;
+Received: from 2a02-8389-2341-5b80-d601-7564-c2e0-491c.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:d601:7564:c2e0:491c] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vkFYB-0000000BxEQ-1xYI;
+	Mon, 26 Jan 2026 05:54:11 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>,
+	Christian Brauner <brauner@kernel.org>
+Cc: "Darrick J. Wong" <djwong@kernel.org>,
+	Carlos Maiolino <cem@kernel.org>,
+	Qu Wenruo <wqu@suse.com>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	linux-block@vger.kernel.org,
+	linux-xfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org
+Subject: bounce buffer direct I/O when stable pages are required v3
+Date: Mon, 26 Jan 2026 06:53:31 +0100
+Message-ID: <20260126055406.1421026-1-hch@lst.de>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260105-define-rust-helper-v2-0-51da5f454a67@google.com>
-In-Reply-To: <20260105-define-rust-helper-v2-0-51da5f454a67@google.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Mon, 26 Jan 2026 06:08:03 +0100
-X-Gm-Features: AZwV_QjC45jcqbNpvCzRgWaUDtcYZvulw1uksmCYv_NCU9WJD69mYzMDZ_yhpJo
-Message-ID: <CANiq72m4hBinKM4jRrkpZ5nM_wraQ8FMsYtjgKRkNDmK5sS8dw@mail.gmail.com>
-Subject: Re: [PATCH v2 00/27] Allow inlining C helpers into Rust when using LTO
-To: Alice Ryhl <aliceryhl@google.com>
-Cc: rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	Peter Zijlstra <peterz@infradead.org>, Elle Rhumsaa <elle@weathered-steel.dev>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, linux-block@vger.kernel.org, 
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
-	Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, linux-clk@vger.kernel.org, 
-	Benno Lossin <lossin@kernel.org>, Danilo Krummrich <dakr@kernel.org>, 
-	Thomas Gleixner <tglx@linutronix.de>, Paul Moore <paul@paul-moore.com>, 
-	Serge Hallyn <sergeh@kernel.org>, linux-security-module@vger.kernel.org, 
-	Josh Poimboeuf <jpoimboe@kernel.org>, Jason Baron <jbaron@akamai.com>, 
-	Steven Rostedt <rostedt@goodmis.org>, Ard Biesheuvel <ardb@kernel.org>, 
-	Andrew Ballance <andrewjballance@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>, maple-tree@lists.infradead.org, 
-	linux-mm@kvack.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
-	Uladzislau Rezki <urezki@gmail.com>, Vitaly Wool <vitaly.wool@konsulko.se>, 
-	Rob Herring <robh@kernel.org>, devicetree@vger.kernel.org, 
-	Daniel Almeida <daniel.almeida@collabora.com>, Michal Wilczynski <m.wilczynski@samsung.com>, 
-	linux-pwm@vger.kernel.org, "Paul E. McKenney" <paulmck@kernel.org>, rcu@vger.kernel.org, 
-	Will Deacon <will@kernel.org>, Fiona Behrens <me@kloenk.dev>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Vlastimil Babka <vbabka@suse.cz>, 
-	Christoph Lameter <cl@gentwo.org>, David Rientjes <rientjes@google.com>, Ingo Molnar <mingo@redhat.com>, 
-	Waiman Long <longman@redhat.com>, Mitchell Levy <levymitchell0@gmail.com>, 
-	Frederic Weisbecker <frederic@kernel.org>, Lyude Paul <lyude@redhat.com>, 
-	Anna-Maria Behnsen <anna-maria@linutronix.de>, John Stultz <jstultz@google.com>, linux-usb@vger.kernel.org, 
-	Tejun Heo <tj@kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>, 
-	Matthew Wilcox <willy@infradead.org>, Tamir Duberstein <tamird@gmail.com>, linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Mon, Jan 5, 2026 at 1:42=E2=80=AFPM Alice Ryhl <aliceryhl@google.com> wr=
-ote:
->
->       rust: bug: add __rust_helper to helpers
->       rust: err: add __rust_helper to helpers
->       rust: maple_tree: add __rust_helper to helpers
->       rust: mm: add __rust_helper to helpers
->       rust: of: add __rust_helper to helpers
->       rust: rbtree: add __rust_helper to helpers
->       rust: slab: add __rust_helper to helpers
->       rust: uaccess: add __rust_helper to helpers
->       rust: workqueue: add __rust_helper to helpers
+Hi all,
 
-Applied these to `rust-next` -- thanks everyone!
+[note to maintainers:  we're ready to merge I think, and Christian
+already said he'd do on Friday.  If acceptable to everyone I'd like
+to merge it through the block tree, or topic branch in it due to
+pending work on top of this]
 
-If someone did not intend for me to take it even if the Acked-by is
-there (e.g. perhaps Andrew wanted to pick those nevertheless?), then
-please shout.
+this series tries to address the problem that under I/O pages can be
+modified during direct I/O, even when the device or file system require
+stable pages during I/O to calculate checksums, parity or data
+operations.  It does so by adding block layer helpers to bounce buffer
+an iov_iter into a bio, then wires that up in iomap and ultimately
+XFS.
 
-With this, and if I didn't miss any message (plus looking at
-linux-next where I see Greg picked usb), then only clk and jump_label
-remain (plus any new incoming one).
+The reason that the file system even needs to know about it, is because
+reads need a user context to copy the data back, and the infrastructure
+to defer ioends to a workqueue currently sits in XFS.  I'm going to look
+into moving that into ioend and enabling it for other file systems.
+Additionally btrfs already has it's own infrastructure for this, and
+actually an urgent need to bounce buffer, so this should be useful there
+and could be wire up easily.  In fact the idea comes from patches by
+Qu that did this in btrfs.
 
-Let's see if we can get them done next cycle then.
+This patch fixes all but one xfstests failures on T10 PI capable devices
+(generic/095 seems to have issues with a mix of mmap and splice still,
+I'm looking into that separate), and make qemu VMs running Windows,
+or Linux with swap enabled fine on an XFS file on a device using PI.
 
-Cheers,
-Miguel
+Performance numbers on my (not exactly state of the art) NVMe PI test
+setup:
+
+  Sequential reads using io_uring, QD=16.
+  Bandwidth and CPU usage (usr/sys):
+
+  | size |        zero copy         |          bounce          |
+  +------+--------------------------+--------------------------+
+  |   4k | 1316MiB/s (12.65/55.40%) | 1081MiB/s (11.76/49.78%) |
+  |  64K | 3370MiB/s ( 5.46/18.20%) | 3365MiB/s ( 4.47/15.68%) |
+  |   1M | 3401MiB/s ( 0.76/23.05%) | 3400MiB/s ( 0.80/09.06%) |
+  +------+--------------------------+--------------------------+
+
+  Sequential writes using io_uring, QD=16.
+  Bandwidth and CPU usage (usr/sys):
+
+  | size |        zero copy         |          bounce          |
+  +------+--------------------------+--------------------------+
+  |   4k |  882MiB/s (11.83/33.88%) |  750MiB/s (10.53/34.08%) |
+  |  64K | 2009MiB/s ( 7.33/15.80%) | 2007MiB/s ( 7.47/24.71%) |
+  |   1M | 1992MiB/s ( 7.26/ 9.13%) | 1992MiB/s ( 9.21/19.11%) |
+  +------+--------------------------+--------------------------+
+
+Note that the 64k read numbers look really odd to me for the baseline
+zero copy case, but are reproducible over many repeated runs.
+
+The bounce read numbers should further improve when moving the PI
+validation to the file system and removing the double context switch,
+which I have patches for that will sent out soon.
+
+Changes since v2:
+ - add a BIO_MAX_SIZE constant and use it
+ - remove a pointless repeated page_folio call
+ - fix a comment typo
+ - add a new comment about copying to a pinned iter
+
+Changes since v1:
+ - spelling fixes
+ - add more details to some commit messages
+ - add a new code comment about freeing the bio early in the I/O
+   completion handler
+
+Diffstat:
+ block/bio.c               |  332 ++++++++++++++++++++++++++++------------------
+ block/blk-lib.c           |    9 -
+ block/blk-merge.c         |    8 -
+ block/blk.h               |   11 -
+ fs/iomap/direct-io.c      |  191 ++++++++++++++------------
+ fs/iomap/ioend.c          |    8 +
+ fs/xfs/xfs_aops.c         |    8 -
+ fs/xfs/xfs_file.c         |   41 +++++
+ include/linux/bio.h       |   26 +++
+ include/linux/blk_types.h |    3 
+ include/linux/iomap.h     |    9 +
+ include/linux/uio.h       |    3 
+ lib/iov_iter.c            |   98 +++++++++++++
+ 13 files changed, 507 insertions(+), 240 deletions(-)
