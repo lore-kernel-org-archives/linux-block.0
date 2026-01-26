@@ -1,130 +1,89 @@
 Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53552285C96;
-	Mon, 26 Jan 2026 02:43:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C8228248B;
+	Mon, 26 Jan 2026 02:45:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769395430; cv=none; b=XG5nfcTCjrfpXgqzFIf8fHigzM/Xrzr5M5hAFyFT3T0cGwPSSGdVJDWxFY/pE3ZGdc7eAEf551g1LF0m4n4O1ymRNqfosU5BTDwm9bp5EcZO8NI216XbNr080UZBzILWzEQjbHvWZxYTzAl7cKAPfM8/JZuguKn0IJRcdCimCL0=
+	t=1769395542; cv=none; b=rgtbgEtGFakynBjkELpLMtChOkqh9uPSqzWnGieQEeIJrTjX7nnm1JkCTWtSn2fRqIUfoAIeI5r2+h5Gw5lBJTeqh1vfU46XhUyLeDhu7oUYyyDRz1Lg/rukT93bBCje1p6OiRVhuzP5H+hqTtxNE2nZwzR9B3lDeohEiMylCwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769395430; c=relaxed/simple;
-	bh=v5IxLNP8KmzwmWx+jfT6s0Cy/wxLp5gtIK/U4E5vClg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=of9qf+YKGH4caVlp7gR11E4+ouubo04129lxlZMuihQA2HPo+jxGlVpztjXai15txfLH92jI4vrhgustv1MWTwc/i+XH5XyGveOZpiyCJZ+KaeK5dPgHMNDE23B3rr26OsmfMgMGqqZYgyy8MdltvK+G+r9WpRpzXR46Ks4Mpdk=
+	s=arc-20240116; t=1769395542; c=relaxed/simple;
+	bh=+cN5ZOiciUWvsWPyD8/EilVaTmFNcsbKfHcYB9FJcKk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=W4+aJ3Lg80vjdMewX3vlaaKRH3opvpRZ+y51S4gDNPONGJ7slGl02v8je+of1BibzMaK0cuQqDiSitk+cGr/SZgewo6qW3DhKq+Sl+bsVVg55grnItcKT+0udISsXSpHvugDOQKXLSbCgCPaLycZ2gkBN6VlojQyFk1fCqnXQnA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: d2140c4cfa6011f0b0f03b4cfa9209d1-20260126
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
-	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
-	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
-	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
-	HR_TO_NO_NAME, IP_UNTRUSTED, SRC_UNTRUSTED, IP_UNFAMILIAR, SRC_UNFAMILIAR
-	DN_TRUSTED, SRC_TRUSTED, SA_TRUSTED, SA_EXISTED, SN_TRUSTED
-	SN_EXISTED, SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS, CIE_GOOD_SPF
-	CIE_UNKNOWN, GTI_FG_BS, GTI_RG_INFO, GTI_C_BU, AMN_GOOD
-	ABX_MISS_RDNS
+X-UUID: 1798514cfa6111f0b0f03b4cfa9209d1-20260126
 X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.6,REQID:86c31801-d3b4-4b1b-9b45-57b7b2b57233,IP:10,U
-	RL:0,TC:0,Content:-25,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTI
-	ON:release,TS:-20
-X-CID-INFO: VERSION:1.3.6,REQID:86c31801-d3b4-4b1b-9b45-57b7b2b57233,IP:10,URL
-	:0,TC:0,Content:-25,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:-20
-X-CID-META: VersionHash:a9d874c,CLOUDID:1ed21dfeeba864af6c8183d563262b76,BulkI
-	D:260126104342CZTJ5TOG,BulkQuantity:0,Recheck:0,SF:17|19|38|66|78|81|82|10
-	2|127|850|898,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bu
-	lk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:
-	0,BRE:0,ARC:0
+X-CID-O-INFO: VERSION:1.3.6,REQID:57b3c94e-ee81-4ec5-8cd1-c4119b88192b,IP:10,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:5
+X-CID-INFO: VERSION:1.3.6,REQID:57b3c94e-ee81-4ec5-8cd1-c4119b88192b,IP:10,URL
+	:0,TC:0,Content:0,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
+	elease,TS:5
+X-CID-META: VersionHash:a9d874c,CLOUDID:1e55da3c77d56adf754c616902a7389a,BulkI
+	D:260124043231HN9O7BOU,BulkQuantity:1,Recheck:0,SF:17|19|64|66|78|80|81|82
+	|83|102|127|841|898,TC:nil,Content:0|15|52,EDM:-3,IP:-2,URL:0,File:nil,RT:
+	nil,Bulk:40,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0
+	,BRR:0,BRE:0,ARC:0
 X-CID-BVR: 2,SSN|SDN
 X-CID-BAS: 2,SSN|SDN,0,_
 X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD
 X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: d2140c4cfa6011f0b0f03b4cfa9209d1-20260126
+X-UUID: 1798514cfa6111f0b0f03b4cfa9209d1-20260126
 X-User: tianyaxiong@kylinos.cn
-Received: from localhost.localdomain [(223.153.105.152)] by mailgw.kylinos.cn
+Received: from [10.200.43.20] [(223.153.105.152)] by mailgw.kylinos.cn
 	(envelope-from <tianyaxiong@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 1330171107; Mon, 26 Jan 2026 10:43:39 +0800
-From: Yaxiong Tian <tianyaxiong@kylinos.cn>
-To: rostedt@goodmis.org,
-	axboe@kernel.dk,
-	mhiramat@kernel.org,
-	mathieu.desnoyers@efficios.com
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	Yaxiong Tian <tianyaxiong@kylinos.cn>
-Subject: [PATCH v2 3/3] blktrace: Make init_blk_tracer() asynchronous
-Date: Mon, 26 Jan 2026 10:43:35 +0800
-Message-Id: <20260126024335.298184-1-tianyaxiong@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260126024033.290136-1-tianyaxiong@kylinos.cn>
-References: <20260126024033.290136-1-tianyaxiong@kylinos.cn>
+	(Generic MTA with TLSv1.3 TLS_AES_128_GCM_SHA256 128/128)
+	with ESMTP id 2040554667; Mon, 26 Jan 2026 10:45:36 +0800
+Message-ID: <d9e906f5-adfe-45da-84fe-d47ef9a159ba@kylinos.cn>
+Date: Mon, 26 Jan 2026 10:45:32 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] tracing: Export eval_map_wq for asynchronous use by
+ other modules
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: axboe@kernel.dk, mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org
+References: <20260122032051.386331-1-tianyaxiong@kylinos.cn>
+ <20260122032415.395548-1-tianyaxiong@kylinos.cn>
+ <20260123153247.004688f6@gandalf.local.home>
+Content-Language: en-US
+From: Yaxiong Tian <tianyaxiong@kylinos.cn>
+In-Reply-To: <20260123153247.004688f6@gandalf.local.home>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-The init_blk_tracer() function causes significant boot delay as it
-waits for the trace_event_sem lock held by trace_event_update_all().
-Specifically, its child function register_trace_event() requires
-this lock, which is occupied for an extended period during boot.
 
-To mitigate this contention, we have moved init_blk_tracer() to the
-trace_init_wq  workqueue, allowing it to execute asynchronously and
-prevent blocking the main boot thread.
+在 2026/1/24 04:32, Steven Rostedt 写道:
+> On Thu, 22 Jan 2026 11:24:15 +0800
+> Yaxiong Tian <tianyaxiong@kylinos.cn> wrote:
+>
+>> The eval_map_work_func() function, though queued in eval_map_wq,
+>> holds the trace_event_sem read-write lock for a long time during
+>> kernel boot. This causes blocking issues for other functions.
+>>
+>> Making eval_map_wq extern allows other modules to schedule their
+>> work asynchronously on this queue,  preventing it from blocking
+>> the main boot thread.
+> If you are going to make this wq generic for other parts of the tracing
+> code, then let's rename it. As "eval_map" is specific to the enum mappings
+> being updated (which I hope someday I can get that update working at build
+> time. And when I do, the name will be totally meaningless).
+>
+> Let's rename it to "trace_init_wq" instead.
+>
+> -- Steve
 
-Signed-off-by: Yaxiong Tian <tianyaxiong@kylinos.cn>
----
- kernel/trace/blktrace.c | 23 ++++++++++++++++++++++-
- 1 file changed, 22 insertions(+), 1 deletion(-)
+Thank you for your suggestion. I have renamed it to trace_init_wq and 
+released the V2 version.
 
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index d031c8d80be4..d611cd1f02ef 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -1832,7 +1832,9 @@ static struct trace_event trace_blk_event = {
- 	.funcs		= &trace_blk_event_funcs,
- };
- 
--static int __init init_blk_tracer(void)
-+static struct work_struct blktrace_works __initdata;
-+
-+static int __init __init_blk_tracer(void)
- {
- 	if (!register_trace_event(&trace_blk_event)) {
- 		pr_warn("Warning: could not register block events\n");
-@@ -1852,6 +1854,25 @@ static int __init init_blk_tracer(void)
- 	return 0;
- }
- 
-+static void __init blktrace_works_func(struct work_struct *work)
-+{
-+	__init_blk_tracer();
-+}
-+
-+static int __init init_blk_tracer(void)
-+{
-+	int ret = 0;
-+
-+	if (trace_init_wq) {
-+		INIT_WORK(&blktrace_works, blktrace_works_func);
-+		queue_work(trace_init_wq, &blktrace_works);
-+	} else {
-+		ret = __init_blk_tracer();
-+	}
-+
-+	return ret;
-+}
-+
- device_initcall(init_blk_tracer);
- 
- static int blk_trace_remove_queue(struct request_queue *q)
--- 
-2.25.1
+
 
