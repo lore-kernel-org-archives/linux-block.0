@@ -1,159 +1,84 @@
-Received: from relay.hostedemail.com (smtprelay0012.hostedemail.com [216.40.44.12])
+Received: from mail.itpri.com (mx1.itpri.com [185.125.111.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA14123EA89;
-	Mon, 26 Jan 2026 14:36:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90B6D2264A3;
+	Mon, 26 Jan 2026 15:56:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.111.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769438215; cv=none; b=uyNlaSeQsPkhAxAzFTs00elDLSb04HCIZO8Zg94CJBJGiA42mWOHZABEPVsToyVzSybXCfFSHzz5lX5izbimlqmFNXPse1kz8DQlfM7YmJaFbw2p1xxISW/aRkO8u28pductaUFl9BgXaZqPz/wsLLCRMxquZ9QgKEIL2s3GWg8=
+	t=1769442973; cv=none; b=DdqcXq6oN7AWXDseM9ZNtCBazLt+XADkn+UaOAYib6SCm8pc6V3DraDywBRUeGGz5i9oG7XlFQ96sdB/40jQOVrTQMLMdXzMNyDhDSSoL1xdjy0yMFwRvgwnnYMOue3Fganb6m/T1R0xwWqV07ltgFywCro5Pf7XGkehlZLbcYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769438215; c=relaxed/simple;
-	bh=jMPEDTeiWeVa4oLHy6ZcUp/vDUqMEZWPE7aY464U3W4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sniaIaKQwu+DBkvAcNWWxjjAJ7geAfKlUhG473WfKE6MUwZnq3lUq0ltI+IS3XjqsD6dH81SDJuGAzGA+0bCPIw1PzH8yAQI/JTUxzit++bwYwAXsFY6o+h2JO+MDKidkeeWn5l4ul6Ez1KKZcGlCvgvnr+AOGLkVInPrHgTuBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
-Received: from omf05.hostedemail.com (a10.router.float.18 [10.200.18.1])
-	by unirelay06.hostedemail.com (Postfix) with ESMTP id 0AC521B0A3C;
-	Mon, 26 Jan 2026 14:36:47 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf05.hostedemail.com (Postfix) with ESMTPA id 0C18D20011;
-	Mon, 26 Jan 2026 14:36:44 +0000 (UTC)
-Date: Mon, 26 Jan 2026 09:36:46 -0500
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Yaxiong Tian <tianyaxiong@kylinos.cn>
-Cc: axboe@kernel.dk, mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/3] tracing: Rename `eval_map_wq` and export it for
- asynchronous use by other modules
-Message-ID: <20260126093646.3922b905@gandalf.local.home>
-In-Reply-To: <20260126024316.297178-1-tianyaxiong@kylinos.cn>
-References: <20260126024033.290136-1-tianyaxiong@kylinos.cn>
-	<20260126024316.297178-1-tianyaxiong@kylinos.cn>
-X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1769442973; c=relaxed/simple;
+	bh=MYzJU2DKsgYEs8+WNe0VqkKqVfQssw6PPszUTaknKGs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Kezg4CADisiW6RQ7tG/PwsqJFFZdLp8qN3a/E7rRNMvJH7vbSA82lurYX8Im2bYJDuTdKzKrQgqDo7yiV6ZLzVCcRGYuBXWA/ccFQeNLBI83IG2JqQ4f1gTnneS74Vmij16fSTKI860iBiOpe8h+qMlG+6kYrp4m3QIdhN4vsLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zazolabs.com; spf=pass smtp.mailfrom=zazolabs.com; dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b=J4+poeqy; arc=none smtp.client-ip=185.125.111.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zazolabs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zazolabs.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b="J4+poeqy"
+X-Virus-Scanned: Yes
+Message-ID: <88f97f6a-f8a8-441e-83eb-71415398b40a@zazolabs.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=zazolabs.com; s=mail;
+	t=1769442967; bh=MYzJU2DKsgYEs8+WNe0VqkKqVfQssw6PPszUTaknKGs=;
+	h=Subject:To:Cc:References:From:In-Reply-To;
+	b=J4+poeqyP6LxMsk0+Cv2eS9tDZjsjjOl2toosfup8gMpcN092CAlMuUydGEMvcaI6
+	 9SkNq49VygVtiVewwvnzCybMF48nyYGTbtPeE8o1HtQlvLgpwpjxN/+PoP/F52Sn1+
+	 u+0ydvREMRttnK5ECn6qUufT15m3PcjBNYi8JbhoZMjdVIRMS+gnsVftO67Fm2qQl7
+	 Z4A5WKkcKgWv77Z1NzxI4RaE5U8DSWzwcgMPwqCKPwMOh6k0uwhsGfSnG0bKUCrjVi
+	 U1qQfv8PycfjoGDT9TGr4ubQtHUvjF4/kIxcoWTEzcw30UY8+IT8utT2F/zQCmm5Pd
+	 xQK83dOnhoW0Db5LquU376tWNv1OLog1uzCZ4UNuhIyAparHBSmKNw8VTFMPzH524v
+	 +yILsQFoFtNVCxvQN6Ld60Xi9VBcCuF2vVht8uTSxI5HJQxVfKZugJasKDUKPiMY+s
+	 F0XJJyhfsGC9SjgPgGLWV32TM89UOCQNyrfZ0sges4brtsc1cZVrA5RJP9PUeg0KTY
+	 ckdYyCQXRx3L4/zJaUPeMKX5S137019EY+OgvvazzOd8tWPWW+j7g9wyF/BU3D1R8c
+	 D8GL4NRvlcxfpSrGzTic/SAD8cjCQf3eS2BKXmqyl5S0dBI97RsGgESlKNt0FG2b4F
+	 N58A6CSxnaXfprHJqljZtpLY=
+Date: Mon, 26 Jan 2026 17:56:05 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [PATCH] selftests: ublk: mark each test start and end time in
+ dmesg
+Content-Language: en-GB
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Shuah Khan <shuah@kernel.org>, linux-block@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260126112544.1811817-2-alex@zazolabs.com>
+ <aXd0KdG_k-LDxeDo@fedora>
+From: Alexander Atanasov <alex@zazolabs.com>
+In-Reply-To: <aXd0KdG_k-LDxeDo@fedora>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Stat-Signature: aqtr4u4qwr5my4umxu56a5z5kf93ixpf
-X-Rspamd-Server: rspamout04
-X-Rspamd-Queue-Id: 0C18D20011
-X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
-X-Session-ID: U2FsdGVkX19iq/IWG9jz79aRyHPrTTDnFB2BymTjM70=
-X-HE-Tag: 1769438204-242823
-X-HE-Meta: U2FsdGVkX1+CjsL7tZvGh7qM4v0yp+S2CJFxEB8OK7MOh91wtNa2vufNnGt3IUOkb3B+zIdQ3XLwPJ6B+UPRHmkrGRoKc4qbOhAG+mXYJxE6oLwkmwVQk+KwI3YSvlA8MDE+Tq3PmVNzd43opcdBpDvrkmNCKfvUJA9EqQtu15IToxUoCFie/z4+WA3yZL5bnw8rDSmkfmKCXbj5xUXcg3kqyOGz5Jrftf0zde0MTq2n1xK5q//Fz0Nxdo2tKlffx7SNfiPsVtxss1g5KVGJ1wvgAIftjlqn9LVD1HkQ3H6h1SuYi3m3pDYTL8YONjNW
 
-On Mon, 26 Jan 2026 10:43:16 +0800
-Yaxiong Tian <tianyaxiong@kylinos.cn> wrote:
+On 26.01.26 16:03, Ming Lei wrote:
+> On Mon, Jan 26, 2026 at 11:25:44AM +0000, Alexander Atanasov wrote:
+>> Log test start and end time in dmesg, so generated log messages
+>> during the test run can be linked to specific test from the test
+>> suite.
 
-Hi,
+[snip]
 
-Some of your terminology is a little confusing. The subject says "modules"
-but no module will use it (the term module means loadable code at runtime
-into the Linux kernel). A better subject would be:
-
-
-  tracing: Rename `eval_map_wq` and allow other parts of tracing use it
-
-
-> The eval_map_work_func() function, though queued in eval_map_wq,
-> holds the trace_event_sem read-write lock for a long time during
-> kernel boot. This causes blocking issues for other functions.
+>>   _remove_test_files()
+>> @@ -166,6 +167,7 @@ _cleanup_test() {
+>>   	"${UBLK_PROG}" del -a
+>>   
+>>   	_remove_files
+>> +	echo "ublk selftest: $TID done at $(date --iso-8601=sec)" | tee /dev/kmsg
+>>   }
 > 
-> Rename eval_map_wq to trace_init_wq and export it, thereby allowing
-
-Also saying "export" for a function means something like "EXPORT_SYMBOLE()"
-which again deals with Linux modules. A better term is "make it global".
-
-> other modules to schedule work on this queue asynchronously and
-
- .. other parts of tracing ..
-
-> avoiding blockage of the main boot thread.
+> Also `date "+%F %T"`(which is taken by blktests project) looks more readable, such as:
 > 
-> Signed-off-by: Yaxiong Tian <tianyaxiong@kylinos.cn>
-
-Other than that, this patch looks good.
-
--- Steve
-
-> ---
->  kernel/trace/trace.c | 18 +++++++++---------
->  kernel/trace/trace.h |  2 ++
->  2 files changed, 11 insertions(+), 9 deletions(-)
+> [root@ktest-40 blktests]# date "+%F %T"
+> 2026-01-26 14:00:51
+> [root@ktest-40 blktests]# date --iso-8601=sec
+> 2026-01-26T14:01:54+00:00
 > 
-> diff --git a/kernel/trace/trace.c b/kernel/trace/trace.c
-> index e18005807395..c61e30cb7339 100644
-> --- a/kernel/trace/trace.c
-> +++ b/kernel/trace/trace.c
-> @@ -10774,7 +10774,7 @@ int tracing_init_dentry(void)
->  extern struct trace_eval_map *__start_ftrace_eval_maps[];
->  extern struct trace_eval_map *__stop_ftrace_eval_maps[];
->  
-> -static struct workqueue_struct *eval_map_wq __initdata;
-> +struct workqueue_struct *trace_init_wq __initdata;
->  static struct work_struct eval_map_work __initdata;
->  static struct work_struct tracerfs_init_work __initdata;
->  
-> @@ -10790,15 +10790,15 @@ static int __init trace_eval_init(void)
->  {
->  	INIT_WORK(&eval_map_work, eval_map_work_func);
->  
-> -	eval_map_wq = alloc_workqueue("eval_map_wq", WQ_UNBOUND, 0);
-> -	if (!eval_map_wq) {
-> -		pr_err("Unable to allocate eval_map_wq\n");
-> +	trace_init_wq = alloc_workqueue("trace_init_wq", WQ_UNBOUND, 0);
-> +	if (!trace_init_wq) {
-> +		pr_err("Unable to allocate trace_init_wq\n");
->  		/* Do work here */
->  		eval_map_work_func(&eval_map_work);
->  		return -ENOMEM;
->  	}
->  
-> -	queue_work(eval_map_wq, &eval_map_work);
-> +	queue_work(trace_init_wq, &eval_map_work);
->  	return 0;
->  }
->  
-> @@ -10807,8 +10807,8 @@ subsys_initcall(trace_eval_init);
->  static int __init trace_eval_sync(void)
->  {
->  	/* Make sure the eval map updates are finished */
-> -	if (eval_map_wq)
-> -		destroy_workqueue(eval_map_wq);
-> +	if (trace_init_wq)
-> +		destroy_workqueue(trace_init_wq);
->  	return 0;
->  }
->  
-> @@ -10969,9 +10969,9 @@ static __init int tracer_init_tracefs(void)
->  	if (ret)
->  		return 0;
->  
-> -	if (eval_map_wq) {
-> +	if (trace_init_wq) {
->  		INIT_WORK(&tracerfs_init_work, tracer_init_tracefs_work_func);
-> -		queue_work(eval_map_wq, &tracerfs_init_work);
-> +		queue_work(trace_init_wq, &tracerfs_init_work);
->  	} else {
->  		tracer_init_tracefs_work_func(NULL);
->  	}
-> diff --git a/kernel/trace/trace.h b/kernel/trace/trace.h
-> index de4e6713b84e..e52f259f8945 100644
-> --- a/kernel/trace/trace.h
-> +++ b/kernel/trace/trace.h
-> @@ -770,6 +770,8 @@ extern unsigned long nsecs_to_usecs(unsigned long nsecs);
->  
->  extern unsigned long tracing_thresh;
->  
-> +extern struct workqueue_struct *trace_init_wq __initdata;
-> +
->  /* PID filtering */
->  
->  bool trace_find_filtered_pid(struct trace_pid_list *filtered_pids,
+> So would you like to consider it too?
+
+I saw this a bit late. I choose iso-8601=sec since it is mid ground 
+between readable and reliable to parse. But if other test use +%F +%T 
+i'll cook a v3 with it, no point to deviate.
+
 
