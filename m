@@ -1,20 +1,20 @@
 Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6394C7DA66;
-	Mon, 26 Jan 2026 02:43:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6805A7DA66;
+	Mon, 26 Jan 2026 02:43:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769395408; cv=none; b=ZxBqpgepOtO9RP/DEL6hgWrEYhhIN8xEmmIO7cg8bO+JLZkHVVf7OQQLo5pOukxqL22BTbWrcqxhwbhsDtrAAfw6gSGb69sNAjXYSk681zSpm2x6XnEENOMUdPawCIaM+ASSgAL2IMkzt6M8Vdl/DvwPPqQ0hnL9Ec4fVUgUaF4=
+	t=1769395421; cv=none; b=cQK1HBkhby8TKkT0FujcAwaGi72tv4tsGhvNrSs9IuXfzR+xkO8SrXM3xV/78FEvhBzOdOt7FBBITOiZbTUVpTiZjD7ng/uQlZEh0gHjuJGe6gKV4JVdTEc4Z0zYR8XzE5KCUDy9tEU1F1eZQG7YL8pOfsot5I4aut59ridc5ec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769395408; c=relaxed/simple;
-	bh=4TdlL4iladGctkLRvzlbmw3NeoTlujsqOI+g2elIzVU=;
+	s=arc-20240116; t=1769395421; c=relaxed/simple;
+	bh=1l7yt29Ik8g5nJiW6lmtDICUMJlfEgiDjCFUGw7mZDg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=MCBERQguGhfzdfLWjW8OFTDHA7PIetDeQbMUPelQyBNQ1kk1q+/ajiDERTNw3i3wrzzfBns4YKQVF+VU+vNlEBtICCh7Ir0SbwqQ2I7qQtNqUdXpixOa57yU94WldtfCRTKO+Fto+cx/RTTMd453icnxHXvEQVNLm++haFimGSs=
+	 MIME-Version; b=UZpAUUEf/mMRAKAjgBOVEo8CItkLCJGhSzbTgMWGC951PDfEp1/PpT3l/WPnrQ15mEW+ja4GTPEVFFMc9IGLMlT0eKKb6ctSsoQ/YiOxumwZk0MUXYz6RkXJyrCwU/vDQwY8PU/f5iRGUGOgdfogANA7s1IlplTMWkdVzAO2LSM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: c6d7bfd6fa6011f0b0f03b4cfa9209d1-20260126
+X-UUID: cc8b0e2efa6011f0b0f03b4cfa9209d1-20260126
 X-CTIC-Tags:
 	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
 	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
@@ -26,27 +26,27 @@ X-CTIC-Tags:
 	CIE_UNKNOWN, GTI_FG_BS, GTI_RG_INFO, GTI_C_BU, AMN_GOOD
 	ABX_MISS_RDNS
 X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.6,REQID:31ddab7f-1e5e-4267-8943-fe852fd87ed9,IP:10,U
-	RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:0
-X-CID-INFO: VERSION:1.3.6,REQID:31ddab7f-1e5e-4267-8943-fe852fd87ed9,IP:10,URL
-	:0,TC:0,Content:-5,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:a9d874c,CLOUDID:4210cfb6fccb232f9bc3a0d4290bdcc0,BulkI
-	D:260126104321OHI01H1F,BulkQuantity:0,Recheck:0,SF:17|19|38|66|78|81|82|10
+X-CID-O-INFO: VERSION:1.3.6,REQID:f5d8a836-423e-4815-84d0-db0a48a34133,IP:10,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:5
+X-CID-INFO: VERSION:1.3.6,REQID:f5d8a836-423e-4815-84d0-db0a48a34133,IP:10,URL
+	:0,TC:0,Content:0,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
+	elease,TS:5
+X-CID-META: VersionHash:a9d874c,CLOUDID:8497e752e683fcde637bed06aa353b8c,BulkI
+	D:260126104333XKEST3MK,BulkQuantity:0,Recheck:0,SF:17|19|38|66|78|81|82|10
 	2|127|850|898,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bu
 	lk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:
 	0,BRE:0,ARC:0
 X-CID-BVR: 2,SSN|SDN
 X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_FSD,TF_CID_SPAM_SNR,TF_CID_SPAM_FAS
+X-CID-FACTOR: TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_SNR
 X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: c6d7bfd6fa6011f0b0f03b4cfa9209d1-20260126
+X-UUID: cc8b0e2efa6011f0b0f03b4cfa9209d1-20260126
 X-User: tianyaxiong@kylinos.cn
 Received: from localhost.localdomain [(223.153.105.152)] by mailgw.kylinos.cn
 	(envelope-from <tianyaxiong@kylinos.cn>)
 	(Generic MTA)
-	with ESMTP id 2105670250; Mon, 26 Jan 2026 10:43:20 +0800
+	with ESMTP id 1967147986; Mon, 26 Jan 2026 10:43:30 +0800
 From: Yaxiong Tian <tianyaxiong@kylinos.cn>
 To: rostedt@goodmis.org,
 	axboe@kernel.dk,
@@ -56,9 +56,9 @@ Cc: linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-trace-kernel@vger.kernel.org,
 	Yaxiong Tian <tianyaxiong@kylinos.cn>
-Subject: [PATCH v2 1/3] tracing: Rename `eval_map_wq` and export it for asynchronous use by other modules
-Date: Mon, 26 Jan 2026 10:43:16 +0800
-Message-Id: <20260126024316.297178-1-tianyaxiong@kylinos.cn>
+Subject: [PATCH v2 2/3] tracing/kprobes: Make setup_boot_kprobe_events() asynchronous
+Date: Mon, 26 Jan 2026 10:43:26 +0800
+Message-Id: <20260126024326.297650-1-tianyaxiong@kylinos.cn>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20260126024033.290136-1-tianyaxiong@kylinos.cn>
 References: <20260126024033.290136-1-tianyaxiong@kylinos.cn>
@@ -70,89 +70,56 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The eval_map_work_func() function, though queued in eval_map_wq,
-holds the trace_event_sem read-write lock for a long time during
-kernel boot. This causes blocking issues for other functions.
+During kernel boot, the setup_boot_kprobe_events() function causes
+significant delays, increasing overall startup time.
 
-Rename eval_map_wq to trace_init_wq and export it, thereby allowing
-other modules to schedule work on this queue asynchronously and
-avoiding blockage of the main boot thread.
+The root cause is a lock contention chain: its child function
+enable_boot_kprobe_events() requires the event_mutex, which is
+already held by early_event_add_tracer(). early_event_add_tracer()
+itself is blocked waiting for the trace_event_sem  read-write lock,
+which is held for an extended period by trace_event_update_all().
+
+To resolve this, we have moved the execution of
+setup_boot_kprobe_events() to the trace_init_wq workqueue, allowing
+it to run asynchronously.
 
 Signed-off-by: Yaxiong Tian <tianyaxiong@kylinos.cn>
 ---
- kernel/trace/trace.c | 18 +++++++++---------
- kernel/trace/trace.h |  2 ++
- 2 files changed, 11 insertions(+), 9 deletions(-)
+ kernel/trace/trace_kprobe.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/kernel/trace/trace.c b/kernel/trace/trace.c
-index e18005807395..c61e30cb7339 100644
---- a/kernel/trace/trace.c
-+++ b/kernel/trace/trace.c
-@@ -10774,7 +10774,7 @@ int tracing_init_dentry(void)
- extern struct trace_eval_map *__start_ftrace_eval_maps[];
- extern struct trace_eval_map *__stop_ftrace_eval_maps[];
- 
--static struct workqueue_struct *eval_map_wq __initdata;
-+struct workqueue_struct *trace_init_wq __initdata;
- static struct work_struct eval_map_work __initdata;
- static struct work_struct tracerfs_init_work __initdata;
- 
-@@ -10790,15 +10790,15 @@ static int __init trace_eval_init(void)
- {
- 	INIT_WORK(&eval_map_work, eval_map_work_func);
- 
--	eval_map_wq = alloc_workqueue("eval_map_wq", WQ_UNBOUND, 0);
--	if (!eval_map_wq) {
--		pr_err("Unable to allocate eval_map_wq\n");
-+	trace_init_wq = alloc_workqueue("trace_init_wq", WQ_UNBOUND, 0);
-+	if (!trace_init_wq) {
-+		pr_err("Unable to allocate trace_init_wq\n");
- 		/* Do work here */
- 		eval_map_work_func(&eval_map_work);
- 		return -ENOMEM;
- 	}
- 
--	queue_work(eval_map_wq, &eval_map_work);
-+	queue_work(trace_init_wq, &eval_map_work);
- 	return 0;
+diff --git a/kernel/trace/trace_kprobe.c b/kernel/trace/trace_kprobe.c
+index 9953506370a5..4c6621f02696 100644
+--- a/kernel/trace/trace_kprobe.c
++++ b/kernel/trace/trace_kprobe.c
+@@ -2031,6 +2031,13 @@ static __init int init_kprobe_trace_early(void)
  }
+ core_initcall(init_kprobe_trace_early);
  
-@@ -10807,8 +10807,8 @@ subsys_initcall(trace_eval_init);
- static int __init trace_eval_sync(void)
- {
- 	/* Make sure the eval map updates are finished */
--	if (eval_map_wq)
--		destroy_workqueue(eval_map_wq);
-+	if (trace_init_wq)
-+		destroy_workqueue(trace_init_wq);
- 	return 0;
- }
- 
-@@ -10969,9 +10969,9 @@ static __init int tracer_init_tracefs(void)
- 	if (ret)
- 		return 0;
- 
--	if (eval_map_wq) {
-+	if (trace_init_wq) {
- 		INIT_WORK(&tracerfs_init_work, tracer_init_tracefs_work_func);
--		queue_work(eval_map_wq, &tracerfs_init_work);
-+		queue_work(trace_init_wq, &tracerfs_init_work);
- 	} else {
- 		tracer_init_tracefs_work_func(NULL);
- 	}
-diff --git a/kernel/trace/trace.h b/kernel/trace/trace.h
-index de4e6713b84e..e52f259f8945 100644
---- a/kernel/trace/trace.h
-+++ b/kernel/trace/trace.h
-@@ -770,6 +770,8 @@ extern unsigned long nsecs_to_usecs(unsigned long nsecs);
- 
- extern unsigned long tracing_thresh;
- 
-+extern struct workqueue_struct *trace_init_wq __initdata;
++static struct work_struct kprobe_trace_work __initdata;
 +
- /* PID filtering */
++static void __init kprobe_trace_works_func(struct work_struct *work)
++{
++	setup_boot_kprobe_events();
++}
++
+ /* Make a tracefs interface for controlling probe points */
+ static __init int init_kprobe_trace(void)
+ {
+@@ -2048,7 +2055,12 @@ static __init int init_kprobe_trace(void)
+ 	trace_create_file("kprobe_profile", TRACE_MODE_READ,
+ 			  NULL, NULL, &kprobe_profile_ops);
  
- bool trace_find_filtered_pid(struct trace_pid_list *filtered_pids,
+-	setup_boot_kprobe_events();
++	if (trace_init_wq) {
++		INIT_WORK(&kprobe_trace_work, kprobe_trace_works_func);
++		queue_work(trace_init_wq, &kprobe_trace_work);
++	} else {
++		setup_boot_kprobe_events();
++	}
+ 
+ 	return 0;
+ }
 -- 
 2.25.1
 
