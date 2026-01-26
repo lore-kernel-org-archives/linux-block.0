@@ -1,92 +1,92 @@
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90A26330305
-	for <linux-block@vger.kernel.org>; Mon, 26 Jan 2026 10:54:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A41CE30ACE5
+	for <linux-block@vger.kernel.org>; Mon, 26 Jan 2026 10:55:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.42
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769424885; cv=pass; b=P+pJocYDEGTnmFDBKJPVv47H5T7xffrFYCrM5vEWr2Gt83bLUE0NgCbdRl6p0c9E586UK0hcK5m6McB53S3g9mizzbnsyh9no5CpRF7gb+RnmNhEK1xh7cem08zvRsfcvjqGCIxQV+4ajcjXoEWtoFzJW8r47qzTPYZIiZj+W08=
+	t=1769424951; cv=pass; b=EQ8C4+utbjLNKu4x7ZEZ0r3Yn6ta0gN4qRmvXHwEhmHHn+4vqti0D5W42TpyG5YbigYsiOCdr5U5Bejs+BQpkPiNQChUvb5mzifn6W2EBIhQYSJ+IV/3lJbNNB1TfukHd8HGJi3shVHXsF9xxsyncE7kje9Jrs1j/o/KKyf98MU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769424885; c=relaxed/simple;
-	bh=3omMcSnzzBOB/jU4R6Db7fut+Zs1dL68KtxqM98Cvg8=;
+	s=arc-20240116; t=1769424951; c=relaxed/simple;
+	bh=gm1y3HjSbfjetP2qj6SkQ/PvAerOiP935sq/jHQIUpg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AEody1VUP3TKpwCJwlJLu2Ak0jMns0rvOaTNkLOuO8XXc/Bry7U4AP5G1+0wjp+0q+27kVI+nqzgVqZDlHYXSA9Hc3sFSp02s3kLjE3ojyK7V3cqfW6guBct9yby2dMNwH5TrzajdQGjw7kYeBDJkG3rNglVNxGD3+tmkhmy2vk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BDwcCI1z; arc=pass smtp.client-ip=209.85.208.48
+	 To:Cc:Content-Type; b=SzAc+bxxWwMftO8HlxGnzwXz8eHiRQPA8p9tPlNf2T1e95CbpEIjq0u5PYoYzeIbRSW/Hmz0PTBRoGXSsjM0+/Gpt3oblZU5qTD1cvyfdSX6sJ+/OkGqiPDJyz8yNte3HtA5U3kU3Szc6ITZe20e7h4l8kB6pc2Dof19jRoKK3c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c3iPKmcd; arc=pass smtp.client-ip=209.85.208.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BDwcCI1z"
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-64b9dfc146fso7695231a12.0
-        for <linux-block@vger.kernel.org>; Mon, 26 Jan 2026 02:54:43 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769424882; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c3iPKmcd"
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-658381b28e8so5821746a12.0
+        for <linux-block@vger.kernel.org>; Mon, 26 Jan 2026 02:55:49 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769424948; cv=none;
         d=google.com; s=arc-20240605;
-        b=cRnaAQ5cHVSQn5CeMuuYjSu2ko4Qs40yReLUxsvIjuHolJwyWGaR2mLZBiBNVu5ZtE
-         h94Fg7faK4hd8i3Br2gwJ0e9tQwjepu+r8C5esxFgrcMRVcuz1x4aD+enexl9A4OM+Ey
-         M55gv0UMdVS+bAkA6+FIDWuIbae5VA6Mw1TObkCuoCV++JjVra2IHbOaXZ1VWuuO227W
-         Obu87svnZAGDLiMg8fe0bWCj4+rwOmytvc8bA1f1WCh2tD19dprPx474Aa3kP8+FG9Do
-         hhpe9lh5SO5hlsrlLvT2WEzU7E8MPWFT7bq/RqrEKWVNfy0H5XJ/sJqUhx5VYAijJ71T
-         E1ew==
+        b=ctMmOzgFbfht28YqTYRjv+69BtROVaO83S7hnnAExKJm0eKL6fA1kh2y7PA7oEd1fr
+         B8jGLYIgItneyQ7wowGs13z8gNpBpcFhDd8PEZZuxEBo7AWyF1pEeJNXQe4QkffQIKSY
+         WoU9rgbtpYvBJXmW+HHHy/JJEkw4t2DEb1KndS8p/QviDN/iw1dbHYZdt5ZuxKEiPv7v
+         WaHQFImGoFAZWTK/H8yMQv0iVRLpBZl8ji2lViuLxNI6EK3sXmqmmcaG7/NF+VDJ3utn
+         G56gCg/l5m2gP5whLjXPod2jZBVeBaX0JAafCXr1YnE7U6aU7gvmGKsugl5BAi2LCwIU
+         PBbg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=yNBCh+MzIZqXXtP5FXW5pr/v9SaMB3DIQFyJVa5+MmY=;
-        fh=za3VW7smekfD0sB84rsU/naWfdrVi97qC6x63aTxgvw=;
-        b=VgzDABC/F40/BSGuHpuo10HKUuV1bIIWYuxvOXGEv97dbyz6y+qsTvxz4abYlsS9tY
-         jekb7+EifA/yzykGrqeKIUWBebYR0gDhY/ce7xjcsoit+sU79/fqfXdJ7RGrq6OlSOn9
-         BUl7hlBXN64MMvDErutdeYyzvPP6AYLz1q5X9WjCudfXjpvYD056nOrtonbsvrOoH0o9
-         f+yfqQxs60vTJzVcngc3M4zT+WMeVGo8abIQHqueh51BKdm+68d3ToauWaGOoJEOpmeK
-         anIzfSuoJsVNOsC3qwtpQ/L3xrTFKH8WlhQ7BaY5t2bwfa9jfizEVczf6ZfhqaFaPJ4Z
-         a8eQ==;
+        bh=gm1y3HjSbfjetP2qj6SkQ/PvAerOiP935sq/jHQIUpg=;
+        fh=VoxQxy4SkIAYDRu4gGOXB0TTTHLrFAFWJPxvb2XdmVQ=;
+        b=TT048ITSSsjqmh7/5Jr2vHCWJ9aJy7ILS0PYBQli4M+41WJifSdVDVGbt81fVOKg/w
+         TOoIaS4oaEDK20I7VM4pstVQfwIjOpcebNj8NdiUyTPB1T38VAF/FPEnL9rMm3gHHhUs
+         OG5KXdRwyzJtVjWj1BOD0Tp6Oburw4FJl2CWwFbyIuQxU/67+hcOTckZjLqt+m4eyqMa
+         yDOQ69+v3U1N9dKTB5GeeAgkuoAaXvvoWDWlWC+atInwU+wU2xFb+C4pj2YbbuECmjGj
+         aXaALi/PZ/OfilFyhBt6RiXZsdkcm2l4JooHZThXR4HfXcXdkXhe8HjYY25mYaDncqUy
+         puLQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1769424882; x=1770029682; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1769424948; x=1770029748; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=yNBCh+MzIZqXXtP5FXW5pr/v9SaMB3DIQFyJVa5+MmY=;
-        b=BDwcCI1zcwMS1r+JBTzVcAgOhhCyKy0iK3KjR7cl4JIukj3SmH85AXv9o9B8g1qctg
-         k7izeFCcTtPCcQtECVeXoH+n24rzuwNk8c9uqRbQNFhOjscE+kr1BAy4gEqD7omZkb2y
-         dactuQd5KyDLfPA1OEwNuUMSZ9eRk39Jh+Q/gCPk2LrC9aAEAoMY562w82OB/4q4YB6g
-         ol38PUksbxt0njqtUvypKopW88GmE/q9XXJ3pWhOzN3l8DKqd0UCXlHY/CMu2WImU2ul
-         E5MDdkm1+mUS25rqM+9YDj3y0VXgB+ZMpT8mE23DvKrUub13/KaHHX6oli1RGkl0eUl7
-         qyWg==
+        bh=gm1y3HjSbfjetP2qj6SkQ/PvAerOiP935sq/jHQIUpg=;
+        b=c3iPKmcdWcrKJaAj/tOAIo5py1TPzrNQ5pnCQBDB5cDKZBqdHFmbS2cqW9rU4pd1BZ
+         xo3+8zTVQNLKxD+hOyRZmewYR3RYRC3SyibdkCCyBnF7cuRF5YucN15R6RtEEWQlFxAy
+         NpVZAC2tc0lG0F1smKvYG4EBrF/KdDlLJliGkZQgEFBs1rPPMFhas58k6dZf1FKOUDZ5
+         7Ync/FiSACF5NS+fns8XGi/3p5YOQPPZGHI8gPSRF0EU/oz/phSYciODICKoCqgDNwSk
+         +D+AXYHRfBa//b7v0zpEPo8lK2n/F4uwg0lBf/jxL/b7TlGtN1oAEnNixJE2uEk1k2e+
+         S5Fw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769424882; x=1770029682;
+        d=1e100.net; s=20230601; t=1769424948; x=1770029748;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yNBCh+MzIZqXXtP5FXW5pr/v9SaMB3DIQFyJVa5+MmY=;
-        b=oyRSAj5KfhB2J1+1gDMYenAZD6Jdkx6rcMYREenvMC/8u4q7DF1ID3I+qAohHUa99i
-         oq+h2SiPQuDNvYrGEty5V55UEFMtScSFCMTwWqKe2+CbrFyrbAscK0bngZ8m5wrXsf5r
-         EEVTv5Eg7OGKMwWqEHNqi6fF589WSL7FjVs4mzq5rVxDMYbLy+3NVf446LvNrQiOckWy
-         fyYILv9qJ8MItgoBvdueFhuFY45dYmcQUtFkl3ueO4PK9XEtFflxIQnDWff3Vz0m4Oxv
-         v3pP0ITJNLYkdmH5ayfpgb4Bh4wF9bXj1mVtJuced2/ZTY6ieJOA+PbbcP8YWO9zaCKr
-         KYTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXxg4kL2idZnMz5ksGHYSQysikUdHnom7atlT7UYC+uCPjxay/S5TLWhHt4rdcC+eAnJ/dvJj3ORmq0Gg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YziPEyyihJ3WZ27hXjLNxao7/SEFEErvhPNNdMwYKUfsJXdvaw1
-	QMtlv5fhAdVqt9mAsDPa4hoMC4X+gqKe4tbFFGG6LNaKXXPyKxgUVcVAvdGwvXR/LAsqpsLddoz
-	h8b2XA2d/GLFwyESOEL4xv0HbmlQ/RQ==
-X-Gm-Gg: AZuq6aJVLOXnylhvC3Y+503NZgq+n0zVnis3JbbLgyV7ALX/EOXxcMcrkxgHzql/qj5
-	rB9IheKbOHbNt7cyALMSAJh5QJEn0OKSqrqAAptAPSEPaIT8HYUr2ZnHpOg8Nh5kVgrVUPcm3Ym
-	zzbUn6hUM/p+gyE2OdMcMb92flAHUxp5nKaahT7I8iN6F1ohVTBDfr3VW85m/zLp39NF9kc6wOp
-	hoYlM6XOu9r6EDV2S+JObCps/KrFSPqtBiyR6yQxT2JJuvFXUCYXrgxkxOhI8yoJNYThHUvq1bF
-	8T27y8Yx2Ed2etfaYxdsAktLT/o96h1sNGq3ZsWwg9+h2UGg+oqqW5dj4w==
-X-Received: by 2002:a05:6402:4306:b0:658:1224:3d5b with SMTP id
- 4fb4d7f45d1cf-658709c0267mr3007632a12.1.1769424881479; Mon, 26 Jan 2026
- 02:54:41 -0800 (PST)
+        bh=gm1y3HjSbfjetP2qj6SkQ/PvAerOiP935sq/jHQIUpg=;
+        b=Cbs3tmLEPKJqloN0nOTlxFoEN11ZKWcDI5USfJ1RZCUOgsftXmHnD9WhHDL155/HaJ
+         4B3VQ0w/4Z/L84Ue7iD/0AxQFQjongGYtz7dLzZT/o1gC6Gry1vQG2knTZBZQx5oUpqx
+         6T19H/PjNV26jUkJal2J7E0loJkg7lyhpzQUYTJ3LVUPXTeEA/2q9t9aV1yzMFmgAA2w
+         zA3W8ZCvzs0pnQH9M5apZEwe79GVs/u46ou71ifENEkSZeNreatnu2dF9ixNScxgPYlY
+         eBJB8CM/5bmUzbPyZSdLJhfMhKx05FUeoqPhiqg/ff2c5kNz3vfTIh+73v9hiBUB2ssW
+         FDlA==
+X-Forwarded-Encrypted: i=1; AJvYcCUyuOTYBroTvyAUK0UDw0Svf+J1j+QOfoB3GC5I4mx05QGrCdmbk5Vgw15CXnsxZwrw5EwGZxc946kl4w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwsGZG5ei1+GpTkPb9VdyQXVeOwvjOOTnFfrQbn+M55kufqLV/f
+	nBc4mTdCaBgLB8I/hX8+4503+nuVSp8BR4ryormUaTlwsyOvg8F+Lc0n/JFo4viVlWJk++3x464
+	uZKWCFuDrxY3B8X2f4fpq5IWyoi29zg==
+X-Gm-Gg: AZuq6aJTf8qUc+GYu++IA6t3+8C1PeyzAaR53KIJ/yO/sPn5jt2pWTQIoV1ryDr4SN/
+	yzRMGpBOlyNxcgn9Pvufczl3dxJhGfaSPEvJnLldMdxU4/XdmG+6xEUnEm7tAZnAZ+bicUu/kO4
+	eU6nkxsTLoZ+LPFp2Bn9AkD1uJQFNy05qhxfLsQ8cWOK4knzVlC8RX5+aA8mRca+NIDtvl9/1pu
+	20rplAMoOmBMvkWHbV6/34v9HDPREzKOAI4QOu1915mayyG0EAj4lBUW5I8dDFTpR4YS6V+x9Jo
+	dlMxFQMrZ91OsvMx1HqS55Z0CMw/tbckwlLRD4CoQxr2/cnhxXQFICYw7g==
+X-Received: by 2002:a05:6402:380c:b0:655:a20a:a258 with SMTP id
+ 4fb4d7f45d1cf-6587069c213mr2486327a12.10.1769424947707; Mon, 26 Jan 2026
+ 02:55:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260126055406.1421026-1-hch@lst.de>
-In-Reply-To: <20260126055406.1421026-1-hch@lst.de>
+References: <20260126055406.1421026-1-hch@lst.de> <20260126055406.1421026-2-hch@lst.de>
+In-Reply-To: <20260126055406.1421026-2-hch@lst.de>
 From: Anuj gupta <anuj1072538@gmail.com>
-Date: Mon, 26 Jan 2026 16:24:03 +0530
-X-Gm-Features: AZwV_QgJvnXLJlNIFnJC-x5vJYhiyLLjRUKN4n8q42zV9yyRDXraubp27mNNc8w
-Message-ID: <CACzX3At3fS19fmp8wOq29rHK-yw0KFp1bAvTdo9NC9eQj4E=pw@mail.gmail.com>
-Subject: Re: bounce buffer direct I/O when stable pages are required v3
+Date: Mon, 26 Jan 2026 16:25:09 +0530
+X-Gm-Features: AZwV_QjUgod4A74r99ZxhhMNDurfLjL6lQ1hQ8sz2YOsyYFIfGBA-FWn3r3zY7U
+Message-ID: <CACzX3AuJb887ish66TQLWyDezFBW0-XiuOaq6E624s9hxEBhUg@mail.gmail.com>
+Subject: Re: [PATCH 01/15] block: add a BIO_MAX_SIZE constant and use it
 To: Christoph Hellwig <hch@lst.de>
 Cc: Jens Axboe <axboe@kernel.dk>, Christian Brauner <brauner@kernel.org>, 
 	"Darrick J. Wong" <djwong@kernel.org>, Carlos Maiolino <cem@kernel.org>, Qu Wenruo <wqu@suse.com>, 
@@ -94,22 +94,4 @@ Cc: Jens Axboe <axboe@kernel.dk>, Christian Brauner <brauner@kernel.org>,
 	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-As Keith suggested, here are the QD1 latency numbers (in usec)
-
-Intel Optane:
-
-Sequential write
-  | size | zero copy  |  bounce   |
-  +------+------------+-----------+
-  |   4k |    8.91    |    9.09   |
-  |  64K |    35.98   |    39.9   |
-  |   1M |    341.96  |    531.51 |
-  +------+-------------------------+
-
-Sequential read
-  | size | zero copy  |  bounce   |
-  +------+------------+-----------+
-  |   4k |    7.18    |    14.28  |
-  |  64K |    36.4    |    95.61  |
-  |   1M |    206.38  |    258.66 |
-  +------+-------------------------+
+Reviewed-by: Anuj Gupta <anuj20.g@samsung.com>
