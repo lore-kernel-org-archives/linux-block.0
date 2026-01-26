@@ -1,89 +1,203 @@
-Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0AF32475CB;
-	Mon, 26 Jan 2026 19:12:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3A82258EDB;
+	Mon, 26 Jan 2026 19:36:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769454778; cv=none; b=tCE6Db7XB8gd/O0MLYISkCM1ljgvuhZkH3GOxY79tbRJiiJyPIB3RryZucnPlJMsiaBjMTJcZ3HjPjrdBoghjtapUL2zui4S6jPZ0NfF1zsJBeXBOfpQvovdzPyxsl4PDw8k0VWD0keZd9wzl1uI8h41kaMTDkuwXNyReWFzDJs=
+	t=1769456210; cv=none; b=P13FZDzkOKbnvT1je21V9d3beT1PLo3YsdGrdJghhnJaM2o1Y4yqBhSyGDwk7lJs7vSH1vdoU7LQv0yhhIAEkDEQucH4eYIj1fFaakUMgoWpXXKqXARXmV67xjGWEXVREKv2Z16yFhlr4EVlUVa86Evfed2hQAPsNQ8QnmQ/AUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769454778; c=relaxed/simple;
-	bh=L0UW6hrzAJav4BEvDCb4gbxi00lWcyoTcmwxw8Bcxic=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RphQD2L4E2NphHGEepuBCIt5NnoW50KitRnWmtCO28KCYDlH0h12H34N3xzmVEee/sTKcviCjDCPiJhDEeXyuVOwoOHldeYHuS9CAnbksWUOoE0InT6jxCURcdO/a3SI9zyXiAbXzCTH7e0Umyr5MfxgaMuFL2IHyzB5vsASBhs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=x9resg0i; arc=none smtp.client-ip=199.89.1.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1769456210; c=relaxed/simple;
+	bh=WQDHzbHWisuyP9HUrv0hhczQyl1XzKm5J3s1W8GvNw0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rbW8eqbG2pRJjXUbqSl9It9AzK130eSBDTi5j6L7oEXpVv/dvP5yzk7Znhu4QTLZtGWXqplW3PtVGOBQS2SStrh6DAG7STaEJDsyrLAPuUFGA/PLPm3J/idCbr2aiRzZbAab2chSYjWnm40KL7CYYcfEQscMvOivKblXxKUQpKg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Iu+SXhoT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="x9resg0i"
-Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4f0J8S1wxMzlh1Sr;
-	Mon, 26 Jan 2026 19:12:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1769454774; x=1772046775; bh=L0UW6hrzAJav4BEvDCb4gbxi
-	00lWcyoTcmwxw8Bcxic=; b=x9resg0iOiWbYn2mxnm98i5bEHONSybLK2oB8a1T
-	SRjspSI2/X14fh0ao0snL5N/804jAse8Ve37KaTm2oNi8/TZ9pqll+JI+eQ8xISH
-	H4YFcmJu6nAk9I1557/n1Gw/XPps2rQwqPjKa+jo8wLLImUZedhihq8msSfYQggT
-	4wOOO50kyXKMpbU0zfLUa/MrYFd/GxH3CkfC7C/QZ4+lPXSzLtGRiaT+55lfrvjs
-	cZr1jdoOvB5O0z9p3Jmjpw2eJ/6VYsk2GIWz6UZTNnC0ItyhAu8ep3PrUzBP4ZdQ
-	/uC3RJfhmeC4Qbw7vRGbJPUeTCpN88sFWw+ny8PIsmf33g==
-X-Virus-Scanned: by MailRoute
-Received: from 013.lax.mailroute.net ([127.0.0.1])
- by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id kdWDbU6Uevu5; Mon, 26 Jan 2026 19:12:54 +0000 (UTC)
-Received: from [100.119.48.131] (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4f0J8P4wn3zlh1SG;
-	Mon, 26 Jan 2026 19:12:53 +0000 (UTC)
-Message-ID: <5273400e-5cf8-4d70-a85d-accfb2977d8e@acm.org>
-Date: Mon, 26 Jan 2026 11:12:52 -0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Iu+SXhoT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76E88C116C6;
+	Mon, 26 Jan 2026 19:36:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769456209;
+	bh=WQDHzbHWisuyP9HUrv0hhczQyl1XzKm5J3s1W8GvNw0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Iu+SXhoTaNkr/e5V3RWQB+X70Sztgq9Qy+fCPHKu7nxIx3sP5QfQvnfxNPAHjzB50
+	 vrAxgnGQqHdN34+wLcvFwsliXz/7UouDiegID86GeglOFeDnpVz9oM8Z3QZ8Y5l17w
+	 5gaogrFWp1TRHZ9UfrVYCMwktn8JjPV2dHwoduWE9654SnQFurMmiiSbPXTRDuNXJD
+	 T32W86LDtwSy3uB2dnevPQ+6ngfHRuW/vWlyVMabYfDxX2qR4FhsU9XtMWiWWHtV9g
+	 dTEc+aXXeFZosDhHRMHAzQ6GlmmurRSdkvcOpz31MlXYKV/zyVnHGdbHNipPrh63cR
+	 6Ooi2hJ0MHkYA==
+Date: Mon, 26 Jan 2026 11:36:48 -0800
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Christian Brauner <brauner@kernel.org>,
+	Carlos Maiolino <cem@kernel.org>, Qu Wenruo <wqu@suse.com>,
+	Al Viro <viro@zeniv.linux.org.uk>, linux-block@vger.kernel.org,
+	linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 01/15] block: add a BIO_MAX_SIZE constant and use it
+Message-ID: <20260126193648.GV5910@frogsfrogsfrogs>
+References: <20260126055406.1421026-1-hch@lst.de>
+ <20260126055406.1421026-2-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [LSF/MM/BPF TOPIC] Block storage copy offloading
-To: Viacheslav Dubeyko <slava@dubeyko.com>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Cc: lsf-pc@lists.linux-foundation.org, Jaegeuk Kim <jaegeuk@kernel.org>
-References: <0cfe6fe2-3865-4dc2-92a7-74b1240f7b63@acm.org>
- <eab078c99e17e45632c6b35e2fe1145e9459ff2f.camel@dubeyko.com>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <eab078c99e17e45632c6b35e2fe1145e9459ff2f.camel@dubeyko.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260126055406.1421026-2-hch@lst.de>
 
-On 1/26/26 10:18 AM, Viacheslav Dubeyko wrote:
-> I am not completely sure that copy offloading to the storage device can
-> reduce energy consumption. The storage device needs to spend energy for
-> executing this operation, anyway. Do you have any numbers that can
-> prove your point?
+On Mon, Jan 26, 2026 at 06:53:32AM +0100, Christoph Hellwig wrote:
+> Currently the only constant for the maximum bio size is BIO_MAX_SECTORS,
+> which is in units of 512-byte sectors, but a lot of user need a byte
+> limit.
+> 
+> Add a BIO_MAX_SIZE constant, redefine BIO_MAX_SECTORS in terms of it, and
+> switch all bio-related uses of UINT_MAX for the maximum size to use the
+> symbolic names instead.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Yes, we have measurements that prove this point but unfortunately the
-vendor that collected this data does not allow us to publish that data.
+Yay, thanks!
+Reviewed-by: "Darrick J. Wong" <djwong@kernel.org>
 
-Reducing energy consumption matters for mobile devices. There are other
-applications for copy offloading, e.g. in data centers and in enterprise
-applications. I don't think that these other users care as much about
-reducing energy consumption as we do.
+--D
 
-> Which file system have you considered as working model of your approach?
-Every LFS for zoned storage has to perform garbage collection, isn't it?
-I think that we can discuss copy offloading without having to discuss
-filesystem implementation details.
-
-Thanks,
-
-Bart.
-
+> ---
+>  block/bio.c               | 10 +++++-----
+>  block/blk-lib.c           |  9 ++++-----
+>  block/blk-merge.c         |  8 ++++----
+>  include/linux/blk_types.h |  3 ++-
+>  4 files changed, 15 insertions(+), 15 deletions(-)
+> 
+> diff --git a/block/bio.c b/block/bio.c
+> index 2359c0723b88..ac7703e149c6 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -924,7 +924,7 @@ static inline bool bio_full(struct bio *bio, unsigned len)
+>  {
+>  	if (bio->bi_vcnt >= bio->bi_max_vecs)
+>  		return true;
+> -	if (bio->bi_iter.bi_size > UINT_MAX - len)
+> +	if (bio->bi_iter.bi_size > BIO_MAX_SIZE - len)
+>  		return true;
+>  	return false;
+>  }
+> @@ -1030,7 +1030,7 @@ int bio_add_page(struct bio *bio, struct page *page,
+>  {
+>  	if (WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED)))
+>  		return 0;
+> -	if (bio->bi_iter.bi_size > UINT_MAX - len)
+> +	if (bio->bi_iter.bi_size > BIO_MAX_SIZE - len)
+>  		return 0;
+>  
+>  	if (bio->bi_vcnt > 0) {
+> @@ -1057,7 +1057,7 @@ void bio_add_folio_nofail(struct bio *bio, struct folio *folio, size_t len,
+>  {
+>  	unsigned long nr = off / PAGE_SIZE;
+>  
+> -	WARN_ON_ONCE(len > UINT_MAX);
+> +	WARN_ON_ONCE(len > BIO_MAX_SIZE);
+>  	__bio_add_page(bio, folio_page(folio, nr), len, off % PAGE_SIZE);
+>  }
+>  EXPORT_SYMBOL_GPL(bio_add_folio_nofail);
+> @@ -1081,7 +1081,7 @@ bool bio_add_folio(struct bio *bio, struct folio *folio, size_t len,
+>  {
+>  	unsigned long nr = off / PAGE_SIZE;
+>  
+> -	if (len > UINT_MAX)
+> +	if (len > BIO_MAX_SIZE)
+>  		return false;
+>  	return bio_add_page(bio, folio_page(folio, nr), len, off % PAGE_SIZE) > 0;
+>  }
+> @@ -1238,7 +1238,7 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+>  		extraction_flags |= ITER_ALLOW_P2PDMA;
+>  
+>  	size = iov_iter_extract_pages(iter, &pages,
+> -				      UINT_MAX - bio->bi_iter.bi_size,
+> +				      BIO_MAX_SIZE - bio->bi_iter.bi_size,
+>  				      nr_pages, extraction_flags, &offset);
+>  	if (unlikely(size <= 0))
+>  		return size ? size : -EFAULT;
+> diff --git a/block/blk-lib.c b/block/blk-lib.c
+> index 9e2cc58f881f..0be3acdc3eb5 100644
+> --- a/block/blk-lib.c
+> +++ b/block/blk-lib.c
+> @@ -32,7 +32,7 @@ static sector_t bio_discard_limit(struct block_device *bdev, sector_t sector)
+>  	 * Align the bio size to the discard granularity to make splitting the bio
+>  	 * at discard granularity boundaries easier in the driver if needed.
+>  	 */
+> -	return round_down(UINT_MAX, discard_granularity) >> SECTOR_SHIFT;
+> +	return round_down(BIO_MAX_SIZE, discard_granularity) >> SECTOR_SHIFT;
+>  }
+>  
+>  struct bio *blk_alloc_discard_bio(struct block_device *bdev,
+> @@ -107,8 +107,7 @@ static sector_t bio_write_zeroes_limit(struct block_device *bdev)
+>  {
+>  	sector_t bs_mask = (bdev_logical_block_size(bdev) >> 9) - 1;
+>  
+> -	return min(bdev_write_zeroes_sectors(bdev),
+> -		(UINT_MAX >> SECTOR_SHIFT) & ~bs_mask);
+> +	return min(bdev_write_zeroes_sectors(bdev), BIO_MAX_SECTORS & ~bs_mask);
+>  }
+>  
+>  /*
+> @@ -337,8 +336,8 @@ int blkdev_issue_secure_erase(struct block_device *bdev, sector_t sector,
+>  	int ret = 0;
+>  
+>  	/* make sure that "len << SECTOR_SHIFT" doesn't overflow */
+> -	if (max_sectors > UINT_MAX >> SECTOR_SHIFT)
+> -		max_sectors = UINT_MAX >> SECTOR_SHIFT;
+> +	if (max_sectors > BIO_MAX_SECTORS)
+> +		max_sectors = BIO_MAX_SECTORS;
+>  	max_sectors &= ~bs_mask;
+>  
+>  	if (max_sectors == 0)
+> diff --git a/block/blk-merge.c b/block/blk-merge.c
+> index b82c6d304658..0eb0aef97197 100644
+> --- a/block/blk-merge.c
+> +++ b/block/blk-merge.c
+> @@ -95,13 +95,13 @@ static inline bool req_gap_front_merge(struct request *req, struct bio *bio)
+>  }
+>  
+>  /*
+> - * The max size one bio can handle is UINT_MAX becasue bvec_iter.bi_size
+> - * is defined as 'unsigned int', meantime it has to be aligned to with the
+> + * The maximum size that a bio can fit has to be aligned down to the
+>   * logical block size, which is the minimum accepted unit by hardware.
+>   */
+>  static unsigned int bio_allowed_max_sectors(const struct queue_limits *lim)
+>  {
+> -	return round_down(UINT_MAX, lim->logical_block_size) >> SECTOR_SHIFT;
+> +	return round_down(BIO_MAX_SIZE, lim->logical_block_size) >>
+> +			SECTOR_SHIFT;
+>  }
+>  
+>  /*
+> @@ -502,7 +502,7 @@ unsigned int blk_recalc_rq_segments(struct request *rq)
+>  
+>  	rq_for_each_bvec(bv, rq, iter)
+>  		bvec_split_segs(&rq->q->limits, &bv, &nr_phys_segs, &bytes,
+> -				UINT_MAX, UINT_MAX);
+> +				UINT_MAX, BIO_MAX_SIZE);
+>  	return nr_phys_segs;
+>  }
+>  
+> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+> index 19a888a2f104..d59553324a84 100644
+> --- a/include/linux/blk_types.h
+> +++ b/include/linux/blk_types.h
+> @@ -281,7 +281,8 @@ struct bio {
+>  };
+>  
+>  #define BIO_RESET_BYTES		offsetof(struct bio, bi_max_vecs)
+> -#define BIO_MAX_SECTORS		(UINT_MAX >> SECTOR_SHIFT)
+> +#define BIO_MAX_SIZE		UINT_MAX /* max value of bi_iter.bi_size */
+> +#define BIO_MAX_SECTORS		(BIO_MAX_SIZE >> SECTOR_SHIFT)
+>  
+>  static inline struct bio_vec *bio_inline_vecs(struct bio *bio)
+>  {
+> -- 
+> 2.47.3
+> 
+> 
