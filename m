@@ -1,145 +1,127 @@
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6836A3375DD
-	for <linux-block@vger.kernel.org>; Mon, 26 Jan 2026 16:41:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 607CA3EBF3A;
+	Mon, 26 Jan 2026 17:20:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769445704; cv=none; b=Iq9OhFWa7bOteEwT/qCvLOp4wP5FiBPkchudSsDjROJAJk6iUIZxYhb1TWdDqrhNc9IMBelUEzTotDg+K/mXVHJuFQsJ7eXwsscxKQoY7jwhl95IfMdUMpjRdDAOgtp1fZTu0mZXtMddu7iDbiu4kqnjzZQY3WOkZEKSgwZq2sU=
+	t=1769448017; cv=none; b=JnojzzhdSPQMDsSW+0YlW0lWcPKk8Nj1lbRLyh9Od59ggcAlnNbhGSTfwQpP0b4K7j1bFeOf5RlnBgqxQdqOvVRoSCCX3g6/YIpyg+pOrXJXzfW9VIWENBy+dxULBuziBvKyJOE/prlU0tZF272U4rg+XtA0UG6MhwLYOkoCoYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769445704; c=relaxed/simple;
-	bh=8yoM3+JoKX/J9QDS4HwajBIfb+G9TUqyNd63YSi5fTQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jOzXyw9PQyzQ4Oi8v/SsG21JbGYPSLfukx/qqeQR9rfWglR6rXYZZ2sWmL0xsBCgyUcaA26qMirNN31iREIDPPc1GtGEKAmZeyqvY7+b7t4uGRjWGjS6oWm4nAd9goEU7Gc3+YwLzdadGQom4L5/E1qG39xOeq2KCgATX21iJp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=WW/xyn0r; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="WW/xyn0r"
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-42fbbc3df8fso2891488f8f.2
-        for <linux-block@vger.kernel.org>; Mon, 26 Jan 2026 08:41:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1769445700; x=1770050500; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OEUrHNK8dWefUqOs00hvfwKIFD0uk17xYeaKpauo658=;
-        b=WW/xyn0r2OskO1/gzWNoULgDe2kdC0eHk8bhHWXchpqj6zBf/26ldY8HjHl/v+zfKq
-         0qzUPWlXUqmkd09XTetXlHKx+7HC6pXXogPKuOmnKvpxpo8uT1gS2ldSwn0+aY6O3zXv
-         h4u28Zn2G+3wOJKfpnm0NJLdQ9RlpUGvGRv+J9GzTaSPIcAl7PT+NbuvAF13p7AvUCps
-         HQUsFJA9gGnmG+46x+XVjR+e/k9QQB5OdIVD1VfeWImnSfxGSdfEeYyD+7A84RHrUs6Y
-         +XsYMZpdegAEXSTsvZ0x4GU1LO33SWaRjXInzhh+Aa6FFN1CV/9RrMu25lmu96Z4WiHq
-         WHJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769445700; x=1770050500;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OEUrHNK8dWefUqOs00hvfwKIFD0uk17xYeaKpauo658=;
-        b=B1os34rxgvK3ueM/x980NOxQ5lfg9v+CuoTOdyRZTg8uOzJ1zWAwqw7Le8y/NV0be9
-         EZ8z4Kd69wGGo8PWb8barAxQuggd5q67wHdWH7FIMC+b1DNKOts3k3F03ZpuCczGLsb0
-         GSalQ3qz2yoXaSD+w5GBl6QJotIz8Vwp6k4QPWSmW1QzRJ8K2PEjBxva6CXlIJXbSheE
-         imyodkNcrbEpEwrQLN56Z7IacPclgeeH+3IMfVuvXvW+i54pzy7k9pOZQeSt3tiEVdQq
-         LPjiaNP3vF2tnhmA9PXQ94rIqEEWsxIkqDlZdqim9/58/s91PQTyVzZzjsjKHHNiSER0
-         XtRw==
-X-Forwarded-Encrypted: i=1; AJvYcCXUEJWeEC9mcpmHJDGDS36lQk+jLXKAEpZn3mfCRRXxqxK5SOf/iNPZLIzsY4dPOKVssrV44ty2ffqWZQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxw3B+kiBgHXbG+o9XYp4/Y7ysEw+sdDy0u7G+lyPx6ULI5YMnW
-	FhFbpquRRGl4dPPjgDWVl0Trybk9wYyiizxUCsSluuth1dLI7MVW7iMcTdFaj7RKRTQ=
-X-Gm-Gg: AZuq6aLqdrADtyVVJRHISuAJ0kgTB5n1hBESY/8V6Z/yO6f4PqZwPyqUHo33UTlBXyD
-	0b6KzoJYc9aUnF7Mg2wRuKyalAFtiL0GUIHx/1EcP01NDP7pqv7A4AzW3mTN4dQ/+SJA/QHqWTL
-	/P8hun/oQyoAzj6tg5KnerEehxxjMYDB4qByjwWIulYMMEHGX8vDWCkR7liB4A8EpHrCYN3yagg
-	2p1nmBIAJpwBGXPjK1Orzy/yKGgzXTOzI9fXtwlPBIM5kyOhmiPHWCOZ5Fzlkveuti1wDBKfKyg
-	DcgOf0t9fXehJfMGJqdz5bBlyGttqHERdzHqKQlKnYqxrd8aQZbNKQpW91iq+Tz/2PlCjoiQDlk
-	Q3S2MKnexKnK3KFw6HQmmwCo/Abt8mzeuICF1eNZu/owZHzg5KovMffz2UtdUI+bsd4zkAFCrDI
-	xGW2oj8KoFVDNXxBBrhh0Xg446
-X-Received: by 2002:a05:6000:4212:b0:435:95ce:84cd with SMTP id ffacd0b85a97d-435ca39bd3emr10384617f8f.54.1769445699664;
-        Mon, 26 Jan 2026 08:41:39 -0800 (PST)
-Received: from localhost (109-81-26-156.rct.o2.cz. [109.81.26.156])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435b1f74b15sm31194587f8f.35.2026.01.26.08.41.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jan 2026 08:41:39 -0800 (PST)
-Date: Mon, 26 Jan 2026 17:41:38 +0100
-From: Michal Hocko <mhocko@suse.com>
-To: Frederic Weisbecker <frederic@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Chen Ridong <chenridong@huawei.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Gabriele Monaco <gmonaco@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Marco Crivellari <marco.crivellari@suse.com>,
-	Muchun Song <muchun.song@linux.dev>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
-	"Rafael J . Wysocki" <rafael@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
-	Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
-	linux-mm@kvack.org, linux-pci@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 03/33] memcg: Prepare to protect against concurrent
- isolated cpuset change
-Message-ID: <aXeZQoSHJ9QX7B6W@tiehlicka>
-References: <20260125224541.50226-1-frederic@kernel.org>
- <20260125224541.50226-4-frederic@kernel.org>
+	s=arc-20240116; t=1769448017; c=relaxed/simple;
+	bh=1+vf/wEJCfdsaxeTEOnRwFVvVbwoyOpB6oOR+N+aw2w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PWnG0Y6XxSDFPyUab0HCbJ37I8r+XCz8rmy7pUDUOTx/TRv8KHuR7+WhjrEwL9SCvwWNmnHyJozZsT31GONNJyEl9Ig1Z9wfuN52R6PWlj1MgpTADrQuLluT5sYhph3EO5ytALNZPld8jSe0+KKiPXddX8JdCgjRRDAK5vbBLo4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A41FEC116C6;
+	Mon, 26 Jan 2026 17:20:11 +0000 (UTC)
+From: Yu Kuai <yukuai@fnnas.com>
+To: axboe@kernel.dk,
+	linux-block@vger.kernel.org,
+	linux-raid@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	yukuai@fnnas.com,
+	heinzm@redhat.com,
+	jiashengjiangcool@gmail.com,
+	jinpu.wang@ionos.com,
+	linan122@huawei.com
+Subject: [GIT PULL] md-7.0-20260127
+Date: Tue, 27 Jan 2026 01:20:08 +0800
+Message-ID: <20260126172008.343807-1-yukuai@fnnas.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260125224541.50226-4-frederic@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Sun 25-01-26 23:45:10, Frederic Weisbecker wrote:
-> The HK_TYPE_DOMAIN housekeeping cpumask will soon be made modifiable at
-> runtime. In order to synchronize against memcg workqueue to make sure
-> that no asynchronous draining is pending or executing on a newly made
-> isolated CPU, target and queue a drain work under the same RCU critical
-> section.
-> 
-> Whenever housekeeping will update the HK_TYPE_DOMAIN cpumask, a memcg
-> workqueue flush will also be issued in a further change to make sure
-> that no work remains pending after a CPU has been made isolated.
-> 
-> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
-> ---
->  mm/memcontrol.c | 21 +++++++++++++++++----
->  1 file changed, 17 insertions(+), 4 deletions(-)
-> 
-> diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-> index be810c1fbfc3..2289a0299331 100644
-> --- a/mm/memcontrol.c
-> +++ b/mm/memcontrol.c
-> @@ -2003,6 +2003,19 @@ static bool is_memcg_drain_needed(struct memcg_stock_pcp *stock,
->  	return flush;
->  }
->  
-> +static void schedule_drain_work(int cpu, struct work_struct *work)
-> +{
-> +	/*
-> +	 * Protect housekeeping cpumask read and work enqueue together
-> +	 * in the same RCU critical section so that later cpuset isolated
-> +	 * partition update only need to wait for an RCU GP and flush the
-> +	 * pending work on newly isolated CPUs.
-> +	 */
-> +	guard(rcu)();
-> +	if (!cpu_is_isolated(cpu))
-> +		schedule_work_on(cpu, work);
+Hi Jens,
 
-Shouldn't this in the guarded rcu section?
--- 
-Michal Hocko
-SUSE Labs
+Please consider pulling the following changes into your for-7.0/block
+branch.
+
+This pull request contains:
+
+Bug Fixes:
+- Fix raid5_run() to return error when log_init() fails (Yu Kuai)
+- Fix IO hang with degraded array with llbitmap (Yu Kuai)
+- Fix percpu_ref not resurrected on suspend timeout in llbitmap (Yu Kuai)
+- Fix GPF in write_page caused by resize race (Jack Wang)
+- Fix NULL pointer dereference in process_metadata_update (Jiasheng Jiang)
+- Fix hang when stopping arrays with metadata through dm-raid
+  (Heinz Mauelshagen)
+- Fix any_working flag handling in raid10_sync_request (Li Nan)
+
+Cleanups & Refactoring:
+- Refactor sync/recovery code path, improve error handling for badblocks,
+  and remove unused recovery_disabled field (Li Nan)
+- Consolidate mddev boolean fields into mddev_flags (Yu Kuai)
+
+Improvements:
+- Use mempool to allocate stripe_request_ctx and make sure max_sectors is
+  not less than io_opt in raid5 (Yu Kuai)
+
+Thanks,
+Kuai
+
+The following changes since commit 8e5bcc3a955a2cc4460b391f55d3b49905eb248e:
+
+  selftests: ublk: add missing gitignore for metadata_size binary (2026-01-25 10:11:32 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mdraid/linux.git tags/md-7.0-20260127
+
+for you to fetch changes up to cefcb9297fbdb6d94b61787b4f8d84f55b741470:
+
+  md raid: fix hang when stopping arrays with metadata through dm-raid (2026-01-26 13:46:40 +0800)
+
+----------------------------------------------------------------
+Heinz Mauelshagen (1):
+      md raid: fix hang when stopping arrays with metadata through dm-raid
+
+Jack Wang (1):
+      md/bitmap: fix GPF in write_page caused by resize race
+
+Jiasheng Jiang (1):
+      md-cluster: fix NULL pointer dereference in process_metadata_update
+
+Li Nan (12):
+      md/raid1: simplify uptodate handling in end_sync_write
+      md: factor error handling out of md_done_sync into helper
+      md/raid1,raid10: support narrow_write_error when badblocks is disabled
+      md: break remaining operations on badblocks set failure in narrow_write_error
+      md: mark rdev Faulty when badblocks setting fails
+      md: update curr_resync_completed even when MD_RECOVERY_INTR is set
+      md: remove MD_RECOVERY_ERROR handling and simplify resync_offset update
+      md: factor out sync completion update into helper
+      md: move finish_reshape to md_finish_sync()
+      md/raid10: fix any_working flag handling in raid10_sync_request
+      md/raid10: cleanup skip handling in raid10_sync_request
+      md: remove recovery_disabled
+
+Yu Kuai (8):
+      md/raid5: fix raid5_run() to return error when log_init() fails
+      md: merge mddev has_superblock into mddev_flags
+      md: merge mddev faillast_dev into mddev_flags
+      md: merge mddev serialize_policy into mddev_flags
+      md/raid5: use mempool to allocate stripe_request_ctx
+      md/raid5: make sure max_sectors is not less than io_opt
+      md/raid5: fix IO hang with degraded array with llbitmap
+      md/md-llbitmap: fix percpu_ref not resurrected on suspend timeout
+
+ drivers/md/md-bitmap.c   |   7 +-
+ drivers/md/md-cluster.c  |   7 +-
+ drivers/md/md-llbitmap.c |   4 +-
+ drivers/md/md.c          | 188 +++++++++++++++++++++++++----------------------
+ drivers/md/md.h          |  25 +++----
+ drivers/md/raid0.c       |   4 +-
+ drivers/md/raid1-10.c    |   5 --
+ drivers/md/raid1.c       |  88 +++++++++-------------
+ drivers/md/raid1.h       |   5 --
+ drivers/md/raid10.c      | 178 ++++++++++++++------------------------------
+ drivers/md/raid10.h      |   5 --
+ drivers/md/raid5.c       | 143 +++++++++++++++++++++--------------
+ drivers/md/raid5.h       |   4 +-
+ 13 files changed, 310 insertions(+), 353 deletions(-)
+
