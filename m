@@ -1,353 +1,203 @@
-Received: from mail.itpri.com (mx1.itpri.com [185.125.111.158])
+Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C54B92FA0C6;
-	Mon, 26 Jan 2026 08:34:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.111.158
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769416457; cv=none; b=SsAK7fl4W2L5WkqEpfvVsuejmOtjjTyZNbApCEE7t26hJ/l6HdnVSX7yWNAEaz7OozV/zGtTqhMLnBMFZzTgopoo+5RTO2k8oJZy26ditXz9MY5mKdFqIWTa3sw35j2OmgtLKH9s522I0cOHXJ02TDgNi2o80I+GheIhtF8IboI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769416457; c=relaxed/simple;
-	bh=x6dG68/K5l0AwsEc8UvHDxe8a9IktxU8g4/oqzGOqRU=;
-	h=Content-Type:MIME-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=mqTKTV0EgIo8oKVMT2rAmIuCO6UOPR3hrKDVEiX8sTkbp+NSFrgaMzmJSp/TRROoVPotkCiRgP+gQffR1WIqrgSj7TduvOuN/X89Nk45yMhI8+hq1L/rDebzYk5q9KDL3coc64L394we927SpSIJYchcUWZoOlEk3iyl0NHc59E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zazolabs.com; spf=pass smtp.mailfrom=zazolabs.com; dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b=Bv/AF/cl; arc=none smtp.client-ip=185.125.111.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zazolabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zazolabs.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F17F327FB34;
+	Mon, 26 Jan 2026 10:25:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.154.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769423102; cv=fail; b=cdUL55sEixSmTQ77SF4y1+MLosjHdTiRPeeQq4Vt0Igp7JjiTMpiSczV3Nof911CGgQWbQaZ2cB1T4g1k0mXifFbtfVG9pHNoVQHbZg2D6JTEn8uOdOYC/Qp4+SqA+chwC6LQ5roY19PyfJUhc37Ecb8NtMkMUJ8YTHcpVnC8aI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769423102; c=relaxed/simple;
+	bh=f+z6ql9M5JhawzkmfcJJBxApS2D5ls0dv54BOWw8ja8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=qVy5HlmCj13VI2OzUHnPoDNTE/IZSs0K3UdCzed4mm60bsQGTwmdQn/rzvFch/wOyfgrzPHkDLea8Z34Ypr+x807pfjTvd4iZnzCeUblYcJh/iwAA8Bg0Jf6RmqnGFYCXxXBPA2VT3WuK6+q8k2Ly/NYF0ZxAKsnqYv56dcgqq4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=eSzyAx5s; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=IIa184MS; arc=fail smtp.client-ip=216.71.154.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b="Bv/AF/cl"
-X-Virus-Scanned: Yes
-Content-Type: text/plain;
-	charset=us-ascii
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=zazolabs.com; s=mail;
-	t=1769416450; bh=x6dG68/K5l0AwsEc8UvHDxe8a9IktxU8g4/oqzGOqRU=;
-	h=Subject:From:In-Reply-To:Cc:References:To;
-	b=Bv/AF/clkueQN9G2Z9nxzWPhTFJk/ukB5GE2jg6XqCKRft39YdrDFq3wn14Wfa9vD
-	 aECYqv0RUhNAdUB0j6q2/BH8M6EakcCLwesIU9ds8mW8vL0S4rDaEohCLYUO9OX2+5
-	 Qy9odTg9AmLwYm3TvUUTos92czumizVPnlyI172LC/RtycmmI1c7pLe0Vtw0sUv1Jy
-	 oCwmQlbas7nKnRZACftzEBcz5hYqrBbxz1XdETsQj4anGOcnLBYMSIKM71Zq8dVKXS
-	 OeRni2sxH61HuHW7B4B3FI60gNo9j6nckCJTd4Y8tqXRmzq9nOTPz6uxBluJaLo7h4
-	 g7yy3kedg8nK653bOoESjArHeDpRQwd4EZLqKVme1s7dx0MA/VttPRIsu9U6unNtOB
-	 ecnGvrViC//Zfng72/OYg+gK0LpS0KoG82tDnOwHLh7BDhKIKSveISUT3dLt6v8V8t
-	 AsOaBs5E84UAECAjxcd9742wi4cp6YIa3LwfERJ6VmU/P3ohfE6YFTAbWrt2cbNV4V
-	 8aIL3BIItnqFM4egMsOERjGjk+VdpAHjGTsV5sg6KmlznKkvSAt4yNX8uNdsI/cS1d
-	 Nt/+gN+1qNjKRER9RK1KGsbdgsklSXZfwSmWLC827uw9B4enHdlRQaq4XuyU8wGXq8
-	 1bKXSkkb5M1/8eS1uIEn7P/I=
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="eSzyAx5s";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="IIa184MS"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1769423101; x=1800959101;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=f+z6ql9M5JhawzkmfcJJBxApS2D5ls0dv54BOWw8ja8=;
+  b=eSzyAx5s1/ie1Jr4oeQGmOdayOGgkScRleFTzyVPLn8PuyHa7H6Z7H1Y
+   8sLq3qFf8DEhRGmo64D4bN1/Xc2A7I9tLk88n3Z+5zVvXWsQTh991J8In
+   lAVwTpdZblAwpP6tZma+KNYta8ap1ekBHZ9MsPYR4MUJ2GpiZxhvKezCf
+   1XseBAnamuhcN3ecRaZzwOne7oiZrQaZBPHCW5uT0YW3CE+dhaweWyMeZ
+   igREQy6vGwlXl3iP28P62L1FhMofpY0fN7He4A2b3eqoC0K+rKxmPRlnM
+   B9fYhNSMSJ2SjoKxz06vwZ5AlUmHCFCbvLmogq32zk9HvHwRmVnoW2Kxk
+   g==;
+X-CSE-ConnectionGUID: Q96mHHJOSnGkZD9ropKMAw==
+X-CSE-MsgGUID: GsCJ6D5IRvaYqeJU9WpdGg==
+X-IronPort-AV: E=Sophos;i="6.21,254,1763395200"; 
+   d="scan'208";a="138710029"
+Received: from mail-westusazon11012045.outbound.protection.outlook.com (HELO SJ2PR03CU001.outbound.protection.outlook.com) ([52.101.43.45])
+  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 26 Jan 2026 18:24:54 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=gcuhOtpWIRLaA/LPbuguSYuXa5gbXMPqLviJmSOartbHEnIi0h8qOcRBk2IEcJNGwRCixhGpsjApm2yx0iteNzcPMm8f2XIO3f3v8X1giQaHHiQK+awxZBCO79j7DHroeR0DVaKPBT6Ku9nQtqtgd1tC1pAfeUN3KEbb+4JVxAuNuw8q84GfLLVIwgXvVBUeTaQnglKFwIVocVCuWn5K9CLdOhUvDNEAFtFvVXd/5Jv/q16I1Jf2ZFptcRwn3pNpp4oaXR7T9zcKW9sZ6r3g2mOE5LoR281Y3+OoFHciGNzw2iVNHrd41hbbSb9iII7Shgun6HIoMS5IzV1Tzt23pg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=f+z6ql9M5JhawzkmfcJJBxApS2D5ls0dv54BOWw8ja8=;
+ b=wSwhYpfuHJ0zskfu2ds/vDPJjfWCqsjhRUvgiPJLcP9DRgrQdn8Qct4/XvBrAqFLxUgAoIXR1B2t1nujmILH2vuwI4HB2Dg5APiPnxBQkE2XFRRP+ENZOaPXgbLigenLvLAcC4QE1F+J0O9aybQu0zglCWPBgiCderR/ThLCM1qS8NYOIgBksQK8mszJHp3Z85+/hKSXqpDr4epq95tZwB2AEa68ip4R9x5jYd4zUOzXNRG549Rpnl+fA7VhLCcMCq4V9CRLcrtYunmDASTH4HCe6J7wrn3S2qQG9EFDXtUC5tA8TXYp6Q7RLkKaXz4AaewWgCzuoItemKbdzZdGHg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=f+z6ql9M5JhawzkmfcJJBxApS2D5ls0dv54BOWw8ja8=;
+ b=IIa184MS9XomAXWb3aqcX/ztMOdaUuA8Yk4gUB7iyj9k+yv73ZLu8bZMitOjs2BnSm//BPJvJXmacV5gHk47C14ud9pni9n5j8+7zPnSmqhq/KbNQg7ZIcYGnv3FqUDfangfRfrJHj7UeKDJeez1ytyTuMQd1jHe2zRiyeSPFWs=
+Received: from LV8PR04MB8984.namprd04.prod.outlook.com (2603:10b6:408:18b::13)
+ by PH0PR04MB7849.namprd04.prod.outlook.com (2603:10b6:510:d6::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.3; Mon, 26 Jan
+ 2026 10:24:46 +0000
+Received: from LV8PR04MB8984.namprd04.prod.outlook.com
+ ([fe80::9ba6:7273:90bc:53a8]) by LV8PR04MB8984.namprd04.prod.outlook.com
+ ([fe80::9ba6:7273:90bc:53a8%5]) with mapi id 15.20.9564.001; Mon, 26 Jan 2026
+ 10:24:46 +0000
+From: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To: hch <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Christian Brauner
+	<brauner@kernel.org>
+CC: "Darrick J. Wong" <djwong@kernel.org>, Carlos Maiolino <cem@kernel.org>,
+	WenRuo Qu <wqu@suse.com>, Al Viro <viro@zeniv.linux.org.uk>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
+Subject: Re: [PATCH 01/15] block: add a BIO_MAX_SIZE constant and use it
+Thread-Topic: [PATCH 01/15] block: add a BIO_MAX_SIZE constant and use it
+Thread-Index: AQHcjog57A9CnZwqlUaPsHc6XMSc1rVkPvGA
+Date: Mon, 26 Jan 2026 10:24:46 +0000
+Message-ID: <ef8a6be9-05b9-4959-9421-caedbf5d33a4@wdc.com>
+References: <20260126055406.1421026-1-hch@lst.de>
+ <20260126055406.1421026-2-hch@lst.de>
+In-Reply-To: <20260126055406.1421026-2-hch@lst.de>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: LV8PR04MB8984:EE_|PH0PR04MB7849:EE_
+x-ms-office365-filtering-correlation-id: 679fc2e1-8b5c-42d2-7e0f-08de5cc52112
+x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|7416014|19092799006|366016|1800799024|38070700021;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?cGJLN3hnZVk3ZWZYU0s2UU4zdWxMQUVwVDlNWlZSZHEwWk9TQ1plcEpPQmZX?=
+ =?utf-8?B?c1p3M0ZHanJrRTRBSWdHVURUb0JDdndsdkJwL1RueHFGVWtoTTE0ZVlheE9L?=
+ =?utf-8?B?aTRWMFl0RElEY21KNEYwT0JuRXRvcWZUdUJ4aTM2SWJIRnhZem9WQVEvOHdP?=
+ =?utf-8?B?L2p3cnh6UDBVS0ZRSDJaTk1MQjJYYldrcm9KdGNLQlNITGNnUnNHZU1YLzFT?=
+ =?utf-8?B?c2FpNFpsU0sxWUZZVm5NMjQ1SExRZ0p0VHE5bEg0OU03UzZJc25DZW41VFZO?=
+ =?utf-8?B?bmlER1VRZVZqT0taK25GOUFIaWx0ZkpRYzIzWEg4MEFRS1RNNVhMTnorVE5T?=
+ =?utf-8?B?eEIxS00rZmtHcmhUZnVFTk93K0JXbDhGcTN6a0F4aEFZMmVpd1N4S2l1Rlps?=
+ =?utf-8?B?Z2p1RWdacFBYdjRNMmtSQW9scHY3ajF1SENndkpuRW8vaU0yQ2hDb01nTU5t?=
+ =?utf-8?B?OE9jYTdLSDZ1eDgyNEozRi93RzN5S2toY1BSMXh5cHlxVjRic3lPS3pqd2hI?=
+ =?utf-8?B?eDRWd0NFdTdRc1UwRHJSZGZpOEJTWEFHWFFpY0hiWTFUYjIxeHFsR2l4b2Jw?=
+ =?utf-8?B?YmYrVHAxc0ZMRHhLNmI4M2RSUHAyTS9IMEVFdE8wcUIvN0FzVXJoSDJGZU1J?=
+ =?utf-8?B?K0pPRTMwYnhLbHdjamZjMUY3M1pkaWYvRjhaVkE4bDRlYVp4TThrcmNTcFAr?=
+ =?utf-8?B?ZjJtT3Ntd1J4Z09xdk03RlZOQWtaM3cxK1NOK2ZsNDlaazdMeDNLNUdOMHhV?=
+ =?utf-8?B?M21WS2NnQytjcWNnd3k0amdaVFZkNGM1N3FmcmpRSTZIR3pzOGpIZkNpTE5r?=
+ =?utf-8?B?eWx4NzJRcHV1c0wwQnVsZ1FyYkE2bXU0ZTRQT2VjdE5TQU9FQzZiWUZ1anYv?=
+ =?utf-8?B?TlpKaG5hYU9jMW4zMzVKTzV1UUM5S09kcGtSRDNDNmxDRjRGMUF6VGppakxO?=
+ =?utf-8?B?U2RseVRDMVc0QmljMnNoK3Azb2NGN3NIdytsMmNmdU1MRFZtc3ZqTWxSRksv?=
+ =?utf-8?B?dVo5OHAxY1d2UG1hcHlVbVNTSTZ3VUljZWpIVksrV3JFdWpzNWl0YzZ3QlZn?=
+ =?utf-8?B?YUpoRE9lWGh3dUZyOG00VDZURHAxbVBwWDAyMTJIVjZieXRLeURQbjRvSXJU?=
+ =?utf-8?B?NmM1YXN1bzEvWjg0Vng1bThCeXlOczJkcUdBOHd4b0daenZJYUN1SE85QTQv?=
+ =?utf-8?B?UFhMZlhOenJWNkwvN2VHOEsyMENDZ1VGSzROSFk5Q29MUU5LVXdOcGVVeG9H?=
+ =?utf-8?B?RldCY2FCYWw2ZTJpYXVXY0puTXdtTkREQlM2SkxxUGcyTlQvbzNwMTJFUmNq?=
+ =?utf-8?B?THN5NDRpN2RYOVVwVi8rdGM0dVg1SVk5d2UzWmxqZlVtTUl3NE5VTFNDYnRE?=
+ =?utf-8?B?eklyaUk3MHFCRlRUektuaEc2QlZxVTRlei9hRXlwTDZVNUNtSlV6WTZINjBB?=
+ =?utf-8?B?QWI3UVVZaHVXSzhsRnBpNUJVTkJESGZRR0VLOVNRYUp5ck1QK3crYUtibGN5?=
+ =?utf-8?B?cGp2aEIwMjc3SUlHakYvSTM4WHVwUzA5bm5ZemxnUjVtUk9yNGZRQ20vRnpS?=
+ =?utf-8?B?bEo1SmdSckNvTzJndjBsUFZCTUNlQ012dDdEUHJoWkNXYjhlb0NWYnNObGlz?=
+ =?utf-8?B?WEtVa09VL0FJM3VFSTNIRUJnNDVHOXNveC9vaDJBTlBjaFNsQ3ZqR3RFbjIz?=
+ =?utf-8?B?dDVPSmVHck5HODRyMGVqdFREUDBwcDVqZFV4NWZDR0xGaHlobmhBK1FWMmFy?=
+ =?utf-8?B?c25mL0NjaXd1VmFDRjdOZmRPODNKZkI4QkQyNk1jQnhsMVdEWnFxcTNBTm5L?=
+ =?utf-8?B?RHV3N1hHYXlqdDVSRUNDOHhVa292encxMHpvOXh4b0o1aklvUXNCTHlKVW5H?=
+ =?utf-8?B?YXF6ZzFuSzVKVXI0UUU4aDdXZGEvTjR5TEtkMUZoWFpBTC9hOGtPdDVCWUtN?=
+ =?utf-8?B?Nndxd2IvQldRYWZQcEpOQmF0MnJSc3IxamdtT09ZaXdYcW9UcEZyczAzejBP?=
+ =?utf-8?B?eFVuMythU09sTnE3NXJTREl0R3poSEtHLzJiUFMveUhCQ1JLYnora1JaQ2k1?=
+ =?utf-8?B?SFBjL0N3ZWZ2QWZhWWJrbTF6MGsydXBNazhJdUVCTnAvckdhOHpMZmdsbWhY?=
+ =?utf-8?B?SFBoVkhHeEhqQnhmNzJKRTUrdHdMWTdtM3RPSjA4U2VXQy8xZlhoQk9uRnBY?=
+ =?utf-8?Q?d7l7X66B4zMMMscK3QH2k9o=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV8PR04MB8984.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(19092799006)(366016)(1800799024)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?T3A3UndTajBTZFhWZDNWSmxpSUtXb0RjakpFbDFwQnc3YS9GSWUzQlloL0Nl?=
+ =?utf-8?B?SDlqVTdWMTV4VGhGWFFZbFZTSUZYci81b2lsTmVLYm81cFdiLzlzcGx1V3VD?=
+ =?utf-8?B?dXVqcHRpNFpvZTBwRllPZ2dKNXVwT2pFcUljZzUzZlJYNmlRRWpYQ1BtUk9E?=
+ =?utf-8?B?ZERTZVcyUzExa1FPVnc3MUhoQ09vZm42SGoxcDB3Mmk0cFJIZUtmbkRGWmdr?=
+ =?utf-8?B?MUhEVVF5ejJ3K3UzVVRJaW9jazVEMVgvbGFJQmM0dDBaQlNFQ1k0eW1JL0x4?=
+ =?utf-8?B?L2hTL2NmbTJoRGZIeGRmamdVQmpJQi8yR24vVDF2Q0tiaXVHcDNoUnRyRTUx?=
+ =?utf-8?B?ZmNmZmNRalRZRzRPVW9ia1o1aHlSK1RPYmNpcUJkM0pTQkJTc1pzYlEzUEVG?=
+ =?utf-8?B?cmY2bXFqYS9PVDZwODV3ZkFRUlNtVGIzem5rRUFIMlhPMUtFdGswaXUwcG5H?=
+ =?utf-8?B?SGlrc0kyS3FvbFJYWWVkQWdmUW5vVXg2L1phT3EvUnBTSG93bnkzenpJeE1l?=
+ =?utf-8?B?S29VUTNKT0Q5UVh3Y0ltSGNoVk5kTmZTTW11bnowb2JBZVZILzh2cDJjNzBu?=
+ =?utf-8?B?anNMM3Qzd2Y5RVJlSHZhZVI5eVQ0VTRWTDVndlJQd1ZUa20vemM4RkJsVm1Y?=
+ =?utf-8?B?TjhpY2RtTVNKbjM1ckVrYlBKcnNPOVN3dm1LMzRXenhsL3RJLzFrUzRqNDZi?=
+ =?utf-8?B?QjdFdWZwb25Ra0wwYzlwNThPSzl0dUtoL3dnNkFxaHk5c3hFQXNkZnRPcjRB?=
+ =?utf-8?B?SDBrTTZhbDkzcG0xOUlRNnZ0TkpYMmZUejFwQ3Zlc0RSY2FjWm1pREJEWlhS?=
+ =?utf-8?B?SzZBNWJvMllkamRmZTBMYjRpTXJEV0pWQ0xrR01LTE5uQnR5WGNHcktNNk5k?=
+ =?utf-8?B?cWRuZ0licUp5NlNsUW5WTEVaSjd6VUFYUGhVQjhuTU8xMUhQVnlpWEppZTZV?=
+ =?utf-8?B?K3owODhhOUpsUklBU0JHZnpMV1Yrengzb01MdElqMENZRllzbk9VZHVtY1Qw?=
+ =?utf-8?B?WmtaUThXVmlaRnZLR0EyVk96dEJyeWt2am9FWTVsdVIxbjhpRndUcHJJMk8z?=
+ =?utf-8?B?Vy90aXNweVY3WkV1RmxJbGhFemdQMUM4S2d1b256QmxTWlJEdm1tQk9BOTIr?=
+ =?utf-8?B?N25kcVQ5MnZJZnp1K080KzQ2T01JTU1Ec3l2T3dwbHRSWWVVUGUvbWFTVzNI?=
+ =?utf-8?B?ZGE4S0gxeWgwZWRqYW1xcHcydlRSSjQ0MkMxVDJraWhNWGZZMFFLbyswUmlP?=
+ =?utf-8?B?SEp5dlljaEhrY2QxWWVUcDZ2U0NnZGt4amRQK1I0bk9GcGpMZi93QUUvSEg1?=
+ =?utf-8?B?cDVZZTlOYzVTZWp6WWJJaFZtdFFicnNlRmwyanZhallxM2g1UUljSWhEZWV4?=
+ =?utf-8?B?MDM5RHJxdjhyUmMrRG5Nd01vVGdnWmZmaUF4MWh4WTUyODZNMVhLRUY0NTc4?=
+ =?utf-8?B?MXY3RHVwSW5TQ080Z3JndDBFbDlxRW1yTkQxMzlQWThNM3FoZUt6Zm1La0d6?=
+ =?utf-8?B?bXROVXVlK2h3My8xTGN3S2ZBV0xvOEZ3Y2VnYVJJTVJiRDIzeHplaXNnbGpx?=
+ =?utf-8?B?YzRtdk90bUNlZUorY2RDdkFtRmRuVExoRHhiY3dIZ202Yy83citJTXFZQzJY?=
+ =?utf-8?B?N0l0TzBlZStlczVWUVpzYUhLbUxPeG00VE5JTVYrNnMveE03emdwWHB3SUtx?=
+ =?utf-8?B?b0dKWXVJL0Q2dTNGY2ErRFNjT3czQ2NqVWJYblhneWN4S1hFaWJvV1lHNzgz?=
+ =?utf-8?B?TU1udXNqTUV4QTN3ODBRQUhDamJFUXgwRnNEMWQxY0ZCaTR0UWtHZzVSeWxT?=
+ =?utf-8?B?aDNoK05MRWRWR2JRZDQxU1Vnd3lyU3o2MDg2R3RxZ2dja2JqTkxicFBId1Jw?=
+ =?utf-8?B?WUZUWGk1V2FDTno4ZXRqSTZyK1IrR2QxWHRTeTJZZlpkY2U0ZHJHWm53VmtR?=
+ =?utf-8?B?TURFT3R4elo3OUxSUUZqbHVqbWlRYy9hOCs3M1d1ZlMvd3Y5ZTg5cERCSzJj?=
+ =?utf-8?B?Z3QyYS8zSmFpc0J6N0o4SkFXRHJTd3ZvcU9LLzBlQVJRc0x1UFlIbWx3cm9h?=
+ =?utf-8?B?UUEwV2pkN1hLUytmdlVoa2tFdzRyK1k0cWVEZHlkZmwyM3E2a3Uxa0s0TUpI?=
+ =?utf-8?B?UHY5TUhyVXZuM0tCL0VRb3VOVFJoZEwzSVlhb09rTG1kOGNDR3ZNWnZhVWs5?=
+ =?utf-8?B?UGNEaGJXVWsyNTJVUXBDWDVTc3pxMDNzbnA1OGdXamdpOXpkaFVlK0luQXow?=
+ =?utf-8?B?c0NyOEVvVmNXM0V0eUt2Z2F3eGV4YS9Gd01XYmRESzBKSlJTNFhkSW9WZzVE?=
+ =?utf-8?B?MGxVUkgrbllEa0tCOWZsRnZYTmJRQkJLSFJlejIrenM3K3FTQXZNbjdKYU5Z?=
+ =?utf-8?Q?9Y9THc9tXu5DYSeQ=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <7D4A54D6ABB88F42A902FC0E4B1A22A9@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] selftests: ublk: io-reorder triggered in
- test_generic_01.sh
-From: Alexander Atanasov <alex@zazolabs.com>
-In-Reply-To: <aXbDCtZ8fvljMEsC@fedora>
-Date: Mon, 26 Jan 2026 10:33:58 +0200
-Cc: alex+zkern@zazolabs.com,
- Shuah Khan <shuah@kernel.org>,
- linux-block@vger.kernel.org,
- linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <7B09D8AA-C725-432A-AE85-D7CC620836EC@zazolabs.com>
-References: <20260123112039.1370223-1-alex@zazolabs.com>
- <aXN4mFuoXhtJDKyF@fedora> <147635F1-943E-46D5-8EF1-D1C965F85EC1@zazolabs.com>
- <aXOGrXo3AbXPHA-K@fedora> <03C8F5B9-B2E1-4C78-A043-B4F9422508B7@zazolabs.com>
- <aXY2qdYtfVTSc7jB@fedora> <c517e1ca-0e2b-4143-b0f6-07a3d0c3abcf@zazolabs.com>
- <aXbDCtZ8fvljMEsC@fedora>
-To: Ming Lei <ming.lei@redhat.com>
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	SlAsxL/E1zvJm5mOrhXISiOM+fzDD1i915xA0P5ALfBE9fXig+MEbiVf7aLcFgqtkQ5xSmIlaKM0Z8seT+BhQO/7kLJ+pchTc+pE8g5ICKiN0JbqH3adOxDzAZuG9SaRjspbinBhuvpQX66jm8zW6OSPrIx8Lm5usYiIKNiw/L09FpHdnl/2MdcxBtZnxO/mda0ZD1ZNPoyrCmwTMvbNjOUwLYjt6xpnNY8paqpYRqm6aENjjo4GlY3Wt7kcjvkhh6W/0myzzPyjUtxAsLG+fUe0twG9yBlV88Myw1q3+y2FrIfD54WpbXI79h52xvzwdFQbCIyb9AEx26RAlHr9Zw2NzQuXfJKhstGEPg9tYYCl0uao3xASlQ7vPT4X8InCU225zUVxrIfx5dp2NqtUMIpUhCWY5556DpAviPMUAyFv8K4zuHDhrMXpH1sOF4GjtAIvBqifcHCUzW3hnSzOzoUXY6wYSH5bOUkd65XEmVUuH0NMEwX3Fbk7f8bRyehW+6hPKOSlVvWRkXIFh377IVw3AOb61wNTXped/K471aGOU5rwn4wA+uz6jfId1Dw0RZ8gWezqmM2fe07qq3b07d83sWcG1cgqyDtCwVmYQfAqoO507fqfFs22RQTk9tMl
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: LV8PR04MB8984.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 679fc2e1-8b5c-42d2-7e0f-08de5cc52112
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jan 2026 10:24:46.5919
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: xxyM8pI4Znna4IAhuWefGkD84v22jFFSoRpTJGdFBAgED+2NrHbR/Vo5ZgSmKI8gqXYVQGZigyzVAg77ORqp6KrMYN5lqcSxqfKQ+2cb6MA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR04MB7849
 
-Hello,
-
-> On 26 Jan 2026, at 3:27, Ming Lei <ming.lei@redhat.com> wrote:
->=20
-> On Sun, Jan 25, 2026 at 08:35:20PM +0200, Alexander Atanasov wrote:
->> On 25.01.26 17:28, Ming Lei wrote:
->>> On Fri, Jan 23, 2026 at 05:00:33PM +0200, Alexander Atanasov wrote:
->>>>=20
->>>>=20
->>=20
->> [snip]
->>=20
->>> Can you test the following patch and see if re-order still can =
-happen?
->>>=20
->>>=20
->>> diff --git a/tools/testing/selftests/ublk/test_generic_01.sh =
-b/tools/testing/selftests/ublk/test_generic_01.sh
->>> index 26cf3c7ceeb5..26d5e52ece29 100755
->>> --- a/tools/testing/selftests/ublk/test_generic_01.sh
->>> +++ b/tools/testing/selftests/ublk/test_generic_01.sh
->>> @@ -13,7 +13,7 @@ if ! _have_program fio; then
->>>   exit "$UBLK_SKIP_CODE"
->>>  fi
->>> -_prep_test "null" "sequential io order"
->>> +_prep_test "null" "ublk dispatch won't reorder IO"
->>>  dev_id=3D$(_add_ublk_dev -t null)
->>>  _check_add_dev $TID $?
->>> @@ -39,9 +39,13 @@ fio --name=3Dwrite_seq \
->>>  ERR_CODE=3D$?
->>>  kill "$btrace_pid"
->>>  wait
->>> -if grep -q "io_out_of_order" "$UBLK_TMP"; then
->>> - cat "$UBLK_TMP"
->>> +
->>> +# Check for out-of-order completions detected by bpftrace
->>> +if grep -q "^out_of_order:" "$UBLK_TMP"; then
->>> + echo "I/O reordering detected:"
->>> + grep "^out_of_order:" "$UBLK_TMP"
->>>   ERR_CODE=3D255
->>>  fi
->>> +
->>>  _cleanup_test "null"
->>>  _show_result $TID $ERR_CODE
->>> diff --git a/tools/testing/selftests/ublk/trace/seq_io.bt =
-b/tools/testing/selftests/ublk/trace/seq_io.bt
->>> index b2f60a92b118..60ac40e66606 100644
->>> --- a/tools/testing/selftests/ublk/trace/seq_io.bt
->>> +++ b/tools/testing/selftests/ublk/trace/seq_io.bt
->>> @@ -2,23 +2,45 @@
->>>   $1:  dev_t
->>>   $2:  RWBS
->>>   $3:     strlen($2)
->>> +
->>> + Track request order between block_io_start and block_rq_complete.
->>> + For each request, record its start sequence number and verify
->>> + completions happen in the same order.
->>>  */
->>> +
->>>  BEGIN {
->>> - @last_rw[$1, str($2)] =3D (uint64)0;
->>> + @start_seq =3D (uint64)0;
->>> + @complete_seq =3D (uint64)0;
->>> + @out_of_order =3D (uint64)0;
->>> +}
->>> +
->>> +tracepoint:block:block_io_start
->>> +{
->>> + if ((int64)args.dev =3D=3D $1 && !strncmp(args.rwbs, str($2), $3)) =
-{
->>> + @start_order[args.sector] =3D @start_seq;
->>> + @start_seq =3D @start_seq + 1;
->>> + }
->>>  }
->>> +
->>>  tracepoint:block:block_rq_complete
->>>  {
->>> - $dev =3D $1;
->>>   if ((int64)args.dev =3D=3D $1 && !strncmp(args.rwbs, str($2), $3)) =
-{
->>> - $last =3D @last_rw[$dev, str($2)];
->>> - if ((uint64)args.sector !=3D $last) {
->>> - printf("io_out_of_order: exp %llu actual %llu\n",
->>> - args.sector, $last);
->>> + $expected_order =3D @start_order[args.sector];
->>> + if ($expected_order !=3D @complete_seq) {
->>> + printf("out_of_order: sector %llu started at seq %llu but =
-completed at seq %llu\n",
->>> + args.sector, $expected_order, @complete_seq);
->>> + @out_of_order =3D @out_of_order + 1;
->>>   }
->>> - @last_rw[$dev, str($2)] =3D (args.sector + args.nr_sector);
->>> + delete(@start_order[args.sector]);
->>> + @complete_seq =3D @complete_seq + 1;
->>>   }
->>>  }
->>>  END {
->>> - clear(@last_rw);
->>> + printf("total_start: %llu total_complete: %llu out_of_order: =
-%llu\n",
->>> + @start_seq, @complete_seq, @out_of_order);
->>> + clear(@start_order);
->>> + clear(@start_seq);
->>> + clear(@complete_seq);
->>> + clear(@out_of_order);
->>>  }
->>=20
->>=20
->> First run after reboot always fails:
->>=20
->> ./test_generic_01.sh
->> ublk selftest: generic_01 starting at 2026-01-25T19:08:47+02:00
->> I/O reordering detected:
->> out_of_order: sector 112040 started at seq 88 but completed at seq 0
->> out_of_order: sector 112048 started at seq 89 but completed at seq 1
->> out_of_order: sector 112056 started at seq 90 but completed at seq 2
->> out_of_order: sector 112064 started at seq 91 but completed at seq 3
->> out_of_order: sector 112072 started at seq 92 but completed at seq 4
->> out_of_order: sector 112080 started at seq 93 but completed at seq 5
->> out_of_order: sector 112088 started at seq 94 but completed at seq 6
->> out_of_order: sector 112096 started at seq 95 but completed at seq 7
->> out_of_order: sector 112104 started at seq 96 but completed at seq 8
->> out_of_order: sector 112112 started at seq 97 but completed at seq 9
->> out_of_order: sector 112120 started at seq 98 but completed at seq 10
->> out_of_order: sector 112128 started at seq 99 but completed at seq 11
->=20
-> In the 1st bpf attachment, fio may be started between attaching
-> block_start_req and block_complete_req. Maybe the following patch can
-> solve it:
->=20
->=20
-> diff --git a/tools/testing/selftests/ublk/test_generic_01.sh =
-b/tools/testing/selftests/ublk/test_generic_01.sh
-> index 26cf3c7ceeb5..15cea9e55e1c 100755
-> --- a/tools/testing/selftests/ublk/test_generic_01.sh
-> +++ b/tools/testing/selftests/ublk/test_generic_01.sh
-> @@ -13,7 +13,7 @@ if ! _have_program fio; then
-> exit "$UBLK_SKIP_CODE"
-> fi
->=20
-> -_prep_test "null" "sequential io order"
-> +_prep_test "null" "ublk dispatch won't reorder IO"
->=20
-> dev_id=3D$(_add_ublk_dev -t null)
-> _check_add_dev $TID $?
-> @@ -21,15 +21,20 @@ _check_add_dev $TID $?
-> dev_t=3D$(_get_disk_dev_t "$dev_id")
-> bpftrace trace/seq_io.bt "$dev_t" "W" 1 > "$UBLK_TMP" 2>&1 &
-> btrace_pid=3D$!
-> -sleep 2
->=20
-> -if ! kill -0 "$btrace_pid" > /dev/null 2>&1; then
-> +# Wait for bpftrace probes to be attached (BEGIN block prints =
-BPFTRACE_READY)
-> +for _ in $(seq 100); do
-> + grep -q "BPFTRACE_READY" "$UBLK_TMP" 2>/dev/null && break
-> + sleep 0.1
-> +done
-> +
-> +if ! kill -0 "$btrace_pid" 2>/dev/null; then
-> _cleanup_test "null"
-> exit "$UBLK_SKIP_CODE"
-> fi
->=20
-> -# run fio over this ublk disk
-> -fio --name=3Dwrite_seq \
-> +# run fio over this ublk disk (pinned to CPU 0)
-> +taskset -c 0 fio --name=3Dwrite_seq \
->     --filename=3D/dev/ublkb"${dev_id}" \
->     --ioengine=3Dlibaio --iodepth=3D16 \
->     --rw=3Dwrite \
-> @@ -39,9 +44,13 @@ fio --name=3Dwrite_seq \
-> ERR_CODE=3D$?
-> kill "$btrace_pid"
-> wait
-> -if grep -q "io_out_of_order" "$UBLK_TMP"; then
-> - cat "$UBLK_TMP"
-> +
-> +# Check for out-of-order completions detected by bpftrace
-> +if grep -q "^out_of_order:" "$UBLK_TMP"; then
-> + echo "I/O reordering detected:"
-> + grep "^out_of_order:" "$UBLK_TMP"
-> ERR_CODE=3D255
-> fi
-> +
-> _cleanup_test "null"
-> _show_result $TID $ERR_CODE
-> diff --git a/tools/testing/selftests/ublk/trace/seq_io.bt =
-b/tools/testing/selftests/ublk/trace/seq_io.bt
-> index b2f60a92b118..8ebe13d24c67 100644
-> --- a/tools/testing/selftests/ublk/trace/seq_io.bt
-> +++ b/tools/testing/selftests/ublk/trace/seq_io.bt
-> @@ -2,23 +2,64 @@
-> $1:  dev_t
-> $2:  RWBS
-> $3:     strlen($2)
-> +
-> + Track request order between block_io_start and block_rq_complete.
-> + For each request, record its start sequence number and verify
-> + completions happen in the same order.
-> +
-> + Sequence starts at 1 so that 0 means "never seen" (bpftrace maps
-> + return 0 for missing keys). On first valid completion, sync
-> + complete_seq to handle probe attachment races.
-> +
-> + block_rq_complete is listed first to ensure it's attached before
-> + block_io_start, reducing the window for missed completions.
-> */
-> +
-> BEGIN {
-> - @last_rw[$1, str($2)] =3D (uint64)0;
-> + @start_seq =3D (uint64)1;
-> + @complete_seq =3D (uint64)0;
-> + @out_of_order =3D (uint64)0;
-> + /* Initialize map type with dummy entry */
-> + @start_order[0] =3D (uint64)0;
-> + delete(@start_order[0]);
-> + printf("BPFTRACE_READY\n");
-> }
-> +
-> tracepoint:block:block_rq_complete
-> {
-> - $dev =3D $1;
-> if ((int64)args.dev =3D=3D $1 && !strncmp(args.rwbs, str($2), $3)) {
-> - $last =3D @last_rw[$dev, str($2)];
-> - if ((uint64)args.sector !=3D $last) {
-> - printf("io_out_of_order: exp %llu actual %llu\n",
-> - args.sector, $last);
-> + $expected =3D @start_order[args.sector];
-> + if ($expected > 0) {
-> + /* Sync complete_seq on first valid completion */
-> + if (@complete_seq =3D=3D 0) {
-> + @complete_seq =3D $expected;
-> + }
-> +
-> + if ($expected !=3D @complete_seq) {
-> + printf("out_of_order: sector %llu started at seq %llu but completed =
-at seq %llu\n",
-> + args.sector, $expected, @complete_seq);
-> + @out_of_order =3D @out_of_order + 1;
-> + }
-> + delete(@start_order[args.sector]);
-> + @complete_seq =3D @complete_seq + 1;
-> }
-> - @last_rw[$dev, str($2)] =3D (args.sector + args.nr_sector);
-> + /* $expected =3D=3D 0 means we never saw this sector start, skip it =
-*/
-> + }
-> +}
-> +
-> +tracepoint:block:block_io_start
-> +{
-> + if ((int64)args.dev =3D=3D $1 && !strncmp(args.rwbs, str($2), $3)) {
-> + @start_order[args.sector] =3D @start_seq;
-> + @start_seq =3D @start_seq + 1;
-> }
-> }
->=20
-> END {
-> - clear(@last_rw);
-> + printf("total_start: %llu total_complete: %llu out_of_order: =
-%llu\n",
-> + @start_seq - 1, @complete_seq, @out_of_order);
-> + clear(@start_order);
-> + clear(@start_seq);
-> + clear(@complete_seq);
-> + clear(@out_of_order);
-> }
->=20
-
-
-This solves it - no more out of order detected.
-
-Looks like this auto mount explains why it misses a few seqs on the =
-first run.=20
-
-[   99.548551] ublk selftest: generic_01 starting at =
-2026-01-26T10:24:07+02:00
-[  104.173575] NOTICE: Automounting of tracing to debugfs is deprecated =
-and will be removed in 2030
-[  112.680519] ublk selftest: generic_01 done at =
-2026-01-26T10:24:20+02:00
-[  116.564281] ublk selftest: generic_01 starting at =
-2026-01-26T10:24:24+02:00
-[  130.658273] ublk selftest: generic_01 done at =
-2026-01-26T10:24:38+02:00
-
-
-have fun,
-alex
-
-
-
+TG9va3MgZ29vZCwNCg0KUmV2aWV3ZWQtYnk6IEpvaGFubmVzIFRodW1zaGlybiA8am9oYW5uZXMu
+dGh1bXNoaXJuQHdkYy5jb20+DQoNCg==
