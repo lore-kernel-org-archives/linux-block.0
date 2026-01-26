@@ -1,121 +1,145 @@
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ED6733BBBF
-	for <linux-block@vger.kernel.org>; Mon, 26 Jan 2026 16:27:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6836A3375DD
+	for <linux-block@vger.kernel.org>; Mon, 26 Jan 2026 16:41:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769444859; cv=none; b=gBfcTuRAOkLXXF0uQLzYqJ4d2VLQE5dRvb3rXQ7cMTkLcUHVwUC9bKWs+SDkImKYDNaTqhkj6fLWXNz1yB65dMFlLcmaSIdhXQ5hydxW14ZLdwE3tIA/ITHb0TWlIA/q6HSVL8ZenxI3WYKpyonkMBjrZ9Ifu5LPhLke7R/AcG8=
+	t=1769445704; cv=none; b=Iq9OhFWa7bOteEwT/qCvLOp4wP5FiBPkchudSsDjROJAJk6iUIZxYhb1TWdDqrhNc9IMBelUEzTotDg+K/mXVHJuFQsJ7eXwsscxKQoY7jwhl95IfMdUMpjRdDAOgtp1fZTu0mZXtMddu7iDbiu4kqnjzZQY3WOkZEKSgwZq2sU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769444859; c=relaxed/simple;
-	bh=ZGfjECRXSu+gnzNjS9m351g0BIpokfDygnm7jjNTFe8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DoV/qC4waePmcQq395Y2y6H9KkS7jNoFIm1s6K+VpN2dNl4Os3JiPh+Ka3J95NWcf67rXwsHBq7ke5DMZ1efohrCKIE8x5NOecaH1AZj/Bb078/I41cTiwgpglzoqdRkjg93hFW2OPOPj/YrZbCmXhLqrKXcRQgrsxx9XI3UeCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=VavjwfHL; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+	s=arc-20240116; t=1769445704; c=relaxed/simple;
+	bh=8yoM3+JoKX/J9QDS4HwajBIfb+G9TUqyNd63YSi5fTQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jOzXyw9PQyzQ4Oi8v/SsG21JbGYPSLfukx/qqeQR9rfWglR6rXYZZ2sWmL0xsBCgyUcaA26qMirNN31iREIDPPc1GtGEKAmZeyqvY7+b7t4uGRjWGjS6oWm4nAd9goEU7Gc3+YwLzdadGQom4L5/E1qG39xOeq2KCgATX21iJp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=WW/xyn0r; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="VavjwfHL"
-Received: from pps.filterd (m0109332.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 60QFd2nW2052827
-	for <linux-block@vger.kernel.org>; Mon, 26 Jan 2026 08:27:37 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=s2048-2025-q2; bh=oA3/xdC0n/q6uovqhC
-	X2hnYk9NIsQT61ZIxK+RshItc=; b=VavjwfHLAGj1zfm6fumAtTQMC/mh2Zymc+
-	eu6ryXmFi1klQZcDJ4h9crroHq8orlyv7fqnrFkQSo96b0xtSigyT0dmMAY6ODfD
-	hih+n3fJhnp/n6ZxcCSNm0BbrmZdMCbgIQp3PSHNeCj9RjgRZIQBd1XFW4nnWkJl
-	PRFCTDIZg2e599IY/0qVMaQ3ciqlV39jezQxp+Co9np5FxfnJJIE47iunZ54arMU
-	rgQ23QdtgX5xRkj4IUUS7dmN/q4WhewW3ddrcB6yOJUA6lFBBRGvFsY4z6A47OA+
-	gC/lD8FqhyQai3NMHA/sUpgrokeyF1iPJJO7+FbAd7dz1QkhCRlA==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4bx0vx3ykr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-block@vger.kernel.org>; Mon, 26 Jan 2026 08:27:36 -0800 (PST)
-Received: from twshared18017.01.snb2.facebook.com (2620:10d:c0a8:fe::f072) by
- mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.29; Mon, 26 Jan 2026 16:27:36 +0000
-Received: by devbig197.nha3.facebook.com (Postfix, from userid 544533)
-	id 542056B9FA8A; Mon, 26 Jan 2026 08:27:25 -0800 (PST)
-From: Keith Busch <kbusch@meta.com>
-To: <axboe@kernel.dk>, <linux-block@vger.kernel.org>
-CC: Keith Busch <kbusch@kernel.org>
-Subject: [PATCH] block: remove bio_last_bvec_all
-Date: Mon, 26 Jan 2026 08:27:24 -0800
-Message-ID: <20260126162724.1864652-1-kbusch@meta.com>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="WW/xyn0r"
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-42fbbc3df8fso2891488f8f.2
+        for <linux-block@vger.kernel.org>; Mon, 26 Jan 2026 08:41:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1769445700; x=1770050500; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=OEUrHNK8dWefUqOs00hvfwKIFD0uk17xYeaKpauo658=;
+        b=WW/xyn0r2OskO1/gzWNoULgDe2kdC0eHk8bhHWXchpqj6zBf/26ldY8HjHl/v+zfKq
+         0qzUPWlXUqmkd09XTetXlHKx+7HC6pXXogPKuOmnKvpxpo8uT1gS2ldSwn0+aY6O3zXv
+         h4u28Zn2G+3wOJKfpnm0NJLdQ9RlpUGvGRv+J9GzTaSPIcAl7PT+NbuvAF13p7AvUCps
+         HQUsFJA9gGnmG+46x+XVjR+e/k9QQB5OdIVD1VfeWImnSfxGSdfEeYyD+7A84RHrUs6Y
+         +XsYMZpdegAEXSTsvZ0x4GU1LO33SWaRjXInzhh+Aa6FFN1CV/9RrMu25lmu96Z4WiHq
+         WHJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769445700; x=1770050500;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OEUrHNK8dWefUqOs00hvfwKIFD0uk17xYeaKpauo658=;
+        b=B1os34rxgvK3ueM/x980NOxQ5lfg9v+CuoTOdyRZTg8uOzJ1zWAwqw7Le8y/NV0be9
+         EZ8z4Kd69wGGo8PWb8barAxQuggd5q67wHdWH7FIMC+b1DNKOts3k3F03ZpuCczGLsb0
+         GSalQ3qz2yoXaSD+w5GBl6QJotIz8Vwp6k4QPWSmW1QzRJ8K2PEjBxva6CXlIJXbSheE
+         imyodkNcrbEpEwrQLN56Z7IacPclgeeH+3IMfVuvXvW+i54pzy7k9pOZQeSt3tiEVdQq
+         LPjiaNP3vF2tnhmA9PXQ94rIqEEWsxIkqDlZdqim9/58/s91PQTyVzZzjsjKHHNiSER0
+         XtRw==
+X-Forwarded-Encrypted: i=1; AJvYcCXUEJWeEC9mcpmHJDGDS36lQk+jLXKAEpZn3mfCRRXxqxK5SOf/iNPZLIzsY4dPOKVssrV44ty2ffqWZQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxw3B+kiBgHXbG+o9XYp4/Y7ysEw+sdDy0u7G+lyPx6ULI5YMnW
+	FhFbpquRRGl4dPPjgDWVl0Trybk9wYyiizxUCsSluuth1dLI7MVW7iMcTdFaj7RKRTQ=
+X-Gm-Gg: AZuq6aLqdrADtyVVJRHISuAJ0kgTB5n1hBESY/8V6Z/yO6f4PqZwPyqUHo33UTlBXyD
+	0b6KzoJYc9aUnF7Mg2wRuKyalAFtiL0GUIHx/1EcP01NDP7pqv7A4AzW3mTN4dQ/+SJA/QHqWTL
+	/P8hun/oQyoAzj6tg5KnerEehxxjMYDB4qByjwWIulYMMEHGX8vDWCkR7liB4A8EpHrCYN3yagg
+	2p1nmBIAJpwBGXPjK1Orzy/yKGgzXTOzI9fXtwlPBIM5kyOhmiPHWCOZ5Fzlkveuti1wDBKfKyg
+	DcgOf0t9fXehJfMGJqdz5bBlyGttqHERdzHqKQlKnYqxrd8aQZbNKQpW91iq+Tz/2PlCjoiQDlk
+	Q3S2MKnexKnK3KFw6HQmmwCo/Abt8mzeuICF1eNZu/owZHzg5KovMffz2UtdUI+bsd4zkAFCrDI
+	xGW2oj8KoFVDNXxBBrhh0Xg446
+X-Received: by 2002:a05:6000:4212:b0:435:95ce:84cd with SMTP id ffacd0b85a97d-435ca39bd3emr10384617f8f.54.1769445699664;
+        Mon, 26 Jan 2026 08:41:39 -0800 (PST)
+Received: from localhost (109-81-26-156.rct.o2.cz. [109.81.26.156])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435b1f74b15sm31194587f8f.35.2026.01.26.08.41.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Jan 2026 08:41:39 -0800 (PST)
+Date: Mon, 26 Jan 2026 17:41:38 +0100
+From: Michal Hocko <mhocko@suse.com>
+To: Frederic Weisbecker <frederic@kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Chen Ridong <chenridong@huawei.com>,
+	Danilo Krummrich <dakr@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Gabriele Monaco <gmonaco@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Muchun Song <muchun.song@linux.dev>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
+	Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+	linux-mm@kvack.org, linux-pci@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 03/33] memcg: Prepare to protect against concurrent
+ isolated cpuset change
+Message-ID: <aXeZQoSHJ9QX7B6W@tiehlicka>
+References: <20260125224541.50226-1-frederic@kernel.org>
+ <20260125224541.50226-4-frederic@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: 0GWAG63RgjrX9npNTUuGex5iZ59TZbNk
-X-Proofpoint-GUID: 0GWAG63RgjrX9npNTUuGex5iZ59TZbNk
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTI2MDEzNiBTYWx0ZWRfX/MtRGFIoQ5i9
- bVmvJD3pzSnZeo8kqA0XfplNlSEkw4gnreD/Ko18CiX4YpGnj3vEabSFMcvoh+Xda5Z5fdVPFBF
- 7FQhKi5mtQAZlPXV/AWPVH8U7BG5Untxfiz0y2ZT77ORHZeG7NSukK4KVesePVT9jEdO2ZXrXEp
- sDCXkoKZPYo9lbZrcKn6bC0itkEBjDco77iT1BygEijDklJ9WiBcein5eOO6uhi5Jtf8Td0rSnO
- tMGDr/JxVZlR5zDkd8ycC6l6o+QXFufj5jA0zbCub9SuLZwfaRy+QwByAfIXho4dHjBNTYVk9lz
- 6WhT38rMoMD+00DcoRDOWX9lgNlnZ8an5y12nFaKNEwub9Nbse77yDZQs22zISQakD07nL021de
- L0IHBXw7pETUehPaBwU9BIOlYvh/MBds6z9VXVDvPpNJNN8KXOZFrF1xgpA7dTHvV9wXo8PhLIV
- svM+fxgZuyBzBcklJxw==
-X-Authority-Analysis: v=2.4 cv=P743RyAu c=1 sm=1 tr=0 ts=697795f8 cx=c_pps
- a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
- a=vUbySO9Y5rIA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8
- a=tJ1nug0kx5D7Olr3xrgA:9
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.20,FMLib:17.12.100.49
- definitions=2026-01-26_04,2026-01-26_01,2025-10-01_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260125224541.50226-4-frederic@kernel.org>
 
-From: Keith Busch <kbusch@kernel.org>
+On Sun 25-01-26 23:45:10, Frederic Weisbecker wrote:
+> The HK_TYPE_DOMAIN housekeeping cpumask will soon be made modifiable at
+> runtime. In order to synchronize against memcg workqueue to make sure
+> that no asynchronous draining is pending or executing on a newly made
+> isolated CPU, target and queue a drain work under the same RCU critical
+> section.
+> 
+> Whenever housekeeping will update the HK_TYPE_DOMAIN cpumask, a memcg
+> workqueue flush will also be issued in a further change to make sure
+> that no work remains pending after a CPU has been made isolated.
+> 
+> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+> ---
+>  mm/memcontrol.c | 21 +++++++++++++++++----
+>  1 file changed, 17 insertions(+), 4 deletions(-)
+> 
+> diff --git a/mm/memcontrol.c b/mm/memcontrol.c
+> index be810c1fbfc3..2289a0299331 100644
+> --- a/mm/memcontrol.c
+> +++ b/mm/memcontrol.c
+> @@ -2003,6 +2003,19 @@ static bool is_memcg_drain_needed(struct memcg_stock_pcp *stock,
+>  	return flush;
+>  }
+>  
+> +static void schedule_drain_work(int cpu, struct work_struct *work)
+> +{
+> +	/*
+> +	 * Protect housekeeping cpumask read and work enqueue together
+> +	 * in the same RCU critical section so that later cpuset isolated
+> +	 * partition update only need to wait for an RCU GP and flush the
+> +	 * pending work on newly isolated CPUs.
+> +	 */
+> +	guard(rcu)();
+> +	if (!cpu_is_isolated(cpu))
+> +		schedule_work_on(cpu, work);
 
-There are no more callers of this function after commit f6b2d8b134b2413
-("btrfs: track the next file offset in struct btrfs_bio_ctrl"), so
-remove the function.
-
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
- Documentation/block/biovecs.rst | 1 -
- include/linux/bio.h             | 6 ------
- 2 files changed, 7 deletions(-)
-
-diff --git a/Documentation/block/biovecs.rst b/Documentation/block/biovec=
-s.rst
-index b9dc0c9dbee44..11126ed6f40f7 100644
---- a/Documentation/block/biovecs.rst
-+++ b/Documentation/block/biovecs.rst
-@@ -135,7 +135,6 @@ Usage of helpers:
- 	bio_first_bvec_all()
- 	bio_first_page_all()
- 	bio_first_folio_all()
--	bio_last_bvec_all()
-=20
- * The following helpers iterate over single-page segment. The passed 'st=
-ruct
-   bio_vec' will contain a single-page IO vector during the iteration::
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 95cfc79b88b89..69d56b1d1bd21 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -256,12 +256,6 @@ static inline struct folio *bio_first_folio_all(stru=
-ct bio *bio)
- 	return page_folio(bio_first_page_all(bio));
- }
-=20
--static inline struct bio_vec *bio_last_bvec_all(struct bio *bio)
--{
--	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
--	return &bio->bi_io_vec[bio->bi_vcnt - 1];
--}
--
- /**
-  * struct folio_iter - State for iterating all folios in a bio.
-  * @folio: The current folio we're iterating.  NULL after the last folio=
-.
---=20
-2.47.3
-
+Shouldn't this in the guarded rcu section?
+-- 
+Michal Hocko
+SUSE Labs
