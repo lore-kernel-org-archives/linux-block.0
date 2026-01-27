@@ -1,22 +1,23 @@
 Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ACED199E94;
-	Tue, 27 Jan 2026 01:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2C5523AE87;
+	Tue, 27 Jan 2026 01:23:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769476829; cv=none; b=o1HTIMfx3C8CCGzUrvaLILPZkTv+qqL0ZP7/LpqjPJmC0qMKnG9nDQQvJCk2kVo0uPjtTSlWxRSg6gjh6b9XBRiAfFqc0vDebh82hQDDUrYWp55K9HztcXUm6hZzH7DsLgnov7KyzT+xszjQXJTjAfiNmgJq+VXRty+DEaKfA9A=
+	t=1769476996; cv=none; b=TJYDPkXsGYFyIZCTjZss3vgeLF2AuzCKfrjNWjZ1LxOuNUfbRZ9F+9c8S/gO6CD3daAHDegX1MdozvQozDSBXQ0fmAie580IwLgmxxf/u4xforMm7qamjwv7oL43tE6rx83iE4Pbx0gj/NWMD3npbVdWKzwt/qAeBDjgK/KzLcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769476829; c=relaxed/simple;
-	bh=8mfetCrZP74D2sqDqt7GC12sKjnAQMeRGv4/KWaUjw8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=VgS+X6oRpraDqS82C2bNEyFz2jzYUPT1R62vnkuT8EOwGBYfS+zS/I7NbN5tTbEDWMMIzBWMlpdChpWvUJ8q1GXRcsN3exDDJqVQVgWLXfxF7Jz2/4jOtuy0eee9jtagNlDK0ssshFMWJ9N+2b7ijKcotKwIWneQ5+C+yLt5XNk=
+	s=arc-20240116; t=1769476996; c=relaxed/simple;
+	bh=c26LWJOSqBn1uKS1Y9B9BBfhxHXeS6WDWMMV2m3rB18=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=L6eGoax2lKfGKhS6jtNJLmehru5Z14mC9DfHkpXEr8dutf1IEJSP8ab7ut0Ir5jRGiXCSNiy3+W5jNCPDGQ1qjRODb75J3GAoo0EiMS1iGOdoc3RlfRWZj+sNBbTNcGxHdQ1UGE+qQxxPwBjPJI5t71vXoC6Gk5mAnNITd/UYrw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 58592c8efb1e11f0b0f03b4cfa9209d1-20260127
+X-UUID: bc148bc4fb1e11f0b0f03b4cfa9209d1-20260127
 X-CTIC-Tags:
 	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
-	HR_CTT_TXT, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
+	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
 	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
 	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
 	HR_TO_NO_NAME, IP_UNTRUSTED, SRC_UNTRUSTED, IP_UNFAMILIAR, SRC_UNFAMILIAR
@@ -25,27 +26,27 @@ X-CTIC-Tags:
 	CIE_UNKNOWN, GTI_FG_BS, GTI_RG_INFO, GTI_C_BU, AMN_GOOD
 	ABX_MISS_RDNS
 X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.6,REQID:ed83315c-d473-40ae-b85c-320bd3b34dab,IP:10,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:5
-X-CID-INFO: VERSION:1.3.6,REQID:ed83315c-d473-40ae-b85c-320bd3b34dab,IP:10,URL
-	:0,TC:0,Content:0,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
-	elease,TS:5
-X-CID-META: VersionHash:a9d874c,CLOUDID:583654df13fc3f53443175fa62d85539,BulkI
-	D:260127092020IZI2QH0M,BulkQuantity:0,Recheck:0,SF:17|19|38|66|78|102|127|
-	850|898,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bulk:nil
-	,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:
-	0,ARC:0
+X-CID-O-INFO: VERSION:1.3.6,REQID:aa351779-3fc6-44d4-b54e-291288915f4b,IP:10,U
+	RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:0
+X-CID-INFO: VERSION:1.3.6,REQID:aa351779-3fc6-44d4-b54e-291288915f4b,IP:10,URL
+	:0,TC:0,Content:-5,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:a9d874c,CLOUDID:0045e75a0578c7fb8869caa328d596fb,BulkI
+	D:260127092308A80JDBPV,BulkQuantity:0,Recheck:0,SF:17|19|38|66|78|81|82|10
+	2|127|850|898,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bu
+	lk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:
+	0,BRE:0,ARC:0
 X-CID-BVR: 2,SSN|SDN
 X-CID-BAS: 2,SSN|SDN,0,_
 X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD
 X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 58592c8efb1e11f0b0f03b4cfa9209d1-20260127
+X-UUID: bc148bc4fb1e11f0b0f03b4cfa9209d1-20260127
 X-User: tianyaxiong@kylinos.cn
 Received: from localhost.localdomain [(175.2.158.168)] by mailgw.kylinos.cn
 	(envelope-from <tianyaxiong@kylinos.cn>)
 	(Generic MTA)
-	with ESMTP id 632687073; Tue, 27 Jan 2026 09:20:19 +0800
+	with ESMTP id 620773331; Tue, 27 Jan 2026 09:23:07 +0800
 From: Yaxiong Tian <tianyaxiong@kylinos.cn>
 To: rostedt@goodmis.org,
 	axboe@kernel.dk,
@@ -55,49 +56,103 @@ Cc: linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-trace-kernel@vger.kernel.org,
 	Yaxiong Tian <tianyaxiong@kylinos.cn>
-Subject: [PATCH v3 0/3] Tracing: Accelerate Kernel Boot by Asynchronizing
-Date: Tue, 27 Jan 2026 09:20:16 +0800
-Message-Id: <20260127012016.76713-1-tianyaxiong@kylinos.cn>
+Subject: [PATCH v3 1/3] tracing: Rename `eval_map_wq` and allow other parts of tracing use it
+Date: Tue, 27 Jan 2026 09:23:03 +0800
+Message-Id: <20260127012303.84230-1-tianyaxiong@kylinos.cn>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20260127012016.76713-1-tianyaxiong@kylinos.cn>
+References: <20260127012016.76713-1-tianyaxiong@kylinos.cn>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On my ARM64 platform, I observed that certain tracing module
-initializations run for up to 200ms—for example, init_kprobe_trace().
-Analysis reveals the root cause: the execution flow eval_map_work_func()
-→trace_event_update_with_eval_map()→trace_event_update_all()
-is highly time-consuming. Although this flow is placed in eval_map_wq
-for asynchronous execution, it holds the trace_event_sem lock, causing
-other modules to be blocked either directly or indirectly.
+The eval_map_work_func() function, though queued in eval_map_wq,
+holds the trace_event_sem read-write lock for a long time during
+kernel boot. This causes blocking issues for other functions.
 
-To resolve this issue, I rename `eval_map_wq` and make it global and moved
-other initialization functions under the tracing subsystem that are
-related to this lock to run asynchronously on this workqueue. After this
-optimization, boot time is reduced by approximately 200ms.
+Rename eval_map_wq to trace_init_wq and make it global, thereby
+allowing other parts of tracing to schedule work on this queue
+asynchronously and avoiding blockage of the main boot thread.
 
+Signed-off-by: Yaxiong Tian <tianyaxiong@kylinos.cn>
 ---
-Changes in v2:
-- Rename eval_map_wq to trace_init_wq.
-Changes in v3:
-- Opt PATCH 1/3 commit
+ kernel/trace/trace.c | 18 +++++++++---------
+ kernel/trace/trace.h |  2 ++
+ 2 files changed, 11 insertions(+), 9 deletions(-)
 
-Yaxiong Tian (3):
-  tracing: Rename `eval_map_wq` and allow other parts of tracing use it
-  tracing/kprobes: Make setup_boot_kprobe_events() asynchronous
-  blktrace: Make init_blk_tracer() asynchronous
-
- kernel/trace/blktrace.c     | 23 ++++++++++++++++++++++-
- kernel/trace/trace.c        | 18 +++++++++---------
- kernel/trace/trace.h        |  2 ++
- kernel/trace/trace_kprobe.c | 14 +++++++++++++-
- 4 files changed, 46 insertions(+), 11 deletions(-)
-
+diff --git a/kernel/trace/trace.c b/kernel/trace/trace.c
+index e18005807395..c61e30cb7339 100644
+--- a/kernel/trace/trace.c
++++ b/kernel/trace/trace.c
+@@ -10774,7 +10774,7 @@ int tracing_init_dentry(void)
+ extern struct trace_eval_map *__start_ftrace_eval_maps[];
+ extern struct trace_eval_map *__stop_ftrace_eval_maps[];
+ 
+-static struct workqueue_struct *eval_map_wq __initdata;
++struct workqueue_struct *trace_init_wq __initdata;
+ static struct work_struct eval_map_work __initdata;
+ static struct work_struct tracerfs_init_work __initdata;
+ 
+@@ -10790,15 +10790,15 @@ static int __init trace_eval_init(void)
+ {
+ 	INIT_WORK(&eval_map_work, eval_map_work_func);
+ 
+-	eval_map_wq = alloc_workqueue("eval_map_wq", WQ_UNBOUND, 0);
+-	if (!eval_map_wq) {
+-		pr_err("Unable to allocate eval_map_wq\n");
++	trace_init_wq = alloc_workqueue("trace_init_wq", WQ_UNBOUND, 0);
++	if (!trace_init_wq) {
++		pr_err("Unable to allocate trace_init_wq\n");
+ 		/* Do work here */
+ 		eval_map_work_func(&eval_map_work);
+ 		return -ENOMEM;
+ 	}
+ 
+-	queue_work(eval_map_wq, &eval_map_work);
++	queue_work(trace_init_wq, &eval_map_work);
+ 	return 0;
+ }
+ 
+@@ -10807,8 +10807,8 @@ subsys_initcall(trace_eval_init);
+ static int __init trace_eval_sync(void)
+ {
+ 	/* Make sure the eval map updates are finished */
+-	if (eval_map_wq)
+-		destroy_workqueue(eval_map_wq);
++	if (trace_init_wq)
++		destroy_workqueue(trace_init_wq);
+ 	return 0;
+ }
+ 
+@@ -10969,9 +10969,9 @@ static __init int tracer_init_tracefs(void)
+ 	if (ret)
+ 		return 0;
+ 
+-	if (eval_map_wq) {
++	if (trace_init_wq) {
+ 		INIT_WORK(&tracerfs_init_work, tracer_init_tracefs_work_func);
+-		queue_work(eval_map_wq, &tracerfs_init_work);
++		queue_work(trace_init_wq, &tracerfs_init_work);
+ 	} else {
+ 		tracer_init_tracefs_work_func(NULL);
+ 	}
+diff --git a/kernel/trace/trace.h b/kernel/trace/trace.h
+index de4e6713b84e..e52f259f8945 100644
+--- a/kernel/trace/trace.h
++++ b/kernel/trace/trace.h
+@@ -770,6 +770,8 @@ extern unsigned long nsecs_to_usecs(unsigned long nsecs);
+ 
+ extern unsigned long tracing_thresh;
+ 
++extern struct workqueue_struct *trace_init_wq __initdata;
++
+ /* PID filtering */
+ 
+ bool trace_find_filtered_pid(struct trace_pid_list *filtered_pids,
 -- 
 2.25.1
 
