@@ -1,64 +1,64 @@
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D20227E06C
-	for <linux-block@vger.kernel.org>; Wed, 28 Jan 2026 21:18:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FCCD2E2665
+	for <linux-block@vger.kernel.org>; Wed, 28 Jan 2026 21:18:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769635087; cv=none; b=crgqT1T9l/o98CZ8aNYaud1gVXa0BWIYWMfE2LRYSu9KjrZrSeFRtSy3ZXBBF3XcxC5rPOYyPaOJ8+Oft1jLAwBHiXJJpX/h8L2KotfjUCkYLCoHVzvYNRfEgIC82N68PgovOi0iMMu+gfIVxVAJW05SFzPZHPXAxr5pRDg253M=
+	t=1769635118; cv=none; b=VDhX7BqnW1UMawDLJnVmA4+BbyGfwwQrpUNO8Ril0MTOAJkiee2hZK/9u8b3zHfEQ2ZDmYiPu0Imz1Vs9QnGLaOebhkxVnTpFAmNeIv6apTC8BCpU/J81eE0F+1WZruwEFcmgwFQhKFDtlRKSijUcpi+Z/+iJRF2Gvc8wO1ZAP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769635087; c=relaxed/simple;
-	bh=kjFXNlbmAL0BO92rYrTkCSuMABiMP5ofoNy2abW+ap8=;
+	s=arc-20240116; t=1769635118; c=relaxed/simple;
+	bh=4kYgZEqqo+Pmcqz03RJxSk4QVGQCPTN00vY5Iav8aA4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z8ObZTzjLvnBA1lYEeMVlbWreF/fUD0PNMeKTMoNgmsuoircR9jWm+FBtDX7PrRCOltEljvTcb+4y2reCTKCyELXtUl08RTylGFeonE1onY8KeeGi3b3LVEmUtJCCbTuEcUE49sOcZmaB2f5+rMZ9GDhLkWPrxvbLyJaobQHLVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=VcAbRWxC; arc=none smtp.client-ip=209.85.128.50
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZPdZvYi8R/g4rpWIyXhJiBPideDWid9JohKr9Hi04QbpBnF8fGkIb7v7EIeG6k2/Qh8q3LHvQMRZDG2bzhfA4YR66dgANuEd+NQ8Trp+nD7QzQLp7a8AwvNsfkF5uuo95HVw30F5b4yx3FQmiECEDUXP3B+iZYwqlHrwBND9MZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=QGEzAbN/; arc=none smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="VcAbRWxC"
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-47ee07570deso2229915e9.1
-        for <linux-block@vger.kernel.org>; Wed, 28 Jan 2026 13:18:06 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="QGEzAbN/"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-47ff94b46afso2212705e9.1
+        for <linux-block@vger.kernel.org>; Wed, 28 Jan 2026 13:18:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1769635085; x=1770239885; darn=vger.kernel.org;
+        d=suse.com; s=google; t=1769635115; x=1770239915; darn=vger.kernel.org;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=ZU7FEnl0OZQVA7ODIpy0SKJAEacHqZRjK4EaXTvPIzs=;
-        b=VcAbRWxCx1sqsR7wsEPCek4TghMY0a1vc9GxEknZR59yeMCqkqjg1CaJoLrqOfymzc
-         LYIMCKsdWDcGTXFFAeHuG1vHMeb1H+qG5dYzKoFl7O7O7tffhq8wkVwb943kpXJavfS0
-         JXZsmZ0mietseQsxHDXU+1WCIwSUXbjThkfHww+t/wfYahNCHJc0k2smjB2CrMlHRT1J
-         oIQsBhMzeHlO8saKSiNKhXA9/h9DM4jnwQKUtbAdkzeoYpUc8uBTKgDNTO8n/XeLXBVg
-         zwGU85oRqLdKHO38LyxQs5lZtHxrEalkUPEs9Yf3ZRzRT6Goe8iMzyZqQbtbc0i++cMy
-         lmNQ==
+        bh=xp9Fgd2RIw247dmeHBhZGyViCdcfCoSm8F9wNiqAlQI=;
+        b=QGEzAbN/eEMk5A/rTxwKJRDVCttq3I7NJpXff+rpekFVtH3sO2QZSZPnD5uT9DQPgR
+         Gnu8mpf1dqnDbRPhMVvDtwOV8yFq91IxfE8GOXWJkneW1Tjd7MTBCGFcuzYrFB2deRbM
+         xoo5L/Jltg6IiewSP8AESHjqjNlKl8N3DwJ6ABMy5Rg/Iw6GNWp77ZOU5Jdi5sEqOJmc
+         W3SERxPYyj04hbNVpcDgYCuO2e4ZVU7JZKoU7frE6saJFdrUNIXOhVCpjvqixV8sMmMz
+         IFFqLdwr+UvQUWFkM8+a9oa0OsbtLf3CbdfK7ckkOTfZkf4CSe4GU/N8pIDo4N36cAgs
+         csRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769635085; x=1770239885;
+        d=1e100.net; s=20230601; t=1769635115; x=1770239915;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZU7FEnl0OZQVA7ODIpy0SKJAEacHqZRjK4EaXTvPIzs=;
-        b=UHAXe68Jdc97fJrwRLihsWR/dRBfW/ziuNT0RGbAzbDSm9Cql//1Ag5CfQwlqVfyHx
-         ktX6x+hZh0VbSk4bebaLV/NEhX2EyRJJ1yi4F0DY79w5HxF6kcwgTYZN7bER+cZeeKEa
-         8JxCsxRgFYKCG34VmoeVBnQy7I0+1H6C7xuhGMY5oOivOTJSjvGyOOXekhT4iXL/re8e
-         Xir9fajxKSwOLMszsLaIB5PEK+GwmXpdvCyHiXtDOLhGIA/qLPxUxIi1FesKSUM1r0Eq
-         eUUi5pLR9fIkqmg5qGhWK0U11jtb9zeY2AtoKY4q6Pfpd1bSQ7KLC1kdBjsc1CH3J7mD
-         L7WA==
-X-Forwarded-Encrypted: i=1; AJvYcCV54Rxl1A9V+y/kbWrzhTHpP2lae+IOP0rcWOxYTNaWd7+xqA6X1s6KzfRVBpheeEnWb8sA7rixLwyIAQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKaWcgmWF5xn7A3L1UC/CJUrwx1BD7YmMnylx7NJmOZ3VypLEQ
-	tSqjCjfZ698+ZLKJfbWpGazg9PtdTDVUBriQTy4MCScbNWWMyqy6FjRFUwk41oY79Ro=
-X-Gm-Gg: AZuq6aK7thm1tUHq4pjmb0MH8Y/nPfY7/3nKO5vT947owMn5l64h/bED4ntV2DC8v0Y
-	Od5o1KlBYLsu2ezg1zBQthgOXlC7sZ2Ex1Bc/LZVV4DDhnAhiT+JPrZEDDeSs7i6A6NyOBw1gx4
-	Ct0K4bfqyV54wMr10CPjfadTOS0Itt1mku1/pH3mzPIUnY42unuH+uQO2HCQ7wae2h3/aQtUrfO
-	fSVi5mGJKhtHN9NwIiUBznubclCXDWXU7U700fxYs5hMrz3CRC+P60+z/KqweuLFq1QIqmzy1Ta
-	i/pdwAF5bzD0AC67yvl3G241fF3qQqt2o52q5DqoHaMCILoQQk3HKcBNXNc3EoXEdpiHTCNbdME
-	lnRPDfvIHZESkn2Be4Ab7hoAy4Emiq1RAHqpfJaUd4rvot5ItWnVf+esj2yZVgxFd3oYrSspTTy
-	Q3ww1MERG2iq21TYYs3kPQ9DIz
-X-Received: by 2002:a05:600c:154c:b0:47e:e9bf:dd8a with SMTP id 5b1f17b1804b1-48069cb2fddmr85513805e9.37.1769635084662;
-        Wed, 28 Jan 2026 13:18:04 -0800 (PST)
+        bh=xp9Fgd2RIw247dmeHBhZGyViCdcfCoSm8F9wNiqAlQI=;
+        b=bnEY2+Vf2GZHxHpt/Ib5lSuRzC8qmBmORrSuf1GjwbNyMo98VI+/aPgitwOOL0yEyO
+         5jjbhVZGxQWIDwD6IqWh2iyoua+XAVeZEXqxHJ8WEFpYNW3yGOnQeeHhUTIjPYozP8lQ
+         dT3y5ovZ9l6KQJeAQTAKK3RnlhJW2kkKnBo5nTwrfgeZquWim+OqmUJZanA9zAAQNPyR
+         ks2SuwzqHuHTGM2yLNmpQ1HZm9OIC+G4BucVuQOfKdbd5qIGUC0Z2L9Vgjzewb0PCUKD
+         fKDbsUBWZbPiDbnZQNKA3dQLZTe+HjSP04bXUcHxI/ZrKwOUZzWI1/s7E7fkR682cYsu
+         pF3A==
+X-Forwarded-Encrypted: i=1; AJvYcCW7D9GNe76htAZnB1RAKgRvVlVdjOndNL1jurCXKRd1ofkyMByTSi+AUzTa/INkxWU4yepzA2E8kAlteg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxmaxtahzz9X8PWww4B74oCml4alFm/4AQ7KHPt/nvMAS+RPf0k
+	rMk0DfU6TpAuSX49Grs42qQ5RKeajmOf4AUkKBwzKkifuGXorLzSst/KveI8h7y80ow=
+X-Gm-Gg: AZuq6aI93y1k2ry+PUEX6LskHaOZZlgKvkRnBbXXlZHmTfxwiTOIVsieo7I1zCleY/V
+	ahY2UJEEM1xSJLSWdvkiylstqrnglHJuh+dD4pQPBqmxcnApnxgQNzXEtiuWH7LJiaup28dsinh
+	WWFWltNVdG3g/ci8yj0ogcL9pKa83GunPQ6xCBbACjmvpxcbQ2+YDTbF5M/Vrs2XiNo+k+Co8ic
+	W0T3HpQs46/pSOIYuAfRNT04C1M6c1WPjrDfZW/9m635cYOCeuVHxQ/X6K8HzzOnBT0X2fx6Dj6
+	rJgG82ULYEAeikDkoQKD2q5vVU93eDqCiO+pkOrn4QtyPe38ft0V0d9yb5ohe4m5p9MKo2VtYv9
+	kgVH/sdLJ1Bx29P1Ir5wbMkf8ZnRFCLOcTw1D/mLnq9vdyy+q8Obk/Jr1xLpEymnghZeYA2GT45
+	mSMHBe1+wbq6C51yPn4CTg2Wtc
+X-Received: by 2002:a7b:ca47:0:b0:47e:e38b:a83 with SMTP id 5b1f17b1804b1-480828828dcmr6056415e9.7.1769635114891;
+        Wed, 28 Jan 2026 13:18:34 -0800 (PST)
 Received: from localhost (109-81-26-156.rct.o2.cz. [109.81.26.156])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4806ce4c515sm85708295e9.11.2026.01.28.13.18.04
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435e131ce64sm9991967f8f.26.2026.01.28.13.18.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Jan 2026 13:18:04 -0800 (PST)
-Date: Wed, 28 Jan 2026 22:18:03 +0100
+        Wed, 28 Jan 2026 13:18:34 -0800 (PST)
+Date: Wed, 28 Jan 2026 22:18:33 +0100
 From: Michal Hocko <mhocko@suse.com>
 To: Frederic Weisbecker <frederic@kernel.org>
 Cc: LKML <linux-kernel@vger.kernel.org>,
@@ -91,13 +91,14 @@ Cc: LKML <linux-kernel@vger.kernel.org>,
 	netdev@vger.kernel.org
 Subject: Re: [PATCH 03/33] memcg: Prepare to protect against concurrent
  isolated cpuset change
-Message-ID: <aXp9CzgCTBEhlDqM@tiehlicka>
+Message-ID: <aXp9KWl3VaNDMKPp@tiehlicka>
 References: <20260125224541.50226-1-frederic@kernel.org>
  <20260125224541.50226-4-frederic@kernel.org>
  <aXeZQoSHJ9QX7B6W@tiehlicka>
  <aXizUsfywjtIIN50@localhost.localdomain>
  <aXnMj1phN3TJZkNz@tiehlicka>
  <aXnymtIZSc-fw1b8@localhost.localdomain>
+ <aXp9CzgCTBEhlDqM@tiehlicka>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -107,68 +108,73 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <aXnymtIZSc-fw1b8@localhost.localdomain>
+In-Reply-To: <aXp9CzgCTBEhlDqM@tiehlicka>
 
-On Wed 28-01-26 12:27:22, Frederic Weisbecker wrote:
-> Le Wed, Jan 28, 2026 at 09:45:03AM +0100, Michal Hocko a écrit :
-> > On Tue 27-01-26 13:45:06, Frederic Weisbecker wrote:
-> > > Le Mon, Jan 26, 2026 at 05:41:38PM +0100, Michal Hocko a écrit :
-> > > > On Sun 25-01-26 23:45:10, Frederic Weisbecker wrote:
-> > > > > The HK_TYPE_DOMAIN housekeeping cpumask will soon be made modifiable at
-> > > > > runtime. In order to synchronize against memcg workqueue to make sure
-> > > > > that no asynchronous draining is pending or executing on a newly made
-> > > > > isolated CPU, target and queue a drain work under the same RCU critical
-> > > > > section.
+On Wed 28-01-26 22:18:04, Michal Hocko wrote:
+> On Wed 28-01-26 12:27:22, Frederic Weisbecker wrote:
+> > Le Wed, Jan 28, 2026 at 09:45:03AM +0100, Michal Hocko a écrit :
+> > > On Tue 27-01-26 13:45:06, Frederic Weisbecker wrote:
+> > > > Le Mon, Jan 26, 2026 at 05:41:38PM +0100, Michal Hocko a écrit :
+> > > > > On Sun 25-01-26 23:45:10, Frederic Weisbecker wrote:
+> > > > > > The HK_TYPE_DOMAIN housekeeping cpumask will soon be made modifiable at
+> > > > > > runtime. In order to synchronize against memcg workqueue to make sure
+> > > > > > that no asynchronous draining is pending or executing on a newly made
+> > > > > > isolated CPU, target and queue a drain work under the same RCU critical
+> > > > > > section.
+> > > > > > 
+> > > > > > Whenever housekeeping will update the HK_TYPE_DOMAIN cpumask, a memcg
+> > > > > > workqueue flush will also be issued in a further change to make sure
+> > > > > > that no work remains pending after a CPU has been made isolated.
+> > > > > > 
+> > > > > > Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+> > > > > > ---
+> > > > > >  mm/memcontrol.c | 21 +++++++++++++++++----
+> > > > > >  1 file changed, 17 insertions(+), 4 deletions(-)
+> > > > > > 
+> > > > > > diff --git a/mm/memcontrol.c b/mm/memcontrol.c
+> > > > > > index be810c1fbfc3..2289a0299331 100644
+> > > > > > --- a/mm/memcontrol.c
+> > > > > > +++ b/mm/memcontrol.c
+> > > > > > @@ -2003,6 +2003,19 @@ static bool is_memcg_drain_needed(struct memcg_stock_pcp *stock,
+> > > > > >  	return flush;
+> > > > > >  }
+> > > > > >  
+> > > > > > +static void schedule_drain_work(int cpu, struct work_struct *work)
+> > > > > > +{
+> > > > > > +	/*
+> > > > > > +	 * Protect housekeeping cpumask read and work enqueue together
+> > > > > > +	 * in the same RCU critical section so that later cpuset isolated
+> > > > > > +	 * partition update only need to wait for an RCU GP and flush the
+> > > > > > +	 * pending work on newly isolated CPUs.
+> > > > > > +	 */
+> > > > > > +	guard(rcu)();
+> > > > > > +	if (!cpu_is_isolated(cpu))
+> > > > > > +		schedule_work_on(cpu, work);
 > > > > > 
-> > > > > Whenever housekeeping will update the HK_TYPE_DOMAIN cpumask, a memcg
-> > > > > workqueue flush will also be issued in a further change to make sure
-> > > > > that no work remains pending after a CPU has been made isolated.
-> > > > > 
-> > > > > Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
-> > > > > ---
-> > > > >  mm/memcontrol.c | 21 +++++++++++++++++----
-> > > > >  1 file changed, 17 insertions(+), 4 deletions(-)
-> > > > > 
-> > > > > diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-> > > > > index be810c1fbfc3..2289a0299331 100644
-> > > > > --- a/mm/memcontrol.c
-> > > > > +++ b/mm/memcontrol.c
-> > > > > @@ -2003,6 +2003,19 @@ static bool is_memcg_drain_needed(struct memcg_stock_pcp *stock,
-> > > > >  	return flush;
-> > > > >  }
-> > > > >  
-> > > > > +static void schedule_drain_work(int cpu, struct work_struct *work)
-> > > > > +{
-> > > > > +	/*
-> > > > > +	 * Protect housekeeping cpumask read and work enqueue together
-> > > > > +	 * in the same RCU critical section so that later cpuset isolated
-> > > > > +	 * partition update only need to wait for an RCU GP and flush the
-> > > > > +	 * pending work on newly isolated CPUs.
-> > > > > +	 */
-> > > > > +	guard(rcu)();
-> > > > > +	if (!cpu_is_isolated(cpu))
-> > > > > +		schedule_work_on(cpu, work);
+> > > > > Shouldn't this in the guarded rcu section?
 > > > > 
-> > > > Shouldn't this in the guarded rcu section?
+> > > > This is what guard(rcu)() does, right?
+> > > > Or am I missing something?
 > > > 
-> > > This is what guard(rcu)() does, right?
-> > > Or am I missing something?
+> > > I am probably misreading the patch. But I've had the following in mind
+> > > 
+> > > 	scoped_guard(rcu) {
+> > > 		if (!cpu_is_isolated(cpu))
+> > > 			schedule_work_on(cpu, work);
+> > > 	}
 > > 
-> > I am probably misreading the patch. But I've had the following in mind
+> > guard(...)() protects everything that follows within the same block
+> > (here the whole function) whereas scoped_guard only applies to the
+> > following scope (here what is inside the {} in your example).
 > > 
-> > 	scoped_guard(rcu) {
-> > 		if (!cpu_is_isolated(cpu))
-> > 			schedule_work_on(cpu, work);
-> > 	}
+> > So both work.
 > 
-> guard(...)() protects everything that follows within the same block
-> (here the whole function) whereas scoped_guard only applies to the
-> following scope (here what is inside the {} in your example).
-> 
-> So both work.
+> I see. Thanks for the clarification. I would probably prefer a more
+> explicit call convention but no strong opinion on that.
 
-I see. Thanks for the clarification. I would probably prefer a more
-explicit call convention but no strong opinion on that.
+Forgot to add
+Acked-by: Michal Hocko <mhocko@suse.com>
+Thanks!
 -- 
 Michal Hocko
 SUSE Labs
