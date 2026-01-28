@@ -1,154 +1,136 @@
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAED42E2665
-	for <linux-block@vger.kernel.org>; Wed, 28 Jan 2026 21:18:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D35202BE03D;
+	Wed, 28 Jan 2026 23:38:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769635140; cv=none; b=MBBhpt2xpLOvPVPQ9L7bSZnGJ5vQYEQr5RSBKnb1gGPkYvalEHgT3M+CyGqb7JG5sDY8avHIWlYhdU7rF4h0Nt6saM8K+a/HYooBCP0rRb8FLy7rDQEQGiRT8VdkQn1Vaf/Fd5Y00tzOHMJiv7PgQm5flBWMO37DSjMJ/3S2oWM=
+	t=1769643500; cv=none; b=K+T1JGO622KhCnSG4pXkV5nwTCJnriDMrYUhD+TzNxyU2KDKyc4DSPF6ihiAZaHxMVNB1mL2vexXY0DwdW8iHMIHibRZxYXwYDC9E2tvElHSyNMd7hpl0PlPxd2Hn7XboiXFJIXdc+rOxap0sGovhlN5sDTnNsWfcoGSyj8fhyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769635140; c=relaxed/simple;
-	bh=R26B82zxPcid0PkRJfA5J9VLBvvgfckzt4BZtC2Buu8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F8mhpO8z7RGO2w3CE4MtTMkLgMlmEx/8y1C+4URgiqew7RhQ2ojh4qo+OHJ6SB52b4L8X8gaD5uCOXTqR7NzXXvJSrYXWNxRzrNqT8eE/d4aHaBf693I9hUyN21NCX+S4hs/eYNPAbD2yu51K/OG5jM3s+6jBNgJgDYFXh2a8wc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=H6/Pt2QS; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1769643500; c=relaxed/simple;
+	bh=F0SGT1zA7nJrKcds9k2gzkJL1tql6F1LMQ2X/R9SLXU=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=TkHGM5aiyCg/YwMZfYh158+Hl4AYaCYos4jXrIbNsaobwwLnp5nGb/g9ku6d98wtrEnfDtnDalQmr/Vlt1x9+og8tulgOu+gz4YMsNWvu/3LPBlABlI/uuTuEc/XN9fJQVWejpArtbPAmSkTLI1leW5CozkgTq2AL3lZM90cHBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u5Z8pkQs; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="H6/Pt2QS"
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-48069a48629so2882485e9.0
-        for <linux-block@vger.kernel.org>; Wed, 28 Jan 2026 13:18:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1769635136; x=1770239936; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KW1Mn8hE3xrcR5j18KDZNCCnIS+/tf2Xt9JxG670/6k=;
-        b=H6/Pt2QSJL40tHRjCnqTJlyeIJBSCnr6XIoN79q068X0MJU9XhocPvQi3HFIkZymOP
-         p8kxmgBVkKuyGCdOTB6i9edsgCbEngNrTzpB+fJmWfV0QD5weM0n/jRnTPjP7dR8i0fd
-         XPcJli/57tpaiplIsRRfu/P7GpWnWHZ7UOuoOtvXdjd8lOWeFXblOPmGyTJgQGpUDdVX
-         TjBp17TAhFz4dhaYtX7FHH3TO+d7uWcui8ah2wAxjnHEdJf2DAaU243XGNDazfe4iT80
-         ZPl523HaMWYMdHiUL4T38lxBoNV59O7P5kaPK3MmoGwSuq7gWlGhXbmGHaRcqptdF3co
-         lYyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769635136; x=1770239936;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KW1Mn8hE3xrcR5j18KDZNCCnIS+/tf2Xt9JxG670/6k=;
-        b=OBoM+fWkN+SoH9v5Pvf7J1hODUqsod5TL19sax62v2e2rMobWRDPJBQvuS6jWD3V1U
-         gvl7X0Zz7G6dc0dTvdGZ/uF8DefjHGfe8YQxE2hzQwnFskWCJKLX61PR0FZ7h0XRbhuu
-         rE2rhY/KlcocD734k4TLFeI51JtsVdclEs1Td2WxnfydyqqLU8DDFG+T0bCGF0WPdYQ8
-         Y6NH+Fu7IMXwBV0cxIWUOxZlk96x5E4WhQ0RUGtN0FaDVUr18WnoqCuViTW/k7q5yGKm
-         ITWuVKaIphRk7mnYv6OxUvkWUPCRgeWSkTp83aOBOAo+2m/eYhRVq2CMPLw2sxX8ZqrX
-         lnFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV1/WESEVJFjqi4ID45K0WRW6NWpGK7udyTm6vQQ9cU4DQUxytFkGBGsVvWWRJgZBYPi2nJY2MNbcmQcg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXVmBV+egsq1DNk1NYvFxzluiuYcButC+PnKXMjIYSvjYX13WA
-	fNpvi2cwW3XTTHplHlbO1v63dWqKYV/kb8Pu+Tw0I7YboyQ6EBiLvBQM70bXOpaNHTA=
-X-Gm-Gg: AZuq6aJX5gkTPPyWGp0n2ZOS+zEX2C0nHamHwhOMSdUr9s5C2mqASjweuolXz23I2m3
-	KcsZQIp8SyYOaX4w5Z9MXe8nJ+AIhHIsUfEwkmgq1kW8n87V7YeAYoBAXoZbaVKNzpL1bKTiJ3C
-	ieF4WPc6wyA6jKDt77uMJ5zghyD3j5z5xv9367EIpwOYly5mGXi9Xf8+FiU83gUhLKMRxxab2im
-	MAKah7PAWiE8aMaDOC91SqEVsrBAh2Q3gv4+tLPgBUISjIDrnN8oDY4mxQ7sg5o1DKYCdHgsaAD
-	sMPkQOKzAN3SwoNV8Bdl9WCHOnoj7FepfUdOUXM89lDnmZ2ElyaZmK0YAV+iI2kEIBZJ1f/RsT8
-	eYFhjAivwnv7HINZD1gOeG4KuWTVwp9md9aWBywQPFnl7fRrxqKSTUWwBNJUEekalwZdBjucMEK
-	hKOsuVTpg7YbmC8x0yjKsldxl3
-X-Received: by 2002:a05:600c:3e16:b0:477:755b:5587 with SMTP id 5b1f17b1804b1-48069c10f78mr74663935e9.8.1769635136165;
-        Wed, 28 Jan 2026 13:18:56 -0800 (PST)
-Received: from localhost (109-81-26-156.rct.o2.cz. [109.81.26.156])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4806d78cb6csm3510525e9.2.2026.01.28.13.18.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Jan 2026 13:18:55 -0800 (PST)
-Date: Wed, 28 Jan 2026 22:18:54 +0100
-From: Michal Hocko <mhocko@suse.com>
-To: Frederic Weisbecker <frederic@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Chen Ridong <chenridong@huawei.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Gabriele Monaco <gmonaco@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Marco Crivellari <marco.crivellari@suse.com>,
-	Muchun Song <muchun.song@linux.dev>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
-	"Rafael J . Wysocki" <rafael@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
-	Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
-	linux-mm@kvack.org, linux-pci@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 04/33] mm: vmstat: Prepare to protect against concurrent
- isolated cpuset change
-Message-ID: <aXp9Pp4YvlbJumeY@tiehlicka>
-References: <20260125224541.50226-1-frederic@kernel.org>
- <20260125224541.50226-5-frederic@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u5Z8pkQs"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10D22C4CEF1;
+	Wed, 28 Jan 2026 23:38:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769643500;
+	bh=F0SGT1zA7nJrKcds9k2gzkJL1tql6F1LMQ2X/R9SLXU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=u5Z8pkQsCsASHBAWQsH9T1G5ZcaqbryygrnEcq1600aasgTUAnDh3GNvGpgJ0D9lv
+	 xPa4jgCIpnpMBjCBuYljQSCb60qJCO9igRU8Hp/RKs6EkVei4Fc+8AKOle+vuQPysG
+	 FWSJ/pvJC62A1eD8OrsjajN7ic4SgGkD/mWkderuV0tsgEuL9xwUPS7oFw9Ad+w3Vc
+	 t0v9qojp+LNw+AkWJskfFTGxq+uNrg1X8mhv4VeYCk9Ea0zUrphX5DFqvLBMDRdOyS
+	 OOHfmQ2upHuEMDALuFfFT+J2swjVrLdqNxZpYA3UqiWc/fnrZTNHOXbLxp+v4jrLMp
+	 yP/X61KGrVeKQ==
+Date: Thu, 29 Jan 2026 08:38:17 +0900
+From: Masami Hiramatsu (Google) <mhiramat@kernel.org>
+To: Yaxiong Tian <tianyaxiong@kylinos.cn>
+Cc: rostedt@goodmis.org, axboe@kernel.dk, mathieu.desnoyers@efficios.com,
+ corbet@lwn.net, skhan@linuxfoundation.org,
+ linux-trace-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH v4 0/5] Tracing: Accelerate Kernel Boot by
+ Asynchronizing
+Message-Id: <20260129083817.d26c61da3cf274bf37e1b2a0@kernel.org>
+In-Reply-To: <20260128125117.1704853-1-tianyaxiong@kylinos.cn>
+References: <20260128125117.1704853-1-tianyaxiong@kylinos.cn>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260125224541.50226-5-frederic@kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Sun 25-01-26 23:45:11, Frederic Weisbecker wrote:
-> The HK_TYPE_DOMAIN housekeeping cpumask will soon be made modifiable at
-> runtime. In order to synchronize against vmstat workqueue to make sure
-> that no asynchronous vmstat work is pending or executing on a newly made
-> isolated CPU, target and queue a vmstat work under the same RCU read
-> side critical section.
+On Wed, 28 Jan 2026 20:51:17 +0800
+Yaxiong Tian <tianyaxiong@kylinos.cn> wrote:
+
+> On my ARM64 platform, I observed that certain tracing module
+> initializations run for up to 200ms—for example, init_kprobe_trace().
+> Analysis reveals the root cause: the execution flow eval_map_work_func()
+> →trace_event_update_with_eval_map()→trace_event_update_all()
+> is highly time-consuming. Although this flow is placed in eval_map_wq
+> for asynchronous execution, it holds the trace_event_sem lock, causing
+> other modules to be blocked either directly or indirectly. Also in
+> init_blk_tracer(), this functions require trace_event_sem device_initcall.
 > 
-> Whenever housekeeping will update the HK_TYPE_DOMAIN cpumask, a vmstat
-> workqueue flush will also be issued in a further change to make sure
-> that no work remains pending after a CPU has been made isolated.
+> To resolve this issue, I rename `eval_map_wq` and make it global and moved
+> other initialization functions under the tracing subsystem that are
+> related to this lock to run asynchronously on this workqueue. After this
+> optimization, boot time is reduced by approximately 200ms.
 > 
-> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+> Given that asynchronous initialization makes it indeterminate when tracing
+> will begin, we introduce the trace_async_init kernel parameter.Asynchronous
+> behavior is enabled only when this parameter is explicitly provided.
+> 
+> Based on my analysis and testing, I've identified that only these two
+> locations significantly impact timing. Other initcall_* functions do not
+> exhibit relevant lock contention.
+> 
+> A brief summary of the test results is as follows:
+> Before this PATCHS:
+> [    0.224933] calling  init_kprobe_trace+0x0/0xe0 @ 1
+> [    0.455016] initcall init_kprobe_trace+0x0/0xe0 returned 0 after 230080 usecs
+> 
+> Only opt setup_boot_kprobe_events() can see:
+> [    0.258609] calling  init_blk_tracer+0x0/0x68 @ 1
+> [    0.454991] initcall init_blk_tracer+0x0/0x68 returned 0 after 196377 usecs
+> 
+> After this PATCHS:
+> [    0.224940] calling  init_kprobe_trace+0x0/0xe0 @ 1
+> [    0.224946] initcall init_kprobe_trace+0x0/0xe0 returned 0 after 3 usecs
+> skip --------
+> [    0.264835] calling  init_blk_tracer+0x0/0x68 @ 1
+> [    0.264841] initcall init_blk_tracer+0x0/0x68 returned 0 after 2 usecs
 
-Acked-by: Michal Hocko <mhocko@suse.com>
-Thanks!
+OK, this series looks good to me.
 
+Acked-by: Masami Hiramatsu (Google) <mhiramat@kernel.org>
+
+for this series.
+
+Thank you,
+
+
+> 
 > ---
->  mm/vmstat.c | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
+> Changes in v2:
+> - Rename eval_map_wq to trace_init_wq.
+> Changes in v3:
+> - Opt PATCH 1/3 commit
+> Changes in v4:
+> - add trace_async_init boot parameter in patch2
+> - add init_kprobe_trace's skip logic in patch3
+> - add Suggested-by tag 
+> - Other synchronous optimizations related to trace_async_init
 > 
-> diff --git a/mm/vmstat.c b/mm/vmstat.c
-> index 65de88cdf40e..ed19c0d42de6 100644
-> --- a/mm/vmstat.c
-> +++ b/mm/vmstat.c
-> @@ -2144,11 +2144,13 @@ static void vmstat_shepherd(struct work_struct *w)
->  		 * infrastructure ever noticing. Skip regular flushing from vmstat_shepherd
->  		 * for all isolated CPUs to avoid interference with the isolated workload.
->  		 */
-> -		if (cpu_is_isolated(cpu))
-> -			continue;
-> +		scoped_guard(rcu) {
-> +			if (cpu_is_isolated(cpu))
-> +				continue;
->  
-> -		if (!delayed_work_pending(dw) && need_update(cpu))
-> -			queue_delayed_work_on(cpu, mm_percpu_wq, dw, 0);
-> +			if (!delayed_work_pending(dw) && need_update(cpu))
-> +				queue_delayed_work_on(cpu, mm_percpu_wq, dw, 0);
-> +		}
->  
->  		cond_resched();
->  	}
+> Yaxiong Tian (5):
+>   tracing: Rename `eval_map_wq` and allow other parts of tracing use it
+>   tracing: add trace_async_init boot parameter
+>   tracing/kprobes: Skip setup_boot_kprobe_events() when no cmdline event
+>   tracing/kprobes: Make setup_boot_kprobe_events() asynchronous when
+>     trace_async_init set
+>   blktrace: Make init_blk_tracer() asynchronous when trace_async_init
+>     set
+> 
+>  .../admin-guide/kernel-parameters.txt         |  8 ++++++
+>  kernel/trace/blktrace.c                       | 23 +++++++++++++++-
+>  kernel/trace/trace.c                          | 27 ++++++++++++-------
+>  kernel/trace/trace.h                          |  2 ++
+>  kernel/trace/trace_kprobe.c                   | 18 ++++++++++++-
+>  5 files changed, 67 insertions(+), 11 deletions(-)
+> 
 > -- 
-> 2.51.1
+> 2.25.1
 > 
+> 
+
 
 -- 
-Michal Hocko
-SUSE Labs
+Masami Hiramatsu (Google) <mhiramat@kernel.org>
