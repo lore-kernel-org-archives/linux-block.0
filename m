@@ -1,184 +1,161 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AD372BE644;
-	Wed, 28 Jan 2026 08:39:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 361B23376B0
+	for <linux-block@vger.kernel.org>; Wed, 28 Jan 2026 08:45:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769589558; cv=none; b=OeIneUUPb0ZgveFcKS4GrsrfQbZkK9OgRumuM8MGYivkgLSy9nwC8SPipjUBpttCrBG0IeJ78Oj7GniCkAwUoeh+33WfeDayRS8Y3vM9t4rlfBTH4awakV80tirHM7mfhtAqRRvLt7mkbSV5OnS6smZGhVLM2+zB0TX7LABpmLQ=
+	t=1769589910; cv=none; b=Q5d5j5jPUWt9aLkSJ9Tpd9p6insF8Sv0Oa6WQK0af6RObC5L6u4SbF/nTdyNc+IxXj87IcEdjbWg7UuKaGj+ds7Apa76SI8yWBABKa06Pyfo0NiI5p22pVumHkAwnJx+76Rl8JKU8tucP3X6EaMH3NxOgOfox8iFFofhRP0XsZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769589558; c=relaxed/simple;
-	bh=jyDIBgd2dVoTOoNBEgP2eQ8ROxB5IpkQMTnov8i8hAU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KK51PlAsUt27v3AwYjwm4pQAbbPljpvYuDrOPbHP4vso9S8hRoyMq4zg6NQCqZ7YGYG8VOSmLHu7pYSGrjBiYBNs/MxQLjyIsvJIo92Y5YueGXavepXyFI+mETTipt+xuaD46dZolEm6I2xYIinqE2Sw9p+/LkJI86K65j2BAbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: cfd1b43cfc2411f0b0f03b4cfa9209d1-20260128
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.6,REQID:0c86a15a-a7bb-45b4-a610-52085b897074,IP:0,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
-	elease,TS:0
-X-CID-META: VersionHash:a9d874c,CLOUDID:2f617db6a462fa1cb07923e6f2d777b4,BulkI
-	D:nil,BulkQuantity:0,Recheck:0,SF:80|81|82|83|102|898,TC:nil,Content:0|15|
-	52,EDM:-3,IP:nil,URL:99|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OS
-	I:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULS
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: cfd1b43cfc2411f0b0f03b4cfa9209d1-20260128
-X-User: tianyaxiong@kylinos.cn
-Received: from [10.42.13.21] [(10.44.16.150)] by mailgw.kylinos.cn
-	(envelope-from <tianyaxiong@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_128_GCM_SHA256 128/128)
-	with ESMTP id 1474635869; Wed, 28 Jan 2026 16:39:08 +0800
-Message-ID: <5044e453-4fd8-4530-a793-292adc2888ac@kylinos.cn>
-Date: Wed, 28 Jan 2026 16:39:05 +0800
+	s=arc-20240116; t=1769589910; c=relaxed/simple;
+	bh=RmjPdOoSLN83hdmAOBaQ60Ic1/65Z53zJZ8NP4f3+Rw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lCVvPeuUbPIpnPcyzhLXlibpZLU0sTsmBFQlwnypgd9TBixtefju7r+kg+eohvzpCoz7AblO9meMVL+LKVA8w72xy2IEB+jK8PiQJmIzmR0IaQS+h3luztC+NbTZ7cPmvz8VNqRxityhh8AffU+RYwbPn2suiuf93dpnb4vxbGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=SZIbsb4u; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="SZIbsb4u"
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-47edd6111b4so74144845e9.1
+        for <linux-block@vger.kernel.org>; Wed, 28 Jan 2026 00:45:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1769589905; x=1770194705; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=yzZ5aaJur2cGbo3tv1Z3AlCZuGpqhSu9RlDH7L/IIPI=;
+        b=SZIbsb4uqLo2GtuIKPa3bbLA7N6dH7jjl6viB/R0/10DmYtuzJlEe7d0Lgh3AsecRy
+         Jb04vA7E9/uLgkJZj1z+cgSxI3Pw1kEmK8VTCRIPmIz0NhYj96oATGrLZoy7Q77sTuDw
+         mGjKnzWQTVqorHggE4D4U6/8Mf1kmcypiioWs0sIzDr+ORIOuLY1V6G4ENM7uvS7yfSs
+         ZNvihc9rHZx9imvV17/9Oe01/vYcd1kY83/3Hw76N9KkKngapUjdwLQYcCYYynsVx+y9
+         1Jbevjw8z6Hb9P7DLqp8t2bANC8o9Q00TSBYdZxWguV1RtcG2SS3gAKfvOKvJZxcgBXk
+         4HcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769589905; x=1770194705;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yzZ5aaJur2cGbo3tv1Z3AlCZuGpqhSu9RlDH7L/IIPI=;
+        b=ByNNvyCK7DHzu7ADXbr08ANTNJKkE/lpbAvMK8lceL1EOJHMi0aLi+I8TQjNYU2GAS
+         z3yx2TJqnjlp6lDrPcmRrHkJ/N8D5X26YsIWDwI1Tyv9Ye4pccc9Zyzb8Q6focEkgcBb
+         aIkR28hJukbZdy8MQ99lTA3WKoQpiH0rzywcI8oTT+NhZm6C1BjTy1fdAbSpvPl9QdeQ
+         6LTY+qqNOfdFRHE9RnAv3S1wQcZlkTav1MNs+WfKrfTL9s4sFIVYrqUuW3PLoQ6RQlhk
+         rrbtPcK14NUscTQF/P71Zm6p0q0WHJusyQQ4KYOLeY7UxHvE7znZYgJvtr+w7A0GpbuA
+         Pw/A==
+X-Forwarded-Encrypted: i=1; AJvYcCXN6KSgkzA1zOIBzj+mBbde5lWwfiKWdht/jqlJVRZ4iD8kfrNpmE5rZazBzHQMG+ZitwSnrBVdM+XyOg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx3YSGQGfJ8HeoO/6NgUHf4+WFAuyGehBNfGpWay3ZoaPOceEpN
+	FhjTPc6FQkD09bxmSbGzl1u/Ly21qyPj//jd/Vl8pzdRrOqNrZi0H57hOpV2HpIrML8=
+X-Gm-Gg: AZuq6aKLB1GdYhExmlyA8TETEyOV87jgvyJMntMpfSR2zUnl4Xm0F5HzV/HypuRAPi2
+	IMNZZy9O5I3dLZWsBi8uSbLpRgOgBsE9GDwJzfDnp9sFgwuvOGNvOb7GjVo8VRKbM6mDpvKvsVS
+	91jpn0XYfY7cVm5D+dQYRfYtoBG+e/sR3/gF2N/wk0xSvvCQ4wpScoaieP5H2SBkQXZPEviy/7n
+	WGDBQyvkBTZZQ+xFin7z/3lYt0RYFMzZs2SuB8sreV1ZM9dpfcG6SEzj/kR16V2ZtwJhxI6fSnI
+	2H1GAR57T3n3sEEZGYzD+caeFV6zaZQKmBk1IB3snxurbG1XX8m3CEhh7R79Eg1ELCtKC8ssxrK
+	4ofztVSnSw9+HWqLB3/Yw4d7hG8lsqJ81XqWgfblcgZLDaN34kgjh26hYgZ1NvWQ9lo3msgE3cM
+	+CZk0Ow6vOb+h6wVkxW+QE0ZOL
+X-Received: by 2002:a05:600c:4e12:b0:480:6873:b2f6 with SMTP id 5b1f17b1804b1-48069c557d0mr54819185e9.20.1769589905328;
+        Wed, 28 Jan 2026 00:45:05 -0800 (PST)
+Received: from localhost (109-81-26-156.rct.o2.cz. [109.81.26.156])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48066bee7d0sm121124905e9.4.2026.01.28.00.45.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Jan 2026 00:45:04 -0800 (PST)
+Date: Wed, 28 Jan 2026 09:45:03 +0100
+From: Michal Hocko <mhocko@suse.com>
+To: Frederic Weisbecker <frederic@kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Chen Ridong <chenridong@huawei.com>,
+	Danilo Krummrich <dakr@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Gabriele Monaco <gmonaco@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Muchun Song <muchun.song@linux.dev>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
+	Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+	linux-mm@kvack.org, linux-pci@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 03/33] memcg: Prepare to protect against concurrent
+ isolated cpuset change
+Message-ID: <aXnMj1phN3TJZkNz@tiehlicka>
+References: <20260125224541.50226-1-frederic@kernel.org>
+ <20260125224541.50226-4-frederic@kernel.org>
+ <aXeZQoSHJ9QX7B6W@tiehlicka>
+ <aXizUsfywjtIIN50@localhost.localdomain>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/3] tracing/kprobes: Make setup_boot_kprobe_events()
- asynchronous
-To: "Masami Hiramatsu (Google)" <mhiramat@kernel.org>
-Cc: rostedt@goodmis.org, axboe@kernel.dk, mathieu.desnoyers@efficios.com,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org
-References: <20260127012016.76713-1-tianyaxiong@kylinos.cn>
- <20260127012312.84659-1-tianyaxiong@kylinos.cn>
- <20260128134936.539782c2112073e55e7a0304@kernel.org>
- <6ab04276-8897-4d5e-a86c-e656cf1f6f91@kylinos.cn>
- <20260128165302.1c67c6fc1c54525247d7f553@kernel.org>
-Content-Language: en-US
-From: Yaxiong Tian <tianyaxiong@kylinos.cn>
-In-Reply-To: <20260128165302.1c67c6fc1c54525247d7f553@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <aXizUsfywjtIIN50@localhost.localdomain>
 
+On Tue 27-01-26 13:45:06, Frederic Weisbecker wrote:
+> Le Mon, Jan 26, 2026 at 05:41:38PM +0100, Michal Hocko a �crit :
+> > On Sun 25-01-26 23:45:10, Frederic Weisbecker wrote:
+> > > The HK_TYPE_DOMAIN housekeeping cpumask will soon be made modifiable at
+> > > runtime. In order to synchronize against memcg workqueue to make sure
+> > > that no asynchronous draining is pending or executing on a newly made
+> > > isolated CPU, target and queue a drain work under the same RCU critical
+> > > section.
+> > > 
+> > > Whenever housekeeping will update the HK_TYPE_DOMAIN cpumask, a memcg
+> > > workqueue flush will also be issued in a further change to make sure
+> > > that no work remains pending after a CPU has been made isolated.
+> > > 
+> > > Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+> > > ---
+> > >  mm/memcontrol.c | 21 +++++++++++++++++----
+> > >  1 file changed, 17 insertions(+), 4 deletions(-)
+> > > 
+> > > diff --git a/mm/memcontrol.c b/mm/memcontrol.c
+> > > index be810c1fbfc3..2289a0299331 100644
+> > > --- a/mm/memcontrol.c
+> > > +++ b/mm/memcontrol.c
+> > > @@ -2003,6 +2003,19 @@ static bool is_memcg_drain_needed(struct memcg_stock_pcp *stock,
+> > >  	return flush;
+> > >  }
+> > >  
+> > > +static void schedule_drain_work(int cpu, struct work_struct *work)
+> > > +{
+> > > +	/*
+> > > +	 * Protect housekeeping cpumask read and work enqueue together
+> > > +	 * in the same RCU critical section so that later cpuset isolated
+> > > +	 * partition update only need to wait for an RCU GP and flush the
+> > > +	 * pending work on newly isolated CPUs.
+> > > +	 */
+> > > +	guard(rcu)();
+> > > +	if (!cpu_is_isolated(cpu))
+> > > +		schedule_work_on(cpu, work);
+> > 
+> > Shouldn't this in the guarded rcu section?
+> 
+> This is what guard(rcu)() does, right?
+> Or am I missing something?
 
-在 2026/1/28 15:53, Masami Hiramatsu (Google) 写道:
-> On Wed, 28 Jan 2026 15:24:15 +0800
-> Yaxiong Tian <tianyaxiong@kylinos.cn> wrote:
->
->> 在 2026/1/28 12:49, Masami Hiramatsu (Google) 写道:
->>> On Tue, 27 Jan 2026 09:23:12 +0800
->>> Yaxiong Tian <tianyaxiong@kylinos.cn> wrote:
->>>
->>>> During kernel boot, the setup_boot_kprobe_events() function causes
->>>> significant delays, increasing overall startup time.
->>>>
->>>> The root cause is a lock contention chain: its child function
->>>> enable_boot_kprobe_events() requires the event_mutex, which is
->>>> already held by early_event_add_tracer(). early_event_add_tracer()
->>>> itself is blocked waiting for the trace_event_sem  read-write lock,
->>>> which is held for an extended period by trace_event_update_all().
->>>>
->>>> To resolve this, we have moved the execution of
->>>> setup_boot_kprobe_events() to the trace_init_wq  workqueue, allowing
->>>> it to run asynchronously.
->>>>
->>>> Signed-off-by: Yaxiong Tian <tianyaxiong@kylinos.cn>
->>>> ---
->>>>    kernel/trace/trace_kprobe.c | 14 +++++++++++++-
->>>>    1 file changed, 13 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/kernel/trace/trace_kprobe.c b/kernel/trace/trace_kprobe.c
->>>> index 9953506370a5..4c6621f02696 100644
->>>> --- a/kernel/trace/trace_kprobe.c
->>>> +++ b/kernel/trace/trace_kprobe.c
->>>> @@ -2031,6 +2031,13 @@ static __init int init_kprobe_trace_early(void)
->>>>    }
->>>>    core_initcall(init_kprobe_trace_early);
->>>>    
->>>> +static struct work_struct kprobe_trace_work __initdata;
->>>> +
->>>> +static void __init kprobe_trace_works_func(struct work_struct *work)
->>>> +{
->>>> +	setup_boot_kprobe_events();
->>>> +}
->>>> +
->>>>    /* Make a tracefs interface for controlling probe points */
->>>>    static __init int init_kprobe_trace(void)
->>>>    {
->>>> @@ -2048,7 +2055,12 @@ static __init int init_kprobe_trace(void)
->>>>    	trace_create_file("kprobe_profile", TRACE_MODE_READ,
->>>>    			  NULL, NULL, &kprobe_profile_ops);
->>>>    
->>>> -	setup_boot_kprobe_events();
->>>> +	if (trace_init_wq) {
->>>> +		INIT_WORK(&kprobe_trace_work, kprobe_trace_works_func);
->>>> +		queue_work(trace_init_wq, &kprobe_trace_work);
->>> Hmm, this queue_work is not required if kprobe_boot_events_buf[] is
->>> empty. We should check it because most of the time we don't need it.
->> Yes, I will improve it in the next version.
->>> Also, deferring initialization makes it indeterminate when this
->>> tracing will begin.
->> Indeed, While most scenarios don't need boot-time tracing, and users
->> prioritize boot speed, we must balance the need for deterministic traces
->> with faster startup.
-> I just wonder why don't you define kprobe events after boot (e.g.
-> from init script) instead of kernel cmdline. Using cmdline means
-> it will be used for tracing kernel boot.
->
-> - tracing kernel boot -> use kernel cmdline (synchronous)
-> - tracing user boot -> use tracefs (asynchronous)
-I was actually working on a boot optimization task when I found that my 
-machine was getting blocked on trace-related operations.
->
->>> For kprobe event use case, I think setup_boot_kprobe_events() should
->>> check the kprobe_boot_events_buf is empty at first. But I think Yaxiong
->>> use case happens when you are using kprobe events via cmdline, is that
->>> correct?
->> The issue was identified without enabling kprobe events via the cmdline.
-> Interesting. So is it fixed by another patch [1]?
->
-> [1] https://lore.kernel.org/all/20260127053848.108473-1-sunliming@linux.dev/
->
-Yes, specifically looking at trace_kprobe in isolation, that issue is 
-indeed resolved. However, the process still ends up blocking the 
-initialization of blktrace later on.
->> The core finding is that asynchronous initialization can drastically cut
->> boot time under different workloads. As blocking occurs elsewhere in the
->> tracing infrastructure beyond just kprobe events, adopting async is a
->> broadly applicable strategy for boot time optimization.
-> Yes, but it is also possible to set it up from user space, because that
-> user process can work asynchronously.
-> We can make the ftrace initialization async to accelerate boot time, but
-> that means it is not useful for tracing kernel boot.
->
->>> I think introducing "async" cmdline option is more preferable.
->> Agreed, this works. Users focused on boot speed over early-boot tracing
->> can opt for this parameter to gain a startup performance boost.
-> Yeah, that is an option. Anyway, basically, users have another option to
-> setup ftrace after boot user space asynchronously. That is my
-> recommendation for such use case.
-Yes, that's what I normally do.
->
->>> BTW, I found that the kprobe events from kernel cmdline will be made
->>> after boot-time tracing from bootconfig. Maybe it should be run this
->>> earlier timing too.
->> Yes. Additionally, this optimization does not conflict with the current
->> patch series at all.
->>
->> I'll submit the updated patch for the next version promptly.
-> OK.
->
-> Thank you,
->
->>> Thank you,
->>>
->>>
->>>> +	} else {
->>>> +		setup_boot_kprobe_events();
->>>> +	}
->>>>    
->>>>    	return 0;
->>>>    }
->>>> -- 
->>>> 2.25.1
->>>>
->
+I am probably misreading the patch. But I've had the following in mind
+
+	scoped_guard(rcu) {
+		if (!cpu_is_isolated(cpu))
+			schedule_work_on(cpu, work);
+	}
+-- 
+Michal Hocko
+SUSE Labs
