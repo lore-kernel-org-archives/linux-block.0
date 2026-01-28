@@ -1,161 +1,139 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 361B23376B0
-	for <linux-block@vger.kernel.org>; Wed, 28 Jan 2026 08:45:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F5292FF169;
+	Wed, 28 Jan 2026 09:51:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769589910; cv=none; b=Q5d5j5jPUWt9aLkSJ9Tpd9p6insF8Sv0Oa6WQK0af6RObC5L6u4SbF/nTdyNc+IxXj87IcEdjbWg7UuKaGj+ds7Apa76SI8yWBABKa06Pyfo0NiI5p22pVumHkAwnJx+76Rl8JKU8tucP3X6EaMH3NxOgOfox8iFFofhRP0XsZ0=
+	t=1769593863; cv=none; b=gNcg5wqRSJXyny6tcZYH6L5/NMDQMnnI0tbZtlZVHo6dh6BJq0bwzwO5abDeti6ut4Cn93fbFS8+Pmyju20YMj6hBOxNK72wqoUsaV8kmn7BIh/xWpWztLtoG6TflUPsV/0d59jHTbxZsVKfUVGRDh12/CkVhMKZBMq64jLLzeo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769589910; c=relaxed/simple;
-	bh=RmjPdOoSLN83hdmAOBaQ60Ic1/65Z53zJZ8NP4f3+Rw=;
+	s=arc-20240116; t=1769593863; c=relaxed/simple;
+	bh=d8FCYBbyEcRDcsvKBvHb9kc2mz26ZS+2oVeQswS5PPs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lCVvPeuUbPIpnPcyzhLXlibpZLU0sTsmBFQlwnypgd9TBixtefju7r+kg+eohvzpCoz7AblO9meMVL+LKVA8w72xy2IEB+jK8PiQJmIzmR0IaQS+h3luztC+NbTZ7cPmvz8VNqRxityhh8AffU+RYwbPn2suiuf93dpnb4vxbGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=SZIbsb4u; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=uvDqL9QJ7lJQUbs7KzuSQnaP+lhGeVJoRCESUl50h5d6A+e2BFbaT24fsRT5U6afIdqj6OrEYnwg/ol/X+JXIZKr5U57ETlru5eFkqyGkoAS9shqWBYTAqFthVSRzwuRs85sL1waKjRTI+iTY3njYxxebfxyghIDAuaUKwoCQ9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hNaYgSeQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="SZIbsb4u"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-47edd6111b4so74144845e9.1
-        for <linux-block@vger.kernel.org>; Wed, 28 Jan 2026 00:45:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1769589905; x=1770194705; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=yzZ5aaJur2cGbo3tv1Z3AlCZuGpqhSu9RlDH7L/IIPI=;
-        b=SZIbsb4uqLo2GtuIKPa3bbLA7N6dH7jjl6viB/R0/10DmYtuzJlEe7d0Lgh3AsecRy
-         Jb04vA7E9/uLgkJZj1z+cgSxI3Pw1kEmK8VTCRIPmIz0NhYj96oATGrLZoy7Q77sTuDw
-         mGjKnzWQTVqorHggE4D4U6/8Mf1kmcypiioWs0sIzDr+ORIOuLY1V6G4ENM7uvS7yfSs
-         ZNvihc9rHZx9imvV17/9Oe01/vYcd1kY83/3Hw76N9KkKngapUjdwLQYcCYYynsVx+y9
-         1Jbevjw8z6Hb9P7DLqp8t2bANC8o9Q00TSBYdZxWguV1RtcG2SS3gAKfvOKvJZxcgBXk
-         4HcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769589905; x=1770194705;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yzZ5aaJur2cGbo3tv1Z3AlCZuGpqhSu9RlDH7L/IIPI=;
-        b=ByNNvyCK7DHzu7ADXbr08ANTNJKkE/lpbAvMK8lceL1EOJHMi0aLi+I8TQjNYU2GAS
-         z3yx2TJqnjlp6lDrPcmRrHkJ/N8D5X26YsIWDwI1Tyv9Ye4pccc9Zyzb8Q6focEkgcBb
-         aIkR28hJukbZdy8MQ99lTA3WKoQpiH0rzywcI8oTT+NhZm6C1BjTy1fdAbSpvPl9QdeQ
-         6LTY+qqNOfdFRHE9RnAv3S1wQcZlkTav1MNs+WfKrfTL9s4sFIVYrqUuW3PLoQ6RQlhk
-         rrbtPcK14NUscTQF/P71Zm6p0q0WHJusyQQ4KYOLeY7UxHvE7znZYgJvtr+w7A0GpbuA
-         Pw/A==
-X-Forwarded-Encrypted: i=1; AJvYcCXN6KSgkzA1zOIBzj+mBbde5lWwfiKWdht/jqlJVRZ4iD8kfrNpmE5rZazBzHQMG+ZitwSnrBVdM+XyOg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3YSGQGfJ8HeoO/6NgUHf4+WFAuyGehBNfGpWay3ZoaPOceEpN
-	FhjTPc6FQkD09bxmSbGzl1u/Ly21qyPj//jd/Vl8pzdRrOqNrZi0H57hOpV2HpIrML8=
-X-Gm-Gg: AZuq6aKLB1GdYhExmlyA8TETEyOV87jgvyJMntMpfSR2zUnl4Xm0F5HzV/HypuRAPi2
-	IMNZZy9O5I3dLZWsBi8uSbLpRgOgBsE9GDwJzfDnp9sFgwuvOGNvOb7GjVo8VRKbM6mDpvKvsVS
-	91jpn0XYfY7cVm5D+dQYRfYtoBG+e/sR3/gF2N/wk0xSvvCQ4wpScoaieP5H2SBkQXZPEviy/7n
-	WGDBQyvkBTZZQ+xFin7z/3lYt0RYFMzZs2SuB8sreV1ZM9dpfcG6SEzj/kR16V2ZtwJhxI6fSnI
-	2H1GAR57T3n3sEEZGYzD+caeFV6zaZQKmBk1IB3snxurbG1XX8m3CEhh7R79Eg1ELCtKC8ssxrK
-	4ofztVSnSw9+HWqLB3/Yw4d7hG8lsqJ81XqWgfblcgZLDaN34kgjh26hYgZ1NvWQ9lo3msgE3cM
-	+CZk0Ow6vOb+h6wVkxW+QE0ZOL
-X-Received: by 2002:a05:600c:4e12:b0:480:6873:b2f6 with SMTP id 5b1f17b1804b1-48069c557d0mr54819185e9.20.1769589905328;
-        Wed, 28 Jan 2026 00:45:05 -0800 (PST)
-Received: from localhost (109-81-26-156.rct.o2.cz. [109.81.26.156])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48066bee7d0sm121124905e9.4.2026.01.28.00.45.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Jan 2026 00:45:04 -0800 (PST)
-Date: Wed, 28 Jan 2026 09:45:03 +0100
-From: Michal Hocko <mhocko@suse.com>
-To: Frederic Weisbecker <frederic@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Chen Ridong <chenridong@huawei.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Gabriele Monaco <gmonaco@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Marco Crivellari <marco.crivellari@suse.com>,
-	Muchun Song <muchun.song@linux.dev>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
-	"Rafael J . Wysocki" <rafael@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
-	Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
-	linux-mm@kvack.org, linux-pci@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 03/33] memcg: Prepare to protect against concurrent
- isolated cpuset change
-Message-ID: <aXnMj1phN3TJZkNz@tiehlicka>
-References: <20260125224541.50226-1-frederic@kernel.org>
- <20260125224541.50226-4-frederic@kernel.org>
- <aXeZQoSHJ9QX7B6W@tiehlicka>
- <aXizUsfywjtIIN50@localhost.localdomain>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hNaYgSeQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEF55C4CEF1;
+	Wed, 28 Jan 2026 09:51:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769593862;
+	bh=d8FCYBbyEcRDcsvKBvHb9kc2mz26ZS+2oVeQswS5PPs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hNaYgSeQzxJZBAs1VTBOlDcPLXOObVpqfp7jYlt4gZuMHykwu1I5ScXD6IxVu3jzE
+	 vUGqTazMCrKxrKXcTB1tPjRJwhd6/1Qkd7VH1eoYgc/a7tC+j2hURVK8V1Wk2dH2S0
+	 +L63f0S7I8cCNN0Q9PRR1qdgwwfX4wlnpY63Ev89/6Mban/7Ov7p8AdjTaXaGIDPtj
+	 1JjddJSzj3bDlHGwj0B1JEemIG0/G4hj9NtamNLHDTjgVBr/yLER+l+yvRNrD21DFp
+	 L9F++mxUc2tRoyNgYZSK6q+/TYiHAW2ERkwncXQxmeA33w/lJ/HL2foWMHVdMP/Rcc
+	 sSf/VH1VUVRQA==
+Date: Wed, 28 Jan 2026 10:50:57 +0100
+From: Carlos Maiolino <cem@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Christian Brauner <brauner@kernel.org>, 
+	"Darrick J. Wong" <djwong@kernel.org>, Qu Wenruo <wqu@suse.com>, Al Viro <viro@zeniv.linux.org.uk>, 
+	linux-block@vger.kernel.org, linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: bounce buffer direct I/O when stable pages are required v3
+Message-ID: <aXnb17nHHog9z6tC@nidhogg.toxiclabs.cc>
+References: <20260126055406.1421026-1-hch@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aXizUsfywjtIIN50@localhost.localdomain>
+In-Reply-To: <20260126055406.1421026-1-hch@lst.de>
 
-On Tue 27-01-26 13:45:06, Frederic Weisbecker wrote:
-> Le Mon, Jan 26, 2026 at 05:41:38PM +0100, Michal Hocko a écrit :
-> > On Sun 25-01-26 23:45:10, Frederic Weisbecker wrote:
-> > > The HK_TYPE_DOMAIN housekeeping cpumask will soon be made modifiable at
-> > > runtime. In order to synchronize against memcg workqueue to make sure
-> > > that no asynchronous draining is pending or executing on a newly made
-> > > isolated CPU, target and queue a drain work under the same RCU critical
-> > > section.
-> > > 
-> > > Whenever housekeeping will update the HK_TYPE_DOMAIN cpumask, a memcg
-> > > workqueue flush will also be issued in a further change to make sure
-> > > that no work remains pending after a CPU has been made isolated.
-> > > 
-> > > Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
-> > > ---
-> > >  mm/memcontrol.c | 21 +++++++++++++++++----
-> > >  1 file changed, 17 insertions(+), 4 deletions(-)
-> > > 
-> > > diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-> > > index be810c1fbfc3..2289a0299331 100644
-> > > --- a/mm/memcontrol.c
-> > > +++ b/mm/memcontrol.c
-> > > @@ -2003,6 +2003,19 @@ static bool is_memcg_drain_needed(struct memcg_stock_pcp *stock,
-> > >  	return flush;
-> > >  }
-> > >  
-> > > +static void schedule_drain_work(int cpu, struct work_struct *work)
-> > > +{
-> > > +	/*
-> > > +	 * Protect housekeeping cpumask read and work enqueue together
-> > > +	 * in the same RCU critical section so that later cpuset isolated
-> > > +	 * partition update only need to wait for an RCU GP and flush the
-> > > +	 * pending work on newly isolated CPUs.
-> > > +	 */
-> > > +	guard(rcu)();
-> > > +	if (!cpu_is_isolated(cpu))
-> > > +		schedule_work_on(cpu, work);
-> > 
-> > Shouldn't this in the guarded rcu section?
+On Mon, Jan 26, 2026 at 06:53:31AM +0100, Christoph Hellwig wrote:
+> Hi all,
 > 
-> This is what guard(rcu)() does, right?
-> Or am I missing something?
+> [note to maintainers:  we're ready to merge I think, and Christian
+> already said he'd do on Friday.  If acceptable to everyone I'd like
+> to merge it through the block tree, or topic branch in it due to
+> pending work on top of this]
 
-I am probably misreading the patch. But I've had the following in mind
+FWIW, no problems from my side with this approach.
 
-	scoped_guard(rcu) {
-		if (!cpu_is_isolated(cpu))
-			schedule_work_on(cpu, work);
-	}
--- 
-Michal Hocko
-SUSE Labs
+Carlos
+
+> 
+> this series tries to address the problem that under I/O pages can be
+> modified during direct I/O, even when the device or file system require
+> stable pages during I/O to calculate checksums, parity or data
+> operations.  It does so by adding block layer helpers to bounce buffer
+> an iov_iter into a bio, then wires that up in iomap and ultimately
+> XFS.
+> 
+> The reason that the file system even needs to know about it, is because
+> reads need a user context to copy the data back, and the infrastructure
+> to defer ioends to a workqueue currently sits in XFS.  I'm going to look
+> into moving that into ioend and enabling it for other file systems.
+> Additionally btrfs already has it's own infrastructure for this, and
+> actually an urgent need to bounce buffer, so this should be useful there
+> and could be wire up easily.  In fact the idea comes from patches by
+> Qu that did this in btrfs.
+> 
+> This patch fixes all but one xfstests failures on T10 PI capable devices
+> (generic/095 seems to have issues with a mix of mmap and splice still,
+> I'm looking into that separate), and make qemu VMs running Windows,
+> or Linux with swap enabled fine on an XFS file on a device using PI.
+> 
+> Performance numbers on my (not exactly state of the art) NVMe PI test
+> setup:
+> 
+>   Sequential reads using io_uring, QD=16.
+>   Bandwidth and CPU usage (usr/sys):
+> 
+>   | size |        zero copy         |          bounce          |
+>   +------+--------------------------+--------------------------+
+>   |   4k | 1316MiB/s (12.65/55.40%) | 1081MiB/s (11.76/49.78%) |
+>   |  64K | 3370MiB/s ( 5.46/18.20%) | 3365MiB/s ( 4.47/15.68%) |
+>   |   1M | 3401MiB/s ( 0.76/23.05%) | 3400MiB/s ( 0.80/09.06%) |
+>   +------+--------------------------+--------------------------+
+> 
+>   Sequential writes using io_uring, QD=16.
+>   Bandwidth and CPU usage (usr/sys):
+> 
+>   | size |        zero copy         |          bounce          |
+>   +------+--------------------------+--------------------------+
+>   |   4k |  882MiB/s (11.83/33.88%) |  750MiB/s (10.53/34.08%) |
+>   |  64K | 2009MiB/s ( 7.33/15.80%) | 2007MiB/s ( 7.47/24.71%) |
+>   |   1M | 1992MiB/s ( 7.26/ 9.13%) | 1992MiB/s ( 9.21/19.11%) |
+>   +------+--------------------------+--------------------------+
+> 
+> Note that the 64k read numbers look really odd to me for the baseline
+> zero copy case, but are reproducible over many repeated runs.
+> 
+> The bounce read numbers should further improve when moving the PI
+> validation to the file system and removing the double context switch,
+> which I have patches for that will sent out soon.
+> 
+> Changes since v2:
+>  - add a BIO_MAX_SIZE constant and use it
+>  - remove a pointless repeated page_folio call
+>  - fix a comment typo
+>  - add a new comment about copying to a pinned iter
+> 
+> Changes since v1:
+>  - spelling fixes
+>  - add more details to some commit messages
+>  - add a new code comment about freeing the bio early in the I/O
+>    completion handler
+> 
+> Diffstat:
+>  block/bio.c               |  332 ++++++++++++++++++++++++++++------------------
+>  block/blk-lib.c           |    9 -
+>  block/blk-merge.c         |    8 -
+>  block/blk.h               |   11 -
+>  fs/iomap/direct-io.c      |  191 ++++++++++++++------------
+>  fs/iomap/ioend.c          |    8 +
+>  fs/xfs/xfs_aops.c         |    8 -
+>  fs/xfs/xfs_file.c         |   41 +++++
+>  include/linux/bio.h       |   26 +++
+>  include/linux/blk_types.h |    3 
+>  include/linux/iomap.h     |    9 +
+>  include/linux/uio.h       |    3 
+>  lib/iov_iter.c            |   98 +++++++++++++
+>  13 files changed, 507 insertions(+), 240 deletions(-)
+> 
