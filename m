@@ -1,755 +1,184 @@
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azon11011023.outbound.protection.outlook.com [40.107.208.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19A222F0C7F
-	for <linux-block@vger.kernel.org>; Tue, 27 Jan 2026 23:52:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FE601D5178
+	for <linux-block@vger.kernel.org>; Wed, 28 Jan 2026 00:21:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.208.23
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769557949; cv=pass; b=q3UFqOZwnE9NQpVFXNh6pSbBN30lSK2j1Bf7y1JH2GeeXo8w5WPka8yV1P2lCtIQaMmSKaYJE5kfLvjPrk6IWdHeFUBIZKoVaTgiTVbMBYdx53ofpVz605x2uIazD6odLGygXQBoP8bl4kRZD6NDhKfvecfXeUEOhgPma4Ck/54=
+	t=1769559677; cv=fail; b=E3RbaxJBc2J1QXMajXpcPFFw+gbHJQW/wJBF2JBA1FwHzovDefiBgBYR9PMigNNqGqIZu1QzR255U4tVH14gE132RgPbU6d9/Dqoem7Dahy4pshseULOD1OL1GKXvqzUejPvIk4is0GhbizKsbpfPRL8yjvmgIYIBzREslQrC0Q=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769557949; c=relaxed/simple;
-	bh=VS4F8Fqe9sOTgyTfp4fbiBlsK3l/XnA6wlaqz/MAW5c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bb2SO9kUWP5dcheI6+5FVmdSwCNS5paZxvt1KHC9yaEydCrSaK8yg1nOvqVmS/GSiX2p5hGi+Yu/rvFonRZVA8Ge2S0l+3h3hflUJLiwgKQ7WMYDxSGSZGSPIiVQJ/Cz9aoWyo1gAmGIueTGOr7BJ0NJdq6lw6tbBi2AKu45l8o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J9ZC0Fng; arc=pass smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1769559677; c=relaxed/simple;
+	bh=nvwz8exDjVltsTCkupOPOCH92G/vD2CgRjxCG2GMZoM=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=LNHK3aKh4uEhD4YFzTlRMt3brGzi3iWjzsO5M8XqWdbHFTyWUV1o+CsYhLponrIjzbq29UQvX7X73eVFxbBH2ZCWLCY3jxhtr2ejocX4vlP0fY5aDdRCsidEqAvl2Nq1FKEFKsv9B4boARBSgkq1w1ypQDIYvESforyuiBgCQwo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=IEPeCvqm; arc=fail smtp.client-ip=40.107.208.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J9ZC0Fng"
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-50299648ae9so80011cf.1
-        for <linux-block@vger.kernel.org>; Tue, 27 Jan 2026 15:52:25 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769557945; cv=none;
-        d=google.com; s=arc-20240605;
-        b=kSJidiefLGsViBlr+hfdhud0ANcTYFR1D3CqYOhdKgMyZo87xlQckVprngyvn8+47H
-         bo/CV356Xv3HmLz+jgFWXGSrHwUytGUCdPpmtL/7sNZYtcjUO1ca3oLxIBcd899a1dCy
-         fu7lGKaK7fjcrvVFBXJz2UP7PKuhC6TZLmjVOPgi9/BsoVmlP+mOFivk61WVPBjdOoPj
-         LXKFne4ONxOwfEANHXesdBp0EYdO868lt3XiiZNZJIEviwdlfeFI7aeXcqwr3vjk5q9V
-         wInY0aMtsejZLHPLEfN+CHZJSfXy2dowCgOKAw0CLbwb1AsHC+Q4M5TGe6K0xgpwEjcG
-         Xixw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=+ZRvTKXPkrkt6X+J/Cjw1nYajRoQjv33aP+kK07JubU=;
-        fh=iVjdQ/MU1xZ+u3LGUMOe3kDn1wX9iR2PWo50BvsNQpo=;
-        b=BO674LRCvV+UXLdI6w6x+7oyGvexdY0pu0C/XHeHB5qLsrp7dVCfunwAWlbU8bPS+w
-         RQ3xYyHJGh+8Tl9EzpzhoYi0zD2yMZ0cAn7KN0PIlbKwLxZW6i0LkSdR3wQX1i2TB3hR
-         iApn7wpkot/GzU8AoOUC+CBZ44krp7YoBy+YvFsUV7GFDu5tLpOEj1GL6QrC1NVKzkej
-         vlmLddgIHD2xBkqJKcNFl3Zebn+ww+VS1fb0z6vHnsIar/aYVJwLSwhGUJOZOs4jLhZK
-         uT+SdkPouD0+20bW2lOjUjyh6vDBvmCxft6wb26FDJECyQvUUYpqIXWKCJkSTUCUDT29
-         kxQw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769557945; x=1770162745; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+ZRvTKXPkrkt6X+J/Cjw1nYajRoQjv33aP+kK07JubU=;
-        b=J9ZC0FngmOJj2KZLe0RKJAgG73sz3uKqsJutb4G8KhSe1SdATV704hduzE2x4JkTtA
-         G0COpBL8QYT7OuYHaWm4orp+cOZXZKIvv3kC0VYknXPLDrGYRC0VWuF1jer6+SZlYEpg
-         oem4THVpjq/TFnK6IEXfOoidG4ZyKXZndgSp20PrB3GAXZjSC6sngflXNB7EywbVywxU
-         srhvCxgFQYvumko94o/i6JFgUZNg+qD9jF/mHjSE+2igyfZ228l5DooFyEuE2EJi+3AT
-         MTMpHCq7liMoC8X7IdlAs2CjnwCTAEiMt/JDvqAp/crjZykqsPXL5u4TIMfQ1jZiybjD
-         D1sg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769557945; x=1770162745;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=+ZRvTKXPkrkt6X+J/Cjw1nYajRoQjv33aP+kK07JubU=;
-        b=f6fkjm/EhiZpOtlLDxGMMN7UFd3kDcwqDQWpKm/PSt3k+OzsjmCcWkslNOgAioeX2m
-         RrZdCoyRBsavBruBHLpoWBFuJzn6o3UTnlbq3TIgoEL1KYhddGhNVqZ7BGvofMB2vP7U
-         bKzY7x8f9Lvf7/VMYaKYsAhUoZT93FkXuy104rS7Nqqd8kSxu2BOnqyr4OrwKwidgeEn
-         c9aC3ef9ztaop05Ss9GCPWFadFsipN4x6XB3aLUY4Fv7DalMYxL2hdqUuFA3urTjA7CH
-         X4CAo2i9mkc6Hb51YTUy4gh96Gk9/uG19JM4SejJUAg8WdQxfwvBHc6dmn3ag4J4sAGM
-         xAmw==
-X-Forwarded-Encrypted: i=1; AJvYcCWDVwpQQ9i+i3p1+9XrXvnN6RFLVltL6FA0K+BbM6lJlYDPjruP4SXbnMjDEKpvqiNcLqSG0/OgfWKE/Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGsxp1aHbQt2Q7GBL/u6Nq4dxObL/L16RhDVN6e+kHs8aeUc9G
-	AuPFHqMsUBtOiPGy4yhaSXx9NHXLi04kdMo9ml/RFdvCeSjxhO+ZgiFqQCw2TlqvMzYHsGzKS6/
-	ANZ1C85Elz7HAjtazxvuzU80/MNaQv7m0PdAoiuyw
-X-Gm-Gg: AZuq6aL2ha64GDNnqj9YQx3yePMKP/ckP83tb5KJ5wdqQXBUO82YJE3a6jJrLhgvK6h
-	jpkSyUKvkXNwDkS2QiSG3xqwDg+2QsH3eYg6+rRfERmw+BhTTN7q2k8OvIZ5WdykgA70ff3yGoB
-	5VKzFOHpLSEJStwqg2cVgeep+y/wTGelxYlJ6RdPq9940i5FoKMHWG8LTOqfQKEqKP8VXJ6HhKB
-	vsnzJoNvl7MJi6Cg+qj/nuT+UaJvMK30uctPR2xuCrlB+upBelCQNeMg7enIf5a7Pp+xd9gFe2v
-	ruKhtodejVfcwD9aTT2VPv5rJQ==
-X-Received: by 2002:a05:622a:6681:b0:501:197d:32af with SMTP id
- d75a77b69052e-503340e2447mr9436431cf.0.1769557944532; Tue, 27 Jan 2026
- 15:52:24 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="IEPeCvqm"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=V98ErmWcR0UkuRTt60K+XwWoXZB0wfK1p+EawsUP1x9I4dg74TZIZJhiJfbsoV3JZSRcampetXePaqBeBbCzARsXZyFKh2hbWL+ekY3tBVujRWiRQLIj6vX5ZMiCoZw2BOFFRrpBbbIl+jrIpz0/SCUWJld12EqhMS2FE/QX7FZzwI4s7IqW6olCBnAPwHVA/mNn9f2tFnTgwfL3nC70IM2M8CX90ZNoLc+yynAEUXDXFcQiCR3E9Z1/ZXM1x93gAOC8vIq+gbVBE09U9pwNhych6ZVnGbDBe7ziswFWeZjl1LOV+o5tmOhMJYA56rijrrhG7Qc0jr3DuvowLDVnUw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=nvwz8exDjVltsTCkupOPOCH92G/vD2CgRjxCG2GMZoM=;
+ b=gCM3DN0pcX9iQnNL5p6P3XE1ib1cA76eaGBr5aYC7pSFQ84E8rSUZ93Cq31XptWqaa41kiD9bp3oJUoyU+FNK7TDpcOQrsAuIukcJ3pPAprArgsgqsxF4YAuwjXiB8KNmJlzPNOR9G9e9tdsB+eO13wUbCAo/0LCZX7jb/Er42LQOrw8DS4ggvgve8EF2jRt34aaGxjyCG15umd037Q9rEHp3ejSaT2WE6Esm/vUFo5wyNHNhpdPMZNQ//aE7OwXaqfrXozckJH2skRrxl8LnEPQUjBB0WxUx2g5SjvfPamxy1AaAqnmIwACoCMNzB0GSoflGb9NiKFTk1Zrn0JC9g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nvwz8exDjVltsTCkupOPOCH92G/vD2CgRjxCG2GMZoM=;
+ b=IEPeCvqmkBn5bJ9UjI1DMbAud6Qg869tXO0DCvS/jOnlD9TzzFXaz1BFVJpiYh0SoI/TUGdWeOr4wZFv4USHjsmDZJXSKHJeFvmHB1cQ6rX7l6fVAuNsSAH4meEnzUHDVmV4Ssrbia/07umBa8NpXKtiAmrGlM+L2AEUxDg/8O596Y+ybIK2lECJl7y/Zspv9ZUS9o4Q8iPwRs2ct8rMml3peRFo6FNKySi/x5+q0bDSdVlJIDwKXtsSwWoRNez96XABZTbblFNMWMLjoaS68ZQKIVzdhGmCzu+uNzj6osULkeNGbgm9j6F4eU/vvCon0lu0C0LFxp84aE2K0ZkSvQ==
+Received: from LV3PR12MB9404.namprd12.prod.outlook.com (2603:10b6:408:219::9)
+ by SA1PR12MB8094.namprd12.prod.outlook.com (2603:10b6:806:336::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.7; Wed, 28 Jan
+ 2026 00:21:11 +0000
+Received: from LV3PR12MB9404.namprd12.prod.outlook.com
+ ([fe80::57ac:82e6:1ec5:f40b]) by LV3PR12MB9404.namprd12.prod.outlook.com
+ ([fe80::57ac:82e6:1ec5:f40b%5]) with mapi id 15.20.9542.015; Wed, 28 Jan 2026
+ 00:21:10 +0000
+From: Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+CC: "haris.iqbal@ionos.com" <haris.iqbal@ionos.com>, "jinpu.wang@ionos.com"
+	<jinpu.wang@ionos.com>, "yanjun.zhu@linux.dev" <yanjun.zhu@linux.dev>,
+	Chaitanya Kulkarni <ckulkarnilinux@gmail.com>, "grzegorz.prajsner@ionos.com"
+	<grzegorz.prajsner@ionos.com>, "axboe@kernel.dk" <axboe@kernel.dk>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, Chaitanya
+ Kulkarni <chaitanyak@nvidia.com>
+Subject: Re: [PATCH] rnbd-clt: fix refcount underflow in device unmap path
+Thread-Topic: [PATCH] rnbd-clt: fix refcount underflow in device unmap path
+Thread-Index: AQHchBnvMmj8aOk0+kaT6bvRmUvcZbVlrtaAgAEg9wA=
+Date: Wed, 28 Jan 2026 00:21:10 +0000
+Message-ID: <9ddb4708-ffb0-4748-9939-9f879046041d@nvidia.com>
+References: <20260112231928.68185-1-ckulkarnilinux@gmail.com>
+ <aXhLQmRudk7cSAnT@shinmob>
+In-Reply-To: <aXhLQmRudk7cSAnT@shinmob>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: LV3PR12MB9404:EE_|SA1PR12MB8094:EE_
+x-ms-office365-filtering-correlation-id: 21b5248a-a477-477d-1001-08de5e03239c
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|366016|10070799003|1800799024|38070700021;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?TjJtQittam5vNzZkYkJiYjFGMHB0RmZxc002SDRobVlhUzBXUldIaWVrVjNq?=
+ =?utf-8?B?dlVSTGptckptMVFHTkx0dVRnOHJXME9ERFpjM0sxbFVoWUdUR0I2SCtnNkh6?=
+ =?utf-8?B?cGhGMWNyd0VuQ3dreUJtMHNHZFRmUGVveXNOUXp3bmozRFhDVnVZbTJ1L08y?=
+ =?utf-8?B?cWhrbXkyMm9ERGZvaDZ1TllFSklOR0ZtekhKa3JZcTVsZHpyYUI0Qmc1STRi?=
+ =?utf-8?B?d3EyblRwdGg1ZEtxRm9mOXkzK2s1ck1lVEtFQ1ZqK1hjOVBnVEs0dVBHRjR0?=
+ =?utf-8?B?TkpVbnNSek9relV1N3pSNUJiTVFlT2luOFlBNXdrcWIyWDEwTkxHY2U3U0F6?=
+ =?utf-8?B?UWxacGhsRTd1ZG5JcHBRMTl6MTl6NmxoSnFRNnlRZW9UYll0cTdFODVVbkpD?=
+ =?utf-8?B?WHpsQlEwZ2t5aWZLbUJWUDBoSlFXdEE2RzZnb0ZLd1lvZVVRUkZETU9DS0Zl?=
+ =?utf-8?B?cEUyamFUZ2NGN3l2WUV6QmRhZmFDcU1zeHFmR2N3NHd2a2tqSkdQZTRPeUpY?=
+ =?utf-8?B?YStqeHlwTmRPS0I3elYrTkZQdDVlUmpRSUhXdEg3NUZmY1cxdm1QQ0VWTVAz?=
+ =?utf-8?B?Z1ZVR3RBaGF6ZGQ1akJLNjd3WjBoM1lsWmQ2TkhZSDZkTmtEY1A5ZjcrMUYx?=
+ =?utf-8?B?ZGhDVHNxMmhEbXgvblRXVmIyeXB0eG84N2F2NVdXV09MbktyS2d1MnBuaVp3?=
+ =?utf-8?B?OWlHV2FpNlpIbmlQUTUwVWs1TUNVaC9QK1AvcVJxcVFtNTRFTDZiem5DZmVJ?=
+ =?utf-8?B?S2pOQytUdFd5cHZhTzM2U2gvYWoxNFVVc3lCSkE2N1dZcEhIbVJsckZFNyta?=
+ =?utf-8?B?ak9Bc2pQbkZWcis4WDJvY3RYZy9sdHpXQmQzQmFsd1pxTmptbGxtNTkvY0pD?=
+ =?utf-8?B?YjE5WFkrVzVrNURUckdsU1NaR2RsdnZWRmk1MC9zWExFdER4KzVhWXZscXRG?=
+ =?utf-8?B?NUdzRHAxV09UUkVyRjJjcnJDN0ZJQ0RZZTZiTjlXN0c3MUN2ZmcwTC93MXRD?=
+ =?utf-8?B?aG95aUk0QXg2T2haRVJ1cHBSVkt6Rk5Ibm1TdTZVMVBOVldRVHl0MHFMNmdC?=
+ =?utf-8?B?SWlHNklNOUp5T1NZSm03ejZKLzEvWDQ3bzR2THpjakFRRFZhM1ppZTMyU3Zt?=
+ =?utf-8?B?b1NQVWY2YWVWUS9TOVN6em5rZ2NsbmswOVQvOGVLemQ4dTcwVlJsdHlpVlpJ?=
+ =?utf-8?B?b2RmaHhhMVNmNmJuSHFHVVh1OER5dXFrR085RlpwQzFaT2grTUw0MEEwaUlk?=
+ =?utf-8?B?SStIa3pWdE00bzRhM2FGOFR4cE9UVXIxeHNoeXJWajNTTXJDYVlVTS9Jbmth?=
+ =?utf-8?B?dlEwRUYzMGkva0duOWRKOFJQb09pVklMTnJHSmZpeEVVdHZlYjVTcnhXUGI0?=
+ =?utf-8?B?SlRNVTYxSUhiclZnTnJTNUtoSGZKSE84Qjl1QTM5S0lZeU1wRVo2V3dpcXE2?=
+ =?utf-8?B?S3ZvcW9FQnd4UExGaFU4b2poSFcrNkJ4SzN0RnV3alh2TWp2VTV5c3U3UHVk?=
+ =?utf-8?B?amdVVVpESUhTYjByOVVpN281Qnk1RDFPbzhrdGVpeGMyblFpdXB3RUFjWXd3?=
+ =?utf-8?B?dGd0L2JYbi96MUNEaU1KdXFrL0d0KzM3YUVzYVFUZDlWS2ppY01vUzJYV2gv?=
+ =?utf-8?B?MEwySkFKRkFRVFFYc2grcVhPNXhNQ3NuR0ErMkVoT0dwVDNxWHR0UklxbE12?=
+ =?utf-8?B?RHJIOUlmOFhGUG5MaDRKbHFZTk9GTE5iQW9NcC9sTnFKZ1BtTWVTWlFxc1hH?=
+ =?utf-8?B?R3BqSUkyYmFOdVg1U3pDeVlEcURYaXJ3MVFYSUtQbldjaUszWjlIbEFtdEl0?=
+ =?utf-8?B?S0RMdEh4WVFBRnNDdmNxRnVQbTJ6emZxcmFpRzRGMEZhRTFGSEFCYnp5MDFn?=
+ =?utf-8?B?TnZwcTVhYUFDa1hOMS9DVmxqREgxQWliRzVuVVBrVGVCeFo2YVRjZjRYYzM0?=
+ =?utf-8?B?ZXZ1Z1IrQ2MrakFMQVFPTm8vVmhEUkxvSGFjOGtLV215MGxDY3RObnl0TlpC?=
+ =?utf-8?B?TysxVERJZEhnaDJWeXpLL1l1cWFveDZ2K0pMdzRSYm1nR1FtYmF6WUFSbHBB?=
+ =?utf-8?B?d1FUTEtscEZhSHJGT0FsUTgzekhYZU1RR2NSYXg2eW4zV1NIZmpsMjc1RDRF?=
+ =?utf-8?B?aDlrMkJVZlQ2NDJMeTdhQktoVVNxbTd4YThuelhhbDdWT01uZG9oSVpHTHND?=
+ =?utf-8?Q?gJGCL+DZ59oWEUpulh+jljY=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR12MB9404.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(10070799003)(1800799024)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 2
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?MkhFS2djQkM1bTZRbmZCVWY1cUZPTll2T2lOYWUycnpZT2o4VENGdWhEVm9W?=
+ =?utf-8?B?cFJHdnFOaGZldTFuVHVZZFR3MmpYNmYxM0ZRbEJhaEFId1Q3ZE5oaWYwNDlQ?=
+ =?utf-8?B?WHNIV2FxdG9WbUcrbzBpeCs5aWFEQTZ1eEdyOEwwLzZscTlCYjFROGUvN1Ba?=
+ =?utf-8?B?VTRRQzRKVWorKzFQdEUvWmF2bWp0SnpONlZOZHZHTHZQWDl4eUdXR0ZaZUJm?=
+ =?utf-8?B?OC9iS0phN1ExNEhhTGY4WklhVHptNWZ0a1ZMNzUyemdoQ0UvNW1HSFZCVlJ2?=
+ =?utf-8?B?dDZJZG9LaXZsRDl0aUdmOG1RMUFSUjRLd0pwOC9qZ3NMT2tWc1FqZkZnK2Nn?=
+ =?utf-8?B?R0FzRmNTNWNpUXBKci81QTQxWCt0VmJ3czlHZmQ0RENianJ0cWd5OE1FOUtM?=
+ =?utf-8?B?Mm9hOERNMFJ4S1JKOEFiNXhGWGpHMnVRVkJqSmRGem9NUE9aamU0dXByN0VJ?=
+ =?utf-8?B?M2QvTXhWTEIxd0UyYmtUVjBQOXNYaXJsejB1SmpaV3hQR1l5NlJGaTJkQkhU?=
+ =?utf-8?B?TTdCTkEreCs3U1Z3MDVrK2dNampqRTlhWjZCOTNwWUdFMFA0WFFvN1lVOGo0?=
+ =?utf-8?B?dmpyeGU3TVdDVk9GVnhkZnVwUTg0RlYyNTdXM21nTDNDZUpzRHAvL3JDbXlo?=
+ =?utf-8?B?Um1kenpKcVQya3d0dVY0ZVlSanZTMXgxeUIydDlCcmo2N3poc3pQLzh0a0Fn?=
+ =?utf-8?B?NTVmOXVjV0FyZndRM214MXl2MHdNeXpLOEEwS29kbmJuMFhZMk9QdGtIWDc2?=
+ =?utf-8?B?dEdpL0VnMEhldG9UWXhDYmVuVUE4WVlVUHFKNkU5UE5NWjZ4L0RjS1NxbzEw?=
+ =?utf-8?B?L3AzY3g5MDJ1TStMbGRuM2FTbmpNYjZOSlExZTZVNTJGOGoyc0tqeDdFdVlI?=
+ =?utf-8?B?ejNsaC9HSm53bHorV3Ayc3lSL3RGdk9lUUQ0eFY0blpuTlQrcXdHcUxqMmhL?=
+ =?utf-8?B?VUFnVlhGVzJiWHlDOWorTTJoZTJCSVBRYU5sOVFlTk10SVRrQ09EdFhZMmIy?=
+ =?utf-8?B?bCt2MXZ5ZDBuY09QbzE5QUpxS09hRktnSStHMnlRV2d5Y2FFSkcrSkViQW9u?=
+ =?utf-8?B?S2hiUHJ5bXB3aVRoVzY1ZnJIeHNEb3dNS0ErV3VodHk0cEZXVDVJdS93Uk1B?=
+ =?utf-8?B?M20vTWNyZGsyQmtadEIvQnkweFVFbmw5Y1ZEQUE5ZVhBOWordTlXdjYrS3J3?=
+ =?utf-8?B?NlExVEJoZVA3VTUyeWsrNElRYmlmV3A4L2VnZnhpOEF3YXIyZzVCaUxYcUVw?=
+ =?utf-8?B?RzdyQUYrS2xNT0VVMW1SN3RhZ1N3cFlteTBTdkEza1JET3NTbUhRZkJVRGdm?=
+ =?utf-8?B?b243QVQyVXNuR2lXUmtJRitlbnNxdHhUVG9sWUJPYmsrVi9nZ2owMWllNU9Q?=
+ =?utf-8?B?MHF1bTdEVW41SGNWY1JJVlg1NS8vWFFlNytFVXpCYm9wdWl3Y2VuaStJdk44?=
+ =?utf-8?B?WnVFSXZHRy9oZlRzVTZHZ2RvKzNZQ1JPb1UycEVLNzRzV05yT1NibHhKUVN5?=
+ =?utf-8?B?YzE4ZldSdEtlMHZsQmIwd043L0JQSXFodC91YU53MktsaXFTcnhUbm04YWZh?=
+ =?utf-8?B?RWtSY3RnTlhrejA4REsyZUxSQVNVVFlteXo4cE9nUEtnT1hza2pEK01ISWQw?=
+ =?utf-8?B?NS82RXcrOU04NTdsV2NSeVFIWVJVTWR6RUJXVldLeVVQK0Z2cUpUY3pMancx?=
+ =?utf-8?B?U3NCbTJLR21Qcmd3L0UxT01ZbnFJaFpON3pEVFZwZ29OOUl0OHdyK3Y2cS8z?=
+ =?utf-8?B?aG50bmtpZ1VqVHV2VkxDa1ZyZ3JiNjhxWU92bXAwUys3d2dhdWxPSm40eklv?=
+ =?utf-8?B?R3g5S0x1VUJYbGl3YnI1amVjaldJd0JsejA2bkppeVo0aWNMc0FIUkM2SHJZ?=
+ =?utf-8?B?a3Z0Y05ZSVJxMnlnSUM0aWN2TGp5TzJ6VjAyWEtnUTl5MHJhKy9lb0hlaTA1?=
+ =?utf-8?B?cVRmUEFPanUzUDFRWmpQeW50YS9BNHlwb2tiM0NEOXRGczBkTlI5cFBOVFln?=
+ =?utf-8?B?T3RRS1N5NDdFRUpObExVVlNCQ2h0U1dkaUdDQW1FaTdBcDZOR0lkMUo3dmVh?=
+ =?utf-8?B?YXVKRHl1LzBOa3RkZ1VhK2VWOHh4TVliNXRUQXhRLzBWdmxZTmRFMmN1cGJ6?=
+ =?utf-8?B?Wk1CYzF4NVQ0aWhOWHU2Sno1LzBsQXBPQjlUNXZhVkUyNFd2MG1ZNG9TSzFa?=
+ =?utf-8?B?V3RrTk42L0d6dElHT2NMcit2RHgrbFdSdFpBeE5kbmdLNHJ5YU9PcG00R2Rz?=
+ =?utf-8?B?aklvWGViQ0toSDRDL2JndzJTazR3SmZNeFZmV2I0ZXlsRWFxbDV3dU1FbmVl?=
+ =?utf-8?B?TDQ3bTg3TURQZWtiazNza3lCeEYxYlFFQ3dvaHRuQTBkVFd0bTE3MFhXazls?=
+ =?utf-8?Q?T8nc2GQKQms3l+yoanWljCKIJ4WzdraVh5asPIQAkn6fM?=
+x-ms-exchange-antispam-messagedata-1: tGEmBsLowoWjuw==
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <8D79F7B2B17B8444AD580E2213A328E0@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <697400dc.a70a0220.35de72.000a.GAE@google.com> <20260124113148.2398-1-hdanton@sina.com>
- <CAJuCfpEcqAiK-z=EZ5im12F2wfGHYogiMHaTC4t5uopLmBKQPw@mail.gmail.com>
- <CAJuCfpEJUeQcpfbh-0KTsp1UdTs5yrKTbvAV6QOKdQHJZ2HWww@mail.gmail.com>
- <CAJuCfpF_a=-kTZLdOzZpKrWhO2CyowwT+PdZ7_tP-cXxe23DiQ@mail.gmail.com> <CAEf4BzZxEVSFtu7uozpr-7NvRqt2WqjzmHrvQgG6TDoJQ9p_AQ@mail.gmail.com>
-In-Reply-To: <CAEf4BzZxEVSFtu7uozpr-7NvRqt2WqjzmHrvQgG6TDoJQ9p_AQ@mail.gmail.com>
-From: Suren Baghdasaryan <surenb@google.com>
-Date: Tue, 27 Jan 2026 15:52:12 -0800
-X-Gm-Features: AZwV_QhT6quY5zxTYPH6FFpp-MS0l0k7PdIWHA9EixLsSgXcFdvVYcINLCHWJIk
-Message-ID: <CAJuCfpHMJ-5hP+eHpD1jyJtdmFb9qaSfaZ8GdsHY8BrorvUdkg@mail.gmail.com>
-Subject: Re: [syzbot] [block?] possible deadlock in blkdev_read_iter
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: Hillf Danton <hdanton@sina.com>, 
-	syzbot <syzbot+4e70c8e0a2017b432f7a@syzkaller.appspotmail.com>, axboe@kernel.dk, 
-	linux-block@vger.kernel.org, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
-	linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: LV3PR12MB9404.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 21b5248a-a477-477d-1001-08de5e03239c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Jan 2026 00:21:10.8324
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: S04ZicDvOrXmoVN8lDhg1PWql9RqVx3tqplCHACwaeybb/XrV8PnV6bvKs27voq2mRomfDU2FaEr7CJEn+T3Ug==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8094
 
-On Tue, Jan 27, 2026 at 10:51=E2=80=AFAM Andrii Nakryiko
-<andrii.nakryiko@gmail.com> wrote:
->
-> On Mon, Jan 26, 2026 at 6:22=E2=80=AFPM Suren Baghdasaryan <surenb@google=
-.com> wrote:
-> >
-> > On Mon, Jan 26, 2026 at 2:33=E2=80=AFPM Suren Baghdasaryan <surenb@goog=
-le.com> wrote:
-> > >
-> > > On Mon, Jan 26, 2026 at 9:20=E2=80=AFAM Suren Baghdasaryan <surenb@go=
-ogle.com> wrote:
-> > > >
-> > > > On Sat, Jan 24, 2026 at 3:32=E2=80=AFAM Hillf Danton <hdanton@sina.=
-com> wrote:
-> > > > >
-> > > > > Add Lorenzo and Suren
-> > > >
-> > > > Thanks!
-> > > >
-> > > > >
-> > > > > > Date: Fri, 23 Jan 2026 15:14:36 -0800
-> > > > > > Hello,
-> > > > > >
-> > > > > > syzbot found the following issue on:
-> > > > > >
-> > > > > > HEAD commit:    24d479d26b25 Linux 6.19-rc6
-> > > > > > git tree:       upstream
-> > > > > > console output: https://syzkaller.appspot.com/x/log.txt?x=3D100=
-033fa580000
-> > > > > > kernel config:  https://syzkaller.appspot.com/x/.config?x=3D185=
-9476832863c41
-> > > > > > dashboard link: https://syzkaller.appspot.com/bug?extid=3D4e70c=
-8e0a2017b432f7a
-> > > > > > compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (=
-GNU Binutils for Debian) 2.40
-> > > > > > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D1=
-1451b9a580000
-> > > > > > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D104=
-5e852580000
-> > > > > >
-> > > > > > Downloadable assets:
-> > > > > > disk image (non-bootable): https://storage.googleapis.com/syzbo=
-t-assets/d900f083ada3/non_bootable_disk-24d479d2.raw.xz
-> > > > > > vmlinux: https://storage.googleapis.com/syzbot-assets/d0f3c47f6=
-869/vmlinux-24d479d2.xz
-> > > > > > kernel image: https://storage.googleapis.com/syzbot-assets/8002=
-31513703/bzImage-24d479d2.xz
-> > > > > >
-> > > > > > IMPORTANT: if you fix the issue, please add the following tag t=
-o the commit:
-> > > > > > Reported-by: syzbot+4e70c8e0a2017b432f7a@syzkaller.appspotmail.=
-com
-> > > > > >
-> > > > > > WARNING: possible circular locking dependency detected
-> > > > > > syzkaller #0 Not tainted
-> > > > > > ------------------------------------------------------
-> > > > > > syz.0.17/6091 is trying to acquire lock:
-> > > > > > ffff8881061287a8 (
-> > > > > > &sb->s_type->i_mutex_key#8){++++}-{4:4}, at: inode_lock_shared =
-include/linux/fs.h:1042 [inline]
-> > > > > > &sb->s_type->i_mutex_key#8){++++}-{4:4}, at: blkdev_read_iter+0=
-x19e/0x500 block/fops.c:855
-> > > > > >
-> > > > > > but task is already holding lock:
-> > > > > > ffff888012aa0448 (vm_lock){++++}-{0:0}, at: lock_next_vma+0x10e=
-/0xed0 mm/mmap_lock.c:334
-> > > > > >
-> > > > > > which lock already depends on the new lock.
-> > > > > >
-> > > > > >
-> > > > > > the existing dependency chain (in reverse order) is:
-> > > > > >
-> > > > > > -> #2 (vm_lock){++++}-{0:0}:
-> > > > > >        __vma_enter_locked+0x260/0x770 mm/mmap_lock.c:72
-> > > > > >        __vma_start_write+0x21/0x160 mm/mmap_lock.c:104
-> > > > > >        vma_start_write include/linux/mmap_lock.h:213 [inline]
-> > > > > >        mprotect_fixup+0x4e3/0xb80 mm/mprotect.c:768
-> > > > > >        setup_arg_pages+0x4a2/0xbb0 fs/exec.c:670
-> > > > > >        load_elf_binary+0xb5b/0x4fe0 fs/binfmt_elf.c:1028
-> > > > > >        search_binary_handler fs/exec.c:1669 [inline]
-> > > > > >        exec_binprm fs/exec.c:1701 [inline]
-> > > > > >        bprm_execve fs/exec.c:1753 [inline]
-> > > > > >        bprm_execve+0x8c2/0x1620 fs/exec.c:1729
-> > > > > >        kernel_execve+0x2ef/0x3b0 fs/exec.c:1919
-> > > > > >        try_to_run_init_process init/main.c:1506 [inline]
-> > > > > >        kernel_init+0x14a/0x2b0 init/main.c:1634
-> > > > > >        ret_from_fork+0x983/0xb10 arch/x86/kernel/process.c:158
-> > > > > >        ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:24=
-6
-> > > > > >
-> > > > > > -> #1 (&mm->mmap_lock){++++}-{4:4}:
-> > > > > >        __might_fault mm/memory.c:7174 [inline]
-> > > > > >        __might_fault+0x113/0x190 mm/memory.c:7168
-> > > > > >        _copy_to_iter+0x1c2/0x1710 lib/iov_iter.c:196
-> > > > > >        copy_page_to_iter lib/iov_iter.c:374 [inline]
-> > > > > >        copy_page_to_iter+0x12a/0x1e0 lib/iov_iter.c:361
-> > > > > >        copy_folio_to_iter include/linux/uio.h:204 [inline]
-> > > > > >        filemap_read+0x6b1/0xe40 mm/filemap.c:2851
-> > > > > >        blkdev_read_iter+0x1ac/0x500 block/fops.c:856
-> > > > > >        new_sync_read fs/read_write.c:491 [inline]
-> > > > > >        vfs_read+0x8bf/0xcf0 fs/read_write.c:572
-> > > > > >        ksys_read+0x12a/0x250 fs/read_write.c:715
-> > > > > >        do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-> > > > > >        do_syscall_64+0xcd/0xf80 arch/x86/entry/syscall_64.c:94
-> > > > > >        entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> > > > > >
-> > > > > > -> #0 (&sb->s_type->i_mutex_key#8){++++}-{4:4}:
-> > > > > >        check_prev_add kernel/locking/lockdep.c:3165 [inline]
-> > > > > >        check_prevs_add kernel/locking/lockdep.c:3284 [inline]
-> > > > > >        validate_chain kernel/locking/lockdep.c:3908 [inline]
-> > > > > >        __lock_acquire+0x1669/0x2890 kernel/locking/lockdep.c:52=
-37
-> > > > > >        lock_acquire kernel/locking/lockdep.c:5868 [inline]
-> > > > > >        lock_acquire+0x179/0x330 kernel/locking/lockdep.c:5825
-> > > > > >        down_read+0x9b/0x460 kernel/locking/rwsem.c:1537
-> > > > > >        inode_lock_shared include/linux/fs.h:1042 [inline]
-> > > > > >        blkdev_read_iter+0x19e/0x500 block/fops.c:855
-> > > > > >        __kernel_read+0x3f3/0xbf0 fs/read_write.c:530
-> > > > > >        freader_fetch+0x1d7/0x9d0 lib/buildid.c:100
-> > > > > >        __build_id_parse.isra.0+0xdd/0x6c0 lib/buildid.c:297
-> > > > > >        do_procmap_query+0xb0e/0x1080 fs/proc/task_mmu.c:733
-> > > > > >        procfs_procmap_ioctl+0x9d/0xe0 fs/proc/task_mmu.c:813
-> > > > > >        vfs_ioctl fs/ioctl.c:51 [inline]
-> > > > > >        __do_sys_ioctl fs/ioctl.c:597 [inline]
-> > > > > >        __se_sys_ioctl fs/ioctl.c:583 [inline]
-> > > > > >        __x64_sys_ioctl+0x18e/0x210 fs/ioctl.c:583
-> > > > > >        do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-> > > > > >        do_syscall_64+0xcd/0xf80 arch/x86/entry/syscall_64.c:94
-> > > > > >        entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> > > > > >
-> > > >
-> > > > It looks like:
-> > > > #0 is executing PROCMAP_QUERY ioclt, read-locks vm_lock and then ca=
-lls
-> > > > build_id_parse()->__build_id_parse(...,
-> > > > may_fault=3Dtrue)->__kernel_read() which eventually takes
-> > > > inode->i_rwsem.
-> > > > #1 is a file-backed page fault which asserts that it might take
-> > > > mmap_lock for read.
-> > > > #2 is load_elf_binary()->mprotect_fixup() which write-locks both
-> > > > mmap_lock and vm_lock. I'm guessing it already holds inode->i_rwsem
-> > > > before write-locking these locks.
-> > > >
-> > > > Originally I thought the issue is most liley introduced in
-> > > > d9d1c2d81797 ("fs/proc/task_mmu: execute PROCMAP_QUERY ioctl under
-> > > > per-vma locks"). But if #2 indeed takes inode->i_rwsem before
-> > > > write-locking mmap_lock, then the problem should exist even before
-> > > > that change when we didn't use vm_lock and relied on mmap_lock...
-> > > >
-> > > > I'll try to analyze this more before attempting a fix.
-> > >
-> > > I was able to reproduce the same issue even after reverting
-> > > d9d1c2d81797. The deadlock in this case is simpler and involves
-> > > mmap_lock instead of vm_lock (see below).
-> > > Looks like the race is between the read() syscall and do_procmap_quer=
-y().
-> > > I'll continue investigating, in the meantime CC'ing Andrii.
-> >
-> > So, here is a cleaner version of that report (with d9d1c2d81797 reverte=
-d):
-> >
-> >  -> #1 (&mm->mmap_lock){++++}-{4:4}:
-> >         __might_fault+0xed/0x170
-> >         _copy_to_iter+0x118/0x1720
-> >         copy_page_to_iter+0x12d/0x1e0
-> >         filemap_read+0x720/0x10a0
-> >         blkdev_read_iter+0x2b5/0x4e0
-> >         vfs_read+0x7f4/0xae0
-> >         ksys_read+0x12a/0x250
-> >         do_syscall_64+0xcb/0xf80
-> >         entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> >
-> >  -> #0 (&sb->s_type->i_mutex_key#8){++++}-{4:4}:
-> >         __lock_acquire+0x1509/0x26d0
-> >         lock_acquire+0x185/0x340
-> >         down_read+0x98/0x490
-> >         blkdev_read_iter+0x2a7/0x4e0
-> >         __kernel_read+0x39a/0xa90
-> >         freader_fetch+0x1d5/0xa80
-> >         __build_id_parse.isra.0+0xea/0x6a0
-> >         do_procmap_query+0xd75/0x1050
-> >         procfs_procmap_ioctl+0x7a/0xb0
-> >         __x64_sys_ioctl+0x18e/0x210
-> >         do_syscall_64+0xcb/0xf80
-> >         entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> >
-> >  other info that might help us debug this:
-> >
-> >   Possible unsafe locking scenario:
-> >
-> >         CPU0                    CPU1
-> >         ----                    ----
-> >    rlock(&mm->mmap_lock);
-> >                                 lock(&sb->s_type->i_mutex_key#8);
-> >                                 lock(&mm->mmap_lock);
-> >    rlock(&sb->s_type->i_mutex_key#8);
-> >
-> >   *** DEADLOCK ***
-> >
-> > Both threads are calling blkdev_read_iter(), which uses
-> > inode_lock_shared() to read-lock inode->i_rwsem. I'm not sure why CPU1
-> > shows lock() instead of rlock(). So both threads read-lock
-> > inode->i_rwsem and mmap_lock but in a different order. IIUC, with
-> > read-locks this should not deadlock until some other thread
-> > write-locks the mmap_lock in between and this becomes a real deadlock:
-> >
-> >         CPU0       CPU1         CPU2
-> >         ----       ----         ----
-> >    rlock(&mm->mmap_lock);
-> >                                 rlock(&sb->s_type->i_mutex_key#8);
-> >                    wlock(&mm->mmap_lock) <-- waiting for CPU0
-> >                                 rlock(&mm->mmap_lock); <-- waiting for =
-CPU1
-> >    rlock(&sb->s_type->i_mutex_key#8); <-- waiting for CPU2
-> >
-> > I believe in the original report this write-locking thread was the one
-> > calling mprotect_fixup().
-> >
-> > Per https://docs.kernel.org/mm/process_addrs.html#lock-ordering,
-> > inode->i_rwsem should be locked before mm->mmap_lock, so
-> > procfs_procmap_ioctl() has to be fixed to follow this lock ordering.
-> > One possibility I can think of is to use build_id_parse_nofault()
-> > first and if it fails because the required page is not faulted, we do
-> > freader_init_from_file(), then drop the mmap/vma lock and execute
-> > freader_fetch() outside of these locks to fault in that page. Once
-> > that's done, we'll retry the whole operation and this time
-> > build_id_parse_nofault() should pass (unless we already evicted that
-> > page, which is extremely unlikely and in that case, we'll retry
-> > again).
-> >
-> > I tried a POC with build_id_parse_nofault() but without the whole
-> > dance with freader_init_from_file/freader_fetch and the deadlock is
-> > gone. Andrii, WDYT?
->
-> I don't like it :) Too much complexity, _nofault() variant only makes
-> sense for BPF in non-sleepable contexts. I think this can be fixed
-> simpler and cleaner. We don't need to hold VMA lock while fetching
-> build ID. Build ID works with vma's vm_file, so we can just get its
-> reference, drop vma lock, then fetch build id. Below diff passes our
-> BPF selftests. Might need to think about a bit leaner code changes,
-> but the idea should be clear. Diff below will be butchered by gmail,
-> but you can fetch it at [0]. Do you mind validating that deadlock is
-> gone? Thanks!
-
-Sure. I'll test it later today, once I'm home.
-
->
-> [0] https://git.kernel.org/pub/scm/linux/kernel/git/andrii/bpf-next.git/c=
-ommit/?h=3Dprocmap-query-vma-deadlock-fix&id=3D7faf95b63a8a7ac6e78b6d90101c=
-94bfa6ecdfd1
->
-> Author: Andrii Nakryiko <andrii@kernel.org>
-> Date:   Tue Jan 27 10:46:04 2026 -0800
->
->     procfs: avoid fetching build ID while holding VMA lock
->
->     Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
->
-> diff --git a/fs/proc/task_mmu.c b/fs/proc/task_mmu.c
-> index 81dfc26bfae8..564bf82e3731 100644
-> --- a/fs/proc/task_mmu.c
-> +++ b/fs/proc/task_mmu.c
-> @@ -656,6 +656,7 @@ static int do_procmap_query(struct mm_struct *mm,
-> void __user *uarg)
->         struct proc_maps_locking_ctx lock_ctx =3D { .mm =3D mm };
->         struct procmap_query karg;
->         struct vm_area_struct *vma;
-> +       struct file *vm_file =3D NULL;
->         const char *name =3D NULL;
->         char build_id_buf[BUILD_ID_SIZE_MAX], *name_buf =3D NULL;
->         __u64 usize;
-> @@ -720,6 +721,9 @@ static int do_procmap_query(struct mm_struct *mm,
-> void __user *uarg)
->                 karg.dev_major =3D MAJOR(inode->i_sb->s_dev);
->                 karg.dev_minor =3D MINOR(inode->i_sb->s_dev);
->                 karg.inode =3D inode->i_ino;
-> +
-> +               if (karg.build_id_size)
-> +                       vm_file =3D get_file(vma->vm_file);
->         } else {
->                 karg.vma_offset =3D 0;
->                 karg.dev_major =3D 0;
-> @@ -727,21 +731,6 @@ static int do_procmap_query(struct mm_struct *mm,
-> void __user *uarg)
->                 karg.inode =3D 0;
->         }
->
-> -       if (karg.build_id_size) {
-> -               __u32 build_id_sz;
-> -
-> -               err =3D build_id_parse(vma, build_id_buf, &build_id_sz);
-> -               if (err) {
-> -                       karg.build_id_size =3D 0;
-> -               } else {
-> -                       if (karg.build_id_size < build_id_sz) {
-> -                               err =3D -ENAMETOOLONG;
-> -                               goto out;
-> -                       }
-> -                       karg.build_id_size =3D build_id_sz;
-> -               }
-> -       }
-> -
->         if (karg.vma_name_size) {
->                 size_t name_buf_sz =3D min_t(size_t, PATH_MAX,
-> karg.vma_name_size);
->                 const struct path *path;
-> @@ -779,6 +768,28 @@ static int do_procmap_query(struct mm_struct *mm,
-> void __user *uarg)
->         query_vma_teardown(&lock_ctx);
->         mmput(mm);
->
-> +       if (karg.build_id_size) {
-> +               __u32 build_id_sz;
-> +
-> +               err =3D -ENOENT;
-> +               if (vm_file)
-> +                       err =3D build_id_parse_file(vm_file,
-> build_id_buf, &build_id_sz);
-> +               if (err) {
-> +                       karg.build_id_size =3D 0;
-> +               } else {
-> +                       if (karg.build_id_size < build_id_sz) {
-> +                               err =3D -ENAMETOOLONG;
-> +                               goto out;
-> +                       }
-> +                       karg.build_id_size =3D build_id_sz;
-> +               }
-> +       }
-> +
-> +       if (vm_file) {
-> +               fput(vm_file);
-> +               vm_file =3D NULL;
-> +       }
-> +
->         if (karg.vma_name_size &&
-> copy_to_user(u64_to_user_ptr(karg.vma_name_addr),
->                                                name, karg.vma_name_size))=
- {
->                 kfree(name_buf);
-> @@ -797,6 +808,8 @@ static int do_procmap_query(struct mm_struct *mm,
-> void __user *uarg)
->
->  out:
->         query_vma_teardown(&lock_ctx);
-> +       if (vm_file)
-> +               fput(vm_file);
->         mmput(mm);
->         kfree(name_buf);
->         return err;
-> diff --git a/include/linux/buildid.h b/include/linux/buildid.h
-> index 831c1b4b626c..7acc06b22fb7 100644
-> --- a/include/linux/buildid.h
-> +++ b/include/linux/buildid.h
-> @@ -7,7 +7,10 @@
->  #define BUILD_ID_SIZE_MAX 20
->
->  struct vm_area_struct;
-> +struct file;
-> +
->  int build_id_parse(struct vm_area_struct *vma, unsigned char
-> *build_id, __u32 *size);
-> +int build_id_parse_file(struct file *file, unsigned char *build_id,
-> __u32 *size);
->  int build_id_parse_nofault(struct vm_area_struct *vma, unsigned char
-> *build_id, __u32 *size);
->  int build_id_parse_buf(const void *buf, unsigned char *build_id, u32 buf=
-_size);
->
-> diff --git a/lib/buildid.c b/lib/buildid.c
-> index aaf61dfc0919..c0002129d526 100644
-> --- a/lib/buildid.c
-> +++ b/lib/buildid.c
-> @@ -271,7 +271,7 @@ static int get_build_id_64(struct freader *r,
-> unsigned char *build_id, __u32 *si
->  /* enough for Elf64_Ehdr, Elf64_Phdr, and all the smaller requests */
->  #define MAX_FREADER_BUF_SZ 64
->
-> -static int __build_id_parse(struct vm_area_struct *vma, unsigned char
-> *build_id,
-> +static int __build_id_parse(struct file *file, unsigned char *build_id,
->                             __u32 *size, bool may_fault)
->  {
->         const Elf32_Ehdr *ehdr;
-> @@ -279,11 +279,7 @@ static int __build_id_parse(struct vm_area_struct
-> *vma, unsigned char *build_id,
->         char buf[MAX_FREADER_BUF_SZ];
->         int ret;
->
-> -       /* only works for page backed storage  */
-> -       if (!vma->vm_file)
-> -               return -EINVAL;
-> -
-> -       freader_init_from_file(&r, buf, sizeof(buf), vma->vm_file, may_fa=
-ult);
-> +       freader_init_from_file(&r, buf, sizeof(buf), file, may_fault);
->
->         /* fetch first 18 bytes of ELF header for checks */
->         ehdr =3D freader_fetch(&r, 0, offsetofend(Elf32_Ehdr, e_type));
-> @@ -324,7 +320,11 @@ static int __build_id_parse(struct vm_area_struct
-> *vma, unsigned char *build_id,
->   */
->  int build_id_parse_nofault(struct vm_area_struct *vma, unsigned char
-> *build_id, __u32 *size)
->  {
-> -       return __build_id_parse(vma, build_id, size, false /* !may_fault =
-*/);
-> +       /* only works for page backed storage  */
-> +       if (!vma->vm_file)
-> +               return -EINVAL;
-> +
-> +       return __build_id_parse(vma->vm_file, build_id, size, false /*
-> !may_fault */);
->  }
->
->  /*
-> @@ -340,7 +340,16 @@ int build_id_parse_nofault(struct vm_area_struct
-> *vma, unsigned char *build_id,
->   */
->  int build_id_parse(struct vm_area_struct *vma, unsigned char
-> *build_id, __u32 *size)
->  {
-> -       return __build_id_parse(vma, build_id, size, true /* may_fault */=
-);
-> +       /* only works for page backed storage  */
-> +       if (!vma->vm_file)
-> +               return -EINVAL;
-> +
-> +       return __build_id_parse(vma->vm_file, build_id, size, true /*
-> may_fault */);
-> +}
-> +
-> +int build_id_parse_file(struct file *file, unsigned char *build_id,
-> __u32 *size)
-> +{
-> +       return __build_id_parse(file, build_id, size, true /* may_fault *=
-/);
->  }
->
->  /**
->
->
-> >
-> > >
-> > > [   62.320932][ T9229]
-> > > [   62.321471][ T9229] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > [   62.323016][ T9229] WARNING: possible circular locking dependency =
-detected
-> > > [   62.324618][ T9229] 6.19.0-rc6-00001-g40bea6261b2a #42 Not tainted
-> > > [   62.326013][ T9229] ----------------------------------------------=
---------
-> > > [   62.327560][ T9229] hillf/9229 is trying to acquire lock:
-> > > [   62.328821][ T9229] ffff888145b7b5a8
-> > > (&sb->s_type->i_mutex_key#8){++++}-{4:4}, at:
-> > > blkdev_read_iter+0x2a7/0x4e0
-> > > [   62.331102][ T9229]
-> > > [   62.331102][ T9229] but task is already holding lock:
-> > > [   62.332722][ T9229] ffff888183a6e540 (&mm->mmap_lock){++++}-{4:4},
-> > > at: do_procmap_query+0x39f/0x1050
-> > > [   62.334795][ T9229]
-> > > [   62.334795][ T9229] which lock already depends on the new lock.
-> > > [   62.334795][ T9229]
-> > > [   62.337072][ T9229]
-> > > [   62.337072][ T9229] the existing dependency chain (in reverse orde=
-r) is:
-> > > [   62.338998][ T9229]
-> > > [   62.338998][ T9229] -> #1 (&mm->mmap_lock){++++}-{4:4}:
-> > > [   62.340646][ T9229]        __might_fault+0xed/0x170
-> > > [   62.341763][ T9229]        _copy_to_iter+0x118/0x1720
-> > > [   62.342913][ T9229]        copy_page_to_iter+0x12d/0x1e0
-> > > [   62.344167][ T9229]        filemap_read+0x720/0x10a0
-> > > [   62.345298][ T9229]        blkdev_read_iter+0x2b5/0x4e0
-> > > [   62.346480][ T9229]        vfs_read+0x7f4/0xae0
-> > > [   62.347518][ T9229]        ksys_read+0x12a/0x250
-> > > [   62.348584][ T9229]        do_syscall_64+0xcb/0xf80
-> > > [   62.349707][ T9229]        entry_SYSCALL_64_after_hwframe+0x77/0x7=
-f
-> > > [   62.351116][ T9229]
-> > > [   62.351116][ T9229] -> #0 (&sb->s_type->i_mutex_key#8){++++}-{4:4}=
-:
-> > > [   62.353012][ T9229]        __lock_acquire+0x1509/0x26d0
-> > > [   62.354213][ T9229]        lock_acquire+0x185/0x340
-> > > [   62.355323][ T9229]        down_read+0x98/0x490
-> > > [   62.356441][ T9229]        blkdev_read_iter+0x2a7/0x4e0
-> > > [   62.357619][ T9229]        __kernel_read+0x39a/0xa90
-> > > [   62.358767][ T9229]        freader_fetch+0x1d5/0xa80
-> > > [   62.359927][ T9229]        __build_id_parse.isra.0+0xea/0x6a0
-> > > [   62.361232][ T9229]        do_procmap_query+0xd75/0x1050
-> > > [   62.362434][ T9229]        procfs_procmap_ioctl+0x7a/0xb0
-> > > [   62.363687][ T9229]        __x64_sys_ioctl+0x18e/0x210
-> > > [   62.364863][ T9229]        do_syscall_64+0xcb/0xf80
-> > > [   62.365977][ T9229]        entry_SYSCALL_64_after_hwframe+0x77/0x7=
-f
-> > > [   62.367394][ T9229]
-> > > [   62.367394][ T9229] other info that might help us debug this:
-> > > [   62.367394][ T9229]
-> > > [   62.369637][ T9229]  Possible unsafe locking scenario:
-> > > [   62.369637][ T9229]
-> > > [   62.371237][ T9229]        CPU0                    CPU1
-> > > [   62.372441][ T9229]        ----                    ----
-> > > [   62.373687][ T9229]   rlock(&mm->mmap_lock);
-> > > [   62.374688][ T9229]
-> > > lock(&sb->s_type->i_mutex_key#8);
-> > > [   62.376444][ T9229]                                lock(&mm->mmap_=
-lock);
-> > > [   62.377956][ T9229]   rlock(&sb->s_type->i_mutex_key#8);
-> > > [   62.379165][ T9229]
-> > > [   62.379165][ T9229]  *** DEADLOCK ***
-> > > [   62.379165][ T9229]
-> > > [   62.380952][ T9229] 1 lock held by hillf/9229:
-> > > [   62.381971][ T9229]  #0: ffff888183a6e540
-> > > (&mm->mmap_lock){++++}-{4:4}, at: do_procmap_query+0x39f/0x1050
-> > > [   62.384162][ T9229]
-> > > [   62.384162][ T9229] stack backtrace:
-> > > [   62.385458][ T9229] CPU: 3 UID: 0 PID: 9229 Comm: hillf Not tainte=
-d
-> > > 6.19.0-rc6-00001-g40bea6261b2a #42 PREEMPT(full)
-> > > [   62.385471][ T9229] Hardware name: QEMU Standard PC (i440FX + PIIX=
-,
-> > > 1996), BIOS 1.17.0-debian-1.17.0-1 04/01/2014
-> > > [   62.385477][ T9229] Call Trace:
-> > > [   62.385482][ T9229]  <TASK>
-> > > [   62.385487][ T9229]  dump_stack_lvl+0x100/0x190
-> > > [   62.385505][ T9229]  print_circular_bug.cold+0x185/0x1d5
-> > > [   62.385521][ T9229]  check_noncircular+0x14a/0x170
-> > > [   62.385534][ T9229]  __lock_acquire+0x1509/0x26d0
-> > > [   62.385547][ T9229]  lock_acquire+0x185/0x340
-> > > [   62.385557][ T9229]  ? blkdev_read_iter+0x2a7/0x4e0
-> > > [   62.385569][ T9229]  ? __pfx___might_resched+0x10/0x10
-> > > [   62.385583][ T9229]  down_read+0x98/0x490
-> > > [   62.385593][ T9229]  ? blkdev_read_iter+0x2a7/0x4e0
-> > > [   62.385603][ T9229]  ? __pfx_down_read+0x10/0x10
-> > > [   62.385612][ T9229]  ? lock_acquire+0x185/0x340
-> > > [   62.385622][ T9229]  ? is_bpf_text_address+0x25/0x1a0
-> > > [   62.385634][ T9229]  blkdev_read_iter+0x2a7/0x4e0
-> > > [   62.385645][ T9229]  __kernel_read+0x39a/0xa90
-> > > [   62.385658][ T9229]  ? __pfx___kernel_read+0x10/0x10
-> > > [   62.385671][ T9229]  ? __lock_acquire+0x481/0x26d0
-> > > [   62.385683][ T9229]  freader_fetch+0x1d5/0xa80
-> > > [   62.385697][ T9229]  ? find_held_lock+0x2b/0x80
-> > > [   62.385712][ T9229]  ? __pfx_freader_fetch+0x10/0x10
-> > > [   62.385725][ T9229]  ? __asan_memset+0x27/0x50
-> > > [   62.385737][ T9229]  __build_id_parse.isra.0+0xea/0x6a0
-> > > [   62.385751][ T9229]  ? __pfx___build_id_parse.isra.0+0x10/0x10
-> > > [   62.385766][ T9229]  ? __pfx_find_vma+0x10/0x10
-> > > [   62.385774][ T9229]  ? __might_fault+0x129/0x170
-> > > [   62.385788][ T9229]  do_procmap_query+0xd75/0x1050
-> > > [   62.385798][ T9229]  ? __pfx_do_procmap_query+0x10/0x10
-> > > [   62.385807][ T9229]  ? __sanitizer_cov_trace_switch+0x53/0x90
-> > > [   62.385817][ T9229]  ? do_vfs_ioctl+0x226/0x13b0
-> > > [   62.385828][ T9229]  ? __pfx_do_vfs_ioctl+0x10/0x10
-> > > [   62.385839][ T9229]  ? putname+0xfc/0x1b0
-> > > [   62.385846][ T9229]  ? putname+0x101/0x1b0
-> > > [   62.385857][ T9229]  ? __x64_sys_openat+0x143/0x210
-> > > [   62.385867][ T9229]  procfs_procmap_ioctl+0x7a/0xb0
-> > > [   62.385877][ T9229]  ? __pfx_procfs_procmap_ioctl+0x10/0x10
-> > > [   62.385888][ T9229]  __x64_sys_ioctl+0x18e/0x210
-> > > [   62.385899][ T9229]  do_syscall_64+0xcb/0xf80
-> > > [   62.385913][ T9229]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> > > [   62.385923][ T9229] RIP: 0033:0x412209
-> > > [   62.385931][ T9229] Code: c0 79 93 eb d5 48 8d 7c 1d 00 eb 99 0f 1=
-f
-> > > 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b
-> > > 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 d8 ff ff ff f7 d=
-8
-> > > 64 89 01 48
-> > > [   62.385940][ T9229] RSP: 002b:00007fff380d5588 EFLAGS: 00000217
-> > > ORIG_RAX: 0000000000000010
-> > > [   62.385950][ T9229] RAX: ffffffffffffffda RBX: 00007fff380d56c8
-> > > RCX: 0000000000412209
-> > > [   62.385956][ T9229] RDX: 0000200000000180 RSI: 00000000c0686611
-> > > RDI: 0000000000000004
-> > > [   62.385962][ T9229] RBP: 00007fff380d55a0 R08: 0000000000000000
-> > > R09: 00007fff380d5640
-> > > [   62.385968][ T9229] R10: 0000000000000000 R11: 0000000000000217
-> > > R12: 00007fff380d56b8
-> > > [   62.385974][ T9229] R13: 0000000000000002 R14: 00000000004a0e40
-> > > R15: 0000000000000002
-> > > [   62.385982][ T9229]  </TASK>
-> > >
-> > >
-> > >
-> > > >
-> > > > > > other info that might help us debug this:
-> > > > > >
-> > > > > > Chain exists of:
-> > > > > >   &sb->s_type->i_mutex_key#8 --> &mm->mmap_lock --> vm_lock
-> > > > > >
-> > > > > >  Possible unsafe locking scenario:
-> > > > > >
-> > > > > >        CPU0                    CPU1
-> > > > > >        ----                    ----
-> > > > > >   rlock(vm_lock);
-> > > > > >                                lock(&mm->mmap_lock);
-> > > > > >                                lock(vm_lock);
-> > > > > >   rlock(&sb->s_type->i_mutex_key#8);
-> > > > > >
-> > > > > >  *** DEADLOCK ***
-> > > > > >
-> > > > > > 1 lock held by syz.0.17/6091:
-> > > > > >  #0: ffff888012aa0448 (vm_lock){++++}-{0:0}, at: lock_next_vma+=
-0x10e/0xed0 mm/mmap_lock.c:334
-> > > > > >
-> > > > > > stack backtrace:
-> > > > > > CPU: 2 UID: 0 PID: 6091 Comm: syz.0.17 Not tainted syzkaller #0=
- PREEMPT(full)
-> > > > > > Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3=
--debian-1.16.3-2~bpo12+1 04/01/2014
-> > > > > > Call Trace:
-> > > > > >  <TASK>
-> > > > > >  __dump_stack lib/dump_stack.c:94 [inline]
-> > > > > >  dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
-> > > > > >  print_circular_bug+0x275/0x340 kernel/locking/lockdep.c:2043
-> > > > > >  check_noncircular+0x146/0x160 kernel/locking/lockdep.c:2175
-> > > > > >  check_prev_add kernel/locking/lockdep.c:3165 [inline]
-> > > > > >  check_prevs_add kernel/locking/lockdep.c:3284 [inline]
-> > > > > >  validate_chain kernel/locking/lockdep.c:3908 [inline]
-> > > > > >  __lock_acquire+0x1669/0x2890 kernel/locking/lockdep.c:5237
-> > > > > >  lock_acquire kernel/locking/lockdep.c:5868 [inline]
-> > > > > >  lock_acquire+0x179/0x330 kernel/locking/lockdep.c:5825
-> > > > > >  down_read+0x9b/0x460 kernel/locking/rwsem.c:1537
-> > > > > >  inode_lock_shared include/linux/fs.h:1042 [inline]
-> > > > > >  blkdev_read_iter+0x19e/0x500 block/fops.c:855
-> > > > > >  __kernel_read+0x3f3/0xbf0 fs/read_write.c:530
-> > > > > >  freader_fetch+0x1d7/0x9d0 lib/buildid.c:100
-> > > > > >  __build_id_parse.isra.0+0xdd/0x6c0 lib/buildid.c:297
-> > > > > >  do_procmap_query+0xb0e/0x1080 fs/proc/task_mmu.c:733
-> > > > > >  procfs_procmap_ioctl+0x9d/0xe0 fs/proc/task_mmu.c:813
-> > > > > >  vfs_ioctl fs/ioctl.c:51 [inline]
-> > > > > >  __do_sys_ioctl fs/ioctl.c:597 [inline]
-> > > > > >  __se_sys_ioctl fs/ioctl.c:583 [inline]
-> > > > > >  __x64_sys_ioctl+0x18e/0x210 fs/ioctl.c:583
-> > > > > >  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-> > > > > >  do_syscall_64+0xcd/0xf80 arch/x86/entry/syscall_64.c:94
-> > > > > >  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> > > > > > RIP: 0033:0x7ff1a238f7c9
-> > > > > > Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 =
-f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3=
-d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-> > > > > > RSP: 002b:00007ffebbe538b8 EFLAGS: 00000246 ORIG_RAX: 000000000=
-0000010
-> > > > > > RAX: ffffffffffffffda RBX: 00007ff1a25e5fa0 RCX: 00007ff1a238f7=
-c9
-> > > > > > RDX: 0000200000000180 RSI: 00000000c0686611 RDI: 00000000000000=
-04
-> > > > > > RBP: 00007ff1a2413f91 R08: 0000000000000000 R09: 00000000000000=
-00
-> > > > > > R10: 0000000000000000 R11: 0000000000000246 R12: 00000000000000=
-00
-> > > > > > R13: 00007ff1a25e5fa0 R14: 00007ff1a25e5fa0 R15: 00000000000000=
-03
-> > > > > >  </TASK>
+T24gMS8yNi8yNiAyMzowNiwgU2hpbmljaGlybyBLYXdhc2FraSB3cm90ZToNCj4gSGFyaXMgYW5k
+IEplbnMsDQo+DQo+IEkgc3VnZ2VzdCB0byBwaWNrIHVwIDU4MWNmODMzY2FjNCAoImJsb2NrOiBy
+bmJkOiBhZGQgLnJlbGVhc2UgdG8NCj4gcm5iZF9kZXZfa3R5cGUiKSB0byB2Ni4xOS1yYzggdG8g
+Zml4IHRoZSBrbWVtbGVhayBpc3N1ZSBvbiB0aGUgTGludXMgbWFzdGVyDQo+IGJyYW5jaC4gSSBh
+cHBsaWVkIDU4MWNmODMzY2FjNCBvbiB0b3Agb2YgdjYuMTgtcmM3IGtlcm5lbCwgYW5kIGNvbmZp
+cm1lZCB0aGUNCj4ga21lbWxlYWsgZmFpbHVyZSBkaXNhcHBlYXJzLg0KDQpUaGFua3MgeW91IFNo
+aW5pY2hpcm8gZm9yIGRldGFpbGVkIGFuYWx5c2lzLiBQbGVhc2UgbGV0IG1lIGtub3cgaWYgdGhl
+cmUgDQppcyBhbnl0aGluZyBJIGNhbiBkby4gLWNrDQoNCg==
