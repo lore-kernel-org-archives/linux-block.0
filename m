@@ -1,99 +1,130 @@
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAF06302176
-	for <linux-block@vger.kernel.org>; Wed, 28 Jan 2026 04:16:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81ADA2264A8;
+	Wed, 28 Jan 2026 04:49:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769573803; cv=none; b=pekZxqWe4ugd6E97LtI0K5K2uGlmMejNEHjhOaYnGDN7HupUlKViGtdGBIcP70JFimKVRE3KkNK8UQFKARgRi2H8EwodlNeaUK8CAxbt7vNOsXV566wR8s4hPBKfmphOBvIBCG/rGvrtQnrB4vitW0IKVdfCJ86PONJ958u4UA8=
+	t=1769575779; cv=none; b=CsZ0Ig0TJNRuMkyFqm7KnkDayHPpP2iBAU/6cOqWyZrGoSO+Y5KhxxoMJbRv/2cGkR9XOSDeRDcY4b7EwMNkqQOZEAeWRIgmih4NljzFhSnLyfgERlvzH4DidfXgQOmao7UVW2CqFroq8dF2XiGQTynZtINmPb+RpP/uGYG336E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769573803; c=relaxed/simple;
-	bh=bTImWss/BYcQhZ+04PoDOpJtXc3wnrm41egoAIBRf14=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nPd2jLR/sM9kmuPrMHWbS0lWtHKDXkUIqejwUtvBYQb0XEp28mfq8QnHInIme2hkW7p3BftJvukX2sQeEMi5EoS9PhbgzEK/0/tN2m7E+kaQqiG1i0OY11eCI6yzhuzDrS8DRakX0y67OBQAqmjgLwe2R3R1xToD4aSp9om8dlU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=pFQ+hf93; arc=none smtp.client-ip=209.85.219.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1769575779; c=relaxed/simple;
+	bh=umvKSX/52KFvcK5MHhG0AKEwZqp2cQ4avhWh2heNEbY=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=YKHYhu8ACvPo5kjHG4DkdDoVjZcyq4/9rTqTPd3cpwufufojdLOP6wv2oV+WndYw0j+uEo/pj8hLU0wu9VnIi0fnoW2mOFi9W3bxgD2U2P1zJWE4ny4wnsik723F4xQHTHIetstiJUxKXjzA9Z8a8Sx0cTrqyqZhe8a+HWbbXDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B0lKhTh2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="pFQ+hf93"
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-88a367a1dbbso108603086d6.0
-        for <linux-block@vger.kernel.org>; Tue, 27 Jan 2026 20:16:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1769573799; x=1770178599; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HoifIw0qoxwdt8GUgoNTHtGtVpgiDjUypOcaxxgq9j0=;
-        b=pFQ+hf93zVxSn4K/WMonwcEURhJz4AV7Zjt/w4HxDOfH+ueR/e8ay0OoJ4zwSt5cs/
-         SRHVFsN0aLJ5aa4JEDrNXtn3meLxpSwxZRJJkaBBLjXxXxOS4Ku+0+4xfCItRQowq18F
-         E6LyHDktCDkkxk4b2SzRX06EtsFBxPboCk4nUu7X0vHTJ9zToQvRr+bJyuODntvHpIQI
-         R/TJ5jebQqwOmNAsU69eLulISfy11uQ9iNmZGb/f/lO4YTbi4caIRMZvlR4SjdLrY4lj
-         j5JIicgOB12bgP4qlSpAS0NT1v+x2EMZjKTB/0p2agdJUPeVGjImPc6xPchjDtXGShPI
-         nx3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769573799; x=1770178599;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HoifIw0qoxwdt8GUgoNTHtGtVpgiDjUypOcaxxgq9j0=;
-        b=H33HDssznjQoUlo88ToKJbPfeIhbxxAi2QJdulC31Y8v1DETL7mkAADD7NK/dL/ADO
-         wdXrMpbK7c2VcMOaNzawlxOzTG/4pO5Erefry9DH7bw6L204dh2GUzoL2kMgj8OdyAfO
-         zDSU99xNMDjEQYL/CEErqxQ/kV+Ysh0+0esW/ZKXlJfDQklOXHkU0jCD5NkPsNZAyEBY
-         APP/K33xbe3PLxMEEsjZM3HnupKRa8Y42lZGszl7iFV9uPXk69qx7BJ9kJJOXtYC5jHM
-         e1WmkSQbAHFPX/JNRKtr1Yko76DL//D2FHHivzY1IudTPqL2Vu5iVCKUJCWtmNfvKHuP
-         RPiA==
-X-Forwarded-Encrypted: i=1; AJvYcCWihCVzEsDpu8lBnoKwl7yQ+zp4Z9wLtL9fXq3jjsKB5MCiwuxu+xQBdfpKdPmOK+e/ImLYOOKbox5BEg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzEudIP5H6Ym7zWrYA0beVR9Sw9NebWu+TwCCOsiIiz+79S38wx
-	f4rhs6R39rMdyBKrqS2QUmxGv7G+1mXBHOZjtub0rsDWcgm4DvMdFbY5eymHKuc4s+g=
-X-Gm-Gg: AZuq6aJ1+eKcqKtMKrlRbynVCjfdgj6ZlHWjjOjkgBNcx3SAb5INvPqt9A6+EaWJEqI
-	VTU0+/zjcK+en+y6kkqLy16BMAiGqkhj8xYPVD0w1sxVZuL74q+l9nxDUd9TIDqOEmPvNNXRUjJ
-	X+wshlk1q3WsCixarMZhuQ67DMkziXKPo4ePgGYzcMvPWa8SYtY7v6E+vl1B/mKtVrrUxGlxF4u
-	izCNnwabUIBPm/+rsSGyiBPma/STSPyFjRlgRG4d9LvettDh1QNkrtk2R/c68LI2QjHIAh0h5m8
-	K7XeOBphbBB9oQZ28aFIUjT5WS+vAY06LxtEo0ZJeAuzW+ZgzFrkkZHL/F6+FkSeeqN5F2OB1Ds
-	kD1NoqLq/Em4gsuJXrdEqYYV2bqEo8pCxrkvaOWSRQgQhIiODxgpfuG3hYjYXX/DA0Es4gsrhWQ
-	lqNcn7LM69VgUx/owqMQ/OC5imwfs9H7HWM3HNHkYa9H/e1v537ZX/wMePler2xXopbpIqMTY=
-X-Received: by 2002:a05:6214:e83:b0:894:6a0b:2483 with SMTP id 6a1803df08f44-894cc95735dmr64225836d6.53.1769573798725;
-        Tue, 27 Jan 2026 20:16:38 -0800 (PST)
-Received: from [192.168.201.17] ([50.234.116.5])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-894d375eb4dsm9914336d6.46.2026.01.27.20.16.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Jan 2026 20:16:38 -0800 (PST)
-Message-ID: <10668b83-05f7-4745-bfcb-591d70379433@kernel.dk>
-Date: Tue, 27 Jan 2026 21:16:36 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B0lKhTh2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE0FAC4CEF1;
+	Wed, 28 Jan 2026 04:49:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769575779;
+	bh=umvKSX/52KFvcK5MHhG0AKEwZqp2cQ4avhWh2heNEbY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=B0lKhTh2fBTFrbFQfkBWAhdNbPv3OAFg8tZd7cUPRHPbMgsEVLAVe6sdk9CeeLvmZ
+	 SpjBlV5ok89NVLuCmw1KeusKTit1bQThc42K2xA67VjAsbP0F5d/nBAirKSqrqB927
+	 LKDxmzy4EH7Qu1mD24Oe6fdmSOAwqc+KX0H1umEojUQG2xyvC7U0cYl08xf6CxUAgz
+	 9AbA0SFh5vpGPB8fw4sN/1tWMFlted+1hI4crCt2LpP6BnuhXwBuZzKSgBDEL8AbY1
+	 XtK72PenfJhMvXpvOy7GUJAcNtPZHXnNhSfrwJyAuek4lT1wFmUSn0AeT8dBoWuD+Z
+	 yTRFgmN78Zp7w==
+Date: Wed, 28 Jan 2026 13:49:36 +0900
+From: Masami Hiramatsu (Google) <mhiramat@kernel.org>
+To: Yaxiong Tian <tianyaxiong@kylinos.cn>
+Cc: rostedt@goodmis.org, axboe@kernel.dk, mathieu.desnoyers@efficios.com,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 2/3] tracing/kprobes: Make setup_boot_kprobe_events()
+ asynchronous
+Message-Id: <20260128134936.539782c2112073e55e7a0304@kernel.org>
+In-Reply-To: <20260127012312.84659-1-tianyaxiong@kylinos.cn>
+References: <20260127012016.76713-1-tianyaxiong@kylinos.cn>
+	<20260127012312.84659-1-tianyaxiong@kylinos.cn>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] rnbd-clt: fix refcount underflow in device unmap path
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- Chaitanya Kulkarni <ckulkarnilinux@gmail.com>
-Cc: "haris.iqbal@ionos.com" <haris.iqbal@ionos.com>,
- "jinpu.wang@ionos.com" <jinpu.wang@ionos.com>,
- "yanjun.zhu@linux.dev" <yanjun.zhu@linux.dev>,
- "grzegorz.prajsner@ionos.com" <grzegorz.prajsner@ionos.com>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <20260112231928.68185-1-ckulkarnilinux@gmail.com>
- <aXhLQmRudk7cSAnT@shinmob>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <aXhLQmRudk7cSAnT@shinmob>
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 1/27/26 12:06 AM, Shinichiro Kawasaki wrote:
-> Haris and Jens,
-> 
-> I suggest to pick up 581cf833cac4 ("block: rnbd: add .release to
-> rnbd_dev_ktype") to v6.19-rc8 to fix the kmemleak issue on the Linus master
-> branch. I applied 581cf833cac4 on top of v6.18-rc7 kernel, and confirmed the
-> kmemleak failure disappears.
+On Tue, 27 Jan 2026 09:23:12 +0800
+Yaxiong Tian <tianyaxiong@kylinos.cn> wrote:
 
-I reverted the fix from 6.19 instead, and picked up the offending commit
-in for-7.0/block.
+> During kernel boot, the setup_boot_kprobe_events() function causes
+> significant delays, increasing overall startup time.
+> 
+> The root cause is a lock contention chain: its child function
+> enable_boot_kprobe_events() requires the event_mutex, which is
+> already held by early_event_add_tracer(). early_event_add_tracer()
+> itself is blocked waiting for the trace_event_sem  read-write lock,
+> which is held for an extended period by trace_event_update_all().
+> 
+> To resolve this, we have moved the execution of
+> setup_boot_kprobe_events() to the trace_init_wq  workqueue, allowing
+> it to run asynchronously.
+> 
+> Signed-off-by: Yaxiong Tian <tianyaxiong@kylinos.cn>
+> ---
+>  kernel/trace/trace_kprobe.c | 14 +++++++++++++-
+>  1 file changed, 13 insertions(+), 1 deletion(-)
+> 
+> diff --git a/kernel/trace/trace_kprobe.c b/kernel/trace/trace_kprobe.c
+> index 9953506370a5..4c6621f02696 100644
+> --- a/kernel/trace/trace_kprobe.c
+> +++ b/kernel/trace/trace_kprobe.c
+> @@ -2031,6 +2031,13 @@ static __init int init_kprobe_trace_early(void)
+>  }
+>  core_initcall(init_kprobe_trace_early);
+>  
+> +static struct work_struct kprobe_trace_work __initdata;
+> +
+> +static void __init kprobe_trace_works_func(struct work_struct *work)
+> +{
+> +	setup_boot_kprobe_events();
+> +}
+> +
+>  /* Make a tracefs interface for controlling probe points */
+>  static __init int init_kprobe_trace(void)
+>  {
+> @@ -2048,7 +2055,12 @@ static __init int init_kprobe_trace(void)
+>  	trace_create_file("kprobe_profile", TRACE_MODE_READ,
+>  			  NULL, NULL, &kprobe_profile_ops);
+>  
+> -	setup_boot_kprobe_events();
+> +	if (trace_init_wq) {
+> +		INIT_WORK(&kprobe_trace_work, kprobe_trace_works_func);
+> +		queue_work(trace_init_wq, &kprobe_trace_work);
+
+Hmm, this queue_work is not required if kprobe_boot_events_buf[] is
+empty. We should check it because most of the time we don't need it.
+Also, deferring initialization makes it indeterminate when this
+tracing will begin.
+
+For kprobe event use case, I think setup_boot_kprobe_events() should
+check the kprobe_boot_events_buf is empty at first. But I think Yaxiong
+use case happens when you are using kprobe events via cmdline, is that
+correct?
+
+I think introducing "async" cmdline option is more preferable.
+
+BTW, I found that the kprobe events from kernel cmdline will be made
+after boot-time tracing from bootconfig. Maybe it should be run this
+earlier timing too.
+
+Thank you,
+
+
+> +	} else {
+> +		setup_boot_kprobe_events();
+> +	}
+>  
+>  	return 0;
+>  }
+> -- 
+> 2.25.1
+> 
+
 
 -- 
-Jens Axboe
+Masami Hiramatsu (Google) <mhiramat@kernel.org>
