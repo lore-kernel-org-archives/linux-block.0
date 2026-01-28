@@ -1,96 +1,141 @@
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C89AF34EEFA
-	for <linux-block@vger.kernel.org>; Wed, 28 Jan 2026 12:28:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C37C1DE2AD;
+	Wed, 28 Jan 2026 12:51:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769603314; cv=none; b=XQNdsN+oXJAebHir/jNPrF69PMfwbrXBRtK3hZsi5apWICj4FmL03IJcigMreysMUPE4C4TKnJz/6afKmL4BCxEGj03rjzUVY8LT+a+UD757lDkHmsg1t2BvsEi/KeS3sWxiwMBfn9dc8pquPT1Um4+Oa52r7lY2GLNMXXsqAbA=
+	t=1769604705; cv=none; b=XWmVzUxxaxrd8mJdl0YOJrMAZn1C3zG53oJ7skt0GyTLgsSwc8Xn96kVlLFbLAfUIPrP/ICTHrKgolpF8mXDPt5y50THckmxdlt2lxbuOCIl16Gt0CMDDnRKTtfiC4qNxFiiBHpqCcopnHiB+xn0yi0SAVScmkSYm40PPKweAJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769603314; c=relaxed/simple;
-	bh=WieMihouRH3yblcjYO919ii/575NNtK42r5AoPOiE04=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=hZyYUgLVkeXGRzhc3dlIEmsqPeXrfMiKLNSo85b/krVIsVEEVxT+js9jBVlWgKIS1sbm0DtIYi+L67Nm2SpvNLW0fFJQTxkpYjRl07GEFn+uUkmeamY9ymIG2FDYWNqbIzt6cmbTGF5PhyLVbCj4jQea90kEjix8qs7qJuso/wI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=dfLMUI+9; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="dfLMUI+9"
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-502a789834fso56711011cf.2
-        for <linux-block@vger.kernel.org>; Wed, 28 Jan 2026 04:28:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1769603312; x=1770208112; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OkTSOzBpSUcG6pRtvf4q8YShTh5K2XFL4/Cb5Ho1saI=;
-        b=dfLMUI+9bYxn74brbHEsn22FygZ3mwEvYbF92Nl/1FSLqrknnXYe5Tz/1Q2CSDzg/Y
-         jd8YqPawvKiXFQYpok0J11yNbOABO/jC8h2L230WDIJtd4hkdSqAgZFAqBMBcL/SWfcw
-         h5cfI7dgocvChko+mYiy554dinvK5v1Vphw8zNx8efZLf7K3zkAxmbnVw10UH9LKd+nu
-         FcNiPpqAB61ozyBdVjpvpCAgConnsIEsXoaNsMHtYEYniWdg3Jp/jKyrHv3ndNDKSOHJ
-         nXAMaPCVvhUhHU3KiyuEM+ljNwBNuZybvk61exofyXnBUMNLNMtZdD7Y02ynz3cs3rVY
-         85vw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769603312; x=1770208112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=OkTSOzBpSUcG6pRtvf4q8YShTh5K2XFL4/Cb5Ho1saI=;
-        b=KygLPdpAQJBVGU7QPaoetj0BJ8194opACMZDs3VtN5aW1nQsdny18HsYvTaOFMNzNH
-         qt3lipwmOB2eNbspaB4VM6OVF6ZcgXQb9+bH5e9BD/4y11AJcpRGO90iDpH33h9IDpV6
-         f2kX2kz3gQRNjKKiFaia2H3BzvPctkVBVhW3VKDG/Qdji7wcMUt0phBHcDJJocwUSH3W
-         4wQUtX7gqtyPh6ftB1VZpNNglr6vlQbC2u6meuqZYgAtvcQEBhFe6kBRO9t2cj1OV0aC
-         0Na8BRotJz1/VILQLIQtxNEkZKDZYcXwlz4RIowHqTK3stH9ru8U29grnHI5ZjDNHDPM
-         yDKg==
-X-Gm-Message-State: AOJu0Yxxio9gTrhzewcd6bZsw4NZvJCBI8KBA8MAVITMQclXpUt5yWgv
-	9WA2vyv1a99FKtc02O2Oudvfqu3zR02llu7pEzPae1SYolBOF0NQ2p2vXa+qC29w84w=
-X-Gm-Gg: AZuq6aLnTzMwMBRIDAV1CkosuZsHMkGQ4aRktZPy78NBzN7QN0hkVQhx3rVrQLkcyy7
-	yqWywQ+0HPrEq8nqBl8caEkB6/VYS4moyAxQqarH9SNJGF+YLixRc+6GvA9if3jyMMZ+pIWa+cQ
-	UZsGD0tBRQmSEhBbxLobWs1y+yb1CKeeoFQU2PWSMXSNQ5YWS0GZTt+TPgeb55GqAGAtExcd2w+
-	BwNKMXGd9+9U26WF6oUUZW3JJljx4Cc+T8fOdeW53yaBzRUEDOiTydQ0r6Ljwuzs9Tr1mpf0QBE
-	uEc+ZY1GBPJSpvUb7pM+kQeQvdEbuq8UfUjadDnx2jqJbwOMVwvO/HYX692RAgPi95hyty07cb5
-	doaokvxrGZY1HPf4jQoQwAzSFikVKM4zPnddWnO/C9tew/BFZ/iJBd3lY5O5L+w1eZH0ZPqVx49
-	eR8fh4OvYQlLn5465KwlnlPGUc9+g+apLB/B0TOie/c/BkSWYOfSYkGgBdICDADq+6kNw6T58Uc
-	y0=
-X-Received: by 2002:ac8:7f41:0:b0:4ee:42e5:f5ae with SMTP id d75a77b69052e-5032f8961b7mr58945351cf.25.1769603311767;
-        Wed, 28 Jan 2026 04:28:31 -0800 (PST)
-Received: from [127.0.0.1] ([50.234.116.5])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5033a4dcfefsm10974441cf.4.2026.01.28.04.28.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Jan 2026 04:28:30 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20260127224704.440877-1-thorsten.blum@linux.dev>
-References: <20260127224704.440877-1-thorsten.blum@linux.dev>
-Subject: Re: [PATCH] block: Replace snprintf with strscpy in
- check_partition
-Message-Id: <176960331041.194901.16439582104055685977.b4-ty@kernel.dk>
-Date: Wed, 28 Jan 2026 05:28:30 -0700
+	s=arc-20240116; t=1769604705; c=relaxed/simple;
+	bh=VfeSfNy9tmSOGhyx/aNm4BRVYjFdieR57cjNXNADOAQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=jI8Z29v15dCqNO8leFVNLHdMJDS20pGu9/j0BmD3OEEDTfGhxEGSFJtqgBAqFgXBprkYLFxkSht4I91dQ6D7rgXDBw7/vDkdcFnSG27lFpZVrntWDbIexeKXMmQkNrR/ksFp0gjtCY9efILxiU32N4YOSAuTlh1Mv/TRhL52pJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 1251b942fc4811f0b0f03b4cfa9209d1-20260128
+X-CTIC-Tags:
+	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
+	HR_CTT_TXT, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
+	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
+	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
+	HR_TO_NO_NAME, IP_UNTRUSTED, SRC_UNTRUSTED, IP_UNFAMILIAR, SRC_UNFAMILIAR
+	DN_TRUSTED, SRC_TRUSTED, SA_TRUSTED, SA_EXISTED, SN_TRUSTED
+	SN_EXISTED, SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS, CIE_GOOD_SPF
+	CIE_UNKNOWN, GTI_FG_BS, GTI_RG_INFO, GTI_C_BU, AMN_GOOD
+	ABX_MISS_RDNS
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.6,REQID:a70827dc-b6c5-4361-bdbe-a8f4e1ad788a,IP:10,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:5
+X-CID-INFO: VERSION:1.3.6,REQID:a70827dc-b6c5-4361-bdbe-a8f4e1ad788a,IP:10,URL
+	:0,TC:0,Content:0,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
+	elease,TS:5
+X-CID-META: VersionHash:a9d874c,CLOUDID:ae0ae57303552be8df558628df9162d0,BulkI
+	D:260128205135MNOENJBZ,BulkQuantity:0,Recheck:0,SF:17|19|38|66|78|102|127|
+	850|898,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bulk:nil
+	,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:
+	0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 1251b942fc4811f0b0f03b4cfa9209d1-20260128
+X-User: tianyaxiong@kylinos.cn
+Received: from localhost.localdomain [(175.2.149.138)] by mailgw.kylinos.cn
+	(envelope-from <tianyaxiong@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 1134550984; Wed, 28 Jan 2026 20:51:32 +0800
+From: Yaxiong Tian <tianyaxiong@kylinos.cn>
+To: mhiramat@kernel.org,
+	rostedt@goodmis.org,
+	axboe@kernel.dk,
+	mathieu.desnoyers@efficios.com,
+	corbet@lwn.net,
+	skhan@linuxfoundation.org
+Cc: linux-trace-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	Yaxiong Tian <tianyaxiong@kylinos.cn>
+Subject: [PATCH v4 0/5] Tracing: Accelerate Kernel Boot by Asynchronizing
+Date: Wed, 28 Jan 2026 20:51:17 +0800
+Message-Id: <20260128125117.1704853-1-tianyaxiong@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+On my ARM64 platform, I observed that certain tracing module
+initializations run for up to 200ms—for example, init_kprobe_trace().
+Analysis reveals the root cause: the execution flow eval_map_work_func()
+→trace_event_update_with_eval_map()→trace_event_update_all()
+is highly time-consuming. Although this flow is placed in eval_map_wq
+for asynchronous execution, it holds the trace_event_sem lock, causing
+other modules to be blocked either directly or indirectly. Also in
+init_blk_tracer(), this functions require trace_event_sem device_initcall.
 
-On Tue, 27 Jan 2026 23:47:01 +0100, Thorsten Blum wrote:
-> Replace snprintf("%s", ...) with the faster and more direct strscpy().
-> 
-> 
+To resolve this issue, I rename `eval_map_wq` and make it global and moved
+other initialization functions under the tracing subsystem that are
+related to this lock to run asynchronously on this workqueue. After this
+optimization, boot time is reduced by approximately 200ms.
 
-Applied, thanks!
+Given that asynchronous initialization makes it indeterminate when tracing
+will begin, we introduce the trace_async_init kernel parameter.Asynchronous
+behavior is enabled only when this parameter is explicitly provided.
 
-[1/1] block: Replace snprintf with strscpy in check_partition
-      commit: f46ebb910989a1db244f95bd1f937907591aa2ee
+Based on my analysis and testing, I've identified that only these two
+locations significantly impact timing. Other initcall_* functions do not
+exhibit relevant lock contention.
 
-Best regards,
+A brief summary of the test results is as follows:
+Before this PATCHS:
+[    0.224933] calling  init_kprobe_trace+0x0/0xe0 @ 1
+[    0.455016] initcall init_kprobe_trace+0x0/0xe0 returned 0 after 230080 usecs
+
+Only opt setup_boot_kprobe_events() can see:
+[    0.258609] calling  init_blk_tracer+0x0/0x68 @ 1
+[    0.454991] initcall init_blk_tracer+0x0/0x68 returned 0 after 196377 usecs
+
+After this PATCHS:
+[    0.224940] calling  init_kprobe_trace+0x0/0xe0 @ 1
+[    0.224946] initcall init_kprobe_trace+0x0/0xe0 returned 0 after 3 usecs
+skip --------
+[    0.264835] calling  init_blk_tracer+0x0/0x68 @ 1
+[    0.264841] initcall init_blk_tracer+0x0/0x68 returned 0 after 2 usecs
+
+---
+Changes in v2:
+- Rename eval_map_wq to trace_init_wq.
+Changes in v3:
+- Opt PATCH 1/3 commit
+Changes in v4:
+- add trace_async_init boot parameter in patch2
+- add init_kprobe_trace's skip logic in patch3
+- add Suggested-by tag 
+- Other synchronous optimizations related to trace_async_init
+
+Yaxiong Tian (5):
+  tracing: Rename `eval_map_wq` and allow other parts of tracing use it
+  tracing: add trace_async_init boot parameter
+  tracing/kprobes: Skip setup_boot_kprobe_events() when no cmdline event
+  tracing/kprobes: Make setup_boot_kprobe_events() asynchronous when
+    trace_async_init set
+  blktrace: Make init_blk_tracer() asynchronous when trace_async_init
+    set
+
+ .../admin-guide/kernel-parameters.txt         |  8 ++++++
+ kernel/trace/blktrace.c                       | 23 +++++++++++++++-
+ kernel/trace/trace.c                          | 27 ++++++++++++-------
+ kernel/trace/trace.h                          |  2 ++
+ kernel/trace/trace_kprobe.c                   | 18 ++++++++++++-
+ 5 files changed, 67 insertions(+), 11 deletions(-)
+
 -- 
-Jens Axboe
-
-
+2.25.1
 
