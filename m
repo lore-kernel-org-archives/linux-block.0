@@ -1,169 +1,156 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0275156236
-	for <linux-block@vger.kernel.org>; Wed, 28 Jan 2026 06:08:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D88051A285;
+	Wed, 28 Jan 2026 07:24:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769580512; cv=none; b=DcBBs3WIctSd5AtOlz2eX9br7K6ws2lcvmu4RZqj2FzrvB+c6Wlhr72aEmdH6BvqAh8vSzNl98WU03fmZAnTNGgYCCB+k5ana0wZNMmePC62Rt40fVjiwytR2SBzPyQHqRkIe8B2iEEke4YRGHX4tflSVsxNxS/VKfS0wV8arUw=
+	t=1769585070; cv=none; b=O6RXrOSMzOfnAP/+UK9FrMYKx1S1J84O31V7ZYWqq8USrtaj4g5Lv2YU4YHnRb/nUFFN/v4hH23bLqeSxDZbGwXVEydT2cmvUGCMto7qYtMvstSwjraClYN0OKoJIaQMxuQKOhGZt3SBWdE9EDMmar5ujMICp95/oxjduhpWK1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769580512; c=relaxed/simple;
-	bh=Tvtjma8yHYxT7hevJIZoKqVozmWu7Oxt+LywaVZeXys=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VRYvYoatWnbROCE2W0SbgsDm35sjgem/IGR8HbX0iQqU/GflPXLAgFnnFkbCVrgLsnJa/LGN7p21M02sCre1P69L+E2Ejee7Z9eDyYxjHOqcw4NzggHfYA5vmvHFyMljPWxljRjK0+IEMdY8s4VBGEsBLb2PSiPIgKO/PksNRg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=NYFk6/H7; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="NYFk6/H7"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 60RIBE0o007148;
-	Wed, 28 Jan 2026 06:08:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=wkoM9QgZ1YTgAjTN7zWEpaspS7u5/Q
-	oK+VSk9hQ8ilE=; b=NYFk6/H7AUiZfZutNWIUfjZHR6zZBpf+R/0eEkRVs5gRaM
-	QEOIFMnalxazABCTL1bgzOZexVmod39zLTR9xNixFwZyMBopk8wIiHAAjAlD0kvZ
-	qMEnut52w+aaC2LzJ5A4mTwWf1sJTmR9p0+qfm0jW3nft07AsZkL//gVtmx1hRgo
-	o9ukJWCqa4kjYnAu/TgBnhf/IzMQe7nR8U7x/Uhr6mX/EkQCAc2W+m2qazooIzOl
-	UrTO+Neu4aDZK7cYZQLd89JBsj5TQBnCzeZbx0qa5QKjb6BDpAUTp4qbsNHO5+9z
-	HayyaMTLDymHHRtRjMaF8EF4Vp5OlQ+jodzm6yCA==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4bvnrthj9r-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 28 Jan 2026 06:08:27 +0000 (GMT)
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 60S63g3D027656;
-	Wed, 28 Jan 2026 06:08:26 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4bvnrthj9n-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 28 Jan 2026 06:08:26 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 60S2ZVdr023624;
-	Wed, 28 Jan 2026 06:08:26 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4bwamjv11k-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 28 Jan 2026 06:08:25 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 60S68MVf56033762
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 28 Jan 2026 06:08:24 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C561620043;
-	Wed, 28 Jan 2026 06:08:22 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BEEC120040;
-	Wed, 28 Jan 2026 06:08:21 +0000 (GMT)
-Received: from li-dc0c254c-257c-11b2-a85c-98b6c1322444.ibm.com (unknown [9.124.210.170])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Wed, 28 Jan 2026 06:08:21 +0000 (GMT)
-Date: Wed, 28 Jan 2026 11:38:19 +0530
-From: Ojaswin Mujoo <ojaswin@linux.ibm.com>
-To: Vitaliy Filippov <vitalifster@gmail.com>
-Cc: linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: Re: [PATCH v2] Do not require atomic writes to be power of 2 sized
- and aligned on length boundary
-Message-ID: <aXmn07uJ9qxe4qJt@li-dc0c254c-257c-11b2-a85c-98b6c1322444.ibm.com>
-References: <20251221132402.27293-1-vitalifster@gmail.com>
+	s=arc-20240116; t=1769585070; c=relaxed/simple;
+	bh=X3vkGGiawfSJyIU94BOjCdFV2SqWZmFFTpCUR9GJS3s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kcIXwNG++bzjIWHNrAH21fZqdgfkRG4EChMGq/QzNdTQmXoZr4ZfQ4FaIJ9d5mN+b1GR3TCpdwvCXv5BP8gj86pzUwnSA5A7vUu2F2lE6vOsX4F4jNX2o3dwcNFajREvhkdIqBOqjV7Wu8NsMW34UevZtb6i8yVlZ+nlNDeZm/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 5b9d7c2cfc1a11f0b0f03b4cfa9209d1-20260128
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.6,REQID:b85a8993-7159-4b88-aa5f-53aad656943e,IP:0,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
+	elease,TS:0
+X-CID-META: VersionHash:a9d874c,CLOUDID:5aaa4de4c293ab30bcf762f8b0bddaa9,BulkI
+	D:nil,BulkQuantity:0,Recheck:0,SF:80|81|82|83|102|898,TC:nil,Content:0|15|
+	52,EDM:-3,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0
+	,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 5b9d7c2cfc1a11f0b0f03b4cfa9209d1-20260128
+X-User: tianyaxiong@kylinos.cn
+Received: from [10.42.13.21] [(10.44.16.150)] by mailgw.kylinos.cn
+	(envelope-from <tianyaxiong@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_128_GCM_SHA256 128/128)
+	with ESMTP id 2118149314; Wed, 28 Jan 2026 15:24:18 +0800
+Message-ID: <6ab04276-8897-4d5e-a86c-e656cf1f6f91@kylinos.cn>
+Date: Wed, 28 Jan 2026 15:24:15 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251221132402.27293-1-vitalifster@gmail.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: v2hUHrqSRzzxycWwIH2oCaQ2tvy7finp
-X-Authority-Analysis: v=2.4 cv=Uptu9uwB c=1 sm=1 tr=0 ts=6979a7db cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=TkuBN2Fti-PRllfk:21 a=kj9zAlcOel0A:10 a=vUbySO9Y5rIA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=pGLkceISAAAA:8 a=3Mt9XtWo_b8JSGLEDj0A:9
- a=CjuIK1q_8ugA:10
-X-Proofpoint-ORIG-GUID: jmNoTbNoTrvxUjQGk0qTB3R4NWeEqHO7
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMTI4MDA0NCBTYWx0ZWRfX8vM4Ye7MRchu
- /HWDw03opb+7Ke+41Gjti5bBREzZIbGgHuxZGqpy9XoiIiWQa/qg7ZmFt8qP4ka8lNG3UXxsK6Q
- dJ39vyguzhbySrEfR5JktB5A+Xobx7uERZ//CTNWHtfw13JtqTDbBKzDsnkaJxF7QNQjV5yAoxR
- d80I7nGsBFb9zEmAmjB6N8t0J94BpIhy6++UoE0g7n4ewBIGvfWHbPKg9SRGMLpALKcOPtcIYDH
- Z5VOY9ppWlEbHkbhPbUFRtt22YBn+yi+O187rx5oZWAPCIXXTcRZBUiHIxC+K2CE+QsCDy0ddza
- ggCYVbyK4XfGtThSILg4uxoz4IsoYQLMIatXnMwAkvPGnQrkp4ZsIEgHI0bf32Sxtjzn+pc/Gq4
- jAgxjd0qaHeVkiTeNqVsaXgmxjwd2W8CeRWQuEcjyk/YiYaUpo0Hk5khbPtkoqNFEx+BusEipQz
- JVOU0F/cLCoSwWB4Enw==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-01-27_05,2026-01-27_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 priorityscore=1501 clxscore=1011 lowpriorityscore=0
- phishscore=0 adultscore=0 impostorscore=0 bulkscore=0 spamscore=0
- suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2601150000
- definitions=main-2601280044
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 2/3] tracing/kprobes: Make setup_boot_kprobe_events()
+ asynchronous
+To: "Masami Hiramatsu (Google)" <mhiramat@kernel.org>
+Cc: rostedt@goodmis.org, axboe@kernel.dk, mathieu.desnoyers@efficios.com,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org
+References: <20260127012016.76713-1-tianyaxiong@kylinos.cn>
+ <20260127012312.84659-1-tianyaxiong@kylinos.cn>
+ <20260128134936.539782c2112073e55e7a0304@kernel.org>
+Content-Language: en-US
+From: Yaxiong Tian <tianyaxiong@kylinos.cn>
+In-Reply-To: <20260128134936.539782c2112073e55e7a0304@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Sun, Dec 21, 2025 at 04:24:02PM +0300, Vitaliy Filippov wrote:
-> It contradicts NVMe specification where alignment is only required when atomic
-> write boundary (NABSPF/NABO) is set and highly limits usage of NVMe atomic writes
-> 
-> Signed-off-by: Vitaliy Filippov <vitalifster@gmail.com>
 
-Hi Vitaliy,
+在 2026/1/28 12:49, Masami Hiramatsu (Google) 写道:
+> On Tue, 27 Jan 2026 09:23:12 +0800
+> Yaxiong Tian <tianyaxiong@kylinos.cn> wrote:
+>
+>> During kernel boot, the setup_boot_kprobe_events() function causes
+>> significant delays, increasing overall startup time.
+>>
+>> The root cause is a lock contention chain: its child function
+>> enable_boot_kprobe_events() requires the event_mutex, which is
+>> already held by early_event_add_tracer(). early_event_add_tracer()
+>> itself is blocked waiting for the trace_event_sem  read-write lock,
+>> which is held for an extended period by trace_event_update_all().
+>>
+>> To resolve this, we have moved the execution of
+>> setup_boot_kprobe_events() to the trace_init_wq  workqueue, allowing
+>> it to run asynchronously.
+>>
+>> Signed-off-by: Yaxiong Tian <tianyaxiong@kylinos.cn>
+>> ---
+>>   kernel/trace/trace_kprobe.c | 14 +++++++++++++-
+>>   1 file changed, 13 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/kernel/trace/trace_kprobe.c b/kernel/trace/trace_kprobe.c
+>> index 9953506370a5..4c6621f02696 100644
+>> --- a/kernel/trace/trace_kprobe.c
+>> +++ b/kernel/trace/trace_kprobe.c
+>> @@ -2031,6 +2031,13 @@ static __init int init_kprobe_trace_early(void)
+>>   }
+>>   core_initcall(init_kprobe_trace_early);
+>>   
+>> +static struct work_struct kprobe_trace_work __initdata;
+>> +
+>> +static void __init kprobe_trace_works_func(struct work_struct *work)
+>> +{
+>> +	setup_boot_kprobe_events();
+>> +}
+>> +
+>>   /* Make a tracefs interface for controlling probe points */
+>>   static __init int init_kprobe_trace(void)
+>>   {
+>> @@ -2048,7 +2055,12 @@ static __init int init_kprobe_trace(void)
+>>   	trace_create_file("kprobe_profile", TRACE_MODE_READ,
+>>   			  NULL, NULL, &kprobe_profile_ops);
+>>   
+>> -	setup_boot_kprobe_events();
+>> +	if (trace_init_wq) {
+>> +		INIT_WORK(&kprobe_trace_work, kprobe_trace_works_func);
+>> +		queue_work(trace_init_wq, &kprobe_trace_work);
+> Hmm, this queue_work is not required if kprobe_boot_events_buf[] is
+> empty. We should check it because most of the time we don't need it.
+Yes, I will improve it in the next version.
+> Also, deferring initialization makes it indeterminate when this
+> tracing will begin.
+Indeed, While most scenarios don't need boot-time tracing, and users 
+prioritize boot speed, we must balance the need for deterministic traces 
+with faster startup.
 
-There's some context to how this feature is designed as such. One of the
-reasons to have powers of 2 is to abstract out device (SCSI, NVME) level
-spec details from the higher level implementation of atomic writes. My
-memory on what the specs say is a bit fuzzy but iirc SCSI defines an
-optional alignment for WRITE_ATOMIC command wheras NVMe can have a
-boundary which shall not be crossed. 
+>
+> For kprobe event use case, I think setup_boot_kprobe_events() should
+> check the kprobe_boot_events_buf is empty at first. But I think Yaxiong
+> use case happens when you are using kprobe events via cmdline, is that
+> correct?
+The issue was identified without enabling kprobe events via the cmdline. 
+The core finding is that asynchronous initialization can drastically cut 
+boot time under different workloads. As blocking occurs elsewhere in the 
+tracing infrastructure beyond just kprobe events, adopting async is a 
+broadly applicable strategy for boot time optimization.
+>
+> I think introducing "async" cmdline option is more preferable.
 
-Which means, for a user to perform atomic writes, the physical blocks
-allocated by the filesystem would need to adhere to these limitations,
-which would need knowledge, at the FS level, of what the underlying device
-is and what its limitations are. We wanted to avoid exposing these
-details to the FS. The power of 2 length and alignment becomes a good
-middle ground where if the FS can ensure that the allocated blocks
-follow these limits, then it would satisfy both SCSI and NVMe, without
-having to worry about the individual spec's details.
+Agreed, this works. Users focused on boot speed over early-boot tracing 
+can opt for this parameter to gain a startup performance boost.
 
-It also helps that power of 2 simplifies the calculations at a lot of
-places and the first users of the feature ie DBs are okay with this
-limitation.
+>
+> BTW, I found that the kprobe events from kernel cmdline will be made
+> after boot-time tracing from bootconfig. Maybe it should be run this
+> earlier timing too.
 
-Yes it might be a bit restrictive and we might have use cases in the
-future that need non power-of-2, but just removing it from the
-generic helpers, like you did, is not the right way. It will be a more
-involved change that might need modifications throughout the stack.
+Yes. Additionally, this optimization does not conflict with the current 
+patch series at all.
 
-Regards,
-ojaswin
+I'll submit the updated patch for the next version promptly.
 
-> ---
->  fs/read_write.c | 8 --------
->  1 file changed, 8 deletions(-)
-> 
-> diff --git a/fs/read_write.c b/fs/read_write.c
-> index 833bae068770..5467d710108d 100644
-> --- a/fs/read_write.c
-> +++ b/fs/read_write.c
-> @@ -1802,17 +1802,9 @@ int generic_file_rw_checks(struct file *file_in, struct file *file_out)
->  
->  int generic_atomic_write_valid(struct kiocb *iocb, struct iov_iter *iter)
->  {
-> -	size_t len = iov_iter_count(iter);
-> -
->  	if (!iter_is_ubuf(iter))
->  		return -EINVAL;
->  
-> -	if (!is_power_of_2(len))
-> -		return -EINVAL;
-> -
-> -	if (!IS_ALIGNED(iocb->ki_pos, len))
-> -		return -EINVAL;
-> -
->  	if (!(iocb->ki_flags & IOCB_DIRECT))
->  		return -EOPNOTSUPP;
->  
-> -- 
-> 2.51.0
-> 
+> Thank you,
+>
+>
+>> +	} else {
+>> +		setup_boot_kprobe_events();
+>> +	}
+>>   
+>>   	return 0;
+>>   }
+>> -- 
+>> 2.25.1
+>>
+>
