@@ -1,96 +1,96 @@
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBAE51F9ECB
-	for <linux-block@vger.kernel.org>; Wed, 28 Jan 2026 12:17:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C89AF34EEFA
+	for <linux-block@vger.kernel.org>; Wed, 28 Jan 2026 12:28:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769602676; cv=none; b=D3hxfMexjbkkof+qr2X9w9usZd/4EhdrZWVa9w46yoKeFsP2wbnCXPabDoLoN418IHdUt3kI0mlL/7aWA94cfF9h2+/n7dYhRxRwgHKixudgmKOLD/9wEvxLoUgsIe90VDpCstGlrD7zfp86ZA/ih/nW4ndjhdN3m7tfq9BfWl4=
+	t=1769603314; cv=none; b=XQNdsN+oXJAebHir/jNPrF69PMfwbrXBRtK3hZsi5apWICj4FmL03IJcigMreysMUPE4C4TKnJz/6afKmL4BCxEGj03rjzUVY8LT+a+UD757lDkHmsg1t2BvsEi/KeS3sWxiwMBfn9dc8pquPT1Um4+Oa52r7lY2GLNMXXsqAbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769602676; c=relaxed/simple;
-	bh=vFWdb3PBX2zBDqdrtWvluSHxOAFMa8qzzSmnhwckFpM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KhPDXsdpWZs0ZGVOM0aFhNLoKUsVs/fQKAtSg5lWp+pWCHrYCD69GH/k954b5EHKIVgIrluN+hiBIKnO4zOmV0VC2FAfQjnwTmD6Qu4DL+XVKokU6YKP03qEtFAC65593Pt4uou4B0BVnziT+lbJETBPAn8+XQxWBU0cSQ40wDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=GYSpmv+b; arc=none smtp.client-ip=209.85.160.172
+	s=arc-20240116; t=1769603314; c=relaxed/simple;
+	bh=WieMihouRH3yblcjYO919ii/575NNtK42r5AoPOiE04=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=hZyYUgLVkeXGRzhc3dlIEmsqPeXrfMiKLNSo85b/krVIsVEEVxT+js9jBVlWgKIS1sbm0DtIYi+L67Nm2SpvNLW0fFJQTxkpYjRl07GEFn+uUkmeamY9ymIG2FDYWNqbIzt6cmbTGF5PhyLVbCj4jQea90kEjix8qs7qJuso/wI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=dfLMUI+9; arc=none smtp.client-ip=209.85.160.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="GYSpmv+b"
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-502acd495feso77136241cf.2
-        for <linux-block@vger.kernel.org>; Wed, 28 Jan 2026 04:17:54 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="dfLMUI+9"
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-502a789834fso56711011cf.2
+        for <linux-block@vger.kernel.org>; Wed, 28 Jan 2026 04:28:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1769602674; x=1770207474; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=oUdr6DX+iZadrtnG4gSybF93zfd1qmcT/Pp5WRh3xdg=;
-        b=GYSpmv+bzR9piAMErSx0mrN+RyeOdPkAoA92oW3lGX3DEzLKoSsOtDUSBHVEFOr4fi
-         L3bZZ4sigZSxVR4xVHYnqLUazJDz9UeCFAEkn0RSL9MoPVA83XPIydnn5elD3FlwkTeo
-         Zp263OUdzduHpNsudNlOoSbZrbmcZWf28AMFe1mOSnIe9H4VAAyIduZW42hrKLGzo5U7
-         T6m65V+E+qiVCxEYrkrTstYe5NiK5lzqwmBSMDFmpnjiy8e9x62+Zg0lC4+I3n547A0x
-         KxPopf+KKO4RcwfaGvItNGM2zAFoTUdOF1WpONLPW3s/DYDxGitko2swKwm+7Uxxq0qQ
-         MGyw==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1769603312; x=1770208112; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OkTSOzBpSUcG6pRtvf4q8YShTh5K2XFL4/Cb5Ho1saI=;
+        b=dfLMUI+9bYxn74brbHEsn22FygZ3mwEvYbF92Nl/1FSLqrknnXYe5Tz/1Q2CSDzg/Y
+         jd8YqPawvKiXFQYpok0J11yNbOABO/jC8h2L230WDIJtd4hkdSqAgZFAqBMBcL/SWfcw
+         h5cfI7dgocvChko+mYiy554dinvK5v1Vphw8zNx8efZLf7K3zkAxmbnVw10UH9LKd+nu
+         FcNiPpqAB61ozyBdVjpvpCAgConnsIEsXoaNsMHtYEYniWdg3Jp/jKyrHv3ndNDKSOHJ
+         nXAMaPCVvhUhHU3KiyuEM+ljNwBNuZybvk61exofyXnBUMNLNMtZdD7Y02ynz3cs3rVY
+         85vw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769602674; x=1770207474;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=oUdr6DX+iZadrtnG4gSybF93zfd1qmcT/Pp5WRh3xdg=;
-        b=R1oFUW7psIna7kHBFqCSb5Fsp2lVsiOTwdkXKJGVoqHA8uX22PaB4TN1f9lX/NL+Cw
-         O9UddBAisXZgQVb2ODsN/wK4efduvC1qSKkFN5pM2i7736PyWN3pSUVol93GY19JHN1E
-         qxTYZT7QjdvOxE+iNiuvLa8rny/tqQ3f4GJf7zvDl1l7HKy9f2bZVu1DIu+X8Oxh93H3
-         EGBCvW70ALDCxJEQct1rJvwSRe/KMk5Lahk4DHcF0/HJV4+JZbpsh8zcbHQs0jkyTIc4
-         fUBRxcvA8zIsCPQbPyWI+RoWafK2a23v/3ZZcz7WCCiJq7FavMxtSDf7gfSa/DuuM8cv
-         /PFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXhMxzwQN93veNNd/7WDURgeJH6a8MZKChhX8VFXbSKmAyUn4Aj+Gr8TOse0LVaIguAZ2uobT50zcTfjg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxg6pg8hD2fbAtotjDImtvSnDcH5rh9IUELxgrlMBKMYPx2zniE
-	NOzXoUl6bYvSzS4MrxHuUeAk1l3HBUmyHm2GJyXJ9/zf9PR56JPjQhehlj/cdPZoAEw=
-X-Gm-Gg: AZuq6aLbzDnO2i2Oj3P9CJPEjGZkwlX37mVw3ZwuFbBkfVQTTAt5KHHz2Ei+vpKV+7R
-	OvWR7UWPwWJR4Zu1YRtiqgqZndXHhNAh8H+BfwN2fbdKlRdU13YLYm53TZQpLLFGNbPNNN7/cK9
-	bQ0A29sCLzTBJAMNsI847JV5P5jI6Vki0Jc5fFM6/xl483yHKhRNm18F3rgVnnTP6T1nhkc7fSr
-	3Brd8puL9y6/J1NtEbpvZDYqrkKp6uoA2RR32AJfkZqtDGhKw+1apmRdN7CSptvL9YiwVW2+gyJ
-	B++oYIzdFY+irTVvcdSAEDnXodnZVg5rovhz8Ai40yJSN1Vn5ouGTFW6yqMRyN67qoKrDFguFpe
-	jtkPct5Kk2oj19AYkNn5zfezTdUuUdlEqx+Ti/f5BYooyJmo2fqYXbNFz5LZ13Eq4JS2yxVkXBF
-	gKbZ1/jb+Se38w/q4ej8hdrSdmdzmTJMIHeDSVKBYT4Ugmc1SL/PX/ejcoTkGmvOej3xHmAZE=
-X-Received: by 2002:a05:622a:2d5:b0:502:6ed5:7b0d with SMTP id d75a77b69052e-5032f8f0e01mr63543941cf.48.1769602665322;
-        Wed, 28 Jan 2026 04:17:45 -0800 (PST)
-Received: from [192.168.201.17] ([50.234.116.5])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5033745c4e3sm14749451cf.6.2026.01.28.04.17.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Jan 2026 04:17:44 -0800 (PST)
-Message-ID: <16e41d3d-401f-4600-a304-08f1d2ba6892@kernel.dk>
-Date: Wed, 28 Jan 2026 05:17:42 -0700
+        d=1e100.net; s=20230601; t=1769603312; x=1770208112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=OkTSOzBpSUcG6pRtvf4q8YShTh5K2XFL4/Cb5Ho1saI=;
+        b=KygLPdpAQJBVGU7QPaoetj0BJ8194opACMZDs3VtN5aW1nQsdny18HsYvTaOFMNzNH
+         qt3lipwmOB2eNbspaB4VM6OVF6ZcgXQb9+bH5e9BD/4y11AJcpRGO90iDpH33h9IDpV6
+         f2kX2kz3gQRNjKKiFaia2H3BzvPctkVBVhW3VKDG/Qdji7wcMUt0phBHcDJJocwUSH3W
+         4wQUtX7gqtyPh6ftB1VZpNNglr6vlQbC2u6meuqZYgAtvcQEBhFe6kBRO9t2cj1OV0aC
+         0Na8BRotJz1/VILQLIQtxNEkZKDZYcXwlz4RIowHqTK3stH9ru8U29grnHI5ZjDNHDPM
+         yDKg==
+X-Gm-Message-State: AOJu0Yxxio9gTrhzewcd6bZsw4NZvJCBI8KBA8MAVITMQclXpUt5yWgv
+	9WA2vyv1a99FKtc02O2Oudvfqu3zR02llu7pEzPae1SYolBOF0NQ2p2vXa+qC29w84w=
+X-Gm-Gg: AZuq6aLnTzMwMBRIDAV1CkosuZsHMkGQ4aRktZPy78NBzN7QN0hkVQhx3rVrQLkcyy7
+	yqWywQ+0HPrEq8nqBl8caEkB6/VYS4moyAxQqarH9SNJGF+YLixRc+6GvA9if3jyMMZ+pIWa+cQ
+	UZsGD0tBRQmSEhBbxLobWs1y+yb1CKeeoFQU2PWSMXSNQ5YWS0GZTt+TPgeb55GqAGAtExcd2w+
+	BwNKMXGd9+9U26WF6oUUZW3JJljx4Cc+T8fOdeW53yaBzRUEDOiTydQ0r6Ljwuzs9Tr1mpf0QBE
+	uEc+ZY1GBPJSpvUb7pM+kQeQvdEbuq8UfUjadDnx2jqJbwOMVwvO/HYX692RAgPi95hyty07cb5
+	doaokvxrGZY1HPf4jQoQwAzSFikVKM4zPnddWnO/C9tew/BFZ/iJBd3lY5O5L+w1eZH0ZPqVx49
+	eR8fh4OvYQlLn5465KwlnlPGUc9+g+apLB/B0TOie/c/BkSWYOfSYkGgBdICDADq+6kNw6T58Uc
+	y0=
+X-Received: by 2002:ac8:7f41:0:b0:4ee:42e5:f5ae with SMTP id d75a77b69052e-5032f8961b7mr58945351cf.25.1769603311767;
+        Wed, 28 Jan 2026 04:28:31 -0800 (PST)
+Received: from [127.0.0.1] ([50.234.116.5])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-5033a4dcfefsm10974441cf.4.2026.01.28.04.28.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Jan 2026 04:28:30 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: Thorsten Blum <thorsten.blum@linux.dev>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20260127224704.440877-1-thorsten.blum@linux.dev>
+References: <20260127224704.440877-1-thorsten.blum@linux.dev>
+Subject: Re: [PATCH] block: Replace snprintf with strscpy in
+ check_partition
+Message-Id: <176960331041.194901.16439582104055685977.b4-ty@kernel.dk>
+Date: Wed, 28 Jan 2026 05:28:30 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: bounce buffer direct I/O when stable pages are required v3
-To: Christoph Hellwig <hch@lst.de>, Christian Brauner <brauner@kernel.org>
-Cc: "Darrick J. Wong" <djwong@kernel.org>, Carlos Maiolino <cem@kernel.org>,
- Qu Wenruo <wqu@suse.com>, Al Viro <viro@zeniv.linux.org.uk>,
- linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
- linux-fsdevel@vger.kernel.org
-References: <20260126055406.1421026-1-hch@lst.de>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20260126055406.1421026-1-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3
 
-On 1/25/26 10:53 PM, Christoph Hellwig wrote:
-> Hi all,
+
+On Tue, 27 Jan 2026 23:47:01 +0100, Thorsten Blum wrote:
+> Replace snprintf("%s", ...) with the faster and more direct strscpy().
 > 
-> [note to maintainers:  we're ready to merge I think, and Christian
-> already said he'd do on Friday.  If acceptable to everyone I'd like
-> to merge it through the block tree, or topic branch in it due to
-> pending work on top of this]
+> 
 
-Queued up in a fork off for-7.0/block, for-7.0/block-stable-pages.
+Applied, thanks!
 
+[1/1] block: Replace snprintf with strscpy in check_partition
+      commit: f46ebb910989a1db244f95bd1f937907591aa2ee
+
+Best regards,
 -- 
 Jens Axboe
+
+
 
