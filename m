@@ -1,72 +1,61 @@
-Received: from mail.itpri.com (mx1.itpri.com [185.125.111.158])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B80D82F7AB0
-	for <linux-block@vger.kernel.org>; Thu, 29 Jan 2026 05:46:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.111.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A9A9374731
+	for <linux-block@vger.kernel.org>; Thu, 29 Jan 2026 07:32:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769665577; cv=none; b=FrQ0g11aEKikKza5vT0ctzxzHhxvbeY1spzYvGsyRvfi8GYGc6+dzx2Mu5/88uj25tuVbtsyr/U0h0Pey6nlLpj+U6YxSoeEJOvCZIwrRbvQUxf01+z6FBB17uV1PYGOGPuJpL6UslXgU0p+wwQahNBYOkkCuiBNAF89C7U6Eso=
+	t=1769671934; cv=none; b=V5XWhS/6kEBvnsqoFvy0pRKkQGvjb4E1Wfx+Wk5cNduasmwjw9skrxmcQHukN6UmE05Fw+jQKa9c3Q13iNUNGKcQE4ah7xtL/1GlqGrpUFTc5Xt0Kta9BwFoV3sPSkFJKEJGDOmxThb7mVwuDulWC+ms5MePzmXnk41zX5fCYjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769665577; c=relaxed/simple;
-	bh=PlhNRBqqOdYaPjfLhcRPDV73rzC7fYT1YsJuvbN/Zeg=;
-	h=Content-Type:MIME-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=M0mt5Wm43ZP5B8aamBVp9+aiByJOqtWw7Gz9md8gwA3QQ9QGYQPsqcEMGTKMt5ih7dLN3m1lKDJRdnQ3jfNZSBuaI7LEXpz+lNBGLUX6RsJ3uG8/GIAiLjNcxvXPosXPJPN+dgNu9KW+3iU9MOx9H7rFtiiGUiAGbvVyL3qQwNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zazolabs.com; spf=pass smtp.mailfrom=zazolabs.com; dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b=U9oMns/S; arc=none smtp.client-ip=185.125.111.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zazolabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zazolabs.com
+	s=arc-20240116; t=1769671934; c=relaxed/simple;
+	bh=AkViob5+TxtFCQ43CbplvbofciMpOiLo8XwJ4uxJsag=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=IwIkS7rtfkTXEYOHh+YxDSMjDuG3+Pzw+pdak1G+uXfCui7o6CjyESX+567M/NbOC2POqp+zRm3nmQwNb1RIOSIye1XEF21n0M8P+rzHBIwSI/GmOIIK7n6TG0871CtzjYcvHoTVBgqpoASFlQ/IqML4LeAJ1G3DGIwcutfk1Sg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A1sCmNCg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b="U9oMns/S"
-X-Virus-Scanned: Yes
-Content-Type: text/plain;
-	charset=us-ascii
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=zazolabs.com; s=mail;
-	t=1769665569; bh=PlhNRBqqOdYaPjfLhcRPDV73rzC7fYT1YsJuvbN/Zeg=;
-	h=Subject:From:In-Reply-To:Cc:References:To;
-	b=U9oMns/SCRqUMsgtG7n4ulz7o8OCW4anuOLCq4d1yznPx38JW5gBO6AmzvYhCGq+8
-	 7Nbpu/Gdu/y6JDSWnd6UIYsIr2fwbohCmIZHGKcaNAvhob6ULOtOwIkAJTjZKjrl1y
-	 CYesFjMw0PIJWiu+WP6Z/lOwNPX1jNsqtwW8emu9BoqUqk45sGBgWikEBYkUtFF0x6
-	 AEp3X4hchLA6NmsE06DfdJs2UieIUWP7wLog47rwDL4yfXkQMP2wup41sas48pES3l
-	 ES2nXIYcVsmBNHIUaUPYC4iQ34CylXwT5PqYD2Am592krH3zjiDYfZLZbnuJvrys5x
-	 EgapkuF3w+yReNYKOot3cx9jN481CGF5aNDE5BUg1/5d0mpj4njQqCj/dOJMRS99lo
-	 /up7uB0fuwtBy9QDRqAQopnD74FytEZyjBKDIGPde6x35iEHoSa5Uqemu90dprYvGF
-	 jwECMREIcQ0OaAsWLGo3kwASXQHQfnRHy8FL92ZtVS0vGpfe/oGBsUAyRBAr2Zvfus
-	 oHWArD3kGfTcO/X+1Wt2B6HWqcRA2etasdbY0jJAASxHUf/sTbDmiGyxX8CMdlz7ZO
-	 fFf9eA5vHhivxclOLUv+S3MvnBYKtTzpemBhKvR2W8qflF/QpVftHM5YcbOvN36wmb
-	 rM4wbBhpVaEQFesOwJC1egC8=
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A1sCmNCg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2D59C16AAE;
+	Thu, 29 Jan 2026 07:32:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769671934;
+	bh=AkViob5+TxtFCQ43CbplvbofciMpOiLo8XwJ4uxJsag=;
+	h=From:To:Subject:Date:From;
+	b=A1sCmNCgCN/G3cNBxM7RdIrKndZE+UhQBkjNE+JuTjdJUDBVIPlKJk4t1RTh/gDcL
+	 E6au6k0/cVHobDUKiNgN8WbyMfyF/bVjCF4tBNy1WGGuG9cz9CyPqiJItvLPZPXav8
+	 Ph3QB1iZLmCrEos+4BauawdlidvozT27AfKtwEEcEUjwWiP8Mq4YZqEgoRXUcDv6ZS
+	 b7VMQQAwFmKWCIIvaFUPnhp8csLuO+QVpDqR52AVW20V9ppBQ4i8fyi590dxMq016r
+	 7IyzurXYbvlekHZkswGTfBH3L8B/1IxV68wgfe1pJ3B1pa4sKN2NV+966eLhgmjW6a
+	 zG74YfZYG1poQ==
+From: Damien Le Moal <dlemoal@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	linux-block@vger.kernel.org
+Subject: [PATCH 0/2] Cleanup patches
+Date: Thu, 29 Jan 2026 16:27:13 +0900
+Message-ID: <20260129072715.1107336-1-dlemoal@kernel.org>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 2/5] ublk: add UBLK_F_NO_AUTO_PART_SCAN feature flag
-From: Alexander Atanasov <alex@zazolabs.com>
-In-Reply-To: <20260129031501.3403688-3-ming.lei@redhat.com>
-Date: Thu, 29 Jan 2026 07:45:57 +0200
-Cc: Jens Axboe <axboe@kernel.dk>,
- linux-block@vger.kernel.org,
- Caleb Sander Mateos <csander@purestorage.com>,
- Uday Shankar <ushankar@purestorage.com>,
- Yoav Cohen <yoav@nvidia.com>
-Content-Transfer-Encoding: 7bit
-Message-Id: <4D5660DF-DE29-460B-90C8-F3800F6DCDC2@zazolabs.com>
-References: <20260129031501.3403688-1-ming.lei@redhat.com>
- <20260129031501.3403688-3-ming.lei@redhat.com>
-To: Ming Lei <ming.lei@redhat.com>
+Content-Transfer-Encoding: 8bit
 
+Jens,
 
+Here is a couple of cleanup patches for the block layer.
+No functional changes are introduced by these patches.
 
-> On 29 Jan 2026, at 5:14, Ming Lei <ming.lei@redhat.com> wrote:
-> 
-> Add a new feature flag UBLK_F_NO_AUTO_PART_SCAN to allow users to suppress
-> automatic partition scanning when starting a ublk device.
-> 
-> This is useful for some cases in which use don't want to scan
-> partitions.
+Damien Le Moal (2):
+  block: cleanup queue limit features definition
+  block: introduce blk_queue_rot()
 
-s/in which use/in which user/
+ block/bfq-iosched.c    | 20 ++++++++++----------
+ block/blk-iocost.c     |  2 +-
+ block/blk-iolatency.c  |  5 +----
+ block/blk-wbt.c        |  5 ++---
+ include/linux/blkdev.h | 11 +++++------
+ 5 files changed, 19 insertions(+), 24 deletions(-)
 
-
-have fun,
-alex
+-- 
+2.52.0
 
