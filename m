@@ -1,112 +1,105 @@
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED6FB3783A5
-	for <linux-block@vger.kernel.org>; Thu, 29 Jan 2026 09:27:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2C6A2FFDF8
+	for <linux-block@vger.kernel.org>; Thu, 29 Jan 2026 09:38:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769678847; cv=none; b=sJTXZfiwDSHMdiDWDuNBhszw3wuhsSOdUm4Hhx+8cBPwAUIo2ObOX+EB2u3vYTTiC0eABt3fzadfzoVpV9d7X6+pnD3/6+tVbT0pPERPXw/fqPW6wwTM9gWmk35VwVVyvfsLSDKqJ25BZzKHmDVV9gtJR8MVHkfb+lHogRLPObQ=
+	t=1769679527; cv=none; b=LNAj9FGD4uPOaNr5wTHotjSHZkmyhDL8P4hR4f036ONyone0U8Q/KIcawX9oaOMIEAZzQWOtppZukKTa5W6OyUHvPAAnJLmdZlr2+R9grccpsau7nGCTU/SleGzzCkXZsbQMWaUVKHM56K5HhigvCgVBeJ7xmHXYPqWiG8+L3xg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769678847; c=relaxed/simple;
-	bh=4bRaTgrCKseoLnMwWid7iSb2X5Y0CMnCnaMIQDLYSAw=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
-	 Content-Type:References; b=XqWaTpnr6Xfbu8ZDDJ1+4Rdp13b3AGPYGUrDrFfnMlKURL9SjITQGu3mdWHb3C2gw/7a3RJYi8WwPC6aJmjNUYKN5SiKp6EPu869elS7hvPJXFpZIv16AMcTaj3zDYBfaQf8W61CfANPda3OF9ybXD6l7rq3WwQNHoRLpBqRTSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=GzzAzzTV; arc=none smtp.client-ip=203.254.224.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1769679527; c=relaxed/simple;
+	bh=4nrhlaxpYbD331SCy7Jus+A7rJxtGa/xJE8QMn2pJRo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hhqCwZM+aSlCK+Hxq5GtWlQjZvpNLaMomZyCdKk0qSEgVpR04EfQwnhYjrY2K+9vNSSXGU9pN2kYYxU/efR5J6AOFOHTyaE5DddGYD/2z2RTHcnV2vujKs1mqYarCOaZnEq69PvXGy4TI3Ye3u9gdbhaF0S7YLbJVX3dAAcPP6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MfXNkFaW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="GzzAzzTV"
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20260129092724epoutp02d9882c9129033380060d0db8f39b4a17~PKYhgLMFj1628516285epoutp02z
-	for <linux-block@vger.kernel.org>; Thu, 29 Jan 2026 09:27:24 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20260129092724epoutp02d9882c9129033380060d0db8f39b4a17~PKYhgLMFj1628516285epoutp02z
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1769678844;
-	bh=HTJkzz/t9Yvine6k3rYUCcimE1lwu9jEJYFkbVE5xQA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GzzAzzTVXzlBQLcffAa6J4diAS2/dcKB9/cCFco2XOO6/hCKRPCrjmuuLQsRxD/ZM
-	 lP73gbJdsDnsgnXQcfO6VHflm4/8wNP9Chs+Vvk4C0kWqEw/158wqIDR7IhE/8ylsf
-	 4tlt6ECACReaM66Pu2bEbcpp31HCX+4Er5ZCKhKQ=
-Received: from epsnrtp04.localdomain (unknown [182.195.42.156]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTPS id
-	20260129092723epcas5p17ea68069b8cddc520c61ea4540435011~PKYhIRM8v2500625006epcas5p1j;
-	Thu, 29 Jan 2026 09:27:23 +0000 (GMT)
-Received: from epcas5p4.samsung.com (unknown [182.195.38.90]) by
-	epsnrtp04.localdomain (Postfix) with ESMTP id 4f1v1Q6K97z6B9mC; Thu, 29 Jan
-	2026 09:27:22 +0000 (GMT)
-Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-	20260129092722epcas5p262db49c6db5e12931dc0433090b20e57~PKYfn3rZJ2444824448epcas5p2R;
-	Thu, 29 Jan 2026 09:27:22 +0000 (GMT)
-Received: from green245.gost (unknown [107.99.41.245]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20260129092720epsmtip186b0b3daa7cec921ec0d647610f08fd1~PKYeDuLvH0871908719epsmtip1L;
-	Thu, 29 Jan 2026 09:27:20 +0000 (GMT)
-Date: Thu, 29 Jan 2026 14:53:06 +0530
-From: Anuj Gupta <anuj20.g@samsung.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Anuj gupta <anuj1072538@gmail.com>, Jens Axboe <axboe@kernel.dk>,
-	Christian Brauner <brauner@kernel.org>, "Darrick J. Wong"
-	<djwong@kernel.org>, Carlos Maiolino <cem@kernel.org>, "Martin K. Petersen"
-	<martin.petersen@oracle.com>, Kanchan Joshi <joshi.k@samsung.com>,
-	linux-block@vger.kernel.org, nvdimm@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org
-Subject: Re: support file system generated / verified integrity information
-Message-ID: <20260129092306.7kxrizlwwk2ee756@green245.gost>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MfXNkFaW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02980C4CEF7;
+	Thu, 29 Jan 2026 09:38:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769679526;
+	bh=4nrhlaxpYbD331SCy7Jus+A7rJxtGa/xJE8QMn2pJRo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=MfXNkFaW6eE0yUNU/k45i6ypf4bioIjuulLIvgw6/zHsodna4xqnhow3daMVP3U0J
+	 JvBakv1DL227rDdQMEv2sKWwD3kVhzbAaGYAa9BlfECzKK4ylOLzZs4g5zrI0Q/OPe
+	 0VqZyYNXGqwPtKHnzj3CMeGSVYCZvh0IFz1QL/mY1azg6SmtD5GO9VnF8AKvwd4lPe
+	 xkdYh5LqGdThD0P7gzg39u1+jlp/h7BI1N/Ef8BRgtqUyZYdui3WoVfUsKf+rpPa/E
+	 J8jTGJQj8c24NKlLviBgrWXR27g+eKXC4FNa2opu9vN8FAW/E6isem9LK/M5CeLo2c
+	 hzdlgpvQpzpBw==
+Message-ID: <7a791d5d-cc74-45bb-a7c7-0d681d3601e0@kernel.org>
+Date: Thu, 29 Jan 2026 18:38:44 +0900
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20260127151609.GA1883@lst.de>
-X-CMS-MailID: 20260129092722epcas5p262db49c6db5e12931dc0433090b20e57
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-	boundary="----bVwHse4Nykw-L2c5iRRXKf-G.8k0lxUwrpcTFjGaDb9lfltx=_136471_"
-CMS-TYPE: 105P
-cpgsPolicy: CPGSC10-542,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20260129092722epcas5p262db49c6db5e12931dc0433090b20e57
-References: <20260121064339.206019-1-hch@lst.de>
-	<CACzX3AuDkwEw3v0bNmYLk8updk1ghVJa-T9o=EHXor9FA7badw@mail.gmail.com>
-	<20260127151609.GA1883@lst.de>
-	<CGME20260129092722epcas5p262db49c6db5e12931dc0433090b20e57@epcas5p2.samsung.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] block: introduce blk_queue_rot()
+To: Nitesh Shetty <nj.shetty@samsung.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+References: <20260129072715.1107336-1-dlemoal@kernel.org>
+ <20260129072715.1107336-3-dlemoal@kernel.org>
+ <CGME20260129092258epcas5p1fb7fd90db827d982829475652b43786a@epcas5p1.samsung.com>
+ <20260129091846.nx3crn6347gf6brv@green245.gost>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <20260129091846.nx3crn6347gf6brv@green245.gost>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-------bVwHse4Nykw-L2c5iRRXKf-G.8k0lxUwrpcTFjGaDb9lfltx=_136471_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
-
-On 27/01/26 04:16PM, Christoph Hellwig wrote:
->On Tue, Jan 27, 2026 at 08:24:28PM +0530, Anuj gupta wrote:
->> Hi Christoph,
+On 1/29/26 18:18, Nitesh Shetty wrote:
+> On 29/01/26 04:27PM, Damien Le Moal wrote:
+>> To check if a request queue is for a rotational device, a double
+>> negation is needed with the pattern "!blk_queue_nonrot(q)". Simplify
+>> this with the introduction of the helper blk_queue_rot() which tests
+>> if a requests queue limit has the BLK_FEAT_ROTATIONAL feature set.
+>> All call sites of blk_queue_nonrot() are modified to use blk_queue_rot()
+>> and blk_queue_nonrot() definition removed.
 >>
->> Here are the QD1 latency numbers (in usec)
->
->Thanks a lot!
->
->Adding in the baseline numbers, as I wanted to compare those:
->
->> Intel Optane:
+>> No functional changes.
 >>
->> Sequential read
->>   | size | baseline | xfs-bounce |  xfs-pi  |
->>   +------+----------+-----------+-----------+
->>   |   4k |    7.18  |    13.62   |     7.20 |
->>   |  64K |   36.40  |    99.66   |    34.16 |
->>   |   1M |  206.38  |   258.88   |   306.23 |
->>   +------+----------+------------+----------+
->
->So for 4k and 64k reads we basically get back to the baseline.
->The 1M numbers are puzzling, though.  I wonder if we need to
->add WQ_CPU_INTENSIVE or do some other tweaks to the XFS I/O
->completion workqueue so that we don't overload the scheduler.
+>> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+>> ---
+>> block/bfq-iosched.c    | 20 ++++++++++----------
+>> block/blk-iocost.c     |  2 +-
+>> block/blk-iolatency.c  |  5 +----
+>> block/blk-wbt.c        |  5 ++---
+>> include/linux/blkdev.h |  4 ++--
+>> 5 files changed, 16 insertions(+), 20 deletions(-)
+>>
+>> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+>> index 6e54b1d3d8bc..3ebdec40e758 100644
+>> --- a/block/bfq-iosched.c
+>> +++ b/block/bfq-iosched.c
+>> @@ -231,7 +231,7 @@ static struct kmem_cache *bfq_pool;
+>> #define BFQ_RQ_SEEKY(bfqd, last_pos, rq) \
+>> 	(get_sdist(last_pos, rq) >			\
+>> 	 BFQQ_SEEK_THR &&				\
+>> -	 (!blk_queue_nonrot(bfqd->queue) ||		\
+>> +	 (blk_queue_rot(bfqd->queue) ||			\
+>> 	  blk_rq_sectors(rq) < BFQQ_SECT_THR_NONROT))
+>> #define BFQQ_CLOSE_THR		(sector_t)(8 * 1024)
+>> #define BFQQ_SEEKY(bfqq)	(hweight32(bfqq->seek_history) > 19)
+>> @@ -4165,7 +4165,7 @@ static bool bfq_bfqq_is_slow(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+>>
+>> 	/* don't use too short time intervals */
+>> 	if (delta_usecs < 1000) {
+>> -		if (blk_queue_nonrot(bfqd->queue))
+>> +		if (!blk_queue_rot(bfqd->queue))
+> blk_queue_rot looks fine to me in other places.
+> Keeping blk_queue_nonrot would avoid the double negation here and few places.
 
-Tried adding WQ_CPU_INTENSIVE[1] but didn't see any change in the 1M
-latency. Looks like this needs something beyond just workqueue tuning.
+There is no more double negation. blk_queue_rot() tests for a feature flag being
+set. The !blk_queue_rot(q) tests the opposite.
 
-------bVwHse4Nykw-L2c5iRRXKf-G.8k0lxUwrpcTFjGaDb9lfltx=_136471_
-Content-Type: text/plain; charset="utf-8"
+> I see you made the changes for bdev_nonrot down, but missed to add here
+> ?
+
+Here where ? What did I miss ?
 
 
-------bVwHse4Nykw-L2c5iRRXKf-G.8k0lxUwrpcTFjGaDb9lfltx=_136471_--
+-- 
+Damien Le Moal
+Western Digital Research
