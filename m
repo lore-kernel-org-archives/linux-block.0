@@ -1,102 +1,98 @@
-Received: from smtpfallback04.a1.net (smtpfallback04.a1.net [194.48.128.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f193.google.com (mail-oi1-f193.google.com [209.85.167.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E13E205E02
-	for <linux-block@vger.kernel.org>; Thu, 29 Jan 2026 12:33:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.48.128.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D19837107E
+	for <linux-block@vger.kernel.org>; Thu, 29 Jan 2026 12:47:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769689989; cv=none; b=MQ5NWBLcfw9nPj0I92/qEYW9e8jnMgHR4jB+osXqqGqPYl8lcXqfIuSz3RW4DkVZuFqgVxGBsrANI/5tHAi9TTuBqjRgpGdT0oNIhe3XVIKZ54faAxSOhX5YOypbnyhMNG4aRbHWzzur3uVr2FsUqsYYUtvlbXAat/WafwUGf1s=
+	t=1769690862; cv=none; b=PN6cqWkJznYsoPvFkA0tvdv36+gnSYAgmLXhN7DJxExVTZotEs4h6iTyZSMXgjaiIbvMdtIE7OA59H7XGnFfBa+hr2kbf8TT37Tc0E1Rx/gCSdCB3/fiUOMwO3yxlzRUDXATKVjtiy69WfXGsoe/p4iAgLTdbX/mLRuqj3jlW/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769689989; c=relaxed/simple;
-	bh=akakqK6ecUVgMw7nEG6Jjwn+5pm2eVq8jb4NkCoSgw4=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=IfI2ki0yZQYD5vA5bXIH/QdC++N0jmVmxacyrQsMVvu0pC4W20oCkfHWieCJ/yl2JfntHTIqbrOVHqMvf5Gz9MSW2EesLzMBsG82T+FUIp+N5/boJeGe62ErpaC1eQi8L/dJObn5Wj/HcETFiJrR0W2bW3hebVL5/iD9hZhT+Ns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=aon.at; spf=pass smtp.mailfrom=aon.at; dkim=pass (4096-bit key) header.d=aon.at header.i=@aon.at header.b=mK+w1f8U; arc=none smtp.client-ip=194.48.128.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=aon.at
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aon.at
+	s=arc-20240116; t=1769690862; c=relaxed/simple;
+	bh=A+uH+FMU1M9LPW8x3vGiKxIKk0sSXlUou4sZ24YDWOQ=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=QiT/d6/nwr5pk1ok3vedThE6PvpikqUJL6TzZAU+3hcEDXFqDlid2214papu8voOY7e9MjW/0uHfqk0M2Q2fmAogff7UpsAM7IfjP9grb7bgndXLHcofpud1HjMbu9frZfIlwFaqFcxvByfRZLQsY1c6PqNYwJ787+uMKpvab44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Nn5W5ZcD; arc=none smtp.client-ip=209.85.167.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=aon.at header.i=@aon.at header.b="mK+w1f8U"
-Received: from smtpout02.a1.net (unknown [10.247.84.12])
-	by smtpfallback04.a1.net (Postfix) with ESMTPS id 4f1yxQ0hWKzYl0R4
-	for <linux-block@vger.kernel.org>; Thu, 29 Jan 2026 13:24:10 +0100 (CET)
-Received: from golem (unknown [100.86.142.102])
-	by smtpout02.a1.net (Postfix) with ESMTPSA id 4f1yxD6HPyzGrqny
-	for <linux-block@vger.kernel.org>; Thu, 29 Jan 2026 13:24:00 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aon.at; s=resmail1;
-	t=1769689441;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=ooGkKpKzGL9/GyOJubLs29sRBP46f6dCngsP/Z4u69A=;
-	b=mK+w1f8UtFyspzDD1qggsxERzDkWlI57iZ7dScXZtyqlJIJVGu/Fge2YfqleQqHD2qeUvs
-	e4aOtSm7k7/3CYSx/uo+kVBh1jDt1nboqcbytp6ZtDqJXN8PRka+W7oiB72N7xRkxv5/GX
-	gW3Dnv06B+qjqfRtPTNpRXb1kNlpWddwLPwjlNC5XB9J8vgBXWhlZVDVaAz78KjezXndpc
-	9IV82lU21923gqKLj2lIKk3mQGnBc1riYtdL7NKpg4QSFd9euD+IH0gyrss5Bs3gMXa5xW
-	WJT/251g6hOMnpyX0L4WoWHTnUb9ZBa5SPhAZYKFShXbVfm/G8vjdl6ISbvQwaaWu+V0Bc
-	ESQD06PFXWUVROx3Hea2yeoUxvvfEXGME6SA0HZWwbde1Z7AztkuJURxjJQv/v/JAKgu8d
-	uCv5HYsrIXSj43Wj1eF/PzXGcBpsd+fT2FYUHgYVfy2/LRFuZHsXB2y3ipEBbCl3esl9iB
-	6JbnoRZFnW8g/w1dKQpeBQR1Umi+bjIxg9Al8GOCMLMU9AhFL9mQTgJ+GqfnViX7auFpdU
-	deZ3nmpYKqtRm2TSmQ5ni1avMAGLq1wBMIHS4LiKnMFaEKCLy33YgrtmS/i4BH5NpUfPvv
-	LgRU6mmmBN5vX81By6hwMuQZd3289MwnuyqHLSQywwI2i2UXsxw64=
-Date: Thu, 29 Jan 2026 13:14:41 +0100
-From: nokangaroo <nokangaroo@aon.at>
-To: linux-block@vger.kernel.org
-Subject: Recent commits break loop device unmounting
-Message-ID: <20260129131441.7c574b58@golem>
-X-Mailer: Claws Mail 4.3.1git129 (GTK 3.24.52; x86_64-pc-linux-gnu)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Nn5W5ZcD"
+Received: by mail-oi1-f193.google.com with SMTP id 5614622812f47-45c838069e5so632234b6e.0
+        for <linux-block@vger.kernel.org>; Thu, 29 Jan 2026 04:47:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1769690856; x=1770295656; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=I49rk0mJMeOtsVg4sLszBeHOn8VTBgFPuk/FrYrQmbg=;
+        b=Nn5W5ZcDgd9jS58kA8G1Yn3tVt0AOfaCHBLZzrQZsW/R8CJTKojApWgoYr5xyD5ben
+         ij7zkgL1L404aTTmf/TzD65zPJXMeamrRmlxJSlMOm3E0gBpa9suiHZLG79iBER/ZLjD
+         5845LqMrvNmTMA8i9RehTTsxqSwcoe/ihQCxtVw7MD7CkzEqgajoGZRKnWrx7vFQe5Ae
+         s1W94PcQKoZn1KIDgvh2v4qHUBHEW5m4/nj4xMbGMPGGjUW6hEkrKCg3EAz+0f2MefHT
+         dGGgGnGL5a1u8c3oymjatUaTu1Vam4/+XQV/qvCgdLNz1WCr1K+hMMQ1AiDgb10A9EJo
+         6Wlw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769690856; x=1770295656;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=I49rk0mJMeOtsVg4sLszBeHOn8VTBgFPuk/FrYrQmbg=;
+        b=fGq9C3oG1IOFdGoS/vHoOf36lcWOAwSSkQaybSXEP/ZSvRUXOfjwBM/MJmLmP2nbhz
+         orDc2AsNrL61F1/TG5f94aFcvZcrl3j1O2E9nowmOiwPfmTkUluL3ReSkrXxyiMnpkJa
+         WRvfeliljgefOni9B3M5qM8i3Tc7rYBQGBpPQOW1zNzhsw7UpjRps9xKQj9IrAz7pZzl
+         CIEpfE6UVWEG2khG88KbVswnv3pguJGIpy2B8RQdOoXtszmDTMdDTWtgXBMUsJS8gkVv
+         YuJ8SpNuNi/8TGc006vtdfhzn5uka0eC5klg/cMwIzbLD7HhMZTHEHPtg7KaWURzws0q
+         +SBA==
+X-Gm-Message-State: AOJu0YxND3F9AmfdTTGY9pHKj+hjqkvfkg6mdQ2fN3lTeL2SFTHVqr8R
+	DdBVYUFq4UlAAJsfz1JpdRYTR+vPVyFKS4LDjEkPO3xj/xAzU6sVBw6CxtpCGw20KNaUOFZ20Dc
+	ZlicCGwi/7g==
+X-Gm-Gg: AZuq6aLg6/kYQQn3ZLNSBBA/O3R3IVMJP9ADscBjIMvUfi+cdlqaPDZSEAVzdHC+LaZ
+	CYnfIQVG6HAxqd5H40LEsVkPnV5LcVHOqDY+Ol/1QksSpurWGWE+Bg3FLQ5W1G4fqFz9VyAjK0A
+	prX4I+/or0dKmnxGaMyY0gVfT9rqXgK3IdLmPlkjjtLJ7OzdWzFxdRZVbkRufgstb53A9hXw9CX
+	JKRRxywyy5vw1T7dzwP/OKjF5+BgTlrgpZIl6XOkcyCD1kswaW23IIatI9prAVM638/3p9T3QxV
+	3oZ6hBW0mlxvo4J5Ah9lU23ptlbcn1gf9hdLrYoATbjJU1YsL0GGM9iGIc51s3k81hwDhgMZ6Xi
+	VEleoSaywOxcdxhjheBtc0v+j5RslH/UERCQYvKE9NkoG5mMEjQ36s/frIFea7fRHBUyi9FGasi
+	BQpSyYVlcW9yWx2qRue+z5TM6tBOa17ZeIGzn8NVEfhaJIeOjTficrVgL6J7r2MCtz
+X-Received: by 2002:a05:6808:1926:b0:459:9630:3742 with SMTP id 5614622812f47-45efc5ac8d8mr4472541b6e.22.1769690856526;
+        Thu, 29 Jan 2026 04:47:36 -0800 (PST)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4095751ea47sm3675072fac.15.2026.01.29.04.47.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jan 2026 04:47:35 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Cc: Caleb Sander Mateos <csander@purestorage.com>, 
+ Uday Shankar <ushankar@purestorage.com>
+In-Reply-To: <20260124042716.2314690-1-ming.lei@redhat.com>
+References: <20260124042716.2314690-1-ming.lei@redhat.com>
+Subject: Re: [PATCH V2] ublk: document IO reference counting design
+Message-Id: <176969085566.453880.8016909450526060679.b4-ty@kernel.dk>
+Date: Thu, 29 Jan 2026 05:47:35 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3
 
-	commit 08e136ebd193eae7d5eff4c66d576c4a2dabdc3f
-	Author: Raphael Pinsonneault-Thibeault <rpthibeault@gmail.com>
-	Date:   Wed Dec 17 14:00:40 2025 -0500
 
-	loop: don't change loop device under exclusive opener in loop_set_status
+On Sat, 24 Jan 2026 12:27:16 +0800, Ming Lei wrote:
+> Add comprehensive documentation for ublk's split reference counting
+> model (io->ref + io->task_registered_buffers) above ublk_init_req_ref()
+> given this model isn't very straightforward.
+> 
+> 
 
-	loop_set_status() is allowed to change the loop device while there
-	are other openers of the device, even exclusive ones.
+Applied, thanks!
 
-	In this case, it causes a KASAN: slab-out-of-bounds Read in
-	ext4_search_dir(), since when looking for an entry in an inlined
-	directory, e_value_offs is changed underneath the filesystem by
-	loop_set_status().
+[1/1] ublk: document IO reference counting design
+      commit: 0921abdcbd1cbd6605ea425e85758bd4a19b9b32
 
-	Fix the problem by forbidding loop_set_status() from modifying the loop
-	device while there are exclusive openers of the device. This is similar
-	to the fix in loop_configure() by commit 33ec3e53e7b1 ("loop: Don't
-	change loop device under exclusive opener") alongside commit
-	ecbe6bc0003b ("block: use bd_prepare_to_claim directly in the loop
-	driver").
+Best regards,
+-- 
+Jens Axboe
 
-and the follow-up
-	commit 2704024d83fa9eb8e5f16925aae340fd9d246694
-	Author: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-	Date:   Wed Jan 7 19:41:43 2026 +0900
 
-	loop: add missing bd_abort_claiming in loop_set_status
 
-break unmounting a loop device by a normal user
-(udisksctl unmount -b /dev/loop0).
-The device seems to be unmounted, but the path still appears in the file
-manager, and if the device is on an external harddisk I cannot unmount the
-disk.
-
-Bisecting: 0 revisions left to test after this (roughly 0 steps)
-[08e136ebd193eae7d5eff4c66d576c4a2dabdc3f] loop: don't change loop device under
-exclusive opener in loop_set_status
-
-As a workaround I reverted this commit (and the follow-up before it).
-
-  git revert -n 2704024d83fa9eb8e5f16925aae340fd9d246694
-  git revert -n 08e136ebd193eae7d5eff4c66d576c4a2dabdc3f
-
-If they solve an actual problem it needs to be fixed differently.
-Commits 33ec3e53e7b1 and ecbe6bc0003b seem to be correct.
-
-I will supply more information if needed
