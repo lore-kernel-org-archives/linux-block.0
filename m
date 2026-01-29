@@ -1,47 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACC0F33A9EE
-	for <linux-block@vger.kernel.org>; Thu, 29 Jan 2026 16:20:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B80C533A9EE
+	for <linux-block@vger.kernel.org>; Thu, 29 Jan 2026 16:20:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769703644; cv=none; b=fcje1jx36hf+N0kqmOoLGzq8T3giBFianvEaOLjRtnAWy7GVwd7rGz0HhlBhOgDKLYi4AA6ZIiVBnii8V+dVbWKdNby1n++4YX7Z4L5wFePf/wpD0adqg6tVkUoNd2OdFv4X0bUOezAmUttdNCkM93kvsOwJwyQY0OWT8w+SO4E=
+	t=1769703651; cv=none; b=GQe/7xTwgXXpEoEFzPxkrsWFQwysW/1L0RL0anTmUGj6cnkiiAuMvDmDOCJyMlk7bFV8kGgqyom+i5uOdF/Qnu2imT2w0iYPapk8VQOgozwWk6jZak6PNf23ydbnueOux+GEEocTfpqk2nFFHmUdearavq4wcAdgguWJ5Ccc+e8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769703644; c=relaxed/simple;
-	bh=9zy2J2aaTJCmo0k4+He6kmOLUPNqOYKv7thg9MsyR6E=;
+	s=arc-20240116; t=1769703651; c=relaxed/simple;
+	bh=BqVSmQuPWvev/AZ0GLr9Tli+Jjt2URdSgp08t6Gwe1E=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=T5mwD1sUpuHzXG7AvA/AZUhBUgH3EEMn8/O0V9pLAxJr/UXC7GMLt7g8sxdfXDMADHLhA86TXS34UhmJ5MYZwH95qi0W3nCzG3Jxg7QsxcOkyC+GmxsC6o1BTYflNrd30uUC7b69cjlR8phmYsUXldIG8gfauXmQrrXDPJW4H6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iesdzu2p; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=UWRdT4HV642BKhDcKFpDY5wXZNLvdsPGKkndOfvtJHexguu+hBu2Uvf8LP6YfX4JGoYXWGHK20J9MveCm/IdhvN7cfmk1LEKq2vR439hMbyIAIfzA1phfV/yoYWMRq2LQG0N/ZIgpdNkYWrxidKveel9EWI/31XozMeUVWIG820=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OIohgNhS; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iesdzu2p"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OIohgNhS"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769703641;
+	s=mimecast20190719; t=1769703648;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=A9wAnwjmH+fnuD3GLiryobxVeMK4kXnLmJ3V/OiZog0=;
-	b=iesdzu2p6gmp1mcQ4Tug+DslEfNHqkiKUhWtbfDRDx1hWNza8C1Nt2MZc2mNRdu0076t4r
-	h2/gAdIeU0wP65rMrndNAwg7F4vks54UymGNJE31aYlu/SgRlVjUuVsf28i79+gJy1Z36t
-	rQbOxmP5VGwcXpx2/Dkq5EE1T4gAWF8=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=eOMPfpObACjxjb1Pf++idWki8zpk3vVdNvgoi7qQA+o=;
+	b=OIohgNhSgyvnaWCct68hr7VprVu462jiikjrNTPFPro51iFwRcdMW0Bo5jsAwZ0PCyZ3CT
+	RafAaAUjBg3QAfZlqq6Kf55wzagG1lQ6Y2RQ2utcEKUaDbL7cxKgqhJQWf5/zbPojwSzeN
+	WQ6IvtNd2wP5PMViKsBClIQL9Q2p1M4=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-694-GrAHfS5dMfaA1riP2hmmfw-1; Thu,
- 29 Jan 2026 11:20:39 -0500
-X-MC-Unique: GrAHfS5dMfaA1riP2hmmfw-1
-X-Mimecast-MFC-AGG-ID: GrAHfS5dMfaA1riP2hmmfw_1769703637
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-347-Nh1OGlurObawXthCw5-apA-1; Thu,
+ 29 Jan 2026 11:20:42 -0500
+X-MC-Unique: Nh1OGlurObawXthCw5-apA-1
+X-Mimecast-MFC-AGG-ID: Nh1OGlurObawXthCw5-apA_1769703641
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 38F4E19560B4;
-	Thu, 29 Jan 2026 16:20:37 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 27B7F18005BD;
+	Thu, 29 Jan 2026 16:20:41 +0000 (UTC)
 Received: from localhost (unknown [10.72.116.182])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5847E3000218;
-	Thu, 29 Jan 2026 16:20:35 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2A01519560B2;
+	Thu, 29 Jan 2026 16:20:39 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
@@ -49,9 +49,9 @@ Cc: Caleb Sander Mateos <csander@purestorage.com>,
 	Uday Shankar <ushankar@purestorage.com>,
 	Alexander Atanasov <alex@zazolabs.com>,
 	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 7/9] selftests: ublk: disable partition scan for integrity tests
-Date: Fri, 30 Jan 2026 00:19:56 +0800
-Message-ID: <20260129162001.3532311-8-ming.lei@redhat.com>
+Subject: [PATCH V2 8/9] selftests: ublk: mark each test start and end time in dmesg
+Date: Fri, 30 Jan 2026 00:19:57 +0800
+Message-ID: <20260129162001.3532311-9-ming.lei@redhat.com>
 In-Reply-To: <20260129162001.3532311-1-ming.lei@redhat.com>
 References: <20260129162001.3532311-1-ming.lei@redhat.com>
 Precedence: bulk
@@ -61,57 +61,41 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-The null target doesn't handle IO, so disable partition scan to avoid IO
-failures caused by integrity verification during the kernel's partition
-table read.
+From: Alexander Atanasov <alex@zazolabs.com>
 
+Log test start and end time in dmesg, so generated log messages
+during the test run can be linked to specific test from the test
+suite.
+
+Signed-off-by: Alexander Atanasov <alex@zazolabs.com>
+(switch to `date +%F %T`)
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- tools/testing/selftests/ublk/test_null_04.sh | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ tools/testing/selftests/ublk/test_common.sh | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/tools/testing/selftests/ublk/test_null_04.sh b/tools/testing/selftests/ublk/test_null_04.sh
-index 22328e0f3925..a5599d38583a 100755
---- a/tools/testing/selftests/ublk/test_null_04.sh
-+++ b/tools/testing/selftests/ublk/test_null_04.sh
-@@ -21,7 +21,7 @@ _check_value() {
- _test_metadata_only() {
- 	local dev_id
+diff --git a/tools/testing/selftests/ublk/test_common.sh b/tools/testing/selftests/ublk/test_common.sh
+index bbe031c94a29..dd4eff97610a 100755
+--- a/tools/testing/selftests/ublk/test_common.sh
++++ b/tools/testing/selftests/ublk/test_common.sh
+@@ -126,6 +126,7 @@ _prep_test() {
+ 	modprobe ublk_drv > /dev/null 2>&1
+ 	UBLK_TMP=$(mktemp ublk_test_XXXXX)
+ 	[ "$UBLK_TEST_QUIET" -eq 0 ] && echo "ublk $type: $*"
++	echo "ublk selftest: $TID starting at $(date '+%F %T')" | tee /dev/kmsg
+ }
  
--	dev_id=$(_add_ublk_dev -t null -u --metadata_size 8)
-+	dev_id=$(_add_ublk_dev -t null -u --no_auto_part_scan --metadata_size 8)
- 	_check_add_dev "$TID" $?
+ _remove_test_files()
+@@ -170,6 +171,7 @@ _cleanup_test() {
+ 	"${UBLK_PROG}" del -a
  
- 	_check_value "metadata_size" "$(_get_metadata_size "$dev_id" metadata_size)" 8 &&
-@@ -40,7 +40,7 @@ _test_metadata_only() {
- _test_integrity_capable_ip() {
- 	local dev_id
+ 	_remove_files
++	echo "ublk selftest: $TID done at $(date '+%F %T')" | tee /dev/kmsg
+ }
  
--	dev_id=$(_add_ublk_dev -t null -u --integrity_capable --metadata_size 64 --pi_offset 56 --csum_type ip)
-+	dev_id=$(_add_ublk_dev -t null -u --no_auto_part_scan --integrity_capable --metadata_size 64 --pi_offset 56 --csum_type ip)
- 	_check_add_dev "$TID" $?
- 
- 	_check_value "metadata_size" "$(_get_metadata_size "$dev_id" metadata_size)" 64 &&
-@@ -59,7 +59,7 @@ _test_integrity_capable_ip() {
- _test_integrity_reftag_t10dif() {
- 	local dev_id
- 
--	dev_id=$(_add_ublk_dev -t null -u --integrity_reftag --metadata_size 8 --csum_type t10dif)
-+	dev_id=$(_add_ublk_dev -t null -u --no_auto_part_scan --integrity_reftag --metadata_size 8 --csum_type t10dif)
- 	_check_add_dev "$TID" $?
- 
- 	_check_value "metadata_size" "$(_get_metadata_size "$dev_id" metadata_size)" 8 &&
-@@ -78,7 +78,7 @@ _test_integrity_reftag_t10dif() {
- _test_nvme_csum() {
- 	local dev_id
- 
--	dev_id=$(_add_ublk_dev -t null -u --metadata_size 16 --csum_type nvme --tag_size 8)
-+	dev_id=$(_add_ublk_dev -t null -u --no_auto_part_scan --metadata_size 16 --csum_type nvme --tag_size 8)
- 	_check_add_dev "$TID" $?
- 
- 	_check_value "metadata_size" "$(_get_metadata_size "$dev_id" metadata_size)" 16 &&
+ _have_feature()
 -- 
 2.47.0
 
