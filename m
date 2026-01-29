@@ -1,125 +1,124 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0ED816A956
-	for <linux-block@vger.kernel.org>; Thu, 29 Jan 2026 08:21:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A72225771
+	for <linux-block@vger.kernel.org>; Thu, 29 Jan 2026 09:23:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769674921; cv=none; b=uO4XLBoHcF/yvvBDXXolgN2pEL3IYBt32Qy/512S4/lNo/UUvtZQgu6uY4MWeiEc9U66HZfNeszD1W28T3LVoLFJOXbpZ6pwOqEoH7s5putmv9I79INhqhmjFARo0w0jgoH2FkXOT2h8zraYKfE868a+TbfEyzn01k/5D+CxiTE=
+	t=1769678586; cv=none; b=nNmpf0Wi/bhoRxO0y1rNdVVae2ZXsV7EQ3E8D9HVdrk3IxYf0y9KbIsdzswI+8u1lCp+0EDHT4r8MfVF6cmmsh3dyUpJGV4n5SVPYDFkg49E+wavB9jn2h0fNfr8pcgkaft/G9PNzAXgEIitAJrp6nIJ2j52nH/ireQpEZrwJRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769674921; c=relaxed/simple;
-	bh=eB4TnzMxrO4cX6tz7m47qcyKK/60d6ivEpCr0yKXFK8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OR/aHWNLLS1mLwdO0VafUG3SVTfFhc6ukPg7qpfzHi3DMI+1fEUfGyf0y6z+54/63pyamuDSUrp2zNxsTjVNtrYTv4eYgXocSTCItV8lcTq38kFV/84ZclixCxIwggmdhLi1mvOEccP6hehUdcPmATPbIhvRHOjwlzQNyhznnAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VUqfhpLr; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1769678586; c=relaxed/simple;
+	bh=ARs//fIDejJMHXNpru/GOfl78BmMhpV7mS+cI7e3jF4=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
+	 Content-Type:References; b=WhACTtk0xW/hqxcDM3XJJa9WmQa/YiYrfxVbjPN5JOujGAAbiSLKM5tHkXmQlDZDv3HV5UInO4/v+otWscHE3zxnMwMqkCzAPFP9hvo+sp6O1vqVJCKPiMjGOkxFXge+BqjNB60qICcIkE58Lun6Feplu5hOqutg/lAnZd9nfOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=Q/5PnCZz; arc=none smtp.client-ip=203.254.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VUqfhpLr"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769674918;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AUilyuw8LfdXlHS2LJn/PeiP5yz2o+GH6XWV8wAxZ9s=;
-	b=VUqfhpLrtG+mgEBpox4Zl9Tq+6OytoVcqHkP5mxNd9feJU/PuWVBNnKQacMre7W8pAMCZK
-	GZmhpyH7BSRko1ng/W9nYF36WRFjEe23Zakn0VzereuvilzzAfkOMW3krKiHA7+8HCHvS1
-	Mcl5+o0VtltTo0Kr3v/nyNKYXktO/AQ=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-10-zlJnqMuBP6OV76VJ2HUAhQ-1; Thu,
- 29 Jan 2026 03:21:57 -0500
-X-MC-Unique: zlJnqMuBP6OV76VJ2HUAhQ-1
-X-Mimecast-MFC-AGG-ID: zlJnqMuBP6OV76VJ2HUAhQ_1769674916
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E39481800357;
-	Thu, 29 Jan 2026 08:21:55 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.182])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A25D118002A6;
-	Thu, 29 Jan 2026 08:21:51 +0000 (UTC)
-Date: Thu, 29 Jan 2026 16:21:46 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	Uday Shankar <ushankar@purestorage.com>,
-	Alexander Atanasov <alex@zazolabs.com>,
-	Yoav Cohen <yoav@nvidia.com>
-Subject: Re: [PATCH 2/5] ublk: add UBLK_F_NO_AUTO_PART_SCAN feature flag
-Message-ID: <aXsYmhdCLBSN704-@fedora>
-References: <20260129031501.3403688-1-ming.lei@redhat.com>
- <20260129031501.3403688-3-ming.lei@redhat.com>
- <CADUfDZoYtEjVjqQDnHXQynZUp3NJv+bgWuFJuvOUS_hJcOy3qg@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="Q/5PnCZz"
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20260129092301epoutp04e5e822c6dc7409c075b4c57102491deb~PKUsUSiaD1559215592epoutp04n
+	for <linux-block@vger.kernel.org>; Thu, 29 Jan 2026 09:23:01 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20260129092301epoutp04e5e822c6dc7409c075b4c57102491deb~PKUsUSiaD1559215592epoutp04n
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1769678581;
+	bh=qUI9j7bLsc/At0wO/OTw5TxXAC8JsaEARV5hmvwnG/c=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Q/5PnCZznOXaUpCI+pYDUOjyQ5VmFOJ+2E7ksYDBXSDYXqi3hB4jt19n6BsMU6WPh
+	 yxZnSWfxfZv6MD2RahXQEXr1e80lewONBHuxDY5qi6irntSd1G+fmSiIlcWQn45+5s
+	 Dbs5Ck4mzCop2f9R/nBli34f/nfi+vcTuxYHFCQM=
+Received: from epsnrtp03.localdomain (unknown [182.195.42.155]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTPS id
+	20260129092300epcas5p497c738bc1c9130fde8bde6c2ef93629f~PKUr-sXzK2452624526epcas5p4t;
+	Thu, 29 Jan 2026 09:23:00 +0000 (GMT)
+Received: from epcas5p2.samsung.com (unknown [182.195.38.95]) by
+	epsnrtp03.localdomain (Postfix) with ESMTP id 4f1twM4y0wz3hhTD; Thu, 29 Jan
+	2026 09:22:59 +0000 (GMT)
+Received: from epsmtip2.samsung.com (unknown [182.195.34.31]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+	20260129092258epcas5p1fb7fd90db827d982829475652b43786a~PKUqbo9f40563405634epcas5p1D;
+	Thu, 29 Jan 2026 09:22:58 +0000 (GMT)
+Received: from green245.gost (unknown [107.99.41.245]) by
+	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20260129092258epsmtip27dd77ea529ab52486982c8fef66e4a08~PKUp8Hjuq1221112211epsmtip2D;
+	Thu, 29 Jan 2026 09:22:58 +0000 (GMT)
+Date: Thu, 29 Jan 2026 14:48:46 +0530
+From: Nitesh Shetty <nj.shetty@samsung.com>
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 2/2] block: introduce blk_queue_rot()
+Message-ID: <20260129091846.nx3crn6347gf6brv@green245.gost>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20260129072715.1107336-3-dlemoal@kernel.org>
+X-CMS-MailID: 20260129092258epcas5p1fb7fd90db827d982829475652b43786a
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+	boundary="----dZkOkAIazzHoUX-2rQXwJ8woeHD-_lbejx.E5KOGiu3cq0eS=_13656e_"
+CMS-TYPE: 105P
+cpgsPolicy: CPGSC10-542,Y
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20260129092258epcas5p1fb7fd90db827d982829475652b43786a
+References: <20260129072715.1107336-1-dlemoal@kernel.org>
+	<20260129072715.1107336-3-dlemoal@kernel.org>
+	<CGME20260129092258epcas5p1fb7fd90db827d982829475652b43786a@epcas5p1.samsung.com>
+
+------dZkOkAIazzHoUX-2rQXwJ8woeHD-_lbejx.E5KOGiu3cq0eS=_13656e_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADUfDZoYtEjVjqQDnHXQynZUp3NJv+bgWuFJuvOUS_hJcOy3qg@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Wed, Jan 28, 2026 at 08:44:58PM -0800, Caleb Sander Mateos wrote:
-> On Wed, Jan 28, 2026 at 7:15 PM Ming Lei <ming.lei@redhat.com> wrote:
-> >
-> > Add a new feature flag UBLK_F_NO_AUTO_PART_SCAN to allow users to suppress
-> > automatic partition scanning when starting a ublk device.
-> >
-> > This is useful for some cases in which use don't want to scan
-> > partitions.
-> >
-> > Users still can manually trigger partition scanning later when appropriate
-> > using standard tools (e.g., partprobe, blockdev --rereadpt).
-> >
-> > Reported-by: Yoav Cohen <yoav@nvidia.com>
-> > Link: https://lore.kernel.org/linux-block/DM4PR12MB63280C5637917C071C2F0D65A9A8A@DM4PR12MB6328.namprd12.prod.outlook.com/
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >  drivers/block/ublk_drv.c      | 7 ++++++-
-> >  include/uapi/linux/ublk_cmd.h | 3 +++
-> >  2 files changed, 9 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> > index 94470a2ec05e..0b98ab0f8257 100644
-> > --- a/drivers/block/ublk_drv.c
-> > +++ b/drivers/block/ublk_drv.c
-> > @@ -80,7 +80,8 @@
-> >                 | UBLK_F_BUF_REG_OFF_DAEMON \
-> >                 | (IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY) ? UBLK_F_INTEGRITY : 0) \
-> >                 | UBLK_F_SAFE_STOP_DEV \
-> > -               | UBLK_F_BATCH_IO)
-> > +               | UBLK_F_BATCH_IO \
-> > +               | UBLK_F_NO_AUTO_PART_SCAN)
-> >
-> >  #define UBLK_F_ALL_RECOVERY_FLAGS (UBLK_F_USER_RECOVERY \
-> >                 | UBLK_F_USER_RECOVERY_REISSUE \
-> > @@ -2364,6 +2365,10 @@ static void ublk_partition_scan_work(struct work_struct *work)
-> >                                              &disk->state)))
-> >                 goto out;
-> >
-> > +       /* Skip partition scan if disabled by user */
-> > +       if (ub->dev_info.flags & UBLK_F_NO_AUTO_PART_SCAN)
-> > +               goto out;
-> 
-> Seems like it's not necessary to schedule ublk_partition_scan_work()
-> in this case? Could just clear_bit(GD_SUPPRESS_PART_SCAN,
-> &disk->state) in ublk_ctrl_start_dev()?
+On 29/01/26 04:27PM, Damien Le Moal wrote:
+>To check if a request queue is for a rotational device, a double
+>negation is needed with the pattern "!blk_queue_nonrot(q)". Simplify
+>this with the introduction of the helper blk_queue_rot() which tests
+>if a requests queue limit has the BLK_FEAT_ROTATIONAL feature set.
+>All call sites of blk_queue_nonrot() are modified to use blk_queue_rot()
+>and blk_queue_nonrot() definition removed.
+>
+>No functional changes.
+>
+>Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+>---
+> block/bfq-iosched.c    | 20 ++++++++++----------
+> block/blk-iocost.c     |  2 +-
+> block/blk-iolatency.c  |  5 +----
+> block/blk-wbt.c        |  5 ++---
+> include/linux/blkdev.h |  4 ++--
+> 5 files changed, 16 insertions(+), 20 deletions(-)
+>
+>diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+>index 6e54b1d3d8bc..3ebdec40e758 100644
+>--- a/block/bfq-iosched.c
+>+++ b/block/bfq-iosched.c
+>@@ -231,7 +231,7 @@ static struct kmem_cache *bfq_pool;
+> #define BFQ_RQ_SEEKY(bfqd, last_pos, rq) \
+> 	(get_sdist(last_pos, rq) >			\
+> 	 BFQQ_SEEK_THR &&				\
+>-	 (!blk_queue_nonrot(bfqd->queue) ||		\
+>+	 (blk_queue_rot(bfqd->queue) ||			\
+> 	  blk_rq_sectors(rq) < BFQQ_SECT_THR_NONROT))
+> #define BFQQ_CLOSE_THR		(sector_t)(8 * 1024)
+> #define BFQQ_SEEKY(bfqq)	(hweight32(bfqq->seek_history) > 19)
+>@@ -4165,7 +4165,7 @@ static bool bfq_bfqq_is_slow(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+>
+> 	/* don't use too short time intervals */
+> 	if (delta_usecs < 1000) {
+>-		if (blk_queue_nonrot(bfqd->queue))
+>+		if (!blk_queue_rot(bfqd->queue))
+blk_queue_rot looks fine to me in other places.
+Keeping blk_queue_nonrot would avoid the double negation here and few places.
+I see you made the changes for bdev_nonrot down, but missed to add here
+?
 
-OK, we can do it by saving one time of wq schedule.
+Thanks,
+Nitesh
 
-> Is it actually necessary to clear GD_SUPPRESS_PART_SCAN at all? Does
-> that flag block partprobe too?
-
-Yes, the flag is totally controlled by user side.
+------dZkOkAIazzHoUX-2rQXwJ8woeHD-_lbejx.E5KOGiu3cq0eS=_13656e_
+Content-Type: text/plain; charset="utf-8"
 
 
-Thanks, 
-Ming
-
+------dZkOkAIazzHoUX-2rQXwJ8woeHD-_lbejx.E5KOGiu3cq0eS=_13656e_--
