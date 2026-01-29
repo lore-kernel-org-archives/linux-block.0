@@ -1,136 +1,126 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay.hostedemail.com (smtprelay0017.hostedemail.com [216.40.44.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D35202BE03D;
-	Wed, 28 Jan 2026 23:38:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 193E7223339;
+	Thu, 29 Jan 2026 00:40:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769643500; cv=none; b=K+T1JGO622KhCnSG4pXkV5nwTCJnriDMrYUhD+TzNxyU2KDKyc4DSPF6ihiAZaHxMVNB1mL2vexXY0DwdW8iHMIHibRZxYXwYDC9E2tvElHSyNMd7hpl0PlPxd2Hn7XboiXFJIXdc+rOxap0sGovhlN5sDTnNsWfcoGSyj8fhyw=
+	t=1769647260; cv=none; b=UHsHbv9tUp0bCps3xAwMknICNwkEyoMf2XZvQR20+r70lnGthssflkQKLu44ZO1oz8ELc/dzt7RMvHxuyYCdsZQ+pmHrS5R4sncPlqG5g7R5r+Z1DCS2v5qY25B8RXMdbKMvJpoCVJtPaV/SlZ+sAozs7H1TgZrTkzqUIy9Lg8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769643500; c=relaxed/simple;
-	bh=F0SGT1zA7nJrKcds9k2gzkJL1tql6F1LMQ2X/R9SLXU=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=TkHGM5aiyCg/YwMZfYh158+Hl4AYaCYos4jXrIbNsaobwwLnp5nGb/g9ku6d98wtrEnfDtnDalQmr/Vlt1x9+og8tulgOu+gz4YMsNWvu/3LPBlABlI/uuTuEc/XN9fJQVWejpArtbPAmSkTLI1leW5CozkgTq2AL3lZM90cHBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u5Z8pkQs; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u5Z8pkQs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10D22C4CEF1;
-	Wed, 28 Jan 2026 23:38:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769643500;
-	bh=F0SGT1zA7nJrKcds9k2gzkJL1tql6F1LMQ2X/R9SLXU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=u5Z8pkQsCsASHBAWQsH9T1G5ZcaqbryygrnEcq1600aasgTUAnDh3GNvGpgJ0D9lv
-	 xPa4jgCIpnpMBjCBuYljQSCb60qJCO9igRU8Hp/RKs6EkVei4Fc+8AKOle+vuQPysG
-	 FWSJ/pvJC62A1eD8OrsjajN7ic4SgGkD/mWkderuV0tsgEuL9xwUPS7oFw9Ad+w3Vc
-	 t0v9qojp+LNw+AkWJskfFTGxq+uNrg1X8mhv4VeYCk9Ea0zUrphX5DFqvLBMDRdOyS
-	 OOHfmQ2upHuEMDALuFfFT+J2swjVrLdqNxZpYA3UqiWc/fnrZTNHOXbLxp+v4jrLMp
-	 yP/X61KGrVeKQ==
-Date: Thu, 29 Jan 2026 08:38:17 +0900
-From: Masami Hiramatsu (Google) <mhiramat@kernel.org>
-To: Yaxiong Tian <tianyaxiong@kylinos.cn>
-Cc: rostedt@goodmis.org, axboe@kernel.dk, mathieu.desnoyers@efficios.com,
- corbet@lwn.net, skhan@linuxfoundation.org,
- linux-trace-kernel@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH v4 0/5] Tracing: Accelerate Kernel Boot by
- Asynchronizing
-Message-Id: <20260129083817.d26c61da3cf274bf37e1b2a0@kernel.org>
-In-Reply-To: <20260128125117.1704853-1-tianyaxiong@kylinos.cn>
+	s=arc-20240116; t=1769647260; c=relaxed/simple;
+	bh=3rmMdu/KL4FWCpGsuku9mWgwpv92dXcCAGYUU5AQhag=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Icr0YAORgid2qb43mpWuO/QomGQt4EQRKaK4cmWThgNPxp06plg1djPr6OMlgNT34blBLF4VHeBdDkxptDvfF8K+c22uSBcO0VGSTdRb37LDnkHxEr8KxGqAbsFv9kT07ZsXO87+riKVrk8/s/be9yRffVE79J9wrTB5ao3+xl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
+Received: from omf07.hostedemail.com (a10.router.float.18 [10.200.18.1])
+	by unirelay02.hostedemail.com (Postfix) with ESMTP id 4CD5813B5F5;
+	Thu, 29 Jan 2026 00:40:57 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf07.hostedemail.com (Postfix) with ESMTPA id 0D6A920024;
+	Thu, 29 Jan 2026 00:40:54 +0000 (UTC)
+Date: Wed, 28 Jan 2026 19:41:04 -0500
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Yaxiong Tian <tianyaxiong@kylinos.cn>, axboe@kernel.dk
+Cc: mhiramat@kernel.org, mathieu.desnoyers@efficios.com, corbet@lwn.net,
+ skhan@linuxfoundation.org, linux-trace-kernel@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org
+Subject: Re: [PATCH v4 5/5] blktrace: Make init_blk_tracer() asynchronous
+ when trace_async_init set
+Message-ID: <20260128194104.30051be1@gandalf.local.home>
+In-Reply-To: <20260128125554.1717261-1-tianyaxiong@kylinos.cn>
 References: <20260128125117.1704853-1-tianyaxiong@kylinos.cn>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	<20260128125554.1717261-1-tianyaxiong@kylinos.cn>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Stat-Signature: beqh17izdaycrar7xb7bm8th3g6gxb4o
+X-Rspamd-Server: rspamout04
+X-Rspamd-Queue-Id: 0D6A920024
+X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
+X-Session-ID: U2FsdGVkX191utgOXByJ08pMzV/bP1/D7KV+QdkEBP4=
+X-HE-Tag: 1769647254-38167
+X-HE-Meta: U2FsdGVkX1/AzcRMiLttA/OItKDcWNp8wTRrk5URzaqA94mBMgrhcmEReYqWj2ITdZIy5F3nDgNIL0G54tzvFTyX9zk1EUwUiZL5X7tFWdXv0LBERIdar+EVekzbW2/22SAjA/Xt22M0Ha08ci54JpwIfriN1Qx/2jh8oAYV+Iv7WSpDmfCzj7bpOaJk885sO9K3lWJH91hVzPKnBE6o2ez2guloMyyjnDP6q3zsR3BweXEkn1GfzmuSyvFLuJVFENBBa4jBogkkksrxPc/FjEujPzsJMFz9/O8GXkNBWsVCYteThDEuq/6fZbLY5fPA
 
-On Wed, 28 Jan 2026 20:51:17 +0800
+
+Jens,
+
+Can you give me an acked-by on this patch and I can take the series through
+my tree.
+
+Or perhaps this doesn't even need to test the trace_async_init flag and can
+always do the work queue? Does blk_trace ever do tracing at boot up? That
+is, before user space starts?
+
+Thanks,
+
+-- Steve
+
+
+On Wed, 28 Jan 2026 20:55:54 +0800
 Yaxiong Tian <tianyaxiong@kylinos.cn> wrote:
 
-> On my ARM64 platform, I observed that certain tracing module
-> initializations run for up to 200ms—for example, init_kprobe_trace().
-> Analysis reveals the root cause: the execution flow eval_map_work_func()
-> →trace_event_update_with_eval_map()→trace_event_update_all()
-> is highly time-consuming. Although this flow is placed in eval_map_wq
-> for asynchronous execution, it holds the trace_event_sem lock, causing
-> other modules to be blocked either directly or indirectly. Also in
-> init_blk_tracer(), this functions require trace_event_sem device_initcall.
+> The init_blk_tracer() function causes significant boot delay as it
+> waits for the trace_event_sem lock held by trace_event_update_all().
+> Specifically, its child function register_trace_event() requires
+> this lock, which is occupied for an extended period during boot.
 > 
-> To resolve this issue, I rename `eval_map_wq` and make it global and moved
-> other initialization functions under the tracing subsystem that are
-> related to this lock to run asynchronously on this workqueue. After this
-> optimization, boot time is reduced by approximately 200ms.
+> To resolve this, when the trace_async_init parameter is enabled, the
+> execution of primary init_blk_tracer() is moved to the trace_init_wq
+> workqueue, allowing it to run asynchronously. and prevent blocking
+> the main boot thread.
 > 
-> Given that asynchronous initialization makes it indeterminate when tracing
-> will begin, we introduce the trace_async_init kernel parameter.Asynchronous
-> behavior is enabled only when this parameter is explicitly provided.
-> 
-> Based on my analysis and testing, I've identified that only these two
-> locations significantly impact timing. Other initcall_* functions do not
-> exhibit relevant lock contention.
-> 
-> A brief summary of the test results is as follows:
-> Before this PATCHS:
-> [    0.224933] calling  init_kprobe_trace+0x0/0xe0 @ 1
-> [    0.455016] initcall init_kprobe_trace+0x0/0xe0 returned 0 after 230080 usecs
-> 
-> Only opt setup_boot_kprobe_events() can see:
-> [    0.258609] calling  init_blk_tracer+0x0/0x68 @ 1
-> [    0.454991] initcall init_blk_tracer+0x0/0x68 returned 0 after 196377 usecs
-> 
-> After this PATCHS:
-> [    0.224940] calling  init_kprobe_trace+0x0/0xe0 @ 1
-> [    0.224946] initcall init_kprobe_trace+0x0/0xe0 returned 0 after 3 usecs
-> skip --------
-> [    0.264835] calling  init_blk_tracer+0x0/0x68 @ 1
-> [    0.264841] initcall init_blk_tracer+0x0/0x68 returned 0 after 2 usecs
-
-OK, this series looks good to me.
-
-Acked-by: Masami Hiramatsu (Google) <mhiramat@kernel.org>
-
-for this series.
-
-Thank you,
-
-
-> 
+> Signed-off-by: Yaxiong Tian <tianyaxiong@kylinos.cn>
 > ---
-> Changes in v2:
-> - Rename eval_map_wq to trace_init_wq.
-> Changes in v3:
-> - Opt PATCH 1/3 commit
-> Changes in v4:
-> - add trace_async_init boot parameter in patch2
-> - add init_kprobe_trace's skip logic in patch3
-> - add Suggested-by tag 
-> - Other synchronous optimizations related to trace_async_init
+>  kernel/trace/blktrace.c | 23 ++++++++++++++++++++++-
+>  1 file changed, 22 insertions(+), 1 deletion(-)
 > 
-> Yaxiong Tian (5):
->   tracing: Rename `eval_map_wq` and allow other parts of tracing use it
->   tracing: add trace_async_init boot parameter
->   tracing/kprobes: Skip setup_boot_kprobe_events() when no cmdline event
->   tracing/kprobes: Make setup_boot_kprobe_events() asynchronous when
->     trace_async_init set
->   blktrace: Make init_blk_tracer() asynchronous when trace_async_init
->     set
-> 
->  .../admin-guide/kernel-parameters.txt         |  8 ++++++
->  kernel/trace/blktrace.c                       | 23 +++++++++++++++-
->  kernel/trace/trace.c                          | 27 ++++++++++++-------
->  kernel/trace/trace.h                          |  2 ++
->  kernel/trace/trace_kprobe.c                   | 18 ++++++++++++-
->  5 files changed, 67 insertions(+), 11 deletions(-)
-> 
-> -- 
-> 2.25.1
-> 
-> 
+> diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+> index d031c8d80be4..56c7270ec447 100644
+> --- a/kernel/trace/blktrace.c
+> +++ b/kernel/trace/blktrace.c
+> @@ -1832,7 +1832,9 @@ static struct trace_event trace_blk_event = {
+>  	.funcs		= &trace_blk_event_funcs,
+>  };
+>  
+> -static int __init init_blk_tracer(void)
+> +static struct work_struct blktrace_works __initdata;
+> +
+> +static int __init __init_blk_tracer(void)
+>  {
+>  	if (!register_trace_event(&trace_blk_event)) {
+>  		pr_warn("Warning: could not register block events\n");
+> @@ -1852,6 +1854,25 @@ static int __init init_blk_tracer(void)
+>  	return 0;
+>  }
+>  
+> +static void __init blktrace_works_func(struct work_struct *work)
+> +{
+> +	__init_blk_tracer();
+> +}
+> +
+> +static int __init init_blk_tracer(void)
+> +{
+> +	int ret = 0;
+> +
+> +	if (trace_init_wq && trace_async_init) {
+> +		INIT_WORK(&blktrace_works, blktrace_works_func);
+> +		queue_work(trace_init_wq, &blktrace_works);
+> +	} else {
+> +		ret = __init_blk_tracer();
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+>  device_initcall(init_blk_tracer);
+>  
+>  static int blk_trace_remove_queue(struct request_queue *q)
 
-
--- 
-Masami Hiramatsu (Google) <mhiramat@kernel.org>
