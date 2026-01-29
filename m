@@ -1,86 +1,112 @@
 Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAF4B3783A5
-	for <linux-block@vger.kernel.org>; Thu, 29 Jan 2026 09:26:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED6FB3783A5
+	for <linux-block@vger.kernel.org>; Thu, 29 Jan 2026 09:27:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769678784; cv=none; b=i1vH+WFvfRxLwaWlaIpJPLcu8X/P+bwEahK+1Quk+56vq1RSdlI7wHX2G7tIVSaNXLmmNT5a125Kiyn26ksJ0Fs8cqOYs/tghxf3UxS386y29Kk64aZJiXxl5hn91AV2CVE/XdkOn8VsP+dmJoFxNf0d5dEvd/dpHdGY1CCP+v4=
+	t=1769678847; cv=none; b=sJTXZfiwDSHMdiDWDuNBhszw3wuhsSOdUm4Hhx+8cBPwAUIo2ObOX+EB2u3vYTTiC0eABt3fzadfzoVpV9d7X6+pnD3/6+tVbT0pPERPXw/fqPW6wwTM9gWmk35VwVVyvfsLSDKqJ25BZzKHmDVV9gtJR8MVHkfb+lHogRLPObQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769678784; c=relaxed/simple;
-	bh=xjm2p3qaSda7vbBTyXyzpBMogbZTtEAmMp/qGhezn8U=;
+	s=arc-20240116; t=1769678847; c=relaxed/simple;
+	bh=4bRaTgrCKseoLnMwWid7iSb2X5Y0CMnCnaMIQDLYSAw=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
-	 Content-Type:References; b=j7zULtrWMBFMKfBgJ3ZDXxKiL6A+hSNfuy8wMRYg9SdGnKrIx6CVaSsCz2gnuzZECD8LGfL7nH/ddS5Y+C8K9cnr5MOzpG4NOuiFcC6JzOzFbgZ/hsvQfL8vsUSTKuJ8CiNTKJVhrGKjbtDV1BrUK9F0YDOxKNNT7eWPlNqOppY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=iNomuOJV; arc=none smtp.client-ip=203.254.224.25
+	 Content-Type:References; b=XqWaTpnr6Xfbu8ZDDJ1+4Rdp13b3AGPYGUrDrFfnMlKURL9SjITQGu3mdWHb3C2gw/7a3RJYi8WwPC6aJmjNUYKN5SiKp6EPu869elS7hvPJXFpZIv16AMcTaj3zDYBfaQf8W61CfANPda3OF9ybXD6l7rq3WwQNHoRLpBqRTSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=GzzAzzTV; arc=none smtp.client-ip=203.254.224.25
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="iNomuOJV"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="GzzAzzTV"
 Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20260129092620epoutp0274916ada22ce2bc41639b16de4727cfe~PKXmdSl6I1628716287epoutp02P
-	for <linux-block@vger.kernel.org>; Thu, 29 Jan 2026 09:26:20 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20260129092620epoutp0274916ada22ce2bc41639b16de4727cfe~PKXmdSl6I1628716287epoutp02P
+	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20260129092724epoutp02d9882c9129033380060d0db8f39b4a17~PKYhgLMFj1628516285epoutp02z
+	for <linux-block@vger.kernel.org>; Thu, 29 Jan 2026 09:27:24 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20260129092724epoutp02d9882c9129033380060d0db8f39b4a17~PKYhgLMFj1628516285epoutp02z
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1769678780;
-	bh=xjm2p3qaSda7vbBTyXyzpBMogbZTtEAmMp/qGhezn8U=;
+	s=mail20170921; t=1769678844;
+	bh=HTJkzz/t9Yvine6k3rYUCcimE1lwu9jEJYFkbVE5xQA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=iNomuOJVbojcetsPeSkIJYYoXaj8pTh+TqULFPz68TIXFYii7gR6/3k2FusjCuReJ
-	 y0jieCpyNTZ6qKqcn5xXYMHCC0wtp8Ff8AeUtVDmrkxmRybMu+JOLuIImA2q1WtdGF
-	 U3zD/Hxo7X74tOkvWD8TCg2NglDtaWQk8nJ44ql4=
+	b=GzzAzzTVXzlBQLcffAa6J4diAS2/dcKB9/cCFco2XOO6/hCKRPCrjmuuLQsRxD/ZM
+	 lP73gbJdsDnsgnXQcfO6VHflm4/8wNP9Chs+Vvk4C0kWqEw/158wqIDR7IhE/8ylsf
+	 4tlt6ECACReaM66Pu2bEbcpp31HCX+4Er5ZCKhKQ=
 Received: from epsnrtp04.localdomain (unknown [182.195.42.156]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTPS id
-	20260129092620epcas5p4997b55ade206483956ef61c222d00393~PKXmQMMqe3121531215epcas5p4O;
-	Thu, 29 Jan 2026 09:26:20 +0000 (GMT)
-Received: from epcas5p1.samsung.com (unknown [182.195.38.94]) by
-	epsnrtp04.localdomain (Postfix) with ESMTP id 4f1v0C6nDxz6B9m9; Thu, 29 Jan
-	2026 09:26:19 +0000 (GMT)
+	epcas5p1.samsung.com (KnoxPortal) with ESMTPS id
+	20260129092723epcas5p17ea68069b8cddc520c61ea4540435011~PKYhIRM8v2500625006epcas5p1j;
+	Thu, 29 Jan 2026 09:27:23 +0000 (GMT)
+Received: from epcas5p4.samsung.com (unknown [182.195.38.90]) by
+	epsnrtp04.localdomain (Postfix) with ESMTP id 4f1v1Q6K97z6B9mC; Thu, 29 Jan
+	2026 09:27:22 +0000 (GMT)
 Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
-	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-	20260129092619epcas5p4091e2e45f05f99ed376d4707f39f15e6~PKXk7WORi3121531215epcas5p4M;
-	Thu, 29 Jan 2026 09:26:19 +0000 (GMT)
+	epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+	20260129092722epcas5p262db49c6db5e12931dc0433090b20e57~PKYfn3rZJ2444824448epcas5p2R;
+	Thu, 29 Jan 2026 09:27:22 +0000 (GMT)
 Received: from green245.gost (unknown [107.99.41.245]) by
 	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20260129092618epsmtip1a68387c0e3f594ac9c11d35c1e7091a9~PKXkUbHOA0870608706epsmtip1I;
-	Thu, 29 Jan 2026 09:26:18 +0000 (GMT)
-Date: Thu, 29 Jan 2026 14:52:06 +0530
-From: Nitesh Shetty <nj.shetty@samsung.com>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 1/2] block: cleanup queue limit features definition
-Message-ID: <20260129092206.kxbcu7uvwycwegqn@green245.gost>
+	20260129092720epsmtip186b0b3daa7cec921ec0d647610f08fd1~PKYeDuLvH0871908719epsmtip1L;
+	Thu, 29 Jan 2026 09:27:20 +0000 (GMT)
+Date: Thu, 29 Jan 2026 14:53:06 +0530
+From: Anuj Gupta <anuj20.g@samsung.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Anuj gupta <anuj1072538@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+	Christian Brauner <brauner@kernel.org>, "Darrick J. Wong"
+	<djwong@kernel.org>, Carlos Maiolino <cem@kernel.org>, "Martin K. Petersen"
+	<martin.petersen@oracle.com>, Kanchan Joshi <joshi.k@samsung.com>,
+	linux-block@vger.kernel.org, nvdimm@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org
+Subject: Re: support file system generated / verified integrity information
+Message-ID: <20260129092306.7kxrizlwwk2ee756@green245.gost>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20260129072715.1107336-2-dlemoal@kernel.org>
-X-CMS-MailID: 20260129092619epcas5p4091e2e45f05f99ed376d4707f39f15e6
+In-Reply-To: <20260127151609.GA1883@lst.de>
+X-CMS-MailID: 20260129092722epcas5p262db49c6db5e12931dc0433090b20e57
 X-Msg-Generator: CA
 Content-Type: multipart/mixed;
-	boundary="----HKC0oM6l2X7jDELFNxUL3gr1rNZobpnU9ZVzK0VPY15yFScq=_137046_"
+	boundary="----bVwHse4Nykw-L2c5iRRXKf-G.8k0lxUwrpcTFjGaDb9lfltx=_136471_"
 CMS-TYPE: 105P
 cpgsPolicy: CPGSC10-542,Y
 X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20260129092619epcas5p4091e2e45f05f99ed376d4707f39f15e6
-References: <20260129072715.1107336-1-dlemoal@kernel.org>
-	<20260129072715.1107336-2-dlemoal@kernel.org>
-	<CGME20260129092619epcas5p4091e2e45f05f99ed376d4707f39f15e6@epcas5p4.samsung.com>
+X-CMS-RootMailID: 20260129092722epcas5p262db49c6db5e12931dc0433090b20e57
+References: <20260121064339.206019-1-hch@lst.de>
+	<CACzX3AuDkwEw3v0bNmYLk8updk1ghVJa-T9o=EHXor9FA7badw@mail.gmail.com>
+	<20260127151609.GA1883@lst.de>
+	<CGME20260129092722epcas5p262db49c6db5e12931dc0433090b20e57@epcas5p2.samsung.com>
 
-------HKC0oM6l2X7jDELFNxUL3gr1rNZobpnU9ZVzK0VPY15yFScq=_137046_
+------bVwHse4Nykw-L2c5iRRXKf-G.8k0lxUwrpcTFjGaDb9lfltx=_136471_
 Content-Type: text/plain; charset="utf-8"; format="flowed"
 Content-Disposition: inline
 
-On 29/01/26 04:27PM, Damien Le Moal wrote:
->Unwrap the definition of BLK_FEAT_ATOMIC_WRITES and
->renumber this feature to be sequential with BLK_FEAT_SKIP_TAGSET_QUIESCE.
+On 27/01/26 04:16PM, Christoph Hellwig wrote:
+>On Tue, Jan 27, 2026 at 08:24:28PM +0530, Anuj gupta wrote:
+>> Hi Christoph,
+>>
+>> Here are the QD1 latency numbers (in usec)
 >
->Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
->---
-Reviewed-by: Nitesh Shetty <nj.shetty@samsung.com>
+>Thanks a lot!
+>
+>Adding in the baseline numbers, as I wanted to compare those:
+>
+>> Intel Optane:
+>>
+>> Sequential read
+>>   | size | baseline | xfs-bounce |  xfs-pi  |
+>>   +------+----------+-----------+-----------+
+>>   |   4k |    7.18  |    13.62   |     7.20 |
+>>   |  64K |   36.40  |    99.66   |    34.16 |
+>>   |   1M |  206.38  |   258.88   |   306.23 |
+>>   +------+----------+------------+----------+
+>
+>So for 4k and 64k reads we basically get back to the baseline.
+>The 1M numbers are puzzling, though.  I wonder if we need to
+>add WQ_CPU_INTENSIVE or do some other tweaks to the XFS I/O
+>completion workqueue so that we don't overload the scheduler.
 
-------HKC0oM6l2X7jDELFNxUL3gr1rNZobpnU9ZVzK0VPY15yFScq=_137046_
+Tried adding WQ_CPU_INTENSIVE[1] but didn't see any change in the 1M
+latency. Looks like this needs something beyond just workqueue tuning.
+
+------bVwHse4Nykw-L2c5iRRXKf-G.8k0lxUwrpcTFjGaDb9lfltx=_136471_
 Content-Type: text/plain; charset="utf-8"
 
 
-------HKC0oM6l2X7jDELFNxUL3gr1rNZobpnU9ZVzK0VPY15yFScq=_137046_--
+------bVwHse4Nykw-L2c5iRRXKf-G.8k0lxUwrpcTFjGaDb9lfltx=_136471_--
