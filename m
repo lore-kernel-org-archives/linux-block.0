@@ -1,54 +1,58 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD2A82D061B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCD0D33ADB0
 	for <linux-block@vger.kernel.org>; Fri, 30 Jan 2026 16:26:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769790365; cv=none; b=rYa6IA5SB82KjC/K5ZcW8Hlcz+slvjB5hpEc9NMgzLTeXUuisD4OaJ1swXtw5voFxRRGsphd8pnvNpBTtHa0f55//+zKPjJ18xYJm+wP4FyAdTjNn9RAal9C66AaWXYxq7Ta9tLrUZsLNj9Kga9RiWVZg0NJWKbPCEsjfqTxdSw=
+	t=1769790365; cv=none; b=RbtkqjHmrVTs+REtCXD7bcinsA00YyPzrz41XvN/NxNsGwkI8GMcMEXr4WmgqeqzbY8YYolh3jxNr1Lshf3gW0id3jeBrwMmHqDwZVikWbcCXrjSqpujq2vIjVbUGYBXyqEB0awUIeVLQje/4EXA6nNQRBv9nzTieKM1Vrp92Ec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1769790365; c=relaxed/simple;
-	bh=5Z263AXmGssO1BQ6DqMOONhC7Nim5IJ3rjZ+yPAy1Jc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hTwc/JkmF7t3Ncse5wVJ3hiFatMaIlOZjfh3JA2sJDBqKdAyc3B4lUFXWzUUNZqGxba/lRF+cSFANvlPR+dOl80QDB7HWCeZAl/tudigogGtG3jFVRyU6hQ50i86jzmTDVKEkPFTI50H/2qFCPyegNjUiPVjpy8ZrBM/TgiP1nw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cwOVe4gt; arc=none smtp.client-ip=170.10.129.124
+	bh=aR9W8x97xCMezOI6D5u/kgNujFKClBVY0aGp2QyU9TQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=LLBhsT1apWsQIQVai58wZFWl8QzGaYVeZklYX5pxefEWX4WSwa5cCLDJlnmOeong0/dSAK+o7lvKESV5ZM/PJmLcdN6MsTuiS21HEgeT5SWespjsgVcYxmYlmYsxfDR692+oQDiFiFrk/Nk6f1DSh98rnpodeKzyY9D9ybR7vu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jNkJz1a0; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cwOVe4gt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jNkJz1a0"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
 	s=mimecast20190719; t=1769790362;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=ygfW8Aq/zgDsvRKYgEPkI4Q8Ibhe5PuoT+TN8rTc1YI=;
-	b=cwOVe4gtzjosWd0p1qaFsn/2802xIgYMM6qjwYIuLxHvtUDh8zl/uLUQ/9PNmIa+P/2xuT
-	7NzEI/u4VsSVEIRGmFBoxYylevTdMNCJan95GHMUcTx4VSoZfhIWDaMAyNFetd3vVFtQjv
-	sdrW5p1fkM/imn5c8NFAx1BNzI1C09E=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iCEid9wHN9wpVuMqx5X+NQ9lhJzwmjJDPDy1GvW6odc=;
+	b=jNkJz1a0zMbs0XE5HaHbfNgcWWi3QFvqQXwFgtDFm00z/TAKEVsw/uPeUTNXUOilfPNWh+
+	Rsjxi4F/ReG28BZFoXU9diRDpfcQwZmfebBJXSRGei00naQhhplvEzo9AGA2N8R9JpTeSe
+	Dj7DDmgyyxQLbaa20HBklEC2QgM7R78=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-3-TcED5kEoNXab0m3wM_uVBg-1; Fri,
- 30 Jan 2026 11:25:57 -0500
-X-MC-Unique: TcED5kEoNXab0m3wM_uVBg-1
-X-Mimecast-MFC-AGG-ID: TcED5kEoNXab0m3wM_uVBg_1769790355
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-253-HzEjLXSAPy2xiMM0rmAgsg-1; Fri,
+ 30 Jan 2026 11:26:01 -0500
+X-MC-Unique: HzEjLXSAPy2xiMM0rmAgsg-1
+X-Mimecast-MFC-AGG-ID: HzEjLXSAPy2xiMM0rmAgsg_1769790359
 Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 848CF19560A7;
-	Fri, 30 Jan 2026 16:25:55 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 507951800357;
+	Fri, 30 Jan 2026 16:25:59 +0000 (UTC)
 Received: from fedora.brq.redhat.com (unknown [10.43.17.192])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 107683000218;
-	Fri, 30 Jan 2026 16:25:53 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CA2CC3000218;
+	Fri, 30 Jan 2026 16:25:57 +0000 (UTC)
 From: Ondrej Kozina <okozina@redhat.com>
 To: linux-block@vger.kernel.org
 Cc: Ondrej Kozina <okozina@redhat.com>,
 	gmazyland@gmail.com,
 	gjoyce@ibm.com,
 	jonathan.derrick@linux.dev
-Subject: [PATCH 0/6] Extend Single User Mode (SUM) support in sed-opal.
-Date: Fri, 30 Jan 2026 17:25:06 +0100
-Message-ID: <20260130162527.570255-1-okozina@redhat.com>
+Subject: [PATCH 2/6] sed-opal: refactor (split) IOC_OPAL_LR_SETUP internals.
+Date: Fri, 30 Jan 2026 17:25:08 +0100
+Message-ID: <20260130162527.570255-3-okozina@redhat.com>
+In-Reply-To: <20260130162527.570255-1-okozina@redhat.com>
+References: <20260130162527.570255-1-okozina@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -58,42 +62,135 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-This patch series extends support for TCG Storage Opal SSC Single User
-Mode (SUM) in the sed-opal kernel interface. SUM addresses few
-shortcomins described in the chapter 2 of the OPAL2 sepecification
-extension (see below). It better isolates Admin authority from User
-stored data by taking the Lock/Unlock/Enable/Disable privileges from
-Admin when managing Locking Ranges configured for SUM.
+IOC_OPAL_LR_SETUP is used to set up a locking range entirely under a
+single authority (usually Admin1), but for Single User Mode (SUM),
+the permissions for attributes (RangeStart, RangeLength)
+and (ReadLockEnable, WriteLockEnable, ReadLocked, WriteLocked)
+may be split between two different authorities. Typically, it is Admin1
+for the former and the User associated with the LockingRange in SUM
+for the latter.
 
-This permission split necessitates separate ioctl calls for operations
-that previously could be performed atomically under a single authority.
-The series refactors existing code and introduces new ioctls to support
-this model:
+This commit only splits the internals in preparation for the introduction
+of separate ioctls for setting RangeStart, RangeLength and the rest
+using new ioctl calls.
 
-- IOC_OPAL_REACTIVATE_LSP: Switch an active OPAL2 device to/from SUM
-- IOC_OPAL_LR_SET_START_LEN: Set locking range boundaries only
-- IOC_OPAL_ENABLE_DISABLE_LR: Set lock enable states only
-- IOC_OPAL_GET_SUM_STATUS: Query SUM configuration status
+Signed-off-by: Ondrej Kozina <okozina@redhat.com>
+---
+ block/sed-opal.c | 73 +++++++++++++++++++++++++++++-------------------
+ 1 file changed, 45 insertions(+), 28 deletions(-)
 
-References:
-- TCG Storage Opal SSC Feature Set: Single User Mode specification
-- cryptsetup code using the extended sed-opal interface:
-  https://gitlab.com/cryptsetup/cryptsetup/-/merge_requests/832
-
-Ondrej Kozina (6):
-  sed-opal: add IOC_OPAL_REACTIVATE_LSP.
-  sed-opal: refactor (split) IOC_OPAL_LR_SETUP internals.
-  sed-opal: add IOC_OPAL_LR_SET_START_LEN ioctl.
-  sed-opal: add IOC_OPAL_ENABLE_DISABLE_LR.
-  sed-opal: increase column attribute type size to 64 bits.
-  sed-opal: add IOC_OPAL_GET_SUM_STATUS ioctl.
-
- block/opal_proto.h            |   4 +
- block/sed-opal.c              | 367 +++++++++++++++++++++++++++++++---
- include/linux/sed-opal.h      |   4 +
- include/uapi/linux/sed-opal.h |  25 +++
- 4 files changed, 371 insertions(+), 29 deletions(-)
-
+diff --git a/block/sed-opal.c b/block/sed-opal.c
+index 552aa2b48a7b..9fb6e0b953d5 100644
+--- a/block/sed-opal.c
++++ b/block/sed-opal.c
+@@ -1520,7 +1520,7 @@ static inline int enable_global_lr(struct opal_dev *dev, u8 *uid,
+ 	return err;
+ }
+ 
+-static int setup_locking_range(struct opal_dev *dev, void *data)
++static int setup_enable_range(struct opal_dev *dev, void *data)
+ {
+ 	u8 uid[OPAL_UID_LENGTH];
+ 	struct opal_user_lr_setup *setup = data;
+@@ -1534,38 +1534,47 @@ static int setup_locking_range(struct opal_dev *dev, void *data)
+ 
+ 	if (lr == 0)
+ 		err = enable_global_lr(dev, uid, setup);
+-	else {
+-		err = cmd_start(dev, uid, opalmethod[OPAL_SET]);
++	else
++		err = generic_lr_enable_disable(dev, uid, !!setup->RLE, !!setup->WLE, 0, 0);
++	if (err) {
++		pr_debug("Failed to create enable lr command.\n");
++		return err;
++	}
+ 
+-		add_token_u8(&err, dev, OPAL_STARTNAME);
+-		add_token_u8(&err, dev, OPAL_VALUES);
+-		add_token_u8(&err, dev, OPAL_STARTLIST);
++	return finalize_and_send(dev, parse_and_check_status);
++}
+ 
+-		add_token_u8(&err, dev, OPAL_STARTNAME);
+-		add_token_u8(&err, dev, OPAL_RANGESTART);
+-		add_token_u64(&err, dev, setup->range_start);
+-		add_token_u8(&err, dev, OPAL_ENDNAME);
++static int setup_locking_range_start_length(struct opal_dev *dev, void *data)
++{
++	int err;
++	u8 uid[OPAL_UID_LENGTH];
++	struct opal_user_lr_setup *setup = data;
+ 
+-		add_token_u8(&err, dev, OPAL_STARTNAME);
+-		add_token_u8(&err, dev, OPAL_RANGELENGTH);
+-		add_token_u64(&err, dev, setup->range_length);
+-		add_token_u8(&err, dev, OPAL_ENDNAME);
++	err = build_locking_range(uid, sizeof(uid), setup->session.opal_key.lr);
++	if (err)
++		return err;
+ 
+-		add_token_u8(&err, dev, OPAL_STARTNAME);
+-		add_token_u8(&err, dev, OPAL_READLOCKENABLED);
+-		add_token_u64(&err, dev, !!setup->RLE);
+-		add_token_u8(&err, dev, OPAL_ENDNAME);
++	err = cmd_start(dev, uid, opalmethod[OPAL_SET]);
+ 
+-		add_token_u8(&err, dev, OPAL_STARTNAME);
+-		add_token_u8(&err, dev, OPAL_WRITELOCKENABLED);
+-		add_token_u64(&err, dev, !!setup->WLE);
+-		add_token_u8(&err, dev, OPAL_ENDNAME);
++	add_token_u8(&err, dev, OPAL_STARTNAME);
++	add_token_u8(&err, dev, OPAL_VALUES);
++	add_token_u8(&err, dev, OPAL_STARTLIST);
++
++	add_token_u8(&err, dev, OPAL_STARTNAME);
++	add_token_u8(&err, dev, OPAL_RANGESTART);
++	add_token_u64(&err, dev, setup->range_start);
++	add_token_u8(&err, dev, OPAL_ENDNAME);
++
++	add_token_u8(&err, dev, OPAL_STARTNAME);
++	add_token_u8(&err, dev, OPAL_RANGELENGTH);
++	add_token_u64(&err, dev, setup->range_length);
++	add_token_u8(&err, dev, OPAL_ENDNAME);
++
++	add_token_u8(&err, dev, OPAL_ENDLIST);
++	add_token_u8(&err, dev, OPAL_ENDNAME);
+ 
+-		add_token_u8(&err, dev, OPAL_ENDLIST);
+-		add_token_u8(&err, dev, OPAL_ENDNAME);
+-	}
+ 	if (err) {
+-		pr_debug("Error building Setup Locking range command.\n");
++		pr_debug("Error building Setup Locking RangeStartLength command.\n");
+ 		return err;
+ 	}
+ 
+@@ -3050,7 +3059,12 @@ static int opal_setup_locking_range(struct opal_dev *dev,
+ {
+ 	const struct opal_step lr_steps[] = {
+ 		{ start_auth_opal_session, &opal_lrs->session },
+-		{ setup_locking_range, opal_lrs },
++		{ setup_locking_range_start_length, opal_lrs },
++		{ setup_enable_range, opal_lrs },
++		{ end_opal_session, }
++	}, lr_global_steps[] = {
++		{ start_auth_opal_session, &opal_lrs->session },
++		{ setup_enable_range, opal_lrs },
+ 		{ end_opal_session, }
+ 	};
+ 	int ret;
+@@ -3060,7 +3074,10 @@ static int opal_setup_locking_range(struct opal_dev *dev,
+ 		return ret;
+ 	mutex_lock(&dev->dev_lock);
+ 	setup_opal_dev(dev);
+-	ret = execute_steps(dev, lr_steps, ARRAY_SIZE(lr_steps));
++	if (opal_lrs->session.opal_key.lr == 0)
++		ret = execute_steps(dev, lr_global_steps, ARRAY_SIZE(lr_global_steps));
++	else
++		ret = execute_steps(dev, lr_steps, ARRAY_SIZE(lr_steps));
+ 	mutex_unlock(&dev->dev_lock);
+ 
+ 	return ret;
 -- 
 2.52.0
 
