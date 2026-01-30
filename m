@@ -1,69 +1,67 @@
-Received: from mail-pj1-f98.google.com (mail-pj1-f98.google.com [209.85.216.98])
+Received: from mail-dy1-f226.google.com (mail-dy1-f226.google.com [74.125.82.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DB713502B3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A375F3451D5
 	for <linux-block@vger.kernel.org>; Fri, 30 Jan 2026 17:14:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.98
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769793273; cv=none; b=ulKoYzequTUrWdEbUgUNmTZ+O9eXdn2NeTGwGI6Fs4yEmU1frX5mwBSCnf/Q7wYSfN7IMkBCkvKY4uILTOwAN3eMC0ASRfruzc6cL1mP2eL0g39CJM/ork6Pxx01ZWf01UO1YsutUk9wyFL2U/POQTxQVezpckbW4hVTQ+DkJhc=
+	t=1769793275; cv=none; b=oDSewj61J2UQG5mwNtDwWKMW83mD26Pu1b5tWAxIP7n5WLa0/brc4T29tSf5ymKAqvhZLx80ce5fPvQG4jtVZNvgLfqGI4KMEfvYDnHaSXU7F0f9+FftDQdRPXPlttm7OQmF2chD3WUluf9HvgccvgtUcBaqldMseq0VSXE2UZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769793273; c=relaxed/simple;
-	bh=uH26QxCWKhGjIjs7WgnjKQrwoovULgl956akyEOBsdA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UYVLTCjmIW9uxyOT7r/H7mfbaYwG8G0WNIguUfLBTFDhKFfp+HXyGAxsxfvHbTexOot8n5KcxOUSqKA4nRf5bBldqgA5E3nIn+XQhjdTC8LB10JfT8h7Bri7Zmn2ioXqQxBMkVbiDF0qvn9MeOviaPaDfzxrbYgmHikTd1v3+Is=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=H36yyUrg; arc=none smtp.client-ip=209.85.216.98
+	s=arc-20240116; t=1769793275; c=relaxed/simple;
+	bh=4AhqRcSK5RFr3YMpIfgAjPxjSkOOGh6Ggk88l8ioE6U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=p+mz88JKX34lGpza1uRVM2ZDGgsPaWQH5yINUKQZ0qGa7C26dsJqVLFSWju4OCD+BzXQcGt2t8AysMrGiBloI+GJq0Wp3v3R8P9v+gESyVVCclyvQ2nNdDmUO16Eg+xycc6VRmftIOgJPKFoWH5OUiik3i8Kr7q350r40v/Ik1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Xk8KRXy8; arc=none smtp.client-ip=74.125.82.226
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="H36yyUrg"
-Received: by mail-pj1-f98.google.com with SMTP id 98e67ed59e1d1-34c567db0a9so33382a91.1
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Xk8KRXy8"
+Received: by mail-dy1-f226.google.com with SMTP id 5a478bee46e88-2b79658162dso59676eec.3
         for <linux-block@vger.kernel.org>; Fri, 30 Jan 2026 09:14:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=purestorage.com; s=google2022; t=1769793271; x=1770398071; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gg1XU3B6cgpEe2psLflcWBiUZvtKlNIIXguQ1b/fEKw=;
-        b=H36yyUrgWN5H0VCiZpwSIinJV5TX2r7VdFI2bRpyMHbG1wrOXRHVXwyIQsh6LmBeh9
-         yFSbS10+TteqoKenLr/60QnX/Hj5Z+il7/7PRTLZsHQO5xm4RxP9EONIRMPWa46/YHpX
-         pdcUNA9hWMzStDi3atKUY85EKevkDIXrV2BpO1nslNtr8XqRfMB1bfuMl1El2i5hIiU9
-         Y8K0ih1atz+iAZ3K6Mph72F07SjK7Oo+42eA84weQbuBB8jzMVqW1aFORFnwEGmFcZpe
-         qlh92zSVL2e3Grj6HcWO0i/idXAJJgCRBMV8xQENgct3J5f+ZadtAoodn2UK7xBw6Qai
-         03Xg==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Qs/gvqR82bO0f0PLgN8KfuRjSpNKFdKgyKNx0LU+OsY=;
+        b=Xk8KRXy8aa+hkEVXFqBLcfvIT3DnL31KPxSj0v2YY+70DLdp3CUCx53SuIgIspWvWj
+         391U+Wf1WlIf260znbKHyv4G2SSHJnUBF1YOZZidiM/SDgYYFI01izKSHCmMqrFlTBav
+         teH0e/ms6l8BDuXnfGShxE9LBCMC1Ko46wcY4CB78BvAkDQWA17BupVf82vckZogW7Ny
+         379TdRPkMzX3pWNbsJ4ZBgLH8Wt5VVQgrcH+Wy4TZV+NmmTb3mI9FRo0+by2P45R4oZf
+         Otb4Gu/81gbHhVjmxUv/E50eNQJZSZj+2/VTCa2+C2xDsEedBJbYZgImXj+1NdXgXiaM
+         XS0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1769793271; x=1770398071;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=gg1XU3B6cgpEe2psLflcWBiUZvtKlNIIXguQ1b/fEKw=;
-        b=oJYZWnfjXwEpqpPbhI1EUjoVLxbJ0mdRlea2xRLVwUXMiCiS8em0Ht1zKybNYuKG0l
-         lTzU77Kf9iXOVrhpPQGinWF/2ftoYnt6PHWQOo8t9AFBS+m1+Esdkd9m/ymhhriwIPrG
-         3JANSFg/RaEtX/CKdSUVolc0F/tlsFO6JSlrAm3JgSI0cTP32yDp8KwxYFtODRswVplx
-         UNwK+NejTKU+mXrIjn7Bw6/MFN45DRG1+QRNmyDAhLVJZGVWnzf4Jq0nWV2SaJzLCbEI
-         KSVNGd0Cn2+LiGCIt+9FSW6S9TA5qbkL/7NB2wLEHXF1c+flfByhwSaDBBkqT5jlbLAq
-         x17Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUU2pAYkmSQW1yiNRl2pbo8mRuchSmG/EX10Pmi4S8SQ0r+wGfgjk/Rmil1Ix0yAnSLqB517g6V1f1lhw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwF5H6zRy6WZvB6vY9G2oyiM9WiuTwRHhmBepROzxDJU8hs+1cz
-	fi3bmSl1QUPFNgThJ3biQtz+JrYIAkW6lqIbZVnYS0RS7Gs0j7uJevnc2K+itTin9Fn0clokfxv
-	NSc0KzECBaZD2c7huqs3Hw0cEksi0mYmXJEar
-X-Gm-Gg: AZuq6aKHm1aAFwfxeLolu6pHlLLxvkz3zMPehsKmX5rkXgcUumLT0BnBc9BU42TNVmx
-	GyzDlNTpBXQgAlPy4dIcvIUaovrhqriIPxT5IAWrVWhv7vks4FB3VdChUoXhAXVI5QELr5hElno
-	YHjta1kxF1u3lwC4s2qJSGpGkaZnFDMl4F6C4Ck8JIhua+oS7qQAyD9+5xNkEmv6e02iayl+jgE
-	F27xmr1x4EFJMS46/AdwyqSL9TLwhiajD4fqjqD9/oD3yt/q+AO+X9vXEbupGjUM9judxSGLA/Q
-	KreDOgsetBOxfBecoAkTwmiT7yHA1GhUc0rEOzTuXvYrHBa5nYXmSDj8xmqrByB1uNXgV+ukwwX
-	ZsPp3eu2b5ZuPe4qW+QsOBxX5cCAccbI+IMct+EJ9hA==
-X-Received: by 2002:a17:90b:56c3:b0:352:ebe9:2828 with SMTP id 98e67ed59e1d1-3543b416d7dmr2651094a91.7.1769793271050;
-        Fri, 30 Jan 2026 09:14:31 -0800 (PST)
-Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.129])
-        by smtp-relay.gmail.com with ESMTPS id 98e67ed59e1d1-3540f3a37f6sm1168618a91.6.2026.01.30.09.14.30
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Qs/gvqR82bO0f0PLgN8KfuRjSpNKFdKgyKNx0LU+OsY=;
+        b=FxiHYPWKedd0xIIp94Fyvq1RqerOekdcXTrXnBsosCzjTcrqK3kINJLKSe3KBZ/pgd
+         v10gZDQALciqy+paMh4wkScap7Z6H5aM8Kw2fMChZyBu7XVauiqFCN/sUYO4o6VTEcDY
+         KurQwX9C+oql1h8kCOdlCKXu+VHIc2o0+ByLAXG4L1b2QagrTN2rUwoyaF0hhvFTr/Ht
+         IyWeNzKMp/zpQcrLr5mHgzuZ1jwFLrYDD2rwWkeOwTc6Y9DhFLckTBh7TNbZJitN8oJZ
+         E25fHn3mUn8ah7bf5DPeDj7oYhM+LhoyU6TzvjJkLrg7q9S7/0IWFJHBymFbgE9wTlTI
+         Dxaw==
+X-Forwarded-Encrypted: i=1; AJvYcCWMSBcjRTb8RN8zKeD5ECLJyVl67bmJyX2YUNlyXDwYDSJKiQJ6XDipXaX7llbifFTHxRSsm6MlpMDgXA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9XWRu7EJbOw97aDBaEOUMVa6gHZYNCTm+lFjXnV2kpyQe9OxX
+	usWX8La0V1ON9JQvsLvz7dY0rv5XNLn+LpPY+a/CDbCvKOAUoML5SKRWRDEL+UltP29Loprk8tW
+	ihpgWK10pU6AzRYYKVXWE9rUOkW1kVYuOajOs
+X-Gm-Gg: AZuq6aKHQIPnKV5UU9ObD4N0qiGzY1in4iapTfO1t+ihdJSAOO0PtiH7LhHYwvcpDkV
+	hIrzwb0K5qpFYLzoh37VgkfrGAuMT1Cfy+mFd7LDclRTKJ9vwfGwgpCQgN0sMSXWDokft1kXKBG
+	SJVUEXgnNRYfGYBuLlJk+ZMHbC3RgzTOkV+a6lwcQnZ+loWQVZgYZcBWEHKevCU1crFVkxJ2GDd
+	juPIcHootKI6goijtFVMmVPzKS1ejSU30g284Va334KGYqM2wc1lOE4kg2dcrT297wxsOb/u+uY
+	7YMODbHfpuUiElklgugTxlOiZe1VugFhi/SKClneqsrT3PTnGKcfW7WiKtmnu3u9glKcRAoiVOv
+	ckpIkA8ibOhryjsJrvmRdMeMiHS7SsyBHrPM7MCSuqg==
+X-Received: by 2002:a05:7300:cd8d:b0:2b7:2f29:64a7 with SMTP id 5a478bee46e88-2b7c865038emr905042eec.2.1769793270542;
+        Fri, 30 Jan 2026 09:14:30 -0800 (PST)
+Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.128])
+        by smtp-relay.gmail.com with ESMTPS id a92af1059eb24-124a9df4b8bsm1488143c88.8.2026.01.30.09.14.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Jan 2026 09:14:31 -0800 (PST)
+        Fri, 30 Jan 2026 09:14:30 -0800 (PST)
 X-Relaying-Domain: purestorage.com
 Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.112.29.101])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 4E88D342042;
-	Fri, 30 Jan 2026 10:14:30 -0700 (MST)
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id AE252340237;
+	Fri, 30 Jan 2026 10:14:29 -0700 (MST)
 Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id 4AADBE40249; Fri, 30 Jan 2026 10:14:30 -0700 (MST)
+	id 9F1DAE40249; Fri, 30 Jan 2026 10:14:29 -0700 (MST)
 From: Caleb Sander Mateos <csander@purestorage.com>
 To: Ming Lei <ming.lei@redhat.com>,
 	Jens Axboe <axboe@kernel.dk>
@@ -71,12 +69,10 @@ Cc: Govindarajulu Varadarajan <govind.varadar@gmail.com>,
 	linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Caleb Sander Mateos <csander@purestorage.com>
-Subject: [PATCH v2 3/3] ublk: drop ublk_ctrl_start_recovery() header argument
-Date: Fri, 30 Jan 2026 10:14:14 -0700
-Message-ID: <20260130171414.1376543-4-csander@purestorage.com>
+Subject: [PATCH v2 0/3] ublk: fix struct ublksrv_ctrl_cmd accesses
+Date: Fri, 30 Jan 2026 10:14:11 -0700
+Message-ID: <20260130171414.1376543-1-csander@purestorage.com>
 X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20260130171414.1376543-1-csander@purestorage.com>
-References: <20260130171414.1376543-1-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -85,60 +81,28 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-ublk_ctrl_start_recovery() only uses its const struct ublksrv_ctrl_cmd *
-header argument to log the dev_id. But this value is already available
-in struct ublk_device's ub_number field. So log ub_number instead and
-drop the unused header argument.
+struct ublksrv_ctrl_cmd is part of the io_uring_sqe. Since commit
+87213b0d847c ("ublk: allow non-blocking ctrl cmds in IO_URING_F_NONBLOCK
+issue") allowed some commands to be handled in the non-blocking issue,
+the SQE may lie in userspace-mapped memory. Validate that the SQE size
+is the expected 128 bytes before dereferencing it. Use READ_ONCE() to
+copy the ublksrv_ctrl_cmd from the SQE to a local variable. This avoids
+data races if userspace writes to the SQE concurrently.
 
-Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
----
- drivers/block/ublk_drv.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+v2:
+- Make a local copy of the struct ublksrv_ctrl_cmd (Ming)
+- Add Reviewed-by tag (Ming)
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 8122b012a7ae..60d07480a24c 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -4870,12 +4870,11 @@ static int ublk_ctrl_set_params(struct ublk_device *ub,
- 	mutex_unlock(&ub->mutex);
- 
- 	return ret;
- }
- 
--static int ublk_ctrl_start_recovery(struct ublk_device *ub,
--		const struct ublksrv_ctrl_cmd *header)
-+static int ublk_ctrl_start_recovery(struct ublk_device *ub)
- {
- 	int ret = -EINVAL;
- 
- 	mutex_lock(&ub->mutex);
- 	if (ublk_nosrv_should_stop_dev(ub))
-@@ -4900,11 +4899,11 @@ static int ublk_ctrl_start_recovery(struct ublk_device *ub,
- 	 */
- 	if (test_bit(UB_STATE_OPEN, &ub->state) || !ublk_dev_in_recoverable_state(ub)) {
- 		ret = -EBUSY;
- 		goto out_unlock;
- 	}
--	pr_devel("%s: start recovery for dev id %d.\n", __func__, header->dev_id);
-+	pr_devel("%s: start recovery for dev id %d\n", __func__, ub->ub_number);
- 	init_completion(&ub->completion);
- 	ret = 0;
-  out_unlock:
- 	mutex_unlock(&ub->mutex);
- 	return ret;
-@@ -5281,11 +5280,11 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
- 		break;
- 	case UBLK_CMD_SET_PARAMS:
- 		ret = ublk_ctrl_set_params(ub, &header);
- 		break;
- 	case UBLK_CMD_START_USER_RECOVERY:
--		ret = ublk_ctrl_start_recovery(ub, &header);
-+		ret = ublk_ctrl_start_recovery(ub);
- 		break;
- 	case UBLK_CMD_END_USER_RECOVERY:
- 		ret = ublk_ctrl_end_recovery(ub, &header);
- 		break;
- 	case UBLK_CMD_UPDATE_SIZE:
+Caleb Sander Mateos (2):
+  ublk: use READ_ONCE() to read struct ublksrv_ctrl_cmd
+  ublk: drop ublk_ctrl_start_recovery() header argument
+
+Govindarajulu Varadarajan (1):
+  ublk: Validate SQE128 flag before accessing the cmd
+
+ drivers/block/ublk_drv.c | 65 +++++++++++++++++++++-------------------
+ 1 file changed, 35 insertions(+), 30 deletions(-)
+
 -- 
 2.45.2
 
