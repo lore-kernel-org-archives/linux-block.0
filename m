@@ -1,84 +1,102 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sg-1-101.ptr.blmpb.com (sg-1-101.ptr.blmpb.com [118.26.132.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94F41487BE
-	for <linux-block@vger.kernel.org>; Fri, 30 Jan 2026 02:36:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C03833469C
+	for <linux-block@vger.kernel.org>; Fri, 30 Jan 2026 02:59:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769740578; cv=none; b=to9WlrX/NdkM6/clC/lVr+gyTkWZO7DH+Uhwi23qgxYVZqtUS3llY/VQsK2KNBFobxpxjjDYbqiTCJ5oeDO9MX1LPSNo2XtB9VxjlwbWi2XKuEv8FCnXA2kfdCYv9a2+kweaHfUzLfU0UlpBgH2jLnesehfpViIqBYkn7hFUKYU=
+	t=1769741980; cv=none; b=TY7W8B+dg8Co3sYC8AGYh3kZaMk+Ern/JOjlpZCD9F8WBhBy37YsVGhEsi/0iqw8uagobiCXXNWfxelBd5QlHXG0CHZsBU21IzQsLiFdGyD/+S72MS+tTZi0ac/vGjFNfa7IhRwL/URI9UmhzIPCj3w0C+gWBIDGTpKZLx9ixZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769740578; c=relaxed/simple;
-	bh=nin3a//CcTksLO1qYvLJXeA/Seog0sOffg69Y6XWuT8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=otjP7zRNsBC0Rj2YktbqH88RbCzcTBNdLcp+XgefGw6Cw4PbgQbJ9W4O4xKQgDrJD8lEkUwslssLfu0ekWi3mkx36EijD6Zy+MuDfeJCYrXCvG3YDCf6QWUG2FeTrKiUC7KHZy1shcXrsPq+SSR+1FhzfptR+dTpEvWKIrvTcY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OMHU19Pt; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1769741980; c=relaxed/simple;
+	bh=eMWwDyIByNpiHRYUN43fVfJqfLictFvS0WLam0IM7IQ=;
+	h=In-Reply-To:From:Subject:Message-Id:Content-Type:References:Cc:
+	 Date:Mime-Version:To; b=s9uJBBwf+RFBc+Fzrn5O5X5J+Rhr11qWJ/HKz0Q6L7BKXV3E41XGmtF1CyiOFiPGkDIKT5p9rOGYlciFCu3ylV/czzsO3DPldvUOzhsJYs6koM0ElvvzKVCcv2v8sEi48VyKbjvCnYu2uAFuwyx3mVHzHTNejzOfcHqrmbWQTIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=Q2xq+1xU; arc=none smtp.client-ip=118.26.132.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OMHU19Pt"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769740575;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wDLlqogTgAyKGmrWmpBhSlpnvL9Af+bxzY06uc7qz70=;
-	b=OMHU19PtSjcGK8YZN97qCnlpZ+vkW6BmbGhZ+VU7XN1XhRHhXGHp8eLUoYR5bl7iDycnzV
-	WFzTlJMOD4tqItIkkI0S3MfTEhQmxQWU2SFzr/foTS3lU+RYg+ABZDyq4aYwPn0yHQ5rV3
-	3TnUrcdTqlayxaRDY1ZZoiWoGBnDQNU=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-301-491eZz0FPw2Qd94bttmoSw-1; Thu,
- 29 Jan 2026 21:36:13 -0500
-X-MC-Unique: 491eZz0FPw2Qd94bttmoSw-1
-X-Mimecast-MFC-AGG-ID: 491eZz0FPw2Qd94bttmoSw_1769740572
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9C5271956050;
-	Fri, 30 Jan 2026 02:36:12 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.182])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 868B83000218;
-	Fri, 30 Jan 2026 02:36:09 +0000 (UTC)
-Date: Fri, 30 Jan 2026 10:36:04 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] ublk: restore auto buf unregister refcount optimization
-Message-ID: <aXwZFA9FSpoL0t9z@fedora>
-References: <20260128205636.4003327-1-csander@purestorage.com>
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="Q2xq+1xU"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=2212171451; d=bytedance.com; t=1769741964; h=from:subject:
+ mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
+ mime-version:in-reply-to:message-id;
+ bh=Ncz7fLi2vx1N9dOIDvX6q5Y5aKeZK2x1VYstftIHVXg=;
+ b=Q2xq+1xUs1pCJwiY4rZq+Yh+/Qbinm+HCk2gaSQ84Fop4M91Qnc/1zgPcx+78/KC7Tq5PY
+ cHZsAqERw69Po1j7irnU0yW4ytsNIu3PKD77v3xWIwojflZOm6lrfz8n6XSBXnovgJf6Nd
+ 5rABsunwVl8XuQbwJOHol5mh10uOY/GJudtf3uINiateqmkTUE6oYya7II7Yo9ywDk4Zt9
+ 9JcA1FirAhEPrgaL+C0BY3peXK1q0GfebRzvwkbqid+NHt9f1M3y7Qa+DH0bbgKzwE9i1R
+ wzCnVcGAL6dw6AXks1wAUbTVYtEDOej8IPNgN7L82cz39776dPFy7aUGETPZgg==
+Content-Language: en-US
+In-Reply-To: <20260109083126.15052-1-lidiangang@bytedance.com>
+X-Original-From: Diangang Li <lidiangang@bytedance.com>
+From: "Diangang Li" <lidiangang@bytedance.com>
+Subject: Re: [RFC 0/1] block: export windowed IO P99 latency
+Message-Id: <003ed785-455d-4245-bb7d-47e58eae7814@bytedance.com>
+Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+References: <20260109083126.15052-1-lidiangang@bytedance.com>
+Cc: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>, 
+	<changfengnan@bytedance.com>
+Date: Fri, 30 Jan 2026 10:59:06 +0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260128205636.4003327-1-csander@purestorage.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Mime-Version: 1.0
+To: "Diangang Li" <diangangli@gmail.com>, <axboe@kernel.dk>
+X-Lms-Return-Path: <lba+2697c1e8a+321b29+vger.kernel.org+lidiangang@bytedance.com>
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 28, 2026 at 01:56:34PM -0700, Caleb Sander Mateos wrote:
-> Commit 1ceeedb59749 ("ublk: optimize UBLK_IO_UNREGISTER_IO_BUF on daemon
-> task") optimized ublk request buffer unregistration to use a non-atomic
-> reference count decrement when performed on the ublk_io's daemon task.
-> The optimization applied to auto buffer unregistration, which happens as
-> part of handling UBLK_IO_COMMIT_AND_FETCH_REQ on the daemon task.
-> However, commit b749965edda8 ("ublk: remove ublk_commit_and_fetch()")
-> reordered the ublk_sub_req_ref() for the completed request before the
-> io_buffer_unregister_bvec() call. As a result, task_registered_buffers
-> is already 0 when io_buffer_unregister_bvec() calls ublk_io_release()
-> and the non-atomic refcount optimization doesn't apply.
-> Move the io_buffer_unregister_bvec() call back to before
-> ublk_need_complete_req() to restore the reference counting optimization.
+On 2026/1/9 16:31, Diangang Li wrote:
+> Production environments occasionally run into elevated tail latencies. The
+> source can be the underlying device, but it can also be higher in the
+> stack (filesystem contention/journaling, memory reclaim, writeback, etc.).
+> Existing block IO statistics only provide throughput and average latency,
+> which fail to capture the critical tail end of the latency distribution
+> that often causes user-visible performance problems.
 > 
-> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-> Fixes: b749965edda8 ("ublk: remove ublk_commit_and_fetch()")
+> This patch adds windowed P99 latency tracking for block IO operations,
+> exposing the 99th percentile latency in /proc/diskstats and
+> /sys/block/<dev>/stat. System administrators can now monitor tail latency
+> trends over time using tools like iostat, enabling quick validation or
+> elimination of disk hardware as the source of latency issues.
+> 
+> Implementation uses per-CPU sliced ring histograms (21 buckets, 8us..~8s
+> range) with minimal overhead. P99 values are computed by aggregating
+> recent 1-second slices when reading statistics, reported in microseconds
+> using bucket midpoints.
+> 
+> The added work on the IO path is intentionally small (bucket selection and
+> a per-CPU counter update, with occasional per-slice reset), and in our
+> testing it does not have a measurable impact on IO performance.
+> 
+> Diangang Li (1):
+>    block: export windowed IO P99 latency
+> 
+>   block/blk-core.c          |  5 ++-
+>   block/blk-flush.c         |  6 ++-
+>   block/blk-mq.c            |  5 ++-
+>   block/genhd.c             | 50 ++++++++++++++++++++++++-
+>   include/linux/part_stat.h | 79 +++++++++++++++++++++++++++++++++++++++
+>   5 files changed, 139 insertions(+), 6 deletions(-)
+> 
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Hi Jens, hi all,
 
-Thanks,
-Ming
+Quick sanity check on the motivation/design before I respin.
 
+I want to expose a simple tail metric (P99) via diskstats/sysfs stat, 
+since avg latency/throughput often miss the spikes seen in prod.
+
+I considered read-to-read deltas, but diskstats is polled frequently 
+(often sub-second, multiple agents), so the effective window becomes 
+reader-dependent and too short/noisy. Current approach uses a fixed 
+window (per-CPU 1s slices in a small ring histogram) and aggregates on read.
+
+Does this direction make sense? Is diskstats/sysfs the right place for 
+it? Any better low-overhead, polling-independent approach (and 
+preferences on percentile/window/buckets)?
+
+Best regards,
+Diangang Li
