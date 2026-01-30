@@ -1,123 +1,132 @@
-Received: from mail-pj1-f98.google.com (mail-pj1-f98.google.com [209.85.216.98])
+Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E3023242D7
-	for <linux-block@vger.kernel.org>; Fri, 30 Jan 2026 15:25:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 983C131A55F
+	for <linux-block@vger.kernel.org>; Fri, 30 Jan 2026 15:29:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769786743; cv=none; b=iFdXGj9jx73Z+R6ZDFFH1yKfoYy6V0mDd20Xlf6zBsqbnzkxgm2Gel2c2PtjyL5XqciKwGl6QOO1oC4u2G21/RqqREg4lCsVG0FJH1M4kaUjoZpLabAU/f+VqnmXrWJvi/tPaiA2H8CpQbt9wuAxCxuHjjrSOEa5nKuj8kC10NU=
+	t=1769786966; cv=none; b=SaOtLwTAFrTOx0tOddlrbTNMjNftIyICf6fxxHQpjWTwl6S+PUPiwahLRhGGVUUpk+sB4jin3dtrCS1qt3aa9biTW79616n2WdAEkS73ftXhkEB75rQR6WdSpXEpE7CaXqEscNMVN2wqxAJbl9bUGMHBR5DqsdxUncKCI31Hjkg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769786743; c=relaxed/simple;
-	bh=wKqc5wL6bmJmWU1bp7rBaZXhIYlpKw54rXza8d084hA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OmWV0OpZ/yqMnANkE1Kqcje0uHwRV4XKG7+nmbDYaTiVAznmD/EXI/Lqzj/Z0/gaex1MtW9EHHeIA2gc5S470WZiuH1EvwuMmFj2QzQcziCLlnxbBGOlLGG8/odW5YvFaKTKA1qbl4ULa29Keccj4ghm12X8oPg4UwTojFrpdqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=TQfg0XC/; arc=none smtp.client-ip=209.85.216.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+	s=arc-20240116; t=1769786966; c=relaxed/simple;
+	bh=dRqVPcaZS29sd/em7Max0dkckXOqsZz270ytXfMTsNA=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=A9Xx24SG1jxXPs4qrkDVN71jsQireeTCRfmfnKuk/yB5vD2bE38MMfjjGzeWtzhoxWVDMTSpD9mFu8xBk2FWK3+zmfaPgA0kvsfMeBav36D9ND4kAMa3HoTX3fIflpCHXV0kUdJJbTzlWYoEgKJevDEFMOb8Ax6BcFfvmgRekYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=IZfXNbg0; arc=none smtp.client-ip=209.85.161.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="TQfg0XC/"
-Received: by mail-pj1-f98.google.com with SMTP id 98e67ed59e1d1-352de4c94adso251652a91.3
-        for <linux-block@vger.kernel.org>; Fri, 30 Jan 2026 07:25:41 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="IZfXNbg0"
+Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-663064bcb53so956059eaf.3
+        for <linux-block@vger.kernel.org>; Fri, 30 Jan 2026 07:29:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1769786741; x=1770391541; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=22ajtlAGYSup+nUm/O6p4DsQdEeWGvJ4Xo9qaGa5Z+U=;
-        b=TQfg0XC/Vwwm1/MyMQXRDfNmUznAlCbYpTJ8PonfsHn3I9omqNHnSVGSVFN8L/VwFK
-         J/FgZWk/tbxjAyYvK4GktNEhFvzoO+NkM+ify5d40rQCjUxc6SwLDft2aojoAVu8MxxT
-         bX8DIM3GOSe6k31igeL5Zi+mU1VYAiKDuj4Opw1ft+6Q7b695j3eQHsMj2f1iXayjTy6
-         38daDy6VeotU1bebvFE9HrqCrd5qkKKhT6JkWywA8YjW19GRcN1bQwW4WbSE3r6qsUlT
-         3P2U8uVAwwzL+KsJtaSIu0A/tJZOFi+R3XyfhUUE/qQds5E6/BJXIBeSq+VjDBsDNhtd
-         g4EA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769786741; x=1770391541;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1769786962; x=1770391762; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=22ajtlAGYSup+nUm/O6p4DsQdEeWGvJ4Xo9qaGa5Z+U=;
-        b=S/uQfgDJVDh7AzewJzpqFsoyrycFCmS9FRKUJihIVu4ZfZAFZpKyUgzvI2WMbtBV5E
-         x5KFS/SXiF8BRJtCQXeVciamXos7JB+EYu2ku1+w/519ajsWm0vd7/PVFZoIOFiXCimJ
-         CvpmDqPZQue10oiCMiLuW6qlcQQM+BgCa90IrjJQjXNdShJlO1/agKA7TXioxdWJyRRx
-         DC5TnJiurJqcccOxOfHqemnKieWkvt4PMg6RK+J6Ssw96SRTNfJYCWROM2/JPk+98WR0
-         OKMZ9Ze6f6sT3WoNuV4vdVwuXeU0U/iQNhets9zCBvuDK4MJGmIpnE/e0pDuzAjVi/7C
-         2oVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWwtxYtfccBbIEzizDohZGW6ublGLOrxz0MVKCfrsBntk9DCBm2HktGOTkfU+/qspIeNS9lm4P5ES9NxA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMwquxKNwTWZxmm7sO7myBu1jp/uSfN6a+59hvi6+M4M61GrMd
-	0IjB0CnQl8NE6OpQ77hr4jT1huitxe3a+d4s1gVaYPVkAFZlI/ZCiyALqdn+7tufNjX4VL5CJlB
-	0XqDvxO1B5Cw7sQQRvClmgCvuAHQ8cSpWWap9W+zq6Vles58Ce9Ub
-X-Gm-Gg: AZuq6aJ0fIUM68Q5t9mSLWqdeRISaSWgwBgb8kTWa238Z1bjMjPF+YuBFor2PxawaW2
-	RM95wPX+PId5lw0tebKtTmdbJdGTokYRUPNwrYf+HitQM0BkIIjI8Dj8PiCkMPAKHZLSyTRUYEl
-	jO+VyelungGcu37r5tmJMNf9Hx5SeCKw4CpSZLifDqCmbCvzL4FiY77gASwKgk6WgssxBzN4FCb
-	ZwjfuiHVvUoDgNK3Dx6fOf1jyrsJ/w84LaIoJqbjONSstPDMmcVJutkSwVPqp1wA9+E/WuT9H5G
-	zDSGrkNx0tcA/TPypnzuQy/Yh/jeFIc7TXPQ3BEnu/kUkz8ZhySq5DJmXV/pncEGw4rIVUeqif/
-	pAsY+ynToWH0w8Jd8IOKgjKneaOQ=
-X-Received: by 2002:a17:90b:3ccc:b0:34c:2db6:57e8 with SMTP id 98e67ed59e1d1-3543b2efe3amr2777148a91.1.1769786740685;
-        Fri, 30 Jan 2026 07:25:40 -0800 (PST)
-Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
-        by smtp-relay.gmail.com with ESMTPS id 98e67ed59e1d1-3540f3b5f8fsm1166983a91.7.2026.01.30.07.25.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Jan 2026 07:25:40 -0800 (PST)
-X-Relaying-Domain: purestorage.com
-Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.112.29.101])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id E3765340603;
-	Fri, 30 Jan 2026 08:25:39 -0700 (MST)
-Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id D42EEE40A28; Fri, 30 Jan 2026 08:25:39 -0700 (MST)
-From: Caleb Sander Mateos <csander@purestorage.com>
-To: Ming Lei <ming.lei@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Caleb Sander Mateos <csander@purestorage.com>,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] ublk: remove "can't touch 'ublk_io' any more" comments
-Date: Fri, 30 Jan 2026 08:25:30 -0700
-Message-ID: <20260130152531.1274646-1-csander@purestorage.com>
-X-Mailer: git-send-email 2.45.2
+        bh=AeKy6M7r7gfxKyuYFmxJhxfTnzsc5fIY0z5kqhndfrA=;
+        b=IZfXNbg0ocV+ZZWW4O0pr7c2W2/wkmTKHsX3hak++xxkgACviDonTDWQNUzK2jZyZ7
+         7arO9GH1MhIqiPvljaYL1HxD6D5Vww1cVeurOaRPpzTnJs+zUJiecIN4LI1OQh78KJEW
+         IrzcC/VPahmrka6N/0hk7iieMTnInUrsg8O7kc8EINUlgvqDekmk37NZz0/KRMZJ0ys+
+         6BlzAef912pS9BfRFm5yjfwyuH7jyc6Tj/yW6RKfJaH18KBa6z3iu5GZmkOv1Lb+LyRX
+         lP1n55yQQKU1oI+GGKEIx1b0cKZqs0Wj8bXVbwo7/2l7B0vZpVGqxHdhzR4LVzq4OvnI
+         h9zg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769786962; x=1770391762;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AeKy6M7r7gfxKyuYFmxJhxfTnzsc5fIY0z5kqhndfrA=;
+        b=jGTgJZiB4nBMSoadHXcViGVpse47PznJa9y+eLpjTtCP2evXUfAcGysMyK995AFgHt
+         pvc78A5aAQhN7UEtmjjo+8BbC2VUBxO/Nzr3cgySHz8aKLvwsPmDokpj6s2dsLIMlnSi
+         SdH2TCpk+zLyzQFj3rayK42LvskFYRVc8KAy0ph1YM9beuUPfQ3y4syJ7RqT9W8BRrrS
+         5g6Kl5WO5LdSe7HI5S6yoodDJuLExwWM/sCcjrYWSZ4tmJGq7PdxiAyhFWAMQYlJeoB4
+         /OCmb4yoBaPn+EcEFemDYBtpYAmuMQFEulyZLo3NcVVkh4iCEbN22zFZ6DFnL4ND6r+a
+         Y5GQ==
+X-Gm-Message-State: AOJu0Yy3f8gPjhnO6K2BBYRCj8QVLyRLUvw7WrvTULpdq8yIFluw1BXe
+	NJFL6+KyFOxQKSoNNs9GCNxyrB7/HlvS+IW7G4XjgrA5FqlFrl1tE3wT1d34eSqGpWNK2NW8Hx9
+	UXrl+oM0=
+X-Gm-Gg: AZuq6aKzg6/N3zzHA/fr+I9JLC1YNX/vLTbTtSnhH7JokeQOwUNT2ZmqaRGaylvbGdv
+	yiOA/Jt/dFcHvbzRBECmoc9FGhYIdN5jKRN6ms8U4GhPQ4uBU99irrCx7LB4EdfcjVEIjFgIErC
+	bnv2l4StJrpx6FjfnM1dHehv5DFaomqk5b+tDrHFOb3kwojrFqNVAFAN946Z+rATwMh//MTGDsi
+	zhRS+cJerga8sGp8xNoA49e/p7PRB8V6YrvBZf/5TU90op4UTrOz19ic88CiE2aaVB+LnOPKizk
+	kbLrvTpfAB3IXPy/xJxGnqCER82VmttDevzHMi9Hk4JKSTFRAcS+MCjz96bW1GNie0Ds8EdjbP3
+	SlUCM6qz1q3HvssMZolMKAsv8QPav++DxYu+vXOJQdCqdMo5IEDOBHY7cZ4HfMlqpkR49RtnmOs
+	VrXwKCd4DSjME9gq/Ut7FO6cGYNs0d49guW/OdNbOteY9FIMdM/jhuTd6qK+lB0Uv4e9wT
+X-Received: by 2002:a05:6820:205:b0:662:bf9b:1638 with SMTP id 006d021491bc7-6630f3f1bf5mr1752775eaf.62.1769786962334;
+        Fri, 30 Jan 2026 07:29:22 -0800 (PST)
+Received: from [192.168.1.102] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-662f99655fdsm4941706eaf.8.2026.01.30.07.29.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 30 Jan 2026 07:29:21 -0800 (PST)
+Message-ID: <33de2c33-8142-4909-afdd-dccc8981b3c8@kernel.dk>
+Date: Fri, 30 Jan 2026 08:29:20 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 6.19-rc8
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The struct ublk_io is in fact accessed in __ublk_complete_rq() after the
-comment. But it's not racy to access the ublk_io between clearing its
-UBLK_IO_FLAG_OWNED_BY_SRV flag and completing the request, as no other
-thread can use the ublk_io in the meantime.
+Hi Linus,
 
-Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
----
- drivers/block/ublk_drv.c | 2 --
- 1 file changed, 2 deletions(-)
+Just a few minor fixes that should go into this release:
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 5efaf53261ce..1c8699ea7abd 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -3336,11 +3336,10 @@ static int ublk_ch_uring_cmd_local(struct io_uring_cmd *cmd,
- 		ret = ublk_config_io_buf(ub, io, cmd, addr, &buf_idx);
- 		if (buf_idx != UBLK_INVALID_BUF_IDX)
- 			io_buffer_unregister_bvec(cmd, buf_idx, issue_flags);
- 		compl = ublk_need_complete_req(ub, io);
- 
--		/* can't touch 'ublk_io' any more */
- 		if (req_op(req) == REQ_OP_ZONE_APPEND)
- 			req->__sector = addr;
- 		if (compl)
- 			__ublk_complete_rq(req, io, ublk_dev_need_map_io(ub), NULL);
- 
-@@ -3668,11 +3667,10 @@ static int ublk_batch_commit_io(struct ublk_queue *ubq,
- 			__func__, data->ub->dev_info.dev_id, ubq->q_id,
- 			elem->tag, ret);
- 		return ret;
- 	}
- 
--	/* can't touch 'ublk_io' any more */
- 	if (buf_idx != UBLK_INVALID_BUF_IDX)
- 		io_buffer_unregister_bvec(data->cmd, buf_idx, data->issue_flags);
- 	if (req_op(req) == REQ_OP_ZONE_APPEND)
- 		req->__sector = ublk_batch_zone_lba(uc, elem);
- 	if (compl)
+- Fix for an accounting leak in bcache that's been there forever, and a
+  related dead code removal.
+
+- Revert of a fix for rnbd that went into this series, but depends on
+  other changes that are staged for 7.0.
+
+- NVMe pull request via Keith
+	- TCP target completion race condition fix (Ming)
+	- DMA descriptor cleanup fix (Roger)
+
+Please pull!
+
+
+The following changes since commit 3ef825dfd4e487d6f92b23ee2df2455814583ef4:
+
+  bcache: use bio cloning for detached device requests (2026-01-22 07:24:50 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-6.19-20260130
+
+for you to fetch changes up to 4da7c5c3ec34d839bba6e035c3d05c447a2f9d4f:
+
+  bcache: fix I/O accounting leak in detached_dev_do_request (2026-01-28 19:06:55 -0700)
+
+----------------------------------------------------------------
+block-6.19-20260130
+
+----------------------------------------------------------------
+Jens Axboe (2):
+      Revert "rnbd-clt: fix refcount underflow in device unmap path"
+      Merge tag 'nvme-6.19-2026-01-28' of git://git.infradead.org/nvme into block-6.19
+
+Ming Lei (1):
+      nvmet: fix race in nvmet_bio_done() leading to NULL pointer dereference
+
+Roger Pau Monne (1):
+      nvme-pci: DMA unmap the correct regions in nvme_free_sgls
+
+Shida Zhang (2):
+      bcache: remove dead code in detached_dev_do_request
+      bcache: fix I/O accounting leak in detached_dev_do_request
+
+ drivers/block/rnbd/rnbd-clt.c     | 1 +
+ drivers/md/bcache/request.c       | 6 +-----
+ drivers/nvme/host/pci.c           | 4 ++--
+ drivers/nvme/target/io-cmd-bdev.c | 3 ++-
+ 4 files changed, 6 insertions(+), 8 deletions(-)
+
 -- 
-2.45.2
+Jens Axboe
 
