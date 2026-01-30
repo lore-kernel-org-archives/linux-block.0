@@ -1,137 +1,76 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53BEE346AF8
-	for <linux-block@vger.kernel.org>; Fri, 30 Jan 2026 16:05:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.133.124
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769789154; cv=pass; b=nBQuYDQCQqirY9lMTbWPY9Sk9xV45vjtyG5ClK1puoERQ0t7dZrzgUb/cWSZwwbOCPoib7TmQ9l7d/EVdRofec8DbXmjY3NH04iJoIrdM4+8UvG37IknECicEZWRTOmIhmlYXXH/8h/yXJkt43xHz+z67MOzFqSo9KbIQdtKpR0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769789154; c=relaxed/simple;
-	bh=0iGqAXYnUVnFf0gTQRuu89BeJfVib/pSawu/VGhVV4U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=huOwPTAz5O2UBsw2F3K7NX9p3Vxi+T0QwFwRKhj6TTGfgVdF4z8mtHqky2ag13g1ev9RGXFlrNABZFtX8k1Nqf4ezKIYOvF6LbRXpbRDE4qeEb9hfPY83lS1KSUQrLhrWq4AizUDoqbMj3Sy8pXFSxhyPkQEOPtk1bo4IMVVBmM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=haolZxMZ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=BWIyS05J; arc=pass smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68201340A69
+	for <linux-block@vger.kernel.org>; Fri, 30 Jan 2026 16:09:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769789352; cv=none; b=D2dNmoPNZkk3WKFALJmUjAwWtdY5vulim5+mSYPZA/3uNkm5GdzfPLOWqmJpd+HQC7zVomtXmF8bfR4C33QvQNzLji8NajpLqCU4PpBQ+eS1pXwiGfJJJsIP6b9AoPMV4p57inorF1uMCJjQywg6B68/j72YgxW4M4wMJvz6nRM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769789352; c=relaxed/simple;
+	bh=MPy2dmqKlCsrw5okIZFwkiGzwVi0bWXg1j0NfWvMFRQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type:References; b=T0Q7N9rweArFwVN4ksC5foiHn7Lo02EdGUe4h3LunD9F5XwaHT4MpuCO8GeQlYc4D/9p+Y960pqK8+I3H2GVLoLIHKFOFMf7ugDKdpnFuMyWSuQD0SbYRV+mc2RueaRNqDGYsKMREuc+o3phuaXjECMYF/7L/RKfJBP6Wx8PmMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=KY4UiRjJ; arc=none smtp.client-ip=203.254.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="haolZxMZ";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="BWIyS05J"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769789152;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0iGqAXYnUVnFf0gTQRuu89BeJfVib/pSawu/VGhVV4U=;
-	b=haolZxMZsvydtz2Ar5gSdUyJq0woQcZfa29v8ABcLUA05IQjmO24XFfy3yfUB82HIGMnnp
-	Te7jT3Qn4EWop4U0XTzMTiuKtmkkFXn2zCpLg6ZKXOKfqzVmZ3SOmptNXIVaOdYHQSoPaQ
-	TV+zzI0DPpFd//rjsSwEe/fJY80AIHw=
-Received: from mail-vs1-f72.google.com (mail-vs1-f72.google.com
- [209.85.217.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-220-HQ_If-B1N_2nPsCRLqbAOQ-1; Fri, 30 Jan 2026 11:05:48 -0500
-X-MC-Unique: HQ_If-B1N_2nPsCRLqbAOQ-1
-X-Mimecast-MFC-AGG-ID: HQ_If-B1N_2nPsCRLqbAOQ_1769789148
-Received: by mail-vs1-f72.google.com with SMTP id ada2fe7eead31-5ec38a3265aso6558068137.1
-        for <linux-block@vger.kernel.org>; Fri, 30 Jan 2026 08:05:48 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769789148; cv=none;
-        d=google.com; s=arc-20240605;
-        b=JPmhgQr66/yImsnYlwKApIUnHpXEK+vle00C8HJMIuJc73CecmSDfkNTCNO8fv/Q8I
-         vvuW7LzOtJwaEoDItzE65SktYSfyDnWUfPI4mleUPC+UHgXdaLlIpj80fVB5OnuiAPpq
-         UoezNE1611RzylKXGk8UyDE9/tI/1yqs2XVniwCPYzO6D450himKzLJGKJto2vvKpKg/
-         aEU0fjOo+vuxh5CjSpYuKWPeB7XKSnajapzWPIQMEFKTvPol93X5hu8/4eNTJLzaOAPX
-         a0ORFsLfIN3tmmnqSD1U+Y1xVWPduVHw7kF6HwE4uTEzWFlRV9xNu81ZesjSEUWM0xrR
-         iF4Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=0iGqAXYnUVnFf0gTQRuu89BeJfVib/pSawu/VGhVV4U=;
-        fh=qB/Ij0TCJdlnQeaydyMo2ApA0RRzG0qGnlYyoe/H9Qw=;
-        b=Guqra1yCruJHkySZizn2T0dVWJZqT/igW5u/hKI+s3OEQKuaUuPOz1RHh+vfPDHK8V
-         w+ryhbHTE06xlg/hQS67iAD3RTDtYvohJ+42yqgVBjzSF6AV96tn8VwJMxYTvFZDw2/s
-         AZAtMewjwh1HvDj5qdxkg981jZ/TV7ae6NhdRBBzQtPEiSjsQGRRovSQ5M1lo4E0nxtG
-         dKrVAEdSuPlhTZqxSDApsslYSUl2PshLz4+joY6WZVtAhwrIyRVfVGSYdNKKs1B2evCN
-         SKVoYlcv+p2o1shaKkkZEg2Q+pIS1hvK+Pp3W5+SFkJlpU5Kcq7qlq7VNNmk+plsbU+4
-         rk+A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1769789148; x=1770393948; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0iGqAXYnUVnFf0gTQRuu89BeJfVib/pSawu/VGhVV4U=;
-        b=BWIyS05JTcAljQrlpgXOwEk1ek/8Vi00LE4WPJl+2lnf3Gyc2U0NJ62cgFzA8IwZsZ
-         wmml8809qlAvEhgeK9eJZVCuDsYmO8gO3TqE4RMFMo5rKczMjRplkTuMIkN+wf3Umcde
-         +1KA+vdBF9QaqWGbMmKcZqcZnIoI556SsMBwbpzJ0XDUvqJyE+kRiZmKxNJppdEBmsuj
-         jBK1kkZudKxMaOAdyAV9qEtB26VODRxyWjiTCJ8fUkU6rK852MrGtyLN7c/+DCLe/rTD
-         h8rKrgFm2q2g0NetRwrTCL8sJfmiG3yfdHlBVb5G24CfklK1yy7oaI4egRdw49+uM4b+
-         k4pg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769789148; x=1770393948;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=0iGqAXYnUVnFf0gTQRuu89BeJfVib/pSawu/VGhVV4U=;
-        b=p3uQpPx7LEnjaOXAfbJKrfzmSYV4CUoJS+JobnWxHJ79f3aVbY/KYg7XTufF0Euvpl
-         3VJr/BayVHU5/S9d2hxYft1ZE2XzwVb58hrrjS9aGlWU0IgoHcP90N+EIvyyBBS+ki58
-         Ly23hv0LBiCFvGe4v1fTpOTa8M/+vA8d35LI8h3WJ52+XA9I/lupQs4doeM6ujakqb36
-         1EGwT1k9Z2CHqjlh9Qji+/X6Y27AE2/4LT6ZE/wgoZaLCtBfvlOMUw5s7OCrr4kF7DbH
-         AShI/78Teontc/c1VaP05zCewB8eQ1g0fn8PLO51nF3pu/YDau7aPNqFefVraxcF7cl3
-         fk2g==
-X-Forwarded-Encrypted: i=1; AJvYcCX14w81U4ls1QE2tquoUAWQ17kZE2m3W3cKVPrVlfFELv4rttpIOR0/V38Z13OZMQ6wGsXehXaUBF7Vbg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwatwXpgFAQFAYLtqnK7DHbrk3xR/utEFbp4QEqkZo4h0mzLmwk
-	n7uPhOQ/aWpAxESf3lXWZ9dgKqXjgZd67FkozSX51Z2SOGSOepZZBLuJ7jdz8eY+umdDLnVBYl0
-	NeOLbFW7kHUnJ4z3RErjUJ6uONqTGt+cITOk1UTxmQdav0gxH0f0W89OYCE5xcp1qvnBgjKHSkU
-	jqhePfA3AmMNra5gMrq+U/mpjcxTDzXkYlcmvNQr8=
-X-Gm-Gg: AZuq6aKVQZzORH2pGBZNyqxwG7IocOQ+quOSxCGWT3DTo9qe7lGbhJYd/BkjP0B8k9t
-	hP48O3thueUgN4DR5XbX7hCTO6/u84M655aTmjVCMQH/t3VYRKHQu2HTKlquzXoymm61Y9dpQBn
-	NXnbOMVKMXdpVXlZjqVj46/z5kMHoUuKQtxUYaDj+VO78YENgYdfr8jK8is1NBXntxAPo=
-X-Received: by 2002:a05:6102:1610:b0:5dd:a08e:5bac with SMTP id ada2fe7eead31-5f8cdaf1314mr2506363137.6.1769789146365;
-        Fri, 30 Jan 2026 08:05:46 -0800 (PST)
-X-Received: by 2002:a05:6102:1610:b0:5dd:a08e:5bac with SMTP id
- ada2fe7eead31-5f8cdaf1314mr2506307137.6.1769789144562; Fri, 30 Jan 2026
- 08:05:44 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="KY4UiRjJ"
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20260130160904epoutp0430a7f56e8f73747fa61d052f0f2de2cd~PjggmTd5u1747117471epoutp044
+	for <linux-block@vger.kernel.org>; Fri, 30 Jan 2026 16:09:04 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20260130160904epoutp0430a7f56e8f73747fa61d052f0f2de2cd~PjggmTd5u1747117471epoutp044
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1769789344;
+	bh=MPy2dmqKlCsrw5okIZFwkiGzwVi0bWXg1j0NfWvMFRQ=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=KY4UiRjJGS2lCsrOGQdD93kUWvTwdyrnyLE/BUSQ8RBHEQGND4J0+Qy+8qLUdbfTp
+	 NYHNuhHMKV7FVOUnpPF9dGIRjzL4MYApDqHx7wgluHHNnlSPBnf2yA5yZmGMrgZrpv
+	 YWvHAqysKnNCFguPOz5O4ginKOckKkz84xBX8rs8=
+Received: from epsnrtp02.localdomain (unknown [182.195.42.154]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTPS id
+	20260130160903epcas5p312a66a400bf438157c5285f2f9076dd5~PjggFPk7l2594425944epcas5p3R;
+	Fri, 30 Jan 2026 16:09:03 +0000 (GMT)
+Received: from epcas5p4.samsung.com (unknown [182.195.38.91]) by
+	epsnrtp02.localdomain (Postfix) with ESMTP id 4f2gtQ74s2z2SSKX; Fri, 30 Jan
+	2026 16:09:02 +0000 (GMT)
+Received: from epsmtip1.samsung.com (unknown [182.195.34.30]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+	20260130160902epcas5p4f47396b260179d83b338be44cb4b886e~Pjge3l3yq1410114101epcas5p4r;
+	Fri, 30 Jan 2026 16:09:02 +0000 (GMT)
+Received: from [107.122.11.51] (unknown [107.122.11.51]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20260130160900epsmtip10421ddfc9116cd83f323b3bf56c455af~PjgdWa7fj1856918569epsmtip1p;
+	Fri, 30 Jan 2026 16:09:00 +0000 (GMT)
+Message-ID: <7cee5c9a-756f-43d2-92b7-5d8a5fb4fd2b@samsung.com>
+Date: Fri, 30 Jan 2026 21:38:59 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260129224618.975401-1-csander@purestorage.com>
- <20260129224618.975401-3-csander@purestorage.com> <aXzS1iOjZAVEcZ8k@fedora>
-In-Reply-To: <aXzS1iOjZAVEcZ8k@fedora>
-From: Ming Lei <ming.lei@redhat.com>
-Date: Sat, 31 Jan 2026 00:05:33 +0800
-X-Gm-Features: AZwV_Qh0-ZZzs4VgJoZDDlOUzbCR8qeO0yE6NTSoiaYFIDtGn7u77a5L3J-SUpE
-Message-ID: <CAFj5m9LskF5Gb_iCXBpc0LcJYK1tWQ4mrYntQuf866Mp4EtujA@mail.gmail.com>
-Subject: Re: [PATCH 2/4] ublk: don't write to struct ublksrv_ctrl_cmd
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Govindarajulu Varadarajan <govind.varadar@gmail.com>, 
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 06/15] block: add fs_bio_integrity helpers
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Christian
+	Brauner <brauner@kernel.org>
+Cc: "Darrick J. Wong" <djwong@kernel.org>, Carlos Maiolino <cem@kernel.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>, Anuj Gupta
+	<anuj20.g@samsung.com>, linux-block@vger.kernel.org, nvdimm@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org
+Content-Language: en-US
+From: Kanchan Joshi <joshi.k@samsung.com>
+In-Reply-To: <20260128161517.666412-7-hch@lst.de>
+Content-Transfer-Encoding: 7bit
+X-CMS-MailID: 20260130160902epcas5p4f47396b260179d83b338be44cb4b886e
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+cpgsPolicy: CPGSC10-542,Y
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20260128165050epcas5p190f1dd0d8f5a3f51c74e8f3155e190ee
+References: <20260128161517.666412-1-hch@lst.de>
+	<CGME20260128165050epcas5p190f1dd0d8f5a3f51c74e8f3155e190ee@epcas5p1.samsung.com>
+	<20260128161517.666412-7-hch@lst.de>
 
-On Fri, Jan 30, 2026 at 11:48=E2=80=AFPM Ming Lei <ming.lei@redhat.com> wro=
-te:
->
-> On Thu, Jan 29, 2026 at 03:46:15PM -0700, Caleb Sander Mateos wrote:
-> > ublk_ctrl_uring_cmd_permission() writes to struct ublksrv_ctrl_cmd's
-> > addr and len fields, which is racy because ublksrv_ctrl_cmd is part of
-> > the io_uring_sqe, which may lie in userspace-mapped memory. Store the
-> > values of addr in len in local variables instead to avoid the race.
-> >
-> > Fixes: 87213b0d847c ("ublk: allow non-blocking ctrl cmds in IO_URING_F_=
-NONBLOCK issue")
-> > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
->
-> The simpler approach is to define local `header` variable and copy data t=
-o
-> it.
-
-Given READ_ONCE() is still needed in patch 3, I'd suggest to fix by adding
-local `struct ublksrv_ctrl_cmd` shadow variable in an easy & reliable way.
-
-Thanks,
-
+Reviewed-by: Kanchan Joshi <joshi.k@samsung.com>
