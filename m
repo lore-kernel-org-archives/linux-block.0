@@ -1,70 +1,73 @@
-Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
+Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A87D30C61D
-	for <linux-block@vger.kernel.org>; Fri, 30 Jan 2026 15:12:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75CA935CBC4
+	for <linux-block@vger.kernel.org>; Fri, 30 Jan 2026 15:12:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769785961; cv=none; b=ganKZNjjG7a8hTWnjWmDWHHwnR/a+ZHdUfLxxYNzivp22N6vK2famgmRYrX97/mV6CGpseVh/0LzIXtla5TEU5c0GlykuQiyFtWJWtfXKLsgDMKIUUX/WreUdUyghOIZAysSzFi+nsNlYxRbrMumyLlf817OgB+DKkRCTjJJATs=
+	t=1769785962; cv=none; b=g3SYUu5z4PvAQhC3I+CAf0I1LHdCZjF57yvDYY8i1FlWDgIZQ43CEdRKnr+kch7kSR5oZvv2J0dV2CEs5sJizA19DNoVXTuuOsdNbc3LCfkOyeD/G2C2TYY5Ir/RklsaOTDM0tFkPBaPuFk7dLP5wz6ynrpvrm30QQQCNtrBrmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769785961; c=relaxed/simple;
-	bh=iGeggJeQX9uYoahJzcc0RbYr/2cTy5sVq2dVoGX5ljk=;
-	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=B0Q6fGP4b0m5WJYaH8gcfWwcVL8jdYEoHS5zLLGGivTfm9cb+6lULzuxB8ScmDSU9S31Udvl57V2AUuFEcyC8clWuRTHwrzKK1l5x+do4Xcedd+wgowiGuSl+QLHrNhGE4OK5H+oTcKpMHU0Fw8pNdQpKU5E2nqmEtKaAxRNIlU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=1j6qcEmi; arc=none smtp.client-ip=209.85.210.43
+	s=arc-20240116; t=1769785962; c=relaxed/simple;
+	bh=sVRIbLRLm2gdKVdmxMHiNrrjFKokCmeAu5KAGlszTcs=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=QQ6+uX/iEyJwS4W6rZxEtrTSYMS+QV+pMM9Es7qYdBr68L/LmexbUg4tRswWmF7aLKeDeXNJvfpoIHrHcJtEtc7OEDfn8c0tm0OOfnF3VXA4msw210SqJ4ZvrxNE2KyqcaSvdw0AWMmIqnan+LBDxJ7IotkzWbUMGfSAd9HUa6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Zj2VVCgO; arc=none smtp.client-ip=209.85.210.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="1j6qcEmi"
-Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-7cfdf0c8908so1333569a34.0
-        for <linux-block@vger.kernel.org>; Fri, 30 Jan 2026 07:12:39 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Zj2VVCgO"
+Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-7d18a9d2b1aso2206529a34.2
+        for <linux-block@vger.kernel.org>; Fri, 30 Jan 2026 07:12:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1769785958; x=1770390758; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1769785960; x=1770390760; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=i4FxRs3c+84UbVfsSFyOiWwW6/z7WTOgoT+QaGsd2WM=;
-        b=1j6qcEmiriaqrzvBSXd3mrsbS6vzc04hbw6GkeDBpGLh9Ix1NER+LFUZsp/LAbMBLK
-         Kqvc5ZaqrpwlI1qmC+RMFUQYhioQIic2CW93HRTEYeLupWhYTNLlBVD3+NPx3yffQX5z
-         hxV22rDrC0FwQYtrB3KR5SAxgDPt6PM9a3EoD3OAt09ZmcS8K6MIf48Jq8QWGnCfnK6p
-         SfYgMUhpagELCcl/mu8lfJTsN3CGME3bdSCm8EMjAyCu5VBAbdsma9bOF5o2wRCBuuow
-         IwP+QXLxxd4Uik6qLnYD+KGUq0UkQP+GCXRUCaBdiFPlQT+2M7cS+vM1paTprpzvPtdI
-         0ltw==
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eXoX3vnzmebVZOm3CUt6qKUyHourmARTnybZ8qjemAw=;
+        b=Zj2VVCgOx5+BLUt3wOEOf+8cVRC5q0SyyeIG1Y/GUwngcBPVAL68HWAdZlC8cOgLe5
+         DVQu5M5onKVsChvQ4kc2daU5YiEeH3sc2XZjBu7Cbzu6Z6rTl2MUZA17puYLGBuZ8tcf
+         lCriotUSNfVJw9IKFWn+ZQVmhfk0CmAJLEVaodlJIE1xzflXv3MOJK7TYr5/kleD+o5A
+         i3sdSp1C8JJ7Rg/cLTFokts0sBqpPWNp3CdXj95WWoIcc/9mNLlwGhVVJcJcwDSUrroA
+         L7vGc4XRJvfybn3P/11GsMxoghxER4w9G2eGoAHVLe82ZPO0puBWEO26RYH1FCtxbGHj
+         bQ+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769785958; x=1770390758;
+        d=1e100.net; s=20230601; t=1769785960; x=1770390760;
         h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=i4FxRs3c+84UbVfsSFyOiWwW6/z7WTOgoT+QaGsd2WM=;
-        b=c2PoqEVR2vYr1l2cjF4eNwmHxmSV/7R2RTYsPOKwx+cYbPTX0VtMEokPGTL4vCa0Fh
-         JQe81PK+TjKOyUXZn9dW8RZm9gXxfmrIb5ikFc1SeDkvp3099DCWbvyTbUZAbA9ucULj
-         9dWoD1N/bCgD/08LZSLMHuNcqx2/DswrmobkJFR1c9dtdeikKhnSWL8J69cnGh4kLCvD
-         VwtLbAdO1NKkFReFk0JvbOTgjUlom/SFjutSL0SRjzFWbA8wNzvtrnNzpIabEAr0Ehdy
-         XOgj94gGTR7HQ5s3uziTFeZ3AeJfzJOlyM71WpkSRIgY0WFLXLdNYpj82lWC1nKu1pMM
-         XAjA==
-X-Gm-Message-State: AOJu0YyEYLnwRgbU+SxYRtZKaethzI3BYSmY3YSCLf/odyN4r16sA6aP
-	oUuRVZh9aM9s7DfqcFxmQARobz7MUGF0RncRMR2UqncCPyXQOQBvH6A+nLhHl4SabQ8=
-X-Gm-Gg: AZuq6aJU/Ncf2SJujyDBgeNRNy3sPhl8ubmjV5blX/Z4RW6clV5EKo+EApueybvClM4
-	Cd2xa++W16FDxyX15uA4jCw/F0JSKmAdC4qW607ya1GIrHFczAglVcsfq+C8mwEbQW1dCbZbqH/
-	vl1ax1O1jUR0SyRnJ4z3hY8gj3jMIq6Ag55kbY9OyIQkrTleHkyAM58f3/dfa1G28YIroyPPX46
-	AviOppjugDdgMyALZxMdVQ7Dh6xxOYwVcZJRyuDFZxK096Ou2z9sBspk0TVcPcbZJ+krojtciNP
-	2aZFXXRMQa7WugcOGV1eJDVWZgWb8N2WKmL61I342wiDNUGYu0bNISjOtZwHyud+FQHsvvmyib6
-	cn9PnLJGvEq/Jc4W7GqjAn8DwgU+hEKiiQRHT+wr/9tnhc+WL//RaIaEE7cGVk+8apEp2X0Iylr
-	wy0fl4l8DyF/mCrSRGDhRPIxdd70pXMW3PZq3d6l/uIjMAAnsJfLei9uzo5WR4yYSHY0tLGaebJ
-	Q==
-X-Received: by 2002:a05:6830:929:b0:7cf:db63:e3dd with SMTP id 46e09a7af769-7d1a532b1d1mr2440440a34.17.1769785958416;
-        Fri, 30 Jan 2026 07:12:38 -0800 (PST)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d18c69e632sm5685845a34.10.2026.01.30.07.12.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=eXoX3vnzmebVZOm3CUt6qKUyHourmARTnybZ8qjemAw=;
+        b=qJNGutpzHUnOf4HEYefLWmFzIWwBlY9cyi5UVQnndngu/KB7FdB2jmLxMoyMzvsN0D
+         6CS2yklnFNkz6p8rMQ8POe7jSmiS7b8HT3c8ZCkDBjbZix6MLEDo7H/kXni7ZA9huE/Q
+         QJ8Gxb1SOJJdk0nOydPpSR+Fv8b80dCx9ndNSKoxyTjo9bLKYRUrpHlNl2gXtuM2UJZV
+         SZqRmCJHY16Y4IViMoX8GBlXLeGz09MQ/Q0v25Yzsq6/ZyPxPddAIOZdkdvVDc5Xqbb9
+         HUZyvh1oyqNB4r2sdx89pApa742tSvpSVyzT369EvtFRkDMOeBJhWEwL7/TDR9b/ph6h
+         rDIw==
+X-Gm-Message-State: AOJu0YzPNsTeWzy0HbFik8YMbEFjPuz/BZTBKYlk2TGVBbcrd6PeUX76
+	I+SRK+qn+5D6ZqyhcRappifnu/tNQWl9YCwkP3UU1EOZrE2KxzBP1wMpTTQpG6IMO4g=
+X-Gm-Gg: AZuq6aIsQHhx+ztNfgMJUnLv7Qiog7mC/WWkcyABTSA0tAr7tl5+PjmRZH9aba5DcyG
+	2IQSCSd5KYfZjjsavwM5+aU/Cr4jFDmsNlz0olmOwnbc0M4X6fzkMCvVqARy9lteZ20WY6ST4XP
+	HUDooKD2wuCXspfUQGrlQOJF0m446Bl1wZZtDu+MdmATUdwqbJybWGz4jBhf4qdeYhNobwYoqb8
+	XVG2V6DSAFltKOp8yKCESmIeDeWHk18YmlWu70JbxnZ/eMOBP/rPfbX8N45vrsyhOtUwXb00/Nr
+	NpiQ1t6xuaSSDFAv/SmrUz3EIOz997IzhXVlKKZ4DsZK3bBgppVYqQ/94RoqKqch/+DjhKhT0HX
+	BX92cXAojDgTZfKWrcsLtIhVFo5EpnaCVFTKuauuUm2vWI01qE+KwJOUZ1+Xx3VLOyZ3B5bTyYD
+	eFRy8xM/XSvv1xhxoVRPnnrjzk6UwJPHnCvP3onaQXZlzD7jRqXq8CdoPEDjsA1an2OeKzYwILZ
+	w==
+X-Received: by 2002:a05:6830:3498:b0:7c6:aea0:3382 with SMTP id 46e09a7af769-7d1a532b43fmr1876606a34.23.1769785955615;
         Fri, 30 Jan 2026 07:12:35 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d18c69e632sm5685845a34.10.2026.01.30.07.12.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Jan 2026 07:12:34 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Damien Le Moal <dlemoal@kernel.org>
-In-Reply-To: <20260130062846.1227392-1-dlemoal@kernel.org>
-References: <20260130062846.1227392-1-dlemoal@kernel.org>
-Subject: Re: [PATCH] block: introduce bdev_rot()
-Message-Id: <176978595572.809940.5645724024309473376.b4-ty@kernel.dk>
-Date: Fri, 30 Jan 2026 08:12:35 -0700
+To: Ming Lei <ming.lei@redhat.com>, 
+ Caleb Sander Mateos <csander@purestorage.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20260128205636.4003327-1-csander@purestorage.com>
+References: <20260128205636.4003327-1-csander@purestorage.com>
+Subject: Re: [PATCH] ublk: restore auto buf unregister refcount
+ optimization
+Message-Id: <176978595418.809940.7908857788281671989.b4-ty@kernel.dk>
+Date: Fri, 30 Jan 2026 08:12:34 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -76,20 +79,26 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3
 
 
-On Fri, 30 Jan 2026 15:28:45 +0900, Damien Le Moal wrote:
-> Introduce the helper function bdev_rot() to test if a block device is a
-> rotational one. The existing function bdev_nonrot() which tests for the
-> opposite condition is redefined using this new helper.
-> This avoids the double negation (operator and name) that appears when
-> testing if a block device is a rotational device, thus making the code a
-> little easier to read.
+On Wed, 28 Jan 2026 13:56:34 -0700, Caleb Sander Mateos wrote:
+> Commit 1ceeedb59749 ("ublk: optimize UBLK_IO_UNREGISTER_IO_BUF on daemon
+> task") optimized ublk request buffer unregistration to use a non-atomic
+> reference count decrement when performed on the ublk_io's daemon task.
+> The optimization applied to auto buffer unregistration, which happens as
+> part of handling UBLK_IO_COMMIT_AND_FETCH_REQ on the daemon task.
+> However, commit b749965edda8 ("ublk: remove ublk_commit_and_fetch()")
+> reordered the ublk_sub_req_ref() for the completed request before the
+> io_buffer_unregister_bvec() call. As a result, task_registered_buffers
+> is already 0 when io_buffer_unregister_bvec() calls ublk_io_release()
+> and the non-atomic refcount optimization doesn't apply.
+> Move the io_buffer_unregister_bvec() call back to before
+> ublk_need_complete_req() to restore the reference counting optimization.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] block: introduce bdev_rot()
-      commit: da562d92e6755c00cd67845a8dbfb908dac51a9c
+[1/1] ublk: restore auto buf unregister refcount optimization
+      commit: ad5f2e2908c9b79a86529281a48e94d644d43dc7
 
 Best regards,
 -- 
