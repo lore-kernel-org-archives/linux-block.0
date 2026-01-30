@@ -1,53 +1,82 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f228.google.com (mail-pl1-f228.google.com [209.85.214.228])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D73119F137
-	for <linux-block@vger.kernel.org>; Fri, 30 Jan 2026 16:34:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A340D320A24
+	for <linux-block@vger.kernel.org>; Fri, 30 Jan 2026 17:14:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.228
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769790868; cv=none; b=d29C7RdzZHIBeuKEjMxYwAAca45ZRbzJUYDXuMINuV43yJvI2nKcO1/AEV1ruH0VBcMmGrmIe6m/yhfAH3chUXtsR/9zwW+nZUSSTyTzm/PoHSE2bhflwINhBBLNLqYhqTrtpegZxrjJZQMw9yRnbsgYdfybpFu/tLg+1uMAKPs=
+	t=1769793273; cv=none; b=o59D3cVMjT3HZXZxW9L4t1MAkQlc0ZxuOS/6+i1QCTN+bDIn/JGcXy3NaozMDVQ6aTu2UubjUgbdvvm7HLHqaYGWyhGuEFgnGDx8E4mU68NIVqbsxac3kUCGmANG7HRnmvVmN2YJ3egr/WOyUIo7357Qy7f9fCELMohr8MhGzwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769790868; c=relaxed/simple;
-	bh=9bnCZr/v2q3WKowBg3IoF1ImW7SII5/PwmcL2WXJD/o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=q121hvLCcRpqqChH8uD0i7I/8FiUYQDZZrw01okw7WOfPZ8TXegvH58LleoXX3zRkk4VuoBPSt0nc5R4f/KHs/kkBuhSgPcufliOBbICTU7HSJP7g8Sng9YOFWhfh+pfa5PM/G921N0AePb/tHJPDliA0n9aMc9p+UzuNClQxRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bbRvx8fG; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1769793273; c=relaxed/simple;
+	bh=wCkT+0Fo7ip1VAXveKM+pIVE+TBXQ2MYyUCKXghWGUQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=hR2r4XOj11bPqxCHfsKq6U9FfKEQ5c7NNt0+XbICyNLcFlyaQZJlhNaVG+bdPNLSD3JBaNn+2UaQytmF9ByvbUtLXluywFp6yWQ7E/9I0NOf05ZIIfQCrMn8coDvgORQbBQZs6fvAcz7NQBArRYR5cL+hMawtX8AiPjEYm6tYg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=d0IE/pIA; arc=none smtp.client-ip=209.85.214.228
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bbRvx8fG"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769790866;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=M9kMTxZZn6akxbL5bK7EzAglUZuVa77+RwCgOjtFW3c=;
-	b=bbRvx8fGZ6OKB1dqiVgz0SyFOHTIcbV80R3x03WAulFgjcrFOILCtz0iFJ2H1AH/6hi8Ih
-	9R+hbuPIOse9WgpiFPzCqS4o7JnJxQy8bccHIYmK96vKF2EAYC+bV8gj1xoJGuhePT5c6M
-	Jeueo2IL4s1yFhpatB8f4GzE4IjIM98=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-556-lgBjHo3JP7OFygt9QXH05A-1; Fri,
- 30 Jan 2026 11:34:23 -0500
-X-MC-Unique: lgBjHo3JP7OFygt9QXH05A-1
-X-Mimecast-MFC-AGG-ID: lgBjHo3JP7OFygt9QXH05A_1769790863
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EDF5518005B2;
-	Fri, 30 Jan 2026 16:34:22 +0000 (UTC)
-Received: from fedora.brq.redhat.com (unknown [10.43.17.192])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id ADB643001DB7;
-	Fri, 30 Jan 2026 16:34:21 +0000 (UTC)
-From: Ondrej Kozina <okozina@redhat.com>
-To: linux-block@vger.kernel.org
-Cc: Ondrej Kozina <okozina@redhat.com>,
-	gmazyland@gmail.com,
-	jonathan.derrick@linux.dev
-Subject: [PATCH] sed-opal: ignore locking ranges array when not enabling SUM.
-Date: Fri, 30 Jan 2026 17:33:52 +0100
-Message-ID: <20260130163402.571854-1-okozina@redhat.com>
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="d0IE/pIA"
+Received: by mail-pl1-f228.google.com with SMTP id d9443c01a7336-2a08cb5e30eso1126205ad.1
+        for <linux-block@vger.kernel.org>; Fri, 30 Jan 2026 09:14:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1769793271; x=1770398071; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8pYvyvztBv1OPHWCa1BTrjMg7Bnkkyf2mkorsSdzRqM=;
+        b=d0IE/pIA7Bkt9TI8aV6P4pbUhC9xy0MzHVQSH+kaY/cPj8PjP/hj8rlEdm8OTSTkmy
+         cAkTq+4aSLTwePCjIteUozWQZQSE9MQAZIu+zcOmUj2MZxGI0eX7MzVdpJoFcl5HsBOh
+         Zz9JaczA0L2rmb1eFqb0fU3IQkre13+Aqen0V3ubULFZRVhrTpcnwIHN8eORVyBVv2xU
+         mm2MWkbPMP7ieI6pTmmdhEUNxUfJy0OPX9RVp0Ofv/I2axax/1Na4WkApIrN1Hq4v7jq
+         1eRqWrz9YspFPuNGhQMkr8NNGKIqNXTVJpBwc+4o4ov8h65lWy5k+f1YERN7YkH9aZsj
+         ApOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769793271; x=1770398071;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=8pYvyvztBv1OPHWCa1BTrjMg7Bnkkyf2mkorsSdzRqM=;
+        b=R524cdZjT1J5gphaxoyU8BmY3ojdrE48ExIw45HaHwnLhUuoWz3EiA8R5MQeDTRhNb
+         azL0pYDl9xN+GO9qP0l2tM2UaFPDkaEXNlKg4fCdNA9tslTN+Rpg97ofOJdxZ32p2h2d
+         m7BbHmrr0dsjMggo9hKd9lcZtKkOhRJoSJnYMAATsURHWW4WyOECd1iFv63B/AjjhXsS
+         YunuRtTf7DuhBlsV5pejrG0H/e6N15GH4WxwcGQOsfMZFMpe1VnJwsCfWT3KOJnmz1MP
+         zz3734PjDRFChtUPVjBWl2r0k3xviW/A+1zrHsTtVvfIYIcnQLGQ4WN7aMuymk+GbyNC
+         PFaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUeoTTjN+J2uCr8REzU0Ej33EsxbWtsxGZo+snvhfaLpyVBT4WJ0G6RQvgviJ5/3drP2GXyKqTq38MuYQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5ZaZ3gdTS9EI5mGiT44kzpmpDsTv4mFmCrzU9aM/TAViVT7ML
+	at5kddGhFjn8cBmZuwrl5g2SSLYO+uCVd1UdISTJPGRkIyshO5DkKcz2GK2a/ViWAio9LjDE+TI
+	jLBNmV0IaRu5yp4a87BPNtSUo9m9vIUguP3u3OBu7pIMgrXF+EXAL
+X-Gm-Gg: AZuq6aI1JxO17jVJA5Ym2IkGtqKVEN09P1FC8cqmTypnIfdM3nTKXjHeHjUyQlMYL2B
+	mWVzxf4IFyOXCE1S6w+pH14jTZNKAE5aWo9z5apUPlK2kyjea/m4AK3hiqETQzJ+zXSZoKxiUJw
+	bk1fOnw3m7EI+IQtzwfn3oKxNQNMEVoFcnKXz3K3Zjzc/G1wsYEAvTB5I4m1oW2p85i2IwYrvW0
+	rTk9GMEMvDivki8eWOfSniLgZjU2J1bLenxLk24ZM8rjqCG8NeTGbzqwO42ToS7F0E3uj9kBMiL
+	3l29gNjKhFhbJvScCy5oR1Xy1ee+K/n9KXfYReFltUiSHMMQ5J6+Ao9MhJJqnUYrewK4v8Mt/dI
+	vbHc2S/H7Rp6z/A6YkJ+eChDCo+8=
+X-Received: by 2002:a17:903:2c07:b0:2a7:87c0:d1d7 with SMTP id d9443c01a7336-2a8d9a7f66emr27658905ad.9.1769793270768;
+        Fri, 30 Jan 2026 09:14:30 -0800 (PST)
+Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2a88b3eeec9sm11140785ad.12.2026.01.30.09.14.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Jan 2026 09:14:30 -0800 (PST)
+X-Relaying-Domain: purestorage.com
+Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.112.29.101])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id D75B634058D;
+	Fri, 30 Jan 2026 10:14:29 -0700 (MST)
+Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
+	id D18B7E40249; Fri, 30 Jan 2026 10:14:29 -0700 (MST)
+From: Caleb Sander Mateos <csander@purestorage.com>
+To: Ming Lei <ming.lei@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>
+Cc: Govindarajulu Varadarajan <govind.varadar@gmail.com>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Caleb Sander Mateos <csander@purestorage.com>
+Subject: [PATCH v2 1/3] ublk: Validate SQE128 flag before accessing the cmd
+Date: Fri, 30 Jan 2026 10:14:12 -0700
+Message-ID: <20260130171414.1376543-2-csander@purestorage.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20260130171414.1376543-1-csander@purestorage.com>
+References: <20260130171414.1376543-1-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -55,32 +84,46 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-The locking ranges count and the array items are always ignored unless
-Single User Mode (SUM) is requested in the activate method.
+From: Govindarajulu Varadarajan <govind.varadar@gmail.com>
 
-It is useless to enforce limits of unused array in the non-SUM case.
+ublk_ctrl_cmd_dump() accesses (header *)sqe->cmd before
+IO_URING_F_SQE128 flag check. This could cause out of boundary memory
+access.
 
-Signed-off-by: Ondrej Kozina <okozina@redhat.com>
+Move the SQE128 flag check earlier in ublk_ctrl_uring_cmd() to return
+-EINVAL immediately if the flag is not set.
+
+Fixes: 71f28f3136af ("ublk_drv: add io_uring based userspace block driver")
+Signed-off-by: Govindarajulu Varadarajan <govind.varadar@gmail.com>
+Reviewed-by: Caleb Sander Mateos <csander@purestorage.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/sed-opal.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/block/ublk_drv.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index 37746801479c..a26a94642d84 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -2942,7 +2942,8 @@ static int opal_activate_lsp(struct opal_dev *dev,
- 	};
- 	int ret;
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 5efaf53261ce..01088194c8d3 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -5219,14 +5219,14 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
  
--	if (!opal_lr_act->num_lrs || opal_lr_act->num_lrs > OPAL_MAX_LRS)
-+	if (opal_lr_act->sum &&
-+	    (!opal_lr_act->num_lrs || opal_lr_act->num_lrs > OPAL_MAX_LRS))
- 		return -EINVAL;
+ 	if (ublk_ctrl_uring_cmd_may_sleep(cmd_op) &&
+ 	    issue_flags & IO_URING_F_NONBLOCK)
+ 		return -EAGAIN;
  
- 	ret = opal_get_key(dev, &opal_lr_act->key);
+-	ublk_ctrl_cmd_dump(cmd);
+-
+ 	if (!(issue_flags & IO_URING_F_SQE128))
+-		goto out;
++		return -EINVAL;
++
++	ublk_ctrl_cmd_dump(cmd);
+ 
+ 	ret = ublk_check_cmd_op(cmd_op);
+ 	if (ret)
+ 		goto out;
+ 
 -- 
-2.52.0
+2.45.2
 
