@@ -1,95 +1,99 @@
-Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com [209.85.161.72])
+Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBDD436CDEB
-	for <linux-block@vger.kernel.org>; Fri, 30 Jan 2026 12:35:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A87D30C61D
+	for <linux-block@vger.kernel.org>; Fri, 30 Jan 2026 15:12:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769776531; cv=none; b=tB4GrdxlukxUnToU4d0hLBD6YSLhYeJuGuxBIXXupi2g4cmh4SI92P8mrpPSeKr5or9WLN3HdODkKRBOaoKoBrTQ7jgFBsS+6hr3k6FVF5Ugh9MfYJ28WmP+CRWO0F9nINymUg+fyjCmZMnSLhVlbZp86lRgRuIjTwkA7THpabo=
+	t=1769785961; cv=none; b=ganKZNjjG7a8hTWnjWmDWHHwnR/a+ZHdUfLxxYNzivp22N6vK2famgmRYrX97/mV6CGpseVh/0LzIXtla5TEU5c0GlykuQiyFtWJWtfXKLsgDMKIUUX/WreUdUyghOIZAysSzFi+nsNlYxRbrMumyLlf817OgB+DKkRCTjJJATs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769776531; c=relaxed/simple;
-	bh=E6Ym4Q6E2Nk5tZ4hGeZ85+h+V1SwK4jeyBBx4YjJmmQ=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=sLDWudW3eYKREUliv85qOqcmdvlJrEgI9IGCuwyhfCTNlUpucp5q5qtkVebXrENp6BOrJd0rNqEPCSIVsqEAyPjr+v+H+3TrY0cVEmYuiMtM/gAbEdQeWd9Lo6G5hsbdz9Ai1teword5goNqeQa3Qt+PKNcd+eO2SzcJBlOTsow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f72.google.com with SMTP id 006d021491bc7-66314e79f6cso742521eaf.2
-        for <linux-block@vger.kernel.org>; Fri, 30 Jan 2026 04:35:29 -0800 (PST)
+	s=arc-20240116; t=1769785961; c=relaxed/simple;
+	bh=iGeggJeQX9uYoahJzcc0RbYr/2cTy5sVq2dVoGX5ljk=;
+	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=B0Q6fGP4b0m5WJYaH8gcfWwcVL8jdYEoHS5zLLGGivTfm9cb+6lULzuxB8ScmDSU9S31Udvl57V2AUuFEcyC8clWuRTHwrzKK1l5x+do4Xcedd+wgowiGuSl+QLHrNhGE4OK5H+oTcKpMHU0Fw8pNdQpKU5E2nqmEtKaAxRNIlU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=1j6qcEmi; arc=none smtp.client-ip=209.85.210.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="1j6qcEmi"
+Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-7cfdf0c8908so1333569a34.0
+        for <linux-block@vger.kernel.org>; Fri, 30 Jan 2026 07:12:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1769785958; x=1770390758; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=i4FxRs3c+84UbVfsSFyOiWwW6/z7WTOgoT+QaGsd2WM=;
+        b=1j6qcEmiriaqrzvBSXd3mrsbS6vzc04hbw6GkeDBpGLh9Ix1NER+LFUZsp/LAbMBLK
+         Kqvc5ZaqrpwlI1qmC+RMFUQYhioQIic2CW93HRTEYeLupWhYTNLlBVD3+NPx3yffQX5z
+         hxV22rDrC0FwQYtrB3KR5SAxgDPt6PM9a3EoD3OAt09ZmcS8K6MIf48Jq8QWGnCfnK6p
+         SfYgMUhpagELCcl/mu8lfJTsN3CGME3bdSCm8EMjAyCu5VBAbdsma9bOF5o2wRCBuuow
+         IwP+QXLxxd4Uik6qLnYD+KGUq0UkQP+GCXRUCaBdiFPlQT+2M7cS+vM1paTprpzvPtdI
+         0ltw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769776529; x=1770381329;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dHQ2gYlVwBCbmrP5aNeBe8IwPY4dK+Q628znig2cnq4=;
-        b=n5igB0SfMkqEmWup8O6zGupeUxbHoBYSSf9wdzBKCZ/u2POpgM4pGymj0OWdUEH6ci
-         Fp88Xa/rKrcd/aisa9y1ruWj+LRooe0yZWhUKNbtRpGxn1qbJxFCzeGn8uZVArYPYpmv
-         PWpr0w6XULjKFsfoi8hPI05tNrQxuobl9kp4U7+JW26JvwoKOzFXtenIdjjP/V+oXBDF
-         iYHnnuX53BPNeanJ+VI3MuRM0o7i2UFluf8fc1VcAUaZQHvSI0B+UoVl8CUymVdUdZ8H
-         n2+Su36WxTqhJS8WUFkjPJnvRrDNkYapwgB+wPASiakYOjkHTcb8Bs36Q8x+qVzOPTht
-         1mRA==
-X-Gm-Message-State: AOJu0Yw12KtOWSYIggjD3yt5tvE8jn0Cp9pb25IG709dukE6uCGrSOdy
-	Ga3d5+VKRaHwbJMGiG+jeMq73BED6R0UUFL/oKk62/CWAz0syCypRQmbRoRCras7N4542Ufe2iD
-	BX5dz/i0jfHtfIxQN/p0j7L/HXqxabPAYZHLDc+xWvNJOrGPtNxwmBb+u6C0=
+        d=1e100.net; s=20230601; t=1769785958; x=1770390758;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:to:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=i4FxRs3c+84UbVfsSFyOiWwW6/z7WTOgoT+QaGsd2WM=;
+        b=c2PoqEVR2vYr1l2cjF4eNwmHxmSV/7R2RTYsPOKwx+cYbPTX0VtMEokPGTL4vCa0Fh
+         JQe81PK+TjKOyUXZn9dW8RZm9gXxfmrIb5ikFc1SeDkvp3099DCWbvyTbUZAbA9ucULj
+         9dWoD1N/bCgD/08LZSLMHuNcqx2/DswrmobkJFR1c9dtdeikKhnSWL8J69cnGh4kLCvD
+         VwtLbAdO1NKkFReFk0JvbOTgjUlom/SFjutSL0SRjzFWbA8wNzvtrnNzpIabEAr0Ehdy
+         XOgj94gGTR7HQ5s3uziTFeZ3AeJfzJOlyM71WpkSRIgY0WFLXLdNYpj82lWC1nKu1pMM
+         XAjA==
+X-Gm-Message-State: AOJu0YyEYLnwRgbU+SxYRtZKaethzI3BYSmY3YSCLf/odyN4r16sA6aP
+	oUuRVZh9aM9s7DfqcFxmQARobz7MUGF0RncRMR2UqncCPyXQOQBvH6A+nLhHl4SabQ8=
+X-Gm-Gg: AZuq6aJU/Ncf2SJujyDBgeNRNy3sPhl8ubmjV5blX/Z4RW6clV5EKo+EApueybvClM4
+	Cd2xa++W16FDxyX15uA4jCw/F0JSKmAdC4qW607ya1GIrHFczAglVcsfq+C8mwEbQW1dCbZbqH/
+	vl1ax1O1jUR0SyRnJ4z3hY8gj3jMIq6Ag55kbY9OyIQkrTleHkyAM58f3/dfa1G28YIroyPPX46
+	AviOppjugDdgMyALZxMdVQ7Dh6xxOYwVcZJRyuDFZxK096Ou2z9sBspk0TVcPcbZJ+krojtciNP
+	2aZFXXRMQa7WugcOGV1eJDVWZgWb8N2WKmL61I342wiDNUGYu0bNISjOtZwHyud+FQHsvvmyib6
+	cn9PnLJGvEq/Jc4W7GqjAn8DwgU+hEKiiQRHT+wr/9tnhc+WL//RaIaEE7cGVk+8apEp2X0Iylr
+	wy0fl4l8DyF/mCrSRGDhRPIxdd70pXMW3PZq3d6l/uIjMAAnsJfLei9uzo5WR4yYSHY0tLGaebJ
+	Q==
+X-Received: by 2002:a05:6830:929:b0:7cf:db63:e3dd with SMTP id 46e09a7af769-7d1a532b1d1mr2440440a34.17.1769785958416;
+        Fri, 30 Jan 2026 07:12:38 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d18c69e632sm5685845a34.10.2026.01.30.07.12.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Jan 2026 07:12:35 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org, Damien Le Moal <dlemoal@kernel.org>
+In-Reply-To: <20260130062846.1227392-1-dlemoal@kernel.org>
+References: <20260130062846.1227392-1-dlemoal@kernel.org>
+Subject: Re: [PATCH] block: introduce bdev_rot()
+Message-Id: <176978595572.809940.5645724024309473376.b4-ty@kernel.dk>
+Date: Fri, 30 Jan 2026 08:12:35 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:f08:b0:65b:250c:70e9 with SMTP id
- 006d021491bc7-6630f02d377mr1235092eaf.27.1769776528833; Fri, 30 Jan 2026
- 04:35:28 -0800 (PST)
-Date: Fri, 30 Jan 2026 04:35:28 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <697ca590.a70a0220.6f39b.0240.GAE@google.com>
-Subject: [syzbot] Monthly block report (Jan 2026)
-From: syzbot <syzbot+listf4d018cab1259bab4bbd@syzkaller.appspotmail.com>
-To: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3
 
-Hello block maintainers/developers,
 
-This is a 31-day syzbot report for the block subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/block
+On Fri, 30 Jan 2026 15:28:45 +0900, Damien Le Moal wrote:
+> Introduce the helper function bdev_rot() to test if a block device is a
+> rotational one. The existing function bdev_nonrot() which tests for the
+> opposite condition is redefined using this new helper.
+> This avoids the double negation (operator and name) that appears when
+> testing if a block device is a rotational device, thus making the code a
+> little easier to read.
+> 
+> [...]
 
-During the period, 0 new issues were detected and 0 were fixed.
-In total, 41 issues are still open and 108 have already been fixed.
+Applied, thanks!
 
-Some of the still happening issues:
+[1/1] block: introduce bdev_rot()
+      commit: da562d92e6755c00cd67845a8dbfb908dac51a9c
 
-Ref  Crashes Repro Title
-<1>  18846   Yes   INFO: task hung in read_part_sector (2)
-                   https://syzkaller.appspot.com/bug?extid=82de77d3f217960f087d
-<2>  8181    Yes   KMSAN: kernel-infoleak in filemap_read
-                   https://syzkaller.appspot.com/bug?extid=905d785c4923bea2c1db
-<3>  3789    Yes   INFO: task hung in bdev_open
-                   https://syzkaller.appspot.com/bug?extid=5c6179f2c4f1e111df11
-<4>  3483    Yes   INFO: task hung in sync_bdevs (3)
-                   https://syzkaller.appspot.com/bug?extid=97bc0b256218ed6df337
-<5>  2632    Yes   INFO: task hung in bdev_release
-                   https://syzkaller.appspot.com/bug?extid=4da851837827326a7cd4
-<6>  1696    Yes   INFO: task hung in blkdev_fallocate
-                   https://syzkaller.appspot.com/bug?extid=39b75c02b8be0a061bfc
-<7>  682     Yes   possible deadlock in elevator_change
-                   https://syzkaller.appspot.com/bug?extid=ccae337393ac17091c34
-<8>  512     No    INFO: task hung in queue_limits_commit_update_frozen
-                   https://syzkaller.appspot.com/bug?extid=f272bbfbf8498ddadea5
-<9>  139     No    KCSAN: data-race in block_uevent / inc_diskseq (2)
-                   https://syzkaller.appspot.com/bug?extid=c147f9175ec6cc7bd73b
-<10> 135     Yes   general protection fault in rtlock_slowlock_locked
-                   https://syzkaller.appspot.com/bug?extid=08df3e4c9b304b37cb04
+Best regards,
+-- 
+Jens Axboe
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
