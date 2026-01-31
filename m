@@ -1,73 +1,72 @@
-Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
+Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28CB217BCA
-	for <linux-block@vger.kernel.org>; Sat, 31 Jan 2026 13:49:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62E8932E6AC
+	for <linux-block@vger.kernel.org>; Sat, 31 Jan 2026 13:49:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769867353; cv=none; b=YzCPkTK8uUl3qzXFrHinz5/Vc7R7M22QDFHWhj6n3QM+e28xtOJ/xDgaJlLVkh149c1sajZ33BEXDFc54GgFgtKfbl5TQYi8s1K/99ymGRnkYSHuPDmrOlP8oeOe091/yJO7t/TAQLY2l72j+KtrV0pMtjRdwJY3maozTMlWc04=
+	t=1769867353; cv=none; b=mgtd9Z6uaAdEev+BqW3p6HGFyK4LF7H188zHykfEEvf55sG37Guc3vkxxj1Wh4nV1QMSdGhS5YI1YhGCFgdze9L/ig/Ql5liDgdZF4E0qUF6SyNiCSQUbJAFI/Rg4yrOApk308Cx6/+Y5XcxjSjMAwI4uRyLyVdKYv1pm+OhUPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1769867353; c=relaxed/simple;
-	bh=f6k7ALdOVAWOrs5cKk+a3aEpKdtPurVjVpECEtMYa70=;
+	bh=PIuQwJICRkdXwKlZJc2OOqIS3RqDS1HMvtT/iqeO/qM=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=h5vklG+h3c3ck18WC5EBjBgWX5gdIV6awuq7OVh07Djp4twtGij+vPMbxAXXfFQOKE+PWEvY8Y7nWAcaRfDZwujQatrnNimoL396ZqAVVIjTov5dehXOvuQgc40OgfCcmJOwpdsDdc3kMHjyOT9mKF5UCw+VjFORrMLTLTgFUvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=FkE2CeDx; arc=none smtp.client-ip=209.85.161.46
+	 MIME-Version:Content-Type; b=AyMCxzWwTZ2VkKm2U8t7TRffqEahxG4Ae3n00uBaK/yUl5XLDW6ue1zyjBPGdQsnBSeoYsMgS1D8mwUE+sGAUFRc7sA6PxJ1QF9u0SOVHK3+d8Q6wM9RMBkRqP1Cr3YB23WLBZR0B6Pz3jlTASWSW7s0n9V2qS+kPQsXNBZwxX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=qE6zNfCJ; arc=none smtp.client-ip=209.85.161.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="FkE2CeDx"
-Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-66307e10d1dso1557234eaf.0
-        for <linux-block@vger.kernel.org>; Sat, 31 Jan 2026 05:49:11 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="qE6zNfCJ"
+Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-66106a2f8d1so2115724eaf.1
+        for <linux-block@vger.kernel.org>; Sat, 31 Jan 2026 05:49:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1769867351; x=1770472151; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9pBDA9lF2FzKZhWCpmhdTZ6Cdm9a3pQch+N5zOUhpho=;
-        b=FkE2CeDxT2KfRndl4bKEda5jHP8DlSVjNjr4Y9RG1ZPs1cbOKuKM1sRLTFOtA+tEsd
-         ir7VHAYxwJaizXdOy1K02ts6SdP+25VLLbTnKHirZSWQeHBYSc3I9Ie60AobDqX8OLSV
-         0L3guzsYUFo+CkJFM/WuZ0WwpGOE1kWl5qdkgEBZOZqUw/uen2tLW0xEUYXtMu30vmW0
-         6iWYqUXVaUSWJI2R2Pk5lUUgDOF90rgs83vtvb0mgUCfE6THodbHXl6CK+628mg5QMow
-         a/6ocRz7CS7SI2pqAEDtmufn2Y65PZi9mH3bTtsP4WLEJGfz+uzoN6FEjFGGZtN/5KrQ
-         eQ2A==
+        bh=EjuuAT4RnNe5hWPU5ljQ0ilmliBzevq8hmX9YQy/wrQ=;
+        b=qE6zNfCJ4fj47PVpAhZoHqB9SWEzAtLTFTP1qLpgX14l+bcCP3eSPZfEojUgc1V0pX
+         DIZ9GePwZLnm515bO2k6PANKFieX/F3wUawe+kmkLws8Ma29f0rvZPwCFfq0qcsZfiai
+         2X6e+TXZ6ROhbeX9Np1ubukshK3rUyc3izcG2lHawjKShUqp0r1DXxCiXuhysfStF6Py
+         5pE6c+KPhHMoH+J048UVa+rUveXeCiPEetAWrYcL7Q38SS4r8Ls9a7O6SwhNRvkAw0wD
+         TSAThCZ75L1nU47AbpGUgbuubRXqweP8/cn4LClhnptz24MBt7vG0xqxMaIceSjJsF0f
+         YPgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1769867351; x=1770472151;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=9pBDA9lF2FzKZhWCpmhdTZ6Cdm9a3pQch+N5zOUhpho=;
-        b=RoyXrSGHJnMOJaqyatDqnSFxsnrOjaHLzyQbUSreo2T9ybrTMTFmtMKDQYvtEzwR25
-         JprxJrCSrJ7zHh/LVlVA89SflpTBOs0hLqwqcVN+GjXXHXarvimrovFm4tT8Y3sjfcfg
-         Le7I6TlOZC94JYnG2IpB7rVhAeh8evphgHimrNGNicNEmyCj14o/K3BRRvkkSWuWR9eY
-         A4VYIU3adfAmCI/z8LdeRXUTMz7EdcjrPqTL4kvm5KV0jX41H2RexWWIktpSGfpBwC3x
-         SjWrJL+EadKXTx4DtAzJyJarHon8t32mobS8iiMmyPHIzZmZESEEAMEccjxzj16hWDoE
-         uZJQ==
-X-Gm-Message-State: AOJu0YxJvSDgcrsqN9qpi7cOMTp85HhhXcbZnA9+v1mlCLZ7DdegeSc8
-	KYmmIn/GUDFK/MkRBqkwIwQtYqp+47RzezNB82vV5GDWX+Y0lpBsoSeffzI93ESEgpF9gYKkMxy
-	iP5OWKD0=
-X-Gm-Gg: AZuq6aIGN9anwDBpgJHSPqvh4nCZfcIOOjPSxbHasUB9WRvJqQZfTuH2nnavv46QrLo
-	697j9h0F092Yr3+FpcV041meP9RzW1XIsy32sFtvNKQQ0ap0Ur69v2XsiNjfM+EmrDcrs83dV1U
-	lG/feax/UUFPaafYvT173xVp5opOgQ4BEnNXBRwaXK2LtwMzryG1O7UPurKXW7ZehHT3/QhHgXh
-	e+ZC1sI4n4EP5AH+tuO7Z4vGmxAzQHTLvwZKBYacb0/yUEs92VnPgu1Pc6PcIIoIBGifw9OOVBx
-	OgNv3iAkfA97vZsmKFnKnOy5z0eSTODkROT1/7jgEc99CHzlIBKP7nijFL39pQpa4jVJbQsQlak
-	+4rGDe3AVCnYv0JPWa65lckNQipOXd/4dgbciBBpUK6KMowUpSUsojTnV/doCD75Cshb+8Gkrso
-	rpfcgaTKEYKmAEIUxxvpLVZPuAFEP+MNay+QdEkbUmkZ1vK6NPsjTOKJEYagfwqo3+
-X-Received: by 2002:a05:6820:2002:b0:65f:75e4:3481 with SMTP id 006d021491bc7-6630f3e5615mr2536722eaf.83.1769867349429;
-        Sat, 31 Jan 2026 05:49:09 -0800 (PST)
+        bh=EjuuAT4RnNe5hWPU5ljQ0ilmliBzevq8hmX9YQy/wrQ=;
+        b=lo4GNsHm6d7gAPFUP2WpR0DD1z7xprW/Fu6mMW6pyjgpZLsw0UtzQAhmX67cKNwvo4
+         uMePzWCUOWrdAHf7jxGDODxp1QdlE9bWaSCO2YLtcQ9YWUmwx0Ju+1AkyybDUdJy+zHJ
+         XZs9iliUeZt2sN4tpd6myK617F6aTRn+jSEHwtW9/rC6xWt1m+29xBxDk2y0XLvwHHJ8
+         WM5VKvm4DKRFHcVYHH1xSa40HxF69UyEtMG397o2L6by9nAokBEfpfutT6gRpEaIxjS+
+         9QWtw2NhKXmd63qQpwIY9myeIz8+ntI9VXP90rQmcRiTm9UU6sTotPRudkz2NF9lMx1N
+         UKqQ==
+X-Gm-Message-State: AOJu0Yw8qLrMyhy73vCpbVEIBQiOLDYI9EAxMHk7hg5idAZ5IbgiBeQA
+	5gPeg8Flmalo4Du2HBTZr8TzLk+cPBCfE8l5BuQVZh9ws9nzE5IetgWfcGzWfNs1HCc+x/b5uzw
+	yvmeT0PA=
+X-Gm-Gg: AZuq6aJpDATBrr83TLLG2S19vT+zOcc//hE4uDxKG3URVawRVUZ+RYbgTDGk+FYQdB9
+	Q+Q5ar5HNDD2NS8OLhV4d7yVzt/EgfQHlRGjmv0BQ56ebfYoAv6pU0nwo7buoRdL++SR8mZWPRH
+	NZ+XcggyA8HY9fxyzvAvlpfoeVM6UAKUzs3SMsZvW7AsQo0/FBnIVDEzovLKMm6ktUHstwCZR2c
+	Xa7OqUM6OEK0iTRNYnz1ThSryTyHCuwwtr4kR2vz9010j6YThkFZP/NlLWvmd6KPlh6SZYpqL0R
+	1ApG6r4IjyrQHoWiv3z8fg8/v814e29vJ4WiRUhv1nRU9H8CTzvlYsr5sXvkbftbNg9Ebr7swVZ
+	QEYv72Vn9VABdWucG3lk6lNJj7Bjo71KCeaodxQeyHeiR7ucCh5QnHKXGKhf5jCiL0213dFJYn9
+	k1Gi4d+CQJG9lvrvR8AJZC+14+H986t8c42JaO5g+IAuUL13Ae3Hxlz/Z8b+5c+H3g
+X-Received: by 2002:a05:6820:60f:b0:65e:f0f9:aa7c with SMTP id 006d021491bc7-6630f00a07amr3069502eaf.4.1769867351276;
+        Sat, 31 Jan 2026 05:49:11 -0800 (PST)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-662f9a19cb4sm6575789eaf.9.2026.01.31.05.49.08
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-662f9a19cb4sm6575789eaf.9.2026.01.31.05.49.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 31 Jan 2026 05:49:08 -0800 (PST)
+        Sat, 31 Jan 2026 05:49:10 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Cc: Caleb Sander Mateos <csander@purestorage.com>, 
- Uday Shankar <ushankar@purestorage.com>, 
- Alexander Atanasov <alex@zazolabs.com>
-In-Reply-To: <20260129162001.3532311-1-ming.lei@redhat.com>
-References: <20260129162001.3532311-1-ming.lei@redhat.com>
-Subject: Re: [PATCH V2 0/9] ublk: misc improvement in driver and selftests
-Message-Id: <176986734815.961362.5601371269442256546.b4-ty@kernel.dk>
-Date: Sat, 31 Jan 2026 06:49:08 -0700
+To: Ming Lei <ming.lei@redhat.com>, 
+ Caleb Sander Mateos <csander@purestorage.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20260130152531.1274646-1-csander@purestorage.com>
+References: <20260130152531.1274646-1-csander@purestorage.com>
+Subject: Re: [PATCH] ublk: remove "can't touch 'ublk_io' any more" comments
+Message-Id: <176986734954.961362.1910133026196372474.b4-ty@kernel.dk>
+Date: Sat, 31 Jan 2026 06:49:09 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -79,45 +78,18 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3
 
 
-On Fri, 30 Jan 2026 00:19:49 +0800, Ming Lei wrote:
-> The 1st patch improves fetch command removal and canceling, which is
-> reported as risk from AI.
+On Fri, 30 Jan 2026 08:25:30 -0700, Caleb Sander Mateos wrote:
+> The struct ublk_io is in fact accessed in __ublk_complete_rq() after the
+> comment. But it's not racy to access the ublk_io between clearing its
+> UBLK_IO_FLAG_OWNED_BY_SRV flag and completing the request, as no other
+> thread can use the ublk_io in the meantime.
 > 
-> The 2nd patch adds UBLK_F_NO_AUTO_PART_SCAN for disabling partition
-> scanning during adding disk.
 > 
-> The other patches improves ublk selftests:
-> 	- rename test_generic_15 to test_part_02
-> 	- refactor test_null_04 into separate functions and simplifying
-> 	  implementations
-> 	- kill IO verify failure in null/integrity tests by not scanning partition
-> 	- mark each test start and end in dmesg log
-> 	- move all temp files/dir into single directory, and allow user to
-> 	  override default temp dir
->   	- derive TID automatically from script name
-> 
-> [...]
 
 Applied, thanks!
 
-[1/9] ublk: check list membership before cancelling batch fetch command
-      commit: 66d3af8d5d678d221776a1886baec8d78293592c
-[2/9] ublk: add UBLK_F_NO_AUTO_PART_SCAN feature flag
-      commit: 8443e2087e7002fa25984faad6bbf5f63b280645
-[3/9] selftests: ublk: derive TID automatically from script name
-      commit: 3a4d8bed0b47543b2dfce0b1d714b40d68ff2f7e
-[4/9] selftests: ublk: add selftest for UBLK_F_NO_AUTO_PART_SCAN
-      commit: e07a2039b6d4ae3acf8ae39b86be449b7fa18d4a
-[5/9] selftests: ublk: rename test_generic_15 to test_part_02
-      commit: 7a30d3dfea4a455d1109d5258fe332f2157071ba
-[6/9] selftests: ublk: refactor test_null_04 into separate functions
-      commit: 130975353b1548d76aa9790a4ac7e74bd2a37221
-[7/9] selftests: ublk: disable partition scan for integrity tests
-      commit: 76334de7da404c385e18efb3640ed60ca77a899f
-[8/9] selftests: ublk: mark each test start and end time in dmesg
-      commit: 4e0d293af9e37c735aec574c1e69ed71f81f94b2
-[9/9] selftests: ublk: move test temp files into a sub directory
-      commit: 2feca79ef8df5505b87c00812b9ba263b92c64ed
+[1/1] ublk: remove "can't touch 'ublk_io' any more" comments
+      commit: 491af20b3c6d5baedb96357d4b12232ae490cbe7
 
 Best regards,
 -- 
