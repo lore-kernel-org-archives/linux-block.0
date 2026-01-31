@@ -1,74 +1,73 @@
-Received: from mail-oa1-f53.google.com (mail-oa1-f53.google.com [209.85.160.53])
+Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A5CC17BCA
-	for <linux-block@vger.kernel.org>; Sat, 31 Jan 2026 13:49:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28CB217BCA
+	for <linux-block@vger.kernel.org>; Sat, 31 Jan 2026 13:49:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769867351; cv=none; b=M7OdeIsc7btKfQ6nEfwWa7olp0PhqRERnTxnS/Ithvgi/3wPqWKltL6aRJ//DhjDUQ4rIy5H558tnZDv6srGKJDYxZtiJYwLE8GwQ93BCjhVLJ8PkIb9niQGD1p22M4IdKdo1Ja/6BLIUnXEjjR8Ih9L6jqmlYVW1vie5H5E6d4=
+	t=1769867353; cv=none; b=YzCPkTK8uUl3qzXFrHinz5/Vc7R7M22QDFHWhj6n3QM+e28xtOJ/xDgaJlLVkh149c1sajZ33BEXDFc54GgFgtKfbl5TQYi8s1K/99ymGRnkYSHuPDmrOlP8oeOe091/yJO7t/TAQLY2l72j+KtrV0pMtjRdwJY3maozTMlWc04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769867351; c=relaxed/simple;
-	bh=/gOFXD9nThQ0vLPPYxOy2VEWy0lENVXv1tENI9CtWF8=;
+	s=arc-20240116; t=1769867353; c=relaxed/simple;
+	bh=f6k7ALdOVAWOrs5cKk+a3aEpKdtPurVjVpECEtMYa70=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=lfFJgCGmXxVJ2CSOzkjGkzjon/0080zramP6jJVU381NmjbE/v5xNxJ4bQdMUdqj8bHGmkB3+fWUAZI5NzerbeF5La/DS1ESaaTaGWMR74uG7Nscqmlalh5PYnBdPWZdrrK0nvIZbl+nhzOxRBG7/vMaooelgMtbPhbtccNLy48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=a7cRz+rS; arc=none smtp.client-ip=209.85.160.53
+	 MIME-Version:Content-Type; b=h5vklG+h3c3ck18WC5EBjBgWX5gdIV6awuq7OVh07Djp4twtGij+vPMbxAXXfFQOKE+PWEvY8Y7nWAcaRfDZwujQatrnNimoL396ZqAVVIjTov5dehXOvuQgc40OgfCcmJOwpdsDdc3kMHjyOT9mKF5UCw+VjFORrMLTLTgFUvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=FkE2CeDx; arc=none smtp.client-ip=209.85.161.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="a7cRz+rS"
-Received: by mail-oa1-f53.google.com with SMTP id 586e51a60fabf-40429b1d8baso1012009fac.0
-        for <linux-block@vger.kernel.org>; Sat, 31 Jan 2026 05:49:09 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="FkE2CeDx"
+Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-66307e10d1dso1557234eaf.0
+        for <linux-block@vger.kernel.org>; Sat, 31 Jan 2026 05:49:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1769867348; x=1770472148; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1769867351; x=1770472151; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=R2jyQzt8IRTDPBUvo6K1XygSmaxOASgA/JR84N4qE18=;
-        b=a7cRz+rSnt17WFGwP924FgAtjfCCmmvVvxntq/WVWlKq3dwZKUxytt+aVENZo2D39y
-         KYBy/1U25e/OnvKdYEIChsIk/dF6nlI3ya7U9DKztivpEH6c5KAA2Vky7IJ/vk+NMPWK
-         xUbI8NWFcYhymJ2UffrEk568XEd2BJa8/ukh2T7k8x0YtJ8Cm3tifuLJmBi80Hp6mskn
-         sqaAOfvWrcYf7dI7kgXtdp91VVy2icOcHSgB03b7To1AMm0Ja8IaQiC5WG8rOR7hY9z/
-         D0gYmYFhWXVddh04Cx9cZay8jQwAydbnD/i5g0xwEPa3Uj3q65ddlV4fQ3MiHcFONYsJ
-         +e8g==
+        bh=9pBDA9lF2FzKZhWCpmhdTZ6Cdm9a3pQch+N5zOUhpho=;
+        b=FkE2CeDxT2KfRndl4bKEda5jHP8DlSVjNjr4Y9RG1ZPs1cbOKuKM1sRLTFOtA+tEsd
+         ir7VHAYxwJaizXdOy1K02ts6SdP+25VLLbTnKHirZSWQeHBYSc3I9Ie60AobDqX8OLSV
+         0L3guzsYUFo+CkJFM/WuZ0WwpGOE1kWl5qdkgEBZOZqUw/uen2tLW0xEUYXtMu30vmW0
+         6iWYqUXVaUSWJI2R2Pk5lUUgDOF90rgs83vtvb0mgUCfE6THodbHXl6CK+628mg5QMow
+         a/6ocRz7CS7SI2pqAEDtmufn2Y65PZi9mH3bTtsP4WLEJGfz+uzoN6FEjFGGZtN/5KrQ
+         eQ2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769867348; x=1770472148;
+        d=1e100.net; s=20230601; t=1769867351; x=1770472151;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=R2jyQzt8IRTDPBUvo6K1XygSmaxOASgA/JR84N4qE18=;
-        b=jVuDyQ8s5slRZKRV1in3KtDi0G34IsLzi4ms/4lPgvDLhkDRGoJaf2bnYsOpOwzfta
-         6kzZuijoc9N3vS85MzbjmSxd7i5IRpAs4MIyDZDC8i5SlvxcO154EXgA3ZjlF6nhAILN
-         Cqf+KTyUs2J2A1n0KAyivHHnmkdWzQmzvWICvE691xziEnDDtLP7S92mtAMaAXqdMFch
-         0NV+O+EVJGBAfbyTYP1YjmekPVT7CA4O3TKZL8aWpRMfzuiwcMfyyPJoSIBA+DrnidF7
-         6lvsaWJib5mhMNYUlvL9TVZSRJmvmUeo1hwJMUaGbTLgLHcfAawjyGQg5+Yutua7eK5q
-         IjTg==
-X-Forwarded-Encrypted: i=1; AJvYcCUAMmLxGTFlZyQXkxgEDGBhZ2f1Twn9LbgR6wP8Kz3HkQ2gpjZijeMd4+WV8F9Ew72idinjjrZ6cCM4aA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywuu6GY04QvU83Vy3DfjrRrHnsegxgOeqyedTAXIiPTsb8v4Rps
-	DYlJ1f06jmkuVGmI7AbEcZHysbNMbN/tDf68XXTc6otMTG+WDM4HIPm7Hdl0xgdnhXQO2rtUahU
-	ZcG89CZQ=
-X-Gm-Gg: AZuq6aL9r05G6EBWvoPsBDLTfQoIPFy60Mmj4oxEAbATfeHEy+qbppTLPIZZ6n3NpSM
-	CPy3MoldYkpd7y8oPGa+JpXyYrMRXl5S3ab8RyCJPtg59zwbk0uG0MuxCCMZbloKoS5hU9GVZNs
-	eYYEOx/o7tk7b5MUiK9bYWMPG1DneePHjQ9iRu6p82JWbh8bdkbMyPWMSw7vpuPePm5qmwqzxt3
-	dA/cE0h2S1K/d5e47AW5zAriD6YLxshiIUFLsWzfJMsbAmKPOfoYcqyAxXz8JCz2kuGfnRBWiw0
-	Ha+VXhMyRlx/HKPqqc+FKfaZmFmLAAqA7B6suNr2wooMoLI5TIJDCAoKKSKxtF0eDy5IRvkuK7u
-	KJp7vriX33C1GUdn7gO8cqGLSQd+irRTi36JAUDVyPkcLknCefIRYWcs1gMFjn3O8wuWU2mSmAp
-	MymzeMmsRzsbUYmXhqPQF0I13xv+Me/oqMBnj3jAw1j3br5TaN2YiwJdbifOPVVrjL
-X-Received: by 2002:a05:6820:4d4b:10b0:663:f65:1c97 with SMTP id 006d021491bc7-6630f651d43mr2115238eaf.63.1769867348020;
-        Sat, 31 Jan 2026 05:49:08 -0800 (PST)
+        bh=9pBDA9lF2FzKZhWCpmhdTZ6Cdm9a3pQch+N5zOUhpho=;
+        b=RoyXrSGHJnMOJaqyatDqnSFxsnrOjaHLzyQbUSreo2T9ybrTMTFmtMKDQYvtEzwR25
+         JprxJrCSrJ7zHh/LVlVA89SflpTBOs0hLqwqcVN+GjXXHXarvimrovFm4tT8Y3sjfcfg
+         Le7I6TlOZC94JYnG2IpB7rVhAeh8evphgHimrNGNicNEmyCj14o/K3BRRvkkSWuWR9eY
+         A4VYIU3adfAmCI/z8LdeRXUTMz7EdcjrPqTL4kvm5KV0jX41H2RexWWIktpSGfpBwC3x
+         SjWrJL+EadKXTx4DtAzJyJarHon8t32mobS8iiMmyPHIzZmZESEEAMEccjxzj16hWDoE
+         uZJQ==
+X-Gm-Message-State: AOJu0YxJvSDgcrsqN9qpi7cOMTp85HhhXcbZnA9+v1mlCLZ7DdegeSc8
+	KYmmIn/GUDFK/MkRBqkwIwQtYqp+47RzezNB82vV5GDWX+Y0lpBsoSeffzI93ESEgpF9gYKkMxy
+	iP5OWKD0=
+X-Gm-Gg: AZuq6aIGN9anwDBpgJHSPqvh4nCZfcIOOjPSxbHasUB9WRvJqQZfTuH2nnavv46QrLo
+	697j9h0F092Yr3+FpcV041meP9RzW1XIsy32sFtvNKQQ0ap0Ur69v2XsiNjfM+EmrDcrs83dV1U
+	lG/feax/UUFPaafYvT173xVp5opOgQ4BEnNXBRwaXK2LtwMzryG1O7UPurKXW7ZehHT3/QhHgXh
+	e+ZC1sI4n4EP5AH+tuO7Z4vGmxAzQHTLvwZKBYacb0/yUEs92VnPgu1Pc6PcIIoIBGifw9OOVBx
+	OgNv3iAkfA97vZsmKFnKnOy5z0eSTODkROT1/7jgEc99CHzlIBKP7nijFL39pQpa4jVJbQsQlak
+	+4rGDe3AVCnYv0JPWa65lckNQipOXd/4dgbciBBpUK6KMowUpSUsojTnV/doCD75Cshb+8Gkrso
+	rpfcgaTKEYKmAEIUxxvpLVZPuAFEP+MNay+QdEkbUmkZ1vK6NPsjTOKJEYagfwqo3+
+X-Received: by 2002:a05:6820:2002:b0:65f:75e4:3481 with SMTP id 006d021491bc7-6630f3e5615mr2536722eaf.83.1769867349429;
+        Sat, 31 Jan 2026 05:49:09 -0800 (PST)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-662f9a19cb4sm6575789eaf.9.2026.01.31.05.49.06
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-662f9a19cb4sm6575789eaf.9.2026.01.31.05.49.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 31 Jan 2026 05:49:07 -0800 (PST)
+        Sat, 31 Jan 2026 05:49:08 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
-To: Ming Lei <ming.lei@redhat.com>, 
- Caleb Sander Mateos <csander@purestorage.com>
-Cc: Govindarajulu Varadarajan <govind.varadar@gmail.com>, 
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20260130171414.1376543-1-csander@purestorage.com>
-References: <20260130171414.1376543-1-csander@purestorage.com>
-Subject: Re: [PATCH v2 0/3] ublk: fix struct ublksrv_ctrl_cmd accesses
-Message-Id: <176986734625.961362.7129018676090960172.b4-ty@kernel.dk>
-Date: Sat, 31 Jan 2026 06:49:06 -0700
+To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Cc: Caleb Sander Mateos <csander@purestorage.com>, 
+ Uday Shankar <ushankar@purestorage.com>, 
+ Alexander Atanasov <alex@zazolabs.com>
+In-Reply-To: <20260129162001.3532311-1-ming.lei@redhat.com>
+References: <20260129162001.3532311-1-ming.lei@redhat.com>
+Subject: Re: [PATCH V2 0/9] ublk: misc improvement in driver and selftests
+Message-Id: <176986734815.961362.5601371269442256546.b4-ty@kernel.dk>
+Date: Sat, 31 Jan 2026 06:49:08 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -80,25 +79,45 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.14.3
 
 
-On Fri, 30 Jan 2026 10:14:11 -0700, Caleb Sander Mateos wrote:
-> struct ublksrv_ctrl_cmd is part of the io_uring_sqe. Since commit
-> 87213b0d847c ("ublk: allow non-blocking ctrl cmds in IO_URING_F_NONBLOCK
-> issue") allowed some commands to be handled in the non-blocking issue,
-> the SQE may lie in userspace-mapped memory. Validate that the SQE size
-> is the expected 128 bytes before dereferencing it. Use READ_ONCE() to
-> copy the ublksrv_ctrl_cmd from the SQE to a local variable. This avoids
-> data races if userspace writes to the SQE concurrently.
+On Fri, 30 Jan 2026 00:19:49 +0800, Ming Lei wrote:
+> The 1st patch improves fetch command removal and canceling, which is
+> reported as risk from AI.
+> 
+> The 2nd patch adds UBLK_F_NO_AUTO_PART_SCAN for disabling partition
+> scanning during adding disk.
+> 
+> The other patches improves ublk selftests:
+> 	- rename test_generic_15 to test_part_02
+> 	- refactor test_null_04 into separate functions and simplifying
+> 	  implementations
+> 	- kill IO verify failure in null/integrity tests by not scanning partition
+> 	- mark each test start and end in dmesg log
+> 	- move all temp files/dir into single directory, and allow user to
+> 	  override default temp dir
+>   	- derive TID automatically from script name
 > 
 > [...]
 
 Applied, thanks!
 
-[1/3] ublk: Validate SQE128 flag before accessing the cmd
-      commit: da7e4b75e50c087d2031a92f6646eb90f7045a67
-[2/3] ublk: use READ_ONCE() to read struct ublksrv_ctrl_cmd
-      commit: ed9f54cc1e335096733aed03c2a46de3d58922ed
-[3/3] ublk: drop ublk_ctrl_start_recovery() header argument
-      commit: 373df2c0255da77f0842368708afce771e1330ca
+[1/9] ublk: check list membership before cancelling batch fetch command
+      commit: 66d3af8d5d678d221776a1886baec8d78293592c
+[2/9] ublk: add UBLK_F_NO_AUTO_PART_SCAN feature flag
+      commit: 8443e2087e7002fa25984faad6bbf5f63b280645
+[3/9] selftests: ublk: derive TID automatically from script name
+      commit: 3a4d8bed0b47543b2dfce0b1d714b40d68ff2f7e
+[4/9] selftests: ublk: add selftest for UBLK_F_NO_AUTO_PART_SCAN
+      commit: e07a2039b6d4ae3acf8ae39b86be449b7fa18d4a
+[5/9] selftests: ublk: rename test_generic_15 to test_part_02
+      commit: 7a30d3dfea4a455d1109d5258fe332f2157071ba
+[6/9] selftests: ublk: refactor test_null_04 into separate functions
+      commit: 130975353b1548d76aa9790a4ac7e74bd2a37221
+[7/9] selftests: ublk: disable partition scan for integrity tests
+      commit: 76334de7da404c385e18efb3640ed60ca77a899f
+[8/9] selftests: ublk: mark each test start and end time in dmesg
+      commit: 4e0d293af9e37c735aec574c1e69ed71f81f94b2
+[9/9] selftests: ublk: move test temp files into a sub directory
+      commit: 2feca79ef8df5505b87c00812b9ba263b92c64ed
 
 Best regards,
 -- 
