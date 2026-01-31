@@ -1,47 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BC1C33B955
-	for <linux-block@vger.kernel.org>; Sat, 31 Jan 2026 16:24:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D58133372A
+	for <linux-block@vger.kernel.org>; Sat, 31 Jan 2026 16:24:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769876659; cv=none; b=tFXcfYu2pJD8T1IUzlHVGbxfBypNUZ2ECx7ngb5d25lf/u6Vns3CrB3Yg9w3xIa+/+sN/EbuMUaq5iPr9Rf6eBnMmcIxCX8CBQrI4v/px8VvI1kqw6au5PwkdS66WqzCKFnB+d4IX1udb92cF3n1Z3j1WDVeDzjt3FSI4C7ohLs=
+	t=1769876663; cv=none; b=kXt5OatGmqQEjyKxpUTrukOTERxdTcIG9aUwMKVzoqw0yMXBFY4vi1kYJ6/L41PYc0QwmvtZtDc13pDgqH+2mYBfqJVi72kAPmkDItwjWAgUBhIi/BG+BQuvp9XawfKaDsMXmGL5twDQD4gnXPQ9U3KD/rdJNidUSO2DGejnOzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769876659; c=relaxed/simple;
-	bh=nqDsdCnf3s7KcCnAziWza8C1dPVmFLUD/KKzcw4YVzA=;
+	s=arc-20240116; t=1769876663; c=relaxed/simple;
+	bh=t7RigYbywTcN2UXYV9rsbxRoTZfn+gHyO46fmhgo67Y=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NVgYtg0mklPOak4wV0KjosIDX0ln5hgXL3D/yS0rdpyFfHO2XyXIE/f8u5h8M7X/4PaLppFBa+DOWlrrJvf8y1QTo3LEVkTGfEwt+x7Sk3UUtTx7yHv43jH2CVqxFrTS64+zJZX9jfuVJB4xbSWId9woh9ABJ7m4fFet4XOqbg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SebJJIe5; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=uuJGWzw4MOheneSi2Ss8bC90Iz9nv2prQIrgRsXW/yrJySoZGjvIp2Vxg2AsSSA9qRSnPsnhVpQ0X1flrTPfamSqjJjHjWVr6HlGMFVCl31Xu3+Blz6cMhkc08pZHVEubTMp+9It1UwyHsKvx5ab4xTbN846WMDpYNI5b2qSDP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=af7Yv5WZ; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SebJJIe5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="af7Yv5WZ"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769876657;
+	s=mimecast20190719; t=1769876661;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Z8QE8IbY4TApNi1m1RCKJ2PC+bGcrOt/Sf/xVvb/JME=;
-	b=SebJJIe5D0wvOPbLoLCJ9gcdwLr0DOXdaDgzYe6v2wqSPFHgYheFG7mGops1vH5xKePVbf
-	J4suAMSrlRDTqa22ieSnf17vVP4Mtc7fpVGuKJ5+naVwTQ53hu+/KDRn3DvXMBSbawlXY0
-	jk2fk0pAaBP91YJgFnVZIoLGrSmGl4I=
+	bh=/xQtAavvVyTyO40H4w5JGNuHyeS5PjWzhlPkBcsuzqE=;
+	b=af7Yv5WZ6ChrYPAWhuzIZ5w72N3F6xnkRhuC4cC8TmCT2LOiq+XUBkFDmziVYT+bnLBM8o
+	ZT8T1s0OSlBT0tVOTfJ1ZiTViCXkZ0ctWVq6gj3z6/R2BemeAn6qhZcIbfulKJvZxilG7C
+	NUHEO29nolZ5uva5a/+2tZL8LhGdMrI=
 Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-385-A1FEj4kwO26rC8errkbsTw-1; Sat,
- 31 Jan 2026 11:24:13 -0500
-X-MC-Unique: A1FEj4kwO26rC8errkbsTw-1
-X-Mimecast-MFC-AGG-ID: A1FEj4kwO26rC8errkbsTw_1769876652
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-496-UQnnNGlVNfuf3zMmO3ixww-1; Sat,
+ 31 Jan 2026 11:24:17 -0500
+X-MC-Unique: UQnnNGlVNfuf3zMmO3ixww-1
+X-Mimecast-MFC-AGG-ID: UQnnNGlVNfuf3zMmO3ixww_1769876656
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F14E818003FD;
-	Sat, 31 Jan 2026 16:24:11 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6A8CC18005B0;
+	Sat, 31 Jan 2026 16:24:16 +0000 (UTC)
 Received: from localhost (unknown [10.72.116.22])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D15FB19560A2;
-	Sat, 31 Jan 2026 16:24:10 +0000 (UTC)
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3F3BE1800285;
+	Sat, 31 Jan 2026 16:24:14 +0000 (UTC)
 From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>,
 	linux-block@vger.kernel.org
@@ -51,9 +51,9 @@ Cc: Caleb Sander Mateos <csander@purestorage.com>,
 	linux-kselftest@vger.kernel.org,
 	Shuah Khan <shuah@kernel.org>,
 	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 3/9] selftests: ublk: add _ublk_del_dev helper function
-Date: Sun,  1 Feb 2026 00:23:34 +0800
-Message-ID: <20260131162342.13872-4-ming.lei@redhat.com>
+Subject: [PATCH 4/9] selftests: ublk: track created devices for per-test cleanup
+Date: Sun,  1 Feb 2026 00:23:35 +0800
+Message-ID: <20260131162342.13872-5-ming.lei@redhat.com>
 In-Reply-To: <20260131162342.13872-1-ming.lei@redhat.com>
 References: <20260131162342.13872-1-ming.lei@redhat.com>
 Precedence: bulk
@@ -63,137 +63,58 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Add _ublk_del_dev() to delete a specific ublk device by ID and
-use it in all test scripts instead of calling UBLK_PROG directly.
+Track device IDs in UBLK_DEVS array when created. Update
+_cleanup_test() to only delete devices created by this test
+instead of using 'del -a' which removes all devices.
 
-Also remove unused _remove_ublk_devices() function.
+This prepares for running tests concurrently where each test
+should only clean up its own devices.
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- tools/testing/selftests/ublk/test_common.sh     | 13 +++++++------
- tools/testing/selftests/ublk/test_generic_16.sh |  4 ++--
- tools/testing/selftests/ublk/test_null_04.sh    |  8 ++++----
- tools/testing/selftests/ublk/test_part_02.sh    |  4 ++--
- 4 files changed, 15 insertions(+), 14 deletions(-)
+ tools/testing/selftests/ublk/test_common.sh | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
 diff --git a/tools/testing/selftests/ublk/test_common.sh b/tools/testing/selftests/ublk/test_common.sh
-index 8d298a7ee7b1..0f1fdb0892b4 100755
+index 0f1fdb0892b4..422882c32490 100755
 --- a/tools/testing/selftests/ublk/test_common.sh
 +++ b/tools/testing/selftests/ublk/test_common.sh
-@@ -106,11 +106,6 @@ _check_root() {
+@@ -164,7 +164,12 @@ _check_add_dev()
+ }
+ 
+ _cleanup_test() {
+-	"${UBLK_PROG}" del -a
++	if [ -f "${UBLK_TEST_DIR}/.ublk_devs" ]; then
++		while read -r dev_id; do
++			${UBLK_PROG} del -n "${dev_id}"
++		done < "${UBLK_TEST_DIR}/.ublk_devs"
++		rm -f "${UBLK_TEST_DIR}/.ublk_devs"
++	fi
+ 
+ 	_remove_files
+ 	rmdir ${UBLK_TEST_DIR}
+@@ -205,6 +210,7 @@ _create_ublk_dev() {
  	fi
- }
  
--_remove_ublk_devices() {
--	${UBLK_PROG} del -a
--	modprobe -r ublk_drv > /dev/null 2>&1
--}
--
- _get_ublk_dev_state() {
- 	${UBLK_PROG} list -n "$1" | grep "state" | awk '{print $11}'
- }
-@@ -277,10 +272,16 @@ __ublk_kill_daemon()
- 	echo "$state"
- }
- 
--__remove_ublk_dev_return() {
-+_ublk_del_dev() {
+ 	if [[ "$dev_id" =~ ^[0-9]+$ ]]; then
++		echo "$dev_id" >> "${UBLK_TEST_DIR}/.ublk_devs"
+ 		echo "${dev_id}"
+ 	else
+ 		return 255
+@@ -276,6 +282,11 @@ _ublk_del_dev() {
  	local dev_id=$1
  
  	${UBLK_PROG} del -n "${dev_id}"
-+}
 +
-+__remove_ublk_dev_return() {
-+	local dev_id=$1
-+
-+	_ublk_del_dev "${dev_id}"
- 	local res=$?
- 	udevadm settle
- 	return ${res}
-diff --git a/tools/testing/selftests/ublk/test_generic_16.sh b/tools/testing/selftests/ublk/test_generic_16.sh
-index 42e8d2e16ec9..3ef367836ac5 100755
---- a/tools/testing/selftests/ublk/test_generic_16.sh
-+++ b/tools/testing/selftests/ublk/test_generic_16.sh
-@@ -24,7 +24,7 @@ if ! ${UBLK_PROG} stop -n "${dev_id}" --safe; then
- fi
- 
- # Clean up device
--${UBLK_PROG} del -n "${dev_id}" > /dev/null 2>&1
-+_ublk_del_dev "${dev_id}" > /dev/null 2>&1
- udevadm settle
- 
- # Test 2: stop --safe on device with active opener should fail
-@@ -49,7 +49,7 @@ kill $dd_pid 2>/dev/null
- wait $dd_pid 2>/dev/null
- 
- # Now device should be idle, regular delete should work
--${UBLK_PROG} del -n "${dev_id}"
-+_ublk_del_dev "${dev_id}"
- udevadm settle
- 
- _cleanup_test "null"
-diff --git a/tools/testing/selftests/ublk/test_null_04.sh b/tools/testing/selftests/ublk/test_null_04.sh
-index a5599d38583a..6713b280a6ff 100755
---- a/tools/testing/selftests/ublk/test_null_04.sh
-+++ b/tools/testing/selftests/ublk/test_null_04.sh
-@@ -34,7 +34,7 @@ _test_metadata_only() {
- 		"$(cat "/sys/block/ublkb$dev_id/integrity/protection_interval_bytes")" 512 &&
- 	_check_value "tag_size" "$(cat "/sys/block/ublkb$dev_id/integrity/tag_size")" 0
- 
--	${UBLK_PROG} del -n "${dev_id}"
-+	_ublk_del_dev "${dev_id}"
++	# Remove from tracking file
++	if [ -f "${UBLK_TEST_DIR}/.ublk_devs" ]; then
++		sed -i "/^${dev_id}$/d" "${UBLK_TEST_DIR}/.ublk_devs"
++	fi
  }
  
- _test_integrity_capable_ip() {
-@@ -53,7 +53,7 @@ _test_integrity_capable_ip() {
- 		"$(cat "/sys/block/ublkb$dev_id/integrity/protection_interval_bytes")" 512 &&
- 	_check_value "tag_size" "$(cat "/sys/block/ublkb$dev_id/integrity/tag_size")" 0
- 
--	${UBLK_PROG} del -n "${dev_id}"
-+	_ublk_del_dev "${dev_id}"
- }
- 
- _test_integrity_reftag_t10dif() {
-@@ -72,7 +72,7 @@ _test_integrity_reftag_t10dif() {
- 		"$(cat "/sys/block/ublkb$dev_id/integrity/protection_interval_bytes")" 512 &&
- 	_check_value "tag_size" "$(cat "/sys/block/ublkb$dev_id/integrity/tag_size")" 0
- 
--	${UBLK_PROG} del -n "${dev_id}"
-+	_ublk_del_dev "${dev_id}"
- }
- 
- _test_nvme_csum() {
-@@ -91,7 +91,7 @@ _test_nvme_csum() {
- 		"$(cat "/sys/block/ublkb$dev_id/integrity/protection_interval_bytes")" 512 &&
- 	_check_value "tag_size" "$(cat "/sys/block/ublkb$dev_id/integrity/tag_size")" 8
- 
--	${UBLK_PROG} del -n "${dev_id}"
-+	_ublk_del_dev "${dev_id}"
- }
- 
- _prep_test "null" "integrity params"
-diff --git a/tools/testing/selftests/ublk/test_part_02.sh b/tools/testing/selftests/ublk/test_part_02.sh
-index 727d0f4610d6..acd098deda3a 100755
---- a/tools/testing/selftests/ublk/test_part_02.sh
-+++ b/tools/testing/selftests/ublk/test_part_02.sh
-@@ -46,13 +46,13 @@ _test_partition_scan_no_hang()
- 	if [ "$state" != "${expected_state}" ]; then
- 		echo "FAIL: Device state is $state, expected ${expected_state}"
- 		ERR_CODE=255
--		${UBLK_PROG} del -n "${dev_id}" > /dev/null 2>&1
-+		_ublk_del_dev "${dev_id}" > /dev/null 2>&1
- 		return
- 	fi
- 	echo "PASS: Device transitioned to ${expected_state} in ${elapsed}s without hanging"
- 
- 	# Clean up the device
--	${UBLK_PROG} del -n "${dev_id}" > /dev/null 2>&1
-+	_ublk_del_dev "${dev_id}" > /dev/null 2>&1
- }
- 
- _prep_test "partition_scan" "verify async partition scan prevents IO hang"
+ __remove_ublk_dev_return() {
 -- 
 2.47.0
 
