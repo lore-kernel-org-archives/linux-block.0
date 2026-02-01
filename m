@@ -1,38 +1,76 @@
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A856313FEE;
-	Sun,  1 Feb 2026 10:19:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 036BE126C02
+	for <linux-block@vger.kernel.org>; Sun,  1 Feb 2026 17:07:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769941160; cv=none; b=pC8fYo7jNXa5KsEinUw1cMAEEwVSHenD5JKNzAmtYmLLq6qY61GAJZ0SN/86/Og9+ogMnjzOF/x7depWeaK9DxWyuAn7kKeW3xs8tIQPqOwz8nNTJ8aabl85Aq+W07ZotoyecOH6ZNwJRblrtXqWi68fmzzg1kkkqIKwHOJWXNA=
+	t=1769965627; cv=none; b=YpImMO6njLF+eb3hcnrnC/EYXgRxuew7w4Va4u/PlEi8bmTX5g027RREw3RV1OS8P7yXob6NFLEwztR6fXuof/annQpnHENj8qmAX8pwwLFAZMVIGwiA6e4kHhgNR9hlKHqoFRUwvZnsWD7fLapx/ScqVrivzm5IUsayHAwR5H4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769941160; c=relaxed/simple;
-	bh=l791/JQziHxDvos9Asw3LaD/6cvSs6Ny6pRTYEHGurE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
-	 In-Reply-To:Content-Type; b=TMDV0c/puSnEhzYMkPevMfvoyZh8GVY2vQ/WTsS3JANB5oa8+Ny8cHstuE0rrAjTH213CwcPkd2p59bpbPX85X/Uf2VRxufAR5c4gvgsWu2wATumMUSz9aM5ZLQYv9hs8c29nqxamHOO/8wTl3AU2zV2kq8hH4BNZZWxwRtbTO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=CJf/VqnQ; arc=none smtp.client-ip=80.237.130.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
+	s=arc-20240116; t=1769965627; c=relaxed/simple;
+	bh=NG66e7ZbHRx7QhfXGiYe0MLhUIDgBKe5tPbBLDQDLDA=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=Kar5ZxHERG08PfOVAJ9PoGavSGwwYnv1+T/Ydg30BUWeTdv+hB8+Y30N1cs7JHRaIQK3Zci2odk5jbM8pA3kWQW1WvOwmH3rQxtQop2OAZaDohw39gJt9MERenNUGrz+vT3Begi/y5EymwUDZWVvvpAq7ksHzP1scZxpgz4UkFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Q3W+XikX; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=WXnGySUQ; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Q3W+XikX; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=WXnGySUQ; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="CJf/VqnQ"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:Cc:From:References:To:Subject:MIME-Version:Date:Message-ID:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:In-Reply-To:
-	References; bh=q6P610DI+HncYKG3xy5X4hGPgP1JvCNTGoiptoHB8p0=; t=1769941158;
-	x=1770373158; b=CJf/VqnQRobh3yHsOBQ0oG1hSGtO6zQQyTiUbpN6wsjJZR2CiHPD8T8x1P65j
-	gSzLkzhUE3BmiJDn/AvQQ0sLY6Bf6j9kzopGIjDN/r+SH+bIm/mIycfqma9oPX7Io17XyiVjisVjH
-	BDmm7GfMcgcgE7xyGq5rwQbYmCQvN/IccnYfh3Cm6O/pVYZzF0+xkUtZxGaYRKq4nQG7Kun8JNQ39
-	epc3bWMfM1Uqp/e2kaejOt08Zm9R26Luag9s5CD8/KYALRLuof/YZjKvlYaLB5RwhNyTc24LS3zH7
-	mZPnAg4AoFtojx/H5ayJ9wHO6gUcmMPrBhnJY42183LOlVTTNw==;
-Received: from [2a02:8108:8984:1d00:a0cf:1912:4be:477f]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128)
-	id 1vmUXu-00EKvO-0T;
-	Sun, 01 Feb 2026 11:19:10 +0100
-Message-ID: <62de4453-17e8-47f6-a10b-39bf5a49fdee@leemhuis.info>
-Date: Sun, 1 Feb 2026 11:19:09 +0100
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Q3W+XikX";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="WXnGySUQ";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Q3W+XikX";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="WXnGySUQ"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 9EBD935333;
+	Sun,  1 Feb 2026 17:06:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1769965617; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ZhWs3crfA2G6ueORTmclwUlmcN2OtgYnNiy2QgcLdF8=;
+	b=Q3W+XikXte+zwB8vDEZ2JOJfS9pB5S/C7XdlArNEidopw+i7GLwtDx0Brde3uXk73i5A21
+	3egDpDGg5uxXips9LHgUQgV1IaDEi4T709EjAOeaQheNC5jsc+b6zr84vX8CdlQ7uXgUkn
+	FpNb4DEae/c18kFQUCpQyImRxGDb/50=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1769965617;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ZhWs3crfA2G6ueORTmclwUlmcN2OtgYnNiy2QgcLdF8=;
+	b=WXnGySUQFhe2jRqe8d4DtfUNbJ6/xi0xlcwtuBGzbzBhH2lg7htIFVD8daI94u35g+ZJqD
+	qdEmlHp/ut+O2uCw==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=Q3W+XikX;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=WXnGySUQ
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1769965617; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ZhWs3crfA2G6ueORTmclwUlmcN2OtgYnNiy2QgcLdF8=;
+	b=Q3W+XikXte+zwB8vDEZ2JOJfS9pB5S/C7XdlArNEidopw+i7GLwtDx0Brde3uXk73i5A21
+	3egDpDGg5uxXips9LHgUQgV1IaDEi4T709EjAOeaQheNC5jsc+b6zr84vX8CdlQ7uXgUkn
+	FpNb4DEae/c18kFQUCpQyImRxGDb/50=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1769965617;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ZhWs3crfA2G6ueORTmclwUlmcN2OtgYnNiy2QgcLdF8=;
+	b=WXnGySUQFhe2jRqe8d4DtfUNbJ6/xi0xlcwtuBGzbzBhH2lg7htIFVD8daI94u35g+ZJqD
+	qdEmlHp/ut+O2uCw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5F8CF3EA62;
+	Sun,  1 Feb 2026 17:06:57 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id J4tDFDGIf2nrWQAAD6G6ig
+	(envelope-from <hare@suse.de>); Sun, 01 Feb 2026 17:06:57 +0000
+Message-ID: <50ee77fa-0c44-422e-9ee2-eece60b189e1@suse.de>
+Date: Sun, 1 Feb 2026 18:06:52 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -40,75 +78,71 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: Recent commits break loop device unmounting
-To: nokangaroo <nokangaroo@aon.at>
-References: <20260129131441.7c574b58@golem>
-From: Thorsten Leemhuis <regressions@leemhuis.info>
-Content-Language: de-DE, en-US
-Cc: linux-block@vger.kernel.org,
- Linux kernel regressions list <regressions@lists.linux.dev>,
- Raphael Pinsonneault-Thibeault <rpthibeault@gmail.com>,
- Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
- Jens Axboe <axboe@kernel.dk>, LKML <linux-kernel@vger.kernel.org>
-In-Reply-To: <20260129131441.7c574b58@golem>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1769941158;05be5bad;
-X-HE-SMSGID: 1vmUXu-00EKvO-0T
+Content-Language: en-US
+To: lsf-pc <lsf-pc@lists.linux-foundation.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+From: Hannes Reinecke <hare@suse.de>
+Subject: [LSF/MM?BFP TOPIC] Block-layer device resets
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Score: -4.51
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	RCVD_TLS_ALL(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:mid,suse.de:email];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	SUBJECT_HAS_QUESTION(0.00)[]
+X-Spam-Level: 
+X-Rspamd-Action: no action
+X-Rspamd-Queue-Id: 9EBD935333
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Flag: NO
 
-Lo! Top-posting to facilitate processing. And Ccing a few people and lists.
+Hi all,
 
-Thx for the report. Does the problem still happen with latest mainline
-(e.g. 6.19-rc7 or later)? Asking, as a fix for the culprit went into -rc5
+We are currently working on implementing cross-controller resets for
+NVMe, which requires to send a command to the target which then should
+terminate all commands on a given controller.
+While we could easily terminate the controller, the specification
+also requires us to terminate all outstanding commands.
+Which then recurses into my all-time favourite topic on how to
+abort outstanding commands from the fs/bio layer.
 
-Ciao, Thorsten
+However, here we don't have to dissect/match to individual commands,
+but rather have to abort everything, which seems rather easier.s
 
-On 1/29/26 13:14, nokangaroo wrote:
-> 	commit 08e136ebd193eae7d5eff4c66d576c4a2dabdc3f
-> 	Author: Raphael Pinsonneault-Thibeault <rpthibeault@gmail.com>
-> 	Date:   Wed Dec 17 14:00:40 2025 -0500
-> 
-> 	loop: don't change loop device under exclusive opener in loop_set_status
-> 
-> 	loop_set_status() is allowed to change the loop device while there
-> 	are other openers of the device, even exclusive ones.
-> 
-> 	In this case, it causes a KASAN: slab-out-of-bounds Read in
-> 	ext4_search_dir(), since when looking for an entry in an inlined
-> 	directory, e_value_offs is changed underneath the filesystem by
-> 	loop_set_status().
-> 
-> 	Fix the problem by forbidding loop_set_status() from modifying the loop
-> 	device while there are exclusive openers of the device. This is similar
-> 	to the fix in loop_configure() by commit 33ec3e53e7b1 ("loop: Don't
-> 	change loop device under exclusive opener") alongside commit
-> 	ecbe6bc0003b ("block: use bd_prepare_to_claim directly in the loop
-> 	driver").
-> 
-> and the follow-up
-> 	commit 2704024d83fa9eb8e5f16925aae340fd9d246694
-> 	Author: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-> 	Date:   Wed Jan 7 19:41:43 2026 +0900
-> 
-> 	loop: add missing bd_abort_claiming in loop_set_status
-> 
-> break unmounting a loop device by a normal user
-> (udisksctl unmount -b /dev/loop0).
-> The device seems to be unmounted, but the path still appears in the file
-> manager, and if the device is on an external harddisk I cannot unmount the
-> disk.
-> 
-> Bisecting: 0 revisions left to test after this (roughly 0 steps)
-> [08e136ebd193eae7d5eff4c66d576c4a2dabdc3f] loop: don't change loop device under
-> exclusive opener in loop_set_status
-> 
-> As a workaround I reverted this commit (and the follow-up before it).
-> 
->   git revert -n 2704024d83fa9eb8e5f16925aae340fd9d246694
->   git revert -n 08e136ebd193eae7d5eff4c66d576c4a2dabdc3f
-> 
-> If they solve an actual problem it needs to be fixed differently.
-> Commits 33ec3e53e7b1 and ecbe6bc0003b seem to be correct.
-> 
-> I will supply more information if needed
+So I would like to fathom whether such a thing is feasible/reasonable
+(I think so, obviously, and can think of several other use-cases, too,
+qemu springs to mind here ...) and discuss possible implementations
+(set 'req->deadline' to zero for all pending commands?).
+Or maybe we can do such a thing already and I'm just not aware of it...
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
