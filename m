@@ -1,61 +1,102 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60722288C2C
-	for <linux-block@vger.kernel.org>; Mon,  2 Feb 2026 09:19:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 259762D63F6;
+	Mon,  2 Feb 2026 10:06:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770023964; cv=none; b=oncIoUu629lpDYGfltFJbmirs/RRHzXgJJbqGSM3s+mRUrhAwXqLV4CM5Cd1EbWdlXSgJMrwRWiSHuePpIgAjEwUEZjE7GbXm3+evM1KAlqWLlj+zlQ8sOGggnss/3L6rNjFXKjNc5qgSZkCUW1e2gspX93jmLHFGoEzESqiYJg=
+	t=1770026798; cv=none; b=s8YJ2vUbpVR30HyHR0OaXb9yR5LgWFy9ScYKrkd4OLly1UBN4fmrvZaNQrslK0hZuoy+JyNolXpkANinmxDQC+GpJ9qxU/fs9qXKuXrLBlqV5rY1X4IVuQse5fS4GsUiOWQyStelg4XRTwflC6dFkE/Cwa/1tHpAgM1J9vJsEz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770023964; c=relaxed/simple;
-	bh=/ilCW2xCbY4lwRFso6M90vzhoPUVltPSDyIfEyKmBcY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gQzLHSx/hZmrqTeXB+S9NICmAkfEdPlaZ/4QGI4jOoH611MskVQ119e5478DfRQav23EtilMp9tkUup91BIuCYo6Cq2MqEbngEgxaoxSZm43CJBcQ6LQ7+chWd79b1DliCQ6VhA8vBWjwaDYwNlXNOeMWrhjfWDPFfLePgsZ25A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=sYH7XKx1; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1770026798; c=relaxed/simple;
+	bh=AR8WJZlCheylxeYBIiVxCcxzyOcuAsM0oQ9x69QBGeM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=KoHEXogpBdZKkvBYA+pPiwaDHeOlL2ueBOt+rkrWF54gxMjNu3LWybSybTntLInLKdpD3rr9cG8JgJNILo+XhwnKlqI7kw0XJlLBZk7/8lpaUaAPLl/GchBD8lelSA/NzISP3F/viz588M2fS8Mz0xsd76++3MH+NEVHzfsBvgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F3Zk2JPt; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="sYH7XKx1"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=JPqbp3yaqUhFiYOxm6qv/ceOF6xxsDbADufNjCM4fGo=; b=sYH7XKx1QhlMTAsBYeCgnPQTic
-	AMP/9Rcc0D4k9N6qj7fgLLSI+ej4oVvW63eAvWdKxuPEQJEuSimz7XVR9tSq+TjTk5MwpZkJZH8bX
-	FVc5kg4C87XKDsVT98XVCEBHz+oQwpchsKnLZXInKjj05Sd0jle2yZQXE+Dc1GTIMgwY1ugnfXheN
-	CtUyjD6Aya/i6IyqQizcS8pc60NP9LHsTESK9agKiuFqacvrbywD/ot4vHA/Q4U6Zg3SJ8CcB8Mci
-	uMQsy+iFrBPNhioY+Ug4Q4iyaDyHcTnlUGMSuA874itdOxcVrpKxFP3PfJiRGrcZYDbbArLXZLtG0
-	IYuaGceQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vmq5Y-00000004hVF-13ev;
-	Mon, 02 Feb 2026 09:19:20 +0000
-Date: Mon, 2 Feb 2026 01:19:20 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Ondrej Kozina <okozina@redhat.com>
-Cc: linux-block@vger.kernel.org, gmazyland@gmail.com,
-	jonathan.derrick@linux.dev
-Subject: Re: [PATCH] sed-opal: ignore locking ranges array when not enabling
- SUM.
-Message-ID: <aYBsGMWq3Vzhpft1@infradead.org>
-References: <20260130163402.571854-1-okozina@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F3Zk2JPt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4988CC116C6;
+	Mon,  2 Feb 2026 10:06:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770026797;
+	bh=AR8WJZlCheylxeYBIiVxCcxzyOcuAsM0oQ9x69QBGeM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=F3Zk2JPtX9BKsOfGhozTjtxp24jGgOGKlChNCS+jg88F1hIocpFuLVSYIR18rCyVU
+	 Moue0o90AkrrRNWLZsD3Ivul0Ujd6NRdOLRfS4mbYhd+jIgh3WaUTu37sqLhjoVDDM
+	 ZgNKC4CQQbziV9McP8h+/UTn9ywlHI2QkvLZ2ar9yc3YlJ8hR3SruAEiAa6yi0It27
+	 BEnKNuFE3HNDel0CDsOIk6P757sPTcTgYwWOtVRxtchr0rBPAWQmmqwkgUZckaznQa
+	 zih68OgLAg6wb4fCu8Re3XEGr9fp/N7elqd9Vgxj/bLH1xzTBTaowCfXgw4AOXcm0E
+	 o6qWmBVO6NSqg==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: Gary Guo <gary@garyguo.net>, Oliver Mangold <oliver.mangold@pm.me>
+Cc: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>,
+ Boqun Feng <boqun.feng@gmail.com>, =?utf-8?Q?Bj=C3=B6rn?= Roy Baron
+ <bjorn3_gh@protonmail.com>, Alice
+ Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Benno Lossin
+ <lossin@kernel.org>, Danilo Krummrich <dakr@kernel.org>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Dave Ertman
+ <david.m.ertman@intel.com>, Ira
+ Weiny <ira.weiny@intel.com>, Leon Romanovsky <leon@kernel.org>, "Rafael J.
+ Wysocki" <rafael@kernel.org>, Maarten Lankhorst
+ <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>,
+ Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>, Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Lorenzo
+ Stoakes <lorenzo.stoakes@oracle.com>, "Liam R. Howlett"
+ <Liam.Howlett@oracle.com>, Viresh Kumar <vireshk@kernel.org>, Nishanth
+ Menon <nm@ti.com>, Stephen Boyd <sboyd@kernel.org>, Bjorn Helgaas
+ <bhelgaas@google.com>, Krzysztof =?utf-8?Q?Wilczy=C5=84ski?=
+ <kwilczynski@kernel.org>, Paul
+ Moore <paul@paul-moore.com>, Serge Hallyn <sergeh@kernel.org>, Asahi Lina
+ <lina+kernel@asahilina.net>, rust-for-linux@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-fsdevel@vger.kernel.org,
+ linux-mm@kvack.org, linux-pm@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-security-module@vger.kernel.org
+Subject: Re: [PATCH v13 2/4] rust: `AlwaysRefCounted` is renamed to
+ `RefCounted`.
+In-Reply-To: <20251201160030.6956a834.gary@garyguo.net>
+References: <20251117-unique-ref-v13-0-b5b243df1250@pm.me>
+ <20251117-unique-ref-v13-2-b5b243df1250@pm.me>
+ <20251201160030.6956a834.gary@garyguo.net>
+Date: Mon, 02 Feb 2026 10:48:39 +0100
+Message-ID: <87wm0vpjbc.fsf@t14s.mail-host-address-is-not-set>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260130163402.571854-1-okozina@redhat.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain
 
-On Fri, Jan 30, 2026 at 05:33:52PM +0100, Ondrej Kozina wrote:
-> The locking ranges count and the array items are always ignored unless
-> Single User Mode (SUM) is requested in the activate method.
-> 
-> It is useless to enforce limits of unused array in the non-SUM case.
+Gary Guo <gary@garyguo.net> writes:
 
-Looks good:
+> On Mon, 17 Nov 2025 10:07:57 +0000
+> Oliver Mangold <oliver.mangold@pm.me> wrote:
+>
+>> `AlwaysRefCounted` will become a marker trait to indicate that it is
+>> allowed to obtain an `ARef<T>` from a `&T`, which cannot be allowed for
+>> types which are also Ownable.
+>
+> The message needs a rationale for making the change rather than relying
+> on the reader to deduce so.
+>
+> For example:
+>
+> 	There are types where it may both be referenced counted in some
+> 	cases and owned in other. In such cases, obtaining `ARef<T>`
+> 	from `&T` would be unsound as it allows creation of `ARef<T>`
+> 	copy from `&Owned<T>`.
+>
+> 	Therefore, we split `AlwaysRefCounted` into `RefCounted` (which
+> 	`ARef<T>` would require) and a marker trait to indicate that
+> 	the type is always reference counted (and not `Ownable`) so the
+> 	`&T` -> `ARef<T>` conversion is possible.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Thanks, I'll mix this in with the one I sent to Daniel.
+
+
+Best regards,
+Andreas Hindborg
+
+
 
