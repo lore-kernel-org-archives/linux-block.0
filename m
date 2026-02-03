@@ -1,45 +1,46 @@
-Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11013046.outbound.protection.outlook.com [52.101.72.46])
+Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011048.outbound.protection.outlook.com [52.101.65.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E02A9318ED5;
-	Tue,  3 Feb 2026 10:26:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.72.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AD4E318152;
+	Tue,  3 Feb 2026 10:27:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.48
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770114421; cv=fail; b=X/y9NTY1Vdw+RljWHGXpyc5geIkN1E4Yo8d4amlpm6iNQLZAz4h3ZDKlYX5ysO5NIHObyzdXM2vywf8W2NAcwptdXacGAiLpbdX31+JcmYilElwtfwAL+hhDbyGssUXMAXJWlJXt7lUr0igq6lD/6Kg3DKz1w8Ce3DdDow+1g+Y=
+	t=1770114425; cv=fail; b=c0RP+qsmbGiOQM6YGR3X+/zo5EYfgnalDNdWZpZO7Ou4YTubpZ9ug0aipRTzZOpU/Fixh7pG0kre2EQrYYgKrZFQu4X3A0l+MwH+CkF/0PaNvagab9p2ORw8llCKsKkGhIsp3INTL7fR63h6sy9pNzawjuBnZYOSWw/hOiGA+yQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770114421; c=relaxed/simple;
-	bh=VSAllVeZTXriR9SZe0UkfNyOcmYH9JPAaDlV9ZuTxGE=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=aHHlgVbzLavx9hT4yQxp2zRPYvtss0qz6fqrF08qegRSnXIYD94y8c6xRSUf811fiPrEDheoYywGZdZVtgfv3SnsHdPup1rFEY1U3JNMhAC5f3vt2CwY33eZWmS9MTld4KRdM/dVWpdwn1xu4LAiwM4X0tyCx7qUtgx5OL4QkxI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=GCVSiLV7; arc=fail smtp.client-ip=52.101.72.46
+	s=arc-20240116; t=1770114425; c=relaxed/simple;
+	bh=0gabG0FyllZJjXyjZYRDGgYrUKm5+6VgfcgJVhGsUUc=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=EXx9DnkqYHWW6Z/Ga/0yZlwEX5yVa0VT1oThSGnmCw0zJZltnJJq8fRl6joNq7Nxxs7Y23FB+yDWxKD0MXvx6BCwYIk4y/NM1tRIpXcJgl3R1rFnyGnoP+sYrNMrKHJ8s3zMbYtZrxuBBjUmY0v3lEUguRFcorxpXdkWUjrG8NY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=BdxMaHMW; arc=fail smtp.client-ip=52.101.65.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="GCVSiLV7"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="BdxMaHMW"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=pD4ileOl5B4lVJseU4abbrcQnuLmqvh8c4WSNySfbSBi+S5duCluqFuhr/teEne6RL3/hOn9o9wPxfY64dzq7+QXDzWZOOrKbH0hTtAT6rJjHg8RWAhuYM52zkXVcTx/aBN/HnqDibx4m30xj2m3zqZitNyk++ccllh+ND15qOQeV2iA4/biS4mpL2cpC3pa6tmVyNQhKBYFssy0IOYJKnpFpYo6Id2ifi2Uzh17Q/2Yo22WMo+9xoxHDDnUQqRUo1qTgL9bCrjwYnt9GIT3cU9t5HDVqriLh3kuD60FeGBwQrhHsQa3LEr6lDiuiEXJZOJYgwTk9a4lepgI7/KiVQ==
+ b=s76u1YYJm1bLDjRNzYNg6QsEfZwGWugShUFHXXyZKpe6Mi/gf9CSFipHAK4FBx+YaBrW0waiHZLO6xvYXGc/N9HuX92aclnqAzMB1NzorbY9K2PzK43S5ua1Xt3Pyt2pyz4hiF7wk1InOA8RmSLgApFWwVYsWC9yBU/nEFZG+BVqm0Wq0ImyxaYFbi4Yns+cj0nO0jDhRIN8pRfLn95v+EV74OdRuA9YFfhNw9NrklJ9t3ExaRNGerDWSz7l59vfQnvKahWM68qc2oNSS7+bd1nu5jHTskSeZ5JcgQEcwIRNbHkbQW9gUUTUHZvlcm58kaImow0Gd4iz4DiDdOu+kg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=114VxTVkPgCZhez6ChvYISEB3luUOGxZMBEaI8Q4OR4=;
- b=hcrVXI75drxe6HqgEICRKqtxfoyN/ISBfg6qbKHdxUMWt78exDc4AJZC/+nOz/uJnU7/Oiobu9jI1ScG4lThdJvkhc7jdDirkkbie/nefdoCWyzsAAH6lTnNQ52qfsOd8BP1KhAS7P+FjPGB1sGkaDPgCkTS2XU/OEF/WKQXw0p7AvYHEx2nbuyltOrGaNE9n0P51sDzN9xmUVVlPnUaSJfnjamfljgdNuWeSRlO0ubH8bkq+qqmk7Cr0n5aevoRIG7Llpc90BXtEZRKiJ4IMSP1cgZ5m5tSW+6Z2ovyle2yTZJXtC5NC0WjMueeQCmbpEKI4MrWcszXZOELV6hTZQ==
+ bh=8QNknnqP/s/mowL8OKisM7t2zjYlIqX67P1z7LErTcY=;
+ b=PUBYe2ofMuVXbR6kSlKsKV06Kcs9D/yDD+vpqqlm1l110Cq7a9sGbHstcrOaRGykYJvGvbxK1VK6AIQMAwivsbkphR5D1M1/P4k/FOSpqIFIHrUJ0dVuwTorS3dW3bJedGST3F2ybuR3G9XJHaGX0/OLJnRvUbIQ6JtkaR6Dq0Z17zWZLrhSsEYL7cOzt2RT4QPJhm9wcqVBF6HHahlhaW/w68NY7Yg1qS8XPj7QDnHDQkI8N1UqiHgA4OZO35dq5WeULZJY+BF867dJhLrK+isiRmRflSGzZGawmnphS/RzrUDvsFfwk9e2xOmSwr7rMhNQLRHEKXC4jBRSkOpvxw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=114VxTVkPgCZhez6ChvYISEB3luUOGxZMBEaI8Q4OR4=;
- b=GCVSiLV7VtQGuVICGe8MvU+/S5TvYmkKpALZUxinhfEuLkPHKYlyXfqTZ1mWyrBCZ/e61l8IqZthZQ2CBNFCFCasE0PM6xcsLzRD+Oj8a+kYri1rVZ2W7L8iacV6kWyMfIB0hTWpBUOKQcEfoVm/vVr+i+aJW/Y3Oo6h5JqWqFu0mPJQvwjMd/IbJ9FXGdmYp5ntKyJrtSY14So/HxFHg2XSMwkxAh7BZJ0JCDX3qNN1wrJ5m5fOTxcM8wVI6FWbdNtV3nT8VzTl0d0LGFR3yFkO9Eaw19mK+uUTDzar8pYNBGsLitNbvNC3hEeSmGYbcsVKpP7kDPsaaSFdN/xOUQ==
+ bh=8QNknnqP/s/mowL8OKisM7t2zjYlIqX67P1z7LErTcY=;
+ b=BdxMaHMWlNh+PeGd6J0fJXHFzSZdwHDOu4HVLgg1LJFzgdlBp4ZyuwyViMRhsXQMo6OjCgATTSRpkqlVA8wE+Z2LjXPPEZwGq4VpSokCmm3/6nqcqow8fCNXRQLZ7xbtlPplZmeOkC0rbBrRUOPIBm01xUrb8B0BIqp1T3FO16qzrLQ7zGIBuFV/y977JMxrkZxo7fHc7sxmhfUtys9KdkbJNMUkoxPZPDJILrTW0BcrxLQxkL3Frcx9vsEO7imKh/xUBEDmW+6EVx1WiANsWIm3/gnLvCHLjwubfA3AW+EqEK2vbIzSPkBdGQnifieBTNo/EFAWGCYAP88UFXENFw==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from DU2PR04MB8567.eurprd04.prod.outlook.com (2603:10a6:10:2d6::21)
  by PAXPR04MB8720.eurprd04.prod.outlook.com (2603:10a6:102:21f::14) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9587.12; Tue, 3 Feb
- 2026 10:26:57 +0000
+ 2026 10:27:01 +0000
 Received: from DU2PR04MB8567.eurprd04.prod.outlook.com
  ([fe80::32c4:a8a7:1724:b754]) by DU2PR04MB8567.eurprd04.prod.outlook.com
  ([fe80::32c4:a8a7:1724:b754%2]) with mapi id 15.20.9542.008; Tue, 3 Feb 2026
- 10:26:57 +0000
+ 10:27:01 +0000
 From: ziniu.wang_1@nxp.com
 To: axboe@kernel.dk,
 	ulf.hansson@linaro.org,
@@ -48,10 +49,12 @@ Cc: linux-block@vger.kernel.org,
 	linux-mmc@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	imx@lists.linux.dev
-Subject: [PATCH v3 0/2] Optimize secure erase performance for certain Kingston eMMC devices
-Date: Tue,  3 Feb 2026 18:29:01 +0800
-Message-Id: <20260203102903.2953660-1-ziniu.wang_1@nxp.com>
+Subject: [PATCH v3 1/2] block: decouple secure erase size limit from discard size limit
+Date: Tue,  3 Feb 2026 18:29:02 +0800
+Message-Id: <20260203102903.2953660-2-ziniu.wang_1@nxp.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20260203102903.2953660-1-ziniu.wang_1@nxp.com>
+References: <20260203102903.2953660-1-ziniu.wang_1@nxp.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-ClientProxiedBy: SG2P153CA0011.APCP153.PROD.OUTLOOK.COM (2603:1096::21) To
@@ -64,116 +67,143 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: DU2PR04MB8567:EE_|PAXPR04MB8720:EE_
-X-MS-Office365-Filtering-Correlation-Id: e6836134-b673-4f60-2f6f-08de630ec1b7
+X-MS-Office365-Filtering-Correlation-Id: 58fff773-4918-4c8d-14be-08de630ec44f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|52116014|1800799024|376014|366016|19092799006|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?LQeo6mMJW4pRnQL6BynWR/fM3/O68BaiL7vmmxDF8LZaTIDEtAUHpgJwr+uw?=
- =?us-ascii?Q?QMM1nNe4tyONWCbJtSxq8khFS5DLa8nKxz/3glg6AfKfX1FdXKQFIEk/epRu?=
- =?us-ascii?Q?TzPL8z0bmp+tJDppiqHwm6xot7qaJgdLWCn7L8XXDk9e3Hxw00Kj416K9HZn?=
- =?us-ascii?Q?OfFrwvSAhCpLJW9uqB3YzmzUgyyc+0d0VCtSi2hi8Wyn8tMRRpDmq4WuOjZn?=
- =?us-ascii?Q?YtcV93mIhPkGIueThMm1ebynJCtulNpcaOrwRycfRsVj8yVOKXvBQTYRvL7/?=
- =?us-ascii?Q?dQ9GLs+hKqO33/C8cQwpBSCCv5C7sL4/aa5S6QOj5WUQSL98JIAfZn+OAa5P?=
- =?us-ascii?Q?HYRmurEglGmSAlgAMB0ebH73XjiBXjcaMq0Yr+6aBaHik/zZ98TAJtPMpQtD?=
- =?us-ascii?Q?VgyNMA2z7NL7lMkPCvjzpOnFgyRYYI2TPCj5w+Zk4SHy3sn45Id0t4ngLrFh?=
- =?us-ascii?Q?TtgWmiOg25ym62DltAp6Q+OdSE8CKwzrGgJrAZ3MzcdvjlFxKXRhcdDB5F1x?=
- =?us-ascii?Q?KXwOgMeX+zAyy4wzYXQOd3d9zP/16faAA0/8hECT3upwYV6Dh/X6wZ74g6QQ?=
- =?us-ascii?Q?/Ne/XUUOh3dgyaYZOAv8G1gWkXB6jM85CIkFWu7B5yzOLdsaj3NX6X2owhaB?=
- =?us-ascii?Q?nDGcA/HYK0MJAsvCCL54ii/EuTL3DsSCWZNXtkgYTxTb4jprFQoVLVey2IRx?=
- =?us-ascii?Q?rrIxhbKTBkLrkF56xQ6sw+qDfy3XMGmn5UE40tArwEjnRxPXQCvA5pOT3N9a?=
- =?us-ascii?Q?+WouRFU9Ry7korZeptMePsJb1sAK5RiDA9ynSBDs+4MPsdFWjILhRYVUsT0f?=
- =?us-ascii?Q?Prks9D+31YrUczCdP1mEdDQyfPnh2Fybh+Mxc6JgWg7X66qEKGNRTPN6BzY1?=
- =?us-ascii?Q?Q4r7zlS3hYpVBu0jKZgJQTryY7FUE3J2XLbnTHj44GDcT0iu6PIplPRyPYgF?=
- =?us-ascii?Q?asAGvEM34EK5NAuHyBT+aeXnFnLmfSsHL/CbWR29XKWA9umAblp92KhUO5bu?=
- =?us-ascii?Q?hSnS+lAzUg/Tu6c6UO0bwyBqrvLNYF3Y7XX2Sjhw9F2Df9IspkH76BghTANZ?=
- =?us-ascii?Q?FcXWE/om69oVqoiuzYI/n/rumDlPRQI2mArOfU8mtobiNeL9XgKpKpKmYD0J?=
- =?us-ascii?Q?lIxJ13xx9jemm2Ooza4kXnIDxV93HOx8rK+ma5K9wWbnihrGfvgKha4CkJs4?=
- =?us-ascii?Q?74UjfRsnsuYfwX/bKTg1uCbDV5ZUq59dnQQSDQbqHWREG60Yh+OFqPr82Slv?=
- =?us-ascii?Q?inTicbdY4MMqxxGdmCGctzKJY9L6aKUaCNnR6hWXsyWtp58R5rEV3egChxdA?=
- =?us-ascii?Q?Iq7C2h+HgnKlEGVi/+YwyMVWi5p1btD9W3IAQF01e8ACCZNLsRxvQ0T8Z9Bg?=
- =?us-ascii?Q?4yJCvFNgKSQsmq/BtNXErJPykokjrZIOP3VSZDcuP6cA8T98BJwW/KJacCkG?=
- =?us-ascii?Q?tprKGouzS5QpaDWlwYBYJ5uACuYDisTmNXCj0NUYLZ0OR6GIcMDPKYQ45wa9?=
- =?us-ascii?Q?uc2jQHRQbke7DZULFl+rxFrdVSdHxFcOnoo41whb7OZSOvDNCFCRS1sO3+OX?=
- =?us-ascii?Q?icEFNfxok5ilV76eQIozMZKEsPhalcIBtTyqlkAXll9VxQ6cOnwl+HysAFsR?=
- =?us-ascii?Q?RimUUP07rTX6sxDstih80JM=3D?=
+	=?us-ascii?Q?vm0i2Kz3N+DD0ImwmGlkLFifKifxo9FOxKQwvSNK/0gXp4ZOxk/So3rpjMhG?=
+ =?us-ascii?Q?rd/uKyLbTNrB87LPjmhrkyXzmClNQo9NXAL8eSefI0dznzV0HSt5Vhv9OplK?=
+ =?us-ascii?Q?mrWQBieKilPoJLKyhsQailS+2Q8GGQXVbkPMoFp5AfrkpiLgKfSTP01Ag8Np?=
+ =?us-ascii?Q?bSfSnC7iuxbPbgP9WEMRDQNgZiMDfdLecQafpLoTGO315UXi65hhmybCrINg?=
+ =?us-ascii?Q?oQL9+W61AjD/0tO8MLk/UPQzXY6xaRxlqNloBDpbIKC4ynDFMiS0Ao4kQLir?=
+ =?us-ascii?Q?gdh5FnvnE+NVXh4n9kDvK0USObE24LSuqt8AkRvtjVXR0H3ghOxLRAKKtWoJ?=
+ =?us-ascii?Q?leJAGDZBL+auVNoI+e1Ij45fDtqEK7kCHSphYHJmL++NWCwLSfg1hR2UObhP?=
+ =?us-ascii?Q?6iCwKrRw0gRgWY2SGSPQJZeMzLuedYWjm3SwpQFbzcOSNTgCHVRrUIsGQhYQ?=
+ =?us-ascii?Q?CxrCdWVYPtV9UT5GTB6Smw5voP8jHG1BXF3wCkYNvXx6hI1MCbKnzWuL1m76?=
+ =?us-ascii?Q?fGTtVxJDVU4GO9V+aUZhiRYERbi8KGIIAQyeF9GM2sf2gLYs/iTHISFtHPqu?=
+ =?us-ascii?Q?i0XDPgcLr8CStHIUIQGa/xbSMTDl9wKjSa1y+CFEMIQK7WbNYi0H1QbFitie?=
+ =?us-ascii?Q?dF4yWnBR7bbdsrL13i2Xf3T0W1Gn27UjN8JW4FMs0pK1dnuXPn7o+jmNahMO?=
+ =?us-ascii?Q?trl3ypNeZBOZGQ+x3UVoxcE+tAPMNqFKfy84PdkXG30M6mthMpu1V+QDUgF6?=
+ =?us-ascii?Q?2vnvjHFon9YOVpdgWVdd7x6ibeey2jNfX2sIWzrsHlxQ4NEN/RlRs6zqlmEx?=
+ =?us-ascii?Q?pvlD0k5z0EGzsLy8nz+mMuoz1XYngPadyIpFU26R9TxJSqU2kqnpPqWXj4fI?=
+ =?us-ascii?Q?Bg1V6VItK6Bktp1983OALRRWTbIXvOkDlFb+GnWS3BPiEGhIcENZW9xHClOc?=
+ =?us-ascii?Q?t6mK5ZbwhjnmsfZb0qZtxeqqQXtp5jViLvVsQ0+1FTUyfkTazPaVNTVRIvpb?=
+ =?us-ascii?Q?Y4wV3asm3X981KCckKwBBhr6g5lPvq4XrUeETPBDKjsNOqJk6En/hxxaIXDk?=
+ =?us-ascii?Q?bLzhIdBjezDzLVk6wrmk8ZsWXDOVlj6NvgyU4A9VLz/epUm5GeH3qyiQ8UOi?=
+ =?us-ascii?Q?LgndlEDJMWDO0IgFNsulZt3UAwUBIhjYB1WrYEJQXkwx7k0CMIj4Fyk4ac8k?=
+ =?us-ascii?Q?LexlzeEbc/aMfX8P33Qg8aJgItic6yGmVjDiT5UVkKcFWsBNbtv+2BmD8IXO?=
+ =?us-ascii?Q?JP8OpGxB3fPtw34ImHl3ZkFwvB5z1HqaqeH0REO/44DwLLha60oczrHoQgmL?=
+ =?us-ascii?Q?FPkug/KYlcb6KK+pFMogS3D2bwm9haCO6EtzPYpEN0/KhZ4Zo1YRs5hmrwy0?=
+ =?us-ascii?Q?e1xehLwG1Vc5zTpbeIK+C1IbphtaaEZJWQFgPiYFC6cVWE/CZoE0mivKOB8e?=
+ =?us-ascii?Q?onixkYoVJnUjFoj8Lco24xsB54+8YAbSHAtkzD8R36K7qZ//ts8c1d2Z4KOW?=
+ =?us-ascii?Q?Iv8Gqyml1mBdBuY9bdiJ8fp2XnRLVYG3SqzYsxvVnX+zl0ixZ+Eht32adP3N?=
+ =?us-ascii?Q?q2b53ZegN6lDOmuwq1Pj0JaBTOTKo1DYxNYQNatbNlMPr6L4n1D6ONReRWLA?=
+ =?us-ascii?Q?V5iUQkphvCjxPC6AnuX1HwE=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU2PR04MB8567.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(1800799024)(376014)(366016)(19092799006)(38350700014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?TBHuH90mKQY4kA6vSOQgQucpm1rColAercO2QllLHz/SzKhOUn6fx2GM5i3z?=
- =?us-ascii?Q?dVKKQjxM6q62yGuahf9yWWqaLNUipSVu+REBz3mN0neUNFoZnp0gtCwpbj1X?=
- =?us-ascii?Q?dJBLMATALTqmandlVKU6O5U1PTA1qyCYs9IRLvorJ98xUhtm9aIlpy/fr/xH?=
- =?us-ascii?Q?nqfTY9KVj6wsI846YwziUch9tSasSArgwq7urj5yEGAO1eEo1T9+jXbr6P4P?=
- =?us-ascii?Q?jswUPc4Wdvu9qhW7di8iptQntBVxFd8HuJroP/Z/yt36r/74+5HQF+lL+S8C?=
- =?us-ascii?Q?jBlwVeVMO3xh/deKM5xV3FGNdEepDQ2QUgeUkQAv3IwPloysWyIDFpVVCUfL?=
- =?us-ascii?Q?fPx2jWAUn+2Zml23FTIbfJ+y2cw8Wxjj2mdDEPmJ4qXYE2cX1IlcU9Glu88F?=
- =?us-ascii?Q?F1soecJQjUs9LEP5FL8useKzUMJKZvwtbAP9Y0BXRecx8JpU/DTWko0o62p7?=
- =?us-ascii?Q?uwT/Y7Cs33uVYHG99LCmjrNTGtnq4NZeXd3eMRQF8Wok0hZM5XTTROQ0EW06?=
- =?us-ascii?Q?Nz6ni3XORrvRJq4z60YDMvucwn4PqhvTpsmdl9ND/keW5LP+HsAtMztt4elY?=
- =?us-ascii?Q?rNkOmYxEmGIrc7HK8jMboZoo7u617mqZCAfzhCLUczVr05OHjeMWOrIksQyl?=
- =?us-ascii?Q?5lAYX/o8UpG3CGvpDT7Ee4/Nj/K57r5OQYyKG3qMNwkA9pauKv2X2J7Voyho?=
- =?us-ascii?Q?oFkNOB0JdHqNempzGSXb6t/x4u4Zv1mS70uty06Sq3lX6w/6rHHPAN0EghHZ?=
- =?us-ascii?Q?DwC0cKSWtfrYnMNCoUBeizXE2km1VvLI0gvpb4Rzqu2xuQE96Ty4StFOSVCt?=
- =?us-ascii?Q?xqIZhRdus0KPKo8ZIEcA2o2C2mgv+3Ha45isL2d0Vt6g3HrtE7OcHOklPFXm?=
- =?us-ascii?Q?KHlifjD99tJ2qglWnpmVBO7sHSIlqtDBwkK6mjP5NJozDl146v4wTzEgus+q?=
- =?us-ascii?Q?gyn34FQm035M0Y5N5U8i+rTVhOXkdvW+SXVWhcu6nD22sN40IxDP7Pd8IRJT?=
- =?us-ascii?Q?vTDeQWCLLTFIzzGdaEbW1JUY/uFZHfW/NQNKR8hIqy3tgvpMHvojkal5Mdzr?=
- =?us-ascii?Q?vK3wSKpb1ierSYX5b0JcyhCxaNRguIQlgWc8LYK3+NjzSxpy6preBpBJfUI/?=
- =?us-ascii?Q?7vOumDOD8YVp6nQkmr90wQIxDAeRttxlvoV506VvaDyVI1zDA305C1gtCHaU?=
- =?us-ascii?Q?xYb3MH9BNSVo3IoxCT7rFaQvBp+/dDuFlemmYn1buCZmJ4BBmD17HsrHHZU0?=
- =?us-ascii?Q?lmJujvn9dDZ0sl3hc7/UGj32/3F76EypgcxQH7UZjYtyDX70lBSl6h6rj3zW?=
- =?us-ascii?Q?3Jw0GXOt8+/o+Qkd/DR6BeUA9d+b06j8IJP8Tzl5yVMOM7O++fyp23Yj4Pgd?=
- =?us-ascii?Q?GDgFJrTBJbRDAUIsx6DRz8UvypJfP7jPXz+hcL66XBFOCSHPN4Xaq8PlVlso?=
- =?us-ascii?Q?u3fc9p+Dab2DdJubj+6270FBUZhYSzXpCkDOrRtZU5JQpFwY98qBZWgPysFs?=
- =?us-ascii?Q?GMpedRT2S2q6TDpVg+QfI1rEegg6G3YW6D7q/6ZoeMk9gilfp9qoS75Px2m8?=
- =?us-ascii?Q?et3ETDh+xkDrEOItlNKBhVoQ5qhFbM9LBMrPCwePOa9GfQL6hvW8uP+zXfAc?=
- =?us-ascii?Q?zUOYwk/qI4jd+xLSqW/ODg/7etNyJoaXvU2WRnfYcNiYXNznxvgCwKs9+L2f?=
- =?us-ascii?Q?G5A4/j7VTyjm4mZOd+w2NRZfvkQnYugZn/jb3U3j6jN6muzgZxuOUY320vct?=
- =?us-ascii?Q?7PVARNrenw=3D=3D?=
+	=?us-ascii?Q?/Lh72wt8rg8x+BW9ERWFbSQtzl9GENI9sHBuK6+kUjalqX305EyYyHlnmRpq?=
+ =?us-ascii?Q?AsZtk+E92BM8EBe5XyePZdSkrdcGvds83t+KxAvzZFDOwGASTKxyzRFFzmz8?=
+ =?us-ascii?Q?wca0j07B0117pxf9N5+qYaOzpbrvYFQfqSDST5cAiKkjvt8z81+BrHprOomQ?=
+ =?us-ascii?Q?fLIUMs2NL1+S46pk+5Vmk0EzC8i7H3qHSjvF56DX5OYtejCLxMCsvIMEvRwp?=
+ =?us-ascii?Q?B5vWVGGoCdDx9A7zBtfFKddkmBzWwTS58EO2hRTM3sC/CD3hszvwl7GIBBjx?=
+ =?us-ascii?Q?csx0mW+ow5LN5wulfR4HkZikszfsdqXP2DF06gmu8Uzmt0imXKo5b5ZLuWV9?=
+ =?us-ascii?Q?9tLSe8tjH1SKT8Iel4y7q6629I7Xs67GlfbT7pgO6nDCg4Ghfy+YK5XHDnmY?=
+ =?us-ascii?Q?zbneMcOHclel3togUtHZN0tO/zcRekyJPi1IrD2SvMcthrcRsEm47gtKtXtW?=
+ =?us-ascii?Q?QGkSoL2bcH/VLBTBFtk6FrKPaYoslgK45K47sO65aHgiNV/a40yti2hHH04Y?=
+ =?us-ascii?Q?Gv/Zq50XDWaj4i7U3ikyWM/mlZUqSXwqMtOVId059pUA+4uA4SbCFgO+liwO?=
+ =?us-ascii?Q?skw1L7gFGsUKuQjzG8QqwomD9B+DR4KV2W4Wz9yvYZ/KoQ/hPPSV7wnzSSHd?=
+ =?us-ascii?Q?trc/+x/pQOCVra5RWukUlJoUmyjHN4YbsE9eolmBJRgEHe804o6LOUt+zuwN?=
+ =?us-ascii?Q?W4gOzw6iHChSEa8tpDxnwaUxG6eTFuG3YYkT6ZAfU91t7bmf5XLhwZJX6KKp?=
+ =?us-ascii?Q?7PwwKg+fhQb02xafjhXv822PJbgoBM7wBeXNqd0tsosdVSaGFTeIlTuIfBzI?=
+ =?us-ascii?Q?foqSIvLXIFR/G3CHETGf/8ypgr0nK6Rb008KeP0rxuPyq9t5Va2HM6yjBgyX?=
+ =?us-ascii?Q?hQyteMBpInu8UcB6xwLI1zUq+MkhuZ19HCAU56ImNZ9DjSQ1Kr+DE7ww/B73?=
+ =?us-ascii?Q?fGNcSekGoCaTaxwwp1ZAgYOmeARd2fH2VR5cMmMB7oyCRRm5B+n0AE1gv74N?=
+ =?us-ascii?Q?v7THl5RpUe0OmgwUgMp0VVf55aFYRDjuOx+rqF3+yzE9UWN/T2hfXwZ1gd+s?=
+ =?us-ascii?Q?Mo7g9kyjvdDjPZ5TEle6dtZC2oP4z9MEV01qQyUK/t6IbUYaIOUIMdqv9Nqk?=
+ =?us-ascii?Q?4SU01W79lrAZVF8REyqIRtT1qczjKy6IV6S1ZkO1Jxrrsfcrx4lXAiqw8R+J?=
+ =?us-ascii?Q?bERbPU/Neg7x1ggf2tvSYPlM6jGWQX9MszWwZ4lc1ZT0KnyWKxZHVkBdYB2/?=
+ =?us-ascii?Q?XGLeSPPbBCAv6wv/ZbX7bzNUiWqBjEq1IL3kfti78eHG5ig8ytFmqgvWwb1L?=
+ =?us-ascii?Q?OTqYo2y042XxpxYWSanYB8PQf0szwIFHx42xBKzdZsNeo1cn4VxviXmM2oHt?=
+ =?us-ascii?Q?wLoXSXu2dNMll9Cejr9AoABqtBotYvo3867WjTPsN2J3xwiwl5oaabJWS5np?=
+ =?us-ascii?Q?BHjLIBt/C6q5ZzXkBR2N58z/O+JxwqdMYVDiTDI0uR/4JGTuQcoeMGUPpCC5?=
+ =?us-ascii?Q?b64kHq0bgpMi37FP5hr2lG9y4Axfd+BfJaeHDbB8cvI90Xlp+Jw7GgfekO0X?=
+ =?us-ascii?Q?oadz7Uza9FKUk5lYnnoIxj2S7i3yk3jcuhbTGafW0sH4LrFkDaeHNcp3QXH9?=
+ =?us-ascii?Q?twvEXov/YVC7J1rtnGbGD5djxGx3ItDtY51d3ePPjhzsxKLQPw5A8bnnGxZk?=
+ =?us-ascii?Q?aduOHAvp+TfYLpjDGH5GbGcWuPCl3ZDtfnz21ovm7WlFW7u3GW3md6h/9OF0?=
+ =?us-ascii?Q?M1Hqv76phA=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e6836134-b673-4f60-2f6f-08de630ec1b7
+X-MS-Exchange-CrossTenant-Network-Message-Id: 58fff773-4918-4c8d-14be-08de630ec44f
 X-MS-Exchange-CrossTenant-AuthSource: DU2PR04MB8567.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Feb 2026 10:26:57.0688
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Feb 2026 10:27:01.1259
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: F+lLyQxwAtaIHvSLiFym3z54lfZ7ZDjXg3pyMR+V1FUO5J6rU8sFVXLXnHfIm0CWGaLODcozlPPT7HFjTJ3mcA==
+X-MS-Exchange-CrossTenant-UserPrincipalName: IFP2RgHq+laLipKOTbm2kKt0ymEtKcKBlyQgfSA2/ayb9d8qVPw3NL+/vQcgQCTt/J5CPTR0bLiEBx1NzMo2Ag==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8720
 
 From: Luke Wang <ziniu.wang_1@nxp.com>
 
-This patch series optimize secure erase performance for certain Kingston
-eMMC devices (IY2964 and IB2932) that take a fixed ~2 seconds per secure
-erase operation regardless of size.
+Secure erase should use max_secure_erase_sectors instead of being limited
+by max_discard_sectors. Separate the handling of REQ_OP_SECURE_ERASE from
+REQ_OP_DISCARD to allow each operation to use its own size limit.
 
-Currently, a 1GB secure erase requires ~300 operations (limited by max
-discard size), taking ~10 minutes. With these changes, the same secure
-erase completes in a single operation, reducing time to just 2 seconds.
-
+Signed-off-by: Luke Wang <ziniu.wang_1@nxp.com>
 ---
-Changes in v3:
-- Refactor to use helper function __bio_split_discard()
-Changes in v2:
-- Rebased on v6.19-rc1 as requested
-- Cover letter: terminology fix (command -> operation)
----
+ block/blk-merge.c | 21 +++++++++++++++++----
+ 1 file changed, 17 insertions(+), 4 deletions(-)
 
-Luke Wang (2):
-  block: decouple secure erase size limit from discard size limit
-  mmc: add quirk to optimize certain Kingston eMMC secure erase/trim
-    performance
-
- block/blk-merge.c         | 21 +++++++++++++++++----
- drivers/mmc/core/card.h   |  5 +++++
- drivers/mmc/core/queue.c  |  9 +++++++--
- drivers/mmc/core/quirks.h |  9 +++++++++
- include/linux/mmc/card.h  |  1 +
- 5 files changed, 39 insertions(+), 6 deletions(-)
-
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 0eb0aef97197..fcf09325b22e 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -158,8 +158,9 @@ static struct bio *bio_submit_split(struct bio *bio, int split_sectors)
+ 	return bio;
+ }
+ 
+-struct bio *bio_split_discard(struct bio *bio, const struct queue_limits *lim,
+-		unsigned *nsegs)
++static struct bio *__bio_split_discard(struct bio *bio,
++		const struct queue_limits *lim, unsigned *nsegs,
++		unsigned int max_sectors)
+ {
+ 	unsigned int max_discard_sectors, granularity;
+ 	sector_t tmp;
+@@ -169,8 +170,7 @@ struct bio *bio_split_discard(struct bio *bio, const struct queue_limits *lim,
+ 
+ 	granularity = max(lim->discard_granularity >> 9, 1U);
+ 
+-	max_discard_sectors =
+-		min(lim->max_discard_sectors, bio_allowed_max_sectors(lim));
++	max_discard_sectors = min(max_sectors, bio_allowed_max_sectors(lim));
+ 	max_discard_sectors -= max_discard_sectors % granularity;
+ 	if (unlikely(!max_discard_sectors))
+ 		return bio;
+@@ -194,6 +194,19 @@ struct bio *bio_split_discard(struct bio *bio, const struct queue_limits *lim,
+ 	return bio_submit_split(bio, split_sectors);
+ }
+ 
++struct bio *bio_split_discard(struct bio *bio, const struct queue_limits *lim,
++		unsigned *nsegs)
++{
++	unsigned int max_sectors;
++
++	if (bio_op(bio) == REQ_OP_SECURE_ERASE)
++		max_sectors = lim->max_secure_erase_sectors;
++	else
++		max_sectors = lim->max_discard_sectors;
++
++	return __bio_split_discard(bio, lim, nsegs, max_sectors);
++}
++
+ static inline unsigned int blk_boundary_sectors(const struct queue_limits *lim,
+ 						bool is_atomic)
+ {
 -- 
 2.34.1
 
