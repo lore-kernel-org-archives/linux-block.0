@@ -1,19 +1,19 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A117E37E310
-	for <linux-block@vger.kernel.org>; Tue,  3 Feb 2026 08:20:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 409CC393DF8
+	for <linux-block@vger.kernel.org>; Tue,  3 Feb 2026 08:20:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770106801; cv=none; b=CiQ/9H2pyZc3Owu2Cvxg2f4cpM6EtJgY4ABs5QXSCx48fuVNalIZHje2UUqh39gtMZ6oSEq4R1l0gSbb7ix5g6NX0xB33G/lYj3gvIqKRJst+Pvxvpo+WMbXqZg26DlxEgfA3O/jfZ89XGzfrS0iaJmRrVNdySTr/axszynXGFQ=
+	t=1770106804; cv=none; b=dXjuVj0Ecc/8kcI7KLNJH86ppswRCIigcKIIoQA5BE+n4qovEqDtMU/zZr6NtvqLnuCGrKZ8rpa5Xq1NRlFxsbUGEy69Kg3jAB1N+eg5PRM0Tlad0HeifAx2t9tQQx30e44Dr68WeB+l77uj/wOtulglAe3+aeCrzn9/xOUk0mI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770106801; c=relaxed/simple;
-	bh=+fMBxn76F0Syv9uOaA3p6vmTGWJZ6F5huDxh07+lYhk=;
+	s=arc-20240116; t=1770106804; c=relaxed/simple;
+	bh=Ztsq6MunkoXbauqZ+G5QVHwG1zuID+j1jb9JsYTPzwM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hgK4TqU17MsWLHpzWdz8jS0sQLAOJ0TfseBNu5itiQmsxKrMcaiV+5EmQwpdeJlZva1VGK0aPiCnwqmlmJge3XYG7cZDsHxIiQCRzpkzCcgN+nrE7foCBYfHqKohA/0PUgxNtgbYvOOxq8Jjb3s81s9LGA35jqoioNi/K1E2ZpE=
+	 MIME-Version; b=cMal8Qmvh7cMpFvkbxBE49B485+dE+bVj73H0Z0NOxpaOWxdx9o9f0Ee5oIro1k1g1zLAEkHU7ZT44vOSI/rGEslfk55o4Fl+5sbt43Gioje3LwnW1n4BmcvBj81kU9PyoYkFRMam1oyveZNx5/2huAo8FW8OsOAcU2JxQ6b8Qg=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DC60C116D0;
-	Tue,  3 Feb 2026 08:19:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 903BFC19422;
+	Tue,  3 Feb 2026 08:20:01 +0000 (UTC)
 From: Yu Kuai <yukuai@fnnas.com>
 To: axboe@kernel.dk,
 	linux-block@vger.kernel.org,
@@ -23,9 +23,9 @@ To: axboe@kernel.dk,
 Cc: yukuai@fnnas.com,
 	bvanassche@acm.org,
 	hare@suse.de
-Subject: [PATCH v7 2/8] blk-mq-sched: unify elevators checking for async requests
-Date: Tue,  3 Feb 2026 16:19:43 +0800
-Message-ID: <20260203081952.732210-3-yukuai@fnnas.com>
+Subject: [PATCH v7 3/8] blk-mq: factor out a helper blk_mq_limit_depth()
+Date: Tue,  3 Feb 2026 16:19:44 +0800
+Message-ID: <20260203081952.732210-4-yukuai@fnnas.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260203081952.732210-1-yukuai@fnnas.com>
 References: <20260203081952.732210-1-yukuai@fnnas.com>
@@ -37,79 +37,94 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-bfq and mq-deadline consider sync writes as async requests and only
-reserve tags for sync reads by async_depth, however, kyber doesn't
-consider sync writes as async requests for now.
-
-Consider the case there are lots of dirty pages, and user use fsync to
-flush dirty pages. In this case sched_tags can be exhausted by sync writes
-and sync reads can stuck waiting for tag. Hence let kyber follow what
-mq-deadline and bfq did, and unify async requests checking for all
-elevators.
+There are no functional changes, just make code cleaner.
 
 Signed-off-by: Yu Kuai <yukuai@fnnas.com>
-Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 ---
- block/bfq-iosched.c   | 2 +-
- block/blk-mq-sched.h  | 5 +++++
- block/kyber-iosched.c | 2 +-
- block/mq-deadline.c   | 2 +-
- 4 files changed, 8 insertions(+), 3 deletions(-)
+ block/blk-mq.c | 62 ++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 37 insertions(+), 25 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 617633be8abc..89289ec283f6 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -697,7 +697,7 @@ static void bfq_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data *data)
- 	unsigned int limit, act_idx;
- 
- 	/* Sync reads have full depth available */
--	if (op_is_sync(opf) && !op_is_write(opf))
-+	if (blk_mq_is_sync_read(opf))
- 		limit = data->q->nr_requests;
- 	else
- 		limit = bfqd->async_depths[!!bfqd->wr_busy_queues][op_is_sync(opf)];
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index 02c40a72e959..5678e15bd33c 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -137,4 +137,9 @@ static inline void blk_mq_set_min_shallow_depth(struct request_queue *q,
- 						depth);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index cf1daedbb39f..b7b272e856b8 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -498,6 +498,42 @@ __blk_mq_alloc_requests_batch(struct blk_mq_alloc_data *data)
+ 	return rq_list_pop(data->cached_rqs);
  }
  
-+static inline bool blk_mq_is_sync_read(blk_opf_t opf)
++static void blk_mq_limit_depth(struct blk_mq_alloc_data *data)
 +{
-+	return op_is_sync(opf) && !op_is_write(opf);
++	struct elevator_mq_ops *ops;
++
++	/* If no I/O scheduler has been configured, don't limit requests */
++	if (!data->q->elevator) {
++		blk_mq_tag_busy(data->hctx);
++		return;
++	}
++
++	/*
++	 * All requests use scheduler tags when an I/O scheduler is
++	 * enabled for the queue.
++	 */
++	data->rq_flags |= RQF_SCHED_TAGS;
++
++	/*
++	 * Flush/passthrough requests are special and go directly to the
++	 * dispatch list, they are not subject to the async_depth limit.
++	 */
++	if ((data->cmd_flags & REQ_OP_MASK) == REQ_OP_FLUSH ||
++	    blk_op_is_passthrough(data->cmd_flags))
++		return;
++
++	WARN_ON_ONCE(data->flags & BLK_MQ_REQ_RESERVED);
++	data->rq_flags |= RQF_USE_SCHED;
++
++	/*
++	 * By default, sync requests have no limit, and async requests are
++	 * limited to async_depth.
++	 */
++	ops = &data->q->elevator->type->ops;
++	if (ops->limit_depth)
++		ops->limit_depth(data->cmd_flags, data);
 +}
 +
- #endif
-diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
-index c1b36ffd19ce..2b3f5b8959af 100644
---- a/block/kyber-iosched.c
-+++ b/block/kyber-iosched.c
-@@ -556,7 +556,7 @@ static void kyber_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data *data)
- 	 * We use the scheduler tags as per-hardware queue queueing tokens.
- 	 * Async requests can be limited at this stage.
- 	 */
--	if (!op_is_sync(opf)) {
-+	if (!blk_mq_is_sync_read(opf)) {
- 		struct kyber_queue_data *kqd = data->q->elevator->elevator_data;
+ static struct request *__blk_mq_alloc_requests(struct blk_mq_alloc_data *data)
+ {
+ 	struct request_queue *q = data->q;
+@@ -516,31 +552,7 @@ static struct request *__blk_mq_alloc_requests(struct blk_mq_alloc_data *data)
+ 	data->ctx = blk_mq_get_ctx(q);
+ 	data->hctx = blk_mq_map_queue(data->cmd_flags, data->ctx);
  
- 		data->shallow_depth = kqd->async_depth;
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 3e3719093aec..29d00221fbea 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -495,7 +495,7 @@ static void dd_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data *data)
- 	struct deadline_data *dd = data->q->elevator->elevator_data;
+-	if (q->elevator) {
+-		/*
+-		 * All requests use scheduler tags when an I/O scheduler is
+-		 * enabled for the queue.
+-		 */
+-		data->rq_flags |= RQF_SCHED_TAGS;
+-
+-		/*
+-		 * Flush/passthrough requests are special and go directly to the
+-		 * dispatch list.
+-		 */
+-		if ((data->cmd_flags & REQ_OP_MASK) != REQ_OP_FLUSH &&
+-		    !blk_op_is_passthrough(data->cmd_flags)) {
+-			struct elevator_mq_ops *ops = &q->elevator->type->ops;
+-
+-			WARN_ON_ONCE(data->flags & BLK_MQ_REQ_RESERVED);
+-
+-			data->rq_flags |= RQF_USE_SCHED;
+-			if (ops->limit_depth)
+-				ops->limit_depth(data->cmd_flags, data);
+-		}
+-	} else {
+-		blk_mq_tag_busy(data->hctx);
+-	}
+-
++	blk_mq_limit_depth(data);
+ 	if (data->flags & BLK_MQ_REQ_RESERVED)
+ 		data->rq_flags |= RQF_RESV;
  
- 	/* Do not throttle synchronous reads. */
--	if (op_is_sync(opf) && !op_is_write(opf))
-+	if (blk_mq_is_sync_read(opf))
- 		return;
- 
- 	/*
 -- 
 2.51.0
 
