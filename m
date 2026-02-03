@@ -1,238 +1,149 @@
-Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011030.outbound.protection.outlook.com [40.107.130.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DC1431AA84;
-	Tue,  3 Feb 2026 10:27:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.30
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770114429; cv=fail; b=tb+XDt0aLhMUq1Mf2VE65EM+BPAAqWWApQipeEwtpPdS/xOoZ9vOfzbqWu8Fi6gaQm8X015tWYVOqmf5eiWIB3mVFQLuZ44mr0aec4WNTmiYbxZ1L+FQ+fVnEwwtKemmt8ybuazrbtWFY3HqXONwNHRHZ6gNJRqpghu1ZGV7M1I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770114429; c=relaxed/simple;
-	bh=IxcaP8LEVNRRP1lUX2sxnK8oxQ60GH196Kx99TDIUvs=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=RVblo6N+8plyITD1OMZ3jNPdBuf8tyPI8hZlRGXvcRBFMbu6xBv1lpsEvmk5hjIH+YPlP5tayh41FdtynwTL0+gJUJCTyxFuzbV44MuPfQeGWCBOPaNYOClKYqWIvghBLUegYRNDmAIJni4/vlg2ZJJwJ0tD0PGUIfIrod/4bCg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=cYjhTQkt; arc=fail smtp.client-ip=40.107.130.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33068323406
+	for <linux-block@vger.kernel.org>; Tue,  3 Feb 2026 10:54:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770116079; cv=none; b=Soaf3zv3BRd7zOkc1bLd+CQzxhLizFQzIniRMxJJDBSmDq52b6pg7EbTM/M5B5nLGNZk+4BH12aW4eF/iPrimG5+oRpXHxEDUeCBiuA9tFbn/PV19HU2BKbS7Z/untvT05a5ORUJGRiTiE+mtLMdI6AuGpqkEI7USiWqIcrgDxk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770116079; c=relaxed/simple;
+	bh=ZH71Nu88hsHG5/zlGLW9UgyzVfa1zeDXINj5mHKRrmU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MYcFB5k4D+hL9DxGFLh42vUVWhYh+Qth1tkJEvNaSqh3Vql6pOGD1BWe5xT8p6B+fds+OQvYdrC0atuByQUEdKOhji3aVqOAYywFcfWOFylhjx4kH6XGyqrqmoP7PUHyei6Qdf/URqLLX+M1uhklPkLe12WvU7M3M+qT5w4eMKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=T08FQ5CB; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="cYjhTQkt"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=UNKPtqdw0cl8JR1KgOPdtrrxUNr8HfZYsIX/FlxBAdKfQZ119lKByzXdhbcV3DmlAQhL0wHqY6WLmtxqmEL/EmPUDx+S1zvWhb5OajvisDGXvquB3DV4c46jvrOENXg21ANgNfbgNYy638fc8/7xOkmR1W8PPhbV/F8hLvJ+cau8sl1bAvqtdAh1jLVmtfGc3cjQmP2jDN0j7XHWu42yG+SRsvbdK6mcYFGz/RnEbIkeCJaW+VJW41p9w/1nLCdGWf5dh+5EmkCdWgIJ+eXF37+R6gFRceHGWvdyG8rXh63eXPVf1jn6m+k7aOy92IrfnOAwrL85XDCTg7UGlngN0A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wLa0IjxI1yM3LLdIxlkka7kLwtJeh/h0xCIjf724uvw=;
- b=KKxjo23nUeEOCo+AIYHvKnJYQ/euoBXJcwnMM/uysfif+axex2mWu3Y7aQs4XyrWyPrtuO9MYR0yXmZx3u7bPPvkwNG1QUGMobGaSz1INFb+ZjVSA01RnNqHFoX3s0bParyIDX0m5NQZO+EaRbZTJDL8RExwqs7Y3kzjZoogzrT7gCNR2YmRjQbqKd+i+t3SQ++jMJdi0YoPgv9z9oeoemXCP3oajITBREHqrrZp2rvFMzxVsXVyWqY5cLZ1UyyjGtx7DkvnZFaAby2StcKmNcL2/LMt7vkf3R5DEyfSOnzyxfgkRFbOAv58sJtVKWTcg8ZhBVyPWZdRk0HdRJSLmQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wLa0IjxI1yM3LLdIxlkka7kLwtJeh/h0xCIjf724uvw=;
- b=cYjhTQktGEa6m8Ts7Qv4M0K9yZD4Rs/v8PPYv0xY/+5edijJ2VutA41PJD8EzbGAdNcnnfQjaK9tZDKqF2623NSK/XmTDoA8kIy+XtFgYirEUbfRXF7ASeXSy7xB4l2uFmXjiBkfudw8yXQ4TNnz8JfgBJutVqDFhP9wBFUHZMkm830U6nfzYn60brTG4eshL415pt+6+HrZ0s3BwROK9WAzH08pWvMuCletZ1pANszOinWrDSsWoJbvOgeUiOJd+qhLt5GVJM6WWUoMsN2QMw4BxOK2GLhD5RQ0vDpYW5h5VMOfWQi5sJ2LqKJGpKqPtGXpNafi+lMqPo1Xte8yTA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from DU2PR04MB8567.eurprd04.prod.outlook.com (2603:10a6:10:2d6::21)
- by PAXPR04MB8720.eurprd04.prod.outlook.com (2603:10a6:102:21f::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9587.12; Tue, 3 Feb
- 2026 10:27:04 +0000
-Received: from DU2PR04MB8567.eurprd04.prod.outlook.com
- ([fe80::32c4:a8a7:1724:b754]) by DU2PR04MB8567.eurprd04.prod.outlook.com
- ([fe80::32c4:a8a7:1724:b754%2]) with mapi id 15.20.9542.008; Tue, 3 Feb 2026
- 10:27:04 +0000
-From: ziniu.wang_1@nxp.com
-To: axboe@kernel.dk,
-	ulf.hansson@linaro.org,
-	hch@infradead.org
-Cc: linux-block@vger.kernel.org,
-	linux-mmc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev
-Subject: [PATCH v3 2/2] mmc: add quirk to optimize certain Kingston eMMC secure erase/trim performance
-Date: Tue,  3 Feb 2026 18:29:03 +0800
-Message-Id: <20260203102903.2953660-3-ziniu.wang_1@nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260203102903.2953660-1-ziniu.wang_1@nxp.com>
-References: <20260203102903.2953660-1-ziniu.wang_1@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SG2P153CA0011.APCP153.PROD.OUTLOOK.COM (2603:1096::21) To
- DU2PR04MB8567.eurprd04.prod.outlook.com (2603:10a6:10:2d6::21)
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="T08FQ5CB"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4801ea9bafdso24195665e9.3
+        for <linux-block@vger.kernel.org>; Tue, 03 Feb 2026 02:54:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1770116076; x=1770720876; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=XebVXPSNdMrxJAnIqGRVfZUx1GAqbd6tkSOPzi0fCbQ=;
+        b=T08FQ5CBYfkbD0iHW5HaKVN11vqTjVQhlR1+fZWHfxWmOEWycVcdFxEi+XU2Cq03d+
+         OFKEt7Ic2xC1IJ7exHCHvQ3GeI6pxu7jOSWKx210o84u5CNuAfH5dOU+RoVfLwWoTGwb
+         ac2Pz8wSHPij5xp8HqsATikAknqY7ro9LN6oP5Qb5aYW5XorlZ+y61y1IsfUbtGJYJz/
+         Q8QE4VyfSDaPpemO19IW+9k0Hz6dDVT8e9TNxNJc70Xa0c1D24QWgxi0J2vMn3ohhJwO
+         YG8WHB7IIuP8fbRudUmFF6P8PVWK6frbM75riNNr0lVUDriRhlgVEbgQ25llT70aZoHK
+         hopQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770116076; x=1770720876;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XebVXPSNdMrxJAnIqGRVfZUx1GAqbd6tkSOPzi0fCbQ=;
+        b=Wovt/v4szOKXSfZhz7/jcyrcw6n6t2n4k7lJXm7XfLFkPR+u98uG+hX9eUJcCV/Ylp
+         r6+/ip94Wbk37MYA18/qAMJWdYxFb6HnTZG+zC7GqTQijp653h+K6ZxsAEsDSdgvI58Y
+         Gf5lnFFmF4+FahHs5gu/Q8x7Tr0jrY3D6kBUIzmJSJ3VkKYskw2VebTJCOeiGfFT3lf4
+         xqfOyVFeKJLT98L9WyWkpH4zmg9Vdx0dHgcSVM6qo2FHFFsJIX5A5KMRvuqCahvYFyjV
+         tgD8j5H0fuULAMYpxRcnbL2qsdDMMmyQMT4MVOZfd/Bdgss7DrdXH38l7ixNrVFT82uC
+         UUGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV8pvq7LihOECns7M1B7v2c/GWmQ433eQMEz5tTEJq5SNSYNAPs5SndzLMvAwW7ALTaB3OCphHONqyWzg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKt90HOVsnuywk/p5tdrzKXcOThs4e9JNC0Qlgj634DRC1Jy1g
+	uUbS+7bqsXsQCg5nRa62Zf0DjQu5WopwwAUdbnvwIbfWbzN6Oq/ZnAdZ1Uhz+k5uRIA=
+X-Gm-Gg: AZuq6aIf7ELd4PDI3ihng5NPr+ySVKRnBAgCnC9mnwFdHXXSfB8kKoZXBYQqFSV3NYr
+	do6ElSfV/HXfJvGbTeKkZ8xBV9PmwIk3yTIOOI1z3nA7BTqnOdR6EnSDJX4iuPgEZh1npsPqXyu
+	yhAmwdbXfmG53QK+90go+AbW3qA5Kzsf8GPXF8TOVDyuKMKWoS+hly4JzXxyWBkfmzKbpa5fqJi
+	0hfdy9NrZ/z0zGsnVvGbuVuK6GQTc5xzd9IcEyu4qU3kmTeKeI64JGP5IsLZvwOEuYiK0frP2UT
+	Q8LBhuLlNHmgelbEY206mFuwkoAzaECTBtVO6rdpyzBAk2VPGwohBrssutuX/K1z5zteGh9W+9b
+	8pQAqatWR5u1PdjqZAfgqZ8Or+yRg436ch/ZJRlayWjP53cLiIwCnP4knTuBJDsttHnRaxQi5fD
+	B8VopEMuEEIM+UfZp1hn2W3X15J4DEHj9z99L4DK+DSQ==
+X-Received: by 2002:a05:600c:8b2f:b0:47f:f952:d207 with SMTP id 5b1f17b1804b1-482db48c8a2mr188218615e9.19.1770116076560;
+        Tue, 03 Feb 2026 02:54:36 -0800 (PST)
+Received: from blackdock.suse.cz (nat2.prg.suse.com. [195.250.132.146])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435e1322f40sm49312022f8f.34.2026.02.03.02.54.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Feb 2026 02:54:36 -0800 (PST)
+Date: Tue, 3 Feb 2026 11:54:34 +0100
+From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
+To: Ming Lei <ming.lei@redhat.com>
+Cc: =?utf-8?B?5p2O6b6Z5YW0?= <coregee2000@gmail.com>, 
+	syzkaller@googlegroups.com, tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk, 
+	cgroups@vger.kernel.org, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	yukuai@fnnas.com
+Subject: Re: [Kernel Bug] KASAN: slab-use-after-free Read in
+ __blkcg_rstat_flush
+Message-ID: <ffzrfu62npwacsl3225qqyjbhd6oue3x3rt46l2wcyp5oq4eli@26gvvst6hrmu>
+References: <CAHPqNmwT9oRpem3J3erS_W0uSQND47LGGSBsNxP8E6uSUish1w@mail.gmail.com>
+ <aYFlZf9p4cY0rIbc@fedora>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DU2PR04MB8567:EE_|PAXPR04MB8720:EE_
-X-MS-Office365-Filtering-Correlation-Id: f19da5b4-b510-4062-836d-08de630ec62b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|52116014|1800799024|376014|366016|19092799006|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?7EBAE8j7Spwg7KUDQGFTBQrLeH/ZPh5GwZ0jO+Re7vOHn7y5Z9M4Ep54O6EK?=
- =?us-ascii?Q?uMw5sLK+52/hKxRgN2hH8oTLYAyJWyf4KbM8K4jMjADHSYyfZBujASZlQXwI?=
- =?us-ascii?Q?uff6fLtaX0uHa0ejHWK7x0xgD54kCMl79BE/HsFmFmGgpdSm3FSuQjKY68Vl?=
- =?us-ascii?Q?cQfsp4uDyqpUkzs6CDFyzZ8RP/F0IbhZ+CROLpLPgXGTUfLO03WR/6jq6YFm?=
- =?us-ascii?Q?k8vx7sKqkT75I1wzPEh7C8vvxNoOGyMdfn3A0zLK5LjDP4pdNtJswJdt0JDf?=
- =?us-ascii?Q?Fr8VBB8FyA2r5yE9Tn2mc+Y+TRH2DAeDhlQR3FCZ6LsEhM8wF+jN5mdDveLp?=
- =?us-ascii?Q?oHz0/FMgPqrOHEtxk9/IeqRXc5xOwa18k2qGOSfOgsE+k8MMH9U3UtgcuuOF?=
- =?us-ascii?Q?wh+LbiCPyNIrbRx78kpDRxNg7/j2PqKeBiTVh46UEIGUYtogMoF3LfuW4+Gm?=
- =?us-ascii?Q?5VWESjhAmTTgTh5hhtEkBXv6ux95JzEok6/jhr3u3YIU6gOQ9iuCteXxgmJw?=
- =?us-ascii?Q?+++/DOsX7V046BRDnLN15/2XNKSQMdYvLj6J0OFtXgflS5PP7y9lMz/AAWZ6?=
- =?us-ascii?Q?ZlnV1Hfv0XN7XdbLpfl7l1UepAnNZBfnLQRTRHz6W0hTqOoegU4ekGg6ciWf?=
- =?us-ascii?Q?BnZv4OTfPezJlIUE/xZRXHdyUHwQkrE6mTVJ7j7taY7fN5CENQUfvnLV5ZIZ?=
- =?us-ascii?Q?yqaZvtNL1gEFOUsc4mUuQRI2JqDlWjtU3/yOgn/jWlUqH0gHaW5KH5gEXV10?=
- =?us-ascii?Q?hQ+olojQOCKhElMQv3vAYGEALmH3AATkHmPZ4y7MrTHG1pL7q74QhK+BJ+hK?=
- =?us-ascii?Q?ERVUlRA7HyGdHbmPlyMZm0Pc0dk4q31QQj3W4YFvWjhQCTSRM/t4NORp7jfL?=
- =?us-ascii?Q?aMrczKQK7DghWFRZ+GPMsuiZ1yyv8AqLqdj6hKysrBpYoMwlJO+v5K1Ej3oa?=
- =?us-ascii?Q?RK+HZStZ0Zeul1MnW8vm6AeXK0jaJ9GKu+zirz0UtIB2D6pjIMbH/dFNrmQe?=
- =?us-ascii?Q?Uynkf1eGLwyrFNR7TJ3wPDcrohFQYh4mIs/K38chotR6V8bjuPTou/wVx3Vj?=
- =?us-ascii?Q?b022WNxo6OMhWN1lzIUo8nv8Crvrp0fEywy34WjDo3fgMk7Evtj5EbM4fHl4?=
- =?us-ascii?Q?1wdDtPV7jIzcZbW9PnCwm68FnzYeSf1ZRW9jHjjTJcMaZMgUiAdyzLfdIclr?=
- =?us-ascii?Q?OxV05e5xgPHM9rXseJ+RCe5cCxXgCpmWwyVnrXerZGn9JOn9NanLHz8GyFNj?=
- =?us-ascii?Q?2ZQYHPC/5sbhk4frtPA8NAyoNjub+VpWyl69+CNYjpIzhOAGN5F9GAuCGtIZ?=
- =?us-ascii?Q?GSN//gY9l199SHFdKYN8TTvEy4iZW7OYzIoFLOyU5JXt2PwMz1UAUlQ2Kg8t?=
- =?us-ascii?Q?0gkVOjJjtC0mtRgu2jzgFmZErxTaHDY2HSMk7Qjm5fLzwmPFAMSi6SRNXYvv?=
- =?us-ascii?Q?+qfvBB7SfXF0NIwPVSu7NfW75ggVk4C1TG1uXLdS/fVIQBWAs4uiwse7y7Eg?=
- =?us-ascii?Q?vMk9OK8p6HdHmi7O/4HyOEYSRoFT//pUI6WBhzM84XyzNx/67ktW28r3a/wP?=
- =?us-ascii?Q?sJUWl9ztB0LOi7EwWsS4u89SrvT9HV83yOhnDKvsgsw8LsjPq19T7p6TbXda?=
- =?us-ascii?Q?hI9dcRo/iRVMbTRip3aZHWM=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU2PR04MB8567.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(1800799024)(376014)(366016)(19092799006)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?vMpMUzmJO6mf/B6cVHlt4vwP0m0GH/thbCebHgclSfFY4VWebNUeBXKO1CLz?=
- =?us-ascii?Q?yAT5zYRSjFkPSZpAcuSe8u5PL8GkGq5laWKJmHiVIjgs9Yo/gDZgCrjD82ul?=
- =?us-ascii?Q?8x0AtsFBJtRa0I+FruTcZQsgqJs+S84z/y9yRbpRfcgTO6xF+iKL9qsRMBqB?=
- =?us-ascii?Q?Dg9QEBmW2BXG/RjAiaGUI2pVOpA6h19UWZWxEbCypGuHJJzEyJ77SbhI5dER?=
- =?us-ascii?Q?SUDvrdQi92HCNRQZc224rBdHDd/mLjbIsfVl2tfnS75PrNpycvKmsO8B9Wp0?=
- =?us-ascii?Q?pPlxHJvZdFyL3SVm6EBzSmiJYzFugNE1Msg2nHq0DKUDS1Vqj9LQJ0EHzgLO?=
- =?us-ascii?Q?Lvm61hp0rGkqTGFeBwVH1DorQ6w2jRNOiCQ9p1FKOVp+lZdRrX8cZ2MCybxT?=
- =?us-ascii?Q?QRD5djE+GdHfeWmAmlWWtnibPILkSUdnDtfIah+lcdekw7Z6mWtNUY94HHbT?=
- =?us-ascii?Q?YnZbORRqv/Y/Z9DdPUaYooOOFDg9nr/or8aE4lFX9hWgYai5FSPqsH1lJewW?=
- =?us-ascii?Q?Rb4+23rN+OLzmOVO8bhMeT93SflZWEizWd60sfUOtbO635Tui5HwjiuMhELo?=
- =?us-ascii?Q?wtjtmNGcrlARrvVG0izG09ICSNNnMNCf6KUb51487cqAU2rzqo9Qwm7Zw4n9?=
- =?us-ascii?Q?dWEMLSzM6lqIWVRCQp1PlYNk78cVqwSApFYyzPDb00xN86M62n7P+snzTFT3?=
- =?us-ascii?Q?skiInAOJmTfse5GLJpYqgxmqaPbmunnyISW6uSq67kqs+jZb3rEb6FAm3Qry?=
- =?us-ascii?Q?q/2w5ya+hjKsJNBlFk+zE4/yIWFqpckjBvR29XLUKDYN2wm97Wom2f9k86IP?=
- =?us-ascii?Q?uP1ZYSm9bbCaS52RjbDt+QrQCUDDEO0oBxj75bgsrrnBOOoXHyEq9u2q85Jj?=
- =?us-ascii?Q?jNM+5Cvd+tspFv508eEBo0uCzRrxc5nENAhdIS9SVMvwNev2CIWc2ihgOYug?=
- =?us-ascii?Q?K4V8Pq+upRUhqaqOMR3kFkuwY+gIXjhcRxKn5nVwJaZXi2ioJ/Vr95v5kUUw?=
- =?us-ascii?Q?nxXapIan4KVMj0IIhYITE/58ubA+jkGf0/rqODCJ9gzioK1pl7l3v+RgUkVT?=
- =?us-ascii?Q?8pPE0kUGfqCn47ttENjQuk2Sb3I16Zgt0nzQtK9OvSDjkyr5sOHdbjnN8tQM?=
- =?us-ascii?Q?NZfgwcD3akfTuiXN4HJKanmeBGzB0ojPp24k+cRL6rRn+Bx/zYwF/x0b6xHm?=
- =?us-ascii?Q?YVJcQbYLWEa/YgxXZsabliiE+LD9ecrJMiddZmA2y9zGglYhK7IW7btSBCwy?=
- =?us-ascii?Q?bYcL+kW+zVAKH2B+/G6BpnNwvLVplLDdbTdCJl5hvrO2ukCJobTaTXsEO4En?=
- =?us-ascii?Q?/fQnToiMxCZ2Bs4uKcQFsWg2efZAJO91W5GRnATtx2l22fx0UpHWsUVsxloi?=
- =?us-ascii?Q?j/sOByyt3MzMZNFcivKuOJZiV+4uEROJGW5vKC0IaR71KX5hPZlmzJ5G7XLT?=
- =?us-ascii?Q?oDwK9PpIdLXy9gzkZLz1B5Nqz9P8x7EB2zCxu6F6fZEKEvsdAg7LNR2pU7FZ?=
- =?us-ascii?Q?X0zfo1cdoZB9lKY59a5NpEESFxsjRtV8aAdm6H5lK+vuEEgciKLVz94zqyKT?=
- =?us-ascii?Q?gBb9HYz2/tY4UJsmvW6TLIHMgiJmFGT2LzNYSvVfTYw3Qr+PqyU/K36zAoAJ?=
- =?us-ascii?Q?IWFzZf0qn7lbStYprSd6L8K6QKenn3q0RMNvdCzfQ5Ek21oBHWBl9sba5fYl?=
- =?us-ascii?Q?5ee0fIJS2X0MWmAMWByZKJIDOB2np+DgOuHqw16bGzo7/ioON+J8WK6fvale?=
- =?us-ascii?Q?lcF3dC+IOw=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f19da5b4-b510-4062-836d-08de630ec62b
-X-MS-Exchange-CrossTenant-AuthSource: DU2PR04MB8567.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Feb 2026 10:27:04.0952
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: i0h1W6ygDX5Ht8SZribz7ktdC+J6YygV5olRdLvRciTDOAgOMKzZOfzDl39hKj+90bOQYDkBqneia7ye0CfKZw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8720
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="om5bwzeo4m3sw47s"
+Content-Disposition: inline
+In-Reply-To: <aYFlZf9p4cY0rIbc@fedora>
 
-From: Luke Wang <ziniu.wang_1@nxp.com>
 
-Kingston eMMC IY2964 and IB2932 takes a fixed ~2 seconds for each secure
-erase/trim operation regardless of size - that is, a single secure
-erase/trim operation of 1MB takes the same time as 1GB. With default
-calculated 3.5MB max discard size, secure erase 1GB requires ~300 separate
-operations taking ~10 minutes total.
+--om5bwzeo4m3sw47s
+Content-Type: text/plain; protected-headers=v1; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Kernel Bug] KASAN: slab-use-after-free Read in
+ __blkcg_rstat_flush
+MIME-Version: 1.0
 
-Add MMC_QUIRK_FIXED_SECURE_ERASE_TRIM_TIME quirk to set maximum secure
-erase size for those devices. This allows 1GB secure erase to complete
-in a single operation, reducing time from 10 minutes to just 2 seconds.
+Hello.
 
-Signed-off-by: Luke Wang <ziniu.wang_1@nxp.com>
----
- drivers/mmc/core/card.h   | 5 +++++
- drivers/mmc/core/queue.c  | 9 +++++++--
- drivers/mmc/core/quirks.h | 9 +++++++++
- include/linux/mmc/card.h  | 1 +
- 4 files changed, 22 insertions(+), 2 deletions(-)
+On Tue, Feb 03, 2026 at 11:03:01AM +0800, Ming Lei <ming.lei@redhat.com> wr=
+ote:
+> Can you try the following patch?
 
-diff --git a/drivers/mmc/core/card.h b/drivers/mmc/core/card.h
-index a9619dd45270..a7c364d0030a 100644
---- a/drivers/mmc/core/card.h
-+++ b/drivers/mmc/core/card.h
-@@ -311,4 +311,9 @@ static inline int mmc_card_broken_mdt(const struct mmc_card *c)
- 	return c->quirks & MMC_QUIRK_BROKEN_MDT;
- }
- 
-+static inline int mmc_card_fixed_secure_erase_trim_time(const struct mmc_card *c)
-+{
-+	return c->quirks & MMC_QUIRK_FIXED_SECURE_ERASE_TRIM_TIME;
-+}
+I think it'd work thanks to the rcu_read_lock() in
+__blkcg_rstat_flush(). However, the chaining of RCU callbacks makes
+predictability of the release path less deterministic and may be
+unnecessary.
+
+What about this:
+
+index 3cffb68ba5d87..e2f51e3bf04ef 100644
+--- a/tmp/b.c
++++ b/tmp/a.c
+@@ -1081,6 +1081,7 @@ static void __blkcg_rstat_flush(struct blkcg *blkcg, =
+int cpu)
+ 		smp_mb();
+=20
+ 		WRITE_ONCE(bisc->lqueued, false);
++		blkg_put(blkg);
+ 		if (bisc =3D=3D &blkg->iostat)
+ 			goto propagate_up; /* propagate up to parent only */
+=20
+@@ -2220,8 +2221,10 @@ void blk_cgroup_bio_start(struct bio *bio)
+ 	if (!READ_ONCE(bis->lqueued)) {
+ 		struct llist_head *lhead =3D this_cpu_ptr(blkcg->lhead);
+=20
++		blkg_get(bio->bi_blkg);
+ 		llist_add(&bis->lnode, lhead);
+ 		WRITE_ONCE(bis->lqueued, true);
 +
- #endif
-diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
-index 284856c8f655..eb1053d8cae7 100644
---- a/drivers/mmc/core/queue.c
-+++ b/drivers/mmc/core/queue.c
-@@ -184,8 +184,13 @@ static void mmc_queue_setup_discard(struct mmc_card *card,
- 		return;
- 
- 	lim->max_hw_discard_sectors = max_discard;
--	if (mmc_card_can_secure_erase_trim(card))
--		lim->max_secure_erase_sectors = max_discard;
-+	if (mmc_card_can_secure_erase_trim(card)) {
-+		if (mmc_card_fixed_secure_erase_trim_time(card))
-+			lim->max_secure_erase_sectors = UINT_MAX >> card->erase_shift;
-+		else
-+			lim->max_secure_erase_sectors = max_discard;
-+	}
-+
- 	if (mmc_card_can_trim(card) && card->erased_byte == 0)
- 		lim->max_write_zeroes_sectors = max_discard;
- 
-diff --git a/drivers/mmc/core/quirks.h b/drivers/mmc/core/quirks.h
-index f5e8a0f6d11b..6f727b4a60a5 100644
---- a/drivers/mmc/core/quirks.h
-+++ b/drivers/mmc/core/quirks.h
-@@ -153,6 +153,15 @@ static const struct mmc_fixup __maybe_unused mmc_blk_fixups[] = {
- 	MMC_FIXUP("M62704", CID_MANFID_KINGSTON, 0x0100, add_quirk_mmc,
- 		  MMC_QUIRK_TRIM_BROKEN),
- 
-+	/*
-+	 * On Some Kingston eMMCs, secure erase/trim time is independent
-+	 * of erase size, fixed at approximately 2 seconds.
-+	 */
-+	MMC_FIXUP("IY2964", CID_MANFID_KINGSTON, 0x0100, add_quirk_mmc,
-+		  MMC_QUIRK_FIXED_SECURE_ERASE_TRIM_TIME),
-+	MMC_FIXUP("IB2932", CID_MANFID_KINGSTON, 0x0100, add_quirk_mmc,
-+		  MMC_QUIRK_FIXED_SECURE_ERASE_TRIM_TIME),
-+
- 	END_FIXUP
- };
- 
-diff --git a/include/linux/mmc/card.h b/include/linux/mmc/card.h
-index 4722dd7e46ce..9dc4750296af 100644
---- a/include/linux/mmc/card.h
-+++ b/include/linux/mmc/card.h
-@@ -330,6 +330,7 @@ struct mmc_card {
- #define MMC_QUIRK_BROKEN_SD_POWEROFF_NOTIFY	(1<<17) /* Disable broken SD poweroff notify support */
- #define MMC_QUIRK_NO_UHS_DDR50_TUNING	(1<<18) /* Disable DDR50 tuning */
- #define MMC_QUIRK_BROKEN_MDT    (1<<19) /* Wrong manufacturing year */
-+#define MMC_QUIRK_FIXED_SECURE_ERASE_TRIM_TIME	(1<<20) /* Secure erase/trim time is fixed regardless of size */
- 
- 	bool			written_flag;	/* Indicates eMMC has been written since power on */
- 	bool			reenable_cmdq;	/* Re-enable Command Queue */
--- 
-2.34.1
+ 	}
+=20
+ 	u64_stats_update_end_irqrestore(&bis->sync, flags);
 
+
+
+(If only I remembered whether a reference taken from blkcg->lhead causes
+reference cycle...)
+
+Michal
+
+
+--om5bwzeo4m3sw47s
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iJEEABYKADkWIQRCE24Fn/AcRjnLivR+PQLnlNv4CAUCaYHT5hsUgAAAAAAEAA5t
+YW51MiwyLjUrMS4xMSwyLDIACgkQfj0C55Tb+AjBlAEA+pA79J0qs+XvKea3uo4M
+AQ50Yt4XmSII2ywcpyrrZyoA/11CWP4Nn4BpuWlnQDGzcmWM4UOrIG8XHCGOsJze
++v0K
+=YQs9
+-----END PGP SIGNATURE-----
+
+--om5bwzeo4m3sw47s--
