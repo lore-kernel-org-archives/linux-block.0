@@ -1,129 +1,121 @@
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 794BB3A962A
-	for <linux-block@vger.kernel.org>; Tue,  3 Feb 2026 14:30:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A1A82D5C86
+	for <linux-block@vger.kernel.org>; Tue,  3 Feb 2026 14:40:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770129006; cv=none; b=eJcxupz9imv8gxR9KBWCU/zQxyV6bsD4Kp4/S/RJ4aDTPclNtbDEkr+d9Lq3B4nrkxToLAwmvajqvZaBOSalSSSGOuP9TeqftxNm3pUomlLkI07/hsrMmNs+TOhej9BPAeVhtfIrnVt3wwL7FiFzYjbWZkREQTRD378LgT7bDjI=
+	t=1770129642; cv=none; b=Bpl4qaM8bCc749Fmo3gSU9Qf9SJekFxjkWFB5qZ5AE2lIEKKo6Eyzaz+ufd9mo0nHBf3a+EyKI+g/TiritFZyDJxUer7mJlOjBoWHBw9ImOnSZjhJvJG5YHSYlIp/pKpi/9wnDbpCYXSZzE2INqY/cRj2yLB4oNsTnsghviwC34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770129006; c=relaxed/simple;
-	bh=UvTKWk8LbeBFHcVCJKpU20JLBXsp+tnV9NPm1OGKUwo=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=jSg3HzTU8O0UP2O5mkvVy2gao5uhZFNMWZk1K3ilNb+whwONOgjo6CH7vVrRW8chdMkGKDkQW9paqCQnb+Kge5DfK6FD/oHdtFaHkf8CL/SWh6GKmUacOdDv++JxVdaHaAaT1wz00epJ+V3neaNuz8VJBenQoWlNEVy+B6qWOaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U2AAA94f; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1770129642; c=relaxed/simple;
+	bh=gzADKnZnshWmlCett9WUmEgFJ73tJpuHtH0nAg1R+T0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sX42cXJNfwHAE7WJM3jXG3PiabPbBvkT8lYk4ljwbJLt9gngzPKSGNtFP5Gmtgp5mKHx4xMFuYpY8pvxI9vAdF4yr2i5CegIc+ar+2W1FNCNY/hI4DtU3ZutJ1L4pz5PLVqdm0E8l7PCv0pDiTBAN7bKna3WAeLtghpgRNKuDqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AYLFvhpZ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U2AAA94f"
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-42fb2314eb0so4645512f8f.2
-        for <linux-block@vger.kernel.org>; Tue, 03 Feb 2026 06:30:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770129002; x=1770733802; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ehtdN2dtUUyw8t9CF8LW9obJiHb6WlF1A+WpekGmvjk=;
-        b=U2AAA94ffPnCSzAikW5yA04x32mT/4Lhm3A5+o+xOc+K9spDhUGDCYtDpZMmjdnAXE
-         RUcBTopbhWNOiqj0kRzDHaQouvB0y2xIBtIlW+itwdPmB6joM5Qr8Fo2u0qCVQ8h5Ort
-         gg6UXCJuwbbtLf3oVpiI5o3X2VKrKDdumySLRcRGnKXXhjvq+5c8fzN+zG7hspXfupij
-         uclb7juGF9sSTyScKiXLjNsD7ZtJR6iIsczy0egNElhIHYjHZcCqw/MzC7TW91X44JGs
-         b1S8bu4ljJtqOgYX7OPgldm/O4IF1ps0kyDR7QI/YfCBcY9JF70cKviIDLB2/y3Xs+b5
-         9ChA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770129002; x=1770733802;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ehtdN2dtUUyw8t9CF8LW9obJiHb6WlF1A+WpekGmvjk=;
-        b=iiVzwJr556OBJCGKN5wfG6fExpaemLvHxnLjoHQ1EzXSGuCkWbGM9i/1byFb4ZuYqF
-         PToTOzY4FN1u92R4frI5D3T/5fZEa6XSZxAT31CFF/geJCKj00McOvr+hIptn0fOEu8m
-         sth5LT5CLkp7DZsItkghBeKtV2CrdA1nHHXzTj0l9/ujE2yI7LOM97NnKoba4jY/iyj1
-         r0GzDOh8ysGE8cv3kG6tpwZi475SW8tu8My3Q2X/sDTn6afvYPIFA0rOcxj0v6M3VZvm
-         mFeKrUKcUXOLxgiZ7Umx1kmOfAkKYmEnw7HE5i2LgFEIdtqw3lhhQphWTkY2pOo0gvQd
-         m9FA==
-X-Gm-Message-State: AOJu0YzmXUYOkT9Wmw7hrV07K39/bRRdACk7FJihEcGLy+KgPnaznffv
-	01JwfSpNizJZQK7VxGUggiB3QGwUQ2mX/BrtObI3r6GOYKDnv2A2IRAhmCnoWA==
-X-Gm-Gg: AZuq6aJcpVcejDNw+r8exlhNcwr8p6agRT1wtPlY+TJyOBk/VcP/YSZdt2sqxkEjDV+
-	tbuCJwG6YgXsZQpL7/bvMeUKJRSBqhOEqqnzlgsyMXvSK2rSroOswVfiE3HBLyekbqfNu2LTkkk
-	LKr3fz2/bhEmAGso0Hx6wVTNFu+/fEdsFe5iaCv9tCpKuvpPZSwUdKoQKL3l7IIUs0B/Qj3VjFZ
-	XUlddV17sGJqkklcrsBE/OkNOVOo6zP3BmfTwFjEnpocxr8P7dXAL73oN2QbiBSXYovm3jbuY79
-	1zcjhsTmEOZPjnbDar3K2kzqpmPku25YOOxUZi3zGrNSAp7vQQfYLFVuCLDRK6OzuTciQNseEvU
-	uvLAmLlGkKww7wYLUosAL6PUtdt4WQLF51B9dJlMgOrqV+WFvNjlPhO9qekSV0nAHEWXqNDH1Qs
-	Ev41MUhAvmAgJbY1iiCoQ58jbO+Vx/cNVDQ6N++KNjF4y7VCReSYAoBPOaGDq+rzmyFhv6eFEib
-	98XQnVe5dysOd6DXyuiq0cREtoGr5MgZha3o4nhKVF124OxdoRL5upd17ShtI/iRRERpQuA81re
-X-Received: by 2002:a5d:5f54:0:b0:435:95c9:6895 with SMTP id ffacd0b85a97d-435f3a72dd1mr22421934f8f.18.1770129002134;
-        Tue, 03 Feb 2026 06:30:02 -0800 (PST)
-Received: from ?IPV6:2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c? ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435e1322dc7sm52615095f8f.37.2026.02.03.06.30.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Feb 2026 06:30:01 -0800 (PST)
-Message-ID: <4796d2f7-5300-4884-bd2e-3fcc7fdd7cea@gmail.com>
-Date: Tue, 3 Feb 2026 14:29:55 +0000
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AYLFvhpZ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770129640;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=H/nnbujEPK1lQRC/VY41UZ05KgAH7I2xmKiWW/7cFeI=;
+	b=AYLFvhpZtpQZbWxuj+SNJxZE88MyYVwXFRSmFt+KiND2Lapz7xd5vW8s/lVUpV8nScJwyq
+	r36eLUc7Cqdu0mnebY5H9NETGmeSnwMs1+5LILc+kilNIGJHuYFB/oVfpm6rIsgT1mbZzx
+	rxEgTlBVsVjcepEplUAoDsso8ASv6uw=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-85-puqqbEFcPZuegfmJDwGq1g-1; Tue,
+ 03 Feb 2026 09:40:37 -0500
+X-MC-Unique: puqqbEFcPZuegfmJDwGq1g-1
+X-Mimecast-MFC-AGG-ID: puqqbEFcPZuegfmJDwGq1g_1770129635
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 590581800372;
+	Tue,  3 Feb 2026 14:40:35 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.35])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 435A01800577;
+	Tue,  3 Feb 2026 14:40:28 +0000 (UTC)
+Date: Tue, 3 Feb 2026 22:40:23 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+Cc: =?utf-8?B?5p2O6b6Z5YW0?= <coregee2000@gmail.com>,
+	syzkaller@googlegroups.com, tj@kernel.org, josef@toxicpanda.com,
+	axboe@kernel.dk, cgroups@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	yukuai@fnnas.com
+Subject: Re: [Kernel Bug] KASAN: slab-use-after-free Read in
+ __blkcg_rstat_flush
+Message-ID: <aYII17gzXXPCTS3p@fedora>
+References: <CAHPqNmwT9oRpem3J3erS_W0uSQND47LGGSBsNxP8E6uSUish1w@mail.gmail.com>
+ <aYFlZf9p4cY0rIbc@fedora>
+ <ffzrfu62npwacsl3225qqyjbhd6oue3x3rt46l2wcyp5oq4eli@26gvvst6hrmu>
+ <aYHXzyRJbzFSohNm@fedora>
+ <l55sz3sgogoyniecolvzscjamxqrxlzgk7w7scds3tt42z6atj@nrfvjqg2agib>
+ <aYIBR6eeudRUQ9q8@fedora>
+ <74zggmy53vzdb2q7sidvasnnlih5d5b4rp6jb6ibpka5zg7z7x@enl7iqw4prji>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: linux-block@vger.kernel.org
-Cc: io-uring <io-uring@vger.kernel.org>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "Gohad, Tushar" <tushar.gohad@intel.com>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Christoph Hellwig <hch@lst.de>, Kanchan Joshi <joshi.k@samsung.com>,
- Anuj Gupta <anuj20.g@samsung.com>, Nitesh Shetty <nj.shetty@samsung.com>,
- "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>
-From: Pavel Begunkov <asml.silence@gmail.com>
-Subject: [LSF/MM/BPF TOPIC] dmabuf backed read/write
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <74zggmy53vzdb2q7sidvasnnlih5d5b4rp6jb6ibpka5zg7z7x@enl7iqw4prji>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Good day everyone,
+On Tue, Feb 03, 2026 at 03:16:43PM +0100, Michal Koutný wrote:
+> On Tue, Feb 03, 2026 at 10:08:07PM +0800, Ming Lei <ming.lei@redhat.com> wrote:
+> > I can't parse your question, here blkg_release() simply needs to flush
+> > all stats. Why do you talk about preventing new flush? why is it related
+> > with this UAF?
+> 
+> What prevents this fix:
+> 
+> --- a/block/blk-cgroup.c
+> +++ b/block/blk-cgroup.c
+> @@ -169,14 +169,6 @@ static void __blkg_release(struct rcu_head *rcu)
+>  #ifdef CONFIG_BLK_CGROUP_PUNT_BIO
+>         WARN_ON(!bio_list_empty(&blkg->async_bios));
+>  #endif
+> -       /*
+> -        * Flush all the non-empty percpu lockless lists before releasing
+> -        * us, given these stat belongs to us.
+> -        *
+> -        * blkg_stat_lock is for serializing blkg stat update
+> -        */
+> -       for_each_possible_cpu(cpu)
+> -               __blkcg_rstat_flush(blkcg, cpu);
+> 
+>         /* release the blkcg and parent blkg refs this blkg has been holding */
+>         css_put(&blkg->blkcg->css);
+> @@ -195,6 +187,15 @@ static void blkg_release(struct percpu_ref *ref)
+>  {
+>         struct blkcg_gq *blkg = container_of(ref, struct blkcg_gq, refcnt);
+> 
+> +       /*
+> +        * Flush all the non-empty percpu lockless lists before releasing
+> +        * us, given these stat belongs to us.
+> +        *
+> +        * blkg_stat_lock is for serializing blkg stat update
+> +        */
+> +       for_each_possible_cpu(cpu)
+> +               __blkcg_rstat_flush(blkcg, cpu);
+> +
+>         call_rcu(&blkg->rcu_head, __blkg_release);
+>  }
 
-dma-buf is a powerful abstraction for managing buffers and DMA mappings,
-and there is growing interest in extending it to the read/write path to
-enable device-to-device transfers without bouncing data through system
-memory. I was encouraged to submit it to LSF/MM/BPF as that might be
-useful to mull over details and what capabilities and features people
-may need.
+This one looks more clever, can you send one formal patch?
 
-The proposal consists of two parts. The first is a small in-kernel
-framework that allows a dma-buf to be registered against a given file
-and returns an object representing a DMA mapping. The actual mapping
-creation is delegated to the target subsystem (e.g. NVMe). This
-abstraction centralises request accounting, mapping management, dynamic
-recreation, etc. The resulting mapping object is passed through the I/O
-stack via a new iov_iter type.
 
-As for the user API, a dma-buf is installed as an io_uring registered
-buffer for a specific file. Once registered, the buffer can be used by
-read / write io_uring requests as normal. io_uring will enforce that the
-buffer is only used with "compatible files", which is for now restricted
-to the target registration file, but will be expanded in the future.
-Notably, io_uring is a consumer of the framework rather than a
-dependency, and the infrastructure can be reused.
-
-It took a couple of iterations on the list to get it to the current
-design, v2 of the series can be looked up at [1], which implements the
-infrastructure and initial wiring for NVMe. It slightly diverges from
-the description above, as some of the framework bits are block specific,
-and I'll be working on refining that and simplifying some of the
-interfaces for v3. A good chunk of block handling is based on prior work
-from Keith that was pre DMA mapping buffers [2].
-
-Tushar was helping and mention he got good numbers for P2P transfers
-compared to bouncing it via RAM. Anuj, Kanchan and Nitesh also
-previously reported encouraging results for system memory backed
-dma-buf for optimising IOMMU overhead, quoting Anuj:
-
-- STRICT: before = 570 KIOPS, after = 5.01 MIOPS
-- LAZY: before = 1.93 MIOPS, after = 5.01 MIOPS
-- PASSTHROUGH: before = 5.01 MIOPS, after = 5.01 MIOPS
-
-[1] https://lore.kernel.org/io-uring/cover.1763725387.git.asml.silence@gmail.com/
-[2] https://lore.kernel.org/io-uring/20220805162444.3985535-1-kbusch@fb.com/
--- 
-Pavel Begunkov
+Thanks, 
+Ming
 
