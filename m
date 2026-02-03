@@ -1,113 +1,164 @@
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DD41274643
-	for <linux-block@vger.kernel.org>; Tue,  3 Feb 2026 12:05:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63F7C31A7F2
+	for <linux-block@vger.kernel.org>; Tue,  3 Feb 2026 12:19:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770120310; cv=none; b=GR2YHJ1MjLJh8snb9dLU2xOhwLFLEPvi9kmMTnwZ7QFB9oiUP0SJ4dwxCSEnHPA5oTskRHIO/ShnnlK4QXapQSR/ft9uV2qGW3Bm3nm/L4mzFeKzShsnjlxx0Nhk87e3pbxMmM73CfNi6awZ26Y6PwM5RaPzpKLijRJgRDbCXO0=
+	t=1770121167; cv=none; b=GUpMLd0+4lDFXwV4QNOea8Fy9ZPfq0t8lElut4dwXf9qA8Y44ae7e9gzGHdttKJ+8lxe0PexJkSCoN0rltwm2pKgGh+EhFj4SBAXa5MOztfQ1MTdMZyj6QvrMqQje4PZrXmbJJHZ4obc4APmODbk64fvxT6ikIHopp+4jf4x2Ls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770120310; c=relaxed/simple;
-	bh=VCQKXK/b6w1p0rJZZ0YdDkePSLgf9Ak6OzkldxZRzdo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GKj9qXX2ZeIf0Kf1s0yZvPhtgnhXTER/Hhk38OmIw3CkDPN4BM1BtgMiTjhUB4zd9TkPIstG0w68zx3ZoqFhr0qEJGrDp3HYFbb+5iNPUPP1NQvTmXE99jvrXqcPnO1FoXHzpt1441alwdxoPZmyamRD6HydN0BKcMI/XMoaLH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OnTJwRE7; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1770121167; c=relaxed/simple;
+	bh=y+zDCmjtsWueMEMMWNL0lc2iYJZ13eE3IykfoZVbAkI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=Wa2PQ1lfmnx0MUqpyoxH+gz8uPfe2nxo7eVFnoH8yFL5xHkFYjVokvj2jud/Fc+ti2nhEHMjWm+HQmDx5s7X8FguydWSsufU3OuuOQMlw5X2fP3KK9qrx+iZ6d1mOiUIkPaZ8RzpjbhjhH0f1ci4CYNvsMk4BErTOLz1Zrb2+q4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=eKgp6HpI; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OnTJwRE7"
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-b885a18f620so835143966b.3
-        for <linux-block@vger.kernel.org>; Tue, 03 Feb 2026 04:05:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770120307; x=1770725107; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z1+6Ooei3qcktWMsNzPcdbmfIrr0F/PihFSzcD/XR6E=;
-        b=OnTJwRE7iOPQs5eWmkNgQt6vOV6BKYC6WbrymRs/RPpLSnnPA7mb6WuNa8L8MDJJ35
-         8QEUpDYWyNB3tUIHx+/a4kYXjXVM19MuUWUWJT6/3ZbFjFyzR8B+hczC3OYlRYk9YHIl
-         wJlUDal5lJ+iiOHcPldMa/Olez48ETiJcs26EvJcLl1ISG4E2ZjPV+1HosnM9SRQTV/7
-         N2dUi/hrcmZiDvnF/9qE/4LlcQt9S416pFmgx+D7PIZCiYaHT7WngG7bTG9NI4xSriIe
-         FqwrGHjs4RakQV0Pm7kN2wYcw2VTXBm4qyfC2Xi9680IsSG60IJOTobgzjJ/M1T9Y/EC
-         9ZRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770120307; x=1770725107;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=z1+6Ooei3qcktWMsNzPcdbmfIrr0F/PihFSzcD/XR6E=;
-        b=SI2nusINyvS2ATaSapPuZJPVw6myZ2or3zPT5oeGNfYGOlbUnJL9/EnjYysS8QQVy1
-         hfShEwcEaF8rCli+3LUdWCcZktQeVWFwFrnDRoXr4TBe6EmNbYjOufJ0QKOCQ8kqBPmO
-         Zqg9Xu0daTAw3VCvbzRLLjWDCtwE/KR7kxxabOCwSAIBZalnSiz5Yt3ObzWzUO4nHIE6
-         ZBz746QtngtL0pfalx4pGYLSlx2VCrEcXp7oj/VS2kTwxIlWkWnByxCrPVwU92MXGJag
-         Nk62iGlb/YTa6zIyd4ygpC88Bi7r6SP+bqhhgzwjHUOutC/tC3tWtbjEtF3h605ifkAv
-         lVcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVmSEGPt+ARkbnZ2X18yOP+wh64A0elc6UsjqnQbenVgqlaUNvxui2OY2NJzYOxmMFG8LMzQ1TGSgKqjQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyf9bMkDhY1VdfZc5Emou1kgrACVUsO29Ta8GYSZdlftm75Rvz/
-	NmryVuceXC0kuBMSKwYCiyEapbitruQRkaUo2MUW6qst5NewDSvV00G8vOKRDw==
-X-Gm-Gg: AZuq6aKLT7evz6kAJVQGJ29k4M0DfTtgo0h5JkCsThzZ03Gfw+v6P5vdk4hTuKkaGyx
-	KqfRmXGlNepYGTa9cA4u64jB3D4ZbXHFVt1Udrn/Y4/BR3Iw4mTT7iiL7NdDc5D4zi3simw4f/9
-	nJjNp8p5kAtByvP0DyRNeBS6BbSDp6UaLaJxHXnLRSN5d3nji0vxGiimeAu4VAKdNxR0FrEZixK
-	PszLthFrkhRDz3V7Q73X2gl6hVGjteDJONmqu+AX9YNSA4lAHQ5OgQsOo3j/zA+BJNFHmfgIiSW
-	j7n3it/JOAcoNmmDA8n5EMQZBrsr3/1lFCJLc6q+dOgsrcxnXN+SW+krXnx5uX8WrnD2K6fZ3VL
-	oYU36+lTvlGmrgkNM0rscs7rWHgb1V9ZKP2kabm09dTyLOgjJvsITfdbnQLuQGKQtMb+QSZUw/k
-	UtGtL2djI=
-X-Received: by 2002:a05:6000:184f:b0:435:9d70:f299 with SMTP id ffacd0b85a97d-435f3a7e644mr22293614f8f.22.1770114553095;
-        Tue, 03 Feb 2026 02:29:13 -0800 (PST)
-Received: from localhost ([212.73.77.104])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-435e10e4762sm49060917f8f.6.2026.02.03.02.29.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Feb 2026 02:29:12 -0800 (PST)
-From: Askar Safin <safinaskar@gmail.com>
-To: dhowells@redhat.com
-Cc: axboe@kernel.dk,
-	brauner@kernel.org,
-	cem@kernel.org,
-	djwong@kernel.org,
-	hch@lst.de,
-	kundan.kumar@samsung.com,
-	linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	viro@zeniv.linux.org.uk,
-	willy@infradead.org,
-	wqu@suse.com
-Subject: Re: [PATCH 03/14] iov_iter: extract a iov_iter_extract_bvecs helper from bio code
-Date: Tue,  3 Feb 2026 13:28:21 +0300
-Message-ID: <20260203102821.3017412-1-safinaskar@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <1763225.1769180226@warthog.procyon.org.uk>
-References: <1763225.1769180226@warthog.procyon.org.uk>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="eKgp6HpI"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 6130GcMJ028582;
+	Tue, 3 Feb 2026 12:19:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=ZwwmEa
+	03CUZyywUHHwzuYS7UjNPzpgozHSrzQre094I=; b=eKgp6HpIb2pdd3vVGSkOx6
+	VBfQV6uH8q5Q7bHwHYhAA1UrT5NLt0aGEwvqSKEVkWT//BCj53bNgI+o4SouNlp6
+	i1oCcLq8QsAVpwYJw4hVKOQXEcT5uC4IQlVkeOLYzGJRDO2F4/Adr7w8N1JRpewT
+	7cXOGJFQe1I6TVlKmglr4snKUnujzf6ZwVjcXp+BeJiH2xVCIzNjCvIqcv0k+k0x
+	xGPSi3phu9ejo6C8Kc0Vt5x2j/Kni9Vq4jZa7cQPX4O0kWYCHSik3fxGKrukALaS
+	TrAEXgzkdVe7MiSpzsLgB1J6C1FMH4fTov33JC4nZR/ApX8DOAKe5fCQa5KYfQqg
+	==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4c1986d96p-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 03 Feb 2026 12:19:19 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 613AvOri025700;
+	Tue, 3 Feb 2026 12:19:17 GMT
+Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4c1w2ms21p-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 03 Feb 2026 12:19:17 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 613CJH3N23921352
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 3 Feb 2026 12:19:17 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 35DBD58059;
+	Tue,  3 Feb 2026 12:19:17 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BDBAA58058;
+	Tue,  3 Feb 2026 12:19:14 +0000 (GMT)
+Received: from [9.111.10.240] (unknown [9.111.10.240])
+	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  3 Feb 2026 12:19:14 +0000 (GMT)
+Message-ID: <10428c95-2023-466b-ad1a-4b190bc402a1@linux.ibm.com>
+Date: Tue, 3 Feb 2026 17:49:12 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [LSF/MM?BFP TOPIC] Block-layer device resets
+To: Hannes Reinecke <hare@suse.de>, Damien Le Moal <dlemoal@kernel.org>,
+        lsf-pc <lsf-pc@lists.linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+References: <50ee77fa-0c44-422e-9ee2-eece60b189e1@suse.de>
+ <7ec5f552-197f-48be-9898-9cc4233783fc@kernel.org>
+ <2594023b-b1a5-4752-bb4b-73a4fce4ef5d@suse.de>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <2594023b-b1a5-4752-bb4b-73a4fce4ef5d@suse.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjAzMDA5NCBTYWx0ZWRfX71UBOaHoifbW
+ vfdaLIgcfUOORBRbZSlJPxulUZMhl13Cjgl7NyR9exfIkbn6/kRy5Rbdn420T65/I/F5rwhJMUx
+ WCuB7jneWGAOBC66TppwQFavI+oT7bhjLN/olT21WhlvkXNydk+3Gsz5tuDJtnsjGXU1A2S+54l
+ OvpyFl7XeMKX200TN1gF5TQWtz+oBvVw4JzLi4nA/k/oO93b4Gr/GKKR0r1vweoNmebrQ9p1T1N
+ gAUgcdDAHUxlM31nPa/1FWksyRq3g7aRtl+EaDZDnEiSukeld8g6N0kfb7EzO00J2LclHxiFCpV
+ Voe9ZUMApNjyJXVsetHpxVOGJHPjHhhdAg5lOocvlkFk4O4lfZxOENh1OatRwdfwvwLmaqW1xok
+ cVODxkXwZ5LpMWPc78y1HVsPSTRk11NpEZ+Eb18LJetm7mdlSeXQOxRk6qHhLNjGXYQcGgMjuWx
+ oovXTo+8XXYxKZHPIsw==
+X-Proofpoint-GUID: gF4zFd5UD7hys2SEoJ3-aS50wHX9ZvkV
+X-Authority-Analysis: v=2.4 cv=DbAaa/tW c=1 sm=1 tr=0 ts=6981e7c7 cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+ a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=hV3ytQWAjLcP9wIvwFgA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: gF4zFd5UD7hys2SEoJ3-aS50wHX9ZvkV
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-03_03,2026-02-02_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 phishscore=0 adultscore=0 malwarescore=0 impostorscore=0
+ priorityscore=1501 lowpriorityscore=0 clxscore=1011 suspectscore=0
+ spamscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.19.0-2601150000
+ definitions=main-2602030094
 
-David Howells <dhowells@redhat.com>:
-> Can we make vmsplice() just copy data?
-
-vmsplice already caused at least one security issue in the past:
-CVE-2020-29374 (see https://lwn.net/Articles/849638/ ). There may be other
-CVEs, try to search CVE database.
-
-Also, I think vmsplice is rarely used.
-
-So, if you author a patch, which makes vmsplice equivalent to readv/writev,
-and mention these CVEs, then, I think, such patch has high chance to
-succeed.
 
 
-Also, as well as I understand, this patch introduces kbufs,
-which are modern uring-based alternative to whatever splice/pipe originally
-meant to be:
-https://lore.kernel.org/all/20260116233044.1532965-4-joannelkoong@gmail.com/ .
+On 2/3/26 4:34 AM, Hannes Reinecke wrote:
+> On 2/2/26 02:46, Damien Le Moal wrote:
+>> On 2/2/26 02:06, Hannes Reinecke wrote:
+>>> Hi all,
+>>>
+>>> We are currently working on implementing cross-controller resets for
+>>> NVMe, which requires to send a command to the target which then should
+>>> terminate all commands on a given controller.
+>>> While we could easily terminate the controller, the specification
+>>> also requires us to terminate all outstanding commands.
+>>> Which then recurses into my all-time favourite topic on how to
+>>> abort outstanding commands from the fs/bio layer.
+>>>
+>>> However, here we don't have to dissect/match to individual commands,
+>>> but rather have to abort everything, which seems rather easier.s
+>>>
+>>> So I would like to fathom whether such a thing is feasible/reasonable
+>>> (I think so, obviously, and can think of several other use-cases, too,
+>>> qemu springs to mind here ...) and discuss possible implementations
+>>> (set 'req->deadline' to zero for all pending commands?).
+>>> Or maybe we can do such a thing already and I'm just not aware of it...
+>>
+>> Hmmm... Command timeouts ? E.g. if a controller is slow to respond (send
+>> completions), the block layer timeout timer may trigger, which will call into
+>> the low level device driver to force a reset. But before the reset actually
+>> happens, completions may actually come back, and we do handle that race
+>> correctly, well at least for scsi/ata.
+>>
+>> Your scenario sound very similar to this: once you reset the controller,
+>> whatever was pending will be silent and can be aborted or retried. So it does
+>> sound like that should not be too difficult, no ? Generalize the timeout
+>> processing or do something similar ?
+>>
+> The good thing is we don't even need to generalize anything. It should
+> should be sufficient to walk the inflight requests and set
+> 'rq->deadline' to 'jiffies'. General idea here is to just _initiate_
+> command termination with this, one then still has to wait for all
+> commands to complete, but at least now there is a reasonable chance
+> that this will happen quickly.
+Well if the request which is being terminated this way happens to be admin
+command then it may cause the controller reset. The issue with this approach
+is that we're artificially inducing the timeout (instead of actually issuing
+abort) and NVMe driver timeout handler assumes the admin command timeout is
+fatal and it resets the controller. 
 
-I. e. these kbufs provide kernel-managed buffer for fast I/O.
+IMO, conceptually, the goal here is not to force a timeout but to explicitly
+abort all outstanding commands as required by the NVMe cross-controller reset
+semantics. So combining these two (timeout and abort) mechanisms makes the intent
+unclear and coupling abort semantics to timeout handling makes it fragile. 
 
-So, I think it is good idea to deprecate splice in favor of these kbufs.
+So from this perspective, it would be cleaner to have an explicit blk-mq callback
+for aborting all outstanding requests. The block layer would invoke this callback,
+and each driver could implement the abort logic according to its own requirements
+and specification constraints. For NVMe, this shall allow us to abort in-flight
+commands without overloading the timeout path or triggering unintended controller
+resets, any thoughts?
 
--- 
-Askar Safin
+Thanks,
+--Nilay
+
