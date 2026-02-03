@@ -1,142 +1,134 @@
-Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A2923921F7
-	for <linux-block@vger.kernel.org>; Tue,  3 Feb 2026 14:46:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770129985; cv=none; b=VC8d8M8a1+OivJFhoaF6WN76TcYMfWKt8zSMk7w0hTvsZO57ryRcrscQf/BXb3o/ojV2ud+oVlGvdKUMKHh7uL38QffofPS/gq7BtHsnIQVwJmhhrg4atY/OyIGCJkDEOiJiyi0xTltU6fUnYRIbeolz9eRrGmOR7C8tvisQW3U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770129985; c=relaxed/simple;
-	bh=MAFQ5WMv7g5W0wOxe78cTJkvFbcpcxg6XzjQZ0plQGk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jyQP9GTp9G5Kr5FN4gG+huMSxhI+LlDbPUEHp6TklIkdLstSfoAcowWrVJemCnx72N9MS1ISj7nzWt/6R+TISjua8B+h512pCqIrihl5i+xSX68MrawruVsiBwPjiYV0IocBMjRQzYT0/jHNESRiYSZz9w/7sL5XRVJtRWxlhK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Us9E4mi9; arc=none smtp.client-ip=209.85.167.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE4A0EEC3
+	for <linux-block@vger.kernel.org>; Tue,  3 Feb 2026 15:10:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770131416; cv=pass; b=ZElcagniIPT7lPevjm838dPMgDe1kCxCXqoc+E8lsqayI1/I/8HLH1U1bafg0mmDLlBRHC/jI6B6oIrxv19fpGGmJIIpgz9EYzG0XvI1mum28UJ7p9ugJfIGFPv7f2DhgD2Gur5MzGJtNF3AaSNY86PgMLL6Tn32rbwdO5nYavg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770131416; c=relaxed/simple;
+	bh=E1P/jKeLTITaEg2uiRxu51q4eC03n7OutGh+U5SKGJY=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=mYMXkYGox+qpvm7sfdzgFJ5+YE7kPPMBguPGvvZ21zg8LkS5tsRCncgYOZ049rlFl4lRK/5Nk+4WzhajJV8aCztJ7nQFlMO9xOzNO51idHF3/IVX2+53LQhy+LgHFtYkdH0HSCsrZxFkgL37mCz/Z8TrVETaM1ZWGkrUZ5+y35c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=BdtBHhcC; arc=pass smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Us9E4mi9"
-Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-45c9fdf2a06so3817987b6e.2
-        for <linux-block@vger.kernel.org>; Tue, 03 Feb 2026 06:46:23 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="BdtBHhcC"
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-59b77f2e43aso1058575e87.1
+        for <linux-block@vger.kernel.org>; Tue, 03 Feb 2026 07:10:14 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770131413; cv=none;
+        d=google.com; s=arc-20240605;
+        b=NTu0AXp8xjGJ8RkU5AvZ9XXhtUo7BtrxSjBdg+emLDk7cIL2HKERXs5qYlF7oqoq+R
+         CBYZD7M8HMwlGEY1RxNlA7CtFNJQJA/+Lxm7ydiTUqgX4lIINYBsCWKVJeGDdW8cb8TG
+         pnnY+YppbmYV4zVk+5WWEHDsqo4/NBmK6yshJA+j+DebSFlHfFUlwjrId1HgyMAeZWL8
+         6RvSoLi8sZbNgX7jZUIBqhVfuW9MLe7oEFfVi4aPTqAAITdAMxViqk37MFKHwb/Kz7uS
+         fPCehND7QulVajZFw5U7obH2KwZCxh/PHL15BHtsGCVP5JzwhW9OPl6jFzEkgznj/G5x
+         6Ofg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=E1P/jKeLTITaEg2uiRxu51q4eC03n7OutGh+U5SKGJY=;
+        fh=zbR7/JQB0OO/r08Oqode0BC6DW2Jyxc2MeTsLLsdB6c=;
+        b=LFGeCX414ImIiQSLF/8bDFbQdgH5Sz1rN1sRedi9lT5AZKllnXuipNO4l51a/eREl3
+         VYAi+TXX03G3/J/C8I8DU8ExjBmq/PerQ2jF4vNHTs4ZW/C+onLAtrZAMrI2Ag68ePYX
+         JnZtVerAx87afsWl5Nr+rVVC6QIWtZxbGZy/vJjVriep4d2o0kAqUKnrI0Bt0jaChFEb
+         RVOYNE7x3RnSDgp3u1WsobrC0ZWoif2haYfuBhy/kostJSgdVuE6twTYOcPEbTWS2MKY
+         0ObkeeIohEvnN7ZwhyTki1LerWhqBx6eCKDA+FO8InHfasDz3/efC8kHlg5bVTtKYIO0
+         wQrA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1770129982; x=1770734782; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=h8h3ESOfLmEqhgP4IZ+IYjjxYQsHrPxJrChAZKxI144=;
-        b=Us9E4mi9jFMoqA0S8SMHFYNTZvhJeod7qw08PIuv185rTJHlmuqBPqZO/ZLoTOVKRt
-         F+EL0Rxp4FdF3QhOusGdCE05bQQKLoRDGm39ALJiU1TIfRrs5ccnRErwaXeYqG2FZ3Xy
-         sSsj1YHrXgv9nlgazkLCA6XJbFcwzOCK2DWuzkvoN3VMPSyLMYIygwxDNoUT8oLP6zIm
-         nR1y6+Km4txn1UVchrf/LLhF5Ejck89FYcjBdEc6LUF7kIO47zAWiKw25tUzZnWh0yUc
-         MUSlXwyvDN7eqydGAnyId5VQ9Vk+fQWQ5MqycdOBM/oAkCnrVPmf3KMt1ndMWxY5skLp
-         KYXg==
+        d=ionos.com; s=google; t=1770131413; x=1770736213; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=E1P/jKeLTITaEg2uiRxu51q4eC03n7OutGh+U5SKGJY=;
+        b=BdtBHhcCkn+7yYZUGa3PdDokrx8V3pm1wuenTw68179+LvQoQ3kcjcaJRowhp/7RaP
+         o81I5UX2A3R01uAHcqoj3jgi681xf+trmNPWa7ffqflZTQWoBwTK+dnEFPcver7+VoWK
+         PvQtvCIMxi+yYp3MZuKHRKYkF/foZgt9+j14cxDwCQaqtEWfq2ce8Ga69V7FZyTV2W93
+         xwnEXY1QnZFAoqIgOFbkJmS+djiVFJ5Nu48zpRp2bgSx1ZxTFXNyddm82sjIbGL5OxO4
+         dsBVljvf8wWXJTNj9Hyy9vRtVDBXCpVFkvKR4LHB3rti/0VkizD15XH4sc2DXoSPr29d
+         jydQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770129982; x=1770734782;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=h8h3ESOfLmEqhgP4IZ+IYjjxYQsHrPxJrChAZKxI144=;
-        b=I5S5mkCkb97CmEGdyqjrnFwdcifz2mkeQfJrWQKJDyhKxrKriYkyFVPCPz+eN8fnpI
-         LiaMhbIO1nALoEfcf+zK5sriOBUJ2SecFsijwTu5s6Y6WKSbcHW9C5u7l5Gn2RFzAm74
-         PI4T/Pux5jhSXEtmdPXqmSEB753uLRdylilXFNSvSNhgjXQQdiPGg3FtCDBNMI9dg/x0
-         bf2wcVdGrYCwlWezXshG8+JdgclQOwjMqijTNQfIZIUxXT+nhzl9BbttN+Bxt9pMSzos
-         2ObH0VGP8YD5dPCcnvceyLBAiMMmsvL0+UYLOJdTEhu5f6GGmOQG+P+GEPokHdJAmM++
-         rJrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWDWongX6YfHggTNIgbi92Y2958JdZ9Sxm12kJ4guQ6LS+lM3mh+Jl2QfqPfQg3Coeh2k/Y9eoavAAciA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/ZLoXUXH8U722wgLDgaE3dd9UsLMHA6v6h5PD3fG8gmvPLAHp
-	BBHm3Eh0lRVgUKn4KYyrNSHL4YaY0pH+l1vrP7e0GgWekbr/NIFgz/65SfDO2oqgoJM=
-X-Gm-Gg: AZuq6aIuVJAlsXhU/QAlFW18WEatkHgIGACKiukgFLYrJi038Wd5A0jAOPHkuZpKToO
-	1BJil7ePI6Sm157PrViGLtr6TtgJX1YOf2x59RZ/9abf2+CdrfjBC8getG8itNnbJmOXCR1CLnu
-	JiAChFVjg9i6s8porsjQFPLFj5si3jhcg/1xGY8gKYcsGOQEOsLIxKtXHD6hRiDeOOZ9TxJqU3V
-	L3Yabpll5nJLu4ksgncbksFRns3qbGc9hprHAgwI+PlpATmC6P5msz3mILg76dIWqw91r5m40Mr
-	oAMMIyC4wsivX1f98zs1XOXIYIZjOk6p6n/urzVi7AaoNRBGF8ZY0vpzfaZrV3tXmYaL58HFb1k
-	tNHrfGwSas9kDH+HufsvSw7Taa+Z0VNPhxhLpA8FWvNw40vwRW29KMXCW6ZFxq8PLjx6Tfx2dLq
-	kYmBF0MUJbpo5FiU7DPYtxx0B1/6WVXc2wFyZHQV3LU5IF9Gu0VQEWHuZA1vDeCv57KUyL0g==
-X-Received: by 2002:a05:6808:1596:b0:459:a26c:2c3c with SMTP id 5614622812f47-45f34b9d012mr7359494b6e.26.1770129982125;
-        Tue, 03 Feb 2026 06:46:22 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-45f08f20e38sm11231499b6e.10.2026.02.03.06.46.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Feb 2026 06:46:21 -0800 (PST)
-Message-ID: <00babfab-5bd7-4b66-a765-f7c6689543c7@kernel.dk>
-Date: Tue, 3 Feb 2026 07:46:20 -0700
+        d=1e100.net; s=20230601; t=1770131413; x=1770736213;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=E1P/jKeLTITaEg2uiRxu51q4eC03n7OutGh+U5SKGJY=;
+        b=siRB9/wuQ6QosSkRV70v/nPQJ5TP1d9Db+BhYPbL8CEPL56yyEzmoMelFnoDAJrLkt
+         DJ6cT9FliBn0wByjLVasNSkbTgM4d58vDjLrElOFusW/5kizK8XDg/fFqeB+NXt+Tb6H
+         ZzAKQZbKHzAP7dIPAK2bmsiVr9sdGIGByNkwD+//f60fHG/7hLtBizZOMhBBIaAVc+xs
+         jSBt0nUi79azXjG5GaCLPfPi+LuInLC0Gj3Dd3lcJcxtdXz09Zszyur98nQgfD3DLals
+         TD2nzi4/aZNIsngH5bcUaZKclAjDyQo6IFz4XlmuIjQZjvDx8LOzKnoSPzaLZ/QbErP4
+         x52w==
+X-Forwarded-Encrypted: i=1; AJvYcCXUxc6O8kbK8H04BDdPJ2ZqG2klp3WTVTXJW5E56BPzgby+BtsokIFrZfhGDkEtRsKbDp4etuJGVmkspw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9v9rn9Sdjxoc7wvwJdE7PaJvd3TV+HFIYJTkbMKfqN/fqbnp6
+	S7p359VAO78ec8QEYJ6yMBywNIE6NbTXy4goxLqjOLQD56Z0DUilwXSUKlvOyO+skkSDyVeY7He
+	F5n3eAo2OTkxcJKinDNVx21enJknlRP8ZpDaL1Lu88w==
+X-Gm-Gg: AZuq6aIcMuAI3LBabrTgzuGkcYVHxzOj3wQaFZ39QumXdFpSDFwNIn89Co8cAQ1mT7X
+	tFV03mUDAzuGxeHoALXLwNNr+sB4ryizqUpDNhDfLBCp9dQmuDL17I54PdaTz1d/jEIUxC1qYXx
+	9xbM/JWfEie3lZWTUBv3mRnCG+bKD9HD4iMCjnTxqGnlvbvyA1np4nPEerBeV08ToTFG2NfS5ib
+	nM9u5KQ+WDrbTDnfAwFW31wunzVP15z0oawv8/7AqVz1pTfhjigthnDvQJx/KAZF/R2lDCOih7g
+	RMZTHMRX+IN/FrqYNEFb3a2sVgFBSou9LAaHhtqFnwWhC5Y4zdL3J+pGZaMWRKTuaH4=
+X-Received: by 2002:ac2:51d3:0:b0:59b:ad4c:a0dc with SMTP id
+ 2adb3069b0e04-59e31700921mr1290774e87.15.1770131412756; Tue, 03 Feb 2026
+ 07:10:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Kernel Bug] KASAN: slab-use-after-free Read in
- __blkcg_rstat_flush
-To: Ming Lei <ming.lei@redhat.com>, =?UTF-8?Q?Michal_Koutn=C3=BD?=
- <mkoutny@suse.com>
-Cc: =?UTF-8?B?5p2O6b6Z5YW0?= <coregee2000@gmail.com>,
- syzkaller@googlegroups.com, tj@kernel.org, josef@toxicpanda.com,
- cgroups@vger.kernel.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, yukuai@fnnas.com
-References: <CAHPqNmwT9oRpem3J3erS_W0uSQND47LGGSBsNxP8E6uSUish1w@mail.gmail.com>
- <aYFlZf9p4cY0rIbc@fedora>
- <ffzrfu62npwacsl3225qqyjbhd6oue3x3rt46l2wcyp5oq4eli@26gvvst6hrmu>
- <aYHXzyRJbzFSohNm@fedora>
- <l55sz3sgogoyniecolvzscjamxqrxlzgk7w7scds3tt42z6atj@nrfvjqg2agib>
- <aYIBR6eeudRUQ9q8@fedora>
- <74zggmy53vzdb2q7sidvasnnlih5d5b4rp6jb6ibpka5zg7z7x@enl7iqw4prji>
- <aYII17gzXXPCTS3p@fedora>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <aYII17gzXXPCTS3p@fedora>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From: Haris Iqbal <haris.iqbal@ionos.com>
+Date: Tue, 3 Feb 2026 16:09:59 +0100
+X-Gm-Features: AZwV_QgUI9j_N4lfZ_aafA4jh_DFhv8FDMCk-hFt8OyjXbdkqVCdgN8qrpHOOm0
+Message-ID: <CAJpMwyiVqqbR3ni+URv0uPnE0Bgt_+d+-_+_t6E3wzfiUOT-cg@mail.gmail.com>
+Subject: [LSF/MM/BPF TOPIC] A block level, active-active replication solution
+To: lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org
+Cc: Jia Li <jia.li@ionos.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 2/3/26 7:40 AM, Ming Lei wrote:
-> On Tue, Feb 03, 2026 at 03:16:43PM +0100, Michal Koutný wrote:
->> On Tue, Feb 03, 2026 at 10:08:07PM +0800, Ming Lei <ming.lei@redhat.com> wrote:
->>> I can't parse your question, here blkg_release() simply needs to flush
->>> all stats. Why do you talk about preventing new flush? why is it related
->>> with this UAF?
->>
->> What prevents this fix:
->>
->> --- a/block/blk-cgroup.c
->> +++ b/block/blk-cgroup.c
->> @@ -169,14 +169,6 @@ static void __blkg_release(struct rcu_head *rcu)
->>  #ifdef CONFIG_BLK_CGROUP_PUNT_BIO
->>         WARN_ON(!bio_list_empty(&blkg->async_bios));
->>  #endif
->> -       /*
->> -        * Flush all the non-empty percpu lockless lists before releasing
->> -        * us, given these stat belongs to us.
->> -        *
->> -        * blkg_stat_lock is for serializing blkg stat update
->> -        */
->> -       for_each_possible_cpu(cpu)
->> -               __blkcg_rstat_flush(blkcg, cpu);
->>
->>         /* release the blkcg and parent blkg refs this blkg has been holding */
->>         css_put(&blkg->blkcg->css);
->> @@ -195,6 +187,15 @@ static void blkg_release(struct percpu_ref *ref)
->>  {
->>         struct blkcg_gq *blkg = container_of(ref, struct blkcg_gq, refcnt);
->>
->> +       /*
->> +        * Flush all the non-empty percpu lockless lists before releasing
->> +        * us, given these stat belongs to us.
->> +        *
->> +        * blkg_stat_lock is for serializing blkg stat update
->> +        */
->> +       for_each_possible_cpu(cpu)
->> +               __blkcg_rstat_flush(blkcg, cpu);
->> +
->>         call_rcu(&blkg->rcu_head, __blkg_release);
->>  }
-> 
-> This one looks more clever, can you send one formal patch?
+Hi,
 
-I'll drop the previous one for now - I didn't really mind it,
-but if we can fix it without, then yeah agree that's better.
+We are working on a pair of kernel modules which would offer a new
+replication solution in the Linux kernel. It would be a block level,
+active-active replication solution for RDMA transport.
 
--- 
-Jens Axboe
+The existing block level replication solution in the Linux kernel is
+DRBD, which is an active-passive solution. The data replication in
+DRBD happens through 2 network hops.
 
+An active-active solution which one can build is by exporting block
+devices, either through NVMeOF or RNBD/RTRS, over the network, and
+then creating a raid1 device over it. It would provide a single hop
+replication solution, but the synchronization during a degraded state
+goes through 2 hops.
+
+The proposed solution would provide an active-active single hop
+replication, and a single hop synchronization (directly between
+storage nodes) in case of a degraded state.
+
+The first kernel module is Reliable Multicast on top of RTRS (RMR),
+which uses the existing RTRS kernel module in the RDMA subsystem. RMR
+works in a client-server architecture, with the server module residing
+on the storage nodes. RMR uses the transport ulp RTRS to guarantee
+delivery of IO to a group of hosts; And also provides data recovery if
+one host in the group misses some IOs. The data recovery is handled by
+the RMR server module, directly between the storage nodes.
+
+The second one is BRMR, which is a network block device over RMR. BRMR
+provides mirroring functionality and supports replacement of disks.
+
+The proposed solution tracks dirty IOs through a dirty map, and has
+internal mechanisms to prevent data corruption in case of crashes,
+similar to the activity log in DRBD.
+
+We would like to present the idea and internal workings of the
+solution, and also discuss design and some benchmarking results
+(comparison with RAID1 over RNBD/NVMeOF devices, or DRBD) during
+LSF/MM/BPF. We also want to get feedback, and potentially get more
+people involved in the project.
+
+(BRMR/RMR are in-development modules, and we plan to push them to
+GitHub or somewhere else before the LSF/MM/BPF summit)
+
+Regards
+- Haris
