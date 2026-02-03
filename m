@@ -1,128 +1,129 @@
-Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D0E73A8FE2
-	for <linux-block@vger.kernel.org>; Tue,  3 Feb 2026 14:18:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 794BB3A962A
+	for <linux-block@vger.kernel.org>; Tue,  3 Feb 2026 14:30:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770128322; cv=none; b=ReASzQFWXcT9tnvopLLef3hiZ4YChLocXYQoZPOlX+yYbgJrNUPeEEuWnveMbQ+9DUIQpy6kLHmnPVUcPbS4zVK791K1yWRGLYGguSRlClC9hWSmBqN4IWP5ke7BD40xTyhgneGiMLVNWyZtlpX8iKqYtf+TNY/AG4BSKhrPy1o=
+	t=1770129006; cv=none; b=eJcxupz9imv8gxR9KBWCU/zQxyV6bsD4Kp4/S/RJ4aDTPclNtbDEkr+d9Lq3B4nrkxToLAwmvajqvZaBOSalSSSGOuP9TeqftxNm3pUomlLkI07/hsrMmNs+TOhej9BPAeVhtfIrnVt3wwL7FiFzYjbWZkREQTRD378LgT7bDjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770128322; c=relaxed/simple;
-	bh=0BhorpACNUl4Cwrl2jZ0JWi7TG8vpJ10g9B08vNYnr4=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=EY2+UxxIRH8hwsV6VQ2mN7n5K/RaQ7E/spyiRtbp0/0FLkq8UQA9uvNPabhsP54b3NJ+GJW694C3di34dZcfYQlW2tQR9y7sQyw8wjRXAaSYIhmh9xq54C8J1/VrdlfbCDOZukEYujBMJFgYFFUcUPxTZN0n7BiyFixgcqALQN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=JuV9jenV; arc=none smtp.client-ip=209.85.167.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1770129006; c=relaxed/simple;
+	bh=UvTKWk8LbeBFHcVCJKpU20JLBXsp+tnV9NPm1OGKUwo=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=jSg3HzTU8O0UP2O5mkvVy2gao5uhZFNMWZk1K3ilNb+whwONOgjo6CH7vVrRW8chdMkGKDkQW9paqCQnb+Kge5DfK6FD/oHdtFaHkf8CL/SWh6GKmUacOdDv++JxVdaHaAaT1wz00epJ+V3neaNuz8VJBenQoWlNEVy+B6qWOaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U2AAA94f; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="JuV9jenV"
-Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-45f015a3259so2157307b6e.2
-        for <linux-block@vger.kernel.org>; Tue, 03 Feb 2026 06:18:39 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U2AAA94f"
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-42fb2314eb0so4645512f8f.2
+        for <linux-block@vger.kernel.org>; Tue, 03 Feb 2026 06:30:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1770128318; x=1770733118; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1770129002; x=1770733802; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ftziA6tdxyXPX3qXiu9MtZHw8CpYDliMRtslvchTnUk=;
-        b=JuV9jenVMD3WcV/sSHjI5inLMkHrQbWS/4gMqulNR/tQUwTjnxd6D7PuRPLaO74B7/
-         8w4oxVX0LcLL9rf9tdxX+LXUN3D9Ew1DjmqKTnt2CRjqsBP/LZiIv/tBJ1+nM+DQrhpd
-         zYfRRJff+N4Rh0o6R2rDqJc3gLPoDr4ejX2ojsTqWpOGeMkyaXRD7Y41bjrorJVzZAk0
-         UmF5IM/iT0PB/LCrAGOreWNyYMJlCESt5ZHMsESl0pVlbIZgYZ2ug1Lt3+kEi1haW1sr
-         I4a4wJ5NQ6ZjLsKZYVshf3Cecu8dUnKZT8e7eX1ETobDbHEWoIfzBLArEwN/hQiUZHZi
-         P1UQ==
+        bh=ehtdN2dtUUyw8t9CF8LW9obJiHb6WlF1A+WpekGmvjk=;
+        b=U2AAA94ffPnCSzAikW5yA04x32mT/4Lhm3A5+o+xOc+K9spDhUGDCYtDpZMmjdnAXE
+         RUcBTopbhWNOiqj0kRzDHaQouvB0y2xIBtIlW+itwdPmB6joM5Qr8Fo2u0qCVQ8h5Ort
+         gg6UXCJuwbbtLf3oVpiI5o3X2VKrKDdumySLRcRGnKXXhjvq+5c8fzN+zG7hspXfupij
+         uclb7juGF9sSTyScKiXLjNsD7ZtJR6iIsczy0egNElhIHYjHZcCqw/MzC7TW91X44JGs
+         b1S8bu4ljJtqOgYX7OPgldm/O4IF1ps0kyDR7QI/YfCBcY9JF70cKviIDLB2/y3Xs+b5
+         9ChA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770128318; x=1770733118;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ftziA6tdxyXPX3qXiu9MtZHw8CpYDliMRtslvchTnUk=;
-        b=kLSr62LQuU4kQ0GtJJf7jPpZ2jCbj6cbQqThBJ8bdzV1kT7LZGpOoD/6FD/zLAkZ7g
-         yTkTXjXpMG95BR7nKSOidqhePzGCtcmuV/alW0r3y/xB6y3ZmrUsWgqwsxeGIHcF21kb
-         JphyRIb+gcCuyMeDie23pyGsXO8AUgmzI/F2mJWQ4LHqfd7SPtaeDobvQJ8AEh7mzMZS
-         Uj7zjXeqSswrIQO6EzDdl7Qkdy8yfNUeX+OVPxtxEjRJ9XErY+I/ehklvJZIXPa/kBMh
-         YzqnMvxlUdBegdteBxNvxw2DlhbsnjiQY/IBW44fflROMdXvfQO7DcLzmiuHn/3TyBPr
-         WbUA==
-X-Gm-Message-State: AOJu0YyfA+dc5KaT/zNOuWGe8LdUcZ+oMzayskgFp9n9sBsoCnoGWt3m
-	58Nd5Jpzo3h67Dxrp7LVIHOM9Iq2/Nf+4Mtj+AK2eixd1fEru3uUYF9/RiICEvvDhj8=
-X-Gm-Gg: AZuq6aIjq47R3sBYNFevzt7pWANpGBRJ4/LqtN0OXzO/vgxqDiOfriYlP7K5Yk2V7W5
-	MaMT28iYw/c1t/EzshOhDibcOqvfxY3YoumJwSk0oKAffwhjzCdrIxohco4EAMZe1gzSdq3PSPa
-	D6nIBZxl8RyU8nGEHIHkqW118aUXsEx7AUx6JxWRv0tZ1918hlahyxvettBNKRkqtc88nLLrHYl
-	Y28EUpP84uO430b6s1TAbqNgMgjkoBy+zzcM5nfmCtffkR+fcPsAfsSWt0tzimI34vwPLsr5KBU
-	s7tXsh02cjFnGdZUWvFEpi2fWyk7aNvLLWv76gpFOkJvir8bKo6oKPBH2nLmCXlk6CoC+/t9M8L
-	Tc9mPK96Yz/zxd2aqfwQZd6zRSS4CCVLarehTb/xlu8g8V3dkmm7RETUlSdrQsrv6hh2PlcX00x
-	dAU6+ZpJzmtLAFA1i92IGapoLGpv0kTwNqeelLFlqtgTfG06fZ0ZGwU97HMK2yG8ff
-X-Received: by 2002:a05:6808:3a10:b0:450:c321:d50d with SMTP id 5614622812f47-45f34ca28d6mr8251081b6e.40.1770128317874;
-        Tue, 03 Feb 2026 06:18:37 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-462cb7ca939sm611916b6e.9.2026.02.03.06.18.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Feb 2026 06:18:36 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, tj@kernel.org, nilay@linux.ibm.com, 
- ming.lei@redhat.com, Yu Kuai <yukuai@fnnas.com>
-Cc: bvanassche@acm.org, hare@suse.de
-In-Reply-To: <20260203081952.732210-1-yukuai@fnnas.com>
-References: <20260203081952.732210-1-yukuai@fnnas.com>
-Subject: Re: [PATCH v7 0/8] blk-mq: introduce new queue attribute
- async_depth
-Message-Id: <177012831648.1184270.13164634466085803116.b4-ty@kernel.dk>
-Date: Tue, 03 Feb 2026 07:18:36 -0700
+        d=1e100.net; s=20230601; t=1770129002; x=1770733802;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ehtdN2dtUUyw8t9CF8LW9obJiHb6WlF1A+WpekGmvjk=;
+        b=iiVzwJr556OBJCGKN5wfG6fExpaemLvHxnLjoHQ1EzXSGuCkWbGM9i/1byFb4ZuYqF
+         PToTOzY4FN1u92R4frI5D3T/5fZEa6XSZxAT31CFF/geJCKj00McOvr+hIptn0fOEu8m
+         sth5LT5CLkp7DZsItkghBeKtV2CrdA1nHHXzTj0l9/ujE2yI7LOM97NnKoba4jY/iyj1
+         r0GzDOh8ysGE8cv3kG6tpwZi475SW8tu8My3Q2X/sDTn6afvYPIFA0rOcxj0v6M3VZvm
+         mFeKrUKcUXOLxgiZ7Umx1kmOfAkKYmEnw7HE5i2LgFEIdtqw3lhhQphWTkY2pOo0gvQd
+         m9FA==
+X-Gm-Message-State: AOJu0YzmXUYOkT9Wmw7hrV07K39/bRRdACk7FJihEcGLy+KgPnaznffv
+	01JwfSpNizJZQK7VxGUggiB3QGwUQ2mX/BrtObI3r6GOYKDnv2A2IRAhmCnoWA==
+X-Gm-Gg: AZuq6aJcpVcejDNw+r8exlhNcwr8p6agRT1wtPlY+TJyOBk/VcP/YSZdt2sqxkEjDV+
+	tbuCJwG6YgXsZQpL7/bvMeUKJRSBqhOEqqnzlgsyMXvSK2rSroOswVfiE3HBLyekbqfNu2LTkkk
+	LKr3fz2/bhEmAGso0Hx6wVTNFu+/fEdsFe5iaCv9tCpKuvpPZSwUdKoQKL3l7IIUs0B/Qj3VjFZ
+	XUlddV17sGJqkklcrsBE/OkNOVOo6zP3BmfTwFjEnpocxr8P7dXAL73oN2QbiBSXYovm3jbuY79
+	1zcjhsTmEOZPjnbDar3K2kzqpmPku25YOOxUZi3zGrNSAp7vQQfYLFVuCLDRK6OzuTciQNseEvU
+	uvLAmLlGkKww7wYLUosAL6PUtdt4WQLF51B9dJlMgOrqV+WFvNjlPhO9qekSV0nAHEWXqNDH1Qs
+	Ev41MUhAvmAgJbY1iiCoQ58jbO+Vx/cNVDQ6N++KNjF4y7VCReSYAoBPOaGDq+rzmyFhv6eFEib
+	98XQnVe5dysOd6DXyuiq0cREtoGr5MgZha3o4nhKVF124OxdoRL5upd17ShtI/iRRERpQuA81re
+X-Received: by 2002:a5d:5f54:0:b0:435:95c9:6895 with SMTP id ffacd0b85a97d-435f3a72dd1mr22421934f8f.18.1770129002134;
+        Tue, 03 Feb 2026 06:30:02 -0800 (PST)
+Received: from ?IPV6:2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c? ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435e1322dc7sm52615095f8f.37.2026.02.03.06.30.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Feb 2026 06:30:01 -0800 (PST)
+Message-ID: <4796d2f7-5300-4884-bd2e-3fcc7fdd7cea@gmail.com>
+Date: Tue, 3 Feb 2026 14:29:55 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: linux-block@vger.kernel.org
+Cc: io-uring <io-uring@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ "Gohad, Tushar" <tushar.gohad@intel.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Christoph Hellwig <hch@lst.de>, Kanchan Joshi <joshi.k@samsung.com>,
+ Anuj Gupta <anuj20.g@samsung.com>, Nitesh Shetty <nj.shetty@samsung.com>,
+ "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>
+From: Pavel Begunkov <asml.silence@gmail.com>
+Subject: [LSF/MM/BPF TOPIC] dmabuf backed read/write
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
 
+Good day everyone,
 
-On Tue, 03 Feb 2026 16:19:41 +0800, Yu Kuai wrote:
-> Changes in v7:
->  - add review tag;
->  - rebase with for-7.0/block;
-> Changes in v6:
->  - split patch 3 to factor out a helper;
->  - improve some wording;
-> Changes in v5:
->  - just resend with new email server;
-> Changes in v4:
->  - add review tag for the last patch 3;
->  - rebase with my new email address, patches are not changed;
-> Changes in v3:
->  - use guard()/scope_guard() in patch 3;
->  - add review tag other than patch 3;
-> Changes in v2:
->  - keep limit_depth() method for kyber and mq-deadline in patch 3;
->  - add description about sysfs api change for kyber and mq-deadline;
->  - improve documentation in patch 7;
->  - add review tag for patch 1;
-> 
-> [...]
+dma-buf is a powerful abstraction for managing buffers and DMA mappings,
+and there is growing interest in extending it to the read/write path to
+enable device-to-device transfers without bouncing data through system
+memory. I was encouraged to submit it to LSF/MM/BPF as that might be
+useful to mull over details and what capabilities and features people
+may need.
 
-Applied, thanks!
+The proposal consists of two parts. The first is a small in-kernel
+framework that allows a dma-buf to be registered against a given file
+and returns an object representing a DMA mapping. The actual mapping
+creation is delegated to the target subsystem (e.g. NVMe). This
+abstraction centralises request accounting, mapping management, dynamic
+recreation, etc. The resulting mapping object is passed through the I/O
+stack via a new iov_iter type.
 
-[1/8] block: convert nr_requests to unsigned int
-      commit: 73e0b2945d4b54fa826ecb7d01e5e42a355ecfb7
-[2/8] blk-mq-sched: unify elevators checking for async requests
-      commit: 8209353834bdded4019e2a13b1e1555e3076eaef
-[3/8] blk-mq: factor out a helper blk_mq_limit_depth()
-      commit: c35c0d11265819063335583dd791a42ffc3b84d7
-[4/8] blk-mq: add a new queue sysfs attribute async_depth
-      commit: 012379e5fb1d7c56e894b1d1d81e564a567e9ef5
-[5/8] kyber: covert to use request_queue->async_depth
-      commit: 5400a8a9adfdfa90fc1a5d8f999e20c142360e72
-[6/8] mq-deadline: covert to use request_queue->async_depth
-      commit: 80383e7ffab9b40a4bf26bd13e1a7c53cea3fa87
-[7/8] block, bfq: convert to use request_queue->async_depth
-      commit: cbb8e161097d29b65352e84a2016f5b54667a927
-[8/8] blk-mq: add documentation for new queue attribute async_dpeth
-      commit: f6f4162bf702e44d59ae75c17c1d268664591b7e
+As for the user API, a dma-buf is installed as an io_uring registered
+buffer for a specific file. Once registered, the buffer can be used by
+read / write io_uring requests as normal. io_uring will enforce that the
+buffer is only used with "compatible files", which is for now restricted
+to the target registration file, but will be expanded in the future.
+Notably, io_uring is a consumer of the framework rather than a
+dependency, and the infrastructure can be reused.
 
-Best regards,
+It took a couple of iterations on the list to get it to the current
+design, v2 of the series can be looked up at [1], which implements the
+infrastructure and initial wiring for NVMe. It slightly diverges from
+the description above, as some of the framework bits are block specific,
+and I'll be working on refining that and simplifying some of the
+interfaces for v3. A good chunk of block handling is based on prior work
+from Keith that was pre DMA mapping buffers [2].
+
+Tushar was helping and mention he got good numbers for P2P transfers
+compared to bouncing it via RAM. Anuj, Kanchan and Nitesh also
+previously reported encouraging results for system memory backed
+dma-buf for optimising IOMMU overhead, quoting Anuj:
+
+- STRICT: before = 570 KIOPS, after = 5.01 MIOPS
+- LAZY: before = 1.93 MIOPS, after = 5.01 MIOPS
+- PASSTHROUGH: before = 5.01 MIOPS, after = 5.01 MIOPS
+
+[1] https://lore.kernel.org/io-uring/cover.1763725387.git.asml.silence@gmail.com/
+[2] https://lore.kernel.org/io-uring/20220805162444.3985535-1-kbusch@fb.com/
 -- 
-Jens Axboe
-
-
+Pavel Begunkov
 
