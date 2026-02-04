@@ -1,38 +1,71 @@
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26648421A11;
-	Wed,  4 Feb 2026 16:15:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EC6D41C2F4
+	for <linux-block@vger.kernel.org>; Wed,  4 Feb 2026 16:29:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770221733; cv=none; b=tTcQU8KQIGpM+rBHTyZda6BLnEI0bHi1pnWuMcMFqBOLxCCYL61rjLfGnqwzz9Thm0bTglm1KvyJfhPKLUpVaS/nRqC25uDsobFKS7ZzHHSUc2yp1HU/oY85DCJTvvzdYk/LnANXj3+NQ65M84nWBbvW4EyzPjlZ1lSSnaBryH0=
+	t=1770222554; cv=none; b=HPawkls/+ESEXcuPyjcclrfCpuDrrkKh0qQE55hyZLOb6UdMH1i6rBJiJVoqZawobpvADUITwZ+HLhyMhMcElvFabR+mDJmXL/fVURWyKBOrLlJGbIPJ5C1k/PpUeBIQ/f5VoZrnnpwFUFeQjXqK6qSWDOS104kUe8O0ESFgipw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770221733; c=relaxed/simple;
-	bh=VUXwFN/tQFzURvWM4nP/VXY6rg+eLJPscffz1scgyOc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=C1kc36mdh3HoFZq1CP26WoiLTTY1x/8dA9CG25DBJhUeZn0e/UodF8CLuxtgOSn//Bo08Dfkf87FTNwk9biOBGFJs0assrid2Ba46qRsfiOs5PKup493lqVBuTR0+gHzH8f6+dehbl9aj9k6+vBUFCUrEfTGtvwx9kJgdEHwqe8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=CG7LMhqC; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+	s=arc-20240116; t=1770222554; c=relaxed/simple;
+	bh=zx6zdUMJ3RWLn3ws9n48sdVAdIHgBT02jJR/P/LpS2Q=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=sXNuLFZgU6n+U5mxdmJ1mz7di8iqXd0CsoYilXxcy4zmb5m7ZDmhkQJWpiPPTGHZvyPm+jUHLBAbF0ABoVRw+rJ1dOYSmSEuW8DHKXHk/qgPlPS73YBpZpUNkskHf3yrPIjcBF3M1GH4/bdFTzVHHceFobjn5+ibjy9u6q1s71Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=c8wd/yFe; arc=none smtp.client-ip=209.85.167.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="CG7LMhqC"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:Message-Id:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From:
-	Reply-To:Content-ID:Content-Description:In-Reply-To:References;
-	bh=743Ax+sX0JeWi/iOSLknxfX/DnCNL6/UbMsg4xu3V5o=; b=CG7LMhqClsDn8SrGyQ4oW/9vY5
-	FCt2puoFLtjIFUGnVCuDZmzBGCw8iaXsyFMAXc70nxo/hiw/1lDOB2Vf0Hv94lsjgu+OoE1c2UTRT
-	VBx8gpVyVWrl4VpGwA1c94qu5XzR2aEhTDScNlx0QubDoMR+pW9QGNpmch30o5ysRLMl7/FzJcy8T
-	wL3B1pdxLpfyK+BpK2CefGuEAxQlRsjfSU6yufvxdfnKwfcC7QOJq2HGT8U/vZ7FAg8ZaFZBxq2YD
-	mq81wpUsbl4mgNBK2ZFls7OhPMsCSUWWkltmxqU88h97PL2VM8m7g5SdlM+nt7Cj5chlm3FQArLta
-	7YB1+g7A==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.94.2)
-	(envelope-from <leitao@debian.org>)
-	id 1vnfXG-005iji-2V; Wed, 04 Feb 2026 16:15:22 +0000
-From: Breno Leitao <leitao@debian.org>
-Date: Wed, 04 Feb 2026 08:15:12 -0800
-Subject: [PATCH] blk-cgroup: add CONFIG_BLK_CGROUP_DEBUG_STATS option
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="c8wd/yFe"
+Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-45e934bb51dso2660808b6e.1
+        for <linux-block@vger.kernel.org>; Wed, 04 Feb 2026 08:29:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1770222552; x=1770827352; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=O9Cy4ZG9D75M6RO/VmoqzuT0aEphF0+VmauEpS+Qd98=;
+        b=c8wd/yFewXgNLiFbbRXdcUzATVA8dj7vt6UJjUldGWPfF5go5sIYvUXXm//5uAZei2
+         xSApenc/T9j9YylBljZfNiIbCvM2Vrf1ePBoi+AoWklVyKmvXb1vOCEv3XMTiHvIdctU
+         yDqxIBBjWERCe6di60Rjoqy18Ac0l/H5T9RCeN7+AFKl62JADE2gkjrQoWTnnuutu813
+         SAHp22LZ4Ihuh4FAIiluu752HPMEILdn/R4H3dL8FTiQdHpvK+J+4qyIB7iuScZImavQ
+         E5gyw26tDXXlojzbmJvoD6ME8hLu4GNq1IutRLwlzPHiLgJ5dhJ31HIN11IlRByTnhgU
+         ho5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770222552; x=1770827352;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=O9Cy4ZG9D75M6RO/VmoqzuT0aEphF0+VmauEpS+Qd98=;
+        b=l6GB6OpsfsdpDd4CZSepCDN5kqX2clg8naJcY211ZJG/VGhZV6YqMjeF9adQwZsqHH
+         FLs5CNYG4hmZGo2KZoaBKwwv5iWiUUyZhU2kLbE8fEVPY6QwNFtSgi0b1Cps8qQgXToN
+         0S/OVNjH1xOBfknrbbkLBQWLQgmLosXXjU6X3xSasIU5fr1e9sRQuchcWaZOCFviF79I
+         ODnHkGz/BlWEZB1CCdIz0R84UYeMJaEmATpyrqxGtLTpSZa6X/sgeggcw8WpwCsNK7fb
+         uu+4TkUxNBoBuSfKXD5sLfeBf7pppG7O5/jOPPTI4f2S760FyQZ3CEOhxfL5jBpkz91d
+         Uinw==
+X-Gm-Message-State: AOJu0Yxk4lajkaorG5Q+FsabufBCSsiQBUiCkIcuETXWPrwUHKVA0GFk
+	NN02tQEVHqpXdl3IbXAiPy48yIb57hNrtOGGbYuWFE1w1blSmvoUAKH3nQ3NFcsvqs8=
+X-Gm-Gg: AZuq6aKEQ5CP2BS7VounOYqRHJhVK6Mc6SdMYzEfW9/uoNYOsDo6rfo4lSLlu612VJZ
+	ss7F6v23MYPxESewW//Nqk92Y77l/QG21PK4484D4MzCIL+hM49YIbdHoVvvGcTHtvTI2jdcatJ
+	a/TGsWBpXWRm+Bnupr4t6n/OjLUH4LE0BSYCS1X0IEGaoiUVFwnh+dGMLaB3zbreWmSpcDjHMFR
+	UsRCUKf2hH6w6bD7XYIRs/mKjBUilooXzFiAqMahAEFVIJsPQnYGoQsQeLdhgWB9eWCr7NcYSjS
+	/N1c1auLgOgH262CBSN/d6dcayppM/TYqWEvtbcBHcEH1afaAUrAciWVFEfSP4U9zqcrf80Z381
+	pXLhpwF4+8ckzfBQdBE/WyICzNO8gii0Q0ccE+pwdvOGpA37uSUYvI5MlR8TqrPk2lNMWAebXJq
+	mi4fDsGcyoSzEEl5PbavpmYRnkkZJTBxGH3L7It8drn+iaXQ5oQg7KX8p6bvTL+AA=
+X-Received: by 2002:a05:6808:bc2:b0:450:d28e:2509 with SMTP id 5614622812f47-462d5ab6738mr1488455b6e.66.1770222551943;
+        Wed, 04 Feb 2026 08:29:11 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-462d6614885sm1573550b6e.1.2026.02.04.08.29.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Feb 2026 08:29:08 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: Yang Xiuwei <yangxiuwei2025@163.com>
+Cc: linux-block@vger.kernel.org, Yang Xiuwei <yangxiuwei@kylinos.cn>
+In-Reply-To: <20260106024257.144974-1-yangxiuwei2025@163.com>
+References: <20260106024257.144974-1-yangxiuwei2025@163.com>
+Subject: Re: [PATCH] block: remove redundant kill_bdev() call in
+ set_blocksize()
+Message-Id: <177022254820.27547.9593412596108847919.b4-ty@kernel.dk>
+Date: Wed, 04 Feb 2026 09:29:08 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -41,99 +74,24 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260204-blk_cgroup_debug_stats-v1-1-09c0754b4242@debian.org>
-X-B4-Tracking: v=1; b=H4sIAJBwg2kC/yXMQQrCMBAAwK8se24gjUVjviIlNOk2rkpbsokUS
- v8u6nEus6NQZhJ0sGOmNwsvMzpoG8B4H+ZEikd0gEabsza6U+H19DHlpa5+pFCTlzIUUWTbYO1
- lusaTxgZwzTTx9otv/d9Sw4Ni+W54HB9WnuAdegAAAA==
-X-Change-ID: 20260204-blk_cgroup_debug_stats-e81b887f9c30
-To: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, 
- Josef Bacik <josef@toxicpanda.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- cgroups@vger.kernel.org, thevlad@meta.com, kernel-team@meta.com, 
- Breno Leitao <leitao@debian.org>
-X-Mailer: b4 0.15-dev-f4305
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2265; i=leitao@debian.org;
- h=from:subject:message-id; bh=VUXwFN/tQFzURvWM4nP/VXY6rg+eLJPscffz1scgyOc=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpg3CV/tamWhcKJHEkH+qxX1hGY9CbIBZsRrcE/
- 09p+DGfNzaJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaYNwlQAKCRA1o5Of/Hh3
- bYVPEACD/Wmep+MgW/Pr92FZLSZ0GUsJ+kz3UywUCV+HVyIiUqgl/SDwIQURe0wYtgrFF9G/b/N
- y7ymCLP1rjYUNvhvxXtzEWrgarnXj6Z8UMG+PHRilXYZco0TV/F7ZhqRnfp4iEHetT2q8XJPXkE
- kDiicrbZZTWSCfgrKjSPYqDf3Af3RDZF5qVTplph8ggn87LyXmJE/05aZ6PkVCPEppDc8c/sWFT
- 8o8JrGvqFws8DOY81eG6wCY0ZS1zqs4Co4eYk3MfaWAn9+tx5jCyJf5q9rw/PUM1HGVXirlXdnQ
- 8oTuGSDxU//M5ni3R6+EV21CPLcWd6m4wM7G0O00XAgc28FLA52Q2EJBYecvCvAKBmwjDvUK0BX
- z8P3SpyAGef6k2Q3Clq4tsKQ43RG/Pis05fydzjZpDRMvbP/YCSktOkCw6Ufjk+ZvyBj6+VMk3s
- lukkqhJj6r0CUG53YU0e4i+ZF8iHaw1jPNR0rX6jh9/r7u7JmANa+p43RO1sAfI609Vd+6U38MJ
- UA5pue1fmO1XDDqQszuCMhe7jYxYqTbdpzC/OwEeY1D3yK0ZzoilMShRToaPTqKiVpyfqWomi43
- ALZDlr0/ouPUqqc9hF3rWO2cZzVk3CSKzldU5d+no4cayrhmnbZ8SGiWIYIaGNkMJfdhTFWCYhY
- kLq3mxmaMEryhWA==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
-X-Debian-User: leitao
+X-Mailer: b4 0.14.3
 
-Add a Kconfig option to enable blkcg_debug_stats by default at compile
-time. When CONFIG_BLK_CGROUP_DEBUG_STATS is enabled, additional debugging
-information is shown in the cgroup io.stat file, including cost.wait,
-cost.indebt, and cost.indelay for iocost, as well as latency statistics
-for iolatency.
 
-The runtime module parameter blkcg_debug_stats remains functional,
-allowing the setting to be toggled regardless of the compile-time
-default.
+On Tue, 06 Jan 2026 10:42:57 +0800, Yang Xiuwei wrote:
+> The second kill_bdev() call in set_blocksize() is redundant as the first
+> call already clears all buffers and pagecache, and locks prevent new
+> pagecache creation between the calls.
+> 
+> 
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
-This option is commonly enabled by some hyperscalers, either through the
-command line or custom patches. Let's make it part of the kernel.
----
- block/Kconfig      | 15 +++++++++++++++
- block/blk-cgroup.c |  2 +-
- 2 files changed, 16 insertions(+), 1 deletion(-)
+Applied, thanks!
 
-diff --git a/block/Kconfig b/block/Kconfig
-index 15027963472d7..03fb95a24564c 100644
---- a/block/Kconfig
-+++ b/block/Kconfig
-@@ -170,6 +170,21 @@ config BLK_CGROUP_IOPRIO
- 	scheduler and block devices process requests. Only some I/O schedulers
- 	and some block devices support I/O priorities.
- 
-+config BLK_CGROUP_DEBUG_STATS
-+	bool "Enable blkcg debug stats by default"
-+	depends on BLK_CGROUP
-+	default n
-+	help
-+	Enable blkcg debug stats by default. This provides additional
-+	debugging information in the cgroup io.stat file, including
-+	cost.wait, cost.indebt, cost.indelay for iocost and latency
-+	statistics for iolatency.
-+
-+	This can also be enabled at runtime via the blkcg_debug_stats
-+	module parameter.
-+
-+	If unsure, say N.
-+
- config BLK_DEBUG_FS
- 	bool "Block layer debugging information in debugfs"
- 	default y
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 3cffb68ba5d87..67687d02b3cbc 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -56,7 +56,7 @@ static struct blkcg_policy *blkcg_policy[BLKCG_MAX_POLS];
- 
- static LIST_HEAD(all_blkcgs);		/* protected by blkcg_pol_mutex */
- 
--bool blkcg_debug_stats = false;
-+bool blkcg_debug_stats = IS_ENABLED(CONFIG_BLK_CGROUP_DEBUG_STATS);
- 
- static DEFINE_RAW_SPINLOCK(blkg_stat_lock);
- 
-
----
-base-commit: 4c87cdd0328495759f6e9f9f4e1e53ef8032a76f
-change-id: 20260204-blk_cgroup_debug_stats-e81b887f9c30
+[1/1] block: remove redundant kill_bdev() call in set_blocksize()
+      commit: d4d78dd43cecaeaadb24e78927a4d6fda7d1f1d9
 
 Best regards,
---  
-Breno Leitao <leitao@debian.org>
+-- 
+Jens Axboe
+
+
 
