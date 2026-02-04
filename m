@@ -1,103 +1,152 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A1D82566F7;
-	Wed,  4 Feb 2026 01:54:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DCE4288522
+	for <linux-block@vger.kernel.org>; Wed,  4 Feb 2026 01:54:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770170056; cv=none; b=gy87XTR8G7nXkrQ2wLfunX2JgmViwCrCg9urbna0d5U1qrBXrr0H7SL7nYwytvb64LEEUd5yPE+MRFvnqQFPkl3rgR7/ai7Q43nbtspj1FVWEfOO/pgr00Q6szlUN8KH0s0e/xqrVE5oxB/pginNY6M3E2hOBoWwnd6uGD3L5t4=
+	t=1770170086; cv=none; b=etmrA57L3KT2rsaTViNd/Iv6wwbRTm483q7K+IKwO5P2PnN0cfv1FOYzPUvVw11dnxenQPclLv3sHr6m2bAuXmLZwMleTEB3kW7AaEtT5H+7YVwu/Z87Bq0r46vstPUSmKPt/YdpaWivh1VmRv596pn7bSvz2C3pSrJAz8JcXuo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770170056; c=relaxed/simple;
-	bh=nvx0pzDMUCUQRnDLUIB4oTe85CB/B2famYO/awEkHsQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZGQ96FKzH2lwhsjgZl3w4AXz99J8kCNptQRzGAqyjFNo8pY1DVyRODuLGX1DPPtIjBkhW530yMD0kau8f1lCCe9yG2fRaQWHT+g6L7vedGpiPfr6CFT0SJS1t6iDD+s6Nrr5bZDOgXqN+E3as1C1H9pLni5hOVmbYQOa+B+m04o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 6312c92e016c11f1b0f03b4cfa9209d1-20260204
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
-	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
-	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
-	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
-	HR_TO_NO_NAME, IP_UNTRUSTED, SRC_UNTRUSTED, IP_UNFAMILIAR, SRC_UNFAMILIAR
-	DN_TRUSTED, SRC_TRUSTED, SA_TRUSTED, SA_EXISTED, SN_TRUSTED
-	SN_EXISTED, SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS, CIE_GOOD_SPF
-	CIE_UNKNOWN, GTI_FG_BS, GTI_RG_INFO, GTI_C_BU, AMN_GOOD
-	ABX_MISS_RDNS
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.6,REQID:093277ee-298b-4bae-bcee-417e6fd0f7fb,IP:10,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:5
-X-CID-INFO: VERSION:1.3.6,REQID:093277ee-298b-4bae-bcee-417e6fd0f7fb,IP:10,URL
-	:0,TC:0,Content:0,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
-	elease,TS:5
-X-CID-META: VersionHash:a9d874c,CLOUDID:0097b561cca95778e6a6bcdc1fce4b27,BulkI
-	D:2601282055117T6T78JL,BulkQuantity:2,Recheck:0,SF:17|19|38|66|78|81|82|10
-	2|127|850|898,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bu
-	lk:41,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0
-	,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 6312c92e016c11f1b0f03b4cfa9209d1-20260204
-X-User: tianyaxiong@kylinos.cn
-Received: from localhost.localdomain [(175.2.200.196)] by mailgw.kylinos.cn
-	(envelope-from <tianyaxiong@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 447492575; Wed, 04 Feb 2026 09:54:05 +0800
-From: Yaxiong Tian <tianyaxiong@kylinos.cn>
-To: axboe@kernel.dk,
-	rostedt@goodmis.org,
-	mhiramat@kernel.org,
-	mathieu.desnoyers@efficios.com
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	Yaxiong Tian <tianyaxiong@kylinos.cn>
-Subject: [PATCH v5 3/3] tracing/kprobes: Skip setup_boot_kprobe_events() when no cmdline event
-Date: Wed,  4 Feb 2026 09:54:01 +0800
-Message-Id: <20260204015401.163748-1-tianyaxiong@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260204015103.155025-1-tianyaxiong@kylinos.cn>
-References: <20260204015103.155025-1-tianyaxiong@kylinos.cn>
+	s=arc-20240116; t=1770170086; c=relaxed/simple;
+	bh=NLPFJAq9RDDV7RlMq2TKhkq8x9LqAZLW2s8SzHQEcWk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JgY0y7T700eSZNsu2IWyEiigY/hBl5XpRWe/JwFO+wT4r6ixPyTltEG5rjM4ERe+mf7NQKQ+82GHl9/JvjjSbIzRBPbFnBauGLkprZTUwCorKkZSZedYK69X3VxKS/o+8CDbIiunNyhgKfOwIRfq8eHNmzdYLUQI6NcV22ubufQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=LhgQP24u; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=uh9YDwP3; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=LhgQP24u; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=uh9YDwP3; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="LhgQP24u";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="uh9YDwP3";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="LhgQP24u";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="uh9YDwP3"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 4FA073E6D1;
+	Wed,  4 Feb 2026 01:54:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1770170083; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=E1ZYjNV2X28rMeAM+PFo3TqTGHBUzQa6SKV+CQkZEOQ=;
+	b=LhgQP24ueHurwisRL7JFwM/de9O1ovAMkjuKoGjl6zImQUTev/JploBIt3IGPmCpVtKW3O
+	PvpicrwOKuTPOv3c4APzw48PCrlaLWacq5jWIYefnb/wb7gnbkUQby/pWyMJBWON9qI2n7
+	FC4bNC5DXRRdx9Zbn5zaBsRsApRMfMU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1770170083;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=E1ZYjNV2X28rMeAM+PFo3TqTGHBUzQa6SKV+CQkZEOQ=;
+	b=uh9YDwP3nYTqAJDPV5VDeK48YvEtwRg5eaoB25Ne7Ax9KaY9yHHDZc1pVz8cGDGhPS4nUj
+	POJpniJts3rHYPDg==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=LhgQP24u;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=uh9YDwP3
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1770170083; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=E1ZYjNV2X28rMeAM+PFo3TqTGHBUzQa6SKV+CQkZEOQ=;
+	b=LhgQP24ueHurwisRL7JFwM/de9O1ovAMkjuKoGjl6zImQUTev/JploBIt3IGPmCpVtKW3O
+	PvpicrwOKuTPOv3c4APzw48PCrlaLWacq5jWIYefnb/wb7gnbkUQby/pWyMJBWON9qI2n7
+	FC4bNC5DXRRdx9Zbn5zaBsRsApRMfMU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1770170083;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=E1ZYjNV2X28rMeAM+PFo3TqTGHBUzQa6SKV+CQkZEOQ=;
+	b=uh9YDwP3nYTqAJDPV5VDeK48YvEtwRg5eaoB25Ne7Ax9KaY9yHHDZc1pVz8cGDGhPS4nUj
+	POJpniJts3rHYPDg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id CA5CA3EA63;
+	Wed,  4 Feb 2026 01:54:40 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id nuG6HuCmgmlrMgAAD6G6ig
+	(envelope-from <hare@suse.de>); Wed, 04 Feb 2026 01:54:40 +0000
+Message-ID: <ed53063e-fe45-47b4-8614-481a720f6a69@suse.de>
+Date: Wed, 4 Feb 2026 02:54:37 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 4/8] blk-mq: add a new queue sysfs attribute
+ async_depth
+To: Yu Kuai <yukuai@fnnas.com>, axboe@kernel.dk, linux-block@vger.kernel.org,
+ tj@kernel.org, nilay@linux.ibm.com, ming.lei@redhat.com
+Cc: bvanassche@acm.org
+References: <20260203081952.732210-1-yukuai@fnnas.com>
+ <20260203081952.732210-5-yukuai@fnnas.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20260203081952.732210-5-yukuai@fnnas.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Spam-Score: -4.51
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-0.997];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	MIME_TRACE(0.00)[0:+];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	ARC_NA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from,2a07:de40:b281:106:10:150:64:167:received];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:mid,suse.de:email]
+X-Spam-Level: 
+X-Rspamd-Action: no action
+X-Rspamd-Queue-Id: 4FA073E6D1
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Flag: NO
 
-When the 'kprobe_event=' kernel command-line parameter is not provided,
-there is no need to execute setup_boot_kprobe_events().
+On 2/3/26 09:19, Yu Kuai wrote:
+> Add a new field async_depth to request_queue and related APIs, this is
+> currently not used, following patches will convert elevators to use
+> this instead of internal async_depth.
+> 
+> Signed-off-by: Yu Kuai <yukuai@fnnas.com>
+> Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
+> ---
+>   block/blk-core.c       |  1 +
+>   block/blk-mq.c         |  6 ++++++
+>   block/blk-sysfs.c      | 42 ++++++++++++++++++++++++++++++++++++++++++
+>   block/elevator.c       |  1 +
+>   include/linux/blkdev.h |  1 +
+>   5 files changed, 51 insertions(+)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-This change optimizes the initialization function init_kprobe_trace()
-by skipping unnecessary work and effectively prevents potential blocking
-that could arise from contention on the event_mutex lock in subsequent
-operations.
+Cheers,
 
-Signed-off-by: Yaxiong Tian <tianyaxiong@kylinos.cn>
----
- kernel/trace/trace_kprobe.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/kernel/trace/trace_kprobe.c b/kernel/trace/trace_kprobe.c
-index 9953506370a5..89d2740f7bb5 100644
---- a/kernel/trace/trace_kprobe.c
-+++ b/kernel/trace/trace_kprobe.c
-@@ -2048,6 +2048,10 @@ static __init int init_kprobe_trace(void)
- 	trace_create_file("kprobe_profile", TRACE_MODE_READ,
- 			  NULL, NULL, &kprobe_profile_ops);
- 
-+	/* If no 'kprobe_event=' cmd is provided, return directly. */
-+	if (kprobe_boot_events_buf[0] == '\0')
-+		return 0;
-+
- 	setup_boot_kprobe_events();
- 
- 	return 0;
+Hannes
 -- 
-2.25.1
-
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
