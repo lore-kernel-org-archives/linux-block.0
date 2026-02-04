@@ -1,20 +1,20 @@
 Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 245772566F7;
-	Wed,  4 Feb 2026 01:53:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A78082566F7;
+	Wed,  4 Feb 2026 01:54:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770170038; cv=none; b=O6XjakdFsos+NgMRZN7NrO0gsATqmQqKrTGmIlFW0lH8+V7d4VWlbLoTPRgVSFPLq40/xcEhpxdb2vP/BjMGEDHfXE0KxNMvY7Sdlufw1zGrxWV1DHDiHOYiaOfEUSIofDQpKoQ6dhy4K9W/CUkbf9fPFigqc51ZDyIjedAta5U=
+	t=1770170047; cv=none; b=LzcmgGzg1dCfoGXLY3sLKKdeNplsZfmENiiwpoAAC8BQWVbHfEsZ/ixYDNlIwNFtwB07Rl1767uypOhjj1UYAWUsNnP6BlLrZJcRfQBgD/X0ilejiky5XRSulqwP8l89OXo2t8S7KsX4PtC7m1Kvk1RamcW0RREuWQ7xnr8kWPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770170038; c=relaxed/simple;
-	bh=gb8+RLwH1mLnHCvquqykDWLMdPea4d3L/yrMxNd7l2g=;
+	s=arc-20240116; t=1770170047; c=relaxed/simple;
+	bh=WEjxltr5Xt9TcsRaRQ3bSIUoWWFGhZ95yRImxuAXmAE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=S6cSfweKBTAYkA7azLYpamalyKtJXhVgoyzkxQ3DajVQBJ5aATrK5ervhlTDnwMOvXeazCUcSJdt1mQWUNc1ASNhRRaUpm8dbxQxZgQlmIQfKmbbk+L5r9+xaCU6M9ERmK3VQsYRcOuCiec5egXqe2eQDyU0f6E/JGEnF//xqC8=
+	 MIME-Version; b=bgPzGd1sO/NtSV3yzmnLySA2AshTht7m5EHZQduH301e/3kgM7qeA4k0CSXJNuGVdpkDLEql35+aCA3wvJJgOt8VNLQ5GzVrAXab6tZQ3jtt68AU4IYE+VaHAsWef+P3YiKSSeOKcb4RMw5CfIiRIUQc3XXQb45Bl9UgQVmYZnU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 58a04980016c11f1b0f03b4cfa9209d1-20260204
+X-UUID: 5ddff97c016c11f1b0f03b4cfa9209d1-20260204
 X-CTIC-Tags:
 	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
 	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
@@ -26,27 +26,27 @@ X-CTIC-Tags:
 	CIE_UNKNOWN, GTI_FG_BS, GTI_RG_INFO, GTI_C_BU, AMN_GOOD
 	ABX_MISS_RDNS
 X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.6,REQID:385d6458-5ae6-411f-80d3-ade1a969d0a0,IP:10,U
-	RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:0
-X-CID-INFO: VERSION:1.3.6,REQID:385d6458-5ae6-411f-80d3-ade1a969d0a0,IP:10,URL
-	:0,TC:0,Content:-5,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:a9d874c,CLOUDID:0afb1723e33868daa67ba680e2d5be25,BulkI
-	D:260128205414BPB3US2C,BulkQuantity:2,Recheck:0,SF:17|19|38|66|78|81|82|10
+X-CID-O-INFO: VERSION:1.3.6,REQID:a5e7a100-3b33-43d2-963e-8b92dba2615b,IP:10,U
+	RL:0,TC:0,Content:-25,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:-20
+X-CID-INFO: VERSION:1.3.6,REQID:a5e7a100-3b33-43d2-963e-8b92dba2615b,IP:10,URL
+	:0,TC:0,Content:-25,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-20
+X-CID-META: VersionHash:a9d874c,CLOUDID:8ee2fa70695bee6b271dd2c43c576882,BulkI
+	D:260204095359LKVTL8IS,BulkQuantity:0,Recheck:0,SF:17|19|38|66|78|81|82|10
 	2|127|850|898,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bu
-	lk:41,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0
-	,BRE:0,ARC:0
+	lk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:
+	0,BRE:0,ARC:0
 X-CID-BVR: 2,SSN|SDN
 X-CID-BAS: 2,SSN|SDN,0,_
 X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD
 X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 58a04980016c11f1b0f03b4cfa9209d1-20260204
+X-UUID: 5ddff97c016c11f1b0f03b4cfa9209d1-20260204
 X-User: tianyaxiong@kylinos.cn
 Received: from localhost.localdomain [(175.2.200.196)] by mailgw.kylinos.cn
 	(envelope-from <tianyaxiong@kylinos.cn>)
 	(Generic MTA)
-	with ESMTP id 1253373005; Wed, 04 Feb 2026 09:53:48 +0800
+	with ESMTP id 2065433284; Wed, 04 Feb 2026 09:53:56 +0800
 From: Yaxiong Tian <tianyaxiong@kylinos.cn>
 To: axboe@kernel.dk,
 	rostedt@goodmis.org,
@@ -56,9 +56,9 @@ Cc: linux-block@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-trace-kernel@vger.kernel.org,
 	Yaxiong Tian <tianyaxiong@kylinos.cn>
-Subject: [PATCH v5 1/3] tracing: Rename `eval_map_wq` and allow other parts of tracing use it
-Date: Wed,  4 Feb 2026 09:53:44 +0800
-Message-Id: <20260204015344.162818-1-tianyaxiong@kylinos.cn>
+Subject: [PATCH v5 2/3] blktrace: Make init_blk_tracer() asynchronous
+Date: Wed,  4 Feb 2026 09:53:53 +0800
+Message-Id: <20260204015353.163331-1-tianyaxiong@kylinos.cn>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20260204015103.155025-1-tianyaxiong@kylinos.cn>
 References: <20260204015103.155025-1-tianyaxiong@kylinos.cn>
@@ -70,89 +70,61 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The eval_map_work_func() function, though queued in eval_map_wq,
-holds the trace_event_sem read-write lock for a long time during
-kernel boot. This causes blocking issues for other functions.
+The init_blk_tracer() function causes significant boot delay as it
+waits for the trace_event_sem lock held by trace_event_update_all().
+Specifically, its child function register_trace_event() requires
+this lock, which is occupied for an extended period during boot.
 
-Rename eval_map_wq to trace_init_wq and make it global, thereby
-allowing other parts of tracing to schedule work on this queue
-asynchronously and avoiding blockage of the main boot thread.
+To resolve this, the execution of primary init_blk_tracer() is moved
+to the trace_init_wq workqueue, allowing it to run asynchronously,
+and prevent blocking the main boot thread.
 
-Suggested-by: Steven Rostedt <rostedt@goodmis.org>
 Signed-off-by: Yaxiong Tian <tianyaxiong@kylinos.cn>
 ---
- kernel/trace/trace.c | 18 +++++++++---------
- kernel/trace/trace.h |  1 +
- 2 files changed, 10 insertions(+), 9 deletions(-)
+ kernel/trace/blktrace.c | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
 
-diff --git a/kernel/trace/trace.c b/kernel/trace/trace.c
-index b1cb30a7b83d..01df88e77818 100644
---- a/kernel/trace/trace.c
-+++ b/kernel/trace/trace.c
-@@ -10774,7 +10774,7 @@ int tracing_init_dentry(void)
- extern struct trace_eval_map *__start_ftrace_eval_maps[];
- extern struct trace_eval_map *__stop_ftrace_eval_maps[];
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index d031c8d80be4..d611cd1f02ef 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -1832,7 +1832,9 @@ static struct trace_event trace_blk_event = {
+ 	.funcs		= &trace_blk_event_funcs,
+ };
  
--static struct workqueue_struct *eval_map_wq __initdata;
-+struct workqueue_struct *trace_init_wq __initdata;
- static struct work_struct eval_map_work __initdata;
- static struct work_struct tracerfs_init_work __initdata;
- 
-@@ -10790,15 +10790,15 @@ static int __init trace_eval_init(void)
+-static int __init init_blk_tracer(void)
++static struct work_struct blktrace_works __initdata;
++
++static int __init __init_blk_tracer(void)
  {
- 	INIT_WORK(&eval_map_work, eval_map_work_func);
- 
--	eval_map_wq = alloc_workqueue("eval_map_wq", WQ_UNBOUND, 0);
--	if (!eval_map_wq) {
--		pr_err("Unable to allocate eval_map_wq\n");
-+	trace_init_wq = alloc_workqueue("trace_init_wq", WQ_UNBOUND, 0);
-+	if (!trace_init_wq) {
-+		pr_err("Unable to allocate trace_init_wq\n");
- 		/* Do work here */
- 		eval_map_work_func(&eval_map_work);
- 		return -ENOMEM;
- 	}
- 
--	queue_work(eval_map_wq, &eval_map_work);
-+	queue_work(trace_init_wq, &eval_map_work);
+ 	if (!register_trace_event(&trace_blk_event)) {
+ 		pr_warn("Warning: could not register block events\n");
+@@ -1852,6 +1854,25 @@ static int __init init_blk_tracer(void)
  	return 0;
  }
  
-@@ -10807,8 +10807,8 @@ subsys_initcall(trace_eval_init);
- static int __init trace_eval_sync(void)
- {
- 	/* Make sure the eval map updates are finished */
--	if (eval_map_wq)
--		destroy_workqueue(eval_map_wq);
-+	if (trace_init_wq)
-+		destroy_workqueue(trace_init_wq);
- 	return 0;
- }
- 
-@@ -10969,9 +10969,9 @@ static __init int tracer_init_tracefs(void)
- 	if (ret)
- 		return 0;
- 
--	if (eval_map_wq) {
++static void __init blktrace_works_func(struct work_struct *work)
++{
++	__init_blk_tracer();
++}
++
++static int __init init_blk_tracer(void)
++{
++	int ret = 0;
++
 +	if (trace_init_wq) {
- 		INIT_WORK(&tracerfs_init_work, tracer_init_tracefs_work_func);
--		queue_work(eval_map_wq, &tracerfs_init_work);
-+		queue_work(trace_init_wq, &tracerfs_init_work);
- 	} else {
- 		tracer_init_tracefs_work_func(NULL);
- 	}
-diff --git a/kernel/trace/trace.h b/kernel/trace/trace.h
-index de4e6713b84e..9e8d52503618 100644
---- a/kernel/trace/trace.h
-+++ b/kernel/trace/trace.h
-@@ -769,6 +769,7 @@ extern cpumask_var_t __read_mostly tracing_buffer_mask;
- extern unsigned long nsecs_to_usecs(unsigned long nsecs);
++		INIT_WORK(&blktrace_works, blktrace_works_func);
++		queue_work(trace_init_wq, &blktrace_works);
++	} else {
++		ret = __init_blk_tracer();
++	}
++
++	return ret;
++}
++
+ device_initcall(init_blk_tracer);
  
- extern unsigned long tracing_thresh;
-+extern struct workqueue_struct *trace_init_wq __initdata;
- 
- /* PID filtering */
- 
+ static int blk_trace_remove_queue(struct request_queue *q)
 -- 
 2.25.1
 
