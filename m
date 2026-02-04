@@ -1,123 +1,97 @@
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D95462BD012
-	for <linux-block@vger.kernel.org>; Wed,  4 Feb 2026 15:30:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC6F3D994;
+	Wed,  4 Feb 2026 15:41:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770219055; cv=none; b=cnCpTPS/ae6NiI5RpmvaElYrNxV1cGOtR6DbcV1h1RS7XJ/3yN97tzb2E+kTXTeP39ILk/F7F4cGsmOgkzUBA9SBS5R3uwsVM3Yxwpw6NWxFpXfNFNdXkMQDp1JpdlrSGrzB8VSDfU1NkeIX0WIrMQNMTKIo5vZT+InnFCFTvfc=
+	t=1770219697; cv=none; b=Zgh+u3j5aYTP/nbi+tqHdDmsHHpggvAirWz9TkSN4Ul0R2GqCoxUHqoair+P/Hcii8E/HskE9BiapCmX06wY74i5d6fj19jr2n1vtImWdGOx5XB7rqoaG/zjjp68g+VvmR2CBbArx6jdjgGr6POlgc7g1ZfkSGUnqQLwp7KDUjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770219055; c=relaxed/simple;
-	bh=a7OAGpPMyyu4loh7iMCRQAaawYutoxtkzlPkls7sOMQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
-	 Content-Type:References; b=FinvwtWvCgEU5YA426WaiSmm1018/1LkJ83oB1xZEnQxlom2bZk8o40a51ylaDh8H+BH1O9NnC3PoX5+iryLNs+1JuFOKNjG/0ccIKjYa0AwxRH7drK+WLR+DPt+5g4OJnsz5fF0VoN94YSHZ50HKmCN6+PCBXmb2r/g9mWP/Vo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=i0cYTe7l; arc=none smtp.client-ip=203.254.224.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1770219697; c=relaxed/simple;
+	bh=RmfM/AZglZOEG9CAOPaE0engWdOby0R8qOmmSRG9PzY=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
+	 References:In-Reply-To; b=Ef9qVNbbIlZjYyUdJSWfoxCaEH4heCzoDaaK9YNPPbD1ElJEl846AJrARtdNuWHetFpmHI43z4NU+ZJrC1yOMxxVT/REUfg1yHkColr1gc7uTmvFuWs/e/YtdP82bAas6U0CGiRXOcF5sjyXYdUuFD3aavCTL9SfSA6qEUo0v7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YblZPv9N; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="i0cYTe7l"
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20260204153052epoutp022c47249d9ba587fb8bb5da4006637f8c~RFNmC85hP2649026490epoutp02z
-	for <linux-block@vger.kernel.org>; Wed,  4 Feb 2026 15:30:52 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20260204153052epoutp022c47249d9ba587fb8bb5da4006637f8c~RFNmC85hP2649026490epoutp02z
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1770219053;
-	bh=GMZkkwt+ygUc95YJRehpOJ9rDzYC29QaYgbwGeEI8Ug=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=i0cYTe7lQkN7aGv58NQgjHPtUvuHT+JX3mAt19E3Y83yRgGckZc9FfmXCOTcv38ND
-	 Me2yK0JIjdDdfHzWZdiDgTZssJudS2tncWvp/JQtVj8RGnJ3e80Hgm1e9eGk5fT6Hj
-	 W8vHYvibHO7mYSbxNp8l7/podEfvyPtyuEjRM1Bs=
-Received: from epsnrtp02.localdomain (unknown [182.195.42.154]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTPS id
-	20260204153052epcas5p2a5dd889761fbbe0da0188d4f55423645~RFNlpYRUi0658106581epcas5p23;
-	Wed,  4 Feb 2026 15:30:52 +0000 (GMT)
-Received: from epcas5p2.samsung.com (unknown [182.195.38.95]) by
-	epsnrtp02.localdomain (Postfix) with ESMTP id 4f5kp34KGfz2SSKX; Wed,  4 Feb
-	2026 15:30:51 +0000 (GMT)
-Received: from epsmtip2.samsung.com (unknown [182.195.34.31]) by
-	epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-	20260204153051epcas5p1c2efd01ef32883680fed2541f9fca6c2~RFNkOnJ8g2260322603epcas5p16;
-	Wed,  4 Feb 2026 15:30:51 +0000 (GMT)
-Received: from green245.gost (unknown [107.99.41.245]) by
-	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20260204153049epsmtip22ed4d2525789b012deef6b6b5c76c314~RFNii_-zk3140331403epsmtip2K;
-	Wed,  4 Feb 2026 15:30:48 +0000 (GMT)
-Date: Wed, 4 Feb 2026 20:56:34 +0530
-From: Nitesh Shetty <nj.shetty@samsung.com>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: linux-block@vger.kernel.org, io-uring <io-uring@vger.kernel.org>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, Christian
-	=?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>, Christoph Hellwig
-	<hch@lst.de>, Kanchan Joshi <joshi.k@samsung.com>, Anuj Gupta
-	<anuj20.g@samsung.com>, "lsf-pc@lists.linux-foundation.org"
-	<lsf-pc@lists.linux-foundation.org>
-Subject: Re: [LSF/MM/BPF TOPIC] dmabuf backed read/write
-Message-ID: <20260204152634.gyybb2axszwpewrk@green245.gost>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YblZPv9N"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E497AC19423;
+	Wed,  4 Feb 2026 15:41:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770219697;
+	bh=RmfM/AZglZOEG9CAOPaE0engWdOby0R8qOmmSRG9PzY=;
+	h=Date:Subject:Cc:To:From:References:In-Reply-To:From;
+	b=YblZPv9NZoOzZEJVNv8HA1+4sFt1ES94BtjWj/jwWQhsxY3vxHvf7DqTQjEjeqbo2
+	 FJ58mPfgwvoLWUwCabHSjaw7P9XfHuXBYHi9pP4P0EN9anoZf58friJHJvHzYEZKJ3
+	 YSf1Sg9av7M3sW/wxmVSYf+8H9OQTpsN4hyu1DXefDBPyPxBT/EDgF1GIkrJNmKzE2
+	 /Pn7KQINq88+5nWE0xyysbbTiRv94r/J9PC/wIXx0LkQ+Rexm9iDVw8wj4CY3cOtm3
+	 yjgIAK1AFaVnQOwfUfyNh0bCF4+GnX9NHHcHDgSINoTEsHr0Scg8O22oJZ0KOaSpVZ
+	 FhpluNISWJfGg==
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <4796d2f7-5300-4884-bd2e-3fcc7fdd7cea@gmail.com>
-X-CMS-MailID: 20260204153051epcas5p1c2efd01ef32883680fed2541f9fca6c2
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-	boundary="----dZkOkAIazzHoUX-2rQXwJ8woeHD-_lbejx.E5KOGiu3cq0eS=_150a72_"
-CMS-TYPE: 105P
-cpgsPolicy: CPGSC10-542,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20260204153051epcas5p1c2efd01ef32883680fed2541f9fca6c2
-References: <4796d2f7-5300-4884-bd2e-3fcc7fdd7cea@gmail.com>
-	<CGME20260204153051epcas5p1c2efd01ef32883680fed2541f9fca6c2@epcas5p1.samsung.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 04 Feb 2026 16:41:28 +0100
+Message-Id: <DG6AIA0QK77C.EKG7X4NBEJ00@kernel.org>
+Subject: Re: [PATCH v14 1/9] rust: types: Add Ownable/Owned types
+Cc: "Miguel Ojeda" <ojeda@kernel.org>, "Boqun Feng" <boqun.feng@gmail.com>,
+ "Gary Guo" <gary@garyguo.net>, =?utf-8?q?Bj=C3=B6rn_Roy_Baron?=
+ <bjorn3_gh@protonmail.com>, "Benno Lossin" <lossin@kernel.org>, "Alice
+ Ryhl" <aliceryhl@google.com>, "Trevor Gross" <tmgross@umich.edu>, "Greg
+ Kroah-Hartman" <gregkh@linuxfoundation.org>, "Dave Ertman"
+ <david.m.ertman@intel.com>, "Ira Weiny" <ira.weiny@intel.com>, "Leon
+ Romanovsky" <leon@kernel.org>, "Paul Moore" <paul@paul-moore.com>, "Serge
+ Hallyn" <sergeh@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>,
+ "David Airlie" <airlied@gmail.com>, "Simona Vetter" <simona@ffwll.ch>,
+ "Alexander Viro" <viro@zeniv.linux.org.uk>, "Christian Brauner"
+ <brauner@kernel.org>, "Jan Kara" <jack@suse.cz>, "Igor Korotin"
+ <igor.korotin.linux@gmail.com>, "Daniel Almeida"
+ <daniel.almeida@collabora.com>, "Lorenzo Stoakes"
+ <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ "Viresh Kumar" <vireshk@kernel.org>, "Nishanth Menon" <nm@ti.com>, "Stephen
+ Boyd" <sboyd@kernel.org>, "Bjorn Helgaas" <bhelgaas@google.com>,
+ =?utf-8?q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+ <linux-kernel@vger.kernel.org>, <rust-for-linux@vger.kernel.org>,
+ <linux-block@vger.kernel.org>, <linux-security-module@vger.kernel.org>,
+ <dri-devel@lists.freedesktop.org>, <linux-fsdevel@vger.kernel.org>,
+ <linux-mm@kvack.org>, <linux-pm@vger.kernel.org>,
+ <linux-pci@vger.kernel.org>, "Asahi Lina" <lina+kernel@asahilina.net>
+To: "Andreas Hindborg" <a.hindborg@kernel.org>
+From: "Danilo Krummrich" <dakr@kernel.org>
+References: <20260204-unique-ref-v14-0-17cb29ebacbb@kernel.org>
+ <20260204-unique-ref-v14-1-17cb29ebacbb@kernel.org>
+In-Reply-To: <20260204-unique-ref-v14-1-17cb29ebacbb@kernel.org>
 
-------dZkOkAIazzHoUX-2rQXwJ8woeHD-_lbejx.E5KOGiu3cq0eS=_150a72_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-
-On 03/02/26 02:29PM, Pavel Begunkov wrote:
->Good day everyone,
+On Wed Feb 4, 2026 at 12:56 PM CET, Andreas Hindborg wrote:
+> From: Asahi Lina <lina+kernel@asahilina.net>
 >
->dma-buf is a powerful abstraction for managing buffers and DMA mappings,
->and there is growing interest in extending it to the read/write path to
->enable device-to-device transfers without bouncing data through system
->memory. I was encouraged to submit it to LSF/MM/BPF as that might be
->useful to mull over details and what capabilities and features people
->may need.
+> By analogy to `AlwaysRefCounted` and `ARef`, an `Ownable` type is a
+> (typically C FFI) type that *may* be owned by Rust, but need not be. Unli=
+ke
+> `AlwaysRefCounted`, this mechanism expects the reference to be unique
+> within Rust, and does not allow cloning.
 >
->The proposal consists of two parts. The first is a small in-kernel
->framework that allows a dma-buf to be registered against a given file
->and returns an object representing a DMA mapping. The actual mapping
->creation is delegated to the target subsystem (e.g. NVMe). This
->abstraction centralises request accounting, mapping management, dynamic
->recreation, etc. The resulting mapping object is passed through the I/O
->stack via a new iov_iter type.
+> Conceptually, this is similar to a `KBox<T>`, except that it delegates
+> resource management to the `T` instead of using a generic allocator.
 >
->As for the user API, a dma-buf is installed as an io_uring registered
->buffer for a specific file. Once registered, the buffer can be used by
->read / write io_uring requests as normal. io_uring will enforce that the
->buffer is only used with "compatible files", which is for now restricted
->to the target registration file, but will be expanded in the future.
->Notably, io_uring is a consumer of the framework rather than a
->dependency, and the infrastructure can be reused.
+> This change is a derived work based on work by Asahi Lina
+> <lina+kernel@asahilina.net> [1] and Oliver Mangold <oliver.mangold@pm.me>=
+.
 >
-We have been following the series, its interesting from couple of angles,
-- IOPS wise we see a major improvement especially for IOMMU
-- Series provides a way to do p2pdma to accelerator memory
+> Link: https://lore.kernel.org/rust-for-linux/20250202-rust-page-v1-1-e317=
+0d7fe55e@asahilina.net/ [1]
+> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 
-Here are few topics which I am looking into specifically,
-- Right now the series uses a PRP list. We need a good way to keep the
-   sg_table info around and decide on‑the‑fly whether to expose the buffer
-   as a PRP list or an SG list, depending on the I/O size.
-- Possibility of futher optimization for new type of iov iter to reduce
-   per IO cost
+Given the From: line above, this needs Lina's SoB.
 
-Thanks,
-Nitesh
+This patch was also originally posted by Abdiel and Boqun and I think we sh=
+ould
+account for this. I mentioned this in a couple of previous versions already=
+,
+e.g. in [1]. I think we should account for this.
 
-------dZkOkAIazzHoUX-2rQXwJ8woeHD-_lbejx.E5KOGiu3cq0eS=_150a72_
-Content-Type: text/plain; charset="utf-8"
-
-
-------dZkOkAIazzHoUX-2rQXwJ8woeHD-_lbejx.E5KOGiu3cq0eS=_150a72_--
+[1] https://lore.kernel.org/all/cc28d048-5e0f-4f0e-b0f2-1b9e240f639b@kernel=
+.org/
