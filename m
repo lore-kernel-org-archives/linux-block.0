@@ -1,95 +1,155 @@
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sg-1-18.ptr.blmpb.com (sg-1-18.ptr.blmpb.com [118.26.132.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DB413644D2
-	for <linux-block@vger.kernel.org>; Wed,  4 Feb 2026 06:07:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CF90385505
+	for <linux-block@vger.kernel.org>; Wed,  4 Feb 2026 06:44:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770185250; cv=none; b=c4ZMRVulBZoV3bdGcCXn7F+mogqatKvimHxzagOIbNCrNB4JZsApLVnZXjuem1+ylot8EGkvRVBxJGH910pcJtamvb64IJpSLMvP4md54Om0/8QN6Txvl5z++dnlVeRy00Q5h1q/yUpvGk1RavxI0Hyc8mgCjYK2nyIvajgpRv4=
+	t=1770187483; cv=none; b=hTJN8cOta9cFCN8OY6UU64zJEWOuDc7rlj2eiWzGRo2L9/ShHOA3JQa/M6pYa/tNumgdNCgy+fsq966Vv2UDQz/u0xm3d8Ldwh2XSU2iFMhN8hDvDi+ZxIhJdhgt7UZ2NqK1aAiEiy8yuTKzOrLaPbdPsoowhS0lMpkLu/D1mUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770185250; c=relaxed/simple;
-	bh=vFeASoXmH/a8+nINHgGsmh6ICV7WwiJIChiSbgDwE7s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type:References; b=CoLRBc0XpPFs2o+m7XHF9f9J4+irlPF3u+B9CkBjBtbHnOnEUycNm00VdghFuVb5K3nkOA0YtjzBP4Qvh47c6zC4zq5sHfFoAjFYlnJ1EDYWr673bYAPNpb0w9PVzAH99lby8TDe1Q9FUfCqEIRSrMsJ0W9bM6B7mInDqfpMQNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=NhzBjLSH; arc=none smtp.client-ip=203.254.224.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	s=arc-20240116; t=1770187483; c=relaxed/simple;
+	bh=Z/qv8hIzfC+7bCZ6iww8n5urT94nR+ZITtVjDfdX/2M=;
+	h=To:Subject:References:Mime-Version:In-Reply-To:Cc:Content-Type:
+	 From:Date:Message-Id; b=VP6oSnjvUYamkIs+LcqPzQB9yxgd4G+CuhCXOCj1f1UfVlGLa3TL7wexMsgcebmOtco/YbCV6PoDko5CFrqHRYpPhNmTtakezgsnVfpf9h0KEdPczbNiaz/J0N+nGcU6QRa1AiDVjHtJVxwIz8UW0018OLxai7fMkT4P90TSVjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=pass smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=WtZyk/Ia; arc=none smtp.client-ip=118.26.132.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fnnas.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="NhzBjLSH"
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20260204060727epoutp028496a3769ff5cb680799c05c06836c06~Q9hqm4Bu60207102071epoutp02C
-	for <linux-block@vger.kernel.org>; Wed,  4 Feb 2026 06:07:27 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20260204060727epoutp028496a3769ff5cb680799c05c06836c06~Q9hqm4Bu60207102071epoutp02C
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1770185247;
-	bh=y2frTBlrPcApGJAKcojyrODxcLgxJHU1QEnp9KWJoZE=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=NhzBjLSHtZQSQfwpotD0ry+Zimlaaw5fqm639OJbdbhO5fR5z5AnqlhFlOCe902o8
-	 frZCx7w8qfrbc9ahl5e4C1eLYZNUptEigCQ8ZEOyCMxJPQOOiJ1ezeBjZ7cSv9MUPd
-	 pWrdY+SkrHWCbDZFh9P9kvzipTxVl2Dyw8JReVZ8=
-Received: from epsnrtp02.localdomain (unknown [182.195.42.154]) by
-	epcas5p2.samsung.com (KnoxPortal) with ESMTPS id
-	20260204060727epcas5p232ff332ff546f37733e37b0c13d6cada~Q9hqaEc0W0625406254epcas5p2u;
-	Wed,  4 Feb 2026 06:07:27 +0000 (GMT)
-Received: from epcas5p4.samsung.com (unknown [182.195.38.94]) by
-	epsnrtp02.localdomain (Postfix) with ESMTP id 4f5VHy44lQz2SSKd; Wed,  4 Feb
-	2026 06:07:26 +0000 (GMT)
-Received: from epsmtip2.samsung.com (unknown [182.195.34.31]) by
-	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-	20260204060726epcas5p3816adfde071ae343471ac7a6a33a0e82~Q9ho7YiaV1775217752epcas5p3N;
-	Wed,  4 Feb 2026 06:07:26 +0000 (GMT)
-Received: from [107.122.10.194] (unknown [107.122.10.194]) by
-	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20260204060722epsmtip24e8143a262629db8288b2256b0e51ace~Q9hlWsA3n1083210832epsmtip2D;
-	Wed,  4 Feb 2026 06:07:22 +0000 (GMT)
-Message-ID: <beb2ebf6-8207-4bbe-a77c-ccb09e2d841e@samsung.com>
-Date: Wed, 4 Feb 2026 11:37:20 +0530
+	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="WtZyk/Ia"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1770187471;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=i+9AfGJMfN0HhM1ZePCGgsCVg25yjlBNrKsHci7KeXU=;
+ b=WtZyk/Ia9Ih6K3JtUnKkxsNQ3Rlbm9m+IwZlUSmBe8EKgnJvHaDl9eIHjuiFgNVV31MvqD
+ LhY6ee8tovGwYC09pKLcTjNW2MXPAYy5mptkxNTt219/tT0Q4XkVStafaNZS/saFb9sqyP
+ inBlj0Wrk2iEHr4er/ZDY5M2kKSRWX8EHZsW82WvZt2e/t1J6UH/pqVIoWB2cq+F23c5Ms
+ nQyhXpDrFqONCi+9P52knBk78aQDMpRjIMCUHyaddMcOmsmLecLCIBAFDgIQfWS8nGw5Do
+ ArL40qMSjan2GRG+d3fJ5n5+jU9BzDyc0YAkFkU9XRx7jZQAgZwH5s0AjfIBKw==
+To: =?utf-8?q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>
+Subject: Re: [PATCH v2 6/7] blk-cgroup: allocate pds before freezing queue in blkcg_activate_policy()
+X-Lms-Return-Path: <lba+26982eacd+847e39+vger.kernel.org+yukuai@fnnas.com>
+Received: from [192.168.1.104] ([39.182.0.137]) by smtp.feishu.cn with ESMTPS; Wed, 04 Feb 2026 14:44:28 +0800
+References: <20260203080602.726505-1-yukuai@fnnas.com> <20260203080602.726505-7-yukuai@fnnas.com> <gq45vl55n2gucipjc5jk5e5kp7ups3nw672ua6nvksooycezv5@lfr62hy5br4f>
+Reply-To: yukuai@fnnas.com
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [LSF/MM/BPF TOPIC] dmabuf backed read/write
-To: Keith Busch <kbusch@kernel.org>, Pavel Begunkov <asml.silence@gmail.com>
-Cc: linux-block@vger.kernel.org, io-uring <io-uring@vger.kernel.org>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, Christoph
-	Hellwig <hch@lst.de>, Kanchan Joshi <joshi.k@samsung.com>, Nitesh Shetty
-	<nj.shetty@samsung.com>, "lsf-pc@lists.linux-foundation.org"
-	<lsf-pc@lists.linux-foundation.org>
+Mime-Version: 1.0
+In-Reply-To: <gq45vl55n2gucipjc5jk5e5kp7ups3nw672ua6nvksooycezv5@lfr62hy5br4f>
+Cc: <tj@kernel.org>, <josef@toxicpanda.com>, <axboe@kernel.dk>, 
+	<cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>, 
+	<linux-kernel@vger.kernel.org>, <zhengqixing@huawei.com>, 
+	<hch@infradead.org>, <ming.lei@redhat.com>, <nilay@linux.ibm.com>, 
+	<yukuai@fnnas.com>
 Content-Language: en-US
-From: Anuj Gupta/Anuj Gupta <anuj20.g@samsung.com>
-In-Reply-To: <aYI5S1puAZ-rPvlC@kbusch-mbp>
-Content-Transfer-Encoding: 8bit
-X-CMS-MailID: 20260204060726epcas5p3816adfde071ae343471ac7a6a33a0e82
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-cpgsPolicy: CPGSC10-542,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20260203180716epcas5p1c9658e583e26197b515f6db07a100aa9
-References: <4796d2f7-5300-4884-bd2e-3fcc7fdd7cea@gmail.com>
-	<CGME20260203180716epcas5p1c9658e583e26197b515f6db07a100aa9@epcas5p1.samsung.com>
-	<aYI5S1puAZ-rPvlC@kbusch-mbp>
+Content-Type: text/plain; charset=UTF-8
+From: "Yu Kuai" <yukuai@fnnas.com>
+Date: Wed, 4 Feb 2026 14:44:26 +0800
+Message-Id: <fe9f7cc4-a9dc-4809-9d98-d5158c17c983@fnnas.com>
+User-Agent: Mozilla Thunderbird
+Content-Transfer-Encoding: quoted-printable
+X-Original-From: Yu Kuai <yukuai@fnnas.com>
 
-On 2/3/2026 11:37 PM, Keith Busch wrote:
-> Thanks for submitting the topic. The performance wins look great, but
-> I'm a little surpised passthrough didn't show any difference. We're
-> still skipping a bit of transformations with the dmabuf compared to not
-> having it, so maybe it's just a matter of crafting the right benchmark
-> to show the benefit.
-> 
+Hi,
 
-Those numbers were from a drive that saturates at ~5M IOPS, 
-sopassthrough didn’t have much headroom. I did a quick run with two such
-drives and saw a small improvement (~2–3%): ~5.97 MIOPS -> ~6.13 MIOPS,
-but I’ll try tweaking the kernel config a bit to see if there’s more
-headroom.
+=E5=9C=A8 2026/2/3 17:06, Michal Koutn=C3=BD =E5=86=99=E9=81=93:
+> On Tue, Feb 03, 2026 at 04:06:01PM +0800, Yu Kuai <yukuai@fnnas.com> wrot=
+e:
+>> Some policies like iocost and iolatency perform percpu allocation in
+>> pd_alloc_fn(). Percpu allocation with queue frozen can cause deadlock
+>> because percpu memory reclaim may issue IO.
+>>
+>> Now that q->blkg_list is protected by blkcg_mutex,
+> With this ^^^
+>
+> ...
+>> restructure
+>> blkcg_activate_policy() to allocate all pds before freezing the queue:
+>> 1. Allocate all pds with GFP_KERNEL before freezing the queue
+>> 2. Freeze the queue
+>> 3. Initialize and online all pds
+>>
+>> Note: Future work is to remove all queue freezing before
+>> blkcg_activate_policy() to fix the deadlocks thoroughly.
+>>
+>> Signed-off-by: Yu Kuai <yukuai@fnnas.com>
+>> ---
+>>   block/blk-cgroup.c | 90 +++++++++++++++++-----------------------------
+>>   1 file changed, 32 insertions(+), 58 deletions(-)
+>>
+>> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+>> index 0206050f81ea..7fcb216917d0 100644
+>> --- a/block/blk-cgroup.c
+>> +++ b/block/blk-cgroup.c
+>> @@ -1606,8 +1606,7 @@ static void blkcg_policy_teardown_pds(struct reque=
+st_queue *q,
+>>   int blkcg_activate_policy(struct gendisk *disk, const struct blkcg_pol=
+icy *pol)
+>>   {
+>>   	struct request_queue *q =3D disk->queue;
+>> -	struct blkg_policy_data *pd_prealloc =3D NULL;
+>> -	struct blkcg_gq *blkg, *pinned_blkg =3D NULL;
+>> +	struct blkcg_gq *blkg;
+>>   	unsigned int memflags;
+>>   	int ret;
+>>  =20
+>> @@ -1622,90 +1621,65 @@ int blkcg_activate_policy(struct gendisk *disk, =
+const struct blkcg_policy *pol)
+> ...
+>
+>> +	/* Now freeze queue and initialize/online all pds */
+>> +	if (queue_is_mq(q))
+>> +		memflags =3D blk_mq_freeze_queue(q);
+>> +
+>> +	spin_lock_irq(&q->queue_lock);
+>> +	list_for_each_entry_reverse(blkg, &q->blkg_list, q_node) {
+>> +		struct blkg_policy_data *pd =3D blkg->pd[pol->plid];
+>> +
+>> +		/* Skip dying blkg */
+>> +		if (hlist_unhashed(&blkg->blkcg_node))
+>> +			continue;
+>> +
+>> +		spin_lock(&blkg->blkcg->lock);
+>>   		if (pol->pd_init_fn)
+>>   			pol->pd_init_fn(pd);
+>> -
+>>   		if (pol->pd_online_fn)
+>>   			pol->pd_online_fn(pd);
+>>   		pd->online =3D true;
+>> -
+>>   		spin_unlock(&blkg->blkcg->lock);
+>>   	}
+>>  =20
+>>   	__set_bit(pol->plid, q->blkcg_pols);
+>> -	ret =3D 0;
+>> -
+>>   	spin_unlock_irq(&q->queue_lock);
+>> -out:
+>> -	mutex_unlock(&q->blkcg_mutex);
+>> +
+>>   	if (queue_is_mq(q))
+>>   		blk_mq_unfreeze_queue(q, memflags);
+>> -	if (pinned_blkg)
+>> -		blkg_put(pinned_blkg);
+>> -	if (pd_prealloc)
+>> -		pol->pd_free_fn(pd_prealloc);
+>> -	return ret;
+>> +	mutex_unlock(&q->blkcg_mutex);
+>> +	return 0;
+> Why is q->queue_lock still needed here?
 
-+1 on the topic - I'm interested in attending the discussion and
-reviewing/testing v3 when it lands.
+I do want to remove queue_lock for accessing blkgs. However, this set just =
+protect q->blkg_list
+with blkg_mutex, and I'll remove the queue_lock after everything is convert=
+ed to blkg_mutex.
 
-Thanks,
-Anuj
+>
+> Thanks,
+> Michal
+
+--=20
+Thansk,
+Kuai
