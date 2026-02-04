@@ -1,155 +1,131 @@
-Received: from sg-1-18.ptr.blmpb.com (sg-1-18.ptr.blmpb.com [118.26.132.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CF90385505
-	for <linux-block@vger.kernel.org>; Wed,  4 Feb 2026 06:44:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A60173A1D13;
+	Wed,  4 Feb 2026 10:15:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770187483; cv=none; b=hTJN8cOta9cFCN8OY6UU64zJEWOuDc7rlj2eiWzGRo2L9/ShHOA3JQa/M6pYa/tNumgdNCgy+fsq966Vv2UDQz/u0xm3d8Ldwh2XSU2iFMhN8hDvDi+ZxIhJdhgt7UZ2NqK1aAiEiy8yuTKzOrLaPbdPsoowhS0lMpkLu/D1mUk=
+	t=1770200156; cv=none; b=qT0CXYYjfU6kzsxi5FgMZwLIuwudJ/2YPDCgZMg+8N/iI0wbQ5SueRxELPi+T4Ly4CZKp/xAFiwTBRzocJneJrL9GNVqWSmqwgrLBPVCr2YSPCWE/pW4uLmXkR1DYAqPRmpf9SvILAHzkM7swwYnDg/RWeUNNEJaEgnOhBeTN2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770187483; c=relaxed/simple;
-	bh=Z/qv8hIzfC+7bCZ6iww8n5urT94nR+ZITtVjDfdX/2M=;
-	h=To:Subject:References:Mime-Version:In-Reply-To:Cc:Content-Type:
-	 From:Date:Message-Id; b=VP6oSnjvUYamkIs+LcqPzQB9yxgd4G+CuhCXOCj1f1UfVlGLa3TL7wexMsgcebmOtco/YbCV6PoDko5CFrqHRYpPhNmTtakezgsnVfpf9h0KEdPczbNiaz/J0N+nGcU6QRa1AiDVjHtJVxwIz8UW0018OLxai7fMkT4P90TSVjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=pass smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=WtZyk/Ia; arc=none smtp.client-ip=118.26.132.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fnnas.com
+	s=arc-20240116; t=1770200156; c=relaxed/simple;
+	bh=Vml1Yv6/8IU5ssSk3RIZ6pAEqcuSbNl+cNLCkYETK7Q=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=rm/rKWSvyxcN4HtJsh6GxbO/7qgSiAeaXnHiiDl1LvAtlyhtYjO5XpVGmFIpFqLbBSTGHA9MvJnL8PoSSrAdLAWsZ/B+2tq8oAmCB9Hp5rA+EXKIKSkDcXWfQHCkZ4JGJBHC++gHR76CMLK3+evARGQXwjVHy8VfQSGTWhYG46g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OhPgqJW9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="WtZyk/Ia"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1770187471;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=i+9AfGJMfN0HhM1ZePCGgsCVg25yjlBNrKsHci7KeXU=;
- b=WtZyk/Ia9Ih6K3JtUnKkxsNQ3Rlbm9m+IwZlUSmBe8EKgnJvHaDl9eIHjuiFgNVV31MvqD
- LhY6ee8tovGwYC09pKLcTjNW2MXPAYy5mptkxNTt219/tT0Q4XkVStafaNZS/saFb9sqyP
- inBlj0Wrk2iEHr4er/ZDY5M2kKSRWX8EHZsW82WvZt2e/t1J6UH/pqVIoWB2cq+F23c5Ms
- nQyhXpDrFqONCi+9P52knBk78aQDMpRjIMCUHyaddMcOmsmLecLCIBAFDgIQfWS8nGw5Do
- ArL40qMSjan2GRG+d3fJ5n5+jU9BzDyc0YAkFkU9XRx7jZQAgZwH5s0AjfIBKw==
-To: =?utf-8?q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>
-Subject: Re: [PATCH v2 6/7] blk-cgroup: allocate pds before freezing queue in blkcg_activate_policy()
-X-Lms-Return-Path: <lba+26982eacd+847e39+vger.kernel.org+yukuai@fnnas.com>
-Received: from [192.168.1.104] ([39.182.0.137]) by smtp.feishu.cn with ESMTPS; Wed, 04 Feb 2026 14:44:28 +0800
-References: <20260203080602.726505-1-yukuai@fnnas.com> <20260203080602.726505-7-yukuai@fnnas.com> <gq45vl55n2gucipjc5jk5e5kp7ups3nw672ua6nvksooycezv5@lfr62hy5br4f>
-Reply-To: yukuai@fnnas.com
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OhPgqJW9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 340D0C4CEF7;
+	Wed,  4 Feb 2026 10:15:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770200156;
+	bh=Vml1Yv6/8IU5ssSk3RIZ6pAEqcuSbNl+cNLCkYETK7Q=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=OhPgqJW9B8KO9AoTInwb0hRe9dxoo6qrc6bfA7bEOupUPrUBOdOA1I6vHZ5+IlSSJ
+	 EWMFCy2f+wK6/D7yf4+2fD2UIgYfbiqboS55m4CzrT3ka4Cq3sSMXuRW4hnvujIjsN
+	 ShSAPfe4uEEG8pVUQkT7DgSjgB4a+ealjvIbj6C2SZzKScMLr2EERe2iysydlUMzze
+	 aU2MMR/1nGkROoSrQL/5sWNyWTFuJMQehdxMQFKrlfyGct0RMaCxb+ixTiGzyksllW
+	 joHRHiJA8l3bw0ZEMrXD4N0q1nlVDXDDccud9NV6hJ60d37Lrvz3lD6liMWdUfTi1z
+	 Uj88ljHQ/ycuw==
+Date: Wed, 4 Feb 2026 19:15:52 +0900
+From: Masami Hiramatsu (Google) <mhiramat@kernel.org>
+To: Yaxiong Tian <tianyaxiong@kylinos.cn>
+Cc: axboe@kernel.dk, rostedt@goodmis.org, mathieu.desnoyers@efficios.com,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 0/3] Tracing: Accelerate Kernel Boot by
+ Asynchronizing
+Message-Id: <20260204191552.881a00764093cf63557a372a@kernel.org>
+In-Reply-To: <20260204015103.155025-1-tianyaxiong@kylinos.cn>
+References: <20260204015103.155025-1-tianyaxiong@kylinos.cn>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-In-Reply-To: <gq45vl55n2gucipjc5jk5e5kp7ups3nw672ua6nvksooycezv5@lfr62hy5br4f>
-Cc: <tj@kernel.org>, <josef@toxicpanda.com>, <axboe@kernel.dk>, 
-	<cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>, 
-	<linux-kernel@vger.kernel.org>, <zhengqixing@huawei.com>, 
-	<hch@infradead.org>, <ming.lei@redhat.com>, <nilay@linux.ibm.com>, 
-	<yukuai@fnnas.com>
-Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8
-From: "Yu Kuai" <yukuai@fnnas.com>
-Date: Wed, 4 Feb 2026 14:44:26 +0800
-Message-Id: <fe9f7cc4-a9dc-4809-9d98-d5158c17c983@fnnas.com>
-User-Agent: Mozilla Thunderbird
-Content-Transfer-Encoding: quoted-printable
-X-Original-From: Yu Kuai <yukuai@fnnas.com>
+Content-Transfer-Encoding: 8bit
 
-Hi,
+On Wed,  4 Feb 2026 09:51:03 +0800
+Yaxiong Tian <tianyaxiong@kylinos.cn> wrote:
 
-=E5=9C=A8 2026/2/3 17:06, Michal Koutn=C3=BD =E5=86=99=E9=81=93:
-> On Tue, Feb 03, 2026 at 04:06:01PM +0800, Yu Kuai <yukuai@fnnas.com> wrot=
-e:
->> Some policies like iocost and iolatency perform percpu allocation in
->> pd_alloc_fn(). Percpu allocation with queue frozen can cause deadlock
->> because percpu memory reclaim may issue IO.
->>
->> Now that q->blkg_list is protected by blkcg_mutex,
-> With this ^^^
->
-> ...
->> restructure
->> blkcg_activate_policy() to allocate all pds before freezing the queue:
->> 1. Allocate all pds with GFP_KERNEL before freezing the queue
->> 2. Freeze the queue
->> 3. Initialize and online all pds
->>
->> Note: Future work is to remove all queue freezing before
->> blkcg_activate_policy() to fix the deadlocks thoroughly.
->>
->> Signed-off-by: Yu Kuai <yukuai@fnnas.com>
->> ---
->>   block/blk-cgroup.c | 90 +++++++++++++++++-----------------------------
->>   1 file changed, 32 insertions(+), 58 deletions(-)
->>
->> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
->> index 0206050f81ea..7fcb216917d0 100644
->> --- a/block/blk-cgroup.c
->> +++ b/block/blk-cgroup.c
->> @@ -1606,8 +1606,7 @@ static void blkcg_policy_teardown_pds(struct reque=
-st_queue *q,
->>   int blkcg_activate_policy(struct gendisk *disk, const struct blkcg_pol=
-icy *pol)
->>   {
->>   	struct request_queue *q =3D disk->queue;
->> -	struct blkg_policy_data *pd_prealloc =3D NULL;
->> -	struct blkcg_gq *blkg, *pinned_blkg =3D NULL;
->> +	struct blkcg_gq *blkg;
->>   	unsigned int memflags;
->>   	int ret;
->>  =20
->> @@ -1622,90 +1621,65 @@ int blkcg_activate_policy(struct gendisk *disk, =
-const struct blkcg_policy *pol)
-> ...
->
->> +	/* Now freeze queue and initialize/online all pds */
->> +	if (queue_is_mq(q))
->> +		memflags =3D blk_mq_freeze_queue(q);
->> +
->> +	spin_lock_irq(&q->queue_lock);
->> +	list_for_each_entry_reverse(blkg, &q->blkg_list, q_node) {
->> +		struct blkg_policy_data *pd =3D blkg->pd[pol->plid];
->> +
->> +		/* Skip dying blkg */
->> +		if (hlist_unhashed(&blkg->blkcg_node))
->> +			continue;
->> +
->> +		spin_lock(&blkg->blkcg->lock);
->>   		if (pol->pd_init_fn)
->>   			pol->pd_init_fn(pd);
->> -
->>   		if (pol->pd_online_fn)
->>   			pol->pd_online_fn(pd);
->>   		pd->online =3D true;
->> -
->>   		spin_unlock(&blkg->blkcg->lock);
->>   	}
->>  =20
->>   	__set_bit(pol->plid, q->blkcg_pols);
->> -	ret =3D 0;
->> -
->>   	spin_unlock_irq(&q->queue_lock);
->> -out:
->> -	mutex_unlock(&q->blkcg_mutex);
->> +
->>   	if (queue_is_mq(q))
->>   		blk_mq_unfreeze_queue(q, memflags);
->> -	if (pinned_blkg)
->> -		blkg_put(pinned_blkg);
->> -	if (pd_prealloc)
->> -		pol->pd_free_fn(pd_prealloc);
->> -	return ret;
->> +	mutex_unlock(&q->blkcg_mutex);
->> +	return 0;
-> Why is q->queue_lock still needed here?
+> On my ARM64 platform, I observed that certain tracing module
+> initializations run for up to 200ms—for example, init_kprobe_trace().
+> Analysis reveals the root cause: the execution flow eval_map_work_func()
+> →trace_event_update_with_eval_map()→trace_event_update_all()
+> is highly time-consuming. Although this flow is placed in eval_map_wq
+> for asynchronous execution, it holds the trace_event_sem lock, causing
+> other modules to be blocked either directly or indirectly. Also in
+> init_blk_tracer(), this functions require trace_event_sem device_initcall.
+> 
+> To resolve this issue, I rename `eval_map_wq` and make it global and moved
+> init_blk_tracer that are related to this lock to run asynchronously on this
+> workqueue. Also check for kprobe_event= grub parameter; if not provided,
+> init_kprobe_trace() returns directly. After optimization, boot time is
+> reduced by approximately 200ms.
+> 
+> 
+> Based on my analysis and testing, I've identified that only these two
+> locations significantly impact timing. Other initcall_* functions do not
+> exhibit relevant lock contention.
+> 
+> A brief summary of the test results is as follows:
+> Before this PATCHS:
+> [    0.224933] calling  init_kprobe_trace+0x0/0xe0 @ 1
+> [    0.455016] initcall init_kprobe_trace+0x0/0xe0 returned 0 after 230080 usecs
+> 
+> Only opt setup_boot_kprobe_events() can see:
+> [    0.258609] calling  init_blk_tracer+0x0/0x68 @ 1
+> [    0.454991] initcall init_blk_tracer+0x0/0x68 returned 0 after 196377 usecs
+> 
+> After this PATCHS:
+> [    0.224940] calling  init_kprobe_trace+0x0/0xe0 @ 1
+> [    0.224946] initcall init_kprobe_trace+0x0/0xe0 returned 0 after 3 usecs
+> skip --------
+> [    0.264835] calling  init_blk_tracer+0x0/0x68 @ 1
+> [    0.264841] initcall init_blk_tracer+0x0/0x68 returned 0 after 2 usecs
 
-I do want to remove queue_lock for accessing blkgs. However, this set just =
-protect q->blkg_list
-with blkg_mutex, and I'll remove the queue_lock after everything is convert=
-ed to blkg_mutex.
+Looks good to me.
 
->
-> Thanks,
-> Michal
+Acked-by: Masami Hiramatsu (Google) <mhiramat@kernel.org>
 
---=20
-Thansk,
-Kuai
+Thanks!
+
+> 
+> ---
+> Changes in v2:
+> - Rename eval_map_wq to trace_init_wq.
+> Changes in v3:
+> - Opt PATCH 1/3 commit
+> Changes in v4:
+> - add trace_async_init boot parameter in patch2
+> - add init_kprobe_trace's skip logic in patch3
+> - add Suggested-by tag 
+> - Other synchronous optimizations related to trace_async_init
+> https://lore.kernel.org/all/20260128125117.1704853-1-tianyaxiong@kylinos.cn/
+> Changes in v5:
+> - remove trace_async_init boot parameter (patch2 v4)
+> - remove make  Make setup_boot_kprobe_events() asynchronous (patch4 v4)
+> - Adjusted the patch sequence.
+> 
+> 
+> Yaxiong Tian (3):
+>   tracing: Rename `eval_map_wq` and allow other parts of tracing use it
+>   blktrace: Make init_blk_tracer() asynchronous
+>   tracing/kprobes: Skip setup_boot_kprobe_events() when no cmdline event
+> 
+>  kernel/trace/blktrace.c     | 23 ++++++++++++++++++++++-
+>  kernel/trace/trace.c        | 18 +++++++++---------
+>  kernel/trace/trace.h        |  1 +
+>  kernel/trace/trace_kprobe.c |  4 ++++
+>  4 files changed, 36 insertions(+), 10 deletions(-)
+> 
+> -- 
+> 2.25.1
+> 
+> 
+
+
+-- 
+Masami Hiramatsu (Google) <mhiramat@kernel.org>
