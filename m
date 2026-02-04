@@ -1,146 +1,63 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E567E28980E
-	for <linux-block@vger.kernel.org>; Wed,  4 Feb 2026 01:58:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CA8C2C11FA
+	for <linux-block@vger.kernel.org>; Wed,  4 Feb 2026 02:28:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770170315; cv=none; b=czXtoZWtAN64a4pwV33U3rS5QLrTh31zbz2HLxjELJtR8EJyQWeOJafO/qXRu5ceI/Efg1xDH1VZDAUsIq5wUKB6JmbnolE+YkIafYuGl8beD2yAVitUggmE/o4H2gMotix/6WGuUmI7NTyoqbiLLoRhSD+F9ALiFzFBYT+K1rI=
+	t=1770172115; cv=none; b=MKrbEpcg6vO5FpUeJadxvfACzHhiPl54qs+kW17FpwaqGEuXBxplXPsn3mkd6AUo1vsqP8eVI5+ndAH6vWbz85YZUWQkbglWCwZMozhWVFZM00fmFtnExpTBLfzzJcvQn69gIpOgmdg2g/LpGSCD8L+GYnE3xFjrMqv60imigxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770170315; c=relaxed/simple;
-	bh=5VrRkS+zgKK9bZFLext8nWIteAYPEBCgW8mhE9whUjk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pjklWD2SDnfQ/4c2wj7wOrRijPcebpugGqlsGDCi8aKCZlBF/DkOs616Z1ylFqQcUJDUaAupRIQWRqCXznaUxkRj7Q/fOMP8TGwAtr3zuQ6mrbjDRmQapv+8knJ5iJmH87dQ0ykDCd/qTtqCZuR3+VPoDHL7iau4uUbDUgiS4T0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=yt45ZQnc; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=UgMz51K3; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=yt45ZQnc; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=UgMz51K3; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1770172115; c=relaxed/simple;
+	bh=XDRVb9CWRW+G0SfTvZO0zjDG1jtMDeYXPxuCpAp6xms=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=aZTpV1Rm57ja7esrzMgzFRPgPhJZJSlz1BvqAEy/H88bF4QTPzkw3OM1yehGr7wrzkVSbKHMfzD0F85aYnxz9MDC0mZoiIaLdPsQgGMTSRNPEXJ73+JF+lB02+FyzOAnOqR95rdlKtwtHwP6clyATgLiGGhaM1rjim9xFWp4Ub4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=UXGlxCKV; arc=none smtp.client-ip=117.135.210.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="yt45ZQnc";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="UgMz51K3";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="yt45ZQnc";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="UgMz51K3"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 019BB5BCC7;
-	Wed,  4 Feb 2026 01:58:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1770170312; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vjaUR9nsig9iP+E9O+05swY8bJuPkeSHlsRz0TGkVtk=;
-	b=yt45ZQnc0W/vPeeFPACRvK5+4mRt/G4wtq8+OnhxvT31VT8ZfV2CGBBOeXjgfQkezXQQBx
-	Ia1rgg5ySFXoVy+r8En8UpEECKXyaKXt0qssrmGqtq8yWwmy41G2D+UcYGwJsnAvAroKYG
-	RpOka6zETWVQWUQcJNecbyId8xf+TKM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1770170312;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vjaUR9nsig9iP+E9O+05swY8bJuPkeSHlsRz0TGkVtk=;
-	b=UgMz51K3zLp27faqFUdTpY4DXUosgdFl0oYc7GqluxvUDZJIy7luZ8S8rHy9t2aZhHOtpn
-	2tsO60DO1n7BWSBA==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=yt45ZQnc;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=UgMz51K3
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1770170312; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vjaUR9nsig9iP+E9O+05swY8bJuPkeSHlsRz0TGkVtk=;
-	b=yt45ZQnc0W/vPeeFPACRvK5+4mRt/G4wtq8+OnhxvT31VT8ZfV2CGBBOeXjgfQkezXQQBx
-	Ia1rgg5ySFXoVy+r8En8UpEECKXyaKXt0qssrmGqtq8yWwmy41G2D+UcYGwJsnAvAroKYG
-	RpOka6zETWVQWUQcJNecbyId8xf+TKM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1770170312;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vjaUR9nsig9iP+E9O+05swY8bJuPkeSHlsRz0TGkVtk=;
-	b=UgMz51K3zLp27faqFUdTpY4DXUosgdFl0oYc7GqluxvUDZJIy7luZ8S8rHy9t2aZhHOtpn
-	2tsO60DO1n7BWSBA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5BAE63EA63;
-	Wed,  4 Feb 2026 01:58:29 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id yfhGBMWngmlregAAD6G6ig
-	(envelope-from <hare@suse.de>); Wed, 04 Feb 2026 01:58:29 +0000
-Message-ID: <2e66760b-9a52-4577-93e2-f0331f03e3d8@suse.de>
-Date: Wed, 4 Feb 2026 02:58:26 +0100
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="UXGlxCKV"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=5u
+	y2FZqZ06G3MYx+hL/Vnhq+ZuzXJJyK5+7hfPg8cK0=; b=UXGlxCKVimWX6F3qZ2
+	Ysb1TmgGpTZa75/G87tMpDCUNNiGzU4x8VN2kjr+F1KOl95ggdjR2pBb+fygTkOT
+	VPnIZzVTAAm40lRpEaUHXtuRmF9gMur4TnC65gnqc0j6QK5ZxZlddBwq4W+35FZ7
+	bgbxdKq6YrFU1HJTvWyoNsXog=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g0-2 (Coremail) with SMTP id _____wD3_3a7roJpzxzJKw--.22037S2;
+	Wed, 04 Feb 2026 10:28:13 +0800 (CST)
+From: Yang Xiuwei <yangxiuwei2025@163.com>
+To: axboe@kernel.dk
+Cc: linux-block@vger.kernel.org
+Subject: Re: [PATCH] block: remove redundant kill_bdev() call in set_blocksize()
+Date: Wed,  4 Feb 2026 10:28:11 +0800
+Message-Id: <20260204022811.3498546-1-yangxiuwei2025@163.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20260106024257.144974-1-yangxiuwei2025@163.com>
+References: <20260106024257.144974-1-yangxiuwei2025@163.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 7/8] block, bfq: convert to use
- request_queue->async_depth
-To: Yu Kuai <yukuai@fnnas.com>, axboe@kernel.dk, linux-block@vger.kernel.org,
- tj@kernel.org, nilay@linux.ibm.com, ming.lei@redhat.com
-Cc: bvanassche@acm.org
-References: <20260203081952.732210-1-yukuai@fnnas.com>
- <20260203081952.732210-8-yukuai@fnnas.com>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20260203081952.732210-8-yukuai@fnnas.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-0.997];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	ARC_NA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received,2a07:de40:b281:104:10:150:64:97:from];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:dkim,suse.de:email]
-X-Spam-Flag: NO
-X-Spam-Score: -4.51
-X-Rspamd-Queue-Id: 019BB5BCC7
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spam-Level: 
+X-CM-TRANSID:_____wD3_3a7roJpzxzJKw--.22037S2
+X-Coremail-Antispam: 1Uf129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+	VFW2AGmfu7bjvjm3AaLaJ3UbIYCTnIWIevJa73UjIFyTuYvj4iWlkqDUUUU
+X-CM-SenderInfo: p1dqw55lxzvxisqskqqrwthudrp/xtbC6R3VZmmCrr31TAAA3G
 
-On 2/3/26 09:19, Yu Kuai wrote:
-> The default limits is unchanged, and user can configure async_depth now.
-> 
-> Signed-off-by: Yu Kuai <yukuai@fnnas.com>
-> Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
-> ---
->   block/bfq-iosched.c | 43 +++++++++++++++++--------------------------
->   1 file changed, 17 insertions(+), 26 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+Hi Jens,
 
-Cheers,
+I wanted to gently follow up on a patch I sent on Jan 6, 2026 to 
+remove a redundant kill_bdev() call in set_blocksize(). Christoph 
+Hellwig reviewed it on Jan 8, 2026 with a Reviewed-by tag.
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+I haven't seen it merged yet, so I wanted to check if it's still 
+pending in your queue. I understand you're very busy, so no rush - 
+just wanted to make sure it's on your radar.
+
+Thanks for your time!
+
+Best regards,
+Yang Xiuwei
+
