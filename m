@@ -1,141 +1,196 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f49.google.com (mail-yx1-f49.google.com [74.125.224.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E72A940B6DB;
-	Wed,  4 Feb 2026 13:48:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770212939; cv=none; b=IaiORfi5RK62VgfKbYyhIbqgnIKQ/YdkHRj/tfZcCXIN+B5u/FJO6FFH+sgdFZ2iq9fDp3vzp6rIozfNSdlZFy6BX/qCpCnadmDTe0dp9G1dYv91UG90Wv5jLvECJp1WM50aBLzzhec0k3OOSYeEGocEgXGd7xhrtz/TuOyzrUk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770212939; c=relaxed/simple;
-	bh=pc9zD6AGH0779UZk+DuKfn4l01qz37hu1Ou3/rMWP/o=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=U6PJscERFTmR33/SGe8COZ9p8ZslM0SHC5NHvCP3EVHfL7sVCL+pl/Sameml5tAD+D0xBg3GS6GCO6nB4m1XMcCG9uyDWFs8NNPzzSCR7+LEgm2C0Zfp2y+knvI67HpGezeMC9zFPt9ti0Ptox8+xYzAhcagCuGpkqvMfw31xnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pn+7zita; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4E521CF7D5
+	for <linux-block@vger.kernel.org>; Wed,  4 Feb 2026 14:31:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770215481; cv=pass; b=aqRob5qtGkFrl6k4itmRtiPiW7B+rc1XfKdtwnNypk+q8YiQEs8v4zWRoIvJd36ekuJpbLZnJ8t/Z6KEksLsSKKfjxl5ExmKm28ySxnynP3pYv6edmuUwii0Bdm9fb3GsiGHxPMTNq8wymybAGBhUfhiDdOoDAg5H68oDJkqro8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770215481; c=relaxed/simple;
+	bh=VeU1M/+PLjDRdSdinp+x/60VrhCRA3f0z0U08KL3du0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cMW9OlhgTej5hhWMxKw7k+0vASNZj4OWn31o/IZIICCVtKIRx/YP6m4dm6au2eh9c/aD384rDFh8pQNIm0E+Q4a590tkldDSu0cxHnjwB0J0ANpcDvzsdaCBp97TaPxe4JuXKkwE3DuiYSJNDrKpYF7KOHh2ScMxKiZipYvhMzg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=cVGIRotZ; arc=pass smtp.client-ip=74.125.224.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pn+7zita"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C3B18C16AAE;
-	Wed,  4 Feb 2026 13:48:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770212938;
-	bh=pc9zD6AGH0779UZk+DuKfn4l01qz37hu1Ou3/rMWP/o=;
-	h=From:Subject:Date:To:Cc:Reply-To:From;
-	b=Pn+7zitau8dsBWxCJ/Po0WKOyYvBGRrURL5BuXh/VP36NBXTyCoEJdm3E5Mdrhqfq
-	 lL3S8Xm64GgVHK6EQNAMFLxWuwaUNqIGOtaiWIc9szT7gtd16urZmagC9B1+2V+7cP
-	 kcTu1e3QTZaom/DIiG7pYFO6J+YoyanShIHk4wObDB6pLnq4slSsi5F2GpbwbEMx1v
-	 9U32saX28N8lzHSuH+Z51vE0MsV4npEG7Y8LYPQyw1idsI1BFCWqn5iLTbW2rlZVux
-	 tv2RLxe4xvFXxDoKWuD0tsktyLlSumaPj21FlSABGCj3Ak+QCh/4sRuUVRh8kbLMkm
-	 f7B6S+XzdXDmQ==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF649E9538B;
-	Wed,  4 Feb 2026 13:48:57 +0000 (UTC)
-From: Jihan LIN via B4 Relay <devnull+linjh22s.gmail.com@kernel.org>
-Subject: [PATCH RFC 0/3] zram: Allow zcomps to manage their own streams
-Date: Wed, 04 Feb 2026 13:48:50 +0000
-Message-Id: <20260204-b4_zcomp_stream-v1-0-35c06ce1d332@gmail.com>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cVGIRotZ"
+Received: by mail-yx1-f49.google.com with SMTP id 956f58d0204a3-649dbff9727so1159322d50.3
+        for <linux-block@vger.kernel.org>; Wed, 04 Feb 2026 06:31:20 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770215480; cv=none;
+        d=google.com; s=arc-20240605;
+        b=TaFCrdePkkEyLIcs3flLgh+IsON4qA23NK2ITGwVN1C8bUssg6bB870ji1lwq9AdDA
+         S17ock9FnPluZs2JVBDXlSUPV14JPvRJosSnEyot5Hp3EWGSZMzLu+HCePJI+MfVJgH/
+         9i4FSi1/OGB0XZ1uLqFSjIvXCwEmUQxIaEni0jv/frQdvZB1DRjr8N5ywYe4T+WeXRg+
+         fXpJAdYRY/QNrgdJ0PT58arBrH/DZVxNCIktzhgocUuN5dCwY1HnMHceMrVqqkBaq82z
+         S9Etle6W4NqmSlKAIplwzKkyzlJTY3ml6M3bSCiBZoOxiysq6RysBAxWXyt/Famxx5VJ
+         wZdw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=dI+cml2Ore4hIHpIJvCr+cPhA0RJkwTrbCvVMmSJFk8=;
+        fh=CtqKfInXfN04wsF7PFVIzxaWNNmTNlagD7A1VCj0LI8=;
+        b=Qi+ydJZY3cDYnRgzaCBjwkvcsIescY9jYsbvR/QyHmAnTtdx5SW05cdCogqL1B9aEm
+         z/jMR4briP2k+jeqZCioTcsroexz/GXdgfM77JDUx6dicX98bVGOuqARpDOD3b98TZpW
+         qeUnQq4K3kUUkMy/GQ6U5bIXIGEh9Dbe9Mviv34rWCkKmoM6UEVDVgO/YiwdrNHOBKVx
+         JI/ZoVkMfXg36sFTksuLVUtM+3dHL63+RWKVXwJ0wWbH6vrftfYMVhf7Ne4mKhLSZpsc
+         mpy2RueoAXMZgDp0Pn5DwcjZPsfdJJrBqP2WuJ57HFfOsr8U2PuyLZy05GzHmXB98JoG
+         TTMg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1770215480; x=1770820280; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=dI+cml2Ore4hIHpIJvCr+cPhA0RJkwTrbCvVMmSJFk8=;
+        b=cVGIRotZeWoXwteae1+pUw0PuU1R3gckrsrRbUmOHUs336JjKKecQj030iJTPuCKOz
+         8mo813apBO0a1SadlbMFURGvxLIy7EwBQsK91/V64xx+hkZJRpk1YDBz5QkxDr4PEEJQ
+         BaE9eBsZzrZbiq/RCnxe293Hw1jNXYW8eMmASyID8JcWIRTfCgfBju70TOFMvPx3/o1y
+         rZmmcRnOV01pPAa/mIobR8RVsU/Do/nN80Qgs+OZpgZR2mBTDBYsLCn6V7a4EGDM+Rph
+         xaiTAyVATTAho13twlb97EsTOwD67nXw3/NsqoTA3Lj+Csd7oHNgdQUgbSa6dxUl8w7z
+         cjlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770215480; x=1770820280;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dI+cml2Ore4hIHpIJvCr+cPhA0RJkwTrbCvVMmSJFk8=;
+        b=NuhHww7L9NdiUJQ1xu92v8KOEwj5wXyEoPHabotNJsV/We5AVWtNTB/FUrcwDnpHsx
+         pUlxzob9q3xYRMZvJq1lS+jgNsPoXiOnSj5g08iIlovCT1MV0AYmI/Et/aFb0ISorg1y
+         2FF+7f9UbqYposMICZSIm2UJ6jGVOyvdDrS/WocIfdAy8541TpEDicD8km/8oO7+HJoE
+         SkRvvPVT+jJkbLiFANJ+g/MvKi5XWXIfVqpmX7106MwX/z03+8SsNmwPsMF2rwiBGUGo
+         +DoN/OOiDHYkz/Z+uK00/H0zwIRebj0ZoFmhr1qRBeDjJiUfyYRA8WQGVoPzPrqKdbGo
+         3ucg==
+X-Forwarded-Encrypted: i=1; AJvYcCVkjcGULe+CDUat+Qw2l4Rcve2IaCdpr+NikQAgKJspZ4wzvvu15xl/YJD7tJ2mXJw41S6RNPA+aQLZig==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy4LIhaeeBn7/tFE/rBBHnc9DknPcMoYMe2gh7KXhsFwAFUY3VS
+	xcveSB2ZYmmA3az8h+c22/dsquaThU1TP7Oebri2oP+BIzBNS8oLm2vlJR147xBGAsYFun63Skw
+	Xq55UvfZ+qjiDe7nykndboT6floAnMu/rtWeEWC9kUV9OmU6nKIpD3h4=
+X-Gm-Gg: AZuq6aItT22kO2ISYL1QBBGurvV3YsBwQ05/jY+VUbJeOLQBW94l54uT6eT91Ebc8fh
+	v+7rukG18/boolvZXAIEpxBv6L8v4lKQyxS/t27J1u+hvAH8a2aY+m/MrxFJB9LvCgKzpzyIcNt
+	zsz2wMcAyzEOp9CrQR+tdVYvI82zXWnILHWc5pYR/MbVn54xRH23+Cx8m5A4tWexYvsLh2DDIAL
+	bB+blzw8DwLEW5U+aFmZs6wXS1RRwPDpu78//OewxFtYYsgYgGEHtWdTwkW2kPdy1r/SXlV45aS
+	toZjDxc=
+X-Received: by 2002:a05:690e:11ce:b0:649:64d4:8127 with SMTP id
+ 956f58d0204a3-649db33311emr2635192d50.4.1770215479555; Wed, 04 Feb 2026
+ 06:31:19 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAEJOg2kC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDIzMDIKGbZBJflZyfWxBfXFKUmpira55qmWZuYWGSamhkoQTUVVCUmpZZATY
- xWinIzVkptrYWAHqm2bFmAAAA
-X-Change-ID: 20260202-b4_zcomp_stream-7e9f7884e128
-To: Minchan Kim <minchan@kernel.org>, 
- Sergey Senozhatsky <senozhatsky@chromium.org>, Jens Axboe <axboe@kernel.dk>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
- Jihan LIN <linjh22s@gmail.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1770212935; l=3744;
- i=linjh22s@gmail.com; s=linjh22s_machine; h=from:subject:message-id;
- bh=pc9zD6AGH0779UZk+DuKfn4l01qz37hu1Ou3/rMWP/o=;
- b=4SsG2RqijlRLSQ8Y2rIR4aTpFpmzdHPT9SqREaJPrkg9S+oH8KLUA3tOjM6z7p08YaCO/0haT
- foiz3YYYU4FAWr7+UkX43u+xl3ZpHSv+FRPi3qG6X+mPwyyqRJMA0xI
-X-Developer-Key: i=linjh22s@gmail.com; a=ed25519;
- pk=MnRQAVFy1t4tiGb8ce7ohJwrN2YFXd+dA7XmzR6GmUc=
-X-Endpoint-Received: by B4 Relay for linjh22s@gmail.com/linjh22s_machine
- with auth_id=592
-X-Original-From: Jihan LIN <linjh22s@gmail.com>
-Reply-To: linjh22s@gmail.com
+References: <20260204034003.2961402-1-ziniu.wang_1@nxp.com> <20260204034003.2961402-3-ziniu.wang_1@nxp.com>
+In-Reply-To: <20260204034003.2961402-3-ziniu.wang_1@nxp.com>
+From: Ulf Hansson <ulf.hansson@linaro.org>
+Date: Wed, 4 Feb 2026 15:30:41 +0100
+X-Gm-Features: AZwV_QgI7Imdfxcsknmh62CBzZI03NFl9MPDU-nwW2BMZCSmMmoB66KvDFFoZiw
+Message-ID: <CAPDyKFr1UhsDakJaP-W39=n-DhM4F0KTWTaEwXZRmLpnKa+y=A@mail.gmail.com>
+Subject: Re: [PATCH v4 2/2] mmc: add quirk to optimize certain Kingston eMMC
+ secure erase/trim performance
+To: ziniu.wang_1@nxp.com
+Cc: axboe@kernel.dk, hch@infradead.org, linux-block@vger.kernel.org, 
+	linux-mmc@vger.kernel.org, linux-kernel@vger.kernel.org, imx@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-Hi all,
+On Wed, 4 Feb 2026 at 04:38, <ziniu.wang_1@nxp.com> wrote:
+>
+> From: Luke Wang <ziniu.wang_1@nxp.com>
+>
+> Kingston eMMC IY2964 and IB2932 takes a fixed ~2 seconds for each secure
+> erase/trim operation regardless of size - that is, a single secure
+> erase/trim operation of 1MB takes the same time as 1GB. With default
+> calculated 3.5MB max discard size, secure erase 1GB requires ~300 separate
+> operations taking ~10 minutes total.
+>
+> Add MMC_QUIRK_FIXED_SECURE_ERASE_TRIM_TIME quirk to set maximum secure
+> erase size for those devices. This allows 1GB secure erase to complete
+> in a single operation, reducing time from 10 minutes to just 2 seconds.
+>
+> Signed-off-by: Luke Wang <ziniu.wang_1@nxp.com>
 
-This RFC series introduces a new interface to allow zram compression
-backends to manage their own streams, in addition to the existing
-per-CPU stream model.
+Even if the optimized performance requires patch1, I decided to apply
+$subject patch as is for next as it doesn't make anything worse as a
+standalone patch. I also added a stable-tag to it.
 
-Current zram manages compression contexts via preemptive per-CPU
-streams, which strictly limits concurrency to the number of online CPUs. 
-In contrast, hardware accelerators specialized for page compression
-generally process PAGE_SIZE payloads (e.g. 4K) using standard
-algorithms. These devices expose the limitations of this model due to
-the following features:
- - These devices utilize a hardware queue to batch requests. A typical
-   queue depth (e.g., 256) far exceeds the number of available CPUs.
- - These devices are asymmetric. Submission is generally fast and
-   asynchronous, but completion implies latency.
- - Some devices only support compression requests, leaving decompression
-   to be handled by software.
+Patch1, is better merged via Jens' block tee.
 
-This exposes the limitations of the current zcomp architecture, which
-assumes a model where streams are inherently tied to CPU execution
-contexts. This design is not flexible enough to integrate with such
-backends, as it forces a one-size-fits-all model that limits the ability
-to offload compression operations from CPU.
+Kind regards
+Uffe
 
-This series proposes a hybrid approach. While maintaining full backward
-compatibility with existing backends, this series introduces a new set
-of operations, op->{get, put}_streams(), for backends that wish to
-manage their own streams. This allows the backend to handle contentions
-internally and dynamically select an execution path for the acquired
-streams. A new flag is also introduced to indicate this capability at
-runtime. zram_write_page() now prefers streams managed by the backend if
- a bio is considered asynchronous.
-
-Some design decisions as follows.
-1. The proposed get_stream() does not take gfp_t flags to keep the
-   interface minimal. By design, backends are fully responsible for
-   allocation safety.
-2. The default per-cpu streams now also imply synchronous path for the
-   backends.
-3. The recompression path currently relies on the default per-cpu
-   streams. This is a trade-off, since recompression is primarily for
-   memory saving, and hardware accelerators typically prioritize
-   throughput over compression ratio.
-4. zstrm->lock is restricted to the default per-cpu streams. Backends
-   must implement internal locking if required. While currently exposed
-   in struct zstrm, this mutex is an implementation detail of the
-   default path. Future work may involve making the default stream
-   locking mechanism opaque to the backends, ensuring they interact only
-   with the necessary stream interfaces.
-
-Although I do not have access to an Intel IAA accelerator and other
-accelerators may not be generally available, this series seems to give
-a good start for supporting batched asynchronous operations in zram.
-The next step would be to introduce an interface that allows
-non-blocking compression submission and validate its real-world
-performance once such hardware accelerators become available.
-
-Signed-off-by: Jihan LIN <linjh22s@gmail.com>
----
-Jihan LIN (3):
-      zram: Rename zcomp_strm_{init, free}()
-      zram: Introduce zcomp-managed streams
-      zram: Use zcomp-managed streams for async write requests
-
- drivers/block/zram/zcomp.c    | 37 ++++++++++++++++++++++++++++++-------
- drivers/block/zram/zcomp.h    | 23 +++++++++++++++++++++--
- drivers/block/zram/zram_drv.c | 28 ++++++++++++++++++++++------
- 3 files changed, 73 insertions(+), 15 deletions(-)
----
-base-commit: 24d479d26b25bce5faea3ddd9fa8f3a6c3129ea7
-change-id: 20260202-b4_zcomp_stream-7e9f7884e128
-
-Best regards,
--- 
-Jihan LIN <linjh22s@gmail.com>
-
-
+> ---
+>  drivers/mmc/core/card.h   | 5 +++++
+>  drivers/mmc/core/queue.c  | 9 +++++++--
+>  drivers/mmc/core/quirks.h | 9 +++++++++
+>  include/linux/mmc/card.h  | 1 +
+>  4 files changed, 22 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/mmc/core/card.h b/drivers/mmc/core/card.h
+> index a9619dd45270..a7c364d0030a 100644
+> --- a/drivers/mmc/core/card.h
+> +++ b/drivers/mmc/core/card.h
+> @@ -311,4 +311,9 @@ static inline int mmc_card_broken_mdt(const struct mmc_card *c)
+>         return c->quirks & MMC_QUIRK_BROKEN_MDT;
+>  }
+>
+> +static inline int mmc_card_fixed_secure_erase_trim_time(const struct mmc_card *c)
+> +{
+> +       return c->quirks & MMC_QUIRK_FIXED_SECURE_ERASE_TRIM_TIME;
+> +}
+> +
+>  #endif
+> diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
+> index 284856c8f655..eb1053d8cae7 100644
+> --- a/drivers/mmc/core/queue.c
+> +++ b/drivers/mmc/core/queue.c
+> @@ -184,8 +184,13 @@ static void mmc_queue_setup_discard(struct mmc_card *card,
+>                 return;
+>
+>         lim->max_hw_discard_sectors = max_discard;
+> -       if (mmc_card_can_secure_erase_trim(card))
+> -               lim->max_secure_erase_sectors = max_discard;
+> +       if (mmc_card_can_secure_erase_trim(card)) {
+> +               if (mmc_card_fixed_secure_erase_trim_time(card))
+> +                       lim->max_secure_erase_sectors = UINT_MAX >> card->erase_shift;
+> +               else
+> +                       lim->max_secure_erase_sectors = max_discard;
+> +       }
+> +
+>         if (mmc_card_can_trim(card) && card->erased_byte == 0)
+>                 lim->max_write_zeroes_sectors = max_discard;
+>
+> diff --git a/drivers/mmc/core/quirks.h b/drivers/mmc/core/quirks.h
+> index f5e8a0f6d11b..6f727b4a60a5 100644
+> --- a/drivers/mmc/core/quirks.h
+> +++ b/drivers/mmc/core/quirks.h
+> @@ -153,6 +153,15 @@ static const struct mmc_fixup __maybe_unused mmc_blk_fixups[] = {
+>         MMC_FIXUP("M62704", CID_MANFID_KINGSTON, 0x0100, add_quirk_mmc,
+>                   MMC_QUIRK_TRIM_BROKEN),
+>
+> +       /*
+> +        * On Some Kingston eMMCs, secure erase/trim time is independent
+> +        * of erase size, fixed at approximately 2 seconds.
+> +        */
+> +       MMC_FIXUP("IY2964", CID_MANFID_KINGSTON, 0x0100, add_quirk_mmc,
+> +                 MMC_QUIRK_FIXED_SECURE_ERASE_TRIM_TIME),
+> +       MMC_FIXUP("IB2932", CID_MANFID_KINGSTON, 0x0100, add_quirk_mmc,
+> +                 MMC_QUIRK_FIXED_SECURE_ERASE_TRIM_TIME),
+> +
+>         END_FIXUP
+>  };
+>
+> diff --git a/include/linux/mmc/card.h b/include/linux/mmc/card.h
+> index 4722dd7e46ce..9dc4750296af 100644
+> --- a/include/linux/mmc/card.h
+> +++ b/include/linux/mmc/card.h
+> @@ -330,6 +330,7 @@ struct mmc_card {
+>  #define MMC_QUIRK_BROKEN_SD_POWEROFF_NOTIFY    (1<<17) /* Disable broken SD poweroff notify support */
+>  #define MMC_QUIRK_NO_UHS_DDR50_TUNING  (1<<18) /* Disable DDR50 tuning */
+>  #define MMC_QUIRK_BROKEN_MDT    (1<<19) /* Wrong manufacturing year */
+> +#define MMC_QUIRK_FIXED_SECURE_ERASE_TRIM_TIME (1<<20) /* Secure erase/trim time is fixed regardless of size */
+>
+>         bool                    written_flag;   /* Indicates eMMC has been written since power on */
+>         bool                    reenable_cmdq;  /* Re-enable Command Queue */
+> --
+> 2.34.1
+>
