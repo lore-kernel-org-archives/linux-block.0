@@ -1,97 +1,90 @@
-Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EC6D41C2F4
-	for <linux-block@vger.kernel.org>; Wed,  4 Feb 2026 16:29:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E1E13033EC;
+	Wed,  4 Feb 2026 16:47:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770222554; cv=none; b=HPawkls/+ESEXcuPyjcclrfCpuDrrkKh0qQE55hyZLOb6UdMH1i6rBJiJVoqZawobpvADUITwZ+HLhyMhMcElvFabR+mDJmXL/fVURWyKBOrLlJGbIPJ5C1k/PpUeBIQ/f5VoZrnnpwFUFeQjXqK6qSWDOS104kUe8O0ESFgipw=
+	t=1770223620; cv=none; b=ox08H25JRFw8N9euMqED2JnSx0NhOmyell6dpVdIKUTfCGFsFqVqKPGp79e2B05VsvOa5K3RKvurrECtOsvV4KnalXP3INnzmWubZ7zKWxN2PdiOAaaRJ1xUZtr1/SzZ3YqhQG/0JcGUrU2DeMws3wLd2fu6jm6b9jqUVTZxGow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770222554; c=relaxed/simple;
-	bh=zx6zdUMJ3RWLn3ws9n48sdVAdIHgBT02jJR/P/LpS2Q=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=sXNuLFZgU6n+U5mxdmJ1mz7di8iqXd0CsoYilXxcy4zmb5m7ZDmhkQJWpiPPTGHZvyPm+jUHLBAbF0ABoVRw+rJ1dOYSmSEuW8DHKXHk/qgPlPS73YBpZpUNkskHf3yrPIjcBF3M1GH4/bdFTzVHHceFobjn5+ibjy9u6q1s71Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=c8wd/yFe; arc=none smtp.client-ip=209.85.167.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1770223620; c=relaxed/simple;
+	bh=dy73/9OQI/HuBvsd+ptSVtFrF/SFQ/zEvH4RIO0j4i4=;
+	h=Mime-Version:Content-Type:Date:Message-Id:To:From:Subject:Cc:
+	 References:In-Reply-To; b=lJeBf6qZ0mZnnXmkTJWUxamZjm8G2ZET1S1TiGOEFK0khtCKwEzHyiMglAA3emjRbp+9QAhQ9ehSPsGOU2kQbpupQ83FmvJ474gXIBvcqVihBO6oJv8xgZVIa+KEEVljjyLnvZxiNqjFmUvaKVlfm1tV4TtFjoOvcBj5+j0MBMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZHj8q1Uc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="c8wd/yFe"
-Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-45e934bb51dso2660808b6e.1
-        for <linux-block@vger.kernel.org>; Wed, 04 Feb 2026 08:29:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1770222552; x=1770827352; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=O9Cy4ZG9D75M6RO/VmoqzuT0aEphF0+VmauEpS+Qd98=;
-        b=c8wd/yFewXgNLiFbbRXdcUzATVA8dj7vt6UJjUldGWPfF5go5sIYvUXXm//5uAZei2
-         xSApenc/T9j9YylBljZfNiIbCvM2Vrf1ePBoi+AoWklVyKmvXb1vOCEv3XMTiHvIdctU
-         yDqxIBBjWERCe6di60Rjoqy18Ac0l/H5T9RCeN7+AFKl62JADE2gkjrQoWTnnuutu813
-         SAHp22LZ4Ihuh4FAIiluu752HPMEILdn/R4H3dL8FTiQdHpvK+J+4qyIB7iuScZImavQ
-         E5gyw26tDXXlojzbmJvoD6ME8hLu4GNq1IutRLwlzPHiLgJ5dhJ31HIN11IlRByTnhgU
-         ho5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770222552; x=1770827352;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=O9Cy4ZG9D75M6RO/VmoqzuT0aEphF0+VmauEpS+Qd98=;
-        b=l6GB6OpsfsdpDd4CZSepCDN5kqX2clg8naJcY211ZJG/VGhZV6YqMjeF9adQwZsqHH
-         FLs5CNYG4hmZGo2KZoaBKwwv5iWiUUyZhU2kLbE8fEVPY6QwNFtSgi0b1Cps8qQgXToN
-         0S/OVNjH1xOBfknrbbkLBQWLQgmLosXXjU6X3xSasIU5fr1e9sRQuchcWaZOCFviF79I
-         ODnHkGz/BlWEZB1CCdIz0R84UYeMJaEmATpyrqxGtLTpSZa6X/sgeggcw8WpwCsNK7fb
-         uu+4TkUxNBoBuSfKXD5sLfeBf7pppG7O5/jOPPTI4f2S760FyQZ3CEOhxfL5jBpkz91d
-         Uinw==
-X-Gm-Message-State: AOJu0Yxk4lajkaorG5Q+FsabufBCSsiQBUiCkIcuETXWPrwUHKVA0GFk
-	NN02tQEVHqpXdl3IbXAiPy48yIb57hNrtOGGbYuWFE1w1blSmvoUAKH3nQ3NFcsvqs8=
-X-Gm-Gg: AZuq6aKEQ5CP2BS7VounOYqRHJhVK6Mc6SdMYzEfW9/uoNYOsDo6rfo4lSLlu612VJZ
-	ss7F6v23MYPxESewW//Nqk92Y77l/QG21PK4484D4MzCIL+hM49YIbdHoVvvGcTHtvTI2jdcatJ
-	a/TGsWBpXWRm+Bnupr4t6n/OjLUH4LE0BSYCS1X0IEGaoiUVFwnh+dGMLaB3zbreWmSpcDjHMFR
-	UsRCUKf2hH6w6bD7XYIRs/mKjBUilooXzFiAqMahAEFVIJsPQnYGoQsQeLdhgWB9eWCr7NcYSjS
-	/N1c1auLgOgH262CBSN/d6dcayppM/TYqWEvtbcBHcEH1afaAUrAciWVFEfSP4U9zqcrf80Z381
-	pXLhpwF4+8ckzfBQdBE/WyICzNO8gii0Q0ccE+pwdvOGpA37uSUYvI5MlR8TqrPk2lNMWAebXJq
-	mi4fDsGcyoSzEEl5PbavpmYRnkkZJTBxGH3L7It8drn+iaXQ5oQg7KX8p6bvTL+AA=
-X-Received: by 2002:a05:6808:bc2:b0:450:d28e:2509 with SMTP id 5614622812f47-462d5ab6738mr1488455b6e.66.1770222551943;
-        Wed, 04 Feb 2026 08:29:11 -0800 (PST)
-Received: from [127.0.0.1] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-462d6614885sm1573550b6e.1.2026.02.04.08.29.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Feb 2026 08:29:08 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: Yang Xiuwei <yangxiuwei2025@163.com>
-Cc: linux-block@vger.kernel.org, Yang Xiuwei <yangxiuwei@kylinos.cn>
-In-Reply-To: <20260106024257.144974-1-yangxiuwei2025@163.com>
-References: <20260106024257.144974-1-yangxiuwei2025@163.com>
-Subject: Re: [PATCH] block: remove redundant kill_bdev() call in
- set_blocksize()
-Message-Id: <177022254820.27547.9593412596108847919.b4-ty@kernel.dk>
-Date: Wed, 04 Feb 2026 09:29:08 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZHj8q1Uc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF418C4CEF7;
+	Wed,  4 Feb 2026 16:46:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770223620;
+	bh=dy73/9OQI/HuBvsd+ptSVtFrF/SFQ/zEvH4RIO0j4i4=;
+	h=Date:To:From:Subject:Cc:References:In-Reply-To:From;
+	b=ZHj8q1Ucvt7QcaZcn9QuPYACGDPfU/YL82+e6kQIaszjDn8/K3Lk25/ytj8Malksx
+	 QTrROJpGVUsMkMWTzjQvp0wcUGKl69dlGdw+uM4ZXkcku66CUCCFf+JntNkoa9XeFK
+	 UBAoEJloaJHzf8XjFtFKSgZDr+rjjdpxj021cT2FEEhwdvxmV1QnS69elAgBlCG2S1
+	 5VpdKtuK+x95jkiRP0Q0olnVlaCNxNMiWvM9N5rJSdpQVInfdYkjh/kMwVzxggH0vt
+	 xi4ko64jYM5R0Fh8vdICZWmXXV6iTywKSpHzFCGMppUp7E+ZJ8jy9VLrS1L5oDN6Sy
+	 z8aQSzU00WK2A==
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 04 Feb 2026 17:46:51 +0100
+Message-Id: <DG6BWC5SOHUG.2K1ZXGYNVB69V@kernel.org>
+To: "Andreas Hindborg" <a.hindborg@kernel.org>
+From: "Danilo Krummrich" <dakr@kernel.org>
+Subject: Re: [PATCH v14 1/9] rust: types: Add Ownable/Owned types
+Cc: "Miguel Ojeda" <ojeda@kernel.org>, "Boqun Feng" <boqun.feng@gmail.com>,
+ "Gary Guo" <gary@garyguo.net>, =?utf-8?q?Bj=C3=B6rn_Roy_Baron?=
+ <bjorn3_gh@protonmail.com>, "Benno Lossin" <lossin@kernel.org>, "Alice
+ Ryhl" <aliceryhl@google.com>, "Trevor Gross" <tmgross@umich.edu>, "Greg
+ Kroah-Hartman" <gregkh@linuxfoundation.org>, "Dave Ertman"
+ <david.m.ertman@intel.com>, "Ira Weiny" <ira.weiny@intel.com>, "Leon
+ Romanovsky" <leon@kernel.org>, "Paul Moore" <paul@paul-moore.com>, "Serge
+ Hallyn" <sergeh@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>,
+ "David Airlie" <airlied@gmail.com>, "Simona Vetter" <simona@ffwll.ch>,
+ "Alexander Viro" <viro@zeniv.linux.org.uk>, "Christian Brauner"
+ <brauner@kernel.org>, "Jan Kara" <jack@suse.cz>, "Igor Korotin"
+ <igor.korotin.linux@gmail.com>, "Daniel Almeida"
+ <daniel.almeida@collabora.com>, "Lorenzo Stoakes"
+ <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ "Viresh Kumar" <vireshk@kernel.org>, "Nishanth Menon" <nm@ti.com>, "Stephen
+ Boyd" <sboyd@kernel.org>, "Bjorn Helgaas" <bhelgaas@google.com>,
+ =?utf-8?q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+ <linux-kernel@vger.kernel.org>, <rust-for-linux@vger.kernel.org>,
+ <linux-block@vger.kernel.org>, <linux-security-module@vger.kernel.org>,
+ <dri-devel@lists.freedesktop.org>, <linux-fsdevel@vger.kernel.org>,
+ <linux-mm@kvack.org>, <linux-pm@vger.kernel.org>,
+ <linux-pci@vger.kernel.org>, "Asahi Lina" <lina+kernel@asahilina.net>
+References: <20260204-unique-ref-v14-0-17cb29ebacbb@kernel.org>
+ <20260204-unique-ref-v14-1-17cb29ebacbb@kernel.org>
+ <7uftlTZxNVxMw7VNqETbf9dBIWLrQ1Px16pM3qnAcc6FPgQj-ERdWfAACc5aDSAdeHM5lLTdSBZYkcOIgu7mWA==@protonmail.internalid> <DG6AIA0QK77C.EKG7X4NBEJ00@kernel.org> <87fr7gpk6d.fsf@t14s.mail-host-address-is-not-set>
+In-Reply-To: <87fr7gpk6d.fsf@t14s.mail-host-address-is-not-set>
 
+On Wed Feb 4, 2026 at 5:06 PM CET, Andreas Hindborg wrote:
+> It is my understanding that the SoB needs confirmation from the author
+> if the code was changed. I changed the code and did not want to bother
+> the original author, because it is my understanding they do not wish to
+> be contacted. I did not want to misrepresent the original author, and so
+> I did not change the "From:" line.
 
-On Tue, 06 Jan 2026 10:42:57 +0800, Yang Xiuwei wrote:
-> The second kill_bdev() call in set_blocksize() is redundant as the first
-> call already clears all buffers and pagecache, and locks prevent new
-> pagecache creation between the calls.
-> 
-> 
+Frankly, I don't know what's the correct thing to do in this case; maybe th=
+e
+correct thing is to just keep the SoB, but list all the changes that have b=
+een
+made.
 
-Applied, thanks!
+Technically, the same thing is common practice when maintainers (including
+myself) apply (minor) changes to a patch when applying them to their tree.
 
-[1/1] block: remove redundant kill_bdev() call in set_blocksize()
-      commit: d4d78dd43cecaeaadb24e78927a4d6fda7d1f1d9
+> How would you prefer to account for the work by Abdiel and Boqun?
 
-Best regards,
--- 
-Jens Axboe
-
-
-
+I mean, I don't have a preference and if I would have one, it wouldn't be
+relevant. :) I just wanted to bring it up since the very first version was =
+sent
+by the two of them. So, I think we should just ask.
