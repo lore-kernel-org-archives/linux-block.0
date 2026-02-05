@@ -1,142 +1,269 @@
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from LO0P265CU003.outbound.protection.outlook.com (mail-uksouthazon11022117.outbound.protection.outlook.com [52.101.96.117])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DED973ACEE5
-	for <linux-block@vger.kernel.org>; Thu,  5 Feb 2026 11:26:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C82C91F63CD;
+	Thu,  5 Feb 2026 13:29:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.96.117
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770290819; cv=pass; b=VbknP19V5PlP6K8hJ8xuI5Sf2qgjFi/yEM4yGW48INsxq6OnTuYXsg3yXtn+nGrr9csrWRfA3uk9ikE+u/JoBn8i9HrZDCVnQLYSzYNLWEfqvP5Iqh4WUw1IXD2o+2TFIiFRnBu2f01wcYz0vxilzJEMvBPmvOSUX+IVnvIx70U=
+	t=1770298165; cv=fail; b=ULc2sV7HbmqeIJxqTUTT4fJKftXn0gvn5yjkPbch6v9029Uq1ifPh6odXuQGhjzs5105on3RTlVC88+Tv3Jbc6vI2BOuxFrbegYkvM5rhb5ZYKWHypofGTA9MbGCiDm3ZcPLq/Ddw0xY7fVxGAHqBNYU+2+JdtLysUYQnzvMdIQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770290819; c=relaxed/simple;
-	bh=mGTIDf7ATEDXLxYZ2BPNG7jAnvGsS/6ibRxfNlu9lN4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QhyQXa1aoMbSG17G7Iw8RUQ2fTXYEexiMn8iHPu30rC7nanUljPz+IDQTQ6KcTDqVvqtkWXeim33bh1jiW8DTt44hoAEzKT0kPup2k2jo0zofJSuS23FeUYc841LAb6LvBSaOVxJ4mOV8EFyZR8knl1Ld0Kbcg2Xl9sWG+0OWqc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=GnCs2IJz; arc=pass smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1770298165; c=relaxed/simple;
+	bh=sAiWjQOuErn/ACd2NqScFH9zHxV+V9/QCEpf77e9vjw=;
+	h=Content-Type:Date:Message-Id:Subject:From:To:Cc:References:
+	 In-Reply-To:MIME-Version; b=nYbcgrEcRERQdlYEpjGXf/EFVEiOfMm6hKzQtG4u6XeVk9x1mwjAdmWkHoRVcDCXIymPpdx9ffnGPwyw5XX6fILO6Z7PZJTNVgu7bAM89VVedOh0sJv3Y+W9wCUMeBTpVwdhgQTm0g3yEoy0Tj8t8kkvKcIomUeF6UzOJyO/Uhc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=N07nRev6; arc=fail smtp.client-ip=52.101.96.117
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=garyguo.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GnCs2IJz"
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-59b9fee282dso684721e87.3
-        for <linux-block@vger.kernel.org>; Thu, 05 Feb 2026 03:26:58 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770290817; cv=none;
-        d=google.com; s=arc-20240605;
-        b=UGJAmGA0OPa43EarnpnTS/2OzRJDnwI9ArY20Tg4MWcZFpEfCtZHFyi1S5Irn0kv4A
-         eicz40pAMbFeayLbfdFyDNQNITukRPH8ZG+RVFsB6CiRVvfVv8VA1mBO4PlL92hyirBW
-         pxO2cBG4x/oTK3uOVrJlq1y/erFj64t30Vt4PzeRHkefBLqoIjw0Ccq3AXGGbCAfB+sr
-         tBThCa/3lIVvnWrzpGFvpUFQAKLYkXLyrV6PgcUXYTnvrkMy4q7q6GYhRasX48slKNC8
-         3gxWNnf1/TSWhX9Q9WDSlko/39f8lUQCSZJDSOMUHZBx0W8JrOPZtSiL0pdycNCNDviu
-         NRLg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=mGTIDf7ATEDXLxYZ2BPNG7jAnvGsS/6ibRxfNlu9lN4=;
-        fh=ekHNL67rVkXMqBec37/E7H7JZo1mUyQzJ5gRNpCEATc=;
-        b=TewA6f3QKuVaf9Pge2U74AGvGG9Aj/NaCTM1VztC+FCFbvT2IFhikWjgvYe2ckUCbT
-         T3v7WaAqKgwW+Vq81tYOihaaPCCm6zNaam9nf/21I7+w+dCuah9ZJ5FJR9mBez9DbJkg
-         jYA9Sq+W19vNvChhmgH+xRly/S6AU4GiDUnTWXcdYKVEQB1wUtm5/k2KF9KzuhtMq7xf
-         g35bl59jCHicGxSqnr1IWTRFLfTNwixzr0C4YNTmCeRHsZvmsDELYIZzpfwpjBEolXXK
-         OCBIs90bATJa920e5SIlrbOsBsBd3wg4Rjvctu/Zy5OAeg+yoZYWYBSayQy71csXqD5h
-         APtQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1770290817; x=1770895617; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=mGTIDf7ATEDXLxYZ2BPNG7jAnvGsS/6ibRxfNlu9lN4=;
-        b=GnCs2IJzwiFZxSGo1spMMprploUI5Ycn6teJay6bf07fY3/STpL7tYdGAB4ktLHE9d
-         oi4W/GyJaPgKYc0jdLAgjsPjeOApixPkKhV+9m5lrYPlXsgzl1CZRAX2QXt/+Is3PlBY
-         6x93OnQg9G9RIABVddFNDerS36ECWjJ7sMC/ybYzuti7favK8EiTuwG+JRW709u2sKdq
-         r9KQLOm+2bGoylvQJ+E/6aZHaILTuJJ7JTa9lbt5v9uJr2xZnbZLn6rZhgjsBRrkrNEW
-         lkXg9jmtcMHw6BOksr3DgS4nt9316EuuVE6gbeTZlQhmgKOHRCQGYDrTqID34wUk5fXp
-         nmNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770290817; x=1770895617;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mGTIDf7ATEDXLxYZ2BPNG7jAnvGsS/6ibRxfNlu9lN4=;
-        b=pO+KdEtEys2d6/99LalEY51AGqVrVWWwyMiGlbLsSlmMrNJD+mktbSTqe8/vP95JSz
-         zlm7qHL86qcd0Mr4ANvKhVeG7YRcLGRnmNDmcru/JQDcXiuev4UznbtKM7jod725Tkt3
-         EvmD6RluD0TdygW/ajDFkH+3At+G5rUumMM2UxRa1QdilS6QlttbI0NjtMhpO0Wsb1zj
-         mxmXYVJt9NSEI8gfBNkr9LdgE3mtTvME8CK3V6bEKMSdiBdgoz+ysymtACLOkIwVaebl
-         FaZEQxgbFfhua8TTzap59k9mTKGJ5aLr+xMuLrp2KS4+mrA0wEn1kcA6D5CsQMuVlPlM
-         XIUg==
-X-Forwarded-Encrypted: i=1; AJvYcCVCr8IVTY69Minic+In9C3LuETNiJr22WAOTQfuL5ztnwxkzxL72aTQC/z0XSbjivceybnIQhsy3JcSDQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz2BwXKReM3xjeJPGwWVhM3ApSLovkQo0f9klu9a0roexMeROAI
-	S/WI6ZyDTpszisd7TJzWqz1kOTQjNmOtxadPXQa27eD/Kf4Z8/nZAUNmE30XAyA+Hi1ycEk4U4E
-	ruQFISzugnoyjprImE8J14lZs+LWw6g3t32ibgH5Eig==
-X-Gm-Gg: AZuq6aL0eoaVdKbS6o4nzWXpXYr7uOzFCAoO0m7z9tL52nPh88xE0KkQcnlnPkhxPGV
-	bjWGPTR0z0YmPafGYulab/oivVPT3TRGd0Zq9GJBU1ps6Cu2+lSzToWgn68UZB+hpKJJiOU9ZA1
-	EEm70ACSUt/LLiMDIIpSPbGCfCTko6QCZ536wK5ZILpNH5YeWa1C89jI4GtdsEFDK1YucGVK8ys
-	0XaLkXjBh/+Gw/uLbD/g2QSD9QH/4cqSbhtrG4urt/zhe7IFyyTR4q34cNePbjYEWzKHH30
-X-Received: by 2002:a05:6512:b25:b0:59e:49a:1eaf with SMTP id
- 2adb3069b0e04-59e38c431f2mr2304967e87.40.1770290816974; Thu, 05 Feb 2026
- 03:26:56 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b="N07nRev6"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=smtuzSasVWMuloYktOLbFhDE3NhmehGEk5BkaswkrLzXz68M9oJ6tD3+43LWO1dvy2GKCsD6GcmC95lm8NAVkmXpzneUETqDyMsgeYUTmkiyyDlzgkgZSxfpLSQjh7NZMZnAsVaqqjymSTClcnFuz5fZJXCU/bmDxq8vCs21uBzOZSDQvIA8bDZMyC2YiZSuBy982s5PXpW5n/PylS3gnnxUs8qHyFijMgJVC2+eI0jT3+8G+LTAmGgKWJkQolN2ak3XD5m1OUx9XbLb3lF/KMS26XMIrZBcaw1mO9IHToxEPkG1j5aLIvGTBwbdA5lv47ON2jqo5+dymfGNkMGBrQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=AM7h6TDaVhvSa64ov5YSSwaylLDR6nBkf9jlzlUZFso=;
+ b=SUz74P2JH3YyrQa2WFAiFxlrQsbCx6FW0REOf+RirTJD7XqGrbHZZAel1sk0OXSlvgmY/xfeXInkKzppB4VoxSJNARQ32UEk/gJkM6XO2vgUjtFx0Lt9MgLa5+Iw3ONJaDR1SX7Y3MNlpb365Xeu2Zr8I4tZVsBInxiAw4lRVJLqTOeWTPCw+ZnwhugrQnfqrIMQsmTEhfTQFnf8/YH4kfNsR7JDwImtvt8qYO1fhnIIqdpkMUmfldQ/Y/DcdVOadaQXQ/RGPpuVodGI+fC9RbH/r8qqSbz7aof93chVpKudaQR1Fyzwb8GSwCIxbjaq3r+qM8DtsB2o711gFDnIdQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
+ dkim=pass header.d=garyguo.net; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AM7h6TDaVhvSa64ov5YSSwaylLDR6nBkf9jlzlUZFso=;
+ b=N07nRev6e4W2iS38vBur2Lr+JT3vUTYrvBu5s/QbkteoAUHlA++wgRh9qeW8wDy/37JJB4QrV4GPmjWtz5aOiFJkVBChZ+m5Azvoe880n8knXacGW11LWKrUoRGvNsHM+AeLt4wwiqrMr00I5uiths0zjOAM1XX/IDItVsKYrxA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=garyguo.net;
+Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:488::16)
+ by LO4P265MB6154.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:27a::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9587.14; Thu, 5 Feb
+ 2026 13:29:20 +0000
+Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+ ([fe80::1c3:ceba:21b4:9986]) by LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+ ([fe80::1c3:ceba:21b4:9986%5]) with mapi id 15.20.9564.016; Thu, 5 Feb 2026
+ 13:29:17 +0000
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Thu, 05 Feb 2026 13:29:16 +0000
+Message-Id: <DG72BM2I3QKI.1SCBV7WL5B1TG@garyguo.net>
+Subject: Re: [PATCH v14 1/9] rust: types: Add Ownable/Owned types
+From: "Gary Guo" <gary@garyguo.net>
+To: "Andreas Hindborg" <a.hindborg@kernel.org>, "Miguel Ojeda"
+ <ojeda@kernel.org>, "Boqun Feng" <boqun.feng@gmail.com>, "Gary Guo"
+ <gary@garyguo.net>, =?utf-8?q?Bj=C3=B6rn_Roy_Baron?=
+ <bjorn3_gh@protonmail.com>, "Benno Lossin" <lossin@kernel.org>, "Alice
+ Ryhl" <aliceryhl@google.com>, "Trevor Gross" <tmgross@umich.edu>, "Danilo
+ Krummrich" <dakr@kernel.org>, "Greg Kroah-Hartman"
+ <gregkh@linuxfoundation.org>, "Dave Ertman" <david.m.ertman@intel.com>,
+ "Ira Weiny" <ira.weiny@intel.com>, "Leon Romanovsky" <leon@kernel.org>,
+ "Paul Moore" <paul@paul-moore.com>, "Serge Hallyn" <sergeh@kernel.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, "David Airlie"
+ <airlied@gmail.com>, "Simona Vetter" <simona@ffwll.ch>, "Alexander Viro"
+ <viro@zeniv.linux.org.uk>, "Christian Brauner" <brauner@kernel.org>, "Jan
+ Kara" <jack@suse.cz>, "Igor Korotin" <igor.korotin.linux@gmail.com>,
+ "Daniel Almeida" <daniel.almeida@collabora.com>, "Lorenzo Stoakes"
+ <lorenzo.stoakes@oracle.com>, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ "Viresh Kumar" <vireshk@kernel.org>, "Nishanth Menon" <nm@ti.com>, "Stephen
+ Boyd" <sboyd@kernel.org>, "Bjorn Helgaas" <bhelgaas@google.com>,
+ =?utf-8?q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>
+Cc: <linux-kernel@vger.kernel.org>, <rust-for-linux@vger.kernel.org>,
+ <linux-block@vger.kernel.org>, <linux-security-module@vger.kernel.org>,
+ <dri-devel@lists.freedesktop.org>, <linux-fsdevel@vger.kernel.org>,
+ <linux-mm@kvack.org>, <linux-pm@vger.kernel.org>,
+ <linux-pci@vger.kernel.org>, "Asahi Lina" <lina+kernel@asahilina.net>
+X-Mailer: aerc 0.21.0
+References: <20260204-unique-ref-v14-0-17cb29ebacbb@kernel.org>
+ <20260204-unique-ref-v14-1-17cb29ebacbb@kernel.org>
+In-Reply-To: <20260204-unique-ref-v14-1-17cb29ebacbb@kernel.org>
+X-ClientProxiedBy: LO4P123CA0520.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:272::16) To LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:488::16)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <ff9a7c20-f465-4afa-bf29-708d4a52974a@linux.dev>
- <CAPDyKFrGpvjONrDmnNZXv+SME_NCNv-LK8J-Vo88RSz1fuD7rg@mail.gmail.com>
- <787171c6-0b9c-400b-8a95-b331b58e284c@linux.dev> <4777aabd-bc9e-4904-9444-892393aecb15@linux.dev>
- <9e362d5fa2604fb0848ea28866dc45fc@realtek.com> <47ed09fc-047b-4f98-8df3-d11d17678c57@linux.dev>
- <380f75c7adc04cbab38cfd2f82bd0c6d@realtek.com> <d46dcebe-ca58-44c4-87ee-cade2e478572@linux.dev>
- <4205fde06ecd4a7489b03ef25e5e4011@realtek.com> <CAPDyKFoC-dwzcsABNy9pA=GGirBWwcxQhNMeTSSStXHtXmWbcg@mail.gmail.com>
- <0b6fd99b-54a6-45f1-942e-94f707f2fbf5@acm.org> <CAPDyKFqic-rFe95g657MdZHtdPXTmFmYQG4ZSBV56S3DhMEF-A@mail.gmail.com>
- <dc1ac2e5-1db1-49b5-847d-a10a611027ae@acm.org> <CAPDyKFrNHc4FexuTbdWM-Kvo0mn9C51nJN5b=e0jZR8miFho+g@mail.gmail.com>
- <2d3b720c-5637-45e7-887d-077b1e9b3c23@acm.org>
-In-Reply-To: <2d3b720c-5637-45e7-887d-077b1e9b3c23@acm.org>
-From: Ulf Hansson <ulf.hansson@linaro.org>
-Date: Thu, 5 Feb 2026 12:26:20 +0100
-X-Gm-Features: AZwV_QidTK3-LL5BRcsQOANx3I9-wfMadBNJN25RW-bBgNYtc6cvI_SW9Xk-ml0
-Message-ID: <CAPDyKFqQCtXzRruVSy0RLfWw11=TB+HAqN=+0P7St=aovZOoEg@mail.gmail.com>
-Subject: Re: [BUG] - Short freezes in gameplay due to MMC_CAP_AGGRESSIVE_PM on
- RTS525A card reader
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Ricky WU <ricky_wu@realtek.com>, 
-	Matthew Schwartz <matthew.schwartz@linux.dev>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>, linux-block <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LOVP265MB8871:EE_|LO4P265MB6154:EE_
+X-MS-Office365-Filtering-Correlation-Id: 975ef89d-3cce-4e35-7232-08de64ba9026
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|1800799024|366016|921020|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?aWN0VUgxYlJnVlBKUlBpRTN0MVdHUnJkR2xHdnpxd1FGNXVQM1dtM3RFTFRu?=
+ =?utf-8?B?QnZLY21xV2dXaTR0MXFlOTJKZk5kcnk5bkNKTlpiYnFzTU5Gc29ickhxQ042?=
+ =?utf-8?B?eWw5bGVxZU5JazFiWU5LeThsSVBXUjA2UlQyWktRdGt5dFdVNHRSVHc2Undk?=
+ =?utf-8?B?MElvcGlSMCswMVcxdVA4bFRYWnFGMVR4M3VOOWc3K0gvTHVWUm5sWVJjYzdu?=
+ =?utf-8?B?NjBYUHBlL2VNU0VZOGVzNDJDSFZpbEh3YjU0aTl4ZGpHSFlYbDZQNDI4ckw5?=
+ =?utf-8?B?VXR3UjRKeW9ENVpUT3lqRjE1V1ZyS0NtL2k5ME91bDZLU0FjMG5oRmp5M1pC?=
+ =?utf-8?B?b3ZIQXV5RDBOQm9YaHpaUng0ejBIbFl0Rm9mOURQdkd3dzNhL2N5bnpuTmZR?=
+ =?utf-8?B?MFM4dlRCa2JxUlpMVlRnV1hTM2ZsMUIxQjVaL3VBNFE4Q1V4TXNYdzFuUUg1?=
+ =?utf-8?B?VjF1bjdNbEg1ay9JUEMxT0poTk4rMlN0OGsxaTkraTMzeEdxVVJGL3BuTVRS?=
+ =?utf-8?B?N0VIMUlnYXhqc2xCT1hWYU5adk9zUXF2Q05VLzNJeVZuU0tCaFdNbGM2RXZH?=
+ =?utf-8?B?TkxMSzVYUHlDTkxFV3JDZkFYZkhFSkd6cTcwZm9XbVhyeFBFUzdXSW1aMDR4?=
+ =?utf-8?B?NHRIT1MrdHZ2bWovdWhOeHNkYlNqUTIxclVTSnhsVXBaTjU2S0JIbGNLZnZq?=
+ =?utf-8?B?R2g5MmI5ZGF0dThoZGNwSFdrajdLTWFEOGxETHdodjBvZzlvOXlRS3NHdG9z?=
+ =?utf-8?B?cWhvL0lUUmlHSTF6ZjhibnBudVp6R1N0M1Z4UnlkbmVGN3NObnhVbit1eXlW?=
+ =?utf-8?B?WStld3pKYmpHbHpSTmFYRDJvNjFEL010QTFVcHRHRjZKc21OMU5tZ1VRRlVn?=
+ =?utf-8?B?VE1Jalh4UnVNR09DQ1krZXl6bXAybVp2SEtoVTlRVi9FVDFNTEpTSExmMzZW?=
+ =?utf-8?B?Qk1nYWlOcXEwSG1sdWtKOEs3d2VFc0RyWGpINXNsOHNHSEgxQTQ3c2tDL0No?=
+ =?utf-8?B?QUlsbHo4N25JbUtQUkhkZ3ZOSUJ4TGFyenptVDQrN1B3UkNhVlNhQS9NRCsr?=
+ =?utf-8?B?cHR3Y0hrMkJJb0F6aGh5ZFc2QWNqOC9nNWcvb21uU0VjOEYrV0hIRkdwTXhq?=
+ =?utf-8?B?a3hmc0dKeW9TdUt1dVo2am0wZDVGUG9HWC9naFlQZk12MHBubXFKVktFS0ZE?=
+ =?utf-8?B?RXViUFZwbmVPRWtKWjU5OFZWQ2Rtblg4K1pSOVlOTlpsQThRbWRwNUZTWXZS?=
+ =?utf-8?B?VUI3c3FDaDl1a2tCczR5OHJtTmZzWWNGL2tGaXlmV2VHVXVLVkFxc0k4Vlps?=
+ =?utf-8?B?QmZzZkk3YittUThSNW5GUjBPQU5NS2haV3NCTFJ0djgrZFBQR01VMHZvekx6?=
+ =?utf-8?B?UVJEaDVLSFBaSEZmaHVPYjRTV3U1TmF2SE42Q3R4WHhZUm5JOFUyK0dOT1NG?=
+ =?utf-8?B?d2RqSzZua2xYb05pK2k1TW1rYmJRYmhHZTlsNk9YWHIrMUM4MHZnSWpTVWtH?=
+ =?utf-8?B?cUZ5OUE1OUNnZlFtZUlRejROMW9GU2VEZVJJMXFHWUdicDYwU1pRcWFNc1Iw?=
+ =?utf-8?B?blhGMFJUWnNqQmRTelN4TEU2cG52U1NNWk5YZlFsOG1MTy96UDRmc1QwcVVN?=
+ =?utf-8?B?UXhSMUpsRHZ5WnpndDZqai9GR1FGK3YyaWE3RUk4eEcyWWR4dFdBZFpCUndz?=
+ =?utf-8?B?RzVJQ2FST2lXc2VtWC9XUE1zUWErRWlwNHVidnFocUd3dmRRL1dqRElNMWNB?=
+ =?utf-8?B?REFuZ3FiS2E2TWtpSXB4QjJGQTJNTnNGazA2R2ptcnZxUFJSeUp2RVFiT2pK?=
+ =?utf-8?B?cEdMQ2JDWUFJaTdDaEZBQmpBRmJ5N2lBMTlKbmJMYWJ0QzBzWEpWWTZSVWc5?=
+ =?utf-8?B?RTNiaGsrSmU1Y2doZFJ6SXFEdVI1bS9LUEQ3ZEVRL2hJOW12ZHMvYTdGam1U?=
+ =?utf-8?B?UlBneWpTQ2IxQThEaXdHQ3FDZFNPOGs5SnJUYXg1YWZzWDlVN0VvblEzWWRt?=
+ =?utf-8?B?bXd3ZVFOTlV1Mkx6c0x0b0hkdy9QM2FBa1dNdDZhQzdJbTVDSldoMEg0REdI?=
+ =?utf-8?B?bHZnMUpOa3gxWWZ5WFNWK2d5RVhaODlXK3cwT09DWTJnWW5zT2h1c0FsS2FE?=
+ =?utf-8?B?d3ZNblFjYjVLOHR5cEdzRkpLTzh1Lzl2ZXE2b1MzYWhRbUlVR2FtRS9pZ3Yz?=
+ =?utf-8?B?cXc9PQ==?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(921020)(7053199007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?eDdJRGtYbHM4MVA5cUZtUzFEb1Y4dEdWOU5JMXJIYUNxaFhBU3RoNy9uREVJ?=
+ =?utf-8?B?ZURrT3Zyd2JoMTdsVzd2ZWNlZmdmR0RhQWlhL3doVC85bnZkb1AxTmx2SE5k?=
+ =?utf-8?B?VGdaWXpnV1VxS3NGWE1qRWlBSlZERlVpZnE5RnJuUzhtQ1VoNWdmMVlBWDR4?=
+ =?utf-8?B?S1o2QkxFZGRFUEUveCs1OE1HNmlvbEllNVd0Und4ZWhwdlFtWEdOMGxxRVFE?=
+ =?utf-8?B?MTUrdk4vY0IvMnRZWkdONDZKajgzcXRDWTB2ZG5LMVp6dW9pbG9STzBITWJJ?=
+ =?utf-8?B?T1paVGEvVVdyVWFWdzh4VDZzdDIxVGRaVVowU2ZjTk5NQmFUNDdTVkRqTFR3?=
+ =?utf-8?B?Y2xLZlZ0TnZlSVVrVUVQMmFubjM2bEhmQ21mYW1tWngxVXFuZmtqR2d2ZWxv?=
+ =?utf-8?B?M1I2MDZxSWpuZWFYQ2V4WlZmSitEaXNaNy8xRmFHdEhyUlZoVVRpUGZ2emJa?=
+ =?utf-8?B?VFNkZ3ozd2ZEdWNlVVJBZDdZTU1ObHVmQSs0eU1TOElrYkFoTGN6Mk5WSmtj?=
+ =?utf-8?B?Q0VWRG4rUlVZUmQ0QU5FM0dhbDV4TUtZOURlNmVRQ0txM0k2b0RWNjJKTlpa?=
+ =?utf-8?B?aHl0NnFnUXRGbktzcTNCak9YcmM0Q3lvSHJ3NHFIUVQrME1ZWmNtNXpNVllV?=
+ =?utf-8?B?aEc3ZmlQQk9ZMkV3cGV5M3pVSG5GMllERHNwRWNBOUtzTTZOODlwMUdIcDlq?=
+ =?utf-8?B?dENlRTQzZFZTZktHUVlUSE4yQWF6TE1DaTNHaGpwR2R0Y2s0V1hQR3dna2VW?=
+ =?utf-8?B?aks4VVdUTEpSVlhCUFNNWkZYRGtjWFFJb09NeTdqbENiclkzMER2b0dSUVhl?=
+ =?utf-8?B?Sys3TnFsbCtqQ3BjNC9YL2daczYvQ0tiTCtOSDUwOXNrZDk3eit1a0pGN1Bx?=
+ =?utf-8?B?STJmN0NjZzV5V20vbkV5YlRFU0d0QUk4U2hCVjErckI3Vm9Rb2xmcE1lSlR1?=
+ =?utf-8?B?MWd4aTNrZ2dxWWxiT2l2eXZiZzRITGR5SUpYY0FFQ2J5dFREY2tKM0ZnMDJo?=
+ =?utf-8?B?dmpvL2VQMlVyWlhTSEZxd2N0dXNmR09XNXRqQ0FXNTVQRnlZY1B5N29WQWVq?=
+ =?utf-8?B?SUNYUDNKQTAzN1EvMXRxS2xzMERzWEtJc0tDeFBobGtISWU2S1RBWS9LZ2FM?=
+ =?utf-8?B?TFNTN1BxSWVmWWlGTkJlb1c0dDhaejJOTHdCVHpnbjh1dS8wRGRMRGxGdUww?=
+ =?utf-8?B?dWVXeDNrWDNWSTJLeXhCa250Wm5kNWsrTFhiV0VqSlljOTdPMmV1eUlYbEJC?=
+ =?utf-8?B?MnBsZFRhWlk4SHVZb3dEbDUrbFYvRFNwOS8wK1h0SkRuTDZzSlRCSlkyTFpQ?=
+ =?utf-8?B?NnNNeE4yMzNmN2dTUTl2SS9YK0hzWUFueFpOcnY5Y3Y0c0tuN3hiTGVGSUFl?=
+ =?utf-8?B?d1FCekxiTmVxcXVHbHErdXJEVDRtN211MW1ndzVOWVlRM1gwZUxHN0JtNUpv?=
+ =?utf-8?B?SkRLblgyNnk3WUtFd2gzNTRxUnhXN2lWUjcydTliWlZ3b0xmRGI3aFhON0pK?=
+ =?utf-8?B?dWZ0bnNRUWZxekxKNWZYYWVLTU8rdGNsck9ETE9TSGo3ckVQeXYxeTN0d3gy?=
+ =?utf-8?B?QlRTK01UaFZHeS92SDR5blVwd0Rhc2ZLYU9tUmhYY1ZRRlVKbjc3NjNDeE45?=
+ =?utf-8?B?UVU5SlgrelJhWi9STlpRbm1GSWpkV2cwL3c0Z1VYdjc4bnM3anhNa0V5OVlF?=
+ =?utf-8?B?TkNnN0paR1kvZHd5ek5qM2RjUE5pbCtuOE0zWG5lUjdCcmZlWlhqMTFiK3pO?=
+ =?utf-8?B?dHZlYzJRdTNTSGkwcmsvR0xKTjc0c3IwSnNrOUhFM2E1VHVnR0doNk5icCtS?=
+ =?utf-8?B?bDRNQ3ZMQk5ib0JSaWIyOUFmSUV6eVpjWU9wcXJtcG1idFY3WnZ0MGFTZXhU?=
+ =?utf-8?B?bmVjc3ZFN1pVeUtNQ0lmcFNLUGtERmsrT0Y0bnR3b3VQN1FxblR2bmMydFpG?=
+ =?utf-8?B?ZGF1R0pMTEptOXVtNlR0SE5ibVNKdlZVQTJ5ZDV0bk15SUV1WFhhNzVSd1hN?=
+ =?utf-8?B?RGphSHpJT2lyc1RpUUhTbUNJaHZUZzFzd1hDWGM3OUlZMU9ROVhyOWdaTnNX?=
+ =?utf-8?B?UHBZTFg5VkJtVlEyTnVvUGVBaXV2ZEQrT2l6SVFkZC96ZmZnVXNQZFNJOXI0?=
+ =?utf-8?B?ZDJ6Q1Y5Z1R1bkl2eFFaeWxOOWtSSS9qUlljZGpwSUtld0N3TGJkbXNHbFYw?=
+ =?utf-8?B?R3lVZnlhRGVCMno3QWNuY1lwMkpNVjdGRUtDSTh5aldBYytTVGF1T2c4Zyti?=
+ =?utf-8?B?bXdVRHI0WGRSK0pkbzJsemRoTVBuZFI5OXFkWE91UGZ3R3c5YmpZV3R6N25z?=
+ =?utf-8?Q?xtSONwYeuF6XQhCYQU?=
+X-OriginatorOrg: garyguo.net
+X-MS-Exchange-CrossTenant-Network-Message-Id: 975ef89d-3cce-4e35-7232-08de64ba9026
+X-MS-Exchange-CrossTenant-AuthSource: LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Feb 2026 13:29:17.9198
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9bZy44iNRSYVdI0vSTXqe23t6eDGqMbVhBymOP43dZ5aj11dmR/Cwtu5hLwd8Od7JU9GQxYUe+ZoUvkIG83YtA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO4P265MB6154
 
-On Tue, 3 Feb 2026 at 19:10, Bart Van Assche <bvanassche@acm.org> wrote:
+On Wed Feb 4, 2026 at 11:56 AM GMT, Andreas Hindborg wrote:
+> From: Asahi Lina <lina+kernel@asahilina.net>
 >
-> On 2/3/26 3:28 AM, Ulf Hansson wrote:
-> > I guess the question then is, do we always want zero latency, which I
-> > assume must be costly from a power savings point of view. At least
-> > during the idle period, while not serving I/O and waiting for the
-> > device to be runtime suspended.
+> By analogy to `AlwaysRefCounted` and `ARef`, an `Ownable` type is a
+> (typically C FFI) type that *may* be owned by Rust, but need not be. Unli=
+ke
+> `AlwaysRefCounted`, this mechanism expects the reference to be unique
+> within Rust, and does not allow cloning.
 >
-> Block I/O latency suffers if a CPU core enters a lower power state while
-> waiting for an I/O completion. Hence the choice in the UFS driver for
-> not allowing CPU cores to enter a lower power state while any block I/O
-> is in progress.
+> Conceptually, this is similar to a `KBox<T>`, except that it delegates
+> resource management to the `T` instead of using a generic allocator.
+>
+> This change is a derived work based on work by Asahi Lina
+> <lina+kernel@asahilina.net> [1] and Oliver Mangold <oliver.mangold@pm.me>=
+.
+>
+> Link: https://lore.kernel.org/rust-for-linux/20250202-rust-page-v1-1-e317=
+0d7fe55e@asahilina.net/ [1]
+> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
+> ---
+>  rust/kernel/lib.rs       |   1 +
+>  rust/kernel/owned.rs     | 196 +++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  rust/kernel/sync/aref.rs |   5 ++
+>  rust/kernel/types.rs     |  11 ++-
+>  4 files changed, 212 insertions(+), 1 deletion(-)
+>
+> diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
+> index f812cf1200428..96a3fadc3377a 100644
+> --- a/rust/kernel/lib.rs
+> +++ b/rust/kernel/lib.rs
+> @@ -119,6 +119,7 @@
+>  pub mod of;
+>  #[cfg(CONFIG_PM_OPP)]
+>  pub mod opp;
+> +pub mod owned;
+>  pub mod page;
+>  #[cfg(CONFIG_PCI)]
+>  pub mod pci;
+> diff --git a/rust/kernel/owned.rs b/rust/kernel/owned.rs
+> new file mode 100644
+> index 0000000000000..fe30580331df9
+> --- /dev/null
+> +++ b/rust/kernel/owned.rs
+> <snip>
+> +
+> +    /// Get a pinned mutable reference to the data owned by this `Owned<=
+T>`.
+> +    pub fn get_pin_mut(&mut self) -> Pin<&mut T> {
+> +        // SAFETY: The type invariants guarantee that the object is vali=
+d, and that we can safely
+> +        // return a mutable reference to it.
+> +        let unpinned =3D unsafe { self.ptr.as_mut() };
+> +
+> +        // SAFETY: We never hand out unpinned mutable references to the =
+data in
+> +        // `Self`, unless the contained type is `Unpin`.
+> +        unsafe { Pin::new_unchecked(unpinned) }
+> +    }
 
-Right, this seems reasonable to me too. Although, in a way it is a
-policy decision, as it means favoring block I/O performance, above
-trusting the cpuidle governor to pick an optimal low power state (from
-performance and power point of view) for the CPUs.
+Probably should be name `as_pin_mut` instead.
 
-The other concern I was trying to point out, is that using the runtime
-PM suspend/resume callbacks for managing the QoS constraint isn't
-really a good fit in my opinion, because of the potential idle period
-beyond the point when I/O was completed and when we may be waiting for
-the device to be runtime suspended (especially when runtime PM
-autosuspend is used).
+With name changed and SOB fixed:
 
-More precisely, during this idle period there is no point in keeping
-the QoS constraint as it would mean potentially wasting unnecessary
-energy by preventing low power states for CPUs. Ideally, I think it
-would be better if we could monitor the I/O request queue to manage
-the QoS constraint directly. Perhaps that is what you suggested too, I
-just didn't get it. :-)
+Reviewed-by: Gary Guo <gary@garyguo.net>
 
-That said, speaking about runtime suspend for UFS. Is runtime PM
-enabled for the UFS card too or is it just the UFS host controller
-that supports it?
+Best,
+Gary
 
-Kind regards
-Uffe
+> +}
+> +
+> +// SAFETY: It is safe to send an [`Owned<T>`] to another thread when the=
+ underlying `T` is [`Send`],
+> +// because of the ownership invariant. Sending an [`Owned<T>`] is equiva=
+lent to sending the `T`.
+> +unsafe impl<T: Ownable + Send> Send for Owned<T> {}
+> +
+> +// SAFETY: It is safe to send [`&Owned<T>`] to another thread when the u=
+nderlying `T` is [`Sync`],
+> +// because of the ownership invariant. Sending an [`&Owned<T>`] is equiv=
+alent to sending the `&T`.
+> +unsafe impl<T: Ownable + Sync> Sync for Owned<T> {}
+> +
