@@ -1,108 +1,103 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F4692C21C1
-	for <linux-block@vger.kernel.org>; Thu,  5 Feb 2026 03:12:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9F2D2D839D
+	for <linux-block@vger.kernel.org>; Thu,  5 Feb 2026 03:42:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770261146; cv=none; b=jO60D9vnGKTsMk+18ifg5FGhqS3dE3s+UJEFGaxyYCsr7iU2bD5Ep4GaDddzXHKPKsaQVXitF1I+fa6n8ID3CNirKvfnlpE6B6Ajcyf7FMqk6+3iRBjP+DuXGFyJfT3YIhWkfpHyyyAayxP8A/F9pLqx5S+2Tjz7IJKFgMqcwyU=
+	t=1770262971; cv=none; b=j/NYeRyGeF8heKS6xlEytnWcLdh9iK0ZJUhnTYyWe2Bfj5ovUI1IpnqXvloBtFAoyN79rpr3Ii+DNykdc0mPFtUB6mL9vkJVGP4oL38MbYlbufNSi+MICTmzWBOgSTJI0FrAKXpngPU+9uvZ/Utqbu/in5Wq3rsmURpqlS6hPTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770261146; c=relaxed/simple;
-	bh=G6vfD4Yxb3fnPBBrZTuCljmSL1phCxflePu2ZT8fNYM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UTCTju4NyHsDEc5gJ7XS47mDZUBnC3Rijp0cpclGUx16hHhjTqAk/D5KTVWapo+BhyyiLwrzrVyXO0arp2S65mNlva+Qo6P/bH4eQnfuVs2/x3/RdG2eOUOVf/Ot4idALpDU8uozBNjBmq+7JlGrJmpj79WvnJtjeSOPcMPtqE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iqE0JwnP; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1770262971; c=relaxed/simple;
+	bh=yTIiCoPaf2axh3yw/BOxlWdHS8hPHmnROAwOuIuJHy0=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=YSxkOF4KPhrRgd9k49cw3h8RKDxJD4RFMmO7DVDhaxFWIKsWQzb7G2EA8fHeB1lht31KVFoyDsJNgUYCJqSaG9XRViB0SRA3JIssv/aZv44g+B25eQKdo6wdC7dMmESmzI3FEF9xb/1SGiKTuaiSnhi8aL6Kq9iLfAmGtvgp6xA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=pLM6QYAQ; arc=none smtp.client-ip=209.85.210.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iqE0JwnP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770261145;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PU4GlXydM1MAqgXjMDFq3vjCStUesvrTn2wdEAI/iFs=;
-	b=iqE0JwnPI7kuhoa9IJo4B9QD3UtMAcAIwYO2trxIpne+yDP2pvU/EkppZTr0g/pK9TXG9r
-	4T0bWTZl8yQ3ljE484nXeTSqKmik2KoHiXj006tILV1v/DG+7WyU9Xoj+ltesBKh184N3o
-	IBRKRIVn05gFmg82niY8KFYu7SiVlFk=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-688-TVTha8Z0ON-75qSXyp4XFg-1; Wed,
- 04 Feb 2026 22:12:22 -0500
-X-MC-Unique: TVTha8Z0ON-75qSXyp4XFg-1
-X-Mimecast-MFC-AGG-ID: TVTha8Z0ON-75qSXyp4XFg_1770261140
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 74E0C18003F6;
-	Thu,  5 Feb 2026 03:12:19 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.36])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6B1171800465;
-	Thu,  5 Feb 2026 03:12:11 +0000 (UTC)
-Date: Thu, 5 Feb 2026 11:12:05 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: linux-block@vger.kernel.org, io-uring <io-uring@vger.kernel.org>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"Gohad, Tushar" <tushar.gohad@intel.com>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Christoph Hellwig <hch@lst.de>, Kanchan Joshi <joshi.k@samsung.com>,
-	Anuj Gupta <anuj20.g@samsung.com>,
-	Nitesh Shetty <nj.shetty@samsung.com>,
-	"lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>
-Subject: Re: [LSF/MM/BPF TOPIC] dmabuf backed read/write
-Message-ID: <aYQKhcnTJLimnbEn@fedora>
-References: <4796d2f7-5300-4884-bd2e-3fcc7fdd7cea@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="pLM6QYAQ"
+Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-7d1916d1e24so351477a34.3
+        for <linux-block@vger.kernel.org>; Wed, 04 Feb 2026 19:42:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1770262969; x=1770867769; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=p8odmZP3AsmwWLVEEIesC2LXuxYRFDXqGBxQCRutSXw=;
+        b=pLM6QYAQ5CfrvbDksf4Mmr3MPy2EfVQZ1L0qPsiGZtaGnPErGd/Ni6fr/653IYFbRp
+         Kc8+qfHniWCFlpXqFTffcTgP1HTKOcT5CTLKCMOH0EUjOXdbJ5lCw6YH2NkQHNsnE4pX
+         FWt882SOfdLZCaTdeHLU49v1/ZQ5D/lksOk12qEiN8Kxr4PVDSUrkGJf2D1P8gbEl6Lr
+         DAXWfWNVOEgcyeuP/xwIvM9SO8F4NXvAV/GHIr5Eo9hLL3N7h3NJmK5sWt+J5bijidwJ
+         lPGaxJg0sHTe2gyh2juXlV2b3xUuFVoGQ/wvG/nCpJ7wjAWihSngNyHrLD89/5Ap73uT
+         ZxGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770262969; x=1770867769;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=p8odmZP3AsmwWLVEEIesC2LXuxYRFDXqGBxQCRutSXw=;
+        b=fkC9Jfw1Je95Ov6dejO2VVYvEeAt6Fp1QKsBBA+oPYLwZbOF3X0dUiIIglOyIeAu6m
+         BaP+kvpeFuZg6jlKr7wYoqUHR57wBLdEHghY/ivBMNdRmxTupIChE9QsAaJXAD+y3+96
+         MWBinjxOdCaFTTuZzrjIdnM3azCqZsM7f3sbgdTp5TgcYrEeaHvImIFOb9Q7MMEZzjGL
+         uYEzLJgCzaQemlfl7bS22aY9/VkI0Mgnd4UJ27XaHW7wg/nYvEO4fHbVgiocym5HbnPV
+         XiiNuHg9AOX6O3eYcgNB7EbNLjYaV0tUEnCIOsGPLcgyM3moJDj4xEhdVEUZGO2RW+2a
+         Z7Sg==
+X-Gm-Message-State: AOJu0Yypu7I9+283HELlTcDR/ZpdVsIg8XifGEtX9hQhbWGSMVck2Bt/
+	eL/FsHN2s1JpiaK/82lXDRRRP8qYPakiAzFBl/eUe9qju4fntLKNiY/5BTeLn7DCF6s=
+X-Gm-Gg: AZuq6aJFZX5CatKVcYYuvGfx7Fk6aPfH4LgsumsXc7v8ntlxYJP61M3akIEc5z97sQl
+	WGGsPgxYurfiEmmqEeLVzlARTHdLfRJuyh0U5hrdekRhk+QPkyJz45Iobvty+Yg+fUBMghl0hUs
+	0sYWipZqo0RyGtDO5+Oz21ynmDE78zggk5dKv2Rzk1ZlQ+dMK3pZiYCqNWnY/9oXQCdES5nF2qp
+	PqZeUM3V7duzOVbRdA5A/rcREO0ykDgFfKe48uQd9vqn0W3gaIxce383vF8J3Rnv2AdPxU/ehGt
+	HNlx0KmqlKZvOEER5NPinJT4gjQfQ2kQLLLmG9DmqWDqD5JSEwFn23nXLmtpNoxzdOz6bOXYcMF
+	jujKkVuMkybtWaUNHtrJZ0yAPbC/Lppi2qHLcP1oaLXkbQ6AC877644xv0iao3p69sJSMRQLIpD
+	ZHLEzuNljDzHl3A+LTPSURO0Z0p0BJPBXqbG3hj6yz7df4W74ZBWnq/D6mfcKNkiPTGPh8cApZ0
+	ec=
+X-Received: by 2002:a05:6830:3901:b0:7d1:4d71:95c7 with SMTP id 46e09a7af769-7d448abb460mr3043741a34.26.1770262969619;
+        Wed, 04 Feb 2026 19:42:49 -0800 (PST)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d4490f35b7sm2812181a34.1.2026.02.04.19.42.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Feb 2026 19:42:49 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: ulf.hansson@linaro.org, hch@infradead.org, ziniu.wang_1@nxp.com
+Cc: linux-block@vger.kernel.org, linux-mmc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, imx@lists.linux.dev
+In-Reply-To: <20260204034003.2961402-1-ziniu.wang_1@nxp.com>
+References: <20260204034003.2961402-1-ziniu.wang_1@nxp.com>
+Subject: Re: (subset) [PATCH v4 0/2] Optimize secure erase performance for
+ certain Kingston eMMC devices
+Message-Id: <177026296860.37701.668895586539274878.b4-ty@kernel.dk>
+Date: Wed, 04 Feb 2026 20:42:48 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4796d2f7-5300-4884-bd2e-3fcc7fdd7cea@gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3
 
-On Tue, Feb 03, 2026 at 02:29:55PM +0000, Pavel Begunkov wrote:
-> Good day everyone,
+
+On Wed, 04 Feb 2026 11:40:01 +0800, ziniu.wang_1@nxp.com wrote:
+> This patch series optimize secure erase performance for certain Kingston
+> eMMC devices (IY2964 and IB2932) that take a fixed ~2 seconds per secure
+> erase operation regardless of size.
 > 
-> dma-buf is a powerful abstraction for managing buffers and DMA mappings,
-> and there is growing interest in extending it to the read/write path to
-> enable device-to-device transfers without bouncing data through system
-> memory. I was encouraged to submit it to LSF/MM/BPF as that might be
-> useful to mull over details and what capabilities and features people
-> may need.
+> Currently, a 1GB secure erase requires ~300 operations (limited by max
+> discard size), taking ~10 minutes. With these changes, the same secure
+> erase completes in a single operation, reducing time to just 2 seconds.
 > 
-> The proposal consists of two parts. The first is a small in-kernel
-> framework that allows a dma-buf to be registered against a given file
-> and returns an object representing a DMA mapping. The actual mapping
-> creation is delegated to the target subsystem (e.g. NVMe). This
-> abstraction centralises request accounting, mapping management, dynamic
-> recreation, etc. The resulting mapping object is passed through the I/O
-> stack via a new iov_iter type.
-> 
-> As for the user API, a dma-buf is installed as an io_uring registered
-> buffer for a specific file. Once registered, the buffer can be used by
-> read / write io_uring requests as normal. io_uring will enforce that the
-> buffer is only used with "compatible files", which is for now restricted
-> to the target registration file, but will be expanded in the future.
-> Notably, io_uring is a consumer of the framework rather than a
-> dependency, and the infrastructure can be reused.
+> [...]
 
-I am interested in this topic.
+Applied, thanks!
 
-Given dma-buf is inherently designed for sharing, I hope the io-uring
-interface can be generic for covering:
+[1/2] block: decouple secure erase size limit from discard size limit
+      commit: ee81212f74a57c5d2b56cf504f40d528dac6faaf
 
-- read/write with same dma-buf can be submitted to multiple devices
-
-- read/write with dma-buf can cross stackable devices(device mapper, raid,
-  ...)
+Best regards,
+-- 
+Jens Axboe
 
 
-Thanks,
-Ming
 
