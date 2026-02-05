@@ -1,161 +1,121 @@
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB3F740FDA4
-	for <linux-block@vger.kernel.org>; Thu,  5 Feb 2026 14:56:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770303381; cv=pass; b=qthvYOkZMZ5orTRfP4qdy5KKH5sB+7IUYaeh+OH4/BThjWpTAerEKdvW+rGWeorV5DCDdYD1awDQ3rEbzh4VF15XCMR1H4SerBTgJNvg8hQL/mxTwJEU7/OLkzmxJNEQlc71ckgPTpuwF6QXu+UdkTIj6RVreuD0CsybSAuGXSI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770303381; c=relaxed/simple;
-	bh=a8UGlQ4it/4rjmlTSwbY3biq3UiTr0x4Cw6OqgopNZ8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GTBoCrQHbYhfiLkwKN7mqBkZC+BZc/f+oNXtspQzRUe/QOeUd6aHxrlazUCSZvoLpg4Cp6pxdHqy2IGXHixlj1lPvxoovjAbGpk4jmQdmz23LPcHv+YMNJD1t8etO4HRdOWNafom7ZP08WdNuYa1ku7ENxJKdJrnajebrilgyBw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=zZt6dC5H; arc=pass smtp.client-ip=209.85.167.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEFA723EA90
+	for <linux-block@vger.kernel.org>; Thu,  5 Feb 2026 15:09:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770304193; cv=none; b=gFjJTcLamrT3X2DohRlHsMmawXWFWP7eIS+Wh2G0Xg0Rn+MLLBDY7CAIE+tP8xneX0WkfPl8riAQcSUn2HUQcZfapbTjIMT5S7aVUkkJWUZXg4R1eZAkr73A+ncm3WrYY68WrZX3t7CL55iupX1P5l6IlNKDPMukm8QNLbflEpQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770304193; c=relaxed/simple;
+	bh=uqCPIjmXVz+ylWQk9Ma/HUX1A02IFnhacygnovlEeXM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=fLblCxksL3DdMgmUdBf4vh7E8C0j9o2J2uRLZaWF//VdVAXCUbgwRfMFo1MvuIkZXGBRt+LJjUnziaKnRZFyBTyA9vul3dKUljQrk4f+IE/Bry/mqXIpg+kh9lHKcbS9bntgydi5gLh7OBDbWcCaJBefnH+vcSYvm1FKGdnpfwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CAOhhvkf; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zZt6dC5H"
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-59e17afd2d5so1412910e87.3
-        for <linux-block@vger.kernel.org>; Thu, 05 Feb 2026 06:56:20 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770303379; cv=none;
-        d=google.com; s=arc-20240605;
-        b=DsG0v9wwD/vNAuhOH0u6Tj7gToFTU6pShLSPd9xXYLIXud8YhCqRaq1csjhrp73bTy
-         Qdro84BJKv2//whJrCtrwOX3KYVW14sd0Y8yzUHhsUS3iU+fQG2/UUkyT1YYfxkrkk1E
-         msI5QmfBdua/j5wf3M41CRPbdYWYid4NOYleLFrJfV8fFy0wX5WD1GG12Lpesuoj71U9
-         dpLhDI3sm6/Zs+oUvmFjoHXOKnqXb4Xv9fj8qH+yBeWgUg8RIUS22PDIsEfb4JIXUvqv
-         ALzrrqiAH7oprNGdfI3LuVuf6HX+UIlp7qLqBGNodb3v5O0RWtje3k70G8WwiRqAdBFk
-         2iZA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=a8UGlQ4it/4rjmlTSwbY3biq3UiTr0x4Cw6OqgopNZ8=;
-        fh=ZKiLjvecGSYoTDXShPa6nOlbpGQ0qXBqqTOoGoKg0+8=;
-        b=HHgHcyK/fQ0QsiRA93F0BbPXhruwkUTVAk2rNpxiXfYhSQJo3bZPl1BvC9LbbIedOK
-         sBOox6/MalqQ2XcMnKDwnuwi/HbBZ6j8aL+KtmKk4RO6Hd69kj8lxH72vUViAdGqXs5Q
-         fSM1ICC9QrlxQKvWdHpeGtt2cWN72lEbaGf9HDo/73/hwM5BKObwf6Zz/SD0XcKqlW7+
-         U7hEtbOkTTZ5SRcSJuvsIFJnYe1GZ0fbndC2TSoVnQdrSrQ/lGSvZgKwEot38YRifrEE
-         buPF5bHaRNqrV23zXpTtXxmpmvu344P1x/KlzpvMBazjrKKRCXGP00d6H5ptmXQihbo0
-         fVBg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1770303379; x=1770908179; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=a8UGlQ4it/4rjmlTSwbY3biq3UiTr0x4Cw6OqgopNZ8=;
-        b=zZt6dC5HbiB2zRJV65Iim6TsolfX1HXSI4TBaFPbEMYkZz9fDi4iohN+6FXfPO7FhX
-         XwnTtAYbjStJ7o2mE+vvsXbQ8ml61gOkLroHe9wubAJghxEvCBDhsYzQP0bvsQdmFkNG
-         ctRGtFOB7tRkWi69iKkp4g89QKTgkHLBC4I7PDHDBumBkfL9TxJzq3d7zwbJJwU25ZZP
-         QMBD9RhkCPdmO9NYZMW+SWi+kstfzC4dSx/YQClk60qvCfw1wwwZ9B4VS7Rjl2e3yvv1
-         o3PFfoSxrSGGG8bcVRWcFUbK1O3V3mfUhGy8ptcM9JneOXG1j4Kd8aGc6prwjhsrgEn5
-         QVDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770303379; x=1770908179;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a8UGlQ4it/4rjmlTSwbY3biq3UiTr0x4Cw6OqgopNZ8=;
-        b=FKGnRFxtEE59vhngpUiZ5SZiFTVBVP+OrQOgk70ELulumZBitqeaobANWICVGyYbbQ
-         UcFJqL5zfpvoMSvexRZTXJcVqDxeZIeJG1JiKSpypFwrjeYjAKNGU4VZp+kZo1+I3evG
-         gYg9O+S8+LJI5fqwKZanmfrWMmil7PdKx6eUwhrjMLrjXtNuzV1Kk2pcyOpQGmLaodXG
-         W9GElw/tca+I9j3gtBWk9TS7lNKt4iSBch3QY2Lwy9FABfB/wKUd+Wfh/CUzcN5ZEepY
-         JgWDyiSHo3fmdEzlBv8aWjtGYiboKzFXgeCfJZ2eslV9eJG/mLDYQVwT4vDEkGfEqL1M
-         hM1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVZzr0ubAbMDEEMd5liGmbPyI2SYr8SIVRXoKiwGfAkGJ8KdWeejjKNO8W/IJBEmHLzJXvkbzd67W92Fg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxv1EaR1KR5QGitMeNEuqsa7nUbhrtnMMqTzYwiFW+Vy4ukNBbX
-	cuQ+fg//aa9KkgwUHoONOR+m70rt7hpOff5rxDuqlm7jnAumWoz702aoRDQaGhnoHy2XE5vqlTj
-	liTQqYhVEbvbd2CGxHqv+ur5AF1M2odW//XRYA2oWeQ==
-X-Gm-Gg: AZuq6aKcsBXy666l97mghCvATdjOZLad0Ao0XS9asKtFrQksCxkwVRU6XoUXORILRQ2
-	ETKS+OpXASpsws8a0ZGLpO8dcXN/S8AP2z0ty74y5/5hjXZaNAykoZ74eg2tcooZbrmZYWUty/a
-	M+LJ8x4lNsKLoeK6CUx2vU9M4gphBvNw4vaHzhQY1uEROtPji/2TovOwfF0+6Jl9e9YjqjsuMwP
-	CbL3wMJwClXyEcNSLvsYFPSdBBkItAGp/cR/VLqN/3q52K+/nE3SVcua5d0Y2HVOUcTftEG
-X-Received: by 2002:a05:6512:2523:b0:59d:f473:aa8e with SMTP id
- 2adb3069b0e04-59e38c27a3emr2431070e87.27.1770303378986; Thu, 05 Feb 2026
- 06:56:18 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CAOhhvkf"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770304192;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MWAate0VAub8j2pH34K8wd5v1+2dxKOy22ySrdtazPk=;
+	b=CAOhhvkf+BtcGOXFwQPqtva7dpB+Sm1x+p0kGcmYuaUofHsKrU6onwyZJZpI/+MotAbS+Q
+	N/YfdbuHOfvN4aT9Qw/+B3ulf6uL/uSBtKOmZltdn6V26kbMEGqFZr4Xrd7zVGJlnupCtn
+	6Z8nP5JWwYxH+bfhbPI+qnXRK2xUitA=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-269-SQeL31z6Mk-m1x2hz6VG7A-1; Thu,
+ 05 Feb 2026 10:09:49 -0500
+X-MC-Unique: SQeL31z6Mk-m1x2hz6VG7A-1
+X-Mimecast-MFC-AGG-ID: SQeL31z6Mk-m1x2hz6VG7A_1770304188
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4178D180057E;
+	Thu,  5 Feb 2026 15:09:48 +0000 (UTC)
+Received: from fedora.brq.redhat.com (unknown [10.43.17.192])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3EF9B18004AD;
+	Thu,  5 Feb 2026 15:09:46 +0000 (UTC)
+From: Ondrej Kozina <okozina@redhat.com>
+To: linux-block@vger.kernel.org
+Cc: Ondrej Kozina <okozina@redhat.com>,
+	gmazyland@gmail.com,
+	jonathan.derrick@linux.dev,
+	gjoyce@ibm.com,
+	hare@suse.de
+Subject: [PATCH v2 0/9] Extend Single User Mode (SUM) support in sed-opal.
+Date: Thu,  5 Feb 2026 16:09:23 +0100
+Message-ID: <20260205150935.238137-1-okozina@redhat.com>
+In-Reply-To: <20260130162527.570255-1-okozina@redhat.com>
+References: <20260130162527.570255-1-okozina@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <ff9a7c20-f465-4afa-bf29-708d4a52974a@linux.dev>
- <CAPDyKFrGpvjONrDmnNZXv+SME_NCNv-LK8J-Vo88RSz1fuD7rg@mail.gmail.com>
- <787171c6-0b9c-400b-8a95-b331b58e284c@linux.dev> <4777aabd-bc9e-4904-9444-892393aecb15@linux.dev>
- <9e362d5fa2604fb0848ea28866dc45fc@realtek.com> <47ed09fc-047b-4f98-8df3-d11d17678c57@linux.dev>
- <380f75c7adc04cbab38cfd2f82bd0c6d@realtek.com> <d46dcebe-ca58-44c4-87ee-cade2e478572@linux.dev>
- <4205fde06ecd4a7489b03ef25e5e4011@realtek.com> <CAPDyKFoC-dwzcsABNy9pA=GGirBWwcxQhNMeTSSStXHtXmWbcg@mail.gmail.com>
- <0b6fd99b-54a6-45f1-942e-94f707f2fbf5@acm.org> <CAPDyKFqic-rFe95g657MdZHtdPXTmFmYQG4ZSBV56S3DhMEF-A@mail.gmail.com>
- <dc1ac2e5-1db1-49b5-847d-a10a611027ae@acm.org> <CAPDyKFrNHc4FexuTbdWM-Kvo0mn9C51nJN5b=e0jZR8miFho+g@mail.gmail.com>
- <2d3b720c-5637-45e7-887d-077b1e9b3c23@acm.org> <CAPDyKFqQCtXzRruVSy0RLfWw11=TB+HAqN=+0P7St=aovZOoEg@mail.gmail.com>
- <4f1d5c9a-f261-49da-9ae6-f068bcd7402c@acm.org>
-In-Reply-To: <4f1d5c9a-f261-49da-9ae6-f068bcd7402c@acm.org>
-From: Ulf Hansson <ulf.hansson@linaro.org>
-Date: Thu, 5 Feb 2026 15:55:42 +0100
-X-Gm-Features: AZwV_QiIMgeILf_6udDuquP88lDGVGj5C32chTiT5zTMK1nwYFJwXumF4IHZ8Ic
-Message-ID: <CAPDyKFqUw-HaKpvqBzoYm8K5gTjdwskAEcWGxnMHaj17QcKLjQ@mail.gmail.com>
-Subject: Re: [BUG] - Short freezes in gameplay due to MMC_CAP_AGGRESSIVE_PM on
- RTS525A card reader
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, Ricky WU <ricky_wu@realtek.com>, 
-	Matthew Schwartz <matthew.schwartz@linux.dev>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>, linux-block <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Thu, 5 Feb 2026 at 15:21, Bart Van Assche <bvanassche@acm.org> wrote:
->
-> On 2/5/26 3:26 AM, Ulf Hansson wrote:
-> > The other concern I was trying to point out, is that using the runtime
-> > PM suspend/resume callbacks for managing the QoS constraint isn't
-> > really a good fit in my opinion, because of the potential idle period
-> > beyond the point when I/O was completed and when we may be waiting for
-> > the device to be runtime suspended (especially when runtime PM
-> > autosuspend is used).
-> >
-> > More precisely, during this idle period there is no point in keeping
-> > the QoS constraint as it would mean potentially wasting unnecessary
-> > energy by preventing low power states for CPUs. Ideally, I think it
-> > would be better if we could monitor the I/O request queue to manage
-> > the QoS constraint directly. Perhaps that is what you suggested too, I
-> > just didn't get it. :-)
->
-> Hmm ... the block layer RPM code monitors the request queue, isn't it?
-> I don't see how the request queue could be monitored more directly than
-> how the block layer RPM code does it today - by checking the counter of
-> the number of requests that is in flight?
->
-> Deciding that the I/O request queue is empty is not possible without
-> waiting until the idle period has expired, isn't it?
+This patch series extends support for TCG Storage Opal SSC Single User
+Mode (SUM) in the sed-opal kernel interface. SUM addresses few
+shortcomins described in the chapter 2 of the OPAL2 sepecification
+extension (see below). It better isolates Admin authority from User
+stored data by taking the Lock/Unlock/Enable/Disable privileges from
+Admin when managing Locking Ranges configured for SUM.
 
-Right, this is how it works today. We would need something additional
-to what we have, to allow us to better manage performance
-optimizations dynamically for block I/O. Exactly how to implement
-this, needs further exploring, at least from my side.
+This permission split necessitates separate ioctl calls for operations
+that previously could be performed atomically under a single authority.
+The series refactors existing code and introduces new ioctls to support
+this model:
 
-FYI, related to this, there is a series from Qcom [1], that in
-principle wants to allow some of the CPUs to enter deep idle states,
-while keeping others to only shallow idle states. This is especially
-useful for some UFS based platforms it seems.
+- IOC_OPAL_REACTIVATE_LSP: Switch an active OPAL2 device to/from SUM
+- IOC_OPAL_LR_SET_START_LEN: Set locking range boundaries only
+- IOC_OPAL_ENABLE_DISABLE_LR: Set lock enable states only
+- IOC_OPAL_GET_SUM_STATUS: Query SUM configuration status
 
->
-> > That said, speaking about runtime suspend for UFS. Is runtime PM
-> > enabled for the UFS card too or is it just the UFS host controller
-> > that supports it?
->
-> It depends on the decisions made by the manufacturer of the device that
-> includes the UFS device.
->
-> In multiple recent UFS-powered devices RPM is enabled for both the UFS
-> device and the UFS host controller.
+References:
+- TCG Storage Opal SSC Feature Set: Single User Mode specification
+- cryptsetup code using the extended sed-opal interface:
+  https://gitlab.com/cryptsetup/cryptsetup/-/merge_requests/832
 
-Okay, thanks for letting me know and taking your time to answer all my
-questions!
+Changes since previus version:
 
-Kind regards
-Uffe
+v2:
+  - Make separate patch adding Locking table UID
+  - Make separate patch adding RangeStartRangeLengthPolicy parameter
+  - Make separate patch adding Admin1PIN parameter
+  - Add comments explaining differences between passing Locking table
+    UID and separate Locking Ranges UID via array in IOC_OPAL_REACTIVATE_LSP
+  - Minor whitespace fixes
+  - Minor commit messages changes in IOC_OPAL_LR_SET_START_LEN and
+    IOC_OPAL_ENABLE_DISABLE_LR ioctls patches.
+  - Additional comments explaining expected answer from the
+    controller in IOC_OPAL_GET_SUM_STATUS ioctl.
 
-[1]
-[PATCH v2 0/5] PM QoS: Add CPU affinity latency QoS support and
-resctrl integration
-https://lore.kernel.org/all/20250721124104.806120-1-quic_zhonhan@quicinc.com/
+Ondrej Kozina (9):
+  sed-opal: add UID of Locking Table.
+  sed-opal: add RangeStartRangeLengthPolicy parameter.
+  sed-opal: add Admin1PIN parameter.
+  sed-opal: add IOC_OPAL_REACTIVATE_LSP.
+  sed-opal: refactor (split) IOC_OPAL_LR_SETUP internals.
+  sed-opal: add IOC_OPAL_LR_SET_START_LEN ioctl.
+  sed-opal: add IOC_OPAL_ENABLE_DISABLE_LR.
+  sed-opal: increase column attribute type size to 64 bits.
+  sed-opal: add IOC_OPAL_GET_SUM_STATUS ioctl.
+
+ block/opal_proto.h            |   4 +
+ block/sed-opal.c              | 385 +++++++++++++++++++++++++++++++---
+ include/linux/sed-opal.h      |   4 +
+ include/uapi/linux/sed-opal.h |  25 +++
+ 4 files changed, 389 insertions(+), 29 deletions(-)
+
+-- 
+2.52.0
+
