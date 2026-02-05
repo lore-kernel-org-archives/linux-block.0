@@ -1,47 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9A141ACED5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B86B23EA90
 	for <linux-block@vger.kernel.org>; Thu,  5 Feb 2026 15:10:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770304210; cv=none; b=o8786QxvJ6hsHOxHTaGkUcwmjx7uhCN4vfn5NswuUrFilL/66HQL/i35KnvUrobH6AjbZUr2T9Ftnzs6VUWA/hHJ2dXL1DhAWNPbe9vOfrifiTQ9U03nlGBcSItiZH9z7TS93eWc7mzRqMfpTRx2sXim7BYrhUwMPUG4r1PgdZQ=
+	t=1770304210; cv=none; b=OciONzWN8L3phTcLZom6uhdJYMDJwk0yw6K2RAmGsqRPw9xg814+Bytt7tUWF7NLjEUyJw+xpoXxpmbqJlUnMIXkWbewxPwXLND06x9FOI+RbozJIDdqXbju45rFWeDoQMmG9fmwLrgmcTCLr9DuqPI3MIW5dAhmIZZ23mF5Ik8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1770304210; c=relaxed/simple;
-	bh=8KBCHH1UWfozHW2P/p9zFRNTTZow7BffOLjRD4GQTTU=;
+	bh=mPFgKXyo1rCk7daYO5lbR8h/FgMa/u3dz5Q1U4TWmWM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bf+L1xs5i4EDtgE736AmWiFDJqIEbeO7v6I43qxwGLFZsZnm78pIRoTa/ozMGnMKIkTvlO8Yb/mm/guOZ1rVABSNsI0LrfVXTK9FG0YWNngDORhTsCuPTqKVAKSqZigeeAgxCylzaC/WqqOVJd4i4BeyF6B73AEJpZL20/N1Nkc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S1bXho1S; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=ce2h1a75hr5YsWOoJLeSNSYo8Cfrwue9htxBBibXrvB494juLaITy8a1PnHjgHemF+zJAhAYkUFX/E/0Oes7mFDW4D+YOj9Z8QdMnZYSNEj140XwuGAO/8QcUNJZqo0IZNplVmKX57GPfHA4KcjaTgQDC7j8vLWYQmqnMdn8oeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bOXFkSrr; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S1bXho1S"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bOXFkSrr"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
 	s=mimecast20190719; t=1770304209;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=LwJ5S953d0bRuNE0UlIXPXn6RrxQYGW7ebjbthqImEI=;
-	b=S1bXho1SPl0zxJFA1/rc8fE0D1HU0eKrX2ZraNMMq4EJQKWsOFhVEGR+q6KTAnzv3xyKGC
-	TWIqqEV9di6I/lThjDkaV9tOnGQ+3Zfr2dACubsoAWm178pOFldqgKpGc8X/GTYaMeKS+3
-	N36BOm9iYOSzW5nFzVWTK7QyItYZtDE=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=vvCLdv3CYjSTRfjo+P4zktU7VDFZBWXUNhh0gXPp4eI=;
+	b=bOXFkSrrlmGlGsXtVlWRBouAX6C4hml+dyQhe3YwTz9jAMnwXec3KY8vxP+ZmuomVNnHy3
+	Ktxyti62e4pYLp+POByj/RIJy9MMmJdkgvj/BOnxss+PwFr+dU40XHPEeOQ5ArOkC/UvAq
+	AdoVkFoU4j6EFcSrzw2HbVK/0k1n9O0=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-617-nHWz9iigPGOfcfW8vNY4_w-1; Thu,
- 05 Feb 2026 10:10:07 -0500
-X-MC-Unique: nHWz9iigPGOfcfW8vNY4_w-1
-X-Mimecast-MFC-AGG-ID: nHWz9iigPGOfcfW8vNY4_w_1770304206
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-678-La9bCuVoORqiqllALVMO1w-1; Thu,
+ 05 Feb 2026 10:10:05 -0500
+X-MC-Unique: La9bCuVoORqiqllALVMO1w-1
+X-Mimecast-MFC-AGG-ID: La9bCuVoORqiqllALVMO1w_1770304204
 Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A726D18005B7;
-	Thu,  5 Feb 2026 15:10:06 +0000 (UTC)
-Received: from fedora.brq.redhat.com (unknown [10.43.17.192])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0FB3E180035A;
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A65221956095;
 	Thu,  5 Feb 2026 15:10:04 +0000 (UTC)
+Received: from fedora.brq.redhat.com (unknown [10.43.17.192])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0213718004AD;
+	Thu,  5 Feb 2026 15:10:02 +0000 (UTC)
 From: Ondrej Kozina <okozina@redhat.com>
 To: linux-block@vger.kernel.org
 Cc: Ondrej Kozina <okozina@redhat.com>,
@@ -49,9 +49,9 @@ Cc: Ondrej Kozina <okozina@redhat.com>,
 	jonathan.derrick@linux.dev,
 	gjoyce@ibm.com,
 	hare@suse.de
-Subject: [PATCH v2 9/9] sed-opal: add IOC_OPAL_GET_SUM_STATUS ioctl.
-Date: Thu,  5 Feb 2026 16:09:32 +0100
-Message-ID: <20260205150935.238137-10-okozina@redhat.com>
+Subject: [PATCH v2 8/9] sed-opal: increase column attribute type size to 64 bits.
+Date: Thu,  5 Feb 2026 16:09:31 +0100
+Message-ID: <20260205150935.238137-9-okozina@redhat.com>
 In-Reply-To: <20260130162527.570255-1-okozina@redhat.com>
 References: <20260130162527.570255-1-okozina@redhat.com>
 Precedence: bulk
@@ -63,237 +63,36 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-This adds a function for retrieving the set of Locking objects enabled
-for Single User Mode (SUM) and the value of the
-RangeStartRangeLengthPolicy parameter.
+Change the column parameter in response_get_column() from u8 to u64
+to support the full range of column identifiers.
 
 Signed-off-by: Ondrej Kozina <okozina@redhat.com>
 ---
- block/sed-opal.c              | 157 ++++++++++++++++++++++++++++++++++
- include/linux/sed-opal.h      |   1 +
- include/uapi/linux/sed-opal.h |   9 ++
- 3 files changed, 167 insertions(+)
+ block/sed-opal.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/block/sed-opal.c b/block/sed-opal.c
-index aec5f4708987..1879bb1cd12e 100644
+index edde7fa52ab3..aec5f4708987 100644
 --- a/block/sed-opal.c
 +++ b/block/sed-opal.c
-@@ -1757,6 +1757,12 @@ static int start_anybodyASP_opal_session(struct opal_dev *dev, void *data)
- 					  OPAL_ADMINSP_UID, NULL, 0);
- }
+@@ -1581,7 +1581,7 @@ static int setup_locking_range_start_length(struct opal_dev *dev, void *data)
  
-+static int start_anybodyLSP_opal_session(struct opal_dev *dev, void *data)
-+{
-+	return start_generic_opal_session(dev, OPAL_ANYBODY_UID,
-+					  OPAL_LOCKINGSP_UID, NULL, 0);
-+}
-+
- static int start_SIDASP_opal_session(struct opal_dev *dev, void *data)
+ static int response_get_column(const struct parsed_resp *resp,
+ 			       int *iter,
+-			       u8 column,
++			       u64 column,
+ 			       u64 *value)
  {
- 	int ret;
-@@ -3388,6 +3394,154 @@ static int opal_get_geometry(struct opal_dev *dev, void __user *data)
- 	return 0;
- }
+ 	const struct opal_resp_tok *tok;
+@@ -1599,7 +1599,7 @@ static int response_get_column(const struct parsed_resp *resp,
+ 	n++;
  
-+static int get_sum_ranges(struct opal_dev *dev, void *data)
-+{
-+	const char *lr_uid;
-+	size_t lr_uid_len;
-+	u64 val;
-+	const struct opal_resp_tok *tok;
-+	int err, tok_n = 2;
-+	struct opal_sum_ranges *sranges = data;
-+	const __u8 lr_all[OPAL_MAX_LRS] = { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
-+
-+	err = generic_get_columns(dev, opaluid[OPAL_LOCKING_INFO_TABLE], OPAL_SUM_SET_LIST,
-+				  OPAL_SUM_RANGE_POLICY);
-+	if (err) {
-+		pr_debug("Couldn't get locking info table columns %d to %d.\n",
-+			 OPAL_SUM_SET_LIST, OPAL_SUM_RANGE_POLICY);
-+		return err;
-+	}
-+
-+	tok = response_get_token(&dev->parsed, tok_n);
-+	if (IS_ERR(tok))
-+		return PTR_ERR(tok);
-+
-+	if (!response_token_matches(tok, OPAL_STARTNAME)) {
-+		pr_debug("Unexpected response token type %d.\n", tok_n);
-+		return OPAL_INVAL_PARAM;
-+	}
-+	tok_n++;
-+
-+	if (response_get_u64(&dev->parsed, tok_n) != OPAL_SUM_SET_LIST) {
-+		pr_debug("Token %d does not match expected column %u.\n",
-+			 tok_n, OPAL_SUM_SET_LIST);
-+		return OPAL_INVAL_PARAM;
-+	}
-+	tok_n++;
-+
-+	tok = response_get_token(&dev->parsed, tok_n);
-+	if (IS_ERR(tok))
-+		return PTR_ERR(tok);
-+
-+	/*
-+	 * The OPAL_SUM_SET_LIST response contains two distinct values:
-+	 *
-+	 *  - the list of individual locking ranges (UIDs) put in SUM. The list
-+	 *    may also be empty signaling the SUM is disabled.
-+	 *
-+	 *  - the Locking table UID if the entire Locking table is put in SUM.
-+	 */
-+	if (response_token_matches(tok, OPAL_STARTLIST)) {
-+		sranges->num_lrs = 0;
-+
-+		tok_n++;
-+		tok = response_get_token(&dev->parsed, tok_n);
-+		if (IS_ERR(tok))
-+			return PTR_ERR(tok);
-+
-+		while (!response_token_matches(tok, OPAL_ENDLIST)) {
-+			lr_uid_len = response_get_string(&dev->parsed, tok_n, &lr_uid);
-+			if (lr_uid_len != OPAL_UID_LENGTH) {
-+				pr_debug("Unexpected response token type %d.\n", tok_n);
-+				return OPAL_INVAL_PARAM;
-+			}
-+
-+			if (memcmp(lr_uid, opaluid[OPAL_LOCKINGRANGE_GLOBAL], OPAL_UID_LENGTH)) {
-+				if (lr_uid[5] != LOCKING_RANGE_NON_GLOBAL) {
-+					pr_debug("Unexpected byte %d at LR UUID position 5.\n",
-+						 lr_uid[5]);
-+					return OPAL_INVAL_PARAM;
-+				}
-+				sranges->lr[sranges->num_lrs++] = lr_uid[7];
-+			} else
-+				sranges->lr[sranges->num_lrs++] = 0;
-+
-+			tok_n++;
-+			tok = response_get_token(&dev->parsed, tok_n);
-+			if (IS_ERR(tok))
-+				return PTR_ERR(tok);
-+		}
-+	} else {
-+		/* Only OPAL_LOCKING_TABLE UID is an alternative to OPAL_STARTLIST here. */
-+		lr_uid_len = response_get_string(&dev->parsed, tok_n, &lr_uid);
-+		if (lr_uid_len != OPAL_UID_LENGTH) {
-+			pr_debug("Unexpected response token type %d.\n", tok_n);
-+			return OPAL_INVAL_PARAM;
-+		}
-+
-+		if (memcmp(lr_uid, opaluid[OPAL_LOCKING_TABLE], OPAL_UID_LENGTH)) {
-+			pr_debug("Unexpected response UID.\n");
-+			return OPAL_INVAL_PARAM;
-+		}
-+
-+		/* sed-opal kernel API already provides following limit in Activate command */
-+		sranges->num_lrs = OPAL_MAX_LRS;
-+		memcpy(sranges->lr, lr_all, OPAL_MAX_LRS);
-+	}
-+	tok_n++;
-+
-+	tok = response_get_token(&dev->parsed, tok_n);
-+	if (IS_ERR(tok))
-+		return PTR_ERR(tok);
-+
-+	if (!response_token_matches(tok, OPAL_ENDNAME)) {
-+		pr_debug("Unexpected response token type %d.\n", tok_n);
-+		return OPAL_INVAL_PARAM;
-+	}
-+	tok_n++;
-+
-+	err = response_get_column(&dev->parsed, &tok_n, OPAL_SUM_RANGE_POLICY, &val);
-+	if (err)
-+		return err;
-+
-+	sranges->range_policy = val ? 1 : 0;
-+
-+	return 0;
-+}
-+
-+static int opal_get_sum_ranges(struct opal_dev *dev, struct opal_sum_ranges *opal_sum_rngs,
-+			       void __user *data)
-+{
-+	const struct opal_step admin_steps[] = {
-+		{ start_admin1LSP_opal_session, &opal_sum_rngs->key },
-+		{ get_sum_ranges, opal_sum_rngs },
-+		{ end_opal_session, }
-+	}, anybody_steps[] = {
-+		{ start_anybodyLSP_opal_session, NULL },
-+		{ get_sum_ranges, opal_sum_rngs },
-+		{ end_opal_session, }
-+	};
-+	int ret;
-+
-+	mutex_lock(&dev->dev_lock);
-+	setup_opal_dev(dev);
-+	if (opal_sum_rngs->key.key_len)
-+		ret = execute_steps(dev, admin_steps, ARRAY_SIZE(admin_steps));
-+	else
-+		ret = execute_steps(dev, anybody_steps, ARRAY_SIZE(anybody_steps));
-+	mutex_unlock(&dev->dev_lock);
-+
-+	/* skip session info when copying back to uspace */
-+	if (!ret && copy_to_user(data + offsetof(struct opal_sum_ranges, num_lrs),
-+				(void *)opal_sum_rngs + offsetof(struct opal_sum_ranges, num_lrs),
-+				sizeof(*opal_sum_rngs) - offsetof(struct opal_sum_ranges, num_lrs))) {
-+		pr_debug("Error copying SUM ranges info to userspace\n");
-+		return -EFAULT;
-+	}
-+
-+	return ret;
-+}
-+
- int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
- {
- 	void *p;
-@@ -3482,6 +3636,9 @@ int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
- 	case IOC_OPAL_ENABLE_DISABLE_LR:
- 		ret = opal_enable_disable_range(dev, p);
- 		break;
-+	case IOC_OPAL_GET_SUM_STATUS:
-+		ret = opal_get_sum_ranges(dev, p, arg);
-+		break;
- 
- 	default:
- 		break;
-diff --git a/include/linux/sed-opal.h b/include/linux/sed-opal.h
-index 1d63479838cf..aa006edb612b 100644
---- a/include/linux/sed-opal.h
-+++ b/include/linux/sed-opal.h
-@@ -56,6 +56,7 @@ static inline bool is_sed_ioctl(unsigned int cmd)
- 	case IOC_OPAL_REACTIVATE_LSP:
- 	case IOC_OPAL_LR_SET_START_LEN:
- 	case IOC_OPAL_ENABLE_DISABLE_LR:
-+	case IOC_OPAL_GET_SUM_STATUS:
- 		return true;
+ 	if (response_get_u64(resp, n) != column) {
+-		pr_debug("Token %d does not match expected column %u.\n",
++		pr_debug("Token %d does not match expected column %llu.\n",
+ 			 n, column);
+ 		return OPAL_INVAL_PARAM;
  	}
- 	return false;
-diff --git a/include/uapi/linux/sed-opal.h b/include/uapi/linux/sed-opal.h
-index bde023ae2295..f69d52e1bf40 100644
---- a/include/uapi/linux/sed-opal.h
-+++ b/include/uapi/linux/sed-opal.h
-@@ -111,6 +111,14 @@ struct opal_lr_status {
- 	__u8  align[4];
- };
- 
-+struct opal_sum_ranges {
-+	struct opal_key key;
-+	__u8 num_lrs;
-+	__u8 lr[OPAL_MAX_LRS];
-+	__u8 range_policy;
-+	__u8 align[5]; /* Align to 8 byte boundary */
-+};
-+
- struct opal_lock_unlock {
- 	struct opal_session_info session;
- 	__u32 l_state;
-@@ -232,5 +240,6 @@ struct opal_revert_lsp {
- #define IOC_OPAL_REACTIVATE_LSP     _IOW('p', 242, struct opal_lr_react)
- #define IOC_OPAL_LR_SET_START_LEN   _IOW('p', 243, struct opal_user_lr_setup)
- #define IOC_OPAL_ENABLE_DISABLE_LR  _IOW('p', 244, struct opal_user_lr_setup)
-+#define IOC_OPAL_GET_SUM_STATUS     _IOW('p', 245, struct opal_sum_ranges)
- 
- #endif /* _UAPI_SED_OPAL_H */
 -- 
 2.52.0
 
