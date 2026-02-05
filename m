@@ -1,66 +1,66 @@
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E45F036E495
-	for <linux-block@vger.kernel.org>; Thu,  5 Feb 2026 10:53:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAC0A3A7F5D
+	for <linux-block@vger.kernel.org>; Thu,  5 Feb 2026 10:58:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770288789; cv=none; b=TrqaWKwYGlpkrCCosadvCtrW1AvnHFWwNGFet9t+CCdb5AJyDBlAvMW6yl8cBWUcpOQqHYYN1B6DbUSN+lDDOsGjqG0Ytd7gFRo9Rd0hGjCxPenRvvviZ7WkDHwnOAjRraT5zuA9VgX3dRvo/kDX7ctjldYdgXnxmmoO9U1Hlq8=
+	t=1770289093; cv=none; b=CHHNxFHtEJrGaZXUQGdyWcOhtPv0Ea7iExp0LTinlDgeAgtxuJcJW60WV0EW99oV9Vs8Nl9z7ZJYxNh9eBeLX+1ubfNIDHNOz0gZ8FGa0R7OCHd/Lx4PmITTzTzL9qE3aYbHKHWrQEOREORlTXE5Zm0Bq/d+QYhXU37BUlZVXFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770288789; c=relaxed/simple;
-	bh=p5ZxxLhRM7KNb+08JyORQsjnmS9D6hRQY8Q0kAaQ6jM=;
+	s=arc-20240116; t=1770289093; c=relaxed/simple;
+	bh=cbh82RvVDowM0gxYQtkrt6AcVZlckgrZRO7ZexD3Ur0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NiusgdwYHelMez4iPjRQ+nPIomnK/n/4hfwSfkjkrEAFHNcWuWypbjCliwn1Tk/bOmfBsNb44l0IJLTSizzCjcpvZBLREn2lZamb8jV7qgNIwVAvy75MpoS8YRz8j4Y2Cqy9T+IMvamMaBWJE+iHseAEMY8u/P7aPJnuqLMcLLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WpeSKyFv; arc=none smtp.client-ip=209.85.221.47
+	 In-Reply-To:Content-Type; b=U1RLq459QlOZydqrIqbib3o5dpJ37hKFNPrGpOBFMp6RRKGMZ7eaAcTwt0BkB1vsRInbqRqdhAD/lzIaiT+6yEeG0A8+WpmS5/+cW/8XqSvd+a1DNiCXY4bQtnkroEnsjOY3Rd2yEjNXf5g1Vi5Aul9awZKm56UHXzJBi0xmmAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SVqzRBIh; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WpeSKyFv"
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-42fb0fc5aa9so623482f8f.1
-        for <linux-block@vger.kernel.org>; Thu, 05 Feb 2026 02:53:08 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SVqzRBIh"
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4801c2fae63so5986065e9.2
+        for <linux-block@vger.kernel.org>; Thu, 05 Feb 2026 02:58:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770288787; x=1770893587; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1770289091; x=1770893891; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=/+c2QLdGZFoULZ/RvBqcUByi9TkEnmi28PPZ5Yodtb0=;
-        b=WpeSKyFvKM8h7aFIEQN6w70HUbK0HrFEZ8qaNiOFIaHOkpMGIbtR2BjA+S5/IoNiR/
-         pIRIqyRjTPiE1WXZgTMpgu1GgK4pXLBHCasaLyTNZR4fLq9NXEANe1jMYsEh8IvRwJPj
-         Q19R7Vhc2H4WB3UuSnPCkdqfURm0cgn+9sGSblFj/TT5J8/k3URRuAuptcMM09qsVoCF
-         dAbIxGOrSIMx8vE8GFl5HJ/EjcB9E2dfHItGh7KrjIwKY/m9/Eb5DkQvPeuy4grRld+0
-         yKGlsKSfMRG3p8dbZQIBFqVAJAWJ4YE/VKMDle/tvpMMXW85GOtv0MFTOs0WQeyiTTwZ
-         8LAw==
+        bh=Pb1Kwo5msKrY9tFVghwuuNrP+c1AKSAw5Wg6OfLyWuE=;
+        b=SVqzRBIhQMJgVpd0tOtqZV5pxLPjwDpqBo3GTGs++gci1MtxhcW9ZciCleIG+XQZJ8
+         SY965oozWXRUr29+bhV+6CCnolYqplyNGirk9JMNf/WaXizMhSNyHbB7GGC5sS5IXy+Z
+         KBk8a30RPr85h0qWT3KYTZE2AEGbzrODyrYW8Q8eMDwVUaXDDOl24Q43qGCQnXbXd5cj
+         gr8KSkeI8qeAc/3QRZeQ8c9RFpd1Qt7xcVLp2LZgMFW+ggU1FOc0DI+PReScmHTCOZSJ
+         UMOEjp33OXABFeaAEDxgL7mi7oJfSx/0PVbNSBs8JStndwXo7Gl9WzoU8sOV+VYMpraa
+         vmkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770288787; x=1770893587;
+        d=1e100.net; s=20230601; t=1770289091; x=1770893891;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/+c2QLdGZFoULZ/RvBqcUByi9TkEnmi28PPZ5Yodtb0=;
-        b=Zc7qO6rxmPHnM5ADJy5G72fKnJZBmGpk7MLUOgbabee79wYyRo3eRjNQavz6pVBaEI
-         1jIJnH6cJpCkQDO7xXZT3vSb2xZACTgl7kAFui607/lry+TDI2auqB2+OsdKTplKOz7j
-         DrpBemXqkWH5QwZcVwO1Sw6xOSoiT/gumHfR2O07x8XgRYAo+sT0I5YZIZKNfd2aFemk
-         gD1T4eeU9XyQ4o1zUgUy4HnqPhF350QeNdxftagrx8loe7UTdgazGlfL1Ir3QUMqvdnW
-         mHNADcCayQwpPLIDsPW7NlX4vn6qm6nXMn7qBuoHeHDnHteeZLlI9D+d6rHJRfajAiIg
-         4Wug==
-X-Forwarded-Encrypted: i=1; AJvYcCVOj0ZHX+qn6FDhzaCz9QoJucAdlg8XGLTX8UUOxrGa7n77UpX3LcztbGY2f+QbuldqsTxTp6Ffz9TZLg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxUiZpU69o/TTEUbAKUhPg37ZU9noja0TAsdL7vh7DY3F2tC9w3
-	G+bSL93jAV6vHaEUOcrW8rKMvcv3jfGpRd1cws7XPKUlYN8xOuDDADIU
-X-Gm-Gg: AZuq6aLi7k1S6eUh4tJvewQQT2pS62wu6uwbnxx1zWMOXLeFEpKmjtFAdmVBVG/Sqry
-	soUhTRQWbjUWohAAqdNE9ueCZoE+cUDFMKODZl0JSVLBxwUUwGFc9TCD3/GftwMAq+fSv63rI7B
-	zYba2zHRbyidrHUeTa2m8TfiLM/iyUc7OBxwEMGD4zcXaV8kD9r2twq1MZeS95PUG3AvCXC+rzW
-	p1XU0w4BcVxXdxGvpbf7rQxdy8Z/N787jrJvRNfDShnSAT4Jvyxsupb41Ox5Ki79zKyXitVhiwo
-	HhYPNouC1pCkyUgYnVDXTIYzV95E89XFKwS77nXcer6EY7wHjjqRjioOHQ7kEIalEweyZ//jPt7
-	59r8r0fHtvb6rCjpOTueps/M9UI14ssALND9L4JwlNCsPpJJEtjwiYknnn6XiwS7YTqGMbOVNVB
-	JHry6ezopiAmIHJ7k=
-X-Received: by 2002:a05:6000:230f:b0:435:b7ca:7521 with SMTP id ffacd0b85a97d-43617e41ef4mr9745313f8f.15.1770288786946;
-        Thu, 05 Feb 2026 02:53:06 -0800 (PST)
+        bh=Pb1Kwo5msKrY9tFVghwuuNrP+c1AKSAw5Wg6OfLyWuE=;
+        b=lqMaA65o80KBikr+u7QdD+Mt10bMDJOUDbOz7kiGhxCB2V5ZWdbxdkW2IoEy/a4VXf
+         D8ihhjvst1vMObX+8gqxMchwI7Jpa9aik5eh7xIa5xfmyvprlghANejdtLGyZdvS+857
+         omcztEmRrzcS3TjhzbV/dsg+r+WhFUH6yX/zba67joAgHxo18Cp30uifOccL0vFr3KVi
+         +am32UMMGCMLsExt/cAhtz7l88ecagi+C8Q+ENc/acMFtwFE5AuCecQ+xhwVNSIKm9Rp
+         tn9cmIMKq+SCE7qNFomWFZv+PmxfRRhNaMMn6CCrgUGzcN2nNoV2rVgwjqjwG6QqW91o
+         bYyA==
+X-Forwarded-Encrypted: i=1; AJvYcCUvTnfOJchtKOFuQSJGRp+vsnLdaKVu9F1Yt8Bff6lzFmC6pZSG085wDZPSi0PLOAL3VIVfXQjhVKv4Yw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGaMmKhXrCv5rPOEBRlv5/uQvDRTitgPgPa2QI+tbECq+Xa0OH
+	1m4AVRi4KCYTdKfOXLrpcIgQKfexT/uhb9hcH7cUBycBbHFPONY95RZdoRlquCjJ
+X-Gm-Gg: AZuq6aLk7Cbjd7a29QKVQldiXo/WxV87s0XwolnhHc0FkFkP2R7f62O9MowG2ac1CCp
+	9gOiGlIYBmnytqeNjWUwu8PXDOyQz3poYi0311fLWU94BkmzIXa7FrkGQzVrXi15PCDaS2qhSut
+	Nzk9+3xx6oWIbMSVPDSHLyxrOggxHkse/j6nSVai4foJxGpa4CZA//Jg8FGQg5SjB7AyIfGrXZP
+	7IdmZksN3kZ/KIyIGJ1Lp9IdJ6o52+UAxaw7Ao82D/A+WC1tLxs86WrSY2YLyxKUZMwINpuZpbI
+	QdYdRy/kVgflNaMgEafhAbzhRGHOf3vtljgSS+6P+1BDT5J8PkVhodXCL6yftpYRczFRmCgv9NL
+	F3/fUvIwv1j8UKINwlYM9v5rTu3AN/+3ldG3Bi87MD9eL7XGnDQtfaso/W8uH0vDtE6hXF+lyma
+	NCodfDFTJ+8igU6Mk=
+X-Received: by 2002:a05:600c:1f16:b0:480:5678:1fdd with SMTP id 5b1f17b1804b1-4830e94c923mr82470515e9.12.1770289091078;
+        Thu, 05 Feb 2026 02:58:11 -0800 (PST)
 Received: from [192.168.1.27] ([176.74.141.242])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43617cc9515sm11966963f8f.0.2026.02.05.02.53.06
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4830fe69e9fsm56649575e9.6.2026.02.05.02.58.10
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Feb 2026 02:53:06 -0800 (PST)
-Message-ID: <c3f45132-de87-4c22-a189-c753a85074dc@gmail.com>
-Date: Thu, 5 Feb 2026 11:53:05 +0100
+        Thu, 05 Feb 2026 02:58:10 -0800 (PST)
+Message-ID: <607e0309-6909-447d-a1c7-a2b37c7e96a7@gmail.com>
+Date: Thu, 5 Feb 2026 11:58:10 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -68,11 +68,11 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/6] sed-opal: add IOC_OPAL_REACTIVATE_LSP.
+Subject: Re: [PATCH 6/6] sed-opal: add IOC_OPAL_GET_SUM_STATUS ioctl.
 To: Ondrej Kozina <okozina@redhat.com>, linux-block@vger.kernel.org
 Cc: gjoyce@ibm.com, jonathan.derrick@linux.dev
 References: <20260130162527.570255-1-okozina@redhat.com>
- <20260130162527.570255-2-okozina@redhat.com>
+ <20260130162527.570255-7-okozina@redhat.com>
 Content-Language: en-US
 From: Milan Broz <gmazyland@gmail.com>
 Autocrypt: addr=gmazyland@gmail.com; keydata=
@@ -118,124 +118,69 @@ Autocrypt: addr=gmazyland@gmail.com; keydata=
  vlB+GpT+iFRLvhCBe5kAERREfRfmWJq1bHod/ulrp/VLGAaZlOBTgsCzufWF5SOLbZkmV2b5
  xy2F/AU3oQUZncCvFMTWpBC+gO/o3kZCyyGCaQdQe4jS/FUJqR1suVwNMzcOJOP/LMQwujE/
  Ch7XLM35VICo9qqhih4OvLHUAWzC5dNSipL+rSGHvWBdfXDhbezJIl6sp7/1rJfS8qPs
-In-Reply-To: <20260130162527.570255-2-okozina@redhat.com>
+In-Reply-To: <20260130162527.570255-7-okozina@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 1/30/26 5:25 PM, Ondrej Kozina wrote:
-> This adds the 'Reactivate' method as described in the
-> "TCG Storage Opal SSC Feature Set: Single User Mode"
-> document (ch. 3.1.1.1).
-> 
-> The method enables switching an already active SED OPAL2 device,
-> with appropriate firmware support for Single User Mode (SUM),
-> to or from SUM.
+> This adds a function for retrieving the set of Locking objects enabled
+> for Single User Mode (SUM) and the value of the
+> RangeStartRangeLengthPolicy parameter.
 > 
 > Signed-off-by: Ondrej Kozina <okozina@redhat.com>
-> ---
->   block/opal_proto.h            |  4 ++
->   block/sed-opal.c              | 91 +++++++++++++++++++++++++++++++++++
->   include/linux/sed-opal.h      |  1 +
->   include/uapi/linux/sed-opal.h | 14 ++++++
->   4 files changed, 110 insertions(+)
-> 
-> diff --git a/block/opal_proto.h b/block/opal_proto.h
-> index d247a457bf6e..d138785b8198 100644
-> --- a/block/opal_proto.h
-> +++ b/block/opal_proto.h
-> @@ -125,6 +125,7 @@ enum opal_uid {
->   	OPAL_LOCKING_INFO_TABLE,
->   	OPAL_ENTERPRISE_LOCKING_INFO_TABLE,
->   	OPAL_DATASTORE,
-> +	OPAL_LOCKING_TABLE,
 
-This addition should be mentioned in commit messages.
-
-Perhaps separate new UID definitions to another patch.
-
-> @@ -2287,6 +2291,64 @@ static int activate_lsp(struct opal_dev *dev, void *data)
->   	return finalize_and_send(dev, parse_and_check_status);
->   }
->   
-> +static int reactivate_lsp(struct opal_dev *dev, void *data)
+...>   
+> +static int get_sum_ranges(struct opal_dev *dev, void *data)
 > +{
-> +	struct opal_lr_react *opal_react = data;
-> +	u8 user_lr[OPAL_UID_LENGTH];
-> +	int err, i;
-> +
-> +	err = cmd_start(dev, opaluid[OPAL_THISSP_UID],
-> +			opalmethod[OPAL_REACTIVATE]);
-> +
-> +	if (err) {
-> +		pr_debug("Error building Reactivate LockingSP command.\n");
-> +		return err;
-> +	}
-> +
 
-Hera I would add comment describing which variants it implement
-  - set SUM for whole locking table (no list)
-  - set SUM for separate LRs
-and how it differs.
+...
+I would add here comment (with reference to TCG spec)  explaining two possible responses
+(list or whole table).
 
-> +	if (opal_react->entire_table) {
-> +		add_token_u8(&err, dev, OPAL_STARTNAME);
-> +		add_token_u64(&err, dev, OPAL_SUM_SET_LIST);
-> +		add_token_bytestring(&err, dev, opaluid[OPAL_LOCKING_TABLE], OPAL_UID_LENGTH);
-> +		add_token_u8(&err, dev, OPAL_ENDNAME);
-> +	} else if (opal_react->num_lrs) {
-> +		err = build_locking_range(user_lr, sizeof(user_lr),
-> +					  opal_react->lr[0]);
-> +		if (err)
-> +			return err;
+> +		while (!response_token_matches(tok, OPAL_ENDLIST)) {
+> +			lr_uid_len = response_get_string(&dev->parsed, tok_n, &lr_uid);
+> +			if (lr_uid_len != OPAL_UID_LENGTH) {
+> +				pr_debug("Unexpected response token type %d.\n", tok_n);
+> +				return OPAL_INVAL_PARAM;
+> +			}
 > +
-> +		add_token_u8(&err, dev, OPAL_STARTNAME);
-> +		add_token_u64(&err, dev, OPAL_SUM_SET_LIST);
+> +			if (memcmp(lr_uid, opaluid[OPAL_LOCKINGRANGE_GLOBAL], OPAL_UID_LENGTH)) {
+> +				if (lr_uid[5] != LOCKING_RANGE_NON_GLOBAL) {
+> +					pr_debug("Unexpected byte %d at LR UUID position 5.\n",
+> +						 lr_uid[5]);
+> +					return OPAL_INVAL_PARAM;
+> +				}
+> +				sranges->lr[sranges->num_lrs++] = lr_uid[7];
+> +			} else
+> +				sranges->lr[sranges->num_lrs++] = 0;
 > +
-> +		add_token_u8(&err, dev, OPAL_STARTLIST);
-> +		add_token_bytestring(&err, dev, user_lr, OPAL_UID_LENGTH);
-> +		for (i = 1; i < opal_react->num_lrs; i++) {
-> +			user_lr[7] = opal_react->lr[i];
-> +			add_token_bytestring(&err, dev, user_lr, OPAL_UID_LENGTH);
+> +			tok_n++;
+> +			tok = response_get_token(&dev->parsed, tok_n);
+> +			if (IS_ERR(tok))
+> +				return PTR_ERR(tok);
 > +		}
-> +		add_token_u8(&err, dev, OPAL_ENDLIST);
+> +	} else {
+> +		/* Only OPAL_LOCKING_TABLE UID is an alternative to OPAL_STARTLIST here. */
+> +		lr_uid_len = response_get_string(&dev->parsed, tok_n, &lr_uid);
+> +		if (lr_uid_len != OPAL_UID_LENGTH) {
+> +			pr_debug("Unexpected response token type %d.\n", tok_n);
+> +			return OPAL_INVAL_PARAM;
+> +		}
 > +
-
-Remove empty line here?
-
-> +		add_token_u8(&err, dev, OPAL_ENDNAME);
-> +	}
+> +		if (memcmp(lr_uid, opaluid[OPAL_LOCKING_TABLE], OPAL_UID_LENGTH)) {
+> +			pr_debug("Unexpected response UID.\n");
+> +			return OPAL_INVAL_PARAM;
+> +		}
 > +
-> +	/* Skipping the rangle policy parameter is same as setting its value to zero */
-> +	if (opal_react->range_policy && (opal_react->num_lrs || opal_react->entire_table)) {
-> +		add_token_u8(&err, dev, OPAL_STARTNAME);
-> +		add_token_u64(&err, dev, OPAL_SUM_RANGE_POLICY);
-> +		add_token_u8(&err, dev, 1);
-> +		add_token_u8(&err, dev, OPAL_ENDNAME);
-> +	}
-> +
-
-This is optional, if not set, admin key remains unchanged. Add comment?
-
-> +	if (opal_react->new_admin_key.key_len) {
-> +		add_token_u8(&err, dev, OPAL_STARTNAME);
-> +		add_token_u64(&err, dev, OPAL_SUM_ADMIN1_PIN);
-> +		add_token_bytestring(&err, dev, opal_react->new_admin_key.key,
-> +				     opal_react->new_admin_key.key_len);
-> +		add_token_u8(&err, dev, OPAL_ENDNAME);
+> +		/* sed-opal kernel API already provides following limit in Activate command */
+> +		sranges->num_lrs = OPAL_MAX_LRS;
+> +		memcpy(sranges->lr, lr_all, OPAL_MAX_LRS);
 > +	}
 
 ...
 
 
-Otherwise looks good.
+Otherwise it is ok.
 
 Milan
-
-p.s.
-I implemented similar code in userspace for opal-toolset and tested on several drives.
-
-Original sedutils do not implement SUM / reactivate at all.
-
-That said, there are many drives that have broken SUM implementation... but I am pretty
-sure the construction above is according to TCG standard.
 
