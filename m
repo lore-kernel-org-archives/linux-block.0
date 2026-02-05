@@ -1,189 +1,241 @@
-Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C57453A4F4A
-	for <linux-block@vger.kernel.org>; Thu,  5 Feb 2026 10:14:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.143.124
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770286468; cv=fail; b=hXL9UIJaErqUB/GREAYw5rGk8UoOyUbR4cyFJAJMZDMbKt8sIgIBa0mwf+S7J9dX9eP7A5hdlz1FCgfk634CminSPrxd9YvLio+xjyXdhWQelXtZqUCSxXyzf7QSmaj/PnUz1GnArDnuZO/v23obz/RyPE2z2OU02TqbpQJMFzg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770286468; c=relaxed/simple;
-	bh=1zfCD+KLxtdA7lC4RwnPsusJBixRWbE8SfHzTy8Guu8=;
-	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=B5pzKmxYwq/efS0qSzB5ZPlbljd9onUN2sR4T3eiDhFP+vMgHpexPBJHWfoF6xNQ+oCX2QpRgWudGdOrAXSXwm6LRt2eMFqYfbtOrXTPEx8jgVLw23lXb091aTwRQFyvRMetoW2ZKDh4pZQLqs9aZMtNQ9KYFFww1X9lHeqTUlU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=e6+muNF4; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=OR83Z1Gf; arc=fail smtp.client-ip=68.232.143.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E45F036E495
+	for <linux-block@vger.kernel.org>; Thu,  5 Feb 2026 10:53:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770288789; cv=none; b=TrqaWKwYGlpkrCCosadvCtrW1AvnHFWwNGFet9t+CCdb5AJyDBlAvMW6yl8cBWUcpOQqHYYN1B6DbUSN+lDDOsGjqG0Ytd7gFRo9Rd0hGjCxPenRvvviZ7WkDHwnOAjRraT5zuA9VgX3dRvo/kDX7ctjldYdgXnxmmoO9U1Hlq8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770288789; c=relaxed/simple;
+	bh=p5ZxxLhRM7KNb+08JyORQsjnmS9D6hRQY8Q0kAaQ6jM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NiusgdwYHelMez4iPjRQ+nPIomnK/n/4hfwSfkjkrEAFHNcWuWypbjCliwn1Tk/bOmfBsNb44l0IJLTSizzCjcpvZBLREn2lZamb8jV7qgNIwVAvy75MpoS8YRz8j4Y2Cqy9T+IMvamMaBWJE+iHseAEMY8u/P7aPJnuqLMcLLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WpeSKyFv; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="e6+muNF4";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="OR83Z1Gf"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1770286465; x=1801822465;
-  h=from:to:subject:date:message-id:references:in-reply-to:
-   content-id:content-transfer-encoding:mime-version;
-  bh=1zfCD+KLxtdA7lC4RwnPsusJBixRWbE8SfHzTy8Guu8=;
-  b=e6+muNF4vOerVrBL1x0WNzi4E2XOaLXfr26gBJabAYnrvzVedK722syf
-   sY8P0wEsNo5J00umOM5Q4Lru4VCkTbAN9KRgkAte8vHNgDP4orBwv6W16
-   66fy0kKyS90Lm/vtRD6CqMBFcd0ppsb+oC4iBhfukQj5dev5vRJIC8tdw
-   4dy5gVQaWb6uC5H/jUgshNa89zNQd44Hy3phwpJVSPN6XBYX1nVI7WUGq
-   mJ+ls/y/W59c51pNC3sVEiyiCTmCnFxDEWsdMpw54+V8OIvwAFwLptjV+
-   ITMt2hkfmcR4f/B/+4VrtK4TmIr+Pa95L/rJskopB9aDqavzeTQwf/dkX
-   Q==;
-X-CSE-ConnectionGUID: DPpnxpYyREmwNCCpXk4y+g==
-X-CSE-MsgGUID: ekouW+mYRrybUvF7amCOIA==
-X-IronPort-AV: E=Sophos;i="6.21,274,1763395200"; 
-   d="scan'208";a="141314995"
-Received: from mail-southcentralusazon11013026.outbound.protection.outlook.com (HELO SA9PR02CU001.outbound.protection.outlook.com) ([40.93.196.26])
-  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 05 Feb 2026 18:14:19 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=HnHs04w4kOxykQW+5HMWR6rRFLt2JYVEmsTr0YPf5c2t2biAZCCBiMvtk8Dap00++DX/E9+ex59lTOuvH45PyQP4SfddC7yP+3LNw8moSULbPgmm4AZ2Jo9vGdE6tA9Mk2FebgR2NJxk+Xmkj28deL9AD8rModjZhHCpZOfDHE95qweM2Nr4IdEy+m5c+ZlaS+2cyxWKwOYXk2/ldLkmvZ8DMJZ36LWEOOTwXCqQ0UrpBSoQ8FbAtKuATrKO8eGch+XO/cJO9s/qAuOK89RCr1+TMD+7v+AIQuETr5tDe/6Qo6qRjd4/mG1kZ/jxpYC/+ITec+OQKW3qLtr6naojBQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PKXzYjrwZy0HqcapLn1ZBdrOc1wUu3IypRc+ghINjQE=;
- b=X9DOC0ZJOoxOt5c5MDxixY8S5e7UjALHXMAu3DAVc7+8HFpD+HVZyE6nmv14FHG7M9bfKJivdZwEQDjRKg6In9+01CZ0frCfUnN1at/iixN57FXHv/ffTVXveSBrDGDZ24QuOuuwdavaf6oCPhFQiRSkBAawxLh0kb/yYPQIg7lE89UTHHurrCoZwj1X6m5S3ml7fG1qJ3dGF8QxTAmz/A5odRFsucNPZA+Ma9uYbHly0/QQCEm2XygvKAhVfRap2+pcFu/CFSZhXcw6f/X00E+HoJMVDLA0S/I5Yuulj+e0faU9lLMj0GYjC9IJOB7ZScvts0lg2zA6uFmRLslgPQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WpeSKyFv"
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-42fb0fc5aa9so623482f8f.1
+        for <linux-block@vger.kernel.org>; Thu, 05 Feb 2026 02:53:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PKXzYjrwZy0HqcapLn1ZBdrOc1wUu3IypRc+ghINjQE=;
- b=OR83Z1GfOvsYRFcpWJDlmSPzX4k94fPch/OMAxpijW8lsAgkvbnSu/ggLydmNUqyCX9p3ArO3bcbt3pK+T8CXLqOHX8eZTfa2HjFuImXBU9GXMTL+Gsu/pK0hUAdQpwOf/S9cocfYaBfB71cZK7G8c8dnCD4sBOkha2TkLly4zo=
-Received: from SN7PR04MB8532.namprd04.prod.outlook.com (2603:10b6:806:350::6)
- by DM6PR04MB6826.namprd04.prod.outlook.com (2603:10b6:5:242::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9587.12; Thu, 5 Feb
- 2026 10:14:17 +0000
-Received: from SN7PR04MB8532.namprd04.prod.outlook.com
- ([fe80::4e14:94e7:a9b3:a4d4]) by SN7PR04MB8532.namprd04.prod.outlook.com
- ([fe80::4e14:94e7:a9b3:a4d4%5]) with mapi id 15.20.9587.013; Thu, 5 Feb 2026
- 10:14:17 +0000
-From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH blktests] common/fio: ignore fio messages about random
- generator selection
-Thread-Topic: [PATCH blktests] common/fio: ignore fio messages about random
- generator selection
-Thread-Index: AQHcj3S3skyqHcYpn0G3LGEhe5IhbbVz8XCA
-Date: Thu, 5 Feb 2026 10:14:16 +0000
-Message-ID: <aYRtZtYZcXPUbz-8@shinmob>
-References: <20260127100710.383851-1-shinichiro.kawasaki@wdc.com>
-In-Reply-To: <20260127100710.383851-1-shinichiro.kawasaki@wdc.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SN7PR04MB8532:EE_|DM6PR04MB6826:EE_
-x-ms-office365-filtering-correlation-id: 41b5cad8-ea94-4e06-cffd-08de649f51fd
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|19092799006|1800799024|376014|38070700021;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?uAik3R3GPBbrpNH0l6bNn+AEUYuKNEybgoTBHgh0anmIaTCMcFkTbDX8yWLp?=
- =?us-ascii?Q?98dU26OJFW/vnybNGKPw3d1Ao9AgGvYTmBtCtk/jaHvItiqJ3BKTDeD6YRsJ?=
- =?us-ascii?Q?a0pNxhXvSwCz9W+hqxsLtuRBQJbwm970KzhbSWC6YoMKxK+IO3LfXfdZcUcf?=
- =?us-ascii?Q?gud7dMi8ACZ5GzszL/MoeeM7WCb6D0Yb9Bo0xgCddkYTAgwQfiIkaw9iGuyU?=
- =?us-ascii?Q?9OGaVfeFLM6FEHONlxy9NyY4q88wOt+ZrqYLhyc2/WRR7Y0RJKke/fjTVQt4?=
- =?us-ascii?Q?3qj/HLFakm2LOQ9/aA4SigJG3Lpcot3yIVMSZLS/5Cl+XkfD4WFQfb1sPZZr?=
- =?us-ascii?Q?wBtXLBGO1d1cdOYB6RXhVYxaMkuB/7UqjZsPxARaKMSlcQcyaTG4vvsskBso?=
- =?us-ascii?Q?sZT6hIr15Nx8Rnr8HCEPn+YjdYcmU8QnGEjJdbYCECGexuI9ro0FSvz/nhpn?=
- =?us-ascii?Q?6bQ3+mP1SgpQ+QUOxvUk0tvNObWiin15CAfD8SNsy6NI5t2o+s+LRFC/6XEy?=
- =?us-ascii?Q?eH2rEzxQgjdJwOiSoRdsMLDiYfXVmqVJZTPDXhfqBW7QQaPkr44ug1cjy+Ci?=
- =?us-ascii?Q?QIosDOwikK3PqLJ7oLSSjmh3KDUVllBqS8yEQd0Klw6V/+Ks143CawHJW22R?=
- =?us-ascii?Q?FJVU1E76vxulTsseEy498CZcYlpkmsnC2wF06aOD3xSNNOwpoO07mtxGlfJX?=
- =?us-ascii?Q?su+II50oBTs1pXGmbFRkD4ek6Z9StJaqvdo+xfOz30zlM5bVc5UA1+vp8Tnn?=
- =?us-ascii?Q?zes4tlg0MqVBPf2XUzPqCkjWg6j7gGcp2/ak+54cuSnkj9/bnFrOU1NhNaM/?=
- =?us-ascii?Q?mmshGY1qyFCTkjLM+zvjFHgRnggljibR8HTOknY3l7zygDy5D+1fiHAzUy+T?=
- =?us-ascii?Q?NdZMvS/5zap3LtsJ8zAxcY8Z9vG3arFtKaOzbn4BeYOtnrxmycgSot7LVQJe?=
- =?us-ascii?Q?N3Gk8rAXrE+JjIE7IIsfIK65SLIFN+Zgv+EBERkHyG/DUIUP/saUGclOK92f?=
- =?us-ascii?Q?Ied+gho8Yv+fN3TVhnghxQWn6wTlF6skl9uMjOYA2mCfBw4T8sHYfsP9NNYx?=
- =?us-ascii?Q?66xnBMhRU7xwOD2OV0Cq3H8rZocf2fuu46paoBwLxgsyk5DmRr7Y/b6tqh9S?=
- =?us-ascii?Q?VQS0OErMcFNF+4akM/4nG7JWRjUwJcKlaoTTSbse30WTcoEb9Bhuj4cJSmIH?=
- =?us-ascii?Q?cA6KS2Khio24Fvtp3gqVVDr4hwTnR8SBglKteH8RheaiempYelxPy/AuinJb?=
- =?us-ascii?Q?bT9ITkr0HpA/apVrDdmtPweJIPuODJsC4+b1V6DZNUXptsGDoBX2krZRTueq?=
- =?us-ascii?Q?gOvv9O7MZiY+QDoY3hE96QOHycjumXU595He8GN7yGFvASdZ5/RM1EI181PX?=
- =?us-ascii?Q?JLfAquHjSOjbw5PRTylNoCmWpgk4uxj3mrMJ83P7R/g601X8LDqQpE6CEjia?=
- =?us-ascii?Q?3ka57QZ65yMZU5SErRDigKuYcq9TxWIJLOofmoNsBrYDi3DcCcday0GgydFx?=
- =?us-ascii?Q?TCNFBfMvWfCSNuoMMAJsrtv9b0Vw2ev/h6D8yxbcfnnVlHVb5yfF2qxb3860?=
- =?us-ascii?Q?wFoHAGAEZmnE7HpGGI6uYGQ9G0nNWhgIKm7D54mu09TQCL+gsbgbe2/4pV88?=
- =?us-ascii?Q?/nMopGyp+ZMlzYjc/bk5euQ=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR04MB8532.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(19092799006)(1800799024)(376014)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?6gL5+W7+Fm22tjKcys7aa71jzeTzuMYwrzkUXPQZQ3Otp7/1xpL6EZd+mmc/?=
- =?us-ascii?Q?8VrWF0fzVcaa6Z+C9TKmFX+qvSfLoz4Gsy0NOSxSod4biFTqk7sItr0aSdAS?=
- =?us-ascii?Q?R8VXaKAKVx5pxcvnvk4EyiLVHknNkQSkhWE39Z7eI4NqGrVjJqhQwamg5yiq?=
- =?us-ascii?Q?Ut9Ehnba+SDkeYljuJ728ATrwtCRQfkLWz5x+uVOZ+qS9SVuQVZ0br1SnQZw?=
- =?us-ascii?Q?w7tYzLCenD3qyLjuSUOXO1evoFvUpdqRJAGzfaJz5nqf3t8EqvKRhiGaau06?=
- =?us-ascii?Q?mkOQWSIHrBBsyuAyzBjweZZDhRXFhwLecn7mCN/shzpUt/b+dfLW8OVr1kZ8?=
- =?us-ascii?Q?PjVPjLqYq4jbvwie3tY+CUAds0wxTGZNdwTt8c7x1d8kykCG9DhNt9lGzPYx?=
- =?us-ascii?Q?SLTjYncB7ogCQ7v64l/zFTxH6lVzYdS/FP5NVu/yrA0+7AARP/9IY/eKpRj0?=
- =?us-ascii?Q?EzpBTnGzpwQq0Gip4gmgXaAgn3y8s18B9/oF+AIyd2pVL0u5kbdbGXL+Lq/T?=
- =?us-ascii?Q?BuV5cCUX0xtq1TK75oHlGxS1D45L6MWd4OU0UCsE/6W7JF9/SKCIMpaOTrxX?=
- =?us-ascii?Q?7zjT6xB2PetZVniwkHDnICei0zp+Z1YtjFclFjiugfiHEDOKX62fYCrOtTWt?=
- =?us-ascii?Q?EKwDgZAirL+dxTdnX7lk82sN5DpJplNlgArBJ1j/DKh734SQdkplALVk555l?=
- =?us-ascii?Q?8Tg/wneY9d5emIFQAAjCnr3wH5shy9M6Ngbgm3firJNKB8A1RcEjUEUYV71E?=
- =?us-ascii?Q?zfb40A/43YB1lw3ub7Q37AvCNheWthUhbTa0r3n1juhUrUzIe1F6Vrhf0zZh?=
- =?us-ascii?Q?1gg1COg7vadeya7REG/1yK4GHGSyEsUOWD9z3U08ah/Y8v241sbDYRwbrd/g?=
- =?us-ascii?Q?vWHVRMK5RQD97dfD37YYzur8Lv1mmDAMxhQHAlQBzFYd7+P1dF1ZT0B8/W3t?=
- =?us-ascii?Q?CWJ675MeRaTifPDo8MgIgBIF520fTAXt2pkYunDfYoG11Bte8Iacanu8YNVC?=
- =?us-ascii?Q?64ys1ihnq+4cvppcUQO3FbnALj/BdAilbcz3j05P2yV+zxWfD+Mj9cG6B7QT?=
- =?us-ascii?Q?xkFJF6dAywejAhY2XtIHdpLZy4z3fTRgnXUNloPDhECLwrGjN0Rcy1jD0YqB?=
- =?us-ascii?Q?dkiWkzK79TMiMKcqSosi6F4jPcr36tQ7ymQmKUmiAWmYGljcEsy7zdD+g8Gu?=
- =?us-ascii?Q?rKLCUqKvxNSr2uFQdt7/EIiX96zVKgOy59kAuNPdaLCj2vkpQ1G8nBS7nKiR?=
- =?us-ascii?Q?l/NMT4DlvrfOGKLQYd4UUBezITr2jh3KnO3kI0vN9lOYxXgW55CMoGOz7c3V?=
- =?us-ascii?Q?tedvGITIFcRmQMB9UbRNlirEvdiNyFUQcQYj7ifqwYRwYjfG4bzFtFLlQqVX?=
- =?us-ascii?Q?svpvmlbp0J0Os5K66Jj01CEHKDTvCV53IwaAV5LQAAxaJg0B4PJYzT9FyJ36?=
- =?us-ascii?Q?nuRIWUC6ymaxmxrnzvsxjV/iQpfOm816oqvQSNgViVYVYYxb0p8ogBqtI9Wn?=
- =?us-ascii?Q?UaKB44G0sFJDCd07uty91kV0cXvsRUYDQIp29e9AJ+ysnkwnUUCOORqU3jDJ?=
- =?us-ascii?Q?cZf/maWE6qm1t+LJH57mQ4fHM83dUI3fSxo2+kEaswgoa4RLV+I65Nqx52hL?=
- =?us-ascii?Q?uhgHOOnOcLXNYhTRizaMExMTkJql0dfxo3a7sDtNViPxviKl1XZgLOL89s41?=
- =?us-ascii?Q?dnuhCeJxFUh1PWR1NEbE0BIJF6v7qq9XvivlMsYyhOTbAl9LNhzwphpjISfa?=
- =?us-ascii?Q?3eJ0SbC0wVW20Dkh9ZnnumjxUYoforY=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <CE0AEAA9A792C94CABDCF586EE01560E@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        d=gmail.com; s=20230601; t=1770288787; x=1770893587; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=/+c2QLdGZFoULZ/RvBqcUByi9TkEnmi28PPZ5Yodtb0=;
+        b=WpeSKyFvKM8h7aFIEQN6w70HUbK0HrFEZ8qaNiOFIaHOkpMGIbtR2BjA+S5/IoNiR/
+         pIRIqyRjTPiE1WXZgTMpgu1GgK4pXLBHCasaLyTNZR4fLq9NXEANe1jMYsEh8IvRwJPj
+         Q19R7Vhc2H4WB3UuSnPCkdqfURm0cgn+9sGSblFj/TT5J8/k3URRuAuptcMM09qsVoCF
+         dAbIxGOrSIMx8vE8GFl5HJ/EjcB9E2dfHItGh7KrjIwKY/m9/Eb5DkQvPeuy4grRld+0
+         yKGlsKSfMRG3p8dbZQIBFqVAJAWJ4YE/VKMDle/tvpMMXW85GOtv0MFTOs0WQeyiTTwZ
+         8LAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770288787; x=1770893587;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/+c2QLdGZFoULZ/RvBqcUByi9TkEnmi28PPZ5Yodtb0=;
+        b=Zc7qO6rxmPHnM5ADJy5G72fKnJZBmGpk7MLUOgbabee79wYyRo3eRjNQavz6pVBaEI
+         1jIJnH6cJpCkQDO7xXZT3vSb2xZACTgl7kAFui607/lry+TDI2auqB2+OsdKTplKOz7j
+         DrpBemXqkWH5QwZcVwO1Sw6xOSoiT/gumHfR2O07x8XgRYAo+sT0I5YZIZKNfd2aFemk
+         gD1T4eeU9XyQ4o1zUgUy4HnqPhF350QeNdxftagrx8loe7UTdgazGlfL1Ir3QUMqvdnW
+         mHNADcCayQwpPLIDsPW7NlX4vn6qm6nXMn7qBuoHeHDnHteeZLlI9D+d6rHJRfajAiIg
+         4Wug==
+X-Forwarded-Encrypted: i=1; AJvYcCVOj0ZHX+qn6FDhzaCz9QoJucAdlg8XGLTX8UUOxrGa7n77UpX3LcztbGY2f+QbuldqsTxTp6Ffz9TZLg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxUiZpU69o/TTEUbAKUhPg37ZU9noja0TAsdL7vh7DY3F2tC9w3
+	G+bSL93jAV6vHaEUOcrW8rKMvcv3jfGpRd1cws7XPKUlYN8xOuDDADIU
+X-Gm-Gg: AZuq6aLi7k1S6eUh4tJvewQQT2pS62wu6uwbnxx1zWMOXLeFEpKmjtFAdmVBVG/Sqry
+	soUhTRQWbjUWohAAqdNE9ueCZoE+cUDFMKODZl0JSVLBxwUUwGFc9TCD3/GftwMAq+fSv63rI7B
+	zYba2zHRbyidrHUeTa2m8TfiLM/iyUc7OBxwEMGD4zcXaV8kD9r2twq1MZeS95PUG3AvCXC+rzW
+	p1XU0w4BcVxXdxGvpbf7rQxdy8Z/N787jrJvRNfDShnSAT4Jvyxsupb41Ox5Ki79zKyXitVhiwo
+	HhYPNouC1pCkyUgYnVDXTIYzV95E89XFKwS77nXcer6EY7wHjjqRjioOHQ7kEIalEweyZ//jPt7
+	59r8r0fHtvb6rCjpOTueps/M9UI14ssALND9L4JwlNCsPpJJEtjwiYknnn6XiwS7YTqGMbOVNVB
+	JHry6ezopiAmIHJ7k=
+X-Received: by 2002:a05:6000:230f:b0:435:b7ca:7521 with SMTP id ffacd0b85a97d-43617e41ef4mr9745313f8f.15.1770288786946;
+        Thu, 05 Feb 2026 02:53:06 -0800 (PST)
+Received: from [192.168.1.27] ([176.74.141.242])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43617cc9515sm11966963f8f.0.2026.02.05.02.53.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 05 Feb 2026 02:53:06 -0800 (PST)
+Message-ID: <c3f45132-de87-4c22-a189-c753a85074dc@gmail.com>
+Date: Thu, 5 Feb 2026 11:53:05 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	wXj5IGRtaHNb+6cwkWmtr5CjccoLM4ATYOHJ9b/JoyufKjnVpHMO5abjzhK1lqw726aFHwosynecn8WCjk/OaQPRy7vi922GG7lu7qht/NHePlJ4HBMO3fnzd020d338CmqIY9zKQpp7Yi3nM/VNfhrtaXmgjZshrjSTKmf457BhTDB4dhJ50Dc1FgQWtP2jpjKABo5cSTBtwNTvEY72NSDBkYsFOATO41V5apkAZ0DVgMp+Dep5HuKdkJaZ/gwZIsBAwaEjxNoVf8R8afw46BwltiWPTXgeSMRwi1ANL1wkSphnqAoDlWqZMBoVwfR3lsCdZzo1MynvOwIRyHr9MVTgDiKpNGGP/EBkNDXjKcnQYX9gtcOjpDbp4Z4xGm9EmFSV65U7zQEJ3iGBi29If8NmwCDD8P8U3xfhzbDEDSnVHKwQ3A5ZCLEzPO74hzotrCntKKNHZddSLQkltaHG9XCNoE7sk/HIsscBBaU1Z6gpYvFIifFDWfp7GbhGkgPLTzGTv8R7mqnXskxYywnzGeYX/nwnyje3tdCH0BzPpDx28iqCMEOh4Q7ozz4itvrC8OJFAeIYf+mDqww5ubhKv0tclf95fFYRnhQZME46SmdI5hL7sI2r3h6+dN13928X
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR04MB8532.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 41b5cad8-ea94-4e06-cffd-08de649f51fd
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Feb 2026 10:14:17.0843
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: BV0ziOdv3854IRZPHQuvS1sigtITVpkscjXiVIfc2nnyofA2JmLULI0tFQTpkbWfFZoZGQuPfSFF52O4KZmckC1ntW8yzUhCNwEsBRMh+08=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB6826
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/6] sed-opal: add IOC_OPAL_REACTIVATE_LSP.
+To: Ondrej Kozina <okozina@redhat.com>, linux-block@vger.kernel.org
+Cc: gjoyce@ibm.com, jonathan.derrick@linux.dev
+References: <20260130162527.570255-1-okozina@redhat.com>
+ <20260130162527.570255-2-okozina@redhat.com>
+Content-Language: en-US
+From: Milan Broz <gmazyland@gmail.com>
+Autocrypt: addr=gmazyland@gmail.com; keydata=
+ xsFNBE94p38BEADZRET8y1gVxlfDk44/XwBbFjC7eM6EanyCuivUPMmPwYDo9qRey0JdOGhW
+ hAZeutGGxsKliozmeTL25Z6wWICu2oeY+ZfbgJQYHFeQ01NVwoYy57hhytZw/6IMLFRcIaWS
+ Hd7oNdneQg6mVJcGdA/BOX68uo3RKSHj6Q8GoQ54F/NpCotzVcP1ORpVJ5ptyG0x6OZm5Esn
+ 61pKE979wcHsz7EzcDYl+3MS63gZm+O3D1u80bUMmBUlxyEiC5jo5ksTFheA8m/5CAPQtxzY
+ vgezYlLLS3nkxaq2ERK5DhvMv0NktXSutfWQsOI5WLjG7UWStwAnO2W+CVZLcnZV0K6OKDaF
+ bCj4ovg5HV0FyQZknN2O5QbxesNlNWkMOJAnnX6c/zowO7jq8GCpa3oJl3xxmwFbCZtH4z3f
+ EVw0wAFc2JlnufR4dhaax9fhNoUJ4OSVTi9zqstxhEyywkazakEvAYwOlC5+1FKoc9UIvApA
+ GvgcTJGTOp7MuHptHGwWvGZEaJqcsqoy7rsYPxtDQ7bJuJJblzGIUxWAl8qsUsF8M4ISxBkf
+ fcUYiR0wh1luUhXFo2rRTKT+Ic/nJDE66Ee4Ecn9+BPlNODhlEG1vk62rhiYSnyzy5MAUhUl
+ stDxuEjYK+NGd2aYH0VANZalqlUZFTEdOdA6NYROxkYZVsVtXQARAQABzSBNaWxhbiBCcm96
+ IDxnbWF6eWxhbmRAZ21haWwuY29tPsLBlQQTAQgAPwIbAwYLCQgHAwIGFQgCCQoLBBYCAwEC
+ HgECF4AWIQQqKRgkP95GZI0GhvnZsFd72T6Y/AUCYaUUZgUJJPhv5wAKCRDZsFd72T6Y/D5N
+ D/438pkYd5NyycQ2Gu8YAjF57Od2GfeiftCDBOMXzh1XxIx7gLosLHvzCZ0SaRYPVF/Nr/X9
+ sreJVrMkwd1ILNdCQB1rLBhhKzwYFztmOYvdCG9LRrBVJPgtaYqO/0493CzXwQ7FfkEc4OVB
+ uhBs4YwFu+kmhh0NngcP4jaaaIziHw/rQ9vLiAi28p1WeVTzOjtBt8QisTidS2VkZ+/iAgqB
+ 9zz2UPkE1UXBAPU4iEsGCVXGWRz99IULsTNjP4K3p8ZpdZ6ovy7X6EN3lYhbpmXYLzZ3RXst
+ PEojSvqpkSQsjUksR5VBE0GnaY4B8ZlM3Ng2o7vcxbToQOsOkbVGn+59rpBKgiRadRFuT+2D
+ x80VrwWBccaph+VOfll9/4FVv+SBQ1wSPOUHl11TWVpdMFKtQgA5/HHldVqrcEssWJb9/tew
+ 9pqxTDn6RHV/pfzKCspiiLVkI66BF802cpyboLBBSvcDuLHbOBHrpC+IXCZ7mgkCrgMlZMql
+ wFWBjAu8Zlc5tQJPgE9eeQAQrfZRcLgux88PtxhVihA1OsMNoqYapgMzMTubLUMYCCsjrHZe
+ nzw5uTcjig0RHz9ilMJlvVbhwVVLmmmf4p/R37QYaqm1RycLpvkUZUzSz2NCyTcZp9nM6ooR
+ GhpDQWmUdH1Jz9T6E9//KIhI6xt4//P15ZfiIs7BTQRPeKd/ARAA3oR1fJ/D3GvnoInVqydD
+ U9LGnMQaVSwQe+fjBy5/ILwo3pUZSVHdaKeVoa84gLO9g6JLToTo+ooMSBtsCkGHb//oiGTU
+ 7KdLTLiFh6kmL6my11eiK53o1BI1CVwWMJ8jxbMBPet6exUubBzceBFbmqq3lVz4RZ2D1zKV
+ njxB0/KjdbI53anIv7Ko1k+MwaKMTzO/O6vBmI71oGQkKO6WpcyzVjLIip9PEpDUYJRCrhKg
+ hBeMPwe+AntP9Om4N/3AWF6icarGImnFvTYswR2Q+C6AoiAbqI4WmXOuzJLKiImwZrSYnSfQ
+ 7qtdDGXWYr/N1+C+bgI8O6NuAg2cjFHE96xwJVhyaMzyROUZgm4qngaBvBvCQIhKzit61oBe
+ I/drZ/d5JolzlKdZZrcmofmiCQRa+57OM3Fbl8ykFazN1ASyCex2UrftX5oHmhaeeRlGVaTV
+ iEbAvU4PP4RnNKwaWQivsFhqQrfFFhvFV9CRSvsR6qu5eiFI6c8CjB49gBcKKAJ9a8gkyWs8
+ sg4PYY7L15XdRn8kOf/tg98UCM1vSBV2moEJA0f98/Z48LQXNb7dgvVRtH6owARspsV6nJyD
+ vktsLTyMW5BW9q4NC1rgQC8GQXjrQ+iyQLNwy5ESe2MzGKkHogxKg4Pvi1wZh9Snr+RyB0Rq
+ rIrzbXhyi47+7wcAEQEAAcLBfAQYAQgAJgIbDBYhBCopGCQ/3kZkjQaG+dmwV3vZPpj8BQJh
+ pRSXBQkk+HAYAAoJENmwV3vZPpj8BPMP/iZV+XROOhs/MsKd7ngQeFgETkmt8YVhb2Rg3Vgp
+ AQe9cn6aw9jk3CnB0ecNBdoyyt33t3vGNau6iCwlRfaTdXg9qtIyctuCQSewY2YMk5AS8Mmb
+ XoGvjH1Z/irrVsoSz+N7HFPKIlAy8D/aRwS1CHm9saPQiGoeR/zThciVYncRG/U9J6sV8XH9
+ OEPnQQR4w/V1bYI9Sk+suGcSFN7pMRMsSslOma429A3bEbZ7Ikt9WTJnUY9XfL5ZqQnjLeRl
+ 8243OTfuHSth26upjZIQ2esccZMYpQg0/MOlHvuFuFu6MFL/gZDNzH8jAcBrNd/6ABKsecYT
+ nBInKH2TONc0kC65oAhrSSBNLudTuPHce/YBCsUCAEMwgJTybdpMQh9NkS68WxQtXxU6neoQ
+ U7kEJGGFsc7/yXiQXuVvJUkK/Xs04X6j0l1f/6KLoNQ9ep/2In596B0BcvvaKv7gdDt1Trgg
+ vlB+GpT+iFRLvhCBe5kAERREfRfmWJq1bHod/ulrp/VLGAaZlOBTgsCzufWF5SOLbZkmV2b5
+ xy2F/AU3oQUZncCvFMTWpBC+gO/o3kZCyyGCaQdQe4jS/FUJqR1suVwNMzcOJOP/LMQwujE/
+ Ch7XLM35VICo9qqhih4OvLHUAWzC5dNSipL+rSGHvWBdfXDhbezJIl6sp7/1rJfS8qPs
+In-Reply-To: <20260130162527.570255-2-okozina@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Jan 27, 2026 / 19:07, Shin'ichiro Kawasaki wrote:
-> The latest fio after the commit 1d282baecd68 ("fio: make sure that child
-> process output is comitted") often prints the warning messages about
-> random generator selection:
->=20
->     fio: file test.0.0 exceeds 32-bit tausworthe random generator.
->     fio: Switching to tausworthe64. Use the random_generator=3D option to=
- get rid of this warning.
->=20
-> This causes fio output parse failure at the test case block/004. To
-> avoid the failure, ignore the messages.
->=20
-> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+On 1/30/26 5:25 PM, Ondrej Kozina wrote:
+> This adds the 'Reactivate' method as described in the
+> "TCG Storage Opal SSC Feature Set: Single User Mode"
+> document (ch. 3.1.1.1).
+> 
+> The method enables switching an already active SED OPAL2 device,
+> with appropriate firmware support for Single User Mode (SUM),
+> to or from SUM.
+> 
+> Signed-off-by: Ondrej Kozina <okozina@redhat.com>
+> ---
+>   block/opal_proto.h            |  4 ++
+>   block/sed-opal.c              | 91 +++++++++++++++++++++++++++++++++++
+>   include/linux/sed-opal.h      |  1 +
+>   include/uapi/linux/sed-opal.h | 14 ++++++
+>   4 files changed, 110 insertions(+)
+> 
+> diff --git a/block/opal_proto.h b/block/opal_proto.h
+> index d247a457bf6e..d138785b8198 100644
+> --- a/block/opal_proto.h
+> +++ b/block/opal_proto.h
+> @@ -125,6 +125,7 @@ enum opal_uid {
+>   	OPAL_LOCKING_INFO_TABLE,
+>   	OPAL_ENTERPRISE_LOCKING_INFO_TABLE,
+>   	OPAL_DATASTORE,
+> +	OPAL_LOCKING_TABLE,
 
-FYI, I applied this patch.=
+This addition should be mentioned in commit messages.
+
+Perhaps separate new UID definitions to another patch.
+
+> @@ -2287,6 +2291,64 @@ static int activate_lsp(struct opal_dev *dev, void *data)
+>   	return finalize_and_send(dev, parse_and_check_status);
+>   }
+>   
+> +static int reactivate_lsp(struct opal_dev *dev, void *data)
+> +{
+> +	struct opal_lr_react *opal_react = data;
+> +	u8 user_lr[OPAL_UID_LENGTH];
+> +	int err, i;
+> +
+> +	err = cmd_start(dev, opaluid[OPAL_THISSP_UID],
+> +			opalmethod[OPAL_REACTIVATE]);
+> +
+> +	if (err) {
+> +		pr_debug("Error building Reactivate LockingSP command.\n");
+> +		return err;
+> +	}
+> +
+
+Hera I would add comment describing which variants it implement
+  - set SUM for whole locking table (no list)
+  - set SUM for separate LRs
+and how it differs.
+
+> +	if (opal_react->entire_table) {
+> +		add_token_u8(&err, dev, OPAL_STARTNAME);
+> +		add_token_u64(&err, dev, OPAL_SUM_SET_LIST);
+> +		add_token_bytestring(&err, dev, opaluid[OPAL_LOCKING_TABLE], OPAL_UID_LENGTH);
+> +		add_token_u8(&err, dev, OPAL_ENDNAME);
+> +	} else if (opal_react->num_lrs) {
+> +		err = build_locking_range(user_lr, sizeof(user_lr),
+> +					  opal_react->lr[0]);
+> +		if (err)
+> +			return err;
+> +
+> +		add_token_u8(&err, dev, OPAL_STARTNAME);
+> +		add_token_u64(&err, dev, OPAL_SUM_SET_LIST);
+> +
+> +		add_token_u8(&err, dev, OPAL_STARTLIST);
+> +		add_token_bytestring(&err, dev, user_lr, OPAL_UID_LENGTH);
+> +		for (i = 1; i < opal_react->num_lrs; i++) {
+> +			user_lr[7] = opal_react->lr[i];
+> +			add_token_bytestring(&err, dev, user_lr, OPAL_UID_LENGTH);
+> +		}
+> +		add_token_u8(&err, dev, OPAL_ENDLIST);
+> +
+
+Remove empty line here?
+
+> +		add_token_u8(&err, dev, OPAL_ENDNAME);
+> +	}
+> +
+> +	/* Skipping the rangle policy parameter is same as setting its value to zero */
+> +	if (opal_react->range_policy && (opal_react->num_lrs || opal_react->entire_table)) {
+> +		add_token_u8(&err, dev, OPAL_STARTNAME);
+> +		add_token_u64(&err, dev, OPAL_SUM_RANGE_POLICY);
+> +		add_token_u8(&err, dev, 1);
+> +		add_token_u8(&err, dev, OPAL_ENDNAME);
+> +	}
+> +
+
+This is optional, if not set, admin key remains unchanged. Add comment?
+
+> +	if (opal_react->new_admin_key.key_len) {
+> +		add_token_u8(&err, dev, OPAL_STARTNAME);
+> +		add_token_u64(&err, dev, OPAL_SUM_ADMIN1_PIN);
+> +		add_token_bytestring(&err, dev, opal_react->new_admin_key.key,
+> +				     opal_react->new_admin_key.key_len);
+> +		add_token_u8(&err, dev, OPAL_ENDNAME);
+> +	}
+
+...
+
+
+Otherwise looks good.
+
+Milan
+
+p.s.
+I implemented similar code in userspace for opal-toolset and tested on several drives.
+
+Original sedutils do not implement SUM / reactivate at all.
+
+That said, there are many drives that have broken SUM implementation... but I am pretty
+sure the construction above is according to TCG standard.
+
