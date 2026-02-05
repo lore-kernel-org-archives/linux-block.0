@@ -1,99 +1,117 @@
-Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4531513C918
-	for <linux-block@vger.kernel.org>; Thu,  5 Feb 2026 03:49:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEAAB2E8B87
+	for <linux-block@vger.kernel.org>; Thu,  5 Feb 2026 05:32:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770263355; cv=none; b=uRn8+k/nI56CA1CtzeAbjZEMrREruWC+lKnmbvDI5X9/bir2yvA5Qfv0aw2qi48osSM2worbdKI/W0bjWiC3KC0mN8jqL5/nmJxwrm3u/Us9B9JtD+5OFMM8gZJjrWCEcIMuwml6MGhK93zhMj5ndM5vPwwTj5/X+zbsj37A//s=
+	t=1770269549; cv=none; b=t8rdRxEuhn06q1YfEXSzy1QhZUe2fC/7vBgksvIrhKLBBeLK348kjG2ld6HChxHHLmk+VLwAuC9Bw6HQwP6OIthk9yi4M2+aEawbBynQh0W7lgmhAI/iaGyAFONzUkr0cp8uyPkORHKQZDtsvgIanz2gyAfmAQMpYE/VJLk44DQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770263355; c=relaxed/simple;
-	bh=iPyI+bxGDzJdunWbBXAgEEG27s3hk51sj5ATRVEllRE=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=VZpmBz2WkoeduOpq7WYU6jBY1yVou7zS5uaxaYlbRrx4h8YzBaTN3dS7eQQYcN8sq1MCuQjgLDaE+MHNRwiB9E7X8/QHlnlXWzVhO5j8inl+dFiX+DCkQByt9Xys3wZrkQwPch0pkwlUXNJdGOCXPK6APWeMy4WQ2Z+TJTrIVlc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=P3L9MIqg; arc=none smtp.client-ip=209.85.167.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1770269549; c=relaxed/simple;
+	bh=D77dSpDx6XxHiHw12gkRRJRdycW0/m7c9bcF272YpI4=;
+	h=Mime-Version:Subject:From:To:CC:In-Reply-To:Message-ID:Date:
+	 Content-Type:References; b=huoskos6SezSG5iRO4XX3x27Zk72LMMb74/oxKWPAdNspe4o0BJw8RVfnKubzGTtU7TaVzvuFMc+nhoysBbEgec/xKuOmeFk9XlN3zqvH180/lQAoBbrQchlTesFFe/otP74cB8SHhvLqTPR8sr6sHBy/iBaW/YpX3OX7cbpl4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=Lgofhn+B; arc=none smtp.client-ip=203.254.224.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="P3L9MIqg"
-Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-45efde72438so334147b6e.3
-        for <linux-block@vger.kernel.org>; Wed, 04 Feb 2026 19:49:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1770263354; x=1770868154; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zmIj1nXvjc7KrTt1sIa6RhdCvmInGqA14FaqO/L3jio=;
-        b=P3L9MIqgAL98cnOx/lYZWRxe5tZ1DiHRV9hyE1YuB41Q5Zlq8E19or0bs3cSjoUgOB
-         NhFuvXvG9StHyiYCLDOITs6/LNrcCL+wlVtHAAyob+2yCwBwwYE408cd5siO1GoDkCxl
-         oOsUfHfryUztXGNPvKGzoYSMC8g4WS3G4odW4tUGzhyNIcb3xAFnhB0kzb88DNi177pD
-         YP6jpxsGxqQioFJfUTcZP+s170tED5Qg9S5pzHqUCrfVY6MB2D7RsrBdkROvLjbxi2Kc
-         zn25oM2SsKG2Q0lnS3aesScHII3vQd62gHE0enDQt5w5NX3DFXhbRxgJSpTQk3eR56I5
-         mFmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770263354; x=1770868154;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=zmIj1nXvjc7KrTt1sIa6RhdCvmInGqA14FaqO/L3jio=;
-        b=AGjGcdQufZQS53eotcdE7KV7/ngAWpBArvgB2AzX38LM8/m2tFz/deWJRiaBKX4Qo9
-         hQaovmYF9r8RHwA7HB8Tej5XgdeFMzdpW7aynpiTDU1cxR8KbbPNEtq+VuOMrZgLZLF8
-         H60b3OqqhznNEgiA6aFVWNYx+k02ESbnzNPLKX/40lOR7+HOHWt/6g/qnAdLoTABGOr9
-         ZWewdnXJLNEYQF3hJKTIltBpyysh9ZWHYS2m8huIygqll8Wo/Wz5OtfviEEhqVAnGzvf
-         tPNG2HMfuQZ4yjCaKKxiw2o3gLddjBC+3wKRtgf90xsrldVC54rolAvAPD2L8Wu/K92S
-         CS5A==
-X-Gm-Message-State: AOJu0YyOXYiaCLjkVtgo4iuXU+kVMij5w2+oOvUnfdgFpocjbCXLxdtB
-	NqHb7IF2c4P4LopRYZyvW6qzdubBZKweSwcuUr68tv8eLHmh9e4Uy7QivjEbrFD1YSroON7JWjd
-	OhlWqA2I=
-X-Gm-Gg: AZuq6aK12c+UZDZ639jLVuVtNP7a6GuirB554vZUtxNa2LlbhxwBWavnaNZrJQsadXD
-	bZC8CFCQwisKdup7imfP5oc7Ss2yj1gReED0a8TXBsr+f/Khq2EWvAt3POMe4VDYg/uoHGGXztd
-	Xa5NX4y/ModFyct7UeKFnvZQPh0HlgJ8KEM2U1Js1h54lqYHqnB+nqSvIMJrcaF2jdY4tXnOlO7
-	0rE7KpnP2N+zKgJ+X2QNkChtN0v/FPUVnxmu/OLHGpptwGiul5fTv+kWYj5T7kS7QCxrS5y4zu1
-	t1R38n+Mw+sXODDmvOkR4pOVEaj7gTlGEtlQWdOOcU7kbdTRNYUcHzQUmaurTQ5zf6RG9sJNV9d
-	38UMjaz2ZjI9ntsWwzLv3mXAs2yIi1Rsyd2qm6S/FoFDp1LeByK/DCRbYg9yrUxuLPRFzixDqqL
-	f8LAF/DjJMEvq2dgUl7s58hUwuncd/VsuxQhPXb4iI1MBJZUDCnVe5ZkAW0wm3MwEb
-X-Received: by 2002:a05:6808:1407:b0:45c:7c9e:854f with SMTP id 5614622812f47-462d5ac3b09mr3312674b6e.58.1770263354251;
-        Wed, 04 Feb 2026 19:49:14 -0800 (PST)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-462d6608caasm2419841b6e.2.2026.02.04.19.49.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Feb 2026 19:49:13 -0800 (PST)
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Cc: Caleb Sander Mateos <csander@purestorage.com>, 
- Uday Shankar <ushankar@purestorage.com>, 
- Alexander Atanasov <alex@zazolabs.com>
-In-Reply-To: <20260201031044.99077-1-ming.lei@redhat.com>
-References: <20260201031044.99077-1-ming.lei@redhat.com>
-Subject: Re: [PATCH] selftests: ublk: organize test directories by test ID
-Message-Id: <177026335303.38867.2536120561689520738.b4-ty@kernel.dk>
-Date: Wed, 04 Feb 2026 20:49:13 -0700
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="Lgofhn+B"
+Received: from epcas2p3.samsung.com (unknown [182.195.41.55])
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20260205053220epoutp03934db2ccfdb11c5dfe83018584eb92f2~RQsSUDE3r0752907529epoutp03N
+	for <linux-block@vger.kernel.org>; Thu,  5 Feb 2026 05:32:20 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20260205053220epoutp03934db2ccfdb11c5dfe83018584eb92f2~RQsSUDE3r0752907529epoutp03N
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1770269540;
+	bh=GwX5cKAP15nRsjmx54ffQ5a/as1w/sPDdfMkfKoW1rs=;
+	h=Subject:Reply-To:From:To:CC:In-Reply-To:Date:References:From;
+	b=Lgofhn+Bm0ZvdIxYnmtRfC7fKM6wV4V/HrMKLADh3KUqpEyUQzxjF8aIkvO1K/W6v
+	 Ei6duvPZy6wPfTS08rtEhWVASEbHykZ2IKIS4IYjtBMM4V2BEMJ01ATdLCUayu0QMS
+	 tY/JGmOBJqZ21qfjLFCQTnFo9Ls5FZgL45wUEnhc=
+Received: from epsnrtp01.localdomain (unknown [182.195.42.153]) by
+	epcas2p3.samsung.com (KnoxPortal) with ESMTPS id
+	20260205053220epcas2p3367f123fbc5373b01fd3bab617d4c6bd~RQsR7qUJp0918009180epcas2p3D;
+	Thu,  5 Feb 2026 05:32:20 +0000 (GMT)
+Received: from epcas2p3.samsung.com (unknown [182.195.38.204]) by
+	epsnrtp01.localdomain (Postfix) with ESMTP id 4f65Sz5v06z6B9mG; Thu,  5 Feb
+	2026 05:32:19 +0000 (GMT)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Mime-Version: 1.0
+Subject: [Patch] bsg: initialize request and reply payloads in
+ bsg_prepare_job
+Reply-To: jonghwi.rha@samsung.com
+Sender: =?UTF-8?B?65287KKF7ZyY?= <jonghwi.rha@samsung.com>
+From: =?UTF-8?B?65287KKF7ZyY?= <jonghwi.rha@samsung.com>
+To: Jens Axboe <axboe@kernel.dk>
+CC: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "hch@lst.de"
+	<hch@lst.de>, =?UTF-8?B?6rmA7KCV7YOc?= <jt1217.kim@samsung.com>,
+	=?UTF-8?B?7KCV7Zic7Jew?= <hyeon.chung@samsung.com>
+X-Priority: 3
+X-Content-Kind-Code: NORMAL
+In-Reply-To: <8c7399bf-76b3-4902-b257-b85c95543f6f@kernel.dk>
+X-CPGS-Detection: blocking_info_exchange
+X-Drm-Type: N,general
+X-Msg-Generator: Mail
+X-Msg-Type: PERSONAL
+X-Reply-Demand: N
+Message-ID: <20260205053219epcms2p20a936a2fa681d19d3386fd480c283447@epcms2p2>
+Date: Thu, 05 Feb 2026 14:32:19 +0900
+X-CMS-MailID: 20260205053219epcms2p20a936a2fa681d19d3386fd480c283447
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.3
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: AUTO_CONFIDENTIAL
+CMS-TYPE: 102P
+cpgsPolicy: CPGSC10-234,Y
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20260130091020epcms2p2d85af8781639a17ab517208feb270dbd
+References: <8c7399bf-76b3-4902-b257-b85c95543f6f@kernel.dk>
+	<20260202120425epcms2p481d034d2a8fc522819673f0bcd59cefd@epcms2p4>
+	<CGME20260130091020epcms2p2d85af8781639a17ab517208feb270dbd@epcms2p2>
+
+Hello,
+
+This is Jonghwi from Samsung. :)
+I am sending you a patch via new email as requested.
 
 
-On Sun, 01 Feb 2026 11:10:44 +0800, Ming Lei wrote:
-> Set UBLK_TEST_DIR to ${TMPDIR:-./ublktest-dir}/${TID}.XXXXXX to create
-> per-test subdirectories organized by test ID. This makes it easier to
-> identify and debug specific test runs.
-> 
-> 
+bsg: initialize request and reply payloads in bsg_prepare_job
 
-Applied, thanks!
+struct bsg_job payloads contain fields that are only populated by
+certain commands, such as sg_list pointers.
 
-[1/1] selftests: ublk: organize test directories by test ID
-      commit: 5d3ae80b4dc43d1c49f5ab6e9835ae5fc9ac5d37
+Because struct bsg_job is allocated with kmalloc(), memory may be
+reused across requests. If a command does not populate all payload
+fields, stale state from a previous job may remain and later be
+misinterpreted during cleanup, potentially leading to use-after-free
+or double-free issues.
 
-Best regards,
--- 
-Jens Axboe
+Initialize both request and reply payloads at the beginning of job
+preparation to ensure a clean state for all commands.
+
+Signed-off-by: Jonghwi Rha <jonghwi.rha@samsung.com>
+
+diff --git a/block/bsg-lib.c b/block/bsg-lib.c
+index 32da4a4429ce..0fbf8e311c03 100644
+--- a/block/bsg-lib.c
++++ b/block/bsg-lib.c
+@@ -234,6 +234,12 @@ static bool bsg_prepare_job(struct device *dev, struct request *req)
+        struct bsg_job *job = blk_mq_rq_to_pdu(req);
+        int ret;
+
++       /* Clear stale SG state since bsg_job is reused as a request PDU */
++       job->request_payload.sg_list = NULL;
++       job->request_payload.sg_cnt = 0;
++       job->reply_payload.sg_list = NULL;
++       job->reply_payload.sg_cnt = 0;
++
+        job->timeout = req->timeout;
+
+        if (req->bio) {
 
 
-
+BRs,
+Jonghwi,
