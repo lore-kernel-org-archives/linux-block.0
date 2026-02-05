@@ -1,98 +1,77 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B86B23EA90
-	for <linux-block@vger.kernel.org>; Thu,  5 Feb 2026 15:10:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65A59219A71
+	for <linux-block@vger.kernel.org>; Thu,  5 Feb 2026 15:38:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770304210; cv=none; b=OciONzWN8L3phTcLZom6uhdJYMDJwk0yw6K2RAmGsqRPw9xg814+Bytt7tUWF7NLjEUyJw+xpoXxpmbqJlUnMIXkWbewxPwXLND06x9FOI+RbozJIDdqXbju45rFWeDoQMmG9fmwLrgmcTCLr9DuqPI3MIW5dAhmIZZ23mF5Ik8=
+	t=1770305896; cv=none; b=HryaPjTUf71cgYKR/wsu9BRx26FQbe30NOQFn7aD6L1fjUpbxLPj3F1wi3odWsZVOy5Cy6Jeqe0TJxAtxwuLoUjGaWAZk5/bCwuvD/0HjAZzXtfWfCqBFXZUyBQ+kkaca9++yLErz8bDbYw6RRgaDfvGW1XU0ebOQQrJ7Sn/Zu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770304210; c=relaxed/simple;
-	bh=mPFgKXyo1rCk7daYO5lbR8h/FgMa/u3dz5Q1U4TWmWM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ce2h1a75hr5YsWOoJLeSNSYo8Cfrwue9htxBBibXrvB494juLaITy8a1PnHjgHemF+zJAhAYkUFX/E/0Oes7mFDW4D+YOj9Z8QdMnZYSNEj140XwuGAO/8QcUNJZqo0IZNplVmKX57GPfHA4KcjaTgQDC7j8vLWYQmqnMdn8oeQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bOXFkSrr; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1770305896; c=relaxed/simple;
+	bh=eKw0GNbhSGb/7NUvqnc3TTcO+szFvMEBMwtXRZijx5g=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=P09xRWeo9c6r4i3uIpW7LHvkeqWDPH9VHbkcvASi5AcWCv3kTSSuQ40NGCd0mx6FR9nBQWBr+Zk3snU9SG0ap12SHd9AIlIiSXVX68k/RlvX9Cz0LBfA/vhHPUFAIN/q1m48G5jQtjUOTgqkRs+USaoBun2f9zvDTsOEBPUDUwI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UFZ+hMvO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bOXFkSrr"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770304209;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vvCLdv3CYjSTRfjo+P4zktU7VDFZBWXUNhh0gXPp4eI=;
-	b=bOXFkSrrlmGlGsXtVlWRBouAX6C4hml+dyQhe3YwTz9jAMnwXec3KY8vxP+ZmuomVNnHy3
-	Ktxyti62e4pYLp+POByj/RIJy9MMmJdkgvj/BOnxss+PwFr+dU40XHPEeOQ5ArOkC/UvAq
-	AdoVkFoU4j6EFcSrzw2HbVK/0k1n9O0=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-678-La9bCuVoORqiqllALVMO1w-1; Thu,
- 05 Feb 2026 10:10:05 -0500
-X-MC-Unique: La9bCuVoORqiqllALVMO1w-1
-X-Mimecast-MFC-AGG-ID: La9bCuVoORqiqllALVMO1w_1770304204
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A65221956095;
-	Thu,  5 Feb 2026 15:10:04 +0000 (UTC)
-Received: from fedora.brq.redhat.com (unknown [10.43.17.192])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0213718004AD;
-	Thu,  5 Feb 2026 15:10:02 +0000 (UTC)
-From: Ondrej Kozina <okozina@redhat.com>
-To: linux-block@vger.kernel.org
-Cc: Ondrej Kozina <okozina@redhat.com>,
-	gmazyland@gmail.com,
-	jonathan.derrick@linux.dev,
-	gjoyce@ibm.com,
-	hare@suse.de
-Subject: [PATCH v2 8/9] sed-opal: increase column attribute type size to 64 bits.
-Date: Thu,  5 Feb 2026 16:09:31 +0100
-Message-ID: <20260205150935.238137-9-okozina@redhat.com>
-In-Reply-To: <20260130162527.570255-1-okozina@redhat.com>
-References: <20260130162527.570255-1-okozina@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UFZ+hMvO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1F43C4CEF7;
+	Thu,  5 Feb 2026 15:38:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770305896;
+	bh=eKw0GNbhSGb/7NUvqnc3TTcO+szFvMEBMwtXRZijx5g=;
+	h=Date:From:To:Cc:Subject:From;
+	b=UFZ+hMvOXmCVZFuq9l08xSEeWSysgRsFJH5ylOjemNgRWllGsvfgQkBxrwunt/2Yd
+	 CcnAKJYaNQi4FLcXk3+gOPP5IUIKifQKpz5AduJn4yXWvFSTUVtUHNooaCivfH3AJN
+	 rE25yeyky9J0CnxL6A75JszyXJwJW+Bb2wkT07c6Ke7ESEBNvqsulqFlQAhTAjvUhd
+	 tC5g8Gxynwk6qOz/eme2gpaqbFI85gU7LcnkmWxFbE0nxNyn7W1g51RqL6VP2FT4i3
+	 Q6QUnTfUbD2LgQo/5wke3ahZcMsqi3ScxksV5GAluOHQ4dwNn+uqIrX4EfAdgfb/VQ
+	 eXWMJ0XcvD5Uw==
+Date: Thu, 5 Feb 2026 08:38:14 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: axboe@kernel.dk
+Cc: linux-nvme@lists.infradead.org, hch@lst.de, linux-block@vger.kernel.org
+Subject: [GIT PULL] nvme fixes for 6.19, final
+Message-ID: <aYS5ZlwruxpNCdTL@kbusch-mbp>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Change the column parameter in response_get_column() from u8 to u64
-to support the full range of column identifiers.
+Hi Jens,
 
-Signed-off-by: Ondrej Kozina <okozina@redhat.com>
----
- block/sed-opal.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Some late fixes for nvme that should go in this release. One for a pci
+regression that causes a kernel panic during certain dma conditions. The
+other fixes a vulnerability in the tcp target.
 
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index edde7fa52ab3..aec5f4708987 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -1581,7 +1581,7 @@ static int setup_locking_range_start_length(struct opal_dev *dev, void *data)
- 
- static int response_get_column(const struct parsed_resp *resp,
- 			       int *iter,
--			       u8 column,
-+			       u64 column,
- 			       u64 *value)
- {
- 	const struct opal_resp_tok *tok;
-@@ -1599,7 +1599,7 @@ static int response_get_column(const struct parsed_resp *resp,
- 	n++;
- 
- 	if (response_get_u64(resp, n) != column) {
--		pr_debug("Token %d does not match expected column %u.\n",
-+		pr_debug("Token %d does not match expected column %llu.\n",
- 			 n, column);
- 		return OPAL_INVAL_PARAM;
- 	}
--- 
-2.52.0
+The following changes since commit 4da7c5c3ec34d839bba6e035c3d05c447a2f9d4f:
 
+  bcache: fix I/O accounting leak in detached_dev_do_request (2026-01-28 19:06:55 -0700)
+
+are available in the Git repository at:
+
+  git://git.infradead.org/nvme.git tags/nvme-6.19-2026-02-05
+
+for you to fetch changes up to 52a0a98549344ca20ad81a4176d68d28e3c05a5c:
+
+  nvmet-tcp: add bounds checks in nvmet_tcp_build_pdu_iovec (2026-02-05 07:29:10 -0800)
+
+----------------------------------------------------------------
+nvme fixes for Linux 6.19
+
+ - Fix NULL pointer access setting up dma mappings (Keith)
+ - Fix invalid memory access from malformed TCP PDU (YunJe)
+
+----------------------------------------------------------------
+Keith Busch (1):
+      nvme-pci: handle changing device dma map requirements
+
+YunJe Shin (1):
+      nvmet-tcp: add bounds checks in nvmet_tcp_build_pdu_iovec
+
+ drivers/nvme/host/pci.c   | 45 ++++++++++++++++++++++++++++++---------------
+ drivers/nvme/target/tcp.c | 17 +++++++++++++++++
+ 2 files changed, 47 insertions(+), 15 deletions(-)
