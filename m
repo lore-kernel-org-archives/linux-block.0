@@ -1,63 +1,117 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 533A81482E8
-	for <linux-block@vger.kernel.org>; Thu,  5 Feb 2026 23:34:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97EA133B6E5;
+	Thu,  5 Feb 2026 23:37:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770334481; cv=none; b=ECq8AlJW+ZJp9vhOxiWpe8J9xrZQE0OCiEaFsRObM23UKUP/YWZ8qB3UgQ8VGhhDrLgcqLc9qGntVRR6nsNSZBX0QJaX7cNhF0alozhiZPfJULBeBTiCsmqfZ2U8+O/yZPkcU+HzIyVPNfhv0Ax00qv7zYuYNuq5A8Y2UA+EKKQ=
+	t=1770334660; cv=none; b=XuqUTclVIlZLj0gehgrDY1xCKVT1Pjy1dU1TbsGSHDQ3xmTGPXMALiWDOypzoqfnYSBtGKAcKPo0ip9lvK7j7G85McNGDDa09WvEE6b5VvvXq1K+vmaoCnTHogras9QOa2TZklwX8Ayy5WKTE1KwDtZ2mPP9k0Q5JFpLpNoRNCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770334481; c=relaxed/simple;
-	bh=DknomvMWuVfxZYm0f5nm/DQ5EKTqoNY4eFNW1ZTche4=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=LrpJvzJmy68fqzSv/nWqcdUUmvS8xd2v4+xOcPTM9r+6ekhazLgHsnSFD/hzPNlgHJ1xM8jRF3Mt+kEDcb3mhu+z0XCZk7zqMNE1cxEgHjWDxrbUjk7g5Shk7MCTSgy5ejjmyAs/3488wsEfmIsjxKFSXtD1MVWicHSRYuviZvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YTHWrJDS; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1770334660; c=relaxed/simple;
+	bh=9fsQs8XyfGV7KTfiHy+W3SDSyzHyIaPegIt6rYd4HUQ=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=EPyaqvLCbcC7IrLqOIzQyXntGknJFTVC3fWxOm6WYV/9kYyjIKQYhzo5GaedVxqLaQZIg9VebFqf9cytkmscSCsODu+oIMSv7g1pG3k9U/OyUaQ1E1K9xA1wjEuLoC8+REUpTwBlUDi1oAeFvQuYS6/XzoSuSjN4N/cr21dfh2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hHOLfnJo; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YTHWrJDS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 376BAC4CEF7;
-	Thu,  5 Feb 2026 23:34:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hHOLfnJo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0ED6DC4CEF7;
+	Thu,  5 Feb 2026 23:37:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770334481;
-	bh=DknomvMWuVfxZYm0f5nm/DQ5EKTqoNY4eFNW1ZTche4=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=YTHWrJDSEHjo4TMDg75vFvA7a/y9pUAew5N2EkD6DL9/hLtibUBZnBey5X0zyqT4I
-	 HqeyZy1g/u6CgLAczO0K/vjd2WEAdLHL55Nvnl0ry1UBEAiK6NK4a5XAzQUzTRtskB
-	 v0626Vs25lCbO3lOqmWa7j9GoSpt6y+dP9NdKHdHWj83LuIXamaLS2ptnctWWTbxmk
-	 gNaJwaCGRLnSRGdlG7zsGV1IAS2ySnLVFt9shGq3Zw/5Jy6mSOsUDLIAgrtBd+3UnD
-	 WKYs5rl8+xQmdaWu5f1hLGcxC/elJl5MvPC2QEQ1YNnKYcNcNr/8ZqftN7srkLbXZ7
-	 C5Kr7AVw7j6mg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 0B1163808200;
-	Thu,  5 Feb 2026 23:34:40 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fixes for 6.19-final
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <88a6cbc7-19ed-40dd-a382-3efef7d24ba9@kernel.dk>
-References: <88a6cbc7-19ed-40dd-a382-3efef7d24ba9@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <88a6cbc7-19ed-40dd-a382-3efef7d24ba9@kernel.dk>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-6.19-20260205
-X-PR-Tracked-Commit-Id: a6abd64e145ca3084b6a567e06517a7c2dbfd38d
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 06bc4e26310f9f2c0dd2fbf4885483306c5235cb
-Message-Id: <177033447856.607944.11309452287509993607.pr-tracker-bot@kernel.org>
-Date: Thu, 05 Feb 2026 23:34:38 +0000
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+	s=k20201202; t=1770334660;
+	bh=9fsQs8XyfGV7KTfiHy+W3SDSyzHyIaPegIt6rYd4HUQ=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=hHOLfnJor7JN/Fk+Ipfr8313t5UcmUT4+/bPAdvLFp9KcVAfrJlCXC8jeZxgK7ZKu
+	 UAJnyL9LitnG/o8sqDUIAmZimtnaV0qSBIgOgU79OEIu9eSm/a1F+63Ss8jx4Do+KO
+	 GuTNTdFKXU2kWHSMSqEK0xI7TaRGf2z9/dNBzYdmxI5vi0m4PDh8FrovW1Nk+1eU7w
+	 L3T2TEnWpIExy6AiXi+lNdpEHyiz4EkoyWUyR5/tlqzqSTrFEfdbPk/CLgdk361JYG
+	 CkNqnKu1IfP6tZPpZomk3ZcFK+pl4Zk3glIkVSvLvqq9IoPedZOIqQZkJ8PWvoTaiy
+	 nw++dTLuaZfVw==
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfauth.phl.internal (Postfix) with ESMTP id E87B0F4006A;
+	Thu,  5 Feb 2026 18:37:38 -0500 (EST)
+Received: from phl-imap-15 ([10.202.2.104])
+  by phl-compute-10.internal (MEProxy); Thu, 05 Feb 2026 18:37:38 -0500
+X-ME-Sender: <xms:wimFaezCUfDBlfEYFLVzioBh4Z28aXLdgMUqYRP7In0ecaqYyjkS3A>
+    <xme:wimFaVHaDv2KDpCVAjlmDegnwZVQgiqhxr9FnqgPQ0iTm-cn1LuamV8rTKH1VUpnP
+    S4FlQLC3N7ywiRAqAgcyzlOnGsGxzXlAqlWr0_YEhESQZKIliMPuYA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddukeeiieefucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedfvehhuhgt
+    khcunfgvvhgvrhdfuceotggvlheskhgvrhhnvghlrdhorhhgqeenucggtffrrghtthgvrh
+    hnpeejvefhudehleetvdejhfejvefghfelgeejvedvgfduuefffeegtdejuefhiedukeen
+    ucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenuc
+    frrghrrghmpehmrghilhhfrhhomheptghhuhgtkhhlvghvvghrodhmvghsmhhtphgruhht
+    hhhpvghrshhonhgrlhhithihqdduieefgeelleelheelqdefvdelkeeggedvfedqtggvlh
+    eppehkvghrnhgvlhdrohhrghesfhgrshhtmhgrihhlrdgtohhmpdhnsggprhgtphhtthho
+    peehpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehjrghmvghsrdgsohhtthhomh
+    hlvgihsehhrghnshgvnhhprghrthhnvghrshhhihhprdgtohhmpdhrtghpthhtohephhgr
+    rhhishdrihhqsggrlhesihhonhhoshdrtghomhdprhgtphhtthhopehlihhnuhigqdgslh
+    hotghksehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqfhhs
+    uggvvhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqd
+    hstghsihesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:wimFaamcC7LS6xrIjGsMcMZp71GshtwnFO8kurRootLvqHU_R_jxjQ>
+    <xmx:wimFaVjL7i6qC9voVRUaffyClSrEoJlSoaJFyDWh_Iny7Xu1P3fAUA>
+    <xmx:wimFaSf_QJSDBvyWiOup5ZVVb7suhF6dRJl3aCXmQQQIReXQvjIQIg>
+    <xmx:wimFaVgdy3IKuQ1KTgm-5i6Bwf4XabBaGrrPTB3_TXGXioZM0Cpn-A>
+    <xmx:wimFaaxdbiCLgKb98sy8mIrBvP2vGFFF7YXJVyISgZbPkJGq3fwgVK1e>
+Feedback-ID: ifa6e4810:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id BF118780070; Thu,  5 Feb 2026 18:37:38 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+X-ThreadId: Ag-6jdtruc1N
+Date: Thu, 05 Feb 2026 18:37:03 -0500
+From: "Chuck Lever" <cel@kernel.org>
+To: "James Bottomley" <James.Bottomley@hansenpartnership.com>,
+ "Haris Iqbal" <haris.iqbal@ionos.com>
+Cc: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ linux-fsdevel@vger.kernel.org
+Message-Id: <8cf8658a-4cea-45d6-b098-0c44da503e44@app.fastmail.com>
+In-Reply-To: 
+ <5cfff8c0b44968cf75d74aef17de6dce73e1a26d.camel@HansenPartnership.com>
+References: 
+ <32e620691c0ecf76f469a21bffaba396f207ccb9.camel@HansenPartnership.com>
+ <CAJpMwyg4Etv3qOw2Ur+L9YmWbt7Rw19uTs0=RsRtuORaEOoHnQ@mail.gmail.com>
+ <5cfff8c0b44968cf75d74aef17de6dce73e1a26d.camel@HansenPartnership.com>
+Subject: Re: [LSF/MM/BPF TOPIC] Documenting the correct pushback on AI inspired (and
+ other) fixes in older drivers
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-The pull request you sent on Thu, 5 Feb 2026 15:24:39 -0700:
+Hello James,
 
-> https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git tags/block-6.19-20260205
+On Thu, Feb 5, 2026, at 5:40 PM, James Bottomley wrote:
+> On Thu, 2026-02-05 at 17:40 +0100, Haris Iqbal wrote:
+> [...]
+>> It is an interesting proposal, but I feel the problem statement
+>> overlaps with some other, already being discussed, or covered topics.
+>> For example, the topic of fixes requiring effort and time of the
+>> maintainer/reviewer, and the fact that AI now potentially leads to
+>> too many such fixes is being discussed in the following link,
+>> 
+>> https://lore.kernel.org/ksummit/20251114183528.1239900-1-dave.hansen@linux.intel.com/#t
+>
+> They are actually pretty orthogonal.  The email is about identifying AI
+> tools used in submission.  I may suspect the uptick in the fixes is due
+> to the use of AI, but I don't really care.  The problem isn't what tool
+> you used it's that the risk vs benefit of actually fixing the driver
+> isn't favourable.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/06bc4e26310f9f2c0dd2fbf4885483306c5235cb
+Agreed, the fire hose of patches that a maintainer has to deal with
+is a perennial problem, no matter the source of the patches.
 
-Thank you!
+Seems to me that benefits/cost analysis is part of patch review. But
+when using AI for review, you can ask it to do an initial analysis
+for you, rather than legislating contributor behavior (over which you
+have no control).
+
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Chuck Lever
