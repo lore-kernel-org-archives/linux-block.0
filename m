@@ -1,47 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEFA723EA90
-	for <linux-block@vger.kernel.org>; Thu,  5 Feb 2026 15:09:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC1C518871F
+	for <linux-block@vger.kernel.org>; Thu,  5 Feb 2026 15:09:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770304193; cv=none; b=gFjJTcLamrT3X2DohRlHsMmawXWFWP7eIS+Wh2G0Xg0Rn+MLLBDY7CAIE+tP8xneX0WkfPl8riAQcSUn2HUQcZfapbTjIMT5S7aVUkkJWUZXg4R1eZAkr73A+ncm3WrYY68WrZX3t7CL55iupX1P5l6IlNKDPMukm8QNLbflEpQ=
+	t=1770304198; cv=none; b=V+JJJkB4TjJGdFrnCxN87UM19WY1qoY2fZKoLa4Sr3ov40pGQAGZ32kmXIjVlAQ7fGBV/Ih3NpnzjgTsuBm57lEuOUgJiGIDLB3Isg3lB1uJLdk7vxm9iJSgOCU2zpEdEv0sPZYw7A06/QxA0o8ydisMeMW8mJBMCKqxDTe4HOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770304193; c=relaxed/simple;
-	bh=uqCPIjmXVz+ylWQk9Ma/HUX1A02IFnhacygnovlEeXM=;
+	s=arc-20240116; t=1770304198; c=relaxed/simple;
+	bh=e9H+1tPWHhMoBU0A58c5qD/LdhC9GAREju4NOD5BrRc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fLblCxksL3DdMgmUdBf4vh7E8C0j9o2J2uRLZaWF//VdVAXCUbgwRfMFo1MvuIkZXGBRt+LJjUnziaKnRZFyBTyA9vul3dKUljQrk4f+IE/Bry/mqXIpg+kh9lHKcbS9bntgydi5gLh7OBDbWcCaJBefnH+vcSYvm1FKGdnpfwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CAOhhvkf; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=J9MJL72oei9vxA2g1e2G0xaMznV6WgKRsYxQR8tx+xLRGfnUJJerVH7TVz69mk9cFcRsRJYtZUU4QN1A5JX19JejklPBV4QoxDc4kozFp94QXLTKz0nNWNMmD5n0/tH5tFQpRcApmrq0c+ee0ScVLmlOYXNk5JWIYhSrpiDHfcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jWchD8Gx; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CAOhhvkf"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jWchD8Gx"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770304192;
+	s=mimecast20190719; t=1770304197;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=MWAate0VAub8j2pH34K8wd5v1+2dxKOy22ySrdtazPk=;
-	b=CAOhhvkf+BtcGOXFwQPqtva7dpB+Sm1x+p0kGcmYuaUofHsKrU6onwyZJZpI/+MotAbS+Q
-	N/YfdbuHOfvN4aT9Qw/+B3ulf6uL/uSBtKOmZltdn6V26kbMEGqFZr4Xrd7zVGJlnupCtn
-	6Z8nP5JWwYxH+bfhbPI+qnXRK2xUitA=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=O3Vhe3cspgj+wLWuwHkRvA4uR8kHsIOzhuMtjlCVP9U=;
+	b=jWchD8Gx3ifzOKBko+LYZ3mneFamfDlzn2RkytRc9FKEBgs2l4GRaqZWJ4uLUMTDktOQrM
+	5lETATYr1ibEyVd6qoPijzV+Gx64WH1A6DdvO1kEiUFioC14BfwYUuxeRwKbz576R8SI72
+	st11PNQRBz7LiKZancyA7x6glbsVtOg=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-269-SQeL31z6Mk-m1x2hz6VG7A-1; Thu,
- 05 Feb 2026 10:09:49 -0500
-X-MC-Unique: SQeL31z6Mk-m1x2hz6VG7A-1
-X-Mimecast-MFC-AGG-ID: SQeL31z6Mk-m1x2hz6VG7A_1770304188
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-397-BCEI6Aq4P82D9ZsszHni5A-1; Thu,
+ 05 Feb 2026 10:09:53 -0500
+X-MC-Unique: BCEI6Aq4P82D9ZsszHni5A-1
+X-Mimecast-MFC-AGG-ID: BCEI6Aq4P82D9ZsszHni5A_1770304192
 Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4178D180057E;
-	Thu,  5 Feb 2026 15:09:48 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 68FA719560A3;
+	Thu,  5 Feb 2026 15:09:52 +0000 (UTC)
 Received: from fedora.brq.redhat.com (unknown [10.43.17.192])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3EF9B18004AD;
-	Thu,  5 Feb 2026 15:09:46 +0000 (UTC)
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9575C180066C;
+	Thu,  5 Feb 2026 15:09:50 +0000 (UTC)
 From: Ondrej Kozina <okozina@redhat.com>
 To: linux-block@vger.kernel.org
 Cc: Ondrej Kozina <okozina@redhat.com>,
@@ -49,9 +49,9 @@ Cc: Ondrej Kozina <okozina@redhat.com>,
 	jonathan.derrick@linux.dev,
 	gjoyce@ibm.com,
 	hare@suse.de
-Subject: [PATCH v2 0/9] Extend Single User Mode (SUM) support in sed-opal.
-Date: Thu,  5 Feb 2026 16:09:23 +0100
-Message-ID: <20260205150935.238137-1-okozina@redhat.com>
+Subject: [PATCH v2 2/9] sed-opal: add RangeStartRangeLengthPolicy parameter.
+Date: Thu,  5 Feb 2026 16:09:25 +0100
+Message-ID: <20260205150935.238137-3-okozina@redhat.com>
 In-Reply-To: <20260130162527.570255-1-okozina@redhat.com>
 References: <20260130162527.570255-1-okozina@redhat.com>
 Precedence: bulk
@@ -63,59 +63,29 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-This patch series extends support for TCG Storage Opal SSC Single User
-Mode (SUM) in the sed-opal kernel interface. SUM addresses few
-shortcomins described in the chapter 2 of the OPAL2 sepecification
-extension (see below). It better isolates Admin authority from User
-stored data by taking the Lock/Unlock/Enable/Disable privileges from
-Admin when managing Locking Ranges configured for SUM.
+As desribed in ch. 3.1.1.1.1.2 of TCG Storage Opal SSC Feature Set:
+Single User Mode document.
 
-This permission split necessitates separate ioctl calls for operations
-that previously could be performed atomically under a single authority.
-The series refactors existing code and introduces new ioctls to support
-this model:
+To be used later in Reactivate method implementation and in function
+for retrieving SUM device status.
 
-- IOC_OPAL_REACTIVATE_LSP: Switch an active OPAL2 device to/from SUM
-- IOC_OPAL_LR_SET_START_LEN: Set locking range boundaries only
-- IOC_OPAL_ENABLE_DISABLE_LR: Set lock enable states only
-- IOC_OPAL_GET_SUM_STATUS: Query SUM configuration status
+Signed-off-by: Ondrej Kozina <okozina@redhat.com>
+---
+ block/opal_proto.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-References:
-- TCG Storage Opal SSC Feature Set: Single User Mode specification
-- cryptsetup code using the extended sed-opal interface:
-  https://gitlab.com/cryptsetup/cryptsetup/-/merge_requests/832
-
-Changes since previus version:
-
-v2:
-  - Make separate patch adding Locking table UID
-  - Make separate patch adding RangeStartRangeLengthPolicy parameter
-  - Make separate patch adding Admin1PIN parameter
-  - Add comments explaining differences between passing Locking table
-    UID and separate Locking Ranges UID via array in IOC_OPAL_REACTIVATE_LSP
-  - Minor whitespace fixes
-  - Minor commit messages changes in IOC_OPAL_LR_SET_START_LEN and
-    IOC_OPAL_ENABLE_DISABLE_LR ioctls patches.
-  - Additional comments explaining expected answer from the
-    controller in IOC_OPAL_GET_SUM_STATUS ioctl.
-
-Ondrej Kozina (9):
-  sed-opal: add UID of Locking Table.
-  sed-opal: add RangeStartRangeLengthPolicy parameter.
-  sed-opal: add Admin1PIN parameter.
-  sed-opal: add IOC_OPAL_REACTIVATE_LSP.
-  sed-opal: refactor (split) IOC_OPAL_LR_SETUP internals.
-  sed-opal: add IOC_OPAL_LR_SET_START_LEN ioctl.
-  sed-opal: add IOC_OPAL_ENABLE_DISABLE_LR.
-  sed-opal: increase column attribute type size to 64 bits.
-  sed-opal: add IOC_OPAL_GET_SUM_STATUS ioctl.
-
- block/opal_proto.h            |   4 +
- block/sed-opal.c              | 385 +++++++++++++++++++++++++++++++---
- include/linux/sed-opal.h      |   4 +
- include/uapi/linux/sed-opal.h |  25 +++
- 4 files changed, 389 insertions(+), 29 deletions(-)
-
+diff --git a/block/opal_proto.h b/block/opal_proto.h
+index 3dfba3de7be1..b9877eacfe91 100644
+--- a/block/opal_proto.h
++++ b/block/opal_proto.h
+@@ -225,6 +225,7 @@ enum opal_lockingstate {
+ 
+ enum opal_parameter {
+ 	OPAL_SUM_SET_LIST = 0x060000,
++	OPAL_SUM_RANGE_POLICY = 0x060001,
+ };
+ 
+ enum opal_revertlsp {
 -- 
 2.52.0
 
