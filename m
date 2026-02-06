@@ -1,58 +1,58 @@
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FDE844A71E
-	for <linux-block@vger.kernel.org>; Fri,  6 Feb 2026 18:25:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 686F443D50B
+	for <linux-block@vger.kernel.org>; Fri,  6 Feb 2026 18:25:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770402317; cv=none; b=X3qGtKE8yu51tgWu8Hh++rh4cW2zJq7gH77ePK0lsiiHg7Ip094OASgqdKEmpaTkAaXbvMIIpQUvlp2RLjz0HnShWFrOymM9lF+yE3xsXstc2yxpwznrTGv2CbYnbKPY+Ho8qegovgP6FM/UVm8pOkX/SxEZqc6yYGOvDY3vEhg=
+	t=1770402321; cv=none; b=nib4p0rqBilNG7AHuVDnH94dEXAkFUgWwcS4AwR2mnZd9m1aOO22o5Mwk0lEuwNeSWZa/cjgWpri20MQ702BIZx6CVDL9YKKQTeU7at2/f/kaICGo8rUb17zqy6Cv3CmMzNyXeatIloHho6KALuWawNmJyIrHBLMTKld1AzBNNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770402317; c=relaxed/simple;
-	bh=x51Cg5xsCzKVGWOmBJtih3DOztBpxfL6ZG35siCQ3ms=;
+	s=arc-20240116; t=1770402321; c=relaxed/simple;
+	bh=wBNEVAk30UYG4m43mdnD0/y+iUy42IO/9sgi8dADWHU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=V/lBFGeNTdy0UVIQn93ABbF75O5nwHC4NClqXLUwVtNcFTthMzGX82yfA6F6UWAAC0UBjdiQtG5JyNIR35/zYc+mYxts1g3YU5dR+IU6N+smvGUUO9HxDATqu/EUGRXPj2r6gKjVWpx9xN2kmTOtRa0W3/MHfVKjlHOMPwF+j0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=D7eLlhRf; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=o3CIKfJw; arc=none smtp.client-ip=195.135.223.131
+	 MIME-Version; b=DyrjPNpL/5KSpGCaeJBdsyBvQ3Km1h3G4gQXQBnBd5MPuBhweRRNhTvnTUt6IHFwl8o7iqW0SV/GnPZkMS+lurUVX1K9jAiC9BfCmV1Gq9xxS4cegIQAfgeaUWpDVnnhn+EJDflL+hX6fOhcPufy8MrHyiNQYEvArXaZfvdeEg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=QvI3NU/7; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=QvI3NU/7; arc=none smtp.client-ip=195.135.223.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="D7eLlhRf";
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="o3CIKfJw"
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="QvI3NU/7";
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="QvI3NU/7"
 Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id E70C05BD38;
-	Fri,  6 Feb 2026 18:24:18 +0000 (UTC)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id D182C5BD30;
+	Fri,  6 Feb 2026 18:24:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
 	t=1770402259; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=u9CaRWPO0XEEkcqklCFMGPi2Gz5Gl8+A3LyPbQLO5J0=;
-	b=D7eLlhRfCnY9+hkf+p9KXeqIRvCUG/8VTOeBoBatxFEeHl/Xn0bMe5QwI88ijwFQ+EWRiH
-	uvth8ETfOFWA1ozenxXnMFRMTrVEiI/qif9B64u8lnRZnzmxLfbBQmV88MX8fSKsMuXwcI
-	VopFnAy38Gpat5BMEP9cRgdHwHI2HQc=
+	bh=naQJMp1+YtAXW7i9Wmu4TNf5csVeJ0Q0sjWmskdGN3Q=;
+	b=QvI3NU/7hIF95rabCHRgR+X9m6CVlVvOttcPtm3aEGXNdbg2Wm2NTtNfy38JSZpmytrMLv
+	tVP1G8tV4DHSmyYF0Kg1A2AaJCHIZHcbHLKVzXI+4Gh0F4BLwEyNsNIwA0O0LJMg0SMTF0
+	FRHZpFDDbOIFaMymXdQKRiSc9pqtPs8=
 Authentication-Results: smtp-out2.suse.de;
 	none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1770402258; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1770402259; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=u9CaRWPO0XEEkcqklCFMGPi2Gz5Gl8+A3LyPbQLO5J0=;
-	b=o3CIKfJwv0X6WkIAr2IiYMi8eN6avPef/zXeFxEXUE36h903nV+Owpb7u4etSigKcKohLD
-	gdEgUE5gkC9KQaUnY11RyWswS+kgcFwLNuK7No7/ssnOEx6DuCszdIE0mPjwJE35N/GHJl
-	2U392xn0mh+Rg5g2lhcEdHOhoNKz4CY=
+	bh=naQJMp1+YtAXW7i9Wmu4TNf5csVeJ0Q0sjWmskdGN3Q=;
+	b=QvI3NU/7hIF95rabCHRgR+X9m6CVlVvOttcPtm3aEGXNdbg2Wm2NTtNfy38JSZpmytrMLv
+	tVP1G8tV4DHSmyYF0Kg1A2AaJCHIZHcbHLKVzXI+4Gh0F4BLwEyNsNIwA0O0LJMg0SMTF0
+	FRHZpFDDbOIFaMymXdQKRiSc9pqtPs8=
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id B9DC33EA63;
-	Fri,  6 Feb 2026 18:24:18 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A6BE23EA63;
+	Fri,  6 Feb 2026 18:24:19 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id ACrlLNIxhmkTCQAAD6G6ig
-	(envelope-from <neelx@suse.com>); Fri, 06 Feb 2026 18:24:18 +0000
+	id QKcdKNMxhmkTCQAAD6G6ig
+	(envelope-from <neelx@suse.com>); Fri, 06 Feb 2026 18:24:19 +0000
 From: Daniel Vacek <neelx@suse.com>
 To: Chris Mason <clm@fb.com>,
 	Josef Bacik <josef@toxicpanda.com>,
@@ -66,9 +66,9 @@ Cc: linux-block@vger.kernel.org,
 	linux-fscrypt@vger.kernel.org,
 	linux-btrfs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v6 39/43] btrfs: set the appropriate free space settings in reconfigure
-Date: Fri,  6 Feb 2026 19:23:11 +0100
-Message-ID: <20260206182336.1397715-40-neelx@suse.com>
+Subject: [PATCH v6 41/43] btrfs: disable auto defrag on encrypted files
+Date: Fri,  6 Feb 2026 19:23:13 +0100
+Message-ID: <20260206182336.1397715-42-neelx@suse.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260206182336.1397715-1-neelx@suse.com>
 References: <20260206182336.1397715-1-neelx@suse.com>
@@ -107,130 +107,42 @@ X-Spam-Level:
 
 From: Josef Bacik <josef@toxicpanda.com>
 
-btrfs/330 uncovered a problem where we were accidentally turning off the
-free space tree when we do the transition from ro->rw.  This happens
-because we don't update
+We will drop the inode and re-look it up to do defrag with auto defrag,
+which means we could lose the encryption policy.
+
+Auto defrag needs to be reworked to just hold onto the inode for
+scheduling later so we don't lose the context.  For now just disable it
+if the file is encrypted.
 
 Signed-off-by: Josef Bacik <josef@toxicpanda.com>
 Signed-off-by: Daniel Vacek <neelx@suse.com>
 ---
 
-v5: https://lore.kernel.org/linux-btrfs/325598eeb1d23f9ae04f675b4ee218f7e98e3ff0.1706116485.git.josef@toxicpanda.com/
- * Re-wrapped comments.
- * Fixed argument type.  mount_opt is now ull.
+v5: https://lore.kernel.org/linux-btrfs/b717912bf88797b3044a3c2724b59b1ecc17ea78.1706116485.git.josef@toxicpanda.com/
+ * No changes since.
 ---
- fs/btrfs/disk-io.c |  2 +-
- fs/btrfs/super.c   | 28 +++++++++++++++-------------
- fs/btrfs/super.h   |  3 ++-
- 3 files changed, 18 insertions(+), 15 deletions(-)
+ fs/btrfs/defrag.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/fs/btrfs/disk-io.c b/fs/btrfs/disk-io.c
-index f47a20976b53..993d2080fcbf 100644
---- a/fs/btrfs/disk-io.c
-+++ b/fs/btrfs/disk-io.c
-@@ -3416,7 +3416,7 @@ int __cold open_ctree(struct super_block *sb, struct btrfs_fs_devices *fs_device
- 	 * Handle the space caching options appropriately now that we have the
- 	 * super block loaded and validated.
- 	 */
--	btrfs_set_free_space_cache_settings(fs_info);
-+	btrfs_set_free_space_cache_settings(fs_info, &fs_info->mount_opt);
- 
- 	if (!btrfs_check_options(fs_info, &fs_info->mount_opt, sb->s_flags)) {
- 		ret = -EINVAL;
-diff --git a/fs/btrfs/super.c b/fs/btrfs/super.c
-index 06788b27a870..4a2887147ead 100644
---- a/fs/btrfs/super.c
-+++ b/fs/btrfs/super.c
-@@ -745,10 +745,10 @@ bool btrfs_check_options(const struct btrfs_fs_info *info,
- }
- 
- /*
-- * This is subtle, we only call this during open_ctree().  We need to pre-load
-- * the mount options with the on-disk settings.  Before the new mount API took
-- * effect we would do this on mount and remount.  With the new mount API we'll
-- * only do this on the initial mount.
-+ * Because we have an odd set of behavior with turning on and off the space cache
-+ * and free space tree we have to call this before we start the mount operation
-+ * after we load the super, or before we start remount.  This is to make sure we
-+ * have the proper free space settings in place if the user didn't specify any.
-  *
-  * This isn't a change in behavior, because we're using the current state of the
-  * file system to set the current mount options.  If you mounted with special
-@@ -756,21 +756,22 @@ bool btrfs_check_options(const struct btrfs_fs_info *info,
-  * settings, because mounting without these features cleared the on-disk
-  * settings, so this being called on re-mount is not needed.
-  */
--void btrfs_set_free_space_cache_settings(struct btrfs_fs_info *fs_info)
-+void btrfs_set_free_space_cache_settings(struct btrfs_fs_info *fs_info,
-+					 unsigned long long *mount_opt)
- {
--	if (fs_info->sectorsize != PAGE_SIZE && btrfs_test_opt(fs_info, SPACE_CACHE)) {
-+	if (fs_info->sectorsize != PAGE_SIZE && btrfs_raw_test_opt(*mount_opt, SPACE_CACHE)) {
- 		btrfs_info(fs_info,
- 			   "forcing free space tree for sector size %u with page size %lu",
- 			   fs_info->sectorsize, PAGE_SIZE);
--		btrfs_clear_opt(fs_info->mount_opt, SPACE_CACHE);
--		btrfs_set_opt(fs_info->mount_opt, FREE_SPACE_TREE);
-+		btrfs_clear_opt(*mount_opt, SPACE_CACHE);
-+		btrfs_set_opt(*mount_opt, FREE_SPACE_TREE);
- 	}
- 
- 	/*
- 	 * At this point our mount options are populated, so we only mess with
- 	 * these settings if we don't have any settings already.
- 	 */
--	if (btrfs_test_opt(fs_info, FREE_SPACE_TREE))
-+	if (btrfs_raw_test_opt(*mount_opt, FREE_SPACE_TREE))
+diff --git a/fs/btrfs/defrag.c b/fs/btrfs/defrag.c
+index f64c0502cef9..cd6ea6e5d3ea 100644
+--- a/fs/btrfs/defrag.c
++++ b/fs/btrfs/defrag.c
+@@ -126,6 +126,14 @@ void btrfs_add_inode_defrag(struct btrfs_inode *inode, u32 extent_thresh)
+ 	if (!need_auto_defrag(fs_info))
  		return;
  
- 	if (btrfs_is_zoned(fs_info) &&
-@@ -780,10 +781,10 @@ void btrfs_set_free_space_cache_settings(struct btrfs_fs_info *fs_info)
- 		return;
- 	}
- 
--	if (btrfs_test_opt(fs_info, SPACE_CACHE))
-+	if (btrfs_raw_test_opt(*mount_opt, SPACE_CACHE))
- 		return;
- 
--	if (btrfs_test_opt(fs_info, NOSPACECACHE))
-+	if (btrfs_raw_test_opt(*mount_opt, NOSPACECACHE))
++	/*
++	 * Since we have to read the inode at defrag time disable auto defrag
++	 * for encrypted inodes until we have code to read the parent and load
++	 * the encryption context.
++	 */
++	if (IS_ENCRYPTED(&inode->vfs_inode))
++		return;
++
+ 	if (test_bit(BTRFS_INODE_IN_DEFRAG, &inode->runtime_flags))
  		return;
  
- 	/*
-@@ -791,9 +792,9 @@ void btrfs_set_free_space_cache_settings(struct btrfs_fs_info *fs_info)
- 	 * them ourselves based on the state of the file system.
- 	 */
- 	if (btrfs_fs_compat_ro(fs_info, FREE_SPACE_TREE))
--		btrfs_set_opt(fs_info->mount_opt, FREE_SPACE_TREE);
-+		btrfs_set_opt(*mount_opt, FREE_SPACE_TREE);
- 	else if (btrfs_free_space_cache_v1_active(fs_info))
--		btrfs_set_opt(fs_info->mount_opt, SPACE_CACHE);
-+		btrfs_set_opt(*mount_opt, SPACE_CACHE);
- }
- 
- static void set_device_specific_options(struct btrfs_fs_info *fs_info)
-@@ -1573,6 +1574,7 @@ static int btrfs_reconfigure(struct fs_context *fc)
- 
- 	sync_filesystem(sb);
- 	set_bit(BTRFS_FS_STATE_REMOUNTING, &fs_info->fs_state);
-+	btrfs_set_free_space_cache_settings(fs_info, &ctx->mount_opt);
- 
- 	if (!btrfs_check_options(fs_info, &ctx->mount_opt, fc->sb_flags))
- 		return -EINVAL;
-diff --git a/fs/btrfs/super.h b/fs/btrfs/super.h
-index d80a86acfbbe..584f428d36e2 100644
---- a/fs/btrfs/super.h
-+++ b/fs/btrfs/super.h
-@@ -16,7 +16,8 @@ bool btrfs_check_options(const struct btrfs_fs_info *info,
- int btrfs_sync_fs(struct super_block *sb, int wait);
- char *btrfs_get_subvol_name_from_objectid(struct btrfs_fs_info *fs_info,
- 					  u64 subvol_objectid);
--void btrfs_set_free_space_cache_settings(struct btrfs_fs_info *fs_info);
-+void btrfs_set_free_space_cache_settings(struct btrfs_fs_info *fs_info,
-+					 unsigned long long *mount_opt);
- 
- static inline struct btrfs_fs_info *btrfs_sb(struct super_block *sb)
- {
 -- 
 2.51.0
 
