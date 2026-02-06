@@ -1,58 +1,58 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09FE642EEBC
-	for <linux-block@vger.kernel.org>; Fri,  6 Feb 2026 18:24:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 739B043CED4
+	for <linux-block@vger.kernel.org>; Fri,  6 Feb 2026 18:24:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770402263; cv=none; b=Ufck/YfwjEoJRWf1kZgIE+ZU7g/pfErhwhIaUzdub1Z3v9kDREMhUY/jtLQNPnZ3YUeMomAZ4expST1FRsSSWzmfGoGUYJtYNHvYzGeGneWknQ4rckg1VZDLE+VmbIDATfs1iIGV4jSUkET+RqhBpdY9cyF/jk0dOjKFJjVHFKE=
+	t=1770402267; cv=none; b=Svz0Gavk/ILK/h5bjzLX5q9A2M0Q675yAtlWvhNQ/fx6HtPWjyW4RKGlKJHx69Zvb+3nhPW+Jl1hDnRdHsCL9mmAg/yctM80YiiQR08O+2xDeAWim+nXG9/QRUcp0GBKqrPuXI9vqc5d9Wk9MBvDBG7VfBUFffNbu3FZy+Ajz/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770402263; c=relaxed/simple;
-	bh=XVhsTk+LYpWAXNJDQrvJq2UU4XDe6OSIWEwozraAeOc=;
+	s=arc-20240116; t=1770402267; c=relaxed/simple;
+	bh=1Ki8IVuhp5LIau9T8aLckRXW3rjNZE+2QwHBu0EN3yI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lsanjRkuvS8XyD6yOSurWZPSDhKPh+J9SY7oJhCiXjkSPlKGzJGjdBaQVMqpyNbDset1fMAiNOCupiN9WtHEkgGRdnQ9mgxJSucPXSFJdTPwyOT5mH5KvshDUoMULnNpNun1FyW/s5dJ6BB0WuaggN7UCDy9zWwKHxGHz7vxJJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=q827tzaI; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=q827tzaI; arc=none smtp.client-ip=195.135.223.131
+	 MIME-Version; b=Ac/rDF/pLFMz3k+XiPPhvm/lucTxxpdjDAz+DPIG/5OnB5j2HpyRSk4QOXGpN5vpIHPXflUBcqym73c4iEzjEqt/ENaKRIqdWhSg94p0A5osUQ+fsMTUErWB7QGZkmHaeEVI/ms80Gqc3XnDd/9Ntibi4Gg/4Zhr15sFQUswPkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=V5Jvo0Ua; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=V5Jvo0Ua; arc=none smtp.client-ip=195.135.223.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="q827tzaI";
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="q827tzaI"
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="V5Jvo0Ua";
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="V5Jvo0Ua"
 Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id F2F7F5BD27;
-	Fri,  6 Feb 2026 18:23:58 +0000 (UTC)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 95F073E72D;
+	Fri,  6 Feb 2026 18:24:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1770402239; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1770402241; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Ahxdoq0wAm++q/QMvFMTlIGeudeamFjihSebXBaXzxc=;
-	b=q827tzaI998W3R1OaxrJEuODt4hhyA2sxStRK+nO8UgwIsr+6x8LhRCfV4zt9JXvi34KKh
-	jRp7GVBngNSUGZUhEXk3igIekc0cNKAYuPIcJ/XoGM+e19/r+liIGM5k/SQcLS00ayiQZg
-	up9jdfv+QGV73QtTgJFXBhi7BPy38qo=
-Authentication-Results: smtp-out2.suse.de;
+	bh=kxDptG4EymPM3tgwvRdPnDe2fYdObjgTVkmVYXHD3LQ=;
+	b=V5Jvo0Ua//06MvdXODbRrmw+dgIMzMYeW3g4kG4gpMJN2uuwFP7qijRlQJ6Ne8iR1c/xux
+	6ZY3J7EISOsfPY8SqgeLhsUfz9al+QxZ/5zTrkqtGO7xrL06557jjqiKoaDfYVwtiQsiba
+	LsLAGl58LmvvFSJPNm8RXB61jm2Z+mk=
+Authentication-Results: smtp-out1.suse.de;
 	none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1770402239; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1770402241; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Ahxdoq0wAm++q/QMvFMTlIGeudeamFjihSebXBaXzxc=;
-	b=q827tzaI998W3R1OaxrJEuODt4hhyA2sxStRK+nO8UgwIsr+6x8LhRCfV4zt9JXvi34KKh
-	jRp7GVBngNSUGZUhEXk3igIekc0cNKAYuPIcJ/XoGM+e19/r+liIGM5k/SQcLS00ayiQZg
-	up9jdfv+QGV73QtTgJFXBhi7BPy38qo=
+	bh=kxDptG4EymPM3tgwvRdPnDe2fYdObjgTVkmVYXHD3LQ=;
+	b=V5Jvo0Ua//06MvdXODbRrmw+dgIMzMYeW3g4kG4gpMJN2uuwFP7qijRlQJ6Ne8iR1c/xux
+	6ZY3J7EISOsfPY8SqgeLhsUfz9al+QxZ/5zTrkqtGO7xrL06557jjqiKoaDfYVwtiQsiba
+	LsLAGl58LmvvFSJPNm8RXB61jm2Z+mk=
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C40DF3EA63;
-	Fri,  6 Feb 2026 18:23:58 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 645D03EA63;
+	Fri,  6 Feb 2026 18:24:01 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id OMFeL74xhmkTCQAAD6G6ig
-	(envelope-from <neelx@suse.com>); Fri, 06 Feb 2026 18:23:58 +0000
+	id 4LYAGMExhmkTCQAAD6G6ig
+	(envelope-from <neelx@suse.com>); Fri, 06 Feb 2026 18:24:01 +0000
 From: Daniel Vacek <neelx@suse.com>
 To: Chris Mason <clm@fb.com>,
 	Josef Bacik <josef@toxicpanda.com>,
@@ -66,10 +66,11 @@ Cc: linux-block@vger.kernel.org,
 	linux-fscrypt@vger.kernel.org,
 	linux-btrfs@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Boris Burkov <boris@bur.io>
-Subject: [PATCH v6 09/43] btrfs: add infrastructure for safe em freeing
-Date: Fri,  6 Feb 2026 19:22:41 +0100
-Message-ID: <20260206182336.1397715-10-neelx@suse.com>
+	Omar Sandoval <osandov@osandov.com>,
+	Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
+Subject: [PATCH v6 12/43] btrfs: add new FEATURE_INCOMPAT_ENCRYPT flag
+Date: Fri,  6 Feb 2026 19:22:44 +0100
+Message-ID: <20260206182336.1397715-13-neelx@suse.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260206182336.1397715-1-neelx@suse.com>
 References: <20260206182336.1397715-1-neelx@suse.com>
@@ -84,256 +85,115 @@ X-Spam-Score: -6.80
 X-Spamd-Result: default: False [-6.80 / 50.00];
 	REPLY(-4.00)[];
 	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
 	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
 	R_MISSING_CHARSET(0.50)[];
 	NEURAL_HAM_SHORT(-0.20)[-1.000];
 	MIME_GOOD(-0.10)[text/plain];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_HAS_DN(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:mid,suse.com:email];
 	ARC_NA(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	DKIM_SIGNED(0.00)[suse.com:s=susede1];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:mid,suse.com:email];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	R_RATELIMIT(0.00)[to_ip_from(RLjpbzrka5mc1bf4fb9cmz1e4f)];
+	DKIM_SIGNED(0.00)[suse.com:s=susede1];
 	RCVD_TLS_ALL(0.00)[]
 X-Spam-Level: 
 X-Spam-Flag: NO
 
-From: Josef Bacik <josef@toxicpanda.com>
+From: Omar Sandoval <osandov@osandov.com>
 
-When we add fscrypt support we're going to have fscrypt objects hanging
-off of extent_maps.  This includes a block key, which if we're the last
-one freeing the key we may have to unregister it from the block layer.
-This requires taking a semaphore in the block layer, which means we
-can't free em's under the extent map tree lock.
+As encrypted files will be incompatible with older filesystem versions,
+new filesystems should be created with an incompat flag for fscrypt,
+which will gate access to the encryption ioctls.
 
-Thankfully we only do this in two places, one where we're dropping a
-range of extent maps, and when we're freeing logged extents.  Add a
-free_extent_map_safe() which will add the em to a list in the em_tree if
-we free'd the object.  Currently this is unconditional but will be
-changed to conditional on the fscrypt object we will add in a later
-patch.
-
-To process these delayed objects add a free_pending_extent_maps() that
-is called after the lock has been dropped on the em_tree.  This will
-process the extent maps on the freed list and do the appropriate freeing
-work in a safe manner.
-
+Signed-off-by: Omar Sandoval <osandov@osandov.com>
+Signed-off-by: Sweet Tea Dorminy <sweettea-kernel@dorminy.me>
 Signed-off-by: Josef Bacik <josef@toxicpanda.com>
-Reviewed-by: Boris Burkov <boris@bur.io>
 Signed-off-by: Daniel Vacek <neelx@suse.com>
 ---
 
-v5: https://lore.kernel.org/linux-btrfs/6cf44f7860e94de68df242e69f4c5250bd061cff.1706116485.git.josef@toxicpanda.com/
- * No changes since (other than simple function renames).
+v5: https://lore.kernel.org/linux-btrfs/ccbea52046c1dadbbef926bfc878cc23af952729.1706116485.git.josef@toxicpanda.com/
+ * No changes since.
 ---
- fs/btrfs/extent_map.c | 76 +++++++++++++++++++++++++++++++++++++++++--
- fs/btrfs/extent_map.h | 10 ++++++
- fs/btrfs/tree-log.c   |  6 ++--
- 3 files changed, 87 insertions(+), 5 deletions(-)
+ fs/btrfs/fs.h              | 3 ++-
+ fs/btrfs/super.c           | 5 +++++
+ fs/btrfs/sysfs.c           | 6 ++++++
+ include/uapi/linux/btrfs.h | 1 +
+ 4 files changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/fs/btrfs/extent_map.c b/fs/btrfs/extent_map.c
-index 095a561d733f..58589fc11802 100644
---- a/fs/btrfs/extent_map.c
-+++ b/fs/btrfs/extent_map.c
-@@ -34,7 +34,9 @@ void __cold btrfs_extent_map_exit(void)
- void btrfs_extent_map_tree_init(struct extent_map_tree *tree)
- {
- 	tree->root = RB_ROOT;
-+	tree->flags = 0;
- 	INIT_LIST_HEAD(&tree->modified_extents);
-+	INIT_LIST_HEAD(&tree->freed_extents);
- 	rwlock_init(&tree->lock);
- }
+diff --git a/fs/btrfs/fs.h b/fs/btrfs/fs.h
+index d3762fbe7267..5077b7eed4b8 100644
+--- a/fs/btrfs/fs.h
++++ b/fs/btrfs/fs.h
+@@ -315,7 +315,8 @@ enum {
+ 	(BTRFS_FEATURE_INCOMPAT_SUPP_STABLE |	\
+ 	 BTRFS_FEATURE_INCOMPAT_RAID_STRIPE_TREE | \
+ 	 BTRFS_FEATURE_INCOMPAT_EXTENT_TREE_V2 | \
+-	 BTRFS_FEATURE_INCOMPAT_REMAP_TREE)
++	 BTRFS_FEATURE_INCOMPAT_REMAP_TREE |	\
++	 BTRFS_FEATURE_INCOMPAT_ENCRYPT)
  
-@@ -51,9 +53,15 @@ struct extent_map *btrfs_alloc_extent_map(void)
- 	RB_CLEAR_NODE(&em->rb_node);
- 	refcount_set(&em->refs, 1);
- 	INIT_LIST_HEAD(&em->list);
-+	INIT_LIST_HEAD(&em->free_list);
- 	return em;
- }
+ #else
  
-+static void free_extent_map(struct extent_map *em)
-+{
-+	kmem_cache_free(extent_map_cache, em);
-+}
-+
- /*
-  * Drop the reference out on @em by one and free the structure if the reference
-  * count hits zero.
-@@ -65,10 +73,69 @@ void btrfs_free_extent_map(struct extent_map *em)
- 	if (refcount_dec_and_test(&em->refs)) {
- 		WARN_ON(btrfs_extent_map_in_tree(em));
- 		WARN_ON(!list_empty(&em->list));
--		kmem_cache_free(extent_map_cache, em);
-+		free_extent_map(em);
-+	}
-+}
-+
-+/*
-+ * Drop a ref for the extent map in the given tree.
-+ *
-+ * @tree:	tree that the em is a part of.
-+ * @em:		the em to drop the reference to.
-+ *
-+ * Drop the reference count on @em by one, if the reference count hits 0 and
-+ * there is an object on the em that can't be safely freed in the current
-+ * context (if we are holding the extent_map_tree->lock for example), then add
-+ * it to the freed_extents list on the extent_map_tree for later processing.
-+ *
-+ * This must be followed by a btrfs_free_pending_extent_maps() to clear
-+ * the pending frees.
-+ */
-+void btrfs_free_extent_map_safe(struct extent_map_tree *tree,
-+				struct extent_map *em)
-+{
-+	lockdep_assert_held_write(&tree->lock);
-+
-+	if (!em)
-+		return;
-+
-+	if (refcount_dec_and_test(&em->refs)) {
-+		WARN_ON(btrfs_extent_map_in_tree(em));
-+		WARN_ON(!list_empty(&em->list));
-+		list_add_tail(&em->free_list, &tree->freed_extents);
-+		set_bit(EXTENT_MAP_TREE_PENDING_FREES, &tree->flags);
- 	}
- }
+diff --git a/fs/btrfs/super.c b/fs/btrfs/super.c
+index 7eb367b1f6f6..3914abec5b12 100644
+--- a/fs/btrfs/super.c
++++ b/fs/btrfs/super.c
+@@ -2567,6 +2567,11 @@ static int __init btrfs_print_mod_info(void)
+ 			", fsverity=yes"
+ #else
+ 			", fsverity=no"
++#endif
++#ifdef CONFIG_FS_ENCRYPTION
++			", fscrypt=yes"
++#else
++			", fscrypt=no"
+ #endif
+ 			;
  
-+/*
-+ * Free the em objects that exist on the em tree
-+ *
-+ * @tree:	the tree to free the objects from.
-+ *
-+ * If there are any objects on the em->freed_extents list go ahead and
-+ * free them here in a safe way.  This is to be coupled with any uses of
-+ * btrfs_free_extent_map_safe().
-+ */
-+void btrfs_free_pending_extent_maps(struct extent_map_tree *tree)
-+{
-+	struct extent_map *em;
-+
-+	/* Avoid taking the write lock if we don't have any pending frees. */
-+	if (!test_and_clear_bit(EXTENT_MAP_TREE_PENDING_FREES, &tree->flags))
-+		return;
-+
-+	write_lock(&tree->lock);
-+	while ((em = list_first_entry_or_null(&tree->freed_extents,
-+					      struct extent_map, free_list))) {
-+		list_del_init(&em->free_list);
-+		write_unlock(&tree->lock);
-+		free_extent_map(em);
-+		cond_resched();
-+		write_lock(&tree->lock);
-+	}
-+	write_unlock(&tree->lock);
-+}
-+
- /* Do the math around the end of an extent, handling wrapping. */
- static u64 range_end(u64 start, u64 len)
- {
-@@ -784,7 +851,7 @@ static void drop_all_extent_maps_fast(struct btrfs_inode *inode)
- 		em = rb_entry(node, struct extent_map, rb_node);
- 		em->flags &= ~(EXTENT_FLAG_PINNED | EXTENT_FLAG_LOGGING);
- 		btrfs_remove_extent_mapping(inode, em);
--		btrfs_free_extent_map(em);
-+		btrfs_free_extent_map_safe(tree, em);
- 
- 		if (cond_resched_rwlock_write(&tree->lock))
- 			node = rb_first(&tree->root);
-@@ -792,6 +859,8 @@ static void drop_all_extent_maps_fast(struct btrfs_inode *inode)
- 			node = next;
- 	}
- 	write_unlock(&tree->lock);
-+
-+	btrfs_free_pending_extent_maps(tree);
- }
+diff --git a/fs/btrfs/sysfs.c b/fs/btrfs/sysfs.c
+index 27bfb7b55ec4..98d6b1594d43 100644
+--- a/fs/btrfs/sysfs.c
++++ b/fs/btrfs/sysfs.c
+@@ -305,6 +305,9 @@ BTRFS_FEAT_ATTR_INCOMPAT(remap_tree, REMAP_TREE);
+ #ifdef CONFIG_FS_VERITY
+ BTRFS_FEAT_ATTR_COMPAT_RO(verity, VERITY);
+ #endif
++#ifdef CONFIG_FS_ENCRYPTION
++BTRFS_FEAT_ATTR_INCOMPAT(encryption, ENCRYPT);
++#endif /* CONFIG_FS_ENCRYPTION */
  
  /*
-@@ -986,13 +1055,14 @@ void btrfs_drop_extent_map_range(struct btrfs_inode *inode, u64 start, u64 end,
- 		btrfs_free_extent_map(em);
- next:
- 		/* Once for us (for our lookup reference). */
--		btrfs_free_extent_map(em);
-+		btrfs_free_extent_map_safe(em_tree, em);
- 
- 		em = next_em;
- 	}
- 
- 	write_unlock(&em_tree->lock);
- 
-+	btrfs_free_pending_extent_maps(em_tree);
- 	btrfs_free_extent_map(split);
- 	btrfs_free_extent_map(split2);
- }
-diff --git a/fs/btrfs/extent_map.h b/fs/btrfs/extent_map.h
-index 6f685f3c9327..a962012be1c3 100644
---- a/fs/btrfs/extent_map.h
-+++ b/fs/btrfs/extent_map.h
-@@ -97,11 +97,18 @@ struct extent_map {
- 	u32 flags;
- 	refcount_t refs;
- 	struct list_head list;
-+	struct list_head free_list;
-+};
-+
-+enum extent_map_flags {
-+	EXTENT_MAP_TREE_PENDING_FREES,
+  * Features which depend on feature bits and may differ between each fs.
+@@ -338,6 +341,9 @@ static struct attribute *btrfs_supported_feature_attrs[] = {
+ #ifdef CONFIG_FS_VERITY
+ 	BTRFS_FEAT_ATTR_PTR(verity),
+ #endif
++#ifdef CONFIG_FS_ENCRYPTION
++	BTRFS_FEAT_ATTR_PTR(encryption),
++#endif /* CONFIG_FS_ENCRYPTION */
+ 	NULL
  };
  
- struct extent_map_tree {
- 	struct rb_root root;
-+	unsigned long flags;
- 	struct list_head modified_extents;
-+	struct list_head freed_extents;
- 	rwlock_t lock;
- };
+diff --git a/include/uapi/linux/btrfs.h b/include/uapi/linux/btrfs.h
+index 9165154a274d..2f6a46e5f4ce 100644
+--- a/include/uapi/linux/btrfs.h
++++ b/include/uapi/linux/btrfs.h
+@@ -335,6 +335,7 @@ struct btrfs_ioctl_fs_info_args {
+ #define BTRFS_FEATURE_INCOMPAT_ZONED		(1ULL << 12)
+ #define BTRFS_FEATURE_INCOMPAT_EXTENT_TREE_V2	(1ULL << 13)
+ #define BTRFS_FEATURE_INCOMPAT_RAID_STRIPE_TREE	(1ULL << 14)
++#define BTRFS_FEATURE_INCOMPAT_ENCRYPT		(1ULL << 15)
+ #define BTRFS_FEATURE_INCOMPAT_SIMPLE_QUOTA	(1ULL << 16)
+ #define BTRFS_FEATURE_INCOMPAT_REMAP_TREE	(1ULL << 17)
  
-@@ -175,6 +182,9 @@ int btrfs_split_extent_map(struct btrfs_inode *inode, u64 start, u64 len, u64 pr
- 
- struct extent_map *btrfs_alloc_extent_map(void);
- void btrfs_free_extent_map(struct extent_map *em);
-+void btrfs_free_extent_map_safe(struct extent_map_tree *tree,
-+				struct extent_map *em);
-+void btrfs_free_pending_extent_maps(struct extent_map_tree *tree);
- int __init btrfs_extent_map_init(void);
- void __cold btrfs_extent_map_exit(void);
- int btrfs_unpin_extent_cache(struct btrfs_inode *inode, u64 start, u64 len, u64 gen);
-diff --git a/fs/btrfs/tree-log.c b/fs/btrfs/tree-log.c
-index e1bd03ebfd98..4034c04d4d63 100644
---- a/fs/btrfs/tree-log.c
-+++ b/fs/btrfs/tree-log.c
-@@ -5383,7 +5383,7 @@ static int btrfs_log_changed_extents(struct btrfs_trans_handle *trans,
- 		 */
- 		if (ret) {
- 			btrfs_clear_em_logging(inode, em);
--			btrfs_free_extent_map(em);
-+			btrfs_free_extent_map_safe(tree, em);
- 			continue;
- 		}
- 
-@@ -5392,11 +5392,13 @@ static int btrfs_log_changed_extents(struct btrfs_trans_handle *trans,
- 		ret = log_one_extent(trans, inode, em, path, ctx);
- 		write_lock(&tree->lock);
- 		btrfs_clear_em_logging(inode, em);
--		btrfs_free_extent_map(em);
-+		btrfs_free_extent_map_safe(tree, em);
- 	}
- 	WARN_ON(!list_empty(&extents));
- 	write_unlock(&tree->lock);
- 
-+	btrfs_free_pending_extent_maps(tree);
-+
- 	if (!ret)
- 		ret = btrfs_log_prealloc_extents(trans, inode, path, ctx);
- 	if (ret)
 -- 
 2.51.0
 
