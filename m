@@ -1,66 +1,66 @@
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64FDF125A0
-	for <linux-block@vger.kernel.org>; Fri,  6 Feb 2026 15:30:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6517C242D76
+	for <linux-block@vger.kernel.org>; Fri,  6 Feb 2026 15:31:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770391849; cv=none; b=c/ZBE2WNlOWRlPHm7F6PAo/JslfD94buznWLvxF+s500OpFU909UZyc2dcO0UYiqsD074GGA121fOkjZr5A/vR6hIbV7Zaf1HrQ1Dea194TBgVbX45VypRVsqBkLd9jHE3iaL/QLCa+H1083zX4naDUQTDbrguYDEqcipmMNiB8=
+	t=1770391879; cv=none; b=gyPlQC2kLAti9p6NNpX/7TctPMJ2saMjZI1kD45Rfwxg3AqzHjQmBz1h3pDEqwO5iwVKDVYdW5m+czPX7z+dbGrVNUMo0kGzAV+LLOdo2MSjrD/BYlEWtFedV77pVCOmWP4KCJF+rafwfm/o/ek/FKjv2fL0V+uD5up7Obxn8vY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770391849; c=relaxed/simple;
-	bh=ngk1LzR9/uUd4RJFz0bD6uqseSPL3AONrCCs6ttaPXk=;
+	s=arc-20240116; t=1770391879; c=relaxed/simple;
+	bh=hNPJcrix6QY0iYU3UnHRjn8TEiB9GF9QLK1VgkwQiUQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZBttdlFPtwTgTgNhogeKTv4uizXh7ucwLlDxUdrNp8pF0TL2XpPxNEiTzxPkFVBgagPr+SFIVUmWTPem4FJgro5+spW1dSalUg/TEAIYZkU0D/Y0ZjDrbB0Z8S62qGekxRn0fUKXCxgRRpNqC+BZn9Ass2mhM/9sw9ftr/cAIFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CbaLw1La; arc=none smtp.client-ip=209.85.221.43
+	 In-Reply-To:Content-Type; b=BhM4aYF5kIUYLVhws9wlknFfw4I+OwVuoMCgypfBFDik1ftLk4D29Vqi1tT8KYGzJpBh4w6Yosmj+GdWOZAg8I5FpPPt7rRlxyL0FCoYLUus7gleH7CDNbEJNRewjcIcjmsqdiDe7cmUJtcwy19AaPA5KAvQTw95NxEoTiylEEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HWKnL5PI; arc=none smtp.client-ip=209.85.221.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CbaLw1La"
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-4359a16a400so2210251f8f.1
-        for <linux-block@vger.kernel.org>; Fri, 06 Feb 2026 07:30:49 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HWKnL5PI"
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-4359108fd24so1499123f8f.2
+        for <linux-block@vger.kernel.org>; Fri, 06 Feb 2026 07:31:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770391848; x=1770996648; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1770391878; x=1770996678; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=FiuzeKES9rDDSINlTwU+2mg+F8PdKmrrdAX7+vK5jPg=;
-        b=CbaLw1LaBijHpNvPQw4eYxBBd0a4Zj7ajiS9nZFUj8OfAB5BUnaYsWBnFAI4GbAln0
-         xGtACr5WgVPV7LGnOv916f1pFe98mRr0WtOt+ewc9us8gluebZYXfxLof9Gc9wG0ueip
-         UNM7nObC2OXoRS1N8DrdEPD+UuJFMiT4NbMDmE0HJoM+B0PZbq8udWzVqWuK2aJUQljd
-         pchCE8UmBDWaVY8yeauZxJGqcQZRTqxMVwfFTRigMGrWJkyht5J+2X67+nV0hu2DRUoO
-         pKn2YUgtI6rDk/rJ8+nkZvt7GAPfx+cWJv2QbJBH0JrsRYpwo/I6UDZNQwkH0q5UX+Td
-         /dRw==
+        bh=3uv9MgmMqAnAXAVWR1s5oakmXADa9z91hufidypOmYE=;
+        b=HWKnL5PIdVbQTTFi0YxoUsj7xprGIJNQEFddm9VB3WLYekxSfsdJEc2LZz2N97ROIb
+         +hXf5xEyvVSO7rUF3ji4BAvFoVgZoEJ4F73+oEDbDAyeHaN1RMdn8AJAqdxw/ACQBz/8
+         SZnBDEPhVN0tYPnevO5xJ+BPLn4q+TJqGfym9EW5KxMzGWvcHh4VKveHTrVEqOIpxrUL
+         9RW4dxv/rQC/6ikiyxGBYaXJBG1HSdO/LLDxxVh79/Hl6OjDWc7Z+jw0MPtjZcrxkKzn
+         rMr4nE6rB2e3ZuafQKIN9AIiprJ8jKRL450GB3Zq56o8h0dinBe/lE2bP2cVfXS0/qX3
+         9Pvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770391848; x=1770996648;
+        d=1e100.net; s=20230601; t=1770391878; x=1770996678;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FiuzeKES9rDDSINlTwU+2mg+F8PdKmrrdAX7+vK5jPg=;
-        b=PzHtxzUzMB4DpskvzLCQodVCNGgX5McH7ZQY+1QVt1yMMWHlOcvNbT/888h2SSW+zl
-         09Aeo5LjdA2hlM65/l0mUtMI7MptswqRur180kicqu3qQ5U6Dy9shUsGE+6glSIhaLBN
-         48Pdb4KDg8hEIyXUXJqtr6hM0Md3JAkTldnrd8ckMoEIT2rgYHI7J5P951ARMO7L1zJy
-         4JKFr34xLNT2DSrXc32PmHAsHAvBPI1MorEihM3FQEe/DF80NaZyiVwBYS1o/JQOLWEx
-         Lj/8uPS/qL5mhe+BuXv8EdZ84561DNo63RpCYP7dNpjldAYmanSEQKxK3OYd9zaK4KkX
-         Mb6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUi/UiEUUx+okkvzDy7bp8HHUmSNGvt2aZsrSeHGTTcD4V4HLUxp8NBnU+8sXVkb9sUP76Ti7Al8E9qOQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzSb3CD40mXD/Ux59LYGjfYNpCQXr5V3aaS3GclrUclYicJxFm8
-	rjdh10/k03HoqXpTyvxI346r09j3WxNBvZ4dpEmIbhHeBue51PAfuV6V
-X-Gm-Gg: AZuq6aIlUHBVmOtKIZp1AI4cZJ63zXTD9AU51WDS6nIryAKe3D7FT6tOO4JAJYGwHLH
-	H6h1kOz/J9JnL9pCeLCDLXsdBLdPeNgj00/ms/8K04wwPrNx56TW/lDb2gbFDRtD1OdVebahzjf
-	pWPJt/GI5DGm0qBR0S16pk1zIGGmAY+2bGrjYpqAb8OwW5uAGRYMOXNHzYqXaif6C8tpgI9nDMf
-	sULdShH6pXJDe0igOlSDd4ZBQrFxC8V0ppAR/6SEAW+NeaYXWhuIZLdxqs9BsRowfzN0dFVfPCh
-	wnNusi6+daFZeuc4ngGTp8Ql30r0Y44HGbEBgHv2ge0OfaUWiXYYkew0D5VIKPbhI/XxGylPXgs
-	k/xSzCpvST1/gWLD4RxsDS8mJl0Ib9r2h5i00B7TWmGqYdC1oGwf5cW7DB56bw7T4lra7qJQAGb
-	LaebX3H/Y1gd5sGcy/+YK+UrCQ5IUdM6D+Kjqo
-X-Received: by 2002:a05:6000:2209:b0:430:feb3:f5ae with SMTP id ffacd0b85a97d-4362938fbddmr4652754f8f.55.1770391847539;
-        Fri, 06 Feb 2026 07:30:47 -0800 (PST)
+        bh=3uv9MgmMqAnAXAVWR1s5oakmXADa9z91hufidypOmYE=;
+        b=vuCJSOBUEsHuBtJhLi3868Fnkq5ESCsqANsGKHEuSSEAJOU3a5XgZMwWN+cZXZH+C8
+         bfbZhzq4Dtip20k2t8WQx+fQI8lAof5kQ6yoKP2gp1TGRJlnUmN6l9kbYnhuoh4bwxhS
+         E+Oqx5OzMq44BAeU5Lwl6/j6RpnJWOxuWHBZLOnyXoCA3sfpqEiwGTYr1JRlwzWq9o9e
+         W6CKg29XnXCm9HueBHZcgCK6tXyfIO3xwTv/dYGMvciwAt5tnuGyEGoGkHHt6n3GXAMl
+         n3k8fvHViwKX/LEkcEmCahTpGIkfrQkrHKNZgg+/2cWzvrDaq9kE86ozHUpDHmc7+kqO
+         rBCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVEm/Pk3K9jzJ5OvwrKEXeReMybD/G5kwCHnfw9Sdyyou5prpuLGBo9iLasqc+o5qS2QjOrFZ+9HG4KPg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzk4OtK8RaxP7PQTMWx3zqGOYh/ifh8U0zcYciwrscvH3B0hCGW
+	mphiawnQj7FqhbUAAriYJle9Biyc5RD4uhnNpmLSrobnE7NtW1Vr9CHeJ7VEoQ==
+X-Gm-Gg: AZuq6aIOBA2fbp2S/YGdz0lnaFs/Ch0d5Jo5/cbqj8mWqReDBxqbpujKJQl73r7vvOR
+	m4QYQ7SlR0lqt3OamIoEjNFOTbr9lbLAVbihQ4ybpiGvfk0S303RDTsjoEUA/OoyOGRo+orbyB7
+	Z2lL3FB7bQnld8z1UCG0ul7ihmtKv1+yeodj1FA59AxxAHiDFdhI7Ssd1ONElsnXK1QF8Zfkwj8
+	MrfQ1NfEpwXhwm5g/+O+5fh7STmnOsatYXnTuHTP4SH2Ao71gtoajbAV7ld+1sjOfMXanyen5Sv
+	oRRzzSXqe/IYS8Cfw0gVFPwVU749joDgr1H3yzCYe4iGKeASqjqtx3r6aGihs6OJgNk70hTdlOC
+	XhJqda2l4it7YdGDQtw3uZJ12T9n0vrp2GIQy25cMlefyr9uFN05ZZq3s88MgRk8cb9GmmztLoZ
+	NrDOyYsUNI2VZPOn/xIQpnsKP+z192S1AJX8Ei
+X-Received: by 2002:a05:6000:1ac9:b0:42b:3131:5437 with SMTP id ffacd0b85a97d-4362967e0bfmr4292049f8f.34.1770391877547;
+        Fri, 06 Feb 2026 07:31:17 -0800 (PST)
 Received: from [192.168.2.14] (85-70-151-113.rcd.o2.cz. [85.70.151.113])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-436296bd4a1sm6782642f8f.17.2026.02.06.07.30.46
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4362972fa41sm6616644f8f.23.2026.02.06.07.31.16
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Feb 2026 07:30:47 -0800 (PST)
-Message-ID: <5f984628-2547-4393-b5ff-23d8e4d5481a@gmail.com>
-Date: Fri, 6 Feb 2026 16:30:46 +0100
+        Fri, 06 Feb 2026 07:31:17 -0800 (PST)
+Message-ID: <e9231bd7-36fd-4d13-a002-0e91601481ac@gmail.com>
+Date: Fri, 6 Feb 2026 16:31:16 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -68,11 +68,12 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/9] sed-opal: add UID of Locking Table.
+Subject: Re: [PATCH v3 2/9] sed-opal: add RangeStartRangeLengthPolicy
+ parameter.
 To: Ondrej Kozina <okozina@redhat.com>, linux-block@vger.kernel.org
 Cc: jonathan.derrick@linux.dev, gjoyce@ibm.com, hare@suse.de
 References: <20260205150935.238137-1-okozina@redhat.com>
- <20260206141804.278721-2-okozina@redhat.com>
+ <20260206141804.278721-3-okozina@redhat.com>
 Content-Language: en-US
 From: Milan Broz <gmazyland@gmail.com>
 Autocrypt: addr=gmazyland@gmail.com; keydata=
@@ -118,25 +119,21 @@ Autocrypt: addr=gmazyland@gmail.com; keydata=
  vlB+GpT+iFRLvhCBe5kAERREfRfmWJq1bHod/ulrp/VLGAaZlOBTgsCzufWF5SOLbZkmV2b5
  xy2F/AU3oQUZncCvFMTWpBC+gO/o3kZCyyGCaQdQe4jS/FUJqR1suVwNMzcOJOP/LMQwujE/
  Ch7XLM35VICo9qqhih4OvLHUAWzC5dNSipL+rSGHvWBdfXDhbezJIl6sp7/1rJfS8qPs
-In-Reply-To: <20260206141804.278721-2-okozina@redhat.com>
+In-Reply-To: <20260206141804.278721-3-okozina@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 2/6/26 3:17 PM, Ondrej Kozina wrote:
-> As described in ch. 6.3, Table 240 in TCG Storage
-> Architecture Core Specification document.
+> As desribed in ch. 3.1.1.1.1.2 of TCG Storage Opal SSC Feature Set:
+> Single User Mode document.
 > 
-> It's also referenced in TCG Storage Opal SSC Feature Set:
-> Single User Mode document, ch. 3.1.1.1 Reactivate method.
-> 
-> It will be used later in Reactivate method implemetation
-> for sed-opal interface.
+> To be used later in Reactivate method implementation and in function
+> for retrieving SUM device status.
 > 
 > Signed-off-by: Ondrej Kozina <okozina@redhat.com>
 > ---
 >   block/opal_proto.h | 1 +
->   block/sed-opal.c   | 2 ++
->   2 files changed, 3 insertions(+)
+>   1 file changed, 1 insertion(+)
 
 Reviewed-and-tested-by: Milan Broz <gmazyland@gmail.com>
 
