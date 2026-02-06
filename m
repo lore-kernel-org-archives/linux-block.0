@@ -1,107 +1,128 @@
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BF303EDAD0
-	for <linux-block@vger.kernel.org>; Fri,  6 Feb 2026 13:41:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 749F52FCBE5
+	for <linux-block@vger.kernel.org>; Fri,  6 Feb 2026 14:18:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770385297; cv=none; b=HiGKXNy67Kf7fldbN0LQL8d1pVsOldaQnOFm2IkFPU1ueipvVuxEHeYUbaquDfJHPNtYCLtXj5m4bvBFxVujBnV2CCRVFcN4JX5c/galppiKK/yq4krKSKK6gTHaroCOgBsk3ppX5g/gQis7OAVOyGbcnvzvPOLZXWNddJ5Hzpk=
+	t=1770387502; cv=none; b=ZUCAkCKnqYyhyopqCkjCrVVmWF5eEk9TVhXptDlpH+YygdpzFo0fuImxbm0lGS491G+invU9LLDDOw1yX5yKyE8u2nycEXAjtOAjWQMtJAYBJegwUCng7ofEKsES4hZxdFUCfH/resS63TLN6l7EQDlfyNP7TIaHmHhocdb55xM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770385297; c=relaxed/simple;
-	bh=+OZMpUB4NB9Unpm7VBjK4a4FOY+JLHJZXxHyl2rpuo0=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=fsd5/Jvr9VTn0sunVUOarIOk3K8nQHrJFUwBGznuZWp9SqtMKAzZ68OsTwm/JoRJ+DUJ/ujW3SwCXWaFjiORHZYjlvrHBWLGkdtQHDgOJPOurPQA01FSvovgd7+pBMeffiy+4NnffgBWGsc5w97zcf8Zv42Uj1P4nuXbYlySl2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=cOyqQm4w; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1770387502; c=relaxed/simple;
+	bh=0DF4MD1K7J8UrqxAH2HhAEY6xxwFKq2v5xwI4vyvdLE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=GcFVlIaihvcLjZLu7RrXHkHKLSQS8Uod4WAg8opKv5xB7ARrdCfGAhDgu1TQiwcR816QLkI8bs5o6siwVUxlksQmouGblsfMpwjl9nPg2FZKU5cOmp+nswOKvxUTi5gI7LjL92hRKfBOuBVaK9J3pw0JBL8tiDdMYLYT1r+zmnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VpsENdMW; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cOyqQm4w"
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-4362c932df8so401249f8f.1
-        for <linux-block@vger.kernel.org>; Fri, 06 Feb 2026 05:41:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1770385296; x=1770990096; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=de3L1Y43pQAlWgG037quWHVZGctmRcLtI04VYJ4LOZw=;
-        b=cOyqQm4whw7FEyCNXGQmsqlka4Mxg02pffu3lfTQtDtTPwvf69WAKZfBNkHBKk8KDU
-         2Hdjid6fhDBnN/KTYPFAUecDABxZD13G4YMFKOy/pI6Y8bh7rx6s0hMY7ACfwVgm5ux4
-         i1lQM7+O+iyOeaYuIaWD3y3zzG7KKuKtr3UkFB6jVnMdx6qpqAwcob0eOhQLYj30EFN1
-         zQV02dKXeU7UZOXVpExSbV102Q3ZgcYXI8xINb58DiSKCNsy5rpqmyW0250E/6zs4rJq
-         pTxqPb2Ug/8keIr5zmNTVuhMgv84u9M5evY7gZQyhsnPEwwQweBTUUextQ4WomfYMSdl
-         6bFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770385296; x=1770990096;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=de3L1Y43pQAlWgG037quWHVZGctmRcLtI04VYJ4LOZw=;
-        b=LScF3PQ9p6/jJ5HmAQJ2JphNW9r5xFEMkRjj2M0waWQM8YwBq93Mk5f+FTQVLT3X0K
-         0XIb5kKdmoUI4yH17Fo9xdV0KkYRI/38KDKEJMQO3vRzFc1JHVhol9+eAvwbKUAd8jTU
-         doq4RsevgOW1MLA5R3pkAs4VeHHqXByNVcHKnNUD2xfLXeEsEwLDjSn7eiccFTC1RmZr
-         8w2FpvuHBTN1kc+UpQDU15h9/blEcJQnxZy5ZFYVAMDplTxfLNlzKuLaZnLE7Ete6l6E
-         DLsvq6aJlEK1ZXwzCd1Yu7VuDG4AaIC0Sm6uJ3f1uYGmU92yCmCRjPLgkylyidyEBZ65
-         Jx+w==
-X-Gm-Message-State: AOJu0YyjoB3H1et706yhNi+/TBAg4WfJoCfKeNQuYUyYl9ZvpJaf95JF
-	zDyng0ZeKwLNp77K34fbRZ4w+uArc9JJssXVJM9/FdKki8UyYtIwDPBDWpoTOFl6JNs=
-X-Gm-Gg: AZuq6aJQHuTtn+Px4XXpjHYhNbT0U8c6hY49MWm90P8yDm7NBjLK6t16SI4LI1Agqh3
-	g5zokAaGSnWWyAAbyvfRZK8H4Qri6sHsBrRZjd0esjz4JFXdcWo1Pyv/gqsBo47Js5K/ZzSMSg1
-	//hYSP9eOZHHZz1RrNN0bty4Ag3NhGJTYqxIhdpMjAnXkVLZjYpDNq7P3LHQQvczAIvBV5LFbHu
-	FrLveIF/czRsfTZm6GjnKdLezia4ZVCsX8zPVq17sBIH0qFOgAsw138XDwqkaOHTy2uMFXxUWr4
-	khguKy3wAlvw1nxvQOoH3dUjAniyYY9Pt3GNCHdSMfdR/KcXWVn6lGx14sl/dU/XXi89lburUeV
-	PcKOsAzHmT6tQVdKZejsPis3XaO69pUszCzgZ8yoI+hOoyIXsYPvtmysfOvjizlOIFFKLdeaixo
-	60f745u9SSU7PbXK//
-X-Received: by 2002:a05:6000:2410:b0:432:c0e6:cfcc with SMTP id ffacd0b85a97d-4362937855bmr4814517f8f.23.1770385295867;
-        Fri, 06 Feb 2026 05:41:35 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4362972fc1bsm6103719f8f.28.2026.02.06.05.41.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Feb 2026 05:41:35 -0800 (PST)
-Date: Fri, 6 Feb 2026 16:41:32 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel <linux-kernel@vger.kernel.org>
-Subject: [bug report] bio: add allocation cache abstraction
-Message-ID: <aYXvjAi0L-4casuv@stanley.mountain>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VpsENdMW"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770387501;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Bullg6yNNBmzJkOHEKeTRCAiA39UYGik2XyNOgWAsSo=;
+	b=VpsENdMW4I7l+fOXzoExoerFy5r2pouh+IPJxoHs1E9y10DY8mof9FEmrxJSf0hyZNEk7r
+	RWSs9b601xSGW+BkNxPYIYaLFhQHTZzrybQrUAxui+8WG4/4y0UgorkjzXLOPW0NfQcp1b
+	MICFs/e3vETvGelQDyCHY0vijUps/BM=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-614-fc0RrskTPJOl5jXgmvj6IA-1; Fri,
+ 06 Feb 2026 09:18:18 -0500
+X-MC-Unique: fc0RrskTPJOl5jXgmvj6IA-1
+X-Mimecast-MFC-AGG-ID: fc0RrskTPJOl5jXgmvj6IA_1770387497
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4ECF6195608F;
+	Fri,  6 Feb 2026 14:18:17 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.44.34.202])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5A7061800464;
+	Fri,  6 Feb 2026 14:18:15 +0000 (UTC)
+From: Ondrej Kozina <okozina@redhat.com>
+To: linux-block@vger.kernel.org
+Cc: Ondrej Kozina <okozina@redhat.com>,
+	gmazyland@gmail.com,
+	jonathan.derrick@linux.dev,
+	gjoyce@ibm.com,
+	hare@suse.de
+Subject: [PATCH v3 0/9] Extend Single User Mode (SUM) support in sed-opal.
+Date: Fri,  6 Feb 2026 15:17:54 +0100
+Message-ID: <20260206141804.278721-1-okozina@redhat.com>
+In-Reply-To: <20260205150935.238137-1-okozina@redhat.com>
+References: <20260205150935.238137-1-okozina@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <caa37f28-a2e8-4e0a-a9ce-a365ce805e4b@stanley.mountain>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-[ Smatch checking is paused while we raise funding.  #SadFace
-  https://lore.kernel.org/all/aTaiGSbWZ9DJaGo7@stanley.mountain/ -dan ]
+This patch series extends support for TCG Storage Opal SSC Single User
+Mode (SUM) in the sed-opal kernel interface. SUM addresses few
+shortcomins described in the chapter 2 of the OPAL2 sepecification
+extension (see below). It better isolates Admin authority from User
+stored data by taking the Lock/Unlock/Enable/Disable privileges from
+Admin when managing Locking Ranges configured for SUM.
 
-Hello Jens Axboe,
+This permission split necessitates separate ioctl calls for operations
+that previously could be performed atomically under a single authority.
+The series refactors existing code and introduces new ioctls to support
+this model:
 
-Commit be4d234d7aeb ("bio: add allocation cache abstraction") from
-Mar 8, 2021 (linux-next), leads to the following Smatch static
-checker warning:
+- IOC_OPAL_REACTIVATE_LSP: Switch an active OPAL2 device to/from SUM
+- IOC_OPAL_LR_SET_START_LEN: Set locking range boundaries only
+- IOC_OPAL_ENABLE_DISABLE_LR: Set lock enable states only
+- IOC_OPAL_GET_SUM_STATUS: Query SUM configuration status
 
-	block/bio.c:790 bio_cpu_dead()
-	error: potential null dereference 'bs'.  (hlist_entry_safe() returns null)
+References:
+- TCG Storage Opal SSC Feature Set: Single User Mode specification
+- cryptsetup code using the extended sed-opal interface:
+  https://gitlab.com/cryptsetup/cryptsetup/-/merge_requests/832
 
-block/bio.c
-    785 static int bio_cpu_dead(unsigned int cpu, struct hlist_node *node)
-    786 {
-    787         struct bio_set *bs;
-    788 
-    789         bs = hlist_entry_safe(node, struct bio_set, cpuhp_dead);
---> 790         if (bs->cache) {
+Changes since previus version:
 
-It doesn't really make sense to use hlist_entry_safe() instead of
-hlist_entry() if we're not going to check for NULL.
+v3:
+  - Add code comments in the IOC_OPAL_GET_SUM_STATUS patch explaining
+    the different code paths for key set or not set in the opal_sum_ranges
+    ioctl parameter
+  - Extended IOC_OPAL_GET_SUM_STATUS commit message referencing the TCG
+    doc where the new columns are described.
 
-    791                 struct bio_alloc_cache *cache = per_cpu_ptr(bs->cache, cpu);
-    792 
-    793                 bio_alloc_cache_prune(cache, -1U);
-    794         }
-    795         return 0;
-    796 }
+v2:
+  - Make separate patch adding Locking table UID
+  - Make separate patch adding RangeStartRangeLengthPolicy parameter
+  - Make separate patch adding Admin1PIN parameter
+  - Add comments explaining differences between passing Locking table
+    UID and separate Locking Ranges UID via array in IOC_OPAL_REACTIVATE_LSP
+  - Minor whitespace fixes
+  - Minor commit messages changes in IOC_OPAL_LR_SET_START_LEN and
+    IOC_OPAL_ENABLE_DISABLE_LR ioctls patches.
+  - Additional comments explaining expected answer from the
+    controller in IOC_OPAL_GET_SUM_STATUS ioctl.
 
-regards,
-dan carpenter
+Ondrej Kozina (9):
+  sed-opal: add UID of Locking Table.
+  sed-opal: add RangeStartRangeLengthPolicy parameter.
+  sed-opal: add Admin1PIN parameter.
+  sed-opal: add IOC_OPAL_REACTIVATE_LSP.
+  sed-opal: refactor (split) IOC_OPAL_LR_SETUP internals.
+  sed-opal: add IOC_OPAL_LR_SET_START_LEN ioctl.
+  sed-opal: add IOC_OPAL_ENABLE_DISABLE_LR.
+  sed-opal: increase column attribute type size to 64 bits.
+  sed-opal: add IOC_OPAL_GET_SUM_STATUS ioctl.
+
+ block/opal_proto.h            |   4 +
+ block/sed-opal.c              | 387 +++++++++++++++++++++++++++++++---
+ include/linux/sed-opal.h      |   4 +
+ include/uapi/linux/sed-opal.h |  29 +++
+ 4 files changed, 395 insertions(+), 29 deletions(-)
+
+-- 
+2.52.0
+
