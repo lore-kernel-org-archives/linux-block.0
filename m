@@ -1,66 +1,66 @@
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5522529ACF7
-	for <linux-block@vger.kernel.org>; Fri,  6 Feb 2026 15:34:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0734629B8E1
+	for <linux-block@vger.kernel.org>; Fri,  6 Feb 2026 15:34:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770392041; cv=none; b=kHQkT9EriUxfvHzq8aXTZ0m6EGcwg9rxwQD+KRO4YWqTIHFWyu/9SbaDAKSeESGx+5DfkubGuN3vXKd0BBWxU6xnPBJeKjdOp4Fp1579rbCHbLmHd2s9IVs5RbpvFmXBzyLZt6pZ4QO0LFJAPacWZMzjxcijN13aonDY9Gs1+w0=
+	t=1770392089; cv=none; b=iVqLXd8KDlER4qmgHrMa7J9DmVhKzi0JILunza8+s8jqOCLNyaLkLSjQaTnttJw2orpmBMw/nWe6lMmvw5TshSPh6w7ghwR45tck9743zLIEusukjp6PDWBEMg1nkPoA+6ZSzcnuOU6arP0RTaL2Y6kY8I+Oytj5o3vc82PBtuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770392041; c=relaxed/simple;
-	bh=ZfH9HPV4D4gLTNXhRnWVo0LRswRQ2U4/RdvMjsDc7zo=;
+	s=arc-20240116; t=1770392089; c=relaxed/simple;
+	bh=LRmnAsJzMOl1lBwo1pl+gT+aMNy3YzxB7dLOb9tYVoY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MiMAYa7IgTnJfwXu0Go0Wv2ITfKHpOd8ZP2ujYrsWXirOr39wCVXmZuFVeSWaQhTRsGeRJ3wI/Lt3iOPYw24eSt6uN+k5XG0gEdc+knnhRN3/EzCnw8tmJr6Z6sXEw4/BTK8DwVHObqzttfATGUVJmzxBq9HCRjYJvibt1D69W4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EAlrPT/J; arc=none smtp.client-ip=209.85.128.53
+	 In-Reply-To:Content-Type; b=D75TlWm+yeRjTTD4MgoN1e+K18dL3+SzqKenYFlVk5To1oG4IroCQ4K1nnkSUQb6RTBtSeJzVRNdV1RNG/jVbJ92sEJmVneLv+5xK3fuRfqzB2kpkViHmkHoaorqGb3mJ9pKpbAzneR9Ca8DUS3xSU2HQI8+R1kWKBmGdUvh97s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kfZJsBh7; arc=none smtp.client-ip=209.85.128.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EAlrPT/J"
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4806e0f6b69so17641435e9.3
-        for <linux-block@vger.kernel.org>; Fri, 06 Feb 2026 07:34:01 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kfZJsBh7"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4801eb2c0a5so21293755e9.3
+        for <linux-block@vger.kernel.org>; Fri, 06 Feb 2026 07:34:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770392040; x=1770996840; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1770392087; x=1770996887; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=0nyb9gSRbYF+JCXJne8YIqeWZN4AZ97HH7ruXtTGy2U=;
-        b=EAlrPT/J5/vBhRqUkDJaPLDWi3JZzWs62H7UMrRBRlrKMUjc0saHTBB66qQ0cf731H
-         0mOxNKHhbMGo0mWCzFdjMHOMFDhrHgV3wfDSicUXBUzfotqvNQvhbH+bbMB3F5eUEKl9
-         8oVuKg1nb11+co+97mHE0tosankzZZvU1zf2igl3fov9rS1ylfjH0WzaTi5nrdwRs3vV
-         xjkBNljvXUNR3LlX23uB9LjvEldx7dwv8yMGoPUKKd18chA94uBlql+WXOMR03Xa9/6b
-         dDLPrNEABzCdqcoX7euNB1H2Wkea77/8UmyL0xaGtpP63Wz7/4A2iJGYcY4fyW4M/Q/p
-         Tc2Q==
+        bh=5dWbxjsQqbdlIK+2FBz3dITKreK2ZWSV4fiiN5/24Vc=;
+        b=kfZJsBh70IkHePVQw6RqiNGJRej9f5SgGg4+tPKaKu9v4gKZgI4H9gdApar37cRE9w
+         DdFvA49G8/Ha84Hzi/NFvKk7xtE18seNhDOuMNL98AwCAUAeDv28PoFx8jd6vXMMO97V
+         LkD+8UlTuIyyUzY+qjheyblEXqdty0TZ96LNZK2Fcw+AiPYayD98Ly5v5IlGWfXA74yx
+         K74yUTQWiGNMxnSNgwFkuZ8ampRSOiau2IS6eloVFsetw1tg8jofz8xYpC+uQJv6+t6o
+         Zgi54vPstxHdy+vO+4HmC3mxHCB+5TkKyPZ1jIsPDhE+PmZq9nUjQbZhHH9YbAKXImm3
+         HM0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770392040; x=1770996840;
+        d=1e100.net; s=20230601; t=1770392087; x=1770996887;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0nyb9gSRbYF+JCXJne8YIqeWZN4AZ97HH7ruXtTGy2U=;
-        b=aKQiLkDlEporggkshs6IKtsoeBkIP0jIjoaUemZKIGwhPujclf/fNg9lgWyBywKSEB
-         UuL4olVpssGCpaWFGhjU+tsptmlD43QQBCywUOid4jj1+Y35paxU8OIN5L0CwKJOKUqQ
-         KiQ4ui6FYdjAfjmDFTd47evlhwTtkLzkpWL0nuRN9klHfniHTYGmYEOPfn+YZKFVgpyi
-         AJgVZo7k9Zg3KGUVnc7sLITT33vn3jpnzvV5DdBNnG0ZiLswrUTsI3TXjdAtcRvlCRSu
-         y1uc5zxwksrLDdw9EuxdOiM8X+EJunpXGwcVUHre0H8Eepl0Wlwp11eH3/VdwXP3jk7v
-         tCcw==
-X-Forwarded-Encrypted: i=1; AJvYcCUpnnyFcF39mP2WnqVTV2REcY9snbi6UQJeZurJ4DdJQYCob+R7M/08TsPFtG5tspnmZ8G2nlqytfsU9g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQbN9kkIfL3yQyKfbXbXDVdVn3M68Ldr9YdIhBC19v4mnq6WlQ
-	fhu197E6UXOqDnaYp9mIDucXZmzNDP/1Yn/JOyHBN2RA+asZDLM+LdLi
-X-Gm-Gg: AZuq6aJaJThvRgZbhRRekKYX5osIvV0fbUVLGVlZ/3khi7QY3bLwKsFq42Ur4rTrmuK
-	E5kyF4vM80IRaqzWwNAX56K/ziSJ9aHvPc39n1gy2B0mIdDIyWDE6Wg0B5f4yDeOtN84rAN0Dh9
-	hS44tBwWBUPU3HY8gYLXYl6kSBElDAUelHTlRV++33VroFJAElFsrF/pO+QusZnDJEmwW/Yarw3
-	5nmLw7Y2Rla50AUUO7JFDeLPQZ+47WSgvmvvfBStJeSNYTqffT2Mc3KXhjKpNwNcIjDB0nwb7S2
-	vwH0EGOaFfNh64+MpKi1mgh6Ol6FXRAiSqGylVBGWGDsX+vFL2VnRl2ZZN5L9BKAJXFN2EzAhQ2
-	7QTkW2prGO50ajiwh1Fz2d1c8oMNlggx+KO++LkOQzNTjzSV30pbpGSLtUgN2zvCc6zBh3Egxfw
-	cANvOj9vFIFtw2XhCGBV8+RhhxnozpLwz7ICbP
-X-Received: by 2002:a05:600c:4745:b0:47e:e2ec:9947 with SMTP id 5b1f17b1804b1-48320227106mr45136715e9.33.1770392039359;
-        Fri, 06 Feb 2026 07:33:59 -0800 (PST)
+        bh=5dWbxjsQqbdlIK+2FBz3dITKreK2ZWSV4fiiN5/24Vc=;
+        b=S0xRYaVwngJeLYAyDEygp/5A50EvjimrPE3u+xl89vyfYYRweVSFhveWVxvIGxSZpA
+         8IdanOuVc0dgjeNfHqMwqHj5jOrZhrzwr3j8MFenPYK6MotpERNQKhsHOgRUNf1rXE6H
+         /GvK0NcoWeXxF8GDmjbw1+Q5GW3xkXb37eTfu3mOcUwIi1FynzZg5h3rscqZSYgxSkAS
+         EhQ1aVDXdiO1xfdT+GdI9Ak3FW05Tw81jQOAqnPOT4eQI6Qu4T9C/IeduHG9DN9ZYOVM
+         sc+MlVTg9iFYRwGAvf38qgU2LOC7Iw+P99eLlUhuQuysCHTDk/slb4D+JcYqzoGHEosR
+         i2bQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU1dD6EyZrYyOJg1/+jwHSLveSxYqsBXQxo5UdgoL9hCBMOnEVVfPYMdXNdzLiTDETnYV5EHDfH09XWcw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0BBmFZGty4xhd6AyCD6oBODVi+gAXbsOcNqv/NtnkBYoEaATN
+	gayl7sv7+NqlzeNQVKrfdiI6RxVVh2fK4uOJ4ZwcjmODuwB30ih0YzdE
+X-Gm-Gg: AZuq6aLg71X09JhhUdE5S/4l0Ds7Ul8skZYm3EZsemH8cgiShSplJoSRRZSVAwcrEOB
+	xVf1tSg+r3yteXC+dsEhino5MAFd/SjQpqFkpTZI4y4T+EXxrxUy01rGL14lnqPuxvQzxXbRsuk
+	u1Z1O5VNURj6QQ0tbloAm/jRAyRfn6Eb5e8MKGvFY7l40ViWltk4P5X7C53/SmKUqZNrUHhmMyD
+	SiBe/KdC2GcBq1C98oQpuMR89/A8pLBNacNn5D9ny2jrQEvrHitd3RPzIIKJl3pYKpiLu2pZ3Qg
+	qSOnMfNeinnArSAMbUbTfQl/WFQiXfLegQHucJSeLT9u6+4CsJ2MynYNrpUQS95lYDtbhsGyNTq
+	v3ZIHLtCni7rDv4PMB+UBo97ovKwALYrkU/vkbJjMxVg103OFHI/F8Cy/9hq+IGzS12wYK9PBeK
+	EudZPoPfuGtTlRcOoHgi7HtTnp2Y90NTMcBabFdYrjCzRUWE4=
+X-Received: by 2002:a05:600c:a08c:b0:477:7b16:5fb1 with SMTP id 5b1f17b1804b1-483201dc3d5mr44165775e9.7.1770392087262;
+        Fri, 06 Feb 2026 07:34:47 -0800 (PST)
 Received: from [192.168.2.14] (85-70-151-113.rcd.o2.cz. [85.70.151.113])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483206d8c60sm82261135e9.8.2026.02.06.07.33.58
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483206d8c60sm82352385e9.8.2026.02.06.07.34.46
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Feb 2026 07:33:59 -0800 (PST)
-Message-ID: <b9ed839b-4336-44cf-bd66-4a15811cf6bc@gmail.com>
-Date: Fri, 6 Feb 2026 16:33:58 +0100
+        Fri, 06 Feb 2026 07:34:46 -0800 (PST)
+Message-ID: <ec489caf-6171-458c-b391-12512ae3b38e@gmail.com>
+Date: Fri, 6 Feb 2026 16:34:46 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -68,12 +68,11 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 5/9] sed-opal: refactor (split) IOC_OPAL_LR_SETUP
- internals.
+Subject: Re: [PATCH v3 6/9] sed-opal: add IOC_OPAL_LR_SET_START_LEN ioctl.
 To: Ondrej Kozina <okozina@redhat.com>, linux-block@vger.kernel.org
 Cc: jonathan.derrick@linux.dev, gjoyce@ibm.com, hare@suse.de
 References: <20260205150935.238137-1-okozina@redhat.com>
- <20260206141804.278721-6-okozina@redhat.com>
+ <20260206141804.278721-7-okozina@redhat.com>
 Content-Language: en-US
 From: Milan Broz <gmazyland@gmail.com>
 Autocrypt: addr=gmazyland@gmail.com; keydata=
@@ -119,27 +118,36 @@ Autocrypt: addr=gmazyland@gmail.com; keydata=
  vlB+GpT+iFRLvhCBe5kAERREfRfmWJq1bHod/ulrp/VLGAaZlOBTgsCzufWF5SOLbZkmV2b5
  xy2F/AU3oQUZncCvFMTWpBC+gO/o3kZCyyGCaQdQe4jS/FUJqR1suVwNMzcOJOP/LMQwujE/
  Ch7XLM35VICo9qqhih4OvLHUAWzC5dNSipL+rSGHvWBdfXDhbezJIl6sp7/1rJfS8qPs
-In-Reply-To: <20260206141804.278721-6-okozina@redhat.com>
+In-Reply-To: <20260206141804.278721-7-okozina@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 2/6/26 3:17 PM, Ondrej Kozina wrote:
-> IOC_OPAL_LR_SETUP is used to set up a locking range entirely under a
-> single authority (usually Admin1), but for Single User Mode (SUM),
-> the permissions for attributes (RangeStart, RangeLength)
-> and (ReadLockEnable, WriteLockEnable, ReadLocked, WriteLocked)
-> may be split between two different authorities. Typically, it is Admin1
-> for the former and the User associated with the LockingRange in SUM
-> for the latter.
+On 2/6/26 3:18 PM, Ondrej Kozina wrote:
+> This ioctl is used to set up locking range start (offset)
+> and locking range length attributes only.
 > 
-> This commit only splits the internals in preparation for the introduction
-> of separate ioctls for setting RangeStart, RangeLength and the rest
-> using new ioctl calls.
+> In Single User Mode (SUM), if the RangeStartRangeLengthPolicy parameter
+> is set in the 'Reactivate' method, only Admin authority maintains the
+> locking range length and start (offset) attributes of Locking objects
+> set up for SUM. All other attributes from struct opal_user_lr_setup
+> (RLE - read locking enabled, WLE - write locking enabled) shall
+> remain in possession of the User authority associated with the Locking
+> object set for SUM.
+> 
+> Therefore, we need a separate function for setting up locking range
+> start and locking range length because it may require two different
+> authorities (and sessions) if the RangeStartRangeLengthPolicy attribute
+> is set.
+> 
+> With the IOC_OPAL_LR_SET_START_LEN ioctl, the opal_user_lr_setup
+> members 'RLE' and 'WLE' of the ioctl argument are ignored.
 > 
 > Signed-off-by: Ondrej Kozina <okozina@redhat.com>
 > ---
->   block/sed-opal.c | 73 +++++++++++++++++++++++++++++-------------------
->   1 file changed, 45 insertions(+), 28 deletions(-)
+>   block/sed-opal.c              | 28 ++++++++++++++++++++++++++++
+>   include/linux/sed-opal.h      |  1 +
+>   include/uapi/linux/sed-opal.h |  1 +
+>   3 files changed, 30 insertions(+)
 
 Reviewed-and-tested-by: Milan Broz <gmazyland@gmail.com>
 
