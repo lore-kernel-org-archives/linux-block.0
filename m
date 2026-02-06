@@ -1,66 +1,66 @@
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6517C242D76
-	for <linux-block@vger.kernel.org>; Fri,  6 Feb 2026 15:31:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 747742877CB
+	for <linux-block@vger.kernel.org>; Fri,  6 Feb 2026 15:31:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770391879; cv=none; b=gyPlQC2kLAti9p6NNpX/7TctPMJ2saMjZI1kD45Rfwxg3AqzHjQmBz1h3pDEqwO5iwVKDVYdW5m+czPX7z+dbGrVNUMo0kGzAV+LLOdo2MSjrD/BYlEWtFedV77pVCOmWP4KCJF+rafwfm/o/ek/FKjv2fL0V+uD5up7Obxn8vY=
+	t=1770391904; cv=none; b=eRN9Hgjs5U2WakoGvQDy6lJrNl9L2PxTaT94gMllgtaj4V3wg6yrQDiXYAuJqAUSEIS6LENaE5ExIY6YdZHQV1I0ySKJ+UNNniTXhQ7wNR5zqkQ2i0OFNheW0p5EhRle93y13Lr2kDPM467P0ArBzV+z922Km6gPGz2UssuiZ+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770391879; c=relaxed/simple;
-	bh=hNPJcrix6QY0iYU3UnHRjn8TEiB9GF9QLK1VgkwQiUQ=;
+	s=arc-20240116; t=1770391904; c=relaxed/simple;
+	bh=FOZp+fKYICaywSOSz8HEGx0ClQJmII5sbhnSlZlsVrg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BhM4aYF5kIUYLVhws9wlknFfw4I+OwVuoMCgypfBFDik1ftLk4D29Vqi1tT8KYGzJpBh4w6Yosmj+GdWOZAg8I5FpPPt7rRlxyL0FCoYLUus7gleH7CDNbEJNRewjcIcjmsqdiDe7cmUJtcwy19AaPA5KAvQTw95NxEoTiylEEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HWKnL5PI; arc=none smtp.client-ip=209.85.221.49
+	 In-Reply-To:Content-Type; b=X/j9dyIQBHhKvgCWwbm2Ep+P5qpqekOqZYp89JItL/V0tabL4oDU+bYx76X2qscxUVNCJ8FkbYE/gsPqXu7Qe/T4McP9X4KVDUcX9OsOXalcH0ZqhM8L1St/70kv+RNhXDM9FkBJyVrMSIDAJKdxSkKpwuJQnRa+R1SvGwjpwt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VZQ/Je4a; arc=none smtp.client-ip=209.85.128.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HWKnL5PI"
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-4359108fd24so1499123f8f.2
-        for <linux-block@vger.kernel.org>; Fri, 06 Feb 2026 07:31:19 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VZQ/Je4a"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-482f454be5bso27386015e9.0
+        for <linux-block@vger.kernel.org>; Fri, 06 Feb 2026 07:31:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770391878; x=1770996678; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1770391903; x=1770996703; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=3uv9MgmMqAnAXAVWR1s5oakmXADa9z91hufidypOmYE=;
-        b=HWKnL5PIdVbQTTFi0YxoUsj7xprGIJNQEFddm9VB3WLYekxSfsdJEc2LZz2N97ROIb
-         +hXf5xEyvVSO7rUF3ji4BAvFoVgZoEJ4F73+oEDbDAyeHaN1RMdn8AJAqdxw/ACQBz/8
-         SZnBDEPhVN0tYPnevO5xJ+BPLn4q+TJqGfym9EW5KxMzGWvcHh4VKveHTrVEqOIpxrUL
-         9RW4dxv/rQC/6ikiyxGBYaXJBG1HSdO/LLDxxVh79/Hl6OjDWc7Z+jw0MPtjZcrxkKzn
-         rMr4nE6rB2e3ZuafQKIN9AIiprJ8jKRL450GB3Zq56o8h0dinBe/lE2bP2cVfXS0/qX3
-         9Pvw==
+        bh=dtaKddwV2/PcA3n1ea+mcGd7uhw0cLfK+Ko2hhVKsUM=;
+        b=VZQ/Je4aqSeah8CGvMEzBEpKIeoCyVrytXIA5k2WCQ4wzXGXvJzZOQEgeVcyw08Zmc
+         8eDckuXUeNhi9YjbE+Gat4W4+ShHOu6VewHKTYZssULJtsbHIYiRNlEwpQ1KKViPGBAj
+         7IGuNnzgqjjgzNE/RlHJ/yeRMDRqFVTc9cyRGD7qKiwewO+7bTpAe++Sra9YjR1FJSS4
+         AfhF9QVSmViqGQV6jW832IPS/T+9MvQGG2dQbmb0Z3vGj943ZJ/QY9QsRLFvrTBocSDP
+         BdN//3CWl1G3Uv3pifk3sFN/hc4ydykNR8IhDn4OIuoxi7hMPNS+Dc5PmI0fjgehTN0g
+         ZmSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770391878; x=1770996678;
+        d=1e100.net; s=20230601; t=1770391903; x=1770996703;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3uv9MgmMqAnAXAVWR1s5oakmXADa9z91hufidypOmYE=;
-        b=vuCJSOBUEsHuBtJhLi3868Fnkq5ESCsqANsGKHEuSSEAJOU3a5XgZMwWN+cZXZH+C8
-         bfbZhzq4Dtip20k2t8WQx+fQI8lAof5kQ6yoKP2gp1TGRJlnUmN6l9kbYnhuoh4bwxhS
-         E+Oqx5OzMq44BAeU5Lwl6/j6RpnJWOxuWHBZLOnyXoCA3sfpqEiwGTYr1JRlwzWq9o9e
-         W6CKg29XnXCm9HueBHZcgCK6tXyfIO3xwTv/dYGMvciwAt5tnuGyEGoGkHHt6n3GXAMl
-         n3k8fvHViwKX/LEkcEmCahTpGIkfrQkrHKNZgg+/2cWzvrDaq9kE86ozHUpDHmc7+kqO
-         rBCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVEm/Pk3K9jzJ5OvwrKEXeReMybD/G5kwCHnfw9Sdyyou5prpuLGBo9iLasqc+o5qS2QjOrFZ+9HG4KPg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzk4OtK8RaxP7PQTMWx3zqGOYh/ifh8U0zcYciwrscvH3B0hCGW
-	mphiawnQj7FqhbUAAriYJle9Biyc5RD4uhnNpmLSrobnE7NtW1Vr9CHeJ7VEoQ==
-X-Gm-Gg: AZuq6aIOBA2fbp2S/YGdz0lnaFs/Ch0d5Jo5/cbqj8mWqReDBxqbpujKJQl73r7vvOR
-	m4QYQ7SlR0lqt3OamIoEjNFOTbr9lbLAVbihQ4ybpiGvfk0S303RDTsjoEUA/OoyOGRo+orbyB7
-	Z2lL3FB7bQnld8z1UCG0ul7ihmtKv1+yeodj1FA59AxxAHiDFdhI7Ssd1ONElsnXK1QF8Zfkwj8
-	MrfQ1NfEpwXhwm5g/+O+5fh7STmnOsatYXnTuHTP4SH2Ao71gtoajbAV7ld+1sjOfMXanyen5Sv
-	oRRzzSXqe/IYS8Cfw0gVFPwVU749joDgr1H3yzCYe4iGKeASqjqtx3r6aGihs6OJgNk70hTdlOC
-	XhJqda2l4it7YdGDQtw3uZJ12T9n0vrp2GIQy25cMlefyr9uFN05ZZq3s88MgRk8cb9GmmztLoZ
-	NrDOyYsUNI2VZPOn/xIQpnsKP+z192S1AJX8Ei
-X-Received: by 2002:a05:6000:1ac9:b0:42b:3131:5437 with SMTP id ffacd0b85a97d-4362967e0bfmr4292049f8f.34.1770391877547;
-        Fri, 06 Feb 2026 07:31:17 -0800 (PST)
+        bh=dtaKddwV2/PcA3n1ea+mcGd7uhw0cLfK+Ko2hhVKsUM=;
+        b=D/bhfCJbN7dghmxb7s3qszQ7UIw5iUXwOcDUuI8ylxQQ2gaA6POOZu95hmwdwtVVHU
+         f2cph9qUikDKVBBvubTkBdSdBAC4ObFHCFe6eTLwWRsPqdVQIYLvLzUdlOT3hTyWPH+N
+         XZgnLsZw6RinM8Y5zv5HEi1BJpzelINIKNA7Pf+cIbbn8cm4bLaYONtAUKlHSakC7egs
+         hZD5xGya2zxgG5VX+0D2DVFefS0r7ifvzAP12bJ+cGTygXbpTUB/Vr+2tlb6pRrQtDYO
+         7WaaxRtdrQ8/yhAUo5XZBRX710fg2CPx1zbWzm+kvH42+ljuzmkLiJKXHL8wfWhdrKpP
+         5eOg==
+X-Forwarded-Encrypted: i=1; AJvYcCUQ4EYWyfeiRsq0WeiPITpFBB7PQu+3VLhiPeqfJVrTWpgUR4BzwudCi1JwEVYSGHgM2WS4OBs6yhVd7A==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3PopUh1ze9Ma15Qs+BebZ4r8VwYle2BxEud5e+0SiRCf4Diuk
+	/V5BF/XB0kgS6Y3sbkteA/qqvssS6bqxpG25bfGw4vAlhnEnM/Z+jLWQM7yusQ==
+X-Gm-Gg: AZuq6aJawfMPuoCa0N9JeH6mUF0rlwR571zpY4gxWb0xvN5nkdzryNIdEqwA67ZXHwl
+	V6c94PtloDR6e3/Y3A6T3gnHAiWazlqw2yQS/vRg5e/xXLJTl+BoWQyTwMc4fkDj8qZpy8jQkSO
+	/zjTWvDbDHVByon1CvaFbEwfGvshiDjc9HDDT4aeZSOrwF4aIXI8WppSCAN+MX3yrHXcNNgb+cK
+	CdhvZeJeFMLiJJ8w0H/OfYfMWQqYnHLpvnncDNPhYz9zyZoQAfSEiKaNWuZZBbLh5Jpheu4BODX
+	3e8HdMo34grGtPGTYvXUVEh6EUDMsW6QNxFHichY1DONyuUyHdTAy9w1qzcAe8x5GGPQOpM7TVp
+	Q/LC2tRhlAq+9zjBGHy7+ddPNTzGSF5jwSo12yG1CUZ9q4wiHaNVEDmgTFNhj/VNF9meDjnUcQS
+	jwbWB6Pb6lAi44iYa3DOLfHQSUvbOvW+DTto7B
+X-Received: by 2002:a05:600c:1f82:b0:47e:e981:78b4 with SMTP id 5b1f17b1804b1-483203d0b11mr47461565e9.12.1770391902702;
+        Fri, 06 Feb 2026 07:31:42 -0800 (PST)
 Received: from [192.168.2.14] (85-70-151-113.rcd.o2.cz. [85.70.151.113])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4362972fa41sm6616644f8f.23.2026.02.06.07.31.16
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483207286bcsm55655415e9.12.2026.02.06.07.31.42
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Feb 2026 07:31:17 -0800 (PST)
-Message-ID: <e9231bd7-36fd-4d13-a002-0e91601481ac@gmail.com>
-Date: Fri, 6 Feb 2026 16:31:16 +0100
+        Fri, 06 Feb 2026 07:31:42 -0800 (PST)
+Message-ID: <e1d39e41-b503-4207-91cf-2e94b159e4b5@gmail.com>
+Date: Fri, 6 Feb 2026 16:31:41 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -68,12 +68,11 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/9] sed-opal: add RangeStartRangeLengthPolicy
- parameter.
+Subject: Re: [PATCH v3 3/9] sed-opal: add Admin1PIN parameter.
 To: Ondrej Kozina <okozina@redhat.com>, linux-block@vger.kernel.org
 Cc: jonathan.derrick@linux.dev, gjoyce@ibm.com, hare@suse.de
 References: <20260205150935.238137-1-okozina@redhat.com>
- <20260206141804.278721-3-okozina@redhat.com>
+ <20260206141804.278721-4-okozina@redhat.com>
 Content-Language: en-US
 From: Milan Broz <gmazyland@gmail.com>
 Autocrypt: addr=gmazyland@gmail.com; keydata=
@@ -119,16 +118,15 @@ Autocrypt: addr=gmazyland@gmail.com; keydata=
  vlB+GpT+iFRLvhCBe5kAERREfRfmWJq1bHod/ulrp/VLGAaZlOBTgsCzufWF5SOLbZkmV2b5
  xy2F/AU3oQUZncCvFMTWpBC+gO/o3kZCyyGCaQdQe4jS/FUJqR1suVwNMzcOJOP/LMQwujE/
  Ch7XLM35VICo9qqhih4OvLHUAWzC5dNSipL+rSGHvWBdfXDhbezJIl6sp7/1rJfS8qPs
-In-Reply-To: <20260206141804.278721-3-okozina@redhat.com>
+In-Reply-To: <20260206141804.278721-4-okozina@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 2/6/26 3:17 PM, Ondrej Kozina wrote:
-> As desribed in ch. 3.1.1.1.1.2 of TCG Storage Opal SSC Feature Set:
+> As desribed in ch. 3.1.1.1.1.3 of TCG Storage Opal SSC Feature Set:
 > Single User Mode document.
 > 
-> To be used later in Reactivate method implementation and in function
-> for retrieving SUM device status.
+> To be used later in Reactivate method implementation.
 > 
 > Signed-off-by: Ondrej Kozina <okozina@redhat.com>
 > ---
