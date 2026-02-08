@@ -1,231 +1,108 @@
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+Received: from lamorak.hansenpartnership.com (lamorak.hansenpartnership.com [198.37.111.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33A2B1DC997;
-	Sun,  8 Feb 2026 15:46:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3F762D6E4B;
+	Sun,  8 Feb 2026 17:59:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.37.111.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770565564; cv=none; b=nZAVolYjKIkPzdNaIcqXYW0gTdvBlF5iLNSRrj/+ppwAbRdYaE5OIumj2TBUPRlTI9X1unDn8Hux6LLRvXQf7kI64+0cDtSlqzyRUTelhIgE0E3P3j791HvNlfY1MmNH6hlvzK8a54yVx9HmDUAwpOd66nerKw2259t8ExrK298=
+	t=1770573541; cv=none; b=QSSpfuPEPeOaKqobAIWnLia+FNbae4QZGvuIdN+ixFeA4CA334DJULZvEc/364YxID/OyWRCpfyDDRYgk4TYUsaP2mvDnf0j3kJjPbXEbRdNYTk02qrspeLAwxDrEkOpOxib4FpcCeZ2iFVxmPOVjbiUI+8JOWzdUDFxsIi//NI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770565564; c=relaxed/simple;
-	bh=BVZlCooIP+3CoJVrJRcq/JMDT9aA2HKBaCJaSp9wDV8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=B9pyKTMljLYN+0drBi5ahEL/Xx6+16GuxWQhhckqpZhGewKJ2Bs13fxOmLOczGEdLLC/C3Py9ez+Sy7F2bHHbkvm85v+HherHDrnqEY7bMWf8rr2FdBwi//3f4paBLvTZnuLe2seq0Aep/Otd23PgprJyxECwdV+NIecWuBCcx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=PQC4UqYq; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+	s=arc-20240116; t=1770573541; c=relaxed/simple;
+	bh=HcStWpUdrKK1j47P6pV65slaRWOSXsWHhMnFpPYGMfI=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=SIPwi6lglHahGJrPUVPkIISD4E8CCleuR6/ko4KAeeiWqvmjhu2FCWdgwgGuEzHkBB+GdNg8qfhyQwiQ7vItnN6i/vFpOEH/IYAD6QIEO2M8CBpDCPBic9i86wPMMFCiWUb213Vzu2LsyUqlmhgVQcfdPrAhvNaxNYgJy7pLkIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=SeBzHuxo; arc=none smtp.client-ip=198.37.111.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="PQC4UqYq"
-Received: from pps.filterd (m0148461.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 618BHp632454622;
-	Sun, 8 Feb 2026 07:45:47 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=dCMDtr1XTQrFphWhlBPtBA1vakQMmpwVIyr6tPT3/RY=; b=PQC4UqYqp2aL
-	/ya7WE3BCqBS8GdGEn9ByEsbiiF1etssTMq954ZT8I5wGVH0UWy2BKrvRw3CpecQ
-	4Gjp4ayomzcvodpCq2APtXMtQtPhUcCJgE7kn/uLLlZm+B2t5/SiBoWoUoVIlKu1
-	+AfwQI4iLhko//XpBn0FmSqSYo98jx4ce6kEGNxSLvzNTfbqQAGE9wo4rsZ0VGhW
-	8U7SzO75fyEq+T8iRPNqLz9Vid6+vOFmfFX9XovXsaAjQITZquHyfj4NT+8tZgc9
-	IAe2r/2zf3ZHd0Gs6tCgjvjF4iPeJ46M6lBt9RxZsyKH4g22Q7boM8OI9wVXNadG
-	GJfU/eYyOw==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4c63c9gqj6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Sun, 08 Feb 2026 07:45:46 -0800 (PST)
-Received: from devbig003.atn7.facebook.com (2620:10d:c0a8:1b::30) by
- mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.35; Sun, 8 Feb 2026 15:45:45 +0000
-From: Chris Mason <clm@meta.com>
-To: Daniel Vacek <neelx@suse.com>
-CC: Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-        Eric Biggers
-	<ebiggers@kernel.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>, Jaegeuk Kim
-	<jaegeuk@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, David Sterba
-	<dsterba@suse.com>,
-        <linux-block@vger.kernel.org>, <linux-fscrypt@vger.kernel.org>,
-        <linux-btrfs@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Omar Sandoval <osandov@osandov.com>,
-        "Sweet
- Tea Dorminy" <sweettea-kernel@dorminy.me>
-Subject: Re: [PATCH v6 10/43] btrfs: start using fscrypt hooks
-Date: Sun, 8 Feb 2026 07:44:45 -0800
-Message-ID: <20260208154525.3580889-1-clm@meta.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260206182336.1397715-11-neelx@suse.com>
-References: <20260206182336.1397715-1-neelx@suse.com> <20260206182336.1397715-11-neelx@suse.com>
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="SeBzHuxo"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=hansenpartnership.com; s=20151216; t=1770573539;
+	bh=HcStWpUdrKK1j47P6pV65slaRWOSXsWHhMnFpPYGMfI=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+	b=SeBzHuxo1g6KvE7yw18PGTzmSYD8/rcng2d+usDFpwcn/pIZvKIpQGKwOzi4KXKYR
+	 UHiDj5UnZ7BdOcEu4VXJhPGv2HB01gdvIBUV277wuxRi2hPrMO5dY4gjbYgRkQtjGW
+	 BBBLj1ipHIvCM7Mr1/RUUKiukcXbGFZvkFNZ/4cw=
+Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4300:d341::a774])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by lamorak.hansenpartnership.com (Postfix) with ESMTPSA id 5A6F21C035B;
+	Sun, 08 Feb 2026 12:58:59 -0500 (EST)
+Message-ID: <e0a696dea2b68b99f604ce8bfb897fc3d38acc90.camel@HansenPartnership.com>
+Subject: Re: [LSF/MM/BPF TOPIC] Documenting the correct pushback on AI
+ inspired (and other) fixes in older drivers
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+To: Finn Thain <fthain@linux-m68k.org>
+Cc: "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, 
+	"linux-block@vger.kernel.org"
+	 <linux-block@vger.kernel.org>, linux-fsdevel@vger.kernel.org
+Date: Sun, 08 Feb 2026 12:58:58 -0500
+In-Reply-To: <5938441c-aaa9-c405-a78a-a66f387a5370@linux-m68k.org>
+References: 
+	<32e620691c0ecf76f469a21bffaba396f207ccb9.camel@HansenPartnership.com>
+	 <5938441c-aaa9-c405-a78a-a66f387a5370@linux-m68k.org>
+Autocrypt: addr=James.Bottomley@HansenPartnership.com;
+ prefer-encrypt=mutual;
+ keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: R3GAdtBSOM7vZ1mpbg7--Ows1iWKTQdC
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjA4MDEzNiBTYWx0ZWRfXw0dyW29DHLBQ
- ZOIue4bGXwoy73aZN/Po3djoDkJXsmy/G5Srzot6iB5gXsRZ3TpLlyb+0JEd0Kxixsy3EGEHOY8
- QNwxDfSBkD4tMGdS8Y5NwGvGcvDrwuKRoWiiN8z+2SW5Ek2doP0p++KeTkLoyfFUPDRWl3/nXeX
- lsdOa99bCxb4H9qp8vf05YgfY3wgH3Kvf+kLImjpu8OHedwmc3nbY/oXZcKkv7ZEBvDbHJXtx/a
- +9LpEzCV6KRhusPSQv/soY0BB3KJNCnKvRAhMKUnhbo3KAoBPdIGl+T0w5/5NWCzSPbzJRvn0r4
- b3iMdiCIBIbMbbXd6WKwaZFwfthqlZ3dQxqFlWaauyfpuCaaZANNlXFZ8CNcF1APBeuA59GUYmo
- D18e3mwy3d1PaLBhVn5f0vSMwD4lyYqGU1aSMfHz8EuxbE9vPfLHQB2Qifj8firqbowNEA6Y/jt
- LhCYNsFiYW0bAl4xrVA==
-X-Proofpoint-GUID: R3GAdtBSOM7vZ1mpbg7--Ows1iWKTQdC
-X-Authority-Analysis: v=2.4 cv=H5fWAuYi c=1 sm=1 tr=0 ts=6988afaa cx=c_pps
- a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
- a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22 a=Mpw57Om8IfrbqaoTuvik:22
- a=GgsMoib0sEa3-_RKJdDe:22 a=NEAV23lmAAAA:8 a=iox4zFpeAAAA:8 a=-uoBkjAQAAAA:8
- a=OMOj4mSnXPpJsoStnEoA:9 a=WzC6qhA0u3u7Ye7llzcV:22 a=y0wLjPFBLyexm0soFTcm:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-02-08_04,2026-02-05_03,2025-10-01_01
 
-Daniel Vacek <neelx@suse.com> wrote:
-> From: Omar Sandoval <osandov@osandov.com>
-> 
-> In order to appropriately encrypt, create, open, rename, and various
-> symlink operations must call fscrypt hooks. These determine whether the
-> inode should be encrypted and do other preparatory actions. The
-> superblock must have fscrypt operations registered, so implement the
-> minimal set also, and introduce the new fscrypt.[ch] files to hold the
-> fscrypt-specific functionality.
+On Fri, 2026-02-06 at 09:57 +1100, Finn Thain wrote:
+>=20
+> On Thu, 5 Feb 2026, James Bottomley wrote:
+>=20
+> > To set the stage, we in SCSI have seen an uptick in patches to
+> > older drivers mostly fixing missing free (data leak) and data race
+> > problems. I'm not even sure they're all AI found, but we don't
+> > really need to know that.=20
+>=20
+> If I may predict the next scene, by extrapolating only a little, we
+> are approaching the point where it will be feasible to request that
+> an AI simply generate a new driver, based on chip datasheets plus all
+> of the open source drivers available for training, rather than patch=20
+> the bugs in an existing driver.
 
-Hi everyone,
+Seems possible, but do we care?  For a driver we don't have, I think
+we'd be reasonably happy to try out an AI generated one, assuming
+there's a maintainer who has hardware to test.  For existing drivers, I
+think AI rewrites (even in rust) would be rejected.
 
-I'm running the btrfs for-next branch, along with the encryption patch set
-through my AI review prompts:
+> At that point, what use is a maintainer? I think we can still add
+> value if we are able to leverage our ability and experience in
+> validating such code  i.e. prove its correctness somehow. If we can
+> do that, then the codebase we presently call Linux might continue to
+> grow because it would remain superior than some AI-generated
+> alternative codebase.
 
-https://github.com/masoncl/review-prompts
+Well, I don't think regarding Maintainers as being in competition with
+AI will be very productive.  AI is a tool for maintainers to use, if
+they wish, to augment their other skills.
 
-I'm working on some btrfs specific instructions, but hopefully these reviews
-are already useful.  I've kept the headers to make it easier to double check
-that I'm actually replying to the right email, but please let me know if any
-parts of this are incorrect:
+> Documentation that would raise the bar for patch submissions seems
+> like a band-aid. The basic complaint seems to be that minor fixes
+> have become cheaper and easier to produce, overwhelming reviewers.
+> The solution has to be, make code review cheaper and more effective
+> i.e. fight fire with fire.
 
-commit 4d7d769810b1d47ec75a6efa0f691c43d9969b54
-Author: Omar Sandoval <osandov@osandov.com>
+Chris Mason is already doing that, I think.  However, I didn't anchor
+my proposal around lack of review, I anchored it to a better documented
+risk/benefit calculation ... and that doesn't change enormously however
+many reviews the patch gets.
 
-btrfs: start using fscrypt hooks
+Regards,
 
-This commit adds fscrypt support to btrfs by implementing fscrypt hooks
-in various inode operations including create, open, rename, and symlink
-operations.
-
-> diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
-> index b6c763a17406b..9d90e2e946fc4 100644
-> --- a/fs/btrfs/inode.c
-> +++ b/fs/btrfs/inode.c
-
-[ ... ]
-
-> @@ -6506,6 +6510,12 @@ int btrfs_new_inode_prepare(struct btrfs_new_inode_args *args,
->  		return ret;
->  	}
->
-> +	ret = fscrypt_prepare_new_inode(dir, inode, &args->encrypt);
-> +	if (ret) {
-> +		fscrypt_free_filename(&args->fname);
-> +		return ret;
-> +	}
-> +
-
-When fscrypt_prepare_new_inode() fails, are the ACLs leaked?
-
-Looking earlier in the function, posix_acl_create() allocates args->acl
-and args->default_acl. When fscrypt_prepare_new_inode() fails, the
-error path frees the filename but doesn't release these ACLs.
-
-Callers like btrfs_symlink() skip btrfs_new_inode_args_destroy() on
-error, so the ACLs would never be released. Should this add
-posix_acl_release() calls before returning?
-
-[ ... ]
-
-> @@ -8994,20 +9015,28 @@ static int btrfs_symlink(struct mnt_idmap *idmap, struct inode *dir,
->  	};
->  	unsigned int trans_num_items;
->  	int ret;
-> -	int name_len;
->  	int datasize;
->  	unsigned long ptr;
->  	struct btrfs_file_extent_item *ei;
->  	struct extent_buffer *leaf;
-> +	struct fscrypt_str disk_link;
-> +	size_t max_len;
-> +	u32 name_len = strlen(symname);
-> +
-> +	/*
-> +	 * BTRFS_MAX_INLINE_DATA_SIZE() isn't actually telling the truth, we actually
-> +	 * limit inline data extents to min(BTRFS_MAX_INLINE_DATA_SIZE(), sectorsize),
-> +	 * so adjust max_len given this wonderful bit of inconsistency.
-> +	 */
-> +	max_len = min_t(size_t, BTRFS_MAX_INLINE_DATA_SIZE(fs_info), fs_info->sectorsize);
->
-> -	name_len = strlen(symname);
->  	/*
-> -	 * Symlinks utilize uncompressed inline extent data, which should not
-> -	 * reach block size.
-> +	 * fscrypt sets disk_link.len to be len + 1, including a NUL terminator,
-> +	 * but we don't store that '\0' character.
->  	 */
-> -	if (name_len > BTRFS_MAX_INLINE_DATA_SIZE(fs_info) ||
-> -	    name_len >= fs_info->sectorsize)
-> -		return -ENAMETOOLONG;
-> +	ret = fscrypt_prepare_symlink(dir, symname, name_len, max_len + 1, &disk_link);
-> +	if (ret)
-> +		return ret;
->
->  	inode = new_inode(dir->i_sb);
->  	if (!inode)
-
-[ ... ]
-
-> @@ -9044,10 +9073,22 @@ static int btrfs_symlink(struct mnt_idmap *idmap, struct inode *dir,
->  		inode = NULL;
->  		goto out;
->  	}
-> +
-> +	if (IS_ENCRYPTED(inode)) {
-> +		ret = fscrypt_encrypt_symlink(inode, symname, name_len, &disk_link);
-> +		if (ret) {
-> +			btrfs_abort_transaction(trans, ret);
-> +			btrfs_free_path(path);
-> +			discard_new_inode(inode);
-> +			inode = NULL;
-> +			goto out;
-> +		}
-> +	}
-> +
->  	key.objectid = btrfs_ino(BTRFS_I(inode));
->  	key.type = BTRFS_EXTENT_DATA_KEY;
->  	key.offset = 0;
-> -	datasize = btrfs_file_extent_calc_inline_size(name_len);
-> +	datasize = btrfs_file_extent_calc_inline_size(disk_link.len - 1);
->  	ret = btrfs_insert_empty_item(trans, root, path, &key, datasize);
->  	if (unlikely(ret)) {
->  		btrfs_abort_transaction(trans, ret);
-
-[ ... ]
-
-> @@ -9084,6 +9125,29 @@ static int btrfs_symlink(struct mnt_idmap *idmap, struct inode *dir,
->  	return ret;
->  }
-
-Does this code leak disk_link.name when creating encrypted symlinks?
-
-According to fscrypt.h, when fscrypt_encrypt_symlink() is called,
-'one will be kmalloc()'ed and the filesystem will be responsible
-for freeing it'. However, btrfs_symlink() never frees disk_link.name
-in any exit path, whether success or failure.
-
-Looking at ext4/namei.c:3443-3444, it correctly handles this:
-
-    if (disk_link.name != (unsigned char *)symname)
-        kfree(disk_link.name);
-
-Should similar cleanup be added here?
+James
 
