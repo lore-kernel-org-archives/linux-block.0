@@ -1,110 +1,143 @@
-Received: from fout-a4-smtp.messagingengine.com (fout-a4-smtp.messagingengine.com [103.168.172.147])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACE8C3043D7;
-	Fri,  6 Feb 2026 22:38:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEF05345724
+	for <linux-block@vger.kernel.org>; Sun,  8 Feb 2026 06:21:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770417504; cv=none; b=eEmaRQHO2xHsRvgwMdTrYEK8nEwnsR5F4iMlRyKwriUddVHvy72Mht9h+zqrHr5HXRzydEQ4mZc5ipEordR04fC24MIs+ps8qHSLZcFdolMY5miMqwli/xWubjLlqzxghxby/InTF7qcgyZViL9QIMZdDZR9M2OndpnHM6Vt9vU=
+	t=1770531677; cv=none; b=Wp4TSrQiAmeX77ebbbY9TJKwWhpeMuPymYDqSkUZCe89dLEl6sOEXGK+I6736QTcONy/+CBEHWv7AnT5aj+xU+kduyP7r+5G0rkzpMQvgevUUn5c1Bd5MhRzjgv0BdLGYpUQp9tH+uN9+K5wf4RvF/iu15YcaBfJzg6XyRYA1xc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770417504; c=relaxed/simple;
-	bh=Bbw6VXoNApPGgxUT2nfFc0/wHQooiDOMNJ4U0eo4hJE=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=bRpvFatAPZnRCCoxYj+GLdwR701ccZ4R0/Cs3qAYlcgzpvlQzM+oCaym0iaGJY7X6fzuh9bjUoGZZNsl6sHIEklyDGHtsMSasQ4eCRHpUXB1DQ+1iKSAbCkHOCtCynjtFpKwvcBYFkIjnmbSsB62qejnPeHsTi8dY0dzmAv05Wo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=liqzkMWI; arc=none smtp.client-ip=103.168.172.147
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
+	s=arc-20240116; t=1770531677; c=relaxed/simple;
+	bh=icSYaXK3CoH7JYytfswkh+qUzCBauUgvYf2+Z4mC8D0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e+7OI5VWK4NLPwHIMWA2te31CovapPALK5HzOtC1YkyQ0FaRrTJ6ifWrC7Y4c5aYUpsnXFxhFUEBTHr8IjFGAwCKtvrAEojk+XBFr9jLtkI80cCYAqG+0wP7ZFMizWPAmYT36fG3YTgRM29YsoDr9nLemB445VBo5ZtKs8O97TM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LP3tXMKl; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="liqzkMWI"
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfout.phl.internal (Postfix) with ESMTP id ACE2FEC00B1;
-	Fri,  6 Feb 2026 17:38:22 -0500 (EST)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-01.internal (MEProxy); Fri, 06 Feb 2026 17:38:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1770417502; x=1770503902; bh=TOe6tBoZ94gvWUM5HNpF1Y5kR38DOrSzRwj
-	4lmrYzFE=; b=liqzkMWI2o6lmVZkic1bmZQBYB1Wm9kJTC2pdTtDXU8OhW6DvCp
-	y5lYzgpyixYHhrvcoVp7F2+u9G7MmMmIeAmOsG9uucStcMNVBcbqx3GkfwHDvjC2
-	jTl4jg+wnpPvRirEqnHrR9eeZ1qWP2ppJSoPR8dW7smPdGpmxJcuLAjNXaEeqHI4
-	W3sETnr7Nv4NmEu6FE1dTr+l+XX0lrVOoNoiTmWRWOTx6J6Pa8OcjE91SlAbBjmO
-	U9/eg5FRzIl0fLXeHH19XTbHdjSKKfYDpVfLDUpeOKXkY0tzXDUD2Xt65X7BjKep
-	n0qCEH4y8mNhJ1VTPi+ysOPPFkOqFxxSI5A==
-X-ME-Sender: <xms:Xm2GaZJtEaTWxoE5dQxXaeVlgM8lw6Lymae5BggK1gsWuC68pFAA-Q>
-    <xme:Xm2GaeEscSZ_n_ffVKVWF8y8OunTm6vuCsYf9D4Hdeoy6OFaM9boK4pNiRbyY2bRX
-    AWtYczPYIcew-EHRIw502zCE54QnFiGhAW8FuUv-dO6_SgO-yF88XI>
-X-ME-Received: <xmr:Xm2GadSJJ-Cd3BhLLl1oDQJpG8tnvlnAxAH9jbiUq_FoMHK5mp04P-bfvy_3>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddukeelfeelucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevufgjkfhfgggtsehttdertddttddvnecuhfhrohhmpefhihhnnhcuvfhh
-    rghinhcuoehfthhhrghinheslhhinhhugidqmheikehkrdhorhhgqeenucggtffrrghtth
-    gvrhhnpeelueehleehkefgueevtdevteejkefhffekfeffffdtgfejveekgeefvdeuheeu
-    leenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehfth
-    hhrghinheslhhinhhugidqmheikehkrdhorhhgpdhnsggprhgtphhtthhopeehpdhmohgu
-    vgepshhmthhpohhuthdprhgtphhtthhopegujhifohhngheskhgvrhhnvghlrdhorhhgpd
-    hrtghpthhtohepjhgrmhgvshdrsghothhtohhmlhgvhieshhgrnhhsvghnphgrrhhtnhgv
-    rhhshhhiphdrtghomhdprhgtphhtthhopehlihhnuhigqdhstghsihesvhhgvghrrdhkvg
-    hrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdgslhhotghksehvghgvrhdrkhgv
-    rhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqfhhsuggvvhgvlhesvhhgvghrrd
-    hkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:Xm2Gaadoi9VU5l4Rt4ViIHjceh6k1fWZs92-LS1Z4ECSNDEdbdl_Cw>
-    <xmx:Xm2GacrzGMEsEnoKqMjqQAGQeq8QhiWMm0ph9wLX_3YxMfbSipLHoA>
-    <xmx:Xm2Gab-4zHCp0mcKkpK08x7KccbukYJNJfDTbkX8T_XDyfIcz6WLFA>
-    <xmx:Xm2GaYcSsE3piS4lvU9UptTvQrOk4X1jv3t0c5PQAAQprDsksXqI3g>
-    <xmx:Xm2GaU_lcluMy6f64WLj3G8hzLByEop2ylf5m0D7h0DlCS71Xlmzor_J>
-Feedback-ID: i58a146ae:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 6 Feb 2026 17:38:20 -0500 (EST)
-Date: Sat, 7 Feb 2026 09:38:48 +1100 (AEDT)
-From: Finn Thain <fthain@linux-m68k.org>
-To: "Darrick J. Wong" <djwong@kernel.org>
-cc: James Bottomley <James.Bottomley@hansenpartnership.com>, 
-    "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, 
-    "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
-    linux-fsdevel@vger.kernel.org
-Subject: Re: [LSF/MM/BPF TOPIC] Documenting the correct pushback on AI inspired
- (and other) fixes in older drivers
-In-Reply-To: <20260206051847.GC7693@frogsfrogsfrogs>
-Message-ID: <2f1cd352-44d8-d014-240c-8b264c1ba95c@linux-m68k.org>
-References: <32e620691c0ecf76f469a21bffaba396f207ccb9.camel@HansenPartnership.com> <5938441c-aaa9-c405-a78a-a66f387a5370@linux-m68k.org> <20260206051847.GC7693@frogsfrogsfrogs>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LP3tXMKl"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770531676;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8VE5Ny+tVu3mEKfo+elkhrIq2FxH5N//a++dnU6IQdg=;
+	b=LP3tXMKlDSC7Me4zwdm9wBLftXcG1J0FLdH4ZuRETWmgmfabIsjF6p2E09dbyEGkuwqJwn
+	n9kZ9w96aSAwGw+EoJFe9bI+F7Fc8de/cBwa9MrHr8/6V3XuNB0RFGscb/OaV3WNAm2o4r
+	tBBRzSsUKsdUn3xmNlnRXvw49xMZx8U=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-283-44DZAFX5MWqNLIz5874OaQ-1; Sun,
+ 08 Feb 2026 01:21:12 -0500
+X-MC-Unique: 44DZAFX5MWqNLIz5874OaQ-1
+X-Mimecast-MFC-AGG-ID: 44DZAFX5MWqNLIz5874OaQ_1770531671
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 015141956089;
+	Sun,  8 Feb 2026 06:21:11 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (unknown [10.6.23.247])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1C8E918003F6;
+	Sun,  8 Feb 2026 06:21:09 +0000 (UTC)
+Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 6186L82j971832
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Sun, 8 Feb 2026 01:21:08 -0500
+Received: (from bmarzins@localhost)
+	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 6186L7QZ971831;
+	Sun, 8 Feb 2026 01:21:07 -0500
+Date: Sun, 8 Feb 2026 01:21:07 -0500
+From: Benjamin Marzinski <bmarzins@redhat.com>
+To: jaeyuel.im@lge.com
+Cc: Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
+        Mikulas Patocka <mpatocka@redhat.com>, dm-devel@lists.linux.dev,
+        linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH] dm init: ensure block device is ready before creating
+ mapped device
+Message-ID: <aYgrU8MpeTqJjTMl@redhat.com>
+References: <20251212000955.171808-1-jaeyuel.im@lge.com>
+ <20260206050526.930530-1-jaeyuel.im@lge.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260206050526.930530-1-jaeyuel.im@lge.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-
-On Thu, 5 Feb 2026, Darrick J. Wong wrote:
-
-> On Fri, Feb 06, 2026 at 09:57:45AM +1100, Finn Thain wrote:
-> > 
-> > On Thu, 5 Feb 2026, James Bottomley wrote:
-> > 
-> > > To set the stage, we in SCSI have seen an uptick in patches to older 
-> > > drivers mostly fixing missing free (data leak) and data race 
-> > > problems. I'm not even sure they're all AI found, but we don't 
-> > > really need to know that.
-> > 
-> > If I may predict the next scene, by extrapolating only a little, we 
-> > are approaching the point where it will be feasible to request that an 
-> > AI simply generate a new driver, based on chip datasheets plus all of 
-> > the open source drivers available for training, rather than patch the 
-> > bugs in an existing driver.
-> > 
-> > At that point, what use is a maintainer? I think we can still add 
-> > value if
+On Fri, Feb 06, 2026 at 05:05:26AM +0000, jaeyuel.im@lge.com wrote:
+> From: "jaeyuel.im" <jaeyuel.im@lge.com>
 > 
-> Being a magic sources of datasheets obtained through murky means, 
-> obviously.  What /was/ grandpa doing when he came home with a bunch of 
-> weird machinery at 3am in 1957??  :P
+> The current implementation of dm_init_init() uses early_lookup_bdev() to
+> wait for the device node to appear. However, early_lookup_bdev() only
+> verifies that the device node exists and returns the dev_t. It does not
+> guarantee that the underlying block device structure is fully initialized
+> and ready for I/O operations or to be opened.
+> 
+> On certain platforms (e.g., embedded systems with specific storage
+> drivers), this can lead to a race condition where dm_early_create()
+> attempts to open the device immediately after early_lookup_bdev() returns,
+> but fails because the device is not yet fully ready. This results in boot
+> failures as the mapped device cannot be created.
+> 
+> This patch adds an additional check using blkdev_get_no_open() after
+> early_lookup_bdev() returns. This ensures that the struct block_device is
+> actually available and the device is ready to be opened, effectively
+> preventing the race condition.
+> 
+> Changes in v2:
+> - Pass autoload parameter for new blkdev_get_no_open()
+> 
+> Changes in v3:
+> - Exported to a public header for both blkdev_get_no_open() and
+>   blkdev_put_no_open()
+> 
+> Link: https://patchwork.kernel.org/project/dm-devel/patch/20251212000955.171808-1-jaeyuel.im@lge.com/
+> Signed-off-by: jaeyuel.im <jaeyuel.im@lge.com>
+> ---
+
+You should put the description of your version changes here, after the
+triple dash, so that they aren't part of the actual commit message. 
+
+>  drivers/md/dm-init.c   | 14 ++++++++++++++
+>  include/linux/blkdev.h |  3 +++
+>  2 files changed, 17 insertions(+)
+> 
+> [snip] 
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 72e34acd439c..7f4a05b536ca 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -1873,4 +1873,7 @@ static inline int bio_split_rw_at(struct bio *bio,
+>  
+>  #define DEFINE_IO_COMP_BATCH(name)	struct io_comp_batch name = { }
+
+If you're adding declarations linux/blkdev.h, you should remove them
+from block/blk.h, so the functions aren't declared twice.
+
+Also, IMHO it seems more natural for these declarions to placed near the
+related bdev_file_open_by_dev() and bdev_file_open_by_path() ones
+earlier in this file.
+
+Finally I Added Jens and linux-block to the CCs, since the patch
+includes changes to the block files. FYI, scripts/get_maintainer.pl can
+help you send your patches the right people and lists.
+
+-Ben
+  
+> +struct block_device *blkdev_get_no_open(dev_t dev, bool autoload);
+> +void blkdev_put_no_open(struct block_device *bdev);
+> +
+>  #endif /* _LINUX_BLKDEV_H */
+> -- 
+> 2.34.1
 > 
 
-I'm told he was building a steam-powered flying saucer. I don't know 
-whether he was more interested in the question, how did we get here or to 
-where might we go.
