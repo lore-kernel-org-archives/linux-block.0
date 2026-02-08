@@ -1,143 +1,226 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEF05345724
-	for <linux-block@vger.kernel.org>; Sun,  8 Feb 2026 06:21:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FE7E2441B8;
+	Sun,  8 Feb 2026 13:18:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770531677; cv=none; b=Wp4TSrQiAmeX77ebbbY9TJKwWhpeMuPymYDqSkUZCe89dLEl6sOEXGK+I6736QTcONy/+CBEHWv7AnT5aj+xU+kduyP7r+5G0rkzpMQvgevUUn5c1Bd5MhRzjgv0BdLGYpUQp9tH+uN9+K5wf4RvF/iu15YcaBfJzg6XyRYA1xc=
+	t=1770556702; cv=none; b=B8gTAJSwGuKtj9pmINDN/nlK10qeCp4oI9BKMG81OpX/wdpOKMvNyvs0J8emkF5hNtGVzLCeDpmXNSqDe6/zvUhiciA5LbcAgbHzF56VNEgQIo9SBYuOKsk2I6SYxbo/bvuglJaHvOq0LMRZ2xCuhGZpFBbKA2A/3+vAufELsq0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770531677; c=relaxed/simple;
-	bh=icSYaXK3CoH7JYytfswkh+qUzCBauUgvYf2+Z4mC8D0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e+7OI5VWK4NLPwHIMWA2te31CovapPALK5HzOtC1YkyQ0FaRrTJ6ifWrC7Y4c5aYUpsnXFxhFUEBTHr8IjFGAwCKtvrAEojk+XBFr9jLtkI80cCYAqG+0wP7ZFMizWPAmYT36fG3YTgRM29YsoDr9nLemB445VBo5ZtKs8O97TM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LP3tXMKl; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1770556702; c=relaxed/simple;
+	bh=6g7r4VhyG2HWU2AYFMAFpaO5CaVLc2pDSZumZIwZRhc=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pFCXJVOJjT2lvI0Mc5X461VMFzNQWqRfUatFq3qLEMGUAHdp8PLD026CUviyqQ8iIKkHonW+1o51r4rOrvub6gEqNaBG4tJlNR9+J5H9BmrF3fg+E6DPE3+aipwsFJs6QwdDWW8lVEmJA+WoDNrVh4AB9/SLAKDbSuMSveM2EDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=tzvxrYbg; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LP3tXMKl"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770531676;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8VE5Ny+tVu3mEKfo+elkhrIq2FxH5N//a++dnU6IQdg=;
-	b=LP3tXMKlDSC7Me4zwdm9wBLftXcG1J0FLdH4ZuRETWmgmfabIsjF6p2E09dbyEGkuwqJwn
-	n9kZ9w96aSAwGw+EoJFe9bI+F7Fc8de/cBwa9MrHr8/6V3XuNB0RFGscb/OaV3WNAm2o4r
-	tBBRzSsUKsdUn3xmNlnRXvw49xMZx8U=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-283-44DZAFX5MWqNLIz5874OaQ-1; Sun,
- 08 Feb 2026 01:21:12 -0500
-X-MC-Unique: 44DZAFX5MWqNLIz5874OaQ-1
-X-Mimecast-MFC-AGG-ID: 44DZAFX5MWqNLIz5874OaQ_1770531671
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 015141956089;
-	Sun,  8 Feb 2026 06:21:11 +0000 (UTC)
-Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (unknown [10.6.23.247])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1C8E918003F6;
-	Sun,  8 Feb 2026 06:21:09 +0000 (UTC)
-Received: from bmarzins-01.fast.eng.rdu2.dc.redhat.com (localhost [127.0.0.1])
-	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.17.1) with ESMTPS id 6186L82j971832
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Sun, 8 Feb 2026 01:21:08 -0500
-Received: (from bmarzins@localhost)
-	by bmarzins-01.fast.eng.rdu2.dc.redhat.com (8.18.1/8.18.1/Submit) id 6186L7QZ971831;
-	Sun, 8 Feb 2026 01:21:07 -0500
-Date: Sun, 8 Feb 2026 01:21:07 -0500
-From: Benjamin Marzinski <bmarzins@redhat.com>
-To: jaeyuel.im@lge.com
-Cc: Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
-        Mikulas Patocka <mpatocka@redhat.com>, dm-devel@lists.linux.dev,
-        linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH] dm init: ensure block device is ready before creating
- mapped device
-Message-ID: <aYgrU8MpeTqJjTMl@redhat.com>
-References: <20251212000955.171808-1-jaeyuel.im@lge.com>
- <20260206050526.930530-1-jaeyuel.im@lge.com>
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="tzvxrYbg"
+Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 618AgKIA3236267;
+	Sun, 8 Feb 2026 05:18:02 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
+	 bh=EoIGrtxRRxbLe6X5l7v6Y8YnpXO4kkvbtEF10x8BiKM=; b=tzvxrYbgvJ7m
+	yMpJE6HFAcFRO8A43tbclIpmnm81NtmcamRJcAOzryO6VYg3/AmLKj+Wb9P0Ureh
+	B1w5W3x1Y/bihdOX6Fzg6RCVIlL33h6yglGE8l/3VOLzzSVbEJ370XNTJKS6nRCj
+	DIa5xMwnDQiXXe6KJYro/bMQFTDS0MThkZaZHQvUS/z8OJwWEBxVhwWrHbjYv9kx
+	CY5tBAJY6R26BQEf48+eoJyscbsW+NrSBgfUEOsK703/YwGuEKIlBB2kuEq5wchk
+	CU3P2A6rTGgN3d1H0HoZ7JDCbVS8nFPrc1rdlLGSoyW1Vk6txt2WIxbEnWY4cf7Y
+	+Mn76kRQ3w==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4c65jjyae2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Sun, 08 Feb 2026 05:18:02 -0800 (PST)
+Received: from devbig003.atn7.facebook.com (2620:10d:c085:208::f) by
+ mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.35; Sun, 8 Feb 2026 13:18:01 +0000
+From: Chris Mason <clm@meta.com>
+To: Daniel Vacek <neelx@suse.com>
+CC: Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+        Eric Biggers
+	<ebiggers@kernel.org>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>, Jaegeuk Kim
+	<jaegeuk@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, David Sterba
+	<dsterba@suse.com>,
+        <linux-block@vger.kernel.org>, <linux-fscrypt@vger.kernel.org>,
+        <linux-btrfs@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v6 42/43] btrfs: disable encryption on RAID5/6
+Date: Sun, 8 Feb 2026 05:14:57 -0800
+Message-ID: <20260208131745.2173841-1-clm@meta.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260206182336.1397715-43-neelx@suse.com>
+References: <20260206182336.1397715-1-neelx@suse.com> <20260206182336.1397715-43-neelx@suse.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260206050526.930530-1-jaeyuel.im@lge.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: 7iQgHGVSyDzV3k5FuRLTuk2jnpqHCaIw
+X-Proofpoint-GUID: 7iQgHGVSyDzV3k5FuRLTuk2jnpqHCaIw
+X-Authority-Analysis: v=2.4 cv=HM/O14tv c=1 sm=1 tr=0 ts=69888d0a cx=c_pps
+ a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
+ a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22 a=Mpw57Om8IfrbqaoTuvik:22
+ a=GgsMoib0sEa3-_RKJdDe:22 a=NEAV23lmAAAA:8 a=iox4zFpeAAAA:8 a=maIFttP_AAAA:8
+ a=ojOyy3yCrAsgUvTcCNgA:9 a=WzC6qhA0u3u7Ye7llzcV:22 a=qR24C9TJY6iBuJVj_x8Y:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjA4MDExNCBTYWx0ZWRfXzZIM0D/1NVfr
+ kqj+8zRW0/jVFSS58zxu4ZPvxigFu1ElLZQaBuDDwrS4M77TdhrS1RybeRQLc2LEcIr39BauKQX
+ hqc47XCARcw84SZH7BRrPpnL0/tR54KjQNjGES37J5yh+j4Y8Fk6G8GXuuE2vzYeR0HjflaLoGc
+ DUqqn7vb1gEx/UtvQAcXMOZvaBv6KN9LB4locuGOnXje6KwxAXIldo1/TZbak+jkkHHd0hWEY6p
+ MU+QHiVV/oJqdQHLwTvz9mjZS1zGMHyNsLc5D0wW09CXGjNLrrMazrkUsX7agJgxL15cn443rvv
+ E5mUJXkHNTZRlolrWTuni9BR6SB8fxF0a+HMNLSq4qITUcVpbxnjZtaQlMaPL9mOigD8PdCZ9eM
+ bQZrgv/Zl8uw79aWvXKlAtXqj+3+zPszAXKAwPVyKQzIiMp0KPGLKgU7h2pqWN2L4waOccEOFYZ
+ jGA7Icap9060e7NCW4A==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-08_03,2026-02-05_03,2025-10-01_01
 
-On Fri, Feb 06, 2026 at 05:05:26AM +0000, jaeyuel.im@lge.com wrote:
-> From: "jaeyuel.im" <jaeyuel.im@lge.com>
+Daniel Vacek <neelx@suse.com> wrote:
+> From: Josef Bacik <josef@toxicpanda.com>
 > 
-> The current implementation of dm_init_init() uses early_lookup_bdev() to
-> wait for the device node to appear. However, early_lookup_bdev() only
-> verifies that the device node exists and returns the dev_t. It does not
-> guarantee that the underlying block device structure is fully initialized
-> and ready for I/O operations or to be opened.
+> The RAID5/6 code will re-arrange bios and submit them through a
+> different mechanism.  This is problematic with inline encryption as we
+> have to get the bio and csum it after it's been encrypted, and the
+> radi5/6 bio's don't have the btrfs_bio embedded, so we have no way to
+> get the csums put on disk.
 > 
-> On certain platforms (e.g., embedded systems with specific storage
-> drivers), this can lead to a race condition where dm_early_create()
-> attempts to open the device immediately after early_lookup_bdev() returns,
-> but fails because the device is not yet fully ready. This results in boot
-> failures as the mapped device cannot be created.
+> This isn't an unsolvable problem, but would require a bit of reworking.
+> Since we discourage users from using this code currently simply don't
+> allow encryption on RAID5/6 setups.  If there's sufficient demand in the
+> future we can add the support for this.
 > 
-> This patch adds an additional check using blkdev_get_no_open() after
-> early_lookup_bdev() returns. This ensures that the struct block_device is
-> actually available and the device is ready to be opened, effectively
-> preventing the race condition.
-> 
-> Changes in v2:
-> - Pass autoload parameter for new blkdev_get_no_open()
-> 
-> Changes in v3:
-> - Exported to a public header for both blkdev_get_no_open() and
->   blkdev_put_no_open()
-> 
-> Link: https://patchwork.kernel.org/project/dm-devel/patch/20251212000955.171808-1-jaeyuel.im@lge.com/
-> Signed-off-by: jaeyuel.im <jaeyuel.im@lge.com>
-> ---
 
-You should put the description of your version changes here, after the
-triple dash, so that they aren't part of the actual commit message. 
+Hi everyone,
 
->  drivers/md/dm-init.c   | 14 ++++++++++++++
->  include/linux/blkdev.h |  3 +++
->  2 files changed, 17 insertions(+)
-> 
-> [snip] 
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index 72e34acd439c..7f4a05b536ca 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -1873,4 +1873,7 @@ static inline int bio_split_rw_at(struct bio *bio,
->  
->  #define DEFINE_IO_COMP_BATCH(name)	struct io_comp_batch name = { }
+I'm running the btrfs for-next branch, along with the encryption patch set
+through my AI review prompts:
 
-If you're adding declarations linux/blkdev.h, you should remove them
-from block/blk.h, so the functions aren't declared twice.
+https://github.com/masoncl/review-prompts
 
-Also, IMHO it seems more natural for these declarions to placed near the
-related bdev_file_open_by_dev() and bdev_file_open_by_path() ones
-earlier in this file.
+I'm working on some btrfs specific instructions, but hopefully these reviews
+are already useful.  I've kept the headers to make it easier to double check
+that I'm actually replying to the right email, but please let me know if any
+parts of this are incorrect:
 
-Finally I Added Jens and linux-block to the CCs, since the patch
-includes changes to the block files. FYI, scripts/get_maintainer.pl can
-help you send your patches the right people and lists.
 
--Ben
-  
-> +struct block_device *blkdev_get_no_open(dev_t dev, bool autoload);
-> +void blkdev_put_no_open(struct block_device *bdev);
+commit 6a39a21e95e116ad02c6ce9f832838acc111692f
+Author: Josef Bacik <josef@toxicpanda.com>
+
+btrfs: disable encryption on RAID5/6
+
+The RAID5/6 code will re-arrange bios and submit them through a
+different mechanism to handle parity. This is problematic with inline
+encryption as we have to get the bio and csum it after it's been
+encrypted, and the RAID5/6 bios don't have the btrfs_bio embedded, so
+there's no way to get the csums put on disk.
+
+> commit 6a39a21e95e116ad02c6ce9f832838acc111692f
+> Author: Josef Bacik <josef@toxicpanda.com>
+> Date:   Fri Feb 6 19:23:14 2026 +0100
+>
+>     btrfs: disable encryption on RAID5/6
+>
+>     The RAID5/6 code will re-arrange bios and submit them through a
+>     different mechanism.  This is problematic with inline encryption as we
+>     have to get the bio and csum it after it's been encrypted, and the
+>     radi5/6 bio's don't have the btrfs_bio embedded, so we have no way to
+                                                                       ^^^^
+
+This isn't a bug, but there's a typo: 'radi5/6' should be 'raid5/6'.
+
+[ ... ]
+
+>
+> diff --git a/fs/btrfs/ioctl.c b/fs/btrfs/ioctl.c
+> index a8adf99ad0a81..1bade8fea16e8 100644
+> --- a/fs/btrfs/ioctl.c
+> +++ b/fs/btrfs/ioctl.c
+> @@ -5198,6 +5198,10 @@ long btrfs_ioctl(struct file *file, unsigned int
+>  			return -EOPNOTSUPP;
+>  		if (sb_rdonly(fs_info->sb))
+>  			return -EROFS;
+> +		if (btrfs_fs_incompat(fs_info, RAID56)) {
+> +			btrfs_warn(fs_info, "can't enable encryption with RAID5/6");
+> +			return -EINVAL;
+> +		}
+
+This check prevents enabling encryption when RAID56 is already active,
+but does NOT prevent converting to RAID5/6 after encryption is enabled.
+The check_raid56_incompat_flag() function in fs/btrfs/volumes.c:5558
+sets the RAID56 flag during balance operations without checking if
+ENCRYPT is already set. This allows users to:
+
+1. Enable encryption via FS_IOC_SET_ENCRYPTION_POLICY (sets ENCRYPT at
+   line 5210 in this function)
+2. Later run btrfs balance to convert to RAID5/6 (sets RAID56 flag at
+   volumes.c:5558)
+3. End up with both ENCRYPT and RAID56 flags set
+
+The commit message states "simply don't allow encryption on RAID5/6
+setups" which implies preventing the incompatible state entirely, not
+just one entry path. The volumes.c code path needs a corresponding
+check:
+
+static void check_raid56_incompat_flag(struct btrfs_fs_info *info, u64 type)
+{
+	if (!(type & BTRFS_BLOCK_GROUP_RAID56_MASK))
+		return;
+	// MISSING: check for ENCRYPT flag here
+	btrfs_set_fs_incompat(info, RAID56);
+}
+
+Without this check, data corruption can occur via the RAID5/6 bio path
+that cannot handle encrypted data properly, as explained in the commit
+message.
+
+> diff --git a/fs/btrfs/super.c b/fs/btrfs/super.c
+> index 4a2887147ead4..aefcbe56e85ad 100644
+> --- a/fs/btrfs/super.c
+> +++ b/fs/btrfs/super.c
+> @@ -734,6 +734,12 @@ bool btrfs_check_options(const struct btrfs_fs_info *info,
+>  	if (btrfs_check_mountopts_zoned(info, mount_opt))
+>  		ret = false;
+>
+> +	if (btrfs_fs_incompat(info, RAID56) &&
+> +	    btrfs_raw_test_opt(*mount_opt, TEST_DUMMY_ENCRYPTION)) {
+> +		btrfs_err(info, "cannot use test_dummy_encryption with RAID5/6");
+> +		ret = false;
+> +	}
 > +
->  #endif /* _LINUX_BLKDEV_H */
-> -- 
-> 2.34.1
-> 
+
+Similar to the ioctl.c issue, this prevents mounting with
+test_dummy_encryption when RAID56 is already active, but does NOT
+prevent converting to RAID5/6 after mounting with test_dummy_encryption.
+
+The check_raid56_incompat_flag() function in fs/btrfs/volumes.c:5558
+sets the RAID56 flag during balance operations without checking if
+test_dummy_encryption is in use. Since test_dummy_encryption cannot be
+changed after mount (enforced by btrfs_check_test_dummy_encryption at
+line 1547-1560), a user can:
+
+1. Mount filesystem with -o test_dummy_encryption
+2. Later run btrfs balance to convert to RAID5/6 (sets RAID56 flag)
+3. End up with both test_dummy_encryption active and RAID56 flag set
+
+While test_dummy_encryption is primarily a testing/development feature,
+the patch explicitly protects against this combination, indicating it's
+an important incompatibility. The volumes.c code path needs a check for
+the TEST_DUMMY_ENCRYPTION mount option:
+
+static void check_raid56_incompat_flag(struct btrfs_fs_info *info, u64 type)
+{
+	if (!(type & BTRFS_BLOCK_GROUP_RAID56_MASK))
+		return;
+	// MISSING: check for TEST_DUMMY_ENCRYPTION mount option
+	btrfs_set_fs_incompat(info, RAID56);
+}
+
+Does this allow the same encrypted bio / RAID5/6 bio incompatibility
+described in the commit message?
 
