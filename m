@@ -1,48 +1,48 @@
 Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34D98261B80
-	for <linux-block@vger.kernel.org>; Mon,  9 Feb 2026 17:52:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B909325DB12;
+	Mon,  9 Feb 2026 21:26:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770659523; cv=none; b=ma7ZTcR4VX5FFcByxpGDsI1evN62F0p5E+P63VFHJ15rQd1zr7/RC7H4ZL5e66DpMFSu6U4XfQUPg4Z3rWg1DG7edEDj7vrnXCdw2pQCanqwrpYPnVzg2ywQqHmC5qc/UeBfN2ATByfJEbXyh6cdeCqr3jZZhfJWejk1+/fa0NU=
+	t=1770672413; cv=none; b=gkUvjRhk6hJTCnaWp2IwDLfSyi+02IYV+qzFrHxXnaWNnYatx0cVK7UH3VheTTKYIgzi/69yCTrmHOL2OR6UZUJV/LAVuLFuqZ+nbVQEOzDzimakznk3NVyqhpPrlFN9QTWugEA9RnjPFA2Ik2FATAseNHpgSzdpOuvwYDltBrU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770659523; c=relaxed/simple;
-	bh=wWRw45vxPzMf6IUhlILMEm7Zh4ZyPMbWLX+8yExKoms=;
+	s=arc-20240116; t=1770672413; c=relaxed/simple;
+	bh=6mIU3Bu8hC+Jz6m03yEqAZNJUwSNuiDh/RPcTfgdnGA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UfzEiUu3J7oi7VgnOjU6EHTUeWUB2jjLB2bgUwE+pGVnjp5ihuK8lIwucsKA0hKh9PdbXILllnSCGPUzjlhd3Vo02+nVj4r0FgmiNiwK5JGEWcwv41Mwmw+BAc6cEsNmmxsIrp/IWLeOrsP7uh6JaNNKdvurnWyoaOVX1U7jUO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=nP4ebFiQ; arc=none smtp.client-ip=199.89.1.16
+	 In-Reply-To:Content-Type; b=MXIbcE188bYVXrZWcR+gtAqeaoBKojlmFEreSA0Z2nSs2SaXNdGgp+jF4W+6tU7DVut5MOrw+RG8RvrFKLU/9l0zlL57Rda2nJHW1ADw2ntqYl4dm+Ffx+AYUx4pcvvoDeigidBAzJSwh3hOX0ilBsKpAn+8uKJmoJqOLnrMhhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=OM83KAGb; arc=none smtp.client-ip=199.89.1.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="nP4ebFiQ"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="OM83KAGb"
 Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4f8shf57YhzlfjRv;
-	Mon,  9 Feb 2026 17:52:02 +0000 (UTC)
+	by 013.lax.mailroute.net (Postfix) with ESMTP id 4f8ySX2R7HzlfddR;
+	Mon,  9 Feb 2026 21:26:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:content-type:content-type:in-reply-to
 	:from:from:content-language:references:subject:subject
 	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1770659519; x=1773251520; bh=wWRw45vxPzMf6IUhlILMEm7Z
-	h4ZyPMbWLX+8yExKoms=; b=nP4ebFiQQ+2ePiCZoz4k648cjcCDTBFzscyxKGIn
-	7b3wEZiVYGWZxiPLtNJ1UL/6bcRmGZbbHqY1WKp4rN0wrTg1uHy3tVV/gE6qjk5G
-	UOD2vJFwRLVUcnS6oETEE5cp7e0hVKxLzGfXcgWHH+mW8HdlywkrO95VhDWhHm37
-	4nL0KlB2K1irwnzrgipoTFRGaBql2aGnkJJ7EECoaSVwmUMR/JaUEoXLlY2jXCYE
-	jQF4PjrRZXveqvZ3b3iP/+qgYrAAMWXiFM9C0KmCuXzdiKJcDoY4o5M6KbscGm/r
-	jtI2RWcxUXMmmHfoDcj3+FLDel7wRkpGE8t7E9VDcKScOA==
+	 s=mr01; t=1770672410; x=1773264411; bh=PwJK6C7uj+PdiSlpFRWiuAs5
+	zIA0mKj5gLHCNH7N1Zk=; b=OM83KAGbO1+o0h4kxxvvtejeAFNKNyQ95fCne0bA
+	K6YhC6RM3FZsrKdKNtEhd3Pp4/k61ChcvnARRKdBwW/RSubGTSW/uO/ML1hVjRx+
+	ucjoNAkTlQZFVoEaXN3LD8Zf0Q0TglUMhzxThQMcMBtqCYnnHUbHnEB8G6JHlBqd
+	ar5Cnq5G0r8N/wJl8ZUJz1Ek0ktAHs1AkeqfNxtdagRLgc+GKf6U//r94HaGQJ+x
+	rRYRRKHgEi3l/tzeDeLKLH0Q22bS5yJy51GeS4d+gBRNdk55PFAAWRlE0xbOfRmZ
+	tESeZcfXYur+bL6PJ8QevuZduz0ZjgYqpg7nB2Dr25xTWQ==
 X-Virus-Scanned: by MailRoute
 Received: from 013.lax.mailroute.net ([127.0.0.1])
  by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id toXWEeWDQ0M2; Mon,  9 Feb 2026 17:51:59 +0000 (UTC)
+ id L55xXk_P6xjf; Mon,  9 Feb 2026 21:26:50 +0000 (UTC)
 Received: from [100.119.48.131] (unknown [104.135.180.219])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4f8shX1QN1zlfdCr;
-	Mon,  9 Feb 2026 17:51:55 +0000 (UTC)
-Message-ID: <b2069052-ac7d-46f6-bdd5-a96533144f9c@acm.org>
-Date: Mon, 9 Feb 2026 09:51:55 -0800
+	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4f8yST527kzlfddn;
+	Mon,  9 Feb 2026 21:26:49 +0000 (UTC)
+Message-ID: <7a6077b3-0be0-4447-ad69-973a4f064a8c@acm.org>
+Date: Mon, 9 Feb 2026 13:26:48 -0800
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -50,30 +50,59 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/4] blk-mq: use blk_queue_enter/exit to protect debugfs
- file creation
+Subject: Re: [LSF/MM/BPF TOPIC] Block storage copy offloading
 To: Keith Busch <kbusch@kernel.org>
-Cc: Yu Kuai <yukuai@fnnas.com>, axboe@kernel.dk, hch@lst.de,
- sagi@grimberg.me, sven@kernel.org, j@jannau.net,
- linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, tj@kernel.org,
- nilay@linux.ibm.com, ming.lei@redhat.com, neal@gompa.dev,
- asahi@lists.linux.dev, linux-arm-kernel@lists.infradead.org
-References: <20260209082953.3053721-1-yukuai@fnnas.com>
- <20260209082953.3053721-5-yukuai@fnnas.com>
- <6b18e0bc-efa7-4bd5-b12b-a313941d2ba1@acm.org> <aYoaWwI-sl5hK6s_@kbusch-mbp>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ lsf-pc@lists.linux-foundation.org, Jaegeuk Kim <jaegeuk@kernel.org>
+References: <0cfe6fe2-3865-4dc2-92a7-74b1240f7b63@acm.org>
+ <aYPdHYvuLeIevwUJ@kbusch-mbp>
 Content-Language: en-US
 From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <aYoaWwI-sl5hK6s_@kbusch-mbp>
+In-Reply-To: <aYPdHYvuLeIevwUJ@kbusch-mbp>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 2/9/26 9:33 AM, Keith Busch wrote:
-> I had to look up the original commit that introduced the WARN,
-> 65d466b629847. The commit message says "Creating new debugfs entries can
-> trigger fs reclaim", so that must be the path that enters back into the
-> block layer request_queue.
+On 2/4/26 3:58 PM, Keith Busch wrote:
+> On Fri, Jan 23, 2026 at 02:19:44PM -0800, Bart Van Assche wrote:
+>> Adoption of zoned storage is increasing in mobile devices. Log-
+>> structured filesystems are better suited for zoned storage than
+>> traditional filesystems. These filesystems perform garbage collection.
+>> Garbage collection involves copying data on the storage medium.
+>> Offloading the copying operation to the storage device reduces energy
+>> consumption. Hence the proposal to discuss integration of copy
+>> offloading in the Linux kernel block, SCSI and NVMe layers.
+>>
+>> Other use-cases for copy offloading include reducing network traffic in
+>> NVMeOF setups while copying data and also increasing throughput while
+>> copying data.
+> 
+> I'm interested in the topic. I'm just not sure about the approach. If it
+> doesn't support vectored sector sources, then it's much less
+> interesting. From the host point of view, I'd like to be able to submit
+> arbitrarily large bio's to the block layer that can be split and merged
+> for optimal alignment to hardware limits. The two-bio approach looks
+> overly complicated with respect to that.
 
-Thanks Keith. It's probably a good idea to integrate this information in
-the source code comment above the blk_queue_enter() call.
+Hi Keith,
+
+How about supporting vectored sources with this approach:
+* Copy requests with multiple discontiguous input or output ranges
+   are submitted as multiple bios - one bio for each contiguous range.
+* Before these multiple bios are submitted, blk_start_plug() is called.
+   After these have been submitted blk_finish_plug() is called.
+* After device mapper LBA translation has completed for all involved
+   bios, if all involved bios apply to the same input and output
+   block devices, and if sufficient requests are available, the block
+   layer submits all the translated requests at once to the block driver
+   by calling a new callback pointer that is added in struct blk_mq_ops.
+* The block driver is responsible for combining the discontiguous
+   requests into a single copy offload command (if permitted by the
+   device limits).
+
+Thanks,
 
 Bart.
+
+
