@@ -1,19 +1,19 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34332238C1A;
-	Mon,  9 Feb 2026 08:30:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30D0325B662;
+	Mon,  9 Feb 2026 08:30:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770625803; cv=none; b=nU+8LfsJKcVQghttTBSRp1tyTDH2+rf9xzUlRFCPnvV4+Q0+RDn/6L8WZ3LGZ1jVuNP6ag8Kw7m2bxaByXoSS3t/r+59Tglp1hEQHCsECswu+Jg9/7FeX+voTxOQTgXcQZRsZUdNWVzUAGD052cEGyYLnrirSX4AeWpP7/eK5zg=
+	t=1770625807; cv=none; b=NWASyd1u21byOnJ9jVBsIuhnuXi9zSE02AIXoi+WgO+46LO2Z97/YTX4+6stwT1fCBBVzz1n6LPnZT6qqvtykB5tY0LTGeDohjE3HKcY7UjDlzXFlZ7/ZNebxAIhiJPaKVH0i5al61c/EsxsPqDNoii7YsJJkw2hpFYhJzmh/TQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770625803; c=relaxed/simple;
-	bh=CxBXDMyA5Bm+xGWcn3ygc6KizgdQHOJfUe+4270eDxM=;
+	s=arc-20240116; t=1770625807; c=relaxed/simple;
+	bh=Z8XY86SbilQF3jFqmqDdH6b7NvL72k5A+I8GMGnjMMs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=txJ2V0tWw5soLr3XrolIbYYWBTx+NGrnSKlI9S9VLzLqWgR6CMlpdJBpPbcV87Q07YX5tnLUe4ikfh2Q95ppdeYJY+S8JyjE2sucp06yWHaCgO/EeSZbMt6j9h6kyP5Ifbo8UnAK0rrJryaAsaanYtDMXGamvWxlMjkJEiY6zno=
+	 MIME-Version; b=CLkuODp/v4+7CUfE7QjJA8aEkBK5WiyyCtyV0ih1KklPg3Z6nxvfaXX9a/34dvGqXcwDmYzYL5w7jW1EomhWSAgbT1/njQ+XCTRIuDeWS9gjsgAM8ZAXv+mFE2KqR5LnTa578bBOIPn+UpxdOso10PgzmruRjo4HUh21suEF2hM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65620C19422;
-	Mon,  9 Feb 2026 08:29:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60B28C19422;
+	Mon,  9 Feb 2026 08:30:03 +0000 (UTC)
 From: Yu Kuai <yukuai@fnnas.com>
 To: axboe@kernel.dk,
 	kbusch@kernel.org,
@@ -30,9 +30,9 @@ Cc: tj@kernel.org,
 	asahi@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
 	yukuai@fnnas.com
-Subject: [PATCH 1/4] nvme-rdma: move blk_mq_update_nr_hw_queues after nvme_unfreeze
-Date: Mon,  9 Feb 2026 16:29:50 +0800
-Message-ID: <20260209082953.3053721-2-yukuai@fnnas.com>
+Subject: [PATCH 2/4] nvme-tcp: move blk_mq_update_nr_hw_queues after nvme_unfreeze
+Date: Mon,  9 Feb 2026 16:29:51 +0800
+Message-ID: <20260209082953.3053721-3-yukuai@fnnas.com>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260209082953.3053721-1-yukuai@fnnas.com>
 References: <20260209082953.3053721-1-yukuai@fnnas.com>
@@ -56,23 +56,25 @@ Fix this by moving nvme_unfreeze() before blk_mq_update_nr_hw_queues()
 so the queue is unfrozen before the call, allowing the internal
 freeze/unfreeze to work correctly.
 
+Reported-by: Yi Zhang <yi.zhang@redhat.com>
+Closes: https://lore.kernel.org/all/CAHj4cs9gNKEYAPagD9JADfO5UH+OiCr4P7OO2wjpfOYeM-RV=A@mail.gmail.com/
 Signed-off-by: Yu Kuai <yukuai@fnnas.com>
 ---
- drivers/nvme/host/rdma.c | 2 +-
+ drivers/nvme/host/tcp.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index 35c0822edb2d..b0253d90ac86 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -898,9 +898,9 @@ static int nvme_rdma_configure_io_queues(struct nvme_rdma_ctrl *ctrl, bool new)
- 			nvme_unfreeze(&ctrl->ctrl);
+diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
+index 69cb04406b47..daa02afbc9f5 100644
+--- a/drivers/nvme/host/tcp.c
++++ b/drivers/nvme/host/tcp.c
+@@ -2203,9 +2203,9 @@ static int nvme_tcp_configure_io_queues(struct nvme_ctrl *ctrl, bool new)
+ 			nvme_unfreeze(ctrl);
  			goto out_wait_freeze_timed_out;
  		}
-+		nvme_unfreeze(&ctrl->ctrl);
- 		blk_mq_update_nr_hw_queues(ctrl->ctrl.tagset,
- 			ctrl->ctrl.queue_count - 1);
--		nvme_unfreeze(&ctrl->ctrl);
++		nvme_unfreeze(ctrl);
+ 		blk_mq_update_nr_hw_queues(ctrl->tagset,
+ 			ctrl->queue_count - 1);
+-		nvme_unfreeze(ctrl);
  	}
  
  	/*
