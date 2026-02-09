@@ -1,66 +1,66 @@
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9AAE364032
-	for <linux-block@vger.kernel.org>; Mon,  9 Feb 2026 10:59:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAB3436E49B
+	for <linux-block@vger.kernel.org>; Mon,  9 Feb 2026 11:15:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770634796; cv=none; b=ga+tFy//8q8t909P3ucS6sokPU3XY0qrJHmA70CFSR1zaIecVDWaov8PRga72EHbCLioO7uofAI9+eE6nbvqUMg7mxHJ21Vouq9G/3wHJqsvXz5GKGzBo2spTV0HeqQ4tz+6XnqULRU8pz80paQEme5oshEprxn4BBiF8SfaBfs=
+	t=1770635725; cv=none; b=e33EtQuEOnkVhyeisbfq+uwca5ZHlxZodbCqZDaKaSh5IHO/el30etQU3vqfAYR8L88xFDgVZi+tQ/284Y2AMknEzY6fOFtQ+cW6LItpZ24tlAFMKXNuBT6XbV1MrzbtKoW0ybixhmq/DdcGze/elx2AxXGGVlMjbQRFCct1LcI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770634796; c=relaxed/simple;
-	bh=v0s80yQdoPcSpPQhHvKUreuJ98yEUo/WgcNVMu0aSBg=;
+	s=arc-20240116; t=1770635725; c=relaxed/simple;
+	bh=eFyLq2eShSuSoRftAfNzIMk7e5J3AUWEPeBcMfu5m68=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UlzCAnU+At01FmxOS9VO/JZ11ViKfWdljGhu5NQY1H2Je7ncuyeaFCBMpdCPqrv1CZJdvFrD3w3zqjqgHs8N/mDP7fn/9oN6uMpMiaZclgMorhkrDbAbNGskdKvEeh/dYdaEX700mzTa/IMJQ69vUvpYzYQWWpKirPBXUedKyFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E5NWzgFE; arc=none smtp.client-ip=209.85.128.43
+	 In-Reply-To:Content-Type; b=Sn/r6AU9IDc2TnfSSgky19txJkGR7282jSKst5mJbCpFSP3/USPPMrQw3r5uRpUbbAlLx0a/RqhgEfPhArodCU441eefniD1KtPcF5TKHyOdENIYuE2yfLsZq44Ouv4dvXXxq1SDOaYcgvVuyqYrUZVcQYtyXVuEq72z/nyROFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LW7YteST; arc=none smtp.client-ip=209.85.221.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E5NWzgFE"
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4806e0f6b69so32591375e9.3
-        for <linux-block@vger.kernel.org>; Mon, 09 Feb 2026 02:59:55 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LW7YteST"
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-435a11957f6so3340311f8f.0
+        for <linux-block@vger.kernel.org>; Mon, 09 Feb 2026 03:15:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770634794; x=1771239594; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1770635723; x=1771240523; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=G688QNZNzseecNO9s2R/4hOww/aUhIqv4CaNYmpeoYQ=;
-        b=E5NWzgFEYVlkwKYbEEaVWvPUMr3yCQkBYW9Zw2+N1+KglrJasumluLmQHHrFRyyurY
-         eKoke8bWt0hBcbm6leyfW+S76klDSpNxmMfBwgGDD/Q6ZmPl0Q7TC6jEujaQrP8tJUHW
-         p7XLBlt4qMSUYlCFB/sMqChFVbyvxwDlxrajc3JTWS0KpbjbJrsIbQt3RU6w+N7G1ZFl
-         W5Yx3v7CKbyL8W+mfSINVc/tPIZoVC1q39kOvYcgL5pOYqHiPBxNydoAqRbcBawypt20
-         S36x/rWJ2Ji9asbPUOTydsVGm2Ac1t/+yRXjJYkX5VPvYAsmFs7vTszyP0qLjcuLYiQf
-         krJw==
+        bh=3wbG3Hwlnnt7XslslOQ5Ajzf6jd6ChHMQtwpqlWp/yk=;
+        b=LW7YteSTTFZNudE7wYSq4uzKRotya6t+c/tpDKe0aQubmcjnbywKTV4ZD6djoh5Awl
+         +SDAinaG2Iuz4DJ6Ti6gJ9ahiLrQRG8o9beCRW+gM9MGuOBgqiRdAWzfRpiGUZWjqv/R
+         Ep/aeauG4Ax784yVdeh0Xel1S6PlwumZtaJSg7dugdtPl5Sv8jvMC9x7FJJI0ie4xtaY
+         XpEM+n6N8ShL7PWD+z9YjGDjhya6P/SfF4rspdbi8U74I/Fm/cAd9fiuiQTlR7VRAt6F
+         evyzvU92lGCuyG1O6/fqh86AriJYe+oeZvHl1RXfS8ZhGUmF6lbN/1yCaI2ces8rtFFE
+         JFSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770634794; x=1771239594;
+        d=1e100.net; s=20230601; t=1770635723; x=1771240523;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=G688QNZNzseecNO9s2R/4hOww/aUhIqv4CaNYmpeoYQ=;
-        b=qtrnzKo68wUlUg8b3pWE3ZojgIsubX+p6+DQXF5YABXYBe6CgrnTIcqVwCsA21JEIc
-         rdvUkM0zVKR2l9HgE+g2SQxG25HYCSXvnZ/bGCZlZJbsr6W27KlTf1qM2/ikCbjkg9Uc
-         m7oClBgyS2Gc6/SNmYy9EAhglfSKIELVk0smaOGUvxHhSr+bcbcpPVklLib9yD9Ulr0b
-         FKnMOwF5au5rqy858AXf49o0ACwPGuCTA5ffhcrRblAIZqifSnOWybCrtSSTcGqPtxnq
-         h+8K2y6uBQFhlSC7F1mibaxqTpSg7CR1m++MR3kUvQcjpTJqtR4BkraR9UlwSQhOmEc6
-         TU8A==
-X-Gm-Message-State: AOJu0Yzd9jb01W35r1e5WwX1AXhMWL4Xlk9uDdTMvzFejU+VEKG3kq0p
-	PfBbfWalM1HkDrZYeP1QyQUUiFoFL6IzD+/sFu77vhevlDdo/raVAJd7eetlwQ==
-X-Gm-Gg: AZuq6aIu+nRGf/J81DEbkF90o7l3A0W2LUh6onJtGNyEX6u4uSXqjn82PYkAJnCiwzb
-	l2LBFew/eBofHlUvzr5PWnYbVKMjdR0kdev9L8niVedIbGYkeoP/8524Qy7Di7VBRlxTrR64RoV
-	6y2M+apEqlqG7GNqCsT243r8awxs5BhaYJH5MokzNiTG2BCuDRGciq1Tey/KkQoA2nNZToZGRuu
-	57SZcd/W5HjTppmM19+SxXiXwRIKf+WkRYS+LozgMOFuBj5QkkdIHHs5G/eudSJr8X9WgALl0Vd
-	+u0/cAS0pjgHFUThVVhnP/GT2hjqtpNtUufsM8CTkcTAE8i/RDJZkMRCh0D0oQD80X8x08Kou95
-	+Wiz/q3ZvwHZNUn4N5C8nrpCdghNVJP9jwid1NLd5ehFlYOlGcvQhu9VpDOIw+hgRKEBRcNiwo/
-	4bmgzsUzjU/MINFnzzT8bmAEDX95nk2yxhvVleR5E1ruLewC/jCrjO6xudrIa9JAH0YWeAgEEJ1
-	XT1o8zZ54eqKWsvd6+f0iwJE1MlwljcuBGnkoFLrfOITNI=
-X-Received: by 2002:a05:600c:a08:b0:480:4d37:e742 with SMTP id 5b1f17b1804b1-483201dd276mr144307045e9.10.1770634793982;
-        Mon, 09 Feb 2026 02:59:53 -0800 (PST)
+        bh=3wbG3Hwlnnt7XslslOQ5Ajzf6jd6ChHMQtwpqlWp/yk=;
+        b=ImkjwAlaLm3hRkPEhMaz58RwwqS2ZDrQ1kvgGHkIeYJH5l5iEfd/2PT/+X/ZkfOBvV
+         K/YuRm5xfCQBxyuJPfn6HbS+45upoQgtiH9n9suuU2Ky0xJ9MX/EL2vds98n3wB8pckw
+         eGRtG3kMTmY3J3x2L85VsZKtvaYVvdqzbg+/jH5x1OzaEIkgpFE5wTUuVKhaoIMjz0X7
+         zX+j9eME0tt8k7ueUH4S3pTWjctzteaAiYbs94DLOwcHD3vaw1KevYAGboGVth4CHfvL
+         CUCSSxYaZB0iliSM8v8v2/MaPtYYKr4IiJ50j9s+90ic8FcOX07YbqTLrlkldB6z/Uqo
+         uPlQ==
+X-Gm-Message-State: AOJu0Yx10uTC1AN+QExRB43UVTxJtzAhKG3ZQDW/+UTNeryS5n4wBNRe
+	0/0V/JS2ZixdIVyt4+WRAyVHtnlhN7iT35WckaDGYrDH/tRbB991pJKg
+X-Gm-Gg: AZuq6aL5HBbXrG2U3FqXgWuAU5DvM5CpqYWUo5JfaMvgn1eefL9FdpyQJXj+PqklYhn
+	f5YAjrC63HvO3R1RrF72LNsABE0esEd2d7L4X54szHOGke/HjiIyGyeIQkfZOi5ShSlHMOJ3kpp
+	JWFAuSws7IoeVxkp/RI4t71Qt32zKcwanpXVlhpBmTh6M5iafvqh8uENY7WRrpV1lWtDbBSHjyu
+	9ivGOEaX+stUNxA46Qr/jy1NT2cT2L/SdBsP/OwQ7JPdzegn4+cmv+aeYL7MDEhJMEAXsNuK2cE
+	A0+m1MLZJg6I+Kl6IP+Flu0WKIoZtHEtQnGZPgy/0dLKFQb/d/05vHZ8KM5rpVMl6HjQyPqtca+
+	J3cm37Uk4T8cXeIuShaTUw2ErG1kJ5GyWCsDxClgAbmr82JxIM4+FpucV3MMrh1lnu9t8pSzH9U
+	9w4hg235vkp6mkH9xGNXZp2ZdnoGiS7rCSinAqTjU1Qg++uRjaz8l+VImJWT6RmWid9EUvLH20E
+	JIYaWDoPZNFLI/vr6IG23gjR6hzf9+M7x31s749M0z0XXo=
+X-Received: by 2002:a05:6000:2209:b0:435:9241:37b4 with SMTP id ffacd0b85a97d-4362938ffe3mr19185555f8f.53.1770635723028;
+        Mon, 09 Feb 2026 03:15:23 -0800 (PST)
 Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:9b67])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48333bad79bsm196879525e9.8.2026.02.09.02.59.52
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4376806626fsm12638100f8f.37.2026.02.09.03.15.22
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Feb 2026 02:59:53 -0800 (PST)
-Message-ID: <4736af5c-4bf8-4e9b-8f82-4b89a75d2cdb@gmail.com>
-Date: Mon, 9 Feb 2026 10:59:53 +0000
+        Mon, 09 Feb 2026 03:15:22 -0800 (PST)
+Message-ID: <76299bc2-4871-4571-bef6-9886ee0d2c5f@gmail.com>
+Date: Mon, 9 Feb 2026 11:15:22 +0000
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -69,137 +69,66 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [LSF/MM/BPF TOPIC] dmabuf backed read/write
-To: Jason Gunthorpe <jgg@nvidia.com>
+To: Nitesh Shetty <nj.shetty@samsung.com>
 Cc: linux-block@vger.kernel.org, io-uring <io-uring@vger.kernel.org>,
  "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "Gohad, Tushar" <tushar.gohad@intel.com>,
  =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
  Christoph Hellwig <hch@lst.de>, Kanchan Joshi <joshi.k@samsung.com>,
- Anuj Gupta <anuj20.g@samsung.com>, Nitesh Shetty <nj.shetty@samsung.com>,
+ Anuj Gupta <anuj20.g@samsung.com>,
  "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>
 References: <4796d2f7-5300-4884-bd2e-3fcc7fdd7cea@gmail.com>
- <20260205174135.GA444713@nvidia.com>
- <dbcc2912-e1df-491d-b1e0-7812279297de@gmail.com>
- <20260205235647.GA4177530@nvidia.com>
- <3281a845-a1b8-468c-a528-b9f6003cddea@gmail.com>
- <20260206152041.GA1874040@nvidia.com>
- <df7fe4d7-ca28-408e-bed3-bd1fa23e7588@gmail.com>
- <20260206183756.GB1874040@nvidia.com>
+ <CGME20260204153051epcas5p1c2efd01ef32883680fed2541f9fca6c2@epcas5p1.samsung.com>
+ <20260204152634.gyybb2axszwpewrk@green245.gost>
 Content-Language: en-US
 From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20260206183756.GB1874040@nvidia.com>
+In-Reply-To: <20260204152634.gyybb2axszwpewrk@green245.gost>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 2/6/26 18:37, Jason Gunthorpe wrote:
-> On Fri, Feb 06, 2026 at 05:57:14PM +0000, Pavel Begunkov wrote:
->> On 2/6/26 15:20, Jason Gunthorpe wrote:
->>> On Fri, Feb 06, 2026 at 03:08:25PM +0000, Pavel Begunkov wrote:
->>>> On 2/5/26 23:56, Jason Gunthorpe wrote:
->>>>> On Thu, Feb 05, 2026 at 07:06:03PM +0000, Pavel Begunkov wrote:
->>>>>> On 2/5/26 17:41, Jason Gunthorpe wrote:
->>>>>>> On Tue, Feb 03, 2026 at 02:29:55PM +0000, Pavel Begunkov wrote:
->>>>>>>
->>>>>>>> The proposal consists of two parts. The first is a small in-kernel
->>>>>>>> framework that allows a dma-buf to be registered against a given file
->>>>>>>> and returns an object representing a DMA mapping.
->>>>>>>
->>>>>>> What is this about and why would you need something like this?
->>>>>>>
->>>>>>> The rest makes more sense - pass a DMABUF (or even memfd) to iouring
->>>>>>> and pre-setup the DMA mapping to get dma_addr_t, then directly use
->>>>>>> dma_addr_t through the entire block stack right into the eventual
->>>>>>> driver.
->>>>>>
->>>>>> That's more or less what I tried to do in v1, but 1) people didn't like
->>>>>> the idea of passing raw dma addresses directly, and having it wrapped
->>>>>> into a black box gives more flexibility like potentially supporting
->>>>>> multi-device filesystems.
->>>>>
->>>>> Ok.. but what does that have to do with a user space visible file?
->>>>
->>>> If you're referring to registration taking a file, it's used to forward
->>>> this registration to the right driver, which knows about devices and can
->>>> create dma-buf attachment[s]. The abstraction users get is not just a
->>>> buffer but rather a buffer registered for a "subsystem" represented by
->>>> the passed file. With nvme raw bdev as the only importer in the patch set,
->>>> it's simply converges to "registered for the file", but the notion will
->>>> need to be expanded later, e.g. to accommodate filesystems.
->>>
->>> Sounds completely goofy to me.
+On 2/4/26 15:26, Nitesh Shetty wrote:
+> On 03/02/26 02:29PM, Pavel Begunkov wrote:
+>> Good day everyone,
 >>
->> Hmm... the discussion is not going to be productive, isn't it?
+>> dma-buf is a powerful abstraction for managing buffers and DMA mappings,
+>> and there is growing interest in extending it to the read/write path to
+>> enable device-to-device transfers without bouncing data through system
+>> memory. I was encouraged to submit it to LSF/MM/BPF as that might be
+>> useful to mull over details and what capabilities and features people
+>> may need.
+>>
+>> The proposal consists of two parts. The first is a small in-kernel
+>> framework that allows a dma-buf to be registered against a given file
+>> and returns an object representing a DMA mapping. The actual mapping
+>> creation is delegated to the target subsystem (e.g. NVMe). This
+>> abstraction centralises request accounting, mapping management, dynamic
+>> recreation, etc. The resulting mapping object is passed through the I/O
+>> stack via a new iov_iter type.
+>>
+>> As for the user API, a dma-buf is installed as an io_uring registered
+>> buffer for a specific file. Once registered, the buffer can be used by
+>> read / write io_uring requests as normal. io_uring will enforce that the
+>> buffer is only used with "compatible files", which is for now restricted
+>> to the target registration file, but will be expanded in the future.
+>> Notably, io_uring is a consumer of the framework rather than a
+>> dependency, and the infrastructure can be reused.
+>>
+> We have been following the series, its interesting from couple of angles,
+> - IOPS wise we see a major improvement especially for IOMMU
+> - Series provides a way to do p2pdma to accelerator memory
 > 
-> Well, this FD thing is very confounding and, sorry I don't see much
-> logic to this design. I understand the problems you are explaining but
-> not this solution.
+> Here are few topics which I am looking into specifically,
+> - Right now the series uses a PRP list. We need a good way to keep the
+>    sg_table info around and decide on‑the‑fly whether to expose the buffer
+>    as a PRP list or an SG list, depending on the I/O size.
+> - Possibility of futher optimization for new type of iov iter to reduce
+>    per IO cost
 
-We won't agree on this one. If an abstraction linking two entities
-makes sense and is useful, it should be fine to have that. It's
-functionally the same as well, just register the buffer multiple times.
-In fact, I could get rid of the fd argument, and keep and dynamically
-update a map in io_uring for all files / subsystems the registration
-can be used with, but all such generality has additional cost while
-not bringing anything new to the table.
-
->> Or would it be mapping it for each IO?
-> 
-> mapping for each IO could be possible with a phys_addr_t path.
-> 
->> dma-buf already exists as well, and I'm ashamed to admit,
->> but I don't know how a user program can read into / write from
->> memory provided by dma-buf.
-> 
-> You can mmap them. It can even be used with read() write() system
-> calls if the dma buf exporter is using P2P pages.
-> 
->> I'm not doing it for any particular driver but rather trying
->> to reuse what's already there, i.e. a good coverage of existing
->> dma-buf exporters, and infrastructure dma-buf provides, e.g.
->> move_notify. And trying to do that efficiently, avoiding GUP
->> (what io_uring can already do for normal memory), keeping long
->> term mappings (modulo move_notify), and so. That includes
->> optimising the cost of system memory rw with iommu.
-> 
-> I would suggest leading with these reasons to frame why you are trying
-> to do this. It seems the main motivation is to create a pre
-> registered, and pre-IOMMU-mapped io uring pool of MMIO memory, and
-> indeed you cannot do that with the existing mechanisms at all.
-
-My bad, I didn't try to go into "why" well enough. I want to be
-able to use dma-buf as a first class citizen in the path, i.e.
-keeping a clear notion of a buffer for the user and being able to
-interact with any existing exporter, all that while maximising
-performance, which definitely includes pre-mapping memory.
-
-> As a step forward I could imagine having a DMABUF handing out P2P
-> pages and allowing io uring to "register" it complete with move
-
-Forcing dma-buf to have pages is a big step back, IMHO
-
-> notify. This would get you half the way there and doesn't require
-> major changes to the block stack since you can still be pushing
-> unmapped struct page backed addresses and everything will work
-> fine. It is a good way to sidestep the FOLL_LONGTERM issue.
-> 
-> Pre-iommu-mapping the pool seems like an orthogonal project as it
-> applies to everything coming from pre-registered io uring buffers,
-> even normal cpu memory. You could have a next step of pre-mapping the
-> P2P pages and CPU pages equally.
-
-It was already tried for normal user memory (not by me), but
-the verdict was that it should be dma-buf based.
-
-> Finally you could try a project to remove the P2P page requirement for
-> cases that use the pre-iommu-mapping flow.
-> 
-> It would probably be helpful not to mixup those three things..
-
-I agree that pre-mapping and p2p can in theory can be decoupled here,
-but in practice dma-buf already provides right abstractions and
-infrastructure to cover both in one go. I really don't think it's a
-good idea to re-engineer parts of dma-buf that are responsible for
-interaction with the importer device.
+There is a bunch of improvements that we can have on the NVMe driver
+side, just take a look what Keith was doing in his series ([2] in the
+first email in the thread), that looked very exciting (I dropped it for
+simplicity). I was planning to take a closer look at optimising the driver
+part after, but if someone wants to take it off my hands, it'll definitely
+be welcome!
 
 -- 
 Pavel Begunkov
