@@ -1,66 +1,60 @@
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAB3436E49B
-	for <linux-block@vger.kernel.org>; Mon,  9 Feb 2026 11:15:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D13AE2E542A
+	for <linux-block@vger.kernel.org>; Mon,  9 Feb 2026 12:02:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770635725; cv=none; b=e33EtQuEOnkVhyeisbfq+uwca5ZHlxZodbCqZDaKaSh5IHO/el30etQU3vqfAYR8L88xFDgVZi+tQ/284Y2AMknEzY6fOFtQ+cW6LItpZ24tlAFMKXNuBT6XbV1MrzbtKoW0ybixhmq/DdcGze/elx2AxXGGVlMjbQRFCct1LcI=
+	t=1770638537; cv=none; b=LdoZqiVJ1nxYl9WgoYW9aer8tzyECXCWYP22Ek9Vonabo1B5mbu5p3YaPd+onYqKOHfM4oW4ujPt7A+xadQ3YjW9bJiSSLLS1Svwl+bSCGs0WbW0coiaAS/5YIWuMVEkutyJWtbEfENNsFjfz4pX/tGmUZ01O8fBmAPqGueVqO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770635725; c=relaxed/simple;
-	bh=eFyLq2eShSuSoRftAfNzIMk7e5J3AUWEPeBcMfu5m68=;
+	s=arc-20240116; t=1770638537; c=relaxed/simple;
+	bh=7C07J6jSmYGWYG+7USL+sSOBiH2cX4O0C5tQmk+MUPk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Sn/r6AU9IDc2TnfSSgky19txJkGR7282jSKst5mJbCpFSP3/USPPMrQw3r5uRpUbbAlLx0a/RqhgEfPhArodCU441eefniD1KtPcF5TKHyOdENIYuE2yfLsZq44Ouv4dvXXxq1SDOaYcgvVuyqYrUZVcQYtyXVuEq72z/nyROFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LW7YteST; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 In-Reply-To:Content-Type; b=ijoKEZjT7SZ2R/IqznVwZoTTHpGlpY8N7FJrrj0luml2pRqeLzhf70RpD0p7bzGn4YFevlMpM2y2CjUTWauIX0+tdu5sTTZe0dYAoB7E/qebB9rAmxX2f87F/DGtEo8vUoXmKzpxLcNuDFjDPRQpOEATEysEaH5zC6AyKQ3K7mE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Px584EiF; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LW7YteST"
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-435a11957f6so3340311f8f.0
-        for <linux-block@vger.kernel.org>; Mon, 09 Feb 2026 03:15:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770635723; x=1771240523; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3wbG3Hwlnnt7XslslOQ5Ajzf6jd6ChHMQtwpqlWp/yk=;
-        b=LW7YteSTTFZNudE7wYSq4uzKRotya6t+c/tpDKe0aQubmcjnbywKTV4ZD6djoh5Awl
-         +SDAinaG2Iuz4DJ6Ti6gJ9ahiLrQRG8o9beCRW+gM9MGuOBgqiRdAWzfRpiGUZWjqv/R
-         Ep/aeauG4Ax784yVdeh0Xel1S6PlwumZtaJSg7dugdtPl5Sv8jvMC9x7FJJI0ie4xtaY
-         XpEM+n6N8ShL7PWD+z9YjGDjhya6P/SfF4rspdbi8U74I/Fm/cAd9fiuiQTlR7VRAt6F
-         evyzvU92lGCuyG1O6/fqh86AriJYe+oeZvHl1RXfS8ZhGUmF6lbN/1yCaI2ces8rtFFE
-         JFSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770635723; x=1771240523;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3wbG3Hwlnnt7XslslOQ5Ajzf6jd6ChHMQtwpqlWp/yk=;
-        b=ImkjwAlaLm3hRkPEhMaz58RwwqS2ZDrQ1kvgGHkIeYJH5l5iEfd/2PT/+X/ZkfOBvV
-         K/YuRm5xfCQBxyuJPfn6HbS+45upoQgtiH9n9suuU2Ky0xJ9MX/EL2vds98n3wB8pckw
-         eGRtG3kMTmY3J3x2L85VsZKtvaYVvdqzbg+/jH5x1OzaEIkgpFE5wTUuVKhaoIMjz0X7
-         zX+j9eME0tt8k7ueUH4S3pTWjctzteaAiYbs94DLOwcHD3vaw1KevYAGboGVth4CHfvL
-         CUCSSxYaZB0iliSM8v8v2/MaPtYYKr4IiJ50j9s+90ic8FcOX07YbqTLrlkldB6z/Uqo
-         uPlQ==
-X-Gm-Message-State: AOJu0Yx10uTC1AN+QExRB43UVTxJtzAhKG3ZQDW/+UTNeryS5n4wBNRe
-	0/0V/JS2ZixdIVyt4+WRAyVHtnlhN7iT35WckaDGYrDH/tRbB991pJKg
-X-Gm-Gg: AZuq6aL5HBbXrG2U3FqXgWuAU5DvM5CpqYWUo5JfaMvgn1eefL9FdpyQJXj+PqklYhn
-	f5YAjrC63HvO3R1RrF72LNsABE0esEd2d7L4X54szHOGke/HjiIyGyeIQkfZOi5ShSlHMOJ3kpp
-	JWFAuSws7IoeVxkp/RI4t71Qt32zKcwanpXVlhpBmTh6M5iafvqh8uENY7WRrpV1lWtDbBSHjyu
-	9ivGOEaX+stUNxA46Qr/jy1NT2cT2L/SdBsP/OwQ7JPdzegn4+cmv+aeYL7MDEhJMEAXsNuK2cE
-	A0+m1MLZJg6I+Kl6IP+Flu0WKIoZtHEtQnGZPgy/0dLKFQb/d/05vHZ8KM5rpVMl6HjQyPqtca+
-	J3cm37Uk4T8cXeIuShaTUw2ErG1kJ5GyWCsDxClgAbmr82JxIM4+FpucV3MMrh1lnu9t8pSzH9U
-	9w4hg235vkp6mkH9xGNXZp2ZdnoGiS7rCSinAqTjU1Qg++uRjaz8l+VImJWT6RmWid9EUvLH20E
-	JIYaWDoPZNFLI/vr6IG23gjR6hzf9+M7x31s749M0z0XXo=
-X-Received: by 2002:a05:6000:2209:b0:435:9241:37b4 with SMTP id ffacd0b85a97d-4362938ffe3mr19185555f8f.53.1770635723028;
-        Mon, 09 Feb 2026 03:15:23 -0800 (PST)
-Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:9b67])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4376806626fsm12638100f8f.37.2026.02.09.03.15.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Feb 2026 03:15:22 -0800 (PST)
-Message-ID: <76299bc2-4871-4571-bef6-9886ee0d2c5f@gmail.com>
-Date: Mon, 9 Feb 2026 11:15:22 +0000
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Px584EiF"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6190Rsk9608141;
+	Mon, 9 Feb 2026 12:02:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=PHfXuG
+	Xdkin7WaQJ/hXTDVhFvLZMkLitpMTNwa9cb4c=; b=Px584EiFw/8UrpQHYgzGm1
+	2kpjbGjJIxbtwoa5cIREhKR9tYpsizXl/v2V+5Msi/bAw+ryc2rfCM8Dre6LGI3L
+	tp/yadTJrzhy+fARBXoy20Jgmh23Xu5OZbMijhZDCBReWntXcI/01rALGfY72/ZT
+	89zo3GYz8mTNeoOfgja0PbUXTdJwb0NlJglSp8kWVYDeNiUIchIZ1dboHWWAYek5
+	3Pg8shhqBjB4091m9hCA6fKx2g2NnbL6Wgb/hBAIKUmsaGkCC4d0mg8ynBfUVbcJ
+	ZN4M422oDkjXiXalo9hCnh0y6xa95CZMGm0fhzRxRKCJ9gqnQh/vd3n4PavD8lgQ
+	==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4c696uwkew-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 09 Feb 2026 12:02:13 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 6199erkR019246;
+	Mon, 9 Feb 2026 12:02:12 GMT
+Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4c6hxjvsuk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 09 Feb 2026 12:02:12 +0000
+Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
+	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 619C2Bbg24707734
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 9 Feb 2026 12:02:11 GMT
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 70E605803F;
+	Mon,  9 Feb 2026 12:02:11 +0000 (GMT)
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C32085804E;
+	Mon,  9 Feb 2026 12:02:08 +0000 (GMT)
+Received: from [9.111.86.70] (unknown [9.111.86.70])
+	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  9 Feb 2026 12:02:08 +0000 (GMT)
+Message-ID: <42e27ffb-6b30-4737-9c80-76e3b9ccd4b7@linux.ibm.com>
+Date: Mon, 9 Feb 2026 17:32:06 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -68,68 +62,75 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [LSF/MM/BPF TOPIC] dmabuf backed read/write
-To: Nitesh Shetty <nj.shetty@samsung.com>
-Cc: linux-block@vger.kernel.org, io-uring <io-uring@vger.kernel.org>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Christoph Hellwig <hch@lst.de>, Kanchan Joshi <joshi.k@samsung.com>,
- Anuj Gupta <anuj20.g@samsung.com>,
- "lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>
-References: <4796d2f7-5300-4884-bd2e-3fcc7fdd7cea@gmail.com>
- <CGME20260204153051epcas5p1c2efd01ef32883680fed2541f9fca6c2@epcas5p1.samsung.com>
- <20260204152634.gyybb2axszwpewrk@green245.gost>
+Subject: Re: [bug report] WARNING: possible circular locking dependency
+ detected at pcpu_alloc_noprof+0x8a3/0xd90 and
+ __blk_mq_update_nr_hw_queues+0x76c/0xca0
+To: Yi Zhang <yi.zhang@redhat.com>
+Cc: linux-block <linux-block@vger.kernel.org>,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+References: <CAHj4cs8F=OV9s3La2kEQ34YndgfZP-B5PHS4Z8_b9euKG6J4mw@mail.gmail.com>
+ <95f56935-9df0-4012-9d82-8f10b021c9f5@linux.ibm.com>
+ <CAHj4cs_iETU_7VnfYkA8RF41PHgXsEqw82oCH9_pJp_usZDRYg@mail.gmail.com>
 Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20260204152634.gyybb2axszwpewrk@green245.gost>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <CAHj4cs_iETU_7VnfYkA8RF41PHgXsEqw82oCH9_pJp_usZDRYg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: d9ldzLltHrfG6tLecbvcqlwhUaG5JqJ_
+X-Proofpoint-ORIG-GUID: d9ldzLltHrfG6tLecbvcqlwhUaG5JqJ_
+X-Authority-Analysis: v=2.4 cv=JdWxbEKV c=1 sm=1 tr=0 ts=6989ccc5 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=ZbyQEeeQdriBWLpqdCEA:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjA5MDA5OSBTYWx0ZWRfX5YI9VD12uvXp
+ l9Ht+uSIh24CH1yLxQAuXDrHATFssThX+wXWcpkccNQIiywZ/Wd2yHnGJ64f0Glum/BHAX7OH90
+ SIfh8JchndgrIOwUjaHYB18ozCtvTokEFo1DVrMCizUYM+1H5eJUY09XQAizmnRZcghAOTPgSBo
+ zKv0/gb6j8sO0/Um9MDTPGk3aJEQuCcOFYAy1moo8Izc5yANtyYHroQW8XxPfA5BNwaoD/BqVm+
+ 5pt+KzqdJNCj7kH2OtImRlYTW0ZSBNNGEMWslIB5u4lvWpqL3w/5CuXWOB9i0XTeCNhH5/palxZ
+ 7ORAqqDBlX31svj8U83zA1Gf9T3Wwq4lxSYMgA3AeFtz3EiTR5CoQ0nwm8mJ3IZc586TolN/M3K
+ 5AoERfbDXHSH9XJ/2nLCMQ1qYEpxyXh/qq6EdjppyZFssGlKfaJU1Ofk3g8QirM/rfK2N33LFeI
+ 3urwAXIHKWoix4538Pg==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-08_05,2026-02-09_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 clxscore=1015 impostorscore=0 bulkscore=0
+ lowpriorityscore=0 suspectscore=0 adultscore=0 spamscore=0 malwarescore=0
+ phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
+ definitions=main-2602090099
 
-On 2/4/26 15:26, Nitesh Shetty wrote:
-> On 03/02/26 02:29PM, Pavel Begunkov wrote:
->> Good day everyone,
->>
->> dma-buf is a powerful abstraction for managing buffers and DMA mappings,
->> and there is growing interest in extending it to the read/write path to
->> enable device-to-device transfers without bouncing data through system
->> memory. I was encouraged to submit it to LSF/MM/BPF as that might be
->> useful to mull over details and what capabilities and features people
->> may need.
->>
->> The proposal consists of two parts. The first is a small in-kernel
->> framework that allows a dma-buf to be registered against a given file
->> and returns an object representing a DMA mapping. The actual mapping
->> creation is delegated to the target subsystem (e.g. NVMe). This
->> abstraction centralises request accounting, mapping management, dynamic
->> recreation, etc. The resulting mapping object is passed through the I/O
->> stack via a new iov_iter type.
->>
->> As for the user API, a dma-buf is installed as an io_uring registered
->> buffer for a specific file. Once registered, the buffer can be used by
->> read / write io_uring requests as normal. io_uring will enforce that the
->> buffer is only used with "compatible files", which is for now restricted
->> to the target registration file, but will be expanded in the future.
->> Notably, io_uring is a consumer of the framework rather than a
->> dependency, and the infrastructure can be reused.
->>
-> We have been following the series, its interesting from couple of angles,
-> - IOPS wise we see a major improvement especially for IOMMU
-> - Series provides a way to do p2pdma to accelerator memory
+
+
+On 2/9/26 12:13 PM, Yi Zhang wrote:
+> Hi Nilay
 > 
-> Here are few topics which I am looking into specifically,
-> - Right now the series uses a PRP list. We need a good way to keep the
->    sg_table info around and decide on‑the‑fly whether to expose the buffer
->    as a PRP list or an SG list, depending on the I/O size.
-> - Possibility of futher optimization for new type of iov iter to reduce
->    per IO cost
+> In case you missed this bug report, this issue can still be reproduced
+> on the latest linux-block/for-next, thanks.
+> 
+> [ 1549.643282] run blktests block/029 at 2026-02-08 08:22:30
+> [ 1549.968483] null_blk: disk nullb1 created
+> 
+> [ 1551.208843] ======================================================
+> [ 1551.215023] WARNING: possible circular locking dependency detected
+> [ 1551.221203] 6.19.0-rc8+ #1 Not tainted
+> [ 1551.224962] ------------------------------------------------------
+> [ 1551.231142] check/12517 is trying to acquire lock:
+> [ 1551.235933] ffffffffa8356190 (pcpu_alloc_mutex){+.+.}-{4:4}, at:
+> pcpu_alloc_noprof+0x92f/0xf10
+> [ 1551.244565]
+>                but task is already holding lock:
+> [ 1551.250397] ffff888227b5c7e8
+> (&q->q_usage_counter(io)#28){++++}-{0:0}, at:
+> __blk_mq_update_nr_hw_queues+0x758/0xd00
+> [ 1551.260849]
+>                which lock already depends on the new lock.
 
-There is a bunch of improvements that we can have on the NVMe driver
-side, just take a look what Keith was doing in his series ([2] in the
-first email in the thread), that looked very exciting (I dropped it for
-simplicity). I was planning to take a closer look at optimising the driver
-part after, but if someone wants to take it off my hands, it'll definitely
-be welcome!
+Oh yes, I missed it. Thanks for reminding! I will send out a patch to
+fix it.
 
--- 
-Pavel Begunkov
-
+Thanks,
+--Nilay
