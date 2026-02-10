@@ -1,161 +1,197 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F96C38885C
-	for <linux-block@vger.kernel.org>; Tue, 10 Feb 2026 16:28:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 957FF22F388
+	for <linux-block@vger.kernel.org>; Tue, 10 Feb 2026 16:38:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770740890; cv=none; b=Sj48wsnja3lE/ABxDVNSWwgVtMunsE/yEZvJuzjKZSuKhpNzU5lZyTmW0wwzRRbgn1mG4c+P5foc4h6XNrJHormNi+epPmXycLwvGPLODavGNOAx1tApp42ASrj98mn4RE1rty5Kg/LXW0rj2NREFJngoCNgCz0xdwhrJTYZ0hw=
+	t=1770741483; cv=none; b=cZrclE+O8F7/8CGrAX31enwJR4DqofTO4/8DJqkuJNlNuimjtE3vQObUxhHTEPL8P+Qo7fO8M1gfeUeYcTM9XeR7gYsbjBL9qly+DvlYfafvEcYoRYJ9zXe2/vk+6IgQFgzZdvJdPfJXfsIEskdp6EXIiP/o3HFuXKl7gh9Nip4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770740890; c=relaxed/simple;
-	bh=DH3k4FdGPdWWQRQ6qmhNiFNtxu/TvUz5786JIq53OKA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l0kqjAnl5SKfrDqL+ShHUgtOQWBW9A1zm/QP93IykZhmHh5UlOr7XW/WUjFbLLx3s4vg8iVBn+Iyrxzl68b2PFAk2oiifoaMyBc58YldSZQ+YBntDwXzv+l/HTzaiWcgIcg8057skurj6Rig4zYQ/qU3ZPv2ENzekO1nSg5Zi/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ugm4qDQz; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=b7YKrMfv; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ugm4qDQz; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=b7YKrMfv; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1770741483; c=relaxed/simple;
+	bh=naOq9zt4BYqb8oi/j4+zUOP4P/M+psDY05W0cStV6I4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HwASXA53G5Mbi2ULHoqEHxn6MkvUYzu2385Zj4318nhuwzzwB6ZifD5alux4fC6D025lSA1oFC7X5hKjYHOjH8Ps1Lm45OgAfRm100AyaFOIqOX7z3bIKHs+2uXqnGu/WLxs4gHPluH8AwtC7U+P4R8F5iDvSXHJAi3bsG74BuM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P3TnSgvp; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ugm4qDQz";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="b7YKrMfv";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ugm4qDQz";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="b7YKrMfv"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P3TnSgvp"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770741481;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=wQ4w7TUNhvmGRR094/wdhZnzztkYQptsZhG4t5guo2A=;
+	b=P3TnSgvpQgJWdaafD8TmRzwaVrcWZB6qg/eueeUjYLIPiFcNvUHvxLPEi5Pp8QZyyYTzHG
+	pWA/z582/snkKqrDqTdpILlqdUrzSuGGHDVcD+DOGuQKZXW4YE4Ux4sjNMiXsc9hGkyCpT
+	qieDQFgQFtxfu3iF/D5svBg380bN6ok=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-488-j5dT-Pz0N660120MpT6Q1A-1; Tue,
+ 10 Feb 2026 11:36:27 -0500
+X-MC-Unique: j5dT-Pz0N660120MpT6Q1A-1
+X-Mimecast-MFC-AGG-ID: j5dT-Pz0N660120MpT6Q1A_1770741386
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 4EA0E3E712;
-	Tue, 10 Feb 2026 16:28:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1770740887; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nAVsEo8GmnBUTthGDjzzMOFlPvlLeck1eI358Mycbwo=;
-	b=ugm4qDQznhpOWKcyUIGTZHtVYaZM8SCUGsqKfy9U/oNutiefPjZuYeJJXouvdFS1PIC5dp
-	VG1duQEusSsTFBYwaCgQ8LXedBEGI7GyrQ6CIQzkqp7oRXVY7UXfSITUO7KYjAMOc7OKRQ
-	QtWWzB7mD7098ykplzK4zz4LJmSIJ18=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1770740887;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nAVsEo8GmnBUTthGDjzzMOFlPvlLeck1eI358Mycbwo=;
-	b=b7YKrMfvHozmd7LuRgInoCwFe/lFsljMEz8EVUYTaWY88c//gKTkKWgSfxZROXObFqB/MQ
-	2EOa+bGorSnHLYAQ==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=ugm4qDQz;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=b7YKrMfv
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1770740887; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nAVsEo8GmnBUTthGDjzzMOFlPvlLeck1eI358Mycbwo=;
-	b=ugm4qDQznhpOWKcyUIGTZHtVYaZM8SCUGsqKfy9U/oNutiefPjZuYeJJXouvdFS1PIC5dp
-	VG1duQEusSsTFBYwaCgQ8LXedBEGI7GyrQ6CIQzkqp7oRXVY7UXfSITUO7KYjAMOc7OKRQ
-	QtWWzB7mD7098ykplzK4zz4LJmSIJ18=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1770740887;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nAVsEo8GmnBUTthGDjzzMOFlPvlLeck1eI358Mycbwo=;
-	b=b7YKrMfvHozmd7LuRgInoCwFe/lFsljMEz8EVUYTaWY88c//gKTkKWgSfxZROXObFqB/MQ
-	2EOa+bGorSnHLYAQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 352B73EA62;
-	Tue, 10 Feb 2026 16:28:07 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id WTtZDJdci2nYdwAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Tue, 10 Feb 2026 16:28:07 +0000
-Date: Tue, 10 Feb 2026 17:28:02 +0100
-From: Daniel Wagner <dwagner@suse.de>
-To: Keith Busch <kbusch@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Yu Kuai <yukuai@fnnas.com>, 
-	axboe@kernel.dk, sagi@grimberg.me, sven@kernel.org, j@jannau.net, 
-	linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, tj@kernel.org, 
-	nilay@linux.ibm.com, ming.lei@redhat.com, neal@gompa.dev, asahi@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 3/4] nvme-apple: move blk_mq_update_nr_hw_queues after
- nvme_unfreeze
-Message-ID: <f3451ddd-96b6-4bc1-9d4c-964e361d56fc@flourine.local>
-References: <20260209082953.3053721-1-yukuai@fnnas.com>
- <20260209082953.3053721-4-yukuai@fnnas.com>
- <20260209145832.GC18315@lst.de>
- <aYn-xwFHCpd7sITJ@kbusch-mbp>
- <e3e7d95b-2712-4365-922d-731449e7193a@fnnas.com>
- <aYtKFNm-wRKn6l66@kbusch-mbp>
- <20260210154108.GB2484@lst.de>
- <aYtWSscg6L9xxlzc@kbusch-mbp>
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F0B6E1944B0A;
+	Tue, 10 Feb 2026 16:36:19 +0000 (UTC)
+Received: from localhost (unknown [10.2.16.202])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D0E59300DDBE;
+	Tue, 10 Feb 2026 16:36:18 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Martin Wilck <mwilck@suse.com>,
+	Benjamin Marzinski <bmarzins@redhat.com>,
+	Hannes Reinecke <hare@suse.de>
+Subject: [PATCH] block: allow IOC_PR_READ_* ioctls with BLK_OPEN_READ
+Date: Tue, 10 Feb 2026 11:36:17 -0500
+Message-ID: <20260210163617.144359-1-stefanha@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aYtWSscg6L9xxlzc@kbusch-mbp>
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Spam-Flag: NO
-X-Spam-Score: -4.51
-X-Rspamd-Queue-Id: 4EA0E3E712
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spam-Level: 
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Tue, Feb 10, 2026 at 09:01:14AM -0700, Keith Busch wrote:
-> On Tue, Feb 10, 2026 at 04:41:08PM +0100, Christoph Hellwig wrote:
-> > On Tue, Feb 10, 2026 at 08:09:08AM -0700, Keith Busch wrote:
-> > > If you leave the queue quiesced, pending IO will form requests that are
-> > > entered and waiting in the block layer. You can't freeze a queue with
-> > > entered requests.
-> > > 
-> > > We unquiesce first to flush any pending IO that had entered during the
-> > > prior reset. It's not the best way to handle this situation. It would be
-> > > smarter to steal the bio's from all the entered requests, then end those
-> > > requests, then resubmit the bios after the hw queues are initialized. We
-> > > don't do that because no one's really complained, probably because the
-> > > queue counts don't usually change after a reset.
-> > 
-> > FYI, Daniel Wagner had been thinking about doing this reinsert for
-> > something (I forgot what exactly),
+The recently added IOC_PR_READ_* ioctls require the same BLK_OPEN_WRITE
+permission as the older persistent reservation ioctls. This has the
+drawback that udev triggers when the file descriptor is closed,
+resulting in unnecessary activity like scanning partitions even though
+these read-only ioctls do not modify the device.
 
-This feature would solve a tricky problem with isolation patches:
+Change IOC_PR_READ_KEYS and IOC_PR_READ_RESERVATION to require
+BLK_OPEN_READ. This prevents unnecessary activity every time `blkpr
+--read-keys` or `blkpr --read-reservation` is invoked by shell scripts,
+for example.
 
-https://lore.kernel.org/linux-nvme/87cy7vrbc4.ffs@tglx/
+It is safe to reduce the permission requirement from BLK_OPEN_WRITE to
+BLK_OPEN_READ since these two ioctls do not modify the persistent
+reservation state. Userspace cannot use the information fetched by these
+ioctls to make changes to the device unless it later opens the device
+with BLK_OPEN_WRITE.
 
-Currently, it's not possible to take the cpu hotplug lock which would
-prevent races in the cpu-queue mapping. The current logic depends on
-making progress in the error case. If it would be possible to fail the
-in-flight request in the error handler and reinsert them in the block
-layer, progress could be guaranteed when holding the cpu hotplug lock.
+Fixes: 3e2cb9ee76c2 ("block: add IOC_PR_READ_RESERVATION ioctl")
+Fixes: 22a1ffea5f80 ("block: add IOC_PR_READ_KEYS ioctl")
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Martin Wilck <mwilck@suse.com>
+Cc: Benjamin Marzinski <bmarzins@redhat.com>
+Suggested-by: Hannes Reinecke <hare@suse.de>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ block/ioctl.c | 34 +++++++++++++++++++++++-----------
+ 1 file changed, 23 insertions(+), 11 deletions(-)
 
-Unfortunatly, haven't found time to implement and test this idea so far.
-Sorry.
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 344478348a54e..337e4c3b65b2c 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -318,7 +318,13 @@ int blkdev_compat_ptr_ioctl(struct block_device *bdev, blk_mode_t mode,
+ EXPORT_SYMBOL(blkdev_compat_ptr_ioctl);
+ #endif
+ 
+-static bool blkdev_pr_allowed(struct block_device *bdev, blk_mode_t mode)
++enum pr_direction {
++	PR_IN,  /* read from device */
++	PR_OUT, /* write to device */
++};
++
++static bool blkdev_pr_allowed(struct block_device *bdev, blk_mode_t mode,
++		enum pr_direction dir)
+ {
+ 	/* no sense to make reservations for partitions */
+ 	if (bdev_is_partition(bdev))
+@@ -326,11 +332,17 @@ static bool blkdev_pr_allowed(struct block_device *bdev, blk_mode_t mode)
+ 
+ 	if (capable(CAP_SYS_ADMIN))
+ 		return true;
++
+ 	/*
+-	 * Only allow unprivileged reservations if the file descriptor is open
+-	 * for writing.
++	 * Only allow unprivileged reservation _out_ commands if the file
++	 * descriptor is open for writing. Allow reservation _in_ commands if
++	 * the file descriptor is open for reading since they do not modify the
++	 * device.
+ 	 */
+-	return mode & BLK_OPEN_WRITE;
++	if (dir == PR_IN)
++		return mode & BLK_OPEN_READ;
++	else
++		return mode & BLK_OPEN_WRITE;
+ }
+ 
+ static int blkdev_pr_register(struct block_device *bdev, blk_mode_t mode,
+@@ -339,7 +351,7 @@ static int blkdev_pr_register(struct block_device *bdev, blk_mode_t mode,
+ 	const struct pr_ops *ops = bdev->bd_disk->fops->pr_ops;
+ 	struct pr_registration reg;
+ 
+-	if (!blkdev_pr_allowed(bdev, mode))
++	if (!blkdev_pr_allowed(bdev, mode, PR_OUT))
+ 		return -EPERM;
+ 	if (!ops || !ops->pr_register)
+ 		return -EOPNOTSUPP;
+@@ -357,7 +369,7 @@ static int blkdev_pr_reserve(struct block_device *bdev, blk_mode_t mode,
+ 	const struct pr_ops *ops = bdev->bd_disk->fops->pr_ops;
+ 	struct pr_reservation rsv;
+ 
+-	if (!blkdev_pr_allowed(bdev, mode))
++	if (!blkdev_pr_allowed(bdev, mode, PR_OUT))
+ 		return -EPERM;
+ 	if (!ops || !ops->pr_reserve)
+ 		return -EOPNOTSUPP;
+@@ -375,7 +387,7 @@ static int blkdev_pr_release(struct block_device *bdev, blk_mode_t mode,
+ 	const struct pr_ops *ops = bdev->bd_disk->fops->pr_ops;
+ 	struct pr_reservation rsv;
+ 
+-	if (!blkdev_pr_allowed(bdev, mode))
++	if (!blkdev_pr_allowed(bdev, mode, PR_OUT))
+ 		return -EPERM;
+ 	if (!ops || !ops->pr_release)
+ 		return -EOPNOTSUPP;
+@@ -393,7 +405,7 @@ static int blkdev_pr_preempt(struct block_device *bdev, blk_mode_t mode,
+ 	const struct pr_ops *ops = bdev->bd_disk->fops->pr_ops;
+ 	struct pr_preempt p;
+ 
+-	if (!blkdev_pr_allowed(bdev, mode))
++	if (!blkdev_pr_allowed(bdev, mode, PR_OUT))
+ 		return -EPERM;
+ 	if (!ops || !ops->pr_preempt)
+ 		return -EOPNOTSUPP;
+@@ -411,7 +423,7 @@ static int blkdev_pr_clear(struct block_device *bdev, blk_mode_t mode,
+ 	const struct pr_ops *ops = bdev->bd_disk->fops->pr_ops;
+ 	struct pr_clear c;
+ 
+-	if (!blkdev_pr_allowed(bdev, mode))
++	if (!blkdev_pr_allowed(bdev, mode, PR_OUT))
+ 		return -EPERM;
+ 	if (!ops || !ops->pr_clear)
+ 		return -EOPNOTSUPP;
+@@ -434,7 +446,7 @@ static int blkdev_pr_read_keys(struct block_device *bdev, blk_mode_t mode,
+ 	size_t keys_copy_len;
+ 	int ret;
+ 
+-	if (!blkdev_pr_allowed(bdev, mode))
++	if (!blkdev_pr_allowed(bdev, mode, PR_IN))
+ 		return -EPERM;
+ 	if (!ops || !ops->pr_read_keys)
+ 		return -EOPNOTSUPP;
+@@ -486,7 +498,7 @@ static int blkdev_pr_read_reservation(struct block_device *bdev,
+ 	struct pr_read_reservation out = {};
+ 	int ret;
+ 
+-	if (!blkdev_pr_allowed(bdev, mode))
++	if (!blkdev_pr_allowed(bdev, mode, PR_IN))
+ 		return -EPERM;
+ 	if (!ops || !ops->pr_read_reservation)
+ 		return -EOPNOTSUPP;
+-- 
+2.52.0
+
