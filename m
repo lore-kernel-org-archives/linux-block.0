@@ -1,86 +1,118 @@
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from lf-1-13.ptr.blmpb.com (lf-1-13.ptr.blmpb.com [103.149.242.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB74430F7E9
-	for <linux-block@vger.kernel.org>; Tue, 10 Feb 2026 04:10:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B3962D6E55
+	for <linux-block@vger.kernel.org>; Tue, 10 Feb 2026 06:47:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.149.242.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770696634; cv=none; b=MtZp7jtAeUc45mywEiRuPP5MNiXZzPQEzUMs500Qckv8iBDmvQNwDr+w7cSYcgxYeGfEzFCYURSVRbntbdj9gej0U8tUVJUYMXlbmQ7wGxzO1jx9yMkEpzqprlRvS8vwNg3z/6XAxfCXRf2zAfhQgNLXKbFii/RZTRYg3YnWqEo=
+	t=1770706082; cv=none; b=o+g+AAE5l9ilVC9gDE0EbvFivh2wjvTnJpoVndEhl+p3C+Kp9FQ5a+2zbn04lYArB6A1oUS/GJVMoscgdEASpBvw1bqyR+l1E9t0RPbhZP/Pw9KM6MOOPZdbKpIUKz6/N39GyNi8usjvCsH21pvAw3x7fHfv/2MtdXP2uoT23Lw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770696634; c=relaxed/simple;
-	bh=v95coYCBEj9D7alqrTv7xxW8TNrcUtrwwm7osjxxiG8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fK9OrNi17DJHMTscmh287qvqKVaOj8ysMX4eNoD/+IB/sUmd1C7lc4/7mK3U2q6dG1tAzUGuTDnwiUnFcdeTo0y6zwdiovyPmSH8+As1ZIE6tDNydGhIgt5w3pcg7W2cRhj0VkW84Pt94J0Y5C5ByodGpt7zxFMm8I9trxFk6iI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=B1N5TNRy; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1770706082; c=relaxed/simple;
+	bh=Q3rsAHTSrLO/NPDxnNxpBD4uJ+ygSuIcGfSsO6jP5KI=;
+	h=Cc:From:Date:Message-Id:References:Subject:Mime-Version:
+	 In-Reply-To:Content-Type:To; b=UjG/fhll4s8QJZT08V5peIC+U0/77ReUo0/Ntyi6KK+yWQ0lUbZ/6xCV7Mw5zZ3kCXsLQY2rJKhMIR7iR/ZIMJcSM3J0R6KDvfdQfsYxxSnHhYVSp0J3W1JSlob8Wr1h/94jCffHVvDpNu4eqKb3OZDmC4PAjrPRcs0lZZYk7L4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=none smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=THTV2M7j; arc=none smtp.client-ip=103.149.242.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=fnnas.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="B1N5TNRy"
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2a95bfdb31eso14281955ad.3
-        for <linux-block@vger.kernel.org>; Mon, 09 Feb 2026 20:10:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1770696633; x=1771301433; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mScTVjrr5hgqDSceepZk2KFe97cs6wupSJIij6NU0Os=;
-        b=B1N5TNRyZ5Kt3U8/BrHAaC1nRXPhJTjWq78jmOnJ5ZRUf/fSIfwu5lpUlZ9AfV4yOw
-         WSvWGe4UUGtnhoHN3TJgpsTO+8o4pfQDDCt7pzTCQHqbEkNdBDZIhpkZQgUKKzlrVCsN
-         838anfPCMu9oD8C4skV09DbUsy+8D+7UnFqLk=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770696633; x=1771301433;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mScTVjrr5hgqDSceepZk2KFe97cs6wupSJIij6NU0Os=;
-        b=H4B2w4R2UfNiv+CEj9eVrMNfmw2bFHWLVurVfHRH9mifrpl3/4mA3IRRz/HfaZWdik
-         rGdXmXlAspmX12yYgxDMz9On+ePmwIKhZBlLvvYb84gBZT8tqpCHw8SZSQcTIUKRwGrB
-         /m5MVOI1Nkv8fFh+R+HKU+leoHOa0VDVSpuJS4V0Tal88aukLDIlagDUiUk8x7zhjz2R
-         MTabg5OLVCRV5+oPdjkgtn6s7ybjW62yHz9f0XPVX/m8gosEMIOoQMcAodvCbFFLoSgX
-         YOAfclmf0WNygJoI4ek4fV6K8lut/YzA2i3bCKGn0/5BypGVrlpByTgoxCXHhdXaXZJw
-         9Zlw==
-X-Forwarded-Encrypted: i=1; AJvYcCV/TAAz5IEhS/hqVUs1fqBecLuY1sjLgxnoWPWdLpadlKulY9XRF3Mn93VIYs7+ulWOVnz1Tz6T4HGmFA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzSRLJftONp7RbKOw9v3IQE6oOR+WeI7TwaEZ01rnzNMlj0K+wz
-	CQg3TDseN5F88TyCaUoRPlCk6+mI3cD//ml7BPGSpxHH8CS6HdumkVrFXdB6HNV/Vw==
-X-Gm-Gg: AZuq6aK+kyBsRFXgA+LDTBeDy/gXc1RHbSJjYFenZoIHdBiLMTD7ro1NewU/t1iEG2M
-	0N+nYq+/9DUMTxW6VIoNYg6JuMOLj04ReJY4pgxEXVIx2DkQ9UqhxE0eNlcqxSfdi0jSVEY1Kcn
-	qCHGmVhS0S+gpu5aaDb+mzRSqaL1UDHdEwEbKUMIS611tBjvTJ874eAbx0GSHCmOzUAQCYjbCb3
-	HfFbac3o6oQ1Xg2rhuPzDq8S8Jlv3SheiaghacoXTH4lu7ktgLj9eyq9RuH/kJQvp3lZA4f/YrX
-	xBlGKwn2Wc20SBmTGOSJS+c29h7xBQs5mfYR2kObml8r0cF3/0i5OWWE8ZkftQppjrYTlg0L8ZJ
-	IE9Zgw2rs6tyvg9b2f48KmCIKAyyAGu4apwVAvvBGIlaaGJunqi0NxVqfSJQQnezeYvfNyPMJZ2
-	Nrudwn/Vc9eqKd083pjjioftT7N3UwEttfQACFlfY0V722jpSJuMoNGDLPsh5V
-X-Received: by 2002:a17:902:c945:b0:29e:9c82:a918 with SMTP id d9443c01a7336-2a95214a72amr125016215ad.22.1770696633129;
-        Mon, 09 Feb 2026 20:10:33 -0800 (PST)
-Received: from google.com ([2a00:79e0:2031:6:3f6:92b2:887b:120])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a951a638c0sm132083815ad.15.2026.02.09.20.10.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Feb 2026 20:10:32 -0800 (PST)
-Date: Tue, 10 Feb 2026 13:10:28 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Minchan Kim <minchan@kernel.org>, Brian Geffon <bgeffon@google.com>, 
-	Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-mm@kvack.org, Richard Chang <richardycc@google.com>, 
-	David Stevens <stevensd@google.com>, Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: Re: [PATCH] zram: drop slot trylock and miss_free
-Message-ID: <fkx7xu4nl7olte26x6ra4p4nokc6frnpguc3wkmk45hmqfw3z2@ewyryw3mx54y>
-References: <20260210035045.3817297-1-senozhatsky@chromium.org>
+	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="THTV2M7j"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1770706025;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=B8lLyQsuCZGvaPXxcEDtf7RNvxTLmSi8xokdUUVNsXM=;
+ b=THTV2M7jKe4aQpu+v+JWKmpgqac2BexFS/TquKhUs0M8JcLDUxtUemuSWDJCmE8GSVYjqp
+ tKEJYJNOmvB4ZQvCWwLT98fY7qEUPRny7z/+ljvGknIzrDrsrVYqSGwX/2K4oTgclbgR0L
+ nwnNum/zcJyJHE486QPhLFKZ9ix/H4Xw9dfDD7U0u217R+Gp1GO3A50LLdwUI/LfIvSGD9
+ hv4IJ6pJimN/s59KwTLNBXgWNxQo9EFYmrI5SBn1b1xYtdnwMQ4jElh4Wy1wNdcl/ZydCx
+ 5ZIYNwwyNOygzjjeVxGBjx3obBMcs4is35i1/tV6ZdX41wDbNzhMHqjeXG+K/g==
+Cc: <axboe@kernel.dk>, <sagi@grimberg.me>, <sven@kernel.org>, <j@jannau.net>, 
+	<linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>, 
+	<tj@kernel.org>, <nilay@linux.ibm.com>, <ming.lei@redhat.com>, 
+	<neal@gompa.dev>, <asahi@lists.linux.dev>, 
+	<linux-arm-kernel@lists.infradead.org>, <yukuai@fnnas.com>
+From: "Yu Kuai" <yukuai@fnnas.com>
+Date: Tue, 10 Feb 2026 14:47:00 +0800
+Message-Id: <e3e7d95b-2712-4365-922d-731449e7193a@fnnas.com>
+Content-Transfer-Encoding: quoted-printable
+References: <20260209082953.3053721-1-yukuai@fnnas.com> <20260209082953.3053721-4-yukuai@fnnas.com> <20260209145832.GC18315@lst.de> <aYn-xwFHCpd7sITJ@kbusch-mbp>
+X-Lms-Return-Path: <lba+2698ad467+c4d69c+vger.kernel.org+yukuai@fnnas.com>
+Reply-To: yukuai@fnnas.com
+Subject: Re: [PATCH 3/4] nvme-apple: move blk_mq_update_nr_hw_queues after nvme_unfreeze
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260210035045.3817297-1-senozhatsky@chromium.org>
+Mime-Version: 1.0
+In-Reply-To: <aYn-xwFHCpd7sITJ@kbusch-mbp>
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+To: "Keith Busch" <kbusch@kernel.org>, "Christoph Hellwig" <hch@lst.de>
+X-Original-From: Yu Kuai <yukuai@fnnas.com>
+User-Agent: Mozilla Thunderbird
+Received: from [192.168.1.104] ([39.182.0.137]) by smtp.feishu.cn with ESMTPS; Tue, 10 Feb 2026 14:47:02 +0800
 
-On (26/02/10 12:50), Sergey Senozhatsky wrote:
-> Commit e914d8f00391 ("mm: fix unexpected zeroed page
-> mapping with zram swap") removed swap_slot_free_notify()
-> calls from end_io callbacks.  This means that there is
-> no more slot_free_notify() from IRQ context and hence
-> slot-free cannot deadlock on slot lock any more.  Drop
-> slot trylock.
+Hi,
 
-Oh, please ignore this patch.  I realized it doesn't make sense,
-we can drop miss_free, but trylock has to stay.
+=E5=9C=A8 2026/2/9 23:35, Keith Busch =E5=86=99=E9=81=93:
+> On Mon, Feb 09, 2026 at 03:58:32PM +0100, Christoph Hellwig wrote:
+>> On Mon, Feb 09, 2026 at 04:29:52PM +0800, Yu Kuai wrote:
+>>> blk_mq_update_nr_hw_queues() freezes and unfreezes queues internally.
+>>> When the queue is already frozen before this call (from nvme_start_free=
+ze
+>>> in apple_nvme_disable), the freeze depth becomes 2. The internal unfree=
+ze
+>>> only decrements it to 1, leaving the queue still frozen when
+>>> debugfs_create_files() is called.
+>>>
+>>> This triggers WARN_ON_ONCE(q->mq_freeze_depth !=3D 0) in
+>>> debugfs_create_files() and risks deadlock.
+>>>
+>>> Fix this by moving nvme_unfreeze() before blk_mq_update_nr_hw_queues()
+>>> so the queue is unfrozen before the call, allowing the internal
+>>> freeze/unfreeze to work correctly.
+>>>
+>>> Signed-off-by: Yu Kuai <yukuai@fnnas.com>
+>>> ---
+>>>   drivers/nvme/host/apple.c | 2 +-
+>>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/drivers/nvme/host/apple.c b/drivers/nvme/host/apple.c
+>>> index 15b3d07f8ccd..1835753ad91a 100644
+>>> --- a/drivers/nvme/host/apple.c
+>>> +++ b/drivers/nvme/host/apple.c
+>>> @@ -1202,8 +1202,8 @@ static void apple_nvme_reset_work(struct work_str=
+uct *work)
+>>>  =20
+>>>   	nvme_unquiesce_io_queues(&anv->ctrl);
+>>>   	nvme_wait_freeze(&anv->ctrl);
+>>> -	blk_mq_update_nr_hw_queues(&anv->tagset, 1);
+>>>   	nvme_unfreeze(&anv->ctrl);
+>>> +	blk_mq_update_nr_hw_queues(&anv->tagset, 1);
+>> Looks good on it's own, but it would also good to align the
+>> apple driver with the PCI one here more.
+> I'm pretty sure this series would deadlock nvme-pci, as that driver
+> still leaves the queue frozen when calling blk_mq_update_nr_hw_queues.
+
+Yeah, thanks for the letting me know. It's true I didn't realize nvme-pci
+still leaves the queue frozen.
+
+>
+> We've left it frozen on purpose, though. The idea was to prevent new IO
+> from entering a hw context that's no longer backed by a hardware
+> resourse. Unfreezing prior opens that window up again. Maybe it's not a
+> big deal; I don't often encounter scenarios where the queue count
+> changes after a reset.
+
+Do you think if there are new IO coming between nvme_unfreeze() and
+blk_mq_update_nr_hw_queues(), will be any race problems? If so, will it
+be helpful to move nvme_unquiesce_io_queues() after
+blk_mq_update_nr_hw_queues() so that new IO won't be issued to driver
+during the race window.
+
+I'm not quite familiar with nvme drivers, details will be quite helpful. :)
+
+--=20
+Thansk,
+Kuai
