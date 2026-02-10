@@ -1,43 +1,45 @@
-Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
+Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED9A277C88;
-	Tue, 10 Feb 2026 20:51:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.178.238
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1033132E126;
+	Tue, 10 Feb 2026 20:51:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.166.238
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770756672; cv=fail; b=hedAA8Cs5+DF6H1iYnc16xculjqsaZBGad4BzHFVrWEdD9cSjAP2qPQped5yNave62ShGVS2aL6LeC7LK4rGKq768KuBSUAqTS+iMRmgQLrItjMx54YbCebijxDSkxwVl5X/PNw7R42ncn21l0c6u97topNmJvcIhYsEHPsKfbo=
+	t=1770756703; cv=fail; b=mnpFIE36IU8iT5VnGf9Fs/HRDlsLczAg/IjCH1db6pszDDKv6LnG0GdRDqBPIUUsYjAoH8d76u6vTVjjads8hqBWMId0ZeM/usLE14X49GOB0dtVogkdFGcqhX0FtW4Fi1vT13At95nfnZ5WOrl28yTqBoQ7zmQDMPO44ciAjAk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770756672; c=relaxed/simple;
-	bh=9yRJa0aD40TOF/IidGU3HiUVX6nLg+82vxBhd1/c+F8=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=R9DA5ZS6JcZe59/59nRThs2B7a0diVQhr+UH9ecLVyJKk6ovgsR3oE4/g14CxZuMUGmBVsmzc/ePrPIoC+Kl/56tXAUhiKBSP8BpxsomfCD+2sQPTO/L4QbOu4Sk+a4zELTACzYlksqYNyFW4NwOnJqRRlzasLk4oo3yYqVDvYw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=IA9NrL64; arc=fail smtp.client-ip=205.220.178.238
+	s=arc-20240116; t=1770756703; c=relaxed/simple;
+	bh=OfcCmo+rYOzpGGlQXYmR3fKtzz/G8Dm/sKTjubvVhl0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=OM1s3rh9bvXiFuwsvfHUxZxdC4mA4Ff/VK/yL2VVm+8FyHSwr9rqwulZJJ/gJvBRT5tiOuzK6KBekUFFXh1bMZ+1bydM8oBJOaDXoCSwdejhm5AsZEP/nb6fe9nzSUKZUoc1MCRnt3D1cTtO2O3OdvFiKukU/7LM6/90avP9h2Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=mArUsCDl; arc=fail smtp.client-ip=205.220.166.238
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="IA9NrL64"
-Received: from pps.filterd (m0250811.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61ACv0TL2236728;
-	Tue, 10 Feb 2026 20:50:50 GMT
+	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="mArUsCDl"
+Received: from pps.filterd (m0250809.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61A4j14E1601906;
+	Tue, 10 Feb 2026 12:51:21 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
 	 h=cc:content-transfer-encoding:content-type:date:from
-	:message-id:mime-version:subject:to; s=PPS06212021; bh=yoFFc72MW
-	sR22cNrB7RcTYXUkqyoAnOF8w4rqxoGJqE=; b=IA9NrL644UBsz6z9D0LUQeUnQ
-	5HOXqGRz3+ZScPJ7HMaMiHMYLk/rCoVJ8gX/J7xpalj7jq2Jxw8tVs+ZuwruO7LS
-	HoXGlvoW7m3YoY0GuWrU/gKBSvrEIJJFIe/tmP8bnSxia26gqJvm6A6WJKptVAFy
-	v6Dw1Z5D9TQCGD37zBja1POMHy3LD+B8LPhvCYYacMEsbgVJJ7b/IxZdFjvNRFFm
-	mOyEedVRdciB+tl7DxkIsOafBJ2CxEKHLkVwpCpnixxGX/3ieVmJtS2FOA88Fpt9
-	uI4Cwx2GDFYd/emZmJcLNw7eerM1xvx1FCD7Dm2A/1FvcVuJHorIjChdcYKGw==
-Received: from sn4pr2101cu001.outbound.protection.outlook.com (mail-southcentralusazon11012008.outbound.protection.outlook.com [40.93.195.8])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 4c5tkwkx11-1
+	:in-reply-to:message-id:mime-version:references:subject:to; s=
+	PPS06212021; bh=3v20aIvkjUbDY5FPlMLfx3WBO7VBRfSrjYgyLctjdEg=; b=
+	mArUsCDl7GlF7bNycFESAf5ItE/EER2GQgnsRDb9OihrOI4qJ5sRq2oF0TUhIJE8
+	bPaymkTsiSCGvLBAQYGT4xfeE/tzs93lIsd3aEXoVcOm89JaihGMIc0yn8DqzmCJ
+	oqfdNApckMgmN7bglcVQKARXCBQFADKEL5VxSMzakPOLgbnLEndR0iKb09wgAgJM
+	S+Cw7ObyKOGRWGj3aWTSBqg1YV2TOd4sPA2XjO3CZhiaKV6u+cV+C9caCzNzDLzq
+	afOQdtD8gaSLHESel2JtKfUriyJIdWSWR1v7FZ7E9mhSeBS/jnLk8kJ7p5fYny4L
+	zoC6C0vtTlul5H7r42V1Qw==
+Received: from mw6pr02cu001.outbound.protection.outlook.com (mail-westus2azon11012002.outbound.protection.outlook.com [52.101.48.2])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 4c65sj3h8q-1
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Tue, 10 Feb 2026 20:50:50 +0000 (GMT)
+	Tue, 10 Feb 2026 12:51:21 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=rAoWVmDK8ZxE7jf2fgoWy3qE0lDnA7GXnQS2FAsS1Qv4dHNXTLNDxng0yKBDbAEaS36JJDrpFpoqGCqC8szBwG3W/ppU8sTRqVkSwp41k6ll+nDxyYzTHMMuFpBKdFShYwv+sAYHjj6y6gZY1YL5tzqrqS4sgD/EygGKKaNIxBMU6vHlc98eNTn/a+Fye9qitOBAIEi1tkPxkVK0vjtRB7Ixnn5ohXI1/kpyQAYRJWJLAk6w2fhDRkp6bWnOSoGFimgEZC7250Ke2LaJUZuzP5666T7cklTIvrseZJQ8HlVZVrmXmT/HJup2T4sNLl1lmohgmSYw0TmhkbAB9/ESBA==
+ b=TFLQGGVykgthHTHAOzeO4AKq+2lhCI6Hnn2eT1vCpQDsPqVLUfEV5XjjIG9t8a80d9Z9sgvjXWFl84k4WDOwEcD/XBoNm1mEkjHS66EgVf6R/6rkVaM318MQXZ9KYmQXNYLRLNeB0oCtT8HDDBPZ2mKHA151KBB0nP70k/kLO1d4h579UZ+7qoLbMJrIyi0UKtFvfX/xVUgzSMZa6NI6+DqXe2pZSIRej1sZSXyi/6RjnJk0tGoNmcH5GERKh03fhzUpxrT2/vC1gQ3XgaL8jb/jAc0nlM6b0JjtkPzxEacp5tzkBk9gMPepHHk84X/Fu6k5CNMtWX8fOm0dlJUwYw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yoFFc72MWsR22cNrB7RcTYXUkqyoAnOF8w4rqxoGJqE=;
- b=bPDglLRHUkcYuJDMRCoL5GWegRK3biMnj1Uusb/hFqOMe+8VqwA9STHbHohZFEMT+wwRqOS7GhYhAdOEn83JAz/vmTLNr8n75mn/EVek9tm4lYk8VYbY7sxMRY2VUrNmWM2xNIqMbuRr47vNp+BZImoHjmErBsOG5cea7+cHvAZYi4fWiJ+GiXB1rpT5hhHHpxyM4xKmNrmFg+9QYNZFGF7WoXYnOy7gcHEAibncMqW1p2Oz6ssYs7F2u3ix+NZtJXy25erXf3pjsMAw00fWZLp9j66wG1pVCHmDPEewa20rUgZRWe5Ynk4rmFNktI+Fzf3dWMzBXqvaBlfpYKxEog==
+ bh=3v20aIvkjUbDY5FPlMLfx3WBO7VBRfSrjYgyLctjdEg=;
+ b=iFsl6187yeP5pGWY0jgipzyOR2jHq3TgLk5BkZYmkJoNQkmKfq5w4h9yTvLxLBujfdR1lOtw+DrytqimgKrQ0/Q0QJ4l0VqJ1rWEjFBtPH+y5oCFJ33dF9k5ZJqmcGLwiLiwOi/kpZC5OM0kFzRkTHWVI85EdvGvqsRSdzrzNgDLsrJ/UlPKnlgH3SQqpdDiyeH82f890jjVLuVEwZn85H/KuLaxH8Kmg+/L0YzDy78C5ZG1Po3Xgh9DPMa8IjHoKBkUT+MbgEUKJv9VV1jViNCUHQeXFrPdYYxU9UuCDz3tnST/hH3OlsUjHzZz+3I0jW2fV9mVknXueSMB1ChBzw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=windriver.com; dmarc=pass action=none
  header.from=windriver.com; dkim=pass header.d=windriver.com; arc=none
@@ -45,11 +47,11 @@ Received: from MN2PR11MB3885.namprd11.prod.outlook.com (2603:10b6:208:151::27)
  by MW6PR11MB8309.namprd11.prod.outlook.com (2603:10b6:303:24c::19) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9587.20; Tue, 10 Feb
- 2026 20:50:47 +0000
+ 2026 20:51:19 +0000
 Received: from MN2PR11MB3885.namprd11.prod.outlook.com
  ([fe80::a8bb:9703:986e:845]) by MN2PR11MB3885.namprd11.prod.outlook.com
  ([fe80::a8bb:9703:986e:845%4]) with mapi id 15.20.9587.016; Tue, 10 Feb 2026
- 20:50:47 +0000
+ 20:51:19 +0000
 From: "Ionut Nechita (Wind River)" <ionut.nechita@windriver.com>
 To: axboe@kernel.dk
 Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -58,10 +60,12 @@ Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         sunlightlinux@gmail.com, chris.friesen@windriver.com,
         stable@vger.kernel.org, ionut_n2001@yahoo.com, bigeasy@linutronix.de,
         ionut.nechita@windriver.com
-Subject: [PATCH v2 0/1] block/blk-mq: fix RT kernel regression with dedicated quiesce_sync_lock
-Date: Tue, 10 Feb 2026 22:49:44 +0200
-Message-ID: <20260210204943.21709-3-ionut.nechita@windriver.com>
+Subject: [PATCH v2 1/1] block/blk-mq: fix RT kernel regression with dedicated quiesce_sync_lock
+Date: Tue, 10 Feb 2026 22:49:46 +0200
+Message-ID: <20260210204943.21709-5-ionut.nechita@windriver.com>
 X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20260210204943.21709-3-ionut.nechita@windriver.com>
+References: <20260210204943.21709-3-ionut.nechita@windriver.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-ClientProxiedBy: VI1PR04CA0104.eurprd04.prod.outlook.com
@@ -75,141 +79,269 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: MN2PR11MB3885:EE_|MW6PR11MB8309:EE_
-X-MS-Office365-Filtering-Correlation-Id: 32f54846-ac42-43ad-ff5c-08de68e61117
+X-MS-Office365-Filtering-Correlation-Id: 33ff3475-6813-49c1-18b6-08de68e6243c
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|10070799003|1800799024|366016|52116014|7416014|376014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?jmEDDg+reu6388UbqzwxiWtcZ9zs7tV1xgPE3Mt+EE9Y+ewkXkLGt95LzVsn?=
- =?us-ascii?Q?jQ0Ar14QJ52CjhJO0x+I0q+/pmhFfWzKD8twioIlDT31XKeTveZbh2dXrrt9?=
- =?us-ascii?Q?cPGPDGBzT4hhnUo9c8Fz0ai2L3W3C8mFkZHpg9fRAWkgGtMpUgFX4cZ16Oh1?=
- =?us-ascii?Q?Mxhp6pRM+ebRGuRpvj6u/KYs9mAjO5w7i/jklQ1YmjjMsKGo09O82yaQAWlQ?=
- =?us-ascii?Q?tDw7cSCPo5l39cV7vb+9ULf/q7zncKYnbzz/U418QqHGkhUITcuUaUIRuxv8?=
- =?us-ascii?Q?NTMvcF8OzLQMZgMAEvbRnDdvWXnn6QW9+KFskqecgmAW+GHwl8JqD+V5Zean?=
- =?us-ascii?Q?p0wgUqG6kzYpTnDLtpnH5aM0oYnxQYY2qBzkTbt9iNlCy7B3iOd5w2YjY1XE?=
- =?us-ascii?Q?LkM3C5dBxXurURTjGjRkqqhNszPdROefsz8YTDDQ3ONzk+oR6tkQ38yU5s6t?=
- =?us-ascii?Q?ts/ynN/r66Ceahn+771cUU5YbN2R0RbQycKDQIx8O2d5vZ1wWdns2d1Pr4CO?=
- =?us-ascii?Q?+0106GJq0rVyKXv7ggUOLYBNDP4v7/kai4ON0UGdkyMBs2Bl55IRCuBSIdYE?=
- =?us-ascii?Q?R3Qq8XUxtn6d1G1+PAsZmx2lcD/IXItlLxzcD0m0UecV7l8wUWI6DlrN3OcS?=
- =?us-ascii?Q?E0xI2puvxZ/detIjSrr+NXXoG40L6McYjWF94YOE5WsWVRIuCalv10yJNspe?=
- =?us-ascii?Q?VF/ItfbQL8rwlZkMmRaPI2YNt+SDV/lJJc/UjLqNs1ABcALM/RQjKOQ4eP3z?=
- =?us-ascii?Q?ybhk5QLfb6sIMz9ATgj0rnUUTsPw0MxvZAnHlQkGlxWOvDuF8UwCQrQVDJ77?=
- =?us-ascii?Q?gPJ5pN6+54aEbkz7Lbx5/sM+aZ4gLBBQ8RKJYj01MshOnX3fbC7wA4MJ5E48?=
- =?us-ascii?Q?ZUf6KLGi/OtsjVw+tFQ7N8Tl+5c2sNW1f2b91UlHZeHljFeJiokGXH+Kf21P?=
- =?us-ascii?Q?4outdgCvNBf2N6gsQHJ7BYrvQVfbFi/p82ydSGxNl7wBJEfiPxbOP4SOYdmp?=
- =?us-ascii?Q?7TkAq0v22KSgKsRcszywwFow4yRB0SbrRtHutHJ9EurEWA2WUV017shP78TJ?=
- =?us-ascii?Q?RQzTPLJ5rs3RSDBWPb9ncPfXkYqdfCnC5EYDYjXpBxqFq49t+9LMuISwCZrQ?=
- =?us-ascii?Q?kwams4j5Dnxg1lA5L7hf1YLdQqVrrAlXADWeyY47Kwc2het5SSzNpFwMSS9o?=
- =?us-ascii?Q?urbYnfq0877x13975cRqcjHu2GI0YituFMIYuOnFvrmAO45iZJa5PsFqWCYo?=
- =?us-ascii?Q?O0C+mVhJhg/NpFeSFdG8/WaYSGKC37K+3BwPQU9SQ+g0r6UbxXg8h8ZV6yx7?=
- =?us-ascii?Q?hjxR7hwoQ92JY/6hjQcaY/st9wFA82oCGL+2IOB/RJEXY7nDUtX6pedP7a7l?=
- =?us-ascii?Q?HtI2vp2/khjq8Y1CpiD0EFmv81sPGlHlwP3NUaNdpAN/8eUZbh0UpUX+Euz+?=
- =?us-ascii?Q?mw+giqARXRqkIMIpdn/C2ekwQBa2JxqU0ockMKGfKuOFUA+goe/Z6gFn+MJS?=
- =?us-ascii?Q?36yhHig1cAFHUnXJ0B5q8UMayJCwg22cwxis6MqIB/cUuEkLBZpQg2libPn2?=
- =?us-ascii?Q?/ny8Pq/eaVqH7FxFnbU=3D?=
+	=?us-ascii?Q?dMGtKGttln72a4iPJHgX2WasTRpHOtR6idBwTMcvIPkjWkM3BNIlocw5krOT?=
+ =?us-ascii?Q?l3q37kM/9Gh//ebk8jSkWCsoKxty8e0g9bnvBV9EdPGzhKIpYv9Kz42Y61/0?=
+ =?us-ascii?Q?ooX3sxU5hM2aGTdhRwNJIsJHlQUtzWLZnIGbCO1fWI42K1HfYkDJWz/6X2Pz?=
+ =?us-ascii?Q?0rJiPG3HFa0WNxyx5zlacUQbfe4OJUxG6DlvOa7hwc7d0pmyf7olIGyl4kAG?=
+ =?us-ascii?Q?FuwKS91dVbRIHvoAoka4g/1SZ2yRD7qB5/tJU+kkspE3GXtaG/uQBFCiD17Z?=
+ =?us-ascii?Q?rj54pqfil7NdCQs7fybhI5LIBDL8O4ncEQ1dG3HA7Y1PWqzs87dvKvxvM7ul?=
+ =?us-ascii?Q?ZcuIhN1qvjBiMbPva8tF2q2D5Ic1hwvmw4h82v2CMSkIXqqccdjTaSNNE93K?=
+ =?us-ascii?Q?vRwVDlS8Y8Gvyld+JO2u1I478pXEfx1xe+fOPNJQ+orOQ43S9tJAysfDiefw?=
+ =?us-ascii?Q?pPDxT4nciMTebDQxVn9dn5IPrR6zTciPQR80WTTWMb09WOoU1nXmNUTrIoqp?=
+ =?us-ascii?Q?gisV6WRl3kvuPbdL5edrLMngR48LLu0aGEB3jO0Rs9cL2DCjLI8nPvB4Am5X?=
+ =?us-ascii?Q?QD2PmVC1VNSHr0Khf05MW0FOJqXvDMgOZaNxopDFf1116m1D02RahSSdbVIT?=
+ =?us-ascii?Q?+qiFHQbkd9Vft7JmCUgV2o4VGLWLSrkfcdIorMZB5klg1SauAJAP+iHwlKGC?=
+ =?us-ascii?Q?OgfczW7ZpvCQi9i38xvmlVu6acT5zZBOv6v3/k3RecHR0682Rsc5hb5F9IXd?=
+ =?us-ascii?Q?b1P3NV3ZzNHxlRumeHcPyLEfXJwTm4oMtwrOa7tQV3NC42NbdzqGFY9XVWp1?=
+ =?us-ascii?Q?YNd91HvOBfW4dLA7i8QnSpcqCLTePofrcSmrMuPiBlQzkRtS2UqS1baqCgIL?=
+ =?us-ascii?Q?GuqceL25Evc8pkmhwW1hh6Xcp3o5GVPzHIxFaV+glrM/1hCx7+O6cPDtOghj?=
+ =?us-ascii?Q?z2LkuhKK1r7H037s+2medXYq/N++U8z/+3+jc/k/6TQO6Qz8oRz++tT/e968?=
+ =?us-ascii?Q?TA8C55f8bTjEKY/eYFlzZI+1Ni4R3tcoBFdGUWU1bkzeauKN9ZUQu77gtaV7?=
+ =?us-ascii?Q?CkW1oFWLIBICeFPUzyHxwBVy6PC10BSqW6svbOq65Mio5Ae87Q2g2fItjri5?=
+ =?us-ascii?Q?FXRhSCYwWyfFp0kFWrcPIgMciOdV9PUQ2i5oIvd8QWAcU30FBiss5bMGEr/B?=
+ =?us-ascii?Q?Ksr5I93h2hAtoI6uu49ciXBRsMZ88UWHoAB3Ho3A3XQ+9E25FPQZKgXKvaXx?=
+ =?us-ascii?Q?RxgAfI8lvORnI/cOobGthfAwMeGVWydZwySZrR5w88k770rlgtQa1AIN7EES?=
+ =?us-ascii?Q?PrXl3eYqDo4GFhpqWL8EuqADuEOi2hzX2hCytlE1eAPBHg6p6TWXpjv41fX+?=
+ =?us-ascii?Q?UofUEyw/+WOqp2Tg+G4JaqDKl1yKSift/rYlUSEScTvgOViDkwovoBJFqCTz?=
+ =?us-ascii?Q?C114mBYDsrUDfJxh51BzK7TLnfgOQquUl8rzI/ObNOb4qMBbjLupWjN5+T2v?=
+ =?us-ascii?Q?jYUDFun1Nf3W50cfXc0HCFnX4ovHVq6Ycw4jqlmieL2J6e8cTjg1XgtI9nNV?=
+ =?us-ascii?Q?Wz8PyjU1M/E41AIfEnw=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR11MB3885.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(1800799024)(366016)(52116014)(7416014)(376014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?7sKWjzZzmdEDon+pb444cNEe7/pZsvpGfHWlAdl+P9xOcutJ6AVLPguoVs/q?=
- =?us-ascii?Q?IQ1eWUwbK+CP5/wX15oY8ZNcElLru7ic2ZAAeZASE/UygLvyFRf2sengUm4E?=
- =?us-ascii?Q?ZI+Tt6EcGjQKQ1tX8qkx1yKYAXzbImQzOAgjQgNGQZNGqdTsaTuek6QuukQ4?=
- =?us-ascii?Q?CkqoRadN4MBwKoxMxk+6cOZGpSn0v+zkbI4FqjP5WfU+Wnoqfk1loO0Ku0Xv?=
- =?us-ascii?Q?g34mS6KbjaRhzV1FnbzbyQIhmDLsfR4eOeLGXVYktirTddFR2YcMp3v7apgf?=
- =?us-ascii?Q?BvZsLlscSN9SfV7+Pav5dlXrzjSELTFaQOEuow8jZKxmOraNygTWPPP9H8Cn?=
- =?us-ascii?Q?LrfGtpn4kjcUONzZmTDNuzRbSvfOB7TeNTWqn1v6C8qZWBUVfkYsdrgzUu1Y?=
- =?us-ascii?Q?qfbTfR28qhHARjJqY1mILt/JxIfxiTZxALzPnSPRqmJTHvG85FZm/4r1NSvn?=
- =?us-ascii?Q?JnHMUzl8ym0sUqbFK9Y0NwlI750E4jA7mv2gcViIKPz1pl0BO60EYQomjYux?=
- =?us-ascii?Q?ShBHIgGBwmVgS/WTwl0x7Css3wbAWgnrkN5YyXEMJnygKrhN/6OHO7KHZ34w?=
- =?us-ascii?Q?xDYssMLGXMHxEWk3StZC+AdFxNI1knA7yQLpGgMOkDsecFAoQ5oULzDTPa42?=
- =?us-ascii?Q?vkGU63b5xaC81Kg81znDr3F1Do0MzGsqkiN4ouZRL8HWsnMVtB3rX6Vz6JLg?=
- =?us-ascii?Q?2p0Gvmb2SyO9sF7hXjeDVt1DikV7hzpQFkLWGRMboJo0ByqrUHAHVzqCrSpy?=
- =?us-ascii?Q?nTQk8J46/5aL2uabFGLaFqGgSmMc05JaEu5Zm99zzO5tygJClhWqY7Q7nSg7?=
- =?us-ascii?Q?+mJQ1ZQcPNyJVRPJJZ1HpR+PVxAQ3H1Aiu0cgxyU60kniW0YQ8ahJ1wap8oc?=
- =?us-ascii?Q?8ChJE6nknQucTOA6JAxGKj0nw3fyqTUdoWHoiGGtvrQmihz9oLjJWL3A5Jw2?=
- =?us-ascii?Q?JOTlAEIR7JU4rkaIYBHmGinkqUoWbEar6HLdGKeRwLMVXaqRYXHID7jYl8YI?=
- =?us-ascii?Q?PucE+IGHVq04ykpoUbp46IELKdG5HK4vsjiYSBlJWVC6sDJLdyxCD36vCTIG?=
- =?us-ascii?Q?4ZVy1odo5ygSId0AKMgRtfh/N6U321oTx1fuwE82Bt696VMavSIc52nYoKRJ?=
- =?us-ascii?Q?ypuqB/wV7KngCTCt6iJCdOkQ/jSS2bVk+C5cdyZ8jnXs8ezJEOmt3xo8ZEeQ?=
- =?us-ascii?Q?b7K40o4peoEWWizLkPRwJHw2PcRrkOfVJYAvDiHsUHdXU6n/oFcAWyJyB8RT?=
- =?us-ascii?Q?2NTXIKHTFcCZ9/+EgjvJ77kf6KbTDdlJk+zcRKhXF4OHPCcKPfOzL0N8gUjX?=
- =?us-ascii?Q?+deH4zQ1WV9zxzzNHnjJG2S+aR1tlkpjiq76t3oYBvI4XC/XGcQGMHH1cEuG?=
- =?us-ascii?Q?l2TICSugWzv5LAlP8AUFjWTQkWojJNfalwWXFaslW+79UhlEO3S+JluScs1C?=
- =?us-ascii?Q?zIm9TuGOmsxJBFD3hcZwkJJjuGTyEh9SHCmidFIdH/FNBQzU2mzaoasoia5k?=
- =?us-ascii?Q?BPTx7XPRTOsBVsVh9ZyPB98vHDeUXgiC55+YiQjNmv9C6kn9hm4uvhsnJ6sC?=
- =?us-ascii?Q?MM1aWvMgfpMBv5KHgTXyLohje95L99BYJh4fS2Q85yRZGYn+ehoK6BFzgTgj?=
- =?us-ascii?Q?F97P49yHVJiw+QrFSzmGHDWk8JeMrbYzh+X/nkKIKKuXmdZ3tzH5mwJE1zBP?=
- =?us-ascii?Q?L+G5VE+gpUnajYh+MTyzYd2EFo45sWdY/Kr+nj8po1QMMVJ67MHFm4cVJFS3?=
- =?us-ascii?Q?B0wVZY9ML5ml63LEZseZmaXv2sHee3HBqWsOfDA14YiSAHs/bKWG5vo/mruB?=
-X-MS-Exchange-AntiSpam-MessageData-1: bURvwi5REr8SjFv3z5drFUZkbC6e0q0FoG8=
+	=?us-ascii?Q?YRt2K0gUzM1fL1ohydgDj/EpV5jsVb7Qo0wvWMSHlTNRDhS+Vj1aTwKz2c5e?=
+ =?us-ascii?Q?bRK267i0m4zZ+qwUUjKw7ap1N8l5tkr+67spOvTugMxjp6SzWxnUdn3a/SVz?=
+ =?us-ascii?Q?XjnyAAF27egx1w7HI/vKl6Fh6/SHkp8zpPPW0MarRtE8etPmZBN6J8ABwBie?=
+ =?us-ascii?Q?a+ERTA5qXJPuRtZwwprl9xg3zLfzW1iN5MFQ3zgpoV41ixyvjh1G05lyAsZm?=
+ =?us-ascii?Q?+zGynI1XJM51h3P034U4/g48ghjUatDGmPjpLsG3w1981fg2zZ7NaAd/X2Fn?=
+ =?us-ascii?Q?nR2N5Y1d9c37T//w5rE/B6NKfC8Xk/5PzdvzwEQP3BbqlRznkQ7+0XJ8/A3O?=
+ =?us-ascii?Q?sW3wFAQmu99vLLzFBnPDGFFoGyoACJ99UnjVWCkSfpGQMdzbAxqcrqdwMyZq?=
+ =?us-ascii?Q?71t2txD3edbslPZ4e9aAzZSO5iGat9Qmz2c02MQzOoHtcpjk/3qg/JrY5CVv?=
+ =?us-ascii?Q?ZKjie8Ig+2/Yr5OWpTyDeQNSWkWwv0UFEf9mWpIZdxDKF/aTjbD6s+2Dez8o?=
+ =?us-ascii?Q?4mDqyfOlyrbfHLE08oD1MYdvAQ0dy3JjZ78tLBWEfj3s9xPcEuVIQSWzSgtz?=
+ =?us-ascii?Q?06UZVqDqO34+4gyncJXak2QBl5/ZPAk9uXC+6GhmBTy55Tfv6KiLWdPLtonS?=
+ =?us-ascii?Q?mNzzaem8GgaEpWYnhxGBBEiZKekkcEExc6iLIo1CfHRh55/4mtKUSAHla9/T?=
+ =?us-ascii?Q?SML/EC06H/116RWVfej+9xj1Ws48VlzKNGkZsp7fDY5oXBTMTQMh3gVKcZ6k?=
+ =?us-ascii?Q?3IRCAV9JyLJxgQK87fRqY6cINA3dJKPSEf1NoVJdas+G6bFQlppqWPNt1muW?=
+ =?us-ascii?Q?TaVDT+ssafL1wZ3xotButP9DqJbn53Cf9WRCChUCt4XP/vhxX0PyKZiwZB/n?=
+ =?us-ascii?Q?sakmzCL9tgfDan0edSW+eE018shy5MdvqbSQbQITk1Gs/DV08EwFiXpQ1rRe?=
+ =?us-ascii?Q?3OqGa2ZkxKv8b4PyLaFgI9ccYl2kf9l8sTZLlPUAG0ydef8sLz8yk17sras5?=
+ =?us-ascii?Q?/ToH3OuL69H/uGPjeYW0KYeL0qYbSW7OtPoYhaq21ss2bnqT4M2dWx9wfg/1?=
+ =?us-ascii?Q?OUOe495BOUZyT4B2LKYOwMj0w0zJumTuIhjuHjhM2djs8ln6mDMeSegxNhFZ?=
+ =?us-ascii?Q?Ss20oWB0SxNA+NvtlPtVxhvWK3457mvVWBVVWbb6CEukJ3K3oH/d9vyFMGv6?=
+ =?us-ascii?Q?f4JG96tuUdsM0xzbj1DhbOBKsj2oNXUlOTztVuWnN74mM/YrDDOyqZFVlT6I?=
+ =?us-ascii?Q?f0BKn0+52PLdwmdFPCdhSRW9bj+U1ZJgkfSV4mPZb4uLksarFFNhBlJ2EVUZ?=
+ =?us-ascii?Q?pgsXKWdEHx4t26jAZ13z0vxjBrLV7WkKw89r7uVdq3dAsNAL1WJt8S1Zz6IK?=
+ =?us-ascii?Q?Lix0a9lFnJuBPkTPNfPDKmU4axpQfxIrcW0ODwDLvNEQXYFXAHi5CFXd5PCl?=
+ =?us-ascii?Q?KqHQu5P62M8VPlFfLGl316MMAdFUk8qOy39m1GQlzCizzEmogFApMdxXW8Nr?=
+ =?us-ascii?Q?lYNPQiZ3CXM+ECLMQHw8vP/3qI/IKNlizSPu5RfKrVWhFGW+1pQyWRHh8GH7?=
+ =?us-ascii?Q?ceptOxeVkJz+0xmQA9b939M+4zXj0bisZq9aI5YfXvjgw4yGEK/QbuA1oub5?=
+ =?us-ascii?Q?ja6etrTW+GGHl0ijQC6Abm7Nv2X6N66Tvdr3alOH3TYA8BCnXty4qRpIm2y3?=
+ =?us-ascii?Q?35owMoZDAV1+RPxWzNErDfDS+0a96csNJr2EbJzGmIq2Z/xVwepPldChQN2S?=
+ =?us-ascii?Q?vEqKPYu3djnNzLSsu6s93hrukiRO4w6WbHxexSs7P8T4EdTu2aQSHzHkH86x?=
+X-MS-Exchange-AntiSpam-MessageData-1: rj3O88WFsPe72IW/jKEn5zwVe6FcSFRXI6I=
 X-OriginatorOrg: windriver.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 32f54846-ac42-43ad-ff5c-08de68e61117
+X-MS-Exchange-CrossTenant-Network-Message-Id: 33ff3475-6813-49c1-18b6-08de68e6243c
 X-MS-Exchange-CrossTenant-AuthSource: MN2PR11MB3885.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Feb 2026 20:50:47.5106
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Feb 2026 20:51:19.3904
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 8ddb2873-a1ad-4a18-ae4e-4644631433be
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: njzlAIT+oYRI+4Gu+v4I+IO3toN+jUI/nheMFw9fXlokAf68H/QHevhNqT7mVMV1nVOQFfUle5JYct4E64EJTjqux9Ag1zeigQ78y6f53NE=
+X-MS-Exchange-CrossTenant-UserPrincipalName: 8OX//9WDaaFXUIgTcBUGPCiZzdII4xEhKe41g1lEDeAVZbJ6mx80rastT+yBxGBjUZAkHnGkQfQt6VqnrrJWFREusj6qmlaHOChnTlrqLGo=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR11MB8309
-X-Authority-Analysis: v=2.4 cv=bvBBxUai c=1 sm=1 tr=0 ts=698b9a2a cx=c_pps
- a=5ppPJOB7bB2hO4guNQQ//Q==:117 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19
+X-Proofpoint-ORIG-GUID: mSr9s3nxRvQRTGqEgJJaVZILs01jssY5
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjEwMDE3MiBTYWx0ZWRfXwyK2dGZEMYaB
+ E31Jsgj6RJd3rwST3WF11vuouRK/2qt27JPXbv5gFGMFaT5WA+ql9IWp0n16Y1AB5at1WEdiPq9
+ yEHEbuQQLNMuwHRBtInlrZZMlRn8iTLwOWeC/+iFLB98rOXpjTBYupsnEhu1kDbU0mIp2LH5reR
+ jISz02G/Oju+LvQyvqTVCpgI1lSzKuyoRlGP9PqOjsVQDCotHjeOBc0b+AzkQuIX95Oid+11t4j
+ VqoOvBMFALi2RkOzx+khQ7/s5jcBh99Ztaeq2y4SIKrKJwWXFThwUzcg6CRRHXNK9DDdwyBUkzY
+ 8rnXKHqXyfZfSCxPo2pe4bWgfda/FBQhP1soydP6S3uHTXpkhVn/enydShiHgEoRT33OHWvcXuU
+ m48lSrNcVIWMxvOY5Z7xFYs+wqNUMnhhIU3Tmkj/trksCtDRR6N5M87OSo0ezYuMNVj7YHuzHZb
+ /rq32r8wuzxhZERPlyg==
+X-Proofpoint-GUID: mSr9s3nxRvQRTGqEgJJaVZILs01jssY5
+X-Authority-Analysis: v=2.4 cv=Cpyys34D c=1 sm=1 tr=0 ts=698b9a49 cx=c_pps
+ a=wMiyO8M9v1WpSot1jLKY+A==:117 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19
  a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19
  a=xqWC_Br6kY4A:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=-juEKH9_NjLGvZPlg1sA:9
-X-Proofpoint-GUID: SsMwAAuJ4GQyi2JlZFa1rEkRVPabp6Oa
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjEwMDE3MiBTYWx0ZWRfX3AS8u7pLkOwB
- /vjjQ5YMBGm9iXvgatS8pYx7BZOag6eyKro+T84SnC+uy9czwTD0y1VyoJM8lNtHhSxobBLfAGg
- Wh5aZH3hXjvjRUxoNLMRR9Fi6w7yG017KjcNgi5r1i9dg9VsYtzuE8ePSDZMaaGnk43gNEpPQI3
- BSQQc0f7VsJBo41ZIEo778dugCjWgZ5w5LAQDZ6LMAqgF7MBmw78poxV/BcCLFOyuHMy9F/05zY
- tI+7woMz3fDFwPJJXiNrHllOF38KVNIFEYPYgDmt8aJvSW7z82ti06tojk7a7QpsDW46rz9nDJv
- Cb4r5S7LynRlQ32xwNZ0pKwgQbW16aXKl3V+ANvSON0YrdRzywUgYhtwnynKqNJ/GQ1WTeKNeNV
- qcYyIOROyPBSOM4qjY4voIv8IuOnvUDa1V6F9IGWLmk3Dw7q5TQ1fE16mVkupFg2gd4nwTs/IlB
- h9Uo39FzXQIoV39RHzA==
-X-Proofpoint-ORIG-GUID: SsMwAAuJ4GQyi2JlZFa1rEkRVPabp6Oa
+ a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=t7CeM3EgAAAA:8
+ a=VwQbUJbxAAAA:8 a=Cw8VXQZKCj28N06HuCYA:9 a=FdTzh2GWekK77mhwV6Dw:22
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-02-10_03,2026-02-10_02,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 spamscore=0 adultscore=0 impostorscore=0 bulkscore=0
- suspectscore=0 phishscore=0 priorityscore=1501 clxscore=1011
- lowpriorityscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
- definitions=main-2602100172
+ spamscore=0 lowpriorityscore=0 bulkscore=0 clxscore=1015 impostorscore=0
+ priorityscore=1501 phishscore=0 suspectscore=0 adultscore=0 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2602100172
 
-Hi Jens,
+From: Ionut Nechita <ionut.nechita@windriver.com>
 
-This is v2 of the fix for the RT kernel performance regression caused by
-commit 679b1874eba7 ("block: fix ordering between checking
-QUEUE_FLAG_QUIESCED request adding").
+In RT kernel (PREEMPT_RT), commit 679b1874eba7 ("block: fix ordering
+between checking QUEUE_FLAG_QUIESCED request adding") causes severe
+performance regression on systems with multiple MSI-X interrupt vectors.
 
-Changes since v1 (RESEND, Jan 9):
-- Rebased on top of axboe/for-7.0/block
-- No code changes
+The above change added spinlock_t queue_lock to blk_mq_run_hw_queue()
+to synchronize QUEUE_FLAG_QUIESCED checks with blk_mq_unquiesce_queue().
+While this works correctly in standard kernel, it causes catastrophic
+serialization in RT kernel where spinlock_t converts to sleeping
+rt_mutex.
 
-The problem: on PREEMPT_RT kernels, the spinlock_t queue_lock added in
-blk_mq_run_hw_queue() converts to a sleeping rt_mutex, causing all IRQ
-threads (one per MSI-X vector) to serialize. On megaraid_sas with 8
-MSI-X vectors, throughput drops from 640 MB/s to 153 MB/s.
+Problem in RT kernel:
+- blk_mq_run_hw_queue() is called from IRQ thread context (I/O completion)
+- With 8 MSI-X vectors, all 8 IRQ threads contend on the same queue_lock
+- queue_lock becomes rt_mutex (sleeping) in RT kernel
+- IRQ threads serialize and enter D-state waiting for lock
+- Throughput drops from 640 MB/s to 153 MB/s
 
-The fix introduces a dedicated raw_spinlock_t quiesce_sync_lock that
-does not convert to rt_mutex on RT kernels. The critical section is
-provably short (only flag and counter checks), making raw_spinlock safe.
+The original commit message noted that memory barriers were considered
+but rejected because "memory barrier is not easy to be maintained" -
+barriers would need to be added at multiple call sites throughout the
+block layer where work is added before calling blk_mq_run_hw_queue().
 
-In past used memory barriers but was rejected due to barrier pairing
-complexity across multiple call sites (as noted by Muchun Song).
+Solution:
+Instead of using the general-purpose queue_lock or attempting complex
+memory barrier pairing across many call sites, introduce a dedicated
+raw_spinlock_t quiesce_sync_lock specifically for synchronizing the
+quiesce state between:
+- blk_mq_quiesce_queue_nowait()
+- blk_mq_unquiesce_queue()
+- blk_mq_run_hw_queue()
 
-Ionut Nechita (1):
-  block/blk-mq: fix RT kernel regression with dedicated
-    quiesce_sync_lock
+Why raw_spinlock is safe:
+- Critical section is provably short (only flag and counter checks)
+- No sleeping operations under lock
+- raw_spinlock does not convert to rt_mutex in RT kernel
+- Provides same ordering guarantees as original queue_lock approach
 
+This approach:
+- Maintains correctness of original synchronization
+- Avoids sleeping in RT kernel's IRQ thread context
+- Limits scope to only quiesce-related synchronization
+- Simpler than auditing all call sites for memory barrier pairing
+
+Additionally, change blk_freeze_queue_start to use async=true for better
+performance in RT kernel by avoiding synchronous queue runs during freeze.
+
+Test results on RT kernel (megaraid_sas with 8 MSI-X vectors):
+- Before: 153 MB/s, 6-8 IRQ threads in D-state
+- After:  640 MB/s, 0 IRQ threads blocked
+
+Fixes: 679b1874eba7 ("block: fix ordering between checking QUEUE_FLAG_QUIESCED request adding")
+Cc: stable@vger.kernel.org
+Signed-off-by: Ionut Nechita <ionut.nechita@windriver.com>
+---
  block/blk-core.c       |  1 +
  block/blk-mq.c         | 27 ++++++++++++++++-----------
  include/linux/blkdev.h |  6 ++++++
  3 files changed, 23 insertions(+), 11 deletions(-)
 
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 474700ffaa1c8..fd615aeb5c463 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -434,6 +434,7 @@ struct request_queue *blk_alloc_queue(struct queue_limits *lim, int node_id)
+ 	mutex_init(&q->limits_lock);
+ 	mutex_init(&q->rq_qos_mutex);
+ 	spin_lock_init(&q->queue_lock);
++	raw_spin_lock_init(&q->quiesce_sync_lock);
+ 
+ 	init_waitqueue_head(&q->mq_freeze_wq);
+ 	mutex_init(&q->mq_freeze_lock);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 0ad3dd3329db7..888718a782f88 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -171,7 +171,7 @@ bool __blk_freeze_queue_start(struct request_queue *q,
+ 		percpu_ref_kill(&q->q_usage_counter);
+ 		mutex_unlock(&q->mq_freeze_lock);
+ 		if (queue_is_mq(q))
+-			blk_mq_run_hw_queues(q, false);
++			blk_mq_run_hw_queues(q, true);
+ 	} else {
+ 		mutex_unlock(&q->mq_freeze_lock);
+ 	}
+@@ -262,10 +262,10 @@ void blk_mq_quiesce_queue_nowait(struct request_queue *q)
+ {
+ 	unsigned long flags;
+ 
+-	spin_lock_irqsave(&q->queue_lock, flags);
++	raw_spin_lock_irqsave(&q->quiesce_sync_lock, flags);
+ 	if (!q->quiesce_depth++)
+ 		blk_queue_flag_set(QUEUE_FLAG_QUIESCED, q);
+-	spin_unlock_irqrestore(&q->queue_lock, flags);
++	raw_spin_unlock_irqrestore(&q->quiesce_sync_lock, flags);
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue_nowait);
+ 
+@@ -317,14 +317,14 @@ void blk_mq_unquiesce_queue(struct request_queue *q)
+ 	unsigned long flags;
+ 	bool run_queue = false;
+ 
+-	spin_lock_irqsave(&q->queue_lock, flags);
++	raw_spin_lock_irqsave(&q->quiesce_sync_lock, flags);
+ 	if (WARN_ON_ONCE(q->quiesce_depth <= 0)) {
+ 		;
+ 	} else if (!--q->quiesce_depth) {
+ 		blk_queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
+ 		run_queue = true;
+ 	}
+-	spin_unlock_irqrestore(&q->queue_lock, flags);
++	raw_spin_unlock_irqrestore(&q->quiesce_sync_lock, flags);
+ 
+ 	/* dispatch requests which are inserted during quiescing */
+ 	if (run_queue)
+@@ -2368,14 +2368,19 @@ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
+ 		unsigned long flags;
+ 
+ 		/*
+-		 * Synchronize with blk_mq_unquiesce_queue(), because we check
+-		 * if hw queue is quiesced locklessly above, we need the use
+-		 * ->queue_lock to make sure we see the up-to-date status to
+-		 * not miss rerunning the hw queue.
++		 * Synchronize with blk_mq_unquiesce_queue(). We check if hw
++		 * queue is quiesced locklessly above, so we need to use
++		 * quiesce_sync_lock to ensure we see the up-to-date status
++		 * and don't miss rerunning the hw queue.
++		 *
++		 * Uses raw_spinlock to avoid sleeping in RT kernel's IRQ
++		 * thread context during I/O completion. Critical section is
++		 * short (only flag and counter checks), making raw_spinlock
++		 * safe.
+ 		 */
+-		spin_lock_irqsave(&hctx->queue->queue_lock, flags);
++		raw_spin_lock_irqsave(&hctx->queue->quiesce_sync_lock, flags);
+ 		need_run = blk_mq_hw_queue_need_run(hctx);
+-		spin_unlock_irqrestore(&hctx->queue->queue_lock, flags);
++		raw_spin_unlock_irqrestore(&hctx->queue->quiesce_sync_lock, flags);
+ 
+ 		if (!need_run)
+ 			return;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 99ef8cd7673c2..ab9e62aa3ae42 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -514,6 +514,12 @@ struct request_queue {
+ 	struct request		*last_merge;
+ 
+ 	spinlock_t		queue_lock;
++	/*
++	 * Synchronizes quiesce state checks between blk_mq_run_hw_queue()
++	 * and blk_mq_unquiesce_queue(). Uses raw_spinlock to avoid sleeping
++	 * in RT kernel's IRQ thread context during I/O completion.
++	 */
++	raw_spinlock_t		quiesce_sync_lock;
+ 
+ 	int			quiesce_depth;
+ 
 -- 
 2.52.0
 
