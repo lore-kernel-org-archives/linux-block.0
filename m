@@ -1,42 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F01F43207;
-	Wed, 11 Feb 2026 12:31:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80AEA1A9FA4;
+	Wed, 11 Feb 2026 12:31:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770813091; cv=none; b=s0xL4kaqmGm5WoU/G6L2yV7QLM5Rfs01T20MvdhTwGZ6yVsatEbz4QkqeDchVRTeG9piVFhiCWVSDn4Py6g14+6i4IYTJ/LlTxW2Jbea0LmFgc6nMHpDXyUYfOyitJTNTV3wOaizp5F7Th2XXO9t60/EepFU+SnOnHDgVEMG3KQ=
+	t=1770813107; cv=none; b=fxgIPNv75en0grp2VCWfytbMBYLfYJTzjLAn8VE05scx7T/74Nr31mtKzIJGpctc6omADdxU4dcjUr0JhrrE+itUowymr48zKq40NIHzkDXRRWyIo56LT8chVXJhfI7EQucNm2/pPgB3hr2UD9MYtCIriqKuB9nblB+4l1cqEME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770813091; c=relaxed/simple;
-	bh=54ptZY70lc/rowJfJIo76PTdUbKdlVReVnA7x+FOggg=;
+	s=arc-20240116; t=1770813107; c=relaxed/simple;
+	bh=Tf2HFjwCMjCSlIDdTt4ev05KSSziEzdiulZOqr2rm+A=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rdw85/gaJbhUhukA5G2mTJX3cPhVUMWcK3qIhx3nLeJ0OkDwBVP411Jz/ApW64VoSwvAhVjTmgdYWYmY0/AFtttkUr5FtY4x6VHx//W57H3UvIbOnWvy7PfiEnt4quaGvaECk0uOTqE5SBvWfmf5M1cEh63B+pRfkrjLcgZ25Pc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AfDKzCeB; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=hD+bi1OP0sxtHQwdYB/YQHCpqRFfKDgif1AIQ7O2G1H5mnV4ZF/7zW/17h6hxDbf5/hWhoOfoyC9NVrMnDXS2nNcK1oaaUKrwPeQelkR/7EFdgoBmtysxns9HYhXP7DaaFAHiPNTQapITI2355nAnrC4pa6RTd8xZ6pgGrYHaag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tewN5C1X; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AfDKzCeB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AC58C19425;
-	Wed, 11 Feb 2026 12:31:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tewN5C1X"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DDADC2BC87;
+	Wed, 11 Feb 2026 12:31:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770813090;
-	bh=54ptZY70lc/rowJfJIo76PTdUbKdlVReVnA7x+FOggg=;
+	s=k20201202; t=1770813107;
+	bh=Tf2HFjwCMjCSlIDdTt4ev05KSSziEzdiulZOqr2rm+A=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=AfDKzCeBPe361GvqJ5M4rZ0G8L5qd50P1Gf8EJuL+cy3pAZCJze+0dMMslrTxixyI
-	 ExxklOyK9j6n/tnlgOG0bAaxg4y3S/xrGwEt3jSIC4zLw3/9lb5MLnVS1J3D+f9gT+
-	 hXP+4wrvJ5wTrSG23vlAE9EMM44UQBtxwstBMBc1Chm9hSmPl8ktdewgJFilLBwU6A
-	 6q2SgoRooeyzEbqBcjVKBk+ldl5NFoecLvSb9kI4uANQcf6pJGwJsFh7KwZnOOhTJe
-	 TYk+Z6mtlZaAB6jK4yzXjQXH0C9PCRnDtojAyDdhJdt7ZZtCpIq7j3NbMr3h4Y5MaZ
-	 E9NFKmfArFi0A==
+	b=tewN5C1XsPMIXcoLeufJOAvYhAgoy8xQJX4J2i0/3nQgpQLc9ihayjI/GY+UtxxZs
+	 lK4MgFSx59z+qgqdbbOvZbYOErhUlvBusYZe8BYWpXbXykclKpcTZDga55dXD2cBpF
+	 4daeHAhT73Pp3xXWQMjlQyMzM/kBanfZuEra1VIzIhqlyw5fyUsPjSGLVlMlPgWlo6
+	 3bTbq/X60+ZfyhgcKdUn1E+YuodpcxqsSIv88OXQbtxsWPMvgCWyHIhWMFYWMA8A21
+	 qTtIDGThTynefynpPWDwLfrZ0lz2EqzD/xXU8CKSt0czLib7F+/yQ/g7fT8G+UQHPM
+	 +C8qHLiYEel7g==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Luke Wang <ziniu.wang_1@nxp.com>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
+Cc: Yu Kuai <yukuai@fnnas.com>,
+	Nilay Shroff <nilay@linux.ibm.com>,
+	Hannes Reinecke <hare@suse.de>,
 	Jens Axboe <axboe@kernel.dk>,
 	Sasha Levin <sashal@kernel.org>,
 	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.19-6.12] block: decouple secure erase size limit from discard size limit
-Date: Wed, 11 Feb 2026 07:30:19 -0500
-Message-ID: <20260211123112.1330287-9-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.19-6.18] blk-mq-sched: unify elevators checking for async requests
+Date: Wed, 11 Feb 2026 07:30:27 -0500
+Message-ID: <20260211123112.1330287-17-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260211123112.1330287-1-sashal@kernel.org>
 References: <20260211123112.1330287-1-sashal@kernel.org>
@@ -49,229 +50,298 @@ MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.19
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Luke Wang <ziniu.wang_1@nxp.com>
+From: Yu Kuai <yukuai@fnnas.com>
 
-[ Upstream commit ee81212f74a57c5d2b56cf504f40d528dac6faaf ]
+[ Upstream commit 1db61b0afdd7e8aa9289c423fdff002603b520b5 ]
 
-Secure erase should use max_secure_erase_sectors instead of being limited
-by max_discard_sectors. Separate the handling of REQ_OP_SECURE_ERASE from
-REQ_OP_DISCARD to allow each operation to use its own size limit.
+bfq and mq-deadline consider sync writes as async requests and only
+reserve tags for sync reads by async_depth, however, kyber doesn't
+consider sync writes as async requests for now.
 
-Signed-off-by: Luke Wang <ziniu.wang_1@nxp.com>
-Reviewed-by: Ulf Hansson <ulf.hansson@linaro.org>
+Consider the case there are lots of dirty pages, and user use fsync to
+flush dirty pages. In this case sched_tags can be exhausted by sync writes
+and sync reads can stuck waiting for tag. Hence let kyber follow what
+mq-deadline and bfq did, and unify async requests checking for all
+elevators.
+
+Signed-off-by: Yu Kuai <yukuai@fnnas.com>
+Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-This is an important caller. `blk_insert_cloned_request` is used by
-device mapper (dm) to submit cloned requests. If
-`blk_queue_get_max_sectors` returns the wrong value (e.g.,
-`max_discard_sectors` instead of `max_secure_erase_sectors`), and the
-cloned request's sector count exceeds the wrong limit but fits within
-the correct one, the request will be **rejected with BLK_STS_IOERR** on
-line 3291. This is a real I/O error path!
-
-Here is my complete analysis:
+Now I have all the information needed for a thorough analysis. Let me
+compile the findings.
 
 ---
 
-## Detailed Analysis
+## Complete Analysis
 
-### 1. Commit Message Analysis
+### 1. COMMIT MESSAGE ANALYSIS
 
-The commit clearly describes a **bug fix**: secure erase operations were
-incorrectly limited by `max_discard_sectors` instead of
-`max_secure_erase_sectors`. This is a correctness issue, not a feature.
-The commit was reviewed by Ulf Hansson (MMC maintainer) and merged by
-Jens Axboe (block layer maintainer).
+The subject "blk-mq-sched: unify elevators checking for async requests"
+sounds like a cleanup/unification commit, but the message body reveals a
+**real I/O starvation bug in the kyber scheduler**:
 
-### 2. Code Change Analysis
+> *"Consider the case there are lots of dirty pages, and user use fsync
+to flush dirty pages. In this case sched_tags can be exhausted by sync
+writes and sync reads can stuck waiting for tag."*
 
-The patch modifies two files with two distinct changes:
+This describes a concrete, user-visible problem: sync read starvation
+when kyber is the I/O scheduler and fsync flushes dirty pages.
 
-**Change A: `block/blk.h` - `blk_queue_get_max_sectors()`**
+### 2. CODE CHANGE ANALYSIS — The Bug Mechanism
 
-Before the fix:
-```211:213:block/blk.h
-        if (unlikely(op == REQ_OP_DISCARD || op == REQ_OP_SECURE_ERASE))
-                return min(q->limits.max_discard_sectors,
-                           UINT_MAX >> SECTOR_SHIFT);
+The key to understanding this bug lies in the difference between
+`op_is_sync()` and the new `blk_mq_is_sync_read()`:
+
+```470:474:include/linux/blk_types.h
+static inline bool op_is_sync(blk_opf_t op)
+{
+        return (op & REQ_OP_MASK) == REQ_OP_READ ||
+                (op & (REQ_SYNC | REQ_FUA | REQ_PREFLUSH));
+}
 ```
 
-Both `REQ_OP_DISCARD` and `REQ_OP_SECURE_ERASE` used
-`max_discard_sectors`. The fix separates them so secure erase uses
-`max_secure_erase_sectors`.
+`op_is_sync()` returns **true** for both sync reads AND sync writes
+(writes with `REQ_SYNC`/`REQ_FUA`/`REQ_PREFLUSH`).
 
-**Change B: `block/blk-merge.c` - `bio_split_discard()`**
+When `fsync()` triggers writeback, writes get `REQ_SYNC` because
+`wbc->sync_mode == WB_SYNC_ALL`:
 
-The original `bio_split_discard()` always split using
-`lim->max_discard_sectors`, even for `REQ_OP_SECURE_ERASE` (which
-reaches this function via `__bio_split_to_limits` at line 407-409 of
-`blk.h`). The fix refactors the function into a wrapper that selects the
-correct limit and a helper `__bio_split_discard()` that does the actual
-splitting.
+```93:103:include/linux/writeback.h
+static inline blk_opf_t wbc_to_write_flags(struct writeback_control
+*wbc)
+{
+        blk_opf_t flags = 0;
 
-### 3. Bug Mechanism and Impact
+        if (wbc->sync_mode == WB_SYNC_ALL)
+                flags |= REQ_SYNC;
+        // ...
+}
+```
 
-**The bug**: The kernel `queue_limits` structure has separate fields for
-`max_discard_sectors` and `max_secure_erase_sectors`, but the block
-layer core code in two critical paths ignored the secure erase field and
-always used the discard field.
+**Kyber's bug** — in `kyber_limit_depth()`:
 
-**Concrete impact scenarios**:
+```553:564:block/kyber-iosched.c
+static void kyber_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data
+*data)
+{
+        /*
+  - We use the scheduler tags as per-hardware queue queueing tokens.
+  - Async requests can be limited at this stage.
+         */
+        if (!op_is_sync(opf)) {
+                struct kyber_queue_data *kqd =
+data->q->elevator->elevator_data;
 
-1. **virtio_blk**: This driver reads separate limits from the virtio
-   config for discard (`max_discard_sectors`) and secure erase
-   (`max_secure_erase_sectors`). The driver even documents the
-   workaround: *"The discard and secure erase limits are combined since
-   the Linux block layer uses the same limit for both commands."*
-   (virtio_blk.c lines 1336-1341). This means the driver had to
-   artificially reduce its limits to compensate for the block layer bug.
+                data->shallow_depth = kqd->async_depth;
+        }
+}
+```
 
-2. **xen-blkfront**: Sets `max_secure_erase_sectors = UINT_MAX` while
-   `max_discard_sectors = get_capacity(gd)` - different values.
+The condition `!op_is_sync(opf)` means only truly async operations get
+throttled. Sync writes (from fsync) pass `op_is_sync()` as true, so they
+get **full depth** — no throttling. This means sync writes can consume
+ALL sched_tags.
 
-3. **dm (device mapper)**: The `blk_insert_cloned_request()` function
-   calls `blk_queue_get_max_sectors()` and rejects requests that exceed
-   the limit with `BLK_STS_IOERR`. If `max_secure_erase_sectors` >
-   `max_discard_sectors` on the underlying device, valid secure erase
-   requests could be rejected with I/O errors. Conversely, if
-   `max_secure_erase_sectors` < `max_discard_sectors`, oversized
-   requests could be sent to hardware.
+**mq-deadline and bfq already handle this correctly:**
 
-4. **The most dangerous case**: When `max_secure_erase_sectors <
-   max_discard_sectors`, the bio splitting code won't split the secure
-   erase bio when it should, sending a request larger than the device
-   can handle. This can cause **I/O errors, device failures, or data
-   integrity issues** with secure erase operations.
+```493:506:block/mq-deadline.c
+static void dd_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data
+*data)
+{
+        struct deadline_data *dd = data->q->elevator->elevator_data;
 
-### 4. Scope and Risk Assessment
+        /* Do not throttle synchronous reads. */
+        if (op_is_sync(opf) && !op_is_write(opf))
+                return;
 
-- **Lines changed**: ~25 lines of actual logic change across 2 files
-- **Files touched**: `block/blk-merge.c` and `block/blk.h` (core block
-  layer, but well-contained)
-- **Risk of regression**: **Low**. For any driver that sets
-  `max_secure_erase_sectors == max_discard_sectors` (like MMC), the
-  behavior is completely unchanged. For drivers with different values,
-  the behavior is corrected.
-- **The change is obviously correct**: Secure erase operations should
-  use secure erase limits, not discard limits.
+        // ... throttle everything else including sync writes
+        data->shallow_depth = dd->async_depth;
+}
+```
 
-### 5. Affected Subsystems and Users
+Both mq-deadline and bfq use `op_is_sync(opf) && !op_is_write(opf)` to
+give full depth only to sync **reads**. Sync writes are properly
+throttled by `async_depth`.
 
-- MMC/eMMC (mobile, embedded) - same values, no visible change
-- virtio_blk (VMs, cloud) - corrects a workaround-needing limitation
-- xen-blkfront (Xen VMs) - corrects a real mismatch
-- dm (device-mapper stacking) - fixes potential I/O errors
+**The fix:** Changes kyber's condition from `!op_is_sync(opf)` to
+`!blk_mq_is_sync_read(opf)`, where the new helper is defined as:
 
-### 6. Backport Complexity
+```c
+static inline bool blk_mq_is_sync_read(blk_opf_t opf)
+{
+    return op_is_sync(opf) && !op_is_write(opf);
+}
+```
 
-- For kernels 6.12+: The patch should apply nearly cleanly;
-  `bio_submit_split()` and the current code structure exist.
-- For kernels 6.1-6.11: The `blk.h` change applies cleanly (same
-  pattern). The `blk-merge.c` change needs adaptation because the
-  splitting mechanism is different (returns split bio instead of using
-  `bio_submit_split`), but the conceptual fix is the same.
-- For kernel 5.15: `max_secure_erase_sectors` field exists but
-  `blkdev_issue_secure_erase` was introduced in 6.1; older kernels have
-  different secure erase code paths.
+### 3. BEHAVIORAL IMPACT BY SCHEDULER
 
-### 7. Stability Indicators
+| Scheduler | Before | After | Behavioral Change? |
+|---|---|---|---|
+| **kyber** | Only async ops throttled; sync writes get full depth |
+Everything except sync reads throttled | **YES — this is the bug fix** |
+| **bfq** | `op_is_sync(opf) && !op_is_write(opf)` |
+`blk_mq_is_sync_read(opf)` | **NO — semantically identical** |
+| **mq-deadline** | `op_is_sync(opf) && !op_is_write(opf)` |
+`blk_mq_is_sync_read(opf)` | **NO — semantically identical** |
 
-- Reviewed by Ulf Hansson (MMC subsystem co-maintainer)
-- Merged by Jens Axboe (block layer maintainer)
-- Simple, obviously correct fix
+The bfq and mq-deadline changes are purely cosmetic refactoring. The
+actual bug fix is exclusively in kyber.
 
-### 8. Conclusion
+### 4. BUG SEVERITY
 
-This commit fixes a real bug where the block layer core was using the
-wrong limit for secure erase operations, potentially causing:
-- I/O errors when valid requests are rejected
-- Oversized requests being sent to hardware
-- Unnecessary performance limitations
+The starvation scenario is concrete and reproducible:
+1. System has lots of dirty pages
+2. User calls `fsync()` to flush them
+3. Lots of sync writes are submitted
+4. Kyber gives them full depth (no throttling)
+5. All sched_tags consumed by sync writes
+6. Sync reads from applications **starve** — they cannot get any tags
+7. Read I/O hangs until writes complete
 
-The fix is small, contained, obviously correct, and was reviewed by
-multiple maintainers. It affects core block layer code that is shared
-across all block devices supporting secure erase. The risk of regression
-is minimal since the change only affects the code path when
-`max_secure_erase_sectors != max_discard_sectors`.
+This is a **system responsiveness issue** — applications waiting for
+reads (file access, page faults) can hang when another process is doing
+heavy fsyncing.
+
+### 5. SCOPE AND RISK
+
+- **Size:** Very small — adds a 4-line helper, changes one condition in
+  each of 3 files
+- **Risk for bfq/mq-deadline:** Zero — semantically identical changes
+- **Risk for kyber:** Low — the change aligns kyber with the well-
+  established and battle-tested behavior of mq-deadline and bfq. Kyber's
+  `async_depth` is set to 75% of `q->nr_requests` (`KYBER_ASYNC_PERCENT
+  = 75`), so sync writes still get generous tag allocation, just not
+  unlimited
+- **Possible regression:** Slight reduction in sync write throughput on
+  kyber (now throttled to 75% of tags instead of 100%), but this is the
+  correct behavior to prevent read starvation
+
+### 6. REVIEW AND TESTING
+
+The commit has two `Reviewed-by` tags from experienced kernel
+developers:
+- **Nilay Shroff** (IBM) — block layer contributor
+- **Hannes Reinecke** (SUSE) — longstanding storage/block subsystem
+  maintainer
+
+Signed off by **Jens Axboe** — block subsystem maintainer.
+
+### 7. DEPENDENCY ANALYSIS
+
+The commit depends on `42e6c6ce03fd3e` ("lib/sbitmap: convert
+shallow_depth from one word to the whole sbitmap") for context lines in
+the bfq part (which references `bfqd->async_depths`, renamed from
+`bfqd->word_depths` in the prerequisite). However:
+
+- The **core fix** (kyber condition change) is completely independent
+- The bfq and mq-deadline changes are cosmetic and could be dropped for
+  stable
+- For stable trees, the kyber fix + helper function could be backported
+  alone, or the bfq/mq-deadline parts could be adapted to match older
+  context
+
+### 8. BUG LONGEVITY
+
+The bug has existed since kyber's introduction in commit `00e043936e9a1`
+(April 2017, kernel v4.12). The original code already used
+`!op_is_sync(op)` which had the same problem. The mq-deadline scheduler
+only added tag reservation in v5.15 (commit `07757588e507`, June 2021)
+and correctly used `op_is_sync(opf) && !op_is_write(opf)` from the
+start. The bfq scheduler similarly had the correct check. Kyber was the
+odd one out.
+
+### 9. CONCLUSION
+
+This commit fixes a real I/O starvation bug in the kyber scheduler where
+sync writes (from fsync/sync) can exhaust all scheduler tags and starve
+sync reads. The fix is:
+
+- **Small and surgical** — one condition change in kyber, plus a trivial
+  helper function
+- **Obviously correct** — it aligns kyber with the proven behavior of
+  mq-deadline and bfq
+- **Low risk** — the bfq/mq-deadline parts are semantically identical;
+  the kyber change is well-bounded
+- **Well-reviewed** — by experienced block subsystem developers and the
+  subsystem maintainer
+- **Fixes a real user-visible bug** — read I/O starvation during fsync-
+  heavy workloads
+
+The only concern is the dependency on a prerequisite for the bfq context
+lines, but the core kyber fix is standalone and the bfq/mq-deadline
+parts are optional cosmetic refactoring that could be adapted or dropped
+for stable trees.
 
 **YES**
 
- block/blk-merge.c | 21 +++++++++++++++++----
- block/blk.h       |  6 +++++-
- 2 files changed, 22 insertions(+), 5 deletions(-)
+ block/bfq-iosched.c   | 2 +-
+ block/blk-mq-sched.h  | 5 +++++
+ block/kyber-iosched.c | 2 +-
+ block/mq-deadline.c   | 2 +-
+ 4 files changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index d3115d7469df0..bf8faadb0bd46 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -158,8 +158,9 @@ static struct bio *bio_submit_split(struct bio *bio, int split_sectors)
- 	return bio;
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 6e54b1d3d8bc2..9e9d081e86bb2 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -697,7 +697,7 @@ static void bfq_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data *data)
+ 	unsigned int limit, act_idx;
+ 
+ 	/* Sync reads have full depth available */
+-	if (op_is_sync(opf) && !op_is_write(opf))
++	if (blk_mq_is_sync_read(opf))
+ 		limit = data->q->nr_requests;
+ 	else
+ 		limit = bfqd->async_depths[!!bfqd->wr_busy_queues][op_is_sync(opf)];
+diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+index 02c40a72e9598..5678e15bd33c4 100644
+--- a/block/blk-mq-sched.h
++++ b/block/blk-mq-sched.h
+@@ -137,4 +137,9 @@ static inline void blk_mq_set_min_shallow_depth(struct request_queue *q,
+ 						depth);
  }
  
--struct bio *bio_split_discard(struct bio *bio, const struct queue_limits *lim,
--		unsigned *nsegs)
-+static struct bio *__bio_split_discard(struct bio *bio,
-+		const struct queue_limits *lim, unsigned *nsegs,
-+		unsigned int max_sectors)
- {
- 	unsigned int max_discard_sectors, granularity;
- 	sector_t tmp;
-@@ -169,8 +170,7 @@ struct bio *bio_split_discard(struct bio *bio, const struct queue_limits *lim,
- 
- 	granularity = max(lim->discard_granularity >> 9, 1U);
- 
--	max_discard_sectors =
--		min(lim->max_discard_sectors, bio_allowed_max_sectors(lim));
-+	max_discard_sectors = min(max_sectors, bio_allowed_max_sectors(lim));
- 	max_discard_sectors -= max_discard_sectors % granularity;
- 	if (unlikely(!max_discard_sectors))
- 		return bio;
-@@ -194,6 +194,19 @@ struct bio *bio_split_discard(struct bio *bio, const struct queue_limits *lim,
- 	return bio_submit_split(bio, split_sectors);
- }
- 
-+struct bio *bio_split_discard(struct bio *bio, const struct queue_limits *lim,
-+		unsigned *nsegs)
++static inline bool blk_mq_is_sync_read(blk_opf_t opf)
 +{
-+	unsigned int max_sectors;
-+
-+	if (bio_op(bio) == REQ_OP_SECURE_ERASE)
-+		max_sectors = lim->max_secure_erase_sectors;
-+	else
-+		max_sectors = lim->max_discard_sectors;
-+
-+	return __bio_split_discard(bio, lim, nsegs, max_sectors);
++	return op_is_sync(opf) && !op_is_write(opf);
 +}
 +
- static inline unsigned int blk_boundary_sectors(const struct queue_limits *lim,
- 						bool is_atomic)
- {
-diff --git a/block/blk.h b/block/blk.h
-index e4c433f62dfc7..4cd5a91346d8a 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -208,10 +208,14 @@ static inline unsigned int blk_queue_get_max_sectors(struct request *rq)
- 	struct request_queue *q = rq->q;
- 	enum req_op op = req_op(rq);
+ #endif
+diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
+index c1b36ffd19ceb..2b3f5b8959af0 100644
+--- a/block/kyber-iosched.c
++++ b/block/kyber-iosched.c
+@@ -556,7 +556,7 @@ static void kyber_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data *data)
+ 	 * We use the scheduler tags as per-hardware queue queueing tokens.
+ 	 * Async requests can be limited at this stage.
+ 	 */
+-	if (!op_is_sync(opf)) {
++	if (!blk_mq_is_sync_read(opf)) {
+ 		struct kyber_queue_data *kqd = data->q->elevator->elevator_data;
  
--	if (unlikely(op == REQ_OP_DISCARD || op == REQ_OP_SECURE_ERASE))
-+	if (unlikely(op == REQ_OP_DISCARD))
- 		return min(q->limits.max_discard_sectors,
- 			   UINT_MAX >> SECTOR_SHIFT);
+ 		data->shallow_depth = kqd->async_depth;
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index 3e3719093aec7..29d00221fbea6 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -495,7 +495,7 @@ static void dd_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data *data)
+ 	struct deadline_data *dd = data->q->elevator->elevator_data;
  
-+	if (unlikely(op == REQ_OP_SECURE_ERASE))
-+		return min(q->limits.max_secure_erase_sectors,
-+			   UINT_MAX >> SECTOR_SHIFT);
-+
- 	if (unlikely(op == REQ_OP_WRITE_ZEROES))
- 		return q->limits.max_write_zeroes_sectors;
+ 	/* Do not throttle synchronous reads. */
+-	if (op_is_sync(opf) && !op_is_write(opf))
++	if (blk_mq_is_sync_read(opf))
+ 		return;
  
+ 	/*
 -- 
 2.51.0
 
