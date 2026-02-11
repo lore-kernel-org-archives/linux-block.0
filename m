@@ -1,43 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80AEA1A9FA4;
-	Wed, 11 Feb 2026 12:31:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16CFE1D5CEA;
+	Wed, 11 Feb 2026 12:31:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770813107; cv=none; b=fxgIPNv75en0grp2VCWfytbMBYLfYJTzjLAn8VE05scx7T/74Nr31mtKzIJGpctc6omADdxU4dcjUr0JhrrE+itUowymr48zKq40NIHzkDXRRWyIo56LT8chVXJhfI7EQucNm2/pPgB3hr2UD9MYtCIriqKuB9nblB+4l1cqEME=
+	t=1770813119; cv=none; b=nQ6qslHSCpIBrR0B/uo9ggCPWzl2lH692zldPfsDBsJt6mZ7a1pvz5rcaJA6R6bouKgPqJTxseTdsyK70q+qE7AxOM2RlztAvnSt9OM2e8Jt7u/J6/1vkeFQyPNmxvw1iV89qbDG19bQsovfU/Px0fNZUjoCpMY8OmMPeJs/B8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770813107; c=relaxed/simple;
-	bh=Tf2HFjwCMjCSlIDdTt4ev05KSSziEzdiulZOqr2rm+A=;
+	s=arc-20240116; t=1770813119; c=relaxed/simple;
+	bh=W6lMWwQYpj38AyccgL7rBPPw/3iRhrUGaZC7plCayeY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hD+bi1OP0sxtHQwdYB/YQHCpqRFfKDgif1AIQ7O2G1H5mnV4ZF/7zW/17h6hxDbf5/hWhoOfoyC9NVrMnDXS2nNcK1oaaUKrwPeQelkR/7EFdgoBmtysxns9HYhXP7DaaFAHiPNTQapITI2355nAnrC4pa6RTd8xZ6pgGrYHaag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tewN5C1X; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=ds3dg5MsZJYOeFB+doEk+iKBipNe+BLHQUE2KOG0fETn1ZOBwCt88sBNLSq1RZnlu7Vp08zLv9f6+KOtvvBCPqA+0hzRWluWRDwgt3c/qSKvB7Bsu8diKzV4cz8FIhJYJvy9LQhOB82VbXOQn6QVzko3y3wLiynDx1fDGKtchhk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FOxXVuty; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tewN5C1X"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DDADC2BC87;
-	Wed, 11 Feb 2026 12:31:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FOxXVuty"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BAD4C4CEF7;
+	Wed, 11 Feb 2026 12:31:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770813107;
-	bh=Tf2HFjwCMjCSlIDdTt4ev05KSSziEzdiulZOqr2rm+A=;
+	s=k20201202; t=1770813119;
+	bh=W6lMWwQYpj38AyccgL7rBPPw/3iRhrUGaZC7plCayeY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tewN5C1XsPMIXcoLeufJOAvYhAgoy8xQJX4J2i0/3nQgpQLc9ihayjI/GY+UtxxZs
-	 lK4MgFSx59z+qgqdbbOvZbYOErhUlvBusYZe8BYWpXbXykclKpcTZDga55dXD2cBpF
-	 4daeHAhT73Pp3xXWQMjlQyMzM/kBanfZuEra1VIzIhqlyw5fyUsPjSGLVlMlPgWlo6
-	 3bTbq/X60+ZfyhgcKdUn1E+YuodpcxqsSIv88OXQbtxsWPMvgCWyHIhWMFYWMA8A21
-	 qTtIDGThTynefynpPWDwLfrZ0lz2EqzD/xXU8CKSt0czLib7F+/yQ/g7fT8G+UQHPM
-	 +C8qHLiYEel7g==
+	b=FOxXVutycOFUrt8I+5ZBkOd3fvL5fgFnznZqxRiL8e68c7ScMBqhKp2+UZIfI6QjT
+	 p00GZIJe3cUcNDY8DXBKtVJVuUgeaicRwaPOg1t+72iULSozrBjqfGFfSLplaKubuK
+	 0EEE1dx29Cv4oQ5PWfdQOncKgJypwdOflDJDMvn66XDBNGZ+jS4KjWxwJozabvyb7P
+	 Fdb4yOfMRi0mrezhDmfAu6nxV0qLNBTg8u2fmM1ARTfCM/OgOqvbbU0TfgiBD3G/w2
+	 bixd3x8IWiClJ7Q2e3RUoxLFi/HkGhamYNOqGkEtYnpFmyc/2RBIblK716kkJtPZJz
+	 vm8obLX5Pv9qw==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
 Cc: Yu Kuai <yukuai@fnnas.com>,
 	Nilay Shroff <nilay@linux.ibm.com>,
+	Ming Lei <ming.lei@redhat.com>,
 	Hannes Reinecke <hare@suse.de>,
 	Jens Axboe <axboe@kernel.dk>,
 	Sasha Levin <sashal@kernel.org>,
 	linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.19-6.18] blk-mq-sched: unify elevators checking for async requests
-Date: Wed, 11 Feb 2026 07:30:27 -0500
-Message-ID: <20260211123112.1330287-17-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.19-5.10] blk-mq-debugfs: add missing debugfs_mutex in blk_mq_debugfs_register_hctxs()
+Date: Wed, 11 Feb 2026 07:30:33 -0500
+Message-ID: <20260211123112.1330287-23-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260211123112.1330287-1-sashal@kernel.org>
 References: <20260211123112.1330287-1-sashal@kernel.org>
@@ -55,20 +56,15 @@ Content-Transfer-Encoding: 8bit
 
 From: Yu Kuai <yukuai@fnnas.com>
 
-[ Upstream commit 1db61b0afdd7e8aa9289c423fdff002603b520b5 ]
+[ Upstream commit 9d20fd6ce1ba9733cd5ac96fcab32faa9fc404dd ]
 
-bfq and mq-deadline consider sync writes as async requests and only
-reserve tags for sync reads by async_depth, however, kyber doesn't
-consider sync writes as async requests for now.
-
-Consider the case there are lots of dirty pages, and user use fsync to
-flush dirty pages. In this case sched_tags can be exhausted by sync writes
-and sync reads can stuck waiting for tag. Hence let kyber follow what
-mq-deadline and bfq did, and unify async requests checking for all
-elevators.
+In blk_mq_update_nr_hw_queues(), debugfs_mutex is not held while
+creating debugfs entries for hctxs. Hence add debugfs_mutex there,
+it's safe because queue is not frozen.
 
 Signed-off-by: Yu Kuai <yukuai@fnnas.com>
 Reviewed-by: Nilay Shroff <nilay@linux.ibm.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
@@ -76,8 +72,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
 
 LLM Generated explanations, may be completely bogus:
 
-Now I have all the information needed for a thorough analysis. Let me
-compile the findings.
+Now I have a comprehensive picture. Let me compile the full analysis.
 
 ---
 
@@ -85,263 +80,194 @@ compile the findings.
 
 ### 1. COMMIT MESSAGE ANALYSIS
 
-The subject "blk-mq-sched: unify elevators checking for async requests"
-sounds like a cleanup/unification commit, but the message body reveals a
-**real I/O starvation bug in the kyber scheduler**:
+The commit title is clear: "add missing debugfs_mutex in
+blk_mq_debugfs_register_hctxs()". The body explicitly describes the
+problem: `debugfs_mutex` is not held while creating debugfs entries for
+hctxs during `blk_mq_update_nr_hw_queues()`. The author (Yu Kuai) notes
+it's safe to add the mutex there because "queue is not frozen" at that
+point (meaning there's no deadlock risk with freeze-related locks).
 
-> *"Consider the case there are lots of dirty pages, and user use fsync
-to flush dirty pages. In this case sched_tags can be exhausted by sync
-writes and sync reads can stuck waiting for tag."*
+Three reviewers signed off: Nilay Shroff (IBM), Ming Lei (Red Hat), and
+Hannes Reinecke (SUSE) -- all experienced block layer developers. The
+merge was by Jens Axboe (block layer maintainer).
 
-This describes a concrete, user-visible problem: sync read starvation
-when kyber is the I/O scheduler and fsync flushes dirty pages.
+### 2. CODE CHANGE ANALYSIS
 
-### 2. CODE CHANGE ANALYSIS — The Bug Mechanism
-
-The key to understanding this bug lies in the difference between
-`op_is_sync()` and the new `blk_mq_is_sync_read()`:
-
-```470:474:include/linux/blk_types.h
-static inline bool op_is_sync(blk_opf_t op)
-{
-        return (op & REQ_OP_MASK) == REQ_OP_READ ||
-                (op & (REQ_SYNC | REQ_FUA | REQ_PREFLUSH));
-}
-```
-
-`op_is_sync()` returns **true** for both sync reads AND sync writes
-(writes with `REQ_SYNC`/`REQ_FUA`/`REQ_PREFLUSH`).
-
-When `fsync()` triggers writeback, writes get `REQ_SYNC` because
-`wbc->sync_mode == WB_SYNC_ALL`:
-
-```93:103:include/linux/writeback.h
-static inline blk_opf_t wbc_to_write_flags(struct writeback_control
-*wbc)
-{
-        blk_opf_t flags = 0;
-
-        if (wbc->sync_mode == WB_SYNC_ALL)
-                flags |= REQ_SYNC;
-        // ...
-}
-```
-
-**Kyber's bug** — in `kyber_limit_depth()`:
-
-```553:564:block/kyber-iosched.c
-static void kyber_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data
-*data)
-{
-        /*
-  - We use the scheduler tags as per-hardware queue queueing tokens.
-  - Async requests can be limited at this stage.
-         */
-        if (!op_is_sync(opf)) {
-                struct kyber_queue_data *kqd =
-data->q->elevator->elevator_data;
-
-                data->shallow_depth = kqd->async_depth;
-        }
-}
-```
-
-The condition `!op_is_sync(opf)` means only truly async operations get
-throttled. Sync writes (from fsync) pass `op_is_sync()` as true, so they
-get **full depth** — no throttling. This means sync writes can consume
-ALL sched_tags.
-
-**mq-deadline and bfq already handle this correctly:**
-
-```493:506:block/mq-deadline.c
-static void dd_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data
-*data)
-{
-        struct deadline_data *dd = data->q->elevator->elevator_data;
-
-        /* Do not throttle synchronous reads. */
-        if (op_is_sync(opf) && !op_is_write(opf))
-                return;
-
-        // ... throttle everything else including sync writes
-        data->shallow_depth = dd->async_depth;
-}
-```
-
-Both mq-deadline and bfq use `op_is_sync(opf) && !op_is_write(opf)` to
-give full depth only to sync **reads**. Sync writes are properly
-throttled by `async_depth`.
-
-**The fix:** Changes kyber's condition from `!op_is_sync(opf)` to
-`!blk_mq_is_sync_read(opf)`, where the new helper is defined as:
+The diff is minimal -- **3 lines added**:
 
 ```c
-static inline bool blk_mq_is_sync_read(blk_opf_t opf)
+mutex_lock(&q->debugfs_mutex);
+queue_for_each_hw_ctx(q, hctx, i)
+    blk_mq_debugfs_register_hctx(q, hctx);
+mutex_unlock(&q->debugfs_mutex);
+```
+
+#### The Bug Mechanism
+
+The `debugfs_mutex` was introduced in commit `5cf9c91ba927` ("block:
+serialize all debugfs operations using q->debugfs_mutex", v5.19) by
+Christoph Hellwig. That commit explicitly stated the goal: *"Use the
+existing debugfs_mutex to serialize all debugfs operations that rely on
+q->debugfs_dir or the directories hanging off it."*
+
+That commit added `lockdep_assert_held(&q->debugfs_mutex)` in many
+functions:
+- `blk_mq_debugfs_register_sched()` (line 706)
+- `blk_mq_debugfs_unregister_sched()` (line 725)
+- `blk_mq_debugfs_unregister_rqos()` (line 746)
+- `blk_mq_debugfs_register_rqos()` (line 759)
+- `blk_mq_debugfs_register_sched_hctx()` (line 777)
+- `blk_mq_debugfs_unregister_sched_hctx()` (line 798)
+
+But it missed `blk_mq_debugfs_register_hctxs()`, which is called from
+`__blk_mq_update_nr_hw_queues()` at line 5165 of `block/blk-mq.c`
+**without** holding `debugfs_mutex`.
+
+All other callers properly hold the mutex:
+- `blk_register_queue()` in `blk-sysfs.c` holds `debugfs_mutex` when
+  calling `blk_mq_debugfs_register()` (which internally calls
+  `blk_mq_debugfs_register_hctx()`)
+- `blk_mq_sched_reg_debugfs()` in `blk-mq-sched.c` holds `debugfs_mutex`
+  when calling sched debugfs registration
+- `rq_qos_add()` in `blk-rq-qos.c` holds `debugfs_mutex` when
+  registering rqos debugfs
+
+#### The Race
+
+The race is between two concurrent paths:
+
+**Thread A** -- `__blk_mq_update_nr_hw_queues()` →
+`blk_mq_debugfs_register_hctxs()` → `blk_mq_debugfs_register_hctx()`:
+
+```656:673:block/blk-mq-debugfs.c
+void blk_mq_debugfs_register_hctx(struct request_queue *q,
+                                  struct blk_mq_hw_ctx *hctx)
 {
-    return op_is_sync(opf) && !op_is_write(opf);
+        struct blk_mq_ctx *ctx;
+        char name[20];
+        int i;
+
+        if (!q->debugfs_dir)
+                return;
+
+        snprintf(name, sizeof(name), "hctx%u", hctx->queue_num);
+        hctx->debugfs_dir = debugfs_create_dir(name, q->debugfs_dir);
+        // ... creates more debugfs files ...
 }
 ```
 
-### 3. BEHAVIORAL IMPACT BY SCHEDULER
+**Thread B** -- `blk_unregister_queue()` → `blk_debugfs_remove()`:
 
-| Scheduler | Before | After | Behavioral Change? |
-|---|---|---|---|
-| **kyber** | Only async ops throttled; sync writes get full depth |
-Everything except sync reads throttled | **YES — this is the bug fix** |
-| **bfq** | `op_is_sync(opf) && !op_is_write(opf)` |
-`blk_mq_is_sync_read(opf)` | **NO — semantically identical** |
-| **mq-deadline** | `op_is_sync(opf) && !op_is_write(opf)` |
-`blk_mq_is_sync_read(opf)` | **NO — semantically identical** |
+```884:895:block/blk-sysfs.c
+static void blk_debugfs_remove(struct gendisk *disk)
+{
+        struct request_queue *q = disk->queue;
 
-The bfq and mq-deadline changes are purely cosmetic refactoring. The
-actual bug fix is exclusively in kyber.
+        mutex_lock(&q->debugfs_mutex);
+        blk_trace_shutdown(q);
+        debugfs_remove_recursive(q->debugfs_dir);
+        q->debugfs_dir = NULL;
+        // ...
+        mutex_unlock(&q->debugfs_mutex);
+}
+```
 
-### 4. BUG SEVERITY
+Without the mutex in Thread A:
+1. Thread A checks `q->debugfs_dir` (line 663) -- not NULL, proceeds
+2. Thread B acquires `debugfs_mutex`, removes `q->debugfs_dir`, sets it
+   to NULL
+3. Thread A uses the now-stale/freed `q->debugfs_dir` to create child
+   entries (line 667)
 
-The starvation scenario is concrete and reproducible:
-1. System has lots of dirty pages
-2. User calls `fsync()` to flush them
-3. Lots of sync writes are submitted
-4. Kyber gives them full depth (no throttling)
-5. All sched_tags consumed by sync writes
-6. Sync reads from applications **starve** — they cannot get any tags
-7. Read I/O hangs until writes complete
+This can result in orphaned debugfs entries, inconsistent debugfs state,
+and potentially use of a freed dentry.
 
-This is a **system responsiveness issue** — applications waiting for
-reads (file access, page faults) can hang when another process is doing
-heavy fsyncing.
+### 3. CLASSIFICATION
 
-### 5. SCOPE AND RISK
+This is a **synchronization bug fix** -- adding a missing lock
+acquisition in a path that was accidentally omitted when the locking
+scheme was introduced. It completes the locking protocol established in
+commit `5cf9c91ba927`.
 
-- **Size:** Very small — adds a 4-line helper, changes one condition in
-  each of 3 files
-- **Risk for bfq/mq-deadline:** Zero — semantically identical changes
-- **Risk for kyber:** Low — the change aligns kyber with the well-
-  established and battle-tested behavior of mq-deadline and bfq. Kyber's
-  `async_depth` is set to 75% of `q->nr_requests` (`KYBER_ASYNC_PERCENT
-  = 75`), so sync writes still get generous tag allocation, just not
-  unlimited
-- **Possible regression:** Slight reduction in sync write throughput on
-  kyber (now throttled to 75% of tags instead of 100%), but this is the
-  correct behavior to prevent read starvation
+### 4. SCOPE AND RISK
 
-### 6. REVIEW AND TESTING
+- **Size**: 3 lines added (+2 mutex_lock/unlock, consistent with
+  existing pattern)
+- **Files touched**: 1 file (`block/blk-mq-debugfs.c`)
+- **Subsystem**: Block layer (blk-mq) -- core infrastructure used by all
+  block device drivers
+- **Risk**: Extremely low. The mutex is already held by all other paths.
+  The commit message explicitly addresses deadlock safety ("queue is not
+  frozen")
+- **Pattern match**: 100% consistent with how every other debugfs
+  operation in the block layer acquires this lock
 
-The commit has two `Reviewed-by` tags from experienced kernel
-developers:
-- **Nilay Shroff** (IBM) — block layer contributor
-- **Hannes Reinecke** (SUSE) — longstanding storage/block subsystem
-  maintainer
+### 5. USER IMPACT
 
-Signed off by **Jens Axboe** — block subsystem maintainer.
+The `__blk_mq_update_nr_hw_queues()` path is triggered during:
+- CPU hotplug events (adding/removing CPUs changes hw queue count)
+- Driver-initiated hw queue resizing (e.g., `null_blk` via configfs
+  `submit_queues`)
+- SCSI/NVMe driver queue changes
 
-### 7. DEPENDENCY ANALYSIS
+This means any system doing CPU hotplug or block device reconfiguration
+could hit this race. The impact is concurrent with disk
+registration/unregistration, which happens during device discovery and
+removal -- both common operations.
 
-The commit depends on `42e6c6ce03fd3e` ("lib/sbitmap: convert
-shallow_depth from one word to the whole sbitmap") for context lines in
-the bfq part (which references `bfqd->async_depths`, renamed from
-`bfqd->word_depths` in the prerequisite). However:
+### 6. STABILITY INDICATORS
 
-- The **core fix** (kyber condition change) is completely independent
-- The bfq and mq-deadline changes are cosmetic and could be dropped for
-  stable
-- For stable trees, the kyber fix + helper function could be backported
-  alone, or the bfq/mq-deadline parts could be adapted to match older
-  context
+- **3 Reviewed-by tags** from major Linux storage developers
+- **Merged by Jens Axboe** (block layer maintainer)
+- Part of a series of debugfs locking improvements to the block layer
+  (see commit `0e94ed336814` protecting `hctx_busy_show`)
 
-### 8. BUG LONGEVITY
+### 7. DEPENDENCY CHECK
 
-The bug has existed since kyber's introduction in commit `00e043936e9a1`
-(April 2017, kernel v4.12). The original code already used
-`!op_is_sync(op)` which had the same problem. The mq-deadline scheduler
-only added tag reservation in v5.15 (commit `07757588e507`, June 2021)
-and correctly used `op_is_sync(opf) && !op_is_write(opf)` from the
-start. The bfq scheduler similarly had the correct check. Kyber was the
-odd one out.
+- **Dependencies**: Requires `debugfs_mutex` in `struct request_queue`,
+  which has been present since v5.19 (commit `5cf9c91ba927`)
+- **Self-contained**: The fix is entirely self-contained -- no other
+  patches required
+- **Applies to**: All stable trees from 5.19 onwards (6.1.y, 6.6.y,
+  6.12.y, etc.)
 
-### 9. CONCLUSION
+### Summary
 
-This commit fixes a real I/O starvation bug in the kyber scheduler where
-sync writes (from fsync/sync) can exhaust all scheduler tags and starve
-sync reads. The fix is:
+This commit fixes a missing lock acquisition in
+`blk_mq_debugfs_register_hctxs()` that was overlooked when the
+`debugfs_mutex` serialization scheme was introduced in v5.19. Every
+other debugfs operation in the block layer properly holds this lock. The
+fix is:
+- **3 lines** of trivially correct code
+- **Zero risk** of regression (follows established pattern exactly)
+- **Well-reviewed** by 3 experienced block layer developers
+- **Fixes a real race** between hw queue updates and debugfs teardown
+- **Self-contained** with no dependencies beyond what's in all affected
+  stable trees
 
-- **Small and surgical** — one condition change in kyber, plus a trivial
-  helper function
-- **Obviously correct** — it aligns kyber with the proven behavior of
-  mq-deadline and bfq
-- **Low risk** — the bfq/mq-deadline parts are semantically identical;
-  the kyber change is well-bounded
-- **Well-reviewed** — by experienced block subsystem developers and the
-  subsystem maintainer
-- **Fixes a real user-visible bug** — read I/O starvation during fsync-
-  heavy workloads
-
-The only concern is the dependency on a prerequisite for the bfq context
-lines, but the core kyber fix is standalone and the bfq/mq-deadline
-parts are optional cosmetic refactoring that could be adapted or dropped
-for stable trees.
+The fix is small, surgical, obviously correct, and meets all stable
+kernel criteria.
 
 **YES**
 
- block/bfq-iosched.c   | 2 +-
- block/blk-mq-sched.h  | 5 +++++
- block/kyber-iosched.c | 2 +-
- block/mq-deadline.c   | 2 +-
- 4 files changed, 8 insertions(+), 3 deletions(-)
+ block/blk-mq-debugfs.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 6e54b1d3d8bc2..9e9d081e86bb2 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -697,7 +697,7 @@ static void bfq_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data *data)
- 	unsigned int limit, act_idx;
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 4896525b1c054..553d93b88e194 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -686,8 +686,10 @@ void blk_mq_debugfs_register_hctxs(struct request_queue *q)
+ 	struct blk_mq_hw_ctx *hctx;
+ 	unsigned long i;
  
- 	/* Sync reads have full depth available */
--	if (op_is_sync(opf) && !op_is_write(opf))
-+	if (blk_mq_is_sync_read(opf))
- 		limit = data->q->nr_requests;
- 	else
- 		limit = bfqd->async_depths[!!bfqd->wr_busy_queues][op_is_sync(opf)];
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index 02c40a72e9598..5678e15bd33c4 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -137,4 +137,9 @@ static inline void blk_mq_set_min_shallow_depth(struct request_queue *q,
- 						depth);
++	mutex_lock(&q->debugfs_mutex);
+ 	queue_for_each_hw_ctx(q, hctx, i)
+ 		blk_mq_debugfs_register_hctx(q, hctx);
++	mutex_unlock(&q->debugfs_mutex);
  }
  
-+static inline bool blk_mq_is_sync_read(blk_opf_t opf)
-+{
-+	return op_is_sync(opf) && !op_is_write(opf);
-+}
-+
- #endif
-diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
-index c1b36ffd19ceb..2b3f5b8959af0 100644
---- a/block/kyber-iosched.c
-+++ b/block/kyber-iosched.c
-@@ -556,7 +556,7 @@ static void kyber_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data *data)
- 	 * We use the scheduler tags as per-hardware queue queueing tokens.
- 	 * Async requests can be limited at this stage.
- 	 */
--	if (!op_is_sync(opf)) {
-+	if (!blk_mq_is_sync_read(opf)) {
- 		struct kyber_queue_data *kqd = data->q->elevator->elevator_data;
- 
- 		data->shallow_depth = kqd->async_depth;
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 3e3719093aec7..29d00221fbea6 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -495,7 +495,7 @@ static void dd_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data *data)
- 	struct deadline_data *dd = data->q->elevator->elevator_data;
- 
- 	/* Do not throttle synchronous reads. */
--	if (op_is_sync(opf) && !op_is_write(opf))
-+	if (blk_mq_is_sync_read(opf))
- 		return;
- 
- 	/*
+ void blk_mq_debugfs_unregister_hctxs(struct request_queue *q)
 -- 
 2.51.0
 
