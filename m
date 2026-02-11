@@ -1,117 +1,156 @@
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4173F2FF170
-	for <linux-block@vger.kernel.org>; Wed, 11 Feb 2026 03:07:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1F922C0F69
+	for <linux-block@vger.kernel.org>; Wed, 11 Feb 2026 07:21:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770779257; cv=none; b=OK7E9GZc06qDqu14hMKaH9VXxS7lytotj8vhOBs88I20lwvvPFA+hwyfLgda3uHA/ymCMyBin99Zdk3511DcxDxriMUVav6egbsuiIIMdz4x1dTrH04MPfAJX+u5gb+aR+x4cTMoIaeObRtuN1v84PUyyN0XqLM7i9WigSHXU1U=
+	t=1770794498; cv=none; b=lnGwruAHJ9QuL2xL8gu+VyH3XKasBwDxQxDYOBmadeZQe3IyYp169Ai/97WEZsPwbg8Lbr4MKpFDPNx/daSyQZG/pQUwMkbFkNDIIIjxvsPkFG/jDVYqGdVgIwlrs+C6TuXgWjYV4ki515ktK7EEc3kuWL2cPpFKsWjz9ejj+Fs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770779257; c=relaxed/simple;
-	bh=d+Ycl62/leAnxtSAgivt5g86iPtT/Dk6S09KWMzg3yU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AYKWUT/UhqqGaMtK2LAA3/bKXLggn1aJtwrFI/+ahs5FdDR1pZ9lULEuTw3+18GhAch9p2jDL92CjLyZlSp3Ppbzl3NrKbwTuxRnU9LAtMKMOjUDtjEKaslB0zUSGfBtjYvMS9WKki2KoPOuQeDeJLKqHLBhiriqWx9QRHl3Rqw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=XT4EDHfy; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1770794498; c=relaxed/simple;
+	bh=l+W5E8cEauvMSTGXjqQqfk7bAYGPUezL8ANdBQkPkew=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=o+COKIIJZFHRx9P5kg39w6crU6i2LA+aMbkaJ2LdhD050gJwL/5kmNUKJvbKpOKwshuTYLksmR3J92Rol6KfV2dOS3l1mq6Jsn0SPNOI8UYbcHqbJ/0bkkaHoOWFKzDSwY0ElxGaXicTpNz/zjf7ipJfJ1H+kBm77iC/djP/vAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=WtEKjO89; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="XT4EDHfy"
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-824923c7059so596538b3a.3
-        for <linux-block@vger.kernel.org>; Tue, 10 Feb 2026 19:07:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1770779255; x=1771384055; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2kdwUSceZmDAkePxcpaC3kPf3XjbthHmmdDCwpY/AiM=;
-        b=XT4EDHfyPr+0vokzeNVgChwNwc2IgJh3i3rUQxHfDfN6TPSIK48JIjaiSU3fkns3LY
-         JrS4/T8qLqAm9PhA/lx/2NgPm9SpGPpS0MdwN9aj6LssOWQAU/bVYlXAGywX6pmVa/FD
-         qPIta5XijSihYQJ3U5HaDlV2u8C7ycHuzfphQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770779255; x=1771384055;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2kdwUSceZmDAkePxcpaC3kPf3XjbthHmmdDCwpY/AiM=;
-        b=PmFKzTJLL61FGgrhZRf5iFxxjI7I/SJEnv4Vyp8KowhZaO5Nsa0mL9IEzlSzLtqVxa
-         E7/Z/kOdc0FrbB+rJSVoo1qEkh6kxSywwKJqrb/zUe2RIXZGLDwp/rmX6tGjkBZgY2E1
-         SVJHWeLWxsUwBYNcjhv6yls+MdHJvg9ANVAvpiEvC/Fi+l5+J6Q3AQka8haBKNp73Mkh
-         utXF0vAYr1ys1ph5isp5CdGXaMMtFU3u43plr0Lff5i2x7KlLx8OUauhNWXYlPMchYJM
-         i0ubG/fjLAwUDIoBdfq/uK/jl4ga3jmgDQvyjuzrtlisKlaIxjcgf093658/irNn40c1
-         d7aA==
-X-Forwarded-Encrypted: i=1; AJvYcCUQJZPZew/njskRlFepUaUDngoafZZVW2/m/797QGvnPwW9DiiUB9NXdhYMDvKMGH5Is7IL036PcwPiiA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyiurgcGajcjvSdDjW2I+An4cGtMX3v8GmxbVSQTp6/BvgOiY86
-	vXjIYny7kOVxrGF4OqeX7dTuH499uUJkpIonXRqpDh1bDF/ydItJCeoXTsv8Bula9Q==
-X-Gm-Gg: AZuq6aKjQnrBZL8T6Jgf950GYLiOCYdv1Q3lTQa8UGLYWg5Iwj+jEWU7zyjB1E471c5
-	3svLdertcwQLyQPc8+rEi1AMsgm0DfpTNe4HvFhKVHrA94KX3XsVwaObQfm7iAmB8bAdDRMKw/H
-	nYlEw7oSvm6F+xzDRrPDLsFeGIhOrLrfPpq7Hu06qOtycrdUjq3XXe5CuuFXJOCrT4ljSMTO8D8
-	nmFdzorq3qbiBRXxRf9USI2mQr46MSQGE7+adi1O8gx85av3MGwV+a+xrfTLzRb/CNcBg/kSu3D
-	WORXLK90fQkcoh6PoW8MdScGYwTdJ5F1b6tDcv7DsCavJPCF1UKzqlM/rIYpTepZNMCoLAZ+xuj
-	sR+aDrD0iDXGlZNJom6V0SyEWhJeWO7aikP3JESd6VsViC2pR1eVx1FLX4K+PTNsb/Y5Gez8PRy
-	6skVFIwwUUNGpTOobugmkEiZ2JEwvrjCJ4icIFadAyh+dPsQKjp0OaIVricS0g/A==
-X-Received: by 2002:a05:6a00:3014:b0:822:1dbc:e75d with SMTP id d2e1a72fcca58-8244160a9d0mr14781080b3a.1.1770779255616;
-        Tue, 10 Feb 2026 19:07:35 -0800 (PST)
-Received: from google.com ([2a00:79e0:2031:6:ec5:3497:e96b:e7be])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8249e3af080sm423001b3a.15.2026.02.10.19.07.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Feb 2026 19:07:34 -0800 (PST)
-Date: Wed, 11 Feb 2026 12:07:31 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, Minchan Kim <minchan@kernel.org>, 
-	Brian Geffon <bgeffon@google.com>, Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-mm@kvack.org, Richard Chang <richardycc@google.com>, 
-	David Stevens <stevensd@google.com>
-Subject: Re: [PATCH] zram: drop slot trylock and miss_free
-Message-ID: <d2wp2s3jj4lm6shynryqwkvamyrpn3g5larn6z3yeyplel6by4@5ew3ii7v5sjz>
-References: <20260210035045.3817297-1-senozhatsky@chromium.org>
- <aYtAz5vQTod7DXqV@casper.infradead.org>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="WtEKjO89"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61AHJqph3145172;
+	Wed, 11 Feb 2026 07:20:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=tVeBcd
+	15Nr/lYHQPoIK7MUPZrIaiLLh1fg8rsMVWypk=; b=WtEKjO89JiE0MQ4uCyE697
+	+hfOWvkm+Q/N2A6zFBhMpw5Iac7CW3j7mysqmPdBVBzIkX9DjVKHiN/ho08GaukF
+	5TPKEMVhDn4UT49lcQw6OeyglkSqmGQYxkfRLgpR7y8FR6TMxXTTSF3D7YndLPdl
+	z2XXWoEmi8lg6EUqXWLIDQSn+EfbJRlUpShlHQP3/DMdPM4N408q/FBAlboHWtms
+	7jYmpBystaFU8AcOwBMGP6KKqeDi4ejN1ohSexKSrjyYyGtUmYE+KmZSgLMKQgyt
+	MlJZufdWoI8V6N+fGgYhZG1bvbzuf6kP49NirdYjcgt/Bi+ifhu2MNk5fB9VygQw
+	==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4c696v5jcw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 11 Feb 2026 07:20:52 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 61B4bonm012610;
+	Wed, 11 Feb 2026 07:20:52 GMT
+Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4c6h7kcqj6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 11 Feb 2026 07:20:52 +0000
+Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
+	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 61B7KpTM14615122
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 11 Feb 2026 07:20:52 GMT
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9ED075805C;
+	Wed, 11 Feb 2026 07:20:51 +0000 (GMT)
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A764358062;
+	Wed, 11 Feb 2026 07:20:43 +0000 (GMT)
+Received: from [9.111.95.190] (unknown [9.111.95.190])
+	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 11 Feb 2026 07:20:42 +0000 (GMT)
+Message-ID: <f5da8810-84cd-408b-a1e6-8e80c8578168@linux.ibm.com>
+Date: Wed, 11 Feb 2026 12:50:36 +0530
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aYtAz5vQTod7DXqV@casper.infradead.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 4/4] blk-mq: use blk_queue_enter/exit to protect debugfs
+ file creation
+To: Yu Kuai <yukuai@fnnas.com>, axboe@kernel.dk, kbusch@kernel.org, hch@lst.de,
+        sagi@grimberg.me, sven@kernel.org, j@jannau.net,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Cc: tj@kernel.org, ming.lei@redhat.com, neal@gompa.dev, asahi@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org
+References: <20260209082953.3053721-1-yukuai@fnnas.com>
+ <20260209082953.3053721-5-yukuai@fnnas.com>
+Content-Language: en-US
+From: Nilay Shroff <nilay@linux.ibm.com>
+In-Reply-To: <20260209082953.3053721-5-yukuai@fnnas.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: FlcRqaD5j4-TxqEFZe63x4QhMoW6Obeo
+X-Proofpoint-ORIG-GUID: FlcRqaD5j4-TxqEFZe63x4QhMoW6Obeo
+X-Authority-Analysis: v=2.4 cv=JdWxbEKV c=1 sm=1 tr=0 ts=698c2dd5 cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=IkcTkHD0fZMA:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=r8Y53hCUo0QDHyeveBkA:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjExMDA1OCBTYWx0ZWRfX+UHbHzSWb7sl
+ pGtScLZRicf3aGugnqzbVjXe+OENcCfIF3W4qIAk46692uGrCydXtI7cJg//bXsvSxNhfDlqFBM
+ KuZ7lXi59NOlSLr46bF9wbtC5572QFijotW89tJFDBKvpYGMTUlWKwy207RvfBx/Ouz4YY4juD+
+ Ilck9DAcsseIfEcJCDAWEcwvHO7sECdILvIaYqNofjrVn2QxoISKCq5O2AMpWqOsF6EZ6ag6wVA
+ KpsEi/zjawWIPbdGcKf1++0oNVHpoH/oV5+U7JTAxZATf6zYMwnr/Bz6CDztf1zYGN2K5+Z78qw
+ agofRXEVDTBY/ZtBsAv/42DUg4Msai4bYme/LCRIMYvR+ppJhyZFatnsmLHvqzmMR3fnLV4rsB0
+ d3loVquzkGGTtJzAHTTB9dKGhcDhKFE/P4T8T7T+6uUK0RamueyFX4vOn2iJzh2ZaoTB5Ol4yh0
+ ZjvZe9m/6EfNr2Yujww==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-10_03,2026-02-10_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 clxscore=1015 impostorscore=0 bulkscore=0
+ lowpriorityscore=0 suspectscore=0 adultscore=0 spamscore=0 malwarescore=0
+ phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
+ definitions=main-2602110058
 
-On (26/02/10 14:29), Matthew Wilcox wrote:
-> On Tue, Feb 10, 2026 at 12:50:37PM +0900, Sergey Senozhatsky wrote:
-> > @@ -1943,15 +1927,9 @@ static ssize_t debug_stat_show(struct device *dev,
-> >  {
-> >  	int version = 1;
-> >  	struct zram *zram = dev_to_zram(dev);
-> > -	ssize_t ret;
-> >  
-> >  	guard(rwsem_read)(&zram->dev_lock);
-> > -	ret = sysfs_emit(buf,
-> > -			"version: %d\n0 %8llu\n",
-> > -			version,
-> > -			(u64)atomic64_read(&zram->stats.miss_free));
-> > -
-> > -	return ret;
-> > +	return sysfs_emit(buf, "version: %d\n0 0\n", version);
-> >  }
-> 
-> You don't need the dev_lock any more to just report the version.
 
-True.  I'll think if I want to send out a v2 with just miss_free
-removal.  The objective was to remove trylock (and all the things
-around it), but trylock has to stay.  While we cannot have
 
-	slot_lock(42)
-	<IRQ>
-	slot_lock(42)
+On 2/9/26 1:59 PM, Yu Kuai wrote:
+> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+> index faeaa1fc86a7..03583d0d3972 100644
+> --- a/block/blk-mq-debugfs.c
+> +++ b/block/blk-mq-debugfs.c
+> @@ -613,11 +613,6 @@ static void debugfs_create_files(struct request_queue *q, struct dentry *parent,
+>  				 const struct blk_mq_debugfs_attr *attr)
+>  {
+>  	lockdep_assert_held(&q->debugfs_mutex);
+> -	/*
+> -	 * Creating new debugfs entries with queue freezed has the risk of
+> -	 * deadlock.
+> -	 */
+> -	WARN_ON_ONCE(q->mq_freeze_depth != 0);
+>  	/*
+>  	 * debugfs_mutex should not be nested under other locks that can be
+>  	 * grabbed while queue is frozen.
+> @@ -628,9 +623,19 @@ static void debugfs_create_files(struct request_queue *q, struct dentry *parent,
+>  	if (IS_ERR_OR_NULL(parent))
+>  		return;
+>  
+> +	/*
+> +	 * Avoid creating debugfs files while the queue is frozen, wait for
+> +	 * the queue to be unfrozen and prevent new freeze while creating
+> +	 * debugfs files.
+> +	 */
+> +	if (blk_queue_enter(q, 0))
+> +		return;
+> +
+>  	for (; attr->name; attr++)
+>  		debugfs_create_file_aux(attr->name, attr->mode, parent,
+>  				    (void *)attr, data, &blk_mq_debugfs_fops);
+> +
+> +	blk_queue_exit(q);
+>  }
+>  
+>  void blk_mq_debugfs_register(struct request_queue *q)
 
-any more, the slot-free-notify is still called under spin_lock, and
-slot_lock() might_sleep().  So trylock has to stay around.
+I also noticed that we use other debugfs helpers such as debugfs_create_dir()
+from some block paths, which could run into the same fs-reclaim recursion issue.
+So we may need to consider those call sites as well to ensure consistent handling.
 
-> And should the version be changed now that you've changed the format to
-> not include miss_free?
+On another note, instead of waiting for queue to be unfreezed, does it makes sense to
+wrap the debugfs code under NOIO context (as Christoph pointed in another thread)?
+IMO, if fs-reclaim recursion is the only issue here we would be better off using
+NOIO context instead of blocking for queue to be unfrozen from other contexts.
 
-The idea was to bump the version only when the format changes.  You
-normally (well, technically "always", since e914d8f00391) would see
-0 miss_free, and with the patch it's just a hard-coded 0.
+Thanks,
+--Nilay
 
-Thanks for taking a look, Matthew.
