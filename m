@@ -1,101 +1,166 @@
-Received: from sg-1-21.ptr.blmpb.com (sg-1-21.ptr.blmpb.com [118.26.132.21])
+Received: from sg-1-13.ptr.blmpb.com (sg-1-13.ptr.blmpb.com [118.26.132.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2198D2D320E
-	for <linux-block@vger.kernel.org>; Wed, 11 Feb 2026 01:57:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38077239E9D
+	for <linux-block@vger.kernel.org>; Wed, 11 Feb 2026 02:07:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770775061; cv=none; b=QntFWIoMDTtRsox47Mqp7z/LxYzzxW0vscqTeFELRU7FaaD2b7W3+KqRcZIkcUpLD/9wmRIn4jHzY/BFSUvWvIs0bf9DyeVnwUv1i1wbCuV9MRR8HCJZU5MzXQa3dkAr1JzQye56PCa2ms609zyzYdnZQLxdykmiBy/2OCl3Eh8=
+	t=1770775645; cv=none; b=TK2UW5YvUqRrPUoNmo4HWDnm1zwdztjF3F0oyL3BCZm+/N8g0nmMMLF+daLpEfm+LcJ3MV+P/i3gyypz5hKNJc25QAsQW0dPjZUq8Ss5hbkYq08VZphVBI7ZowRXvyqjpOQBRmzw+Cb8WBaYF37QRsld4fFrRcIbSX6Fh9GiaqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770775061; c=relaxed/simple;
-	bh=UG0mqORVxhaZ0a+OZCSMkiGFaCvU9+2moAIWtkDvylc=;
-	h=In-Reply-To:Mime-Version:Cc:From:Date:Message-Id:Content-Type:
-	 Subject:References:To; b=FyRCvQ8cdD3I47lGI9YsqQMoVrbcSgacBqH9D2SXWUMEh/GHAr5m0ATeRCK9re0xJbrVMFECF8Mz4h0MgTASnRlRaYr+UM4Lxcv2IxJxUndmyuKbi5XrYbPIHK7E9rVM5NGPz21FDEn4JncnaIvyKZib/Ye/Ca5qGec6keBBO4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=pass smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=vqp1JWRc; arc=none smtp.client-ip=118.26.132.21
+	s=arc-20240116; t=1770775645; c=relaxed/simple;
+	bh=lE7yrnHhWwTZjWQdgFG+/zmvdS0+p8WYidWv2IPPipI=;
+	h=Subject:In-Reply-To:Mime-Version:Content-Type:To:Cc:From:Date:
+	 Message-Id:References; b=f5bECRTK5JexmUfCvpyyizvbLK7rnWb5/c3hUueB+2oIzvs9gu0fCzhYCtplKyFjwgsqszi3zQVIeLBfoqiiK1PmajKUcD2FG/k5wo3N6/y0wD7FgCqzoStD/VfcDIQEklFgEsgUVQnSFzPnpg2oEhbXjiLgJNE3OO+FohjUCe0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=none smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=qSwpewMy; arc=none smtp.client-ip=118.26.132.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fnnas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=fnnas.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="vqp1JWRc"
+	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="qSwpewMy"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1770775051;
+ s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1770775631;
   h=from:subject:mime-version:from:date:message-id:subject:to:cc:
  reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=UG0mqORVxhaZ0a+OZCSMkiGFaCvU9+2moAIWtkDvylc=;
- b=vqp1JWRc8DOOZsP7AMzTytrnJyLG3LxiYQvOCDXL8S8Zb2UyLbuelVmjdfEHw4rJmjh5Lw
- 8yYPelvrgUqQ/0l0gVK7TwqzLW6ySaPA3UjkHuBYcGMnBent6iPSF7/kbx/xLHR2w+WOnn
- UJpl1oGmnS56WXR6Spe6k2AB85Vb986jt5z9tPLi8QJt3b4cu6pt8VI4eLNoWIWyGyOfDG
- ua//Fq2A0iK4KMG1EUDp5c3ZokUjCqCiUCK28eNBgkhlKE3ZMWaYrQKxf8AJqNPaJ1hgU7
- jpVNbJ4GusObE2vYHKWBLvYLQgnqTgMC4dwULqc+2SDF7x6gzO92TdOfBtb3ew==
-In-Reply-To: <f3451ddd-96b6-4bc1-9d4c-964e361d56fc@flourine.local>
+ bh=lE7yrnHhWwTZjWQdgFG+/zmvdS0+p8WYidWv2IPPipI=;
+ b=qSwpewMy2I8/VESCfrLhD4XLy/0tjNH4vUrOnW63I4pl/q3RAE1Dlc7DfIUIYwDtDUBJMA
+ OAQZoqUdQpHzD3hwLoptAAELksMBljsUI7Q6vBg/rz1cw+pVgiEi8wwFMTEUAQ602lSit5
+ AuE3gKv7uhsP2C/iOfYCNsst8LYncfjzl24l7nzOdX4WB5FODMIk5/rOfKPlsrREx6QxRE
+ r8VyfRmWY/+lNRWYadwo+Zoq84w3P/UC2jkhOKp3oIvUBOGrLB+FlvbnbnavunAskx7zfz
+ EychBsc5GSJMvuCxyX/vuXEayZLPCgpz4Y+5VjVJJXrQnyLrY+3ZxEHt1ZilhA==
+Reply-To: yukuai@fnnas.com
+Subject: Re: [PATCH v7 09/16] blk-throttle: fix possible deadlock for fs reclaim under rq_qos_mutex
+X-Original-From: Yu Kuai <yukuai@fnnas.com>
+In-Reply-To: <924c838e-130b-42a4-8dcd-8c5f5675de53@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Cc: "Christoph Hellwig" <hch@lst.de>, <axboe@kernel.dk>, <sagi@grimberg.me>, 
-	<sven@kernel.org>, <j@jannau.net>, <linux-block@vger.kernel.org>, 
-	<linux-nvme@lists.infradead.org>, <tj@kernel.org>, <nilay@linux.ibm.com>, 
-	<ming.lei@redhat.com>, <neal@gompa.dev>, <asahi@lists.linux.dev>, 
-	<linux-arm-kernel@lists.infradead.org>, <yukuai@fnnas.com>
-From: "Yu Kuai" <yukuai@fnnas.com>
-Date: Wed, 11 Feb 2026 09:57:26 +0800
-Message-Id: <baa254f9-c41c-44f7-959a-8ce69e1768fa@fnnas.com>
-X-Original-From: Yu Kuai <yukuai@fnnas.com>
-Reply-To: yukuai@fnnas.com
-User-Agent: Mozilla Thunderbird
+X-Lms-Return-Path: <lba+2698be44e+e3f6b4+vger.kernel.org+yukuai@fnnas.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [PATCH 3/4] nvme-apple: move blk_mq_update_nr_hw_queues after nvme_unfreeze
-References: <20260209082953.3053721-1-yukuai@fnnas.com> <20260209082953.3053721-4-yukuai@fnnas.com> <20260209145832.GC18315@lst.de> <aYn-xwFHCpd7sITJ@kbusch-mbp> <e3e7d95b-2712-4365-922d-731449e7193a@fnnas.com> <aYtKFNm-wRKn6l66@kbusch-mbp> <20260210154108.GB2484@lst.de> <aYtWSscg6L9xxlzc@kbusch-mbp> <f3451ddd-96b6-4bc1-9d4c-964e361d56fc@flourine.local>
-Received: from [192.168.1.104] ([39.182.0.137]) by smtp.feishu.cn with ESMTPS; Wed, 11 Feb 2026 09:57:28 +0800
 Content-Transfer-Encoding: quoted-printable
 Content-Language: en-US
-X-Lms-Return-Path: <lba+2698be209+b8b170+vger.kernel.org+yukuai@fnnas.com>
-To: "Daniel Wagner" <dwagner@suse.de>, "Keith Busch" <kbusch@kernel.org>
+Received: from [192.168.1.104] ([39.182.0.137]) by smtp.feishu.cn with ESMTPS; Wed, 11 Feb 2026 10:07:08 +0800
+To: "Nilay Shroff" <nilay@linux.ibm.com>, "Ming Lei" <ming.lei@redhat.com>, 
+	<yukuai@fnnas.com>
+Cc: <axboe@kernel.dk>, <linux-block@vger.kernel.org>, <tj@kernel.org>
+From: "Yu Kuai" <yukuai@fnnas.com>
+Date: Wed, 11 Feb 2026 10:07:07 +0800
+Message-Id: <6b4901df-ccb5-401f-b5d5-796e4916a076@fnnas.com>
+References: <20251231085126.205310-1-yukuai@fnnas.com> <20251231085126.205310-10-yukuai@fnnas.com> <aV5L25KZkM4dvzLD@fedora> <e2054693-7100-4bdc-95eb-9e70d9d3231e@fnnas.com> <924c838e-130b-42a4-8dcd-8c5f5675de53@linux.ibm.com>
+User-Agent: Mozilla Thunderbird
 
-Hi,
+Hi, Nilay and Ming
 
-=E5=9C=A8 2026/2/11 0:28, Daniel Wagner =E5=86=99=E9=81=93:
-> On Tue, Feb 10, 2026 at 09:01:14AM -0700, Keith Busch wrote:
->> On Tue, Feb 10, 2026 at 04:41:08PM +0100, Christoph Hellwig wrote:
->>> On Tue, Feb 10, 2026 at 08:09:08AM -0700, Keith Busch wrote:
->>>> If you leave the queue quiesced, pending IO will form requests that ar=
-e
->>>> entered and waiting in the block layer. You can't freeze a queue with
->>>> entered requests.
+=E5=9C=A8 2026/1/9 17:09, Nilay Shroff =E5=86=99=E9=81=93:
+>
+> On 1/8/26 10:26 PM, Yu Kuai wrote:
+>> Hi,
+>>
+>> =E5=9C=A8 2026/1/7 20:04, Ming Lei =E5=86=99=E9=81=93:
+>>> On Wed, Dec 31, 2025 at 04:51:19PM +0800, Yu Kuai wrote:
+>>>> blk_throtl_init() can be called with rq_qos_mutex held from blkcg
+>>>> configuration, and fs reclaim can be triggered because GFP_KERNEL is u=
+sed
+>>>> to allocate memory. This can deadlock because rq_qos_mutex can be held
+>>>> with queue frozen.
 >>>>
->>>> We unquiesce first to flush any pending IO that had entered during the
->>>> prior reset. It's not the best way to handle this situation. It would =
-be
->>>> smarter to steal the bio's from all the entered requests, then end tho=
-se
->>>> requests, then resubmit the bios after the hw queues are initialized. =
-We
->>>> don't do that because no one's really complained, probably because the
->>>> queue counts don't usually change after a reset.
->>> FYI, Daniel Wagner had been thinking about doing this reinsert for
->>> something (I forgot what exactly),
-> This feature would solve a tricky problem with isolation patches:
+>>>> Fix the problem by using blkg_conf_open_bdev_frozen(), also remove
+>>>> useless queue frozen from blk_throtl_init().
+>>>>
+>>>> Signed-off-by: Yu Kuai <yukuai@fnnas.com>
+>>>> ---
+>>> I think this patch goes toward wrong direction by enlarging queue freez=
+e
+>>> scope, and blkg_conf_prep() may run into percpu allocation, then new
+>>> lockdep warning could be triggered.
+>>>
+>>> IMO, we should try to reduce blkg_conf_open_bdev_frozen() uses, instead=
+ of
+>>> adding more.
+>> Fortunately, blk_throtl_init() doesn't have percpu allocation, so this i=
+s
+>> safe now. Unfortunately, blk-iocost and blk-iolatency do have percpu all=
+ocation
+>> and they're already problematic for a long time. The queue is already fr=
+ozen from
+>> blkcg_activate_policy() and then the pd_alloc_fn() will try percpu alloc=
+ation.
+>>
+>> To be honest, I feel it's too complicated to move all the percpu allocat=
+ion out of
+>> queue frozen, will it be possible to fix this the other way by passing a=
+nother gfp
+>> into pcpu_alloc_noprof() that it'll be atomic to work around the pcpu_al=
+loc_mutex.
+>>
+> I agree that in some cases, when percpu allocation occurs deep within com=
+plex call
+> chains, it can be quite challenging to move the allocation ahead of ->fre=
+eze_lock
+> without significantly restructuring the code.
 >
-> https://lore.kernel.org/linux-nvme/87cy7vrbc4.ffs@tglx/
+> Looking back at the history of percpu allocation behavior, commit 28307d9=
+38fb2
+> (=E2=80=9Cpercpu: make pcpu_alloc() aware of current gfp context=E2=80=9D=
+) changed pcpu_alloc()
+> semantics such that allocations were treated as atomic if the current GFP=
+ context
+> did not include GFP_KERNEL. As a result, GFP_NOIO and GFP_NOFS allocation=
+s were
+> also treated as atomic. This change was merged in kernel v5.10.
 >
-> Currently, it's not possible to take the cpu hotplug lock which would
-> prevent races in the cpu-queue mapping. The current logic depends on
-> making progress in the error case. If it would be possible to fail the
-> in-flight request in the error handler and reinsert them in the block
-> layer, progress could be guaranteed when holding the cpu hotplug lock.
+> Later, commit 9a5b183941b5 (=E2=80=9Cmm, percpu: do not consider sleepabl=
+e allocations
+> atomic=E2=80=9D) refined this behavior further. With this change, percpu =
+allocations are
+> considered atomic only if the the caller explicitly marked the calling co=
+ntext
+> atomic (probably using GFP_ATOMIC or GFP_NOWAIT).
 >
-> Unfortunatly, haven't found time to implement and test this idea so far.
-> Sorry.
+> While commit 9a5b183941b5 ("mm, percpu: do not consider sleepable allocat=
+ions
+> atomic=E2=80=9D) does the right thing conceptually, it has resulted in a =
+number of lockdep
+> warnings reporting potential deadlocks when code paths attempt to allocat=
+e percpu
+> memory while a request queue is frozen.
+>
+> Given this history, and the recent lockdep splats involving percpu alloca=
+tion and
+> queue freezing, I would suggest using GFP_ATOMIC for pcpu allocations tha=
+t are
+> invoked while the queue is already frozen, where feasible. By =E2=80=9Cfe=
+asible,=E2=80=9D I mean
+> cases where the allocation size is small enough that using GFP_ATOMIC is =
+reasonable=E2=80=94
+> typically only a few tens or hundreds of bytes per CPU. In such cases, th=
+e risk and
+> cost associated with atomic allocations are minimal and acceptable.
+>
+> For example, struct latency_stat, which requires approximately 40 bytes p=
+er CPU, and
+> struct iocg_pcpu_stat, which requires only 8 bytes per CPU, are good cand=
+idates for
+> this approach.
+>
+> Using GFP_ATOMIC in these limited, well-defined cases could help avoid lo=
+ckdep warnings
+> and potential deadlocks, without requiring invasive refactoring to move p=
+ercpu allocations
+> outside the queue-freeze window.
 
-Thanks all!
+Just a notice, I follow the idea to reduce queue frozen scope, see patch 6,=
+7 in
+the following thread:
 
-If I understand this correctly, it seems fine to make progress with this se=
-t,
-currently IO can return error during the race window, and this can be final=
-ly
-fixed with this reinsert.
+[PATCH v2 0/7] blk-cgroup: fix races and deadlocks - Yu Kuai <https://lore.=
+kernel.org/all/20260203080602.726505-1-yukuai@fnnas.com/>
 
+>
+> Thanks,
+> --Nilay
+>
 --=20
 Thansk,
 Kuai
