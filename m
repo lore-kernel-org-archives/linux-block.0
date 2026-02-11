@@ -1,72 +1,51 @@
-Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011036.outbound.protection.outlook.com [40.93.194.36])
+Received: from smtp153-166.sina.com.cn (smtp153-166.sina.com.cn [61.135.153.166])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C94F1261B92
-	for <linux-block@vger.kernel.org>; Wed, 11 Feb 2026 20:50:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.36
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770843018; cv=fail; b=F3lIy7w7DGss/a4UjFR6rGU8Fjt8fhlDXF6++FTBPDbxprSXicaTjlghHr+j0umKeOcMIMe669q6g070X1zShB945cJjZJFObdPRrPwtkL6EmerEuij35kTk5/CEpCGCG22JJerWUw1JaWqNAb2WO57m4UeQKn/wFpVmwHMM4k8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770843018; c=relaxed/simple;
-	bh=F7+jxxOnQxD0zZ2PyTIzYwvFKo+tm3G1sJzZL7eppY4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=df+xQ3QHD6ckSOwVqpgIBgLGQ7TKqBEAnFjag8eg70okUQgGlRi5NJWkdfRsRmkQbn3q901by2YDX7vnCJ5QoKeEr/LHrWUzc8Hp3saTDOGCKhcX2I7F4JI5oh7hfiK6IKPOqwz4DfxVx+R00JU3VSK6gySAoAT0o4lMOuPQCIg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=SHMic5FQ; arc=fail smtp.client-ip=40.93.194.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3561B318EF4
+	for <linux-block@vger.kernel.org>; Wed, 11 Feb 2026 23:59:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=61.135.153.166
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770854386; cv=none; b=WB15fbc/L0cDy+JisUhBW7DluOqja1JdXDDSsi0tA2kLJxeieUsep+0PKcnj8zNAFuSTFW3/jsgblhJ3dEgpdB9a0cPFb4empj3ADR8SZ9qrIBXecXAmyg3moRN7g8nKKFPdGSY/fEAqGKUrJKRn76TbQJaXiQ24KfR7kmtB2tw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770854386; c=relaxed/simple;
+	bh=zRx7nVRKQ/AqMAnuDevh7KAI929T7Vn6lCmq49SEt/c=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=uP8Xqs3J2+Aoo3wYEnKgx2EgY8Pn7MsMCpK1pOcwz1YQBna7a1WGx0qXwrmTAIoP6DaZbaAI9vsjEzRyYTqumFHtwWwDacMTn7o2XbcimxAJCuki1hpFl8UBq9ceCx4wpaftThiu03TukDnaBDRuUyxa7pbguN1/Uilfn0OrKF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=FHvkiBM8; arc=none smtp.client-ip=61.135.153.166
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="SHMic5FQ"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=w+RkWgbBL5WzzqaZm24+I/BJAb6z7Jql+u9gdoY+beu2qa7VD0vN26NROxneX+rCz7BmvYgHNi6asQ0+YidO4xo2GCwOFAntFRb78e0wmccUcBVYJfdNa3Rgc7ge+QhVZiI3p90bmt435Q5E5ZafIZJWrbSHYiwU0GDrLEgn39Q+c7Cj5eLGTDAxkloqg80hSWg274XWMFym+wnvr42oDPApxK8+cPPZfOZ74myOQZOV+QUKgN9Vz/9SaN2X1CBcrtJxgg+X+AIhRWggLaFKn2ogIu51GoKojEfs9uKUEp/S8BuMm4sv2JFzK+GVImdMUayW+I+KZxlGs75fJDOjnA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BC+43XdUJh2SWXLMwOiYUUF32eFg90jxmYtzrJWLbf4=;
- b=YTo3vlHhNwY/DJ0DIDWwXg7cfImzhRDvFuhBIGjSvyYbRLdKNI0EpNjpIjsdKV9UGOqLkpqKjGkfQeIGDUucYNJV4o8z399M1qFfJ4LzL2POtqhH0p9Tapevtq6XTWE/ZYR2g9u+WdVaPf/T7+++zfWk3b1snVUa47EW6lnnzXuUMUYrh4P2HvJ3JlriD4FvKWg5X1Klkw2iEaCnqBSaNR6FOCQGE1yKHwlsQzly3ik542Md9XAOv+d/Af+otwWvqeFGgVoSBztG72GuzQ8H9TCSRggFsodkHKBRWhZr0c9IxEmYdeJlLC/X5iLu7zyfcA2pHur9MNyvs5vhrzQCzQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=lst.de smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BC+43XdUJh2SWXLMwOiYUUF32eFg90jxmYtzrJWLbf4=;
- b=SHMic5FQ+S0FYKM1rOHgCMXDhb0xkiStRODI+V2dAG+C8gsc9ehN6uSU5P5jU/BVCd1NAF+Jc5Yf8F5JgfvgZ39Y9R9LFsA1SShdW3ujymrn4eDT7IGfk3hwy9tAytDrsMTeVy2DvZYJOjFFzAn92bwHOTAIGwxPQHRx6Oh+uq2eTSPCE19JJdoo9IY3pXfkfnUhawJHc4Qn9mCWjICRxPNfrnsZkxuTlFjJggjXzU7AlVZyYta4ZWIqhggF+ozOTCaB8/lYHodzDUVF3jZjf3MBku3GFYqqueSvJz8tPTos/FhONpUj+RvdXGf1XgJ+p2wFllBTfD4kJDMEz4q8IA==
-Received: from SN7P222CA0005.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:124::22)
- by SA5PPFD911547FB.namprd12.prod.outlook.com (2603:10b6:80f:fc04::8e4) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9587.18; Wed, 11 Feb
- 2026 20:50:12 +0000
-Received: from SN1PEPF000397AF.namprd05.prod.outlook.com
- (2603:10b6:806:124:cafe::d9) by SN7P222CA0005.outlook.office365.com
- (2603:10b6:806:124::22) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9611.10 via Frontend Transport; Wed,
- 11 Feb 2026 20:50:02 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SN1PEPF000397AF.mail.protection.outlook.com (10.167.248.53) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9611.8 via Frontend Transport; Wed, 11 Feb 2026 20:50:10 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 11 Feb
- 2026 12:49:53 -0800
-Received: from dev.nvidia.com (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 11 Feb
- 2026 12:49:52 -0800
-From: Chaitanya Kulkarni <kch@nvidia.com>
-To: <hch@lst.de>
-CC: <leon@kernel.org>, <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-	Chaitanya Kulkarni <kch@nvidia.com>
-Subject: [PATCH] block: fix partial IOVA mapping cleanup in blk_rq_dma_map_iova
-Date: Wed, 11 Feb 2026 12:49:44 -0800
-Message-ID: <20260211204944.23380-1-kch@nvidia.com>
-X-Mailer: git-send-email 2.39.5
+	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="FHvkiBM8"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1770854379;
+	bh=VlCa2ouJtJnz/hPOA2UW0zncffyUYX2V5/hDOAOwG88=;
+	h=From:Subject:Date:Message-ID;
+	b=FHvkiBM8LCucq3kRTynS6XuuC4aVo0AfGoIomVChX6TwlyerS9JcqRGJqcm2D4n8n
+	 aWDKxYR9jskaitNkaXKSYGFFhgE6b48nQ14ylbZuRWeRDRTpfCmIPepQZbv3nAEEoL
+	 A5hy18CUg2skD/mZDGuRNKUx3mVtWRUZQ0pUMHOY=
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([114.249.62.144])
+	by sina.com (10.54.253.33) with ESMTP
+	id 698D17E1000044C6; Wed, 12 Feb 2026 07:59:30 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 7266036685202
+X-SMAIL-UIID: 85A447C7E9224D86A19CBCA7C0B2540F-20260212-075930-1
+From: Hillf Danton <hdanton@sina.com>
+To: "Ionut Nechita (Wind River)" <ionut.nechita@windriver.com>
+Cc: axboe@kernel.dk,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bigeasy@linutronix.de
+Subject: Re: [PATCH v3 1/1] block/blk-mq: use atomic_t for quiesce_depth to avoid lock contention on RT
+Date: Thu, 12 Feb 2026 07:59:17 +0800
+Message-ID: <20260211235919.2955-1-hdanton@sina.com>
+In-Reply-To: <20260211203928.324307-2-ionut.nechita@windriver.com>
+References: 
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -74,116 +53,210 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF000397AF:EE_|SA5PPFD911547FB:EE_
-X-MS-Office365-Filtering-Correlation-Id: e9778675-eaa1-4b6f-c08f-08de69af25f3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|36860700013|82310400026|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?b2ehQYkeqOzOPGUNuZH4fTJjfbI8I/+QDyUIukEJB/XDGt4SmhYg0x26znds?=
- =?us-ascii?Q?91I8Qj+BpGbXI9rbCOcqcXCxVvd5sFA+qIPWW3RTQb7v8QWK/RN12KZUmWpx?=
- =?us-ascii?Q?6fI/dH6ZDxRBVvCQG6qRjJiZzqJ2vyJn73hsd+SUSSJAxcMHxplvftP8LS/w?=
- =?us-ascii?Q?QJiYnVgI5BtoylagVLhMqr+VyNXtoDW5z80M59IN0DYIdAUQEfyXs2lhzFz7?=
- =?us-ascii?Q?yrBjbKMG6FPsHqT8mSIsY0r8Zk6aFJZ37VOgYOvKST3+XtHguiCWvuQLIHYY?=
- =?us-ascii?Q?i+SZPhzOG60fPce4OSALwHU+U9cKzITDwNiumoVmH0jAWUFesfOFHUYfQK3T?=
- =?us-ascii?Q?5dewm/WicJ7WVn0UvzKcoUtKU9jo92pmnF/HPD88BKnqFdrvThOieblWEcgf?=
- =?us-ascii?Q?xkOzCzxveXHKj5Tbbzyz3TCZzpgQFFs0eMf9gZ+o6ak/l/E2DZi9TJp6E1My?=
- =?us-ascii?Q?N5kEY2eSWJ7OMz6pa3KcGFBCqta5SJAdE+/XZEG0JtHrygPdiH2dKq8bTRAe?=
- =?us-ascii?Q?uBfscXLRUUc3Gg6LyJjdbxCr6VUnVbEff1XtWt6dNMFqq7k4e9BIIJS8Tk8i?=
- =?us-ascii?Q?FF9FQ78QWy3Vlta8u6URHmTXmYdkiRMKYKR1liQf7PSQyRG6Fjvp3alyKj/W?=
- =?us-ascii?Q?2nZUV7Tu86WldN+KPIwTQeK8AG+GJj7te33mo4MT6SE8sHsQdpdy7wkz0SHq?=
- =?us-ascii?Q?XMi7DqNcMxrecQWl+dZrK17jzOSHojFiywu2B7YrgVEXFn6H+h88ABYr13JT?=
- =?us-ascii?Q?p96UkkaO1XaxqVSFcEA08zXG874KpbI8yI0yqcOxelGKUTLGyZ9XANZ2Wau2?=
- =?us-ascii?Q?zGDAgrU2Fpf45Q1sdC9MTt2Bphl1Ye6dDVn2M8Aaf3tGPrm2l5Kr7asunuMq?=
- =?us-ascii?Q?4aMvwB2BYaIA6VGTEm2kK7DIqQuCD5q06KloJ50Lga/skiofsQOhUaBpBvjV?=
- =?us-ascii?Q?AjmmBak5Myg6QF8Cy+PxGptN9FQfg0pvorgsxtniue8DEzwkY/aoDV1YVQAA?=
- =?us-ascii?Q?CD19RSBlbHCv6d8BaojSI29IB3psT90izJIDxc6VSJHcPzGlGWMoqMVjXuyH?=
- =?us-ascii?Q?ZHr0zRTgArfpfYyqJoozMK+H2X+87Ws5EtZ04msnxT2zfl6yQJiv38ToFlCC?=
- =?us-ascii?Q?rqQ5kNCgfX9oEsZ6ubgOHKksZZ2D2jXPeL1rLbmxNxfRULWDBCdtz5EbLpyk?=
- =?us-ascii?Q?gjfiVinZgbLFm47/eYu+YUid1ggebxAuiIa14dP1m/4Y7akOX6fIbfJHC41a?=
- =?us-ascii?Q?Vxb0aLvdYLXJLDg84MWiNGBGcVDQCqByBqAs7uFITx1iPfQasw9IFdQxQMUV?=
- =?us-ascii?Q?Y1lzaLoS6Wu+zhoqC5GbE2q/HteOeXf5Hq5+XIozUEnmRJ4JrJo0XkzFq+Lp?=
- =?us-ascii?Q?lKY5KhM/9LKW1cLi5bkxMyHxk26/pkbmUyW2W0gkl2+KL+2C1MMVC8LmH6q+?=
- =?us-ascii?Q?kXGqDWrQ+wQEjBKIO7i725YMXbtGP9fOM/IKszetAMt03vMOC6oxaFk6mrul?=
- =?us-ascii?Q?ckxzVU8lAtI1GkfJSu6qg8l3WA1PL5yh4DdP8DRpDD8MomZy3LyIK/1sSCDm?=
- =?us-ascii?Q?pgTyN5XRbtjAVkiOrWYIS6TFIQMmlPqCfTU6ekvRJRJvFgwNsnpBAM0IMxzh?=
- =?us-ascii?Q?6ihtgdbexbzogKKUwiGdLMW0oxBq1UIlwEUErtsqdQSWuxb955couUOFS39b?=
- =?us-ascii?Q?GwAzRg=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(36860700013)(82310400026)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	zvym6gE0xo9apUtVKMiMDvyQKciMypI245CeZsuIjMg0BlwxhlJjyvFEgLONztXUABv7i7g9ZMP8VK4FXqe1jGkrf3PWfSqninB51+Cn6R0Bz1r4KCnQoNsHZllwP6XppIuUw6pqtFMkqhL8g+uZcfT2KIxUBO1OJLo2ah4G49ZUdPWjhP5aO3NYGJrgha5GB1dYmqCWtOmejaIPHAKm4VR3p/zgCyAJUa+N/pbOj8brJ8ffnjXYG6Om32w/WverhQ38l+/zeTw1wgzBH2AjsFEZneaiiVq+h0GfK3LHXl1JL67z5OYAp/EjDriNjzSiImj/tQNQ5jTl4eJIfnGfOSgb2pxcBIE6IpRDemyLjJXBwy0IwfVAUdJ1ca+W2sa7Td0AXmOkU4Xhscj/7G8kCFmwluQuL/r05+cNwAngq42M515SIkJljQNIU+uw3tN0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Feb 2026 20:50:10.8703
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e9778675-eaa1-4b6f-c08f-08de69af25f3
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF000397AF.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA5PPFD911547FB
 
-When dma_iova_link() fails partway through mapping a request's bvec
-list, the function breaks out of the loop without cleaning up
-already mapped segments. Similarly, if dma_iova_sync() fails after
-linking all segments, no cleanup is performed.
+On Wed, 11 Feb 2026 22:39:29 +0200
+> From: Ionut Nechita <ionut.nechita@windriver.com>
+> 
+> In RT kernel (PREEMPT_RT), commit 679b1874eba7 ("block: fix ordering
+> between checking QUEUE_FLAG_QUIESCED request adding") causes severe
+> performance regression on systems with multiple MSI-X interrupt
+> vectors.
+> 
+> The above change introduced spinlock_t queue_lock usage in
+> blk_mq_run_hw_queue() to synchronize QUEUE_FLAG_QUIESCED checks
+> with blk_mq_unquiesce_queue(). While this works correctly in
+> standard kernel, it causes catastrophic serialization in RT kernel
+> where spinlock_t converts to sleeping rt_mutex.
+> 
+> Problem in RT kernel:
+> - blk_mq_run_hw_queue() is called from IRQ thread context
+> - With multiple MSI-X vectors, all IRQ threads contend on
+>   the same queue_lock
+> - queue_lock becomes rt_mutex (sleeping) in RT kernel
+> - IRQ threads serialize and enter D-state waiting for lock
+> - Throughput drops from 640 MB/s to 153 MB/s
+> 
+> Solution:
+> Convert quiesce_depth to atomic_t and use it directly for quiesce
+> state checking, eliminating QUEUE_FLAG_QUIESCED entirely. This
+> removes the need for any locking in the hot path.
+> 
+> The atomic counter serves as both the depth tracker and the quiesce
+> indicator (depth > 0 means quiesced). This eliminates the race
+> window that existed between updating the depth and the flag.
+> 
+> Memory ordering is ensured by:
+> - smp_mb__after_atomic() after modifying quiesce_depth
+> - smp_rmb() before re-checking quiesce state in
+>   blk_mq_run_hw_queue()
+> 
+> Performance impact:
+> - RT kernel: eliminates lock contention, restores full throughput
+> - Non-RT kernel: atomic ops are similar cost to the previous
+>   spinlock acquire/release, no regression expected
+> 
+> Test results on RT kernel:
+> Hardware: Broadcom/LSI MegaRAID 12GSAS/PCIe Secure SAS39xx
+>   (megaraid_sas driver, 128 MSI-X vectors, 120 hw queues)
+> - Before: 153 MB/s, IRQ threads in D-state
+> - After:  640 MB/s, no IRQ threads blocked
+> 
+> Suggested-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> Fixes: 679b1874eba7 ("block: fix ordering between checking QUEUE_FLAG_QUIESCED request adding")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Ionut Nechita <ionut.nechita@windriver.com>
+> ---
+>  block/blk-core.c       |  1 +
+>  block/blk-mq-debugfs.c |  1 -
+>  block/blk-mq.c         | 45 ++++++++++++++++--------------------------
+>  include/linux/blkdev.h |  9 ++++++---
+>  4 files changed, 24 insertions(+), 32 deletions(-)
+> 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 8387fe50ea15..4eea19426cc6 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -434,6 +434,7 @@ struct request_queue *blk_alloc_queue(struct queue_limits *lim, int node_id)
+>  	mutex_init(&q->limits_lock);
+>  	mutex_init(&q->rq_qos_mutex);
+>  	spin_lock_init(&q->queue_lock);
+> +	atomic_set(&q->quiesce_depth, 0);
+>  
+>  	init_waitqueue_head(&q->mq_freeze_wq);
+>  	mutex_init(&q->mq_freeze_lock);
+> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+> index 4896525b1c05..c63fe8864248 100644
+> --- a/block/blk-mq-debugfs.c
+> +++ b/block/blk-mq-debugfs.c
+> @@ -89,7 +89,6 @@ static const char *const blk_queue_flag_name[] = {
+>  	QUEUE_FLAG_NAME(INIT_DONE),
+>  	QUEUE_FLAG_NAME(STATS),
+>  	QUEUE_FLAG_NAME(REGISTERED),
+> -	QUEUE_FLAG_NAME(QUIESCED),
+>  	QUEUE_FLAG_NAME(RQ_ALLOC_TIME),
+>  	QUEUE_FLAG_NAME(HCTX_ACTIVE),
+>  	QUEUE_FLAG_NAME(SQ_SCHED),
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 968699277c3d..1e0f5a311bef 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -260,12 +260,12 @@ EXPORT_SYMBOL_GPL(blk_mq_unfreeze_queue_non_owner);
+>   */
+>  void blk_mq_quiesce_queue_nowait(struct request_queue *q)
+>  {
+> -	unsigned long flags;
+> -
+> -	spin_lock_irqsave(&q->queue_lock, flags);
+> -	if (!q->quiesce_depth++)
+> -		blk_queue_flag_set(QUEUE_FLAG_QUIESCED, q);
+> -	spin_unlock_irqrestore(&q->queue_lock, flags);
+> +	atomic_inc(&q->quiesce_depth);
+> +	/*
+> +	 * Ensure the store to quiesce_depth is visible before any
+> +	 * subsequent loads in blk_mq_run_hw_queue().
+> +	 */
+> +	smp_mb__after_atomic();
 
-This leaves partial IOVA mappings in place. The completion path
-attempts to unmap the full expected size via dma_iova_destroy() or
-nvme_unmap_data(), but only a partial size was actually mapped,
-leading to incorrect unmap operations.
+Nope mb is not enough.
 
-Add an out_unlink error path that calls dma_iova_destroy() to clean
-up partial mappings before returning failure. The dma_iova_destroy()
-function handles both partial unlink and IOVA space freeing. It
-correctly handles the mapped_len == 0 case (first dma_iova_link()
-failure) by only freeing the IOVA allocation without attempting to
-unmap.
+	int qd = atomic_read(&q->quiesce_depth);
+	for (;;) {
+		int v = qd + 1;
+		if (atomic_try_cmpxchg(&q->quiesce_depth, &qd, v))
+			break;
+	}
 
-Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
----
- block/blk-mq-dma.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+More important however, why not send this patch to the RT tree instead, given
+the spin lock is good and correct in mainline. By good I mean fixing RT stuff
+in the mainline is not encouraged.
 
-diff --git a/block/blk-mq-dma.c b/block/blk-mq-dma.c
-index 3c87779cdc19..bfdb9ed70741 100644
---- a/block/blk-mq-dma.c
-+++ b/block/blk-mq-dma.c
-@@ -121,17 +121,20 @@ static bool blk_rq_dma_map_iova(struct request *req, struct device *dma_dev,
- 		error = dma_iova_link(dma_dev, state, vec->paddr, mapped,
- 				vec->len, dir, attrs);
- 		if (error)
--			break;
-+			goto out_unlink;
- 		mapped += vec->len;
- 	} while (blk_map_iter_next(req, &iter->iter, vec));
- 
- 	error = dma_iova_sync(dma_dev, state, 0, mapped);
--	if (error) {
--		iter->status = errno_to_blk_status(error);
--		return false;
--	}
-+	if (error)
-+		goto out_unlink;
- 
- 	return true;
-+
-+out_unlink:
-+	dma_iova_destroy(dma_dev, state, mapped, dir, attrs);
-+	iter->status = errno_to_blk_status(error);
-+	return false;
- }
- 
- static inline void blk_rq_map_iter_init(struct request *rq,
--- 
-2.39.5
-
+>  }
+>  EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue_nowait);
+>  
+> @@ -314,21 +314,18 @@ EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue);
+>   */
+>  void blk_mq_unquiesce_queue(struct request_queue *q)
+>  {
+> -	unsigned long flags;
+> -	bool run_queue = false;
+> +	int depth;
+>  
+> -	spin_lock_irqsave(&q->queue_lock, flags);
+> -	if (WARN_ON_ONCE(q->quiesce_depth <= 0)) {
+> -		;
+> -	} else if (!--q->quiesce_depth) {
+> -		blk_queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
+> -		run_queue = true;
+> -	}
+> -	spin_unlock_irqrestore(&q->queue_lock, flags);
+> +	depth = atomic_dec_if_positive(&q->quiesce_depth);
+> +	if (WARN_ON_ONCE(depth < 0))
+> +		return;
+>  
+> -	/* dispatch requests which are inserted during quiescing */
+> -	if (run_queue)
+> +	if (depth == 0) {
+> +		/* Ensure the decrement is visible before running queues */
+> +		smp_mb__after_atomic();
+> +		/* dispatch requests which are inserted during quiescing */
+>  		blk_mq_run_hw_queues(q, true);
+> +	}
+>  }
+>  EXPORT_SYMBOL_GPL(blk_mq_unquiesce_queue);
+>  
+> @@ -2352,17 +2349,9 @@ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
+>  
+>  	need_run = blk_mq_hw_queue_need_run(hctx);
+>  	if (!need_run) {
+> -		unsigned long flags;
+> -
+> -		/*
+> -		 * Synchronize with blk_mq_unquiesce_queue(), because we check
+> -		 * if hw queue is quiesced locklessly above, we need the use
+> -		 * ->queue_lock to make sure we see the up-to-date status to
+> -		 * not miss rerunning the hw queue.
+> -		 */
+> -		spin_lock_irqsave(&hctx->queue->queue_lock, flags);
+> +		/* Pairs with smp_mb__after_atomic() in blk_mq_unquiesce_queue() */
+> +		smp_rmb();
+>  		need_run = blk_mq_hw_queue_need_run(hctx);
+> -		spin_unlock_irqrestore(&hctx->queue->queue_lock, flags);
+>  
+>  		if (!need_run)
+>  			return;
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 72e34acd439c..9ad725af81f6 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -516,7 +516,8 @@ struct request_queue {
+>  
+>  	spinlock_t		queue_lock;
+>  
+> -	int			quiesce_depth;
+> +	/* Atomic quiesce depth - also serves as quiesced indicator (depth > 0) */
+> +	atomic_t		quiesce_depth;
+>  
+>  	struct gendisk		*disk;
+>  
+> @@ -660,7 +661,6 @@ enum {
+>  	QUEUE_FLAG_INIT_DONE,		/* queue is initialized */
+>  	QUEUE_FLAG_STATS,		/* track IO start and completion times */
+>  	QUEUE_FLAG_REGISTERED,		/* queue has been registered to a disk */
+> -	QUEUE_FLAG_QUIESCED,		/* queue has been quiesced */
+>  	QUEUE_FLAG_RQ_ALLOC_TIME,	/* record rq->alloc_time_ns */
+>  	QUEUE_FLAG_HCTX_ACTIVE,		/* at least one blk-mq hctx is active */
+>  	QUEUE_FLAG_SQ_SCHED,		/* single queue style io dispatch */
+> @@ -697,7 +697,10 @@ void blk_queue_flag_clear(unsigned int flag, struct request_queue *q);
+>  #define blk_noretry_request(rq) \
+>  	((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
+>  			     REQ_FAILFAST_DRIVER))
+> -#define blk_queue_quiesced(q)	test_bit(QUEUE_FLAG_QUIESCED, &(q)->queue_flags)
+> +static inline bool blk_queue_quiesced(struct request_queue *q)
+> +{
+> +	return atomic_read(&q->quiesce_depth) > 0;
+> +}
+>  #define blk_queue_pm_only(q)	atomic_read(&(q)->pm_only)
+>  #define blk_queue_registered(q)	test_bit(QUEUE_FLAG_REGISTERED, &(q)->queue_flags)
+>  #define blk_queue_sq_sched(q)	test_bit(QUEUE_FLAG_SQ_SCHED, &(q)->queue_flags)
+> -- 
+> 2.53.0
