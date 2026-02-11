@@ -1,83 +1,101 @@
-Received: from smtp153-162.sina.com.cn (smtp153-162.sina.com.cn [61.135.153.162])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sg-1-21.ptr.blmpb.com (sg-1-21.ptr.blmpb.com [118.26.132.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C43771E32D6
-	for <linux-block@vger.kernel.org>; Wed, 11 Feb 2026 00:24:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=61.135.153.162
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2198D2D320E
+	for <linux-block@vger.kernel.org>; Wed, 11 Feb 2026 01:57:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770769478; cv=none; b=Ge0dtejRln12vDHiJuPvVP4nC9uIufuJv6xErgdJOxjkt2WYi4Lr9SbGklCuJ71k0ipfPLbxd9Aqmg1jYjbLkMpKJ3T+X0rP+d0lOHRb8/JuqDm/ip7fXICfThZNmw2H7zcOLIa6lo+YPgHXjvbKd/k3evwNCHPyXLrnK7pT2Bw=
+	t=1770775061; cv=none; b=QntFWIoMDTtRsox47Mqp7z/LxYzzxW0vscqTeFELRU7FaaD2b7W3+KqRcZIkcUpLD/9wmRIn4jHzY/BFSUvWvIs0bf9DyeVnwUv1i1wbCuV9MRR8HCJZU5MzXQa3dkAr1JzQye56PCa2ms609zyzYdnZQLxdykmiBy/2OCl3Eh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770769478; c=relaxed/simple;
-	bh=ju5P6MSCRAendyS2SYVIhbA3tQky8z9n3jLbBjeZ/zU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IvhBPfR8DKdditgb0/FID3IfdrcipTeFJvnlxQI96BwbgwMx1AG/Snjd+MFOJLVQGSNnHBv9mGl2P/N8jssvcidMf4jw+lySGCwEPUQ7e7mtWxjAHwwGODkK5fNz29AmRGg05ek3fLuXsW1UWhLH7Y+koeOJEqXlM1qyYZUjB18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b=swLTMrtT; arc=none smtp.client-ip=61.135.153.162
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+	s=arc-20240116; t=1770775061; c=relaxed/simple;
+	bh=UG0mqORVxhaZ0a+OZCSMkiGFaCvU9+2moAIWtkDvylc=;
+	h=In-Reply-To:Mime-Version:Cc:From:Date:Message-Id:Content-Type:
+	 Subject:References:To; b=FyRCvQ8cdD3I47lGI9YsqQMoVrbcSgacBqH9D2SXWUMEh/GHAr5m0ATeRCK9re0xJbrVMFECF8Mz4h0MgTASnRlRaYr+UM4Lxcv2IxJxUndmyuKbi5XrYbPIHK7E9rVM5NGPz21FDEn4JncnaIvyKZib/Ye/Ca5qGec6keBBO4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=pass smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=vqp1JWRc; arc=none smtp.client-ip=118.26.132.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fnnas.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=sina.com header.i=@sina.com header.b="swLTMrtT"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sina.com; s=201208; t=1770769473;
-	bh=RW2u9FblXw/99dFsoyPShyFu+/Svaln1D1IAhqA6bAw=;
-	h=From:Subject:Date:Message-ID;
-	b=swLTMrtTnSNSszhy+Hbn3PyXmiYl36ZhmiKtjtjsVQYUPdVWpn0dgmwiIO2vme4QO
-	 HiJjUynRUGWBSjR5cK773CACiDYXIrl9fjmfDtGnwTQdG6XakqGsGl/XPxGVTMz9qN
-	 d7VCDoqdjFBprxWeliYt0UAf2rFgU7PgRFAFiPl4=
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([114.249.62.144])
-	by sina.com (10.54.253.31) with ESMTP
-	id 698BCAF50000053A; Wed, 11 Feb 2026 08:19:03 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 9897336816036
-X-SMAIL-UIID: 1BFCAC35E8DD46D0B5890F59211E6431-20260211-081903-1
-From: Hillf Danton <hdanton@sina.com>
-To: "Ionut Nechita (Wind River)" <ionut.nechita@windriver.com>
-Cc: axboe@kernel.dk,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bigeasy@linutronix.de
-Subject: Re: [PATCH v2 0/1] block/blk-mq: fix RT kernel regression with dedicated quiesce_sync_lock
-Date: Wed, 11 Feb 2026 08:18:49 +0800
-Message-ID: <20260211001851.2821-1-hdanton@sina.com>
-In-Reply-To: <20260210204943.21709-3-ionut.nechita@windriver.com>
-References: 
+	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="vqp1JWRc"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1770775051;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=UG0mqORVxhaZ0a+OZCSMkiGFaCvU9+2moAIWtkDvylc=;
+ b=vqp1JWRc8DOOZsP7AMzTytrnJyLG3LxiYQvOCDXL8S8Zb2UyLbuelVmjdfEHw4rJmjh5Lw
+ 8yYPelvrgUqQ/0l0gVK7TwqzLW6ySaPA3UjkHuBYcGMnBent6iPSF7/kbx/xLHR2w+WOnn
+ UJpl1oGmnS56WXR6Spe6k2AB85Vb986jt5z9tPLi8QJt3b4cu6pt8VI4eLNoWIWyGyOfDG
+ ua//Fq2A0iK4KMG1EUDp5c3ZokUjCqCiUCK28eNBgkhlKE3ZMWaYrQKxf8AJqNPaJ1hgU7
+ jpVNbJ4GusObE2vYHKWBLvYLQgnqTgMC4dwULqc+2SDF7x6gzO92TdOfBtb3ew==
+In-Reply-To: <f3451ddd-96b6-4bc1-9d4c-964e361d56fc@flourine.local>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Cc: "Christoph Hellwig" <hch@lst.de>, <axboe@kernel.dk>, <sagi@grimberg.me>, 
+	<sven@kernel.org>, <j@jannau.net>, <linux-block@vger.kernel.org>, 
+	<linux-nvme@lists.infradead.org>, <tj@kernel.org>, <nilay@linux.ibm.com>, 
+	<ming.lei@redhat.com>, <neal@gompa.dev>, <asahi@lists.linux.dev>, 
+	<linux-arm-kernel@lists.infradead.org>, <yukuai@fnnas.com>
+From: "Yu Kuai" <yukuai@fnnas.com>
+Date: Wed, 11 Feb 2026 09:57:26 +0800
+Message-Id: <baa254f9-c41c-44f7-959a-8ce69e1768fa@fnnas.com>
+X-Original-From: Yu Kuai <yukuai@fnnas.com>
+Reply-To: yukuai@fnnas.com
+User-Agent: Mozilla Thunderbird
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH 3/4] nvme-apple: move blk_mq_update_nr_hw_queues after nvme_unfreeze
+References: <20260209082953.3053721-1-yukuai@fnnas.com> <20260209082953.3053721-4-yukuai@fnnas.com> <20260209145832.GC18315@lst.de> <aYn-xwFHCpd7sITJ@kbusch-mbp> <e3e7d95b-2712-4365-922d-731449e7193a@fnnas.com> <aYtKFNm-wRKn6l66@kbusch-mbp> <20260210154108.GB2484@lst.de> <aYtWSscg6L9xxlzc@kbusch-mbp> <f3451ddd-96b6-4bc1-9d4c-964e361d56fc@flourine.local>
+Received: from [192.168.1.104] ([39.182.0.137]) by smtp.feishu.cn with ESMTPS; Wed, 11 Feb 2026 09:57:28 +0800
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+X-Lms-Return-Path: <lba+2698be209+b8b170+vger.kernel.org+yukuai@fnnas.com>
+To: "Daniel Wagner" <dwagner@suse.de>, "Keith Busch" <kbusch@kernel.org>
 
-On Tue, 10 Feb 2026 22:49:44 +0200 Ionut Nechita (Wind River) wrote:
-> Hi Jens,
-> 
-> This is v2 of the fix for the RT kernel performance regression caused by
-> commit 679b1874eba7 ("block: fix ordering between checking
-> QUEUE_FLAG_QUIESCED request adding").
-> 
-> Changes since v1 (RESEND, Jan 9):
-> - Rebased on top of axboe/for-7.0/block
-> - No code changes
-> 
-> The problem: on PREEMPT_RT kernels, the spinlock_t queue_lock added in
-> blk_mq_run_hw_queue() converts to a sleeping rt_mutex, causing all IRQ
-> threads (one per MSI-X vector) to serialize. On megaraid_sas with 8
-> MSI-X vectors, throughput drops from 640 MB/s to 153 MB/s.
-> 
-> The fix introduces a dedicated raw_spinlock_t quiesce_sync_lock that
-> does not convert to rt_mutex on RT kernels. The critical section is
-> provably short (only flag and counter checks), making raw_spinlock safe.
-> 
-> Test results on RT kernel (megaraid_sas with 8 MSI-X vectors):
-> - Before: 153 MB/s, 6-8 IRQ threads in D-state
-> - After:  640 MB/s, 0 IRQ threads blocked
+Hi,
+
+=E5=9C=A8 2026/2/11 0:28, Daniel Wagner =E5=86=99=E9=81=93:
+> On Tue, Feb 10, 2026 at 09:01:14AM -0700, Keith Busch wrote:
+>> On Tue, Feb 10, 2026 at 04:41:08PM +0100, Christoph Hellwig wrote:
+>>> On Tue, Feb 10, 2026 at 08:09:08AM -0700, Keith Busch wrote:
+>>>> If you leave the queue quiesced, pending IO will form requests that ar=
+e
+>>>> entered and waiting in the block layer. You can't freeze a queue with
+>>>> entered requests.
+>>>>
+>>>> We unquiesce first to flush any pending IO that had entered during the
+>>>> prior reset. It's not the best way to handle this situation. It would =
+be
+>>>> smarter to steal the bio's from all the entered requests, then end tho=
+se
+>>>> requests, then resubmit the bios after the hw queues are initialized. =
+We
+>>>> don't do that because no one's really complained, probably because the
+>>>> queue counts don't usually change after a reset.
+>>> FYI, Daniel Wagner had been thinking about doing this reinsert for
+>>> something (I forgot what exactly),
+> This feature would solve a tricky problem with isolation patches:
 >
-Because the top waiter is allowed to spin on rtmutex owner, the D-state
-irq threads are expected.
-OTOH raw spinlock offers nothing for top waiter, which is the extra price
-for resuming the throughput.
+> https://lore.kernel.org/linux-nvme/87cy7vrbc4.ffs@tglx/
+>
+> Currently, it's not possible to take the cpu hotplug lock which would
+> prevent races in the cpu-queue mapping. The current logic depends on
+> making progress in the error case. If it would be possible to fail the
+> in-flight request in the error handler and reinsert them in the block
+> layer, progress could be guaranteed when holding the cpu hotplug lock.
+>
+> Unfortunatly, haven't found time to implement and test this idea so far.
+> Sorry.
+
+Thanks all!
+
+If I understand this correctly, it seems fine to make progress with this se=
+t,
+currently IO can return error during the race window, and this can be final=
+ly
+fixed with this reinsert.
+
+--=20
+Thansk,
+Kuai
