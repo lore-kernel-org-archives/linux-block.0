@@ -1,234 +1,277 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3D00313E0D;
-	Wed, 11 Feb 2026 11:31:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F01F43207;
+	Wed, 11 Feb 2026 12:31:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770809481; cv=none; b=UqslqKiy3pC4dnn1CBe5vQm4TK5KknCaEyE87OFpIEIW6bm5dcAgvtShVP80IEgeDAzLD5MdwqfNGKNoOmliObECOYVUGvbXSQ0xGeHCEpIa106gO4qXZJBRmJqPNmE3pWT5FhJFjiDRrN8vUSZ+0y5H1y3eViWuitV56sC9jeE=
+	t=1770813091; cv=none; b=s0xL4kaqmGm5WoU/G6L2yV7QLM5Rfs01T20MvdhTwGZ6yVsatEbz4QkqeDchVRTeG9piVFhiCWVSDn4Py6g14+6i4IYTJ/LlTxW2Jbea0LmFgc6nMHpDXyUYfOyitJTNTV3wOaizp5F7Th2XXO9t60/EepFU+SnOnHDgVEMG3KQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770809481; c=relaxed/simple;
-	bh=r6Oj5uSMc1lzIWi/mj5FIh7uqMehtkOa6MRoztKgJFA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c8ztHOfdUds3IyE2rW4BQJfcv8cKHS7+uH7Lap4faMriWJW9Cx7MKNQDPXQFEblU2j3CqpYcoeZlfGIFruwrUtGiw8g6WK/otUA/DwrdWJodfaVUJ1HoixeMsCBKbWYkoCrPAnNF276J3TkxyNll6CyShrVrYYehVxB732uBKI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=0sXGHG1T; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=yPcwiIyx; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	s=arc-20240116; t=1770813091; c=relaxed/simple;
+	bh=54ptZY70lc/rowJfJIo76PTdUbKdlVReVnA7x+FOggg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=rdw85/gaJbhUhukA5G2mTJX3cPhVUMWcK3qIhx3nLeJ0OkDwBVP411Jz/ApW64VoSwvAhVjTmgdYWYmY0/AFtttkUr5FtY4x6VHx//W57H3UvIbOnWvy7PfiEnt4quaGvaECk0uOTqE5SBvWfmf5M1cEh63B+pRfkrjLcgZ25Pc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AfDKzCeB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="0sXGHG1T";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="yPcwiIyx"
-Date: Wed, 11 Feb 2026 12:31:07 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1770809469;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KNAYpsr5sQNu+uU2DhYy3Ytlt/Qx3h50xN9qAwhfg3Q=;
-	b=0sXGHG1T0hKhVFy0Xc0FuppkYJ+mihrldsIu/Nw3sGMS4955Y1s+w2yOJlOL7EMC9TZgQ1
-	xz7H+uNEppsA6gTNTIilzVwMgWeeEAljq1lcURTpO9pGsdl3uiNrwPgVbisDScM8JMhuyE
-	IN5rj+nwXNPlUbz5LxN/nylxY1OkDvNV03TQUZeW2xV7auZAp2nYXi91LF3eyuVYy69OfR
-	1Sp5q4jA+RYWAghnuyaiVsOZDgFM5feaFwRv6jPJ9485ZH03iel7N02Lmp6yjBq5nRcFIu
-	bO3AE34/EDK5KiEovSLv8VLxva/41fYe4f8aT25NrcDzqxL12iIYPX0Tkc1nvg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1770809469;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KNAYpsr5sQNu+uU2DhYy3Ytlt/Qx3h50xN9qAwhfg3Q=;
-	b=yPcwiIyx4Ft1OHoFej6cBLlvAzRLr18f+CbpRKPhkNe4zlPcK4iWYXZXr22+sXRg+B4khD
-	ZXj+HQzIR6i5tgBg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: "Ionut Nechita (Wind River)" <ionut.nechita@windriver.com>
-Cc: axboe@kernel.dk, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-rt-users@vger.kernel.org,
-	ming.lei@redhat.com, muchun.song@linux.dev,
-	mkhalfella@purestorage.com, sunlightlinux@gmail.com,
-	chris.friesen@windriver.com, stable@vger.kernel.org,
-	ionut_n2001@yahoo.com
-Subject: Re: [PATCH v2 1/1] block/blk-mq: fix RT kernel regression with
- dedicated quiesce_sync_lock
-Message-ID: <20260211113107.NjjnR0HT@linutronix.de>
-References: <20260210204943.21709-3-ionut.nechita@windriver.com>
- <20260210204943.21709-5-ionut.nechita@windriver.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AfDKzCeB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AC58C19425;
+	Wed, 11 Feb 2026 12:31:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770813090;
+	bh=54ptZY70lc/rowJfJIo76PTdUbKdlVReVnA7x+FOggg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=AfDKzCeBPe361GvqJ5M4rZ0G8L5qd50P1Gf8EJuL+cy3pAZCJze+0dMMslrTxixyI
+	 ExxklOyK9j6n/tnlgOG0bAaxg4y3S/xrGwEt3jSIC4zLw3/9lb5MLnVS1J3D+f9gT+
+	 hXP+4wrvJ5wTrSG23vlAE9EMM44UQBtxwstBMBc1Chm9hSmPl8ktdewgJFilLBwU6A
+	 6q2SgoRooeyzEbqBcjVKBk+ldl5NFoecLvSb9kI4uANQcf6pJGwJsFh7KwZnOOhTJe
+	 TYk+Z6mtlZaAB6jK4yzXjQXH0C9PCRnDtojAyDdhJdt7ZZtCpIq7j3NbMr3h4Y5MaZ
+	 E9NFKmfArFi0A==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: Luke Wang <ziniu.wang_1@nxp.com>,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Sasha Levin <sashal@kernel.org>,
+	linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.19-6.12] block: decouple secure erase size limit from discard size limit
+Date: Wed, 11 Feb 2026 07:30:19 -0500
+Message-ID: <20260211123112.1330287-9-sashal@kernel.org>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260211123112.1330287-1-sashal@kernel.org>
+References: <20260211123112.1330287-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260210204943.21709-5-ionut.nechita@windriver.com>
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.19
+Content-Transfer-Encoding: 8bit
 
-On 2026-02-10 22:49:46 [+0200], Ionut Nechita (Wind River) wrote:
-> From: Ionut Nechita <ionut.nechita@windriver.com>
-> 
-> In RT kernel (PREEMPT_RT), commit 679b1874eba7 ("block: fix ordering
-> between checking QUEUE_FLAG_QUIESCED request adding") causes severe
-> performance regression on systems with multiple MSI-X interrupt vectors.
-> 
-> The above change added spinlock_t queue_lock to blk_mq_run_hw_queue()
-> to synchronize QUEUE_FLAG_QUIESCED checks with blk_mq_unquiesce_queue().
-> While this works correctly in standard kernel, it causes catastrophic
-> serialization in RT kernel where spinlock_t converts to sleeping
-> rt_mutex.
+From: Luke Wang <ziniu.wang_1@nxp.com>
 
-So !RT has the same synchronisation on the lock but spinning on the lock
-makes it less dramatic?
+[ Upstream commit ee81212f74a57c5d2b56cf504f40d528dac6faaf ]
 
-> Problem in RT kernel:
-> - blk_mq_run_hw_queue() is called from IRQ thread context (I/O completion)
-> - With 8 MSI-X vectors, all 8 IRQ threads contend on the same queue_lock
-> - queue_lock becomes rt_mutex (sleeping) in RT kernel
-> - IRQ threads serialize and enter D-state waiting for lock
-> - Throughput drops from 640 MB/s to 153 MB/s
-> 
-> The original commit message noted that memory barriers were considered
-> but rejected because "memory barrier is not easy to be maintained" -
-> barriers would need to be added at multiple call sites throughout the
-> block layer where work is added before calling blk_mq_run_hw_queue().
-> 
-> Solution:
-> Instead of using the general-purpose queue_lock or attempting complex
-> memory barrier pairing across many call sites, introduce a dedicated
-> raw_spinlock_t quiesce_sync_lock specifically for synchronizing the
-> quiesce state between:
-> - blk_mq_quiesce_queue_nowait()
-> - blk_mq_unquiesce_queue()
-> - blk_mq_run_hw_queue()
-> 
-> Why raw_spinlock is safe:
-> - Critical section is provably short (only flag and counter checks)
-> - No sleeping operations under lock
-> - raw_spinlock does not convert to rt_mutex in RT kernel
-> - Provides same ordering guarantees as original queue_lock approach
+Secure erase should use max_secure_erase_sectors instead of being limited
+by max_discard_sectors. Separate the handling of REQ_OP_SECURE_ERASE from
+REQ_OP_DISCARD to allow each operation to use its own size limit.
 
-Okay.
+Signed-off-by: Luke Wang <ziniu.wang_1@nxp.com>
+Reviewed-by: Ulf Hansson <ulf.hansson@linaro.org>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
 
-> This approach:
-> - Maintains correctness of original synchronization
-> - Avoids sleeping in RT kernel's IRQ thread context
-> - Limits scope to only quiesce-related synchronization
-> - Simpler than auditing all call sites for memory barrier pairing
-> 
-> Additionally, change blk_freeze_queue_start to use async=true for better
-> performance in RT kernel by avoiding synchronous queue runs during freeze.
-> 
-> Test results on RT kernel (megaraid_sas with 8 MSI-X vectors):
-> - Before: 153 MB/s, 6-8 IRQ threads in D-state
-> - After:  640 MB/s, 0 IRQ threads blocked
-> 
-> Fixes: 679b1874eba7 ("block: fix ordering between checking QUEUE_FLAG_QUIESCED request adding")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Ionut Nechita <ionut.nechita@windriver.com>
-> ---
->  block/blk-core.c       |  1 +
->  block/blk-mq.c         | 27 ++++++++++++++++-----------
->  include/linux/blkdev.h |  6 ++++++
->  3 files changed, 23 insertions(+), 11 deletions(-)
-> 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 474700ffaa1c8..fd615aeb5c463 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -434,6 +434,7 @@ struct request_queue *blk_alloc_queue(struct queue_limits *lim, int node_id)
->  	mutex_init(&q->limits_lock);
->  	mutex_init(&q->rq_qos_mutex);
->  	spin_lock_init(&q->queue_lock);
-> +	raw_spin_lock_init(&q->quiesce_sync_lock);
->  
->  	init_waitqueue_head(&q->mq_freeze_wq);
->  	mutex_init(&q->mq_freeze_lock);
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 0ad3dd3329db7..888718a782f88 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -171,7 +171,7 @@ bool __blk_freeze_queue_start(struct request_queue *q,
->  		percpu_ref_kill(&q->q_usage_counter);
->  		mutex_unlock(&q->mq_freeze_lock);
->  		if (queue_is_mq(q))
-> -			blk_mq_run_hw_queues(q, false);
-> +			blk_mq_run_hw_queues(q, true);
+LLM Generated explanations, may be completely bogus:
 
-I read what you wrote to Keith here and still don't get it. If the goal
-is to have the same lock contention on RT as on !RT (where we spin on
-the lock) why not keep everything else as-is? Why is important to spread
-it across multiple CPUs? This looks unrelated. It could be added as a
-second optimisation.
+This is an important caller. `blk_insert_cloned_request` is used by
+device mapper (dm) to submit cloned requests. If
+`blk_queue_get_max_sectors` returns the wrong value (e.g.,
+`max_discard_sectors` instead of `max_secure_erase_sectors`), and the
+cloned request's sector count exceeds the wrong limit but fits within
+the correct one, the request will be **rejected with BLK_STS_IOERR** on
+line 3291. This is a real I/O error path!
 
-Another thing: If you have multiple interrupts, why don't you have one
-queue per interrupt? Wouldn't this also avoid the spinning here?
+Here is my complete analysis:
 
->  	} else {
->  		mutex_unlock(&q->mq_freeze_lock);
->  	}
-> @@ -262,10 +262,10 @@ void blk_mq_quiesce_queue_nowait(struct request_queue *q)
->  {
->  	unsigned long flags;
->  
-> -	spin_lock_irqsave(&q->queue_lock, flags);
-> +	raw_spin_lock_irqsave(&q->quiesce_sync_lock, flags);
->  	if (!q->quiesce_depth++)
->  		blk_queue_flag_set(QUEUE_FLAG_QUIESCED, q);
-> -	spin_unlock_irqrestore(&q->queue_lock, flags);
-> +	raw_spin_unlock_irqrestore(&q->quiesce_sync_lock, flags);
+---
 
-Since you have only "inc and set bit if was zero" and below "dec and
-clear bit if become zero" what about using atomic_t for quiesce_depth?
-There is atomic_inc_return() mostly doing the same thing with one atomic
-op. That flag could be avoided if the the blk_queue_quiesced() condition
-is "quiesce_depth > 0". That could avoid the lock.
+## Detailed Analysis
 
->  }
->  EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue_nowait);
->  
-> @@ -317,14 +317,14 @@ void blk_mq_unquiesce_queue(struct request_queue *q)
->  	unsigned long flags;
->  	bool run_queue = false;
->  
-> -	spin_lock_irqsave(&q->queue_lock, flags);
-> +	raw_spin_lock_irqsave(&q->quiesce_sync_lock, flags);
->  	if (WARN_ON_ONCE(q->quiesce_depth <= 0)) {
->  		;
->  	} else if (!--q->quiesce_depth) {
->  		blk_queue_flag_clear(QUEUE_FLAG_QUIESCED, q);
->  		run_queue = true;
->  	}
-> -	spin_unlock_irqrestore(&q->queue_lock, flags);
-> +	raw_spin_unlock_irqrestore(&q->quiesce_sync_lock, flags);
->  
->  	/* dispatch requests which are inserted during quiescing */
->  	if (run_queue)
-> @@ -2368,14 +2368,19 @@ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
->  		unsigned long flags;
->  
->  		/*
-> -		 * Synchronize with blk_mq_unquiesce_queue(), because we check
-> -		 * if hw queue is quiesced locklessly above, we need the use
-> -		 * ->queue_lock to make sure we see the up-to-date status to
-> -		 * not miss rerunning the hw queue.
-> +		 * Synchronize with blk_mq_unquiesce_queue(). We check if hw
-> +		 * queue is quiesced locklessly above, so we need to use
-> +		 * quiesce_sync_lock to ensure we see the up-to-date status
-> +		 * and don't miss rerunning the hw queue.
-> +		 *
-> +		 * Uses raw_spinlock to avoid sleeping in RT kernel's IRQ
-> +		 * thread context during I/O completion. Critical section is
-> +		 * short (only flag and counter checks), making raw_spinlock
-> +		 * safe.
->  		 */
-> -		spin_lock_irqsave(&hctx->queue->queue_lock, flags);
-> +		raw_spin_lock_irqsave(&hctx->queue->quiesce_sync_lock, flags);
->  		need_run = blk_mq_hw_queue_need_run(hctx);
-> -		spin_unlock_irqrestore(&hctx->queue->queue_lock, flags);
-> +		raw_spin_unlock_irqrestore(&hctx->queue->quiesce_sync_lock, flags);
+### 1. Commit Message Analysis
 
-but here I am unsure. If the above operation (setting/ clearing the bit)
-is lockless it might require a handshake if the counter goes back to 0
-before it is visible here. Maybe not since it could be observed before
-the lock was acquired. That is why I am unsure.
+The commit clearly describes a **bug fix**: secure erase operations were
+incorrectly limited by `max_discard_sectors` instead of
+`max_secure_erase_sectors`. This is a correctness issue, not a feature.
+The commit was reviewed by Ulf Hansson (MMC maintainer) and merged by
+Jens Axboe (block layer maintainer).
 
->  		if (!need_run)
->  			return;
+### 2. Code Change Analysis
 
-Sebastian
+The patch modifies two files with two distinct changes:
+
+**Change A: `block/blk.h` - `blk_queue_get_max_sectors()`**
+
+Before the fix:
+```211:213:block/blk.h
+        if (unlikely(op == REQ_OP_DISCARD || op == REQ_OP_SECURE_ERASE))
+                return min(q->limits.max_discard_sectors,
+                           UINT_MAX >> SECTOR_SHIFT);
+```
+
+Both `REQ_OP_DISCARD` and `REQ_OP_SECURE_ERASE` used
+`max_discard_sectors`. The fix separates them so secure erase uses
+`max_secure_erase_sectors`.
+
+**Change B: `block/blk-merge.c` - `bio_split_discard()`**
+
+The original `bio_split_discard()` always split using
+`lim->max_discard_sectors`, even for `REQ_OP_SECURE_ERASE` (which
+reaches this function via `__bio_split_to_limits` at line 407-409 of
+`blk.h`). The fix refactors the function into a wrapper that selects the
+correct limit and a helper `__bio_split_discard()` that does the actual
+splitting.
+
+### 3. Bug Mechanism and Impact
+
+**The bug**: The kernel `queue_limits` structure has separate fields for
+`max_discard_sectors` and `max_secure_erase_sectors`, but the block
+layer core code in two critical paths ignored the secure erase field and
+always used the discard field.
+
+**Concrete impact scenarios**:
+
+1. **virtio_blk**: This driver reads separate limits from the virtio
+   config for discard (`max_discard_sectors`) and secure erase
+   (`max_secure_erase_sectors`). The driver even documents the
+   workaround: *"The discard and secure erase limits are combined since
+   the Linux block layer uses the same limit for both commands."*
+   (virtio_blk.c lines 1336-1341). This means the driver had to
+   artificially reduce its limits to compensate for the block layer bug.
+
+2. **xen-blkfront**: Sets `max_secure_erase_sectors = UINT_MAX` while
+   `max_discard_sectors = get_capacity(gd)` - different values.
+
+3. **dm (device mapper)**: The `blk_insert_cloned_request()` function
+   calls `blk_queue_get_max_sectors()` and rejects requests that exceed
+   the limit with `BLK_STS_IOERR`. If `max_secure_erase_sectors` >
+   `max_discard_sectors` on the underlying device, valid secure erase
+   requests could be rejected with I/O errors. Conversely, if
+   `max_secure_erase_sectors` < `max_discard_sectors`, oversized
+   requests could be sent to hardware.
+
+4. **The most dangerous case**: When `max_secure_erase_sectors <
+   max_discard_sectors`, the bio splitting code won't split the secure
+   erase bio when it should, sending a request larger than the device
+   can handle. This can cause **I/O errors, device failures, or data
+   integrity issues** with secure erase operations.
+
+### 4. Scope and Risk Assessment
+
+- **Lines changed**: ~25 lines of actual logic change across 2 files
+- **Files touched**: `block/blk-merge.c` and `block/blk.h` (core block
+  layer, but well-contained)
+- **Risk of regression**: **Low**. For any driver that sets
+  `max_secure_erase_sectors == max_discard_sectors` (like MMC), the
+  behavior is completely unchanged. For drivers with different values,
+  the behavior is corrected.
+- **The change is obviously correct**: Secure erase operations should
+  use secure erase limits, not discard limits.
+
+### 5. Affected Subsystems and Users
+
+- MMC/eMMC (mobile, embedded) - same values, no visible change
+- virtio_blk (VMs, cloud) - corrects a workaround-needing limitation
+- xen-blkfront (Xen VMs) - corrects a real mismatch
+- dm (device-mapper stacking) - fixes potential I/O errors
+
+### 6. Backport Complexity
+
+- For kernels 6.12+: The patch should apply nearly cleanly;
+  `bio_submit_split()` and the current code structure exist.
+- For kernels 6.1-6.11: The `blk.h` change applies cleanly (same
+  pattern). The `blk-merge.c` change needs adaptation because the
+  splitting mechanism is different (returns split bio instead of using
+  `bio_submit_split`), but the conceptual fix is the same.
+- For kernel 5.15: `max_secure_erase_sectors` field exists but
+  `blkdev_issue_secure_erase` was introduced in 6.1; older kernels have
+  different secure erase code paths.
+
+### 7. Stability Indicators
+
+- Reviewed by Ulf Hansson (MMC subsystem co-maintainer)
+- Merged by Jens Axboe (block layer maintainer)
+- Simple, obviously correct fix
+
+### 8. Conclusion
+
+This commit fixes a real bug where the block layer core was using the
+wrong limit for secure erase operations, potentially causing:
+- I/O errors when valid requests are rejected
+- Oversized requests being sent to hardware
+- Unnecessary performance limitations
+
+The fix is small, contained, obviously correct, and was reviewed by
+multiple maintainers. It affects core block layer code that is shared
+across all block devices supporting secure erase. The risk of regression
+is minimal since the change only affects the code path when
+`max_secure_erase_sectors != max_discard_sectors`.
+
+**YES**
+
+ block/blk-merge.c | 21 +++++++++++++++++----
+ block/blk.h       |  6 +++++-
+ 2 files changed, 22 insertions(+), 5 deletions(-)
+
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index d3115d7469df0..bf8faadb0bd46 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -158,8 +158,9 @@ static struct bio *bio_submit_split(struct bio *bio, int split_sectors)
+ 	return bio;
+ }
+ 
+-struct bio *bio_split_discard(struct bio *bio, const struct queue_limits *lim,
+-		unsigned *nsegs)
++static struct bio *__bio_split_discard(struct bio *bio,
++		const struct queue_limits *lim, unsigned *nsegs,
++		unsigned int max_sectors)
+ {
+ 	unsigned int max_discard_sectors, granularity;
+ 	sector_t tmp;
+@@ -169,8 +170,7 @@ struct bio *bio_split_discard(struct bio *bio, const struct queue_limits *lim,
+ 
+ 	granularity = max(lim->discard_granularity >> 9, 1U);
+ 
+-	max_discard_sectors =
+-		min(lim->max_discard_sectors, bio_allowed_max_sectors(lim));
++	max_discard_sectors = min(max_sectors, bio_allowed_max_sectors(lim));
+ 	max_discard_sectors -= max_discard_sectors % granularity;
+ 	if (unlikely(!max_discard_sectors))
+ 		return bio;
+@@ -194,6 +194,19 @@ struct bio *bio_split_discard(struct bio *bio, const struct queue_limits *lim,
+ 	return bio_submit_split(bio, split_sectors);
+ }
+ 
++struct bio *bio_split_discard(struct bio *bio, const struct queue_limits *lim,
++		unsigned *nsegs)
++{
++	unsigned int max_sectors;
++
++	if (bio_op(bio) == REQ_OP_SECURE_ERASE)
++		max_sectors = lim->max_secure_erase_sectors;
++	else
++		max_sectors = lim->max_discard_sectors;
++
++	return __bio_split_discard(bio, lim, nsegs, max_sectors);
++}
++
+ static inline unsigned int blk_boundary_sectors(const struct queue_limits *lim,
+ 						bool is_atomic)
+ {
+diff --git a/block/blk.h b/block/blk.h
+index e4c433f62dfc7..4cd5a91346d8a 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -208,10 +208,14 @@ static inline unsigned int blk_queue_get_max_sectors(struct request *rq)
+ 	struct request_queue *q = rq->q;
+ 	enum req_op op = req_op(rq);
+ 
+-	if (unlikely(op == REQ_OP_DISCARD || op == REQ_OP_SECURE_ERASE))
++	if (unlikely(op == REQ_OP_DISCARD))
+ 		return min(q->limits.max_discard_sectors,
+ 			   UINT_MAX >> SECTOR_SHIFT);
+ 
++	if (unlikely(op == REQ_OP_SECURE_ERASE))
++		return min(q->limits.max_secure_erase_sectors,
++			   UINT_MAX >> SECTOR_SHIFT);
++
+ 	if (unlikely(op == REQ_OP_WRITE_ZEROES))
+ 		return q->limits.max_write_zeroes_sectors;
+ 
+-- 
+2.51.0
+
