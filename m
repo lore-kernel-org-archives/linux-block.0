@@ -1,130 +1,118 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 945E32F39DE
-	for <linux-block@vger.kernel.org>; Thu, 12 Feb 2026 12:53:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DC93318EF7
+	for <linux-block@vger.kernel.org>; Thu, 12 Feb 2026 13:02:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770900831; cv=none; b=WiV0TctD4OrJWnVfp73qpp5ufM4d0UR8Wsn7FvJiwIWEKCc4gi+qF0fXmewl96o03B/8VBX/PX+4GdjLmR+39ctpLsH2U6lnscfGZniz13DB0afOYZuC2ch4/xPENpBwACEunmckG/n16+jW5tsAMJSajQ82Z5Du4o3bmFTN3Ls=
+	t=1770901361; cv=none; b=UGxfz8RdagfLoo6UhA6xFhFsTCblH0YW4hQvNSsSyOjbtls4L9fo/F5FyMrk5fJ/HJYsPVg8ZA5xVE7CYj1J7WlxlyL3qOMuVFteaatL+6lY4y+60jqKYqlrreEDVymlhwdVa5MWjZuG/DBKmkRHrHbBYyS6fOYL27kZiv/dvBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770900831; c=relaxed/simple;
-	bh=01LvpQtH+qOINc93aGJRhsa3F6+JnfqL70CjSs12cjE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dXRBM7zKVd/dArVQfxhJX+6z64cIAefWHHSJOkftYzBdjKBEsoR91YYru0sY0TkpD6jM5IlUBg7+cOELXXBScqFmznV1rHam32jZwirgcI1SWsb7KqlEUvlaaxaPTR98FJv4AlEehZzkIK5ckdh5VkTXHp1aVvcDw6jx5Gv/sFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UviKnrW8; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1770901361; c=relaxed/simple;
+	bh=nPAulLG18MWB/UxWpIYZL/kSbGji6qgpvlBf/VNVdJw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LJCOVO0BNDPm2gPaR8L0e8w+7I+G8ZM4E9930aFyB94aDkOKOU66lsp0ogElSzhjdGa1FqhonOY3ZiBqO/9aOIOOdOfK2UQ3LXbbUOIGRXd2vbIOQFb3th26H+oB71Vynpp/scv+iuiR7De1fQtzoK9DJJTB8OISxiVh3FehAek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XOJ/vo39; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UviKnrW8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82BFBC4CEF7;
-	Thu, 12 Feb 2026 12:53:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770900831;
-	bh=01LvpQtH+qOINc93aGJRhsa3F6+JnfqL70CjSs12cjE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=UviKnrW8b38w66Xjwgy6NpjMrmWLlJnxvHlthoaf3uuOj38yJJRER5MT/dLsZEFjn
-	 a7BLRtHLcLwPp/zUwUexwwXoiiMcUOo+8MjRC2+GLmkHEynR267BAYdBRk6/O4ZSIo
-	 /6sRZaOmVCvpHkRnUnL5qt4eOqR6x0qdJo9Ia/8r9VD8RxYzJFH6vo7zldTc2nehep
-	 4MeJG+4+TTCtQuCU5AZe1Xhk+pSODY8QoXbSvYKMo6CfCFzT69fCxycc3hiCNmYmGr
-	 7DGEo/wPz/019+DDBqLZGeBj6epiY9yDFNJ7yD2ogDfkPHZpahMfqYDjSNdVHzcFpE
-	 MZ0shfUX2E8qQ==
-Message-ID: <237fa136-ff52-4e7c-830b-1ed8e985f2f1@kernel.org>
-Date: Thu, 12 Feb 2026 13:53:43 +0100
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XOJ/vo39"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770901359;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ltFGZoGV7QrGTTfviVUIlXqOp/J0Al9OJh4yhgkYu+8=;
+	b=XOJ/vo39PaoQWrC5ELRcRIyIuDaeTFgAyfJD1aGBz00d0/QP6EyHamUVoxEP4y5rj7e8I1
+	aMMgPfRFhkJqYrU3KSAEYQrd+S2656NVaipSrW9A247fdZmBIiGCP9qdiVh25rKHryWzL+
+	eNleSrqoDdjwSr5fHiJKHNpBOBqUuH0=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-628-AtE4CMgyN7GYEBGRVBTjCg-1; Thu,
+ 12 Feb 2026 08:02:36 -0500
+X-MC-Unique: AtE4CMgyN7GYEBGRVBTjCg-1
+X-Mimecast-MFC-AGG-ID: AtE4CMgyN7GYEBGRVBTjCg_1770901355
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8918D1955BC1;
+	Thu, 12 Feb 2026 13:02:34 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.145])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0720630001B9;
+	Thu, 12 Feb 2026 13:02:30 +0000 (UTC)
+Date: Thu, 12 Feb 2026 21:02:24 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: ublk invert part scan bit logic
+Message-ID: <aY3PYGblTx748m4q@fedora>
+References: <0535f4dd-ada3-414a-84c6-7abc232aa670@kernel.dk>
+ <aY3KpLbAOchXxXyi@fedora>
+ <dfc5a8d3-45d3-4fe2-aa0b-b9571b5fb883@kernel.dk>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [bug report] kernel BUG at mm/hugetlb.c:5868! triggered by
- blktests nvme/tcp nvme/029
-To: Yi Zhang <yi.zhang@redhat.com>, Hannes Reinecke <hare@suse.de>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block <linux-block@vger.kernel.org>,
- "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
- Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- Daniel Wagner <dwagner@suse.de>, Ming Lei <ming.lei@redhat.com>,
- linux-mm@kvack.org, muchun.song@linux.dev, osalvador@suse.de
-References: <CAHj4cs9Ez5f+SsHMcbYVeKGScuL9vq71i57kRgu2KneRtXRwmw@mail.gmail.com>
- <05281713-80b3-4199-8e76-672e84fcc33e@kernel.dk>
- <CAHj4cs8+Xgz1qgf3H0sDMFhVAmzb9EsVmuJoRLBOgP7bQymodw@mail.gmail.com>
- <CAHj4cs_4-5g5oW-Wx7KwceALy8F-Ku4cxQGMZ88ARpvZN4HRjg@mail.gmail.com>
- <CAHj4cs9AUA94ntY0uhDDAmoWTMA3kxpSCArKG9MHcgkVASJfAg@mail.gmail.com>
- <e281da57-caa0-4e36-8ff2-80175bc43090@suse.de>
- <CAHj4cs-mxgZ+tWXgOfjYx+X_bC35zBHyMbNYcCUuHe0JPLsHWw@mail.gmail.com>
-From: "David Hildenbrand (Arm)" <david@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=david@kernel.org; keydata=
- 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
- qIws/H2t
-In-Reply-To: <CAHj4cs-mxgZ+tWXgOfjYx+X_bC35zBHyMbNYcCUuHe0JPLsHWw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <dfc5a8d3-45d3-4fe2-aa0b-b9571b5fb883@kernel.dk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On 11/21/25 11:32, Yi Zhang wrote:
+On Thu, Feb 12, 2026 at 05:48:40AM -0700, Jens Axboe wrote:
+> On 2/12/26 5:42 AM, Ming Lei wrote:
+> > On Thu, Feb 12, 2026 at 04:05:27AM -0700, Jens Axboe wrote:
+> >> Hi,
+> >>
+> >> For ublk, there's this logic in in ublk_ctrl_start_dev():
+> >>
+> >> /* Skip partition scan if disabled by user */
+> >> if (ub->dev_info.flags & UBLK_F_NO_AUTO_PART_SCAN) {
+> >> 	clear_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
+> >> } else {
+> >> 	/* Schedule async partition scan for trusted daemons */
+> >> 	if (!ub->unprivileged_daemons)
+> >> 		schedule_work(&ub->partition_scan_work);
+> >> }
+> >>
+> >> where the
+> >>
+> >> clear_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
+> >>
+> >> seems reversed? Why is GD_SUPPRESS_PART_SCAN being cleared if
+> >> UBLK_F_NO_AUTO_PART_SCAN is set? Added in:
+> >>
+> >> 8443e2087e70 ("ublk: add UBLK_F_NO_AUTO_PART_SCAN feature flag")
+> > 
+> > Yeah, the interface is designed in this way: partition scan is not
+> > done during add disk, and allowed since then on. The selftest code
+> > is written in same way too.
+> > 
+> > If GD_SUPPRESS_PART_SCAN isn't cleared, userspace can't probe partitions
+> > any more.
+> > 
+> > However, if you think the interface isn't good, we still can change it
+> > before 7.0 release.
 > 
-> 
-> On Fri, Nov 21, 2025 at 3:44 PM Hannes Reinecke <hare@suse.de 
-> <mailto:hare@suse.de>> wrote:
-> 
->     On 11/20/25 16:18, Yi Zhang wrote:
->      > I did more testing today, and found that this issue cannot be
->      > reproduced if I don't set the nr_hugepages
->      >
->      > https://github.com/linux-blktests/blktests/blob/master/tests/
->     nvme/029#L71 <https://github.com/linux-blktests/blktests/blob/
->     master/tests/nvme/029#L71>
->      >
-> 
->     But is the inverse also true, namely _can_ you reproduce it when
->     nr_hugepages is set?
-> 
-> Yes, it's now 100% reproduced in my environment.
-> CCed linux-mm@
+> What I mean is, if UBLK_F_NO_AUTO_PART_SCAN is set, should we not
+> either leave the disk->state alone, or _set_ GD_SUPPRESS_PART_SCAN?
 
-Stumbling over this mail in linux-mm, do we have some more information 
-about the problem we are running into?
+UBLK_F_NO_AUTO_PART_SCAN means partition scanning isn't done automatically
+from add_disk(), but it still allow userspace to send ioctl(BLKRRPART) for
+probing partition since disk is added.
 
--- 
-Cheers,
+If GD_SUPPRESS_PART_SCAN is set, ioctl(BLKRRPART) can't succeed any more.
 
-David
+> I might be confused here, but the current implementation doesn't
+> make much sense to me! If it is correct, then a comment to that
+> effect would be good imho.
+
+I admit it is a little confusing, will send a patch to document this
+behavior if no one objects the UAPI.
+
+
+Thanks,
+Ming
+
