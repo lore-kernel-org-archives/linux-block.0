@@ -1,132 +1,102 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0FFD2D8377
-	for <linux-block@vger.kernel.org>; Thu, 12 Feb 2026 10:26:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B13492DB78A
+	for <linux-block@vger.kernel.org>; Thu, 12 Feb 2026 11:05:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770891995; cv=none; b=DBLwEKHWKNj0dAyZS9tJKpGbzJCsEqqsnBpmksssiCw0gkrRNWYNq3ws8Ic992L1uGmYztwKGKVy6DsTCdGZWKF/vX8jCZWkcQi8ZDftXQeDrI9dbs2TsVi1Js7xOf3U8tuOzlt0I6orPEyEV1F3Mux3X3yoh79S2MgRw4RUeHM=
+	t=1770894331; cv=none; b=b3BOmEC5m0J56x+cLc52T5WdzGYDfl5fqpTVEgx/UIz2HP46yt84qohiuUTbCSN6V7pANjfAj63lVr/VgMLKoi5a6VD4gvt4m37GQ9yWHpSP7A0H6XmnJUcaGPdWCn3SP6HQqK25YAUZWB97puIKiix1nNO754/aTPjzveMgbWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770891995; c=relaxed/simple;
-	bh=7lrT8ca/WW4Fm/idiqIKhyx8k+KZaFJexiXo1fc8v4A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nx7UKXeruOtN3BSFbae7kpUfoV74Hh5fs5/LBxRGb/CnTaf3yu/tUEwH+VTdeCiX8sxEmmHHccJqslvFgPNEfFmNSyHAV4O3fp0l5G18aLmy1VzIF7M+zOFn+CesvdrCqUgYCtXLZ3NC0R4WzwD8PFFFJvPbm24dvGlsCE5pAwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=XeviEHRC; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1770894331; c=relaxed/simple;
+	bh=cTyadoJRVfMfmXBNQrJrUbQR1ZtoThlCTFLO00VnVio=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=f/QyBUt2nGQm4/fsmb7H22f9uqwWLfeRNekFq+ZdqhPiESmPuPZV+/a9IhuImq3UhCg+RGfaL59iKBE/DN9MiBN+p2YOeeFwSLkE78LJIf6nJMBs5c9+jI42c3DgilGZ8O1bQxbww6XFu8FhPR6DECpvzIiOtzDJLk9pMn6I1Xc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ySQ/uybb; arc=none smtp.client-ip=209.85.210.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="XeviEHRC"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4832701b9b7so35833165e9.2
-        for <linux-block@vger.kernel.org>; Thu, 12 Feb 2026 02:26:33 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ySQ/uybb"
+Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-7cfccba483eso2709245a34.0
+        for <linux-block@vger.kernel.org>; Thu, 12 Feb 2026 03:05:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1770891992; x=1771496792; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7lrT8ca/WW4Fm/idiqIKhyx8k+KZaFJexiXo1fc8v4A=;
-        b=XeviEHRC0jHKRw4rabMzgU0YH/t55Fsgv7e6WAZ/Dp723wmXcbRzIHabp2iXNCSwPE
-         VPLGQ/AWk7uwYdoCwomsRU3IYLaCjW4q1vMFhOA4ifIDBJvka6pN9Q62PKJr2EaQdN3S
-         xSHTi42hSU6XsLCvBcVzv2cesb2euWd+ymyMPPtkAFg02cQmDVVVj7YfyYGZlmHJILNt
-         +4TskdTs3Bj+qIgydhOw1oehc5Qdr3ZT657E0FbvtrQA4Dok9DLt/0AtSuQKmJpYnAnf
-         A36p5zlLYuX6CP154HSRmWrUXw+TU6hwk2hjaNIUKUlitla7nmmSDj/nFCNpyAYEiabU
-         xToA==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1770894328; x=1771499128; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nMo7UYfozPkFUrgCebyxKuU+IeMfOcuvKg/mZ+fIKUQ=;
+        b=ySQ/uybbTMuToX1gn4aXHs2CSajv9x1W5q+6VBGhoViUOLrUKGZGnXeftpyCHNqoUF
+         l3taAAT63nBiMCKBT+Oj6RWeX/M0eiDBh8fVy2F7wfWzsWVeNXwW29IuTeeSiq11y/Px
+         mjSCUaVagcPVdjocv8eqXmr6ZxQPryt6DC+IwUocNifMnrH/0ebAXhgYKe2lPdmYraQN
+         qIhiTjaSPdipBt/ZCbbTRyAw8pmp1hXfXXZj6LUUgWhaS2WLpeMggUUodlEbFibrH5LF
+         VUYDy7n4Lhb0lumQBjnzfUOTXMBhAUxojeIat0l0YgEOaP0gaWsg4Xf6oS6uEl0mn43g
+         iDDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770891992; x=1771496792;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7lrT8ca/WW4Fm/idiqIKhyx8k+KZaFJexiXo1fc8v4A=;
-        b=RLOnw6Z0W2m7Vrexc4XLSSjxuUI8uC7WECdWZOrwrfo9dWSsoqAnUYMegYcWUUYm7G
-         r34BvBi8awPj1rZDhEpTuC3Db5fS1A8q9vA+WyM7xR1kuu+URTlntZObqGwQ8ebMZQzM
-         KKJUp3yyTj67koxKAoMqjUO4xfHtsaLlTvVqhxAQ0UN91Jpd5CRhS4DnS3N/JncC/SMI
-         Su4l2WcQqpf6uQ+vnRrSxP/UbYzNV8vEuMBzZAkBnG3+06mmxqqEam7iYXndnazkhZq7
-         XH0g3AakGcUF50pizp0U97aXQ5O9XUhMAxUVFab9xMBjsMbn2vbuvvkWzqh5FwjheKSi
-         GAdg==
-X-Forwarded-Encrypted: i=1; AJvYcCWnBmIAFFZoIBNzlm2qR6FXD375wcZJefcQEaAB9TNb/ZJ84e85ZJ4/yLc3qRD7NGAF3tKVMC40Og0eMA==@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywqno3yWGVmp/wjaqcVxWUC3iJkeqTooaK7qVJha+0KPqCDllnP
-	gN1KokfSSTY9mbQhR+H1rKMlRlP+eq0SLbWBw+vjRCjQInVnoa/G7BYv8jsyYTOL6Z8=
-X-Gm-Gg: AZuq6aL2l5eE/qhPMk3yQSwe+wst7xilw5ogjc7aSDWSe1w7TrzRKfCM4hLl7r/YNUT
-	A5OpJix4aADwChZOFfNDQ5PGC+xrTJKOAi7Wsvk5uOuLdgIO4AL6fV0ddCj+Q+9Xr2QPD/PP2YW
-	AQgqnR2B5i09ACeVUGA3p+1GJXHdGOf9IvuaxbL6bpoOxIG+Hfod+Y//QTYJCosCHAi14WBZ4YE
-	pPtc4VeQ4cIajD3kloSvocUOf0Vu4qnW5ZiHulg3QnLHI+QSb0q7Fqry35GXeVdVlIe3yaKstxn
-	pKi0PgCSg8+AlXz1Rz+vALTinxrIhvx9PgYzZUUfbdmh8/fRsliXg2lf6nimktPqo7CXIs64UlN
-	WB8VhHYT1jA1HLd0euHiHjneqvOmza2yi1nVMikQLjETg+QaFF6lAlI6NVqPq9oxbkkJEiP/7pS
-	+lv4eFbtBR+nug+AppevfceBQGEw5ZmicKKWQi+pwWoGA=
-X-Received: by 2002:a05:600c:c494:b0:475:de14:db1e with SMTP id 5b1f17b1804b1-4836570e54cmr32039815e9.24.1770891992143;
-        Thu, 12 Feb 2026 02:26:32 -0800 (PST)
-Received: from blackdock.suse.cz (nat2.prg.suse.com. [195.250.132.146])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4378e72c203sm4467424f8f.2.2026.02.12.02.26.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Feb 2026 02:26:31 -0800 (PST)
-Date: Thu, 12 Feb 2026 11:26:29 +0100
-From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
-To: Breno Leitao <leitao@debian.org>
-Cc: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, 
-	Josef Bacik <josef@toxicpanda.com>, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	cgroups@vger.kernel.org, thevlad@meta.com, kernel-team@meta.com
-Subject: Re: [PATCH] blk-cgroup: add CONFIG_BLK_CGROUP_DEBUG_STATS option
-Message-ID: <jf2bkbvk3h5j3mqfldu66egbvbeq62mzdenuimpgn7d4tfkrpx@b2s6zzdgmgyh>
-References: <20260204-blk_cgroup_debug_stats-v1-1-09c0754b4242@debian.org>
+        d=1e100.net; s=20230601; t=1770894328; x=1771499128;
+        h=content-transfer-encoding:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nMo7UYfozPkFUrgCebyxKuU+IeMfOcuvKg/mZ+fIKUQ=;
+        b=rSUs6GRTGFWeQbZADw6aRAJyCNaR0XeIMKFuCJ8SrTH6tIh4QOSUkydeAaxt/l+U5C
+         ZUX39+9Wn+C9BmYHrBhG5yAuhA85CCO/n0fNhKKQFE/qDeZSKP/ZIkreCoMjXxeirZND
+         HGXzZPjUqzpQCXaNzgurrxqaAfJo4Jxgkc68PUHzDVphVZ8xzDzzTCibUA09botzKzhc
+         fp69MkqfYddMT/ZIe2knbTxkTZY7NMFJ0Gn3l7ztw5E6Y7vPx8LCTdbOOuETxymneRLw
+         Sm6w810kP51MNDrcG+IIyDBhL81Rq+rY3UPgpbkQ2WX2OQVVQot68W9et9dtgNpJFVqZ
+         cAxw==
+X-Forwarded-Encrypted: i=1; AJvYcCWKZHF99sNy1oleBNpYHmvZe1BFfDfcVnJKw/kqZB6XIJONtkpQLE5QdFrAPNohaMfMWeRDUJpCzI9MBA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzyRHWYv3jh5FSVl/o8czGhGI6Brn9lbLkkl33wv/L4XEyXd4sf
+	f+Xac9dI3fLfobddtcOwsoaXc/k9Pwkkj/w5YBmfO6T0U2Me8n4Tcp7cLwLaTv+IYdY=
+X-Gm-Gg: AZuq6aJnxAzf/5BhJK//klI8E7vtJsALHD9/cVp7brSOWxDHdjiYAFGPuldoY/6EM29
+	H7N5FKgD1VD6x3PZhBa//TIs4lylU/7ZcTpaHsoumorysYI/slLDIqNEIL3juk/7yZ5cljqFZJ8
+	uov1rG5xbkzULtNRUCLT713eWqUZ3y3kpcbg9LCzP3k7SGmdGCC7bC5WA1dw1hP+VHB1hKnCakS
+	HHAlFw4ZbfA/l+uOKPRasJi1BU0A+2IXMGD07HL62khQ0sNOkeiPtglZkYizQZJGPt06cElXEaC
+	aP7dNY4CGp4Zqf6F2RQjVc3609NGuw4G/uIJVKV8QiIU1Wa465V9XAddxZg12Nfy62M7fu3Lsko
+	Pe9Kcv9x39dZ/oOp8ctxZG+h02KtBYRl8h9Yhfc2YKoYL/0WcE9yVZT9n71LxCDKU2994DMv4Pp
+	5t1PSPbfaQd1xb62CdYPhl1lMHAD7Bq7ma19ZMewem8KoDyy9hQjKK3+kjC9jhIuIfztmgVJOk7
+	yLLopDaMs72v/jYDtPY
+X-Received: by 2002:a05:6830:6b09:b0:7c7:58e9:8e16 with SMTP id 46e09a7af769-7d4b2a0f50bmr1157120a34.14.1770894328557;
+        Thu, 12 Feb 2026 03:05:28 -0800 (PST)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7d4a7530a8bsm3666324a34.4.2026.02.12.03.05.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Feb 2026 03:05:28 -0800 (PST)
+Message-ID: <0535f4dd-ada3-414a-84c6-7abc232aa670@kernel.dk>
+Date: Thu, 12 Feb 2026 04:05:27 -0700
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ndpqitjmtn3vcpwo"
-Content-Disposition: inline
-In-Reply-To: <20260204-blk_cgroup_debug_stats-v1-1-09c0754b4242@debian.org>
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Ming Lei <ming.lei@redhat.com>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: ublk invert part scan bit logic
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+Hi,
 
---ndpqitjmtn3vcpwo
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
-Subject: Re: [PATCH] blk-cgroup: add CONFIG_BLK_CGROUP_DEBUG_STATS option
-MIME-Version: 1.0
+For ublk, there's this logic in in ublk_ctrl_start_dev():
 
-Hello Breno.
+/* Skip partition scan if disabled by user */
+if (ub->dev_info.flags & UBLK_F_NO_AUTO_PART_SCAN) {
+	clear_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
+} else {
+	/* Schedule async partition scan for trusted daemons */
+	if (!ub->unprivileged_daemons)
+		schedule_work(&ub->partition_scan_work);
+}
 
-On Wed, Feb 04, 2026 at 08:15:12AM -0800, Breno Leitao <leitao@debian.org> wrote:
-> Add a Kconfig option to enable blkcg_debug_stats by default at compile
-> time. When CONFIG_BLK_CGROUP_DEBUG_STATS is enabled, additional debugging
-> information is shown in the cgroup io.stat file, including cost.wait,
-> cost.indebt, and cost.indelay for iocost, as well as latency statistics
-> for iolatency.
+where the
 
-This seems to be toggleable quite easily anytime at runtime (not sysctl
-but modprobe config), not a boot cmdline where CONFIG_ default could
-step in.
+clear_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
 
-This only guards printing of already collected stats (sometimes even
-without kernel consumers), not sure if it's that useful.
+seems reversed? Why is GD_SUPPRESS_PART_SCAN being cleared if
+UBLK_F_NO_AUTO_PART_SCAN is set? Added in:
 
-blk-cgroup isn't modularized since 32e380aedc3de ("blkcg: make
-CONFIG_BLK_CGROUP bool") v3.5-rc1~42^2~92 exposing it like a module
-parameter is historical artifact.
+8443e2087e70 ("ublk: add UBLK_F_NO_AUTO_PART_SCAN feature flag")
 
-So I'd dare to propose removing it altogether and print those stats
-everytime. Readers of the nested-keys format should survive that.
-(I don't even see the param documented.)
+-- 
+Jens Axboe
 
-And if there were eager readers that'd be affected performance-wise,
-more conventional would be to make this only boot cmdline parameter that
-could static-branch also the stat collection spots (for some more
-benefit). And then would also a CONFIG_urable default make sense.
-
-WDYT?
-
-Michal
-
---ndpqitjmtn3vcpwo
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iJEEABYKADkWIQRCE24Fn/AcRjnLivR+PQLnlNv4CAUCaY2q0BsUgAAAAAAEAA5t
-YW51MiwyLjUrMS4xMSwyLDIACgkQfj0C55Tb+Ag0eAEA11t6G6sXuJd5qgGckJt+
-kYrhlMR5UyfYWqtl83O1icQBAIls9699cgxyP41vPeyz0q1GPr+XgPvxnly87RCO
-ticG
-=bajm
------END PGP SIGNATURE-----
-
---ndpqitjmtn3vcpwo--
