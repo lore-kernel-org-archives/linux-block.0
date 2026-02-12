@@ -1,98 +1,140 @@
-Received: from mail-oi1-f193.google.com (mail-oi1-f193.google.com [209.85.167.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25BB32F1FFE
-	for <linux-block@vger.kernel.org>; Thu, 12 Feb 2026 14:09:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE29D1E5702
+	for <linux-block@vger.kernel.org>; Thu, 12 Feb 2026 14:22:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770905374; cv=none; b=KOe/rF24DS2lKFWSnO6UnF4CVOzloZ88iSExT4D10OBymdCqqWPIrmAfuG66We2F5Qtxl1duM8JzfRwR/2NHNH5LcNP7XKqijt3PtpGo1jLxTTLkxj4hqpxaTofoseCaKTLTZ/m2YQSsqV0Kj72fBfu3RErPEIwiYZdLwxS4X80=
+	t=1770906174; cv=none; b=k7zkJH9PNfUgwgaLqc8hzkFHx1apsGgbCSp2TrlnsNUsFgNC1qAUr5U+flS3O99NffZiqWKbXgaQi8DxMBsPBZ2LD6+6ZOEzrEuQ7AqK1wUKpWKRBWqLagQlhWaO2wOr2TBASHu824MdUDM2OK8CxdYL/CeWANQq+GRcXEYtxI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770905374; c=relaxed/simple;
-	bh=AffLqmle439f76Batn9z25muWqa/PWI1cB3mmDFodbo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OgppdVbHWaUtU8w2nupOgLfCjWwRLIcNeoRmVjRPKzOSM4CmPl4bLDfsgepYdesjWez1hYm/DhIwEKEBuIZ0lwVQD20SF09OkhTuNV0MgeTFVE9YUwQhYvpiQ1mb3rsscsDsJydVaZnvRn+AD8QnDIivcM9AzlIItPpH2wtOZc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=OQ3ju8SE; arc=none smtp.client-ip=209.85.167.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1770906174; c=relaxed/simple;
+	bh=wNfa2ftZ7WsZGTvhiItt4+sHdLdFsPahu9en+PGmAIM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CmtbgC/+Ce4CZ+3rlbfV/yVOJVPtrllCWTIhMcwVq0hflhrMGvCQi00syBUzA+CQWuxxQrqShPrJJuO5DOlMpIXeA5SWahdgt8ekLmCLnjx7mQeu1P9KwQJb73zhVuhoSwUVUIWMWcl/Y/kw2s/+xZFvUexaL14QDFXyJ1FV4hk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dbv5wWWG; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="OQ3ju8SE"
-Received: by mail-oi1-f193.google.com with SMTP id 5614622812f47-45c733ccc32so2016058b6e.0
-        for <linux-block@vger.kernel.org>; Thu, 12 Feb 2026 06:09:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1770905370; x=1771510170; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=32XJ9y+Yy71t88Pn/7srvyPyza7VGbFksQW+o+n2NfA=;
-        b=OQ3ju8SEZ5gCbiPZ1eDQO7FCCA6KLgZSebGKOFt+JmQXXZFNX8L2xcX2IT1uKA8LiF
-         dT8Dr/v9K/Smz/mgtviUwM+pCMu+FxlR8UXhdwXp0zsEdt6vgRLzBqG5zmRyaISpCohV
-         MuJJq+H6YXfK8u7JQaBaCF3fyi5gr6IesEH7jjjijKGPl+SBQghVDQY9iHji/FDh1JAx
-         RWMGsBOOKZ33HQk4ybDDev1iCkyiSBjsaTnmRaSVNAL87HYtwKNM3FlYXtA9uLaT1An6
-         D65ccOYitoGU6sd1n8SI5YC7+LTHDAlg8edmlLq/UaSbVy5uSExZdLGcRt/xCk4hOL5h
-         Au5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770905370; x=1771510170;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=32XJ9y+Yy71t88Pn/7srvyPyza7VGbFksQW+o+n2NfA=;
-        b=eP/+DDAGUmn3nTjh21Azkj6/pN2csNwYUxVkMfttHSX/X8Ku/IzdJG6Oq4ndGBg5+o
-         MiFjAj+OV4Gzj0NYqz7p2mmuDBmxZXW7sXZ3UC9Ic3eAH75/IbREcs0pcTaA7+F6g7YJ
-         DNBT/LHiev2ThirgqJsCWcjKAPb0n1d/gjQg38JASFUm9ns+SVzF2ITHAINRpP/jeHZH
-         EHYNjj6cilS+AFElm5cpxUf8JlmriIWi0RHwfo8c3HdShw502m8h0P9Y+pGoDP8IKFBJ
-         p9gP15kx9vNNb1r4KyWNj4x+UOrX4tOEINa5jWVigYTpGiDwP1HfFxvJEjQ1QiY35Hdn
-         QsLA==
-X-Forwarded-Encrypted: i=1; AJvYcCXIHKANJbsldz73K1oAQUr2i4Z30m6GSC3zV8Z5tg215qEPAV2PEZLptkGLRdSPAlZV6RwhGiS+C35Hzg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy35wz+uWr1l9o9g7FrbqsxBJeVBMdRSOWxevqJNAtDwQ9ZMWdK
-	FIdqovGoimaH5kvYaHMu/CpUrLNPZaX3ci+36ojRxAC3T7C6GHCX7wnMpw6oQPFBLE4=
-X-Gm-Gg: AZuq6aLz/vk30PwXL07RKwLvAwSGrGrTPAw2rVWK9Bf5pfk36k7ZKVN4JiERACCODVP
-	YvK1h1Xi0USQ/Yewfq6dBuwJ6afK3Ipq3n75/m+JCWKlCDztdDEuptI7bcBEnKLGsKiSwm4nT/u
-	c3JqRnXfh4Xhhlbf0x/lL1frGnp2G3mYb+TPxFVRZE0Vbj4bRkaKLidsbMaiiFEGXisUaUfbLa1
-	6m8XieOhHPeJ833Zkla+oYWynB97zx14FO7vZQuZKIXutrJHUTMBe+BHunYtt/LLZmDySiVEKy+
-	sEiXAeZAq6/l7C6+6lkzIcOo8ECExI76rlIQmKjKHpN/PJPgIjO1mF0bSiTfDGLB3SNph8XHzLT
-	uA0nynJ3JEVtVqm7a6fWWCAiollYILQ8IwQ+z3ZgQqgDJyqVftKnwGTyhS+RJsA6YIqIl/JqF4d
-	UZfxSeP0s2LpRu+7VNm/TgJll2fvj8Sr+BceV/MuOutQ3pvZZq1oA1dJ2vx/HQoBCLap0vp3WfO
-	CG2PtYAzoTHwyB+AP0c
-X-Received: by 2002:a05:6820:4a12:b0:672:a49f:127b with SMTP id 006d021491bc7-675dae67e97mr711425eaf.3.1770905369831;
-        Thu, 12 Feb 2026 06:09:29 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-67475fbc91bsm2680419eaf.15.2026.02.12.06.09.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Feb 2026 06:09:29 -0800 (PST)
-Message-ID: <0576dcec-3e8f-4e77-b532-052ae8c6137e@kernel.dk>
-Date: Thu, 12 Feb 2026 07:09:28 -0700
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dbv5wWWG"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770906172;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ptFhSm65DCfj49xFpwwKLztH7AFNqHdJc1L/FQijGkI=;
+	b=dbv5wWWGnaUrUbSEZe/aSB5wCtaqsnsODAD8tdHfnsAMPYmiSfyvQIuRIjwAfq4R+/z538
+	4gxvKhYi7FvpZquYPDWC2P7BKGaoNkJxfoRRSzTwYvOXvfEz2ziA3I9FXa0Sxj2tvfEooz
+	RbRLgbpP/UTaleca2PtJ+ZJq0CFly7I=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-685-WfzRq2ZpME-c-kDlWc_HWw-1; Thu,
+ 12 Feb 2026 09:22:49 -0500
+X-MC-Unique: WfzRq2ZpME-c-kDlWc_HWw-1
+X-Mimecast-MFC-AGG-ID: WfzRq2ZpME-c-kDlWc_HWw_1770906168
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A1AEF180025B;
+	Thu, 12 Feb 2026 14:22:47 +0000 (UTC)
+Received: from fedora (unknown [10.72.116.145])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D983D19560BB;
+	Thu, 12 Feb 2026 14:22:44 +0000 (UTC)
+Date: Thu, 12 Feb 2026 22:22:39 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Hannes Reinecke <hare@suse.de>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: ublk invert part scan bit logic
+Message-ID: <aY3iLwf8G3jKUIbw@fedora>
+References: <0535f4dd-ada3-414a-84c6-7abc232aa670@kernel.dk>
+ <aY3KpLbAOchXxXyi@fedora>
+ <dfc5a8d3-45d3-4fe2-aa0b-b9571b5fb883@kernel.dk>
+ <aY3PYGblTx748m4q@fedora>
+ <e63cd486-cdf0-4c90-85a5-b2f15699e96d@suse.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/1] block/blk-mq: use atomic_t for quiesce_depth to
- avoid lock contention on RT
-To: Hillf Danton <hdanton@sina.com>,
- "Ionut Nechita (Wind River)" <ionut.nechita@windriver.com>
-Cc: torvalds@linux-foundation.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, bigeasy@linutronix.de
-References: <20260212132644.2998-1-hdanton@sina.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20260212132644.2998-1-hdanton@sina.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e63cd486-cdf0-4c90-85a5-b2f15699e96d@suse.de>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On 2/12/26 6:26 AM, Hillf Danton wrote:
-> On Thu, 12 Feb 2026 09:14:18 +0200 Ionut Nechita (Wind River) wrote:
->>
->> PREEMPT_RT has been merged into mainline since v6.12. There is no
->> separate RT tree for this kind of fix anymore. The spinlock in question
+On Thu, Feb 12, 2026 at 03:04:53PM +0100, Hannes Reinecke wrote:
+> On 2/12/26 14:02, Ming Lei wrote:
+> > On Thu, Feb 12, 2026 at 05:48:40AM -0700, Jens Axboe wrote:
+> > > On 2/12/26 5:42 AM, Ming Lei wrote:
+> > > > On Thu, Feb 12, 2026 at 04:05:27AM -0700, Jens Axboe wrote:
+> > > > > Hi,
+> > > > > 
+> > > > > For ublk, there's this logic in in ublk_ctrl_start_dev():
+> > > > > 
+> > > > > /* Skip partition scan if disabled by user */
+> > > > > if (ub->dev_info.flags & UBLK_F_NO_AUTO_PART_SCAN) {
+> > > > > 	clear_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
+> > > > > } else {
+> > > > > 	/* Schedule async partition scan for trusted daemons */
+> > > > > 	if (!ub->unprivileged_daemons)
+> > > > > 		schedule_work(&ub->partition_scan_work);
+> > > > > }
+> > > > > 
+> > > > > where the
+> > > > > 
+> > > > > clear_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
+> > > > > 
+> > > > > seems reversed? Why is GD_SUPPRESS_PART_SCAN being cleared if
+> > > > > UBLK_F_NO_AUTO_PART_SCAN is set? Added in:
+> > > > > 
+> > > > > 8443e2087e70 ("ublk: add UBLK_F_NO_AUTO_PART_SCAN feature flag")
+> > > > 
+> > > > Yeah, the interface is designed in this way: partition scan is not
+> > > > done during add disk, and allowed since then on. The selftest code
+> > > > is written in same way too.
+> > > > 
+> > > > If GD_SUPPRESS_PART_SCAN isn't cleared, userspace can't probe partitions
+> > > > any more.
+> > > > 
+> > > > However, if you think the interface isn't good, we still can change it
+> > > > before 7.0 release.
+> > > 
+> > > What I mean is, if UBLK_F_NO_AUTO_PART_SCAN is set, should we not
+> > > either leave the disk->state alone, or _set_ GD_SUPPRESS_PART_SCAN?
+> > 
+> > UBLK_F_NO_AUTO_PART_SCAN means partition scanning isn't done automatically
+> > from add_disk(), but it still allow userspace to send ioctl(BLKRRPART) for
+> > probing partition since disk is added.
+> > 
+> > If GD_SUPPRESS_PART_SCAN is set, ioctl(BLKRRPART) can't succeed any more.
+> > 
+> > > I might be confused here, but the current implementation doesn't
+> > > make much sense to me! If it is correct, then a comment to that
+> > > effect would be good imho.
+> > 
+> > I admit it is a little confusing, will send a patch to document this
+> > behavior if no one objects the UAPI.
+> > 
+> Is there a specific reason to continue to allow BLKRRPART if the
+> UBLK_F_NO_AUTO_PART_SCAN is set? Wouldn't is be better to have a
+
+No, I just want to allow future ioctl(BLKRRPART).
+
+> simple 'UBLK_F_NO_PART_SCAN', which directly maps to GD_SUPPRESS_PART_SCAN?
+> Would we lose something substantial in that case?
+
+If there is, we may add new feature flag for it.
+
 > 
-> https://git.kernel.org/pub/scm/linux/kernel/git/rt/linux-rt-devel.git/
+> I actually would _like_ to be able to suppress partition scan
+> completely for ublk devices...
 
-Hillf, just stop. Not just this thread, but replying in general. It's
-always useless, time wasting, and unproductive.
+Fine, we can change UBLK_F_NO_AUTO_PART_SCAN to align with GD_SUPPRESS_PART_SCAN.
 
--- 
-Jens Axboe
+
+
+Thanks,
+Ming
 
