@@ -1,67 +1,81 @@
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCFA82253EF
-	for <linux-block@vger.kernel.org>; Thu, 12 Feb 2026 15:01:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E8CE33F37E
+	for <linux-block@vger.kernel.org>; Thu, 12 Feb 2026 15:07:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770908508; cv=none; b=sLUxoOs6h7s2RivfDD+fuzXodW3Xn+lJ8MMR33cWKMHPSZO4BCkcmADShY5zMbQFNfK9t4Ei6TnPViZ+aEetIS9D69OcqoXafUX8nhOP46RZvvPvI9E7LxbdVDmi0AZlHRT6VHQPR/nq7fp0XiPGn+qy33/13LHW1NBB5PDwETY=
+	t=1770908821; cv=none; b=FaDaSYb+I34M+6PEMzeBYLUXLUjs86VO/kvLFkKajuE7/Wdmm/6dyIqRoFIpu7EgWePAcH4AcIjHB+2Nifi+3iHInwoS+HhfsKh+L6abpw8TvAoTTcRxUgDtvrjoSrlsGbwOQchxOoKJ9vZ/i5k6sKHwI1O8fkL3QHlBhxqEK8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770908508; c=relaxed/simple;
-	bh=SU9IhclmYAClkIor0Wj2kzs0hgoV8SbTOCEoQqrbUHc=;
+	s=arc-20240116; t=1770908821; c=relaxed/simple;
+	bh=gxa18cIC8NmuiSuzXDMx3kLKx/EuXErcXX55GfbQ7eM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Iez0dWCteMo9UekBdShFhLW0NI1kWQMcAVBOb6RNBlXqVq4pGaav3WfRhpG5JzsN1FK7pwwTv3hoIWXO+HN/woAG5+RgieemhBDPvWvtqlJx/khg8A+9QOzFJXp2d/OT0ceopZh1iMx7cT/yWCHxSQENacld/82zlSKnWDlC224=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com; spf=pass smtp.mailfrom=linbit.com; dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b=lqev2ftq; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linbit.com
+	 In-Reply-To:Content-Type; b=bL6ZT1ZWXj05ZTYWlmCLWF/3JZYd9u/BCb9Vjz2Z+3aftmsiEViu+miX2oRXm+ftQY9h1t+8mH9/J2GE7VyNoLeME0qcmN4+FJZU4D0+rcRPPpZhPQdVWEAW3ed9k1bU78Z1zDdMD6Xw4ZdRnfc8DDxZe556gSLwqz8Nt4bm6tE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=OHl3GKaG; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=/J3BsuNT; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=OHl3GKaG; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=/J3BsuNT; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linbit-com.20230601.gappssmtp.com header.i=@linbit-com.20230601.gappssmtp.com header.b="lqev2ftq"
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-4327790c4e9so5297686f8f.2
-        for <linux-block@vger.kernel.org>; Thu, 12 Feb 2026 07:01:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20230601.gappssmtp.com; s=20230601; t=1770908505; x=1771513305; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+5IOSasBlsX0Zq7MQwRuynmqCbpOzr3vQNsDoSWsb48=;
-        b=lqev2ftq/PYnJitIimWWg5gzKqLAXLI7REoSEr/nSjHtWKjGvTjqyK9pDBwsly/oyK
-         iGJOPRIi8wSCCTmX/SdNgrm+1RxpZBmIuNeIFrGjj3kEbcUY4Cl0CEt97Jp/5ggp2PW7
-         vYGCXl1F4+qEESN74SsjPFpVyuSLyl/lskzDGRR2lGQB9rKoTqQBLa5v5MOrgC/Z1e9Z
-         t9O8twCiQKsQsObeuWxojR0VdKsmw1T56tPy/YtMqtbx4tHhh51gMv0J/ohYbpaWAi0W
-         9y+RlXo85TLI2K+1WUy5um+254LJaYBCfC/FbapXMUgj4yVBB+1O6sllKlcFnZQ4X28h
-         B2LA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770908505; x=1771513305;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+5IOSasBlsX0Zq7MQwRuynmqCbpOzr3vQNsDoSWsb48=;
-        b=XQFyUFDYN/ho8oToZNp4gNGGFCUj0697xWk2asu8T9218LGKEzDuhFz4208GSCpB7e
-         1UldfR1SVQTr7NrA9K+rYeG2Wx6WgzFPUHJ6ON/JikG/jMDgvEX73U/am4ZIs8NlGxZM
-         RztFtmWZOkZJKiuz61Dkr/+k9DMCWaPSgaxtgyn1S4QM44LPbsos3SXL2DNhZb2kHlRz
-         /mAxZAn3COEMteChtdZKp8GvMXf3oba8H7auH3d+kNjmdBdf9fdUby4k2B0pYKwH+e07
-         0RbvwQJsV/nlV/67ZVzWlPrVp+Q4VaBqN81whh7AjnEJs2bOxx3jwkLihFaI/7m+w28P
-         eaIA==
-X-Forwarded-Encrypted: i=1; AJvYcCUvWoY0m43q0sLdrBhZYBw7vO7BbiByWDx38RffU1jgsk0a6FIRpk93HOJazgN/wF0bD5UG/874pcj2Xw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwvFYQvMu42SP9ek2Q9+uz64EI49pHNEBAyQsVCgsR3VgqbNAEg
-	02F+fTpjbI+05lNCgTIB/g8lAdQwwzAllV4hlCum/YSuSEPNMvtYms28N3RvNblsnJs=
-X-Gm-Gg: AZuq6aKdwvRb7KsBcm6Wgz/gzl/CSfmy4HopnDxb6S4bQM5440S+XK9DQNydLdei6qm
-	bFWixjGbRo+VO6qiOp3QDiJqeqUU1f4FPHTCtEPlFB5lIdHUWG8/O+wyt2Dv3C8WC4Vh3X3ZQ9P
-	EI4ZceIjY9i3RwD9uRI5UXRD2dsLhHHxvUYCnEqBIUV9lXISAkvKvl6KI2U6L83+daMp0cbSm22
-	Qc/bdlIV+E3pqIoBng1SEQJE16Ajj+BGL91Uk+APx45G1zZBaI+WcIsxB5mtr3YiOkkdfG1Gnru
-	/4ZjkraxLAkx1leEHQM8osMXpNotOQLogq257hyI3ICuxom+sBH9RZiANCcXdBemgA+MRFPsTgt
-	nFOYwcmZjfgvEWwl4viGjh50qPkgeqcOSh7L5Salkeuty0sZ7upEdLgKvmqJSh2ZjTBmTCpldc1
-	YXcCk2IfwdziC9XGSdJJXhAJ+r+mrriDYg8zhvijMAhrP1Drar2K/W7TSnTvAm033LiZuZYGb5B
-	uUskaUhDVO6MwvGk1+E0y1mMQ==
-X-Received: by 2002:a5d:5f84:0:b0:435:e436:7fb with SMTP id ffacd0b85a97d-4378acaba28mr5911570f8f.50.1770908505145;
-        Thu, 12 Feb 2026 07:01:45 -0800 (PST)
-Received: from [192.168.178.55] (h082218028181.host.wavenet.at. [82.218.28.181])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43783e5be13sm12942474f8f.35.2026.02.12.07.01.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Feb 2026 07:01:44 -0800 (PST)
-Message-ID: <eaa83421-a07a-4ee7-81ad-f32d4a237ff8@linbit.com>
-Date: Thu, 12 Feb 2026 16:01:43 +0100
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="OHl3GKaG";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="/J3BsuNT";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="OHl3GKaG";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="/J3BsuNT"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 913075BDAB;
+	Thu, 12 Feb 2026 15:06:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1770908818; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=S6o0vnm+5wjCmunKruzybaqFhSsTIhJQC8Z8TJ1nXc4=;
+	b=OHl3GKaGePlgH8rQvagEoBQk7OHuKQc1Pitv1RxL3proRKykyrgM1Vp6paJ74WKEWGREef
+	yRT4/xB5h8XCKaAXvKZ4yxDIqc15EgPexJhj5w8DsUemZn1M/7qL5azrOzudFjHt+rnP6L
+	2o9PFv8lTVqdbDnkkHLMr6EHaoE25yw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1770908818;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=S6o0vnm+5wjCmunKruzybaqFhSsTIhJQC8Z8TJ1nXc4=;
+	b=/J3BsuNTNOu8+l9Gumb3Mpw1/Gg6g5SUORoeDYPOnyraoyzVDRcaycl2njMX3C7/HnBQZR
+	LPFA0ohik6oTvODQ==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=OHl3GKaG;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="/J3BsuNT"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1770908818; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=S6o0vnm+5wjCmunKruzybaqFhSsTIhJQC8Z8TJ1nXc4=;
+	b=OHl3GKaGePlgH8rQvagEoBQk7OHuKQc1Pitv1RxL3proRKykyrgM1Vp6paJ74WKEWGREef
+	yRT4/xB5h8XCKaAXvKZ4yxDIqc15EgPexJhj5w8DsUemZn1M/7qL5azrOzudFjHt+rnP6L
+	2o9PFv8lTVqdbDnkkHLMr6EHaoE25yw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1770908818;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=S6o0vnm+5wjCmunKruzybaqFhSsTIhJQC8Z8TJ1nXc4=;
+	b=/J3BsuNTNOu8+l9Gumb3Mpw1/Gg6g5SUORoeDYPOnyraoyzVDRcaycl2njMX3C7/HnBQZR
+	LPFA0ohik6oTvODQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 782643EA62;
+	Thu, 12 Feb 2026 15:06:58 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id WRziHJLsjWlaHwAAD6G6ig
+	(envelope-from <hare@suse.de>); Thu, 12 Feb 2026 15:06:58 +0000
+Message-ID: <8f63c5d8-6a71-42e0-a0eb-3621cd625f0c@suse.de>
+Date: Thu, 12 Feb 2026 16:06:58 +0100
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -69,50 +83,89 @@ List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] drbd: always set BLK_FEAT_STABLE_WRITES
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jens Axboe <axboe@kernel.dk>, drbd-dev@lists.linbit.com,
- linux-kernel@vger.kernel.org, Lars Ellenberg <lars.ellenberg@linbit.com>,
- Philipp Reisner <philipp.reisner@linbit.com>, linux-block@vger.kernel.org
-References: <20260205173928.3166880-2-christoph.boehmwalder@linbit.com>
- <aYWNhtixUGuj3hat@infradead.org>
-From: =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= <christoph.boehmwalder@linbit.com>
+Subject: Re: ublk invert part scan bit logic
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <0535f4dd-ada3-414a-84c6-7abc232aa670@kernel.dk>
+ <aY3KpLbAOchXxXyi@fedora> <dfc5a8d3-45d3-4fe2-aa0b-b9571b5fb883@kernel.dk>
+ <aY3PYGblTx748m4q@fedora> <e63cd486-cdf0-4c90-85a5-b2f15699e96d@suse.de>
+ <aY3iLwf8G3jKUIbw@fedora>
 Content-Language: en-US
-In-Reply-To: <aYWNhtixUGuj3hat@infradead.org>
-Content-Type: text/plain; charset=UTF-8
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <aY3iLwf8G3jKUIbw@fedora>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Spam-Score: -4.51
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	TO_DN_SOME(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	RCVD_TLS_ALL(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Spam-Level: 
+X-Rspamd-Action: no action
+X-Rspamd-Queue-Id: 913075BDAB
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Flag: NO
 
-Am 06.02.26 um 07:43 schrieb Christoph Hellwig:
-> On Thu, Feb 05, 2026 at 06:39:29PM +0100, Christoph Böhmwalder wrote:
->> DRBD requires stable pages because it may read the same bio data
->> multiple times for local disk I/O and network transmission, and in
->> some cases for calculating checksums.
->>
->> The BLK_FEAT_STABLE_WRITES flag is set when the device is first
->> created, but blk_set_stacking_limits() clears it whenever a
->> backing device is attached. In some cases the flag may be
->> inherited from the backing device, but we want it to be enabled
->> at all times.
+On 2/12/26 15:22, Ming Lei wrote:
+> On Thu, Feb 12, 2026 at 03:04:53PM +0100, Hannes Reinecke wrote:
+>> On 2/12/26 14:02, Ming Lei wrote:
+>>> On Thu, Feb 12, 2026 at 05:48:40AM -0700, Jens Axboe wrote:
+[ .. ]
+>>>> I might be confused here, but the current implementation doesn't
+>>>> make much sense to me! If it is correct, then a comment to that
+>>>> effect would be good imho.
+>>>
+>>> I admit it is a little confusing, will send a patch to document this
+>>> behavior if no one objects the UAPI.
+>>>
+>> Is there a specific reason to continue to allow BLKRRPART if the
+>> UBLK_F_NO_AUTO_PART_SCAN is set? Wouldn't is be better to have a
 > 
-> This looks like a bug.  If an underlying device requires
-> BLK_FEAT_STABLE_WRITES, the upper device needs to inherit it.
+> No, I just want to allow future ioctl(BLKRRPART).
+> 
+>> simple 'UBLK_F_NO_PART_SCAN', which directly maps to GD_SUPPRESS_PART_SCAN?
+>> Would we lose something substantial in that case?
+> 
+> If there is, we may add new feature flag for it.
+> 
+>>
+>> I actually would _like_ to be able to suppress partition scan
+>> completely for ublk devices...
+> 
+> Fine, we can change UBLK_F_NO_AUTO_PART_SCAN to align with GD_SUPPRESS_PART_SCAN.
+> 
+yes, please. That would make the code easier to understand and we 
+wouldn't need to have any 'special' handling (or documentation)
+here.
 
-The current block layer logic actually seems correct to me. The
-underlying device may or may not require stable writes, but regardless
-of that, DRBD itself definitely does need it. In blk_stack_limits, DRBD
-is the top device, and DRBD's backing disk is the bottom device. If the
-backing disk happens to require stable writes, this would indeed be
-correctly inherited.
+Cheers,
 
-So the only missing logic is that DRBD still wants to enable stable
-writes for itself even if the backing disk does *not* request it.
-So it seems to me that this patch is the correct fix for DRBD's special
-case.
-
-Is it not supposed to work like that?
-
+Hannes
 -- 
-Christoph Böhmwalder
-LINBIT | Keeping the Digital World Running
-DRBD HA —  Disaster Recovery — Software defined Storage
-
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
