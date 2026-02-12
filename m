@@ -1,101 +1,99 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E8CE33F37E
-	for <linux-block@vger.kernel.org>; Thu, 12 Feb 2026 15:07:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBACA1EEA5F
+	for <linux-block@vger.kernel.org>; Thu, 12 Feb 2026 15:23:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770908821; cv=none; b=FaDaSYb+I34M+6PEMzeBYLUXLUjs86VO/kvLFkKajuE7/Wdmm/6dyIqRoFIpu7EgWePAcH4AcIjHB+2Nifi+3iHInwoS+HhfsKh+L6abpw8TvAoTTcRxUgDtvrjoSrlsGbwOQchxOoKJ9vZ/i5k6sKHwI1O8fkL3QHlBhxqEK8I=
+	t=1770909829; cv=none; b=Hc71lF28VK0yZXbPzR7pQr/vXjouDnsJHGFiVLUNftPnlTaTc07CkDfeX8q3Hva8LBeSsAxcAsCIrTxXPo+xXv1UST7eEf6qqNWJkrRuZQhbJHXeV7Dp6HenUOUyrEbuNes7c8GlK3xHb6NaDUnYVhVZYGDIVWqPoKmZbFp3olo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770908821; c=relaxed/simple;
-	bh=gxa18cIC8NmuiSuzXDMx3kLKx/EuXErcXX55GfbQ7eM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bL6ZT1ZWXj05ZTYWlmCLWF/3JZYd9u/BCb9Vjz2Z+3aftmsiEViu+miX2oRXm+ftQY9h1t+8mH9/J2GE7VyNoLeME0qcmN4+FJZU4D0+rcRPPpZhPQdVWEAW3ed9k1bU78Z1zDdMD6Xw4ZdRnfc8DDxZe556gSLwqz8Nt4bm6tE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=OHl3GKaG; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=/J3BsuNT; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=OHl3GKaG; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=/J3BsuNT; arc=none smtp.client-ip=195.135.223.131
+	s=arc-20240116; t=1770909829; c=relaxed/simple;
+	bh=oq1RV8vmEW+wsEdfwCuojy7u0J5S7Vw4RazMQn1VjHs=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To; b=FAgBq9J0tJQiOmvKLI1GyT8bciDhbIMGQubmi4MVhZNB0ef9MlaIrpFsRGz4kdzcrbO3eXwwSxH0En85UZQaV6bzkYOPYIqVHRbIcUXmvmi0H6Dn1L9zzP6tghfOgVWuZtCTwcWxGIFVKZZ5tcRnIr6jNT3qgd/Mwcleo3z5eA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=d+Bs/3JW; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=MsHPp0sP; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=d2x7Y8tY; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=vw29r+4B; arc=none smtp.client-ip=195.135.223.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="OHl3GKaG";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="/J3BsuNT";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="OHl3GKaG";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="/J3BsuNT"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="d+Bs/3JW";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="MsHPp0sP";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="d2x7Y8tY";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="vw29r+4B"
 Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 913075BDAB;
-	Thu, 12 Feb 2026 15:06:58 +0000 (UTC)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 01D013E6CE;
+	Thu, 12 Feb 2026 15:23:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1770908818; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1770909826; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
 	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=S6o0vnm+5wjCmunKruzybaqFhSsTIhJQC8Z8TJ1nXc4=;
-	b=OHl3GKaGePlgH8rQvagEoBQk7OHuKQc1Pitv1RxL3proRKykyrgM1Vp6paJ74WKEWGREef
-	yRT4/xB5h8XCKaAXvKZ4yxDIqc15EgPexJhj5w8DsUemZn1M/7qL5azrOzudFjHt+rnP6L
-	2o9PFv8lTVqdbDnkkHLMr6EHaoE25yw=
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=wwNVz192v3URqIaCsnTslVz2YPDKzTOQFcIOsBCgnkM=;
+	b=d+Bs/3JW058pi7sOnu080TaSLAMNkke5QGYC7xyVuPcYljV7v9uremksNEaFS20ZDFINx5
+	HzEogEB/Li2r4CBH1lk+kflN2wtqxTofIPyAGdMESer5Y/2vxEre7/FVONpcGyGaci7H+b
+	Y5sE4L8/pxtKUFjrZ1+fUjJU4FKGhCA=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1770908818;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	s=susede2_ed25519; t=1770909826;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
 	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=S6o0vnm+5wjCmunKruzybaqFhSsTIhJQC8Z8TJ1nXc4=;
-	b=/J3BsuNTNOu8+l9Gumb3Mpw1/Gg6g5SUORoeDYPOnyraoyzVDRcaycl2njMX3C7/HnBQZR
-	LPFA0ohik6oTvODQ==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=OHl3GKaG;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="/J3BsuNT"
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=wwNVz192v3URqIaCsnTslVz2YPDKzTOQFcIOsBCgnkM=;
+	b=MsHPp0sPVENo3VOVIc1b29aIlnsmwaVLbx+6d1fU1NiawxaqX+owBFJPhoi/ezALSs3rFn
+	/sKP0sDWIB2niBDg==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=d2x7Y8tY;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=vw29r+4B
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1770908818; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1770909824; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
 	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=S6o0vnm+5wjCmunKruzybaqFhSsTIhJQC8Z8TJ1nXc4=;
-	b=OHl3GKaGePlgH8rQvagEoBQk7OHuKQc1Pitv1RxL3proRKykyrgM1Vp6paJ74WKEWGREef
-	yRT4/xB5h8XCKaAXvKZ4yxDIqc15EgPexJhj5w8DsUemZn1M/7qL5azrOzudFjHt+rnP6L
-	2o9PFv8lTVqdbDnkkHLMr6EHaoE25yw=
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=wwNVz192v3URqIaCsnTslVz2YPDKzTOQFcIOsBCgnkM=;
+	b=d2x7Y8tYGabZUjaizggA0wVXs0Zo0COvgmUrcj8GZ9iN59uqw21RGRMsP6QkIU5Ol+hKgT
+	+R5z3bYPXDP4MU4+T/84h19YVJveEYqW3fsov3d5vch7ZJu7TsukalJ6dEH0fJy3be30p7
+	I6wjUvUCTMgdpDBXKalK89voYwzQdM8=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1770908818;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	s=susede2_ed25519; t=1770909824;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
 	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=S6o0vnm+5wjCmunKruzybaqFhSsTIhJQC8Z8TJ1nXc4=;
-	b=/J3BsuNTNOu8+l9Gumb3Mpw1/Gg6g5SUORoeDYPOnyraoyzVDRcaycl2njMX3C7/HnBQZR
-	LPFA0ohik6oTvODQ==
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=wwNVz192v3URqIaCsnTslVz2YPDKzTOQFcIOsBCgnkM=;
+	b=vw29r+4Be+12bIPk/dD8BaQnrM0eWIV0N4SvCkMyE/VxJliw2Vk08zPiMS8fC16xhWPAiv
+	R8ZSmbRRR5ntf4BQ==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 782643EA62;
-	Thu, 12 Feb 2026 15:06:58 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 82AC13EA62;
+	Thu, 12 Feb 2026 15:23:43 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id WRziHJLsjWlaHwAAD6G6ig
-	(envelope-from <hare@suse.de>); Thu, 12 Feb 2026 15:06:58 +0000
-Message-ID: <8f63c5d8-6a71-42e0-a0eb-3621cd625f0c@suse.de>
-Date: Thu, 12 Feb 2026 16:06:58 +0100
+	id Poq9Hn/wjWnlKgAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Thu, 12 Feb 2026 15:23:43 +0000
+From: Daniel Wagner <dwagner@suse.de>
+Subject: [PATCH blktests v4 0/3] bcache: add initial test cases
+Date: Thu, 12 Feb 2026 16:23:30 +0100
+Message-Id: <20260212-bcache-v4-0-215f3fde1c84@suse.de>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: ublk invert part scan bit logic
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <0535f4dd-ada3-414a-84c6-7abc232aa670@kernel.dk>
- <aY3KpLbAOchXxXyi@fedora> <dfc5a8d3-45d3-4fe2-aa0b-b9571b5fb883@kernel.dk>
- <aY3PYGblTx748m4q@fedora> <e63cd486-cdf0-4c90-85a5-b2f15699e96d@suse.de>
- <aY3iLwf8G3jKUIbw@fedora>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <aY3iLwf8G3jKUIbw@fedora>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/2XMTQ6CMBCG4auQrq3pTH9EV97DuCjtIN2AabXRE
+ O5uYYEYl99knndkiWKgxE7VyCLlkMLQl6F2FXOd7W/Egy+boUAjAAVvnHUdcanJHaSpXd0qVp7
+ vkdrwWkKXa9ldSI8hvpduhvn6l8jAgetj04oGvQIlzumZaO+JzYGMWwQrQl4CaGwLtSYj7S+SW
+ 4QrkgWhE+hBW6WF/KJpmj7T/tKSBAEAAA==
+X-Change-ID: 20260120-bcache-35ec7368c8f4
+To: Christoph Hellwig <hch@infradead.org>, 
+ Stephen Zhang <starzhangzsd@gmail.com>, 
+ Kent Overstreet <kent.overstreet@linux.dev>, Coly Li <colyli@fnnas.com>, 
+ Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>, 
+ Johannes Thumshirn <Johannes.Thumshirn@wdc.com>, 
+ linux-block@vger.kernel.org, linux-bcache@vger.kernel.org, 
+ Daniel Wagner <dwagner@suse.de>
+X-Mailer: b4 0.14.3
 X-Spam-Score: -4.51
 X-Spamd-Result: default: False [-4.51 / 50.00];
 	BAYES_HAM(-3.00)[100.00%];
@@ -104,68 +102,88 @@ X-Spamd-Result: default: False [-4.51 / 50.00];
 	NEURAL_HAM_SHORT(-0.20)[-1.000];
 	MIME_GOOD(-0.10)[text/plain];
 	MX_GOOD(-0.01)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	TO_DN_SOME(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCVD_TLS_ALL(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	FREEMAIL_TO(0.00)[infradead.org,gmail.com,linux.dev,fnnas.com,wdc.com,vger.kernel.org,suse.de];
 	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	RCVD_COUNT_TWO(0.00)[2];
 	FROM_EQ_ENVFROM(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DKIM_TRACE(0.00)[suse.de:+]
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:dkim,suse.de:mid,suse.de:email]
 X-Spam-Level: 
 X-Rspamd-Action: no action
-X-Rspamd-Queue-Id: 913075BDAB
+X-Rspamd-Queue-Id: 01D013E6CE
 X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
 X-Spam-Flag: NO
 
-On 2/12/26 15:22, Ming Lei wrote:
-> On Thu, Feb 12, 2026 at 03:04:53PM +0100, Hannes Reinecke wrote:
->> On 2/12/26 14:02, Ming Lei wrote:
->>> On Thu, Feb 12, 2026 at 05:48:40AM -0700, Jens Axboe wrote:
-[ .. ]
->>>> I might be confused here, but the current implementation doesn't
->>>> make much sense to me! If it is correct, then a comment to that
->>>> effect would be good imho.
->>>
->>> I admit it is a little confusing, will send a patch to document this
->>> behavior if no one objects the UAPI.
->>>
->> Is there a specific reason to continue to allow BLKRRPART if the
->> UBLK_F_NO_AUTO_PART_SCAN is set? Wouldn't is be better to have a
-> 
-> No, I just want to allow future ioctl(BLKRRPART).
-> 
->> simple 'UBLK_F_NO_PART_SCAN', which directly maps to GD_SUPPRESS_PART_SCAN?
->> Would we lose something substantial in that case?
-> 
-> If there is, we may add new feature flag for it.
-> 
->>
->> I actually would _like_ to be able to suppress partition scan
->> completely for ublk devices...
-> 
-> Fine, we can change UBLK_F_NO_AUTO_PART_SCAN to align with GD_SUPPRESS_PART_SCAN.
-> 
-yes, please. That would make the code easier to understand and we 
-wouldn't need to have any 'special' handling (or documentation)
-here.
-
+I've updated the v3 version with the feedback from Shinichiro for v2.
+Shinichiro, please note I did rewrite some of the logic in v3, thus some of your
+comments didn't apply. But hopefully I don't made a big mess :)
+ 
 Cheers,
+Daniel
 
-Hannes
+[1] https://lore.kernel.org/linux-bcache/CANubcdX7eNbH_bo4-f94DUbdiEbt04Vxy1MPyhm+CZyXB01FuQ@mail.gmail.com/
+ 
+
+Signed-off-by: Daniel Wagner <dwagner@suse.de>
+---
+Changes in v4:
+- changed file mode to 755 for 001 and 002
+- changed license to GPL-3.0+
+- use group_requires
+- fixed whitespace damage
+- dropped unnecessary '|| true'
+- added 'local' for local variables
+- added wait loop for register interface to show up
+- updated documentation
+- Link to v3: https://patch.msgid.link/20260122-bcache-v3-0-2c02d15a4503@suse.de
+
+Changes in v3:
+- add bcache/002
+- return created bcache devices to tests case
+- made cleanup more robust (handling detached cache)
+- track all resources correctly
+- operatoe only in final cleanup on known devices
+- Link to v2: https://patch.msgid.link/20260121-bcache-v2-0-b26af185e63a@suse.de
+
+Changes in v2:
+- fixed whitespace damage
+- added documentation on how to configure for bcache tests
+- do registering explicitly
+- made disk wiping more robust
+- Link to v1: https://patch.msgid.link/20260120-bcache-v1-1-59bf0b2d4140@suse.de
+
+---
+Daniel Wagner (3):
+      bcache: add bcache/001
+      bcache: add bcache/002
+      doc: document how to configure bcache tests
+
+ Documentation/running-tests.md |  10 ++
+ tests/bcache/001               |  44 +++++
+ tests/bcache/001.out           |   3 +
+ tests/bcache/002               |  62 +++++++
+ tests/bcache/002.out           |   2 +
+ tests/bcache/rc                | 375 +++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 496 insertions(+)
+---
+base-commit: e387a7e0169cc012eb6a7140a0561d2901c92a76
+change-id: 20260120-bcache-35ec7368c8f4
+
+Best regards,
 -- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+Daniel Wagner <dwagner@suse.de>
+
