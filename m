@@ -1,287 +1,235 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 939535464D
-	for <linux-block@vger.kernel.org>; Fri, 13 Feb 2026 06:56:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770965807; cv=none; b=K+EVbTR4D41dvqSOqSg5NHxwHkfe1SOz7FuIZF63H7hsqFWdGhlUc3gjRIJy4GCD3ugdFmuF/no2Arq2hnaE5poA/1lQRUoVc5lp6CmE291ZQ6D8O5BJ4VvhcbKkSFGNii4R7hbSP9btE5pdHbs4LoOFrJsgNM2KWLNML83aa6g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770965807; c=relaxed/simple;
-	bh=NdhD4U0MWGPytrmPURxMcWeGcpmAu/wx+N2X+MTaPXo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=I0/jRHeAZ9oMvbm48aCEjSJuzARq0JFdnLrd79B3JSZTuBPTuz6UeQHq5c3pru0pH6XISBp/0ohufaE2HyANnETYEMK0ffWcUBqzTk/OPk3gzURf77pRn/95k2V4Gt6lrXKX9rSKd3gvGfI0TfpzGn375r0H4+iJYVIApe6zx1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=EMAYcn3M; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=94mMgXl0; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=EMAYcn3M; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=94mMgXl0; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4C171A08BC;
+	Fri, 13 Feb 2026 07:25:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.166.238
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770967532; cv=fail; b=dp+BpMeB8boa92RsaGvmaSH1gaXiWnGAR88iTyB0QumqdCfGGanFrUMtUs+2CVMtfStK0EhONeA2ROaYmvdCfThi9MGpkCCc/mEDPuZoWHu6jfan0CCded2nj84Og/DdQAwdpKvIaxh9tEnlWy6dMY3PUwKqR3m7z/m4059S2mQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770967532; c=relaxed/simple;
+	bh=nA495hI3JLbGTBPmdCWhg0pSgmza9JC2Bx2Tm4G/+GI=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=WMulFvZ9aPP+MfeLY2Dv5xF8hGOt7xYD9D+3B6BUXKB3Dq33YWoE+gq1NbfQyBnr9UQIqX4o2IPxLBAybyYwY6dRnioqVIFXhiluk0dAI6fIklkHFIjX+bLFvDpRHufm5gchvTuMkV1EkpWfMMPEoG2uY4NGy8vxBvDzchxzWAA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=QWyyGnYa; arc=fail smtp.client-ip=205.220.166.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="EMAYcn3M";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="94mMgXl0";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="EMAYcn3M";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="94mMgXl0"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 4DA383E6D4;
-	Fri, 13 Feb 2026 06:56:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1770965798; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9Hs0m4tQy+Y6qVNqriNvxsK/fyXGkDeJFdqBjApZIic=;
-	b=EMAYcn3MN9KFgJNkOCGxqGxInWQ7Z6ctsxaUq9nUkwQPPFjTkTb+jKuzsZb7Ykw7opMfiH
-	nYSVnXzwpF8ASWpJhLKs7Wuwf+gAw0+CPO3b/YOwVioYlH428iac5/NanAZFG1I8RSqg+t
-	kkz07OupKvPexCmS7IPUCJRE6Ge4JYs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1770965798;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9Hs0m4tQy+Y6qVNqriNvxsK/fyXGkDeJFdqBjApZIic=;
-	b=94mMgXl0FV/PiJj+BadN7nmmGGMHQeaRU1EjywmIvRKQLx2xf7ZyWF0jM2UPNkFVxJ8WPU
-	5xQXATTpghcqOsDA==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1770965798; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9Hs0m4tQy+Y6qVNqriNvxsK/fyXGkDeJFdqBjApZIic=;
-	b=EMAYcn3MN9KFgJNkOCGxqGxInWQ7Z6ctsxaUq9nUkwQPPFjTkTb+jKuzsZb7Ykw7opMfiH
-	nYSVnXzwpF8ASWpJhLKs7Wuwf+gAw0+CPO3b/YOwVioYlH428iac5/NanAZFG1I8RSqg+t
-	kkz07OupKvPexCmS7IPUCJRE6Ge4JYs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1770965798;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9Hs0m4tQy+Y6qVNqriNvxsK/fyXGkDeJFdqBjApZIic=;
-	b=94mMgXl0FV/PiJj+BadN7nmmGGMHQeaRU1EjywmIvRKQLx2xf7ZyWF0jM2UPNkFVxJ8WPU
-	5xQXATTpghcqOsDA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 1C3C93EA62;
-	Fri, 13 Feb 2026 06:56:38 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id U+mFBSbLjmlUTAAAD6G6ig
-	(envelope-from <hare@suse.de>); Fri, 13 Feb 2026 06:56:38 +0000
-Message-ID: <bf9fb99d-fa41-40cd-906d-0f8029c7f03a@suse.de>
-Date: Fri, 13 Feb 2026 07:56:37 +0100
+	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="QWyyGnYa"
+Received: from pps.filterd (m0250809.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 61D6QQPu1457212;
+	Thu, 12 Feb 2026 23:24:47 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
+	 h=cc:content-transfer-encoding:content-type:date:from
+	:message-id:mime-version:subject:to; s=PPS06212021; bh=6n44ZWXVc
+	1FHm0XitB62rbRSjRQuQzVcuT2YayibXQ8=; b=QWyyGnYaxg459pHdBvRzxHzxA
+	H1FUttFrHh5Mb+bumYFy9EAxHoIAsEifGCtK3Vn7rpBPiPYvYOpYsN6tE/rFM8UT
+	P9ZnFbxDWpxPYnIl1+sARxFG7zmqe2NPLWM901YHtBj1Wq9gax7t9QZ+F+mCDTIc
+	JmeZoiqeT86ivZ+ZNOWcToor6YmCeJp0DOwzK4Rlb25I8FaW4tutp5poaystkKLT
+	HOjkKckVU9bScCjRHuTkZrzeZvCKObDUosq0BdyoFJYs1uyv5XcHK4Y7BxU1TrCY
+	XO9klU3R9J7xbkXAehKL3l3XLoTjC3n20/0hSShv11LDIffqiL4UHPQ+5wyLw==
+Received: from mw6pr02cu001.outbound.protection.outlook.com (mail-westus2azon11012003.outbound.protection.outlook.com [52.101.48.3])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 4c65sj6uyq-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Thu, 12 Feb 2026 23:24:46 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=rhsJ/cQWdv/FGhrl3DDs1kkmnWpirhlic/rnEdfSW4myskPWiMJLlwksJ/nQ1G4molCvD3Hw6XZDlXS1od4ajv0iewz9BXc/xr88fvx6Gq0CcVrT3a+BaBMthnPK53SBTTWeKYRt/hhWNhUdmVR7Xoc8tCLV2CxK85Iuz7aaDg/830lXhmlxZF3DXkyVG64OmSlc3y+r4hKkDSi4nvu0M5jqBjPPl2wr8cEorutp7PbPv3pJ8Qz6fx4DKq2wuVE3cVWpb7J4U9lutuoO1EVKBwSrumVTZ9BGPhofGTX26OCYf3XgeU4GGYJfTbIF//Ibjkp2o8r5bb9ztaw/bSiTnA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6n44ZWXVc1FHm0XitB62rbRSjRQuQzVcuT2YayibXQ8=;
+ b=h5bBE2syta0+7Hz5GSvWstmk5KJEtfC7k0cujC/7iT+ve9w3yDiczv4jWwe0C3DayvfHefAyS5xQ3yLzwWM6+XbUiRIpS1aOUMIclHrv1wjOXWWTdvYBVY9CWKZzScgR9YWpyFQ5iZA/dNjBkfAGDeeh4YkHxBl7JF+4o6iopKkV2St88HCcIhybQwODNHu5dPmdOKTf0tLIihwwsDl6MKboqPDFkzz0z3CrsA6jlzFhY2ccqbib/g+San5dVfXhqqd/0jKxR+M3Oq/f0XQmsEPIPwiCdOUr9KxnK6jN741M2KkqPxZF5WxiwluoCW+C+W4omVQzfcO5FTkE/1c4kQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=windriver.com; dmarc=pass action=none
+ header.from=windriver.com; dkim=pass header.d=windriver.com; arc=none
+Received: from MN2PR11MB3885.namprd11.prod.outlook.com (2603:10b6:208:151::27)
+ by SJ2PR11MB8347.namprd11.prod.outlook.com (2603:10b6:a03:544::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9611.14; Fri, 13 Feb
+ 2026 07:24:44 +0000
+Received: from MN2PR11MB3885.namprd11.prod.outlook.com
+ ([fe80::a8bb:9703:986e:845]) by MN2PR11MB3885.namprd11.prod.outlook.com
+ ([fe80::a8bb:9703:986e:845%4]) with mapi id 15.20.9611.008; Fri, 13 Feb 2026
+ 07:24:44 +0000
+From: "Ionut Nechita (Wind River)" <ionut.nechita@windriver.com>
+To: axboe@kernel.dk
+Cc: bigeasy@linutronix.de, chris.friesen@windriver.com, clrkwllms@kernel.org,
+        ionut_n2001@yahoo.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-rt-devel@lists.linux.dev,
+        linux-rt-users@vger.kernel.org, ming.lei@redhat.com,
+        mkhalfella@purestorage.com, muchun.song@linux.dev, rostedt@goodmis.org,
+        stable@vger.kernel.org, sunlightlinux@gmail.com,
+        "Ionut Nechita (Wind River)" <ionut.nechita@windriver.com>
+Subject: [PATCH v4 0/1] block/blk-mq: use atomic_t for quiesce_depth to avoid lock contention on RT
+Date: Fri, 13 Feb 2026 09:24:12 +0200
+Message-ID: <20260213072412.28863-2-ionut.nechita@windriver.com>
+X-Mailer: git-send-email 2.53.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: VI1PR07CA0302.eurprd07.prod.outlook.com
+ (2603:10a6:800:130::30) To MN2PR11MB3885.namprd11.prod.outlook.com
+ (2603:10b6:208:151::27)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] ublk: cleanup flag handling and fix
- UBLK_F_NO_AUTO_PART_SCAN
-To: Ming Lei <ming.lei@redhat.com>, Alexander Atanasov <alex@zazolabs.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- Yoav Cohen <yoav@nvidia.com>
-References: <20260212152553.1737373-1-alex@zazolabs.com>
- <aY6fAlXmzQZCKwmM@fedora>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <aY6fAlXmzQZCKwmM@fedora>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:helo]
-X-Spam-Flag: NO
-X-Spam-Score: -4.30
-X-Spam-Level: 
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN2PR11MB3885:EE_|SJ2PR11MB8347:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3946b45f-def4-4de1-98ec-08de6ad0f5d4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|10070799003|1800799024|366016|7416014|376014|52116014|7142099003;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?wJQQSmqieyIlzpaRL3P6RJ5uQoNjNFn0disvEL2qcaWMu2un6X6fe5kdp/W6?=
+ =?us-ascii?Q?b6uuYyBjLPNHlbCaxBUjPGMpotXFKxbXXRF2glYDtRuM0N6uFtj5WQw7M17O?=
+ =?us-ascii?Q?zGfUlDOJs/e0wTH3wwmiWpo5LWL6q04K+kBu7xY3WyH+obGH1qm5M30wOxve?=
+ =?us-ascii?Q?WVJ6d3bK+sSHxliBOdA7dri4m7V4+UzV0JvpJS4ftlmBUHos9/eaiFk7wHR1?=
+ =?us-ascii?Q?Iadxsd2Sgekj/eOT3Mc+KsW6WwzrWdZPstHl2ZdACK5xIJSlRWe0YrM/PRbh?=
+ =?us-ascii?Q?vYNPxcjQpsd9Xpm3+Mhb5aGVWKkxTsx/oAjKjKpqi9UBl8Vo5wc2vUn+VQof?=
+ =?us-ascii?Q?54PnT843XOjozXoxnvqpvduCGt9AQHjIJt15jWo9EcsC/19mzRLTkCR7/OVP?=
+ =?us-ascii?Q?JdHZ2bAOaqjewh2adTK+3vO/jT4ZHS9tGAheFrTYLqDlXs3YJTevhkY+mKOK?=
+ =?us-ascii?Q?rpohEB+11oUEan633MIzpjRcSCAQbodeH362SQ71SEmSP3jNGZVm/7ScWHkn?=
+ =?us-ascii?Q?sR6eR5lK4BgkHDvbiBfKzAajKwrZS3TPBX3uPuQcfGL2+MqlU0XHEtsgMqD3?=
+ =?us-ascii?Q?zVg2LA+NmaiZdL9XsaypbvsHO2/XARawymKkD+KVGk/qLbidIs2zda6jFqqF?=
+ =?us-ascii?Q?wrbAocfgl/IKdSf6dlXEMtpVJZbtXxWA4EjkfLfWmfXIjHNcXJmXqFXoqjSt?=
+ =?us-ascii?Q?l6aj2geqNvsaniXqnm1tmKJ0RRJ5Ki1r3iOpazCYqUsiBtgnojEg1bcuQGnu?=
+ =?us-ascii?Q?lFk30wvGfkmMCvDHuLn8peB36z/ulTK/sFchMCPl2Xib+cKpDFByNtzVKE5w?=
+ =?us-ascii?Q?ObQSdY7DrygVK0DT5ZhBBRmSAyZc1peDjBBe+C5KKRZ99j2OG8opasnrel6M?=
+ =?us-ascii?Q?cwfYN7Z5x+wRTEPDJryxDiWag4ZOLYyAt+AjYSd6WvSu1ZtfA+wxrvpGXkYZ?=
+ =?us-ascii?Q?nKwk26BgZ1s2IJSKg1Jowl2I0SoKgTmleH9LgFnnZBOll9eb+BAJ5OMe6W2B?=
+ =?us-ascii?Q?dvLBBbh0QRAqgXWu+1dDphQgQW6A+zNZLV8V5mR2QwsYQSzpojku1fgTzCzW?=
+ =?us-ascii?Q?HoxwMQAa5EpiZXZFXOAOPFlK3bEqTfGSTKhoKiaOsIlQLTb8O0qH5j++5Xv9?=
+ =?us-ascii?Q?ukYtIyAeJA2fL5ax4VBhPczyD9Dl2ofpJmccsS5cnofEM9pOxl2UUnvJ6Lg2?=
+ =?us-ascii?Q?VEEljZpMjIh+cvxW6IrZD8zNT5WCCkP8b910l6cjVEPPDBXGLUgHwsTl3UfJ?=
+ =?us-ascii?Q?IUqtyH0zNsftCjO9siAvCbposFW5fc3mp0RH1w5DxsTUgDFvl769KFQdlU7j?=
+ =?us-ascii?Q?03r09MjqImm3a30yfIusLvu3VflHpW6z0NKRhv3mu9hhA6Te/CsgfEP8THz0?=
+ =?us-ascii?Q?8NU3zQVxmFlZ3FeRLVs8oiPvWFejwBK/SIX5BRZrsn6g/4ID5mF7NoY9QKex?=
+ =?us-ascii?Q?VyEjdsBsFstkgVmCgzfvsx31pqgarV2xt/rOUtYbm6LtAANWFSlSCXOktOyf?=
+ =?us-ascii?Q?1PdcnmVHJ+Fcqk6ZqUXPBRO9qWowjoftVhmc4X1R03z4RIOFwfiHC3Mhrkz5?=
+ =?us-ascii?Q?AutcSP/NAopsVkO3+5o=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR11MB3885.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(1800799024)(366016)(7416014)(376014)(52116014)(7142099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?UTXzrPrN2DW4dbiwI2dywSY3zELWfB/BGOTj48ntAKp6u9GuEfgDPnTbbcth?=
+ =?us-ascii?Q?cfjOTFLFxPccpJu1xmXQ9HRTyGwi/H57oDzvAdjif5ALKhry+bqjq098mOGM?=
+ =?us-ascii?Q?2Pzm/Kg/+cH5hzyvbtdIoIXSIh/pACwqtTwFOlcpJLDNwjrwEfnKga01rBOU?=
+ =?us-ascii?Q?NzANLc4mPHAEj9OtpDNa0sI0wLqKEMs+b+uv6nzvwKEwfBrirJEPHh3g51qV?=
+ =?us-ascii?Q?EY+cMQrELVMgQwJPdAA06ue5WT3g+e3FvkvZQKDb/wGnJShF6ihM+mRMTaV4?=
+ =?us-ascii?Q?AAKApS/QqNEcy9YSOYIcJ6ti8fWvpr30NJgI5zTloW0guxXSuGTBcm58hG2B?=
+ =?us-ascii?Q?S+Pw04KVmMij7nq7393tgLUuOJA/9kQMMMdvX/gUf0hN/9wTz7xL+sOUhn6k?=
+ =?us-ascii?Q?L9kiqkf2GzaGvlP0qcbr+yOjMWRdCfMS2dw/mWAdh/THDPmQQy1jklZ84pLa?=
+ =?us-ascii?Q?h0glvny0U5GjfMwpJkc5v0F5brI2gUxac/FAgnYXgN69igc7Es3sH0k6QXaT?=
+ =?us-ascii?Q?bHOZK3KouZ1FbHXhvV3v5KU05Qd7S3SC3J+MHZotMFlfEL1DrDF06KRAM4oM?=
+ =?us-ascii?Q?mEq+pTg+8To30SfM9lJKjvFWsBQhRSU1VHgUQk5Jn6EzMzMiEyvK7a2Zk5+0?=
+ =?us-ascii?Q?tgeNpXrfWxkCVB+h8J6+5kfMKpRjYN3rR90aVQcOfP+/IKbV3lAGptmsSNjX?=
+ =?us-ascii?Q?enNZNW80FHb27jIrNTjP7B2bjWgE/dG2JxZERFbr8oIFeg8TtUtMMoIS8tRO?=
+ =?us-ascii?Q?AjO1FtiIehtZfMOzoYu+WP+LEqBbwWZw81RimR+lJieOaizyi1hBgkQgpcjl?=
+ =?us-ascii?Q?+SLE8OsrerUhRPn2yQGXtbbsgG6TinYv1OZawlKwiZFS7D94hRuAvV9RHUw2?=
+ =?us-ascii?Q?Jj020O+4fkaZijxkd8hE2oJi3KFv6aWRGMfkfPFkacneqSKe03XH8K+dLvZy?=
+ =?us-ascii?Q?pvLf9tHS554Fs0kKnejaKkJ5fz6Hv9TDgLmrRw0fz6kHCKya1Ud8Wl7fdm11?=
+ =?us-ascii?Q?qzgIhqL3mY5Jf2TZ2fK4Rk9Zmh/9mdCqagfJFqmsCWzF5p+PenARL7CtHwP4?=
+ =?us-ascii?Q?DFwsO9NtWYwTucQLFcykCKIFPj/DD9+TfhehNxTanLa8zyKMqlCWaqiP5x3k?=
+ =?us-ascii?Q?R6Hi0lbSAiiXN1Zf0jUz+1aKAsoFktKyvRkey0FHUNJcy27cAnW9fsuVKzzr?=
+ =?us-ascii?Q?k9hZiix8FD0x9iPgVj/5pgiSbwK4CGnVOajSi/UhD/c1vvNCJ521u7bVWiYb?=
+ =?us-ascii?Q?/yN5+Go2MlnUOLOBK+PxeUMP3YU57D2XlugQJrFdRt+YYGMbp0MO/Kgk5fdE?=
+ =?us-ascii?Q?nvlrIbtXHqHbXVM6rLISqXww7v5NLjL/T3ms+LIIc99A8RjCVZlH7v8p3JXi?=
+ =?us-ascii?Q?q/QA5Z+KIQ5UqMSNXXo8wHBHG2cjEWvMysHhLA/W2ycK/0OugDgt9A+UpcW5?=
+ =?us-ascii?Q?1TMByD9DQP8+6fol33hNKRDRPL3Wd8uburTfz4oZtdwijHAYA/Edel5LCBvO?=
+ =?us-ascii?Q?7eW6N1xc8wweZWpBPxv6iCs4GJoqG8YN88IQ3AjPc2Hpqm4edGY1qK6VIo0t?=
+ =?us-ascii?Q?x+51CxbEtUlpfrPYtYKPmv8+XdlmUwZOZ7rsmkB76dvkN2O1vKdatmyosffK?=
+ =?us-ascii?Q?WYJWounKdVflGvXTMKuGjCdjsDbIS+wbQym24WzHoZUSSJarw5TLgAzoMyB8?=
+ =?us-ascii?Q?pNR60jdawMdEcoV8x+zVCzc8vJiEQF46yflKn1uvO0pTJ0HTic/BbWhXHO5h?=
+ =?us-ascii?Q?Mb/+5WSLY9oaQRpmSuVZJPFneIA5XvTxtAB5lKOKSLiEDDQRiSDwYqvVI/nS?=
+X-MS-Exchange-AntiSpam-MessageData-1: /9t1iWXc4iDWrjzqBDhmI+ofJdvUOp04zhM=
+X-OriginatorOrg: windriver.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3946b45f-def4-4de1-98ec-08de6ad0f5d4
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR11MB3885.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Feb 2026 07:24:44.5078
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 8ddb2873-a1ad-4a18-ae4e-4644631433be
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 8s5xl+hilMZJqG/5kKFqby90r8ZG9ykKG6sfYxmI2uaWdW+4ay8IuSV+wuhAl2ojAXPW0ys00C4/hKf3aLg5B7U/boI0rhfHcglhPGKOXTc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB8347
+X-Proofpoint-ORIG-GUID: t39__j9Yukxovcd0ChQayp59oM7JpC2z
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMjEzMDA1NSBTYWx0ZWRfX9Z1SAFV+viqz
+ 9+2lanuDa38eJeQZF8vQZdc5I36fUZUDoesJ66nZ7JVBemdGkzsypYT5MIvqtK6BIf5cLdZEwSU
+ 7kmVHMn7HGucdoVAhQOVri8EFlsFO8ycQJZDGyrFFbTcxEmPkxQlUhm5C244IibX7eF4uVDJYsZ
+ Jh5cTS5ZObP2KDRMRjPg0H/hLJI1RhMw1r36/0GjZRwrOBxV5F9uaXcYc8ZmJlXL9w0TanpyxKR
+ Ph+Tpziq5SuovNobjZt2IzdOHBiLLB5kHcTJNrhatLdSViaVorVP0FPoUAzrAfJK482GaeUUhNR
+ VkEBLbwCOEd9uDQHNDjjFfAvHbF0nPZnhAT2hXyRKKWp62GBNeijlDD3wVFXtXEmOTFh4Ajtq4k
+ awSOyofLkD+/aVCHPrUmHWWhg6wfIz2fx3EH1AhfzwaHXx7j2DvFr5UiQVYXXWk+IhnvKxu4C84
+ Hjv5PVG8ggomT3v/bhg==
+X-Proofpoint-GUID: t39__j9Yukxovcd0ChQayp59oM7JpC2z
+X-Authority-Analysis: v=2.4 cv=Cpyys34D c=1 sm=1 tr=0 ts=698ed1be cx=c_pps
+ a=O5ql0vl6PVxeYGQXc+vjrA==:117 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19
+ a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19
+ a=xqWC_Br6kY4A:10 a=HzLeVaNsDn8A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=Mpw57Om8IfrbqaoTuvik:22 a=GgsMoib0sEa3-_RKJdDe:22 a=9nd0r87i4cbtBJwJiegA:9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-02-13_01,2026-02-12_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 lowpriorityscore=0 bulkscore=0 clxscore=1015 impostorscore=0
+ priorityscore=1501 phishscore=0 suspectscore=0 adultscore=0 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2601150000 definitions=main-2602130055
 
-On 2/13/26 04:48, Ming Lei wrote:
-> On Thu, Feb 12, 2026 at 03:25:52PM +0000, Alexander Atanasov wrote:
->> Currently the code misuse GD_SUPPRESS_PART_SCAN flag
->> as it tries to use it as a switch for the auto partition scan.
->> When UBLK_F_NO_AUTO_PART_SCAN is not passed a proper
->> auto partition scanning is not done because the first
->> call to ublk_partition_scan_work will clear the bit
->> GD_SUPPRESS_PART_SCAN but not actually load the partitions.
->>
->> How it should work:
->> Unprivileged daemons - never scan partitions, they have
->> GD_SUPPRESS_PART_SCAN always set - they are marked as devices
->> without partitions. While ioctl(BLKRRPART) does require
->> CAP_SYS_ADMIN, block layer have its own a check in
->> disk_has_partscan(...) if partitions are supported.
->>
->> Trusted daemons - auto scan partitions by default
->> and they do not have the bit set, so they do have partitions.
->>
->> For trusted daemons auto partitions scan is performed but it can
->> be skipped if user have set UBLK_F_NO_AUTO_PART_SCAN flag.
->>
->> Rework the code to work as described above:
->> - remove checks in ublk_partition_scan_work and rely on
->> the caller to schedule the work only if it has to be done.
->> - keep GD_SUPPRESS_PART_SCAN always set on unprivileged
->> - keep GD_SUPPRESS_PART_SCAN always clear on trusted
->> - Properly handle user request to skip auto partitioning scanning
->>
->> Fixes: 8443e2087e70 ("ublk: add UBLK_F_NO_AUTO_PART_SCAN feature flag")
->> Signed-off-by: Alexander Atanasov <alex@zazolabs.com>
->> ---
->>   drivers/block/ublk_drv.c | 14 ++++----------
->>   1 file changed, 4 insertions(+), 10 deletions(-)
->>
->> Cc: Yoav Cohen <yoav@nvidia.com>
->>
->> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
->> index 3c918db4905c..e662c6e8e722 100644
->> --- a/drivers/block/ublk_drv.c
->> +++ b/drivers/block/ublk_drv.c
->> @@ -2361,14 +2361,9 @@ static void ublk_partition_scan_work(struct work_struct *work)
->>   	if (!disk)
->>   		return;
->>   
->> -	if (WARN_ON_ONCE(!test_and_clear_bit(GD_SUPPRESS_PART_SCAN,
->> -					     &disk->state)))
->> -		goto out;
->> -
-> 
-> It is wrong to remove clearing GD_SUPPRESS_PART_SCAN, otherwise ioctl(BLKRRPART)
-> can't succeed.
-> 
->>   	mutex_lock(&disk->open_mutex);
->>   	bdev_disk_changed(disk, false);
->>   	mutex_unlock(&disk->open_mutex);
->> -out:
->>   	ublk_put_disk(disk);
->>   }
->>   
->> @@ -4429,12 +4424,11 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
->>   
->>   	set_bit(UB_STATE_USED, &ub->state);
->>   
->> -	/* Skip partition scan if disabled by user */
->> -	if (ub->dev_info.flags & UBLK_F_NO_AUTO_PART_SCAN) {
->> +	if (!ub->unprivileged_daemons) {
->> +		/* Enable partition scanning for trusted daemons */
->>   		clear_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
->> -	} else {
->> -		/* Schedule async partition scan for trusted daemons */
->> -		if (!ub->unprivileged_daemons)
->> +		/* Skip auto partition scan if requested by user */
->> +		if (!(ub->dev_info.flags & UBLK_F_NO_AUTO_PART_SCAN))
->>   			schedule_work(&ub->partition_scan_work);
-> 
-> We may switch to disallow partition scan permanently for UBLK_F_NO_AUTO_PART_SCAN
-> per discussion in the following thread:
-> 
-> https://lore.kernel.org/linux-block/0535f4dd-ada3-414a-84c6-7abc232aa670@kernel.dk/
-> 
-> So the change may can be simplified as below, meantime
-> selftests/ublk/test_part_01.sh need to be updated.
-> 
-> Alexander, please let us know if you'd like work this way?
-> 
-> diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
-> index a88876756805..d6f479fff75b 100644
-> --- a/include/uapi/linux/ublk_cmd.h
-> +++ b/include/uapi/linux/ublk_cmd.h
-> @@ -367,8 +367,8 @@
->    */
->   #define UBLK_F_SAFE_STOP_DEV   (1ULL << 17)
-> 
-> -/* Disable automatic partition scanning when device is started */
-> -#define UBLK_F_NO_AUTO_PART_SCAN (1ULL << 18)
-> +/* Disable partition scanning */
-> +#define UBLK_F_NO_PART_SCAN    (1ULL << 18)
-> 
->   /* device state */
->   #define UBLK_S_DEV_DEAD        0
-> [root@ktest-40 linux]# git diff
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index c13cda58a7c6..f1a104222fb1 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -81,7 +81,7 @@
->                  | (IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY) ? UBLK_F_INTEGRITY : 0) \
->                  | UBLK_F_SAFE_STOP_DEV \
->                  | UBLK_F_BATCH_IO \
-> -               | UBLK_F_NO_AUTO_PART_SCAN)
-> +               | UBLK_F_NO_PART_SCAN)
-> 
->   #define UBLK_F_ALL_RECOVERY_FLAGS (UBLK_F_USER_RECOVERY \
->                  | UBLK_F_USER_RECOVERY_REISSUE \
-> @@ -4438,14 +4438,13 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
-> 
->          set_bit(UB_STATE_USED, &ub->state);
-> 
-> -       /* Skip partition scan if disabled by user */
-> -       if (ub->dev_info.flags & UBLK_F_NO_AUTO_PART_SCAN) {
-> -               clear_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
-> -       } else {
-> -               /* Schedule async partition scan for trusted daemons */
-> -               if (!ub->unprivileged_daemons)
-> -                       schedule_work(&ub->partition_scan_work);
-> -       }
-> +       /*
-> +        * Only schedule async partition scan in case of
-> +        * !UBLK_F_NO_PART_SCAN and trusted daemons
-> +        */
-> +       if (!(ub->dev_info.flags & UBLK_F_NO_PART_SCAN) &&
-> +                       !ub->unprivileged_daemons)
-> +               schedule_work(&ub->partition_scan_work);
-> 
->   out_put_cdev:
->          if (ret) {
-> diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
-> index a88876756805..d6f479fff75b 100644
-> --- a/include/uapi/linux/ublk_cmd.h
-> +++ b/include/uapi/linux/ublk_cmd.h
-> @@ -367,8 +367,8 @@
->    */
->   #define UBLK_F_SAFE_STOP_DEV   (1ULL << 17)
-> 
-> -/* Disable automatic partition scanning when device is started */
-> -#define UBLK_F_NO_AUTO_PART_SCAN (1ULL << 18)
-> +/* Disable partition scanning */
-> +#define UBLK_F_NO_PART_SCAN    (1ULL << 18)
-> 
->   /* device state */
->   #define UBLK_S_DEV_DEAD        0
-> 
-> 
-Thanks, that is precisely what I had in mind.
+Hi Jens,
 
-You can add:
+This is v4 of the fix for the RT kernel performance regression caused by
+commit 6bda857bcbb86 ("block: fix ordering between checking
+QUEUE_FLAG_QUIESCED request adding").
 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+Changes since v3 (Feb 11):
+- Rebased on top of axboe/for-7.0/block
+- Fixed Fixes tag commit hash to match upstream (6bda857bcbb86)
+- Added Reviewed-by from Sebastian Andrzej Siewior
+- No code changes
 
-Cheers,
+Changes since v2 (Feb 10):
+- Replaced raw_spinlock_t quiesce_sync_lock with atomic_t for
+  quiesce_depth, as suggested by Sebastian Andrzej Siewior
+- Eliminated QUEUE_FLAG_QUIESCED entirely; blk_queue_quiesced() now
+  checks atomic_read(&q->quiesce_depth) > 0
+- Use atomic_dec_if_positive() in blk_mq_unquiesce_queue() to avoid
+  race between WARN check and decrement
+- Removed the unrelated blk_mq_run_hw_queues() async=true change
+- Removed blk-mq-debugfs.c QUIESCED flag entry
+- Uses smp_mb__after_atomic() / smp_rmb() for memory ordering instead
+  of any spinlock in the hot path
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+Changes since v1 (RESEND, Jan 9):
+- Rebased on top of axboe/for-7.0/block
+- No code changes
+
+The problem: on PREEMPT_RT kernels, the spinlock_t queue_lock added in
+blk_mq_run_hw_queue() converts to a sleeping rt_mutex, causing all IRQ
+threads (one per MSI-X vector) to serialize. On megaraid_sas with 128
+MSI-X vectors and 120 hw queues, throughput drops from 640 MB/s to
+153 MB/s.
+
+The fix converts quiesce_depth to atomic_t, which serves as both the
+depth tracker and the quiesce indicator (depth > 0 means quiesced).
+This eliminates QUEUE_FLAG_QUIESCED and removes the need for any lock
+in the hot path. Memory ordering is ensured by smp_mb__after_atomic()
+after modifying quiesce_depth and smp_rmb() before re-checking quiesce
+state in blk_mq_run_hw_queue().
+
+Ionut Nechita (1):
+  block/blk-mq: use atomic_t for quiesce_depth to avoid lock contention
+    on RT
+
+ block/blk-core.c       |  1 +
+ block/blk-mq-debugfs.c |  1 -
+ block/blk-mq.c         | 45 ++++++++++++++++--------------------------
+ include/linux/blkdev.h |  9 ++++++---
+ 4 files changed, 24 insertions(+), 32 deletions(-)
+
+--
+2.53.0
+
