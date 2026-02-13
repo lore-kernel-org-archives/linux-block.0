@@ -1,104 +1,240 @@
-Received: from mail-pf1-f196.google.com (mail-pf1-f196.google.com [209.85.210.196])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2BBB34DB59
-	for <linux-block@vger.kernel.org>; Fri, 13 Feb 2026 09:42:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78BA034D3BD
+	for <linux-block@vger.kernel.org>; Fri, 13 Feb 2026 09:56:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770975744; cv=none; b=OEKfaZzRir8RyrrEOV7VDfgqefmnj622xb9x+i8L6TwtAA8LEtIeHAUpFNXnnpxI46lA1JtD6ALhKfIOUmt+wonpXi+h5A2eYz3dJgtCBMVKMLm62bILJ5NYsSc7AKfgPfMNXTwiNDOWIltASsaVQK4Kmm7S7xCb0LK3aVcWFUk=
+	t=1770976575; cv=none; b=Hap1B9aBSXMTESmFu/FI03a6nsnHVPckw5Xt9RbVEUyFRt3bjicrb5aNjyvBmrXNdtc3R2Pj+qDnEDwJDDn/3LDd9hCfHsbLK7a4Npn+7qrKqOfkWCWhuZaz/pPCLWRYMNrbP65gOKpAD5erWJM7VoO6v+YliNbsI02BcnXyBbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770975744; c=relaxed/simple;
-	bh=iPx/p1PDS2qSP5J+nCZnQvpqGZRAvVSgR3VaXJVUIuY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XNFnIIlL1ZfV0rGDGRreaZIqEFJbh9v7//7/WYpVOcqZX9uC52vuWJx91o9cpuBZeyJdE+h3T+iyKul1zoUbDhqlrGQfWtFXShu0huRMG620kru1Z6iQHysNBdAomwJZPyeKPAIROB4KGNNyuyW4UaSNl1kmwaeERBaUb5+soMg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iAjigQqe; arc=none smtp.client-ip=209.85.210.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1770976575; c=relaxed/simple;
+	bh=WY/dD/Y0HWJt2n1zEa25Prpk8xJdrB4VCNNbwKnasdE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oKw9n48oT9mifi7Qz6/VOqA8VGa/J6hvPecDPrrWYWmY+jAcJuM7VS46eADMufDzyt1kJcTnILyayrBZ0iL887V3iC3CtIztUfhE3uXEtNd1C40Y3PhaCkkkZzvPJwj5V3A0mx9v0L/y8FAW7KxPho/fwUgenuigpQv4zK/Mx3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=BUrXuVrU; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Ds5zlB7b; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=BUrXuVrU; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Ds5zlB7b; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iAjigQqe"
-Received: by mail-pf1-f196.google.com with SMTP id d2e1a72fcca58-824adc96ad2so792525b3a.3
-        for <linux-block@vger.kernel.org>; Fri, 13 Feb 2026 01:42:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770975743; x=1771580543; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=H9jdm9e4LpehRQOnSCiausys9F0ow8LvB9lV5cy/oWQ=;
-        b=iAjigQqeQCWezymj3tk4db3Qdz+UawGyG9f5LegvL/mpkErfrC2DXVUqhcySBdEIMs
-         zIIXndROL6VtD60wG5w68zd3aCXqk6nfAyttSKwh5piw+4Xam5c4kiz6OrMHXwPL50uk
-         wNDPtmwxnu7iHJfi5JwP1GZduZRf9zuntRzn/rUJtA2NYt+4fm5cDhDHBZdFkpjAncJ7
-         B3yExDo8kSb0MSEszQ4P5NU/6/gGjkhz4mXdopTdlas6jIXSgPaJcJIvMwBVVNovxgXg
-         HPlBDtlUoSpt/cYNqcC/XzxFZ9UdqFM+CYMA8qF2HQVzRTz3hZSNZFhRqnrVBLMB6h0+
-         goqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770975743; x=1771580543;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=H9jdm9e4LpehRQOnSCiausys9F0ow8LvB9lV5cy/oWQ=;
-        b=LdPIgSV0F1GkrUEiTwgJw4vp0+P0nHDfmHIVU54o1oYqVf+4ODZkAkK5qigeL3FEBD
-         r/WScHJwPuxZ87j5mpPK/krm4eAbwjGqyQ1Vl3E3kRi3sC/ME9CuK54C+T9WS03RvaRj
-         V8p9Bk1JxWEag3VL1O5X5SQ/0WjnZ8iOeLKtlr7jflr0B9wqCJLjaMvBPh6JCzeWQwh0
-         +vt4de3MVg6Z2q+5u2MRQmUnbCUTKEcsZxGmFxLM9A/fMeN5zFSQFbl+S58z1dgdidhk
-         /rK+dSDF5tkkx5nu+Y3g4Nh4MP0oJs4Mb2fzz4FceWuKEtl5a5eB3hWFduyibszM+Wzo
-         J+ow==
-X-Forwarded-Encrypted: i=1; AJvYcCVe1YaxgGNy1DDwdsCEOIEnIlMKIsU9iQReC9vbRdSPFz19ZQQzJCkJHijlOO7rCrh27ETLfu8uJh1a9Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxpNBd3Y7MGFZD00VzP7FTHDg+ZvCG1jjvvdIjRvlZ6P9E9V4q8
-	7ozs6apfvHMLd5B3zJBWDKRE+Xg8PXv6Kr8rnep3RmUZs3W6OcjOFVXW
-X-Gm-Gg: AZuq6aJGU3//UX3MjBg9MxU8Hh6BVBUSh5a40OOnIWWpW7qgAdftpR62/+QflyqGV0D
-	WC7mcrUGFY8+Vb+CC0Qabwm3I/RQqLYdpNmaOm6dEIeNX8mcv+xBxSud8f32lX15R2cjlAOCVnY
-	LSV5brX2FHS2rh26wn+OJHcE/jv65uxobxqM/fUNFHgEITj56A/ld9wnntlgsPDtJMlWysek7UB
-	H41mjRS3YFCIh5pvnC0pTbABQdT0SAphENVEUGY03h3+rrNwvM6ezMxKllS2u4Zsgwh7IeiU3PV
-	Ua6YTjnibfAw62JLeuijt5WoZz+s/IBSucNrDidDnrLhvGoGZp/JEf+Jc41M30T/LFtBw1X3ncy
-	YvPA4uA7MXjBykqGpaPeY93wZaLBSXm0jNkOEiIAvn/h/YxheMGN+ZftckOocPnkCqouDjomTBN
-	qlfoRA9x6PewELDjbXKPlr1DUQmh3RSdCB8A==
-X-Received: by 2002:a05:6a20:2595:b0:38d:fe2a:4b13 with SMTP id adf61e73a8af0-3946746db87mr1876262637.77.1770975743002;
-        Fri, 13 Feb 2026 01:42:23 -0800 (PST)
-Received: from archwsl.localdomain ([117.184.79.158])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c6e196accf9sm6996720a12.13.2026.02.13.01.42.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Feb 2026 01:42:22 -0800 (PST)
-From: Jialin Wang <wjl.linux@gmail.com>
-To: wjl.linux@gmail.com
-Cc: axboe@kernel.dk,
-	cgroups@vger.kernel.org,
-	josef@toxicpanda.com,
-	lianux.mm@gmail.com,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	tj@kernel.org
-Subject: Re: [RFC PATCH] blk-iocost: introduce 'linear-max' cost model for cloud disk
-Date: Fri, 13 Feb 2026 17:42:18 +0800
-Message-ID: <20260213094218.253536-1-wjl.linux@gmail.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260213073829.182168-1-wjl.linux@gmail.com>
-References: <20260213073829.182168-1-wjl.linux@gmail.com>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="BUrXuVrU";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Ds5zlB7b";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="BUrXuVrU";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Ds5zlB7b"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 9ADC45BCC4;
+	Fri, 13 Feb 2026 09:56:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1770976572; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qBJp+W6+w4hpK1AOjuJLBK8cne5W/Y5VssQKf43ZEcM=;
+	b=BUrXuVrU4Uj6JeWVtHNxu88KEqTAApBzpLUGAKfVFe2/TCfmIgy6NE5QzmaDN7DKMBOsGG
+	ZckVaiWgkkpXmcY97TGZ4774iAyr3Var34MEz9aYElUmwWpVZkMwG/fGjrNKdd43FcMP0X
+	bKV/xb9tVwCcknG0GeL6ZpYq+lL8Y5M=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1770976572;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qBJp+W6+w4hpK1AOjuJLBK8cne5W/Y5VssQKf43ZEcM=;
+	b=Ds5zlB7bv4vIWUQYT40lau/zwk7JiXqptX+FGL1vAdKrX94QpSG11m2XlfY0lzWbZ059rP
+	xa9emAAylTWn18Dw==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=BUrXuVrU;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=Ds5zlB7b
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1770976572; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qBJp+W6+w4hpK1AOjuJLBK8cne5W/Y5VssQKf43ZEcM=;
+	b=BUrXuVrU4Uj6JeWVtHNxu88KEqTAApBzpLUGAKfVFe2/TCfmIgy6NE5QzmaDN7DKMBOsGG
+	ZckVaiWgkkpXmcY97TGZ4774iAyr3Var34MEz9aYElUmwWpVZkMwG/fGjrNKdd43FcMP0X
+	bKV/xb9tVwCcknG0GeL6ZpYq+lL8Y5M=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1770976572;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qBJp+W6+w4hpK1AOjuJLBK8cne5W/Y5VssQKf43ZEcM=;
+	b=Ds5zlB7bv4vIWUQYT40lau/zwk7JiXqptX+FGL1vAdKrX94QpSG11m2XlfY0lzWbZ059rP
+	xa9emAAylTWn18Dw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 813873EA62;
+	Fri, 13 Feb 2026 09:56:12 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 5S3eHjz1jmngDgAAD6G6ig
+	(envelope-from <dwagner@suse.de>); Fri, 13 Feb 2026 09:56:12 +0000
+Date: Fri, 13 Feb 2026 10:56:11 +0100
+From: Daniel Wagner <dwagner@suse.de>
+To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, 
+	"nbd@other.debian.org" <nbd@other.debian.org>, "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
+Subject: Re: blktests failures with v6.19 kernel
+Message-ID: <6ad314f7-f3d2-495a-b1ef-a81a06498952@flourine.local>
+References: <aY7ZBfMjVIhe_wh3@shinmob>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aY7ZBfMjVIhe_wh3@shinmob>
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	URIBL_BLOCKED(0.00)[suse.de:dkim,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
+X-Spam-Flag: NO
+X-Spam-Score: -4.51
+X-Rspamd-Queue-Id: 9ADC45BCC4
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spam-Level: 
 
-> This formula correctly models the dual-bucket behavior of cloud disks.
-> It ensures that for any block size, the calculated cost aligns with the
-> actual bottleneck (IOPS or BPS). This allows the system to reach close
-> to the provisioned BPS/IOPS limits without premature throttling, while
-> still maintaining the latency protection benefits of iocost.
+On Fri, Feb 13, 2026 at 07:57:58AM +0000, Shinichiro Kawasaki wrote:
+> [3] lockdep WARN during nvme/058 with fc transport
+> 
+> [  409.028219] [     T95] ============================================
+> [  409.029133] [     T95] WARNING: possible recursive locking detected
+> [  409.030058] [     T95] 6.19.0+ #575 Not tainted
+> [  409.030892] [     T95] --------------------------------------------
+> [  409.031801] [     T95] kworker/u16:9/95 is trying to acquire lock:
+> [  409.032691] [     T95] ffff88813ba54948 ((wq_completion)nvmet-wq){+.+.}-{0:0}, at: touch_wq_lockdep_map+0x7e/0x1a0
+> [  409.033869] [     T95] 
+>                           but task is already holding lock:
+> [  409.035254] [     T95] ffff88813ba54948 ((wq_completion)nvmet-wq){+.+.}-{0:0}, at: process_one_work+0xeef/0x1480
+> [  409.036383] [     T95] 
+>                           other info that might help us debug this:
+> [  409.037769] [     T95]  Possible unsafe locking scenario:
+> 
+> [  409.039113] [     T95]        CPU0
+> [  409.039781] [     T95]        ----
+> [  409.040406] [     T95]   lock((wq_completion)nvmet-wq);
+> [  409.041154] [     T95]   lock((wq_completion)nvmet-wq);
+> [  409.041898] [     T95] 
+>                            *** DEADLOCK ***
+> 
+> [  409.043609] [     T95]  May be due to missing lock nesting notation
+> 
+> [  409.044960] [     T95] 3 locks held by kworker/u16:9/95:
+> [  409.045721] [     T95]  #0: ffff88813ba54948 ((wq_completion)nvmet-wq){+.+.}-{0:0}, at: process_one_work+0xeef/0x1480
+> [  409.046845] [     T95]  #1: ffff888109797ca8 ((work_completion)(&assoc->del_work)){+.+.}-{0:0}, at: process_one_work+0x7e4/0x1480
+> [  409.048063] [     T95]  #2: ffffffffac481480 (rcu_read_lock){....}-{1:3}, at: __flush_work+0xe3/0xc70
+> [  409.049128] [     T95] 
+>                           stack backtrace:
+> [  409.050366] [     T95] CPU: 1 UID: 0 PID: 95 Comm: kworker/u16:9 Not tainted 6.19.0+ #575 PREEMPT(voluntary) 
+> [  409.050370] [     T95] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-4.fc42 04/01/2014
+> [  409.050373] [     T95] Workqueue: nvmet-wq nvmet_fc_delete_assoc_work [nvmet_fc]
+> [  409.050384] [     T95] Call Trace:
+> [  409.050386] [     T95]  <TASK>
+> [  409.050388] [     T95]  dump_stack_lvl+0x6a/0x90
+> [  409.050393] [     T95]  print_deadlock_bug.cold+0xc0/0xcd
+> [  409.050401] [     T95]  __lock_acquire+0x1312/0x2230
+> [  409.050408] [     T95]  ? lockdep_unlock+0x5e/0xc0
+> [  409.050410] [     T95]  ? __lock_acquire+0xd03/0x2230
+> [  409.050413] [     T95]  lock_acquire+0x170/0x300
+> [  409.050415] [     T95]  ? touch_wq_lockdep_map+0x7e/0x1a0
+> [  409.050418] [     T95]  ? __flush_work+0x4e8/0xc70
+> [  409.050420] [     T95]  ? find_held_lock+0x2b/0x80
+> [  409.050423] [     T95]  ? touch_wq_lockdep_map+0x7e/0x1a0
+> [  409.050425] [     T95]  touch_wq_lockdep_map+0x97/0x1a0
+> [  409.050428] [     T95]  ? touch_wq_lockdep_map+0x7e/0x1a0
+> [  409.050430] [     T95]  ? __flush_work+0x4e8/0xc70
+> [  409.050432] [     T95]  __flush_work+0x5c1/0xc70
+> [  409.050434] [     T95]  ? __pfx___flush_work+0x10/0x10
+> [  409.050436] [     T95]  ? __pfx___flush_work+0x10/0x10
+> [  409.050439] [     T95]  ? __pfx_wq_barrier_func+0x10/0x10
+> [  409.050444] [     T95]  ? __pfx___might_resched+0x10/0x10
+> [  409.050454] [     T95]  nvmet_ctrl_free+0x2e9/0x810 [nvmet]
+> [  409.050474] [     T95]  ? __pfx___cancel_work+0x10/0x10
+> [  409.050479] [     T95]  ? __pfx_nvmet_ctrl_free+0x10/0x10 [nvmet]
+> [  409.050498] [     T95]  nvmet_cq_put+0x136/0x180 [nvmet]
+> [  409.050515] [     T95]  nvmet_fc_target_assoc_free+0x398/0x2040 [nvmet_fc]
+> [  409.050522] [     T95]  ? __pfx_nvmet_fc_target_assoc_free+0x10/0x10 [nvmet_fc]
+> [  409.050528] [     T95]  nvmet_fc_delete_assoc_work.cold+0x82/0xff [nvmet_fc]
+> [  409.050533] [     T95]  process_one_work+0x868/0x1480
+> [  409.050538] [     T95]  ? __pfx_process_one_work+0x10/0x10
+> [  409.050541] [     T95]  ? lock_acquire+0x170/0x300
+> [  409.050545] [     T95]  ? assign_work+0x156/0x390
+> [  409.050548] [     T95]  worker_thread+0x5ee/0xfd0
+> [  409.050553] [     T95]  ? __pfx_worker_thread+0x10/0x10
+> [  409.050555] [     T95]  kthread+0x3af/0x770
+> [  409.050560] [     T95]  ? lock_acquire+0x180/0x300
+> [  409.050563] [     T95]  ? __pfx_kthread+0x10/0x10
+> [  409.050565] [     T95]  ? __pfx_kthread+0x10/0x10
+> [  409.050568] [     T95]  ? ret_from_fork+0x6e/0x810
+> [  409.050576] [     T95]  ? lock_release+0x1ab/0x2f0
+> [  409.050578] [     T95]  ? rcu_is_watching+0x11/0xb0
+> [  409.050582] [     T95]  ? __pfx_kthread+0x10/0x10
+> [  409.050585] [     T95]  ret_from_fork+0x55c/0x810
+> [  409.050588] [     T95]  ? __pfx_ret_from_fork+0x10/0x10
+> [  409.050590] [     T95]  ? __switch_to+0x10a/0xda0
+> [  409.050598] [     T95]  ? __switch_to_asm+0x33/0x70
+> [  409.050602] [     T95]  ? __pfx_kthread+0x10/0x10
+> [  409.050605] [     T95]  ret_from_fork_asm+0x1a/0x30
+> [  409.050610] [     T95]  </TASK>
 
-This model still has some limitations. Under workloads with mixed IO sizes and
-vrate max at 100%, it fail to fully saturate the hardware performance.
-However, it still demonstrates a clear improvement over the linear model.
+nvmet_fc_target_assoc_free runs in the nvmet_wq context and calls
 
-The following fio benchmarks were conducted with two cgroups assigned equal weights:
+  nvmet_fc_delete_target_queue
+    nvmet_cq_put
+      nvmet_cq_destroy
+        nvmet_ctrl_put
+         nvmet_ctrl_free
+           flush_work(&ctrl->async_event_work);
+           cancel_work_sync(&ctrl->fatal_err_work);
+ 
+The async_event_work could be running on nvmet_wq. So this deadlock is
+real. No idea how to fix it yet.
 
-Cgroup A: fio --bs=32k ...
-Cgroup B: fio --bs=1M  ...
+> [4] WARN during nvme/058 fc transport
+> 
+> [ 1410.913156] [   T1369] WARNING: block/genhd.c:463 at __add_disk+0x87b/0xd50, CPU#0: kworker/u16:12/1369
 
-Results:
+	/*
+	 * If the driver provides an explicit major number it also must provide
+	 * the number of minors numbers supported, and those will be used to
+	 * setup the gendisk.
+	 * Otherwise just allocate the device numbers for both the whole device
+	 * and all partitions from the extended dev_t space.
+	 */
+	ret = -EINVAL;
+	if (disk->major) {
+		if (WARN_ON(!disk->minors))
+			goto out;
 
-Model       | Cgroup A (32k)         | Cgroup B (1M)        | Total
-------------+------------------------+----------------------|----------------------
-linear      | 1137 IOPS (35.5 MiB/s) | 79 IOPS (79.5 MiB/s) | 1216 IOPS 115.0 MiB/s
-linear-max  | 1781 IOPS (55.7 MiB/s) | 83 IOPS (83.9 MiB/s) | 1864 IOPS 139.6 MiB/s
+If I read the correct, the gendisk is allocated in nvme_mpath_alloc_disk
+and then added due the ANA change in nvme_update_ana_state. Not sure if
+this is really fc related but I haven't really figured out how this part
+of the code yet.
