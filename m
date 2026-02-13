@@ -1,225 +1,132 @@
-Received: from mail-pf1-f195.google.com (mail-pf1-f195.google.com [209.85.210.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F4272FF158
-	for <linux-block@vger.kernel.org>; Fri, 13 Feb 2026 07:38:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6484112CDBE;
+	Fri, 13 Feb 2026 07:44:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770968316; cv=none; b=texkMBrqM20892oVnHDuG/zNnJYFW9UGi5HHc74wlIUMbRvBllEpvNpTpTyooyGTexfy68OBk0JkrUjNGsnCRfOnN7uVXZwVBF7DVXU/V0FjuAe3CK0xj/Q3q1ycqbBAnv3SLgM0hQvgq4WD6BqQugDirYY6up014hAGqJZVfQY=
+	t=1770968661; cv=none; b=LtdhLpzFYegW5k9KTtq7SqQUpgUtccruChEEXeQVv+t3krq+hiyLsPNL1Os5kCkBW6LsTiW0r+4x1OOyU1PuDcl4Gteii57ybP0QWI/mWLbktF5iHwO6XpfjeIlyVAvRbnXEDVUTYhNQFKPVxlq/orw+0590EAabsN93j3dWMYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770968316; c=relaxed/simple;
-	bh=HNCSRMt+uVOtWUpx9BoHkeZenvzhAbsE081cSwO+Qw0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XdMLymmJLXRt6/8MqGswsTPumvbBp4xDOWrHWHvkV65PQOW7H+L5v5yj4tlGlam8gjR7BW4Zd3W2patPlyOZzRtqlwTKC2VCab9EiTeUk26n/bGjNxAgCR+6xi/NXpKEFrDqMIdG1ADLsGwNVOWezdfd6ewF7JY7fhNcaABLUOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fDr4/+Ey; arc=none smtp.client-ip=209.85.210.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1770968661; c=relaxed/simple;
+	bh=Iej+NEixDFiICkcJ7oW5RSH+XN+y2EQLVBJ6GPt8NCU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R4lJ0pJhch1qXgpazAo1Fa5e/YKMJLiT9KmGA9yYvHQp7iz6u351oKWVQTOS3vj74pdW42aS7mIJAzte/v85+TPMjMtz/f2hhIb5+TH6a+xQYZM9gH1egScmqP8Gmc7uX/kBimCerY9Q0DJJMu23nrl5lTfUx9l2Y6cq54uQ73w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ORrtKGXM; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fDr4/+Ey"
-Received: by mail-pf1-f195.google.com with SMTP id d2e1a72fcca58-82418b0178cso467373b3a.1
-        for <linux-block@vger.kernel.org>; Thu, 12 Feb 2026 23:38:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1770968315; x=1771573115; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=TUNbAPwCyhGMoDBC5WsOOsA+LVhyxhs3/AZuxGFmVLQ=;
-        b=fDr4/+Ey4gxFhAoGsNGFV0vOB2RPktLXpGndCXHa6/RCOAdOXdzdU8onGUqxf9hr2G
-         U0YNmganwdBfBPSxfAMZ27VU7ZmGkTSfdmc7B1l3Iv8Jgi8FjTtnR5KRTzuJhL6ys1Vw
-         WreOEzDnFjFUetpD7qf7mqtEwF+n9w8TsI/Z2xQWHwIVivOI6O2e7L2+nTQUSxv7EZSR
-         SmolaOo52hE+XMXrca0YeBT/SFdrMd9JuSNjvfHgcNxoPOAJU/ufIglT8+Z/J6M5HxE8
-         CHgoibOXZ/tBog6MGU8yEobXzydNbfqMpbWJt8dQueezjW5yp/Wq4uGs9YbiMBc/m0Qx
-         +n0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770968315; x=1771573115;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TUNbAPwCyhGMoDBC5WsOOsA+LVhyxhs3/AZuxGFmVLQ=;
-        b=Cz0LranDp8Spfnzie3hhL6NOZ5DwthL8E5OV9E78AokDkoHAu+CkK53d4AiDBjb0nw
-         9wXfiIMbevdwoBuYLdfBjBivxnVlKzuRe0oR+Ky5sCvF+POJ9akpqXvBWBP9iUNe6VV3
-         obC0ZqTCPgPH5FsGl51BY6DHa8p8euy25GwKIbFUiTgWsr31QTZm839VIxQz9k2nOXVq
-         z54QxWVCWxPSOIQZfr8QFjfHoR8i9Fu1BVHT70skywlACBf11qEHHICU0or7AfC86npW
-         W9p7VUItZEWUqQI91VmI7dfjdbZtmy7nk+WwUrXrrofVeaou5MvRfEYvyOsjI0BoHORc
-         lihA==
-X-Forwarded-Encrypted: i=1; AJvYcCUBJj3GpIBOfwTu32GYcJKZDTHrwnPiECl1v8AfW+ju6Aet+J1KjA7IC0xq/Xe/MGmNO4uzDEYtGVkeAg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxk0q0ZUenl3HclnOZpA3QbvAfJB9M1eKszXXGpwGmfrQ/doxkF
-	VUbdrA6DzBIitPMNdkAGpsx3qX3f636L0kCMeC6ujDNVKUi3BTj4k1lb
-X-Gm-Gg: AZuq6aK54aZzrGIcsZeT/tUHEFE8kTRiTf9VijUl50bTP9trURj7XseS/qB6TXfy+FJ
-	OnzHYBIYGtGYWhygw/03fMd+n0B3KbSY3XyedftDEWtQj1rkUqF9DqCmIUIFHN9l3hF3tQiRRGN
-	qBErU6W3gyXYqlcN99VV7f5v6rot17MN1T/ldpaGV8AdOtH6YPtrS3t0LdjqNeoA230CT4Qo1t/
-	LZUMi5PpPoOTEhD3mdV4V6DOoW2gi7rpaQLXIjqMndnNr4marIIYYIdW/mGKfTDgzbV6ihx8DjJ
-	RRD8SFfxg6oMvhyju1preEivN9jUAcGc/r6k8LZBTq6/dO3nXXYtVQRcv3I6iuIm25L46q5Qihy
-	wbCDVDIDLOWWXs/84fPu265X/MPXWIX0NT2aBGU5lrTiX9eYG4wq+e7m360qgl80MAyuWsptzoC
-	LUmd4u09O5c2nfe555RshiQHywtP7n2McO8Q==
-X-Received: by 2002:a05:6a00:2e85:b0:824:ae74:5725 with SMTP id d2e1a72fcca58-824c95c3afemr1122224b3a.35.1770968314668;
-        Thu, 12 Feb 2026 23:38:34 -0800 (PST)
-Received: from archwsl.localdomain ([117.184.79.158])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-824c6a2e936sm1498959b3a.6.2026.02.12.23.38.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Feb 2026 23:38:34 -0800 (PST)
-From: Jialin Wang <wjl.linux@gmail.com>
-To: tj@kernel.org,
-	josef@toxicpanda.com,
-	axboe@kernel.dk
-Cc: lianux.mm@gmail.com,
-	cgroups@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jialin Wang <wjl.linux@gmail.com>
-Subject: [RFC PATCH] blk-iocost: introduce 'linear-max' cost model for cloud disk
-Date: Fri, 13 Feb 2026 15:38:29 +0800
-Message-ID: <20260213073829.182168-1-wjl.linux@gmail.com>
-X-Mailer: git-send-email 2.52.0
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ORrtKGXM"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=PzJr18DZCPt/Rt8pwbA8DQVW7RLNjlPlz5tg8FEv8Uo=; b=ORrtKGXMwe9+5jo5T7ZNsDHk41
+	C99i/Ik0qJMDNMJhJLgXyDn+ja1G0rjvFtk7FXps2aUX1s92YauyBMsgo3ib+iSYmAslzhRsuhoKa
+	ahd8YGCJouB39S64xocDe4pOT/PTrg6sKKckqxJAhbGbnxpNxy+zgId1882VWGfYAfJcw5B/ksQM9
+	1hhY8s4BMPQ7zWlJkwjdqaaF9q11fNuPfq7L7eiC0JbnuyZjLKP4bfnqq8ZTboPDROR/RAzkZnwVT
+	ho9f+DkwA84IeSLC78AlZ0meApdqVF/I6pYqyePaTnJEgjrc6a0qowzWF1JhXuoI/2LGkty6SGxP5
+	46/zA5mw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vqnqd-000000037dK-3F8S;
+	Fri, 13 Feb 2026 07:44:19 +0000
+Date: Thu, 12 Feb 2026 23:44:19 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Andreas Hindborg <a.hindborg@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] block: update docs for bio and bvec_iter
+Message-ID: <aY7WU_q6au3HgX6W@infradead.org>
+References: <20260212-bvec_iter-docs-v1-1-888607db0ddc@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260212-bvec_iter-docs-v1-1-888607db0ddc@kernel.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-In public cloud environments, block devices usually enforce performance
-limits based on two independent token buckets: IOPS and BPS. The device
-is throttled when either the IOPS limit or the BPS limit is reached.
+On Thu, Feb 12, 2026 at 06:17:03PM +0100, Andreas Hindborg wrote:
+> The documentation for bio and bvec_iter refers to a vector named bvl_vec.
+> This does not exis. Update the documentation comment with the correct name.
+> 
+> Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
+> ---
+>  include/linux/blk_types.h | 2 +-
+>  include/linux/bvec.h      | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+> index 5dc061d318a45..10403145a4510 100644
+> --- a/include/linux/blk_types.h
+> +++ b/include/linux/blk_types.h
+> @@ -271,7 +271,7 @@ struct bio {
+>  	 * Everything starting with bi_max_vecs will be preserved by bio_reset()
+>  	 */
+>  
+> -	unsigned short		bi_max_vecs;	/* max bvl_vecs we can hold */
+> +	unsigned short		bi_max_vecs;	/* max count of bio_vec we can hold */
 
-To effectively manage "noisy neighbor" problems, we configure iocost
-model parameters (or vrate max) to approximately 95% of the cloud
-provider's provisioned limits. The goal is to strictly avoid hitting
-the storage backend's hard BPS/IOPS limits. By saturating the virtual
-budget before the physical limit, iocost engages throttling first.
-Unlike the indiscriminate throttling applied by cloud storage backends,
-iocost selectively penalizes low-weight cgroups or heavy-traffic
-perpetrators. Consequently, IO-latency-sensitive critical workloads
-remain entirely unaffected by the congestion. Extensive testing has
-verified that this approach yields excellent isolation results.
+If you want to touch it make it actually correct, as the story is
+rather complicated:
 
-However, the existing 'linear' cost model leads to significant
-performance loss in this specific configuration due to its additive
-nature.
+	/*
+	 * Number of elements in bi_io_vec that were allocated for this bio.
+	 * Only used by the bio submitter to make bio_add_page fail once full
+	 * and freeing the bi_io_vec allocation.  Must not be used in drivers
+	 * and does not hold a useful value for cloned bios.
+	 */
 
-Using tools/cgroup/iocost_coef_gen.py, we measured the following
-performance data on a typical cloud disk:
+>  
+>  	atomic_t		__bi_cnt;	/* pin count */
+>  
+> diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+> index 3fc0efa0825b1..a05e792e6c216 100644
+> --- a/include/linux/bvec.h
+> +++ b/include/linux/bvec.h
+> @@ -79,7 +79,7 @@ struct bvec_iter {
+>  						   sectors */
+>  	unsigned int		bi_size;	/* residual I/O count */
+>  
+> -	unsigned int		bi_idx;		/* current index into bvl_vec */
+> +	unsigned int		bi_idx;		/* current index into bi_io_vec */
 
-8:16 rbps=173471131 rseqiops=3566 rrandiops=3566 wbps=173333269 wseqiops=3566 wrandiops=3559
+Also not quite correct.  The bvec_iter can be used for bvec array that
+are not part of a bio. So more something like:
 
-Dividing BPS by IOPS (173471131 / 3566) yields approximately 48607
-bytes. When running fio with bs=48607, we observed a 50% drop in
-throughput compared to running without iocost enabled.
+	/* current index into the bvec array */
+	unsigned int		bi_idx;
 
-The reason is that the current 'linear' model calculates cost as:
+Also to make this useful I think all the comments on the iter fields
+need a bit of polishing as the description is rather terse and often
+misleading.
 
-  Cost = BaseCost + (Pages * PerPageCost)
+Maybe something like:
 
-Expanding the internal variables relative to IOPS and BPS, this is
-effectively:
+struct bvec_iter {
+	/*
+	 * Current device address in 512 byte sectors.
+	 * Only updated by the bio iter wrappers and not the bvec iterator
+	 * helpers themselves.
+	 */
+	 sector_t		bi_sector;
 
-  Cost = VTIME_PER_SEC * ((1 / IOPS - 4096 / BPS) + size / BPS)
+	/*
+	 * Remaining size in bytes.
+	 */
+	unsigned int		bi_size;
 
-When the I/O size is such that the IOPS cost component roughly equals
-the BPS cost component (as in the bs=48607 case above), the linear
-model sums them up. Since cloud disks throttle based on *either* IOPS
-*or* BPS (whichever is exhausted first), summing them effectively
-doubles the calculated cost. This causes iocost to drain virtual time
-twice as fast as necessary, throttling the device to 50% utilization.
+	/*
+	 * Current index into the bvec array.  The actual current
+	 * synthetic bvec is still offset from the caller provided entry
+	 * by bio_bvec_done.
+	 */
+	unsigned int		bi_idx;
 
-To solve this, this patch introduces a new 'linear-max' cost model.
-Instead of adding the components, it takes the maximum:
-
-  Cost = VTIME_PER_SEC * max(1 / IOPS, size / BPS)
-
-Which translates to:
-
-  Cost = max(BaseCost + PerPageCost, Pages * PerPageCost)
-
-This formula correctly models the dual-bucket behavior of cloud disks.
-It ensures that for any block size, the calculated cost aligns with the
-actual bottleneck (IOPS or BPS). This allows the system to reach close
-to the provisioned BPS/IOPS limits without premature throttling, while
-still maintaining the latency protection benefits of iocost.
-
-Signed-off-by: Jialin Wang <wjl.linux@gmail.com>
----
- block/blk-iocost.c | 21 ++++++++++++++++++---
- 1 file changed, 18 insertions(+), 3 deletions(-)
-
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index ef543d163d46..ead478d8e5bc 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -445,6 +445,7 @@ struct ioc {
- 	int				autop_idx;
- 	bool				user_qos_params:1;
- 	bool				user_cost_model:1;
-+	bool				cost_model_linear_max:1;
- };
- 
- struct iocg_pcpu_stat {
-@@ -2565,7 +2566,12 @@ static void calc_vtime_cost_builtin(struct bio *bio, struct ioc_gq *iocg,
- 			cost += coef_seqio;
- 		}
- 	}
--	cost += pages * coef_page;
-+
-+	if (ioc->cost_model_linear_max)
-+		cost = max(cost + coef_page, pages * coef_page);
-+	else
-+		cost += pages * coef_page;
-+
- out:
- 	*costp = cost;
- }
-@@ -3368,10 +3374,11 @@ static u64 ioc_cost_model_prfill(struct seq_file *sf,
- 		return 0;
- 
- 	spin_lock(&ioc->lock);
--	seq_printf(sf, "%s ctrl=%s model=linear "
-+	seq_printf(sf, "%s ctrl=%s model=%s "
- 		   "rbps=%llu rseqiops=%llu rrandiops=%llu "
- 		   "wbps=%llu wseqiops=%llu wrandiops=%llu\n",
- 		   dname, ioc->user_cost_model ? "user" : "auto",
-+		   ioc->cost_model_linear_max ? "linear-max" : "linear",
- 		   u[I_LCOEF_RBPS], u[I_LCOEF_RSEQIOPS], u[I_LCOEF_RRANDIOPS],
- 		   u[I_LCOEF_WBPS], u[I_LCOEF_WSEQIOPS], u[I_LCOEF_WRANDIOPS]);
- 	spin_unlock(&ioc->lock);
-@@ -3412,6 +3419,7 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
- 	struct ioc *ioc;
- 	u64 u[NR_I_LCOEFS];
- 	bool user;
-+	bool linear_max;
- 	char *body, *p;
- 	int ret;
- 
-@@ -3442,6 +3450,7 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
- 	spin_lock_irq(&ioc->lock);
- 	memcpy(u, ioc->params.i_lcoefs, sizeof(u));
- 	user = ioc->user_cost_model;
-+	linear_max = ioc->cost_model_linear_max;
- 
- 	while ((p = strsep(&body, " \t\n"))) {
- 		substring_t args[MAX_OPT_ARGS];
-@@ -3464,7 +3473,11 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
- 			continue;
- 		case COST_MODEL:
- 			match_strlcpy(buf, &args[0], sizeof(buf));
--			if (strcmp(buf, "linear"))
-+			if (!strcmp(buf, "linear"))
-+				linear_max = false;
-+			else if (!strcmp(buf, "linear-max"))
-+				linear_max = true;
-+			else
- 				goto einval;
- 			continue;
- 		}
-@@ -3481,8 +3494,10 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
- 	if (user) {
- 		memcpy(ioc->params.i_lcoefs, u, sizeof(u));
- 		ioc->user_cost_model = true;
-+		ioc->cost_model_linear_max = linear_max;
- 	} else {
- 		ioc->user_cost_model = false;
-+		ioc->cost_model_linear_max = false;
- 	}
- 	ioc_refresh_params(ioc, true);
- 	spin_unlock_irq(&ioc->lock);
--- 
-2.52.0
-
+	/*
+	 * Current offset in the bvec entry pointed to by by_idx.
+	 */
+	unsigned int            bi_bvec_done;
+}
