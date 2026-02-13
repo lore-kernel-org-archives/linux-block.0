@@ -1,257 +1,285 @@
-Received: from mail.itpri.com (mx1.itpri.com [185.125.111.158])
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D9A11F03EF
-	for <linux-block@vger.kernel.org>; Fri, 13 Feb 2026 11:05:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.111.158
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770980749; cv=none; b=RyiwsarBb79L1ZBJy9iou6bk9i3lHxk2kg4g9Uo5cPkiXjHbzHMiMNLSEzfko1ILx38+F6KpwgyT91AFH9iEVLm3LELG6uqdbiAKq0Sxhyp/dm8cw5urYO4FcL7nAm4wLMYd3MfdCPMJM4IbjmGWDyiK24QN8OQ5iYw5FuEVm3w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770980749; c=relaxed/simple;
-	bh=jkkcB6ll+qcxHW2AYIBSAKgfMB1n7DIqZsmsZPxBk58=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=n5cV/tqd9mmNgu5vFiUdMot2+rvTVbbObUVV55DWC/Dp57Bf8Ul7vnhC7XPbwNVw1CmpK8i/G9txF2M0XoizDvcvA69l01NYm9asheuqQKpygw1ReC+xFFHDFm+z2I9xuI2dKE0zSq5NbOADOa5JAo8emslIZTEXMA3QDGroexM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zazolabs.com; spf=pass smtp.mailfrom=zazolabs.com; dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b=TpjLFztq; arc=none smtp.client-ip=185.125.111.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zazolabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zazolabs.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EC5A313554;
+	Fri, 13 Feb 2026 11:24:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.143.124
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770981844; cv=fail; b=uwaLBkFhMrIJjIyPXC4WqF+ef5ayOBM/WkO9vwvNt2+oar8MUjOtf3UkGzBL5jrgj4JkbA+9Mee3c/8YqjiscMr1OSTK76lSxd1/KvSt2JMhQF/lI71Qzncvf3ovXJNZIhr6/uTNwUXSKRVDf88f5DxuQ8TYIUfmDoJzbOt0BlM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770981844; c=relaxed/simple;
+	bh=2L37C/C4et87riNeGxH2M6wlMxKrL6CCFFpyUDodoz0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=ilIHgvQNgnJCgAtqWoA2/oUS4+vCoxaEpdx/b/QflBIoMS8jm33VCO9GvGkoUt3Q9kG/8Lh0FcCMRh6uszet5oq9N5oGNFcMxmUOo/8SyU2M/9CC3HOHqlAdKliXJRY2Bey1ksR4nqBQHlsUut7BG3uhUvuwdacVn9Go+ZJzhQQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=PDfM5u+U; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=Jw8oQPPU; arc=fail smtp.client-ip=68.232.143.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b="TpjLFztq"
-X-Virus-Scanned: Yes
-Message-ID: <efe851c6-cb40-4e6f-a382-047b33753ee1@zazolabs.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=zazolabs.com; s=mail;
-	t=1770980742; bh=jkkcB6ll+qcxHW2AYIBSAKgfMB1n7DIqZsmsZPxBk58=;
-	h=Subject:To:Cc:References:From:In-Reply-To;
-	b=TpjLFztqlAtJ73QvMC1Z2xj7uD4rIEDAmKjAl3dwz4kIk3Y3guuqnsyZ3WGc1jqYS
-	 JtzFceQ3tD87gexeLrdIE10nrBSveak8Kr/cVfoi4SJxCHcKN6ATBaLqZzVz4EfkK4
-	 EKQDDhcoM0h6z2VaKcl97jsjIOHmKKNV5xhOeEhpXmwsHJcoGZkCqTK4ffa4U8Iis3
-	 6/k0mCBLMbliH8o99Cj1UHmlOB/U3jVKT2E0JPEJe20fS/rO5qqXJDZj31CniA1CS+
-	 Qv2w11UAw016cTdzQgBsfk68rJ0faNae/npotyYdxbHUfbaKG9Nhopfwo/F/ylAZvt
-	 wVw2UkPte32Br+jdyv1cEsHaRtnS9IXU4F4Lg+KuEOc5msIC/H7oO3SUtgZ427TUqA
-	 Kc7683tnGblmDA/+YgjLYNMugWGjwBpxFeUYjfkY1zYGaqC591qfQ8sVTqb0vfLjdA
-	 /V/idK4J6ouYmA25Y3iL9iNtBE1aA7tBBM0KkzsJnBpmPaE4tOPF8k/akM0FmtrV/v
-	 E0Puqagbv/thTHyaW48N/8OXHwUMYm+k1EfZXxO10THD6gg44vNA5EqpsQZ8wJ7HpP
-	 YKkCATb9O48UlYBVcHjhMZF38nOYuKeEBPGJ/VPg/ozUwMGlqGU1O5ExtJa7NFhch1
-	 zt1pBEqx81FVp3aWQlOXOGsM=
-Date: Fri, 13 Feb 2026 13:05:40 +0200
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="PDfM5u+U";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="Jw8oQPPU"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1770981840; x=1802517840;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=2L37C/C4et87riNeGxH2M6wlMxKrL6CCFFpyUDodoz0=;
+  b=PDfM5u+UWrW8yV9fh79gd+2j2t5tjtCNKBFqlEHvx+TC0PGeK6Zs52Y6
+   zTMJzW+60ZKQVXB1DC4+UANpa5pXt33vqy0DrgvfWwZ46e1fJRbeBGOqe
+   G6v+oi55jKmJ7UOJ8PqezCRyAV6slxd401ON5p5lKg2+JDwruc3HDG0XL
+   aG/FA0YA4zGw3VYFfg6hKFupfVsKTy25wjk+/+KQ7sq8T+D0soSJUXywQ
+   QjQwztoSN/Q76Clw0zq7/GOLBEJHRy0mtVCgBECkKN7G2RvSSRBuu+jkq
+   QMpbqSfSBeTSLOqwv8laqGI+Hk2Vc9cNWJUdbyA5xoVeWdh83YN4pDV/C
+   Q==;
+X-CSE-ConnectionGUID: tbA7b9HfS4WSnKTs0Eezfg==
+X-CSE-MsgGUID: SCHwFnfAQkyLa4cojnyEFw==
+X-IronPort-AV: E=Sophos;i="6.21,288,1763395200"; 
+   d="scan'208";a="141832040"
+Received: from mail-centralusazon11011030.outbound.protection.outlook.com (HELO DM5PR21CU001.outbound.protection.outlook.com) ([52.101.62.30])
+  by ob1.hgst.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 13 Feb 2026 19:23:53 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=svTL+/0yZCykSOqCv+ekjKkoPeLzS3HmI3T9LokaFrCm9Ce5cZP31RJeZhCxPkUGOwl+CwDhCQtXZzs1QYfmL8l0vHqPMn++xnfNlMj17jqd1B5CDhzeDdTZH4YwpttTezN8mOpOsm+V15bonpzcmpMu3a/n023NowMK9sz/1gb0STa++kU0y5/vj2x2FC7H3lJPWJJJ7AOJhYEuxaWFEXpT2NQZS9G/dmg9lP/flwqU2v+nTCvGlf3tzlbsbRE6rJ2OVZ4HWFDmwjxnUDLa/L4jvFfNEzvCUk9plpdARmchGphxsCEtqzcQB6BjiV+QAxLdOx07QNqKAGreMuG43Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xM+xBFSs8FX2O4WgnTaDbyw5QyvdJNNWGbyA+zP9veI=;
+ b=cfgWQ2nZ4c0nYRkv+XSh7NL6tGnfZIEghWKOZCNkICBAO8i9Zoq/1xyygPahkD//wWR0bfTilot2PvitOF8alARLOjjxn+LgSwqit7lnTB3LBCdql25AjmlVoSg+IGtfe+fZNUVIQcVia1JoGEZCmjzqssKlysRhvWPK0C0U+JnS0fOQKbmLFfYuNYH+33sqhTlXtIxZFEK/4Wb3CBanr9OGymDFVSoQnickh5085TDqXrCtAfHtpo7XUjYJVdOn1F/otmaA9XhW6wfTjajegQq4ohYB7SECo1jGz2YHP5mTSZ0PgwRGGyGqMxwLCKzN3YN0YzW0r3OP4uqDUaps5g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xM+xBFSs8FX2O4WgnTaDbyw5QyvdJNNWGbyA+zP9veI=;
+ b=Jw8oQPPUodhayZIq8fP+PlEim73x3pcvRgawSuabwmKNLbpZtcOPHZg5QlN8onY39eP7k6w1B4IOwVTb4hk9EKCjvi6VWy30regxywIFUvqCtoztkrSCYzgBcnNlArFHnqZUWM+IbSeF05GObryDn47Fl1XVndEhacoq8FzjazQ=
+Received: from SN7PR04MB8532.namprd04.prod.outlook.com (2603:10b6:806:350::6)
+ by LV3PR04MB9252.namprd04.prod.outlook.com (2603:10b6:408:26f::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9611.13; Fri, 13 Feb
+ 2026 11:23:51 +0000
+Received: from SN7PR04MB8532.namprd04.prod.outlook.com
+ ([fe80::4e14:94e7:a9b3:a4d4]) by SN7PR04MB8532.namprd04.prod.outlook.com
+ ([fe80::4e14:94e7:a9b3:a4d4%5]) with mapi id 15.20.9611.008; Fri, 13 Feb 2026
+ 11:23:51 +0000
+From: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To: Daniel Wagner <dwagner@suse.de>
+CC: Chaitanya Kulkarni <chaitanyak@nvidia.com>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "linux-scsi@vger.kernel.org"
+	<linux-scsi@vger.kernel.org>, "linux-nvme@lists.infradead.org"
+	<linux-nvme@lists.infradead.org>, "lsf-pc@lists.linux-foundation.org"
+	<lsf-pc@lists.linux-foundation.org>, Bart Van Assche <bvanassche@acm.org>,
+	Hannes Reinecke <hare@suse.de>, hch <hch@lst.de>, Jens Axboe
+	<axboe@kernel.dk>, "sagi@grimberg.me" <sagi@grimberg.me>, "tytso@mit.edu"
+	<tytso@mit.edu>, Johannes Thumshirn <Johannes.Thumshirn@wdc.com>, Christian
+ Brauner <brauner@kernel.org>, "Martin K. Petersen"
+	<martin.petersen@oracle.com>, "linux-fsdevel@vger.kernel.org"
+	<linux-fsdevel@vger.kernel.org>, =?iso-8859-1?Q?Javier_Gonz=E1lez?=
+	<javier@javigon.com>, "willy@infradead.org" <willy@infradead.org>, Jan Kara
+	<jack@suse.cz>, "amir73il@gmail.com" <amir73il@gmail.com>, "vbabka@suse.cz"
+	<vbabka@suse.cz>, Damien Le Moal <dlemoal@kernel.org>
+Subject: Re: [LSF/MM/BPF ATTEND][LSF/MM/BPF TOPIC] : blktests: status,
+ expansion plan for the storage stack test framework
+Thread-Topic: [LSF/MM/BPF ATTEND][LSF/MM/BPF TOPIC] : blktests: status,
+ expansion plan for the storage stack test framework
+Thread-Index: AQHcm5X2GyQlbhzV6UGhlrLvCD3GoLV+sd+AgAHNZ4A=
+Date: Fri, 13 Feb 2026 11:23:50 +0000
+Message-ID: <aY77ogf5nATlJUg_@shinmob>
+References: <31a2a4c2-8c33-429a-a2b1-e1f3a0e90d72@nvidia.com>
+ <459953fa-5330-4eb1-a1b4-7683b04e3d45@flourine.local>
+In-Reply-To: <459953fa-5330-4eb1-a1b4-7683b04e3d45@flourine.local>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SN7PR04MB8532:EE_|LV3PR04MB9252:EE_
+x-ms-office365-filtering-correlation-id: ff874725-6c19-4096-a149-08de6af25d28
+x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|376014|7416014|19092799006|1800799024|38070700021;
+x-microsoft-antispam-message-info:
+ =?iso-8859-1?Q?vDthQW8p3DFuTdqeqn0P0jkIb+p8cNh7TbcWwFHxxH8EloNDYenpD8lMFL?=
+ =?iso-8859-1?Q?NM2z7R1P4qMmACJqZZxbGTw7KwlFYrKuFlOcl6DBd7owqViJEiJrMzsJr0?=
+ =?iso-8859-1?Q?v6Yl58mvatRyHFeW6U4ZMK8/CbGRzOoLaCChQkFsyT0+eWR8OziFK7+n6k?=
+ =?iso-8859-1?Q?M8ckz0z+6Gh8mOd8dn6y65A0ybB2mPojekzoAmAH85tNINHywWrI8kt2ra?=
+ =?iso-8859-1?Q?T4Xa17afrjehgy7TcNUekO0KT9W4xuLMGCI2xNBrcgUhv8Ja+zqyRm0UYb?=
+ =?iso-8859-1?Q?9BDqLwYgWvsmQmxHEGgqvtuJRo/Gc7oDi/gCgOtcsH0ul5OoEnhh2uyEGH?=
+ =?iso-8859-1?Q?vCFz9zSAynUHdgGz9pmSgT/eY4Hu/BsOPcPFwxBHYv9j2Np0Seaab+k6G6?=
+ =?iso-8859-1?Q?Gyq1cZyrhhf11Hkt4jUy2rfYGzyMbE8divDGsCXuHdKGqDwFoercU55zDr?=
+ =?iso-8859-1?Q?lqlrRmcblBUPitdPICrdm4yGS6kPAk6hKeZ+0blcX0QWm18Upig1aTgBhk?=
+ =?iso-8859-1?Q?mT9H17//E6AFl1dyi/dFA2WCPUh8PlyPFm63XMbnntDODQP3fTdcA/925Z?=
+ =?iso-8859-1?Q?ija2srSrRPnNvH84ElpB3YcgIqR5wHG70aZm0CFITNgwdEI1YfFLrfaPCt?=
+ =?iso-8859-1?Q?huKTPpoW90q8oJzPWKFaeu31TQ2ISErpeYXkHxRcBOt7wu3g7dHtPT/UJo?=
+ =?iso-8859-1?Q?1/fLY+Ld8xjT+Jw7w9ks1jayHChoYdEo+ODszecwWoXzdob2GcmozTm80J?=
+ =?iso-8859-1?Q?5hqoOTTVGpJAs4OXNutRfsUCB9/GMg4+esd91sZMk3ikE26+ut8wo52W/L?=
+ =?iso-8859-1?Q?p/BeR8uH2E1FN9mtGSsFooZzU+lpjmmbr56NrpR166S20ZjoiT8J/WKsai?=
+ =?iso-8859-1?Q?gzD04XZMZ/Wlf0X41YEhmQkwRMceEQv8IrNQV0rQH5q9t/PneIzR8Y8jts?=
+ =?iso-8859-1?Q?JWliM0phdAatCRkXkhFcrIEtdYoyguG4qlByvZNuDUcw+GK2HG4qg+9UFL?=
+ =?iso-8859-1?Q?SdVamAJBj2InxfU+I6gSyY69t06pXrVmYr0+uTSxpMRhjvEJ6djUHxm0k6?=
+ =?iso-8859-1?Q?rxhWEyf9xzwe3+ob6/HFk4L5m19keLV+1zxRKGN78yO8xYm0/rLovDKuyC?=
+ =?iso-8859-1?Q?XCAIOqCDw1+rly56YQl/CxGz4tCxrVu7UxkSNLhBn3nK+NROdwEl2DdDYg?=
+ =?iso-8859-1?Q?SfmdUusMfOVmeDhdKT6SK3NhPsed4iLbzgje1LqhwctB99FicDtjockHG7?=
+ =?iso-8859-1?Q?rkO0rTiiSM0GrbD8B2UcRtI7hyuq6879b8MHJVsO7dvrR5TWDyeq+LsVdy?=
+ =?iso-8859-1?Q?VDMccJ60nHGGpW9mIOEADltgazakD0DyZaXAXBgdCl9e5Qee09UN7N+8qf?=
+ =?iso-8859-1?Q?PjhTD8Coymxk5O6XW02kfdFpz6RFNzCDtjq7ILK6NQad0/D4tuuGJqOZ+7?=
+ =?iso-8859-1?Q?Uo2o3AwhNio5QAIF9emgWNytVV3s2LNufmcG8KuIoGrZ0zkLUGyyQaoA46?=
+ =?iso-8859-1?Q?7Z2WxB5G8Qs0Heh5bmoF0KBR3r4dU/UWAq4gYUD7v9ay6JzUvLWm6Phf67?=
+ =?iso-8859-1?Q?RynSNeeIXpwkGtqMMR3HXVmkdcSn0RfK3cHpLocyVLdYdvScLqr3ou3rF/?=
+ =?iso-8859-1?Q?a3L995fgvnfyjc6Sx5t5d/nmgl56NQQztlfSG3CSjwfq9jKsRES222gnzY?=
+ =?iso-8859-1?Q?y+A0WwwmVUU9vUfPyYc=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR04MB8532.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(19092799006)(1800799024)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?LFRllyfIeX8M6f7Of/H5+aR+FYXtoZjhlD48A8G+kx97ZP3+PJSu9mz9vu?=
+ =?iso-8859-1?Q?Hjh0J8IxaFO61304Db4G7sPTHRDMbwW+QyP0UYkkxAckFaI9CRBAd9q5nc?=
+ =?iso-8859-1?Q?FuMYpYCSymDgGw4jw8uOPm8B+c1MNY7BypeiSNHzmAsaUvjoiURv/I5ls3?=
+ =?iso-8859-1?Q?t7NKRZGrXEe8wWDY4kCiZqhaRnzcS1oy94a4lkP7ICndHAs2EwM5kfhA/1?=
+ =?iso-8859-1?Q?tMl7Txc4V7bs7xSpRcWDa5XRJznZu3Bq7tU9oNvpL7gzc4JwbYIncHLjMb?=
+ =?iso-8859-1?Q?zXaE6ZS0+IBsXKZFstfO6kfFi+1oKqZMBJJ+KRjVkE8fryJcJHy3ubQKm/?=
+ =?iso-8859-1?Q?WUWxjwBRDue9AiweDaOp2sN5sdBdgODPa8qAiAKiet5Ye/qYC+S2i18DB7?=
+ =?iso-8859-1?Q?2iFV2NeCQR09UXYfOANoSY2NH23tJpNlBLPZF9jT3BfbdbW35ATJKKJarN?=
+ =?iso-8859-1?Q?JMfGvlF5lyUkijTaioVAM+Gz2u8UAhJXmkE/8Pdj4pad2mjmQXBlM/UVMy?=
+ =?iso-8859-1?Q?Vln0CLVtrJuWof439sWV/tQbuDuuRDWBx1vcon2d+Thp2THviDVxDgN6XK?=
+ =?iso-8859-1?Q?8STSrG3pi0M712XxLuAIbAN4v6KMfb4eRVLX1WyyAyZi6tpv5YMRgtzkM3?=
+ =?iso-8859-1?Q?5lYuAlb+AhGwVSDNAfNvXqnMERVW4+b2rVQ5WU3GiTnAMLAPO+kTqlmvdY?=
+ =?iso-8859-1?Q?HiN6+fKE0IaC+PoJ11CQ0D8l/EdQVJG63QqKqqr7qL1trGsH2pOsC/jwhV?=
+ =?iso-8859-1?Q?VbUjEKb2h6IBRvnPu6DlsLtYIEd+oH2qZH3PlGfuPnGBuLZ3vLxIIUivHf?=
+ =?iso-8859-1?Q?NMJDcluQ8p7eDBSiRedQZAwBg5V9EmDjazqW29SyYM+x70EV6hMweHkkBf?=
+ =?iso-8859-1?Q?yPuEP7jgs+mu7uxOuKc+J3S4HdXcMvq6k60gutJFnzb5zkjj+4Tztf4+jB?=
+ =?iso-8859-1?Q?vMQr5aVaf1nf/WKX4yq34Ffxn0iyDhNx23MFRwMFvMwJFbpAYeX8SwnbxB?=
+ =?iso-8859-1?Q?xxB0xHsBT4N0XKhUkRAm2gVOLWaO3l6vD+X9Botwz9Qr/SxdsHwzsnmLEq?=
+ =?iso-8859-1?Q?+CYRJsXMkm5Q0lnXw4pDJbBuCAs8l2tj+xYv+mIKEOCRjk4SDmN9I+eYBQ?=
+ =?iso-8859-1?Q?pDPia5fHbDkXkz7U316haazMHc2+d1+Gyq58kR+3R4832SmXYz0am0wTPV?=
+ =?iso-8859-1?Q?RLje9Bz+o/pbcOkp7oxg7Z3IYr3rBAGx1MpBX+6+HweqBNw/OgvNUBCl8a?=
+ =?iso-8859-1?Q?vBuwQJS9DfOMzLS/GB++/2znvlx/1Qa1w9N0nhxlA3cHj5X3n0wsI7QebY?=
+ =?iso-8859-1?Q?tRqAlnasQ9ZCmUvl5L2j6fHeWNTBb6wVymZBLTQMk30DHiBcVkDGeMdeBP?=
+ =?iso-8859-1?Q?7FWQ1REgRFmiZ4Ye8FBask8VZkyxpKsaoEvQ883Xz08g+ODV857Qvc+ppG?=
+ =?iso-8859-1?Q?wq3e3Nf7yz9tpzLCwXM37cG8VEmjdBBM4k5S9YYAzlv32obPr+9A4xkOS8?=
+ =?iso-8859-1?Q?0208ftjXpZmx91a4B1NXf5fhmIWoDwXxZjpI+YnTGZGqHYLXHOEgXd5XUy?=
+ =?iso-8859-1?Q?mKjQRj0zrbJjtEMXDIa4yOGEvGjDSYvazkcOsun1YcbJE/ngFg8sLKtBR/?=
+ =?iso-8859-1?Q?fmcuRvOtBwHIJPn7hBdNo89cxikDXEQxjDPVFkeDjO8CKqWfUk/fepnB36?=
+ =?iso-8859-1?Q?r7skzbRFVEfksmapz9JYBsGi1tpNNvDVpnr5NgtJZXHIG6PP6TTXZOR4GV?=
+ =?iso-8859-1?Q?CQmdgz6lBN/DmqXLStzMe+imMCtSgxnDSn2VTrcTyHtd8WZHF7mqO7QVdA?=
+ =?iso-8859-1?Q?i58VpXyGSU5pjSqzwDS+ffNicFrf9lM=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-ID: <B3CD1A87B4F7504F8514FAFC82C82247@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] ublk: cleanup flag handling and fix
- UBLK_F_NO_AUTO_PART_SCAN
-Content-Language: en-GB
-To: Ming Lei <ming.lei@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- Hannes Reinecke <hare@suse.de>, Yoav Cohen <yoav@nvidia.com>
-References: <20260212152553.1737373-1-alex@zazolabs.com>
- <aY6fAlXmzQZCKwmM@fedora>
-From: Alexander Atanasov <alex@zazolabs.com>
-In-Reply-To: <aY6fAlXmzQZCKwmM@fedora>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	gcqWD9TzpzGNxB1UEW7ZBFpLFzzDiShv4BSxhMVoeNv58PTLkQUBeBW2AqDul7l29wl2LJKcDDAEOzi0uHn56HUjzqPvO6M2wBf850W5v7ynBsZgN9+ZuHlH+2nTfbsFdoFjRne+81OamSZBMT9mRiMp9VNVmOjVd4TfIkhui/xjgBLMYJgAcOkjE5YfBjnOxCg71uB71Y1ixDegFwkFb8MJK/9Yk6MyVnqO4tGGgLPCypadLxKNC/VI5lfJ/hT6T2T3I5WFl+kM7+KiCjEBR3ituHFSDy8Ryc0qD/Lb7uqqNzcPnjcKMRweOudklCKKaE48FHjTeLgy0KV9zo+YLueutCJJcdHW54l8+N8lLhlsqVQl2EaUnd/wwKzxy8M8ZGx4G/a2p87IA9A97QOfZoSj1iEOTSVvOmvHXJEweYc8/rdgsF7o4WShKUBin9+zZn/NJb7AJOXL0tVQwwkwuRAa65b55AndxIMn7Q6mra9oiJ6BVNMa8LGm/tprZaI9BdyZCvsY9FCb2KZ5CF7unPiFoNJnDRFxIYCByjLSSHrJ9q9UkFM2VNEEDxwpxtKWCixVkLPiSEriEAhbg+p8R8+84KsoUYA+r0QhF2U5JGXqu3k7XJVvs3kAvJZrd/A/
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR04MB8532.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ff874725-6c19-4096-a149-08de6af25d28
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Feb 2026 11:23:51.0401
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: RDN21gYeHl+vZAhJgRaASlPLqsVH1RNqSzxgq+f7KUr+cid6hIAOKs9nG2crJmR1OK6Xk37jxMwHKCVUXjgY2JPa4E1wnTnqQ3dKt7hFZJA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR04MB9252
 
-On 13.02.26 5:48, Ming Lei wrote:
-> On Thu, Feb 12, 2026 at 03:25:52PM +0000, Alexander Atanasov wrote:
->> Currently the code misuse GD_SUPPRESS_PART_SCAN flag
->> as it tries to use it as a switch for the auto partition scan.
->> When UBLK_F_NO_AUTO_PART_SCAN is not passed a proper
->> auto partition scanning is not done because the first
->> call to ublk_partition_scan_work will clear the bit
->> GD_SUPPRESS_PART_SCAN but not actually load the partitions.
->>
->> How it should work:
->> Unprivileged daemons - never scan partitions, they have
->> GD_SUPPRESS_PART_SCAN always set - they are marked as devices
->> without partitions. While ioctl(BLKRRPART) does require
->> CAP_SYS_ADMIN, block layer have its own a check in
->> disk_has_partscan(...) if partitions are supported.
->>
->> Trusted daemons - auto scan partitions by default
->> and they do not have the bit set, so they do have partitions.
->>
->> For trusted daemons auto partitions scan is performed but it can
->> be skipped if user have set UBLK_F_NO_AUTO_PART_SCAN flag.
->>
->> Rework the code to work as described above:
->> - remove checks in ublk_partition_scan_work and rely on
->> the caller to schedule the work only if it has to be done.
->> - keep GD_SUPPRESS_PART_SCAN always set on unprivileged
->> - keep GD_SUPPRESS_PART_SCAN always clear on trusted
->> - Properly handle user request to skip auto partitioning scanning
->>
->> Fixes: 8443e2087e70 ("ublk: add UBLK_F_NO_AUTO_PART_SCAN feature flag")
->> Signed-off-by: Alexander Atanasov <alex@zazolabs.com>
->> ---
->>   drivers/block/ublk_drv.c | 14 ++++----------
->>   1 file changed, 4 insertions(+), 10 deletions(-)
->>
->> Cc: Yoav Cohen <yoav@nvidia.com>
->>
->> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
->> index 3c918db4905c..e662c6e8e722 100644
->> --- a/drivers/block/ublk_drv.c
->> +++ b/drivers/block/ublk_drv.c
->> @@ -2361,14 +2361,9 @@ static void ublk_partition_scan_work(struct work_struct *work)
->>   	if (!disk)
->>   		return;
->>   
->> -	if (WARN_ON_ONCE(!test_and_clear_bit(GD_SUPPRESS_PART_SCAN,
->> -					     &disk->state)))
->> -		goto out;
->> -
-> 
-> It is wrong to remove clearing GD_SUPPRESS_PART_SCAN, otherwise ioctl(BLKRRPART)
-> can't succeed.
+On Feb 12, 2026 / 08:52, Daniel Wagner wrote:
+> On Wed, Feb 11, 2026 at 08:35:30PM +0000, Chaitanya Kulkarni wrote:
+> >  =A0 For the storage track at LSFMMBPF2026, I propose a session dedicat=
+ed to
+> >  =A0 blktests to discuss expansion plan and CI integration progress.
+>=20
+> Thanks for proposing this topic.
 
-If you agree with how should it work in the message then it is not a 
-problems. GD_SUPPRESS_PART_SCAN is set only on unprivileged - no
-partitions on them. Trusted have it always clear - they
-schedule the scan and get their partitions automatically.
-If user passes the UBLK_F_NO_AUTO_PART_SCAN, then the scan is not 
-scheduled and it is up to the user to reread partitions.
-This ublk_partition_scan_work is used inside ublk_drv only,
-ioctl uses different code path. Double checked and the only
-way to reach it is thru ublk_ctrl_add_dev and from ublk_ctrl_uring_cmd.
+Chaitanya, my thank also goes to you.
 
+> Just a few random topics which come to mind we could discuss:
+>=20
+> - blktests has gain a bit of traction and some folks run on regular
+>   basis these tests. Can we gather feedback from them, what is working
+>   good, what is not? Are there feature wishes?
 
-> 
->>   	mutex_lock(&disk->open_mutex);
->>   	bdev_disk_changed(disk, false);
->>   	mutex_unlock(&disk->open_mutex);
->> -out:
->>   	ublk_put_disk(disk);
->>   }
->>   
->> @@ -4429,12 +4424,11 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
->>   
->>   	set_bit(UB_STATE_USED, &ub->state);
->>   
->> -	/* Skip partition scan if disabled by user */
->> -	if (ub->dev_info.flags & UBLK_F_NO_AUTO_PART_SCAN) {
->> +	if (!ub->unprivileged_daemons) {
->> +		/* Enable partition scanning for trusted daemons */
->>   		clear_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
->> -	} else {
->> -		/* Schedule async partition scan for trusted daemons */
->> -		if (!ub->unprivileged_daemons)
->> +		/* Skip auto partition scan if requested by user */
->> +		if (!(ub->dev_info.flags & UBLK_F_NO_AUTO_PART_SCAN))
->>   			schedule_work(&ub->partition_scan_work);
-> 
-> We may switch to disallow partition scan permanently for UBLK_F_NO_AUTO_PART_SCAN
-> per discussion in the following thread:
-> 
-> https://lore.kernel.org/linux-block/0535f4dd-ada3-414a-84c6-7abc232aa670@kernel.dk/
-> 
-> So the change may can be simplified as below, meantime
-> selftests/ublk/test_part_01.sh need to be updated.
+Good topic, I also would like to hear about it.
 
-Ok, tests and docs are next as Jens requested.
+FYI, from the past LSFMM sessions and hallway talks, major feedbacks I had
+received are these two:
 
-> 
-> Alexander, please let us know if you'd like work this way?
+ 1. blktests CI infra looks missing (other than CKI by Redhat)
+    -> Some activities are ongoing to start blktests CI service.
+       I hope the status are shared at the session.
 
-https://lore.kernel.org/linux-block/c95b3de4-f4f8-4b35-a3e4-a83da98ced0b@zazolabs.com/T/#mbb410ceb3f4c6f23e6c566911dfc833365ce9cdc
+ 2. blktests are rather difficult to start using for some new users
+    -> I think config example is demanded, so that new users can
+       just copy it to start the first run, and understand the
+       config options easily.
 
-in short - having partitions and auto scan are two different features, 
-why merge them?
+> - Do we need some sort of configuration tool which allows to setup a
+>   config? I'd still have a TODO to provide a config example with all
+>   knobs which influence blktests, but I wonder if we should go a step
+>   further here, e.g. something like kdevops has?
 
-If we want to cover all cases i thing we should go like this:
+Do you mean the "make menuconfig" style? Most of the blktests users are
+familiar with menuconfig, so that would be an idea. If users really want
+it, we can think of it. IMO, blktests still do not have so many options,
+then config.example would be simpler and more appropriate, probably.
 
-/* Enable partitions support on device */
-#define UBLK_F_PARTITIONS (1ULL << 18)
+> - Which area do we lack tests? Should we just add an initial simple
+>   tests for the missing areas, so the basic infra is there and thus
+>   lowering the bar for adding new tests?
 
-/* Do not perform automatic partition scanning when device is added */
-#define UBLK_F_NO_AUTO_PART_SCAN (1ULL << 19)
+To identify the uncovered area, I think code coverage will be useful. A few
+years ago, I measured it and shared in LSFMM, but that measurement was done=
+ for
+each source tree directory. The coverage ratio by source file will be more
+helpful to identify the missing area. I don't have time slot to measure it,
+so if anyone can do it and share the result, it will be appreciated. Once w=
+e
+know the missing areas, it sounds a good idea to add initial samples for ea=
+ch
+of the areas.
 
-Added value is to have partitions enabled/disabled explicitly for 
-trusted devices. Where by default they will be disabled.
+> - The recent addition of kmemleak shows it's a great idea to enable more
+>   of the kernel test infrastructure when running the tests.
 
-Also may be change from UBLK_F_NO_AUTO_PART_SCAN to 
-UBLK_F_AUTO_PART_SCAN - to make it explicit instead and be like
-the rest of the flags - all are enable flags
+Completely agreed.
 
-Then these variants become possible:
-- unprivileged without partitions (can we add security checks to allow 
-partitions for them too?)
-- trusted with or without partitions (UBLK_F_PARTITIONS bound to 
-GD_SUPPRESS_PART_SCAN)
-- If it is a device with partitions then UBLK_F_NO_AUTO_PART_SCAN 
-controls if initial auto scan is performed or not.
+>   Are there more such things we could/should enable?
 
-Having them separate can allow emulation of removable media where data 
-is not available at device creation time but is known when available by 
-external event so you can load partitions. Two step device bring up, 
-i.e. partition scan at device creation time will block you, but you know 
-when data is available from an external event, and then you can load 
-partitions.
+I'm also interested in this question :)
 
-What do you think?
+> - I would like to hear from Shin'ichiro if he is happy how things
+>   are going? :)
 
-I'be added CC Yoav since i think he requested that feature in first 
-place. I beleive Hannes may have a different use case, so let's get some 
-more input on this.
+More importantly, I would like to listen to voices from storage sub-system
+developers to see if they are happy or not, especially the maintainers.
 
-> diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
-> index a88876756805..d6f479fff75b 100644
-> --- a/include/uapi/linux/ublk_cmd.h
-> +++ b/include/uapi/linux/ublk_cmd.h
-> @@ -367,8 +367,8 @@
->    */
->   #define UBLK_F_SAFE_STOP_DEV   (1ULL << 17)
-> 
-> -/* Disable automatic partition scanning when device is started */
-> -#define UBLK_F_NO_AUTO_PART_SCAN (1ULL << 18)
-> +/* Disable partition scanning */
-> +#define UBLK_F_NO_PART_SCAN    (1ULL << 18)
-> 
->   /* device state */
->   #define UBLK_S_DEV_DEAD        0
-> [root@ktest-40 linux]# git diff
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index c13cda58a7c6..f1a104222fb1 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -81,7 +81,7 @@
->                  | (IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY) ? UBLK_F_INTEGRITY : 0) \
->                  | UBLK_F_SAFE_STOP_DEV \
->                  | UBLK_F_BATCH_IO \
-> -               | UBLK_F_NO_AUTO_PART_SCAN)
-> +               | UBLK_F_NO_PART_SCAN)
-> 
->   #define UBLK_F_ALL_RECOVERY_FLAGS (UBLK_F_USER_RECOVERY \
->                  | UBLK_F_USER_RECOVERY_REISSUE \
-> @@ -4438,14 +4438,13 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
-> 
->          set_bit(UB_STATE_USED, &ub->state);
-> 
-> -       /* Skip partition scan if disabled by user */
-> -       if (ub->dev_info.flags & UBLK_F_NO_AUTO_PART_SCAN) {
-> -               clear_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
-> -       } else {
-> -               /* Schedule async partition scan for trusted daemons */
-> -               if (!ub->unprivileged_daemons)
-> -                       schedule_work(&ub->partition_scan_work);
-> -       }
-> +       /*
-> +        * Only schedule async partition scan in case of
-> +        * !UBLK_F_NO_PART_SCAN and trusted daemons
-> +        */
-> +       if (!(ub->dev_info.flags & UBLK_F_NO_PART_SCAN) &&
-> +                       !ub->unprivileged_daemons)
-> +               schedule_work(&ub->partition_scan_work);
+From my view, blktests keep on finding kernel bugs. I think it demonstrates=
+ the
+value of this community effort, and I'm happy about it. Said that, I find w=
+hat
+blktests can improve more, of course. Here I share the list of improvement
+opportunities from my view point (I already mentioned the first three items=
+).
 
-a few lines above
-set_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
-is done uncoditionally.
-
-schedule_work(&ub->partition_scan_work); without clearing
-the bit first won't load the partitions just clear the bit and return.
-This is a bug in the original commit, not a result of any of the 
-proposed changes.
-
--- 
-have fun,
-alex
+ 1. We can have more CI infra to make the most of blktests
+ 2. We can add config examples to help new users
+ 3. We can measure code coverage to identify missing test areas
+ 4. Long standing failures make test result reports dirty
+    - I feel lockdep WARNs are tend to be left unfixed rather long period.
+      How can we gather effort to fix them?
+ 5. We can refactor and clean up blktests framework for ease of maintainanc=
+e
+      (e.g. trap handling)
+ 6. Some users run blktests with built-in kernel modules, which makes a num=
+ber
+    of test cases skipped. We can add more built-in kernel modules support =
+to
+    expand test coverage for such use case.=
