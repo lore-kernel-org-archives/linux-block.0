@@ -1,140 +1,138 @@
-Received: from 013.lax.mailroute.net (013.lax.mailroute.net [199.89.1.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f174.google.com (mail-dy1-f174.google.com [74.125.82.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F9AF1C5D72;
-	Fri, 13 Feb 2026 17:44:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 212EB2C11E5
+	for <linux-block@vger.kernel.org>; Fri, 13 Feb 2026 22:45:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771004651; cv=none; b=Y1nciqY7pqI0IqvOk8WqpWqGMB3PQUJBGrqdoujtEKUqrTjRzu5D00nT7oD+ycD41+zyZUcSirhjNjzL9G7LrvO07+tlENXlEd7D+flv2Gr4XHdut6ZQYk0eesIUcV8hSl6A6PZh3kx/YYJZ/vrOFpKVmQelUTOxDUuwyQIWK4Q=
+	t=1771022739; cv=none; b=BPIVS0SL2SCoOST7s41c8W/6TZemQsDcrvMMCRUAGK/EPrO/TtNnORSq1q1vLq22sLVNNof+7TZwyXdZnfDx0qQt9Ht0PwCNxzikJ/8YaO0A25X0rhAIpxb46Ti2hWvQOHh8Jk/GGn80+c5NC5Sz8PBGxOgvV5nfdL1kqlVwvGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771004651; c=relaxed/simple;
-	bh=D79a4GzqBUqsbj5ac+8oLuPoUQ+fQfKkkmR+53g3EUY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=qPYM6mN4+8zSifFLNRf/5bBriMqspeRdi8pDX//wmA37e6Fs0/cXPlmbp7/0FUvMAWTJy9MzNQDUMStvGjr7VXP1zu5lXytF5LhJEFLcKz9jvovBbvmJ+AmIRrhkXhlxGXNE8xkdXkdkCf+ba1+x5U6E1zTQq5oLNFw1Tm7pkq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=QzNyeC+7; arc=none smtp.client-ip=199.89.1.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+	s=arc-20240116; t=1771022739; c=relaxed/simple;
+	bh=woHZc9BPo5DngwCKRvAMPblGmAjcXMiVMXj/kHArH+U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZJxGbwIVbtqgwol01+ySh/6JFO1wllGpK0Q15S3yL04GejPLyzpZGXSmiYt4VIDM7SnBl6l5hQyOFfWieEteGZ3zNVFbyKNj10Nl4zX3D9dDIPrlMrpBa+bzHPdE6yqfjV4BEdBIVRyeSZdY4MIC238NL1WTRx8Zpb0Y4f0Zi0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=deBjHvqr; arc=none smtp.client-ip=74.125.82.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="QzNyeC+7"
-Received: from localhost (localhost [127.0.0.1])
-	by 013.lax.mailroute.net (Postfix) with ESMTP id 4fCKKj6mlFzlgqwF;
-	Fri, 13 Feb 2026 17:44:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
-	content-transfer-encoding:content-type:content-type:in-reply-to
-	:from:from:content-language:references:subject:subject
-	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1771004648; x=1773596649; bh=t9RzRfvwbSgpAAn+57L/twMb
-	K6THI0fSwkzw1UKZRes=; b=QzNyeC+78j+FCizjBSZLWJPixMNPatJ8HNzEwubp
-	yRQdiq+UcNG4TgXbrCcSBO+1U5RLvQF2JDPAWNVvrEr9kjznYAo+foAHwGGzPjK2
-	8iNettCMNTrcbNYGdjuD6pbrRwHvT07kkG+TTiCX6wWnUDwHG+0J+H4goOL9P1lh
-	ey4fyk4jg112tX+f2Ac+RqUjOivwmP4IltVmK6Fk1BvJjCIe418yhhV7GOZV7IK0
-	GF7K2kY2+RDX9ynJ2WTrhSKVHXX2gD16iDiIbiXGi7BvEh0+Zgid3FSsfUv10bFq
-	Snt3Pp7CNxP2zBTqV4ydz3FCoyDTnnOozvhyQU0r7U2m/A==
-X-Virus-Scanned: by MailRoute
-Received: from 013.lax.mailroute.net ([127.0.0.1])
- by localhost (013.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id 8XnJ08o8QUxG; Fri, 13 Feb 2026 17:44:08 +0000 (UTC)
-Received: from [100.119.48.131] (unknown [104.135.180.219])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bvanassche@acm.org)
-	by 013.lax.mailroute.net (Postfix) with ESMTPSA id 4fCKKg1FjCzlfgPZ;
-	Fri, 13 Feb 2026 17:44:06 +0000 (UTC)
-Message-ID: <5157497a-3536-4187-883e-19a54167955a@acm.org>
-Date: Fri, 13 Feb 2026 09:44:06 -0800
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="deBjHvqr"
+Received: by mail-dy1-f174.google.com with SMTP id 5a478bee46e88-2b86671f87eso2716249eec.0
+        for <linux-block@vger.kernel.org>; Fri, 13 Feb 2026 14:45:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1771022736; x=1771627536; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=seymYYEGAxfqY34qujfE2eQZoACCFYqRmAJDQBRrN+Q=;
+        b=deBjHvqr/OwI1vNsA+3tMcO4o+eIS3uZoaN870TdXiXd5iUpj7jYZczAHDDztsrfiK
+         vUPn5f+xNJepS5Jad6U8rSg9VM/GyrfHDisnIlS5UYAAKPROYOELdGmRynY/qcTcCsFj
+         +su+TEjKBGE9jAgpTh4G4Wd8F+tgPyf9A3DY42jmRjnLM17VUL8CGacjH6gxs25o2LB2
+         DKKMeZnD1c9PZZx14CuyTamKw9puc2BiaRpBxHdl0KwIF66bpQ5c4/zAAW9WXssjLknD
+         qDokiEMNRRCtFt9MWAv0Pa4rOz47goXYwkCk3pZelirKEicNbeUkHPGJUYsTyC9pNePc
+         8Fyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771022736; x=1771627536;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=seymYYEGAxfqY34qujfE2eQZoACCFYqRmAJDQBRrN+Q=;
+        b=ZO0aw03wZLOrFXavElZtXPpZhNbpZSppSrok276COFPD6OfTrrHeaKd1prUWZNsW82
+         x/HTKO1NSZxdxKti9GoLGTHHbUAqcR/HL8/GNLyyS9tWBYHIxtkkijUMoSz/vvNBzHzf
+         YOV21OA+9pVWyaCl00dyKYiVHj+U7oLwavdZNxydXWhdVjWk4WaPG/nXDuydRXjk7xBP
+         cjuM7OMVffpFwxbmBU9BmvMd3D4bxONJ9xAq51f3K5jYX223bsGZS1SgYj8oCQ+55DL1
+         u3eiw9ivwBL/YqQlF/QzsD1gv/Kaolu9Qs1UMK+8Wf41Yf1XPAMrzmvzZV25buAx+Ymk
+         dUuA==
+X-Forwarded-Encrypted: i=1; AJvYcCUrrF1f8RHl2HIDVHeUrokw/zhRJn55egBKmIEyLrpP136kvjPfHK+Xw8TZBZCS6DovS4guiQivxvXPNQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz61ZuJCtwS4g4smdWhvWEzAw3WORPYU/iilyItkRppykdzhR+7
+	zrqPA3ZYIOk+eOHo66c8/OguPPM4wMGfSE+LL8RF/YlrRLudLXscLBWX00jQFz2z7cE=
+X-Gm-Gg: AZuq6aLIFMNKpOOueq+cRwBBBFztyrKLje+WdOMPkNwrAtHcZbLv39HHQ2DhgFtRfCE
+	dEDmgnL1gQNiK/aOyG8ZK4rYzgFpkq8/TzZ9cI3DFuFhd/bymZY4HqIdcsLo4Uq46I/Oo5csxde
+	LNlSzYU2TXn6TsN93FgDvsWkG2ApAOBmSKwmHhVOdP5FwnNVhCxnQ9Wmol+7skeMCTzoGQzleEW
+	p6HXpSZY68tAxSo3DOiQr/MoX4MSt6e0Su/MA77rYor/AbbL9Uc9rIXtC0/l2d/wXPHPLfnYtnQ
+	MBd+MW0sZ7Xq6eOofJCWYNLv2Y/ep0frDJdq1ua7P/KHgQwXsOe1t0HUDFhdbBphqjLaOUHOgvp
+	/9Rxc6dXSgY4JdeEDdEuFsX1Kp4PGVbC0tYZ5Suhkhz5xsoxJUvpUQ6GZi1Ty//c3nUWWup5omL
+	1lgvW1EbZU+i03aTg1iJuyVigu7VFDlt4ZFMesN4uEB+gb9A==
+X-Received: by 2002:a05:7301:4005:b0:2ba:9a2a:e3cc with SMTP id 5a478bee46e88-2babc44eda3mr1285604eec.20.1771022735938;
+        Fri, 13 Feb 2026 14:45:35 -0800 (PST)
+Received: from apollo.purestorage.com ([208.88.152.253])
+        by smtp.googlemail.com with ESMTPSA id 5a478bee46e88-2bacb543d80sm262764eec.1.2026.02.13.14.45.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Feb 2026 14:45:35 -0800 (PST)
+From: Mohamed Khalfella <mkhalfella@purestorage.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Omar Sandoval <osandov@fb.com>,
+	Ming Lei <ming.lei@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>,
+	Yu Kuai <yukuai@fnnas.com>,
+	Nilay Shroff <nilay@linux.ibm.com>,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Mohamed Khalfella <mkhalfella@purestorage.com>
+Subject: [PATCH] blk-mq-debugfs: Fix warning about possible deadlock
+Date: Fri, 13 Feb 2026 14:45:04 -0800
+Message-ID: <20260213224504.3990506-1-mkhalfella@purestorage.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: blktests failures with v6.19 kernel
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
- "nbd@other.debian.org" <nbd@other.debian.org>,
- "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
-References: <aY7ZBfMjVIhe_wh3@shinmob>
-Content-Language: en-US
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <aY7ZBfMjVIhe_wh3@shinmob>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 2/12/26 11:57 PM, Shinichiro Kawasaki wrote:
-> [5] kmemleak at nvme/061 wiht rdma transport and siw driver
-> 
-> unreferenced object 0xffff888114792600 (size 32):
->    comm "kworker/2:1H", pid 66, jiffies 4295489358
->    hex dump (first 32 bytes):
->      c2 f6 83 05 00 ea ff ff 00 00 00 00 00 10 00 00  ................
->      00 b0 fd 60 81 88 ff ff 00 10 00 00 00 00 00 00  ...`............
->    backtrace (crc 3dbac61d):
->      __kmalloc_noprof+0x62f/0x8b0
->      sgl_alloc_order+0x74/0x330
->      0xffffffffc1b73433
->      0xffffffffc1bc1f0d
->      0xffffffffc1bc8064
->      __ib_process_cq+0x14f/0x3e0 [ib_core]
->      ib_cq_poll_work+0x49/0x160 [ib_core]
->      process_one_work+0x868/0x1480
->      worker_thread+0x5ee/0xfd0
->      kthread+0x3af/0x770
->      ret_from_fork+0x55c/0x810
->      ret_from_fork_asm+0x1a/0x30
+Commit 65d466b62984 ("blk-mq-debugfs: warn about possible deadlock")
+added WARN_ONCE_ON() to debugfs_create_files() to prevent potential
+deadlock if the queue is frozen. We hit this warning with the stacktrace
+below
 
-There are no sgl_alloc() calls in the RDMA subsystem. I think the above
-indicates a memory leak in either the RDMA NVMe target driver or in the
-NVMe target core.
+WARNING: block/blk-mq-debugfs.c:620 at debugfs_create_files+0x9c/0x1d0
+Workqueue: nvme-wq nvme_tcp_reconnect_ctrl_work [nvme_tcp]
+RIP: 0010:debugfs_create_files+0x9c/0x1d0
+Call Trace:
+ <TASK>
+ blk_mq_debugfs_register_hctx+0x186/0x320
+ blk_mq_debugfs_register_hctxs+0x80/0xa0
+ blk_mq_update_nr_hw_queues+0xc8f/0xd50
+ nvme_tcp_setup_ctrl+0xcfa/0xda0 [nvme_tcp]
+ nvme_tcp_reconnect_ctrl_work+0x51/0x180 [nvme_tcp]
+ process_scheduled_works+0x840/0xd80
+ worker_thread+0x36d/0x4a0
+ kthread+0x366/0x380
+ ret_from_fork+0x7b/0x670
+ ret_from_fork_asm+0x1a/0x30
+ </TASK>
 
-> [7] kmemleak at zbd/009
-> 
-> unreferenced object 0xffff88815f1f1280 (size 32):
->    comm "mount", pid 1745, jiffies 4294866235
->    hex dump (first 32 bytes):
->      6d 65 74 61 64 61 74 61 2d 74 72 65 65 6c 6f 67  metadata-treelog
->      00 93 9c fb af bb ae 00 00 00 00 00 00 00 00 00  ................
->    backtrace (crc 2ee03cc2):
->      __kmalloc_node_track_caller_noprof+0x66b/0x8c0
->      kstrdup+0x42/0xc0
->      kobject_set_name_vargs+0x44/0x110
->      kobject_init_and_add+0xcf/0x140
->      btrfs_sysfs_add_space_info_type+0xf2/0x200 [btrfs]
->      create_space_info_sub_group.constprop.0+0xfb/0x1b0 [btrfs]
->      create_space_info+0x247/0x320 [btrfs]
->      btrfs_init_space_info+0x143/0x1b0 [btrfs]
->      open_ctree+0x2eed/0x43fe [btrfs]
->      btrfs_get_tree.cold+0x90/0x1da [btrfs]
->      vfs_get_tree+0x87/0x2f0
->      vfs_cmd_create+0xbd/0x280
->      __do_sys_fsconfig+0x64f/0xa30
->      do_syscall_64+0x95/0x540
->      entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> unreferenced object 0xffff888128d80000 (size 16):
->    comm "mount", pid 1745, jiffies 4294866237
->    hex dump (first 16 bytes):
->      64 61 74 61 2d 72 65 6c 6f 63 00 4b 96 f6 48 82  data-reloc.K..H.
->    backtrace (crc 1598f702):
->      __kmalloc_node_track_caller_noprof+0x66b/0x8c0
->      kstrdup+0x42/0xc0
->      kobject_set_name_vargs+0x44/0x110
->      kobject_init_and_add+0xcf/0x140
->      btrfs_sysfs_add_space_info_type+0xf2/0x200 [btrfs]
->      create_space_info_sub_group.constprop.0+0xfb/0x1b0 [btrfs]
->      create_space_info+0x211/0x320 [btrfs]
->      open_ctree+0x2eed/0x43fe [btrfs]
->      btrfs_get_tree.cold+0x90/0x1da [btrfs]
->      vfs_get_tree+0x87/0x2f0
->      vfs_cmd_create+0xbd/0x280
->      __do_sys_fsconfig+0x64f/0xa30
->      do_syscall_64+0x95/0x540
->      entry_SYSCALL_64_after_hwframe+0x76/0x7e
+Here __blk_mq_update_nr_hw_queues() did set PF_MEMALLOC_NOIO flag before
+calling blk_mq_debugfs_register_hctxs() and this should guarantee the
+described deadlock will not happen. Warn only if the queue is frozen and
+NOIO flag is not set.
 
-Please report the above to the BTRFS maintainers.
+Fixes: 65d466b62984 ("blk-mq-debugfs: warn about possible deadlock")
+Signed-off-by: Mohamed Khalfella <mkhalfella@purestorage.com>
+---
+ block/blk-mq-debugfs.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Thanks,
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index faeaa1fc86a7..ec6670dc0a3d 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -612,12 +612,14 @@ static void debugfs_create_files(struct request_queue *q, struct dentry *parent,
+ 				 void *data,
+ 				 const struct blk_mq_debugfs_attr *attr)
+ {
++	unsigned int pflags = READ_ONCE(current->flags);
++
+ 	lockdep_assert_held(&q->debugfs_mutex);
+ 	/*
+ 	 * Creating new debugfs entries with queue freezed has the risk of
+ 	 * deadlock.
+ 	 */
+-	WARN_ON_ONCE(q->mq_freeze_depth != 0);
++	WARN_ON_ONCE((q->mq_freeze_depth != 0) && !(pflags & PF_MEMALLOC_NOIO));
+ 	/*
+ 	 * debugfs_mutex should not be nested under other locks that can be
+ 	 * grabbed while queue is frozen.
 
-Bart.
+base-commit: cd7a5651db263b5384aef1950898e5e889425134
+-- 
+2.52.0
+
