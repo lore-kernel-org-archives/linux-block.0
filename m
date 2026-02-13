@@ -1,240 +1,257 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.itpri.com (mx1.itpri.com [185.125.111.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78BA034D3BD
-	for <linux-block@vger.kernel.org>; Fri, 13 Feb 2026 09:56:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D9A11F03EF
+	for <linux-block@vger.kernel.org>; Fri, 13 Feb 2026 11:05:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.111.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770976575; cv=none; b=Hap1B9aBSXMTESmFu/FI03a6nsnHVPckw5Xt9RbVEUyFRt3bjicrb5aNjyvBmrXNdtc3R2Pj+qDnEDwJDDn/3LDd9hCfHsbLK7a4Npn+7qrKqOfkWCWhuZaz/pPCLWRYMNrbP65gOKpAD5erWJM7VoO6v+YliNbsI02BcnXyBbI=
+	t=1770980749; cv=none; b=RyiwsarBb79L1ZBJy9iou6bk9i3lHxk2kg4g9Uo5cPkiXjHbzHMiMNLSEzfko1ILx38+F6KpwgyT91AFH9iEVLm3LELG6uqdbiAKq0Sxhyp/dm8cw5urYO4FcL7nAm4wLMYd3MfdCPMJM4IbjmGWDyiK24QN8OQ5iYw5FuEVm3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770976575; c=relaxed/simple;
-	bh=WY/dD/Y0HWJt2n1zEa25Prpk8xJdrB4VCNNbwKnasdE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oKw9n48oT9mifi7Qz6/VOqA8VGa/J6hvPecDPrrWYWmY+jAcJuM7VS46eADMufDzyt1kJcTnILyayrBZ0iL887V3iC3CtIztUfhE3uXEtNd1C40Y3PhaCkkkZzvPJwj5V3A0mx9v0L/y8FAW7KxPho/fwUgenuigpQv4zK/Mx3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=BUrXuVrU; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Ds5zlB7b; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=BUrXuVrU; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Ds5zlB7b; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1770980749; c=relaxed/simple;
+	bh=jkkcB6ll+qcxHW2AYIBSAKgfMB1n7DIqZsmsZPxBk58=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=n5cV/tqd9mmNgu5vFiUdMot2+rvTVbbObUVV55DWC/Dp57Bf8Ul7vnhC7XPbwNVw1CmpK8i/G9txF2M0XoizDvcvA69l01NYm9asheuqQKpygw1ReC+xFFHDFm+z2I9xuI2dKE0zSq5NbOADOa5JAo8emslIZTEXMA3QDGroexM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zazolabs.com; spf=pass smtp.mailfrom=zazolabs.com; dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b=TpjLFztq; arc=none smtp.client-ip=185.125.111.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zazolabs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zazolabs.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="BUrXuVrU";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Ds5zlB7b";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="BUrXuVrU";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Ds5zlB7b"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 9ADC45BCC4;
-	Fri, 13 Feb 2026 09:56:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1770976572; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qBJp+W6+w4hpK1AOjuJLBK8cne5W/Y5VssQKf43ZEcM=;
-	b=BUrXuVrU4Uj6JeWVtHNxu88KEqTAApBzpLUGAKfVFe2/TCfmIgy6NE5QzmaDN7DKMBOsGG
-	ZckVaiWgkkpXmcY97TGZ4774iAyr3Var34MEz9aYElUmwWpVZkMwG/fGjrNKdd43FcMP0X
-	bKV/xb9tVwCcknG0GeL6ZpYq+lL8Y5M=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1770976572;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qBJp+W6+w4hpK1AOjuJLBK8cne5W/Y5VssQKf43ZEcM=;
-	b=Ds5zlB7bv4vIWUQYT40lau/zwk7JiXqptX+FGL1vAdKrX94QpSG11m2XlfY0lzWbZ059rP
-	xa9emAAylTWn18Dw==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=BUrXuVrU;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=Ds5zlB7b
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1770976572; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qBJp+W6+w4hpK1AOjuJLBK8cne5W/Y5VssQKf43ZEcM=;
-	b=BUrXuVrU4Uj6JeWVtHNxu88KEqTAApBzpLUGAKfVFe2/TCfmIgy6NE5QzmaDN7DKMBOsGG
-	ZckVaiWgkkpXmcY97TGZ4774iAyr3Var34MEz9aYElUmwWpVZkMwG/fGjrNKdd43FcMP0X
-	bKV/xb9tVwCcknG0GeL6ZpYq+lL8Y5M=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1770976572;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qBJp+W6+w4hpK1AOjuJLBK8cne5W/Y5VssQKf43ZEcM=;
-	b=Ds5zlB7bv4vIWUQYT40lau/zwk7JiXqptX+FGL1vAdKrX94QpSG11m2XlfY0lzWbZ059rP
-	xa9emAAylTWn18Dw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 813873EA62;
-	Fri, 13 Feb 2026 09:56:12 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 5S3eHjz1jmngDgAAD6G6ig
-	(envelope-from <dwagner@suse.de>); Fri, 13 Feb 2026 09:56:12 +0000
-Date: Fri, 13 Feb 2026 10:56:11 +0100
-From: Daniel Wagner <dwagner@suse.de>
-To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, 
-	"nbd@other.debian.org" <nbd@other.debian.org>, "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>
-Subject: Re: blktests failures with v6.19 kernel
-Message-ID: <6ad314f7-f3d2-495a-b1ef-a81a06498952@flourine.local>
-References: <aY7ZBfMjVIhe_wh3@shinmob>
+	dkim=pass (4096-bit key) header.d=zazolabs.com header.i=@zazolabs.com header.b="TpjLFztq"
+X-Virus-Scanned: Yes
+Message-ID: <efe851c6-cb40-4e6f-a382-047b33753ee1@zazolabs.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=zazolabs.com; s=mail;
+	t=1770980742; bh=jkkcB6ll+qcxHW2AYIBSAKgfMB1n7DIqZsmsZPxBk58=;
+	h=Subject:To:Cc:References:From:In-Reply-To;
+	b=TpjLFztqlAtJ73QvMC1Z2xj7uD4rIEDAmKjAl3dwz4kIk3Y3guuqnsyZ3WGc1jqYS
+	 JtzFceQ3tD87gexeLrdIE10nrBSveak8Kr/cVfoi4SJxCHcKN6ATBaLqZzVz4EfkK4
+	 EKQDDhcoM0h6z2VaKcl97jsjIOHmKKNV5xhOeEhpXmwsHJcoGZkCqTK4ffa4U8Iis3
+	 6/k0mCBLMbliH8o99Cj1UHmlOB/U3jVKT2E0JPEJe20fS/rO5qqXJDZj31CniA1CS+
+	 Qv2w11UAw016cTdzQgBsfk68rJ0faNae/npotyYdxbHUfbaKG9Nhopfwo/F/ylAZvt
+	 wVw2UkPte32Br+jdyv1cEsHaRtnS9IXU4F4Lg+KuEOc5msIC/H7oO3SUtgZ427TUqA
+	 Kc7683tnGblmDA/+YgjLYNMugWGjwBpxFeUYjfkY1zYGaqC591qfQ8sVTqb0vfLjdA
+	 /V/idK4J6ouYmA25Y3iL9iNtBE1aA7tBBM0KkzsJnBpmPaE4tOPF8k/akM0FmtrV/v
+	 E0Puqagbv/thTHyaW48N/8OXHwUMYm+k1EfZXxO10THD6gg44vNA5EqpsQZ8wJ7HpP
+	 YKkCATb9O48UlYBVcHjhMZF38nOYuKeEBPGJ/VPg/ozUwMGlqGU1O5ExtJa7NFhch1
+	 zt1pBEqx81FVp3aWQlOXOGsM=
+Date: Fri, 13 Feb 2026 13:05:40 +0200
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aY7ZBfMjVIhe_wh3@shinmob>
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	TO_DN_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	URIBL_BLOCKED(0.00)[suse.de:dkim,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	MISSING_XM_UA(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
-X-Spam-Flag: NO
-X-Spam-Score: -4.51
-X-Rspamd-Queue-Id: 9ADC45BCC4
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spam-Level: 
+Subject: Re: [PATCH] ublk: cleanup flag handling and fix
+ UBLK_F_NO_AUTO_PART_SCAN
+Content-Language: en-GB
+To: Ming Lei <ming.lei@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+ Hannes Reinecke <hare@suse.de>, Yoav Cohen <yoav@nvidia.com>
+References: <20260212152553.1737373-1-alex@zazolabs.com>
+ <aY6fAlXmzQZCKwmM@fedora>
+From: Alexander Atanasov <alex@zazolabs.com>
+In-Reply-To: <aY6fAlXmzQZCKwmM@fedora>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Feb 13, 2026 at 07:57:58AM +0000, Shinichiro Kawasaki wrote:
-> [3] lockdep WARN during nvme/058 with fc transport
+On 13.02.26 5:48, Ming Lei wrote:
+> On Thu, Feb 12, 2026 at 03:25:52PM +0000, Alexander Atanasov wrote:
+>> Currently the code misuse GD_SUPPRESS_PART_SCAN flag
+>> as it tries to use it as a switch for the auto partition scan.
+>> When UBLK_F_NO_AUTO_PART_SCAN is not passed a proper
+>> auto partition scanning is not done because the first
+>> call to ublk_partition_scan_work will clear the bit
+>> GD_SUPPRESS_PART_SCAN but not actually load the partitions.
+>>
+>> How it should work:
+>> Unprivileged daemons - never scan partitions, they have
+>> GD_SUPPRESS_PART_SCAN always set - they are marked as devices
+>> without partitions. While ioctl(BLKRRPART) does require
+>> CAP_SYS_ADMIN, block layer have its own a check in
+>> disk_has_partscan(...) if partitions are supported.
+>>
+>> Trusted daemons - auto scan partitions by default
+>> and they do not have the bit set, so they do have partitions.
+>>
+>> For trusted daemons auto partitions scan is performed but it can
+>> be skipped if user have set UBLK_F_NO_AUTO_PART_SCAN flag.
+>>
+>> Rework the code to work as described above:
+>> - remove checks in ublk_partition_scan_work and rely on
+>> the caller to schedule the work only if it has to be done.
+>> - keep GD_SUPPRESS_PART_SCAN always set on unprivileged
+>> - keep GD_SUPPRESS_PART_SCAN always clear on trusted
+>> - Properly handle user request to skip auto partitioning scanning
+>>
+>> Fixes: 8443e2087e70 ("ublk: add UBLK_F_NO_AUTO_PART_SCAN feature flag")
+>> Signed-off-by: Alexander Atanasov <alex@zazolabs.com>
+>> ---
+>>   drivers/block/ublk_drv.c | 14 ++++----------
+>>   1 file changed, 4 insertions(+), 10 deletions(-)
+>>
+>> Cc: Yoav Cohen <yoav@nvidia.com>
+>>
+>> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+>> index 3c918db4905c..e662c6e8e722 100644
+>> --- a/drivers/block/ublk_drv.c
+>> +++ b/drivers/block/ublk_drv.c
+>> @@ -2361,14 +2361,9 @@ static void ublk_partition_scan_work(struct work_struct *work)
+>>   	if (!disk)
+>>   		return;
+>>   
+>> -	if (WARN_ON_ONCE(!test_and_clear_bit(GD_SUPPRESS_PART_SCAN,
+>> -					     &disk->state)))
+>> -		goto out;
+>> -
 > 
-> [  409.028219] [     T95] ============================================
-> [  409.029133] [     T95] WARNING: possible recursive locking detected
-> [  409.030058] [     T95] 6.19.0+ #575 Not tainted
-> [  409.030892] [     T95] --------------------------------------------
-> [  409.031801] [     T95] kworker/u16:9/95 is trying to acquire lock:
-> [  409.032691] [     T95] ffff88813ba54948 ((wq_completion)nvmet-wq){+.+.}-{0:0}, at: touch_wq_lockdep_map+0x7e/0x1a0
-> [  409.033869] [     T95] 
->                           but task is already holding lock:
-> [  409.035254] [     T95] ffff88813ba54948 ((wq_completion)nvmet-wq){+.+.}-{0:0}, at: process_one_work+0xeef/0x1480
-> [  409.036383] [     T95] 
->                           other info that might help us debug this:
-> [  409.037769] [     T95]  Possible unsafe locking scenario:
+> It is wrong to remove clearing GD_SUPPRESS_PART_SCAN, otherwise ioctl(BLKRRPART)
+> can't succeed.
+
+If you agree with how should it work in the message then it is not a 
+problems. GD_SUPPRESS_PART_SCAN is set only on unprivileged - no
+partitions on them. Trusted have it always clear - they
+schedule the scan and get their partitions automatically.
+If user passes the UBLK_F_NO_AUTO_PART_SCAN, then the scan is not 
+scheduled and it is up to the user to reread partitions.
+This ublk_partition_scan_work is used inside ublk_drv only,
+ioctl uses different code path. Double checked and the only
+way to reach it is thru ublk_ctrl_add_dev and from ublk_ctrl_uring_cmd.
+
+
 > 
-> [  409.039113] [     T95]        CPU0
-> [  409.039781] [     T95]        ----
-> [  409.040406] [     T95]   lock((wq_completion)nvmet-wq);
-> [  409.041154] [     T95]   lock((wq_completion)nvmet-wq);
-> [  409.041898] [     T95] 
->                            *** DEADLOCK ***
+>>   	mutex_lock(&disk->open_mutex);
+>>   	bdev_disk_changed(disk, false);
+>>   	mutex_unlock(&disk->open_mutex);
+>> -out:
+>>   	ublk_put_disk(disk);
+>>   }
+>>   
+>> @@ -4429,12 +4424,11 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
+>>   
+>>   	set_bit(UB_STATE_USED, &ub->state);
+>>   
+>> -	/* Skip partition scan if disabled by user */
+>> -	if (ub->dev_info.flags & UBLK_F_NO_AUTO_PART_SCAN) {
+>> +	if (!ub->unprivileged_daemons) {
+>> +		/* Enable partition scanning for trusted daemons */
+>>   		clear_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
+>> -	} else {
+>> -		/* Schedule async partition scan for trusted daemons */
+>> -		if (!ub->unprivileged_daemons)
+>> +		/* Skip auto partition scan if requested by user */
+>> +		if (!(ub->dev_info.flags & UBLK_F_NO_AUTO_PART_SCAN))
+>>   			schedule_work(&ub->partition_scan_work);
 > 
-> [  409.043609] [     T95]  May be due to missing lock nesting notation
+> We may switch to disallow partition scan permanently for UBLK_F_NO_AUTO_PART_SCAN
+> per discussion in the following thread:
 > 
-> [  409.044960] [     T95] 3 locks held by kworker/u16:9/95:
-> [  409.045721] [     T95]  #0: ffff88813ba54948 ((wq_completion)nvmet-wq){+.+.}-{0:0}, at: process_one_work+0xeef/0x1480
-> [  409.046845] [     T95]  #1: ffff888109797ca8 ((work_completion)(&assoc->del_work)){+.+.}-{0:0}, at: process_one_work+0x7e4/0x1480
-> [  409.048063] [     T95]  #2: ffffffffac481480 (rcu_read_lock){....}-{1:3}, at: __flush_work+0xe3/0xc70
-> [  409.049128] [     T95] 
->                           stack backtrace:
-> [  409.050366] [     T95] CPU: 1 UID: 0 PID: 95 Comm: kworker/u16:9 Not tainted 6.19.0+ #575 PREEMPT(voluntary) 
-> [  409.050370] [     T95] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-4.fc42 04/01/2014
-> [  409.050373] [     T95] Workqueue: nvmet-wq nvmet_fc_delete_assoc_work [nvmet_fc]
-> [  409.050384] [     T95] Call Trace:
-> [  409.050386] [     T95]  <TASK>
-> [  409.050388] [     T95]  dump_stack_lvl+0x6a/0x90
-> [  409.050393] [     T95]  print_deadlock_bug.cold+0xc0/0xcd
-> [  409.050401] [     T95]  __lock_acquire+0x1312/0x2230
-> [  409.050408] [     T95]  ? lockdep_unlock+0x5e/0xc0
-> [  409.050410] [     T95]  ? __lock_acquire+0xd03/0x2230
-> [  409.050413] [     T95]  lock_acquire+0x170/0x300
-> [  409.050415] [     T95]  ? touch_wq_lockdep_map+0x7e/0x1a0
-> [  409.050418] [     T95]  ? __flush_work+0x4e8/0xc70
-> [  409.050420] [     T95]  ? find_held_lock+0x2b/0x80
-> [  409.050423] [     T95]  ? touch_wq_lockdep_map+0x7e/0x1a0
-> [  409.050425] [     T95]  touch_wq_lockdep_map+0x97/0x1a0
-> [  409.050428] [     T95]  ? touch_wq_lockdep_map+0x7e/0x1a0
-> [  409.050430] [     T95]  ? __flush_work+0x4e8/0xc70
-> [  409.050432] [     T95]  __flush_work+0x5c1/0xc70
-> [  409.050434] [     T95]  ? __pfx___flush_work+0x10/0x10
-> [  409.050436] [     T95]  ? __pfx___flush_work+0x10/0x10
-> [  409.050439] [     T95]  ? __pfx_wq_barrier_func+0x10/0x10
-> [  409.050444] [     T95]  ? __pfx___might_resched+0x10/0x10
-> [  409.050454] [     T95]  nvmet_ctrl_free+0x2e9/0x810 [nvmet]
-> [  409.050474] [     T95]  ? __pfx___cancel_work+0x10/0x10
-> [  409.050479] [     T95]  ? __pfx_nvmet_ctrl_free+0x10/0x10 [nvmet]
-> [  409.050498] [     T95]  nvmet_cq_put+0x136/0x180 [nvmet]
-> [  409.050515] [     T95]  nvmet_fc_target_assoc_free+0x398/0x2040 [nvmet_fc]
-> [  409.050522] [     T95]  ? __pfx_nvmet_fc_target_assoc_free+0x10/0x10 [nvmet_fc]
-> [  409.050528] [     T95]  nvmet_fc_delete_assoc_work.cold+0x82/0xff [nvmet_fc]
-> [  409.050533] [     T95]  process_one_work+0x868/0x1480
-> [  409.050538] [     T95]  ? __pfx_process_one_work+0x10/0x10
-> [  409.050541] [     T95]  ? lock_acquire+0x170/0x300
-> [  409.050545] [     T95]  ? assign_work+0x156/0x390
-> [  409.050548] [     T95]  worker_thread+0x5ee/0xfd0
-> [  409.050553] [     T95]  ? __pfx_worker_thread+0x10/0x10
-> [  409.050555] [     T95]  kthread+0x3af/0x770
-> [  409.050560] [     T95]  ? lock_acquire+0x180/0x300
-> [  409.050563] [     T95]  ? __pfx_kthread+0x10/0x10
-> [  409.050565] [     T95]  ? __pfx_kthread+0x10/0x10
-> [  409.050568] [     T95]  ? ret_from_fork+0x6e/0x810
-> [  409.050576] [     T95]  ? lock_release+0x1ab/0x2f0
-> [  409.050578] [     T95]  ? rcu_is_watching+0x11/0xb0
-> [  409.050582] [     T95]  ? __pfx_kthread+0x10/0x10
-> [  409.050585] [     T95]  ret_from_fork+0x55c/0x810
-> [  409.050588] [     T95]  ? __pfx_ret_from_fork+0x10/0x10
-> [  409.050590] [     T95]  ? __switch_to+0x10a/0xda0
-> [  409.050598] [     T95]  ? __switch_to_asm+0x33/0x70
-> [  409.050602] [     T95]  ? __pfx_kthread+0x10/0x10
-> [  409.050605] [     T95]  ret_from_fork_asm+0x1a/0x30
-> [  409.050610] [     T95]  </TASK>
-
-nvmet_fc_target_assoc_free runs in the nvmet_wq context and calls
-
-  nvmet_fc_delete_target_queue
-    nvmet_cq_put
-      nvmet_cq_destroy
-        nvmet_ctrl_put
-         nvmet_ctrl_free
-           flush_work(&ctrl->async_event_work);
-           cancel_work_sync(&ctrl->fatal_err_work);
- 
-The async_event_work could be running on nvmet_wq. So this deadlock is
-real. No idea how to fix it yet.
-
-> [4] WARN during nvme/058 fc transport
+> https://lore.kernel.org/linux-block/0535f4dd-ada3-414a-84c6-7abc232aa670@kernel.dk/
 > 
-> [ 1410.913156] [   T1369] WARNING: block/genhd.c:463 at __add_disk+0x87b/0xd50, CPU#0: kworker/u16:12/1369
+> So the change may can be simplified as below, meantime
+> selftests/ublk/test_part_01.sh need to be updated.
 
-	/*
-	 * If the driver provides an explicit major number it also must provide
-	 * the number of minors numbers supported, and those will be used to
-	 * setup the gendisk.
-	 * Otherwise just allocate the device numbers for both the whole device
-	 * and all partitions from the extended dev_t space.
-	 */
-	ret = -EINVAL;
-	if (disk->major) {
-		if (WARN_ON(!disk->minors))
-			goto out;
+Ok, tests and docs are next as Jens requested.
 
-If I read the correct, the gendisk is allocated in nvme_mpath_alloc_disk
-and then added due the ANA change in nvme_update_ana_state. Not sure if
-this is really fc related but I haven't really figured out how this part
-of the code yet.
+> 
+> Alexander, please let us know if you'd like work this way?
+
+https://lore.kernel.org/linux-block/c95b3de4-f4f8-4b35-a3e4-a83da98ced0b@zazolabs.com/T/#mbb410ceb3f4c6f23e6c566911dfc833365ce9cdc
+
+in short - having partitions and auto scan are two different features, 
+why merge them?
+
+If we want to cover all cases i thing we should go like this:
+
+/* Enable partitions support on device */
+#define UBLK_F_PARTITIONS (1ULL << 18)
+
+/* Do not perform automatic partition scanning when device is added */
+#define UBLK_F_NO_AUTO_PART_SCAN (1ULL << 19)
+
+Added value is to have partitions enabled/disabled explicitly for 
+trusted devices. Where by default they will be disabled.
+
+Also may be change from UBLK_F_NO_AUTO_PART_SCAN to 
+UBLK_F_AUTO_PART_SCAN - to make it explicit instead and be like
+the rest of the flags - all are enable flags
+
+Then these variants become possible:
+- unprivileged without partitions (can we add security checks to allow 
+partitions for them too?)
+- trusted with or without partitions (UBLK_F_PARTITIONS bound to 
+GD_SUPPRESS_PART_SCAN)
+- If it is a device with partitions then UBLK_F_NO_AUTO_PART_SCAN 
+controls if initial auto scan is performed or not.
+
+Having them separate can allow emulation of removable media where data 
+is not available at device creation time but is known when available by 
+external event so you can load partitions. Two step device bring up, 
+i.e. partition scan at device creation time will block you, but you know 
+when data is available from an external event, and then you can load 
+partitions.
+
+What do you think?
+
+I'be added CC Yoav since i think he requested that feature in first 
+place. I beleive Hannes may have a different use case, so let's get some 
+more input on this.
+
+> diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
+> index a88876756805..d6f479fff75b 100644
+> --- a/include/uapi/linux/ublk_cmd.h
+> +++ b/include/uapi/linux/ublk_cmd.h
+> @@ -367,8 +367,8 @@
+>    */
+>   #define UBLK_F_SAFE_STOP_DEV   (1ULL << 17)
+> 
+> -/* Disable automatic partition scanning when device is started */
+> -#define UBLK_F_NO_AUTO_PART_SCAN (1ULL << 18)
+> +/* Disable partition scanning */
+> +#define UBLK_F_NO_PART_SCAN    (1ULL << 18)
+> 
+>   /* device state */
+>   #define UBLK_S_DEV_DEAD        0
+> [root@ktest-40 linux]# git diff
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index c13cda58a7c6..f1a104222fb1 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -81,7 +81,7 @@
+>                  | (IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY) ? UBLK_F_INTEGRITY : 0) \
+>                  | UBLK_F_SAFE_STOP_DEV \
+>                  | UBLK_F_BATCH_IO \
+> -               | UBLK_F_NO_AUTO_PART_SCAN)
+> +               | UBLK_F_NO_PART_SCAN)
+> 
+>   #define UBLK_F_ALL_RECOVERY_FLAGS (UBLK_F_USER_RECOVERY \
+>                  | UBLK_F_USER_RECOVERY_REISSUE \
+> @@ -4438,14 +4438,13 @@ static int ublk_ctrl_start_dev(struct ublk_device *ub,
+> 
+>          set_bit(UB_STATE_USED, &ub->state);
+> 
+> -       /* Skip partition scan if disabled by user */
+> -       if (ub->dev_info.flags & UBLK_F_NO_AUTO_PART_SCAN) {
+> -               clear_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
+> -       } else {
+> -               /* Schedule async partition scan for trusted daemons */
+> -               if (!ub->unprivileged_daemons)
+> -                       schedule_work(&ub->partition_scan_work);
+> -       }
+> +       /*
+> +        * Only schedule async partition scan in case of
+> +        * !UBLK_F_NO_PART_SCAN and trusted daemons
+> +        */
+> +       if (!(ub->dev_info.flags & UBLK_F_NO_PART_SCAN) &&
+> +                       !ub->unprivileged_daemons)
+> +               schedule_work(&ub->partition_scan_work);
+
+a few lines above
+set_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
+is done uncoditionally.
+
+schedule_work(&ub->partition_scan_work); without clearing
+the bit first won't load the partitions just clear the bit and return.
+This is a bug in the original commit, not a result of any of the 
+proposed changes.
+
+-- 
+have fun,
+alex
