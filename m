@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F38E2D8384;
-	Sun, 15 Feb 2026 23:45:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CC762DF137;
+	Sun, 15 Feb 2026 23:45:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771199116; cv=none; b=jm3Ug9ekB3fVR79MNqxKye9jbZL+WPaXDQSwNu4YdAXVLt0z9dbSOQnHvrcK4dKl0KRTAzuMOiToj04vyxlQo74oDQs5OJC8ltA+1RZV0QjHRNzgScN0X7p0bzLJh9Vli7d69to69ST0M5EKts0a0UT6GNEXzW9d6Ko9tVzhvc0=
+	t=1771199121; cv=none; b=AG5BXMyaEPFiWERRawHslsPjcNrELDTbFq35pobsuKY57FlmMA2dOQx7Zer4fQ+tatGA81YEfZ9mgRC2J1MInvvXKwZiHQMwJG0goPYyPWiyAwaFqKpdI0wqdfSwULSlPO4gMYAIw9ln9vE6szsZjgsYENDELtNUvRaF3VQcHB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771199116; c=relaxed/simple;
-	bh=xknlJKjDgQx2PklWhfpIJtdR7sb0fmRIcoqZtD2O+JQ=;
+	s=arc-20240116; t=1771199121; c=relaxed/simple;
+	bh=eIKMKUHsinnjm6IdiHwgx8Cbg+4YOZ96zj8DP30QUB0=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=d+uA1MjU7mKCND9SUcVlw3GTfOTgSU2v8Oul7hl9x9C8RYq3DbV2FGmAKAQPpKeF0eV+dxvHAcavF25hczfCTjMxF0KbQ/NqCiD592J3uycAU6dvTS9iSEmmyxe1/7h1UAqMWkYdyjjkQe152StqV74IRRIFrK3IeD2yxIw/faY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DTq0574l; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=eXc510TgKr+0RzE33lhMl3N5x0OlU8RGr+U/AQPSH4udhgjUc0a1a+pDj0yCwvPGLJeCQ7wSouYEmDhuAcD1Jd3aoO+OhJAzXWSqDMjbq4Z980BTWCF06fCXY0rdI1CgHd34bH+jc/Qh8en1oK8SeXnvT+iv7xy0+upEwJfxahs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rbc0r5Qr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DTq0574l"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8BA5C4CEF7;
-	Sun, 15 Feb 2026 23:45:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rbc0r5Qr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA85AC4CEF7;
+	Sun, 15 Feb 2026 23:45:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771199116;
-	bh=xknlJKjDgQx2PklWhfpIJtdR7sb0fmRIcoqZtD2O+JQ=;
+	s=k20201202; t=1771199121;
+	bh=eIKMKUHsinnjm6IdiHwgx8Cbg+4YOZ96zj8DP30QUB0=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=DTq0574lt4lFIjV5BGtsOf53qYZq/UUXgIQFVYEJnLtavbUVAreck4t93U/I85b4w
-	 8rtpG/bqaQF0Cl4uI4mW2ivUpfjqgcqtlad46pfHK2iq2nF9FgWbopKXZmp2MxtF0M
-	 qDiMt3QAsZGIJoPl9/85vRHZdH5bY8sRMYw9PJ+YWjXXmuEoB8vPr2h9OxoJWSrK5X
-	 LblQ1dOTw+BPdGutBKjuTMjRhVLuvBNJIKxM/Q+PnSQfLKxV2m9GWo8np2086DBB9Q
-	 NauJCPEqCnOcEW/PTtC3Jdk0N+EvnM5Uib1/M0iw+/Xc4qvrUCnSTasP9UKa0aCPch
-	 dEXJRtvDrsbqQ==
+	b=Rbc0r5Qrb7qkrPQNiJhEBZ/acLMM0TcAMN3AMncJp2J+dllypKZuVEnbEuLEdtPqe
+	 kAkj28y8tQoORj03TgbhgyHxbtBUgTIg7TnDKh9LvzRQRpPa/kOlStL2AJJJcFlh2G
+	 OBYUszJXkIqmN6LV7neooRwL0Oia03CB8TCbPZoSyqIrLVnAL/eY7EHgVrRiIj4jFj
+	 cDXes+AKBsTL5FZJTBzNzPntyDprzHoOdcJ9oJcx3u1h7FwlVcfCk5dNe6CKebmC9Y
+	 2IW7RK0jWDli2Qgl6MzZM65u3Uq9OI4AhCNXhfBwPOJ88Y7umYxeJot8XzSHbXVSXN
+	 re0k1O/fG1qBQ==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Mon, 16 Feb 2026 00:34:48 +0100
-Subject: [PATCH 01/79] block: rnull: adopt new formatting guidelines
+Date: Mon, 16 Feb 2026 00:35:48 +0100
+Subject: [PATCH 61/79] block: rust: add `GenDisk::tag_set`
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260216-rnull-v6-19-rc5-send-v1-1-de9a7af4b469@kernel.org>
+Message-Id: <20260216-rnull-v6-19-rc5-send-v1-61-de9a7af4b469@kernel.org>
 References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 In-Reply-To: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 To: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
@@ -56,61 +56,64 @@ Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
  Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1060; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=xknlJKjDgQx2PklWhfpIJtdR7sb0fmRIcoqZtD2O+JQ=;
- b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpklgcx+Hel7olsXH4zRoVtUmD4dmhza68hS3aH
- Ic1/VCoziCJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZJYHAAKCRDhuBo+eShj
- d/mQEAC2VIEFmtp53Y73KZqpnd3iisJkJprBqibxgwe4PmVofc2jb+vYmI0M27QBCSy7TZI70qa
- fGabetSqKwfit5BTtDd9i8VWhdIt28z2tBa7lQAQU6gUXN7+h/0OrgZUjrQMYNSiMHEFfjDKRnm
- vabPA9SvNgKI9Nnq8mkj/4DwHLO9QedW9ZuM5LWiGLNx2tYrP6i4d6f17F0u0F3Q/YEXzg7Ad79
- rCfup6mPXjh+Xf0R9Yh17SM491NorZ3/e62rV/U9PgM2mDlpJz52MpGgdcWoecew5g0h1GVb26L
- zFkE5WCDPNOrzhFCo7ezaTdQ1lwwVrBjyYuJZb4tEmPP7qHwjN6Awf73ZPJCjhBN31N9Hfe1l9+
- AvHq3/DZURYUCKi8+421oXhmInZaNb9i7n8dd5vLyZar08vDXomuh6rNdNoUDo5MHhEkI2NvbXs
- zwiWTGN2OytTL79j5+i6BQQQQkYcUR3mpk+wN0LAw3G/kd1FGEicOnVdIs7u25hOO5FvJUSuWKE
- /5IDy8vVRxcU0Bxei4QO7I70wnsJPp8f2XIZhRzeWn75szLBUXWyEoO1QJssJXqH8ztnRr3rdL4
- HSQUvjWibaQyn2e79bqnYQP7AjY51xhJ+EF84ezBywBBDfAj+JSzVpIgtytQanunAnN6dcj1GU/
- jqhUKqDc7YaEwKQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1761; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=eIKMKUHsinnjm6IdiHwgx8Cbg+4YOZ96zj8DP30QUB0=;
+ b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpklhSUpM//34bJGuIqeD4kIISe6J2+Xnz/36Oz
+ i3Tue+aVvaJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZJYUgAKCRDhuBo+eShj
+ d2ACD/9agCA2MGNXTbdM1QI2Fqe0Uv4YftmLwHQmg3ttOb56ej/wO1bKYAhe0GN0qziAWopJau4
+ o0v2t8yrPv+7WU6DIDSmuRZpgPzPnTRuoGFYQZ6Lh411eX8QrJxB2O7q8ifRdC4mFnbjtwDg2C3
+ 4fPmL3+dZ1q+993ilNfCnY0Z4UlN7HY+SQwoykInhH+N4AE05eaLRn46TUygY45VrAB64SUbfn1
+ IajI0wymMUHYBZ+HzBY7g3eGoN0VYsdF+3DrIROzEEKGT1H8civF+vq5l5vOERuM/dNgFUfoL2c
+ 5CmmyxBVVkScEaqYEKacICSZyO1E3RYo8K6dway2M/RkKEqDTg1Fx66SAJtm40J6Ey9Aw6ItnVe
+ EEmVReAdxwoOBGi/lmHD/PFLujWLvXcynBCLOzH2RSh7jhwhFUi3GHsYsExziyRzVJUhwG22D8m
+ ld6ezc0wQ4S9YIKtIwU4AGc/KbXTL3kQRQnDff43cWlMCXT7msoIBuOAxCDS4x0QXOUR4/XHONr
+ qbxDBnvXoe84HzyMkXKj7Rl7scESnbv0+LU67zAnYhfYYl4i4QRoTDxUuW17OqbwhbFFEyEkH9c
+ IcqmDeQr/0HbO7kmpejntQgs1BLHmNyIbwFKOYg/soSqoUP/7EWEhaXufcHs+aRrSCpsmseuSe/
+ Z4FtD6NOI8sKr1w==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Reformat `use` statements to have one item per line as required by the
-updated Rust formatting guidelines. Apply a formatting workaround to
-ensure `rustfmt` produces the expected output.
+Add a method to `GenDisk` to obtain a reference to the associated `TagSet`.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- drivers/block/rnull/rnull.rs | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+ rust/kernel/block/mq/gen_disk.rs | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
-index a9d5e575a2c43..2c83b014b05e9 100644
---- a/drivers/block/rnull/rnull.rs
-+++ b/drivers/block/rnull/rnull.rs
-@@ -10,14 +10,21 @@
-         self,
-         mq::{
-             self,
--            gen_disk::{self, GenDisk},
--            Operations, TagSet,
-+            gen_disk::{
-+                self,
-+                GenDisk, //
-+            },
-+            Operations,
-+            TagSet, //
-         },
-     },
-     error::Result,
-     pr_info,
-     prelude::*,
--    sync::{aref::ARef, Arc},
-+    sync::{
-+        aref::ARef,
-+        Arc, //
-+    },
- };
- use pin_init::PinInit;
+diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_disk.rs
+index c6b9839864012..b5291bc3e051d 100644
+--- a/rust/kernel/block/mq/gen_disk.rs
++++ b/rust/kernel/block/mq/gen_disk.rs
+@@ -236,7 +236,7 @@ pub fn build(
+         // `__blk_mq_alloc_disk` above.
+         let mut disk = UniqueArc::new(
+             GenDisk {
+-                _tagset: tagset,
++                tag_set: tagset,
+                 gendisk,
+                 backref: Arc::pin_init(
+                     // INVARIANT: We break `GenDiskRef` invariant here, but we restore it below.
+@@ -320,7 +320,7 @@ pub(crate) const fn build_vtable() -> &'static bindings::block_device_operations
+ ///    `bindings::device_add_disk`.
+ ///  - `self.gendisk.queue.queuedata` is initialized by a call to `ForeignOwnable::into_foreign`.
+ pub struct GenDisk<T: Operations> {
+-    _tagset: Arc<TagSet<T>>,
++    tag_set: Arc<TagSet<T>>,
+     gendisk: *mut bindings::gendisk,
+     backref: Arc<Revocable<GenDiskRef<T>>>,
+ }
+@@ -342,6 +342,11 @@ pub fn queue_data(&self) -> <T::QueueData as ForeignOwnable>::Borrowed<'_> {
+         // SAFETY: By type invariant, self is a valid gendisk.
+         unsafe { T::QueueData::borrow((*(*self.gendisk).queue).queuedata) }
+     }
++
++    /// Get a reference to the `TagSet` used by this `GenDisk`.
++    pub fn tag_set(&self) -> &Arc<TagSet<T>> {
++        &self.tag_set
++    }
+ }
  
+ // SAFETY: `GenDisk` is an owned pointer to a `struct gendisk` and an `Arc` to a
 
 -- 
 2.51.2
