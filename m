@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8C5E30C368;
-	Sun, 15 Feb 2026 23:43:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C83082E7F3A;
+	Sun, 15 Feb 2026 23:43:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771199026; cv=none; b=FzE9ipdQMRzcIe8ZcFOFWKuL98o8bwGvwZDLCKEuKGGd+Oz6CiVSX6wt5QAhJao4O3C6pp7LjdJmNxFhtpe2i2LogJophQJXJfARDx8KLXykExIp/t3Qi0B2uROd4o7uq/6JQfaZ4sQYD/jMTPsTKuSCCvtGWV3n1dGrCGCUH7M=
+	t=1771199031; cv=none; b=mTtmOl3ZMwawjQlrFZQDpbxEi9VfzrhD/PPWlJhd3FC9WQNhtPZD5j3LxSpyqYhlvZOS+oIvElZtjh6Eu254baGzmVAA0m60ugdyw2BdnvHosI2x9ze3bMbn5JC4gTstyx6Hbks3hTIqgQ4iwQf+6gx4yffSDnFAFdng4J3l2Ls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771199026; c=relaxed/simple;
-	bh=hyJWmGhHnYKgGumF3acRrYQ7yD9VZFPwyaRRW4uns7c=;
+	s=arc-20240116; t=1771199031; c=relaxed/simple;
+	bh=kRUjCKtoTGv3hT8Dyq+/AHzdexRsLl9w4VNxmn7tYGw=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=VhaVWf09pPPJbd0M+Yl9zWP1V9Sn+Frw3XVAk2ZNq2vEt1lQHd32Kiktcdy1zup9pJr2b2wCvXL3T6iQOXNlPsPEhYyD/HPg9a/zdeQRp7OJ0msnE30LVch8SA7c4Sn0J13A8/osM/QzZpNFoQwocrb/TAFC+lfLq8ef+s62II4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r0Xvw+Xb; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=P3xo2Ci2So+/Ck6krUTJMkzZgPspeGFtZJXWHDLMNbKhUPfxE6RVz6NixKpZwG4XOTWMCkjzFeKDPMBr2Fh0qOKr9Uc+JstpIfmJ89RAZKhp9vPAtj2tNSdO0QOyyDuh6QQ930hfc2GaNtNEZxuMBr2ITXrWwkrCpODl725s4jA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nLiFV3Ln; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r0Xvw+Xb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DD5BC4CEF7;
-	Sun, 15 Feb 2026 23:43:42 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nLiFV3Ln"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F166C4CEF7;
+	Sun, 15 Feb 2026 23:43:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771199026;
-	bh=hyJWmGhHnYKgGumF3acRrYQ7yD9VZFPwyaRRW4uns7c=;
+	s=k20201202; t=1771199031;
+	bh=kRUjCKtoTGv3hT8Dyq+/AHzdexRsLl9w4VNxmn7tYGw=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=r0Xvw+Xbl4WyoIV0Fgvc4CnezN4AquFYJprwOMMZ4tW2FWDP8IEMP5IspVkvapRKr
-	 eyQCXlRj9nuKYDdDqQr3EeH1EDajPMZ6uvg/8RHpfiYqBCE1AUpo51WkLT2mkQWzuf
-	 8yAVDEjVXa5fUyolR1WoGZg95YCrxgWlLbnDCaI5uWYLA9l/ss7OYNKWrCggl1Bfxh
-	 /2MC4rdaD8XO4sPI0pN414gUY+NUp0nhQwJPAaunICom5uRzXiXKtQa0eL2W0q5vxT
-	 kJ8UlGWZDBAMe6iz/mIQmb//20aycZ9d1XVZvHVp5sNncJqa79a4o8+O28Mk8KfS6M
-	 O2UdjgNGNAg5Q==
+	b=nLiFV3Ln/kAwVQ7jgAzUZt+QYD+bmIuFMsT+Yi1JtwFIAC4Lujy/4vUBPaUqsLg44
+	 Pz5kKMHGBj4HSoM6TCWWWgcdWSlyV5siE4mMwFGwsawfIDi81j2DYEZsrE4SOW8Rdl
+	 ppe7QzEeYHDnYcB99OkjNje7ruTXucVP2m+fbLKPcU+O1vOp7vsr6oUador9TD7ti0
+	 bGP/7zKouCcCjV2LzilOwSYablNh8SiboQY5agiYoMXvp6KeR3QEY9vwL3IB3Z+zdb
+	 LhX4QTTScID+Yo4Mu7zeL6I5tphcET+DJqzX7jvoaMwa5mj37bI/TCLaThjyrKluyT
+	 WIWP+70m+b0Yg==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Mon, 16 Feb 2026 00:35:04 +0100
-Subject: [PATCH 17/79] block: rnull: allow specifying the home numa node
+Date: Mon, 16 Feb 2026 00:35:15 +0100
+Subject: [PATCH 28/79] block: rnull: add partial I/O support for bad blocks
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260216-rnull-v6-19-rc5-send-v1-17-de9a7af4b469@kernel.org>
+Message-Id: <20260216-rnull-v6-19-rc5-send-v1-28-de9a7af4b469@kernel.org>
 References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 In-Reply-To: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 To: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
@@ -56,160 +56,298 @@ Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
  Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4428; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=hyJWmGhHnYKgGumF3acRrYQ7yD9VZFPwyaRRW4uns7c=;
- b=kA0DAAoB4bgaPnkoY3cByyZiAGmSWCujcbaRtyQ+5c46GUtpYsZLNpV7VYMbAQXDEhY8owFWT
- okCMwQAAQoAHRYhBBLB+UdWv3wqFdbAEuG4Gj55KGN3BQJpklgrAAoJEOG4Gj55KGN3ydkQAInh
- m/4xDjaLWkap0qZVw4kdG+BQcpK/gQBOgCp5aQJ9g6jpMgw7xGymCSWaXegQ/45lRH69A69dmJ9
- YevW/afwAjaK0Gy8+719L2V0WxkeUUbqtPvQP0r6h+O7HwKOEXeBp4svcMpD78XGzcaixFcTM73
- +q3wrysM6xhIEIuFJxU4aPzz5XV6a0i4Am1u+LWbWUulfmD2VQzSH/qit7F7Al2Gh/xLWAaXsz7
- mbeJOcNYaEtkyMwGIuoAAwOjcikxVvUHrAGHDVKgXx1rY7xVSAsw+GdBe+/2qKgSKKxCmiLIVzM
- Qdj9jl32dxV7g7L+SGVXd/XxSziAAft+K4g/ZY9TIw1BGIl1SzTZH+oayKtrCtHyjV45KFZ+Mor
- 3A1YvvKSQtwicHPmGYKsNR3neTKoLgAR9O8uHmNol4224yieRMP7lc8HkY6MNV4zI7b/UonXR6b
- WkRDZQmScebq/brfppkcJXOKGDu9tAWj9yp7JNC3fBMGFA6WmSxIXN+cF7/Qur2tofw7IKbsWuz
- EscfebPY9qQ/gPiYBQ21h0h/Wn0Tks5pLQ9TGjlsne3xZW9didm3pGauc/h3TFaEmIsjObi5vBT
- hlLepzDjKUpTaBBiRvm5KUtk7hxb4iqtjjqxihxO7H94YIe8K90FeU4QFctgIu785HWqX6gRMky
- 2c514
+X-Developer-Signature: v=1; a=openpgp-sha256; l=10153;
+ i=a.hindborg@kernel.org; h=from:subject:message-id;
+ bh=kRUjCKtoTGv3hT8Dyq+/AHzdexRsLl9w4VNxmn7tYGw=;
+ b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpklg1reIhnxlHbTm+/U8X/ib+aOTFikBpNjyXx
+ 0q1mGQ6z6OJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZJYNQAKCRDhuBo+eShj
+ dyK7EADGq2Yc0ZJAzDtZeBoR2EMzSt3mLhli34HJVUPQzCDsXSWLN9by/tgnavK/GIhYiLm8NbT
+ TKEb3gE133xHSC+rJ9eBZPLMuDl3FAzvZo3Kr+jQNmHa9aBIccULynHVxfQMJyfAdtmK/fOLZV1
+ MAcvY4iXxSDezJhmY8n3wYlux5RCjMpMgdrZonAnYinWmQ7OOaUMJQwtC5cI0JX1dOHpq5BIBLB
+ 6pDyObhtaC2k/70xjE5lg1t3BCNvGRMZYqOXpe7nqXgE5ad6XaMZd8ForSAMIUauJAS1gSwLH9a
+ QxI59iQ8+X+Q4lFVcPdtr5orNUyY73x4nI7enf9Gj4pFU61AOahn49yDt79J7RHIWoQJsVdznAc
+ waWHA973pU0gBLE7xefFVSKEpoPU7SHPdbtHFsIr/Jsyl3HtL/5D5ki3IxdkRFWg9muENuhF9La
+ jkeWWtmv8ea992mOpNlsQJUdMW2J5TPSPNowJs3nbfDcSUnUJL6r5cMPymG9nAMHp0yZAvW5Vu3
+ ByHMgLf3Jy1AxQZUloIQkxT10ERnBQiH3mvaDxhPrAynoJcLvRYtMHDdlWNerehpg8UR8gwGs3i
+ pSz2BsirisJm7OvQrguGyGuM8GJTpPXGYTQAZh+jR/aaSwYaV1HpZ2M/20xcW+6rJSe+T6BBpnB
+ hIlDtcIOxv/pL7Q==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Add a configfs attribute to specify the NUMA node for rnull tag set
-and CPU map allocations. This allows testing NUMA-aware block device
-behavior and optimizing memory placement for specific hardware
-configurations.
+Add bad_blocks_partial_io configuration option that allows partial I/O
+completion when encountering bad blocks, rather than failing the entire
+request.
+
+When enabled, requests are truncated to stop before the first bad block
+range, allowing the valid portion to be processed successfully. This
+improves compatibility with applications that can handle partial
+reads/writes.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- drivers/block/rnull/configfs.rs | 19 +++++++++++++++++++
- drivers/block/rnull/rnull.rs    | 18 ++++++++++++++++--
- 2 files changed, 35 insertions(+), 2 deletions(-)
+ drivers/block/rnull/configfs.rs |  32 ++--------
+ drivers/block/rnull/rnull.rs    | 125 ++++++++++++++++++++++++++++------------
+ 2 files changed, 95 insertions(+), 62 deletions(-)
 
 diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
-index b05bfc23090c2..fe00617d2b679 100644
+index a39691b39e374..c08a3cbd66f18 100644
 --- a/drivers/block/rnull/configfs.rs
 +++ b/drivers/block/rnull/configfs.rs
-@@ -5,6 +5,7 @@
-     THIS_MODULE, //
- };
- use kernel::{
-+    bindings,
-     block::mq::gen_disk::{
-         GenDisk,
-         GenDiskBuilder, //
-@@ -92,6 +93,7 @@ fn make_group(
-                 memory_backed: 6,
-                 submit_queues: 7,
-                 use_per_node_hctx: 8,
-+                home_node: 9,
+@@ -104,6 +104,7 @@ fn make_group(
+                 no_sched:11,
+                 badblocks: 12,
+                 badblocks_once: 13,
++                badblocks_partial_io: 14,
              ],
          };
  
-@@ -111,6 +113,7 @@ fn make_group(
-                     name: name.try_into()?,
-                     memory_backed: false,
-                     submit_queues: 1,
-+                    home_node: bindings::NUMA_NO_NODE,
+@@ -128,6 +129,7 @@ fn make_group(
+                     no_sched: false,
+                     bad_blocks: Arc::pin_init(BadBlocks::new(false), GFP_KERNEL)?,
+                     bad_blocks_once: false,
++                    bad_blocks_partial_io: false,
                  }),
              }),
              core::iter::empty(),
-@@ -167,6 +170,7 @@ struct DeviceConfigInner {
-     disk: Option<GenDisk<NullBlkDevice>>,
-     memory_backed: bool,
-     submit_queues: u32,
-+    home_node: i32,
+@@ -189,6 +191,7 @@ struct DeviceConfigInner {
+     no_sched: bool,
+     bad_blocks: Arc<BadBlocks>,
+     bad_blocks_once: bool,
++    bad_blocks_partial_io: bool,
  }
  
  #[vtable]
-@@ -199,6 +203,7 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
-                 completion_time: guard.completion_time,
-                 memory_backed: guard.memory_backed,
-                 submit_queues: guard.submit_queues,
-+                home_node: guard.home_node,
+@@ -226,6 +229,7 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+                 no_sched: guard.no_sched,
+                 bad_blocks: guard.bad_blocks.clone(),
+                 bad_blocks_once: guard.bad_blocks_once,
++                bad_blocks_partial_io: guard.bad_blocks_partial_io,
              })?);
              guard.powered = true;
          } else if guard.powered && !power_op {
-@@ -302,3 +307,17 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
-         Ok(())
-     })
- );
-+
-+configfs_simple_field!(
-+    DeviceConfig,
-+    9,
-+    home_node,
-+    i32,
-+    check | value | {
-+        if value == 0 || value >= kernel::num_online_nodes().try_into()? {
-+            Err(kernel::error::code::EINVAL)
-+        } else {
-+            Ok(())
-+        }
-+    }
-+);
-diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
-index 278f75d886fd9..fb3ce272d5bec 100644
---- a/drivers/block/rnull/rnull.rs
-+++ b/drivers/block/rnull/rnull.rs
-@@ -20,7 +20,10 @@
-             TagSet, //
-         },
-     },
--    error::Result,
-+    error::{
-+        code,
-+        Result, //
-+    },
-     new_mutex,
-     new_xarray,
-     page::SafePage,
-@@ -95,6 +98,10 @@
-             description:
-         "Use per-node allocation for hardware context queues, 0-false, 1-true. Default: 0-false",
-         },
-+        home_node: i32 {
-+            default: -1,
-+            description: "Home node for the device. Default: -1 (no node)",
-+        },
-     },
+@@ -427,29 +431,5 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+     }
  }
  
-@@ -131,6 +138,7 @@ fn init(_module: &'static ThisModule) -> impl PinInit<Self, Error> {
-                     completion_time: Delta::from_nanos(completion_time),
-                     memory_backed: *module_parameters::memory_backed.value() != 0,
-                     submit_queues,
-+                    home_node: *module_parameters::home_node.value(),
+-#[vtable]
+-impl configfs::AttributeOperations<13> for DeviceConfig {
+-    type Data = DeviceConfig;
+-
+-    fn show(this: &DeviceConfig, page: &mut [u8; PAGE_SIZE]) -> Result<usize> {
+-        let mut writer = kernel::str::Formatter::new(page);
+-
+-        if this.data.lock().bad_blocks_once {
+-            writer.write_str("1\n")?;
+-        } else {
+-            writer.write_str("0\n")?;
+-        }
+-
+-        Ok(writer.bytes_written())
+-    }
+-
+-    fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+-        if this.data.lock().powered {
+-            return Err(EBUSY);
+-        }
+-
+-        this.data.lock().bad_blocks_once = kstrtobool_bytes(page)?;
+-
+-        Ok(())
+-    }
+-}
++configfs_simple_bool_field!(DeviceConfig, 13, bad_blocks_once);
++configfs_simple_bool_field!(DeviceConfig, 14, bad_blocks_partial_io);
+diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
+index 0f569c5b65f77..6691e5912c5c9 100644
+--- a/drivers/block/rnull/rnull.rs
++++ b/drivers/block/rnull/rnull.rs
+@@ -162,6 +162,7 @@ fn init(_module: &'static ThisModule) -> impl PinInit<Self, Error> {
+                     no_sched: *module_parameters::no_sched.value() != 0,
+                     bad_blocks: Arc::pin_init(BadBlocks::new(false), GFP_KERNEL)?,
+                     bad_blocks_once: false,
++                    bad_blocks_partial_io: false,
                  })?;
                  disks.push(disk, GFP_KERNEL)?;
              }
-@@ -154,6 +162,7 @@ struct NullBlkOptions<'a> {
-     completion_time: Delta,
-     memory_backed: bool,
-     submit_queues: u32,
-+    home_node: i32,
+@@ -190,6 +191,7 @@ struct NullBlkOptions<'a> {
+     no_sched: bool,
+     bad_blocks: Arc<BadBlocks>,
+     bad_blocks_once: bool,
++    bad_blocks_partial_io: bool,
  }
  struct NullBlkDevice;
  
-@@ -168,6 +177,7 @@ fn new(options: NullBlkOptions<'_>) -> Result<GenDisk<Self>> {
-             completion_time,
-             memory_backed,
-             submit_queues,
-+            home_node,
+@@ -209,6 +211,7 @@ fn new(options: NullBlkOptions<'_>) -> Result<GenDisk<Self>> {
+             no_sched,
+             bad_blocks,
+             bad_blocks_once,
++            bad_blocks_partial_io,
          } = options;
  
-         let flags = if memory_backed {
-@@ -176,8 +186,12 @@ fn new(options: NullBlkOptions<'_>) -> Result<GenDisk<Self>> {
-             mq::tag_set::Flags::default()
-         };
- 
-+        if home_node > kernel::num_online_nodes().try_into()? {
-+            return Err(code::EINVAL);
-+        }
-+
-         let tagset = Arc::pin_init(
--            TagSet::new(submit_queues, 256, 1, bindings::NUMA_NO_NODE, flags),
-+            TagSet::new(submit_queues, 256, 1, home_node, flags),
+         let mut flags = mq::tag_set::Flags::default();
+@@ -239,6 +242,7 @@ fn new(options: NullBlkOptions<'_>) -> Result<GenDisk<Self>> {
+                 block_size: block_size.into(),
+                 bad_blocks,
+                 bad_blocks_once,
++                bad_blocks_partial_io,
+             }),
              GFP_KERNEL,
          )?;
+@@ -327,16 +331,62 @@ fn discard(tree: &Tree, mut sector: u64, sectors: u64, block_size: u64) -> Resul
+     }
+ 
+     #[inline(never)]
+-    fn transfer(
+-        command: bindings::req_op,
+-        tree: &Tree,
+-        sector: u64,
+-        segment: Segment<'_>,
++    fn transfer(rq: &mut Owned<mq::Request<Self>>, tree: &Tree, sectors: u32) -> Result {
++        let mut sector = rq.sector();
++        let end_sector = sector + <u32 as Into<u64>>::into(sectors);
++        let command = rq.command();
++
++        for bio in rq.bio_iter_mut() {
++            let segment_iter = bio.segment_iter();
++            for segment in segment_iter {
++                // Length might be limited by bad blocks.
++                let length = segment
++                    .len()
++                    .min((sector - end_sector) as u32 >> SECTOR_SHIFT);
++                match command {
++                    bindings::req_op_REQ_OP_WRITE => Self::write(tree, sector, segment)?,
++                    bindings::req_op_REQ_OP_READ => Self::read(tree, sector, segment)?,
++                    _ => (),
++                }
++                sector += u64::from(length) >> SECTOR_SHIFT;
++
++                if sector >= end_sector {
++                    return Ok(());
++                }
++            }
++        }
++        Ok(())
++    }
++
++    fn handle_bad_blocks(
++        rq: &mut Owned<mq::Request<Self>>,
++        queue_data: &QueueData,
++        sectors: &mut u32,
+     ) -> Result {
+-        match command {
+-            bindings::req_op_REQ_OP_WRITE => Self::write(tree, sector, segment)?,
+-            bindings::req_op_REQ_OP_READ => Self::read(tree, sector, segment)?,
+-            _ => (),
++        if queue_data.bad_blocks.enabled() {
++            let start = rq.sector();
++            let end = start + u64::from(*sectors);
++            match queue_data.bad_blocks.check(start..end) {
++                badblocks::BlockStatus::None => {}
++                badblocks::BlockStatus::Acknowledged(mut range)
++                | badblocks::BlockStatus::Unacknowledged(mut range) => {
++                    rq.data_ref().error.store(1, ordering::Relaxed);
++
++                    if queue_data.bad_blocks_once {
++                        queue_data.bad_blocks.set_good(range.clone())?;
++                    }
++
++                    if queue_data.bad_blocks_partial_io {
++                        let block_size_sectors = queue_data.block_size >> SECTOR_SHIFT;
++                        range.start = align_down(range.start, block_size_sectors);
++                        if start < range.start {
++                            *sectors = (range.start - start) as u32;
++                        }
++                    } else {
++                        *sectors = 0;
++                    }
++                }
++            };
+         }
+         Ok(())
+     }
+@@ -398,6 +448,7 @@ struct QueueData {
+     block_size: u64,
+     bad_blocks: Arc<BadBlocks>,
+     bad_blocks_once: bool,
++    bad_blocks_partial_io: bool,
+ }
+ 
+ #[pin_data]
+@@ -426,6 +477,30 @@ impl HasHrTimer<Self> for Pdu {
+     }
+ }
+ 
++fn is_power_of_two<T>(value: T) -> bool
++where
++    T: core::ops::Sub<T, Output = T>,
++    T: core::ops::BitAnd<Output = T>,
++    T: core::cmp::PartialOrd<T>,
++    T: Copy,
++    T: From<u8>,
++{
++    (value > 0u8.into()) && (value & (value - 1u8.into())) == 0u8.into()
++}
++
++fn align_down<T>(value: T, to: T) -> T
++where
++    T: core::ops::Sub<T, Output = T>,
++    T: core::ops::Not<Output = T>,
++    T: core::ops::BitAnd<Output = T>,
++    T: core::cmp::PartialOrd<T>,
++    T: Copy,
++    T: From<u8>,
++{
++    debug_assert!(is_power_of_two(to));
++    value & !(to - 1u8.into())
++}
++
+ #[vtable]
+ impl Operations for NullBlkDevice {
+     type QueueData = Pin<KBox<QueueData>>;
+@@ -444,39 +519,17 @@ fn queue_rq(
+         mut rq: Owned<mq::Request<Self>>,
+         _is_last: bool,
+     ) -> Result {
+-        if queue_data.bad_blocks.enabled() {
+-            let start = rq.sector();
+-            let end = start + u64::from(rq.sectors());
+-            match queue_data.bad_blocks.check(start..end) {
+-                badblocks::BlockStatus::None => {}
+-                badblocks::BlockStatus::Acknowledged(range)
+-                | badblocks::BlockStatus::Unacknowledged(range) => {
+-                    rq.data_ref().error.store(1, ordering::Relaxed);
+-                    if queue_data.bad_blocks_once {
+-                        queue_data.bad_blocks.set_good(range)?;
+-                    }
+-                }
+-            };
+-        }
++        let mut sectors = rq.sectors();
+ 
+-        // TODO: Skip IO if bad block.
++        Self::handle_bad_blocks(&mut rq, queue_data.get_ref(), &mut sectors)?;
+ 
+         if queue_data.memory_backed {
+             let tree = &queue_data.tree;
+-            let command = rq.command();
+-            let mut sector = rq.sector();
+ 
+-            if command == bindings::req_op_REQ_OP_DISCARD {
+-                Self::discard(tree, sector, rq.sectors().into(), queue_data.block_size)?;
++            if rq.command() == bindings::req_op_REQ_OP_DISCARD {
++                Self::discard(tree, rq.sector(), sectors.into(), queue_data.block_size)?;
+             } else {
+-                for bio in rq.bio_iter_mut() {
+-                    let segment_iter = bio.segment_iter();
+-                    for segment in segment_iter {
+-                        let length = segment.len();
+-                        Self::transfer(command, tree, sector, segment)?;
+-                        sector += u64::from(length) >> block::SECTOR_SHIFT;
+-                    }
+-                }
++                Self::transfer(&mut rq, tree, sectors)?;
+             }
+         }
  
 
 -- 
