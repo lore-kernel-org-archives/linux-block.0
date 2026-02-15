@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEA222DECA1;
-	Sun, 15 Feb 2026 23:42:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BBD22D7DF1;
+	Sun, 15 Feb 2026 23:42:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771198923; cv=none; b=aFlv2owfZKDoE+rjaoOIQPuDrn+NNDk/D6d7DEH0+2BEA3/fcsstLwOrKRWMclef132hq0ssmh3JTotQJe6h4s84RI9iruznNtoKXmomcEwKgFa60OUQ0wY7u5bA48zGjtN25uy2vXVEpopTF6Us5U4fak/6rfKJ6+O+yXv2jmc=
+	t=1771198929; cv=none; b=Tc9WcKqGItfOICj9sKUPlrH8JCWnPJBlF2n0Hzyr1l97I9doB2+2Mt4cwKy2XTZCL20cdi21YLj6/lt1oy/FwU8aL+fVte3aGR3+tghtjIIRJ/gn3uWqSdWgMDekIvdk9IWvkbEcDXu8bsQTqmQUKut4+Rcm0Q6T0Iv5AlH6xXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771198923; c=relaxed/simple;
-	bh=EF8S7FmFl3vSFKxHiqAFcxC7opaobmJHHkh7NyfesPA=;
+	s=arc-20240116; t=1771198929; c=relaxed/simple;
+	bh=uYEwg9qVRQ0NhWZcmlYe0zv8laqBKSDqB2tGW/RMct8=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=bN2El3oXd3DI7Ft/TJctppf/cqC00ebY6bpJCA3Ak7x8SZoTCKOfDR4RGZCfqa3tnIdGqxEALVxQAR4HgZVh9rwcgZGoP0soSDRiX1nrBHBI8xzBez2WYRAAJljyQor0EvgzMxquGyfJYVMs4BP2T837qHMHR+nxxtcQ8C/nfng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ohVjIgyq; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=F3zsPLnIOMnQQktGhXgnhQKyuKrS7LRUcKSRhVXEPUpNu5XTQnFlKwLkR3Z6jCxuW+rnrIyylGVPrj/bsUc5vkAuL5eIOSLY7tbHKOaN5ciHSG0szOPRjMpXL92T+sa4YCGRuqEn5o1KZI34SMpK5G4X1bhEE9+Lejqm3cAqe0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CU27ZXms; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ohVjIgyq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A76FC19422;
-	Sun, 15 Feb 2026 23:41:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CU27ZXms"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53D6AC19425;
+	Sun, 15 Feb 2026 23:42:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771198923;
-	bh=EF8S7FmFl3vSFKxHiqAFcxC7opaobmJHHkh7NyfesPA=;
+	s=k20201202; t=1771198928;
+	bh=uYEwg9qVRQ0NhWZcmlYe0zv8laqBKSDqB2tGW/RMct8=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=ohVjIgyq+9ZcKRmy85+VAIPos6ieoFUf7IrfB0vpWBkF4UmMEIJGcb7X3KUIu7szr
-	 uQp+/uHB89+wk4oLqScNs3x/4AKs9vyO6WBUXGIMKpZSWmh10K9TIK3nFv83V6mY+f
-	 3FLGDsu8oRMyp6Ekxmwb+d3nnaraSnjz1U6/+9R3KKI5A3ZJKqrxQYYe8I0QyyaOsH
-	 PjD9BxtoBixN2sAf9tLYSkyhkWl0dsqPZo9gNpNXbDasvkkhxcxoXBZ+egOFkckO3G
-	 yQo4+hK0C0YQwHYvQait1QpFBjc1+x7ds+Uh4bCb5YlMzksGZPZ4gZQjLWNb85wOlQ
-	 M43NGEbAZPdTQ==
+	b=CU27ZXms6kIrV7G19DfaAaAOwUelhCVipFwQDeCbX4VWn6wVJPDLJ3grDPzSnCtK+
+	 KiuMpnyzd8owICPC2W0nqFdb5DrMTnIxEomPXMeWMm3QGk8Qp3tZcdom0FXNbB1OF3
+	 xwp2ycZjZvwEnm0SbXFmmEx8fPkYkZN5dSSwlKMe1WpNA3bGiOWZ7mHerhivkeXudH
+	 otqNDMK90oSKhrl57Wv9F0Iq4PyNxVeEhkJujbCXcvaVMxk2fhM7WPYnmy0J2J2rSd
+	 omkM1H18JL/cwXlob4zMsBQ7RMTfe/1XOx5TpA5tlAHEbRBQbiQIXRYlM4rP29ymMY
+	 h+cIgNNxzckGQ==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Mon, 16 Feb 2026 00:35:13 +0100
-Subject: [PATCH 26/79] block: rnull: add badblocks support
+Date: Mon, 16 Feb 2026 00:35:45 +0100
+Subject: [PATCH 58/79] block: rust: add `Segment::copy_to_page_limit`
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260216-rnull-v6-19-rc5-send-v1-26-de9a7af4b469@kernel.org>
+Message-Id: <20260216-rnull-v6-19-rc5-send-v1-58-de9a7af4b469@kernel.org>
 References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 In-Reply-To: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 To: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
@@ -56,292 +56,97 @@ Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
  Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=8577; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=EF8S7FmFl3vSFKxHiqAFcxC7opaobmJHHkh7NyfesPA=;
- b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpklgzCA5NKN0hlzRJ+B3wI8OXUsh2VHHxSR288
- UF5GphVh4OJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZJYMwAKCRDhuBo+eShj
- d2wvEACO+eazDMVAJLN0GdcSEnzfv4GHoA4o8dfxM15esOo7Welb8VxAhDC2XXVg3Qb7tsdG3Wv
- yQ0qA8AvvWvnsdwXiElwFD14hB509xw5X7VZyEWLTmeUB7ZsKA0I/YSA3XSZr7+/C2e78nOPsf8
- faDFaVBXfb/pXA+Pm9YHNn6j1mlKBfFj2u0j6M8Ei+rvZRxm0KzTQHa8inblXNOXFxGNYkyAwdv
- eEqQ6LLNz1AspU0lNhC4rtn/DBzN9v6MHJCEqUtesRgrxoNd41B2A6h2NZrmX63hSwJEFHzatyj
- UXAZF7luejDKv4T2xgWsN/HPbuxRiRam9mT0fVxZO4zOtjqd+vbr6VteXCRLC1fQNytkvrOxX/0
- V46/1Qr9layTOdMPU6fF6hEDeV4wiJNImaicjCBNlEzmEY0g0sTjZ/xCq6XnQPeN5hVdI1MM3dl
- tKeIrYpzRDIPwrPQtoJ3JMwaIUMDeZhssAut5Dxu01PGoX2ayRd4Og8pJuVAJ61tVHPX8goJDkY
- PGAsDNIqyJybynjO2OFs0QdxeU8ali0gl3ivlIU3ycJ6APNzICDdHDoViaKV1fNPtx/FoOWxoPi
- 2ugP9oVP+5W9lWVpGYFFkxD8nz+hAsVx6LCIpFfvXGrVhUWftQUDYs0zQ9sArU2lynbpttaYx0S
- o2ykBH3e1UR4mjg==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2840; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=uYEwg9qVRQ0NhWZcmlYe0zv8laqBKSDqB2tGW/RMct8=;
+ b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpklhPD1Vd13GaRkq5agX96n72Np4kCvlo5WLCD
+ fk9Egr801WJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZJYTwAKCRDhuBo+eShj
+ d7efD/wPEHMykdNbgIQEgFjD0g5u2LBnODSA52TqS+8dh9ONb7dkKxO6CM34Xdd5hZN9vKMUaJ5
+ oyXEeVDHOLxk95g1hPvhVpYZ1QVVxOEySidpbAGXoIucHyW3bNa/75cg0df/ymrsxTT2vsZbVoh
+ aWjyFDqwMSw0k6Dn0E1nMfxMPlP2IGXS/G8AxSz/Y/1NjDs/ln6V27Menk1/1K4/WfWpa2g6jtT
+ i7LiKLwqGTtRBXq/9T4PO6TuRJedJ/2IAUxbftcIT0mUbMSxTM2rnJVl7s5NouEgt6D2YSdgKoV
+ S2I0ax8k7WECCBLHwKmcmPI8WX9CqSjg0X5BLpIVT3c7KNLcrCk88REdnMIszn21mE34J1gVp21
+ wujZR9oktHlgM7OSn/hcmXEmq7G05hqdOO5nyvDruUebu7pdNJfDrg0czUEbX9hOpJBHOInTLyI
+ ysttQjhHvQkaNthtvcRF3/nI7va/qZfjWTcMZPnv8whDNEXUA+xip5OJ2v0stNbB1kGlkUeQuUx
+ OcJI0uds2mDLTZpGXcOPYOCNutpX8eCzUMGFi9z3oTCF8QhQxfRs9QI9uV0ApIqO9FUsZIAdhG2
+ Kmzp5QHauxc0nuXi7kddfnCSwPO9b2rR013RDTJA4cu92ljKeaL85sobd0WH5Dc2H0W0HHVTO1K
+ fM4GmOTX+d+pGvQ==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Add badblocks support to the rnull driver with a configfs interface for
-managing bad sectors.
-
-- Configfs attribute for adding/removing bad blocks via "+start-end" and
-  "-start-end" syntax.
-- Request handling that checks for bad blocks and returns IO errors.
-- Updated request completion to handle error status properly.
-
-The badblocks functionality is disabled by default and is enabled when
-first bad block is added.
+Add a method to `block::mq::bio::Segment` to copy a bounded amount of bytes
+to a page.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- drivers/block/rnull/configfs.rs | 63 ++++++++++++++++++++++++++++++++++++++---
- drivers/block/rnull/rnull.rs    | 46 ++++++++++++++++++++++++++----
- 2 files changed, 100 insertions(+), 9 deletions(-)
+ rust/kernel/block/bio/vec.rs    | 27 ++++++++++++++++++++++++++-
+ rust/kernel/block/mq/request.rs |  3 +--
+ 2 files changed, 27 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
-index 18e32a87673aa..61a76addf468b 100644
---- a/drivers/block/rnull/configfs.rs
-+++ b/drivers/block/rnull/configfs.rs
-@@ -6,9 +6,12 @@
- };
- use kernel::{
-     bindings,
--    block::mq::gen_disk::{
--        GenDisk,
--        GenDiskBuilder, //
-+    block::{
-+        badblocks::BadBlocks,
-+        mq::gen_disk::{
-+            GenDisk,
-+            GenDiskBuilder, //
-+        }, //
-     },
-     c_str,
-     configfs::{
-@@ -27,7 +30,10 @@
-         kstrtobool_bytes,
-         CString, //
-     },
--    sync::Mutex,
-+    sync::{
-+        Arc,
-+        Mutex, //
-+    },
-     time, //
- };
- use macros::{
-@@ -96,6 +102,7 @@ fn make_group(
-                 home_node: 9,
-                 discard: 10,
-                 no_sched:11,
-+                badblocks: 12,
-             ],
-         };
- 
-@@ -118,6 +125,7 @@ fn make_group(
-                     home_node: bindings::NUMA_NO_NODE,
-                     discard: false,
-                     no_sched: false,
-+                    bad_blocks: Arc::pin_init(BadBlocks::new(false), GFP_KERNEL)?,
-                 }),
-             }),
-             core::iter::empty(),
-@@ -177,6 +185,7 @@ struct DeviceConfigInner {
-     home_node: i32,
-     discard: bool,
-     no_sched: bool,
-+    bad_blocks: Arc<BadBlocks>,
- }
- 
- #[vtable]
-@@ -212,6 +221,7 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
-                 home_node: guard.home_node,
-                 discard: guard.discard,
-                 no_sched: guard.no_sched,
-+                bad_blocks: guard.bad_blocks.clone(),
-             })?);
-             guard.powered = true;
-         } else if guard.powered && !power_op {
-@@ -367,3 +377,48 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
-         Ok(())
-     }
- }
-+
-+#[vtable]
-+impl configfs::AttributeOperations<12> for DeviceConfig {
-+    type Data = DeviceConfig;
-+
-+    fn show(this: &DeviceConfig, page: &mut [u8; PAGE_SIZE]) -> Result<usize> {
-+        let ret = this.data.lock().bad_blocks.show(page, false);
-+        if ret < 0 {
-+            Err(Error::from_errno(ret as c_int))
-+        } else {
-+            Ok(ret as usize)
-+        }
+diff --git a/rust/kernel/block/bio/vec.rs b/rust/kernel/block/bio/vec.rs
+index 20cea478050b9..ed1c1374c9c76 100644
+--- a/rust/kernel/block/bio/vec.rs
++++ b/rust/kernel/block/bio/vec.rs
+@@ -79,13 +79,38 @@ pub fn advance(&mut self, count: u32) -> Result {
+     /// Returns the number of bytes copied.
+     #[inline(always)]
+     pub fn copy_to_page(&mut self, dst_page: Pin<&mut SafePage>, dst_offset: usize) -> usize {
++        self.copy_to_page_limit(dst_page, dst_offset, 0)
 +    }
 +
-+    fn store(this: &DeviceConfig, page: &[u8]) -> Result {
-+        // This attribute can be set while device is powered.
++    /// Copy data of this segment into `dst_page`.
++    ///
++    /// Copies at most `limit` bytes of data from the current offset to the next page boundary. That
++    /// is `PAGE_SIZE - (self.offeset() % PAGE_SIZE)` bytes of data. Data is placed at offset
++    /// `self.offset()` in the target page. This call will advance offset and reduce length of
++    /// `self`.
++    ///
++    /// If `limit` is zero it is ignored.
++    ///
++    /// Returns the number of bytes copied.
++    #[inline(always)]
++    pub fn copy_to_page_limit(
++        &mut self,
++        dst_page: Pin<&mut SafePage>,
++        dst_offset: usize,
++        limit: usize,
++    ) -> usize {
+         // SAFETY: We are not moving out of `dst_page`.
+         let dst_page = unsafe { Pin::into_inner_unchecked(dst_page) };
+         let src_offset = self.offset() % PAGE_SIZE;
+         debug_assert!(dst_offset <= PAGE_SIZE);
+-        let length = (PAGE_SIZE - src_offset)
++        let mut length = (PAGE_SIZE - src_offset)
+             .min(self.len() as usize)
+             .min(PAGE_SIZE - dst_offset);
 +
-+        for line in core::str::from_utf8(page)?.lines() {
-+            let mut chars = line.chars();
-+            match chars.next() {
-+                Some(sign @ '+' | sign @ '-') => {
-+                    if let Some((start, end)) = chars.as_str().split_once('-') {
-+                        let start: u64 = start.parse().map_err(|_| EINVAL)?;
-+                        let end: u64 = end.parse().map_err(|_| EINVAL)?;
-+
-+                        if start > end {
-+                            return Err(EINVAL);
-+                        }
-+
-+                        this.data.lock().bad_blocks.enable();
-+
-+                        if sign == '+' {
-+                            this.data.lock().bad_blocks.set_bad(start..=end, true)?;
-+                        } else {
-+                            this.data.lock().bad_blocks.set_good(start..=end)?;
-+                        }
-+                    }
-+                }
-+                _ => return Err(EINVAL),
-+            }
++        if limit > 0 {
++            length = length.min(limit);
 +        }
 +
-+        Ok(())
-+    }
-+}
-diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
-index b0008e2f9c398..861392c5b5841 100644
---- a/drivers/block/rnull/rnull.rs
-+++ b/drivers/block/rnull/rnull.rs
-@@ -9,6 +9,7 @@
+         let page_idx = self.offset() / PAGE_SIZE;
+ 
+         // SAFETY: self.bio_vec is valid and thus bv_page must be a valid
+diff --git a/rust/kernel/block/mq/request.rs b/rust/kernel/block/mq/request.rs
+index cebb30fe9b3bc..bc655d202ca01 100644
+--- a/rust/kernel/block/mq/request.rs
++++ b/rust/kernel/block/mq/request.rs
+@@ -7,7 +7,6 @@
+ use crate::{
      bindings,
-     block::{
-         self,
-+        badblocks::{self, BadBlocks},
-         bio::Segment,
-         mq::{
-             self,
-@@ -37,6 +38,10 @@
-     str::CString,
+     block::mq::Operations,
+-    prelude::*,
      sync::{
-         aref::ARef,
-+        atomic::{
-+            ordering,
-+            Atomic, //
-+        },
-         Arc,
-         Mutex, //
+         aref::{ARef, RefCounted},
+         atomic::ordering,
+@@ -18,7 +17,7 @@
      },
-@@ -155,6 +160,7 @@ fn init(_module: &'static ThisModule) -> impl PinInit<Self, Error> {
-                     home_node: *module_parameters::home_node.value(),
-                     discard: *module_parameters::discard.value() != 0,
-                     no_sched: *module_parameters::no_sched.value() != 0,
-+                    bad_blocks: Arc::pin_init(BadBlocks::new(false), GFP_KERNEL)?,
-                 })?;
-                 disks.push(disk, GFP_KERNEL)?;
-             }
-@@ -181,6 +187,7 @@ struct NullBlkOptions<'a> {
-     home_node: i32,
-     discard: bool,
-     no_sched: bool,
-+    bad_blocks: Arc<BadBlocks>,
- }
- struct NullBlkDevice;
+     types::{ForeignOwnable, Opaque, Ownable, OwnableRefCounted, Owned},
+ };
+-use core::{ffi::c_void, marker::PhantomData, ops::Deref, ptr::NonNull};
++use core::{ffi::c_void, marker::PhantomData, ops::Deref, pin::Pin, ptr::NonNull};
  
-@@ -198,6 +205,7 @@ fn new(options: NullBlkOptions<'_>) -> Result<GenDisk<Self>> {
-             home_node,
-             discard,
-             no_sched,
-+            bad_blocks,
-         } = options;
- 
-         let mut flags = mq::tag_set::Flags::default();
-@@ -226,6 +234,7 @@ fn new(options: NullBlkOptions<'_>) -> Result<GenDisk<Self>> {
-                 completion_time,
-                 memory_backed,
-                 block_size: block_size.into(),
-+                bad_blocks,
-             }),
-             GFP_KERNEL,
-         )?;
-@@ -327,6 +336,16 @@ fn transfer(
-         }
-         Ok(())
-     }
-+
-+    fn end_request(rq: Owned<mq::Request<Self>>) {
-+        let status = rq.data_ref().error.load(ordering::Relaxed);
-+        rq.data_ref().error.store(0, ordering::Relaxed);
-+
-+        match status {
-+            0 => rq.end_ok(),
-+            _ => rq.end(bindings::BLK_STS_IOERR),
-+        }
-+    }
- }
- 
- const _CHEKC_STATUS_WIDTH: () = build_assert!((PAGE_SIZE >> SECTOR_SHIFT) <= 64);
-@@ -373,12 +392,14 @@ struct QueueData {
-     completion_time: Delta,
-     memory_backed: bool,
-     block_size: u64,
-+    bad_blocks: Arc<BadBlocks>,
- }
- 
- #[pin_data]
- struct Pdu {
-     #[pin]
-     timer: kernel::time::hrtimer::HrTimer<Self>,
-+    error: Atomic<u32>,
- }
- 
- impl HrTimerCallback for Pdu {
-@@ -408,6 +429,7 @@ impl Operations for NullBlkDevice {
-     fn new_request_data() -> impl PinInit<Self::RequestData> {
-         pin_init!(Pdu {
-             timer <- kernel::time::hrtimer::HrTimer::new(),
-+            error: Atomic::new(0),
-         })
-     }
- 
-@@ -417,6 +439,19 @@ fn queue_rq(
-         mut rq: Owned<mq::Request<Self>>,
-         _is_last: bool,
-     ) -> Result {
-+        if queue_data.bad_blocks.enabled() {
-+            let start = rq.sector();
-+            let end = start + u64::from(rq.sectors());
-+            if !matches!(
-+                queue_data.bad_blocks.check(start..end),
-+                badblocks::BlockStatus::None
-+            ) {
-+                rq.data_ref().error.store(1, ordering::Relaxed);
-+            }
-+        }
-+
-+        // TODO: Skip IO if bad block.
-+
-         if queue_data.memory_backed {
-             let tree = &queue_data.tree;
-             let command = rq.command();
-@@ -437,7 +472,7 @@ fn queue_rq(
-         }
- 
-         match queue_data.irq_mode {
--            IRQMode::None => rq.end_ok(),
-+            IRQMode::None => Self::end_request(rq),
-             IRQMode::Soft => mq::Request::complete(rq.into()),
-             IRQMode::Timer => {
-                 OwnableRefCounted::into_shared(rq)
-@@ -451,9 +486,10 @@ fn queue_rq(
-     fn commit_rqs(_queue_data: Pin<&QueueData>) {}
- 
-     fn complete(rq: ARef<mq::Request<Self>>) {
--        OwnableRefCounted::try_from_shared(rq)
--            .map_err(|_e| kernel::error::code::EIO)
--            .expect("Failed to complete request")
--            .end_ok();
-+        Self::end_request(
-+            OwnableRefCounted::try_from_shared(rq)
-+                .map_err(|_e| kernel::error::code::EIO)
-+                .expect("Failed to complete request"),
-+        )
-     }
- }
+ use super::RequestQueue;
+ use crate::block::bio::Bio;
 
 -- 
 2.51.2
