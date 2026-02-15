@@ -1,35 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C76AD2DB7A1;
-	Sun, 15 Feb 2026 23:42:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D67AD2D94BE;
+	Sun, 15 Feb 2026 23:42:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771198948; cv=none; b=fw4UuYJXUi/vTXe2ka78E8Kc8L/j/TBHIvUTEz/U8A8Iqft9lIflmwStWtWAynlbHpXEz1A0sWxpGriBUWHXaeOI1VWf1vHUCwvvudxzpWuGihForHMUJ8ic3YmnBk8T3stoqd4q+ghs5NIosIMEbpwYR25oCbD/Xw6zpRzGwS4=
+	t=1771198953; cv=none; b=QUGReWhcnV3Cxr7rFscaWMo3P3VMcIoeaihGrxRY5lyV8xK7dPoLkveOtBnRBfnRv3mlr2Yo6JLpnNKhv9U9TM804z38bbtIW1DqQsiwNAPDs9EldFWLDXozBRCenQXeIkfRnjb6wsnCTdBJjs/6fFFv2tLYi3PQDTCz0T1gW2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771198948; c=relaxed/simple;
-	bh=3w4qnZwh2+aU+MMv2rWpFqX4lbRY4HhOYDulfwtiM5M=;
+	s=arc-20240116; t=1771198953; c=relaxed/simple;
+	bh=ZBT3g2yxwr2ga5MlCDT4cJc5rd6AoVQ9CyP5UJLr7JY=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=LDgOHnlFkMRwm+lWePLO7NKB86bCUfvXrOo1PE8QWJeRnvdDwqU2ZARR2JA2+8L2CWF77YCcR+50zoCrNikkW1KJeuYr6CtppFdAWQSyeOSOmrK4LjSbcGfBQ6kOVu/mz1WuGLbd7rKXe4Wiq3/m7Gz0PJajADKNukB5LzX9olo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hcNBsaOU; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=SSkmRB9niKNZutB+V+ITW322IlefuETSSKVmu+DsXlx/OKtGrSq0k0+xVjGrrB8SRbi1NY2sljZNvajtrBYNPqzeyGGJzPiwrfIRmIjI4Zm2Kl2WvqyiGd9h4uoyTvF3sJQK2qmQ1u9tdPd6gx0Ar/7u0AunKcZh33+HUe3si/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oQ0LJSHO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hcNBsaOU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A372C4CEF7;
-	Sun, 15 Feb 2026 23:42:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oQ0LJSHO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DBDCC19422;
+	Sun, 15 Feb 2026 23:42:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771198948;
-	bh=3w4qnZwh2+aU+MMv2rWpFqX4lbRY4HhOYDulfwtiM5M=;
+	s=k20201202; t=1771198953;
+	bh=ZBT3g2yxwr2ga5MlCDT4cJc5rd6AoVQ9CyP5UJLr7JY=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=hcNBsaOUM934DH9Bn9Bt2eXMRFTjwTsogGjvGEoqIobTgU/yhXBgCW+djhbrod562
-	 cotXZxz70B7WGOdbqDoyoRkCajfzwkKHrLswK0I/GXkWYW4EAy8zdjNCRojo+4EBSY
-	 nMI9JFDO46qVxu0S0dJJH0Wk0E3pZEummL/3uZeM9ieDl3tYUqxpYL2ZVOqr4nRqAE
-	 tvhlweYgaY5yXc+hpVGVN2U3k6cBwCQeYgYUGrpD6WkagJZO/ZPv69kh/TrThfiw93
-	 dswZKTI/pyRE6JxRKOToSWKg4PXwe4oOhhIOuPFELLh0429JTk6gL6qhOmPrOcMX3l
-	 fxW8qyqfqpbBQ==
+	b=oQ0LJSHOI5yscAmkUVG++3cAQSWRAceqv3D0uq2h4/A0ND+d+Vay35uo/6D8Nhd6t
+	 Kzr1zb85rkn8P/78LpvGZ59R4GfHdtt3COdBcJEYKIr7lRH4bRoIKWw+fymLavNP3q
+	 SBtVcCVRmM1yfS7oBEqzJe77DVBax4bkBD6j2pITc/rOXCSZ1qH1STZdMsBJNZV+OG
+	 yXnGajUfOZZ7QyYxYwN6FUzK9Vjj63nHRv3vcVqya/h5YfvC3g/PWL7l2ZdE2XLJwd
+	 h9KR3R+ehhy5DQU9iIce96EAr3JH88izhhVM63PLazxU4ndAAPzn3uOjCSAVGobvf2
+	 oevjZEmirz1wA==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Mon, 16 Feb 2026 00:35:03 +0100
-Subject: [PATCH 16/79] block: rust: allow specifying home node when
- constructing `TagSet`
+Date: Mon, 16 Feb 2026 00:34:50 +0100
+Subject: [PATCH 03/79] block: rnull: add macros to define configfs
+ attributes
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -38,7 +38,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260216-rnull-v6-19-rc5-send-v1-16-de9a7af4b469@kernel.org>
+Message-Id: <20260216-rnull-v6-19-rc5-send-v1-3-de9a7af4b469@kernel.org>
 References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 In-Reply-To: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 To: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
@@ -57,94 +57,332 @@ Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
  Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2776; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=3w4qnZwh2+aU+MMv2rWpFqX4lbRY4HhOYDulfwtiM5M=;
- b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpklgq/QYUe8bZ2utIQqjhHTdAHO+CoJMp7AuDq
- tKoe/uOJg6JAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZJYKgAKCRDhuBo+eShj
- d07ND/9tv906O8JV5IQLXSRDJsUM5zCW6KhC6KwqGSY4R86jRB+711HKXUg03JJQDCLhm5B1odN
- g5QNE1tI6Keo/Rlim+cgJ4C0MTNOFejGDuccLgjBur1v1qbhRtouw6LvcJhG8troiQXNaLo95Sh
- N4YJ1E0nvmwmxrrI/LnQZNCgwmyEzkipgRoWL3ii5hAa6JVBiuZFlheUXC9yUId42wJVfQrbyPG
- YcbY0u8K1j+ejkox7kq83opF2JANf984yHH5OC3PxPRrdXygZKUqKIKRG3Y7Z9MKfC11FHSzfXD
- bltiQQFd0bBP81hoCG2rNMg3gbY95zq8MxhhGVpndJA8yI6K0KkwuJv2Jp6lsrVOyLkBoJs24/4
- 8BFVbkxpRuoQv6ll/Bx+0XCfRq/COAOYxmIX60aqJ2M8q38PqYxCIB65sUizUlj2PN/+QCruQwR
- HInNKE7a+lLXj8GN7lo3X2z+jCyhoz1bebAowt6EWF6qWXD/n52dwMSpc2WBW2IMC53VYLHNopE
- xH2efg0tHDD8dX8CtvqT6ryGyT6oLFHGZB0OE2bnCSQuiS3iAJe0g/akikOI/b3ae1yLKsx99aL
- B5mslJIRkZyXSkcCXEy36iRF+6W26ki8gRLBy37mk0RcC39eLJZ4qPtzM8027gJ4xsyoEe5tHyT
- T5x6R19UphlS3XQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=10210;
+ i=a.hindborg@kernel.org; h=from:subject:message-id;
+ bh=ZBT3g2yxwr2ga5MlCDT4cJc5rd6AoVQ9CyP5UJLr7JY=;
+ b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpklgeSt5Gpp+/cjlALcsKqnCvx2CtOLaSgTmuZ
+ 5S1M+PAvxKJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZJYHgAKCRDhuBo+eShj
+ dxG0EACwY4lNl7HxgkSgg52iQKuudaW+KKtUEtLbOPnjN4vwDRaW5/rzgKREi8+8L4Hn5i/pRaE
+ aLRUmsG035uMlSrRwgqucvAmHDuETFlxewsvaN7bHlDpPIc69KG7I6dqME4ApI99615IFir39Il
+ US4j/8i7YXr6fLC7NRBJwm0YG31P22xqc/oHntGgoG8zFsyiUbOp3AnMBP/2ffB1zdwLTVDNDGp
+ zcFP3+yr7euceudcVIoeVJkw74154p/lEI8rerssardEivgs7WsVg5nDpvSJO3elWw2ZSyCP/u0
+ v/XB3MuW+tuiYWeJl4ZQdSwQecBB4T5lirjtCUR87ijjFr4U7gV+0uzyEf4htnzdnOY3LzVkxxX
+ +UDQYhjIA3VI5xFOLVe9lA9vmGmpgVXANMzhsaqH10mf4qx/EeqxFqFPDUskqY2caxftq7KxGQK
+ mvVrfajabD6Bsbpoe19hmDSh1GG5dQ0AZwVDTGVLQt5Yhgrx6jhCDqV8tfHRV88+vj6++g1QAOy
+ 5AGIXTLcyWlLBc57zWrNCWZKLv2ZFE1hewbPQQhGbMmvmBmzAtSA6EVXeBEtZrgKGzGNu73fCGb
+ /GXzLK6AF3F/BfkVnOcRSln/2rPEyETi0aqJoa8EPiCrGY7UEoJuwxs0SkRb93ZhKRRxCoqTEcJ
+ fIvQw9h7rLuyy/Q==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Add a `numa_node` parameter to `TagSet::new` to specify the home NUMA
-node for tag set allocations. This allows drivers to optimize memory
-placement for NUMA systems.
+Defining configfs attributes in rust is a bit verbose at the moment. Add
+some macros to make the attribute definition less verbose.
+
+The configfs Rust abstractions should eventually provide procedural macros
+for this task. When we get more users of the configfs Rust abstractions, we
+shall consider this task.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- drivers/block/rnull/rnull.rs    | 5 ++++-
- rust/kernel/block/mq.rs         | 5 ++++-
- rust/kernel/block/mq/tag_set.rs | 3 ++-
- 3 files changed, 10 insertions(+), 3 deletions(-)
+ drivers/block/rnull/configfs.rs        | 134 +++++++++------------------------
+ drivers/block/rnull/configfs/macros.rs | 128 +++++++++++++++++++++++++++++++
+ 2 files changed, 164 insertions(+), 98 deletions(-)
 
-diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
-index 990dfcf95c9de..278f75d886fd9 100644
---- a/drivers/block/rnull/rnull.rs
-+++ b/drivers/block/rnull/rnull.rs
-@@ -176,7 +176,10 @@ fn new(options: NullBlkOptions<'_>) -> Result<GenDisk<Self>> {
-             mq::tag_set::Flags::default()
-         };
+diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
+index ea38b27a9011c..eafa71dfc40d3 100644
+--- a/drivers/block/rnull/configfs.rs
++++ b/drivers/block/rnull/configfs.rs
+@@ -1,20 +1,41 @@
+ // SPDX-License-Identifier: GPL-2.0
  
--        let tagset = Arc::pin_init(TagSet::new(submit_queues, 256, 1, flags), GFP_KERNEL)?;
-+        let tagset = Arc::pin_init(
-+            TagSet::new(submit_queues, 256, 1, bindings::NUMA_NO_NODE, flags),
-+            GFP_KERNEL,
-+        )?;
+-use super::{NullBlkDevice, THIS_MODULE};
++use super::{
++    NullBlkDevice,
++    THIS_MODULE, //
++};
+ use kernel::{
+-    block::mq::gen_disk::{GenDisk, GenDiskBuilder},
++    block::mq::gen_disk::{
++        GenDisk,
++        GenDiskBuilder, //
++    },
+     c_str,
+-    configfs::{self, AttributeOperations},
++    configfs::{
++        self,
++        AttributeOperations, //
++    },
+     configfs_attrs,
+-    fmt::{self, Write as _},
++    fmt::{
++        self,
++        Write as _, //
++    },
+     new_mutex,
+     page::PAGE_SIZE,
+     prelude::*,
+-    str::{kstrtobool_bytes, CString},
+-    sync::Mutex,
++    str::{
++        kstrtobool_bytes,
++        CString, //
++    },
++    sync::Mutex, //
++};
++use macros::{
++    configfs_simple_bool_field,
++    configfs_simple_field, //
+ };
+ use pin_init::PinInit;
  
-         let queue_data = Box::pin_init(
-             pin_init!(QueueData {
-diff --git a/rust/kernel/block/mq.rs b/rust/kernel/block/mq.rs
-index 76e790cdb1f8f..d3957f2fb1a66 100644
---- a/rust/kernel/block/mq.rs
-+++ b/rust/kernel/block/mq.rs
-@@ -57,6 +57,7 @@
- //!
- //! ```rust
- //! use kernel::{
-+//!     bindings,
- //!     block::mq::{self, *},
- //!     new_mutex,
- //!     prelude::*,
-@@ -92,7 +93,9 @@
- //! }
- //!
- //! let tagset: Arc<TagSet<MyBlkDevice>> =
--//!     Arc::pin_init(TagSet::new(1, 256, 1, mq::tag_set::Flags::default()), GFP_KERNEL)?;
-+//!     Arc::pin_init(
-+//!         TagSet::new(1, 256, 1, bindings::NUMA_NO_NODE, mq::tag_set::Flags::default()),
-+//!         GFP_KERNEL)?;
- //! let mut disk = gen_disk::GenDiskBuilder::new()
- //!     .capacity_sectors(4096)
- //!     .build(fmt!("myblk"), tagset, ())?;
-diff --git a/rust/kernel/block/mq/tag_set.rs b/rust/kernel/block/mq/tag_set.rs
-index af214f7dd0c10..e9b36d6329b9b 100644
---- a/rust/kernel/block/mq/tag_set.rs
-+++ b/rust/kernel/block/mq/tag_set.rs
-@@ -41,6 +41,7 @@ pub fn new(
-         nr_hw_queues: u32,
-         num_tags: u32,
-         num_maps: u32,
-+        numa_node: i32,
-         flags: Flags,
-     ) -> impl PinInit<Self, error::Error> {
-         // SAFETY: `blk_mq_tag_set` only contains integers and pointers, which
-@@ -53,7 +54,7 @@ pub fn new(
-                     ops: OperationsVTable::<T>::build(),
-                     nr_hw_queues,
-                     timeout: 0, // 0 means default which is 30Hz in C
--                    numa_node: bindings::NUMA_NO_NODE,
-+                    numa_node,
-                     queue_depth: num_tags,
-                     cmd_size,
-                     flags: flags.into_inner(),
++mod macros;
++
+ pub(crate) fn subsystem() -> impl PinInit<kernel::configfs::Subsystem<Config>, Error> {
+     let item_type = configfs_attrs! {
+         container: configfs::Subsystem<Config>,
+@@ -166,99 +187,16 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+     }
+ }
+ 
+-#[vtable]
+-impl configfs::AttributeOperations<1> for DeviceConfig {
+-    type Data = DeviceConfig;
+-
+-    fn show(this: &DeviceConfig, page: &mut [u8; PAGE_SIZE]) -> Result<usize> {
+-        let mut writer = kernel::str::Formatter::new(page);
+-        writer.write_fmt(fmt!("{}\n", this.data.lock().block_size))?;
+-        Ok(writer.bytes_written())
+-    }
+-
+-    fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+-        if this.data.lock().powered {
+-            return Err(EBUSY);
+-        }
+-
+-        let text = core::str::from_utf8(page)?.trim();
+-        let value = text.parse::<u32>().map_err(|_| EINVAL)?;
+-
+-        GenDiskBuilder::validate_block_size(value)?;
+-        this.data.lock().block_size = value;
+-        Ok(())
+-    }
+-}
+-
+-#[vtable]
+-impl configfs::AttributeOperations<2> for DeviceConfig {
+-    type Data = DeviceConfig;
+-
+-    fn show(this: &DeviceConfig, page: &mut [u8; PAGE_SIZE]) -> Result<usize> {
+-        let mut writer = kernel::str::Formatter::new(page);
+-
+-        if this.data.lock().rotational {
+-            writer.write_str("1\n")?;
+-        } else {
+-            writer.write_str("0\n")?;
+-        }
+-
+-        Ok(writer.bytes_written())
+-    }
+-
+-    fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+-        if this.data.lock().powered {
+-            return Err(EBUSY);
+-        }
+-
+-        this.data.lock().rotational = kstrtobool_bytes(page)?;
+-
+-        Ok(())
+-    }
+-}
+-
+-#[vtable]
+-impl configfs::AttributeOperations<3> for DeviceConfig {
+-    type Data = DeviceConfig;
+-
+-    fn show(this: &DeviceConfig, page: &mut [u8; PAGE_SIZE]) -> Result<usize> {
+-        let mut writer = kernel::str::Formatter::new(page);
+-        writer.write_fmt(fmt!("{}\n", this.data.lock().capacity_mib))?;
+-        Ok(writer.bytes_written())
+-    }
+-
+-    fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+-        if this.data.lock().powered {
+-            return Err(EBUSY);
+-        }
+-
+-        let text = core::str::from_utf8(page)?.trim();
+-        let value = text.parse::<u64>().map_err(|_| EINVAL)?;
+-
+-        this.data.lock().capacity_mib = value;
+-        Ok(())
+-    }
+-}
+-
+-#[vtable]
+-impl configfs::AttributeOperations<4> for DeviceConfig {
+-    type Data = DeviceConfig;
+-
+-    fn show(this: &DeviceConfig, page: &mut [u8; PAGE_SIZE]) -> Result<usize> {
+-        let mut writer = kernel::str::Formatter::new(page);
+-        writer.write_fmt(fmt!("{}\n", this.data.lock().irq_mode))?;
+-        Ok(writer.bytes_written())
+-    }
++configfs_simple_field!(DeviceConfig, 1, block_size, u32, check GenDiskBuilder::validate_block_size);
++configfs_simple_bool_field!(DeviceConfig, 2, rotational);
++configfs_simple_field!(DeviceConfig, 3, capacity_mib, u64);
++configfs_simple_field!(DeviceConfig, 4, irq_mode, IRQMode);
+ 
+-    fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+-        if this.data.lock().powered {
+-            return Err(EBUSY);
+-        }
++impl core::str::FromStr for IRQMode {
++    type Err = Error;
+ 
+-        let text = core::str::from_utf8(page)?.trim();
+-        let value = text.parse::<u8>().map_err(|_| EINVAL)?;
+-
+-        this.data.lock().irq_mode = IRQMode::try_from(value)?;
+-        Ok(())
++    fn from_str(s: &str) -> Result<Self> {
++        let value: u8 = s.parse().map_err(|_| EINVAL)?;
++        value.try_into()
+     }
+ }
+diff --git a/drivers/block/rnull/configfs/macros.rs b/drivers/block/rnull/configfs/macros.rs
+new file mode 100644
+index 0000000000000..53ce9d5dbdc8a
+--- /dev/null
++++ b/drivers/block/rnull/configfs/macros.rs
+@@ -0,0 +1,128 @@
++// SPDX-License-Identifier: GPL-2.0
++
++use super::DeviceConfig;
++use core::{fmt::Write, str::FromStr};
++use kernel::{page::PAGE_SIZE, prelude::*};
++
++pub(crate) fn show_field<T: fmt::Display>(value: T, page: &mut [u8; PAGE_SIZE]) -> Result<usize> {
++    let mut writer = kernel::str::Formatter::new(page);
++    writer.write_fmt(fmt!("{}\n", value))?;
++    Ok(writer.bytes_written())
++}
++
++pub(crate) fn store_with_power_check<F>(this: &DeviceConfig, page: &[u8], store_fn: F) -> Result
++where
++    F: FnOnce(&DeviceConfig, &[u8]) -> Result,
++{
++    if this.data.lock().powered {
++        return Err(EBUSY);
++    }
++    store_fn(this, page)
++}
++
++pub(crate) fn store_number_with_power_check<F, T>(
++    this: &DeviceConfig,
++    page: &[u8],
++    store_fn: F,
++) -> Result
++where
++    F: FnOnce(&DeviceConfig, T) -> Result,
++    T: FromStr,
++{
++    if this.data.lock().powered {
++        return Err(EBUSY);
++    }
++
++    let text = core::str::from_utf8(page)?.trim();
++    let value = text.parse::<T>().map_err(|_| EINVAL)?;
++
++    store_fn(this, value)
++}
++
++macro_rules! configfs_attribute {
++    (
++        $type:ty,
++        $id:literal,
++        show: |$show_this:ident, $show_page:ident| $show_block:expr,
++        store: |$store_this:ident, $store_page:ident| $store_block:expr
++        $(,)?
++    ) => {
++        #[vtable]
++        impl configfs::AttributeOperations<$id> for $type {
++            type Data = $type;
++
++            fn show($show_this: &$type, $show_page: &mut [u8; PAGE_SIZE]) -> Result<usize> {
++                $show_block
++            }
++
++            fn store($store_this: &$type, $store_page: &[u8]) -> Result {
++                $store_block
++            }
++        }
++    };
++}
++pub(crate) use configfs_attribute;
++
++// Specialized macro for simple boolean fields that just store kstrtobool_bytes result.
++macro_rules! configfs_simple_bool_field {
++    ($type:ty, $id:literal, $field:ident) => {
++        crate::configfs::macros::configfs_attribute!($type, $id,
++            show: |this, page| crate::configfs::macros::show_field(this.data.lock().$field, page),
++            store: |this, page|
++              crate::configfs::macros::store_with_power_check(this, page, |this, page| {
++                this.data.lock().$field = kstrtobool_bytes(page)?;
++                Ok(())
++            })
++        );
++    };
++}
++pub(crate) use configfs_simple_bool_field;
++
++// Specialized macro for simple numeric fields that just parse and assign
++macro_rules! configfs_simple_field {
++    // Simple direct assignment
++    ($type:ty, $id:literal, $field:ident, $field_type:ty) => {
++        crate::configfs::macros::configfs_attribute!($type, $id,
++            show: |this, page| crate::configfs::macros::show_field(this.data.lock().$field, page),
++            store: |this, page| crate::configfs::macros::store_number_with_power_check(
++                this,
++                page,
++                |this, value: $field_type| {
++                    this.data.lock().$field = value;
++                    Ok(())
++                }
++            )
++        );
++    };
++    // With infallible conversion expression (direct value)
++    ($type:ty, $id:literal, $field:ident, $field_type:ty, into $convert:expr) => {
++        crate::configfs::macros::configfs_attribute!($type, $id,
++            show: |this, page|
++                crate::configfs::macros::show_field(this.data.lock().$field, page),
++            store: |this, page| crate::configfs::macros::store_number_with_power_check(
++                this,
++                page,
++                |this, value: $field_type| {
++                    this.data.lock().$field = $convert(value);
++                    Ok(())
++                }
++            )
++        );
++    };
++    // With check, no conversion
++    ($type:ty, $id:literal, $field:ident, $field_type:ty, check $check:expr) => {
++        crate::configfs::macros::configfs_attribute!($type, $id,
++            show: |this, page| crate::configfs::macros::show_field(this.data.lock().$field, page),
++            store: |this, page| crate::configfs::macros::store_number_with_power_check(
++                this,
++                page,
++                |this, value: $field_type| {
++                    $check(value)?;
++                    this.data.lock().$field = value;
++                    Ok(())
++                }
++            )
++        );
++    };
++}
++pub(crate) use configfs_simple_field;
 
 -- 
 2.51.2
