@@ -1,35 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2844F2E2852;
-	Sun, 15 Feb 2026 23:46:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AF3930CD94;
+	Sun, 15 Feb 2026 23:46:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771199176; cv=none; b=iVvjawRVcj630cX4LugLzBhoGGJ6I77FT/qEf6BxbTT22+9R8/PZI/VkF4dhbYA73qj7fRhXkBlJe2MjREo23HottjY3jnPCwbg2SukK4Jb0Bgb038kzuSD45wTw1NXudl3pZVo0DgWOKegpCnXi5EB3AJAL1EJM4ntn7kJEnXs=
+	t=1771199181; cv=none; b=joUe8DTAyybxEvQ4FHe8I8nt2CaezLrF0LGu8AYul3KNjo5pyX/qwgVi+9S8b1XFkLBhaOcpK1XVAhVK+z93wI9Z9Khd6qDt7UCfz+/MLuPBrojMlHrRCJONTmlm7j/PsQq8ZrCurxOPbSUZ59JazEQmdPRMMH6SUqQm8I87Ptw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771199176; c=relaxed/simple;
-	bh=SmeQZXFebNfgMhT0PU4tfkkh8SCMyfZDkLAJp5Aj2+g=;
+	s=arc-20240116; t=1771199181; c=relaxed/simple;
+	bh=9wLxYaTCPfOG5uonTZ2h8ocU8FWs+hSDrEKcM2sv5z4=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=LyfPNv0xwFM5EOzLlQD2IfaRVuLECaNiBNlNLh1OVzm7ixjTyWRnkVgYgEntxcx3EprSR+Bg/ERnHUZgF3RNPzAy9h+pnzBGE0ahjHihSq3SHzJ9aTaZWPGnvc4QjUrzeT1Xy6JQTCUC3L8Sb3dDI9wWbxh5MqZHp//1VeEWXQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=knbOyE00; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=DlaRhCz4p0LLG/VnxxWTt1LPqSpYlNQwiorUfc1hoUiL8uuoP/X+rrCau22mgq5kX37nTTStWbiYKFYgGVozvDUOw2INX/Raic6m+22Meq8adxMvG9Qhjt5oATQ+BFSNHLMnvCwKxVkRl5iIhoe4V2xu8LZmzBjlUroaog+3ooY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kjCDYQsR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="knbOyE00"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 864ACC4CEF7;
-	Sun, 15 Feb 2026 23:46:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kjCDYQsR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4FD6C4CEF7;
+	Sun, 15 Feb 2026 23:46:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771199176;
-	bh=SmeQZXFebNfgMhT0PU4tfkkh8SCMyfZDkLAJp5Aj2+g=;
+	s=k20201202; t=1771199181;
+	bh=9wLxYaTCPfOG5uonTZ2h8ocU8FWs+hSDrEKcM2sv5z4=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=knbOyE00fHy5kmFNl9V+TkJ2VfcplCF4AeFvXCssIlmBjbGFlST02ikxq5VIxwjEU
-	 cAQJZulXgIGpfYdvUVCxJROn345beJ63HQacigsH3SmHFtf6p18NRlKq6KUopXzvMP
-	 u0cXk/H7K1cqwE1c8TgMcIaQT8JZIJ8HbbWVJrqAUqJoCcQ4AkQ6I2JCMEg6NCpB1V
-	 WNJLYtEpctbJO+lrb2+BrZv31E/bm/fLWSwLl1rZbB/+HgYV5MEQO6KnUSgZvFPBRX
-	 aOPMGZzY8v3UJ5v7Hs8a/C5B4tt8R42GuU9axuD2s12tJTy5vwFFzj621e6yQ19su5
-	 xUCBuNIC4KuJQ==
+	b=kjCDYQsRlhCQN6obSBw1ii95Qd4xqZ2D3oZ1pMKrFWp3LbPJEa068zb6SNYsrLyzl
+	 RNtqfQABlx0D/geY5TXUSQ0unzKd7ZTFl8WrcQ6ptjFu3A7zKaqi2rHelGAxlnSd+D
+	 J3eLNHh7W6AAppxKG9zzibmJ3iLxifuLzA7d+yJ7P4tFY8tPnGTRQKZ30Y2RvuxtbT
+	 5aAU2fp1DgwaHG2wxFp/FdWtUMtAu/NBUq8CY2UY5lei5riX8DMBInCnZ5ry7D2sfd
+	 9iQrZXLs9GlIXjr3wAh1d/iIpmUWJ6nvaC/yLvGJXKLavrqTYsAvNxCt1mLq6iK4Sp
+	 nSEyBV6LaEO/g==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Mon, 16 Feb 2026 00:35:44 +0100
-Subject: [PATCH 57/79] block: rust: allow setting write cache and FUA flags
- for `GenDisk`
+Date: Mon, 16 Feb 2026 00:35:36 +0100
+Subject: [PATCH 49/79] block: rust: add `map_queues` support
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -38,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260216-rnull-v6-19-rc5-send-v1-57-de9a7af4b469@kernel.org>
+Message-Id: <20260216-rnull-v6-19-rc5-send-v1-49-de9a7af4b469@kernel.org>
 References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 In-Reply-To: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 To: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
@@ -57,112 +56,121 @@ Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
  Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3122; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=SmeQZXFebNfgMhT0PU4tfkkh8SCMyfZDkLAJp5Aj2+g=;
- b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpklhPxhVYrbg/jqgQz+TX3wQMfT4hRanolERcq
- iBGDi6PjuSJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZJYTwAKCRDhuBo+eShj
- d8VrD/9iDAv4/R16Jikua6mLzD8+doovIV+CniFnxdRh9EjytOr41KXGvjIE2jpebbEWLXNvnhu
- J/pLqVjdxVGJkfuYyyOGJZ5xUTfed3f+2oGEwtn/fIyLjQ02fBxX3V9uR5TDvxbMFYEJWCXVInA
- nheaxy+vjh7rP0DPWqslmsajzqztYr7TD+XYRI2yVR1YD4a66YlslCmcSohocxU9Hvhf1rAJ3Zv
- 9yedHbMyr0+T1UzL9DwSfvTpA0G4mFNzlt8/mIorrLgbrdodHgrkzJ33KOnZm2oNyVT7rJER5w9
- bk7/iOGMYu1bwzy3NiWaruwGoywlJgeMJf73OaUEv5nfFZE2Ed5/6ScUDATU5Opvnru7I+u5H1z
- awIZnLhwRz1x9qCRe0FTY2+0dlTT7X9hz1CBw4OjNK5rDTIHFw7i2A7NjdikeEowX73PwJJ141u
- 3dnbRekFt9x72pavXfVUAGCkRjoVYqLtrHVOdYXrmbpit4JiwFkC+h/iRnhcE1YKtY9huAtmyW9
- BTvx4eSeANFBm4KjSKnbeIzmztOTXC6zo0U3cwvpe93LeFxvnlMhsr77Kwg6SfWi6oAxNuuaR5f
- jEIhOrv3llH+ImrALAH8vYA4RBFVYDkvE6igKcpWXNkbTDaBpeijcGuBrbGhYPAbOkUUIahPV7K
- /dIvSHjKMitbfpQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3879; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=9wLxYaTCPfOG5uonTZ2h8ocU8FWs+hSDrEKcM2sv5z4=;
+ b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpklhHteQM6fc3Iu+s7ErTmW5+zxHdbuM7v9MUt
+ WW0qbMjDayJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZJYRwAKCRDhuBo+eShj
+ d82UEADCFQq4xg0GLRoFbDArGbCjq1pYimjtXweH1jUHAlgJbGGDkikwcOVePhVAnaq0cdE5BuY
+ FST4N7wGwn5uDWVPQjXpCx3F0A00D312QyAmD8cvTc3vOP3J4jJptfyTx18my0TG3l/QpGh2k6+
+ VRnt/4++OOUgxoE8WyWXsHSiexrgbP5JGRTRiN48GSZzVsD+hMHSp/+pgp7Xcl0BR+8bGdFiCQm
+ LGiYwXAUL5k3Gqj/IYOdhE00o/x0U8DPQMfes514MGFteRl7clkgSvYEFKWth04xf/u7Ko2u7Ku
+ 9RZFRbrxsRa66tuTEpsFIA6IX/RwvMKZoXDegWKZ8M0TsY7LUUI2V7aNC7bnV2Xv0mertjEooNo
+ Ua16efkXqh+Tx/mi18AdzA0+qemfM30vBYaWJ9xQDcAbSVCfSq+gB9EFg/ft+MzN7AS9w2UdGdt
+ EJyQcDaAUyDI4zCU7pPSm/5GHu52+/vVcaHnTHT8vGfMk1tFZQ4t5d9DTiAS11OUgBMHJqhQEPX
+ F2LkCpJ5bsvfp0U5L+/nuiphEGkRmHRxMhE4MQ2vGaAWhI4jUEAeiJC76C5ficBetddzfL4fS+U
+ ZIk5m9JLWOTZyF3nP1DNE0C1fLiAMjBgV3OOwQg8Bp5j7v0btIbGpJUHAd4dzkHYMBmRMjTb/gX
+ QQhP/zLigZgzM0g==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Add methods to `GenDiskBuilder` for enabling the write cache and FUA
-feature flags. These flags are set in the `queue_limits` structure
-when building the disk.
+Add support for the `map_queues` callback to the Rust block layer
+bindings. This callback allows drivers to customize the mapping between
+CPUs and hardware queues.
+
+The callback receives a mutable reference to the `TagSet`, and drivers
+can use the `TagSet::update_maps` method to configure the mappings for
+each queue type.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- rust/kernel/block/mq/gen_disk.rs | 30 +++++++++++++++++++++++++++---
- 1 file changed, 27 insertions(+), 3 deletions(-)
+ rust/kernel/block/mq/operations.rs | 28 ++++++++++++++++++++++++++--
+ rust/kernel/block/mq/tag_set.rs    | 13 +++++++++++++
+ 2 files changed, 39 insertions(+), 2 deletions(-)
 
-diff --git a/rust/kernel/block/mq/gen_disk.rs b/rust/kernel/block/mq/gen_disk.rs
-index a6f113ea4bea4..c6b9839864012 100644
---- a/rust/kernel/block/mq/gen_disk.rs
-+++ b/rust/kernel/block/mq/gen_disk.rs
-@@ -7,7 +7,7 @@
- 
- use crate::{
+diff --git a/rust/kernel/block/mq/operations.rs b/rust/kernel/block/mq/operations.rs
+index 3f84ebadec86b..017fad010d174 100644
+--- a/rust/kernel/block/mq/operations.rs
++++ b/rust/kernel/block/mq/operations.rs
+@@ -8,7 +8,7 @@
      bindings,
--    block::mq::{operations::OperationsVTable, Operations, RequestQueue, TagSet},
-+    block::mq::{operations::OperationsVTable, Feature, Operations, RequestQueue, TagSet},
-     error::{self, from_err_ptr, Result},
-     fmt::{self, Write},
+     block::{
+         error::BlkResult,
+-        mq::{gen_disk::GenDiskRef, request::RequestDataWrapper, IdleRequest, Request},
++        mq::{gen_disk::GenDiskRef, request::RequestDataWrapper, IdleRequest, Request, TagSet},
+     },
+     error::{from_result, to_result, Result},
      prelude::*,
-@@ -34,6 +34,8 @@ pub struct GenDiskBuilder<T> {
-     zone_size_sectors: u32,
-     #[cfg(CONFIG_BLK_DEV_ZONED)]
-     zone_append_max_sectors: u32,
-+    write_cache: bool,
-+    forced_unit_access: bool,
-     _p: PhantomData<T>,
+@@ -101,6 +101,11 @@ fn report_zones(
+     ) -> Result<u32> {
+         Err(ENOTSUPP)
+     }
++
++    /// Called by the kernel to map submission queues to CPU cores.
++    fn map_queues(_tag_set: &TagSet<Self>) {
++        build_error!(crate::error::VTABLE_DEFAULT_ERROR)
++    }
  }
  
-@@ -51,6 +53,8 @@ fn default() -> Self {
-             zone_size_sectors: 0,
-             #[cfg(CONFIG_BLK_DEV_ZONED)]
-             zone_append_max_sectors: 0,
-+            write_cache: false,
-+            forced_unit_access: false,
-             _p: PhantomData,
-         }
-     }
-@@ -143,6 +147,18 @@ pub fn zone_append_max(mut self, sectors: u32) -> Self {
-         self
+ /// A vtable for blk-mq to interact with a block device driver.
+@@ -394,6 +399,21 @@ impl<T: Operations> OperationsVTable<T> {
+         })
      }
  
-+    /// Declare that this device supports forced unit access.
-+    pub fn forced_unit_access(mut self, enable: bool) -> Self {
-+        self.forced_unit_access = enable;
-+        self
++    /// This function is called by the C kernel. A pointer to this function is
++    /// installed in the `blk_mq_ops` vtable for the driver.
++    ///
++    /// # Safety
++    ///
++    /// This function may only be called by blk-mq C infrastructure. `tag_set`
++    /// must be a pointer to a valid and initialized `TagSet<T>`. The pointee
++    /// must be valid for use as a reference at least the duration of this call.
++    unsafe extern "C" fn map_queues_callback(tag_set: *mut bindings::blk_mq_tag_set) {
++        // SAFETY: The safety requirements of this function satiesfies the
++        // requirements of `TagSet::from_ptr`.
++        let tag_set = unsafe { TagSet::from_ptr(tag_set) };
++        T::map_queues(tag_set);
 +    }
 +
-+    /// Declare that this device has a write-back cache.
-+    pub fn write_cache(mut self, enable: bool) -> Self {
-+        self.write_cache = enable;
-+        self
+     const VTABLE: bindings::blk_mq_ops = bindings::blk_mq_ops {
+         queue_rq: Some(Self::queue_rq_callback),
+         queue_rqs: None,
+@@ -415,7 +435,11 @@ impl<T: Operations> OperationsVTable<T> {
+         exit_request: Some(Self::exit_request_callback),
+         cleanup_rq: None,
+         busy: None,
+-        map_queues: None,
++        map_queues: if T::HAS_MAP_QUEUES {
++            Some(Self::map_queues_callback)
++        } else {
++            None
++        },
+         #[cfg(CONFIG_BLK_DEBUG_FS)]
+         show_rq: None,
+     };
+diff --git a/rust/kernel/block/mq/tag_set.rs b/rust/kernel/block/mq/tag_set.rs
+index 600c9c6249123..330ff28c91507 100644
+--- a/rust/kernel/block/mq/tag_set.rs
++++ b/rust/kernel/block/mq/tag_set.rs
+@@ -89,6 +89,19 @@ pub fn new(
+     pub(crate) fn raw_tag_set(&self) -> *mut bindings::blk_mq_tag_set {
+         self.inner.get()
+     }
++
++    /// Create a `TagSet<T>` from a raw pointer.
++    ///
++    /// # Safety
++    ///
++    /// `ptr` must be a pointer to a valid and initialized `TagSet<T>`. There
++    /// may be no other mutable references to the tag set. The pointee must be
++    /// live and valid at least for the duration of the returned lifetime `'a`.
++    pub(crate) unsafe fn from_ptr<'a>(ptr: *mut bindings::blk_mq_tag_set) -> &'a Self {
++        // SAFETY: By the safety requirements of this function, `ptr` is valid
++        // for use as a reference for the duration of `'a`.
++        unsafe { &*(ptr.cast::<Self>()) }
 +    }
-+
-     /// Build a new `GenDisk` and add it to the VFS.
-     pub fn build(
-         self,
-@@ -163,7 +179,7 @@ pub fn build(
-         lim.physical_block_size = self.physical_block_size;
-         lim.max_hw_discard_sectors = self.max_hw_discard_sectors;
-         if self.rotational {
--            lim.features |= bindings::BLK_FEAT_ROTATIONAL;
-+            lim.features = Feature::Rotational.into();
-         }
+ }
  
-         #[cfg(CONFIG_BLK_DEV_ZONED)]
-@@ -172,11 +188,19 @@ pub fn build(
-                 return Err(error::code::EINVAL);
-             }
- 
--            lim.features |= bindings::BLK_FEAT_ZONED;
-+            //lim.features |= request::Feature::Zoned.into();
-             lim.chunk_sectors = self.zone_size_sectors;
-             lim.max_hw_zone_append_sectors = self.zone_append_max_sectors;
-         }
- 
-+        if self.write_cache {
-+            lim.features |= Feature::WriteCache;
-+        }
-+
-+        if self.forced_unit_access {
-+            lim.features |= Feature::ForcedUnitAccess;
-+        }
-+
-         // SAFETY: `tagset.raw_tag_set()` points to a valid and initialized tag set
-         let gendisk = from_err_ptr(unsafe {
-             bindings::__blk_mq_alloc_disk(
+ #[pinned_drop]
 
 -- 
 2.51.2
