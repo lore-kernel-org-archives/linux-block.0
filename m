@@ -1,237 +1,218 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 071D93033D8;
-	Sun, 15 Feb 2026 20:34:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771187648; cv=none; b=AG80OAvvbwP+hhWb4ngwKIqpgfb1M1r3/z/jktzDxCr/zkhfKVL2edFFRWkglWlyWmpYiqFWhVrDxvXCeaKK2ki7yb3+miiW1dqoAl6iZVNPu9wK5sioxpu8vwHL1Ktr+I+64xkjrXywYNQJ7yMY1JAOkbngeu3bERn3gjrY8gQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771187648; c=relaxed/simple;
-	bh=kPkx+XLnnEICTvDYdgmZp891oWtR10FsHihH5ePtz5U=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=XMSGd1ZSlcCjD64zg2vuzwbfB1aiylzRAxvQIA6XuPMnyuoZjMQ7Zu13aUTT9Pfy00EGBYwRt4CoDqvorxHW6cgznVJWT+Gosgu0770+898qgyDYXF3Nki2GbY+22VlJ6pFr0qW+zp+NVjO9OD6mu51eo3Qjjoe+7R0qA427+4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hKXdsfmQ; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C186C23C4FA
+	for <linux-block@vger.kernel.org>; Sun, 15 Feb 2026 21:18:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.175
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771190323; cv=pass; b=ViXm4r6bBjX/ZQxtN4pV78x9f0hW10XMRFD5yCKf+Xozj53bXjVWkw480ugwNaefdUSZjga9z3sIN/vGWWteR3tjiiIaiGpByOptM+EzcRQIqByTceAJP0SfCC5FWTtDms66WtCdttNvBphTIsZn4HIJZ0f7t33780oIxwFLnE4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771190323; c=relaxed/simple;
+	bh=kHKJYV8nnw8Z8vztJHTpu6iFGyZWzK74DCx4AAtkr30=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eJvj4BGH7/5JBTyf1FvU4q0U17NZn4EZ31dAjRSlbwtDM78OLob6ok/PaBS3R/Kr/u+844C3aoAxU+O7J+SOaHiWMBdXUuTqCzWqczkNjTLdxe1eCqkIKff+m3w1X4sU/O4dry0OY5Y1pkEO+cRBk3fk0ogfNZbPVmWVhALGZqo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=P0N2Rfgi; arc=pass smtp.client-ip=209.85.208.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hKXdsfmQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF4E0C4CEF7;
-	Sun, 15 Feb 2026 20:34:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771187647;
-	bh=kPkx+XLnnEICTvDYdgmZp891oWtR10FsHihH5ePtz5U=;
-	h=From:Date:Subject:To:Cc:From;
-	b=hKXdsfmQS2ygvBqdSgITFv9KTonI6gHJYAE3uZL+wFoQjqYhb2LAfm2sVnsxL3WDZ
-	 d/6dnbkRYpYMy/XDAA5vp6cokvYbuLmscWpZG1Ah1Bu3T3oFNS7fsokq09COtxikpB
-	 Xz/ryi6e/XQuh5TcMMSW28h+F6ZewF6y+oigNUA2V9XUOKUTgY1K5oi0ixK12UUvvw
-	 qaPlG0JsTKmYSpcD+JiHznfimjVNx1TzydWEICosObKq3a6qV7qwr+M0mnDgRe6fgV
-	 JoKeHBf5ZOy17ms7w0BuKCveHbHMAfvQNSAxmJ4r8AU31ZpSsKQluzZXx0q7HkWWIQ
-	 tMwVYT/5aJAkA==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Sun, 15 Feb 2026 21:33:47 +0100
-Subject: [PATCH] configfs: rust: add an API for adding default groups from
- C
+	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="P0N2Rfgi"
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-38709888abeso19514921fa.1
+        for <linux-block@vger.kernel.org>; Sun, 15 Feb 2026 13:18:41 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771190320; cv=none;
+        d=google.com; s=arc-20240605;
+        b=eq6cuKO528Cha6PIyniCRYXfbROQbpEz8ePJWtSkz7dVQ6uMC8MRmhnd7maPzTkqMP
+         hvFFUNK5yrsPT/tGj2bi5GUG9I2/uyNYnBu2ih88t/sThi/p82xmZO08QaNyb/KDnZkl
+         7FGge90X7ckKM4QS+a3jnDrtnqWyzOxdOTzjVfT1F7CuMzdVnJ1/2oFYhSQkgfM8Rxtx
+         BelTDAPFX1FuEvjOVbio4H536uVA889GjeP42R2ynddvBRzWhmlXhGFpx6feqpfSuy89
+         UMJKBBwRiW6IJTCRY0IBtnV1tbwa9Oet4m9e/NN/Qqb0Lq3vNOTMTFwEz37pXoosIsch
+         Ewnw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=nh5TnaSI7rZPj2uhgnsZBl8QSuJdZuhEOKvh+vqqOKs=;
+        fh=w+403DemR6k22fDg/cgCNuFvObkidheb1AGfvQJ7qCs=;
+        b=kUhyQ9L2VaJFHa8j3bW4t/2n1m4rijKt4ZGWAv+oerp+LEVWg/LXx6QR0YWHB7XJaU
+         lextYNn2VJeAYfcWYwHdAhvyiTslVZmBo6+kPUyl93w5iHbn9tGYomA+fLDSauQEPXsC
+         iSdeA6HQ9yk+hSWrSFQx9pPzCOXRzvCTw7D7xoH4TniQnX5gOdf57GiLKrvxg3ZBRdvO
+         In6UWwmoRc3RyMy0gc4BWp+EyBvVjb6z82dxsRmnfe0SQr99CIlgG52J3qTnjb/CcqZM
+         K59NXSkjkWlOIgWjh96IbXwjefwOFGZvJsuiXJ3hybVh5v3H8cI7p1XI1N+zybvdUQYW
+         gANg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ionos.com; s=google; t=1771190320; x=1771795120; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nh5TnaSI7rZPj2uhgnsZBl8QSuJdZuhEOKvh+vqqOKs=;
+        b=P0N2RfgiPzN4CIynQyVmn8d3n6n9uuP7CBn0ef4S3xG/F8oQzqUWj7JSo/bP9gaBPD
+         uAmxfKcp7OB+r2tiEgGjYd1Kx3Uq+4z7FSTQqXyUKyF9EJK7XD2qZvRBIq5O/i0pPYGv
+         p3B2P5uzhbrqeCa1PaY/o+TSf+VQF77SEzikQSc+PcelJVFYsAPqlqzZvT7y9Ke1mu18
+         fQDMuWHWBP1T/G0+Cx8xgVsvHUGipS8av/Rbk2j07mRtgB0/RYA+n559ngBRZ+uZIDrH
+         Mqh9LRqmYu/QwVbgexFaC4gnD9YdIara2f+ZUb+ZOYiwfNq4QieLLnNf7m5wrUHc23HX
+         o7aA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771190320; x=1771795120;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=nh5TnaSI7rZPj2uhgnsZBl8QSuJdZuhEOKvh+vqqOKs=;
+        b=KDsLpNGO6FvSq+LRNu7awe13SwkuaiuUhTXQ541IIczXul6QVaQl/HX8Vyzpp6Dlrh
+         jPGSqSwL6sChAbegIllbVjwsYe27VILJgDn92WF8AXoaha/Dtw/bb6YhLeJvRjuG9kJs
+         6Zg3KhTF9kAtV8raJzADFDPCr8IUvqSOJV2b+A12MhCBEMAn01kuoaBkRZ9htDxF/Kbb
+         ErZL9iCh+XQtuUYgRsMmkt1wDqB0AqKe/GUTCSExzj7SCZH3bo6nbBzf1m/vaIpCiNkl
+         2bc7uDJJN3fFU7jvHOn0lPz4nD1D2lKq24p0gVl7O8YpKiWZySCfOHiANe0UJw7IjHp/
+         1r7A==
+X-Forwarded-Encrypted: i=1; AJvYcCXqUnCxpUBuS5Px03aNc9jTLnI3Pvcya/q9Ss580c1UB4FVjqbMmJyKrWEWcX8edmgpe7kB1/Tdbu1m5Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9VUt+Z5sEnAAn19jn24YwdktAEdtxdChHvR+hBhWnmrhOBV6c
+	JtWrVqAvPitIKajQi01+CnTCqXermE03uPXNMWaznW6dh+bVPqOyIbIfa/UUXfULtirMB8BMwG0
+	AG2QFgavpa2IwoUxzDoJOy3FSKCLSRcBkV9ev1iw/mw==
+X-Gm-Gg: AZuq6aJKMOAaN0QiJQdDyvjboz1jYJMGo9E67RouEI04pl5ImRJjWiUVjQ8/MQJC4bo
+	oOenl5y0q33rDq7h0sn63S+TRSOtVuGH7tA11WWvDpKc1YAJlT1TE0sqM3bufSfVkOuWJkBSgv1
+	iHkLKDfu37GhvqMjWZFotg+jK5/0jqwOc14Islk22fMsZ3obKVjYfAzkUYhaXaZ/S23Z1DEkA8h
+	ByAanzp5QiQJIs+hoYlb/ISwMa9WGbIYZRbJpXVM0fOLlIIXAyNN4iTUoFZNe1ryaeTo6Ocv5+5
+	V9EblMyuVPDuamQzF/maCGdDthA+xn61LbganloScPTWEi03gCSllCf74VWyHyRXY/boDbF1EAN
+	tZuPmWaGfahpPo256zMxNxf4=
+X-Received: by 2002:a2e:a781:0:b0:383:1d89:8d0c with SMTP id
+ 38308e7fff4ca-38810525294mr24772281fa.15.1771190319860; Sun, 15 Feb 2026
+ 13:18:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260215-configfs-c-default-groups-v1-1-e967daef6c36@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAKotkmkC/x3MTQrDIBBA4avIrDugJnHRq5Qu/BnNQNHgNCEQc
- vdKl9/ivQuEOpPAU13Q6WDhVgfMQ0FcfS2EnIbBauu0NQvGVjOXLBgxUfb754ult30TDCloP89
- umryD0W+dMp//9+t93z+/UzK9awAAAA==
-X-Change-ID: 20260215-configfs-c-default-groups-bdb0a44633a6
-To: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
- Miguel Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>, 
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
- Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
- Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
- Breno Leitao <leitao@debian.org>
-Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
- rust-for-linux@vger.kernel.org, Andreas Hindborg <a.hindborg@kernel.org>
-X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5733; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=kPkx+XLnnEICTvDYdgmZp891oWtR10FsHihH5ePtz5U=;
- b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpki2rc22Xg526E17P8XggB+tiQE/HNwmekN3wW
- ivbt9FsREyJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZItqwAKCRDhuBo+eShj
- dxAVEAChDY57aQjccAsf9b40HD44r2KSgKp6iA5HiN6i/O/efL2nYYW5feu0dU0ewKju/bAFv8n
- 4An6Jg/ilNu/PiHu1waCHvxbEhVOMWXaFpM+jOByG8GMROWS6YuRYEqPsvUDJjVfTuZwwjaJ+6t
- GwGP9VOR/cksiMqHgQcE0KpaSDK0DB+bGVN1EcUCX0skcNptcDq7fuJJeueDus7rglYQo5YMnUV
- op2B3sN7udRTc9aQoPTjEsBTYke36MIYDP+xcJhJUMSSfWAepbYimu00WJa+2x5YPNRdrtwKhBY
- nAgtPkdNQ1tg5yVejVGSeGAV1WItH0Ircxzin71NX5J58UKA+2XvcXyFWEviXoh6O67X+n5G3nw
- oxNYDQCc6nrLx/C5ksN6RxqCiu2PfOABUypib+PsRJGT/SM8MfasJ0Dvf8ER6sGDajm5itc77xo
- pp2CzwUXGPmQyF9yqhxCqBSJ+fwQ6QPJTtwA/5MbWPHLDhYMvIyhFxaa00nl9wYvUllDna504gk
- g4vUmhEVNUKrKyvEPidFot83Kwr/91ndyMLv33wByxT3FsHDkeG9g+OE49dTKvJ83mgKrt5TKFM
- +4PVRq2B0vrzlk4uHZMM/bbFz7DZ4awWha25hReB2Vf9dPrC+2JbFrodSMKTBQXAP1Dp0Sf+NXB
- mQb0Tu+N/ynyHcw==
-X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
- fpr=3108C10F46872E248D1FB221376EB100563EF7A7
+References: <31a2a4c2-8c33-429a-a2b1-e1f3a0e90d72@nvidia.com>
+ <459953fa-5330-4eb1-a1b4-7683b04e3d45@flourine.local> <aY77ogf5nATlJUg_@shinmob>
+In-Reply-To: <aY77ogf5nATlJUg_@shinmob>
+From: Haris Iqbal <haris.iqbal@ionos.com>
+Date: Sun, 15 Feb 2026 22:18:28 +0100
+X-Gm-Features: AaiRm50UiUfxjs0q7nnu2kE7OqfPsAIU6uDVz4YX8OUdHbhFYRNnEhFTdkEJv9w
+Message-ID: <CAJpMwyis1iZB2dQMC4VC8stVhRhOg0mfauCWQd_Nv8Ojb+X-Yw@mail.gmail.com>
+Subject: Re: [LSF/MM/BPF ATTEND][LSF/MM/BPF TOPIC] : blktests: status,
+ expansion plan for the storage stack test framework
+To: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: Daniel Wagner <dwagner@suse.de>, Chaitanya Kulkarni <chaitanyak@nvidia.com>, 
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>, 
+	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, 
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, 
+	"lsf-pc@lists.linux-foundation.org" <lsf-pc@lists.linux-foundation.org>, Bart Van Assche <bvanassche@acm.org>, 
+	Hannes Reinecke <hare@suse.de>, hch <hch@lst.de>, Jens Axboe <axboe@kernel.dk>, 
+	"sagi@grimberg.me" <sagi@grimberg.me>, "tytso@mit.edu" <tytso@mit.edu>, 
+	Johannes Thumshirn <Johannes.Thumshirn@wdc.com>, Christian Brauner <brauner@kernel.org>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, 
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>, 
+	"willy@infradead.org" <willy@infradead.org>, Jan Kara <jack@suse.cz>, 
+	"amir73il@gmail.com" <amir73il@gmail.com>, "vbabka@suse.cz" <vbabka@suse.cz>, Damien Le Moal <dlemoal@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Some C subsystems provide a feature to add configfs default groups to the
-configfs hierarchy of other drivers or subsystems. Rust abstractions for
-these subsystems will want a way to add these default groups via the
-configfs Rust API. So add infrastructure to make this possible.
+On Fri, Feb 13, 2026 at 12:25=E2=80=AFPM Shinichiro Kawasaki
+<shinichiro.kawasaki@wdc.com> wrote:
+>
+> On Feb 12, 2026 / 08:52, Daniel Wagner wrote:
+> > On Wed, Feb 11, 2026 at 08:35:30PM +0000, Chaitanya Kulkarni wrote:
+> > >    For the storage track at LSFMMBPF2026, I propose a session dedicat=
+ed to
+> > >    blktests to discuss expansion plan and CI integration progress.
+> >
+> > Thanks for proposing this topic.
+>
+> Chaitanya, my thank also goes to you.
+>
+> > Just a few random topics which come to mind we could discuss:
+> >
+> > - blktests has gain a bit of traction and some folks run on regular
+> >   basis these tests. Can we gather feedback from them, what is working
+> >   good, what is not? Are there feature wishes?
+>
+> Good topic, I also would like to hear about it.
+>
+> FYI, from the past LSFMM sessions and hallway talks, major feedbacks I ha=
+d
+> received are these two:
+>
+>  1. blktests CI infra looks missing (other than CKI by Redhat)
+>     -> Some activities are ongoing to start blktests CI service.
+>        I hope the status are shared at the session.
+>
+>  2. blktests are rather difficult to start using for some new users
+>     -> I think config example is demanded, so that new users can
+>        just copy it to start the first run, and understand the
+>        config options easily.
+>
+> > - Do we need some sort of configuration tool which allows to setup a
+> >   config? I'd still have a TODO to provide a config example with all
+> >   knobs which influence blktests, but I wonder if we should go a step
+> >   further here, e.g. something like kdevops has?
+>
+> Do you mean the "make menuconfig" style? Most of the blktests users are
+> familiar with menuconfig, so that would be an idea. If users really want
+> it, we can think of it. IMO, blktests still do not have so many options,
+> then config.example would be simpler and more appropriate, probably.
+>
+> > - Which area do we lack tests? Should we just add an initial simple
+> >   tests for the missing areas, so the basic infra is there and thus
+> >   lowering the bar for adding new tests?
+>
+> To identify the uncovered area, I think code coverage will be useful. A f=
+ew
+> years ago, I measured it and shared in LSFMM, but that measurement was do=
+ne for
+> each source tree directory. The coverage ratio by source file will be mor=
+e
+> helpful to identify the missing area. I don't have time slot to measure i=
+t,
+> so if anyone can do it and share the result, it will be appreciated. Once=
+ we
+> know the missing areas, it sounds a good idea to add initial samples for =
+each
+> of the areas.
+>
+> > - The recent addition of kmemleak shows it's a great idea to enable mor=
+e
+> >   of the kernel test infrastructure when running the tests.
+>
+> Completely agreed.
+>
+> >   Are there more such things we could/should enable?
+>
+> I'm also interested in this question :)
+>
+> > - I would like to hear from Shin'ichiro if he is happy how things
+> >   are going? :)
+>
+> More importantly, I would like to listen to voices from storage sub-syste=
+m
+> developers to see if they are happy or not, especially the maintainers.
+>
+> From my view, blktests keep on finding kernel bugs. I think it demonstrat=
+es the
+> value of this community effort, and I'm happy about it. Said that, I find=
+ what
+> blktests can improve more, of course. Here I share the list of improvemen=
+t
+> opportunities from my view point (I already mentioned the first three ite=
+ms).
 
-Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
----
- drivers/block/rnull/configfs.rs |  1 +
- rust/helpers/configfs.c         | 16 ++++++++++++++++
- rust/helpers/helpers.c          |  1 +
- rust/kernel/configfs.rs         | 33 ++++++++++++++++++++++++++++++++-
- samples/rust/rust_configfs.rs   |  8 +++++++-
- 5 files changed, 57 insertions(+), 2 deletions(-)
+A possible feature for blktest could be integration with something
+like virtme-ng.
+Running on VM can be versatile and fast. The run can be made parallel
+too, by spawning multiple VMs simultaneously.
 
-diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
-index 6713a6d92391d..ea38b27a9011c 100644
---- a/drivers/block/rnull/configfs.rs
-+++ b/drivers/block/rnull/configfs.rs
-@@ -78,6 +78,7 @@ fn make_group(
-                     name: name.try_into()?,
-                 }),
-             }),
-+            core::iter::empty(),
-         ))
-     }
- }
-diff --git a/rust/helpers/configfs.c b/rust/helpers/configfs.c
-new file mode 100644
-index 0000000000000..7cec8ffcb093d
---- /dev/null
-+++ b/rust/helpers/configfs.c
-@@ -0,0 +1,16 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <linux/configfs.h>
-+
-+__rust_helper void
-+rust_helper_configfs_add_default_group(struct config_group *new_group,
-+				       struct config_group *group)
-+{
-+	configfs_add_default_group(new_group, group);
-+}
-+
-+__rust_helper void
-+__rust_helper_configfs_remove_default_groups(struct config_group *group)
-+{
-+	configfs_remove_default_groups(group);
-+}
-diff --git a/rust/helpers/helpers.c b/rust/helpers/helpers.c
-index 79c72762ad9c4..613b41e8b781c 100644
---- a/rust/helpers/helpers.c
-+++ b/rust/helpers/helpers.c
-@@ -19,6 +19,7 @@
- #include "build_bug.c"
- #include "clk.c"
- #include "completion.c"
-+#include "configfs.c"
- #include "cpu.c"
- #include "cpufreq.c"
- #include "cpumask.c"
-diff --git a/rust/kernel/configfs.rs b/rust/kernel/configfs.rs
-index 466fb7f407628..705f1647269d9 100644
---- a/rust/kernel/configfs.rs
-+++ b/rust/kernel/configfs.rs
-@@ -242,12 +242,22 @@ unsafe fn container_of(group: *const bindings::config_group) -> *const Self {
- ///
- /// To add a subgroup to configfs, pass this type as `ctype` to
- /// [`crate::configfs_attrs`] when creating a group in [`GroupOperations::make_group`].
--#[pin_data]
-+#[pin_data(PinnedDrop)]
- pub struct Group<Data> {
-     #[pin]
-     group: Opaque<bindings::config_group>,
-     #[pin]
-     data: Data,
-+    default_groups: KVec<Arc<dyn CDefaultGroup>>,
-+}
-+
-+#[pinned_drop]
-+impl<Data> PinnedDrop for Group<Data> {
-+    fn drop(self: Pin<&mut Self>) {
-+        // SAFETY: We have exclusive access to `self` and we know the default groups are alive
-+        // because we reference them through `self.default_groups`.
-+        unsafe { bindings::configfs_remove_default_groups(self.group.get()) };
-+    }
- }
- 
- impl<Data> Group<Data> {
-@@ -259,7 +269,13 @@ pub fn new(
-         name: CString,
-         item_type: &'static ItemType<Group<Data>, Data>,
-         data: impl PinInit<Data, Error>,
-+        default_groups: impl IntoIterator<Item = Arc<dyn CDefaultGroup>>,
-     ) -> impl PinInit<Self, Error> {
-+        let mut dg = KVec::new();
-+        for group in default_groups {
-+            dg.push(group, GFP_KERNEL).unwrap();
-+        }
-+
-         try_pin_init!(Self {
-             group <- pin_init::init_zeroed().chain(|v: &mut Opaque<bindings::config_group>| {
-                 let place = v.get();
-@@ -268,13 +284,28 @@ pub fn new(
-                 unsafe {
-                     bindings::config_group_init_type_name(place, name.cast(), item_type.as_ptr())
-                 };
-+
-+                for default_group in &dg {
-+                    // SAFETY: We keep the default groups alive until `Self` is dropped.
-+                    unsafe { bindings::configfs_add_default_group(default_group.group_ptr(), place) }
-+                }
-                 Ok(())
-             }),
-             data <- data,
-+            default_groups: dg,
-         })
-     }
- }
- 
-+/// A trait for default configfs groups added by C code.
-+///
-+/// Rust abstractions that work with C code that creates configfs groups can implement this trait to
-+/// add the groups as default groups via the Rust configfs API.
-+pub trait CDefaultGroup {
-+    /// Return a raw pointer to the group definition.
-+    fn group_ptr(&self) -> *mut bindings::config_group;
-+}
-+
- // SAFETY: `Group<Data>` embeds a field of type `bindings::config_group`
- // within the `group` field.
- unsafe impl<Data> HasGroup<Data> for Group<Data> {
-diff --git a/samples/rust/rust_configfs.rs b/samples/rust/rust_configfs.rs
-index 0ccc7553ef395..c65dda8bfacd2 100644
---- a/samples/rust/rust_configfs.rs
-+++ b/samples/rust/rust_configfs.rs
-@@ -84,7 +84,12 @@ fn make_group(&self, name: &CStr) -> Result<impl PinInit<configfs::Group<Child>,
-             ],
-         };
- 
--        Ok(configfs::Group::new(name.try_into()?, tpe, Child::new()))
-+        Ok(configfs::Group::new(
-+            name.try_into()?,
-+            tpe,
-+            Child::new(),
-+            core::iter::empty(),
-+        ))
-     }
- }
- 
-@@ -153,6 +158,7 @@ fn make_group(&self, name: &CStr) -> Result<impl PinInit<configfs::Group<GrandCh
-             name.try_into()?,
-             tpe,
-             GrandChild::new(),
-+            core::iter::empty(),
-         ))
-     }
- }
-
----
-base-commit: 05f7e89ab9731565d8a62e3b5d1ec206485eeb0b
-change-id: 20260215-configfs-c-default-groups-bdb0a44633a6
-
-Best regards,
--- 
-Andreas Hindborg <a.hindborg@kernel.org>
-
-
+>
+>  1. We can have more CI infra to make the most of blktests
+>  2. We can add config examples to help new users
+>  3. We can measure code coverage to identify missing test areas
+>  4. Long standing failures make test result reports dirty
+>     - I feel lockdep WARNs are tend to be left unfixed rather long period=
+.
+>       How can we gather effort to fix them?
+>  5. We can refactor and clean up blktests framework for ease of maintaina=
+nce
+>       (e.g. trap handling)
+>  6. Some users run blktests with built-in kernel modules, which makes a n=
+umber
+>     of test cases skipped. We can add more built-in kernel modules suppor=
+t to
+>     expand test coverage for such use case.
