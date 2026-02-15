@@ -1,292 +1,237 @@
-Received: from a1-bg02.venev.name (a1-bg02.venev.name [213.240.239.49])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C31828371;
-	Sun, 15 Feb 2026 18:55:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.240.239.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 071D93033D8;
+	Sun, 15 Feb 2026 20:34:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771181711; cv=none; b=H5BuBWqdKRBlPvcaPx4+vPVJLZIVZti149p7ifaXMMaUjF2+w+ag81vLNGk+6XCSV8vGzpmBEHWHNrC//K5ZBlRf/TjmL5FzWBNIvXnyFgQFucqqMRXt1h+FfE10lCmy9dr/y6Y+GfWHPw7SxsoWW5BxGldlk/rmVwPVK7/hmGk=
+	t=1771187648; cv=none; b=AG80OAvvbwP+hhWb4ngwKIqpgfb1M1r3/z/jktzDxCr/zkhfKVL2edFFRWkglWlyWmpYiqFWhVrDxvXCeaKK2ki7yb3+miiW1dqoAl6iZVNPu9wK5sioxpu8vwHL1Ktr+I+64xkjrXywYNQJ7yMY1JAOkbngeu3bERn3gjrY8gQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771181711; c=relaxed/simple;
-	bh=52rk4431vTIwEh28KLsOORuISrOm684BpcHiRK0ikDI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=K/zvacg3oseK2uPJ0+z79QA9lyc75pTr2CgX2EvPxW0r7LbY+EAW9vu0Z/tUXVvFGJoMhhNkO+3eaeUUoN5qHIobbTsAolX3jTvlecKzEb7RDcMLiAMvILSe9WLmEFjqMj0QN0GOEb6d7YkB73PqpUWRIyyJJUdCNcIcsDD0jkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=venev.name; spf=pass smtp.mailfrom=venev.name; dkim=pass (4096-bit key) header.d=venev.name header.i=@venev.name header.b=lKdzryJK; arc=none smtp.client-ip=213.240.239.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=venev.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=venev.name
+	s=arc-20240116; t=1771187648; c=relaxed/simple;
+	bh=kPkx+XLnnEICTvDYdgmZp891oWtR10FsHihH5ePtz5U=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=XMSGd1ZSlcCjD64zg2vuzwbfB1aiylzRAxvQIA6XuPMnyuoZjMQ7Zu13aUTT9Pfy00EGBYwRt4CoDqvorxHW6cgznVJWT+Gosgu0770+898qgyDYXF3Nki2GbY+22VlJ6pFr0qW+zp+NVjO9OD6mu51eo3Qjjoe+7R0qA427+4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hKXdsfmQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=venev.name header.i=@venev.name header.b="lKdzryJK"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=venev.name;
-	s=default; h=Content-Transfer-Encoding:Message-ID:Date:Subject:To:From:
-	Content-Type:Reply-To:Sender; bh=HT0C8IQtP6ll2eG6quVPn4D1EGUnvCU9+Ng85cw2CDo=
-	; b=lKdzryJKkZ+EVYmAIQxQdwhNCKVztbSAPr1hm5d/pq+uCirMrZxueRIaHaDpQW8vZDOt56x+0
-	iO2VBKZKduawDOSIV0NXcdL8p7KumYEHotDfvhmZZxOBclKu0VNckWM/1GRZYvlgWVwCmUPRhUaWS
-	euW/2O61gS72JGuXWmlyizlMWd9l9arXEgPh4KBx5GFspOIRemywHoKSjx4IBo0J2WRANpENKN7EV
-	JbNLJy1dfntVd3X/ronNf7ZhOHYwIcwidKpNB8C/ZsfPSE+BPbJ4cgXGtVwPGFoMqItcehCEkoqcc
-	jgnoTCHDENFO6ElQixvc//woqgS7GgaGSgtA3FoVYWZSSiQULKkL5Yx00CUcCWqUDzYw5xJbTwT1Z
-	KNEAI6xuVugEZkivqxfrl6h45nEW47yQjbccsCTVn8gH37mxkQYL6IUTieysj5omIHHkG32qwdprL
-	8D937XiGh1n7wQRJKl3LBTLUnAof5k+R7jCILkvxyQwwuG7X7xzmrN7rBFb/N4TQv4VKzk57AEdDi
-	DTVYBy4gijQjqnrnWckHcEz7JhYH5ufzyBKnPtiSSBA3/oQWJyuVK3tThALl8U4/3FsSA9s8VyBJ+
-	SwLDXmktOL4qlqJfGFt6ots35moKi5DFnBGSq8fQuhOOqiXgNy3q0K7yiUtCrapbgzNb5H4=;
-Received: from a1-bg02.venev.name ([213.240.239.49] helo=pmx1.venev.name)
-	by a1-bg02.venev.name with esmtps
-	id 1vrgV3-00000009U7A-3lW3
-	(TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	(envelope-from <hristo@venev.name>);
-	Sun, 15 Feb 2026 18:05:41 +0000
-Received: from venev.name ([213.240.239.49])
-	by pmx1.venev.name with ESMTPSA
-	id wgezEPUKkmnpfiIAdB6GMg
-	(envelope-from <hristo@venev.name>); Sun, 15 Feb 2026 18:05:41 +0000
-From: Hristo Venev <hristo@venev.name>
-To: Donald Hunter <donald.hunter@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	Josef Bacik <josef@toxicpanda.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org,
-	nbd@other.debian.org,
-	Hristo Venev <hristo@venev.name>
-Subject: [PATCH] netlink: specs: add specification for NBD
-Date: Sun, 15 Feb 2026 20:03:02 +0200
-Message-ID: <20260215180309.2255721-3-hristo@venev.name>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hKXdsfmQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF4E0C4CEF7;
+	Sun, 15 Feb 2026 20:34:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771187647;
+	bh=kPkx+XLnnEICTvDYdgmZp891oWtR10FsHihH5ePtz5U=;
+	h=From:Date:Subject:To:Cc:From;
+	b=hKXdsfmQS2ygvBqdSgITFv9KTonI6gHJYAE3uZL+wFoQjqYhb2LAfm2sVnsxL3WDZ
+	 d/6dnbkRYpYMy/XDAA5vp6cokvYbuLmscWpZG1Ah1Bu3T3oFNS7fsokq09COtxikpB
+	 Xz/ryi6e/XQuh5TcMMSW28h+F6ZewF6y+oigNUA2V9XUOKUTgY1K5oi0ixK12UUvvw
+	 qaPlG0JsTKmYSpcD+JiHznfimjVNx1TzydWEICosObKq3a6qV7qwr+M0mnDgRe6fgV
+	 JoKeHBf5ZOy17ms7w0BuKCveHbHMAfvQNSAxmJ4r8AU31ZpSsKQluzZXx0q7HkWWIQ
+	 tMwVYT/5aJAkA==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+Date: Sun, 15 Feb 2026 21:33:47 +0100
+Subject: [PATCH] configfs: rust: add an API for adding default groups from
+ C
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
 List-Subscribe: <mailto:linux-block+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260215-configfs-c-default-groups-v1-1-e967daef6c36@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAKotkmkC/x3MTQrDIBBA4avIrDugJnHRq5Qu/BnNQNHgNCEQc
+ vdKl9/ivQuEOpPAU13Q6WDhVgfMQ0FcfS2EnIbBauu0NQvGVjOXLBgxUfb754ult30TDCloP89
+ umryD0W+dMp//9+t93z+/UzK9awAAAA==
+X-Change-ID: 20260215-configfs-c-default-groups-bdb0a44633a6
+To: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
+ Miguel Ojeda <ojeda@kernel.org>, Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+ Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
+ Breno Leitao <leitao@debian.org>
+Cc: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
+ rust-for-linux@vger.kernel.org, Andreas Hindborg <a.hindborg@kernel.org>
+X-Mailer: b4 0.15-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=5733; i=a.hindborg@kernel.org;
+ h=from:subject:message-id; bh=kPkx+XLnnEICTvDYdgmZp891oWtR10FsHihH5ePtz5U=;
+ b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpki2rc22Xg526E17P8XggB+tiQE/HNwmekN3wW
+ ivbt9FsREyJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZItqwAKCRDhuBo+eShj
+ dxAVEAChDY57aQjccAsf9b40HD44r2KSgKp6iA5HiN6i/O/efL2nYYW5feu0dU0ewKju/bAFv8n
+ 4An6Jg/ilNu/PiHu1waCHvxbEhVOMWXaFpM+jOByG8GMROWS6YuRYEqPsvUDJjVfTuZwwjaJ+6t
+ GwGP9VOR/cksiMqHgQcE0KpaSDK0DB+bGVN1EcUCX0skcNptcDq7fuJJeueDus7rglYQo5YMnUV
+ op2B3sN7udRTc9aQoPTjEsBTYke36MIYDP+xcJhJUMSSfWAepbYimu00WJa+2x5YPNRdrtwKhBY
+ nAgtPkdNQ1tg5yVejVGSeGAV1WItH0Ircxzin71NX5J58UKA+2XvcXyFWEviXoh6O67X+n5G3nw
+ oxNYDQCc6nrLx/C5ksN6RxqCiu2PfOABUypib+PsRJGT/SM8MfasJ0Dvf8ER6sGDajm5itc77xo
+ pp2CzwUXGPmQyF9yqhxCqBSJ+fwQ6QPJTtwA/5MbWPHLDhYMvIyhFxaa00nl9wYvUllDna504gk
+ g4vUmhEVNUKrKyvEPidFot83Kwr/91ndyMLv33wByxT3FsHDkeG9g+OE49dTKvJ83mgKrt5TKFM
+ +4PVRq2B0vrzlk4uHZMM/bbFz7DZ4awWha25hReB2Vf9dPrC+2JbFrodSMKTBQXAP1Dp0Sf+NXB
+ mQb0Tu+N/ynyHcw==
+X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
+ fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-This patch adds an initial YNL specification for NBD. The specification
-can be used to produce a UAPI header that is equivalent to the one
-currently shipped in the kernel.
+Some C subsystems provide a feature to add configfs default groups to the
+configfs hierarchy of other drivers or subsystems. Rust abstractions for
+these subsystems will want a way to add these default groups via the
+configfs Rust API. So add infrastructure to make this possible.
 
-The spec appears to be accurate enough so that commands can be issued
-with pyynl.
-
-Signed-off-by: Hristo Venev <hristo@venev.name>
+Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- Documentation/netlink/specs/nbd.yaml | 206 +++++++++++++++++++++++++++
- 1 file changed, 206 insertions(+)
- create mode 100644 Documentation/netlink/specs/nbd.yaml
+ drivers/block/rnull/configfs.rs |  1 +
+ rust/helpers/configfs.c         | 16 ++++++++++++++++
+ rust/helpers/helpers.c          |  1 +
+ rust/kernel/configfs.rs         | 33 ++++++++++++++++++++++++++++++++-
+ samples/rust/rust_configfs.rs   |  8 +++++++-
+ 5 files changed, 57 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/netlink/specs/nbd.yaml b/Documentation/netlink/specs/nbd.yaml
+diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
+index 6713a6d92391d..ea38b27a9011c 100644
+--- a/drivers/block/rnull/configfs.rs
++++ b/drivers/block/rnull/configfs.rs
+@@ -78,6 +78,7 @@ fn make_group(
+                     name: name.try_into()?,
+                 }),
+             }),
++            core::iter::empty(),
+         ))
+     }
+ }
+diff --git a/rust/helpers/configfs.c b/rust/helpers/configfs.c
 new file mode 100644
-index 0000000000000..a84912a867d91
+index 0000000000000..7cec8ffcb093d
 --- /dev/null
-+++ b/Documentation/netlink/specs/nbd.yaml
-@@ -0,0 +1,206 @@
-+# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
-+---
-+name: nbd
-+protocol: genetlink-c
-+uapi-header: linux/nbd-netlink.h
-+doc: See :file:`drivers/block/nbd.c`
++++ b/rust/helpers/configfs.c
+@@ -0,0 +1,16 @@
++// SPDX-License-Identifier: GPL-2.0
 +
-+c-family-name: nbd-genl-family-name
-+c-version-name: nbd-genl-version
-+max-by-define: true
++#include <linux/configfs.h>
 +
-+attribute-sets:
-+  -
-+    name: nbd-attrs
-+    name-prefix: nbd-attr-
-+    doc: Configuration policy attributes, used for CONNECT
-+    attributes:
-+      -
-+        name: unspec
-+        value: 0
-+        type: unused
-+      -
-+        name: index
-+        type: u32
-+      -
-+        name: size-bytes
-+        type: u64
-+      -
-+        name: block-size-bytes
-+        type: u64
-+      -
-+        name: timeout
-+        type: u64
-+      -
-+        name: server-flags
-+        type: u64
-+      -
-+        name: client-flags
-+        type: u64
-+      -
-+        name: sockets
-+        type: nest
-+        nested-attributes: sock-item-attrs
-+      -
-+        name: dead-conn-timeout
-+        type: u64
-+      -
-+        name: device-list
-+        type: nest
-+        nested-attributes: device-item-attrs
-+      -
-+        name: backend-identifier
-+        type: string
-+  -
-+    name: device-item-attrs
-+    name-prefix: nbd-device-item-
-+    doc: |
-+      This is the format for multiple devices with :code:`NBD_ATTR_DEVICE_LIST`
++__rust_helper void
++rust_helper_configfs_add_default_group(struct config_group *new_group,
++				       struct config_group *group)
++{
++	configfs_add_default_group(new_group, group);
++}
 +
-+      .. code-block::
++__rust_helper void
++__rust_helper_configfs_remove_default_groups(struct config_group *group)
++{
++	configfs_remove_default_groups(group);
++}
+diff --git a/rust/helpers/helpers.c b/rust/helpers/helpers.c
+index 79c72762ad9c4..613b41e8b781c 100644
+--- a/rust/helpers/helpers.c
++++ b/rust/helpers/helpers.c
+@@ -19,6 +19,7 @@
+ #include "build_bug.c"
+ #include "clk.c"
+ #include "completion.c"
++#include "configfs.c"
+ #include "cpu.c"
+ #include "cpufreq.c"
+ #include "cpumask.c"
+diff --git a/rust/kernel/configfs.rs b/rust/kernel/configfs.rs
+index 466fb7f407628..705f1647269d9 100644
+--- a/rust/kernel/configfs.rs
++++ b/rust/kernel/configfs.rs
+@@ -242,12 +242,22 @@ unsafe fn container_of(group: *const bindings::config_group) -> *const Self {
+ ///
+ /// To add a subgroup to configfs, pass this type as `ctype` to
+ /// [`crate::configfs_attrs`] when creating a group in [`GroupOperations::make_group`].
+-#[pin_data]
++#[pin_data(PinnedDrop)]
+ pub struct Group<Data> {
+     #[pin]
+     group: Opaque<bindings::config_group>,
+     #[pin]
+     data: Data,
++    default_groups: KVec<Arc<dyn CDefaultGroup>>,
++}
 +
-+        [NBD_ATTR_DEVICE_LIST]
-+          [NBD_DEVICE_ITEM]
-+            [NBD_DEVICE_INDEX]
-+            [NBD_DEVICE_CONNECTED]
-+    attributes:
-+      -
-+        name: unspec
-+        value: 0
-+        type: unused
-+      -
-+        name: item
-+        name-prefix: nbd-device-
-+        type: nest
-+        nested-attributes: device-attrs
-+        multi-attr: true
-+  -
-+    name: device-attrs
-+    name-prefix: nbd-device-
-+    attr-max-name: nbd-device-attr-max
-+    attributes:
-+      -
-+        name: unspec
-+        value: 0
-+        type: unused
-+      -
-+        name: index
-+        type: u32
-+      -
-+        name: connected
-+        type: u8
-+  -
-+    name: sock-item-attrs
-+    name-prefix: nbd-sock-item-
-+    doc: |
-+      This is the format for multiple sockets with :code:`NBD_ATTR_SOCKETS`
++#[pinned_drop]
++impl<Data> PinnedDrop for Group<Data> {
++    fn drop(self: Pin<&mut Self>) {
++        // SAFETY: We have exclusive access to `self` and we know the default groups are alive
++        // because we reference them through `self.default_groups`.
++        unsafe { bindings::configfs_remove_default_groups(self.group.get()) };
++    }
+ }
+ 
+ impl<Data> Group<Data> {
+@@ -259,7 +269,13 @@ pub fn new(
+         name: CString,
+         item_type: &'static ItemType<Group<Data>, Data>,
+         data: impl PinInit<Data, Error>,
++        default_groups: impl IntoIterator<Item = Arc<dyn CDefaultGroup>>,
+     ) -> impl PinInit<Self, Error> {
++        let mut dg = KVec::new();
++        for group in default_groups {
++            dg.push(group, GFP_KERNEL).unwrap();
++        }
 +
-+      .. code-block::
+         try_pin_init!(Self {
+             group <- pin_init::init_zeroed().chain(|v: &mut Opaque<bindings::config_group>| {
+                 let place = v.get();
+@@ -268,13 +284,28 @@ pub fn new(
+                 unsafe {
+                     bindings::config_group_init_type_name(place, name.cast(), item_type.as_ptr())
+                 };
 +
-+        [NBD_ATTR_SOCKETS]
-+          [NBD_SOCK_ITEM]
-+            [NBD_SOCK_FD]
-+          [NBD_SOCK_ITEM]
-+            [NBD_SOCK_FD]
-+    attributes:
-+      -
-+        name: unspec
-+        value: 0
-+        type: unused
-+      -
-+        name: item
-+        name-prefix: nbd-sock-
-+        type: nest
-+        nested-attributes: sock-attrs
-+        multi-attr: true
-+  -
-+    name: sock-attrs
-+    name-prefix: nbd-sock-
-+    attributes:
-+      -
-+        name: unspec
-+        value: 0
-+        type: unused
-+      -
-+        name: fd
-+        type: u32
++                for default_group in &dg {
++                    // SAFETY: We keep the default groups alive until `Self` is dropped.
++                    unsafe { bindings::configfs_add_default_group(default_group.group_ptr(), place) }
++                }
+                 Ok(())
+             }),
+             data <- data,
++            default_groups: dg,
+         })
+     }
+ }
+ 
++/// A trait for default configfs groups added by C code.
++///
++/// Rust abstractions that work with C code that creates configfs groups can implement this trait to
++/// add the groups as default groups via the Rust configfs API.
++pub trait CDefaultGroup {
++    /// Return a raw pointer to the group definition.
++    fn group_ptr(&self) -> *mut bindings::config_group;
++}
 +
-+operations:
-+  enum-model: unified
-+  name-prefix: nbd-cmd-
-+  list:
-+    -
-+      name: unspec
-+      value: 0
-+      doc: NBD_CMD_UNSPEC
-+    -
-+      name: connect
-+      doc: See :file:`drivers/block/nbd.c`, :code:`nbd_genl_connect()`
-+      attribute-set: nbd-attrs
-+      dont-validate: [strict]
-+      do:
-+        request:
-+          attributes:
-+            - index
-+            - size-bytes
-+            - block-size-bytes
-+            - timeout
-+            - server-flags
-+            - client-flags
-+            - sockets
-+            - dead-conn-timeout
-+            - backend-identifier
-+        reply:
-+          attributes:
-+            - index
-+    -
-+      name: disconnect
-+      doc: See :file:`drivers/block/nbd.c`, :code:`nbd_genl_disconnect()`
-+      attribute-set: nbd-attrs
-+      dont-validate: [strict]
-+      do:
-+        request:
-+          attributes:
-+            - index
-+    -
-+      name: reconfigure
-+      doc: See :file:`drivers/block/nbd.c`, :code:`nbd_genl_reconfigure()`
-+      attribute-set: nbd-attrs
-+      dont-validate: [strict]
-+      do:
-+        request:
-+          attributes:
-+            - index
-+            - size-bytes
-+            - block-size-bytes
-+            - timeout
-+            - client-flags
-+            - sockets
-+            - dead-conn-timeout
-+            - backend-identifier
-+    -
-+      name: link-dead
-+      doc: See :file:`drivers/block/nbd.c`, :code:`nbd_mark_nsock_dead()` / :code:`nbd_dead_link_work()`
-+      attribute-set: nbd-attrs
-+      event:
-+        attributes:
-+          - index
-+      mcgrp: nbd_mc_group
-+    -
-+      name: status
-+      doc: See :file:`drivers/block/nbd.c`, :code:`nbd_genl_status()`
-+      attribute-set: nbd-attrs
-+      dont-validate: [strict]
-+      do:
-+        request:
-+          attributes:
-+            - index
-+        reply:
-+          attributes:
-+            - device-list
-+
-+mcast-groups:
-+  list:
-+    -
-+      name: nbd_mc_group
-+      c-define-name: nbd-genl-mcast-group-name
+ // SAFETY: `Group<Data>` embeds a field of type `bindings::config_group`
+ // within the `group` field.
+ unsafe impl<Data> HasGroup<Data> for Group<Data> {
+diff --git a/samples/rust/rust_configfs.rs b/samples/rust/rust_configfs.rs
+index 0ccc7553ef395..c65dda8bfacd2 100644
+--- a/samples/rust/rust_configfs.rs
++++ b/samples/rust/rust_configfs.rs
+@@ -84,7 +84,12 @@ fn make_group(&self, name: &CStr) -> Result<impl PinInit<configfs::Group<Child>,
+             ],
+         };
+ 
+-        Ok(configfs::Group::new(name.try_into()?, tpe, Child::new()))
++        Ok(configfs::Group::new(
++            name.try_into()?,
++            tpe,
++            Child::new(),
++            core::iter::empty(),
++        ))
+     }
+ }
+ 
+@@ -153,6 +158,7 @@ fn make_group(&self, name: &CStr) -> Result<impl PinInit<configfs::Group<GrandCh
+             name.try_into()?,
+             tpe,
+             GrandChild::new(),
++            core::iter::empty(),
+         ))
+     }
+ }
+
+---
+base-commit: 05f7e89ab9731565d8a62e3b5d1ec206485eeb0b
+change-id: 20260215-configfs-c-default-groups-bdb0a44633a6
+
+Best regards,
 -- 
-2.53.0
+Andreas Hindborg <a.hindborg@kernel.org>
+
 
