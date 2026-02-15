@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BA4630DEAD;
-	Sun, 15 Feb 2026 23:46:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8E32312803;
+	Sun, 15 Feb 2026 23:46:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771199196; cv=none; b=nOcYyB3DyMeZEFRZcRK34O/jf7rFNiZuIQCrGpiCVt7BaqGQfogZNBgMmrbuuXxWSRWXUjOuSUJck8/CH2hS0RLICJwJkHq++16GUnKocN73/aYdYW7cuIFSZk6e32vwIOs932M5aNh8zu2oluvSaQ8jdjDGSqRYKtaqrG1KfAA=
+	t=1771199200; cv=none; b=C/2B8l3zQT+x9Bceo+G9M++zTwrOSE+liB5ji0NyTWFZQlT8HE+FX6P67jBx0pd11nE//S01m0Uv6dLLxXUZ3S28LnhEZPEHAbJ1SsGAMho8UlsRWAizVT4RRFypPtuplAW/GOfXCXEwbHzhJEwIAxKX8nLUHJuhVrtITzVvJGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771199196; c=relaxed/simple;
-	bh=1D3Qowx2aO/t4IbOvgsohdBDGHVkeFHvWTMo4nJU384=;
+	s=arc-20240116; t=1771199200; c=relaxed/simple;
+	bh=V7NPmcHt489UPhx819RkTB11oJ7rpInWWLTHwSOdN0k=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=TcqSk2mExm4ndubQBypPmlUcf2767sGhJZxUIhlEmAA7ZG2GdXQtdIUxB4fZvkegWFZb5NRKafhFDGhnyvRYb3B43g04jP6wHOYbtbNJW+qa5GWLJnwC9Rlzx7GS2AyTB2S9Ihl7wBpfRxF9QWyMq60iXhfetycGI9KO/W4QT7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=apYQLKSE; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=PT3or5V3XEdjUipF2y3i00Kd3thd/4zTzhq6rBVGyfR8NjqudX6M1QGdTLT2dZRgYowBazP4l7oZ0NAzmvIbB3T3RtAfvReOTvfY4MTau5LuMEjxyh4iKwbhYCKEkeyMeYkOyGBP+mpnGI6TrIcQNdzLTfxfr9niMafk1k5LPbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QOAAWiOD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="apYQLKSE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D11CC4CEF7;
-	Sun, 15 Feb 2026 23:46:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QOAAWiOD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7043DC4CEF7;
+	Sun, 15 Feb 2026 23:46:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771199195;
-	bh=1D3Qowx2aO/t4IbOvgsohdBDGHVkeFHvWTMo4nJU384=;
+	s=k20201202; t=1771199200;
+	bh=V7NPmcHt489UPhx819RkTB11oJ7rpInWWLTHwSOdN0k=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=apYQLKSEGKioDBmRLdyp49YhhecKtiE4t5lJ1+rq6Eqnw5uAOhOdqKGstI6n3JrPQ
-	 4jY6cBFbWPOcya15GtWyOaNkjSP1/YVcHiO7iCHqC9+aJBHnbHnPIWpyc8IBFplC+m
-	 2iLz979YOrDEYF3hKy36fH0FY2ZQo+ob8YGuuGOe1iFx31rTm2au3/RJV9in0Mz7Wn
-	 VgWrNweaTCoYWM6akq3agJRPDFiLe2IQ1Nwy6cz6Y3VbrOfM6DwCf3/3RXZ2QYhRW+
-	 /8Dzy0ucH1lDoPgbznEKC0tCFtZKBSShiGcL5Wx6Y+rkmJc5jscse5T7uS+tB80Auw
-	 qVhe9/gVxleMg==
+	b=QOAAWiODki0/fVEd+vwj3qIdMPRlM/t1Wt0oN/BXImgWeFtx+e7pHGr/rrOldFWHW
+	 Qq5WsoutXlj/lz9xAQ8S/osGEmSW1h5JM4OWOtGphjFd6aBOsyBlDshTGy+PJ9a6NS
+	 sm9BwJt/4JxJD/aim4CEBeVdRT/IbTo5V4Oh3+iOen7SGETNd7v6e/icRmt+uNDqKt
+	 dQhKsEQ+QiMqvb6q07pVlYQFDwSx2B92Wcq1aV5DQiU3MMedDVkgfjtKTjn7b/7hKW
+	 j1fEcxeA1awXgYmE02RtIiYkeCzhdq1E/DBY3wtJ+WYVqFjNG1BzN724aDSYIjpz/B
+	 nXXddZuJ2B0/w==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Mon, 16 Feb 2026 00:35:27 +0100
-Subject: [PATCH 40/79] block: rnull: add bandwidth limiting
+Date: Mon, 16 Feb 2026 00:35:17 +0100
+Subject: [PATCH 30/79] block: rust: add `hctx` private data support
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260216-rnull-v6-19-rc5-send-v1-40-de9a7af4b469@kernel.org>
+Message-Id: <20260216-rnull-v6-19-rc5-send-v1-30-de9a7af4b469@kernel.org>
 References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 In-Reply-To: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 To: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
@@ -56,337 +56,302 @@ Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
  Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=10640;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=11810;
  i=a.hindborg@kernel.org; h=from:subject:message-id;
- bh=1D3Qowx2aO/t4IbOvgsohdBDGHVkeFHvWTMo4nJU384=;
- b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpklg/lJ8RWBn2XqZv3u9MAaleDBN4J6c9pL1EJ
- bQYXASf7kGJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZJYPwAKCRDhuBo+eShj
- d6adEAC1AoqKlyjEncpLkoQZDBtLyNnZisBjZMEGbED4jlqtXi+tqor3i/XT+zMdn2i0SSNUM2o
- ymEeqxJzhJsRd/xOhFQ5tvangLI53sBloxbomvjTtAAk0L6BOLFf9GWHGdHj+Ma9f9PXC6mblIO
- WEYHUe3pF6ffQdmS1RPsKX4TbNxJ1CYIEShynTnp5yq842QSs620NFz0YKZhHPQL9DZPiyelcX8
- PykJ92EkZbLZeRB3ND2+gYpgm7k/55TKcwlDz9JzQhvi4KEhAZIeDEPujmY0+xlgElZNvIwR17P
- PMrwhJHoN3aeEPx6IK8m2jArV64/JV1qWRF9Taop6aiGribyIY5Ot1tbBIeeaI0Bk0OB6HsK8aH
- EkJYzXTcxjmZ8mP449ZiB384I+HUc5i0tt/klS6ld0FIgkrtpOl8MV+TT4n4ADEl7HeFHw9cX80
- 2Z5Ujr6UQa4xck2quT/mYwyOlgx7lohn1s0H4JE7CwSm6rcaoUP+ZhxGWUtpxTuRpocZAc++cAb
- XswxLn6fVPoF2MHD3ZHeBCDhWlQJi7XZjGe2ARzj5u++0y9wQ8fiQs4BGwjVdBwHYpFJy0Wcqa7
- rXAnGj7bUGfIelI24lgLX21Osa+v1fX49660d9PP3dB5jM4OEv+/E/pF/CvmOdYJZi7pp4YO6Sh
- szGVbzqkiaQle+g==
+ bh=V7NPmcHt489UPhx819RkTB11oJ7rpInWWLTHwSOdN0k=;
+ b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpklg2hepO/XMsV/RoMZ08ue9FZTE5Lj97prJGD
+ j8WSlxnqgOJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZJYNgAKCRDhuBo+eShj
+ d+EKD/9u8LB3MZ2sU5dzRt1fQ1mTyKDY3Y4tuS/8D47vQY5WL29VWojTttVXM62mDObm1xTLHde
+ 6y2lYsO4hRrH+mB2SJnSx4ygR13sIWFKhLjVtwB/Q6uOj/cS049/8c2wDvaIdj/rtvlttrDdKqL
+ HvAmiykeVZukA9xzP8OAY7bENI49gLT0u10mccqkfMahAqAqRsS6RMBGsTZ4Nk4boXYXIoe/JjA
+ 2ANAoJmns8NzTtiHJAUsXL/zAge5zAn9kaNfEhSXVAriMC+5Xiaq832sUWMPeGnu3QW24aBc4dk
+ BJ3fF10wT2+sC88QFzHc0aU5FaTDJONchPfXk2pVuglhVA3m5eF3cLHUSKXEdJraCvfRPxLFvS8
+ AhQ/4D14KsSIUITCXytGv2RQL9AM4D1DhO5/dgckrJPRA8gCTUhe2o7NtrJyt5DS2IEmyiJAq38
+ g4qycoOGZHQmxq2XCPzNDy++RkTIq3pJyOs7Odm65g2nrNPEO0OJJX6+11xOWSFDSEGkRNSqpcg
+ naKWE/RVHDizTPOU1na0zdD8W2isxPUiE0lJdT1Gs4cSCci1bZLZd8XJURL4NPc7RGy3akPG1aF
+ ulSl5POtOg9MQxfFF7qt/1QWFUJsE1P2gWtHiZ71LP8gpSw3vXsHTXdOtbv9wHNbymiikWE1i5U
+ wgVtNsa9xbE/Fsw==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Add bandwidth limiting support to rnull via the `mbps` configfs
-attribute. When set to a non-zero value, the driver limits I/O
-throughput to the specified rate in megabytes per second.
+C block device drivers can attach private data to a hardware context
+(`struct blk_mq_hw_ctx`). Add support for this feature for Rust block
+device drivers via the `Operations::HwData` associated type.
 
-The implementation uses a token bucket algorithm to enforce the rate
-limit, delaying request completion when the limit is exceeded.
+The private data is created in the `init_hctx` callback and stored in
+the `driver_data` field of `blk_mq_hw_ctx`. It is passed to `queue_rq`,
+`commit_rqs`, and `poll` callbacks, and is released in `exit_hctx`.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- drivers/block/rnull/configfs.rs |   7 ++-
- drivers/block/rnull/rnull.rs    | 111 +++++++++++++++++++++++++++++++++++-----
- 2 files changed, 105 insertions(+), 13 deletions(-)
+ drivers/block/rnull/rnull.rs       |  8 +++-
+ rust/kernel/block/mq.rs            | 23 ++++++++++-
+ rust/kernel/block/mq/operations.rs | 85 +++++++++++++++++++++++++++++++-------
+ 3 files changed, 97 insertions(+), 19 deletions(-)
 
-diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
-index e365eb06be6de..d369d8b683c61 100644
---- a/drivers/block/rnull/configfs.rs
-+++ b/drivers/block/rnull/configfs.rs
-@@ -105,6 +105,7 @@ fn make_group(
-                 badblocks_once: 13,
-                 badblocks_partial_io: 14,
-                 cache_size_mib: 15,
-+                mbps: 16,
-             ],
-         };
- 
-@@ -136,6 +137,7 @@ fn make_group(
-                         GFP_KERNEL
-                     )?,
-                     cache_size_mib: 0,
-+                    mbps: 0,
-                 }),
-             }),
-             core::iter::empty(),
-@@ -200,6 +202,7 @@ struct DeviceConfigInner {
-     bad_blocks_partial_io: bool,
-     cache_size_mib: u64,
-     disk_storage: Arc<DiskStorage>,
-+    mbps: u32,
- }
- 
- #[vtable]
-@@ -239,6 +242,7 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
-                 bad_blocks_once: guard.bad_blocks_once,
-                 bad_blocks_partial_io: guard.bad_blocks_partial_io,
-                 storage: guard.disk_storage.clone(),
-+                bandwidth_limit: u64::from(guard.mbps) * 2u64.pow(20),
-             })?);
-             guard.powered = true;
-         } else if guard.powered && !power_op {
-@@ -250,7 +254,6 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
-     }
- }
- 
--// DiskStorage::new(cache_size_mib << 20, block_size as usize),
- configfs_simple_field!(DeviceConfig, 1, block_size, u32, check GenDiskBuilder::validate_block_size);
- configfs_simple_bool_field!(DeviceConfig, 2, rotational);
- configfs_simple_field!(DeviceConfig, 3, capacity_mib, u64);
-@@ -457,3 +460,5 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
-         Ok(())
-     })
- );
-+
-+configfs_simple_field!(DeviceConfig, 16, mbps, u32);
 diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
-index 55cbdfed25414..16a4f915e59f4 100644
+index 9e8d085924040..4e226186d2f36 100644
 --- a/drivers/block/rnull/rnull.rs
 +++ b/drivers/block/rnull/rnull.rs
-@@ -25,7 +25,8 @@
-             self,
-             gen_disk::{
-                 self,
--                GenDisk, //
-+                GenDisk,
-+                GenDiskRef, //
-             },
-             Operations,
-             TagSet, //
-@@ -37,24 +38,31 @@
-         Result, //
-     },
-     ffi,
-+    impl_has_hr_timer,
-     new_mutex,
-     new_spinlock,
-     pr_info,
-     prelude::*,
-+    revocable::Revocable,
-     str::CString,
-     sync::{
-         aref::ARef,
-         atomic::{
-             ordering,
-             Atomic, //
--        }, //
-+        },
-         Arc,
-+        ArcBorrow,
-         Mutex,
-+        SetOnce,
-         SpinLock,
--        SpinLockGuard,
-+        SpinLockGuard, //
-     },
-     time::{
-         hrtimer::{
-+            self,
-+            ArcHrTimerHandle,
-+            HrTimer,
-             HrTimerCallback,
-             HrTimerCallbackContext,
-             HrTimerPointer,
-@@ -129,6 +137,10 @@
-             default: 0,
-             description: "No IO scheduler",
-         },
-+        mbps: u32 {
-+            default: 0,
-+            description: "Max bandwidth in MiB/s. 0 means no limit.",
-+        },
-     },
- }
- 
-@@ -174,6 +186,7 @@ fn init(_module: &'static ThisModule) -> impl PinInit<Self, Error> {
-                     bad_blocks_once: false,
-                     bad_blocks_partial_io: false,
-                     storage: Arc::pin_init(DiskStorage::new(0, block_size as usize), GFP_KERNEL)?,
-+                    bandwidth_limit: u64::from(*module_parameters::mbps.value()) * 2u64.pow(20),
-                 })?;
-                 disks.push(disk, GFP_KERNEL)?;
-             }
-@@ -204,6 +217,7 @@ struct NullBlkOptions<'a> {
-     bad_blocks_once: bool,
-     bad_blocks_partial_io: bool,
-     storage: Arc<DiskStorage>,
-+    bandwidth_limit: u64,
- }
- 
- #[pin_data]
-@@ -216,9 +230,18 @@ struct NullBlkDevice {
-     bad_blocks: Arc<BadBlocks>,
-     bad_blocks_once: bool,
-     bad_blocks_partial_io: bool,
-+    bandwidth_limit: u64,
-+    #[pin]
-+    bandwidth_timer: HrTimer<Self>,
-+    bandwidth_bytes: Atomic<u64>,
-+    #[pin]
-+    bandwidth_timer_handle: SpinLock<Option<ArcHrTimerHandle<Self>>>,
-+    disk: SetOnce<Arc<Revocable<GenDiskRef<Self>>>>,
- }
- 
- impl NullBlkDevice {
-+    const BANDWIDTH_TIMER_INTERVAL: Delta = Delta::from_millis(20);
-+
-     fn new(options: NullBlkOptions<'_>) -> Result<Arc<GenDisk<Self>>> {
-         let NullBlkOptions {
-             name,
-@@ -236,6 +259,7 @@ fn new(options: NullBlkOptions<'_>) -> Result<Arc<GenDisk<Self>>> {
-             bad_blocks_once,
-             bad_blocks_partial_io,
-             storage,
-+            bandwidth_limit,
-         } = options;
- 
-         let mut flags = mq::tag_set::Flags::default();
-@@ -260,7 +284,7 @@ fn new(options: NullBlkOptions<'_>) -> Result<Arc<GenDisk<Self>>> {
-             GFP_KERNEL,
-         )?;
- 
--        let queue_data = Box::try_pin_init(
-+        let queue_data = Arc::try_pin_init(
-             try_pin_init!(Self {
-                 storage,
-                 irq_mode,
-@@ -270,6 +294,11 @@ fn new(options: NullBlkOptions<'_>) -> Result<Arc<GenDisk<Self>>> {
-                 bad_blocks,
-                 bad_blocks_once,
-                 bad_blocks_partial_io,
-+                bandwidth_limit: bandwidth_limit / 50,
-+                bandwidth_timer <- HrTimer::new(),
-+                bandwidth_bytes: Atomic::new(0),
-+                bandwidth_timer_handle <- new_spinlock!(None),
-+                disk: SetOnce::new(),
-             }),
-             GFP_KERNEL,
-         )?;
-@@ -286,7 +315,10 @@ fn new(options: NullBlkOptions<'_>) -> Result<Arc<GenDisk<Self>>> {
-                 .max_hw_discard_sectors(ffi::c_uint::MAX >> block::SECTOR_SHIFT);
-         }
- 
--        builder.build(fmt!("{}", name.to_str()?), tagset, queue_data)
-+        let disk = builder.build(fmt!("{}", name.to_str()?), tagset, queue_data)?;
-+        let queue_data: ArcBorrow<'_, Self> = disk.queue_data();
-+        queue_data.disk.populate(disk.get_ref());
-+        Ok(disk)
-     }
- 
-     fn sheaf_size() -> usize {
-@@ -504,6 +536,36 @@ fn end_request(rq: Owned<mq::Request<Self>>) {
-     }
- }
- 
-+impl_has_hr_timer! {
-+    impl HasHrTimer<Self> for NullBlkDevice {
-+        mode: hrtimer::RelativeHardMode<kernel::time::Monotonic>,
-+        field: self.bandwidth_timer,
-+    }
-+}
-+
-+impl HrTimerCallback for NullBlkDevice {
-+    type Pointer<'a> = Arc<Self>;
-+
-+    fn run(
-+        this: ArcBorrow<'_, Self>,
-+        mut context: HrTimerCallbackContext<'_, Self>,
-+    ) -> HrTimerRestart {
-+        if this.bandwidth_bytes.load(ordering::Relaxed) == 0 {
-+            return HrTimerRestart::NoRestart;
-+        }
-+
-+        this.disk.as_ref().map(|disk| {
-+            disk.try_access()
-+                .map(|disk| disk.queue().start_stopped_hw_queues_async())
-+        });
-+
-+        this.bandwidth_bytes.store(0, ordering::Relaxed);
-+
-+        context.forward_now(Self::BANDWIDTH_TIMER_INTERVAL);
-+        HrTimerRestart::Restart
-+    }
-+}
-+
- struct HwQueueContext {
-     page: Option<KBox<disk_storage::NullBlockPage>>,
- }
-@@ -511,7 +573,7 @@ struct HwQueueContext {
- #[pin_data]
- struct Pdu {
-     #[pin]
--    timer: kernel::time::hrtimer::HrTimer<Self>,
-+    timer: HrTimer<Self>,
-     error: Atomic<u32>,
- }
- 
-@@ -560,14 +622,14 @@ fn align_down<T>(value: T, to: T) -> T
- 
- #[vtable]
- impl Operations for NullBlkDevice {
--    type QueueData = Pin<KBox<Self>>;
-+    type QueueData = Arc<Self>;
+@@ -506,6 +506,7 @@ impl Operations for NullBlkDevice {
+     type QueueData = Pin<KBox<QueueData>>;
      type RequestData = Pdu;
      type TagSetData = ();
-     type HwData = Pin<KBox<SpinLock<HwQueueContext>>>;
++    type HwData = ();
  
      fn new_request_data() -> impl PinInit<Self::RequestData> {
          pin_init!(Pdu {
--            timer <- kernel::time::hrtimer::HrTimer::new(),
-+            timer <- HrTimer::new(),
-             error: Atomic::new(0),
-         })
-     }
-@@ -575,14 +637,39 @@ fn new_request_data() -> impl PinInit<Self::RequestData> {
+@@ -516,6 +517,7 @@ fn new_request_data() -> impl PinInit<Self::RequestData> {
+ 
      #[inline(always)]
      fn queue_rq(
-         hw_data: Pin<&SpinLock<HwQueueContext>>,
--        this: Pin<&Self>,
-+        this: ArcBorrow<'_, Self>,
-         rq: Owned<mq::IdleRequest<Self>>,
++        _hw_data: (),
+         queue_data: Pin<&QueueData>,
+         mut rq: Owned<mq::Request<Self>>,
          _is_last: bool,
-     ) -> BlkResult {
--        let mut rq = rq.start();
-         let mut sectors = rq.sectors();
- 
--        Self::handle_bad_blocks(this.get_ref(), &mut rq, &mut sectors)?;
-+        if this.bandwidth_limit != 0 {
-+            if !this.bandwidth_timer.active() {
-+                drop(this.bandwidth_timer_handle.lock().take());
-+                let arc: Arc<_> = this.into();
-+                *this.bandwidth_timer_handle.lock() =
-+                    Some(arc.start(Self::BANDWIDTH_TIMER_INTERVAL));
-+            }
-+
-+            if this
-+                .bandwidth_bytes
-+                .fetch_add(u64::from(rq.bytes()), ordering::Relaxed)
-+                + u64::from(rq.bytes())
-+                > this.bandwidth_limit
-+            {
-+                rq.queue().stop_hw_queues();
-+                if this.bandwidth_bytes.load(ordering::Relaxed) <= this.bandwidth_limit {
-+                    rq.queue().start_stopped_hw_queues_async();
-+                }
-+
-+                return Err(kernel::block::error::code::BLK_STS_DEV_RESOURCE);
-+            }
-+        }
-+
-+        let mut rq = rq.start();
-+
-+        use core::ops::Deref;
-+        Self::handle_bad_blocks(this.deref(), &mut rq, &mut sectors)?;
- 
-         if this.memory_backed {
-             if rq.command() == bindings::req_op_REQ_OP_DISCARD {
-@@ -604,7 +691,7 @@ fn queue_rq(
+@@ -546,7 +548,11 @@ fn queue_rq(
          Ok(())
      }
  
--    fn commit_rqs(_hw_data: Pin<&SpinLock<HwQueueContext>>, _queue_data: Pin<&Self>) {}
-+    fn commit_rqs(_hw_data: Pin<&SpinLock<HwQueueContext>>, _queue_data: ArcBorrow<'_, Self>) {}
+-    fn commit_rqs(_queue_data: Pin<&QueueData>) {}
++    fn commit_rqs(_hw_data: (), _queue_data: Pin<&QueueData>) {}
++
++    fn init_hctx(_tagset_data: (), _hctx_idx: u32) -> Result {
++        Ok(())
++    }
  
-     fn init_hctx(_tagset_data: (), _hctx_idx: u32) -> Result<Self::HwData> {
-         KBox::pin_init(new_spinlock!(HwQueueContext { page: None }), GFP_KERNEL)
+     fn complete(rq: ARef<mq::Request<Self>>) {
+         Self::end_request(
+diff --git a/rust/kernel/block/mq.rs b/rust/kernel/block/mq.rs
+index 415be31e9a777..3eab3ca8f5480 100644
+--- a/rust/kernel/block/mq.rs
++++ b/rust/kernel/block/mq.rs
+@@ -17,6 +17,12 @@
+ //! - The [`GenDisk`] type that abstracts the C type `struct gendisk`.
+ //! - The [`Request`] type that abstracts the C type `struct request`.
+ //!
++//! Many of the C types that this module abstracts allow a driver to carry
++//! private data, either embedded in the struct directly, or as a C `void*`. In
++//! these abstractions, this data is typed. The types of the data is defined by
++//! associated types in `Operations`, see [`Operations::RequestData`] for an
++//! example.
++//!
+ //! The kernel will interface with the block device driver by calling the method
+ //! implementations of the `Operations` trait.
+ //!
+@@ -71,6 +77,7 @@
+ //! impl Operations for MyBlkDevice {
+ //!     type RequestData = ();
+ //!     type QueueData = ();
++//!     type HwData = ();
+ //!     type TagSetData = ();
+ //!
+ //!     fn new_request_data(
+@@ -78,12 +85,17 @@
+ //!         pin_init::zeroed::<()>()
+ //!     }
+ //!
+-//!     fn queue_rq(_queue_data: (), rq: Owned<Request<Self>>, _is_last: bool) -> Result {
++//!     fn queue_rq(
++//!         _hw_data: (),
++//!         _queue_data: (),
++//!         rq: Owned<Request<Self>>,
++//!         _is_last: bool
++//!     ) -> Result {
+ //!         rq.end_ok();
+ //!         Ok(())
+ //!     }
+ //!
+-//!     fn commit_rqs(_queue_data: ()) {}
++//!     fn commit_rqs(_hw_data: (), _queue_data: ()) {}
+ //!
+ //!     fn complete(rq: ARef<Request<Self>>) {
+ //!         OwnableRefCounted::try_from_shared(rq)
+@@ -91,6 +103,13 @@
+ //!             .expect("Fatal error - expected to be able to end request")
+ //!             .end_ok();
+ //!     }
++//!
++//!     fn init_hctx(
++//!         _tagset_data: (),
++//!         _hctx_idx: u32,
++//!     ) -> Result<Self::HwData> {
++//!         Ok(())
++//!     }
+ //! }
+ //!
+ //! let tagset: Arc<TagSet<MyBlkDevice>> =
+diff --git a/rust/kernel/block/mq/operations.rs b/rust/kernel/block/mq/operations.rs
+index 9aab6240428cc..6641c340d87f4 100644
+--- a/rust/kernel/block/mq/operations.rs
++++ b/rust/kernel/block/mq/operations.rs
+@@ -44,6 +44,10 @@ pub trait Operations: Sized {
+     /// the `GenDisk` associated with this `Operations` implementation.
+     type QueueData: ForeignOwnable;
+ 
++    /// Data associated with a dispatch queue. This is stored as a pointer in
++    /// the C `struct blk_mq_hw_ctx` that represents a hardware queue.
++    type HwData: ForeignOwnable;
++
+     /// Data associated with a `TagSet`. This is stored as a pointer in `struct
+     /// blk_mq_tag_set`.
+     type TagSetData: ForeignOwnable;
+@@ -54,20 +58,30 @@ pub trait Operations: Sized {
+     /// Called by the kernel to queue a request with the driver. If `is_last` is
+     /// `false`, the driver is allowed to defer committing the request.
+     fn queue_rq(
++        hw_data: ForeignBorrowed<'_, Self::HwData>,
+         queue_data: ForeignBorrowed<'_, Self::QueueData>,
+         rq: Owned<Request<Self>>,
+         is_last: bool,
+     ) -> Result;
+ 
+     /// Called by the kernel to indicate that queued requests should be submitted.
+-    fn commit_rqs(queue_data: ForeignBorrowed<'_, Self::QueueData>);
++    fn commit_rqs(
++        hw_data: ForeignBorrowed<'_, Self::HwData>,
++        queue_data: ForeignBorrowed<'_, Self::QueueData>,
++    );
++
++    /// Called by the kernel to allocate and initialize a driver specific hardware context data.
++    fn init_hctx(
++        tagset_data: ForeignBorrowed<'_, Self::TagSetData>,
++        hctx_idx: u32,
++    ) -> Result<Self::HwData>;
+ 
+     /// Called by the kernel when the request is completed.
+     fn complete(rq: ARef<Request<Self>>);
+ 
+     /// Called by the kernel to poll the device for completed requests. Only
+     /// used for poll queues.
+-    fn poll() -> bool {
++    fn poll(_hw_data: ForeignBorrowed<'_, Self::HwData>) -> bool {
+         build_error!(crate::error::VTABLE_DEFAULT_ERROR)
+     }
+ }
+@@ -127,6 +141,11 @@ impl<T: Operations> OperationsVTable<T> {
+         let mut rq =
+             unsafe { Owned::from_raw(NonNull::<Request<T>>::new_unchecked((*bd).rq.cast())) };
+ 
++        // SAFETY: The safety requirement for this function ensure that `hctx`
++        // is valid and that `driver_data` was produced by a call to
++        // `into_foreign` in `Self::init_hctx_callback`.
++        let hw_data = unsafe { T::HwData::borrow((*hctx).driver_data) };
++
+         // SAFETY: `hctx` is valid as required by this function.
+         let queue_data = unsafe { (*(*hctx).queue).queuedata };
+ 
+@@ -140,6 +159,7 @@ impl<T: Operations> OperationsVTable<T> {
+         unsafe { rq.start_unchecked() };
+ 
+         let ret = T::queue_rq(
++            hw_data,
+             queue_data,
+             rq,
+             // SAFETY: `bd` is valid as required by the safety requirement for
+@@ -162,6 +182,10 @@ impl<T: Operations> OperationsVTable<T> {
+     /// This function may only be called by blk-mq C infrastructure. The caller
+     /// must ensure that `hctx` is valid.
+     unsafe extern "C" fn commit_rqs_callback(hctx: *mut bindings::blk_mq_hw_ctx) {
++        // SAFETY: `driver_data` was installed by us in `init_hctx_callback` as
++        // the result of a call to `into_foreign`.
++        let hw_data = unsafe { T::HwData::borrow((*hctx).driver_data) };
++
+         // SAFETY: `hctx` is valid as required by this function.
+         let queue_data = unsafe { (*(*hctx).queue).queuedata };
+ 
+@@ -170,7 +194,7 @@ impl<T: Operations> OperationsVTable<T> {
+         // `ForeignOwnable::from_foreign()` is only called when the tagset is
+         // dropped, which happens after we are dropped.
+         let queue_data = unsafe { T::QueueData::borrow(queue_data) };
+-        T::commit_rqs(queue_data)
++        T::commit_rqs(hw_data, queue_data)
+     }
+ 
+     /// This function is called by the C kernel. A pointer to this function is
+@@ -194,12 +218,18 @@ impl<T: Operations> OperationsVTable<T> {
+     ///
+     /// # Safety
+     ///
+-    /// This function may only be called by blk-mq C infrastructure.
++    /// This function may only be called by blk-mq C infrastructure. `hctx` must
++    /// be a pointer to a valid and aligned `struct blk_mq_hw_ctx` that was
++    /// previously initialized by a call to `init_hctx_callback`.
+     unsafe extern "C" fn poll_callback(
+-        _hctx: *mut bindings::blk_mq_hw_ctx,
++        hctx: *mut bindings::blk_mq_hw_ctx,
+         _iob: *mut bindings::io_comp_batch,
+     ) -> crate::ffi::c_int {
+-        T::poll().into()
++        // SAFETY: By function safety requirement, `hctx` was initialized by
++        // `init_hctx_callback` and thus `driver_data` came from a call to
++        // `into_foreign`.
++        let hw_data = unsafe { T::HwData::borrow((*hctx).driver_data) };
++        T::poll(hw_data).into()
+     }
+ 
+     /// This function is called by the C kernel. A pointer to this function is
+@@ -207,15 +237,29 @@ impl<T: Operations> OperationsVTable<T> {
+     ///
+     /// # Safety
+     ///
+-    /// This function may only be called by blk-mq C infrastructure. This
+-    /// function may only be called once before `exit_hctx_callback` is called
+-    /// for the same context.
++    /// This function may only be called by blk-mq C infrastructure.
++    /// `tagset_data` must be initialized by the initializer returned by
++    /// `TagSet::try_new` as part of tag set initialization. `hctx` must be a
++    /// pointer to a valid `blk_mq_hw_ctx` where the `driver_data` field was not
++    /// yet initialized. This function may only be called onece before
++    /// `exit_hctx_callback` is called for the same context.
+     unsafe extern "C" fn init_hctx_callback(
+-        _hctx: *mut bindings::blk_mq_hw_ctx,
+-        _tagset_data: *mut crate::ffi::c_void,
+-        _hctx_idx: crate::ffi::c_uint,
+-    ) -> crate::ffi::c_int {
+-        from_result(|| Ok(0))
++        hctx: *mut bindings::blk_mq_hw_ctx,
++        tagset_data: *mut core::ffi::c_void,
++        hctx_idx: crate::ffi::c_uint,
++    ) -> core::ffi::c_int {
++        from_result(|| {
++            // SAFETY: By the safety requirements of this function,
++            // `tagset_data` came from a call to `into_foreign` when the
++            // `TagSet` was initialized.
++            let tagset_data = unsafe { T::TagSetData::borrow(tagset_data) };
++            let data = T::init_hctx(tagset_data, hctx_idx)?;
++
++            // SAFETY: by the safety requirments of this function, `hctx` is
++            // valid for write
++            unsafe { (*hctx).driver_data = data.into_foreign().cast() };
++            Ok(0)
++        })
+     }
+ 
+     /// This function is called by the C kernel. A pointer to this function is
+@@ -223,11 +267,20 @@ impl<T: Operations> OperationsVTable<T> {
+     ///
+     /// # Safety
+     ///
+-    /// This function may only be called by blk-mq C infrastructure.
++    /// This function may only be called by blk-mq C infrastructure. `hctx` must
++    /// be a valid pointer that was previously initialized by a call to
++    /// `init_hctx_callback`. This function may be called only once after
++    /// `init_hctx_callback` was called.
+     unsafe extern "C" fn exit_hctx_callback(
+-        _hctx: *mut bindings::blk_mq_hw_ctx,
++        hctx: *mut bindings::blk_mq_hw_ctx,
+         _hctx_idx: crate::ffi::c_uint,
+     ) {
++        // SAFETY: By the safety requirements of this function, `hctx` is valid for read.
++        let ptr = unsafe { (*hctx).driver_data };
++
++        // SAFETY: By the safety requirements of this function, `ptr` came from
++        // a call to `into_foreign` in `init_hctx_callback`
++        unsafe { T::HwData::from_foreign(ptr) };
+     }
+ 
+     /// This function is called by the C kernel. A pointer to this function is
 
 -- 
 2.51.2
