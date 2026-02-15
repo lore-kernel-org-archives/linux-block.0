@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB5912DE6FF;
-	Sun, 15 Feb 2026 23:45:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E4C62DE6FF;
+	Sun, 15 Feb 2026 23:45:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771199140; cv=none; b=YacP+ZvUU7gSUuFH87wojQgaOGdfiEwZYQReU0g9ugNzlhIUrUxNBGhfvtyg6JZnnkdoDFZKVvgkkO3lijJCCsno13btq3lcRGeN1w5bWJPXVDd7Rv68dR74Y7u8xdMu3DqZrF5u6KMzvD0qPi1aUETX04fVzsQyU7S/EzkCSVE=
+	t=1771199146; cv=none; b=N1+CCTyKDXrqcqEFCuHMgxiv11ZB32K9i3blrOu5jiPN/k2J9K7Tg3gE3YT8EOnOweyODiNjpCGaemMqHS+gyxokFD7OgMljt7JBIF0iBYrX5BZ5Fe68/y6280z75XM4mUSdZKIp61oDxgCR2aAp+mDvDwN5EXl0swLc0RJS/gQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771199140; c=relaxed/simple;
-	bh=iHJebs10G3KEuSKPd64YYQzEozbVohCdh4WUvdT+gdA=;
+	s=arc-20240116; t=1771199146; c=relaxed/simple;
+	bh=SHQHcWrAr56kHNOm4L4h66Q7ENSNd//dP5BDvu4tb6M=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=us5GFfLItM3NjuyzRq1UrzkoGEoIyD/z2zJYY7fIK/JTehxk5043IO6/UVOq1RopiKd3T+ZY4l6aI1jBF5tEWxOMLbmqzEdixtv3cyG7+r7GDLqc2rkBIhyppKy8ZkM6vwsqgV/rEWgBb4Ar5xcCVs3hM+XZubU31KXeCw+ssjI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OWNqkVSp; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=da/iUjfH/eyh4tpOXW2YxR1YXzEkRJmH8RwnI1wngaCN0CHLmqxh3b18suALiAnY9+48TI3MYcDnD7f+n0fE8a5spCaR6+maZXedZ2NLi9+aFGfaowKGwVyi76O3W2S8cV2xpvVDLF+kkw8KcjIJX2x4qK9FP14gxTRZ/mUV/Ws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hPpt3LKx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OWNqkVSp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6497AC4CEF7;
-	Sun, 15 Feb 2026 23:45:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hPpt3LKx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F9D6C4CEF7;
+	Sun, 15 Feb 2026 23:45:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771199140;
-	bh=iHJebs10G3KEuSKPd64YYQzEozbVohCdh4WUvdT+gdA=;
+	s=k20201202; t=1771199145;
+	bh=SHQHcWrAr56kHNOm4L4h66Q7ENSNd//dP5BDvu4tb6M=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=OWNqkVSpuHPfeqJ1obG9KjUAge7I1l0KH3Bd4vcO7D26r2YjI5dQDpC664biAVsof
-	 LFGcoc+uoSB3f4UWDWN86wMaA+4RLjrMK04KxYVHi3HbR/g1M2+q6dJsxzwsAmUXf0
-	 MkdCMQfCPZCXbesYKg53FrD3gFepV53oCsnpLSVUlJj1CppafFHN3uj7GrdOBt7HWz
-	 gnz5pKgtMyrqfBnP12nE/1Iul/ci552vsJvYYQAyjIFfwPXI2JLXzPhnxLqcng+qQB
-	 mvptHf9cmJkdD+nYS69XoZtNMyqtb+EQ73fqh0HFSZdctdRHsTaTiX549NW1gItkDz
-	 A8JUVDBoPx4Rg==
+	b=hPpt3LKx5ODgoYvnFGDMc14a3psBUBdm8tStjS5YgTVFEr+gtMc//bnKnabcdQdT7
+	 I/rS6+/EcCG5iTAq6a3lk6rDMPGzsyC3TYYaS3t9M259/FDw1QplubWXeerUvMD6iB
+	 LN6k+te+eC0yHj4VBoMBMMe6PaNnSxdaxBM+B5kfQyWawcr5LgZYkb3mDy5w8NOaGV
+	 3wTNcFGqxqwLhPg9ZriKTYgMaud9NlUCz3brhRzVgXWpRYBO5nYRKmwGXvxWSAw7e/
+	 IESujoisZqCNTtgdFy275L4lm7V5YNO6V+Rxs5YgWRrNr2S6AlI9Z7rG7FFLVOfEM8
+	 ArP9h9+gYnmSA==
 From: Andreas Hindborg <a.hindborg@kernel.org>
-Date: Mon, 16 Feb 2026 00:35:51 +0100
-Subject: [PATCH 64/79] block: rust: add an abstraction for `struct rq_list`
+Date: Mon, 16 Feb 2026 00:35:40 +0100
+Subject: [PATCH 53/79] block: rnull: add polled completion support
 Precedence: bulk
 X-Mailing-List: linux-block@vger.kernel.org
 List-Id: <linux-block.vger.kernel.org>
@@ -37,7 +37,7 @@ List-Unsubscribe: <mailto:linux-block+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260216-rnull-v6-19-rc5-send-v1-64-de9a7af4b469@kernel.org>
+Message-Id: <20260216-rnull-v6-19-rc5-send-v1-53-de9a7af4b469@kernel.org>
 References: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 In-Reply-To: <20260216-rnull-v6-19-rc5-send-v1-0-de9a7af4b469@kernel.org>
 To: Boqun Feng <boqun.feng@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
@@ -56,211 +56,315 @@ Cc: linux-block@vger.kernel.org, rust-for-linux@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
  Andreas Hindborg <a.hindborg@kernel.org>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=6135; i=a.hindborg@kernel.org;
- h=from:subject:message-id; bh=iHJebs10G3KEuSKPd64YYQzEozbVohCdh4WUvdT+gdA=;
- b=kA0DAAoB4bgaPnkoY3cByyZiAGmSWFWjeowTsFEiINSqulAD21O5tLcZBRTLEu7+cvl0taWOq
- YkCMwQAAQoAHRYhBBLB+UdWv3wqFdbAEuG4Gj55KGN3BQJpklhVAAoJEOG4Gj55KGN3uDQQAK5S
- TJnyt6251s9+e3u70mSgIM2EB4xbkhZPSh2nxTo3lEp8w82guHRW0t/howvgJ3nj9a6w4XCwEb+
- AV1gxbGx40380Hc0c3wU9N+z4qG5PXCNGGOHSd+OEnl5gVXZnZZtbbVSveZ79khqvzcTJ3gz7d0
- 7UIWol335/lElOkzzPm/gSQKxUSKOcIt2H+VozTRfqpok96aJx89/jI9g7tI4goDwEh00tbcchK
- PpHQ0APkpbh09Kb81cZ0I/SXBMWttrK3oF3P8eio0mjOLmq7Eh2Dhvs1kB1OZd3LbsUHXb0xDCa
- WJEanZ2sRkFI8QAVA5/6loJIUgo1joWAaMu2oUIbvIp5FAlKy2p/crJIYU+hdKE7pm8O+VNmqps
- rW7N1XxuiUFlFp2SQwlKbxmnshbAz7OvnLl1LvvYfdfv7BQMCIzjBRfdExGQl28u6kCiN2o8YDS
- dDkxJ+d/dydjryyzj7Mr444ULi3Cl73k+OAm09roYSf9gxMKYBkO2gExZsIg4B0WqdUA5GUkYXi
- cJn5wgLNpae6d8gxQ7y8KXFpa87YWXO2bxdWn3efgB/cERasAm6EG5izcBgz/WEFLSksxZJsS79
- 0TL1iD3sJOhx1/dvbZBCVV3oHa/xp6OnRG/JFWt31mFFA0+/9upKGkRAW0okHMgaq2tWDEcgTy1
- Cv3+C
+X-Developer-Signature: v=1; a=openpgp-sha256; l=10872;
+ i=a.hindborg@kernel.org; h=from:subject:message-id;
+ bh=SHQHcWrAr56kHNOm4L4h66Q7ENSNd//dP5BDvu4tb6M=;
+ b=owEBbQKS/ZANAwAKAeG4Gj55KGN3AcsmYgBpklhLjsQPQorh27YF42h7pD7jlkOf1PFHTBR0u
+ 3TI7UoofBKJAjMEAAEKAB0WIQQSwflHVr98KhXWwBLhuBo+eShjdwUCaZJYSwAKCRDhuBo+eShj
+ d/KSD/0Rq9t9OnKDySf4+B2ol8H/EOjSF++wjSDKMA6Gpxss08a0mQWIH/LyS47nXEwmBggaUy9
+ tu/RxjMv0xAtNqMH+77fDnl4wQ6Mz71L75tvo5/bdr+r0XqtDpMFSz9/ORtahkvxnUh/fvZaPFi
+ Kw9SMbHJLN7zdXYv3lmjmxORRblYVtx9wjy7fSkr1VIqgXlmF2PdImQjOj/3CiR1dvKRPrxBRTb
+ jg/e3bw0Bylhy3p9JdQDWy45aS+y2Efo87I0xdwGJFHq66oC0imdKawYcAKJWVxN5uLYRaa8yPY
+ DuKjEvfrHiFWnoVf/taQxtIOObpyTuEm9WFZQcc5ab/Bn6Y8c+E3cpmvHfNxZh8XRvElSrOs8gr
+ g+gCRZ5xRBC7ttW7aJ452Nasv/Jjj5nX4W0coMwiJHjCEPU1aBZ16/K6NM3xg30jvGxlwUKxPL5
+ sHAMc2ZuAWxKc98g3LwKspOP+ec5E+TCQAKUTawX0Hg91XkIiC3J7NrRmL1K9UTchJTepvhfY8X
+ IDu6hjqSwaf1UQDrbaP20U18GBNQQMuC1e8MyCBNhR88ge25oY3qeGV9Omdqw4COBKSMZtTmsZ4
+ gI6/xPGsy82TJ0P006FIq2h6Nf77XHBzaZ5tj1LD+KeI8k7C61GSP3d6nI8PPTXxRR7j9yb4mqG
+ S4rjwcR/abkmxyA==
 X-Developer-Key: i=a.hindborg@kernel.org; a=openpgp;
  fpr=3108C10F46872E248D1FB221376EB100563EF7A7
 
-Add the `RequestList` type as a safe wrapper around the C `struct
-rq_list`. This type provides methods to iterate over and manipulate
-lists of block requests, which is needed for implementing the
-`queue_rqs` callback.
-
-The abstraction includes methods for popping requests from the list,
-checking if the list is empty, and peeking at the head request.
+Add support for polled I/O completion in rnull. This feature requires
+configuring poll queues via the `poll_queues` attribute.
 
 Signed-off-by: Andreas Hindborg <a.hindborg@kernel.org>
 ---
- rust/helpers/blk.c                   |  26 ++++++++
- rust/kernel/block/mq.rs              |   2 +
- rust/kernel/block/mq/request_list.rs | 113 +++++++++++++++++++++++++++++++++++
- 3 files changed, 141 insertions(+)
+ drivers/block/rnull/configfs.rs |  19 +++++-
+ drivers/block/rnull/rnull.rs    | 130 ++++++++++++++++++++++++++++++++++++----
+ 2 files changed, 136 insertions(+), 13 deletions(-)
 
-diff --git a/rust/helpers/blk.c b/rust/helpers/blk.c
-index 91b72131a04cd..0db567dfc5d53 100644
---- a/rust/helpers/blk.c
-+++ b/rust/helpers/blk.c
-@@ -27,3 +27,29 @@ bool rust_helper_blk_mq_add_to_batch(struct request *req,
- {
- 	return blk_mq_add_to_batch(req, iob, is_error, complete);
- }
-+
-+__rust_helper struct request *rust_helper_rq_list_pop(struct rq_list *rl)
-+{
-+	return rq_list_pop(rl);
-+}
-+
-+__rust_helper int rust_helper_rq_list_empty(const struct rq_list *rl)
-+{
-+	return rq_list_empty(rl);
-+}
-+
-+__rust_helper void rust_helper_rq_list_add_tail(struct rq_list *rl,
-+						struct request *rq)
-+{
-+	rq_list_add_tail(rl, rq);
-+}
-+
-+__rust_helper void rust_helper_rq_list_init(struct rq_list *rl)
-+{
-+	rq_list_init(rl);
-+}
-+
-+__rust_helper struct request *rust_helper_rq_list_peek(struct rq_list *rl)
-+{
-+	return rq_list_peek(rl);
-+}
-diff --git a/rust/kernel/block/mq.rs b/rust/kernel/block/mq.rs
-index b36112f7b22b9..786c32f2cb56c 100644
---- a/rust/kernel/block/mq.rs
-+++ b/rust/kernel/block/mq.rs
-@@ -129,6 +129,7 @@
- pub mod gen_disk;
- mod operations;
- mod request;
-+mod request_list;
- mod request_queue;
- pub mod tag_set;
+diff --git a/drivers/block/rnull/configfs.rs b/drivers/block/rnull/configfs.rs
+index 0873d696f80f6..e134e21a6b564 100644
+--- a/drivers/block/rnull/configfs.rs
++++ b/drivers/block/rnull/configfs.rs
+@@ -71,7 +71,7 @@ impl AttributeOperations<0> for Config {
+         writer.write_str(
+             "blocksize,size,rotational,irqmode,completion_nsec,memory_backed\
+              submit_queues,use_per_node_hctx,discard,blocking,shared_tags,\
+-             zoned,zone_size,zone_capacity\n",
++             zoned,zone_size,zone_capacity,poll_queues\n",
+         )?;
+         Ok(writer.bytes_written())
+     }
+@@ -117,6 +117,7 @@ fn make_group(
+                 zone_max_open: 24,
+                 zone_max_active: 25,
+                 zone_append_max_sectors: 26,
++                poll_queues: 27,
+             ],
+         };
  
-@@ -141,6 +142,7 @@
- pub use request::IdleRequest;
- pub use request::Request;
- pub use request::RequestTimerHandle;
-+pub use request_list::RequestList;
- pub use request_queue::RequestQueue;
- pub use tag_set::QueueType;
- pub use tag_set::TagSet;
-diff --git a/rust/kernel/block/mq/request_list.rs b/rust/kernel/block/mq/request_list.rs
-new file mode 100644
-index 0000000000000..60284d9ef6c9c
---- /dev/null
-+++ b/rust/kernel/block/mq/request_list.rs
-@@ -0,0 +1,113 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+use core::marker::PhantomData;
-+
-+use crate::{owned::Owned, types::Opaque};
-+
-+use super::{IdleRequest, Operations};
-+
-+/// A list of [`Request`].
-+///
-+/// # INVARIANTS
-+///
-+/// - `self.inner` is always a valid list, meaning the `next` and `prev`
-+///   pointers point to valid requests, or are both null.
-+/// - All requests in the list are valid for use as `IdleRequest<T>`.
-+#[repr(transparent)]
-+pub struct RequestList<T: Operations> {
-+    inner: Opaque<bindings::rq_list>,
-+    _p: PhantomData<T>,
-+}
-+
-+impl<T: Operations> RequestList<T> {
-+    /// Create a new [`RequestList`].
-+    pub fn new() -> Self {
-+        let this = Self {
-+            inner: Opaque::zeroed(),
-+            _p: PhantomData,
-+        };
-+
-+        // NOTE: We are actually good to go, but we call the C initializer for forward
-+        // compatibility.
-+        // SAFETY: `this.inner` is a valid allocation for use as `bindings::rq_list!.
-+        unsafe { bindings::rq_list_init(this.inner.get()) }
-+
-+        //INVARIANT: `self.inner` was initialized above and is empty.
-+        this
-+    }
-+
-+    /// Create a mutable reference to a [`RequestList`] from a raw pointer.
-+    ///
-+    /// # SAFETY
-+    /// - The list pointed to by `ptr` must satisfy the invariants of `Self`.
-+    /// - The list pointed to by `ptr` must remain valid for use as a mutable reference for the
-+    ///   duration of `'a`.
-+    pub unsafe fn from_raw<'a>(ptr: *mut bindings::rq_list) -> &'a mut Self {
-+        // SAFETY:
-+        // - RequestList is transparent.
-+        // - By function safety requirements, `ptr` is valid for us as a mutable reference.
-+        unsafe { &mut (*ptr.cast()) }
-+    }
-+
-+    /// Check if the list is empty.
-+    pub fn empty(&self) -> bool {
-+        // SAFETY: By type invariant, self.inner is valid.
-+        let ret = unsafe { bindings::rq_list_empty(self.inner.get()) };
-+        ret != 0
-+    }
-+
-+    /// Pop a request from the list.
-+    ///
-+    /// Returns [`None`] if the list is empty.
-+    pub fn pop(&mut self) -> Option<Owned<IdleRequest<T>>> {
-+        // SAFETY: By type invariant `self.inner` is a valid list.
-+        let ptr = unsafe { bindings::rq_list_pop(self.inner.get()) };
-+
-+        if !ptr.is_null() {
-+            // SAFETY: If `rq_list_pop` returns a non-null pointer, it points to a valid request. By
-+            // type invariant all requests in this list are valid for use as `IdleRequest`.
-+            Some(unsafe { IdleRequest::from_raw(ptr) })
+@@ -156,6 +157,7 @@ fn make_group(
+                     zone_max_open: 0,
+                     zone_max_active: 0,
+                     zone_append_max_sectors: u32::MAX,
++                    poll_queues: 0,
+                 }),
+             }),
+             core::iter::empty(),
+@@ -231,6 +233,7 @@ struct DeviceConfigInner {
+     zone_max_open: u32,
+     zone_max_active: u32,
+     zone_append_max_sectors: u32,
++    poll_queues: u32,
+ }
+ 
+ #[vtable]
+@@ -281,6 +284,7 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+                 zone_max_open: guard.zone_max_open,
+                 zone_max_active: guard.zone_max_active,
+                 zone_append_max_sectors: guard.zone_append_max_sectors,
++                poll_queues: guard.poll_queues,
+             })?);
+             guard.powered = true;
+         } else if guard.powered && !power_op {
+@@ -510,3 +514,16 @@ fn store(this: &DeviceConfig, page: &[u8]) -> Result {
+ configfs_simple_field!(DeviceConfig, 24, zone_max_open, u32);
+ configfs_simple_field!(DeviceConfig, 25, zone_max_active, u32);
+ configfs_simple_field!(DeviceConfig, 26, zone_append_max_sectors, u32);
++configfs_simple_field!(
++    DeviceConfig,
++    27,
++    poll_queues,
++    u32,
++    check | value | {
++        if value > kernel::num_possible_cpus() {
++            Err(kernel::error::code::EINVAL)
 +        } else {
-+            None
++            Ok(())
 +        }
 +    }
-+
-+    /// Push a request on the tail of the list.
-+    pub fn push_tail(&mut self, rq: Owned<IdleRequest<T>>) {
-+        let ptr = rq.as_raw();
-+        core::mem::forget(rq);
-+        // INVARIANT: rq is an `IdleRequest<T>`.
-+        // SAFETY: By type invariant, `self.inner` is a valid list.
-+        unsafe { bindings::rq_list_add_tail(self.inner.get(), ptr) };
-+    }
-+
-+    /// Peek at the head of the list.
-+    ///
-+    /// Returns a null pointer if the list is empty.
-+    pub fn peek_raw(&self) -> *mut bindings::request {
-+        // SAFETY: By type invariant, `self.inner` is a valid list.
-+        unsafe { bindings::rq_list_peek(self.inner.get()) }
-+    }
++);
+diff --git a/drivers/block/rnull/rnull.rs b/drivers/block/rnull/rnull.rs
+index 765bbc8101d10..92e75f15e02c6 100644
+--- a/drivers/block/rnull/rnull.rs
++++ b/drivers/block/rnull/rnull.rs
+@@ -33,6 +33,7 @@
+                 GenDisk,
+                 GenDiskRef, //
+             },
++            IoCompletionBatch,
+             Operations,
+             TagSet, //
+         },
+@@ -188,6 +189,10 @@
+             default: 0,
+             description: "Maximum size of a zone append command (in 512B sectors). Specify 0 for no zone append.",
+         },
++        poll_queues: u32 {
++            default: 0,
++            description: "Number of IOPOLL submission queues.",
++        },
+     },
+ }
+ 
+@@ -244,6 +249,7 @@ fn init(_module: &'static ThisModule) -> impl PinInit<Self, Error> {
+                     zone_max_open: *module_parameters::zone_max_open.value(),
+                     zone_max_active: *module_parameters::zone_max_active.value(),
+                     zone_append_max_sectors: *module_parameters::zone_append_max_sectors.value(),
++                    poll_queues: *module_parameters::poll_queues.value(),
+                 })?;
+                 disks.push(disk, GFP_KERNEL)?;
+             }
+@@ -291,6 +297,7 @@ struct NullBlkOptions<'a> {
+     zone_max_active: u32,
+     #[cfg_attr(not(CONFIG_BLK_DEV_ZONED), expect(unused_variables))]
+     zone_append_max_sectors: u32,
++    poll_queues: u32,
+ }
+ 
+ static SHARED_TAG_SET: SetOnce<Arc<TagSet<NullBlkDevice>>> = SetOnce::new();
+@@ -348,6 +355,7 @@ fn new(options: NullBlkOptions<'_>) -> Result<Arc<GenDisk<Self>>> {
+             zone_max_open,
+             zone_max_active,
+             zone_append_max_sectors,
++            poll_queues,
+         } = options;
+ 
+         let mut flags = mq::tag_set::Flags::default();
+@@ -369,7 +377,21 @@ fn new(options: NullBlkOptions<'_>) -> Result<Arc<GenDisk<Self>>> {
+ 
+         let tagset_ctor = || -> Result<Arc<_>> {
+             Arc::pin_init(
+-                TagSet::new(submit_queues, (), hw_queue_depth, 1, home_node, flags),
++                TagSet::new(
++                    submit_queues + poll_queues,
++                    KBox::new(
++                        NullBlkTagsetData {
++                            queue_depth: hw_queue_depth,
++                            submit_queue_count: submit_queues,
++                            poll_queue_count: poll_queues,
++                        },
++                        GFP_KERNEL,
++                    )?,
++                    hw_queue_depth,
++                    if poll_queues == 0 { 1 } else { 3 },
++                    home_node,
++                    flags,
++                ),
+                 GFP_KERNEL,
+             )
+         };
+@@ -685,6 +707,7 @@ fn run(
+ 
+ struct HwQueueContext {
+     page: Option<KBox<disk_storage::NullBlockPage>>,
++    poll_queue: kernel::ringbuffer::RingBuffer<Owned<mq::Request<NullBlkDevice>>>,
+ }
+ 
+ #[pin_data]
+@@ -713,11 +736,17 @@ impl HasHrTimer<Self> for Pdu {
+     }
+ }
+ 
++struct NullBlkTagsetData {
++    queue_depth: u32,
++    submit_queue_count: u32,
++    poll_queue_count: u32,
 +}
 +
-+impl<T: Operations> Default for RequestList<T> {
-+    fn default() -> Self {
-+        Self::new()
-+    }
-+}
+ #[vtable]
+ impl Operations for NullBlkDevice {
+     type QueueData = Arc<Self>;
+     type RequestData = Pdu;
+-    type TagSetData = ();
++    type TagSetData = KBox<NullBlkTagsetData>;
+     type HwData = Pin<KBox<SpinLock<HwQueueContext>>>;
+ 
+     fn new_request_data() -> impl PinInit<Self::RequestData> {
+@@ -733,7 +762,7 @@ fn queue_rq(
+         this: ArcBorrow<'_, Self>,
+         rq: Owned<mq::IdleRequest<Self>>,
+         _is_last: bool,
+-        _is_poll: bool,
++        is_poll: bool,
+     ) -> BlkResult {
+         if this.bandwidth_limit != 0 {
+             if !this.bandwidth_timer.active() {
+@@ -770,13 +799,29 @@ fn queue_rq(
+         #[cfg(not(CONFIG_BLK_DEV_ZONED))]
+         this.handle_regular_command(&hw_data, &mut rq)?;
+ 
+-        match this.irq_mode {
+-            IRQMode::None => Self::end_request(rq),
+-            IRQMode::Soft => mq::Request::complete(rq.into()),
+-            IRQMode::Timer => {
+-                OwnableRefCounted::into_shared(rq)
+-                    .start(this.completion_time)
+-                    .dismiss();
++        if is_poll {
++            // NOTE: We lack the ability to insert `Owned<Request>` into a
++            // `kernel::list::List`, so we use a `RingBuffer` instead. The
++            // drawback of this is that we have to allocate the space for the
++            // ring buffer during drive initialization, and we have to hold the
++            // lock protecting the list until we have processed all the requests
++            // in the list. Change to a linked list when the kernel gets this
++            // ability.
 +
-+impl<T: Operations> Drop for RequestList<T> {
-+    fn drop(&mut self) {
-+        while let Some(rq) = self.pop() {
-+            drop(rq)
++            // NOTE: We are processing requests during submit rather than during
++            // poll. This is different from C driver. C driver does processing
++            // during poll.
++
++            hw_data.lock().poll_queue.push_head(rq)?;
++        } else {
++            match this.irq_mode {
++                IRQMode::None => Self::end_request(rq),
++                IRQMode::Soft => mq::Request::complete(rq.into()),
++                IRQMode::Timer => {
++                    OwnableRefCounted::into_shared(rq)
++                        .start(this.completion_time)
++                        .dismiss();
++                }
+             }
+         }
+         Ok(())
+@@ -784,8 +829,39 @@ fn queue_rq(
+ 
+     fn commit_rqs(_hw_data: Pin<&SpinLock<HwQueueContext>>, _queue_data: ArcBorrow<'_, Self>) {}
+ 
+-    fn init_hctx(_tagset_data: (), _hctx_idx: u32) -> Result<Self::HwData> {
+-        KBox::pin_init(new_spinlock!(HwQueueContext { page: None }), GFP_KERNEL)
++    fn poll(
++        hw_data: Pin<&SpinLock<HwQueueContext>>,
++        _this: ArcBorrow<'_, Self>,
++        batch: &mut IoCompletionBatch<Self>,
++    ) -> Result<bool> {
++        let mut guard = hw_data.lock();
++        let mut completed = false;
++
++        while let Some(rq) = guard.poll_queue.pop_tail() {
++            let status = rq.data_ref().error.load(ordering::Relaxed);
++            rq.data_ref().error.store(0, ordering::Relaxed);
++
++            // TODO: check error handling via status
++            if let Err(rq) = batch.add_request(rq, status != 0) {
++                Self::end_request(rq);
++            }
++
++            completed = true;
 +        }
-+    }
-+}
 +
-+impl<T: Operations> Iterator for &mut RequestList<T> {
-+    type Item = Owned<IdleRequest<T>>;
-+
-+    fn next(&mut self) -> Option<Self::Item> {
-+        self.pop()
++        Ok(completed)
 +    }
-+}
++
++    fn init_hctx(tagset_data: &NullBlkTagsetData, _hctx_idx: u32) -> Result<Self::HwData> {
++        KBox::pin_init(
++            new_spinlock!(HwQueueContext {
++                page: None,
++                poll_queue: kernel::ringbuffer::RingBuffer::new(
++                    tagset_data.queue_depth.try_into()?
++                )?,
++            }),
++            GFP_KERNEL,
++        )
+     }
+ 
+     fn complete(rq: ARef<mq::Request<Self>>) {
+@@ -805,4 +881,34 @@ fn report_zones(
+     ) -> Result<u32> {
+         Self::report_zones_internal(disk, sector, nr_zones, callback)
+     }
++
++    fn map_queues(tag_set: Pin<&mut TagSet<Self>>) {
++        let mut submit_queue_count = tag_set.data().submit_queue_count;
++        let mut poll_queue_count = tag_set.data().poll_queue_count;
++
++        if tag_set.hw_queue_count() != submit_queue_count + poll_queue_count {
++            pr_warn!(
++                "tag set has unexpected hardware queue count: {}\n",
++                tag_set.hw_queue_count()
++            );
++            submit_queue_count = 1;
++            poll_queue_count = 0;
++        }
++
++        let mut offset = 0;
++        tag_set
++            .update_maps(|mut qmap| {
++                use mq::QueueType::*;
++                let queue_count = match qmap.kind() {
++                    Default => submit_queue_count,
++                    Read => 0,
++                    Poll => poll_queue_count,
++                };
++                qmap.set_queue_count(queue_count);
++                qmap.set_offset(offset);
++                offset += queue_count;
++                qmap.map_queues();
++            })
++            .unwrap()
++    }
+ }
 
 -- 
 2.51.2
